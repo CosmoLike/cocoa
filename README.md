@@ -6,8 +6,6 @@
 
   - [Cocoa](https://github.com/CosmoLike/cocoa) (Private)
 
-    **The cocoa repository contains the main Cobaya code, including the installation scripts**. It does not require [Git LFS](https://git-lfs.github.com) to be cloned correctly, because it does not include large data files by design.
-
 # Installation
 
 ## Cloning the Repository
