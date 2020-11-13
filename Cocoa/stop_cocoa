@@ -20,7 +20,7 @@ if [ -n "${OLD_PATH}" ]; then
     unset OLD_PATH
 fi
 
-source ./scripts/impl_unset_keys.sh
+source ./installation_scripts/impl_unset_keys.sh
 unset ROOTDIR
 unset SETUP_COBAYA
 unset SETUP_PREREQUISITE_DONE

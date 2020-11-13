@@ -1,7 +1,11 @@
-timing: True
-debug: True
-stop_at_error: True
-
+theory:
+  camb:
+    path: ./external_modules/code/CAMB
+    use_renames: true
+    extra_args:
+      AccuracyBoost: 1.1
+      num_massive_neutrinos: 1
+      nnu: 3.046
 likelihood:
   sn.pantheon:
     path: ./external_modules/data/sn_data
@@ -11,7 +15,6 @@ likelihood:
     path: ./external_modules/data/
   bao.sdss_dr12_consensus_bao:
     path: ./external_modules/data/
-
 params:
   logA:
     prior:
@@ -43,7 +46,7 @@ params:
       max: 100
     ref:
       dist: norm
-      loc: 67.00
+      loc: 67.0
       scale: 2
     proposal: 2
     latex: H_0
@@ -79,16 +82,6 @@ params:
       scale: 0.006
     proposal: 0.003
     latex: \tau_\mathrm{reio}
-
-theory:
-  camb:
-    path: ./external_modules/code/CAMB
-    use_renames: True
-    extra_args:
-      AccuracyBoost: 1.1
-      num_massive_neutrinos: 1
-      nnu: 3.046
-
 sampler:
   evaluate:
     override:
@@ -98,5 +91,8 @@ sampler:
       omegabh2: 0.022383
       omegach2: 0.12011
       tau: 0.0543
-
-output: ../projects/example/chains/EXAMPLE_EVALUATE
+timing: true
+stop_at_error: true
+output: EXAMPLE_EVALUATE
+packages_path: null
+test: false
