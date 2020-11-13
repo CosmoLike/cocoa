@@ -1,0 +1,140 @@
+if [ -z "${ROOTDIR}" ]; then
+    echo 'ERROR ROOTDIR not define'
+    return
+fi
+if [ -z "${CXX_COMPILER}" ]; then
+    echo 'ERROR CXX_COMPILER not define'
+    return
+fi
+if [ -z "${C_COMPILER}" ]; then
+    echo 'ERROR C_COMPILER not define'
+    return
+fi
+if [ -z "${PIP3}" ]; then
+    echo 'ERROR PIP3 not define'
+    return
+fi
+if [ -z "${PYTHON3}" ]; then
+    echo 'ERROR PIP3 not define'
+    return
+fi
+
+# ----------------------------------------------------------------------------
+# ----------------------------------------------------------------------------
+# -------------------------- PIP required packages ---------------------------
+# ----------------------------------------------------------------------------
+# ----------------------------------------------------------------------------
+
+if [ -z "${IGNORE_ALL_PIP_INSTALLATION}" ]; then
+    env CXX=$CXX_COMPILER CC=$C_COMPILER $PIP3 install $ROOTDIR/../cocoa_installation_libraries/pip_cache/setuptools-46.2.0.zip --upgrade --prefix=$ROOTDIR/.local --find-links file:$ROOTDIR/../cocoa_installation_libraries/pip_cache --no-dependencies
+
+    env CXX=$CXX_COMPILER CC=$C_COMPILER $PIP3 install $ROOTDIR/../cocoa_installation_libraries/pip_cache/wheel-0.34.2.tar.gz --upgrade --prefix=$ROOTDIR/.local --find-links file:$ROOTDIR/../cocoa_installation_libraries/pip_cache --no-dependencies
+
+    env CXX=$CXX_COMPILER CC=$C_COMPILER $PIP3 install pip --upgrade --prefix=$ROOTDIR/.local --find-links file:$ROOTDIR/../cocoa_installation_libraries/pip_cache --no-index --no-dependencies
+
+    env CXX=$CXX_COMPILER CC=$C_COMPILER $PIP3 install wget --upgrade --prefix=$ROOTDIR/.local --find-links file:$ROOTDIR/../cocoa_installation_libraries/pip_cache --no-index --no-dependencies
+
+    env CXX=$CXX_COMPILER CC=$C_COMPILER $PIP3 install six --upgrade --prefix=$ROOTDIR/.local --find-links file:$ROOTDIR/../cocoa_installation_libraries/pip_cache --no-index --no-dependencies
+
+    env CXX=$CXX_COMPILER CC=$C_COMPILER $PIP3 install $ROOTDIR/../cocoa_installation_libraries/pip_cache/PGen-0.2.1.zip  --upgrade --prefix=$ROOTDIR/.local --find-links file:$ROOTDIR/../cocoa_installation_libraries/pip_cache --force
+
+    env CXX=$CXX_COMPILER CC=$C_COMPILER $PIP3 install tokenizers --upgrade --prefix=$ROOTDIR/.local --find-links file:$ROOTDIR/../cocoa_installation_libraries/pip_cache --no-index --no-dependencies
+
+    env CXX=$CXX_COMPILER CC=$C_COMPILER $PIP3 install $ROOTDIR/../cocoa_installation_libraries/pip_cache/Cython-0.29.17.tar.gz  --upgrade --prefix=$ROOTDIR/.local --find-links file:$ROOTDIR/../cocoa_installation_libraries/pip_cache --force --no-dependencies
+
+    env CXX=$CXX_COMPILER CC=$C_COMPILER $PIP3 install requests --upgrade --prefix=$ROOTDIR/.local --find-links file:$ROOTDIR/../cocoa_installation_libraries/pip_cache --no-index --no-dependencies
+
+    env CXX=$CXX_COMPILER CC=$C_COMPILER $PIP3 install urllib3 --upgrade --prefix=$ROOTDIR/.local --find-links file:$ROOTDIR/../cocoa_installation_libraries/pip_cache --no-index --no-dependencies
+
+    env CXX=$CXX_COMPILER CC=$C_COMPILER $PIP3 install chardet --upgrade --prefix=$ROOTDIR/.local --find-links file:$ROOTDIR/../cocoa_installation_libraries/pip_cache --no-index --no-dependencies
+
+    env CXX=$CXX_COMPILER CC=$C_COMPILER $PIP3 install certifi --upgrade --prefix=$ROOTDIR/.local --find-links file:$ROOTDIR/../cocoa_installation_libraries/pip_cache --no-index --no-dependencies
+
+    env CXX=$CXX_COMPILER CC=$C_COMPILER $PIP3 install idna --upgrade --prefix=$ROOTDIR/.local --find-links file:$ROOTDIR/../cocoa_installation_libraries/pip_cache --no-index --no-dependencies
+
+    env CXX=$CXX_COMPILER CC=$C_COMPILER $PIP3 install python-dateutil --upgrade --prefix=$ROOTDIR/.local --find-links file:$ROOTDIR/../cocoa_installation_libraries/pip_cache --no-index --no-dependencies
+
+    env CXX=$CXX_COMPILER CC=$C_COMPILER $PIP3 install pytz --upgrade --prefix=$ROOTDIR/.local --find-links file:$ROOTDIR/../cocoa_installation_libraries/pip_cache --no-index --no-dependencies
+
+    if [ -z "${IGNORE_OPENBLAS_INSTALLATION}" ]; then
+        cd $ROOTDIR/../cocoa_installation_libraries/pip_cache/numpy_openblas
+
+        cp site.cfg.example site.cfg
+        sed --in-place --regexp-extended  "s@library_dirs(\s{1,})=(\s{1,})XXX@library_dirs = $ROOTDIR/.local/lib@g" site.cfg
+        sed --in-place --regexp-extended  "s@include_dirs(\s{1,})=(\s{1,})XXX@include_dirs = $ROOTDIR/.local/include@g" site.cfg
+        sed --in-place --regexp-extended  "s@runtime_library_dirs(\s{1,})=(\s{1,})XXX@runtime_library_dirs = $ROOTDIR/.local/lib@g" site.cfg
+
+        env CXX=$CXX_COMPILER CC=$C_COMPILER FC=$FORTRAN_COMPILER $PYTHON3 setup.py config > /dev/null
+
+        env CXX=$CXX_COMPILER CC=$C_COMPILER FC=$FORTRAN_COMPILER $PYTHON3 setup.py build -j $MAKE_NUM_THREADS --force
+
+        env CXX=$CXX_COMPILER CC=$C_COMPILER FC=$FORTRAN_COMPILER $PYTHON3 setup.py install --prefix $ROOTDIR/.local > /dev/null
+
+        cd $ROOTDIR
+    else
+        env CXX=$CXX_COMPILER CC=$C_COMPILER $PIP3 install numpy --upgrade --prefix=$ROOTDIR/.local --find-links file:$ROOTDIR/../cocoa_installation_libraries/pip_cache --no-dependencies
+    fi
+
+    env CXX=$CXX_COMPILER CC=$C_COMPILER $PIP3 install mpmath --upgrade --prefix=$ROOTDIR/.local --find-links file:$ROOTDIR/../cocoa_installation_libraries/pip_cache --no-index --no-dependencies
+
+    env CXX=$CXX_COMPILER CC=$C_COMPILER $PIP3 install PyYAML --upgrade --prefix=$ROOTDIR/.local --find-links file:$ROOTDIR/../cocoa_installation_libraries/pip_cache --no-index --no-dependencies
+
+    env CXX=$CXX_COMPILER CC=$C_COMPILER $PIP3 install pyparsing --upgrade --prefix=$ROOTDIR/.local --find-links file:$ROOTDIR/../cocoa_installation_libraries/pip_cache --no-index --no-dependencies
+
+    env CXX=$CXX_COMPILER CC=$C_COMPILER $PIP3 install fuzzywuzzy --upgrade --prefix=$ROOTDIR/.local --find-links file:$ROOTDIR/../cocoa_installation_libraries/pip_cache --no-index  --no-dependencies
+
+    env CXX=$CXX_COMPILER CC=$C_COMPILER $PIP3 install cycler --upgrade --prefix=$ROOTDIR/.local --find-links file:$ROOTDIR/../cocoa_installation_libraries/pip_cache --no-index --no-dependencies
+
+    env CXX=$CXX_COMPILER CC=$C_COMPILER $PIP3 install kiwisolver --upgrade --prefix=$ROOTDIR/.local --find-links file:$ROOTDIR/../cocoa_installation_libraries/pip_cache --no-index --no-dependencies
+
+    env CXX=$CXX_COMPILER CC=$C_COMPILER $PIP3 install pillow --upgrade --prefix=$ROOTDIR/.local --find-links file:$ROOTDIR/../cocoa_installation_libraries/pip_cache --no-index --no-dependencies
+
+    if [ -z "${IGNORE_OPENBLAS_INSTALLATION}" ]; then
+        cd $ROOTDIR/../cocoa_installation_libraries/pip_cache/scipy
+
+        cp site.cfg.example site.cfg
+        sed --in-place --regexp-extended  "s@library_dirs(\s{1,})=(\s{1,})XXX@library_dirs = $ROOTDIR/.local/lib@g" site.cfg
+        sed --in-place --regexp-extended  "s@include_dirs(\s{1,})=(\s{1,})XXX@include_dirs = $ROOTDIR/.local/include@g" site.cfg
+        sed --in-place --regexp-extended  "s@runtime_library_dirs(\s{1,})=(\s{1,})XXX@runtime_library_dirs = $ROOTDIR/.local/lib@g" site.cfg
+
+        env CXX=$CXX_COMPILER CC=$C_COMPILER FC=$FORTRAN_COMPILER $PYTHON3 setup.py config > /dev/null 2> /dev/null
+
+        env C=$FORTRAN_COMPILER CXX=$CXX_COMPILER CC=$C_COMPILER FC=$FORTRAN_COMPILER $PYTHON3 setup.py build --fcompiler=gnu95 -j $MAKE_NUM_THREADS install --prefix $ROOTDIR/.local --force > /dev/null 2> /dev/null
+
+        cd $ROOTDIR
+    else
+        env CXX=$CXX_COMPILER CC=$C_COMPILER $PIP3 install scipy --upgrade --prefix=$ROOTDIR/.local --find-links file:$ROOTDIR/../cocoa_installation_libraries/pip_cache
+    fi
+
+    env CXX=$CXX_COMPILER CC=$C_COMPILER $PIP3 install sympy --upgrade --prefix=$ROOTDIR/.local --find-links file:$ROOTDIR/../cocoa_installation_libraries/pip_cache --no-index --no-dependencies
+
+    env CXX=$CXX_COMPILER CC=$C_COMPILER $PIP3 install imageio --upgrade --prefix=$ROOTDIR/.local --find-links file:$ROOTDIR/../cocoa_installation_libraries/pip_cache --no-index --no-dependencies
+
+    env CXX=$CXX_COMPILER CC=$C_COMPILER $PIP3 install pillow --upgrade --prefix=$ROOTDIR/.local --find-links file:$ROOTDIR/../cocoa_installation_libraries/pip_cache --no-index --no-dependencies
+
+    if [ -z "${IGNORE_OPENBLAS_INSTALLATION}" ]; then
+        cd $ROOTDIR/../cocoa_installation_libraries/pip_cache/pandas
+
+        env CXX=$CXX_COMPILER CC=$C_COMPILER FC=$FORTRAN_COMPILER $PYTHON3 setup.py build_ext --inplace --force -j $MAKE_NUM_THREADS > /dev/null 2> /dev/null
+
+        env CXX=$CXX_COMPILER CC=$C_COMPILER FC=$FORTRAN_COMPILER $PIP3 install -e . --no-build-isolation --no-use-pep517 --prefix=$ROOTDIR/.local --find-links file:$ROOTDIR/../cocoa_installation_libraries/pip_cache --no-index --force --no-dependencies > /dev/null 2> /dev/null
+
+        cd $ROOTDIR
+    else
+        env CXX=$CXX_COMPILER CC=$C_COMPILER $PIP3 install pandas --upgrade --prefix=$ROOTDIR/.local --find-links file:$ROOTDIR/../cocoa_installation_libraries/pip_cache --no-index --no-dependencies
+    fi
+
+    env CXX=$CXX_COMPILER CC=$C_COMPILER $PIP3 install mpi4py --upgrade --prefix=$ROOTDIR/.local --find-links file:$ROOTDIR/../cocoa_installation_libraries/pip_cache --no-index --no-dependencies
+
+    env CXX=$CXX_COMPILER CC=$C_COMPILER $PIP3 install py-bobyqa --upgrade --prefix=$ROOTDIR/.local --find-links file:$ROOTDIR/../cocoa_installation_libraries/pip_cache --no-index --no-dependencies
+
+    env CXX=$CXX_COMPILER CC=$C_COMPILER $PIP3 install matplotlib --upgrade --prefix=$ROOTDIR/.local --find-links file:$ROOTDIR/../cocoa_installation_libraries/pip_cache --no-index --no-dependencies
+
+    env CXX=$CXX_COMPILER CC=$C_COMPILER $PIP3 install pybind11 --upgrade --prefix=$ROOTDIR/.local --find-links file:$ROOTDIR/../cocoa_installation_libraries/pip_cache --no-index --no-dependencies
+
+    env CXX=$CXX_COMPILER CC=$C_COMPILER $PIP3 install astropy --upgrade --prefix=$ROOTDIR/.local --find-links file:$ROOTDIR/../cocoa_installation_libraries/pip_cache --no-index --no-dependencies
+
+    env CXX=$CXX_COMPILER CC=$C_COMPILER $PIP3 install GetDist --upgrade --prefix=$ROOTDIR/.local --find-links file:$ROOTDIR/../cocoa_installation_libraries/pip_cache --no-index --no-dependencies
+
+    env CXX=$CXX_COMPILER CC=$C_COMPILER $PIP3 install pyfits --upgrade --prefix=$ROOTDIR/.local --find-links file:$ROOTDIR/../cocoa_installation_libraries/pip_cache --no-index --no-dependencies
+fi

@@ -1,0 +1,41 @@
+if [ -z "${ROOTDIR}" ]; then
+    echo 'ERROR ROOTDIR not define' 
+    return
+fi
+if [ -z "${CXX_COMPILER}" ]; then
+    echo 'ERROR CXX_COMPILER not define' 
+    return
+fi
+if [ -z "${C_COMPILER}" ]; then
+    echo 'ERROR C_COMPILER not define' 
+    return
+fi
+if [ -z "${MAKE_NUM_THREADS}" ]; then
+    echo 'ERROR MAKE_NUM_THREADS not define' 
+    return
+fi
+# ----------------------------------------------------------------------------
+# ----------------------------------------------------------------------------
+# ----------------------------- COMPILE COSMOLIKE ----------------------------
+# ----------------------------------------------------------------------------
+# ----------------------------------------------------------------------------
+
+if [ -z "${IGNORE_COSMOLIKE_COMPILATION}" ]; then 
+    cd $ROOTDIR/external_modules/code/desxplanck
+
+    make -f MakefileCobaya clean
+
+    make -j $MAKE_NUM_THREADS -f MakefileCobaya all
+
+    cd $ROOTDIR
+
+    addvar LD_LIBRARY_PATH $ROOTDIR/external_modules/code/desxplanck
+
+    addvar PYTHONPATH $ROOTDIR/external_modules/code/desxplanck
+
+    if [ -n "${COSMOLIKE_DEBUG_MODE}" ]; then
+        export SPDLOG_LEVEL=debug
+    else
+        export SPDLOG_LEVEL=info
+    fi
+fi

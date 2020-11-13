@@ -1,0 +1,386 @@
+source ./scripts/impl_unset_keys.sh
+export ROOTDIR=$PWD
+
+# ----------------------------------------------------------------------------
+# ----------------------------------------------------------------------------
+# -----------------------  OPTIONS FOR SYSTEM INSTALLATION -------------------
+# ----------------------------------------------------------------------------
+# ----------------------------------------------------------------------------
+
+#  ---------------------------------------------------------------------------
+# WHICH SUPERCOMPUTER WILL COCOA BE INSTALLED? -------------------------------
+
+#export DOCKER_INSTALLATION=1
+
+#export MIDWAY_SUPERCOMPUTER_INSTALLATION=1
+
+#export OCELOTE_SUPERCOMPUTER_INSTALLATION=1
+
+export AMYPOND_SUPERCOMPUTER_INSTALLATION=1
+
+#export PUMA_SUPERCOMPUTER_INSTALLATION=1
+
+#export MACOS_HOMEBREW_INSTALLATION=1
+
+# SEE IF/ELSE BLOCK ON LINE ~62 TO TWEAK THE MANUAL INSTALLATION
+#export MANUAL_INSTALLATION=1
+
+#export NASA_SUPERCOMPUTER_INSTALLATION=1
+
+# ----------------------------------------------------------------------------
+# ----------------------------------------------------------------------------
+# -------------------------------  OPTIONAL OPTIONS --------------------------
+# ----------------------------------------------------------------------------
+# ----------------------------------------------------------------------------
+
+# ----------------------------------------------------------------------------
+# SETUP_REQUIRED_PACKAGES SCRIPT MAY TAKE A LONG TIME - THREADING W/ 8 CORES
+# CAN SPEED IT UP TO FACTOR 2x - BUT IT REQUIRES MORE RAM --------------------
+
+export THREAD_UNXZ=1
+
+# USUALLY YOU CAN PUSH THIS TO > NUM CPUS
+export MAKE_NUM_THREADS=16
+
+# ----------------------------------------------------------------------------
+# CONTROL OVER EXTERNAL CODES ON SETUP_COCOA SCRIPT -------------------------
+
+#export IGNORE_CAMB_COMPILATION=1
+
+#export IGNORE_CLASS_COMPILATION=1
+
+#export IGNORE_COSMOLIKE_COMPILATION=1
+
+# ----------------------------------------------------------------------------
+# IF DEFINED, COSMOLIKE WILL BE COMPILED WITH DEBUG FLAG
+#   DEBUG FLAG = ALL COMPILER WARNINGS + NO MATH OPTIMIZATION + NO OPENMP
+
+#export COSMOLIKE_DEBUG_MODE=1
+
+#export IGNORE_POLYCHORD_COMPILATION=1
+
+#export IGNORE_PLANCK_COMPILATION=1
+
+# ----------------------------------------------------------------------------
+# ----------------------------------------------------------------------------
+# --------------------------- DERIVED OPTIONS  -------------------------------
+# ----------------------------------------------------------------------------
+# ----------------------------------------------------------------------------
+
+export GLOBALPYTHON3=python3
+
+export COSMOLIKE_NDEBUG_COMMON_FLAGS='-foptimize-strlen -finline-functions-called-once -fmerge-all-constants -Wno-unused-result -Wno-format-overflow -fmax-errors=1 -fthread-jumps -fcse-follow-jumps -fsplit-wide-types -fcse-skip-blocks -faggressive-loop-optimizations -fif-conversion -fif-conversion2 -fexpensive-optimizations -free -fschedule-insns -fschedule-insns2 -fsched-spec-load-dangerous -fshrink-wrap -fcaller-saves -fcombine-stack-adjustments -fipa-ra -ftree-reassoc -ftree-partial-pre -ftree-forwprop -ftree-fre -ftree-phiprop -fhoist-adjacent-loads -ftree-copy-prop -fipa-pure-const -fipa-reference -fipa-pta -fipa-profile -fipa-cp -fipa-cp-clone -fipa-icf -ftree-loop-distribution -ftree-loop-if-convert -ftree-loop-distribute-patterns -ftree-scev-cprop -ftree-parallelize-loops=4 -ftree-pta -ftree-sra -ftree-loop-vectorize -fpartial-inlining -fpredictive-commoning -fpeephole2 -fguess-branch-probability -freorder-blocks-algorithm=stc -freorder-blocks-and-partition -freorder-functions -falign-functions -falign-loops -falign-jumps -flto -fcprop-registers -funsafe-math-optimizations -fassociative-math -freciprocal-math -ffinite-math-only -fno-signed-zeros -fvpt -funroll-loops -fschedule-fusion -fpeel-loops -fmove-loop-invariants -fexcess-precision=fast -fgcse-after-reload -ftree-slp-vectorize -foptimize-sibling-calls -ffast-math -fvect-cost-model=dynamic -fvect-cost-model -funswitch-loops -ffp-contract=fast -fivopts -fopenmp'
+
+if [ -n "${MANUAL_INSTALLATION}" ]; then
+
+    export FORTRAN_COMPILER=gfortran-9
+
+    export C_COMPILER=gcc-9
+
+    export CXX_COMPILER=g++-9
+
+    #export GLOBAL_PACKAGES_LOCATION=/usr/local
+
+    export PYTHON_VERSION=3.7
+
+    # IF DEF, SCRIPT WILL NOT UPGRADE/INSTALL PYTHON3 PACKAGES
+    # PS: INSTALLATION OF PIP PACKAGES DOES NOT REQUIRE INTERNET
+    #     WE PROVIDE CACHE WITH ALL PIP PACKAGES (IN SOME SUPERCOMPUTERS
+    #     THE NODES ACCESSIBLE USING INTERACTIVE JOBS HAVE NO INTERNET)
+    #export IGNORE_ALL_PIP_INSTALLATION=1
+
+    # IF DEF, SCRIPT WILL NOT INSTALL ALL C++ PACKAGES
+    #    REQUIRED C++ PACKAGES ARE
+    #    - spdlog
+    #    - armadillo
+    #    - carma
+    #    - boost
+    #export IGNORE_CPP_INSTALLATION=1
+
+    # OPTIONAL - MORE REFINE CONTROL ON C++ PACKAGES
+    #export IGNORE_CPP_BOOST_INSTALLATION=1
+    #export IGNORE_CPP_ARMA_INSTALLATION=1
+    #export IGNORE_CPP_SPDLOG_INSTALLATION=1
+    #export IGNORE_CPP_CARMA_INSTALLATION=1
+
+    # IF DEF, SCRIPT WILL NOT INSTALL ALL C PACKAGES
+    #    REQUIRED C PACKAGES ARE
+    #    - fftw3
+    #    - cfitsio
+    #    - GSL
+    #export IGNORE_C_INSTALLATION=1
+
+    # OPTIONAL - MORE REFINE CONTROL ON C PACKAGES
+    #export IGNORE_C_CFITSIO_INSTALLATION=1
+    #export IGNORE_C_FFTW_INSTALLATION=1
+    #export IGNORE_C_GSL_INSTALLATION=1
+
+    # IF DEF, SCRIPT WILL NOT INSTALL ALL FORTRAN PACKAGES
+    #    REQUIRED FORTRAN PACKAGES ARE
+    #    - lapack version 3.9.0
+    #export IGNORE_FORTRAN_INSTALLATION=1
+
+    # IF DEF, CLEAN_ALL SCRIPT ALSO DELETE COMPILED REQUIRED PACKAGES
+    #export CLEAN_ALL_INCLUDE_REQUIRED_PACKAGES=1
+
+    # ------------------------------------------------------------------------
+    # -------------------------- RARE OPTIONS  -------------------------------
+    # ------------------------------------------------------------------------
+
+    # RARE OPTION - IF DEF, PYTHON VIRTUAL ENVIRONMENT WILL NOT LOAD SYSTEM
+    # PACKAGES. IT PROVIDES TOTAL CONTROL/ISOLATION OF THE PYTHON INSTALLATION
+    #export DONT_USE_SYSTEM_PIP_PACKAGES=1
+
+    # RARE OPTION - IF DEF, SCRIPT WON'T UNXZ `./EXTERNAL_MODULES/CODE` XZ FILES
+    #export NO_UNXZ_EXTERNAL_MODULES_CODE=1
+
+    # RARE OPTION - IF DEF, SCRIPT WON'T UNXZ ./EXTERNAL_MODULES/DATA XZ FILES
+    #export NO_UNXZ_EXTERNAL_MODULES_DATA=1
+
+    # RARE OPTION - IF DEFINED, THE SCRIPT WILL NOT INSTALL DISTUTILS PACKAGE
+    # PS: SOME SUPERCOMPUTERS HAVE NUMPY TOO OLD FOR PACKAGES SUCH AS ASTROPY
+    #     NUMPY REQUIRES OPENBLAS AND DISUTILS IS TOO OLD TO INSTALL OPENBLAS
+    #     ON SOME SUPERCOMPUTERS
+    export IGNORE_DISTUTILS_INSTALLATION=1
+
+    # RARE OPTION - IF DEFINED, THE SCRIPT WILL NOT INSTALL OPENBLAS
+    # PS: ONLY REQUIRED IF USER DOESN'T HAVE UPDATED NUMPY SOME SUPERCOMPUTERS
+    #     HAVE NUMPY TOO OLD FOR PACKAGES SUCH AS ASTROPY
+    export IGNORE_OPENBLAS_INSTALLATION=1
+
+    # RARE OPTION - IF DEFINED, THE SCRIPT WILL NOT INSTALL CMAKE
+    # PS: SOME SUPERCOMPUTERS HAVE TOO OLD CMAKE TO INSTALL REQUIRED PACKAGES
+    #export IGNORE_CMAKE_INSTALLATION=1
+
+    # RARE OPTION - IF DEFINED, THE SCRIPT WILL NOT INSTALL XZ PACKAGE
+    #export IGNORE_XZ_INSTALLATION=1
+
+elif [ -n "${DOCKER_INSTALLATION}" ]; then
+
+    export GLOBAL_PACKAGES_LOCATION=/usr/local
+    export PYTHON_VERSION=3.7
+    export FORTRAN_COMPILER=gfortran
+    export C_COMPILER=gcc
+    export CXX_COMPILER=g++
+    export GLOBALPYTHON3=python3
+
+    export IGNORE_DISTUTILS_INSTALLATION=1
+    export IGNORE_OPENBLAS_INSTALLATION=1
+    export IGNORE_XZ_INSTALLATION=1
+    export IGNORE_ALL_PIP_INSTALLATION=1
+    export IGNORE_CMAKE_INSTALLATION=1
+    export IGNORE_CPP_BOOST_INSTALLATION=1
+    export IGNORE_CPP_ARMA_INSTALLATION=1
+    export IGNORE_CPP_SPDLOG_INSTALLATION=1
+    export IGNORE_C_INSTALLATION=1
+    export IGNORE_FORTRAN_INSTALLATION=1
+
+elif [ -n "${MIDWAY_SUPERCOMPUTER_INSTALLATION}" ]; then
+
+    module unload mkl
+    module unload gcc
+    module load gcc/9.2.0
+    module load cfitsio/3
+    module load gsl/2.2.1
+    module load boost/1.68.0
+    module load armadillo/7.8
+    module load python/3.7.0
+    module load openmpi/3.1.2
+    module load fftw3/3.3.5
+    module load cmake/3.15
+
+    export PYTHON_VERSION=3.6
+    export FORTRAN_COMPILER=gfortran
+    export C_COMPILER=gcc
+    export CXX_COMPILER=g++
+
+    export IGNORE_DISTUTILS_INSTALLATION=1
+    export IGNORE_OPENBLAS_INSTALLATION=1
+    export IGNORE_XZ_INSTALLATION=1
+    export IGNORE_CMAKE_INSTALLATION=1
+    export IGNORE_CPP_BOOST_INSTALLATION=1
+    export IGNORE_CPP_ARMA_INSTALLATION=1
+    export IGNORE_C_CFITSIO_INSTALLATION=1
+    export IGNORE_C_GSL_INSTALLATION=1
+    export IGNORE_C_FFTW_INSTALLATION=1
+    export IGNORE_FORTRAN_INSTALLATION=1
+
+elif [ -n "${OCELOTE_SUPERCOMPUTER_INSTALLATION}" ]; then
+
+    module unload gcc
+    module unload openmpi
+    module unload git
+    module unload xz
+    module unload cfitsio
+    module unload gsl
+    module unload boost
+    module unload fftw3
+    module unload lapack
+    module unload intel
+    module unload gcc/7.2.0
+    module unload openmpi/gcc/3/3.1.1
+    module unload openmpi/gcc/3/3.1.4
+    module unload fftw3/openmpi/gcc/64/3.3.7
+    module unload cfitsio/3/3.450
+
+    module load gcc/7.2.0
+    module load openmpi/gcc/3/3.1.4
+    module load git/2.9
+    module load xz/5.2.2
+    module load python/3.6/3.6.5
+    module load cfitsio/3/3.450
+    module load intel/mkl/64/11.3.4/2016.4.258
+    module load boost/1/1.65.1
+    module load lapack/gcc/64/3.8.0
+
+    export PYTHON_VERSION=3.6
+    export FORTRAN_COMPILER=gfortran
+    export C_COMPILER=gcc
+    export CXX_COMPILER=g++
+
+    export IGNORE_DISTUTILS_INSTALLATION=1
+    export IGNORE_OPENBLAS_INSTALLATION=1
+    export IGNORE_XZ_INSTALLATION=1
+    export IGNORE_CPP_BOOST_INSTALLATION=1
+    export IGNORE_FORTRAN_INSTALLATION=1
+    export OCELOTE_MAKEFILE_COSMOLIKE_FLAGS=1
+
+    ulimit -s unlimited
+
+    export COSMOLIKE_NDEBUG_COMMON_FLAGS='-foptimize-strlen -finline-functions-called-once -fmerge-all-constants -Wno-unused-result -Wno-format-overflow -fmax-errors=1 -fthread-jumps -fcse-follow-jumps -fsplit-wide-types -fcse-skip-blocks -faggressive-loop-optimizations -fif-conversion -fif-conversion2 -fexpensive-optimizations -free -fschedule-insns -fschedule-insns2 -fsched-spec-load-dangerous -fshrink-wrap -fcaller-saves -fcombine-stack-adjustments -fipa-ra -ftree-reassoc -ftree-partial-pre -ftree-forwprop -ftree-fre -ftree-phiprop -fhoist-adjacent-loads -ftree-copy-prop -fipa-pure-const -fipa-reference -fipa-pta -fipa-profile -fipa-cp -fipa-cp-clone -fipa-icf -ftree-loop-distribution -ftree-loop-if-convert -ftree-loop-distribute-patterns -ftree-scev-cprop -ftree-parallelize-loops=4 -ftree-pta -ftree-sra -ftree-loop-vectorize -fpartial-inlining -fpredictive-commoning -fpeephole2 -fguess-branch-probability -freorder-blocks-algorithm=stc -freorder-blocks-and-partition -freorder-functions -falign-functions -falign-loops -falign-jumps -flto -fcprop-registers -funsafe-math-optimizations -fassociative-math -freciprocal-math -ffinite-math-only -fno-signed-zeros -fvpt -funroll-loops -fschedule-fusion -fpeel-loops -fmove-loop-invariants -fexcess-precision=fast -fgcse-after-reload -ftree-slp-vectorize -foptimize-sibling-calls -ffast-math -fvect-cost-model=dynamic -fvect-cost-model -funswitch-loops -ffp-contract=fast -fivopts -fopenmp'
+
+elif [ -n "${NASA_SUPERCOMPUTER_INSTALLATION}" ]; then
+
+    module unload gcc/8.2
+    module unload gcc/6.2
+    module unload python/2.7.15
+    module unload boost/1.62
+    module unload pkgsrc/2018Q3
+    module unload mpi-sgi/mpt
+    module unload mpi-sgi/mpt.2.12r26
+    module unload mpi-sgi/mpt.2.14r19
+    module unload mpi-sgi/mpt.2.15r20
+    module unload python3/3.7.0
+
+    module load gcc/8.2
+    module load mpi-sgi/mpt
+    module load boost/1.62
+    module load python3/3.7.0
+    module load pkgsrc/2018Q3
+
+    ulimit -s unlimited
+
+    export PYTHON_VERSION=3.7
+    export FORTRAN_COMPILER=gfortran
+    export C_COMPILER=gcc
+    export CXX_COMPILER=g++
+
+    export IGNORE_DISTUTILS_INSTALLATION=1
+    export IGNORE_XZ_INSTALLATION=1
+    export IGNORE_CPP_BOOST_INSTALLATION=1
+
+elif [ -n "${AMYPOND_SUPERCOMPUTER_INSTALLATION}" ]; then
+
+    export GLOBAL_PACKAGES_LOCATION=/usr/local
+    export PYTHON_VERSION=3
+    export FORTRAN_COMPILER=gfortran-9
+    export C_COMPILER=gcc-9
+    export CXX_COMPILER=g++-9
+
+    export IGNORE_DISTUTILS_INSTALLATION=1
+    export IGNORE_OPENBLAS_INSTALLATION=1
+    export IGNORE_XZ_INSTALLATION=1
+    export IGNORE_ALL_PIP_INSTALLATION=1
+    export IGNORE_CMAKE_INSTALLATION=1
+    export IGNORE_CPP_BOOST_INSTALLATION=1
+    export IGNORE_CPP_ARMA_INSTALLATION=1
+    export IGNORE_CPP_SPDLOG_INSTALLATION=1
+    export IGNORE_C_INSTALLATION=1
+    export IGNORE_FORTRAN_INSTALLATION=1
+
+elif [ -n "${MACOS_HOMEBREW_INSTALLATION}" ]; then
+
+    export GLOBAL_PACKAGES_LOCATION=/usr/local
+    export PYTHON_VERSION=3.7
+
+    export FORTRAN_COMPILER=gfortran-9
+    export C_COMPILER=gcc-9
+    export CXX_COMPILER=g++-9
+
+    export IGNORE_DISTUTILS_INSTALLATION=1
+    export IGNORE_OPENBLAS_INSTALLATION=1
+    export IGNORE_ALL_PIP_INSTALLATION=1
+    export IGNORE_XZ_INSTALLATION=1
+    export IGNORE_CMAKE_INSTALLATION=1
+    export IGNORE_CPP_BOOST_INSTALLATION=1
+    export IGNORE_CPP_ARMA_INSTALLATION=1
+    export IGNORE_C_INSTALLATION=1
+    export IGNORE_FORTRAN_INSTALLATION=1
+
+elif [ -n "${PUMA_SUPERCOMPUTER_INSTALLATION}" ]; then
+
+    module unload cmake
+    module unload gnu8
+    module unload python
+    module unload gsl/2.6
+    module unload openmpi3/3.1.4
+
+    module load cmake/3.15.4
+    module load gnu8/8.3.0
+    module load python/3.6/3.6.5
+    module load gsl/2.6
+    module load openmpi3/3.1.4
+
+    export GLOBALPYTHON3=python3.6
+    export PYTHON_VERSION=3.6
+
+    ulimit -s unlimited
+
+    export FORTRAN_COMPILER=gfortran
+    export C_COMPILER=gcc
+    export CXX_COMPILER=g++
+
+    export IGNORE_DISTUTILS_INSTALLATION=1
+    export IGNORE_CMAKE_INSTALLATION=1
+
+    export DONT_USE_SYSTEM_PIP_PACKAGES=1
+
+    export COSMOLIKE_NDEBUG_COMMON_FLAGS='-foptimize-strlen -finline-functions-called-once -fmerge-all-constants -Wno-unused-result -Wno-format-overflow -fmax-errors=1 -fthread-jumps -fcse-follow-jumps -fsplit-wide-types -fcse-skip-blocks -faggressive-loop-optimizations -fif-conversion -fif-conversion2 -fexpensive-optimizations -free -fschedule-insns -fschedule-insns2 -fsched-spec-load-dangerous -fshrink-wrap -fcaller-saves -fcombine-stack-adjustments -fipa-ra -ftree-reassoc -fcode-hoisting -ftree-partial-pre -ftree-forwprop -ftree-fre -ftree-phiprop -fhoist-adjacent-loads -ftree-copy-prop -fipa-pure-const -fipa-reference -fipa-pta -fipa-profile -fipa-cp -fipa-cp-clone -fipa-icf -ftree-loop-distribution -ftree-loop-if-convert -ftree-loop-distribute-patterns -floop-interchange -ftree-scev-cprop -ftree-parallelize-loops=4 -ftree-pta -ftree-sra -ftree-loop-vectorize -fpartial-inlining -fpredictive-commoning -fpeephole2 -fguess-branch-probability -freorder-blocks-algorithm=stc -freorder-blocks-and-partition -freorder-functions -falign-functions -falign-loops -falign-jumps -flto -fcprop-registers -funsafe-math-optimizations -fassociative-math -freciprocal-math -ffinite-math-only -fno-signed-zeros -fvpt -funroll-loops -fschedule-fusion -fpeel-loops -fmove-loop-invariants -fexcess-precision=fast -fgcse-after-reload -floop-unroll-and-jam -fsplit-loops -ftree-slp-vectorize -foptimize-sibling-calls -ffast-math -fvect-cost-model=dynamic -fvect-cost-model -funswitch-loops -ffp-contract=fast -march=native -fivopts -fopenmp'
+fi
+
+if [ -z "${IGNORE_CMAKE_INSTALLATION}" ]; then
+    export CMAKE_ROOT=$ROOTDIR/.local/bin/cmake
+    export CMAKE=$ROOTDIR/.local/bin/cmake
+else
+    export CMAKE=cmake
+fi
+
+if [ -n "${IGNORE_CPP_INSTALLATION}" ]; then
+    export IGNORE_CPP_BOOST_INSTALLATION=1
+    export IGNORE_CPP_ARMA_INSTALLATION=1
+    export IGNORE_CPP_SPDLOG_INSTALLATION=1
+    export IGNORE_CPP_CARMA_INSTALLATION=1
+fi
+
+if [ -n "${IGNORE_C_INSTALLATION}" ]; then
+    export IGNORE_C_CFITSIO_INSTALLATION=1
+    export IGNORE_C_FFTW_INSTALLATION=1
+    export IGNORE_C_GSL_INSTALLATION=1
+fi
+
+if [ -n "${IGNORE_FORTRAN_INSTALLATION}" ]; then
+    export IGNORE_FORTRAN_LAPACK_INSTALLATION=1
+fi
+
+if [ -n "${GLOBAL_PACKAGES_LOCATION}" ]; then
+    export GLOBAL_PACKAGES_INCLUDE=$GLOBAL_PACKAGES_LOCATION/include
+    export GLOBAL_PACKAGES_LIB=$GLOBAL_PACKAGES_LOCATION/lib
+fi
+
+if [ -z "${THREAD_UNXZ}" ]; then
+    export MAKE_NUM_THREADS=1
+fi
+
+export PIP3=$ROOTDIR/.local/bin/pip$PYTHON_VERSION
+export PYTHON3=$ROOTDIR/.local/bin/python$PYTHON_VERSION
+export COBAYA_PACKAGES_PATH=external_modules

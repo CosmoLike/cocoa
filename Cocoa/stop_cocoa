@@ -1,0 +1,27 @@
+deactivate
+
+if [ -n "${OLD_OMP_NUM_THREADS}" ]; then
+    export OMP_NUM_THREADS=$OLD_OMP_NUM_THREADS
+    unset OLD_OMP_NUM_THREADS
+fi
+
+if [ -n "${OLD_LD_LIBRARY_PATH}" ]; then
+    export LD_LIBRARY_PATH=$OLD_LD_LIBRARY_PATH
+    unset OLD_LD_LIBRARY_PATH
+fi
+
+if [ -n "${OLD_PYTHONPATH}" ]; then
+    export PYTHONPATH=$OLD_PYTHONPATH
+    unset OLD_PYTHONPATH
+fi
+
+if [ -n "${OLD_PATH}" ]; then
+    export PATH=$OLD_PATH
+    unset OLD_PATH
+fi
+
+source ./scripts/impl_unset_keys.sh
+unset ROOTDIR
+unset SETUP_COBAYA
+unset SETUP_PREREQUISITE_DONE
+unset SET_INSTALLATION_OPTIONS

@@ -1,0 +1,16 @@
+*.u2d
+.DS_Store
+*.suo
+*.user
+*.tmp
+tester_Debug
+tester_Release
+.vs/
+x64/
+Debug/
+Release/
+Debuglib/
+Releaselib/
+DebugMPI/
+ReleaseMPI/
+

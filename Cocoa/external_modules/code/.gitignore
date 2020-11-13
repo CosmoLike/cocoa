@@ -1,0 +1,8 @@
+*.o
+*.cfg
+*.pyc
+*.so
+*.pyo
+*.dSYM
+*.mod
+.DS_Store

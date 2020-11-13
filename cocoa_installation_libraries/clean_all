@@ -1,0 +1,30 @@
+rm -rf ./armadillo-9.860.2
+
+rm -rf ./binutils-2.34
+
+rm -rf ./boost_1_72_0
+
+rm -rf ./cfitsio-3.47
+
+rm -rf ./cmake-3.17.1
+
+rm -rf ./carma
+
+rm -rf ./fftw-3.3.8
+
+rm -rf ./gsl-2.6
+
+rm -rf ./lapack-3.9.0
+
+rm -rf ./lapack-build
+
+rm -rf ./OpenBLAS
+
+rm -rf  ./pip_cache
+
+rm -rf ./spdlog
+
+rm -rf ./texinfo-6.7
+
+rm -rf ./xz-5.2.5
+

@@ -1,0 +1,9 @@
+*.o
+*.cfg
+*.pyc
+*.so
+*.pyo
+*.dSYM
+*.mod
+git_etiquette_impl.sh
+.DS_Store

@@ -1,0 +1,28 @@
+if [ -z "${ROOTDIR}" ]; then
+    echo 'ERROR ROOTDIR not define'
+    return
+fi
+if [ -z "${PYTHON3}" ]; then
+    echo 'ERROR PYTHON3 not define'
+    return
+fi
+
+# ----------------------------------------------------------------------------
+# ----------------------------------------------------------------------------
+# ------------------------------- REMOVE CLASS -------------------------------
+# ----------------------------------------------------------------------------
+# ----------------------------------------------------------------------------
+
+rm $ROOTDIR/.local/lib/python$PYTHON_VERSION/site-packages/classy*
+
+cd $ROOTDIR/external_modules/code/class_public/
+
+make clean
+
+rm -f class
+
+cd ./python
+
+$PYTHON3 setup.py clean
+
+cd $ROOTDIR

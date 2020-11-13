@@ -1,0 +1,67 @@
+# ----------------------------------------------------------------------------
+# ----------------------------------------------------------------------------
+# ------------------------------ Basic Settings ------------------------------
+# ----------------------------------------------------------------------------
+# ----------------------------------------------------------------------------
+
+if [ -n "${SET_INSTALLATION_OPTIONS}" ]; then
+    source $SET_INSTALLATION_OPTIONS
+else
+    source set_installation_options
+fi
+
+source installation_scripts/clean_camb
+source installation_scripts/clean_class
+source installation_scripts/clean_cosmolike
+source installation_scripts/clean_planck
+source installation_scripts/clean_polychord
+source installation_scripts/clean_required
+
+deactivate
+
+if [ -n "${OLD_OMP_NUM_THREADS}" ]; then
+    export OMP_NUM_THREADS=$OLD_OMP_NUM_THREADS
+    unset OLD_OMP_NUM_THREADS
+fi
+
+if [ -n "${OLD_LD_LIBRARY_PATH}" ]; then
+    export LD_LIBRARY_PATH=$OLD_LD_LIBRARY_PATH
+    unset OLD_LD_LIBRARY_PATH
+fi
+
+if [ -n "${OLD_PYTHONPATH}" ]; then
+    export PYTHONPATH=$OLD_PYTHONPATH
+    unset OLD_PYTHONPATH
+fi
+
+if [ -n "${OLD_PATH}" ]; then
+    export PATH=$OLD_PATH
+    unset OLD_PATH
+fi
+
+# ----------------------------------------------------------------------------
+# ----------------------------------------------------------------------------
+# ----------------------------------------------------------------------------
+# ----------------------------------------------------------------------------
+# ----------------------------------------------------------------------------
+
+cd $ROOTDIR/external_modules
+
+find . -maxdepth 12 -name '*.pyc' -delete
+find . -maxdepth 12 -name '*.o' -delete
+find . -maxdepth 12 -name '*.pyo' -delete
+find . -maxdepth 12 -name '*.mod' -delete
+find . -maxdepth 12 -name '*.so' -delete
+find . -maxdepth 12 -name '*.a' -delete
+
+cd ./data
+
+sh clean_all.sh
+
+cd $ROOTDIR
+
+source ./installation_scripts/impl_unset_keys.sh
+unset ROOTDIR
+unset SETUP_COBAYA
+unset SETUP_PREREQUISITE_DONE
+unset SET_INSTALLATION_OPTIONS

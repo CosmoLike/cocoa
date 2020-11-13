@@ -1,0 +1,134 @@
+# ----------------------------------------------------------------------------
+# ----------------------------------------------------------------------------
+# ------------------------------ Basic Settings ------------------------------
+# ----------------------------------------------------------------------------
+# ----------------------------------------------------------------------------
+
+function addvar () {
+    local tmp="${!1}" ;
+    tmp="${tmp//:${2}:/:}" ;
+    tmp="${tmp/#${2}:/}" ;
+    tmp="${tmp/%:${2}/}" ;
+    export $1="${2}:${tmp}" ;
+}
+
+if [ -n "${SET_INSTALLATION_OPTIONS}" ]; then
+    source $SET_INSTALLATION_OPTIONS
+else
+    source set_installation_options
+fi
+
+
+if [ -n "${OMP_NUM_THREADS}" ]; then
+    export OLD_OMP_NUM_THREADS=$OMP_NUM_THREADS
+fi
+
+
+export OLD_LD_LIBRARY_PATH=$LD_LIBRARY_PATH
+
+export OLD_PYTHONPATH=$PYTHONPATH
+
+export OLD_PATH=$PATH
+
+
+# ----------------------------------------------------------------------------
+# ----------------------------------------------------------------------------
+# ---------------------- Activate Virtual Enviroment -------------------------
+# ----------------------------------------------------------------------------
+# ----------------------------------------------------------------------------
+
+source $ROOTDIR/.local/bin/activate
+
+if [ -n "${GLOBAL_PACKAGES_LOCATION}" ]; then
+addvar PYTHONPATH $GLOBAL_PACKAGES_LOCATION/lib/python$PYTHON_VERSION/site-packages
+
+addvar LD_LIBRARY_PATH $GLOBAL_PACKAGES_LOCATION/lib
+fi
+
+addvar LD_LIBRARY_PATH $ROOTDIR/.local/lib
+
+addvar PYTHONPATH $ROOTDIR/.local/lib/python$PYTHON_VERSION/site-packages
+
+addvar PYTHONPATH $ROOTDIR/.local/lib
+
+addvar PATH $ROOTDIR/.local/bin
+
+# ----------------------------------------------------------------------------
+# ----------------------------------------------------------------------------
+# --------------------------------- COSMOLIKE --------------------------------
+# ----------------------------------------------------------------------------
+# ----------------------------------------------------------------------------
+
+if [ -z "${IGNORE_COSMOLIKE_COMPILATION}" ]; then
+    if [ -n "${COSMOLIKE_DEBUG_MODE}" ]; then
+        export SPDLOG_LEVEL=debug
+    fi
+
+    addvar LD_LIBRARY_PATH $ROOTDIR/external_modules/code/des_y3
+
+    addvar PYTHONPATH $ROOTDIR/external_modules/code/des_y3
+
+    if [ -n "${COSMOLIKE_DEBUG_MODE}" ]; then
+        export SPDLOG_LEVEL=debug
+    fi
+fi
+
+
+
+# ----------------------------------------------------------------------------
+# ----------------------------------------------------------------------------
+# --------------------------------- COSMOLIKE DESxPlanck ---------------------
+# ----------------------------------------------------------------------------
+# ----------------------------------------------------------------------------
+
+if [ -z "${IGNORE_COSMOLIKE_COMPILATION}" ]; then
+    if [ -n "${COSMOLIKE_DEBUG_MODE}" ]; then
+        export SPDLOG_LEVEL=debug
+    fi
+
+    addvar LD_LIBRARY_PATH $ROOTDIR/external_modules/code/desxplanck
+
+    addvar PYTHONPATH $ROOTDIR/external_modules/code/desxplanck
+
+    if [ -n "${COSMOLIKE_DEBUG_MODE}" ]; then
+        export SPDLOG_LEVEL=debug
+    fi
+fi
+
+
+
+# ----------------------------------------------------------------------------
+# ----------------------------------------------------------------------------
+# ----------------------------- PLANCK LIKELIHOOD ----------------------------
+# ----------------------------------------------------------------------------
+# ----------------------------------------------------------------------------
+
+if [ -z "${IGNORE_PLANCK_COMPILATION}" ]; then
+    if [ -n "${CLIK_PATH}" ]; then
+        export OLD_CLIK_PATH=$CLIK_PATH
+    fi
+
+    if [ -n "${CLIK_DATA}" ]; then
+        export OLD_CLIK_DATA=$CLIK_DATA
+    fi
+
+    if [ -n "${CLIK_PLUGIN}" ]; then
+        export OLD_CLIK_PLUGIN=$CLIK_PLUGIN
+    fi
+
+    addvar LD_LIBRARY_PATH $ROOTDIR/external_modules/code/planck/plc_3.0/plc-3.01/lib
+
+    addvar PYTHONPATH $ROOTDIR/.local/lib/python/site-packages
+
+    export CLIK_PATH=$ROOTDIR/.local
+
+    export CLIK_DATA=$ROOTDIR/.local/share/clik
+
+    export CLIK_PLUGIN=rel2015
+fi
+
+
+# ----------------------------------------------------------------------------
+# ----------------------------------------------------------------------------
+# ----------------------------------------------------------------------------
+# ----------------------------------------------------------------------------

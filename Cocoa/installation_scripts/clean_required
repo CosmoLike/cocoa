@@ -1,0 +1,16 @@
+if [ -z "${ROOTDIR}" ]; then
+    echo 'ERROR ROOTDIR not define'
+    return
+fi
+
+echo 'Warning: all local required packages will be deleted'
+
+rm -rf $ROOTDIR/.local/
+
+cd $ROOTDIR/../cocoa_installation_libraries
+
+sh clean_all
+
+cd $ROOTDIR
+
+unset SETUP_PREREQUISITE_DONE

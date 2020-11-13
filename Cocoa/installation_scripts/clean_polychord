@@ -1,0 +1,22 @@
+if [ -z "${ROOTDIR}" ]; then
+    echo 'ERROR ROOTDIR not define'
+    return
+fi
+if [ -z "${PYTHON3}" ]; then
+    echo 'ERROR PYTHON3 not define'
+    return
+fi
+
+# ----------------------------------------------------------------------------
+# ----------------------------------------------------------------------------
+# ----------------------------- REMOVE POLYCHORD ------------------------------
+# ----------------------------------------------------------------------------
+# ----------------------------------------------------------------------------
+
+rm -rf $ROOTDIR/.local/lib/python3.6/site-packages/pypolychord-1.16-py3.6-linux-x86_64.egg
+
+cd $ROOTDIR/external_modules/code/PolyChordLite/
+
+make clean
+
+cd $ROOTDIR

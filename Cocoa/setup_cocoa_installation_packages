@@ -1,0 +1,110 @@
+# ----------------------------------------------------------------------------
+# ----------------------------------------------------------------------------
+# ------------------------------ Basic Settings ------------------------------
+# ----------------------------------------------------------------------------
+# ----------------------------------------------------------------------------
+
+if [ -n "${SET_INSTALLATION_OPTIONS}" ]; then
+    source $SET_INSTALLATION_OPTIONS
+else
+    source set_installation_options
+fi
+
+
+function addvar () {
+    local tmp="${!1}" ;
+    tmp="${tmp//:${2}:/:}" ;
+    tmp="${tmp/#${2}:/}" ;
+    tmp="${tmp/%:${2}/}" ;
+    export $1="${2}:${tmp}" ;
+}
+
+if [ -n "${LD_LIBRARY_PATH}" ]; then
+    export OLD_LD_LIBRARY_PATH=$LD_LIBRARY_PATH
+fi
+
+if [ -n "${PYTHONPATH}" ]; then
+    export OLD_PYTHONPATH=$PYTHONPATH
+fi
+
+if [ -n "${PATH}" ]; then
+    export OLD_PATH=$PATH
+fi
+
+# ----------------------------------------------------------------------------
+# ----------------------------------------------------------------------------
+# ---------------------- Activate Virtual Enviroment -------------------------
+# ----------------------------------------------------------------------------
+# ----------------------------------------------------------------------------
+echo 'Activating Virtual Enviroment'
+
+cd ../
+
+if [ -n "${DONT_USE_SYSTEM_PIP_PACKAGES}" ]; then
+    $GLOBALPYTHON3 -m venv $ROOTDIR/.local/
+else
+    $GLOBALPYTHON3 -m venv $ROOTDIR/.local/ --system-site-packages
+fi
+
+cd ./Cocoa
+
+source $ROOTDIR/.local/bin/activate
+
+if [ -n "${GLOBAL_PACKAGES_LOCATION}" ]; then
+addvar PYTHONPATH $GLOBAL_PACKAGES_LOCATION/lib/python$PYTHON_VERSION/site-packages
+
+addvar LD_LIBRARY_PATH $GLOBAL_PACKAGES_LOCATION/lib
+fi
+
+addvar LD_LIBRARY_PATH $ROOTDIR/.local/lib
+
+addvar PYTHONPATH $ROOTDIR/.local/lib/python$PYTHON_VERSION/site-packages
+
+addvar PYTHONPATH $ROOTDIR/.local/lib
+
+addvar PATH $ROOTDIR/.local/bin
+
+# ----------------------------------------------------------------------------
+# ----------------------------------------------------------------------------
+# ----------------------------------------------------------------------------
+# ----------------------------------------------------------------------------
+# ----------------------------------------------------------------------------
+
+source ./installation_scripts/setup_xz
+
+source ./installation_scripts/setup_decompress_files
+
+source ./installation_scripts/setup_cmake
+
+source ./installation_scripts/setup_openblas
+
+source ./installation_scripts/setup_pip_packages
+
+source ./installation_scripts/setup_cpp_packages
+
+source ./installation_scripts/setup_c_packages
+
+source ./installation_scripts/setup_fortran_packages
+
+
+# ----------------------------------------------------------------------------
+# ----------------------------------------------------------------------------
+# ----------------------------------------------------------------------------
+# ----------------------------------------------------------------------------
+# ----------------------------------------------------------------------------
+
+if [ -n "${OLD_LD_LIBRARY_PATH}" ]; then
+    export LD_LIBRARY_PATH=$OLD_LD_LIBRARY_PATH
+    unset OLD_LD_LIBRARY_PATH
+else
+    unset LD_LIBRARY_PATH
+fi
+
+if [ -n "${OLD_PYTHONPATH}" ]; then
+    export PYTHONPATH=$OLD_PYTHONPATH
+    unset OLD_PYTHONPATH
+else
+    unset PYTHONPATH
+fi
+
+source stop_cocoa

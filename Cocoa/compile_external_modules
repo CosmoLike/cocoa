@@ -1,0 +1,81 @@
+# ----------------------------------------------------------------------------
+# ----------------------------------------------------------------------------
+# ------------------------------ Basic Settings ------------------------------
+# ----------------------------------------------------------------------------
+# ----------------------------------------------------------------------------
+
+function addvar () {
+    local tmp="${!1}" ;
+    tmp="${tmp//:${2}:/:}" ;
+    tmp="${tmp/#${2}:/}" ;
+    tmp="${tmp/%:${2}/}" ;
+    export $1="${2}:${tmp}" ;
+}
+
+if [ -n "${SET_INSTALLATION_OPTIONS}" ]; then
+    source $SET_INSTALLATION_OPTIONS
+else
+    source set_installation_options
+fi
+
+if [ -n "${OMP_NUM_THREADS}" ]; then
+    export OLD_OMP_NUM_THREADS=$OMP_NUM_THREADS
+fi
+
+if [ -n "${LD_LIBRARY_PATH}" ]; then
+    export OLD_LD_LIBRARY_PATH=$LD_LIBRARY_PATH
+fi
+
+if [ -n "${PYTHONPATH}" ]; then
+    export OLD_PYTHONPATH=$PYTHONPATH
+fi
+
+if [ -n "${PATH}" ]; then
+    export OLD_PATH=$PATH
+fi
+
+# ----------------------------------------------------------------------------
+# ----------------------------------------------------------------------------
+# ---------------------- Activate Virtual Enviroment -------------------------
+# ----------------------------------------------------------------------------
+# ----------------------------------------------------------------------------
+
+source $ROOTDIR/.local/bin/activate
+
+if [ -n "${GLOBAL_PACKAGES_LOCATION}" ]; then
+addvar PYTHONPATH $GLOBAL_PACKAGES_LOCATION/lib/python$PYTHON_VERSION/site-packages
+
+addvar LD_LIBRARY_PATH $GLOBAL_PACKAGES_LOCATION/lib
+fi
+
+addvar LD_LIBRARY_PATH $ROOTDIR/.local/lib
+
+addvar PYTHONPATH $ROOTDIR/.local/lib/python$PYTHON_VERSION/site-packages
+
+addvar PYTHONPATH $ROOTDIR/.local/lib
+
+addvar PATH $ROOTDIR/.local/bin
+
+# ----------------------------------------------------------------------------
+# ----------------------------------------------------------------------------
+# ------------------------------ COMPILE COBAYA ------------------------------
+# ----------------------------------------------------------------------------
+# ----------------------------------------------------------------------------
+
+if [ -z "${IGNORE_ALL_PIP_INSTALLATION}" ]; then
+    $PIP3 install --editable cobaya --prefix=$ROOTDIR/.local --find-links file:$ROOTDIR/../cocoa_installation_libraries/pip_cache --no-index
+else
+    $PIP3 install --editable cobaya --prefix=$ROOTDIR/.local
+fi
+
+source $ROOTDIR/installation_scripts/setup_camb
+
+source $ROOTDIR/installation_scripts/setup_class
+
+source $ROOTDIR/installation_scripts/setup_cosmolike
+
+source $ROOTDIR/installation_scripts/setup_cosmolike_6x2pt
+
+source $ROOTDIR/installation_scripts/setup_polychord
+
+source $ROOTDIR/installation_scripts/setup_planck

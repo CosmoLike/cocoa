@@ -1,0 +1,51 @@
+if [ -z "${ROOTDIR}" ]; then
+    echo 'ERROR ROOTDIR not define' 
+    return
+fi
+if [ -z "${CXX_COMPILER}" ]; then
+    echo 'ERROR CXX_COMPILER not define' 
+    return
+fi
+if [ -z "${C_COMPILER}" ]; then
+    echo 'ERROR C_COMPILER not define' 
+    return
+fi
+if [ -z "${FORTRAN_COMPILER}" ]; then
+    echo 'ERROR C_COMPILER not define' 
+    return
+fi
+if [ -z "${CMAKE}" ]; then
+    echo 'ERROR CMAKE not define' 
+    return
+fi
+# ----------------------------------------------------------------------------
+# ----------------------------------------------------------------------------
+# ----------------------------- DECOMPRESS FILES ----------------------------- 
+# ----------------------------------------------------------------------------
+# ----------------------------------------------------------------------------
+
+echo 'DECOMPRESSING NECESSARY FILES - THAT MIGHT TAKE A WHILE'
+
+cd $ROOTDIR/../cocoa_installation_libraries/
+
+sh unxv_all.sh
+
+cd $ROOTDIR
+
+# files under ./external_modules/code/
+if [ -z "${NO_UNXZ_EXTERNAL_MODULES_CODE}" ]; then 
+    cd $ROOTDIR/external_modules/code/planck/code/plc_3.0/plc-3.01/src/plik/component_plugin/rel2015/
+
+    sh unxv_all.sh
+
+    cd $ROOTDIR
+fi
+
+# files under ./external_modules/data/
+if [ -z "${NO_UNXZ_EXTERNAL_MODULES_DATA}" ]; then 
+    cd $ROOTDIR/external_modules/data/
+
+    sh unxv_all.sh
+
+    cd $ROOTDIR
+fi
