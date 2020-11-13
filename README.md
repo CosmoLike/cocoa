@@ -28,27 +28,6 @@ While [Cocoa](https://github.com/CosmoLike/cocoa) and [Cocoa-Installation-Librar
 
     $ git clone https://github.com/CosmoLike/cocoa.git
 
-If [Git LFS](https://git-lfs.github.com) has not been previously installed in your machine, then type the following commands:
-
-    $ cd ./cocoa
-
-    $ cd ./git-lfs-install/linux-amd64-v2.10.0 (Linux)
-    $ cd ./git-lfs-install/darwin-amd64-v2.10.0 (MacOS)
-
-    $ sh install.sh
-
-    $ cd ../../
-
-The default prefix on `install.sh` is `$HOME/.local`. **Make sure that `$HOME/.local/bin` is added to `$PATH`**. If the user wants a different installation folder, please change line 4 of `install.sh` that reads
-
-    prefix=$HOME/.local
-
-Once [Git LFS](https://git-lfs.github.com) has been set up, [Cocoa-Installation-Libraries](https://github.com/CosmoLike/cocoa_installation_libraries), [Cocoa-External-Code](https://github.com/CosmoLike/cobaya_code) and [Cocoa-External-Data](https://github.com/CosmoLike/cobaya_data) submodules can be checkout via the command
-
-    $ sh ./git_checkout.sh
-
-PS: As explained in appendix [Git Submodules](https://github.com/CosmoLike/cocoa#git-submodules), **we provide bash scripts wrappers for common git commands**. Please refrain from utilizing git commands directly.  Users are also highly encouraged to read section [Git etiquette](https://github.com/CosmoLike/cocoa/blob/master/README.md#git-etiquette) when developing on Cocoa, as our bash scripts wrappers for common git commands have restrictions that must be understood for your local work to be safely saved.
-
 PS: We have a monthly quota of only 150 GB in bandwidth for [Git LFS](https://git-lfs.github.com) files, and therefore we ask users to use good judgment in the number of times you clone repositories with large files. See appendix [Git LFS](https://github.com/CosmoLike/cocoa/blob/master/README.md#git-lfs) for further information.
 
 ## Installation of required packages
@@ -96,13 +75,11 @@ The installation can be performed with the following commands:
 
     $ source setup_cocoa_installation_packages
 
-    $ source setup_compile_external_modules
+    $ source compile_external_modules
 
 Sourcing [setup_cocoa_installation_packages](https://github.com/CosmoLike/cocoa/blob/master/Cocoa/setup_cocoa_installation_packages) may require a long time (~hours) depending on the supercomputer environment (System Option). It is possible to speed-up installation considerably by running `source setup_cocoa_installation_packages` on an interactive node w/ 16 threads, which is especially important in HPC environments where the the script needs to install all the required packages instead of relying on system's packages (such as NASA Pleiades or UofA Puma). However, for the Docker Installation, sourcing [setup_cocoa_installation_packages](https://github.com/CosmoLike/cocoa/blob/master/Cocoa/setup_cocoa_installation_packages) should take only a few minutes.
 
-PS: Users are highly encouraged to read appendices [Further Information about the configuration files](https://github.com/CosmoLike/cocoa/blob/master/README.md#further-information-about-the-configuration-files) and [Further Information about the difference between `setup_compile_external_modules` and `start_cocoa` scripts](https://github.com/CosmoLike/cocoa/blob/master/README.md#further-information-about-the-difference-between-setup_compile_external_modules-and-start_cocoa-scripts) to learn more about the configuration files after running a few basic examples.
-
-PS: Sourcing [setup_compile_external_modules](https://github.com/CosmoLike/cocoa/blob/master/Cocoa/setup_compile_external_modules) script takes a long time, and there are ways to reduce compilation time during development. See appendix [Compiling Boltzmann, CosmoLike, and Likelihood codes](https://github.com/CosmoLike/cocoa/blob/master/README.md#compiling-boltzmann-cosmolike-and-likelihood-codes) for in-depth information on the compilation of individual modules.
+PS: Users are highly encouraged to read appendices [Further Information about the configuration files](https://github.com/CosmoLike/cocoa/blob/master/README.md#further-information-about-the-configuration-files) and [Further Information about the difference between `compile_external_modules` and `start_cocoa` scripts](https://github.com/CosmoLike/cocoa/blob/master/README.md#further-information-about-the-difference-between-compile_external_modules-and-start_cocoa-scripts) to learn more about the configuration files after running a few basic examples.
 
 ## Running Examples
 
@@ -126,27 +103,27 @@ The installation of Cocoa required packages, as well as Boltzmann and Likelihood
 
     This file has instructions on how to install packages that are required by the Cobaya Framework. [Setup_cocoa_installation_packages](https://github.com/CosmoLike/cocoa/blob/master/Cocoa/setup_cocoa_installation_packages) file also contains instructions on to uncompress [xz files](https://tukaani.org/xz/format.html) on [Cocoa-Installation-Libraries](https://github.com/CosmoLike/cocoa_installation_libraries), [Cobaya-External-Code](https://github.com/CosmoLike/cobaya_code) and [Cobaya-External-Data](https://github.com/CosmoLike/cobaya_data) submodules.
 
- - [setup_compile_external_modules](https://github.com/CosmoLike/cocoa/blob/master/Cocoa/setup_compile_external_modules)
+ - [compile_external_modules](https://github.com/CosmoLike/cocoa/blob/master/Cocoa/compile_external_modules)
 
-    This file has instructions on how to install Boltzmann, Sampler and likelihood codes that are required by the Cobaya Framework. [Setup_compile_external_modules](https://github.com/CosmoLike/cocoa/blob/master/Cocoa/setup_compile_external_modules) also contains instructions on setting up the python virtual environment.
+    This file has instructions on how to install Boltzmann, Sampler and likelihood codes that are required by the Cobaya Framework. [compile_external_modules](https://github.com/CosmoLike/cocoa/blob/master/Cocoa/compile_external_modules) also contains instructions on setting up the python virtual environment.
 
  - [start_cocoa](https://github.com/CosmoLike/cocoa/blob/master/Cocoa/start_cocoa)
     
-    This file has instructions on how to set up the Python virtual environment without performing any compilation/installation (much faster than [setup_compile_external_modules](https://github.com/CosmoLike/cocoa/blob/master/Cocoa/setup_compile_external_modules)).
+    This file has instructions on how to set up the Python virtual environment without performing any compilation/installation (much faster than [compile_external_modules](https://github.com/CosmoLike/cocoa/blob/master/Cocoa/compile_external_modules)).
     
  - [stop_cocoa](https://github.com/CosmoLike/cocoa/blob/master/Cocoa/stop_cocoa)
 
     This file has instructions on how to unset the Python virtual environment - including recovering original `$PYTHONPATH`, `$LD_LIBRARY_PATH`, and `PATH`. This script is critical if the user wants to go back and forth between multiple installations of Cocoa. It is also vital in case the user wants to unload Cocoa safely so other applications can be loaded without using the libraries located at `$ROOTDIR/.local`.
     
- - [clean_all_cocoa_installation](https://github.com/CosmoLike/cocoa/blob/master/Cocoa/clean_all_cocoa_installation)
+ - [clean_all](https://github.com/CosmoLike/cocoa/blob/master/Cocoa/clean_all)
 
     This file has instructions on how to clean keys associated with the Python virtual environment and delete the compilation of the Boltzmann, Sampler, and likelihood codes, and local installation of the required packages installed by the [setup_cocoa_installation_packages].
 
-## Further Information about the difference between [setup_compile_external_modules](https://github.com/CosmoLike/cocoa/blob/master/Cocoa/setup_compile_external_modules) and [start_cocoa](https://github.com/CosmoLike/cocoa/blob/master/Cocoa/start_cocoa) scripts
+## Further Information about the difference between [compile_external_modules](https://github.com/CosmoLike/cocoa/blob/master/Cocoa/setup_compile_external_modules) and [start_cocoa](https://github.com/CosmoLike/cocoa/blob/master/Cocoa/start_cocoa) scripts
 
 The command:
 
-    $ source setup_compile_external_modules
+    $ source compile_external_modules
 
 will compile the Cocoa framework, including Boltzmann and likelihood codes. Once the user disconnects or additional terminals are invoked, they must reload all Cocoa environment flags. To do that without recompiling Cobaya modules, execute the command:
 
@@ -366,72 +343,12 @@ Here is a list of Homebrew and pip commands that install most dependencies
 
 By no means, we want to discourage people from cloning code from their original repositories. We've included these codes as compressed [xz file format](https://tukaani.org/xz/format.html) in our repository for convenience in the initial development. The work of those authors is extraordinary, and they must be properly cited. Once all Cocoa's submodules go public, we intend to replace these files by clones to their original repositories. The same applies to all the data products and auxiliary packages we use.
 
-## Git Submodules
-[Cocoa-Installation-Libraries](https://github.com/CosmoLike/cocoa_installation_libraries), [Cobaya-External-Code](https://github.com/CosmoLike/cobaya_code) and [Cobaya-External-Data](https://github.com/CosmoLike/cobaya_data) are all [git submodules](https://git-scm.com/book/en/v2/Git-Tools-Submodules) on [Cocoa](https://github.com/CosmoLike/cocoa). Submodule is feature that allows a parent project to keep track of work done in other projects. The split of Cocoa in four repositories optimizes development time - given that users don't have to deal with a single overblown repository with many Gigabytes in size. The split also optimizes the use of our limited acquired monthly bandwidth for [Git LFS](https://git-lfs.github.com) files.
-
-[Git submodules](https://git-scm.com/book/en/v2/Git-Tools-Submodules), however, are a little tricky to maintain, and users can easily find themselves dealing with submodules that have [detached HEADs](https://stackoverflow.com/a/55570998/2472169). This error can potentially destroy the user's development work, so we advise users to avoid using git commands directly. Whenever there is the need to checkout/pull/push repositories or to add/commit files, go to the parent folder of the Cocoa repository and use the following bash commands:
-
-    $ sh ./git_checkout.sh
-
-    $ sh ./git_pull.sh
-
-    $ sh ./git_push.sh
-
-    $ sh ./git_add.sh
-
-    $ sh ./git_commit.sh
-
-    $ sh ./git_intent.sh
-
-    $ sh ./git_reset.sh
-
-    $ sh ./git_status.sh
-
-    $ sh ./git_stash.sh
-
-    $ sh ./git_stash_drop.sh
-
-    $ sh ./git_stash_pop.sh
-
-The scripts `git_intent.sh` wraps the command `git add --all --intent-to-add`. The bash commands above will minimize but not eliminate the risk of forming [detached HEADs](https://stackoverflow.com/a/55570998/2472169) on submodules. **If the user does encounter such error, then immediately run the script**
-
-    $ sh git_check_fix_detached_head.sh
-
-**from the Cocoa parent directory to avoid potential data losses**. This command creates a branch named `test` that will contain all the development work on the [detached HEADs](https://stackoverflow.com/a/55570998/2472169). `git_check_fix_detached_head.sh` also shows the differences between test and master branches. If the user agrees with them, then run the script `git_merge_test.sh` to merge test branch to master (followed by `git_delete_test.sh`). Otherwise, just run `git_delete_test.sh`. **Please, do not push test branch to the remote repository**
-
 ## Git LFS
   [Git LFS](https://git-lfs.github.com) requires Git v1.8+. We don't provide any script/file to aid the installation of the required Git package.
 
 ### Total bandwidth for Git LFS files
 
 **We have a monthly quota of only 150 GB in bandwidth for [Git LFS](https://git-lfs.github.com) files, and therefore we ask users to use good judgment in the number of times you clone repositories with large files**. The public release of Cocoa aims to replace them with bash scripts that will download such files from their original location. Some of these locations only provide limited bandwidth for downloads, and files are not compressed with the state-of-the-art [xz file format](https://tukaani.org/xz/format.html), increasing download times significantly. Cloning [Cobaya-External-Data](https://github.com/CosmoLike/cobaya_data) repository is, therefore, significantly faster. The repository also includes associated files for [CamSpec](https://arxiv.org/abs/1910.00483), [SROLL2](http://sroll20.ias.u-psud.fr) and low-l [LFI](https://arxiv.org/abs/1807.06206) CMB/[Planck](https://wiki.cosmos.esa.int/planck-legacy-archive/index.php/Main_Page) likelihoods. **Users can use `git_clean.sh` and `git_reset.sh` scripts to reset all four repositories to their original state in case some catastrophic edit is made**.
-
-## Git etiquette
-
-To avoid excessive commits associated with files that we frequently change when setting up the local installation, the default behavior in `git_commit.sh` is to
-
-  - **ignore local changes on [set_installation_options](https://github.com/CosmoLike/cocoa/blob/master/Cocoa/set_installation_options)**
-  - **ignore local changes on [setup_compile_external_modules](https://github.com/CosmoLike/cocoa/blob/master/Cocoa/setup_compile_external_modules)**
-  - **ignore local changes on [start_cocoa](https://github.com/CosmoLike/cocoa/blob/master/Cocoa/start_cocoa)**
-  - **ignore local changes on [stop_cocoa](https://github.com/CosmoLike/cocoa/blob/master/Cocoa/stop_cocoa)**
-  - **ignore local changes on [setup_cocoa_installation_packages](https://github.com/CosmoLike/cocoa/blob/master/Cocoa/setup_cocoa_installation_packages)**
-  - **ignore local changes on files that mimic git commands (ex: [git_commit.sh](https://github.com/CosmoLike/cocoa/blob/master/git_commit.sh))**
-  - **ignore local changes on previously committed .xz files (avoids accidental deletion of the files tracked by [Git LFS](https://git-lfs.github.com))**
-  - **ignore local changes on [unxv_all.sh](https://github.com/CosmoLike/cocoa_installation_libraries/blob/master/unxv_all.sh) script**
-  - **ignore local changes on example YAML files at [/Cocoa/yaml/examples](https://github.com/CosmoLike/cocoa/tree/master/Cocoa/yaml/examples)**
-  - **ignore local changes on example PBS/GetDist files at [/Cocoa/scripts](https://github.com/CosmoLike/cocoa/tree/master/Cocoa/scripts)**
-
-The repository also does the following to enforce best Git practices
-
-  - block commits of files with names that contains non-ASCII characters or whitespaces
-
-Developers may need to revoke such limitations from time to time, which can be done by setting the environment variable
-
-    export TURN_OFF_GIT_ETIQUETTE=1
-
-before running `sh git_commit.sh`. **Please be conscious of using `export TURN_OFF_GIT_ETIQUETTE=1` key when committing your changes, as it can generate lots of merge conflicts that would slow down other developers' work. After running `sh git_commit.sh`, the key `TURN_OFF_GIT_ETIQUETTE` will be unset automatically. Therefore, at every commit, `export TURN_OFF_GIT_ETIQUETTE=1` must be set to change protected files (this is annoying on purpose)**.
-
-**If one of the developers activate `export TURN_OFF_GIT_ETIQUETTE=1` to change one of the protected files, then everyone needs to activate the same key to pull and properly merge them! The behavior is annoying on purpose! The rationale of this key is to avoid changes in these files as much as possible once development stabilizes to alpha versions**.
 
 ## Compiling Boltzmann, CosmoLike and Likelihood codes
 
@@ -449,17 +366,17 @@ We understand that most users adopt either [CAMB](https://github.com/cmbant/CAMB
 
 Another way to avoid excessive compilation times during development (after running [setup_compile_external_modules](https://github.com/CosmoLike/cocoa/blob/master/Cocoa/setup_compile_external_modules) at least once)  is to use specialized keys that recompile only the specific modules the user might have changed. A few examples of such scripts are:
 
-    source ./scripts/setup_class
+    source ./installation_scripts/setup_class
 
-    source ./scripts/setup_camb
+    source ./installation_scripts/setup_camb
 
-    source ./scripts/setup_cosmolike
+    source ./installation_scripts/setup_cosmolike
 
-    source ./scripts/setup_cosmolike_6x2pt
+    source ./installation_scripts/setup_cosmolike_6x2pt
 
-    source ./scripts/setup_planck
+    source ./installation_scripts/setup_planck
 
-    source ./scripts/setup_polychord
+    source ./installation_scripts/setup_polychord
 
 
 ## Running Jupyter Notebooks inside the [Whovian-Cosmo](https://hub.docker.com/r/vivianmiranda/whovian-cosmo) container
