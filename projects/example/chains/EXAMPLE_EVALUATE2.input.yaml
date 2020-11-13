@@ -1,11 +1,26 @@
-timing: True
-debug: True
-stop_at_error: True
-
+theory:
+  camb:
+    path: ./external_modules/code/CAMB
+    use_renames: true
+    extra_args:
+      lmax: 2800
+      halofit_version: mead
+      bbn_predictor: PArthENoPE_880.2_standard.dat
+      AccuracyBoost: 1.1
+      lSampleBoost: 1.1
+      num_massive_neutrinos: 1
+      nnu: 3.046
 likelihood:
-  des_y1.shear:
-    path: ./external_modules/data/des_data
-
+  planck_2018_lowl.TT:
+    path: ./external_modules/
+  planck_2018_lowl.EE:
+    path: ./external_modules/
+  planck_2018_highl_plik.TTTEEE:
+    path: ./external_modules/
+  planck_2018_highl_plik.TTTEEE_lite:
+    path: ./external_modules/
+  planck_2018_lensing.clik:
+    path: ./external_modules/
 params:
   logA:
     prior:
@@ -37,7 +52,7 @@ params:
       max: 100
     ref:
       dist: norm
-      loc: 67.00
+      loc: 67
       scale: 2
     proposal: 2
     latex: H_0
@@ -109,17 +124,12 @@ params:
     latex: r_\mathrm{drag}
   yheused:
     latex: Y_P^\mathrm{BBN}
-
-theory:
-  camb:
-    path: ./external_modules/code/CAMB
-    stop_at_error: True
-    use_renames: True
-    extra_args:
-      AccuracyBoost: 1.1
-      num_massive_neutrinos: 1
-      nnu: 3.046
-
+  omegan:
+    derived: 'lambda omegam, omegab, omegac: omegam-omegab-omegac'
+    latex: \Omega_\mathrm{\\nu}
+  omegan2:
+    derived: 'lambda omegan, H0: omegan*(H0/100)**2'
+    latex: \Omega_\mathrm{\\nu} h^2
 sampler:
   evaluate:
     override:
@@ -129,15 +139,29 @@ sampler:
       omegabh2: 0.022383
       omegach2: 0.12011
       tau: 0.0543
-      DES_DzS1: 0.0
-      DES_DzS2: 0.0
-      DES_DzS3: 0.0
-      DES_DzS4: 0.0
-      DES_m1: 0.0
-      DES_m2: 0.0
-      DES_m3: 0.0
-      DES_m4: 0.0
-      DES_AIA: 1.0
-      DES_alphaIA: 1.0
-
-output: ../projects/example/chains/EXAMPLE_EVALUATE4
+      A_planck: 1.0
+      calib_100T: 0.9987983397505178
+      calib_217T: 0.9987920200754659
+      A_cib_217: 65.73042744689862
+      xi_sz_cib: 0.014846669030139295
+      A_sz: 7.578566683767703
+      ksz_norm: 1.830268477586373
+      gal545_A_100: 7.125299946661039
+      gal545_A_143: 8.131426090291662
+      gal545_A_143_217: 15.761217543468344
+      gal545_A_217: 77.5214280531049
+      ps_A_100_100: 261.2823535136313
+      ps_A_143_143: 74.28290799465884
+      ps_A_143_217: 41.22322908951794
+      ps_A_217_217: 125.31939118418777
+      galf_TE_A_100: 0.15314307440243102
+      galf_TE_A_100_143: 0.07963000762154462
+      galf_TE_A_100_217: 0.46305342686237344
+      galf_TE_A_143: 0.104139430567495
+      galf_TE_A_143_217: 0.7243969435429755
+      galf_TE_A_217: 1.9172389532222787
+timing: true
+stop_at_error: true
+output: EXAMPLE_EVALUATE2
+packages_path: null
+test: false

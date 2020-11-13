@@ -1,11 +1,15 @@
-timing: True
-debug: True
-stop_at_error: True
-
+theory:
+  camb:
+    path: ./external_modules/code/CAMB
+    stop_at_error: true
+    use_renames: true
+    extra_args:
+      AccuracyBoost: 1.1
+      num_massive_neutrinos: 1
+      nnu: 3.046
 likelihood:
   des_y1.shear:
     path: ./external_modules/data/des_data
-
 params:
   logA:
     prior:
@@ -37,7 +41,7 @@ params:
       max: 100
     ref:
       dist: norm
-      loc: 67.00
+      loc: 67.0
       scale: 2
     proposal: 2
     latex: H_0
@@ -109,17 +113,6 @@ params:
     latex: r_\mathrm{drag}
   yheused:
     latex: Y_P^\mathrm{BBN}
-
-theory:
-  camb:
-    path: ./external_modules/code/CAMB
-    stop_at_error: True
-    use_renames: True
-    extra_args:
-      AccuracyBoost: 1.1
-      num_massive_neutrinos: 1
-      nnu: 3.046
-
 sampler:
   evaluate:
     override:
@@ -139,5 +132,8 @@ sampler:
       DES_m4: 0.0
       DES_AIA: 1.0
       DES_alphaIA: 1.0
-
-output: ../projects/example/chains/EXAMPLE_EVALUATE4
+timing: true
+stop_at_error: true
+output: EXAMPLE_EVALUATE4
+packages_path: null
+test: false
