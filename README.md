@@ -12,7 +12,7 @@
 
 ## Cloning the Repository
 
-While [Cocoa](https://github.com/CosmoLike/cocoa) and [Cocoa-Installation-Libraries](https://github.com/CosmoLike/cocoa_installation_libraries) repositories are publicly available, the submodules [Cobaya-External-Code](https://github.com/CosmoLike/cobaya_code) and [Cobaya-External-Data](https://github.com/CosmoLike/cobaya_data) will remain private (Cosmolike and DES-Y3 data are not public). Users must, therefore, **set-up [ssh public-key authentication](https://docs.github.com/en/free-pro-team@latest/github/authenticating-to-github/adding-a-new-ssh-key-to-your-github-account) in Github before pursuing the installation**  (our scripts do not support HTTP authentication). Once that is done, type
+Type
 
     $ git clone https://github.com/CosmoLike/cocoa.git
 
