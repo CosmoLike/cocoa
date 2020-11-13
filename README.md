@@ -4,7 +4,7 @@
 
   Cocoa allows users to run, inside the [Cobaya](https://github.com/CobayaSampler) framework, [CosmoLike](https://github.com/CosmoLike) routines that evaluate data vectors for the [Dark Energy Survey](https://www.darkenergysurvey.org) (a.k.a DES). This readme file presents basic and advanced instructions for installing all Cocoa components, including the [Planck likelihood](https://wiki.cosmos.esa.int/planck-legacy-archive/index.php/Main_Page). **By no means, we want to discourage users from cloning Cobaya, CAMB, CLASS, Polychord, and Planck data from their original repositories. Please check the appendix [Proper Credits](https://github.com/CosmoLike/cocoa#proper-credits)**. Once we have the public release of Cosmolike code applied to DES-Y3 and LSST-Y1, we will refactor our repository to enforce Cocoa to clone such codes from their repositories (or forks). We welcome contributions to make such changes.
 
-  - [Cocoa](https://github.com/CosmoLike/cocoa) (Public)
+  - [Cocoa](https://github.com/CosmoLike/cocoa) (Private)
 
     **The cocoa repository contains the main Cobaya code, including the installation scripts**. It does not require [Git LFS](https://git-lfs.github.com) to be cloned correctly, because it does not include large data files by design.
 
