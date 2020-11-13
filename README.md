@@ -2,23 +2,11 @@
 
 ## Overview
 
-  Cocoa allows users to run, inside the [Cobaya](https://github.com/CobayaSampler) framework, [CosmoLike](https://github.com/CosmoLike) routines that evaluate data vectors for the [Dark Energy Survey](https://www.darkenergysurvey.org) (a.k.a DES). This readme file presents basic and advanced instructions for installing all Cocoa components, including the [Planck likelihood](https://wiki.cosmos.esa.int/planck-legacy-archive/index.php/Main_Page). There are four central repositories associated with the Cocoa project. **By no means, we want to discourage users from cloning Cobaya, CAMB, CLASS, Polychord, and Planck data from their original repositories. Please check the appendix [Proper Credits](https://github.com/CosmoLike/cocoa#proper-credits)**. Once we have the public release of Cosmolike code applied to DES-Y3 and LSST-Y1, we will refactor our repository to enforce Cocoa to clone such codes from their repositories (or forks). We welcome contributions to make such changes.
+  Cocoa allows users to run, inside the [Cobaya](https://github.com/CobayaSampler) framework, [CosmoLike](https://github.com/CosmoLike) routines that evaluate data vectors for the [Dark Energy Survey](https://www.darkenergysurvey.org) (a.k.a DES). This readme file presents basic and advanced instructions for installing all Cocoa components, including the [Planck likelihood](https://wiki.cosmos.esa.int/planck-legacy-archive/index.php/Main_Page). **By no means, we want to discourage users from cloning Cobaya, CAMB, CLASS, Polychord, and Planck data from their original repositories. Please check the appendix [Proper Credits](https://github.com/CosmoLike/cocoa#proper-credits)**. Once we have the public release of Cosmolike code applied to DES-Y3 and LSST-Y1, we will refactor our repository to enforce Cocoa to clone such codes from their repositories (or forks). We welcome contributions to make such changes.
 
   - [Cocoa](https://github.com/CosmoLike/cocoa) (Public)
 
     **The cocoa repository contains the main Cobaya code, including the installation scripts**. It does not require [Git LFS](https://git-lfs.github.com) to be cloned correctly, because it does not include large data files by design.
-
-  - [Cocoa-Installation-Libraries](https://github.com/CosmoLike/cocoa_installation_libraries) (Public)
-
-    **The Cocoa-Installation-Libraries repository contains libraries that are required by cocoa**. Cocoa-Installation-Libraries repository does require [Git LFS](https://git-lfs.github.com) so that big files can be appropriately fetched. Files are compressed in the [xz file format](https://tukaani.org/xz/format.html).
-
-  - [Cocoa-External-Code](https://github.com/CosmoLike/cobaya_code) (Private)
-
-    **The [Cocoa-External-Code](https://github.com/CosmoLike/cobaya_code) repository contains external theory, sampler, and likelihood codes (e.g., CosmoLike, CLASS and CAMB)**. Check the appendix [Proper Credits](https://github.com/CosmoLike/cocoa#proper-credits) for further information on the authorship of these packages. This repository does require [Git LFS](https://git-lfs.github.com) and libraries that can uncompress files in the [xz file format](https://tukaani.org/xz/format.html), as some files associated with the Planck likelihood code are compressed.
-
-  - [Cocoa-External-Data](https://github.com/CosmoLike/cobaya_data) (Private)
-
-    **The [Cocoa-External-Data](https://github.com/CosmoLike/cobaya_data) repository contains data files required to run external likelihoods (e.g., Planck and DES-Y1 data)**. This repository does require [Git LFS](https://git-lfs.github.com) and libraries that can uncompress the [xz file format](https://tukaani.org/xz/format.html).
 
 # Installation
 
