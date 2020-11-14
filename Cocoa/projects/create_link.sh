@@ -1,6 +1,6 @@
 cd $ROOTDIR/projects
 
-for NAME in $(find . -mindepth 1 -maxdepth 1 -type d); do
+for NAME in $(find . -mindepth 1 -maxdepth 1 -type d ! -name 'example'); do
   ln -s $ROOTDIR/projects/$NAME/interface $ROOTDIR/external_modules/code/
   mv $ROOTDIR/external_modules/code/interface $ROOTDIR/external_modules/code/$NAME
 
