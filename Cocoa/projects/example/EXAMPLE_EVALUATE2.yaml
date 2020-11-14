@@ -168,4 +168,4 @@ sampler:
       galf_TE_A_143_217: 0.7243969435429755
       galf_TE_A_217: 1.9172389532222787
 
-output: ../projects/example/chains/EXAMPLE_EVALUATE2
+output: ./projects/example/chains/EXAMPLE_EVALUATE2
