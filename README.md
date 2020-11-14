@@ -89,15 +89,15 @@ The installation of Cocoa required packages, as well as Boltzmann and Likelihood
 
  - [compile_external_modules](https://github.com/CosmoLike/cocoa/blob/master/Cocoa/compile_external_modules)
 
-    This file has instructions on how to install Boltzmann, Sampler and likelihood codes that are required by the Cobaya Framework. [compile_external_modules](https://github.com/CosmoLike/cocoa/blob/master/Cocoa/compile_external_modules) also contains instructions on setting up the python virtual environment.
+    This file has instructions on how to compile Boltzmann, Sampler and likelihood codes that are required by the Cobaya Framework. 
 
  - [start_cocoa](https://github.com/CosmoLike/cocoa/blob/master/Cocoa/start_cocoa)
 
-    This file has instructions on how to set up the Python virtual environment without performing any compilation/installation (much faster than [compile_external_modules](https://github.com/CosmoLike/cocoa/blob/master/Cocoa/compile_external_modules)).
+    This file has instructions on how to set up the Python virtual environment.
 
  - [stop_cocoa](https://github.com/CosmoLike/cocoa/blob/master/Cocoa/stop_cocoa)
 
-    This file has instructions on how to unset the Python virtual environment - including recovering original `$PYTHONPATH`, `$LD_LIBRARY_PATH`, and `PATH`. This script is critical if the user wants to go back and forth between multiple installations of Cocoa. It is also vital in case the user wants to unload Cocoa safely so other applications can be loaded without using the libraries located at `$ROOTDIR/.local`.
+    This file has instructions on how to unset the Python virtual environment - including recovering original `$PYTHONPATH`, `$LD_LIBRARY_PATH`, and `PATH`. 
 
  - [clean_all](https://github.com/CosmoLike/cocoa/blob/master/Cocoa/clean_all)
 
