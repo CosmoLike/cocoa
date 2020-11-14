@@ -99,4 +99,4 @@ sampler:
       omegach2: 0.12011
       tau: 0.0543
 
-output: ../projects/example/chains/EXAMPLE_EVALUATE
+output: ./projects/example/chains/EXAMPLE_EVALUATE
