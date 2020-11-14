@@ -69,7 +69,7 @@ PS: Users are highly encouraged to read appendices [Further Information about th
 
 After that, the Cobaya Framework should be ready, and the user can test a few examples:
 
-    mpirun -n 1 cobaya-run ./yaml/EXAMPLE_EVALUATE[1-6].yaml -f
+    mpirun -n 1 cobaya-run ./projects/example/EXAMPLE_EVALUATE[1-4].yaml -f
 
 These examples will evaluate various likelihoods at specific cosmologies. The `-f` ensures that the same YAML file can be run multiple times, overwriting output files from previous evaluations that are located at `./chains`.
 
