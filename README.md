@@ -332,23 +332,11 @@ By no means, we want to discourage people from cloning code from their original 
 
 ### Total bandwidth for Git LFS files
 
-**We have a monthly quota of only 150 GB in bandwidth for [Git LFS](https://git-lfs.github.com) files, and therefore we ask users to use good judgment in the number of times you clone repositories with large files**. The public release of Cocoa aims to replace them with bash scripts that will download such files from their original location. Some of these locations only provide limited bandwidth for downloads, and files are not compressed with the state-of-the-art [xz file format](https://tukaani.org/xz/format.html), increasing download times significantly. Cloning [Cobaya-External-Data](https://github.com/CosmoLike/cobaya_data) repository is, therefore, significantly faster. The repository also includes associated files for [CamSpec](https://arxiv.org/abs/1910.00483), [SROLL2](http://sroll20.ias.u-psud.fr) and low-l [LFI](https://arxiv.org/abs/1807.06206) CMB/[Planck](https://wiki.cosmos.esa.int/planck-legacy-archive/index.php/Main_Page) likelihoods. **Users can use `git_clean.sh` and `git_reset.sh` scripts to reset all four repositories to their original state in case some catastrophic edit is made**.
+**We have a monthly quota of only 150 GB in bandwidth for [Git LFS](https://git-lfs.github.com) files, and therefore we ask users to use good judgment in the number of times you clone repositories with large files**. **Users can use `git clean` and `git reset` commands to reset the repository to its original state in case some catastrophic edit is made**.
 
 ## Compiling Boltzmann, CosmoLike and Likelihood codes
 
-We understand that most users adopt either [CAMB](https://github.com/cmbant/CAMB) or [CLASS](https://github.com/lesgourg/class_public), but not both. To avoid excessive compilation times during installation, users can set the following keys before running [setup_compile_external_modules](https://github.com/CosmoLike/cocoa/blob/master/Cocoa/setup_compile_external_modules)
-
-    export IGNORE_CAMB_COMPILATION=1
-
-    export IGNORE_CLASS_COMPILATION=1
-
-    export IGNORE_COSMOLIKE_COMPILATION=1
-
-    export IGNORE_POLYCHORD_COMPILATION=1
-
-    export IGNORE_PLANCK_COMPILATION=1
-
-Another way to avoid excessive compilation times during development (after running [setup_compile_external_modules](https://github.com/CosmoLike/cocoa/blob/master/Cocoa/setup_compile_external_modules) at least once)  is to use specialized keys that recompile only the specific modules the user might have changed. A few examples of such scripts are:
+To avoid excessive compilation times during development, users can use specialized scripts that compile only the specific modules:
 
     source ./installation_scripts/setup_class
 
