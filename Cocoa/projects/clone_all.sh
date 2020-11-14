@@ -8,8 +8,9 @@ for NAME in $URLS; do
 done
 
 # take the cocoa_ out of the dir names
-for DIR in $(find . -mindepth 1 -maxdepth 1 -type d); do
-    mv "${DIR}" $(echo "${DIR}" | sed -E 's@cocoa_@@') 2> /dev/null
+for DIR in $(find . -mindepth 1 -maxdepth 1 -type d ! -name 'example'); do
+    # https://unix.stackexchange.com/a/61402
+    mv -T "${DIR}" $(echo "${DIR}" | sed -E 's@cocoa_@@') 2> /dev/null
 done
 
 cd $ROOTDIR
