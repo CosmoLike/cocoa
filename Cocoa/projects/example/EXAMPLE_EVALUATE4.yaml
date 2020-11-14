@@ -140,4 +140,4 @@ sampler:
       DES_AIA: 1.0
       DES_alphaIA: 1.0
 
-output: ../projects/example/chains/EXAMPLE_EVALUATE4
+output: ./projects/example/chains/EXAMPLE_EVALUATE4
