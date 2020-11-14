@@ -4,8 +4,6 @@
 
   Cocoa allows users to run, inside the [Cobaya](https://github.com/CobayaSampler) framework, [CosmoLike](https://github.com/CosmoLike) routines that evaluate data vectors for the [Dark Energy Survey](https://www.darkenergysurvey.org) (a.k.a DES). This readme file presents basic and advanced instructions for installing all Cocoa components, including the [Planck likelihood](https://wiki.cosmos.esa.int/planck-legacy-archive/index.php/Main_Page). **By no means, we want to discourage users from cloning Cobaya, CAMB, CLASS, Polychord, and Planck data from their original repositories. Please check the appendix [Proper Credits](https://github.com/CosmoLike/cocoa#proper-credits)**. Once we have the public release of Cosmolike code applied to DES-Y3 and LSST-Y1, we will refactor our repository to enforce Cocoa to clone such codes from their repositories (or forks). We welcome contributions to make such changes.
 
-  - [Cocoa](https://github.com/CosmoLike/cocoa) (Private)
-
 # Installation
 
 ## Cloning the Repository
@@ -94,13 +92,13 @@ The installation of Cocoa required packages, as well as Boltzmann and Likelihood
     This file has instructions on how to install Boltzmann, Sampler and likelihood codes that are required by the Cobaya Framework. [compile_external_modules](https://github.com/CosmoLike/cocoa/blob/master/Cocoa/compile_external_modules) also contains instructions on setting up the python virtual environment.
 
  - [start_cocoa](https://github.com/CosmoLike/cocoa/blob/master/Cocoa/start_cocoa)
-    
+
     This file has instructions on how to set up the Python virtual environment without performing any compilation/installation (much faster than [compile_external_modules](https://github.com/CosmoLike/cocoa/blob/master/Cocoa/compile_external_modules)).
-    
+
  - [stop_cocoa](https://github.com/CosmoLike/cocoa/blob/master/Cocoa/stop_cocoa)
 
     This file has instructions on how to unset the Python virtual environment - including recovering original `$PYTHONPATH`, `$LD_LIBRARY_PATH`, and `PATH`. This script is critical if the user wants to go back and forth between multiple installations of Cocoa. It is also vital in case the user wants to unload Cocoa safely so other applications can be loaded without using the libraries located at `$ROOTDIR/.local`.
-    
+
  - [clean_all](https://github.com/CosmoLike/cocoa/blob/master/Cocoa/clean_all)
 
     This file has instructions on how to clean keys associated with the Python virtual environment and delete the compilation of the Boltzmann, Sampler, and likelihood codes, and local installation of the required packages installed by the [setup_cocoa_installation_packages].
