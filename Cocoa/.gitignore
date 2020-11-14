@@ -21,3 +21,9 @@ pip-selfcheck.json
 doc/
 x86_64-pc-linux-gnu/
 /.local/
+
+set_installation_options
+compile_external_modules
+setup_cocoa_installation_packages
+start_cocoa
+stop_cocoa
