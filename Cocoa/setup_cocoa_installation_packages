@@ -93,18 +93,5 @@ source ./installation_scripts/setup_fortran_packages
 # ----------------------------------------------------------------------------
 # ----------------------------------------------------------------------------
 
-if [ -n "${OLD_LD_LIBRARY_PATH}" ]; then
-    export LD_LIBRARY_PATH=$OLD_LD_LIBRARY_PATH
-    unset OLD_LD_LIBRARY_PATH
-else
-    unset LD_LIBRARY_PATH
-fi
-
-if [ -n "${OLD_PYTHONPATH}" ]; then
-    export PYTHONPATH=$OLD_PYTHONPATH
-    unset OLD_PYTHONPATH
-else
-    unset PYTHONPATH
-fi
-
 source stop_cocoa
+
