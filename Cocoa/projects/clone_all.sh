@@ -4,7 +4,9 @@ URLS="git@github.com:CosmoLike/cocoa_des_y3.git
       git@github.com:CosmoLike/cocoa_desxplanck.git"
 
 for NAME in $URLS; do
-  git clone $NAME
+  # https://stackoverflow.com/a/11231970/2472169
+  # we don't want the sh to crash if git fails
+  git clone $NAME || true
 done
 
 # take the cocoa_ out of the dir names
