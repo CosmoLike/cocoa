@@ -22,14 +22,15 @@ doc/
 x86_64-pc-linux-gnu/
 /.local/
 
+external_modules/data/bao_data/
+external_modules/data/bicep_keck_2015/
+external_modules/data/des_data/
+external_modules/data/sn_data/
+
 set_installation_options
 compile_external_modules
 setup_cocoa_installation_packages
 start_cocoa
 stop_cocoa
-projects/
-projects/.gitignore./installation_scripts/
-./projects/
-./external_modules/
-./cobaya/
-./.local/
+
+projects/.gitignore./
