@@ -12,7 +12,7 @@ for NAME in $(find . -mindepth 1 -maxdepth 1 -type d ! -name 'example'); do
     source $FNAME
   fi
   cd $ROOTDIR/projects
-  echo "${NAME}/" >> $ROOTDIR/projects/.gitignore
+  echo "${NAME}" >> $ROOTDIR/projects/.gitignore
 done
 
 source $ROOTDIR/projects/create_link.sh
