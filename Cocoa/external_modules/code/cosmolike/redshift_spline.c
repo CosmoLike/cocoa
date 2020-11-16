@@ -13,9 +13,7 @@
 #include "redshift_spline.h"
 #include "structs.h"
 
-#ifdef COBAYA_SAMPLER
-#include "../log.c/src/log.h"
-#endif
+#include "log.c/src/log.h"
 
 //#define Z_SPLINE_TYPE gsl_interp_akima
 #define Z_SPLINE_TYPE gsl_interp_cspline

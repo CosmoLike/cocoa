@@ -22,9 +22,7 @@
 #include <gsl/gsl_math.h>
 #include "basics.h"
 
-#ifdef COBAYA_SAMPLER
-#include "../log.c/src/log.h"
-#endif
+#include "log.c/src/log.h"
 
 con constants = {
     3.14159265358979323846, // pi
@@ -144,7 +142,7 @@ double int_gsl_integrate_medium_precision(double (*func)(double, void *),
                                           void *arg, double a, double b,
                                           double *error, int niter) {
   double res, err;
-  gsl_integration_cquad_workspace *w = 
+  gsl_integration_cquad_workspace *w =
       gsl_integration_cquad_workspace_alloc(niter);
   gsl_function F;
   F.function = func;
@@ -157,7 +155,6 @@ double int_gsl_integrate_medium_precision(double (*func)(double, void *),
   return res;
 }
 
-#ifdef COBAYA_SAMPLER
 double int_gsl_integrate_low_precision(double (*func)(double, void *),
     void *arg, double a, double b, double *error, int niter) {
   gsl_set_error_handler_off();
@@ -166,27 +163,9 @@ double int_gsl_integrate_low_precision(double (*func)(double, void *),
   F.function = func;
   F.params  = arg;
   size_t neval;
-  gsl_integration_qng(&F,a,b,0,precision.medium,&res,&err,&neval);  
+  gsl_integration_qng(&F,a,b,0,precision.medium,&res,&err,&neval);
   return res;
 }
-#else
-double int_gsl_integrate_low_precision(double (*func)(double, void *),
-                                       void *arg, double a, double b,
-                                       double *error, int niter) {
-  double res, err;
-  gsl_integration_cquad_workspace *wcrude =
-      gsl_integration_cquad_workspace_alloc(niter);
-  gsl_function F;
-  F.function = func;
-  F.params = arg;
-  gsl_integration_cquad(&F, a, b, 0, precision.low, wcrude, &res, &err, 0);
-  if (NULL != error) {
-    *error = err;
-  }
-  gsl_integration_cquad_workspace_free(wcrude);
-  return res;
-}
-#endif
 
 double int_gsl_integrate_cov_precision(double (*func)(double, void *),
                                        void *arg, double a, double b,
@@ -255,7 +234,7 @@ double **create_double_matrix(long nrl, long nrh, long ncl, long nch)
   return m;
 }
 
-// free a double matrix allocated by create_double_matrix() 
+// free a double matrix allocated by create_double_matrix()
 void free_double_matrix(double **m, long nrl, long nrh __attribute__((unused)), long ncl, long nch __attribute__((unused)))
 {
   free((FREE_ARG)(m[nrl] + ncl - NR_END));
@@ -273,7 +252,7 @@ double *create_double_vector(long nl, long nh)
   return v - nl + NR_END;
 }
 
-// allocate a int vector with subscript range v[nl..nh] 
+// allocate a int vector with subscript range v[nl..nh]
 int *int_vector(long nl, long nh)
 {
   int *v;
@@ -293,7 +272,7 @@ long *long_vector(long nl, long nh)
   return v - nl + NR_END;
 }
 
-// free a double vector allocated with vector() 
+// free a double vector allocated with vector()
 void free_double_vector(double *v, long nl, long nh __attribute__((unused)))
 {
   free((FREE_ARG)(v + nl - NR_END));
@@ -315,7 +294,7 @@ double interpol(double *f, int n, double a, double b, double dx, double x,
   double r;
   int i;
   if (x < a) {
-    if (lower == 0.) {    
+    if (lower == 0.) {
       return 0.0;
     }
     return f[0] + lower * (x - a);
@@ -379,7 +358,7 @@ double interpol2d(double **f, int nx, double ax, double bx, double dx, double x,
   }
 
   if (x > bx) {
-    return 0.; 
+    return 0.;
   }
   t = (x - ax) / dx;
   i = (int)(floor(t));

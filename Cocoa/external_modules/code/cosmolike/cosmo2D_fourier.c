@@ -4,7 +4,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "../log.c/src/log.h"
+#include "log.c/src/log.h"
 
 #include "basics.h"
 #include "cosmo3D.h"
@@ -22,12 +22,10 @@
 // ----------------------------------------------------------------------------
 
 double int_for_C_cl_tomo(double a, void *params) {
-#ifdef DEBUG
   if (a >= 1.0) {
     log_fatal("a>=1 in int_for_C_cl_tomo");
     exit(1);
   }
-#endif
 
   double *ar = (double *)params;
   struct chis chidchi = chi_all(a);
@@ -42,12 +40,10 @@ double int_for_C_cl_tomo(double a, void *params) {
 }
 
 double int_for_C_cl_tomo_b2(double a, void *params) {
-#ifdef DEBUG
   if (a >= 1.0) {
     log_fatal("a>=1 in int_for_C_cl_tomo_b2");
     exit(1);
   }
-#endif
 
   double *ar = (double *) params;
   const double b1 = gbias.b1_function(1. / a - 1., (int)ar[0]);
@@ -161,8 +157,8 @@ double C_cl_tomo(double l, int ni, int nj) {
   static galpara G;
   static double **table;
   static double ds = .0, logsmin = .0, logsmax = .0;
-#ifdef DEBUG
-  if (ni < 0 ||
+  if (
+    ni < 0 ||
     ni >= tomo.clustering_Nbin ||
     nj < 0 ||
     nj >= tomo.clustering_Nbin
@@ -170,7 +166,6 @@ double C_cl_tomo(double l, int ni, int nj) {
     log_fatal("C_cl_tomo(l,%d,%d) outside tomo.clustering_Nbin range", ni, nj);
     exit(1);
   }
-#endif
 
   if (recompute_clustering(C, G, N, ni, nj)) {
     if (table == 0) {
@@ -219,8 +214,17 @@ double C_cl_tomo(double l, int ni, int nj) {
     }
   }
 
-  double f1 = exp(interpol_fitslope(table[j], Ntable.N_ell, logsmin, logsmax,
-                                    ds, log(l), 1.));
+  double f1 = exp(
+    interpol_fitslope(
+      table[j],
+      Ntable.N_ell,
+      logsmin,
+      logsmax,
+      ds,
+      log(l),
+      1.
+    )
+  );
   if (isnan(f1)) {
     f1 = 0.;
   }

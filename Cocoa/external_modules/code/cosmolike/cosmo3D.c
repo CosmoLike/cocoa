@@ -14,7 +14,7 @@
   #include <nage01.h>
   #include <nage02.h>
 #endif
-#include "../log.c/src/log.h"
+#include "log.c/src/log.h"
 #include "basics.h"
 #include "cosmo3D.h"
 #include "recompute.h"
