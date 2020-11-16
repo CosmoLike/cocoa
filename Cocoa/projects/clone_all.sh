@@ -6,6 +6,7 @@ URLS="git@github.com:CosmoLike/cocoa_des_y3.git
 for NAME in $URLS; do
   # https://stackoverflow.com/a/11231970/2472169
   # we don't want the sh to crash if git fails
+  rm -rf $NAME
   git clone $NAME || true
 done
 
