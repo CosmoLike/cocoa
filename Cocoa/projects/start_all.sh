@@ -7,12 +7,13 @@ for NAME in $(find . -mindepth 1 -maxdepth 1 -type d ! -name 'example'); do
   cd $ROOTDIR/projects/$NAME/scripts
   # https://stackoverflow.com/a/11231970/2472169
   # we don't want the sh to crash if source
-  declare FNAME=start_$NAME
+  declare FNAME=start_$(echo "${NAME}" | sed -E 's@./@@')
   if [ -f "$FNAME" ]; then
     source $FNAME
   fi
   cd $ROOTDIR/projects
-  echo "${NAME}" >> $ROOTDIR/projects/.gitignore
+  declare NAME2=$(echo "${NAME}" | sed -E 's@./@@')
+  echo "${NAME2}" >> $ROOTDIR/projects/.gitignore
 done
 
 source $ROOTDIR/projects/create_link.sh
