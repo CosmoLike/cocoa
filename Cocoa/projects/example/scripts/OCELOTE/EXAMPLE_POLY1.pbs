@@ -1,0 +1,23 @@
+#PBS -q high_pri
+#PBS -l select=20:ncpus=28:mem=168gb:pcmem=6gb
+#PBS -N EMCMC22
+#PBS -W group_list=cosmo
+#PBS -l walltime=96:00:00
+
+echo ------------------------------------------------------
+echo -n 'Job is running on node '; cat $PBS_NODEFILE
+echo ------------------------------------------------------
+echo PBS: qsub is running on $PBS_O_HOST
+echo PBS: executing queue is $PBS_QUEUE
+echo PBS: working directory is $PBS_O_WORKDIR
+echo PBS: job identifier is $PBS_JOBID
+echo PBS: job name is $PBS_JOBNAME
+echo PBS: node file is $PBS_NODEFILE
+echo PBS: current home directory is $PBS_O_HOME
+echo PBS: PATH = $PBS_O_PATH
+echo ------------------------------------------------------
+
+cd $PBS_O_WORKDIR
+source setup_load_external_modules
+export OMP_NUM_THREADS=4
+mpirun -np 140 ./bin/cobaya-run ./yaml/EXAMPLE_POLY1.yaml -r
