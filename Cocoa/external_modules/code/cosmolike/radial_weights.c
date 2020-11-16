@@ -4,7 +4,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "../log.c/src/log.h"
+#include "log.c/src/log.h"
 
 #include "basics.h"
 #include "bias.h"

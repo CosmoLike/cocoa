@@ -4,16 +4,14 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "../cfastpt/cfastpt.h"
+#include "cfastpt/cfastpt.h"
 #include "basics.h"
 #include "cosmo3D.h"
 #include "pt_cfastpt.h"
 #include "recompute.h"
 #include "structs.h"
 
-#ifdef COBAYA_SAMPLER
-#include "../log.c/src/log.h"
-#endif
+#include "log.c/src/log.h"
 
 double K_CH0(double k_mpch) { return k_mpch * cosmology.coverH0; }
 
@@ -32,7 +30,7 @@ void FPT_input(double k[FPT.N], double P[FPT.N]) {
   }
 #endif
   const double dlgk = log(10.) / (double)FPT.N_per_dec;
-  const double tmp = log(FPT.k_min); 
+  const double tmp = log(FPT.k_min);
   {
     const int i = 0;
     k[i] = exp(tmp  + i*dlgk);
@@ -55,7 +53,7 @@ void get_FPT_bias(void) {
         FPT.k_min = K_CH0(FPT.k_min);
         FPT.k_max = K_CH0(FPT.k_max);
       }
-      
+
     }
     double k[FPT.N], Pin[FPT.N], Pout[FPT.N];
     FPT_input(k, Pin);
@@ -128,7 +126,7 @@ double PT_d2d2(double k_coverH0) { // interpolate FPT.tab_AB[1]
     update_cosmopara(&C);
     logkmin = log(FPT.k_min);
     logkmax = log(FPT.k_max);
-    dlgk = log(10.) / (double)FPT.N_per_dec;    
+    dlgk = log(10.) / (double)FPT.N_per_dec;
   }
   double lgk = log(k_coverH0);
   return interpol(FPT.tab_AB[1], FPT.N, logkmin, logkmax, dlgk, lgk, 0., 0.);
@@ -203,7 +201,7 @@ void get_FPT_IA(void) {
   static cosmopara C;
   if (recompute_cosmo3D(C)) {
     update_cosmopara(&C);
-    
+
     if (FPT.tab_IA == 0) { // if table doesn't exit yet, create it
       FPT.tab_IA = create_double_matrix(0, FPT.N_IA - 1, 0, FPT.N - 1);
       if (FPT.k_min < limits.k_min_cH0) {
@@ -220,11 +218,11 @@ void get_FPT_IA(void) {
         IA_mix_DBB[FPT.N];
 
     FPT_input(k, Pin);
-    
+
     IA_tt(k, Pin, FPT.N, IA_tt_EE, IA_tt_BB);
     IA_ta(k, Pin, FPT.N, IA_ta_dE1, IA_ta_dE2, IA_ta_0E0E, IA_ta_0B0B);
     IA_mix(k, Pin, FPT.N, IA_mix_A, IA_mix_B, IA_mix_DEE, IA_mix_DBB);
-    
+
     #pragma omp parallel for
     for (int i = 0; i < FPT.N; i++) {
       FPT.tab_IA[0][i] = IA_tt_EE[i]; // tt_EE
@@ -236,7 +234,7 @@ void get_FPT_IA(void) {
       FPT.tab_IA[6][i] = IA_mix_A[i];      // mix_A
       FPT.tab_IA[7][i] = IA_mix_B[i] * 4.; // mix_B
       FPT.tab_IA[8][i] = IA_mix_DEE[i];    // mix_D_EE
-      FPT.tab_IA[9][i] = IA_mix_DBB[i];    // mix_D_BB      
+      FPT.tab_IA[9][i] = IA_mix_DBB[i];    // mix_D_BB
     }
   }
 }
@@ -247,7 +245,7 @@ double TATT_II_EE(double k_coverH0, double a, double C1, double C2, double b_ta,
   nla_EE = C1 * C1_2 * pdelta_ak;
   static cosmopara C;
   static double logkmin = 0., logkmax = 0., dlgk = 0.;
-  
+
   // if TATT is specified, i.e. C2 !=0 (TT), or b_ta != 0 (TA)
   if (C2 != 0 || b_ta != 0) {
     // only call FASTPT if cosmology changed since last call
@@ -315,7 +313,7 @@ double TATT_II_BB(double k_coverH0, double a, double C1, double C2, double b_ta,
     if (lgk < logkmin || lgk >= logkmax) {
       return 0.0;
     }
-    
+
     double g4 = growfac_a*growfac_a*growfac_a*growfac_a;
 
     ta_BB = C1 * C1_2 * b_ta * b_ta_2 * g4 *

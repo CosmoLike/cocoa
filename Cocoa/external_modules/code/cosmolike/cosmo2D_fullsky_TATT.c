@@ -6,7 +6,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "../log.c/src/log.h"
+#include "log.c/src/log.h"
 
 #include "bias.h"
 #include "basics.h"
@@ -67,45 +67,42 @@ double C2_TT(double a, double nz, double growfac_a) {
 // ------------------------------------------------------------------
 
 double int_for_C_shear_shear_IA_EE(double a, void *params) {
-  double res = 0., ell, fK, k, ws1, ws2, wk1, wk2;
-  double C1, C1_2, C2, C2_2, b_ta, b_ta_2, growfac_a;
-  double *ar = (double *)params;
-#ifdef DEBUG
   if (a >= 1.0) {
     log_fatal("a >= 1");
     exit(1);
   }
-#endif
 
-  growfac_a = growfac(a);
+  double *ar = (double *) params;
+
+  const double growfac_a = growfac(a);
   struct chis chidchi = chi_all(a);
   double hoverh0 = hoverh0v2(a, chidchi.dchida);
 
-  ell = ar[2] + 0.5;
-  fK = f_K(chidchi.chi);
-  k = ell / fK;
+  const double ell = ar[2] + 0.5;
+  const double fK = f_K(chidchi.chi);
+  const double k = ell / fK;
 
   // radial n_z weight for first source bin (for use with IA term)
-  ws1 = W_source(a, ar[0], hoverh0);
+  const double ws1 = W_source(a, ar[0], hoverh0);
 
   // radial n_z weight for second source bin (for use with IA term)
-  ws2 = W_source(a, ar[1], hoverh0);
-  wk1 = W_kappa(a, fK, ar[0]); // radial lens efficiency for first source bin
-  wk2 = W_kappa(a, fK, ar[1]); // radial lens efficiency for second source bin
+  const double ws2 = W_source(a, ar[1], hoverh0);
+  const double wk1 = W_kappa(a, fK, ar[0]); // radial lens efficiency for first source bin
+  const double wk2 = W_kappa(a, fK, ar[1]); // radial lens efficiency for second source bin
 
   // IA parameters for first source bin
-  C1 = C1_TA(a, ar[0], growfac_a);
-  b_ta = b_TA(a, ar[0]);
-  C2 = C2_TT(a, ar[0], growfac_a);
+  const double C1 = C1_TA(a, ar[0], growfac_a);
+  const double b_ta = b_TA(a, ar[0]);
+  const double C2 = C2_TT(a, ar[0], growfac_a);
 
   // IA parameters for second source bin
-  C1_2 = C1_TA(a, ar[1], growfac_a);
-  b_ta_2 = b_TA(a, ar[1]);
-  C2_2 = C2_TT(a, ar[1], growfac_a);
+  const double C1_2 = C1_TA(a, ar[1], growfac_a);
+  const double b_ta_2 = b_TA(a, ar[1]);
+  const double C2_2 = C2_TT(a, ar[1], growfac_a);
 
   // GG cosmic shear
   const double pdelta_ak = Pdelta(k, a);
-  res = wk1 * wk2 * pdelta_ak;
+  double res = wk1 * wk2 * pdelta_ak;
   //COCOA: Took these evaluations of the parenthesis - to force them to update
   //COCOA: the static variables in the first call that is done outside OpenMP loop
   const double tmp1 = TATT_II_EE(k, a, C1, C2, b_ta, C1_2, C2_2, b_ta_2, growfac_a, pdelta_ak);
@@ -121,15 +118,14 @@ double int_for_C_shear_shear_IA_EE(double a, void *params) {
 }
 
 double int_for_C_shear_shear_IA_BB(double a, void *params) {
-  double res = 0., ell, fK, k, ws1, ws2;
-  double C1, C1_2, C2, C2_2, b_ta, b_ta_2;
-  double *ar = (double *)params;
-#ifdef DEBUG
   if (a >= 1.0) {
     log_fatal("a >= 1");
     exit(1);
   }
-#endif
+
+  double res = 0., ell, fK, k, ws1, ws2;
+  double C1, C1_2, C2, C2_2, b_ta, b_ta_2;
+  double *ar = (double *) params;
 
   const double growfac_a = growfac(a);
   struct chis chidchi = chi_all(a);
@@ -161,14 +157,13 @@ double int_for_C_shear_shear_IA_BB(double a, void *params) {
 }
 
 double int_for_C_ggl_IA_TATT(double a, void *params) {
-  double res, ell, fK, k, w_density, w_mag, ws, wk, b1, b2, bs2, C1, C2, b_ta;
-  double *ar = (double *)params;
- #ifdef DEBUG
   if (a >= 1.0) {
     log_fatal("a >= 1");
     exit(1);
   }
-#endif
+
+  double res, ell, fK, k, w_density, w_mag, ws, wk, b1, b2, bs2, C1, C2, b_ta;
+  double *ar = (double *) params;
 
   const double growfac_a = growfac(a);
   struct chis chidchi = chi_all(a);
@@ -219,25 +214,39 @@ double int_for_C_ggl_IA_TATT(double a, void *params) {
 double C_EE_TATT(double l, int ni, int nj) {
   double array[3] = {(double)ni, (double)nj, l};
   double EE = int_gsl_integrate_low_precision(
-      int_for_C_shear_shear_IA_EE, (void *)array,
-      fmax(amin_source(ni), amin_source(nj)), amax_source(ni), NULL, 1000);
+    int_for_C_shear_shear_IA_EE,
+    (void *) array,
+    fmax(amin_source(ni), amin_source(nj)),
+    amax_source(ni),
+    NULL,
+    1000
+  );
   return EE;
 }
 
 double C_BB_TATT(double l, int ni, int nj) {
   double array[3] = {(double)ni, (double)nj, l};
   return int_gsl_integrate_low_precision(
-      int_for_C_shear_shear_IA_BB, (void *)array,
-      fmax(amin_source(ni), amin_source(nj)),
-      fmin(amax_source_IA(ni), amax_source_IA(nj)), NULL, 1000);
+    int_for_C_shear_shear_IA_BB,
+    (void *) array,
+    fmax(amin_source(ni), amin_source(nj)),
+    fmin(amax_source_IA(ni), amax_source_IA(nj)),
+    NULL,
+    1000
+  );
 }
 
 // Cocoa: CHANGED THE INTEGRATION FROM MEDIUM TO LOW PRECISION!!
 double C_ggl_TATT(double l, int nl, int ns) {
   double array[3] = {(double)nl, (double)ns, l};
-  double gE = int_gsl_integrate_low_precision(int_for_C_ggl_IA_TATT,
-                                                 (void *)array, amin_lens(nl),
-                                                 amax_lens(nl), NULL, 1000);
+  double gE = int_gsl_integrate_low_precision(
+    int_for_C_ggl_IA_TATT,
+    (void *)array,
+    amin_lens(nl),
+    amax_lens(nl),
+    NULL,
+    1000
+  );
   return gE;
 }
 
@@ -253,12 +262,10 @@ double w_gamma_t_TATT(int nt, int ni, int nj) {
   static cosmopara C;
   static nuisancepara N;
   static galpara G;
-#ifdef DEBUG
   if (like.Ntheta == 0) {
     log_fatal("like.Ntheta not initialized");
     exit(1);
   }
-#endif
   if (Pl == 0) {
     Pl = create_double_matrix(0, like.Ntheta - 1, 0, LMAX - 1);
     w_vec = create_double_vector(0, tomo.ggl_Npowerspectra * like.Ntheta - 1);
@@ -352,12 +359,10 @@ double xi_pm_TATT(int pm, int nt, int ni, int nj) {
   static double *xi_vec_minus = 0;
   static cosmopara C;
   static nuisancepara N;
-#ifdef DEBUG
   if (like.Ntheta == 0) {
     log_fatal("like.Ntheta not initialized");
     exit(1);
   }
-#endif
   if (Glplus == 0) {
     Glplus = create_double_matrix(0, like.Ntheta - 1, 0, LMAX - 1);
     Glminus = create_double_matrix(0, like.Ntheta - 1, 0, LMAX - 1);
@@ -559,12 +564,10 @@ double C_EE_tab(double l, int ni, int nj) {
   static double **table, *sig;
   static int osc[100];
   static double ds = .0, logsmin = .0, logsmax = .0;
-#ifdef DEBUG
   if (ni < 0 || ni >= tomo.shear_Nbin || nj < 0 || nj >= tomo.shear_Nbin) {
     log_fatal("C_shear_shear_EE(l,%d,%d) outside tomo.shear_Nbin range", ni, nj);
     exit(1);
   }
-#endif
   if (recompute_shear(C, N)) {
     if (table == 0) {
       table = create_double_matrix(0, tomo.shear_Npowerspectra - 1, 0,
@@ -619,12 +622,10 @@ double C_EE_tab(double l, int ni, int nj) {
     update_cosmopara(&C);
     update_nuisance(&N);
   }
-#ifdef DEBUG
   if (log(l) < logsmin || log(l) > logsmax) {
     log_fatal("C_EE_tab: l = %e outside look-up table range [%e,%e]", l, exp(logsmin), exp(logsmax));
     exit(1);
   }
-#endif
   int k = N_shear(ni, nj);
   double f1;
   if (osc[k] == 0) {
@@ -646,17 +647,19 @@ double C_BB_tab(double l, int ni, int nj) {
   static double **table, *sig;
   static int osc[100];
   static double ds = .0, logsmin = .0, logsmax = .0;
-#ifdef DEBUG
   if (ni < 0 || ni >= tomo.shear_Nbin || nj < 0 || nj >= tomo.shear_Nbin) {
     log_fatal("C_shear_shear_BB(l,%d,%d) outside tomo.shear_Nbin range",
            ni, nj);
     exit(1);
   }
-#endif
   if (recompute_shear(C, N)) {
     if (table == 0) {
-      table = create_double_matrix(0, tomo.shear_Npowerspectra - 1, 0,
-                                   NTAB_TATT - 1);
+      table = create_double_matrix(
+        0,
+        tomo.shear_Npowerspectra - 1,
+        0,
+        NTAB_TATT - 1
+      );
       sig = create_double_vector(0, tomo.ggl_Npowerspectra - 1);
       logsmin = log(fmax(LMIN_tab - 1., 1.0));
       logsmax = log(LMAX + 1);
@@ -716,8 +719,18 @@ double C_BB_tab(double l, int ni, int nj) {
   int k = N_shear(ni, nj);
   double f1;
   if (osc[k] == 0) {
-    f1 = sig[k] * exp(interpol(table[k], NTAB_TATT, logsmin, logsmax, ds,
-                               lgl, 0., 0.));
+    f1 = sig[k] * exp(
+      interpol(
+        table[k],
+        NTAB_TATT,
+        logsmin,
+        logsmax,
+        ds,
+        lgl,
+        0.,
+        0.
+      )
+    );
   } else {
     f1 = interpol(table[k], NTAB_TATT, logsmin, logsmax, ds, lgl, 0., 0.);
   }
@@ -735,12 +748,10 @@ double C_ggl_TATT_tab(double l, int ni, int nj) {
   static double **table, *sig;
   static int osc[100];
   static double ds = .0, logsmin = .0, logsmax = .0;
-#ifdef DEBUG
   if (ni < 0 || ni >= tomo.clustering_Nbin || nj < 0 || nj >= tomo.shear_Nbin) {
     log_fatal("C_ggl_TATT_tab(l,%d,%d) outside tomo.X_Nbin range", ni, nj);
     exit(1);
   }
-#endif
   if (recompute_ggl(C, G, N, ni)) {
     if (table == 0) {
       table = create_double_matrix(0, tomo.ggl_Npowerspectra-1, 0,
@@ -797,15 +808,29 @@ double C_ggl_TATT_tab(double l, int ni, int nj) {
   }
   const double lgl = log(l);
   if (lgl < logsmin || lgl > logsmax) {
-    log_fatal("C_ggl_TATT_tab: l = %e outside look-up table range [%e,%e]", l,
-           exp(logsmin), exp(logsmax));
+    log_fatal(
+      "C_ggl_TATT_tab: l = %e outside look-up table range [%e,%e]",
+      l,
+      exp(logsmin),
+      exp(logsmax)
+    );
     exit(1);
   }
   int k = N_ggl(ni, nj);
   double f1 = 0.;
   if (test_zoverlap(ni, nj) && osc[k] == 0) {
-    f1 = sig[k] * exp(interpol(table[k], NTAB_TATT, logsmin, logsmax, ds,
-                               lgl, 0., 0.));
+    f1 = sig[k] * exp(
+      interpol(
+        table[k],
+        NTAB_TATT,
+        logsmin,
+        logsmax,
+        ds,
+        lgl,
+        0.,
+        0.
+      )
+    );
   }
   if (test_zoverlap(ni, nj) && osc[k] == 1) {
     f1 = interpol(table[k], NTAB_TATT, logsmin, logsmax, ds, lgl, 0., 0.);
