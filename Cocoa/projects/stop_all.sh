@@ -11,8 +11,10 @@ for NAME in $(find . -mindepth 1 -maxdepth 1 -type d ! -name 'example'); do
   cd $ROOTDIR/projects
 done
 
-rm -rf $ROOTDIR/projects/.gitignore
-
 source delete_link.sh
+
+rm -rf $ROOTDIR/external_modules/data/.gitignore
+rm -rf $ROOTDIR/external_modules/code/.gitignore
+rm -rf $ROOTDIR/cobaya/cobaya/likelihoods/.gitignore
 
 cd $ROOTDIR
