@@ -28,4 +28,8 @@ setup_cocoa_installation_packages
 start_cocoa
 stop_cocoa
 projects/
-projects/.gitignore
+projects/.gitignore./installation_scripts/
+./projects/
+./external_modules/
+./cobaya/
+./.local/
