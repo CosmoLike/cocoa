@@ -10,6 +10,13 @@ for NAME in $(find . -mindepth 1 -maxdepth 1 -type d ! -name 'example'); do
   fi
 done
 
+# create tmp .gitignore and include all projects in it
+touch $ROOTDIR/projects/.gitignore
+
+for NAME in $(find . -mindepth 1 -maxdepth 1 -type d ! -name 'example'); do
+    echo "${NAME}/" >> .gitignore
+done
+
 source create_link.sh
 
 cd $ROOTDIR
