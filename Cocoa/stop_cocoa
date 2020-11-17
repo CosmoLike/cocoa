@@ -25,12 +25,6 @@ if [ -n "${OLD_PATH}" ]; then
     unset OLD_PATH
 fi
 
-source ./installation_scripts/impl_unset_keys.sh
-unset ROOTDIR
-unset SETUP_COBAYA
-unset SETUP_PREREQUISITE_DONE
-unset SET_INSTALLATION_OPTIONS
-
 # ----------------------------------------------------------------------------
 # ----------------------------------------------------------------------------
 # ----------------------------- PLANCK LIKELIHOOD ----------------------------
@@ -65,4 +59,8 @@ source $ROOTDIR/projects/stop_all.sh
 # ----------------------------------------------------------------------------
 # ----------------------------------------------------------------------------
 
-
+source ./installation_scripts/impl_unset_keys.sh
+unset ROOTDIR
+unset SETUP_COBAYA
+unset SETUP_PREREQUISITE_DONE
+unset SET_INSTALLATION_OPTIONS
