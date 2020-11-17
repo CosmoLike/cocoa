@@ -13,8 +13,9 @@ done
 
 source delete_link.sh
 
-rm -rf $ROOTDIR/external_modules/data/.gitignore
-rm -rf $ROOTDIR/external_modules/code/.gitignore
-rm -rf $ROOTDIR/cobaya/cobaya/likelihoods/.gitignore
+rm -f $ROOTDIR/.gitignore
+rm -f $ROOTDIR/external_modules/data/.gitignore
+rm -f $ROOTDIR/external_modules/code/.gitignore
+rm -f $ROOTDIR/cobaya/cobaya/likelihoods/.gitignore
 
 cd $ROOTDIR
