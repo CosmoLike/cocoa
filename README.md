@@ -339,10 +339,6 @@ To avoid excessive compilation times during development, users can use specializ
 
     source ./installation_scripts/setup_camb
 
-    source ./installation_scripts/setup_cosmolike
-
-    source ./installation_scripts/setup_cosmolike_6x2pt
-
     source ./installation_scripts/setup_planck
 
     source ./installation_scripts/setup_polychord
