@@ -14,7 +14,7 @@ external_modules/data/des_data/
 external_modules/data/sn_data/
 
 set_installation_options
-compile_external_modules
-setup_cocoa_installation_packages
-start_cocoa
-stop_cocoa
+#compile_external_modules
+#setup_cocoa_installation_packages
+#start_cocoa
+#stop_cocoa
