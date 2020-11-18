@@ -1,3 +1,8 @@
+if [ -z "${ROOTDIR}" ]; then
+    echo 'ERROR ROOTDIR not define'
+    return
+fi
+
 cd $ROOTDIR/projects
 
 for NAME in $(find . -mindepth 1 -maxdepth 1 -type d ! -name 'example'); do
