@@ -60,8 +60,14 @@ The installation can be performed with the following commands:
     $ source setup_cocoa_installation_packages
 
     $ source compile_external_modules
+    
+    $ source start_cocoa
 
 Sourcing [setup_cocoa_installation_packages](https://github.com/CosmoLike/cocoa/blob/master/Cocoa/setup_cocoa_installation_packages) may require a long time (~hours) depending on the supercomputer environment (System Option). It is possible to speed-up installation considerably by running `source setup_cocoa_installation_packages` on an interactive node w/ 16 threads, which is especially important in HPC environments where the the script needs to install all the required packages instead of relying on system's packages (such as NASA Pleiades or UofA Puma). However, for the Docker Installation, sourcing [setup_cocoa_installation_packages](https://github.com/CosmoLike/cocoa/blob/master/Cocoa/setup_cocoa_installation_packages) should take only a few minutes.
+
+Once the user is done working on the Cocoa enviroment, type:
+
+    $ source stop_cocoa
 
 PS: Users are highly encouraged to read appendices [Further Information about the configuration files](https://github.com/CosmoLike/cocoa/blob/master/README.md#further-information-about-the-configuration-files) and [Further Information about the difference between `compile_external_modules` and `start_cocoa` scripts](https://github.com/CosmoLike/cocoa/blob/master/README.md#further-information-about-the-difference-between-compile_external_modules-and-start_cocoa-scripts) to learn more about the configuration files after running a few basic examples.
 
@@ -70,7 +76,8 @@ PS: Users are highly encouraged to read appendices [Further Information about th
 After that, the Cobaya Framework should be ready, and the user can test a few examples:
 
     mpirun -n 1 cobaya-run ./projects/example/EXAMPLE_EVALUATE[1-4].yaml -f
-
+    mpirun -n 4 cobaya-run ./projects/example/EXAMPLE_MCMC1.yaml -f
+    
 These examples will evaluate various likelihoods at specific cosmologies. The `-f` ensures that the same YAML file can be run multiple times, overwriting output files from previous evaluations that are located at `./chains`.
 
 # Appendix
@@ -102,16 +109,6 @@ The installation of Cocoa required packages, as well as Boltzmann and Likelihood
  - [clean_all](https://github.com/CosmoLike/cocoa/blob/master/Cocoa/clean_all)
 
     This file has instructions on how to clean keys associated with the Python virtual environment and delete the compilation of the Boltzmann, Sampler, and likelihood codes, and local installation of the required packages installed by the [setup_cocoa_installation_packages].
-
-## Further Information about the difference between [compile_external_modules](https://github.com/CosmoLike/cocoa/blob/master/Cocoa/setup_compile_external_modules) and [start_cocoa](https://github.com/CosmoLike/cocoa/blob/master/Cocoa/start_cocoa) scripts
-
-The command:
-
-    $ source compile_external_modules
-
-will compile the Cocoa framework, including Boltzmann and likelihood codes. Once the user disconnects or additional terminals are invoked, they must reload all Cocoa environment flags. To do that without recompiling Cobaya modules, execute the command:
-
-    $ source start_cocoa
 
 ## Docker Installation Part I: Further Information for PCs Environment
 
