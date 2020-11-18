@@ -1,21 +1,21 @@
 if [ -z "${ROOTDIR}" ]; then
-    echo 'ERROR ROOTDIR not define' 
+    echo 'ERROR ROOTDIR not defined'
     return
 fi
 if [ -z "${CXX_COMPILER}" ]; then
-    echo 'ERROR CXX_COMPILER not define' 
+    echo 'ERROR CXX_COMPILER not defined'
     return
 fi
 if [ -z "${C_COMPILER}" ]; then
-    echo 'ERROR C_COMPILER not define' 
+    echo 'ERROR C_COMPILER not defined'
     return
 fi
 if [ -z "${PYTHON3}" ]; then
-    echo 'ERROR PYTHON3 not define' 
+    echo 'ERROR PYTHON3 not defined'
     return
 fi
 if [ -z "${MAKE_NUM_THREADS}" ]; then
-    echo 'ERROR MAKE_NUM_THREADS not define' 
+    echo 'ERROR MAKE_NUM_THREADS not defined'
     return
 fi
 # ----------------------------------------------------------------------------

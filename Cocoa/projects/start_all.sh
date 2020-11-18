@@ -1,3 +1,13 @@
+if [ -z "${ROOTDIR}" ]; then
+    echo 'ERROR ROOTDIR not define'
+    return
+fi
+
+rm -f $ROOTDIR/projects/.gitignore
+rm -f $ROOTDIR/external_modules/data/.gitignore
+rm -f $ROOTDIR/external_modules/code/.gitignore
+rm -f $ROOTDIR/cobaya/cobaya/likelihoods/.gitignore
+
 cd $ROOTDIR/projects
 
 # create tmp .gitignore and include all projects in it

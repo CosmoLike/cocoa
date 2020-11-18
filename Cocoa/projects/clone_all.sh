@@ -1,3 +1,8 @@
+if [ -z "${ROOTDIR}" ]; then
+    echo 'ERROR ROOTDIR not define'
+    return
+fi
+
 cd $ROOTDIR/projects
 
 URLS="git@github.com:CosmoLike/cocoa_des_y3.git
