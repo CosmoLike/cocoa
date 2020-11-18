@@ -1,1 +1,29 @@
-cobaya.egg-info/
+# Backups
+*~
+\#*
+.\#*
+
+# OS-specific
+.directory
+
+# Python and packaging
+*.pyc
+*.egg-info/
+build/
+dist/
+__pycache__
+
+# Documentation
+docs/_*
+docs/.ipynb_checkpoints
+docs/src_examples/*/*.png
+
+# Tests
+.pytest_cache
+tests/.ipynb_checkpoints
+
+# IDE-specific
+.idea
+
+# pytest
+.cache
