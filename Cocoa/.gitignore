@@ -13,8 +13,8 @@ external_modules/data/bicep_keck_2015/
 external_modules/data/des_data/
 external_modules/data/sn_data/
 
-set_installation_options
-compile_external_modules
-setup_cocoa_installation_packages
-start_cocoa
-stop_cocoa
+#set_installation_options
+#compile_external_modules
+#setup_cocoa_installation_packages
+#start_cocoa
+#stop_cocoa
