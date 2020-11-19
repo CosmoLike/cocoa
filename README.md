@@ -10,7 +10,7 @@
 
 Type
 
-    $ git clone https://github.com/CosmoLike/cocoa.git
+    $ git clone git@github.com:CosmoLike/cocoa.git
 
 PS: We have a monthly quota of only 150 GB in bandwidth for [Git LFS](https://git-lfs.github.com) files, and therefore we ask users to use good judgment in the number of times you clone repositories with large files. See appendix [Git LFS](https://github.com/CosmoLike/cocoa/blob/master/README.md#git-lfs) for further information.
 
