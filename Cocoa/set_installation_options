@@ -69,8 +69,6 @@ export MAKE_NUM_THREADS=16
 
 export GLOBALPYTHON3=python3
 
-export COSMOLIKE_NDEBUG_COMMON_FLAGS='-foptimize-strlen -finline-functions-called-once -fmerge-all-constants -Wno-unused-result -Wno-format-overflow -fmax-errors=1 -fthread-jumps -fcse-follow-jumps -fsplit-wide-types -fcse-skip-blocks -faggressive-loop-optimizations -fif-conversion -fif-conversion2 -fexpensive-optimizations -free -fschedule-insns -fschedule-insns2 -fsched-spec-load-dangerous -fshrink-wrap -fcaller-saves -fcombine-stack-adjustments -fipa-ra -ftree-reassoc -ftree-partial-pre -ftree-forwprop -ftree-fre -ftree-phiprop -fhoist-adjacent-loads -ftree-copy-prop -fipa-pure-const -fipa-reference -fipa-pta -fipa-profile -fipa-cp -fipa-cp-clone -fipa-icf -ftree-loop-distribution -ftree-loop-if-convert -ftree-loop-distribute-patterns -ftree-scev-cprop -ftree-parallelize-loops=4 -ftree-pta -ftree-sra -ftree-loop-vectorize -fpartial-inlining -fpredictive-commoning -fpeephole2 -fguess-branch-probability -freorder-blocks-algorithm=stc -freorder-blocks-and-partition -freorder-functions -falign-functions -falign-loops -falign-jumps -flto -fcprop-registers -funsafe-math-optimizations -fassociative-math -freciprocal-math -ffinite-math-only -fno-signed-zeros -fvpt -funroll-loops -fschedule-fusion -fpeel-loops -fmove-loop-invariants -fexcess-precision=fast -fgcse-after-reload -ftree-slp-vectorize -foptimize-sibling-calls -ffast-math -fvect-cost-model=dynamic -fvect-cost-model -funswitch-loops -ffp-contract=fast -fivopts -fopenmp'
-
 if [ -n "${MANUAL_INSTALLATION}" ]; then
 
     export FORTRAN_COMPILER=gfortran-9
@@ -123,36 +121,32 @@ if [ -n "${MANUAL_INSTALLATION}" ]; then
     # IF DEF, CLEAN_ALL SCRIPT ALSO DELETE COMPILED REQUIRED PACKAGES
     #export CLEAN_ALL_INCLUDE_REQUIRED_PACKAGES=1
 
-    # ------------------------------------------------------------------------
-    # -------------------------- RARE OPTIONS  -------------------------------
-    # ------------------------------------------------------------------------
-
-    # RARE OPTION - IF DEF, PYTHON VIRTUAL ENVIRONMENT WILL NOT LOAD SYSTEM
+    # IF DEF, PYTHON VIRTUAL ENVIRONMENT WILL NOT LOAD SYSTEM
     # PACKAGES. IT PROVIDES TOTAL CONTROL/ISOLATION OF THE PYTHON INSTALLATION
     #export DONT_USE_SYSTEM_PIP_PACKAGES=1
 
-    # RARE OPTION - IF DEF, SCRIPT WON'T UNXZ `./EXTERNAL_MODULES/CODE` XZ FILES
+    # IF DEF, SCRIPT WON'T UNXZ `./EXTERNAL_MODULES/CODE` XZ FILES
     #export NO_UNXZ_EXTERNAL_MODULES_CODE=1
 
-    # RARE OPTION - IF DEF, SCRIPT WON'T UNXZ ./EXTERNAL_MODULES/DATA XZ FILES
+    # IF DEF, SCRIPT WON'T UNXZ ./EXTERNAL_MODULES/DATA XZ FILES
     #export NO_UNXZ_EXTERNAL_MODULES_DATA=1
 
-    # RARE OPTION - IF DEFINED, THE SCRIPT WILL NOT INSTALL DISTUTILS PACKAGE
+    # IF DEFINED, THE SCRIPT WILL NOT INSTALL DISTUTILS PACKAGE
     # PS: SOME SUPERCOMPUTERS HAVE NUMPY TOO OLD FOR PACKAGES SUCH AS ASTROPY
     #     NUMPY REQUIRES OPENBLAS AND DISUTILS IS TOO OLD TO INSTALL OPENBLAS
     #     ON SOME SUPERCOMPUTERS
     export IGNORE_DISTUTILS_INSTALLATION=1
 
-    # RARE OPTION - IF DEFINED, THE SCRIPT WILL NOT INSTALL OPENBLAS
+    # IF DEFINED, THE SCRIPT WILL NOT INSTALL OPENBLAS
     # PS: ONLY REQUIRED IF USER DOESN'T HAVE UPDATED NUMPY SOME SUPERCOMPUTERS
     #     HAVE NUMPY TOO OLD FOR PACKAGES SUCH AS ASTROPY
     export IGNORE_OPENBLAS_INSTALLATION=1
 
-    # RARE OPTION - IF DEFINED, THE SCRIPT WILL NOT INSTALL CMAKE
+    # IF DEFINED, THE SCRIPT WILL NOT INSTALL CMAKE
     # PS: SOME SUPERCOMPUTERS HAVE TOO OLD CMAKE TO INSTALL REQUIRED PACKAGES
     #export IGNORE_CMAKE_INSTALLATION=1
 
-    # RARE OPTION - IF DEFINED, THE SCRIPT WILL NOT INSTALL XZ PACKAGE
+    # IF DEFINED, THE SCRIPT WILL NOT INSTALL XZ PACKAGE
     #export IGNORE_XZ_INSTALLATION=1
 
 elif [ -n "${DOCKER_INSTALLATION}" ]; then
@@ -180,30 +174,20 @@ elif [ -n "${MIDWAY_SUPERCOMPUTER_INSTALLATION}" ]; then
     module unload mkl
     module unload gcc
     module load gcc/9.2.0
-    module load cfitsio/3
-    module load gsl/2.2.1
-    module load boost/1.68.0
-    module load armadillo/7.8
     module load python/3.7.0
     module load openmpi/3.1.2
-    module load fftw3/3.3.5
     module load cmake/3.15
 
+    export GLOBALPYTHON3=python3.6
     export PYTHON_VERSION=3.6
     export FORTRAN_COMPILER=gfortran
     export C_COMPILER=gcc
     export CXX_COMPILER=g++
 
     export IGNORE_DISTUTILS_INSTALLATION=1
-    export IGNORE_OPENBLAS_INSTALLATION=1
     export IGNORE_XZ_INSTALLATION=1
     export IGNORE_CMAKE_INSTALLATION=1
-    export IGNORE_CPP_BOOST_INSTALLATION=1
-    export IGNORE_CPP_ARMA_INSTALLATION=1
-    export IGNORE_C_CFITSIO_INSTALLATION=1
-    export IGNORE_C_GSL_INSTALLATION=1
-    export IGNORE_C_FFTW_INSTALLATION=1
-    export IGNORE_FORTRAN_INSTALLATION=1
+    export DONT_USE_SYSTEM_PIP_PACKAGES=1
 
 elif [ -n "${OCELOTE_SUPERCOMPUTER_INSTALLATION}" ]; then
 
@@ -228,26 +212,20 @@ elif [ -n "${OCELOTE_SUPERCOMPUTER_INSTALLATION}" ]; then
     module load git/2.9
     module load xz/5.2.2
     module load python/3.6/3.6.5
-    module load cfitsio/3/3.450
     module load intel/mkl/64/11.3.4/2016.4.258
-    module load boost/1/1.65.1
-    module load lapack/gcc/64/3.8.0
 
+    export GLOBALPYTHON3=python3.6
     export PYTHON_VERSION=3.6
     export FORTRAN_COMPILER=gfortran
     export C_COMPILER=gcc
     export CXX_COMPILER=g++
 
     export IGNORE_DISTUTILS_INSTALLATION=1
-    export IGNORE_OPENBLAS_INSTALLATION=1
     export IGNORE_XZ_INSTALLATION=1
-    export IGNORE_CPP_BOOST_INSTALLATION=1
-    export IGNORE_FORTRAN_INSTALLATION=1
     export OCELOTE_MAKEFILE_COSMOLIKE_FLAGS=1
+    export DONT_USE_SYSTEM_PIP_PACKAGES=1
 
     ulimit -s unlimited
-
-    export COSMOLIKE_NDEBUG_COMMON_FLAGS='-foptimize-strlen -finline-functions-called-once -fmerge-all-constants -Wno-unused-result -Wno-format-overflow -fmax-errors=1 -fthread-jumps -fcse-follow-jumps -fsplit-wide-types -fcse-skip-blocks -faggressive-loop-optimizations -fif-conversion -fif-conversion2 -fexpensive-optimizations -free -fschedule-insns -fschedule-insns2 -fsched-spec-load-dangerous -fshrink-wrap -fcaller-saves -fcombine-stack-adjustments -fipa-ra -ftree-reassoc -ftree-partial-pre -ftree-forwprop -ftree-fre -ftree-phiprop -fhoist-adjacent-loads -ftree-copy-prop -fipa-pure-const -fipa-reference -fipa-pta -fipa-profile -fipa-cp -fipa-cp-clone -fipa-icf -ftree-loop-distribution -ftree-loop-if-convert -ftree-loop-distribute-patterns -ftree-scev-cprop -ftree-parallelize-loops=4 -ftree-pta -ftree-sra -ftree-loop-vectorize -fpartial-inlining -fpredictive-commoning -fpeephole2 -fguess-branch-probability -freorder-blocks-algorithm=stc -freorder-blocks-and-partition -freorder-functions -falign-functions -falign-loops -falign-jumps -flto -fcprop-registers -funsafe-math-optimizations -fassociative-math -freciprocal-math -ffinite-math-only -fno-signed-zeros -fvpt -funroll-loops -fschedule-fusion -fpeel-loops -fmove-loop-invariants -fexcess-precision=fast -fgcse-after-reload -ftree-slp-vectorize -foptimize-sibling-calls -ffast-math -fvect-cost-model=dynamic -fvect-cost-model -funswitch-loops -ffp-contract=fast -fivopts -fopenmp'
 
 elif [ -n "${NASA_SUPERCOMPUTER_INSTALLATION}" ]; then
 
@@ -264,12 +242,12 @@ elif [ -n "${NASA_SUPERCOMPUTER_INSTALLATION}" ]; then
 
     module load gcc/8.2
     module load mpi-sgi/mpt
-    module load boost/1.62
     module load python3/3.7.0
     module load pkgsrc/2018Q3
 
     ulimit -s unlimited
 
+    export GLOBALPYTHON3=python3.7
     export PYTHON_VERSION=3.7
     export FORTRAN_COMPILER=gfortran
     export C_COMPILER=gcc
@@ -277,32 +255,26 @@ elif [ -n "${NASA_SUPERCOMPUTER_INSTALLATION}" ]; then
 
     export IGNORE_DISTUTILS_INSTALLATION=1
     export IGNORE_XZ_INSTALLATION=1
-    export IGNORE_CPP_BOOST_INSTALLATION=1
+    export DONT_USE_SYSTEM_PIP_PACKAGES=1
 
 elif [ -n "${AMYPOND_SUPERCOMPUTER_INSTALLATION}" ]; then
 
-    export GLOBAL_PACKAGES_LOCATION=/usr/local
-    export PYTHON_VERSION=3
+    export GLOBALPYTHON3=python3.6
+    export PYTHON_VERSION=3.6
     export FORTRAN_COMPILER=gfortran-9
     export C_COMPILER=gcc-9
     export CXX_COMPILER=g++-9
 
     export IGNORE_DISTUTILS_INSTALLATION=1
-    export IGNORE_OPENBLAS_INSTALLATION=1
     export IGNORE_XZ_INSTALLATION=1
-    export IGNORE_ALL_PIP_INSTALLATION=1
     export IGNORE_CMAKE_INSTALLATION=1
-    export IGNORE_CPP_BOOST_INSTALLATION=1
-    export IGNORE_CPP_ARMA_INSTALLATION=1
-    export IGNORE_CPP_SPDLOG_INSTALLATION=1
-    export IGNORE_C_INSTALLATION=1
-    export IGNORE_FORTRAN_INSTALLATION=1
+    export DONT_USE_SYSTEM_PIP_PACKAGES=1
 
 elif [ -n "${MACOS_HOMEBREW_INSTALLATION}" ]; then
 
     export GLOBAL_PACKAGES_LOCATION=/usr/local
     export PYTHON_VERSION=3.7
-
+    export GLOBALPYTHON3=python3.7
     export FORTRAN_COMPILER=gfortran-9
     export C_COMPILER=gcc-9
     export CXX_COMPILER=g++-9
@@ -342,11 +314,8 @@ elif [ -n "${PUMA_SUPERCOMPUTER_INSTALLATION}" ]; then
 
     export IGNORE_DISTUTILS_INSTALLATION=1
     export IGNORE_CMAKE_INSTALLATION=1
-
     export DONT_USE_SYSTEM_PIP_PACKAGES=1
     export OCELOTE_MAKEFILE_COSMOLIKE_FLAGS=1
-
-    export COSMOLIKE_NDEBUG_COMMON_FLAGS='-foptimize-strlen -finline-functions-called-once -fmerge-all-constants -Wno-unused-result -Wno-format-overflow -fmax-errors=1 -fthread-jumps -fcse-follow-jumps -fsplit-wide-types -fcse-skip-blocks -faggressive-loop-optimizations -fif-conversion -fif-conversion2 -fexpensive-optimizations -free -fschedule-insns -fschedule-insns2 -fsched-spec-load-dangerous -fshrink-wrap -fcaller-saves -fcombine-stack-adjustments -fipa-ra -ftree-reassoc -fcode-hoisting -ftree-partial-pre -ftree-forwprop -ftree-fre -ftree-phiprop -fhoist-adjacent-loads -ftree-copy-prop -fipa-pure-const -fipa-reference -fipa-pta -fipa-profile -fipa-cp -fipa-cp-clone -fipa-icf -ftree-loop-distribution -ftree-loop-if-convert -ftree-loop-distribute-patterns -floop-interchange -ftree-scev-cprop -ftree-parallelize-loops=4 -ftree-pta -ftree-sra -ftree-loop-vectorize -fpartial-inlining -fpredictive-commoning -fpeephole2 -fguess-branch-probability -freorder-blocks-algorithm=stc -freorder-blocks-and-partition -freorder-functions -falign-functions -falign-loops -falign-jumps -flto -fcprop-registers -funsafe-math-optimizations -fassociative-math -freciprocal-math -ffinite-math-only -fno-signed-zeros -fvpt -funroll-loops -fschedule-fusion -fpeel-loops -fmove-loop-invariants -fexcess-precision=fast -fgcse-after-reload -floop-unroll-and-jam -fsplit-loops -ftree-slp-vectorize -foptimize-sibling-calls -ffast-math -fvect-cost-model=dynamic -fvect-cost-model -funswitch-loops -ffp-contract=fast -march=native -fivopts -fopenmp'
 fi
 
 if [ -z "${IGNORE_CMAKE_INSTALLATION}" ]; then
