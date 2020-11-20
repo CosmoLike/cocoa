@@ -120,11 +120,11 @@ The installation of Cocoa required packages, as well as Boltzmann and Likelihood
 
  - [setup_cocoa_installation_packages](https://github.com/CosmoLike/cocoa/blob/master/Cocoa/setup_cocoa_installation_packages)
 
-    This file has instructions on how to install packages that are required by the Cobaya Framework. [Setup_cocoa_installation_packages](https://github.com/CosmoLike/cocoa/blob/master/Cocoa/setup_cocoa_installation_packages) file also contains instructions on to uncompress [xz files](https://tukaani.org/xz/format.html) on [Cocoa-Installation-Libraries](https://github.com/CosmoLike/cocoa_installation_libraries), [Cobaya-External-Code](https://github.com/CosmoLike/cobaya_code) and [Cobaya-External-Data](https://github.com/CosmoLike/cobaya_data) submodules.
+    This file has instructions on how to install packages required by the Cocoa Framework.
 
  - [compile_external_modules](https://github.com/CosmoLike/cocoa/blob/master/Cocoa/compile_external_modules)
 
-    This file has instructions on how to compile Boltzmann, Sampler and likelihood codes that are required by the Cobaya Framework. 
+    This file has instructions on how to compile Boltzmann, Sampler and likelihood codes. 
 
  - [start_cocoa](https://github.com/CosmoLike/cocoa/blob/master/Cocoa/start_cocoa)
 
