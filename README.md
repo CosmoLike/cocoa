@@ -35,22 +35,11 @@ PS: Cocoa chooses the preferred method of installation via special environment k
     # ----------------------------------------------------------------------------
 
     export DOCKER_INSTALLATION=1
-
     #export MIDWAY_SUPERCOMPUTER_INSTALLATION=1
-
-    #export OCELOTE_SUPERCOMPUTER_INSTALLATION=1
-
-    #export AMYPOND_SUPERCOMPUTER_INSTALLATION=1
-
-    #export PUMA_SUPERCOMPUTER_INSTALLATION=1
-
-    #export MACOS_HOMEBREW_INSTALLATION=1
-
-    # SEE IF/ELSE BLOCK ON LINE ~62 TO TWEAK THE MANUAL INSTALLATION
-    #export MANUAL_INSTALLATION=1
-
     #export NASA_SUPERCOMPUTER_INSTALLATION=1
-
+    (...)
+    #export MANUAL_INSTALLATION=1
+    
 **Exporting, at the same, more than one of the special keys listed above produces undefined behavior!**
 
 PS: As previously stated, Docker installation is a lot easier for beginners (quick start). However, on HPC systems, dealing with containers and [PBS](https://www.openpbs.org) and  [SLURM](https://slurm.schedmd.com/documentation.html) submission scripts is a little annoying. Therefore, users are encouraged to learn how to do a manual installation on your HPC system when using Cocoa for running lots of MCMC chains.
@@ -193,12 +182,7 @@ and proceed to the section [Cloning the Repository](https://github.com/CosmoLike
 **First, check the appendix [Prerequisites for MacOS](https://github.com/CosmoLike/cocoa#prerequisites-for-macos)** before reading any further. In the file [set_installation_options](https://github.com/CosmoLike/cocoa/blob/master/Cocoa/set_installation_options), the user needs to uncomment the line `export MACOS_HOMEBREW_INSTALLATION=1`, while making sure that all other special keys are unset, as shown below:
 
     #export DOCKER_INSTALLATION=1
-    #export MIDWAY_SUPERCOMPUTER_INSTALLATION=1
-    #export OCELOTE_SUPERCOMPUTER_INSTALLATION=1
-    #export AMYPOND_SUPERCOMPUTER_INSTALLATION=1
-    #export NASA_SUPERCOMPUTER_INSTALLATION=1
-    #export MANUAL_INSTALLATION=1
-    #export PUMA_SUPERCOMPUTER_INSTALLATION=1
+    (...)
     export MACOS_HOMEBREW_INSTALLATION=1
 
 This special key assumes all prerequisites packages have been installed. Users can adapt the if/else block associated with `MACOS_HOMEBREW_INSTALLATION` for advanced tunning settings.
@@ -214,7 +198,7 @@ If there is no preset special key for your particular enviroment, the user need 
     Cocoa/.local/lib
     Cocoa/.local/share
 
-The script `setup_compile_external_modules` contains the lines:
+The script `compile_external_modules` contains the lines:
 
     if [ -n "${DONT_USE_SYSTEM_PIP_PACKAGES}" ]; then
         $GLOBALPYTHON3 -m venv $ROOTDIR/.local/
@@ -222,7 +206,7 @@ The script `setup_compile_external_modules` contains the lines:
         $GLOBALPYTHON3 -m venv $ROOTDIR/.local/ --system-site-packages
     fi
 
-The command `venv` activates an [isolated python environment](https://python-guide-kr.readthedocs.io/ko/latest/dev/virtualenvs.html) that utilizes system packages if available (and if the users allows it via the enviroment flag `DONT_USE_SYSTEM_PIP_PACKAGES`)  but does not affect them in any way in case upgrades are required. Finally, consistent use of the scripts [setup_compile_external_modules](https://github.com/CosmoLike/cocoa/blob/master/Cocoa/setup_compile_external_modules) and [stop_cocoa](https://github.com/CosmoLike/cocoa/blob/master/Cocoa/stop_cocoa) ensures that `PYTHONPATH`, `LD_LIBRARY_PATH`, and `PATH` are not affected once the user decides to switch projects, avoiding the potential use of Cobaya's required packages elsewhere.
+The command `venv` activates an [isolated python environment](https://python-guide-kr.readthedocs.io/ko/latest/dev/virtualenvs.html) that utilizes system packages if available (and if the users allows it via the enviroment flag `DONT_USE_SYSTEM_PIP_PACKAGES`)  but does not affect them in any way in case upgrades are required. Finally, consistent use of the scripts [compile_external_modules](https://github.com/CosmoLike/cocoa/blob/master/Cocoa/compile_external_modules) and [stop_cocoa](https://github.com/CosmoLike/cocoa/blob/master/Cocoa/stop_cocoa) ensures that `PYTHONPATH`, `LD_LIBRARY_PATH`, and `PATH` are not affected once the user decides to switch projects, avoiding the potential use of Cobaya's required packages elsewhere.
 
 Once the manual installation of all required packages is performed, the environment keys
 
