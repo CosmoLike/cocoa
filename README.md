@@ -82,7 +82,7 @@ These examples will evaluate various likelihoods at specific cosmologies. The `-
 
 # The Project Folder
 
-The project folder holds all the projects the user will develop their work. Individual projects should be hosted on an independent folder named `cocoa_XXX` where `XXX = project name.` The majority of projects we are working on are not public, and they are safeguarded on the private repositories listed on `project/clone_all.sh`. You can add your projects there, and the script `setup_cocoa_installation_packages` will try to clone all listed projects. Having inaccessible repositories listed at `project/clone_all.sh` will not cause any errors. 
+The project folder holds all the projects that are being developed by our group. Individual projects should be hosted on an independent folder named `cocoa_XXX` where `XXX = project name.` The majority of projects we are working on are not public (yet), and they are safeguarded on the private repositories listed on `project/clone_all.sh`. You can add your projects there, and the script `setup_cocoa_installation_packages` will try to clone all listed projects. Having inaccessible repositories listed at `project/clone_all.sh` will not cause any errors. 
 
 The `cocoa_XXX` folder that host the `XXX` project needs to have the more or less the following structure (taken from our private DES-Y3 project)
 
@@ -115,8 +115,6 @@ The `cocoa_XXX` folder that host the `XXX` project needs to have the more or les
     +-- chains
     |   +-- README
       
-
-
 # Appendix
 
 ## Further Information about the configuration files
