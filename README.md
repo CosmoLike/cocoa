@@ -4,13 +4,15 @@
 
   Cocoa allows users to run, inside the [Cobaya](https://github.com/CobayaSampler) framework, [CosmoLike](https://github.com/CosmoLike) routines that evaluate data vectors for the [Dark Energy Survey](https://www.darkenergysurvey.org) (a.k.a DES). This readme file presents basic and advanced instructions for installing all Cocoa components, including the [Planck likelihood](https://wiki.cosmos.esa.int/planck-legacy-archive/index.php/Main_Page). **By no means, we want to discourage users from cloning Cobaya, CAMB, CLASS, Polychord, and Planck data from their original repositories. Please check the appendix [Proper Credits](https://github.com/CosmoLike/cocoa#proper-credits)**. Once we have the public release of Cosmolike code applied to DES-Y3 and LSST-Y1, we will refactor our repository to enforce Cocoa to clone such codes from their repositories (or forks). We welcome contributions to make such changes.
 
+Cocoa developers explicitly copied all Boltzman codes, likelihoods, Cocoa Sampler, and all python/C/C++/Fortran requirements to create a very controllable environment that will ensure the reproducibility of our DES-Y3 and LSST-Y1 results. All the required python packages, including Numpy and Scipy, have been stored at [cocoa_installation_libraries](https://github.com/CosmoLike/cocoa/tree/main/cocoa_installation_libraries) folder, and installation scripts enforce the use of the available local cache instead of internet connection or global packages on the host machine. We will be quite conservative when deciding to upgrade the required packages.
+
 # Installation
 
 ## Cloning the Repository
 
 Type
 
-    $ git clone https://github.com/CosmoLike/cocoa.git
+    $ git clone git@github.com:CosmoLike/cocoa.git
 
 PS: We have a monthly quota of only 150 GB in bandwidth for [Git LFS](https://git-lfs.github.com) files, and therefore we ask users to use good judgment in the number of times you clone repositories with large files. See appendix [Git LFS](https://github.com/CosmoLike/cocoa/blob/master/README.md#git-lfs) for further information.
 
@@ -80,6 +82,41 @@ After that, the Cobaya Framework should be ready, and the user can test a few ex
     
 These examples will evaluate various likelihoods at specific cosmologies. The `-f` ensures that the same YAML file can be run multiple times, overwriting output files from previous evaluations that are located at `./chains`.
 
+# The Project Folder
+
+The project folder holds all the projects that are being developed by our group. Individual projects should be hosted on an independent folder named `cocoa_XXX` where `XXX = project name.` The majority of projects we are working on are not public (yet), and they are safeguarded on the private repositories listed on `project/clone_all.sh`. You can add your projects there, and the script `setup_cocoa_installation_packages` will try to clone all listed projects. Having inaccessible repositories listed at `project/clone_all.sh` will not cause any errors. 
+
+The `cocoa_XXX` folder that host the `XXX` project needs to have the more or less the following structure (taken from our private DES-Y3 project)
+
+    +-- cocoa_des_y3
+    |    +-- likelihood
+    |    |   +-- _cosmolike_prototype_base.py
+    |    |   +-- des_3x2pt.py
+    |    |   +-- des_3x2pt.yaml
+    |    |   +-- des_2x2pt.py
+    |    |   +-- des_3x2pt.yaml
+    |    |   +-- des_cosmic_shear.py
+    |    |   +-- des_cosmic_shear.yaml
+    |    +-- scripts
+    |    |   +-- compile_des_y3
+    |    |   +-- start_des_y3
+    |    |   +-- stop_des_y3
+    |    +-- data
+    |    |   +-- DES.paramnames
+    |    |   +-- DES_Y3.dataset
+    |    |   +-- datavector.txt
+    |    |   +-- covariance.txt
+    |    |   +-- nzlens.txt
+    |    |   +-- nzsource.txt
+    |    |   +-- mask.mask
+    |    +-- interface
+    |    |   +-- MakefileCosmolike
+    |    |   +-- cosmolike_des_y3_interface.py
+    |    |   +-- interface.cpp
+    |    |   +-- interface.hpp
+    |    +-- chains
+    |    |   +-- README
+      
 # Appendix
 
 ## Further Information about the configuration files
