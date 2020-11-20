@@ -6,7 +6,7 @@
 
 Cocoa developers explicitly copied all Boltzman codes, likelihoods, Cocoa Sampler, and all python/C/C++/Fortran requirements to create a very controllable environment that will ensure the reproducibility of our DES-Y3 and LSST-Y1 results. All the required python packages, including Numpy and Scipy, have been stored at [cocoa_installation_libraries](https://github.com/CosmoLike/cocoa/tree/main/cocoa_installation_libraries). Installation scripts enforce the use of the available local cache instead of internet connection or packages already installed on the host machine. 
 
-PS: To be fair, we are quite loose on the installation procedures for MacOS (see appendix: [Prerequisites for MacOS](https://github.com/CosmoLike/cocoa#prerequisites-for-macos), because our group never run production results on such an environment.
+PS: To be fair, we are quite loose on the installation procedures for MacOS (see appendix: [Prerequisites for MacOS](https://github.com/CosmoLike/cocoa#prerequisites-for-macos)) because our group never run production results in such an environment.
 
 # Installation
 
