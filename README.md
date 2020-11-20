@@ -67,7 +67,7 @@ The installation can be performed with the following commands:
     
     $ source start_cocoa
 
-Sourcing [setup_cocoa_installation_packages](https://github.com/CosmoLike/cocoa/blob/master/Cocoa/setup_cocoa_installation_packages) may require a long time (~hours) depending on the supercomputer environment (System Option). It is possible to speed-up installation considerably by running `source setup_cocoa_installation_packages` on an interactive node w/ 16 threads, which is especially important in HPC environments where the the script needs to install all the required packages instead of relying on system's packages (such as NASA Pleiades or UofA Puma). However, for the Docker Installation, sourcing [setup_cocoa_installation_packages](https://github.com/CosmoLike/cocoa/blob/master/Cocoa/setup_cocoa_installation_packages) should take only a few minutes.
+Sourcing [setup_cocoa_installation_packages](https://github.com/CosmoLike/cocoa/blob/master/Cocoa/setup_cocoa_installation_packages) may require a long time (~hours) depending on the supercomputer environment (System Option). It is possible to speed-up installation considerably by running `source setup_cocoa_installation_packages` on an interactive node w/ ~16 threads. For the Docker Installation, however, sourcing [setup_cocoa_installation_packages](https://github.com/CosmoLike/cocoa/blob/master/Cocoa/setup_cocoa_installation_packages) should take only a few minutes.
 
 Once the user is done working on the Cocoa enviroment, type:
 
