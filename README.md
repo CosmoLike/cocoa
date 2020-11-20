@@ -132,7 +132,7 @@ The installation of Cocoa required packages, as well as Boltzmann and Likelihood
 
  - [stop_cocoa](https://github.com/CosmoLike/cocoa/blob/master/Cocoa/stop_cocoa)
 
-    This file has instructions on how to unset the Python virtual environment - including recovering original `$PYTHONPATH`, `$LD_LIBRARY_PATH`, and `PATH`. 
+    This file has instructions on how to unset the Python virtual environment - including recovering original `PYTHONPATH`, `LD_LIBRARY_PATH`, and `PATH`. 
 
  - [clean_all](https://github.com/CosmoLike/cocoa/blob/master/Cocoa/clean_all)
 
