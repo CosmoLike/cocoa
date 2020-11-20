@@ -80,6 +80,43 @@ After that, the Cobaya Framework should be ready, and the user can test a few ex
     
 These examples will evaluate various likelihoods at specific cosmologies. The `-f` ensures that the same YAML file can be run multiple times, overwriting output files from previous evaluations that are located at `./chains`.
 
+# The Project Folder
+
+The project folder holds all the projects the user (or our group) will develop their work. Individual projects should be hosted on an independent folder named `cocoa_XXX` where `XXX = project name.` The majority of projects we are working on are not public, and they are safeguarded on the private repositories listed on `project/clone_all.sh`. You can add your projects there, and the script `setup_cocoa_installation_packages` will try to clone all listed projects. Having inaccessible repositories listed at `project/clone_all.sh` will not cause any errors. 
+
+The `cocoa_XXX` folder that host the `XXX` project needs to have the more or less the following structure (taken from our private DES-Y3 project)
+
+    .
+    +-- likelihood
+    |   +-- _cosmolike_prototype_base.py
+    |   +-- des_3x2pt.py
+    |   +-- des_3x2pt.yaml
+    |   +-- des_2x2pt.py
+    |   +-- des_3x2pt.yaml
+    |   +-- des_cosmic_shear.py
+    |   +-- des_cosmic_shear.yaml
+    +-- scripts
+    |   +-- compile_des_y3
+    |   +-- start_des_y3
+    |   +-- stop_des_y3
+    +-- data
+    |   +-- DES.paramnames
+    |   +-- DES_Y3.dataset
+    |   +-- datavector.txt
+    |   +-- covariance.txt
+    |   +-- nzlens.txt
+    |   +-- nzsource.txt
+    |   +-- mask.mask
+    +-- interface
+    |   +-- MakefileCosmolike
+    |   +-- cosmolike_des_y3_interface.py
+    |   +-- interface.cpp
+    |   +-- interface.hpp
+    +-- chains
+    |   +-- README
+      
+
+
 # Appendix
 
 ## Further Information about the configuration files
