@@ -86,34 +86,34 @@ The project folder holds all the projects that are being developed by our group.
 
 The `cocoa_XXX` folder that host the `XXX` project needs to have the more or less the following structure (taken from our private DES-Y3 project)
 
-    .
-    +-- likelihood
-    |   +-- _cosmolike_prototype_base.py
-    |   +-- des_3x2pt.py
-    |   +-- des_3x2pt.yaml
-    |   +-- des_2x2pt.py
-    |   +-- des_3x2pt.yaml
-    |   +-- des_cosmic_shear.py
-    |   +-- des_cosmic_shear.yaml
-    +-- scripts
-    |   +-- compile_des_y3
-    |   +-- start_des_y3
-    |   +-- stop_des_y3
-    +-- data
-    |   +-- DES.paramnames
-    |   +-- DES_Y3.dataset
-    |   +-- datavector.txt
-    |   +-- covariance.txt
-    |   +-- nzlens.txt
-    |   +-- nzsource.txt
-    |   +-- mask.mask
-    +-- interface
-    |   +-- MakefileCosmolike
-    |   +-- cosmolike_des_y3_interface.py
-    |   +-- interface.cpp
-    |   +-- interface.hpp
-    +-- chains
-    |   +-- README
+    +-- cocoa_des_y3
+    |    +-- likelihood
+    |    |   +-- _cosmolike_prototype_base.py
+    |    |   +-- des_3x2pt.py
+    |    |   +-- des_3x2pt.yaml
+    |    |   +-- des_2x2pt.py
+    |    |   +-- des_3x2pt.yaml
+    |    |   +-- des_cosmic_shear.py
+    |    |   +-- des_cosmic_shear.yaml
+    |    +-- scripts
+    |    |   +-- compile_des_y3
+    |    |   +-- start_des_y3
+    |    |   +-- stop_des_y3
+    |    +-- data
+    |    |   +-- DES.paramnames
+    |    |   +-- DES_Y3.dataset
+    |    |   +-- datavector.txt
+    |    |   +-- covariance.txt
+    |    |   +-- nzlens.txt
+    |    |   +-- nzsource.txt
+    |    |   +-- mask.mask
+    |    +-- interface
+    |    |   +-- MakefileCosmolike
+    |    |   +-- cosmolike_des_y3_interface.py
+    |    |   +-- interface.cpp
+    |    |   +-- interface.hpp
+    |    +-- chains
+    |    |   +-- README
       
 # Appendix
 
