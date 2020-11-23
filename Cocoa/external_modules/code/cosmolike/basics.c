@@ -107,24 +107,8 @@ void invert_matrix_colesky(gsl_matrix *A) {
   gsl_linalg_cholesky_invert(A);
 }
 
-double int_gsl_integrate_insane_precision(double (*func)(double, void *),
-                                          void *arg, double a, double b,
-                                          double *error, int niter) {
-  double res, err;
-  gsl_integration_cquad_workspace *w =
-      gsl_integration_cquad_workspace_alloc(niter);
-  gsl_function F;
-  F.function = func;
-  F.params = arg;
-  gsl_integration_cquad(&F, a, b, 0, precision.insane, w, &res, &err, 0);
-  if (NULL != error)
-    *error = err;
-  gsl_integration_cquad_workspace_free(w);
-  return res;
-}
-
 double int_gsl_integrate_high_precision(double (*func)(double, void *),
-  void *arg, double a, double b, double *error, int niter) {
+void *arg, double a, double b, double *error, int niter) {
   double res, err;
   gsl_integration_cquad_workspace *w =
       gsl_integration_cquad_workspace_alloc(niter);
@@ -139,11 +123,10 @@ double int_gsl_integrate_high_precision(double (*func)(double, void *),
 }
 
 double int_gsl_integrate_medium_precision(double (*func)(double, void *),
-                                          void *arg, double a, double b,
-                                          double *error, int niter) {
+void *arg, double a, double b, double *error, int niter) {
   double res, err;
   gsl_integration_cquad_workspace *w =
-      gsl_integration_cquad_workspace_alloc(niter);
+    gsl_integration_cquad_workspace_alloc(niter);
   gsl_function F;
   F.function = func;
   F.params = arg;
@@ -156,125 +139,89 @@ double int_gsl_integrate_medium_precision(double (*func)(double, void *),
 }
 
 double int_gsl_integrate_low_precision(double (*func)(double, void *),
-    void *arg, double a, double b, double *error, int niter) {
+void *arg, double a, double b, double *error, int niter) {
   gsl_set_error_handler_off();
   double res, err;
   gsl_function F;
   F.function = func;
-  F.params  = arg;
+  F.params = arg;
   size_t neval;
   gsl_integration_qng(&F,a,b,0,precision.medium,&res,&err,&neval);
   return res;
 }
 
-double int_gsl_integrate_cov_precision(double (*func)(double, void *),
-                                       void *arg, double a, double b,
-                                       double *error, int niter) {
-  double res, err;
-  gsl_integration_cquad_workspace *wcrude =
-      gsl_integration_cquad_workspace_alloc(niter);
-  gsl_function F;
-  F.function = func;
-  F.params = arg;
-  gsl_integration_cquad(&F, a, b, 1e-16, precision.high, wcrude, &res, &err, 0);
-  if (NULL != error) {
-    *error = err;
-  }
-  gsl_integration_cquad_workspace_free(wcrude);
-  return res;
-}
-
-int line_count(char *filename) {
-  FILE *n;
-  n = fopen(filename, "r");
-  if (!n) {
-    printf("line_count: %s not found!\nEXIT!\n", filename);
-    exit(1);
-  }
-  int ch = 0, prev = 0, number_of_lines = 0;
-
-  do {
-    prev = ch;
-    ch = fgetc(n);
-    if (ch == '\n')
-      number_of_lines++;
-  } while (ch != EOF);
-  fclose(n);
-  // last line might not end with \n, but if previous character does, last line
-  // is empty
-  if (ch != '\n' && prev != '\n' && number_of_lines != 0)
-    number_of_lines++;
-  return number_of_lines;
-}
-
-double **create_double_matrix(long nrl, long nrh, long ncl, long nch)
-/* allocate a double matrix with subscript range m[nrl..nrh][ncl..nch] */
-{
+// allocate a double matrix with subscript range m[nrl..nrh][ncl..nch]
+double **create_double_matrix(long nrl, long nrh, long ncl, long nch) {
   long i, nrow = nrh - nrl + 1, ncol = nch - ncl + 1;
   double **m;
 
-  /* allocate pointers to rows */
+  // allocate pointers to rows
   m = (double **)calloc(nrow + NR_END, sizeof(double *));
-  if (!m)
-    error("allocation failure 1 in create_double_matrix()");
+  if (!m) {
+    log_fatal("allocation failure 1 in create_double_matrix()");
+    exit(1);
+  }
   m += NR_END;
   m -= nrl;
 
   /* allocate rows and set pointers to them */
   m[nrl] = (double *)calloc(nrow * ncol + NR_END, sizeof(double));
-  if (!m[nrl])
-    error("allocation failure 2 in create_double_matrix()");
+  if (!m[nrl]) {
+    log_fatal("allocation failure 2 in create_double_matrix()");
+    exit(1);
+  }
   m[nrl] += NR_END;
   m[nrl] -= ncl;
 
   for (i = nrl + 1; i <= nrh; i++)
     m[i] = m[i - 1] + ncol;
 
-  /* return pointer to array of pointers to rows */
+  // return pointer to array of pointers to rows
   return m;
 }
 
 // free a double matrix allocated by create_double_matrix()
-void free_double_matrix(double **m, long nrl, long nrh __attribute__((unused)), long ncl, long nch __attribute__((unused)))
-{
+void free_double_matrix(double **m, long nrl, long nrh __attribute__((unused)),
+long ncl, long nch __attribute__((unused))) {
   free((FREE_ARG)(m[nrl] + ncl - NR_END));
   free((FREE_ARG)(m + nrl - NR_END));
 }
 
 // allocate a double vector with subscript range v[nl..nh]
-double *create_double_vector(long nl, long nh)
-{
+double *create_double_vector(long nl, long nh) {
   double *v;
   v = (double *) calloc(nh - nl + 1 + NR_END, sizeof(double));
   if (!v) {
-    error("allocation failure in double vector()");
+    log_fatal("allocation failure in double vector()");
+    exit(1);
   }
   return v - nl + NR_END;
 }
 
 // allocate a int vector with subscript range v[nl..nh]
-int *int_vector(long nl, long nh)
-{
+int *int_vector(long nl, long nh) {
   int *v;
   v = (int *)calloc(nh - nl + 1 + NR_END, sizeof(int));
-  if (!v)
-    error("allocation failure in int vector()");
+  if (!v) {
+    log_fatal("allocation failure in int vector()");
+    exit(1);
+  }
   return v - nl + NR_END;
 }
 
 // allocate a int vector with subscript range v[nl..nh]
-long *long_vector(long nl, long nh)
-{
+long *long_vector(long nl, long nh) {
   long *v;
   v = (long *)calloc(nh - nl + 1 + NR_END, sizeof(long));
-  if (!v)
-    error("allocation failure in int vector()");
+  if (!v) {
+    log_fatal("allocation failure in int vector()");
+    exit(1);
+  }
   return v - nl + NR_END;
 }
 
 // free a double vector allocated with vector()
-void free_double_vector(double *v, long nl, long nh __attribute__((unused)))
-{
+void free_double_vector(double *v, long nl, long nh __attribute__((unused))) {
   free((FREE_ARG)(v + nl - NR_END));
 }
 
@@ -316,13 +263,35 @@ double interpol(double *f, int n, double a, double b, double dx, double x,
   }
 }
 
+int line_count(char *filename) {
+  FILE *n;
+  n = fopen(filename, "r");
+  if (!n) {
+    printf("line_count: %s not found!\nEXIT!\n", filename);
+    exit(1);
+  }
+  int ch = 0, prev = 0, number_of_lines = 0;
+
+  do {
+    prev = ch;
+    ch = fgetc(n);
+    if (ch == '\n')
+      number_of_lines++;
+  } while (ch != EOF);
+  fclose(n);
+  // last line might not end with \n, but if previous character does, last line
+  // is empty
+  if (ch != '\n' && prev != '\n' && number_of_lines != 0)
+    number_of_lines++;
+  return number_of_lines;
+}
+
 double interpol_fitslope(double *f, int n, double a, double b, double dx,
                          double x, double lower) {
   double r;
   int i, fitrange;
   if (x < a) {
     if (lower == 0.) {
-      // error("value too small in interpol");
       return 0.0;
     }
     return f[0] + lower * (x - a);
@@ -395,13 +364,10 @@ double interpol2d_fitslope(double **f, int nx, double ax, double bx, double dx,
   int i, j, fitrange;
   if (x < ax) {
     return 0.;
-    //		error("value too small in interpol2d");
   }
 
   if (x > bx) {
     return 0.;
-    //	printf("%le %le\n",x,bx);
-    //	  error("value too big in interpol2d");
   }
   t = (x - ax) / dx;
   i = (int)(floor(t));

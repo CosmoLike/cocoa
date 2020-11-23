@@ -42,13 +42,9 @@ galpara gbias = {.b2 = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0},
                  .b_mag = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
                            0.0}}; // default: point to old bgal_z routin
 
-model_para_redmagic redm;
-
 clusterpara Cluster = {.model = "default"};
 
-pdeltapara pdeltaparams = {.runmode = "Halofit", .DIFF_n = 0., .DIFF_A = 0.};
-
-globalpara global;
+pdeltapara pdeltaparams = {.runmode = "Halofit"};
 
 FPTpara FPT = {.k_min = 1.e-5,
                .k_max = 1.e+3,
@@ -68,60 +64,6 @@ nuisancepara nuisance = {
     .sigma_zphot_clustering = {0., 0., 0., 0., 0., 0., 0., 0., 0., 0.},
     .bias_zphot_clustering = {0., 0., 0., 0., 0., 0., 0., 0., 0., 0.}};
 
-priorpara prior = {.shear_calibration_m = {{0., 0.},
-                                           {0., 0.},
-                                           {0., 0.},
-                                           {0., 0.},
-                                           {0., 0.},
-                                           {0., 0.},
-                                           {0., 0.},
-                                           {0., 0.},
-                                           {0., 0.},
-                                           {0., 0.}},
-                   .sigma_zphot_shear = {{0., 0.},
-                                         {0., 0.},
-                                         {0., 0.},
-                                         {0., 0.},
-                                         {0., 0.},
-                                         {0., 0.},
-                                         {0., 0.},
-                                         {0., 0.},
-                                         {0., 0.},
-                                         {0., 0.}},
-                   .bias_zphot_shear = {{0., 0.},
-                                        {0., 0.},
-                                        {0., 0.},
-                                        {0., 0.},
-                                        {0., 0.},
-                                        {0., 0.},
-                                        {0., 0.},
-                                        {0., 0.},
-                                        {0., 0.},
-                                        {0., 0.}},
-                   .sigma_zphot_clustering = {{0., 0.},
-                                              {0., 0.},
-                                              {0., 0.},
-                                              {0., 0.},
-                                              {0., 0.},
-                                              {0., 0.},
-                                              {0., 0.},
-                                              {0., 0.},
-                                              {0., 0.},
-                                              {0., 0.}},
-                   .bias_zphot_clustering = {{0., 0.},
-                                             {0., 0.},
-                                             {0., 0.},
-                                             {0., 0.},
-                                             {0., 0.},
-                                             {0., 0.},
-                                             {0., 0.},
-                                             {0., 0.},
-                                             {0., 0.},
-                                             {0., 0.}}};
-
-flat_priorpara flat_prior;
-
-covpar covparams;
 
 barypara bary = {.isPkbary = 0};
 
