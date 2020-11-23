@@ -70,7 +70,7 @@ typedef struct {
   double MGSigma;
   double MGmu;
   double random; // Random number between zero and 1 - see interface.cpp
-  int is_cached; 
+  int is_cached;
 } cosmopara;
 
 typedef struct {
@@ -164,16 +164,6 @@ typedef struct {
 } galpara;
 
 typedef struct {
-  double hod[5];
-  double cg;            // galaxy concentration
-  double fc;            // central occupation
-  double b_a;           // assembly bias
-  int parameterization; // Zehavi, Reddick, histo
-  double n0;
-  char HOD_FILE[CHAR_MAX_SIZE];
-} model_para_redmagic;
-
-typedef struct {
   double N200_min;
   double N200_max;
   int N200_Nbin;
@@ -188,18 +178,7 @@ typedef struct {
 typedef struct {
   char runmode[CHAR_MAX_SIZE];
   char baryons[CHAR_MAX_SIZE];
-  double DIFF_n; // difference fucntion describing the constant uncertainty in
-                 // Pdelta for k>0.01
-  double DIFF_A; // difference fucntion describing the scale dependent
-                 // uncertainty in Pdelta for k>0.01
 } pdeltapara;
-
-typedef struct {
-  double sglob;
-  double aglob;
-  double rglob;
-  int reset_cov_tables;
-} globalpara;
 
 typedef struct { // parameters for power spectrum passed to FASTPT
   // general specifiers
@@ -273,171 +252,6 @@ typedef struct {
   double cluster_selection[10];
 } nuisancepara;
 
-typedef struct {  // two parameters for each nuisance parameter: Center
-                  // (prior.*[0]) + width of Gaussian (prior.*[1])
-  double Omega_m; // matter density parameter
-  double Omega_v; // cosmogical constant parameter
-  double sigma_8; // power spectrum normalization
-  double A_s;
-  double n_spec;  // spectral index of initial power spectrum
-  double alpha_s; // running of spectral index of initial power spectrum
-  double w0;      // time dependent Dark energy parametrization zero order
-  double wa;      // time dependent Dark energy parametrization first order
-  double omb;     // Omega baryon
-  double h0;      // Hubble constant
-  double M_nu;
-  double Omega_nu; // density parameter of massive neutrinos; Omega_m =
-                   // Omega_cdm+ Omega_nu + omb
-  double f_NL;
-  double MGSigma;
-  double MGmu;
-  double A_ia[2]; // A IA see Joachimi2012
-  double A2_ia[2];
-  double beta_ia[2];      // beta IA see Joachimi2012
-  double eta_ia[2];       // eta_other IA see Joachimi2012
-  double eta_ia_highz[2]; // additional uncertainty at high z
-  double LF_alpha[2];
-  double LF_P[2];
-  double LF_Q[2];
-  double LF_red_alpha[2];
-  double LF_red_P[2];
-  double LF_red_Q[2];
-  double shear_calibration_m[10][2];
-  double sigma_zphot_shear[10][2];
-  double bias_zphot_shear[10][2];
-  double sigma_zphot_clustering[10][2];
-  double bias_zphot_clustering[10][2];
-  double sigma_zphot_magnification[10][2];
-  double bias_zphot_magnification[10][2];
-  double cluster_Mobs_lgM0[2];
-  double cluster_Mobs_sigma[2];
-  double cluster_Mobs_alpha[2];
-  double cluster_Mobs_beta[2];
-  double cluster_Mobs_N_pivot[2];
-  double cluster_Mobs_lgN0[2];
-  double cluster_Mobs_sigma0[2];
-  double cluster_Mobs_sigma_qm[2];
-  double cluster_Mobs_sigma_qz[2];
-  double cluster_completeness[2];
-  double cluster_centering_f0[2];
-  double cluster_centering_alpha[2];
-  double cluster_centering_sigma[2];
-  double cluster_centering_M_pivot[2];
-  double bary_Q1[2];
-  double bary_Q2[2];
-  double bary_Q3[2];
-} priorpara;
-
-typedef struct {
-  double HOD_rm[5][2];
-  double cg_rm[2];
-  double fc_rm[2];
-} flat_priorpara;
-
-typedef struct input_cosmo_params_mpp {
-  double omega_m;
-  double sigma_8;
-  double A_s;
-  double n_s;
-  double w0;
-  double wa;
-  double omega_b;
-  double omega_nuh2;
-  double h0;
-  double MGSigma;
-  double MGmu;
-} input_cosmo_params_mpp;
-
-typedef struct input_cosmo_params {
-  double omega_m;
-  double sigma_8;
-  double n_s;
-  double w0;
-  double wa;
-  double omega_b;
-  double h0;
-  double MGSigma;
-  double MGmu;
-} input_cosmo_params;
-
-typedef struct input_nuisance_params_mpp {
-  double bias[10];
-  double bias2[10];
-  double lens_z_bias[10];
-  double source_z_bias[10];
-  double shear_m[10];
-  double A_z[10];
-  double MOR[10];
-  double selection[10];
-  double b_mag[10];
-} input_nuisance_params_mpp;
-
-typedef struct input_nuisance_params {
-  double bias[10];
-  double source_z_bias[10];
-  double source_z_s;
-  double lens_z_bias[10];
-  double lens_z_s;
-  double shear_m[10];
-  double A_ia;
-  double beta_ia;
-  double eta_ia;
-  double eta_ia_highz;
-  double lf[6];
-  double m_lambda[6];
-  double cluster_c[4];
-  double bary[3];
-  double b_mag[10];
-} input_nuisance_params;
-
-typedef struct input_nuisance_params_grs {
-  double grsbias[7];
-  double grssigmap[7];
-  double grssigmaz;
-  double grspshot;
-  double grskstar;
-} input_nuisance_params_grs;
-
-typedef struct {
-  double tmin;                // Theta min (arcmin) 
-  double tmax;                // Theta max (arcmin) 
-  int ntheta;                 // number of theta bins 
-  double lmin;                // ell min  
-  double lmax;                // ell max  
-  int ncl;                    // number of ell bins 
-  int ng;                     // ng covariance? 
-  char outdir[CHAR_MAX_SIZE];           // output directory 
-  char filename[CHAR_MAX_SIZE];         // output file name prefix 
-  char C_FOOTPRINT_FILE[CHAR_MAX_SIZE]; // angular power spectrum of survey footprint, in
-                              //   healpix format 
-  char ss[8];                 // Calculate shear-shear components 
-  char ls[8];                 // Calculate shear-position components 
-  char ll[8];                 // Calculate position-position components 
-} covpar;
-
-typedef struct {
-  int N_z;
-  int N_t;
-  int N_k;
-  int N_mu;
-  double k_star; // in h/Mpc
-  double k_min;  // in h/Mpc
-  double k_max;  // in h/Mpc
-  double f_sky;
-  double z[10];
-  double V_z[10]; // in (Mpc/h)^3
-  double H_ref[10];
-  double DA_ref[10];
-  double **datav;
-  double **var;
-  double *k;
-  double *mu;
-  double n_mt[10][2]; // in (h/Mpc)^3
-  double b_mt[10][2];
-  double sigma_z; // fractional accuracy
-  double sigma_p; // in km/s
-} GRSpara_mt;
-
 typedef struct {
   char FILE_logPkR[CHAR_MAX_SIZE];
   char scenario[100]; // available options: mb2, illustris, eagle, HzAGN,
@@ -459,16 +273,6 @@ typedef struct {
   int Nchi;
 } fft_optimize;
 
-typedef struct input_HOD_params {
-  double lgMmin[10];
-  double sigma_lgMin;
-  double lgM1;
-  double lgM0;
-  double alpha;
-  double f_c;
-  double c_g;
-} input_HOD_params;
-
 double bgal_z(double z, int nz);
 
 double b1_per_bin(double z, int nz);
@@ -487,23 +291,13 @@ extern Cmb cmb;
 
 extern galpara gbias;
 
-extern model_para_redmagic redm;
-
 extern clusterpara Cluster;
 
 extern pdeltapara pdeltaparams;
 
-extern globalpara global;
-
 extern FPTpara FPT;
 
 extern nuisancepara nuisance;
-
-extern priorpara prior;
-
-extern flat_priorpara flat_prior;
-
-extern covpar covparams;
 
 extern barypara bary;
 

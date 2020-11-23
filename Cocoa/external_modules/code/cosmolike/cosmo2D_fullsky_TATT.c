@@ -25,7 +25,7 @@ int LMAX = 100000;
 // table
 int LMIN_tab = 20;
 // number of grid point for C(ell) look-up tables
-int NTAB_TATT = 50;
+int NTAB_TATT = 60;
 
 // NLA/TA amplitude C1, nz argument only need if per-bin amplitude
 double C1_TA(double a, double nz, double growfac_a) {

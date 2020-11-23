@@ -123,9 +123,6 @@ void error(char *s);
 
 void cdgamma(fftw_complex x, fftw_complex *res);
 
-double int_gsl_integrate_insane_precision(double (*func)(double, void *),
-                                          void *arg, double a, double b,
-                                          double *error, int niter);
 
 double int_gsl_integrate_high_precision(double (*func)(double, void *),
                                         void *arg, double a, double b,
@@ -136,10 +133,6 @@ double int_gsl_integrate_medium_precision(double (*func)(double, void *),
                                           double *error, int niter);
 
 double int_gsl_integrate_low_precision(double (*func)(double, void *),
-                                       void *arg, double a, double b,
-                                       double *error, int niter);
-
-double int_gsl_integrate_cov_precision(double (*func)(double, void *),
                                        void *arg, double a, double b,
                                        double *error, int niter);
 
