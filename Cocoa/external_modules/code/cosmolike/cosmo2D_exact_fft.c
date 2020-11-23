@@ -320,7 +320,7 @@ double w_tomo_nonLimber(int nt, int ni, int nj) {
   static cosmopara C;
   static nuisancepara N;
   static galpara G;
-#ifdef DEBUG
+
   if (like.Ntheta == 0) {
     log_fatal("like.Ntheta not initialized");
     exit(1);
@@ -329,7 +329,6 @@ double w_tomo_nonLimber(int nt, int ni, int nj) {
     log_fatal("ni != nj tomography not supported");
     exit(1);
   }
-#endif
 
   if (Pl == 0) {
     NTHETA = like.Ntheta;
