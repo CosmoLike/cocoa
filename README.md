@@ -2,9 +2,11 @@
 
 ## Overview
 
-  Cocoa allows users to run, inside the [Cobaya](https://github.com/CobayaSampler) framework, [CosmoLike](https://github.com/CosmoLike) routines that evaluate data vectors for the [Dark Energy Survey](https://www.darkenergysurvey.org) (a.k.a DES). This readme file presents basic and advanced instructions for installing all Cocoa components, including the [Planck likelihood](https://wiki.cosmos.esa.int/planck-legacy-archive/index.php/Main_Page). **By no means, we want to discourage users from cloning Cobaya, CAMB, CLASS, Polychord, and Planck data from their original repositories. Please check the appendix [Proper Credits](https://github.com/CosmoLike/cocoa#proper-credits)**. Once we have the public release of Cosmolike code applied to DES-Y3 and LSST-Y1, we will refactor our repository to enforce Cocoa to clone such codes from their repositories (or forks). We welcome contributions to make such changes.
+  Cocoa allows users to run, inside the [Cobaya](https://github.com/CobayaSampler) framework, [CosmoLike](https://github.com/CosmoLike) routines that evaluate data vectors for the [Dark Energy Survey](https://www.darkenergysurvey.org) (a.k.a DES). This readme file presents basic and advanced instructions for installing all Cocoa components, including the [Planck likelihood](https://wiki.cosmos.esa.int/planck-legacy-archive/index.php/Main_Page). **By no means, we want to discourage general users from cloning Cobaya, CAMB, CLASS, Polychord, and Planck data from their original repositories. Please check the appendix [Proper Credits](https://github.com/CosmoLike/cocoa#proper-credits)**. 
 
-Cocoa developers explicitly copied all Boltzman codes, likelihoods, Cocoa Sampler, and all python/C/C++/Fortran requirements to create a very controllable environment that will ensure the reproducibility of our DES-Y3 and LSST-Y1 results. All the required python packages, including Numpy and Scipy, have been stored at [cocoa_installation_libraries](https://github.com/CosmoLike/cocoa/tree/main/cocoa_installation_libraries) folder, and installation scripts enforce the use of the available local cache instead of internet connection or global packages on the host machine. We will be quite conservative when deciding to upgrade the required packages.
+Cocoa developers explicitly copied all Boltzman codes, likelihoods, Cocoa Sampler, and all python/C/C++/Fortran requirements to create a very controllable environment that will ensure the reproducibility of our DES-Y3 and LSST-Y1 results. All the required python packages, including Numpy and Scipy, have been stored in [cocoa_installation_libraries](https://github.com/CosmoLike/cocoa/tree/main/cocoa_installation_libraries) folder. Installation scripts enforce the use of the available local cache instead of internet connection or packages already installed on the host machine. 
+
+PS: To be fair, we are quite loose on the installation procedures for MacOS (see appendix: [Prerequisites for MacOS](https://github.com/CosmoLike/cocoa#prerequisites-for-macos)) because our group never runs production results in such environment.
 
 # Installation
 
@@ -33,22 +35,11 @@ PS: Cocoa chooses the preferred method of installation via special environment k
     # ----------------------------------------------------------------------------
 
     export DOCKER_INSTALLATION=1
-
     #export MIDWAY_SUPERCOMPUTER_INSTALLATION=1
-
-    #export OCELOTE_SUPERCOMPUTER_INSTALLATION=1
-
-    #export AMYPOND_SUPERCOMPUTER_INSTALLATION=1
-
-    #export PUMA_SUPERCOMPUTER_INSTALLATION=1
-
-    #export MACOS_HOMEBREW_INSTALLATION=1
-
-    # SEE IF/ELSE BLOCK ON LINE ~62 TO TWEAK THE MANUAL INSTALLATION
-    #export MANUAL_INSTALLATION=1
-
     #export NASA_SUPERCOMPUTER_INSTALLATION=1
-
+    (...)
+    #export MANUAL_INSTALLATION=1
+    
 **Exporting, at the same, more than one of the special keys listed above produces undefined behavior!**
 
 PS: As previously stated, Docker installation is a lot easier for beginners (quick start). However, on HPC systems, dealing with containers and [PBS](https://www.openpbs.org) and  [SLURM](https://slurm.schedmd.com/documentation.html) submission scripts is a little annoying. Therefore, users are encouraged to learn how to do a manual installation on your HPC system when using Cocoa for running lots of MCMC chains.
@@ -65,7 +56,7 @@ The installation can be performed with the following commands:
     
     $ source start_cocoa
 
-Sourcing [setup_cocoa_installation_packages](https://github.com/CosmoLike/cocoa/blob/master/Cocoa/setup_cocoa_installation_packages) may require a long time (~hours) depending on the supercomputer environment (System Option). It is possible to speed-up installation considerably by running `source setup_cocoa_installation_packages` on an interactive node w/ 16 threads, which is especially important in HPC environments where the the script needs to install all the required packages instead of relying on system's packages (such as NASA Pleiades or UofA Puma). However, for the Docker Installation, sourcing [setup_cocoa_installation_packages](https://github.com/CosmoLike/cocoa/blob/master/Cocoa/setup_cocoa_installation_packages) should take only a few minutes.
+Sourcing [setup_cocoa_installation_packages](https://github.com/CosmoLike/cocoa/blob/master/Cocoa/setup_cocoa_installation_packages) may require a long time (~hours) depending on the supercomputer environment (System Option). It is possible to speed-up installation considerably by running `source setup_cocoa_installation_packages` on an interactive node w/ ~16 threads. For the Docker Installation, however, sourcing [setup_cocoa_installation_packages](https://github.com/CosmoLike/cocoa/blob/master/Cocoa/setup_cocoa_installation_packages) should take only a few minutes.
 
 Once the user is done working on the Cocoa enviroment, type:
 
@@ -82,9 +73,9 @@ After that, the Cobaya Framework should be ready, and the user can test a few ex
     
 These examples will evaluate various likelihoods at specific cosmologies. The `-f` ensures that the same YAML file can be run multiple times, overwriting output files from previous evaluations that are located at `./chains`.
 
-# The Project Folder
+# The Projects Folder
 
-The project folder holds all the projects that are being developed by our group. Individual projects should be hosted on an independent folder named `cocoa_XXX` where `XXX = project name.` The majority of projects we are working on are not public (yet), and they are safeguarded on the private repositories listed on `project/clone_all.sh`. You can add your projects there, and the script `setup_cocoa_installation_packages` will try to clone all listed projects. Having inaccessible repositories listed at `project/clone_all.sh` will not cause any errors. 
+The `projects` folder includes all the projects that are being developed by our group. Individual projects must be hosted on independent folders named `cocoa_XXX` where XXX is the project name. The majority of projects we are working on are not public (yet), and they are safeguarded on the private repositories listed on `project/clone_all.sh` (the backbone Cosmolike software, however, is publicly available at `external_modules/code`!). You can add your projects there, and the script `setup_cocoa_installation_packages` will try to clone all listed projects. Having inaccessible repositories listed at `project/clone_all.sh` will not cause any errors. 
 
 The `cocoa_XXX` folder that host the `XXX` project needs to have the more or less the following structure (taken from our private DES-Y3 project)
 
@@ -129,11 +120,11 @@ The installation of Cocoa required packages, as well as Boltzmann and Likelihood
 
  - [setup_cocoa_installation_packages](https://github.com/CosmoLike/cocoa/blob/master/Cocoa/setup_cocoa_installation_packages)
 
-    This file has instructions on how to install packages that are required by the Cobaya Framework. [Setup_cocoa_installation_packages](https://github.com/CosmoLike/cocoa/blob/master/Cocoa/setup_cocoa_installation_packages) file also contains instructions on to uncompress [xz files](https://tukaani.org/xz/format.html) on [Cocoa-Installation-Libraries](https://github.com/CosmoLike/cocoa_installation_libraries), [Cobaya-External-Code](https://github.com/CosmoLike/cobaya_code) and [Cobaya-External-Data](https://github.com/CosmoLike/cobaya_data) submodules.
+    This file has instructions on how to install packages required by the Cocoa Framework.
 
  - [compile_external_modules](https://github.com/CosmoLike/cocoa/blob/master/Cocoa/compile_external_modules)
 
-    This file has instructions on how to compile Boltzmann, Sampler and likelihood codes that are required by the Cobaya Framework. 
+    This file has instructions on how to compile Boltzmann, Sampler and likelihood codes. 
 
  - [start_cocoa](https://github.com/CosmoLike/cocoa/blob/master/Cocoa/start_cocoa)
 
@@ -141,7 +132,7 @@ The installation of Cocoa required packages, as well as Boltzmann and Likelihood
 
  - [stop_cocoa](https://github.com/CosmoLike/cocoa/blob/master/Cocoa/stop_cocoa)
 
-    This file has instructions on how to unset the Python virtual environment - including recovering original `$PYTHONPATH`, `$LD_LIBRARY_PATH`, and `PATH`. 
+    This file has instructions on how to unset the Python virtual environment - including recovering original `PYTHONPATH`, `LD_LIBRARY_PATH`, and `PATH`. 
 
  - [clean_all](https://github.com/CosmoLike/cocoa/blob/master/Cocoa/clean_all)
 
@@ -188,22 +179,17 @@ and proceed to the section [Cloning the Repository](https://github.com/CosmoLike
 
 ## System Installation: Further Information for MacOS
 
-**First, check the appendix [Prerequisites for MacOS](https://github.com/CosmoLike/cocoa#prerequisites-for-macos)** before reading any further. In the file [set_installation_options](https://github.com/CosmoLike/cocoa/blob/master/Cocoa/set_installation_options), the user needs to uncomment the line `export MACOS_HOMEBREW_INSTALLATION=1`, while making sure that all other special keys are unset, as shown below:
+**First, check the appendix [Prerequisites for MacOS](https://github.com/CosmoLike/cocoa#prerequisites-for-macos-system-installation)** before reading any further. In the file [set_installation_options](https://github.com/CosmoLike/cocoa/blob/master/Cocoa/set_installation_options), the user needs to uncomment the line `export MACOS_HOMEBREW_INSTALLATION=1`, while making sure that all other special keys are unset, as shown below:
 
     #export DOCKER_INSTALLATION=1
-    #export MIDWAY_SUPERCOMPUTER_INSTALLATION=1
-    #export OCELOTE_SUPERCOMPUTER_INSTALLATION=1
-    #export AMYPOND_SUPERCOMPUTER_INSTALLATION=1
-    #export NASA_SUPERCOMPUTER_INSTALLATION=1
-    #export MANUAL_INSTALLATION=1
-    #export PUMA_SUPERCOMPUTER_INSTALLATION=1
+    (...)
     export MACOS_HOMEBREW_INSTALLATION=1
 
 This special key assumes all prerequisites packages have been installed. Users can adapt the if/else block associated with `MACOS_HOMEBREW_INSTALLATION` for advanced tunning settings.
 
 ## System Installation: Further Information for Linux
 
-**First, check the appendix [Prerequisites for Linux](https://github.com/CosmoLike/cocoa#prerequisites-for-linux)** before reading any further. In the file [set_installation_options](https://github.com/CosmoLike/cocoa/blob/master/Cocoa/set_installation_options), the user needs to uncomment one of the special keys, while making sure that all other special keys are not activated.
+**First, check the appendix [Prerequisites for Linux](https://github.com/CosmoLike/cocoa#prerequisites-for-linux-system-installation)** before reading any further. In the file [set_installation_options](https://github.com/CosmoLike/cocoa/blob/master/Cocoa/set_installation_options), the user needs to uncomment one of the special keys, while making sure that all other special keys are not activated.
 
 If there is no preset special key for your particular enviroment, the user need to perform a manual installation (and select the `export MANUAL_INSTALLATION = 1`). Manually installing the required packages by advanced users has the additional advantage of avoiding repeated compilation of prerequisites packages that take a long time to build. Our scripts never install packages on `$HOME/.local` or other locations in the user's `$PATH` and `$LD_LIBRARY_PATH`. Doing so could impose incompatibilities between Cobaya and different projects. The decision to perform global upgrades on packages required by multiple projects is the user's sole responsibility. All requirements for Cocoa are installed at
 
@@ -212,7 +198,7 @@ If there is no preset special key for your particular enviroment, the user need 
     Cocoa/.local/lib
     Cocoa/.local/share
 
-The script `setup_compile_external_modules` contains the lines:
+The script `compile_external_modules` contains the lines:
 
     if [ -n "${DONT_USE_SYSTEM_PIP_PACKAGES}" ]; then
         $GLOBALPYTHON3 -m venv $ROOTDIR/.local/
@@ -220,7 +206,7 @@ The script `setup_compile_external_modules` contains the lines:
         $GLOBALPYTHON3 -m venv $ROOTDIR/.local/ --system-site-packages
     fi
 
-The command `venv` activates an [isolated python environment](https://python-guide-kr.readthedocs.io/ko/latest/dev/virtualenvs.html) that utilizes system packages if available (and if the users allows it via the enviroment flag `DONT_USE_SYSTEM_PIP_PACKAGES`)  but does not affect them in any way in case upgrades are required. Finally, consistent use of the scripts [setup_compile_external_modules](https://github.com/CosmoLike/cocoa/blob/master/Cocoa/setup_compile_external_modules) and [stop_cocoa](https://github.com/CosmoLike/cocoa/blob/master/Cocoa/stop_cocoa) ensures that `PYTHONPATH`, `LD_LIBRARY_PATH`, and `PATH` are not affected once the user decides to switch projects, avoiding the potential use of Cobaya's required packages elsewhere.
+The command `venv` activates an [isolated python environment](https://python-guide-kr.readthedocs.io/ko/latest/dev/virtualenvs.html) that utilizes system packages if available (and if the users allows it via the enviroment flag `DONT_USE_SYSTEM_PIP_PACKAGES`)  but does not affect them in any way in case upgrades are required. Finally, consistent use of the scripts [compile_external_modules](https://github.com/CosmoLike/cocoa/blob/master/Cocoa/compile_external_modules) and [stop_cocoa](https://github.com/CosmoLike/cocoa/blob/master/Cocoa/stop_cocoa) ensures that `PYTHONPATH`, `LD_LIBRARY_PATH`, and `PATH` are not affected once the user decides to switch projects, avoiding the potential use of Cobaya's required packages elsewhere.
 
 Once the manual installation of all required packages is performed, the environment keys
 
@@ -283,7 +269,7 @@ We assume the user has the following packages installed:
 We also assume all contributors have added their [ssh-keys](https://docs.github.com/en/enterprise/2.15/user/articles/adding-a-new-ssh-key-to-your-github-account) to Cocoa's private submodules. Note that
 
    - **zsh (the Z shell) is not a valid substitution for bash**,
-   - **Python 3.6 and 3.8 are not compatible with Cocoa**
+   - **Python 3.8 is not compatible with Cocoa**
    - **GCC-10 compilers are not compatible with Cocoa**.
 
 We welcome contributions to make Cocoa work with these packages, compilers, and script languages.
