@@ -2,6 +2,7 @@ chains/
 share/
 include/
 .local/
+*.out
 
 cobaya/cobaya/likelihoods/.gitignore
 external_modules/code/.gitignore
