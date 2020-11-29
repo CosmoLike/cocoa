@@ -19,3 +19,5 @@ compile_external_modules
 setup_cocoa_installation_packages
 start_cocoa
 stop_cocoa
+
+project/
