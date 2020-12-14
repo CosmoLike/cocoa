@@ -239,8 +239,9 @@ void get_FPT_IA(void) {
   }
 }
 
-double TATT_II_EE(double k_coverH0, double a, double C1, double C2, double b_ta,
-  double C1_2, double C2_2, double b_ta_2, double growfac_a, double pdelta_ak) {
+double TATT_II_EE(double k_coverH0, double a __attribute__((unused)), double C1, 
+double C2, double b_ta, double C1_2, double C2_2, double b_ta_2, 
+double growfac_a, double pdelta_ak) {
   double nla_EE = 0., ta_EE = 0., tt_EE = 0., mix_EE = 0.;
   nla_EE = C1 * C1_2 * pdelta_ak;
   static cosmopara C;
@@ -294,8 +295,9 @@ double TATT_II_EE(double k_coverH0, double a, double C1, double C2, double b_ta,
   return nla_EE + ta_EE + mix_EE + tt_EE;
 }
 
-double TATT_II_BB(double k_coverH0, double a, double C1, double C2, double b_ta,
-                  double C1_2, double C2_2, double b_ta_2, double growfac_a) {
+double TATT_II_BB(double k_coverH0, double a __attribute__((unused)), double C1, 
+double C2, double b_ta,double C1_2, double C2_2, double b_ta_2, 
+double growfac_a) {
   double ta_BB = 0., tt_BB = 0., mix_BB = 0.;
   static cosmopara C;
   static double logkmin = 0., logkmax = 0., dlgk = 0.;
@@ -330,8 +332,8 @@ double TATT_II_BB(double k_coverH0, double a, double C1, double C2, double b_ta,
   return ta_BB + mix_BB + tt_BB;
 }
 
-double TATT_GI_E(double k_coverH0, double a, double C1, double C2,
-                 double b_ta, double growfac_a, double pdelta_ak) {
+double TATT_GI_E(double k_coverH0, double a __attribute__((unused)), double C1, 
+double C2, double b_ta, double growfac_a, double pdelta_ak) {
   double nla_GI = 0., ta_GI = 0., tt_GI = 0.;// mix_GI = 0.;
   nla_GI = C1 * pdelta_ak;
   static cosmopara C;

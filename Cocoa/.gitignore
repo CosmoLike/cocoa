@@ -3,6 +3,7 @@ share/
 include/
 .local/
 *.out
+core.*
 
 cobaya/cobaya/likelihoods/.gitignore
 external_modules/code/.gitignore

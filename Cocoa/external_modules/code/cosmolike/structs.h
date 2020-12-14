@@ -153,9 +153,6 @@ typedef struct {
   double b2[10];  // quadratic bias parameter for redshift bin i
   double bs2[10]; // leading order tidal bias for redshift bin i
   double rcorr[10];
-  double hod[10][6]; // HOD[i] contains HOD parameters of galaxies in clustering
-                     // bin i, following 5 parameter model of Zehavi et al. 2011
-                     // + modification of concentration parameter
   double cg[10];
   double n_hod[10];
   double b_mag[10]; // amplitude of magnification bias, b_mag[i] =

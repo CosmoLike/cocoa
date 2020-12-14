@@ -23,11 +23,11 @@
 
 double int_for_C_cl_tomo(double a, void *params) {
   if (a >= 1.0) {
-    log_fatal("a>=1 in int_for_C_cl_tomo");
+    log_fatal("a>=1");
     exit(1);
   }
 
-  double *ar = (double *)params;
+  double *ar = (double *) params;
   struct chis chidchi = chi_all(a);
   const double hoverh0 = hoverh0v2(a, chidchi.dchida);
   const double ell = ar[2] + 0.5;
@@ -47,8 +47,8 @@ double int_for_C_cl_tomo_b2(double a, void *params) {
 
   double *ar = (double *) params;
   const double b1 = gbias.b1_function(1. / a - 1., (int)ar[0]);
-  const double b2 = gbias.b2[(int)ar[0]];
-  const double bs2 = gbias.bs2[(int)ar[0]];
+  const double b2 = gbias.b2[(int) ar[0]];
+  const double bs2 = gbias.bs2[(int) ar[0]];
   const double growfac_a = growfac(a);
   struct chis chidchi = chi_all(a);
   const double hoverh0 = hoverh0v2(a, chidchi.dchida);
@@ -137,7 +137,7 @@ double C_cl_tomo_nointerp(double l, int ni, int nj) {
     // COCOA: WE CHANGE INTEGRATION FROM MEDIUM TO LOW PRECISION!!
     return int_gsl_integrate_low_precision(
       int_for_C_cl_tomo,
-      (void *)array,
+      (void *) array,
       amin_lens(nj),
       0.99999,
       NULL,
@@ -184,7 +184,7 @@ double C_cl_tomo(double l, int ni, int nj) {
     update_galpara(&G);
   }
 
-  int j = ni * tomo.clustering_Nbin + nj;
+  const int j = ni * tomo.clustering_Nbin + nj;
 
   if (table[j][0] > 123456780.0) {
     // still need to recompute this tomography bin combination
@@ -228,6 +228,5 @@ double C_cl_tomo(double l, int ni, int nj) {
   if (isnan(f1)) {
     f1 = 0.;
   }
-
   return f1;
 }

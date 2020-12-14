@@ -84,6 +84,8 @@ double bgal_z(double z, int ni) {
     return gbias.b[ni];
   }
   else { // old default: passive evolution
+    printf("what the hell?\n");
+    exit(1);
     double z_evolv_passiv =
         growfac(1. / (z + 1.)) /
         growfac(1. / (1. + 0.5 * (tomo.clustering_zmin[ni] +

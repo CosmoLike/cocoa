@@ -14,8 +14,6 @@
 
 void fastpt_scalar(int *alpha_ar, int *beta_ar, int *ell_ar, int *isP13type_ar, 
 double *coeff_A_ar, int Nterms, double *Pout, double *k, double *Pin, int Nk){
-	int alpha, beta, ell, isP13type, sign;
-
 	double **Fy;
 	Fy = malloc(sizeof(double*) * Nterms);
 	for(int i=0;i<Nterms;i++) {
@@ -69,7 +67,6 @@ void J_abl_ar(double *x, double *fx, long N, int *alpha, int *beta, int *ell, in
 
 	// Only calculate the m>=0 part
 	double eta_m[halfN+1];
-	long j;
 	for(long i=0; i<=halfN; i++) {
 		eta_m[i] = 2*M_PI / dlnx / N * i;
 	}

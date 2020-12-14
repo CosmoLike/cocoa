@@ -139,14 +139,15 @@ void *arg, double a, double b, double *error, int niter) {
 }
 
 double int_gsl_integrate_low_precision(double (*func)(double, void *),
-void *arg, double a, double b, double *error, int niter) {
+void *arg, double a, double b, double *error, 
+int niter __attribute__((unused))) {
   gsl_set_error_handler_off();
   double res, err;
   gsl_function F;
   F.function = func;
   F.params = arg;
   size_t neval;
-  gsl_integration_qng(&F,a,b,0,precision.medium,&res,&err,&neval);
+  gsl_integration_qng(&F, a, b, 0, precision.medium, &res, &err, &neval);
   return res;
 }
 

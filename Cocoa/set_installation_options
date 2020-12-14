@@ -357,3 +357,9 @@ fi
 export PIP3=$ROOTDIR/.local/bin/pip$PYTHON_VERSION
 export PYTHON3=$ROOTDIR/.local/bin/python$PYTHON_VERSION
 export COBAYA_PACKAGES_PATH=external_modules
+
+if [ -n "${COSMOLIKE_DEBUG_MODE}" ]; then
+    export SPDLOG_LEVEL=debug
+else
+    export SPDLOG_LEVEL=info
+fi

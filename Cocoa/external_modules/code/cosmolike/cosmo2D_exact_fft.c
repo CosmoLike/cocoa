@@ -93,7 +93,8 @@ void f_chi_for_Psi_cl(double *chi_ar, int Nchi, double *f_chi_ar, int ni) {
 }
 
 // Integrand for galaxy density RSD
-void f_chi_for_Psi_cl_RSD(double *chi_ar, int Nchi, double *f_chi_RSD_ar, int ni) {
+void f_chi_for_Psi_cl_RSD(double *chi_ar, int Nchi, double *f_chi_RSD_ar,
+int ni) {
   const double real_coverH0 = cosmology.coverH0 / cosmology.h0;
   for (int i = 0; i < Nchi; i++) {
     // first convert unit of chi from Mpc to c/H0
@@ -114,7 +115,7 @@ void f_chi_for_Psi_cl_RSD(double *chi_ar, int Nchi, double *f_chi_RSD_ar, int ni
 
 // Integrand for lensing magnification of galaxy density
 void f_chi_for_Psi_cl_Mag(double *chi_ar, int Nchi, double *f_chi_Mag_ar,
-                          int ni) {
+int ni) {
   const double real_coverH0 = cosmology.coverH0 / cosmology.h0;
   for (int i = 0; i < Nchi; i++) {
     // first convert unit of chi from Mpc to c/H0
@@ -133,14 +134,16 @@ void f_chi_for_Psi_cl_Mag(double *chi_ar, int Nchi, double *f_chi_Mag_ar,
 
 // Mixture of non-Limber and Limber of C_cl (galaxy clustering)
 void C_cl_mixed(int L, int LMAX, int ni, int nj, double *Cl, double dev,
-                double tolerance) {
+double tolerance) {
+
+  static double **k1_ar, **k2_ar, **Fk1_ar, **Fk2_ar;
+  static double **Fk1_Mag_ar, **Fk2_Mag_ar;
+  static double *chi_ar;
+
   const int Nell_block = 20; //COCOA: original value = 100
   const int Nchi = 500; //COCOA: original value = 1000
   const int LMAX_NOLIMBER = 400;
   int ell_ar[Nell_block];
-  static double **k1_ar, **k2_ar, **Fk1_ar, **Fk2_ar;
-  static double **Fk1_Mag_ar, **Fk2_Mag_ar;
-  static double *chi_ar;
   double f1_chi_ar[Nchi], f2_chi_ar[Nchi];
   double f1_chi_RSD_ar[Nchi], f2_chi_RSD_ar[Nchi];
   double f1_chi_Mag_ar[Nchi], f2_chi_Mag_ar[Nchi];
@@ -166,16 +169,24 @@ void C_cl_mixed(int L, int LMAX, int ni, int nj, double *Cl, double dev,
       Fk2_ar[i] = malloc(Nchi * sizeof(double));
       Fk1_Mag_ar[i] = malloc(Nchi * sizeof(double));
       Fk2_Mag_ar[i] = malloc(Nchi * sizeof(double));
-      for (int j = 0; j < Nchi; j++) {
-        Fk1_ar[i][j] = 0.;
-        Fk2_ar[i][j] = 0.;
-        Fk1_Mag_ar[i][j] = 0.;
-        Fk2_Mag_ar[i][j] = 0.;
-      }
     }
     chi_ar = malloc(Nchi * sizeof(double));
-    for (int i = 0; i < Nchi; i++) {
-      chi_ar[i] = chi_min * exp(dlnchi * i);
+  }
+
+  for (int i = 0; i < Nchi; i++) {
+    // chi_min and chi_max are cosmology dependent
+    chi_ar[i] = chi_min * exp(dlnchi * i);
+  }
+
+  #pragma omp parallel for
+  for (int i = 0; i < Nell_block; i++) {
+    for (int j = 0; j < Nchi; j++) {
+      k1_ar[i][j] = 0.0;
+      k2_ar[i][j] = 0.0;
+      Fk1_ar[i][j] = 0.;
+      Fk2_ar[i][j] = 0.;
+      Fk1_Mag_ar[i][j] = 0.;
+      Fk2_Mag_ar[i][j] = 0.;
     }
   }
 
@@ -340,8 +351,8 @@ double w_tomo_nonLimber(int nt, int ni, int nj) {
 
     #pragma omp parallel for
     for (int i = 0; i < NTHETA; i++) {
-      double Pmin[LMAX + 1];
-      double Pmax[LMAX + 1];
+      double *Pmin = create_double_vector(0, LMAX+1);
+      double *Pmax = create_double_vector(0, LMAX+1);
 
       xmin[i] = cos(exp(log(like.vtmin) + (i + 0.0) * logdt));
       xmax[i] = cos(exp(log(like.vtmin) + (i + 1.0) * logdt));
@@ -355,6 +366,9 @@ double w_tomo_nonLimber(int nt, int ni, int nj) {
       for (int l = 1; l < LMAX; l++) {
         Pl[i][l] = a*(Pmin[l + 1] - Pmax[l + 1] - Pmin[l - 1] + Pmax[l - 1]);
       }
+
+      free_double_vector(Pmin,0,LMAX+1);
+      free_double_vector(Pmax,0,LMAX+1);
     }
   }
 
@@ -367,7 +381,7 @@ double w_tomo_nonLimber(int nt, int ni, int nj) {
     // dev will be the actual difference between exact and Limber calcuation
     double** Cl = malloc(tomo.clustering_Nbin * sizeof(double*));
     for (int nz = 0; nz < tomo.clustering_Nbin; nz++) {
-      Cl[nz] = malloc(LMAX * sizeof(double));
+      Cl[nz] = calloc(LMAX, sizeof(double));
       C_cl_mixed(L, LMAX, nz, nz, Cl[nz], dev, tolerance); // no threading
     }
     #pragma omp parallel for

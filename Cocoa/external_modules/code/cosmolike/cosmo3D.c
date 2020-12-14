@@ -1841,6 +1841,6 @@ double PkRatio_baryons(double kintern, double a) {
 // ------------------------------------------------------------------------
 // ------------------------------------------------------------------------
 
-double MG_Sigma(double a) {
+double MG_Sigma(double a __attribute__((unused))) {
   return 0.0;
 }
