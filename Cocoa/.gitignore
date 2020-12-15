@@ -3,10 +3,7 @@ share/
 include/
 .local/
 *.out
-<<<<<<< HEAD
 core.*
-=======
->>>>>>> 838280336e01be26d498b950fec5388b93ddf86f
 
 cobaya/cobaya/likelihoods/.gitignore
 external_modules/code/.gitignore
@@ -18,7 +15,7 @@ external_modules/data/bicep_keck_2015/
 external_modules/data/des_data/
 external_modules/data/sn_data/
 
-set_installation_options
+#set_installation_options
 compile_external_modules
 setup_cocoa_installation_packages
 start_cocoa

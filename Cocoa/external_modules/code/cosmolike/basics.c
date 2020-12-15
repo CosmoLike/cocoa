@@ -139,23 +139,15 @@ void *arg, double a, double b, double *error, int niter) {
 }
 
 double int_gsl_integrate_low_precision(double (*func)(double, void *),
-<<<<<<< HEAD
-void *arg, double a, double b, double *error, 
+void *arg, double a, double b, double *error,
 int niter __attribute__((unused))) {
-=======
-void *arg, double a, double b, double *error, int niter) {
->>>>>>> 838280336e01be26d498b950fec5388b93ddf86f
   gsl_set_error_handler_off();
   double res, err;
   gsl_function F;
   F.function = func;
   F.params = arg;
   size_t neval;
-<<<<<<< HEAD
   gsl_integration_qng(&F, a, b, 0, precision.medium, &res, &err, &neval);
-=======
-  gsl_integration_qng(&F,a,b,0,precision.medium,&res,&err,&neval);
->>>>>>> 838280336e01be26d498b950fec5388b93ddf86f
   return res;
 }
 
