@@ -3,7 +3,10 @@ share/
 include/
 .local/
 *.out
+<<<<<<< HEAD
 core.*
+=======
+>>>>>>> 838280336e01be26d498b950fec5388b93ddf86f
 
 cobaya/cobaya/likelihoods/.gitignore
 external_modules/code/.gitignore
