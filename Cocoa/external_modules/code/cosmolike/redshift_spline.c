@@ -121,6 +121,7 @@ int test_kmax(double l, int zl) {
 int test_zoverlap(int zl, int zs) {
   // if (tomo.clustering_zmin[zl] >= tomo.shear_zmax[zs]) {return 0;}
   if (ggl_efficiency(zl, zs) > survey.ggl_overlap_cut) {
+
     return 1;
   }
   if (redshift.shear_photoz < 4 &&
@@ -1189,19 +1190,19 @@ double zmean(int j) {
       array[0] = 1.0 * i;
       table[i][0] =
           int_gsl_integrate_low_precision(
-            int_for_zmean, 
+            int_for_zmean,
             (void *) array,
             tomo.clustering_zmin[i],
-            tomo.clustering_zmax[i], 
-            NULL, 
+            tomo.clustering_zmax[i],
+            NULL,
             1024
-          ) / 
+          ) /
           int_gsl_integrate_low_precision(
-            norm_for_zmean, 
+            norm_for_zmean,
             (void *) array,
             tomo.clustering_zmin[i],
-            tomo.clustering_zmax[i], 
-            NULL, 
+            tomo.clustering_zmax[i],
+            NULL,
             1024
           );
     }
@@ -1278,11 +1279,11 @@ double ggl_efficiency(int zl, int zs) {
         array[1] = 1.0 * j;
         table[i][j] =
             int_gsl_integrate_medium_precision(
-              int_for_ggl_efficiency, 
-              (void *) array, 
+              int_for_ggl_efficiency,
+              (void *) array,
               tomo.clustering_zmin[i],
-              tomo.clustering_zmax[i], 
-              NULL, 
+              tomo.clustering_zmax[i],
+              NULL,
               1024
             ) / max_g_tomo(j);
       }
@@ -1295,11 +1296,11 @@ double ggl_efficiency(int zl, int zs) {
         array[1] = 1.0 * j;
         table[i][j] =
             int_gsl_integrate_medium_precision(
-              int_for_ggl_efficiency, 
-              (void *) array, 
+              int_for_ggl_efficiency,
+              (void *) array,
               tomo.clustering_zmin[i],
-              tomo.clustering_zmax[i], 
-              NULL, 
+              tomo.clustering_zmax[i],
+              NULL,
               1024
             ) /max_g_tomo(j);
       }
@@ -1494,14 +1495,12 @@ double g2_tomo(double a, int zbin) {
 }
 
 double int_for_g_lens(double aprime, void *params) {
-  double chi1, chi_prime, val;
   double *ar = (double *)params;
-  int zbin = (int)ar[0];
-  chi1 = ar[1];
-  chi_prime = chi(aprime);
-  val = pf_photoz(1. / aprime - 1., zbin) * f_K(chi_prime - chi1) /
+  const int zbin = (int) ar[0];
+  const double chi1 = ar[1];
+  const double chi_prime = chi(aprime);
+  return pf_photoz(1. / aprime - 1., zbin) * f_K(chi_prime - chi1) /
         f_K(chi_prime) / (aprime * aprime);
-  return val;
 }
 
 // for *lens* tomography bin zbin
@@ -1535,20 +1534,22 @@ double g_lens(double a, int zbin) {
       }
     }
     if (tomo.clustering_Nbin > 0) {
-      const int j = 0;
-      double array[2];
-      array[0] = (double) j;
-      double aa = 1./(redshift.clustering_zdistrpar_zmax + 1.);
-      for (int i = 0; i < Ntable.N_a; i++, aa += da) {
-        array[1] = chi(aa);
-        table[j + 1][i] = int_gsl_integrate_medium_precision(
-          int_for_g_lens,
-          (void *) array,
-          1. / (redshift.shear_zdistrpar_zmax + 1.),
-          aa,
-          NULL,
-          4000
-        );
+      {
+        const int j = 0;
+        double array[2];
+        array[0] = (double) j;
+        double aa = 1./(redshift.clustering_zdistrpar_zmax + 1.);
+        for (int i = 0; i < Ntable.N_a; i++, aa += da) {
+          array[1] = chi(aa);
+          table[j + 1][i] = int_gsl_integrate_medium_precision(
+            int_for_g_lens,
+            (void *) array,
+            1. / (redshift.shear_zdistrpar_zmax + 1.),
+            aa,
+            NULL,
+            4000
+          );
+        }
       }
       #pragma omp parallel for
       for (int j = 1; j < tomo.clustering_Nbin; j++) {

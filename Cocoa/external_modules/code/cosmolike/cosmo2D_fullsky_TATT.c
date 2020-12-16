@@ -186,7 +186,7 @@ double int_for_C_ggl_IA_TATT(double a, void *params) {
   w_mag = W_mag(a, fK, ar[0]) * gbias.b_mag[(int)ar[0]];
 
   // galaxy bias parameters for lens bin
-  b1 = gbias.b1_function(1. / a - 1., (int)ar[0]);
+  b1 = gbias.b1_function(1. / a - 1., (int) ar[0]);
   b2 = gbias.b2[(int)ar[0]];
   bs2 = gbias.bs2[(int)ar[0]];
   const double g4 = growfac_a*growfac_a*growfac_a*growfac_a;
@@ -241,7 +241,7 @@ double C_ggl_TATT(double l, int nl, int ns) {
   double array[3] = {(double)nl, (double)ns, l};
   double gE = int_gsl_integrate_low_precision(
     int_for_C_ggl_IA_TATT,
-    (void *)array,
+    (void *) array,
     amin_lens(nl),
     amax_lens(nl),
     NULL,
@@ -298,9 +298,10 @@ double w_gamma_t_TATT(int nt, int ni, int nj) {
     }
   }
   if (recompute_ggl(C, G, N, ni)) {
+    // COCOA: CANT OPENMP HERE - VARYNG ONLY BIAS CAUSES RACE CONDITION HERE
+    for (int nz = 0; nz < tomo.ggl_Npowerspectra; nz++)
     {
-      const int nz = 0;
-      double Cl[LMAX];
+      double *Cl = malloc(sizeof(double)*(LMAX));
       {
         const int l = 2;
         Cl[l] = C_ggl_TATT(1.0 * l, ZL(nz), ZS(nz));
@@ -324,26 +325,8 @@ double w_gamma_t_TATT(int nt, int ni, int nj) {
           w_vec[nz * like.Ntheta + i] += Pl[i][l] * Cl[l];
         }
       }
+      free(Cl);
     }
-
-    #pragma omp parallel for
-    for (int nz = 1; nz < tomo.ggl_Npowerspectra; nz++)
-    {
-      double Cl[LMAX];
-      for (int l = 2; l < LMIN_tab; l++) {
-        Cl[l] = C_ggl_TATT(1.0 * l, ZL(nz), ZS(nz));
-      }
-      for (int l = LMIN_tab; l < LMAX; l++) {
-        Cl[l] = C_ggl_TATT_tab(1.0 * l, ZL(nz), ZS(nz));
-      }
-      for (int i = 0; i < NTHETA; i++) {
-        w_vec[nz * like.Ntheta + i] = 0;
-        for (int l = 2; l < LMAX; l++) {
-          w_vec[nz * like.Ntheta + i] += Pl[i][l] * Cl[l];
-        }
-      }
-    }
-
     update_cosmopara(&C);
     update_galpara(&G);
     update_nuisance(&N);
