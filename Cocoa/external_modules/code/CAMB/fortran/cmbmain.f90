@@ -558,7 +558,7 @@
         !All have at least k_per_logint steps per log k
 
         boost = CP%Accuracy%AccuracyBoost * CP%Accuracy%TransferkBoost
-        k_per_logint =CP%Transfer%k_per_logint
+        k_per_logint = CP%Transfer%k_per_logint
         if (CP%Transfer%high_precision) boost = boost*1.5
 
         q_switch_lowk1 = 0.7/State%taurst
@@ -1132,8 +1132,10 @@
     real(dl) atol
 
     atol=tol/exp(CP%Accuracy%AccuracyBoost*CP%Accuracy%IntTolBoost-1)
-    if (CP%Transfer%high_precision) atol=atol/10000 !CHECKTHIS
-
+    if (CP%Transfer%high_precision) then
+        atol=atol/10000 !CHECKTHIS
+    endif
+    
     ind=1
     call initial(EV,y, tau)
     if (global_error_flag/=0) return

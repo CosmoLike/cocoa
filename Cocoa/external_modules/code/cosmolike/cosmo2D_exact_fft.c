@@ -25,17 +25,16 @@ double G_taper(double k) {
 }
 
 double int_for_C_cl_lin(double a, void *params) {
-  double res, ell, fK, k;
-  double *ar = (double *)params;
+  double *ar = (double*) params;
 
   struct chis chidchi = chi_all(a);
-  double hoverh0 = hoverh0v2(a, chidchi.dchida);
+  const double hoverh0 = hoverh0v2(a, chidchi.dchida);
 
-  ell = ar[2] + 0.5;
-  fK = f_K(chidchi.chi);
-  k = ell / fK;
+  const double ell = ar[2] + 0.5;
+  const double fK = f_K(chidchi.chi);
+  const double k = ell / fK;
 
-  res = W_gal(a, ar[0], chidchi.chi, hoverh0) *
+  const double res = W_gal(a, ar[0], chidchi.chi, hoverh0) *
     W_gal(a, ar[1], chidchi.chi, hoverh0) * chidchi.dchida / (fK * fK);
 
   return res * p_lin(k, a);
@@ -50,19 +49,19 @@ double C_cl_lin_nointerp(double l, int ni, int nj) {
 
 // test for replacing Plin with Pdelta and rescaled
 double int_for_C_cl_nl_rescale(double a, void *params) {
-  double res, ell, fK, k;
-  double *ar = (double *)params;
+  double *ar = (double*) params;
 
   double growfac_a = growfac(a);
   struct chis chidchi = chi_all(a);
   double hoverh0 = hoverh0v2(a, chidchi.dchida);
 
-  ell = ar[2] + 0.5;
-  fK = f_K(chidchi.chi);
-  k = ell / fK;
+  const double ell = ar[2] + 0.5;
+  const double fK = f_K(chidchi.chi);
+  const double k = ell / fK;
 
-  res = W_gal(a, ar[0], chidchi.chi, hoverh0) *
+  const double res = W_gal(a, ar[0], chidchi.chi, hoverh0) *
     W_gal(a, ar[1], chidchi.chi, hoverh0) * chidchi.dchida / (fK * fK);
+
   return res * Pdelta(k, 0.9999) * growfac_a * growfac_a;
 }
 
@@ -77,8 +76,7 @@ double C_cl_nl_rescaled_nointerp(double l, int ni, int nj) {
 void f_chi_for_Psi_cl(double *chi_ar, int Nchi, double *f_chi_ar, int ni) {
   const double real_coverH0 = cosmology.coverH0/cosmology.h0; // unit Mpc
   for (int i = 0; i < Nchi; i++) {
-    // first convert unit of chi from Mpc to c/H0
-    const double a = a_chi(chi_ar[i]/real_coverH0);
+    const double a = a_chi(chi_ar[i]/real_coverH0 /* convert unit to c/H0 */);
     const double z = 1. / a - 1.;
     if ((z < tomo.clustering_zmin[ni]) || (z > tomo.clustering_zmax[ni])) {
       f_chi_ar[i] = 0.;
@@ -97,8 +95,7 @@ void f_chi_for_Psi_cl_RSD(double *chi_ar, int Nchi, double *f_chi_RSD_ar,
 int ni) {
   const double real_coverH0 = cosmology.coverH0 / cosmology.h0;
   for (int i = 0; i < Nchi; i++) {
-    // first convert unit of chi from Mpc to c/H0
-    const double a = a_chi(chi_ar[i] / real_coverH0);
+    const double a = a_chi(chi_ar[i]/real_coverH0 /* convert unit to c/H0 */);
     const double z = 1. / a - 1.;
     if ((z < tomo.clustering_zmin[ni]) || (z > tomo.clustering_zmax[ni])) {
       f_chi_RSD_ar[i] = 0.;
@@ -118,14 +115,13 @@ void f_chi_for_Psi_cl_Mag(double *chi_ar, int Nchi, double *f_chi_Mag_ar,
 int ni) {
   const double real_coverH0 = cosmology.coverH0 / cosmology.h0;
   for (int i = 0; i < Nchi; i++) {
-    // first convert unit of chi from Mpc to c/H0
-    const double a = a_chi(chi_ar[i] / real_coverH0);
+    const double a = a_chi(chi_ar[i]/real_coverH0 /* convert unit to c/H0 */);
     const double z = 1. / a - 1.;
-    const double fK = f_K(chi_ar[i] / real_coverH0);
+    const double fK = f_K(chi_ar[i]/real_coverH0 /* convert unit to c/H0 */);
     if ((z > tomo.clustering_zmax[ni])) {
       f_chi_Mag_ar[i] = 0.;
     } else {
-      const double wmag = W_mag(a, fK, (double)ni);
+      const double wmag = W_mag(a, fK, (double) ni);
       const double window_M = wmag / fK / (real_coverH0 * real_coverH0);
       f_chi_Mag_ar[i] = window_M * growfac(a); // unit [Mpc^-2]
     }
@@ -149,9 +145,9 @@ double tolerance) {
   double f1_chi_Mag_ar[Nchi], f2_chi_Mag_ar[Nchi];
 
   const double real_coverH0 = cosmology.coverH0 / cosmology.h0;
-  const double chi_min = chi(1./(1.+0.002))*real_coverH0;
-  const double chi_max = chi(1./(1.+4.))*real_coverH0;
-  const double dlnchi = log(chi_max / chi_min) / (Nchi - 1.);
+  const double chi_min = chi(1./(1.+0.002))*real_coverH0; // DIMENSIONELESS
+  const double chi_max = chi(1./(1.+4.))*real_coverH0; // DIMENSIONELESS
+  const double dlnchi = log(chi_max/chi_min) / (Nchi - 1.);
   const double dlnk = dlnchi;
 
   // COCOA: no need to create/destroy arrays with same size at every call
@@ -183,10 +179,10 @@ double tolerance) {
     for (int j = 0; j < Nchi; j++) {
       k1_ar[i][j] = 0.0;
       k2_ar[i][j] = 0.0;
-      Fk1_ar[i][j] = 0.;
-      Fk2_ar[i][j] = 0.;
-      Fk1_Mag_ar[i][j] = 0.;
-      Fk2_Mag_ar[i][j] = 0.;
+      Fk1_ar[i][j] = 0.0;
+      Fk2_ar[i][j] = 0.0;
+      Fk1_Mag_ar[i][j] = 0.0;
+      Fk2_Mag_ar[i][j] = 0.0;
     }
   }
 

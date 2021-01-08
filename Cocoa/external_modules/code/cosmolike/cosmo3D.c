@@ -131,225 +131,13 @@ void setup_chi(int* io_nz, double** io_z, double** io_chi, int io) {
 }
 
 double chi(double io_a) {
-  static cosmopara C;
-  static int first = 0;
-  double redshift, out_chi;
-  #if defined(NAGLIB)
-  static Nag_Spline spline;
-  if (first == 0) {
-    spline.lamda = NULL;
-    spline.c = NULL;
-    first = 1;
-  }
-  #else
-  static int nz;
-  static double** z;
-  static double** chi;
-  if (first == 0) {
-    z = NULL;
-    chi = NULL;
-    first = 1;
-  }
-  #endif
-  if (recompute_cosmo3D(C)) {
-    update_cosmopara(&C);
-    #if defined(NAGLIB)
-    int nz;
-    double** z = (double**) NAG_ALLOC(1, double*);
-    double** chi = (double**) NAG_ALLOC(1, double*);
-    #else
-    if(z != NULL) {
-      free(z);
-      z = NULL;
-    }
-    z = (double**) malloc(1*sizeof(double*));
-    if(chi != NULL) {
-      free(chi);
-      chi = NULL;
-    }
-    chi = (double**) malloc(1*sizeof(double*));
-    #endif
-    if(z == NULL) {
-      log_fatal("fail allocation");
-      exit(1);
-    }
-    (*z) = NULL;
-    if(chi == NULL) {
-      log_fatal("fail allocation");
-      exit(1);
-    }
-    (*chi) = NULL;
-    #if defined(NAGLIB)
-    if(spline.lamda != NULL) {
-      NAG_FREE(spline.lamda);
-      spline.lamda = NULL;
-    }
-    if(spline.c != NULL) {
-      NAG_FREE(spline.c);
-      spline.c = NULL;
-    }
-    #endif
-    setup_chi(&nz, z, chi, 0);
-    #if defined(NAGLIB)
-    NagError fail;
-    INIT_FAIL(fail);
-    nag_1d_spline_interpolant(nz, (*z), (*chi), &spline, &fail);
-    if(fail.code != NE_NOERROR) {
-      log_fatal("NAG interpolation failed %s", fail.message);
-      exit(1);
-    }
-    NAG_FREE((*z));
-    NAG_FREE(z);
-    NAG_FREE((*chi));
-    NAG_FREE(chi);
-    #endif
-  }
-  redshift = 1.0/io_a - 1.0;
-  #if defined(NAGLIB)
-  NagError fail;
-  INIT_FAIL(fail);
-  nag_1d_spline_evaluate(redshift, &out_chi, &spline, &fail);
-  if(fail.code != NE_NOERROR) {
-    log_fatal("NAG interpolation failed %s", fail.message);
-    exit(1);
-  }
-  #else
-  int j = 0;
-  {
-    size_t ilo = 0;
-    size_t ihi = nz-1;
-    while (ihi>ilo+1) {
-      size_t ll = (ihi+ilo)/2;
-      if((*z)[ll]>redshift)
-        ihi = ll;
-      else
-        ilo = ll;
-    }
-    j = ilo;
-  }
-  double dy = (redshift-(*z)[j])/((*z)[j+1]-(*z)[j]);
-  out_chi = (*chi)[j] + dy*((*chi)[j+1]-(*chi)[j]);
-  #endif
-  // convert from (Mpc/h) to (Mpc/h)/(c/H0=100)^3 (dimensioneless)
-  return (out_chi/(cosmology.coverH0));
+  struct chis r = chi_all(io_a);
+  return r.chi;
 }
 
 double dchi_da(double io_a) {
-  static cosmopara C;
-  static int first = 0;
-  double redshift;
-  double out_dchi[4];
-  #if defined(NAGLIB)
-  static Nag_Spline spline;
-  if (first == 0) {
-    spline.lamda = NULL;
-    spline.c = NULL;
-    first = 1;
-  }
-  #else
-  static int nz;
-  static double** z;
-  static double** chi;
-  if (first == 0) {
-    z = NULL;
-    chi = NULL;
-    first = 1;
-  }
-  #endif
-  if (recompute_cosmo3D(C)) {
-    update_cosmopara(&C);
-    #if defined(NAGLIB)
-    int nz;
-    double** z = (double**) NAG_ALLOC(1, double*);
-    double** chi = (double**) NAG_ALLOC(1, double*);
-    #else
-    if(z != NULL) {
-      free(z);
-      z = NULL;
-    }
-    z = (double**) malloc(1*sizeof(double*));
-    if(chi != NULL) {
-      free(chi);
-      chi = NULL;
-    }
-    chi = (double**) malloc(1*sizeof(double*));
-    #endif
-    if(z == NULL) {
-      log_fatal("fail allocation");
-      exit(1);
-    }
-    (*z) = NULL;
-    if(chi == NULL) {
-      log_fatal("fail allocation");
-      exit(1);
-    }
-    (*chi) = NULL;
-    #if defined(NAGLIB)
-    if(spline.lamda != NULL) {
-      NAG_FREE(spline.lamda);
-      spline.lamda = NULL;
-    }
-    if(spline.c != NULL) {
-      NAG_FREE(spline.c);
-      spline.c = NULL;
-    }
-    #endif
-    setup_chi(&nz, z, chi, 0);
-    #if defined(NAGLIB)
-    NagError fail;
-    INIT_FAIL(fail);
-    nag_1d_spline_interpolant(nz, (*z), (*chi), &spline, &fail);
-    if(fail.code != NE_NOERROR) {
-      log_fatal("NAG interpolation failed %s", fail.message);
-      exit(1);
-    }
-    NAG_FREE((*z));
-    NAG_FREE(z);
-    NAG_FREE((*chi));
-    NAG_FREE(chi);
-    #endif
-  }
-  redshift = 1.0/io_a - 1.0;
-  #if defined(NAGLIB)
-  NagError fail;
-  Nag_DerivType derivs;
-  INIT_FAIL(fail);
-  derivs = Nag_LeftDerivs;
-  nag_1d_spline_deriv(derivs,redshift,out_dchi,&spline,&fail);
-  if(fail.code != NE_NOERROR) {
-    log_fatal("NAG interpolation failed %s", fail.message);
-    exit(1);
-  }
-  #else
-  int j = 0;
-  {
-    size_t ilo = 0;
-    size_t ihi = nz-1;
-    while (ihi>ilo+1) {
-      size_t ll = (ihi+ilo)/2;
-      if((*z)[ll]>redshift)
-        ihi = ll;
-      else
-        ilo = ll;
-    }
-    j = ilo;
-  }
-  if (j>0) {
-    double dy = (redshift-(*z)[j])/((*z)[j+1]-(*z)[j]);
-    double tmp_up = ((*chi)[j+2]-(*chi)[j])/((*z)[j+2]-(*z)[j]);
-    double tmp_down = ((*chi)[j+1]-(*chi)[j-1])/((*z)[j+1]-(*z)[j-1]);
-    out_dchi[1] = tmp_down + dy*(tmp_up-tmp_down);
-  } else {
-    double dy = (redshift-(*z)[j])/((*z)[j+1]-(*z)[j]);
-    double tmp_up = ((*chi)[j+2]-(*chi)[j])/((*z)[j+2]-(*z)[j]);
-    double tmp_down = ((*chi)[j+1]-(*chi)[j])/((*z)[j+1]-(*z)[j]);
-    out_dchi[1] = tmp_down + dy*(tmp_up-tmp_down);
-  }
-  #endif
-  // convert from (Mpc/h) to (Mpc/h)/(c/H0=100)^3 (dimensioneless)
-  out_dchi[1] = (out_dchi[1]/cosmology.coverH0);
-  // convert from d\chi/dz to d\chi/da
-  return out_dchi[1]/(io_a*io_a);
+  struct chis r = chi_all(io_a);
+  return r.dchida;
 }
 
 struct chis chi_all(double io_a) {
@@ -359,38 +147,38 @@ struct chis chi_all(double io_a) {
   double out_dchi[4];
   #if defined(NAGLIB)
   static Nag_Spline spline;
-  if (first == 0) {
-    spline.lamda = NULL;
-    spline.c = NULL;
-    first = 1;
-  }
+    if (first == 0) {
+      spline.lamda = NULL;
+      spline.c = NULL;
+      first = 1;
+    }
   #else
-  static int nz;
-  static double** z;
-  static double** chi;
-  if (first == 0) {
-    z = NULL;
-    chi = NULL;
-    first = 1;
-  }
+    static int nz;
+    static double** z;
+    static double** chi;
+    if (first == 0) {
+      z = NULL;
+      chi = NULL;
+      first = 1;
+    }
   #endif
   if (recompute_cosmo3D(C)) {
     update_cosmopara(&C);
     #if defined(NAGLIB)
-    int nz;
-    double** z = (double**) NAG_ALLOC(1, double*);
-    double** chi = (double**) NAG_ALLOC(1, double*);
+      int nz;
+      double** z = (double**) NAG_ALLOC(1, double*);
+      double** chi = (double**) NAG_ALLOC(1, double*);
     #else
-    if(z != NULL) {
-      free(z);
-      z = NULL;
-    }
-    z = (double**) malloc(1*sizeof(double*));
-    if(chi != NULL) {
-      free(chi);
-      chi = NULL;
-    }
-    chi = (double**) malloc(1*sizeof(double*));
+      if(z != NULL) {
+        free(z);
+        z = NULL;
+      }
+      z = (double**) malloc(1*sizeof(double*));
+      if(chi != NULL) {
+        free(chi);
+        chi = NULL;
+      }
+      chi = (double**) malloc(1*sizeof(double*));
     #endif
     if(z == NULL) {
       log_fatal("fail allocation");
@@ -403,75 +191,78 @@ struct chis chi_all(double io_a) {
     }
     (*chi) = NULL;
     #if defined(NAGLIB)
-    if(spline.lamda != NULL) {
-      NAG_FREE(spline.lamda);
-      spline.lamda = NULL;
-    }
-    if(spline.c != NULL) {
-      NAG_FREE(spline.c);
-      spline.c = NULL;
-    }
+      if(spline.lamda != NULL) {
+        NAG_FREE(spline.lamda);
+        spline.lamda = NULL;
+      }
+      if(spline.c != NULL) {
+        NAG_FREE(spline.c);
+        spline.c = NULL;
+      }
     #endif
     setup_chi(&nz, z, chi, 0);
     #if defined(NAGLIB)
-    NagError fail;
-    INIT_FAIL(fail);
-    nag_1d_spline_interpolant(nz, (*z), (*chi), &spline, &fail);
-    if(fail.code != NE_NOERROR) {
-      log_fatal("NAG interpolation failed %s", fail.message);
-      exit(1);
-    }
-    NAG_FREE((*z));
-    NAG_FREE(z);
-    NAG_FREE((*chi));
-    NAG_FREE(chi);
+      NagError fail;
+      INIT_FAIL(fail);
+      nag_1d_spline_interpolant(nz, (*z), (*chi), &spline, &fail);
+      if(fail.code != NE_NOERROR) {
+        log_fatal("NAG interpolation failed %s", fail.message);
+        exit(1);
+      }
+      NAG_FREE((*z));
+      NAG_FREE(z);
+      NAG_FREE((*chi));
+      NAG_FREE(chi);
     #endif
   }
   redshift = 1.0/io_a - 1.0;
   #if defined(NAGLIB)
-  NagError fail;
-  Nag_DerivType derivs;
-  INIT_FAIL(fail);
-  derivs = Nag_LeftDerivs;
-  nag_1d_spline_deriv(derivs,redshift,out_dchi,&spline,&fail);
-  if(fail.code != NE_NOERROR) {
-    log_fatal("NAG interpolation failed %s", fail.message);
-    exit(1);
-  }
-  #else
-  int j = 0;
-  {
-    size_t ilo = 0;
-    size_t ihi = nz-1;
-    while (ihi>ilo+1) {
-      size_t ll = (ihi+ilo)/2;
-      if((*z)[ll]>redshift)
-        ihi = ll;
-      else
-        ilo = ll;
+    NagError fail;
+    Nag_DerivType derivs;
+    INIT_FAIL(fail);
+    derivs = Nag_LeftDerivs;
+    nag_1d_spline_deriv(derivs,redshift,out_dchi,&spline,&fail);
+    if(fail.code != NE_NOERROR) {
+      log_fatal("NAG interpolation failed %s", fail.message);
+      exit(1);
     }
-    j = ilo;
-  }
-  double dy = (redshift-(*z)[j])/((*z)[j+1]-(*z)[j]);
-  out_dchi[0] = (*chi)[j] + dy*((*chi)[j+1]-(*chi)[j]);
-  if (j>0) {
-    double tmp_up = ((*chi)[j+2]-(*chi)[j])/((*z)[j+2]-(*z)[j]);
-    double tmp_down = ((*chi)[j+1]-(*chi)[j-1])/((*z)[j+1]-(*z)[j-1]);
-    out_dchi[1] = tmp_down + dy*(tmp_up-tmp_down);
-  } else {
-    double tmp_up = ((*chi)[j+2]-(*chi)[j])/((*z)[j+2]-(*z)[j]);
-    double tmp_down = ((*chi)[j+1]-(*chi)[j])/((*z)[j+1]-(*z)[j]);
-    out_dchi[1] = tmp_down + dy*(tmp_up-tmp_down);
-  }
+  #else
+    int j = 0;
+    {
+      size_t ilo = 0;
+      size_t ihi = nz-1;
+      while (ihi>ilo+1) {
+        size_t ll = (ihi+ilo)/2;
+        if((*z)[ll]>redshift)
+          ihi = ll;
+        else
+          ilo = ll;
+      }
+      j = ilo;
+    }
+    double dy = (redshift-(*z)[j])/((*z)[j+1]-(*z)[j]);
+    out_dchi[0] = (*chi)[j] + dy*((*chi)[j+1]-(*chi)[j]);
+    if (j>0) {
+      double tmp_up = ((*chi)[j+2]-(*chi)[j])/((*z)[j+2]-(*z)[j]);
+      double tmp_down = ((*chi)[j+1]-(*chi)[j-1])/((*z)[j+1]-(*z)[j-1]);
+      out_dchi[1] = tmp_down + dy*(tmp_up-tmp_down);
+    } else {
+      double tmp_up = ((*chi)[j+2]-(*chi)[j])/((*z)[j+2]-(*z)[j]);
+      double tmp_down = ((*chi)[j+1]-(*chi)[j])/((*z)[j+1]-(*z)[j]);
+      out_dchi[1] = tmp_down + dy*(tmp_up-tmp_down);
+    }
   #endif
+
   // convert from (Mpc/h) to (Mpc/h)/(c/H0=100)^3 (dimensioneless)
   out_dchi[1] = (out_dchi[1]/cosmology.coverH0);
   // convert from d\chi/dz to d\chi/da
   out_dchi[1] = out_dchi[1]/(io_a*io_a);
-  /* output result */
+
+  // output result
   struct chis result;
   result.chi = out_dchi[0]/cosmology.coverH0;
   result.dchida = out_dchi[1];
+
   return result;
 }
 

@@ -305,7 +305,7 @@ def read_ini(ini_filename, no_validate=False):
     return cp
 
 
-def get_matter_power_interpolator(params, zmin=0, zmax=10, nz_step=100, zs=None, kmax=10, nonlinear=True,
+def get_matter_power_interpolator(params, zmin=0, zmax=10.0, nz_step=100, zs=None, kmax=10, nonlinear=True,
                                   var1=None, var2=None, hubble_units=True, k_hunit=True,
                                   return_z_k=False, k_per_logint=None, log_interp=True, extrap_kmax=None):
     r"""
@@ -343,7 +343,7 @@ def get_matter_power_interpolator(params, zmin=0, zmax=10, nz_step=100, zs=None,
     """
 
     pars = params.copy()
-
+    print("TESTTTT\n\n\n")
     if zs is None:
         zs = zmin + np.exp(np.log(zmax - zmin + 1) * np.linspace(0, 1, nz_step)) - 1
     pars.set_matter_power(redshifts=zs, kmax=kmax, k_per_logint=k_per_logint, silent=True)

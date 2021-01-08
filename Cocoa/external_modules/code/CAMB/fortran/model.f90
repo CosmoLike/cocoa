@@ -67,11 +67,16 @@
 
         real(dl) :: IntTolBoost = 1._dl !Tolerances for integrating differential equations
 
-        real(dl) :: SourcekAccuracyBoost = 1._dl !Accuracy of k sampling for source time integration
+        !VM BEGINS
+        !real(dl) :: SourcekAccuracyBoost = 1._dl !Accuracy of k sampling for source time integration
+        real(dl) :: SourcekAccuracyBoost = 1.05_dl
+        !VM ENDS
 
         real(dl) :: IntkAccuracyBoost = 1._dl !Accuracy of k sampling for integration
 
-        real(dl) :: TransferkBoost = 1._dl !Accuracy of k sampling for transfer functions
+        !VM BEGINS
+        real(dl) :: TransferkBoost = 1.05_dl !Accuracy of k sampling for transfer functions
+        !VM ENDS
 
         real(dl) :: NonFlatIntAccuracyBoost = 1._dl !Accuracy of non-flat time integration
 

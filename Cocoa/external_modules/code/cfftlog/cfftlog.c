@@ -11,7 +11,7 @@
 #include "utils_complex.h"
 
 
-void cfftlog(double *x, double *fx, long N, config *config, int ell, double *y, double *Fy) {	
+void cfftlog(double *x, double *fx, long N, config *config, int ell, double *y, double *Fy) {
 	long N_original = N;
 	long N_pad = config->N_pad;
 	N += 2*N_pad;
@@ -31,7 +31,7 @@ void cfftlog(double *x, double *fx, long N, config *config, int ell, double *y, 
 	for(i=0; i<=halfN; i++) {eta_m[i] = 2*M_PI / dlnx / N * i;}
 
 	double complex gl[halfN+1];
-	
+
 	switch(config->derivative) {
 		case 0: g_l_cfft((double)ell, config->nu, eta_m, gl, halfN+1); break;
 		case 1: g_l_1_cfft((double)ell, config->nu, eta_m, gl, halfN+1); break;
@@ -88,7 +88,7 @@ void cfftlog(double *x, double *fx, long N, config *config, int ell, double *y, 
 	free(fb);
 }
 
-void cfftlog_ells(double *x, double *fx, long N, config *config, int* ell, long Nell, double **y, double **Fy) {	
+void cfftlog_ells(double *x, double *fx, long N, config *config, int* ell, long Nell, double **y, double **Fy) {
 	long N_original = N;
 	long N_pad = config->N_pad;
 	long N_extrap_low = config->N_extrap_low;
@@ -96,16 +96,13 @@ void cfftlog_ells(double *x, double *fx, long N, config *config, int* ell, long 
 	N += (2*N_pad + N_extrap_low+N_extrap_high);
 
 	if(N % 2) {
-		printf("Please use even number of x !\n"); 
+		printf("Please use even number of x !\n");
 		exit(0);
 	}
 	long halfN = N/2;
 
-	double x0;
-	x0 = x[0];
-
-	double dlnx;
-	dlnx = log(x[1]/x0);
+	const double x0 = x[0];
+	const double dlnx = log(x[1]/x0);
 
 	// Only calculate the m>=0 part
 	double eta_m[halfN+1];
@@ -126,9 +123,16 @@ void cfftlog_ells(double *x, double *fx, long N, config *config, int* ell, long 
 			printf("Can't log-extrapolate zero on the low side!\n");
 			exit(1);
 		}
-		else if(fx[0]>0) {sign = 1;}
-		else {sign=-1;}
-		if(fx[1]/fx[0]<=0) {printf("Log-extrapolation on the low side fails due to sign change!\n"); exit(1);}
+		else if(fx[0]>0) {
+			sign = 1;
+		}
+		else {
+			sign=-1;
+		}
+		if(fx[1]/fx[0]<=0) {
+			printf("Log-extrapolation on the low side fails due to sign change!\n");
+			exit(1);
+		}
 		double dlnf_low = log(fx[1]/fx[0]);
 		for(int i=N_pad; i<N_pad+N_extrap_low; i++) {
 			xi = exp(log(x0) + (i-N_pad - N_extrap_low)*dlnx);
@@ -143,27 +147,34 @@ void cfftlog_ells(double *x, double *fx, long N, config *config, int* ell, long 
 			printf("Can't log-extrapolate zero on the high side!\n");
 			exit(1);
 		}
-		else if(fx[N_original-1]>0) {sign = 1;}
-		else {sign=-1;}
-		if(fx[N_original-1]/fx[N_original-2]<=0) {printf("Log-extrapolation on the high side fails due to sign change!\n"); exit(1);}
+		else if(fx[N_original-1]>0) {
+			sign = 1;
+		}
+		else {
+			sign=-1;
+		}
+		if(fx[N_original-1]/fx[N_original-2]<=0) {
+			printf("Log-extrapolation on the high side fails due to sign change!\n");
+			exit(1);
+		}
 		double dlnf_high = log(fx[N_original-1]/fx[N_original-2]);
 		for(int i=N-N_pad-N_extrap_high; i<N-N_pad; i++) {
 			xi = exp(log(x[N_original-1]) + (i-N_pad - N_extrap_low- N_original)*dlnx);
-			fb[i] = sign * exp(log(fx[N_original-1]*sign) + (i- N_pad - N_extrap_low- N_original)*dlnf_high) / pow(xi, config->nu);
+			fb[i] = sign * exp(log(fx[N_original-1]*sign) + (i- N_pad - N_extrap_low- N_original)*dlnf_high)/pow(xi, config->nu);
 		}
 	}
 
 	fftw_complex *out = (fftw_complex*) fftw_malloc(sizeof(fftw_complex) * (halfN+1) );
 	fftw_plan plan_forward;
-	
+
 	plan_forward = fftw_plan_dft_r2c_1d(N, fb, out, FFTW_ESTIMATE);
 	fftw_execute(plan_forward);
 	c_window_cfft(out, config->c_window_width, halfN);
-	
+
 
 	double **out_ifft = malloc(sizeof(double*) * Nell);
 	fftw_complex **out_vary = malloc(sizeof(fftw_complex*) * Nell);
-	fftw_plan* plan_backward = malloc(sizeof(fftw_plan*) * Nell); 
+	fftw_plan* plan_backward = malloc(sizeof(fftw_plan*) * Nell);
 	for(int j=0; j<Nell; j++) {
 		out_ifft[j] = malloc(sizeof(double) * N);
 		out_vary[j] = (fftw_complex*) fftw_malloc(sizeof(fftw_complex) * (halfN+1) );
@@ -287,7 +298,7 @@ void cfftlog_ells_increment(double *x, double *fx, long N, config *config, int* 
 
 	double **out_ifft = malloc(sizeof(double*) * Nell);
 	fftw_complex **out_vary = malloc(sizeof(fftw_complex*) * Nell);
-	fftw_plan* plan_backward = malloc(sizeof(fftw_plan*) * Nell); 
+	fftw_plan* plan_backward = malloc(sizeof(fftw_plan*) * Nell);
 	for(int j=0; j<Nell; j++) {
 		out_ifft[j] = malloc(sizeof(double) * N);
 		out_vary[j] = (fftw_complex*) fftw_malloc(sizeof(fftw_complex) * (halfN+1) );

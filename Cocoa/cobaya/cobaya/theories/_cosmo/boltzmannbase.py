@@ -314,6 +314,7 @@ class BoltzmannBase(Theory):
         if key in self._current_state:
             return self._current_state[key]
         k, z, pk = self.get_Pk_grid(var_pair=var_pair, nonlinear=nonlinear)
+
         log_p = True
         sign = 1
         if np.any(pk < 0):

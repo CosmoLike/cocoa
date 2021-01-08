@@ -12,33 +12,33 @@
 
 #include "../log.c/src/log.h"
 
-void fastpt_scalar(int *alpha_ar, int *beta_ar, int *ell_ar, int *isP13type_ar, 
+void fastpt_scalar(int *alpha_ar, int *beta_ar, int *ell_ar, int *isP13type_ar,
 double *coeff_A_ar, int Nterms, double *Pout, double *k, double *Pin, int Nk){
 	double **Fy;
 	Fy = malloc(sizeof(double*) * Nterms);
 	for(int i=0;i<Nterms;i++) {
 		Fy[i] = malloc(sizeof(double) * Nk);
 	}
-	
+
 	fastpt_config config;
-	config.nu = -2.; 
-	config.c_window_width = 0.25; 
+	config.nu = -2.;
+	config.c_window_width = 0.25;
 	config.N_pad = 1500;
-	config.N_extrap_low = 500; 
+	config.N_extrap_low = 500;
 	config.N_extrap_high = 500;
-	
+
 	for(int j=0; j<Nk; j++) {
 		Pout[j] = 0.;
 	}
 
 	J_abl_ar(k, Pin, Nk, alpha_ar, beta_ar, ell_ar, isP13type_ar, Nterms, &config, Fy);
-	
+
 	for(int i=0; i<Nterms; i++) {
 		for(int j=0; j<Nk; j++){
 			Pout[j] += coeff_A_ar[i] * Fy[i][j];
 		}
 	}
-	
+
 	for(int i = 0; i < Nterms; i++) {
 		free(Fy[i]);
 	}
@@ -54,16 +54,13 @@ void J_abl_ar(double *x, double *fx, long N, int *alpha, int *beta, int *ell, in
 	N += (2*N_pad + N_extrap_low+N_extrap_high);
 
 	if(N % 2) {
-		log_fatal("cfastpt.c: J_abl_ar: Please use even number of x !"); 
+		log_fatal("cfastpt.c: J_abl_ar: Please use even number of x !");
 		exit(0);
 	}
 	const long halfN = N/2;
 
-	double x0;
-	x0 = x[0];
-
-	double dlnx;
-	dlnx = log(x[1]/x0);
+	const double x0 = x[0];
+	const double dlnx = log(x[1]/x0);
 
 	// Only calculate the m>=0 part
 	double eta_m[halfN+1];
@@ -88,7 +85,7 @@ void J_abl_ar(double *x, double *fx, long N, int *alpha, int *beta, int *ell, in
 		else if(fx[0]>0) {sign = 1;}
 		else {sign=-1;}
 		if(fx[1]/fx[0]<=0) {
-			log_fatal("J_abl_ar: Log-extrapolation on the low side fails due to sign change!"); 
+			log_fatal("J_abl_ar: Log-extrapolation on the low side fails due to sign change!");
 			exit(1);
 		}
 		double dlnf_low = log(fx[1]/fx[0]);
@@ -131,36 +128,35 @@ void J_abl_ar(double *x, double *fx, long N, int *alpha, int *beta, int *ell, in
 
 	double **out_ifft = malloc(sizeof(double*) * Nterms);
 	fftw_complex **out_vary = malloc(sizeof(fftw_complex*) * Nterms);
-	fftw_plan* plan_backward = malloc(sizeof(fftw_plan*) * Nterms); 
-	
+	fftw_plan* plan_backward = malloc(sizeof(fftw_plan*) * Nterms);
+
 	for(int i_term=0;i_term<Nterms;i_term++) {
 		out_ifft[i_term] = malloc(sizeof(double) * (2*N) );
 		out_vary[i_term] = (fftw_complex*) fftw_malloc(sizeof(fftw_complex) * (N+1) );
 		plan_backward[i_term] = fftw_plan_dft_c2r_1d(2*N, out_vary[i_term], out_ifft[i_term], FFTW_ESTIMATE);
 	}
 
-	int i_term;
 	double tau_l[N+1];
 	for(long i=0;i<=N;i++){
 		tau_l[i] = 2.*M_PI / dlnx / N * i;
 	}
-	
+
 	// initialize FFT plans for Convolution
 	// avoid initialization for each i_term
 	fftw_complex **a = malloc(sizeof(fftw_complex*) * Nterms);
 	fftw_complex **b = malloc(sizeof(fftw_complex*) * Nterms);
-	fftw_complex **a1 = malloc(sizeof(fftw_complex*) * Nterms); 
+	fftw_complex **a1 = malloc(sizeof(fftw_complex*) * Nterms);
 	fftw_complex **b1 = malloc(sizeof(fftw_complex*) * Nterms);
 	fftw_complex **c = malloc(sizeof(fftw_complex*) * Nterms);
 	fftw_plan* pa = malloc(sizeof(fftw_plan*) * Nterms);
 	fftw_plan* pb = malloc(sizeof(fftw_plan*) * Nterms);
 	fftw_plan* pc = malloc(sizeof(fftw_plan*) * Nterms);
-	
+
 	long Ntotal_convolve;
 	if(N%2==0) { // N+1 is odd
 		Ntotal_convolve = 2*N + 1;
 	}else {
-		log_fatal("J_abl_ar: This fftconvolve doesn't support even size input arrays (of out_pad1, outpad2)"); 
+		log_fatal("J_abl_ar: This fftconvolve doesn't support even size input arrays (of out_pad1, outpad2)");
 		exit(1);
 	}
 
@@ -180,10 +176,10 @@ void J_abl_ar(double *x, double *fx, long N, int *alpha, int *beta, int *ell, in
 	fftw_complex** out_pad2 = (fftw_complex**) fftw_malloc(sizeof(fftw_complex*) * Nterms );
 
 	#pragma omp parallel for
-	for(i_term=0; i_term<Nterms; i_term++) {
+	for(int i_term=0; i_term<Nterms; i_term++) {
 		out_pad1[i_term] = (fftw_complex*) fftw_malloc(sizeof(fftw_complex) * (N+1) );
 		out_pad2[i_term] = (fftw_complex*) fftw_malloc(sizeof(fftw_complex) * (N+1) );
-		
+
 		double complex gl[halfN+1];
 		g_m_vals(ell[i_term]+0.5, 1.5 + config->nu + alpha[i_term], eta_m, gl, halfN+1);
 
@@ -196,7 +192,7 @@ void J_abl_ar(double *x, double *fx, long N, int *alpha, int *beta, int *ell, in
 		}
 
 		fftw_complex *pads_convolve = (fftw_complex*) fftw_malloc(sizeof(fftw_complex) * (2*N+1) );
-		
+
 		if(alpha != beta){
 			g_m_vals(ell[i_term]+0.5, 1.5 + config->nu + beta[i_term], eta_m, gl, halfN+1);
 
@@ -251,7 +247,7 @@ void J_abl_ar(double *x, double *fx, long N, int *alpha, int *beta, int *ell, in
 
 		fftw_destroy_plan(pa[i_term]);
 		fftw_destroy_plan(pb[i_term]);
-		fftw_destroy_plan(pc[i_term]);	
+		fftw_destroy_plan(pc[i_term]);
 	}
 
 	free(plan_forward);
@@ -267,7 +263,7 @@ void J_abl_ar(double *x, double *fx, long N, int *alpha, int *beta, int *ell, in
 	free(b);
 	free(a1);
 	free(b1);
-	free(c);	
+	free(c);
 	free(pa);
 	free(pb);
 	free(pc);
@@ -282,10 +278,10 @@ void fastpt_tensor(int *alpha_ar, int *beta_ar, int *J1_ar, int *J2_ar, int *Jk_
 	fastpt_config config;
 	config.c_window_width = 0.25; config.N_pad = 1500;
 	config.N_extrap_low = 500; config.N_extrap_high = 500;
-	
+
 	J_abJ1J2Jk_ar(k, Pin, Nk, alpha_ar, beta_ar, J1_ar, J2_ar, Jk_ar, Nterms, &config, Fy);
-	
-	#pragma omp parallel for	
+
+	#pragma omp parallel for
 	for(int j=0; j<Nk; j++){
 		Pout[j] = 0.;
 		for(int i=0; i<Nterms; i++) {
@@ -309,7 +305,7 @@ void J_abJ1J2Jk_ar(double *x, double *fx, long N, int *alpha, int *beta, int *J1
 	N += (2*N_pad + N_extrap_low+N_extrap_high);
 
 	if(N % 2) {
-		log_fatal("J_abJ1J2Jk_ar: Please use even number of x !"); 
+		log_fatal("J_abJ1J2Jk_ar: Please use even number of x !");
 		exit(0);
 	}
 	const long halfN = N/2;
@@ -345,7 +341,7 @@ void J_abJ1J2Jk_ar(double *x, double *fx, long N, int *alpha, int *beta, int *J1
 			sign=-1;
 		}
 		if(fx[1]/fx[0]<=0) {
-			log_fatal("J_abJ1J2Jk_ar: Log-extrapolation on the low side fails due to sign change!"); 
+			log_fatal("J_abJ1J2Jk_ar: Log-extrapolation on the low side fails due to sign change!");
 			exit(1);
 		}
 		const double dlnf_low = log(fx[1]/fx[0]);
@@ -359,7 +355,7 @@ void J_abJ1J2Jk_ar(double *x, double *fx, long N, int *alpha, int *beta, int *J1
 		x_full[i] = x[i-N_pad-N_extrap_low];
 		f_unbias[i] = fx[i-N_pad-N_extrap_low];
 	}
-	
+
 	if(N_extrap_high) {
 		int sign;
 		if(fx[N_original-1]==0) {
@@ -373,7 +369,7 @@ void J_abJ1J2Jk_ar(double *x, double *fx, long N, int *alpha, int *beta, int *J1
 			sign=-1;
 		}
 		if(fx[N_original-1]/fx[N_original-2]<=0) {
-			log_fatal("J_abJ1J2Jk_ar: Log-extrapolation on the high side fails due to sign change!"); 
+			log_fatal("J_abJ1J2Jk_ar: Log-extrapolation on the high side fails due to sign change!");
 			exit(1);
 		}
 		const double dlnf_high = log(fx[N_original-1]/fx[N_original-2]);
@@ -386,15 +382,15 @@ void J_abJ1J2Jk_ar(double *x, double *fx, long N, int *alpha, int *beta, int *J1
 	double **fb1 = malloc(sizeof(double*) * Nterms);
 	double **fb2 = malloc(sizeof(double*) * Nterms);
 	double **out_ifft = malloc(sizeof(double*) * Nterms);
-	
+
 	fftw_complex **out = malloc(sizeof(fftw_complex*) * Nterms);
 	fftw_complex **out2 = malloc(sizeof(fftw_complex*) * Nterms);
 	fftw_complex **out_vary = malloc(sizeof(fftw_complex*) * Nterms);
 
-	fftw_plan* plan_forward = malloc(sizeof(fftw_plan*) * Nterms); 
-	fftw_plan* plan_forward2 = malloc(sizeof(fftw_plan*) * Nterms); 
-	fftw_plan* plan_backward = malloc(sizeof(fftw_plan*) * Nterms); 
-	
+	fftw_plan* plan_forward = malloc(sizeof(fftw_plan*) * Nterms);
+	fftw_plan* plan_forward2 = malloc(sizeof(fftw_plan*) * Nterms);
+	fftw_plan* plan_backward = malloc(sizeof(fftw_plan*) * Nterms);
+
 	for(int i_term=0; i_term<Nterms; i_term++) {
 		fb1[i_term] = malloc(N * sizeof(double));
 		fb2[i_term] = malloc(N * sizeof(double));
@@ -414,18 +410,18 @@ void J_abJ1J2Jk_ar(double *x, double *fx, long N, int *alpha, int *beta, int *J1
 
 	fftw_complex **a = malloc(sizeof(fftw_complex*) * Nterms);
 	fftw_complex **b = malloc(sizeof(fftw_complex*) * Nterms);
-	fftw_complex **a1 = malloc(sizeof(fftw_complex*) * Nterms); 
+	fftw_complex **a1 = malloc(sizeof(fftw_complex*) * Nterms);
 	fftw_complex **b1 = malloc(sizeof(fftw_complex*) * Nterms);
 	fftw_complex **c = malloc(sizeof(fftw_complex*) * Nterms);
 	fftw_plan* pa = malloc(sizeof(fftw_plan*) * Nterms);
 	fftw_plan* pb = malloc(sizeof(fftw_plan*) * Nterms);
 	fftw_plan* pc = malloc(sizeof(fftw_plan*) * Nterms);
-	
+
 	long Ntotal_convolve;
 	if(N%2==0) { // N+1 is odd
 		Ntotal_convolve = 2*N + 1;
 	} else {
-		log_fatal("J_abJ1J2Jk_ar: This fftconvolve doesn't support even size input arrays (of out_pad1, outpad2)"); 
+		log_fatal("J_abJ1J2Jk_ar: This fftconvolve doesn't support even size input arrays (of out_pad1, outpad2)");
 		exit(1);
 	}
 
@@ -442,8 +438,8 @@ void J_abJ1J2Jk_ar(double *x, double *fx, long N, int *alpha, int *beta, int *J1
 
 	fftw_complex** out_pad1 = (fftw_complex**) fftw_malloc(sizeof(fftw_complex*) * Nterms);
 	fftw_complex** out_pad2 = (fftw_complex**) fftw_malloc(sizeof(fftw_complex*) * Nterms);
-	
-	#pragma omp parallel for	
+
+	#pragma omp parallel for
 	for(int i_term=0; i_term<Nterms; i_term++) {
 		const double nu1 = -2.-alpha[i_term];
 		const double nu2 = -2.-beta[i_term];
@@ -483,12 +479,12 @@ void J_abJ1J2Jk_ar(double *x, double *fx, long N, int *alpha, int *beta, int *J1
 		}
 
 		fftw_complex *pads_convolve = (fftw_complex*) fftw_malloc(sizeof(fftw_complex) * (2*N+1) );
-		fftconvolve_optimize(out_pad1[i_term], out_pad2[i_term], N+1, pads_convolve, 
+		fftconvolve_optimize(out_pad1[i_term], out_pad2[i_term], N+1, pads_convolve,
 			a[i_term], b[i_term], a1[i_term], b1[i_term], c[i_term], pa[i_term], pb[i_term], pc[i_term]);
 
 		// convolution finished
 		pads_convolve[N] = creal(pads_convolve[N]);
-		
+
 		double complex h_part[N+1];
 		for(long i=0; i<=N; i++){
 			h_part[i] = pads_convolve[i+N]; //C_h term in Eq.(2.21) in McEwen et al (2016)
@@ -514,7 +510,7 @@ void J_abJ1J2Jk_ar(double *x, double *fx, long N, int *alpha, int *beta, int *J1
 		fftw_destroy_plan(plan_backward[i_term]);
 		fftw_destroy_plan(pa[i_term]);
 		fftw_destroy_plan(pb[i_term]);
-		fftw_destroy_plan(pc[i_term]);	
+		fftw_destroy_plan(pc[i_term]);
 
 		fftw_free(out[i_term]);
 		fftw_free(out2[i_term]);
@@ -546,7 +542,7 @@ void J_abJ1J2Jk_ar(double *x, double *fx, long N, int *alpha, int *beta, int *J1
 	free(b);
 	free(a1);
 	free(b1);
-	free(c);	
+	free(c);
 	free(fb1);
 	free(fb2);
 	free(out_ifft);
@@ -737,7 +733,7 @@ void IA_ta(double *k, double *Pin, long Nk, double *P_dE1, double *P_dE2, double
 	double g[3*Nk-2];
 	fftconvolve_real(Pin, f, Nk, 2*Nk-1, g);
 	for(i=0; i<Nk; i++){
-		P_dE2[i] = 2.* pow(k[i],3)/(896.*M_PI*M_PI) * Pin[i] * g[Nk-1+i] * dL; 
+		P_dE2[i] = 2.* pow(k[i],3)/(896.*M_PI*M_PI) * Pin[i] * g[Nk-1+i] * dL;
 	}
 }
 
@@ -834,6 +830,6 @@ void IA_mix(double *k, double *Pin, long Nk, double *P_A, double *P_B, double *P
 	double g[3*Nk-2];
 	fftconvolve_real(Pin, f, Nk, 2*Nk-1, g);
 	for(i=0; i<Nk; i++){
-		P_B[i] = pow(k[i],3)/(2.*M_PI*M_PI) * Pin[i] * g[Nk-1+i] * dL; 
+		P_B[i] = pow(k[i],3)/(2.*M_PI*M_PI) * Pin[i] * g[Nk-1+i] * dL;
 	}
 }
