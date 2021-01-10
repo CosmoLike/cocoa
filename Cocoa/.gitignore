@@ -4,6 +4,10 @@ include/
 .local/
 *.out
 core.*
+*.a
+*.o
+*.pyc
+*.egg-info/
 
 cobaya/cobaya/likelihoods/.gitignore
 external_modules/code/.gitignore
