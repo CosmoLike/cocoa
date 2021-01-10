@@ -102,7 +102,7 @@ class mcmc(CovmatSampler):
                 raise LoggedError(
                     self.log,
                     "Cannot resume a run with a different number of chains: "
-                    "was %d and now is %d.", max(self.mpi_size, 1),
+                    "was %d and now is %d.", max(self.mpi_size or 0, 1),
                     max(get_mpi_size(), 1))
             if more_than_one_process():
                 if get_mpi().Get_version()[0] < 3:
@@ -155,11 +155,12 @@ class mcmc(CovmatSampler):
             # If resuming but no existing chain, assume failed run and ignore blocking
             # if speeds measurement requested
             if self.output.is_resuming() and not len(self.collection) \
-               and self.measure_speeds:
+                    and self.measure_speeds:
                 self.blocking = None
             if self.measure_speeds and self.blocking:
-                self.log.warning(
-                    "Parameter blocking manually fixed: speeds will not be measured.")
+                if is_main_process():
+                    self.log.warning(
+                        "Parameter blocking manually fixed: speeds will not be measured.")
             elif self.measure_speeds:
                 n = None if self.measure_speeds is True else int(self.measure_speeds)
                 self.model.measure_and_set_speeds(n=n, discard=0)

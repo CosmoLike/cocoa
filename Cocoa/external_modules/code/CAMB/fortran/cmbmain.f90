@@ -558,7 +558,7 @@
         !All have at least k_per_logint steps per log k
 
         boost = CP%Accuracy%AccuracyBoost * CP%Accuracy%TransferkBoost
-        k_per_logint = CP%Transfer%k_per_logint
+        k_per_logint =CP%Transfer%k_per_logint
         if (CP%Transfer%high_precision) boost = boost*1.5
 
         q_switch_lowk1 = 0.7/State%taurst
@@ -699,7 +699,7 @@
     taustart=min(taustart,0.1_dl)
 
     !     Start when massive neutrinos are strongly relativistic.
-    if (CP%Num_nu_massive>0) then
+    if (CP%Num_nu_massive>0 .and. any(State%nu_masses(1:CP%Nu_mass_eigenstates)/=0)) then
         taustart=min(taustart,1.d-3/maxval(State%nu_masses(1:CP%Nu_mass_eigenstates))/State%adotrad)
     end if
 
@@ -1132,10 +1132,8 @@
     real(dl) atol
 
     atol=tol/exp(CP%Accuracy%AccuracyBoost*CP%Accuracy%IntTolBoost-1)
-    if (CP%Transfer%high_precision) then
-        atol=atol/10000 !CHECKTHIS
-    endif
-    
+    if (CP%Transfer%high_precision) atol=atol/10000 !CHECKTHIS
+
     ind=1
     call initial(EV,y, tau)
     if (global_error_flag/=0) return

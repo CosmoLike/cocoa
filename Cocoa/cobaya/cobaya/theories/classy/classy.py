@@ -204,7 +204,8 @@ class classy(BoltzmannBase):
                 self.extra_args["output"] += " lCl"
                 self.extra_args["lensing"] = "yes"
                 # For l_max_scalars, remember previous entries.
-                self.extra_args["l_max_scalars"] = max(v.values())
+                self.extra_args["l_max_scalars"] = \
+                    max(self.extra_args.get("l_max_scalars", 0), max(v.values()))
                 self.collectors[k] = Collector(
                     method="lensed_cl", kwargs={"lmax": self.extra_args["l_max_scalars"]})
                 if 'T_cmb' not in self.derived_extra:
@@ -267,10 +268,10 @@ class classy(BoltzmannBase):
             self.extra_args["modes"] = "s,t"
         # If B spectrum with l>50, or lensing, recommend using Halofit
         cls = self._must_provide.get("Cl", {})
-        if (((any(("b" in cl.lower()) for cl in cls) and
-              max(cls[cl] for cl in cls if "b" in cl.lower()) > 50) or
-             any(("p" in cl.lower()) for cl in cls) and
-             not self.extra_args.get("non linear"))):
+        has_BB_l_gt_50 = (any(("b" in cl.lower()) for cl in cls) and
+                          max(cls[cl] for cl in cls if "b" in cl.lower()) > 50)
+        has_lensing = any(("p" in cl.lower()) for cl in cls)
+        if (has_BB_l_gt_50 or has_lensing) and not self.extra_args.get("non linear"):
             self.log.warning("Requesting BB for ell>50 or lensing Cl's: "
                              "using a non-linear code is recommended (and you are not "
                              "using any). To activate it, set "
@@ -339,8 +340,8 @@ class classy(BoltzmannBase):
         # CLASS not correctly initialized, or input parameters not correct
         except CosmoSevereError:
             self.log.error("Serious error setting parameters or computing results. "
-                           "The parameters passed were %r and %r. "
-                           "See original CLASS's error traceback below.\n",
+                           "The parameters passed were %r and %r. To see the original "
+                           "CLASS' error traceback, make 'debug: True'.",
                            state["params"], self.extra_args)
             raise  # No LoggedError, so that CLASS traceback gets printed
         # Gather products
@@ -388,6 +389,7 @@ class classy(BoltzmannBase):
 
         To get a parameter *from a likelihood* use `get_param` instead.
         """
+        # TODO: fails with derived_requested=False
         # Put all parameters in CLASS nomenclature (self.derived_extra already is)
         requested = [self.translate_param(p) for p in (
             self.output_params if derived_requested else [])]

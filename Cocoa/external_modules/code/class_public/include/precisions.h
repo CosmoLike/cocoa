@@ -18,7 +18,7 @@ class_precision_parameter(back_integration_stepsize,double,7.e-3)
 /**
  * Tolerance of the background integration, giving the allowed relative integration error.
  */
-class_precision_parameter(tol_background_integration,double,1.e-2)
+class_precision_parameter(tol_background_integration,double,/*1.e-2*/ 5e-4) // VM BEGINS
 /**
  * Tolerance of the deviation of \f$ \Omega_r \f$ from 1 for which to start integration:
  * The starting point of integration will be chosen,
@@ -36,12 +36,12 @@ class_precision_parameter(tol_M_ncdm,double,1.e-7)
  * Tolerance on the relative precision of the integration over
  * non-cold dark matter phase-space distributions.
  */
-class_precision_parameter(tol_ncdm,double,1.e-3)
+class_precision_parameter(tol_ncdm,double, /*1.e-3*/ 2.5e-4) // VM BEGINS
 /**
  * Tolerance on the relative precision of the integration over
  * non-cold dark matter phase-space distributions in the synchronous gauge.
  */
-class_precision_parameter(tol_ncdm_synchronous,double,1.e-3)
+class_precision_parameter(tol_ncdm_synchronous,double,/*1.e-3*/ 2.5e-4) // VM BEGINS
 /**
  * Tolerance on the relative precision of the integration over
  * non-cold dark matter phase-space distributions in the newtonian gauge.
@@ -87,7 +87,7 @@ class_precision_parameter(recfast_z_initial,double,1.0e4)
 /**
  * Number of recfast integration steps, e.g. if this is 1.10^4 and the previous one is 10^4, the step will be Delta z = 0.5
  */
-class_precision_parameter(recfast_Nz0,int,20000)
+class_precision_parameter(recfast_Nz0,int,/*20000*/ 22000) // VM BEGINS
 /**
  * If there is interacting DM, we want the thermodynamics table to
  * start at a much larger z, in order to capture the possible
@@ -113,7 +113,7 @@ class_precision_parameter(thermo_Nz2_idm_dr,int,100)
 /**
  * Tolerance of the relative value of integral during thermodynamical integration
  */
-class_precision_parameter(tol_thermo_integration,double,1.0e-2)
+class_precision_parameter(tol_thermo_integration,double,/*1.0e-2*/ 5.0e-3) // VM BEGINS
 /*
  * Recfast 1.4 switch parameters
  */
@@ -167,11 +167,11 @@ class_precision_parameter(k_step_super,double,0.002) /**< step in k space, in un
 class_precision_parameter(k_step_transition,double,0.2) /**< dimensionless number regulating the transition from 'sub' steps to 'super' steps. Decrease for more precision. */
 class_precision_parameter(k_step_super_reduction,double,0.1) /**< the step k_step_super is reduced by this amount in the k-->0 limit (below scale of Hubble and/or curvature radius) */
 
-class_precision_parameter(k_per_decade_for_pk,double,10.0) /**< if values needed between kmax inferred from k_oscillations and k_kmax_for_pk, this gives the number of k per decade outside the BAO region*/
+class_precision_parameter(k_per_decade_for_pk,double,/*10.0*/ 20.0) /**< if values needed between kmax inferred from k_oscillations and k_kmax_for_pk, this gives the number of k per decade outside the BAO region*/
 
-class_precision_parameter(idmdr_boost_k_per_decade_for_pk,double,1.0) /**< boost factor for the case of DAO in idm-idr models */
+class_precision_parameter(idmdr_boost_k_per_decade_for_pk,double, 1.0) /**< boost factor for the case of DAO in idm-idr models */
 
-class_precision_parameter(k_per_decade_for_bao,double,70.0) /**< if values needed between kmax inferred from k_oscillations and k_kmax_for_pk, this gives the number of k per decade inside the BAO region (for finer sampling)*/
+class_precision_parameter(k_per_decade_for_bao,double, /*70.0*/ 140) /**< if values needed between kmax inferred from k_oscillations and k_kmax_for_pk, this gives the number of k per decade inside the BAO region (for finer sampling)*/
 
 class_precision_parameter(k_bao_center,double,3.0) /**< in ln(k) space, the central value of the BAO region where sampling is finer is defined as k_rec times this number (recommended: 3, i.e. finest sampling near 3rd BAO peak) */
 
@@ -222,18 +222,18 @@ class_precision_parameter(gw_ini,double,1.0)      /**< initial condition for ten
 /**
  * default step \f$ d \tau \f$ in perturbation integration, in units of the timescale involved in the equations (usually, the min of \f$ 1/k \f$, \f$ 1/aH \f$, \f$ 1/\dot{\kappa} \f$)
  */
-class_precision_parameter(perturb_integration_stepsize,double,0.5)
+class_precision_parameter(perturb_integration_stepsize,double, /*0.5*/ 0.03) // VM BEGINS
 
 /**
  * default step \f$ d \tau \f$ for sampling the source function, in units of the timescale involved in the sources: \f$ (\dot{\kappa}- \ddot{\kappa}/\dot{\kappa})^{-1} \f$
  */
-class_precision_parameter(perturb_sampling_stepsize,double,0.1)
+class_precision_parameter(perturb_sampling_stepsize,double, /*0.1*/ 0.08) // VM BEGINS - AFFECTED PLIK LITE A LOT
 
 /**
  * control parameter for the precision of the perturbation integration,
  * IMPORTANT FOR SETTING THE STEPSIZE OF NDF15
  */
-class_precision_parameter(tol_perturb_integration,double,1.0e-5)
+class_precision_parameter(tol_perturb_integration,double, /*1.0e-5*/ 5e-6) // VM BEGINS
 
 /**
  * cutoff relevant for controlling stiffness in the PPF scheme. It is
@@ -414,7 +414,8 @@ class_precision_parameter(selection_tophat_edge,double,0.1) /**< controls how sm
  * Nonlinear module precision parameters
  * */
 
-class_precision_parameter(sigma_k_per_decade,double,80.) /**< logarithmic stepsize controlling the precision of integrals for sigma(R,k) and similar quantitites */
+
+class_precision_parameter(sigma_k_per_decade,double,/*80.*/ 160 /*VM BEGINS*/) /**< logarithmic stepsize controlling the precision of integrals for sigma(R,k) and similar quantitites */
 
 class_precision_parameter(nonlinear_min_k_max,double,20.0) /**< when
                                using an algorithm to compute nonlinear
@@ -432,12 +433,12 @@ class_precision_parameter(halofit_min_k_nonlinear,double,1.0e-4)/**< value of k 
 
 class_precision_parameter(halofit_min_k_max,double,5.0) /**< DEPRECATED: should use instead nonlinear_min_k_max */
 
-class_precision_parameter(halofit_k_per_decade,double,80.0) /**< halofit needs to evalute integrals
+class_precision_parameter(halofit_k_per_decade,double, 160.0/*80.0*/) /**< halofit needs to evalute integrals // VM BEGINS
                                   (linear power spectrum times some
                                   kernels). They are sampled using
                                   this logarithmic step size. */
 
-class_precision_parameter(halofit_sigma_precision,double,0.05) /**< a smaller value will lead to a
+class_precision_parameter(halofit_sigma_precision,double,/*0.05*/ 0.025 /*VM BEGINS*/) /**< a smaller value will lead to a
 				      more precise halofit result at the *highest*
 				      redshift at which halofit can make computations,
 				      at the expense of requiring a larger k_max; but
@@ -450,7 +451,7 @@ class_precision_parameter(halofit_tol_sigma,double,1.0e-6) /**< tolerance requir
                                whcih defines the wavenumber of
                                non-linearity, k_nl=1./R_nl */
 
-class_precision_parameter(pk_eq_z_max,double,5.0) /**< Maximum z for the pk_eq method */
+class_precision_parameter(pk_eq_z_max,double,/*5.0*/ 10.01 /*VM BEGINS*/) /**< Maximum z for the pk_eq method */ //VM BEGINS - CHANGED TO 10.01
 class_precision_parameter(pk_eq_tol,double,1.0e-7) /**< Tolerance on the pk_eq method for finding the pk */
 
 /** Parameters relevant for HMcode computation */
@@ -488,8 +489,8 @@ class_precision_parameter(mmax_for_p1h_integral,double,1.e18)
  * Lensing precision parameters
  * */
 
-class_precision_parameter(accurate_lensing,int,_FALSE_) /**< switch between Gauss-Legendre quadrature integration and simple quadrature on a subdomain of angles */
-class_precision_parameter(num_mu_minus_lmax,int,70) /**< difference between num_mu and l_max, increase for more precision */
+class_precision_parameter(accurate_lensing,int,/*_FALSE_*/ _TRUE_ /*VM BEGINS*/) /**< switch between Gauss-Legendre quadrature integration and simple quadrature on a subdomain of angles */
+class_precision_parameter(num_mu_minus_lmax,int,/*70*/ 120 /*VM BEGINS*/) /**< difference between num_mu and l_max, increase for more precision */
 class_precision_parameter(delta_l_max,int,500)/**< difference between l_max in unlensed and lensed spectra */
 class_precision_parameter(tol_gauss_legendre,double,ppr->smallest_allowed_variation) /**< tolerance with which quadrature points are found: must be very small for an accurate integration (if not entered manually, set automatically to match machine precision) */
 

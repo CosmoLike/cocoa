@@ -319,7 +319,7 @@ def merge_info(*infos):
     return current_info
 
 
-def is_equal_info(info_old, info_new, strict=False, print_not_log=False, ignore_blocks=()):
+def is_equal_info(info_old, info_new, strict=True, print_not_log=False, ignore_blocks=()):
     """
     Compares two information dictionaries, and old one versus a new one, and updates the
     new one for selected values of the old one.

@@ -130,8 +130,9 @@ class BoltzmannBase(Theory):
             # Products and other computations
             if k == "Cl":
                 current = self._must_provide.get(k, {})
-                self._must_provide[k] = {cl: max(current.get(cl, 0), v.get(cl, 0))
-                                         for cl in set(current).union(v)}
+                self._must_provide[k] = {
+                    cl.lower(): max(current.get(cl.lower(), 0), v.get(cl, 0))
+                    for cl in set(current).union(v)}
             elif k == 'sigma_R':
                 self._check_args(k, v, ('z', 'R'))
                 for pair in self._norm_vars_pairs(v.pop("vars_pairs", []), k):
@@ -314,7 +315,6 @@ class BoltzmannBase(Theory):
         if key in self._current_state:
             return self._current_state[key]
         k, z, pk = self.get_Pk_grid(var_pair=var_pair, nonlinear=nonlinear)
-
         log_p = True
         sign = 1
         if np.any(pk < 0):
