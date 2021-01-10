@@ -261,7 +261,7 @@ class camb(BoltzmannBase):
         args = {}
         params = []
         pars = getfullargspec(set_func)
-        for arg, v in zip(pars.args[1:], pars.defaults[1:]):
+        for arg, v in zip(pars.args[1:], pars.defaults[0:]):
             if arg in self.extra_args:
                 args[arg] = self.extra_args.pop(arg)
             elif isinstance(v, numbers.Number) or v is None:

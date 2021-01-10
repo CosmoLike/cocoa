@@ -74,7 +74,7 @@ class Halofit(NonLinearModel):
             - mead2020_feedback: 2020 version of HMcode with baryonic feedback `arXiv:2009.01858 <https://arxiv.org/abs/2009.01858>`_
         :param HMcode_A_baryon: HMcode parameter A_baryon. Default 3.13.
         :param HMcode_eta_baryon: HMcode parameter eta_baryon. Default 0.603.
-        :param HMcode_eta_baryon: HMcode parameter logT_AGN. Default 7.8.
+        :param HMCode_logT_AGN: HMcode parameter logT_AGN. Default 7.8.
         """
         self.halofit_version = halofit_version
         self.HMCode_A_baryon = HMCode_A_baryon
