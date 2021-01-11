@@ -1274,7 +1274,7 @@
 
         if (qmax_int > k_max_0) then
             max_k_dk = max(3000, 2*maximum_l)/State%tau0
-
+    
             call ThisCT%q%Add_delta(k_max_0, min(qmax_int, max_k_dk), dk)
             if (qmax_int > max_k_dk) then
                 !This allows inclusion of high k modes for computing BB lensed spectrum accurately

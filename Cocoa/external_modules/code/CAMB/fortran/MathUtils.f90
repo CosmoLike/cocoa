@@ -37,8 +37,10 @@
 
     !convert the class function (un-type-checked) into correct type to call correctly for class argument
     call C_F_PROCPOINTER(c_funloc(fin), f)
-
-    max_it = PresentDefault(25, maxit)
+!VM BEGINS
+    !max_it = PresentDefault(25, maxit)
+    max_it = PresentDefault(26, maxit)
+!VM ENDS
     min_steps = PresentDefault(0, minsteps)
     abstol = DefaultFalse(abs_tol)
     h=0.5d0*(b-a)
