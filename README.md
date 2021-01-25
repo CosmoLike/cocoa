@@ -16,7 +16,7 @@ PS: We are quite loose on the installation procedures for MacOS (see appendix: [
 
 Type
 
-    $ git clone https://github.com/CosmoLike/cocoa.git
+    $ git lfs clone https://github.com/CosmoLike/cocoa.git
 
 We have a monthly quota of only 150 GB in bandwidth for [Git LFS](https://git-lfs.github.com) files, and therefore we ask users to use good judgment in the number of times you clone repositories with large files (each clone will download around 5GB from Git LFS). See appendix [Git LFS](https://github.com/CosmoLike/cocoa/blob/master/README.md#git-lfs) for further information.
 
