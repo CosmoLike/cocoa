@@ -6,15 +6,17 @@
 
 Cocoa developers explicitly copied all Boltzman codes, likelihoods, Cocoa Sampler, and all python/C/C++/Fortran requirements to create a very controllable environment that will ensure the reproducibility of our DES-Y3 and LSST-Y1 results. All the required python packages, including Numpy and Scipy, have been stored in [cocoa_installation_libraries](https://github.com/CosmoLike/cocoa/tree/main/cocoa_installation_libraries) folder. Installation scripts enforce the use of the available local cache instead of internet connection or packages already installed on the host machine. 
 
-PS: To be fair, we are quite loose on the installation procedures for MacOS (see appendix: [Prerequisites for MacOS](https://github.com/CosmoLike/cocoa#prerequisites-for-macos)) because our group never runs production results in such environment.
+PS: To be fair, we are quite loose on the installation procedures for MacOS (see appendix: [Prerequisites for MacOS](https://github.com/CosmoLike/cocoa#prerequisites-for-macos-system-installation)) because our group never runs production results in such environment.
 
 # Installation
 
 ## Cloning the Repository
 
+**Warning**: Users must have installed [Git LFS](https://git-lfs.github.com) before cloning the repository. See sections: [Prerequisites for Linux](https://github.com/CosmoLike/cocoa#prerequisites-for-linux-system-installation) and [Prerequisites for MacOS](https://github.com/CosmoLike/cocoa#prerequisites-for-macos-system-installation) for further information 
+
 Type
 
-    $ git clone git@github.com:CosmoLike/cocoa.git
+    $ git clone https://github.com/CosmoLike/cocoa.git
 
 PS: We have a monthly quota of only 150 GB in bandwidth for [Git LFS](https://git-lfs.github.com) files, and therefore we ask users to use good judgment in the number of times you clone repositories with large files. See appendix [Git LFS](https://github.com/CosmoLike/cocoa/blob/master/README.md#git-lfs) for further information.
 
@@ -259,6 +261,7 @@ We assume the user has the following packages installed:
 
    - [Bash](https://www.amazon.com/dp/B0043GXMSY/ref=cm_sw_em_r_mt_dp_x3UoFbDXSXRBT);
    - [Git](https://git-scm.com) v1.8+;
+   - [Git LFS](https://git-lfs.github.com);
    - [gcc](https://gcc.gnu.org) v9.*;
    - [gfortran](https://gcc.gnu.org) v9.*;
    - [g++](https://gcc.gnu.org) v9.*;
