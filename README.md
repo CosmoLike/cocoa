@@ -54,6 +54,8 @@ The installation can be performed with the following commands:
 
     $ source setup_cocoa_installation_packages
 
+**WARNING**: before running `$ source setup_cocoa_installation_packages`, make sure that you added the projects you have access via ssh-keys on `projects/clone_all.sh` file. See [Project-Folder](https://github.com/CosmoLike/cocoa#the-projects-folder) section for further details.
+
     $ source compile_external_modules
     
     $ source start_cocoa
@@ -77,7 +79,7 @@ These examples will evaluate various likelihoods at specific cosmologies. The `-
 
 # The Projects Folder
 
-The `projects` folder includes all the projects that are being developed by our group. Individual projects must be hosted on independent folders named `cocoa_XXX` where XXX is the project name. The majority of projects we are working on are not public (yet), and they are safeguarded on the private repositories listed on `project/clone_all.sh` (the backbone Cosmolike software, however, is publicly available at `external_modules/code`!). You can add your projects there, and the script `setup_cocoa_installation_packages` will try to clone all listed projects. Having inaccessible repositories listed at `project/clone_all.sh` will not cause any errors. 
+The `projects` folder includes all the projects that are being developed by our group. Individual projects must be hosted on independent folders named `cocoa_XXX` where XXX is the project name. The majority of projects we are working on are not public (yet), and they are safeguarded on the private repositories listed on `project/clone_all.sh` (the backbone Cosmolike software, however, is publicly available at `external_modules/code`!). You can add your projects there, and the script `setup_cocoa_installation_packages` will try to clone all listed projects. **Having inaccessible repositories listed at `project/clone_all.sh` will not cause any errors**. By default, cocoa will try to clone the private projects `cocoa_des_y3`, `cocoa_desxplanck` and `cocoa_des_y3u`.
 
 The `cocoa_XXX` folder that host the `XXX` project needs to have the more or less the following structure (taken from our private DES-Y3 project)
 
@@ -142,50 +144,53 @@ Here is a list of Homebrew and pip commands that install most dependencies
 
     brew install gcc@9
     alias brew='HOMEBREW_CC=gcc-9 HOMEBREW_CXX=g++-9 brew'
-    brew install open-mpi
-    brew install git
-    brew install git-lfs
+    brew install open-mpi || (brew upgrade open-mpi && brew cleanup open-mpi)
+    brew install git || (brew upgrade git && brew cleanup git)
+    brew install git-lfs || (brew upgrade git-lfs && brew cleanup git-lfs)
     git lfs install
     git lfs install --system
     brew install gmp --build-from-source
     brew install hdf5 --build-from-source
-    brew install python@3.7
-    brew install cmake
+    brew install python@3.7 || (brew upgrade python@3.7 && brew cleanup python@3.7)
+    brew install cmake || (brew upgrade cmake && brew cleanup cmake)
     brew install armadillo --build-from-source
     brew install boost --build-from-source
-    brew install gsl
-    brew install fftw
-    brew install cfitsio
-    brew install lapack
-    brew install findutils
-    brew install xz
+    brew install gsl || (brew upgrade gsl && brew cleanup gsl)
+    brew install fftw || (brew upgrade fftw && brew cleanup fftw)
+    brew install cfitsio || (brew upgrade cfitsio && brew cleanup cfitsio)
+    brew install lapack || (brew upgrade lapack && brew cleanup lapack)
+    brew install findutils || (brew upgrade findutils && brew cleanup findutils)
+    brew install xz || (brew upgrade xz && brew cleanup xz)
     export PATH="/usr/local/opt/python@3.7/bin:$PATH"
 
-    pip3 install virtualenv --upgrade
-    pip3 install wget --upgrade
-    pip3 install six --upgrade
-    pip3 install python-dateutil --upgrade
-    pip3 install pytz --upgrade
-    pip3 install mpmath --upgrade
-    pip3 install PyYAML --upgrade
-    pip3 install pyparsing --upgrade
-    pip3 install fuzzywuzzy --upgrade
-    pip3 install cycler --upgrade
-    pip3 install kiwisolver --upgrade
-    pip3 install pillow --upgrade
-    pip3 install numpy --upgrade
-    pip3 install scipy --upgrade
-    pip3 install sympy --upgrade
-    pip3 install cython  --upgrade
-    pip3 install imageio --upgrade
-    pip3 install pillow --upgrade
-    pip3 install pandas --upgrade
-    pip3 install py-bobyqa --upgrade
-    pip3 install matplotlib --upgrade
-    pip3 install pybind11 --upgrade
-    pip3 install GetDist --upgrade
-    pip3 install astropy --upgrade
-    pip3 install pyfits --upgrade
+    pip3.7 install virtualenv --upgrade
+    pip3.7 install wget --upgrade
+    pip3.7 install wheel --upgrade
+    pip3.7 install setuptools --upgrade
+    pip3.7 install six --upgrade
+    pip3.7 install python-dateutil --upgrade
+    pip3.7 install pytz --upgrade
+    pip3.7 install mpmath --upgrade
+    pip3.7 install PyYAML --upgrade
+    pip3.7 install pyparsing --upgrade
+    pip3.7 install fuzzywuzzy --upgrade
+    pip3.7 install cycler --upgrade
+    pip3.7 install kiwisolver --upgrade
+    pip3.7 install enum34 --upgrade
+    pip3.7 install pillow --upgrade
+    pip3.7 install numpy --upgrade
+    pip3.7 install scipy --upgrade
+    pip3.7 install sympy --upgrade
+    pip3.7 install cython  --upgrade
+    pip3.7 install imageio --upgrade
+    pip3.7 install pillow --upgrade
+    pip3.7 install pandas --upgrade
+    pip3.7 install py-bobyqa --upgrade
+    pip3.7 install matplotlib --upgrade
+    pip3.7 install pybind11 --upgrade
+    pip3.7 install GetDist --upgrade
+    pip3.7 install astropy --upgrade
+    pip3.7 install pyfits --upgrade
 
 **It is also necessary to update `$PATH`** so the OS can detect the [Homebrew](https://brew.sh) python installation. Adding to `~/.bash_profile` code similar to the lines below should be enough (don't forget to replace `XXX` by the user's home folder):
 
