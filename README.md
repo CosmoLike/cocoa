@@ -18,11 +18,11 @@ Type
 
     $ git clone https://github.com/CosmoLike/cocoa.git
 
-PS: We have a monthly quota of only 150 GB in bandwidth for [Git LFS](https://git-lfs.github.com) files, and therefore we ask users to use good judgment in the number of times you clone repositories with large files. See appendix [Git LFS](https://github.com/CosmoLike/cocoa/blob/master/README.md#git-lfs) for further information.
+We have a monthly quota of only 150 GB in bandwidth for [Git LFS](https://git-lfs.github.com) files, and therefore we ask users to use good judgment in the number of times you clone repositories with large files (each clone will download around 5GB from Git LFS). See appendix [Git LFS](https://github.com/CosmoLike/cocoa/blob/master/README.md#git-lfs) for further information.
 
 ## Installation of required packages
 
-There are two options for installing the requirements to run Cocoa. The first and easier one is via Docker Container, while the more challenging option is a manual installation directly into the Linux/macOS operation system (Windows is not supported). For a few HPC systems that are commonly used by the Cocoa developers, special keys make installation directly into the HPC system a lot easier.
+There are two options for installing the requirements to run Cocoa. The first and easier one is via Docker Container, while the more challenging option is a manual installation directly into the Linux/macOS operation system (Windows is not supported). For a few HPC systems commonly used by the Cocoa developers, special keys make installation directly into the HPC system easier.
 
 For further information on Docker installation, see appendices [Docker Installation Part I: Further Information for PCs Environment](https://github.com/CosmoLike/cocoa/blob/master/README.md#docker-installation-part-i-further-information-for-pcs-environment) and [Docker Installation Part II: Further Information for HPC Systems](https://github.com/CosmoLike/cocoa/blob/master/README.md#docker-installation-part-ii-further-information-for-hpc-systems) for in-depth instructions.
 
@@ -112,6 +112,86 @@ The `cocoa_XXX` folder that host the `XXX` project needs to have the more or les
       
 # Appendix
 
+## Prerequisites for Linux (System Installation)
+
+We assume the user has the following packages installed:
+
+   - [Bash](https://www.amazon.com/dp/B0043GXMSY/ref=cm_sw_em_r_mt_dp_x3UoFbDXSXRBT);
+   - [Git](https://git-scm.com) v1.8+;
+   - [Git LFS](https://git-lfs.github.com);
+   - [gcc](https://gcc.gnu.org) v9.*;
+   - [gfortran](https://gcc.gnu.org) v9.*;
+   - [g++](https://gcc.gnu.org) v9.*;
+   - [Python](https://www.python.org) v3.7.*;
+   - [PIP package manager](https://pip.pypa.io/en/stable/installing/)
+   - [Python Virtual Environment](https://www.geeksforgeeks.org/python-virtual-environment/)
+
+We also assume all contributors have added their [ssh-keys](https://docs.github.com/en/enterprise/2.15/user/articles/adding-a-new-ssh-key-to-your-github-account) to Cocoa's private submodules. Note that
+
+   - **zsh (the Z shell) is not a valid substitution for bash**,
+   - **Python 3.8 is not compatible with Cocoa**
+   - **GCC-10 compilers are not compatible with Cocoa**.
+
+We welcome contributions to make Cocoa work with these packages, compilers, and script languages.
+
+## Prerequisites for MacOS (System Installation)
+
+We assume the user adopts [Homebrew](https://brew.sh) as the OS package manager, and [BASH](https://www.howtogeek.com/444596/how-to-change-the-default-shell-to-bash-in-macos-catalina/) as the default shell. While alternatives, such as [MacPorts](https://www.macports.org) and [Fink](http://www.finkproject.org), may provide all the requirements, we don't  present instructions for them. We also don't provide documentation for installation on [zsh](https://www.howtogeek.com/444596/how-to-change-the-default-shell-to-bash-in-macos-catalina/) shell, the default shell on macOS Catalina. Finally, we also assume all contributors have added their ssh-keys to Cocoa's private submodules.
+
+Here is a list of Homebrew and pip commands that install most dependencies
+
+    brew install gcc@9
+    alias brew='HOMEBREW_CC=gcc-9 HOMEBREW_CXX=g++-9 brew'
+    brew install open-mpi
+    brew install git
+    brew install git-lfs
+    git lfs install
+    git lfs install --system
+    brew install gmp --build-from-source
+    brew install hdf5 --build-from-source
+    brew install python@3.7
+    brew install cmake
+    brew install armadillo --build-from-source
+    brew install boost --build-from-source
+    brew install gsl
+    brew install fftw
+    brew install cfitsio
+    brew install lapack
+    brew install findutils
+    brew install xz
+    export PATH="/usr/local/opt/python@3.7/bin:$PATH"
+
+    pip3 install virtualenv --upgrade
+    pip3 install wget --upgrade
+    pip3 install six --upgrade
+    pip3 install python-dateutil --upgrade
+    pip3 install pytz --upgrade
+    pip3 install mpmath --upgrade
+    pip3 install PyYAML --upgrade
+    pip3 install pyparsing --upgrade
+    pip3 install fuzzywuzzy --upgrade
+    pip3 install cycler --upgrade
+    pip3 install kiwisolver --upgrade
+    pip3 install pillow --upgrade
+    pip3 install numpy --upgrade
+    pip3 install scipy --upgrade
+    pip3 install sympy --upgrade
+    pip3 install cython  --upgrade
+    pip3 install imageio --upgrade
+    pip3 install pillow --upgrade
+    pip3 install pandas --upgrade
+    pip3 install py-bobyqa --upgrade
+    pip3 install matplotlib --upgrade
+    pip3 install pybind11 --upgrade
+    pip3 install GetDist --upgrade
+    pip3 install astropy --upgrade
+    pip3 install pyfits --upgrade
+
+**It is also necessary to update `$PATH`** so the OS can detect the [Homebrew](https://brew.sh) python installation. Adding to `~/.bash_profile` code similar to the lines below should be enough (don't forget to replace `XXX` by the user's home folder):
+
+    python3=/Users/XXX/Library/Python/3.7/bin
+    export PATH=$python3:$PATH
+    
 ## Further Information about the configuration files
 
 The installation of Cocoa required packages, as well as Boltzmann and Likelihood codes, are managed via the following scripts located at `./Cocoa`.
@@ -254,86 +334,6 @@ If the system-wide CMAKE is old, but the user has a local [CMAKE](https://cmake.
     export CMAKE=local_installation
 
 can be set to point our scripts to the local [CMAKE](https://cmake.org) v3.11+ installation.
-
-## Prerequisites for Linux (System Installation)
-
-We assume the user has the following packages installed:
-
-   - [Bash](https://www.amazon.com/dp/B0043GXMSY/ref=cm_sw_em_r_mt_dp_x3UoFbDXSXRBT);
-   - [Git](https://git-scm.com) v1.8+;
-   - [Git LFS](https://git-lfs.github.com);
-   - [gcc](https://gcc.gnu.org) v9.*;
-   - [gfortran](https://gcc.gnu.org) v9.*;
-   - [g++](https://gcc.gnu.org) v9.*;
-   - [Python](https://www.python.org) v3.7.*;
-   - [PIP package manager](https://pip.pypa.io/en/stable/installing/)
-   - [Python Virtual Environment](https://www.geeksforgeeks.org/python-virtual-environment/)
-
-We also assume all contributors have added their [ssh-keys](https://docs.github.com/en/enterprise/2.15/user/articles/adding-a-new-ssh-key-to-your-github-account) to Cocoa's private submodules. Note that
-
-   - **zsh (the Z shell) is not a valid substitution for bash**,
-   - **Python 3.8 is not compatible with Cocoa**
-   - **GCC-10 compilers are not compatible with Cocoa**.
-
-We welcome contributions to make Cocoa work with these packages, compilers, and script languages.
-
-## Prerequisites for MacOS (System Installation)
-
-We assume the user adopts [Homebrew](https://brew.sh) as the OS package manager, and [BASH](https://www.howtogeek.com/444596/how-to-change-the-default-shell-to-bash-in-macos-catalina/) as the default shell. While alternatives, such as [MacPorts](https://www.macports.org) and [Fink](http://www.finkproject.org), may provide all the requirements, we don't  present instructions for them. We also don't provide documentation for installation on [zsh](https://www.howtogeek.com/444596/how-to-change-the-default-shell-to-bash-in-macos-catalina/) shell, the default shell on macOS Catalina. Finally, we also assume all contributors have added their ssh-keys to Cocoa's private submodules.
-
-Here is a list of Homebrew and pip commands that install most dependencies
-
-    brew install gcc@9
-    alias brew='HOMEBREW_CC=gcc-9 HOMEBREW_CXX=g++-9 brew'
-    brew install open-mpi
-    brew install git
-    brew install git-lfs
-    git lfs install
-    git lfs install --system
-    brew install gmp --build-from-source
-    brew install hdf5 --build-from-source
-    brew install python@3.7
-    brew install cmake
-    brew install armadillo --build-from-source
-    brew install boost --build-from-source
-    brew install gsl
-    brew install fftw
-    brew install cfitsio
-    brew install lapack
-    brew install findutils
-    brew install xz
-    export PATH="/usr/local/opt/python@3.7/bin:$PATH"
-
-    pip3 install virtualenv --upgrade
-    pip3 install wget --upgrade
-    pip3 install six --upgrade
-    pip3 install python-dateutil --upgrade
-    pip3 install pytz --upgrade
-    pip3 install mpmath --upgrade
-    pip3 install PyYAML --upgrade
-    pip3 install pyparsing --upgrade
-    pip3 install fuzzywuzzy --upgrade
-    pip3 install cycler --upgrade
-    pip3 install kiwisolver --upgrade
-    pip3 install pillow --upgrade
-    pip3 install numpy --upgrade
-    pip3 install scipy --upgrade
-    pip3 install sympy --upgrade
-    pip3 install cython  --upgrade
-    pip3 install imageio --upgrade
-    pip3 install pillow --upgrade
-    pip3 install pandas --upgrade
-    pip3 install py-bobyqa --upgrade
-    pip3 install matplotlib --upgrade
-    pip3 install pybind11 --upgrade
-    pip3 install GetDist --upgrade
-    pip3 install astropy --upgrade
-    pip3 install pyfits --upgrade
-
-**It is also necessary to update `$PATH`** so the OS can detect the [Homebrew](https://brew.sh) python installation. Adding to `~/.bash_profile` code similar to the lines below should be enough (don't forget to replace `XXX` by the user's home folder):
-
-    python3=/Users/XXX/Library/Python/3.7/bin
-    export PATH=$python3:$PATH
 
 ## Proper Credits
    The following is not an exhaustive list of the codes we use
