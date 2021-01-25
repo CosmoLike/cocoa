@@ -54,7 +54,7 @@ The installation can be performed with the following commands:
 
     $ source setup_cocoa_installation_packages
 
-**WARNING**: before running `$ source setup_cocoa_installation_packages`, make sure that you added the projects you have access via ssh-keys on `projects/clone_all.sh` file. See [Project-Folder](https://github.com/CosmoLike/cocoa#the-projects-folder) section for further details.
+**WARNING**: before running `source setup_cocoa_installation_packages`, make sure that you added the projects you have access via ssh-keys on `projects/clone_all.sh` file. See [Project-Folder](https://github.com/CosmoLike/cocoa#the-projects-folder) section for further details.
 
     $ source compile_external_modules
     
