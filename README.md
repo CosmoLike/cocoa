@@ -12,7 +12,7 @@ PS: We are quite loose on the installation procedures for MacOS (see appendix: [
 
 ## Cloning the Repository
 
-**Warning**: Users must have installed [Git LFS](https://git-lfs.github.com) before cloning the repository. See sections: [Prerequisites for Linux](https://github.com/CosmoLike/cocoa#prerequisites-for-linux-system-installation) and [Prerequisites for MacOS](https://github.com/CosmoLike/cocoa#prerequisites-for-macos-system-installation) for further information.
+**Warning**: Users must have installed [Git LFS](https://git-lfs.github.com) before cloning the repository. See sections: [Prerequisites for Linux](https://github.com/CosmoLike/cocoa#prerequisites-for-linux-system-installation) and [Prerequisites for MacOS](https://github.com/CosmoLike/cocoa#prerequisites-for-macos-system-installation) for further information on what needs to be installed before cloning the repository.
 
 Type
 
