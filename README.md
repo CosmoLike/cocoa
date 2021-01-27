@@ -6,13 +6,19 @@
 
 Cocoa developers explicitly copied all Boltzman codes, likelihoods, Cocoa Sampler, and all python/C/C++/Fortran requirements to create a very controllable environment that will ensure the reproducibility of our DES-Y3 and LSST-Y1 results. All the required python packages, including Numpy and Scipy, have been stored in [cocoa_installation_libraries](https://github.com/CosmoLike/cocoa/tree/main/cocoa_installation_libraries) folder (linux installation). Installation scripts enforce the use of the available local cache instead of internet connection or packages already installed on the host machine. 
 
-PS: We are quite loose on the installation procedures for MacOS (see appendix: [Prerequisites for MacOS](https://github.com/CosmoLike/cocoa#prerequisites-for-macos-system-installation)) because our group rarely runs code in such an environment.
+PS: We are quite loose on the installation procedures for MacOS (see appendix: [Prerequisites for MacOS](https://github.com/CosmoLike/cocoa#prerequisites-for-macos-system-installation)) because our group rarely runs production-ready code in such an environment.
 
 # Installation
 
-## Cloning the Repository
+## Before Cloning the Repository
 
-**Warning**: Users must have installed [Git LFS](https://git-lfs.github.com) before cloning the repository. See sections: [Prerequisites for Linux](https://github.com/CosmoLike/cocoa#prerequisites-for-linux-system-installation) and [Prerequisites for MacOS](https://github.com/CosmoLike/cocoa#prerequisites-for-macos-system-installation) for further information on what needs to be installed before cloning the repository.
+There are two options for installing the requirements to run Cocoa and clone the repository using [Git LFS](https://git-lfs.github.com). The first and more straightforward one is through Docker containers. The latter option is the manual installation of the requirements directly into the Linux/macOS (Windows is not supported).
+
+For further information on Docker installation, see appendices [Docker Installation Part I: Further Information for PCs Environment](https://github.com/CosmoLike/cocoa/blob/master/README.md#docker-installation-part-i-further-information-for-pcs-environment) and [Docker Installation Part II: Further Information for HPC Systems](https://github.com/CosmoLike/cocoa/blob/master/README.md#docker-installation-part-ii-further-information-for-hpc-systems) for in-depth instructions.
+
+For further information on system installation, see appendices [System Installation: Further Information for MacOS](https://github.com/CosmoLike/cocoa/blob/master/README.md#system-installation-further-information-for-macos) and [System Installation: Further Information for Linux](https://github.com/CosmoLike/cocoa/blob/master/README.md#system-installation-further-information-for-linux) for in-depth instructions.
+
+## Cloning the Repository
 
 Type
 
@@ -20,15 +26,9 @@ Type
 
 We have a monthly quota of only 150 GB in bandwidth for [Git LFS](https://git-lfs.github.com) files, and therefore we ask users to use good judgment in the number of times you clone repositories with large files (each clone will download around 5GB from Git LFS). See appendix [Git LFS](https://github.com/CosmoLike/cocoa/blob/master/README.md#git-lfs) for further information.
 
-## Installation of required packages
+## Installation/Compilation of Boltzman/Likelihood codes
 
-There are two options for installing the requirements to run Cocoa. The first and easier one is via Docker Container, while the more challenging option is a manual installation directly into the Linux/macOS operation system (Windows is not supported). For a few HPC systems commonly used by the Cocoa developers, special keys make installation directly into the HPC system easier.
-
-For further information on Docker installation, see appendices [Docker Installation Part I: Further Information for PCs Environment](https://github.com/CosmoLike/cocoa/blob/master/README.md#docker-installation-part-i-further-information-for-pcs-environment) and [Docker Installation Part II: Further Information for HPC Systems](https://github.com/CosmoLike/cocoa/blob/master/README.md#docker-installation-part-ii-further-information-for-hpc-systems) for in-depth instructions.
-
-For further information on system installation, see appendices [System Installation: Further Information for MacOS](https://github.com/CosmoLike/cocoa/blob/master/README.md#system-installation-further-information-for-macos) and [System Installation: Further Information for Linux](https://github.com/CosmoLike/cocoa/blob/master/README.md#system-installation-further-information-for-linux) for in-depth instructions.
-
-PS: Cocoa chooses the preferred method of installation via special environment keys located on [set_installation_options](https://github.com/CosmoLike/cocoa/blob/master/Cocoa/set_installation_options) script (Docker is the default option)
+Cocoa chooses the preferred method of installation via special environment keys located on [set_installation_options](https://github.com/CosmoLike/cocoa/blob/master/Cocoa/set_installation_options) script (Docker is the default option)
 
     # ----------------------------------------------------------------------------
     # ----------------------------------------------------------------------------
@@ -41,12 +41,12 @@ PS: Cocoa chooses the preferred method of installation via special environment k
     #export NASA_SUPERCOMPUTER_INSTALLATION=1
     (...)
     #export MANUAL_INSTALLATION=1
-    
+
+For a few HPC systems commonly used by the Cocoa developers, special keys with pre-defined configurations exists.
+
 **Exporting, at the same, more than one of the special keys listed above produces undefined behavior!**
 
-PS: As previously stated, Docker installation is a lot easier for beginners (quick start). However, on HPC systems, dealing with containers and [PBS](https://www.openpbs.org) and  [SLURM](https://slurm.schedmd.com/documentation.html) submission scripts is a little annoying. Therefore, users are encouraged to learn how to do a manual installation on your HPC system when using Cocoa for running lots of MCMC chains.
-
-PS: If users want to use Jupiter notebooks from the container at any time during development (the [Cobaya](https://github.com/CobayaSampler) framework that Cocoa heavily depends on has excellent integration with Jupyter notebooks), then we advise them to read appendix [Running Jupyter Notebooks inside the Whovian-Cosmo container](https://github.com/CosmoLike/cocoa/blob/master/README.md#running-jupyter-notebooks-inside-the-whovian-cosmo-container) for in-depth instructions.
+PS: On HPC systems, dealing with docker containers and [PBS](https://www.openpbs.org) and  [SLURM](https://slurm.schedmd.com/documentation.html) submission scripts can be a little annoying. Therefore, users are encouraged to learn how to do a manual installation on your HPC system when using Cocoa for running lots of MCMC chains.
 
 ## Sourcing the Configuration Files
 
@@ -62,11 +62,11 @@ The installation can be performed with the following commands:
 
 Sourcing [setup_cocoa_installation_packages](https://github.com/CosmoLike/cocoa/blob/master/Cocoa/setup_cocoa_installation_packages) may require a long time (~hours) depending on the supercomputer environment (System Option). It is possible to speed-up installation considerably by running `source setup_cocoa_installation_packages` on an interactive node w/ ~16 threads. For the Docker Installation, however, sourcing [setup_cocoa_installation_packages](https://github.com/CosmoLike/cocoa/blob/master/Cocoa/setup_cocoa_installation_packages) should take only a few minutes.
 
-Once the user is done working on the Cocoa enviroment, type:
+Once the work on the Cocoa environment is done, type:
 
     $ source stop_cocoa
 
-PS: Users are highly encouraged to read appendices [Further Information about the configuration files](https://github.com/CosmoLike/cocoa/blob/master/README.md#further-information-about-the-configuration-files) and [Further Information about the difference between `compile_external_modules` and `start_cocoa` scripts](https://github.com/CosmoLike/cocoa/blob/master/README.md#further-information-about-the-difference-between-compile_external_modules-and-start_cocoa-scripts) to learn more about the configuration files after running a few basic examples.
+PS: Users are highly encouraged to read appendix [Further Information about the configuration files](https://github.com/CosmoLike/cocoa/blob/master/README.md#further-information-about-the-configuration-files) to learn more about the configuration files.
 
 ## Running Examples
 
@@ -197,34 +197,6 @@ Here is a list of Homebrew and pip commands that install most dependencies
     python3=/Users/XXX/Library/Python/3.7/bin
     export PATH=$python3:$PATH
     
-## Further Information about the configuration files
-
-The installation of Cocoa required packages, as well as Boltzmann and Likelihood codes, are managed via the following scripts located at `./Cocoa`.
-
- - [set_installation_options](https://github.com/CosmoLike/cocoa/blob/master/Cocoa/set_installation_options)
-
-    This file contains environment variables that manage the installation process.
-
- - [setup_cocoa_installation_packages](https://github.com/CosmoLike/cocoa/blob/master/Cocoa/setup_cocoa_installation_packages)
-
-    This file has instructions on how to install packages required by the Cocoa Framework.
-
- - [compile_external_modules](https://github.com/CosmoLike/cocoa/blob/master/Cocoa/compile_external_modules)
-
-    This file has instructions on how to compile Boltzmann, Sampler and likelihood codes. 
-
- - [start_cocoa](https://github.com/CosmoLike/cocoa/blob/master/Cocoa/start_cocoa)
-
-    This file has instructions on how to set up the Python virtual environment.
-
- - [stop_cocoa](https://github.com/CosmoLike/cocoa/blob/master/Cocoa/stop_cocoa)
-
-    This file has instructions on how to unset the Python virtual environment - including recovering original `PYTHONPATH`, `LD_LIBRARY_PATH`, and `PATH`. 
-
- - [clean_all](https://github.com/CosmoLike/cocoa/blob/master/Cocoa/clean_all)
-
-    This file has instructions on how to clean keys associated with the Python virtual environment and delete the compilation of the Boltzmann, Sampler, and likelihood codes, and local installation of the required packages installed by the [setup_cocoa_installation_packages].
-
 ## Docker Installation Part I: Further Information for PCs Environment
 
 We highly advise users to run Cocoa inside an instantiation of the [Whovian-Cosmo](https://hub.docker.com/r/vivianmiranda/whovian-cosmo) docker image. Installation of the [docker engine](https://docs.docker.com/engine/) on local PCs is a reasonably straightforward process - see the [official documentation](https://docs.docker.com/engine/install/) for OS-specific instructions.
@@ -246,6 +218,9 @@ This step may take some time, as the [Whovian-Cosmo](https://hub.docker.com/r/vi
 
 and proceed to the section [Cloning the Repository](https://github.com/CosmoLike/cocoa#cloning-the-repository). **There isn't permanent storage outside `/home/whovian/host/`. Be aware of this fact to not lose any work**.
 
+PS: If users want to use Jupiter notebooks from the container at any time during development (the [Cobaya](https://github.com/CobayaSampler) framework that Cocoa heavily depends on has excellent integration with Jupyter notebooks), then we advise them to read appendix [Running Jupyter Notebooks inside the Whovian-Cosmo container](https://github.com/CosmoLike/cocoa/blob/master/README.md#running-jupyter-notebooks-inside-the-whovian-cosmo-container) for in-depth instructions.
+
+
 ## Docker Installation Part II: Further Information for HPC Systems
 
 HPC systems don't allow users to run docker containers using the standard [docker engine](https://docs.docker.com/engine/) for [security reasons](https://www.reddit.com/r/docker/comments/7y2yp2/why_is_singularity_used_as_opposed_to_docker_in/?utm_source=share&utm_medium=web2x&context=3). There is, however, an alternative engine called [Singularity](https://sylabs.io/guides/3.6/user-guide/index.html) that can run docker images in compliance with HPC security requirements. The [Singularity](https://sylabs.io/guides/3.6/user-guide/index.html) engine installation requires administrative privileges. However, many HPC systems have already adopted it.
@@ -263,6 +238,8 @@ after requesting interactive nodes successfully (never run jobs on login nodes!)
     $ cd /home/whovian/host/
 
 and proceed to the section [Cloning the Repository](https://github.com/CosmoLike/cocoa#cloning-the-repository). **There isn't permanent storage outside `/home/whovian/host/`. Be aware of this fact to not lose any work**
+
+PS: If users want to use Jupiter notebooks from the container at any time during development (the [Cobaya](https://github.com/CobayaSampler) framework that Cocoa heavily depends on has excellent integration with Jupyter notebooks), then we advise them to read appendix [Running Jupyter Notebooks inside the Whovian-Cosmo container](https://github.com/CosmoLike/cocoa/blob/master/README.md#running-jupyter-notebooks-inside-the-whovian-cosmo-container) for in-depth instructions.
 
 ## System Installation: Further Information for MacOS
 
@@ -340,6 +317,34 @@ If the system-wide CMAKE is old, but the user has a local [CMAKE](https://cmake.
 
 can be set to point our scripts to the local [CMAKE](https://cmake.org) v3.11+ installation.
 
+## Further Information about the configuration files
+
+The installation of Cocoa required packages, as well as Boltzmann and Likelihood codes, are managed via the following scripts located at `./Cocoa`.
+
+ - [set_installation_options](https://github.com/CosmoLike/cocoa/blob/master/Cocoa/set_installation_options)
+
+    This file contains environment variables that manage the installation process.
+
+ - [setup_cocoa_installation_packages](https://github.com/CosmoLike/cocoa/blob/master/Cocoa/setup_cocoa_installation_packages)
+
+    This file has instructions on how to install packages required by the Cocoa Framework.
+
+ - [compile_external_modules](https://github.com/CosmoLike/cocoa/blob/master/Cocoa/compile_external_modules)
+
+    This file has instructions on how to compile Boltzmann, Sampler and likelihood codes. 
+
+ - [start_cocoa](https://github.com/CosmoLike/cocoa/blob/master/Cocoa/start_cocoa)
+
+    This file has instructions on how to set up the Python virtual environment.
+
+ - [stop_cocoa](https://github.com/CosmoLike/cocoa/blob/master/Cocoa/stop_cocoa)
+
+    This file has instructions on how to unset the Python virtual environment - including recovering original `PYTHONPATH`, `LD_LIBRARY_PATH`, and `PATH`. 
+
+ - [clean_all](https://github.com/CosmoLike/cocoa/blob/master/Cocoa/clean_all)
+
+    This file has instructions on how to clean keys associated with the Python virtual environment and delete the compilation of the Boltzmann, Sampler, and likelihood codes, and local installation of the required packages installed by the [setup_cocoa_installation_packages].
+    
 ## Proper Credits
    The following is not an exhaustive list of the codes we use
 
