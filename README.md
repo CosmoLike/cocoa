@@ -42,7 +42,12 @@ Cocoa chooses the preferred method of installation via special environment keys 
     (...)
     #export MANUAL_INSTALLATION=1
 
-For a few HPC systems commonly used by the Cocoa developers, special keys with pre-defined configurations exists.
+For a few HPC systems commonly used by the Cocoa developers, special keys with pre-defined configurations exist. See section [System Installation: Further Information for Linux]() for further instructions on `MANUAL_INSTALLATION` if the pre-defined configuration is not available for your environment. For macOS system installation, the user needs to uncomment the line `export MACOS_HOMEBREW_INSTALLATION=1`, while making sure that all other special keys are unset, as shown below:
+
+    #export DOCKER_INSTALLATION=1
+    (...)
+    export MACOS_HOMEBREW_INSTALLATION=1
+
 
 **Exporting, at the same, more than one of the special keys listed above produces undefined behavior!**
 
@@ -241,19 +246,7 @@ and proceed to the section [Cloning the Repository](https://github.com/CosmoLike
 
 PS: If users want to use Jupiter notebooks from the container at any time during development (the [Cobaya](https://github.com/CobayaSampler) framework that Cocoa heavily depends on has excellent integration with Jupyter notebooks), then we advise them to read appendix [Running Jupyter Notebooks inside the Whovian-Cosmo container](https://github.com/CosmoLike/cocoa/blob/master/README.md#running-jupyter-notebooks-inside-the-whovian-cosmo-container) for in-depth instructions.
 
-## System Installation: Further Information for MacOS
-
-**First, check the appendix [Prerequisites for MacOS](https://github.com/CosmoLike/cocoa#prerequisites-for-macos-system-installation)** before reading any further. In the file [set_installation_options](https://github.com/CosmoLike/cocoa/blob/master/Cocoa/set_installation_options), the user needs to uncomment the line `export MACOS_HOMEBREW_INSTALLATION=1`, while making sure that all other special keys are unset, as shown below:
-
-    #export DOCKER_INSTALLATION=1
-    (...)
-    export MACOS_HOMEBREW_INSTALLATION=1
-
-This special key assumes all prerequisites packages have been installed. Users can adapt the if/else block associated with `MACOS_HOMEBREW_INSTALLATION` for advanced tunning settings.
-
 ## System Installation: Further Information for Linux
-
-**First, check the appendix [Prerequisites for Linux](https://github.com/CosmoLike/cocoa#prerequisites-for-linux-system-installation)** before reading any further. In the file [set_installation_options](https://github.com/CosmoLike/cocoa/blob/master/Cocoa/set_installation_options), the user needs to uncomment one of the special keys, while making sure that all other special keys are not activated.
 
 If there is no preset special key for your particular enviroment, the user need to perform a manual installation (and select the `export MANUAL_INSTALLATION = 1`). Manually installing the required packages by advanced users has the additional advantage of avoiding repeated compilation of prerequisites packages that take a long time to build. Our scripts never install packages on `$HOME/.local` or other locations in the user's `$PATH` and `$LD_LIBRARY_PATH`. Doing so could impose incompatibilities between Cobaya and different projects. The decision to perform global upgrades on packages required by multiple projects is the user's sole responsibility. All requirements for Cocoa are installed at
 
