@@ -1,4 +1,4 @@
-# to build 
+# to build
 # $> make
 
 # to install the core utilities
@@ -10,14 +10,14 @@
 # cleanup
 # $> make clean
 
-# here are the thing that you should modify 
+# here are the thing that you should modify
 ################################################################################################
 
 # set your prefix to where you want to install clik.
 # default is to let it in the current directory
 PREFIX := $(shell pwd)
 
-# set the path of the cfitsio lib. 
+# set the path of the cfitsio lib.
 # bewared that cfitsio must have been compiled with the option "make shared"
 CFITSIOPATH := /usr/local
 #CFITSIOPATH := /softs/cfitsio/3.24
@@ -38,7 +38,7 @@ FC = ifort
 
 # on my mac I got
 IFORTLIBPATH = /usr/bin/ifort-2011-base/compiler/lib
-IFORTRUNTIME = -L$(IFORTLIBPATH) -lintlc -limf -lsvml -liomp5 -lifportmt -lifcoremt -lpthread
+IFORTRUNTIME = -L$(IFORTLIBPATH) -lintlc -limf -lsvml -liomp5 -lifportmt -lifcoremt -lpthread -lcurl
 
 # on a linux machine, ifort 11.1
 #IFORTLIBPATH = /softs/intel/fce/11.1.075/lib/intel64
@@ -52,11 +52,11 @@ IFORTRUNTIME = -L$(IFORTLIBPATH) -lintlc -limf -lsvml -liomp5 -lifportmt -lifcor
 # if you are using gfortran set here where the lib are installed
 # and check the runtime libs
 GFORTRANLIBPATH = /usr/lib
-GFORTRANRUNTIME = -L$(GFORTRANLIBPATH) -lgfortran -lgomp
+GFORTRANRUNTIME = -L$(GFORTRANLIBPATH) -lgfortran -lgomp -lcurl
 
-# if you are on linux and using mkl, you need to set this 
-MKLROOT = 
-LAPACKLIBPATHMKL = 
+# if you are on linux and using mkl, you need to set this
+MKLROOT =
+LAPACKLIBPATHMKL =
 #some example
 #MKLROOT = /softs/intel/mkl/10.2.6.038/
 # on mkl 10.3
@@ -73,7 +73,7 @@ LAPACKLIBPATHMKL =
 COLORS = 1
 
 #set echo to echo -e to have colourized output on some shell
-ECHO = echo 
+ECHO = echo
 
 
 # what is the openmp option for your C compiler (leave empty to compile without openmp)
@@ -88,7 +88,7 @@ CM64 =
 #CM64 = -m64 #linux
 
 # what is the 32/64 bit option for your F90 compiler (leave empty if you don't want to know)
-FM64 = 
+FM64 =
 #FM64 = -arch x86_64 #macos
 #FM64 = -m64
 
@@ -172,7 +172,7 @@ VERSION = $(strip $(shell cat svnversion)) MAKEFILE
 #macos
 DEFINESMACOS = -D HAS_RTLD_DEFAULT
 #linux
-DEFINESLINUX = 
+DEFINESLINUX =
 
 DEFINESCOMMON = -D HAS_LAPACK -D LAPACK_CLIK -D NOHEALPIX -D CLIK_LENSING -D 'CLIKSVNVERSION="$(VERSION)"' -D CAMSPEC_V1
 
@@ -244,7 +244,7 @@ endif
 #LAPACK = -L/some/path -lsomefortranlapack -lsomedependencyforyourlapack
 #LAPACKLIBPATH = /some/path
 # leave this one empty
-#LAPACKDEP = 
+#LAPACKDEP =
 
 #CFITSIO link
 CFITSIO =  -L$(CFITSIO_LIBPATH) -lcfitsio
@@ -253,7 +253,7 @@ CFITSIO =  -L$(CFITSIO_LIBPATH) -lcfitsio
 LDFLAG = $(CM64) $(CFITSIO) $(LAPACK) $(FRUNTIME) -ldl -lm -lpthread
 
 # define some path to find the codes
-SRCPATHLIST := src src/minipmc src/cldf src/camspec src/bflike src/simall src/lenslike/plenslike src/cmbonly src/gibbs src/actspt src/lowlike src/plik src/plik/component_plugin/rel2015 
+SRCPATHLIST := src src/minipmc src/cldf src/camspec src/bflike src/simall src/lenslike/plenslike src/cmbonly src/gibbs src/actspt src/lowlike src/plik src/plik/component_plugin/rel2015
 vpath %.c $(SRCPATHLIST)
 vpath %.f90  $(SRCPATHLIST)
 vpath  %.F90 $(SRCPATHLIST)
@@ -279,7 +279,7 @@ GIBBSLKL := $(addprefix $(ODIR)/,comm_br_mod.f90.o comm_gauss_br_mod.f90.o comm_
 BFLIKELKL := $(addprefix $(ODIR)/,long_intrinsic_smw.f90.o fitstools_smw.f90.o bflike_QUonly.f90.o bflike.f90.o bflike_smw.f90.o clik_bflike.f90.o clik_bflike.o)
 PLIKLITELKL := $(addprefix $(ODIR)/,plik_cmbonly.f90.o clik_cmbonly.f90.o clik_cmbonly.o)
 PLIKLKL := $(addprefix $(ODIR)/, smica.o clik_hfipack.o clik_parametric.o clik_parametric_addon.o fg2015.o corrnoise.o leakage.o)
-SIMALLLKL := 
+SIMALLLKL :=
 
 CMBLKL:= $(ACTSPTLKL) $(CAMSPECLKL) $(GIBBSLKL) $(LOWLIKELKL) $(BFLIKELKL) $(SIMALLLKL) $(PLIKLITELKL) $(PLIKLKL)
 CLIKLIB := $(TOOLS) $(CLIKMAIN) $(CMBLKL) $(LENSLKL) $(LAPACKDEP)
@@ -287,7 +287,7 @@ CLIKLIB := $(TOOLS) $(CLIKMAIN) $(CMBLKL) $(LENSLKL) $(LAPACKDEP)
 
 all: $(BDIR)/libclik.$(SO) $(BDIR)/libclik_f90.$(SO) $(BDIR)/clik_example_C $(BDIR)/clik_example_f90
 
-install_dir: 
+install_dir:
 	@mkdir -p $(PREFIX)/bin
 	@mkdir -p $(PREFIX)/lib
 	@mkdir -p $(PREFIX)/include
@@ -320,7 +320,7 @@ ifdef PYTHON
 PYTHONPATH = $(PREFIX)/lib/`$(PYTHON) -c"import sys;print('python%s/site-packages'%sys.version[0:3])"`
 PYTHONEXE := `which $(PYTHON)`
 else
-PYTHONPATH := 
+PYTHONPATH :=
 endif
 
 $(BDIR)/clik_profile.sh: src/clik_profile.sh.template |$(BDIR)
@@ -337,7 +337,7 @@ $(ODIR): | $(BDIR)
 
 $(CLIKLIB): | $(ODIR) $(ODIR)/.print_info $(ODIR)/.test_cfitsio
 
-$(BDIR)/libclik.$(SO): $(CLIKLIB) 
+$(BDIR)/libclik.$(SO): $(CLIKLIB)
 	@$(ECHO) "build $(BLUE_COLOR)$(@) $(NO_COLOR)"
 	@$(LD)  $(SHARED)  $(LAPACK) $(LDFLAG) $^ -o $@
 
@@ -362,19 +362,19 @@ endif
 	@$(ECHO) "using the following command line:"
 	gcc $(SHARED)  $(MKL_TO_INCLUDE) -Wl,--start-group $(MKL_LIB_FULLPATH) -Wl,--end-group -L$(IFORTLIBPATH) -L/lib -L/lib64 -liomp5 -lpthread -lm -o $@
 
-$(ODIR)/%.o : %.c 
+$(ODIR)/%.o : %.c
 	@$(ECHO) "$(GREEN_COLOR)$< $(NO_COLOR) -> $(GREEN_COLOR) $(@) $(NO_COLOR)"
 	@$(CC) -c $(CFLAGS) $< -o$(@)
 
-$(ODIR)/%.f90.o : %.f90 
+$(ODIR)/%.f90.o : %.f90
 	@$(ECHO) "$(GREEN_COLOR)$< $(NO_COLOR) -> $(GREEN_COLOR) $(@) $(NO_COLOR)"
 	@$(FC) -c $(FFLAGS) $< -o$(@)
 
-$(ODIR)/%.f90.o : %.F90 
+$(ODIR)/%.f90.o : %.F90
 	@$(ECHO) "$(GREEN_COLOR)$< $(NO_COLOR) -> $(GREEN_COLOR) $(@) $(NO_COLOR)"
 	@$(FC) -c $(FFLAGS) $< -o$(@)
 
-$(ODIR)/%.py: src/python/tools/%.py 
+$(ODIR)/%.py: src/python/tools/%.py
 	@sed "s@PYTHONEXE@$(PYTHONEXE)@g;s@REPLACEPATH@$(PYTHONPATH)@g" <$< >$@
 	@$(INSTALL) $@ $(PREFIX)/bin/$(subst .py,,$(@F))
 	@$(ECHO) "install python tools $(BLUE_COLOR)  $(subst .py,,$(@F)) $(NO_COLOR) in $(BLUE_COLOR)$(PREFIX)/bin $(NO_COLOR)"
@@ -420,8 +420,8 @@ endif
 
 INSTALL_CFLAG = $(subst ",\",$(subst ',\',$(CM64) $(COPENMP) $(CFPIC) $(DEFINES) -I $(PREFIX)/include $(INCLUDES)))
 INSTALL_FFLAG = $(subst ",\",$(subst ',\',$(FM64) $(FOPENMP) $(FFPIC) $(DEFINES) $(FMODULEPATH) $(PREFIX)/include))
-INSTALL_CLIB = $(CM64) $(CFITSIO) $(FRUNTIME) -ldl -lm -lpthread $(CFITSIO) $(FRUNTIME) 
-INSTALL_FLIB = $(CM64) $(CFITSIO) $(FRUNTIME) -ldl -lm -lpthread $(CFITSIO) $(FRUNTIME) 
+INSTALL_CLIB = $(CM64) $(CFITSIO) $(FRUNTIME) -ldl -lm -lpthread $(CFITSIO) $(FRUNTIME)
+INSTALL_FLIB = $(CM64) $(CFITSIO) $(FRUNTIME) -ldl -lm -lpthread $(CFITSIO) $(FRUNTIME)
 ifdef LAPACK_INSTALL
 INSTALL_CLIB += $(LAPACK_INSTALL)
 INSTALL_FLIB += $(LAPACK_INSTALL)

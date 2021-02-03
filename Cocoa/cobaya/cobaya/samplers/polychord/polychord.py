@@ -18,7 +18,7 @@ from tempfile import gettempdir
 import re
 
 # Local
-from cobaya.tools import read_dnumber, get_external_function, PythonPath, \
+from cobaya.tools import read_dnumber, get_external_function, \
     find_with_regexp, NumberWithUnits, load_module, VersionCheckError
 from cobaya.sampler import Sampler
 from cobaya.mpi import is_main_process, share_mpi, sync_processes
@@ -30,6 +30,10 @@ from cobaya.conventions import _separator, _evidence_extension, _packages_path_a
 
 
 class polychord(Sampler):
+    r"""
+    PolyChord sampler \cite{Handley:2015fda,2015MNRAS.453.4384H}, a nested sampler
+    tailored for high-dimensional parameter spaces with a speed hierarchy.
+    """
     # Name of the PolyChord repo and version to download
     _pc_repo_name = "PolyChord/PolyChordLite"
     _pc_repo_version = "1.17.1"
@@ -371,7 +375,6 @@ class polychord(Sampler):
                 self.logZ, self.logZstd,
                 *[np.exp(self.logZ + n * self.logZstd) for n in [-1, 1]])
 
-
     def products(self):
         """
         Auxiliary function to define what should be returned in a scripted call.
@@ -476,7 +479,8 @@ class polychord(Sampler):
             poly_build_path = None
         else:
             if is_main_process():
-                log.info("Importing *auto-installed* PolyChord (but defaulting to *global*).")
+                log.info(
+                    "Importing *auto-installed* PolyChord (but defaulting to *global*).")
             poly_build_path = cls.get_import_path(path)
         try:
             # TODO: add min_version when polychord module version available

@@ -2206,7 +2206,7 @@
 
     TimeSampleBoost = State%CP%Accuracy%AccuracyBoost*State%CP%Accuracy%TimeStepBoost
     call TimeSteps%Init()
-    
+
     call TimeSteps%Add_delta(State%taurst, State%taurend, State%dtaurec)
 
     ! Calculating the timesteps after recombination
