@@ -1,0 +1,173 @@
+CC = $(C_COMPILER)
+CXX = $(CXX_COMPILER)
+
+# LINK ARMADILLO LIBRARY
+ARMA := 1
+
+# LINK GSL LIBRARY
+GSL   := 1
+
+# LINK FFTW
+FFTW := 1
+
+# LINK FMT
+#FMT := 1
+
+# LINK SPDLOG
+SPDLOG := 1
+
+# LINK INTEL THREAD BUILDING BLOCKS
+#TBB := 1
+
+# LINK NAG LIBRARY
+#NAG := 1
+
+# LINK C LOG LIBRARY
+CLOG :=1
+
+# LINK PYBIND LIBRARY
+PYBIND := 1
+
+# DEFINE TEST CODE
+TEST := 1
+
+CSOURCES =
+OBJECTC =
+CFLAGS =  -std=c99 -I ${ROOTDIR}/.local/include/ -I ${ROOTDIR}/external_modules/code/
+CXXFLAGS = -std=c++14 -I ${ROOTDIR}/.local/include/ -I ${ROOTDIR}/external_modules/code/
+LDFLAGS = -L ${ROOTDIR}/.local/lib
+
+ifdef COSMOLIKE_DEBUG_MODE
+	COMMON_FLAGS += -O0  -DDEBUG -W -Wall -Wextra -Wcomment -pedantic -g -fmax-errors=1 -Wno-unknown-pragmas
+else
+	ifdef OCELOTE_MAKEFILE_COSMOLIKE_FLAGS
+		COMMON_FLAGS += -foptimize-strlen -finline-functions-called-once -fmerge-all-constants -Wno-unused-result -Wno-format-overflow -fmax-errors=1 -fthread-jumps -fcse-follow-jumps -fsplit-wide-types -fcse-skip-blocks -faggressive-loop-optimizations -fif-conversion -fif-conversion2 -fexpensive-optimizations -free -fschedule-insns -fschedule-insns2 -fsched-spec-load-dangerous -fshrink-wrap -fcaller-saves -fcombine-stack-adjustments -ftree-reassoc -ftree-partial-pre -ftree-forwprop -ftree-fre -ftree-phiprop -fhoist-adjacent-loads -ftree-copy-prop -ftree-loop-if-convert -ftree-loop-distribute-patterns -ftree-scev-cprop -ftree-parallelize-loops=4 -ftree-pta -ftree-sra -ftree-loop-vectorize -fpartial-inlining -fpredictive-commoning -fpeephole2 -fguess-branch-probability -freorder-blocks-algorithm=stc -freorder-blocks-and-partition -freorder-functions -falign-functions -falign-loops -falign-jumps -flto -fcprop-registers -funsafe-math-optimizations -fassociative-math -freciprocal-math -ffinite-math-only -fno-signed-zeros -fvpt -funroll-loops -fschedule-fusion -fpeel-loops -fmove-loop-invariants -fexcess-precision=fast -fgcse-after-reload -ftree-slp-vectorize -foptimize-sibling-calls -ffast-math -fvect-cost-model=dynamic -fvect-cost-model -funswitch-loops -ffp-contract=fast -fivopts -fopenmp
+		CXXFLAGS += -O3 -ffast-math
+	else
+	  CFLAGS += -O0
+		COMMON_FLAGS += -foptimize-strlen -finline-functions-called-once -fmerge-all-constants -Wno-unused-result -Wno-format-overflow -fmax-errors=1 -fthread-jumps -fcse-follow-jumps -fsplit-wide-types -fcse-skip-blocks -faggressive-loop-optimizations -fif-conversion -fif-conversion2 -fexpensive-optimizations -free -fschedule-insns -fschedule-insns2 -fsched-spec-load-dangerous -fshrink-wrap -fcaller-saves -fcombine-stack-adjustments -ftree-reassoc -fcode-hoisting -ftree-partial-pre -ftree-forwprop -ftree-fre -ftree-phiprop -fhoist-adjacent-loads -ftree-copy-prop -floop-nest-optimize -floop-parallelize-all -ftree-loop-distribution -ftree-loop-if-convert -ftree-loop-distribute-patterns -floop-interchange -ftree-scev-cprop -ftree-parallelize-loops=4 -ftree-pta -ftree-sra -ftree-loop-vectorize -fpartial-inlining -fpredictive-commoning -fpeephole2 -fguess-branch-probability -freorder-blocks-algorithm=stc -freorder-blocks-and-partition -freorder-functions -falign-functions -falign-loops -falign-jumps -flto -fcprop-registers -funsafe-math-optimizations -fassociative-math -freciprocal-math -ffinite-math-only -fno-signed-zeros -fvpt -funroll-loops -fschedule-fusion -fpeel-loops -fmove-loop-invariants -fexcess-precision=fast -fgcse-after-reload -floop-unroll-and-jam -fsplit-loops -ftree-slp-vectorize -foptimize-sibling-calls -ffast-math -fvect-cost-model=dynamic -fvect-cost-model -funswitch-loops -ffp-contract=fast -march=native -fivopts -fopenmp
+		CXXFLAGS += -O3 -ffast-math
+	endif
+endif
+
+ifdef IGNORE_CPP_SPDLOG_INSTALLATION
+	COMMON_FLAGS += -I ${GLOBAL_PACKAGES_INCLUDE}
+endif
+
+ifdef ARMA
+	CXXFLAGS += -DARMA
+	LDFLAGS += -llapack
+endif
+
+ifdef GSL
+	COMMON_FLAGS += -DHAVE_INLINE -DGSLLIB
+	ifdef IGNORE_C_GSL_INSTALLATION
+		COMMON_FLAGS += -I ${GLOBAL_PACKAGES_INCLUDE}
+		LDFLAGS += -L ${GLOBAL_PACKAGES_LOCATION}/lib
+	endif
+	LDFLAGS += -lgsl -lgslcblas
+endif
+
+ifdef FMT
+	LDFLAGS += -lfmt
+endif
+
+ifdef FFTW
+	ifdef IGNORE_C_FFTW_INSTALLATION
+		COMMON_FLAGS += -I ${GLOBAL_PACKAGES_INCLUDE}
+		LDFLAGS += -L ${GLOBAL_PACKAGES_LOCATION}/lib
+	endif
+	LDFLAGS += -lfftw3
+endif
+
+ifdef NAG
+	COMMON_FLAGS += -I ${NAG_INC} -DNAGLIB
+	LDFLAGS += ${NAG_LIB}/libnagc_mkl.so -lpthread
+endif
+
+ifdef TBB
+	COMMON_FLAGS += -DTBB
+	LDFLAGS += -ltbb -ltbbmalloc
+endif
+
+ifdef CLOG
+	COMMON_FLAGS += -DLOG_USE_COLOR
+	CSOURCES += ${ROOTDIR}/external_modules/code/log.c/src/log.c
+	OBJECTC += ./log.o
+endif
+
+ifdef SPDLOG
+	ifndef IGNORE_CPP_SPDLOG_INSTALLATION
+		LDFLAGS += ${ROOTDIR}/.local/lib/libspdlog.a
+	endif
+endif
+
+ifdef TEST
+	COMMON_FLAGS += -DTEST
+endif
+
+CFLAGS += ${COMMON_FLAGS}
+CXXFLAGS += ${COMMON_FLAGS}
+
+ifdef PYBIND
+	CXXFLAGS += $(shell python3 -m pybind11 --includes) -DPYBIND11
+	LDFLAGS += $(shell python3-config --ldflags)
+endif
+
+LDFLAGS += -lm
+
+all:  shared
+shared: cosmolike_des_y3_interface.so
+
+CSOURCES += \
+		${ROOTDIR}/external_modules/code/cfftlog/cfftlog.c \
+		${ROOTDIR}/external_modules/code/cfftlog/utils_complex.c \
+		${ROOTDIR}/external_modules/code/cfftlog/utils.c \
+		${ROOTDIR}/external_modules/code/cfastpt/cfastpt.c \
+		${ROOTDIR}/external_modules/code/cfastpt/utils_complex_cfastpt.c \
+		${ROOTDIR}/external_modules/code/cfastpt/utils_cfastpt.c \
+		${ROOTDIR}/external_modules/code/cosmolike/basics.c \
+		${ROOTDIR}/external_modules/code/cosmolike/bias.c \
+		${ROOTDIR}/external_modules/code/cosmolike/cosmo3D.c \
+		${ROOTDIR}/external_modules/code/cosmolike/cosmo2D_fourier.c \
+		${ROOTDIR}/external_modules/code/cosmolike/cosmo2D_exact_fft.c \
+		${ROOTDIR}/external_modules/code/cosmolike/cosmo2D_fullsky_TATT.c \
+		${ROOTDIR}/external_modules/code/cosmolike/halo.c \
+		${ROOTDIR}/external_modules/code/cosmolike/recompute.c \
+		${ROOTDIR}/external_modules/code/cosmolike/radial_weights.c \
+		${ROOTDIR}/external_modules/code/cosmolike/redshift_spline.c \
+		${ROOTDIR}/external_modules/code/cosmolike/structs.c \
+		${ROOTDIR}/external_modules/code/cosmolike/pt_cfastpt.c \
+
+OBJECTC += \
+		./cfftlog.o \
+		./utils_complex.o \
+		./utils.o \
+		./cfastpt.o \
+		./utils_complex_cfastpt.o \
+		./utils_cfastpt.o \
+		./basics.o \
+		./bias.o \
+		./cosmo3D.o \
+		./cosmo2D_exact_fft.o \
+		./cosmo2D_fourier.o \
+		./cosmo2D_fullsky_TATT.o \
+		./halo.o \
+		./radial_weights.o \
+		./recompute.o \
+		./redshift_spline.o \
+		./structs.o \
+		./pt_cfastpt.o \
+
+$(OBJECTC): $(CSOURCES)
+	$(CC) $(CFLAGS) -fPIC -DCOBAYA_SAMPLER -c $(CSOURCES)
+
+cosmolike_lsst_fourier_interface.so: $(OBJECTC) $(CSOURCES) interface.cpp
+	$(CXX) $(CXXFLAGS) -DCOBAYA_SAMPLER -shared -fPIC -o $@ $(OBJECTC) interface.cpp $(LDFLAGS)
+	@rm *.o
+
+test: $(OBJECTC) $(CSOURCES) interface.cpp
+	$(CXX) $(CXXFLAGS) -DCOBAYA_SAMPLER -fPIC -o $@ $(OBJECTC) interface.cpp $(LDFLAGS)
+
+clean:
+	@rm -rf cosmolike_lsst_fourier_interface.so cosmolike_lsst_fourier_interface.so.dSYM  *.o
