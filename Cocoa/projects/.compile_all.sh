@@ -1,6 +1,6 @@
 if [ -z "${ROOTDIR}" ]; then
     echo 'ERROR ROOTDIR not define'
-    return
+    exit 1
 fi
 
 cd $ROOTDIR/projects

@@ -1,6 +1,6 @@
 if [ -z "${ROOTDIR}" ]; then
     echo 'ERROR ROOTDIR not defined'
-    return
+    exit 1
 fi
 
 git update-index --assume-unchanged set_installation_options
