@@ -26,7 +26,7 @@ unset NAME2
 
 source $ROOTDIR/projects/.delete_link.sh
 
-rm -f $ROOTDIR/projects/.gitignore
+#rm -f $ROOTDIR/projects/.gitignore
 rm -f $ROOTDIR/external_modules/data/.gitignore
 rm -f $ROOTDIR/external_modules/code/.gitignore
 rm -f $ROOTDIR/cobaya/cobaya/likelihoods/.gitignore

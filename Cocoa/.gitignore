@@ -26,3 +26,12 @@ start_cocoa
 stop_cocoa
 
 project/
+
+#extra protection for DES-Y3 DATA
+projects/desxplanck
+projects/lsst_fourier
+projects/des_y3
+projects/cocoa_desxplanck
+projects/cocoa_lsst_fourier
+projects/cocoa_des_y3
+projects/cocoa_*
