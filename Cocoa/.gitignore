@@ -12,7 +12,7 @@ core.*
 cobaya/cobaya/likelihoods/.gitignore
 external_modules/code/.gitignore
 external_modules/data/.gitignore
-#projects/.gitignore
+projects/.gitignore
 
 external_modules/data/bao_data/
 external_modules/data/bicep_keck_2015/
