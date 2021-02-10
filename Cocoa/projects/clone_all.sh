@@ -7,6 +7,7 @@ cd $ROOTDIR/projects
 
 URLS="git@github.com:CosmoLike/cocoa_des_y3.git
       git@github.com:CosmoLike/cocoa_desxplanck.git
+      git@github.com:CosmoLike/cocoa_desy1xplanck.git
       git@github.com:CosmoLike/cocoa_lsst_fourier.git"
 
 for NAME in $URLS; do
