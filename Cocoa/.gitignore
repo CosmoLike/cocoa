@@ -8,6 +8,7 @@ core.*
 *.o
 *.pyc
 *.egg-info/
+*.out
 
 cobaya/cobaya/likelihoods/.gitignore
 external_modules/code/.gitignore
