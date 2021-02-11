@@ -113,7 +113,7 @@ double int_for_C_shear_shear_IA_mpp(double a, void *params) {
   return res*Pdelta(k,a)*chidchi.dchida/(fK*fK);
 }
 
-// VM - COBAYA - WE CHANGE SOME INTEGRATIONS FROM MEDIUM TO LOW PRECISION!!
+// COBAYA: - WE CHANGE SOME INTEGRATIONS FROM MEDIUM TO LOW PRECISION!!
 double C_shear_shear_IA(double s, int ni, int nj) {
   double array[3] = {(double) ni, (double) nj,s};
   int j,k;
@@ -181,16 +181,10 @@ double C_ggl_IA_tab(double l, int ni, int nj) {
   }
   if (recompute_ggl(C,G,N,ni)){
     if (table == 0) {
-      table = create_double_matrix(
-        0,
-        tomo.ggl_Npowerspectra-1,
-        0,
-        Ntable.N_ell-1
-      );
-      sig = create_double_vector(
-        0,
-        tomo.ggl_Npowerspectra-1
-      );
+      table = create_double_matrix(0, tomo.ggl_Npowerspectra - 1, 0,
+        Ntable.N_ell - 1);
+      sig = create_double_vector(0,
+        tomo.ggl_Npowerspectra - 1);
       logsmin = log(limits.P_2_s_min);
       logsmax = log(limits.P_2_s_max);
       ds = (logsmax - logsmin)/(Ntable.N_ell);
@@ -218,14 +212,14 @@ double C_ggl_IA_tab(double l, int ni, int nj) {
       }
     }
     #pragma omp parallel for
-    for (int k=1; k<tomo.ggl_Npowerspectra; k++) {
+    for (int k = 1; k < tomo.ggl_Npowerspectra; k++) {
       sig[k] = 1.;
       osc[k] = 0;
       const double res = C_ggl_IA(500., ZL(k), ZS(k));
       if (res < 0) {
         sig[k] = -1.;
       }
-      for (int i=0; i<Ntable.N_ell; i++) {
+      for (int i = 0; i < Ntable.N_ell; i++) {
         const double llog = logsmin + i*ds;
         table[k][i] = C_ggl_IA(exp(llog), ZL(k), ZS(k));
         if (res*sig[k] <0.) {
@@ -271,7 +265,8 @@ double C_shear_shear_IA_tab(double l, int ni, int nj) {
   }
   if (recompute_shear(C,N)) {
     if (table==0) {
-      table = create_double_matrix(0, tomo.shear_Npowerspectra-1, 0, Ntable.N_ell-1);
+      table = create_double_matrix(0, tomo.shear_Npowerspectra - 1, 0,
+        Ntable.N_ell - 1);
       logsmin = log(limits.P_2_s_min);
       logsmax = log(limits.P_2_s_max);
       ds = (logsmax - logsmin)/(Ntable.N_ell);
@@ -282,14 +277,14 @@ double C_shear_shear_IA_tab(double l, int ni, int nj) {
       #pragma omp parallel for
       for (int i=1; i<Ntable.N_ell; i++) {
         const double llog = logsmin + i*ds;
-        table[k][i]= log(C_shear_shear_IA(exp(llog), Z1(k), Z2(k)));
+        table[k][i] = log(C_shear_shear_IA(exp(llog), Z1(k), Z2(k)));
       }
     }
     #pragma omp parallel for
     for (int k=1; k<tomo.shear_Npowerspectra; k++) {
       for (int i=0; i<Ntable.N_ell; i++) {
         const double llog = logsmin + i*ds;
-        table[k][i]= log(C_shear_shear_IA(exp(llog), Z1(k), Z2(k)));
+        table[k][i] = log(C_shear_shear_IA(exp(llog), Z1(k), Z2(k)));
       }
     }
     update_cosmopara(&C);

@@ -6,8 +6,6 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "log.c/src/log.h"
-
 #include "bias.h"
 #include "basics.h"
 #include "cosmo2D_fourier.h"
@@ -18,6 +16,8 @@
 #include "recompute.h"
 #include "redshift_spline.h"
 #include "structs.h"
+
+#include "log.c/src/log.h"
 
 // ell_max for transform to angular correlation functions
 int LMAX = 100000;
@@ -298,7 +298,7 @@ double w_gamma_t_TATT(int nt, int ni, int nj) {
     }
   }
   if (recompute_ggl(C, G, N, ni)) {
-    // COCOA: CANT OPENMP HERE - VARYNG ONLY BIAS CAUSES RACE CONDITION HERE
+    // COCOA: CANT OPENMP HERE - VARYNG ONLY BIAS CAUSES RACE CONDITION
     for (int nz = 0; nz < tomo.ggl_Npowerspectra; nz++)
     {
       double *Cl = malloc(sizeof(double)*(LMAX));
@@ -364,10 +364,10 @@ double xi_pm_TATT(int pm, int nt, int ni, int nj) {
 
     #pragma omp parallel for
     for (int i = 0; i < like.Ntheta; i++) {
-      double *Pmin = malloc(sizeof(double)*(LMAX + 1));
-      double *Pmax = malloc(sizeof(double)*(LMAX + 1));
-      double *dPmin = malloc(sizeof(double)*(LMAX + 1));
-      double *dPmax = malloc(sizeof(double)*(LMAX + 1));
+      double *Pmin = create_double_vector(0, LMAX + 1);
+      double *Pmax = create_double_vector(0, LMAX + 1);
+      double *dPmin = create_double_vector(0, LMAX + 1);
+      double *dPmax = create_double_vector(0, LMAX + 1);
 
       gsl_sf_legendre_Pl_deriv_array(LMAX, xmin[i], Pmin, dPmin);
       gsl_sf_legendre_Pl_deriv_array(LMAX, xmax[i], Pmax, dPmax);
@@ -406,10 +406,10 @@ double xi_pm_TATT(int pm, int nt, int ni, int nj) {
             (xmin[i] - xmax[i]);
       }
 
-      free(Pmin);
-      free(Pmax);
-      free(dPmin);
-      free(dPmax);
+      free_double_vector(Pmin, 0, LMAX + 1);
+      free_double_vector(Pmax, 0, LMAX + 1);
+      free_double_vector(dPmin, 0, LMAX + 1);
+      free_double_vector(dPmax, 0, LMAX + 1);
     }
   }
   if (recompute_shear(C, N))
@@ -444,7 +444,7 @@ double xi_pm_TATT(int pm, int nt, int ni, int nj) {
           Cl_BB[l] = C_BB_tab(1.0 * l, Z1NZ, Z2NZ);
         }
         #pragma omp parallel for
-        for (int l = LMIN_tab+1; l < LMAX; l++) {
+        for (int l = LMIN_tab + 1; l < LMAX; l++) {
           Cl_EE[l] = C_EE_tab(1.0 * l, Z1NZ, Z2NZ);
           Cl_BB[l] = C_BB_tab(1.0 * l, Z1NZ, Z2NZ);
         }

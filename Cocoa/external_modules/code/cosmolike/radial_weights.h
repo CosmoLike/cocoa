@@ -20,6 +20,9 @@ double W_RSD(double l, double a0, double a1, double nz);
 
 double W_HOD(double a, double nz, double hoverh0);
 
+//lensing efficiency weightfunction for CMB lensing
+double W_k(double a, double fK);
+
 #ifdef __cplusplus
 }
 #endif

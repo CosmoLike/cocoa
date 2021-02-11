@@ -30,6 +30,26 @@ double C_shear_tomo(double l, int ni, int nj);
 
 double C_shear_tomo_nointerp(double l, int ni, int nj);
 
+// ---------------------------------------------------------------------------
+// ---------------------------------------------------------------------------
+// CMB x LSS Functions
+// ---------------------------------------------------------------------------
+// ---------------------------------------------------------------------------
+
+double C_ks_IA(double s, int ni);
+
+double C_gk_nointerp(double l, int nl);
+
+double C_ks_nointerp(double l, int ns);
+
+double C_kk_nointerp(double l);
+
+double C_gk(double l, int ni);
+
+double C_ks(double l, int ni);
+
+double C_kk(double l);
+
 #ifdef __cplusplus
 }
 #endif
