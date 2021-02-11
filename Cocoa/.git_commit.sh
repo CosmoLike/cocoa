@@ -11,4 +11,4 @@ git update-index --assume-unchanged stop_cocoa
 git update-index --assume-unchanged clean_all
 
 git commit -am "update"
-source $ROOTDIR/projects/.git_commit.sh
+sh $ROOTDIR/projects/.git_commit.sh

@@ -3,5 +3,5 @@ if [ -z "${ROOTDIR}" ]; then
     exit 1
 fi
 
-git add --all
-sh $ROOTDIR/projects/.git_add.sh
+git reset --soft HEAD~1
+sh $ROOTDIR/projects/.git_reset.sh

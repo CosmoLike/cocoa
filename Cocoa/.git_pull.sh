@@ -4,4 +4,4 @@ if [ -z "${ROOTDIR}" ]; then
 fi
 
 git pull origin main
-source $ROOTDIR/projects/.git_pull.sh
+sh $ROOTDIR/projects/.git_pull.sh
