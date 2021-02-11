@@ -242,66 +242,85 @@ double C_cl_tomo(double l, int ni, int nj) {
 
 // galaxy position x kappa CMB
 double int_for_C_gk(double a, void *params) {
+  if (a >= 1.0) {
+    log_fatal("a>=1");
+    exit(1);
+  }
   double *ar = (double *) params;
+
   const double growfac_a = growfac(a);
   struct chis chidchi = chi_all(a);
   const double hoverh0 = hoverh0v2(a, chidchi.dchida);
   const double ell = ar[1]+0.5;
   const double fK = f_K(chidchi.chi);
   const double k = ell/fK;
-  //W_gal radial weight function for clustering, defined in cosmo2D_fourier.c
+
   const double res = W_gal(a, ar[0], chidchi.chi, hoverh0)/(fK*fK);
   return res*W_k(a,fK)*chidchi.dchida*Pdelta(k,a);
 }
 
 double int_for_C_gk_b2(double a, void *params) {
+  if (a >= 1.0) {
+    log_fatal("a>=1");
+    exit(1);
+  }
   double *ar = (double *) params;
+
   const double b1 = gbias.b1_function(1./a-1.,(int)ar[0]);
   const double b2 = gbias.b2[(int)ar[0]];
   const double bs2 = gbias.bs2[(int)ar[0]];
   const double growfac_a = growfac(a);
   const double g4 = growfac_a*growfac_a*growfac_a*growfac_a;
+
   struct chis chidchi = chi_all(a);
   const double hoverh0 = hoverh0v2(a, chidchi.dchida);
   const double ell = ar[1]+0.5;
   const double fK = f_K(chidchi.chi);
   const double k = ell/fK;
+
   const double res = W_HOD(a,ar[0],hoverh0)*W_k(a,fK)*chidchi.dchida/(fK*fK);
   return res*(b1*Pdelta(k,a)+g4*(0.5*b2*PT_d1d2(k)+0.5*bs2*PT_d1s2(k)));
 }
 
 // shear x kappa CMB
 double int_for_C_ks(double a, void *params) {
-  double *ar = (double *) params;
   if (a >= 1.0) {
-    error("a >1 in int_for_C_ks");
+    log_fatal("a>=1");
+    exit(1);
   }
+  double *ar = (double *) params;
+
   struct chis chidchi = chi_all(a);
-  const double ell = ar[1]+0.5;
+  const double ell = ar[1] + 0.5;
   const double fK = f_K(chidchi.chi);
   const double k = ell/fK;
+
   const double res = W_kappa(a, fK, ar[0])/(fK*fK);
   return res*W_k(a, fK)*chidchi.dchida*Pdelta(k,a);
 }
 
 // kappa CMB x kappaCMB
 double int_for_C_kk(double a, void *params) {
-   double *ar = (double *) params;
-   if (a > 1.0) {
-    error("a >1 in int_for_C_kk");
-   }
-   struct chis chidchi = chi_all(a);
-   const double ell = ar[0]+0.5;
-   const double fK = f_K(chidchi.chi);
-   const double k = ell/fK;
-   const double res = pow(W_k(a,fK), 2)*chidchi.dchida/(fK*fK);
-   return res*Pdelta(k,a);
+  if (a >= 1.0) {
+    log_fatal("a>=1");
+    exit(1);
+  }
+  double *ar = (double *) params;
+
+  struct chis chidchi = chi_all(a);
+  const double ell = ar[0] + 0.5;
+  const double fK = f_K(chidchi.chi);
+  const double k = ell/fK;
+
+  const double res = pow(W_k(a,fK), 2)*chidchi.dchida/(fK*fK);
+  return res*Pdelta(k,a);
 }
 
 double int_for_C_ks_IA_mpp(double a, void *params) { // for like.IA==4
    double *ar = (double *) params;
    struct chis chidchi = chi_all(a);
-   double hoverh0 = hoverh0v2(a, chidchi.dchida);
+
+   const double hoverh0 = hoverh0v2(a, chidchi.dchida);
    const double ell = ar[1]+0.5;
    const double fK = f_K(chidchi.chi);
    const double k = ell/fK;
@@ -310,6 +329,7 @@ double int_for_C_ks_IA_mpp(double a, void *params) { // for like.IA==4
    const double wk2 = W_k(a, fK);
    const double norm = cosmology.Omega_m*nuisance.c1rhocrit_ia/growfac(a)*
     nuisance.A_ia*pow(1./(a*nuisance.oneplusz0_ia), nuisance.eta_ia);
+
    const double res= -ws1*wk2*norm + wk1*wk2;
    return res*Pdelta(k,a)*chidchi.dchida/(fK*fK);
 }
