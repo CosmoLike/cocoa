@@ -21,7 +21,8 @@ done
 for DIR in $(find . -mindepth 1 -maxdepth 1 -type d ! -name 'example'); do
     # https://unix.stackexchange.com/a/61402
     mv -T "${DIR}" $(echo "${DIR}" | sed -E 's@cocoa_@@') 2> /dev/null
-    echo "${DIR}" >> $ROOTDIR/projects/.gitignore
+    declare NAME2=$(echo "${DIR}" | sed -E 's@./@@')
+    echo "${NAME2}" >> $ROOTDIR/projects/.gitignore
 done
 
 cd $ROOTDIR
