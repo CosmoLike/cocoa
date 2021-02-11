@@ -12,6 +12,7 @@
 #include "redshift_spline.h"
 #include "structs.h"
 #include "IA.h"
+#include "bias.h"
 
 #include "log.c/src/log.h"
 

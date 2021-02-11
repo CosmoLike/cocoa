@@ -7,6 +7,7 @@ cd $ROOTDIR/projects
 
 URLS="git@github.com:CosmoLike/cocoa_des_y3.git
       git@github.com:CosmoLike/cocoa_desxplanck.git
+      git@github.com:CosmoLike/cocoa_desy1xplanck.git
       git@github.com:CosmoLike/cocoa_lsst_fourier.git"
 
 for NAME in $URLS; do
@@ -20,6 +21,7 @@ done
 for DIR in $(find . -mindepth 1 -maxdepth 1 -type d ! -name 'example'); do
     # https://unix.stackexchange.com/a/61402
     mv -T "${DIR}" $(echo "${DIR}" | sed -E 's@cocoa_@@') 2> /dev/null
+    echo "${DIR}" >> $ROOTDIR/projects/.gitignore
 done
 
 cd $ROOTDIR

@@ -35,3 +35,4 @@ projects/cocoa_desxplanck
 projects/cocoa_lsst_fourier
 projects/cocoa_des_y3
 projects/cocoa_*
+projects/*/
