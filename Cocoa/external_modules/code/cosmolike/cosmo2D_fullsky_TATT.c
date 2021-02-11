@@ -301,7 +301,7 @@ double w_gamma_t_TATT(int nt, int ni, int nj) {
     // COCOA: CANT OPENMP HERE - VARYNG ONLY BIAS CAUSES RACE CONDITION
     for (int nz = 0; nz < tomo.ggl_Npowerspectra; nz++)
     {
-      double *Cl = malloc(sizeof(double)*(LMAX));
+      double *Cl = calloc(LMAX, sizeof(double));
       {
         const int l = 2;
         Cl[l] = C_ggl_TATT(1.0 * l, ZL(nz), ZS(nz));
@@ -485,8 +485,8 @@ double xi_pm_TATT(int pm, int nt, int ni, int nj) {
     }
     #pragma omp parallel for
     for (int nz = 1; nz < tomo.shear_Npowerspectra; nz++) {
-      double *Cl_EE = malloc(sizeof(double)*(LMAX ));
-      double *Cl_BB = malloc(sizeof(double)*(LMAX));
+      double *Cl_EE = calloc(LMAX, sizeof(double));
+      double *Cl_BB = calloc(LMAX, sizeof(double));
       const double Z1NZ = Z1(nz);
       const double Z2NZ = Z2(nz);
       // only compute BB if the TATT parameters allow for B-mode terms

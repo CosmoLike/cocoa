@@ -179,8 +179,8 @@ int recompute_IA(nuisancepara N) {
 }
 
 int recompute_shear(cosmopara C, nuisancepara N) {
-  if (recompute_cosmo3D(C) || 
-    recompute_zphot_shear(N) || 
+  if (recompute_cosmo3D(C) ||
+    recompute_zphot_shear(N) ||
     recompute_IA(N)
   ) {
     return 1;
@@ -253,10 +253,10 @@ int recompute_galaxies(galpara G, int i) {
 }
 
 int recompute_ggl(cosmopara C, galpara G, nuisancepara N, int i) {
-  if (recompute_cosmo3D(C) || 
+  if (recompute_cosmo3D(C) ||
     recompute_zphot_clustering(N) ||
-    recompute_zphot_shear(N) || 
-    recompute_galaxies(G, i) || 
+    recompute_zphot_shear(N) ||
+    recompute_galaxies(G, i) ||
     recompute_IA(N)
   ) {
     return 1;
@@ -266,9 +266,9 @@ int recompute_ggl(cosmopara C, galpara G, nuisancepara N, int i) {
 }
 
 int recompute_clustering(cosmopara C, galpara G, nuisancepara N, int i, int j) {
-  if (recompute_cosmo3D(C) || 
+  if (recompute_cosmo3D(C) ||
     recompute_zphot_clustering(N) ||
-    recompute_galaxies(G, i) || 
+    recompute_galaxies(G, i) ||
     recompute_galaxies(G, j)
   ) {
     return 1;
@@ -286,4 +286,24 @@ int recompute_PkRatio(barypara B) {
 
 void update_PkRatio(barypara *B) {
   sprintf((*B).scenario, "%s", bary.scenario);
+}
+
+int recompute_ks(cosmopara C, galpara G, nuisancepara N, int i) {
+  if (recompute_cosmo3D(C) || recompute_zphot_shear(N) || recompute_galaxies(G,i)
+      || recompute_IA(N) ) {
+    return 1;
+  }
+  else {
+    return 0;
+  }
+}
+
+int recompute_gk(cosmopara C, galpara G, nuisancepara N, int i) {
+  if (recompute_cosmo3D(C) || recompute_zphot_clustering(N)
+      || recompute_galaxies(G,i)) {
+    return 1;
+  }
+  else {
+    return 0;
+  }
 }

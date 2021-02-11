@@ -44,6 +44,10 @@ int recompute_DESclusters(cosmopara C, nuisancepara N);
 
 int recompute_galaxies(galpara G, int i);
 
+int recompute_ks(cosmopara C, galpara G, nuisancepara N, int i);
+
+int recompute_gk(cosmopara C, galpara G, nuisancepara N, int i);
+
 #ifdef __cplusplus
 }
 #endif

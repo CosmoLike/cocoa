@@ -43,14 +43,13 @@ typedef struct {
   char COV_FILE[CHAR_MAX_SIZE];
   char BARY_FILE[CHAR_MAX_SIZE];
   char MASK_FILE[CHAR_MAX_SIZE];
-  int shear_shear;
-  int shear_pos;
-  int pos_pos;
   int clusterN;
   int clusterWL;
   int clusterCG;
   int clusterCC;
-  // MANUWARNING: added "int gk, kk, ks;"
+  int shear_shear;
+  int shear_pos;
+  int pos_pos;
   int gk;
   int kk;
   int ks;

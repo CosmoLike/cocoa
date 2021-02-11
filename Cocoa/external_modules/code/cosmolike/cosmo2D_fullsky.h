@@ -22,11 +22,9 @@ double xi_pm_fullsky(int pm, int nt, int ni, int nj);
 // ---------------------------------------------------------------------------
 // ---------------------------------------------------------------------------
 
-//angular CMB lensing x positions correlation function in tomography bin ni
-double w_gk_fullsky(double theta, int ni);
+double w_gk_fullsky(int nt, int ni);
 
-//angular CMB lensing x galaxy shear correlation function in tomography bin ni
-double w_ks_fullsky(double theta, int ni);
+double w_ks_fullsky(int nt, int ni);
 
 #ifdef __cplusplus
 }

@@ -8,6 +8,7 @@ extern "C" {
 // ------------------------------------------------------------------
 // galaxy clustering power spectrum of galaxies in bins ni, nj
 // ------------------------------------------------------------------
+
 double C_cl_tomo(double l, int ni, int nj);
 
 double C_cl_tomo_nointerp(double l, int ni, int nj);

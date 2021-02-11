@@ -332,11 +332,23 @@ double C_ks_IA(double s, int ni) {
 double C_gk_nointerp(double l, int nl) {
   double array[2] = {(double)nl,l};
   if (gbias.b2[nl] || gbias.b2[nl]) {
-    return int_gsl_integrate_medium_precision(int_for_C_gk_b2,
-      (void*)array, amin_lens(nl), amax_lens(nl), NULL, 1000);
+    return int_gsl_integrate_medium_precision(
+      int_for_C_gk_b2,
+      (void*) array,
+      amin_lens(nl),
+      amax_lens(nl),
+      NULL,
+      1000
+    );
   }
-  return int_gsl_integrate_medium_precision(int_for_C_gk, (void*)array,
-    amin_lens(nl), 0.99999, NULL, 1000);
+  return int_gsl_integrate_medium_precision(
+    int_for_C_gk,
+    (void*) array,
+    amin_lens(nl),
+    0.99999,
+    NULL,
+    1000
+  );
 }
 
 // shear x kappa CMB, for source z-bin ns
@@ -345,15 +357,27 @@ double C_ks_nointerp(double l, int ns) {
     return C_ks_IA(l,ns);
   }
   double array[2] = {(double) ns, l};
-  return int_gsl_integrate_medium_precision(int_for_C_ks, (void*)array,
-    amin_source(ns), amax_source(ns), NULL,1000);
+  return int_gsl_integrate_medium_precision(
+    int_for_C_ks,
+    (void*) array,
+    amin_source(ns),
+    amax_source(ns),
+    NULL,
+    1000
+  );
 }
 
 // kappa CMB x kappa CMB
 double C_kk_nointerp(double l) {
   double array[1] = {l};
-  return int_gsl_integrate_medium_precision(int_for_C_kk, (void*)array,
-    limits.a_min*(1.+1.e-5), 1.-1.e-5, NULL, 1000);
+  return int_gsl_integrate_medium_precision(
+    int_for_C_kk,
+    (void*) array,
+    limits.a_min*(1.+1.e-5),
+    1. - 1.e-5,
+    NULL,
+    1000
+  );
 }
 
 // ---------------------------------------------------------------------------
@@ -362,14 +386,15 @@ double C_kk_nointerp(double l) {
 
 // galaxy position x kappa CMB, lens bin ni
 double C_gk(double l, int ni) {
-   static cosmopara C;
-   static nuisancepara N;
-   static galpara G;
-   static double **table;
-   static double ds = .0, logsmin = .0, logsmax = .0;
-   if (ni < 0 || ni >= tomo.clustering_Nbin){
-      printf("Bin %d outside tomo.clustering_Nbin range\nEXIT\n",ni); exit(1);
-   }
+  static cosmopara C;
+  static nuisancepara N;
+  static galpara G;
+  static double **table;
+  static double ds = .0, logsmin = .0, logsmax = .0;
+  if (ni < 0 || ni >= tomo.clustering_Nbin) {
+    log_fatal("Bin %d outside tomo.clustering_Nbin range", ni);
+    exit(1);
+  }
   if (recompute_clustering(C,G,N,ni,ni)) {
     if (table == 0) {
       table = create_double_matrix(0, tomo.clustering_Nbin-1, 0,
@@ -380,11 +405,11 @@ double C_gk(double l, int ni) {
     }
     {
       const int k = 0;
-      table[k][0]= log(C_gk_nointerp(exp(logsmin),k));
+      table[k][0] = log(C_gk_nointerp(exp(logsmin),k));
       #pragma omp parallel for
-      for (int i=1; i<Ntable.N_ell; i++) {
+      for (int i = 1; i < Ntable.N_ell; i++) {
         const double llog = logsmin + i*ds;
-        table[k][i]= log(C_gk_nointerp(exp(llog),k));
+        table[k][i] = log(C_gk_nointerp(exp(llog),k));
       }
     }
     #pragma omp parallel for
@@ -408,16 +433,16 @@ double C_gk(double l, int ni) {
 
 // shear x kappa CMB, source bin ni
 double C_ks(double l, int ni) {
-   static cosmopara C;
-   static nuisancepara N;
-   static double **table, *sig;
-   static int osc[100];
-   static double ds = .0, logsmin = .0, logsmax = .0;
-   if (ni < 0 || ni >= tomo.clustering_Nbin){
-      printf("Bin %d outside tomo.clustering_Nbin range\nEXIT\n",ni); exit(1);
-   }
-   if (recompute_shear(C,N))
-   {
+  static cosmopara C;
+  static nuisancepara N;
+  static double **table, *sig;
+  static int osc[100];
+  static double ds = .0, logsmin = .0, logsmax = .0;
+  if (ni < 0 || ni >= tomo.clustering_Nbin){
+    log_fatal("Bin %d outside tomo.clustering_Nbin range", ni);
+    exit(1);
+  }
+  if (recompute_shear(C, N)) {
     if (table == 0) {
       table = create_double_matrix(0, tomo.shear_Nbin-1, 0, Ntable.N_ell-1);
       sig = create_double_vector(0,tomo.shear_Nbin-1);
@@ -491,10 +516,9 @@ double C_kk(double l) {
   static cosmopara C;
   static double *table;
   static double ds = .0, logsmin = .0, logsmax = .0;
-  if (recompute_cosmo3D(C))
-  {
+  if (recompute_cosmo3D(C)) {
     if (table == 0) {
-       table   = create_double_vector(0, Ntable.N_ell-1);
+       table   = create_double_vector(0, Ntable.N_ell - 1);
        logsmin = log(limits.P_2_s_min);
        logsmax = log(limits.P_2_s_max);
        ds = (logsmax - logsmin)/(Ntable.N_ell);
@@ -507,7 +531,7 @@ double C_kk(double l) {
     #pragma omp parallel for
     for (int i=1; i<Ntable.N_ell; i++) {
       const double llog = logsmin + i*ds;
-       table[i]= log(C_kk_nointerp(exp(llog)));
+       table[i] = log(C_kk_nointerp(exp(llog)));
     }
     update_cosmopara(&C);
   }
