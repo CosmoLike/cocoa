@@ -176,7 +176,7 @@ double C_ggl_IA_tab(double l, int ni, int nj) {
   static double ds = .0, logsmin = .0, logsmax = .0;
   if ( ni < 0 || ni >= tomo.clustering_Nbin ||
        nj < 0 || nj >= tomo.shear_Nbin ) {
-    log_fatal("C_gl_tomo(l,%d,%d) outside tomo.X_Nbin range", ni, nj);
+    log_fatal("C_ggl_IA_tab(l,%d,%d) outside tomo.X_Nbin range", ni, nj);
     exit(1);
   }
   if (recompute_ggl(C,G,N,ni)){

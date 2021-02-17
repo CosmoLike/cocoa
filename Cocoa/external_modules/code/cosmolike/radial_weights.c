@@ -8,7 +8,6 @@
 
 #include "basics.h"
 #include "bias.h"
-#include "cosmo2D_fourier.h"
 #include "cosmo3D.h"
 #include "redshift_spline.h"
 #include "structs.h"

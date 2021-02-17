@@ -468,30 +468,3 @@ void cdgamma(fftw_complex x, fftw_complex *res) {
   (*res)[0] = yr;
   (*res)[1] = yi;
 }
-
-/////// Hankel transform routine used in cosmo2D_xx/////////////////
-void hankel_kernel_FT(double x, fftw_complex *res, double *arg, int argc __attribute__((unused))) {
-  fftw_complex a1, a2, g1, g2;
-  int mu;
-  double mod, xln2, si, co, d1, d2, pref, q;
-  q = arg[0];
-  mu = (int)(arg[1] + 0.1);
-
-  /* arguments for complex gamma */
-  a1[0] = 0.5 * (1.0 + mu + q);
-  a2[0] = 0.5 * (1.0 + mu - q);
-  a1[1] = 0.5 * x;
-  a2[1] = -a1[1];
-  cdgamma(a1, &g1);
-  cdgamma(a2, &g2);
-  xln2 = x * constants.ln2;
-  si = sin(xln2);
-  co = cos(xln2);
-  d1 = g1[0] * g2[0] + g1[1] * g2[1]; /* Re */
-  d2 = g1[1] * g2[0] - g1[0] * g2[1]; /* Im */
-  mod = g2[0] * g2[0] + g2[1] * g2[1];
-  pref = exp(constants.ln2 * q) / mod;
-
-  (*res)[0] = pref * (co * d1 - si * d2);
-  (*res)[1] = pref * (si * d1 + co * d2);
-}

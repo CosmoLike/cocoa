@@ -136,8 +136,6 @@ double int_gsl_integrate_low_precision(double (*func)(double, void *),
                                        void *arg, double a, double b,
                                        double *error, int niter);
 
-void hankel_kernel_FT(double x, fftw_complex *res, double *arg, int argc);
-
 void invert_matrix_colesky(gsl_matrix *A);
 
 #ifdef __cplusplus
