@@ -14,9 +14,11 @@ PS: We are quite flexible on the installation procedures for MacOS (see appendix
 
 There are two options for installing the requirements to run Cocoa and clone the repository using [Git LFS](https://git-lfs.github.com). The first and more straightforward one is through Docker containers. The latter option is the manual installation of the requirements directly into the Linux/macOS (Windows is not supported).
 
-For Docker installation, see appendices [Docker Installation Part I: Further Information for PCs Environment](https://github.com/CosmoLike/cocoa/blob/master/README.md#docker-installation-part-i-further-information-for-pcs-environment) and [Docker Installation Part II: Further Information for HPC Systems](https://github.com/CosmoLike/cocoa/blob/master/README.md#docker-installation-part-ii-further-information-for-hpc-systems).
+If you want to use cocoa on your Mac OS system, we recommend using the Docker installation, see appendices [Docker Installation Part I: Further Information for PCs Environment](https://github.com/CosmoLike/cocoa/blob/master/README.md#docker-installation-part-i-further-information-for-pcs-environment) 
 
-For system installation, see appendices [Prerequisites for MacOS (System Installation)](https://github.com/CosmoLike/cocoa#prerequisites-for-macos-system-installation) and [Prerequisites for Linux (System Installation)](https://github.com/CosmoLike/cocoa#prerequisites-for-linux-system-installation).
+If you want to use Docker on HPCs please go here [Docker Installation Part II: Further Information for HPC Systems](https://github.com/CosmoLike/cocoa/blob/master/README.md#docker-installation-part-ii-further-information-for-hpc-systems).
+
+Below we detail non-Doocker, system specific installation. Please see appendices for prerequisites: [Prerequisites for MacOS (System Installation)](https://github.com/CosmoLike/cocoa#prerequisites-for-macos-system-installation) and [Prerequisites for Linux (System Installation)](https://github.com/CosmoLike/cocoa#prerequisites-for-linux-system-installation).
 
 ## Cloning the Repository
 
