@@ -12,7 +12,6 @@
 #include "basics.h"
 #include "cosmo3D.h"
 #include "cosmo2D.h"
-#include "IA.h"
 #include "pt_cfastpt.h"
 #include "radial_weights.h"
 #include "recompute.h"
@@ -45,7 +44,7 @@ double beam_planck(double l) {
 // Integrands for Angular Power Spectra
 // ----------------------------------------------------------------------------
 
-double int_for_C_shear_tomo(double a, void *params) {
+double int_for_C_ss_tomo(double a, void *params) {
   if (a >= 1.0) {
     log_fatal("a>=1");
     exit(1);
@@ -63,7 +62,33 @@ double int_for_C_shear_tomo(double a, void *params) {
   return res*Pdelta(k,a);
 }
 
-double int_for_C_gl_tomo(double a, void *params) { // Add RSD
+double int_for_C_ss_tomo_withIA(double a, void *params) {
+  if (a >= 1.0) {
+    log_fatal("a>=1");
+    exit(1);
+  }
+  double *ar = (double *) params;
+
+  struct chis chidchi = chi_all(a);
+  const double hoverh0 = hoverh0v2(a, chidchi.dchida);
+
+  const double ell = ar[2] + 0.5;
+  const double fK = f_K(chidchi.chi);
+  const double k = ell/fK;
+
+  const double ws1 = W_source(a, ar[0], hoverh0);
+  const double ws2 = W_source(a, ar[1], hoverh0);
+  const double wk1 = W_kappa(a, fK, ar[0]);
+  const double wk2 = W_kappa(a, fK, ar[1]);
+
+  const double norm = cosmology.Omega_m*nuisance.c1rhocrit_ia/growfac(a)*
+    nuisance.A_ia*pow(1./(a*nuisance.oneplusz0_ia),nuisance.eta_ia);
+
+  const double res = ws1*ws2*norm*norm - (ws1*wk2+ws2*wk1)*norm + wk1*wk2;
+  return res*Pdelta(k,a)*chidchi.dchida/(fK*fK);
+}
+
+double int_for_C_gs_tomo(double a, void *params) { // Add RSD
   if (a >= 1.0) {
     log_fatal("a>=1");
     exit(1);
@@ -81,9 +106,11 @@ double int_for_C_gl_tomo(double a, void *params) { // Add RSD
 
   struct chis chidchi = chi_all(a);
   const double hoverh0 = hoverh0v2(a, chidchi.dchida);
+
   const double ell = ar[2]+0.5;
   const double fK = f_K(chidchi.chi);
   const double k = ell/fK;
+
   const double wgal = W_gal(a, ar[0], chidchi.chi, hoverh0) +
     W_mag(a, fK, ar[0])*(ell_prefactor1/ell/ell - 1.);
 
@@ -91,7 +118,53 @@ double int_for_C_gl_tomo(double a, void *params) { // Add RSD
   return res*Pdelta(k, a)*ell_prefactor2/(ell * ell);
 }
 
-double int_for_C_gl_tomo_b2(double a, void *params) {
+double int_for_C_gs_tomo_withIA(double a, void *params) {
+  if (a >= 1.0) {
+    log_fatal("a>=1");
+    exit(1);
+  }
+  double *ar = (double *) params;
+
+  static double chi_a_min = 0;
+  if (chi_a_min == 0) {
+    chi_a_min = chi(limits.a_min);
+  }
+
+  const double ell_prefactor1 = (ar[2])*(ar[2]+1.);
+  double ell_prefactor2 = (ar[2]-1.)*ell_prefactor1*(ar[2]+2.);
+  if (ell_prefactor2 <= 0.) {
+    ell_prefactor2 = 0.;
+  }
+  else {
+    ell_prefactor2 = sqrt(ell_prefactor2);
+  }
+
+  struct chis chidchi = chi_all(a);
+  const double hoverh0 = hoverh0v2(a, chidchi.dchida);
+
+  const double ell = ar[2]+0.5;
+  const double fK = f_K(chidchi.chi);
+  const double k = ell/fK;
+
+  const double chi_0 = f_K(ell/k);
+  const double chi_1 = f_K((ell+1.)/k);
+  if (chi_1 > chi_a_min) {
+    return 0;
+  }
+
+  const double a_0 = a_chi(chi_0);
+  const double a_1 = a_chi(chi_1);
+  const double norm = cosmology.Omega_m*nuisance.c1rhocrit_ia/growfac(a)*
+    nuisance.A_ia*pow(1./(a*nuisance.oneplusz0_ia),nuisance.eta_ia);
+
+  const double res = (W_gal(a, ar[0], chidchi.chi, hoverh0) +
+    W_RSD(ell, a_0, a_1, ar[0]) +
+    W_mag(a, fK, ar[0])*(ell_prefactor1/ell/ell - 1.))*
+    (W_kappa(a, fK, ar[1]) - W_source(a, ar[1], hoverh0)*norm);
+  return res*Pdelta(k,a)*chidchi.dchida/(fK*fK)*ell_prefactor2/(ell*ell);
+}
+
+double int_for_C_gs_tomo_b2(double a, void *params) {
   if (a >= 1.0) {
     log_fatal("a>=1");
     exit(1);
@@ -101,6 +174,7 @@ double int_for_C_gl_tomo_b2(double a, void *params) {
   const double b1 = gbias.b1_function(1./a - 1., (int)ar[0]);
   const double b2 = gbias.b2[(int)ar[0]];
   const double bs2 = gbias.bs2[(int)ar[0]];
+
   const double growfac_a = growfac(a);
   struct chis chidchi = chi_all(a);
   const double hoverh0 = hoverh0v2(a, chidchi.dchida);
@@ -122,14 +196,52 @@ double int_for_C_gl_tomo_b2(double a, void *params) {
   return res;
 }
 
-double int_for_C_cl_tomo(double a, void *params) {
+double int_for_C_gs_tomo_b2_withIA(double a, void *params) {
   if (a >= 1.0) {
     log_fatal("a>=1");
     exit(1);
   }
   double *ar = (double *) params;
+
+  const double b1 = gbias.b1_function(1./a-1.,(int)ar[0]);
+  const double b2 = gbias.b2[(int)ar[0]];
+  const double bs2 = gbias.bs2[(int)ar[0]];
+
+  const double grow_fac = growfac(a);
+  const double g4 = grow_fac*grow_fac*grow_fac*grow_fac;
   struct chis chidchi = chi_all(a);
   const double hoverh0 = hoverh0v2(a, chidchi.dchida);
+
+  const double ell = ar[2]+0.5;
+  const double fK = f_K(chidchi.chi);
+  const double k = ell/fK;
+
+  const double norm =
+    (cosmology.Omega_m*nuisance.c1rhocrit_ia/grow_fac)*
+    nuisance.A_ia*pow(1./(a*nuisance.oneplusz0_ia), nuisance.eta_ia);
+
+  const double res = W_HOD(a, ar[0], hoverh0)*
+    (W_kappa(a, fK, ar[1]) - W_source(a, ar[1], hoverh0)*norm);
+  return res*(
+      W_gal(a, ar[0], chidchi.chi,hoverh0)*Pdelta(k, a) +
+      W_HOD(a, ar[0], hoverh0)*g4*(
+        0.5*b2*PT_d1d2(k) +
+        0.5*bs2*PT_d1s2(k) +
+        0.5*b3nl_from_b1(b1)*PT_d1d3(k)
+      )
+    )*chidchi.dchida/(fK*fK);
+}
+
+double int_for_C_gg_tomo(double a, void *params) {
+  if (a >= 1.0) {
+    log_fatal("a>=1");
+    exit(1);
+  }
+  double *ar = (double *) params;
+
+  struct chis chidchi = chi_all(a);
+  const double hoverh0 = hoverh0v2(a, chidchi.dchida);
+
   const double ell = ar[2] + 0.5;
   const double fK = f_K(chidchi.chi);
   const double k = ell / fK;
@@ -139,20 +251,23 @@ double int_for_C_cl_tomo(double a, void *params) {
   return res * Pdelta(k, a);
 }
 
-double int_for_C_cl_tomo_b2(double a, void *params) {
+double int_for_C_gg_tomo_b2(double a, void *params) {
   if (a >= 1.0) {
-    log_fatal("a>=1 in int_for_C_cl_tomo_b2");
+    log_fatal("a>=1");
     exit(1);
   }
 
   double *ar = (double *) params;
-  const double b1 = gbias.b1_function(1. / a - 1., (int)ar[0]);
+
+  const double b1 = gbias.b1_function(1./a - 1., (int) ar[0]);
   const double b2 = gbias.b2[(int) ar[0]];
   const double bs2 = gbias.bs2[(int) ar[0]];
+
   const double growfac_a = growfac(a);
   struct chis chidchi = chi_all(a);
   const double hoverh0 = hoverh0v2(a, chidchi.dchida);
   const double g4 = growfac_a*growfac_a*growfac_a*growfac_a;
+
   const double ell = ar[2] + 0.5;
   const double fK = f_K(chidchi.chi);
   const double k = ell / fK;
@@ -163,13 +278,11 @@ double int_for_C_cl_tomo_b2(double a, void *params) {
     W_HOD(a, ar[0], hoverh0)*W_HOD(a, ar[1], hoverh0)*chidchi.dchida/(fK*fK);
 
   if (res) {
-    res = res * (b1 * b1 * PK +
-                 g4 * (b1 * b2 * PT_d1d2(k) +
-                       0.25 * b2 * b2 * (PT_d2d2(k) - 2. * s4) +
-                       b1 * bs2 * PT_d1s2(k) +
-                       0.5 * b2 * bs2 * (PT_d2s2(k) - 4. / 3. * s4) +
-                       .25 * bs2 * bs2 * (PT_s2s2(k) - 8. / 9. * s4) +
-                       b1 * b3nl_from_b1(b1) * PT_d1d3(k)));
+    res *= b1 * b1 * PK + g4 * (b1 * b2 * PT_d1d2(k) +
+      0.25 * b2 * b2 * (PT_d2d2(k) - 2. * s4) +
+      b1 * bs2 * PT_d1s2(k) + 0.5 * b2 * bs2 * (PT_d2s2(k) - 4. / 3. * s4) +
+      .25 * bs2 * bs2 * (PT_s2s2(k) - 8. / 9. * s4) +
+      b1 * b3nl_from_b1(b1) * PT_d1d3(k));
   }
   res += (W_gal(a, ar[0], chidchi.chi, hoverh0) * W_mag(a, fK, ar[1]) +
           W_gal(a, ar[1], chidchi.chi, hoverh0) * W_mag(a, fK, ar[0])) *
@@ -177,7 +290,6 @@ double int_for_C_cl_tomo_b2(double a, void *params) {
   return res;
 }
 
-// galaxy position x kappa CMB
 double int_for_C_gk(double a, void *params) {
   if (a >= 1.0) {
     log_fatal("a>=1");
@@ -188,6 +300,7 @@ double int_for_C_gk(double a, void *params) {
   const double growfac_a = growfac(a);
   struct chis chidchi = chi_all(a);
   const double hoverh0 = hoverh0v2(a, chidchi.dchida);
+
   const double ell = ar[1]+0.5;
   const double fK = f_K(chidchi.chi);
   const double k = ell/fK;
@@ -206,6 +319,7 @@ double int_for_C_gk_b2(double a, void *params) {
   const double b1 = gbias.b1_function(1./a-1.,(int)ar[0]);
   const double b2 = gbias.b2[(int)ar[0]];
   const double bs2 = gbias.bs2[(int)ar[0]];
+
   const double growfac_a = growfac(a);
   const double g4 = growfac_a*growfac_a*growfac_a*growfac_a;
 
@@ -216,10 +330,9 @@ double int_for_C_gk_b2(double a, void *params) {
   const double k = ell/fK;
 
   const double res = W_HOD(a,ar[0],hoverh0)*W_k(a,fK)*chidchi.dchida/(fK*fK);
-  return res*(b1*Pdelta(k,a)+g4*(0.5*b2*PT_d1d2(k)+0.5*bs2*PT_d1s2(k)));
+  return res*(b1*Pdelta(k,a) + g4*(0.5*b2*PT_d1d2(k) + 0.5*bs2*PT_d1s2(k)));
 }
 
-// kappa CMB x kappaCMB
 double int_for_C_kk(double a, void *params) {
   if (a >= 1.0) {
     log_fatal("a>=1");
@@ -228,6 +341,7 @@ double int_for_C_kk(double a, void *params) {
   double *ar = (double *) params;
 
   struct chis chidchi = chi_all(a);
+
   const double ell = ar[0] + 0.5;
   const double fK = f_K(chidchi.chi);
   const double k = ell/fK;
@@ -236,7 +350,6 @@ double int_for_C_kk(double a, void *params) {
   return res*Pdelta(k,a);
 }
 
-// shear x kappa CMB
 double int_for_C_ks(double a, void *params) {
   if (a >= 1.0) {
     log_fatal("a>=1");
@@ -253,21 +366,24 @@ double int_for_C_ks(double a, void *params) {
   return res*W_k(a, fK)*chidchi.dchida*Pdelta(k,a);
 }
 
-double int_for_C_ks_IA_mpp(double a, void *params) { // for like.IA == 4
+double int_for_C_ks_withIA(double a, void *params) { // for like.IA == 4
   double *ar = (double *) params;
-  struct chis chidchi = chi_all(a);
 
+  struct chis chidchi = chi_all(a);
   const double hoverh0 = hoverh0v2(a, chidchi.dchida);
+
   const double ell = ar[1]+0.5;
   const double fK = f_K(chidchi.chi);
   const double k = ell/fK;
+
   const double ws1 = W_source(a, ar[0], hoverh0);
   const double wk1 = W_kappa(a, fK, ar[0]);
   const double wk2 = W_k(a, fK);
-  const double norm = cosmology.Omega_m*nuisance.c1rhocrit_ia/growfac(a)*
-  nuisance.A_ia*pow(1./(a*nuisance.oneplusz0_ia), nuisance.eta_ia);
 
-  const double res= -ws1*wk2*norm + wk1*wk2;
+  const double norm = cosmology.Omega_m*nuisance.c1rhocrit_ia/growfac(a)*
+    nuisance.A_ia*pow(1./(a*nuisance.oneplusz0_ia), nuisance.eta_ia);
+
+  const double res = -ws1*wk2*norm + wk1*wk2;
   return res*Pdelta(k,a)*chidchi.dchida/(fK*fK);
 }
 
@@ -275,8 +391,7 @@ double int_for_C_ks_IA_mpp(double a, void *params) { // for like.IA == 4
 // Angular Power Spectra - no interpolation
 // ----------------------------------------------------------------------------
 
-//shear tomography power spectra of source galaxy bins ni, nj
-double C_shear_tomo_nointerp(double l, int ni, int nj) {
+double C_ss_tomo_nointerp(double l, int ni, int nj) {
   double array[3] = {(double) ni, (double) nj, l};
   int j,k;
   if (ni <= nj) {
@@ -288,7 +403,7 @@ double C_shear_tomo_nointerp(double l, int ni, int nj) {
     k = nj;
   }
   return int_gsl_integrate_medium_precision(
-    int_for_C_shear_tomo,
+    int_for_C_ss_tomo,
     (void*) array,
     amin_source(j),
     0.99999,
@@ -297,15 +412,38 @@ double C_shear_tomo_nointerp(double l, int ni, int nj) {
   );
 }
 
-//G-G lensing power spectrum, lens bin ni, source bin nj
-double C_gl_tomo_nointerp(double l, int ni, int nj)  {
+// COBAYA: CHANGED SOME INTEGRATIONS FROM MEDIUM TO LOW PRECISION
+double C_ss_tomo_withIA_nointerp(double s, int ni, int nj) {
+  double array[3] = {(double) ni, (double) nj,s};
+  int j,k;
+  if (ni <= nj) {
+    j = nj;
+    k = ni;
+  }
+  switch(like.IA) {
+    case 4:
+      return int_gsl_integrate_low_precision(
+        int_for_C_ss_tomo_withIA,
+        (void*) array,
+        amin_source(j),
+        amax_source(k),
+        NULL,
+        1000
+      );
+    default:
+      log_fatal("like.IA = %d not supported", like.IA);
+      exit(1);
+  }
+}
+
+double C_gs_tomo_nointerp(double l, int ni, int nj)  {
   if(l == 1.) {
     return 0.;
   }
   double array[3] = {(double) ni, (double) nj, l};
   if (gbias.b2[ni] || gbias.b2[nj]) {
     return int_gsl_integrate_low_precision(
-      int_for_C_gl_tomo_b2,
+      int_for_C_gs_tomo_b2,
       (void*) array,
       amin_lens(ni),
       amax_lens(ni),
@@ -314,7 +452,7 @@ double C_gl_tomo_nointerp(double l, int ni, int nj)  {
     );
   }
   return int_gsl_integrate_medium_precision(
-    int_for_C_gl_tomo,
+    int_for_C_gs_tomo,
     (void*) array,
     amin_lens(ni),
     0.99999,
@@ -323,8 +461,36 @@ double C_gl_tomo_nointerp(double l, int ni, int nj)  {
   );
 }
 
-// galaxy clustering power spectrum bins ni, nj
-double C_cl_tomo_nointerp(double l, int ni, int nj) {
+// COBAYA: CHANGED SOME INTEGRATIONS FROM MEDIUM TO LOW PRECISION
+double C_gs_tomo_withIA_nointerp(double s, int nl, int ns) {
+  double array[3] = {(double) nl, (double) ns,s};
+  switch(like.IA){
+    case 4:
+      if (gbias.b2[nl]) {
+        return int_gsl_integrate_medium_precision(
+          int_for_C_gs_tomo_b2_withIA,
+          (void*) array,
+          amin_lens(nl),
+          amax_lens(nl),
+          NULL,
+          1000
+        );
+      }
+      return int_gsl_integrate_low_precision(
+        int_for_C_gs_tomo_withIA,
+        (void*) array,
+        amin_lens(nl),
+        0.9999,
+        NULL,
+        1000
+      );
+    default:
+      log_fatal("like.IA = %d not supported", like.IA);
+      exit(1);
+  }
+}
+
+double C_gg_tomo_nointerp(double l, int ni, int nj) {
   static int init = -1;
   double array[3] = {1.0 * ni, 1.0 * nj, l};
   if (gbias.b2[ni] || gbias.b2[nj]) {
@@ -344,7 +510,7 @@ double C_cl_tomo_nointerp(double l, int ni, int nj) {
       }
       // COCOA: WE CHANGE INTEGRATION FROM MEDIUM TO LOW PRECISION!!
       return int_gsl_integrate_low_precision(
-        int_for_C_cl_tomo,
+        int_for_C_gg_tomo,
         (void *) array,
         fmax(amin_lens(ni),
         amin_lens(nj)),
@@ -356,7 +522,7 @@ double C_cl_tomo_nointerp(double l, int ni, int nj) {
     }
     // COCOA: WE CHANGE INTEGRATION FROM MEDIUM TO LOW PRECISION!!
     return int_gsl_integrate_low_precision(
-      int_for_C_cl_tomo_b2,
+      int_for_C_gg_tomo_b2,
       (void *) array,
       amin_lens(ni),
       amax_lens(ni),
@@ -366,7 +532,7 @@ double C_cl_tomo_nointerp(double l, int ni, int nj) {
   } else {
     if (ni == nj) {
       return int_gsl_integrate_medium_precision(
-        int_for_C_cl_tomo,
+        int_for_C_gg_tomo,
         (void *) array,
         amin_lens(ni),
         0.999999,
@@ -376,7 +542,7 @@ double C_cl_tomo_nointerp(double l, int ni, int nj) {
     }
     // COCOA: CHANGED INTEGRATION FROM MEDIUM TO LOW PRECISION
     return int_gsl_integrate_low_precision(
-      int_for_C_cl_tomo,
+      int_for_C_gg_tomo,
       (void *) array,
       amin_lens(nj),
       0.99999,
@@ -409,11 +575,11 @@ double C_gk_tomo_nointerp(double l, int nl) {
   );
 }
 
-double C_ks_IA_nointerp(double s, int ni) {
+double C_ks_tomo_withIA_nointerp(double s, int ni) {
   double array[2] = {(double) ni, s};
   if (like.IA == 4) {
     return int_gsl_integrate_medium_precision(
-      int_for_C_ks_IA_mpp,
+      int_for_C_ks_withIA,
       (void*) array,
       amin_source(ni),
       amax_source(ni),
@@ -421,14 +587,13 @@ double C_ks_IA_nointerp(double s, int ni) {
       1000
     );
   }
-  log_fatal("C_ks_IA does not support like.IA = %d", like.IA);
+  log_fatal("C_ks_withIA does not support like.IA = %d", like.IA);
   exit(1);
 }
 
-// shear x kappa CMB, for source z-bin ns
 double C_ks_tomo_nointerp(double l, int ns) {
   if (like.IA) {
-    return C_ks_IA_nointerp(l,ns);
+    return C_ks_tomo_withIA_nointerp(l,ns);
   }
   double array[2] = {(double) ns, l};
   return int_gsl_integrate_medium_precision(
@@ -441,7 +606,6 @@ double C_ks_tomo_nointerp(double l, int ns) {
   );
 }
 
-// kappa CMB x kappa CMB
 double C_kk_nointerp(double l) {
   double array[1] = {l};
   return int_gsl_integrate_medium_precision(
@@ -458,13 +622,13 @@ double C_kk_nointerp(double l) {
 // Angular Power Spectra - with interpolation
 // ----------------------------------------------------------------------------
 
-double C_shear_tomo(double l, int ni, int nj) {
+double C_ss_tomo(double l, int ni, int nj) {
   static cosmopara C;
   static nuisancepara N;
   static double **table;
   static double ds = .0, logsmin = .0, logsmax = .0;
   if (ni < 0 || ni >= tomo.shear_Nbin || nj < 0 || nj >= tomo.shear_Nbin) {
-    log_fatal("C_shear_tomo(l,%d,%d) outside tomo.shear_Nbin range", ni, nj);
+    log_fatal("C_ss_tomo(l,%d,%d) outside tomo.shear_Nbin range", ni, nj);
     exit(1);
   }
   if (recompute_shear(C,N)) {
@@ -480,19 +644,19 @@ double C_shear_tomo(double l, int ni, int nj) {
       {
         const int i = 0;
         const double llog = logsmin + i*ds;
-        table[k][i]= log(C_shear_tomo_nointerp(exp(llog), Z1(k), Z2(k)));
+        table[k][i]= log(C_ss_tomo_nointerp(exp(llog), Z1(k), Z2(k)));
       }
       #pragma omp parallel for
       for (int i=1; i<Ntable.N_ell; i++) {
         const double llog = logsmin + i*ds;
-        table[k][i]= log(C_shear_tomo_nointerp(exp(llog), Z1(k), Z2(k)));
+        table[k][i]= log(C_ss_tomo_nointerp(exp(llog), Z1(k), Z2(k)));
       }
     }
     #pragma omp parallel for
     for (int k=1; k<tomo.shear_Npowerspectra; k++) {
       for (int i=0; i<Ntable.N_ell; i++) {
         const double llog = logsmin + i*ds;
-        table[k][i]= log(C_shear_tomo_nointerp(exp(llog), Z1(k), Z2(k)));
+        table[k][i]= log(C_ss_tomo_nointerp(exp(llog), Z1(k), Z2(k)));
       }
     }
     update_cosmopara(&C);
@@ -515,14 +679,58 @@ double C_shear_tomo(double l, int ni, int nj) {
   return f1;
 }
 
-double C_gl_tomo(double l, int ni, int nj) {
+double C_ss_tomo_withIA(double l, int ni, int nj) {
+  static cosmopara C;
+  static nuisancepara N;
+  static double **table;
+  static double ds = .0, logsmin = .0, logsmax = .0;
+  if (ni < 0 || ni >= tomo.shear_Nbin || nj < 0 || nj >= tomo.shear_Nbin) {
+    log_fatal("C_shear_tomo(l,%d,%d) outside tomo.shear_Nbin range", ni, nj);
+    exit(1);
+  }
+  if (recompute_shear(C,N)) {
+    if (table==0) {
+      table = create_double_matrix(0, tomo.shear_Npowerspectra - 1, 0,
+        Ntable.N_ell - 1);
+      logsmin = log(limits.P_2_s_min);
+      logsmax = log(limits.P_2_s_max);
+      ds = (logsmax - logsmin)/(Ntable.N_ell);
+    }
+    {
+      const int k = 0;
+      table[k][0]= log(C_ss_tomo_withIA_nointerp(exp(logsmin), Z1(k), Z2(k)));
+      #pragma omp parallel for
+      for (int i=1; i<Ntable.N_ell; i++) {
+        const double llog = logsmin + i*ds;
+        table[k][i] = log(C_ss_tomo_withIA_nointerp(exp(llog), Z1(k), Z2(k)));
+      }
+    }
+    #pragma omp parallel for
+    for (int k=1; k<tomo.shear_Npowerspectra; k++) {
+      for (int i=0; i<Ntable.N_ell; i++) {
+        const double llog = logsmin + i*ds;
+        table[k][i] = log(C_ss_tomo_withIA_nointerp(exp(llog), Z1(k), Z2(k)));
+      }
+    }
+    update_cosmopara(&C);
+    update_nuisance(&N);
+  }
+  double f1 = exp(interpol_fitslope(table[N_shear(ni,nj)], Ntable.N_ell,
+    logsmin, logsmax, ds, log(l), 1.));
+  if (isnan(f1)) {
+    f1 = 0.;
+  }
+  return f1;
+}
+
+double C_gs_tomo(double l, int ni, int nj) {
   static cosmopara C;
   static nuisancepara N;
   static galpara G;
   static double **table;
   static double ds = .0, logsmin = .0, logsmax = .0;
   if (ni < 0 || ni >= tomo.clustering_Nbin || nj < 0 || nj >= tomo.shear_Nbin) {
-    log_fatal("C_gl_tomo(l,%d,%d) outside tomo.X_Nbin range", ni, nj);
+    log_fatal("C_gs_tomo(l,%d,%d) outside tomo.X_Nbin range", ni, nj);
     exit(1);
   }
   if (recompute_ggl(C,G,N,ni)) {
@@ -543,19 +751,19 @@ double C_gl_tomo(double l, int ni, int nj) {
       {
         const int i = 0;
         const double llog = logsmin + i*ds;
-        table[k][i]= log(C_gl_tomo_nointerp(exp(llog), ZL(k), ZS(k)));
+        table[k][i]= log(C_gs_tomo_nointerp(exp(llog), ZL(k), ZS(k)));
       }
       #pragma omp parallel for
       for (int i=1; i<Ntable.N_ell; i++) {
           const double llog = logsmin + i*ds;
-          table[k][i]= log(C_gl_tomo_nointerp(exp(llog), ZL(k), ZS(k)));
+          table[k][i]= log(C_gs_tomo_nointerp(exp(llog), ZL(k), ZS(k)));
       }
     }
     #pragma omp parallel for
     for (int k=1; k<tomo.ggl_Npowerspectra; k++) {
       for (int i=0; i<Ntable.N_ell; i++) {
           const double llog = logsmin + i*ds;
-          table[k][i]= log(C_gl_tomo_nointerp(exp(llog), ZL(k), ZS(k)));
+          table[k][i]= log(C_gs_tomo_nointerp(exp(llog), ZL(k), ZS(k)));
       }
     }
     update_cosmopara(&C);
@@ -583,7 +791,93 @@ double C_gl_tomo(double l, int ni, int nj) {
   }
 }
 
-double C_cl_tomo(double l, int ni, int nj) {
+double C_gs_tomo_withIA(double l, int ni, int nj) {
+  static cosmopara C;
+  static nuisancepara N;
+  static galpara G;
+  static double **table, *sig;
+  static int osc[100];
+  static double ds = .0, logsmin = .0, logsmax = .0;
+  if ( ni < 0 || ni >= tomo.clustering_Nbin ||
+       nj < 0 || nj >= tomo.shear_Nbin ) {
+    log_fatal("C_gs_tomo_withIA(l,%d,%d) outside tomo.X_Nbin range", ni, nj);
+    exit(1);
+  }
+  if (recompute_ggl(C,G,N,ni)){
+    if (table == 0) {
+      table = create_double_matrix(0, tomo.ggl_Npowerspectra - 1, 0,
+        Ntable.N_ell - 1);
+      sig = create_double_vector(0,
+        tomo.ggl_Npowerspectra - 1);
+      logsmin = log(limits.P_2_s_min);
+      logsmax = log(limits.P_2_s_max);
+      ds = (logsmax - logsmin)/(Ntable.N_ell);
+    }
+    {
+      const int k = 0;
+      sig[k] = 1.;
+      osc[k] = 0;
+      const double res = C_gs_tomo_withIA_nointerp(500., ZL(k), ZS(k));
+      if (res < 0) {
+        sig[k] = -1.;
+      }
+      #pragma omp parallel for
+      for (int i=0; i<Ntable.N_ell; i++) {
+        const double llog = logsmin + i*ds;
+        table[k][i] = C_gs_tomo_withIA_nointerp(exp(llog), ZL(k), ZS(k));
+        if (res*sig[k] < 0.) {
+          osc[k] = 1;
+        }
+      }
+      if (osc[k] == 0) {
+        for(int i = 0; i < Ntable.N_ell; i++) {
+          table[k][i] = log(sig[k]*table[k][i]);
+        }
+      }
+    }
+    #pragma omp parallel for
+    for (int k = 1; k < tomo.ggl_Npowerspectra; k++) {
+      sig[k] = 1.;
+      osc[k] = 0;
+      const double res = C_gs_tomo_withIA_nointerp(500., ZL(k), ZS(k));
+      if (res < 0) {
+        sig[k] = -1.;
+      }
+      for (int i = 0; i < Ntable.N_ell; i++) {
+        const double llog = logsmin + i*ds;
+        table[k][i] = C_gs_tomo_withIA_nointerp(exp(llog), ZL(k), ZS(k));
+        if (res*sig[k] <0.) {
+          osc[k] = 1;
+        }
+      }
+      if (osc[k] == 0) {
+        for (int i = 0; i < Ntable.N_ell; i++) {
+          table[k][i] = log(sig[k]*table[k][i]);
+        }
+      }
+    }
+    update_cosmopara(&C);
+    update_nuisance(&N);
+    update_galpara(&G);
+  }
+  const int k = N_ggl(ni, nj);
+  const int tmp = test_zoverlap(ni, nj);
+  double f1 = 0.;
+  if (tmp && osc[k] == 0) {
+    f1 = sig[k]*exp(interpol_fitslope(table[k], Ntable.N_ell, logsmin,
+      logsmax, ds, log(l), 1.));
+  }
+  else if (tmp && osc[k] ==1) {
+    f1 = interpol_fitslope(table[k], Ntable.N_ell, logsmin, logsmax, ds,
+      log(l), 1.);
+  }
+  if (isnan(f1)) {
+    f1 = 0;
+  }
+  return f1;
+}
+
+double C_gg_tomo(double l, int ni, int nj) {
   static cosmopara C;
   static nuisancepara N;
   static galpara G;
@@ -618,7 +912,7 @@ double C_cl_tomo(double l, int ni, int nj) {
     {
       const int i = 0;
       const double llog = logsmin + i*ds;
-      const double result = C_cl_tomo_nointerp(exp(llog), ni, nj);
+      const double result = C_gg_tomo_nointerp(exp(llog), ni, nj);
       if (result <= 0) {
         table[j][i] = -100;
       }
@@ -630,7 +924,7 @@ double C_cl_tomo(double l, int ni, int nj) {
     #pragma omp parallel for
     for (int i = 1; i < Ntable.N_ell; i++) {
       const double llog = logsmin + i*ds;
-      const double result = C_cl_tomo_nointerp(exp(llog), ni, nj);
+      const double result = C_gg_tomo_nointerp(exp(llog), ni, nj);
       if (result <= 0) {
         table[j][i] = -100;
       }
@@ -825,194 +1119,170 @@ double C_ks_wrapper(double l, int ni) {
 // Correlation Functions (real space) - flat sky
 // ----------------------------------------------------------------------------
 
-void hankel_kernel_FT(double x, fftw_complex *res, double *arg, int argc __attribute__((unused))) {
-  fftw_complex a1, a2, g1, g2;
-  int mu;
-  double mod, xln2, si, co, d1, d2, pref, q;
-  q = arg[0];
-  mu = (int)(arg[1] + 0.1);
-
-  /* arguments for complex gamma */
-  a1[0] = 0.5 * (1.0 + mu + q);
-  a2[0] = 0.5 * (1.0 + mu - q);
-  a1[1] = 0.5 * x;
-  a2[1] = -a1[1];
-  cdgamma(a1, &g1);
-  cdgamma(a2, &g2);
-  xln2 = x * constants.ln2;
-  si = sin(xln2);
-  co = cos(xln2);
-  d1 = g1[0] * g2[0] + g1[1] * g2[1]; /* Re */
-  d2 = g1[1] * g2[0] - g1[0] * g2[1]; /* Im */
-  mod = g2[0] * g2[0] + g2[1] * g2[1];
-  pref = exp(constants.ln2 * q) / mod;
-
-  (*res)[0] = pref * (co * d1 - si * d2);
-  (*res)[1] = pref * (si * d1 + co * d2);
-}
-
-void xipm_via_hankel(double **xi, double *logthetamin, double *logthetamax,
-C_tomo_pointer C_tomo,int ni, int nj) {
-  const double l_min = 0.0001;
-  const double l_max = 5.0e6;
-  static double loglmax = -123.0, loglmin, dlnl,  lnrc, arg[2];
-  static int nc;
-
-  double        l, kk, *lP, t;
-  fftw_plan     plan1,plan;
-  fftw_complex *f_lP,*conv;
-  fftw_complex  kernel;
-  int           i, count;
-  lP   = fftw_malloc(Ntable.N_thetaH*sizeof(double));
-  f_lP = fftw_malloc((Ntable.N_thetaH/2+1)*sizeof(fftw_complex));
-  conv = fftw_malloc((Ntable.N_thetaH/2+1)*sizeof(fftw_complex));
-  plan  = fftw_plan_dft_r2c_1d(Ntable.N_thetaH, lP, f_lP, FFTW_ESTIMATE);
-  plan1 = fftw_plan_dft_c2r_1d(Ntable.N_thetaH, conv, lP, FFTW_ESTIMATE);
-  if (loglmax==-123.0) {
-    loglmax  = log(l_max);
-    loglmin  = log(l_min);
-    dlnl     = (loglmax-loglmin)/(1.0*Ntable.N_thetaH);
-    lnrc     = 0.5*(loglmax+loglmin);
-    nc       = Ntable.N_thetaH/2+1;
-  }
-  /* Power spectrum on logarithmic bins */
-  for(i=0; i<Ntable.N_thetaH; i++) {
-    l     = exp(lnrc+(i-nc)*dlnl);
-    lP[i] = l*C_tomo(l,ni,nj);
-  }
-  /* go to log-Fourier-space */
-  fftw_execute(plan);
-  arg[0] = 0;   /* bias */
-  for (count=0; count<=1; count++) {
-    arg[1] = (count==0 ? 0 : 4);   /* order of Bessel function */
-    /* perform the convolution, negative sign for kernel (complex conj.!) */
-    for(i=0; i<Ntable.N_thetaH/2+1; i++) {
-      kk = 2*constants.pi*i/(dlnl*Ntable.N_thetaH);
-      hankel_kernel_FT(kk, &kernel, arg, 2);
-      conv[i][0] = f_lP[i][0]*kernel[0]-f_lP[i][1]*kernel[1];
-      conv[i][1] = f_lP[i][1]*kernel[0]+f_lP[i][0]*kernel[1];
-    }
-    /* force Nyquist- and 0-frequency-components to be double */
-    conv[0][1] = 0;
-    conv[Ntable.N_thetaH/2][1] = 0;
-    /* go back to double space, i labels log-bins in theta */
-    fftw_execute(plan1);
-    for(i=0; i<Ntable.N_thetaH; i++) {
-      t = exp((nc-i)*dlnl-lnrc);             /* theta=1/l */
-      xi[count][Ntable.N_thetaH-i-1] = lP[i]/(t*2*constants.pi*Ntable.N_thetaH);
-    }
-  }
-
-  *logthetamin = (nc-Ntable.N_thetaH+1)*dlnl-lnrc;
-  *logthetamax = nc*dlnl-lnrc;
-  /* clean up */
-  fftw_free(conv);
-  fftw_free(lP);
-  fftw_free(f_lP);
-  fftw_destroy_plan(plan);
-  fftw_destroy_plan(plan1);
-}
-
-void twopoint_via_hankel(double **xi, double *logthetamin, double *logthetamax,
-C_tomo_pointer C_tomo, int ni, int nj, int N_Bessel) {
-  const double l_min = 0.0001;
-  const double l_max = 5.0e6;
-  double loglmax, loglmin, dlnl, lnrc, arg[2];
-  static int nc;
-
-  double        l, kk, *lP, t;
-  fftw_plan     plan1,plan;
-  fftw_complex *f_lP,*conv;
-  fftw_complex  kernel;
-  int           i;
-  lP   = fftw_malloc(Ntable.N_thetaH*sizeof(double));
-  f_lP = fftw_malloc((Ntable.N_thetaH/2+1)*sizeof(fftw_complex));
-  conv = fftw_malloc((Ntable.N_thetaH/2+1)*sizeof(fftw_complex));
-  plan  = fftw_plan_dft_r2c_1d(Ntable.N_thetaH, lP, f_lP, FFTW_ESTIMATE);
-  plan1 = fftw_plan_dft_c2r_1d(Ntable.N_thetaH, conv, lP, FFTW_ESTIMATE);
-  loglmax  = log(l_max);
-  loglmin  = log(l_min);
-  dlnl     = (loglmax-loglmin)/(1.0*Ntable.N_thetaH-1.);
-  lnrc     = 0.5*(loglmax+loglmin);
-  nc       = Ntable.N_thetaH/2+1;
-  /* Power spectrum on logarithmic bins */
-  for(i=0; i<Ntable.N_thetaH; i++) {
-    l     = exp(lnrc+(i-nc)*dlnl);
-    lP[i] = l*C_tomo(l,ni,nj);
-
-  }
-
-  /* go to log-Fourier-space */
-  fftw_execute(plan);
-  arg[0] = 0;   /* bias */
-  arg[1] = N_Bessel;   /* order of Bessel function */
-  /* perform the convolution, negative sign for kernel (complex conj.!) */
-  for(i=0; i<Ntable.N_thetaH/2+1; i++) {
-    kk = 2*constants.pi*i/(dlnl*Ntable.N_thetaH);
-    hankel_kernel_FT(kk, &kernel, arg, 2);
-    conv[i][0] = f_lP[i][0]*kernel[0]-f_lP[i][1]*kernel[1];
-    conv[i][1] = f_lP[i][1]*kernel[0]+f_lP[i][0]*kernel[1];
-  }
-  /* force Nyquist- and 0-frequency-components to be double */
-  conv[0][1] = 0;
-  conv[Ntable.N_thetaH/2][1] = 0;
-  /* go back to double space, i labels log-bins in theta */
-  fftw_execute(plan1);
-  for(i=0; i<Ntable.N_thetaH; i++) {
-    t = exp((nc-i)*dlnl-lnrc);             /* theta=1/l */
-    xi[0][Ntable.N_thetaH-i-1] = lP[i]/(t*2*constants.pi*Ntable.N_thetaH);
-  }
-
-
-  *logthetamin = (nc-Ntable.N_thetaH+1)*dlnl-lnrc;
-  *logthetamax = nc*dlnl-lnrc;
-
-  /* clean up */
-  fftw_free(conv);
-  fftw_free(lP);
-  fftw_free(f_lP);
-  fftw_destroy_plan(plan);
-  fftw_destroy_plan(plan1);
-}
-
 double xi_pm_tomo(int pm, double theta, int ni, int nj) {
   static cosmopara C;
   static nuisancepara N;
   static double **table;
   static double dlogtheta, logthetamin, logthetamax;
 
-  if (recompute_shear(C,N)) {
+  if (recompute_shear(C, N)) {
     if (like.IA != 0 && like.IA != 3 && like.IA != 4) {
       log_fatal("xi_pm_tomo does not support like.IA = %d yet", like.IA);
       exit(1);
     }
-    C_tomo_pointer C_pointer = &C_shear_tomo;
+    C_tomo_pointer C_pointer = &C_ss_tomo;
     if (like.IA == 3 || like.IA == 4) {
-      C_pointer = &C_shear_shear_IA_tab;
+      C_pointer = &C_ss_tomo_withIA;
     }
     if (table == 0) {
       table = create_double_matrix(0, 2*tomo.shear_Npowerspectra - 1, 0,
         Ntable.N_thetaH - 1);
     }
-    // COCOA: DONT OPENMP A LOOP THAT CALLS FFTLOG
-    for (int i = 0; i < tomo.shear_Npowerspectra; i++){
-      double **tab;
-      tab   = create_double_matrix(0, 1, 0, Ntable.N_thetaH-1);
 
-      xipm_via_hankel(tab, &logthetamin, &logthetamax, C_pointer, Z1(i), Z2(i));
+    // ------------------------------------------------------------------------
+    // Cocoa: code extracted (& adapted) from xipm_via_hankel (begins)
+    // ------------------------------------------------------------------------
+    typedef fftw_complex fftwZ;
 
-      for (int k = 0; k < Ntable.N_thetaH; k++) {
-        table[2*i][k] = tab[0][k];
-        table[2*i + 1][k] = tab[1][k];
-      }
+    const int NSIZE = tomo.shear_Npowerspectra;
+    const double l_min = 0.0001;
+    const double l_max = 5.0e6;
+    const double loglmax = log(l_max);
+    const double loglmin = log(l_min);
+    const double dlnl = (loglmax - loglmin)/(1.0*Ntable.N_thetaH);
+    const double lnrc = 0.5*(loglmax + loglmin);
+    const double nc = Ntable.N_thetaH/2 + 1;
 
-      free_double_matrix(tab,0, 1, 0, Ntable.N_thetaH - 1);
-    }
+    logthetamin = (nc-Ntable.N_thetaH+1)*dlnl-lnrc;
+    logthetamax = nc*dlnl-lnrc;
     dlogtheta = (logthetamax - logthetamin)/((double) Ntable.N_thetaH);
+
+    fftwZ** flP = (fftwZ**) malloc(sizeof(fftwZ*)*NSIZE);
+    for (int j=0; j<NSIZE; j++) {
+      flP[j] = (fftwZ*) fftw_malloc((Ntable.N_thetaH/2+1)*sizeof(fftwZ));
+    }
+    {
+      double** lP = (double**) malloc(sizeof(double*)*NSIZE);
+      fftw_plan* plan = (fftw_plan*) malloc(sizeof(fftw_plan)*NSIZE);
+      for (int j=0; j<NSIZE; j++) {
+        const int ARRAYSZ = Ntable.N_thetaH;
+        lP[j] = (double*) malloc(ARRAYSZ*sizeof(double));
+        plan[j] = fftw_plan_dft_r2c_1d(ARRAYSZ, lP[j], flP[j], FFTW_ESTIMATE);
+      }
+      { // Power spectrum on logarithmic bins (begins)
+        {
+          const int j = 0;
+          {
+            const int i = 0;
+            const double l = exp(lnrc+(i-nc)*dlnl);
+            lP[j][i] = l*C_pointer(exp(lnrc + (i - nc)*dlnl), Z1(j), Z2(j));
+          }
+          #pragma omp parallel for
+          for(int i=1; i<Ntable.N_thetaH; i++) {
+            const double l = exp(lnrc+(i-nc)*dlnl);
+            lP[j][i] = l*C_pointer(exp(lnrc + (i - nc)*dlnl), Z1(j), Z2(j));
+          }
+        }
+        #pragma omp parallel for
+        for (int j=1; j<NSIZE; j++) {
+          for(int i=0; i<Ntable.N_thetaH; i++) {
+            const double l = exp(lnrc+(i-nc)*dlnl);
+            lP[j][i] = l*C_pointer(exp(lnrc + (i - nc)*dlnl), Z1(j), Z2(j));
+          }
+        }
+      } // Power spectrum on logarithmic bins (ends)
+      #pragma omp parallel for
+      for (int j=0; j<NSIZE; j++) {
+        fftw_execute(plan[j]); // Execute FFTW in parallel (thread-safe)
+      }
+      for (int j = 0; j < NSIZE; j++) {
+        fftw_free(lP[j]);
+        fftw_destroy_plan(plan[j]);
+      }
+      free(lP);
+      free(plan);
+    }
+    double*** lP = (double***) malloc(sizeof(double**)*NSIZE);
+    fftwZ*** kernel = (fftwZ***) malloc(sizeof(fftwZ**)*NSIZE);
+    fftwZ*** conv = (fftwZ***) malloc(sizeof(fftwZ**)*NSIZE);
+    fftw_plan** plan = (fftw_plan**) malloc(sizeof(fftw_plan*)*NSIZE);
+    double*** tab = (double***) malloc(sizeof(double**)*NSIZE);
+    for (int j=0; j<NSIZE; j++) {
+      lP[j] = (double**) malloc(sizeof(double*)*2);
+      kernel[j] = (fftwZ**) malloc(sizeof(fftwZ*)*2);
+      conv[j] = (fftwZ**) malloc(sizeof(fftwZ*)*2);
+      plan[j] = (fftw_plan*) malloc(sizeof(fftw_plan)*2);
+      tab[j] = create_double_matrix(0, 1, 0, Ntable.N_thetaH-1);
+      for (int m=0; m<2; m++) {
+        const int ARRAYSZ = Ntable.N_thetaH;
+        const int COVSZ = (Ntable.N_thetaH/2+1);
+        lP[j][m] = (double*) malloc(ARRAYSZ*sizeof(double));
+        kernel[j][m] = (fftwZ*) fftw_malloc(sizeof(fftwZ));
+        conv[j][m] = (fftwZ*) fftw_malloc(COVSZ*sizeof(fftwZ));
+        plan[j][m] =
+          fftw_plan_dft_c2r_1d(ARRAYSZ, conv[j][m], lP[j][m], FFTW_ESTIMATE);
+      }
+    }
+    #pragma omp parallel for
+    for (int j=0; j<NSIZE; j++) {
+      for (int m=0; m<2; m++) {
+        double arg[2];
+        arg[0] = 0; // bias
+        arg[1] = (m == 0 ? 0 : 4); // order of Bessel function
+
+        // perform the convolution, negative sign for kernel (complex conj.!)
+        for(int i=0; i<(Ntable.N_thetaH/2+1); i++) {
+          const double k = 2*constants.pi*i/(dlnl*Ntable.N_thetaH);
+          hankel_kernel_FT(k, kernel[j][m], arg, 2);
+          conv[j][m][i][0] = flP[j][i][0]*(kernel[j][m][0][0]) -
+            flP[j][i][1]*(kernel[j][m][0][1]);
+          conv[j][m][i][1] = flP[j][i][1]*(kernel[j][m][0][0]) +
+            flP[j][i][0]*(kernel[j][m][0][1]);
+        }
+
+        // force Nyquist- and 0-frequency-components to be double
+        conv[j][m][0][1] = 0;
+        conv[j][m][Ntable.N_thetaH/2][1] = 0;
+
+        fftw_execute(plan[j][m]);
+
+        for(int k=0; k<Ntable.N_thetaH; k++) {
+          const double t = exp((nc-k)*dlnl-lnrc); // theta=1/l
+          tab[j][m][Ntable.N_thetaH-k-1] =
+            lP[j][m][k]/(t*2*constants.pi*Ntable.N_thetaH);
+        }
+      }
+      for (int k=0; k<Ntable.N_thetaH; k++) {
+        table[2*j][k] = tab[j][0][k];
+        table[2*j+1][k] = tab[j][1][k];
+      }
+    }
+    for (int j=0; j<NSIZE; j++) {
+      for (int m=0; m<2; m++) {
+        fftw_free(lP[j][m]);
+        fftw_free(kernel[j][m]);
+        fftw_free(conv[j][m]);
+        fftw_destroy_plan(plan[j][m]);
+      }
+      fftw_free(flP[j]);
+      free(lP[j]);
+      free(kernel[j]);
+      free(conv[j]);
+      free(plan[j]);
+      free_double_matrix(tab[j], 0, 1, 0, Ntable.N_thetaH);
+    }
+    free(flP);
+    free(lP);
+    free(kernel);
+    free(conv);
+    free(plan);
+    free(tab);
+    // ------------------------------------------------------------------------
+    // Cocoa: code extracted (& adapted) from xipm_via_hankel (ends)
+    // ------------------------------------------------------------------------
     update_cosmopara(&C);
     update_nuisance(&N);
   }
-
   return interpol(
     table[2*N_shear(ni, nj) + (1 - pm)/2],
     Ntable.N_thetaH,
@@ -1025,38 +1295,155 @@ double xi_pm_tomo(int pm, double theta, int ni, int nj) {
   );
 }
 
-double w_gamma_t_tomo(double theta,int ni, int nj) {
+double w_gs_tomo(double theta,int ni, int nj) {
   static cosmopara C;
   static nuisancepara N;
   static galpara G;
   static double **table;
   static double dlogtheta, logthetamin, logthetamax;
 
-  if (recompute_ggl(C,G,N,ni)) {
+  if (recompute_ggl(C, G, N, ni)) {
     if (like.IA != 0 && like.IA != 3 && like.IA != 4) {
       printf("cosmo2D_real.c: w_gamma_t_tomo does not support like.IA = %d yet\nEXIT!\n",like.IA);
       exit(1);
     }
-    C_tomo_pointer C_gl_pointer = &C_gl_tomo;
-    if (like.IA ==3 || like.IA ==4) C_gl_pointer = &C_ggl_IA_tab;
-
+    C_tomo_pointer C_pointer = &C_gs_tomo;
+    if (like.IA == 3 || like.IA == 4) {
+      C_pointer = &C_gs_tomo_withIA;
+    }
     if (table == 0) {
-      table  = create_double_matrix(0, tomo.ggl_Npowerspectra, 0,
-        Ntable.N_thetaH - 1);
+      table  = create_double_matrix(
+        0,
+        tomo.ggl_Npowerspectra,
+        0,
+        Ntable.N_thetaH - 1
+      );
     }
-    // COCOA: DONT OPENMP A LOOP THAT CALLS FFTLOG
-    for (int i = 0; i <tomo.ggl_Npowerspectra; i++) {
-      double **tab;
-      tab   = create_double_matrix(0, 1, 0, Ntable.N_thetaH-1);
+    // ------------------------------------------------------------------------
+    // Cocoa: code extracted (& adapted) from twopoint_via_hankel (begins)
+    // ------------------------------------------------------------------------
+    typedef fftw_complex fftwZ;
 
-      twopoint_via_hankel(tab, &logthetamin, &logthetamax,C_gl_pointer, ZL(i),ZS(i),2);
+    const int NSIZE = tomo.ggl_Npowerspectra;
+    const double l_min = 0.0001;
+    const double l_max = 5.0e6;
+    const double loglmax = log(l_max);
+    const double loglmin = log(l_min);
+    const double dlnl = (loglmax-loglmin)/(1.0*Ntable.N_thetaH - 1.);
+    const double lnrc = 0.5*(loglmax+loglmin);
+    const double nc = Ntable.N_thetaH/2 + 1;
 
-      for (int k = 0; k < Ntable.N_thetaH; k++) {
-        table[i][k] = tab[0][k];
-      }
-      free_double_matrix(tab,0, 1, 0, Ntable.N_thetaH);
-    }
+    logthetamin = (nc-Ntable.N_thetaH+1)*dlnl-lnrc;
+    logthetamax = nc*dlnl-lnrc;
     dlogtheta = (logthetamax-logthetamin)/((double)Ntable.N_thetaH);
+
+    // go to log-Fourier-space
+    fftwZ** flP = (fftwZ**) malloc(sizeof(fftwZ*)*NSIZE);
+    for (int j=0; j<NSIZE; j++) {
+      flP[j] = fftw_malloc((Ntable.N_thetaH/2+1)*sizeof(fftwZ));
+    }
+    {
+      double** lP = (double**) malloc(sizeof(double*)*NSIZE);
+      fftw_plan* plan = (fftw_plan*) malloc(sizeof(fftw_plan)*NSIZE);
+      for (int j=0; j<NSIZE; j++) {
+        int ARRAYSZ = Ntable.N_thetaH;
+        lP[j] = (double*) malloc(ARRAYSZ*sizeof(double));
+        plan[j] = fftw_plan_dft_r2c_1d(ARRAYSZ, lP[j], flP[j], FFTW_ESTIMATE);
+      }
+      { // Power spectrum on logarithmic bins (begins)
+        {
+          const int j = 0;
+          {
+            const int i = 0;
+            const double l = exp(lnrc + (i - nc)*dlnl);
+            lP[j][i] = l*C_pointer(l, ZL(j), ZS(j));
+          }
+          #pragma omp parallel for
+          for(int i=1; i<Ntable.N_thetaH; i++) {
+            const double l = exp(lnrc + (i - nc)*dlnl);
+            lP[j][i] = l*C_pointer(l, ZL(j), ZS(j));
+          }
+        }
+        #pragma omp parallel for
+        for (int j=1; j<NSIZE; j++) {
+          for(int i=0; i<Ntable.N_thetaH; i++) {
+            const double l = exp(lnrc + (i - nc)*dlnl);
+            lP[j][i] = l*C_pointer(l, ZL(j), ZS(j));
+          }
+        }
+      } // Power spectrum on logarithmic bins (ends)
+      #pragma omp parallel for
+      for (int j=0; j<NSIZE; j++) {
+        fftw_execute(plan[j]); // Execute FFTW in parallel (thread-safe)
+      }
+      for (int j=0; j<NSIZE; j++) {
+        fftw_free(lP[j]);
+        fftw_destroy_plan(plan[j]);
+      }
+      free(lP);
+      free(plan);
+    }
+    double** lP = (double**) malloc(sizeof(double*)*NSIZE);
+    fftwZ** kernel = (fftwZ**) fftw_malloc(sizeof(fftwZ*)*NSIZE);
+    fftwZ** conv = (fftwZ**) fftw_malloc(sizeof(fftwZ*)*NSIZE);
+    fftw_plan* plan = (fftw_plan*) malloc(sizeof(fftw_plan)*NSIZE);
+    double*** tab = (double***) malloc(sizeof(double**)*NSIZE);
+    for (int j=0; j<NSIZE; j++) {
+      const int ARRAYSZ = Ntable.N_thetaH;
+      const int COVSZ = (Ntable.N_thetaH/2+1);
+      lP[j] = (double*) malloc(ARRAYSZ*sizeof(double));
+      kernel[j] = (fftwZ*) fftw_malloc(sizeof(fftwZ));
+      conv[j] = (fftwZ*) fftw_malloc(COVSZ*sizeof(fftwZ));
+      plan[j] = fftw_plan_dft_c2r_1d(ARRAYSZ, conv[j], lP[j], FFTW_ESTIMATE);
+      tab[j] = create_double_matrix(0, 1, 0, Ntable.N_thetaH-1);
+    }
+    #pragma omp parallel for
+    for (int j=0; j<NSIZE; j++) {
+      double arg[2];
+      arg[0] = 0; // bias
+      arg[1] = 2; // order of Bessel function
+
+      for(int i=0; i<(Ntable.N_thetaH/2+1); i++) {
+        const double kk = 2*constants.pi*i/(dlnl*Ntable.N_thetaH);
+        hankel_kernel_FT(kk, kernel[j], arg, 2);
+        conv[j][i][0] = flP[j][i][0]*kernel[j][0][0] -
+          flP[j][i][1]*kernel[j][0][1];
+        conv[j][i][1] = flP[j][i][1]*kernel[j][0][0] +
+          flP[j][i][0]*kernel[j][0][1];
+      }
+
+      // force Nyquist- and 0-frequency-components to be double
+      conv[j][0][1] = 0;
+      conv[j][Ntable.N_thetaH/2][1] = 0;
+
+      fftw_execute(plan[j]); // Execute FFTW in parallel (thread-safe)
+
+      for(int k=0; k<Ntable.N_thetaH; k++) {
+        const double t = exp((nc-k)*dlnl-lnrc); // theta=1/l
+        tab[j][0][Ntable.N_thetaH-k-1] =
+          lP[j][k]/(t*2*constants.pi*Ntable.N_thetaH);
+      }
+      for (int k=0; k<Ntable.N_thetaH; k++) {
+        table[j][k] = tab[j][0][k];
+      }
+    }
+    for (int j=0; j<NSIZE; j++) {
+      fftw_free(flP[j]);
+      fftw_free(lP[j]);
+      fftw_free(conv[j]);
+      fftw_free(kernel[j]);
+      fftw_destroy_plan(plan[j]);
+      free_double_matrix(tab[j], 0, 1, 0, Ntable.N_thetaH);
+    }
+    free(flP);
+    free(lP);
+    free(conv);
+    free(kernel);
+    free(plan);
+    free(tab);
+    // ------------------------------------------------------------------------
+    // Cocoa: code extracted (& adapted) from twopoint_via_hankel (ends)
+    // ------------------------------------------------------------------------
     update_cosmopara(&C);
     update_galpara(&G);
     update_nuisance(&N);
@@ -1077,33 +1464,200 @@ double w_gamma_t_tomo(double theta,int ni, int nj) {
   }
 }
 
-double w_tomo(double theta, int ni, int nj) {
+double w_gg_tomo(double theta, int ni, int nj) {
   static cosmopara C;
   static nuisancepara N;
   static galpara G;
   static double **table;
   static double dlogtheta, logthetamin, logthetamax;
-  if (recompute_clustering(C,G,N,ni,nj)) {
-    double **tab;
-    int i, j,k;
-    tab   = create_double_matrix(0, 1, 0, Ntable.N_thetaH-1);
-    if (table==0) table = create_double_matrix(0, tomo.clustering_Nbin*tomo.clustering_Nbin-1, 0, Ntable.N_thetaH-1);
-    for (i = 0; i < tomo.clustering_Nbin; i++){
-      for (j= i; j < tomo.clustering_Nbin; j++){
-        twopoint_via_hankel(tab, &logthetamin, &logthetamax,&C_cl_tomo, i,j,0);
-        dlogtheta = (logthetamax-logthetamin)/((double)Ntable.N_thetaH);
-        for (k = 0; k < Ntable.N_thetaH; k++){
-          table[i*tomo.clustering_Nbin+j][k] = tab[0][k];
-          table[j*tomo.clustering_Nbin+i][k] = tab[0][k];
+
+  if (recompute_clustering(C, G, N, ni, nj)) {
+    if (table == 0) {
+      table = create_double_matrix(
+        0,
+        tomo.clustering_Nbin*tomo.clustering_Nbin-1,
+        0,
+        Ntable.N_thetaH-1
+      );
+    }
+    // ------------------------------------------------------------------------
+    // Cocoa: code extracted (& adapted) from twopoint_via_hankel (begins)
+    // ------------------------------------------------------------------------
+    typedef fftw_complex fftwZ;
+
+    const int NSIZE = tomo.clustering_Nbin;
+    const double l_min = 0.0001;
+    const double l_max = 5.0e6;
+    const double loglmax = log(l_max);
+    const double loglmin = log(l_min);
+    const double dlnl = (loglmax-loglmin)/(1.0*Ntable.N_thetaH - 1.);
+    const double lnrc = 0.5*(loglmax+loglmin);
+    const double nc = Ntable.N_thetaH/2 + 1;
+
+    logthetamin = (nc-Ntable.N_thetaH+1)*dlnl-lnrc;
+    logthetamax = nc*dlnl-lnrc;
+    dlogtheta = (logthetamax-logthetamin)/((double)Ntable.N_thetaH);
+
+    // go to log-Fourier-space
+    fftwZ*** flP = (fftwZ***) malloc(sizeof(fftwZ**)*NSIZE);
+    for (int i=0; i<NSIZE; i++) {
+      flP[i] = malloc(sizeof(fftwZ*)*NSIZE);
+      for (int j=i; j<NSIZE; j++) {
+        flP[i][j] = fftw_malloc((Ntable.N_thetaH/2+1)*sizeof(fftwZ));
+      }
+    }
+    {
+      double*** lP = (double***) malloc(sizeof(double**)*NSIZE);
+      fftw_plan** plan = (fftw_plan**) malloc(sizeof(fftw_plan*)*NSIZE);
+      for (int i=0; i<NSIZE; i++) {
+        lP[i] = (double**) malloc(sizeof(double*)*NSIZE);
+        plan[i] = (fftw_plan*) malloc(sizeof(fftw_plan)*NSIZE);
+        for (int j=i; j<NSIZE; j++) {
+          int ARRAYSZ = Ntable.N_thetaH;
+          lP[i][j] = (double*) malloc(ARRAYSZ*sizeof(double));
+          plan[i][j] = fftw_plan_dft_r2c_1d(ARRAYSZ, lP[i][j], flP[i][j], FFTW_ESTIMATE);
+        }
+      }
+      { // Power spectrum on logarithmic bins (begins)
+        {
+          const int i = 0;
+          {
+            const int j = i;
+            {
+              const int k = 0;
+              const double l = exp(lnrc + (k - nc)*dlnl);
+              lP[i][j][k] = l*C_gg_tomo(l, i, j);
+            }
+            #pragma omp parallel for
+            for(int k=1; k<Ntable.N_thetaH; k++) {
+              const double l = exp(lnrc + (k - nc)*dlnl);
+              lP[i][j][k] = l*C_gg_tomo(l, i, j);
+            }
+          }
+          #pragma omp parallel for
+          for (int j=i+1; j<NSIZE; j++) {
+            for(int k=0; k<Ntable.N_thetaH; k++) {
+              const double l = exp(lnrc + (k - nc)*dlnl);
+              lP[i][j][k] = l*C_gg_tomo(l, i, j);
+            }
+          }
+        }
+        #pragma omp parallel for
+        for (int i=1; i<NSIZE; i++) {
+          for (int j=i; j<NSIZE; j++) {
+            for(int k=0; k<Ntable.N_thetaH; k++) {
+              const double l = exp(lnrc + (k - nc)*dlnl);
+              lP[i][j][k] = l*C_gg_tomo(l, i, j);
+            }
+          }
+        }
+      } // Power spectrum on logarithmic bins (ends)
+      #pragma omp parallel for
+      for (int i=0; i<NSIZE; i++) {
+        for (int j=i; j<NSIZE; j++) {
+          fftw_execute(plan[i][j]); // Execute FFTW in parallel (thread-safe)
+        }
+      }
+      for (int i=0; i<NSIZE; i++) {
+        for (int j=i; j<NSIZE; j++) {
+          fftw_free(lP[i][j]);
+          fftw_destroy_plan(plan[i][j]);
+        }
+        free(lP[i]);
+        free(plan[i]);
+      }
+      free(lP);
+      free(plan);
+    }
+
+    double*** lP = (double***) fftw_malloc(sizeof(double***)*NSIZE);
+    fftwZ*** kernel = (fftwZ***) malloc(sizeof(fftwZ**)*NSIZE);
+    fftwZ*** conv = (fftwZ***) malloc(sizeof(fftwZ**)*NSIZE);
+    fftw_plan** plan = (fftw_plan**) malloc(sizeof(fftw_plan*)*NSIZE);
+    double**** tab = (double****) malloc(sizeof(double***)*NSIZE);
+    for (int i=0; i<NSIZE; i++) {
+      lP[i] = (double**) fftw_malloc(sizeof(double**)*NSIZE);
+      kernel[i] = (fftwZ**) fftw_malloc(sizeof(fftwZ*)*NSIZE);
+      conv[i] = (fftwZ**) fftw_malloc(sizeof(fftwZ*)*NSIZE);
+      plan[i] = (fftw_plan*) malloc(sizeof(fftw_plan)*NSIZE);
+      for (int j=i; j<NSIZE; j++) {
+        const int ARRAYSZ = Ntable.N_thetaH;
+        lP[i][j] = (double*) fftw_malloc(ARRAYSZ*sizeof(double));
+        kernel[i][j] = (fftwZ*) fftw_malloc(sizeof(fftwZ));
+        conv[i][j] = (fftwZ*) fftw_malloc((ARRAYSZ/2+1)*sizeof(fftwZ));
+        plan[i][j] = fftw_plan_dft_c2r_1d(ARRAYSZ, conv[i][j], lP[i][j], FFTW_ESTIMATE);
+        tab[i][j] = create_double_matrix(0, 1, 0, Ntable.N_thetaH-1);
+      }
+    }
+    for (int i=0; i<NSIZE; i++) {
+      for (int j=i; j<NSIZE; j++) {
+        double arg[2];
+        arg[0] = 0; // bias
+        arg[1] = 0; // order of Bessel function
+
+        for(int k=0; k<(Ntable.N_thetaH/2+1); k++) {
+          const double kk = 2*constants.pi*i/(dlnl*Ntable.N_thetaH);
+          hankel_kernel_FT(kk, kernel[i][j], arg, 2);
+          conv[i][j][k][0] = flP[i][j][k][0]*kernel[i][j][0][0] -
+            flP[i][j][k][1]*kernel[i][j][0][1];
+          conv[i][j][k][1] = flP[i][j][k][1]*kernel[i][j][0][0] +
+            flP[i][j][k][0]*kernel[i][j][0][1];
+        }
+
+        // force Nyquist- and 0-frequency-components to be double
+        conv[i][j][0][1] = 0;
+        conv[i][j][Ntable.N_thetaH/2][1] = 0;
+
+        fftw_execute(plan[i][j]); // Execute FFTW in parallel (thread-safe)
+
+        for(int k=0; k<Ntable.N_thetaH; k++) {
+          const double t = exp((nc-k)*dlnl-lnrc); // theta=1/l
+          tab[i][j][0][Ntable.N_thetaH-k-1] =
+            lP[i][j][k]/(t*2*constants.pi*Ntable.N_thetaH);
+        }
+        for (int k=0; k<Ntable.N_thetaH; k++) {
+          table[i*tomo.clustering_Nbin+j][k] = tab[i][j][0][k];
+          table[j*tomo.clustering_Nbin+i][k] = tab[i][j][0][k];
         }
       }
     }
-    free_double_matrix(tab,0, 1, 0, Ntable.N_thetaH-1);
+    for (int i=0; i<NSIZE; i++) {
+      for (int j=i; j<NSIZE; j++) {
+        fftw_free(lP[i][j]);
+        fftw_free(kernel[i][j]);
+        fftw_free(conv[i][j]);
+        fftw_destroy_plan(plan[i][j]);
+        free_double_matrix(tab[i][j], 0, 1, 0, Ntable.N_thetaH);
+      }
+      fftw_free(flP[i]);
+      free(lP[i]);
+      free(kernel[i]);
+      free(conv[i]);
+      free(plan[i]);
+      free(tab[i]);
+    }
+    free(flP);
+    free(lP);
+    free(kernel);
+    free(conv);
+    free(plan);
+    free(tab);
+    // ------------------------------------------------------------------------
+    // Cocoa: code extracted (& adapted) from twopoint_via_hankel (ends)
+    // ------------------------------------------------------------------------
     update_cosmopara(&C);
     update_galpara(&G);
     update_nuisance(&N);
   }
-  return interpol(table[ni*tomo.clustering_Nbin+nj], Ntable.N_thetaH, logthetamin, logthetamax,dlogtheta, log(theta), 1.0, 1.0);
+  return interpol(
+    table[ni*tomo.clustering_Nbin+nj],
+    Ntable.N_thetaH,
+    logthetamin,
+    logthetamax,dlogtheta,
+    log(theta),
+    1.0,
+    1.0
+  );
 }
 
 // ----------------------------------------------------------------------------
@@ -1182,20 +1736,20 @@ double xi_pm_tomo_fullsky(int pm, int nt, int ni, int nj) {
     }
   }
   if (recompute_shear(C,N)) {
-    C_tomo_pointer C_pointer = &C_shear_tomo;
+    C_tomo_pointer C_pointer = &C_ss_tomo;
     if (like.IA == 3 || like.IA == 4) {
-      C_pointer = &C_shear_shear_IA_tab;
+      C_pointer = &C_ss_tomo_withIA;
     }
     // COCOA: FROM TATT EXPERIENCE, WE CANT OPENMP HERE (POSSIBLE RACE)
     for (int nz = 0; nz < tomo.shear_Npowerspectra; nz++) {
       double *Cl = calloc(LMAX, sizeof(double));
       {
         const int l = 2;
-        Cl[l] = C_shear_shear_IA_tab(1.0*l, Z1(nz), Z2(nz));
+        Cl[l] = C_pointer(1.0*l, Z1(nz), Z2(nz));
       }
       #pragma omp parallel for
       for (int l = 3; l < LMAX; l++) {
-        Cl[l] = C_shear_shear_IA_tab(1.0*l, Z1(nz), Z2(nz));
+        Cl[l] = C_pointer(1.0*l, Z1(nz), Z2(nz));
       }
       #pragma omp parallel for
       for (int i = 0; i < like.Ntheta; i++) {
@@ -1218,7 +1772,7 @@ double xi_pm_tomo_fullsky(int pm, int nt, int ni, int nj) {
   }
 }
 
-double w_gamma_t_tomo_fullsky(int nt, int ni, int nj) {
+double w_gs_tomo_fullsky(int nt, int ni, int nj) {
   static double **Pl =0;
   static double *w_vec =0;
   static cosmopara C;
@@ -1264,20 +1818,20 @@ double w_gamma_t_tomo_fullsky(int nt, int ni, int nj) {
     }
   }
   if (recompute_ggl(C,G,N,ni)) {
-    C_tomo_pointer C_gl_pointer = &C_gl_tomo;
+    C_tomo_pointer C_pointer = &C_gs_tomo;
     if (like.IA == 3 || like.IA == 4) {
-      C_gl_pointer = &C_ggl_IA_tab;
+      C_pointer = &C_gs_tomo_withIA;
     }
     // COCOA: FROM TATT EXPERIENCE, WE CANT OPENMP HERE (POSSIBLE RACE)
     for (int nz = 0; nz <tomo.ggl_Npowerspectra; nz++) {
       double *Cl = calloc(LMAX, sizeof(double));
       {
         const int l = 1;
-        Cl[l] = C_ggl_IA_tab(1.0*l, ZL(nz), ZS(nz));
+        Cl[l] = C_pointer(1.0*l, ZL(nz), ZS(nz));
       }
       #pragma omp parallel for
       for (int l = 2; l < LMAX; l++) {
-        Cl[l] = C_ggl_IA_tab(1.0*l, ZL(nz), ZS(nz));
+        Cl[l] = C_pointer(1.0*l, ZL(nz), ZS(nz));
       }
       #pragma omp parallel for
       for (int i = 0; i < like.Ntheta; i++) {
@@ -1295,7 +1849,7 @@ double w_gamma_t_tomo_fullsky(int nt, int ni, int nj) {
   return w_vec[N_ggl(ni,nj)*like.Ntheta + nt];
 }
 
-double w_tomo_fullsky(int nt, int ni, int nj) {
+double w_gg_tomo_fullsky(int nt, int ni, int nj) {
 	static double **Pl = 0;
 	static double *w_vec = 0;
 	static cosmopara C;
@@ -1344,21 +1898,21 @@ double w_tomo_fullsky(int nt, int ni, int nj) {
 			double *Cl = calloc(LMAX, sizeof(double));
 			{
         int l = 1;
-        Cl[l] = C_cl_tomo_nointerp(l, nz, nz);
+        Cl[l] = C_gg_tomo_nointerp(l, nz, nz);
         l = 2; // just to be on the safe side (race condition) (l=1 just zero?)
-        Cl[l] = C_cl_tomo_nointerp(l, nz, nz);
+        Cl[l] = C_gg_tomo_nointerp(l, nz, nz);
       }
       #pragma omp parallel for
       for (int l = 3; l < LMIN_tab; l++) {
-        Cl[l] = C_cl_tomo_nointerp(l, nz, nz);
+        Cl[l] = C_gg_tomo_nointerp(l, nz, nz);
       }
  			{
         const int l = LMIN_tab;
-        C_cl_tomo(1.0*l, nz, nz);
+        C_gg_tomo(1.0*l, nz, nz);
       }
       #pragma omp parallel for
       for (int l = LMIN_tab + 1; l < LMAX; l++) {
-        C_cl_tomo(1.0*l, nz, nz);
+        C_gg_tomo(1.0*l, nz, nz);
       }
 			#pragma omp parallel for
 			for (int i = 0; i < like.Ntheta; i++) {
@@ -1557,7 +2111,7 @@ double int_for_C_gl_lin(double a, void *params) {
   return res*p_lin(k,a);
 }
 
-double int_for_C_gl_IA_lin(double a, void *params) {
+double int_for_C_gl_withIA_lin(double a, void *params) {
   double *ar = (double *) params;
 
   struct chis chidchi = chi_all(a);
@@ -1746,28 +2300,28 @@ int ni) {
 // ----------------------------------------------------------------------------
 
 //galaxy clustering power spectrum of galaxy bins ni, nj
-double C_gl_lin_nointerp(double l, int ni, int nj)
+double C_gs_lin_nointerp(double l, int ni, int nj)
 {
   double array[3] = {1.0*ni,1.0*nj,l};
   return int_gsl_integrate_medium_precision(int_for_C_gl_lin,(void*)array,amin_lens(ni),amax_lens(ni),NULL,1000);
 }
 
 //galaxy clustering power spectrum of galaxy bins ni, nj
-double C_gl_lin_IA_nointerp(double l, int ni, int nj)
+double C_gs_lin_withIA_nointerp(double l, int ni, int nj)
 {
   double array[3] = {1.0*ni,1.0*nj,l};
-  return int_gsl_integrate_medium_precision(int_for_C_gl_IA_lin,(void*)array,amin_lens(ni),0.9999,NULL,1000);
+  return int_gsl_integrate_medium_precision(int_for_C_gl_withIA_lin,(void*)array,amin_lens(ni),0.9999,NULL,1000);
 }
 
 // galaxy clustering power spectrum of galaxy bins ni, nj
-double C_cl_lin_nointerp(double l, int ni, int nj) {
+double C_gg_lin_nointerp(double l, int ni, int nj) {
   double array[3] = {1.0 * ni, 1.0 * nj, l};
   return int_gsl_integrate_low_precision(int_for_C_cl_lin, (void *)array,
                 fmax(amin_lens(ni), amin_lens(nj)), 0.99999, NULL, 1000);
 }
 
 // galaxy clustering power spectrum of galaxy bins ni, nj
-double C_cl_nl_rescaled_nointerp(double l, int ni, int nj) {
+double C_gg_nl_rescaled_nointerp(double l, int ni, int nj) {
   double array[3] = {1.0 * ni, 1.0 * nj, l};
   return int_gsl_integrate_low_precision(int_for_C_cl_nl_rescale,
     (void *)array, fmax(amin_lens(ni), amin_lens(nj)), 0.99999, NULL, 1000);
@@ -1930,8 +2484,8 @@ double tolerance) {
         cl_temp += tmp[j];
       }
       Cl[ell_ar[i]] = cl_temp * dlnk * 2. / M_PI +
-                      C_cl_tomo_nointerp(1. * ell_ar[i], ni, nj) -
-                      C_cl_lin_nointerp(1. * ell_ar[i], ni, nj);
+                      C_gg_tomo_nointerp(1. * ell_ar[i], ni, nj) -
+                      C_gg_lin_nointerp(1. * ell_ar[i], ni, nj);
     }
     #pragma omp parallel for
     for (int i = 1; i < Nell_block; i++) {
@@ -1947,20 +2501,20 @@ double tolerance) {
         }
       }
       Cl[ell_ar[i]] = cl_temp * dlnk * 2. / M_PI +
-                      C_cl_tomo_nointerp(1. * ell_ar[i], ni, nj) -
-                      C_cl_lin_nointerp(1. * ell_ar[i], ni, nj);
+                      C_gg_tomo_nointerp(1. * ell_ar[i], ni, nj) -
+                      C_gg_lin_nointerp(1. * ell_ar[i], ni, nj);
     }
 
     i_block++;
     L = i_block * Nell_block - 1;
-    dev = Cl[L] / C_cl_tomo_nointerp((double)L, ni, nj) - 1.;
+    dev = Cl[L] / C_gg_tomo_nointerp((double)L, ni, nj) - 1.;
   }
   L++;
 
-  Cl[L] = C_cl_tomo((double)L, ni, nj);
+  Cl[L] = C_gg_tomo((double)L, ni, nj);
   #pragma omp parallel for
   for (int l = L+1; l < LMAX; l++) {
-    Cl[l] = C_cl_tomo((double)l, ni, nj);
+    Cl[l] = C_gg_tomo((double)l, ni, nj);
   }
 }
 
@@ -2000,10 +2554,7 @@ void C_gl_mixed(int L, int LMAX, int nl, int ns, double *Cl, double dev, double 
   double f1_chi_ar[Nchi], f1_chi_RSD_ar[Nchi], f1_chi_Mag_ar[Nchi];
   double f2_chi_ar[Nchi], f2_chi_IA_ar[Nchi];
 
-  // double f2_chi_temp[Nchi];
-
   double chi_min = 10., chi_max = 7000.;
-  // double chi_min = 6., chi_max = 6000.;
 
   double dlnchi = log(chi_max/chi_min) / (Nchi - 1.);
   double dlnk = dlnchi;
@@ -2089,39 +2640,40 @@ void C_gl_mixed(int L, int LMAX, int nl, int ns, double *Cl, double dev, double 
         k1_cH0 = k1_ar[i][j] * real_coverH0;
         cl_temp += (Fk1_ar[i][j])*(Fk2_ar[i][j]) *k1_cH0*k1_cH0*k1_cH0 *p_lin(k1_cH0,1.0);
       }
-      Cl[ell_ar[i]] = cl_temp * dlnk * 2./M_PI + C_ggl_IA(1.*ell_ar[i],nl,ns) - C_gl_lin_IA_nointerp(1.*ell_ar[i],nl,ns);
-      dev = Cl[ell_ar[i]]/C_ggl_IA(1.0*ell_ar[i],nl,ns)-1.;
+      Cl[ell_ar[i]] = cl_temp * dlnk * 2./M_PI + C_gs_tomo_withIA_nointerp(1.*ell_ar[i],nl,ns) - C_gs_lin_withIA_nointerp(1.*ell_ar[i],nl,ns);
+      dev = Cl[ell_ar[i]]/C_gs_tomo_withIA_nointerp(1.0*ell_ar[i],nl,ns)-1.;
     }
 
     i_block++;
     L = i_block*Nell_block -1 ;
-    dev = Cl[L]/C_ggl_IA(1.0*L,nl,ns)-1.;
+    dev = Cl[L]/C_gs_tomo_withIA_nointerp(1.0*L,nl,ns)-1.;
   }
   L++;
 
 
   for (l = L; l < LMAX; l++){
-    // Cl[l]=C_gl_tomo((double)l,nl,ns);
-    Cl[l]=C_ggl_IA_tab((double)l,nl,ns);
+    Cl[l] = C_gs_tomo_withIA((double)l,nl,ns);
   }
   // printf("finished bin %d %d\n", nl,ns);
   for(i=0;i<Nell_block;i++) {
-    free(k1_ar[i]);free(k2_ar[i]);
-    free(Fk1_ar[i]);free(Fk2_ar[i]);
+    free(k1_ar[i]);
+    free(k2_ar[i]);
+    free(Fk1_ar[i]);
+    free(Fk2_ar[i]);
     free(Fk1_Mag_ar[i]);
   }
-  free(k1_ar);free(k2_ar);
-  free(Fk1_ar);free(Fk2_ar);
+  free(k1_ar);
+  free(k2_ar);
+  free(Fk1_ar);
+  free(Fk2_ar);
   free(Fk1_Mag_ar);
-  // fclose(OUT);
-  // exit(0);
 }
 
 // ---------------------------------------------------------------------------
 // Angular Functions (real Space)
 // ---------------------------------------------------------------------------
 
-double w_gamma_t_fullsky_nonLimber(int nt, int ni, int nj) {
+double w_gs_fullsky_nonlimber(int nt, int ni, int nj) {
   // if(1) return 0.;
   static int LMAX = 100000;
   static int NTHETA = 0;
@@ -2135,7 +2687,7 @@ double w_gamma_t_fullsky_nonLimber(int nt, int ni, int nj) {
   if (like.Ntheta ==0){
     printf("cosmo2D_fullsky.c:w_gamma_t_tomo: like.Ntheta not initialized\nEXIT\n"); exit(1);
   }
-  if (Pl ==0){
+  if (Pl ==0) {
     Pl =create_double_matrix(0, like.Ntheta-1, 0, LMAX-1);
     Cl = create_double_vector(0,LMAX-1);
     w_vec = create_double_vector(0,tomo.ggl_Npowerspectra*like.Ntheta-1);
@@ -2145,32 +2697,25 @@ double w_gamma_t_fullsky_nonLimber(int nt, int ni, int nj) {
     xmax= create_double_vector(0, like.Ntheta-1);
     double logdt=(log(like.vtmax)-log(like.vtmin))/like.Ntheta;
 
-    // double *xmid, *Pmid;
     double mythetamin, mythetamax;
-    // xmid= create_double_vector(0, like.Ntheta-1);
-    // Pmid= create_double_vector(0, LMAX+1);
     for(i=0; i<like.Ntheta ; i++){
       mythetamin = exp(log(like.vtmin)+(i+0.0)*logdt);
       mythetamax = exp(log(like.vtmin)+(i+1.0)*logdt);
       xmin[i]=cos(mythetamin);
       xmax[i]=cos(mythetamax);
-      // xmid[i]= (2./3.) * (pow(thetamax,3) - pow(thetamin,3)) / (thetamax*thetamax - thetamin*thetamin);
     }
     Pmin= create_double_vector(0, LMAX+1);
       Pmax= create_double_vector(0, LMAX+1);
 
     for (i = 0; i<NTHETA; i ++){
-      // printf("Tabulating Legendre coefficients %d/%d\n",i+1, NTHETA);
       gsl_sf_legendre_Pl_array(LMAX, xmin[i],Pmin);
       gsl_sf_legendre_Pl_array(LMAX, xmax[i],Pmax);
-        // gsl_sf_legendre_Pl_array(LMAX, xmid[i],Pmid);
       for (int l = 2; l < LMAX; l ++){
         // Pl[i][l] = (2.*l+1)/(4.*M_PI*l*(l+1))*gsl_sf_legendre_Plm(l,2,cos(like.theta[i]));
         Pl[i][l] = (2.*l+1)/(4.*M_PI*l*(l+1)*(xmin[i]-xmax[i]))
         *((l+2./(2*l+1.))*(Pmin[l-1]-Pmax[l-1])
         +(2-l)*(xmin[i]*Pmin[l]-xmax[i]*Pmax[l])
         -2./(2*l+1.)*(Pmin[l+1]-Pmax[l]));
-        // Pl[i][l] = (2.*l+1)/(4.*M_PI*l*(l+1))*Pmid[l]*Pmid[l];
       }
     }
     free_double_vector(xmin,0,like.Ntheta-1);
@@ -2183,10 +2728,6 @@ double w_gamma_t_fullsky_nonLimber(int nt, int ni, int nj) {
     double tolerance= 0.01;
     //dev will be the actual difference between exact and Limber calcuation
     double dev;
-
-    // if (like.IA != 0 && like.IA != 3 && like.IA != 4){printf("cosmo2D_real.c: w_gamma_t_tomo does not support like.IA = %d yet\nEXIT!\n",like.IA); exit(1);}
-    // C_tomo_pointer C_gl_pointer = &C_gl_tomo;
-    // if (like.IA ==3 || like.IA ==4) C_gl_pointer = &C_ggl_IA_tab;
 
     for (nz = 0; nz <tomo.ggl_Npowerspectra; nz ++){
       int L = 1;
@@ -2207,7 +2748,7 @@ double w_gamma_t_fullsky_nonLimber(int nt, int ni, int nj) {
   return w_vec[N_ggl(ni,nj)*like.Ntheta+nt];
 }
 
-double w_tomo_fullsky_nonLimber(int nt, int ni, int nj) {
+double w_gg_tomo_fullsky_nonlimber(int nt, int ni, int nj) {
   static int LMAX = 100000;
   static double **Pl = 0;
   static double *w_vec = 0;

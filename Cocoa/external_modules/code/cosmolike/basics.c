@@ -406,6 +406,33 @@ double interpol2d_fitslope(double **f, int nx, double ax, double bx, double dx,
          dt * (1. - ds) * f[i + 1][j] + dt * ds * f[i + 1][j + 1];
 }
 
+void hankel_kernel_FT(double x, fftw_complex *res, double *arg,
+int argc __attribute__((unused))) {
+  fftw_complex a1, a2, g1, g2;
+
+  // arguments for complex gamma
+  const double q = arg[0];
+  const int mu = (int)(arg[1] + 0.1);
+  a1[0] = 0.5 * (1.0 + mu + q);
+  a2[0] = 0.5 * (1.0 + mu - q);
+  a1[1] = 0.5 * x;
+  a2[1] = -a1[1];
+
+  cdgamma(a1, &g1);
+  cdgamma(a2, &g2);
+
+  const double xln2 = x * constants.ln2;
+  const double si = sin(xln2);
+  const double co = cos(xln2);
+  const double d1 = g1[0] * g2[0] + g1[1] * g2[1]; /* Re */
+  const double d2 = g1[1] * g2[0] - g1[0] * g2[1]; /* Im */
+  const double mod = g2[0] * g2[0] + g2[1] * g2[1];
+  const double pref = exp(constants.ln2 * q) / mod;
+
+  (*res)[0] = pref * (co * d1 - si * d2);
+  (*res)[1] = pref * (si * d1 + co * d2);
+}
+
 void cdgamma(fftw_complex x, fftw_complex *res) {
   double xr, xi, wr, wi, ur, ui, vr, vi, yr, yi, t;
 

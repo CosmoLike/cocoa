@@ -38,10 +38,11 @@ void cfftlog(double *x, double *fx, long N, config *config, int ell, double *y, 
 		case 2: g_l_2_cfft((double)ell, config->nu, eta_m, gl, halfN+1); break;
 		default: printf("Integral Not Supported! Please choose config->derivative from [0,1,2].\n");
 	}
-	// printf("g2[0]: %.15e+I*(%.15e)\n", creal(g2[0]),cimag(g2[0]));
 
 	// calculate y arrays
-	for(i=0; i<N_original; i++) {y[i] = (ell+1.) / x[N_original-1-i];}
+	for(i=0; i<N_original; i++) {
+		y[i] = (ell+1.) / x[N_original-1-i];
+	}
 	y0 = y[0];
 
 	// biased input func
@@ -63,14 +64,12 @@ void cfftlog(double *x, double *fx, long N, config *config, int ell, double *y, 
 	fftw_execute(plan_forward);
 
 	c_window_cfft(out, config->c_window_width, halfN);
-	// printf("out[1]:%.15e+i*(%.15e)\n", creal(out[1]), cimag(out[1]));
 
 	for(i=0; i<=halfN; i++) {
 		out[i] *= cpow(x0*y0/exp(2*N_pad*dlnx), -I*eta_m[i]) * gl[i] ;
 		out[i] = conj(out[i]);
 	}
 
-	// printf("out[1]:%.15e+i*(%.15e)\n", creal(out[1]), cimag(out[1]));
 	double *out_ifft;
 	out_ifft = malloc(sizeof(double) * N );
 	plan_backward = fftw_plan_dft_c2r_1d(N, out, out_ifft, FFTW_ESTIMATE);
@@ -301,8 +300,9 @@ void cfftlog_ells_increment(double *x, double *fx, long N, config *config, int* 
 	fftw_plan* plan_backward = malloc(sizeof(fftw_plan*) * Nell);
 	for(int j=0; j<Nell; j++) {
 		out_ifft[j] = malloc(sizeof(double) * N);
-		out_vary[j] = (fftw_complex*) fftw_malloc(sizeof(fftw_complex) * (halfN+1) );
-		plan_backward[j] = fftw_plan_dft_c2r_1d(N, out_vary[j], out_ifft[j], FFTW_ESTIMATE);
+		out_vary[j] = (fftw_complex*) fftw_malloc(sizeof(fftw_complex)*(halfN+1));
+		plan_backward[j] =
+			fftw_plan_dft_c2r_1d(N, out_vary[j], out_ifft[j], FFTW_ESTIMATE);
 	}
 
 	#pragma omp parallel for
@@ -322,13 +322,15 @@ void cfftlog_ells_increment(double *x, double *fx, long N, config *config, int* 
 		const double y0 = y[j][0];
 
 		for(int i=0; i<=halfN; i++) {
-			out_vary[j][i] = conj(out[i] * cpow(x0*y0/exp((N-N_original)*dlnx), -I*eta_m[i]) * gl[i]) ;
+			out_vary[j][i] =
+			conj(out[i] * cpow(x0*y0/exp((N-N_original)*dlnx), -I*eta_m[i]) * gl[i]);
 		}
 
 		fftw_execute(plan_backward[j]);
 
 		for(int i=0; i<N_original; i++) {
-			Fy[j][i] += out_ifft[j][i+N_pad+N_extrap_high] * sqrt(M_PI) / (4.*N * pow(y[j][i], config->nu));
+			Fy[j][i] += out_ifft[j][i+N_pad+N_extrap_high] * sqrt(M_PI) /
+				(4.*N * pow(y[j][i], config->nu));
 		}
 	}
 

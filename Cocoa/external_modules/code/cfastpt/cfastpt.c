@@ -128,7 +128,7 @@ void J_abl_ar(double *x, double *fx, long N, int *alpha, int *beta, int *ell, in
 
 	double **out_ifft = malloc(sizeof(double*) * Nterms);
 	fftw_complex **out_vary = malloc(sizeof(fftw_complex*) * Nterms);
-	fftw_plan* plan_backward = malloc(sizeof(fftw_plan*) * Nterms);
+	fftw_plan* plan_backward = malloc(sizeof(fftw_plan) * Nterms);
 
 	for(int i_term=0;i_term<Nterms;i_term++) {
 		out_ifft[i_term] = malloc(sizeof(double) * (2*N) );
@@ -148,9 +148,9 @@ void J_abl_ar(double *x, double *fx, long N, int *alpha, int *beta, int *ell, in
 	fftw_complex **a1 = malloc(sizeof(fftw_complex*) * Nterms);
 	fftw_complex **b1 = malloc(sizeof(fftw_complex*) * Nterms);
 	fftw_complex **c = malloc(sizeof(fftw_complex*) * Nterms);
-	fftw_plan* pa = malloc(sizeof(fftw_plan*) * Nterms);
-	fftw_plan* pb = malloc(sizeof(fftw_plan*) * Nterms);
-	fftw_plan* pc = malloc(sizeof(fftw_plan*) * Nterms);
+	fftw_plan* pa = malloc(sizeof(fftw_plan) * Nterms);
+	fftw_plan* pb = malloc(sizeof(fftw_plan) * Nterms);
+	fftw_plan* pc = malloc(sizeof(fftw_plan) * Nterms);
 
 	long Ntotal_convolve;
 	if(N%2==0) { // N+1 is odd
@@ -269,7 +269,10 @@ void J_abl_ar(double *x, double *fx, long N, int *alpha, int *beta, int *ell, in
 	free(pc);
 }
 
-void fastpt_tensor(int *alpha_ar, int *beta_ar, int *J1_ar, int *J2_ar, int *Jk_ar, double *coeff_AB_ar, int Nterms, double *Pout, double *k, double *Pin, int Nk){
+void fastpt_tensor(int *alpha_ar, int *beta_ar, int *J1_ar, int *J2_ar,
+int *Jk_ar, double *coeff_AB_ar, int Nterms, double *Pout, double *k,
+double *Pin, int Nk)
+{
 	double **Fy;
 	Fy = malloc(sizeof(double*) * Nterms);
 	for(int i=0;i<Nterms;i++) {
@@ -295,7 +298,8 @@ void fastpt_tensor(int *alpha_ar, int *beta_ar, int *J1_ar, int *J2_ar, int *Jk_
 	free(Fy);
 }
 
-void J_abJ1J2Jk_ar(double *x, double *fx, long N, int *alpha, int *beta, int *J1, int *J2, int *Jk, int Nterms, fastpt_config *config, double **Fy) {
+void J_abJ1J2Jk_ar(double *x, double *fx, long N, int *alpha, int *beta,
+int *J1, int *J2, int *Jk, int Nterms, fastpt_config *config, double **Fy) {
 	// x: k array, fx: Pin array
 
 	const long N_original = N;
@@ -379,65 +383,78 @@ void J_abJ1J2Jk_ar(double *x, double *fx, long N, int *alpha, int *beta, int *J1
 		}
 	}
 
-	double **fb1 = malloc(sizeof(double*) * Nterms);
-	double **fb2 = malloc(sizeof(double*) * Nterms);
-	double **out_ifft = malloc(sizeof(double*) * Nterms);
-
-	fftw_complex **out = malloc(sizeof(fftw_complex*) * Nterms);
-	fftw_complex **out2 = malloc(sizeof(fftw_complex*) * Nterms);
-	fftw_complex **out_vary = malloc(sizeof(fftw_complex*) * Nterms);
-
-	fftw_plan* plan_forward = malloc(sizeof(fftw_plan*) * Nterms);
-	fftw_plan* plan_forward2 = malloc(sizeof(fftw_plan*) * Nterms);
-	fftw_plan* plan_backward = malloc(sizeof(fftw_plan*) * Nterms);
+	double **fb1 = (double**) malloc(sizeof(double*)*Nterms);
+	double **fb2 = (double**) malloc(sizeof(double*)*Nterms);
+	double **out_ifft = (double**) malloc(sizeof(double*)*Nterms);
+	fftw_complex **out = (fftw_complex**) malloc(sizeof(fftw_complex*)*Nterms);
+	fftw_complex **out2 = (fftw_complex**) malloc(sizeof(fftw_complex*)*Nterms);
+	fftw_complex **out_vary = (fftw_complex**) malloc(sizeof(fftw_complex*)*Nterms);
+	fftw_plan* plan_forward = (fftw_plan*) malloc(sizeof(fftw_plan)*Nterms);
+	fftw_plan* plan_forward2 = (fftw_plan*) malloc(sizeof(fftw_plan)*Nterms);
+	fftw_plan* plan_backward = (fftw_plan*) malloc(sizeof(fftw_plan)*Nterms);
 
 	for(int i_term=0; i_term<Nterms; i_term++) {
-		fb1[i_term] = malloc(N * sizeof(double));
-		fb2[i_term] = malloc(N * sizeof(double));
-		out_ifft[i_term] = malloc(sizeof(double) * (2*N) );
+		fb1[i_term] = (double*) malloc(N * sizeof(double));
+		fb2[i_term] = (double*) malloc(N * sizeof(double));
+		out_ifft[i_term] = (double*) malloc(sizeof(double) * (2*N) );
 		out[i_term] = (fftw_complex*) fftw_malloc(sizeof(fftw_complex) * (halfN+1) );
 		out2[i_term] = (fftw_complex*) fftw_malloc(sizeof(fftw_complex) * (halfN+1) );
 		out_vary[i_term] = (fftw_complex*) fftw_malloc(sizeof(fftw_complex) * (N+1) );
-		plan_forward[i_term] = fftw_plan_dft_r2c_1d(N, fb1[i_term], out[i_term], FFTW_ESTIMATE);
-		plan_forward2[i_term] = fftw_plan_dft_r2c_1d(N, fb2[i_term], out2[i_term], FFTW_ESTIMATE);
-		plan_backward[i_term] = fftw_plan_dft_c2r_1d(2*N, out_vary[i_term], out_ifft[i_term], FFTW_ESTIMATE);
+		plan_forward[i_term] =
+			fftw_plan_dft_r2c_1d(N, fb1[i_term], out[i_term], FFTW_ESTIMATE);
+		plan_forward2[i_term] =
+			fftw_plan_dft_r2c_1d(N, fb2[i_term], out2[i_term], FFTW_ESTIMATE);
+		plan_backward[i_term] = fftw_plan_dft_c2r_1d(2*N, out_vary[i_term],
+			out_ifft[i_term], FFTW_ESTIMATE);
 	}
 
 	double tau_l[N+1];
-	for(long i=0; i<=N; i++){
-		tau_l[i] = 2.*M_PI / dlnx / N * i; // add minus sign convenient for getting fz from g_m_vals
+	for(long i=0; i<=N; i++) {
+		// add minus sign convenient for getting fz from g_m_vals
+		tau_l[i] = 2.*M_PI / dlnx / N * i;
 	}
 
-	fftw_complex **a = malloc(sizeof(fftw_complex*) * Nterms);
-	fftw_complex **b = malloc(sizeof(fftw_complex*) * Nterms);
-	fftw_complex **a1 = malloc(sizeof(fftw_complex*) * Nterms);
-	fftw_complex **b1 = malloc(sizeof(fftw_complex*) * Nterms);
-	fftw_complex **c = malloc(sizeof(fftw_complex*) * Nterms);
-	fftw_plan* pa = malloc(sizeof(fftw_plan*) * Nterms);
-	fftw_plan* pb = malloc(sizeof(fftw_plan*) * Nterms);
-	fftw_plan* pc = malloc(sizeof(fftw_plan*) * Nterms);
+	fftw_complex **a = (fftw_complex**) malloc(sizeof(fftw_complex*)*Nterms);
+	fftw_complex **b = (fftw_complex**) malloc(sizeof(fftw_complex*)*Nterms);
+	fftw_complex **a1 = (fftw_complex**) malloc(sizeof(fftw_complex*)*Nterms);
+	fftw_complex **b1 = (fftw_complex**) malloc(sizeof(fftw_complex*)*Nterms);
+	fftw_complex **c = (fftw_complex**) malloc(sizeof(fftw_complex*)*Nterms);
+	fftw_plan* pa = (fftw_plan*) malloc(sizeof(fftw_plan)*Nterms);
+	fftw_plan* pb = (fftw_plan*) malloc(sizeof(fftw_plan)*Nterms);
+	fftw_plan* pc = (fftw_plan*) malloc(sizeof(fftw_plan)*Nterms);
 
 	long Ntotal_convolve;
 	if(N%2==0) { // N+1 is odd
 		Ntotal_convolve = 2*N + 1;
 	} else {
-		log_fatal("J_abJ1J2Jk_ar: This fftconvolve doesn't support even size input arrays (of out_pad1, outpad2)");
+		log_fatal("J_abJ1J2Jk_ar: This fftconvolve doesn't support even size input"
+			" arrays (of out_pad1, outpad2)");
 		exit(1);
 	}
 
 	for(int i_term=0;i_term<Nterms;i_term++) {
-			a[i_term] = (fftw_complex*) fftw_malloc(sizeof(fftw_complex) * Ntotal_convolve );
-			b[i_term] = (fftw_complex*) fftw_malloc(sizeof(fftw_complex) * Ntotal_convolve );
-			a1[i_term] = (fftw_complex*) fftw_malloc(sizeof(fftw_complex) * Ntotal_convolve );
-			b1[i_term] = (fftw_complex*) fftw_malloc(sizeof(fftw_complex) * Ntotal_convolve );
-			c[i_term] = (fftw_complex*) fftw_malloc(sizeof(fftw_complex) * Ntotal_convolve );
-			pa[i_term] = fftw_plan_dft_1d(Ntotal_convolve, a[i_term], a1[i_term], FFTW_FORWARD, FFTW_ESTIMATE);
-			pb[i_term] = fftw_plan_dft_1d(Ntotal_convolve, b[i_term], b1[i_term], FFTW_FORWARD, FFTW_ESTIMATE);
-			pc[i_term] = fftw_plan_dft_1d(Ntotal_convolve, a1[i_term], c[i_term], FFTW_BACKWARD, FFTW_ESTIMATE);
+			a[i_term] =
+				(fftw_complex*) fftw_malloc(sizeof(fftw_complex)*Ntotal_convolve);
+			b[i_term] =
+				(fftw_complex*) fftw_malloc(sizeof(fftw_complex)*Ntotal_convolve);
+			a1[i_term] =
+				(fftw_complex*) fftw_malloc(sizeof(fftw_complex)*Ntotal_convolve);
+			b1[i_term] =
+				(fftw_complex*) fftw_malloc(sizeof(fftw_complex)*Ntotal_convolve);
+			c[i_term] =
+				(fftw_complex*) fftw_malloc(sizeof(fftw_complex)*Ntotal_convolve);
+			pa[i_term] = fftw_plan_dft_1d(Ntotal_convolve, a[i_term], a1[i_term],
+				FFTW_FORWARD, FFTW_ESTIMATE);
+			pb[i_term] = fftw_plan_dft_1d(Ntotal_convolve, b[i_term], b1[i_term],
+				FFTW_FORWARD, FFTW_ESTIMATE);
+			pc[i_term] = fftw_plan_dft_1d(Ntotal_convolve, a1[i_term], c[i_term],
+				FFTW_BACKWARD, FFTW_ESTIMATE);
 	}
 
-	fftw_complex** out_pad1 = (fftw_complex**) fftw_malloc(sizeof(fftw_complex*) * Nterms);
-	fftw_complex** out_pad2 = (fftw_complex**) fftw_malloc(sizeof(fftw_complex*) * Nterms);
+	fftw_complex** out_pad1 =
+		(fftw_complex**) fftw_malloc(sizeof(fftw_complex*) * Nterms);
+	fftw_complex** out_pad2 =
+		(fftw_complex**) fftw_malloc(sizeof(fftw_complex*) * Nterms);
 
 	#pragma omp parallel for
 	for(int i_term=0; i_term<Nterms; i_term++) {
@@ -456,8 +473,8 @@ void J_abJ1J2Jk_ar(double *x, double *fx, long N, int *alpha, int *beta, int *J1
 		c_window(out[i_term], config->c_window_width, halfN);
 		c_window(out2[i_term], config->c_window_width, halfN);
 
-		out_pad1[i_term] = (fftw_complex*) fftw_malloc(sizeof(fftw_complex) * (N+1) );
-		out_pad2[i_term] = (fftw_complex*) fftw_malloc(sizeof(fftw_complex) * (N+1) );
+		out_pad1[i_term] = (fftw_complex*) fftw_malloc(sizeof(fftw_complex)*(N+1));
+		out_pad2[i_term] = (fftw_complex*) fftw_malloc(sizeof(fftw_complex)*(N+1));
 
 		// Do convolutions
 		for(long i=0; i<=halfN; i++) {

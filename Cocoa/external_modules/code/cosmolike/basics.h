@@ -92,18 +92,16 @@ extern Ntab Ntable;
 void SVD_inversion(gsl_matrix *cov, gsl_matrix *inverseSVD, int Nmatrix);
 
 double interpol2d(double **f, int nx, double ax, double bx, double dx, double x,
-                  int ny, double ay, double by, double dy, double y,
-                  double lower, double upper);
+  int ny, double ay, double by, double dy, double y, double lower, double upper);
 
 double interpol2d_fitslope(double **f, int nx, double ax, double bx, double dx,
-                           double x, int ny, double ay, double by, double dy,
-                           double y, double lower);
+  double x, int ny, double ay, double by, double dy, double y, double lower);
 
 double interpol(double *f, int n, double a, double b, double dx, double x,
-                double lower, double upper);
+  double lower, double upper);
 
 double interpol_fitslope(double *f, int n, double a, double b, double dx,
-                         double x, double lower);
+  double x, double lower);
 
 void free_double_vector(double *v, long nl, long nh);
 
@@ -121,20 +119,20 @@ int line_count(char *filename);
 
 void error(char *s);
 
+void hankel_kernel_FT(double x, fftw_complex *res, double *arg,
+int argc __attribute__((unused)));
+
 void cdgamma(fftw_complex x, fftw_complex *res);
 
 
 double int_gsl_integrate_high_precision(double (*func)(double, void *),
-                                        void *arg, double a, double b,
-                                        double *error, int niter);
+  void *arg, double a, double b, double *error, int niter);
 
 double int_gsl_integrate_medium_precision(double (*func)(double, void *),
-                                          void *arg, double a, double b,
-                                          double *error, int niter);
+  void *arg, double a, double b, double *error, int niter);
 
 double int_gsl_integrate_low_precision(double (*func)(double, void *),
-                                       void *arg, double a, double b,
-                                       double *error, int niter);
+  void *arg, double a, double b, double *error, int niter);
 
 void invert_matrix_colesky(gsl_matrix *A);
 
