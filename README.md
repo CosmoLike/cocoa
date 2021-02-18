@@ -18,7 +18,7 @@ If you want to use cocoa on your Mac OS system, we recommend using the Docker in
 
 If you want to use Docker on HPCs please go here [Docker Installation Part II: Further Information for HPC Systems](https://github.com/CosmoLike/cocoa/blob/master/README.md#docker-installation-part-ii-further-information-for-hpc-systems).
 
-Below we detail non-Doocker, system specific installation. Please see appendices for prerequisites: [Prerequisites for MacOS (System Installation)](https://github.com/CosmoLike/cocoa#prerequisites-for-macos-system-installation) and [Prerequisites for Linux (System Installation)](https://github.com/CosmoLike/cocoa#prerequisites-for-linux-system-installation).
+Below we detail non-Docker, system specific installation. Please see appendices for prerequisites: [Prerequisites for MacOS (System Installation)](https://github.com/CosmoLike/cocoa#prerequisites-for-macos-system-installation) and [Prerequisites for Linux (System Installation)](https://github.com/CosmoLike/cocoa#prerequisites-for-linux-system-installation).
 
 ## Cloning the Repository
 
