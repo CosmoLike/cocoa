@@ -41,19 +41,13 @@ typedef struct {
 
 typedef struct {
   double a_min;
-  double k_min_mpc;
-  double k_max_mpc;
-  double k_max_mpc_class;
   double k_min_cH0;
   double k_max_cH0;
-  double P_2_s_min;
-  double P_2_s_max;
-  double xi_via_hankel_theta_min;
-  double xi_via_hankel_theta_max;
-  double xi_3d_rmin;
-  double xi_3d_rmax;
   double M_min;
   double M_max;
+  int LMIN_tab; // Cosmo2D
+  int LMAX; // Cosmo2D
+  int LMAX_NOLIMBER; // Cosmo2D
 } lim;
 
 typedef struct {
@@ -65,21 +59,8 @@ typedef struct {
   int N_thetaH;
   int N_S2;
   int N_DS;
-  int N_norm;
-  int N_r_3d;
-  int N_k_3d;
-  int N_a_halo;
+  int N_ell_TATT; // Cosmo2D
 } Ntab;
-
-typedef struct {
-  int ORDER;
-  double vt_max;
-  double vt_min;
-  double vt_bin_max;
-  double vt_bin_min;
-  int ni;
-  int nj;
-} cosebis;
 
 extern con constants;
 
@@ -89,7 +70,14 @@ extern lim limits;
 
 extern Ntab Ntable;
 
-void SVD_inversion(gsl_matrix *cov, gsl_matrix *inverseSVD, int Nmatrix);
+double int_gsl_integrate_high_precision(double (*func)(double, void *),
+  void *arg, double a, double b, double *error, int niter);
+
+double int_gsl_integrate_medium_precision(double (*func)(double, void *),
+  void *arg, double a, double b, double *error, int niter);
+
+double int_gsl_integrate_low_precision(double (*func)(double, void *),
+  void *arg, double a, double b, double *error, int niter);
 
 double interpol2d(double **f, int nx, double ax, double bx, double dx, double x,
   int ny, double ay, double by, double dy, double y, double lower, double upper);
@@ -105,10 +93,6 @@ double interpol_fitslope(double *f, int n, double a, double b, double dx,
 
 void free_double_vector(double *v, long nl, long nh);
 
-long *long_vector(long nl, long nh);
-
-int *int_vector(long nl, long nh);
-
 double *create_double_vector(long nl, long nh);
 
 void free_double_matrix(double **m, long nrl, long nrh, long ncl, long nch);
@@ -123,18 +107,6 @@ void hankel_kernel_FT(double x, fftw_complex *res, double *arg,
 int argc __attribute__((unused)));
 
 void cdgamma(fftw_complex x, fftw_complex *res);
-
-
-double int_gsl_integrate_high_precision(double (*func)(double, void *),
-  void *arg, double a, double b, double *error, int niter);
-
-double int_gsl_integrate_medium_precision(double (*func)(double, void *),
-  void *arg, double a, double b, double *error, int niter);
-
-double int_gsl_integrate_low_precision(double (*func)(double, void *),
-  void *arg, double a, double b, double *error, int niter);
-
-void invert_matrix_colesky(gsl_matrix *A);
 
 #ifdef __cplusplus
 }

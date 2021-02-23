@@ -12,92 +12,96 @@ extern "C" {
 // ----------------------------------------------------------------------------
 // ----------------------------------------------------------------------------
 // ----------------------------------------------------------------------------
-// Limber Approximation
+// Correlation Functions (real Space) - Full Sky - bin average
 // ----------------------------------------------------------------------------
 // ----------------------------------------------------------------------------
 // ----------------------------------------------------------------------------
 
-// ----------------------------------------------------------------------------
-// Angular Power Spectra - no interpolation
-// ----------------------------------------------------------------------------
+// ss in real space has a special name
+double xi_pm_tomo(int pm, int nt, int ni, int nj, int limber);
 
-double C_ss_tomo_nointerp(double l, int ni, int nj);
+// gs in real space has a special name
+double w_gammat_tomo(int nt, int ni, int nj, int limber);
 
-double C_ss_tomo_withIA_nointerp(double s, int ni, int nj);
+double w_gg_tomo(int nt, int ni, int nj, int limber);
 
-double C_gs_tomo_nointerp(double l, int ni, int nj);
+double w_gk_tomo(int nt, int ni, int limber);
 
-double C_gs_tomo_withIA_nointerp(double s, int nl, int ns);
-
-double C_gg_tomo_nointerp(double l, int ni, int nj);
-
-double C_gk_tomo_nointerp(double l, int nl);
-
-double C_ks_tomo_nointerp(double l, int ns);
-
-double C_ks_tomo_withIA_nointerp(double s, int ni);
-
-double C_kk_nointerp(double l);
+double w_ks_tomo(int nt, int ni, int limber);
 
 // ----------------------------------------------------------------------------
-// Angular Power Spectra - with interpolation
 // ----------------------------------------------------------------------------
-
-double C_ss_tomo(double l, int ni, int nj);
-
-double C_ss_tomo_withIA(double l, int ni, int nj);
-
-double C_gs_tomo(double l, int ni, int nj);
-
-double C_gs_tomo_withIA(double l, int ni, int nj);
-
-double C_gg_tomo(double l, int ni, int nj);
-
-double C_gk_tomo(double l, int ni);
-
-double C_ks_tomo(double l, int ni);
-
-double C_kk(double l);
-
 // ----------------------------------------------------------------------------
 // Correlation Functions (real space) - flat sky
 // ----------------------------------------------------------------------------
-
-double xi_pm_tomo(int pm, double theta, int ni, int nj);
-
-double w_gs_tomo(double theta, int ni, int nj);
-
-double w_gg_tomo(double theta, int ni, int nj);
-
 // ----------------------------------------------------------------------------
-// Correlation Functions (real space) - full sky
 // ----------------------------------------------------------------------------
 
-double xi_pm_tomo_fullsky(int pm, int nt, int ni, int nj);
+// ss in real space has a special name
+double xi_pm_tomo_flatsky(int pm, double theta, int ni, int nj, int limber);
 
-double w_gs_tomo_fullsky(int nt, int ni, int nj);
+// gs in real space has a special name
+double w_gammat_tomo_flatsky(double theta, int ni, int nj, int limber);
 
-double w_gg_tomo_fullsky(int nt, int ni, int nj);
+double w_gg_tomo_flatsky(double theta, int ni, int nj, int limber);
 
-double w_gk_tomo_fullsky(int nt, int ni);
+double w_gk_tomo_flatsky(double theta, int ni, int limber);
 
-double w_ks_tomo_fullsky(int nt, int ni);
+double w_ks_tomo_flatsky(double theta, int ni, int limber);
 
 // ----------------------------------------------------------------------------
 // ----------------------------------------------------------------------------
 // ----------------------------------------------------------------------------
-// Non-Limber (+RSD)
+// Non Limber (Angular Power Spectrum)
 // ----------------------------------------------------------------------------
 // ----------------------------------------------------------------------------
 // ----------------------------------------------------------------------------
 
+// Mixture of non-Limber and Limber of C_cl (G-G lensing)
+void C_gl_mixed(int L, int LMAX, int nl, int ns, double *Cl, double dev,
+double tolerance);
+
+// Mixture of non-Limber and Limber of C_cl (galaxy clustering)
+void C_cl_mixed(int L, int LMAX, int ni, int nj, double *Cl, double dev,
+double tolerance);
+
 // ----------------------------------------------------------------------------
-// Correlation Functions (real space)
+// ----------------------------------------------------------------------------
+// ----------------------------------------------------------------------------
+// Limber Approximation (Angular Power Spectrum)
+// ----------------------------------------------------------------------------
+// ----------------------------------------------------------------------------
 // ----------------------------------------------------------------------------
 
-double w_gs_fullsky_nonlimber(int nt, int ni, int nj);
+double C_ss_tomo_TATT_EE_limber_nointerp(double l, int ni, int nj); // IA=(5||6)
+double C_ss_tomo_TATT_BB_limber_nointerp(double l, int ni, int nj); // IA=(5||6)
+double C_ss_tomo_TATT_EE_limber(double l, int ni, int nj); // IA=(5||6)
+double C_ss_tomo_TATT_BB_limber(double l, int ni, int nj); // IA=(5||6)
 
-double w_gg_tomo_fullsky_nonlimber(int nt, int ni, int nj);
+double C_ss_tomo_limber_nointerp(double l, int ni, int nj, int use_linear_ps);
+double C_ss_tomo_limber(double l, int ni, int nj); // IA=(0||3||4)
+
+// works with IA=(0||3||4||5||6)
+double C_gs_tomo_limber_nointerp(double l, int ni, int nj, int use_linear_ps);
+
+// works with IA=(0||3||4||5||6)
+double C_gs_tomo_limber(double l, int ni, int nj);
+
+// ----------------------------------------------------------------------------
+// All functions below can run w/ like.IA=0 || like.IA=3 || like.IA=4
+// ----------------------------------------------------------------------------
+
+double C_gg_tomo_limber_nointerp(double l, int ni, int nj, int use_linear_ps);
+double C_gg_tomo_limber(double l, int ni, int nj);
+
+double C_gk_tomo_limber_nointerp(double l, int nl, int use_linear_ps);
+double C_gk_tomo_limber(double l, int ni);
+
+double C_ks_tomo_limber_nointerp(double l, int ns, int use_linear_ps);
+double C_ks_tomo_limber(double l, int ni);
+
+double C_kk_limber_nointerp(double l, int use_linear_ps);
+double C_kk_limber(double l);
 
 #ifdef __cplusplus
 }

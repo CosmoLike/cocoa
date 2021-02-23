@@ -25,87 +25,43 @@
 #include "log.c/src/log.h"
 
 con constants = {
-    3.14159265358979323846, // pi
-    9.86960440108935861883, // pisqr
-    6.28318530717958647693, // twopi
-    0.69314718,
-    2.90888208665721580e-4, // arcmin
-    299792.458              // speed of light km/s
+  3.14159265358979323846, // pi
+  9.86960440108935861883, // pisqr
+  6.28318530717958647693, // twopi
+  0.69314718,
+  2.90888208665721580e-4, // arcmin
+  299792.458              // speed of light km/s
 };
 
 pre precision = {
-    1e-2, // low
-    1e-3, // medium
-    1e-5, // high
-    1e-7  // insane
+  1e-2, // low
+  1e-3, // medium
+  1e-5, // high
+  1e-7  // insane
 };
 
 lim limits = {
-    //	0.19, //a_min (in order to compute z=4 WFIRST)
-    1. / (1. + 10.), // a_min (z=10, needed for CMB lensing)
-    6.667e-6,        // k_min_mpc
-    1.e3,            // k_max_mpc
-    50.,             // k_max_mpc_class
-    2.e-2,           // k_min_cH0
-    3.e+6,           // k_max_cH0
-    0.1,             // P_2_s_min
-    1.0e5,           // P_2_s_max
-    3.0e-7,          // xi_via_hankel_theta_min
-    0.12,            // xi_via_hankel_theta_max
-    1.e-5,           // xi_3d_rmin
-    1.e+0,           // xi_3d_rmax
-    1.e+6,           // M_min
-    1.e+17,          // M_max
+  1./(1.+10.), // a_min (z=10, needed for CMB lensing)
+  2.e-2,       // k_min_cH0
+  3.e+6,       // k_max_cH0
+  1.e+6,       // M_min
+  1.e+17,      // M_max
+  20,          // LMIN_tab
+  100000,      // LMAX
+  400,         // LMAX_NOLIMBER
 };
 
 Ntab Ntable = {
-    100,  // N_a !!!!!!DO NOT F!@#$ING DECREASE THIS NUMBER UNLESS YOU ARE
-          // ELISABETH AND HAVE ASKED TIM BEFORE!!!!
-    500,  // N_k_lin
-    500,  // N_k_nlin
-    200,  // N_ell
-    200,  // N_theta
-    2048, // N_theta for Hankel
-    1000, // N_S2
-    1000, // N_DS
-    50,   // N_norm
-    50,   // N_r_3d
-    25,   // N_k_3d
-    20,   // N_a_halo
+  100,  // N_a
+  500,  // N_k_lin
+  500,  // N_k_nlin
+  200,  // N_ell
+  200,  // N_theta
+  2048, // N_theta for Hankel
+  1000, // N_S2
+  1000, // N_DS
+  120,  // N_ell_TATT
 };
-
-void SVD_inversion(gsl_matrix *cov, gsl_matrix *inverseSVD, int Nmatrix) {
-  int i, j;
-  gsl_matrix *V = gsl_matrix_calloc(Nmatrix, Nmatrix);
-  gsl_matrix *U = gsl_matrix_calloc(Nmatrix, Nmatrix);
-  gsl_vector *S = gsl_vector_calloc(Nmatrix);
-  gsl_vector *work = gsl_vector_calloc(Nmatrix);
-
-  gsl_matrix_memcpy(U, cov);
-
-  gsl_linalg_SV_decomp(U, V, S, work);
-
-  for (i = 0; i < Nmatrix; i++) {
-    gsl_vector *b = gsl_vector_calloc(Nmatrix);
-    gsl_vector *x = gsl_vector_calloc(Nmatrix);
-    gsl_vector_set(b, i, 1.0);
-    gsl_linalg_SV_solve(U, V, S, b, x);
-    for (j = 0; j < Nmatrix; j++) {
-      gsl_matrix_set(inverseSVD, i, j, gsl_vector_get(x, j));
-    }
-    gsl_vector_free(b);
-    gsl_vector_free(x);
-  }
-  gsl_matrix_free(V);
-  gsl_matrix_free(U);
-  gsl_vector_free(S);
-  gsl_vector_free(work);
-}
-
-void invert_matrix_colesky(gsl_matrix *A) {
-  gsl_linalg_cholesky_decomp(A); // Adummy will be overwritten  */
-  gsl_linalg_cholesky_invert(A);
-}
 
 double int_gsl_integrate_high_precision(double (*func)(double, void *),
 void *arg, double a, double b, double *error, int niter) {
@@ -122,7 +78,7 @@ void *arg, double a, double b, double *error, int niter) {
   return res;
 }
 
-double int_gsl_integrate_medium_precision(double (*func)(double, void *),
+double int_gsl_integrate_medium_precision(double (*func)(double, void*),
 void *arg, double a, double b, double *error, int niter) {
   double res, err;
   gsl_integration_cquad_workspace *w =
@@ -138,8 +94,8 @@ void *arg, double a, double b, double *error, int niter) {
   return res;
 }
 
-double int_gsl_integrate_low_precision(double (*func)(double, void *),
-void *arg, double a, double b, double *error,
+double int_gsl_integrate_low_precision(double (*func)(double, void*),
+void* arg, double a, double b, double* error __attribute__((unused)),
 int niter __attribute__((unused))) {
   gsl_set_error_handler_off();
   double res, err;
@@ -199,32 +155,11 @@ double *create_double_vector(long nl, long nh) {
   return v - nl + NR_END;
 }
 
-// allocate a int vector with subscript range v[nl..nh]
-int *int_vector(long nl, long nh) {
-  int *v;
-  v = (int *)calloc(nh - nl + 1 + NR_END, sizeof(int));
-  if (!v) {
-    log_fatal("allocation failure in int vector()");
-    exit(1);
-  }
-  return v - nl + NR_END;
-}
-
-// allocate a int vector with subscript range v[nl..nh]
-long *long_vector(long nl, long nh) {
-  long *v;
-  v = (long *)calloc(nh - nl + 1 + NR_END, sizeof(long));
-  if (!v) {
-    log_fatal("allocation failure in int vector()");
-    exit(1);
-  }
-  return v - nl + NR_END;
-}
-
 // free a double vector allocated with vector()
 void free_double_vector(double *v, long nl, long nh __attribute__((unused))) {
   free((FREE_ARG)(v + nl - NR_END));
 }
+
 
 void error(char *s) {
   printf("error:%s\n ", s);
@@ -319,14 +254,12 @@ double interpol_fitslope(double *f, int n, double a, double b, double dx,
  * polation in the second argument				*
  * ============================================================ */
 double interpol2d(double **f, int nx, double ax, double bx, double dx, double x,
-                  int ny, double ay, double by, double dy, double y,
-                  double lower, double upper) {
+int ny, double ay, double by, double dy, double y, double lower, double upper) {
   double t, dt, s, ds;
   int i, j;
   if (x < ax) {
     return 0.;
   }
-
   if (x > bx) {
     return 0.;
   }
@@ -343,15 +276,12 @@ double interpol2d(double **f, int nx, double ax, double bx, double dx, double x,
   j = (int)(floor(s));
   ds = s - j;
   if ((i + 1 == nx) && (j + 1 == ny)) {
-    // printf("%d %d\n",i+1,j+1);
     return (1. - dt) * (1. - ds) * f[i][j];
   }
   if (i + 1 == nx) {
-    // printf("%d %d\n",i+1,j+1);
     return (1. - dt) * (1. - ds) * f[i][j] + (1. - dt) * ds * f[i][j + 1];
   }
   if (j + 1 == ny) {
-    // printf("%d %d\n",i+1,j+1);
     return (1. - dt) * (1. - ds) * f[i][j] + dt * (1. - ds) * f[i + 1][j];
   }
   return (1. - dt) * (1. - ds) * f[i][j] + (1. - dt) * ds * f[i][j + 1] +
@@ -359,8 +289,7 @@ double interpol2d(double **f, int nx, double ax, double bx, double dx, double x,
 }
 
 double interpol2d_fitslope(double **f, int nx, double ax, double bx, double dx,
-                           double x, int ny, double ay, double by, double dy,
-                           double y, double lower) {
+double x, int ny, double ay, double by, double dy, double y, double lower) {
   double t, dt, s, ds, upper;
   int i, j, fitrange;
   if (x < ax) {
@@ -391,15 +320,12 @@ double interpol2d_fitslope(double **f, int nx, double ax, double bx, double dx,
   j = (int)(floor(s));
   ds = s - j;
   if ((i + 1 == nx) && (j + 1 == ny)) {
-    // printf("%d %d\n",i+1,j+1);
     return (1. - dt) * (1. - ds) * f[i][j];
   }
   if (i + 1 == nx) {
-    // printf("%d %d\n",i+1,j+1);
     return (1. - dt) * (1. - ds) * f[i][j] + (1. - dt) * ds * f[i][j + 1];
   }
   if (j + 1 == ny) {
-    // printf("%d %d\n",i+1,j+1);
     return (1. - dt) * (1. - ds) * f[i][j] + dt * (1. - ds) * f[i + 1][j];
   }
   return (1. - dt) * (1. - ds) * f[i][j] + (1. - dt) * ds * f[i][j + 1] +
