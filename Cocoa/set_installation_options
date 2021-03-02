@@ -231,24 +231,29 @@ elif [ -n "${OCELOTE_SUPERCOMPUTER_INSTALLATION}" ]; then
 
 elif [ -n "${NERSC_SUPERCOMPUTER_INSTALLATION}" ]; then
 
-    module unload intel
-    module unload python/3.7-anaconda-2019.07
-    module unload tbb
-    module unload tensorflow
-    module unload gsl
-    module unload python/3.8-anaconda-2020.11
-    module unload git-lfs/2.8.0
-    module unload git/2.21.0
-    module unload gcc/10.1.0
-    module unload openmpi/4.0.3
+    module unload boost
+    module unload boost/1.72.0
+    module unload cmake
     module unload cmake/3.18.2
+    module unload gcc
+    module unload gcc/10.1.0
+    module unload intel
+    module unload openmpi
+    module unload python
     module unload python/3.7-anaconda-2019.10
+    module unload python/3.8-anaconda-2020.11
+    module unload tbb
+    module unload cfitsio/3.47
+    module unload root/6.18.00-py3
+    module unload impi
 
-    module load git-lfs/2.8.0
-    module load git/2.21.0
     module load gcc/10.1.0
     module load openmpi/4.0.3
     module load cmake/3.18.2
+    module load boost/1.72.0
+    module load cfitsio/3.47
+    module load openmpi
+    module load intel
 
     export GLOBALPYTHON3=python3.6
     export PYTHON_VERSION=3.6
@@ -260,6 +265,8 @@ elif [ -n "${NERSC_SUPERCOMPUTER_INSTALLATION}" ]; then
     export IGNORE_XZ_INSTALLATION=1
     export IGNORE_CMAKE_INSTALLATION=1
     export DONT_USE_SYSTEM_PIP_PACKAGES=1
+    export IGNORE_CPP_BOOST_INSTALLATION=1
+    export IGNORE_C_CFITSIO_INSTALLATION=1
 
 elif [ -n "${NASA_SUPERCOMPUTER_INSTALLATION}" ]; then
 
