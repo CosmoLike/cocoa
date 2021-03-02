@@ -26,7 +26,9 @@ fi
 # ----------------------------------------------------------------------------
 
 if [ -z "${IGNORE_ALL_PIP_INSTALLATION}" ]; then
-    env CXX=$CXX_COMPILER CC=$C_COMPILER $PIP3 install $ROOTDIR/../cocoa_installation_libraries/pip_cache/setuptools-46.2.0.zip --upgrade --prefix=$ROOTDIR/.local --find-links file:$ROOTDIR/../cocoa_installation_libraries/pip_cache --no-dependencies
+    env CXX=$CXX_COMPILER CC=$C_COMPILER $PIP3 install setuptools --upgrade --prefix=$ROOTDIR/.local --find-links file:$ROOTDIR/../cocoa_installation_libraries/pip_cache --no-dependencies
+
+    env CXX=$CXX_COMPILER CC=$C_COMPILER $PIP3 install six --upgrade --prefix=$ROOTDIR/.local --find-links file:$ROOTDIR/../cocoa_installation_libraries/pip_cache --no-index --no-dependencies
 
     env CXX=$CXX_COMPILER CC=$C_COMPILER $PIP3 install $ROOTDIR/../cocoa_installation_libraries/pip_cache/wheel-0.34.2.tar.gz --upgrade --prefix=$ROOTDIR/.local --find-links file:$ROOTDIR/../cocoa_installation_libraries/pip_cache --no-dependencies
 
@@ -34,9 +36,11 @@ if [ -z "${IGNORE_ALL_PIP_INSTALLATION}" ]; then
 
     env CXX=$CXX_COMPILER CC=$C_COMPILER $PIP3 install wget --upgrade --prefix=$ROOTDIR/.local --find-links file:$ROOTDIR/../cocoa_installation_libraries/pip_cache --no-index --no-dependencies
 
-    env CXX=$CXX_COMPILER CC=$C_COMPILER $PIP3 install six --upgrade --prefix=$ROOTDIR/.local --find-links file:$ROOTDIR/../cocoa_installation_libraries/pip_cache --no-index --no-dependencies
+    env CXX=$CXX_COMPILER CC=$C_COMPILER $PIP3 install packaging --upgrade --prefix=$ROOTDIR/.local --find-links file:$ROOTDIR/../cocoa_installation_libraries/pip_cache --no-index --no-dependencies
 
     env CXX=$CXX_COMPILER CC=$C_COMPILER $PIP3 install $ROOTDIR/../cocoa_installation_libraries/pip_cache/PGen-0.2.1.zip  --upgrade --prefix=$ROOTDIR/.local --find-links file:$ROOTDIR/../cocoa_installation_libraries/pip_cache --force
+
+    env CXX=$CXX_COMPILER CC=$C_COMPILER $PIP3 install appdirs --upgrade --prefix=$ROOTDIR/.local --find-links  file:$ROOTDIR/../cocoa_installation_libraries/pip_cache --no-index --no-dependencies
 
     env CXX=$CXX_COMPILER CC=$C_COMPILER $PIP3 install tokenizers --upgrade --prefix=$ROOTDIR/.local --find-links file:$ROOTDIR/../cocoa_installation_libraries/pip_cache --no-index --no-dependencies
 
@@ -47,6 +51,8 @@ if [ -z "${IGNORE_ALL_PIP_INSTALLATION}" ]; then
     env CXX=$CXX_COMPILER CC=$C_COMPILER $PIP3 install urllib3 --upgrade --prefix=$ROOTDIR/.local --find-links file:$ROOTDIR/../cocoa_installation_libraries/pip_cache --no-index --no-dependencies
 
     env CXX=$CXX_COMPILER CC=$C_COMPILER $PIP3 install chardet --upgrade --prefix=$ROOTDIR/.local --find-links file:$ROOTDIR/../cocoa_installation_libraries/pip_cache --no-index --no-dependencies
+
+    env CXX=$CXX_COMPILER CC=$C_COMPILER $PIP3 install pyparsing --upgrade --prefix=$ROOTDIR/.local --find-links file:$ROOTDIR/../cocoa_installation_libraries/pip_cache --no-index --no-dependencies
 
     env CXX=$CXX_COMPILER CC=$C_COMPILER $PIP3 install certifi --upgrade --prefix=$ROOTDIR/.local --find-links file:$ROOTDIR/../cocoa_installation_libraries/pip_cache --no-index --no-dependencies
 
@@ -78,8 +84,6 @@ if [ -z "${IGNORE_ALL_PIP_INSTALLATION}" ]; then
     env CXX=$CXX_COMPILER CC=$C_COMPILER $PIP3 install mpmath --upgrade --prefix=$ROOTDIR/.local --find-links file:$ROOTDIR/../cocoa_installation_libraries/pip_cache --no-index --no-dependencies
 
     env CXX=$CXX_COMPILER CC=$C_COMPILER $PIP3 install PyYAML --upgrade --prefix=$ROOTDIR/.local --find-links file:$ROOTDIR/../cocoa_installation_libraries/pip_cache --no-index --no-dependencies
-
-    env CXX=$CXX_COMPILER CC=$C_COMPILER $PIP3 install pyparsing --upgrade --prefix=$ROOTDIR/.local --find-links file:$ROOTDIR/../cocoa_installation_libraries/pip_cache --no-index --no-dependencies
 
     env CXX=$CXX_COMPILER CC=$C_COMPILER $PIP3 install fuzzywuzzy --upgrade --prefix=$ROOTDIR/.local --find-links file:$ROOTDIR/../cocoa_installation_libraries/pip_cache --no-index  --no-dependencies
 
@@ -123,6 +127,8 @@ if [ -z "${IGNORE_ALL_PIP_INSTALLATION}" ]; then
     else
         env CXX=$CXX_COMPILER CC=$C_COMPILER $PIP3 install pandas --upgrade --prefix=$ROOTDIR/.local --find-links file:$ROOTDIR/../cocoa_installation_libraries/pip_cache --no-index --no-dependencies
     fi
+
+    env CXX=$CXX_COMPILER CC=$C_COMPILER $PIP3 install ordered_set --upgrade --prefix=$ROOTDIR/.local --find-links file:$ROOTDIR/../cocoa_installation_libraries/pip_cache --no-index --no-dependencies
 
     env CXX=$CXX_COMPILER CC=$C_COMPILER $PIP3 install mpi4py --upgrade --prefix=$ROOTDIR/.local --find-links file:$ROOTDIR/../cocoa_installation_libraries/pip_cache --no-index --no-dependencies
 
