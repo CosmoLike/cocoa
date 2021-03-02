@@ -2092,10 +2092,8 @@ double C_ss_tomo_TATT_EE_limber(double l, int ni, int nj)
       logsmax = log(limits.LMAX + 1);
       ds = (logsmax - logsmin) / (Ntable.N_ell_TATT - 1.);
     }
-    // Cocoa: threading here can may cause race condition when
-    // Cocoa: parameters associated with only one bin changes
-    for (int k=0; k<tomo.shear_Npowerspectra; k++)
     {
+      const int k = 0;
       const int Z1NZ = Z1(k);
       const int Z2NZ = Z2(k);
       sig[k] = 1.;
@@ -2115,6 +2113,35 @@ double C_ss_tomo_TATT_EE_limber(double l, int ni, int nj)
           {
             osc[k] = 1;
           }
+        }
+      }
+      if (osc[k] == 0)
+      {
+        for (int i = 0; i<Ntable.N_ell_TATT; i++)
+        {
+          table[k][i] = log(sig[k] * table[k][i]);
+        }
+      }
+    }
+    #pragma omp parallel for
+    for (int k=1; k<tomo.shear_Npowerspectra; k++)
+    {
+      const int Z1NZ = Z1(k);
+      const int Z2NZ = Z2(k);
+      sig[k] = 1.;
+      osc[k] = 0;
+      if (C_ss_tomo_TATT_EE_limber_nointerp(500., Z1NZ, Z2NZ) < 0)
+      {
+        sig[k] = -1.;
+      }
+
+      for (int i = 0; i<Ntable.N_ell_TATT; i++)
+      {
+        const double llog = logsmin + i*ds;
+        table[k][i] = C_ss_tomo_TATT_EE_limber_nointerp(exp(llog), Z1NZ, Z2NZ);
+        if (table[k][i] * sig[k] < 0.)
+        {
+          osc[k] = 1;
         }
       }
       if (osc[k] == 0)
@@ -2198,10 +2225,8 @@ double C_ss_tomo_TATT_BB_limber(double l, int ni, int nj)
       logsmax = log(limits.LMAX + 1);
       ds = (logsmax - logsmin) / (Ntable.N_ell_TATT - 1.);
     }
-    // Cocoa: threading here can may cause race condition when
-    // Cocoa: parameters associated with only one bin changes
-    for (int k=0; k<tomo.shear_Npowerspectra; k++)
     {
+      const int k = 0;
       const int Z1NZ = Z1(k);
       const int Z2NZ = Z2(k);
       sig[k] = 1.;
@@ -2221,6 +2246,34 @@ double C_ss_tomo_TATT_BB_limber(double l, int ni, int nj)
           {
             osc[k] = 1;
           }
+        }
+      }
+      if (osc[k] == 0)
+      {
+        for (int i=0; i<Ntable.N_ell_TATT; i++)
+        {
+          table[k][i] = log(sig[k] * table[k][i]);
+        }
+      }
+    }
+    #pragma omp parallel for
+    for (int k=1; k<tomo.shear_Npowerspectra; k++)
+    {
+      const int Z1NZ = Z1(k);
+      const int Z2NZ = Z2(k);
+      sig[k] = 1.;
+      osc[k] = 0;
+      if (C_ss_tomo_TATT_BB_limber_nointerp(500., Z1NZ, Z2NZ) < 0)
+      {
+        sig[k] = -1.;
+      }
+      for (int i=0; i<Ntable.N_ell_TATT; i++)
+      {
+        const double llog = logsmin + i*ds;
+        table[k][i] = C_ss_tomo_TATT_BB_limber_nointerp(exp(llog), Z1NZ, Z2NZ);
+        if (table[k][i] * sig[k] < 0.)
+        {
+          osc[k] = 1;
         }
       }
       if (osc[k] == 0)
