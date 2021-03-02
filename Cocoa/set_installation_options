@@ -20,6 +20,8 @@ export DOCKER_INSTALLATION=1
 
 #export PUMA_SUPERCOMPUTER_INSTALLATION=1
 
+#export NERSC_SUPERCOMPUTER_INSTALLATION=1
+
 #export MACOS_HOMEBREW_INSTALLATION=1
 
 # SEE IF/ELSE BLOCK ON LINE ~62 TO TWEAK THE MANUAL INSTALLATION
@@ -226,6 +228,45 @@ elif [ -n "${OCELOTE_SUPERCOMPUTER_INSTALLATION}" ]; then
     export DONT_USE_SYSTEM_PIP_PACKAGES=1
 
     ulimit -s unlimited
+
+elif [ -n "${NERSC_SUPERCOMPUTER_INSTALLATION}" ]; then
+
+    module unload boost
+    module unload boost/1.72.0
+    module unload cmake
+    module unload cmake/3.18.2
+    module unload gcc
+    module unload gcc/10.1.0
+    module unload intel
+    module unload openmpi
+    module unload python
+    module unload python/3.7-anaconda-2019.10
+    module unload python/3.8-anaconda-2020.11
+    module unload tbb
+    module unload cfitsio/3.47
+    module unload root/6.18.00-py3
+    module unload impi
+
+    module load gcc/10.1.0
+    module load openmpi/4.0.3
+    module load cmake/3.18.2
+    module load boost/1.72.0
+    module load cfitsio/3.47
+    module load openmpi
+    module load intel
+
+    export GLOBALPYTHON3=python3.6
+    export PYTHON_VERSION=3.6
+    export FORTRAN_COMPILER=gfortran
+    export C_COMPILER=gcc
+    export CXX_COMPILER=g++
+
+    export IGNORE_DISTUTILS_INSTALLATION=1
+    export IGNORE_XZ_INSTALLATION=1
+    export IGNORE_CMAKE_INSTALLATION=1
+    export DONT_USE_SYSTEM_PIP_PACKAGES=1
+    export IGNORE_CPP_BOOST_INSTALLATION=1
+    export IGNORE_C_CFITSIO_INSTALLATION=1
 
 elif [ -n "${NASA_SUPERCOMPUTER_INSTALLATION}" ]; then
 
