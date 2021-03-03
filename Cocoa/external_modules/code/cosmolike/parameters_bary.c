@@ -3,10 +3,44 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <stdlib.h>
 
 #include "basics.h"
 #include "parameters_bary.h"
 #include "structs.h"
+
+void init_bary(char *scenario) {
+  if (strcmp(scenario, "dmo") == 0)
+    bary.isPkbary = 0;
+  if (strcmp(scenario, "mb2") == 0)
+    set_bary_parameters_to_mb2(); // go to check parameters_bary.c
+  if (strcmp(scenario, "illustris") == 0)
+    set_bary_parameters_to_illustris();
+  if (strcmp(scenario, "eagle") == 0)
+    set_bary_parameters_to_eagle();
+  if (strcmp(scenario, "HzAGN") == 0)
+    set_bary_parameters_to_HzAGN();
+  if (strcmp(scenario, "TNG100") == 0)
+    set_bary_parameters_to_TNG100();
+  if (strcmp(scenario, "owls_AGN") == 0)
+    set_bary_parameters_to_owls_AGN();
+  if (strcmp(scenario, "owls_DBLIMFV1618") == 0)
+    set_bary_parameters_to_owls_DBLIMFV1618();
+  if (strcmp(scenario, "owls_NOSN") == 0)
+    set_bary_parameters_to_owls_NOSN();
+  if (strcmp(scenario, "owls_NOSN_NOZCOOL") == 0)
+    set_bary_parameters_to_owls_NOSN_NOZCOOL();
+  if (strcmp(scenario, "owls_NOZCOOL") == 0)
+    set_bary_parameters_to_owls_NOZCOOL();
+  if (strcmp(scenario, "owls_REF") == 0)
+    set_bary_parameters_to_owls_REF();
+  if (strcmp(scenario, "owls_WDENS") == 0)
+    set_bary_parameters_to_owls_WDENS();
+  if (strcmp(scenario, "owls_WML1V848") == 0)
+    set_bary_parameters_to_owls_WML1V848();
+  if (strcmp(scenario, "owls_WML4") == 0)
+    set_bary_parameters_to_owls_WML4();
+}
 
 void set_bary_parameters_to_TNG100() {
   sprintf(bary.FILE_logPkR,
@@ -18,8 +52,10 @@ void set_bary_parameters_to_TNG100() {
   double z[13] = {3.71, 3.49, 3.28, 2.90, 2.44, 2.1, 1.74,
                   1.41, 1.04, 0.7,  0.35, 0.18, 0.0};
 
-  for (int i = 0; i < bary.Nabins; i++)
+  for (int i=0; i<bary.Nabins; i++)
+  {
     bary.z_bins[i] = z[i];
+  }
 }
 
 void set_bary_parameters_to_HzAGN() {
@@ -33,7 +69,9 @@ void set_bary_parameters_to_HzAGN() {
                   1.02715, 0.519195, 0.22878, 0.017865, 0.0};
 
   for (int i = 0; i < bary.Nabins; i++)
+  {
     bary.z_bins[i] = z[i];
+  }
 }
 
 void set_bary_parameters_to_mb2() {
@@ -46,7 +84,9 @@ void set_bary_parameters_to_mb2() {
                   1.1, 1.0,  0.8, 0.7,  0.6, 0.4, 0.35, 0.2, 0.0625, 0.0};
 
   for (int i = 0; i < bary.Nabins; i++)
+  {
     bary.z_bins[i] = z[i];
+  }
 }
 
 void set_bary_parameters_to_illustris() {
@@ -60,7 +100,9 @@ void set_bary_parameters_to_illustris() {
                   0.79, 0.7,  0.6,  0.4,  0.35, 0.2,  0.0};
 
   for (int i = 0; i < bary.Nabins; i++)
+  {
     bary.z_bins[i] = z[i];
+  }
 }
 
 void set_bary_parameters_to_eagle() {
@@ -74,16 +116,14 @@ void set_bary_parameters_to_eagle() {
                   1.26, 1.0,  0.74, 0.5,  0.27, 0.0};
 
   for (int i = 0; i < bary.Nabins; i++)
+  {
     bary.z_bins[i] = z[i];
+  }
 }
 
 void set_bary_parameters_to_owls_AGN() {
-  // sprintf(bary.FILE_logPkR,"./theory_hj/data_sims/PkRatio_0.3_10/PkRatio_owls_AGN.dat");
-  sprintf(bary.FILE_logPkR,
-          "../cosmolike_core/logPkRatio/logPkRatio_owls_AGN.dat");
-  // sprintf(bary.FILE_logPkR,"../cosmolike_core/logPkRatio/logPkRatio_owls_AGN.dat");
+  sprintf(bary.FILE_logPkR, "../cosmolike_core/logPkRatio/logPkRatio_owls_AGN.dat");
   sprintf(bary.scenario, "owls_AGN");
-  // sprintf(bary.FILE_logPkR,"./theory_hj/data_sims/PkRatio_owls_AGN.dat");
   bary.isPkbary = 1;
   bary.Nkbins = line_count(bary.FILE_logPkR) - 1;
   bary.Nabins = 16;
@@ -95,8 +135,7 @@ void set_bary_parameters_to_owls_AGN() {
 }
 
 void set_bary_parameters_to_owls_DBLIMFV1618() {
-  sprintf(bary.FILE_logPkR,
-          "../cosmolike_core/logPkRatio/logPkRatio_owls_DBLIMFV1618.dat");
+  sprintf(bary.FILE_logPkR, "../cosmolike_core/logPkRatio/logPkRatio_owls_DBLIMFV1618.dat");
   sprintf(bary.scenario, "owls_DBLIMFV1618");
   bary.isPkbary = 1;
   bary.Nkbins = line_count(bary.FILE_logPkR) - 1;
@@ -109,8 +148,7 @@ void set_bary_parameters_to_owls_DBLIMFV1618() {
 }
 
 void set_bary_parameters_to_owls_NOSN() {
-  sprintf(bary.FILE_logPkR,
-          "../cosmolike_core/logPkRatio/logPkRatio_owls_NOSN.dat");
+  sprintf(bary.FILE_logPkR, "../cosmolike_core/logPkRatio/logPkRatio_owls_NOSN.dat");
   sprintf(bary.scenario, "owls_NOSN");
   bary.isPkbary = 1;
   bary.Nkbins = line_count(bary.FILE_logPkR) - 1;
@@ -124,8 +162,7 @@ void set_bary_parameters_to_owls_NOSN() {
 }
 
 void set_bary_parameters_to_owls_NOSN_NOZCOOL() {
-  sprintf(bary.FILE_logPkR,
-          "../cosmolike_core/logPkRatio/logPkRatio_owls_NOSN_NOZCOOL.dat");
+  sprintf(bary.FILE_logPkR, "../cosmolike_core/logPkRatio/logPkRatio_owls_NOSN_NOZCOOL.dat");
   sprintf(bary.scenario, "owls_NOSN_NOZCOOL");
   bary.isPkbary = 1;
   bary.Nkbins = line_count(bary.FILE_logPkR) - 1;

@@ -1,3 +1,9 @@
+#ifndef __CFASTPT_CFASTPT_H
+#define __CFASTPT_CFASTPT_H
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 typedef struct fastpt_config {
 	double nu; // only used in scalar; in tensor, nu1,nu2 are computed by alpha,beta
 	double c_window_width;
@@ -41,3 +47,8 @@ void Ps2s2(double *k, double *Pin, long Nk, double *Pout);
 void IA_tt(double *k, double *Pin, long Nk, double *P_E, double *P_B);
 void IA_ta(double *k, double *Pin, long Nk, double *P_dE1, double *P_dE2, double *P_0E0E, double *P_0B0B);
 void IA_mix(double *k, double *Pin, long Nk, double *P_A, double *P_B, double *P_DEE, double *P_DBB);
+
+#ifdef __cplusplus
+}
+#endif
+#endif // HEADER GUARD

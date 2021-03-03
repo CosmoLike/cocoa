@@ -220,7 +220,9 @@ void get_FPT_IA(void) {
     FPT_input(k, Pin);
 
     IA_tt(k, Pin, FPT.N, IA_tt_EE, IA_tt_BB);
+
     IA_ta(k, Pin, FPT.N, IA_ta_dE1, IA_ta_dE2, IA_ta_0E0E, IA_ta_0B0B);
+
     IA_mix(k, Pin, FPT.N, IA_mix_A, IA_mix_B, IA_mix_DEE, IA_mix_DBB);
 
     #pragma omp parallel for
@@ -239,18 +241,20 @@ void get_FPT_IA(void) {
   }
 }
 
-double TATT_II_EE(double k_coverH0, double a __attribute__((unused)), double C1, 
-double C2, double b_ta, double C1_2, double C2_2, double b_ta_2, 
+double TATT_II_EE(double k_coverH0, double a __attribute__((unused)), double C1,
+double C2, double b_ta, double C1_2, double C2_2, double b_ta_2,
 double growfac_a, double pdelta_ak) {
-  double nla_EE = 0., ta_EE = 0., tt_EE = 0., mix_EE = 0.;
-  nla_EE = C1 * C1_2 * pdelta_ak;
+  double ta_EE = 0., tt_EE = 0., mix_EE = 0.;
+  const double nla_EE = C1 * C1_2 * pdelta_ak;
   static cosmopara C;
   static double logkmin = 0., logkmax = 0., dlgk = 0.;
 
   // if TATT is specified, i.e. C2 !=0 (TT), or b_ta != 0 (TA)
-  if (C2 != 0 || b_ta != 0) {
+  if (C2 != 0 || b_ta != 0)
+  {
     // only call FASTPT if cosmology changed since last call
-    if (recompute_cosmo3D(C)) {
+    if (recompute_cosmo3D(C))
+    {
       get_FPT_IA();
       update_cosmopara(&C);
       logkmin = log(FPT.k_min);
@@ -264,24 +268,22 @@ double growfac_a, double pdelta_ak) {
     }
     double g4 = growfac_a*growfac_a*growfac_a*growfac_a;
 
-    double P_ta_EE, P_ta_dE1, P_ta_dE2;
-    P_ta_EE = g4 * interpol(FPT.tab_IA[4], FPT.N, logkmin, logkmax, dlgk, lgk,
+    const double P_ta_EE = g4 * interpol(FPT.tab_IA[4], FPT.N, logkmin, logkmax, dlgk, lgk,
                             0., 0.);
-    P_ta_dE1 = g4 * interpol(FPT.tab_IA[2], FPT.N, logkmin, logkmax, dlgk, lgk,
+    const double P_ta_dE1 = g4 * interpol(FPT.tab_IA[2], FPT.N, logkmin, logkmax, dlgk, lgk,
                              0., 0.);
-    P_ta_dE2 = g4 * interpol(FPT.tab_IA[3], FPT.N, logkmin, logkmax, dlgk, lgk,
+    const double P_ta_dE2 = g4 * interpol(FPT.tab_IA[3], FPT.N, logkmin, logkmax, dlgk, lgk,
                              0., 0.);
 
     ta_EE = C1 * C1_2 *
             (b_ta * b_ta_2 * P_ta_EE + (b_ta + b_ta_2) * (P_ta_dE1 + P_ta_dE2));
 
     if (C2) {
-      double P_mix_EE, P_mix_A, P_mix_B;
-      P_mix_EE = g4 * interpol(FPT.tab_IA[8], FPT.N, logkmin, logkmax, dlgk,
+      const double P_mix_EE = g4 * interpol(FPT.tab_IA[8], FPT.N, logkmin, logkmax, dlgk,
                                lgk, 0., 0.);
-      P_mix_A = g4 * interpol(FPT.tab_IA[6], FPT.N, logkmin, logkmax, dlgk, lgk,
+      const double P_mix_A = g4 * interpol(FPT.tab_IA[6], FPT.N, logkmin, logkmax, dlgk, lgk,
                               0., 0.);
-      P_mix_B = g4 * interpol(FPT.tab_IA[7], FPT.N, logkmin, logkmax, dlgk, lgk,
+      const double P_mix_B = g4 * interpol(FPT.tab_IA[7], FPT.N, logkmin, logkmax, dlgk, lgk,
                               0., 0.);
 
       mix_EE = (C1 * C2_2 + C1_2 * C2) * (P_mix_A + P_mix_B) +
@@ -295,8 +297,8 @@ double growfac_a, double pdelta_ak) {
   return nla_EE + ta_EE + mix_EE + tt_EE;
 }
 
-double TATT_II_BB(double k_coverH0, double a __attribute__((unused)), double C1, 
-double C2, double b_ta,double C1_2, double C2_2, double b_ta_2, 
+double TATT_II_BB(double k_coverH0, double a __attribute__((unused)), double C1,
+double C2, double b_ta,double C1_2, double C2_2, double b_ta_2,
 double growfac_a) {
   double ta_BB = 0., tt_BB = 0., mix_BB = 0.;
   static cosmopara C;
@@ -332,7 +334,7 @@ double growfac_a) {
   return ta_BB + mix_BB + tt_BB;
 }
 
-double TATT_GI_E(double k_coverH0, double a __attribute__((unused)), double C1, 
+double TATT_GI_E(double k_coverH0, double a __attribute__((unused)), double C1,
 double C2, double b_ta, double growfac_a, double pdelta_ak) {
   double nla_GI = 0., ta_GI = 0., tt_GI = 0.;// mix_GI = 0.;
   nla_GI = C1 * pdelta_ak;

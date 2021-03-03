@@ -225,8 +225,8 @@ double xi_pm_tomo(int pm, int nt, int ni, int nj, int limber)
             #pragma omp parallel for
             for (int l=3; l<limits.LMIN_tab; l++)
             {
-              Cl_EE[nz][l] = C_ss_tomo_TATT_EE_limber_nointerp(1.0*l,Z1NZ,Z2NZ);
-              Cl_BB[nz][l] = C_ss_tomo_TATT_BB_limber_nointerp(1.0*l,Z1NZ,Z2NZ);
+              Cl_EE[nz][l] = C_ss_tomo_TATT_EE_limber_nointerp((double) l,Z1NZ,Z2NZ);
+              Cl_BB[nz][l] = C_ss_tomo_TATT_BB_limber_nointerp((double) l,Z1NZ,Z2NZ);
             }
             {
               const int l = limits.LMIN_tab;
@@ -234,9 +234,21 @@ double xi_pm_tomo(int pm, int nt, int ni, int nj, int limber)
               Cl_BB[nz][l] = C_ss_tomo_TATT_BB_limber(1.0*l,Z1NZ,Z2NZ);
             }
             #pragma omp parallel for
-            for (int l=limits.LMIN_tab+1; l<limits.LMAX; l++) {
-              Cl_EE[nz][l] = C_ss_tomo_TATT_EE_limber(1.0*l,Z1NZ,Z2NZ);
-              Cl_BB[nz][l] = C_ss_tomo_TATT_BB_limber(1.0*l,Z1NZ,Z2NZ);
+            for (int l=limits.LMIN_tab+1; l<limits.LMAX-3; l+=4)
+            {
+              // loop unrolling ---------
+
+              Cl_EE[nz][l] = C_ss_tomo_TATT_EE_limber((double) l,Z1NZ,Z2NZ);
+              Cl_BB[nz][l] = C_ss_tomo_TATT_BB_limber((double) l,Z1NZ,Z2NZ);
+
+              Cl_EE[nz][l+1] = C_ss_tomo_TATT_EE_limber((double) l+1,Z1NZ,Z2NZ);
+              Cl_BB[nz][l+1] = C_ss_tomo_TATT_BB_limber((double) l+1,Z1NZ,Z2NZ);
+
+              Cl_EE[nz][l+2] = C_ss_tomo_TATT_EE_limber((double) l+2,Z1NZ,Z2NZ);
+              Cl_BB[nz][l+2] = C_ss_tomo_TATT_BB_limber((double) l+2,Z1NZ,Z2NZ);
+
+              Cl_EE[nz][l+3] = C_ss_tomo_TATT_EE_limber((double) l+3,Z1NZ,Z2NZ);
+              Cl_BB[nz][l+3] = C_ss_tomo_TATT_BB_limber((double) l+3,Z1NZ,Z2NZ);
             }
           }
           else
@@ -258,11 +270,23 @@ double xi_pm_tomo(int pm, int nt, int ni, int nj, int limber)
               Cl_BB[nz][l] = 0.0;
             }
             #pragma omp parallel for
-            for (int l=limits.LMIN_tab+1; l<limits.LMAX; l++)
+            for (int l=limits.LMIN_tab+1; l<limits.LMAX-3; l+=4)
             {
-              Cl_EE[nz][l] = C_ss_tomo_TATT_EE_limber(1.0*l,Z1NZ,Z2NZ);
+              // loop unrolling ---------
+
+              Cl_EE[nz][l] = C_ss_tomo_TATT_EE_limber((double) l,Z1NZ,Z2NZ);
               Cl_BB[nz][l] = 0.0;
+
+              Cl_EE[nz][l+1] = C_ss_tomo_TATT_EE_limber((double) l+1,Z1NZ,Z2NZ);
+              Cl_BB[nz][l+1] = 0.0;
+
+              Cl_EE[nz][l+2] = C_ss_tomo_TATT_EE_limber((double) l+2,Z1NZ,Z2NZ);
+              Cl_BB[nz][l+2] = 0.0;
+
+              Cl_EE[nz][l+3] = C_ss_tomo_TATT_EE_limber((double) l+3,Z1NZ,Z2NZ);
+              Cl_BB[nz][l+3] = 0.0;
             }
+
           }
         }
         #pragma omp parallel for
@@ -280,9 +304,21 @@ double xi_pm_tomo(int pm, int nt, int ni, int nj, int limber)
               Cl_EE[nz][l] = C_ss_tomo_TATT_EE_limber_nointerp(1.0*l,Z1NZ,Z2NZ);
               Cl_BB[nz][l] = C_ss_tomo_TATT_BB_limber_nointerp(1.0*l,Z1NZ,Z2NZ);
             }
-            for (int l=limits.LMIN_tab; l<limits.LMAX; l++) {
-              Cl_EE[nz][l] = C_ss_tomo_TATT_EE_limber(1.0*l,Z1NZ,Z2NZ);
-              Cl_BB[nz][l] = C_ss_tomo_TATT_BB_limber(1.0*l,Z1NZ,Z2NZ);
+            for (int l=limits.LMIN_tab; l<limits.LMAX-3; l+=4)
+            {
+              // loop unrolling ---------
+
+              Cl_EE[nz][l] = C_ss_tomo_TATT_EE_limber((double) l,Z1NZ,Z2NZ);
+              Cl_BB[nz][l] = C_ss_tomo_TATT_BB_limber((double) l,Z1NZ,Z2NZ);
+
+              Cl_EE[nz][l+1] = C_ss_tomo_TATT_EE_limber((double) l+1,Z1NZ,Z2NZ);
+              Cl_BB[nz][l+1] = C_ss_tomo_TATT_BB_limber((double) l+1,Z1NZ,Z2NZ);
+
+              Cl_EE[nz][l+2] = C_ss_tomo_TATT_EE_limber((double) l+2,Z1NZ,Z2NZ);
+              Cl_BB[nz][l+2] = C_ss_tomo_TATT_BB_limber((double) l+2,Z1NZ,Z2NZ);
+
+              Cl_EE[nz][l+3] = C_ss_tomo_TATT_EE_limber((double) l+3,Z1NZ,Z2NZ);
+              Cl_BB[nz][l+3] = C_ss_tomo_TATT_BB_limber((double) l+3,Z1NZ,Z2NZ);
             }
           }
           else
@@ -292,10 +328,21 @@ double xi_pm_tomo(int pm, int nt, int ni, int nj, int limber)
               Cl_EE[nz][l] = C_ss_tomo_TATT_EE_limber_nointerp(1.0*l,Z1NZ,Z2NZ);
               Cl_BB[nz][l] = 0.0;
             }
-            for (int l=limits.LMIN_tab; l<limits.LMAX; l++)
+            for (int l=limits.LMIN_tab; l<limits.LMAX-3; l+=4)
             {
-              Cl_EE[nz][l] = C_ss_tomo_TATT_EE_limber(1.0*l,Z1NZ,Z2NZ);
+              // loop unrolling ---------
+
+              Cl_EE[nz][l] = C_ss_tomo_TATT_EE_limber((double) l,Z1NZ,Z2NZ);
               Cl_BB[nz][l] = 0.0;
+
+              Cl_EE[nz][l+1] = C_ss_tomo_TATT_EE_limber((double) l+1,Z1NZ,Z2NZ);
+              Cl_BB[nz][l+1] = 0.0;
+
+              Cl_EE[nz][l+2] = C_ss_tomo_TATT_EE_limber((double) l+2,Z1NZ,Z2NZ);
+              Cl_BB[nz][l+2] = 0.0;
+
+              Cl_EE[nz][l+3] = C_ss_tomo_TATT_EE_limber((double) l+3,Z1NZ,Z2NZ);
+              Cl_BB[nz][l+3] = 0.0;
             }
           }
         }
@@ -350,9 +397,17 @@ double xi_pm_tomo(int pm, int nt, int ni, int nj, int limber)
             Cl[nz][l] = C_ss_tomo_limber((double) l, Z1NZ, Z2NZ);
           }
           #pragma omp parallel for
-          for (int l=limits.LMIN_tab+1; l<limits.LMAX; l++)
+          for (int l=limits.LMIN_tab+1; l<limits.LMAX-3; l+=4)
           {
+            // loop unrolling ---------
+
             Cl[nz][l] = C_ss_tomo_limber((double) l, Z1NZ, Z2NZ);
+
+            Cl[nz][l+1] = C_ss_tomo_limber((double) l+1, Z1NZ, Z2NZ);
+
+            Cl[nz][l+2] = C_ss_tomo_limber((double) l+2, Z1NZ, Z2NZ);
+
+            Cl[nz][l+3] = C_ss_tomo_limber((double) l+3, Z1NZ, Z2NZ);
           }
         }
         #pragma omp parallel for
@@ -365,9 +420,17 @@ double xi_pm_tomo(int pm, int nt, int ni, int nj, int limber)
             Cl[nz][l] = C_ss_tomo_limber_nointerp((double) l, Z1NZ, Z2NZ,
               use_linear_ps_limber);
           }
-          for (int l=limits.LMIN_tab; l<limits.LMAX; l++)
+          for (int l=limits.LMIN_tab; l<limits.LMAX-3; l+=4)
           {
+            // loop unrolling ---------
+
             Cl[nz][l] = C_ss_tomo_limber((double) l, Z1NZ, Z2NZ);
+
+            Cl[nz][l+1] = C_ss_tomo_limber((double) l+1, Z1NZ, Z2NZ);
+
+            Cl[nz][l+2] = C_ss_tomo_limber((double) l+2, Z1NZ, Z2NZ);
+
+            Cl[nz][l+3] = C_ss_tomo_limber((double) l+3, Z1NZ, Z2NZ);
           }
         }
         #pragma omp parallel for
@@ -492,9 +555,16 @@ double w_gammat_tomo(int nt, int ni, int nj, int limber)
           Cl[nz][l] = C_gs_tomo_limber((double) l, ZLNZ, ZSNZ);
         }
         #pragma omp parallel for
-        for (int l=limits.LMIN_tab+1; l<limits.LMAX; l++)
+        for (int l=limits.LMIN_tab+1; l<limits.LMAX-3; l+=4)
         {
+          // loop unrolling ---------
           Cl[nz][l] = C_gs_tomo_limber((double) l, ZLNZ, ZSNZ);
+
+          Cl[nz][l+1] = C_gs_tomo_limber((double) l+1, ZLNZ, ZSNZ);
+
+          Cl[nz][l+2] = C_gs_tomo_limber((double) l+2, ZLNZ, ZSNZ);
+
+          Cl[nz][l+3] = C_gs_tomo_limber((double) l+3, ZLNZ, ZSNZ);
         }
       }
     }
@@ -621,9 +691,16 @@ double w_gg_tomo(int nt, int ni, int nj, int limber)
           Cl[nz][l] = C_gg_tomo_limber(1.0*l, nz, nz);
         }
         #pragma omp parallel for
-        for (int l=limits.LMIN_tab+1; l<limits.LMAX; l++)
+        for (int l=limits.LMIN_tab+1; l<limits.LMAX-3; l+=4)
         {
-          Cl[nz][l] = C_gg_tomo_limber(1.0*l, nz, nz);
+          // loop unrolling ---------
+          Cl[nz][l] = C_gg_tomo_limber((double) l, nz, nz);
+
+          Cl[nz][l+1] = C_gg_tomo_limber((double) l+1, nz, nz);
+
+          Cl[nz][l+2] = C_gg_tomo_limber((double) l+2, nz, nz);
+
+          Cl[nz][l+3] = C_gg_tomo_limber((double) l+3, nz, nz);
         }
       }
     }
@@ -2680,22 +2757,33 @@ double int_for_C_gs_tomo_limber(double a, void* params)
     return res*Pdelta(k,a)*(chidchi.dchida/(fK*fK))*(ell_prefactor2/(ell*ell));
   }
 }
-/*
-// for like.IA == 3
-double int_for_C_ggl_IA_Az(double a, void *params)
-{
-  double res, ell, fK, k,norm;
-  double *ar = (double *) params;
-  if (a >= 1.0) error("a>=1 in int_for_C_II");
-  ell       = ar[2]+0.5;
-  fK     = f_K(chi(a));
-  k      = ell/fK;
-  norm = nuisance.A_z[(int)ar[1]]*cosmology.Omega_m*nuisance.c1rhocrit_ia*growfac(0.9999)/growfac(a);
-  res= W_gal(a,ar[0])*(W_kappa(a,fK,ar[1])-W_source(a,ar[1])*norm);
 
-  return res*Pdelta(k,a)*dchi_da(a)/fK/fK;
+// for like.IA == 3
+double int_for_C_gs_tomo_limber_withIA_Az(double a, void* params)
+{
+  if (a >= 1.0) {
+    log_fatal("a >= 1");
+    exit(1);
+  }
+
+  double* ar = (double*) params;
+
+  const double growfac_a = growfac(a);
+  struct chis chidchi = chi_all(a);
+  const double hoverh0 = hoverh0v2(a, chidchi.dchida);
+
+  const double ell = ar[2] + 0.5;
+  const double fK = f_K(chidchi.chi);
+  const double k  = ell/fK;
+  const double norm =
+    nuisance.A_z[(int)ar[1]]*cosmology.Omega_m*nuisance.c1rhocrit_ia/growfac_a;
+
+  const double res = W_gal(a, ar[0], chidchi.chi, hoverh0)*(
+    W_kappa(a, fK, ar[1])-W_source(a, ar[1], hoverh0)*norm);
+
+  return res*Pdelta(k,a)*chidchi.dchida/(fK*fK);
 }
-*/
+
 
 // for like.IA == 4
 double int_for_C_gs_tomo_limber_withIA_mpp(double a, void* params)
@@ -2796,27 +2884,43 @@ double int_for_C_gs_tomo_limber_withb2(double a, void* params)
   return res;
 }
 
-/*
 // for like.IA == 3
-double int_for_C_ggl_IA_Az_b2(double a, void *params)
+double int_for_C_gs_tomo_limber_withb2_withIA_Az(double a, void *params)
 {
-  double res, ell, fK, k,norm;
-  double *ar = (double *) params;
+    if (a >= 1.0)
+  {
+    log_fatal("a>=1");
+    exit(1);
+  }
+
+  double* ar = (double*) params;
   double b1 = gbias.b1_function(1./a-1.,(int)ar[0]);
   double b2 = gbias.b2[(int)ar[0]];
   double bs2 = gbias.bs2[(int)ar[0]];
-  double g4 = pow(growfac(a)/growfac(1.0),4.);
-  if (a >= 1.0) error("a>=1 in int_for_C_II");
-  ell       = ar[2]+0.5;
-  fK     = f_K(chi(a));
-  k      = ell/fK;
-  norm = nuisance.A_z[(int)ar[1]]*cosmology.Omega_m*nuisance.c1rhocrit_ia*growfac(0.9999)/growfac(a);
-  res= W_HOD(a,ar[0])*(W_kappa(a,fK,ar[1])-W_source(a,ar[1])*norm);
 
-  return res*(b1*Pdelta(k,a)+g4*(0.5*b2*PT_d1d2(k)+0.5*bs2*PT_d1s2(k)+0.5*b3nl_from_b1(b1)*PT_d1d3(k)))*dchi_da(a)/fK/fK;
+  const double grow_fac = growfac(a);
+  const double g4 = grow_fac*grow_fac*grow_fac*grow_fac;
+  struct chis chidchi = chi_all(a);
+  const double hoverh0 = hoverh0v2(a, chidchi.dchida);
+
+  const double ell = ar[2]+0.5;
+  const double fK = f_K(chi(a));
+  const double k = ell/fK;
+
+  const double norm =
+    nuisance.A_z[(int)ar[1]]*cosmology.Omega_m*nuisance.c1rhocrit_ia/grow_fac;
+
+  const double res = W_HOD(a,ar[0], hoverh0)*(W_kappa(a,fK,ar[1]) -
+    W_source(a,ar[1], hoverh0)*norm);
+
+  return res*(
+    b1*Pdelta(k,a) + g4*(
+      0.5*b2*PT_d1d2(k) +
+      0.5*bs2*PT_d1s2(k) +
+      0.5*b3nl_from_b1(b1)*PT_d1d3(k)
+    )
+  )*chidchi.dchida/(fK*fK);
 }
-*/
-
 
 // for like.IA == 4
 double int_for_C_gs_tomo_limber_withb2_withIA_mpp(double a, void* params) {
