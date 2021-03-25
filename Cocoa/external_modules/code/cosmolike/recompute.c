@@ -33,35 +33,28 @@ void update_galpara(galpara *G) {
 }
 
 void update_nuisance(nuisancepara *N) {
-  int i;
   N->A_ia = nuisance.A_ia;
   N->beta_ia = nuisance.beta_ia;
   N->eta_ia = nuisance.eta_ia;
   N->eta_ia_highz = nuisance.eta_ia_highz;
   N->A2_ia = nuisance.A2_ia;
   N->eta_ia_tt = nuisance.eta_ia_tt;
-  N->LF_alpha = nuisance.LF_alpha;
-  N->LF_P = nuisance.LF_P;
-  N->LF_Q = nuisance.LF_Q;
-  N->LF_red_alpha = nuisance.LF_red_alpha;
-  N->LF_red_P = nuisance.LF_red_P;
-  N->LF_red_Q = nuisance.LF_red_Q;
-  for (i = 0; i < tomo.clustering_Nbin; i++) {
-    N->fred[i] = nuisance.fred[i];
+  for (int i=0; i<tomo.clustering_Nbin; i++) {
     N->sigma_zphot_clustering[i] = nuisance.sigma_zphot_clustering[i];
     N->bias_zphot_clustering[i] = nuisance.bias_zphot_clustering[i];
   }
-  for (i = 0; i < tomo.shear_Nbin; i++) {
+  for (int i=0; i<tomo.shear_Nbin; i++) {
     N->sigma_zphot_shear[i] = nuisance.sigma_zphot_shear[i];
     N->bias_zphot_shear[i] = nuisance.bias_zphot_shear[i];
     N->A_z[i] = nuisance.A_z[i];
     N->A2_z[i] = nuisance.A2_z[i];
     N->b_ta_z[i] = nuisance.b_ta_z[i];
   }
-  for (i = 0; i < tomo.magnification_Nbin; i++) {
+  for (int i=0; i<tomo.magnification_Nbin; i++) {
     N->sigma_zphot_magnification[i] = nuisance.sigma_zphot_magnification[i];
     N->bias_zphot_magnification[i] = nuisance.bias_zphot_magnification[i];
   }
+
   N->cluster_Mobs_lgM0 = nuisance.cluster_Mobs_lgM0;
   N->cluster_Mobs_sigma = nuisance.cluster_Mobs_sigma;
   N->cluster_Mobs_alpha = nuisance.cluster_Mobs_alpha;
@@ -71,17 +64,18 @@ void update_nuisance(nuisancepara *N) {
   N->cluster_Mobs_sigma_qm = nuisance.cluster_Mobs_sigma_qm;
   N->cluster_Mobs_sigma_qz = nuisance.cluster_Mobs_sigma_qz;
 
-  for (i = 0; i < tomo.cluster_Nbin; i++) {
+  for (int i=0; i<tomo.cluster_Nbin; i++) {
     N->cluster_completeness[i] = nuisance.cluster_completeness[i];
   }
   N->cluster_centering_f0 = nuisance.cluster_centering_f0;
   N->cluster_centering_alpha = nuisance.cluster_centering_alpha;
   N->cluster_centering_sigma = nuisance.cluster_centering_sigma;
-  for (int _i = 0; _i < nuisance.N_cluster_MOR; ++_i) {
-    N->cluster_MOR[_i] = nuisance.cluster_MOR[_i];
+
+  for (int i=0; i<nuisance.N_cluster_MOR; ++i) {
+    N->cluster_MOR[i] = nuisance.cluster_MOR[i];
   }
-  for (int _i = 0; _i < nuisance.N_cluster_selection; ++_i) {
-    N->cluster_selection[_i] = nuisance.cluster_selection[_i];
+  for (int i=0; i<nuisance.N_cluster_selection; ++i) {
+    N->cluster_selection[i] = nuisance.cluster_selection[i];
   }
 }
 
@@ -227,11 +221,7 @@ int recompute_ii(cosmopara C, nuisancepara N) {
   if (recompute_cosmo3D(C) || recompute_zphot_clustering(N) ||
       recompute_zphot_shear(N) || N.A_ia != nuisance.A_ia ||
       N.beta_ia != nuisance.beta_ia || N.eta_ia != nuisance.eta_ia ||
-      N.eta_ia_highz != nuisance.eta_ia_highz ||
-      N.LF_alpha != nuisance.LF_alpha ||
-      N.LF_red_alpha != nuisance.LF_red_alpha || N.LF_P != nuisance.LF_P ||
-      N.LF_Q != nuisance.LF_Q || N.LF_red_P != nuisance.LF_red_P ||
-      N.LF_red_Q != nuisance.LF_red_Q) {
+      N.eta_ia_highz != nuisance.eta_ia_highz ) {
     return 1;
   } else {
     return 0;
@@ -275,17 +265,6 @@ int recompute_clustering(cosmopara C, galpara G, nuisancepara N, int i, int j) {
   } else {
     return 0;
   }
-}
-
-int recompute_PkRatio(barypara B) {
-  if (strcmp(B.scenario, bary.scenario) != 0) {
-    return 1;
-  }
-  return 0;
-}
-
-void update_PkRatio(barypara *B) {
-  sprintf((*B).scenario, "%s", bary.scenario);
 }
 
 int recompute_ks(cosmopara C, galpara G, nuisancepara N, int i) {

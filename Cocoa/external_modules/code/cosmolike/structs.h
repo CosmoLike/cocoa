@@ -1,3 +1,5 @@
+#include <gsl/gsl_interp2d.h>
+
 #ifndef __COSMOLIKE_STRUCTS_H
 #define __COSMOLIKE_STRUCTS_H
 #ifdef __cplusplus
@@ -16,33 +18,16 @@ typedef struct {
   double lmax;
   double vtmax;
   double vtmin;
-  double *ell;
-  double *theta;
+  double* ell;
+  double* theta;
   double cosmax;
   double Rmin_bias;
   double Rmin_shear;
   double lmax_shear;
   double lmax_kappacmb;
-  int baryons;
   int IA;
   int bias;
-  int wlphotoz;
-  int clphotoz;
-  int shearcalib;
   int clusterMobs;
-  int Planck15_BAO_H070p6_JLA_w0wa;       // CH
-  int Planck18_BAO_Riess18_Pantheon_w0wa; // CH
-  int Planck18_BAO_w0wa;                  // CH
-  int Planck18_w0;                        // CH
-  int BAO;
-  int SN_WFIRST;
-  int GRS;
-  int SRD;
-  char DATA_FILE[CHAR_MAX_SIZE];
-  char INV_FILE[CHAR_MAX_SIZE];
-  char COV_FILE[CHAR_MAX_SIZE];
-  char BARY_FILE[CHAR_MAX_SIZE];
-  char MASK_FILE[CHAR_MAX_SIZE];
   int clusterN;
   int clusterWL;
   int clusterCG;
@@ -53,9 +38,6 @@ typedef struct {
   int gk;
   int kk;
   int ks;
-  char probes[CHAR_MAX_SIZE];
-  char ext_data[CHAR_MAX_SIZE];
-  int theta_s;
 } likepara;
 
 typedef struct {
@@ -98,7 +80,8 @@ typedef struct {
   double magnification_zmin[10];
 } tomopara;
 
-typedef struct {
+typedef struct
+{
   int shear_photoz;
   double shear_zdistrpar_zmin;
   double shear_zdistrpar_zmax;
@@ -124,32 +107,18 @@ typedef struct {
   double sigma_e;                // rms inrinsic ellipticity noise
   double area_conversion_factor; // factor from deg^2 to radian^2:
                                  // 60*60*constants.arcmin*constants.arcmin
-  double
-      n_gal_conversion_factor; // factor from n_gal/arcmin^2 to n_gal/radian^2:
+  double n_gal_conversion_factor; // factor from n_gal/arcmin^2 to n_gal/radian^2:
                                // 1.0/constants.arcmin/constants.arcmin
   double n_lens; // lens galaxy density per arcmin^2
-  char Kcorrect_File[CHAR_MAX_SIZE];
   double m_lim;
   char name[CHAR_MAX_SIZE];
-  int surveystage;
-  char sourcephotoz[CHAR_MAX_SIZE];
-  char lensphotoz[CHAR_MAX_SIZE];
-  char galsample[CHAR_MAX_SIZE];
   double ggl_overlap_cut;
 } sur;
 
-// MANUWARNING: check this
-typedef struct {
-  char name[CHAR_MAX_SIZE];
-  double fwhm;            // beam fwhm in rad
-  double sensitivity;     // white noise level in muK*rad
-  char pathLensRecNoise[CHAR_MAX_SIZE]; // path to precomputed noise on reconstructed kappa
-} Cmb;
-
 typedef double (*B1_model)(double z, int nz);
 typedef struct {
-  double b[10];   // linear galaxy bias paramter in clustering bin i
-  double b2[10];  // quadratic bias parameter for redshift bin i
+  double b[10]; // linear galaxy bias paramter in clustering bin i
+  double b2[10]; // quadratic bias parameter for redshift bin i
   double bs2[10]; // leading order tidal bias for redshift bin i
   double rcorr[10];
   double cg[10];
@@ -173,7 +142,6 @@ typedef struct {
 
 typedef struct {
   char runmode[CHAR_MAX_SIZE];
-  char baryons[CHAR_MAX_SIZE];
 } pdeltapara;
 
 typedef struct { // parameters for power spectrum passed to FASTPT
@@ -221,13 +189,6 @@ typedef struct {
   double bias_zphot_clustering[10];
   double sigma_zphot_magnification[10];
   double bias_zphot_magnification[10];
-  double LF_alpha;
-  double LF_P;
-  double LF_Q;
-  double LF_red_alpha;
-  double LF_red_P;
-  double LF_red_Q;
-  double fA_blue; // fractional IA amplitude of blue galaxies compared to red
   double cluster_Mobs_lgM0;
   double cluster_Mobs_sigma;
   double cluster_Mobs_alpha;
@@ -249,25 +210,23 @@ typedef struct {
 } nuisancepara;
 
 typedef struct {
-  char FILE_logPkR[CHAR_MAX_SIZE];
-  char scenario[100]; // available options: mb2, illustris, eagle, HzAGN,
-                      // TNG100, owls_AGN, owls_DBLIMFV1618, owls_NOSN,
-                      // owls_NOSN_NOZCOOL, owls_NOZCOOL, owls_REF, owls_WDENS,
-                      // owls_WML1V848, owls_WML4
-  int Nabins;
-  int Nkbins;
-  double z_bins[50];
-  int isPkbary; // if isPkbary=1
+  int is_Pk_bary;
+  int Na_bins;
+  int Nk_bins;
+  double* a_bins;
+  double* logk_bins;
+  double* log_PkR;
+  gsl_interp2d_type* T;
+  gsl_interp2d* interp2d;
 } barypara;
 
 typedef struct {
-  double ***S_integrands_cl; // galaxy density nonlimber integrand
-  double ***S_integrands_sh; // galaxy shape nonlimber integrand
-  int *recompute_cl;         // recompute the above or not
-  int *recompute_sh;
-  int Nell;
-  int Nchi;
-} fft_optimize;
+  char name[CHAR_MAX_SIZE];
+  double fwhm;            // beam fwhm in rad
+  double sensitivity;     // white noise level in muK*rad
+  char pathLensRecNoise[CHAR_MAX_SIZE]; // path to precomputed noise on
+                                        // reconstructed kappa
+} Cmb;
 
 double bgal_z(double z, int nz);
 
@@ -283,8 +242,6 @@ extern redshiftpara redshift;
 
 extern sur survey;
 
-extern Cmb cmb;
-
 extern galpara gbias;
 
 extern clusterpara Cluster;
@@ -297,7 +254,9 @@ extern nuisancepara nuisance;
 
 extern barypara bary;
 
-extern fft_optimize fft_int;
+extern Cmb cmb;
+
+void reset_all_struct();
 
 #ifdef __cplusplus
 }

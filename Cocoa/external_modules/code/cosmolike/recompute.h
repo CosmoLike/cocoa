@@ -35,10 +35,6 @@ int recompute_clustering(cosmopara C, galpara G, nuisancepara N, int i, int j);
 // recompute criteria
 int recompute_clusters(cosmopara C, nuisancepara N);
 
-int recompute_PkRatio(barypara B);
-
-void update_PkRatio(barypara *B);
-
 // recompute criteria
 int recompute_DESclusters(cosmopara C, nuisancepara N);
 

@@ -199,8 +199,8 @@ double xi_pm_tomo(int pm, int nt, int ni, int nj, int limber)
     {
       if (like.IA == 5 || like.IA == 6)
       { // NEW TATT MODELING
-        double** Cl_EE = malloc(tomo.shear_Npowerspectra*sizeof(double*));
-        double** Cl_BB = malloc(tomo.shear_Npowerspectra*sizeof(double*));
+        double** Cl_EE = (double**) malloc(tomo.shear_Npowerspectra*sizeof(double*));
+        double** Cl_BB = (double**) malloc(tomo.shear_Npowerspectra*sizeof(double*));
         for (int nz = 0; nz<tomo.shear_Npowerspectra; nz++)
         {
           Cl_EE[nz] = calloc(limits.LMAX, sizeof(double));

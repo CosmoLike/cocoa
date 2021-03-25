@@ -945,6 +945,7 @@ void setup_p_lin(int* io_nlog10k, int* io_nz, double** io_log10k,
     for (int j = 0; j < nz; j++) {
       z[j] = (*io_z)[j];
     }
+    #pragma omp parallel for
     for (int i=0; i<nlog10k; i++) {
       log10k[i] = (*io_log10k)[i];
       for(int j=0; j<nz; j++) {
@@ -1026,6 +1027,7 @@ void setup_p_lin(int* io_nlog10k, int* io_nz, double** io_log10k,
     for (int j=0; j<nz; j++) {
       (*io_z)[j] = z[j];
     }
+    #pragma omp parallel for
     for (int i=0; i<nlog10k; i++) {
       (*io_log10k)[i] = log10k[i];
       for (int j=0; j<nz; j++) {
@@ -1091,6 +1093,7 @@ void setup_p_nonlin(int* io_nlog10k, int* io_nz, double** io_log10k,
     for (int j=0; j<nz; j++) {
       z[j] = (*io_z)[j];
     }
+    #pragma omp parallel for
     for (int i=0; i<nlog10k; i++) {
       log10k[i] = (*io_log10k)[i];
       for (int j=0; j<nz; j++) {
@@ -1172,10 +1175,25 @@ void setup_p_nonlin(int* io_nlog10k, int* io_nz, double** io_log10k,
     for (int j = 0; j<nz; j++) {
       (*io_z)[j] = z[j];
     }
+    #pragma omp parallel for
     for (int i=0; i<nlog10k; i++) {
       (*io_log10k)[i] = log10k[i];
       for (int j=0; j<nz; j++) {
         (*io_lnP)[i*nz+j] = lnP[i*nz+j];
+      }
+    }
+    // ADD BARYIONIC PHYSICS
+    if (bary.is_Pk_bary == 1)
+    {
+      #pragma omp parallel for
+      for (int i=0; i<nlog10k; i++)
+      {
+        const double KNL = pow(10.0,(*io_log10k)[i])*cosmology.coverH0;
+        for (int j=0; j<nz; j++)
+        {
+          const double a = 1.0/(1.0+z[j]);
+          (*io_lnP)[i*nz+j] = log(exp((*io_lnP)[i*nz+j])*PkRatio_baryons(KNL,a));
+        }
       }
     }
   }
@@ -1547,83 +1565,17 @@ double f_K(double chi) {
 // ------------------------------------------------------------------------
 // ------------------------------------------------------------------------
 
-// return P(k)_bary/P(k)_DMO from hydro sims ; kintern in unit [h/Mpc]
-double PkRatio_baryons(double kintern, double a) {
-  FILE *infile;
-  static barypara B;
-  double logkin = log10(kintern);
-  double res;
-  static double *logk_bins = 0;
-  static double *a_bins = 0;
-  static double **TblogPkR = 0;
-
-  if (bary.isPkbary == 0) {
+// return P(k)_bary/P(k)_DMO from hydro sims ;
+double PkRatio_baryons(double k_NL, double a) {
+  if (bary.is_Pk_bary == 0) {
     return 1.;
+  } else {
+    const double kintern = k_NL/cosmology.coverH0;
+    double result;
+    int status = gsl_interp2d_eval_extrap_e(bary.interp2d, bary.logk_bins,
+      bary.a_bins, bary.log_PkR, log10(kintern), a, NULL, NULL, &result);
+    return pow(10.0, result);
   }
-
-  const gsl_interp2d_type *T = gsl_interp2d_bilinear;
-  gsl_interp2d *interp2d = gsl_interp2d_alloc(T, bary.Nkbins, bary.Nabins);
-  double *GSLPKR = malloc(bary.Nkbins * bary.Nabins * sizeof(double));
-
-  if (recompute_PkRatio(B)) {
-    update_PkRatio(&B);
-
-    printf("in recompute PkRatio \n");
-
-    if (TblogPkR != 0) {
-      free_double_matrix(TblogPkR, 0, bary.Nkbins - 1, 0, bary.Nabins - 1);
-    }
-    TblogPkR = create_double_matrix(0, bary.Nkbins - 1, 0, bary.Nabins - 1);
-
-    if (logk_bins != 0) {
-      free_double_vector(logk_bins, 0, bary.Nkbins - 1);
-    }
-    logk_bins = create_double_vector(0, bary.Nkbins - 1);
-
-    if (a_bins != 0) {
-      free_double_vector(logk_bins, 0, bary.Nabins - 1);
-    }
-    a_bins = create_double_vector(0, bary.Nabins - 1);
-
-    for (int i = 0; i < bary.Nabins; i++) {
-      a_bins[i] = 1. / (1 + bary.z_bins[i]);
-      // printf("a: %le,z: %le\n",a[i],z[i]);
-    }
-
-    infile = fopen(bary.FILE_logPkR, "r");
-    if (infile == NULL) {
-      printf("Error opening logPkRatio file\n");
-      exit(1);
-    }
-
-    fscanf(infile, "%*[^\n]"); // Read and discard the 1st line
-
-    for (int i = 0; i < bary.Nkbins; i++) {
-      fscanf(infile, "%le ", &logk_bins[i]);
-      for (int j = 0; j < bary.Nabins; j++) {
-        fscanf(infile, "%le ", &TblogPkR[i][j]);
-      }
-    }
-    fclose(infile);
-  }
-
-  for (int i = 0; i < bary.Nkbins; i++) {
-    for (int j = 0; j < bary.Nabins; j++) {
-      gsl_interp2d_set(interp2d, GSLPKR, i, j, TblogPkR[i][j]);
-    }
-  }
-
-  gsl_interp2d_init(interp2d, logk_bins, a_bins, GSLPKR, bary.Nkbins,
-                    bary.Nabins);
-
-  // allow extrapolation beyond k>1500 Pk_ratio
-  res = gsl_interp2d_eval_extrap(interp2d, logk_bins, a_bins, GSLPKR, logkin, a,
-                                 NULL, NULL);
-  res = pow(10, res);
-
-  gsl_interp2d_free(interp2d);
-  free(GSLPKR);
-  return res;
 }
 
 // ------------------------------------------------------------------------

@@ -64,7 +64,8 @@ Ntab Ntable = {
 };
 
 double int_gsl_integrate_high_precision(double (*func)(double, void *),
-void *arg, double a, double b, double *error, int niter) {
+void* arg, double a, double b, double* error, int niter)
+{
   double res, err;
   gsl_integration_cquad_workspace *w =
       gsl_integration_cquad_workspace_alloc(niter);
@@ -79,7 +80,8 @@ void *arg, double a, double b, double *error, int niter) {
 }
 
 double int_gsl_integrate_medium_precision(double (*func)(double, void*),
-void *arg, double a, double b, double *error, int niter) {
+void* arg, double a, double b, double* error, int niter)
+{
   double res, err;
   gsl_integration_cquad_workspace *w =
     gsl_integration_cquad_workspace_alloc(niter);
@@ -166,14 +168,15 @@ void error(char *s) {
   exit(1);
 }
 
-/* ============================================================ *
- * Interpolates f at the value x, where f is a double[n] array,	*
- * representing a function between a and b, stepwidth dx.	*
- * 'lower' and 'upper' are powers of a logarithmic power law	*
- * extrapolation. If no	extrapolation desired, set these to 0	*
- * ============================================================ */
+// ============================================================
+// Interpolates f at the value x, where f is a double[n] array,
+// representing a function between a and b, stepwidth dx.
+// 'lower' and 'upper' are powers of a logarithmic power law
+// extrapolation. If no	extrapolation desired, set these to 0
+// ============================================================
+
 double interpol(double *f, int n, double a, double b, double dx, double x,
-                double lower, double upper) {
+double lower, double upper) {
   double r;
   int i;
   if (x < a) {
@@ -187,7 +190,7 @@ double interpol(double *f, int n, double a, double b, double dx, double x,
   if (i + 1 >= n) {
     if (upper == 0.0) {
       if (i + 1 == n) {
-        return f[i]; /* constant extrapolation */
+        return f[i]; // constant extrapolation
       } else {
         return 0.0;
       }
