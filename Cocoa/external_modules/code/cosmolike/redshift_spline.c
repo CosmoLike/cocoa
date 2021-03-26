@@ -389,10 +389,9 @@ double bias_zphot_shear(double z, int nz) {
   return (1. + z) * nuisance.bias_zphot_shear[nz];
 }
 
-double zdistr_histo_n(
-    double z,
-    void *params) // return nz(z,j) based on redshift file with structure z[i]
-                  // nz[0][i] .. nz[tomo.shear_Nbin-1][i]
+// return nz(z,j) based on redshift file with structure z[i]
+// nz[0][i] .. nz[tomo.shear_Nbin-1][i]
+double zdistr_histo_n(double z, void *params)
 {
   double *array = (double *)params;
   static double **tab;

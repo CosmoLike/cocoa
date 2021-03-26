@@ -23,11 +23,13 @@ void reset_like_struct()
   like.lmax = 0;
   like.vtmax = 0;
   like.vtmin = 0;
-  if(like.ell != NULL) {
+  if((like.ell != NULL) == 1) {
     free(like.ell);
+    like.ell = NULL;
   }
-  if(like.theta != NULL) {
+  if((like.theta != NULL) == 1) {
     free(like.theta);
+    like.theta = NULL;
   }
   like.cosmax = 0;
   like.Rmin_bias = 0;
@@ -54,7 +56,8 @@ cosmopara cosmology = {
   .coverH0 = 2997.92458,
   .rho_crit = 7.4775e+21,
   .MGSigma = 0.0,
-  .MGmu = 0.0
+  .MGmu = 0.0,
+  .is_cached = 0
 };
 
 void reset_cosmology_struct() {
@@ -64,7 +67,7 @@ void reset_cosmology_struct() {
   cosmology.MGSigma = 0.0;
   cosmology.MGmu = 0.0;
 
-  cosmology.is_cached = 0.0;
+  cosmology.is_cached = 0;
 
   cosmology.Omega_m = 0.0;
   cosmology.Omega_v = 0.0;
@@ -159,7 +162,7 @@ galpara gbias = {
   .b2 = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0},
   .bs2 = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0},
   .b1_function = &b1_per_bin,
-  .b_mag = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,0.0}
+  .b_mag = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,0.0},
 }; // default: point to old bgal_z routin
 
 void reset_gbias_struct()
@@ -206,7 +209,7 @@ pdeltapara pdeltaparams =
 
 void reset_pdeltaparams_struct()
 {
-  sprintf(pdeltaparams.runmode,"Halofit");
+  sprintf(pdeltaparams.runmode, "Halofit");
 }
 
 FPTpara FPT = {
@@ -303,34 +306,20 @@ void reset_bary_struct()
   bary.Na_bins = 0;
   bary.Nk_bins = 0;
 
-  if(bary.a_bins != NULL) {
+  if((bary.a_bins != NULL)) {
     free(bary.a_bins);
     bary.a_bins = NULL;
   }
-  if(bary.logk_bins != NULL) {
+  if((bary.logk_bins != NULL)) {
     free(bary.logk_bins);
     bary.logk_bins = NULL;
   }
-  if(bary.log_PkR != NULL) {
+  if((bary.log_PkR != NULL)) {
     free(bary.log_PkR);
     bary.log_PkR = NULL;
   }
-  if(bary.interp2d != NULL) {
+  if((bary.interp2d != NULL)) {
     gsl_interp2d_free(bary.interp2d);
     bary.interp2d = NULL;
   }
-}
-
-void reset_all_struct() {
-  reset_like_struct();
-  reset_cosmology_struct();
-  reset_tomo_struct();
-  reset_redshift_struct();
-  reset_survey_struct();
-  reset_gbias_struct();
-  reset_cluster_struct();
-  reset_pdeltaparams_struct();
-  reset_nuisance_struct();
-  reset_bary_struct();
-  reset_cmb_struct();
 }

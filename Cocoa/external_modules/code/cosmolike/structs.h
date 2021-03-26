@@ -256,7 +256,7 @@ extern barypara bary;
 
 extern Cmb cmb;
 
-void reset_all_struct();
+void reset_bary_struct();
 
 #ifdef __cplusplus
 }
