@@ -19,6 +19,7 @@ from cobaya.conventions import _c_km_s, empty_dict
 H_units_conv_factor = {"1/Mpc": 1, "km/s/Mpc": _c_km_s}
 
 
+
 class BoltzmannBase(Theory):
     _get_z_dependent: callable  # defined by inheriting classes
     renames: Mapping[str, str] = empty_dict
