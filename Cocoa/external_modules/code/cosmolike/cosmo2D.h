@@ -83,8 +83,6 @@ double C_ss_tomo_limber(double l, int ni, int nj); // IA=(0||3||4)
 
 // works with IA=(0||3||4||5||6)
 double C_gs_tomo_limber_nointerp(double l, int ni, int nj, int use_linear_ps);
-
-// works with IA=(0||3||4||5||6)
 double C_gs_tomo_limber(double l, int ni, int nj);
 
 // ----------------------------------------------------------------------------

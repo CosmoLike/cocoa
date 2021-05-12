@@ -228,6 +228,7 @@ typedef struct {
                                         // reconstructed kappa
 } Cmb;
 
+
 double bgal_z(double z, int nz);
 
 double b1_per_bin(double z, int nz);
