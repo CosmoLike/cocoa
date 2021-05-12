@@ -38,17 +38,14 @@ double W_mag(double a, double fK, double nz) {
 }
 
 double W_gal(double a, double nz, double chi, double hoverh0) {
-  double wgal = gbias.b1_function(1. / a - 1., (int) nz) *
+  const double wgal = gbias.b1_function(1. / a - 1., (int) nz) *
     pf_photoz(1. / a - 1., (int) nz) * hoverh0;
-  double wmag = gbias.b_mag[(int) nz] * 1.5 * cosmology.Omega_m * f_K(chi) /
-    a * g_lens(a, (int) nz);
-  if (cosmology.MGSigma != 0.) {
-    wmag *= (1. + MG_Sigma(a));
-  }
-  return wgal + wmag;
+
+  return wgal + gbias.b_mag[(int) nz]*W_mag(a, f_K(chi), nz);
 }
 
-double W_source(double a, double nz, double hoverh0) {
+double W_source(double a, double nz, double hoverh0)
+{
   return zdistr_photoz(1. / a - 1., (int)nz) * hoverh0;
 }
 
