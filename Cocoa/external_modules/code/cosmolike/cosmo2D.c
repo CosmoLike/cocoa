@@ -2427,14 +2427,15 @@ double int_for_C_ss_tomo_limber(double a, void* params)
 
   // prefactor correction (1812.05995 eqs 74-79)
   const double ell_prefactor = (ar[2] - 1.)*(ar[2])*(ar[2] + 1.)*(ar[2] + 2.);
-  const double ell4 = ell*ell*ell*ell;
 
+  const double growfac_a = growfac(a);
   struct chis chidchi = chi_all(a);
   const double hoverh0 = hoverh0v2(a, chidchi.dchida);
 
-  const double ell = ar[2]+0.5;
-  const double f_K(chidchi.chi);
+  const double ell = ar[2] + 0.5;
+  const double fK = f_K(chidchi.chi);
   const double k = ell/fK;
+  const double ell4 = ell*ell*ell*ell;
 
   const double ws1 = W_source(a, ar[0], hoverh0);
   const double ws2 = W_source(a, ar[1], hoverh0);
@@ -2476,11 +2477,11 @@ double int_for_C_ss_tomo_limber(double a, void* params)
 
   if(use_linear_ps == 1)
   {
-    res *= p_lin(k,a)
+    res *= p_lin(k,a);
   }
   else
   {
-    res *= Pdelta(k,a)
+    res *= Pdelta(k,a);
   }
 
   return res*(chidchi.dchida/(fK*fK))*ell_prefactor/ell4;
@@ -2917,7 +2918,7 @@ double C_gs_tomo_limber_nointerp(double l, int nl, int ns, int use_linear_ps)
           int_for_C_gs_tomo_limber_withb2,
           (void*) array,
           amin_lens(nl),
-          amax_lens(nl),
+          0.99999,
           NULL,
           GSL_WORKSPACE_SIZE
         );
@@ -2925,7 +2926,7 @@ double C_gs_tomo_limber_nointerp(double l, int nl, int ns, int use_linear_ps)
       return int_gsl_integrate_medium_precision(
         int_for_C_gs_tomo_limber,
         (void*) array,
-        amin_lens(ni),
+        amin_lens(nl),
         0.99999,
         NULL,
         GSL_WORKSPACE_SIZE
@@ -2937,7 +2938,7 @@ double C_gs_tomo_limber_nointerp(double l, int nl, int ns, int use_linear_ps)
           int_for_C_gs_tomo_limber_withb2,
           (void*) array,
           amin_lens(nl),
-          amax_lens(nl),
+          0.99999,
           NULL,
           GSL_WORKSPACE_SIZE
         );
@@ -2957,7 +2958,7 @@ double C_gs_tomo_limber_nointerp(double l, int nl, int ns, int use_linear_ps)
           int_for_C_gs_tomo_limber_withb2,
           (void*) array,
           amin_lens(nl),
-          amax_lens(nl),
+          0.99999,
           NULL,
           GSL_WORKSPACE_SIZE
         );
@@ -2977,7 +2978,7 @@ double C_gs_tomo_limber_nointerp(double l, int nl, int ns, int use_linear_ps)
           int_for_C_gs_tomo_limber_withb2,
           (void*) array,
           amin_lens(nl),
-          amax_lens(nl),
+          0.99999,
           NULL,
           GSL_WORKSPACE_SIZE
         );
@@ -3597,6 +3598,9 @@ double int_for_C_gk_limber_withb2(double a, void* params)
   const double k = ell/fK;
   const double WK = W_k(a, fK);
 
+  const double wgal = W_gal(a, ar[0], chidchi.chi, hoverh0) +
+    W_mag(a, fK, ar[0])*(ell_prefactor/(ell*ell) - 1.0)*gbias.b_mag[(int) ar[0]];
+
   double linear_part = 0.0;
   if(include_RSD_GK == 1)
   {
@@ -3745,7 +3749,9 @@ double int_for_C_ks_limber(double a, void* params)
 
   const int use_linear_ps = (int) ar[2];
 
+  const double growfac_a = growfac(a);
   struct chis chidchi = chi_all(a);
+  const double hoverh0 = hoverh0v2(a, chidchi.dchida);
 
   // prefactor correction (1812.05995 eqs 74-79)
   const double ell_prefactor1 = (ar[1])*(ar[1] + 1.);

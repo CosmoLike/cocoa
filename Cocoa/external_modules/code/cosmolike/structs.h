@@ -163,6 +163,13 @@ typedef struct { // parameters for power spectrum passed to FASTPT
 } FPTpara;
 
 typedef struct {
+  // like.IA = 1 variables
+  double LF_alpha;
+  double LF_P;
+  double LF_Q;
+  double LF_red_alpha;
+  double LF_red_P;
+  double LF_red_Q;
   // like.IA = 3: NLA, per bin
   // like.IA = 4: NLA, power law
   // like.IA = 5: TATT, per bin

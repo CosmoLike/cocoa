@@ -76,8 +76,8 @@ double M_abs(double mag, double a)
       table[i] = KE[i];
     }
   }
-  const double z = 1./a - 1.0;
 
+  double z = 1./a - 1.0;
   if(z >= 3.0)
   { // no acceptable k-korrection exists for k>3, also no meaningful IA model
     z = 2.99;

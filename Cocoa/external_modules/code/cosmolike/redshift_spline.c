@@ -96,22 +96,24 @@ double amax_lens(int i) {
 //redshift overlap tests, allowed tomography combinations
 // ------------------------------------------------------------------------
 
-// test whether the (l,zl) bin is in the linear
-// clustering regime - return 1 if true, 0 otherwise
-int test_kmax(double l, int zl) {
+// test whether the (l,zl) bin is in the linear clustering regime
+// return 1 if true, 0 otherwise
+int test_kmax(double l, int zl)
+{
   static double chiref[10] = {-1.};
-  if (chiref[0] < 0) {
-    int i;
-    for (i = 0; i < tomo.clustering_Nbin; i++) {
-      chiref[i] =
-          chi(1. /
+  if (chiref[0] < 0)
+  {
+    for (int i = 0; i < tomo.clustering_Nbin; i++)
+    {
+      chiref[i] = chi(1. /
               (1. + 0.5 * (tomo.clustering_zmin[i] + tomo.clustering_zmax[i])));
     }
   }
-  double R_min = like.Rmin_bias; // set minimum scale to which we trust our bias
-                                 // model, in Mpc/h
-  double kmax = constants.twopi / R_min * cosmology.coverH0;
-  if ((l + 0.5) / chiref[zl] < kmax) {
+  const double R_min = like.Rmin_bias; // set minimum scale to which
+                                       // we trust our bias model, in Mpc/h
+  const double kmax = constants.twopi / R_min * cosmology.coverH0;
+  if ((l + 0.5) / chiref[zl] < kmax)
+  {
     return 1;
   }
   return 0;
