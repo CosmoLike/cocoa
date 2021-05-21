@@ -9,7 +9,8 @@ extern "C" {
 #define CHAR_MAX_SIZE 1024
 #define MAX_SIZE_ARRAYS 10
 
-typedef struct {
+typedef struct
+{
   int Ncl;
   int Ntheta;
   int Ncos;
@@ -40,10 +41,11 @@ typedef struct {
   int ks;
 } likepara;
 
-typedef struct {
-  double Omega_m; // matter density parameter
-  double Omega_v; // cosmogical constant parameter
-  double h0;      // Hubble constant
+typedef struct
+{
+  double Omega_m;  // matter density parameter
+  double Omega_v;  // cosmogical constant parameter
+  double h0;       // Hubble constant
   double Omega_nu; // density parameter of massive neutrinos;
                    // Omega_m = Omega_cdm+ Omega_nu + omb
   double coverH0;  // units for comoving distances - speeds up code
@@ -57,18 +59,18 @@ typedef struct {
 typedef struct {
   int shear_Nbin;          // number of tomography bins
   int shear_Npowerspectra; // number of tomography power spectra+2+3+...+Nbin
-  double shear_zmax[10];   // code needs modification if more than 10 zbins
-  double shear_zmin[10];
-  double n_source[10];
+  double shear_zmax[MAX_SIZE_ARRAYS]; // code needs modification if more than 10 zbins
+  double shear_zmin[MAX_SIZE_ARRAYS];
+  double n_source[MAX_SIZE_ARRAYS];
   int clustering_Nbin;          // number of tomography bins
   int clustering_Npowerspectra; // number of tomography power
                                 // spectra+2+3+...+Nbin
-  double clustering_zmax[10];
-  double clustering_zmin[10];
-  double n_lens[10];
+  double clustering_zmax[MAX_SIZE_ARRAYS];
+  double clustering_zmin[MAX_SIZE_ARRAYS];
+  double n_lens[MAX_SIZE_ARRAYS];
   int cluster_Nbin; // number of cluster redshift bins
-  double cluster_zmax[10];
-  double cluster_zmin[10];
+  double cluster_zmax[MAX_SIZE_ARRAYS];
+  double cluster_zmin[MAX_SIZE_ARRAYS];
   int cluster_cg_Npowerspectra; // number of cluster-lensing tomography
                                 // combinations
   int cgl_Npowerspectra;  // number of cluster-lensing tomography combinations
@@ -76,8 +78,8 @@ typedef struct {
   int magnification_Nbin; // number of tomography bins
   int magnification_Npowerspectra; // number of tomography power
                                    // spectra+2+3+...+Nbin
-  double magnification_zmax[10];
-  double magnification_zmin[10];
+  double magnification_zmax[MAX_SIZE_ARRAYS];
+  double magnification_zmin[MAX_SIZE_ARRAYS];
 } tomopara;
 
 typedef struct
@@ -101,14 +103,15 @@ typedef struct
   char magnification_REDSHIFT_FILE[CHAR_MAX_SIZE];
 } redshiftpara;
 
-typedef struct {
+typedef struct
+{
   double area;                   // survey_area in deg^2.
   double n_gal;                  // galaxy density per arcmin^2
   double sigma_e;                // rms inrinsic ellipticity noise
   double area_conversion_factor; // factor from deg^2 to radian^2:
                                  // 60*60*constants.arcmin*constants.arcmin
   double n_gal_conversion_factor; // factor from n_gal/arcmin^2 to n_gal/radian^2:
-                               // 1.0/constants.arcmin/constants.arcmin
+                                  // 1.0/constants.arcmin/constants.arcmin
   double n_lens; // lens galaxy density per arcmin^2
   double m_lim;
   char name[CHAR_MAX_SIZE];
@@ -116,35 +119,39 @@ typedef struct {
 } sur;
 
 typedef double (*B1_model)(double z, int nz);
-typedef struct {
-  double b[10]; // linear galaxy bias paramter in clustering bin i
-  double b2[10]; // quadratic bias parameter for redshift bin i
-  double bs2[10]; // leading order tidal bias for redshift bin i
-  double rcorr[10];
-  double cg[10];
-  double n_hod[10];
-  double b_mag[10]; // amplitude of magnification bias, b_mag[i] =
-                    // 5*s[i]+beta[i]-2
+typedef struct
+{
+  double b[MAX_SIZE_ARRAYS];   // linear galaxy bias paramter in clustering bin i
+  double b2[MAX_SIZE_ARRAYS];  // quadratic bias parameter for redshift bin i
+  double bs2[MAX_SIZE_ARRAYS]; // leading order tidal bias for redshift bin i
+  double rcorr[MAX_SIZE_ARRAYS];
+  double cg[MAX_SIZE_ARRAYS];
+  double n_hod[MAX_SIZE_ARRAYS];
+  double b_mag[MAX_SIZE_ARRAYS]; // amplitude of magnification bias, b_mag[i] =
+                                 // 5*s[i]+beta[i]-2
   B1_model b1_function;
 } galpara;
 
-typedef struct {
+typedef struct
+{
   double N200_min;
   double N200_max;
   int N200_Nbin;
-  double N_min[10];
-  double N_max[10];
+  double N_min[MAX_SIZE_ARRAYS];
+  double N_max[MAX_SIZE_ARRAYS];
   int lbin;
   double l_min;
   double l_max;
   char model[CHAR_MAX_SIZE];
 } clusterpara;
 
-typedef struct {
+typedef struct
+{
   char runmode[CHAR_MAX_SIZE];
 } pdeltapara;
 
-typedef struct { // parameters for power spectrum passed to FASTPT
+typedef struct
+{ // parameters for power spectrum passed to FASTPT
   // general specifiers
   double k_min;
   double k_max;
@@ -162,7 +169,8 @@ typedef struct { // parameters for power spectrum passed to FASTPT
   cosmopara C;
 } FPTpara;
 
-typedef struct {
+typedef struct
+{
   // like.IA = 1 variables
   double LF_alpha;
   double LF_P;
@@ -174,11 +182,11 @@ typedef struct {
   // like.IA = 4: NLA, power law
   // like.IA = 5: TATT, per bin
   // like.IA = 6: TATT, power law
-  double A_z[10];  // NLA normalization per source redshift bin, for mpp analyis
-                   // (activate with like.IA =3 or like.IA = 5)
-  double A2_z[10]; // NLA normalization per source redshift bin, for mpp analyis
-                   // (activate with like.IA = 5)
-  double b_ta_z[10];   // b_ta, per bin (like.IA = 6), or use b_ta_z[0] with
+  double A_z[MAX_SIZE_ARRAYS];  // NLA normalization per source redshift bin, for mpp analyis
+                                // (activate with like.IA =3 or like.IA = 5)
+  double A2_z[MAX_SIZE_ARRAYS]; // NLA normalization per source redshift bin, for mpp analyis
+                                // (activate with like.IA = 5)
+  double b_ta_z[MAX_SIZE_ARRAYS]; // b_ta, per bin (like.IA = 6), or use b_ta_z[0] with
                        // like.IA = 5
   double A_ia;         // A IA see Joachimi2012
   double A2_ia;        // placeholder param for quadratic,etc IA
@@ -188,14 +196,14 @@ typedef struct {
   double eta_ia_highz; // uncertainty in high z evolution
   double oneplusz0_ia; // oneplusz0-ia MegaZ
   double c1rhocrit_ia;
-  double fred[10];
-  double shear_calibration_m[10];
-  double sigma_zphot_shear[10];
-  double bias_zphot_shear[10];
-  double sigma_zphot_clustering[10];
-  double bias_zphot_clustering[10];
-  double sigma_zphot_magnification[10];
-  double bias_zphot_magnification[10];
+  double fred[MAX_SIZE_ARRAYS];
+  double shear_calibration_m[MAX_SIZE_ARRAYS];
+  double sigma_zphot_shear[MAX_SIZE_ARRAYS];
+  double bias_zphot_shear[MAX_SIZE_ARRAYS];
+  double sigma_zphot_clustering[MAX_SIZE_ARRAYS];
+  double bias_zphot_clustering[MAX_SIZE_ARRAYS];
+  double sigma_zphot_magnification[MAX_SIZE_ARRAYS];
+  double bias_zphot_magnification[MAX_SIZE_ARRAYS];
   double cluster_Mobs_lgM0;
   double cluster_Mobs_sigma;
   double cluster_Mobs_alpha;
@@ -205,18 +213,19 @@ typedef struct {
   double cluster_Mobs_sigma0;
   double cluster_Mobs_sigma_qm;
   double cluster_Mobs_sigma_qz;
-  double cluster_completeness[10];
+  double cluster_completeness[MAX_SIZE_ARRAYS];
   double cluster_centering_f0;
   double cluster_centering_alpha;
   double cluster_centering_sigma;
   double cluster_centering_M_pivot;
   int N_cluster_MOR;
-  double cluster_MOR[10];
+  double cluster_MOR[MAX_SIZE_ARRAYS];
   int N_cluster_selection;
-  double cluster_selection[10];
+  double cluster_selection[MAX_SIZE_ARRAYS];
 } nuisancepara;
 
-typedef struct {
+typedef struct
+{
   int is_Pk_bary;
   int Na_bins;
   int Nk_bins;
@@ -227,7 +236,8 @@ typedef struct {
   gsl_interp2d* interp2d;
 } barypara;
 
-typedef struct {
+typedef struct
+{
   char name[CHAR_MAX_SIZE];
   double fwhm;            // beam fwhm in rad
   double sensitivity;     // white noise level in muK*rad

@@ -9513,169 +9513,325 @@ static double logPkR_BAHAMAS_T80[380][15] = {{-6.576971e-24,-6.576971e-24,0.0000
 // ---------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------
 
-void set_bary_parameters_to_TNG100() {
+void set_bary_parameters_to_TNG100()
+{
+  if(bary.a_bins != NULL || bary.logk_bins != NULL ||
+     bary.log_PkR != NULL || bary.interp2d != NULL)
+  {
+    reset_bary_struct();
+  }
+
   bary.is_Pk_bary = 1;
   bary.Nk_bins = 325;
   bary.Na_bins = 13;
 
-  if(bary.a_bins == NULL) {
+  if(bary.a_bins == NULL)
+  {
     bary.a_bins = (double*) malloc(sizeof(double)*bary.Na_bins);
+    if (bary.a_bins == NULL)
+    {
+      log_fatal("\x1b[90m{}\x1b[0m: Failed Allocation of {}",
+        "set_bary_parameters_to_TNG100",
+        "a_bins array");
+      exit(1);
+    }
   }
-  if(bary.logk_bins == NULL) {
+  if(bary.logk_bins == NULL)
+  {
     bary.logk_bins = (double*) malloc(sizeof(double)*bary.Nk_bins);
+    if (bary.logk_bins == NULL)
+    {
+      log_fatal("\x1b[90m{}\x1b[0m: Failed Allocation of {}",
+        "set_bary_parameters_to_TNG100",
+        "logk_bins array");
+      exit(1);
+    }
   }
-  if(bary.log_PkR == NULL) {
+  if(bary.log_PkR == NULL)
+  {
     bary.log_PkR = (double*) malloc(sizeof(double)*bary.Nk_bins*bary.Na_bins);
+    if (bary.log_PkR == NULL)
+    {
+      log_fatal("\x1b[90m{}\x1b[0m: Failed Allocation of {}",
+        "set_bary_parameters_to_TNG100",
+        "log_PkR array");
+      exit(1);
+    }
   }
 
   bary.T = (gsl_interp2d_type*) gsl_interp2d_bilinear;
-  if(bary.interp2d == NULL) {
+  if(bary.interp2d == NULL)
+  {
     bary.interp2d = gsl_interp2d_alloc((const gsl_interp2d_type*) bary.T,
       bary.Nk_bins, bary.Na_bins);
-  }
-  if(bary.interp2d == NULL) {
-    log_fatal("Failed Allocation of interp2d struct");
+    if (bary.interp2d == NULL)
+    {
+      log_fatal("\x1b[90m{}\x1b[0m: Failed Allocation of {}",
+        "set_bary_parameters_to_TNG100", "interp2d struct");
+      exit(1);
+    }
   }
 
 	#pragma omp parallel for
-  for (int i=0; i<bary.Na_bins; i++) {
+  for (int i=0; i<bary.Na_bins; i++)
+  {
   	bary.a_bins[i] =  1./(1 + zBins_TNG100[i]);
-  	for (int j=0; j<bary.Nk_bins; j++) {
-  		if (i == 0) {
+  	for (int j=0; j<bary.Nk_bins; j++)
+    {
+  		if (i == 0)
+      {
   			bary.logk_bins[j] = logkBins_TNG100[j];
   		}
     	int status = gsl_interp2d_set(bary.interp2d, bary.log_PkR, j, i,
         logPkR_TNG100[j][i]);
-      if(status) {
-        log_fatal(gsl_strerror(status));
+      if (status)
+      {
+        log_fatal("\x1b[90m{}\x1b[0m: gsl error {}",
+          "set_bary_parameters_to_TNG100", gsl_strerror(status));
+        exit(1);
       }
   	}
   }
 
  	int status = gsl_interp2d_init(bary.interp2d, bary.logk_bins, bary.a_bins,
  		bary.log_PkR, bary.Nk_bins, bary.Na_bins);
-  if(status) {
-    log_fatal(gsl_strerror(status));
+  if (status)
+  {
+    log_fatal("\x1b[90m{}\x1b[0m: gsl error {}",
+      "set_bary_parameters_to_TNG100", gsl_strerror(status));
+    exit(1);
   }
 }
 
 void set_bary_parameters_to_HzAGN()
 {
+  if(bary.a_bins != NULL || bary.logk_bins != NULL ||
+     bary.log_PkR != NULL || bary.interp2d != NULL)
+  {
+    reset_bary_struct();
+  }
+
   bary.is_Pk_bary = 1;
   bary.Na_bins = 11;
   bary.Nk_bins = 675;
 
-  if(bary.a_bins == NULL) {
+  if(bary.a_bins == NULL)
+  {
     bary.a_bins = (double*) malloc(sizeof(double)*bary.Na_bins);
+    if (bary.a_bins == NULL)
+    {
+      log_fatal("\x1b[90m{}\x1b[0m: Failed Allocation of {}",
+        "set_bary_parameters_to_HzAGN", "a_bins array");
+      exit(1);
+    }
   }
-  if(bary.logk_bins == NULL) {
+  if(bary.logk_bins == NULL)
+  {
     bary.logk_bins = (double*) malloc(sizeof(double)*bary.Nk_bins);
+    if (bary.logk_bins == NULL)
+    {
+      log_fatal("\x1b[90m{}\x1b[0m: Failed Allocation of {}",
+        "set_bary_parameters_to_HzAGN", "logk_bins array");
+      exit(1);
+    }
   }
-  if(bary.log_PkR == NULL) {
+  if(bary.log_PkR == NULL)
+  {
     bary.log_PkR = (double*) malloc(sizeof(double)*bary.Nk_bins*bary.Na_bins);
+    if (bary.log_PkR == NULL)
+    {
+      log_fatal("\x1b[90m{}\x1b[0m: Failed Allocation of {}",
+        "set_bary_parameters_to_HzAGN", "log_PkR array");
+      exit(1);
+    }
   }
 
   bary.T = (gsl_interp2d_type*) gsl_interp2d_bilinear;
-  if(bary.interp2d == NULL) {
+  if(bary.interp2d == NULL)
+  {
     bary.interp2d = gsl_interp2d_alloc((const gsl_interp2d_type*) bary.T,
       bary.Nk_bins, bary.Na_bins);
-  }
-  if(bary.interp2d == NULL) {
-    log_fatal("Failed Allocation of interp2d struct");
+    if (bary.interp2d == NULL)
+    {
+      log_fatal("\x1b[90m{}\x1b[0m: Failed Allocation of {}",
+        "set_bary_parameters_to_HzAGN", "interp2d struct");
+      exit(1);
+    }
   }
 
 	#pragma omp parallel for
-  for (int i=0; i<bary.Na_bins; i++) {
+  for (int i=0; i<bary.Na_bins; i++)
+  {
   	bary.a_bins[i] = 1./(1 + zBins_HzAGN[i]);
-  	for (int j=0; j<bary.Nk_bins; j++) {
-  		if (i==0) {
+  	for (int j=0; j<bary.Nk_bins; j++)
+    {
+  		if (i==0)
+      {
   			bary.logk_bins[j] = logkBins_HzAGN[j];
   		}
     	int status = gsl_interp2d_set(bary.interp2d, bary.log_PkR, j, i,
         logPkR_HzAGN[j][i]);
-      if(status) {
-        log_fatal(gsl_strerror(status));
+      if (status)
+      {
+        log_fatal("\x1b[90m{}\x1b[0m: gsl error {}",
+          "set_bary_parameters_to_HzAGN", gsl_strerror(status));
+        exit(1);
       }
   	}
   }
 
  	int status = gsl_interp2d_init(bary.interp2d, bary.logk_bins, bary.a_bins,
  		bary.log_PkR, bary.Nk_bins, bary.Na_bins);
-  if(status) {
-    log_fatal(gsl_strerror(status));
+  if (status)
+  {
+    log_fatal("\x1b[90m{}\x1b[0m: gsl error {}",
+      "set_bary_parameters_to_HzAGN", gsl_strerror(status));
+    exit(1);
   }
 }
 
 void set_bary_parameters_to_mb2()
 {
+  if(bary.a_bins != NULL || bary.logk_bins != NULL ||
+     bary.log_PkR != NULL || bary.interp2d != NULL)
+  {
+    reset_bary_struct();
+  }
+
   bary.is_Pk_bary = 1;
   bary.Na_bins = 21;
   bary.Nk_bins = 350;
 
-  if(bary.a_bins == NULL) {
+  if(bary.a_bins == NULL)
+  {
     bary.a_bins = (double*) malloc(sizeof(double)*bary.Na_bins);
+    if (bary.a_bins == NULL)
+    {
+      log_fatal("\x1b[90m{}\x1b[0m: Failed Allocation of {}",
+        "set_bary_parameters_to_mb2", "a_bins array");
+      exit(1);
+    }
   }
-  if(bary.logk_bins == NULL) {
+  if(bary.logk_bins == NULL)
+  {
     bary.logk_bins = (double*) malloc(sizeof(double)*bary.Nk_bins);
+    if (bary.logk_bins == NULL)
+    {
+      log_fatal("\x1b[90m{}\x1b[0m: Failed Allocation of {}",
+        "set_bary_parameters_to_mb2", "logk_bins array");
+      exit(1);
+    }
   }
-  if(bary.log_PkR == NULL) {
+  if(bary.log_PkR == NULL)
+  {
     bary.log_PkR = (double*) malloc(sizeof(double)*bary.Nk_bins*bary.Na_bins);
+    if (bary.log_PkR == NULL)
+    {
+      log_fatal("\x1b[90m{}\x1b[0m: Failed Allocation of {}",
+        "set_bary_parameters_to_mb2", "log_PkR array");
+      exit(1);
+    }
   }
 
   bary.T = (gsl_interp2d_type*) gsl_interp2d_bilinear;
-  if(bary.interp2d == NULL) {
+  if(bary.interp2d == NULL)
+  {
     bary.interp2d = gsl_interp2d_alloc((const gsl_interp2d_type*) bary.T,
       bary.Nk_bins, bary.Na_bins);
-  }
-  if(bary.interp2d == NULL) {
-    log_fatal("Failed Allocation of interp2d struct");
+    if (bary.interp2d == NULL)
+    {
+      log_fatal("\x1b[90m{}\x1b[0m: Failed Allocation of {}",
+        "set_bary_parameters_to_mb2", "interp2d struct");
+      exit(1);
+    }
   }
 
 	#pragma omp parallel for
-  for (int i=0; i<bary.Na_bins; i++) {
+  for (int i=0; i<bary.Na_bins; i++)
+  {
   	bary.a_bins[i] = 1./(1 + zBins_mb2[i]);
-  	for (int j=0; j<bary.Nk_bins; j++) {
-  		if (i==0) {
+  	for (int j=0; j<bary.Nk_bins; j++)
+    {
+  		if (i==0)
+      {
   			bary.logk_bins[j] = logkBins_mb2[j];
   		}
     	int status = gsl_interp2d_set(bary.interp2d, bary.log_PkR, j, i,
         logPkR_mb2[j][i]);
-      if(status) {
-        log_fatal(gsl_strerror(status));
+      if (status)
+      {
+        log_fatal("\x1b[90m{}\x1b[0m: gsl error {}",
+          "set_bary_parameters_to_mb2", gsl_strerror(status));
+        exit(1);
       }
   	}
   }
 
  	int status = gsl_interp2d_init(bary.interp2d, bary.logk_bins, bary.a_bins,
  		bary.log_PkR, bary.Nk_bins, bary.Na_bins);
-  if(status) {
-    log_fatal(gsl_strerror(status));
+  if (status)
+  {
+    log_fatal("\x1b[90m{}\x1b[0m: gsl error {}",
+      "set_bary_parameters_to_mb2", gsl_strerror(status));
+    exit(1);
   }
 }
 
 void set_bary_parameters_to_illustris()
 {
+  if(bary.a_bins != NULL || bary.logk_bins != NULL ||
+     bary.log_PkR != NULL || bary.interp2d != NULL)
+  {
+    reset_bary_struct();
+  }
+
   bary.is_Pk_bary = 1;
   bary.Na_bins = 23;
   bary.Nk_bins = 323;
 
-  if(bary.a_bins == NULL) {
+  if(bary.a_bins == NULL)
+  {
     bary.a_bins = (double*) malloc(sizeof(double)*bary.Na_bins);
+    if (bary.a_bins == NULL)
+    {
+      log_fatal("\x1b[90m{}\x1b[0m: Failed Allocation of {}",
+        "set_bary_parameters_to_illustris", "a_bins array");
+      exit(1);
+    }
   }
-  if(bary.logk_bins == NULL) {
+  if(bary.logk_bins == NULL)
+  {
     bary.logk_bins = (double*) malloc(sizeof(double)*bary.Nk_bins);
+    if (bary.logk_bins == NULL)
+    {
+      log_fatal("\x1b[90m{}\x1b[0m: Failed Allocation of {}",
+        "set_bary_parameters_to_illustris", "logk_bins array");
+      exit(1);
+    }
   }
-  if(bary.log_PkR == NULL) {
+  if(bary.log_PkR == NULL)
+  {
     bary.log_PkR = (double*) malloc(sizeof(double)*bary.Nk_bins*bary.Na_bins);
+    if (bary.log_PkR == NULL)
+    {
+      log_fatal("\x1b[90m{}\x1b[0m: Failed Allocation of {}",
+        "set_bary_parameters_to_illustris", "log_PkR array");
+      exit(1);
+    }
   }
 
   bary.T = (gsl_interp2d_type*) gsl_interp2d_bilinear;
-  if(bary.interp2d == NULL) {
+  if(bary.interp2d == NULL)
+  {
     bary.interp2d = gsl_interp2d_alloc((const gsl_interp2d_type*) bary.T,
       bary.Nk_bins, bary.Na_bins);
-  }
-  if(bary.interp2d == NULL) {
-    log_fatal("Failed Allocation of interp2d struct");
+
+    if (bary.interp2d == NULL)
+    {
+      log_fatal("\x1b[90m{}\x1b[0m: Failed Allocation of {}",
+        "set_bary_parameters_to_illustris", "interp2d struct");
+      exit(1);
+    }
   }
 
 	#pragma omp parallel for
@@ -9687,136 +9843,256 @@ void set_bary_parameters_to_illustris()
   		}
 			int status = gsl_interp2d_set(bary.interp2d, bary.log_PkR, j, i,
         logPkR_illustris[j][i]);
-      if(status) {
-        log_fatal(gsl_strerror(status));
+      if (status)
+      {
+        log_fatal("\x1b[90m{}\x1b[0m: gsl error {}",
+          "set_bary_parameters_to_illustris", gsl_strerror(status));
+        exit(1);
       }
   	}
   }
 
  	int status = gsl_interp2d_init(bary.interp2d, bary.logk_bins, bary.a_bins,
  		bary.log_PkR, bary.Nk_bins, bary.Na_bins);
-  if(status) {
-    log_fatal(gsl_strerror(status));
+  if (status)
+  {
+    log_fatal("\x1b[90m{}\x1b[0m: gsl error {}",
+      "set_bary_parameters_to_illustris", gsl_strerror(status));
+    exit(1);
   }
 }
 
 void set_bary_parameters_to_eagle()
 {
+  if(bary.a_bins != NULL || bary.logk_bins != NULL ||
+     bary.log_PkR != NULL || bary.interp2d != NULL)
+  {
+    reset_bary_struct();
+  }
+
   bary.is_Pk_bary = 1;
   bary.Na_bins = 13;
   bary.Nk_bins = 309;
 
-  if(bary.a_bins == NULL) {
+  if(bary.a_bins == NULL)
+  {
     bary.a_bins = (double*) malloc(sizeof(double)*bary.Na_bins);
+    if (bary.a_bins == NULL)
+    {
+      log_fatal("\x1b[90m{}\x1b[0m: Failed Allocation of {}",
+        "set_bary_parameters_to_eagle", "a_bins array");
+      exit(1);
+    }
   }
-  if(bary.logk_bins == NULL) {
+  if(bary.logk_bins == NULL)
+  {
     bary.logk_bins = (double*) malloc(sizeof(double)*bary.Nk_bins);
+    if (bary.logk_bins == NULL)
+    {
+      log_fatal("\x1b[90m{}\x1b[0m: Failed Allocation of {}",
+        "set_bary_parameters_to_eagle", "logk_bins array");
+      exit(1);
+    }
   }
-  if(bary.log_PkR == NULL) {
+  if(bary.log_PkR == NULL)
+  {
     bary.log_PkR = (double*) malloc(sizeof(double)*bary.Nk_bins*bary.Na_bins);
+    if (bary.log_PkR == NULL)
+    {
+      log_fatal("\x1b[90m{}\x1b[0m: Failed Allocation of {}",
+        "set_bary_parameters_to_eagle", "log_PkR array");
+      exit(1);
+    }
   }
 
   bary.T = (gsl_interp2d_type*) gsl_interp2d_bilinear;
-  if(bary.interp2d == NULL) {
+  if(bary.interp2d == NULL)
+  {
     bary.interp2d = gsl_interp2d_alloc((const gsl_interp2d_type*) bary.T,
       bary.Nk_bins, bary.Na_bins);
-  }
-  if(bary.interp2d == NULL) {
-    log_fatal("Failed Allocation of interp2d struct");
+
+    if (bary.interp2d == NULL)
+    {
+      log_fatal("\x1b[90m{}\x1b[0m: Failed Allocation of {}",
+        "set_bary_parameters_to_eagle", "interp2d struct");
+      exit(1);
+    }
   }
 
 	#pragma omp parallel for
-  for (int i=0; i<bary.Na_bins; i++) {
+  for (int i=0; i<bary.Na_bins; i++)
+  {
   	bary.a_bins[i] = 1./(1 + zBins_eagle[i]);
-  	for (int j=0; j<bary.Nk_bins; j++) {
-  		if (i == 0) {
+  	for (int j=0; j<bary.Nk_bins; j++)
+    {
+  		if (i == 0)
+      {
   			bary.logk_bins[j] = logkBins_eagle[j];
   		}
 			int status = gsl_interp2d_set(bary.interp2d, bary.log_PkR, j, i,
         logPkR_eagle[j][i]);
-      if(status) {
-        log_fatal(gsl_strerror(status));
+      if (status)
+      {
+        log_fatal("\x1b[90m{}\x1b[0m: gsl error {}",
+          "set_bary_parameters_to_eagle", gsl_strerror(status));
+        exit(1);
       }
   	}
   }
 
  	int status = gsl_interp2d_init(bary.interp2d, bary.logk_bins, bary.a_bins,
  		bary.log_PkR, bary.Nk_bins, bary.Na_bins);
-  if(status) {
-    log_fatal(gsl_strerror(status));
+  if (status)
+  {
+    log_fatal("\x1b[90m{}\x1b[0m: gsl error {}",
+      "set_bary_parameters_to_eagle", gsl_strerror(status));
+    exit(1);
   }
 }
 
 void set_bary_parameters_to_owls_AGN_T80()
 {
+  if(bary.a_bins != NULL || bary.logk_bins != NULL ||
+     bary.log_PkR != NULL || bary.interp2d != NULL)
+  {
+    reset_bary_struct();
+  }
+
   bary.is_Pk_bary = 1;
   bary.Na_bins = 15;
   bary.Nk_bins = 326;
 
-  if(bary.a_bins == NULL) {
+  if(bary.a_bins == NULL)
+  {
     bary.a_bins = (double*) malloc(sizeof(double)*bary.Na_bins);
+    if (bary.a_bins == NULL)
+    {
+      log_fatal("\x1b[90m{}\x1b[0m: Failed Allocation of {}",
+        "set_bary_parameters_to_owls_AGN_T80", "a_bins array");
+      exit(1);
+    }
   }
-  if(bary.logk_bins == NULL) {
+  if(bary.logk_bins == NULL)
+  {
     bary.logk_bins = (double*) malloc(sizeof(double)*bary.Nk_bins);
+    if (bary.logk_bins == NULL)
+    {
+      log_fatal("\x1b[90m{}\x1b[0m: Failed Allocation of {}",
+        "set_bary_parameters_to_owls_AGN_T80", "logk_bins array");
+      exit(1);
+    }
   }
-  if(bary.log_PkR == NULL) {
+  if(bary.log_PkR == NULL)
+  {
     bary.log_PkR = (double*) malloc(sizeof(double)*bary.Nk_bins*bary.Na_bins);
+    if (bary.log_PkR == NULL)
+    {
+      log_fatal("\x1b[90m{}\x1b[0m: Failed Allocation of {}",
+        "set_bary_parameters_to_owls_AGN_T80", "log_PkR array");
+      exit(1);
+    }
   }
 
   bary.T = (gsl_interp2d_type*) gsl_interp2d_bilinear;
-  if(bary.interp2d == NULL) {
+  if(bary.interp2d == NULL)
+  {
     bary.interp2d = gsl_interp2d_alloc((const gsl_interp2d_type*) bary.T,
       bary.Nk_bins, bary.Na_bins);
-  }
-  if(bary.interp2d == NULL) {
-    log_fatal("Failed Allocation of interp2d struct");
+
+    if (bary.interp2d == NULL)
+    {
+      log_fatal("\x1b[90m{}\x1b[0m: Failed Allocation of {}",
+        "set_bary_parameters_to_owls_AGN_T80", "interp2d struct");
+      exit(1);
+    }
   }
 
   #pragma omp parallel for
-  for (int i=0; i<bary.Na_bins; i++) {
+  for (int i=0; i<bary.Na_bins; i++)
+  {
   	bary.a_bins[i] = 1./(1 + zBins_cowls_AGN[i]);
-  	for (int j=0; j<bary.Nk_bins; j++) {
-  		if (i == 0) {
+  	for (int j=0; j<bary.Nk_bins; j++)
+    {
+  		if (i == 0)
+      {
   			bary.logk_bins[j] = logkBins_cowls_AGN_T80[j];
   		}
 			int status = gsl_interp2d_set(bary.interp2d, bary.log_PkR, j, i,
 				logPkR_cowls_AGN_T80[j][i]);
-      if(status) {
-        log_fatal(gsl_strerror(status));
+      if (status)
+      {
+        log_fatal("\x1b[90m{}\x1b[0m: gsl error {}",
+          "set_bary_parameters_to_owls_AGN_T80", gsl_strerror(status));
+        exit(1);
       }
   	}
   }
 
  	int status = gsl_interp2d_init(bary.interp2d, bary.logk_bins, bary.a_bins,
  		bary.log_PkR, bary.Nk_bins, bary.Na_bins);
-  if(status) {
-    log_fatal(gsl_strerror(status));
+  if (status)
+  {
+    log_fatal("\x1b[90m{}\x1b[0m: gsl error {}",
+      "set_bary_parameters_to_owls_AGN_T80", gsl_strerror(status));
+    exit(1);
   }
 }
 
 void set_bary_parameters_to_owls_AGN_T85()
 {
+  if(bary.a_bins != NULL || bary.logk_bins != NULL ||
+     bary.log_PkR != NULL || bary.interp2d != NULL)
+  {
+    reset_bary_struct();
+  }
+
   bary.is_Pk_bary = 1;
   bary.Na_bins = 15;
   bary.Nk_bins = 326;
 
-  if(bary.a_bins == NULL) {
+  if(bary.a_bins == NULL)
+  {
     bary.a_bins = (double*) malloc(sizeof(double)*bary.Na_bins);
+    if (bary.a_bins == NULL)
+    {
+      log_fatal("\x1b[90m{}\x1b[0m: Failed Allocation of {}",
+        "set_bary_parameters_to_owls_AGN_T85", "a_bins array");
+      exit(1);
+    }
   }
-  if(bary.logk_bins == NULL) {
+  if(bary.logk_bins == NULL)
+  {
     bary.logk_bins = (double*) malloc(sizeof(double)*bary.Nk_bins);
+    if (bary.logk_bins == NULL)
+    {
+      log_fatal("\x1b[90m{}\x1b[0m: Failed Allocation of {}",
+        "set_bary_parameters_to_owls_AGN_T85", "logk_bins array");
+      exit(1);
+    }
   }
-  if(bary.log_PkR == NULL) {
+  if(bary.log_PkR == NULL)
+  {
     bary.log_PkR = (double*) malloc(sizeof(double)*bary.Nk_bins*bary.Na_bins);
+    if (bary.log_PkR == NULL)
+    {
+      log_fatal("\x1b[90m{}\x1b[0m: Failed Allocation of {}",
+        "set_bary_parameters_to_owls_AGN_T85", "log_PkR array");
+      exit(1);
+    }
   }
 
   bary.T = (gsl_interp2d_type*) gsl_interp2d_bilinear;
-  if(bary.interp2d == NULL) {
+  if(bary.interp2d == NULL)
+  {
     bary.interp2d = gsl_interp2d_alloc((const gsl_interp2d_type*) bary.T,
       bary.Nk_bins, bary.Na_bins);
-  }
-  if(bary.interp2d == NULL) {
-    log_fatal("Failed Allocation of interp2d struct");
+    if (bary.interp2d == NULL)
+    {
+      log_fatal("\x1b[90m{}\x1b[0m: Failed Allocation of {}",
+        "set_bary_parameters_to_owls_AGN_T85",
+        "interp2d struct");
+      exit(1);
+    }
   }
 
 	#pragma omp parallel for
@@ -9828,158 +10104,284 @@ void set_bary_parameters_to_owls_AGN_T85()
   		}
     	int status = gsl_interp2d_set(bary.interp2d, bary.log_PkR, j, i,
 				logPkR_cowls_AGN_T85[j][i]);
-      if(status) {
-        log_fatal(gsl_strerror(status));
+      if (status)
+      {
+        log_fatal("\x1b[90m{}\x1b[0m: gsl error {}",
+          "set_bary_parameters_to_owls_AGN_T85", gsl_strerror(status));
+        exit(1);
       }
   	}
   }
 
  	int status = gsl_interp2d_init(bary.interp2d, bary.logk_bins, bary.a_bins,
  		bary.log_PkR, bary.Nk_bins, bary.Na_bins);
-  if(status) {
-    log_fatal(gsl_strerror(status));
+  if (status)
+  {
+    log_fatal("\x1b[90m{}\x1b[0m: gsl error {}",
+      "set_bary_parameters_to_owls_AGN_T85", gsl_strerror(status));
+    exit(1);
   }
 }
 
 void set_bary_parameters_to_owls_AGN_T87()
 {
+  if(bary.a_bins != NULL || bary.logk_bins != NULL ||
+     bary.log_PkR != NULL || bary.interp2d != NULL)
+  {
+    reset_bary_struct();
+  }
+
   bary.is_Pk_bary = 1;
   bary.Na_bins = 15;
   bary.Nk_bins = 326;
 
-  if(bary.a_bins == NULL) {
+  if(bary.a_bins == NULL)
+  {
     bary.a_bins = (double*) malloc(sizeof(double)*bary.Na_bins);
+    if (bary.a_bins == NULL)
+    {
+      log_fatal("\x1b[90m{}\x1b[0m: Failed Allocation of {}",
+        "set_bary_parameters_to_owls_AGN_T87", "a_bins array");
+      exit(1);
+    }
   }
-  if(bary.logk_bins == NULL) {
+  if(bary.logk_bins == NULL)
+  {
     bary.logk_bins = (double*) malloc(sizeof(double)*bary.Nk_bins);
+    if (bary.logk_bins == NULL)
+    {
+      log_fatal("\x1b[90m{}\x1b[0m: Failed Allocation of {}",
+        "set_bary_parameters_to_owls_AGN_T87", "logk_bins array");
+      exit(1);
+    }
   }
-  if(bary.log_PkR == NULL) {
+  if(bary.log_PkR == NULL)
+  {
     bary.log_PkR = (double*) malloc(sizeof(double)*bary.Nk_bins*bary.Na_bins);
+    if (bary.log_PkR == NULL)
+    {
+      log_fatal("\x1b[90m{}\x1b[0m: Failed Allocation of {}",
+        "set_bary_parameters_to_owls_AGN_T87", "log_PkR array");
+      exit(1);
+    }
   }
 
   bary.T = (gsl_interp2d_type*) gsl_interp2d_bilinear;
-  if(bary.interp2d == NULL) {
+  if(bary.interp2d == NULL)
+  {
     bary.interp2d = gsl_interp2d_alloc((const gsl_interp2d_type*) bary.T,
       bary.Nk_bins, bary.Na_bins);
-  }
-  if(bary.interp2d == NULL) {
-    log_fatal("Failed Allocation of interp2d struct");
+    if (bary.interp2d == NULL)
+    {
+      log_fatal("\x1b[90m{}\x1b[0m: Failed Allocation of {}",
+        "set_bary_parameters_to_owls_AGN_T87",
+        "interp2d struct");
+      exit(1);
+    }
   }
 
 	#pragma omp parallel for
-  for (int i=0; i<bary.Na_bins; i++) {
+  for (int i=0; i<bary.Na_bins; i++)
+  {
   	bary.a_bins[i] = 1./(1 + zBins_cowls_AGN[i]);
-  	for (int j=0; j<bary.Nk_bins; j++) {
+  	for (int j=0; j<bary.Nk_bins; j++)
+    {
   		if (i == 0) {
   			bary.logk_bins[j] = logkBins_cowls_AGN_T87[j];
   		}
 			int status = gsl_interp2d_set(bary.interp2d, bary.log_PkR, j, i,
 				logPkR_cowls_AGN_T87[j][i]);
-      if(status) {
-        log_fatal(gsl_strerror(status));
+      if (status)
+      {
+        log_fatal("\x1b[90m{}\x1b[0m: gsl error {}",
+          "set_bary_parameters_to_owls_AGN_T87", gsl_strerror(status));
+        exit(1);
       }
   	}
   }
 
  	int status = gsl_interp2d_init(bary.interp2d, bary.logk_bins, bary.a_bins,
  		bary.log_PkR, bary.Nk_bins, bary.Na_bins);
-  if(status) {
-    log_fatal(gsl_strerror(status));
+  if (status)
+  {
+    log_fatal("\x1b[90m{}\x1b[0m: gsl error {}",
+      "set_bary_parameters_to_owls_AGN_T87", gsl_strerror(status));
+    exit(1);
   }
 }
 
 
 void set_bary_parameters_to_BAHAMAS_T76()
 {
+  if(bary.a_bins != NULL || bary.logk_bins != NULL ||
+     bary.log_PkR != NULL || bary.interp2d != NULL)
+  {
+    reset_bary_struct();
+  }
+
   bary.is_Pk_bary = 1;
   bary.Na_bins = 15;
   bary.Nk_bins = 380;
 
-  if(bary.a_bins == NULL) {
+  if(bary.a_bins == NULL)
+  {
     bary.a_bins = (double*) malloc(sizeof(double)*bary.Na_bins);
+    if (bary.a_bins == NULL)
+    {
+      log_fatal("\x1b[90m{}\x1b[0m: Failed Allocation of {}",
+        "set_bary_parameters_to_BAHAMAS_T76", "a_bins array");
+      exit(1);
+    }
   }
-  if(bary.logk_bins == NULL) {
+  if(bary.logk_bins == NULL)
+  {
     bary.logk_bins = (double*) malloc(sizeof(double)*bary.Nk_bins);
+    if (bary.logk_bins == NULL)
+    {
+      log_fatal("\x1b[90m{}\x1b[0m: Failed Allocation of {}",
+        "set_bary_parameters_to_BAHAMAS_T76", "logk_bins array");
+      exit(1);
+    }
   }
-  if(bary.log_PkR == NULL) {
+  if(bary.log_PkR == NULL)
+  {
     bary.log_PkR = (double*) malloc(sizeof(double)*bary.Nk_bins*bary.Na_bins);
+    if (bary.log_PkR == NULL)
+    {
+      log_fatal("\x1b[90m{}\x1b[0m: Failed Allocation of {}",
+        "set_bary_parameters_to_BAHAMAS_T76", "log_PkR array");
+      exit(1);
+    }
   }
 
   bary.T = (gsl_interp2d_type*) gsl_interp2d_bilinear;
-  if(bary.interp2d == NULL) {
+  if(bary.interp2d == NULL)
+  {
     bary.interp2d = gsl_interp2d_alloc((const gsl_interp2d_type*) bary.T,
       bary.Nk_bins, bary.Na_bins);
-  }
-  if(bary.interp2d == NULL) {
-    log_fatal("Failed Allocation of interp2d struct");
+    if (bary.interp2d == NULL)
+    {
+      log_fatal("\x1b[90m{}\x1b[0m: Failed Allocation of {}",
+        "set_bary_parameters_to_BAHAMAS_T76",
+        "interp2d struct");
+      exit(1);
+    }
   }
 
 	#pragma omp parallel for
-  for (int i=0; i<bary.Na_bins; i++) {
+  for (int i=0; i<bary.Na_bins; i++)
+  {
   	bary.a_bins[i] = 1./(1 + zBins_BAHAMAS[i]);
-  	for (int j=0; j<bary.Nk_bins; j++) {
+  	for (int j=0; j<bary.Nk_bins; j++)
+    {
   		if (i == 0) {
   			bary.logk_bins[j] = logkBins_BAHAMAS_T76[j];
   		}
 			int status = gsl_interp2d_set(bary.interp2d, bary.log_PkR, j, i,
 				logPkR_BAHAMAS_T76[j][i]);
-      if(status) {
-        log_fatal(gsl_strerror(status));
+      if (status)
+      {
+        log_fatal("\x1b[90m{}\x1b[0m: gsl error {}",
+          "set_bary_parameters_to_BAHAMAS_T76", gsl_strerror(status));
+        exit(1);
       }
   	}
   }
 
  	int status = gsl_interp2d_init(bary.interp2d, bary.logk_bins, bary.a_bins,
  		bary.log_PkR, bary.Nk_bins, bary.Na_bins);
-  if(status) {
-    log_fatal(gsl_strerror(status));
+  if (status)
+  {
+    log_fatal("\x1b[90m{}\x1b[0m: gsl error {}",
+      "set_bary_parameters_to_BAHAMAS_T76", gsl_strerror(status));
+    exit(1);
   }
 }
 
 void set_bary_parameters_to_BAHAMAS_T78()
 {
+  if(bary.a_bins != NULL || bary.logk_bins != NULL ||
+     bary.log_PkR != NULL || bary.interp2d != NULL)
+  {
+    reset_bary_struct();
+  }
+
   bary.is_Pk_bary = 1;
   bary.Na_bins = 15;
   bary.Nk_bins = 380;
 
-  if(bary.a_bins == NULL) {
+  if(bary.a_bins == NULL)
+  {
     bary.a_bins = (double*) malloc(sizeof(double)*bary.Na_bins);
+    if (bary.a_bins == NULL)
+    {
+      log_fatal("\x1b[90m{}\x1b[0m: Failed Allocation of {}",
+        "set_bary_parameters_to_BAHAMAS_T78", "a_bins array");
+      exit(1);
+    }
   }
-  if(bary.logk_bins == NULL) {
+  if(bary.logk_bins == NULL)
+  {
     bary.logk_bins = (double*) malloc(sizeof(double)*bary.Nk_bins);
+    if (bary.logk_bins == NULL)
+    {
+      log_fatal("\x1b[90m{}\x1b[0m: Failed Allocation of {}",
+        "set_bary_parameters_to_BAHAMAS_T78", "logk_bins array");
+      exit(1);
+    }
   }
-  if(bary.log_PkR == NULL) {
+  if(bary.log_PkR == NULL)
+  {
     bary.log_PkR = (double*) malloc(sizeof(double)*bary.Nk_bins*bary.Na_bins);
+    if (bary.log_PkR == NULL)
+    {
+      log_fatal("\x1b[90m{}\x1b[0m: Failed Allocation of {}",
+        "set_bary_parameters_to_BAHAMAS_T78", "log_PkR array");
+      exit(1);
+    }
   }
 
   bary.T = (gsl_interp2d_type*) gsl_interp2d_bilinear;
-  if(bary.interp2d == NULL) {
+  if(bary.interp2d == NULL)
+  {
     bary.interp2d = gsl_interp2d_alloc((const gsl_interp2d_type*) bary.T,
       bary.Nk_bins, bary.Na_bins);
-  }
-  if(bary.interp2d == NULL) {
-    log_fatal("Failed Allocation of interp2d struct");
+    if (bary.interp2d == NULL)
+    {
+      log_fatal("\x1b[90m{}\x1b[0m: Failed Allocation of {}",
+        "set_bary_parameters_to_BAHAMAS_T78", "interp2d struct");
+      exit(1);
+    }
   }
 
 	#pragma omp parallel for
-  for (int i=0; i<bary.Na_bins; i++) {
+  for (int i=0; i<bary.Na_bins; i++)
+  {
   	bary.a_bins[i] = 1./(1 + zBins_BAHAMAS[i]);
-  	for (int j=0; j<bary.Nk_bins; j++) {
-  		if (i == 0) {
+  	for (int j=0; j<bary.Nk_bins; j++)
+    {
+  		if (i == 0)
+      {
   			bary.logk_bins[j] = logkBins_BAHAMAS_T78[j];
   		}
 			int status = gsl_interp2d_set(bary.interp2d, bary.log_PkR, j, i,
 				logPkR_BAHAMAS_T78[j][i]);
-      if(status) {
-        log_fatal(gsl_strerror(status));
+      if (status)
+      {
+        log_fatal("\x1b[90m{}\x1b[0m: gsl error {}",
+          "set_bary_parameters_to_BAHAMAS_T78", gsl_strerror(status));
+        exit(1);
       }
   	}
   }
 
  	int status = gsl_interp2d_init(bary.interp2d, bary.logk_bins, bary.a_bins,
  		bary.log_PkR, bary.Nk_bins, bary.Na_bins);
-  if(status) {
-    log_fatal(gsl_strerror(status));
+  if (status)
+  {
+    log_fatal("\x1b[90m{}\x1b[0m: gsl error {}",
+      "set_bary_parameters_to_BAHAMAS_T78", gsl_strerror(status));
+    exit(1);
   }
 }
 
@@ -9989,70 +10391,125 @@ void set_bary_parameters_to_BAHAMAS_T80()
   bary.Na_bins = 15;
   bary.Nk_bins = 380;
 
-  if(bary.a_bins == NULL) {
+  if(bary.a_bins == NULL)
+  {
     bary.a_bins = (double*) malloc(sizeof(double)*bary.Na_bins);
+    if (bary.a_bins == NULL)
+    {
+      log_fatal("\x1b[90m{}\x1b[0m: Failed Allocation of {}",
+        "set_bary_parameters_to_BAHAMAS_T80", "a_bins array");
+      exit(1);
+    }
   }
-  if(bary.logk_bins == NULL) {
+  if(bary.logk_bins == NULL)
+  {
     bary.logk_bins = (double*) malloc(sizeof(double)*bary.Nk_bins);
+    if (bary.logk_bins == NULL)
+    {
+      log_fatal("\x1b[90m{}\x1b[0m: Failed Allocation of {}",
+        "set_bary_parameters_to_BAHAMAS_T80", "logk_bins array");
+      exit(1);
+    }
   }
-  if(bary.log_PkR == NULL) {
+  if(bary.log_PkR == NULL)
+  {
     bary.log_PkR = (double*) malloc(sizeof(double)*bary.Nk_bins*bary.Na_bins);
+    if (bary.log_PkR == NULL)
+    {
+      log_fatal("\x1b[90m{}\x1b[0m: Failed Allocation of {}",
+        "set_bary_parameters_to_BAHAMAS_T80", "log_PkR array");
+      exit(1);
+    }
   }
 
   bary.T = (gsl_interp2d_type*) gsl_interp2d_bilinear;
-  if(bary.interp2d == NULL) {
+  if(bary.interp2d == NULL)
+  {
     bary.interp2d = gsl_interp2d_alloc((const gsl_interp2d_type*) bary.T,
       bary.Nk_bins, bary.Na_bins);
-  }
-  if(bary.interp2d == NULL) {
-    log_fatal("Failed Allocation of interp2d struct");
+    if (bary.interp2d == NULL)
+    {
+      log_fatal("\x1b[90m{}\x1b[0m: Failed Allocation of {}",
+        "set_bary_parameters_to_BAHAMAS_T80", "interp2d struct");
+      exit(1);
+    }
   }
 
 	#pragma omp parallel for
-  for (int i=0; i<bary.Na_bins; i++) {
+  for (int i=0; i<bary.Na_bins; i++)
+  {
   	bary.a_bins[i] = 1./(1 + zBins_BAHAMAS[i]);
-  	for (int j=0; j<bary.Nk_bins; j++) {
-  		if (i == 0) {
+  	for (int j=0; j<bary.Nk_bins; j++)
+    {
+  		if (i == 0)
+      {
   			bary.logk_bins[j] = logkBins_BAHAMAS_T80[j];
   		}
 			int status = gsl_interp2d_set(bary.interp2d, bary.log_PkR, j, i,
 				logPkR_BAHAMAS_T80[j][i]);
-      if(status) {
-        log_fatal(gsl_strerror(status));
+      if (status)
+      {
+        log_fatal("\x1b[90m{}\x1b[0m: gsl error {}",
+          "set_bary_parameters_to_BAHAMAS_T80", gsl_strerror(status));
+        exit(1);
       }
   	}
   }
 
  	int status = gsl_interp2d_init(bary.interp2d, bary.logk_bins, bary.a_bins,
  		bary.log_PkR, bary.Nk_bins, bary.Na_bins);
-  if(status) {
-    log_fatal(gsl_strerror(status));
+  if (status)
+  {
+    log_fatal("\x1b[90m{}\x1b[0m: gsl error {}",
+      "set_bary_parameters_to_BAHAMAS_T80", gsl_strerror(status));
+    exit(1);
   }
 }
 
 void init_baryons(const char* scenario)
 {
-  if (strcmp(scenario, "TNG100") == 0) {
+  if (strcmp(scenario, "TNG100") == 0)
+  {
     set_bary_parameters_to_TNG100();
-  } else if (strcmp(scenario, "HzAGN") == 0) {
+  }
+  else if (strcmp(scenario, "HzAGN") == 0)
+  {
   	set_bary_parameters_to_HzAGN();
-  } else if (strcmp(scenario, "mb2") == 0) {
+  }
+  else if (strcmp(scenario, "mb2") == 0)
+  {
   	set_bary_parameters_to_mb2();
-  } else if (strcmp(scenario, "illustris") == 0) {
+  }
+  else if (strcmp(scenario, "illustris") == 0)
+  {
   	set_bary_parameters_to_illustris();
-  } else if (strcmp(scenario, "eagle") == 0) {
+  }
+  else if (strcmp(scenario, "eagle") == 0)
+  {
   	set_bary_parameters_to_eagle();
-  } else if (strcmp(scenario, "owls_AGN_T80") == 0) {
+  }
+  else if (strcmp(scenario, "owls_AGN_T80") == 0)
+  {
   	set_bary_parameters_to_owls_AGN_T80();
-  } else if (strcmp(scenario, "owls_AGN_T85") == 0) {
+  }
+  else if (strcmp(scenario, "owls_AGN_T85") == 0)
+  {
   	set_bary_parameters_to_owls_AGN_T85();
-  } else if (strcmp(scenario, "owls_AGN_T87") == 0) {
+  }
+  else if (strcmp(scenario, "owls_AGN_T87") == 0)
+  {
   	set_bary_parameters_to_owls_AGN_T87();
-  } else if (strcmp(scenario, "BAHAMAS_T76") == 0) {
+  }
+  else if (strcmp(scenario, "BAHAMAS_T76") == 0)
+  {
   	set_bary_parameters_to_BAHAMAS_T76();
-  } else if (strcmp(scenario, "BAHAMAS_T78") == 0) {
+  }
+  else if (strcmp(scenario, "BAHAMAS_T78") == 0)
+  {
   	set_bary_parameters_to_BAHAMAS_T78();
-  } else if (strcmp(scenario, "BAHAMAS_T80") == 0) {
+  }
+  else if (strcmp(scenario, "BAHAMAS_T80") == 0)
+  {
   	set_bary_parameters_to_BAHAMAS_T80();
   }
 }

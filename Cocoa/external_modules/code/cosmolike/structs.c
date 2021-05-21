@@ -23,11 +23,13 @@ void reset_like_struct()
   like.lmax = 0;
   like.vtmax = 0;
   like.vtmin = 0;
-  if((like.ell != NULL) == 1) {
+  if((like.ell != NULL) == 1)
+  {
     free(like.ell);
     like.ell = NULL;
   }
-  if((like.theta != NULL) == 1) {
+  if((like.theta != NULL) == 1)
+  {
     free(like.theta);
     like.theta = NULL;
   }
@@ -51,7 +53,8 @@ void reset_like_struct()
   like.ks = 0;
 }
 
-cosmopara cosmology = {
+cosmopara cosmology =
+{
   .Omega_nu = 0.,
   .coverH0 = 2997.92458,
   .rho_crit = 7.4775e+21,
@@ -60,7 +63,8 @@ cosmopara cosmology = {
   .is_cached = 0
 };
 
-void reset_cosmology_struct() {
+void reset_cosmology_struct()
+{
   cosmology.Omega_nu = 0.;
   cosmology.coverH0 = 2997.92458;
   cosmology.rho_crit = 7.4775e+21;
@@ -77,13 +81,13 @@ void reset_cosmology_struct() {
 }
 
 tomopara tomo = {
-  .n_source = {0., 0., 0., 0., 0., 0., 0., 0., 0., 0.},
-  .n_lens = {0., 0., 0., 0., 0., 0., 0., 0., 0., 0.}
+  .n_source = {0},
+  .n_lens = {0}
 };
 
 void reset_tomo_struct()
 {
-  for(int i=0; i<10; i++)
+  for(int i=0; i<MAX_SIZE_ARRAYS; i++)
   {
     tomo.shear_zmax[i] = 0.0;
     tomo.shear_zmin[i] = 0.0;
@@ -135,7 +139,8 @@ void reset_redshift_struct()
   sprintf(redshift.magnification_REDSHIFT_FILE,"");
 }
 
-sur survey = {
+sur survey =
+{
   .area_conversion_factor =
                   60.0 * 60.0 * 2.90888208665721580e-4 * 2.90888208665721580e-4,
   .n_gal_conversion_factor =
@@ -158,11 +163,12 @@ void reset_survey_struct()
   survey.ggl_overlap_cut = 1.0;
 }
 
-galpara gbias = {
-  .b2 = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0},
-  .bs2 = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0},
+galpara gbias =
+{
+  .b2 = {0},
+  .bs2 = {0},
   .b1_function = &b1_per_bin,
-  .b_mag = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,0.0},
+  .b_mag = {0},
 }; // default: point to old bgal_z routin
 
 void reset_gbias_struct()
@@ -190,7 +196,7 @@ void reset_cluster_struct()
   Cluster.N200_min = 0.0;
   Cluster.N200_max = 0.0;
   Cluster.N200_Nbin = 0;
-  for(int i=0; i<10; i++)
+  for(int i=0; i<MAX_SIZE_ARRAYS; i++)
   {
     Cluster.N_min[i] = 0.0;
     Cluster.N_max[i] = 0.0;
@@ -212,7 +218,8 @@ void reset_pdeltaparams_struct()
   sprintf(pdeltaparams.runmode, "Halofit");
 }
 
-FPTpara FPT = {
+FPTpara FPT =
+{
   .k_min = 1.e-5,
   .k_max = 1.e+3,
   .N = 800,
@@ -221,21 +228,22 @@ FPTpara FPT = {
   .N_IA = 10
 };
 
-nuisancepara nuisance = {
+nuisancepara nuisance =
+{
   .c1rhocrit_ia = 0.01389,
-  .A_z = {0., 0., 0., 0., 0., 0., 0., 0., 0., 0.},
-  .A2_z = {0., 0., 0., 0., 0., 0., 0., 0., 0., 0.},
-  .b_ta_z = {0., 0., 0., 0., 0., 0., 0., 0., 0., 0.},
-  .shear_calibration_m = {0., 0., 0., 0., 0., 0., 0., 0., 0., 0.},
-  .sigma_zphot_shear = {0., 0., 0., 0., 0., 0., 0., 0., 0., 0.},
-  .bias_zphot_shear = {0., 0., 0., 0., 0., 0., 0., 0., 0., 0.},
-  .sigma_zphot_clustering = {0., 0., 0., 0., 0., 0., 0., 0., 0., 0.},
-  .bias_zphot_clustering = {0., 0., 0., 0., 0., 0., 0., 0., 0., 0.}
+  .A_z = {0},
+  .A2_z = {0},
+  .b_ta_z = {0},
+  .shear_calibration_m = {0},
+  .sigma_zphot_shear = {0},
+  .bias_zphot_shear = {0},
+  .sigma_zphot_clustering = {0},
+  .bias_zphot_clustering = {0},
 };
 
 void reset_nuisance_struct()
 {
-  for(int i=0; i<10; i++)
+  for(int i=0; i<MAX_SIZE_ARRAYS; i++)
   {
     nuisance.A_z[i];
     nuisance.A2_z[i];
@@ -306,19 +314,23 @@ void reset_bary_struct()
   bary.Na_bins = 0;
   bary.Nk_bins = 0;
 
-  if((bary.a_bins != NULL)) {
+  if((bary.a_bins != NULL))
+  {
     free(bary.a_bins);
     bary.a_bins = NULL;
   }
-  if((bary.logk_bins != NULL)) {
+  if((bary.logk_bins != NULL))
+  {
     free(bary.logk_bins);
     bary.logk_bins = NULL;
   }
-  if((bary.log_PkR != NULL)) {
+  if((bary.log_PkR != NULL))
+  {
     free(bary.log_PkR);
     bary.log_PkR = NULL;
   }
-  if((bary.interp2d != NULL)) {
+  if((bary.interp2d != NULL))
+  {
     gsl_interp2d_free(bary.interp2d);
     bary.interp2d = NULL;
   }
