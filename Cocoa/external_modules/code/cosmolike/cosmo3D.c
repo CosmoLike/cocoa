@@ -1305,10 +1305,13 @@ double f_K(double chi) {
 // ------------------------------------------------------------------------
 
 // return P(k)_bary/P(k)_DMO from hydro sims ;
-double PkRatio_baryons(double k_NL, double a) {
-  if (bary.is_Pk_bary == 0) {
+double PkRatio_baryons(double k_NL, double a)
+{
+  if (bary.is_Pk_bary == 0)
+  {
     return 1.;
-  } else {
+  } else
+  {
     const double kintern = k_NL/cosmology.coverH0;
     double result;
     int status = gsl_interp2d_eval_extrap_e(bary.interp2d, bary.logk_bins,

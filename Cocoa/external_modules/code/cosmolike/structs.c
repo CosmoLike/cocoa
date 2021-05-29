@@ -287,7 +287,8 @@ void reset_nuisance_struct()
   nuisance.N_cluster_selection = 0;
 }
 
-barypara bary = {
+barypara bary =
+{
   .is_Pk_bary = 0,
   .Na_bins = 0,
   .Nk_bins = 0,

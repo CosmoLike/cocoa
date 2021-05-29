@@ -32,7 +32,8 @@ void update_galpara(galpara *G) {
   }
 }
 
-void update_nuisance(nuisancepara *N) {
+void update_nuisance(nuisancepara *N)
+{
   N->A_ia = nuisance.A_ia;
   N->beta_ia = nuisance.beta_ia;
   N->eta_ia = nuisance.eta_ia;
@@ -79,35 +80,42 @@ void update_nuisance(nuisancepara *N) {
   }
 }
 
-int recompute_cosmo3D(cosmopara C) {
-  if (cosmology.is_cached == 1) {
+int recompute_cosmo3D(cosmopara C)
+{
+  if (cosmology.is_cached == 1)
+  {
     return 0;
-  } else {
+  } else
+  {
     if (C.Omega_m != cosmology.Omega_m || C.Omega_v != cosmology.Omega_v ||
         C.Omega_nu != cosmology.Omega_nu || C.h0 != cosmology.h0 ||
         C.MGSigma != cosmology.MGSigma || C.MGmu != cosmology.MGmu ||
-        C.random != cosmology.random
-    ){
+        C.random != cosmology.random)
+    {
       return 1;
     }
     return 0;
   }
 }
 
-int recompute_zphot_shear(nuisancepara N) {
+int recompute_zphot_shear(nuisancepara N)
+{
   static int photoz = -1;
-  if (photoz != redshift.shear_photoz) {
+  if (photoz != redshift.shear_photoz)
+  {
     photoz = redshift.shear_photoz;
     return 1;
   }
-  if (redshift.shear_photoz != 3 && redshift.shear_photoz != 4) {
+  if (redshift.shear_photoz != 3 && redshift.shear_photoz != 4)
+  {
     return 0;
   }
   int res = 0;
-  for (int i = 0; i < tomo.shear_Nbin; i++) {
+  for (int i = 0; i < tomo.shear_Nbin; i++)
+  {
     if (N.sigma_zphot_shear[i] != nuisance.sigma_zphot_shear[i] ||
-      N.bias_zphot_shear[i] != nuisance.bias_zphot_shear[i]
-    ) {
+      N.bias_zphot_shear[i] != nuisance.bias_zphot_shear[i])
+    {
       res = 1;
     }
   }
