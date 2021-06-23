@@ -159,39 +159,43 @@ int recompute_zphot_magnification(nuisancepara N) {
 }
 
 int recompute_IA(nuisancepara N) {
-  if (N.A_ia   != nuisance.A_ia ||
-    N.eta_ia != nuisance.eta_ia ||
-    N.A2_ia  != nuisance.A2_ia ||
-    N.eta_ia_tt != nuisance.eta_ia_tt
-  ) {
+  if (N.A_ia   != nuisance.A_ia || N.eta_ia != nuisance.eta_ia ||
+      N.A2_ia  != nuisance.A2_ia || N.eta_ia_tt != nuisance.eta_ia_tt)
+  {
     return 1;
   }
-  for (int i = 0; i < tomo.shear_Nbin; i++) {
-    if (N.A_z[i] != nuisance.A_z[i]) {
+  for (int i = 0; i < tomo.shear_Nbin; i++)
+  {
+    if (N.A_z[i] != nuisance.A_z[i])
+    {
       return 1;
     }
-    if (N.A2_z[i] != nuisance.A2_z[i]) {
+    if (N.A2_z[i] != nuisance.A2_z[i])
+    {
       return 1;
     }
-    if (N.b_ta_z[i] != nuisance.b_ta_z[i]) {
+    if (N.b_ta_z[i] != nuisance.b_ta_z[i])
+    {
       return 1;
     }
   }
   return 0;
 }
 
-int recompute_shear(cosmopara C, nuisancepara N) {
-  if (recompute_cosmo3D(C) ||
-    recompute_zphot_shear(N) ||
-    recompute_IA(N)
-  ) {
+int recompute_shear(cosmopara C, nuisancepara N)
+{
+  if (recompute_cosmo3D(C) || recompute_zphot_shear(N) || recompute_IA(N))
+  {
     return 1;
-  } else {
+  }
+  else
+  {
     return 0;
   }
 }
 
-int recompute_clusters(cosmopara C, nuisancepara N) {
+int recompute_clusters(cosmopara C, nuisancepara N)
+{
   if (recompute_cosmo3D(C) ||
       N.cluster_Mobs_lgM0 != nuisance.cluster_Mobs_lgM0 ||
       N.cluster_Mobs_sigma != nuisance.cluster_Mobs_sigma ||
@@ -204,93 +208,114 @@ int recompute_clusters(cosmopara C, nuisancepara N) {
       N.cluster_completeness[0] != nuisance.cluster_completeness[0] ||
       N.cluster_centering_f0 != nuisance.cluster_centering_f0 ||
       N.cluster_centering_alpha != nuisance.cluster_centering_alpha ||
-      N.cluster_centering_sigma != nuisance.cluster_centering_sigma) {
+      N.cluster_centering_sigma != nuisance.cluster_centering_sigma)
+  {
     return 1;
-  } else {
+  }
+  else
+  {
     return 0;
   }
 }
 
-int recompute_DESclusters(cosmopara C, nuisancepara N) {
+int recompute_DESclusters(cosmopara C, nuisancepara N)
+{
   if (recompute_cosmo3D(C))
+  {
     return 1;
-  for (int _i = 0; _i < nuisance.N_cluster_MOR; ++_i) {
+  }
+  for (int _i = 0; _i < nuisance.N_cluster_MOR; ++_i)
+  {
     if (N.cluster_MOR[_i] != nuisance.cluster_MOR[_i])
       return 1;
   }
-  for (int _i = 0; _i < nuisance.N_cluster_selection; ++_i) {
+  for (int _i = 0; _i < nuisance.N_cluster_selection; ++_i)
+  {
     if (N.cluster_selection[_i] != nuisance.cluster_selection[_i])
       return 1;
   }
   return 0;
 }
 
-int recompute_ii(cosmopara C, nuisancepara N) {
+int recompute_ii(cosmopara C, nuisancepara N)
+{
   if (recompute_cosmo3D(C) || recompute_zphot_clustering(N) ||
       recompute_zphot_shear(N) || N.A_ia != nuisance.A_ia ||
       N.beta_ia != nuisance.beta_ia || N.eta_ia != nuisance.eta_ia ||
-      N.eta_ia_highz != nuisance.eta_ia_highz ) {
+      N.eta_ia_highz != nuisance.eta_ia_highz )
+  {
     return 1;
-  } else {
+  }
+  else
+  {
     return 0;
   }
 }
 
 int recompute_galaxies(galpara G, int i) {
-  if (i == -1) {
+  if (i == -1)
+  {
     return 0;
   }
   if (G.b[i] != gbias.b[i] ||
     G.b2[i] != gbias.b2[i] ||
     G.bs2[i] != gbias.bs2[i] ||
     G.cg[i] != gbias.cg[i]
-  ) {
+  )
+  {
     return 1;
   }
   return 0;
 }
 
 int recompute_ggl(cosmopara C, galpara G, nuisancepara N, int i) {
-  if (recompute_cosmo3D(C) ||
-    recompute_zphot_clustering(N) ||
-    recompute_zphot_shear(N) ||
-    recompute_galaxies(G, i) ||
-    recompute_IA(N)
-  ) {
+  if (recompute_cosmo3D(C) || recompute_zphot_clustering(N) ||
+      recompute_zphot_shear(N) || recompute_galaxies(G, i) ||
+      recompute_IA(N))
+  {
     return 1;
-  } else {
+  }
+  else
+  {
     return 0;
   }
 }
 
-int recompute_clustering(cosmopara C, galpara G, nuisancepara N, int i, int j) {
-  if (recompute_cosmo3D(C) ||
-    recompute_zphot_clustering(N) ||
-    recompute_galaxies(G, i) ||
-    recompute_galaxies(G, j)
-  ) {
+int recompute_clustering(cosmopara C, galpara G, nuisancepara N, int i, int j)
+{
+  if (recompute_cosmo3D(C) || recompute_zphot_clustering(N) ||
+      recompute_galaxies(G, i) || recompute_galaxies(G, j))
+  {
     return 1;
-  } else {
+  }
+  else
+  {
     return 0;
   }
 }
 
-int recompute_ks(cosmopara C, galpara G, nuisancepara N, int i) {
-  if (recompute_cosmo3D(C) || recompute_zphot_shear(N) || recompute_galaxies(G,i)
-      || recompute_IA(N) ) {
+int recompute_ks(cosmopara C, galpara G, nuisancepara N, int i)
+{
+  if (recompute_cosmo3D(C) || recompute_zphot_shear(N) ||
+      recompute_galaxies(G,i) || recompute_IA(N))
+  {
     return 1;
   }
-  else {
+  else
+  {
     return 0;
   }
 }
 
-int recompute_gk(cosmopara C, galpara G, nuisancepara N, int i) {
+int recompute_gk(cosmopara C, galpara G, nuisancepara N, int i)
+{
   if (recompute_cosmo3D(C) || recompute_zphot_clustering(N)
-      || recompute_galaxies(G,i)) {
+      || recompute_galaxies(G,i))
+  {
     return 1;
   }
-  else {
+  else
+  {
     return 0;
   }
 }
