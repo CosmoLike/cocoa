@@ -16,10 +16,10 @@ extern "C" {
 
 // \int_(bin_obs_lambda_min)^(bin_obs_lambda_max) \dlambda_obs P(\lambda_obs|M)
 // (see for example https://arxiv.org/pdf/1810.09456.pdf - eq3 qnd 6) 
-double binned_P_obs_lambda_given_M_nointerp(int nl, double mass, double z)
+double binned_P_obs_lambda_given_M_nointerp(int nl, double mass, double z);
 
 // Threading this function is not allowed (unless nl is fixed) 
-double binned_P_lambda_obs_given_M(int nl, double M, double z) 
+double binned_P_lambda_obs_given_M(int nl, double M, double z); 
 
 // ---------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------
@@ -33,6 +33,16 @@ double weighted_bias_nointerp(int nl, double z);
 
 double weighted_bias(int nlambda, double z);
 
+// ----------------------------------------------------------------------------
+// ----------------------------------------------------------------------------
+// ----------------------------------------------------------------------------
+// cluster number counts
+// ----------------------------------------------------------------------------
+// ----------------------------------------------------------------------------
+// ----------------------------------------------------------------------------
+
+double binned_average_number_counts(int nl, double z); // nl = lambda_obs bin
+
 // ---------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------
@@ -44,8 +54,8 @@ double weighted_bias(int nlambda, double z);
 // nl{1,2} = lambda_obs bins, n{i,j} = cluster redshift bins
 double binned_p_cc(double k, double a, int nl1, int nl2, int use_linear_ps);
 
-// nl = lambda_obs bin, ni = cluster redshift bin, nj = galaxy redshift bin
-double binned_p_cg(double k, double a, int nl, int ni, int nj, int use_linear_ps);
+// nl = lambda_obs bin, nj = galaxy redshift bin
+double binned_p_cg(double k, double a, int nl, int nj, int use_linear_ps);
 
 // nl = lambda_obs bin, ni = cluster redshift bin, nj = source redshift bin
 double binned_p_cm(double k, double a, int nl, int use_linear_ps);

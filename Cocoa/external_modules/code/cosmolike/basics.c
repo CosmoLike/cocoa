@@ -41,14 +41,16 @@ pre precision = {
 };
 
 lim limits = {
-  1./(1.+10.), // a_min (z=10, needed for CMB lensing)
-  2.e-2,       // k_min_cH0
-  3.e+6,       // k_max_cH0
-  1.e+6,       // M_min
-  1.e+17,      // M_max
-  20,          // LMIN_tab
-  100000,      // LMAX
-  400,         // LMAX_NOLIMBER
+  1./(1.+10.),  // a_min (z=10, needed for CMB lensing)
+  2.e-2,        // k_min_cH0
+  3.e+6,        // k_max_cH0
+  1.e+6,        // M_min
+  1.e+17,       // M_max
+  0.1,          //P_2_s_min
+  1.0e5,        //P_2_s_max        
+  20,           // LMIN_tab
+  100000,       // LMAX
+  400,          // LMAX_NOLIMBER
 };
 
 Ntab Ntable = {

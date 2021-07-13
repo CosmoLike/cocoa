@@ -25,7 +25,7 @@ double amax_lens(int i);
 // ---------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------
-//redshift overlap tests, allowed tomography combinations
+// redshift overlap tests, allowed tomography combinations
 // ---------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------
@@ -36,24 +36,39 @@ int test_zoverlap(int zl, int zs); // test whether source bin zs is behind lens 
 
 int test_zoverlap_c(int zc, int zs); // test whether source bin zs is behind lens bin zl (clusters)
 
+
 int ZL(int Nbin); // find zlens bin of tomo combination (galaxy-galaxy lensing)
+
 int ZS(int Nbin); // find zsource bin of tomo combination (galaxy-galaxy lensing)
+
 int N_ggl(int zl, int zs); // find tomo bin number tomography combination
 
-int ZC(int Nbin); // find zlens bin of tomo combination (cluster-galaxy lensing)
-int ZSC(int Nbin); // find zsource bin of tomo combination (cluster-galaxy lensing)
+
+int ZCL(int Nbin); // find zlens bin of tomo combination (cluster-galaxy lensing)
+
+int ZCS(int Nbin); // find zsource bin of tomo combination (cluster-galaxy lensing)
+
 int N_cgl(int zl, int zs); // find tomo bin number tomography combination
 
+
 int Z1(int Nbin); // find z1 bin of tomo combination 
+
 int Z2(int Nbin); // find z2 bin of tomo combination 
+
 int N_shear(int z1, int z2); // find tomo bin number tomography combination
 
+
 int ZCL1(int Nbin); // find z1 bin of tomo combination (cluster-galaxy clustering)
+
 int ZCL2(int Nbin); // find z2 bin of tomo combination (cluster-galaxy clustering)
+
 int N_CL(int z1, int z2); // find tomo bin number tomography combination (cluster-galaxy clustering)
 
+
 int ZCCL1(int Nbin); // find z1 bin of tomo combination (cluster-cluster clustering)
+
 int ZCCL2(int Nbin); // find z2 bin of tomo combination (cluster-cluster clustering)
+
 int N_CCL(int z1, int z2); // find tomo bin number tomography combination (cluster-cluster clustering)
 
 // ---------------------------------------------------------------------------------------

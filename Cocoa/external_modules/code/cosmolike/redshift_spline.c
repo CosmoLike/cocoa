@@ -329,7 +329,7 @@ int test_zoverlap_c(int zc, int zs) // test whether source bin zs is behind lens
   return 0;
 }
 
-int ZC(int ni) 
+int ZCL(int ni) 
 {
   static int N[100] = {-42};
   if (N[0] < -1) 
@@ -355,7 +355,7 @@ int ZC(int ni)
   return N[ni];
 }
 
-int ZSC(int nj) 
+int ZCS(int nj) 
 {
   static int N[100] = {-42};
   if (N[0] < -1) 
@@ -1788,8 +1788,14 @@ double nsource(int ni) // ni =-1 -> no tomography; ni>= 0 -> tomography bin ni
 
   if (table == 0 || table[0][0] != survey.n_gal) 
   {
-    zdistr_photoz(0.0, 0.0);
-    
+    #pragma GCC diagnostic push
+    #pragma GCC diagnostic ignored "-Wunused-variable"
+    {
+      double init = zdistr_photoz(0.0, 0.0);
+      
+    }
+    #pragma GCC diagnostic pop
+
     table = create_double_matrix(0, tomo.shear_Nbin, 0, 1);
     
     if (redshift.shear_photoz == 4) 
@@ -1866,7 +1872,12 @@ double nlens(int ni) // ni =-1 -> no tomography; ni>= 0 -> tomography bin ni
 
   if (table == 0 || table[0][0] != survey.n_lens) 
   {
-    pf_photoz(0., 0);
+    #pragma GCC diagnostic push
+    #pragma GCC diagnostic ignored "-Wunused-variable"
+    {
+      double init = pf_photoz(0., 0);
+    }
+    #pragma GCC diagnostic pop
     
     table = create_double_matrix(0, tomo.clustering_Nbin, 0, 1);
     
@@ -1965,11 +1976,13 @@ double zmean(int ni)
   static double** table = 0;
   if (table == 0) 
   {
+    #pragma GCC diagnostic push
+    #pragma GCC diagnostic ignored "-Wunused-variable"
     {
-      double ar[1];
-      ar[0] = pf_photoz(0., 0);
+      double init = pf_photoz(0., 0);
     }
-
+    #pragma GCC diagnostic pop
+    
     table = create_double_matrix(0, tomo.clustering_Nbin, 0, 1);
 
     {
@@ -2019,11 +2032,14 @@ double zmean_source(int ni)
   
   if (table == 0) 
   {
+    #pragma GCC diagnostic push
+    #pragma GCC diagnostic ignored "-Wunused-variable"
     {
-      double ar[1];
-      ar[0] = zdistr_photoz(0., 0);
+      double init = zdistr_photoz(0., 0);
+     
     }
-    
+    #pragma GCC diagnostic pop
+
     table = create_double_matrix(0, tomo.shear_Nbin - 1, 0, 1);
 
     {
@@ -2529,10 +2545,14 @@ double ggl_efficiency(int ni, int nj)
   
   if (table == 0) 
   {
+    #pragma GCC diagnostic push
+    #pragma GCC diagnostic ignored "-Wunused-variable"
     {
       double init = pf_photoz(0, 0);
-      init = zdistr_photoz(0, 0);
+      double init2 = zdistr_photoz(0, 0);
     }
+    #pragma GCC diagnostic pop
+    
     table = create_double_matrix(0, tomo.clustering_Nbin, 0, tomo.shear_Nbin);
     
     {

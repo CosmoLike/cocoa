@@ -10,7 +10,8 @@ URLS="git@github.com:CosmoLike/cocoa_des_y1.git
       git@github.com:CosmoLike/cocoa_desxplanck.git
       git@github.com:CosmoLike/cocoa_desy1xplanck.git
       git@github.com:CosmoLike/cocoa_lsst_fourier.git
-      git@github.com:CosmoLike/cocoa_kids.git"
+      git@github.com:CosmoLike/cocoa_kids.git
+      git@github.com:CosmoLike/cocoa_des_4x2ptN.git"
 
 for NAME in $URLS; do
   # https://stackoverflow.com/a/11231970/2472169

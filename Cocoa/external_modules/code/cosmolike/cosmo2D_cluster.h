@@ -44,7 +44,16 @@ double w_cg_tomo_flatsky(double theta, int nl, int ni, int nj, int limber);
 // ----------------------------------------------------------------------------
 // ----------------------------------------------------------------------------
 
+// nl = lambda_obs bin, ni = cluster redshift bin, nj = source redshift bin
+double C_cs_tomo_limber_nointerp(double l, int nl, int ni, int nj, int use_linear_ps);
+double C_cs_tomo_limber(double l, int nl, int ni, int nj);
+
+// nl{1,2} = lambda_obs bins, n{i,j} = cluster redshift bins
+double C_cc_tomo_limber_nointerp(double l, int nl1, int nl2, int ni, int nj, int use_linear_ps);
+double C_cc_tomo_limber(double l, int nl1, int nl2, int ni, int nj);
+
 // nl = lambda_obs bin, ni = cluster redshift bin, nj = galaxy redshift bin
+double C_cg_tomo_limber_nointerp(double l, int nl, int ni, int nj, int use_linear_ps);
 double C_cg_tomo_limber(double l, int nl, int ni, int nj);
 
 // ----------------------------------------------------------------------------

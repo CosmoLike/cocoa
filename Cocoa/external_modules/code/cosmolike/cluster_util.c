@@ -16,6 +16,7 @@
 #include "bias.h"
 #include "cosmo3D.h"
 #include "cluster_util.h"
+#include "halo.h"
 #include "recompute.h"
 #include "radial_weights.h"
 #include "redshift_spline.h"
@@ -23,6 +24,7 @@
 
 #include "log.c/src/log.h"
 
+static int GSL_WORKSPACE_SIZE = 250;
 static double log_M_min = 12.0;
 static double log_M_max = 15.9; 
 
@@ -195,7 +197,7 @@ int* io_natsrgm, double** io_atsrgm, double** io_alpha, double** io_sigma, int i
 }
 
 // SKEW-NORMAL APPROXIMATION eq B1 of https://arxiv.org/pdf/1810.09456.pdf
-double SDSS_P_true_lambda_given_mass(const double true_lambda, double mass)
+double SDSS_P_true_lambda_given_mass(const double true_lambda, const double mass, const double z)
 {
   static int first = 0;
   static gsl_spline2d* falpha = NULL; // skewness of the skew-normal distribution
@@ -257,13 +259,13 @@ double SDSS_P_true_lambda_given_mass(const double true_lambda, double mass)
       for (int j=0; j<natsrgm; j++) 
       {
         int status = 0;
-        status = gsl_spline2d_set(falpha, alpha, i, j, tmp_alpha[i*nintrinsic_sigma+j]);
+        status = gsl_spline2d_set(falpha, alpha, i, j, (*tmp_alpha)[i*nintrinsic_sigma+j]);
         if (status) 
         {
           log_fatal(gsl_strerror(status));
           exit(1);
         }
-        status = gsl_spline2d_set(fsigma, sigma, i, j, tmp_sigma[i*nintrinsic_sigma+j]);
+        status = gsl_spline2d_set(fsigma, sigma, i, j, (*tmp_sigma)[i*nintrinsic_sigma+j]);
         if (status) 
         {
           log_fatal(gsl_strerror(status));
@@ -273,13 +275,15 @@ double SDSS_P_true_lambda_given_mass(const double true_lambda, double mass)
     }
 
     int status = 0;
-    status = gsl_spline2d_init(falpha, intrinsic_sigma[0], atsrgm[0], alpha, nintrinsic_sigma, natsrgm);
+    status = gsl_spline2d_init(falpha, intrinsic_sigma[0], atsrgm[0], alpha, 
+      nintrinsic_sigma, natsrgm);
     if (status) 
     {
       log_fatal(gsl_strerror(status));
       exit(1);
     }
-    status = gsl_spline2d_init(fsigma, intrinsic_sigma[0], atsrgm[0], sigma, nintrinsic_sigma, natsrgm);
+    status = gsl_spline2d_init(fsigma, intrinsic_sigma[0], atsrgm[0], sigma, 
+      nintrinsic_sigma, natsrgm);
     if (status) 
     {
       log_fatal(gsl_strerror(status));
@@ -305,8 +309,8 @@ double SDSS_P_true_lambda_given_mass(const double true_lambda, double mass)
   const double intrinsic_sigma = nuisance.cluster_MOR[3];
   
   // average true satellite richness given mass
-  double atsrgm = pow((mass - mass_min)/(mass_M1 - mass_min), intrinsic_alpha)*
-    pow(((1+array[1])/1.45),nuisance.cluster_MOR[4]); 
+  const double tmp = (mass - mass_min)/(mass_M1 - mass_min);
+  double atsrgm = pow(tmp, intrinsic_alpha)*pow(((1+z)/1.45), nuisance.cluster_MOR[4]); 
   if (atsrgm > 160) 
   {
     atsrgm = 160;
@@ -341,7 +345,7 @@ double SDSS_P_true_lambda_given_mass(const double true_lambda, double mass)
 // Cocoa: (reading is done in the C++/python interface)
 void setup_SDSS_P_lambda_obs_given_true_lambda(int* io_nz, double** io_z, int* io_nlambda, 
 double** io_lambda, double** io_tau, double** io_mu, double** io_sigma, double** io_fmask, 
-double** io_fprj)
+double** io_fprj, int io)
 {
   static int nz;
   static int nlambda; 
@@ -456,7 +460,7 @@ double** io_fprj)
     else if((*io_sigma) != NULL)
     {
       free((*io_sigma));
-      (*io_igma) = NULL;
+      (*io_sigma) = NULL;
     }
     else if((*io_fmask) != NULL)
     {
@@ -502,7 +506,7 @@ double** io_fprj)
   }
 }
 
-double SDSS_P_lambda_obs_given_true_lambda(double observed_lambda, double true_lambda, double z) 
+double SDSS_P_lambda_obs_given_true_lambda(double observed_lambda, double true_lambda, double zz) 
 {
   static int first = 0;
   static gsl_spline2d* ftau;
@@ -517,13 +521,13 @@ double SDSS_P_lambda_obs_given_true_lambda(double observed_lambda, double true_l
 
     int nz;
     int nlambda;
-    double** z;
-    double** lambda;
     double** tmp_tau;
     double** tmp_mu;
     double** tmp_sigma;
     double** tmp_fmask;
     double** tmp_fprj;
+    double** z;
+    double** lambda;
     double* tau;
     double* mu;
     double* sigma;
@@ -586,31 +590,31 @@ double SDSS_P_lambda_obs_given_true_lambda(double observed_lambda, double true_l
       for (int j=0; j<nlambda; j++) 
       {
         int status = 0;
-        status = gsl_spline2d_set(ftau, tau, i, j, tmp_tau[i*nz + j]);
+        status = gsl_spline2d_set(ftau, tau, i, j, (*tmp_tau)[i*nz + j]);
         if (status) 
         {
           log_fatal(gsl_strerror(status));
           exit(1);
         }
-        status = gsl_spline2d_set(fmu, mu, i, j, tmp_mu[i*nz + j]);
+        status = gsl_spline2d_set(fmu, mu, i, j, (*tmp_mu)[i*nz + j]);
         if (status) 
         {
           log_fatal(gsl_strerror(status));
           exit(1);
         }
-        status = gsl_spline2d_set(fsigma, sigma, i, j, tmp_sigma[i*nz + j]);
+        status = gsl_spline2d_set(fsigma, sigma, i, j, (*tmp_sigma)[i*nz + j]);
         if (status) 
         {
           log_fatal(gsl_strerror(status));
           exit(1);
         }
-        status = gsl_spline2d_set(ffmask, fmask, i, j, tmp_fmask[i*nz + j]);
+        status = gsl_spline2d_set(ffmask, fmask, i, j, (*tmp_fmask)[i*nz + j]);
         if (status) 
         {
           log_fatal(gsl_strerror(status));
           exit(1);
         }
-        status = gsl_spline2d_set(ffprj, fprj, i, j, tmp_fprj[i*nz + j]);
+        status = gsl_spline2d_set(ffprj, fprj, i, j, (*tmp_fprj)[i*nz + j]);
         if (status) 
         {
           log_fatal(gsl_strerror(status));
@@ -620,31 +624,31 @@ double SDSS_P_lambda_obs_given_true_lambda(double observed_lambda, double true_l
     }
 
     int status = 0;
-    status = gsl_spline2d_init(ftau, z, lambda, tau, nz, nlambda);
+    status = gsl_spline2d_init(ftau, (*z), (*lambda), tau, nz, nlambda);
     if (status) 
     {
       log_fatal(gsl_strerror(status));
       exit(1);
     }
-    status = gsl_spline2d_init(fmu, z, lambda, mu, nz, nlambda);
+    status = gsl_spline2d_init(fmu, (*z), (*lambda), mu, nz, nlambda);
     if (status) 
     {
       log_fatal(gsl_strerror(status));
       exit(1);
     }
-    status = gsl_spline2d_init(fsigma, z, lambda, sigma, nz, nlambda);
+    status = gsl_spline2d_init(fsigma, (*z), (*lambda), sigma, nz, nlambda);
     if (status) 
     {
       log_fatal(gsl_strerror(status));
       exit(1);
     }
-    status = gsl_spline2d_init(ffmask, z, lambda, fmask, nz, nlambda);
+    status = gsl_spline2d_init(ffmask, (*z), (*lambda), fmask, nz, nlambda);
     if (status) 
     {
       log_fatal(gsl_strerror(status));
       exit(1);
     }
-    status = gsl_spline2d_init(ffprj, z, lambda, fprj, nz, nlambda);
+    status = gsl_spline2d_init(ffprj, (*z), (*lambda), fprj, nz, nlambda);
     if (status) 
     {
       log_fatal(gsl_strerror(status));
@@ -672,38 +676,40 @@ double SDSS_P_lambda_obs_given_true_lambda(double observed_lambda, double true_l
     free(fprj);  // GSL SPLINE 2D copies the array
   }
   
-  int status = 0;
-  double tau, mu, sigma, fmask, fprj, 
-  
-  status = gsl_spline2d_eval_e(ftau, z, true_lambda, NULL, NULL, &tau);
-  if (status) 
+
+  double tau, mu, sigma, fmask, fprj;
   {
-    log_fatal(gsl_strerror(status));
-    exit(1);
-  }  
-  status = gsl_spline2d_eval_e(fmu, z, true_lambda, NULL, NULL, &mu);
-  if (status) 
-  {
-    log_fatal(gsl_strerror(status));
-    exit(1);
-  }  
-  status = gsl_spline2d_eval_e(fsigma, z, true_lambda, NULL, NULL, &sigma);
-  if (status) 
-  {
-    log_fatal(gsl_strerror(status));
-    exit(1);
-  }
-  status = gsl_spline2d_eval_e(ffmask, z, true_lambda, NULL, NULL, &fmask);
-  if (status) 
-  {
-    log_fatal(gsl_strerror(status));
-    exit(1);
-  }
-  status = gsl_spline2d_eval_e(ffprj, z, true_lambda, NULL, NULL, &fprj);
-  if (status) 
-  {
-    log_fatal(gsl_strerror(status));
-    exit(1);
+    int status = 0;
+    status = gsl_spline2d_eval_e(ftau, zz, true_lambda, NULL, NULL, &tau);
+    if (status) 
+    {
+      log_fatal(gsl_strerror(status));
+      exit(1);
+    }  
+    status = gsl_spline2d_eval_e(fmu, zz, true_lambda, NULL, NULL, &mu);
+    if (status) 
+    {
+      log_fatal(gsl_strerror(status));
+      exit(1);
+    }  
+    status = gsl_spline2d_eval_e(fsigma, zz, true_lambda, NULL, NULL, &sigma);
+    if (status) 
+    {
+      log_fatal(gsl_strerror(status));
+      exit(1);
+    }
+    status = gsl_spline2d_eval_e(ffmask, zz, true_lambda, NULL, NULL, &fmask);
+    if (status) 
+    {
+      log_fatal(gsl_strerror(status));
+      exit(1);
+    }
+    status = gsl_spline2d_eval_e(ffprj, zz, true_lambda, NULL, NULL, &fprj);
+    if (status) 
+    {
+      log_fatal(gsl_strerror(status));
+      exit(1);
+    }
   }
 
   const double x = 1.0/(M_SQRT2*abs(sigma));
@@ -731,10 +737,10 @@ double SDSS_int_P_lambda_obs_given_M_nointerp(double true_lambda, void* params)
   
   const double M = ar[0];
   const double z = ar[1];
-  const double obs_lambda = ar[2]
+  const double obs_lambda = ar[2];
 
   const double r1 = SDSS_P_lambda_obs_given_true_lambda(obs_lambda, true_lambda, z);
-  const double r2 = SDSS_P_true_lambda_given_mass(true_lambda, M);
+  const double r2 = SDSS_P_true_lambda_given_mass(true_lambda, M, z);
 
   return r1*r2;
 }
@@ -752,7 +758,7 @@ double SDSS_P_lambda_obs_given_M_nointerp(double obs_lambda, void* params)
   const double true_lambda_max =  160.;
 
   return int_gsl_integrate_medium_precision(SDSS_int_P_lambda_obs_given_M_nointerp, 
-    (void*) params_in, true_lambda_min, true_lambda_max., NULL, GSL_WORKSPACE_SIZE);
+    (void*) params_in, true_lambda_min, true_lambda_max, NULL, GSL_WORKSPACE_SIZE);
 }
 
 // \int_(bin_lambda_obs_min)^(bin_lambda_obs_max) \dlambda_obs P(\lambda_obs|M)
@@ -778,7 +784,7 @@ double SDSS_binned_P_lambda_obs_given_M_nointerp(int nl, double M, double z)
 
 // \int_(bin_lambda_obs_min)^(bin_lambda_obs_max) \dlambda_obs P(\lambda_obs|M)
 // (see for example https://arxiv.org/pdf/1810.09456.pdf - eq3 qnd 6) 
-double binned_P_lambda_obs_given_M_nointerp(int nl, double mass, double z)
+double binned_P_lambda_obs_given_M_nointerp(int nl, double M, double z)
 {
   if (strcmp(Cluster.model, "SDSS") == 0) 
   {
@@ -803,6 +809,7 @@ double binned_P_lambda_obs_given_M(int nl, double M, double z)
   static nuisancepara N;
   static double** table_P1 = 0;
 
+  const double logM = log10(M);
   const double logmmin = log_M_min;
   const double logmmax = log_M_max; 
   const double zmin = 0.20; 
@@ -818,20 +825,20 @@ double binned_P_lambda_obs_given_M(int nl, double M, double z)
   {
     table_P1 = create_double_matrix(0, nz-1, 0, nm-1);
   }
-  if ((BIN_OBS_LAMBDA != lambda) || recompute_DESclusters(C, N))
+  if ((BIN_OBS_LAMBDA != nl) || recompute_clusters(C, N))
   { 
     {
-      const i = 0;
+      const int i = 0;
       {
-        const j = 0;
+        const int j = 0;
         const double M = pow(10.0, logmmin + j*dm);
-        table_P1[i][j] = binned_P_richness_given_M_nointerp(nl, M, z);
+        table_P1[i][j] = binned_P_lambda_obs_given_M_nointerp(nl, M, z);
       } 
       #pragma omp parallel for     
       for (int j=1; j<nm; j++) 
       {
         const double M = pow(10.0, logmmin + j*dm);
-        table_P1[i][j] = binned_P_richness_given_M_nointerp(nl, M, z);
+        table_P1[i][j] = binned_P_lambda_obs_given_M_nointerp(nl, M, z);
       }
     }
     #pragma omp parallel for
@@ -840,16 +847,17 @@ double binned_P_lambda_obs_given_M(int nl, double M, double z)
       for (int j=0; j<nm; j++) 
       {
         const double M = pow(10.0, logmmin + j*dm);
-        table_P1[i][j] = binned_P_richness_given_M_nointerp(nl, M, z);
+        table_P1[i][j] = binned_P_lambda_obs_given_M_nointerp(nl, M, z);
       }
     }
+    
     update_cosmopara(&C);
     update_nuisance(&N);
     BIN_OBS_LAMBDA = nl;
   }
   if (z > zmin && z < zmax && M > mmin && M < mmax)
   {
-    return interpol2d(table_P1, nz, zmin, zmax, dz, z, nm, logmmin, logmmax, dm, log10(M), 1, 1);
+    return interpol2d(table_P1, nz, zmin, zmax, dz, z, nm, logmmin, logmmax, dm, logM, 1, 1);
   }
   return 0.;
 }
@@ -868,11 +876,11 @@ double int_dndlogM_times_binned_P_lambda_obs_given_M(double logM, void* params)
    
    const int nl = (int) ar[0];
    const double z = ar[1];
-  
+
    const double M = exp(logM);
    const double a = 1./(1. + z);
    
-   return massfunc(M, a)*m*binned_P_lambda_obs_given_M(nl, M , z);
+   return massfunc(M, a)*M*binned_P_lambda_obs_given_M(nl, M , z);
 }
 
 double int_weighted_bias_nointerp(double logM, void* params)
@@ -898,7 +906,7 @@ double weighted_bias_nointerp(int nl, double z)
   const double r1 = int_gsl_integrate_low_precision(int_weighted_bias_nointerp, (void*) param, mmin, 
     mmax, NULL, GSL_WORKSPACE_SIZE);
   
-  const double r2 = int_gsl_integrate_low_precision(int_dndlogM_times_binned_P_lambda_obsgiven_M, 
+  const double r2 = int_gsl_integrate_low_precision(int_dndlogM_times_binned_P_lambda_obs_given_M, 
     (void*) param, mmin, mmax, NULL, GSL_WORKSPACE_SIZE);
 
   return r1/r2; 
@@ -923,12 +931,12 @@ double weighted_bias(int nl, double z)
     table = create_double_matrix(0, nlsize - 1, 0, nasize);
   }
 
-  if (recompute_DESclusters(C, N))
+  if (recompute_clusters(C, N))
   {
     {
-      const n = 0;
+      const int n = 0;
       {
-        const i = 0;
+        const int i = 0;
         const double a = amin + i*da;
         table[n][i] = weighted_bias_nointerp(n, 1./a - 1.);
       }
@@ -954,6 +962,25 @@ double weighted_bias(int nl, double z)
 
   const double a = 1./(z+1.);
   return interpol(table[nl], nasize, amin, amax, da, a, 0., 0.);
+}
+
+// ----------------------------------------------------------------------------
+// ----------------------------------------------------------------------------
+// ----------------------------------------------------------------------------
+// cluster number counts
+// ----------------------------------------------------------------------------
+// ----------------------------------------------------------------------------
+// ----------------------------------------------------------------------------
+// nl = lambda_obs bin, ni = cluster redshift bin
+
+double binned_average_number_counts(int nl, double z)
+{ // def: eq 3 of https://arxiv.org/pdf/1810.09456.pdf; nl = lambda_obs bin, nz = redshift bin
+  double param[2] = {(double) nl, z};
+  const double mmin = 12.0/0.4342944819; // log(pow(10.,12.)) --- 0.4342944819 = log10(e)
+  const double mmax = 15.9/0.4342944819; // log(pow(10.,15.9)) --- 0.4342944819 = log10(e)
+  
+  return int_gsl_integrate_low_precision(int_dndlogM_times_binned_P_lambda_obs_given_M, 
+    (void*) param, mmin, mmax, NULL, GSL_WORKSPACE_SIZE);
 }
 
 // ---------------------------------------------------------------------------------------
@@ -987,8 +1014,8 @@ double binned_p_cc(double k, double a, int nl1, int nl2, int use_linear_ps)
   }
 }
 
-// nl = lambda_obs bin, ni = cluster redshift bin, nj = galaxy redshift bin
-double binned_p_cg(double k, double a, int nl, int ni, int nj, int use_linear_ps)
+// nl = lambda_obs bin, nj = galaxy redshift bin
+double binned_p_cg(double k, double a, int nl, int nj, int use_linear_ps)
 { // binend in lambda_obs
   if(!(a>0) || !(a<1)) 
   {

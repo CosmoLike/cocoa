@@ -47,14 +47,14 @@ double w_gammat_cluster_tomo_flatsky(double theta, int nl, int ni, int nj, int l
 
   const double l_min = w_l_min;
   const double l_max = w_l_max;
-  const double loglmax = log(l_max);
-  const double loglmin = log(l_min);
-  const double dlnl = (loglmax-loglmin)/(1.0*ntheta - 1.);
-  const double lnrc = 0.5*(loglmax + loglmin);
+  const double lnlmax = log(l_max);
+  const double lnlmin = log(l_min);
+  const double dlnl = (lnlmax-lnlmin)/(1.0*ntheta - 1.);
+  const double lnrc = 0.5*(lnlmax + lnlmin);
   const double nc = ntheta/2.0 + 1;
 
-  const double logthetamin = (nc-ntheta+1)*dlnl-lnrc;
-  const double logthetamax = nc*dlnl-lnrc;
+  const double lnthetamin = (nc-ntheta+1)*dlnl-lnrc;
+  const double lnthetamax = nc*dlnl-lnrc;
   const double dlntheta = (lnthetamax - lnthetamin)/((double) ntheta);
   const double lntheta = log(theta);
 
@@ -89,31 +89,31 @@ double w_gammat_cluster_tomo_flatsky(double theta, int nl, int ni, int nj, int l
         { // loop in lambda_obs - (cannot thread loops in lambda_obs  - see cluster_utils)
           { 
             const int j = 0;
-            const int ZC = ZC(j);
-            const int ZS = ZSC(j);
+            const int ZC = ZCL(j);
+            const int ZSC = ZCS(j);
             const int q = nlsize*i + j;
             {
-              const double p = 0;
+              const int p = 0;
               const double l = exp(lnrc + (p - nc)*dlnl);
-              lP[q][p] = l*C_gs_tomo_limber(l, i, ZC, ZS);
+              lP[q][p] = l*C_cs_tomo_limber(l, i, ZC, ZSC);
             }
             #pragma omp parallel for
             for(int p=1; p<ntheta; p++)
             {
               const double l = exp(lnrc + (p - nc)*dlnl);
-              lP[q][p] = l*C_gs_tomo_limber(l, i, ZC, ZS);
+              lP[q][p] = l*C_cs_tomo_limber(l, i, ZC, ZSC);
             }
           }
           #pragma omp parallel for
           for(int j=1; j<ngammat_size; j++)
           { 
-            const int ZC = ZC(j);
-            const int ZS = ZSC(j);
+            const int ZC = ZCL(j);
+            const int ZSC = ZCS(j);
             const int q = nlsize*i + j;
             for(int p=0; p<ntheta; p++)
             {
               const double l = exp(lnrc + (p - nc)*dlnl);
-              lP[j][i] = l*C_gs_tomo_limber(l, i, ZC, ZS);
+              lP[q][p] = l*C_cs_tomo_limber(l, i, ZC, ZSC);
             }
           }    
         }
@@ -200,6 +200,8 @@ double w_gammat_cluster_tomo_flatsky(double theta, int nl, int ni, int nj, int l
       log_fatal("NonLimber not implemented");
       exit(1);
     }
+
+    update_galpara(&G);
     update_cosmopara(&C);
     update_nuisance(&N);
   } 
@@ -241,14 +243,14 @@ double w_cc_tomo_flatsky(double theta, int nl1, int nl2, int ni, int nj, int lim
 
   const double l_min = w_l_min;
   const double l_max = w_l_max;
-  const double loglmax = log(l_max);
-  const double loglmin = log(l_min);
-  const double dlnl = (loglmax-loglmin)/(1.0*ntheta-1.);
-  const double lnrc = 0.5*(loglmax + loglmin);
+  const double lnlmax = log(l_max);
+  const double lnlmin = log(l_min);
+  const double dlnl = (lnlmax-lnlmin)/(1.0*ntheta-1.);
+  const double lnrc = 0.5*(lnlmax + lnlmin);
   const double nc = ntheta/2+1;
 
-  const double logthetamin = (nc-ntheta+1)*dlnl-lnrc;
-  const double logthetamax = nc*dlnl-lnrc;
+  const double lnthetamin = (nc-ntheta+1)*dlnl-lnrc;
+  const double lnthetamax = nc*dlnl-lnrc;
   const double dlntheta = (lnthetamax - lnthetamin)/((double) ntheta);
   const double lntheta = log(theta);
 
@@ -399,6 +401,7 @@ double w_cc_tomo_flatsky(double theta, int nl1, int nl2, int ni, int nj, int lim
       log_fatal("NonLimber not implemented");
       exit(1);
     }
+    
     update_cosmopara(&C);
     update_nuisance(&N);
   }
@@ -443,14 +446,14 @@ double w_cg_tomo_flatsky(double theta, int nl, int ni, int nj, int limber)
 
   const double l_min = w_l_min;
   const double l_max = w_l_max;
-  const double loglmax = log(l_max);
-  const double loglmin = log(l_min);
-  const double dlnl = (loglmax-loglmin)/(1.0*ntheta-1.);
-  const double lnrc = 0.5*(loglmax + loglmin);
+  const double lnlmax = log(l_max);
+  const double lnlmin = log(l_min);
+  const double dlnl = (lnlmax-lnlmin)/(1.0*ntheta-1.);
+  const double lnrc = 0.5*(lnlmax + lnlmin);
   const double nc = ntheta/2+1;
 
-  const double logthetamin = (nc-ntheta+1)*dlnl-lnrc;
-  const double logthetamax = nc*dlnl-lnrc;
+  const double lnthetamin = (nc-ntheta+1)*dlnl-lnrc;
+  const double lnthetamax = nc*dlnl-lnrc;
   const double dlntheta = (lnthetamax - lnthetamin)/((double) ntheta);
   const double lntheta = log(theta);
 
@@ -607,6 +610,8 @@ double w_cg_tomo_flatsky(double theta, int nl, int ni, int nj, int limber)
       log_fatal("NonLimber not implemented");
       exit(1);
     }
+
+    update_galpara(&G);
     update_cosmopara(&C);
     update_nuisance(&N);
   }
@@ -621,7 +626,7 @@ double w_cg_tomo_flatsky(double theta, int nl, int ni, int nj, int limber)
   }
 
   const int q = nlsize*nl + nlsize*nisize*ni + nj;
-  if(i > NSIZE-1)
+  if(q > NSIZE-1)
   {
     log_fatal("error in selecting bin number");
     exit(1);
@@ -663,7 +668,7 @@ double int_for_C_cs_tomo_limber_nointerp(double a, void* params)
   const double fK = f_K(chidchi.chi);
   const double k = ell / fK;
    
-  double res = W_cluster(ni, a, chidchi.chi, hoverh0)*W_kappa(a, fK, nj)
+  double res = W_cluster(ni, a, chidchi.chi, hoverh0)*W_kappa(a, fK, nj);
   if (res != 0) 
   {
     res = res*binned_p_cm(k, a, nl, use_linear_ps);
@@ -718,8 +723,8 @@ double C_cs_tomo_limber(double l, int nl, int ni, int nj)
     { // loop in lambda_obs - (cannot thread loops in lambda_obs  - see cluster_utils)
       {
         const int j = 0;
-        const int ZC = ZC(j);
-        const int ZS = ZSC(j);
+        const int ZC = ZCL(j);
+        const int ZS = ZCS(j);
         const int q = nlsize*i + j;
         {
           const int p=0;
@@ -738,8 +743,8 @@ double C_cs_tomo_limber(double l, int nl, int ni, int nj)
       #pragma omp parallel for
       for(int j=1; j<ngammat_size; j++)
       {
-        const int ZC = ZC(j);
-        const int ZS = ZSC(j);
+        const int ZC = ZCL(j);
+        const int ZS = ZCS(j);
         const int q = nlsize*i + j;
         for (int p=0; p<nell; p++)
         {
@@ -761,7 +766,6 @@ double C_cs_tomo_limber(double l, int nl, int ni, int nj)
   const double lnl = log(l);
   if (lnl < lnlmin || lnl > lnlmax)
   {
-    const double l = exp(log(l));
     log_fatal("l = %e outside look-up table range [%e, %e]", l, exp(lnlmin), exp(lnlmax));
     exit(1);
   }
@@ -814,7 +818,7 @@ double int_for_C_cc_tomo_limber_nointerp(double a, void* params)
   double res = W_cluster(ni, a, chidchi.chi, hoverh0)*W_cluster(nj, a, chidchi.chi, hoverh0);
   if (res != 0)
   {
-    res = res*binned_p_cc(k, a, nl1, nl2, ni, nj, use_linear_ps);
+    res = res*binned_p_cc(k, a, nl1, nl2, use_linear_ps);
   }
 
   return res*chidchi.dchida/(fK*fK);
@@ -822,7 +826,7 @@ double int_for_C_cc_tomo_limber_nointerp(double a, void* params)
 
 double C_cc_tomo_limber_nointerp(double l, int nl1, int nl2, int ni, int nj, int use_linear_ps)
 { 
-  double ar[5] = {(double) nl1, (double) nl2, (double) ni, (double) nj, l, (double) use_linear_ps};  
+  double ar[6] = {(double) nl1, (double) nl2, (double) ni, (double) nj, l, (double) use_linear_ps};  
   const double zmin = fmax(tomo.cluster_zmin[ni], tomo.cluster_zmin[nj]);
   const double zmax = fmin(tomo.cluster_zmax[ni], tomo.cluster_zmax[nj]);
   const double amin = 1./(1. + zmax);
@@ -857,9 +861,9 @@ double C_cc_tomo_limber(double l, int nl1, int nl2, int ni, int nj)
                                            // tomo.cc_clustering_Npowerspectra
   const int NSIZE = nccl_size*nlsize*nlsize;
   
-  const double loglmin = log(limits.P_2_s_min);
-  const double loglmax = log(limits.P_2_s_max);
-  const double dl = (loglmax - loglmin)/(nell - 1); 
+  const double lnlmin = log(limits.P_2_s_min);
+  const double lnlmax = log(limits.P_2_s_max);
+  const double dl = (lnlmax - lnlmin)/(nell - 1); 
 
   if (table_Cl == 0)
   { 
@@ -868,7 +872,7 @@ double C_cc_tomo_limber(double l, int nl1, int nl2, int ni, int nj)
 
   if (recompute_cc(C, N))
   {
-    for (int i=0; j<nlsize; i++) 
+    for (int i=0; i<nlsize; i++) 
     { // loop in lambda_obs - (cannot thread loops in lambda_obs  - see cluster_utils)
       for (int j=0; j<i+1; j++) 
       { // loop in lambda_obs - (cannot thread loops in lambda_obs  - see cluster_utils)
@@ -880,7 +884,7 @@ double C_cc_tomo_limber(double l, int nl1, int nl2, int ni, int nj)
           const int qstar = nlsize*j + nlsize*nlsize*i + k;
           {
             const int p = 0;
-            const double lnl = loglminn + p*dl;
+            const double lnl = lnlmin + p*dl;
             const double l = exp(lnl); 
             table_Cl[q][p] = log(C_cc_tomo_limber_nointerp(l, i, j, ZCCL1, ZCCL2, use_linear_ps_limber));
             table_Cl[qstar][p] = table_Cl[qstar][p];
@@ -888,14 +892,14 @@ double C_cc_tomo_limber(double l, int nl1, int nl2, int ni, int nj)
           #pragma omp parallel for
           for (int p=1; p<nell; ++p)
           {
-            const double lnl = loglminn + p*dl;
+            const double lnl = lnlmin + p*dl;
             const double l = exp(lnl); 
             table_Cl[q][p] = log(C_cc_tomo_limber_nointerp(l, i, j, ZCCL1, ZCCL2, use_linear_ps_limber));
             table_Cl[qstar][p] = table_Cl[q][p];
           }
         }
         #pragma omp parallel for
-        for (int k=1; k<nccl_size; j++) // loop in ni (= nj)
+        for (int k=1; k<nccl_size; k++) // loop in ni (= nj)
         {
           const int ZCCL1 = k; // cross redshift bin not supported so not using ZCCL1(k)
           const int ZCCL2 = k; // cross redshift bin not supported so not using ZCCL2(k)
@@ -903,7 +907,7 @@ double C_cc_tomo_limber(double l, int nl1, int nl2, int ni, int nj)
           const int qstar = nlsize*j + nlsize*nlsize*i + k;
           for (int p=0; p<nell; ++p)
           {
-            const double lnl = loglminn + p*dl;
+            const double lnl = lnlmin + p*dl;
             const double l = exp(lnl); 
             table_Cl[q][p] = log(C_cc_tomo_limber_nointerp(l, i, j, ZCCL1, ZCCL2, use_linear_ps_limber));
             table_Cl[qstar][p] = table_Cl[q][p];
@@ -911,6 +915,7 @@ double C_cc_tomo_limber(double l, int nl1, int nl2, int ni, int nj)
         }
       }
     }
+
     update_cosmopara(&C);
     update_nuisance(&N);
   }
@@ -930,10 +935,10 @@ double C_cc_tomo_limber(double l, int nl1, int nl2, int ni, int nj)
     exit(1);
   }
 
-  const double f1 = exp(interpol(table_Cl[q], nell, loglmin, loglmax, dl, lnl, 1, 1));
+  const double f1 = exp(interpol(table_Cl[q], nell, lnlmin, lnlmax, dl, lnl, 1, 1));
   if (isnan(f1)) 
   {
-    return 0.0
+    return 0.0;
   }
   return f1;
 }
@@ -957,7 +962,7 @@ double int_for_C_cg_tomo_limber_nointerp(double a, void* params)
   const int ni = (int) ar[1];
   const int nj = (int) ar[2];
   const double ell = ar[3] + 0.5;
-  const int use_linear_ps = (int) ar[4]
+  const int use_linear_ps = (int) ar[4];
 
   struct chis chidchi = chi_all(a);
   const double hoverh0 = hoverh0v2(a, chidchi.dchida);
@@ -965,11 +970,11 @@ double int_for_C_cg_tomo_limber_nointerp(double a, void* params)
   const  double fK  = f_K(chidchi.chi);
   const double k = ell/fK;
 
-  double res = W_cluster(ni, a, chidchi.chi, hoverh0) * W_HOD(a, nj, hoverh0)
+  double res = W_cluster(ni, a, chidchi.chi, hoverh0) * W_HOD(a, nj, hoverh0);
 
   if (res != 0)
   {
-    res = res*binned_p_cg(k, a, nl1, ni, nj, use_linear_ps);
+    res = res*binned_p_cg(k, a, nl, nj, use_linear_ps);
   }
   return res*chidchi.dchida/(fK*fK);
 }
@@ -1006,15 +1011,15 @@ double C_cg_tomo_limber(double l, int nl, int ni, int nj)
   const int njsize = tomo.clustering_Nbin;
   const int NSIZE = nlsize*nisize*njsize;
 
-  const double loglmin = log(limits.P_2_s_min);
-  const double loglmax = log(limits.P_2_s_max);
-  const double dl = (loglmax - loglmin)/(nell-1);
+  const double lnlmin = log(limits.P_2_s_min);
+  const double lnlmax = log(limits.P_2_s_max);
+  const double dl = (lnlmax - lnlmin)/(nell-1);
 
   if (table_Cl == 0)
   { 
     table_Cl = create_double_matrix(0, NSIZE - 1, 0, nell);      
   }
-  if (recompute_cg(C, N))
+  if (recompute_cg(C, G, N))
   {
     for (int i=0; i<nlsize; i++) 
     { // loop in lambda_obs - (cannot thread loops in lambda_obs  - see cluster_utils)
@@ -1025,14 +1030,14 @@ double C_cg_tomo_limber(double l, int nl, int ni, int nj)
           const int q = i*nlsize + nlsize*nisize*j + k;
           {
             const int p = 0;
-            const double lnl = loglmin + p*dl;
+            const double lnl = lnlmin + p*dl;
             const double l = exp(lnl);
             table_Cl[q][p] = log(C_cg_tomo_limber_nointerp(l, i, j, k, use_linear_ps_limber));
           }
           #pragma omp parallel for
           for (int p=1; p<nell; ++p)
           {
-            const double lnl = loglmin + p*dl;
+            const double lnl = lnlmin + p*dl;
             const double l = exp(lnl);
             table_Cl[q][p] = log(C_cg_tomo_limber_nointerp(l, i, j, k, use_linear_ps_limber));
           }
@@ -1043,7 +1048,7 @@ double C_cg_tomo_limber(double l, int nl, int ni, int nj)
           const int q = i*nlsize + nlsize*nisize*j + k;
           for (int p=0; p<nell; ++p)
           {
-            const double lnl = loglmin + p*dl;
+            const double lnl = lnlmin + p*dl;
             const double l = exp(lnl);
             table_Cl[q][p] = log(C_cg_tomo_limber_nointerp(l, i, j, k, use_linear_ps_limber));
           }
@@ -1057,13 +1062,15 @@ double C_cg_tomo_limber(double l, int nl, int ni, int nj)
           const int q = i*nlsize + nlsize*nisize*j + k;
           for (int p=0; p<nell; ++p)
           {
-            const double lnl = loglmin + p*dl;
+            const double lnl = lnlmin + p*dl;
             const double l = exp(lnl);
             table_Cl[q][p] = log(C_cg_tomo_limber_nointerp(l, i, j, k, use_linear_ps_limber));
           }
         }
       }
     }
+
+    update_galpara(&G);
     update_cosmopara(&C);
     update_nuisance(&N);
   }
@@ -1071,7 +1078,6 @@ double C_cg_tomo_limber(double l, int nl, int ni, int nj)
   const double lnl = log(l);
   if (lnl < lnlmin || lnl > lnlmax)
   {
-    const double l = exp(l);
     log_fatal("l = %e outside look-up table range [%e, %e]", l, exp(lnlmin), exp(lnlmax));
     exit(1);
   } 
@@ -1082,7 +1088,7 @@ double C_cg_tomo_limber(double l, int nl, int ni, int nj)
     log_fatal("error in selecting bin number");
     exit(1);
   }
-  const double f1 = exp(interpol(table_Cl[q], nell, loglmin, loglmax, dl, lnl, 1, 1));
+  const double f1 = exp(interpol(table_Cl[q], nell, lnlmin, lnlmax, dl, lnl, 1, 1));
   if (isnan(f1)) 
   {
     return 0.0;
@@ -1099,16 +1105,6 @@ double C_cg_tomo_limber(double l, int nl, int ni, int nj)
 // ----------------------------------------------------------------------------
 // ----------------------------------------------------------------------------
 // nl = lambda_obs bin, ni = cluster redshift bin
-
-double binned_average_number_counts(int nl, double z)
-{ // def: eq 3 of https://arxiv.org/pdf/1810.09456.pdf; nl = lambda_obs bin, nz = redshift bin
-  double param[2] = {(double) nl, z};
-  const double mmin = 12.0/0.4342944819; // log(pow(10.,12.)) --- 0.4342944819 = log10(e)
-  const double mmax = 15.9/0.4342944819; // log(pow(10.,15.9)) --- 0.4342944819 = log10(e)
-  
-  return int_gsl_integrate_low_precision(int_dndlogM_times_binned_P_lambda_obs_given_M, 
-    (void*) param, mmin, mmax, NULL, GSL_WORKSPACE_SIZE);
-}
 
 double int_projected_average_number_counts(double a, void* params)
 {
