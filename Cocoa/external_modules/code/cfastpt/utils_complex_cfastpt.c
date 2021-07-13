@@ -192,13 +192,18 @@ void fftconvolve(fftw_complex *in1, fftw_complex *in2, long N, fftw_complex *out
 	fftw_free(c);
 }
 
-void fftconvolve_optimize(fftw_complex *in1, fftw_complex *in2, long N, fftw_complex *out, fftw_complex *a, fftw_complex *b, fftw_complex *a1, fftw_complex *b1, fftw_complex *c, fftw_plan pa, fftw_plan pb, fftw_plan pc) {
+void fftconvolve_optimize(fftw_complex *in1, fftw_complex *in2, long N, fftw_complex *out, fftw_complex *a, 
+fftw_complex *b, fftw_complex *a1, fftw_complex *b1, fftw_complex *c, fftw_plan pa, fftw_plan pb, fftw_plan pc) 
+{
 	long i;
 
 	long Ntotal;
-	if(N%2==1) {
+	if(N%2==1) 
+	{
 		Ntotal = 2*N - 1;
-	}else {
+	}
+	else 
+	{
 		log_fatal("This fftconvolve doesn't support even size input arrays"); 
 		exit(1);
 		Ntotal = 2*N;
@@ -213,27 +218,31 @@ void fftconvolve_optimize(fftw_complex *in1, fftw_complex *in2, long N, fftw_com
 		b[i] = 0.;
 	}
 
-	#pragma omp parallel
-	#pragma omp single 
+//	#pragma omp parallel
+//	#pragma omp single 
 	{
-		#pragma omp task
+//		#pragma omp task
 		fftw_execute(pa);
-		#pragma omp task
+//		#pragma omp task
 		fftw_execute(pb);
-		#pragma omp taskwait
+//		#pragma omp taskwait
 	}
 
-	for(i=0;i<Ntotal;i++){
+	for(i=0;i<Ntotal;i++)
+	{
 		a1[i] *= b1[i];
 	}
+	
 	fftw_execute(pc);
 
-	for(i=0;i<Ntotal; i++){
+	for(i=0;i<Ntotal; i++)
+	{
 		out[i] = c[i]/(double complex)Ntotal;
 	}
 }
 
-void fftconvolve_real(double *in1, double *in2, long N1, long N2, double *out) {
+void fftconvolve_real(double *in1, double *in2, long N1, long N2, double *out) 
+{
 	long i;
 	double *a, *b;
 	fftw_complex *a1, *b1;
@@ -252,16 +261,20 @@ void fftconvolve_real(double *in1, double *in2, long N1, long N2, double *out) {
 
 	c = (double*) fftw_malloc(sizeof(double) * Ntotal );
 
-	for(i=0;i<N1;i++){
+	for(i=0;i<N1;i++)
+	{
 		a[i] = in1[i];
 	}
-	for( ;i<Ntotal;i++){
+	for( ;i<Ntotal;i++)
+	{
 		a[i] = 0.;
 	}
-	for(i=0;i<N2;i++){
+	for(i=0;i<N2;i++)
+	{
 		b[i] = in2[i];
 	}
-	for( ;i<Ntotal;i++){
+	for( ;i<Ntotal;i++)
+	{
 		b[i] = 0.;
 	}
 

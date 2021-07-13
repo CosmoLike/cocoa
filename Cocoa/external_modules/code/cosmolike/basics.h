@@ -23,7 +23,8 @@ static double darg __attribute__((unused)), maxarg1 __attribute__((unused)),
 #define FMIN(a, b)                                                             \
   (maxarg1 = (a), maxarg2 = (b), (maxarg1) < (maxarg2) ? (maxarg1) : (maxarg2))
 
-typedef struct {
+typedef struct 
+{
   double pi;
   double pi_sqr;
   double twopi;
@@ -32,7 +33,8 @@ typedef struct {
   double lightspeed;
 } con;
 
-typedef struct {
+typedef struct 
+{
   double low;
   double medium;
   double high;
@@ -46,7 +48,7 @@ typedef struct {
   double M_min;
   double M_max;
   int LMIN_tab; // Cosmo2D
-  int LMAX; // Cosmo2D
+  int LMAX;     // Cosmo2D
   int LMAX_NOLIMBER; // Cosmo2D
 } lim;
 

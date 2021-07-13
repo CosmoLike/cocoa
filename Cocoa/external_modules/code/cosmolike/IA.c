@@ -61,16 +61,12 @@ void set_LF_DEEP2(void)
 double M_abs(double mag, double a)
 { //in h = 1 units, incl. Poggianti 1997 k+e-corrections
   static double* table;
-  static double dz;
 
   if (table == 0)
   {
     // read in + tabulate k+e corrections for early types, restframe r band
     // interpolated from http://vizier.u-strasbg.fr/viz-bin/VizieR?-source=J/A%2BAS/122/399
-
     table = create_double_vector(0, 30);
-    dz = 0.1;
-
     for (int i = 0; i< 31; i++)
     {
       table[i] = KE[i];

@@ -5,7 +5,6 @@ likepara like =
 {
   .IA = 0.,
   .bias = 0,
-  .clusterMobs = 0,
   .ell = NULL,
   .theta = NULL,
 };
@@ -14,7 +13,6 @@ void reset_like_struct()
 {
   like.IA = 0.;
   like.bias = 0;
-  like.clusterMobs = 0;
   like.Ncl = 0;
   like.Ntheta = 0;
   like.Ncos = 0;
@@ -40,7 +38,6 @@ void reset_like_struct()
   like.lmax_kappacmb = 0;
   like.IA = 0;
   like.bias = 0;
-  like.clusterMobs = 0;
   like.clusterN = 0;
   like.clusterWL = 0;
   like.clusterCG = 0;
@@ -99,21 +96,18 @@ void reset_tomo_struct()
 
     tomo.cluster_zmax[i] = 0.0;
     tomo.cluster_zmin[i] = 0.0;
-
-    tomo.magnification_zmax[i] = 0.0;
-    tomo.magnification_zmin[i] = 0.0;
   }
 
   tomo.shear_Nbin = 0;
-  tomo.shear_Npowerspectra = 0;
   tomo.clustering_Nbin = 0;
-  tomo.clustering_Npowerspectra = 0;
   tomo.cluster_Nbin = 0;
-  tomo.cluster_cg_Npowerspectra = 0;
-  tomo.cgl_Npowerspectra = 0;
+
+  tomo.shear_Npowerspectra = 0;
+  tomo.clustering_Npowerspectra = 0;
   tomo.ggl_Npowerspectra = 0;
-  tomo.magnification_Nbin = 0;
-  tomo.magnification_Npowerspectra = 0;
+  tomo.cg_clustering_Npowerspectra = 0;
+  tomo.cc_clustering_Npowerspectra = 0;
+  tomo.cgl_Npowerspectra = 0;
 }
 
 redshiftpara redshift;
@@ -124,19 +118,13 @@ void reset_redshift_struct()
   redshift.shear_zdistrpar_zmin = 0.0;
   redshift.shear_zdistrpar_zmax = 0.0;
   redshift.shear_histogram_zbins = 0;
-  sprintf(redshift.shear_REDSHIFT_FILE,"");
+  sprintf(redshift.shear_REDSHIFT_FILE, "%s", "");
 
   redshift.clustering_photoz = 0;
   redshift.clustering_zdistrpar_zmin = 0.0;
   redshift.clustering_zdistrpar_zmax = 0.0;
   redshift.clustering_histogram_zbins = 0;
-  sprintf(redshift.clustering_REDSHIFT_FILE,"");
-
-  redshift.magnification_photoz = 0;
-  redshift.magnification_zdistrpar_zmin = 0.0;
-  redshift.magnification_zdistrpar_zmax = 0.0;
-  redshift.magnification_histogram_zbins = 0;
-  sprintf(redshift.magnification_REDSHIFT_FILE,"");
+  sprintf(redshift.clustering_REDSHIFT_FILE, "%s", "");
 }
 
 sur survey =
@@ -159,7 +147,7 @@ void reset_survey_struct()
     1.0 / 2.90888208665721580e-4 / 2.90888208665721580e-4;
   survey.n_lens = 0.0;
   survey.m_lim = 0.0;
-  sprintf(survey.name,"");
+  sprintf(survey.name, "%s", "");
   survey.ggl_overlap_cut = 1.0;
 }
 
@@ -204,7 +192,7 @@ void reset_cluster_struct()
   Cluster.lbin = 0;
   Cluster.l_min = 0.0;
   Cluster.l_min = 0.0;
-  sprintf(Cluster.model,"default");
+  sprintf(Cluster.model, "%s", "default");
 }
 
 
@@ -215,7 +203,7 @@ pdeltapara pdeltaparams =
 
 void reset_pdeltaparams_struct()
 {
-  sprintf(pdeltaparams.runmode, "Halofit");
+  sprintf(pdeltaparams.runmode, "%s", "Halofit");
 }
 
 FPTpara FPT =
@@ -245,19 +233,21 @@ void reset_nuisance_struct()
 {
   for(int i=0; i<MAX_SIZE_ARRAYS; i++)
   {
-    nuisance.A_z[i];
-    nuisance.A2_z[i];
-    nuisance.b_ta_z[i];
-    nuisance.fred[i];
-    nuisance.shear_calibration_m[i];
-    nuisance.sigma_zphot_shear[i];
-    nuisance.bias_zphot_shear[i];
-    nuisance.sigma_zphot_clustering[i];
-    nuisance.sigma_zphot_magnification[i];
-    nuisance.bias_zphot_magnification[i];
-    nuisance.cluster_completeness[i];
-    nuisance.cluster_MOR[i];
-    nuisance.cluster_selection[i];
+    nuisance.A_z[i] = 0.0;
+    nuisance.A2_z[i] = 0.0;
+    nuisance.b_ta_z[i] = 0.0;
+    nuisance.fred[i] = 0.0;
+    
+    nuisance.shear_calibration_m[i] = 0.0;
+    
+    nuisance.sigma_zphot_shear[i] = 0.0;
+    nuisance.bias_zphot_shear[i] = 0.0;
+    
+    nuisance.sigma_zphot_clustering[i] = 0.0;
+    nuisance.bias_zphot_clustering[i] = 0.0;
+    
+    nuisance.cluster_MOR[i] = 0.0;
+    nuisance.cluster_selection[i] = 0.0;
   }
 
   nuisance.A_ia = 0.0;
@@ -268,20 +258,6 @@ void reset_nuisance_struct()
   nuisance.eta_ia_highz = 0.0;
   nuisance.oneplusz0_ia = 0.0;
   nuisance.c1rhocrit_ia = 0.01389;
-
-  nuisance.cluster_Mobs_lgM0 = 0.0;
-  nuisance.cluster_Mobs_sigma = 0.0;
-  nuisance.cluster_Mobs_alpha = 0.0;
-  nuisance.cluster_Mobs_beta = 0.0;
-  nuisance.cluster_Mobs_N_pivot = 0.0;
-  nuisance.cluster_Mobs_lgN0 = 0.0;
-  nuisance.cluster_Mobs_sigma0 = 0.0;
-  nuisance.cluster_Mobs_sigma_qm = 0.0;
-  nuisance.cluster_Mobs_sigma_qz = 0.0;
-  nuisance.cluster_centering_f0 = 0.0;
-  nuisance.cluster_centering_alpha = 0.0;
-  nuisance.cluster_centering_sigma = 0.0;
-  nuisance.cluster_centering_M_pivot = 0.0;
 
   nuisance.N_cluster_MOR = 0;
   nuisance.N_cluster_selection = 0;
@@ -302,10 +278,10 @@ Cmb cmb;
 
 void reset_cmb_struct()
 {
-  sprintf(cmb.name,"");
+  sprintf(cmb.name, "%s", "");
   cmb.fwhm = 0.0;
   cmb.sensitivity = 0.0;
-  sprintf(cmb.pathLensRecNoise,"");
+  sprintf(cmb.pathLensRecNoise, "%s", "");
 }
 
 void reset_bary_struct()

@@ -41,7 +41,8 @@ int J_table(int *alpha_ar, int *beta_ar, int *l1_ar, int *l2_ar, int *l_ar,
 double *coeff_A_ar, int Nterms, int *alpha_ar_new, int *beta_ar_new, 
 int *J1_ar, int *J2_ar, int *Jk_ar, double *coeff_AB_ar) {
 	int row = 0;
-	for(int i=0;i<Nterms;i++){
+	for(int i=0;i<Nterms;i++)
+	{
 		const int l1 = l1_ar[i]; 
 		const int l2 = l2_ar[i]; 
 		const int l = l_ar[i];
@@ -51,11 +52,15 @@ int *J1_ar, int *J2_ar, int *Jk_ar, double *coeff_AB_ar) {
 		const int l1_p_l2 = l1+l2; 
 		const int l1_p_l = l1+l; 
 		const int l_p_l2 = l+l2;		
-		for(int J1=l_m_l2; J1<=l_p_l2; J1++){
-			for(int J2=l1_m_l; J2<=l1_p_l; J2++){
-				for(int Jk=l1_m_l2; Jk<=l1_p_l2; Jk++){
+		for(int J1=l_m_l2; J1<=l_p_l2; J1++)
+		{
+			for(int J2=l1_m_l; J2<=l1_p_l; J2++)
+			{
+				for(int Jk=l1_m_l2; Jk<=l1_p_l2; Jk++) 
+				{
 					const double B = coeff_B(l1,l2,l,J1,J2,Jk);
-					if(B!=0) {
+					if(B!=0) 
+					{
 						alpha_ar_new[row] = alpha_ar[i];
 						beta_ar_new[row] = beta_ar[i];
 						J1_ar[row] = J1;
@@ -70,7 +75,8 @@ int *J1_ar, int *J2_ar, int *Jk_ar, double *coeff_AB_ar) {
 	}
 	/*
 	int row = 0;
-	for(int i=0;i<Nterms;i++){
+	for(int i=0;i<Nterms;i++)
+	{
 		const int l1 = l1_ar[i]; 
 		const int l2 = l2_ar[i]; 
 		const int l = l_ar[i];
@@ -85,9 +91,12 @@ int *J1_ar, int *J2_ar, int *Jk_ar, double *coeff_AB_ar) {
 		const int sz3 = (l1_p_l2-l1_m_l2+1);
 		double tmp[sz1*sz2*sz3];
 		#pragma omp parallel for
-		for(int J1=l_m_l2; J1<=l_p_l2; J1++){
-			for(int J2=l1_m_l; J2<=l1_p_l; J2++){			
-				for(int Jk=l1_m_l2; Jk<=l1_p_l2; Jk++){
+		for(int J1=l_m_l2; J1<=l_p_l2; J1++)
+		{
+			for(int J2=l1_m_l; J2<=l1_p_l; J2++)
+			{			
+				for(int Jk=l1_m_l2; Jk<=l1_p_l2; Jk++)
+				{
 					const int tmp_j = J1-l_m_l2;
 					const int tmp_l = J2-l1_m_l;
 					const int tmp_k = Jk-l1_m_l2;
@@ -95,14 +104,18 @@ int *J1_ar, int *J2_ar, int *Jk_ar, double *coeff_AB_ar) {
 				}
 			}
 		}
-		for(int J1=l_m_l2; J1<=l_p_l2; J1++){
-			for(int J2=l1_m_l; J2<=l1_p_l; J2++){			
-				for(int Jk=l1_m_l2; Jk<=l1_p_l2; Jk++){
+		for(int J1=l_m_l2; J1<=l_p_l2; J1++)
+		{
+			for(int J2=l1_m_l; J2<=l1_p_l; J2++)
+			{			
+				for(int Jk=l1_m_l2; Jk<=l1_p_l2; Jk++)
+				{
 					const int tmp_j = J1-l_m_l2;
 					const int tmp_l = J2-l1_m_l;
 					const int tmp_k = Jk-l1_m_l2;
 					const double B = tmp[tmp_j*(sz2*sz3)+tmp_l*sz3+tmp_k];					
-					if(B!=0) {
+					if(B!=0) 
+					{
 						alpha_ar_new[row] = alpha_ar[i];
 						beta_ar_new[row] = beta_ar[i];
 						J1_ar[row] = J1;
@@ -138,7 +151,8 @@ double coeff_B(int l1, int l2, int l, int J1, int J2, int Jk){
 	}
 }
 
-long factorial(int n){
+long factorial(int n)
+{
 	if(n<0){printf("factorial(n): n=%d \n",n);exit(1);}
 	static long FACTORIAL_LIST[] = {1,1,2,6,24,120,\
 									 720,5040,40320,362880,\

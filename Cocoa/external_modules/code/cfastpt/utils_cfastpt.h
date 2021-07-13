@@ -4,9 +4,11 @@
 extern "C" {
 #endif
 
-void extrap_log_linear(double *fk, int N_origin, int N_extra, double *large_fk);
+void extrap_log_linear(double* fk, int N_origin, int N_extra, double* large_fk);
 
-int J_table(int *alpha_ar, int *beta_ar, int *l1_ar, int *l2_ar, int *l_ar, double *coeff_A_ar, int Nterms, int *alpha_ar_new, int *beta_ar_new, int *J1_ar, int *J2_ar, int *Jk_ar, double *coeff_AB_ar);
+int J_table(int* alpha_ar, int* beta_ar, int* l1_ar, int* l2_ar, int* l_ar, 
+double* coeff_A_ar, int Nterms, int* alpha_ar_new, int* beta_ar_new, int* J1_ar, int* J2_ar, 
+int* Jk_ar, double* coeff_AB_ar);
 
 double coeff_B(int l1, int l2, int l, int J1, int J2, int Jk);
 

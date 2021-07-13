@@ -52,18 +52,18 @@ lim limits = {
 };
 
 Ntab Ntable = {
-  100,  // N_a
+  250,  // N_a (modified by COCOA from 100)
   500,  // N_k_lin
   500,  // N_k_nlin
-  200,  // N_ell
-  200,  // N_theta
+  200,  // N_ell 
+  200,  // N_theta 
   2048, // N_theta for Hankel
   1000, // N_S2
   1000, // N_DS
-  120,  // N_ell_TATT
+  140,  // N_ell_TATT (modified by COCOA)
 };
 
-double int_gsl_integrate_high_precision(double (*func)(double, void *),
+double int_gsl_integrate_high_precision(double (*func)(double, void*),
 void* arg, double a, double b, double* error, int niter)
 {
   double res, err;
@@ -115,7 +115,7 @@ double **create_double_matrix(long nrl, long nrh, long ncl, long nch) {
   double **m;
 
   // allocate pointers to rows
-  m = (double **)calloc(nrow + NR_END, sizeof(double *));
+  m = (double **) calloc(nrow + NR_END, sizeof(double *));
   if (!m) {
     log_fatal("allocation failure 1 in create_double_matrix()");
     exit(1);

@@ -9515,8 +9515,7 @@ static double logPkR_BAHAMAS_T80[380][15] = {{-6.576971e-24,-6.576971e-24,0.0000
 
 void set_bary_parameters_to_TNG100()
 {
-  if(bary.a_bins != NULL || bary.logk_bins != NULL ||
-     bary.log_PkR != NULL || bary.interp2d != NULL)
+  if(bary.a_bins != NULL || bary.logk_bins != NULL || bary.log_PkR != NULL || bary.interp2d != NULL)
   {
     reset_bary_struct();
   }
@@ -9582,8 +9581,7 @@ void set_bary_parameters_to_TNG100()
       {
   			bary.logk_bins[j] = logkBins_TNG100[j];
   		}
-    	int status = gsl_interp2d_set(bary.interp2d, bary.log_PkR, j, i,
-        logPkR_TNG100[j][i]);
+    	int status = gsl_interp2d_set(bary.interp2d, bary.log_PkR, j, i, logPkR_TNG100[j][i]);
       if (status)
       {
         log_fatal("\x1b[90m{}\x1b[0m: gsl error {}",
@@ -9605,8 +9603,7 @@ void set_bary_parameters_to_TNG100()
 
 void set_bary_parameters_to_HzAGN()
 {
-  if(bary.a_bins != NULL || bary.logk_bins != NULL ||
-     bary.log_PkR != NULL || bary.interp2d != NULL)
+  if(bary.a_bins != NULL || bary.logk_bins != NULL || bary.log_PkR != NULL || bary.interp2d != NULL)
   {
     reset_bary_struct();
   }
@@ -9665,12 +9662,11 @@ void set_bary_parameters_to_HzAGN()
   	bary.a_bins[i] = 1./(1 + zBins_HzAGN[i]);
   	for (int j=0; j<bary.Nk_bins; j++)
     {
-  		if (i==0)
+  		if (i == 0)
       {
   			bary.logk_bins[j] = logkBins_HzAGN[j];
   		}
-    	int status = gsl_interp2d_set(bary.interp2d, bary.log_PkR, j, i,
-        logPkR_HzAGN[j][i]);
+    	int status = gsl_interp2d_set(bary.interp2d, bary.log_PkR, j, i, logPkR_HzAGN[j][i]);
       if (status)
       {
         log_fatal("\x1b[90m{}\x1b[0m: gsl error {}",
@@ -9692,8 +9688,7 @@ void set_bary_parameters_to_HzAGN()
 
 void set_bary_parameters_to_mb2()
 {
-  if(bary.a_bins != NULL || bary.logk_bins != NULL ||
-     bary.log_PkR != NULL || bary.interp2d != NULL)
+  if(bary.a_bins != NULL || bary.logk_bins != NULL || bary.log_PkR != NULL || bary.interp2d != NULL)
   {
     reset_bary_struct();
   }
@@ -9752,12 +9747,11 @@ void set_bary_parameters_to_mb2()
   	bary.a_bins[i] = 1./(1 + zBins_mb2[i]);
   	for (int j=0; j<bary.Nk_bins; j++)
     {
-  		if (i==0)
+  		if (i == 0)
       {
   			bary.logk_bins[j] = logkBins_mb2[j];
   		}
-    	int status = gsl_interp2d_set(bary.interp2d, bary.log_PkR, j, i,
-        logPkR_mb2[j][i]);
+    	int status = gsl_interp2d_set(bary.interp2d, bary.log_PkR, j, i, logPkR_mb2[j][i]);
       if (status)
       {
         log_fatal("\x1b[90m{}\x1b[0m: gsl error {}",
@@ -9779,8 +9773,7 @@ void set_bary_parameters_to_mb2()
 
 void set_bary_parameters_to_illustris()
 {
-  if(bary.a_bins != NULL || bary.logk_bins != NULL ||
-     bary.log_PkR != NULL || bary.interp2d != NULL)
+  if(bary.a_bins != NULL || bary.logk_bins != NULL || bary.log_PkR != NULL || bary.interp2d != NULL)
   {
     reset_bary_struct();
   }
@@ -9835,14 +9828,16 @@ void set_bary_parameters_to_illustris()
   }
 
 	#pragma omp parallel for
-  for (int i=0; i<bary.Na_bins; i++) {
+  for (int i=0; i<bary.Na_bins; i++) 
+  {
   	bary.a_bins[i] = 1./(1 + zBins_illustris[i]);
-  	for (int j=0; j<bary.Nk_bins; j++) {
-  		if (i==0) {
+  	for (int j=0; j<bary.Nk_bins; j++) 
+    {
+  		if (i == 0) 
+      {
   			bary.logk_bins[j] = logkBins_illustris[j];
   		}
-			int status = gsl_interp2d_set(bary.interp2d, bary.log_PkR, j, i,
-        logPkR_illustris[j][i]);
+			int status = gsl_interp2d_set(bary.interp2d, bary.log_PkR, j, i, logPkR_illustris[j][i]);
       if (status)
       {
         log_fatal("\x1b[90m{}\x1b[0m: gsl error {}",
@@ -9864,8 +9859,7 @@ void set_bary_parameters_to_illustris()
 
 void set_bary_parameters_to_eagle()
 {
-  if(bary.a_bins != NULL || bary.logk_bins != NULL ||
-     bary.log_PkR != NULL || bary.interp2d != NULL)
+  if(bary.a_bins != NULL || bary.logk_bins != NULL || bary.log_PkR != NULL || bary.interp2d != NULL)
   {
     reset_bary_struct();
   }
@@ -9929,8 +9923,7 @@ void set_bary_parameters_to_eagle()
       {
   			bary.logk_bins[j] = logkBins_eagle[j];
   		}
-			int status = gsl_interp2d_set(bary.interp2d, bary.log_PkR, j, i,
-        logPkR_eagle[j][i]);
+			int status = gsl_interp2d_set(bary.interp2d, bary.log_PkR, j, i, logPkR_eagle[j][i]);
       if (status)
       {
         log_fatal("\x1b[90m{}\x1b[0m: gsl error {}",
@@ -9952,8 +9945,7 @@ void set_bary_parameters_to_eagle()
 
 void set_bary_parameters_to_owls_AGN_T80()
 {
-  if(bary.a_bins != NULL || bary.logk_bins != NULL ||
-     bary.log_PkR != NULL || bary.interp2d != NULL)
+  if(bary.a_bins != NULL || bary.logk_bins != NULL || bary.log_PkR != NULL || bary.interp2d != NULL)
   {
     reset_bary_struct();
   }
@@ -10017,8 +10009,7 @@ void set_bary_parameters_to_owls_AGN_T80()
       {
   			bary.logk_bins[j] = logkBins_cowls_AGN_T80[j];
   		}
-			int status = gsl_interp2d_set(bary.interp2d, bary.log_PkR, j, i,
-				logPkR_cowls_AGN_T80[j][i]);
+			int status = gsl_interp2d_set(bary.interp2d, bary.log_PkR, j, i, logPkR_cowls_AGN_T80[j][i]);
       if (status)
       {
         log_fatal("\x1b[90m{}\x1b[0m: gsl error {}",
@@ -10040,8 +10031,7 @@ void set_bary_parameters_to_owls_AGN_T80()
 
 void set_bary_parameters_to_owls_AGN_T85()
 {
-  if(bary.a_bins != NULL || bary.logk_bins != NULL ||
-     bary.log_PkR != NULL || bary.interp2d != NULL)
+  if(bary.a_bins != NULL || bary.logk_bins != NULL || bary.log_PkR != NULL || bary.interp2d != NULL)
   {
     reset_bary_struct();
   }
@@ -10102,8 +10092,7 @@ void set_bary_parameters_to_owls_AGN_T85()
   		if (i == 0) {
   			bary.logk_bins[j] = logkBins_cowls_AGN_T85[j];
   		}
-    	int status = gsl_interp2d_set(bary.interp2d, bary.log_PkR, j, i,
-				logPkR_cowls_AGN_T85[j][i]);
+    	int status = gsl_interp2d_set(bary.interp2d, bary.log_PkR, j, i, logPkR_cowls_AGN_T85[j][i]);
       if (status)
       {
         log_fatal("\x1b[90m{}\x1b[0m: gsl error {}",
@@ -10125,8 +10114,7 @@ void set_bary_parameters_to_owls_AGN_T85()
 
 void set_bary_parameters_to_owls_AGN_T87()
 {
-  if(bary.a_bins != NULL || bary.logk_bins != NULL ||
-     bary.log_PkR != NULL || bary.interp2d != NULL)
+  if(bary.a_bins != NULL || bary.logk_bins != NULL || bary.log_PkR != NULL || bary.interp2d != NULL)
   {
     reset_bary_struct();
   }
@@ -10189,8 +10177,7 @@ void set_bary_parameters_to_owls_AGN_T87()
   		if (i == 0) {
   			bary.logk_bins[j] = logkBins_cowls_AGN_T87[j];
   		}
-			int status = gsl_interp2d_set(bary.interp2d, bary.log_PkR, j, i,
-				logPkR_cowls_AGN_T87[j][i]);
+			int status = gsl_interp2d_set(bary.interp2d, bary.log_PkR, j, i, logPkR_cowls_AGN_T87[j][i]);
       if (status)
       {
         log_fatal("\x1b[90m{}\x1b[0m: gsl error {}",
@@ -10213,8 +10200,7 @@ void set_bary_parameters_to_owls_AGN_T87()
 
 void set_bary_parameters_to_BAHAMAS_T76()
 {
-  if(bary.a_bins != NULL || bary.logk_bins != NULL ||
-     bary.log_PkR != NULL || bary.interp2d != NULL)
+  if(bary.a_bins != NULL || bary.logk_bins != NULL || bary.log_PkR != NULL || bary.interp2d != NULL)
   {
     reset_bary_struct();
   }
@@ -10277,8 +10263,7 @@ void set_bary_parameters_to_BAHAMAS_T76()
   		if (i == 0) {
   			bary.logk_bins[j] = logkBins_BAHAMAS_T76[j];
   		}
-			int status = gsl_interp2d_set(bary.interp2d, bary.log_PkR, j, i,
-				logPkR_BAHAMAS_T76[j][i]);
+			int status = gsl_interp2d_set(bary.interp2d, bary.log_PkR, j, i, logPkR_BAHAMAS_T76[j][i]);
       if (status)
       {
         log_fatal("\x1b[90m{}\x1b[0m: gsl error {}",
@@ -10300,8 +10285,7 @@ void set_bary_parameters_to_BAHAMAS_T76()
 
 void set_bary_parameters_to_BAHAMAS_T78()
 {
-  if(bary.a_bins != NULL || bary.logk_bins != NULL ||
-     bary.log_PkR != NULL || bary.interp2d != NULL)
+  if(bary.a_bins != NULL || bary.logk_bins != NULL || bary.log_PkR != NULL || bary.interp2d != NULL)
   {
     reset_bary_struct();
   }
@@ -10364,8 +10348,7 @@ void set_bary_parameters_to_BAHAMAS_T78()
       {
   			bary.logk_bins[j] = logkBins_BAHAMAS_T78[j];
   		}
-			int status = gsl_interp2d_set(bary.interp2d, bary.log_PkR, j, i,
-				logPkR_BAHAMAS_T78[j][i]);
+			int status = gsl_interp2d_set(bary.interp2d, bary.log_PkR, j, i, logPkR_BAHAMAS_T78[j][i]);
       if (status)
       {
         log_fatal("\x1b[90m{}\x1b[0m: gsl error {}",
@@ -10511,5 +10494,10 @@ void init_baryons(const char* scenario)
   else if (strcmp(scenario, "BAHAMAS_T80") == 0)
   {
   	set_bary_parameters_to_BAHAMAS_T80();
+  }
+  else
+  {
+    log_fatal("option not implemented");
+    exit(1);
   }
 }

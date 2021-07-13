@@ -23,33 +23,40 @@
 // ---------------------------------------------------------------------------
 
 // set to 1.686 for consistency with Tinker mass & bias definition
-double delta_c(double a __attribute__((unused))) { return 1.686; }
-
-double delta_Delta(double a __attribute__((unused))) {
-  return 200.0; // using Tinker et al mass & bias functions with \Delta = 200
-                // rho_{mean}
+double delta_c(double a __attribute__((unused))) 
+{ 
+  return 1.686; 
 }
 
-// virial density in solar masses/h/(H0/c)^3
-double rho_Delta(double a) {
+double delta_Delta(double a __attribute__((unused))) 
+{ // using Tinker et al mass & bias functions with \Delta = 200 rho_{mean}
+  return 200.0;
+}
+
+double rho_Delta(double a) // virial density in solar masses/h/(H0/c)^3 
+{
   // using Tinker et al mass & bias functions with \Delta = 200 rho_{mean}
   return (delta_Delta(a) * cosmology.rho_crit * cosmology.Omega_m);
 }
 
-double m_Delta(double r, double a) {
+double m_Delta(double r, double a) 
+{
   return 4. * M_PI / 3.0 * pow(r, 3.0) * rho_Delta(a);
 }
 
-// calculate r_Delta in c/H0 given m in (solar masses/h)
-double r_Delta(double m, double a) {
+double r_Delta(double m, double a) 
+{ // calculate r_Delta in c/H0 given m in (solar masses/h)
   return pow(3. / (4. * M_PI) * (m / rho_Delta(a)), 1. / 3.);
 }
 
-double r_s(double m, double a) { return r_Delta(m, a) / conc(m, a); }
+double r_s(double m, double a) 
+{ 
+  return r_Delta(m, a) / conc(m, a); 
+}
 
-double radius(double m) {
-  return pow(3. / 4. * m / (M_PI * cosmology.rho_crit * cosmology.Omega_m),
-             1. / 3.);
+double radius(double m) 
+{
+  return pow(3. / 4. * m / (M_PI * cosmology.rho_crit * cosmology.Omega_m), 1. / 3.);
 }
 
 // ---------------------------------------------------------------------------
@@ -65,16 +72,19 @@ double sigma2_integrand(double x, void *params) // inner integral
          (array[0] * 2. * M_PI * M_PI);
 }
 
-double sigma2(double m) {
+double sigma2(double m) 
+{
   static cosmopara C;
-
   static double *table_S2;
   static double dm = .0, logmmin = 1., logmmax = 1.;
   double mlog, result, array[1];
   int i;
-  if (recompute_cosmo3D(C)) {
+  if (recompute_cosmo3D(C)) 
+  {
     update_cosmopara(&C);
-    if (table_S2 == 0) {
+    
+    if (table_S2 == 0) 
+    {
       table_S2 = create_double_vector(0, Ntable.N_S2 - 1);
       logmmin = log(limits.M_min / 2.0);
       logmmax = log(limits.M_max * 2.0);

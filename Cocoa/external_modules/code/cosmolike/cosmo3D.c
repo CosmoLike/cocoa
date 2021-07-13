@@ -72,7 +72,7 @@ void setup_chi(int* io_nz, double** io_z, double** io_chi, int io)
     // IO != 1 IMPLES THAT LOCAL H(Z) WILL BE COPIED TO IO_chi(Z)
     if (z == NULL || chi == NULL)
     {
-      printf("cosmo3D::setup_hubble: z or H not allocated\n");
+      log_fatal("z or H not allocated\n");
       exit(1);
     }
 
@@ -88,7 +88,7 @@ void setup_chi(int* io_nz, double** io_z, double** io_chi, int io)
     }
     else
     {
-      printf("cosmo3D::setup_hubble: input pointer not allocated\n");
+      log_fatal("input pointer not allocated\n");
       exit(1);
     }
 
@@ -1318,6 +1318,11 @@ double PkRatio_baryons(double k_NL, double a)
     double result;
     int status = gsl_interp2d_eval_extrap_e(bary.interp2d, bary.logk_bins,
       bary.a_bins, bary.log_PkR, log10(kintern), a, NULL, NULL, &result);
+    if (status)
+    {
+      log_fatal(gsl_strerror(status));
+      exit(1);
+    }
     return pow(10.0, result);
   }
 }

@@ -12,66 +12,166 @@
 #include "redshift_spline.h"
 #include "structs.h"
 
-double W_kappa(double a, double fK, double nz) {
-  double wkappa = 1.5 * cosmology.Omega_m * fK / a * g_tomo(a, (int)nz);
-  if (cosmology.MGSigma != 0.) {
+double W_kappa(double a, double fK, int nz) 
+{
+  if(!(a>0) || !(a<1)) 
+  {
+    log_fatal("a>0 and a<1 not true");
+    exit(1);
+  }
+  if(nz < -1 || nz > tomo.shear_Nbin - 1) 
+  {
+    log_fatal("invalid bin input ni = %d", nz);
+    exit(1);
+  }
+  double wkappa = (1.5*cosmology.Omega_m*fK/a) * g_tomo(a, nz);
+  if (cosmology.MGSigma != 0.) 
+  {
     wkappa *= (1. + MG_Sigma(a));
   }
   return wkappa;
 }
 
-double W2_kappa(double a, double fK, double nz) {
+double W2_kappa(double a, double fK, int nz) 
+{
+  if(!(a>0) || !(a<1)) 
+  {
+    log_fatal("a>0 and a<1 not true");
+    exit(1);
+  }
+  if(nz < -1 || nz > tomo.shear_Nbin - 1) 
+  {
+    log_fatal("invalid bin input ni = %d", nz);
+    exit(1);
+  }
   const double tmp = (1.5*cosmology.Omega_m*fK/a);
-  double wkappa = tmp*tmp*g2_tomo(a, (int) nz);
-  if(cosmology.MGSigma != 0.){
-    wkappa *= pow((1.+MG_Sigma(a)),2.);
+  double wkappa = tmp*tmp*g2_tomo(a, nz);
+  if(cosmology.MGSigma != 0)
+  {
+    const double MG = (1.0 + MG_Sigma(a));
+    wkappa *= MG*MG;
   }
   return wkappa;
 }
 
-double W_mag(double a, double fK, double nz) {
-  double wmag = 1.5 * cosmology.Omega_m * fK / a * g_lens(a, (int) nz);
-  if (cosmology.MGSigma != 0.) {
+double W_mag(double a, double fK, int nz) 
+{
+  if(!(a>0) || !(a<1)) 
+  {
+    log_fatal("a>0 and a<1 not true");
+    exit(1);
+  }
+  if(nz < -1 || nz > tomo.clustering_Nbin - 1) 
+  {
+    log_fatal("invalid bin input ni = %d (max %d)", nz, tomo.clustering_Nbin);
+    exit(1);
+  }
+  double wmag = (1.5 * cosmology.Omega_m * fK / a) * g_lens(a, nz);
+  if (cosmology.MGSigma != 0) 
+  {
     wmag *= (1. + MG_Sigma(a));
   }
   return wmag;
 }
 
-double W_gal(double a, double nz, double chi, double hoverh0) {
-  const double wgal = gbias.b1_function(1. / a - 1., (int) nz) *
-    pf_photoz(1. / a - 1., (int) nz) * hoverh0;
-
-  return wgal + gbias.b_mag[(int) nz]*W_mag(a, f_K(chi), nz);
-}
-
-double W_source(double a, double nz, double hoverh0)
+double W_gal(double a, int nz, double chi, double hoverh0) 
 {
-  return zdistr_photoz(1. / a - 1., (int)nz) * hoverh0;
-}
-
-double f_rsd(double aa) {
-#ifdef DEBUG
-  if(!(aa>0)) {
-    log_fatal("Error on f_rsd: null scale factor");
+  if(!(a>0) || !(a<1)) 
+  {
+    log_fatal("a>0 and a<1 not true");
     exit(1);
   }
-#endif
-  const double z = 1.0/aa-1.0;
+  if(nz < -1 || nz > tomo.clustering_Nbin - 1) 
+  {
+    log_fatal("invalid bin input ni = %d", nz);
+    exit(1);
+  }
+  const double z = 1. / a - 1;
+  const double fK = f_K(chi);
+  const double wgal = gbias.b1_function(z, nz) * pf_photoz(z, nz) * hoverh0;
+  return wgal + gbias.b_mag[nz]*W_mag(a, fK, nz);
+}
+
+double W_source(double a, int nz, double hoverh0)
+{
+  if(nz < -1 || nz > tomo.shear_Nbin - 1) 
+  {
+    log_fatal("invalid bin input ni = %d", nz);
+    exit(1);
+  }
+  return zdistr_photoz(1./a - 1., (int) nz) * hoverh0;
+}
+
+double f_rsd(double a) 
+{
+  if(!(a>0) || !(a<1)) 
+  {
+    log_fatal("a>0 and a<1 not true");
+    exit(1);
+  }
+  const double z = 1.0/a-1.0;
   return f_growth(z);
 }
 
-double W_RSD(double l, double a0, double a1, double nz) {
+double W_RSD(double l, double a0, double a1, int nz) 
+{
+  if(!(a0>0) || !(a0<1)) 
+  {
+    log_fatal("a>0 and a<1 not true");
+    exit(1);
+  }
+  if(!(a1>0) || !(a1<1)) 
+  {
+    log_fatal("a>0 and a<1 not true");
+    exit(1);
+  }
+  if(nz < -1 || nz > tomo.clustering_Nbin - 1) 
+  {
+    log_fatal("invalid bin input ni = %d", nz);
+    exit(1);
+  }
   double w = (1 + 8. * l) / ((2. * l + 1.) * (2. * l + 1.)) *
-             pf_photoz(1. / a0 - 1., (int) nz) * hoverh0(a0) * f_rsd(a0);
+    pf_photoz(1. / a0 - 1., nz) * hoverh0(a0) * f_rsd(a0);
+  
   w -= 4. / (2 * l + 3.) * sqrt((2 * l + 1.) / (2 * l + 3.)) *
-       pf_photoz(1. / a1 - 1., (int) nz) * hoverh0(a1) * f_rsd(a1);
+    pf_photoz(1. / a1 - 1., nz) * hoverh0(a1) * f_rsd(a1);
+  
   return w;
 }
 
-double W_HOD(double a, double nz, double hoverh0) {
-  return pf_photoz(1. / a - 1., (int) nz) * hoverh0;
+double W_HOD(double a, int nz, double hoverh0) 
+{
+  if(!(a>0) || !(a<1)) 
+  {
+    log_fatal("a>0 and a<1 not true");
+    exit(1);
+  }
+  if(nz < -1 || nz > tomo.clustering_Nbin - 1) 
+  {
+    log_fatal("invalid bin input ni = %d", nz);
+    exit(1);
+  }
+  const double z = 1. / a - 1.;
+  return pf_photoz(z, nz) * hoverh0;
 }
 
-double W_k(double a, double fK) {
-  return 1.5*cosmology.Omega_m*fK/a*g_cmb(a);
+double W_cluster(int nz, double a, double chi, double hoverh0)
+{
+  if(!(a>0) || !(a<1)) 
+  {
+    log_fatal("a>0 and a<1 not true");
+    exit(1);
+  }
+  const double z = 1. / a - 1.;
+  return zdistr_cluster(nz, z, chi, hoverh0)*hoverh0;
+}
+
+double W_k(double a, double fK) 
+{
+  if(!(a>0) || !(a<1)) 
+  {
+    log_fatal("a>0 and a<1 not true");
+    exit(1);
+  }
+  return (1.5*cosmology.Omega_m*fK/a)*g_cmb(a);
 }
