@@ -67,9 +67,9 @@ if [ -z "${IGNORE_CPP_CARMA_INSTALLATION}" ]; then
     
     mkdir $ROOTDIR/.local/include/carma/ 
 
-    cp ./include/carma.h $ROOTDIR/.local/include/carma/
+    cp ./carma.h $ROOTDIR/.local/include/carma/
 
-    cp -r ./include/carma_bits $ROOTDIR/.local/include/carma/
+    cp -r ./carma_bits $ROOTDIR/.local/include/carma/
 
     cd $ROOTDIR
 fi
