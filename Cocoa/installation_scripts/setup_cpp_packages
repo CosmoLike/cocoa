@@ -46,7 +46,7 @@ fi
 if [ -z "${IGNORE_CPP_ARMA_INSTALLATION}" ]; then
     echo 'INSTALLING CPP ARMADILLO - THAT MIGHT TAKE A WHILE'
 
-    cd $ROOTDIR/../cocoa_installation_libraries/armadillo-9.860.2
+    cd $ROOTDIR/../cocoa_installation_libraries/armadillo-10.6.2
 
     rm -f CMakeCache.txt
 

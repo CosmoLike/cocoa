@@ -30,7 +30,7 @@ if [ -z "${IGNORE_ALL_PIP_INSTALLATION}" ]; then
 
     env CXX=$CXX_COMPILER CC=$C_COMPILER $PIP3 install six --upgrade --prefix=$ROOTDIR/.local --find-links file:$ROOTDIR/../cocoa_installation_libraries/pip_cache --no-index --no-dependencies
 
-    env CXX=$CXX_COMPILER CC=$C_COMPILER $PIP3 install $ROOTDIR/../cocoa_installation_libraries/pip_cache/wheel-0.34.2.tar.gz --upgrade --prefix=$ROOTDIR/.local --find-links file:$ROOTDIR/../cocoa_installation_libraries/pip_cache --no-dependencies
+    env CXX=$CXX_COMPILER CC=$C_COMPILER $PIP3 install $ROOTDIR/../cocoa_installation_libraries/pip_cache/wheel-0.37.0.tar.gz --upgrade --prefix=$ROOTDIR/.local --find-links file:$ROOTDIR/../cocoa_installation_libraries/pip_cache --no-dependencies
 
     env CXX=$CXX_COMPILER CC=$C_COMPILER $PIP3 install pip --upgrade --prefix=$ROOTDIR/.local --find-links file:$ROOTDIR/../cocoa_installation_libraries/pip_cache --no-index --no-dependencies
 
@@ -44,7 +44,7 @@ if [ -z "${IGNORE_ALL_PIP_INSTALLATION}" ]; then
 
     env CXX=$CXX_COMPILER CC=$C_COMPILER $PIP3 install tokenizers --upgrade --prefix=$ROOTDIR/.local --find-links file:$ROOTDIR/../cocoa_installation_libraries/pip_cache --no-index --no-dependencies
 
-    env CXX=$CXX_COMPILER CC=$C_COMPILER $PIP3 install $ROOTDIR/../cocoa_installation_libraries/pip_cache/Cython-0.29.17.tar.gz  --upgrade --prefix=$ROOTDIR/.local --find-links file:$ROOTDIR/../cocoa_installation_libraries/pip_cache --force --no-dependencies
+    env CXX=$CXX_COMPILER CC=$C_COMPILER $PIP3 install $ROOTDIR/../cocoa_installation_libraries/pip_cache/Cython-0.29.24.tar.gz  --upgrade --prefix=$ROOTDIR/.local --find-links file:$ROOTDIR/../cocoa_installation_libraries/pip_cache --force --no-dependencies
 
     env CXX=$CXX_COMPILER CC=$C_COMPILER $PIP3 install requests --upgrade --prefix=$ROOTDIR/.local --find-links file:$ROOTDIR/../cocoa_installation_libraries/pip_cache --no-index --no-dependencies
 
@@ -142,5 +142,5 @@ if [ -z "${IGNORE_ALL_PIP_INSTALLATION}" ]; then
 
     env CXX=$CXX_COMPILER CC=$C_COMPILER $PIP3 install GetDist --upgrade --prefix=$ROOTDIR/.local --find-links file:$ROOTDIR/../cocoa_installation_libraries/pip_cache --no-index --no-dependencies
 
-    env CXX=$CXX_COMPILER CC=$C_COMPILER $PIP3 install pyfits --upgrade --prefix=$ROOTDIR/.local --find-links file:$ROOTDIR/../cocoa_installation_libraries/pip_cache --no-index --no-dependencies
+    #env CXX=$CXX_COMPILER CC=$C_COMPILER $PIP3 install pyfits --upgrade --prefix=$ROOTDIR/.local --find-links file:$ROOTDIR/../cocoa_installation_libraries/pip_cache --no-index --no-dependencies
 fi

@@ -58,6 +58,15 @@ addvar PYTHONPATH $ROOTDIR/.local/lib
 
 addvar PATH $ROOTDIR/.local/bin
 
+export NUMPY_HEADERS=$ROOTDIR/.local/lib/python$PYTHON_VERSION/site-packages/numpy/core/include
+
+addvar LD_LIBRARY_PATH $ROOTDIR/.local/lib/python$PYTHON_VERSION/site-packages/numpy/core/lib
+
+export CPATH=$CPATH:$ROOTDIR/.local/lib/python$PYTHON_VERSION/site-packages/numpy/core/include
+
+export C_INCLUDE_PATH=$C_INCLUDE_PATH:$ROOTDIR/.local/lib/python$PYTHON_VERSION/site-packages/numpy/core/include
+export CPLUS_INCLUDE_PATH=$CPLUS_INCLUDE_PATH:$ROOTDIR/.local/lib/python$PYTHON_VERSION/site-packages/numpy/core/include
+
 # ----------------------------------------------------------------------------
 # ----------------------------------------------------------------------------
 # ----------------------------- PLANCK LIKELIHOOD ----------------------------
@@ -101,4 +110,3 @@ source $ROOTDIR/projects/.start_all.sh
 # ----------------------------------------------------------------------------
 # ----------------------------------------------------------------------------
 export START_COCOA_DONE=1
-

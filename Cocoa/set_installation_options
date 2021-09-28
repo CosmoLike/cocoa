@@ -10,13 +10,13 @@ export ROOTDIR=$PWD
 #  ---------------------------------------------------------------------------
 # WHICH SUPERCOMPUTER WILL COCOA BE INSTALLED? -------------------------------
 
-export DOCKER_INSTALLATION=1
+#export DOCKER_INSTALLATION=1
 
 #export MIDWAY_SUPERCOMPUTER_INSTALLATION=1
 
 #export OCELOTE_SUPERCOMPUTER_INSTALLATION=1
 
-#export AMYPOND_SUPERCOMPUTER_INSTALLATION=1
+export AMYPOND_SUPERCOMPUTER_INSTALLATION=1
 
 #export PUMA_SUPERCOMPUTER_INSTALLATION=1
 
@@ -300,8 +300,8 @@ elif [ -n "${NASA_SUPERCOMPUTER_INSTALLATION}" ]; then
 
 elif [ -n "${AMYPOND_SUPERCOMPUTER_INSTALLATION}" ]; then
 
-    export GLOBALPYTHON3=python3.6
-    export PYTHON_VERSION=3.6
+    export GLOBALPYTHON3=python3.8
+    export PYTHON_VERSION=3.8
     export FORTRAN_COMPILER=gfortran-9
     export C_COMPILER=gcc-9
     export CXX_COMPILER=g++-9
