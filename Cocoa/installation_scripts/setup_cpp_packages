@@ -63,7 +63,13 @@ if [ -z "${IGNORE_CPP_CARMA_INSTALLATION}" ]; then
 
     cd $ROOTDIR/../cocoa_installation_libraries/carma
 
-    cp -r ./include/carma/ $ROOTDIR/.local/include/carma/
+    rm -rf $ROOTDIR/.local/include/carma/
+    
+    mkdir $ROOTDIR/.local/include/carma/ 
+
+    cp ./include/carma.h $ROOTDIR/.local/include/carma/
+
+    cp -r ./include/carma_bits $ROOTDIR/.local/include/carma/
 
     cd $ROOTDIR
 fi
