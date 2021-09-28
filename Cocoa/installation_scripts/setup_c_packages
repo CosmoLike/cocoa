@@ -35,9 +35,9 @@ if [ -z "${IGNORE_C_FFTW_INSTALLATION}" ]; then
 
     FC=$FORTRAN_COMPILER CC=$C_COMPILER ./configure --enable-openmp --prefix=$ROOTDIR/.local --enable-shared=yes --enable-static=yes > /dev/null 2> /dev/null
 
-    make -j $MAKE_NUM_THREADS all > /dev/null
+    make -j $MAKE_NUM_THREADS all > /dev/null 2> /dev/null
 
-    make install > /dev/null
+    make install > /dev/null 2> /dev/null
 
     cd $ROOTDIR
 fi
