@@ -2,6 +2,7 @@
 *.tar
 *.tgz
 armadillo-9.860.2/
+armadillo-10.6.2/
 boost_1_72_0/
 CAMB/
 class_public/
