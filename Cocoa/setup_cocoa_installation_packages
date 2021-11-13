@@ -75,20 +75,60 @@ addvar PATH $ROOTDIR/.local/bin
 # ----------------------------------------------------------------------------
 
 source ./installation_scripts/setup_xz
+if [ $? -ne 0 ] 
+then
+echo "FAILED setup_xz SCRIPT" >&2
+return 1
+fi
 
 source ./installation_scripts/setup_decompress_files
+if [ $? -ne 0 ] 
+then
+echo "FAILED setup_decompress_files SCRIPT" >&2
+return 1
+fi
 
 source ./installation_scripts/setup_cmake
+if [ $? -ne 0 ] 
+then
+echo "FAILED setup_cmake SCRIPT" >&2
+return 1
+fi
 
 source ./installation_scripts/setup_openblas
+if [ $? -ne 0 ] 
+then
+echo "FAILED setup_openblas SCRIPT" >&2
+return 1
+fi
 
 source ./installation_scripts/setup_pip_packages
+if [ $? -ne 0 ] 
+then
+echo "FAILED setup_pip_packages SCRIPT" >&2
+return 1
+fi
 
 source ./installation_scripts/setup_cpp_packages
+if [ $? -ne 0 ] 
+then
+echo "FAILED setup_cpp_packages SCRIPT" >&2
+return 1
+fi
 
 source ./installation_scripts/setup_c_packages
+if [ $? -ne 0 ] 
+then
+echo "FAILED setup_c_packages SCRIPT" >&2
+return 1
+fi
 
 source ./installation_scripts/setup_fortran_packages
+if [ $? -ne 0 ] 
+then
+echo "FAILED setup_fortran_packages SCRIPT" >&2
+return 1
+fi
 
 
 # ----------------------------------------------------------------------------

@@ -1,26 +1,26 @@
 if [ -z "${ROOTDIR}" ]; then
     echo 'ERROR ROOTDIR not defined'
-    return
+    return 1
 fi
 if [ -z "${CXX_COMPILER}" ]; then
     echo 'ERROR CXX_COMPILER not defined'
-    return
+    return 1
 fi
 if [ -z "${C_COMPILER}" ]; then
     echo 'ERROR C_COMPILER not defined'
-    return
+    return 1
 fi
 if [ -z "${FORTRAN_COMPILER}" ]; then
     echo 'ERROR C_COMPILER not defined'
-    return
+    return 1
 fi
 if [ -z "${CMAKE}" ]; then
     echo 'ERROR CMAKE not defined'
-    return
+    return 1
 fi
 if [ -z "${MAKE_NUM_THREADS}" ]; then
     echo 'ERROR MAKE_NUM_THREADS not defined'
-    return
+    return 1
 fi
 # ----------------------------------------------------------------------------
 # ----------------------------------------------------------------------------
