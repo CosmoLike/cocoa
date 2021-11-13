@@ -45,11 +45,23 @@ if [ -z "${IGNORE_PLANCK_COMPILATION}" ]; then
 
     if [ -z "${IGNORE_C_CFITSIO_INSTALLATION}" ]; then
         FC=$FORTRAN_COMPILER CC=$C_COMPILER CXX=$CXX_COMPILER $PYTHON3 waf configure --gcc --gfortran --cfitsio_islocal --cfitsio_include=$ROOTDIR/.local/include --cfitsio_lib=$ROOTDIR/.local/lib --prefix $ROOTDIR/.local --debug --python=$ROOTDIR/.local/bin/python
+        if [ $? -ne 0 ] 
+        then
+          echo "PROBLEM CONF PLANCK"
+        fi
     else
         FC=$FORTRAN_COMPILER CC=$C_COMPILER CXX=$CXX_COMPILER $PYTHON3 waf configure --gcc --gfortran --cfitsio_islocal --prefix $ROOTDIR/.local --cfitsio_prefix=$GLOBAL_PACKAGES_LOCATION --python=$ROOTDIR/.local/bin/python
+        if [ $? -ne 0 ] 
+        then
+          echo "PROBLEM CONF PLANCK"
+        fi
     fi
 
     $PYTHON3 waf install -v
+    if [ $? -ne 0 ] 
+    then
+      echo "PROBLEM INSTALLING PLANCK"
+    fi
 
     cd $ROOTDIR
 fi

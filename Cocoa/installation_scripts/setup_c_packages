@@ -36,8 +36,22 @@ if [ -z "${IGNORE_C_FFTW_INSTALLATION}" ]; then
     FC=$FORTRAN_COMPILER CC=$C_COMPILER ./configure --enable-openmp --prefix=$ROOTDIR/.local --enable-shared=yes --enable-static=yes > /dev/null 2> /dev/null
 
     make -j $MAKE_NUM_THREADS all > /dev/null 2> /dev/null
+    if [ $? -eq 0 ] 
+    then
+      echo "MAKE FFTW OK"
+    else
+      echo "FFTW COULD NOT MAKE" >&2
+      return 1
+    fi
 
     make install > /dev/null 2> /dev/null
+    if [ $? -eq 0 ] 
+    then
+      echo "MAKE INSTALL FFTW OK"
+    else
+      echo "FFTW COULD NOT MAKE INSTALL" >&2
+      return 1
+    fi
 
     cd $ROOTDIR
 fi
@@ -51,8 +65,22 @@ if [ -z "${IGNORE_C_CFITSIO_INSTALLATION}" ]; then
     $CMAKE -DBUILD_SHARED_LIBS=TRUE -DCMAKE_INSTALL_PREFIX=$ROOTDIR/.local -DCMAKE_C_COMPILER=$C_COMPILER -DCMAKE_CXX_COMPILER=$CXX_COMPILER -DCMAKE_FC_COMPILER=FORTRAN_COMPILER --log-level=ERROR .  > /dev/null 2> /dev/null
 
     make -j $MAKE_NUM_THREADS all > /dev/null 2> /dev/null
+    if [ $? -eq 0 ] 
+    then
+      echo "MAKE CFITSIO OK"
+    else
+      echo "CFITSIO COULD NOT MAKE" >&2
+      return 1
+    fi
 
     make install > /dev/null 2> /dev/null
+    if [ $? -eq 0 ] 
+    then
+      echo "MAKE INSTALL CFITSIO OK"
+    else
+      echo "CFITSIO COULD NOT MAKE INSTALL" >&2
+      return 1
+    fi
 
     cd $ROOTDIR
 fi
@@ -64,8 +92,22 @@ if [ -z "${IGNORE_C_GSL_INSTALLATION}" ]; then
     CC=$C_COMPILER ./configure --prefix=$ROOTDIR/.local --enable-shared=yes --enable-static=yes > /dev/null 2> /dev/null
 
     make -j $MAKE_NUM_THREADS all > /dev/null 2> /dev/null
+    if [ $? -eq 0 ] 
+    then
+      echo "MAKE CFITSIO OK"
+    else
+      echo "CFITSIO COULD NOT MAKE" >&2
+      return 1
+    fi
 
     make install > /dev/null 2> /dev/null
+    if [ $? -eq 0 ] 
+    then
+      echo "MAKE INSTALL GSL OK"
+    else
+      echo "GSL COULD NOT MAKE INSTALL" >&2
+      return 1
+    fi
 
     cd $ROOTDIR
 fi

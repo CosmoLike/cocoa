@@ -26,12 +26,10 @@ export DOCKER_INSTALLATION=1
 
 #export MACOS_HOMEBREW_INSTALLATION=1
 
-
+#export NASA_SUPERCOMPUTER_INSTALLATION=1
 
 # SEE IF/ELSE BLOCK ON LINE ~62 TO TWEAK THE MANUAL INSTALLATION
 #export MANUAL_INSTALLATION=1
-
-#export NASA_SUPERCOMPUTER_INSTALLATION=1
 
 # ----------------------------------------------------------------------------
 # ----------------------------------------------------------------------------
@@ -367,24 +365,29 @@ elif [ -n "${PUMA_SUPERCOMPUTER_INSTALLATION}" ]; then
 
 elif [ -n "${WOLF_SUPERCOMPUTER_INSTALLATION}" ]; then
     
-    module unload gcc 
-    module unload git
-    module unload openmpi
-    module unload intel/mkl
     module unload boost
-    module unload cmake
-    
-    module load git/2.12.2
-    module load gcc/10.2.0
-    module load openmpi/4.0.1 
-    module load intel/mkl/64/2020/20.0.1
-    module load boost/1.76.0
+    module load boost/1.71.0
 
     # need to create a conda enviroment w/ name p3.7
     # conda create --name p3.7 python=3.7 --quiet --yes
+    # conda install -n p3.7 --quiet --yes \
+    #'conda-forge::libgcc-ng=9.3.0' \
+    #'conda-forge::libstdcxx-ng=9.3.0' \
+    #'conda-forge::gcc_linux-64=9.3.0' \
+    #'conda-forge::gxx_linux-64=9.3.0'
     # source activate p3.7
+    # ------------------------------------------------------
+    # BASHRC
+    # module load slurm
+    # module load git/2.12.2
+    # module load gcc/9.2.0
+    # module load openmpi/4.0.1 
+    # module load intel/mkl/64/2020/20.0.1
+    # module load anaconda/3
+    # source activate p3.7
+
     # This must be done manually before installation
-    export GLOBALPYTHON3=/gpfs/home/vinmirandabr/.conda/envs/p3.7/bin/python3.7
+    export GLOBALPYTHON3=~/.conda/envs/p3.7/bin/python3.7
     export PYTHON_VERSION=3.7
     ulimit -s unlimited
 

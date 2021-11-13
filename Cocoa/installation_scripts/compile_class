@@ -34,12 +34,20 @@ if [ -z "${IGNORE_CLASS_COMPILATION}" ]; then
     rm -f class
 
     CC=$C_COMPILER PYTHON=$PYTHON3 make -j $MAKE_NUM_THREADS
+    if [ $? -ne 0 ] 
+    then
+      echo "PROBLEM MAKE CLASS"
+    fi
 
     cd ./python
 
     $PYTHON3 setup.py clean
 
     $PYTHON3 setup.py build
+    if [ $? -ne 0 ] 
+    then
+      echo "PROBLEM BUILDING CLASS"
+    fi
 
     cd $ROOTDIR
 fi

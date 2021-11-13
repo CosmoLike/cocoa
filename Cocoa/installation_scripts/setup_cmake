@@ -26,10 +26,31 @@ if [ -z "${IGNORE_CMAKE_INSTALLATION}" ]; then
     cd $ROOTDIR/../cocoa_installation_libraries/cmake-3.17.1
 
     env CC=$C_COMPILER CXX=$CPP_COMPILER ./bootstrap --prefix=$ROOTDIR/.local > /dev/null 2> /dev/null
+    if [ $? -eq 0 ] 
+    then
+      echo "BOOTSTRAP CMAKE OK"
+    else
+      echo "CMAKE COULD NOT BOOTSTRAP" >&2
+      return 1
+    fi
 
     make -j $MAKE_NUM_THREADS > /dev/null 2> /dev/null
+    if [ $? -eq 0 ] 
+    then
+      echo "MAKE CMAKE OK"
+    else
+      echo "CMAKE COULD NOT MAKE" >&2
+      return 1
+    fi
 
     make install > /dev/null 2> /dev/null
+    if [ $? -eq 0 ] 
+    then
+      echo "MAKE INSTALL CMAKE OK"
+    else
+      echo "CMAKE COULD NOT MAKE INSTALL" >&2
+      return 1
+    fi
 
     cd $ROOTDIR
 fi

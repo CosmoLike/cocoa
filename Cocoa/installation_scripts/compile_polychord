@@ -37,6 +37,10 @@ if [ -z "${IGNORE_POLYCHORD_COMPILATION}" ]; then
     CC=$C_COMPILER CXX=$CPP_COMPILER  make -j $MAKE_NUM_THREADS pypolychord MPI=1
 
     CC=mpicc CXX=mpicxx $PYTHON3 setup.py install --prefix $ROOTDIR/.local
+    if [ $? -ne 0 ] 
+    then
+      echo "PROBLEM INSTALLING POLYCHORD"
+    fi
 
     cd ../../../
 fi

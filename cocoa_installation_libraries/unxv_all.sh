@@ -20,15 +20,26 @@ fi
 if [ -z "${IGNORE_ALL_PIP_INSTALLATION}" ]; then
     echo 'DECOMPRESSING PIP CACHE'
     rm -rf ./pip_cache/
+    
     if [ -z "${THREAD_UNXZ}" ]; then
-        tar xf pip_cache.xz &
+        tar xf pip_cache.xz
         proc2=$!
     else
         tar xf pip_cache.xz &
         proc2=$!
     fi
+
+    rm -rf ./expat241/
+    if [ -z "${THREAD_UNXZ}" ]; then
+        tar xf expat241.xz
+        proc2X=$!
+    else
+        tar xf expat241.xz &
+        proc2A=$!
+    fi
 else
   proc2=1
+  proc2A=1
 fi
 
 if [ -z "${IGNORE_CMAKE_INSTALLATION}" ]; then
@@ -186,4 +197,4 @@ if [ -n "${THREAD_UNXZ}" ]; then
      echo 'DECOMPRESSION IS HAPPENING IN PARALLEL - WAITING ALL OF THEM TO FINISH'
 fi
 
-wait "$proc1" "$proc2" "$proc3" "$proc4" "$proc5" "$proc6" "$proc7" "$proc8" "$proc9" "$proc10" "$proc11" "$proc12" "$proc13" 2>/dev/null > /dev/null
+wait "$proc1" "$proc2" "$proc2A" "$proc3" "$proc4" "$proc5" "$proc6" "$proc7" "$proc8" "$proc9" "$proc10" "$proc11" "$proc12" "$proc13" 2>/dev/null > /dev/null

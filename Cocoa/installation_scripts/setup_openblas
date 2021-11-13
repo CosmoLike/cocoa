@@ -1,18 +1,18 @@
 if [ -z "${ROOTDIR}" ]; then
     echo 'ERROR ROOTDIR not defined'
-    return
+    return 1
 fi
 if [ -z "${CXX_COMPILER}" ]; then
     echo 'ERROR CXX_COMPILER not defined'
-    return
+    return 1
 fi
 if [ -z "${C_COMPILER}" ]; then
     echo 'ERROR C_COMPILER not defined'
-    return
+    return 1
 fi
 if [ -z "${MAKE_NUM_THREADS}" ]; then
     echo 'ERROR MAKE_NUM_THREADS not defined'
-    return
+    return 1
 fi
 # ----------------------------------------------------------------------------
 # ----------------------------------------------------------------------------
@@ -26,9 +26,24 @@ if [ -z "${IGNORE_OPENBLAS_INSTALLATION}" ]; then
     cd $ROOTDIR/../cocoa_installation_libraries/OpenBLAS
 
     export MAKE_NB_JOBS=$MAKE_NUM_THREADS
+    
     make CC=$C_COMPILER FC=$FORTRAN_COMPILER USE_OPENMP=1 > /dev/null 2> /dev/null
+    if [ $? -eq 0 ] 
+    then
+      echo "MAKE OPENBLAS OK"
+    else
+      echo "OPENBLAS COULD NOT MAKE" >&2
+      return 1
+    fi
 
     make install PREFIX=$ROOTDIR/.local > /dev/null 2> /dev/null
+    if [ $? -eq 0 ] 
+    then
+      echo "MAKE INSTALL OPENBLAS OK"
+    else
+      echo "OPENBLAS COULD NOT MAKE INSTALL" >&2
+      return 1
+    fi
     unset MAKE_NB_JOBS
 
     cd $ROOTDIR/

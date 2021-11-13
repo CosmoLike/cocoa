@@ -40,6 +40,10 @@ if [ -z "${IGNORE_CAMB_COMPILATION}" ]; then
     $PYTHON3 setup.py clean
 
     COMPILER=$FORTRAN_COMPILER F90C=$FORTRAN_COMPILER $PYTHON3 setup.py build
+    if [ $? -ne 0 ] 
+    then
+      echo "PROBLEM BUILDING CAMB"
+    fi
 
     cd $ROOTDIR
 fi
