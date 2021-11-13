@@ -364,10 +364,6 @@ elif [ -n "${PUMA_SUPERCOMPUTER_INSTALLATION}" ]; then
     export OCELOTE_MAKEFILE_COSMOLIKE_FLAGS=1
 
 elif [ -n "${WOLF_SUPERCOMPUTER_INSTALLATION}" ]; then
-    
-    module unload boost
-    module load boost/1.71.0
-
     # need to create a conda enviroment w/ name p3.7
     # conda create --name p3.7 python=3.7 --quiet --yes
     # conda install -n p3.7 --quiet --yes \
@@ -386,6 +382,9 @@ elif [ -n "${WOLF_SUPERCOMPUTER_INSTALLATION}" ]; then
     # module load anaconda/3
     # source activate p3.7
 
+    module unload boost
+    module load boost/1.71.0
+
     # This must be done manually before installation
     export GLOBALPYTHON3=~/.conda/envs/p3.7/bin/python3.7
     export PYTHON_VERSION=3.7
@@ -398,6 +397,29 @@ elif [ -n "${WOLF_SUPERCOMPUTER_INSTALLATION}" ]; then
     export IGNORE_DISTUTILS_INSTALLATION=1
     export DONT_USE_SYSTEM_PIP_PACKAGES=1
     export IGNORE_CPP_BOOST_INSTALLATION=1
+elif [ -n "${UNESP_SUPERCOMPUTER_INSTALLATION}" ]; then
+    # need to create a conda enviroment w/ name p3.7
+    # conda create --name p3.7 python=3.7 --quiet --yes
+    # conda install -n p3.7 --quiet --yes \
+    #'conda-forge::libgcc-ng=9.3.0' \
+    #'conda-forge::libstdcxx-ng=9.3.0' \
+    #'conda-forge::gcc_linux-64=9.3.0' \
+    #'conda-forge::gxx_linux-64=9.3.0'
+    # source activate p3.7
+    # ------------------------------------------------------
+    # BASHRC
+    #module unload gcc
+    #module unload boost
+    #module unload cmake
+    #module unload intel/compilers/2017
+    #module unload intel/mpi/2017
+    #module unload openmpi
+    #module unload miniconda
+
+    #module load gcc/9.3.0
+    #module load openmpi/4.0.1
+    #module load miniconda/3
+    #source activate p3.7
 fi
 
 if [ -z "${IGNORE_CMAKE_INSTALLATION}" ]; then
