@@ -366,7 +366,7 @@ elif [ -n "${PUMA_SUPERCOMPUTER_INSTALLATION}" ]; then
     export OCELOTE_MAKEFILE_COSMOLIKE_FLAGS=1
 
 elif [ -n "${WOLF_SUPERCOMPUTER_INSTALLATION}" ]; then
-    # need to create a conda enviroment w/ name p3.7
+    # need to create a conda enviroment w/ name cocoa
     # conda create --name p3.7 python=3.7 --quiet --yes
     # conda install -n p3.7 --quiet --yes \
     #'conda-forge::libgcc-ng=9.3.0' \
@@ -382,10 +382,6 @@ elif [ -n "${WOLF_SUPERCOMPUTER_INSTALLATION}" ]; then
     # module load openmpi/4.0.1 
     # module load intel/mkl/64/2020/20.0.1
     # module load anaconda/3
-    # source activate p3.7
-
-    module unload boost
-    module load boost/1.71.0
 
     # This must be done manually before installation
     export GLOBALPYTHON3=$CONDA_PREFIX/bin/python3.7
@@ -398,41 +394,17 @@ elif [ -n "${WOLF_SUPERCOMPUTER_INSTALLATION}" ]; then
 
     export IGNORE_DISTUTILS_INSTALLATION=1
     export DONT_USE_SYSTEM_PIP_PACKAGES=1
-    export IGNORE_CPP_BOOST_INSTALLATION=1
-elif [ -n "${UNESP_SUPERCOMPUTER_INSTALLATION}" ]; then
-    # need to create a conda enviroment w/ name p3.7
-    # conda create --name p3.7 python=3.7 --quiet --yes
-    # conda install -n p3.7 --quiet --yes \
-    # 'conda-forge::libgcc-ng=11.2.0' \
-    # 'conda-forge::libstdcxx-ng=11.2.0' \
-    # 'conda-forge::libgfortran-ng=11.2.0' \
-    # 'conda-forge::gcc_linux-64=11.2.0' \
-    # 'conda-forge::gxx_linux-64=11.2.0' \
-    # 'conda-forge::gfortran_linux-64=11.2.0' \
-    # 'conda-forge::hdf5=1.10.6' \ 
-    # 'conda-forge::sysroot_linux-64=2.17' #GLIB=2.17
-    # ---------------------------------------------------------
-    # BASHRC OR BEFORE USING/STARTING COCOA -------------------
-    # ---------------------------------------------------------
-    # module unload gcc
-    # module unload boost
-    # module unload cmake
-    # module unload intel/compilers/2017
-    # module unload intel/mpi/2017
-    # module unload openmpi
-    # module unload miniconda
-    # module load gcc/9.3.0
-    # module load openmpi/4.0.1
-    # module load miniconda/3
-    # source activate p3.7
-    # export PATH=$CONDA_PREFIX/bin:$PATH
-    # export LD_LIBRARY_PATH=$CONDA_PREFIX/lib:$LD_LIBRARY_PATH
-    # export CPLUS_INCLUDE_PATH=$CONDA_PREFIX/include/python3.7m/:$CPLUS_INCLUDE_PATH
-    # export C_INCLUDE_PATH=$CONDA_PREFIX/include/python3.7m/:$C_INCLUDE_PATH
-    # ---------------------------------------------------------
 
+elif [ -n "${UNESP_SUPERCOMPUTER_INSTALLATION}" ]; then
+    # ASSUME THE USE OF MINICONDA (COCOA ENVIROMENT - SEE NOTES)
+
+    export PATH=$CONDA_PREFIX/bin:$PATH
+    export LD_LIBRARY_PATH=$CONDA_PREFIX/lib:$LD_LIBRARY_PATH
+    export CPLUS_INCLUDE_PATH=$CONDA_PREFIX/include/python3.7m/:$CPLUS_INCLUDE_PATH
+    export C_INCLUDE_PATH=$CONDA_PREFIX/include/python3.7m/:$C_INCLUDE_PATH
     export GLOBALPYTHON3=$CONDA_PREFIX/bin/python3.7
     export PYTHON_VERSION=3.7
+    
     ulimit -s unlimited
 
     export FORTRAN_COMPILER=$CONDA_PREFIX/bin/x86_64-conda-linux-gnu-gfortran
