@@ -175,17 +175,17 @@ fi
 
 if [ -z "${IGNORE_DISTUTILS_INSTALLATION}" ]; then
     echo 'DECOMPRESSING BINUTILS'
-    rm -rf ./binutils-2.34/
+    rm -rf ./binutils-2.37/
     rm -rf ./texinfo-6.7/
     if [ -z "${THREAD_UNXZ}" ]; then
         tar xf texinfo-6.7.xz
         proc12=$!
-        tar xf binutils-2.34.xz
+        tar xf binutils-2.37.xz
         proc13=$!
     else
         tar xf texinfo-6.7.xz &
         proc12=$!
-        tar xf binutils-2.34.xz &
+        tar xf binutils-2.37.xz &
         proc13=$!
     fi
 else
