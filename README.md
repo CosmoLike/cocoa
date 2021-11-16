@@ -20,6 +20,33 @@ If you want to use Docker on HPCs please go here [Docker Installation Part II: F
 
 Below we detail non-Docker, system specific installation. Please see appendices for prerequisites: [Prerequisites for MacOS (System Installation)](https://github.com/CosmoLike/cocoa#prerequisites-for-macos-system-installation) and [Prerequisites for Linux (System Installation)](https://github.com/CosmoLike/cocoa#prerequisites-for-linux-system-installation).
 
+## OPTIONAL: MINICONDA SETUP
+A simple way to install all prerequisites (plus most packages needed by Cocoa) is via [miniconda](https://docs.conda.io/en/latest/miniconda.html). This is almost as simple as using Docker
+
+    conda create --name cocoa python=3.7 --quiet --yes
+    
+    conda install -n cocoa --quiet --yes  \
+      'conda-forge::libgcc-ng=11.2.0' \
+      'conda-forge::libstdcxx-ng=11.2.0' \
+      'conda-forge::libgfortran-ng=11.2.0' \
+      'conda-forge::gxx_linux-64=11.2.0' \
+      'conda-forge::gcc_linux-64=11.2.0' \
+      'conda-forge::gfortran_linux-64=11.2.0' \
+      'conda-forge::sysroot_linux-64=2.17' \
+      'conda-forge::git=2.33.1' \
+      'conda-forge::hdf5=1.10.6' \
+      'conda-forge::git-lfs=3.0.2 \
+      'conda-forge::cmake=3.21.3' \
+      'conda-forge::boost=1.76.0' \
+      'conda-forge::gsl=2.7' \
+      'conda-forge::fftw=3.3.10' \
+      'conda-forge::cfitsio=4.0.0' \
+      'conda-forge::openblas=0.3.18' \
+      'conda-forge::lapack=3.9.0' \
+      'conda-forge::armadillo=10.7.3'
+      
+    source activate cocoa
+        
 ## Cloning the Repository
 
 Type
@@ -39,16 +66,13 @@ Cocoa chooses the preferred method of installation via special environment keys 
     # ----------------------------------------------------------------------------
 
     export DOCKER_INSTALLATION=1
-    #export MIDWAY_SUPERCOMPUTER_INSTALLATION=1
-    #export NASA_SUPERCOMPUTER_INSTALLATION=1
+    #export MINICONDA_INSTALLATION=1
     (...)
-    #export MANUAL_INSTALLATION=1
-
-For a few HPC systems commonly used by the Cocoa developers, special keys with pre-defined configurations exist. See section [System Installation: Further Information for Linux]() for further instructions on `MANUAL_INSTALLATION` if the pre-defined configuration is not available for your environment. For macOS system installation, the user needs to uncomment the line `export MACOS_HOMEBREW_INSTALLATION=1`, while making sure that all other special keys are unset, as shown below:
-
-    #export DOCKER_INSTALLATION=1
+    #export AMYPOND_SUPERCOMPUTER_INSTALLATION=1
+    #export MACOS_HOMEBREW_INSTALLATION=1
     (...)
-    export MACOS_HOMEBREW_INSTALLATION=1
+    
+For a few HPC systems commonly used by the Cocoa developers, special keys with pre-defined configurations exist. See section [System Installation: Further Information for Linux]() for further instructions on `MANUAL_INSTALLATION` if the pre-defined configuration is not available for your environment. We do, however, strongly encourage the miniconda installation (way easier). For macOS system installation, the user needs to uncomment the line `export MACOS_HOMEBREW_INSTALLATION=1`, while making sure that all other special keys are unset
 
 
 **Exporting, at the same, more than one of the special keys listed above produces undefined behavior!**
@@ -139,51 +163,7 @@ We also assume all contributors have added their [ssh-keys](https://docs.github.
 
    - **zsh (the Z shell) is not a valid substitution for bash**,
 
-A simple way to install all prerequisites (plus many packages needed by Cocoa) is via [miniconda](https://docs.conda.io/en/latest/miniconda.html). 
 
-    conda create --name cocoa python=3.7 --quiet --yes
-    
-    conda install -n cocoa --quiet --yes  \
-      'conda-forge::libgcc-ng=11.2.0' \
-      'conda-forge::libstdcxx-ng=11.2.0' \
-      'conda-forge::libgfortran-ng=11.2.0' \
-      'conda-forge::gxx_linux-64=11.2.0' \
-      'conda-forge::gcc_linux-64=11.2.0' \
-      'conda-forge::gfortran_linux-64=11.2.0' \
-      'conda-forge::sysroot_linux-64=2.17' \
-      'conda-forge::git=2.33.1' \
-      'conda-forge::hdf5=1.10.6' \
-      'conda-forge::git-lfs=3.0.2 \
-      'conda-forge::cmake=3.21.3' \
-      'conda-forge::boost=1.76.0' \
-      'conda-forge::gsl=2.7' \
-      'conda-forge::fftw=3.3.10' \
-      'conda-forge::cfitsio=4.0.0' \
-      'conda-forge::openblas=0.3.18' \
-      'conda-forge::lapack=3.9.0'
-    
-    export PATH=$CONDA_PREFIX/bin:$PATH
-    export LD_LIBRARY_PATH=$CONDA_PREFIX/lib:$LD_LIBRARY_PATH
-    export CPLUS_INCLUDE_PATH=$CONDA_PREFIX/include/python3.7m/:$CPLUS_INCLUDE_PATH
-    export C_INCLUDE_PATH=$CONDA_PREFIX/include/python3.7m/:$C_INCLUDE_PATH
-    export GLOBALPYTHON3=$CONDA_PREFIX/bin/python3.7
-    export PYTHON_VERSION=3.7
-    export FORTRAN_COMPILER=$CONDA_PREFIX/bin/x86_64-conda-linux-gnu-gfortran
-    export C_COMPILER=$CONDA_PREFIX/bin/x86_64-conda-linux-gnu-cc
-    export CXX_COMPILER=$CONDA_PREFIX/bin/x86_64-conda-linux-gnu-g++
-
-    export IGNORE_XZ_INSTALLATION=1
-    export IGNORE_DISTUTILS_INSTALLATION=1
-    export DONT_USE_SYSTEM_PIP_PACKAGES=1
-    export IGNORE_C_GSL_INSTALLATION=1
-    export IGNORE_C_CFITSIO_INSTALLATION=1
-    export IGNORE_C_FFTW_INSTALLATION=1
-    export IGNORE_CPP_BOOST_INSTALLATION=1
-    export IGNORE_CMAKE_INSTALLATION=1
-    export IGNORE_OPENBLAS_INSTALLATION=1
-    export IGNORE_FORTRAN_LAPACK_INSTALLATION=1
-    
-The flags above can be set on [set_installation_options](https://github.com/CosmoLike/cocoa/blob/master/Cocoa/set_installation_options) configuration file
 
 ## Prerequisites for MacOS (System Installation)
 
