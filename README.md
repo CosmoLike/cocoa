@@ -161,8 +161,11 @@ A simple way to install all prerequisites is via [miniconda](https://docs.conda.
     export C_INCLUDE_PATH=$CONDA_PREFIX/include/python3.7m/:$C_INCLUDE_PATH
     export GLOBALPYTHON3=$CONDA_PREFIX/bin/python3.7
     export PYTHON_VERSION=3.7
+    export FORTRAN_COMPILER=$CONDA_PREFIX/bin/x86_64-conda-linux-gnu-gfortran
+    export C_COMPILER=$CONDA_PREFIX/bin/x86_64-conda-linux-gnu-cc
+    export CXX_COMPILER=$CONDA_PREFIX/bin/x86_64-conda-linux-gnu-g++
 
-We welcome contributions to make Cocoa work with these packages, compilers, and script languages.
+The flags above can be set on [set_installation_options](https://github.com/CosmoLike/cocoa/blob/master/Cocoa/set_installation_options) configuration file
 
 ## Prerequisites for MacOS (System Installation)
 
