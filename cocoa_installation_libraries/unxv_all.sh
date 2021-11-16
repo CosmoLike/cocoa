@@ -159,15 +159,19 @@ else
 fi
 
 if [ -z "${IGNORE_FORTRAN_INSTALLATION}" ]; then
-    echo 'DECOMPRESSING FORTRAN LAPACK LIBRARY'
-    if [ -z "${THREAD_UNXZ}" ]; then
-      rm -rf ./lapack-3.9.0/
-      tar xf lapack390.xz
-      proc11=$!
+    if [ -z "${IGNORE_FORTRAN_LAPACK_INSTALLATION}" ]; then
+        echo 'DECOMPRESSING FORTRAN LAPACK LIBRARY'
+        if [ -z "${THREAD_UNXZ}" ]; then
+          rm -rf ./lapack-3.9.0/
+          tar xf lapack390.xz
+          proc11=$!
+        else
+          rm -rf ./lapack-3.9.0/
+          tar xf lapack390.xz &
+          proc11=$!
+        fi
     else
-      rm -rf ./lapack-3.9.0/
-      tar xf lapack390.xz &
-      proc11=$!
+        proc11=1
     fi
 else
   proc11=1

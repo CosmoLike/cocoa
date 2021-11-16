@@ -30,3 +30,5 @@ rm -rf ./texinfo-6.7
 
 rm -rf ./xz-5.2.5
 
+rm -rf ./expat241
+
