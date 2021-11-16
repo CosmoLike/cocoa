@@ -139,7 +139,7 @@ We also assume all contributors have added their [ssh-keys](https://docs.github.
 
    - **zsh (the Z shell) is not a valid substitution for bash**,
 
-A simple way to install all prerequisites is via [miniconda](https://docs.conda.io/en/latest/miniconda.html). 
+A simple way to install all prerequisites (plus many packages needed by Cocoa) is via [miniconda](https://docs.conda.io/en/latest/miniconda.html). 
 
     conda create --name cocoa python=3.7 --quiet --yes
     
@@ -153,7 +153,14 @@ A simple way to install all prerequisites is via [miniconda](https://docs.conda.
       'conda-forge::sysroot_linux-64=2.17' \
       'conda-forge::git=2.33.1' \
       'conda-forge::hdf5=1.10.6' \
-      'conda-forge::git-lfs=3.0.2
+      'conda-forge::git-lfs=3.0.2 \
+      'conda-forge::cmake=3.21.3' \
+      'conda-forge::boost=1.76.0' \
+      'conda-forge::gsl=2.7' \
+      'conda-forge::fftw=3.3.10' \
+      'conda-forge::cfitsio=4.0.0' \
+      'conda-forge::openblas=0.3.18' \
+      'conda-forge::lapack=3.9.0'
     
     export PATH=$CONDA_PREFIX/bin:$PATH
     export LD_LIBRARY_PATH=$CONDA_PREFIX/lib:$LD_LIBRARY_PATH
@@ -165,6 +172,17 @@ A simple way to install all prerequisites is via [miniconda](https://docs.conda.
     export C_COMPILER=$CONDA_PREFIX/bin/x86_64-conda-linux-gnu-cc
     export CXX_COMPILER=$CONDA_PREFIX/bin/x86_64-conda-linux-gnu-g++
 
+    export IGNORE_XZ_INSTALLATION=1
+    export IGNORE_DISTUTILS_INSTALLATION=1
+    export DONT_USE_SYSTEM_PIP_PACKAGES=1
+    export IGNORE_C_GSL_INSTALLATION=1
+    export IGNORE_C_CFITSIO_INSTALLATION=1
+    export IGNORE_C_FFTW_INSTALLATION=1
+    export IGNORE_CPP_BOOST_INSTALLATION=1
+    export IGNORE_CMAKE_INSTALLATION=1
+    export IGNORE_OPENBLAS_INSTALLATION=1
+    export IGNORE_FORTRAN_LAPACK_INSTALLATION=1
+    
 The flags above can be set on [set_installation_options](https://github.com/CosmoLike/cocoa/blob/master/Cocoa/set_installation_options) configuration file
 
 ## Prerequisites for MacOS (System Installation)
