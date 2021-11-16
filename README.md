@@ -20,8 +20,8 @@ If you want to use Docker on HPCs please go here [Docker Installation Part II: F
 
 Below we detail non-Docker, system specific installation. Please see appendices for prerequisites: [Prerequisites for MacOS (System Installation)](https://github.com/CosmoLike/cocoa#prerequisites-for-macos-system-installation) and [Prerequisites for Linux (System Installation)](https://github.com/CosmoLike/cocoa#prerequisites-for-linux-system-installation).
 
-## OPTIONAL: MINICONDA SETUP
-A simple way to install all prerequisites (plus most packages needed by Cocoa) is via [miniconda](https://docs.conda.io/en/latest/miniconda.html). This is almost as simple as using Docker
+## (Optional) CONDA SETUP
+A simple way to install all prerequisites (plus most packages needed by Cocoa) is via conda enviroments. This is almost as simple as using Docker; type the following below to create the cocoa enviroment
 
     conda create --name cocoa python=3.7 --quiet --yes
     
