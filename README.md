@@ -138,8 +138,29 @@ We assume the user has the following packages installed:
 We also assume all contributors have added their [ssh-keys](https://docs.github.com/en/enterprise/2.15/user/articles/adding-a-new-ssh-key-to-your-github-account) to Cocoa's private submodules. Note that
 
    - **zsh (the Z shell) is not a valid substitution for bash**,
-   - **Python 3.8 is not compatible with Cocoa**
-   - **GCC-10 compilers are not compatible with Cocoa**.
+
+A simple way to install all prerequisites is via [miniconda](https://docs.conda.io/en/latest/miniconda.html). 
+
+    conda create --name cocoa python=3.7 --quiet --yes
+    
+    conda install -n cocoa --quiet --yes  \
+      'conda-forge::libgcc-ng=11.2.0' \
+      'conda-forge::libstdcxx-ng=11.2.0' \
+      'conda-forge::libgfortran-ng=11.2.0' \
+      'conda-forge::gxx_linux-64=11.2.0' \
+      'conda-forge::gcc_linux-64=11.2.0' \
+      'conda-forge::gfortran_linux-64=11.2.0' \
+      'conda-forge::sysroot_linux-64=2.17' \
+      'conda-forge::git=2.33.1' \
+      'conda-forge::hdf5=1.10.6' \
+      'conda-forge::git-lfs=3.0.2
+    
+    export PATH=$CONDA_PREFIX/bin:$PATH
+    export LD_LIBRARY_PATH=$CONDA_PREFIX/lib:$LD_LIBRARY_PATH
+    export CPLUS_INCLUDE_PATH=$CONDA_PREFIX/include/python3.7m/:$CPLUS_INCLUDE_PATH
+    export C_INCLUDE_PATH=$CONDA_PREFIX/include/python3.7m/:$C_INCLUDE_PATH
+    export GLOBALPYTHON3=$CONDA_PREFIX/bin/python3.7
+    export PYTHON_VERSION=3.7
 
 We welcome contributions to make Cocoa work with these packages, compilers, and script languages.
 
