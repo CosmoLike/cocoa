@@ -82,7 +82,7 @@ if [ -z "${IGNORE_CPP_ARMA_INSTALLATION}" ]; then
       echo "ARMA COULD NOT CMAKE" >&2
       return 1
     fi
-
+    make clean
     make -j $MAKE_NUM_THREADS all -Wno-dev > /dev/null 2> /dev/null
     if [ $? -eq 0 ] 
     then

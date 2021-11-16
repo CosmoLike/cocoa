@@ -10,7 +10,7 @@ export ROOTDIR=$PWD
 #  ---------------------------------------------------------------------------
 # WHICH SUPERCOMPUTER WILL COCOA BE INSTALLED? -------------------------------
 
-export DOCKER_INSTALLATION=1
+#export DOCKER_INSTALLATION=1
 
 #export MIDWAY_SUPERCOMPUTER_INSTALLATION=1
 
@@ -28,7 +28,7 @@ export DOCKER_INSTALLATION=1
 
 #export NASA_SUPERCOMPUTER_INSTALLATION=1
 
-#export UNESP_SUPERCOMPUTER_INSTALLATION=1
+export UNESP_SUPERCOMPUTER_INSTALLATION=1
 
 # SEE IF/ELSE BLOCK ON LINE ~62 TO TWEAK THE MANUAL INSTALLATION
 #export MANUAL_INSTALLATION=1
@@ -365,52 +365,22 @@ elif [ -n "${PUMA_SUPERCOMPUTER_INSTALLATION}" ]; then
     export DONT_USE_SYSTEM_PIP_PACKAGES=1
     export OCELOTE_MAKEFILE_COSMOLIKE_FLAGS=1
 
-elif [ -n "${WOLF_SUPERCOMPUTER_INSTALLATION}" ]; then
-    # need to create a conda enviroment w/ name cocoa
-    # conda create --name p3.7 python=3.7 --quiet --yes
-    # conda install -n p3.7 --quiet --yes \
-    #'conda-forge::libgcc-ng=9.3.0' \
-    #'conda-forge::libstdcxx-ng=9.3.0' \
-    #'conda-forge::gcc_linux-64=9.3.0' \
-    #'conda-forge::gxx_linux-64=9.3.0'
-    # source activate p3.7
-    # ------------------------------------------------------
-    # BASHRC
-    # module load slurm
-    # module load git/2.12.2
-    # module load gcc/9.2.0
-    # module load openmpi/4.0.1 
-    # module load intel/mkl/64/2020/20.0.1
-    # module load anaconda/3
-
-    # This must be done manually before installation
-    export GLOBALPYTHON3=$CONDA_PREFIX/bin/python3.7
-    export PYTHON_VERSION=3.7
-    ulimit -s unlimited
-
-    export FORTRAN_COMPILER=gfortran
-    export C_COMPILER=gcc
-    export CXX_COMPILER=g++
-
-    export IGNORE_DISTUTILS_INSTALLATION=1
-    export DONT_USE_SYSTEM_PIP_PACKAGES=1
-
-elif [ -n "${UNESP_SUPERCOMPUTER_INSTALLATION}" ]; then
+elif [ -n "${WOLF_SUPERCOMPUTER_INSTALLATION}" ] || [ -n "${UNESP_SUPERCOMPUTER_INSTALLATION}" ]; then
     # ASSUME THE USE OF MINICONDA (COCOA ENVIROMENT - SEE NOTES)
-
+    
     export PATH=$CONDA_PREFIX/bin:$PATH
     export LD_LIBRARY_PATH=$CONDA_PREFIX/lib:$LD_LIBRARY_PATH
     export CPLUS_INCLUDE_PATH=$CONDA_PREFIX/include/python3.7m/:$CPLUS_INCLUDE_PATH
     export C_INCLUDE_PATH=$CONDA_PREFIX/include/python3.7m/:$C_INCLUDE_PATH
     export GLOBALPYTHON3=$CONDA_PREFIX/bin/python3.7
     export PYTHON_VERSION=3.7
-    
+
     ulimit -s unlimited
 
     export FORTRAN_COMPILER=$CONDA_PREFIX/bin/x86_64-conda-linux-gnu-gfortran
     export C_COMPILER=$CONDA_PREFIX/bin/x86_64-conda-linux-gnu-cc
     export CXX_COMPILER=$CONDA_PREFIX/bin/x86_64-conda-linux-gnu-g++
-    
+
     export IGNORE_DISTUTILS_INSTALLATION=1
     export DONT_USE_SYSTEM_PIP_PACKAGES=1
 fi

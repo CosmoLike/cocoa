@@ -183,37 +183,12 @@ if [ -z "${IGNORE_ALL_PIP_INSTALLATION}" ]; then
       return 1
     fi
 
-    if [ -z "${IGNORE_OPENBLAS_INSTALLATION}" ]; then
-        echo "INSTALLING NUMPY (FROM SOURCE AND LOCAL OPENBLAS)"
 
-        cd $ROOTDIR/../cocoa_installation_libraries/pip_cache/numpy-1.21.2-openblas
-        
-        cp site.cfg.example site.cfg
-        sed --in-place --regexp-extended  "s@library_dirs(\s{1,})=(\s{1,})XXX@library_dirs = $ROOTDIR/.local/lib@g" site.cfg
-        sed --in-place --regexp-extended  "s@include_dirs(\s{1,})=(\s{1,})XXX@include_dirs = $ROOTDIR/.local/include@g" site.cfg
-        sed --in-place --regexp-extended  "s@runtime_library_dirs(\s{1,})=(\s{1,})XXX@runtime_library_dirs = $ROOTDIR/.local/lib@g" site.cfg
-
-        env CXX=$CXX_COMPILER CC=$C_COMPILER FC=$FORTRAN_COMPILER $PYTHON3 setup.py build -j $MAKE_NUM_THREADS --force > /dev/null 2> /dev/null
-        if [ $? -ne 0 ] 
-        then
-          echo "PROBLEM PIP numpy"
-          return 1
-        fi
-
-        env CXX=$CXX_COMPILER CC=$C_COMPILER FC=$FORTRAN_COMPILER $PYTHON3 setup.py install --single-version-externally-managed --root=/ > /dev/null 2> /dev/null
-        if [ $? -ne 0 ] 
-        then
-          echo "PROBLEM PIP numpy"
-          return 1
-        fi
-        cd $ROOTDIR
-    else
-        env CXX=$CXX_COMPILER CC=$C_COMPILER $PIP3 install numpy --upgrade --prefix=$ROOTDIR/.local --find-links file:$ROOTDIR/../cocoa_installation_libraries/pip_cache 
-        if [ $? -ne 0 ] 
-        then
-          echo "PROBLEM PIP numpy"
-          return 1
-        fi
+    env CXX=$CXX_COMPILER CC=$C_COMPILER $PIP3 install numpy --upgrade --prefix=$ROOTDIR/.local --find-links file:$ROOTDIR/../cocoa_installation_libraries/pip_cache 
+    if [ $? -ne 0 ] 
+    then
+      echo "PROBLEM PIP numpy"
+      return 1
     fi
 
     env CXX=$CXX_COMPILER CC=$C_COMPILER $PIP3 install mpmath --upgrade --prefix=$ROOTDIR/.local --find-links file:$ROOTDIR/../cocoa_installation_libraries/pip_cache --no-index 
@@ -272,38 +247,11 @@ if [ -z "${IGNORE_ALL_PIP_INSTALLATION}" ]; then
       return 1
     fi
 
-    if [ -z "${IGNORE_OPENBLAS_INSTALLATION}" ]; then
-        echo "INSTALLING SCIPY (FROM SOURCE AND LOCAL OPENBLAS)"
-
-        cd $ROOTDIR/../cocoa_installation_libraries/pip_cache/scipy-1.7.1-openblas
-
-        cp site.cfg.example site.cfg
-        sed --in-place --regexp-extended  "s@library_dirs(\s{1,})=(\s{1,})XXX@library_dirs = $ROOTDIR/.local/lib@g" site.cfg
-        sed --in-place --regexp-extended  "s@include_dirs(\s{1,})=(\s{1,})XXX@include_dirs = $ROOTDIR/.local/include@g" site.cfg
-        sed --in-place --regexp-extended  "s@runtime_library_dirs(\s{1,})=(\s{1,})XXX@runtime_library_dirs = $ROOTDIR/.local/lib@g" site.cfg
-
-        env CXX=$CXX_COMPILER CC=$C_COMPILER FC=$FORTRAN_COMPILER $PYTHON3 setup.py config > /dev/null 2> /dev/null
-        if [ $? -ne 0 ] 
-        then
-          echo "PROBLEM SETUP SCIPY"
-          return 1
-        fi
-
-        env C=$FORTRAN_COMPILER CXX=$CXX_COMPILER CC=$C_COMPILER FC=$FORTRAN_COMPILER $PYTHON3 setup.py build --fcompiler=gnu95 -j $MAKE_NUM_THREADS install --prefix $ROOTDIR/.local --force > /dev/null 2> /dev/null
-        if [ $? -ne 0 ] 
-        then
-          echo "PROBLEM BUILDING SCIPY"
-          return 1
-        fi
-
-        cd $ROOTDIR
-    else
-        env CXX=$CXX_COMPILER CC=$C_COMPILER $PIP3 install scipy --upgrade --prefix=$ROOTDIR/.local --find-links file:$ROOTDIR/../cocoa_installation_libraries/pip_cache
-        if [ $? -ne 0 ] 
-        then
-          echo "PROBLEM PIP sympy"
-          return 1
-        fi
+    env CXX=$CXX_COMPILER CC=$C_COMPILER $PIP3 install scipy --upgrade --prefix=$ROOTDIR/.local --find-links file:$ROOTDIR/../cocoa_installation_libraries/pip_cache
+    if [ $? -ne 0 ] 
+    then
+      echo "PROBLEM PIP sympy"
+      return 1
     fi
 
     env CXX=$CXX_COMPILER CC=$C_COMPILER $PIP3 install sympy --upgrade --prefix=$ROOTDIR/.local --find-links file:$ROOTDIR/../cocoa_installation_libraries/pip_cache --no-index 
@@ -320,28 +268,11 @@ if [ -z "${IGNORE_ALL_PIP_INSTALLATION}" ]; then
       return 1
     fi
 
-    if [ -z "${IGNORE_OPENBLAS_INSTALLATION}" ]; then
-        echo "INSTALLING PANDAS (FROM SOURCE AND LOCAL OPENBLAS)"
-
-        cd $ROOTDIR/../cocoa_installation_libraries/pip_cache/pandas-1.3.3-openblas
-
-        env CXX=$CXX_COMPILER CC=$C_COMPILER FC=$FORTRAN_COMPILER $PYTHON3 setup.py build_ext --inplace --force -j $MAKE_NUM_THREADS > /dev/null 2> /dev/null
-
-        env CXX=$CXX_COMPILER CC=$C_COMPILER FC=$FORTRAN_COMPILER $PIP3 install -e . --no-build-isolation --no-use-pep517 --prefix=$ROOTDIR/.local --find-links file:$ROOTDIR/../cocoa_installation_libraries/pip_cache --no-index --force  > /dev/null 2> /dev/null
-        if [ $? -ne 0 ] 
-        then
-          echo "PROBLEM PIP pandas"
-          return 1
-        fi
-        
-        cd $ROOTDIR
-    else
-        env CXX=$CXX_COMPILER CC=$C_COMPILER $PIP3 install pandas --upgrade --prefix=$ROOTDIR/.local --find-links file:$ROOTDIR/../cocoa_installation_libraries/pip_cache --no-index
-        if [ $? -ne 0 ] 
-        then
-          echo "PROBLEM PIP pandas"
-          return 1
-        fi
+    env CXX=$CXX_COMPILER CC=$C_COMPILER $PIP3 install pandas --upgrade --prefix=$ROOTDIR/.local --find-links file:$ROOTDIR/../cocoa_installation_libraries/pip_cache --no-index
+    if [ $? -ne 0 ] 
+    then
+      echo "PROBLEM PIP pandas"
+      return 1
     fi
 
     env CXX=$CXX_COMPILER CC=$C_COMPILER $PIP3 install ordered_set --upgrade --prefix=$ROOTDIR/.local --find-links file:$ROOTDIR/../cocoa_installation_libraries/pip_cache --no-index

@@ -25,6 +25,16 @@ if [ -n "${OLD_PATH}" ]; then
     unset OLD_PATH
 fi
 
+if [ -n "${OLD_C_INCLUDE_PATH}" ]; then
+    export C_INCLUDE_PATH=$OLD_C_INCLUDE_PATH
+    unset OLD_C_INCLUDE_PATH
+fi
+
+if [ -n "${OLD_CPLUS_INCLUDE_PATH}" ]; then
+    export CPLUS_INCLUDE_PATH=$OLD_CPLUS_INCLUDE_PATH
+    unset OLD_CPLUS_INCLUDE_PATH
+fi
+
 # ----------------------------------------------------------------------------
 # ----------------------------------------------------------------------------
 # ----------------------------- PLANCK LIKELIHOOD ----------------------------
