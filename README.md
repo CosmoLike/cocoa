@@ -35,7 +35,7 @@ A simple way to install all prerequisites (plus most packages needed by Cocoa) i
       'conda-forge::sysroot_linux-64=2.17' \
       'conda-forge::git=2.33.1' \
       'conda-forge::hdf5=1.10.6' \
-      'conda-forge::git-lfs=3.0.2 \
+      'conda-forge::git-lfs=3.0.2' \
       'conda-forge::cmake=3.21.3' \
       'conda-forge::boost=1.76.0' \
       'conda-forge::gsl=2.7' \
@@ -43,7 +43,12 @@ A simple way to install all prerequisites (plus most packages needed by Cocoa) i
       'conda-forge::cfitsio=4.0.0' \
       'conda-forge::openblas=0.3.18' \
       'conda-forge::lapack=3.9.0' \
-      'conda-forge::armadillo=10.7.3'
+      'conda-forge::armadillo=10.7.3'\
+      'conda-forge::expat=2.4.1' \
+      'conda-forge::cython=0.29.24' \
+      'conda-forge::numpy=1.21.4' \
+      'conda-forge::scipy=1.7.2' \
+      'conda-forge::pandas=1.3.4'
       
     source activate cocoa
         
