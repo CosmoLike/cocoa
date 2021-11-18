@@ -46,8 +46,10 @@ A simple way to install most prerequisites is via conda enviroments. This is as 
       'conda-forge::numpy=1.21.4' \
       'conda-forge::scipy=1.7.2' \
       'conda-forge::pandas=1.3.4'
-      
-    source activate cocoa
+ 
+ Then, every time users want to work on Cocoa (including cloning the repository), they must first activate the Cocoa conda environment
+ 
+        source activate cocoa
     
 For manual installation not utilizing conda (not advisable), please see appendices [Prerequisites for MacOS (System Installation)](https://github.com/CosmoLike/cocoa#prerequisites-for-macos-system-installation) and [Prerequisites for Linux (System Installation)](https://github.com/CosmoLike/cocoa#prerequisites-for-linux-system-installation).
         
