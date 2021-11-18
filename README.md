@@ -22,12 +22,12 @@ A simple way to install most prerequisites is via conda enviroments. This is as 
     conda create --name cocoa python=3.7 --quiet --yes
     
     conda install -n cocoa --quiet --yes  \
-      'conda-forge::libgcc-ng=11.2.0' \
-      'conda-forge::libstdcxx-ng=11.2.0' \
-      'conda-forge::libgfortran-ng=11.2.0' \
-      'conda-forge::gxx_linux-64=11.2.0' \
-      'conda-forge::gcc_linux-64=11.2.0' \
-      'conda-forge::gfortran_linux-64=11.2.0' \
+      'conda-forge::libgcc-ng=10.3.0' \
+      'conda-forge::libstdcxx-ng=10.3.0' \
+      'conda-forge::libgfortran-ng=10.3.0' \
+      'conda-forge::gxx_linux-64=10.3.0' \
+      'conda-forge::gcc_linux-64=10.3.0' \
+      'conda-forge::gfortran_linux-64=10.3.0' \
       'conda-forge::sysroot_linux-64=2.17' \
       'conda-forge::git=2.33.1' \
       'conda-forge::git-lfs=3.0.2' \
