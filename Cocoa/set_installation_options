@@ -54,9 +54,13 @@ if [ -n "${DOCKER_INSTALLATION}" ]; then
     export GLOBAL_PACKAGES_LOCATION=/usr/local
     export PYTHON_VERSION=3
     export FORTRAN_COMPILER=gfortran
+    
     export C_COMPILER=gcc
     export CXX_COMPILER=g++
     export GLOBALPYTHON3=python3
+    export MPI_FORTRAN_COMPILER=mpif90
+    export MPI_CXX_COMPILER=mpicc
+    export MPI_CC_COMPILER=mpicxx
 
     export IGNORE_DISTUTILS_INSTALLATION=1
     export IGNORE_OPENBLAS_INSTALLATION=1
@@ -73,9 +77,13 @@ elif [ -n "${AMYPOND_SUPERCOMPUTER_INSTALLATION}" ]; then
 
     export GLOBALPYTHON3=python3.8
     export PYTHON_VERSION=3.8
+    
     export FORTRAN_COMPILER=gfortran-9
     export C_COMPILER=gcc-9
     export CXX_COMPILER=g++-9
+    export MPI_FORTRAN_COMPILER=mpif90
+    export MPI_CXX_COMPILER=mpicc
+    export MPI_CC_COMPILER=mpicxx
 
     export IGNORE_DISTUTILS_INSTALLATION=1
     export IGNORE_XZ_INSTALLATION=1
@@ -87,9 +95,13 @@ elif [ -n "${MACOS_HOMEBREW_INSTALLATION}" ]; then
     export GLOBAL_PACKAGES_LOCATION=/usr/local
     export PYTHON_VERSION=3.7
     export GLOBALPYTHON3=python3.7
+    
     export FORTRAN_COMPILER=gfortran-9
     export C_COMPILER=gcc-9
     export CXX_COMPILER=g++-9
+    export MPI_FORTRAN_COMPILER=mpif90
+    export MPI_CXX_COMPILER=mpicc
+    export MPI_CC_COMPILER=mpicxx
 
     export IGNORE_DISTUTILS_INSTALLATION=1
     export IGNORE_OPENBLAS_INSTALLATION=1
@@ -126,6 +138,9 @@ elif [ -n "${PUMA_SUPERCOMPUTER_INSTALLATION}" ]; then
     export FORTRAN_COMPILER=gfortran
     export C_COMPILER=gcc
     export CXX_COMPILER=g++
+    export MPI_FORTRAN_COMPILER=mpif90
+    export MPI_CXX_COMPILER=mpicc
+    export MPI_CC_COMPILER=mpicxx
 
     export IGNORE_DISTUTILS_INSTALLATION=1
     export IGNORE_CMAKE_INSTALLATION=1
@@ -139,12 +154,18 @@ elif [ -n "${MINICONDA_INSTALLATION}" ]; then
     export C_INCLUDE_PATH=$CONDA_PREFIX/include/python3.7m/:$C_INCLUDE_PATH
     export GLOBALPYTHON3=$CONDA_PREFIX/bin/python3.7
     export PYTHON_VERSION=3.7
+    export PYTHONPATH=$CONDA_PREFIX/lib/python$PYTHON_VERSION/site-packages:$PYTHONPATH
+    export PYTHONPATH=$CONDA_PREFIX/lib:$PYTHONPATH
 
     ulimit -s unlimited
 
     export FORTRAN_COMPILER=$CONDA_PREFIX/bin/x86_64-conda-linux-gnu-gfortran
     export C_COMPILER=$CONDA_PREFIX/bin/x86_64-conda-linux-gnu-cc
     export CXX_COMPILER=$CONDA_PREFIX/bin/x86_64-conda-linux-gnu-g++
+    
+    export MPI_FORTRAN_COMPILER=$CONDA_PREFIX/bin/mpif90
+    export MPI_CXX_COMPILER=$CONDA_PREFIX/bin/mpicc
+    export MPI_CC_COMPILER=$CONDA_PREFIX/bin/mpicxx
 
     export IGNORE_XZ_INSTALLATION=1
     export IGNORE_DISTUTILS_INSTALLATION=1

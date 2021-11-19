@@ -1,10 +1,10 @@
 if [ -z "${ROOTDIR}" ]; then
     echo 'ERROR ROOTDIR not define'
-    return
+    return 1
 fi
 if [ -z "${PYTHON3}" ]; then
     echo 'ERROR PYTHON3 not define'
-    return
+    return 1
 fi
 
 # ----------------------------------------------------------------------------

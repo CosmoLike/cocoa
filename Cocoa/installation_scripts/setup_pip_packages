@@ -292,10 +292,12 @@ if [ -z "${IGNORE_ALL_PIP_INSTALLATION}" ]; then
     return 1
   fi
 
-  env CXX=$CXX_COMPILER CC=$C_COMPILER $PIP3 install mpi4py --upgrade --prefix=$ROOTDIR/.local --find-links file:$ROOTDIR/../cocoa_installation_libraries/pip_cache --no-index
-  if [ $? -ne 0 ]; then
-    echo "PROBLEM PIP mpi4py"
-    return 1
+  if [ -z "${MINICONDA_INSTALLATION}" ]; then
+    env CXX=$CXX_COMPILER CC=$C_COMPILER $PIP3 install mpi4py --upgrade --prefix=$ROOTDIR/.local --find-links file:$ROOTDIR/../cocoa_installation_libraries/pip_cache --no-index
+    if [ $? -ne 0 ]; then
+      echo "PROBLEM PIP mpi4py"
+      return 1
+    fi
   fi
 
   env CXX=$CXX_COMPILER CC=$C_COMPILER $PIP3 install py-bobyqa --upgrade --prefix=$ROOTDIR/.local --find-links file:$ROOTDIR/../cocoa_installation_libraries/pip_cache --no-index
@@ -304,16 +306,18 @@ if [ -z "${IGNORE_ALL_PIP_INSTALLATION}" ]; then
     return 1
   fi
 
-  env CXX=$CXX_COMPILER CC=$C_COMPILER $PIP3 install matplotlib --upgrade --prefix=$ROOTDIR/.local --find-links file:$ROOTDIR/../cocoa_installation_libraries/pip_cache --no-index
-  if [ $? -ne 0 ]; then
-    echo "PROBLEM PIP matplotlib"
-    return 1
-  fi
+  if [ -z "${MINICONDA_INSTALLATION}" ]; then
+    env CXX=$CXX_COMPILER CC=$C_COMPILER $PIP3 install matplotlib --upgrade --prefix=$ROOTDIR/.local --find-links file:$ROOTDIR/../cocoa_installation_libraries/pip_cache --no-index
+    if [ $? -ne 0 ]; then
+      echo "PROBLEM PIP matplotlib"
+      return 1
+    fi
 
-  env CXX=$CXX_COMPILER CC=$C_COMPILER $PIP3 install astropy --upgrade --prefix=$ROOTDIR/.local --find-links file:$ROOTDIR/../cocoa_installation_libraries/pip_cache --no-index
-  if [ $? -ne 0 ]; then
-    echo "PROBLEM PIP astropy"
-    return 1
+    env CXX=$CXX_COMPILER CC=$C_COMPILER $PIP3 install astropy --upgrade --prefix=$ROOTDIR/.local --find-links file:$ROOTDIR/../cocoa_installation_libraries/pip_cache --no-index
+    if [ $? -ne 0 ]; then
+      echo "PROBLEM PIP astropy"
+      return 1
+    fi
   fi
 
   env CXX=$CXX_COMPILER CC=$C_COMPILER $PIP3 install GetDist --upgrade --prefix=$ROOTDIR/.local --find-links file:$ROOTDIR/../cocoa_installation_libraries/pip_cache --no-index

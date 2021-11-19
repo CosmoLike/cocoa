@@ -29,18 +29,20 @@ fi
 # ----------------------------------------------------------------------------
 
 if [ -z "${IGNORE_POLYCHORD_COMPILATION}" ]; then
-    cd ./external_modules/code/PolyChordLite/
+    cd $ROOTDIR/external_modules/code/PolyChordLite/
 
     make clean
+    rm -rf ./lib/*.a
+    rm -rf ./lib/*.so
 
-    CC=$C_COMPILER CXX=$CPP_COMPILER COMPILER=$FORTRAN_COMPILER make all MPI=1 COMPILER_TYPE=gnu
-    CC=$C_COMPILER CXX=$CPP_COMPILER  make -j $MAKE_NUM_THREADS pypolychord MPI=1
+    make all MPI=1 COMPILER_TYPE=gnu
+    make -j $MAKE_NUM_THREADS pypolychord MPI=1
 
-    CC=mpicc CXX=mpicxx $PYTHON3 setup.py install --prefix $ROOTDIR/.local
+    CC=$MPI_CC_COMPILER CXX=$MPI_CXX_COMPILER $PYTHON3 setup.py install --prefix $ROOTDIR/.local
     if [ $? -ne 0 ] 
     then
       echo "PROBLEM INSTALLING POLYCHORD"
     fi
 
-    cd ../../../
+    cd $ROOTDIR
 fi
