@@ -28,6 +28,7 @@ A simple way to install most prerequisites is via conda enviroments. This is as 
       'conda-forge::gxx_linux-64=10.3.0' \
       'conda-forge::gcc_linux-64=10.3.0' \
       'conda-forge::gfortran_linux-64=10.3.0' \
+      'conda-forge::openmpi=4.1.1' \
       'conda-forge::sysroot_linux-64=2.17' \
       'conda-forge::git=2.33.1' \
       'conda-forge::git-lfs=3.0.2' \
@@ -45,7 +46,10 @@ A simple way to install most prerequisites is via conda enviroments. This is as 
       'conda-forge::cython=0.29.24' \
       'conda-forge::numpy=1.21.4' \
       'conda-forge::scipy=1.7.2' \
-      'conda-forge::pandas=1.3.4'
+      'conda-forge::pandas=1.3.4' \
+      'conda-forge::mpi4py=3.1.2' \
+      'conda-forge::matplotlib=3.5.0' \
+      'conda-forge::astropy=4.3.1' 
  
  Then, every time users want to work on Cocoa (including cloning the repository), they must first activate the Cocoa conda environment
  
