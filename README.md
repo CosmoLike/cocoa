@@ -54,7 +54,9 @@ A simple way to install most prerequisites is via conda enviroments. This is as 
  Then, every time users want to work on Cocoa (including cloning the repository), they must first activate the Cocoa conda environment
  
     source activate cocoa
-    
+
+PS: When loading the anaconda via the module system on supercomputers, users sometimes must type the command `conda init bash` before loading any enviroment. 
+
 For manual installation not utilizing conda (not advisable), please see appendices [Prerequisites for MacOS (System Installation)](https://github.com/CosmoLike/cocoa#prerequisites-for-macos-system-installation) and [Prerequisites for Linux (System Installation)](https://github.com/CosmoLike/cocoa#prerequisites-for-linux-system-installation).
         
 ## Cloning the Repository
