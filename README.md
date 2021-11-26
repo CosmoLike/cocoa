@@ -61,9 +61,13 @@ For manual installation not utilizing conda (not advisable), please see appendic
         
 ## Cloning the Repository
 
-Type
+If you aren't a Cocoa developer type (read only repo)
 
     $ git lfs clone https://github.com/CosmoLike/cocoa.git
+
+However, if you are a Cocoa developer, then type instead
+
+    $ git lfs clone git@github.com:CosmoLike/cocoa.git
 
 (**Warning**) We have a monthly quota of only 150 GB in bandwidth for [Git LFS](https://git-lfs.github.com) files, and therefore we ask users to use good judgment in the number of times they clone repositories with large files (each clone will download around 5GB from Git LFS). See appendix [Git LFS](https://github.com/CosmoLike/cocoa/blob/master/README.md#git-lfs) for further information.
 
