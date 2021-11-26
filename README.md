@@ -53,7 +53,7 @@ A simple way to install most prerequisites is via conda enviroments. This is as 
  
  Then, every time users want to work on Cocoa (including cloning the repository), they must first activate the Cocoa conda environment
  
-    source activate cocoa
+    conda activate cocoa
 
 PS: When loading the anaconda for the first time via the module system on supercomputers, users sometimes must type the command `conda init bash` before loading any enviroment. This will add a special script in the `bashrc` file. Users then should reload the bashrc script by typping `source ~/.bashrc`
 
