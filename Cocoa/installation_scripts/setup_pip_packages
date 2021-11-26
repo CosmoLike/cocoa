@@ -58,10 +58,13 @@ fi
 # ----------------------------------------------------------------------------
 # ----------------------------------------------------------------------------
 if [ -z "${IGNORE_ALL_PIP_INSTALLATION}" ]; then
-  env CXX=$CXX_COMPILER CC=$C_COMPILER $PIP3 install setuptools --upgrade --prefix=$ROOTDIR/.local --find-links file:$ROOTDIR/../cocoa_installation_libraries/pip_cache --no-index 
-  if [ $? -ne 0 ]; then
-    echo "PROBLEM PIP setuptools"
-    return 1
+
+  if [ -z "${MINICONDA_INSTALLATION}" ]; then
+    env CXX=$CXX_COMPILER CC=$C_COMPILER $PIP3 install setuptools --upgrade --prefix=$ROOTDIR/.local --find-links file:$ROOTDIR/../cocoa_installation_libraries/pip_cache --no-index 
+    if [ $? -ne 0 ]; then
+      echo "PROBLEM PIP setuptools"
+      return 1
+    fi
   fi
 
   env CXX=$CXX_COMPILER CC=$C_COMPILER $PIP3 install six --upgrade --prefix=$ROOTDIR/.local --find-links file:$ROOTDIR/../cocoa_installation_libraries/pip_cache --no-index 
@@ -70,16 +73,20 @@ if [ -z "${IGNORE_ALL_PIP_INSTALLATION}" ]; then
     return 1
   fi
 
-  env CXX=$CXX_COMPILER CC=$C_COMPILER $PIP3 install $ROOTDIR/../cocoa_installation_libraries/pip_cache/wheel-0.37.0.tar.gz --upgrade --prefix=$ROOTDIR/.local --find-links file:$ROOTDIR/../cocoa_installation_libraries/pip_cache --no-index
-  if [ $? -ne 0 ]; then
-    echo "PROBLEM PIP wheel"
-    return 1
+  if [ -z "${MINICONDA_INSTALLATION}" ]; then
+    env CXX=$CXX_COMPILER CC=$C_COMPILER $PIP3 install $ROOTDIR/../cocoa_installation_libraries/pip_cache/wheel-0.37.0.tar.gz --upgrade --prefix=$ROOTDIR/.local --find-links file:$ROOTDIR/../cocoa_installation_libraries/pip_cache --no-index
+    if [ $? -ne 0 ]; then
+      echo "PROBLEM PIP wheel"
+      return 1
+    fi
   fi
 
-  env CXX=$CXX_COMPILER CC=$C_COMPILER $PIP3 install pip --upgrade --prefix=$ROOTDIR/.local --find-links file:$ROOTDIR/../cocoa_installation_libraries/pip_cache --no-index 
-  if [ $? -ne 0 ]; then
-    echo "PROBLEM PIP pip"
-    return 1
+  if [ -z "${MINICONDA_INSTALLATION}" ]; then
+    env CXX=$CXX_COMPILER CC=$C_COMPILER $PIP3 install pip --upgrade --prefix=$ROOTDIR/.local --find-links file:$ROOTDIR/../cocoa_installation_libraries/pip_cache --no-index 
+    if [ $? -ne 0 ]; then
+      echo "PROBLEM PIP pip"
+      return 1
+    fi
   fi
 
   env CXX=$CXX_COMPILER CC=$C_COMPILER $PIP3 install wget --upgrade --prefix=$ROOTDIR/.local --find-links file:$ROOTDIR/../cocoa_installation_libraries/pip_cache --no-index 

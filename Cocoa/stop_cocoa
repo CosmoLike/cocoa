@@ -35,6 +35,12 @@ if [ -n "${OLD_CPLUS_INCLUDE_PATH}" ]; then
     unset OLD_CPLUS_INCLUDE_PATH
 fi
 
+if [ -n "${OLD_LDFLAGS}" ]; then
+    export LDFLAGS=$OLD_LDFLAGS
+    unset OLD_LDFLAGS
+fi
+
+
 # ----------------------------------------------------------------------------
 # ----------------------------------------------------------------------------
 # ----------------------------- PLANCK LIKELIHOOD ----------------------------
