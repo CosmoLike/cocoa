@@ -14,7 +14,7 @@ There are three options for installing Cocoa's requirements. The first and more 
 
 In Mac OS system, we recommend using the Docker installation, see appendices [Docker Installation Part I: Further Information for PCs Environment](https://github.com/CosmoLike/cocoa/blob/master/README.md#docker-installation-part-i-further-information-for-pcs-environment) If you want to use Docker on HPCs please go here [Docker Installation Part II: Further Information for HPC Systems](https://github.com/CosmoLike/cocoa/blob/master/README.md#docker-installation-part-ii-further-information-for-hpc-systems).
 
-Below we detail non-Docker, system specific, installation. We suggest users to add the option `-o ServerAliveInterval=60` in the ssh command in order to avoid the death of ssh connection during any steps in the installations
+Below we detail non-Docker, system specific, installation. We suggest users to add the option `-o ServerAliveInterval=60` in the ssh command in order to avoid the death of ssh connection during any steps in the installation.
 
 ### (Optional) conda setup
 A simple way to install most prerequisites is via conda enviroments. This is as simple as using Docker. The first step is to type the following command to create the cocoa conda enviroment. 
