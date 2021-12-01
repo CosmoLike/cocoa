@@ -61,11 +61,7 @@ For manual installation not utilizing conda (not advisable), please see appendic
         
 ## Cloning the Repository
 
-If you aren't a Cocoa developer type (read only repo)
-
-    $ git lfs clone https://github.com/CosmoLike/cocoa.git
-
-However, if you are a Cocoa developer, then type instead
+Type:
 
     $ git lfs clone git@github.com:CosmoLike/cocoa.git
 
