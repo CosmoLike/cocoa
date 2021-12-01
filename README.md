@@ -55,6 +55,8 @@ A simple way to install most prerequisites is via conda enviroments. This is as 
  
     conda activate cocoa
 
+(**Warning**) Make sure your github account has the ssh key from the machine you are going to install cocoa
+
 (**Warning**) When loading the anaconda for the first time via the module system on supercomputers, users sometimes must type the command `conda init bash` before loading any environment. This command will add a particular script in the `bashrc` file. Users then should reload the bashrc script via `source ~/.bashrc`.
 
 For manual installation not utilizing conda (not advisable), please see appendices [Prerequisites for MacOS (System Installation)](https://github.com/CosmoLike/cocoa#prerequisites-for-macos-system-installation) and [Prerequisites for Linux (System Installation)](https://github.com/CosmoLike/cocoa#prerequisites-for-linux-system-installation).
