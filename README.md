@@ -1,22 +1,13 @@
-# Cocoa - The [Cobaya](https://github.com/CobayaSampler)-[CosmoLike](https://github.com/CosmoLike) Joint Architecture
-
-## Overview
+# Overview - Cocoa - The [Cobaya](https://github.com/CobayaSampler)-[CosmoLike](https://github.com/CosmoLike) Joint Architecture
 
 Cocoa allows users to run [CosmoLike](https://github.com/CosmoLike) routines that analyze data primarily from the [Dark Energy Survey](https://www.darkenergysurvey.org) (a.k.a DES), and simulate future multi-probe analyses, e.g. for Rubin Observatory's Legacy Survey of Space and Time or the Roman Space Telescope, inside the [Cobaya](https://github.com/CobayaSampler) framework. This readme file presents basic and advanced instructions for installing all Cocoa components, including the [Planck likelihood](https://wiki.cosmos.esa.int/planck-legacy-archive/index.php/Main_Page). **By no means, we want to discourage general users from cloning Cobaya, CAMB, CLASS, Polychord, and Planck data from their original repositories. Please check the appendix [Proper Credits](https://github.com/CosmoLike/cocoa#proper-credits)**. 
 
 Cocoa developers explicitly copied all Boltzman codes, likelihoods, Cocoa Sampler, and all python/C/C++/Fortran requirements to create a very controllable environment that will ensure the reproducibility of our DES-Y3 and LSST-Y1 results. All packages have been stored in [cocoa_installation_libraries](https://github.com/CosmoLike/cocoa/tree/main/cocoa_installation_libraries) folder, allowing the consistent installation even on compute nodes without internet access.
 
-# Installation
+# Installation of cocoa required packages
 
-## Before Cloning the Repository
+## Through conda (best for Linux/HPC environments)
 
-There are three options for installing Cocoa's requirements. The first and more straightforward option is via Docker containers. The second, almost as simple as installation via Docker, utilizes conda enviroments. Finally, there is manual installation using the packages located on the cache folder [cocoa_installation_libraries](https://github.com/CosmoLike/cocoa/tree/main/cocoa_installation_libraries).
-
-In Mac OS system, we recommend using the Docker installation, see appendices [Docker Installation Part I: Further Information for PCs Environment](https://github.com/CosmoLike/cocoa/blob/master/README.md#docker-installation-part-i-further-information-for-pcs-environment) If you want to use Docker on HPCs please go here [Docker Installation Part II: Further Information for HPC Systems](https://github.com/CosmoLike/cocoa/blob/master/README.md#docker-installation-part-ii-further-information-for-hpc-systems).
-
-Below we detail non-Docker, system specific, installation. We suggest users to add the option `-o ServerAliveInterval=60` in the ssh command in order to avoid the death of ssh connection during any steps in the installation.
-
-### (Optional) conda setup
 A simple way to install most prerequisites is via conda enviroments. This is as simple as using Docker. The first step is to type the following command to create the cocoa conda enviroment. 
 
     conda create --name cocoa python=3.7 --quiet --yes
@@ -55,9 +46,147 @@ A simple way to install most prerequisites is via conda enviroments. This is as 
  
     conda activate cocoa
 
-(**Warning**) Make sure your github account has the ssh key from the machine you are going to install cocoa
-
 (**Warning**) When loading the anaconda for the first time via the module system on supercomputers, users sometimes must type the command `conda init bash` before loading any environment. This command will add a particular script in the `bashrc` file. Users then should reload the bashrc script via `source ~/.bashrc`.
+
+## Through docker (best if you dislike conda)
+
+### Information for PCs Environment
+
+We highly advise users to run Cocoa inside an instantiation of the [Whovian-Cosmo](https://hub.docker.com/r/vivianmiranda/whovian-cosmo) docker image. Installation of the [docker engine](https://docs.docker.com/engine/) on local PCs is a reasonably straightforward process - see the [official documentation](https://docs.docker.com/engine/install/) for OS-specific instructions.
+
+  The only step left is the command on macOS:
+
+    $ docker run -it -p 8080:8888 -v $(pwd):/home/whovian/host/ -v ~/.ssh:/home/whovian/.ssh:ro vivianmiranda/whovian-cosmo:version-1.0.2
+
+For linux users, use the following command instead:
+
+    $ docker run -it -p 8080:8888 --user $(id -u):$(id -g) -v $(pwd):/home/whovian/host/ -v ~/.ssh:/home/whovian/.ssh:ro vivianmiranda/whovian-cosmo:version-1.0.2
+
+The bind of the `~/.ssh` folder in the commands above allows users to commit and clone from inside the container. Both commands need to be invoked on the parent folder so the docker container will have access to the listed folders on the host OS. When running the command `docker run` on a specific container for the first time, the docker engine will automatically download the corresponding [Docker Hub](https://hub.docker.com/) image.
+This step may take some time, as the [Whovian-Cosmo](https://hub.docker.com/r/vivianmiranda/whovian-cosmo) image has approximately 700 Megabytes.
+
+  The last step is to access the folder `/home/whovian/host/` where the host files have been mounted:
+
+    $ cd /home/whovian/host/
+
+and proceed to the section [Cloning the Repository](https://github.com/CosmoLike/cocoa#cloning-the-repository). **There isn't permanent storage outside `/home/whovian/host/`. Be aware of this fact to not lose any work**.
+
+PS: If users want to use Jupiter notebooks from the container at any time during development (the [Cobaya](https://github.com/CobayaSampler) framework that Cocoa heavily depends on has excellent integration with Jupyter notebooks), then we advise them to read appendix [Running Jupyter Notebooks inside the Whovian-Cosmo container](https://github.com/CosmoLike/cocoa/blob/master/README.md#running-jupyter-notebooks-inside-the-whovian-cosmo-container) for in-depth instructions.
+
+
+### Information for HPC Systems
+
+HPC systems don't allow users to run docker containers using the standard [docker engine](https://docs.docker.com/engine/) for [security reasons](https://www.reddit.com/r/docker/comments/7y2yp2/why_is_singularity_used_as_opposed_to_docker_in/?utm_source=share&utm_medium=web2x&context=3). There is, however, an alternative engine called [Singularity](https://sylabs.io/guides/3.6/user-guide/index.html) that can run docker images in compliance with HPC security requirements. The [Singularity](https://sylabs.io/guides/3.6/user-guide/index.html) engine installation requires administrative privileges. However, many HPC systems have already adopted it.
+
+To run docker images with Singularity, go to the folder you want to store the image and type:
+
+    singularity build whovian-cosmo docker://vivianmiranda/whovian-cosmo
+
+This command will download the [Whovian-Cosmo](https://hub.docker.com/r/vivianmiranda/whovian-cosmo) image and convert it to an image format that can be accessed via Singularity (Singularity takes a few minutes to do such conversion). To run the container interactively, type:
+
+    singularity shell --no-home --bind /path/to/cocoa:/home/whovian/host --bind ~/.ssh:/home/whovian/.ssh:ro whovian-cosmo
+
+after requesting interactive nodes successfully (never run jobs on login nodes!). The bind of the `~/.ssh` folder in the command above allows users to commit and clone from inside the container. The last step is to access the folder `/home/whovian/host/` where the host files have been mounted
+
+    $ cd /home/whovian/host/
+
+and proceed to the section [Cloning the Repository](https://github.com/CosmoLike/cocoa#cloning-the-repository). **There isn't permanent storage outside `/home/whovian/host/`. Be aware of this fact to not lose any work**
+
+PS: If users want to use Jupiter notebooks from the container at any time during development (the [Cobaya](https://github.com/CobayaSampler) framework that Cocoa heavily depends on has excellent integration with Jupyter notebooks), then we advise them to read appendix [Running Jupyter Notebooks inside the Whovian-Cosmo container](https://github.com/CosmoLike/cocoa/blob/master/README.md#running-jupyter-notebooks-inside-the-whovian-cosmo-container) for in-depth instructions.
+
+## Via homebrew on mac (work in progress)
+
+We are quite flexible on the installation procedures for MacOS (see appendix: [Prerequisites for MacOS](https://github.com/CosmoLike/cocoa#prerequisites-for-macos-system-installation)) because our group rarely runs production-ready code in such an environment. This is a general guideline, and given how frequent [Homebrew](https://brew.sh) updates its packages, there is no garanttee that it will work without additional tweaks.  
+
+We assume the user adopts [Homebrew](https://brew.sh) as the OS package manager, and [BASH](https://www.howtogeek.com/444596/how-to-change-the-default-shell-to-bash-in-macos-catalina/) as the default shell. While alternatives, such as [MacPorts](https://www.macports.org) and [Fink](http://www.finkproject.org), may provide all the requirements, we don't  present instructions for them. We also don't provide documentation for installation on [zsh](https://www.howtogeek.com/444596/how-to-change-the-default-shell-to-bash-in-macos-catalina/) shell, the default shell on macOS Catalina. Finally, we also assume all contributors have added their ssh-keys to Cocoa's private submodules.
+
+Here is a list of Homebrew and pip commands that install most dependencies
+
+    brew install gcc@9
+    alias brew='HOMEBREW_CC=gcc-9 HOMEBREW_CXX=g++-9 brew'
+    brew install open-mpi --build-from-source
+    brew install git
+    brew install git-lfs
+    git lfs install
+    git lfs install --system
+    brew install gmp --build-from-source
+    brew install hdf5 --build-from-source
+    brew install python@3.7 || (brew upgrade python@3.7 && brew cleanup python@3.7)
+    brew install cmake || (brew upgrade cmake && brew cleanup cmake)
+    brew install armadillo --build-from-source
+    brew install boost --build-from-source
+    brew install gsl || (brew upgrade gsl && brew cleanup gsl)
+    brew install fftw || (brew upgrade fftw && brew cleanup fftw)
+    brew install cfitsio || (brew upgrade cfitsio && brew cleanup cfitsio)
+    brew install lapack || (brew upgrade lapack && brew cleanup lapack)
+    brew install findutils || (brew upgrade findutils && brew cleanup findutils)
+    brew install xz || (brew upgrade xz && brew cleanup xz)
+    export PATH="/usr/local/opt/python@3.7/bin:$PATH"
+
+    pip3.7 install virtualenv --upgrade
+    pip3.7 install wget --upgrade
+    pip3.7 install wheel --upgrade
+    pip3.7 install setuptools --upgrade
+    pip3.7 install six --upgrade
+    pip3.7 install python-dateutil --upgrade
+    pip3.7 install pytz --upgrade
+    pip3.7 install mpmath --upgrade
+    pip3.7 install PyYAML --upgrade
+    pip3.7 install pyparsing --upgrade
+    pip3.7 install fuzzywuzzy --upgrade
+    pip3.7 install cycler --upgrade
+    pip3.7 install kiwisolver --upgrade
+    pip3.7 install enum34 --upgrade
+    pip3.7 install pillow --upgrade
+    pip3.7 install numpy --upgrade
+    pip3.7 install scipy --upgrade
+    pip3.7 install sympy --upgrade
+    pip3.7 install cython  --upgrade
+    pip3.7 install imageio --upgrade
+    pip3.7 install pillow --upgrade
+    pip3.7 install pandas --upgrade
+    pip3.7 install py-bobyqa --upgrade
+    pip3.7 install matplotlib --upgrade
+    pip3.7 install pybind11 --upgrade
+    pip3.7 install GetDist --upgrade
+    pip3.7 install astropy --upgrade
+    pip3.7 install pyfits --upgrade
+
+**It is also necessary to update `$PATH`** so the OS can detect the [Homebrew](https://brew.sh) python installation. Adding to `~/.bash_profile` code similar to the lines below should be enough (don't forget to replace `XXX` by the user's home folder):
+
+    python3=/Users/XXX/Library/Python/3.7/bin
+    export PATH=$python3:$PATH
+    
+
+There are three options for installing Cocoa's requirements. The first and more straightforward option is via Docker containers. The second, almost as simple as installation via Docker, utilizes conda enviroments. Finally, there is manual installation using the packages located on the cache folder [cocoa_installation_libraries](https://github.com/CosmoLike/cocoa/tree/main/cocoa_installation_libraries).
+
+In Mac OS system, we recommend using the Docker installation, see appendices [Docker Installation Part I: Further Information for PCs Environment](https://github.com/CosmoLike/cocoa/blob/master/README.md#docker-installation-part-i-further-information-for-pcs-environment) If you want to use Docker on HPCs please go here [Docker Installation Part II: Further Information for HPC Systems](https://github.com/CosmoLike/cocoa/blob/master/README.md#docker-installation-part-ii-further-information-for-hpc-systems).
+
+Below we detail non-Docker, system specific, installation. We suggest users to add the option `-o ServerAliveInterval=60` in the ssh command in order to avoid the death of ssh connection during any steps in the installation.
+
+## For advanced users - manual installation (not advisable)
+
+We assume the user has the following packages installed to perform the manual installation:
+
+   - [Bash](https://www.amazon.com/dp/B0043GXMSY/ref=cm_sw_em_r_mt_dp_x3UoFbDXSXRBT);
+   - [Git](https://git-scm.com) v1.8+;
+   - [Git LFS](https://git-lfs.github.com);
+   - [gcc](https://gcc.gnu.org) v10.*;
+   - [gfortran](https://gcc.gnu.org) v10.*;
+   - [g++](https://gcc.gnu.org) v10.*;
+   - [Python](https://www.python.org) v3.7.*;
+   - [PIP package manager](https://pip.pypa.io/en/stable/installing/)
+   - [Python Virtual Environment](https://www.geeksforgeeks.org/python-virtual-environment/)
+
+We also assume all contributors have added their [ssh-keys](https://docs.github.com/en/enterprise/2.15/user/articles/adding-a-new-ssh-key-to-your-github-account) to Cocoa's private submodules. Note that
+
+   - **zsh (the Z shell) is not a valid substitution for bash**,
+
+
+
+
+### (Optional) conda setup
+
 
 For manual installation not utilizing conda (not advisable), please see appendices [Prerequisites for MacOS (System Installation)](https://github.com/CosmoLike/cocoa#prerequisites-for-macos-system-installation) and [Prerequisites for Linux (System Installation)](https://github.com/CosmoLike/cocoa#prerequisites-for-linux-system-installation).
         
@@ -154,132 +283,9 @@ The `cocoa_XXX` folder that host the `XXX` project needs to have the more or les
       
 # Appendix
 
-## Prerequisites for Linux (System Installation)
 
-We assume the user has the following packages installed:
-
-   - [Bash](https://www.amazon.com/dp/B0043GXMSY/ref=cm_sw_em_r_mt_dp_x3UoFbDXSXRBT);
-   - [Git](https://git-scm.com) v1.8+;
-   - [Git LFS](https://git-lfs.github.com);
-   - [gcc](https://gcc.gnu.org) v9.*;
-   - [gfortran](https://gcc.gnu.org) v9.*;
-   - [g++](https://gcc.gnu.org) v9.*;
-   - [Python](https://www.python.org) v3.7.*;
-   - [PIP package manager](https://pip.pypa.io/en/stable/installing/)
-   - [Python Virtual Environment](https://www.geeksforgeeks.org/python-virtual-environment/)
-
-We also assume all contributors have added their [ssh-keys](https://docs.github.com/en/enterprise/2.15/user/articles/adding-a-new-ssh-key-to-your-github-account) to Cocoa's private submodules. Note that
-
-   - **zsh (the Z shell) is not a valid substitution for bash**,
-
-
-
-## Prerequisites for MacOS (System Installation)
-
-We are quite flexible on the installation procedures for MacOS (see appendix: [Prerequisites for MacOS](https://github.com/CosmoLike/cocoa#prerequisites-for-macos-system-installation)) because our group rarely runs production-ready code in such an environment.
-
-We assume the user adopts [Homebrew](https://brew.sh) as the OS package manager, and [BASH](https://www.howtogeek.com/444596/how-to-change-the-default-shell-to-bash-in-macos-catalina/) as the default shell. While alternatives, such as [MacPorts](https://www.macports.org) and [Fink](http://www.finkproject.org), may provide all the requirements, we don't  present instructions for them. We also don't provide documentation for installation on [zsh](https://www.howtogeek.com/444596/how-to-change-the-default-shell-to-bash-in-macos-catalina/) shell, the default shell on macOS Catalina. Finally, we also assume all contributors have added their ssh-keys to Cocoa's private submodules.
-
-Here is a list of Homebrew and pip commands that install most dependencies
-
-    brew install gcc@9
-    alias brew='HOMEBREW_CC=gcc-9 HOMEBREW_CXX=g++-9 brew'
-    brew install open-mpi || (brew upgrade open-mpi && brew cleanup open-mpi)
-    brew install git || (brew upgrade git && brew cleanup git)
-    brew install git-lfs || (brew upgrade git-lfs && brew cleanup git-lfs)
-    git lfs install
-    git lfs install --system
-    brew install gmp --build-from-source
-    brew install hdf5 --build-from-source
-    brew install python@3.7 || (brew upgrade python@3.7 && brew cleanup python@3.7)
-    brew install cmake || (brew upgrade cmake && brew cleanup cmake)
-    brew install armadillo --build-from-source
-    brew install boost --build-from-source
-    brew install gsl || (brew upgrade gsl && brew cleanup gsl)
-    brew install fftw || (brew upgrade fftw && brew cleanup fftw)
-    brew install cfitsio || (brew upgrade cfitsio && brew cleanup cfitsio)
-    brew install lapack || (brew upgrade lapack && brew cleanup lapack)
-    brew install findutils || (brew upgrade findutils && brew cleanup findutils)
-    brew install xz || (brew upgrade xz && brew cleanup xz)
-    export PATH="/usr/local/opt/python@3.7/bin:$PATH"
-
-    pip3.7 install virtualenv --upgrade
-    pip3.7 install wget --upgrade
-    pip3.7 install wheel --upgrade
-    pip3.7 install setuptools --upgrade
-    pip3.7 install six --upgrade
-    pip3.7 install python-dateutil --upgrade
-    pip3.7 install pytz --upgrade
-    pip3.7 install mpmath --upgrade
-    pip3.7 install PyYAML --upgrade
-    pip3.7 install pyparsing --upgrade
-    pip3.7 install fuzzywuzzy --upgrade
-    pip3.7 install cycler --upgrade
-    pip3.7 install kiwisolver --upgrade
-    pip3.7 install enum34 --upgrade
-    pip3.7 install pillow --upgrade
-    pip3.7 install numpy --upgrade
-    pip3.7 install scipy --upgrade
-    pip3.7 install sympy --upgrade
-    pip3.7 install cython  --upgrade
-    pip3.7 install imageio --upgrade
-    pip3.7 install pillow --upgrade
-    pip3.7 install pandas --upgrade
-    pip3.7 install py-bobyqa --upgrade
-    pip3.7 install matplotlib --upgrade
-    pip3.7 install pybind11 --upgrade
-    pip3.7 install GetDist --upgrade
-    pip3.7 install astropy --upgrade
-    pip3.7 install pyfits --upgrade
-
-**It is also necessary to update `$PATH`** so the OS can detect the [Homebrew](https://brew.sh) python installation. Adding to `~/.bash_profile` code similar to the lines below should be enough (don't forget to replace `XXX` by the user's home folder):
-
-    python3=/Users/XXX/Library/Python/3.7/bin
-    export PATH=$python3:$PATH
     
-## Docker Installation Part I: Further Information for PCs Environment
 
-We highly advise users to run Cocoa inside an instantiation of the [Whovian-Cosmo](https://hub.docker.com/r/vivianmiranda/whovian-cosmo) docker image. Installation of the [docker engine](https://docs.docker.com/engine/) on local PCs is a reasonably straightforward process - see the [official documentation](https://docs.docker.com/engine/install/) for OS-specific instructions.
-
-  The only step left is the command on macOS:
-
-    $ docker run -it -p 8080:8888 -v $(pwd):/home/whovian/host/ -v ~/.ssh:/home/whovian/.ssh:ro vivianmiranda/whovian-cosmo:version-1.0.2
-
-For linux users, use the following command instead:
-
-    $ docker run -it -p 8080:8888 --user $(id -u):$(id -g) -v $(pwd):/home/whovian/host/ -v ~/.ssh:/home/whovian/.ssh:ro vivianmiranda/whovian-cosmo:version-1.0.2
-
-The bind of the `~/.ssh` folder in the commands above allows users to commit and clone from inside the container. Both commands need to be invoked on the parent folder so the docker container will have access to the listed folders on the host OS. When running the command `docker run` on a specific container for the first time, the docker engine will automatically download the corresponding [Docker Hub](https://hub.docker.com/) image.
-This step may take some time, as the [Whovian-Cosmo](https://hub.docker.com/r/vivianmiranda/whovian-cosmo) image has approximately 700 Megabytes.
-
-  The last step is to access the folder `/home/whovian/host/` where the host files have been mounted:
-
-    $ cd /home/whovian/host/
-
-and proceed to the section [Cloning the Repository](https://github.com/CosmoLike/cocoa#cloning-the-repository). **There isn't permanent storage outside `/home/whovian/host/`. Be aware of this fact to not lose any work**.
-
-PS: If users want to use Jupiter notebooks from the container at any time during development (the [Cobaya](https://github.com/CobayaSampler) framework that Cocoa heavily depends on has excellent integration with Jupyter notebooks), then we advise them to read appendix [Running Jupyter Notebooks inside the Whovian-Cosmo container](https://github.com/CosmoLike/cocoa/blob/master/README.md#running-jupyter-notebooks-inside-the-whovian-cosmo-container) for in-depth instructions.
-
-
-## Docker Installation Part II: Further Information for HPC Systems
-
-HPC systems don't allow users to run docker containers using the standard [docker engine](https://docs.docker.com/engine/) for [security reasons](https://www.reddit.com/r/docker/comments/7y2yp2/why_is_singularity_used_as_opposed_to_docker_in/?utm_source=share&utm_medium=web2x&context=3). There is, however, an alternative engine called [Singularity](https://sylabs.io/guides/3.6/user-guide/index.html) that can run docker images in compliance with HPC security requirements. The [Singularity](https://sylabs.io/guides/3.6/user-guide/index.html) engine installation requires administrative privileges. However, many HPC systems have already adopted it.
-
-To run docker images with Singularity, go to the folder you want to store the image and type:
-
-    singularity build whovian-cosmo docker://vivianmiranda/whovian-cosmo
-
-This command will download the [Whovian-Cosmo](https://hub.docker.com/r/vivianmiranda/whovian-cosmo) image and convert it to an image format that can be accessed via Singularity (Singularity takes a few minutes to do such conversion). To run the container interactively, type:
-
-    singularity shell --no-home --bind /path/to/cocoa:/home/whovian/host --bind ~/.ssh:/home/whovian/.ssh:ro whovian-cosmo
-
-after requesting interactive nodes successfully (never run jobs on login nodes!). The bind of the `~/.ssh` folder in the command above allows users to commit and clone from inside the container. The last step is to access the folder `/home/whovian/host/` where the host files have been mounted
-
-    $ cd /home/whovian/host/
-
-and proceed to the section [Cloning the Repository](https://github.com/CosmoLike/cocoa#cloning-the-repository). **There isn't permanent storage outside `/home/whovian/host/`. Be aware of this fact to not lose any work**
-
-PS: If users want to use Jupiter notebooks from the container at any time during development (the [Cobaya](https://github.com/CobayaSampler) framework that Cocoa heavily depends on has excellent integration with Jupyter notebooks), then we advise them to read appendix [Running Jupyter Notebooks inside the Whovian-Cosmo container](https://github.com/CosmoLike/cocoa/blob/master/README.md#running-jupyter-notebooks-inside-the-whovian-cosmo-container) for in-depth instructions.
 
 ## System Installation: Further Information for Linux
 
