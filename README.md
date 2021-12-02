@@ -6,7 +6,7 @@ Cocoa developers explicitly copied all Boltzman codes, likelihoods, Cocoa Sample
 
 # Installation of cocoa required packages
 
-## Through conda (best for Linux/HPC environments)
+### Through conda (best for Linux/HPC environments)
 
 A simple way to install most prerequisites is via conda enviroments. This is as simple as using Docker. The first step is to type the following command to create the cocoa conda enviroment. 
 
@@ -48,11 +48,11 @@ A simple way to install most prerequisites is via conda enviroments. This is as 
 
 (**Warning**) When loading the anaconda for the first time via the module system on supercomputers, users sometimes must type the command `conda init bash` before loading any environment. This command will add a particular script in the `bashrc` file. Users then should reload the bashrc script via `source ~/.bashrc`.
 
-## Through docker (best if you dislike conda)
+### Through docker (best if you dislike conda)
 
-### Information for PCs Environment
+#### Information for PCs Environment
 
-We highly advise users to run Cocoa inside an instantiation of the [Whovian-Cosmo](https://hub.docker.com/r/vivianmiranda/whovian-cosmo) docker image. Installation of the [docker engine](https://docs.docker.com/engine/) on local PCs is a reasonably straightforward process - see the [official documentation](https://docs.docker.com/engine/install/) for OS-specific instructions.
+This installation will allow users to run Cocoa inside an instantiation of the [Whovian-Cosmo](https://hub.docker.com/r/vivianmiranda/whovian-cosmo) docker image. Installation of the [docker engine](https://docs.docker.com/engine/) on local PCs is a reasonably straightforward process - see the [official documentation](https://docs.docker.com/engine/install/) for OS-specific instructions.
 
   The only step left is the command on macOS:
 
@@ -73,8 +73,7 @@ and proceed to the section [Cloning the Repository](https://github.com/CosmoLike
 
 PS: If users want to use Jupiter notebooks from the container at any time during development (the [Cobaya](https://github.com/CobayaSampler) framework that Cocoa heavily depends on has excellent integration with Jupyter notebooks), then we advise them to read appendix [Running Jupyter Notebooks inside the Whovian-Cosmo container](https://github.com/CosmoLike/cocoa/blob/master/README.md#running-jupyter-notebooks-inside-the-whovian-cosmo-container) for in-depth instructions.
 
-
-### Information for HPC Systems
+#### Information for HPC Systems
 
 HPC systems don't allow users to run docker containers using the standard [docker engine](https://docs.docker.com/engine/) for [security reasons](https://www.reddit.com/r/docker/comments/7y2yp2/why_is_singularity_used_as_opposed_to_docker_in/?utm_source=share&utm_medium=web2x&context=3). There is, however, an alternative engine called [Singularity](https://sylabs.io/guides/3.6/user-guide/index.html) that can run docker images in compliance with HPC security requirements. The [Singularity](https://sylabs.io/guides/3.6/user-guide/index.html) engine installation requires administrative privileges. However, many HPC systems have already adopted it.
 
@@ -94,7 +93,7 @@ and proceed to the section [Cloning the Repository](https://github.com/CosmoLike
 
 PS: If users want to use Jupiter notebooks from the container at any time during development (the [Cobaya](https://github.com/CobayaSampler) framework that Cocoa heavily depends on has excellent integration with Jupyter notebooks), then we advise them to read appendix [Running Jupyter Notebooks inside the Whovian-Cosmo container](https://github.com/CosmoLike/cocoa/blob/master/README.md#running-jupyter-notebooks-inside-the-whovian-cosmo-container) for in-depth instructions.
 
-## Via homebrew on mac (work in progress)
+### Via homebrew on mac (work in progress)
 
 We are quite flexible on the installation procedures for MacOS (see appendix: [Prerequisites for MacOS](https://github.com/CosmoLike/cocoa#prerequisites-for-macos-system-installation)) because our group rarely runs production-ready code in such an environment. This is a general guideline, and given how frequent [Homebrew](https://brew.sh) updates its packages, there is no garanttee that it will work without additional tweaks.  
 
@@ -102,8 +101,8 @@ We assume the user adopts [Homebrew](https://brew.sh) as the OS package manager,
 
 Here is a list of Homebrew and pip commands that install most dependencies
 
-    brew install gcc@9
-    alias brew='HOMEBREW_CC=gcc-9 HOMEBREW_CXX=g++-9 brew'
+    brew install gcc@10
+    alias brew='HOMEBREW_CC=gcc-10 HOMEBREW_CXX=g++-10 brew'
     brew install open-mpi --build-from-source
     brew install git
     brew install git-lfs
@@ -156,15 +155,8 @@ Here is a list of Homebrew and pip commands that install most dependencies
 
     python3=/Users/XXX/Library/Python/3.7/bin
     export PATH=$python3:$PATH
-    
-
-There are three options for installing Cocoa's requirements. The first and more straightforward option is via Docker containers. The second, almost as simple as installation via Docker, utilizes conda enviroments. Finally, there is manual installation using the packages located on the cache folder [cocoa_installation_libraries](https://github.com/CosmoLike/cocoa/tree/main/cocoa_installation_libraries).
-
-In Mac OS system, we recommend using the Docker installation, see appendices [Docker Installation Part I: Further Information for PCs Environment](https://github.com/CosmoLike/cocoa/blob/master/README.md#docker-installation-part-i-further-information-for-pcs-environment) If you want to use Docker on HPCs please go here [Docker Installation Part II: Further Information for HPC Systems](https://github.com/CosmoLike/cocoa/blob/master/README.md#docker-installation-part-ii-further-information-for-hpc-systems).
-
-Below we detail non-Docker, system specific, installation. We suggest users to add the option `-o ServerAliveInterval=60` in the ssh command in order to avoid the death of ssh connection during any steps in the installation.
-
-## For advanced users - manual installation (not advisable)
+   
+### For advanced users - manual installation (not advisable)
 
 We assume the user has the following packages installed to perform the manual installation:
 
@@ -183,14 +175,9 @@ We also assume all contributors have added their [ssh-keys](https://docs.github.
    - **zsh (the Z shell) is not a valid substitution for bash**,
 
 
+# Installation of cocoa base code
 
-
-### (Optional) conda setup
-
-
-For manual installation not utilizing conda (not advisable), please see appendices [Prerequisites for MacOS (System Installation)](https://github.com/CosmoLike/cocoa#prerequisites-for-macos-system-installation) and [Prerequisites for Linux (System Installation)](https://github.com/CosmoLike/cocoa#prerequisites-for-linux-system-installation).
-        
-## Cloning the Repository
+### Cloning
 
 Type:
 
@@ -198,7 +185,7 @@ Type:
 
 (**Warning**) We have a monthly quota of only 150 GB in bandwidth for [Git LFS](https://git-lfs.github.com) files, and therefore we ask users to use good judgment in the number of times they clone repositories with large files (each clone will download around 5GB from Git LFS). See appendix [Git LFS](https://github.com/CosmoLike/cocoa/blob/master/README.md#git-lfs) for further information.
 
-## Installation/Compilation of Numerical libraries
+### Installation/Compilation of Numerical libraries (CAMB/CLASS/Planck..)
 
 Cocoa chooses the preferred method of installation via special environment keys located on [set_installation_options](https://github.com/CosmoLike/cocoa/blob/master/Cocoa/set_installation_options) script (Docker is the default option)
 
