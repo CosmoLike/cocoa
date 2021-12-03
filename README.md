@@ -167,7 +167,7 @@ Users can now proceed to the section [Installation of cocoa base code](https://g
 
 ### Via Cocoa's internal scripts and cache
 
-(**Warning**) This method is painfully slow, not advisable. It does, however, offer users that don't work with Minicoda/Anaconda the opportunity to encapsulate the installation of required packages. *The Conda or Docker installation are always preferred*. 
+(**Warning**) This method is painfully slow, not advisable. It does, however, offer users that don't work with Conda the opportunity to encapsulate the installation of required packages. *The Conda or Docker installation are always preferred*. 
 
 Whenever Conda or Docker installation procedures are unavailable, the user can still perform a local semi-autonomous installation on Linux based on a few scripts we implemented. We also provide a local copy of most required packages on Cocoa's cache folder [cocoa_installation_libraries](https://github.com/CosmoLike/cocoa/tree/main/cocoa_installation_libraries), as there are HPC machines where compute nodes that compile code don't have internet access (NASA Pleiades being one example). We, therefore, only assume the pre-installation of the following packages to perform the local setup:
 
