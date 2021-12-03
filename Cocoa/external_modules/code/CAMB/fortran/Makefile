@@ -94,8 +94,8 @@ gfortErr = 0
 ifeq "$(gfortErr)" "0"
 #Gfortran compiler (version 6+):
 #compiler_ver = $(shell gfortran -dumpversion 2>&1)
-COMPILER ?= gfortran
-F90C     ?= gfortran
+COMPILER ?= $(FORTRAN_COMPILER)
+F90C     ?= $(FORTRAN_COMPILER)
 #COMPILER = gfortran
 #F90C     = gfortran
 #VM ENDS

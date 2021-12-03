@@ -1,13 +1,18 @@
+# ---------------------------------------------------
+# ---------------------------------------------------
+#VM BEGINS
 ifdef MPI
-FC = mpif90
-CC = mpicc
-CXX = mpicxx
+FC = $(MPI_FORTRAN_COMPILER)
+CC = $(MPI_CC_COMPILER)
+CXX = $(MPI_CXX_COMPILER)
 else
-FC = gfortran
+FC = $(FORTRAN_COMPILER)
 endif
+#VM ENDS
+# ---------------------------------------------------
+# ---------------------------------------------------
 
 LD = $(FC)
-
 
 # Archive tool
 AR = ar rv
@@ -50,4 +55,10 @@ else
 FFLAGS += -Ofast
 CXXFLAGS += -Ofast
 CXFLAGS += -Ofast
+
+# ---------------------------------------------------
+#VM BEGINS
+FFLAGS +=  -fallow-argument-mismatch
+#VM ENDS
+# ---------------------------------------------------
 endif

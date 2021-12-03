@@ -31,7 +31,7 @@ if [ -z "${IGNORE_DISTUTILS_INSTALLATION}" ]; then
 
     make install > /dev/null 2> /dev/null
 
-    cd $ROOTDIR/../cocoa_installation_libraries/binutils-2.34
+    cd $ROOTDIR/../cocoa_installation_libraries/binutils-2.37
 
     FC=$FORTRAN_COMPILER CC=$C_COMPILER ./configure --prefix=$ROOTDIR/.local > /dev/null 2> /dev/null
 

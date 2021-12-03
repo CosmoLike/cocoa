@@ -174,9 +174,11 @@ def gfortran_conf(ctx):
       mopt = ["-m64"]
   else:
     ctx.env.append_value('FCFLAGS',ctx.env.mopt)
-  ctx.start_msg("Check gfortran version") 
+  ctx.start_msg("Check gfortran version")
   v90 = ctx.cmd_and_log(" ".join(ctx.env.FC)+" --version",quiet=Context.STDOUT).split("\n")[0].strip()
-  version90 = re.findall("(4\.[0-9]\.[0-9])",v90)
+  #VM BEGINS
+  version90 = re.findall("([0-9]+\.[0-9]\.[0-9])",v90)
+  #VM ENDS
   if len(version90)<1:
     #Logs.pprint("PINK","Can't get gfortran version... Let's hope for the best")
     ctx.end_msg("not found, let's hope for the best...",color="PINK")

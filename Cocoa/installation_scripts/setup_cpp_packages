@@ -71,7 +71,10 @@ if [ -z "${IGNORE_CPP_ARMA_INSTALLATION}" ]; then
 
     rm -f CMakeCache.txt
 
-    $CMAKE -DBUILD_SHARED_LIBS=TRUE -DCMAKE_INSTALL_PREFIX=$ROOTDIR/.local -DCMAKE_C_COMPILER=$C_COMPILER -DCMAKE_CXX_COMPILER=$CXX_COMPILER -DCMAKE_FC_COMPILER=FORTRAN_COMPILER --log-level=ERROR . > /dev/null 2> /dev/null
+    $CMAKE -DBUILD_SHARED_LIBS=TRUE -DCMAKE_INSTALL_PREFIX=$ROOTDIR/.local \
+    -DCMAKE_C_COMPILER=$C_COMPILER -DCMAKE_CXX_COMPILER=$CXX_COMPILER \
+    -DLAPACK_FOUND=YES -DLAPACK_LIBRARIES=$ROOTDIR/.local/lib/liblapack.so \
+    -DBLAS_FOUND=NO --log-level=ERROR . > /dev/null 2> /dev/null
     if [ $? -eq 0 ] 
     then
       echo "CMAKE ARMA OK"
@@ -79,7 +82,7 @@ if [ -z "${IGNORE_CPP_ARMA_INSTALLATION}" ]; then
       echo "ARMA COULD NOT CMAKE" >&2
       return 1
     fi
-
+    make clean
     make -j $MAKE_NUM_THREADS all -Wno-dev > /dev/null 2> /dev/null
     if [ $? -eq 0 ] 
     then

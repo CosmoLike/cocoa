@@ -19,9 +19,9 @@ vpath .base build
 # your C compiler:
 #VM BEGINS
 CC       ?= gcc
-#VM ENDS
 #CC       = icc
 #CC       = pgcc
+#VM ENDS
 
 # your tool for creating static libraries:
 AR        = ar rv

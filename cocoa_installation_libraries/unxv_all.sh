@@ -159,15 +159,19 @@ else
 fi
 
 if [ -z "${IGNORE_FORTRAN_INSTALLATION}" ]; then
-    echo 'DECOMPRESSING FORTRAN LAPACK LIBRARY'
-    if [ -z "${THREAD_UNXZ}" ]; then
-      rm -rf ./lapack-3.9.0/
-      tar xf lapack390.xz
-      proc11=$!
+    if [ -z "${IGNORE_FORTRAN_LAPACK_INSTALLATION}" ]; then
+        echo 'DECOMPRESSING FORTRAN LAPACK LIBRARY'
+        if [ -z "${THREAD_UNXZ}" ]; then
+          rm -rf ./lapack-3.9.0/
+          tar xf lapack390.xz
+          proc11=$!
+        else
+          rm -rf ./lapack-3.9.0/
+          tar xf lapack390.xz &
+          proc11=$!
+        fi
     else
-      rm -rf ./lapack-3.9.0/
-      tar xf lapack390.xz &
-      proc11=$!
+        proc11=1
     fi
 else
   proc11=1
@@ -175,17 +179,17 @@ fi
 
 if [ -z "${IGNORE_DISTUTILS_INSTALLATION}" ]; then
     echo 'DECOMPRESSING BINUTILS'
-    rm -rf ./binutils-2.34/
+    rm -rf ./binutils-2.37/
     rm -rf ./texinfo-6.7/
     if [ -z "${THREAD_UNXZ}" ]; then
         tar xf texinfo-6.7.xz
         proc12=$!
-        tar xf binutils-2.34.xz
+        tar xf binutils-2.37.xz
         proc13=$!
     else
         tar xf texinfo-6.7.xz &
         proc12=$!
-        tar xf binutils-2.34.xz &
+        tar xf binutils-2.37.xz &
         proc13=$!
     fi
 else
