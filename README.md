@@ -229,11 +229,12 @@ Type:
 
     $ git lfs clone git@github.com:CosmoLike/cocoa.git
 
-(**Warning**) We have a monthly quota of only 150 GB in bandwidth for [Git LFS](https://git-lfs.github.com) files, and therefore we ask users to use good judgment in the number of times they clone repositories with large files (each clone will download around 5GB from Git LFS). See appendix [Git LFS](https://github.com/CosmoLike/cocoa/blob/master/README.md#git-lfs) for further information.
+(**Warning**) We have a monthly quota of only 150 GB in bandwidth for [Git LFS](https://git-lfs.github.com) files, and therefore we ask users to use good judgment in the number of times they clone repositories with large files (each clone will download around 5GB from Git LFS).
 
 Cocoa chooses the preferred method of installation/compilation via special environment keys located on [set_installation_options](https://github.com/CosmoLike/cocoa/blob/master/Cocoa/set_installation_options) script (Docker is the default option). 
 Choose accordingly to the used installation method of cocoa required packages  
 
+    [Extracted from set_installation_options script]
     #  ---------------------------------------------------------------------------
     # HOW COCOA BE INSTALLED? -------------------------------
 
@@ -250,7 +251,7 @@ After the setup of the proper environment key, the installation/compilation of c
     
     $ source start_cocoa
 
-`setup_cocoa_installation_packages` this will decompress data files (from Planck for example) and install required packages that may have been left out in the Conda/Docker/homebrew procedure. Decompression should take 5-10 minutes, while package installation time may range from a few seconds (conda/docker installation) to hours (manual installation).  
+`setup_cocoa_installation_packages` this will decompress data files (from Planck for example) and install required packages that may have been left out in the Conda/Docker/homebrew procedure. File decompression should take a few minutes, while package installation time may range from a few seconds (conda/docker) to hours (manual installation).  
 
 ### Running Examples
 
