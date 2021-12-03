@@ -18,7 +18,7 @@ By no means, we want to discourage people from cloning code from their original 
 
 # Installation of cocoa required packages
 
-### Via conda (best for Linux/HPC)
+### Via Conda (best for Linux)
 
 A simple way to install most prerequisites is via Conda environment. Assuming that the user had previously installed Minicoda/Anaconda, the first step is to type the following commands to create the cocoa Conda environment.
 
@@ -60,7 +60,7 @@ Then, every time the user wants to work on Cocoa, they must first activate the C
 
     $ conda activate cocoa
 
-### Via docker (best for MacOS)
+### Via Docker (best for MacOS/Windows)
 
 Docker installation will allow users to run Cocoa inside an instantiation of the [Whovian-Cosmo](https://hub.docker.com/r/vivianmiranda/whovian-cosmo) docker image. Installation of the [docker engine](https://docs.docker.com/engine/) on local PCs is a reasonably straightforward process, but it does require `sudo` privileges (see Docker's [official documentation](https://docs.docker.com/engine/install/) for OS-specific instructions).
 
@@ -158,7 +158,7 @@ We assume the user adopts [Homebrew](https://brew.sh) as the OS package manager 
     
 ### Via cocoa's internal cache (cumbersome - not advisable)
 
-Whenever Conda or Docker installation procedures are unavailable, the user can still perform a local semi-autonomous installation on Linux based on a few pre-defined Cocoa scripts. We provide a local copy of most required packages on Cocoa's cache folder [cocoa_installation_libraries](https://github.com/CosmoLike/cocoa/tree/main/cocoa_installation_libraries), as there are HPC machines where compute nodes that compile code don't have internet access, NASA Pleiades being one example. Therefore, we only assume the pre-installation of the following packages to perform the local setup:
+Whenever Conda or Docker installation procedures are unavailable, the user can still perform a local semi-autonomous installation on Linux based on scripts we provide. We provide a local copy of most required packages on Cocoa's cache folder [cocoa_installation_libraries](https://github.com/CosmoLike/cocoa/tree/main/cocoa_installation_libraries), as there are HPC machines where compute nodes that compile code don't have internet access, NASA Pleiades being one example. Therefore, we only assume the pre-installation of the following packages to perform the local setup:
 
    - [Bash](https://www.amazon.com/dp/B0043GXMSY/ref=cm_sw_em_r_mt_dp_x3UoFbDXSXRBT);
    - [Git](https://git-scm.com) v1.8+;
@@ -170,9 +170,9 @@ Whenever Conda or Docker installation procedures are unavailable, the user can s
    - [PIP package manager](https://pip.pypa.io/en/stable/installing/)
    - [Python Virtual Environment](https://www.geeksforgeeks.org/python-virtual-environment/)
 
-Basically, to perform the local semi-autonomous installation, users should just follow the procedures on section [Installation of cocoa base code](https://github.com/CosmoLike/cocoa#installation-of-cocoa-base-code), with some extra configurations on [set_installation_options](https://github.com/CosmoLike/cocoa/blob/master/Cocoa/set_installation_options) script, as we describe below.
+To perform the local semi-autonomous installation, users should just follow the procedures on section [Installation of cocoa base code](https://github.com/CosmoLike/cocoa#installation-of-cocoa-base-code), adding, however, extra configurations on [set_installation_options](https://github.com/CosmoLike/cocoa/blob/master/Cocoa/set_installation_options) that are explained below.
 
-The script that manages the installation is [set_installation_options](https://github.com/CosmoLike/cocoa/blob/master/Cocoa/set_installation_options), and the local installation is selected when the key `MANUAL_INSTALLATION` is set as shown below
+The local installation via cocoa's internal cache is selected when the environment key `MANUAL_INSTALLATION` is set as shown below
 
     [Extracted from set_installation_options script] 
     
@@ -184,7 +184,7 @@ The script that manages the installation is [set_installation_options](https://g
     #export MACOS_HOMEBREW_INSTALLATION=1
     export MANUAL_INSTALLATION=1
     
-On local installation, users also need to set the following self-explanatory keys on [set_installation_options](https://github.com/CosmoLike/cocoa/blob/master/Cocoa/set_installation_options):
+Users also need to set the following self-explanatory keys on [set_installation_options](https://github.com/CosmoLike/cocoa/blob/master/Cocoa/set_installation_options):
  
     [Extracted from set_installation_options script]
   
