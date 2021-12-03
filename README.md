@@ -283,7 +283,7 @@ Once the work on the Cocoa environment is done, type:
 
     $(.local) source stop_cocoa
 
-The script [start_cocoa](https://github.com/CosmoLike/cocoa/blob/master/Cocoa/start_cocoa) ensures that `PYTHONPATH`, `LD_LIBRARY_PATH`, and `PATH` will point preferably to the local Cocoa installation. The script [stop_cocoa](https://github.com/CosmoLike/cocoa/blob/master/Cocoa/stop_cocoa), on the other hand, guarantees that the bash environment is clean after the work on Cocoa is completed. (*Users can, therefore, have installed multiple Cocoa instances without one installation affecting the others*). 
+The script [start_cocoa](https://github.com/CosmoLike/cocoa/blob/master/Cocoa/start_cocoa) ensures that `PYTHONPATH`, `LD_LIBRARY_PATH`, and `PATH` will point preferably to the local Cocoa installation. It also initializes the `$(.local)` private python environment. The script [stop_cocoa](https://github.com/CosmoLike/cocoa/blob/master/Cocoa/stop_cocoa), on the other hand, guarantees that the bash environment is clean after the work on Cocoa is completed. (*Users can, therefore, have installed multiple Cocoa instances without one installation affecting the others*). For example, while one instantiation of Cocoa is running some chains, users can tweak Cosmolike in another one. Of course, we don't want the killing of a terminal session in interactive HPC mode to be the only way to ensure consistency of `PYTHONPATH`, `LD_LIBRARY_PATH`, and `PATH` flags. 
 
 # Download/compiling/running specific cocoa projects
 
@@ -363,7 +363,7 @@ where `XXX` in the line `[... NotebookApp] or http://127.0.0.1:8888/?token=XXX` 
 
    Finally, go to your browser and type `http://localhost:8080/?token=XXX`, where `XXX` is the previously saved token. For security, we do not allow password-based connections to the jupyter notebooks.
    
-### Summary Information about the configuration files
+### Summary Information about Cocoa's configuration files
 
 The installation of Cocoa required packages, as well as Boltzmann and Likelihood codes, are managed via the following scripts located at `./Cocoa`.
 
