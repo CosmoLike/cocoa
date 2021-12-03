@@ -16,6 +16,10 @@ function addvar () {
     export $1="${2}:${tmp}" ;
 }
 
+if [ -n "${OMP_NUM_THREADS}" ]; then
+    export OLD_OMP_NUM_THREADS=$OMP_NUM_THREADS
+fi
+
 if [ -n "${LD_LIBRARY_PATH}" ]; then
     export OLD_LD_LIBRARY_PATH=$LD_LIBRARY_PATH
 fi
@@ -34,6 +38,18 @@ fi
 
 if [ -n "${CPLUS_INCLUDE_PATH}" ]; then
     export OLD_CPLUS_INCLUDE_PATH=$CPLUS_INCLUDE_PATH
+fi
+
+if [ -n "${LDFLAGS}" ]; then
+    export OLD_LDFLAGS=$LDFLAGS
+fi
+
+if [ -n "${CPATH}" ]; then
+    export OLD_CPATH=$CPATH
+fi
+
+if [ -n "${NUMPY_HEADERS}" ]; then
+    export OLD_NUMPY_HEADERS=$NUMPY_HEADERS
 fi
 
 if [ -n "${SET_INSTALLATION_OPTIONS}" ]; then
@@ -62,9 +78,9 @@ cd ./Cocoa
 source $ROOTDIR/.local/bin/activate
 
 if [ -n "${GLOBAL_PACKAGES_LOCATION}" ]; then
-addvar PYTHONPATH $GLOBAL_PACKAGES_LOCATION/lib/python$PYTHON_VERSION/site-packages
+    addvar PYTHONPATH $GLOBAL_PACKAGES_LOCATION/lib/python$PYTHON_VERSION/site-packages
 
-addvar LD_LIBRARY_PATH $GLOBAL_PACKAGES_LOCATION/lib
+    addvar LD_LIBRARY_PATH $GLOBAL_PACKAGES_LOCATION/lib
 fi
 
 addvar LD_LIBRARY_PATH $ROOTDIR/.local/lib
@@ -74,6 +90,10 @@ addvar PYTHONPATH $ROOTDIR/.local/lib/python$PYTHON_VERSION/site-packages
 addvar PYTHONPATH $ROOTDIR/.local/lib
 
 addvar PATH $ROOTDIR/.local/bin
+
+export C_INCLUDE_PATH=$C_INCLUDE_PATH:$ROOTDIR/.local/lib/python$PYTHON_VERSION/site-packages/numpy/core/include
+
+export CPLUS_INCLUDE_PATH=$CPLUS_INCLUDE_PATH:$ROOTDIR/.local/lib/python$PYTHON_VERSION/site-packages/numpy/core/include
 
 # ----------------------------------------------------------------------------
 # ----------------------------------------------------------------------------
@@ -116,6 +136,12 @@ echo "FAILED setup_pip_packages SCRIPT" >&2
 return 1
 fi
 
+export NUMPY_HEADERS=$ROOTDIR/.local/lib/python$PYTHON_VERSION/site-packages/numpy/core/include
+
+addvar LD_LIBRARY_PATH $ROOTDIR/.local/lib/python$PYTHON_VERSION/site-packages/numpy/core/lib
+
+export CPATH=$CPATH:$ROOTDIR/.local/lib/python$PYTHON_VERSION/site-packages/numpy/core/include
+
 source ./installation_scripts/setup_fortran_packages
 if [ $? -ne 0 ] 
 then
@@ -137,15 +163,6 @@ echo "FAILED setup_c_packages SCRIPT" >&2
 return 1
 fi
 
-
-# ----------------------------------------------------------------------------
-# ----------------------------------------------------------------------------
-# ------------------------ CLONE EXTERNAL PROJECTS ---------------------------
-# ----------------------------------------------------------------------------
-# ----------------------------------------------------------------------------
-
-source $ROOTDIR/projects/clone_all.sh
-
 # ----------------------------------------------------------------------------
 # ----------------------------------------------------------------------------
 # ----------------------------------------------------------------------------
@@ -153,4 +170,3 @@ source $ROOTDIR/projects/clone_all.sh
 # ----------------------------------------------------------------------------
 
 source stop_cocoa
-
