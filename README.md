@@ -1,6 +1,6 @@
 # Overview: The [Cobaya](https://github.com/CobayaSampler)-[CosmoLike](https://github.com/CosmoLike) Joint Architecture
 
-Cocoa allows users to run [CosmoLike](https://github.com/CosmoLike) routines that analyze data primarily from the [Dark Energy Survey](https://www.darkenergysurvey.org) (a.k.a DES), and simulate future multi-probe analyses, e.g. for Rubin Observatory's Legacy Survey of Space and Time or the Roman Space Telescope, inside the [Cobaya](https://github.com/CobayaSampler) framework. This readme file presents basic and advanced instructions for installing all Cocoa components, including the [Planck likelihood](https://wiki.cosmos.esa.int/planck-legacy-archive/index.php/Main_Page).
+Cocoa allows users to run [CosmoLike](https://github.com/CosmoLike) routines inside the [Cobaya](https://github.com/CobayaSampler) framework. Cosmolike is capable of analyzing data primarily from the [Dark Energy Survey](https://www.darkenergysurvey.org) (a.k.a DES) and simulating future multi-probe analyses for Rubin Observatory's Legacy Survey of Space and Time or the Roman Space Telescope. This readme file presents basic and advanced instructions for installing all Cocoa components, including the [Planck likelihood](https://wiki.cosmos.esa.int/planck-legacy-archive/index.php/Main_Page).
 
 (**Proper Credits**): The following is not an exhaustive list of the codes we use
 
@@ -14,13 +14,15 @@ Cocoa allows users to run [CosmoLike](https://github.com/CosmoLike) routines tha
 
 - [Polychord](https://github.com/PolyChord/PolyChordLite) is a sampler code developed by Dr. Will Handley, Prof. Lasenby, and Prof. M. Hobson
 
-By no means, we want to discourage people from cloning code from their original repositories. We've included these codes as compressed [xz file format](https://tukaani.org/xz/format.html) in our repository for convenience in the initial development. The work of those authors is extraordinary, and they must be properly cited. Once all Cocoa's submodules go public, we intend to replace these files by clones to their original repositories. The same applies to all the data products and auxiliary packages we use.
+By no means, we want to discourage people from cloning code from their original repositories. We've included these codes as compressed [xz file format](https://tukaani.org/xz/format.html) in our repository for convenience in the initial development. The work of those authors is extraordinary, and they must be properly cited.
 
 # Installation of cocoa required packages
 
+Cosmolike and the interface between Cosmolike and Cocoa requires many packages to be installed, including [GSL](https://www.gnu.org/software/gsl/), [FFTW](https://www.fftw.org), [Armadillo](http://arma.sourceforge.net) and [Boost](https://www.boost.org). The plethora of GCC, Python, and package versions, each one with different bugs and regressions, can make the installation of any big code to be pure agony, especially given that CAMB, CLASS, Cosmolike, and Planck likelihood involves Fortran, C, C++, and Python languages. We try to simplify this process by offering a few installation options on Linux and macOS. 
+
 ### Via Conda (best for Linux)
 
-A simple way to install most prerequisites is via Conda environment. Assuming that the user had previously installed Minicoda/Anaconda, the first step is to type the following commands to create the cocoa Conda environment.
+A simple way to install most prerequisites is via the Conda environment. Cocoa's internal scripts will then install any remaining missing packages when compiling the base code. Assuming that the user had previously installed Minicoda (or Anaconda), the first step is to type the following commands to create the cocoa Conda environment.
 
     $ conda create --name cocoa python=3.7 --quiet --yes
 
@@ -56,50 +58,55 @@ and
       'conda-forge::matplotlib=3.5.0' \
       'conda-forge::astropy=4.3.1' 
  
-Then, every time the user wants to work on Cocoa, they must first activate the Cocoa Conda environment via
+With this installation method, users must activate the Conda environment whenever working with Cocoa, as shown below 
 
     $ conda activate cocoa
 
+Users can now proceed to the section [Installation of cocoa base code](https://github.com/CosmoLike/cocoa#installation-of-cocoa-base-code). 
+
 ### Via Docker (best for MacOS/Windows)
 
-Docker installation will allow users to run Cocoa inside an instantiation of the [Whovian-Cosmo](https://hub.docker.com/r/vivianmiranda/whovian-cosmo) docker image. Installation of the [docker engine](https://docs.docker.com/engine/) on local PCs is a reasonably straightforward process, but it does require `sudo` privileges (see Docker's [official documentation](https://docs.docker.com/engine/install/) for OS-specific instructions).
+Docker installation will allow users to run Cocoa inside an instantiation of the [Whovian-Cosmo](https://hub.docker.com/r/vivianmiranda/whovian-cosmo) docker image. Installation of the [docker engine](https://docs.docker.com/engine/) on local PCs is a straightforward process, but it does require `sudo` privileges (see Docker's [official documentation](https://docs.docker.com/engine/install/) for OS-specific instructions).
 
   On macOS, type:
 
     $ docker run -it -p 8080:8888 -v $(pwd):/home/whovian/host/ -v ~/.ssh:/home/whovian/.ssh:ro vivianmiranda/whovian-cosmo:version-1.0.2
 
-For linux users, use the following command instead:
+Linux users must type the following command instead:
 
     $ docker run -it -p 8080:8888 --user $(id -u):$(id -g) -v $(pwd):/home/whovian/host/ -v ~/.ssh:/home/whovian/.ssh:ro vivianmiranda/whovian-cosmo:version-1.0.2
 
-The bind of the `~/.ssh` folder in the commands above allows users to commit and clone from inside the container. Both commands need to be invoked on the parent folder so the docker container can access to the listed folders on the host OS. When running the command `docker run` on a specific container for the first time, the docker engine will automatically download the corresponding [Docker Hub](https://hub.docker.com/) image.
-This step may take some time, as the [Whovian-Cosmo](https://hub.docker.com/r/vivianmiranda/whovian-cosmo) image has approximately 700 Megabytes.
+The bind `-v ~/.ssh:/home/whovian/.ssh:ro` allows users to pull, push and clone GitHub repositories from inside the container. Users must invoke the command on the parent directory of the path where access inside the docker container is sought. 
+
+When running the `docker run (...)/whovian-cosmo:version-1.0.2` for the first time, the docker engine will automatically download the corresponding image. This step may take some time, as the [Whovian-Cosmo](https://hub.docker.com/r/vivianmiranda/whovian-cosmo) image has approximately 700 Megabytes.
 
   The last step is to access the folder `/home/whovian/host/` where the host files have been mounted:
 
     $ cd /home/whovian/host/
 
-and proceed to the section [Cloning the Repository](https://github.com/CosmoLike/cocoa#cloning-the-repository). 
+and proceed to the section [Installation of cocoa base code](https://github.com/CosmoLike/cocoa#installation-of-cocoa-base-code). 
 
-(**Warning**) HPC systems don't allow users to run docker containers using the standard [docker engine](https://docs.docker.com/engine/) for [security reasons](https://www.reddit.com/r/docker/comments/7y2yp2/why_is_singularity_used_as_opposed_to_docker_in/?utm_source=share&utm_medium=web2x&context=3). There is, however, an alternative engine called [Singularity](https://sylabs.io/guides/3.6/user-guide/index.html) that can run docker images in compliance with HPC security requirements. The [Singularity](https://sylabs.io/guides/3.6/user-guide/index.html) engine installation requires administrative privileges. However, many HPC systems have already adopted it.
+(**Warning**) There isn't permanent storage outside `/home/whovian/host/`. Be aware of this fact to not lose any work
+
+(**Warning**) Most HPC systems don't allow users to run docker containers via the standard [docker engine](https://docs.docker.com/engine/) for [security reasons](https://www.reddit.com/r/docker/comments/7y2yp2/why_is_singularity_used_as_opposed_to_docker_in/?utm_source=share&utm_medium=web2x&context=3). There is, however, an alternative engine called [Singularity](https://sylabs.io/guides/3.6/user-guide/index.html) that is in compliance with most HPC requirements. The [Singularity](https://sylabs.io/guides/3.6/user-guide/index.html) engine installation requires administrative privileges, but many HPC enviroments have already adopted it.
 
 To run docker images with Singularity, go to the folder you want to store the image and type:
 
     $ singularity build whovian-cosmo docker://vivianmiranda/whovian-cosmo
 
-This command will download the [Whovian-Cosmo](https://hub.docker.com/r/vivianmiranda/whovian-cosmo) image and convert it to an image format that can be accessed via Singularity (Singularity takes a few minutes to do such conversion). To run the container interactively, type:
+This command will download the [Whovian-Cosmo](https://hub.docker.com/r/vivianmiranda/whovian-cosmo) image and convert it to a format that can be understood by Singularity (this might take a few minutes). To run the container interactively, type:
 
     $ singularity shell --no-home --bind /path/to/cocoa:/home/whovian/host --bind ~/.ssh:/home/whovian/.ssh:ro whovian-cosmo
 
-after requesting interactive nodes successfully (never run jobs on login nodes!). The bind of the `~/.ssh` folder in the command above allows users to commit and clone from inside the container. The last step is to access the folder `/home/whovian/host/` where the host files have been mounted
+### Via homebrew
 
-    $ cd /home/whovian/host/
+This subsection assumes users adopt [Homebrew](https://brew.sh) as the macOS package manager and [BASH](https://www.howtogeek.com/444596/how-to-change-the-default-shell-to-bash-in-macos-catalina/) as the default shell. 
 
-(**Warning**) There isn't permanent storage outside `/home/whovian/host/`. Be aware of this fact to not lose any work
+(**Warning**) The installation procedures for MacOS are always working in progress; there is no guarantee that our recommendations will work without additional tweaks given how fast [Homebrew](https://brew.sh) updates its packages and Apple changes the OS. *The Docker installation is preferred*.
 
-### Via homebrew (need tweaks - not advisable)
+(**Warning**) Currently, there is a regression in GCC-11, the default compiler on Homebrew, preventing us from adopting it. Therefore, users must build most brew numerical packages from their source via the command `--build-from-source`. Building from source is painfully slow and error prone and does not work in Apple M1 chips without Rosetta 2 emulator. We can do nothing but wait for the GCC developers to fix the bug. 
 
-We assume the user adopts [Homebrew](https://brew.sh) as the OS package manager and [BASH](https://www.howtogeek.com/444596/how-to-change-the-default-shell-to-bash-in-macos-catalina/) as the default shell. The installation procedures for MacOS are always working in progress; therefore, this section only offers a general guideline. Given how frequently [Homebrew](https://brew.sh) updates its packages, there is no guarantee that our recommendations will work without additional tweaks.  Below is a list of Homebrew and pip commands that install most dependencies
+Below is a list of Homebrew and pip commands that install most dependencies
 
     brew install gcc@10
     alias brew='HOMEBREW_CC=gcc-10 HOMEBREW_CXX=g++-10 brew'
@@ -151,14 +158,18 @@ We assume the user adopts [Homebrew](https://brew.sh) as the OS package manager 
     pip3.7 install astropy --upgrade
     pip3.7 install pyfits --upgrade
 
-(**Warning**) It is also necessary to update `$PATH` so the OS can detect the [Homebrew](https://brew.sh) python installation. Adding to `~/.bash_profile` code similar to the lines below should be enough (don't forget to replace `XXX` by the user's home folder):
+Users must also update their `$PATH` so the OS can detect the [Homebrew](https://brew.sh) python installation, as shown below
 
     python3=/Users/XXX/Library/Python/3.7/bin
     export PATH=$python3:$PATH
-    
-### Via Cocoa's internal cache (cumbersome - not advisable)
 
-Whenever Conda or Docker installation procedures are unavailable, the user can still perform a local semi-autonomous installation on Linux based on scripts we provide. We provide a local copy of most required packages on Cocoa's cache folder [cocoa_installation_libraries](https://github.com/CosmoLike/cocoa/tree/main/cocoa_installation_libraries), as there are HPC machines where compute nodes that compile code don't have internet access, NASA Pleiades being one example. Therefore, we only assume the pre-installation of the following packages to perform the local setup:
+Users can now proceed to the section [Installation of cocoa base code](https://github.com/CosmoLike/cocoa#installation-of-cocoa-base-code). 
+
+### Via Cocoa's internal scripts and cache
+
+(**Warning**) This method is painfully slow, not advisable. It does, however, offer users that don't work with Minicoda/Anaconda the opportunity to encapsulate the installation of required packages. *The Conda installation is always preferred*. 
+
+Whenever Conda or Docker installation procedures are unavailable, the user can still perform a local semi-autonomous installation on Linux based on a few scripts we implemented. We also provide a local copy of most required packages on Cocoa's cache folder [cocoa_installation_libraries](https://github.com/CosmoLike/cocoa/tree/main/cocoa_installation_libraries), as there are HPC machines where compute nodes that compile code don't have internet access (NASA Pleiades being one example). We, therefore, only assume the pre-installation of the following packages to perform the local setup:
 
    - [Bash](https://www.amazon.com/dp/B0043GXMSY/ref=cm_sw_em_r_mt_dp_x3UoFbDXSXRBT);
    - [Git](https://git-scm.com) v1.8+;
@@ -170,9 +181,9 @@ Whenever Conda or Docker installation procedures are unavailable, the user can s
    - [PIP package manager](https://pip.pypa.io/en/stable/installing/)
    - [Python Virtual Environment](https://www.geeksforgeeks.org/python-virtual-environment/)
 
-To perform the local semi-autonomous installation, users should just follow the procedures on section [Installation of cocoa base code](https://github.com/CosmoLike/cocoa#installation-of-cocoa-base-code), adding, however, extra configurations on [set_installation_options](https://github.com/CosmoLike/cocoa/blob/master/Cocoa/set_installation_options) that are explained below.
+To perform the local semi-autonomous installation, users should follow the procedures on section [Installation of cocoa base code](https://github.com/CosmoLike/cocoa#installation-of-cocoa-base-code), adding, however, the many additional configurations on [set_installation_options](https://github.com/CosmoLike/cocoa/blob/master/Cocoa/set_installation_options) script that are explained below.
 
-The local installation via cocoa's internal cache is selected when the environment key `MANUAL_INSTALLATION` is set as shown below
+The local installation via cocoa's internal cache is selected whenever the environmental key `MANUAL_INSTALLATION` is set:
 
     [Extracted from set_installation_options script] 
     
@@ -184,7 +195,7 @@ The local installation via cocoa's internal cache is selected when the environme
     #export MACOS_HOMEBREW_INSTALLATION=1
     export MANUAL_INSTALLATION=1
     
-Users also need to set the following self-explanatory keys on [set_installation_options](https://github.com/CosmoLike/cocoa/blob/master/Cocoa/set_installation_options):
+Users also need to set the following self-explanatory environmental keys on [set_installation_options](https://github.com/CosmoLike/cocoa/blob/master/Cocoa/set_installation_options):
  
     [Extracted from set_installation_options script]
   
@@ -216,12 +227,14 @@ Users also need to set the following self-explanatory keys on [set_installation_
       #export IGNORE_OPENBLAS_INSTALLATION=1
       #export IGNORE_FORTRAN_LAPACK_INSTALLATION=1
    
-(**Warning**) Our scripts never install packages on `$HOME/.local` or other locations in the user's `$PATH` and `$LD_LIBRARY_PATH`. Doing so could impose incompatibilities between Cobaya and different projects. The decision to opt for global upgrades on packages required by multiple projects is the user's sole responsibility. All requirements for Cocoa are installed at
+(**Warning**) Our scripts never install packages on `$HOME/.local` or on any locations in the user's `$PATH` and `$LD_LIBRARY_PATH`. Doing so could impose incompatibilities between Cobaya and different projects (or break the users environment). All requirements for Cocoa are installed at
 
     Cocoa/.local/bin
     Cocoa/.local/include
     Cocoa/.local/lib
     Cocoa/.local/share
+
+Users can now proceed to the section [Installation of cocoa base code](https://github.com/CosmoLike/cocoa#installation-of-cocoa-base-code). 
 
 # Installation of cocoa base code
 
