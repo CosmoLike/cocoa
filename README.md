@@ -251,7 +251,7 @@ After the setup of the proper environment key, the installation/compilation of c
     
     $ source start_cocoa
 
-`setup_cocoa_installation_packages` this will decompress data files (from Planck for example) and install required packages that may have been left out in the Conda/Docker/homebrew procedure. File decompression should take a few minutes, while package installation time may range from a few seconds (conda/docker) to hours (manual installation).  
+`setup_cocoa_installation_packages` this will decompress data files and install required packages that may have been left out in the Conda/Docker/homebrew procedure. File decompression should take a few minutes, while package installation time may range from a few seconds (conda/docker) to hours (manual installation).  
 
 ### Running Examples
 
