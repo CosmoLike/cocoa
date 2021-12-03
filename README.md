@@ -167,7 +167,7 @@ Users can now proceed to the section [Installation of cocoa base code](https://g
 
 ### Via Cocoa's internal scripts and cache
 
-(**Warning**) This method is painfully slow, not advisable. It does, however, offer users that don't work with Minicoda/Anaconda the opportunity to encapsulate the installation of required packages. *The Conda installation is always preferred*. 
+(**Warning**) This method is painfully slow, not advisable. It does, however, offer users that don't work with Minicoda/Anaconda the opportunity to encapsulate the installation of required packages. *The Conda or Docker installation are always preferred*. 
 
 Whenever Conda or Docker installation procedures are unavailable, the user can still perform a local semi-autonomous installation on Linux based on a few scripts we implemented. We also provide a local copy of most required packages on Cocoa's cache folder [cocoa_installation_libraries](https://github.com/CosmoLike/cocoa/tree/main/cocoa_installation_libraries), as there are HPC machines where compute nodes that compile code don't have internet access (NASA Pleiades being one example). We, therefore, only assume the pre-installation of the following packages to perform the local setup:
 
@@ -242,10 +242,11 @@ Type:
 
     $ git lfs clone git@github.com:CosmoLike/cocoa.git
 
-(**Warning**) We have a monthly quota of only 150 GB in bandwidth for [Git LFS](https://git-lfs.github.com) files, and therefore we ask users to use good judgment in the number of times they clone repositories with large files (each clone will download around 5GB from Git LFS).
+to clone the repository. 
 
-Cocoa chooses the preferred method of installation/compilation via special environment keys located on [set_installation_options](https://github.com/CosmoLike/cocoa/blob/master/Cocoa/set_installation_options) script (Docker is the default option). 
-Choose accordingly to the used installation method of cocoa required packages  
+(**Warning**) We have a limited monthly quota in bandwidth for [Git LFS](https://git-lfs.github.com) files, and therefore we ask users to use good judgment in the number of times they clone repositories with large files (each clone will download around 5GB from Git LFS).
+
+Cocoa chooses the preferred method of installation and compilation via special environment keys located on [set_installation_options](https://github.com/CosmoLike/cocoa/blob/master/Cocoa/set_installation_options) script. The key should reflect the user's choice in section [Installation of cocoa required packages](https://github.com/CosmoLike/cocoa#installation-of-cocoa-required-packages) to the installation method of cocoa required packages.
 
     [Extracted from set_installation_options script]
     #  ---------------------------------------------------------------------------
@@ -256,34 +257,41 @@ Choose accordingly to the used installation method of cocoa required packages
     #export MACOS_HOMEBREW_INSTALLATION=1
     #export MANUAL_INSTALLATION=1
     
-After the setup of the proper environment key, the installation/compilation of cocoa base code can be performed with the following commands:
+Users must then type the following commands
 
     $ source setup_cocoa_installation_packages
     
     $ source compile_external_modules
     
-    $ source start_cocoa
+`setup_cocoa_installation_packages` script will decompress the data files and install all packages that may have been left out in the Conda/Docker/Homebrew/Manual installation. File decompression should only take a few minutes, while package installation time may range from a few minutes (if installation via *Conda*, *Docker* or *Homebrew* was selected in the previous section) to more than one hour (if installation *via Cocoa's internal scripts and cache* was selected in the previous section).
 
-`setup_cocoa_installation_packages` this will decompress data files and install required packages that may have been left out in the Conda/Docker/homebrew procedure. File decompression should take a few minutes, while package installation time may range from a few seconds (conda/docker) to hours (manual installation).  
+(**warning**) The script [compile_external_modules](https://github.com/CosmoLike/cocoa/blob/master/Cocoa/compile_external_modules) will try to compile Camb, Planck, Class, and Polychord samplers. If users want to compile/recompile just one of these packages for any reason, we provide scripts for that as well. A quick look to [compile_external_modules](https://github.com/CosmoLike/cocoa/blob/master/Cocoa/compile_external_modules) file shows where these scripts can be found. 
 
 ### Running Examples
 
-After that, the Cobaya Framework should be ready, and the user can test a few examples:
+After that, the Cobaya Framework should be ready, and the user can test a few examples following the commands below
 
-    mpirun -n 1 cobaya-run ./projects/example/EXAMPLE_EVALUATE[1-4].yaml -f
-    mpirun -n 4 cobaya-run ./projects/example/EXAMPLE_MCMC1.yaml -f
+    $ source start_cocoa
+    
+    $(.local) mpirun -n 1 cobaya-run ./projects/example/EXAMPLE_EVALUATE[1-4].yaml -f
+    
+    $(.local) mpirun -n 4 cobaya-run ./projects/example/EXAMPLE_MCMC1.yaml -f
     
 These examples will evaluate various likelihoods at specific cosmologies. The `-f` ensures that the same YAML file can be run multiple times, overwriting output files from previous evaluations that are located at `./chains`.
 
 Once the work on the Cocoa environment is done, type:
 
-    $ source stop_cocoa
+    $(.local) source stop_cocoa
 
-PS: Users are encouraged to read appendix [Further Information about the configuration files](https://github.com/CosmoLike/cocoa/blob/master/README.md#further-information-about-the-configuration-files) to learn more about the configuration files.
+The script [start_cocoa](https://github.com/CosmoLike/cocoa/blob/master/Cocoa/start_cocoa) ensures that `PYTHONPATH`, `LD_LIBRARY_PATH`, and `PATH` will point preferably to the local Cocoa installation. The script [stop_cocoa](https://github.com/CosmoLike/cocoa/blob/master/Cocoa/stop_cocoa), on the other hand, guarantees that the bash environment is clean after the work on Cocoa is completed. (*Users can, therefore, have installed multiple Cocoa instances without one installation affecting the others*). 
 
 # Download/compiling/running specific cocoa projects
 
-The `projects` folder includes all the projects that are being developed by our group. Individual projects must be hosted on independent folders named `cocoa_XXX` where XXX is the project name. The majority of projects we are working on are not public (yet), and they are safeguarded on the private repositories listed on `project/clone_all.sh` (the backbone Cosmolike software, however, is publicly available at `external_modules/code`!). You can add your projects there, and the script `setup_cocoa_installation_packages` will try to clone all listed projects. **Having inaccessible repositories listed at `project/clone_all.sh` will not cause any errors**. By default, cocoa will try to clone the private projects `cocoa_des_y3`, `cocoa_desxplanck` and `cocoa_des_y3u`.
+The `projects` folder was designed to include all the projects that are being developed by our group. Individual projects must be hosted on independent folders named `cocoa_XXX` where XXX is the project name. 
+
+The majority of projects we are working on are not public (yet), and they are safeguarded on the private repositories listed on `project/clone_all.sh` (the backbone Cosmolike software, however, is publicly available at `external_modules/code`!). 
+
+You can add your projects there, and the script `setup_cocoa_installation_packages` will try to clone all listed projects. Having inaccessible repositories listed at `project/clone_all.sh` will not cause any errors.
 
 The `cocoa_XXX` folder that host the `XXX` project needs to have the more or less the following structure (taken from our private DES-Y3 project)
 
