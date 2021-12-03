@@ -18,7 +18,7 @@ By no means, we want to discourage people from cloning code from their original 
 
 # Installation of cocoa required packages
 
-### Through conda (best for Linux/HPC environments)
+### Via conda (best for Linux/HPC)
 
 A simple way to install most prerequisites is via Conda environment. Assuming that the user had previously installed Minicoda/Anaconda, the first step is to type the following commands to create the cocoa Conda environment.
 
@@ -60,7 +60,7 @@ Then, every time the user wants to work on Cocoa, they must first activate the C
 
     $ conda activate cocoa
 
-### Through docker (best if you dislike conda)
+### Via docker
 
 Docker installation will allow users to run Cocoa inside an instantiation of the [Whovian-Cosmo](https://hub.docker.com/r/vivianmiranda/whovian-cosmo) docker image. Installation of the [docker engine](https://docs.docker.com/engine/) on local PCs is a reasonably straightforward process, but it does require `sudo` privileges (see Docker's [official documentation](https://docs.docker.com/engine/install/) for OS-specific instructions).
 
@@ -97,7 +97,7 @@ after requesting interactive nodes successfully (never run jobs on login nodes!)
 
 (**Warning**) There isn't permanent storage outside `/home/whovian/host/`. Be aware of this fact to not lose any work
 
-### Through homebrew on MacOS (may need additional tweaks)
+### Via homebrew (need tweaks)
 
 We assume the user adopts [Homebrew](https://brew.sh) as the OS package manager and [BASH](https://www.howtogeek.com/444596/how-to-change-the-default-shell-to-bash-in-macos-catalina/) as the default shell. The installation procedures for MacOS are always working in progress; therefore, this section only offers a general guideline. Given how frequently [Homebrew](https://brew.sh) updates its packages, there is no guarantee that our recommendations will work without additional tweaks.  Below is a list of Homebrew and pip commands that install most dependencies
 
@@ -156,9 +156,9 @@ We assume the user adopts [Homebrew](https://brew.sh) as the OS package manager 
     python3=/Users/XXX/Library/Python/3.7/bin
     export PATH=$python3:$PATH
     
-### Through local installation on Linux (cumbersome - not advisable)
+### Via cocoa's internal cache (cumbersome - not advisable)
 
-Whenever Conda or Docker installation procedures are unavailable, the user can still perform a local semi-autonomous installation based on a few pre-defined Cocoa scripts. We provide a local copy of most required packages on Cocoa's cache folder [cocoa_installation_libraries](https://github.com/CosmoLike/cocoa/tree/main/cocoa_installation_libraries), as there are HPC machines where compute nodes that compile code don't have internet access, NASA Pleiades being one example. Therefore, we only assume the pre-installation of the following packages to perform the local setup:
+Whenever Conda or Docker installation procedures are unavailable, the user can still perform a local semi-autonomous installation on Linux based on a few pre-defined Cocoa scripts. We provide a local copy of most required packages on Cocoa's cache folder [cocoa_installation_libraries](https://github.com/CosmoLike/cocoa/tree/main/cocoa_installation_libraries), as there are HPC machines where compute nodes that compile code don't have internet access, NASA Pleiades being one example. Therefore, we only assume the pre-installation of the following packages to perform the local setup:
 
    - [Bash](https://www.amazon.com/dp/B0043GXMSY/ref=cm_sw_em_r_mt_dp_x3UoFbDXSXRBT);
    - [Git](https://git-scm.com) v1.8+;
