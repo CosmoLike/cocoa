@@ -60,7 +60,7 @@ Then, every time the user wants to work on Cocoa, they must first activate the C
 
     $ conda activate cocoa
 
-### Via docker
+### Via docker (best for MacOS)
 
 Docker installation will allow users to run Cocoa inside an instantiation of the [Whovian-Cosmo](https://hub.docker.com/r/vivianmiranda/whovian-cosmo) docker image. Installation of the [docker engine](https://docs.docker.com/engine/) on local PCs is a reasonably straightforward process, but it does require `sudo` privileges (see Docker's [official documentation](https://docs.docker.com/engine/install/) for OS-specific instructions).
 
@@ -97,7 +97,7 @@ after requesting interactive nodes successfully (never run jobs on login nodes!)
 
 (**Warning**) There isn't permanent storage outside `/home/whovian/host/`. Be aware of this fact to not lose any work
 
-### Via homebrew (need tweaks)
+### Via homebrew (need tweaks - not advisable)
 
 We assume the user adopts [Homebrew](https://brew.sh) as the OS package manager and [BASH](https://www.howtogeek.com/444596/how-to-change-the-default-shell-to-bash-in-macos-catalina/) as the default shell. The installation procedures for MacOS are always working in progress; therefore, this section only offers a general guideline. Given how frequently [Homebrew](https://brew.sh) updates its packages, there is no guarantee that our recommendations will work without additional tweaks.  Below is a list of Homebrew and pip commands that install most dependencies
 
