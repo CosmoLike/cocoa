@@ -308,34 +308,6 @@ The `cocoa_XXX` folder that host the `XXX` project needs to have the more or les
 
 # Appendix
 
-## Summary Information about the configuration files
-
-The installation of Cocoa required packages, as well as Boltzmann and Likelihood codes, are managed via the following scripts located at `./Cocoa`.
-
- - [set_installation_options](https://github.com/CosmoLike/cocoa/blob/master/Cocoa/set_installation_options)
-
-    This file contains environment variables that manage the installation process.
-
- - [setup_cocoa_installation_packages](https://github.com/CosmoLike/cocoa/blob/master/Cocoa/setup_cocoa_installation_packages)
-
-    This file has instructions on how to install packages required by the Cocoa Framework.
-
- - [compile_external_modules](https://github.com/CosmoLike/cocoa/blob/master/Cocoa/compile_external_modules)
-
-    This file has instructions on how to compile Boltzmann, Sampler and likelihood codes. 
-
- - [start_cocoa](https://github.com/CosmoLike/cocoa/blob/master/Cocoa/start_cocoa)
-
-    This file has instructions on how to set up the Python virtual environment.
-
- - [stop_cocoa](https://github.com/CosmoLike/cocoa/blob/master/Cocoa/stop_cocoa)
-
-    This file has instructions on how to unset the Python virtual environment - including recovering original `PYTHONPATH`, `LD_LIBRARY_PATH`, and `PATH`. 
-
- - [clean_all](https://github.com/CosmoLike/cocoa/blob/master/Cocoa/clean_all)
-
-    This file has instructions on how to clean keys associated with the Python virtual environment and delete the compilation of the Boltzmann, Sampler, and likelihood codes, and local installation of the required packages installed by the [setup_cocoa_installation_packages].
-   
 ### Compiling Boltzmann, CosmoLike and Likelihood codes separatelly
 
 To avoid excessive compilation times during development, users can use specialized scripts that compile only the specific modules:
@@ -371,3 +343,31 @@ where `XXX` in the line `[... NotebookApp] or http://127.0.0.1:8888/?token=XXX` 
     $ ssh your_username@your_sever.com -L 8080:localhost:8080
 
    Finally, go to your browser and type `http://localhost:8080/?token=XXX`, where `XXX` is the previously saved token. For security, we do not allow password-based connections to the jupyter notebooks.
+   
+### Summary Information about the configuration files
+
+The installation of Cocoa required packages, as well as Boltzmann and Likelihood codes, are managed via the following scripts located at `./Cocoa`.
+
+ - [set_installation_options](https://github.com/CosmoLike/cocoa/blob/master/Cocoa/set_installation_options)
+
+    This file contains environment variables that manage the installation process.
+
+ - [setup_cocoa_installation_packages](https://github.com/CosmoLike/cocoa/blob/master/Cocoa/setup_cocoa_installation_packages)
+
+    This file has instructions on how to install packages required by the Cocoa Framework.
+
+ - [compile_external_modules](https://github.com/CosmoLike/cocoa/blob/master/Cocoa/compile_external_modules)
+
+    This file has instructions on how to compile Boltzmann, Sampler and likelihood codes. 
+
+ - [start_cocoa](https://github.com/CosmoLike/cocoa/blob/master/Cocoa/start_cocoa)
+
+    This file has instructions on how to set up the Python virtual environment.
+
+ - [stop_cocoa](https://github.com/CosmoLike/cocoa/blob/master/Cocoa/stop_cocoa)
+
+    This file has instructions on how to unset the Python virtual environment - including recovering original `PYTHONPATH`, `LD_LIBRARY_PATH`, and `PATH`. 
+
+ - [clean_all](https://github.com/CosmoLike/cocoa/blob/master/Cocoa/clean_all)
+
+    This file has instructions on how to clean keys associated with the Python virtual environment and delete the compilation of the Boltzmann, Sampler, and likelihood codes, and local installation of the required packages installed by the [setup_cocoa_installation_packages].
