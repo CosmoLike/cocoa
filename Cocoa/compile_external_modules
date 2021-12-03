@@ -16,12 +16,6 @@ function addvar () {
     export $1="${2}:${tmp}" ;
 }
 
-if [ -n "${SET_INSTALLATION_OPTIONS}" ]; then
-    source $SET_INSTALLATION_OPTIONS
-else
-    source set_installation_options
-fi
-
 if [ -n "${OMP_NUM_THREADS}" ]; then
     export OLD_OMP_NUM_THREADS=$OMP_NUM_THREADS
 fi
@@ -36,6 +30,20 @@ fi
 
 if [ -n "${PATH}" ]; then
     export OLD_PATH=$PATH
+fi
+
+if [ -n "${C_INCLUDE_PATH}" ]; then
+    export OLD_C_INCLUDE_PATH=$C_INCLUDE_PATH
+fi
+
+if [ -n "${CPLUS_INCLUDE_PATH}" ]; then
+    export OLD_CPLUS_INCLUDE_PATH=$CPLUS_INCLUDE_PATH
+fi
+
+if [ -n "${SET_INSTALLATION_OPTIONS}" ]; then
+    source $SET_INSTALLATION_OPTIONS
+else
+    source set_installation_options
 fi
 
 # ----------------------------------------------------------------------------

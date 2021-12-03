@@ -1,6 +1,6 @@
 if [ -n "${START_COCOA_DONE}" ]; then
-    echo 'ERROR START_COCOA_DONE already defined'
-    return
+  echo 'ERROR START_COCOA_DONE already defined'
+  return
 fi
 
 # ----------------------------------------------------------------------------
@@ -17,24 +17,47 @@ function addvar () {
     export $1="${2}:${tmp}" ;
 }
 
-if [ -n "${SET_INSTALLATION_OPTIONS}" ]; then
-    source $SET_INSTALLATION_OPTIONS
-else
-    source set_installation_options
-fi
-
-
 if [ -n "${OMP_NUM_THREADS}" ]; then
-    export OLD_OMP_NUM_THREADS=$OMP_NUM_THREADS
+  export OLD_OMP_NUM_THREADS=$OMP_NUM_THREADS
 fi
 
+if [ -n "${LD_LIBRARY_PATH}" ]; then
+  export OLD_LD_LIBRARY_PATH=$LD_LIBRARY_PATH
+fi
 
-export OLD_LD_LIBRARY_PATH=$LD_LIBRARY_PATH
+if [ -n "${PYTHONPATH}" ]; then
+  export OLD_PYTHONPATH=$PYTHONPATH
+fi
 
-export OLD_PYTHONPATH=$PYTHONPATH
+if [ -n "${PATH}" ]; then
+  export OLD_PATH=$PATH
+fi
 
-export OLD_PATH=$PATH
+if [ -n "${C_INCLUDE_PATH}" ]; then
+  export OLD_C_INCLUDE_PATH=$C_INCLUDE_PATH
+fi
 
+if [ -n "${CPLUS_INCLUDE_PATH}" ]; then
+  export OLD_CPLUS_INCLUDE_PATH=$CPLUS_INCLUDE_PATH
+fi
+
+if [ -n "${LDFLAGS}" ]; then
+  export OLD_LDFLAGS=$LDFLAGS
+fi
+
+if [ -n "${CPATH}" ]; then
+  export OLD_CPATH=$CPATH
+fi
+
+if [ -n "${NUMPY_HEADERS}" ]; then
+  export OLD_NUMPY_HEADERS=$NUMPY_HEADERS
+fi
+
+if [ -n "${SET_INSTALLATION_OPTIONS}" ]; then
+  source $SET_INSTALLATION_OPTIONS
+else
+  source set_installation_options
+fi
 
 # ----------------------------------------------------------------------------
 # ----------------------------------------------------------------------------
@@ -45,9 +68,9 @@ export OLD_PATH=$PATH
 source $ROOTDIR/.local/bin/activate
 
 if [ -n "${GLOBAL_PACKAGES_LOCATION}" ]; then
-addvar PYTHONPATH $GLOBAL_PACKAGES_LOCATION/lib/python$PYTHON_VERSION/site-packages
+  addvar PYTHONPATH $GLOBAL_PACKAGES_LOCATION/lib/python$PYTHON_VERSION/site-packages
 
-addvar LD_LIBRARY_PATH $GLOBAL_PACKAGES_LOCATION/lib
+  addvar LD_LIBRARY_PATH $GLOBAL_PACKAGES_LOCATION/lib
 fi
 
 addvar LD_LIBRARY_PATH $ROOTDIR/.local/lib
@@ -65,6 +88,7 @@ addvar LD_LIBRARY_PATH $ROOTDIR/.local/lib/python$PYTHON_VERSION/site-packages/n
 export CPATH=$CPATH:$ROOTDIR/.local/lib/python$PYTHON_VERSION/site-packages/numpy/core/include
 
 export C_INCLUDE_PATH=$C_INCLUDE_PATH:$ROOTDIR/.local/lib/python$PYTHON_VERSION/site-packages/numpy/core/include
+
 export CPLUS_INCLUDE_PATH=$CPLUS_INCLUDE_PATH:$ROOTDIR/.local/lib/python$PYTHON_VERSION/site-packages/numpy/core/include
 
 # ----------------------------------------------------------------------------
@@ -74,27 +98,27 @@ export CPLUS_INCLUDE_PATH=$CPLUS_INCLUDE_PATH:$ROOTDIR/.local/lib/python$PYTHON_
 # ----------------------------------------------------------------------------
 
 if [ -z "${IGNORE_PLANCK_COMPILATION}" ]; then
-    if [ -n "${CLIK_PATH}" ]; then
-        export OLD_CLIK_PATH=$CLIK_PATH
-    fi
+  if [ -n "${CLIK_PATH}" ]; then
+    export OLD_CLIK_PATH=$CLIK_PATH
+  fi
 
-    if [ -n "${CLIK_DATA}" ]; then
-        export OLD_CLIK_DATA=$CLIK_DATA
-    fi
+  if [ -n "${CLIK_DATA}" ]; then
+    export OLD_CLIK_DATA=$CLIK_DATA
+  fi
 
-    if [ -n "${CLIK_PLUGIN}" ]; then
-        export OLD_CLIK_PLUGIN=$CLIK_PLUGIN
-    fi
+  if [ -n "${CLIK_PLUGIN}" ]; then
+    export OLD_CLIK_PLUGIN=$CLIK_PLUGIN
+  fi
 
-    addvar LD_LIBRARY_PATH $ROOTDIR/external_modules/code/planck/plc_3.0/plc-3.01/lib
+  addvar LD_LIBRARY_PATH $ROOTDIR/external_modules/code/planck/plc_3.0/plc-3.01/lib
 
-    addvar PYTHONPATH $ROOTDIR/.local/lib/python/site-packages
+  addvar PYTHONPATH $ROOTDIR/.local/lib/python/site-packages
 
-    export CLIK_PATH=$ROOTDIR/.local
+  export CLIK_PATH=$ROOTDIR/.local
 
-    export CLIK_DATA=$ROOTDIR/.local/share/clik
+  export CLIK_DATA=$ROOTDIR/.local/share/clik
 
-    export CLIK_PLUGIN=rel2015
+  export CLIK_PLUGIN=rel2015
 fi
 
 # ----------------------------------------------------------------------------
@@ -103,7 +127,7 @@ fi
 # ----------------------------------------------------------------------------
 # ----------------------------------------------------------------------------
 
-source $ROOTDIR/projects/.start_all.sh
+source $ROOTDIR/projects/start_all.sh
 
 # ----------------------------------------------------------------------------
 # ----------------------------------------------------------------------------
