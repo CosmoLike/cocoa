@@ -1,4 +1,13 @@
-# Overview: The [Cobaya](https://github.com/CobayaSampler)-[CosmoLike](https://github.com/CosmoLike) Joint Architecture
+# Table of contents: The [Cobaya](https://github.com/CobayaSampler)-[CosmoLike](https://github.com/CosmoLike) Joint Architecture
+1. [Overview](#overview)
+2. [Installation of cocoa required packages](#required_packages)
+    1. [Via Conda (best for Linux)](#required_packages_conda)
+    2. [Via Docker (best for MacOS/Windows)](#required_packages_docker)
+    3. [Via Homebrew](#required_packages_homebrew)
+    4. [Via Cocoa's internal cache](#required_packages_cache)
+3. [Installation of cocoa base code](#cocoa_base_code)
+
+## Overview <a name="overview"></a>
 
 Cocoa allows users to run [CosmoLike](https://github.com/CosmoLike) routines inside the [Cobaya](https://github.com/CobayaSampler) framework. Cosmolike is capable of analyzing data primarily from the [Dark Energy Survey](https://www.darkenergysurvey.org) (a.k.a DES) and simulating future multi-probe analyses for Rubin Observatory's Legacy Survey of Space and Time or the Roman Space Telescope. This readme file presents basic and advanced instructions for installing all Cocoa components, including the [Planck likelihood](https://wiki.cosmos.esa.int/planck-legacy-archive/index.php/Main_Page).
 
@@ -16,11 +25,11 @@ Cocoa allows users to run [CosmoLike](https://github.com/CosmoLike) routines ins
 
 By no means, we want to discourage people from cloning code from their original repositories. We've included these codes as compressed [xz file format](https://tukaani.org/xz/format.html) in our repository for convenience in the initial development. The work of those authors is extraordinary, and they must be properly cited.
 
-# Installation of cocoa required packages
+## Installation of cocoa required packages <a name="required_packages"></a>
 
 Cosmolike and the interface between Cosmolike and Cocoa requires many packages to be installed, including [GSL](https://www.gnu.org/software/gsl/), [FFTW](https://www.fftw.org), [Armadillo](http://arma.sourceforge.net) and [Boost](https://www.boost.org). The plethora of GCC, Python, and package versions, each one with different bugs and regressions, can make the installation of any big code to be pure agony, especially given that CAMB, CLASS, Cosmolike, and Planck likelihood involves Fortran, C, C++, and Python languages. We try to simplify this process by offering a few installation options on Linux and macOS. 
 
-### Via Conda (best for Linux)
+### Via Conda (best for Linux) <a name="required_packages_conda"></a>
 
 A simple way to install most prerequisites is via [Conda](https://github.com/conda/conda) environments. Cocoa's internal scripts will then install any remaining missing packages when compiling the base code. Assuming that the user had previously installed [Minicoda](https://docs.conda.io/en/latest/miniconda.html) (or [Anaconda](https://www.anaconda.com/products/individual)), the first step is to type the following commands to create the cocoa Conda environment.
 
@@ -64,7 +73,7 @@ With this installation method, users must activate the Conda environment wheneve
 
 Users can now proceed to the section [Installation of cocoa base code](https://github.com/CosmoLike/cocoa#installation-of-cocoa-base-code). 
 
-### Via Docker (best for MacOS/Windows)
+### Via Docker (best for MacOS/Windows) <a name="required_packages_docker"></a>
 
 Docker installation will allow users to run Cocoa inside an instantiation of the [Whovian-Cosmo](https://hub.docker.com/r/vivianmiranda/whovian-cosmo) docker image. Installation of the [docker engine](https://docs.docker.com/engine/) on local PCs is a straightforward process, but it does require `sudo` privileges (see Docker's [official documentation](https://docs.docker.com/engine/install/) for OS-specific instructions).
 
@@ -98,7 +107,7 @@ This command will download the [Whovian-Cosmo](https://hub.docker.com/r/vivianmi
 
     $ singularity shell --no-home --bind /path/to/cocoa:/home/whovian/host --bind ~/.ssh:/home/whovian/.ssh:ro whovian-cosmo
 
-### Via homebrew
+### Via Homebrew <a name="required_packages_homebrew"></a>
 
 This subsection assumes users adopt [Homebrew](https://brew.sh) as the macOS package manager and [BASH](https://www.howtogeek.com/444596/how-to-change-the-default-shell-to-bash-in-macos-catalina/) as the default shell. 
 
@@ -165,7 +174,7 @@ Users must also update their `$PATH` so the OS can detect the [Homebrew](https:/
 
 Users can now proceed to the section [Installation of cocoa base code](https://github.com/CosmoLike/cocoa#installation-of-cocoa-base-code). 
 
-### Via Cocoa's internal scripts and cache
+### Via Cocoa's internal cache <a name="required_packages_cache"></a>
 
 (**Warning**) This method is painfully slow, not advisable. It does, however, offer users that don't work with Conda the opportunity to encapsulate the installation of required packages. *We advise the adoption of Conda or Docker installation*. 
 
@@ -236,7 +245,7 @@ Users also need to set the following self-explanatory environmental keys on [set
 
 Users can now proceed to the section [Installation of cocoa base code](https://github.com/CosmoLike/cocoa#installation-of-cocoa-base-code). 
 
-# Installation of cocoa base code
+## Installation of cocoa base code <a name="cocoa_base_code"></a>
 
 Type:
 
