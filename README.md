@@ -22,7 +22,7 @@ Cosmolike and the interface between Cosmolike and Cocoa requires many packages t
 
 ### Via Conda (best for Linux)
 
-A simple way to install most prerequisites is via the Conda environment. Cocoa's internal scripts will then install any remaining missing packages when compiling the base code. Assuming that the user had previously installed Minicoda (or Anaconda), the first step is to type the following commands to create the cocoa Conda environment.
+A simple way to install most prerequisites is via [Conda](https://github.com/conda/conda) environments. Cocoa's internal scripts will then install any remaining missing packages when compiling the base code. Assuming that the user had previously installed [Minicoda](https://docs.conda.io/en/latest/miniconda.html) (or [Anaconda](https://www.anaconda.com/products/individual)), the first step is to type the following commands to create the cocoa Conda environment.
 
     $ conda create --name cocoa python=3.7 --quiet --yes
 
