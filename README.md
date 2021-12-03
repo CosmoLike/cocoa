@@ -167,7 +167,7 @@ Users can now proceed to the section [Installation of cocoa base code](https://g
 
 ### Via Cocoa's internal scripts and cache
 
-(**Warning**) This method is painfully slow, not advisable. It does, however, offer users that don't work with Conda the opportunity to encapsulate the installation of required packages. *The Conda or Docker installation are always preferred*. 
+(**Warning**) This method is painfully slow, not advisable. It does, however, offer users that don't work with Conda the opportunity to encapsulate the installation of required packages. *We advise the adoption of Conda or Docker installation*. 
 
 Whenever Conda or Docker installation procedures are unavailable, the user can still perform a local semi-autonomous installation on Linux based on a few scripts we implemented. We also provide a local copy of most required packages on Cocoa's cache folder [cocoa_installation_libraries](https://github.com/CosmoLike/cocoa/tree/main/cocoa_installation_libraries), as there are HPC machines where compute nodes that compile code don't have internet access (NASA Pleiades being one example). We, therefore, only assume the pre-installation of the following packages to perform the local setup:
 
@@ -227,7 +227,7 @@ Users also need to set the following self-explanatory environmental keys on [set
       #export IGNORE_OPENBLAS_INSTALLATION=1
       #export IGNORE_FORTRAN_LAPACK_INSTALLATION=1
    
-(**Warning**) Our scripts never install packages on `$HOME/.local` or on any locations in the user's `$PATH` and `$LD_LIBRARY_PATH`. Doing so could impose incompatibilities between Cobaya and different projects (or break the users environment). All requirements for Cocoa are installed at
+(**Warning**) Our scripts never install packages on `$HOME/.local` or on other locations in the user's `$PATH` and `$LD_LIBRARY_PATH`. Doing so could impose incompatibilities between Cobaya and different projects (or break the user's environment for other projects). All requirements for Cocoa are installed at
 
     Cocoa/.local/bin
     Cocoa/.local/include
@@ -323,7 +323,20 @@ The `cocoa_XXX` folder that host the `XXX` project needs to have the more or les
     |    |   +-- interface.hpp
     |    +-- chains
     |    |   +-- README
-      
+
+(**Warning**) Developers with access to UofA projects can download them by typing
+
+    $ source $ROOTDIR/projects/clone_all.sh
+Here is a list of projects inside `clone_all` script
+
+    [Extracted from clone_all script]
+    URLS="git@github.com:CosmoLike/cocoa_des_y1.git
+      git@github.com:CosmoLike/cocoa_des_y3.git
+      git@github.com:CosmoLike/cocoa_desxplanck.git
+      git@github.com:CosmoLike/cocoa_desy1xplanck.git
+      git@github.com:CosmoLike/cocoa_lsst_fourier.git
+      git@github.com:CosmoLike/cocoa_kids.git
+      git@github.com:CosmoLike/cocoa_des_4x2ptN.git"
 
 # Appendix
 
