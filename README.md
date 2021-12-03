@@ -156,7 +156,7 @@ We assume the user adopts [Homebrew](https://brew.sh) as the OS package manager 
     python3=/Users/XXX/Library/Python/3.7/bin
     export PATH=$python3:$PATH
     
-### Via cocoa's internal cache (cumbersome - not advisable)
+### Via Cocoa's internal cache (cumbersome - not advisable)
 
 Whenever Conda or Docker installation procedures are unavailable, the user can still perform a local semi-autonomous installation on Linux based on scripts we provide. We provide a local copy of most required packages on Cocoa's cache folder [cocoa_installation_libraries](https://github.com/CosmoLike/cocoa/tree/main/cocoa_installation_libraries), as there are HPC machines where compute nodes that compile code don't have internet access, NASA Pleiades being one example. Therefore, we only assume the pre-installation of the following packages to perform the local setup:
 
@@ -234,16 +234,13 @@ Type:
 Cocoa chooses the preferred method of installation/compilation via special environment keys located on [set_installation_options](https://github.com/CosmoLike/cocoa/blob/master/Cocoa/set_installation_options) script (Docker is the default option). 
 Choose accordingly to the used installation method of cocoa required packages  
 
-    # ----------------------------------------------------------------------------
-    # -----------------------  OPTIONS FOR SYSTEM INSTALLATION -------------------
-    # ----------------------------------------------------------------------------
+    #  ---------------------------------------------------------------------------
+    # HOW COCOA BE INSTALLED? -------------------------------
 
-    export DOCKER_INSTALLATION=1
+    #export DOCKER_INSTALLATION=1
     #export MINICONDA_INSTALLATION=1
-    (...)
-    #export AMYPOND_SUPERCOMPUTER_INSTALLATION=1
     #export MACOS_HOMEBREW_INSTALLATION=1
-    (...)
+    #export MANUAL_INSTALLATION=1
     
 After the setup of the proper environment key, the installation/compilation of cocoa base code can be performed with the following commands:
 
@@ -253,7 +250,7 @@ After the setup of the proper environment key, the installation/compilation of c
     
     $ source start_cocoa
 
-`setup_cocoa_installation_packages` this will decompress data files (from Planck for example) and install required packages that may have been left out in the Conda/Docker procedure (for Manual installation, this script will install all required packages). Decompression should take 5-10 minutes while package installation time may range from a few seconds (in case conda/docker installation was selected ) to hours (manual installation).  
+`setup_cocoa_installation_packages` this will decompress data files (from Planck for example) and install required packages that may have been left out in the Conda/Docker/homebrew procedure. Decompression should take 5-10 minutes, while package installation time may range from a few seconds (conda/docker installation) to hours (manual installation).  
 
 ### Running Examples
 
