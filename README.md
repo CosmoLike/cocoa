@@ -1,3 +1,5 @@
+
+
 # Table of contents: The [Cobaya](https://github.com/CobayaSampler)-[CosmoLike](https://github.com/CosmoLike) Joint Architecture
 1. [Overview](#overview)
 2. [Installation of cocoa required packages](#required_packages)
@@ -6,6 +8,12 @@
     3. [Via Homebrew](#required_packages_homebrew)
     4. [Via Cocoa's internal cache](#required_packages_cache)
 3. [Installation of cocoa base code](#cocoa_base_code)
+    1. [Running Examples](#cocoa_base_code_examples)
+5. [Download/compiling/running specific cocoa projects](#cocoa_projects)
+6. [Appendix](#appendix)
+    1. [Compiling Boltzmann, CosmoLike and Likelihood codes separatelly](#appendix_compile_separatelly)
+    2. [Running Jupyter Notebooks inside the Whovian-Cosmo docker container](#appendix_jupyter_whovian)
+    3. [Summary Information about Cocoa's configuration files](#appendix_config_files)
 
 ## Overview <a name="overview"></a>
 
@@ -71,7 +79,7 @@ With this installation method, users must activate the Conda environment wheneve
 
     $ conda activate cocoa
 
-Users can now proceed to the section [Installation of cocoa base code](https://github.com/CosmoLike/cocoa#installation-of-cocoa-base-code). 
+Users can now proceed to the section [Installation of cocoa base code](#cocoa_base_code). 
 
 ### Via Docker (best for MacOS/Windows) <a name="required_packages_docker"></a>
 
@@ -93,7 +101,7 @@ When running the `docker run (...)/whovian-cosmo:version-1.0.2` for the first ti
 
     $ cd /home/whovian/host/
 
-and proceed to the section [Installation of cocoa base code](https://github.com/CosmoLike/cocoa#installation-of-cocoa-base-code). 
+and proceed to the section [Installation of cocoa base code](#cocoa_base_code). 
 
 (**Warning**) There isn't permanent storage outside `/home/whovian/host/`. Be aware of this fact to not lose any work
 
@@ -172,7 +180,7 @@ Users must also update their `$PATH` so the OS can detect the [Homebrew](https:/
     python3=/Users/XXX/Library/Python/3.7/bin
     export PATH=$python3:$PATH
 
-Users can now proceed to the section [Installation of cocoa base code](https://github.com/CosmoLike/cocoa#installation-of-cocoa-base-code). 
+Users can now proceed to the section [Installation of cocoa base code](#cocoa_base_code). 
 
 ### Via Cocoa's internal cache <a name="required_packages_cache"></a>
 
@@ -243,7 +251,7 @@ Users also need to set the following self-explanatory environmental keys on [set
     Cocoa/.local/lib
     Cocoa/.local/share
 
-Users can now proceed to the section [Installation of cocoa base code](https://github.com/CosmoLike/cocoa#installation-of-cocoa-base-code). 
+Users can now proceed to the section [Installation of cocoa base code](#cocoa_base_code). 
 
 ## Installation of cocoa base code <a name="cocoa_base_code"></a>
 
@@ -274,9 +282,9 @@ Users must then type the following commands
     
 `setup_cocoa_installation_packages` script will decompress the data files and install all packages that may have been left out in the Conda/Docker/Homebrew/Manual installation. File decompression should only take a few minutes, while package installation time may range from a few minutes (if installation via *Conda*, *Docker* or *Homebrew* was selected in the previous section) to more than one hour (if installation *via Cocoa's internal scripts and cache* was selected in the previous section).
 
-(**warning**) The script [compile_external_modules](https://github.com/CosmoLike/cocoa/blob/master/Cocoa/compile_external_modules) will try to compile Camb, Planck, Class, and Polychord samplers. If users want to compile/recompile just one of these packages for any reason, we provide scripts for that as well. A quick look to [compile_external_modules](https://github.com/CosmoLike/cocoa/blob/master/Cocoa/compile_external_modules) file shows where these scripts can be found. 
+(**warning**) The script [compile_external_modules](https://github.com/CosmoLike/cocoa/blob/master/Cocoa/compile_external_modules) will try to compile Camb, Planck, Class, and Polychord samplers. If users want to compile/recompile just one of these packages for any reason, we provide scripts for that as well, see appendix [Compiling Boltzmann, CosmoLike and Likelihood codes separatelly](#compile_separatelly) section.
 
-### Running Examples
+### Running Examples <a name="cocoa_base_code_examples"></a>
 
 After that, the Cobaya Framework should be ready, and the user can test a few examples following the commands below
 
@@ -300,7 +308,7 @@ The script [start_cocoa](https://github.com/CosmoLike/cocoa/blob/master/Cocoa/st
 
 This is a feature, not a bug! Conda Cocoa environment can be the same for all Cocoa instances. Therefore, users can, within the same Conda Cocoa environment, use [start_cocoa](https://github.com/CosmoLike/cocoa/blob/master/Cocoa/start_cocoa) and [stop_cocoa](https://github.com/CosmoLike/cocoa/blob/master/Cocoa/stop_cocoa) to load/unload (.local) environment many times in different Cocoa's instances.
 
-# Download/compiling/running specific cocoa projects
+# Download/compiling/running specific cocoa projects <a name="cocoa_proojects"></a>
 
 The `projects` folder was designed to include all the projects that are being developed by our group. Individual projects must be hosted on independent folders named `cocoa_XXX` where XXX is the project name. 
 
@@ -354,9 +362,9 @@ Here is a list of projects inside [clone_all](https://github.com/CosmoLike/cocoa
       git@github.com:CosmoLike/cocoa_kids.git
       git@github.com:CosmoLike/cocoa_des_4x2ptN.git"
 
-# Appendix
+## Appendix <a name="appendix"></a>
 
-### Compiling Boltzmann, CosmoLike and Likelihood codes separatelly
+### Compiling Boltzmann, CosmoLike and Likelihood codes separatelly <a name="appendix_compile_separatelly"></a>
 
 To avoid excessive compilation times during development, users can use specialized scripts that compile only the specific modules:
 
@@ -368,7 +376,7 @@ To avoid excessive compilation times during development, users can use specializ
 
     source ./installation_scripts/setup_polychord
 
-### Running Jupyter Notebooks inside the [Whovian-Cosmo](https://hub.docker.com/r/vivianmiranda/whovian-cosmo) container
+### Running Jupyter Notebooks inside the [Whovian-Cosmo](https://hub.docker.com/r/vivianmiranda/whovian-cosmo) docker container <a name="appendix_jupyter_whovian"></a>
 
 [Cobaya](https://github.com/CobayaSampler), the framework that Cocoa heavily depends on has excellent integration with Jupyter notebooks. Below, some in-depth instructions to run notebooks inside the [Whovian-Cosmo](https://hub.docker.com/r/vivianmiranda/whovian-cosmo) docker container
 
@@ -392,7 +400,7 @@ where `XXX` in the line `[... NotebookApp] or http://127.0.0.1:8888/?token=XXX` 
 
    Finally, go to your browser and type `http://localhost:8080/?token=XXX`, where `XXX` is the previously saved token. For security, we do not allow password-based connections to the jupyter notebooks.
    
-### Summary Information about Cocoa's configuration files
+### Summary Information about Cocoa's configuration files <a name="appendix_config_files"></a>
 
 The installation of Cocoa required packages, as well as Boltzmann and Likelihood codes, are managed via the following scripts located at `./Cocoa`.
 
