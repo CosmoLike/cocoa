@@ -308,7 +308,7 @@ The script [start_cocoa](https://github.com/CosmoLike/cocoa/blob/master/Cocoa/st
 
 This is a feature, not a bug! Conda Cocoa environment can be the same for all Cocoa instances. Therefore, users can, within the same Conda Cocoa environment, use [start_cocoa](https://github.com/CosmoLike/cocoa/blob/master/Cocoa/start_cocoa) and [stop_cocoa](https://github.com/CosmoLike/cocoa/blob/master/Cocoa/stop_cocoa) to load/unload (.local) environment many times in different Cocoa's instances.
 
-# Download/compiling/running specific cocoa projects <a name="cocoa_proojects"></a>
+# Download/compiling/running specific cocoa projects <a name="cocoa_projects"></a> 
 
 The `projects` folder was designed to include all the projects that are being developed by our group. Individual projects must be hosted on independent folders named `cocoa_XXX` where XXX is the project name. 
 
