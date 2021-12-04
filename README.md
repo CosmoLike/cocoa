@@ -306,7 +306,7 @@ Users can, therefore, install multiple Cocoa instances. While one instantiation 
 
     $(Cocoa)(.local)
 
-This is a feature, not a bug! The Conda environment can be the same for all Cocoa instances, with [start_cocoa](https://github.com/CosmoLike/cocoa/blob/master/Cocoa/start_cocoa)/[stop_cocoa](https://github.com/CosmoLike/cocoa/blob/master/Cocoa/stop_cocoa) loading/unloading the corresponding `(.local)` for different Cocoa instances.
+This is a feature, not a bug! The Conda environment can be the same for all Cocoa instances, with [start_cocoa](https://github.com/CosmoLike/cocoa/blob/master/Cocoa/start_cocoa)/[stop_cocoa](https://github.com/CosmoLike/cocoa/blob/master/Cocoa/stop_cocoa) loading/unloading the corresponding `(.local)` private python environments.
 
 # Download/compiling/running specific cocoa projects <a name="cocoa_projects"></a> 
 
