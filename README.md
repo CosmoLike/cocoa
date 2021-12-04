@@ -242,7 +242,7 @@ Users also need to set the following self-explanatory environmental keys on [set
       #export IGNORE_OPENBLAS_INSTALLATION=1
       #export IGNORE_FORTRAN_LAPACK_INSTALLATION=1
    
-(**Warning**) Our scripts never install packages on `$HOME/.local` or on other locations in the user's `$PATH` and `$LD_LIBRARY_PATH`. Doing so could impose incompatibilities between Cobaya and different projects (or break the user's environment for other projects). All requirements for Cocoa are installed at
+(**Warning**) Our scripts never install packages on `$HOME/.local`. Doing so could impose incompatibilities between Cobaya and different projects (or break the user's environment for other projects). All requirements for Cocoa are installed at
 
     Cocoa/.local/bin
     Cocoa/.local/include
@@ -298,13 +298,15 @@ Once the work on the Cocoa environment is done, type:
 
     $(.local) source stop_cocoa
 
-The script [start_cocoa](https://github.com/CosmoLike/cocoa/blob/master/Cocoa/start_cocoa) ensures that `PYTHONPATH`, `LD_LIBRARY_PATH`, and `PATH` will point preferably to the local Cocoa installation. It also initializes the `$(.local)` private python environment. The script [stop_cocoa](https://github.com/CosmoLike/cocoa/blob/master/Cocoa/stop_cocoa), on the other hand, guarantees that the bash environment is clean after the work on Cocoa is completed. (*Users can, therefore, have installed multiple Cocoa instances without one installation affecting the others*). For example, while one instantiation of Cocoa is running some chains, users can tweak Cosmolike in another one. Of course, we don't want the killing of a terminal session in interactive HPC mode to be the only way to ensure consistency of `PYTHONPATH`, `LD_LIBRARY_PATH`, and `PATH` flags. 
+The script [start_cocoa](https://github.com/CosmoLike/cocoa/blob/master/Cocoa/start_cocoa) ensures that `LD_LIBRARY_PATH`, `CPATH`, `C_INCLUDE_PATH`, `CPLUS_INCLUDE_PATH` and `PATH` will point preferably to the local Cocoa installation. It also initializes the `$(.local)` private python environment (including `PYTHONPATH`). The script [stop_cocoa](https://github.com/CosmoLike/cocoa/blob/master/Cocoa/stop_cocoa), on the other hand, guarantees that the bash environment is clean after the work on Cocoa is completed. 
+
+Users can, therefore, install multiple Cocoa instances. While one instantiation of Cocoa is running chains, for example, users can tweak Cosmolike in a second instance without affecting these MCMCs.
 
 (**Warning**) Users that opt for the Conda installation will have a terminal that looks like this:
 
     $(Cocoa)(.local)
 
-This is a feature, not a bug! Conda Cocoa environment can be the same for all Cocoa instances. Therefore, users can, within the same Conda Cocoa environment, use [start_cocoa](https://github.com/CosmoLike/cocoa/blob/master/Cocoa/start_cocoa) and [stop_cocoa](https://github.com/CosmoLike/cocoa/blob/master/Cocoa/stop_cocoa) to load/unload (.local) environment many times in different Cocoa's instances.
+This is a feature, not a bug! Conda Cocoa environment can be the same for all Cocoa instances. Within the same Conda Cocoa environment, [start_cocoa](https://github.com/CosmoLike/cocoa/blob/master/Cocoa/start_cocoa) and [stop_cocoa](https://github.com/CosmoLike/cocoa/blob/master/Cocoa/stop_cocoa) load and unload (.local) environment for different Cocoa's instances.
 
 # Download/compiling/running specific cocoa projects <a name="cocoa_projects"></a> 
 
