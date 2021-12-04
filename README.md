@@ -93,7 +93,7 @@ Linux users must type the following command instead:
 
 The bind `-v ~/.ssh:/home/whovian/.ssh:ro` allows users to pull, push and clone GitHub repositories from inside the container. Users must invoke the command on the parent directory of the path where access inside the docker container is sought. 
 
-When running the `docker run (...)/whovian-cosmo:version-1.0.2` for the first time, the docker engine will automatically download the corresponding image. This step may take some time, as the [Whovian-Cosmo](https://hub.docker.com/r/vivianmiranda/whovian-cosmo) image has approximately 700 Megabytes.
+When running the `docker run (...)/whovian-cosmo:version-1.0.3` for the first time, the docker engine will automatically download the corresponding image. This step may take some time, as the [Whovian-Cosmo](https://hub.docker.com/r/vivianmiranda/whovian-cosmo) image has approximately 700 Megabytes.
 
   The last step is to access the folder `/home/whovian/host/` where the host files have been mounted:
 
