@@ -349,7 +349,7 @@ The `cocoa_XXX` folder that host the `XXX` project needs to have the more or les
 
 (**Warning**) Developers with access to UofA projects can download them by typing
 
-    $ source $ROOTDIR/projects/clone_all.sh
+    $(.local) source $ROOTDIR/projects/clone_all.sh
 
 Here is a list of projects inside [clone_all](https://github.com/CosmoLike/cocoa/blob/main/Cocoa/projects/.clean_all.sh) script
 
@@ -368,13 +368,13 @@ Here is a list of projects inside [clone_all](https://github.com/CosmoLike/cocoa
 
 To avoid excessive compilation times during development, users can use specialized scripts that compile only the specific modules:
 
-    source ./installation_scripts/setup_class
+    $(.local) source ./installation_scripts/setup_class
 
-    source ./installation_scripts/setup_camb
+    $(.local) source ./installation_scripts/setup_camb
 
-    source ./installation_scripts/setup_planck
+    $(.local) source ./installation_scripts/setup_planck
 
-    source ./installation_scripts/setup_polychord
+    $(.local) source ./installation_scripts/setup_polychord
 
 ### Running Jupyter Notebooks inside the [Whovian-Cosmo](https://hub.docker.com/r/vivianmiranda/whovian-cosmo) docker container <a name="appendix_jupyter_whovian"></a>
 
