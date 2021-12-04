@@ -1,7 +1,5 @@
-
-
-# Table of contents: The [Cobaya](https://github.com/CobayaSampler)-[CosmoLike](https://github.com/CosmoLike) Joint Architecture
-1. [Overview](#overview)
+# Table of contents
+1. [Overview of the Cobaya-CosmoLike Joint Architecture (Cocoa)](#overview)
 2. [Installation of cocoa required packages](#required_packages)
     1. [Via Conda (best for Linux)](#required_packages_conda)
     2. [Via Docker (best for MacOS/Windows)](#required_packages_docker)
@@ -15,7 +13,7 @@
     2. [Running Jupyter Notebooks inside the Whovian-Cosmo docker container](#appendix_jupyter_whovian)
     3. [Summary Information about Cocoa's configuration files](#appendix_config_files)
 
-## Overview <a name="overview"></a>
+## Overview of the [Cobaya](https://github.com/CobayaSampler)-[CosmoLike](https://github.com/CosmoLike) Joint Architecture (Cocoa) <a name="overview"></a>
 
 Cocoa allows users to run [CosmoLike](https://github.com/CosmoLike) routines inside the [Cobaya](https://github.com/CobayaSampler) framework. Cosmolike is capable of analyzing data primarily from the [Dark Energy Survey](https://www.darkenergysurvey.org) (a.k.a DES) and simulating future multi-probe analyses for Rubin Observatory's Legacy Survey of Space and Time or the Roman Space Telescope. This readme file presents basic and advanced instructions for installing all Cocoa components, including the [Planck likelihood](https://wiki.cosmos.esa.int/planck-legacy-archive/index.php/Main_Page).
 
