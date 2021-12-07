@@ -35,7 +35,7 @@ By no means, we want to discourage people from cloning code from their original 
 
 Cosmolike and the interface between Cosmolike and Cocoa requires many packages to be installed, including [GSL](https://www.gnu.org/software/gsl/), [FFTW](https://www.fftw.org), [Armadillo](http://arma.sourceforge.net) and [Boost](https://www.boost.org). The plethora of GCC, Python, and package versions, each one with different bugs and regressions, can make the installation of any big code to be pure agony, especially given that CAMB, CLASS, Cosmolike, and Planck likelihood involves Fortran, C, C++, and Python languages. We try to simplify this process by offering a few installation options on Linux and macOS. 
 
-### Via Conda (best for Linux) <a name="required_packages_conda"></a>
+### Via Conda (best for Linux/HPC) <a name="required_packages_conda"></a>
 
 A simple way to install most prerequisites is via [Conda](https://github.com/conda/conda) environments. Cocoa's internal scripts will then install any remaining missing packages when compiling the base code. Assuming that the user had previously installed [Minicoda](https://docs.conda.io/en/latest/miniconda.html) (or [Anaconda](https://www.anaconda.com/products/individual)), the first step is to type the following commands to create the cocoa Conda environment.
 
@@ -43,7 +43,7 @@ A simple way to install most prerequisites is via [Conda](https://github.com/con
 
 and
 
-    $ conda install -n cocoa --quiet --yes  \
+    $ conda create --name cocoa python=3.7 --quiet --yes && conda install -n cocoa --quiet --yes  \
       'conda-forge::libgcc-ng=10.3.0' \
       'conda-forge::libstdcxx-ng=10.3.0' \
       'conda-forge::libgfortran-ng=10.3.0' \
@@ -197,6 +197,8 @@ Whenever Conda or Docker installation procedures are unavailable, the user can s
    - [Python Virtual Environment](https://www.geeksforgeeks.org/python-virtual-environment/)
 
 To perform the local semi-autonomous installation, users should follow the procedures on section [Installation of cocoa base code](https://github.com/CosmoLike/cocoa#installation-of-cocoa-base-code), adding, however, the many additional configurations on [set_installation_options](https://github.com/CosmoLike/cocoa/blob/master/Cocoa/set_installation_options) script that are explained below.
+
+(**warning**) The command above may not activate the OpenMP; see appendix [OpenMP+MPI hybrid parallelization]() for details on how to run chains with both types of parallelization schemes.
 
 The local installation via cocoa's internal cache is selected whenever the environmental key `MANUAL_INSTALLATION` is set:
 
@@ -415,7 +417,21 @@ where `XXX` in the line `[... NotebookApp] or http://127.0.0.1:8888/?token=XXX` 
     $ ssh your_username@your_sever.com -L 8080:localhost:8080
 
    Finally, go to your browser and type `http://localhost:8080/?token=XXX`, where `XXX` is the previously saved token. For security, we do not allow password-based connections to the jupyter notebooks.
-   
+
+### OpenMP+MPI hybrid parallelization <a name="appendix_openmp_mpi"></a>
+
+    In our experience, activating both OpenMP and MPI in python code when running from HPC environments can be tricky. Solutions are HPC dependent. So below, we list some of our HPC solutions:
+    
+(1) UofA Ocelote (default solution on our scripts):
+    #SBATCH --nodes=1
+    #SBATCH --ntasks-per-node=4
+    #SBATCH --cpus-per-task=4
+    
+    (...)
+    
+    export OMP_NUM_THREADS=$SLURM_CPUS_PER_TASK
+    mpirun -n ${SLURM_NTASKS} --mca btl tcp,self --bind-to core --rank-by core --map-by numa:pe=${OMP_NUM_THREADS} cobaya-run ./projects/example/EXAMPLE_MCMC1.yaml -f -r   
+
 ### Summary Information about Cocoa's configuration files <a name="appendix_config_files"></a>
 
 The installation of Cocoa required packages, as well as Boltzmann and Likelihood codes, are managed via the following scripts located at `./Cocoa`.
