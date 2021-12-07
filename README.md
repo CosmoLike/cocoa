@@ -422,14 +422,14 @@ where `XXX` in the line `[... NotebookApp] or http://127.0.0.1:8888/?token=XXX` 
 In our experience, activating both OpenMP and MPI in python code when running from HPC environments can be tricky. Solutions are HPC dependent. So below, we list some of our HPC solutions:
     
 (1) UofA Ocelote (default solution on our scripts):
-    #SBATCH --nodes=1
-    #SBATCH --ntasks-per-node=4
-    #SBATCH --cpus-per-task=4
+     #SBATCH --nodes=1
+     #SBATCH --ntasks-per-node=4
+     #SBATCH --cpus-per-task=4
     
-    (...)
+     (...)
     
-    export OMP_NUM_THREADS=$SLURM_CPUS_PER_TASK
-    mpirun -n ${SLURM_NTASKS} --mca btl tcp,self --bind-to core --rank-by core --map-by numa:pe=${OMP_NUM_THREADS} cobaya-run ./projects/example/EXAMPLE_MCMC1.yaml -f -r   
+     export OMP_NUM_THREADS=$SLURM_CPUS_PER_TASK
+     mpirun -n ${SLURM_NTASKS} --mca btl tcp,self --bind-to core --rank-by core --map-by numa:pe=${OMP_NUM_THREADS} cobaya-run ./projects/example/EXAMPLE_MCMC1.yaml -f -r   
 
 ### Summary Information about Cocoa's configuration files <a name="appendix_config_files"></a>
 
