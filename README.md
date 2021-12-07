@@ -308,7 +308,7 @@ These examples will evaluate various likelihoods at specific cosmologies. The `-
     --> Returned "Not found" (-13) instead of "Success" (0)
     --------------------------------------------------------------------------
 
-The origin of this problem lies in the choice of conda-forge developers to not compile openmpi with Infiniband compatibility. The solution is to replace `mpirun -n XXX` with `mpirun -n XXX --mca btl tcp,self` which will enforce the TCP protocol for communication. Users outraged by the small overhead TCP will bring over Infiniband can perform the [installation via Cocoa's internal cache](required_packages_cache) that depends on the HPC module system to load the openmpi compiled by the system administrators.    
+The origin of this problem lies in the choice of conda-forge developers to not compile openmpi with Infiniband compatibility. The solution is to replace `mpirun -n XXX cobaya-run` with `mpirun -n XXX --mca btl tcp,self cobaya-run` (please replace `XXX` by the number of MPI cores) which will enforce the TCP protocol for communication. Users outraged by the small overhead TCP will bring over Infiniband can perform the [installation via Cocoa's internal cache](required_packages_cache) that depends on the HPC module system to load the openmpi compiled by the system administrators.    
 
 Once the work on the Cocoa environment is done, type:
 
