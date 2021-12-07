@@ -294,6 +294,22 @@ After that, the Cobaya Framework should be ready, and the user can test a few ex
     
 These examples will evaluate various likelihoods at specific cosmologies. The `-f` ensures that the same YAML file can be run multiple times, overwriting output files from previous evaluations that are located at `./chains`.
 
+(**warning**) In HPC environments, you may face this error when running `cobaya` within the Conda cocoa environment. 
+    
+    --------------------------------------------------------------------------
+    It looks like MPI_INIT failed for some reason; your parallel process is
+    likely to abort.  There are many reasons that a parallel process can
+    fail during MPI_INIT; some of which are due to configuration or environment
+    problems.  This failure appears to be an internal failure; here's some
+    additional information (which may only be relevant to an Open MPI
+    developer):
+
+    mca_bml_base_open() failed
+    --> Returned "Not found" (-13) instead of "Success" (0)
+    --------------------------------------------------------------------------
+
+The origin of this problem lies in the choice of conda-forge developers to not compile openmpi with Infiniband compatibility. The solution is to replace `mpirun -n XXX` with `mpirun -n XXX --mca btl tcp,self` which will enforce the TCP protocol for communication. Users outraged by the small overhead TCP will bring over Infiniband can perform the [installation via Cocoa's internal cache](required_packages_cache) that depends on the HPC module system to load the openmpi compiled by the system administrators.    
+
 Once the work on the Cocoa environment is done, type:
 
     $(.local) source stop_cocoa
