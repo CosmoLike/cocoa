@@ -271,13 +271,15 @@ Cocoa chooses the preferred method of installation and compilation via special e
     #export MACOS_HOMEBREW_INSTALLATION=1
     #export MANUAL_INSTALLATION=1
     
-Users must then type the following commands
+Users must then type the following command
 
-    $ source setup_cocoa_installation_packages
+    source setup_cocoa_installation_packages
+
+This script decompress the data files and install all packages that may have been left out in the Conda/Docker/Homebrew/Manual installation. File decompression should only take a few minutes, while package installation time may range from a few minutes (if installation via *Conda*, *Docker* or *Homebrew* was selected in the previous section) to more than one hour (if installation *via Cocoa's internal scripts and cache* was selected in the previous section). Finally, type
+
+    source compile_external_modules
     
-    $ source compile_external_modules
-    
-`setup_cocoa_installation_packages` script will decompress the data files and install all packages that may have been left out in the Conda/Docker/Homebrew/Manual installation. File decompression should only take a few minutes, while package installation time may range from a few minutes (if installation via *Conda*, *Docker* or *Homebrew* was selected in the previous section) to more than one hour (if installation *via Cocoa's internal scripts and cache* was selected in the previous section).
+to compile CAMB/CLASS/Planck..
 
 (**warning**) The script [compile_external_modules](https://github.com/CosmoLike/cocoa/blob/master/Cocoa/compile_external_modules) will try to compile Camb, Planck, Class, and Polychord samplers. If users want to compile/recompile just one of these packages for any reason, we provide scripts for that as well, see appendix [Compiling Boltzmann, CosmoLike and Likelihood codes separatelly](#compile_separatelly) section.
 
