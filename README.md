@@ -419,7 +419,7 @@ where `XXX` in the line `[... NotebookApp] or http://127.0.0.1:8888/?token=XXX` 
 
 ### OpenMP+MPI hybrid parallelization <a name="appendix_openmp_mpi"></a>
 
-    In our experience, activating both OpenMP and MPI in python code when running from HPC environments can be tricky. Solutions are HPC dependent. So below, we list some of our HPC solutions:
+In our experience, activating both OpenMP and MPI in python code when running from HPC environments can be tricky. Solutions are HPC dependent. So below, we list some of our HPC solutions:
     
 (1) UofA Ocelote (default solution on our scripts):
     #SBATCH --nodes=1
