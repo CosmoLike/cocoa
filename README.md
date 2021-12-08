@@ -264,7 +264,7 @@ The projects folder was designed to include all Cosmolike projects. Similar to l
 
 (**expert**) The prefix `cocoa_` on Cosmolike organization avoids mixing Cobaya-Cosmolike projects with code meant to be run on the legacy CosmoLike code.
 
-**Step 3 of 5**: go back to Cocoa main folder
+**Step 2 of 5**: go back to Cocoa main folder
     
     $ cd ../
     
@@ -277,11 +277,11 @@ The projects folder was designed to include all Cosmolike projects. Similar to l
  
 (**expert**) Why the warning above? [Start_cocoa](https://github.com/CosmoLike/cocoa/blob/master/Cocoa/start_cocoa) calls [./projects/start_all](https://github.com/CosmoLike/cocoa/blob/main/Cocoa/projects/start_all.sh). This script creates a symbolic link for the (1) *likelihood* of all projects to [./cobaya/cobaya/likelihoods/](https://github.com/CosmoLike/cocoa/tree/main/Cocoa/cobaya/cobaya/likelihoods); (2) *data products* of all projects to [./external_modules/data](https://github.com/CosmoLike/cocoa/tree/main/Cocoa/external_modules/data). The script [./projects/start_all](https://github.com/CosmoLike/cocoa/blob/main/Cocoa/projects/start_all.sh) also adds the *cosmolike interface* of all projects to `LD_LIBRARY_PATH` and `PYTHONPATH`.
 
- **Step 3 of 5**: compile the project
+ **Step 4 of 5**: compile the project
  
      $(cocoa)(.local) source ./projects/XXX/scripts/compile_XXX
   
- **Step 4 of 5**: select the number of OpenMP cores and run a template yaml file
+ **Step 5 of 5**: select the number of OpenMP cores and run a template yaml file
     
     $(cocoa)(.local) export OMP_NUM_THREADS = 4
     $(cocoa)(.local) mpirun -n 1 --mca btl tcp,self --bind-to core --rank-by core --map-by numa:pe=${OMP_NUM_THREADS} cobaya-run ./projects/XXX/EXAMPLE_EVALUATE1.yaml -f
