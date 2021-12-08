@@ -308,11 +308,23 @@ and (optional)
     
     $(cocoa) conda deactivate cocoa
 
-# Running cosmolike projects <a name="cocoa_projects"></a> 
+# Running Cosmolike projects <a name="running_cosmolike_projects"></a> 
 
-The projects folder was designed to include all the Cosmolike projects. The majority of projects we are working on are not public (yet), and we safeguard them on the private repositories listed on `./project/clone_all.sh` script (the backbone Cosmolike software, however, is publicly available at `./external_modules/code`!). 
+The projects folder was designed to include all the Cosmolike projects. The majority of projects we are working on are not public (yet). The backbone Cosmolike software, however, is publicly available at `./external_modules/code`). 
 
-**Naming convention on Cosmolike Organization**: Projects named XXX are stored on `cocoa_XXX` repositories hosted at [Cosmolike Organization](https://github.com/CosmoLike). The prefix `cocoa_` is **mandatory**, so we don't mix them with projects that are based on the original CosmoLike program. Our scripts and template yaml files, however, assume the `cocoa_` prefix  has been removed when cloning the repository. The script `project/clone_all.sh` does that automatically, but UofA developers that prefer to clone their git repository manually must remember that convention.
+**Naming convention on Cosmolike Organization**: Projects named XXX are stored on `cocoa_XXX` repositories hosted at [Cosmolike Organization](https://github.com/CosmoLike). The prefix `cocoa_` is **mandatory**, so we don't mix them with projects that are based on the original CosmoLike program. Our scripts and template yaml files, however, assume the `cocoa_` prefix  has been removed as shown below
+
+    $(cocoa)(.local) git clone git@github.com:CosmoLike/cocoa_XXX.git XXX
+
+**After cloning a project, users must restart the Cocoa `(.local)` environment** so the `./project/XXX/script/start_XXX` can be loaded. The [start_cocoa](https://github.com/CosmoLike/cocoa/blob/master/Cocoa/start_cocoa) and [stop_cocoa](https://github.com/CosmoLike/cocoa/blob/master/Cocoa/stop_cocoa) scripts always scan all projects and call `./project/XXX/script/start[stop]_XXX` automatically.
+
+Compilation of a particular project, from the Cocoa main folder, should use 'scripts/compile_XXX' script as shown below:
+
+     $(cocoa)(.local) source ./projects/XXX/scripts/compile_XXX
+
+Most projects have template yamls located at `./projects/XXX/examples/`.
+
+# Creating Cosmolike projects <a name="creating_cosmolike_projects"></a> 
 
 The `XXX` project needs to have the more or less the following structure (taken from our private DES-Y3 project)
 
@@ -344,23 +356,6 @@ The `XXX` project needs to have the more or less the following structure (taken 
     |    |   +-- interface.hpp
     |    +-- chains
     |    |   +-- README
-
-Here is a list of projects inside [clone_all](https://github.com/CosmoLike/cocoa/blob/main/Cocoa/projects/.clean_all.sh) script
-
-    [Extracted from clone_all script]
-    URLS="git@github.com:CosmoLike/cocoa_des_y1.git
-      git@github.com:CosmoLike/cocoa_des_y3.git
-      git@github.com:CosmoLike/cocoa_desxplanck.git
-      git@github.com:CosmoLike/cocoa_desy1xplanck.git
-      git@github.com:CosmoLike/cocoa_lsst_fourier.git
-      git@github.com:CosmoLike/cocoa_kids.git
-      git@github.com:CosmoLike/cocoa_des_4x2ptN.git"
-
-**After cloning a project, users must restart the Cocoa `(.local)` environment** so the `./project/XXX/script/start_XXX` can be loaded (start_cocoa and stop_cocoa scripts scan all projects and call `./project/XXX/script/start[stop]_XXX` automatically).
-
-Compilation of a particular project, from the Cocoa main folder, should use 'scripts/compile_XXX' script as shown below:
-
-     $(cocoa)(.local) source ./projects/des_y3/scripts/compile_des_y3
 
 ## Appendix <a name="appendix"></a>
 
