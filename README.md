@@ -244,7 +244,7 @@ to clone the repository.
 
 (**Warning**) We have a limited monthly quota in bandwidth for [Git LFS](https://git-lfs.github.com) files, and therefore we ask users to use good judgment in the number of times they clone repositories with large files (each clone will download around 5GB from Git LFS).
 
-Cocoa chooses the preferred method of installation and compilation via special environment keys located on [set_installation_options](https://github.com/CosmoLike/cocoa/blob/master/Cocoa/set_installation_options) script. The key should reflect the user's choice in section [Installation of cocoa required packages](https://github.com/CosmoLike/cocoa#installation-of-cocoa-required-packages) to the installation method of cocoa required packages.
+Cocoa is made aware of the chosen installation method of required packages via special environment keys located on the [set_installation_options](https://github.com/CosmoLike/cocoa/blob/master/Cocoa/set_installation_options) script. The user must export the appropriate key.
 
     [Extracted from set_installation_options script]
     #  ---------------------------------------------------------------------------
@@ -259,17 +259,19 @@ Users must then type the following command
 
     source setup_cocoa_installation_packages
 
-This script decompress the data files and install all packages that may have been left out in the Conda/Docker/Homebrew/Manual installation. File decompression should only take a few minutes, while package installation time may range from a few minutes (if installation via *Conda*, *Docker* or *Homebrew* was selected in the previous section) to more than one hour (if installation *via Cocoa's internal scripts and cache* was selected in the previous section). Finally, type
+(**expert**) This script decompress the data files and install all packages that may have been left out in the Conda/Docker/Homebrew/Manual installation. File decompression should only take a few minutes, while package installation time may range from a few minutes (if installation via *Conda*, *Docker* or *Homebrew* was selected) to more than one hour (if installation *via Cocoa's internal scripts and cache* was selected). 
+
+Finally, type
 
     source compile_external_modules
     
-to compile CAMB/CLASS/Planck..
+to compile CAMB, CLASS, Planck and Polychord.
 
-(**expert**) The script [compile_external_modules](https://github.com/CosmoLike/cocoa/blob/master/Cocoa/compile_external_modules) will compile Camb, Planck, Class, and Polychord. If the user wants to later recompile just one of these packages, then read the appendix [Compiling Boltzmann, CosmoLike and Likelihood codes separatelly](#compile_separatelly).
+(**expert**) If the user wants recompile just one of these packages, read the appendix [Compiling Boltzmann, CosmoLike and Likelihood codes separatelly](#compile_separatelly).
 
 ## Running Cobaya Examples <a name="cobaya_base_code_examples"></a>
 
-Let's recap, assuming the user opted for the easier *Conda installation*, and located the terminal at the folder *where Cocoa was cloned*. This is how users can run a basic Cobaya example:
+Assuming the user opted for the easier *Conda installation* and located the terminal at the folder *where Cocoa was cloned*, this is how to run some example YAML files we provide (*no Cosmolike code involved*): 
 
 **Step 1 of 5**: activate the conda environment
 
@@ -285,7 +287,9 @@ Let's recap, assuming the user opted for the easier *Conda installation*, and lo
 
     $(cocoa) source start_cocoa
 
-(**expert**) Users will see a terminal that looks like this: `$(Cocoa)(.local)`. *This is a feature, not a bug*! The Conda environment can be the same for all Cocoa instances, with [start_cocoa](https://github.com/CosmoLike/cocoa/blob/master/Cocoa/start_cocoa)/[stop_cocoa](https://github.com/CosmoLike/cocoa/blob/master/Cocoa/stop_cocoa) loading/unloading the corresponding `LD_LIBRARY_PATH`, `CPATH`, `C_INCLUDE_PATH`, `CPLUS_INCLUDE_PATH` and `PATH`. *Why more than one Cocoa instance?* While users may be running chains in one instance, they might use a second instantiation to make experimental changes.
+(**expert**) Users will see a terminal that looks like this: `$(Cocoa)(.local)`. *This is a feature, not a bug*! The Conda environment can be the same for all Cocoa instances, with [start_cocoa](https://github.com/CosmoLike/cocoa/blob/master/Cocoa/start_cocoa)/[stop_cocoa](https://github.com/CosmoLike/cocoa/blob/master/Cocoa/stop_cocoa) loading/unloading the corresponding `LD_LIBRARY_PATH`, `CPATH`, `C_INCLUDE_PATH`, `CPLUS_INCLUDE_PATH` and `PATH`. 
+
+(**expert**) *Why more than one Cocoa instance?* While users may be running chains in one instance, they might use a second instantiation to make experimental changes.
 
 **Step 4 of 5**: perform a basic OpenMP setup
     
