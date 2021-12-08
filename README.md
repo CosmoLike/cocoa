@@ -274,7 +274,7 @@ Let's recap, assuming the user *just opened a terminal*, opt for the easier *Con
 
     $ conda activate cocoa
      
-**Step 2 of 5**: Go to the main Cocoa folder (all scripts should be run from there)
+**Step 2 of 5**: Go to the Cocoa main folder (all scripts should be run from Cocoa main folder!)
 
     $(cocoa) cd ./cocoa/Cocoa
 
