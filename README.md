@@ -268,7 +268,7 @@ to compile CAMB/CLASS/Planck..
 
 ## Running Cobaya Examples <a name="cobaya_base_code_examples"></a>
 
-Let's recap, assuming the user *just opened a terminal*, opt for the easier *Conda installation*, and the terminal is located at the folder *where Cocoa was cloned*:
+Let's recap, assuming the user *just opened a terminal*, opt for the easier *Conda installation*, and the terminal is located at the folder *where Cocoa was cloned*. This is how users can run a basic Cobaya example:
 
 **Step 1 of 5**: activate conda Cocoa environment
 
