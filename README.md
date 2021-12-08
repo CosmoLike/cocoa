@@ -3,8 +3,7 @@
 2. [Installation of Cocoa required packages](#required_packages)
     1. [Via Conda (best for Linux)](#required_packages_conda)
     2. [Via Docker (best for MacOS/Windows)](#required_packages_docker)
-    3. [(expert) Via Homebrew](#required_packages_homebrew)
-    4. [(expert) Via Cocoa's internal cache](#required_packages_cache)
+    3. [(expert) Via Cocoa's internal cache](#required_packages_cache)
 3. [Installation of Cobaya base code](#cobaya_base_code)
 4. [Running Cobaya Examples](#cobaya_base_code_examples)
 6. [Running Cosmolike projects](#running_cosmolike_projects)
@@ -21,11 +20,11 @@ Cocoa allows users to run [CosmoLike](https://github.com/CosmoLike) routines ins
 
 ## Installation of Cocoa required packages <a name="required_packages"></a>
 
-Cosmolike, including the interface between Cosmolike and Cobaya, requires some C, C++ and Python packages to be installed. These packages include [GSL](https://www.gnu.org/software/gsl/), [FFTW](https://www.fftw.org), [Armadillo](http://arma.sourceforge.net), [Pybind11](https://pybind11.readthedocs.io/en/stable/) and [Boost](https://www.boost.org). In addition, Planck likelihood requires [CFITSIO](https://heasarc.gsfc.nasa.gov/fitsio/), and Cobaya requires many additional Python packages. The overabundance of compiler and package versions, each one with a different set of bugs and regressions, can make the installation of any big code (and the verification of numerical results) to be pure agony. We then try to simplify installation, and more importantly, standardize the package environment used by Cocoa in this section.
+Cosmolike, including the interface between Cosmolike and Cobaya, requires some C, C++ and Python packages to be installed. These packages include [GSL](https://www.gnu.org/software/gsl/), [FFTW](https://www.fftw.org), [Armadillo](http://arma.sourceforge.net), [Pybind11](https://pybind11.readthedocs.io/en/stable/) and [Boost](https://www.boost.org). In addition, Planck likelihood requires [CFITSIO](https://heasarc.gsfc.nasa.gov/fitsio/), and Cobaya requires many additional Python packages. The overabundance of compiler and package versions, each one with a different set of bugs and regressions, can make the installation of any big code (and the verification of numerical results) to be pure agony. In this section, we try to simplify installation, and more importantly, **standardize the package environment** adopted by Cocoa.
 
 ### Via Conda (best for Linux/HPC) <a name="required_packages_conda"></a>
 
-A simple way to install most prerequisites is via [Conda](https://github.com/conda/conda) environments. Cocoa's internal scripts will then install any remaining missing packages when compiling the base code. Assuming that the user had previously installed [Minicoda](https://docs.conda.io/en/latest/miniconda.html) (or [Anaconda](https://www.anaconda.com/products/individual)), the first step is to type the following commands to create the cocoa Conda environment.
+The simpler way to install most prerequisites is via [Conda](https://github.com/conda/conda) environments. Cocoa's internal scripts will then install any remaining missing packages, using a provided internal cache located at [cocoa_installation_libraries](https://github.com/CosmoLike/cocoa/tree/main/cocoa_installation_libraries). Assuming that the user had previously installed [Minicoda](https://docs.conda.io/en/latest/miniconda.html) (or [Anaconda](https://www.anaconda.com/products/individual)), the first step is to type the following commands to create the cocoa Conda environment.
 
       conda create --name cocoa python=3.7 --quiet --yes && \
       conda install -n cocoa --quiet --yes  \
@@ -96,78 +95,13 @@ This command will download the [Whovian-Cosmo](https://hub.docker.com/r/vivianmi
 
     $ singularity shell --no-home --bind /path/to/cocoa:/home/whovian/host --bind ~/.ssh:/home/whovian/.ssh:ro whovian-cosmo
 
-### (expert) Via Homebrew <a name="required_packages_homebrew"></a>
-
-This subsection assumes users adopt [Homebrew](https://brew.sh) as the macOS package manager and [BASH](https://www.howtogeek.com/444596/how-to-change-the-default-shell-to-bash-in-macos-catalina/) as the default shell. 
-
-(**Warning**) The installation procedures for MacOS are always working in progress; there is no guarantee that our recommendations will work without additional tweaks given how fast [Homebrew](https://brew.sh) updates its packages and Apple changes the OS. *The Docker installation is preferred*.
-
-(**expert**) Currently, there is a regression in GCC-11, the default compiler on Homebrew, preventing us from adopting it. Therefore, users must build most brew numerical packages from their source via the command `--build-from-source`. Building from source is painfully slow and error prone and does not work in Apple M1 chips without Rosetta 2 emulator. We can do nothing but wait for the GCC developers to fix the bug. 
-
-Below is a list of Homebrew and pip commands that install most dependencies
-
-    brew install gcc@10
-    alias brew='HOMEBREW_CC=gcc-10 HOMEBREW_CXX=g++-10 brew'
-    brew install open-mpi --build-from-source
-    brew install git
-    brew install git-lfs
-    git lfs install
-    git lfs install --system
-    brew install gmp
-    brew install hdf5 --build-from-source
-    brew install python@3.7 || (brew upgrade python@3.7 && brew cleanup python@3.7)
-    brew install cmake
-    brew install armadillo --build-from-source
-    brew install boost --build-from-source
-    brew install gsl --build-from-source
-    brew install fftw --build-from-source
-    brew install cfitsio --build-from-source
-    brew install lapack --build-from-source
-    brew install findutils
-    brew install xz
-    export PATH="/usr/local/opt/python@3.7/bin:$PATH"
-
-    pip3.7 install virtualenv --upgrade
-    pip3.7 install wget --upgrade
-    pip3.7 install wheel --upgrade
-    pip3.7 install setuptools --upgrade
-    pip3.7 install six --upgrade
-    pip3.7 install python-dateutil --upgrade
-    pip3.7 install pytz --upgrade
-    pip3.7 install mpmath --upgrade
-    pip3.7 install PyYAML --upgrade
-    pip3.7 install pyparsing --upgrade
-    pip3.7 install fuzzywuzzy --upgrade
-    pip3.7 install cycler --upgrade
-    pip3.7 install kiwisolver --upgrade
-    pip3.7 install enum34 --upgrade
-    pip3.7 install pillow --upgrade
-    pip3.7 install numpy --upgrade
-    pip3.7 install scipy --upgrade
-    pip3.7 install sympy --upgrade
-    pip3.7 install cython  --upgrade
-    pip3.7 install imageio --upgrade
-    pip3.7 install pillow --upgrade
-    pip3.7 install pandas --upgrade
-    pip3.7 install py-bobyqa --upgrade
-    pip3.7 install matplotlib --upgrade
-    pip3.7 install pybind11 --upgrade
-    pip3.7 install GetDist --upgrade
-    pip3.7 install astropy --upgrade
-    pip3.7 install pyfits --upgrade
-
-Users must also update their `$PATH` so the OS can detect the [Homebrew](https://brew.sh) python installation, as shown below
-
-    python3=/Users/XXX/Library/Python/3.7/bin
-    export PATH=$python3:$PATH
-
 **Now what? Users can now proceed to the section [Installation of Cobaya base code](#cobaya_base_code)**
 
 ### (expert) Via Cocoa's internal cache <a name="required_packages_cache"></a>
 
-(**Warning**) This method is painfully slow, not advisable. It does, however, offer users that don't work with Conda the opportunity to encapsulate the installation of required packages. *We advise the adoption of Conda or Docker installation*. 
+(**Warning**) This method is painfully slow, not advisable.
 
-Whenever Conda or Docker installation procedures are unavailable, the user can still perform a local semi-autonomous installation on Linux based on a few scripts we implemented. We also provide a local copy of most required packages on Cocoa's cache folder [cocoa_installation_libraries](https://github.com/CosmoLike/cocoa/tree/main/cocoa_installation_libraries), as there are HPC machines where compute nodes that compile code don't have internet access (NASA Pleiades being one example). We, therefore, only assume the pre-installation of the following packages to perform the local setup:
+Whenever Conda or Docker installation procedures are unavailable, the user can still perform a local semi-autonomous installation on Linux based on a few scripts we implemented. We also provide a local copy of almost all required packages on Cocoa's cache folder named [cocoa_installation_libraries](https://github.com/CosmoLike/cocoa/tree/main/cocoa_installation_libraries) (there are HPC machines where compute nodes don't have internet access, NASA Pleiades being one example). We, therefore, only assume the pre-installation of the following packages to perform the local setup via Cocoa's internal cache:
 
    - [Bash](https://www.amazon.com/dp/B0043GXMSY/ref=cm_sw_em_r_mt_dp_x3UoFbDXSXRBT);
    - [Git](https://git-scm.com) v1.8+;
