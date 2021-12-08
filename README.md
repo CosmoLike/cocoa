@@ -291,7 +291,7 @@ Let's recap, assuming the user opted for the easier *Conda installation*, and lo
     
     $(cocoa)(.local) export OMP_NUM_THREADS = [1-4]
 
-**Step 5 of 5**: run `cobaya-run` on a template yaml files we provide
+**Step 5 of 5**: run `cobaya-run` on a template YAML files we provide
 
      $(cocoa)(.local) mpirun -n 1 --mca btl tcp,self --bind-to core --rank-by core --map-by numa:pe=${OMP_NUM_THREADS} cobaya-run ./projects/example/EXAMPLE_EVALUATE[1-4].yaml -f
      
@@ -323,7 +323,7 @@ The projects folder was designed to include all Cosmolike projects. Similar to l
     $ git clone git@github.com:CosmoLike/cocoa_XXX.git XXX
     $ cd ../
 
-(**warning**) The Cosmolike Organization hosts a Cobaya-Cosmolike project named XXX at `git@github.com:CosmoLike/cocoa_XXX.git`. The prefix `cocoa_` avoids mixing Cobaya-Cosmolike projects with code meant to be run on the legacy CosmoLike code. However, our provided scripts and template yaml files assume the removal of `cocoa_` prefix. Indeed, the command `git clone git@github.com:CosmoLike/cocoa_XXX.git XXX` clone the repository *and* remove the prefix `cocoa_`.
+(**warning**) The Cosmolike Organization hosts a Cobaya-Cosmolike project named XXX at `git@github.com:CosmoLike/cocoa_XXX.git`. The prefix `cocoa_` avoids mixing Cobaya-Cosmolike projects with code meant to be run on the legacy CosmoLike code. However, our provided scripts and template YAML files assume the removal of `cocoa_` prefix. Indeed, the command `git clone git@github.com:CosmoLike/cocoa_XXX.git XXX` clone the repository *and* remove the prefix `cocoa_`.
 
 **Step 2 of 4**: activate conda Cocoa environment and the private python environment
 
