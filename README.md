@@ -310,11 +310,13 @@ and (optional)
 
 # Running cosmolike projects <a name="cocoa_projects"></a> 
 
-The `projects` folder was designed to include all the Cosmolike projects. Individual projects must be hosted on independent folders named `cocoa_XXX` where XXX is the project name. 
+The `projects` folder was designed to include all the Cosmolike projects. **The majority of projects we are working on are not public (yet)**, and they are safeguarded on the private repositories listed on `project/clone_all.sh` (the backbone Cosmolike software, however, is publicly available at `external_modules/code`!). 
 
-**The majority of projects we are working on are not public (yet)**, and they are safeguarded on the private repositories listed on `project/clone_all.sh` (the backbone Cosmolike software, however, is publicly available at `external_modules/code`!). 
+**Naming Convention on Cosmolike Organization**: Projects named XXX are stored on `cocoa_XXX` repository hosted at [Cosmolike Organization](https://github.com/CosmoLike). The prefix `cocoa_` is a **mandatory** convention to not confuse with cosmolike only repositories. Our scripts, however, assume the `cocoa_` prefix  has been removed when cloning the repository. The script `project/clone_all.sh` does that automatically, but UofA developers that prefer to clone their git repository manually can acomplish the same via the command:
 
-The `cocoa_XXX` folder that host the `XXX` project needs to have the more or less the following structure (taken from our private DES-Y3 project)
+     $ git clone git@github.com:CosmoLike/cocoa_XXX.git XXX
+
+The `XXX` project needs to have the more or less the following structure (taken from our private DES-Y3 project)
 
     +-- cocoa_des_y3
     |    +-- likelihood
@@ -360,7 +362,7 @@ Here is a list of projects inside [clone_all](https://github.com/CosmoLike/cocoa
       git@github.com:CosmoLike/cocoa_kids.git
       git@github.com:CosmoLike/cocoa_des_4x2ptN.git"
 
-**After cloning a project, users must restart the Cocoa `(.local)` environemnt** so the `./project/XXX/script/start_XXX` can be loaded (start_cocoa and stop_cocoa scipts automatically scans and calls `./project/XXX/script/start[stop]_XXX` for all cloned projects).
+**After cloning a project, users must restart the Cocoa `(.local)` environment** so the `./project/XXX/script/start_XXX` can be loaded (start_cocoa and stop_cocoa scripts scan all projects and call `./project/XXX/script/start[stop]_XXX` automatically).
 
 Compilation of a particular project, from the Cocoa main folder, should use 'scripts/compile_XXX' script as shown below:
 
