@@ -310,13 +310,13 @@ and (optional)
 
 # Running Cosmolike projects <a name="running_cosmolike_projects"></a> 
 
-The projects folder was designed to include all the Cosmolike projects. The majority of projects we are working on are not public (yet). The backbone Cosmolike software, however, is publicly available at `./external_modules/code`). 
+The projects folder was designed to include all Cosmolike projects. The majority of projects we are working on are not public (yet). The backbone Cosmolike software, however, is publicly available at `./external_modules/code`). 
 
-**Naming convention on Cosmolike Organization**: Projects named XXX are stored on `cocoa_XXX` repositories hosted at [Cosmolike Organization](https://github.com/CosmoLike). The prefix `cocoa_` is **mandatory**, so we don't mix them with projects that are based on the original CosmoLike program. Our scripts and template yaml files, however, assume the `cocoa_` prefix  has been removed as shown below
+**Naming convention on Cosmolike Organization**: we, the Cosmolike Organization, host projects named XXX at `git@github.com:CosmoLike/cocoa_XXX.git` repositories. The prefix `cocoa_` on the URLs is **mandatory**, so we don't mix them with projects that are based on the original CosmoLike program. Our scripts and template yaml files, however, assume the `cocoa_` prefix  has been removed as shown below
 
     $(cocoa)(.local) git clone git@github.com:CosmoLike/cocoa_XXX.git XXX
 
-**After cloning a project, users must restart the Cocoa `(.local)` environment** so the `./project/XXX/script/start_XXX` can be loaded. The [start_cocoa](https://github.com/CosmoLike/cocoa/blob/master/Cocoa/start_cocoa) and [stop_cocoa](https://github.com/CosmoLike/cocoa/blob/master/Cocoa/stop_cocoa) scripts always scan all projects and call `./project/XXX/script/start[stop]_XXX` automatically.
+**After cloning a project, users must restart the Cocoa `(.local)` environment** so the `./project/XXX/script/start_XXX` can be loaded. The [start_cocoa](https://github.com/CosmoLike/cocoa/blob/master/Cocoa/start_cocoa) and [stop_cocoa](https://github.com/CosmoLike/cocoa/blob/master/Cocoa/stop_cocoa) scripts always scan all projects and call `./project/XXX/script/start[stop]_XXX` automatically. Without running `./project/XXX/script/start_XXX`, cobaya won't be able to see the Cosmolike based likelihoods!
 
 Compilation of a particular project, from the Cocoa main folder, should use 'scripts/compile_XXX' script as shown below:
 
