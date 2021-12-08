@@ -332,15 +332,17 @@ By no means, we want to discourage people from cloning code from their original 
 
 ### Compiling Boltzmann, CosmoLike and Likelihood codes separatelly <a name="appendix_compile_separatelly"></a>
 
-To avoid excessive compilation times during development, users can use specialized scripts that compile only the specific modules:
+To avoid excessive compilation times during development, users can use following specialized scripts that compile only the specific modules:
 
-    $(.local) source ./installation_scripts/setup_class
+    $(cocoa)(.local) source ./installation_scripts/setup_class
 
-    $(.local) source ./installation_scripts/setup_camb
+    $(cocoa)(.local) source ./installation_scripts/setup_camb
 
-    $(.local) source ./installation_scripts/setup_planck
+    $(cocoa)(.local) source ./installation_scripts/setup_planck
 
-    $(.local) source ./installation_scripts/setup_polychord
+    $(cocoa)(.local) source ./installation_scripts/setup_polychord
+
+Here we assumed that Cocoa's private python environment was already set.
 
 ### Running Jupyter Notebooks inside the [Whovian-Cosmo](https://hub.docker.com/r/vivianmiranda/whovian-cosmo) docker container <a name="appendix_jupyter_whovian"></a>
 
