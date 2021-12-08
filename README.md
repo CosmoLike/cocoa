@@ -233,7 +233,7 @@ Users also need to set the following self-explanatory environmental keys on [set
 
 **Now what? Users can now proceed to the section [Installation of Cobaya base code](#cobaya_base_code)**
 
-## Installation of cobaya base code <a name="cobaya_base_code"></a>
+## Installation of Cobaya base code <a name="cobaya_base_code"></a>
 
 Type:
 
