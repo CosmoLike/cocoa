@@ -1,6 +1,6 @@
 # Table of contents
 1. [Overview of the Cobaya-CosmoLike Joint Architecture (Cocoa)](#overview)
-2. [Installation of Cocoa required packages](#required_packages)
+2. [Installation of Cocoa's required packages](#required_packages)
     1. [Via Conda (best for Linux)](#required_packages_conda)
     2. [Via Docker (best for MacOS/Windows)](#required_packages_docker)
     3. [(expert) Via Cocoa's internal cache](#required_packages_cache)
@@ -18,13 +18,13 @@
 
 Cocoa allows users to run [CosmoLike](https://github.com/CosmoLike) routines inside the [Cobaya](https://github.com/CobayaSampler) framework. Cosmolike is capable of analyzing data primarily from the [Dark Energy Survey](https://www.darkenergysurvey.org) (a.k.a DES) and simulating future multi-probe analyses for Rubin Observatory's Legacy Survey of Space and Time or the Roman Space Telescope. This readme file presents basic and advanced instructions for installing all Cocoa components, including the [Planck likelihood](https://wiki.cosmos.esa.int/planck-legacy-archive/index.php/Main_Page). 
 
-## Installation of Cocoa required packages <a name="required_packages"></a>
+## Installation of Cocoa's required packages <a name="required_packages"></a>
 
 Cosmolike, including the interface between Cosmolike and Cobaya, requires some C, C++ and Python packages to be installed. These packages include [GSL](https://www.gnu.org/software/gsl/), [FFTW](https://www.fftw.org), [Armadillo](http://arma.sourceforge.net), [Pybind11](https://pybind11.readthedocs.io/en/stable/) and [Boost](https://www.boost.org). In addition, Planck likelihood requires [CFITSIO](https://heasarc.gsfc.nasa.gov/fitsio/), and Cobaya requires many additional Python packages. The overabundance of compiler and package versions, each one with a different set of bugs and regressions, can make the installation of any big code (and the verification of numerical results) to be pure agony. In this section, we try to simplify installation, and more importantly, **standardize the package environment** adopted by Cocoa.
 
 ### Via Conda (best for Linux/HPC) <a name="required_packages_conda"></a>
 
-The simpler way to install most prerequisites is via [Conda](https://github.com/conda/conda) environments. Cocoa's internal scripts will then install any remaining missing packages, using a provided internal cache located at [cocoa_installation_libraries](https://github.com/CosmoLike/cocoa/tree/main/cocoa_installation_libraries). Assuming that the user had previously installed [Minicoda](https://docs.conda.io/en/latest/miniconda.html) (or [Anaconda](https://www.anaconda.com/products/individual)), the first step is to type the following commands to create the cocoa Conda environment.
+The simpler way to install most prerequisites is via [Conda](https://github.com/conda/conda). Cocoa's internal scripts will then install any remaining missing packages, using a provided internal cache located at [cocoa_installation_libraries](https://github.com/CosmoLike/cocoa/tree/main/cocoa_installation_libraries). Assuming that the user had previously installed [Minicoda](https://docs.conda.io/en/latest/miniconda.html) (or [Anaconda](https://www.anaconda.com/products/individual)), the first step is to type the following commands to create the cocoa Conda environment.
 
       conda create --name cocoa python=3.7 --quiet --yes && \
       conda install -n cocoa --quiet --yes  \
@@ -75,7 +75,7 @@ Linux users must type the following command instead:
 
     $ docker run -it -p 8080:8888 --user $(id -u):$(id -g) -v $(pwd):/home/whovian/host/ -v ~/.ssh:/home/whovian/.ssh:ro vivianmiranda/whovian-cosmo:version-1.0.3
 
-The bind `-v ~/.ssh:/home/whovian/.ssh:ro` allows users to pull, push and clone GitHub repositories from inside the container. Users must invoke the command on the parent directory of the path where access inside the docker container is sought. 
+The bind `-v ~/.ssh:/home/whovian/.ssh:ro` allows users to pull, push and clone GitHub repositories from inside the container using the host ssh keys. Users must invoke the command on the parent directory of the path where access inside the docker container is sought. 
 
 When running the `docker run (...)/whovian-cosmo:version-1.0.3` for the first time, the docker engine will automatically download the corresponding image. This step may take some time, as the [Whovian-Cosmo](https://hub.docker.com/r/vivianmiranda/whovian-cosmo) image has approximately 700 Megabytes.
 
