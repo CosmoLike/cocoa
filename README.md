@@ -193,7 +193,7 @@ The user must uncomment the appropriate key, and then type the following command
 
     source setup_cocoa_installation_packages
 
-(**expert**) This script decompress the data files and install all packages that may have been left out in the Conda/Docker/Homebrew/Manual installation. File decompression should only take a few minutes, while package installation time may range from a few minutes (if installation via *Conda*, *Docker* or *Homebrew* was selected) to more than one hour (if installation *via Cocoa's internal scripts and cache* was selected). 
+(**expert**) This script decompress the data files and install all packages that may have been left out in the Conda/Homebrew/Manual installation. File decompression should only take a few minutes, while package installation time may range from a few minutes (if installation via *Conda*, *Docker* or *Homebrew* was selected) to more than one hour (if installation *via Cocoa's internal scripts and cache* was selected). 
 
 Finally, type
 
