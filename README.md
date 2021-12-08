@@ -87,9 +87,7 @@ When running the `docker run (...)/whovian-cosmo:version-1.0.3` for the first ti
 
 (**warning**) There isn't permanent storage outside `/home/whovian/host/`. Be aware of this fact to not lose any work
 
-(**expert**) Most HPC systems don't allow users to run docker containers via the standard [docker engine](https://docs.docker.com/engine/) for [security reasons](https://www.reddit.com/r/docker/comments/7y2yp2/why_is_singularity_used_as_opposed_to_docker_in/?utm_source=share&utm_medium=web2x&context=3). There is, however, an alternative engine called [Singularity](https://sylabs.io/guides/3.6/user-guide/index.html) that is in compliance with most HPC requirements. The [Singularity](https://sylabs.io/guides/3.6/user-guide/index.html) engine installation requires administrative privileges, but many HPC enviroments have already adopted it.
-
-To run docker images with Singularity, go to the folder you want to store the image and type:
+(**expert**) Most HPC systems don't allow users to run docker containers via the standard [docker engine](https://docs.docker.com/engine/) for [security reasons](https://www.reddit.com/r/docker/comments/7y2yp2/why_is_singularity_used_as_opposed_to_docker_in/?utm_source=share&utm_medium=web2x&context=3). There is, however, an alternative engine called [Singularity](https://sylabs.io/guides/3.6/user-guide/index.html) that is in compliance with most HPC requirements. The [Singularity](https://sylabs.io/guides/3.6/user-guide/index.html) engine installation requires administrative privileges, but many HPC enviroments have already adopted it. To run docker images with Singularity, go to the folder you want to store the image and type:
 
     $ singularity build whovian-cosmo docker://vivianmiranda/whovian-cosmo
 
@@ -270,7 +268,7 @@ to compile CAMB/CLASS/Planck..
 
 ## Running Cobaya Examples <a name="cobaya_base_code_examples"></a>
 
-Let's recap, assuming the user *just opened a terminal*, opt for the easier *Conda installation*, and the terminal is located at the folder *parent to where cocoa was cloned*:
+Let's recap, assuming the user *just opened a terminal*, opt for the easier *Conda installation*, and the terminal is located at the folder *where Cocoa was cloned*:
 
 **Step 1 of 5**: activate conda Cocoa environment
 
@@ -290,7 +288,7 @@ Let's recap, assuming the user *just opened a terminal*, opt for the easier *Con
     
     $(cocoa)(.local) export OMP_NUM_THREADS = [1-4]
     
-    $(cocoa)(.local) mpirun -n 1 --mca btl tcp,self cobaya-run ./projects/example/EXAMPLE_EVALUATE[1-4].yaml -f
+    $(cocoa)(.local) mpirun -n 1 --mca btl tcp,self --bind-to core --rank-by core --map-by numa:pe=${OMP_NUM_THREADS} cobaya-run ./projects/example/EXAMPLE_EVALUATE[1-4].yaml -f
 
     or
     
@@ -298,7 +296,7 @@ Let's recap, assuming the user *just opened a terminal*, opt for the easier *Con
 
 (**expert**) Why the '--mca btl tcp,self' flag? Conda-forge developers to not compile openmpi with Infiniband compatibility. Users outraged by the small overhead TCP will bring over Infiniband can perform the [installation via Cocoa's internal cache](required_packages_cache) that depends on the HPC module system to load the openmpi compiled by the system administrators. 
 
-(**expert**) Why the '--bind-to core --rank-by core --map-by numa:pe=${OMP_NUM_THREADS}' flag? To enable OpenMP on UofA's HPC (*users should check if the flag is necessary on their particular environment*)
+(**expert**) Why the '--bind-to core --rank-by core --map-by numa:pe=${OMP_NUM_THREADS}' flag? To enable hybrid MPI+OpenMP on UofA's HPC. *Users should check if the flag is necessary on their particular environment.*
 
 **Step 5 of 5**: once the work on the Cocoa environment is done, type:
 
