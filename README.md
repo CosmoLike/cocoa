@@ -215,8 +215,6 @@ Assuming the user opted for the easier *Conda installation* and located the term
 
     $(cocoa) cd ./cocoa/Cocoa
 
-(**warning**) Always run our provided scripts from the Cocoa main folder
-
 **Step 3 of 5**: activate the private python environment
 
     $(cocoa) source start_cocoa
