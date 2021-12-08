@@ -1,6 +1,6 @@
 # Table of contents
 1. [Overview of the Cobaya-CosmoLike Joint Architecture (Cocoa)](#overview)
-2. [Installation of cocoa required packages](#required_packages)
+2. [Installation of Cocoa required packages](#required_packages)
     1. [Via Conda (best for Linux)](#required_packages_conda)
     2. [Via Docker (best for MacOS/Windows)](#required_packages_docker)
     3. [(expert) Via Homebrew](#required_packages_homebrew)
@@ -19,9 +19,9 @@
 
 Cocoa allows users to run [CosmoLike](https://github.com/CosmoLike) routines inside the [Cobaya](https://github.com/CobayaSampler) framework. Cosmolike is capable of analyzing data primarily from the [Dark Energy Survey](https://www.darkenergysurvey.org) (a.k.a DES) and simulating future multi-probe analyses for Rubin Observatory's Legacy Survey of Space and Time or the Roman Space Telescope. This readme file presents basic and advanced instructions for installing all Cocoa components, including the [Planck likelihood](https://wiki.cosmos.esa.int/planck-legacy-archive/index.php/Main_Page). 
 
-## Installation of cocoa required packages <a name="required_packages"></a>
+## Installation of Cocoa required packages <a name="required_packages"></a>
 
-Cosmolike and the interface between Cosmolike and Cocoa requires many packages to be installed, including [GSL](https://www.gnu.org/software/gsl/), [FFTW](https://www.fftw.org), [Armadillo](http://arma.sourceforge.net) and [Boost](https://www.boost.org). The plethora of GCC, Python, and package versions, each one with different bugs and regressions, can make the installation of any big code to be pure agony, especially given that CAMB, CLASS, Cosmolike, and Planck likelihood involves Fortran, C, C++, and Python languages. We try to simplify this process by offering a few installation options on Linux and macOS. 
+Cosmolike, including the interface between Cosmolike and Cobaya, requires some C, C++ and Python packages to be installed. These packages include [GSL](https://www.gnu.org/software/gsl/), [FFTW](https://www.fftw.org), [Armadillo](http://arma.sourceforge.net), [Pybind11](https://pybind11.readthedocs.io/en/stable/) and [Boost](https://www.boost.org). In addition, Planck likelihood requires [CFITSIO](https://heasarc.gsfc.nasa.gov/fitsio/), and Cobaya requires many additional Python packages. The overabundance of compiler and package versions, each one with a different set of bugs and regressions, can make the installation of any big code (and the verification of numerical results) to be pure agony. We then try to simplify installation, and more importantly, standardize the package environment used by Cocoa in this section.
 
 ### Via Conda (best for Linux/HPC) <a name="required_packages_conda"></a>
 
