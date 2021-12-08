@@ -223,17 +223,19 @@ Assuming the user opted for the easier *Conda installation* and located the term
 
 (**expert**) Users will see a terminal that looks like this: `$(Cocoa)(.local)`. *This is a feature, not a bug*! The Conda environment can be the same for all Cocoa instances, with [start_cocoa](https://github.com/CosmoLike/cocoa/blob/master/Cocoa/start_cocoa)/[stop_cocoa](https://github.com/CosmoLike/cocoa/blob/master/Cocoa/stop_cocoa) loading/unloading the corresponding `LD_LIBRARY_PATH`, `CPATH`, `C_INCLUDE_PATH`, `CPLUS_INCLUDE_PATH` and `PATH`. *Why more than one Cocoa instance?* While users may be running chains in one instance, they might use a second instantiation to make experimental changes.
 
-**Step 4 of 5**: perform a basic OpenMP setup
+**Step 4 of 5**: select the number of OpenMP cores
     
-    $(cocoa)(.local) export OMP_NUM_THREADS = [1-4]
+    $(cocoa)(.local) export OMP_NUM_THREADS = 4
 
-**Step 5 of 5**: run `cobaya-run` on a template YAML files we provide
+**Step 5 of 5**: run `cobaya-run` on a the first example YAML files we provide.
 
-     $(cocoa)(.local) mpirun -n 1 --mca btl tcp,self --bind-to core --rank-by core --map-by numa:pe=${OMP_NUM_THREADS} cobaya-run ./projects/example/EXAMPLE_EVALUATE[1-4].yaml -f
+One model evaluation:
+
+     $(cocoa)(.local) mpirun -n 1 --mca btl tcp,self --bind-to core --rank-by core --map-by numa:pe=${OMP_NUM_THREADS} cobaya-run ./projects/example/EXAMPLE_EVALUATE1.yaml -f
      
-or  
+MCMC:
 
-     $(cocoa)(.local) mpirun -n 4 --mca btl tcp,self --bind-to core --rank-by core --map-by numa:pe=${OMP_NUM_THREADS} cobaya-run ./projects/example/EXAMPLE_MCMC[1-3].yaml -f
+     $(cocoa)(.local) mpirun -n 4 --mca btl tcp,self --bind-to core --rank-by core --map-by numa:pe=${OMP_NUM_THREADS} cobaya-run ./projects/example/EXAMPLE_MCMC1.yaml -f
 
 (**expert**) Why the `--mca btl tcp,self` flag? Conda-forge developers don't [compile OpenMPI with Infiniband compatibility](https://github.com/conda-forge/openmpi-feedstock/issues/38). Users outraged by the overhead that TCP will bring over Infiniband can perform the [installation via Cocoa's internal cache](required_packages_cache). 
 
@@ -253,28 +255,35 @@ and (optional)
 
 The projects folder was designed to include all Cosmolike projects. Similar to last section, we assume the user opted for the easier *Conda installation*, and located the terminal at the folder *where Cocoa was cloned*.
 
-**Step 1 of 4**: go to the project folder (`./cocoa/Cocoa/projects`) and clone a cosmolike project, as shown below:
+**Step 1 of 5**: go to the project folder (`./cocoa/Cocoa/projects`) and clone a cosmolike project, with ficticious name XXX in this explanation,  as shown below:
 
     $ cd ./cocoa/Cocoa/projects
     $ git clone git@github.com:CosmoLike/cocoa_XXX.git XXX
+
+(**warning**) The Cosmolike Organization hosts a Cobaya-Cosmolike project named XXX at `CosmoLike/cocoa_XXX`. However, our provided scripts and template YAML files assume the removal of `cocoa_` prefix when cloning the repository.
+
+(**expert**) The prefix `cocoa_` on Cosmolike organization avoids mixing Cobaya-Cosmolike projects with code meant to be run on the legacy CosmoLike code.
+
+**Step 3 of 5**: go back to Cocoa main folder
+    
     $ cd ../
-
-(**warning**) The Cosmolike Organization hosts a Cobaya-Cosmolike project named XXX at `git@github.com:CosmoLike/cocoa_XXX.git`. The prefix `cocoa_` avoids mixing Cobaya-Cosmolike projects with code meant to be run on the legacy CosmoLike code. However, our provided scripts and template YAML files assume the removal of `cocoa_` prefix. Indeed, the command `git clone git@github.com:CosmoLike/cocoa_XXX.git XXX` clone the repository *and* remove the prefix `cocoa_`.
-
-**Step 2 of 4**: activate conda Cocoa environment and the private python environment
+    
+**Step 3 of 5**: activate conda Cocoa environment and the private python environment
 
      $ conda activate cocoa
      $(cocoa) source start_cocoa
  
- (**warning**): Please run the `start_cocoa` *after* cloning the cosmolike repository. 
+(**warning**): Please run the [start_cocoa](https://github.com/CosmoLike/cocoa/blob/master/Cocoa/start_cocoa) script *after* cloning the cosmolike repository. 
  
- **Step 3 of 4**: compile the project
+(**expert**) Why the warning above? [Start_cocoa](https://github.com/CosmoLike/cocoa/blob/master/Cocoa/start_cocoa) calls [./projects/start_all](https://github.com/CosmoLike/cocoa/blob/main/Cocoa/projects/start_all.sh). This script creates a symbolic link for the (1) *likelihood* of all projects to [./cobaya/cobaya/likelihoods/](https://github.com/CosmoLike/cocoa/tree/main/Cocoa/cobaya/cobaya/likelihoods); (2) *data products* of all projects to [./external_modules/data](https://github.com/CosmoLike/cocoa/tree/main/Cocoa/external_modules/data). The script [./projects/start_all](https://github.com/CosmoLike/cocoa/blob/main/Cocoa/projects/start_all.sh) also adds the *cosmolike interface* of all projects to `LD_LIBRARY_PATH` and `PYTHONPATH`.
+
+ **Step 3 of 5**: compile the project
  
      $(cocoa)(.local) source ./projects/XXX/scripts/compile_XXX
   
- **Step 4 of 4**: perform a basic OpenMP setup and run a template yaml file we provide
+ **Step 4 of 5**: select the number of OpenMP cores and run a template yaml file
     
-    $(cocoa)(.local) export OMP_NUM_THREADS = [1-4]
+    $(cocoa)(.local) export OMP_NUM_THREADS = 4
     $(cocoa)(.local) mpirun -n 1 --mca btl tcp,self --bind-to core --rank-by core --map-by numa:pe=${OMP_NUM_THREADS} cobaya-run ./projects/XXX/EXAMPLE_EVALUATE1.yaml -f
 
 ## Creating Cosmolike projects <a name="creating_cosmolike_projects"></a> 
