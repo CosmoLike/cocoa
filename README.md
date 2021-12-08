@@ -61,7 +61,7 @@ With this installation method, users must activate the Conda environment wheneve
 
     $ conda activate cocoa
 
-**Now what? Users can now proceed to the section [Installation of Cobaya base code](#cobaya_base_code)** 
+**Users can now proceed to the section [Installation of Cobaya base code](#cobaya_base_code)** 
 
 ### Via Docker (best for MacOS/Windows) <a name="required_packages_docker"></a>
 
@@ -83,7 +83,7 @@ When running the `docker run (...)/whovian-cosmo:version-1.0.3` for the first ti
 
     $ cd /home/whovian/host/
 
-**Now what? Users can now proceed to the section [Installation of Cobaya base code](#cobaya_base_code)**  
+**Users can now proceed to the section [Installation of Cobaya base code](#cobaya_base_code)**  
 
 (**warning**) There isn't permanent storage outside `/home/whovian/host/`. Be aware of this fact to not lose any work
 
@@ -95,7 +95,7 @@ This command will download the [Whovian-Cosmo](https://hub.docker.com/r/vivianmi
 
     $ singularity shell --no-home --bind /path/to/cocoa:/home/whovian/host --bind ~/.ssh:/home/whovian/.ssh:ro whovian-cosmo
 
-**Now what? Users can now proceed to the section [Installation of Cobaya base code](#cobaya_base_code)**
+**Users can now proceed to the section [Installation of Cobaya base code](#cobaya_base_code)**
 
 ### (expert) Via Cocoa's internal cache <a name="required_packages_cache"></a>
 
@@ -166,7 +166,7 @@ The user also needs to set the following self-explanatory environmental keys on 
     Cocoa/.local/lib
     Cocoa/.local/share
 
-**Now what? Users can now proceed to the section [Installation of Cobaya base code](#cobaya_base_code)**
+**Users can now proceed to the section [Installation of Cobaya base code](#cobaya_base_code)**
 
 ## Installation of Cobaya base code <a name="cobaya_base_code"></a>
 
