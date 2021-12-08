@@ -193,7 +193,9 @@ The user must uncomment the appropriate key, and then type the following command
 
     $ source setup_cocoa_installation_packages
 
-(**expert**) This script decompress the data files and install all packages that may have been left out in the Conda/Docker/Manual installation. File decompression should only take a few minutes, while package installation time may range from a few minutes (if installation via *Conda* or *Docker* was selected) to more than one hour (if installation *via Cocoa's internal scripts and cache* was selected). 
+This script decompress the data files and install all packages that may have been left out in the Conda/Docker/Manual installation. 
+
+(**expert**) File decompression should only take a few minutes, while package installation time may range from a few minutes (if installation via *Conda* or *Docker* was selected) to more than one hour (if installation *via Cocoa's internal scripts and cache* was selected). 
 
 Finally, type
 
@@ -251,7 +253,7 @@ and (optional)
     
     $(cocoa) conda deactivate cocoa
 
-(**expert**) Why is deactivating cocoa optional? Well, this Conda environment can be useful to many types of projects!
+(**expert**) Why is deactivating cocoa optional? Well, Cocoa Conda environment can be useful to many types of projects!
 
 ## Running Cosmolike projects <a name="running_cosmolike_projects"></a> 
 
