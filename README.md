@@ -270,27 +270,29 @@ to compile CAMB/CLASS/Planck..
 
 Let's recap, assuming the user *just opened a terminal*, opt for the easier *Conda installation*, and the terminal is located at the folder *where Cocoa was cloned*. This is how users can run a basic Cobaya example:
 
-**Step 1 of 5**: activate conda Cocoa environment
+**Step 1 of 6**: activate conda Cocoa environment
 
     $ conda activate cocoa
      
-**Step 2 of 5**: Go to the Cocoa main folder (all scripts should be run from Cocoa main folder!)
+**Step 2 of 6**: Go to the Cocoa main folder (all scripts should be run from Cocoa main folder!)
 
     $(cocoa) cd ./cocoa/Cocoa
 
-**Step 3 of 5**: activate the private python environment
+**Step 3 of 6**: activate the private python environment
 
     $(cocoa) source start_cocoa
 
 (**expert**) Users that opt for the Conda installation will have a terminal that looks like this: `$(Cocoa)(.local)`. *This is a feature, not a bug*! The Conda environment can be the same for all Cocoa instances, with [start_cocoa](https://github.com/CosmoLike/cocoa/blob/master/Cocoa/start_cocoa)/[stop_cocoa](https://github.com/CosmoLike/cocoa/blob/master/Cocoa/stop_cocoa) loading/unloading the corresponding `LD_LIBRARY_PATH`, `CPATH`, `C_INCLUDE_PATH`, `CPLUS_INCLUDE_PATH` and `PATH`. *Why more than one Cocoa instance?* While users may be running chains in one instance, they might use a second instantiation to make experimental changes.
 
-**Step 4 of 5**: run examples
+**Step 4 of 6**: basic openmp setup
     
     $(cocoa)(.local) export OMP_NUM_THREADS = [1-4]
-    
+
+**Step 5 of 6**: run template yaml
+
     $(cocoa)(.local) mpirun -n 1 --mca btl tcp,self --bind-to core --rank-by core --map-by numa:pe=${OMP_NUM_THREADS} cobaya-run ./projects/example/EXAMPLE_EVALUATE[1-4].yaml -f
 
-    or
+or
     
     $(cocoa)(.local) mpirun -n 4 --mca btl tcp,self --bind-to core --rank-by core --map-by numa:pe=${OMP_NUM_THREADS} cobaya-run ./projects/example/EXAMPLE_MCMC[1-3].yaml -f
 
@@ -298,7 +300,7 @@ Let's recap, assuming the user *just opened a terminal*, opt for the easier *Con
 
 (**expert**) Why the '--bind-to core --rank-by core --map-by numa:pe=${OMP_NUM_THREADS}' flag? To enable hybrid MPI+OpenMP on UofA's HPC. *Users should check if the flag is necessary on their particular environment.*
 
-**Step 5 of 5**: once the work on the Cocoa environment is done, type:
+**Step 6 of 6**: once the work on the Cocoa environment is done, type:
 
     $(cocoa)(.local) source stop_cocoa
 
