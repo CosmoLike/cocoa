@@ -251,6 +251,8 @@ and (optional)
     
     $(cocoa) conda deactivate cocoa
 
+(**expert**) Why is deactivating cocoa optional? Well, this Conda environment can be useful to many types of projects!
+
 ## Running Cosmolike projects <a name="running_cosmolike_projects"></a> 
 
 The projects folder was designed to include all Cosmolike projects. Similar to last section, we assume the user opted for the easier *Conda installation*, and located the terminal at the folder *where Cocoa was cloned*.
