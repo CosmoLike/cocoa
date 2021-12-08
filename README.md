@@ -274,7 +274,7 @@ Let's recap, assuming the user *just opened a terminal*, opt for the easier *Con
 
     $ conda activate cocoa
      
-**Step 2 of 6**: Go to the Cocoa main folder (all scripts should be run from Cocoa main folder!)
+**Step 2 of 6**: go to the Cocoa main folder (all scripts should be run from the Cocoa main folder!)
 
     $(cocoa) cd ./cocoa/Cocoa
 
@@ -284,23 +284,23 @@ Let's recap, assuming the user *just opened a terminal*, opt for the easier *Con
 
 (**expert**) Users that opt for the Conda installation will have a terminal that looks like this: `$(Cocoa)(.local)`. *This is a feature, not a bug*! The Conda environment can be the same for all Cocoa instances, with [start_cocoa](https://github.com/CosmoLike/cocoa/blob/master/Cocoa/start_cocoa)/[stop_cocoa](https://github.com/CosmoLike/cocoa/blob/master/Cocoa/stop_cocoa) loading/unloading the corresponding `LD_LIBRARY_PATH`, `CPATH`, `C_INCLUDE_PATH`, `CPLUS_INCLUDE_PATH` and `PATH`. *Why more than one Cocoa instance?* While users may be running chains in one instance, they might use a second instantiation to make experimental changes.
 
-**Step 4 of 6**: basic OpenMP setup
+**Step 4 of 6**: perform a basic OpenMP setup
     
     $(cocoa)(.local) export OMP_NUM_THREADS = [1-4]
 
-**Step 5 of 6**: run template yaml
+**Step 5 of 5**: run `cobaya-run` on template yaml files we provide
 
     $(cocoa)(.local) mpirun -n 1 --mca btl tcp,self --bind-to core --rank-by core --map-by numa:pe=${OMP_NUM_THREADS} cobaya-run ./projects/example/EXAMPLE_EVALUATE[1-4].yaml -f
-
-or
     
+or  
+
     $(cocoa)(.local) mpirun -n 4 --mca btl tcp,self --bind-to core --rank-by core --map-by numa:pe=${OMP_NUM_THREADS} cobaya-run ./projects/example/EXAMPLE_MCMC[1-3].yaml -f
 
 (**expert**) Why the '--mca btl tcp,self' flag? Conda-forge developers to not compile OpenMPI with Infiniband compatibility. Users outraged by the small overhead TCP will bring over Infiniband can perform the [installation via Cocoa's internal cache](required_packages_cache) that depends on the HPC module system to load the OpenMPI compiled by the system administrators. 
 
 (**expert**) Why the '--bind-to core --rank-by core --map-by numa:pe=${OMP_NUM_THREADS}' flag? To enable hybrid MPI+OpenMP on UofA's HPC. *Users should check if the flag is necessary on their particular environment.*
 
-**Step 6 of 6**: Once the work is done, type:
+Once the work is done, type:
 
     $(cocoa)(.local) source stop_cocoa
 
@@ -310,11 +310,9 @@ and (optional)
 
 # Running cosmolike projects <a name="cocoa_projects"></a> 
 
-The `projects` folder was designed to include all the Cosmolike projects. **The majority of projects we are working on are not public (yet)**, and they are safeguarded on the private repositories listed on `project/clone_all.sh` (the backbone Cosmolike software, however, is publicly available at `external_modules/code`!). 
+The projects folder was designed to include all the Cosmolike projects. The majority of projects we are working on are not public (yet), and we safeguard them on the private repositories listed on `./project/clone_all.sh` script (the backbone Cosmolike software, however, is publicly available at `./external_modules/code`!). 
 
-**Naming Convention on Cosmolike Organization**: Projects named XXX are stored on `cocoa_XXX` repository hosted at [Cosmolike Organization](https://github.com/CosmoLike). The prefix `cocoa_` is a **mandatory** convention to not confuse with cosmolike only repositories. Our scripts, however, assume the `cocoa_` prefix  has been removed when cloning the repository. The script `project/clone_all.sh` does that automatically, but UofA developers that prefer to clone their git repository manually can acomplish the same via the command:
-
-     $ git clone git@github.com:CosmoLike/cocoa_XXX.git XXX
+**Naming convention on Cosmolike Organization**: Projects named XXX are stored on `cocoa_XXX` repositories hosted at [Cosmolike Organization](https://github.com/CosmoLike). The prefix `cocoa_` is **mandatory**, so we don't mix them with projects that are based on the original CosmoLike program. Our scripts and template yaml files, however, assume the `cocoa_` prefix  has been removed when cloning the repository. The script `project/clone_all.sh` does that automatically, but UofA developers that prefer to clone their git repository manually must remember that convention.
 
 The `XXX` project needs to have the more or less the following structure (taken from our private DES-Y3 project)
 
@@ -346,10 +344,6 @@ The `XXX` project needs to have the more or less the following structure (taken 
     |    |   +-- interface.hpp
     |    +-- chains
     |    |   +-- README
-
-Developers with access to UofA projects, from the Cocoa main folder, can download them by typing
-
-    $(cocoa)(.local) source ./projects/clone_all.sh
 
 Here is a list of projects inside [clone_all](https://github.com/CosmoLike/cocoa/blob/main/Cocoa/projects/.clean_all.sh) script
 
