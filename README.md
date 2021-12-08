@@ -284,7 +284,7 @@ Let's recap, assuming the user *just opened a terminal*, opt for the easier *Con
 
 (**expert**) Users that opt for the Conda installation will have a terminal that looks like this: `$(Cocoa)(.local)`. *This is a feature, not a bug*! The Conda environment can be the same for all Cocoa instances, with [start_cocoa](https://github.com/CosmoLike/cocoa/blob/master/Cocoa/start_cocoa)/[stop_cocoa](https://github.com/CosmoLike/cocoa/blob/master/Cocoa/stop_cocoa) loading/unloading the corresponding `LD_LIBRARY_PATH`, `CPATH`, `C_INCLUDE_PATH`, `CPLUS_INCLUDE_PATH` and `PATH`. *Why more than one Cocoa instance?* While users may be running chains in one instance, they might use a second instantiation to make experimental changes.
 
-**Step 4 of 6**: basic openmp setup
+**Step 4 of 6**: basic OpenMP setup
     
     $(cocoa)(.local) export OMP_NUM_THREADS = [1-4]
 
@@ -296,21 +296,23 @@ or
     
     $(cocoa)(.local) mpirun -n 4 --mca btl tcp,self --bind-to core --rank-by core --map-by numa:pe=${OMP_NUM_THREADS} cobaya-run ./projects/example/EXAMPLE_MCMC[1-3].yaml -f
 
-(**expert**) Why the '--mca btl tcp,self' flag? Conda-forge developers to not compile openmpi with Infiniband compatibility. Users outraged by the small overhead TCP will bring over Infiniband can perform the [installation via Cocoa's internal cache](required_packages_cache) that depends on the HPC module system to load the openmpi compiled by the system administrators. 
+(**expert**) Why the '--mca btl tcp,self' flag? Conda-forge developers to not compile OpenMPI with Infiniband compatibility. Users outraged by the small overhead TCP will bring over Infiniband can perform the [installation via Cocoa's internal cache](required_packages_cache) that depends on the HPC module system to load the OpenMPI compiled by the system administrators. 
 
 (**expert**) Why the '--bind-to core --rank-by core --map-by numa:pe=${OMP_NUM_THREADS}' flag? To enable hybrid MPI+OpenMP on UofA's HPC. *Users should check if the flag is necessary on their particular environment.*
 
-**Step 6 of 6**: once the work on the Cocoa environment is done, type:
+**Step 6 of 6**: Once the work is done, type:
 
     $(cocoa)(.local) source stop_cocoa
 
+and (optional)  
+    
+    $(cocoa) conda deactivate cocoa
+
 # Running cosmolike projects <a name="cocoa_projects"></a> 
 
-The `projects` folder was designed to include all the projects that are being developed by our group. Individual projects must be hosted on independent folders named `cocoa_XXX` where XXX is the project name. 
+The `projects` folder was designed to include all the Cosmolike projects. Individual projects must be hosted on independent folders named `cocoa_XXX` where XXX is the project name. 
 
-The majority of projects we are working on are not public (yet), and they are safeguarded on the private repositories listed on `project/clone_all.sh` (the backbone Cosmolike software, however, is publicly available at `external_modules/code`!). 
-
-You can add your projects there, and the script `setup_cocoa_installation_packages` will try to clone all listed projects. Having inaccessible repositories listed at `project/clone_all.sh` will not cause any errors.
+**The majority of projects we are working on are not public (yet)**, and they are safeguarded on the private repositories listed on `project/clone_all.sh` (the backbone Cosmolike software, however, is publicly available at `external_modules/code`!). 
 
 The `cocoa_XXX` folder that host the `XXX` project needs to have the more or less the following structure (taken from our private DES-Y3 project)
 
@@ -343,9 +345,9 @@ The `cocoa_XXX` folder that host the `XXX` project needs to have the more or les
     |    +-- chains
     |    |   +-- README
 
-(**Warning**) Developers with access to UofA projects can download them by typing
+Developers with access to UofA projects, from the Cocoa main folder, can download them by typing
 
-    $(.local) source $ROOTDIR/projects/clone_all.sh
+    $(cocoa)(.local) source ./projects/clone_all.sh
 
 Here is a list of projects inside [clone_all](https://github.com/CosmoLike/cocoa/blob/main/Cocoa/projects/.clean_all.sh) script
 
@@ -357,6 +359,12 @@ Here is a list of projects inside [clone_all](https://github.com/CosmoLike/cocoa
       git@github.com:CosmoLike/cocoa_lsst_fourier.git
       git@github.com:CosmoLike/cocoa_kids.git
       git@github.com:CosmoLike/cocoa_des_4x2ptN.git"
+
+**After cloning a project, users must restart the Cocoa `(.local)` environemnt** so the `./project/XXX/script/start_XXX` can be loaded (start_cocoa and stop_cocoa scipts automatically scans and calls `./project/XXX/script/start[stop]_XXX` for all cloned projects).
+
+Compilation of a particular project, from the Cocoa main folder, should use 'scripts/compile_XXX' script as shown below:
+
+     $(cocoa)(.local) source ./projects/des_y3/scripts/compile_des_y3
 
 ## Appendix <a name="appendix"></a>
 
