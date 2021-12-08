@@ -127,7 +127,7 @@ The local installation via cocoa's internal cache is selected whenever the envir
     #export MACOS_HOMEBREW_INSTALLATION=1
     export MANUAL_INSTALLATION=1
     
-Users also need to set the following self-explanatory environmental keys on [set_installation_options](https://github.com/CosmoLike/cocoa/blob/master/Cocoa/set_installation_options):
+The user also needs to set the following self-explanatory environmental keys on [set_installation_options](https://github.com/CosmoLike/cocoa/blob/master/Cocoa/set_installation_options):
  
     [Extracted from set_installation_options script]
   
@@ -178,7 +178,7 @@ to clone the repository.
 
 (**Warning**) We have a limited monthly quota in bandwidth for [Git LFS](https://git-lfs.github.com) files, and therefore we ask users to use good judgment in the number of times they clone repositories with large files (each clone will download around 5GB from Git LFS).
 
-Cocoa is made aware of the chosen installation method of required packages via special environment keys located on the [set_installation_options](https://github.com/CosmoLike/cocoa/blob/master/Cocoa/set_installation_options) script. The user must export the appropriate key.
+Cocoa is made aware of the chosen installation method of required packages via special environment keys located on the [set_installation_options](https://github.com/CosmoLike/cocoa/blob/master/Cocoa/set_installation_options) script, as shown below
 
     [Extracted from set_installation_options script]
     #  ---------------------------------------------------------------------------
@@ -189,7 +189,7 @@ Cocoa is made aware of the chosen installation method of required packages via s
     #export MACOS_HOMEBREW_INSTALLATION=1
     #export MANUAL_INSTALLATION=1
     
-Users must then type the following command
+The user must uncomment the appropriate key, and then type the following command
 
     source setup_cocoa_installation_packages
 
