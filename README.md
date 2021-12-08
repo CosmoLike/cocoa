@@ -275,7 +275,7 @@ The projects folder was designed to include all Cosmolike projects. Similar to l
  
 (**warning**): Please run the [start_cocoa](https://github.com/CosmoLike/cocoa/blob/master/Cocoa/start_cocoa) script *after* cloning the cosmolike repository. 
  
-(**expert**) Why the warning above? [Start_cocoa](https://github.com/CosmoLike/cocoa/blob/master/Cocoa/start_cocoa) creates symbolic links, in all available projects, between `./project/XXX/likelihood` and `./cobaya/cobaya/likelihoods/XXX`; `./project/XXX/data` and `./external_modules/data/XXX`; `./project/XXX/interface` and `./external_modules/code/XXX. It also adds the *cosmolike interface* of all projects to `LD_LIBRARY_PATH` and `PYTHONPATH` by calling `./projects/XXX/scripts/start_XXX`.
+(**expert**) Why the warning above? [Start_cocoa](https://github.com/CosmoLike/cocoa/blob/master/Cocoa/start_cocoa) creates symbolic links, in all available projects, between `./project/XXX/likelihood` and `./cobaya/cobaya/likelihoods/XXX`; `./project/XXX/data` and `./external_modules/data/XXX`; `./project/XXX/interface` and `./external_modules/code/XXX`. It also adds the *cosmolike interface* of all projects to `LD_LIBRARY_PATH` and `PYTHONPATH` by calling `./projects/XXX/scripts/start_XXX`.
 
 **Step 4 of 5**: compile the project
  
