@@ -3,9 +3,9 @@
 2. [Installation of cocoa required packages](#required_packages)
     1. [Via Conda (best for Linux)](#required_packages_conda)
     2. [Via Docker (best for MacOS/Windows)](#required_packages_docker)
-    3. [Via Homebrew](#required_packages_homebrew)
-    4. [Via Cocoa's internal cache](#required_packages_cache)
-3. [Installation of cobaya base code](#cobaya_base_code)
+    3. [(expert) Via Homebrew](#required_packages_homebrew)
+    4. [(expert) Via Cocoa's internal cache](#required_packages_cache)
+3. [Installation of Cobaya base code](#cobaya_base_code)
 4. [Running Cobaya Examples](#cobaya_base_code_examples)
 6. [Cosmolike projects](#cocoa_projects)
 7. [Appendix](#appendix)
@@ -16,7 +16,7 @@
 
 ## Overview of the [Cobaya](https://github.com/CobayaSampler)-[CosmoLike](https://github.com/CosmoLike) Joint Architecture (Cocoa) <a name="overview"></a>
 
-Cocoa allows users to run [CosmoLike](https://github.com/CosmoLike) routines inside the [Cobaya](https://github.com/CobayaSampler) framework. Cosmolike is capable of analyzing data primarily from the [Dark Energy Survey](https://www.darkenergysurvey.org) (a.k.a DES) and simulating future multi-probe analyses for Rubin Observatory's Legacy Survey of Space and Time or the Roman Space Telescope. This readme file presents basic and advanced instructions for installing all Cocoa components, including the [Planck likelihood](https://wiki.cosmos.esa.int/planck-legacy-archive/index.php/Main_Page).
+Cocoa allows users to run [CosmoLike](https://github.com/CosmoLike) routines inside the [Cobaya](https://github.com/CobayaSampler) framework. Cosmolike is capable of analyzing data primarily from the [Dark Energy Survey](https://www.darkenergysurvey.org) (a.k.a DES) and simulating future multi-probe analyses for Rubin Observatory's Legacy Survey of Space and Time or the Roman Space Telescope. This readme file presents basic and advanced instructions for installing all Cocoa components, including the [Planck likelihood](https://wiki.cosmos.esa.int/planck-legacy-archive/index.php/Main_Page). 
 
 ## Installation of cocoa required packages <a name="required_packages"></a>
 
@@ -95,7 +95,7 @@ This command will download the [Whovian-Cosmo](https://hub.docker.com/r/vivianmi
 
     $ singularity shell --no-home --bind /path/to/cocoa:/home/whovian/host --bind ~/.ssh:/home/whovian/.ssh:ro whovian-cosmo
 
-### Via Homebrew <a name="required_packages_homebrew"></a>
+### (expert) Via Homebrew <a name="required_packages_homebrew"></a>
 
 This subsection assumes users adopt [Homebrew](https://brew.sh) as the macOS package manager and [BASH](https://www.howtogeek.com/444596/how-to-change-the-default-shell-to-bash-in-macos-catalina/) as the default shell. 
 
@@ -162,7 +162,7 @@ Users must also update their `$PATH` so the OS can detect the [Homebrew](https:/
 
 **Now what? Users can now proceed to the section [Installation of Cobaya base code](#cobaya_base_code)**
 
-### Via Cocoa's internal cache <a name="required_packages_cache"></a>
+### (expert) Via Cocoa's internal cache <a name="required_packages_cache"></a>
 
 (**Warning**) This method is painfully slow, not advisable. It does, however, offer users that don't work with Conda the opportunity to encapsulate the installation of required packages. *We advise the adoption of Conda or Docker installation*. 
 
