@@ -249,7 +249,7 @@ and (optional)
     
     $(cocoa) conda deactivate cocoa
 
-# Running Cosmolike projects <a name="running_cosmolike_projects"></a> 
+## Running Cosmolike projects <a name="running_cosmolike_projects"></a> 
 
 The projects folder was designed to include all Cosmolike projects. Similar to last section, we assume the user opted for the easier *Conda installation*, and located the terminal at the folder *where Cocoa was cloned*.
 
@@ -277,7 +277,7 @@ The projects folder was designed to include all Cosmolike projects. Similar to l
     $(cocoa)(.local) export OMP_NUM_THREADS = [1-4]
     $(cocoa)(.local) mpirun -n 1 --mca btl tcp,self --bind-to core --rank-by core --map-by numa:pe=${OMP_NUM_THREADS} cobaya-run ./projects/XXX/EXAMPLE_EVALUATE1.yaml -f
 
-# Creating Cosmolike projects <a name="creating_cosmolike_projects"></a> 
+## Creating Cosmolike projects <a name="creating_cosmolike_projects"></a> 
 
 The `XXX` project needs to have the more or less the following structure (taken from our private DES-Y3 project)
 
