@@ -5,10 +5,11 @@
     2. [Via Docker (best for MacOS/Windows)](#required_packages_docker)
     3. [Via Homebrew](#required_packages_homebrew)
     4. [Via Cocoa's internal cache](#required_packages_cache)
-3. [Installation of cocoa base code](#cocoa_base_code)
-    1. [Running Examples](#cocoa_base_code_examples)
-5. [Download/compiling/running specific cocoa projects](#cocoa_projects)
-6. [Appendix](#appendix)
+3. [Installation of cobaya base code](#cobaya_base_code)
+4. [Running Cobaya Examples](#cobaya_base_code_examples)
+6. [Cosmolike projects](#cocoa_projects)
+7. [Appendix](#appendix)
+    1. [Proper Credits](#appendix_proper_credits)
     1. [Compiling Boltzmann, CosmoLike and Likelihood codes separatelly](#appendix_compile_separatelly)
     2. [Running Jupyter Notebooks inside the Whovian-Cosmo docker container](#appendix_jupyter_whovian)
     3. [Summary Information about Cocoa's configuration files](#appendix_config_files)
@@ -16,20 +17,6 @@
 ## Overview of the [Cobaya](https://github.com/CobayaSampler)-[CosmoLike](https://github.com/CosmoLike) Joint Architecture (Cocoa) <a name="overview"></a>
 
 Cocoa allows users to run [CosmoLike](https://github.com/CosmoLike) routines inside the [Cobaya](https://github.com/CobayaSampler) framework. Cosmolike is capable of analyzing data primarily from the [Dark Energy Survey](https://www.darkenergysurvey.org) (a.k.a DES) and simulating future multi-probe analyses for Rubin Observatory's Legacy Survey of Space and Time or the Roman Space Telescope. This readme file presents basic and advanced instructions for installing all Cocoa components, including the [Planck likelihood](https://wiki.cosmos.esa.int/planck-legacy-archive/index.php/Main_Page).
-
-(**Proper Credits**): The following is not an exhaustive list of the codes we use
-
-- [Cobaya](https://github.com/CobayaSampler) is a framework developed by Dr. Jesus Torrado and Prof. Anthony Lewis
-
-- [Cosmolike](https://github.com/CosmoLike) is a framework developed by Prof. Elisabeth Krause and Prof. Tim Eifler
-
-- [CAMB](https://github.com/cmbant/CAMB) is a Boltzmann code developed by Prof. Anthony Lewis
-
-- [CLASS](https://github.com/lesgourg/class_public) is a Boltzmann code developed by Prof. Julien Lesgourgues and Dr. Thomas Tram
-
-- [Polychord](https://github.com/PolyChord/PolyChordLite) is a sampler code developed by Dr. Will Handley, Prof. Lasenby, and Prof. M. Hobson
-
-By no means, we want to discourage people from cloning code from their original repositories. We've included these codes as compressed [xz file format](https://tukaani.org/xz/format.html) in our repository for convenience in the initial development. The work of those authors is extraordinary, and they must be properly cited.
 
 ## Installation of cocoa required packages <a name="required_packages"></a>
 
@@ -74,7 +61,7 @@ With this installation method, users must activate the Conda environment wheneve
 
     $ conda activate cocoa
 
-Users can now proceed to the section [Installation of cocoa base code](#cocoa_base_code). 
+**Now what? Users can now proceed to the section [Installation of Cobaya base code](#cobaya_base_code)** 
 
 ### Via Docker (best for MacOS/Windows) <a name="required_packages_docker"></a>
 
@@ -96,11 +83,11 @@ When running the `docker run (...)/whovian-cosmo:version-1.0.3` for the first ti
 
     $ cd /home/whovian/host/
 
-and proceed to the section [Installation of cocoa base code](#cocoa_base_code). 
+**Now what? Users can now proceed to the section [Installation of Cobaya base code](#cobaya_base_code)**  
 
-(**Warning**) There isn't permanent storage outside `/home/whovian/host/`. Be aware of this fact to not lose any work
+(**warning**) There isn't permanent storage outside `/home/whovian/host/`. Be aware of this fact to not lose any work
 
-(**Warning**) Most HPC systems don't allow users to run docker containers via the standard [docker engine](https://docs.docker.com/engine/) for [security reasons](https://www.reddit.com/r/docker/comments/7y2yp2/why_is_singularity_used_as_opposed_to_docker_in/?utm_source=share&utm_medium=web2x&context=3). There is, however, an alternative engine called [Singularity](https://sylabs.io/guides/3.6/user-guide/index.html) that is in compliance with most HPC requirements. The [Singularity](https://sylabs.io/guides/3.6/user-guide/index.html) engine installation requires administrative privileges, but many HPC enviroments have already adopted it.
+(**expert**) Most HPC systems don't allow users to run docker containers via the standard [docker engine](https://docs.docker.com/engine/) for [security reasons](https://www.reddit.com/r/docker/comments/7y2yp2/why_is_singularity_used_as_opposed_to_docker_in/?utm_source=share&utm_medium=web2x&context=3). There is, however, an alternative engine called [Singularity](https://sylabs.io/guides/3.6/user-guide/index.html) that is in compliance with most HPC requirements. The [Singularity](https://sylabs.io/guides/3.6/user-guide/index.html) engine installation requires administrative privileges, but many HPC enviroments have already adopted it.
 
 To run docker images with Singularity, go to the folder you want to store the image and type:
 
@@ -116,7 +103,7 @@ This subsection assumes users adopt [Homebrew](https://brew.sh) as the macOS pac
 
 (**Warning**) The installation procedures for MacOS are always working in progress; there is no guarantee that our recommendations will work without additional tweaks given how fast [Homebrew](https://brew.sh) updates its packages and Apple changes the OS. *The Docker installation is preferred*.
 
-(**Warning**) Currently, there is a regression in GCC-11, the default compiler on Homebrew, preventing us from adopting it. Therefore, users must build most brew numerical packages from their source via the command `--build-from-source`. Building from source is painfully slow and error prone and does not work in Apple M1 chips without Rosetta 2 emulator. We can do nothing but wait for the GCC developers to fix the bug. 
+(**expert**) Currently, there is a regression in GCC-11, the default compiler on Homebrew, preventing us from adopting it. Therefore, users must build most brew numerical packages from their source via the command `--build-from-source`. Building from source is painfully slow and error prone and does not work in Apple M1 chips without Rosetta 2 emulator. We can do nothing but wait for the GCC developers to fix the bug. 
 
 Below is a list of Homebrew and pip commands that install most dependencies
 
@@ -175,7 +162,7 @@ Users must also update their `$PATH` so the OS can detect the [Homebrew](https:/
     python3=/Users/XXX/Library/Python/3.7/bin
     export PATH=$python3:$PATH
 
-Users can now proceed to the section [Installation of cocoa base code](#cocoa_base_code). 
+**Now what? Users can now proceed to the section [Installation of Cobaya base code](#cobaya_base_code)**
 
 ### Via Cocoa's internal cache <a name="required_packages_cache"></a>
 
@@ -194,8 +181,6 @@ Whenever Conda or Docker installation procedures are unavailable, the user can s
    - [Python Virtual Environment](https://www.geeksforgeeks.org/python-virtual-environment/)
 
 To perform the local semi-autonomous installation, users should follow the procedures on section [Installation of cocoa base code](https://github.com/CosmoLike/cocoa#installation-of-cocoa-base-code), adding, however, the many additional configurations on [set_installation_options](https://github.com/CosmoLike/cocoa/blob/master/Cocoa/set_installation_options) script that are explained below.
-
-(**warning**) The command above may not activate the OpenMP; see appendix [OpenMP+MPI hybrid parallelization]() for details on how to run chains with both types of parallelization schemes.
 
 The local installation via cocoa's internal cache is selected whenever the environmental key `MANUAL_INSTALLATION` is set:
 
@@ -241,16 +226,16 @@ Users also need to set the following self-explanatory environmental keys on [set
       #export IGNORE_OPENBLAS_INSTALLATION=1
       #export IGNORE_FORTRAN_LAPACK_INSTALLATION=1
    
-(**Warning**) Our scripts never install packages on `$HOME/.local`. Doing so could impose incompatibilities between Cobaya and different projects (or break the user's environment for other projects). All requirements for Cocoa are installed at
+(**expert**) Our scripts never install packages on `$HOME/.local`. Doing so could impose incompatibilities between Cobaya and different projects (or break the user's environment for other projects). All requirements for Cocoa are installed at
 
     Cocoa/.local/bin
     Cocoa/.local/include
     Cocoa/.local/lib
     Cocoa/.local/share
 
-Users can now proceed to the section [Installation of cocoa base code](#cocoa_base_code). 
+**Now what? Users can now proceed to the section [Installation of Cobaya base code](#cobaya_base_code)**
 
-## Installation of cocoa base code <a name="cocoa_base_code"></a>
+## Installation of cobaya base code <a name="cobaya_base_code"></a>
 
 Type:
 
@@ -281,51 +266,45 @@ This script decompress the data files and install all packages that may have bee
     
 to compile CAMB/CLASS/Planck..
 
-(**warning**) The script [compile_external_modules](https://github.com/CosmoLike/cocoa/blob/master/Cocoa/compile_external_modules) will try to compile Camb, Planck, Class, and Polychord samplers. If users want to compile/recompile just one of these packages for any reason, we provide scripts for that as well, see appendix [Compiling Boltzmann, CosmoLike and Likelihood codes separatelly](#compile_separatelly) section.
+(**expert**) The script [compile_external_modules](https://github.com/CosmoLike/cocoa/blob/master/Cocoa/compile_external_modules) will try to compile Camb, Planck, Class, and Polychord samplers. If users want to compile/recompile just one of these packages for any reason, we provide scripts for that as well, see appendix [Compiling Boltzmann, CosmoLike and Likelihood codes separatelly](#compile_separatelly) section.
 
-### Running Examples <a name="cocoa_base_code_examples"></a>
+## Running Cobaya Examples <a name="cobaya_base_code_examples"></a>
 
-After that, the Cobaya Framework should be ready, and the user can test a few examples following the commands below
+Let's recap, assuming the user *just opened a terminal*, opt for the easier *Conda installation*, and the terminal is located at the folder *parent to where cocoa was cloned*:
 
-    $ source start_cocoa
+**Step 1 of 5**: activate conda Cocoa environment
+
+    $ conda activate cocoa
+     
+**Step 2 of 5**: Go to the main Cocoa folder (all scripts should be run from there)
+
+    $(cocoa) cd ./cocoa/Cocoa
+
+**Step 3 of 5**: activate the private python environment
+
+    $(cocoa) source start_cocoa
+
+(**expert**) Users that opt for the Conda installation will have a terminal that looks like this: `$(Cocoa)(.local)`. *This is a feature, not a bug*! The Conda environment can be the same for all Cocoa instances, with [start_cocoa](https://github.com/CosmoLike/cocoa/blob/master/Cocoa/start_cocoa)/[stop_cocoa](https://github.com/CosmoLike/cocoa/blob/master/Cocoa/stop_cocoa) loading/unloading the corresponding `LD_LIBRARY_PATH`, `CPATH`, `C_INCLUDE_PATH`, `CPLUS_INCLUDE_PATH` and `PATH`. *Why more than one Cocoa instance?* While users may be running chains in one instance, they might use a second instantiation to make experimental changes.
+
+**Step 4 of 5**: run examples
     
-    $(.local) mpirun -n 1 cobaya-run ./projects/example/EXAMPLE_EVALUATE[1-4].yaml -f
+    $(cocoa)(.local) export OMP_NUM_THREADS = [1-4]
     
-    $(.local) mpirun -n 4 cobaya-run ./projects/example/EXAMPLE_MCMC1.yaml -f
+    $(cocoa)(.local) mpirun -n 1 --mca btl tcp,self cobaya-run ./projects/example/EXAMPLE_EVALUATE[1-4].yaml -f
+
+    or
     
-These examples will evaluate various likelihoods at specific cosmologies. The `-f` ensures that the same YAML file can be run multiple times, overwriting output files from previous evaluations that are located at `./chains`.
+    $(cocoa)(.local) mpirun -n 4 --mca btl tcp,self --bind-to core --rank-by core --map-by numa:pe=${OMP_NUM_THREADS} cobaya-run ./projects/example/EXAMPLE_MCMC[1-3].yaml -f
 
-(**warning**) In HPC environments, you may face this error when running `cobaya` within the Conda cocoa environment. 
-    
-    --------------------------------------------------------------------------
-    It looks like MPI_INIT failed for some reason; your parallel process is
-    likely to abort.  There are many reasons that a parallel process can
-    fail during MPI_INIT; some of which are due to configuration or environment
-    problems.  This failure appears to be an internal failure; here's some
-    additional information (which may only be relevant to an Open MPI
-    developer):
+(**expert**) Why the '--mca btl tcp,self' flag? Conda-forge developers to not compile openmpi with Infiniband compatibility. Users outraged by the small overhead TCP will bring over Infiniband can perform the [installation via Cocoa's internal cache](required_packages_cache) that depends on the HPC module system to load the openmpi compiled by the system administrators. 
 
-    mca_bml_base_open() failed
-    --> Returned "Not found" (-13) instead of "Success" (0)
-    --------------------------------------------------------------------------
+(**expert**) Why the '--bind-to core --rank-by core --map-by numa:pe=${OMP_NUM_THREADS}' flag? To enable OpenMP on UofA's HPC (*users should check if the flag is necessary on their particular environment*)
 
-The origin of this problem lies in the choice of conda-forge developers to not compile openmpi with Infiniband compatibility. The solution is to replace `mpirun -n XX cobaya-run` with `mpirun -n XX --mca btl tcp,self cobaya-run` (please replace `XX` by the number of MPI cores) which will enforce the TCP protocol for communication. Users outraged by the small overhead TCP will bring over Infiniband can perform the [installation via Cocoa's internal cache](required_packages_cache) that depends on the HPC module system to load the openmpi compiled by the system administrators.    
+**Step 5 of 5**: once the work on the Cocoa environment is done, type:
 
-Once the work on the Cocoa environment is done, type:
+    $(cocoa)(.local) source stop_cocoa
 
-    $(.local) source stop_cocoa
-
-The script [start_cocoa](https://github.com/CosmoLike/cocoa/blob/master/Cocoa/start_cocoa) ensures that `LD_LIBRARY_PATH`, `CPATH`, `C_INCLUDE_PATH`, `CPLUS_INCLUDE_PATH` and `PATH` will point preferably to the local Cocoa installation. It also initializes the `$(.local)` private python environment (including `PYTHONPATH`). The script [stop_cocoa](https://github.com/CosmoLike/cocoa/blob/master/Cocoa/stop_cocoa), on the other hand, guarantees that the bash environment is clean after the work on Cocoa is completed. 
-
-Users can, therefore, install multiple Cocoa instances. While one instantiation of Cocoa is running chains, for example, users can tweak Cosmolike in a second instance without affecting these MCMCs.
-
-(**Warning**) Users that opt for the Conda installation will have a terminal that looks like this:
-
-    $(Cocoa)(.local)
-
-*This is a feature, not a bug*! The Conda environment can be the same for all Cocoa instances (projects rarely need local versions of GSL/FFTW/Boost...), with [start_cocoa](https://github.com/CosmoLike/cocoa/blob/master/Cocoa/start_cocoa)/[stop_cocoa](https://github.com/CosmoLike/cocoa/blob/master/Cocoa/stop_cocoa) loading/unloading the corresponding `(.local)` private python environments (with corresponding local Planck/CAMB/Cosmolike/CLASS/Cobaya...).
-
-# Download/compiling/running specific cocoa projects <a name="cocoa_projects"></a> 
+# Running cosmolike projects <a name="cocoa_projects"></a> 
 
 The `projects` folder was designed to include all the projects that are being developed by our group. Individual projects must be hosted on independent folders named `cocoa_XXX` where XXX is the project name. 
 
@@ -381,6 +360,22 @@ Here is a list of projects inside [clone_all](https://github.com/CosmoLike/cocoa
 
 ## Appendix <a name="appendix"></a>
 
+### Proper Credits <a name="appendix_proper_credits"></a>
+
+The following is not an exhaustive list of the codes we use
+
+- [Cobaya](https://github.com/CobayaSampler) is a framework developed by Dr. Jesus Torrado and Prof. Anthony Lewis
+
+- [Cosmolike](https://github.com/CosmoLike) is a framework developed by Prof. Elisabeth Krause and Prof. Tim Eifler
+
+- [CAMB](https://github.com/cmbant/CAMB) is a Boltzmann code developed by Prof. Anthony Lewis
+
+- [CLASS](https://github.com/lesgourg/class_public) is a Boltzmann code developed by Prof. Julien Lesgourgues and Dr. Thomas Tram
+
+- [Polychord](https://github.com/PolyChord/PolyChordLite) is a sampler code developed by Dr. Will Handley, Prof. Lasenby, and Prof. M. Hobson
+
+By no means, we want to discourage people from cloning code from their original repositories. We've included these codes as compressed [xz file format](https://tukaani.org/xz/format.html) in our repository for convenience in the initial development. The work of those authors is extraordinary, and they must be properly cited.
+
 ### Compiling Boltzmann, CosmoLike and Likelihood codes separatelly <a name="appendix_compile_separatelly"></a>
 
 To avoid excessive compilation times during development, users can use specialized scripts that compile only the specific modules:
@@ -416,20 +411,6 @@ where `XXX` in the line `[... NotebookApp] or http://127.0.0.1:8888/?token=XXX` 
     $ ssh your_username@your_sever.com -L 8080:localhost:8080
 
    Finally, go to your browser and type `http://localhost:8080/?token=XXX`, where `XXX` is the previously saved token. For security, we do not allow password-based connections to the jupyter notebooks.
-
-### OpenMP+MPI hybrid parallelization <a name="appendix_openmp_mpi"></a>
-
-In our experience, activating both OpenMP and MPI in python code when running from HPC environments can be tricky. Solutions are HPC dependent. So below, we list some of our HPC solutions:
-    
-(1) UofA Ocelote (default solution on our scripts):
-     #SBATCH --nodes=1
-     #SBATCH --ntasks-per-node=4
-     #SBATCH --cpus-per-task=4
-    
-     (...)
-    
-     export OMP_NUM_THREADS=$SLURM_CPUS_PER_TASK
-     mpirun -n ${SLURM_NTASKS} --mca btl tcp,self --bind-to core --rank-by core --map-by numa:pe=${OMP_NUM_THREADS} cobaya-run ./projects/example/EXAMPLE_MCMC1.yaml -f -r   
 
 ### Summary Information about Cocoa's configuration files <a name="appendix_config_files"></a>
 
