@@ -257,14 +257,14 @@ and (optional)
 
 ## Running Cosmolike projects <a name="running_cosmolike_projects"></a> 
 
-The projects folder was designed to include all Cosmolike projects. Similar to last section, we assume the user opted for the easier *Conda installation*, and located the terminal at the folder *where Cocoa was cloned*.
+The projects folder was designed to include all Cosmolike projects. Like the last section, we assume the user opted for the easier *Conda installation*, and located the terminal at the folder *where Cocoa was cloned*.
 
-**Step 1 of 5**: go to the project folder (`./cocoa/Cocoa/projects`) and clone a cosmolike project, with ficticious name XXX in this explanation,  as shown below:
+**Step 1 of 5**: go to the project folder (`./cocoa/Cocoa/projects`) and clone a Cosmolike project, with fictitious name XXX in this explanation,  as shown below:
 
     $ cd ./cocoa/Cocoa/projects
     $ git clone git@github.com:CosmoLike/cocoa_XXX.git XXX
 
-(**warning**) The Cosmolike Organization hosts a Cobaya-Cosmolike project named XXX at `CosmoLike/cocoa_XXX`. However, our provided scripts and template YAML files assume the removal of `cocoa_` prefix when cloning the repository.
+(**warning**) The Cosmolike Organization hosts a Cobaya-Cosmolike project named XXX at `CosmoLike/cocoa_XXX`. However, our provided scripts and template YAML files assume the removal of the `cocoa_` prefix when cloning the repository.
 
 (**expert**) The prefix `cocoa_` on Cosmolike organization avoids mixing Cobaya-Cosmolike projects with code meant to be run on the legacy CosmoLike code.
 
@@ -277,9 +277,9 @@ The projects folder was designed to include all Cosmolike projects. Similar to l
      $ conda activate cocoa
      $(cocoa) source start_cocoa
  
-(**warning**): Please run the [start_cocoa](https://github.com/CosmoLike/cocoa/blob/main/Cocoa/start_cocoa) script *after* cloning the cosmolike repository. 
+(**warning**): Please run the [start_cocoa](https://github.com/CosmoLike/cocoa/blob/main/Cocoa/start_cocoa) script *after* cloning the project repository. 
  
-(**expert**) Why the warning above? The script [start_cocoa](https://github.com/CosmoLike/cocoa/blob/main/Cocoa/start_cocoa) creates symbolic links, in all available projects, between `./project/XXX/likelihood` and `./cobaya/cobaya/likelihoods/XXX`; `./project/XXX/data` and `./external_modules/data/XXX`; `./project/XXX/interface` and `./external_modules/code/XXX`. It also adds the *cosmolike interface* of all projects to `LD_LIBRARY_PATH` and `PYTHONPATH` by calling `./projects/XXX/scripts/start_XXX`.
+(**expert**) Why the warning above? The script [start_cocoa](https://github.com/CosmoLike/cocoa/blob/main/Cocoa/start_cocoa) creates symbolic links, in all available projects, between `./project/XXX/likelihood` and `./cobaya/cobaya/likelihoods/XXX`; `./project/XXX/data` and `./external_modules/data/XXX`; `./project/XXX/interface` and `./external_modules/code/XXX`. It also adds the *Cobaya-Cosmolike interface* of all projects to `LD_LIBRARY_PATH` and `PYTHONPATH` by calling `./projects/XXX/scripts/start_XXX`.
 
 **Step 4 of 5**: compile the project
  
@@ -292,7 +292,7 @@ The projects folder was designed to include all Cosmolike projects. Similar to l
 
 ## Creating Cosmolike projects <a name="creating_cosmolike_projects"></a> 
 
-The `XXX` project needs to have the more or less the following structure (taken from our private DES-Y3 project)
+The `XXX` project needs to have more or less the following structure (taken from our private DES-Y3 project)
 
     +-- cocoa_des_y3
     |    +-- likelihood
