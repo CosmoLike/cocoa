@@ -357,7 +357,7 @@ To avoid excessive compilation times during development, users can use following
 
     $(cocoa)(.local) source ./installation_scripts/setup_polychord
 
-Here we assumed that Cocoa's private python environment was already set.
+Here we assumed that Cocoa's private python environment, `(.local)`, was already set.
 
 ### Running Jupyter Notebooks inside the Whovian-Cosmo docker container <a name="appendix_jupyter_whovian"></a>
 
