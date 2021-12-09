@@ -255,13 +255,13 @@ and (optional)
     
     $(cocoa) conda deactivate cocoa
 
-(**expert**) Why is deactivating cocoa optional? Well, Cocoa Conda environment can be useful to many types of projects!
+(**expert**) Why is the deactivation of the cocoa Conda environment flag optional? The Cocoa Conda environment can be helpful in many types of projects!
 
 ## Running Cosmolike projects <a name="running_cosmolike_projects"></a> 
 
 The projects folder was designed to include all Cosmolike projects. Like the last section, we assume the user opted for the easier *Conda installation*, and located the terminal at the folder *where Cocoa was cloned*.
 
-**Step 1 of 5**: go to the project folder (`./cocoa/Cocoa/projects`) and clone a Cosmolike project, with fictitious name XXX in this explanation,  as shown below:
+**Step 1 of 5**: go to the project folder (`./cocoa/Cocoa/projects`) and clone a Cosmolike project, with fictitious name XXX,  as shown below:
 
     $ cd ./cocoa/Cocoa/projects
     $ git clone git@github.com:CosmoLike/cocoa_XXX.git XXX
