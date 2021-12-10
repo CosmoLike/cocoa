@@ -10,8 +10,8 @@ export ROOTDIR=$PWD
 #  ---------------------------------------------------------------------------
 # HOW COCOA BE INSTALLED? -------------------------------
 
-export DOCKER_INSTALLATION=1
-#export MINICONDA_INSTALLATION=1
+#export DOCKER_INSTALLATION=1
+export MINICONDA_INSTALLATION=1
 #export MACOS_HOMEBREW_INSTALLATION=1
 #export MANUAL_INSTALLATION=1
 
@@ -135,11 +135,16 @@ elif [ -n "${MINICONDA_INSTALLATION}" ]; then
     export PATH=$CONDA_PREFIX/bin:$PATH
     export LD_LIBRARY_PATH=$CONDA_PREFIX/lib:$LD_LIBRARY_PATH
     export LDFLAGS="-L$CONDA_PREFIX/lib":$LDFLAGS
+    
     export CPLUS_INCLUDE_PATH=$CONDA_PREFIX/include/python3.7m/:$CPLUS_INCLUDE_PATH
     export C_INCLUDE_PATH=$CONDA_PREFIX/include/python3.7m/:$C_INCLUDE_PATH
+    
+    export CPLUS_INCLUDE_PATH=$CONDA_PREFIX/lib/python3.7/site-packages/numpy/core/include/:$CPLUS_INCLUDE_PATH
+    export C_INCLUDE_PATH=$CONDA_PREFIX/lib/python3.7/site-packages/numpy/core/include:$C_INCLUDE_PATH
+
     export GLOBALPYTHON3=$CONDA_PREFIX/bin/python3.7
     export GLOBAL_PACKAGES_LOCATION=$CONDA_PREFIX
-    
+
     export PYTHON_VERSION=3.7
     export PYTHONPATH=$CONDA_PREFIX/lib/python$PYTHON_VERSION/site-packages:$PYTHONPATH
     export PYTHONPATH=$CONDA_PREFIX/lib:$PYTHONPATH
