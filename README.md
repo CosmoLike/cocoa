@@ -229,7 +229,7 @@ Assuming the user opted for the easier *Conda installation* and located the term
 
 **Step 4 of 5**: select the number of OpenMP cores
     
-    $(cocoa)(.local) export OMP_NUM_THREADS = 4
+    $(cocoa)(.local) export OMP_NUM_THREADS=4
 
 **Step 5 of 5**: run `cobaya-run` on a the first example YAML files we provide.
 
