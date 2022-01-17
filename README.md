@@ -534,12 +534,12 @@ Installing a new CAMB code requires a few additional steps to ensure that CAMB s
     
     (...)
 
+(**expert**) This step ensures that the command `source compile_external_modules` compiles all modules including the new modified CAMB
+
 **Step 9 of 10**: Compile CAMB via either 
 
     $(cocoa)(.local) source ./installation_scripts/compile_XXX
-or 
-    $(cocoa)(.local) source compile_external_modules
-
+ 
 **Step 10 of 10**: Modify any YAML file that loads the new CAMB, adding the option `path` to the CAMB section
 
     (...)
