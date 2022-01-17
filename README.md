@@ -13,7 +13,7 @@
     1. [Compiling Boltzmann, CosmoLike and Likelihood codes separatelly](#appendix_compile_separatelly)
     2. [Running Jupyter Notebooks inside the Whovian-Cosmo docker container](#appendix_jupyter_whovian)
     3. [Summary Information about Cocoa's configuration files](#appendix_config_files)
-    4. [Adding new modified CAMB](#appendix_new_camb)
+    4. [Adding a new modified CAMB](#appendix_new_camb)
 
 ## Overview of the [Cobaya](https://github.com/CobayaSampler)-[CosmoLike](https://github.com/CosmoLike) Joint Architecture (Cocoa) <a name="overview"></a>
 
@@ -420,7 +420,7 @@ Installing a new CAMB code requires a few additional steps to ensure that (1) CA
 
 **Step 1 of 5**: Move the Boltzmann code to ./external_modules/code/XXX
 
-`XXX` should be replaced by whatever name the user adopts to their modified CAMB (e.g, CAMBQ, CAMB_INFLATION_PCA...). 
+`XXX` should be replaced by whatever name the user adopts to their modified CAMB (e.g., CAMBQ). 
     
 **Step 2 of 5**: Modify the file `./external_modules/code/XXX/camb/_compilers.py` 
     
@@ -499,8 +499,11 @@ Installing a new CAMB code requires a few additional steps to ensure that (1) CA
 
 **Step 5 of 5**: Modify any YAML file that loads the new CAMB, adding the option `path`
 
+    (...)
+    
     theory:
         camb:
-            path: ./external_modules/code/XXX
-            
+            path: ./external_modules/code/XXX   
             (...)
+    
+    (...)
