@@ -414,5 +414,5 @@ The installation of Cocoa required packages, as well as Boltzmann and Likelihood
 
     This file has instructions on how to clean keys associated with the Python virtual environment and delete the compilation of the Boltzmann, Sampler, and likelihood codes, and local installation of the required packages installed by the [setup_cocoa_installation_packages].
 
-## Adding new modified CAMB <a name="appendix_new_camb"></a> 
-    TESTE
+### Adding new modified CAMB <a name="appendix_new_camb"></a> 
+  TESTE
