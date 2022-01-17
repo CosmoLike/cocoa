@@ -43,7 +43,9 @@ if [ -z "${IGNORE_CLASS_COMPILATION}" ]; then
 
     $PYTHON3 setup.py clean
 
-    $PYTHON3 setup.py build
+    rm -rf ./build/
+
+    CC=$C_COMPILER $PYTHON3 setup.py build
     if [ $? -ne 0 ] 
     then
       echo "PROBLEM BUILDING CLASS"
