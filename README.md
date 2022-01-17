@@ -423,7 +423,7 @@ Installing a new CAMB code requires a few additional steps to ensure that (1) CA
     $(cocoa) cd ./cocoa/Cocoa
     $(cocoa) source start_cocoa
     
-**Step 2 of 10**: Move the Boltzmann code to ./external_modules/code/XXX
+**Step 2 of 10**: Move the Boltzmann code to `./external_modules/code/XXX`
 
 `XXX` should be replaced by whatever name the user adopts to their modified CAMB (e.g., CAMBQ). 
     
@@ -506,7 +506,7 @@ Installing a new CAMB code requires a few additional steps to ensure that (1) CA
 
     $(cocoa)(.local) cp ./installation_scripts/compile_camb ./installation_scripts/compile_XXX
 
-**Step 7 of 10**: Modify `./installation_scripts/compile_XXX
+**Step 7 of 10**: Modify `./installation_scripts/compile_XXX`
 
     (...)
     
@@ -517,7 +517,7 @@ Installing a new CAMB code requires a few additional steps to ensure that (1) CA
         
         (...)
 
-**Step 8 of 10**: Add `source $ROOTDIR/installation_scripts/compile_XXX` command to the shell script `./compile_external_modules`
+**Step 8 of 10**: Add `source $ROOTDIR/installation_scripts/compile_XXX` command to the shell script [compile_external_modules](https://github.com/CosmoLike/cocoa/blob/main/Cocoa/compile_external_modules)
 
     (...)
     
