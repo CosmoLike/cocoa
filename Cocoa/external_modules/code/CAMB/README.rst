@@ -1,20 +1,11 @@
+# Overview (from the original repository: https://github.com/cmbant/CAMB) 
+
 ===================
 CAMB
 ===================
 :CAMB: Code for Anisotropies in the Microwave Background
 :Author: Antony Lewis and Anthony Challinor
 :Homepage: https://camb.info/
-
-.. image:: https://img.shields.io/pypi/v/camb.svg?style=flat
-        :target: https://pypi.python.org/pypi/camb/
-.. image:: https://img.shields.io/conda/vn/conda-forge/camb.svg
-   :target: https://anaconda.org/conda-forge/camb
-.. image:: https://readthedocs.org/projects/camb/badge/?version=latest
-   :target: https://camb.readthedocs.org/en/latest
-.. image:: https://travis-ci.org/cmbant/camb.svg?branch=master
-  :target: https://travis-ci.org/cmbant/camb/builds
-.. image:: https://mybinder.org/badge_logo.svg
-  :target: https://mybinder.org/v2/gh/cmbant/CAMB/HEAD?filepath=docs%2FCAMBdemo.ipynb
 
 Description and installation
 =============================
@@ -26,55 +17,98 @@ and background evolution. The code is in Python, with numerical code implemented
 See the `CAMB python example notebook <https://camb.readthedocs.org/en/latest/CAMBdemo.html>`_ for a
 quick introduction to how to use the CAMB Python package.
 
-For a standard non-editable installation use::
+# Adding a new modified CAMB (compatible with Cocoa's shell scripts)
 
-    pip install camb [--user]
+Installing a new CAMB code requires a few additional steps to ensure that (1) CAMB scripts use the correct compiler, and Cocoa's shell scripts can compile and link CAMB. This section is quite helpful for users that possess a modified version of the Boltzmann code, targeted to a particular extension to the standard model.
 
-The --user is optional and only required if you don't have write permission to your main python installation.
-To install from source, clone from github using::
+**Step 1 of 5**: Move the Boltzmann code to ./external_modules/code/XXX
 
-    git clone --recursive https://github.com/cmbant/CAMB
+`XXX` should be replaced by whatever name the user adopts to their modified CAMB (e.g., CAMBQ). 
+    
+**Step 2 of 5**: Modify the file `./external_modules/code/XXX/camb/_compilers.py` 
+    
+    (...)
+    
+    def get_gfortran_version():
+        ver = call_command("$FORTRAN_COMPILER -dumpversion")
+        if ver and '.' not in ver:
+            ver = call_command("$FORTRAN_COMPILER -dumpfullversion")
+        return ver
+    
+    (...)
+    
+**Step 3 of 5**: Modify the file `./external_modules/code/XXX/fortran/Makefile`
 
-Then in the project source root directory use::
+    (...)
+    
+    #Will detect ifort/gfortran or edit for your compiler
+    #ifneq ($(COMPILER),gfortran)
+    #ifortErr = $(shell which ifort >/dev/null 2>&1; echo $$?)
+    #else
+    #ifortErr = 1
+    #endif
+    ifortErr = 1
+    
+    (...)
+    
+    ifeq "$(ifortErr)" "0"
+        (...)
+    else
+        #gfortErr = $(shell which gfortran >/dev/null; echo $$?)
+        gfortErr = 0
+        ifeq "$(gfortErr)" "0"
+        #Gfortran compiler (version 6+):
+        #compiler_ver = $(shell gfortran -dumpversion 2>&1)
+        COMPILER ?= $(FORTRAN_COMPILER)
+        F90C     ?= $(FORTRAN_COMPILER)
+        #COMPILER = gfortran
+        #F90C     = gfortran
+        
+        (...)
+        
+        #FFLAGS+=-march=native
+        
+        (...)
+        
+        endif
+     endif
 
-    python setup.py install [--user]
+**Step 4 of 5**: Modify the file `./external_modules/code/XXX/forutils/Makefile_compiler`
 
-If you want to work on the code, you can also just install in place without copying anything using::
+    (...)
+    
+    #For standalone compiling set the compiler
+    #ifneq ($(COMPILER),gfortran)
+    #ifortErr = $(shell which ifort >/dev/null 2>&1; echo $$?)
+    #else
+    #ifortErr = 1
+    #endif
+    ifortErr = 1
+    
+    (...)
+    
+    ifeq "$(ifortErr)" "0"
+        (...)
+    else
+        #major_version = $(shell gfortran -dumpversion 2>&1 | cut -d " " -f 3 | cut -d. -f 1)
+        #ifneq ($(shell test $(major_version) -gt 5; echo $$?),0)
+        #$(error gfortran version 6.3 or higher (or ifort 14+) is required)
+        #endif
+        #compiler_ver = $(shell gfortran -dumpversion 2>&1)
+        F90C ?= $(FORTRAN_COMPILER)
+        
+        (...)
+     endif
 
-    pip install -e . [--user]
+**Step 5 of 5**: Modify any YAML file that loads the new CAMB, adding the option `path`
 
-You will need gfortran 6 or higher installed to compile. Binary files for Windows are also provided, so these are used instead if no
-gfortran installation is found on Windows machines. If you have gfortran installed, "python setup.py make"
-(and other standard setup commands) will build the Fortran library on all systems (including Windows without directly using a Makefile).
+    (...)
+    
+    theory:
+        camb:
+            path: ./external_modules/code/XXX   
+            (...)
+    
+    (...)
 
-The python wrapper provides a module called "camb" documented in the `Python CAMB documentation <https://camb.readthedocs.io/en/latest/>`_.
 
-After installation you can also run CAMB from the command line reading parameters from a .ini file, e.g.::
-
-  camb inifiles/planck_2018.ini
-
-To compile the Fortran command-line code run "make camb" in the fortran directory. For full details
-see the  `ReadMe <https://camb.info/readme.html>`_.
-
-Branches
-=============================
-
-The master branch contains latest changes to the main release version.
-
-The devel branch contains latest less-stable things in development.
-The master and devel branches have an integrated test suite, which runs automatically on `Travis <https://travis-ci.org>`_  for new commits and pull requests.
-Reference results and test outputs are stored in the `test outputs repository <https://github.com/cmbant/CAMB_test_outputs/>`_. Tests can also be run locally.
-
-To reproduce legacy results, see these branches:
-
- - *CAMB_sources* is the old public `CAMB Sources <https://camb.info/sources/>`_ code.
- - *CAMB_v0* is the old Fortran-oriented (gfortran 4.8-compatible) version as used by the Planck 2018 analysis.
- - *rayleigh* includes frequency-dependent Rayleigh scattering
- - *python2* is the last Python 2 compatible version
-
-=============
-
-.. raw:: html
-
-    <a href="http://www.sussex.ac.uk/astronomy/"><img src="https://cdn.cosmologist.info/antony/Sussex.png" height="170px"></a>
-    <a href="http://erc.europa.eu/"><img src="https://erc.europa.eu/sites/default/files/content/erc_banner-vertical.jpg" height="200px"></a>
