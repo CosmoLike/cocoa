@@ -210,7 +210,7 @@ Installing a new CAMB code requires a few additional steps to ensure that CAMB s
 
     $(cocoa)(.local) source ./installation_scripts/compile_XXX
     
-**Step 9 of 9**: Modify any YAML file that loads the new CAMB, adding the option `path` to the CAMB section
+**Step 9 of 9**: Modify any YAML file that loads the new CLASS, adding the option `path` to the CLASS section
 
     (...)
     
