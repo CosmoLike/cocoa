@@ -151,7 +151,7 @@ Installing a new CAMB code requires a few additional steps to ensure that CAMB s
 
 `XXX` should be replaced by whatever name the user adopts to their modified CLASS (e.g., CLASSQ). 
 
-**Step 3 of 9**: Modify the file `./external_modules/code/XXX/camb/_compilers.py` 
+**Step 3 of 9**: Modify the file `./external_modules/code/XXX/Makefile` 
     
     (...)
     
