@@ -416,7 +416,7 @@ The installation of Cocoa required packages, as well as Boltzmann and Likelihood
 
 ### Adding a new modified CAMB <a name="appendix_new_camb"></a> 
 
-Installing a new CAMB code requires a few additional steps to ensure that CAMB scripts use the correct compiler, and Cocoa's shell scripts can compile and link CAMB. This section is quite helpful for users that possess a modified version of the Boltzmann code, targeted to a particular extension to the standard model. Again, we assume the user opted for the easier *Conda installation* and located the terminal at the folder *where Cocoa was cloned*
+Installing a new CAMB code requires a few additional steps to ensure that CAMB scripts use the correct compiler, and Cocoa's shell scripts can compile and link CAMB. This section is helpful for users who possess a modified version of the Boltzmann code. Again, we assume the user opted for the easier *Conda installation* and located the terminal at the folder *where Cocoa was cloned*
 
 **Step 1 of 10**: Activate Conda environment, go to the Cocoa main folder and start the private python environment
 
