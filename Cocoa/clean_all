@@ -10,12 +10,12 @@ else
   source set_installation_options
 fi
 
-source installation_scripts/clean_camb
-source installation_scripts/clean_class
-source installation_scripts/clean_cosmolike
-source installation_scripts/clean_planck
-source installation_scripts/clean_polychord
-source installation_scripts/clean_required
+source $ROOTDIR/installation_scripts/clean_camb
+source $ROOTDIR/installation_scripts/clean_class
+source $ROOTDIR/installation_scripts/clean_cosmolike
+source $ROOTDIR/installation_scripts/clean_planck
+source $ROOTDIR/installation_scripts/clean_polychord
+source $ROOTDIR/installation_scripts/clean_required
 
 deactivate
 
