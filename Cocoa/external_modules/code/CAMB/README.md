@@ -1,11 +1,12 @@
-Overview 
-=============================
+## Overview 
 
 Original repository: https://github.com/cmbant/CAMB 
 
-:CAMB: Code for Anisotropies in the Microwave Background
-:Author: Antony Lewis and Anthony Challinor
-:Homepage: https://camb.info/
+**CAMB**: Code for Anisotropies in the Microwave Background
+
+**Author**: Antony Lewis and Anthony Challinor
+
+**Homepage**: https://camb.info/
 
 CAMB is a cosmology code for calculating cosmological observables, including
 CMB, lensing, source count and 21cm angular power spectra, matter power spectra, transfer functions
@@ -14,8 +15,8 @@ and background evolution. The code is in Python, with numerical code implemented
 See the `CAMB python example notebook <https://camb.readthedocs.org/en/latest/CAMBdemo.html>`_ for a
 quick introduction to how to use the CAMB Python package.
 
-Adding a new modified CAMB (compatible with Cocoa's shell scripts)
-=============================
+## Adding a new modified CAMB (compatible with Cocoa's shell scripts)
+
 
 Installing a new CAMB code requires a few additional steps to ensure that (1) CAMB scripts use the correct compiler, and Cocoa's shell scripts can compile and link CAMB. This section is quite helpful for users that possess a modified version of the Boltzmann code, targeted to a particular extension to the standard model.
 
