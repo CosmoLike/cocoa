@@ -177,6 +177,17 @@ Installing a new CAMB code requires a few additional steps to ensure that CAMB s
     #CC       = pgcc
     
     (...)
+    
+    classy: libclass.a python/classy.pyx python/cclassy.pxd
+    #ifdef OMPFLAG
+    #cp python/setup.py python/autosetup.py
+    #else
+    #grep -v "lgomp" python/setup.py > python/autosetup.py
+    #endif
+    #cd python; export CC=$(CC); $(PYTHON) autosetup.py install || $(PYTHON) autosetup.py install --user
+    #rm python/autosetup.py
+    
+    (...)
 
 **Step 4 of 12**: Modify the file `./external_modules/code/XXX/python/setup.py` 
     
