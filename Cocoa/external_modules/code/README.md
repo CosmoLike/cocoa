@@ -167,8 +167,8 @@ Installing a new CAMB code requires a few additional steps to ensure that CAMB s
     (...)
     
     GCCPATH_STRING = sbp.Popen(
-    ['$C_COMPILER', '-print-libgcc-file-name'],
-    stdout=sbp.PIPE).communicate()[0]
+        ['$C_COMPILER -print-libgcc-file-name'],
+        stdout=sbp.PIPE, shell=True).communicate()[0]
     GCCPATH = osp.normpath(osp.dirname(GCCPATH_STRING)).decode()
     
     (...)
