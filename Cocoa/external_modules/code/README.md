@@ -6,17 +6,17 @@
 
 Installing a new CAMB code requires a few additional steps to ensure that CAMB scripts use the correct compiler, and Cocoa's shell scripts can compile and link CAMB. This section is helpful for users who possess a modified version of the Boltzmann code. Again, we assume the user opted for the easier *Conda installation* and located the terminal at the folder *where Cocoa was cloned*
 
-**Step 1 of 10**: Activate Conda environment, go to the Cocoa main folder and start the private python environment
+**Step 1 of 13**: Activate Conda environment, go to the Cocoa main folder and start the private python environment
 
     $ conda activate cocoa
     $(cocoa) cd ./cocoa/Cocoa
     $(cocoa) source start_cocoa
     
-**Step 2 of 10**: Move the Boltzmann code to `./external_modules/code/XXX`
+**Step 2 of 13**: Move the Boltzmann code to `./external_modules/code/XXX`
 
 `XXX` should be replaced by whatever name the user adopts to their modified CAMB (e.g., CAMBQ). 
     
-**Step 3 of 10**: Modify the file `./external_modules/code/XXX/camb/_compilers.py` 
+**Step 3 of 13**: Modify the file `./external_modules/code/XXX/camb/_compilers.py` 
     
     (...)
     
@@ -28,7 +28,7 @@ Installing a new CAMB code requires a few additional steps to ensure that CAMB s
     
     (...)
     
-**Step 4 of 10**: Modify the file `./external_modules/code/XXX/fortran/Makefile`
+**Step 4 of 13**: Modify the file `./external_modules/code/XXX/fortran/Makefile`
 
     (...)
     
@@ -64,7 +64,7 @@ Installing a new CAMB code requires a few additional steps to ensure that CAMB s
         endif
      endif
 
-**Step 5 of 10**: Modify the file `./external_modules/code/XXX/forutils/Makefile_compiler`
+**Step 5 of 13**: Modify the file `./external_modules/code/XXX/forutils/Makefile_compiler`
 
     (...)
     
@@ -91,11 +91,11 @@ Installing a new CAMB code requires a few additional steps to ensure that CAMB s
         (...)
      endif
 
-**Step 6 of 10**: Copy `./installation_scripts/compile_camb` to `./installation_scripts/compile_XXX` via the command.
+**Step 6 of 13**: Copy `./installation_scripts/compile_camb` to `./installation_scripts/compile_XXX` via the command.
 
     $(cocoa)(.local) cp ./installation_scripts/compile_camb ./installation_scripts/compile_XXX
 
-**Step 7 of 10**: Modify `./installation_scripts/compile_XXX`
+**Step 7 of 13**: Modify `./installation_scripts/compile_XXX`
 
     (...)
     
@@ -106,29 +106,45 @@ Installing a new CAMB code requires a few additional steps to ensure that CAMB s
         
         (...)
 
-**Step 8 of 10**: Add `source $ROOTDIR/installation_scripts/compile_XXX` command to the shell script [compile_external_modules](https://github.com/CosmoLike/cocoa/blob/main/Cocoa/compile_external_modules)
+**Step 8 of 13**: Modify [compile_external_modules](https://github.com/CosmoLike/cocoa/blob/main/Cocoa/compile_external_modules)
 
     (...)
-    
-    # ----------------------------------------------------------------------------
-    # ----------------------------------------------------------------------------
-    # ------------------------ COMPILE EXTERNAL MODULES --------------------------
-    # ----------------------------------------------------------------------------
-    # ----------------------------------------------------------------------------
 
     source $ROOTDIR/installation_scripts/compile_camb
-    
+   
     source $ROOTDIR/installation_scripts/compile_XXX
     
     (...)
 
 (**expert**) This step ensures that the command `source compile_external_modules` compiles all modules including the new modified CAMB
 
-**Step 9 of 10**: Compile CAMB
+**Step 9 of 13**: Compile CAMB
 
     $(cocoa)(.local) source ./installation_scripts/compile_XXX
- 
-**Step 10 of 10**: Modify any YAML file that loads the new CAMB, adding the option `path` to the CAMB section
+
+**Step 10 of 13**: Copy `./installation_scripts/clean_camb` to `./installation_scripts/clean_XXX` via the command.
+
+    $(cocoa)(.local) cp ./installation_scripts/clean_camb ./installation_scripts/clean_XXX
+
+**Step 11 of 13**: Modify `./installation_scripts/clean_XXX`
+
+    (...) 
+    
+    cd $ROOTDIR/external_modules/code/XXX/
+    
+    (...)
+
+**Step 12 of 13**: Modify [clean_all](https://github.com/CosmoLike/cocoa/blob/main/Cocoa/clean_all)
+
+    (...)
+
+    source $ROOTDIR/installation_scripts/clean_camb
+    
+    source $ROOTDIR/installation_scripts/clean_XXX
+    
+    (...)
+
+**Step 13 of 13**: Modify any YAML file that loads the new CAMB, adding the option `path` to the CAMB section
 
     (...)
     
@@ -138,20 +154,20 @@ Installing a new CAMB code requires a few additional steps to ensure that CAMB s
             (...)
     
     (...)
-
+    
 ## Adding a new modified CLASS <a name="appendix_new_class"></a> 
 
-**Step 1 of 9**: Activate Conda environment, go to the Cocoa main folder and start the private python environment
+**Step 1 of 12**: Activate Conda environment, go to the Cocoa main folder and start the private python environment
 
     $ conda activate cocoa
     $(cocoa) cd ./cocoa/Cocoa
     $(cocoa) source start_cocoa
     
-**Step 2 of 9**: Move the Boltzmann code to `./external_modules/code/XXX`
+**Step 2 of 12**: Move the Boltzmann code to `./external_modules/code/XXX`
 
 `XXX` should be replaced by whatever name the user adopts to their modified CLASS (e.g., CLASSQ). 
 
-**Step 3 of 9**: Modify the file `./external_modules/code/XXX/Makefile` 
+**Step 3 of 12**: Modify the file `./external_modules/code/XXX/Makefile` 
     
     (...)
     
@@ -162,7 +178,7 @@ Installing a new CAMB code requires a few additional steps to ensure that CAMB s
     
     (...)
 
-**Step 4 of 9**: Modify the file `./external_modules/code/XXX/python/setup.py` 
+**Step 4 of 12**: Modify the file `./external_modules/code/XXX/python/setup.py` 
     
     (...)
     
@@ -173,11 +189,11 @@ Installing a new CAMB code requires a few additional steps to ensure that CAMB s
     
     (...)
     
-**Step 5 of 9**: Copy `./installation_scripts/compile_class` to `./installation_scripts/compile_XXX` via the command.
+**Step 5 of 12**: Copy `./installation_scripts/compile_class` to `./installation_scripts/compile_XXX` via the command.
 
     $(cocoa)(.local) cp ./installation_scripts/compile_class ./installation_scripts/compile_XXX
 
-**Step 6 of 9**: Modify `./installation_scripts/compile_XXX`
+**Step 6 of 12**: Modify `./installation_scripts/compile_XXX`
 
     (...)
     
@@ -188,16 +204,10 @@ Installing a new CAMB code requires a few additional steps to ensure that CAMB s
         
         (...)
         
-**Step 7 of 9**: Add `source $ROOTDIR/installation_scripts/compile_XXX` command to the shell script [compile_external_modules](https://github.com/CosmoLike/cocoa/blob/main/Cocoa/compile_external_modules)
+**Step 7 of 12**: Add `source $ROOTDIR/installation_scripts/compile_XXX` command to the shell script [compile_external_modules](https://github.com/CosmoLike/cocoa/blob/main/Cocoa/compile_external_modules)
 
     (...)
     
-    # ----------------------------------------------------------------------------
-    # ----------------------------------------------------------------------------
-    # ------------------------ COMPILE EXTERNAL MODULES --------------------------
-    # ----------------------------------------------------------------------------
-    # ----------------------------------------------------------------------------
-
     source $ROOTDIR/installation_scripts/compile_class
     
     source $ROOTDIR/installation_scripts/compile_XXX
@@ -206,11 +216,33 @@ Installing a new CAMB code requires a few additional steps to ensure that CAMB s
 
 (**expert**) This step ensures that the command `source compile_external_modules` compiles all modules including the new modified CLASS
 
-**Step 8 of 9**: Compile CLASS
+**Step 8 of 12**: Compile CLASS
 
     $(cocoa)(.local) source ./installation_scripts/compile_XXX
+
+**Step 9 of 12**: Copy `./installation_scripts/clean_class` to `./installation_scripts/clean_XXX` via the command.
+
+    $(cocoa)(.local) cp ./installation_scripts/clean_class ./installation_scripts/clean_XXX
+
+**Step 10 of 12**: Modify `./installation_scripts/clean_XXX`
+
+    (...) 
     
-**Step 9 of 9**: Modify any YAML file that loads the new CLASS, adding the option `path` to the CLASS section
+    cd $ROOTDIR/external_modules/code/XXX/
+    
+    (...)
+
+**Step 11 of 12**: Modify [clean_all](https://github.com/CosmoLike/cocoa/blob/main/Cocoa/clean_all)
+
+    (...)
+
+    source $ROOTDIR/installation_scripts/clean_camb
+    
+    source $ROOTDIR/installation_scripts/clean_XXX
+    
+    (...)
+    
+**Step 12 of 12**: Modify any YAML file that loads the new CLASS, adding the option `path` to the CLASS section
 
     (...)
     
