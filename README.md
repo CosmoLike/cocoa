@@ -418,11 +418,16 @@ The installation of Cocoa required packages, as well as Boltzmann and Likelihood
 
 Installing a new CAMB code requires a few additional steps to ensure that (1) CAMB scripts use the correct compiler, and Cocoa's shell scripts can compile and link CAMB. This section is quite helpful for users that possess a modified version of the Boltzmann code, targeted to a particular extension to the standard model.
 
-**Step 1 of 9**: Move the Boltzmann code to ./external_modules/code/XXX
+**Step 1 of 10**: go to the Cocoa main folder and start the private environment
+
+    $(cocoa) cd ./cocoa/Cocoa
+    $(cocoa) source start_cocoa
+    
+**Step 2 of 10**: Move the Boltzmann code to ./external_modules/code/XXX
 
 `XXX` should be replaced by whatever name the user adopts to their modified CAMB (e.g., CAMBQ). 
     
-**Step 2 of 9**: Modify the file `./external_modules/code/XXX/camb/_compilers.py` 
+**Step 3 of 10**: Modify the file `./external_modules/code/XXX/camb/_compilers.py` 
     
     (...)
     
@@ -434,7 +439,7 @@ Installing a new CAMB code requires a few additional steps to ensure that (1) CA
     
     (...)
     
-**Step 3 of 9**: Modify the file `./external_modules/code/XXX/fortran/Makefile`
+**Step 4 of 10**: Modify the file `./external_modules/code/XXX/fortran/Makefile`
 
     (...)
     
@@ -470,7 +475,7 @@ Installing a new CAMB code requires a few additional steps to ensure that (1) CA
         endif
      endif
 
-**Step 4 of 9**: Modify the file `./external_modules/code/XXX/forutils/Makefile_compiler`
+**Step 5 of 10**: Modify the file `./external_modules/code/XXX/forutils/Makefile_compiler`
 
     (...)
     
@@ -497,9 +502,11 @@ Installing a new CAMB code requires a few additional steps to ensure that (1) CA
         (...)
      endif
 
-**Step 5 of 9**: Copy ./installation_scripts/compile_camb to ./installation_scripts/compile_XXX. 
+**Step 6 of 10**: Copy `./installation_scripts/compile_camb` to `./installation_scripts/compile_XXX` via the command.
 
-**Step 6 of 9**: Modify ./installation_scripts/compile_XXX
+    $(cocoa)(.local) cp ./installation_scripts/compile_camb ./installation_scripts/compile_XXX
+
+**Step 7 of 10**: Modify `./installation_scripts/compile_XXX
 
     (...)
     
@@ -510,7 +517,7 @@ Installing a new CAMB code requires a few additional steps to ensure that (1) CA
         
         (...)
 
-**Step 7 of 9**: Add ./installation_scripts/compile_XXX to ./compile_external_modules
+**Step 8 of 10**: Add `source $ROOTDIR/installation_scripts/compile_XXX` command to the shell script `./compile_external_modules`
 
     (...)
     
@@ -526,9 +533,13 @@ Installing a new CAMB code requires a few additional steps to ensure that (1) CA
     
     (...)
 
-**Step 8 of 9**: Compile CAMB via either `source ./installation_scripts/compile_XXX` or `source compile_external_modules`
+**Step 9 of 10**: Compile CAMB via either 
 
-**Step 9 of 9**: Modify any YAML file that loads the new CAMB, adding the option `path` to the CAMB section
+    $(cocoa)(.local) source ./installation_scripts/compile_XXX
+or 
+    $(cocoa)(.local) source compile_external_modules
+
+**Step 10 of 10**: Modify any YAML file that loads the new CAMB, adding the option `path` to the CAMB section
 
     (...)
     
