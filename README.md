@@ -13,12 +13,13 @@
     1. [Compiling Boltzmann, CosmoLike and Likelihood codes separatelly](#appendix_compile_separatelly)
     2. [Running Jupyter Notebooks inside the Whovian-Cosmo docker container](#appendix_jupyter_whovian)
     3. [Summary Information about Cocoa's configuration files](#appendix_config_files)
+    4. [Adding new modified CAMB](#appendix_new_camb)
 
 ## Overview of the [Cobaya](https://github.com/CobayaSampler)-[CosmoLike](https://github.com/CosmoLike) Joint Architecture (Cocoa) <a name="overview"></a>
 
 Cocoa allows users to run [CosmoLike](https://github.com/CosmoLike) routines inside the [Cobaya](https://github.com/CobayaSampler) framework. Cosmolike can analyze data primarily from the [Dark Energy Survey](https://www.darkenergysurvey.org) (a.k.a DES) and simulate future multi-probe analyses for Rubin Observatory's Legacy Survey of Space and Time or the Roman Space Telescope. Besides integrating [Cobaya](https://github.com/CobayaSampler) and [CosmoLike](https://github.com/CosmoLike), this project introduces many shell scripts and readme instructions that mandate the user to "containerize" [Cobaya](https://github.com/CobayaSampler) instances. The container structure of our scripts ensures two things: (1) everyone will run the code with the same compiler, packages, and libraries (2) the user can use multiple [Cobaya](https://github.com/CobayaSampler) instances consistently. This readme file presents basic and advanced instructions for installing all [Cobaya](https://github.com/CobayaSampler) components, including the [Planck likelihood](https://wiki.cosmos.esa.int/planck-legacy-archive/index.php/Main_Page).
 
-(**expert**) Why go to such lengths to containerize [Cobaya](https://github.com/CobayaSampler)? While the command `pip install cobaya --upgrade` from the default [Cobaya](https://github.com/CobayaSampler) instructions is undeniably a more straightforward installation method for beginners, we found that having multiple instances of [Cobaya](https://github.com/CobayaSampler) is better in the context of our projects (we do modify CAMB, CLASS and many likelihood codes extensively). For example, while users may run chains in one instance, many tweaks and changes to the code can be tested (or a different modified CAMB can be linked) in another [Cobaya](https://github.com/CobayaSampler) installation. The consistent use of compilers, packages, and libraries helps debugging and installation (we run this code in many different environments). 
+(**expert**) Why go to such lengths to containerize [Cobaya](https://github.com/CobayaSampler)? While the command `pip install cobaya --upgrade` from the default [Cobaya](https://github.com/CobayaSampler) instructions is undeniably a more straightforward installation method for beginners, we found that having multiple instances of [Cobaya](https://github.com/CobayaSampler) is better in the context of our projects (we do modify CAMB, CLASS and many likelihood codes extensively). For example, while users may run chains in one instance, many tweaks and changes to the code can be tested (or a different modified CAMB can be linked) in another [Cobaya](https://github.com/CobayaSampler) installation. The consistent use of compilers, packages, and libraries helps debugging and installation (we run this code in many different environments).
 
 ## Installation of Cocoa's required packages <a name="required_packages"></a>
 
@@ -412,3 +413,6 @@ The installation of Cocoa required packages, as well as Boltzmann and Likelihood
  - [clean_all](https://github.com/CosmoLike/cocoa/blob/main/Cocoa/clean_all)
 
     This file has instructions on how to clean keys associated with the Python virtual environment and delete the compilation of the Boltzmann, Sampler, and likelihood codes, and local installation of the required packages installed by the [setup_cocoa_installation_packages].
+
+## Adding new modified CAMB <a name="appendix_new_camb"></a> 
+    TESTE
