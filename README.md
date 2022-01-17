@@ -418,11 +418,11 @@ The installation of Cocoa required packages, as well as Boltzmann and Likelihood
 
 Installing a new CAMB code requires a few additional steps to ensure that (1) CAMB scripts use the correct compiler, and Cocoa's shell scripts can compile and link CAMB. This section is quite helpful for users that possess a modified version of the Boltzmann code, targeted to a particular extension to the standard model.
 
-**Step 1 of 5**: Move the Boltzmann code to ./external_modules/code/XXX
+**Step 1 of 8**: Move the Boltzmann code to ./external_modules/code/XXX
 
 `XXX` should be replaced by whatever name the user adopts to their modified CAMB (e.g., CAMBQ). 
     
-**Step 2 of 5**: Modify the file `./external_modules/code/XXX/camb/_compilers.py` 
+**Step 2 of 8**: Modify the file `./external_modules/code/XXX/camb/_compilers.py` 
     
     (...)
     
@@ -434,7 +434,7 @@ Installing a new CAMB code requires a few additional steps to ensure that (1) CA
     
     (...)
     
-**Step 3 of 5**: Modify the file `./external_modules/code/XXX/fortran/Makefile`
+**Step 3 of 8**: Modify the file `./external_modules/code/XXX/fortran/Makefile`
 
     (...)
     
@@ -470,7 +470,7 @@ Installing a new CAMB code requires a few additional steps to ensure that (1) CA
         endif
      endif
 
-**Step 4 of 5**: Modify the file `./external_modules/code/XXX/forutils/Makefile_compiler`
+**Step 4 of 8**: Modify the file `./external_modules/code/XXX/forutils/Makefile_compiler`
 
     (...)
     
@@ -497,7 +497,7 @@ Installing a new CAMB code requires a few additional steps to ensure that (1) CA
         (...)
      endif
 
-**Step 5 of 5**: Modify any YAML file that loads the new CAMB, adding the option `path`
+**Step 5 of 8**: Modify any YAML file that loads the new CAMB, adding the option `path`
 
     (...)
     
@@ -505,5 +505,34 @@ Installing a new CAMB code requires a few additional steps to ensure that (1) CA
         camb:
             path: ./external_modules/code/XXX   
             (...)
+    
+    (...)
+    
+**Step 6 of 8**: Copy ./installation_scripts/compile_camb to ./installation_scripts/compile_XXX. 
+
+**Step 7 of 8**: Modify ./installation_scripts/compile_XXX
+
+    (...)
+    
+    if [ -z "${IGNORE_CAMB_COMPILATION}" ]; then
+        echo 'COMPILING XXX'
+
+        cd $ROOTDIR/external_modules/code/XXX/
+        
+        (...)
+
+**Step 8 of 8**: Add ./installation_scripts/compile_XXX to ./compile_external_modules
+
+    (...)
+    
+    # ----------------------------------------------------------------------------
+    # ----------------------------------------------------------------------------
+    # ------------------------ COMPILE EXTERNAL MODULES --------------------------
+    # ----------------------------------------------------------------------------
+    # ----------------------------------------------------------------------------
+
+    source $ROOTDIR/installation_scripts/compile_camb
+    
+    source $ROOTDIR/installation_scripts/compile_XXX
     
     (...)
