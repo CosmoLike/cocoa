@@ -204,7 +204,7 @@ Installing a new CAMB code requires a few additional steps to ensure that CAMB s
         
         (...)
         
-**Step 7 of 12**: Add `source $ROOTDIR/installation_scripts/compile_XXX` command to the shell script [compile_external_modules](https://github.com/CosmoLike/cocoa/blob/main/Cocoa/compile_external_modules)
+**Step 7 of 12**: Modify [compile_external_modules](https://github.com/CosmoLike/cocoa/blob/main/Cocoa/compile_external_modules)
 
     (...)
     
