@@ -1,14 +1,11 @@
-# Overview (from the original repository: https://github.com/cmbant/CAMB) 
+Overview 
+=============================
 
-===================
-CAMB
-===================
+Original repository: https://github.com/cmbant/CAMB 
+
 :CAMB: Code for Anisotropies in the Microwave Background
 :Author: Antony Lewis and Anthony Challinor
 :Homepage: https://camb.info/
-
-Description and installation
-=============================
 
 CAMB is a cosmology code for calculating cosmological observables, including
 CMB, lensing, source count and 21cm angular power spectra, matter power spectra, transfer functions
@@ -17,15 +14,21 @@ and background evolution. The code is in Python, with numerical code implemented
 See the `CAMB python example notebook <https://camb.readthedocs.org/en/latest/CAMBdemo.html>`_ for a
 quick introduction to how to use the CAMB Python package.
 
-# Adding a new modified CAMB (compatible with Cocoa's shell scripts)
+Adding a new modified CAMB (compatible with Cocoa's shell scripts)
+=============================
 
 Installing a new CAMB code requires a few additional steps to ensure that (1) CAMB scripts use the correct compiler, and Cocoa's shell scripts can compile and link CAMB. This section is quite helpful for users that possess a modified version of the Boltzmann code, targeted to a particular extension to the standard model.
 
-**Step 1 of 5**: Move the Boltzmann code to ./external_modules/code/XXX
+**Step 1 of 10**: go to the Cocoa main folder and start the private environment
+
+    $(cocoa) cd ./cocoa/Cocoa
+    $(cocoa) source start_cocoa
+    
+**Step 2 of 10**: Move the Boltzmann code to `./external_modules/code/XXX`
 
 `XXX` should be replaced by whatever name the user adopts to their modified CAMB (e.g., CAMBQ). 
     
-**Step 2 of 5**: Modify the file `./external_modules/code/XXX/camb/_compilers.py` 
+**Step 3 of 10**: Modify the file `./external_modules/code/XXX/camb/_compilers.py` 
     
     (...)
     
@@ -37,7 +40,7 @@ Installing a new CAMB code requires a few additional steps to ensure that (1) CA
     
     (...)
     
-**Step 3 of 5**: Modify the file `./external_modules/code/XXX/fortran/Makefile`
+**Step 4 of 10**: Modify the file `./external_modules/code/XXX/fortran/Makefile`
 
     (...)
     
@@ -73,7 +76,7 @@ Installing a new CAMB code requires a few additional steps to ensure that (1) CA
         endif
      endif
 
-**Step 4 of 5**: Modify the file `./external_modules/code/XXX/forutils/Makefile_compiler`
+**Step 5 of 10**: Modify the file `./external_modules/code/XXX/forutils/Makefile_compiler`
 
     (...)
     
@@ -100,7 +103,38 @@ Installing a new CAMB code requires a few additional steps to ensure that (1) CA
         (...)
      endif
 
-**Step 5 of 5**: Modify any YAML file that loads the new CAMB, adding the option `path`
+**Step 6 of 10**: Copy `./installation_scripts/compile_camb` to `./installation_scripts/compile_XXX` via the command.
+
+    $(cocoa)(.local) cp ./installation_scripts/compile_camb ./installation_scripts/compile_XXX
+
+**Step 7 of 10**: Modify `./installation_scripts/compile_XXX`
+
+    (...)
+    
+    if [ -z "${IGNORE_CAMB_COMPILATION}" ]; then
+        echo 'COMPILING XXX'
+
+        cd $ROOTDIR/external_modules/code/XXX/
+        
+        (...)
+
+**Step 8 of 10**: Add `source $ROOTDIR/installation_scripts/compile_XXX` command to the shell script [compile_external_modules](https://github.com/CosmoLike/cocoa/blob/main/Cocoa/compile_external_modules)
+
+    (...)
+  
+    source $ROOTDIR/installation_scripts/compile_camb
+    
+    source $ROOTDIR/installation_scripts/compile_XXX
+    
+    (...)
+
+**Step 9 of 10**: Compile CAMB via either 
+
+    $(cocoa)(.local) source ./installation_scripts/compile_XXX
+or 
+    $(cocoa)(.local) source compile_external_modules
+
+**Step 10 of 10**: Modify any YAML file that loads the new CAMB, adding the option `path` to the CAMB section
 
     (...)
     
@@ -110,5 +144,3 @@ Installing a new CAMB code requires a few additional steps to ensure that (1) CA
             (...)
     
     (...)
-
-
