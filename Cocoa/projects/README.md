@@ -61,7 +61,7 @@ Now we list the long list of small changes so the C - C++ - Python interface can
 
 ### Changes in the interface folder 
 
-**Step 1** Choose a project name (e.g., project XXX), and copy the DES-Y3 project using the command below
+**Step 1** Choose a project name (e.g., project XXX where XXX is another experiment - LSST/Roman/KIDS...), and copy the DES-Y3 project using the command below
     
     $ cp ./projects/des_y3/ ./projects/xxx
 
@@ -294,3 +294,24 @@ Now we list the long list of small changes so the C - C++ - Python interface can
     |    |   +-- des_cosmic_shear.yaml
     |    |   +-- des_ggl.yaml
     |    |   +-- des_xi_ggl.yaml
+
+**Step 4** Change the file `params_des_3x2pt.yaml` following the instructions below
+
+Replace the `DES_` prefix for `XXX_` in all parameters. E.g.,
+    
+    XXX_DZ_S1:
+    	prior:
+      	    dist: norm
+      	    loc: 0.0
+      	    scale: 0.005
+    ref:
+        dist: norm
+        loc: 0.0
+        scale: 0.005
+    proposal: 0.005
+    latex: \Delta z_\mathrm{s, XXX}^1
+
+(**Warning**) Similar changes must be made in `params_des_cosmic_shear.yaml`
+
+(**Warning**) Changes in either the number of lenses or source bins will require the introduction of new paremeters in 
+`params_des_cosmic_shear.yaml` and `params_des_3x2pt.yaml`
