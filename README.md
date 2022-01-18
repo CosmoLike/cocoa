@@ -62,6 +62,10 @@ The more straightforward way to install most prerequisites is via [Conda](https:
 With this installation method, users must activate the Conda environment whenever working with Cocoa, as shown below 
 
     $ conda activate cocoa
+    
+Last, users must install git-lfs after activating the conda cocoa environment for the first time
+
+    $(cocoa) $CONDA_PREFIX/bin/git-lfs install
 
 **Users can now proceed to the section [Installation of Cobaya base code](#cobaya_base_code)** 
 
@@ -176,9 +180,11 @@ The user also needs to set the following self-explanatory environmental keys on 
 
 Type:
 
-    $ git lfs clone git@github.com:CosmoLike/cocoa.git
+    $ $CONDA_PREFIX/bin/git-lfs clone git@github.com:CosmoLike/cocoa.git
 
 to clone the repository. 
+
+(**Warning**) We assumed in the command above users have installed the pre-requisite packages (including git-lfs) via the recommended Conda installation method. With other installation method, `$CONDA_PREFIX/bin/git-lfs` should be replaced with `git-lfs`. 
 
 (**Warning**) We have a limited monthly quota in bandwidth for [Git LFS](https://git-lfs.github.com) files, and therefore we ask users to use good judgment in the number of times they clone Cocoa's main repository. 
 
