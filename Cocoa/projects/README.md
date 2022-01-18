@@ -110,15 +110,10 @@ Now we list the long list of small changes so the C - C++ - Python interface can
         (...)
         // change cosmolike_des_y3_interface.so to cosmolike_XXX_interface.so in the line below 
         __file__ = pkg_resources.resource_filename(__name__,'cosmolike_des_y3_interface.so')
-        (...)
         
 **Step 5** Change the file `./projects/XXX/interface/interface.cpp` following the instructions below
     
     (...)
-    
-    // ----------------------------------------------------------------------------
-    // ---------------------------- PYTHON WRAPPER --------------------------------
-    // ----------------------------------------------------------------------------
     
     // change cosmolike_des_y3_interface to cosmolike_XXX_interface in the line below
     PYBIND11_MODULE(cosmolike_des_y3_interface, m)
@@ -126,11 +121,9 @@ Now we list the long list of small changes so the C - C++ - Python interface can
         // change the description below
         m.doc() = "CosmoLike Interface for DES-Y3 3x2 Module";
         
-         (...)
+       (...)
     }
     
-     (...)
-
 ### Changes in the script folder
 
 **Step 1** Change the name of the file `./projects/XXX/scripts/compile_des_y3` using the command below 
@@ -222,14 +215,14 @@ Now we list the long list of small changes so the C - C++ - Python interface can
                   // change DES_ to XXX_ in the line below
                   "DES_B1_"+str(i+1) for i in range(self.lens_ntomo)
                 ]
-            ],
-            B2 = [
+            ], 
+	    B2 = [
                 params_values.get(p, None) for p in [
                   // change DES_ to XXX_ in the line below
                   "DES_B2_"+str(i+1) for i in range(self.lens_ntomo)
                 ]
             ],
-            B_MAG = [
+	    B_MAG = [
                 params_values.get(p, None) for p in [
                   // change DES_ to XXX_ in the line below
                   "DES_BMAG_"+str(i+1) for i in range(self.lens_ntomo)
