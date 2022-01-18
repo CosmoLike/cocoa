@@ -61,7 +61,7 @@ Now we list the long list of small changes so the C - C++ - Python interface can
 
 ### Changes in the interface folder 
 
-**Step 1** Choose a project name (e.g., project XXX where XXX is another experiment - LSST/Roman/KIDS...), and copy the DES-Y3 project using the command below
+**Step 1** Choose a project name (e.g., project XXX), and copy the DES-Y3 project using the command below
     
     $ cp ./projects/des_y3/ ./projects/xxx
 
@@ -258,6 +258,8 @@ Now we list the long list of small changes so the C - C++ - Python interface can
         // change DES_ to XXX_ in the line below
         self.baryon_pcs_qs[3] = params_values.get("DES_BARYON_Q4", None)
 
+(**Warning**) If XXX is more than the experiment name (e.g., `XXX = LSST_Y1`), we suggest to replacing `DES_` with just the experiment name (e.g., `LSST_BARYON_Q1`, `LSST_PM` and `LSST_DZ_L`). The convention adopted must be followed when changing the files `params_des_cosmic_shear.yaml` and `params_des_3x2pt.yaml`.
+
 **Step 2** Change the file `./projects/XXX/likelihood/des_3x2pt.py` following the instructions below
     
     // change des_y3 to XXX in the line below
@@ -310,6 +312,8 @@ Replace the `DES_` prefix for `XXX_` in all parameters. E.g.,
         scale: 0.005
     proposal: 0.005
     latex: \Delta z_\mathrm{s, XXX}^1
+
+(**Warning**) If XXX is more than the experiment name (e.g., `XXX = LSST_Y1`), we suggest to replacing `DES_` with just the experiment name (e.g., `LSST_DZ_S1` and `\Delta z_\mathrm{s, LSST}^1`)
 
 (**Warning**) Similar changes must be made in `params_des_cosmic_shear.yaml`
 
