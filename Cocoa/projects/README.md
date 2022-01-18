@@ -1,5 +1,5 @@
 # Table of contents
-1. [The Projects Folder](#appendix_new_camb)
+1. [The Projects Folder](#appendix_projects_folder)
 2. [Adapting DES-Y3 to a new project](#appendix_des_y3_new)
 
 ## The Projects Folder <a name="appendix_projects_folder"></a> 
@@ -13,6 +13,16 @@ The `cocoa_XXX` folder that host the `XXX` project needs to have the more or les
     |    |   +-- _cosmolike_prototype_base.py
     |    |   +-- des_3x2pt.py
     |    |   +-- des_3x2pt.yaml
+    |    |   +-- des_2x2pt.py
+    |    |   +-- des_2x2pt.yaml
+    |    |   +-- des_clustering.py
+    |    |   +-- des_clustering.yaml
+    |    |   +-- des_cosmic_shear.py
+    |    |   +-- des_cosmic_shear.yaml
+    |    |   +-- des_ggl.py
+    |    |   +-- des_ggl.yaml
+    |    |   +-- des_xi_ggl.py
+    |    |   +-- des_xi_ggl.yaml
     |    +-- scripts
     |    |   +-- compile_des_y3
     |    |   +-- start_des_y3
@@ -37,17 +47,22 @@ The `cocoa_XXX` folder that host the `XXX` project needs to have the more or les
 
 (**warning**) The DES-Y3 project is not public yet, but the code will be release in the near future. 
 
-Adapting the DES-Y3 folder to construct a new project involves many small changes and a few big, significant ones. The big changes are:
+Adapting the DES-Y3 folder to construct a new project involves many small changes and a few big, significant ones. 
 
-* Computation of the covariance matrix using either [CosmoCov](https://github.com/CosmoLike/CosmoCov) or [CosmoCovFourier](https://github.com/CosmoLike/CosmoCov_Fourier).
-* Simulation of new `n(z)` for lenses and sources
-* Changes to Cosmolike C++ interface so the appropriate routines can be called (either in real or Fourier space)
+The big changes are:
 
-Now we list the long list of small changes so the C - C++ - Python interface can work flawlessly
+* Computation of the covariance matrix using either [CosmoCov](https://github.com/CosmoLike/CosmoCov) or [CosmoCovFourier](https://github.com/CosmoLike/CosmoCov_Fourier) (replacing `./projects/des_y3/data/cov_Y3.txt`)
+* Simulation of new `n(z)` for lenses and sources (replacing `./projects/des_y3/data/nz_lens_Y3.txt` and `./projects/des_y3/data/nz_source_Y3.txt`)
+* Changes to the Cosmolike C++ interface so the appropriate routines can be called from the Python likelihood
+* Changes to the Cosmolike Python likelihood so the appropriate routines can be called from Cobaya
+* Additional changes in the `data` file, including the `DES_Y3.dataset` file
+
+Now we list the long list of small changes so the C - C++ - Python interface can work flawlessly. They are tedious, but straightforward
 
 ### Changes in the interface folder 
 
 **Step 1** Choose a project name (e.g., project XXX), and copy the DES-Y3 project using the command below
+    
     $ cp ./projects/des_y3/ ./projects/xxx
 
 **Step 2** Change the file `./projects/XXX/interface/MakefileCosmolike` following the instructions below
@@ -86,6 +101,7 @@ Now we list the long list of small changes so the C - C++ - Python interface can
 	@rm -rf cosmolike_des_y3_interface.so cosmolike_des_y3_interface.so.dSYM  *.o
 
 **Step 3** Change the name of the File `./projects/XXX/interface/cosmolike_des_y3_interface.py` using the command below
+    
     $ mv ./projects/XXX/interface/cosmolike_des_y3_interface.py ./projects/XXX/interface/cosmolike_XXX_interface.py
 
 **Step 4** Changes in the newly created file `./projects/XXX/interface/cosmolike_XXX_interface.py` 
@@ -118,12 +134,15 @@ Now we list the long list of small changes so the C - C++ - Python interface can
 ### Changes in the script folder
 
 **Step 1** Change the name of the file `./projects/XXX/scripts/compile_des_y3` using the command below 
+    
     $ mv ./projects/XXX/scripts/compile_des_y3 ./projects/XXX/scripts/compile_XXX
     
 **Step 2** Change the name of the file `./projects/XXX/scripts/start_des_y3` using the command below 
+    
     $ mv ./projects/XXX/scripts/start_des_y3 ./projects/XXX/scripts/start_XXX
     
 **Step 3** Change the name of the file `./projects/XXX/scripts/stop_des_y3` using the command below 
+    
     $ mv ./projects/XXX/scripts/stop_des_y3 ./projects/XXX/scripts/stop_des_y3
 
 **Step 4** Change the file `./projects/XXX/scripts/compile_des_y3` following the instructions below
@@ -245,3 +264,38 @@ Now we list the long list of small changes so the C - C++ - Python interface can
         self.baryon_pcs_qs[2] = params_values.get("DES_BARYON_Q3", None)
         // change DES_ to XXX_ in the line below
         self.baryon_pcs_qs[3] = params_values.get("DES_BARYON_Q4", None)
+
+**Step 2** Change the file `./projects/XXX/likelihood/des_3x2pt.py` following the instructions below
+    
+    // change des_y3 to XXX in the line below
+    from cobaya.likelihoods.des_y3._cosmolike_prototype_base import _cosmolike_prototype_base
+    // change cosmolike_des_y3_interface to cosmolike_XXX_interface in the line below
+    import cosmolike_des_y3_interface as ci
+
+**Step 3** Change the file `./projects/XXX/likelihood/des_3x2pt.yaml` following the instructions below
+   
+    (...)
+    // change DES_Y3.dataset to XXX.dataset in the line below
+    data_file: DES_Y3.dataset
+   
+    (...)
+    // change params_des_3x2pt to params_XXX_3x2pt in the line below
+    params: !defaults [params_des_3x2pt]
+
+(**Warning**) Similar changes must be made in the following files
+    
+    +-- cocoa_des_y3
+    |    +-- likelihood
+    |    |   +-- _cosmolike_prototype_base.py
+    |    |   +-- des_3x2pt.py
+    |    |   +-- des_3x2pt.yaml
+    |    |   +-- des_2x2pt.py
+    |    |   +-- des_2x2pt.yaml
+    |    |   +-- des_clustering.py
+    |    |   +-- des_clustering.yaml
+    |    |   +-- des_cosmic_shear.py
+    |    |   +-- des_cosmic_shear.yaml
+    |    |   +-- des_ggl.py
+    |    |   +-- des_ggl.yaml
+    |    |   +-- des_xi_ggl.py
+    |    |   +-- des_xi_ggl.yaml
