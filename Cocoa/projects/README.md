@@ -1,4 +1,8 @@
-# The Projects Folder
+# Table of contents
+1. [The Projects Folder](#appendix_new_camb)
+2. [Adapting DES-Y3 to a new project](#appendix_des_y3_new)
+
+# The Projects Folder <a name="appendix_projects_folder"></a> 
 
 The `projects` folder includes all the projects that are being developed by our group. Individual projects must be hosted on independent folders named `cocoa_XXX` where XXX is the project name. The majority of projects we are working on are not public (yet), and they are safeguarded on the private repositories listed on `project/clone_all.sh` (the backbone Cosmolike software, however, is publicly available at `external_modules/code`!). You can add your projects there, and the script `setup_cocoa_installation_packages` will try to clone all listed projects. Having inaccessible repositories listed at `project/clone_all.sh` will not cause any errors. 
 
@@ -28,3 +32,5 @@ The `cocoa_XXX` folder that host the `XXX` project needs to have the more or les
     |    |   +-- interface.hpp
     |    +-- chains
     |    |   +-- README
+
+# Adapting DES-Y3 to a new project <a name="appendix_des_y3_new"></a> 
