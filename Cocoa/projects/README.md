@@ -9,10 +9,6 @@ The `cocoa_XXX` folder that host the `XXX` project needs to have the more or les
     |    |   +-- _cosmolike_prototype_base.py
     |    |   +-- des_3x2pt.py
     |    |   +-- des_3x2pt.yaml
-    |    |   +-- des_2x2pt.py
-    |    |   +-- des_3x2pt.yaml
-    |    |   +-- des_cosmic_shear.py
-    |    |   +-- des_cosmic_shear.yaml
     |    +-- scripts
     |    |   +-- compile_des_y3
     |    |   +-- start_des_y3
