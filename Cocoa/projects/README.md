@@ -34,3 +34,214 @@ The `cocoa_XXX` folder that host the `XXX` project needs to have the more or les
     |    |   +-- README
 
 ## Adapting DES-Y3 to a new project <a name="appendix_des_y3_new"></a> 
+
+(**warning**) The DES-Y3 project is not public yet, but the code will be release in the near future. 
+
+Adapting the DES-Y3 folder to construct a new project involves many small changes and a few big, significant ones. The big changes are:
+
+* Computation of the covariance matrix using either [CosmoCov](https://github.com/CosmoLike/CosmoCov) or [CosmoCovFourier](https://github.com/CosmoLike/CosmoCov_Fourier).
+* Simulation of new `n(z)` for lenses and sources
+* Changes to Cosmolike C++ interface so the appropriate routines can be called (either in real or Fourier space)
+
+Now we list the long list of small changes so the C - C++ - Python interface can work flawlessly
+
+### Changes in the interface folder 
+
+**Step 1** Choose a project name (e.g., project XXX), and copy the DES-Y3 project using the command below
+    $ cp ./projects/des_y3/ ./projects/xxx
+
+**Step 2** Change the file `./projects/XXX/interface/MakefileCosmolike` following the instructions below
+
+    (...)
+     
+    CSOURCES += \
+        (...)
+        ${ROOTDIR}/external_modules/code/cosmolike/pt_cfastpt.c \
+        // add additional files from /external_modules/code/cosmolike that is needed
+    
+    (...)
+    
+    OBJECTC += \
+        (...)
+        ./pt_cfastpt.o \
+        // add additional files from /external_modules/code/cosmolike that is needed
+    
+    (...)
+    
+    all:  shared
+    // change cosmolike_des_y3_interface.so to cosmolike_XXX_interface.so in the line below
+    shared: cosmolike_des_y3_interface.so
+    
+    (...)
+    
+    // change cosmolike_des_y3_interface.so to cosmolike_XXX_interface.so in the line below
+    cosmolike_des_y3_interface.so: $(OBJECTC) $(CSOURCES) interface.cpp
+	$(CXX) $(CXXFLAGS) -DCOBAYA_SAMPLER -shared -fPIC -o $@ $(OBJECTC) interface.cpp $(LDFLAGS)
+	@rm *.o
+    
+    (...)
+    
+    // change cosmolike_des_y3_interface.so to cosmolike_XXX_interface.so in the line below 
+    clean:
+	@rm -rf cosmolike_des_y3_interface.so cosmolike_des_y3_interface.so.dSYM  *.o
+
+**Step 3** Change the name of the File `./projects/XXX/interface/cosmolike_des_y3_interface.py` using the command below
+    $ mv ./projects/XXX/interface/cosmolike_des_y3_interface.py ./projects/XXX/interface/cosmolike_XXX_interface.py
+
+**Step 4** Changes in the newly created file `./projects/XXX/interface/cosmolike_XXX_interface.py` 
+
+    def __bootstrap__():
+        (...)
+        // change cosmolike_des_y3_interface.so to cosmolike_XXX_interface.so in the line below 
+        __file__ = pkg_resources.resource_filename(__name__,'cosmolike_des_y3_interface.so')
+        (...)
+        
+**Step 5** Change the file `./projects/XXX/interface/interface.cpp` following the instructions below
+    
+    (...)
+    
+    // ----------------------------------------------------------------------------
+    // ---------------------------- PYTHON WRAPPER --------------------------------
+    // ----------------------------------------------------------------------------
+    
+    // change cosmolike_des_y3_interface to cosmolike_XXX_interface in the line below
+    PYBIND11_MODULE(cosmolike_des_y3_interface, m)
+    {
+        // change the description below
+        m.doc() = "CosmoLike Interface for DES-Y3 3x2 Module";
+        
+         (...)
+    }
+    
+     (...)
+
+### Changes in the script folder
+
+**Step 1** Change the name of the file `./projects/XXX/scripts/compile_des_y3` using the command below 
+    $ mv ./projects/XXX/scripts/compile_des_y3 ./projects/XXX/scripts/compile_XXX
+    
+**Step 2** Change the name of the file `./projects/XXX/scripts/start_des_y3` using the command below 
+    $ mv ./projects/XXX/scripts/start_des_y3 ./projects/XXX/scripts/start_XXX
+    
+**Step 3** Change the name of the file `./projects/XXX/scripts/stop_des_y3` using the command below 
+    $ mv ./projects/XXX/scripts/stop_des_y3 ./projects/XXX/scripts/stop_des_y3
+
+**Step 4** Change the file `./projects/XXX/scripts/compile_des_y3` following the instructions below
+
+    (...)
+
+    // change $ROOTDIR/projects/des_y3/interface to $ROOTDIR/projects/XXX/interface in the line below 
+    cd $ROOTDIR/projects/des_y3/interface
+    
+**Step 5** Change the file `./projects/XXX/scripts/start_des_y3` following the instructions below
+
+    (...)
+
+    // change $ROOTDIR/projects/des_y3/interface to $ROOTDIR/projects/XXX/interface in the line below 
+    addvar LD_LIBRARY_PATH $ROOTDIR/projects/des_y3/interface
+    
+    // change $ROOTDIR/projects/des_y3/interface to $ROOTDIR/projects/XXX/interface in the line below 
+    addvar PYTHONPATH $ROOTDIR/projects/des_y3/interface
+
+### Changes in the likelihood folder
+
+**Step 1** Change the file `./projects/XXX/likelihood/_cosmolike_prototype_base.py` following the instructions below
+
+    (...) 
+    
+    // change cosmolike_des_y3_interface to cosmolike_XXX_interface in the line below 
+    import cosmolike_des_y3_interface as ci
+    
+    (...)
+     
+    def set_source_related(self, **params_values):
+        ci.set_nuisance_shear_calib(
+          M = [
+            params_values.get(p, None) for p in [
+              // change DES_ to XXX_ in the line below
+              "DES_M"+str(i+1) for i in range(self.source_ntomo)
+            ]
+          ]
+        )
+
+        ci.set_nuisance_shear_photoz(
+          bias = [
+            params_values.get(p, None) for p in [
+              // change DES_ to XXX_ in the line below
+              "DES_DZ_S"+str(i+1) for i in range(self.source_ntomo)
+            ]
+          ]
+        )
+
+        ci.set_nuisance_ia(
+          A1 = [
+            params_values.get(p, None) for p in [
+              // change DES_ to XXX_ in the line below
+              "DES_A1_"+str(i+1) for i in range(self.source_ntomo)
+            ]
+          ],
+          A2 = [
+            params_values.get(p, None) for p in [
+              // change DES_ to XXX_ in the line below
+              "DES_A2_"+str(i+1) for i in range(self.source_ntomo)
+            ]
+          ],
+          B_TA = [
+            params_values.get(p, None) for p in [
+              // change DES_ to XXX_ in the line below
+              "DES_BTA_"+str(i+1) for i in range(self.source_ntomo)
+            ]
+          ],
+        )
+     
+    (...)
+     
+    def set_lens_related(self, **params_values):
+        ci.set_nuisance_bias(
+            B1 = [
+                params_values.get(p, None) for p in [
+                  // change DES_ to XXX_ in the line below
+                  "DES_B1_"+str(i+1) for i in range(self.lens_ntomo)
+                ]
+            ],
+            B2 = [
+                params_values.get(p, None) for p in [
+                  // change DES_ to XXX_ in the line below
+                  "DES_B2_"+str(i+1) for i in range(self.lens_ntomo)
+                ]
+            ],
+            B_MAG = [
+                params_values.get(p, None) for p in [
+                  // change DES_ to XXX_ in the line below
+                  "DES_BMAG_"+str(i+1) for i in range(self.lens_ntomo)
+                ]
+            ]
+        )
+        ci.set_nuisance_clustering_photoz(
+            bias = [
+                params_values.get(p, None) for p in [
+                  // change DES_ to XXX_ in the line below
+                  "DES_DZ_L"+str(i+1) for i in range(self.lens_ntomo)
+                ]
+            ]
+        )
+        ci.set_point_mass(
+            PMV = [
+                params_values.get(p, None) for p in [
+                  // change DES_ to XXX_ in the line below
+                  "DES_PM"+str(i+1) for i in range(self.lens_ntomo)
+                ]
+            ]
+        )
+     
+    (...)
+     
+    def set_baryon_related(self, **params_values):
+        // change DES_ to XXX_ in the line below
+        self.baryon_pcs_qs[0] = params_values.get("DES_BARYON_Q1", None)
+        // change DES_ to XXX_ in the line below
+        self.baryon_pcs_qs[1] = params_values.get("DES_BARYON_Q2", None)
+        // change DES_ to XXX_ in the line below
+        self.baryon_pcs_qs[2] = params_values.get("DES_BARYON_Q3", None)
+        // change DES_ to XXX_ in the line below
+        self.baryon_pcs_qs[3] = params_values.get("DES_BARYON_Q4", None)
