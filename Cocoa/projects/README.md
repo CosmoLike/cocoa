@@ -272,6 +272,16 @@ Now we list the long list of small changes so the C - C++ - Python interface can
     // change cosmolike_des_y3_interface to cosmolike_XXX_interface in the line below
     import cosmolike_des_y3_interface as ci
 
+(**Warning**) Similar changes must be made in the following files
+    
+    +-- cocoa_des_y3
+    |    +-- likelihood
+    |    |   +-- des_2x2pt.py
+    |    |   +-- des_clustering.py
+    |    |   +-- des_cosmic_shear.py
+    |    |   +-- des_ggl.py
+    |    |   +-- des_xi_ggl.py
+    
 **Step 3** Change the file `./projects/XXX/likelihood/des_3x2pt.yaml` following the instructions below
    
     (...)
@@ -286,16 +296,8 @@ Now we list the long list of small changes so the C - C++ - Python interface can
     
     +-- cocoa_des_y3
     |    +-- likelihood
-    |    |   +-- _cosmolike_prototype_base.py
-    |    |   +-- des_3x2pt.py
-    |    |   +-- des_3x2pt.yaml
-    |    |   +-- des_2x2pt.py
     |    |   +-- des_2x2pt.yaml
-    |    |   +-- des_clustering.py
     |    |   +-- des_clustering.yaml
-    |    |   +-- des_cosmic_shear.py
     |    |   +-- des_cosmic_shear.yaml
-    |    |   +-- des_ggl.py
     |    |   +-- des_ggl.yaml
-    |    |   +-- des_xi_ggl.py
     |    |   +-- des_xi_ggl.yaml
