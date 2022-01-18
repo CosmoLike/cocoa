@@ -63,7 +63,7 @@ With this installation method, users must activate the Conda environment wheneve
 
     $ conda activate cocoa
     
-Last, users must install git-lfs after activating the conda cocoa environment for the first time
+When loading conda cocoa environment for the first time, users must install git-lfs
 
     $(cocoa) $CONDA_PREFIX/bin/git-lfs install
 
