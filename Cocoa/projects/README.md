@@ -136,7 +136,7 @@ Now we list the long list of small changes so the C - C++ - Python interface can
     
 **Step 3** Change the name of the file `./projects/XXX/scripts/stop_des_y3` using the command below 
     
-    $ mv ./projects/XXX/scripts/stop_des_y3 ./projects/XXX/scripts/stop_des_y3
+    $ mv ./projects/XXX/scripts/stop_des_y3 ./projects/XXX/scripts/stop_XXX
 
 **Step 4** Change the file `./projects/XXX/scripts/compile_des_y3` following the instructions below
 
