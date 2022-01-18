@@ -91,14 +91,14 @@ Now we list the long list of small changes so the C - C++ - Python interface can
     
     // change cosmolike_des_y3_interface.so to cosmolike_XXX_interface.so in the line below
     cosmolike_des_y3_interface.so: $(OBJECTC) $(CSOURCES) interface.cpp
-	$(CXX) $(CXXFLAGS) -DCOBAYA_SAMPLER -shared -fPIC -o $@ $(OBJECTC) interface.cpp $(LDFLAGS)
-	@rm *.o
+        $(CXX) $(CXXFLAGS) -DCOBAYA_SAMPLER -shared -fPIC -o $@ $(OBJECTC) interface.cpp $(LDFLAGS)
+        @rm *.o
     
     (...)
     
     // change cosmolike_des_y3_interface.so to cosmolike_XXX_interface.so in the line below 
     clean:
-	@rm -rf cosmolike_des_y3_interface.so cosmolike_des_y3_interface.so.dSYM  *.o
+        @rm -rf cosmolike_des_y3_interface.so cosmolike_des_y3_interface.so.dSYM  *.o
 
 **Step 3** Change the name of the File `./projects/XXX/interface/cosmolike_des_y3_interface.py` using the command below
     
