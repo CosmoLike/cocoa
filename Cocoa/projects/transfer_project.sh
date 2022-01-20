@@ -1,9 +1,14 @@
 #!/bin/bash
 
+if [ -z "${ROOTDIR}" ]; then
+    echo 'ERROR ROOTDIR not define'
+    exit 1
+fi
+
 OLD_PROJECT="des_y3"
 OLD_SURVEY="DES"
 
-NEW_PROJECT="XXX"
+NEW_PROJECT="lsst_y1"
 NEW_SURVEY="LSST" 
 
 if [ -d $ROOTDIR/projects/$NEW_PROJECT ]; then
@@ -311,5 +316,22 @@ $ROOTDIR/projects/$NEW_PROJECT/examples/SLURM/$TMP".sbatch" 2>/dev/null
 TMP='example_post'
 sed --in-place --regexp-extended  "s@${OLD_PROJECT}@"${NEW_PROJECT}"@g" \
 $ROOTDIR/projects/$NEW_PROJECT/examples/SLURM/$TMP".sbatch" 2>/dev/null
+
+# ------------------------------------------------------------------------------------
+
+rm $ROOTDIR/projects/$NEW_PROJECT/chains/*.txt
+rm $ROOTDIR/projects/$NEW_PROJECT/chains/*.1.txt
+rm $ROOTDIR/projects/$NEW_PROJECT/chains/*.2.txt
+rm $ROOTDIR/projects/$NEW_PROJECT/chains/*.3.txt
+rm $ROOTDIR/projects/$NEW_PROJECT/chains/*.4.txt
+rm $ROOTDIR/projects/$NEW_PROJECT/chains/*.5.txt
+rm $ROOTDIR/projects/$NEW_PROJECT/chains/*.6.txt
+rm $ROOTDIR/projects/$NEW_PROJECT/chains/*.7.txt
+rm $ROOTDIR/projects/$NEW_PROJECT/chains/*.8.txt
+rm $ROOTDIR/projects/$NEW_PROJECT/chains/*.py
+rm $ROOTDIR/projects/$NEW_PROJECT/chains/*.yaml
+rm $ROOTDIR/projects/$NEW_PROJECT/chains/*.input.yaml
+rm $ROOTDIR/projects/$NEW_PROJECT/chains/*.updated.yaml
+rm $ROOTDIR/projects/$NEW_PROJECT/chains/*.pyc
 
 # ------------------------------------------------------------------------------------

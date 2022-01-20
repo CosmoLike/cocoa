@@ -1,5 +1,5 @@
 if [ -z "${ROOTDIR}" ]; then
-    echo 'ERROR ROOTDIR not define'
+    echo 'ERROR ROOTDIR not defined'
     exit 1
 fi
 
