@@ -1,7 +1,9 @@
 # Table of contents
 1. [The Projects Folder](#appendix_projects_folder)
 2. [Adapting DES-Y3 to a new project](#appendix_des_y3_new)
-
+3. [Small changes when adapting DES-Y3 to a new project - the easy way](#appendix_des_y3_new_small)
+3. [Small changes when adapting DES-Y3 to a new project - the hard way](#appendix_des_y3_new_small2)
+4. 
 ## The Projects Folder <a name="appendix_projects_folder"></a> 
 
 The `projects` folder includes all the projects that are being developed by our group. Individual projects must be hosted on independent folders named `cocoa_XXX` where XXX is the project name. The majority of projects we are working on are not public (yet), the backbone Cosmolike software, however, is publicly available at `external_modules/code`.
@@ -58,6 +60,10 @@ The big changes are:
 * Additional changes in the files localted at `/data`, including the `DES_Y3.dataset`
 
 Now we list the long list of small changes so the C - C++ - Python interface can work flawlessly. They are tedious, but straightforward. **All small changes have been automatized in the script [transfer_project.sh](https://github.com/CosmoLike/cocoa/blob/main/Cocoa/projects/transfer_project.sh)**
+
+## Small changes when adapting DES-Y3 to a new project - the easy way <a name="appendix_des_y3_new_small"></a> 
+
+## Small changes when adapting DES-Y3 to a new project - the hard way <a name="appendix_des_y3_new_small2"></a> 
 
 ### Create the new project
 
