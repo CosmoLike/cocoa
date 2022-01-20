@@ -59,13 +59,15 @@ The big changes are:
 
 Now we list the long list of small changes so the C - C++ - Python interface can work flawlessly. They are tedious, but straightforward
 
-### Changes in the interface folder 
+### Create the new project
 
 **Step 1** Choose a project name (e.g., project XXX), and copy the DES-Y3 project using the command below
     
     $ cp ./projects/des_y3/ ./projects/xxx
+    
+### Changes in the interface folder 
 
-**Step 2** Change the file `./projects/XXX/interface/MakefileCosmolike` following the instructions below
+**Step 1** Change the file `./projects/XXX/interface/MakefileCosmolike` following the instructions below
 
     (...)
      
@@ -100,18 +102,18 @@ Now we list the long list of small changes so the C - C++ - Python interface can
     clean:
         @rm -rf cosmolike_des_y3_interface.so cosmolike_des_y3_interface.so.dSYM  *.o
 
-**Step 3** Change the name of the File `./projects/XXX/interface/cosmolike_des_y3_interface.py` using the command below
+**Step 2** Change the name of the File `./projects/XXX/interface/cosmolike_des_y3_interface.py` using the command below
     
     $ mv ./projects/XXX/interface/cosmolike_des_y3_interface.py ./projects/XXX/interface/cosmolike_XXX_interface.py
 
-**Step 4** Changes in the newly created file `./projects/XXX/interface/cosmolike_XXX_interface.py` 
+**Step 3** Changes in the newly created file `./projects/XXX/interface/cosmolike_XXX_interface.py` 
 
     def __bootstrap__():
         (...)
         // change cosmolike_des_y3_interface.so to cosmolike_XXX_interface.so in the line below 
         __file__ = pkg_resources.resource_filename(__name__,'cosmolike_des_y3_interface.so')
         
-**Step 5** Change the file `./projects/XXX/interface/interface.cpp` following the instructions below
+**Step 4** Change the file `./projects/XXX/interface/interface.cpp` following the instructions below
     
     (...)
     
