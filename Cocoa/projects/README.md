@@ -59,13 +59,15 @@ The big changes are:
 
 Now we list the long list of small changes so the C - C++ - Python interface can work flawlessly. They are tedious, but straightforward
 
-### Changes in the interface folder 
+### Create the new project
 
 **Step 1** Choose a project name (e.g., project XXX), and copy the DES-Y3 project using the command below
     
     $ cp ./projects/des_y3/ ./projects/xxx
+    
+### Changes in the interface folder 
 
-**Step 2** Change the file `./projects/XXX/interface/MakefileCosmolike` following the instructions below
+**Step 1** Change the file `./projects/XXX/interface/MakefileCosmolike` following the instructions below
 
     (...)
      
