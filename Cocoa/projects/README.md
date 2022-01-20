@@ -64,7 +64,7 @@ We list below the long list of small core changes so the C - C++ - Python interf
 
 ## Minor core changes when adapting DES-Y3 to a new project - the easy way <a name="appendix_des_y3_new_small"></a> 
 
-The easier way to create a new project and apply the core changes to the code (**excluding all major modifications listed above **) is via the bash script [transfer_project.sh](https://github.com/CosmoLike/cocoa/blob/main/Cocoa/projects/transfer_project.sh). To proper use the bash script, users must set the following variables (set at the beginning of the [transfer_project.sh](https://github.com/CosmoLike/cocoa/blob/main/Cocoa/projects/transfer_project.sh) file):
+The easier way to create a new project and apply the many minor core changes to the code is via the bash script [transfer_project.sh](https://github.com/CosmoLike/cocoa/blob/main/Cocoa/projects/transfer_project.sh). To proper use the bash script, users must set the following variables (set at the beginning of the [transfer_project.sh](https://github.com/CosmoLike/cocoa/blob/main/Cocoa/projects/transfer_project.sh) file):
 
      OLD_PROJECT="des_y3"
      OLD_SURVEY="DES"
