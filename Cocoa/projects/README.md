@@ -47,15 +47,15 @@ The `cocoa_XXX` folder that host the `XXX` project needs to have the more or les
 
 (**warning**) The DES-Y3 project is not public yet, but the code will be release in the near future. 
 
-Adapting the DES-Y3 folder to construct a new project involves many small changes and a few big, significant ones. 
+Adapting the DES-Y3 folder to construct a new project involves many small changes and a few big, significant ones. **All small changes have been automatized in the script [transfer_project.sh](https://github.com/CosmoLike/cocoa/blob/main/Cocoa/projects/transfer_project.sh)**.
 
 The big changes are:
 
 * Computation of the covariance matrix using either [CosmoCov](https://github.com/CosmoLike/CosmoCov) or [CosmoCovFourier](https://github.com/CosmoLike/CosmoCov_Fourier) (replacing `./projects/des_y3/data/cov_Y3.txt`)
 * Simulation of new `n(z)` for lenses and sources (replacing `./projects/des_y3/data/nz_lens_Y3.txt` and `./projects/des_y3/data/nz_source_Y3.txt`)
 * Changes to the Cosmolike C++ interface so the appropriate routines can be called from the Python likelihood
-* Changes to the Cosmolike Python likelihood so the appropriate routines can be called from Cobaya
-* Additional changes in the `data` file, including the `DES_Y3.dataset` file
+* Changes to the Cosmolike Python likelihood so `Cobaya` can call the appropriate routines
+* Additional changes in the files localted at `/data`, including the `DES_Y3.dataset`
 
 Now we list the long list of small changes so the C - C++ - Python interface can work flawlessly. They are tedious, but straightforward
 
