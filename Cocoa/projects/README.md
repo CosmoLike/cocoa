@@ -49,19 +49,32 @@ The `cocoa_XXX` folder that host the `XXX` project needs to have the more or les
 
 (**warning**) The DES-Y3 project is not public yet, but the code will be release in the near future. 
 
-Adapting the DES-Y3 folder to construct a new project involves many small changes and a few big, significant ones. **All small changes have been automatized in the script [transfer_project.sh](https://github.com/CosmoLike/cocoa/blob/main/Cocoa/projects/transfer_project.sh)**.
+Adapting the DES-Y3 folder to construct a new project involves many small core changes and a few major ones. **All small changes have been automatized in the script [transfer_project.sh](https://github.com/CosmoLike/cocoa/blob/main/Cocoa/projects/transfer_project.sh)**.
 
-The big changes are:
+The Major changes are:
 
 * Computation of the covariance matrix using either [CosmoCov](https://github.com/CosmoLike/CosmoCov) or [CosmoCovFourier](https://github.com/CosmoLike/CosmoCov_Fourier) (replacing `/projects/des_y3/data/cov_Y3.txt`)
 * Simulation of new `n(z)` for lenses and sources (replacing `/projects/des_y3/data/nz_lens_Y3.txt` and `/projects/des_y3/data/nz_source_Y3.txt`)
-* Changes to the Cosmolike C++ interface so the appropriate routines can be called from the Python likelihood
+* Changes to the Cosmolike C++ interface so the appropriate routines can be called from the Python likelihood (will your project compute `3x2pt`, `6x2pt`, `4x2pt+N` or what?)
 * Changes to the Cosmolike Python likelihood so `Cobaya` can call the appropriate routines
 * Additional changes in the files localted at `/data`, including the `DES_Y3.dataset`
+* Changes to the number of lens and source bins in `.dataset` and in `params_XXX_3x2pt` files (and any additional files where the nuisance parameters are listed)
 
-Now we list the long list of small changes so the C - C++ - Python interface can work flawlessly. They are tedious, but straightforward. **All small changes have been automatized in the script [transfer_project.sh](https://github.com/CosmoLike/cocoa/blob/main/Cocoa/projects/transfer_project.sh)**
+Now we list the long list of small core changes so the C - C++ - Python interface can work flawlessly. They are tedious, but straightforward. **All core changes have been automatized in the script [transfer_project.sh](https://github.com/CosmoLike/cocoa/blob/main/Cocoa/projects/transfer_project.sh)**
 
 ## Core changes when adapting DES-Y3 to a new project - the easy way <a name="appendix_des_y3_new_small"></a> 
+
+The easier way to create a new project and apply the core changes to the code (**excluding all major modifications listed above **) is via the bash script [transfer_project.sh](https://github.com/CosmoLike/cocoa/blob/main/Cocoa/projects/transfer_project.sh). To proper use the bash script, users must set the following variables (set in the beggining of the [transfer_project.sh](https://github.com/CosmoLike/cocoa/blob/main/Cocoa/projects/transfer_project.sh) file):
+
+     OLD_PROJECT="des_y3"
+     OLD_SURVEY="DES"
+
+     NEW_PROJECT="lsst_y1"
+     NEW_SURVEY="LSST"
+
+After that, just type
+
+     $(cocoa)(.local) bash transfer_project.sh
 
 ## Core changes when adapting DES-Y3 to a new project - the hard way <a name="appendix_des_y3_new_small2"></a> 
 
@@ -116,7 +129,7 @@ Now we list the long list of small changes so the C - C++ - Python interface can
     
     $(cocoa)(.local) mv $ROOTDIR/projects/XXX/interface/cosmolike_des_y3_interface.py $ROOTDIR/projects/XXX/interface/cosmolike_XXX_interface.py
 
-**Step 3** Changes in the newly created file `./projects/XXX/interface/cosmolike_XXX_interface.py` 
+**Step 3** Changes in the newly created file `$ROOTDIR/projects/XXX/interface/cosmolike_XXX_interface.py` 
 
     def __bootstrap__():
         (...)
@@ -138,15 +151,15 @@ Now we list the long list of small changes so the C - C++ - Python interface can
     
 ### Changes in the script folder
 
-**Step 1:** Change the name of the file `./projects/XXX/scripts/compile_des_y3` using the command below 
+**Step 1:** Change the name of the file `$ROOTDIR/projects/XXX/scripts/compile_des_y3` using the command below 
     
     $(cocoa)(.local) mv $ROOTDIR/projects/XXX/scripts/compile_des_y3 $ROOTDIR/projects/XXX/scripts/compile_XXX
     
-**Step 2:** Change the name of the file `./projects/XXX/scripts/start_des_y3` using the command below 
+**Step 2:** Change the name of the file `$ROOTDIR/projects/XXX/scripts/start_des_y3` using the command below 
     
     $(cocoa)(.local) mv $ROOTDIR/projects/XXX/scripts/start_des_y3 $ROOTDIR/projects/XXX/scripts/start_XXX
     
-**Step 3:** Change the name of the file `./projects/XXX/scripts/stop_des_y3` using the command below 
+**Step 3:** Change the name of the file `$ROOTDIR/projects/XXX/scripts/stop_des_y3` using the command below 
     
     $(cocoa)(.local) mv $ROOTDIR/projects/XXX/scripts/stop_des_y3 $ROOTDIR/projects/XXX/scripts/stop_XXX
 
@@ -272,7 +285,7 @@ Now we list the long list of small changes so the C - C++ - Python interface can
 
 (**Warning**) If XXX is more than the experiment name (e.g., `XXX = LSST_Y1`), we suggest to replacing `DES_` with just the experiment name (e.g., `LSST_BARYON_Q1`, `LSST_PM` and `LSST_DZ_L`). The convention adopted must be followed when changing the files `params_des_cosmic_shear.yaml` and `params_des_3x2pt.yaml`.
 
-**Step 2:** Change the file `./projects/XXX/likelihood/des_3x2pt.py` following the instructions below
+**Step 2:** Change the file `$ROOTDIR/projects/XXX/likelihood/des_3x2pt.py` following the instructions below
     
     // change des_y3 to XXX in the line below
     from cobaya.likelihoods.des_y3._cosmolike_prototype_base import _cosmolike_prototype_base
@@ -289,7 +302,7 @@ Now we list the long list of small changes so the C - C++ - Python interface can
     |    |   +-- des_ggl.py
     |    |   +-- des_xi_ggl.py
     
-**Step 3:** Change the file `./projects/XXX/likelihood/des_3x2pt.yaml` following the instructions below
+**Step 3:** Change the file `$ROOTDIR/projects/XXX/likelihood/des_3x2pt.yaml` following the instructions below
    
     (...)
     // change DES_Y3.dataset to XXX.dataset in the line below (adopted convention: .dataset file name = project name all in CAPS)
