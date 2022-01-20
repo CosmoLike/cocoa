@@ -349,11 +349,11 @@ Replace the `DES_` prefix to the name of the survey associated w/ XXX.
 
 ### Changes in the data folder
 
-**Step 1** Rename the `.dataset` dile (adopted convention: `.dataset` file name = project name capitalized)
+**Step 1:** Rename the `.dataset` dile (adopted convention: `.dataset` file name = project name capitalized)
 
      $(cocoa)(.local) mv $ROOTDIR/projects/XXX/data/DES_Y3.dataset $ROOTDIR/projects/XXX/data/XXX.dataset
      
-**Step 2** Update `XXX.dataset` file with the names of the new data vector, covariance, n(z), binning, mask...
+**Step 2:** Update `XXX.dataset` file with the names of the new data vector, covariance, n(z), binning, mask...
 
      data_file = LSST_Y1_nonlim
      cov_file = cov_lsst_y1
