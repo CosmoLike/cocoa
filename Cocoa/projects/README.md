@@ -1,14 +1,14 @@
 # Table of contents
 1. [The Projects Folder](#appendix_projects_folder)
-2. [Adapting DES-Y3 to a new project](#appendix_des_y3_new)
-3. [Minor core changes when adapting DES-Y3 to a new project - the easy way](#appendix_des_y3_new_small)
-3. [Minor core changes when adapting DES-Y3 to a new project - the hard way](#appendix_des_y3_new_small2)
+2. [Adapting DES_Y3 to a new project](#appendix_des_y3_new)
+3. [Minor core changes when adapting DES_Y3 to a new project - the easy way](#appendix_des_y3_new_small)
+3. [Minor core changes when adapting DES_Y3 to a new project - the hard way](#appendix_des_y3_new_small2)
  
 ## The Projects Folder <a name="appendix_projects_folder"></a> 
 
 The `projects` folder includes all the projects that our group is developing. Individual projects must be hosted on independent folders named `cocoa_XXX` where XXX is the project name. The majority of projects we are working on are not public (yet). However, the backbone Cosmolike software is publicly available at `external_modules/code`.
 
-The `cocoa_XXX` folder that host the `XXX` project needs to have more or less the following structure (taken from our private DES-Y3 project)
+The `cocoa_XXX` folder that host the `XXX` project needs to have more or less the following structure (taken from our private DES_Y3 project)
 
     +-- cocoa_des_y3
     |    +-- likelihood
@@ -45,11 +45,11 @@ The `cocoa_XXX` folder that host the `XXX` project needs to have more or less th
     |    +-- chains
     |    |   +-- README
 
-## Adapting DES-Y3 to a new project <a name="appendix_des_y3_new"></a> 
+## Adapting DES_Y3 to a new project <a name="appendix_des_y3_new"></a> 
 
-(**warning**) The DES-Y3 project is not public yet, but our group will be release the code soon. 
+(**warning**) The `DES_Y3` project is not public yet, but our group will be release the code soon. 
 
-Adapting the DES-Y3 folder to construct a new project involves many small core changes and a few major ones. **All minor core changes have been automatized in the script [transfer_project.sh](https://github.com/CosmoLike/cocoa/blob/main/Cocoa/projects/transfer_project.sh)**.
+Adapting the DES_Y3` folder to construct a new project involves many small core changes and a few major ones. **All minor core changes have been automatized in the script [transfer_project.sh](https://github.com/CosmoLike/cocoa/blob/main/Cocoa/projects/transfer_project.sh)**.
 
 **The Major changes are:**
 
@@ -62,7 +62,7 @@ Adapting the DES-Y3 folder to construct a new project involves many small core c
 
 We list below the long list of small core changes so the C - C++ - Python interface can work flawlessly. They are tedious but straightforward. **All core changes have been automatized in the script [transfer_project.sh](https://github.com/CosmoLike/cocoa/blob/main/Cocoa/projects/transfer_project.sh)**
 
-## Minor core changes when adapting DES-Y3 to a new project - the easy way <a name="appendix_des_y3_new_small"></a> 
+## Minor core changes when adapting DES_Y3 to a new project - the easy way <a name="appendix_des_y3_new_small"></a> 
 
 The easier way to create a new project and apply the many minor core changes to the code is via the bash script [transfer_project.sh](https://github.com/CosmoLike/cocoa/blob/main/Cocoa/projects/transfer_project.sh). To proper use the bash script, users must set the following variables (set at the beginning of the [transfer_project.sh](https://github.com/CosmoLike/cocoa/blob/main/Cocoa/projects/transfer_project.sh) file):
 
@@ -76,15 +76,17 @@ After that, just type
 
      $(cocoa)(.local) bash transfer_project.sh
 
-## Minor core changes when adapting DES-Y3 to a new project - the hard way <a name="appendix_des_y3_new_small2"></a> 
+(**Warning**): It Goes Without Saying that the script [transfer_project.sh](https://github.com/CosmoLike/cocoa/blob/main/Cocoa/projects/transfer_project.sh) **does not magically transform DES into LSST (or Roman) analysis**. [transfer_project.sh](https://github.com/CosmoLike/cocoa/blob/main/Cocoa/projects/transfer_project.sh) **only perform the appropriate renaming of files, scripts and links**
+
+## Minor core changes when adapting DES_Y3 to a new project - the hard way <a name="appendix_des_y3_new_small2"></a> 
 
 ### Create the new project
 
-**Step 1:** Choose a project name (e.g., project XXX), and copy the DES-Y3 project using the command below
+**Step 1:** Choose a project name (e.g., project XXX), and copy the `DES_Y3` project using the command below
     
     $(cocoa)(.local) cp $ROOTDIR/projects/des_y3/ $ROOTDIR/projects/xxx
 
-**Step 2:** Remove the git repository associated with DES-Y3 project
+**Step 2:** Remove the git repository associated with DES_Y3` project
 
     $(cocoa)(.local) rm -rf $ROOTDIR/projects/$NEW_PROJECT/.git/
 
