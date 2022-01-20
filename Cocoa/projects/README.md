@@ -1,14 +1,14 @@
 # Table of contents
 1. [The Projects Folder](#appendix_projects_folder)
 2. [Adapting DES-Y3 to a new project](#appendix_des_y3_new)
-3. [Core changes when adapting DES-Y3 to a new project - the easy way](#appendix_des_y3_new_small)
-3. [Core changes when adapting DES-Y3 to a new project - the hard way](#appendix_des_y3_new_small2)
+3. [Minor core changes when adapting DES-Y3 to a new project - the easy way](#appendix_des_y3_new_small)
+3. [Minor core changes when adapting DES-Y3 to a new project - the hard way](#appendix_des_y3_new_small2)
  
 ## The Projects Folder <a name="appendix_projects_folder"></a> 
 
-The `projects` folder includes all the projects that are being developed by our group. Individual projects must be hosted on independent folders named `cocoa_XXX` where XXX is the project name. The majority of projects we are working on are not public (yet), the backbone Cosmolike software, however, is publicly available at `external_modules/code`.
+The `projects` folder includes all the projects that our group is developing. Individual projects must be hosted on independent folders named `cocoa_XXX` where XXX is the project name. The majority of projects we are working on are not public (yet). However, the backbone Cosmolike software is publicly available at `external_modules/code`.
 
-The `cocoa_XXX` folder that host the `XXX` project needs to have the more or less the following structure (taken from our private DES-Y3 project)
+The `cocoa_XXX` folder that host the `XXX` project needs to have more or less the following structure (taken from our private DES-Y3 project)
 
     +-- cocoa_des_y3
     |    +-- likelihood
@@ -47,24 +47,24 @@ The `cocoa_XXX` folder that host the `XXX` project needs to have the more or les
 
 ## Adapting DES-Y3 to a new project <a name="appendix_des_y3_new"></a> 
 
-(**warning**) The DES-Y3 project is not public yet, but the code will be release in the near future. 
+(**warning**) The DES-Y3 project is not public yet, but our group will be release the code soon. 
 
-Adapting the DES-Y3 folder to construct a new project involves many small core changes and a few major ones. **All small changes have been automatized in the script [transfer_project.sh](https://github.com/CosmoLike/cocoa/blob/main/Cocoa/projects/transfer_project.sh)**.
+Adapting the DES-Y3 folder to construct a new project involves many small core changes and a few major ones. **All minor core changes have been automatized in the script [transfer_project.sh](https://github.com/CosmoLike/cocoa/blob/main/Cocoa/projects/transfer_project.sh)**.
 
-The Major changes are:
+**The Major changes are:**
 
 * Computation of the covariance matrix using either [CosmoCov](https://github.com/CosmoLike/CosmoCov) or [CosmoCovFourier](https://github.com/CosmoLike/CosmoCov_Fourier) (replacing `/projects/des_y3/data/cov_Y3.txt`)
 * Simulation of new `n(z)` for lenses and sources (replacing `/projects/des_y3/data/nz_lens_Y3.txt` and `/projects/des_y3/data/nz_source_Y3.txt`)
 * Changes to the Cosmolike C++ interface so the appropriate routines can be called from the Python likelihood (will your project compute `3x2pt`, `6x2pt`, `4x2pt+N` or what?)
 * Changes to the Cosmolike Python likelihood so `Cobaya` can call the appropriate routines
-* Additional changes in the files localted at `/data`, including the `DES_Y3.dataset`
+* Additional changes in the files located at `/data`, including the `DES_Y3.dataset`
 * Changes to the number of lens and source bins in `.dataset` and in `params_XXX_3x2pt` files (and any additional files where the nuisance parameters are listed)
 
-Now we list the long list of small core changes so the C - C++ - Python interface can work flawlessly. They are tedious, but straightforward. **All core changes have been automatized in the script [transfer_project.sh](https://github.com/CosmoLike/cocoa/blob/main/Cocoa/projects/transfer_project.sh)**
+We list below the long list of small core changes so the C - C++ - Python interface can work flawlessly. They are tedious but straightforward. **All core changes have been automatized in the script [transfer_project.sh](https://github.com/CosmoLike/cocoa/blob/main/Cocoa/projects/transfer_project.sh)**
 
-## Core changes when adapting DES-Y3 to a new project - the easy way <a name="appendix_des_y3_new_small"></a> 
+## Minor core changes when adapting DES-Y3 to a new project - the easy way <a name="appendix_des_y3_new_small"></a> 
 
-The easier way to create a new project and apply the core changes to the code (**excluding all major modifications listed above **) is via the bash script [transfer_project.sh](https://github.com/CosmoLike/cocoa/blob/main/Cocoa/projects/transfer_project.sh). To proper use the bash script, users must set the following variables (set in the beggining of the [transfer_project.sh](https://github.com/CosmoLike/cocoa/blob/main/Cocoa/projects/transfer_project.sh) file):
+The easier way to create a new project and apply the core changes to the code (**excluding all major modifications listed above **) is via the bash script [transfer_project.sh](https://github.com/CosmoLike/cocoa/blob/main/Cocoa/projects/transfer_project.sh). To proper use the bash script, users must set the following variables (set at the beginning of the [transfer_project.sh](https://github.com/CosmoLike/cocoa/blob/main/Cocoa/projects/transfer_project.sh) file):
 
      OLD_PROJECT="des_y3"
      OLD_SURVEY="DES"
@@ -76,7 +76,7 @@ After that, just type
 
      $(cocoa)(.local) bash transfer_project.sh
 
-## Core changes when adapting DES-Y3 to a new project - the hard way <a name="appendix_des_y3_new_small2"></a> 
+## Minor core changes when adapting DES-Y3 to a new project - the hard way <a name="appendix_des_y3_new_small2"></a> 
 
 ### Create the new project
 
@@ -241,13 +241,13 @@ After that, just type
                   "DES_B1_"+str(i+1) for i in range(self.lens_ntomo)
                 ]
             ], 
-	    B2 = [
-                params_values.get(p, None) for p in [
+            B2 = [
+                  params_values.get(p, None) for p in [
                   // change DES_ to the name of the survey associated w/ XXX)
                   "DES_B2_"+str(i+1) for i in range(self.lens_ntomo)
                 ]
             ],
-	    B_MAG = [
+            B_MAG = [
                 params_values.get(p, None) for p in [
                   // change DES_ to the name of the survey associated w/ XXX)
                   "DES_BMAG_"+str(i+1) for i in range(self.lens_ntomo)
@@ -283,7 +283,7 @@ After that, just type
         // change DES_ to the name of the survey associated w/ XXX)
         self.baryon_pcs_qs[3] = params_values.get("DES_BARYON_Q4", None)
 
-(**Warning**) If XXX is more than the experiment name (e.g., `XXX = LSST_Y1`), we suggest to replacing `DES_` with just the experiment name (e.g., `LSST_BARYON_Q1`, `LSST_PM` and `LSST_DZ_L`). The convention adopted must be followed when changing the files `params_des_cosmic_shear.yaml` and `params_des_3x2pt.yaml`.
+(**Warning**) If the project name `XXX` contains more than the experiment name (e.g., `XXX = LSST_Y1`), we suggest to replacing `DES_` with just the experiment name (e.g., `LSST_BARYON_Q1`, `LSST_PM` and `LSST_DZ_L`). The convention adopted must be followed when changing the files `params_des_cosmic_shear.yaml` and `params_des_3x2pt.yaml`. 
 
 **Step 2:** Change the file `$ROOTDIR/projects/XXX/likelihood/des_3x2pt.py` following the instructions below
     
@@ -338,7 +338,7 @@ Replace the `DES_` prefix to the name of the survey associated w/ XXX.
     proposal: 0.005
     latex: \Delta z_\mathrm{s, DES}^1
 
-(**Warning**) If XXX is more than the experiment name (e.g., `XXX = LSST_Y1`), we suggest to replacing `DES_` with just the experiment name (e.g., `LSST_DZ_S1` and `\Delta z_\mathrm{s, LSST}^1`)
+(**Warning**) If the project name `XXX` contains more than the experiment name  (e.g., `XXX = LSST_Y1`), we suggest to replacing `DES_` with just the experiment name (e.g., `LSST_DZ_S1` and `\Delta z_\mathrm{s, LSST}^1`)
 
 (**Warning**) Similar changes must be made in `params_des_cosmic_shear.yaml`
 
@@ -347,7 +347,7 @@ Replace the `DES_` prefix to the name of the survey associated w/ XXX.
 
 ### Changes in the data folder
 
-**Step 1** Rename the `.dataset` dile (adopted convention: .dataset file name = project name all in CAPS)
+**Step 1** Rename the `.dataset` dile (adopted convention: `.dataset` file name = project name capitalized)
 
      $(cocoa)(.local) mv $ROOTDIR/projects/XXX/data/DES_Y3.dataset $ROOTDIR/projects/XXX/data/XXX.dataset
      
