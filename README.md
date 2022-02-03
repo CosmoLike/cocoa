@@ -182,11 +182,11 @@ The user also needs to set the following self-explanatory environmental keys on 
 
 Type:
 
-    $ $CONDA_PREFIX/bin/git-lfs clone git@github.com:CosmoLike/cocoa.git
+    $(cocoa) $CONDA_PREFIX/bin/git-lfs clone git@github.com:CosmoLike/cocoa.git
 
 to clone the repository. 
 
-(**Warning**) We assumed in the command above users have installed the pre-requisite packages (including git-lfs) via the recommended Conda installation method. With other installation method, `$CONDA_PREFIX/bin/git-lfs` should be replaced with `git-lfs`. 
+(**Warning**) We assumed in the command above users have installed the pre-requisite packages (including git-lfs) via the recommended **Conda installation method**. With other installation method, `$CONDA_PREFIX/bin/git-lfs` should be replaced with `git-lfs`. 
 
 (**Warning**) We have a limited monthly quota in bandwidth for [Git LFS](https://git-lfs.github.com) files, and therefore we ask users to use good judgment in the number of times they clone Cocoa's main repository. 
 
