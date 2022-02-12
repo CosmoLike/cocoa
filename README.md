@@ -182,7 +182,7 @@ The user also needs to set the following self-explanatory environmental keys on 
 
 Type:
 
-    $(cocoa) $CONDA_PREFIX/bin/git-lfs clone git@github.com:CosmoLike/cocoa.git
+    $(cocoa) $CONDA_PREFIX/bin/git-lfs clone https://github.com/CosmoLike/cocoa.git
 
 to clone the repository. 
 
