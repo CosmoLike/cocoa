@@ -4112,7 +4112,7 @@ double int_for_C_kk_limber(double a, void* params)
   struct chis chidchi = chi_all(a);
 
   // prefactor correction (1812.05995 eqs 74-79)
-  const double ell_prefactor = (ar[1])*(ar[1] + 1.);
+  const double ell_prefactor = (ar[0])*(ar[0] + 1.);
 
   const double ell = ar[0] + 0.5;
   const double fK = f_K(chidchi.chi);
@@ -4161,13 +4161,13 @@ double C_kk_limber(double l)
     {
       const int i = 0;
       const double lnl = lnlmin + i*dlnl;
-       table[i] = log(C_kk_limber_nointerp(exp(lnl), use_linear_ps_limber));
+      table[i] = log(C_kk_limber_nointerp(exp(lnl), use_linear_ps_limber));
     }
     #pragma omp parallel for
     for (int i=1; i<nell; i++)
     {
       const double lnl = lnlmin + i*dlnl;
-       table[i] = log(C_kk_limber_nointerp(exp(lnl), use_linear_ps_limber));
+      table[i] = log(C_kk_limber_nointerp(exp(lnl), use_linear_ps_limber));
     }
     update_cosmopara(&C);
   }
