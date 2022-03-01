@@ -189,7 +189,8 @@ to clone the repository.
 (**expert**) Cocoa developers with set ssh keys  in GitHub may find more convenient to use the command
 
     $(cocoa) $CONDA_PREFIX/bin/git-lfs clone git@github.com:CosmoLike/cocoa.git
-
+    $(cocoa) cd ./cocoa/Cocoa
+    
 (**Warning**) We assumed in the command above users have installed the pre-requisite packages (including git-lfs) via the recommended **Conda installation method**. With other installation method, `$CONDA_PREFIX/bin/git-lfs` should be replaced with `git-lfs`. 
 
 (**Warning**) We have a limited monthly quota in bandwidth for [Git LFS](https://git-lfs.github.com) files, and therefore we ask users to use good judgment in the number of times they clone Cocoa's main repository. 
