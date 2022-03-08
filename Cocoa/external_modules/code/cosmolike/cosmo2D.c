@@ -33,7 +33,9 @@ static double w_l_max = 5.0e6;
 double beam_cmb(const double l)
 {
   const double sigma = cmb.fwhm/sqrt(8.0*constants.ln2);
-  return exp(-0.5*l*l*sigma*sigma);
+  double norm = 1.0;
+  if(l < like.lmin_kappacmb || l > like.lmax_kappacmb){norm=0.0;}
+  return exp(-0.5*l*(l+1)*sigma*sigma)*norm;
 }
 
 double C_gk_tomo_limber_nointerp_wrapper(double l, int ni, int use_linear_ps)
