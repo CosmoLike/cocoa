@@ -25,6 +25,7 @@ typedef struct
   double Rmin_bias;
   double Rmin_shear;
   double lmax_shear;
+  double lmin_kappacmb;
   double lmax_kappacmb;
   int IA;
   int bias;

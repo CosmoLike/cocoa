@@ -35,6 +35,7 @@ void reset_like_struct()
   like.Rmin_bias = 0;
   like.Rmin_shear = 0;
   like.lmax_shear = 0;
+  like.lmin_kappacmb = 0;
   like.lmax_kappacmb = 0;
   like.IA = 0;
   like.bias = 0;
