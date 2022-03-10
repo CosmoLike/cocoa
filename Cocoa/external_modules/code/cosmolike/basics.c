@@ -58,7 +58,7 @@ Ntab Ntable = {
   500,  // N_k_lin
   500,  // N_k_nlin
   200,  // N_ell 
-  200,  // N_theta 
+  200,  // N_theta (modified by COCOA from 250)
   2048, // N_theta for Hankel
   1000, // N_S2
   1000, // N_DS

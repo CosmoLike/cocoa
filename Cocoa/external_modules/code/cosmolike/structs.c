@@ -49,6 +49,12 @@ void reset_like_struct()
   like.gk = 0;
   like.kk = 0;
   like.ks = 0;
+  like.use_full_sky_shear = 1;
+  like.use_full_sky_ggl = 1;
+  like.use_full_sky_clustering = 1;
+  like.use_full_sky_gk = 1;
+  like.use_full_sky_sk = 1;
+  like.high_def_integration = 0;
 }
 
 cosmopara cosmology =
