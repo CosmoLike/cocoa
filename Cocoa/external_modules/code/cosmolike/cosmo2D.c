@@ -22,7 +22,7 @@
 
 #include "log.c/src/log.h"
 
-static int GSL_WORKSPACE_SIZE = 250;
+static int GSL_WORKSPACE_SIZE = 1000;
 static int use_linear_ps_limber = 0; /* 0 or 1 */
 static int include_RSD_GS = 0; /* 0 or 1 */
 static int include_RSD_GG = 1; /* 0 or 1 */
@@ -4132,7 +4132,16 @@ double int_for_C_kk_limber(double a, void* params)
   {
     res *= Pdelta(k,a);
   }
-
+/*  if( ( fabs(a-0.3)<1e-5 ) && ( fabs(ell-1000)<1 ) )
+  {
+    log_info("\x1b[90m{%s}\x1b[0m: test integrand\n\t - f_K = {%.4e}\n\t - k = {%.4e}\n\t - W_k = {%.4e}\n\t - dchida = {%.4e}\n\t - Pdelta = {%.4e}\n\t - Om = {%.4e}\n",
+            "int_for_C_kk_limber", fK, k, WK, chidchi.dchida, Pdelta(k,a), cosmology.Omega_m );
+    double WK2overfK2 = WK*WK/fK/fK;
+	double ell_factors_combine = ell_prefactor*ell_prefactor/ell4;
+    double Pdelta_times_dchida = Pdelta(k,a) * chidchi.dchida;
+    log_info("\x1b[90m{%s}\x1b[0m: test integrand\n\t - (W_k/f_K)^2 = {%.4e}\n\t - (l*(l+1)/(l+0.5)^2)^2 = {%.4e}\n\t - Pdelta*dchida = {%.4e}\n",
+            "int_for_C_kk_limber", WK2overfK2, ell_factors_combine, Pdelta_times_dchida );
+  }*/
   return res*(chidchi.dchida/(fK*fK))*ell_prefactor*ell_prefactor/ell4;
 }
 

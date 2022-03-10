@@ -2514,7 +2514,11 @@ double g_cmb(double a)
     fchi_cmb = f_K(chi_cmb);
     update_cosmopara(&C);
   }
-
+/*  if (fabs(a-0.3)<1e-5)
+  {
+    log_info("\x1b[90m{%s}\x1b[0m: test g_cmb\n\t - chi_CMB(z=1090) = {%.4e}\n\t - chi(a=0.3) = {%.4e}\n\t - chi_CMB-chi_a = {%.4e}\n\t - fK(chi_CMB-chi_a) = {%.4e}\n\t - fK(chi_CMB) = {%.4e}\n",
+	"g_cmb", chi_cmb, chi(a), chi_cmb - chi(a), f_K(chi_cmb-chi(a)), fchi_cmb);
+  }*/
   return f_K(chi_cmb-chi(a))/fchi_cmb;
 }
 
