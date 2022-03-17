@@ -57,8 +57,12 @@ void get_FPT_bias(void)
     
     if (FPT.tab_AB == 0) 
     { // if table doesn't exit yet, create it
-      FPT.tab_AB = create_double_matrix(0, FPT.N_AB - 1, 0, FPT.N - 1);
-      
+      FPT.tab_AB = (double**) malloc(sizeof(double*)*FPT.N_AB);
+      for(int i=0; i<FPT.N_AB; i++)
+      {
+        FPT.tab_AB[i] = (double*) malloc(sizeof(double)*FPT.N);
+      }
+
       if (FPT.k_min < limits.k_min_cH0) 
       {
         FPT.k_min = K_CH0(FPT.k_min);
@@ -252,8 +256,14 @@ void get_FPT_IA(void)
 
     if (FPT.tab_IA == 0) 
     { // if table doesn't exit yet, create it
-      FPT.tab_IA = create_double_matrix(0, FPT.N_IA - 1, 0, FPT.N - 1);
-      if (FPT.k_min < limits.k_min_cH0) {
+      FPT.tab_IA = (double**) malloc(sizeof(double*)*FPT.N_IA);
+      for(int i=0; i<FPT.N_IA; i++)
+      {
+        FPT.tab_IA[i] = (double*) malloc(sizeof(double)*FPT.N);
+      }
+
+      if (FPT.k_min < limits.k_min_cH0) 
+      {
         FPT.k_min = K_CH0(FPT.k_min);
         FPT.k_max = K_CH0(FPT.k_max);
       }
