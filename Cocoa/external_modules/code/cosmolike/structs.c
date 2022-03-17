@@ -72,7 +72,7 @@ galpara gbias =
   .b2 = {0},
   .bs2 = {0},
   .b1_function = &b1_per_bin,
-  .b_mag = {0},
+  .b_mag = {0}
 }; // default: point to old bgal_z routin
 
 clusterparams Cluster =
@@ -352,9 +352,6 @@ void reset_gbias_struct()
     gbias.b[i] = 0.0;
     gbias.b2[i] = 0.0;
     gbias.bs2[i] = 0.0;
-    gbias.rcorr[i] = 0.0;
-    gbias.cg[i] = 0.0;
-    gbias.n_hod[i] = 0.0;
     gbias.b_mag[i] = 0.0;
   }
   gbias.b1_function = &b1_per_bin;
@@ -478,8 +475,8 @@ void update_galpara(galpara *G)
       G->b[i] = gbias.b[i];
       G->b2[i] = gbias.b2[i];
       G->bs2[i] = gbias.bs2[i];
-      G->cg[i] = gbias.cg[i];
-    } else 
+    } 
+    else 
     {
       printf("lens bin %d: neither HOD nor linear bias set, exit\n", i);
       exit(1);

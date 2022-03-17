@@ -118,8 +118,7 @@ int recompute_galaxies(galpara G, int i)
   {
     return 0;
   }
-  return (G.b[i] != gbias.b[i] || G.b2[i] != gbias.b2[i] || G.bs2[i] != gbias.bs2[i] ||
-    G.cg[i] != gbias.cg[i]) ? 1 : 0;
+  return (G.b[i] != gbias.b[i] || G.b2[i] != gbias.b2[i] || G.bs2[i] != gbias.bs2[i]) ? 1 : 0;
 }
 
 int recompute_clusters(cosmopara C, nuisancepara N)

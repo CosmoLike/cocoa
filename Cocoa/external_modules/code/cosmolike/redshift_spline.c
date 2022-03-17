@@ -19,13 +19,13 @@
 static int GSL_WORKSPACE_SIZE = 1024;
 static double SQRT2 = 1.41421356237;
 
-// ------------------------------------------------------------------------
-// ------------------------------------------------------------------------
-// ------------------------------------------------------------------------
+// ----------------------------------------------------------------------------------
+// ----------------------------------------------------------------------------------
+// ----------------------------------------------------------------------------------
 // integration boundary routines
-// ------------------------------------------------------------------------
-// ------------------------------------------------------------------------
-// ------------------------------------------------------------------------
+// ----------------------------------------------------------------------------------
+// ----------------------------------------------------------------------------------
+// ----------------------------------------------------------------------------------
 
 double amin_source(int ni) 
 {
@@ -143,13 +143,13 @@ double amax_lens(int ni)
     fabs(nuisance.bias_zphot_clustering[ni]), 0.001));
 }
 
-// ------------------------------------------------------------------------
-// ------------------------------------------------------------------------
-// ------------------------------------------------------------------------
+// ----------------------------------------------------------------------------------
+// ----------------------------------------------------------------------------------
+// ----------------------------------------------------------------------------------
 // redshift overlap tests, allowed tomography combinations
-// ------------------------------------------------------------------------
-// ------------------------------------------------------------------------
-// ------------------------------------------------------------------------
+// ----------------------------------------------------------------------------------
+// ----------------------------------------------------------------------------------
+// ----------------------------------------------------------------------------------
 
 // test whether the (l, ni) bin is in the linear clustering regime
 int test_kmax(double l, int ni) // return 1 if true, 0 otherwise
@@ -183,13 +183,13 @@ int test_kmax(double l, int ni) // return 1 if true, 0 otherwise
   return res;
 }
 
-// ---------------------------------------------------------------------------------
-// ---------------------------------------------------------------------------------
-// ---------------------------------------------------------------------------------
+// ----------------------------------------------------------------------------------
+// ----------------------------------------------------------------------------------
+// ----------------------------------------------------------------------------------
 // Galaxy-Galaxy Lensing bins (redshift overlap tests)
-// ---------------------------------------------------------------------------------
-// ---------------------------------------------------------------------------------
-// ---------------------------------------------------------------------------------
+// ----------------------------------------------------------------------------------
+// ----------------------------------------------------------------------------------
+// ----------------------------------------------------------------------------------
 
 int test_zoverlap(int ni, int nj) // test whether source bin nj is behind lens bin ni
 { 
@@ -198,7 +198,6 @@ int test_zoverlap(int ni, int nj) // test whether source bin nj is behind lens b
     log_fatal("invalid bin input (ni, nj) = (%d, %d)", ni, nj);
     exit(1);
   }
-
   if (ggl_efficiency(ni, nj) > survey.ggl_overlap_cut) 
   {
     return 1;
@@ -244,7 +243,7 @@ int ZL(int ni)
       }
     }
   }
-  if(ni < 0 || ni > tomo.ggl_Npowerspectra - 1)
+  if (ni < 0 || ni > tomo.ggl_Npowerspectra - 1)
   {
     log_fatal("invalid bin input ni = %d (max %d)", ni, tomo.ggl_Npowerspectra);
     exit(1);
@@ -270,7 +269,7 @@ int ZS(int nj)
       }
     }
   }
-  if(nj < 0 || nj > tomo.ggl_Npowerspectra - 1)
+  if (nj < 0 || nj > tomo.ggl_Npowerspectra - 1)
   {
     log_fatal("invalid bin input nj = %d (max %d)", nj, tomo.ggl_Npowerspectra);
     exit(1);
@@ -300,7 +299,7 @@ int N_ggl(int ni, int nj)
       }
     }
   }
-  if(ni < 0 || ni > tomo.clustering_Nbin - 1 || nj < 0 || nj > tomo.shear_Nbin - 1)
+  if (ni < 0 || ni > tomo.clustering_Nbin - 1 || nj < 0 || nj > tomo.shear_Nbin - 1)
   {
     log_fatal("invalid bin input (ni, nj) = (%d, %d)", ni, nj);
     exit(1);
@@ -308,13 +307,13 @@ int N_ggl(int ni, int nj)
   return N[ni][nj];
 }
 
-// ---------------------------------------------------------------------------------
-// ---------------------------------------------------------------------------------
-// ---------------------------------------------------------------------------------
+// ----------------------------------------------------------------------------------
+// ----------------------------------------------------------------------------------
+// ----------------------------------------------------------------------------------
 // Cluster-Galaxy Lensing bins (redshift overlap tests)
-// ---------------------------------------------------------------------------------
-// ---------------------------------------------------------------------------------
-// ---------------------------------------------------------------------------------
+// ----------------------------------------------------------------------------------
+// ----------------------------------------------------------------------------------
+// ----------------------------------------------------------------------------------
 
 int test_zoverlap_c(int zc, int zs) // test whether source bin zs is behind lens bin zl
 {
@@ -335,9 +334,9 @@ int ZCL(int ni)
   if (N[0] < -1) 
   {
     int n = 0;
-    for (int i = 0; i < tomo.cluster_Nbin; i++) 
+    for (int i=0; i<tomo.cluster_Nbin; i++) 
     {
-      for (int j = 0; j < tomo.shear_Nbin; j++) 
+      for (int j=0; j<tomo.shear_Nbin; j++) 
       {
         if (test_zoverlap_c(i, j)) 
         {
@@ -347,7 +346,7 @@ int ZCL(int ni)
       }
     }
   }
-  if(ni < 0 || ni > tomo.cgl_Npowerspectra - 1)
+  if (ni < 0 || ni > tomo.cgl_Npowerspectra - 1)
   {
     log_fatal("invalid bin input ni = %d (max %d)", ni, tomo.cgl_Npowerspectra);
     exit(1);
@@ -373,7 +372,7 @@ int ZCS(int nj)
       }
     }
   }
-  if(nj < 0 || nj > tomo.cgl_Npowerspectra - 1)
+  if (nj < 0 || nj > tomo.cgl_Npowerspectra - 1)
   {
     log_fatal("invalid bin input nj = %d (max %d)", nj, tomo.cgl_Npowerspectra);
     exit(1);
@@ -403,7 +402,7 @@ int N_cgl(int ni, int nj)
       }
     }
   }
-  if(ni < 0 || ni > tomo.cluster_Nbin - 1 || nj < 0 || nj > tomo.shear_Nbin - 1)
+  if (ni < 0 || ni > tomo.cluster_Nbin - 1 || nj < 0 || nj > tomo.shear_Nbin - 1)
   {
     log_fatal("invalid bin input (ni, nj) = (%d, %d)", ni, nj);
     exit(1);
@@ -411,13 +410,13 @@ int N_cgl(int ni, int nj)
   return N[ni][nj];
 }
 
-// ---------------------------------------------------------------------------------
-// ---------------------------------------------------------------------------------
-// ---------------------------------------------------------------------------------
+// ----------------------------------------------------------------------------------
+// ----------------------------------------------------------------------------------
+// ----------------------------------------------------------------------------------
 // Cosmic Shear bins (redshift overlap tests)
-// ---------------------------------------------------------------------------------
-// ---------------------------------------------------------------------------------
-// ---------------------------------------------------------------------------------
+// ----------------------------------------------------------------------------------
+// ----------------------------------------------------------------------------------
+// ----------------------------------------------------------------------------------
 
 // find z1 of tomography combination (z1, z2) constituting shear tomo bin Nbin
 int Z1(int ni) 
@@ -435,7 +434,7 @@ int Z1(int ni)
       }
     }
   }
-  if(ni < 0 || ni > tomo.shear_Npowerspectra - 1)
+  if (ni < 0 || ni > tomo.shear_Npowerspectra - 1)
   {
     log_fatal("invalid bin input ni = %d (max = %d)", ni, tomo.shear_Npowerspectra);
     exit(1);
@@ -458,7 +457,7 @@ int Z2(int nj)
       }
     }
   }
-  if(nj < 0 || nj > tomo.shear_Npowerspectra - 1)
+  if (nj < 0 || nj > tomo.shear_Npowerspectra - 1)
   {
     log_fatal("invalid bin input nj = %d (max = %d)", nj, tomo.shear_Npowerspectra);
     exit(1);
@@ -482,7 +481,7 @@ int N_shear(int ni, int nj)
       }
     }
   }
-  if(ni < 0 || ni > tomo.shear_Nbin - 1 || nj < 0 || nj > tomo.shear_Nbin - 1)
+  if (ni < 0 || ni > tomo.shear_Nbin - 1 || nj < 0 || nj > tomo.shear_Nbin - 1)
   {
     log_fatal("invalid bin input (ni, nj) = (%d, %d) (max = %d)", ni, nj, tomo.shear_Nbin);
     exit(1);
@@ -490,13 +489,13 @@ int N_shear(int ni, int nj)
   return N[ni][nj];
 }
 
-// ---------------------------------------------------------------------------------
-// ---------------------------------------------------------------------------------
-// ---------------------------------------------------------------------------------
+// ----------------------------------------------------------------------------------
+// ----------------------------------------------------------------------------------
+// ----------------------------------------------------------------------------------
 // Galaxy Clustering (redshift overlap tests)
-// ---------------------------------------------------------------------------------
-// ---------------------------------------------------------------------------------
-// ---------------------------------------------------------------------------------
+// ----------------------------------------------------------------------------------
+// ----------------------------------------------------------------------------------
+// ----------------------------------------------------------------------------------
 
 int ZCL1(int ni) 
 { // find ZCL1 of tomography combination (zcl1,zcl2) constituting g-clustering tomo bin Nbin
@@ -513,7 +512,7 @@ int ZCL1(int ni)
       }
     }
   }
-  if(ni < 0 || ni > tomo.clustering_Npowerspectra - 1)
+  if (ni < 0 || ni > tomo.clustering_Npowerspectra - 1)
   {
     log_fatal("invalid bin input ni = %d (max %d)", ni, tomo.clustering_Npowerspectra);
     exit(1);
@@ -536,7 +535,7 @@ int ZCL2(int nj)
       }
     }
   }
-  if(nj < 0 || nj > tomo.clustering_Npowerspectra - 1)
+  if (nj < 0 || nj > tomo.clustering_Npowerspectra - 1)
   {
     log_fatal("invalid bin input nj = %d (max %d)", nj, tomo.clustering_Npowerspectra);
     exit(1);
@@ -560,7 +559,7 @@ int N_CL(int ni, int nj)
       }
     }
   }
-  if(ni < 0 || ni > tomo.clustering_Nbin - 1 || nj < 0 || nj > tomo.clustering_Nbin - 1)
+  if (ni < 0 || ni > tomo.clustering_Nbin - 1 || nj < 0 || nj > tomo.clustering_Nbin - 1)
   {
     log_fatal("invalid bin input (ni, nj) = (%d, %d)", ni, nj);
     exit(1);
@@ -727,7 +726,7 @@ int N_CGCL(const int ni, const int nj)
 
 double bias_zphot_shear(double z, int ni) 
 {
-  if(ni < 0 || ni > tomo.shear_Nbin - 1)
+  if (ni < 0 || ni > tomo.shear_Nbin - 1)
   {
     log_fatal("invalid bin input ni = %d", ni);
     exit(1);
@@ -737,7 +736,7 @@ double bias_zphot_shear(double z, int ni)
 
 double sigma_zphot_shear(double z, int ni) 
 {
-  if(ni < 0 || ni > tomo.shear_Nbin - 1)
+  if (ni < 0 || ni > tomo.shear_Nbin - 1)
   {
     log_fatal("invalid bin input ni = %d", ni);
     exit(1);
@@ -833,7 +832,6 @@ double zdistr_histo_n(double z, void* params)
     for (int i=0; i<zbins; i++) 
     {
       fscanf(ein, "%le", &z_v[i]);
-      
       p++;
       if (i > 0 && z_v[i] < z_v[i - 1]) 
       {
@@ -1263,17 +1261,17 @@ double zdistr_photoz(double zz, int nj)
   return res;
 }
 
-// -----------------------------------------------------------------------------
-// -----------------------------------------------------------------------------
-// -----------------------------------------------------------------------------
+// ---------------------------------------------------------------------------------------
+// ---------------------------------------------------------------------------------------
+// ---------------------------------------------------------------------------------------
 // Clustering routines for redshift distributions, including photo-zs * (optional)
-// -----------------------------------------------------------------------------
-// -----------------------------------------------------------------------------
-// -----------------------------------------------------------------------------
+// ---------------------------------------------------------------------------------------
+// ---------------------------------------------------------------------------------------
+// ---------------------------------------------------------------------------------------
 
 double bias_zphot_clustering(double z, int ni) 
 {
-  if(ni < 0 || ni > tomo.clustering_Nbin - 1)
+  if (ni < 0 || ni > tomo.clustering_Nbin - 1)
   {
     log_fatal("invalid bin input ni = %d", ni);
     exit(1);
@@ -1283,7 +1281,7 @@ double bias_zphot_clustering(double z, int ni)
 
 double sigma_zphot_clustering(double z, int ni) 
 {
-  if(ni < 0 || ni > tomo.clustering_Nbin - 1)
+  if (ni < 0 || ni > tomo.clustering_Nbin - 1)
   {
     log_fatal("invalid bin input ni = %d", ni);
     exit(1);
@@ -1314,7 +1312,6 @@ double pf_histo(double z, void* params __attribute__((unused)))
     {
       double space1, space2;
       fscanf(ein, "%le %le %le %le\n", &z_v[i], &space1, &space2, &tab[i]);
-      
       p++;
       if (i > 0 && z_v[i] < z_v[i - 1]) 
       {
@@ -1343,7 +1340,7 @@ double pf_histo(double z, void* params __attribute__((unused)))
   {
     const int ni = (int) floor((z - zhisto_min) / dz);
     
-    if(ni < 0 || ni > tomo.clustering_Nbin - 1)
+    if (ni < 0 || ni > tomo.clustering_Nbin - 1)
     {
       log_fatal("invalid bin input ni = %d", ni);
       exit(1);
@@ -1364,8 +1361,7 @@ double pf_histo_n(double z, void* params)
   if (tab == 0) 
   {
     const int zbins = line_count(redshift.clustering_REDSHIFT_FILE);
-    njmax = zbins;    
-    
+    njmax = zbins;
     tab = (double**) malloc(sizeof(double*)*tomo.clustering_Nbin);
     for (int i=0; i<tomo.clustering_Nbin; i++)
     {
@@ -1384,7 +1380,6 @@ double pf_histo_n(double z, void* params)
     for (int i=0; i<zbins; i++) 
     {
       fscanf(ein, "%le", &z_v[i]);
-      
       p++;
       if (i > 0 && z_v[i] < z_v[i - 1]) 
       {
@@ -1446,7 +1441,6 @@ double pf_histo_n(double z, void* params)
       exit(1);
     }
   }
-  
   double res = 0.0;
   if ((z >= zhisto_min) && (z < zhisto_max)) 
   {
@@ -2087,7 +2081,6 @@ double dV_cluster(double z, void* params)
   return (fK*fK/hoverh0)*pz_cluster(z, nz);
 }
 
-
 double norm_z_cluster(const int nz)
 {
   static cosmopara C;
@@ -2126,13 +2119,13 @@ double zdistr_cluster(const int nz, const double z)
   return dV_cluster(z, (void*) params)/norm_z_cluster(nz);
 }
 
-// ------------------------------------------------------------------------
-// ------------------------------------------------------------------------
-// ------------------------------------------------------------------------
+// ---------------------------------------------------------------------------------------
+// ---------------------------------------------------------------------------------------
+// ---------------------------------------------------------------------------------------
 // routines calculating the number of source and lens galaxies per bin
-// ------------------------------------------------------------------------
-// ------------------------------------------------------------------------
-// ------------------------------------------------------------------------
+// ---------------------------------------------------------------------------------------
+// ---------------------------------------------------------------------------------------
+// ---------------------------------------------------------------------------------------
 
 double int_nsource(double z, void* param __attribute__((unused))) 
 {
@@ -2220,7 +2213,6 @@ double nlens(int ni) // ni =-1 -> no tomography; ni>= 0 -> tomography bin ni
       double init = pf_photoz(0., 0);
     }
     #pragma GCC diagnostic pop
-        
     if (redshift.clustering_photoz == 4) 
     {      
       for (int i=0; i<tomo.clustering_Nbin; i++) 
@@ -2270,7 +2262,7 @@ double int_for_zmean(double z, void* params)
 {
   double* ar = (double*) params;
   const int ni = (int) ar[0];
-  if(ni < -1 || ni > tomo.clustering_Nbin - 1)
+  if (ni < -1 || ni > tomo.clustering_Nbin - 1)
   {
     log_fatal("invalid bin input ni = %d", ni);
     exit(1);
@@ -2282,7 +2274,7 @@ double norm_for_zmean(double z, void* params)
 {
   double* ar = (double*) params;
   const int ni = (int) ar[0];
-  if(ni < -1 || ni > tomo.clustering_Nbin - 1)
+  if (ni < -1 || ni > tomo.clustering_Nbin - 1)
   {
     log_fatal("invalid bin input ni = %d", ni);
     exit(1);
@@ -2344,15 +2336,13 @@ double zmean_source(int ni)
   
   if (table == 0) 
   {
+    table = (double*) malloc(sizeof(double)*tomo.shear_Nbin);
     #pragma GCC diagnostic push
     #pragma GCC diagnostic ignored "-Wunused-variable"
     {
       double init = zdistr_photoz(0., 0);
     }
     #pragma GCC diagnostic pop
-
-    table = (double*) malloc(sizeof(double)*tomo.shear_Nbin);
-
     #pragma omp parallel for
     for (int i=0; i<tomo.shear_Nbin; i++) 
     {
@@ -2364,7 +2354,7 @@ double zmean_source(int ni)
           tomo.shear_zmin[i], tomo.shear_zmax[i], NULL, GSL_WORKSPACE_SIZE);
     }
   }
-  if(ni < 0 || ni > tomo.shear_Nbin - 1)
+  if (ni < 0 || ni > tomo.shear_Nbin - 1)
   {
     log_fatal("invalid bin input ni = %d", ni);
     exit(1);
@@ -2376,20 +2366,17 @@ double max_g_tomo(int zs)
 {
   int i = 0;
   double max = 0;
-  
   for (double z=0.; z<tomo.shear_zmax[zs]; z += tomo.shear_zmax[zs] / 50.) 
   {
-    if(i != 0)
+    if (i != 0)
     {
-      if(!fabs(z>0)) 
+      if (!fabs(z>0))
       {
         log_fatal("z = 0 with 1/z needed");
         exit(1);
       }
-      
       const double a = 1. / (1. + z);
       const double g = g_tomo(a, zs) * (1. + z) * f_K(chi(a));
-      
       if (g > max) 
       {
         max = g;
@@ -2413,23 +2400,20 @@ double max_g_tomo(int zs)
 
 double int_for_g_tomo(double aprime, void* params) 
 {
-  if(!(aprime>0) || !(aprime<1)) 
+  if (!(aprime>0) || !(aprime<1))
   {
     log_fatal("a>0 and a<1 not true");
     exit(1);
   }
   double *ar = (double*)params;
-
   const int ni = (int) ar[0];
-  if(ni < -1 || ni > tomo.shear_Nbin - 1)
+  if (ni < -1 || ni > tomo.shear_Nbin - 1)
   {
     log_fatal("invalid bin input ni = %d", ni);
     exit(1);
   } 
-
   const double chi1 = ar[1];
   const double chi_prime = chi(aprime);
-
   return zdistr_photoz(1. / aprime - 1., ni) * f_K(chi_prime - chi1) /
     f_K(chi_prime) / (aprime * aprime);
 }
@@ -2440,9 +2424,9 @@ double g_tomo(double ainput, int ni) // for tomography bin ni
   static cosmopara C;
   static double** table = 0;
   
-  const int N_z = tomo.shear_Nbin; 
+  const int N_z = tomo.shear_Nbin;
   const int N_a = Ntable.N_a; 
-  const double amin = 1./(redshift.shear_zdistrpar_zmax + 1.);
+  const double amin = 1.0/(redshift.shear_zdistrpar_zmax + 1.0);
   const double amax = 0.999999;
   const double da = (amax - amin)/((double) N_a - 1.0);
 
@@ -2453,11 +2437,6 @@ double g_tomo(double ainput, int ni) // for tomography bin ni
     {
       table[i] = (double*) malloc(sizeof(double)*N_a);
     }
-  }
-
-  if (table == 0) 
-  {
-    table = create_double_matrix(0, tomo.shear_Nbin, 0, Ntable.N_a - 1);
   }
   if (recompute_zphot_shear(N) || recompute_cosmo3D(C)) 
   {
@@ -2530,23 +2509,20 @@ double g_tomo(double ainput, int ni) // for tomography bin ni
 
 double int_for_g2_tomo(double aprime, void* params) 
 { // \int n(z') W(z,z')^2 routines for source clustering
-  if(!(aprime>0) || !(aprime<1)) 
+  if (!(aprime>0) || !(aprime<1))
   {
     log_fatal("a>0 and a<1 not true");
     exit(1);
   }
   double *ar = (double*) params;
-  
   const int ni = (int) ar[0];
-  if(ni < -1 || ni > tomo.shear_Nbin - 1)
+  if (ni < -1 || ni > tomo.shear_Nbin - 1)
   {
     log_fatal("invalid bin input ni = %d", ni);
     exit(1);
   } 
-
   const double chi1 = ar[1];
   const double chi_prime = chi(aprime);
-  
   return zdistr_photoz(1./aprime-1., ni) * f_K(chi_prime - chi1)/
     f_K(chi_prime - chi1)/(f_K(chi_prime)*f_K(chi_prime))/(aprime*aprime);
 }
@@ -2556,10 +2532,10 @@ double g2_tomo(double a, int ni)
   static nuisancepara N;
   static cosmopara C;
   static double** table = 0;
-  
+
   const int N_z = tomo.shear_Nbin; 
   const int N_a = Ntable.N_a; 
-  const double amin = 1./(redshift.shear_zdistrpar_zmax + 1.);
+  const double amin = 1.0/(redshift.shear_zdistrpar_zmax + 1.0);
   const double amax = 0.999999;
   const double da = (amax - amin)/((double) N_a - 1.0);
 
@@ -2749,7 +2725,6 @@ double g_cmb(double a)
   static cosmopara C;
   static double chi_cmb = 0.;
   static double fchi_cmb = 0.;
-  
   if (recompute_cosmo3D(C)) 
   {
     chi_cmb = chi(1./1091.);
@@ -2859,7 +2834,7 @@ double g_lens_cluster(const double a, const int nz, const int nl)
 
 double int_for_ggl_efficiency(double z, void* params) 
 {
-  if(!fabs(z>0)) 
+  if (!fabs(z>0)) 
   {
     log_fatal("z = 0 with 1/z needed");
     exit(1);
@@ -2868,7 +2843,7 @@ double int_for_ggl_efficiency(double z, void* params)
   double* ar = (double*) params;
   const int ni = (int) ar[0];
   const int nj = (int) ar[1];
-  if(ni < -1 || ni > tomo.clustering_Nbin - 1 || nj < -1 || nj > tomo.shear_Nbin - 1)
+  if (ni < -1 || ni > tomo.clustering_Nbin - 1 || nj < -1 || nj > tomo.shear_Nbin - 1)
   {
     log_fatal("invalid bin input (ni, nj) = (%d, %d)", ni, nj);
     exit(1);

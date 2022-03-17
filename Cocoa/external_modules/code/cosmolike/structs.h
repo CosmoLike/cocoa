@@ -270,9 +270,6 @@ typedef struct
   double b[MAX_SIZE_ARRAYS];      // linear galaxy bias paramter in clustering bin i
   double b2[MAX_SIZE_ARRAYS];     // quadratic bias parameter for redshift bin i
   double bs2[MAX_SIZE_ARRAYS];    // leading order tidal bias for redshift bin i
-  double rcorr[MAX_SIZE_ARRAYS];
-  double cg[MAX_SIZE_ARRAYS];
-  double n_hod[MAX_SIZE_ARRAYS];
   double b_mag[MAX_SIZE_ARRAYS];  // amplitude of magnification bias, b_mag[i] = 5*s[i]+beta[i]-2
   B1_model b1_function;
 } galpara;
