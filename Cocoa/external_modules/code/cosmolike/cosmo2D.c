@@ -3776,6 +3776,9 @@ double C_gk_tomo_limber_nointerp(double l, int nl, int use_linear_ps)
 
   if ((gbias.b2[nl] || gbias.b2[nl]) && use_linear_ps == 0)
   {
+	log_info("\x1b[90m{%s}\x1b[0m: b2 set, scale factor int limit: ({%.4e}, {%.4e})\n",
+            "C_gk_tomo_limber_nointerp", amin_lens(nl), amax_lens(nl));
+
     return int_gsl_integrate_medium_precision(
       int_for_C_gk_limber_withb2,
       (void*) array,
@@ -3785,6 +3788,9 @@ double C_gk_tomo_limber_nointerp(double l, int nl, int use_linear_ps)
       GSL_WORKSPACE_SIZE
     );
   }
+  log_info("\x1b[90m{%s}\x1b[0m: b2 not set, scale factor int limit: ({%.4e}, {%.4e})\n",
+            "C_gk_tomo_limber_nointerp", amin_lens(nl), 0.99999);
+
   return int_gsl_integrate_medium_precision(
     int_for_C_gk_limber,
     (void*) array,
@@ -3982,6 +3988,8 @@ double C_ks_tomo_limber_nointerp(double l, int nj, int use_linear_ps)
   { // different IA might require different integrator precision
     case 0:
     {
+	  log_info("\x1b[90m{%s}\x1b[0m: like.IA = {%d} scale factor int limit: ({%.4e}, {%.4e})\n",
+            "C_ks_tomo_limber_noninterp",like.IA, amin_source(nj), 0.99999);
       if(like.high_def_integration == 1)
       {
         return int_gsl_integrate_high_precision(
@@ -4008,6 +4016,9 @@ double C_ks_tomo_limber_nointerp(double l, int nj, int use_linear_ps)
     }
     case 1:
     {
+	  log_info("\x1b[90m{%s}\x1b[0m: like.IA = {%d} scale factor int limit: ({%.4e}, {%.4e})\n",
+            "C_ks_tomo_limber_noninterp",like.IA, amin_source(nj), amax_source(nj));
+
       if(like.high_def_integration == 1)
       {
         return int_gsl_integrate_high_precision(
@@ -4035,6 +4046,9 @@ double C_ks_tomo_limber_nointerp(double l, int nj, int use_linear_ps)
     }
     case 3:
     { 
+	  log_info("\x1b[90m{%s}\x1b[0m: like.IA = {%d} scale factor int limit: ({%.4e}, {%.4e})\n",
+            "C_ks_tomo_limber_noninterp",like.IA, amin_source(nj), amax_source(nj));
+
       if(like.high_def_integration == 1)
       {
         return int_gsl_integrate_high_precision(
@@ -4061,6 +4075,9 @@ double C_ks_tomo_limber_nointerp(double l, int nj, int use_linear_ps)
     }
     case 4:
     {
+	  log_info("\x1b[90m{%s}\x1b[0m: like.IA = {%d} scale factor int limit: ({%.4e}, {%.4e})\n",
+            "C_ks_tomo_limber_noninterp",like.IA, amin_source(nj), amax_source(nj));
+
       if(like.high_def_integration == 1)
       {
         return int_gsl_integrate_high_precision(
