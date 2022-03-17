@@ -55,7 +55,8 @@ double b1_powerlaw(double z, int ni __attribute__((unused))) {
   return gbias.b[0] * pow(1 + z, gbias.b[1]);
 }
 
-double bgal_z(double z, int ni) {
+double bgal_z(double z, int ni) 
+{
   // bias evolution within redshift bin, used by
   // clustering/G-G-lensing routines without HOD modeling
   // change this into desired redshift evolution as function of (z, z_pivot =
@@ -64,7 +65,8 @@ double bgal_z(double z, int ni) {
   // b(z) = (b(z_pivot)-1)*D(z_pivot)/D(z) + 1
 
   // no tomography ->  bias = 1
-  if (ni == -1) {
+  if (ni == -1) 
+  {
     return 1.0;
   }
 
@@ -72,7 +74,8 @@ double bgal_z(double z, int ni) {
   // new default: use b1_function specified in init -
   // if different from bgal_z, to avoid circular call
   // -------------------------------------------------------------
-  if ((gbias.b1_function) && (gbias.b1_function != &bgal_z)) {
+  if ((gbias.b1_function) && (gbias.b1_function != &bgal_z)) 
+  {
     return gbias.b1_function(z, ni);
   }
 
@@ -80,12 +83,12 @@ double bgal_z(double z, int ni) {
   // old options, for backward compatability
   // -------------------------------------------------------------
   // very broad redshift distribution -> no bias evolution model
-  if (redshift.clustering_photoz == 4) {
+  if (redshift.clustering_photoz == 4) 
+  {
     return gbias.b[ni];
   }
-  else { // old default: passive evolution
-    printf("what the hell?\n");
-    exit(1);
+  else 
+  { // old default: passive evolution
     double z_evolv_passiv =
         growfac(1. / (z + 1.)) /
         growfac(1. / (1. + 0.5 * (tomo.clustering_zmin[ni] +

@@ -66,21 +66,17 @@ double M_abs(double mag, double a)
   {
     // read in + tabulate k+e corrections for early types, restframe r band
     // interpolated from http://vizier.u-strasbg.fr/viz-bin/VizieR?-source=J/A%2BAS/122/399
-    table = create_double_vector(0, 30);
-    for (int i = 0; i< 31; i++)
+    const int size = 31;
+    table = (double*) malloc(sizeof(double)*size);
+    for (int i = 0; i<size; i++)
     {
       table[i] = KE[i];
     }
   }
 
-  double z = 1./a - 1.0;
-  if(z >= 3.0)
-  { // no acceptable k-korrection exists for k>3, also no meaningful IA model
-    z = 2.99;
-  }
-
+  // no acceptable k-korrection exists for k>3, also no meaningful IA model
+  const double z = 1./a - 1.0 >= 3.0 ? 2.99 : 1./a - 1.0;
   const double ke = interpol(table, 31, 0., 3.0, 0.1, z, 1.0, 1.0);
-
   struct chis chidchi = chi_all(a);
   const double fK = f_K(chidchi.chi);
 
@@ -190,8 +186,7 @@ double A_IA_Joachimi(const double a)
   const double z = 1./a - 1;
 
   // A_0* < (L/L_0)^beta > *f_red
-  const double A_red =
-    nuisance.A_ia*A_LF(survey.m_lim,a)*f_red_LF(survey.m_lim,a);
+  const double A_red = nuisance.A_ia*A_LF(survey.m_lim,a)*f_red_LF(survey.m_lim,a);
 
   if (a < 1./(1.+ highz))
   { // z > highz, factor in uncertainty in extrapolation of redshift scaling

@@ -1,13 +1,225 @@
 #include <stdio.h>
 #include "structs.h"
 
+//  ----------------------------------------------------------------------------------
+//  ----------------------------------------------------------------------------------
+//  ----------------------------------------------------------------------------------
+//  STRUCT INITIALIZATION  
+//  ----------------------------------------------------------------------------------
+//  ----------------------------------------------------------------------------------
+//  ----------------------------------------------------------------------------------
+
 likepara like =
 {
   .IA = 0.,
   .bias = 0,
   .ell = NULL,
   .theta = NULL,
+  .shear_shear = 0,
+  .shear_pos = 0,
+  .pos_pos = 0,
+  .gk = 0,
+  .kk = 0,
+  .ks = 0,
+  .clusterN = 0,
+  .clusterWL = 0,
+  .clusterCG = 0,
+  .clusterCC = 0,
+  .use_full_sky_shear = 1,
+  .use_full_sky_ggl = 1,
+  .use_full_sky_clustering = 1,
+  .use_full_sky_gk = 1,
+  .use_full_sky_sk = 1,
+  .high_def_integration = 0,
+  .adopt_limber_gg = 0,
+  .adopt_limber_gammat = 1
 };
+
+cosmopara cosmology =
+{
+  .Omega_nu = 0.,
+  .coverH0 = 2997.92458,
+  .rho_crit = 7.4775e+21,
+  .MGSigma = 0.0,
+  .MGmu = 0.0,
+  //.w0 = -1,
+  //.A_s =  2e-9,
+  //.n_s = 0.96,
+  .is_cached = 0
+};
+
+tomopara tomo = 
+{
+  .n_source = {0},
+  .n_lens = {0},
+  .external_selection_cg_clustering = {0}
+};
+
+redshiftpara redshift =
+{
+  .shear_photoz = 0,
+  .shear_zdistrpar_zmin = 0.0,
+  .shear_zdistrpar_zmax = 0.0,
+  .shear_histogram_zbins = 0,
+  .clustering_photoz = 0,
+  .clustering_zdistrpar_zmin = 0.0,
+  .clustering_zdistrpar_zmax = 0.0,
+  .clustering_histogram_zbins = 0
+};
+
+galpara gbias =
+{
+  .b2 = {0},
+  .bs2 = {0},
+  .b1_function = &b1_per_bin,
+  .b_mag = {0},
+}; // default: point to old bgal_z routin
+
+clusterparams Cluster =
+{
+  .interpolate_survey_area = 1,
+  .bias_model = 0,
+  .hmf_model = 0,
+  .nonlinear_bias = 0,
+  .N200_min = 0.0,
+  .N200_max = 0.0,
+  .N200_Nbin = 0,
+  .N_min = {0},
+  .N_max = {0},
+  .model = "default"
+};
+
+pdeltapara pdeltaparams =
+{
+  .runmode = "Halofit"
+};
+
+nuisancepara nuisance =
+{
+  .c1rhocrit_ia = 0.01389,
+  .A_z = {0},
+  .A2_z = {0},
+  .b_ta_z = {0},
+  .shear_calibration_m = {0},
+  .sigma_zphot_shear = {0},
+  .bias_zphot_shear = {0},
+  .sigma_zphot_clustering = {0},
+  .bias_zphot_clustering = {0},
+};
+
+barypara bary =
+{
+  .is_Pk_bary = 0,
+  .Na_bins = 0,
+  .Nk_bins = 0,
+  .a_bins = NULL,
+  .logk_bins = NULL,
+  .log_PkR = NULL,
+  .interp2d = NULL,
+};
+
+Cmb cmb =
+{
+  .fwhm = 0.0,
+  .sensitivity = 0.0
+};
+
+sur survey =
+{
+  .area_conversion_factor  = 60.0 * 60.0 * 2.90888208665721580e-4 * 2.90888208665721580e-4,
+  .n_gal_conversion_factor = 1.0 / 2.90888208665721580e-4 / 2.90888208665721580e-4,
+  .ggl_overlap_cut = 1.
+};
+
+FPTpara FPT =
+{
+  .k_min = 1.e-5,
+  .k_max = 1.e+3,
+  .N = 800,
+  .N_per_dec = 100,
+  .N_AB = 7,
+  .N_IA = 10
+};
+
+lim limits = 
+{
+  .a_min = 1./(1.+10.),    // a_min (z=10, needed for CMB lensing)
+  .k_min_cH0 = 2.e-2,      // k_min_cH0
+  .k_max_cH0 = 3.e+6,      // k_max_cH0
+  .M_min = 1.0e+6,         // M_min
+  .M_max = 1.0e+17,        // M_max
+  .LMIN_tab = 20,          // LMIN_tab
+  .LMAX_NOLIMBER = 250,    // LMAX_NOLIMBER
+  .LMAX = 100000,
+  .LMIN_hankel = 0.0001,
+  .LMAX_hankel = 5.0e6,
+  .cluster_util_log_M_min = 12.0,
+  .cluster_util_log_M_max = 15.9,
+  .binned_P_lambda_obs_given_M_zmin_table = 0.20,
+  .binned_P_lambda_obs_given_M_zmax_table = 0.80,
+  .SDSS_P_lambda_obs_given_M_true_lambda_min = 3.0,
+  .SDSS_P_lambda_obs_given_M_true_lambda_max = 160.0,
+  .halo_exclusion_k_min = 1E-2,
+  .halo_exclusion_k_max = 3E6,
+  .halo_exclusion_k_min_hankel = 5.0E-4,
+  .halo_exclusion_k_max_hankel = 1.0E8,
+  .halo_exclusion_R_min = 0.0,
+  .halo_exclusion_R_max = 15.0/2997
+};
+
+Ntab Ntable = 
+{
+  .N_a = 250,                         // N_a (modified by COCOA from 100)
+  .N_k_lin = 500,                     // N_k_lin
+  .N_k_nlin = 500,                    // N_k_nlin
+  .N_ell = 200,                       // N_ell 
+  .N_theta = 200,                     // N_theta (modified by COCOA from 250)
+  .N_thetaH = 2048,                   // N_theta for Hankel
+  .N_S2 = 1000,                       // N_S2
+  .N_DS = 1000,                       // N_DS
+  .N_ell_TATT = 140,                  // N_ell_TATT (modified by COCOA)
+  .NL_Nell_block = 10,                // Cosmo2D - NL = NonLimber (NL_Nell_block)
+  .NL_Nchi = 500,                     // Cosmo2D - NL = NonLimber (NL_Nchi)
+  .N_a_halo_exclusion = 100,          // N_a for binned_p_cc_incl_halo_exclusion (cluster_util.c)
+  .N_k_halo_exclusion = 100,          // N_k for binned_p_cc_incl_halo_exclusion (cluster_util.c)
+  .N_k_hankel_halo_exclusion = 3192,  // N for 3D Hankel Transform (pk_to_xi and xi_to_pk) 
+  .N_R_halo_exclusion = 64,
+  .binned_P_lambda_obs_given_M_size_z_table = 10,
+  .binned_P_lambda_obs_given_M_size_M_table = 50,
+  .binned_p_cm_size_a_table = 30
+};
+
+pre precision = 
+{
+  .low = 1e-2, 
+  .medium = 1e-3, 
+  .high = 1e-5, 
+  .insane = 1e-7    
+};
+
+TinkerEmuParameters tinkerEmuParam =
+{
+  .tinker_bias_ncosmo = 7,                // do not change
+  .tinker_bias_nparam = 4,                // do not change
+  .tinker_bias_nsamp = 40, 
+  .tinker_bias_nparam_redshift = 6,       // number of parameters of equation 7 in 1907.13167.;
+  .tinker_hmf_ncosmo = 7,                 // do not change
+  .tinker_hmf_nparam = 6,                 // do not change
+  .tinker_hmf_nsamp = 40, 
+  .tinker_hmf_nparam_redshift = 4,        // number of parameters of eq 2 in 1804.05866;
+  .tinker_bias_extrapolation_cut_in = 40,
+  .tinker_bias_extrapolation_cut_out = 45,
+  .tinker_hmf_extrapolation_cut_in = 40,
+  .tinker_hmf_extrapolation_cut_out = 45,
+};
+
+//  ----------------------------------------------------------------------------------
+//  ----------------------------------------------------------------------------------
+//  ----------------------------------------------------------------------------------
+//  RESET STRUCT 
+//  ----------------------------------------------------------------------------------
+//  ----------------------------------------------------------------------------------
+//  ----------------------------------------------------------------------------------
 
 void reset_like_struct()
 {
@@ -55,17 +267,8 @@ void reset_like_struct()
   like.use_full_sky_gk = 1;
   like.use_full_sky_sk = 1;
   like.high_def_integration = 0;
+  like.adopt_limber_gg = 0;
 }
-
-cosmopara cosmology =
-{
-  .Omega_nu = 0.,
-  .coverH0 = 2997.92458,
-  .rho_crit = 7.4775e+21,
-  .MGSigma = 0.0,
-  .MGmu = 0.0,
-  .is_cached = 0
-};
 
 void reset_cosmology_struct()
 {
@@ -83,11 +286,6 @@ void reset_cosmology_struct()
   cosmology.Omega_nu = 0.0;
   cosmology.random = 0.0;
 }
-
-tomopara tomo = {
-  .n_source = {0},
-  .n_lens = {0}
-};
 
 void reset_tomo_struct()
 {
@@ -117,8 +315,6 @@ void reset_tomo_struct()
   tomo.cgl_Npowerspectra = 0;
 }
 
-redshiftpara redshift;
-
 void reset_redshift_struct()
 {
   redshift.shear_photoz = 0;
@@ -133,15 +329,6 @@ void reset_redshift_struct()
   redshift.clustering_histogram_zbins = 0;
   sprintf(redshift.clustering_REDSHIFT_FILE, "%s", "");
 }
-
-sur survey =
-{
-  .area_conversion_factor =
-                  60.0 * 60.0 * 2.90888208665721580e-4 * 2.90888208665721580e-4,
-  .n_gal_conversion_factor =
-                  1.0 / 2.90888208665721580e-4 / 2.90888208665721580e-4,
-  .ggl_overlap_cut = 1.
-};
 
 void reset_survey_struct()
 {
@@ -158,14 +345,6 @@ void reset_survey_struct()
   survey.ggl_overlap_cut = 1.0;
 }
 
-galpara gbias =
-{
-  .b2 = {0},
-  .bs2 = {0},
-  .b1_function = &b1_per_bin,
-  .b_mag = {0},
-}; // default: point to old bgal_z routin
-
 void reset_gbias_struct()
 {
   for(int i=0; i<10; i++)
@@ -181,11 +360,6 @@ void reset_gbias_struct()
   gbias.b1_function = &b1_per_bin;
 }
 
-clusterpara Cluster =
-{
-  .model = "default"
-};
-
 void reset_cluster_struct()
 {
   Cluster.N200_min = 0.0;
@@ -196,99 +370,7 @@ void reset_cluster_struct()
     Cluster.N_min[i] = 0.0;
     Cluster.N_max[i] = 0.0;
   }
-  Cluster.lbin = 0;
-  Cluster.l_min = 0.0;
-  Cluster.l_min = 0.0;
   sprintf(Cluster.model, "%s", "default");
-}
-
-
-pdeltapara pdeltaparams =
-{
-  .runmode = "Halofit"
-};
-
-void reset_pdeltaparams_struct()
-{
-  sprintf(pdeltaparams.runmode, "%s", "Halofit");
-}
-
-FPTpara FPT =
-{
-  .k_min = 1.e-5,
-  .k_max = 1.e+3,
-  .N = 800,
-  .N_per_dec = 100,
-  .N_AB = 7,
-  .N_IA = 10
-};
-
-nuisancepara nuisance =
-{
-  .c1rhocrit_ia = 0.01389,
-  .A_z = {0},
-  .A2_z = {0},
-  .b_ta_z = {0},
-  .shear_calibration_m = {0},
-  .sigma_zphot_shear = {0},
-  .bias_zphot_shear = {0},
-  .sigma_zphot_clustering = {0},
-  .bias_zphot_clustering = {0},
-};
-
-void reset_nuisance_struct()
-{
-  for(int i=0; i<MAX_SIZE_ARRAYS; i++)
-  {
-    nuisance.A_z[i] = 0.0;
-    nuisance.A2_z[i] = 0.0;
-    nuisance.b_ta_z[i] = 0.0;
-    nuisance.fred[i] = 0.0;
-    
-    nuisance.shear_calibration_m[i] = 0.0;
-    
-    nuisance.sigma_zphot_shear[i] = 0.0;
-    nuisance.bias_zphot_shear[i] = 0.0;
-    
-    nuisance.sigma_zphot_clustering[i] = 0.0;
-    nuisance.bias_zphot_clustering[i] = 0.0;
-    
-    nuisance.cluster_MOR[i] = 0.0;
-    nuisance.cluster_selection[i] = 0.0;
-  }
-
-  nuisance.A_ia = 0.0;
-  nuisance.A2_ia = 0.0;
-  nuisance.beta_ia = 0.0;
-  nuisance.eta_ia = 0.0;
-  nuisance.eta_ia_tt = 0.0;
-  nuisance.eta_ia_highz = 0.0;
-  nuisance.oneplusz0_ia = 0.0;
-  nuisance.c1rhocrit_ia = 0.01389;
-
-  nuisance.N_cluster_MOR = 0;
-  nuisance.N_cluster_selection = 0;
-}
-
-barypara bary =
-{
-  .is_Pk_bary = 0,
-  .Na_bins = 0,
-  .Nk_bins = 0,
-  .a_bins = NULL,
-  .logk_bins = NULL,
-  .log_PkR = NULL,
-  .interp2d = NULL,
-};
-
-Cmb cmb;
-
-void reset_cmb_struct()
-{
-  sprintf(cmb.name, "%s", "");
-  cmb.fwhm = 0.0;
-  cmb.sensitivity = 0.0;
-  sprintf(cmb.pathLensRecNoise, "%s", "");
 }
 
 void reset_bary_struct()
@@ -319,3 +401,123 @@ void reset_bary_struct()
     bary.interp2d = NULL;
   }
 }
+
+void reset_pdeltaparams_struct()
+{
+  sprintf(pdeltaparams.runmode, "%s", "Halofit");
+}
+
+void reset_nuisance_struct()
+{
+  for(int i=0; i<MAX_SIZE_ARRAYS; i++)
+  {
+    nuisance.A_z[i] = 0.0;
+    nuisance.A2_z[i] = 0.0;
+    nuisance.b_ta_z[i] = 0.0;
+    nuisance.fred[i] = 0.0;
+    
+    nuisance.shear_calibration_m[i] = 0.0;
+    
+    nuisance.sigma_zphot_shear[i] = 0.0;
+    nuisance.bias_zphot_shear[i] = 0.0;
+    
+    nuisance.sigma_zphot_clustering[i] = 0.0;
+    nuisance.bias_zphot_clustering[i] = 0.0;
+    
+    nuisance.cluster_MOR[i] = 0.0;
+    nuisance.cluster_selection[i] = 0.0;
+  }
+
+  nuisance.A_ia = 0.0;
+  nuisance.A2_ia = 0.0;
+  nuisance.beta_ia = 0.0;
+  nuisance.eta_ia = 0.0;
+  nuisance.eta_ia_tt = 0.0;
+  nuisance.eta_ia_highz = 0.0;
+  nuisance.oneplusz0_ia = 0.0;
+  nuisance.c1rhocrit_ia = 0.01389;
+}
+
+void reset_cmb_struct()
+{
+  sprintf(cmb.name, "%s", "");
+  cmb.fwhm = 0.0;
+  cmb.sensitivity = 0.0;
+  sprintf(cmb.pathLensRecNoise, "%s", "");
+}
+
+// --------------------------------------------------------------------
+// --------------------------------------------------------------------
+// --------------------------------------------------------------------
+// UPDATE
+// --------------------------------------------------------------------
+// --------------------------------------------------------------------
+// --------------------------------------------------------------------
+
+void update_cosmopara(cosmopara *C) 
+{
+  C->Omega_m = cosmology.Omega_m;
+  C->Omega_v = cosmology.Omega_v;
+  C->Omega_nu = cosmology.Omega_nu;
+  C->h0 = cosmology.h0;
+  C->MGSigma = cosmology.MGSigma;
+  C->MGmu = cosmology.MGmu;
+  C->random = cosmology.random;
+  //C->w0 = cosmology.w0;    // cluster cosmology need that information
+  //C->A_s = cosmology.A_s;  // cluster cosmology need that information
+  //C->n_s = cosmology.n_s;  // cluster cosmology need that information
+  C->random = cosmology.random;
+}
+
+void update_galpara(galpara *G) 
+{
+  for (int i=0; i<tomo.clustering_Nbin; i++) 
+  {
+    if (gbias.b[i] > 0.2 && gbias.b[i] < 20) 
+    {
+      G->b[i] = gbias.b[i];
+      G->b2[i] = gbias.b2[i];
+      G->bs2[i] = gbias.bs2[i];
+      G->cg[i] = gbias.cg[i];
+    } else 
+    {
+      printf("lens bin %d: neither HOD nor linear bias set, exit\n", i);
+      exit(1);
+    }
+  }
+}
+
+void update_nuisance(nuisancepara *N)
+{
+  N->A_ia = nuisance.A_ia;
+  N->beta_ia = nuisance.beta_ia;
+  N->eta_ia = nuisance.eta_ia;
+  N->eta_ia_highz = nuisance.eta_ia_highz;
+  N->A2_ia = nuisance.A2_ia;
+  N->eta_ia_tt = nuisance.eta_ia_tt;
+  
+  for (int i=0; i<tomo.clustering_Nbin; i++) 
+  {
+    N->sigma_zphot_clustering[i] = nuisance.sigma_zphot_clustering[i];
+    N->bias_zphot_clustering[i] = nuisance.bias_zphot_clustering[i];
+  }
+  
+  for (int i=0; i<tomo.shear_Nbin; i++) 
+  {
+    N->sigma_zphot_shear[i] = nuisance.sigma_zphot_shear[i];
+    N->bias_zphot_shear[i] = nuisance.bias_zphot_shear[i];
+    N->A_z[i] = nuisance.A_z[i];
+    N->A2_z[i] = nuisance.A2_z[i];
+    N->b_ta_z[i] = nuisance.b_ta_z[i];
+  }
+  
+  for (int i=0; i<Cluster.N_MOR; ++i)
+  {
+    N->cluster_MOR[i] = nuisance.cluster_MOR[i];
+  }
+  for (int i=0; i<Cluster.N_SF; ++i)
+  {
+    N->cluster_selection[i] = nuisance.cluster_selection[i];
+  }
+}
+

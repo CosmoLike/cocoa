@@ -172,7 +172,7 @@ int test_kmax(double l, int ni) // return 1 if true, 0 otherwise
   
   const double R_min = like.Rmin_bias; // set minimum scale to which
                                        // we trust our bias model, in Mpc/h
-  const double kmax = constants.twopi / R_min * cosmology.coverH0;
+  const double kmax = 2.0*M_PI / R_min * cosmology.coverH0;
   
   int res = 0.0;
   if ((l + 0.5) / chiref[ni] < kmax)
@@ -228,7 +228,7 @@ int test_zoverlap(int ni, int nj) // test whether source bin nj is behind lens b
 
 int ZL(int ni) 
 {
-  static int N[100] = {-42};
+  static int N[MAX_SIZE_ARRAYS*MAX_SIZE_ARRAYS] = {-42};
   if (N[0] < -1) 
   {
     int n = 0;
@@ -254,7 +254,7 @@ int ZL(int ni)
 
 int ZS(int nj) 
 {
-  static int N[100] = {-42};
+  static int N[MAX_SIZE_ARRAYS*MAX_SIZE_ARRAYS] = {-42};
   if (N[0] < -1) 
   {
     int n = 0;
@@ -280,7 +280,7 @@ int ZS(int nj)
 
 int N_ggl(int ni, int nj) 
 { // ni = redshift bin of the lens, nj = redshift bin of the source
-  static int N[10][10] = {{-42}};
+  static int N[MAX_SIZE_ARRAYS][MAX_SIZE_ARRAYS] = {{-42}};
   if (N[0][0] < 0) 
   {
     int n = 0;
@@ -331,7 +331,7 @@ int test_zoverlap_c(int zc, int zs) // test whether source bin zs is behind lens
 
 int ZCL(int ni) 
 {
-  static int N[100] = {-42};
+  static int N[MAX_SIZE_ARRAYS*MAX_SIZE_ARRAYS] = {-42};
   if (N[0] < -1) 
   {
     int n = 0;
@@ -357,7 +357,7 @@ int ZCL(int ni)
 
 int ZCS(int nj) 
 {
-  static int N[100] = {-42};
+  static int N[MAX_SIZE_ARRAYS*MAX_SIZE_ARRAYS] = {-42};
   if (N[0] < -1) 
   {
     int n = 0;
@@ -383,7 +383,7 @@ int ZCS(int nj)
 
 int N_cgl(int ni, int nj) 
 {
-  static int N[10][10] = {{-42}};
+  static int N[MAX_SIZE_ARRAYS][MAX_SIZE_ARRAYS] = {{-42}};
   if (N[0][0] < 0) 
   {
     int n = 0;
@@ -422,7 +422,7 @@ int N_cgl(int ni, int nj)
 // find z1 of tomography combination (z1, z2) constituting shear tomo bin Nbin
 int Z1(int ni) 
 {
-  static int N[55] = {-42};
+  static int N[MAX_SIZE_ARRAYS*MAX_SIZE_ARRAYS] = {-42};
   if (N[0] < -1) 
   {
     int n = 0;
@@ -445,7 +445,7 @@ int Z1(int ni)
 
 int Z2(int nj) 
 { // find z2 of tomography combination (z1,z2) constituting shear tomo bin Nbin
-  static int N[55] = {-42};
+  static int N[MAX_SIZE_ARRAYS*MAX_SIZE_ARRAYS] = {-42};
   if (N[0] < -1) 
   {
     int n = 0;
@@ -468,7 +468,7 @@ int Z2(int nj)
 
 int N_shear(int ni, int nj) 
 { // find shear tomography bin number N_shear of tomography combination (z1, z2)
-  static int N[10][10] = {{-42}};
+  static int N[MAX_SIZE_ARRAYS][MAX_SIZE_ARRAYS] = {{-42}};
   if (N[0][0] < -1) 
   {
     int n = 0;
@@ -500,7 +500,7 @@ int N_shear(int ni, int nj)
 
 int ZCL1(int ni) 
 { // find ZCL1 of tomography combination (zcl1,zcl2) constituting g-clustering tomo bin Nbin
-  static int N[55] = {-42};
+  static int N[MAX_SIZE_ARRAYS*MAX_SIZE_ARRAYS] = {-42};
   if (N[0] < -1) 
   {
     int n = 0;
@@ -523,7 +523,7 @@ int ZCL1(int ni)
 
 int ZCL2(int nj) 
 { // find ZCL2 of tomography combination (zcl1, zcl2) constituting g-clustering tomo bin Nbin
-  static int N[55] = {-42};
+  static int N[MAX_SIZE_ARRAYS*MAX_SIZE_ARRAYS] = {-42};
   if (N[0] < -1) 
   {
     int n = 0;
@@ -546,7 +546,7 @@ int ZCL2(int nj)
 
 int N_CL(int ni, int nj) 
 {
-  static int N[10][10] = {{-42}};
+  static int N[MAX_SIZE_ARRAYS][MAX_SIZE_ARRAYS] = {{-42}};
   if (N[0][0] < -1) 
   {
     int n = 0;
@@ -568,17 +568,17 @@ int N_CL(int ni, int nj)
   return N[ni][nj];
 }
 
-// ---------------------------------------------------------------------------------
-// ---------------------------------------------------------------------------------
-// ---------------------------------------------------------------------------------
+// ----------------------------------------------------------------------------------
+// ----------------------------------------------------------------------------------
+// ----------------------------------------------------------------------------------
 // Cluster Clustering (redshift overlap tests)
-// ---------------------------------------------------------------------------------
-// ---------------------------------------------------------------------------------
-// ---------------------------------------------------------------------------------
+// ----------------------------------------------------------------------------------
+// ----------------------------------------------------------------------------------
+// ----------------------------------------------------------------------------------
 
-int ZCCL1(int ni) 
+int ZCCL1(const int ni)
 { // find ZCCL1 of tomography combination (zccl1, zccl2) constituting c-clustering tomo bin Nbin
-  static int N[55] = {-42};
+  static int N[MAX_SIZE_ARRAYS*MAX_SIZE_ARRAYS] = {-42};
   if (N[0] < -1) 
   {
     int n = 0;
@@ -591,7 +591,7 @@ int ZCCL1(int ni)
       }
     }
   }
-  if(ni < 0 || ni > tomo.cc_clustering_Npowerspectra - 1)
+  if (ni < 0 || ni > tomo.cc_clustering_Npowerspectra - 1)
   {
     log_fatal("invalid bin input ni = %d (max %d)", ni, tomo.cc_clustering_Npowerspectra);
     exit(1);
@@ -599,9 +599,9 @@ int ZCCL1(int ni)
   return N[ni];
 }
 
-int ZCCL2(int nj) 
+int ZCCL2(const int nj)
 { // find ZCCL2 of tomography combination (zcl1, zcl2) constituting c-clustering tomo bin Nbin
-  static int N[55] = {-42};
+  static int N[MAX_SIZE_ARRAYS*MAX_SIZE_ARRAYS] = {-42};
   if (N[0] < -1) 
   {
     int n = 0;
@@ -614,7 +614,7 @@ int ZCCL2(int nj)
       }
     }
   }
-  if(nj < 0 || nj > tomo.cc_clustering_Npowerspectra - 1)
+  if (nj < 0 || nj > tomo.cc_clustering_Npowerspectra - 1)
   {
     log_fatal("invalid bin input nj = %d (max %d)", nj, tomo.cc_clustering_Npowerspectra);
     exit(1);
@@ -622,9 +622,9 @@ int ZCCL2(int nj)
   return N[nj];
 }
 
-int N_CCL(int ni, int nj) 
+int N_CCL(const int ni, const int nj)
 {
-  static int N[10][10] = {{-42}};
+  static int N[MAX_SIZE_ARRAYS][MAX_SIZE_ARRAYS] = {{-42}};
   if (N[0][0] < -1) 
   {
     int n = 0;
@@ -638,9 +638,80 @@ int N_CCL(int ni, int nj)
       }
     }
   }
-  if(ni < 0 || ni > tomo.cluster_Nbin - 1 || nj < 0 || nj > tomo.cluster_Nbin - 1)
+  if (ni < 0 || ni > tomo.cluster_Nbin - 1 || nj < 0 || nj > tomo.cluster_Nbin - 1)
   {
     log_fatal("invalid bin input (ni, nj) = (%d, %d)", ni, nj);
+    exit(1);
+  }
+  return N[ni][nj];
+}
+
+// ----------------------------------------------------------------------------------
+// ----------------------------------------------------------------------------------
+// ----------------------------------------------------------------------------------
+// Cluster-Galaxy Cross Clustering
+// ----------------------------------------------------------------------------------
+// ----------------------------------------------------------------------------------
+// ----------------------------------------------------------------------------------
+
+int ZCGCL1(const int ni)
+{
+  if (ni < 0 || ni > tomo.cg_clustering_Npowerspectra - 1)
+  {
+    log_fatal("invalid bin input ni = %d (max %d)", ni, tomo.cg_clustering_Npowerspectra);
+    exit(1);
+  }
+  // we assume cluster bin = galaxy bin (no cross)
+  return tomo.external_selection_cg_clustering[ni];
+}
+
+int ZCGCL2(const int nj)
+{
+  if (nj < 0 || nj > tomo.cg_clustering_Npowerspectra - 1)
+  {
+    log_fatal("invalid bin input ni = %d (max %d)", nj, tomo.cg_clustering_Npowerspectra);
+    exit(1);
+  }
+  // we assume cluster bin = galaxy bin (no cross)
+  return tomo.external_selection_cg_clustering[nj];
+}
+
+// ni = Cluster Nbin, nj = Galaxy Nbin
+int N_CGCL(const int ni, const int nj)
+{
+  static int N[MAX_SIZE_ARRAYS][MAX_SIZE_ARRAYS] = {{-42}};
+  if (N[0][0] < 0)
+  {
+    int n = 0;
+    for (int i=0; i<tomo.cluster_Nbin; i++)
+    {
+      for (int j=0; j<tomo.clustering_Nbin; j++)
+      {
+        if (i == j) // we are not considering cross spectrum
+        {
+          for (int k=0; k<tomo.cg_clustering_Npowerspectra; k++)
+          {
+            if (i == tomo.external_selection_cg_clustering[k])
+            {
+              N[i][j] = n;
+              n++;
+            }
+            else
+            {
+              N[i][j] = -1;
+            }
+          }
+        }
+        else
+        {
+          N[i][j] = -1;
+        }
+      }
+    }
+  }
+  if (ni < 0 || ni > tomo.cluster_Nbin - 1 || nj < 0 || nj > tomo.clustering_Nbin - 1)
+  {
+    log_fatal("invalid bin input (ni (cluster nbin), nj (galaxy nbin)) = (%d, %d)", ni, nj);
     exit(1);
   }
   return N[ni][nj];
@@ -684,8 +755,8 @@ double zdistr_histo_1(double z, void* params __attribute__((unused)))
   {
     const int zbins = line_count(redshift.shear_REDSHIFT_FILE);
     nimax = zbins;
-    tab = create_double_vector(0, zbins - 1);
-    double* z_v = create_double_vector(0, zbins - 1);
+    tab = (double*) malloc(sizeof(double)*zbins);
+    double* z_v = (double*) malloc(sizeof(double)*zbins);
     
     FILE* ein = fopen(redshift.shear_REDSHIFT_FILE, "r");
     if (ein == NULL)
@@ -714,7 +785,7 @@ double zdistr_histo_1(double z, void* params __attribute__((unused)))
     redshift.shear_zdistrpar_zmin = zhisto_min;
     redshift.shear_zdistrpar_zmax = zhisto_max;
 
-    free_double_vector(z_v, 0, zbins - 1);
+    free(z_v);
   }
 
   double res = 0.0;
@@ -744,8 +815,12 @@ double zdistr_histo_n(double z, void* params)
   {
     int zbins = line_count(redshift.shear_REDSHIFT_FILE);
     njmax = zbins;
-    tab = create_double_matrix(0, tomo.shear_Nbin - 1, 0, zbins - 1);
-    double* z_v = create_double_vector(0, zbins - 1);
+    tab = (double**) malloc(sizeof(double*)*tomo.shear_Nbin);
+    for (int i=0; i<tomo.shear_Nbin; i++)
+    {
+      tab[i] = (double*) malloc(sizeof(double)*zbins);
+    }
+    double* z_v = (double*) malloc(sizeof(double)*zbins);
     
     FILE* ein = fopen(redshift.shear_REDSHIFT_FILE, "r");
     if (ein == NULL)
@@ -809,7 +884,7 @@ double zdistr_histo_n(double z, void* params)
         tomo.shear_zmin[k], k, tomo.shear_zmax[k]);
     }
     
-    free_double_vector(z_v, 0, zbins - 1);
+    free(z_v);
     
     if (zhisto_max < tomo.shear_zmax[tomo.shear_Nbin - 1] || zhisto_min > tomo.shear_zmin[0]) 
     {
@@ -860,9 +935,8 @@ double zdistr_photoz(double zz, int nj)
   if (redshift.shear_photoz == -1) 
   {
     return n_of_z(zz, nj);
-  }
-  
-  if ((redshift.shear_photoz != 4 && recompute_zphot_shear(N)) || table == 0) 
+  } 
+  else if ((redshift.shear_photoz != 4 && recompute_zphot_shear(N)) || table == 0) 
   {
     update_nuisance(&N);
     
@@ -879,8 +953,12 @@ double zdistr_photoz(double zz, int nj)
         zbins = zbins1;
       }
       
-      table = create_double_matrix(0, tomo.shear_Nbin, 0, zbins - 1);
-      z_v = create_double_vector(0, zbins - 1);
+      table = (double**) malloc(sizeof(double*)*(tomo.shear_Nbin+1));
+      for (int i=0; i<(tomo.shear_Nbin+1); i++)
+      {
+        table[i] = (double*) malloc(sizeof(double)*zbins);
+      }
+      z_v = (double*) malloc(sizeof(double)*zbins);
       
       for (int i=0; i<tomo.shear_Nbin+1; i++) 
       {
@@ -905,15 +983,15 @@ double zdistr_photoz(double zz, int nj)
         int p=0;
         for (int i=0; i<zbins1; i++) 
         {
-          p++;
-          
           fscanf(ein, "%le", &z_v[i]);
-          
-          if (i > 0 && z_v[i] < z_v[i - 1]) 
+          p++;
+          if (i > 0) 
           {
-            break;
+            if (z_v[i] < z_v[i - 1])
+            {
+              break;
+            }
           }
-          
           for (int k=0; k<tomo.shear_Nbin; k++) 
           {
             double space;
@@ -931,7 +1009,7 @@ double zdistr_photoz(double zz, int nj)
     const double zhisto_max = redshift.shear_zdistrpar_zmax;
     const double da = (zhisto_max - zhisto_min) / ((double) zbins);
     
-    for (int i = 0; i < zbins; i++) 
+    for (int i=0; i<zbins; i++) 
     {
       z_v[i] = zhisto_min + (i + 0.5) * da;
     }
@@ -959,38 +1037,22 @@ double zdistr_photoz(double zz, int nj)
     { // initialization that allows openmp threading of the next loop
       case 0:
       {
-        const int i = 0;
-        double ar[4];
-        ar[0] = tomo.shear_zmin[i];
-        ar[1] = tomo.shear_zmax[i];
-        zdistr_histo_1(0.0, (void*) ar);
+        zdistr_histo_1(0.0, NULL);
         break;
       }
       case 1:
       {
-        const int i = 0;
-        double ar[4];
-        ar[0] = tomo.shear_zmin[i];
-        ar[1] = tomo.shear_zmax[i];
-        zdistr_histo_1(0.0, (void*) ar);
+        zdistr_histo_1(0.0, NULL);
         break;
       }
       case 2:
       {
-        const int i = 0;
-        double ar[4];
-        ar[0] = tomo.shear_zmin[i];
-        ar[1] = tomo.shear_zmax[i];
-        zdistr_histo_1(0.0, (void*) ar);
+        zdistr_histo_1(0.0, NULL);
         break;
       }
       case 3:
       {
-        const int i = 0;
-        double ar[4];
-        ar[0] = tomo.shear_zmin[i];
-        ar[1] = tomo.shear_zmax[i];
-        zdistr_histo_1(0.0, (void*) ar);
+        zdistr_histo_1(0.0, NULL);
         break;
       }
       case 4:
@@ -1004,59 +1066,57 @@ double zdistr_photoz(double zz, int nj)
     }
 
     double NORM[MAX_SIZE_ARRAYS];
-
     #pragma omp parallel for
     for (int i=0; i<tomo.shear_Nbin; i++) 
     {
-      double ar[4];
-      ar[0] = tomo.shear_zmin[i];
-      ar[1] = tomo.shear_zmax[i];
-      
-      double norm = 0.0;
+      double norm;
 
       switch (redshift.shear_photoz) 
       {
         case 0: // no photo-zs, split 'true' n(z) histogram in bins
         {  
-          norm = int_gsl_integrate_medium_precision(zdistr_histo_1, (void*) ar, ar[0], ar[1], 
-            NULL, GSL_WORKSPACE_SIZE);
+          double ar[2] = {tomo.shear_zmin[i], tomo.shear_zmax[i]};
+
+          norm = like.high_def_integration == 1 ?
+            int_gsl_integrate_high_precision(zdistr_histo_1, NULL, tomo.shear_zmin[i],
+              tomo.shear_zmax[i], NULL, GSL_WORKSPACE_SIZE) :
+            int_gsl_integrate_medium_precision(zdistr_histo_1, NULL, tomo.shear_zmin[i],
+              tomo.shear_zmax[i], NULL, GSL_WORKSPACE_SIZE);
           
-          for (int k=0; k < zbins; k++) 
+          for (int k=0; k<zbins; k++) 
           {
-            table[i + 1][k] = 0;
+            table[i+1][k] = 0;
             if (z_v[k] >= ar[0] && z_v[k] <= ar[1]) 
             {
-              table[i + 1][k] = zdistr_histo_1(z_v[k], (void*) ar) / norm;
+              table[i + 1][k] = zdistr_histo_1(z_v[k], NULL) / norm;
             }
           }
           break;
         }
         case 1: // Pseudo Voigt (Lorentzian + Gaussian) photo-zs
-        {
-          norm = 0.;
-          
+        {          
           if (sigma_zphot_shear(0., i) == 0.) 
           {
-            log_fatal("Source galaxy photo-z model underdetermined!\nredshift.shear_photoz = 1,"
-              "but  nuisance.sigma_zphot_shear[%d] not set", i);
+            log_fatal("Source galaxy photo-z model underdetermined! redshift.shear_photoz = 1,"
+              "but nuisance.sigma_zphot_shear[%d] not set", i);
             exit(1);
           }
-          
-          for (int k=0; k < zbins; k++) 
+
+          norm = 0.0;
+          double ar[2] = {tomo.shear_zmin[i], tomo.shear_zmax[i]};
+
+          for (int k=0; k<zbins; k++) 
           {
             const double x1 = (ar[0] - z_v[k] + bias_zphot_shear(z_v[k], i)) /
-                 (SQRT2 * sigma_zphot_shear(z_v[k], i));
+                 (M_SQRT2 * sigma_zphot_shear(z_v[k], i));
             const double x2 = (ar[1] - z_v[k] + bias_zphot_shear(z_v[k], i)) /
-                 (SQRT2 * sigma_zphot_shear(z_v[k], i));
+                 (M_SQRT2 * sigma_zphot_shear(z_v[k], i));
             
-            table[i + 1][k] =
-                zdistr_histo_1(z_v[k], (void*) ar) *
-                (eta * 0.3183 * (atan(x2) - atan(x1)) +
-                 ((1.0 - eta) * 0.5 * (gsl_sf_erf(x2) - gsl_sf_erf(x1))));
-            // this creates a pseudo Voigt profile by adding a Gaussian and
-            // Lorentian (convolved with a tophat) with the correct weights. See,
-            // eg, the Wikipedia article on Voigt profiles for an explanation of
-            // where the numbers come from.
+            table[i + 1][k] = zdistr_histo_1(z_v[k], NULL) * (eta * 0.3183 * (atan(x2) - atan(x1)) +
+              ((1.0 - eta) * 0.5 * (gsl_sf_erf(x2) - gsl_sf_erf(x1))));
+            // this creates a pseudo Voigt profile by adding a Gaussian and Lorentian (convolved
+            // with a tophat) with the correct weights. See, eg, the Wikipedia article on Voigt 
+            // profiles for an explanation of where the numbers come from.
             
             norm += table[i + 1][k] * da;
           }
@@ -1068,7 +1128,8 @@ double zdistr_photoz(double zz, int nj)
         }
         case 2: // Pseudo Voigt (Lorentzian + Gaussian) + outlier (currently flat) photo-zs
         {
-          norm = 0.;
+          norm = 0.0;
+          double ar[2] = {tomo.shear_zmin[i], tomo.shear_zmax[i]};
 
           if (sigma_zphot_shear(0., i) == 0.) 
           {
@@ -1076,22 +1137,19 @@ double zdistr_photoz(double zz, int nj)
               " but nuisance.sigma_zphot_shear[%d] not set",i);
             exit(1);
           }
-          
           for (int k=0; k < zbins; k++) 
           {
             const double x1 = (ar[0] - z_v[k] + bias_zphot_shear(z_v[k], i)) /
-                 (SQRT2 * sigma_zphot_shear(z_v[k], i));
+                 (M_SQRT2 * sigma_zphot_shear(z_v[k], i));
 
             const double x2 = (ar[1] - z_v[k] + bias_zphot_shear(z_v[k], i)) /
-                 (SQRT2 * sigma_zphot_shear(z_v[k], i));
+                 (M_SQRT2 * sigma_zphot_shear(z_v[k], i));
 
-            table[i + 1][k] = zdistr_histo_1(z_v[k], (void*) ar) *
-              (eta * 0.3183 * (atan(x2) - atan(x1)) +
+            table[i + 1][k] = zdistr_histo_1(z_v[k], NULL) * (eta * 0.3183 * (atan(x2) - atan(x1)) +
               ((1.0 - eta) * 0.5 * (gsl_sf_erf(x2) - gsl_sf_erf(x1))));
 
             norm += table[i + 1][k] * da;
           }
-          
           for (int k=0; k < zbins; k++) 
           {
             table[i + 1][k] = outfrac / da + (1. - outfrac) * table[i + 1][k] / norm;
@@ -1100,28 +1158,27 @@ double zdistr_photoz(double zz, int nj)
         }
         case 3: // Gaussian photo-zs
         {
-          norm = 0.;
-          
+          norm = 0.0;
+          double ar[2] = {tomo.shear_zmin[i], tomo.shear_zmax[i]};
+
           if (sigma_zphot_shear(0., i) == 0.) 
           {
             log_fatal("Source galaxy photo-z model underdetermined!\nredshift.shear_photoz = 3,"
               " but nuisance.sigma_zphot_shear[%d] not set", i);
             exit(1);
           }
-          
-          for (int k=0; k < zbins; k++) 
+          for (int k=0; k<zbins; k++) 
           {
             const double x1 = (ar[0] - z_v[k] + bias_zphot_shear(z_v[k], i)) /
-                 (SQRT2 * sigma_zphot_shear(z_v[k], i));
+                 (M_SQRT2 * sigma_zphot_shear(z_v[k], i));
             const double x2 = (ar[1] - z_v[k] + bias_zphot_shear(z_v[k], i)) /
-                 (SQRT2 * sigma_zphot_shear(z_v[k], i));
+                 (M_SQRT2 * sigma_zphot_shear(z_v[k], i));
             
             table[i + 1][k] = 0.5 * zdistr_histo_1(z_v[k], (void*) ar) *
                               (gsl_sf_erf(x2) - gsl_sf_erf(x1));
             
             norm += table[i + 1][k] * da;
           }
-          
           for (int k=0; k<zbins; k++) 
           {
             table[i + 1][k] /= norm;
@@ -1129,17 +1186,16 @@ double zdistr_photoz(double zz, int nj)
           break;
         }
         case 4: // histogram file contains n(z) estimates for each bin
-        {  
-          ar[0] = (double) i;        
+        { 
           norm = 0.0;
-          
-          for (int k=0; k < zbins; k++) 
+          double ar[1] = {(double) i};
+
+          for (int k=0; k<zbins; k++) 
           {
-            table[i + 1][k] = zdistr_histo_n(z_v[k], (void*) ar); // norm;
+            table[i + 1][k] = zdistr_histo_n(z_v[k], (void*) ar); 
             norm += table[i + 1][k] * da;
           }
-          
-          for (int k=0; k < zbins; k++) 
+          for (int k=0; k<zbins; k++) 
           {
             table[i + 1][k] /= norm;
           }
@@ -1147,8 +1203,8 @@ double zdistr_photoz(double zz, int nj)
         }
         default:
         {
-          log_fatal("redshift.shear_photoz = %d not supported in this cosmolike "
-                 "version",redshift.shear_photoz);
+          log_fatal("redshift.shear_photoz = %d not supported in this cosmolike version", 
+            redshift.shear_photoz);
           exit(1);          
         }
       }
@@ -1158,20 +1214,19 @@ double zdistr_photoz(double zz, int nj)
     
     // calculate normalized overall redshift distribution (without bins), store in table[0][:]
     double norm = 0;
-    for (int i = 0; i < tomo.shear_Nbin; i++) 
+    for (int i=0; i<tomo.shear_Nbin; i++) 
     {
       norm += NORM[i];
     }
-
+    #pragma omp parallel for
     for (int k=0; k<zbins; k++) 
     {
       table[0][k] = 0;
-      for (int i = 0; i < tomo.shear_Nbin; i++) 
+      for (int i=0; i<tomo.shear_Nbin; i++) 
       {
         table[0][k] += table[i + 1][k] * NORM[i] / norm;
       }
-    }
-
+    }    
     #pragma omp parallel for
     for (int i=-1; i<tomo.shear_Nbin; i++) 
     {
@@ -1186,7 +1241,7 @@ double zdistr_photoz(double zz, int nj)
   
   if (nj < -1 || nj > tomo.shear_Nbin - 1) 
   {
-    log_fatal("zdistr_photoz(z, %d) outside bin range", nj);
+    log_fatal("nj = %d bin outside range (max = %d)", nj, tomo.shear_Nbin);
     exit(1);
   }
   
@@ -1244,9 +1299,9 @@ double pf_histo(double z, void* params __attribute__((unused)))
   if (tab == 0) 
   {
     const int zbins = line_count(redshift.clustering_REDSHIFT_FILE);
-    tab = create_double_vector(0, zbins - 1);
-    double* z_v = create_double_vector(0, zbins - 1);
-    
+    tab = (double*) malloc(sizeof(double)*zbins);
+    double* z_v = (double*) malloc(sizeof(double)*zbins);
+
     FILE* ein = fopen(redshift.clustering_REDSHIFT_FILE, "r");
     if (ein == NULL)
     {
@@ -1272,7 +1327,7 @@ double pf_histo(double z, void* params __attribute__((unused)))
     zhisto_max = z_v[p - 1] + dz;
     zhisto_min = z_v[0];
 
-    free_double_vector(z_v, 0, zbins - 1);
+    free(z_v);
     
     if (zhisto_max < tomo.clustering_zmax[tomo.clustering_Nbin - 1] ||
         zhisto_min > tomo.clustering_zmin[0]) 
@@ -1309,9 +1364,14 @@ double pf_histo_n(double z, void* params)
   if (tab == 0) 
   {
     const int zbins = line_count(redshift.clustering_REDSHIFT_FILE);
-    njmax = zbins;
-    tab = create_double_matrix(0, tomo.clustering_Nbin - 1, 0, zbins - 1);
-    double* z_v = create_double_vector(0, zbins - 1);
+    njmax = zbins;    
+    
+    tab = (double**) malloc(sizeof(double*)*tomo.clustering_Nbin);
+    for (int i=0; i<tomo.clustering_Nbin; i++)
+    {
+      tab[i] = (double*) malloc(sizeof(double)*zbins);
+    }
+    double* z_v = (double*) malloc(sizeof(double)*zbins);
     
     FILE* ein = fopen(redshift.clustering_REDSHIFT_FILE, "r");
     if (ein == NULL)
@@ -1374,7 +1434,7 @@ double pf_histo_n(double z, void* params)
           k, tomo.clustering_zmin[k], k, tomo.clustering_zmax[k]);
     }
 
-    free_double_vector(z_v, 0, zbins - 1);
+    free(z_v);
     
     if (zhisto_max < tomo.clustering_zmax[tomo.clustering_Nbin - 1] ||
         zhisto_min > tomo.clustering_zmin[0]) 
@@ -1417,8 +1477,7 @@ double pf_photoz(double zz, int nj)
   {
     return n_of_z(zz, nj);
   }
-
-  if ((redshift.clustering_photoz != 4 && recompute_zphot_clustering(N)) || table == 0) 
+  else if ((redshift.clustering_photoz != 4 && recompute_zphot_clustering(N)) || table == 0) 
   {
     update_nuisance(&N);
 
@@ -1432,8 +1491,12 @@ double pf_photoz(double zz, int nj)
         zbins *= 20;
       } // upsample if convolving with analytic photo-z model
       
-      table = create_double_matrix(0, tomo.clustering_Nbin, 0, zbins - 1);
-      z_v = create_double_vector(0, zbins - 1);
+      table = (double**) malloc(sizeof(double*)*(tomo.clustering_Nbin+1));
+      for (int i=0; i<(tomo.clustering_Nbin+1); i++)
+      {
+        table[i] = (double*) malloc(sizeof(double)*zbins);
+      }
+      z_v = (double*) malloc(sizeof(double)*zbins);
       
       for (int i=0; i<tomo.clustering_Nbin+1; i++) 
       {
@@ -1446,8 +1509,7 @@ double pf_photoz(double zz, int nj)
       }
       
       if (redshift.clustering_photoz == 4) 
-      { // if multihisto, force zmin, zmax, tomo bins to match supplied file
-        
+      { // if multihisto, force zmin, zmax, tomo bins to match supplied file   
         FILE* ein = fopen(redshift.clustering_REDSHIFT_FILE, "r");
         if (ein == NULL)
         {
@@ -1458,14 +1520,15 @@ double pf_photoz(double zz, int nj)
         int p = 0;
         for (int i=0; i<zbins; i++) 
         {
-           p++;
           fscanf(ein, "%le", &z_v[i]);
-          
-          if (i > 0 && z_v[i] < z_v[i - 1]) 
+          p++;
+          if (i > 0) 
           {
-            break;
+            if (z_v[i] < z_v[i - 1])
+            {
+              break;
+            }
           }
-
           for (int k=0; k < tomo.clustering_Nbin; k++) 
           {
             double space;
@@ -1473,6 +1536,7 @@ double pf_photoz(double zz, int nj)
           }
         }
         fclose(ein);
+        
         redshift.clustering_zdistrpar_zmin = fmax(z_v[0], 1.e-5);
         redshift.clustering_zdistrpar_zmax = z_v[p - 1] + (z_v[p - 1] - z_v[0]) / (zbins - 1.);
       }
@@ -1481,7 +1545,6 @@ double pf_photoz(double zz, int nj)
     const double zhisto_min = redshift.clustering_zdistrpar_zmin;
     const double zhisto_max = redshift.clustering_zdistrpar_zmax;
     const double da = (zhisto_max - zhisto_min) / ((double) zbins);
-    
     for (int i=0; i<zbins; i++) 
     {
       z_v[i] = zhisto_min + (i + 0.5) * da;
@@ -1510,48 +1573,28 @@ double pf_photoz(double zz, int nj)
     { // initialization that allows openmp threading of the next loop
       case 0:
       {
-        const int i = 0;
-        double ar[2];
-        ar[0] = tomo.clustering_zmin[i];
-        ar[1] = tomo.clustering_zmax[i];
-        pf_histo(0.0, (void*) ar);
-        
+        pf_histo(0.0, NULL);
         break;
       }
       case 1:
       {
-        const int i = 0;
-        double ar[2];
-        ar[0] = tomo.clustering_zmin[i];
-        ar[1] = tomo.clustering_zmax[i];
-        pf_histo(0.0, (void*) ar);
-        
+        pf_histo(0.0, NULL);
         break;
       }
       case 2:
       {
-        const int i = 0;
-        double ar[2];
-        ar[0] = tomo.clustering_zmin[i];
-        ar[1] = tomo.clustering_zmax[i];
-        pf_histo(0.0, (void*) ar);
-        
+        pf_histo(0.0, NULL);
         break;
       }
       case 3:
       {
-        const int i = 0;
-        double ar[2];
-        ar[0] = tomo.clustering_zmin[i];
-        ar[1] = tomo.clustering_zmax[i];
-        pf_histo(0.0, (void*) ar);
-        
+        pf_histo(0.0, NULL);
         break;
       }
       case 4:
       {
         const int i = 0;
-        double ar[2];        
+        double ar[1];        
         ar[0] = (double) i;
         pf_histo_n(0., (void*) ar);
         
@@ -1559,55 +1602,54 @@ double pf_photoz(double zz, int nj)
       }
     }
 
-    double NORM[MAX_SIZE_ARRAYS];
-    
+    double NORM[MAX_SIZE_ARRAYS]; 
     #pragma omp parallel for
     for (int i=0; i<tomo.clustering_Nbin; i++) 
     {
-      double ar[4];
-      ar[0] = tomo.clustering_zmin[i];
-      ar[1] = tomo.clustering_zmax[i];
-
       double norm = 0.0;
 
       switch (redshift.clustering_photoz) 
       {
         case 0: // no photo-zs, split 'true' n(z) histogram in bins
         {
-          norm = int_gsl_integrate_medium_precision(pf_histo, (void*) ar, ar[0], 
-            ar[1], NULL, GSL_WORKSPACE_SIZE);
-          for (int k=0; k<zbins; k++) 
+          norm = like.high_def_integration == 1 ?
+            int_gsl_integrate_high_precision(pf_histo, NULL, tomo.clustering_zmin[i],
+              tomo.clustering_zmax[i], NULL, GSL_WORKSPACE_SIZE) :
+            int_gsl_integrate_medium_precision(pf_histo, NULL, tomo.clustering_zmin[i],
+              tomo.clustering_zmax[i], NULL, GSL_WORKSPACE_SIZE);
+
+          for (int k=0; k<zbins; k++)
           {
-            double zi = z_v[k];
+            const double zi = z_v[k];
             table[i + 1][k] = 0.;
-            if (zi >= ar[0] && zi <= ar[1]) 
+            if (zi >= tomo.clustering_zmin[i] && zi <= tomo.clustering_zmax[i]) 
             {
-              table[i + 1][k] = pf_histo(zi, (void*) ar) / norm;
+              table[i + 1][k] = pf_histo(zi, NULL) / norm;
             }
-          }
-          
+          } 
           break;
         }
         case 1: // Pseudo Voigt (Lorentzian + Gaussian) photo-zs
         {
-          norm = 0.;
           if (sigma_zphot_clustering(0., i) == 0.) 
           {
             log_fatal("Lens galaxy photo-z model underdetermined!\nredshift.clustering_photoz = 1, "
               "but nuisance.sigma_zphot_clustering[%d] not set", i);
             exit(1);
           }
-          
+
+          norm = 0.0;
+
           for (int k=0; k<zbins; k++) 
           {
             const double zi = z_v[k];
             
-            const double x1 = 
-              (ar[0] - zi + bias_zphot_clustering(zi, i))/(SQRT2*sigma_zphot_clustering(zi, i));
-            const double x2 = 
-              (ar[1] - zi + bias_zphot_clustering(zi, i))/(SQRT2*sigma_zphot_clustering(zi, i));
+            const double x1 = (tomo.clustering_zmin[i] - zi + 
+              bias_zphot_clustering(zi, i))/(M_SQRT2*sigma_zphot_clustering(zi, i));
+            const double x2 = (tomo.clustering_zmax[i] - zi + 
+                bias_zphot_clustering(zi, i))/(M_SQRT2*sigma_zphot_clustering(zi, i));
             
-            table[i + 1][k] = pf_histo(zi, (void*) ar)*(eta * 0.3183 * (atan(x2) - atan(x1)) +
+            table[i + 1][k] = pf_histo(zi, NULL)*(eta * 0.3183 * (atan(x2) - atan(x1)) +
               ((1.0 - eta) * 0.5 * (gsl_sf_erf(x2) - gsl_sf_erf(x1))));
             
             // this creates a pseudo Voigt profile by adding a Gaussian and Lorentian (convolved  
@@ -1620,13 +1662,10 @@ double pf_photoz(double zz, int nj)
           {
             table[i + 1][k] /= norm;
           }
-          
           break;
         }
         case 2: // Pseudo Voigt (Lorentzian + Gaussian) + outlier (currently flat) photo-zs
         {
-          norm = 0.;
-
           if (sigma_zphot_clustering(0., i) == 0.) 
           {
             log_fatal("Lens galaxy photo-z model underdetermined!\n redshift.clustering_photoz = 2,"
@@ -1634,24 +1673,26 @@ double pf_photoz(double zz, int nj)
             exit(1);
           }
           
-          for (int k=0; k<zbins; k++) 
+          norm = 0.0;
+
+          for (int k=0; k<zbins; k++)
           {
             const double zi = z_v[k];
             
-            double x1 = (ar[0]-zi+bias_zphot_clustering(zi,i))/(SQRT2*sigma_zphot_clustering(zi,i));
-            double x2 = (ar[1]-zi+bias_zphot_clustering(zi,i))/(SQRT2*sigma_zphot_clustering(zi,i));
+            const double x1 = (tomo.clustering_zmin[i] - zi + 
+              bias_zphot_clustering(zi, i))/(M_SQRT2*sigma_zphot_clustering(zi, i));
+            const double x2 = (tomo.clustering_zmax[i] - zi + 
+              bias_zphot_clustering(zi, i))/(M_SQRT2*sigma_zphot_clustering(zi, i));
             
-            table[i + 1][k] = pf_histo(zi, (void*) ar)*(eta * 0.3183 * (atan(x2) - atan(x1)) +
+            table[i + 1][k] = pf_histo(zi, NULL)*(eta * 0.3183 * (atan(x2) - atan(x1)) +
               ((1.0 - eta) * 0.5 * (gsl_sf_erf(x2) - gsl_sf_erf(x1))));
             
             norm += table[i + 1][k] * da;
           }
-          
           for (int k=0; k<zbins; k++) 
           {
             table[i + 1][k] = outfrac / da + (1. - outfrac) * table[i + 1][k] / norm;
           }
-          
           break;
         }
         case 3: // Gaussian photo-zs
@@ -1663,41 +1704,46 @@ double pf_photoz(double zz, int nj)
             exit(1);
           }
           
-          norm = 0.;
-          for (int k=0; k<zbins; k++) 
+          norm = 0.0;
+
+          for (int k=0; k<zbins; k++)
           {
             const double zi = z_v[k];
-            double x1 = (ar[0]-zi+bias_zphot_clustering(zi,i))/(SQRT2*sigma_zphot_clustering(zi,i));
-            double x2 = (ar[1]-zi+bias_zphot_clustering(zi,i))/(SQRT2*sigma_zphot_clustering(zi,i));
-            table[i + 1][k] = 0.5 * pf_histo(zi, (void*) ar)*(gsl_sf_erf(x2) - gsl_sf_erf(x1));
+            
+            const double x1 = (tomo.clustering_zmin[i] - zi + 
+              bias_zphot_clustering(zi, i))/(M_SQRT2*sigma_zphot_clustering(zi, i));
+            const double x2 = (tomo.clustering_zmax[i] - zi + 
+              bias_zphot_clustering(zi, i))/(M_SQRT2*sigma_zphot_clustering(zi, i));
+            
+            table[i + 1][k] = 0.5 * pf_histo(zi, NULL)*(gsl_sf_erf(x2) - gsl_sf_erf(x1));
+            
             norm += table[i + 1][k] * da;
           }
-          
           for (int k=0; k < zbins; k++) 
           {
             table[i + 1][k] /= norm;
-          }
-          
+          } 
           break;
         }
         case 4: // histogram file contains n(z) estimates for each bin
         { 
-          ar[0] = (double) i;
-          
-          norm = int_gsl_integrate_medium_precision(pf_histo_n, (void*) ar, tomo.clustering_zmin[i],
-            tomo.clustering_zmax[i], NULL, GSL_WORKSPACE_SIZE);
-          
+          double ar[1] = {(double) i};
+
+          norm = like.high_def_integration == 1 ?
+            int_gsl_integrate_high_precision(pf_histo_n, (void*) ar,
+              tomo.clustering_zmin[i], tomo.clustering_zmax[i], NULL, GSL_WORKSPACE_SIZE) :
+            int_gsl_integrate_medium_precision(pf_histo_n, (void*) ar,
+              tomo.clustering_zmin[i], tomo.clustering_zmax[i], NULL, GSL_WORKSPACE_SIZE);
+
           if (norm == 0) 
           {
-            log_fatal("pf_photoz:norm(nz=%d)=0", i);
+            log_fatal("pf_photoz: norm(nz = %d) = 0", i);
             exit(1);
           }
-          
           for (int k=0; k<zbins; k++) 
           {
             table[i + 1][k] = pf_histo_n(z_v[k], (void*) ar)/norm;
           }
-          
           break;
         }
         default:
@@ -1706,6 +1752,7 @@ double pf_photoz(double zz, int nj)
           exit(1);
         }
       }
+
       NORM[i] = norm;
     }
     
@@ -1724,7 +1771,7 @@ double pf_photoz(double zz, int nj)
         table[0][k] += table[i + 1][k] * NORM[i] / norm;
       }
     }
-    
+
     #pragma omp parallel for
     for (int i=-1; i<tomo.clustering_Nbin; i++) 
     {
@@ -1764,8 +1811,319 @@ double pf_photoz(double zz, int nj)
     }
     res = result;
   }
-
   return res;
+}
+
+// ---------------------------------------------------------------------------------------
+// ---------------------------------------------------------------------------------------
+// ---------------------------------------------------------------------------------------
+// cluster routines (for redshift distributions, including photo-zs * (optional))
+// ---------------------------------------------------------------------------------------
+// ---------------------------------------------------------------------------------------
+// ---------------------------------------------------------------------------------------
+
+double pf_cluster_histo_n(double z,  void* params) 
+{
+  static int njmax;
+  static double** table;
+  static double zhisto_max, zhisto_min, dz;
+
+  if (table == 0)
+  {
+    const int zbins = line_count(redshift.clusters_REDSHIFT_FILE);
+    njmax = zbins;
+    table = (double**) malloc(sizeof(double*)*tomo.cluster_Nbin);
+    for (int i=0; i<tomo.cluster_Nbin; i++)
+    {
+      table[i] = (double*) malloc(sizeof(double)*zbins);
+    }
+    double* z_v = (double*) malloc(sizeof(double)*zbins);
+    
+    FILE* ein = fopen(redshift.clusters_REDSHIFT_FILE, "r");
+    if (ein == NULL)
+    {
+      log_fatal("file not opened");
+      exit(1);
+    }
+    int p = 0;
+    for (int i=0; i<zbins; i++)
+    {
+      fscanf(ein, "%le", &z_v[i]);
+      p++;
+      if (i > 0 && z_v[i] < z_v[i-1]) 
+      {
+        break;
+      }
+      for (int k=0; k<tomo.cluster_Nbin; k++)
+      {
+        fscanf(ein," %le", &table[k][i]);
+      }
+    }
+    fclose(ein);
+
+    dz = (z_v[p - 1] - z_v[0]) / ((double) p - 1.0);
+    zhisto_max = z_v[p - 1] + dz;
+    zhisto_min = z_v[0];
+    
+    for (int k=0; k<tomo.cluster_Nbin; k++)
+    { // now, set tomography bin boundaries
+      double max = table[k][0];
+      for (int i=1; i<zbins; i++)
+      {
+        if (table[k][i]> max)
+        {
+          max = table[k][i];
+        }
+      }
+      {
+        int i = 0;
+        while (table[k][i] <1.e-8*max && i < zbins-2)
+        {
+          i++;
+        }
+        tomo.cluster_zmin[k] = z_v[i];
+      }
+      {
+        int i = zbins-1;
+        while (table[k][i] <1.e-8*max && i > 0)
+        {
+          i--;
+        }
+        tomo.cluster_zmax[k] = z_v[i];
+      }
+      log_info("tomo.cluster_zmin[%d] = %.3f,tomo.cluster_zmax[%d] = %.3f",
+        k, tomo.cluster_zmin[k], k, tomo.cluster_zmax[k]);
+    }
+    free(z_v);
+    
+    if (zhisto_max < tomo.cluster_zmax[tomo.cluster_Nbin - 1] || zhisto_min > tomo.cluster_zmin[0])
+    {
+      log_fatal("%e %e %e %e", zhisto_min,tomo.cluster_zmin[0], 
+        zhisto_max,tomo.cluster_zmax[tomo.cluster_Nbin-1]);
+      log_fatal("pf_cluster_histo_n: redshift file = %s is incompatible with bin choice", 
+        redshift.clusters_REDSHIFT_FILE);
+      exit(1);
+    }
+  }
+
+  double res = 0.0;
+  if ((z >= zhisto_min) && (z < zhisto_max)) 
+  {
+    double *ar = (double*) params;
+    const int ni = (int) ar[0];
+    const int nj = (int) floor((z - zhisto_min)/dz);
+
+    if (ni < 0 || ni > tomo.cluster_Nbin - 1 || nj < 0 || nj > njmax - 1)
+    {
+      log_fatal("invalid bin input (ni, nj) = (%d, %d)", ni, nj);
+      exit(1);
+    } 
+    res = table[ni][nj];
+  }
+  return res;
+}
+
+double pz_cluster(const double zz, const int nz)
+{
+  static double** table = 0;
+  static double* z_v = 0;
+  static int zbins = -1;
+  static gsl_spline* photoz_splines[MAX_SIZE_ARRAYS];
+
+  if (nz < -1 || nz > tomo.cluster_Nbin - 1)
+  {
+    log_fatal("invalid bin input nz = %d (max %d)", nz, tomo.cluster_Nbin);
+    exit(1);
+  }
+
+  if (redshift.clusters_photoz == 0)
+  {
+    if ((zz >= tomo.cluster_zmin[nz]) & (zz <= tomo.cluster_zmax[nz])) 
+    {
+      return 1;
+    }
+    else
+    { 
+      return 0;
+    }
+  }
+
+  if (table == 0)
+  {
+    zbins = line_count(redshift.clusters_REDSHIFT_FILE);
+ 
+    table = (double**) malloc(sizeof(double*)*(tomo.cluster_Nbin+1));
+    for (int i=0; i<(tomo.cluster_Nbin+1); i++)
+    {
+      table[i] = (double*) malloc(sizeof(double)*zbins);
+    }
+    z_v = (double*) malloc(sizeof(double)*zbins);
+
+    for (int i=0; i<tomo.clustering_Nbin+1; i++) 
+    {
+      photoz_splines[i] = gsl_spline_alloc(Z_SPLINE_TYPE, zbins);
+      if (photoz_splines[i] == NULL)
+      {
+        log_fatal("fail allocation");
+        exit(1);
+      }
+    }
+
+    FILE* ein = fopen(redshift.clusters_REDSHIFT_FILE,"r");
+    int p = 0;
+    for (int i=0; i<zbins; i++)
+    {
+      fscanf(ein, "%le", &z_v[i]);
+      p++;
+      if (i > 0 && z_v[i] < z_v[i-1]) 
+      {
+        break;
+      }
+      for (int k=0; k<tomo.cluster_Nbin; k++)
+      {
+        double space;
+        fscanf(ein,"%le",&space);
+      }
+    }
+    fclose(ein);
+
+    {
+      const double zhisto_min = fmax(z_v[0], 1.e-5);
+      const double zhisto_max = z_v[p - 1] + (z_v[p - 1] - z_v[0])/((double) p - 1.0);  
+      const double da = (zhisto_max - zhisto_min)/((double) zbins);
+      for (int i=0; i<zbins; i++)
+      { 
+        z_v[i] = zhisto_min + (i + 0.5)*da;
+      }
+    }
+    
+    { // init the function pf_cluster_histo_n
+      double ar[1] = {(double) 0};
+      pf_cluster_histo_n(0., (void*) ar);
+    }
+    double NORM[11]; 
+    #pragma omp parallel for
+    for (int i=0; i<tomo.cluster_Nbin; i++)
+    {
+      double ar[1] = {(double) i};
+
+      const double norm = int_gsl_integrate_medium_precision(pf_cluster_histo_n, (void*) ar, 1E-5, 
+        tomo.cluster_zmax[i] + 1.0, NULL, GSL_WORKSPACE_SIZE) / 
+        (tomo.cluster_zmax[i] - tomo.cluster_zmin[i]);
+      
+      if (norm == 0) 
+      {
+        log_fatal("pz_cluster: norm(nz = %d) = 0", i);
+        exit(1);
+      }
+
+      for (int k=0; k<zbins; k++)
+      { 
+        table[i + 1][k] = pf_cluster_histo_n(z_v[k], (void*) ar)/norm;
+      }
+      NORM[i] = norm;
+    }
+    
+    double norm = 0;
+    for (int i=0; i<tomo.cluster_Nbin; i++)
+    { // calculate normalized overall redshift distribution (without bins), store in table[0][:]
+      norm += NORM[i];
+    }
+
+    for (int k=0; k<zbins; k++)
+    {
+      table[0][k] = 0; 
+      for (int i=0; i<tomo.cluster_Nbin; i++)
+      {
+        table[0][k] += table[i+1][k]*NORM[i]/norm;
+      }
+    }
+
+    #pragma omp parallel for
+    for (int i=-1; i<tomo.cluster_Nbin; i++) 
+    {
+      int status = gsl_spline_init(photoz_splines[i + 1], z_v, table[i + 1], zbins);
+      if (status) 
+      {
+        log_fatal(gsl_strerror(status));
+        exit(1);
+      }
+    }
+  }
+
+  if (nz > tomo.cluster_Nbin - 1 || nz < -1)
+  {
+    log_fatal("pz_cluster(z, %d) outside tomo.cluster_Nbin range", nz);
+    exit(1);
+  }
+
+  double res;
+  if (zz <= z_v[0] || zz >= z_v[zbins - 1]) 
+  {
+    res = 0.0;
+  }
+  else
+  {
+    double result = 0.0;
+    int status = gsl_spline_eval_e(photoz_splines[nz + 1], zz, NULL, &result);
+    if (status) 
+    {
+      log_fatal(gsl_strerror(status));
+      exit(1);
+    }
+    res = result;
+  }
+  return res;
+}
+
+double dV_cluster(double z, void* params)
+{
+  double* ar = (double*) params;
+  const int nz = ar[0];
+  const double a = 1.0/(1.0 + z);
+  struct chis chidchi = chi_all(a);
+  const double hoverh0 = hoverh0v2(a, chidchi.dchida);
+  const double fK = f_K(chidchi.chi);
+  return (fK*fK/hoverh0)*pz_cluster(z, nz);
+}
+
+
+double norm_z_cluster(const int nz)
+{
+  static cosmopara C;
+  static double* table;
+
+  const int N_z = tomo.clustering_Nbin;
+  const double zmin = tomo.cluster_zmin[nz];
+  const double zmax = tomo.cluster_zmax[nz];
+  
+  if (table == 0) 
+  {
+    table = (double*) malloc(sizeof(double)*N_z);
+  }
+  if (recompute_cosmo3D(C))
+  {
+    { // init static vars only 
+      const int i = 0;
+      double params[1] = {0.0};
+      dV_cluster(tomo.cluster_zmin[i], (void*) params);
+    }
+    #pragma omp parallel for
+    for (int i=0; i<N_z; i++)
+    {
+      double params[1] = {(double) i};
+      table[i] = int_gsl_integrate_high_precision(dV_cluster, (void*) params, zmin, zmax, NULL, 
+        GSL_WORKSPACE_SIZE);
+    }
+    update_cosmopara(&C);
+  }
+  return table[nz];
+}
+
+double zdistr_cluster(const int nz, const double z)
+{ //simplfied selection function, disregards evolution of N-M relation+mass function within z bin
+  double params[1] = {nz};
+  return dV_cluster(z, (void*) params)/norm_z_cluster(nz);
 }
 
 // ------------------------------------------------------------------------
@@ -1781,13 +2139,12 @@ double int_nsource(double z, void* param __attribute__((unused)))
   return zdistr_photoz(z, -1);
 }
 
-// returns n_gal for shear tomography bin j, works only with binned
-double nsource(int ni) // ni =-1 -> no tomography; ni>= 0 -> tomography bin ni
-{
-  static double** table = 0;
-
-  if (table == 0 || table[0][0] != survey.n_gal) 
+double nsource(const int ni) // ni =-1 -> no tomography; ni>= 0 -> tomography bin ni
+{ // returns n_gal for shear tomography bin j, works only with binned
+  static double* table = 0;
+  if (table == 0) 
   {
+    table = (double*) malloc(sizeof(double)*(tomo.shear_Nbin+1));
     #pragma GCC diagnostic push
     #pragma GCC diagnostic ignored "-Wunused-variable"
     {
@@ -1795,14 +2152,11 @@ double nsource(int ni) // ni =-1 -> no tomography; ni>= 0 -> tomography bin ni
       
     }
     #pragma GCC diagnostic pop
-
-    table = create_double_matrix(0, tomo.shear_Nbin, 0, 1);
-    
     if (redshift.shear_photoz == 4) 
     {
       for (int i=0; i<tomo.shear_Nbin; i++) 
       {
-        table[i + 1][0] = tomo.n_source[i];
+        table[i + 1] = tomo.n_source[i];
         
         if (tomo.n_source[i] < 0.01 || tomo.n_source[i] > 100.) 
         {
@@ -1813,51 +2167,38 @@ double nsource(int ni) // ni =-1 -> no tomography; ni>= 0 -> tomography bin ni
     } 
     else 
     {
-      const double norm = int_gsl_integrate_medium_precision(int_nsource, NULL, 
-        redshift.shear_zdistrpar_zmin, redshift.shear_zdistrpar_zmax, NULL, GSL_WORKSPACE_SIZE);
+      const double norm = like.high_def_integration == 1 ?
+        int_gsl_integrate_high_precision(int_nsource, NULL, redshift.shear_zdistrpar_zmin,
+         redshift.shear_zdistrpar_zmax, NULL, GSL_WORKSPACE_SIZE) :
+        int_gsl_integrate_medium_precision(int_nsource, NULL, redshift.shear_zdistrpar_zmin,
+         redshift.shear_zdistrpar_zmax, NULL, GSL_WORKSPACE_SIZE);
 
-      {
-        const int i = 0;
-        double ar[3] = {0.0, 0.0, 0.0}; // not used
-        
-        const double res = int_gsl_integrate_medium_precision(int_nsource, (void*) ar, 
-          tomo.shear_zmin[i], tomo.shear_zmax[i], NULL, GSL_WORKSPACE_SIZE);
-        
-        table[i + 1][0] = res / norm * survey.n_gal;
-        
-        if (table[i + 1][0] < 0.01 || table[i + 1][0] > 100) 
-        {
-          log_fatal("nsource(%d) = %e\n outside expected range", i, table[i + 1][0]);
-          exit(1);
-        }
-      }
       #pragma omp parallel for
-      for (int i=1; i<tomo.shear_Nbin; i++) 
-      {
-        double ar[3] = {0.0, 0.0, 0.0}; // not used
+      for (int i=0; i<tomo.shear_Nbin; i++) 
+      {        
+        const double res = like.high_def_integration == 1 ?
+          int_gsl_integrate_high_precision(int_nsource, NULL, tomo.shear_zmin[i], 
+            tomo.shear_zmax[i], NULL, GSL_WORKSPACE_SIZE) :
+          int_gsl_integrate_medium_precision(int_nsource, NULL, tomo.shear_zmin[i], 
+            tomo.shear_zmax[i], NULL, GSL_WORKSPACE_SIZE);
         
-        const double res = int_gsl_integrate_medium_precision(int_nsource, (void*) ar, 
-          tomo.shear_zmin[i], tomo.shear_zmax[i], NULL, GSL_WORKSPACE_SIZE);
+        table[i + 1] = res / norm * survey.n_gal;
         
-        table[i + 1][0] = res / norm * survey.n_gal;
-        
-        if (table[i + 1][0] < 0.01 || table[i + 1][0] > 100) 
+        if (table[i + 1] < 0.01 || table[i + 1] > 100) 
         {
-          log_fatal("nsource(%d) = %e\n outside expected range", i, table[i + 1][0]);
+          log_fatal("nsource(%d) = %e\n outside expected range", i, table[i + 1]);
           exit(1);
         }
       }
     }
-
-    table[0][0] = survey.n_gal;
+    table[0] = survey.n_gal;
   }
-  
-  if(ni < -1 || ni > tomo.shear_Nbin - 1)
+  if (ni < -1 || ni > tomo.shear_Nbin - 1)
   {
     log_fatal("invalid bin input ni = %d", ni);
     exit(1);
   } 
-  return table[ni + 1][0];
+  return table[ni + 1];
 }
 
 double int_nlens(double z, void *param __attribute__((unused))) 
@@ -1868,83 +2209,61 @@ double int_nlens(double z, void *param __attribute__((unused)))
 // returns n_gal for clustering tomography bin ni, works only with binned distributions
 double nlens(int ni) // ni =-1 -> no tomography; ni>= 0 -> tomography bin ni
 {
-  static double** table = 0;
-
-  if (table == 0 || table[0][0] != survey.n_lens) 
+  static double* table = 0;
+  if (table == 0) 
   {
+    table = (double*) malloc(sizeof(double)*(tomo.clustering_Nbin+1));
+
     #pragma GCC diagnostic push
     #pragma GCC diagnostic ignored "-Wunused-variable"
     {
       double init = pf_photoz(0., 0);
     }
     #pragma GCC diagnostic pop
-    
-    table = create_double_matrix(0, tomo.clustering_Nbin, 0, 1);
-    
+        
     if (redshift.clustering_photoz == 4) 
     {      
       for (int i=0; i<tomo.clustering_Nbin; i++) 
       {
-        table[i + 1][0] = tomo.n_lens[i];
+        table[i + 1] = tomo.n_lens[i];
       }
     } 
     else 
     {
-      double norm = 0.0;
-      {
-        double ar[2];
-        ar[0] = tomo.clustering_zmin[0];
-        ar[1] = tomo.clustering_zmax[tomo.clustering_Nbin - 1];
-        
-        norm = int_gsl_integrate_medium_precision(int_nlens, NULL, ar[0], ar[1], NULL, GSL_WORKSPACE_SIZE); 
-      }
+      const double norm = like.high_def_integration == 1 ?
+        int_gsl_integrate_high_precision(int_nlens, NULL, 
+          tomo.clustering_zmin[0], tomo.clustering_zmax[tomo.clustering_Nbin - 1], NULL,
+          GSL_WORKSPACE_SIZE) :
+        int_gsl_integrate_medium_precision(int_nlens, NULL, 
+          tomo.clustering_zmin[0], tomo.clustering_zmax[tomo.clustering_Nbin - 1], NULL,
+          GSL_WORKSPACE_SIZE);
 
-      {
-        const int i = 0;
-        double ar[2];
-        ar[0] = tomo.clustering_zmin[i];
-        ar[1] = tomo.clustering_zmax[i];
-        
-        const double res = int_gsl_integrate_medium_precision(int_nlens, (void*) ar, ar[0], 
-          ar[1], NULL, GSL_WORKSPACE_SIZE);
-        
-        table[i + 1][0] = res / norm * survey.n_lens;
-        
-        if (table[i + 1][0] < 0.001 || table[i + 1][0] > 100) 
+      #pragma omp parallel for 
+      for (int i=0; i<tomo.clustering_Nbin; i++) 
+      { // OMP: nlens depends on pf_photoz which is already initialized        
+        const double res = like.high_def_integration == 1 ?
+          int_gsl_integrate_high_precision(int_nlens, NULL, 
+            tomo.clustering_zmin[i], tomo.clustering_zmax[i], NULL, GSL_WORKSPACE_SIZE) :
+          int_gsl_integrate_medium_precision(int_nlens, NULL, 
+            tomo.clustering_zmin[i], tomo.clustering_zmax[i], NULL, GSL_WORKSPACE_SIZE);
+
+        table[i + 1] = res / norm * survey.n_lens;
+
+        if (table[i + 1] < 0.001 || table[i + 1] > 100) 
         {
-          log_fatal("nlens(%d) = %e\n outside expected range", i, table[i + 1][0]);
-          exit(1);
-        }
-      }     
-      #pragma omp parallel for
-      for (int i=1; i<tomo.clustering_Nbin; i++) 
-      {
-        double ar[2];
-        ar[0] = tomo.clustering_zmin[i];
-        ar[1] = tomo.clustering_zmax[i];
-        
-        const double res = int_gsl_integrate_medium_precision(int_nlens, (void*) ar, ar[0], 
-          ar[1], NULL, GSL_WORKSPACE_SIZE);
-        
-        table[i + 1][0] = res / norm * survey.n_lens;
-        
-        if (table[i + 1][0] < 0.001 || table[i + 1][0] > 100) 
-        {
-          log_fatal("nlens(%d) = %e\n outside expected range", i, table[i + 1][0]);
+          log_fatal("nlens(%d) = %e\n outside expected range", i, table[i + 1]);
           exit(1);
         }
       }
     }
-    
-    table[0][0] = survey.n_lens;
+    table[0] = survey.n_lens;
   }
-
-  if(ni < -1 || ni > tomo.clustering_Nbin - 1)
+  if (ni < -1 || ni > tomo.clustering_Nbin - 1)
   {
     log_fatal("invalid bin input ni = %d", ni);
     exit(1);
   } 
-  return table[ni + 1][0];
+  return table[ni + 1];
 }
 
 double int_for_zmean(double z, void* params) 
@@ -1971,54 +2290,47 @@ double norm_for_zmean(double z, void* params)
   return pf_photoz(z, ni);
 }
 
-double zmean(int ni) 
+double zmean(const int ni)
 { // mean true redshift of galaxies in tomography bin j
-  static double** table = 0;
+  static double* table = 0;
+  
   if (table == 0) 
   {
+    table = (double*) malloc(sizeof(double)*(tomo.clustering_Nbin+1));
     #pragma GCC diagnostic push
     #pragma GCC diagnostic ignored "-Wunused-variable"
     {
       double init = pf_photoz(0., 0);
     }
     #pragma GCC diagnostic pop
-    
-    table = create_double_matrix(0, tomo.clustering_Nbin, 0, 1);
-
-    {
-      const int i = 0;
-      double ar[1];
-      ar[0] = (double) i;
-
-      table[i][0] = int_gsl_integrate_low_precision(int_for_zmean, (void*) ar, 
-        tomo.clustering_zmin[i], tomo.clustering_zmax[i], NULL, GSL_WORKSPACE_SIZE) /
-        int_gsl_integrate_low_precision(norm_for_zmean, (void*) ar, tomo.clustering_zmin[i],
-        tomo.clustering_zmax[i], NULL, GSL_WORKSPACE_SIZE);
-    }
     #pragma omp parallel for
-    for (int i=1; i<tomo.clustering_Nbin; i++) 
+    for (int i=0; i<tomo.clustering_Nbin; i++) 
     {
-      double ar[1];
-      ar[0] = (double) i;
-      table[i][0] = int_gsl_integrate_low_precision(int_for_zmean, (void*) ar, 
-        tomo.clustering_zmin[i], tomo.clustering_zmax[i], NULL, GSL_WORKSPACE_SIZE) /
+      double ar[1] = {(double) i};
+      table[i] = like.high_def_integration == 1 ?
+        int_gsl_integrate_medium_precision(int_for_zmean, (void*) ar, 
+          tomo.clustering_zmin[i], tomo.clustering_zmax[i], NULL, GSL_WORKSPACE_SIZE) /
+        int_gsl_integrate_medium_precision(norm_for_zmean, (void*) ar, tomo.clustering_zmin[i],
+          tomo.clustering_zmax[i], NULL, GSL_WORKSPACE_SIZE) :
+        int_gsl_integrate_low_precision(int_for_zmean, (void*) ar, 
+          tomo.clustering_zmin[i], tomo.clustering_zmax[i], NULL, GSL_WORKSPACE_SIZE) /
         int_gsl_integrate_low_precision(norm_for_zmean, (void*) ar, tomo.clustering_zmin[i],
-        tomo.clustering_zmax[i], NULL, GSL_WORKSPACE_SIZE);
+          tomo.clustering_zmax[i], NULL, GSL_WORKSPACE_SIZE);
     }
   }
-  if(ni < -1 || ni > tomo.clustering_Nbin - 1)
+  if (ni < -1 || ni > tomo.clustering_Nbin - 1)
   {
     log_fatal("invalid bin input ni = %d", ni);
     exit(1);
   } 
-  return table[ni][0];
+  return table[ni];
 }
 
 double int_for_zmean_source(double z, void* params) 
 {
   double* ar = (double*) params;
   const int ni = (int) ar[0];
-  if(ni < -1 || ni > tomo.shear_Nbin - 1)
+  if (ni < -1 || ni > tomo.shear_Nbin - 1)
   {
     log_fatal("invalid bin input ni = %d", ni);
     exit(1);
@@ -2028,7 +2340,7 @@ double int_for_zmean_source(double z, void* params)
 
 double zmean_source(int ni) 
 { // mean true redshift of source galaxies in tomography bin j
-  static double** table = 0;
+  static double* table = 0;
   
   if (table == 0) 
   {
@@ -2036,26 +2348,20 @@ double zmean_source(int ni)
     #pragma GCC diagnostic ignored "-Wunused-variable"
     {
       double init = zdistr_photoz(0., 0);
-     
     }
     #pragma GCC diagnostic pop
 
-    table = create_double_matrix(0, tomo.shear_Nbin - 1, 0, 1);
+    table = (double*) malloc(sizeof(double)*tomo.shear_Nbin);
 
-    {
-      const int i = 0;
-      double ar[1];
-      ar[0] = (double) i;
-      table[i][0] = int_gsl_integrate_medium_precision(int_for_zmean_source, (void*) ar, 
-        tomo.shear_zmin[i], tomo.shear_zmax[i], NULL, GSL_WORKSPACE_SIZE);
-    }
     #pragma omp parallel for
-    for (int i=1; i<tomo.shear_Nbin; i++) 
+    for (int i=0; i<tomo.shear_Nbin; i++) 
     {
-      double ar[1];
-      ar[0] = (double) i;
-      table[i][0] = int_gsl_integrate_medium_precision(int_for_zmean_source, (void*) ar, 
-        tomo.shear_zmin[i], tomo.shear_zmax[i], NULL, GSL_WORKSPACE_SIZE);
+      double ar[1] = {(double) i};
+      table[i] = like.high_def_integration == 1 ? 
+        int_gsl_integrate_high_precision(int_for_zmean_source, (void*) ar, 
+          tomo.shear_zmin[i], tomo.shear_zmax[i], NULL, GSL_WORKSPACE_SIZE) :
+        int_gsl_integrate_medium_precision(int_for_zmean_source, (void*) ar, 
+          tomo.shear_zmin[i], tomo.shear_zmax[i], NULL, GSL_WORKSPACE_SIZE);
     }
   }
   if(ni < 0 || ni > tomo.shear_Nbin - 1)
@@ -2063,7 +2369,7 @@ double zmean_source(int ni)
     log_fatal("invalid bin input ni = %d", ni);
     exit(1);
   } 
-  return table[ni][0];
+  return table[ni];
 }
 
 double max_g_tomo(int zs) 
@@ -2134,89 +2440,71 @@ double g_tomo(double ainput, int ni) // for tomography bin ni
   static cosmopara C;
   static double** table = 0;
   
-  const double da = (0.999999 - 1.0/(redshift.shear_zdistrpar_zmax + 1.))/(Ntable.N_a - 1.0);
-  const double z_shear_max = redshift.shear_zdistrpar_zmax;
-  const double amin = 1. / (z_shear_max + 1.);
+  const int N_z = tomo.shear_Nbin; 
+  const int N_a = Ntable.N_a; 
+  const double amin = 1./(redshift.shear_zdistrpar_zmax + 1.);
+  const double amax = 0.999999;
+  const double da = (amax - amin)/((double) N_a - 1.0);
 
-  if (table == 0 || recompute_zphot_shear(N) || recompute_cosmo3D(C)) 
+  if (table == 0) 
   {
-    if (table == 0) 
+    table = (double**) malloc(sizeof(double*)*(N_z+1));
+    for (int i=0; i<(N_z+1); i++)
     {
-      table = create_double_matrix(0, tomo.shear_Nbin, 0, Ntable.N_a - 1);
+      table[i] = (double*) malloc(sizeof(double)*N_a);
     }
+  }
 
-    { // j=-1, no tomography is being done
-      const int j = -1;
+  if (table == 0) 
+  {
+    table = create_double_matrix(0, tomo.shear_Nbin, 0, Ntable.N_a - 1);
+  }
+  if (recompute_zphot_shear(N) || recompute_cosmo3D(C)) 
+  {
+    { // init static variables
+      double ar[2];
+      ar[1] = chi(amin);
       {
-        const int i = 0;
+        const int j = -1;
+        ar[0] = (double) j; 
+        #pragma GCC diagnostic push
+        #pragma GCC diagnostic ignored "-Wunused-variable"
+        {
+          double init = int_for_g_tomo(amin, (void*) ar);
+        }
+        #pragma GCC diagnostic pop
+      } 
+      if (tomo.shear_Nbin > 0) 
+      { 
+        const int j = 0;      
+        ar[0] = (double) j;
+
+        #pragma GCC diagnostic push
+        #pragma GCC diagnostic ignored "-Wunused-variable"
+        {
+          double init = int_for_g_tomo(amin, (void*) ar);
+        }
+        #pragma GCC diagnostic pop
+      }
+    }    
+    #pragma omp parallel for collapse(2)
+    for (int j=-1; j<tomo.shear_Nbin; j++) 
+    {
+      for (int i=0; i<Ntable.N_a; i++) 
+      {
         const double a = amin + i*da;
         
         double ar[2];
-        ar[0] = (double) j; // if j=-1, no tomography is being done
+        ar[0] = (double) j;          
         ar[1] = chi(a);
         
-        table[j + 1][i] = 
-          int_gsl_integrate_medium_precision(int_for_g_tomo, (void*) ar, amin, a, NULL, 4000);
-      }
-      #pragma omp parallel for
-      for (int i=1; i<Ntable.N_a; i++) 
-      {
-        const double a = amin + i*da;
-        
-        double ar[2];
-        ar[0] = (double) j; // if j=-1, no tomography is being done
-        ar[1] = chi(a);
-        
-        table[j + 1][i] = 
-          int_gsl_integrate_medium_precision(int_for_g_tomo, (void*) ar, amin, a, NULL, 4000);
+        table[j+1][i] = like.high_def_integration == 1 ? 
+          int_gsl_integrate_medium_precision(int_for_g_tomo,
+            (void*) ar, amin, a, NULL, GSL_WORKSPACE_SIZE) :
+          int_gsl_integrate_low_precision(int_for_g_tomo,
+            (void*) ar, amin, a, NULL, GSL_WORKSPACE_SIZE);
       }
     }
-    
-    if (tomo.shear_Nbin > 0) 
-    {
-      {
-        const int j = 0;
-        {
-          const int i = 0;
-          const double a = amin + i*da;
-          
-          double ar[2];
-          ar[0] = (double) j;
-          ar[1] = chi(a);
-          
-          table[j + 1][i] = 
-            int_gsl_integrate_medium_precision(int_for_g_tomo, (void*) ar, amin, a, NULL, 4000);
-        }
-        #pragma omp parallel for
-        for (int i=1; i<Ntable.N_a; i++)  
-        {
-          const double a = amin + i*da;
-  
-          double ar[2];
-          ar[0] = (double) j;
-          ar[1] = chi(a);
-          
-          table[j + 1][i] = 
-            int_gsl_integrate_medium_precision(int_for_g_tomo, (void*) ar, amin, a, NULL, 4000);
-        }
-      }
-      #pragma omp parallel for
-      for (int j=1; j<tomo.shear_Nbin; j++) 
-      {
-        for (int i=0; i<Ntable.N_a; i++)  
-        {
-          const double a = amin + i*da;
-
-          double ar[2];
-          ar[0] = (double) j;
-          ar[1] = chi(a);
-          
-          table[j + 1][i] = 
-            int_gsl_integrate_medium_precision(int_for_g_tomo, (void*) ar, amin, a, NULL, 4000);
-        }
-      }
-    }
-    
     update_nuisance(&N);
     update_cosmopara(&C);
   }
@@ -2234,7 +2522,7 @@ double g_tomo(double ainput, int ni) // for tomography bin ni
   }
   else
   {
-    res = interpol(table[ni + 1], Ntable.N_a, amin, 0.999999, da, ainput, 1.0, 1.0); 
+    res = interpol(table[ni + 1], Ntable.N_a, amin, amax, da, ainput, 1.0, 1.0); 
   }
 
   return res;
@@ -2269,86 +2557,66 @@ double g2_tomo(double a, int ni)
   static cosmopara C;
   static double** table = 0;
   
-  const double da = (0.999999-1./(redshift.shear_zdistrpar_zmax+1.))/(Ntable.N_a-1);
+  const int N_z = tomo.shear_Nbin; 
+  const int N_a = Ntable.N_a; 
+  const double amin = 1./(redshift.shear_zdistrpar_zmax + 1.);
+  const double amax = 0.999999;
+  const double da = (amax - amin)/((double) N_a - 1.0);
 
-  if (table == 0 || recompute_zphot_shear(N) || recompute_cosmo3D(C)) 
+  if (table == 0) 
   {
-    if (table == 0) 
+    table = (double**) malloc(sizeof(double*)*(N_z+1));
+    for (int i=0; i<(N_z+1); i++)
     {
-      table = create_double_matrix(0, tomo.shear_Nbin, 0, Ntable.N_a-1);
+      table[i] = (double*) malloc(sizeof(double)*N_a);
     }
-
-    { // j=-1, no tomography is being done
-      const int j = -1;
+  }
+  if (recompute_zphot_shear(N) || recompute_cosmo3D(C)) 
+  {
+    { // init static variables
+      double ar[2];
+      ar[1] = chi(amin);
       {
-        const int i = 0;
-        const double a = 1./(redshift.shear_zdistrpar_zmax + 1.) + i*da; 
+        const int j = -1;
+        ar[0] = (double) j; 
+        #pragma GCC diagnostic push
+        #pragma GCC diagnostic ignored "-Wunused-variable"
+        {
+          double init = int_for_g2_tomo(amin, (void*) ar);
+        }
+        #pragma GCC diagnostic pop
+      } 
+      if (tomo.shear_Nbin > 0) 
+      { 
+        const int j = 0;      
+        ar[0] = (double) j;
+
+        #pragma GCC diagnostic push
+        #pragma GCC diagnostic ignored "-Wunused-variable"
+        {
+          double init = int_for_g2_tomo(amin, (void*) ar);
+        }
+        #pragma GCC diagnostic pop
+      }
+    }     
+    #pragma omp parallel for collapse(2)
+    for (int j=-1; j<tomo.shear_Nbin; j++) 
+    {
+      for (int i=0; i<Ntable.N_a; i++) 
+      {
+        const double a = amin + i*da;
         
         double ar[2];
-        ar[0] = (double) j; 
+        ar[0] = (double) j;          
         ar[1] = chi(a);
-        
-        table[j+1][i] = int_gsl_integrate_medium_precision(int_for_g2_tomo, (void*) ar,
-          1./(redshift.shear_zdistrpar_zmax+1.), a, NULL, 4000);
-      }      
-      #pragma omp parallel for
-      for (int i=1; i<Ntable.N_a; i++) 
-      {
-        const double a = 1./(redshift.shear_zdistrpar_zmax + 1.) + i*da; 
-        
-        double ar[2];
-        ar[0] = (double) j; 
-        ar[1] = chi(a);
-        
-        table[j+1][i] = int_gsl_integrate_medium_precision(int_for_g2_tomo, (void*) ar,
-          1./(redshift.shear_zdistrpar_zmax+1.), a, NULL, 4000);
-      }
-    }
-  	if (tomo.shear_Nbin > 0) 
-    {
-      {
-        const int j = 0;
-        {
-          const int i = 0;
-          const double a = 1./(redshift.shear_zdistrpar_zmax + 1.) + i*da;
-          
-          double ar[2];
-          ar[0] = (double) j;
-          ar[1] = chi(a);
-          
-          table[j+1][i] = int_gsl_integrate_medium_precision(int_for_g2_tomo,
-            (void*) ar, 1./(redshift.shear_zdistrpar_zmax+1.), a, NULL, 4000);
-        }
-        #pragma omp parallel for
-        for (int i=1; i<Ntable.N_a; i++) 
-        {
-          const double a = 1./(redshift.shear_zdistrpar_zmax + 1.) + i*da;
-          
-          double ar[2];
-          ar[0] = (double) j;
-          ar[1] = chi(a);
-          
-          table[j+1][i] = int_gsl_integrate_medium_precision(int_for_g2_tomo,
-            (void*) ar, 1./(redshift.shear_zdistrpar_zmax+1.), a, NULL, 4000);
-        }
-      }
-      #pragma omp parallel for
-      for (int j=1; j<tomo.shear_Nbin; j++) 
-      {
-        for (int i=0; i<Ntable.N_a; i++) 
-        {
-          const double a = 1./(redshift.shear_zdistrpar_zmax+1.) + i*da;
-          
-          double ar[2];
-          ar[0] = (double) j;          
-          ar[1] = chi(a);
-          
-          table[j+1][i] = int_gsl_integrate_medium_precision(int_for_g2_tomo,
-             (void*) ar, 1./(redshift.shear_zdistrpar_zmax+1.), a, NULL, 4000);
-        }
-      }
-    }
 
+        table[j+1][i] = like.high_def_integration == 1 ? 
+          int_gsl_integrate_high_precision(int_for_g2_tomo,
+            (void*) ar, amin, a, NULL, GSL_WORKSPACE_SIZE) :
+          int_gsl_integrate_medium_precision(int_for_g2_tomo,
+            (void*) ar, amin, a, NULL, GSL_WORKSPACE_SIZE);
+      }
+    }
     update_nuisance(&N);
     update_cosmopara(&C);
   }
@@ -2360,16 +2628,14 @@ double g2_tomo(double a, int ni)
   } 
 
   double res;
-  if (a <= 1./(redshift.shear_zdistrpar_zmax+1.) || a > 1.0 - da) 
+  if (a <= amin || a > 1.0 - da) 
   {
     res = 0.0;
   }
   else 
   {
-    const double amin =  1./(redshift.shear_zdistrpar_zmax + 1.);
-    res = interpol(table[ni + 1], Ntable.N_a, amin, 0.999999, da, a, 1.0, 1.0);
-  }
-  
+    res = interpol(table[ni + 1], Ntable.N_a, amin, amax, da, a, 1.0, 1.0);
+  }  
   return res;
 }
 
@@ -2397,87 +2663,66 @@ double g_lens(double a, int ni)
   static cosmopara C;
   static double** table = 0;
   
-  const double da = (0.999999 - 1. / (redshift.clustering_zdistrpar_zmax + 1.))/(Ntable.N_a - 1);
+  const int N_z = tomo.clustering_Nbin; 
+  const int N_a = Ntable.N_a;
+  const double amin = 1.0/(redshift.clustering_zdistrpar_zmax + 1.0);
+  const double amax = 0.999999;
+  const double da = (amax - amin)/((double) N_a - 1.0);
+  const double amin_shear = 1. / (redshift.shear_zdistrpar_zmax + 1.);
 
-  if (table == 0 || recompute_zphot_clustering(N) || recompute_cosmo3D(C)) 
+  if (table == 0) 
   {
-    if (table == 0) 
+    table = (double**) malloc(sizeof(double*)*(N_z+1));
+    for (int i=0; i<(N_z+1); i++)
     {
-      table = create_double_matrix(0, tomo.clustering_Nbin, 0, Ntable.N_a - 1);
+      table[i] = (double*) malloc(sizeof(double)*N_a);
     }
-
+  }
+  if (recompute_zphot_clustering(N) || recompute_cosmo3D(C)) 
+  {
     {
-      const int j = -1;
-      {
-        const int i = 0;
-        const double a = 1./(redshift.clustering_zdistrpar_zmax + 1.) + i*da;
-        
-        double ar[2];
-        ar[0] = (double) j; // j=-1, no tomography is being done        
-        ar[1] = chi(a);
-        
-        table[j + 1][i] = int_gsl_integrate_medium_precision(int_for_g_lens, (void*) ar,
-          1. / (redshift.shear_zdistrpar_zmax + 1.), a, NULL, 4000);
-      }
-      #pragma omp parallel for
-      for (int i=1; i<Ntable.N_a; i++) 
-      {
-        const double a = 1./(redshift.clustering_zdistrpar_zmax + 1.) + i*da;
-        
-        double ar[2];
-        ar[0] = (double) j; // j=-1, no tomography is being done        
-        ar[1] = chi(a);
-        
-        table[j + 1][i] = int_gsl_integrate_medium_precision(int_for_g_lens, (void*) ar,
-          1. / (redshift.shear_zdistrpar_zmax + 1.), a, NULL, 4000);
-      }
-    }
-    
-    if (tomo.clustering_Nbin > 0) 
-    {
-      {
-        const int j = 0;
+      double ar[2];
+      ar[1] = chi(amin);
+      { // init static variables
+        const int j = -1;
+        ar[0] = (double) j; // j = -1, no tomography is being done        
+        #pragma GCC diagnostic push
+        #pragma GCC diagnostic ignored "-Wunused-variable"
         {
-          const int i = 0;
-          const double a = 1./(redshift.clustering_zdistrpar_zmax + 1.) + i*da;
-          
-          double ar[2];
-          ar[0] = (double) j; 
-          ar[1] = chi(a);
-          
-          table[j + 1][i] = int_gsl_integrate_medium_precision(int_for_g_lens,
-            (void*) ar, 1./(redshift.shear_zdistrpar_zmax + 1.), a, NULL, 4000);
+          double init = int_for_g_lens(amin_shear, (void*) ar);
         }
-        #pragma omp parallel for
-        for (int i=1; i<Ntable.N_a; i++) 
+        #pragma GCC diagnostic pop
+        if (tomo.clustering_Nbin > 0) 
         {
-          const double a = 1./(redshift.clustering_zdistrpar_zmax + 1.) + i*da;
-          
-          double ar[2];
-          ar[0] = (double) j; 
-          ar[1] = chi(a);
-          
-          table[j + 1][i] = int_gsl_integrate_medium_precision(int_for_g_lens,
-            (void*) ar, 1./(redshift.shear_zdistrpar_zmax + 1.), a, NULL, 4000);
+          const int j = 0;
+          ar[0] = (double) j;
+          #pragma GCC diagnostic push
+          #pragma GCC diagnostic ignored "-Wunused-variable"
+          {
+            double init = int_for_g_lens(amin_shear, (void*) ar);
+          }
+          #pragma GCC diagnostic pop 
         }
       }
-      #pragma omp parallel for
-      for (int j=1; j<tomo.clustering_Nbin; j++) 
+    }
+    #pragma omp parallel for collapse(2)
+    for (int j=-1; j<tomo.clustering_Nbin; j++) 
+    {
+      for (int i=0; i<Ntable.N_a; i++) 
       {
         double ar[2];
         ar[0] = (double) j; // if j=-1, no tomography is being done
-        for (int i=0; i<Ntable.N_a; i++) 
-        {
-          const double a =  1./(redshift.clustering_zdistrpar_zmax + 1.) + i*da;
-          
-          ar[1] = chi(a);
-          
-          table[j + 1][i] = int_gsl_integrate_medium_precision(int_for_g_lens, (void*) ar,
-            1. / (redshift.shear_zdistrpar_zmax + 1.), a, NULL, 4000);
-        }
+
+        const double a =  amin + i*da;
+        ar[1] = chi(a);
+        
+        table[j + 1][i] = like.high_def_integration == 1 ?
+          int_gsl_integrate_medium_precision(int_for_g_lens,
+            (void*) ar, amin_shear, a, NULL, GSL_WORKSPACE_SIZE) :
+          int_gsl_integrate_low_precision(int_for_g_lens,
+            (void*) ar, amin_shear, a, NULL, GSL_WORKSPACE_SIZE);
       }
     }
-
     update_nuisance(&N);
     update_cosmopara(&C);
   }
@@ -2487,18 +2732,15 @@ double g_lens(double a, int ni)
     log_fatal("invalid bin input ni = %d", ni);
     exit(1);
   }
-
   double res;
-  if (a <= 1. / (redshift.clustering_zdistrpar_zmax + 1.) || a > 1.0 - da) 
+  if (a < amin || a > 1.0 - da) 
   {
     res = 0.0;
   }
   else 
   {
-    const double amin = 1. / (redshift.clustering_zdistrpar_zmax + 1.);
-    res = interpol(table[ni + 1], Ntable.N_a, amin, 0.999999, da, a, 1.0, 1.0); 
+    res = interpol(table[ni + 1], Ntable.N_a, amin, amax, da, a, 1.0, 1.0); 
   }
-  
   return res;
 }
 
@@ -2514,9 +2756,106 @@ double g_cmb(double a)
     fchi_cmb = f_K(chi_cmb);
     update_cosmopara(&C);
   }
-
-  return f_K(chi_cmb-chi(a))/fchi_cmb;
+  return f_K(chi_cmb - chi(a))/fchi_cmb;
 }
+
+double int_for_g_lens_cl(double aprime, void* params)
+{
+  double* ar = (double*) params;
+  const int ni = (int) ar[0];
+  const double a = ar[1];
+  const int nl = (int) ar[2];
+  if (ni < -1 || ni > tomo.cluster_Nbin - 1)
+  {
+    log_fatal("invalid bin input ni = %d (max %d)", ni, tomo.cluster_Nbin);
+    exit(1);
+  }
+  if (nl < 0 || nl > Cluster.N200_Nbin - 1)
+  {
+    log_fatal("invalid bin input ni = %d (max %d)", nl, Cluster.N200_Nbin);
+    exit(1);
+  } 
+  const double zprime = 1.0/aprime - 1.0;
+  const double chi1 = chi(a);
+  const double chiprime = chi(aprime);
+  return zdistr_cluster(zprime, ni)*f_K(chiprime - chi1)/f_K(chiprime)/(aprime*aprime);
+}
+
+double g_lens_cluster(const double a, const int nz, const int nl)
+{ 
+  static cosmopara C;
+  static double** table = 0;
+
+  const int N_z = tomo.cluster_Nbin;
+  const int N_l = Cluster.N200_Nbin;
+  if (nl < 0 || nl > N_l - 1)
+  {
+    log_fatal("invalid bin input ni = %d (max %d)", nl, N_l);
+    exit(1);
+  } 
+  const int na =  Ntable.N_a; 
+  const double amin = 1.0/(tomo.cluster_zmax[tomo.cluster_Nbin - 1] + 1.);
+  const double amax = 0.999999;
+  const double da = (amax - amin)/((double) na - 1.0);
+  
+  if (table == 0) 
+  {
+    table = (double**) malloc(sizeof(double*)*(tomo.cluster_Nbin + 1));
+    for (int i=0; i<tomo.cluster_Nbin+1; i++)
+    {
+      table[i] = (double*) malloc(sizeof(double)*na);
+    }
+  }
+  if (recompute_cosmo3D(C) /* there is no nuisance bias/sigma parameters yet*/)
+  {
+    { // init static vars only, if j=-1, no tomography is being done
+      double ar[3];
+      ar[0] = (double) -1; // j = -1 no tomography is being done
+      ar[1] = amin;
+      ar[2] = (double) 0;
+      int_for_g_lens_cl(amin, (void*) ar);
+      if (N_z > 0)
+      {
+        ar[0] = (double) 0;
+        int_for_g_lens_cl(amin, (void*) ar);
+      }
+    } 
+    #pragma omp parallel for collapse(2)
+    for (int j=-1; j<N_z; j++) 
+    { 
+      for (int i=0; i<na; i++) 
+      {
+        const double aa = amin + i*da;
+        double ar[3];
+        ar[0] = (double) j; 
+        ar[1] = aa;
+        ar[2] = nl;
+        table[j + 1][i] = int_gsl_integrate_medium_precision(int_for_g_lens_cl, (void*) ar, 
+          1.0/(redshift.shear_zdistrpar_zmax + 1.0), aa, NULL, 4000); 
+      }      
+    }  
+    update_cosmopara(&C);
+  }
+  if (nz < -1 || nz > N_z - 1)
+  {
+    log_fatal("invalid bin input ni = %d (max %d)", nz, N_z);
+    exit(1);
+  }
+  if (a < amin || a > amax)
+  {
+    log_fatal("a = %e outside look-up table range [%e,%e]", a, amin, amax);
+    exit(1);
+  }
+  return interpol(table[nz + 1], na, amin, amax, da, a, 1.0, 1.0); 
+}
+
+// ---------------------------------------------------------------------------------------
+// ---------------------------------------------------------------------------------------
+// ---------------------------------------------------------------------------------------
+// routines for association of a pair redshift bin numbers and power spectrum tomography bin
+// ---------------------------------------------------------------------------------------
+// ---------------------------------------------------------------------------------------
+// ---------------------------------------------------------------------------------------
 
 double int_for_ggl_efficiency(double z, void* params) 
 {
@@ -2553,107 +2892,45 @@ double ggl_efficiency(int ni, int nj)
     }
     #pragma GCC diagnostic pop
     
-    table = create_double_matrix(0, tomo.clustering_Nbin, 0, tomo.shear_Nbin);
-    
+    table = (double**) malloc(sizeof(double*)*(tomo.clustering_Nbin+1));
+    for (int i=0; i<(tomo.clustering_Nbin+1); i++)
+    {
+      table[i] = (double*) malloc(sizeof(double)*(tomo.shear_Nbin+1));
+    }
     {
       const int i = 0;
-      {
-        const int j=0;
-
-        double ar[2];
-        ar[0] = (double) i;
-        ar[1] = (double) j;
-        table[i][j] = int_gsl_integrate_medium_precision(int_for_ggl_efficiency, (void*) ar,
-          tomo.clustering_zmin[i], tomo.clustering_zmax[i], NULL, GSL_WORKSPACE_SIZE)/max_g_tomo(j);
-      }
-      #pragma omp parallel for
-      for (int j=1; j<tomo.shear_Nbin; j++) 
-      {
-        double ar[2];
-        ar[0] = (double) i;
-        ar[1] = (double) j;
-        
-        table[i][j] = int_gsl_integrate_medium_precision(int_for_ggl_efficiency, (void*) ar,
-          tomo.clustering_zmin[i], tomo.clustering_zmax[i], NULL, GSL_WORKSPACE_SIZE)/max_g_tomo(j);
-      }
+      const int j = 0;
+      double ar[2];
+      ar[0] = (double) i;
+      ar[1] = (double) j;
+      #pragma GCC diagnostic push
+      #pragma GCC diagnostic ignored "-Wunused-variable"
+      double init = int_for_ggl_efficiency(tomo.clustering_zmin[i], (void*) ar);
+      double init2 = max_g_tomo(j);
+      #pragma GCC diagnostic pop
     }
-    #pragma omp parallel for
-    for (int i=1; i<tomo.clustering_Nbin; i++) 
+    #pragma omp parallel for collapse (2)
+    for (int i=0; i<tomo.clustering_Nbin; i++) 
     {
       for (int j=0; j<tomo.shear_Nbin; j++) 
       {
         double ar[2];
         ar[0] = (double) i;
         ar[1] = (double) j;
-        table[i][j] = int_gsl_integrate_medium_precision(int_for_ggl_efficiency, (void*) ar,
-          tomo.clustering_zmin[i], tomo.clustering_zmax[i], NULL, GSL_WORKSPACE_SIZE)/max_g_tomo(j);
+        table[i][j] = like.high_def_integration == 1 ?
+          int_gsl_integrate_high_precision(int_for_ggl_efficiency, (void*) ar,
+            tomo.clustering_zmin[i], tomo.clustering_zmax[i], NULL, 
+            GSL_WORKSPACE_SIZE)/max_g_tomo(j) :
+          int_gsl_integrate_medium_precision(int_for_ggl_efficiency, (void*) ar,
+            tomo.clustering_zmin[i], tomo.clustering_zmax[i], NULL, 
+            GSL_WORKSPACE_SIZE)/max_g_tomo(j);
       }
     }
   }
-
   if(ni < 0 || ni > tomo.clustering_Nbin - 1 || nj < 0 || nj > tomo.shear_Nbin - 1)
   {
     log_fatal("invalid bin input (ni, nj) = (%d, %d)", ni, nj);
     exit(1);
   }  
   return table[ni][nj];
-}
-
-// ---------------------------------------------------------------------------------------
-// ---------------------------------------------------------------------------------------
-// ---------------------------------------------------------------------------------------
-// SELECTION FUNCTION (CLUSTER)
-// ---------------------------------------------------------------------------------------
-// ---------------------------------------------------------------------------------------
-// ---------------------------------------------------------------------------------------
-
-double dV_cluster(double chi, double hoverh0)
-{ 
-  const double fK = f_K(chi);
-  return fK*fK/hoverh0;
-}
-
-double dV_cluster2(double z, void* param __attribute__((unused)))
-{ 
-  const double a = 1./(1.+ z);
-  struct chis chidchi = chi_all(a);
-  const double hoverh0 = hoverh0v2(a, chidchi.dchida);
-  return  dV_cluster(chidchi.chi, hoverh0);
-}
-
-double norm_z_cluster(int nz)
-{
-  static cosmopara C;
-  static double **table;
-  
-  if (table == 0) 
-  {
-    table = create_double_matrix(0, tomo.cluster_Nbin - 1, 0, 1);
-  }
-  if(recompute_cosmo3D(C))
-  {
-    double ar[2] = {0.0, 0.0}; // not used
-    {
-      const int i = 0;
-      table[i][0] = int_gsl_integrate_high_precision(dV_cluster2, (void*) ar, 
-        tomo.cluster_zmin[i], tomo.cluster_zmax[i], NULL, GSL_WORKSPACE_SIZE);
-    }
-    #pragma omp parallel for
-    for (int i=1; i<tomo.cluster_Nbin; i++)
-    {
-      table[i][0] = int_gsl_integrate_high_precision(dV_cluster2, (void*) ar, 
-        tomo.cluster_zmin[i], tomo.cluster_zmax[i], NULL, GSL_WORKSPACE_SIZE);
-    }
-    update_cosmopara(&C);
-  }
-  return table[nz][0];
-}
-
-double zdistr_cluster(int nz, double z, double chi, double hoverh0) 
-{ //simplfied selection function, disregards evolution of N-M relation+mass function within z bin
-  if (z > tomo.cluster_zmax[nz] || z < tomo.cluster_zmin[nz]) 
-  {
-    return 0.0;
-  }
-  return dV_cluster(chi, hoverh0)/norm_z_cluster(nz);
 }

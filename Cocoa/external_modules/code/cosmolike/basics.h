@@ -1,5 +1,6 @@
 #include <fftw3.h>
 #include <gsl/gsl_matrix.h>
+#include "structs.h"
 
 #ifndef __COSMOLIKE_BASICS_H
 #define __COSMOLIKE_BASICS_H
@@ -9,70 +10,12 @@ extern "C" {
 
 #define NR_END 1
 #define FREE_ARG char *
-#define EXIT_MISSING_FILE(ein, purpose, filename)                              \
-  if (!ein) {                                                                  \
-    fprintf(stderr, "Could not find %s file %s\n", purpose, filename);         \
-    exit(1);                                                                   \
-  }
 
-static double darg __attribute__((unused)), maxarg1 __attribute__((unused)),
-    maxarg2 __attribute__((unused));
+double fmin(const double a, const double b);
 
-#define FMAX(a, b)                                                             \
-  (maxarg1 = (a), maxarg2 = (b), (maxarg1) > (maxarg2) ? (maxarg1) : (maxarg2))
-#define FMIN(a, b)                                                             \
-  (maxarg1 = (a), maxarg2 = (b), (maxarg1) < (maxarg2) ? (maxarg1) : (maxarg2))
+double fmax(const double a, const double b);
 
-typedef struct 
-{
-  double pi;
-  double pi_sqr;
-  double twopi;
-  double ln2;
-  double arcmin;
-  double lightspeed;
-} con;
-
-typedef struct 
-{
-  double low;
-  double medium;
-  double high;
-  double insane;
-} pre;
-
-typedef struct {
-  double a_min;
-  double k_min_cH0;
-  double k_max_cH0;
-  double M_min;
-  double M_max;
-  double P_2_s_min;
-  double P_2_s_max;
-  int LMIN_tab;      // Cosmo2D
-  int LMAX;          // Cosmo2D
-  int LMAX_NOLIMBER; // Cosmo2D
-} lim;
-
-typedef struct {
-  int N_a;
-  int N_k_lin;
-  int N_k_nlin;
-  int N_ell;
-  int N_theta;
-  int N_thetaH;
-  int N_S2;
-  int N_DS;
-  int N_ell_TATT; // Cosmo2D
-} Ntab;
-
-extern con constants;
-
-extern pre precision;
-
-extern lim limits;
-
-extern Ntab Ntable;
+bin_avg set_bin_average(int i_theta, int j_L);
 
 double int_gsl_integrate_high_precision(double (*func)(double, void *),
   void *arg, double a, double b, double *error, int niter);
@@ -111,6 +54,8 @@ void hankel_kernel_FT(double x, fftw_complex *res, double *arg,
 int argc __attribute__((unused)));
 
 void cdgamma(fftw_complex x, fftw_complex *res);
+
+void hankel_kernel_FT_3D(double x, fftw_complex *res, double *arg, int argc);
 
 #ifdef __cplusplus
 }
