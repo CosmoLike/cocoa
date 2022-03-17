@@ -145,60 +145,6 @@ int niter __attribute__((unused))) {
   return res;
 }
 
-// allocate a double matrix with subscript range m[nrl..nrh][ncl..nch]
-double **create_double_matrix(long nrl, long nrh, long ncl, long nch) {
-  long i, nrow = nrh - nrl + 1, ncol = nch - ncl + 1;
-  double **m;
-
-  // allocate pointers to rows
-  m = (double **) calloc(nrow + NR_END, sizeof(double *));
-  if (!m) {
-    log_fatal("allocation failure 1 in create_double_matrix()");
-    exit(1);
-  }
-  m += NR_END;
-  m -= nrl;
-
-  /* allocate rows and set pointers to them */
-  m[nrl] = (double *)calloc(nrow * ncol + NR_END, sizeof(double));
-  if (!m[nrl]) {
-    log_fatal("allocation failure 2 in create_double_matrix()");
-    exit(1);
-  }
-  m[nrl] += NR_END;
-  m[nrl] -= ncl;
-
-  for (i = nrl + 1; i <= nrh; i++)
-    m[i] = m[i - 1] + ncol;
-
-  // return pointer to array of pointers to rows
-  return m;
-}
-
-// free a double matrix allocated by create_double_matrix()
-void free_double_matrix(double **m, long nrl, long nrh __attribute__((unused)),
-long ncl, long nch __attribute__((unused))) {
-  free((FREE_ARG)(m[nrl] + ncl - NR_END));
-  free((FREE_ARG)(m + nrl - NR_END));
-}
-
-// allocate a double vector with subscript range v[nl..nh]
-double *create_double_vector(long nl, long nh) {
-  double *v;
-  v = (double *) calloc(nh - nl + 1 + NR_END, sizeof(double));
-  if (!v) {
-    log_fatal("allocation failure in double vector()");
-    exit(1);
-  }
-  return v - nl + NR_END;
-}
-
-// free a double vector allocated with vector()
-void free_double_vector(double *v, long nl, long nh __attribute__((unused))) {
-  free((FREE_ARG)(v + nl - NR_END));
-}
-
-
 void error(char *s) {
   printf("error:%s\n ", s);
   exit(1);

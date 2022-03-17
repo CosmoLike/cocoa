@@ -2557,35 +2557,34 @@ double C_ss_tomo_TATT_BB_limber(const double l, const int ni, const int nj)
 
 double int_for_C_ss_tomo_limber(double a, void* params)
 {
-  if(!(a>0) || !(a<1)) 
+  if (!(a>0) || !(a<1)) 
   {
     log_fatal("a>0 and a<1 not true");
     exit(1);
   }
-  double* ar = (double* ) params;
+  double* ar = (double*) params;
 
-  // Cocoa: added extra options to reduce code duplication
-  const int use_linear_ps = ar[3];
+  const int n1 = (int) ar[0]; // first source bin 
+  const int n2 = (int) ar[1]; // second source bin 
+  const double l = ar[2];
+  const int use_linear_ps = (int) ar[3];
 
-  // prefactor correction (1812.05995 eqs 74-79)
-  const double ell_prefactor = (ar[2] - 1.)*(ar[2])*(ar[2] + 1.)*(ar[2] + 2.);
-
+  const double ell = l + 0.5;
+  const double ell_prefactor = l*(l - 1.)*(l + 1.)*(l + 2.); // correction (1812.05995 eqs 74-79)
   const double growfac_a = growfac(a);
   struct chis chidchi = chi_all(a);
   const double hoverh0 = hoverh0v2(a, chidchi.dchida);
-
-  const double ell = ar[2] + 0.5;
   const double fK = f_K(chidchi.chi);
   const double k = ell/fK;
   const double ell4 = ell*ell*ell*ell;
 
-  const double ws1 = W_source(a, ar[0], hoverh0);
-  const double ws2 = W_source(a, ar[1], hoverh0);
-  const double wk1 = W_kappa(a, fK, ar[0]);
-  const double wk2 = W_kappa(a, fK, ar[1]);
-
+  const double ws1 = W_source(a, n1, hoverh0);
+  const double ws2 = W_source(a, n2, hoverh0);
+  const double wk1 = W_kappa(a, fK, n1);
+  const double wk2 = W_kappa(a, fK, n2);
+  const double PK = (use_linear_ps == 1) ? p_lin(k,a) : Pdelta(k,a);
+  
   double res = 0.0;
-
   switch(like.IA)
   {
     case 0:
@@ -2596,8 +2595,7 @@ double int_for_C_ss_tomo_limber(double a, void* params)
     }
     case 1:
     {
-      const double norm =
-        A_IA_Joachimi(a)*cosmology.Omega_m*nuisance.c1rhocrit_ia/growfac_a;
+      const double norm = A_IA_Joachimi(a)*cosmology.Omega_m*nuisance.c1rhocrit_ia/growfac_a;
 
       res = ws1*ws2*norm*norm - (ws1*wk2+ws2*wk1)*norm + wk1*wk2;
 
@@ -2614,9 +2612,9 @@ double int_for_C_ss_tomo_limber(double a, void* params)
     case 4:
     {
       const double norm = cosmology.Omega_m*nuisance.c1rhocrit_ia/growfac_a*
-        nuisance.A_ia*pow(1.0/(a*nuisance.oneplusz0_ia), nuisance.eta_ia);
+        nuisance.A_ia*pow(1./(a*nuisance.oneplusz0_ia), nuisance.eta_ia);
 
-      res = ws1*ws2*norm*norm - (ws1*wk2 + ws2*wk1)*norm + wk1*wk2;
+      res = ws1*ws2*norm*norm - (ws1*wk2+ws2*wk1)*norm + wk1*wk2;
 
       break;
     }
@@ -2624,17 +2622,7 @@ double int_for_C_ss_tomo_limber(double a, void* params)
       log_fatal("like.IA = %d not supported", like.IA);
       exit(1);
   }
-
-  if(use_linear_ps == 1)
-  {
-    res *= p_lin(k,a);
-  }
-  else
-  {
-    res *= Pdelta(k,a);
-  }
-
-  return res*(chidchi.dchida/(fK*fK))*ell_prefactor/ell4;
+  return res*PK*(chidchi.dchida/(fK*fK))*ell_prefactor/ell4;
 }
 
 double C_ss_tomo_limber_nointerp(double l, int ni, int nj, int use_linear_ps, 
@@ -2683,7 +2671,11 @@ double C_ss_tomo_limber(double l, int ni, int nj)
 
   if (table == 0)
   {
-    table = create_double_matrix(0, NSIZE - 1, 0, nell - 1);
+    table = (double**) malloc(sizeof(double*)*NSIZE);
+    for (int i=0; i<NSIZE; i++) 
+    {
+      table[i] = (double*) malloc(sizeof(double)*nell);
+    }
   }
 
   if (recompute_shear(C, N))
@@ -2794,86 +2786,61 @@ double int_for_C_gs_tomo_limber_TATT(double a, void* params)
 
 double int_for_C_gs_tomo_limber(double a, void* params)
 {
-  if(!(a>0) || !(a<1)) 
+  if (!(a>0) || !(a<1)) 
   {
     log_fatal("a>0 and a<1 not true");
     exit(1);
   }
   double* ar = (double*) params;
-
+  const int nl = (int) ar[0];
+  const int ns = (int) ar[1];
+  if (nl < 0 || nl > tomo.clustering_Nbin - 1 || ns < 0 || ns > tomo.shear_Nbin - 1)
+  {
+    log_fatal("error in selecting bin number (nl, ns) = [%d,%d]", nl, ns);
+    exit(1);
+  }
+  const double l = ar[2];
   const int use_linear_ps = (int) ar[3];
 
-  // prefactor correction (1812.05995 eqs 74-79)
-  const double ell_prefactor1 = (ar[2])*(ar[2]+1.);
-  double ell_prefactor2 = (ar[2]-1.)*ell_prefactor1*(ar[2]+2.);
-  if (ell_prefactor2 <= 0.)
-  {
-    ell_prefactor2 = 0.;
-  }
-  else
-  {
-    ell_prefactor2 = sqrt(ell_prefactor2);
-  }
+  const double ell_prefactor1 = l*(l + 1.);                   // correction (1812.05995 eqs 74-79)
+  const double tmp = (l - 1.)*l*(l + 1.)*(l + 2.);            // correction (1812.05995 eqs 74-79)
+  const double ell_prefactor2 = (tmp <= 0.) ? 0 : sqrt(tmp);  // correction (1812.05995 eqs 74-79)
 
+  const double ell = l + 0.5;
   const double growfac_a = growfac(a);
   struct chis chidchi = chi_all(a);
   const double hoverh0 = hoverh0v2(a, chidchi.dchida);
-
-  const double ell = ar[2]+0.5;
   const double fK = f_K(chidchi.chi);
   const double k = ell/fK;
+  const double PK = use_linear_ps == 1 ? p_lin(k,a) : Pdelta(k,a);
 
-  const double wgal = W_gal(a, ar[0], chidchi.chi, hoverh0) +
-    W_mag(a, fK, ar[0])*(ell_prefactor1/ell/ell -1.)*gbias.b_mag[(int) ar[0]];
+  const double ws = W_source(a, ns, hoverh0);
+  const double wk = W_kappa(a, fK, ns);
+  const double wgal = W_gal(a, nl, chidchi.chi, hoverh0) +
+    W_mag(a, fK, nl)*(ell_prefactor1/(ell*ell) -1.0)*gbias.b_mag[nl];
 
   double res = 0.0;
-
-  if(include_RSD_GS == 1)
-  {
-    static double chi_a_min = 0;
-    if (chi_a_min == 0)
-    {
-      chi_a_min = chi(limits.a_min);
-    }
-    const double chi_0 = f_K(ell/k);
-    const double chi_1 = f_K((ell+1.)/k);
-    if (chi_1 > chi_a_min)
-    {
-      return 0;
-    }
-    const double a_0 = a_chi(chi_0);
-    const double a_1 = a_chi(chi_1);
-
-    res = (wgal + W_RSD(ell, a_0, a_1, ar[0]));
-  }
-  else
-  {
-    res = wgal;
-  }
-
   switch(like.IA)
   {
     case 0:
     {
-      res *= W_kappa(a, fK, ar[1]);
+      res = wk;
 
       break;
     }
     case 1:
     {
-      const double norm =
-        A_IA_Joachimi(a)*cosmology.Omega_m*nuisance.c1rhocrit_ia/growfac_a;
+      const double norm = A_IA_Joachimi(a)*cosmology.Omega_m*nuisance.c1rhocrit_ia/growfac_a;
 
-      res *= (W_kappa(a, fK, ar[1]) - W_source(a, ar[1], hoverh0)*norm);
+      res = (wk - ws*norm);
 
       break;
     }
     case 3:
     {
-      const double norm = nuisance.A_z[(int)ar[1]]*cosmology.Omega_m*
-        nuisance.c1rhocrit_ia/growfac_a;
+      const double norm = nuisance.A_z[ns]*cosmology.Omega_m*nuisance.c1rhocrit_ia/growfac_a;
 
-      res *= (W_kappa(a, fK, ar[1]) - W_source(a, ar[1], hoverh0)*norm);
+      res = (wk - ws*norm);
 
       break;
     }
@@ -2882,7 +2849,7 @@ double int_for_C_gs_tomo_limber(double a, void* params)
       const double norm = cosmology.Omega_m*nuisance.c1rhocrit_ia/growfac_a*
         nuisance.A_ia*pow(1./(a*nuisance.oneplusz0_ia),nuisance.eta_ia);
 
-      res *= (W_kappa(a, fK, ar[1]) - W_source(a, ar[1], hoverh0)*norm);
+      res = (wk - ws*norm);
 
       break;
     }
@@ -2891,16 +2858,20 @@ double int_for_C_gs_tomo_limber(double a, void* params)
       exit(1);
   }
 
-  if (use_linear_ps == 1)
+  if (include_RSD_GS == 1)
   {
-    res *= p_lin(k,a);
+    const double chi_0 = f_K(ell/k);
+    const double chi_1 = f_K((ell+1.)/k);
+    const double a_0 = a_chi(chi_0);
+    const double a_1 = a_chi(chi_1);
+
+    res *= (wgal + W_RSD(ell, a_0, a_1, nl));
   }
   else
   {
-    res *= Pdelta(k,a);
+    res *= wgal;
   }
-
-  return res*(chidchi.dchida/(fK*fK))*(ell_prefactor2/(ell*ell));
+  return res*PK*(chidchi.dchida/(fK*fK))*(ell_prefactor2/(ell*ell));
 }
 
 double int_for_C_gs_tomo_limber_withb2(double a, void* params)
@@ -3503,62 +3474,49 @@ double C_gg_tomo_limber(double l, int ni, int nj)
 
 double int_for_C_gk_limber(double a, void* params)
 {
-  if(!(a>0) || !(a<1)) 
+  if (!(a>0) || !(a<1)) 
   {
     log_fatal("a>0 and a<1 not true");
     exit(1);
   }
   double* ar = (double*) params;
 
+  const int nl = (int) ar[0];
+  if (nl < 0 || nl > tomo.clustering_Nbin - 1)
+  {
+    log_fatal("error in selecting bin number ni = %d", nl);
+    exit(1);
+  }
+  const double l = ar[1];
   const int use_linear_ps = (int) ar[2];
 
-  // prefactor correction (1812.05995 eqs 74-79)
-  const double ell_prefactor = (ar[1])*(ar[1] + 1.);
+  const double ell_prefactor = l*(l + 1.);   // prefactor correction (1812.05995 eqs 74-79)
 
+  const double ell = l + 0.5;
   struct chis chidchi = chi_all(a);
   const double hoverh0 = hoverh0v2(a, chidchi.dchida);
-
-  const double ell = ar[1] + 0.5;
   const double fK = f_K(chidchi.chi);
   const double k = ell/fK;
+  const double PK = use_linear_ps == 1 ? p_lin(k,a) : Pdelta(k,a);
 
-  const double wgal = W_gal(a, ar[0], chidchi.chi, hoverh0) +
-    W_mag(a, fK, ar[0])*(ell_prefactor/(ell*ell) - 1.0)*gbias.b_mag[(int) ar[0]];
+  const double WGAL = W_gal(a, nl, chidchi.chi, hoverh0) +
+    W_mag(a, fK, nl)*(ell_prefactor/(ell*ell) - 1.0)*gbias.b_mag[nl];
+  const double WK = W_k(a, fK);
 
   double res;
-  if(include_RSD_GK == 1)
+  if (include_RSD_GK == 1)
   {
-    static double chi_a_min = 0;
-    if (chi_a_min == 0)
-    {
-      chi_a_min = chi(limits.a_min);
-    }
     const double chi_0 = f_K(ell/k);
     const double chi_1 = f_K((ell+1.)/k);
-    if (chi_1 > chi_a_min)
-    {
-      return 0;
-    }
     const double a_0 = a_chi(chi_0);
     const double a_1 = a_chi(chi_1);
-
-    res = (wgal + W_RSD(ell, a_0, a_1, ar[0]))*W_k(a, fK);
+    res = (WGAL + W_RSD(ell, a_0, a_1, nl))*WK;
   }
   else
   {
-    res = wgal*W_k(a, fK);
+    res = WGAL*WK;
   }
-
-  if (use_linear_ps == 1)
-  {
-    res *= p_lin(k,a);
-  }
-  else
-  {
-    res *= Pdelta(k,a);
-  }
-
-  return (res*chidchi.dchida/(fK*fK))*(ell_prefactor/(ell*ell));
+  return (res*PK*chidchi.dchida/(fK*fK))*(ell_prefactor/(ell*ell));
 }
 
 double int_for_C_gk_limber_withb2(double a, void* params)
