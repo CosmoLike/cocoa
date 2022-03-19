@@ -942,13 +942,13 @@ double w_ks_tomo(const int nt, const int ni, const int limber)
   return w_vec[q];
 }
 
-// ----------------------------------------------------------------------------
-// ----------------------------------------------------------------------------
-// ----------------------------------------------------------------------------
+// --------------------------------------------------------------------------------------
+// --------------------------------------------------------------------------------------
+// --------------------------------------------------------------------------------------
 // Correlation Functions (real space) - flat sky
-// ----------------------------------------------------------------------------
-// ----------------------------------------------------------------------------
-// ----------------------------------------------------------------------------
+// --------------------------------------------------------------------------------------
+// --------------------------------------------------------------------------------------
+// --------------------------------------------------------------------------------------
 
 double xi_pm_tomo_flatsky(int pm, double theta, int ni, int nj, int limber)
 {
@@ -969,7 +969,6 @@ double xi_pm_tomo_flatsky(int pm, double theta, int ni, int nj, int limber)
   const double lnthetamin = (nc-ntheta+1)*dlnl-lnrc;
   const double lnthetamax = nc*dlnl - lnrc;
   const double dlntheta = (lnthetamax - lnthetamin)/((double) ntheta);
-  const double lntheta = log(theta);
 
   if (table == 0)
   {
@@ -1081,7 +1080,6 @@ double xi_pm_tomo_flatsky(int pm, double theta, int ni, int nj, int limber)
             plan[j][m] = fftw_plan_dft_c2r_1d(ntheta,conv[j][m],lP[j][m],FFTW_ESTIMATE);
           }
         }
-    
         #pragma omp parallel for
         for (int j=0; j<NSIZE; j++)
         {
@@ -1118,7 +1116,6 @@ double xi_pm_tomo_flatsky(int pm, double theta, int ni, int nj, int limber)
             table[2*j+1][k] = tab[j][1][k];
           }
         }
-        
         for (int j=0; j<NSIZE; j++)
         {
           for (int m=0; m<2; m++)
@@ -1165,6 +1162,7 @@ double xi_pm_tomo_flatsky(int pm, double theta, int ni, int nj, int limber)
     exit(1);
   }
 
+  const double lntheta = log(theta);
   if (lntheta < lnthetamin || lntheta > lnthetamax)
   {
     const double theta = exp(lntheta);
@@ -2107,109 +2105,6 @@ double C2_TT(double a, double nz, double growfac_a)
          pow(1. / (a * nuisance.oneplusz0_ia), nuisance.eta_ia_tt);
 }
 
-/*
-double int_for_C_ss_tomo_TATT_EE_limber(double a, void* params)
-{
-  if(!(a>0) || !(a<1)) 
-  {
-    log_fatal("a>0 and a<1 not true");
-    exit(1);
-  }
-  double* ar = (double* ) params;
-
-  const double growfac_a = growfac(a);
-  struct chis chidchi = chi_all(a);
-  double hoverh0 = hoverh0v2(a, chidchi.dchida);
-
-  const double ell = ar[2] + 0.5;
-  const double fK = f_K(chidchi.chi);
-  const double k = ell / fK;
-
-  // radial n_z weight for first source bin (for use with IA term)
-  const double ws1 = W_source(a, ar[0], hoverh0);
-
-  // radial n_z weight for second source bin (for use with IA term)
-  const double ws2 = W_source(a, ar[1], hoverh0);
-  // radial lens efficiency for first source bin
-  const double wk1 = W_kappa(a, fK, ar[0]);
-  // radial lens efficiency for second source bin
-  const double wk2 = W_kappa(a, fK, ar[1]);
-
-  // IA parameters for first source bin
-  const double C1 = C1_TA(a, ar[0], growfac_a);
-  const double b_ta = b_TA(a, ar[0]);
-  const double C2 = C2_TT(a, ar[0], growfac_a);
-
-  // IA parameters for second source bin
-  const double C1_2 = C1_TA(a, ar[1], growfac_a);
-  const double b_ta_2 = b_TA(a, ar[1]);
-  const double C2_2 = C2_TT(a, ar[1], growfac_a);
-
-  // GG cosmic shear
-  const double pdelta_ak = Pdelta(k, a);
-  double res = wk1 * wk2 * pdelta_ak;
-  //COCOA: Took these evaluations of the parenthesis - to force them to update
-  //COCOA: the static variables in the first call that is done outside OpenMP loop
-  const double tmp1 =
-    TATT_II_EE(k, a, C1, C2, b_ta, C1_2, C2_2, b_ta_2, growfac_a, pdelta_ak);
-  const double tmp2 =
-    TATT_GI_E(k, a, C1, C2, b_ta, growfac_a, pdelta_ak);
-  const double tmp3 =
-    TATT_GI_E(k, a, C1_2, C2_2, b_ta_2, growfac_a, pdelta_ak);
-  if (C1 || C1_2 || C2 || C2_2) {
-    // II contribution
-    res += ws1 * ws2 * tmp1;
-    // GI contribution
-    res += ws1 * wk2 * tmp2 + ws2 * wk1 * tmp3;
-  }
-  return res * chidchi.dchida / (fK * fK);
-}
-
-double int_for_C_ss_tomo_TATT_BB_limber(double a, void* params)
-{
-  if(!(a>0) || !(a<1)) 
-  {
-    log_fatal("a>0 and a<1 not true");
-    exit(1);
-  }
-  double* ar = (double* ) params;
-
-  const double growfac_a = growfac(a);
-  struct chis chidchi = chi_all(a);
-  const double hoverh0 = hoverh0v2(a, chidchi.dchida);
-
-  const double ell = ar[2] + 0.5;
-  const double fK = f_K(chidchi.chi);
-  const double k = ell / fK;
-
-  // radial n_z weight for first source bin (for use with IA term)
-  const double ws1 = W_source(a, ar[0], hoverh0);
-
-  // radial n_z weight for second source bin (for use with IA term)
-  const double ws2 = W_source(a, ar[1], hoverh0);
-
-  // IA parameters for first source bin
-  const double C1 = C1_TA(a, ar[0], growfac_a);
-  const double b_ta = b_TA(a, ar[0]);
-  const double C2 = C2_TT(a, ar[0], growfac_a);
-
-  // IA parameters for second source bin
-  const double C1_2 = C1_TA(a, ar[1], growfac_a);
-  const double b_ta_2 = b_TA(a, ar[1]);
-  const double C2_2 = C2_TT(a, ar[1], growfac_a);
-
-  //COCOA: Took these evaluations of the parenthesis - to force them to update
-  //COCOA: the static variables in the first call that is done outside OpenMP loop
-  double res = 0.;
-  const double tmp1 = TATT_II_BB(k, a, C1, C2, b_ta, C1_2, C2_2, b_ta_2, growfac_a);
-  if ((b_ta || C2) && (b_ta_2 || C2_2))
-  {
-    res = ws1 * ws2 * tmp1;
-  }
-  return res * chidchi.dchida / (fK * fK);
-}
-*/
-
 double int_for_C_ss_tomo_TATT_EE_limber(double a, void* params)
 {
   if (!(a>0) || !(a<1)) 
@@ -2303,12 +2198,15 @@ double C_ss_tomo_TATT_EE_limber_nointerp(double l, int ni, int nj, const int ini
   const double amin = fmax(amin_source(ni), amin_source(nj));
   const double amax = fmin(amax_source(ni), amax_source(nj));
 
-  return (init_static_vars_only == 1) ?
-    int_for_C_ss_tomo_TATT_EE_limber(amin, (void*) ar) : like.high_def_integration == 1 ?
-    int_gsl_integrate_medium_precision(int_for_C_ss_tomo_TATT_EE_limber, (void*) ar, 
-      amin, amax, NULL, GSL_WORKSPACE_SIZE) :
-    int_gsl_integrate_low_precision(int_for_C_ss_tomo_TATT_EE_limber, (void*) ar, 
-      amin, amax, NULL, GSL_WORKSPACE_SIZE);
+  return (init_static_vars_only == 1) ? int_for_C_ss_tomo_TATT_EE_limber(amin, (void*) ar) : 
+    like.high_def_integration == 2 ?
+      int_gsl_integrate_high_precision(int_for_C_ss_tomo_TATT_EE_limber, (void*) ar, 
+        amin, amax, NULL, GSL_WORKSPACE_SIZE) :
+    like.high_def_integration == 1 ?
+      int_gsl_integrate_medium_precision(int_for_C_ss_tomo_TATT_EE_limber, (void*) ar, 
+        amin, amax, NULL, GSL_WORKSPACE_SIZE) :
+      int_gsl_integrate_low_precision(int_for_C_ss_tomo_TATT_EE_limber, (void*) ar, 
+        amin, amax, NULL, GSL_WORKSPACE_SIZE);
 }
 
 double C_ss_tomo_TATT_BB_limber_nointerp(double l, int ni, int nj, const int init_static_vars_only)
@@ -2328,8 +2226,11 @@ double C_ss_tomo_TATT_BB_limber_nointerp(double l, int ni, int nj, const int ini
     exit(1);
   }
 
-  return (init_static_vars_only == 1) ?
-    int_for_C_ss_tomo_TATT_BB_limber(amin, (void*) ar) : like.high_def_integration == 1 ?
+  return (init_static_vars_only == 1) ? int_for_C_ss_tomo_TATT_BB_limber(amin, (void*) ar) : 
+    like.high_def_integration == 2 ?
+    int_gsl_integrate_high_precision(int_for_C_ss_tomo_TATT_BB_limber, (void*) ar,
+      amin, amax, NULL, GSL_WORKSPACE_SIZE) :
+    like.high_def_integration == 1 ?
     int_gsl_integrate_medium_precision(int_for_C_ss_tomo_TATT_BB_limber, (void*) ar,
       amin, amax, NULL, GSL_WORKSPACE_SIZE) :
     int_gsl_integrate_low_precision(int_for_C_ss_tomo_TATT_BB_limber, (void*) ar,
@@ -2644,6 +2545,9 @@ const int init_static_vars_only)
   }
 
   return (init_static_vars_only == 1) ? int_for_C_ss_tomo_limber(amin, (void*) ar) :
+    like.high_def_integration == 2 ?
+    int_gsl_integrate_high_precision(int_for_C_ss_tomo_limber, (void*) ar, amin, amax, NULL, 
+      GSL_WORKSPACE_SIZE) :
     like.high_def_integration == 1 ?
     int_gsl_integrate_medium_precision(int_for_C_ss_tomo_limber, (void*) ar, amin, amax, NULL, 
       GSL_WORKSPACE_SIZE) :
@@ -3019,8 +2923,10 @@ const int init_static_vars_only)
   {
     if (has_b2_galaxies() && use_linear_ps == 0)
     {
-      res = (init_static_vars_only == 1) ?
-        int_for_C_gs_tomo_limber_withb2(amin, (void*) ar) :
+      res = (init_static_vars_only == 1) ? int_for_C_gs_tomo_limber_withb2(amin, (void*) ar) :
+        like.high_def_integration == 2 ?
+        int_gsl_integrate_high_precision(int_for_C_gs_tomo_limber_withb2, (void*) ar, amin, amax, 
+          NULL, GSL_WORKSPACE_SIZE) :
         like.high_def_integration == 1 ?
         int_gsl_integrate_medium_precision(int_for_C_gs_tomo_limber_withb2, (void*) ar, amin, amax, 
           NULL, GSL_WORKSPACE_SIZE) :
@@ -3030,6 +2936,9 @@ const int init_static_vars_only)
     else 
     {
       res =  (init_static_vars_only == 1) ? int_for_C_gs_tomo_limber(amin, (void*) ar) :
+        like.high_def_integration == 2 ?
+        int_gsl_integrate_high_precision(int_for_C_gs_tomo_limber, (void*) ar, amin, amax, NULL, 
+          GSL_WORKSPACE_SIZE) :
         like.high_def_integration == 1 ?
         int_gsl_integrate_medium_precision(int_for_C_gs_tomo_limber, (void*) ar, amin, amax, NULL, 
           GSL_WORKSPACE_SIZE) :
@@ -3047,6 +2956,9 @@ const int init_static_vars_only)
     else
     {
       res = (init_static_vars_only == 1) ? int_for_C_gs_tomo_limber_TATT(amin, (void*) ar) :
+        like.high_def_integration == 2 ?
+        int_gsl_integrate_high_precision(int_for_C_gs_tomo_limber_TATT, (void*) ar, amin, amax, 
+          NULL, GSL_WORKSPACE_SIZE) :
         like.high_def_integration == 1 ?
         int_gsl_integrate_medium_precision(int_for_C_gs_tomo_limber_TATT, (void*) ar, amin, amax, 
           NULL, GSL_WORKSPACE_SIZE) :
@@ -3376,6 +3288,9 @@ const int init_static_vars_only)
   if (has_b2_galaxies() && use_linear_ps == 0)
   {
     res = (init_static_vars_only == 1) ? int_for_C_gg_tomo_limber_withb2(amin, (void*) ar) :
+      like.high_def_integration == 2 ?
+      int_gsl_integrate_high_precision(int_for_C_gg_tomo_limber_withb2, (void*) ar, amin, amax, 
+        NULL, GSL_WORKSPACE_SIZE) :
       like.high_def_integration == 1 ?
       int_gsl_integrate_medium_precision(int_for_C_gg_tomo_limber_withb2, (void*) ar, amin, amax, 
         NULL, GSL_WORKSPACE_SIZE) :
@@ -3385,6 +3300,9 @@ const int init_static_vars_only)
   else
   {
     res = (init_static_vars_only == 1) ? int_for_C_gg_tomo_limber(amin, (void*) ar) :
+      like.high_def_integration == 2 ?
+      int_gsl_integrate_high_precision(int_for_C_gg_tomo_limber, (void*) ar, amin, amax, NULL,
+        GSL_WORKSPACE_SIZE) :
       like.high_def_integration == 1 ?
       int_gsl_integrate_medium_precision(int_for_C_gg_tomo_limber, (void*) ar, amin, amax, NULL,
         GSL_WORKSPACE_SIZE) :
@@ -3602,7 +3520,7 @@ const int init_static_vars_only)
   if (has_b2_galaxies() && use_linear_ps == 0)
   {
     return (init_static_vars_only == 1) ? int_for_C_gk_limber_withb2(amin, (void*) ar) :
-      like.high_def_integration == 1 ?
+      like.high_def_integration > 0 ?
       int_gsl_integrate_high_precision(int_for_C_gk_limber_withb2, (void*) ar, amin, amax, NULL, 
         GSL_WORKSPACE_SIZE) :
       int_gsl_integrate_medium_precision(int_for_C_gk_limber_withb2, (void*) ar, amin, amax, NULL, 
@@ -3611,6 +3529,9 @@ const int init_static_vars_only)
   else
   {
     return (init_static_vars_only == 1) ? int_for_C_gk_limber(amin, (void*) ar) :
+      like.high_def_integration == 2 ?
+      int_gsl_integrate_high_precision(int_for_C_gk_limber, (void*) ar, amin, amax, NULL, 
+        GSL_WORKSPACE_SIZE) :
       like.high_def_integration == 1 ?
       int_gsl_integrate_medium_precision(int_for_C_gk_limber, (void*) ar, amin, amax, NULL, 
         GSL_WORKSPACE_SIZE) :
@@ -3787,6 +3708,9 @@ const int init_static_vars_only)
     exit(1);
   }
   return (init_static_vars_only == 1) ? int_for_C_ks_limber(amin, (void*) ar) :
+    like.high_def_integration == 2 ?
+    int_gsl_integrate_high_precision(int_for_C_ks_limber, (void*) ar, amin, amax, NULL,
+     GSL_WORKSPACE_SIZE) :
     like.high_def_integration == 1 ?
     int_gsl_integrate_medium_precision(int_for_C_ks_limber, (void*) ar, amin, amax, NULL,
      GSL_WORKSPACE_SIZE) :
@@ -3929,7 +3853,7 @@ double C_kk_limber_nointerp(double l, int use_linear_ps, const int init_static_v
   const double amin = limits.a_min*(1. + 1.e-5);
   const double amax = 0.99999;
   return (init_static_vars_only == 1) ? int_for_C_kk_limber(amin, (void*) ar) :
-    like.high_def_integration == 1 ?
+    like.high_def_integration > 0 ?
     int_gsl_integrate_high_precision(int_for_C_kk_limber, (void*) ar, amin, amax, 
       NULL, GSL_WORKSPACE_SIZE) :
     int_gsl_integrate_medium_precision(int_for_C_kk_limber, (void*) ar, amin, amax, 

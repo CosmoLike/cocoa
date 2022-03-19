@@ -1075,7 +1075,7 @@ double zdistr_photoz(double zz, int nj)
         {  
           double ar[2] = {tomo.shear_zmin[i], tomo.shear_zmax[i]};
 
-          norm = like.high_def_integration == 1 ?
+          norm = like.high_def_integration > 0 ?
             int_gsl_integrate_high_precision(zdistr_histo_1, NULL, tomo.shear_zmin[i],
               tomo.shear_zmax[i], NULL, GSL_WORKSPACE_SIZE) :
             int_gsl_integrate_medium_precision(zdistr_histo_1, NULL, tomo.shear_zmin[i],
@@ -1606,7 +1606,7 @@ double pf_photoz(double zz, int nj)
       {
         case 0: // no photo-zs, split 'true' n(z) histogram in bins
         {
-          norm = like.high_def_integration == 1 ?
+          norm = like.high_def_integration > 0  ?
             int_gsl_integrate_high_precision(pf_histo, NULL, tomo.clustering_zmin[i],
               tomo.clustering_zmax[i], NULL, GSL_WORKSPACE_SIZE) :
             int_gsl_integrate_medium_precision(pf_histo, NULL, tomo.clustering_zmin[i],
@@ -1723,7 +1723,7 @@ double pf_photoz(double zz, int nj)
         { 
           double ar[1] = {(double) i};
 
-          norm = like.high_def_integration == 1 ?
+          norm = like.high_def_integration > 0 ?
             int_gsl_integrate_high_precision(pf_histo_n, (void*) ar,
               tomo.clustering_zmin[i], tomo.clustering_zmax[i], NULL, GSL_WORKSPACE_SIZE) :
             int_gsl_integrate_medium_precision(pf_histo_n, (void*) ar,
@@ -2160,7 +2160,7 @@ double nsource(const int ni) // ni =-1 -> no tomography; ni>= 0 -> tomography bi
     } 
     else 
     {
-      const double norm = like.high_def_integration == 1 ?
+      const double norm = like.high_def_integration > 0 ?
         int_gsl_integrate_high_precision(int_nsource, NULL, redshift.shear_zdistrpar_zmin,
          redshift.shear_zdistrpar_zmax, NULL, GSL_WORKSPACE_SIZE) :
         int_gsl_integrate_medium_precision(int_nsource, NULL, redshift.shear_zdistrpar_zmin,
@@ -2169,7 +2169,7 @@ double nsource(const int ni) // ni =-1 -> no tomography; ni>= 0 -> tomography bi
       #pragma omp parallel for
       for (int i=0; i<tomo.shear_Nbin; i++) 
       {        
-        const double res = like.high_def_integration == 1 ?
+        const double res = like.high_def_integration > 0 ?
           int_gsl_integrate_high_precision(int_nsource, NULL, tomo.shear_zmin[i], 
             tomo.shear_zmax[i], NULL, GSL_WORKSPACE_SIZE) :
           int_gsl_integrate_medium_precision(int_nsource, NULL, tomo.shear_zmin[i], 
@@ -2222,7 +2222,7 @@ double nlens(int ni) // ni =-1 -> no tomography; ni>= 0 -> tomography bin ni
     } 
     else 
     {
-      const double norm = like.high_def_integration == 1 ?
+      const double norm = like.high_def_integration > 0 ?
         int_gsl_integrate_high_precision(int_nlens, NULL, 
           tomo.clustering_zmin[0], tomo.clustering_zmax[tomo.clustering_Nbin - 1], NULL,
           GSL_WORKSPACE_SIZE) :
@@ -2233,7 +2233,7 @@ double nlens(int ni) // ni =-1 -> no tomography; ni>= 0 -> tomography bin ni
       #pragma omp parallel for 
       for (int i=0; i<tomo.clustering_Nbin; i++) 
       { // OMP: nlens depends on pf_photoz which is already initialized        
-        const double res = like.high_def_integration == 1 ?
+        const double res = like.high_def_integration > 0  ?
           int_gsl_integrate_high_precision(int_nlens, NULL, 
             tomo.clustering_zmin[i], tomo.clustering_zmax[i], NULL, GSL_WORKSPACE_SIZE) :
           int_gsl_integrate_medium_precision(int_nlens, NULL, 
@@ -2299,7 +2299,13 @@ double zmean(const int ni)
     for (int i=0; i<tomo.clustering_Nbin; i++) 
     {
       double ar[1] = {(double) i};
-      table[i] = like.high_def_integration == 1 ?
+      table[i] = 
+        like.high_def_integration == 2 ?
+        int_gsl_integrate_high_precision(int_for_zmean, (void*) ar, 
+          tomo.clustering_zmin[i], tomo.clustering_zmax[i], NULL, GSL_WORKSPACE_SIZE) /
+        int_gsl_integrate_high_precision(norm_for_zmean, (void*) ar, tomo.clustering_zmin[i],
+          tomo.clustering_zmax[i], NULL, GSL_WORKSPACE_SIZE) :
+        like.high_def_integration == 1 ?
         int_gsl_integrate_medium_precision(int_for_zmean, (void*) ar, 
           tomo.clustering_zmin[i], tomo.clustering_zmax[i], NULL, GSL_WORKSPACE_SIZE) /
         int_gsl_integrate_medium_precision(norm_for_zmean, (void*) ar, tomo.clustering_zmin[i],
@@ -2347,7 +2353,7 @@ double zmean_source(int ni)
     for (int i=0; i<tomo.shear_Nbin; i++) 
     {
       double ar[1] = {(double) i};
-      table[i] = like.high_def_integration == 1 ? 
+      table[i] = like.high_def_integration > 0 ? 
         int_gsl_integrate_high_precision(int_for_zmean_source, (void*) ar, 
           tomo.shear_zmin[i], tomo.shear_zmax[i], NULL, GSL_WORKSPACE_SIZE) :
         int_gsl_integrate_medium_precision(int_for_zmean_source, (void*) ar, 
@@ -2477,7 +2483,11 @@ double g_tomo(double ainput, int ni) // for tomography bin ni
         ar[0] = (double) j;          
         ar[1] = chi(a);
         
-        table[j+1][i] = like.high_def_integration == 1 ? 
+        table[j+1][i] = 
+          like.high_def_integration == 2 ?
+          int_gsl_integrate_high_precision(int_for_g_tomo,
+            (void*) ar, amin, a, NULL, GSL_WORKSPACE_SIZE) :          
+          like.high_def_integration == 1 ? 
           int_gsl_integrate_medium_precision(int_for_g_tomo,
             (void*) ar, amin, a, NULL, GSL_WORKSPACE_SIZE) :
           int_gsl_integrate_low_precision(int_for_g_tomo,
@@ -2586,7 +2596,7 @@ double g2_tomo(double a, int ni)
         ar[0] = (double) j;          
         ar[1] = chi(a);
 
-        table[j+1][i] = like.high_def_integration == 1 ? 
+        table[j+1][i] = like.high_def_integration > 0 ? 
           int_gsl_integrate_high_precision(int_for_g2_tomo,
             (void*) ar, amin, a, NULL, GSL_WORKSPACE_SIZE) :
           int_gsl_integrate_medium_precision(int_for_g2_tomo,
@@ -2692,7 +2702,10 @@ double g_lens(double a, int ni)
         const double a =  amin + i*da;
         ar[1] = chi(a);
         
-        table[j + 1][i] = like.high_def_integration == 1 ?
+        table[j + 1][i] = like.high_def_integration == 2 ?
+          int_gsl_integrate_high_precision(int_for_g_lens,
+            (void*) ar, amin_shear, a, NULL, GSL_WORKSPACE_SIZE) : 
+          like.high_def_integration == 1 ?
           int_gsl_integrate_medium_precision(int_for_g_lens,
             (void*) ar, amin_shear, a, NULL, GSL_WORKSPACE_SIZE) :
           int_gsl_integrate_low_precision(int_for_g_lens,
@@ -2892,7 +2905,7 @@ double ggl_efficiency(int ni, int nj)
         double ar[2];
         ar[0] = (double) i;
         ar[1] = (double) j;
-        table[i][j] = like.high_def_integration == 1 ?
+        table[i][j] = like.high_def_integration > 0 ?
           int_gsl_integrate_high_precision(int_for_ggl_efficiency, (void*) ar,
             tomo.clustering_zmin[i], tomo.clustering_zmax[i], NULL, 
             GSL_WORKSPACE_SIZE)/max_g_tomo(j) :
