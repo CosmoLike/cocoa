@@ -169,16 +169,16 @@ lim limits =
 
 Ntab Ntable = 
 {
-  .N_a = 250,                         // N_a (modified by COCOA from 100)
+  .N_a = 400,                         // N_a        (modified by COCOA from 100 - tested on DES-Y3)
   .N_k_lin = 500,                     // N_k_lin
   .N_k_nlin = 500,                    // N_k_nlin
-  .N_ell = 200,                       // N_ell 
-  .N_theta = 200,                     // N_theta (modified by COCOA from 250)
+  .N_ell = 400,                       // N_ell      (modified by COCOA from 200 - tested on DES-Y3)
+  .N_theta = 250,                     // N_theta    (modified by COCOA from 200 - tested on DES-Y3)
   .N_thetaH = 2048,                   // N_theta for Hankel
   .N_S2 = 1000,                       // N_S2
   .N_DS = 1000,                       // N_DS
-  .N_ell_TATT = 140,                  // N_ell_TATT (modified by COCOA)
-  .NL_Nell_block = 10,                // Cosmo2D - NL = NonLimber (NL_Nell_block)
+  .N_ell_TATT = 200,                  // N_ell_TATT (modified by COCOA from 60 - tested on DES-Y3)
+  .NL_Nell_block = 50,                // Cosmo2D - NL = NonLimber (NL_Nell_block)
   .NL_Nchi = 500,                     // Cosmo2D - NL = NonLimber (NL_Nchi)
   .N_a_halo_exclusion = 100,          // N_a for binned_p_cc_incl_halo_exclusion (cluster_util.c)
   .N_k_halo_exclusion = 100,          // N_k for binned_p_cc_incl_halo_exclusion (cluster_util.c)
@@ -191,9 +191,8 @@ Ntab Ntable =
 
 pre precision = 
 {
-  .low = 1e-2, 
-  .medium = 1e-3, 
-  .high = 1e-5, 
+  .medium = 5e-4, 
+  .high   = 1e-5, 
   .insane = 1e-7    
 };
 

@@ -38,14 +38,6 @@ double interpol(double *f, int n, double a, double b, double dx, double x,
 double interpol_fitslope(double *f, int n, double a, double b, double dx,
   double x, double lower);
 
-void free_double_vector(double *v, long nl, long nh);
-
-double *create_double_vector(long nl, long nh);
-
-void free_double_matrix(double **m, long nrl, long nrh, long ncl, long nch);
-
-double **create_double_matrix(long nrl, long nrh, long ncl, long nch);
-
 int line_count(char *filename);
 
 void error(char *s);

@@ -61,13 +61,26 @@ double w_ks_tomo_flatsky(double theta, int ni, int limber);
 // ----------------------------------------------------------------------------
 // ----------------------------------------------------------------------------
 
+void f_chi_for_Psi_sh_IA(double *const chi, int Nchi, double *const f_chi, const int nj,
+const double zmin, const double zmax);
+
+void f_chi_for_Psi_sh(double *const chi, int Nchi, double *const f_chi, const int nj,
+const double zmax);
+
+void f_chi_for_Psi_cl(double *const chi, int Nchi, double *const f_chi, const int ni,
+const double zmin, const double zmax);
+
+void f_chi_for_Psi_cl_RSD(double *const chi, int Nchi, double *const f_chi, const int ni,
+const double zmin, const double zmax);
+
+void f_chi_for_Psi_cl_Mag(double *const chi, int Nchi, double *const f_chi, const int ni,
+const double zmax);
+
 // Mixture of non-Limber and Limber of C_cl (G-G lensing)
-void C_gl_tomo(int L, int nl, int ns, double *Cl, double dev,
-double tolerance);
+void C_gl_tomo(int L, int nl, int ns, double *Cl, double dev, double tolerance);
 
 // Mixture of non-Limber and Limber of C_cl (galaxy clustering)
-void C_cl_tomo(int L, int ni, int nj, double *Cl, double dev,
-double tolerance);
+void C_cl_tomo(int L, int ni, int nj, double *Cl, double dev, double tolerance);
 
 // ----------------------------------------------------------------------------
 // ----------------------------------------------------------------------------
