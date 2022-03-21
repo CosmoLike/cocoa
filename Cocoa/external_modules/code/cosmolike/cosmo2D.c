@@ -23,21 +23,11 @@
 
 #include "log.c/src/log.h"
 
-<<<<<<< HEAD
-static int GSL_WORKSPACE_SIZE = 1000;
-static int use_linear_ps_limber = 0; /* 0 or 1 */
-static int include_RSD_GS = 0; /* 0 or 1 */
-static int include_RSD_GG = 1; /* 0 or 1 */
-static int include_RSD_GK = 0; /* 0 or 1 */
-static double w_l_min = 0.0001;
-static double w_l_max = 5.0e6;
-=======
 static int GSL_WORKSPACE_SIZE = 250;
 static int use_linear_ps_limber = 0; // 0 or 1 
 static int include_RSD_GS = 0; // 0 or 1 
 static int include_RSD_GG = 1; // 0 or 1 
 static int include_RSD_GK = 0; // 0 or 1 
->>>>>>> 584f993ea7f49a7ceab5cf69d5ce0feb6deefcb4
 
 double beam_cmb(const double l)
 {
