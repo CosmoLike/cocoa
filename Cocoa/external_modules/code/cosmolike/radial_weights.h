@@ -9,6 +9,8 @@ double W_kappa(double a, double fK, int nz);
 
 double W_mag(double a, double fK, int nz);
 
+//double W_mag_cluster(double a, double fK, int nz, int nl);
+
 double W_gal(double a, int nz, double chi, double hoverh0);
 
 // source redshift distribution (radial weight for IA,source clustering)

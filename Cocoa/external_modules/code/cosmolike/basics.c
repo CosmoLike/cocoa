@@ -20,50 +20,84 @@
 #include <gsl/gsl_sf_trig.h>
 #include <gsl/gsl_spline.h>
 #include <gsl/gsl_math.h>
+
+#include "structs.h"
 #include "basics.h"
 
 #include "log.c/src/log.h"
 
-con constants = {
-  3.14159265358979323846, // pi
-  9.86960440108935861883, // pisqr
-  6.28318530717958647693, // twopi
-  0.693147180559945309417232121458176568075, // LOG(2)
-  2.90888208665721580e-4, // arcmin
-  299792.458              // speed of light km/s
-};
+double fmin(const double a, const double b)
+{
+  return a < b ? a : b;
+}
 
-pre precision = {
-  1e-2, // low
-  1e-3, // medium
-  1e-5, // high
-  1e-7  // insane
-};
+double fmax(const double a, const double b)
+{
+  return a > b ? a : b;
+}
 
-lim limits = {
-  1./(1.+10.),  // a_min (z=10, needed for CMB lensing)
-  2.e-2,        // k_min_cH0
-  3.e+6,        // k_max_cH0
-  1.e+6,        // M_min
-  1.e+17,       // M_max
-  0.1,          //P_2_s_min
-  1.0e5,        //P_2_s_max        
-  20,           // LMIN_tab
-  100000,       // LMAX
-  400,          // LMAX_NOLIMBER
-};
+bin_avg set_bin_average(int i_theta, int j_L)
+{
+  static double** Pmin  = 0;
+  static double** Pmax  = 0;
+  static double** dPmin = 0;
+  static double** dPmax = 0;
+  static double* xmin = 0;
+  static double* xmax = 0;
+  
+  if (like.Ntheta == 0)
+  {
+    log_fatal("like.Ntheta not initialized");
+    exit(1);
+  }
 
-Ntab Ntable = {
-  250,  // N_a (modified by COCOA from 100)
-  500,  // N_k_lin
-  500,  // N_k_nlin
-  200,  // N_ell 
-  200,  // N_theta (modified by COCOA from 250)
-  2048, // N_theta for Hankel
-  1000, // N_S2
-  1000, // N_DS
-  140,  // N_ell_TATT (modified by COCOA)
-};
+  if (Pmin == 0)
+  {
+    Pmin = (double**) malloc(like.Ntheta*sizeof(double*));
+    Pmax = (double**) malloc(like.Ntheta*sizeof(double*));
+    dPmin = (double**) malloc(like.Ntheta*sizeof(double*));
+    dPmax = (double**) malloc(like.Ntheta*sizeof(double*));
+    for(int i=0; i<like.Ntheta ; i++)
+    {
+      Pmin[i] = (double*) calloc(limits.LMAX, sizeof(double));
+      Pmax[i] = (double*) calloc(limits.LMAX, sizeof(double));
+      dPmin[i] = (double*) calloc(limits.LMAX, sizeof(double));
+      dPmax[i] = (double*) calloc(limits.LMAX, sizeof(double));
+    }
+    xmin = (double*) calloc(like.Ntheta, sizeof(double));
+    xmax = (double*) calloc(like.Ntheta, sizeof(double));
+    const double logdt=(log(like.vtmax)-log(like.vtmin))/like.Ntheta;
+    for(int i=0; i<like.Ntheta ; i++)
+    {
+      xmin[i] = cos(exp(log(like.vtmin) + (i + 0.0)*logdt));
+      xmax[i] = cos(exp(log(like.vtmin) + (i + 1.0)*logdt));
+    }
+    #pragma omp parallel for
+    for (int i=0; i<like.Ntheta; i++)
+    {
+      int status = gsl_sf_legendre_Pl_deriv_array(limits.LMAX, xmin[i], Pmin[i], dPmin[i]);
+      if (status) 
+      {
+        log_fatal(gsl_strerror(status));
+        exit(1);
+      }
+      status = gsl_sf_legendre_Pl_deriv_array(limits.LMAX, xmax[i], Pmax[i], dPmax[i]);
+      if (status) 
+      {
+        log_fatal(gsl_strerror(status));
+        exit(1);
+      } 
+    }
+  }
+  bin_avg r;
+  r.xmin = xmin[i_theta];
+  r.xmax = xmax[i_theta];
+  r.Pmin = Pmin[i_theta][j_L];
+  r.Pmax = Pmax[i_theta][j_L];
+  r.dPmin = dPmin[i_theta][j_L];
+  r.dPmax = dPmax[i_theta][j_L];
+  return r;
+}
 
 double int_gsl_integrate_high_precision(double (*func)(double, void*),
 void* arg, double a, double b, double* error, int niter)
@@ -352,13 +386,13 @@ int argc __attribute__((unused))) {
   cdgamma(a1, &g1);
   cdgamma(a2, &g2);
 
-  const double xln2 = x * constants.ln2;
+  const double xln2 = x * M_LN2;
   const double si = sin(xln2);
   const double co = cos(xln2);
   const double d1 = g1[0] * g2[0] + g1[1] * g2[1]; /* Re */
   const double d2 = g1[1] * g2[0] - g1[0] * g2[1]; /* Im */
   const double mod = g2[0] * g2[0] + g2[1] * g2[1];
-  const double pref = exp(constants.ln2 * q) / mod;
+  const double pref = exp(M_LN2 * q) / mod;
 
   (*res)[0] = pref * (co * d1 - si * d2);
   (*res)[1] = pref * (si * d1 + co * d2);
@@ -425,4 +459,30 @@ void cdgamma(fftw_complex x, fftw_complex *res) {
 
   (*res)[0] = yr;
   (*res)[1] = yi;
+}
+
+void hankel_kernel_FT_3D(double x, fftw_complex *res, double *arg, int argc __attribute__((unused)))
+{
+      fftw_complex a1, a2, g1, g2;
+      double           mu;
+      double        mod, xln2, si, co, d1, d2, pref, q;
+      q = arg[0];
+      mu = arg[1];
+
+      /* arguments for complex gamma */
+      a1[0] = 0.5*(1.0+mu+q);
+      a2[0] = 0.5*(1.0+mu-q);
+      a1[1] = 0.5*x; a2[1]=-a1[1];
+      cdgamma(a1,&g1);
+      cdgamma(a2,&g2);
+      xln2 = x*M_LN2;
+      si   = sin(xln2);
+      co   = cos(xln2);
+      d1   = g1[0]*g2[0]+g1[1]*g2[1]; /* Re */
+      d2   = g1[1]*g2[0]-g1[0]*g2[1]; /* Im */
+      mod  = g2[0]*g2[0]+g2[1]*g2[1];
+      pref = exp(M_LN2*q)/mod;
+
+      (*res)[0] = pref*(co*d1-si*d2);
+      (*res)[1] = pref*(si*d1+co*d2);
 }

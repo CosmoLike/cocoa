@@ -8,46 +8,64 @@ deactivate
 if [ -n "${OLD_OMP_NUM_THREADS}" ]; then
   export OMP_NUM_THREADS=$OLD_OMP_NUM_THREADS
   unset OLD_OMP_NUM_THREADS
+else
+  unset OMP_NUM_THREADS
 fi
 
 if [ -n "${OLD_LD_LIBRARY_PATH}" ]; then
   export LD_LIBRARY_PATH=$OLD_LD_LIBRARY_PATH
   unset OLD_LD_LIBRARY_PATH
+else
+  unset LD_LIBRARY_PATH
 fi
 
 if [ -n "${OLD_PYTHONPATH}" ]; then
   export PYTHONPATH=$OLD_PYTHONPATH
   unset OLD_PYTHONPATH
+else
+  unset PYTHONPATH
 fi
 
 if [ -n "${OLD_PATH}" ]; then
   export PATH=$OLD_PATH
   unset OLD_PATH
+else
+  unset PATH
 fi
 
 if [ -n "${OLD_C_INCLUDE_PATH}" ]; then
   export C_INCLUDE_PATH=$OLD_C_INCLUDE_PATH
   unset OLD_C_INCLUDE_PATH
+else
+  unset C_INCLUDE_PATH
 fi
 
 if [ -n "${OLD_CPLUS_INCLUDE_PATH}" ]; then
   export CPLUS_INCLUDE_PATH=$OLD_CPLUS_INCLUDE_PATH
   unset OLD_CPLUS_INCLUDE_PATH
+else
+  unset CPLUS_INCLUDE_PATH
 fi
 
 if [ -n "${OLD_LDFLAGS}" ]; then
   export LDFLAGS=$OLD_LDFLAGS
   unset OLD_LDFLAGS
+else
+  unset LDFLAGS
 fi
 
 if [ -n "${OLD_CPATH}" ]; then
   export CPATH=$OLD_CPATH
   unset OLD_CPATH
+else
+  unset CPATH
 fi
 
 if [ -n "${OLD_NUMPY_HEADERS}" ]; then
   export NUMPY_HEADERS=$OLD_NUMPY_HEADERS
   unset OLD_NUMPY_HEADERS
+else
+  unset NUMPY_HEADERS
 fi
 
 # ----------------------------------------------------------------------------
