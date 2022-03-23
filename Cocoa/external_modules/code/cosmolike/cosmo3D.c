@@ -1017,8 +1017,6 @@ double** io_z, double** io_lnP, int io)
     // ADD BARYIONIC PHYSICS
     if (bary.is_Pk_bary == 1)
     {
-      printf("JUST TESTING \n\n\n\n\n\n\n\n\n");
-
       #pragma omp parallel for
       for (int i=0; i<nlog10k; i++)
       {
