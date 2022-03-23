@@ -3509,41 +3509,10 @@ const int init_static_vars_only)
   const double amax = amax_lens(ni);
   if (!(amin>0) || !(amin<1) || !(amax>0) || !(amax<1)) 
   {
-<<<<<<< HEAD
-	log_info("\x1b[90m{%s}\x1b[0m: b2 set, scale factor int limit: ({%.4e}, {%.4e})\n",
-            "C_gk_tomo_limber_nointerp", amin_lens(nl), amax_lens(nl));
-
-    return int_gsl_integrate_medium_precision(
-      int_for_C_gk_limber_withb2,
-      (void*) array,
-      amin_lens(nl),
-      amax_lens(nl),
-      NULL,
-      GSL_WORKSPACE_SIZE
-    );
-  }
-  log_info("\x1b[90m{%s}\x1b[0m: b2 not set, scale factor int limit: ({%.4e}, {%.4e})\n",
-            "C_gk_tomo_limber_nointerp", amin_lens(nl), 0.99999);
-
-  return int_gsl_integrate_medium_precision(
-    int_for_C_gk_limber,
-    (void*) array,
-    amin_lens(nl),
-    0.99999,
-    NULL,
-    GSL_WORKSPACE_SIZE
-  );
-}
-
-double C_gk_tomo_limber(double l, int ni)
-{
-  if(ni < -1 || ni > tomo.clustering_Nbin -1)
-=======
     log_fatal("0 < amin/amax < 1 not true");
     exit(1);
   }
   if (!(amin < amax))
->>>>>>> 584f993ea7f49a7ceab5cf69d5ce0feb6deefcb4
   {
     log_fatal("amin < amax not true");
     exit(1);
@@ -3730,132 +3699,6 @@ const int init_static_vars_only)
     log_fatal("error in selecting bin number nj = %d", nj);
     exit(1);
   }
-<<<<<<< HEAD
-
-  double array[3] = {(double) nj, l, (double) use_linear_ps};
-
-  switch(like.IA)
-  { // different IA might require different integrator precision
-    case 0:
-    {
-	  log_info("\x1b[90m{%s}\x1b[0m: like.IA = {%d} scale factor int limit: ({%.4e}, {%.4e})\n",
-            "C_ks_tomo_limber_noninterp",like.IA, amin_source(nj), 0.99999);
-      if(like.high_def_integration == 1)
-      {
-        return int_gsl_integrate_high_precision(
-          int_for_C_ks_limber,
-          (void*) array,
-          amin_source(nj),
-          0.99999,
-          NULL,
-          GSL_WORKSPACE_SIZE
-        );
-      }
-      else
-      {
-        return int_gsl_integrate_medium_precision(
-          int_for_C_ks_limber,
-          (void*) array,
-          amin_source(nj),
-          0.99999,
-          NULL,
-          GSL_WORKSPACE_SIZE
-        );        
-      }
-      break;
-    }
-    case 1:
-    {
-	  log_info("\x1b[90m{%s}\x1b[0m: like.IA = {%d} scale factor int limit: ({%.4e}, {%.4e})\n",
-            "C_ks_tomo_limber_noninterp",like.IA, amin_source(nj), amax_source(nj));
-
-      if(like.high_def_integration == 1)
-      {
-        return int_gsl_integrate_high_precision(
-          int_for_C_ks_limber,
-          (void*) array,
-          amin_source(nj),
-          amax_source(nj),
-          NULL,
-          GSL_WORKSPACE_SIZE
-        );
-      }
-      else
-      {
-        return int_gsl_integrate_medium_precision(
-          int_for_C_ks_limber,
-          (void*) array,
-          amin_source(nj),
-          amax_source(nj),
-          NULL,
-          GSL_WORKSPACE_SIZE
-        );
-      }
-
-      break;
-    }
-    case 3:
-    { 
-	  log_info("\x1b[90m{%s}\x1b[0m: like.IA = {%d} scale factor int limit: ({%.4e}, {%.4e})\n",
-            "C_ks_tomo_limber_noninterp",like.IA, amin_source(nj), amax_source(nj));
-
-      if(like.high_def_integration == 1)
-      {
-        return int_gsl_integrate_high_precision(
-          int_for_C_ks_limber,
-          (void*) array,
-          amin_source(nj),
-          amax_source(nj),
-          NULL,
-          GSL_WORKSPACE_SIZE
-        );
-      }
-      else
-      {
-        return int_gsl_integrate_medium_precision(
-          int_for_C_ks_limber,
-          (void*) array,
-          amin_source(nj),
-          amax_source(nj),
-          NULL,
-          GSL_WORKSPACE_SIZE
-        );
-      }
-      break;
-    }
-    case 4:
-    {
-	  log_info("\x1b[90m{%s}\x1b[0m: like.IA = {%d} scale factor int limit: ({%.4e}, {%.4e})\n",
-            "C_ks_tomo_limber_noninterp",like.IA, amin_source(nj), amax_source(nj));
-
-      if(like.high_def_integration == 1)
-      {
-        return int_gsl_integrate_high_precision(
-          int_for_C_ks_limber,
-          (void*) array,
-          amin_source(nj),
-          amax_source(nj),
-          NULL,
-          GSL_WORKSPACE_SIZE
-        );
-      }
-      else
-      {
-        return int_gsl_integrate_medium_precision(
-          int_for_C_ks_limber,
-          (void*) array,
-          amin_source(nj),
-          amax_source(nj),
-          NULL,
-          GSL_WORKSPACE_SIZE
-        );
-      }
-      break;
-    }
-    default:
-      log_fatal("like.IA = %d not supported", like.IA);
-      exit(1);
-=======
   double ar[3] = {(double) nj, l, (double) use_linear_ps};
   const double amin = amin_source(nj);
   const double amax = amax_source(nj);
@@ -3863,7 +3706,6 @@ const int init_static_vars_only)
   {
     log_fatal("0 < amin/amax < 1 not true");
     exit(1);
->>>>>>> 584f993ea7f49a7ceab5cf69d5ce0feb6deefcb4
   }
   return (init_static_vars_only == 1) ? int_for_C_ks_limber(amin, (void*) ar) :
     like.high_def_integration == 2 ?
@@ -4001,33 +3843,8 @@ double int_for_C_kk_limber(double a, void* params)
   const double k = ell/fK;
   const double ell4 = ell*ell*ell*ell;
   const double WK = W_k(a, fK);
-<<<<<<< HEAD
-
-  double res = WK*WK;
-
-  if(use_linear_ps == 1)
-  {
-    res *= p_lin(k,a);
-  }
-  else
-  {
-    res *= Pdelta(k,a);
-  }
-/*  if( ( fabs(a-0.3)<1e-5 ) && ( fabs(ell-1000)<1 ) )
-  {
-    log_info("\x1b[90m{%s}\x1b[0m: test integrand\n\t - f_K = {%.4e}\n\t - k = {%.4e}\n\t - W_k = {%.4e}\n\t - dchida = {%.4e}\n\t - Pdelta = {%.4e}\n\t - Om = {%.4e}\n",
-            "int_for_C_kk_limber", fK, k, WK, chidchi.dchida, Pdelta(k,a), cosmology.Omega_m );
-    double WK2overfK2 = WK*WK/fK/fK;
-	double ell_factors_combine = ell_prefactor*ell_prefactor/ell4;
-    double Pdelta_times_dchida = Pdelta(k,a) * chidchi.dchida;
-    log_info("\x1b[90m{%s}\x1b[0m: test integrand\n\t - (W_k/f_K)^2 = {%.4e}\n\t - (l*(l+1)/(l+0.5)^2)^2 = {%.4e}\n\t - Pdelta*dchida = {%.4e}\n",
-            "int_for_C_kk_limber", WK2overfK2, ell_factors_combine, Pdelta_times_dchida );
-  }*/
-  return res*(chidchi.dchida/(fK*fK))*ell_prefactor*ell_prefactor/ell4;
-=======
   const double PK = use_linear_ps == 1 ? p_lin(k,a) : Pdelta(k,a);
   return WK*WK*PK*(chidchi.dchida/(fK*fK))*ell_prefactor*ell_prefactor/ell4;
->>>>>>> 584f993ea7f49a7ceab5cf69d5ce0feb6deefcb4
 }
 
 double C_kk_limber_nointerp(double l, int use_linear_ps, const int init_static_vars_only)

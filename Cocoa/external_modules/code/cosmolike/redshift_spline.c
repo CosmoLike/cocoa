@@ -2835,7 +2835,6 @@ double g_lens_cluster(const double a, const int nz, const int nl)
     exit(1);
   }
   return interpol(table[nz + 1], na, amin, amax, da, a, 1.0, 1.0); 
->>>>>>> 584f993ea7f49a7ceab5cf69d5ce0feb6deefcb4
 }
 
 // ---------------------------------------------------------------------------------------
