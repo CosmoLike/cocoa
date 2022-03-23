@@ -1,6 +1,5 @@
 if [ -n "${START_COCOA_DONE}" ]; then
-  echo 'ERROR START_COCOA_DONE already defined'
-  return
+  source stop_cocoa
 fi
 
 # ----------------------------------------------------------------------------
@@ -109,8 +108,6 @@ if [ -z "${IGNORE_PLANCK_COMPILATION}" ]; then
   if [ -n "${CLIK_PLUGIN}" ]; then
     export OLD_CLIK_PLUGIN=$CLIK_PLUGIN
   fi
-
-  addvar LD_LIBRARY_PATH $ROOTDIR/external_modules/code/planck/plc_3.0/plc-3.01/lib
 
   addvar PYTHONPATH $ROOTDIR/.local/lib/python/site-packages
 
