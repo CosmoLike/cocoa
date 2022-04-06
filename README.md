@@ -134,7 +134,6 @@ The local installation via cocoa's internal cache is selected whenever the envir
 
     #export DOCKER_INSTALLATION=1
     #export MINICONDA_INSTALLATION=1
-    #export MACOS_HOMEBREW_INSTALLATION=1
     export MANUAL_INSTALLATION=1
     
 The user also needs to set the following self-explanatory environmental keys on [set_installation_options](https://github.com/CosmoLike/cocoa/blob/main/Cocoa/set_installation_options):
