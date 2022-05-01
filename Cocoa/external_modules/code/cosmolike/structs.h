@@ -227,6 +227,7 @@ typedef struct
 {
   int Ncl;
   int Ntheta;
+  int Nbp; // number of band-power bins for CMB lensing
   int Ncos;
   int Ndata;
   double lmin;
