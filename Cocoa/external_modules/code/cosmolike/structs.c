@@ -1,6 +1,8 @@
 #include <stdio.h>
 #include "structs.h"
 
+#include "log.c/src/log.h"
+
 //  ----------------------------------------------------------------------------------
 //  ----------------------------------------------------------------------------------
 //  ----------------------------------------------------------------------------------
@@ -174,7 +176,7 @@ lim limits =
   .halo_exclusion_k_min_hankel = 5.0E-4,
   .halo_exclusion_k_max_hankel = 1.0E8,
   .halo_exclusion_R_min = 0.0,
-  .halo_exclusion_R_max = 15.0/2997.
+  .halo_exclusion_R_max = 15.0/2997.,
   .halo_uKS_cmin = 0.1,     // halo.c u_KS(double c, double k, double rv)
   .halo_uKS_cmax = 50.0,    // halo.c u_KS(double c, double k, double rv)
   .halo_uKS_xmin = 1e-10,   // halo.c u_KS(double c, double k, double rv)

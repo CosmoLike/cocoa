@@ -140,7 +140,7 @@ double p_my(const double k, const double a, const int use_2h_only);
 double p_gg_nointerp(const double k, const double a, const int ni, const int use_2h_and_linear_only,
 const int init_static_vars_only);
 
-double p_gg(const double k, const double a, const int ni, const const int use_2h_and_linear_only);
+double p_gg(const double k, const double a, const int ni, const int use_2h_and_linear_only);
 
 double p_gm_nointerp(const double k, const double a, const int ni, const int use_2h_and_linear_only, 
 const int init_static_vars_only);

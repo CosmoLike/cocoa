@@ -1476,6 +1476,99 @@ double m_mean_nointerp(const int ni, const double a, const int init_static_vars_
 // ---------------------------------------------------------------------------
 // ---------------------------------------------------------------------------
 
+double int_bgal(double lnM, void *params)
+{
+  double* ar  = (double*) params;
+  
+  const double a = ar[0];
+  if (!(a>0) || !(a<1)) 
+  {
+    log_fatal("a>0 and a<1 not true");
+    exit(1);
+  }
+  const int ni = (int) ar[1];
+  if (ni < 0 || ni > tomo.clustering_Nbin - 1)
+  {
+    log_fatal("error in selecting bin number ni = %d", ni);
+    exit(1);
+  }
+
+  const double m = exp(lnM);
+
+  return massfunc(m, a)*m*B1(m,a)*(f_c(ni)*n_c(m, a, ni) + n_s(m, a, ni));
+}
+
+double bgal_nointerp(const int ni, const double a, const int init_static_vars_only)
+{
+  if (ni < 0 || ni > tomo.clustering_Nbin - 1)
+  { // avoid segfault for accessing wrong array index
+    log_fatal("error in selecting bin number ni = %d", ni);
+    exit(1);
+  }
+
+  double ar[2] = {a, (double) ni};
+  const double lnMmin = log(10.0)*(gbias.hod[ni][0] - 2.0);
+  const double lnMmax = log(limits.M_max);
+
+  return (init_static_vars_only == 1) ? int_bgal((lnMmin+lnMmax)/2.0, (void*) ar):
+    like.high_def_integration > 0 ?
+    int_gsl_integrate_high_precision(int_bgal, (void*) ar, lnMmin, lnMmax, 
+      NULL, GSL_WORKSPACE_SIZE) :
+    int_gsl_integrate_medium_precision(int_bgal, (void*) ar, lnMmin, lnMmax, 
+      NULL, GSL_WORKSPACE_SIZE);
+}
+
+double bgal(const int ni, const double a)
+{
+  static cosmopara C;
+  static galpara G;
+  static double** table;
+
+  const int nbin = tomo.clustering_Nbin;
+
+  const int na = Ntable.N_a;
+  const double amin = 1.0/(redshift.clustering_zdistrpar_zmax + 1.0);
+  const double amax = 1.0/(redshift.clustering_zdistrpar_zmin + 1.0);
+  const double da = (amax - amin)/((double) na - 1.0);
+
+  if (table == 0) 
+  {    
+    table = (double**) malloc(sizeof(double*)*nbin);
+    for (int i=0; i<nbin; i++) 
+    {
+      table[i] = (double*) malloc(sizeof(double)*na);
+    }
+  }
+  if (recompute_cosmo3D(C) || recompute_all_galaxies(G))
+  {
+    #pragma GCC diagnostic push
+    #pragma GCC diagnostic ignored "-Wunused-variable"
+    {
+      double init = bgal_nointerp(0, amin, 1);
+    }
+    #pragma GCC diagnostic pop
+    #pragma omp parallel for collapse(2)
+    for (int i=0; i<nbin; i++) 
+    { 
+      for (int j=0; j<na; j++) 
+      {
+        table[j][i] = bgal_nointerp(i, amin + j*da, 0);
+      }
+    }
+    update_cosmopara(&C); 
+    update_galpara(&G);
+  }  
+  if ((a < amin) || (a > amax))
+  {
+    return 0.0;
+  }
+  return interpol(table[ni], na, amin, amax, da, a, 1.0, 1.0);
+}
+
+// ---------------------------------------------------------------------------
+// ---------------------------------------------------------------------------
+// ---------------------------------------------------------------------------
+
 double int_fsat(double lnM, void *params)
 {
   double *ar  = (double*) params;
@@ -1675,7 +1768,7 @@ const int init_static_vars_only)
   }
 }
 
-double p_gg(const double k, const double a, const int ni, const const int use_2h_and_linear_only)
+double p_gg(const double k, const double a, const int ni, const int use_2h_and_linear_only)
 {
   static cosmopara C;
   static galpara G;
@@ -1684,9 +1777,9 @@ double p_gg(const double k, const double a, const int ni, const const int use_2h
   static double* amax = 0;
   static double* da = 0;
 
-  const double nbin = tomo.clustering_Nbin;
+  const int nbin = tomo.clustering_Nbin;
 
-  const double nk = Ntable.N_k_nlin;
+  const int nk = Ntable.N_k_nlin;
   const double lnkmin = log(limits.k_min_cH0);
   const double lnkmax = log(limits.k_max_cH0);
   const double dlnk = (lnkmax - lnkmin)/((double) nk - 1.0);
@@ -1710,9 +1803,9 @@ double p_gg(const double k, const double a, const int ni, const const int use_2h
     da = (double*) malloc(sizeof(double)*nbin);
     for (int l=0; l<nbin; l++) 
     {
-      const double amin[l] = amin_lens(l);
-      const double amax[l] = amax_lens(l);
-      const double da[l] = (amax[l] - amin[l])/((double) N_a - 1.0);
+      amin[l] = amin_lens(l);
+      amax[l] = amax_lens(l);
+      da[l] = (amax[l] - amin[l])/((double) na - 1.0);
     }
   }
   if (recompute_cosmo3D(C) || recompute_all_galaxies(G))
@@ -1723,6 +1816,7 @@ double p_gg(const double k, const double a, const int ni, const const int use_2h
       double init = p_gg_nointerp(exp(lnkmin), amin[0], 0, use_2h_and_linear_only, 1);
     }
     #pragma GCC diagnostic pop
+    
     #pragma omp parallel for collapse(3)
     for (int l=0; l<nbin; l++) 
     {
@@ -1778,11 +1872,11 @@ const int init_static_vars_only)
   
   if(use_2h_and_linear_only == 1)
   {
-    return p_lin(kk, aa)*bg;
+    return p_lin(k, a)*bg;
   }
   else
   {
-    return Pdelta(kk, aa)*bg + GM02(k, a, ni, init_static_vars_only)/ng;
+    return Pdelta(k, a)*bg + GM02_nointerp(k, a, ni, init_static_vars_only)/ng;
   }
 }
 
@@ -1795,14 +1889,14 @@ double p_gm (const double k, const double a, const int ni, const int use_2h_and_
   static double* amax = 0;
   static double* da = 0;
 
-  const double nbin = tomo.clustering_Nbin;
+  const int nbin = tomo.clustering_Nbin;
 
-  const double nk = Ntable.N_k_nlin;
+  const int nk = Ntable.N_k_nlin;
   const double lnkmin = log(limits.k_min_cH0);
   const double lnkmax = log(limits.k_max_cH0);
   const double dlnk = (lnkmax - lnkmin)/((double) nk - 1.0);
 
-  const int na = int(Ntable.N_a/5.0); // range is the (\delta a) of a single bin
+  const int na = (int) Ntable.N_a/5.0; // range is the (\delta a) of a single bin
   
   if (table == 0)
   {
@@ -1821,9 +1915,9 @@ double p_gm (const double k, const double a, const int ni, const int use_2h_and_
     da = (double*) malloc(sizeof(double)*nbin);
     for (int l=0; l<nbin; l++) 
     {
-      const double amin[l] = amin_lens(l);
-      const double amax[l] = amax_lens(l);
-      const double da[l] = (amax[l] - amin[l])/((double) N_a - 1.0);
+      amin[l] = amin_lens(l);
+      amax[l] = amax_lens(l);
+      da[l] = (amax[l] - amin[l])/((double) na - 1.0);
     }
   }
   if (recompute_cosmo3D(C) || recompute_all_galaxies(G))
