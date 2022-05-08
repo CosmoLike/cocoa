@@ -119,6 +119,21 @@ nuisancepara nuisance =
   .bias_zphot_clustering = {0},
 };
 
+ynuisancepara ynuisance =
+{
+  .gas_Gamma_KS = 0,
+  .gas_beta = 0,
+  .gas_lgM0 = 0, 
+  .gas_eps1 = 0,
+  .gas_eps2 = 0,
+  .gas_alpha = 0,
+  .gas_A_star = 0,
+  .gas_lgM_star = 0,
+  .gas_sigma_star = 0,
+  .gas_lgT_w = 0,
+  .gas_f_H = 0
+};
+
 barypara bary =
 {
   .is_Pk_bary = 0,
