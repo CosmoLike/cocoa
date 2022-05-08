@@ -77,9 +77,7 @@ double u_nfw_c(const double c, const double k, const double m,const double a);
 // ---------------------------------------------------------------------------
 // ---------------------------------------------------------------------------
 
-double p_mm_1h_noiterp(const double k, const double a);
-
-double p_mm_2h_noiterp(const double k, const double a);
+double p_mm_halomodel_noiterp(const double k, const double a, const int init_static_vars_only);
 
 double p_mm_halomodel(const double k, const double a);
 
@@ -99,6 +97,55 @@ double n_s_cmv(double a);
 double b_ngmatched(double a, double n_cmv);
 
 double b_source(double a); // lookup table for b1 of source galaxies
+
+// ---------------------------------------------------------------------------
+// ---------------------------------------------------------------------------
+// ---------------------------------------------------------------------------
+// ---------------------------------------------------------------------------
+// ---------------------------------------------------------------------------
+// ---------------------------------------------------------------------------
+// functions important for y correlation functions
+// ---------------------------------------------------------------------------
+// ---------------------------------------------------------------------------
+// ---------------------------------------------------------------------------
+// ---------------------------------------------------------------------------
+// ---------------------------------------------------------------------------
+// ---------------------------------------------------------------------------
+
+double p_yy_noiterp(const double k, const double a, const int use_2h_only, 
+const int init_static_vars_only);
+
+double p_yy(const double k, const double a, const int use_2h_only);
+
+double p_my_noiterp(const double k, const double a, const int use_2h_only,
+const int init_static_vars_only);
+
+double p_my(const double k, const double a, const int use_2h_only);
+
+
+// ---------------------------------------------------------------------------
+// ---------------------------------------------------------------------------
+// ---------------------------------------------------------------------------
+// ---------------------------------------------------------------------------
+// ---------------------------------------------------------------------------
+// ---------------------------------------------------------------------------
+// HOD
+// ---------------------------------------------------------------------------
+// ---------------------------------------------------------------------------
+// ---------------------------------------------------------------------------
+// ---------------------------------------------------------------------------
+// ---------------------------------------------------------------------------
+// ---------------------------------------------------------------------------
+
+double p_gg_nointerp(const double k, const double a, const int ni, const int use_2h_and_linear_only,
+const int init_static_vars_only);
+
+double p_gg(const double k, const double a, const int ni, const const int use_2h_and_linear_only);
+
+double p_gm_nointerp(const double k, const double a, const int ni, const int use_2h_and_linear_only, 
+const int init_static_vars_only);
+
+double p_gm (const double k, const double a, const int ni, const int use_2h_and_linear_only);
 
 #ifdef __cplusplus
 }

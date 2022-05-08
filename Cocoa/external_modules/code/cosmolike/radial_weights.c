@@ -206,9 +206,8 @@ double W_k(double a, double fK)
   return (1.5*cosmology.Omega_m*fK/a)*g_cmb(a);
 }
 
-// efficiency weight function for Compton-y
-double W_y(double a) // sigma_Th /(m_e*c^2) / a^2 , see Eq.D9 of 2005.00009.
-{ 
+double W_y(double a) // efficiency weight function for Compton-y
+{ // sigma_Th /(m_e*c^2) / a^2 , see Eq.D9 of 2005.00009.
   const double real_coverH0 = cosmology.coverH0 / cosmology.h0; // unit Mpc
   const double sigma_Th = 7.012e-74 / (real_coverH0*real_coverH0); // from Mpc^2 to (c/H0)^2
   const double E_e = 0.511*cosmology.h0*5.6131e-38;  // from MeV to [G(M_solar/h)^2/(c/H0)]

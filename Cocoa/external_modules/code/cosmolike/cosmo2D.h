@@ -128,6 +128,20 @@ double C_kk_limber_nointerp(double l, int use_linear_ps,
   const int init_static_vars_only);
 double C_kk_limber(double l);
 
+double C_gy_tomo_limber_nointerp(double l, int ni, int use_linear_ps, 
+const int init_static_vars_only);
+double C_gy_tomo_limber(double l, int ni);
+
+double C_ys_tomo_limber_nointerp(double l, int ni, int use_linear_ps, 
+  const int init_static_vars_only);
+double C_ys_tomo_limber(double l, int ni);
+
+double C_ky_limber_nointerp(double l, int use_linear_ps, const int init_static_vars_only);
+double C_ky_limber(double l);
+
+double C_yy_limber_nointerp(double l, int use_linear_ps, const int init_static_vars_only);
+double C_yy_limber(double l);
+
 #ifdef __cplusplus
 }
 #endif

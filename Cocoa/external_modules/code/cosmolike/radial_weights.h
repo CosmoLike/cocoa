@@ -26,7 +26,7 @@ double W_cluster(int nz, double a, double chi, double hoverh0);
 
 double W_k(double a, double fK);
 
-double W_y(double a);
+double W_y(double a); // efficiency weight function for Compton-y
 
 #ifdef __cplusplus
 }

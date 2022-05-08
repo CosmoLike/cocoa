@@ -14,6 +14,7 @@
 #include "basics.h"
 #include "cosmo3D.h"
 #include "cosmo2D.h"
+#include "halo.h"
 #include "IA.h"
 #include "pt_cfastpt.h"
 #include "radial_weights.h"
@@ -826,7 +827,6 @@ double w_ks_tomo(const int nt, const int ni, const int limber)
   static double* w_vec =0;
   static cosmopara C;
   static nuisancepara N;
-  static galpara G;
   
   const int nell = limits.LMAX;
   const int ntheta = like.Ntheta;
@@ -871,7 +871,7 @@ double w_ks_tomo(const int nt, const int ni, const int limber)
       free(Pmax);
     }
   }
-  if (recompute_ks(C, G, N))
+  if (recompute_ks(C, N))
   {
     if (limber == 1)
     {
@@ -920,7 +920,6 @@ double w_ks_tomo(const int nt, const int ni, const int limber)
       exit(1);
     }
     update_cosmopara(&C);
-    update_galpara(&G);
     update_nuisance(&N);
   }
   if (nt < 0 || nt > like.Ntheta - 1)
@@ -3142,8 +3141,8 @@ double int_for_C_gg_tomo_limber(double a, void* params)
   }
   double* ar = (double*) params;
 
-  const double ni = ar[0];
-  const double nj = ar[1];
+  const int ni = (int) ar[0];
+  const int nj = (int) ar[1];
   const double l  = ar[2];
   const int use_linear_ps = (int) ar[3];
 
@@ -3194,8 +3193,8 @@ double int_for_C_gg_tomo_limber_withb2(double a, void* params)
     exit(1);
   }
   double* ar = (double*) params;
-  const double ni = ar[0];
-  const double nj = ar[1];
+  const int ni = (int) ar[0];
+  const int nj = (int) ar[1];
   const double l  = ar[2];
   //const int use_linear_ps = (int) ar[3];
 
@@ -3624,7 +3623,7 @@ double int_for_C_ks_limber(double a, void* params)
   }
 
   double* ar = (double*) params;
-  const int ni = int ar[0];
+  const int ni = (int) ar[0];
   if (ni < -1 || ni > tomo.shear_Nbin - 1)
   {
     log_fatal("error in selecting bin number ni = %d", ni);
@@ -3635,7 +3634,7 @@ double int_for_C_ks_limber(double a, void* params)
   
   const double ell = l + 0.5;
   const double ell_prefactor1 = l*(l + 1.);  // prefactor correction (1812.05995 eqs 74-79)  
-  const double ell_prefactor2 = (l - 1.)*l*(l + 1.)*(l + 2.); 
+  const double tmp = (l - 1.)*l*(l + 1.)*(l + 2.); 
   const double ell_prefactor2 = (tmp > 0) ? sqrt(tmp) : 0.0; 
   const double growfac_a = growfac(a);
   struct chis chidchi = chi_all(a);
@@ -3654,7 +3653,7 @@ double int_for_C_ks_limber(double a, void* params)
   {
     case 0:
     {
-      res = wk1*wk2;
+      res = WK1*WK2;
 
       break;
     }
@@ -3740,7 +3739,7 @@ double C_ks_tomo_limber(double l, int ni)
     }
     sig = (double*) malloc(sizeof(double)*NSIZE);
   }
-  if (recompute_shear(C, N))
+  if (recompute_ks(C, N))
   {
     #pragma GCC diagnostic push
     #pragma GCC diagnostic ignored "-Wunused-variable"
@@ -3926,14 +3925,16 @@ double int_for_C_gy_tomo_limber(double a, void* params)
   }
   const double l = ar[1];
   const int use_linear_ps = (int) ar[2];
+  const int use_2h_only = use_linear_ps;
 
   const double ell = l + 0.5;
+  struct chis chidchi = chi_all(a);
+  const double hoverh0 = hoverh0v2(a, chidchi.dchida);
   const double fK = f_K(chidchi.chi);
   const double k = ell/fK;
-
-  const double WGAL = W_gal(a, nl)
+  const double WGAL = W_gal(a, nl, chidchi.chi, hoverh0);
   const double WY = W_y(a);
-  const double PK = use_linear_ps == 1 ? P_my_linear(k, a) : P_my(k, a);
+  const double PK = p_my(k, a, use_2h_only);
 
   return (WGAL*WY*PK*chidchi.dchida/(fK*fK));
 }
@@ -3941,7 +3942,7 @@ double int_for_C_gy_tomo_limber(double a, void* params)
 double C_gy_tomo_limber_nointerp(double l, int ni, int use_linear_ps, 
 const int init_static_vars_only)
 {
-  double ar[2] = {(double)ni, l, (double) use_linear_ps};
+  double ar[3] = {(double)ni, l, (double) use_linear_ps};
   const double amin = amin_lens(ni);
   const double amax = 0.99999;
 
@@ -3954,6 +3955,7 @@ const int init_static_vars_only)
   else
   {
     return  (init_static_vars_only == 1) ? int_for_C_gy_tomo_limber(amin, (void*) ar) :
+      like.high_def_integration > 0 ?
       int_gsl_integrate_high_precision(int_for_C_gy_tomo_limber, (void*) ar, amin, amax, 
         NULL, GSL_WORKSPACE_SIZE) :
       int_gsl_integrate_medium_precision(int_for_C_gy_tomo_limber, (void*) ar, amin, amax, 
@@ -3965,6 +3967,7 @@ double C_gy_tomo_limber(double l, int ni)
 {
   static cosmopara C;
   static nuisancepara N;
+  static ynuisancepara N2;
   static galpara G;
   static double** table;
 
@@ -3982,7 +3985,7 @@ double C_gy_tomo_limber(double l, int ni)
       table[i] = (double*) malloc(sizeof(double)*nell);
     }
   }
-  if (recompute_gy(C, G, N))
+  if (recompute_gy(C, G, N, N2))
   {
     #pragma GCC diagnostic push
     #pragma GCC diagnostic ignored "-Wunused-variable"
@@ -4004,6 +4007,7 @@ double C_gy_tomo_limber(double l, int ni)
     update_cosmopara(&C);
     update_nuisance(&N);
     update_galpara(&G);
+    update_ynuisance(&N2);
   }
   if (ni < -1 || ni > tomo.clustering_Nbin - 1)
   {
@@ -4050,27 +4054,29 @@ double int_for_C_ys_tomo_limber(double a, void* params)
   }
   const double l = ar[1];
   const int use_linear_ps = (int) ar[2];
-  
+  const int use_2h_only = use_linear_ps;
+
   const double ell_prefactor1 = l*(l + 1.0);
   const double tmp =  (l - 1.0)*l*(l + 1.0)*(l + 2.0);
-  const double ell_prefactor2 = (tmp > 0) : sqrt(tmp) : 0.0;
+  const double ell_prefactor2 = (tmp > 0) ? sqrt(tmp) : 0.0;
   
   const double ell = l + 0.5;
   const double growfac_a = growfac(a);
   struct chis chidchi = chi_all(a);
+  const double hoverh0 = hoverh0v2(a, chidchi.dchida);
   const double fK = f_K(chidchi.chi);
   const double k  = ell/fK;
   const double WS = W_source(a, ni, hoverh0);
   const double WK = W_kappa(a, fK, ni);
   const double WY = W_y(a);
-  const double PK = use_linear_ps == 1 ? P_my_linear(k, a) :  P_my(k, a);
+  const double PK = p_my(k, a, use_2h_only);
 
   double res = 0;
   switch(like.IA)
   {
     case 0:
     {
-      res = WS*WY
+      res = WS*WY;
 
       break;
     }
@@ -4108,7 +4114,7 @@ const int init_static_vars_only)
    
   return  (init_static_vars_only == 1) ? int_for_C_ys_tomo_limber(amin, (void*) ar) :
     like.high_def_integration > 0 ?
-    int_gsl_integrate_highprecision(int_for_C_ys_tomo_limber, (void*) ar, amin, amax, 
+    int_gsl_integrate_high_precision(int_for_C_ys_tomo_limber, (void*) ar, amin, amax, 
       NULL, GSL_WORKSPACE_SIZE) :
     int_gsl_integrate_medium_precision(int_for_C_ys_tomo_limber, (void*) ar, amin, amax, 
       NULL, GSL_WORKSPACE_SIZE);
@@ -4118,6 +4124,8 @@ double C_ys_tomo_limber(double l, int ni)
 {
   static cosmopara C;
   static nuisancepara N;
+  static ynuisancepara N2;
+
   static double** table;
   static double* sig;
   static int osc[100];
@@ -4137,7 +4145,7 @@ double C_ys_tomo_limber(double l, int ni)
     }
     sig = (double*) malloc(sizeof(double)*NSIZE);
   }
-  if (recompute_shear(C, N))
+  if (recompute_ys(C, N, N2))
   {
     #pragma GCC diagnostic push
     #pragma GCC diagnostic ignored "-Wunused-variable"
@@ -4180,6 +4188,7 @@ double C_ys_tomo_limber(double l, int ni)
     }
     update_cosmopara(&C);
     update_nuisance(&N);
+    update_ynuisance(&N2);
   } 
   if (ni < 0 || ni > tomo.shear_Nbin - 1)
   {
@@ -4233,19 +4242,22 @@ double int_for_C_yy_limber(double a, void *params)
   double* ar = (double*) params;
   const double l = ar[0];
   const int use_linear_ps = (int) ar[1];
+  const int use_2h_only = use_linear_ps;
+
   const double ell = l + 0.5;
   struct chis chidchi = chi_all(a);
   const double fK = f_K(chidchi.chi);
   const double k  = ell/fK;
-  const double PK = use_linear_ps == 1 ? P_yy_lin(k, a) : P_yy(k, a);
+  const double PK = p_yy(k, a, use_2h_only);
   const double WY = W_y(a);
+
   return WY*WY*PK*chidchi.dchida/(fK*fK);
 }
 
 double C_yy_limber_nointerp(double l, int use_linear_ps, const int init_static_vars_only)
 {
   double ar[2] = {l, (double) use_linear_ps};
-  const double amin = limits.a_min_hm;
+  const double amin = limits.a_min;
   const double amax = 1.0 - 1.e-5;
 
   return (init_static_vars_only == 1) ? int_for_C_yy_limber(amin, (void*) ar) :
@@ -4259,6 +4271,7 @@ double C_yy_limber_nointerp(double l, int use_linear_ps, const int init_static_v
 double C_yy_limber(double l)
 {
   static cosmopara C;
+  static ynuisancepara N;
   static double* table;
   
   const int nell = Ntable.N_ell;
@@ -4270,7 +4283,7 @@ double C_yy_limber(double l)
   {
     table = (double*) malloc(sizeof(double)*nell);
   }
-  if (recompute_cosmo3D(C))
+  if (recompute_yy(C, N))
   {
     #pragma GCC diagnostic push
     #pragma GCC diagnostic ignored "-Wunused-variable"
@@ -4284,6 +4297,95 @@ double C_yy_limber(double l)
       const double lnl = lnlmin + i*dlnl;
       table[i] = log(C_yy_limber_nointerp(exp(lnl), use_linear_ps_limber, 0));
     }
+    update_ynuisance(&N);
+    update_cosmopara(&C);
+  }
+  const double lnl = log(l);
+  if (lnl < lnlmin)
+  {
+    log_warn("l = %e < l_min = %e. Extrapolation adopted", l, exp(lnlmin));
+  }
+  if (lnl > lnlmax)
+  {
+    log_warn("l = %e > l_max = %e. Extrapolation adopted", l, exp(lnlmax));
+  }
+  const double f1 = exp(interpol(table, nell, lnlmin, lnlmax, dlnl, lnl, 1, 1));
+  return isnan(f1) ? 0.0 : f1;
+}
+
+// ---------------------------------------------------------------------------
+// ---------------------------------------------------------------------------
+// ---------------------------------------------------------------------------
+
+double int_for_C_ky_limber(double a, void*params)
+{
+  if (!(a>0) || !(a<1)) 
+  {
+    log_fatal("a>0 and a<1 not true");
+    exit(1);
+  }
+
+  double *ar = (double*) params;
+  const double l = ar[0];
+  const int use_linear_ps = (int) ar[1];
+  const int use_2h_only = use_linear_ps;
+
+  const double ell_prefactor = l*(l + 1.);
+  const double ell = l + 0.5;
+  struct chis chidchi = chi_all(a);
+  const double fK = f_K(chi(a));
+  const double k = ell/fK;
+  const double PK = p_my(k, a, use_2h_only);
+  const double WK = W_k(a, fK);
+  const double WY = W_y(a);
+
+  return (WK*WY*PK*chidchi.dchida/(fK*fK))*ell_prefactor/(ell*ell);
+}
+
+double C_ky_limber_nointerp(double l, int use_linear_ps, const int init_static_vars_only)
+{
+  double ar[2] = {l, (double) use_linear_ps};
+  const double amin = limits.a_min_hm;
+  const double amax = 1.0 - 1.e-5;
+
+  return (init_static_vars_only == 1) ? int_for_C_ky_limber(amin, (void*) ar) :
+    like.high_def_integration > 0 ?
+    int_gsl_integrate_high_precision(int_for_C_ky_limber, (void*) ar, amin, amax, 
+      NULL, GSL_WORKSPACE_SIZE) :
+    int_gsl_integrate_medium_precision(int_for_C_ky_limber, (void*) ar, amin, amax, 
+      NULL, GSL_WORKSPACE_SIZE);
+}
+
+double C_ky_limber(double l)
+{
+  static cosmopara C;
+  static ynuisancepara N;
+  static double* table;
+  
+  const int nell = Ntable.N_ell;
+  const double lnlmin = log(fmax(limits.LMIN_tab, 1.0));
+  const double lnlmax = log(fmax(limits.LMAX, limits.LMAX_hankel) + 1);
+  const double dlnl = (lnlmax - lnlmin)/((double) nell - 1.0);
+
+  if (table == 0)
+  {
+    table = (double*) malloc(sizeof(double)*nell);
+  }
+  if (recompute_ky(C, N))
+  {
+    #pragma GCC diagnostic push
+    #pragma GCC diagnostic ignored "-Wunused-variable"
+    {
+      double init = C_ky_limber_nointerp(exp(lnlmin), use_linear_ps_limber, 1);
+    }
+    #pragma GCC diagnostic pop
+    #pragma omp parallel for
+    for (int i=0; i<nell; i++)
+    {
+      const double lnl = lnlmin + i*dlnl;
+      table[i] = log(C_ky_limber_nointerp(exp(lnl), use_linear_ps_limber, 0));
+    }
+    update_ynuisance(&N);
     update_cosmopara(&C);
   }
   const double lnl = log(l);

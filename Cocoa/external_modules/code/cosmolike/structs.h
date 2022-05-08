@@ -12,6 +12,7 @@ extern "C" {
 typedef struct 
 {
   double a_min;
+  double a_min_hm;
   double k_min_cH0;
   double k_max_cH0;
   double M_min;
@@ -33,6 +34,10 @@ typedef struct
   double halo_exclusion_k_max_hankel;
   double halo_exclusion_R_min;
   double halo_exclusion_R_max;
+  double halo_uKS_cmin; // halo.c u_KS(double c, double k, double rv)
+  double halo_uKS_cmax; // halo.c u_KS(double c, double k, double rv)
+  double halo_uKS_xmin; // halo.c u_KS(double c, double k, double rv)
+  double halo_uKS_xmax; // halo.c u_KS(double c, double k, double rv)
 } lim;
 
 typedef struct 
@@ -51,8 +56,7 @@ typedef struct
   int N_ell;
   int N_theta;
   int N_thetaH;
-  int N_S2;
-  int N_DS;
+  int N_M;
   int N_ell_TATT;                  // Cosmo2D
   int NL_Nell_block;               // Cosmo2D - NL = NonLimber
   int NL_Nchi;                     // Cosmo2D - NL = NonLimber
@@ -63,6 +67,8 @@ typedef struct
   int binned_P_lambda_obs_given_M_size_z_table;
   int binned_P_lambda_obs_given_M_size_M_table;
   int binned_p_cm_size_a_table;
+  int halo_uKS_nc;                 // halo.c u_KS(double c, double k, double rv)
+  int halo_uks_nx;                 // halo.c u_KS(double c, double k, double rv)
 } Ntab;
 
 typedef struct 
@@ -89,6 +95,7 @@ typedef struct
 
 typedef struct
 {
+  double Omega_b;  // baryon density paramter
   double Omega_m;  // matter density parameter
   double Omega_v;  // cosmogical constant parameter
   double h0;       // Hubble constant
@@ -97,6 +104,7 @@ typedef struct
   double rho_crit; // = 3 H_0^2/(8 pi G), critical comoving density
   double MGSigma;
   double MGmu;
+  double sigma_8;
   double random; // Random number between zero and 1 - see interface.cpp
   //double w0;
   //double A_s;
@@ -212,6 +220,22 @@ typedef struct
 
 typedef struct
 {
+  // Compton-Y related variables
+  double gas_Gamma_KS; // Gamma in K-S profile
+  double gas_beta;     // beta: mass scaling index in bound gas fraction
+  double gas_lgM0;     // critical halo mass, below which gas ejection is significant
+  double gas_eps1;
+  double gas_eps2;
+  double gas_alpha;
+  double gas_A_star;
+  double gas_lgM_star;
+  double gas_sigma_star;
+  double gas_lgT_w;
+  double gas_f_H;
+} ynuisancepara;
+
+typedef struct
+{
   double area;                    // survey_area in deg^2.
   double n_gal;                   // galaxy density per arcmin^2
   double sigma_e;                 // rms inrinsic ellipticity noise
@@ -249,6 +273,10 @@ typedef struct
   int gk;
   int kk;
   int ks;
+  int gy;
+  int sy;
+  int ky;
+  int yy;
   int clusterN;
   int clusterWL;
   int clusterCG;
@@ -271,6 +299,12 @@ typedef struct
   double b2[MAX_SIZE_ARRAYS];     // quadratic bias parameter for redshift bin i
   double bs2[MAX_SIZE_ARRAYS];    // leading order tidal bias for redshift bin i
   double b_mag[MAX_SIZE_ARRAYS];  // amplitude of magnification bias, b_mag[i] = 5*s[i]+beta[i]-2
+  
+  double hod[MAX_SIZE_ARRAYS][MAX_SIZE_ARRAYS]; // HOD[i] contains HOD parameters of galaxies in 
+                                                // clustering bin i, following 5 parameter model 
+                                                // of Zehavi et al. 2011 + modification of 
+                                                // concentration parameter
+  double cg[MAX_SIZE_ARRAYS];                   // galaxy concentration parameter
   B1_model b1_function;
 } galpara;
 
@@ -339,6 +373,8 @@ extern FPTpara FPT;
 
 extern nuisancepara nuisance;
 
+extern ynuisancepara ynuisance;
+
 extern barypara bary;
 
 extern Cmb cmb;
@@ -374,6 +410,8 @@ void update_cosmopara(cosmopara* C);
 void update_galpara(galpara* G);
 
 void update_nuisance(nuisancepara* N);
+
+void update_ynuisance(ynuisancepara* N);
 
 #ifdef __cplusplus
 }
