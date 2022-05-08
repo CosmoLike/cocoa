@@ -26,6 +26,8 @@ double W_cluster(int nz, double a, double chi, double hoverh0);
 
 double W_k(double a, double fK);
 
+double W_y(double a);
+
 #ifdef __cplusplus
 }
 #endif

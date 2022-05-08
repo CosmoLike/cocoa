@@ -80,8 +80,8 @@ double int_for_sigma2(double x, void* params) // inner integral
     log_fatal(gsl_strerror(status));
     exit(1);
   }
-  const double tmp = 3.0*J1.val/ar[0];
 
+  const double tmp = 3.0*J1.val/ar[0];
   return pk*tmp*tmp/(ar[0] * 2.0 * M_PI * M_PI);
 }
 
@@ -424,8 +424,6 @@ double u_nfw_c(const double c, const double k, const double m, const double a)
     (log(1. + c) - c/(1. + c));
 }
 
-
-
 // ---------------------------------------------------------------------------
 // ---------------------------------------------------------------------------
 // ---------------------------------------------------------------------------
@@ -444,15 +442,26 @@ double int_for_I02(double logm, void* params)
   const double c = conc(m, a);
   const double u = u_nfw_c(c, k1, m, a)*u_nfw_c(c, k2, m, a);
   const double tmp = m/(cosmology.rho_crit * cosmology.Omega_m);
-  return massfunc(m, a) * m * tmp * tmp * u;
+  return massfunc(m, a) * m * u * tmp * tmp;
 }
 
-double I02_noiterp(const double k1, const double k2, const double a) 
+double I02_noiterp(const double k1, const double k2, const double a, const int init_static_vars_only) 
 {
   double ar[3] = {a, k1, k2};
-  return int_gsl_integrate_medium_precision(int_for_I02, (void*) ar, log(limits.M_min),
-    log(limits.M_max), NULL, GSL_WORKSPACE_SIZE);
+  const double lnMmin = log(limits.M_min);
+  const double lnMmax = log(limits.M_max);
+
+  return init_static_vars_only == 1 ? int_for_I02(lnMmin, (void*) ar) :
+    like.high_def_integration > 0 ?
+    int_gsl_integrate_high_precision(int_for_I02, (void*) ar, lnMmin, lnMmax, 
+      NULL, GSL_WORKSPACE_SIZE) :
+    int_gsl_integrate_medium_precision(int_for_I02, (void*) ar, lnMmin, lnMmax, 
+      NULL, GSL_WORKSPACE_SIZE);
 }
+
+// ---------------------------------------------------------------------------
+// ---------------------------------------------------------------------------
+// ---------------------------------------------------------------------------
 
 double int_for_I11(double logm, void* params) 
 {
@@ -462,20 +471,26 @@ double int_for_I11(double logm, void* params)
   const double m = exp(logm);
   const double c = conc(m, a);
   const double u = u_nfw_c(c, k, m, a);
-  return massfunc(m, a) * m * m * u * B1_normalized(m, a) / (cosmology.rho_crit * cosmology.Omega_m);
+  return massfunc(m, a) * m * m * u * B1_normalized(m, a)/(cosmology.rho_crit * cosmology.Omega_m);
 }
 
-double I11_noiterp(const double k, const double a) 
+double I11_noiterp(const double k, const double a, const int init_static_vars_only) 
 { 
-   double ar[2] = {a, k};
-   return int_gsl_integrate_medium_precision(int_for_I11, (void*) ar, log(limits.M_min), 
-    log(limits.M_max), NULL, GSL_WORKSPACE_SIZE);
+  double ar[2] = {a, k};
+  const double lnMmin = log(limits.M_min);
+  const double lnMmax = log(limits.M_max);
+  
+  return like.high_def_integration > 0 ?
+    int_gsl_integrate_high_precision(int_for_I11, (void*) ar, lnMmin, lnMmax, 
+      NULL, GSL_WORKSPACE_SIZE) :
+    int_gsl_integrate_medium_precision(int_for_I11, (void*) ar, lnMmin, lnMmax, 
+      NULL, GSL_WORKSPACE_SIZE);
 }
 
 double I11(const double k, const double a) 
-{ // look-up table for I11 integral
+{
   static cosmopara C;
-  static double** table_I1 = 0;
+  static double** tab_I1 = 0;
 
   const int na = Ntable.N_a;
   const double amin = limits.a_min;
@@ -483,16 +498,16 @@ double I11(const double k, const double a)
   const double da = (amax - amin) / ((double) na - 1.0);
 
   const int nk = Ntable.N_k_nlin;
-  const double logkmin = log(limits.k_min_cH0);
-  const double logkmax = log(limits.k_max_cH0);
-  const double dlogk = (logkmax - logkmin) / ((double) nk - 1.0);
+  const double lnkmin = log(limits.k_min_cH0);
+  const double lnkmax = log(limits.k_max_cH0);
+  const double dlnk = (lnkmax - lnkmin) / ((double) nk - 1.0);
 
-  if (table_I1 == 0)
+  if (tab_I1 == 0)
   {
-    table_I1 = (double**) malloc(sizeof(double*)*Ntable.N_a);
+    tab_I1 = (double**) malloc(sizeof(double*)*Ntable.N_a);
     for(int i=0; i<Ntable.N_a;i++)
     {
-      table_I1[i] = (double*) malloc(sizeof(double)*Ntable.N_k_nlin);
+      tab_I1[i] = (double*) malloc(sizeof(double)*Ntable.N_k_nlin);
     }
   }
   if (recompute_cosmo3D(C)) 
@@ -501,12 +516,12 @@ double I11(const double k, const double a)
       const int i = 0;
       {
         const int j = 0;
-        table_I1[i][j] = I11_noiterp(exp(logkmin + j*dlogk), amin + i*da);
+        tab_I1[i][j] = I11_noiterp(exp(lnkmin + j*dlnk), amin + i*da);
       }
       #pragma omp parallel for
       for (int j=1; j<nk; j++)
       {
-        table_I1[i][j] = I11_noiterp(exp(logkmin + j*dlogk), amin + i*da);
+        tab_I1[i][j] = I11_noiterp(exp(lnkmin + j*dlnk), amin + i*da);
       }
     }
     #pragma omp parallel for collapse(2)
@@ -514,25 +529,38 @@ double I11(const double k, const double a)
     {
       for (int j=0; j<nk; j++)
       {
-        table_I1[i][j] = I11_noiterp(exp(logkmin + j*dlogk), amin + i*da);
+        tab_I1[i][j] = I11_noiterp(exp(lnkmin + j*dlnk), amin + i*da);
       }
     }
     update_cosmopara(&C);
   }
-  // const double tmp = fmin(a, amax - 1.1 * da); // to avoid interpolation errors near z = 0
-  return exp(interpol2d(table_I1, na, amin, amax, da, a, nk, logkmin, logkmax, dlogk, log(k),
-    1.0, 1.0));
+
+  const double lnk = log(k);
+  if (lnk < lnkmin)
+  {
+    log_warn("k = %e < k_min = %e. Extrapolation adopted", k, exp(lnkmin));
+  }
+  if (lnk > lnkmax)
+  {
+    log_warn("k = %e > k_max = %e. Extrapolation adopted", k, exp(lnkmax));
+  }
+
+  return exp(interpol2d(tab_I1, na, amin, amax, da, a, nk, lnkmin, logkmax, dlnk, lnk, 1.0, 1.0));
 }
 
-double p_mm_1h_noiterp(const double k, const double a) 
+// ---------------------------------------------------------------------------
+// ---------------------------------------------------------------------------
+// ---------------------------------------------------------------------------
+
+double p_mm_1h_noiterp(const double k, const double a, const int init_static_vars_only) 
 { // 1Halo Terms
-  return I02_noiterp(k, k, a); 
+  return I02_noiterp(k, k, a, init_static_vars_only); 
 }
 
-double p_mm_2h_noiterp(const double k, const double a) 
+double p_mm_2h_noiterp(const double k, const double a, const int init_static_vars_only) 
 { // 2Halo Terms
-  const double tmp = I11_noiterp(k, a);
-  return tmp * tmp * p_lin(k, a); 
+  const double I11 = I11_noiterp(k, a, init_static_vars_only);
+  return I11 * I11 * p_lin(k, a); 
 }
 
 double p_mm_halomodel(const double k, const double a)
@@ -540,19 +568,22 @@ double p_mm_halomodel(const double k, const double a)
   static cosmopara C;
   static double** table_P_NL = 0;
 
+  const int na = Ntable.N_a;
   const double amin = limits.a_min;
   const double amax = 0.999;
-  const double da = (amax - amin) / ((double) Ntable.N_a - 1.0);
-  const double logkmin = log(limits.k_min_cH0);
-  const double logkmax = log(limits.k_max_cH0);
-  const double dk = (logkmax - logkmin) / ((double) Ntable.N_k_nlin - 1.0);
+  const double da = (amax - amin) / ((double) na - 1.0);
+  
+  const int nk = Ntable.N_k_nlin;
+  const double lnkmin = log(limits.k_min_cH0);
+  const double lnkmin = log(limits.k_max_cH0);
+  const double dk = (lnkmin - lnkmin) / ((double) nk - 1.0);
 
   if (table_P_NL == 0)
   {
-    table_P_NL = (double**) malloc(sizeof(double*)*Ntable.N_a);
-    for(int i=0; i<Ntable.N_a;i++)
+    table_P_NL = (double**) malloc(sizeof(double*)*na);
+    for(int i=0; i<na;i++)
     {
-      table_P_NL[i] = (double*) malloc(sizeof(double)*Ntable.N_k_nlin);
+      table_P_NL[i] = (double*) malloc(sizeof(double)*nk);
     } 
   }
   if (recompute_cosmo3D(C)) 
@@ -562,30 +593,47 @@ double p_mm_halomodel(const double k, const double a)
       const double aa = amin + i*da > 0.999 ? 0.999 : amin + i*da;
       {
         const int j = 0;
-        const double kk = exp(logkmin + j*dk);
+        const double kk = exp(lnkmin + j*dk);
         table_P_NL[i][j] = log(p_mm_1h_noiterp(kk, aa) + p_mm_2h_noiterp(kk, aa));
       }
       #pragma omp parallel for
-      for (int j=1; j<Ntable.N_k_nlin; j++) 
+      for (int j=1; j<nk; j++) 
       {
-        const double kk = exp(logkmin + j*dk);
+        const double kk = exp(lnkmin + j*dk);
         table_P_NL[i][j] = log(p_mm_1h_noiterp(kk, aa) + p_mm_2h_noiterp(kk, aa));
       }
     }
     #pragma omp parallel for collapse(2)
-    for (int i=1; i<Ntable.N_a; i++) 
+    for (int i=1; i<na; i++) 
     { 
-      for (int j=0; j<Ntable.N_k_nlin; j++) 
+      for (int j=0; j<nk; j++) 
       {
         const double aa = amin + i*da > amax ? amax : amin + i*da;
-        const double kk = exp(logkmin + j*dk);
+        const double kk = exp(lnkmin + j*dk);
         table_P_NL[i][j] = log(p_mm_1h_noiterp(kk, aa) + p_mm_2h_noiterp(kk, aa));
       }
     }
     update_cosmopara(&C);
   }
-  return exp(interpol2d(table_P_NL, Ntable.N_a, amin, amax, da, a, Ntable.N_k_nlin, logkmin,
-    logkmax, dk, log(k), 1.0, 1.0));
+
+  const double lnk = log(k);
+  if (lnk < lnkmin)
+  {
+    log_warn("k = %e < k_min = %e. Extrapolation adopted", k, exp(lnkmin));
+  }
+  if (lnk > lnkmax)
+  {
+    log_warn("k = %e > k_max = %e. Extrapolation adopted", k, exp(lnkmax));
+  }
+  if (a < amin)
+  {
+    log_warn("a = %e < a_min = %e. Extrapolation adopted", a, amin);
+  }
+  if (a > amax)
+  {
+    log_warn("a = %e > a_max = %e. Extrapolation adopted", a, amax);
+  }
+  return exp(interpol2d(table_P_NL, na, amin, amax, da, a, nk, lnkmin, lnkmax, dk, lnk, 1.0, 1.0));
 }
 
 // ---------------------------------------------------------------------------
@@ -667,4 +715,288 @@ double b_source(double a) // lookup table for b1 of source galaxies
     update_cosmopara(&C);
   }
   return interpol(table, Ntable.N_a, amin, amax, da, a, 1.0, 1.0);
+}
+
+// ---------------------------------------------------------------------------
+// ---------------------------------------------------------------------------
+// ---------------------------------------------------------------------------
+// functions important for y correlation functions
+// ---------------------------------------------------------------------------
+// ---------------------------------------------------------------------------
+// ---------------------------------------------------------------------------
+
+double int_for_I11_y(double logm, void* params) 
+{
+  const double* ar = (double*) params;  
+  const double a = ar[0];
+  const double k = ar[1];
+  const double m = exp(logm);
+  const double cy = conc_y(m,a); 
+  const double u = u_y_bnd(c_y, k, m, a) + u_y_ejc(m);
+  const double tmp = m/(cosmology.rho_crit*cosmology.Omega_m);
+  return massfunc(m, a) * m * u * tmp * B1_normalized(m, a);
+}
+
+double I11_y_noiterp(const double k, const double a, const int init_static_vars_only) 
+{ 
+  double ar[2] = {a, k};
+  const double lnMmin = log(limits.M_min);
+  const double lnMmax = log(limits.M_max);
+  
+  return init_static_vars_only == 1 ? int_for_I11_y(lnMmin, (void*) ar): 
+    like.high_def_integration > 0 ?
+    int_gsl_integrate_high_precision(int_for_I11_y, (void*) ar, lnMmin, lnMmax, 
+      NULL, GSL_WORKSPACE_SIZE) :
+    int_gsl_integrate_medium_precision(int_for_I11_y, (void*) ar, lnMmin, lnMmax, 
+      NULL, GSL_WORKSPACE_SIZE);
+}
+
+// ----------------------------------------------------------------------------------------------
+// ----------------------------------------------------------------------------------------------
+// ----------------------------------------------------------------------------------------------
+
+double int_for_I02_yy(double logm, void* params)
+{
+  double* ar = (double*) params;
+  const double a = ar[0];
+  const double k1 = ar[1];
+  const double k2 = ar[2];
+  const double m = exp(logm);
+  const double cy = conc_y(m,a); 
+  const double u = u_y_bnd(cy, k1, m, a) * u_y_bnd(cy, k2, m, a);
+  const double tmp = m/(cosmology.rho_crit*cosmology.Omega_m);
+  return massfunc(m, a) * m * u * tmp * tmp;
+}
+
+double I02_yy_noiterp(const double k1, const double k2, const double a, 
+const int init_static_vars_only) 
+{
+  double ar[3] = {a, k1, k2};
+  const double lnMmin = log(limits.M_min);
+  const double lnMmax = log(limits.M_max);
+
+  return init_static_vars_only == 1 ? int_for_I02_yy(lnMmin, (void*) ar) :
+    like.high_def_integration > 0 ?
+    int_gsl_integrate_high_precision(int_for_I02_yy, (void*) ar, lnMmin, lnMmax, 
+      NULL, GSL_WORKSPACE_SIZE) :
+    int_gsl_integrate_medium_precision(int_for_I02_yy, (void*) ar, lnMmin, lnMmax, 
+      NULL, GSL_WORKSPACE_SIZE);
+}
+
+double p_yy_1h_noiterp(const double k, const double a, const int init_static_vars_only) 
+{
+  const double I02YY = I02_yy_noiterp(k, k, a, init_static_vars_only);
+  // convert to code unit, Table 2, 2009.01858
+  const double ks = 0.05618/pow(cosmology.sigma_8*a, 1.013)*cosmology.coverH0; 
+  const double x = ks*ks*ks*ks
+  return I02YY*(1.0/(x + 1.0)); // suppress lowk, Eq17, 2009.01858
+}
+
+double p_yy_2h_noiterp(double k, double a, const int init_static_vars_only)
+{
+  const double I11YY = I11_y_noiterp(k, a, init_static_vars_only);
+  return I11YY*I11YY*p_lin(k,a);
+}
+
+double p_yy_noiterp(double k, double a, const int init_static_vars_only)
+{
+  const double PYY1H = p_yy_1h_noiterp(k, a, init_static_vars_only);
+  const double PYY2H = p_yy_2h_noiterp(k, a, init_static_vars_only);
+  return PYY1H + PYY2H;
+}
+
+double p_yy_linear_noiterp(double k, double a, const int init_static_vars_only)
+{
+  const double PYY2H = p_yy_2h_noiterp(k, a, init_static_vars_only);
+  return PYY2H;
+}
+
+double p_yy(const double k, const double a)
+{ 
+  static cosmopara C;
+  static double** tab_P_NL = 0;
+
+  const int na = Ntable.N_a;
+  const double amin = limits.a_min;
+  const double amax = 0.999;
+  const double da = (amax - amin) / ((double) na - 1.0);
+  
+  const int nk = Ntable.N_k_nlin;
+  const double lnkmin = log(limits.k_min_cH0);
+  const double lnkmin = log(limits.k_max_cH0);
+  const double dk = (lnkmin - lnkmin) / ((double) nk - 1.0);
+
+  if (tab_P_NL == 0)
+  {
+    table_P_NL = (double**) malloc(sizeof(double*)*na);
+    for(int i=0; i<na;i++)
+    {
+      tab_P_NL[i] = (double*) malloc(sizeof(double)*nk);
+    } 
+  }
+  if (recompute_cosmo3D(C)) 
+  { // extend this by halo model parameters if these become part of the model
+    #pragma GCC diagnostic push
+    #pragma GCC diagnostic ignored "-Wunused-variable"
+    {
+      double init = p_yy_noiterp(exp(lnkmin), amin, 1);
+    }
+    #pragma GCC diagnostic pop   
+    #pragma omp parallel for collapse(2)
+    for (int i=0; i<na; i++) 
+    { 
+      for (int j=0; j<nk; j++) 
+      {
+        const double aa = amin + i*da > amax ? amax : amin + i*da;
+        const double kk = exp(lnkmin + j*dk);
+        tab_P_NL[i][j] = log(p_yy_noiterp(kk, aa));
+      }
+    }
+    update_cosmopara(&C);
+  }
+
+  const double lnk = log(k);
+  if (lnk < lnkmin)
+  {
+    log_warn("k = %e < k_min = %e. Extrapolation adopted", k, exp(lnkmin));
+  }
+  if (lnk > lnkmax)
+  {
+    log_warn("k = %e > k_max = %e. Extrapolation adopted", k, exp(lnkmax));
+  }
+  if (a < amin)
+  {
+    log_warn("a = %e < a_min = %e. Extrapolation adopted", a, amin);
+  }
+  if (a > amax)
+  {
+    log_warn("a = %e > a_max = %e. Extrapolation adopted", a, amax);
+  }
+  return exp(interpol2d(tab_P_NL, na, amin, amax, da, a, nk, lnkmin, lnkmax, dk, lnk, 1.0, 1.0));
+}
+
+// ----------------------------------------------------------------------------------------------
+// ----------------------------------------------------------------------------------------------
+// ----------------------------------------------------------------------------------------------
+
+double int_for_I02_my(double logm, void* params)
+{
+  double* ar = (double*) params;
+  const double a = ar[0];
+  const double k1 = ar[1];
+  const double k2 = ar[2];
+  const double m = exp(logm);
+  const double c = conc(m,a);
+  const double cy = conc_y(m,a); 
+  const double u = u_y_bnd(cy, k1, m, a) * u_nfw_c(c, k2, m, a);
+  const double tmp = m/(cosmology.rho_crit*cosmology.Omega_m);
+  return massfunc(m, a) * m * u * tmp * tmp;
+}
+
+double I02_my_noiterp(const double k1, const double k2, const double a, 
+const int init_static_vars_only) 
+{
+  double ar[3] = {a, k1, k2};
+  const double lnMmin = log(limits.M_min);
+  const double lnMmax = log(limits.M_max);
+
+  return init_static_vars_only == 1 ? int_for_I02_my(lnMmin, (void*) ar) :
+    like.high_def_integration > 0 ?
+    int_gsl_integrate_high_precision(int_for_I02_my, (void*) ar, lnMmin, lnMmax, 
+      NULL, GSL_WORKSPACE_SIZE) :
+    int_gsl_integrate_medium_precision(int_for_I02_my, (void*) ar, lnMmin, lnMmax, 
+      NULL, GSL_WORKSPACE_SIZE);
+}
+
+double p_my_1h_noiterp(const double k, const double a, const int init_static_vars_only) 
+{
+  const double I02MY = I02_my_noiterp(k, k, a, init_static_vars_only);
+  // convert to code unit, Table 2, 2009.01858
+  const double ks = 0.05618/pow(cosmology.sigma_8*a, 1.013)*cosmology.coverH0; 
+  const double x = ks*ks*ks*ks
+  return I02MY*(1.0/(x + 1.0)); // suppress lowk, Eq17, 2009.01858
+}
+
+double p_my_2h_noiterp(double k, double a, const int init_static_vars_only)
+{
+  const double I11 = I_11_noiterp(k, a, init_static_vars_only);
+  const double I11YY = I_11_y_noiterp(k, a, init_static_vars_only)
+  return I11*I11YY*p_lin(k,a);
+}
+
+double p_my_noiterp(double k, double a, const int init_static_vars_only)
+{
+  const double PM1H = p_my_1h_noiterp(k, a);
+  const double PM2H = p_my_2h_noiterp(k, a, init_static_vars_only);
+  return PM1H + PM2H;
+}
+
+double p_my_linear_noiterp(double k,double a, const int init_static_vars_only)
+{
+  const double PM2H = p_my_2h_noiterp(k, a, init_static_vars_only);
+  return PM2H;
+}
+
+double p_my_halomodel(const double k, const double a)
+{ 
+  static cosmopara C;
+  static double** tab_P_NL = 0;
+
+  const int na = Ntable.N_a;
+  const double amin = limits.a_min;
+  const double amax = 0.999;
+  const double da = (amax - amin) / ((double) na - 1.0);
+  
+  const int nk = Ntable.N_k_nlin;
+  const double lnkmin = log(limits.k_min_cH0);
+  const double lnkmin = log(limits.k_max_cH0);
+  const double dk = (lnkmin - lnkmin) / ((double) nk - 1.0);
+
+  if (tab_P_NL == 0)
+  {
+    table_P_NL = (double**) malloc(sizeof(double*)*na);
+    for(int i=0; i<na;i++)
+    {
+      tab_P_NL[i] = (double*) malloc(sizeof(double)*nk);
+    } 
+  }
+  if (recompute_cosmo3D(C)) 
+  {
+    #pragma GCC diagnostic push
+    #pragma GCC diagnostic ignored "-Wunused-variable"
+    {
+      double init = p_my_noiterp(exp(lnkmin), amin, 1);
+    }
+    #pragma GCC diagnostic pop 
+    #pragma omp parallel for collapse(2)
+    for (int i=0; i<na; i++) 
+    { 
+      for (int j=0; j<nk; j++) 
+      {
+        const double aa = amin + i*da > amax ? amax : amin + i*da;
+        const double kk = exp(lnkmin + j*dk);
+        tab_P_NL[i][j] = log(p_my_noiterp(kk, aa));
+      }
+    }
+    update_cosmopara(&C);
+  }
+
+  const double lnk = log(k);
+  if (lnk < lnkmin)
+  {
+    log_warn("k = %e < k_min = %e. Extrapolation adopted", k, exp(lnkmin));
+  }
+  if (lnk > lnkmax)
+  {
+    log_warn("k = %e > k_max = %e. Extrapolation adopted", k, exp(lnkmax));
+  }
+  if (a < amin)
+  {
+    log_warn("a = %e < a_min = %e. Extrapolation adopted", a, amin);
+  }
+  if (a > amax)
+  {
+    log_warn("a = %e > a_max = %e. Extrapolation adopted", a, amax);
+  }
+  return exp(interpol2d(tab_P_NL, na, amin, amax, da, a, nk, lnkmin, lnkmax, dk, lnk, 1.0, 1.0));
 }
