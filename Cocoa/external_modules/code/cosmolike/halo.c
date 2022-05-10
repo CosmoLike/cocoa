@@ -1752,9 +1752,15 @@ double G11_nointerp(double k, double a, int ni, const int init_static_vars_only)
 // ---------------------------------------------------------------------------
 // ---------------------------------------------------------------------------
 
-double p_gg_nointerp(const double k, const double a, const int ni, const int use_2h_and_linear_only,
-const int init_static_vars_only)
+double p_gg_nointerp(const double k, const double a, const int ni, const int nj,
+const int use_2h_and_linear_only, const int init_static_vars_only)
 {
+  if (ni != nj)
+  {
+    log_fatal("cross-tomography (ni,nj) = (%d,%d) bins not supported", ni, nj);
+    exit(1);
+  }
+
   const double bg = bgal(ni, a);
   const double ng = ngal(ni, a);
   
@@ -1768,7 +1774,8 @@ const int init_static_vars_only)
   }
 }
 
-double p_gg(const double k, const double a, const int ni, const int use_2h_and_linear_only)
+double p_gg(const double k, const double a, const int ni, const int nj, 
+const int use_2h_and_linear_only)
 {
   static cosmopara C;
   static galpara G;
@@ -1776,6 +1783,12 @@ double p_gg(const double k, const double a, const int ni, const int use_2h_and_l
   static double* amin = 0;
   static double* amax = 0;
   static double* da = 0;
+
+  if (ni != nj)
+  {
+    log_fatal("cross-tomography (ni,nj) = (%d,%d) bins not supported", ni, nj);
+    exit(1);
+  }
 
   const int nbin = tomo.clustering_Nbin;
 
@@ -1813,7 +1826,7 @@ double p_gg(const double k, const double a, const int ni, const int use_2h_and_l
     #pragma GCC diagnostic push
     #pragma GCC diagnostic ignored "-Wunused-variable"
     {
-      double init = p_gg_nointerp(exp(lnkmin), amin[0], 0, use_2h_and_linear_only, 1);
+      double init = p_gg_nointerp(exp(lnkmin), amin[0], 0, 0, use_2h_and_linear_only, 1);
     }
     #pragma GCC diagnostic pop
     
@@ -1825,7 +1838,8 @@ double p_gg(const double k, const double a, const int ni, const int use_2h_and_l
         for (int j=0; j<nk; j++) 
         {
           const double lnk  = lnkmin + j*dlnk;
-          table[l][i][j] = p_gg_nointerp(exp(lnk), amin[l] + i*da[l], l, use_2h_and_linear_only, 0);
+          table[l][i][j] = 
+            p_gg_nointerp(exp(lnk), amin[l] + i*da[l], l, l, use_2h_and_linear_only, 0);
           table[l][i][j] = log(table[l][i][j]);
         }
       }
@@ -1880,7 +1894,7 @@ const int init_static_vars_only)
   }
 }
 
-double p_gm (const double k, const double a, const int ni, const int use_2h_and_linear_only)
+double p_gm(const double k, const double a, const int ni, const int use_2h_and_linear_only)
 {
   static cosmopara C;
   static galpara G;
