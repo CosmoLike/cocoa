@@ -3376,13 +3376,10 @@ const int init_static_vars_only)
   else
   {
     res = (init_static_vars_only == 1) ? int_for_C_gg_tomo_limber(amin, (void*) ar) :
-      like.high_def_integration == 2 ?
+      like.high_def_integration > 0 ?
       int_gsl_integrate_high_precision(int_for_C_gg_tomo_limber, (void*) ar, amin, amax, NULL,
         GSL_WORKSPACE_SIZE) :
-      like.high_def_integration == 1 ?
       int_gsl_integrate_medium_precision(int_for_C_gg_tomo_limber, (void*) ar, amin, amax, NULL,
-        GSL_WORKSPACE_SIZE) :
-      int_gsl_integrate_low_precision(int_for_C_gg_tomo_limber, (void*) ar, amin, amax, NULL,
         GSL_WORKSPACE_SIZE);
   }
   return res;
