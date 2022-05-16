@@ -3,8 +3,6 @@ import torch.nn as nn
 import torch.nn.functional as F
 from torch.distributions import MultivariateNormal
 from tqdm import tqdm
-from sklearn.decomposition import PCA
-from sklearn.model_selection import train_test_split
 import numpy as np
 import h5py as h5
 
@@ -111,6 +109,8 @@ class NNEmulator:
             f['X_std']  = self.X_std
             f['Y_mean'] = self.y_mean
             f['Y_std']  = self.y_std
+            f['dv_fid'] = self.dv_fid
+            f['dv_std'] = self.dv_std
         
     def load(self, filename):
         self.trained = True
@@ -120,3 +120,5 @@ class NNEmulator:
             self.X_std  = torch.Tensor(f['X_std'][:])
             self.y_mean = torch.Tensor(f['Y_mean'][:])
             self.y_std  = torch.Tensor(f['Y_std'][:])
+            self.dv_fid = torch.Tensor(f['dv_fid'][:])
+            self.dv_std = torch.Tensor(f['dv_std'][:])

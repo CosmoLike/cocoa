@@ -1,5 +1,6 @@
 import yaml
 import numpy as np
+# from .sampling import get_starting_pos
 
 class Config:
     def __init__(self, configfile):
@@ -9,28 +10,32 @@ class Config:
         self.config_args_emu = config_args['emulator'] 
         self.params          = config_args['params'] 
         config_args_lkl = config_args['likelihood']
-        self.config_lkl(config_args_lkl)
+        
+        self.n_lhs         = int(self.config_args_emu['n_lhs'])
+        self.savedir       = self.config_args_emu['savedir']
+        self.n_train_iter  = int(self.config_args_emu['n_train_iter'])
+        self.dv_fid_path   = self.config_args_emu['dv_fid']
 
-        self.N_lhs        = int(self.config_args_emu['N_lhs'])
-        self.savedir      = self.config_args_emu['savedir']
-        self.N_train_iter = int(self.config_args_emu['N_train_iter'])
-        self.dv_fid_path  = self.config_args_emu['dv_fid']
+        self.config_data(config_args_lkl)
         
-        self.emu_type     = self.config_args_emu['emu_type']
-        self.batch_size   = int(self.config_args_emu['batch_size'])
-        self.n_epochs     = int(self.config_args_emu['n_epochs'])
-
-        self.dv_fid       = np.loadtxt(self.dv_fid_path)[:,1]
-        self.output_dims  = len(self.dv_fid)
-        self.cov          = self.get_full_cov()
-        self.dv_std       = np.sqrt(np.diagonal(self.cov))
+        try:
+            self.n_pcas_baryon = self.config_args_emu['n_pcas_baryon']
+        except:
+            self.n_pcas_baryon = 0
         
-        self.priors       = self.get_priors()
-        self.N_dim        = len(self.priors)
+        self.emu_type      = self.config_args_emu['emu_type']
+        self.batch_size    = int(self.config_args_emu['batch_size'])
+        self.n_epochs      = int(self.config_args_emu['n_epochs'])
         
-        self.param_labels = list(self.priors.keys())
+        self.n_emcee_walkers = int(self.config_args_emu['n_emcee_walkers'])
+        self.n_mcmc          = int(self.config_args_emu['n_mcmc'])
+        
+        self.lhs_minmax    = self.get_lhs_minmax()
+        self.n_dim         = len(self.lhs_minmax)
+        
+        self.param_labels = list(self.lhs_minmax.keys())
     
-    def config_lkl(self, config_args_lkl):
+    def config_data(self, config_args_lkl):
         self.likelihood      = list(config_args_lkl.keys())[0]
         self.config_args_lkl = config_args_lkl[self.likelihood]
         self.likelihood_path = self.config_args_lkl['path']
@@ -39,14 +44,25 @@ class Config:
         with open(self.dataset_path, 'r') as f:
             for line in f.readlines():
                 split_line = line.split()
+                if(split_line[0]=='data_file'):
+                    self.dv_obs_path = self.likelihood_path + '/' + split_line[-1]
                 if(split_line[0]=='cov_file'):
-                    self.cov_file        = self.likelihood_path + '/' + split_line[-1]
+                    cov_file        = self.likelihood_path + '/' + split_line[-1]
                 if(split_line[0]=='mask_file'):
-                    self.mask_file       = self.likelihood_path + '/' + split_line[-1]
+                    mask_file       = self.likelihood_path + '/' + split_line[-1]
                 if(split_line[0]=='baryon_pca_file'):
-                    self.baryon_pca_file = self.likelihood_path + '/' + split_line[-1]
-            
-    def get_priors(self):
+                    baryon_pca_file = self.likelihood_path + '/' + split_line[-1]
+        
+        self.baryon_pcas = np.loadtxt(baryon_pca_file)
+        self.mask        = np.loadtxt(mask_file)[:,1].astype(bool)
+        self.dv_fid      = np.loadtxt(self.dv_fid_path)[:,1]
+        self.dv_obs      = np.loadtxt(self.dv_obs_path)[:,1]
+        self.output_dims = len(self.dv_obs)
+        assert len(self.dv_obs)==len(self.dv_fid),"Observed data vector is of different size compared to the fiducial data vector."
+        self.cov         = self.get_full_cov(cov_file)
+        self.dv_std      = np.sqrt(np.diagonal(self.cov))
+        
+    def get_lhs_minmax(self):
         lh_minmax = {}
         for x in self.params:
             if('prior' in self.params[x]):
@@ -62,9 +78,9 @@ class Config:
                 lh_minmax[x] = {'min': lh_min, 'max': lh_max}
         return lh_minmax
     
-    def get_full_cov(self):
+    def get_full_cov(self, cov_file):
         print("Getting covariance...")
-        full_cov = np.loadtxt(self.cov_file)
+        full_cov = np.loadtxt(cov_file)
         cov = np.zeros((self.output_dims, self.output_dims))
         for line in full_cov:
             i = int(line[0])
@@ -79,3 +95,5 @@ class Config:
             cov[j,i] = cov_ij
 
         return cov
+    
+    
