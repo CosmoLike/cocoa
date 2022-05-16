@@ -1,7 +1,9 @@
 import sys
 from mpi4py import MPI
 import numpy as np
+import torch
 from cocoa_emu import Config, get_lhs_params_list, CocoaModel
+# from cocoa_emu.emulator import NNEmulator, GPEmulator
 
 comm = MPI.COMM_WORLD
 size = comm.Get_size()
@@ -66,5 +68,10 @@ if(rank==0):
     np.save(config.savedir + '/train_data_vectors.npy', train_data_vectors)
     np.save(config.savedir + '/train_params.npy', train_params)
 
+if(config.emu_type=='nn'):
+    emu = NNEmulator(config.N_dim, config.output_dims, config.dv_fid, config.dv_std)
+    print("Training emulator...")
+    emu.train(torch.Tensor(train_params), torch.Tensor(train_data_vectors), 
+              batch_size=config.batch_size, n_epochs=config.n_epochs)
 MPI.Finalize
 # ============================================
