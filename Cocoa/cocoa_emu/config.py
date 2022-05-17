@@ -14,6 +14,8 @@ class Config:
         self.n_lhs         = int(self.config_args_emu['n_lhs'])
         self.savedir       = self.config_args_emu['savedir']
         self.n_train_iter  = int(self.config_args_emu['n_train_iter'])
+        self.n_resample    = int(self.config_args_emu['n_resample'])
+        
         self.dv_fid_path   = self.config_args_emu['dv_fid']
 
         self.config_data(config_args_lkl)
@@ -23,12 +25,16 @@ class Config:
         except:
             self.n_pcas_baryon = 0
         
-        self.emu_type      = self.config_args_emu['emu_type']
-        self.batch_size    = int(self.config_args_emu['batch_size'])
-        self.n_epochs      = int(self.config_args_emu['n_epochs'])
+        self.emu_type      = self.config_args_emu['training']['emu_type']
+        self.batch_size    = int(self.config_args_emu['training']['batch_size'])
+        self.n_epochs      = int(self.config_args_emu['training']['n_epochs'])
         
-        self.n_emcee_walkers = int(self.config_args_emu['n_emcee_walkers'])
-        self.n_mcmc          = int(self.config_args_emu['n_mcmc'])
+        self.n_emcee_walkers = int(self.config_args_emu['sampling']['n_emcee_walkers'])
+        self.n_mcmc          = int(self.config_args_emu['sampling']['n_mcmc'])
+        self.n_burn_in       = int(self.config_args_emu['sampling']['n_burn_in'])
+        self.n_thin          = int(self.config_args_emu['sampling']['n_thin'])
+        self.temper0          = float(self.config_args_emu['sampling']['temper0'])
+        self.temper_increment = float(self.config_args_emu['sampling']['temper_increment'])
         
         self.lhs_minmax    = self.get_lhs_minmax()
         self.n_dim         = len(self.lhs_minmax)
