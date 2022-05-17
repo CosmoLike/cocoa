@@ -18,23 +18,26 @@ def gaussian_prior(theta, params_prior):
     
 class EmuSampler:
     def __init__(self, emu, config):
-        self.emu            = emu
-        self.params         = config.params
+        self.emu              = emu
+        self.params           = config.params
+        
+        self.n_walkers        = config.n_emcee_walkers
+        self.n_pcas_baryon    = config.n_pcas_baryon
+        self.baryon_pcas      = config.baryon_pcas
+        
+        self.emu_type         = config.emu_type
+        self.mask             = config.mask
+        self.cov              = config.cov
+        self.masked_inv_cov   = np.linalg.inv(self.cov[self.mask][:,self.mask])
+        self.dv_obs           = config.dv_obs
+        self.shear_calib_mask = config.shear_calib_mask
+        self.source_ntomo     = config.source_ntomo
+        self.shear_prior_std  = config.config_args_emu['shear_calib']['prior_std']    
         
         self.get_priors()
         
-        self.n_walkers      = config.n_emcee_walkers
-        self.n_pcas_baryon  = config.n_pcas_baryon
-        self.baryon_pcas    = config.baryon_pcas
+        self.n_sample_dims    = config.n_dim + self.source_ntomo + config.n_pcas_baryon
         
-        self.emu_type       = config.emu_type
-        self.mask           = config.mask
-        self.cov            = config.cov
-        self.masked_inv_cov = np.linalg.inv(self.cov[self.mask][:,self.mask])
-        self.dv_obs         = config.dv_obs
-        
-        self.n_sample_dims = config.n_dim + config.n_pcas_baryon
-
     def get_priors(self):
         gaussian_prior_indices = []
         gaussian_prior_parameters = []
@@ -61,6 +64,13 @@ class EmuSampler:
         
         self.gaussian_prior_parameters = np.array(gaussian_prior_parameters)
         self.flat_prior_parameters     = np.array(flat_prior_parameters)
+        
+        shear_prior_std = self.shear_prior_std.split(',')
+        shear_prior_std_list = []
+        for std in shear_prior_std:
+            shear_prior_std_list.append(float(std))
+        self.m_shear_prior_std = np.array(shear_prior_std_list)
+        self.m_shear_prior_parameters = np.array([np.zeros(self.source_ntomo), self.m_shear_prior_std]).T
 
     def get_starting_pos(self):
         p0 = []
@@ -72,18 +82,13 @@ class EmuSampler:
                 p0.append(p0_i)        
         p0 = np.array(p0).T
         if self.n_pcas_baryon!=0:
-            p0_baryons = 0.1 * np.random.normal(size=(self.n_walkers, self.n_pcas_baryon))
-            p0 = np.hstack([p0, p0_baryons])
+            fast_pars_std = self.m_shear_prior_std
+            if(self.n_pcas_baryon > 0):
+                baryon_std = np.hstack([0.1 * np.ones(self.n_pcas_baryon)])
+                fast_pars_std = np.hstack([fast_pars_std, baryon_std])
+            p0_fast = fast_pars_std * np.random.normal(size=(self.n_walkers, self.source_ntomo + self.n_pcas_baryon))
+            p0 = np.hstack([p0, p0_fast])
         return p0
-
-    def ln_prior(self, theta):
-        flat_prior_theta     = theta[self.flat_prior_indices]
-        gaussian_prior_theta = theta[self.gaussian_prior_indices]
-
-        prior_flat  = hard_prior(flat_prior_theta, self.flat_prior_parameters)
-        prior_gauss = gaussian_prior(gaussian_prior_theta, self.gaussian_prior_parameters)
-        
-        return prior_flat + prior_gauss
             
     def compute_datavector(self, theta):
         if(self.emu_type=='nn'):
@@ -98,13 +103,34 @@ class EmuSampler:
             datavector = datavector + Q[i] * self.baryon_pcas[:,i]
         return datavector
 
-    def get_data_vector_emu(self, theta):
-        theta_emu  = theta[:-self.n_pcas_baryon]
-        baryon_q   = theta[-self.n_pcas_baryon:]
-        datavector = self.compute_datavector(theta_emu)
-        datavector = self.add_baryon_q(baryon_q, datavector)
+    def add_shear_calib(self, m, datavector):
+        for i in range(self.source_ntomo):
+            factor = (1 + m[i])**self.shear_calib_mask[i]
+            datavector = factor * datavector
         return datavector
 
+    def get_data_vector_emu(self, theta):
+        theta_emu     = theta[:-(self.n_pcas_baryon + self.source_ntomo)]
+        m_shear_theta = theta[-(self.n_pcas_baryon + self.source_ntomo):-self.n_pcas_baryon]
+        
+        datavector = self.compute_datavector(theta_emu)
+        datavector = self.add_shear_calib(m_shear_theta, datavector)
+        if(self.n_pcas_baryon > 0):
+            baryon_q   = theta[-self.n_pcas_baryon:]
+            datavector = self.add_baryon_q(baryon_q, datavector)
+        return datavector
+
+    def ln_prior(self, theta):
+        flat_prior_theta     = theta[self.flat_prior_indices]
+        gaussian_prior_theta = theta[self.gaussian_prior_indices]
+        m_shear_theta        = theta[-(self.n_pcas_baryon + self.source_ntomo):-self.n_pcas_baryon]
+        
+        prior_flat  = hard_prior(flat_prior_theta, self.flat_prior_parameters)
+        prior_gauss = gaussian_prior(gaussian_prior_theta, self.gaussian_prior_parameters)
+        prior_m_shear = gaussian_prior(m_shear_theta, self.m_shear_prior_parameters)
+        
+        return prior_flat + prior_gauss + prior_m_shear
+    
     def ln_lkl(self, theta):
         model_datavector = self.get_data_vector_emu(theta)
         delta_dv = (model_datavector - self.dv_obs)[self.mask]

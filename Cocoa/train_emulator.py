@@ -82,15 +82,11 @@ for n in range(config.n_train_iter):
         train_data_vectors = current_iter_data_vectors
     # ================== Train emulator ==========================
     if(rank==0):
-        print("train_samples.shape: "      + str(train_samples.shape))
-        print("train_data_vectors.shape: " + str(train_data_vectors.shape))
         np.save(config.savedir + '/train_data_vectors_%d.npy'%(n), current_iter_data_vectors)
         np.save(config.savedir + '/train_samples_%d.npy'%(n), current_iter_samples)
         print("Training emulator...")
         if(config.emu_type=='nn'):
             emu = NNEmulator(config.n_dim, config.output_dims, config.dv_fid, config.dv_std)
-            print("config.n_epochs: "+str(config.n_epochs))
-            print("config.batch_size: "+str(config.batch_size))
             emu.train(torch.Tensor(train_samples), torch.Tensor(train_data_vectors),\
                       batch_size=config.batch_size, n_epochs=config.n_epochs)
             emu.save(config.savedir + 'model_%d'%(n))
@@ -109,7 +105,7 @@ for n in range(config.n_train_iter):
         samples = sampler.chain[:,config.n_burn_in::config.n_thin].reshape((-1, emu_sampler.n_sample_dims))
         
         select_indices = np.random.choice(np.arange(len(samples)), replace=False, size=config.n_resample)
-        next_training_samples = samples[select_indices,:-config.n_pcas_baryon]
+        next_training_samples = samples[select_indices,:-(config.n_pcas_baryon+config.source_ntomo)]
     else:
         next_training_samples = None
     next_training_samples = comm.bcast(next_training_samples, root=0)

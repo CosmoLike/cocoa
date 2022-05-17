@@ -21,10 +21,10 @@ class Config:
         self.config_data(config_args_lkl)
         
         try:
-            self.n_pcas_baryon = self.config_args_emu['n_pcas_baryon']
+            self.n_pcas_baryon = self.config_args_emu['baryons']['n_pcas_baryon']
         except:
             self.n_pcas_baryon = 0
-        
+
         self.emu_type      = self.config_args_emu['training']['emu_type']
         self.batch_size    = int(self.config_args_emu['training']['batch_size'])
         self.n_epochs      = int(self.config_args_emu['training']['n_epochs'])
@@ -58,12 +58,15 @@ class Config:
                     mask_file       = self.likelihood_path + '/' + split_line[-1]
                 if(split_line[0]=='baryon_pca_file'):
                     baryon_pca_file = self.likelihood_path + '/' + split_line[-1]
+                if(split_line[0]=='source_ntomo'):
+                    self.source_ntomo = int(split_line[-1])
         
         self.baryon_pcas = np.loadtxt(baryon_pca_file)
         self.mask        = np.loadtxt(mask_file)[:,1].astype(bool)
         self.dv_fid      = np.loadtxt(self.dv_fid_path)[:,1]
         self.dv_obs      = np.loadtxt(self.dv_obs_path)[:,1]
         self.output_dims = len(self.dv_obs)
+        self.shear_calib_mask = np.load(self.config_args_emu['shear_calib']['mask'])
         assert len(self.dv_obs)==len(self.dv_fid),"Observed data vector is of different size compared to the fiducial data vector."
         self.cov         = self.get_full_cov(cov_file)
         self.dv_std      = np.sqrt(np.diagonal(self.cov))
