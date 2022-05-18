@@ -225,22 +225,28 @@ typedef struct
 
 typedef struct
 {
-  int Ncl;
+  // theta binning
   int Ntheta;
-  int Nbp; // number of band-power bins for CMB lensing
-  int Ncos;
-  int Ndata;
-  double lmin;
-  double lmax;
   double vtmax;
   double vtmin;
-  double* ell;
   double* theta;
+  // logarithmic ell binning
+  int Ncl;
+  double lmin;
+  double lmax;
+  double* ell;
+  // ell band power binning
+  int Nbp; // number of band-power bins for CMB lensing
+  int lmin_bp;// minimum l mode of CMB band power binning matrix (w/ corr)
+  int lmax_bp;// Note: for dv, only need binmat with corr
+  // others
+  int Ncos;
+  int Ndata;
   double cosmax;
   double Rmin_bias;
   double Rmin_shear;
   double lmax_shear;
-  double lmin_kappacmb;
+  double lmin_kappacmb;// minimum l mode cut-off of CMB beam
   double lmax_kappacmb;
   int IA;
   int bias;
