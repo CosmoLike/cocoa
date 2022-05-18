@@ -82,14 +82,16 @@ for n in range(config.n_train_iter):
         train_data_vectors = current_iter_data_vectors
     # ================== Train emulator ==========================
     if(rank==0):
-        np.save(config.savedir + '/train_data_vectors_%d.npy'%(n), current_iter_data_vectors)
-        np.save(config.savedir + '/train_samples_%d.npy'%(n), current_iter_samples)
+        if(config.save_train_data):
+            np.save(config.savedir + '/train_data_vectors_%d.npy'%(n), current_iter_data_vectors)
+            np.save(config.savedir + '/train_samples_%d.npy'%(n), current_iter_samples)
         print("Training emulator...")
         if(config.emu_type=='nn'):
             emu = NNEmulator(config.n_dim, config.output_dims, config.dv_fid, config.dv_std)
             emu.train(torch.Tensor(train_samples), torch.Tensor(train_data_vectors),\
                       batch_size=config.batch_size, n_epochs=config.n_epochs)
-            emu.save(config.savedir + 'model_%d'%(n))
+            if(config.save_intermediate_model):
+                emu.save(config.savedir + 'model_%d'%(n))
         elif(config.emu_type=='gp'):
             emu = GPEmulator(config.n_dim, config.output_dims, config.dv_fid, config.dv_std)
             emu.train(train_samples, train_data_vectors)
@@ -109,5 +111,7 @@ for n in range(config.n_train_iter):
     else:
         next_training_samples = None
     next_training_samples = comm.bcast(next_training_samples, root=0)
-    
+
+if(rank==0):
+    emu.save(config.savedir + 'model_%d'%(n))    
 MPI.Finalize

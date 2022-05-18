@@ -33,7 +33,8 @@ class EmuSampler:
         self.shear_calib_mask = config.shear_calib_mask
         self.source_ntomo     = config.source_ntomo
         self.shear_prior_std  = config.config_args_emu['shear_calib']['prior_std']    
-        
+        self.baryons_config   = config.config_args_emu['baryons']
+
         self.get_priors()
         
         self.n_sample_dims    = config.n_dim + self.source_ntomo + config.n_pcas_baryon
@@ -71,6 +72,13 @@ class EmuSampler:
             shear_prior_std_list.append(float(std))
         self.m_shear_prior_std = np.array(shear_prior_std_list)
         self.m_shear_prior_parameters = np.array([np.zeros(self.source_ntomo), self.m_shear_prior_std]).T
+        
+        if(self.n_pcas_baryon > 0):
+            baryon_priors = []
+            for i in range(self.n_pcas_baryon):
+                baryon_prior_i = self.baryons_config['prior_Q%d'%(i+1)].split(',')
+                baryon_priors.append([float(baryon_prior_i[0]), float(baryon_prior_i[-1])])
+        self.baryon_priors = np.array(baryon_priors)
 
     def get_starting_pos(self):
         p0 = []
@@ -125,11 +133,16 @@ class EmuSampler:
         gaussian_prior_theta = theta[self.gaussian_prior_indices]
         m_shear_theta        = theta[-(self.n_pcas_baryon + self.source_ntomo):-self.n_pcas_baryon]
         
-        prior_flat  = hard_prior(flat_prior_theta, self.flat_prior_parameters)
-        prior_gauss = gaussian_prior(gaussian_prior_theta, self.gaussian_prior_parameters)
+        prior_flat    = hard_prior(flat_prior_theta, self.flat_prior_parameters)
+        prior_gauss   = gaussian_prior(gaussian_prior_theta, self.gaussian_prior_parameters)
         prior_m_shear = gaussian_prior(m_shear_theta, self.m_shear_prior_parameters)
+        if(self.n_pcas_baryon > 0):
+            baryon_q   = theta[-self.n_pcas_baryon:]
+            prior_baryons = hard_prior(flat_prior_theta, self.flat_prior_parameters)
+        else:
+            prior_baryons = 0.
         
-        return prior_flat + prior_gauss + prior_m_shear
+        return prior_flat + prior_gauss + prior_m_shear + prior_baryons
     
     def ln_lkl(self, theta):
         model_datavector = self.get_data_vector_emu(theta)

@@ -11,23 +11,29 @@ class Config:
         self.params          = config_args['params'] 
         config_args_lkl = config_args['likelihood']
         
-        self.n_lhs         = int(self.config_args_emu['n_lhs'])
-        self.savedir       = self.config_args_emu['savedir']
-        self.n_train_iter  = int(self.config_args_emu['n_train_iter'])
-        self.n_resample    = int(self.config_args_emu['n_resample'])
-        
-        self.dv_fid_path   = self.config_args_emu['dv_fid']
-
-        self.config_data(config_args_lkl)
-        
+        self.savedir         = self.config_args_emu['io']['savedir']
+        try:
+            self.save_train_data = self.config_args_emu['io']['save_train_data'].lower()=='true'
+        except:
+            self.save_train_data = False
+        try:
+            self.save_intermediate_model = self.config_args_emu['io']['save_intermediate_model'].lower()=='true'
+        except:
+            self.save_intermediate_model = False
         try:
             self.n_pcas_baryon = self.config_args_emu['baryons']['n_pcas_baryon']
         except:
             self.n_pcas_baryon = 0
 
+        self.dv_fid_path   = self.config_args_emu['training']['dv_fid']
+        self.n_lhs         = int(self.config_args_emu['training']['n_lhs'])
+        self.n_train_iter  = int(self.config_args_emu['training']['n_train_iter'])
+        self.n_resample    = int(self.config_args_emu['training']['n_resample'])
         self.emu_type      = self.config_args_emu['training']['emu_type']
         self.batch_size    = int(self.config_args_emu['training']['batch_size'])
         self.n_epochs      = int(self.config_args_emu['training']['n_epochs'])
+        
+        self.config_data(config_args_lkl)
         
         self.n_emcee_walkers = int(self.config_args_emu['sampling']['n_emcee_walkers'])
         self.n_mcmc          = int(self.config_args_emu['sampling']['n_mcmc'])
@@ -60,13 +66,16 @@ class Config:
                     baryon_pca_file = self.likelihood_path + '/' + split_line[-1]
                 if(split_line[0]=='source_ntomo'):
                     self.source_ntomo = int(split_line[-1])
+                if(split_line[0]=='lens_ntomo'):
+                    self.lens_ntomo = int(split_line[-1])
         
         self.baryon_pcas = np.loadtxt(baryon_pca_file)
-        self.mask        = np.loadtxt(mask_file)[:,1].astype(bool)
+        self.mask        = np.loadtxt(self.config_args_emu['sampling']['scalecut_mask'])[:,1].astype(bool)
         self.dv_fid      = np.loadtxt(self.dv_fid_path)[:,1]
         self.dv_obs      = np.loadtxt(self.dv_obs_path)[:,1]
         self.output_dims = len(self.dv_obs)
         self.shear_calib_mask = np.load(self.config_args_emu['shear_calib']['mask'])
+        
         assert len(self.dv_obs)==len(self.dv_fid),"Observed data vector is of different size compared to the fiducial data vector."
         self.cov         = self.get_full_cov(cov_file)
         self.dv_std      = np.sqrt(np.diagonal(self.cov))
