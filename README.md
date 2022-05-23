@@ -281,7 +281,7 @@ The projects folder was designed to include all Cosmolike projects. Like the las
     $ cd ./cocoa/Cocoa/projects
     $ git clone git@github.com:CosmoLike/cocoa_XXX.git XXX
 
-(**warning**) The Cosmolike Organization hosts a Cobaya-Cosmolike project named XXX at `CosmoLike/cocoa_XXX`. However, our provided scripts and template YAML files assume the removal of the `cocoa_` prefix when cloning the repository.
+(**warning**) The Cosmolike Organization hosts a Cobaya-Cosmolike project named XXX at `CosmoLike/cocoa_XXX`. However, our provided scripts and template YAML files assume the removal of the `cocoa_` prefix when cloning the repository. Example: the [lsst_y1 project](https://github.com/CosmoLike/cocoa_lsst_y1)
 
 (**expert**) The prefix `cocoa_` on Cosmolike organization avoids mixing Cobaya-Cosmolike projects with code meant to be run on the legacy CosmoLike code.
 
