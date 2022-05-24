@@ -13,11 +13,11 @@ class Config:
         
         self.savedir         = self.config_args_emu['io']['savedir']
         try:
-            self.save_train_data = self.config_args_emu['io']['save_train_data'].lower()=='true'
+            self.save_train_data = self.config_args_emu['io']['save_train_data']
         except:
             self.save_train_data = False
         try:
-            self.save_intermediate_model = self.config_args_emu['io']['save_intermediate_model'].lower()=='true'
+            self.save_intermediate_model = self.config_args_emu['io']['save_intermediate_model']
         except:
             self.save_intermediate_model = False
         try:

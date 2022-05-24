@@ -78,7 +78,7 @@ class EmuSampler:
             for i in range(self.n_pcas_baryon):
                 baryon_prior_i = self.baryons_config['prior_Q%d'%(i+1)].split(',')
                 baryon_priors.append([float(baryon_prior_i[0]), float(baryon_prior_i[-1])])
-        self.baryon_priors = np.array(baryon_priors)
+            self.baryon_priors = np.array(baryon_priors)
 
     def get_starting_pos(self):
         p0 = []
@@ -89,13 +89,12 @@ class EmuSampler:
                 p0_i = loc + scale * np.random.normal(size=self.n_walkers)
                 p0.append(p0_i)        
         p0 = np.array(p0).T
-        if self.n_pcas_baryon!=0:
-            fast_pars_std = self.m_shear_prior_std
-            if(self.n_pcas_baryon > 0):
-                baryon_std = np.hstack([0.1 * np.ones(self.n_pcas_baryon)])
-                fast_pars_std = np.hstack([fast_pars_std, baryon_std])
-            p0_fast = fast_pars_std * np.random.normal(size=(self.n_walkers, self.source_ntomo + self.n_pcas_baryon))
-            p0 = np.hstack([p0, p0_fast])
+        fast_pars_std = self.m_shear_prior_std
+        if(self.n_pcas_baryon > 0):
+            baryon_std = np.hstack([0.1 * np.ones(self.n_pcas_baryon)])
+            fast_pars_std = np.hstack([fast_pars_std, baryon_std])
+        p0_fast = fast_pars_std * np.random.normal(size=(self.n_walkers, self.source_ntomo + self.n_pcas_baryon))
+        p0 = np.hstack([p0, p0_fast])
         return p0
             
     def compute_datavector(self, theta):
@@ -119,7 +118,8 @@ class EmuSampler:
 
     def get_data_vector_emu(self, theta):
         theta_emu     = theta[:-(self.n_pcas_baryon + self.source_ntomo)]
-        m_shear_theta = theta[-(self.n_pcas_baryon + self.source_ntomo):-self.n_pcas_baryon]
+        m_shear_theta = theta[self.n_sample_dims-(self.n_pcas_baryon + self.source_ntomo):
+                              self.n_sample_dims-self.n_pcas_baryon]
         
         datavector = self.compute_datavector(theta_emu)
         datavector = self.add_shear_calib(m_shear_theta, datavector)
@@ -131,7 +131,8 @@ class EmuSampler:
     def ln_prior(self, theta):
         flat_prior_theta     = theta[self.flat_prior_indices]
         gaussian_prior_theta = theta[self.gaussian_prior_indices]
-        m_shear_theta        = theta[-(self.n_pcas_baryon + self.source_ntomo):-self.n_pcas_baryon]
+        m_shear_theta        = theta[self.n_sample_dims-(self.n_pcas_baryon + self.source_ntomo):
+                                     self.n_sample_dims-self.n_pcas_baryon]
         
         prior_flat    = hard_prior(flat_prior_theta, self.flat_prior_parameters)
         prior_gauss   = gaussian_prior(gaussian_prior_theta, self.gaussian_prior_parameters)

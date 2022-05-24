@@ -75,6 +75,9 @@ for n in range(config.n_train_iter):
     if(n>1):
         train_samples_list.append(current_iter_samples)
         train_data_vectors_list.append(current_iter_data_vectors)
+        if(n >= 3):
+            del train_samples_list[0]
+            del train_data_vectors_list[0]            
         train_samples      = np.vstack(train_samples_list)
         train_data_vectors = np.vstack(train_data_vectors_list)
     else:
@@ -91,13 +94,13 @@ for n in range(config.n_train_iter):
             emu.train(torch.Tensor(train_samples), torch.Tensor(train_data_vectors),\
                       batch_size=config.batch_size, n_epochs=config.n_epochs)
             if(config.save_intermediate_model):
-                emu.save(config.savedir + 'model_%d'%(n))
+                emu.save(config.savedir + '/model_%d'%(n))
         elif(config.emu_type=='gp'):
             emu = GPEmulator(config.n_dim, config.output_dims, config.dv_fid, config.dv_std)
             emu.train(train_samples, train_data_vectors)
     # ============= Sample from the posterior ======================
         print("Sampling from tempered posterior...")
-        temper_val = config.temper0 + n * config.temper_increment
+        temper_val = min(0.8, config.temper0 + n * config.temper_increment)
         emu_sampler = EmuSampler(emu, config)
         pos0 = emu_sampler.get_starting_pos()
         
@@ -113,5 +116,5 @@ for n in range(config.n_train_iter):
     next_training_samples = comm.bcast(next_training_samples, root=0)
 
 if(rank==0):
-    emu.save(config.savedir + 'model_%d'%(n))    
+    emu.save(config.savedir + '/model_%d'%(n))    
 MPI.Finalize
