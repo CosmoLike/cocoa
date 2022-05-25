@@ -85,6 +85,25 @@ for n in range(config.n_train_iter):
         train_data_vectors = current_iter_data_vectors
     # ================== Train emulator ==========================
     if(rank==0):
+        # ================== Chi_sq cut ==========================
+        def get_chi_sq_cut(train_data_vectors):
+            chi_sq_list = []
+            for dv in train_data_vectors:
+                delta_dv = (dv - config.dv_obs)[config.mask]
+                chi_sq = delta_dv @ config.masked_inv_cov @ delta_dv
+                chi_sq_list.append(chi_sq)
+            chi_sq_arr = np.array(chi_sq_list)
+            select_chi_sq = (chi_sq_arr < config.chi_sq_cut)
+            return select_chi_sq
+        # ===============================================
+        select_chi_sq = get_chi_sq_cut(train_data_vectors)
+        selected_obj = np.sum(select_chi_sq)
+        total_obj    = len(select_chi_sq)
+        # ===============================================
+        
+        train_data_vectors = train_data_vectors[select_chi_sq]
+        train_samples      = train_samples[select_chi_sq]
+    # ========================================================
         if(config.save_train_data):
             np.save(config.savedir + '/train_data_vectors_%d.npy'%(n), current_iter_data_vectors)
             np.save(config.savedir + '/train_samples_%d.npy'%(n), current_iter_samples)

@@ -25,6 +25,10 @@ class Config:
         except:
             self.n_pcas_baryon = 0
 
+        try:
+            self.chi_sq_cut    = float(self.config_args_emu['training']['chi_sq_cut'])
+        except:
+            self.chi_sq_cut = 1e+5
         self.dv_fid_path   = self.config_args_emu['training']['dv_fid']
         self.n_lhs         = int(self.config_args_emu['training']['n_lhs'])
         self.n_train_iter  = int(self.config_args_emu['training']['n_train_iter'])
@@ -77,8 +81,9 @@ class Config:
         self.shear_calib_mask = np.load(self.config_args_emu['shear_calib']['mask'])
         
         assert len(self.dv_obs)==len(self.dv_fid),"Observed data vector is of different size compared to the fiducial data vector."
-        self.cov         = self.get_full_cov(cov_file)
-        self.dv_std      = np.sqrt(np.diagonal(self.cov))
+        self.cov            = self.get_full_cov(cov_file)
+        self.dv_std         = np.sqrt(np.diagonal(self.cov))
+        self.masked_inv_cov = np.linalg.inv(self.cov[self.mask][:,self.mask])
         
     def get_lhs_minmax(self):
         lh_minmax = {}
@@ -100,14 +105,18 @@ class Config:
         print("Getting covariance...")
         full_cov = np.loadtxt(cov_file)
         cov = np.zeros((self.output_dims, self.output_dims))
+        cov_scenario = full_cov.shape[1]
+        
         for line in full_cov:
             i = int(line[0])
             j = int(line[1])
 
-            cov_g_block  = line[-2]
-            cov_ng_block = line[-1]
-
-            cov_ij = cov_g_block + cov_ng_block
+            if(cov_scenario==3):
+                cov_ij = line[2]
+            elif(cov_scenario==10):
+                cov_g_block  = line[8]
+                cov_ng_block = line[9]
+                cov_ij = cov_g_block + cov_ng_block
 
             cov[i,j] = cov_ij
             cov[j,i] = cov_ij

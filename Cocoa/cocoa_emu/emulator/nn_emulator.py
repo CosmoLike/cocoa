@@ -30,16 +30,15 @@ class NNEmulator:
             self.model = nn.Sequential(
                                 nn.Linear(N_DIM, 1024),
                                 nn.ReLU(),
-                                nn.Dropout(p=0.2),
                                 nn.Linear(1024, 1024),
-                                nn.ReLU(),
                                 nn.Dropout(p=0.2),
+                                nn.ReLU(),
                                 nn.Linear(1024, 1024),
-                                nn.ReLU(),
                                 nn.Dropout(p=0.2),
+                                nn.ReLU(),
                                 nn.Linear(1024, 1024),
-                                nn.ReLU(),
                                 nn.Dropout(p=0.2),
+                                nn.ReLU(),
                                 nn.Linear(1024, OUTPUT_DIM),
                                 Affine()
                                 )
