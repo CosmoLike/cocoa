@@ -6,7 +6,7 @@ from cobaya.model import Model
 from cobaya.conventions import kinds, _timing, _params, _prior, _packages_path
 
 def get_model(yaml_file):
-    info         = yaml_load_file(yaml_file)
+    info  = yaml_load_file(yaml_file)
     updated_info = update_info(info)
     model =  Model(updated_info[_params], updated_info[kinds.likelihood],
                updated_info.get(_prior), updated_info.get(kinds.theory),
@@ -19,7 +19,7 @@ class CocoaModel:
         self.model      = get_model(configfile)
         self.likelihood = likelihood
         
-    def calculate_data_vector(self, params_values):        
+    def calculate_data_vector(self, params_values, baryon_scenario=None):        
         likelihood   = self.model.likelihood[self.likelihood]
         input_params = self.model.parameterization.to_input(params_values)
         self.model.provider.set_current_input_params(input_params)
@@ -29,5 +29,8 @@ class CocoaModel:
             params = {p: input_params[p] for p in component.input_params}
             compute_success = component.check_cache_and_compute(want_derived=False,
                                          dependency_params=depend_list, cached=False, **params)
-        data_vector = likelihood.get_datavector(**input_params)
+        if baryon_scenario is None:
+            data_vector = likelihood.get_datavector(**input_params)
+        else:
+            data_vector = likelihood.compute_barion_datavector_masked_reduced_dim(baryon_scenario, **input_params)
         return np.array(data_vector)

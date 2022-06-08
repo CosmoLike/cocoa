@@ -129,7 +129,7 @@ for n in range(config.n_train_iter):
         samples = sampler.chain[:,config.n_burn_in::config.n_thin].reshape((-1, emu_sampler.n_sample_dims))
         
         select_indices = np.random.choice(np.arange(len(samples)), replace=False, size=config.n_resample)
-        next_training_samples = samples[select_indices,:-(config.n_pcas_baryon+config.source_ntomo)]
+        next_training_samples = samples[select_indices,:-(config.n_fast_pars)]
     else:
         next_training_samples = None
     next_training_samples = comm.bcast(next_training_samples, root=0)
