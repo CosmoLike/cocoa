@@ -179,18 +179,17 @@ The user also needs to set the following self-explanatory environmental keys on 
 
 ## Installation of Cobaya base code <a name="cobaya_base_code"></a>
 
-Type:
+Clone the repository:
 
     $(cocoa) $CONDA_PREFIX/bin/git-lfs clone https://github.com/CosmoLike/cocoa.git
-
-to clone the repository. 
+    $(cocoa) cd ./cocoa/Cocoa
 
 (**expert**) Cocoa developers with set ssh keys  in GitHub may find more convenient to use the command
 
     $(cocoa) $CONDA_PREFIX/bin/git-lfs clone git@github.com:CosmoLike/cocoa.git
     $(cocoa) cd ./cocoa/Cocoa
     
-(**Warning**) We assumed in the command above users have installed the pre-requisite packages (including git-lfs) via the recommended **Conda installation method**. With other installation method, `$CONDA_PREFIX/bin/git-lfs` should be replaced with `git-lfs`. 
+(**Warning**) With other installation methods (not Conda), `$CONDA_PREFIX/bin/git-lfs` should be replaced with `git-lfs`. 
 
 (**Warning**) We have a limited monthly quota in bandwidth for [Git LFS](https://git-lfs.github.com) files, and therefore we ask users to use good judgment in the number of times they clone Cocoa's main repository. 
 
@@ -205,7 +204,7 @@ Cocoa is made aware of the chosen installation method of required packages via s
     #export MACOS_HOMEBREW_INSTALLATION=1
     #export MANUAL_INSTALLATION=1
     
-The user must uncomment the appropriate key, and then type the following command
+**default key is `MINICONDA_INSTALLATION`**. The user must uncomment the appropriate key, and then type the following command
 
     $ source setup_cocoa_installation_packages
 
