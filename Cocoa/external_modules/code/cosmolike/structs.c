@@ -148,7 +148,7 @@ lim limits =
   .k_max_cH0 = 3.e+6,      // k_max_cH0
   .M_min = 1.0e+6,         // M_min
   .M_max = 1.0e+17,        // M_max
-  .LMIN_tab = 20,          // LMIN_tab
+  .LMIN_tab = 2,          // LMIN_tab (default = 20)
   .LMAX_NOLIMBER = 250,    // LMAX_NOLIMBER
   .LMAX = 100000,
   .LMIN_hankel = 0.0001,
