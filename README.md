@@ -63,7 +63,7 @@ The more straightforward way to install most prerequisites is via [Conda](https:
  
 With this installation method, users must activate the Conda environment whenever working with Cocoa, as shown below 
 
-    $ conda activate cocoa
+    $(base) conda activate cocoa
     
 When loading conda cocoa environment for the first time, users must install git-lfs
 
