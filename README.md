@@ -30,9 +30,9 @@ This readme file presents basic and advanced instructions for installing all [Co
 
 There are three installation methods. Users must choose one of them
 
-1. [Via Conda (best for Linux)](#required_packages_conda)
-2. [Via Docker (best for MacOS/Windows)](#required_packages_docker)
-3. [(expert) Via Cocoa's internal cache](#required_packages_cache)
+1. [Via Conda](#required_packages_conda) (best for Linux)
+2. [Via Docker](#required_packages_docker) (best for MacOS/Windows)
+3. [(expert) Via Cocoa's internal cache](#required_packages_cache) (This method is slow, not advisable)
 
 ### Via Conda (best for Linux/HPC) <a name="required_packages_conda"></a>
 
@@ -116,8 +116,6 @@ This command will download the [Whovian-Cosmo](https://hub.docker.com/r/vivianmi
 **Users can now proceed to the section [Installation of Cobaya base code](#cobaya_base_code)**
 
 ### (expert) Via Cocoa's internal cache <a name="required_packages_cache"></a>
-
-(**Warning**) This method is slow, not advisable.  
 
 Whenever Conda or Docker installation procedures are unavailable, the user can still perform a local semi-autonomous installation on Linux based on a few scripts we implemented. We also provide a local copy of almost all required packages on Cocoa's cache folder named [cocoa_installation_libraries](https://github.com/CosmoLike/cocoa/tree/main/cocoa_installation_libraries). This cache is especially useful in HPC machines where compute nodes don't have internet access, NASA Pleiades being one example. We, therefore, only assume the pre-installation of the following packages to perform the local setup via Cocoa's internal cache:
 
