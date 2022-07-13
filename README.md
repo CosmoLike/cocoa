@@ -18,7 +18,7 @@
  
 ## Overview of the [Cobaya](https://github.com/CobayaSampler)-[CosmoLike](https://github.com/CosmoLike) Joint Architecture (Cocoa) <a name="overview"></a>
 
-Cocoa allows users to run [CosmoLike](https://github.com/CosmoLike) routines inside the [Cobaya](https://github.com/CobayaSampler) framework. Cosmolike can analyze data primarily from the [Dark Energy Survey](https://www.darkenergysurvey.org) and simulate future multi-probe analyses for Rubin Observatory's Legacy Survey of Space and Time or the Roman Space Telescope. Besides integrating [Cobaya](https://github.com/CobayaSampler) and [CosmoLike](https://github.com/CosmoLike), this project introduces shell scripts and readme instructions that allow users to "containerize" [Cobaya](https://github.com/CobayaSampler). The container structure made possible by our shell scripts ensures two things: 
+Cocoa allows users to run [CosmoLike](https://github.com/CosmoLike) routines inside the [Cobaya](https://github.com/CobayaSampler) framework. [CosmoLike](https://github.com/CosmoLike) can analyze data primarily from the [Dark Energy Survey](https://www.darkenergysurvey.org) and simulate future multi-probe analyses for Rubin Observatory's Legacy Survey of Space and Time or the Roman Space Telescope. Besides integrating [Cobaya](https://github.com/CobayaSampler) and [CosmoLike](https://github.com/CosmoLike), this project introduces shell scripts and readme instructions that allow users to "containerize" [Cobaya](https://github.com/CobayaSampler). The container structure made possible by our shell scripts ensures two things: 
 1. Everyone will run the code with the same compiler, packages, and libraries. The consistent use of compilers, packages, and libraries helps debugging and installation (we run code in many HPC environments). 
 2. Users can use multiple [Cobaya](https://github.com/CobayaSampler) instances consistently. 
 
@@ -67,7 +67,7 @@ With this installation method, users must activate the Conda environment wheneve
 
     $(base) conda activate cocoa
     
-When loading conda cocoa environment for the first time, users must install git-lfs
+When loading conda cocoa environment for the first time, users must install [git-lfs](https://git-lfs.github.com)
 
     $(cocoa) $CONDA_PREFIX/bin/git-lfs install
 
