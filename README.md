@@ -117,7 +117,7 @@ This command will download the [Whovian-Cosmo](https://hub.docker.com/r/vivianmi
 
 ### (expert) Via Cocoa's internal cache <a name="required_packages_cache"></a>
 
-Whenever Conda or Docker installation procedures are unavailable, the user can still perform a local semi-autonomous installation on Linux based on a few scripts we implemented. We also provide a local copy of almost all required packages on Cocoa's cache folder named [cocoa_installation_libraries](https://github.com/CosmoLike/cocoa/tree/main/cocoa_installation_libraries). This cache is especially useful in HPC machines where compute nodes don't have internet access, NASA Pleiades being one example. We, therefore, only assume the pre-installation of the following packages to perform the local setup via Cocoa's internal cache:
+Whenever Conda or Docker installation procedures are unavailable, the user can still perform a local semi-autonomous installation on Linux based on a few provided shell scripts and local copies of most required packages (located at [cocoa_installation_libraries](https://github.com/CosmoLike/cocoa/tree/main/cocoa_installation_libraries). We, therefore, only assume the pre-installation of the following packages to perform the local setup via Cocoa's internal cache:
 
    - [Bash](https://www.amazon.com/dp/B0043GXMSY/ref=cm_sw_em_r_mt_dp_x3UoFbDXSXRBT);
    - [Git](https://git-scm.com) v1.8+;
@@ -129,11 +129,11 @@ Whenever Conda or Docker installation procedures are unavailable, the user can s
    - [PIP package manager](https://pip.pypa.io/en/stable/installing/)
    - [Python Virtual Environment](https://www.geeksforgeeks.org/python-virtual-environment/)
 
+(**expert**) This cache is especially useful in HPC machines where compute nodes don't have internet access, NASA Pleiades being one example. 
+
 (**expert**) This installation method has some advantages to the experience user. For example, the [OpenMPI](https://www.open-mpi.org) library provided by [conda-forge](https://conda-forge.org) is [incompatible with Infiniband](https://github.com/conda-forge/openmpi-feedstock/issues/38).
 
-To perform the local semi-autonomous installation, users should follow the procedures on section [Installation of cocoa base code](https://github.com/CosmoLike/cocoa#installation-of-cocoa-base-code), adding, however, the many additional configurations on [set_installation_options](https://github.com/CosmoLike/cocoa/blob/main/Cocoa/set_installation_options) script that are explained below.
-
-The local installation via cocoa's internal cache is selected whenever the environmental key `MANUAL_INSTALLATION` is set:
+To perform the local semi-autonomous installation, users should follow the procedures on section [Installation of cocoa base code](https://github.com/CosmoLike/cocoa#installation-of-cocoa-base-code). The local installation via cocoa's internal cache is selected whenever the environmental key `MANUAL_INSTALLATION` is set on [set_installation_options](https://github.com/CosmoLike/cocoa/blob/main/Cocoa/set_installation_options) shell script, as shown below
 
     [Extracted from set_installation_options script] 
     
@@ -144,7 +144,7 @@ The local installation via cocoa's internal cache is selected whenever the envir
     #export MINICONDA_INSTALLATION=1
     export MANUAL_INSTALLATION=1
     
-The user also needs to set the following self-explanatory environmental keys on [set_installation_options](https://github.com/CosmoLike/cocoa/blob/main/Cocoa/set_installation_options):
+Users must also set the following self-explanatory environmental keys on [set_installation_options](https://github.com/CosmoLike/cocoa/blob/main/Cocoa/set_installation_options):
  
     [Extracted from set_installation_options script]
   
@@ -176,7 +176,7 @@ The user also needs to set the following self-explanatory environmental keys on 
       #export IGNORE_OPENBLAS_INSTALLATION=1
       #export IGNORE_FORTRAN_LAPACK_INSTALLATION=1
    
-(**expert**) Our scripts never install packages on `$HOME/.local`. Doing so could impose incompatibilities between Cobaya and different projects (or break the user's environment for other projects). All requirements for Cocoa are installed at
+(**expert**) Our scripts never install packages on `$HOME/.local`. All requirements for Cocoa are installed at
 
     Cocoa/.local/bin
     Cocoa/.local/include
