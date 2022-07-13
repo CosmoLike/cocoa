@@ -36,7 +36,7 @@ There are three installation methods. Users must choose one of them:
 
 ### Via Conda (best for Linux/HPC) <a name="required_packages_conda"></a>
 
-The straightforward way to install most prerequisites is via [Conda](https://github.com/conda/conda). Cocoa's internal scripts will then install remaining missing packages via an internal cache located at [cocoa_installation_libraries](https://github.com/CosmoLike/cocoa/tree/main/cocoa_installation_libraries). Assuming that the user had previously installed [Minicoda](https://docs.conda.io/en/latest/miniconda.html) (or [Anaconda](https://www.anaconda.com/products/individual)), the first step is to type the following commands to create the cocoa Conda environment.
+The straightforward way to install most prerequisites is via [Conda](https://github.com/conda/conda). Assuming that the user had previously installed [Minicoda](https://docs.conda.io/en/latest/miniconda.html) (or [Anaconda](https://www.anaconda.com/products/individual)), the first step is to type the following commands to create the cocoa Conda environment.
 
     conda create --name cocoa python=3.7 --quiet --yes && \
     conda install -n cocoa --quiet --yes  \
