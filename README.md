@@ -314,7 +314,7 @@ The projects folder was designed to include all Cosmolike projects. Like the las
 
 ## Creating Cosmolike projects <a name="creating_cosmolike_projects"></a> 
 
-The `XXX` project needs to have more or less the following structure (taken from our private DES-Y3 project)
+The `XXX` project needs to have more or less the following structure (taken from our [DES-Y3 project](https://github.com/CosmoLike/cocoa_des_y3))
 
     +-- cocoa_des_y3
     |    +-- likelihood
@@ -344,8 +344,6 @@ The `XXX` project needs to have more or less the following structure (taken from
     |    |   +-- interface.hpp
     |    +-- chains
     |    |   +-- README
-
-We expect to have a public project that can be used as a template for new Cosmolike projects in the near future.
 
 ## Appendix <a name="appendix"></a>
 
