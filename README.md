@@ -10,7 +10,7 @@
 6. [Creating Cosmolike projects](#creating_cosmolike_projects)
 7. [Appendix](#appendix)
     1. [Proper Credits](#appendix_proper_credits)
-    1. [Compiling Boltzmann, CosmoLike and Likelihood codes separatelly](#appendix_compile_separatelly)
+    1. [Compiling Boltzmann, CosmoLike and Likelihood codes separately](#appendix_compile_separately)
     2. [Running Jupyter Notebooks inside the Whovian-Cosmo docker container](#appendix_jupyter_whovian)
     3. [Summary Information about Cocoa's configuration files](#appendix_config_files)
 8. [The projects folder (external readme)](https://github.com/CosmoLike/cocoa/tree/main/Cocoa/projects)
@@ -125,7 +125,7 @@ Whenever Conda or Docker installation procedures are unavailable, the user can s
    - [PIP package manager](https://pip.pypa.io/en/stable/installing/)
    - [Python Virtual Environment](https://www.geeksforgeeks.org/python-virtual-environment/)
 
-(**expert**) This installation method has some advantages to the experience user. For example, the OpenMPI library provided by [conda-forge](https://conda-forge.org) is [incompatible with Infiniband]((https://github.com/conda-forge/openmpi-feedstock/issues/38)).
+(**expert**) This installation method has some advantages to the experience user. For example, the [OpenMPI](https://www.open-mpi.org) library provided by [conda-forge](https://conda-forge.org) is [incompatible with Infiniband](https://github.com/conda-forge/openmpi-feedstock/issues/38).
 
 To perform the local semi-autonomous installation, users should follow the procedures on section [Installation of cocoa base code](https://github.com/CosmoLike/cocoa#installation-of-cocoa-base-code), adding, however, the many additional configurations on [set_installation_options](https://github.com/CosmoLike/cocoa/blob/main/Cocoa/set_installation_options) script that are explained below.
 
@@ -222,7 +222,7 @@ Finally, type
     
 to compile CAMB, CLASS, Planck and Polychord.
 
-(**expert**) If the user wants recompile just one of these packages, read the appendix [Compiling Boltzmann, CosmoLike and Likelihood codes separatelly](#appendix_compile_separatelly).
+(**expert**) If the user wants recompile just one of these packages, read the appendix [Compiling Boltzmann, CosmoLike and Likelihood codes separately](#appendix_compile_separately).
 
 ## Running Cobaya Examples <a name="cobaya_base_code_examples"></a>
 
@@ -365,7 +365,7 @@ The following is not an exhaustive list of the codes we use
 
 By no means, we want to discourage people from cloning code from their original repositories. We've included these codes as compressed [xz file format](https://tukaani.org/xz/format.html) in our repository for convenience in the initial development. The work of those authors is extraordinary, and they must be properly cited.
 
-### Compiling Boltzmann, CosmoLike and Likelihood codes separatelly <a name="appendix_compile_separatelly"></a>
+### Compiling Boltzmann, CosmoLike and Likelihood codes separately <a name="appendix_compile_separately"></a>
 
 To avoid excessive compilation times during development, users can use following specialized scripts that compile only the specific modules:
 
