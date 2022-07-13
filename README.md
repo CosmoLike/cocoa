@@ -101,9 +101,9 @@ Linux users must type the following command instead:
 
     $ cd /home/whovian/host/
 
-**Users can now proceed to the section [Installation of Cobaya base code](#cobaya_base_code)**  
-
 (**warning**) There isn't permanent storage outside `/home/whovian/host/`. Be aware of this fact to not lose any work
+
+**Users can now proceed to the section [Installation of Cobaya base code](#cobaya_base_code)**  
 
 (**expert**) Most HPC systems don't allow users to run the [docker engine](https://docs.docker.com/engine/). There is, however, an alternative engine called [Singularity](https://sylabs.io/guides/3.6/user-guide/index.html) that is in compliance with most HPC requirements. The [Singularity](https://sylabs.io/guides/3.6/user-guide/index.html) installation requires administrative privileges, but many HPC enviroments have already adopted it. To run docker images with Singularity, go to the folder you want to store the image and type:
 
@@ -112,8 +112,6 @@ Linux users must type the following command instead:
 This command will download the [Whovian-Cosmo](https://hub.docker.com/r/vivianmiranda/whovian-cosmo) image and convert it to a format that can be understood by Singularity (this might take a few minutes). To run the container interactively, type:
 
     $ singularity shell --no-home --bind /path/to/cocoa:/home/whovian/host --bind ~/.ssh:/home/whovian/.ssh:ro whovian-cosmo
-
-**Users can now proceed to the section [Installation of Cobaya base code](#cobaya_base_code)**
 
 ### (expert) Via Cocoa's internal cache <a name="required_packages_cache"></a>
 
