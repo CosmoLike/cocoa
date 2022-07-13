@@ -246,9 +246,9 @@ Assuming the user opted for the easier *Conda installation* and located the term
 
 (**warning**) Users will see a terminal that looks like this: `$(Cocoa)(.local)`. *This is a feature, not a bug*! 
 
-(**expert**) Why `$(Cocoa)(.local)` is a feature, not a bug? The Conda environment can be the same for all Cocoa instances, with [start_cocoa](https://github.com/CosmoLike/cocoa/blob/main/Cocoa/start_cocoa)/[stop_cocoa](https://github.com/CosmoLike/cocoa/blob/main/Cocoa/stop_cocoa) loading/unloading the corresponding `LD_LIBRARY_PATH`, `CPATH`, `C_INCLUDE_PATH`, `CPLUS_INCLUDE_PATH` and `PATH`. *Why more than one Cocoa instance?* While users may be running chains in one instance, they might use a second instantiation to make experimental changes (in our experience this happens a lot).
+(**expert**) The double `$(Cocoa)(.local)` is a feature, not a bug! The Conda environment can be the same for all Cocoa instances, with [start_cocoa](https://github.com/CosmoLike/cocoa/blob/main/Cocoa/start_cocoa)/[stop_cocoa](https://github.com/CosmoLike/cocoa/blob/main/Cocoa/stop_cocoa) loading/unloading appropriate shell environmental variables such as  `LD_LIBRARY_PATH` and `PATH`. 
 
-(**expert**) Why go to such lengths to containerize [Cobaya](https://github.com/CobayaSampler)? While the command `pip install cobaya --upgrade` explained in the default [Cobaya](https://github.com/CobayaSampler) instructions is straightforward, the usage of multiple instances of [Cobaya](https://github.com/CobayaSampler) is more suitable to our projects (we modify CAMB, CLASS and likelihood codes extensively). While users run chains in one instance, tweaks and changes to the pipeline can be tested in another [Cobaya](https://github.com/CobayaSampler) installation. 
+(**expert**) *Why more than one Cocoa instance?* While users may be running chains in one instance, they can use a second instantiation to make experimental changes to a pipeline.
 
 **Step 4 of 5**: select the number of OpenMP cores
     
