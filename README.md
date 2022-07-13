@@ -32,7 +32,7 @@ There are three installation methods. Users must choose one of them:
 
 1. [Via Conda](#required_packages_conda) (best for Linux)
 2. [Via Docker](#required_packages_docker) (best for MacOS/Windows)
-3. [(expert) Via Cocoa's internal cache](#required_packages_cache) (This method is slow, not advisable)
+3. [Via Cocoa's internal cache](#required_packages_cache) (This method is slow, not advisable)
 
 ### Via Conda (best for Linux/HPC) <a name="required_packages_conda"></a>
 
