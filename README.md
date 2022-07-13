@@ -113,7 +113,7 @@ This command will download the [Whovian-Cosmo](https://hub.docker.com/r/vivianmi
 
 (**Warning**) This method is slow, not advisable.  
 
-Whenever Conda or Docker installation procedures are unavailable, the user can still perform a local semi-autonomous installation on Linux based on a few scripts we implemented. We also provide a local copy of almost all required packages on Cocoa's cache folder named [cocoa_installation_libraries](https://github.com/CosmoLike/cocoa/tree/main/cocoa_installation_libraries). This cache is especially useful i HPC machines where compute nodes don't have internet access, NASA Pleiades being one example. We, therefore, only assume the pre-installation of the following packages to perform the local setup via Cocoa's internal cache:
+Whenever Conda or Docker installation procedures are unavailable, the user can still perform a local semi-autonomous installation on Linux based on a few scripts we implemented. We also provide a local copy of almost all required packages on Cocoa's cache folder named [cocoa_installation_libraries](https://github.com/CosmoLike/cocoa/tree/main/cocoa_installation_libraries). This cache is especially useful in HPC machines where compute nodes don't have internet access, NASA Pleiades being one example. We, therefore, only assume the pre-installation of the following packages to perform the local setup via Cocoa's internal cache:
 
    - [Bash](https://www.amazon.com/dp/B0043GXMSY/ref=cm_sw_em_r_mt_dp_x3UoFbDXSXRBT);
    - [Git](https://git-scm.com) v1.8+;
