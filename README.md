@@ -28,7 +28,7 @@ This readme file presents basic and advanced instructions for installing all [Co
 
 [CosmoLike](https://github.com/CosmoLike) and [Cobaya](https://github.com/CobayaSampler) require C, C++ and Python packages to be installed. The overabundance of compiler and package versions, each with a different set of bugs and regressions, can make the installation of any big code (and the verification of numerical results) to be pure agony. This section simplifies installation and standardize the package environment adopted by [Cobaya](https://github.com/CobayaSampler) and [CosmoLike](https://github.com/CosmoLike).
 
-There are three installation methods. Users must choose one of them
+There are three installation methods. Users must choose one of them:
 
 1. [Via Conda](#required_packages_conda) (best for Linux)
 2. [Via Docker](#required_packages_docker) (best for MacOS/Windows)
