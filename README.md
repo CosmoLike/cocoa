@@ -314,36 +314,7 @@ The projects folder was designed to include all Cosmolike projects. Like the las
 
 ## Creating Cosmolike projects <a name="creating_cosmolike_projects"></a> 
 
-The `XXX` project needs to have more or less the following structure (taken from our [DES-Y3 project](https://github.com/CosmoLike/cocoa_des_y3))
-
-    +-- cocoa_des_y3
-    |    +-- likelihood
-    |    |   +-- _cosmolike_prototype_base.py
-    |    |   +-- des_3x2pt.py
-    |    |   +-- des_3x2pt.yaml
-    |    |   +-- des_2x2pt.py
-    |    |   +-- des_3x2pt.yaml
-    |    |   +-- des_cosmic_shear.py
-    |    |   +-- des_cosmic_shear.yaml
-    |    +-- scripts
-    |    |   +-- compile_des_y3
-    |    |   +-- start_des_y3
-    |    |   +-- stop_des_y3
-    |    +-- data
-    |    |   +-- DES.paramnames
-    |    |   +-- DES_Y3.dataset
-    |    |   +-- datavector.txt
-    |    |   +-- covariance.txt
-    |    |   +-- nzlens.txt
-    |    |   +-- nzsource.txt
-    |    |   +-- mask.mask
-    |    +-- interface
-    |    |   +-- MakefileCosmolike
-    |    |   +-- cosmolike_des_y3_interface.py
-    |    |   +-- interface.cpp
-    |    |   +-- interface.hpp
-    |    +-- chains
-    |    |   +-- README
+The Readme file on our [DES-Y3 project](https://github.com/CosmoLike/cocoa_des_y3) contains detailed instruction on how to create a cosmolike project.
 
 ## Appendix <a name="appendix"></a>
 
