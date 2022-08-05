@@ -249,10 +249,12 @@ typedef struct
 
 typedef struct
 {
+  int is_cmb_bandpower;
   int Ncl;
   int Ntheta;
   int Ncos;
   int Ndata;
+  int Nbp; // number of band-power bins for CMB lensing
   double lmin;
   double lmax;
   double vtmax;
@@ -263,6 +265,8 @@ typedef struct
   double Rmin_bias;
   double Rmin_shear;
   double lmax_shear;
+  double lmin_bp;      // minimum l mode of CMB band power binning matrix (w/ corr)
+  double lmax_bp;      // Note: for dv, only need binmat with corr
   double lmin_kappacmb;
   double lmax_kappacmb;
   int IA;
