@@ -76,7 +76,6 @@ bin_avg set_bin_average(int i_theta, int j_L)
     }
     xmin = (double*) calloc(like.Ntheta, sizeof(double));
     xmax = (double*) calloc(like.Ntheta, sizeof(double));
-
     const double logdt=(log(like.vtmax)-log(like.vtmin))/like.Ntheta;
     for(int i=0; i<like.Ntheta ; i++)
     {

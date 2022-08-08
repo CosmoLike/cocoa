@@ -128,7 +128,7 @@ double xi_pm_tomo(const int pm, const int nt, const int ni, const int nj, const 
     { // Cocoa: dont thread (init of static variables inside set_bin_average)
       bin_avg r = set_bin_average(i,0);
       xmin[i] = r.xmin;
-      xmax[i] = r.xmax;      
+      xmax[i] = r.xmax;
     }
 
     double** Pmin = (double**) malloc(sizeof(double)*ntheta);
@@ -142,7 +142,6 @@ double xi_pm_tomo(const int pm, const int nt, const int ni, const int nj, const 
       dPmin[i] = (double*) calloc((nell + 1), sizeof(double));
       dPmax[i] = (double*) calloc((nell + 1), sizeof(double));
     }
-    
     #pragma omp parallel for collapse(2)
     for (int i=0; i<ntheta; i ++)
     {
@@ -155,7 +154,6 @@ double xi_pm_tomo(const int pm, const int nt, const int ni, const int nj, const 
         dPmax[i][l] = r.dPmax;
       }
     }
-
     #pragma omp parallel for collapse(2)
     for (int i=0; i<ntheta; i ++)
     {
@@ -194,9 +192,8 @@ double xi_pm_tomo(const int pm, const int nt, const int ni, const int nj, const 
     free(dPmin);
     free(dPmax);
   }
-
   if (recompute_shear(C, N))
-  {    
+  {
     if (limber == 1)
     {
       if (like.IA == 5 || like.IA == 6)
@@ -2980,7 +2977,7 @@ const int init_static_vars_only)
     }
     else 
     {
-      res =  (init_static_vars_only == 1) ? int_for_C_gs_tomo_limber(amin, (void*) ar) :
+      res = (init_static_vars_only == 1) ? int_for_C_gs_tomo_limber(amin, (void*) ar) :
         like.high_def_integration == 2 ?
         int_gsl_integrate_high_precision(int_for_C_gs_tomo_limber, (void*) ar, amin, amax, NULL, 
           GSL_WORKSPACE_SIZE) :
@@ -2997,6 +2994,7 @@ const int init_static_vars_only)
     {
       log_fatal("use linear power spectrum option not implemented with TATT");
       exit(1);
+      return 0;
     }
     else
     {
@@ -3015,7 +3013,9 @@ const int init_static_vars_only)
   {
     log_fatal("like.IA = %d not supported", like.IA);
     exit(1);
+    return 0;
   }
+  return res;
 }
 
 double C_gs_tomo_limber(double l, int ni, int nj)
@@ -3416,6 +3416,7 @@ double C_gg_tomo_limber(double l, int ni, int nj)
       double init = C_gg_tomo_limber_nointerp(exp(lnlmin), 0, 0, use_linear_ps_limber, 1);
     }
     #pragma GCC diagnostic pop
+    
     #pragma omp parallel for collapse(2)
     for (int k=0; k<NSIZE; k++)  
     {

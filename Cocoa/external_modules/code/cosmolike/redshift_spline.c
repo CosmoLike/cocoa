@@ -212,7 +212,7 @@ int test_zoverlap(int ni, int nj) // test whether source bin nj is behind lens b
   
   const double zmeanlens = zmean(ni);
   const double zmeansource = zmean_source(nj);
-  
+
   if (sphotoz == 4 && lphotoz != 4 && tomo.clustering_zmax[ni] < zmeansource) 
   {
     return 1;
