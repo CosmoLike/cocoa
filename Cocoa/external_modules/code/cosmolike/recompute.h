@@ -30,7 +30,7 @@ int recompute_gs(cosmopara C, galpara G, nuisancepara N);
 
 int recompute_gg(cosmopara C, galpara G, nuisancepara N);
 
-int recompute_ks(cosmopara C, galpara G, nuisancepara N);
+int recompute_ks(cosmopara C, nuisancepara N);
 
 int recompute_gk(cosmopara C, galpara G, nuisancepara N);
 

@@ -382,8 +382,8 @@ double w_gammat_tomo(const int nt, const int ni, const int nj, const int limber)
     double** Pmax = (double**) malloc(sizeof(double*)*ntheta);
     for (int i=0; i<ntheta; i++)
     {
-      Pmin[i] = (double*) malloc((nell + 1), sizeof(double));
-      Pmax[i] = (double*) malloc((nell + 1), sizeof(double));
+      Pmin[i] = (double*) calloc((nell + 1), sizeof(double));
+      Pmax[i] = (double*) calloc((nell + 1), sizeof(double));
     }
     #pragma omp parallel for collapse(2)
     for (int i=0; i<ntheta; i ++)
