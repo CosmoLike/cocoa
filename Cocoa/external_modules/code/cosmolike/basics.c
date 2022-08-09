@@ -50,6 +50,16 @@ bin_avg set_bin_average(int i_theta, int j_L)
     log_fatal("like.Ntheta not initialized");
     exit(1);
   }
+  if (!(i_theta < like.Ntheta))
+   {
+     log_fatal("bad i_theta index");
+     exit(1);
+   }
+   if (!(j_L < limits.LMAX))
+   {
+     log_fatal("bad j_L index");
+     exit(1);
+   }
 
   if (Pmin == 0)
   {

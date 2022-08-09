@@ -225,6 +225,7 @@ typedef struct
 
 typedef struct
 {
+  int is_cmb_bandpower;
   // theta binning
   int Ntheta;
   double vtmax;

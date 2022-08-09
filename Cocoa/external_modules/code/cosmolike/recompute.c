@@ -185,20 +185,9 @@ int recompute_gg(cosmopara C, galpara G, nuisancepara N)
   return 0;
 }
 
-int recompute_ks(cosmopara C, galpara G, nuisancepara N)
+int recompute_ks(cosmopara C, nuisancepara N)
 {
-  if (recompute_cosmo3D(C) || recompute_zphot_shear(N) || recompute_IA(N))
-  {
-    return 1;
-  }
-  for(int i=0; i<tomo.shear_Nbin; i++) 
-  {
-    if(recompute_galaxies(G, i))
-    {
-      return 1;
-    }
-  }
-  return 0;
+  return recompute_shear(C, N);
 }
 
 int recompute_gk(cosmopara C, galpara G, nuisancepara N)
