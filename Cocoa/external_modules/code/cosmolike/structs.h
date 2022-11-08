@@ -250,6 +250,8 @@ typedef struct
 typedef struct
 {
   int is_cmb_bandpower;
+  int is_cmb_kkkk_cov_from_sim;// if kkkk covmat is from sim, apply Hartlap factor
+  double alpha_Hartlap_kkkk;
   int Ncl;
   int Ntheta;
   int Ncos;
