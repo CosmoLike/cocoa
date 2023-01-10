@@ -12,46 +12,46 @@
 #include "redshift_spline.h"
 #include "structs.h"
 
-
-// ---------------------------------------------------------------------------
-// galaxy bias & HOD routines
-// ---------------------------------------------------------------------------
-
-// fitting formula from Lazeyras et al. 2016 (Eq. 5.2)
-// https://arxiv.org/abs/1511.01096
-double b2_from_b1(double b1) {
+double b2_from_b1(double b1)
+{ // fitting formula from Lazeyras et al. 2016 (Eq. 5.2) - 1511.01096
   return 0.412 - 2.143 * b1 + 0.929 * b1 * b1 + 0.008 * b1 * b1 * b1;
 }
 
-// e.g. https://arxiv.org/pdf/1405.1447v4.pdf
-double bs2_from_b1(double b1) {
+double bs2_from_b1(double b1)
+{ // 1405.1447v4.pdf
   return -4. / 7. * (b1 - 1.0);
 }
 
-double b3nl_from_b1(double b1) {
+double b3nl_from_b1(double b1)
+{
   return (b1 - 1.0);
 }
 
-double b1_per_bin_evolv(double z, int ni) {
+double b1_per_bin_evolv(double z, int ni)
+{
   return gbias.b[ni] * pow((1. + z) / (1. + zmean(ni)), 1.0);
 }
 
-double b1_per_bin(double z __attribute__((unused)), int ni) {
+double b1_per_bin(double z __attribute__((unused)), int ni)
+{
   return gbias.b[ni];
 }
 
-double b1_per_bin_pass_evolv(double z, int ni) {
+double b1_per_bin_pass_evolv(double z, int ni)
+{
   double z_evolv_passiv = growfac(1. / (z + 1.)) /
                           growfac(1. / (1. + 0.5 * (tomo.clustering_zmin[ni] +
                                                     tomo.clustering_zmax[ni])));
   return (gbias.b[ni] - 1.) / z_evolv_passiv + 1.;
 }
 
-double b1_growth_scaling(double z, int ni __attribute__((unused))) {
+double b1_growth_scaling(double z, int ni __attribute__((unused)))
+{
   return gbias.b[0] / (growfac(1. / (z + 1.)) / growfac(1.));
 }
 
-double b1_powerlaw(double z, int ni __attribute__((unused))) {
+double b1_powerlaw(double z, int ni __attribute__((unused)))
+{
   return gbias.b[0] * pow(1 + z, gbias.b[1]);
 }
 
