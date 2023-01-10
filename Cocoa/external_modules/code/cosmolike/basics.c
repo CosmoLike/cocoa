@@ -51,15 +51,15 @@ bin_avg set_bin_average(int i_theta, int j_L)
     exit(1);
   }
   if (!(i_theta < like.Ntheta))
-   {
-     log_fatal("bad i_theta index");
-     exit(1);
-   }
-   if (!(j_L < limits.LMAX))
-   {
-     log_fatal("bad j_L index");
-     exit(1);
-   }
+  {
+    log_fatal("bad i_theta index");
+    exit(1);
+  }
+  if (!(j_L < limits.LMAX))
+  {
+    log_fatal("bad j_L index");
+    exit(1);
+  }
 
   if (Pmin == 0)
   {
@@ -150,26 +150,6 @@ void* arg, double a, double b, double* error, int niter)
   return res;
 }
 
-/*
-double int_gsl_integrate_medium_precision(double (*func)(double, void*),
-void* arg, double a, double b, double* error, int niter)
-{
-  double res, err;
-  gsl_integration_cquad_workspace *w = gsl_integration_cquad_workspace_alloc(niter);
-  gsl_function F;
-  F.function = func;
-  F.params = arg;
-  gsl_integration_cquad(&F, a, b, 0, precision.medium, w, &res, &err, 0);
-  if (NULL != error) 
-  {
-    *error = err;
-  }
-  gsl_integration_cquad_workspace_free(w);
-  return res;
-}
-*/
-
-
 double int_gsl_integrate_medium_precision(double (*func)(double, void*),
 void* arg, double a, double b, double* error, int niter)
 {
@@ -186,7 +166,7 @@ void* arg, double a, double b, double* error, int niter)
   gsl_function F;
   F.function = func;
   F.params = arg;
-  gsl_integration_cquad(&F, a, b, 0, precision.medium, &w, &res, &err, 0);
+  gsl_integration_cquad(&F, a, b, 0, precision.medium/2, &w, &res, &err, 0);
   if (NULL != error) 
   {
     *error = err;
