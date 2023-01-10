@@ -10,6 +10,7 @@ core.*
 *.egg-info/
 *.out
 
+
 cobaya/cobaya/likelihoods/.gitignore
 external_modules/code/.gitignore
 external_modules/data/.gitignore
@@ -67,3 +68,14 @@ cobaya/cobaya/likelihoods/lsst_y1
 cobaya/cobaya/likelihoods/des_y3
 cobaya/cobaya/likelihoods/des_4x2ptN
 cobaya/cobaya/likelihoods/kids
+
+
+cobaya/cobaya/likelihoods/bp_desy1xplanck
+cobaya/cobaya/likelihoods/desy1xplanckv2
+cobaya/cobaya/likelihoods/new_desy1xplanck
+external_modules/code/bp_desy1xplanck
+external_modules/code/desy1xplanckv2
+external_modules/code/new_desy1xplanck
+external_modules/data/bp_desy1xplanck
+external_modules/data/desy1xplanckv2
+external_modules/data/new_desy1xplanck
