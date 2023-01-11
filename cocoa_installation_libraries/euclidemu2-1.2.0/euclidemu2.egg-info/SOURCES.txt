@@ -1,0 +1,16 @@
+LICENSE
+MANIFEST.in
+README.md
+setup.py
+euclidemu2.egg-info/PKG-INFO
+euclidemu2.egg-info/SOURCES.txt
+euclidemu2.egg-info/dependency_links.txt
+euclidemu2.egg-info/top_level.txt
+src/cosmo.cxx
+src/cosmo.h
+src/ee2_bindata.dat
+src/emulator.cxx
+src/emulator.h
+src/euclidemu2.cpp
+src/euclidemu2.pyx
+src/units_and_constants.h
