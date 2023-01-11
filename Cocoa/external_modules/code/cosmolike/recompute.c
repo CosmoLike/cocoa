@@ -30,7 +30,8 @@ int recompute_cosmo3D(cosmopara C)
     return (C.Omega_m != cosmology.Omega_m || C.Omega_v != cosmology.Omega_v ||
             C.Omega_nu != cosmology.Omega_nu || C.h0 != cosmology.h0 ||
             C.MGSigma != cosmology.MGSigma || C.MGmu != cosmology.MGmu ||
-            C.random != cosmology.random ) ? 1 : 0;
+            C.random != cosmology.random || C.Omega_b != cosmology.Omega_b ||
+            C.sigma_8 != cosmology.sigma_8) ? 1 : 0;
   }
 }
 
@@ -121,6 +122,35 @@ int recompute_galaxies(galpara G, int i)
   return (G.b[i] != gbias.b[i] || G.b2[i] != gbias.b2[i] || G.bs2[i] != gbias.bs2[i]) ? 1 : 0;
 }
 
+int recompute_all_galaxies(galpara G) 
+{
+  for(int i=0; i<tomo.clustering_Nbin; i++) 
+  {
+    if(recompute_galaxies(G, i))
+    {
+      return 1;
+    }
+  }  
+  return 0;
+}
+
+int recompute_yhalo(ynuisancepara N)
+{
+  if (N.gas_beta != ynuisance.gas_beta || N.gas_lgM0 != ynuisance.gas_lgM0 ||
+      N.gas_eps1 != ynuisance.gas_eps1 || N.gas_eps2 != ynuisance.gas_eps2 || 
+      N.gas_alpha != ynuisance.gas_alpha || N.gas_A_star != ynuisance.gas_A_star || 
+      N.gas_lgM_star != ynuisance.gas_lgM_star || N.gas_sigma_star != ynuisance.gas_sigma_star || 
+      N.gas_lgT_w != ynuisance.gas_lgT_w || N.gas_f_H != ynuisance.gas_f_H || 
+      N.gas_Gamma_KS != ynuisance.gas_Gamma_KS ) 
+  {
+    return 1;
+  }
+  else
+  {
+    return 0;
+  }
+}
+
 int recompute_clusters(cosmopara C, nuisancepara N)
 {
   if (recompute_cosmo3D(C))
@@ -144,6 +174,10 @@ int recompute_clusters(cosmopara C, nuisancepara N)
   return 0;
 }
 
+// ---------------------------------------------------------------------------
+// ---------------------------------------------------------------------------
+// ---------------------------------------------------------------------------
+
 int recompute_shear(cosmopara C, nuisancepara N)
 {
   return (recompute_cosmo3D(C) || recompute_zphot_shear(N) || recompute_IA(N)) ? 1 : 0;
@@ -151,12 +185,11 @@ int recompute_shear(cosmopara C, nuisancepara N)
 
 int recompute_gs(cosmopara C, galpara G, nuisancepara N) 
 {
-  if (recompute_cosmo3D(C) || recompute_zphot_clustering(N) || recompute_zphot_shear(N) || recompute_IA(N))
+  if (recompute_shear(C, N) || recompute_zphot_clustering(N))
   {
     return 1;
   }
-  const int nggl_size = tomo.ggl_Npowerspectra; 
-  for(int i=0; i<nggl_size; i++) 
+  for(int i=0; i<tomo.ggl_Npowerspectra; i++) 
   {
     const int ZLNZ = ZL(i);
     const int ZSNZ = ZS(i);
@@ -174,8 +207,7 @@ int recompute_gg(cosmopara C, galpara G, nuisancepara N)
   {
     return 1;
   }
-  const int ncl_size = tomo.clustering_Nbin; 
-  for(int i=0; i<ncl_size; i++) 
+  for(int i=0; i<tomo.clustering_Nbin; i++) 
   {
     if(recompute_galaxies(G, i))
     {
@@ -185,20 +217,13 @@ int recompute_gg(cosmopara C, galpara G, nuisancepara N)
   return 0;
 }
 
-int recompute_ks(cosmopara C, galpara G, nuisancepara N)
+// ---------------------------------------------------------------------------
+// ---------------------------------------------------------------------------
+// ---------------------------------------------------------------------------
+
+int recompute_ks(cosmopara C, nuisancepara N)
 {
-  if (recompute_cosmo3D(C) || recompute_zphot_shear(N) || recompute_IA(N))
-  {
-    return 1;
-  }
-  for(int i=0; i<tomo.shear_Nbin; i++) 
-  {
-    if(recompute_galaxies(G, i))
-    {
-      return 1;
-    }
-  }
-  return 0;
+  return recompute_shear(C, N);
 }
 
 int recompute_gk(cosmopara C, galpara G, nuisancepara N)
@@ -216,6 +241,45 @@ int recompute_gk(cosmopara C, galpara G, nuisancepara N)
   }
   return 0;
 }
+
+// ---------------------------------------------------------------------------
+// ---------------------------------------------------------------------------
+// ---------------------------------------------------------------------------
+
+int recompute_gy(cosmopara C, galpara G, nuisancepara N, ynuisancepara N2) 
+{
+  if (recompute_cosmo3D(C) || recompute_zphot_clustering(N) || recompute_yhalo(N2))
+  {
+    return 1;
+  }
+  for(int i=0; i<tomo.clustering_Nbin; i++) 
+  {
+    if(recompute_galaxies(G, i))
+    {
+      return 1;
+    }
+  }
+  return 0;
+}
+
+int recompute_ys(cosmopara C, nuisancepara N, ynuisancepara N2)
+{
+  return recompute_shear(C, N) || recompute_yhalo(N2);
+}
+
+int recompute_yy(cosmopara C, ynuisancepara N)
+{
+  return recompute_cosmo3D(C) || recompute_yhalo(N);
+}
+
+int recompute_ky(cosmopara C, ynuisancepara N)
+{
+  return recompute_cosmo3D(C) || recompute_yhalo(N);
+}
+
+// ---------------------------------------------------------------------------
+// ---------------------------------------------------------------------------
+// ---------------------------------------------------------------------------
 
 int recompute_cc(cosmopara C, nuisancepara N)
 {

@@ -1,6 +1,8 @@
 #include <stdio.h>
 #include "structs.h"
 
+#include "log.c/src/log.h"
+
 //  ----------------------------------------------------------------------------------
 //  ----------------------------------------------------------------------------------
 //  ----------------------------------------------------------------------------------
@@ -21,6 +23,10 @@ likepara like =
   .gk = 0,
   .kk = 0,
   .ks = 0,
+  .gy = 0,
+  .sy = 0,
+  .ky = 0,
+  .yy = 0,
   .clusterN = 0,
   .clusterWL = 0,
   .clusterCG = 0,
@@ -42,6 +48,10 @@ cosmopara cosmology =
   .rho_crit = 7.4775e+21,
   .MGSigma = 0.0,
   .MGmu = 0.0,
+  .sigma_8 = 0.0,
+  .Omega_b = 0.0,
+  .Omega_v = 0.0,
+  .h0 = 0.0,
   //.w0 = -1,
   //.A_s =  2e-9,
   //.n_s = 0.96,
@@ -72,7 +82,9 @@ galpara gbias =
   .b2 = {0},
   .bs2 = {0},
   .b1_function = &b1_per_bin,
-  .b_mag = {0}
+  .b_mag = {0},
+  .cg = {0},
+  .hod = {0}
 }; // default: point to old bgal_z routin
 
 clusterparams Cluster =
@@ -105,6 +117,21 @@ nuisancepara nuisance =
   .bias_zphot_shear = {0},
   .sigma_zphot_clustering = {0},
   .bias_zphot_clustering = {0},
+};
+
+ynuisancepara ynuisance =
+{
+  .gas_Gamma_KS = 0,
+  .gas_beta = 0,
+  .gas_lgM0 = 0, 
+  .gas_eps1 = 0,
+  .gas_eps2 = 0,
+  .gas_alpha = 0,
+  .gas_A_star = 0,
+  .gas_lgM_star = 0,
+  .gas_sigma_star = 0,
+  .gas_lgT_w = 0,
+  .gas_f_H = 0
 };
 
 barypara bary =
@@ -143,13 +170,13 @@ FPTpara FPT =
 
 lim limits = 
 {
-  .a_min = 1./(1.+10.),    // a_min (z=10, needed for CMB lensing)
-  .k_min_cH0 = 2.e-2,      // k_min_cH0
-  .k_max_cH0 = 3.e+6,      // k_max_cH0
-  .M_min = 1.0e+6,         // M_min
-  .M_max = 1.0e+17,        // M_max
-  .LMIN_tab = 20,          // LMIN_tab
-  .LMAX_NOLIMBER = 250,    // LMAX_NOLIMBER
+  .a_min = 1.0/(1.0 + 10.0),    // a_min (z = 10, needed for CMB lensing)
+  .k_min_cH0 = 2.e-2,           // k_min_cH0
+  .k_max_cH0 = 3.e+6,           // k_max_cH0
+  .M_min = 1.0e+6,              // M_min
+  .M_max = 1.0e+17,             // M_max
+  .LMIN_tab = 20,               // LMIN_tab
+  .LMAX_NOLIMBER = 250,         // LMAX_NOLIMBER
   .LMAX = 100000,
   .LMIN_hankel = 0.0001,
   .LMAX_hankel = 5.0e6,
@@ -164,7 +191,11 @@ lim limits =
   .halo_exclusion_k_min_hankel = 5.0E-4,
   .halo_exclusion_k_max_hankel = 1.0E8,
   .halo_exclusion_R_min = 0.0,
-  .halo_exclusion_R_max = 15.0/2997
+  .halo_exclusion_R_max = 15.0/2997.,
+  .halo_uKS_cmin = 0.1,     // halo.c u_KS(double c, double k, double rv)
+  .halo_uKS_cmax = 50.0,    // halo.c u_KS(double c, double k, double rv)
+  .halo_uKS_xmin = 1e-10,   // halo.c u_KS(double c, double k, double rv)
+  .halo_uKS_xmax = 5e3      // halo.c u_KS(double c, double k, double rv)
 };
 
 Ntab Ntable = 
@@ -175,8 +206,7 @@ Ntab Ntable =
   .N_ell = 400,                       // N_ell      (modified by COCOA from 200 - tested on DES-Y3)
   .N_theta = 250,                     // N_theta    (modified by COCOA from 200 - tested on DES-Y3)
   .N_thetaH = 2048,                   // N_theta for Hankel
-  .N_S2 = 1000,                       // N_S2
-  .N_DS = 1000,                       // N_DS
+  .N_M  = 1000,                       // N_M, M = mass (Halo Model)
   .N_ell_TATT = 200,                  // N_ell_TATT (modified by COCOA from 60 - tested on DES-Y3)
   .NL_Nell_block = 50,                // Cosmo2D - NL = NonLimber (NL_Nell_block)
   .NL_Nchi = 500,                     // Cosmo2D - NL = NonLimber (NL_Nchi)
@@ -186,7 +216,9 @@ Ntab Ntable =
   .N_R_halo_exclusion = 64,
   .binned_P_lambda_obs_given_M_size_z_table = 10,
   .binned_P_lambda_obs_given_M_size_M_table = 50,
-  .binned_p_cm_size_a_table = 30
+  .binned_p_cm_size_a_table = 30,
+  .halo_uKS_nc = 20,
+  .halo_uks_nx = 200
 };
 
 pre precision = 
@@ -260,6 +292,10 @@ void reset_like_struct()
   like.gk = 0;
   like.kk = 0;
   like.ks = 0;
+  like.gy = 0;
+  like.sy = 0;
+  like.ky = 0;
+  like.yy = 0;
   like.use_full_sky_shear = 1;
   like.use_full_sky_ggl = 1;
   like.use_full_sky_clustering = 1;
@@ -279,11 +315,13 @@ void reset_cosmology_struct()
 
   cosmology.is_cached = 0;
 
+  cosmology.Omega_b = 0.0;
   cosmology.Omega_m = 0.0;
   cosmology.Omega_v = 0.0;
   cosmology.h0 = 0.0;
   cosmology.Omega_nu = 0.0;
   cosmology.random = 0.0;
+  cosmology.sigma_8 = 0.0;
 }
 
 void reset_tomo_struct()
@@ -434,6 +472,21 @@ void reset_nuisance_struct()
   nuisance.c1rhocrit_ia = 0.01389;
 }
 
+void reset_ynuisance_struct()
+{ // Compton-Y related variables  
+  ynuisance.gas_Gamma_KS =  0.0;
+  ynuisance.gas_beta = 0.0;     
+  ynuisance.gas_lgM0 = 0.0;     
+  ynuisance.gas_eps1 = 0.0;
+  ynuisance.gas_eps2 = 0.0;
+  ynuisance.gas_alpha = 0.0;
+  ynuisance.gas_A_star = 0.0;
+  ynuisance.gas_lgM_star = 0.0;
+  ynuisance.gas_sigma_star = 0.0;
+  ynuisance.gas_lgT_w = 0.0;
+  ynuisance.gas_f_H = 0.0;
+}
+
 void reset_cmb_struct()
 {
   sprintf(cmb.name, "%s", "");
@@ -452,6 +505,7 @@ void reset_cmb_struct()
 
 void update_cosmopara(cosmopara *C) 
 {
+  C->Omega_b = cosmology.Omega_b;
   C->Omega_m = cosmology.Omega_m;
   C->Omega_v = cosmology.Omega_v;
   C->Omega_nu = cosmology.Omega_nu;
@@ -474,12 +528,24 @@ void update_galpara(galpara *G)
       G->b[i] = gbias.b[i];
       G->b2[i] = gbias.b2[i];
       G->bs2[i] = gbias.bs2[i];
-    } 
-    else 
-    {
-      printf("lens bin %d: neither HOD nor linear bias set, exit\n", i);
-      exit(1);
     }
+    else
+    {
+      // HOD ------------------------------------------------------------
+      if (gbias.hod[i][0] > 10 && gbias.hod[i][0] < 16) 
+      {
+        for(int j=0; j<MAX_SIZE_ARRAYS; j++)
+        {
+          G->hod[i][j] = gbias.hod[i][j];
+        }
+        G->cg[i]= gbias.cg[i];
+      }
+      else 
+      {
+        log_fatal("lens bin %d: neither linear bias or HOD are set", i);
+        exit(1);
+      }
+    } 
   }
 }
 
@@ -517,3 +583,17 @@ void update_nuisance(nuisancepara *N)
   }
 }
 
+void update_ynuisance(ynuisancepara* N)
+{ // Compton-Y related variables
+  N->gas_Gamma_KS = ynuisance.gas_Gamma_KS;
+  N->gas_beta = ynuisance.gas_beta;     
+  N->gas_lgM0 = ynuisance.gas_lgM0;     
+  N->gas_eps1 = ynuisance.gas_eps1;
+  N->gas_eps2 = ynuisance.gas_eps2;
+  N->gas_alpha = ynuisance.gas_alpha;
+  N->gas_A_star = ynuisance.gas_A_star;
+  N->gas_lgM_star = ynuisance.gas_lgM_star;
+  N->gas_sigma_star = ynuisance.gas_sigma_star;
+  N->gas_lgT_w = ynuisance.gas_lgT_w;
+  N->gas_f_H = ynuisance.gas_f_H;
+}
