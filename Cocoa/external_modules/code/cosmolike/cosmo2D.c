@@ -45,26 +45,64 @@ double beam_cmb(const double l)
   return exp(-l*(l+1.0)*sigma*sigma)*norm;
 }
 
+double w_pixel(const double ell)
+{
+  static int lbins;
+  static double *cl_pixel =0;
+  FILE* ein;
+  int l = (int) ceil(ell);
+
+  if (cl_pixel == 0)
+  {
+    ein = fopen(cmb.pathHealpixWinFunc, "r");
+    if (ein == NULL)
+    {
+      log_info("Can not open file %s, ignore healpix window function\n",
+        cmb.pathHealpixWinFunc);
+      lbins = 0;
+      cl_pixel = malloc(sizeof(double));
+      cl_pixel[0] = 1.0;
+    }
+    else
+    {
+      fclose(ein);
+      lbins = line_count(cmb.pathHealpixWinFunc);
+      cl_pixel = malloc(sizeof(double)*lbins);
+      ein = fopen(cmb.pathHealpixWinFunc, "r");
+      for (int i = 0; i < lbins; i++)
+      {
+        int tmp;
+        double tmp2;
+        fscanf(ein, "%d %le\n", &tmp, &tmp2);
+        cl_pixel[i] = tmp2;
+      }
+      fclose(ein);
+    }
+  }
+  if (lbins>0){return (l < lbins) ? cl_pixel[l] : 0.0;}
+  else{return 1.0;}
+}
+
 double C_gk_tomo_limber_nointerp_wrapper(double l, int ni, int use_linear_ps,
 const int init_static_vars_only)
 {
-  return C_gk_tomo_limber_nointerp(l, ni, use_linear_ps, init_static_vars_only)*beam_cmb(l);
+  return C_gk_tomo_limber_nointerp(l, ni, use_linear_ps, init_static_vars_only)*beam_cmb(l)*w_pixel(l);
 }
 
 double C_gk_tomo_limber_wrapper(double l, int ni)
 {
-  return C_gk_tomo_limber(l, ni)*beam_cmb(l);
+  return C_gk_tomo_limber(l, ni)*beam_cmb(l)*w_pixel(l);
 }
 
 double C_ks_tomo_limber_nointerp_wrapper(double l, int ni, int use_linear_ps, 
 const int init_static_vars_only)
 {
-  return C_ks_tomo_limber_nointerp(l, ni, use_linear_ps, init_static_vars_only)*beam_cmb(l);
+  return C_ks_tomo_limber_nointerp(l, ni, use_linear_ps, init_static_vars_only)*beam_cmb(l)*w_pixel(l);
 }
 
 double C_ks_tomo_limber_wrapper(double l, int ni)
 {
-  return C_ks_tomo_limber(l, ni)*beam_cmb(l);
+  return C_ks_tomo_limber(l, ni)*beam_cmb(l)*w_pixel(l);
 }
 
 static int has_b2_galaxies()
