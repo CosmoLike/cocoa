@@ -332,6 +332,12 @@ if [ -z "${IGNORE_ALL_PIP_INSTALLATION}" ]; then
     echo "PROBLEM PIP GetDist"
     return 1
   fi
+
+  env CXX=$CXX_COMPILER CC=$C_COMPILER  $PIP3 install --global-option=build_ext $ROOTDIR/../cocoa_installation_libraries/euclidemu2-1.2.0 --upgrade  --no-dependencies --prefix=$ROOTDIR/.local --no-index > /dev/null 2> /dev/null  
+  if [ $? -ne 0 ]; then
+    echo "PROBLEM PIP euclidemul"
+    return 1
+  fi
 fi
 
 # PS: --no-index option prevent pip from using internet (forces to use our local cache)
