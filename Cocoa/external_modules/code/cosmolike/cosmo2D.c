@@ -3114,7 +3114,7 @@ double C_gs_tomo_limber(double l, int ni, int nj)
           const int ZSNZ = ZS(k);
           const double lnl = lnlmin + i*dlnl;
           const double ll = exp(lnl);
-          table[k][i] = log(C_gs_tomo_limber_nointerp(ll, ZLNZ, ZSNZ, use_linear_ps_limber, 0));
+          table[k][i] = C_gs_tomo_limber_nointerp(ll, ZLNZ, ZSNZ, use_linear_ps_limber, 0);
         }
       }
     }
