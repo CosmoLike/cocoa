@@ -3809,7 +3809,7 @@ double int_for_C_ks_limber(double a, void* params)
     {
       const double norm = (cosmology.Omega_m*nuisance.c1rhocrit_ia/growfac_a)*
         nuisance.A_ia*pow(1.0/(a*nuisance.oneplusz0_ia), nuisance.eta_ia);
-      res = -(WS1*WK2*norm + WK1*WK2);
+      res = (-WS1*WK2*norm + WK1*WK2);
 
       break;
     }
