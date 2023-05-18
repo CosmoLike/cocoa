@@ -48,9 +48,46 @@ if [ -n "${CPATH}" ]; then
     export OLD_CPATH=$CPATH
 fi
 
+if [ -n "${LD_RUN_PATH}" ]; then
+    export OLD_LD_RUN_PATH=$LD_RUN_PATH
+fi
+
+if [ -n "${CMAKE_LIBRARY_PATH}" ]; then
+    export OLD_CMAKE_LIBRARY_PATH=$CMAKE_LIBRARY_PATH
+fi
+
+if [ -n "${CMAKE_INCLUDE_PATH}" ]; then
+    export OLD_CMAKE_INCLUDE_PATH=$CMAKE_INCLUDE_PATH
+fi
+
+if [ -n "${LIBRARY_PATH}" ]; then
+    export OLD_LIBRARY_PATH=$LIBRARY_PATH
+fi
+
+if [ -n "${INCLUDEPATH}" ]; then
+    export OLD_INCLUDEPATH=$INCLUDEPATH
+fi
+
+if [ -n "${INCLUDE}" ]; then
+    export OLD_INCLUDE=$INCLUDE
+fi
+
 if [ -n "${NUMPY_HEADERS}" ]; then
     export OLD_NUMPY_HEADERS=$NUMPY_HEADERS
 fi
+
+if [ -n "${OBJC_INCLUDE_PATH}" ]; then
+    export OLD_OBJC_INCLUDE_PATH=$OBJC_INCLUDE_PATH
+fi
+
+if [ -n "${OBJC_PATH}" ]; then
+    export OLD_OBJC_PATH=$OBJC_PATH
+fi
+
+# ----------------------------------------------------------------------------
+# ----------------------------------------------------------------------------
+# ----------------------------------------------------------------------------
+# ----------------------------------------------------------------------------
 
 if [ -n "${SET_INSTALLATION_OPTIONS}" ]; then
     source $SET_INSTALLATION_OPTIONS
@@ -85,6 +122,7 @@ addvar PYTHONPATH $ROOTDIR/.local/lib
 export C_INCLUDE_PATH=$C_INCLUDE_PATH:$ROOTDIR/.local/lib/python$PYTHON_VERSION/site-packages/numpy/core/include
 export CPLUS_INCLUDE_PATH=$CPLUS_INCLUDE_PATH:$ROOTDIR/.local/lib/python$PYTHON_VERSION/site-packages/numpy/core/include
 
+export LD_LIBRARY_PATH=$ROOTDIR/.local/lib:$LD_LIBRARY_PATH
 export LDFLAGS="-L$ROOTDIR/.local/lib":$LDFLAGS
 export LD_RUN_PATH=$ROOTDIR/.local/lib:$LD_RUN_PATH
 export LD_RUN_PATH=$ROOTDIR/.local/lib:$LD_RUN_PATH
@@ -104,21 +142,20 @@ export CPATH=$ROOTDIR/.local/include/:$CPATH
 export OBJC_INCLUDE_PATH=$ROOTDIR/.local/:OBJC_INCLUDE_PATH
 export OBJC_PATH=$ROOTDIR/.local/:OBJC_PATH
 
-#export LD_LIBRARY_PATH=$ROOTDIR/.local/lib:$LD_LIBRARY_PATH
 # ----------------------------------------------------------------------------
 # ----------------------------------------------------------------------------
 # ----------------------------------------------------------------------------
 # ----------------------------------------------------------------------------
 # ----------------------------------------------------------------------------
 
-#source ./installation_scripts/setup_xz
+source ./installation_scripts/setup_xz
 if [ $? -ne 0 ] 
 then
 echo "FAILED setup_xz SCRIPT" >&2
 return 1
 fi
 
-#source ./installation_scripts/setup_decompress_files
+source ./installation_scripts/setup_decompress_files
 if [ $? -ne 0 ] 
 then
 echo "FAILED setup_decompress_files SCRIPT" >&2
