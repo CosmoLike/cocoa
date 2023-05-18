@@ -109,7 +109,7 @@ elif [ -n "${DOCKER_INSTALLATION}" ]; then
 elif [ -n "${MINICONDA_INSTALLATION}" ]; then
 
     export PATH=$CONDA_PREFIX/bin:$PATH
-    export LD_LIBRARY_PATH=$CONDA_PREFIX/lib:$LD_LIBRARY_PATH
+    #export LD_LIBRARY_PATH=$CONDA_PREFIX/lib:$LD_LIBRARY_PATH
     export LDFLAGS="-L$CONDA_PREFIX/lib":$LDFLAGS
     
     export CPLUS_INCLUDE_PATH=$CONDA_PREFIX/include/python3.7m/:$CPLUS_INCLUDE_PATH

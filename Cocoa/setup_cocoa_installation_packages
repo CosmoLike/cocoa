@@ -77,23 +77,33 @@ cd ./Cocoa
 
 source $ROOTDIR/.local/bin/activate
 
-if [ -n "${GLOBAL_PACKAGES_LOCATION}" ]; then
-    addvar PYTHONPATH $GLOBAL_PACKAGES_LOCATION/lib/python$PYTHON_VERSION/site-packages
-
-    addvar LD_LIBRARY_PATH $GLOBAL_PACKAGES_LOCATION/lib
-fi
-
-addvar LD_LIBRARY_PATH $ROOTDIR/.local/lib
+export PATH=$ROOTDIR/.local/bin:$PATH
 
 addvar PYTHONPATH $ROOTDIR/.local/lib/python$PYTHON_VERSION/site-packages
-
 addvar PYTHONPATH $ROOTDIR/.local/lib
 
-addvar PATH $ROOTDIR/.local/bin
-
 export C_INCLUDE_PATH=$C_INCLUDE_PATH:$ROOTDIR/.local/lib/python$PYTHON_VERSION/site-packages/numpy/core/include
-
 export CPLUS_INCLUDE_PATH=$CPLUS_INCLUDE_PATH:$ROOTDIR/.local/lib/python$PYTHON_VERSION/site-packages/numpy/core/include
+
+export LD_LIBRARY_PATH=$ROOTDIR/.local/lib:$LD_LIBRARY_PATH
+export LDFLAGS="-L$ROOTDIR/.local/lib":$LDFLAGS
+export LD_RUN_PATH=$ROOTDIR/.local/lib:$LD_RUN_PATH
+export LD_RUN_PATH=$ROOTDIR/.local/lib:$LD_RUN_PATH
+export LIBRARY_PATH=$ROOTDIR/.local/lib:$LIBRARY_PATH
+export LIBRARY_PATH=$ROOTDIR/.local/lib:$LIBRARY_PATH
+
+export CMAKE_INCLUDE_PATH=$ROOTDIR/.local/include/python${PYTHON_VERSION}m/:$CMAKE_INCLUDE_PATH
+export CMAKE_INCLUDE_PATH=$ROOTDIR/.local/include/:$CMAKE_INCLUDE_PATH    
+export CMAKE_LIBRARY_PATH=$ROOTDIR/.local/lib/python$PYTHON_VERSION/site-packages:$CMAKE_LIBRARY_PATH
+export CMAKE_LIBRARY_PATH=$ROOTDIR/.local/lib:$CMAKE_LIBRARY_PATH
+
+export INCLUDE_PATH=$ROOTDIR/.local/include/:$INCLUDE_PATH
+export INCLUDEPATH=$ROOTDIR/.local/include/:$INCLUDEPATH
+export INCLUDE=$ROOTDIR/.local/include/:$INCLUDE
+export CPATH=$ROOTDIR/.local/include/:$CPATH
+
+export OBJC_INCLUDE_PATH=$ROOTDIR/.local/:OBJC_INCLUDE_PATH
+export OBJC_PATH=$ROOTDIR/.local/:OBJC_PATH
 
 # ----------------------------------------------------------------------------
 # ----------------------------------------------------------------------------
@@ -136,12 +146,6 @@ echo "FAILED setup_pip_packages SCRIPT" >&2
 return 1
 fi
 
-export NUMPY_HEADERS=$ROOTDIR/.local/lib/python$PYTHON_VERSION/site-packages/numpy/core/include
-
-addvar LD_LIBRARY_PATH $ROOTDIR/.local/lib/python$PYTHON_VERSION/site-packages/numpy/core/lib
-
-export CPATH=$CPATH:$ROOTDIR/.local/lib/python$PYTHON_VERSION/site-packages/numpy/core/include
-
 source ./installation_scripts/setup_fortran_packages
 if [ $? -ne 0 ] 
 then
@@ -162,6 +166,10 @@ then
 echo "FAILED setup_c_packages SCRIPT" >&2
 return 1
 fi
+
+#export NUMPY_HEADERS=$ROOTDIR/.local/lib/python$PYTHON_VERSION/site-packages/numpy/core/include
+#addvar LD_LIBRARY_PATH $ROOTDIR/.local/lib/python$PYTHON_VERSION/site-packages/numpy/core/lib
+#export CPATH=$CPATH:$ROOTDIR/.local/lib/python$PYTHON_VERSION/site-packages/numpy/core/include
 
 # ----------------------------------------------------------------------------
 # ----------------------------------------------------------------------------
