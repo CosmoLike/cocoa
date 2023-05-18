@@ -10,7 +10,7 @@
         "extra_compile_args": [
             "-std=c++11",
             "-D PRINT_FLAG=0",
-            "-D PATH_TO_EE2_DATA_FILE1=\"/home/u8/vivianmiranda/data2/Vivian/cocoa_geogrowth_new/Cocoa/.local/lib/python3.7/site-packages/euclidemu2/ee2_bindata.dat\"",
+            "-D PATH_TO_EE2_DATA_FILE1=\"/home/u8/vivianmiranda/data2/Vivian/cocoa/Cocoa/.local/lib/python3.7/site-packages/euclidemu2/ee2_bindata.dat\"",
             "-D PATH_TO_EE2_DATA_FILE2=\"/home/u8/vivianmiranda/.local/lib/python3.7/site-packages/euclidemu2/ee2_bindata.dat\""
         ],
         "include_dirs": [

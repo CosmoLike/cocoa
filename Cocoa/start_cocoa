@@ -48,6 +48,30 @@ if [ -n "${CPATH}" ]; then
   export OLD_CPATH=$CPATH
 fi
 
+if [ -n "${LD_RUN_PATH}" ]; then
+    export OLD_LD_RUN_PATH=$LD_RUN_PATH
+fi
+
+if [ -n "${CMAKE_LIBRARY_PATH}" ]; then
+    export OLD_CMAKE_LIBRARY_PATH=$CMAKE_LIBRARY_PATH
+fi
+
+if [ -n "${CMAKE_INCLUDE_PATH}" ]; then
+    export OLD_CMAKE_INCLUDE_PATH=$CMAKE_INCLUDE_PATH
+fi
+
+if [ -n "${LIBRARY_PATH}" ]; then
+    export OLD_LIBRARY_PATH=$LIBRARY_PATH
+fi
+
+if [ -n "${INCLUDEPATH}" ]; then
+    export OLD_INCLUDEPATH=$INCLUDEPATH
+fi
+
+if [ -n "${INCLUDE}" ]; then
+    export OLD_INCLUDE=$INCLUDE
+fi
+
 if [ -n "${NUMPY_HEADERS}" ]; then
   export OLD_NUMPY_HEADERS=$NUMPY_HEADERS
 fi
@@ -59,6 +83,11 @@ fi
 if [ -n "${OBJC_PATH}" ]; then
   export OLD_OBJC_PATH=$OBJC_PATH
 fi
+
+# ----------------------------------------------------------------------------
+# ----------------------------------------------------------------------------
+# ----------------------------------------------------------------------------
+# ----------------------------------------------------------------------------
 
 if [ -n "${SET_INSTALLATION_OPTIONS}" ]; then
   source $SET_INSTALLATION_OPTIONS
@@ -81,17 +110,19 @@ addvar PYTHONPATH $ROOTDIR/.local/lib
 
 export C_INCLUDE_PATH=$C_INCLUDE_PATH:$ROOTDIR/.local/lib/python$PYTHON_VERSION/site-packages/numpy/core/include
 export CPLUS_INCLUDE_PATH=$CPLUS_INCLUDE_PATH:$ROOTDIR/.local/lib/python$PYTHON_VERSION/site-packages/numpy/core/include
+export C_INCLUDE_PATH=$C_INCLUDE_PATH:$ROOTDIR/.local/lib/python$PYTHON_VERSION/site-packages/numpy/core/include/numpy
+export CPLUS_INCLUDE_PATH=$CPLUS_INCLUDE_PATH:$ROOTDIR/.local/lib/python$PYTHON_VERSION/site-packages/numpy/core/include/numpy
 
 export NUMPY_HEADERS=$ROOTDIR/.local/lib/python$PYTHON_VERSION/site-packages/numpy/core/include
 export LD_LIBRARY_PATH=$ROOTDIR/.local/lib/python$PYTHON_VERSION/site-packages/numpy/core/lib:$LD_LIBRARY_PATH
 export CPATH=$CPATH:$ROOTDIR/.local/lib/python$PYTHON_VERSION/site-packages/numpy/core/include
 export CFLAGS=$CFLAGS:$ROOTDIR/.local/lib/python$PYTHON_VERSION/site-packages/numpy/core/include
+export CPATH=$CPATH:$ROOTDIR/.local/lib/python$PYTHON_VERSION/site-packages/numpy/core/include/numpy
+export CFLAGS=$CFLAGS:$ROOTDIR/.local/lib/python$PYTHON_VERSION/site-packages/numpy/core/include/numpy
 
 export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$ROOTDIR/.local/lib
 export LDFLAGS="-L$ROOTDIR/.local/lib":$LDFLAGS
 export LD_RUN_PATH=$ROOTDIR/.local/lib:$LD_RUN_PATH
-export LD_RUN_PATH=$ROOTDIR/.local/lib:$LD_RUN_PATH
-export LIBRARY_PATH=$ROOTDIR/.local/lib:$LIBRARY_PATH
 export LIBRARY_PATH=$ROOTDIR/.local/lib:$LIBRARY_PATH
 
 export CMAKE_INCLUDE_PATH=$ROOTDIR/.local/include/python${PYTHON_VERSION}m/:$CMAKE_INCLUDE_PATH
@@ -126,7 +157,11 @@ if [ -z "${IGNORE_PLANCK_COMPILATION}" ]; then
     export OLD_CLIK_PLUGIN=$CLIK_PLUGIN
   fi
 
-  addvar PYTHONPATH $ROOTDIR/.local/lib/python/site-packages
+  export PYTHONPATH=$ROOTDIR/.local/lib/python/site-packages:$PYTHONPATH
+
+  if [ -n "${GLOBAL_PACKAGES_LOCATION}" ]; then
+    export PYTHONPATH=$GLOBAL_PACKAGES_LOCATION/lib/python$PYTHON_VERSION/site-packages:$PYTHONPATH
+  fi
 
   export CLIK_PATH=$ROOTDIR/.local
 
