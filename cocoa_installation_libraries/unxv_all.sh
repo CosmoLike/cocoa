@@ -143,12 +143,12 @@ if [ -z "${IGNORE_C_INSTALLATION}" ]; then
     if [ -z "${IGNORE_C_GSL_INSTALLATION}" ]; then
         echo 'DECOMPRESSING C GSL LIBRARY'
         if [ -z "${THREAD_UNXZ}" ]; then
-            rm -rf ./gsl-2.6/
-            tar xf gsl-2.6.xz
+            rm -rf ./gsl-2.7/
+            tar xf gsl-2.7.xz
             proc10=$!
         else
-            rm -rf ./gsl-2.6/
-            tar xf gsl-2.6.xz &
+            rm -rf ./gsl-2.7/
+            tar xf gsl-2.7.xz &
             proc10=$!
         fi
     fi

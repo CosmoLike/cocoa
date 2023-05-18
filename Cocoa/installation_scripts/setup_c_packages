@@ -87,7 +87,7 @@ fi
 if [ -z "${IGNORE_C_GSL_INSTALLATION}" ]; then
     echo 'INSTALLING C GSL - THAT MIGHT TAKE A WHILE'
 
-    cd $ROOTDIR/../cocoa_installation_libraries/gsl-2.6/
+    cd $ROOTDIR/../cocoa_installation_libraries/gsl-2.7/
 
     CC=$C_COMPILER ./configure --prefix=$ROOTDIR/.local --enable-shared=yes --enable-static=yes > /dev/null 2> /dev/null
 

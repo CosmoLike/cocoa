@@ -12,8 +12,6 @@ rm -rf ./carma
 
 rm -rf ./fftw-3.3.8
 
-rm -rf ./gsl-2.6
-
 rm -rf ./gsl-2.7
 
 rm -rf ./lapack-3.9.0
