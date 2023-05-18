@@ -68,6 +68,20 @@ else
   unset NUMPY_HEADERS
 fi
 
+if [ -n "${OLD_OBJC_INCLUDE_PATH}" ]; then
+  export OBJC_INCLUDE_PATH=$OLD_OBJC_INCLUDE_PATH
+  unset OLD_OBJC_INCLUDE_PATH
+else
+  unset OBJC_INCLUDE_PATH
+fi
+
+if [ -n "${OLD_OBJC_PATH}" ]; then
+  export OBJC_PATH=$OLD_OBJC_PATH
+  unset OLD_OBJC_PATH
+else
+  unset OBJC_PATH
+fi
+
 # ----------------------------------------------------------------------------
 # ----------------------------------------------------------------------------
 # ----------------------------- PLANCK LIKELIHOOD ----------------------------
