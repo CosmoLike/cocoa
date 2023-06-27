@@ -186,14 +186,14 @@ One model evaluation:
 
         $(cocoa)(.local) mpirun -n 1 --mca btl tcp,self --bind-to core:overload-allowed --rank-by core --map-by numa:pe=${OMP_NUM_THREADS} cobaya-run ./projects/example/EXAMPLE_EVALUATE1.yaml -f
 
-PS: We offer the flag `COCOA_RUN_EVALUATE` as an alias (syntax-sugar) for `mpirun -n 1 --mca btl tcp,self --bind-to core --rank-by core --map-by numa:pe=4 cobaya-run`. 
+PS: We offer the flag `COCOA_RUN_EVALUATE` as an alias (syntax-sugar) for `mpirun -n 1 --mca btl tcp,self --bind-to core:overload-allowed --rank-by core --map-by numa:pe=4 cobaya-run`. 
 
         $(cocoa)(.local) $COCOA_RUN_EVALUATE ./projects/example/EXAMPLE_EVALUATE1.yaml -f
 MCMC:
 
         $(cocoa)(.local) mpirun -n 4 --mca btl tcp,self --bind-to core:overload-allowed --rank-by core --map-by numa:pe=${OMP_NUM_THREADS} cobaya-run ./projects/example/EXAMPLE_MCMC1.yaml -f
 
-PS: We offer the flag `COCOA_RUN_MCMC` as an alias (syntax-sugar) for `mpirun -n 4 --mca btl tcp,self --bind-to core --rank-by core --map-by numa:pe=4 cobaya-run`. 
+PS: We offer the flag `COCOA_RUN_MCMC` as an alias (syntax-sugar) for `mpirun -n 4 --mca btl tcp,self --bind-to core:overload-allowed --rank-by core --map-by numa:pe=4 cobaya-run`. 
 
         $(cocoa)(.local) $COCOA_RUN_MCMC ./projects/example/EXAMPLE_MCMC1.yaml -f
         
@@ -228,7 +228,7 @@ Example of cosmolike projects: [lsst_y1](https://github.com/CosmoLike/cocoa_lsst
         $(cocoa) cd ../
         $(cocoa) source start_cocoa
  
-Remember to run the start_cocoa script only after cloning the project repository is essential. The script *start_cocoa* creates necessary symbolic links and also adds the *Cobaya-Cosmolike interface* of all projects to `LD_LIBRARY_PATH` and `PYTHONPATH` paths.
+Remember to run the start_cocoa script only after cloning the project repository. The script *start_cocoa* creates the necessary symbolic links and adds all projects' *Cobaya-Cosmolike interface* to `LD_LIBRARY_PATH` and `PYTHONPATH` paths.
 
 :four: **Step 4 of 5**: compile the project
  
