@@ -234,7 +234,7 @@ Example of cosmolike projects: [lsst_y1](https://github.com/CosmoLike/cocoa_lsst
  
         $(cocoa)(.local) source ./projects/XXX/scripts/compile_XXX
   
-:five:  **Step 5 of 5**: select the number of OpenMP cores and run a template yaml file
+:five:  **Step 5 of 5**: select the number of OpenMP cores and run a template YAML file
     
         $(cocoa)(.local) export OMP_PROC_BIND=close; export OMP_NUM_THREADS=4
         $(cocoa)(.local) mpirun -n 1 --mca btl tcp,self --bind-to core:overload-allowed --rank-by core --map-by numa:pe=${OMP_NUM_THREADS} cobaya-run ./projects/XXX/EXAMPLE_EVALUATE1.yaml -f
