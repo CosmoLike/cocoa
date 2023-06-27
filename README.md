@@ -228,7 +228,7 @@ Example of cosmolike projects: [lsst_y1](https://github.com/CosmoLike/cocoa_lsst
         $(cocoa) cd ../
         $(cocoa) source start_cocoa
  
-Remember to run the start_cocoa script only after cloning the project repository. The script *start_cocoa* creates the necessary symbolic links and adds all projects' *Cobaya-Cosmolike interface* to `LD_LIBRARY_PATH` and `PYTHONPATH` paths.
+:warning: (**warning**) :warning: Remember to run the start_cocoa script only after cloning the project repository. The script *start_cocoa* creates the necessary symbolic links and adds the *Cobaya-Cosmolike interface* of all projects to `LD_LIBRARY_PATH` and `PYTHONPATH` paths.
 
 :four: **Step 4 of 5**: compile the project
  
