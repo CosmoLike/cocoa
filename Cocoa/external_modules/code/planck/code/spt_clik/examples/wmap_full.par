@@ -1,0 +1,16 @@
+# prepare a file for calling the wmap full likelihood through clik
+
+#res_object = wmap_7_full.clik
+res_object = wmap_9_full.clik
+
+ttmin = 2
+ttmax = 1200
+temin = 2
+temax = 1200
+use_gibbs = 0
+use_lowl_pol = 1
+
+#wmap_data = /Users/benabed/likelihood_v4p1
+#cl_save = wmap_7_full.cltest
+wmap_data = /Users/benabed/Downloads/wmap_likelihood_v5
+cl_save = wmap_9_full.cltest

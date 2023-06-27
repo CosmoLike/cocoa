@@ -1,0 +1,229 @@
+  mapCal95:
+    prior:
+      min: 0.5
+      max: 2.0
+    ref:
+      dist: norm
+      loc: 1.0
+      scale: 0.1
+    proposal: 0.1
+    latex: cal^\mathrm{95}
+  mapCal150:
+    prior:
+      min: 0.5
+      max: 2.0
+    ref:
+      dist: norm
+      loc: 1.0
+      scale: 0.1
+    proposal: 0.1
+    latex: cal^\mathrm{150}
+  mapCal220:
+    prior:
+      min: 0.5
+      max: 2.0
+    ref:
+      dist: norm
+      loc: 1.0
+      scale: 0.1
+    proposal: 0.1
+    latex: cal^\mathrm{220}
+  
+  FTS_calibration_error:
+    prior:
+      min: -2
+      max: 2
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 0.3
+    proposal: 0.3
+    latex: \sigma(FTS)
+  
+  czero_tsz:
+    prior:
+      min: 0.0
+      max: 40.0
+    ref:
+      dist: norm
+      loc: 3.5
+      scale: 1.0
+    proposal: 1.0
+    latex: D_{3000}^{tSZ}
+  czero_ksz:
+    prior:
+      min: 0.0
+      max: 40.0
+    ref:
+      dist: norm
+      loc: 3.9
+      scale: 1.0
+    proposal: 1.0
+    latex: D_{3000}^{kSZ}
+  czero_ksz2:
+    value: 0.
+    latex: D_{3000}^{kSZ2}
+  
+  #DSFG Poisson
+  czero_dg_po:
+    prior:
+      min: 0.0
+      max: 40.0
+    ref:
+      dist: norm
+      loc: 8.6
+      scale: 0.2
+    proposal: 0.2
+    latex: D_{3000}^{DSFG-p}
+  T_dg_po:
+    prior:
+      min: 10.0
+      max: 50.0
+    ref:
+      dist: norm
+      loc: 25
+      scale: 1.0
+    proposal: 1.0
+    latex: T^{DSFG-p}
+  beta_dg_po:
+    prior:
+      min: 0.0
+      max: 6.0
+    ref:
+      dist: norm
+      loc: 1.5
+      scale: 0.1
+    proposal: 0.1
+    latex: \beta^{DSFG-p}
+  sigmasq_dg_po:
+    prior:
+      min: 0.0
+      max: 2.0
+    ref:
+      dist: norm
+      loc: 0.1
+      scale: 0.1
+    proposal: 0.1
+    latex: \sigma^{DSFG-p}
+
+  #DSFG Clustered 1halo
+  czero_dg_cl:
+    prior:
+      min: 0.0
+      max: 40.0
+    ref:
+      dist: norm
+      loc: 3.4
+      scale: 0.2
+    proposal: 0.2
+    latex: D_{3000}^{DSFG-1h}
+  T_dg_cl:
+    value: 25
+    latex: T^{DSFG-1h}
+  beta_dg_cl:
+    prior:
+      min: 0.0
+      max: 6.0
+    ref:
+      dist: norm
+      loc: 0.5
+      scale: 0.1
+    proposal: 0.1
+    latex: \beta^{DSFG-1h}
+  sigmasq_dg_cl:
+    value: 0.
+    latex: \sigma^{DSFG-1h}
+  
+  #DSFG Clustered 2halo
+  czero_dg_cl2:
+    prior:
+      min: 0.0
+      max: 40.0
+    ref:
+      dist: norm
+      loc: 1.0
+      scale: 0.2
+    proposal: 0.2
+    latex: D_{3000}^{DSFG-2h}
+  T_dg_cl2:
+    value: 25
+    latex: T^{DSFG-2h}
+  beta_dg_cl2:
+    prior:
+      min: 0.0
+      max: 6.0
+    ref:
+      dist: norm
+      loc: 0.5
+      scale: 0.1
+    proposal: 0.1
+    latex: \beta^{DSFG-2h}
+  sigmasq_dg_cl2:
+    value: 0.
+    latex: \sigma^{DSFG-2h}
+
+  #tSZxCIB
+  tsz_dg_cor:
+    prior:
+      min: -1.0 
+      max: 1.0
+    ref:
+      dist: norm
+      loc: 0.07
+      scale: 0.1
+    proposal: 0.1
+    latex: \xsi^{tSZxCIB}
+  tsz_cib_slope:
+    value: 0.
+    latex: \alpha^{tSZxCIB}
+
+  #Radio Galaxies
+  czero_rg_po:
+    prior:
+      min: 0.0
+      max: 40.0
+    ref:
+      dist: norm
+      loc: 1.0
+      scale: 0.1
+    proposal: 0.1
+    latex: D_{3000}^{RG-po}
+  czero_rg_cl:
+    value: 0.
+    latex: D_{3000}^{RG-cl}
+  alpha_rg:
+    prior:
+      min: -10.0
+      max: 1.0
+    ref:
+      dist: norm
+      loc: -0.7
+      scale: 0.1
+    proposal: 0.1
+    latex: \alpha^{RG}
+  sigmasq_rg:
+    value: 0.0
+    latex: \sigma^{RG}
+
+  #tSZxRG
+  tsz_rg_cor:
+    value: 0.0
+    latex: \xsi^{tSZxRG}
+
+  #Cirrus
+  czero_cirrus:
+    prior:
+      min: 0.0
+      max: 50.0
+    ref:
+      dist: norm
+      loc: 2.19
+      scale: 0.1
+    proposal: 0.1
+    latex: D_{3000}^{cirrus}
+  T_cirrus:
+    value: 25
+    latex: T^{cirrus}
+  beta_cirrus:
+    value: 1.5
+    latex: \beta^{cirrus}

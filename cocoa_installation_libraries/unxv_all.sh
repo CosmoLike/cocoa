@@ -5,7 +5,7 @@ if [ -n "${THREAD_UNXZ}" ]; then
 fi
 
 if [ -z "${IGNORE_OPENBLAS_INSTALLATION}" ]; then
-    echo 'DECOMPRESSING OPENBLAS'
+    echo 'DECOMPRESSING OPENBLAS - THAT MIGHT TAKE A WHILE'
     rm -rf ./OpenBLAS/
     if [ -z "${THREAD_UNXZ}" ]; then
         tar xf OpenBLAS.xz
@@ -18,7 +18,7 @@ else
 fi
 
 if [ -z "${IGNORE_ALL_PIP_INSTALLATION}" ]; then
-    echo 'DECOMPRESSING PIP CACHE'
+    echo 'DECOMPRESSING PIP CACHE - THAT MIGHT TAKE A WHILE'
     rm -rf ./pip_cache/
     
     if [ -z "${THREAD_UNXZ}" ]; then
@@ -28,14 +28,17 @@ if [ -z "${IGNORE_ALL_PIP_INSTALLATION}" ]; then
         tar xf pip_cache.xz &
         proc2=$!
     fi
-
-    rm -rf ./expat241/
-    if [ -z "${THREAD_UNXZ}" ]; then
+    if [ -z "${MINICONDA_INSTALLATION}" ]; then
+      rm -rf ./expat241/
+      if [ -z "${THREAD_UNXZ}" ]; then
         tar xf expat241.xz
-        proc2X=$!
-    else
+        proc2A=$!
+      else
         tar xf expat241.xz &
         proc2A=$!
+      fi
+    else
+      proc2A=1
     fi
 else
   proc2=1
@@ -84,7 +87,7 @@ if [ -z "${IGNORE_CPP_INSTALLATION}" ]; then
     fi
 
     if [ -z "${IGNORE_CPP_SPDLOG_INSTALLATION}" ]; then
-        echo 'DECOMPRESSING CPP SPDLOG LIBRARY'
+        echo 'DECOMPRESSING CPP SPDLOG LIBRARY - THAT MIGHT TAKE A WHILE'
         if [ -z "${THREAD_UNXZ}" ]; then
             rm -rf ./spdlog/
             tar xf spdlog.xz
@@ -97,7 +100,7 @@ if [ -z "${IGNORE_CPP_INSTALLATION}" ]; then
     fi
 
     if [ -z "${IGNORE_CPP_CARMA_INSTALLATION}" ]; then
-        echo 'DECOMPRESSING CPP CARMA LIBRARY'
+        echo 'DECOMPRESSING CPP CARMA LIBRARY - THAT MIGHT TAKE A WHILE'
         if [ -z "${THREAD_UNXZ}" ]; then
             rm -rf ./carma/
             tar xf carma.xz
@@ -117,19 +120,31 @@ fi
 
 if [ -z "${IGNORE_C_INSTALLATION}" ]; then
     if [ -z "${IGNORE_C_FFTW_INSTALLATION}" ]; then
-        echo 'DECOMPRESSING C FFTW LIBRARY'
-        if [ -z "${THREAD_UNXZ}" ]; then
-            rm -rf ./fftw-3.3.8/
-            tar xf fftw338.xz
-            proc8=$!
+        echo 'DECOMPRESSING C FFTW LIBRARY - THAT MIGHT TAKE A WHILE'
+        if [ -z "${FFTW_NEW_VERSION}" ]; then
+            if [ -z "${THREAD_UNXZ}" ]; then
+                rm -rf ./fftw-3.3.8/
+                tar xf fftw338.xz
+                proc8=$!
+            else
+                rm -rf ./fftw-3.3.8/
+                tar xf fftw338.xz &
+                proc=8$!
+            fi
         else
-            rm -rf ./fftw-3.3.8/
-            tar xf fftw338.xz &
-            proc=8$!
+            if [ -z "${THREAD_UNXZ}" ]; then
+                rm -rf ./fftw-3.3.10/
+                tar xf fftw3310.xz
+                proc8=$!
+            else
+                rm -rf ./fftw-3.3.10/
+                tar xf fftw3310.xz &
+                proc8=$!
+            fi
         fi
     fi
     if [ -z "${IGNORE_C_CFITSIO_INSTALLATION}" ]; then
-        echo 'DECOMPRESSING C CFITSIO LIBRARY'
+        echo 'DECOMPRESSING C CFITSIO LIBRARY - THAT MIGHT TAKE A WHILE'
         if [ -z "${THREAD_UNXZ}" ]; then
             rm -rf ./cfitsio-3.47/
             tar xf cfitsio347.xz
@@ -141,7 +156,7 @@ if [ -z "${IGNORE_C_INSTALLATION}" ]; then
         fi
     fi
     if [ -z "${IGNORE_C_GSL_INSTALLATION}" ]; then
-        echo 'DECOMPRESSING C GSL LIBRARY'
+        echo 'DECOMPRESSING C GSL LIBRARY - THAT MIGHT TAKE A WHILE'
         if [ -z "${THREAD_UNXZ}" ]; then
             rm -rf ./gsl-2.7/
             tar xf gsl-2.7.xz
@@ -160,7 +175,7 @@ fi
 
 if [ -z "${IGNORE_FORTRAN_INSTALLATION}" ]; then
     if [ -z "${IGNORE_FORTRAN_LAPACK_INSTALLATION}" ]; then
-        echo 'DECOMPRESSING FORTRAN LAPACK LIBRARY'
+        echo 'DECOMPRESSING FORTRAN LAPACK LIBRARY - THAT MIGHT TAKE A WHILE'
         if [ -z "${THREAD_UNXZ}" ]; then
           rm -rf ./lapack-3.9.0/
           tar xf lapack390.xz
@@ -178,18 +193,18 @@ else
 fi
 
 if [ -z "${IGNORE_DISTUTILS_INSTALLATION}" ]; then
-    echo 'DECOMPRESSING BINUTILS'
+    echo 'DECOMPRESSING BINUTILS - THAT MIGHT TAKE A WHILE'
     rm -rf ./binutils-2.37/
     rm -rf ./texinfo-6.7/
     if [ -z "${THREAD_UNXZ}" ]; then
         tar xf texinfo-6.7.xz
         proc12=$!
-        tar xf binutils-2.37.xz
+        tar xf binutils237.xz
         proc13=$!
     else
         tar xf texinfo-6.7.xz &
         proc12=$!
-        tar xf binutils-2.37.xz &
+        tar xf binutils237.xz &
         proc13=$!
     fi
 else
@@ -197,8 +212,29 @@ else
   proc13=1
 fi
 
+if [ -z "${IGNORE_FORTRAN_INSTALLATION}" ]; then
+    if [ -z "${IGNORE_FORTRAN_LAPACK_INSTALLATION}" ]; then
+        echo 'DECOMPRESSING HDF5 LIBRARY - THAT MIGHT TAKE A WHILE'
+        if [ -z "${THREAD_UNXZ}" ]; then
+          rm -rf ./CMake-hdf5-1.10.10/
+          tar xf CMakehdf511010.xz
+          proc14=$!
+        else
+          rm -rf ./CMake-hdf5-1.10.10/
+          tar xf CMakehdf511010.xz &
+          proc14=$!
+        fi
+    else
+        proc14=1
+    fi
+else
+  proc14=1
+fi
+
+
+
 if [ -n "${THREAD_UNXZ}" ]; then
      echo 'DECOMPRESSION IS HAPPENING IN PARALLEL - WAITING ALL OF THEM TO FINISH'
 fi
 
-wait "$proc1" "$proc2" "$proc2A" "$proc3" "$proc4" "$proc5" "$proc6" "$proc7" "$proc8" "$proc9" "$proc10" "$proc11" "$proc12" "$proc13" 2>/dev/null > /dev/null
+wait "$proc1" "$proc2" "$proc2A" "$proc3" "$proc4" "$proc5" "$proc6" "$proc7" "$proc8" "$proc9" "$proc10" "$proc11" "$proc12" "$proc13" "$proc14" 2>/dev/null > /dev/null

@@ -1,0 +1,127 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Using WMAP7 likelihood &mdash; clik 5.0 documentation</title>
+    
+    <link rel="stylesheet" href="_static/nature.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '',
+        VERSION:     '5.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="clik 5.0 documentation" href="index.html" />
+    <link rel="next" title="Playing around with likelihood files" href="utils.html" />
+    <link rel="prev" title="Creating synthetic likelihoods" href="fakesmica.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="utils.html" title="Playing around with likelihood files"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="fakesmica.html" title="Creating synthetic likelihoods"
+             accesskey="P">previous</a> |</li>
+        <li><a href="index.html">clik 5.0 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="using-wmap7-likelihood">
+<span id="wmap"></span><h1>Using WMAP7 likelihood<a class="headerlink" href="#using-wmap7-likelihood" title="Permalink to this headline">¶</a></h1>
+<p>If the sources for the <tt class="docutils literal"><span class="pre">wmap7</span></tt> likelihood are available, one can also use this likelihood code along with the WMAP7 likelihood data file whithin clik. To do so, one must also create likelihood files that refers to the WMAP7 dataset. The tool <strong class="program">prepare_wmap</strong> allows to prepare this files. It needs a parameter file describing the location of the WMAP data the description of the range of ells to use and a few flags. Example parameter files are present in the <tt class="docutils literal"><span class="pre">examples</span></tt> directory. See for <tt class="docutils literal"><span class="pre">wmap_full.par</span></tt> that defines likelihood using all of the WMAP7 data for all ells.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="c"># prepare a file for calling the wmap full likelihood through clik</span>
+
+<span class="n">res_object</span> <span class="o">=</span> <span class="n">wmap_7_full</span><span class="o">.</span><span class="n">h5</span>
+
+<span class="n">ttmin</span> <span class="o">=</span> <span class="mi">2</span>
+<span class="n">ttmax</span> <span class="o">=</span> <span class="mi">1200</span>
+<span class="n">temin</span> <span class="o">=</span> <span class="mi">2</span>
+<span class="n">temax</span> <span class="o">=</span> <span class="mi">1200</span>
+<span class="n">use_gibbs</span> <span class="o">=</span> <span class="mi">0</span>
+<span class="n">use_lowl_pol</span> <span class="o">=</span> <span class="mi">1</span>
+
+<span class="n">wmap_data</span> <span class="o">=</span> <span class="o">/</span><span class="n">THE</span><span class="o">/</span><span class="n">PATH</span><span class="o">/</span><span class="n">TO</span><span class="o">/</span><span class="n">likelihood_v4p1</span>
+<span class="n">cl_save</span> <span class="o">=</span> <span class="n">wmap_7_full</span><span class="o">.</span><span class="n">cltest</span>
+</pre></div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="fakesmica.html"
+                        title="previous chapter">Creating synthetic likelihoods</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="utils.html"
+                        title="next chapter">Playing around with likelihood files</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="_sources/usingwmap.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="utils.html" title="Playing around with likelihood files"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="fakesmica.html" title="Creating synthetic likelihoods"
+             >previous</a> |</li>
+        <li><a href="index.html">clik 5.0 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2011, K. Benabed, S. Prunet, E. Hivon, J.F. Cardoso.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+  </body>
+</html>

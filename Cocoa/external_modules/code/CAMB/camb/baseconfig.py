@@ -7,9 +7,24 @@ from ctypes import Structure, POINTER, byref, c_int, c_double, c_bool, c_float
 from numpy.ctypeslib import ndpointer
 import numpy as np
 
+
+def ndpointer_or_null(*args, **kwargs):
+    # allows passing None to fortran optional arguments
+    # from https://stackoverflow.com/a/37664693/1022775
+    base = ndpointer(*args, **kwargs)
+
+    def from_param(cls, obj):
+        if obj is None:
+            return obj
+        return base.from_param(obj)
+
+    return type(base.__name__, (base,), {'from_param': classmethod(from_param)})
+
+
 numpy_3d = ndpointer(c_double, flags='C_CONTIGUOUS', ndim=3)
 numpy_2d = ndpointer(c_double, flags='C_CONTIGUOUS', ndim=2)
 numpy_1d = ndpointer(c_double, flags='C_CONTIGUOUS')
+numpy_1d_or_null = ndpointer_or_null(c_double, flags='C_CONTIGUOUS')
 numpy_1d_int = ndpointer(c_int, flags='C_CONTIGUOUS')
 
 BASEDIR = osp.abspath(osp.dirname(__file__))
@@ -206,7 +221,7 @@ class _AllocatableArray(FortranAllocatable):  # member corresponding to allocata
         if size:
             return ctypes.cast(_reuse_pointer, POINTER(self._ctype * size)).contents
         else:
-            return np.asarray([])
+            return np.empty(0)
 
     def set_allocatable(self, array, name):
         self._set_allocatable_1D_array(byref(self), np.array(array, dtype=self._dtype),
@@ -292,7 +307,7 @@ def AllocatableObjectArray(cls=None):
 
 
 class AllocatableArrayInt(_AllocatableArray):
-    _dtype = np.int
+    _dtype = int
     _ctype = c_int
 
 
@@ -580,16 +595,18 @@ class CAMB_Structure(Structure, metaclass=CAMBStructureMeta):
             fields = cls.__bases__[0].get_all_fields()
         else:
             fields = []
-        fields += cls.__dict__.get('_fields_', [])
+        fields += [(name[1:], value) if name.startswith('_') else (name, value) for name, value in
+                   cls.__dict__.get('_fields_', []) if
+                   not name.startswith('__')]
         return fields
+
+    @classmethod
+    def get_valid_field_names(cls):
+        return set(field[0] for field in cls.get_all_fields())
 
     def _as_string(self):
         s = ''
         for field_name, field_type in self.get_all_fields():
-            if field_name[0:2] == '__':
-                continue
-            if field_name[0] == '_':
-                field_name = field_name[1:]
             obj = getattr(self, field_name)
             if isinstance(obj, (CAMB_Structure, FortranAllocatable)):
                 content = obj._as_string() if isinstance(obj, CAMB_Structure) else str(obj)
@@ -629,7 +646,7 @@ class F2003Class(CAMB_Structure):
     # become undefined if the allocatable field is reassigned.
 
     # classes are referenced by their fortran null pointer object. _class_pointers is a dictionary relating these
-    # f_pointer to python classes Elements are added each class by the @fortran_class decorator.
+    # f_pointer to python classes. Elements are added each class by the @fortran_class decorator.
     _class_pointers = {}
 
     # dictionary mapping class names to classes
@@ -643,6 +660,12 @@ class F2003Class(CAMB_Structure):
 
     def __new__(cls, *args, **kwargs):
         return cls._new_copy()
+
+    def __init__(self, **kwargs):
+        unknowns = set(kwargs) - self.get_valid_field_names()
+        if unknowns:
+            raise ValueError('Unknown argument(s): %s' % unknowns)
+        super().__init__(**kwargs)
 
     @classmethod
     def _new_copy(cls, source=None):

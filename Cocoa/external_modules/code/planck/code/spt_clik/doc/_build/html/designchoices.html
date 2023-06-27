@@ -1,0 +1,158 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Design choices &mdash; clik 5.0 documentation</title>
+    
+    <link rel="stylesheet" href="_static/nature.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '',
+        VERSION:     '5.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="clik 5.0 documentation" href="index.html" />
+    <link rel="next" title="Installing" href="installing.html" />
+    <link rel="prev" title="Authors" href="contribution.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="installing.html" title="Installing"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="contribution.html" title="Authors"
+             accesskey="P">previous</a> |</li>
+        <li><a href="index.html">clik 5.0 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="design-choices">
+<h1>Design choices<a class="headerlink" href="#design-choices" title="Permalink to this headline">¶</a></h1>
+<p>The idea was to build an interface so that people interested into testing their prefered cosmological model against the Planck likelihood will be able to do so in a relatively easy way. This is the reason why the library has <strong>no user serviceable part</strong>. If you start playing around with the code, you are on your own!</p>
+<p>That being said, here are a few key ideas on the library.</p>
+<div class="section" id="a-likelihood-is-entirely-defined-by-a-likelihood-file">
+<h2>A likelihood is entirely defined by a likelihood file.<a class="headerlink" href="#a-likelihood-is-entirely-defined-by-a-likelihood-file" title="Permalink to this headline">¶</a></h2>
+<p>Along with the code, likelihood files will be distributed. They contain all the info needed to define the likelihood. This encompass both the data needed to compute the likelihood (maps, cl, whatnot),but also parameters describing the type of mathematical approximation used to compute this particular likelihood, and parameters describing the expected input of the likelihood.</p>
+<p>This means that a likelihood file containing the some of different likelihood approximation will have to contain the data for each of those approximation. This will translate into possibly huge file. And variations of those likelihoods will contains yet more copy of this huge data.
+To solve partially this problem, it is possible for the likelihoods that need a lot of data to optionally refer to external files. This will be the case in particular for the WMAP7, PLow and lowlike likelihoods.
+In those cases, the data can either be included in the file (as described above) or installed in some directory, in which case the likelihood file simply refers to the path of this directory. The latter case improve the efficiency of the initialization of clik when using this kind of likelihood files.</p>
+<p>In order to use the library, the first step is thus to initialize it with such a file. Functions or subroutine to perform this initialization are available in each language. Another function is provided to cleanup the memory at the end of the use of a given likelihood. Several likelihoods can be initialized within the same session, allowing to perform comparison between different likelihood approximation whithin the same run.</p>
+</div>
+<div class="section" id="the-library-computes-an-approximation-of-the-log-likelihood">
+<h2>The library computes an approximation of the log likelihood<a class="headerlink" href="#the-library-computes-an-approximation-of-the-log-likelihood" title="Permalink to this headline">¶</a></h2>
+<p>Nothing to add here. The library does not compute minus the log likelihood or a chi2 like thingy. Just the log likelihood.
+A function is provided in each language to compute the log likelihood, given a set of parameters.</p>
+</div>
+<div class="section" id="the-input-of-the-compute-function-are-multipoles-of-the-power-spectra-and-nuisance-parameters">
+<span id="querying"></span><h2>The input of the compute function are multipoles of the power spectra and nuisance parameters.<a class="headerlink" href="#the-input-of-the-compute-function-are-multipoles-of-the-power-spectra-and-nuisance-parameters" title="Permalink to this headline">¶</a></h2>
+<p>The <tt class="docutils literal"><span class="pre">compute</span></tt> function expect one single vector of double. This vector must contains power spectra one after the other, starting al l=0, in microK^2, and then the nuisance parameters.
+Since the likelihood is defined by the likelihood file the exact range of power spectra needed by this function can vary from likelihood approximation to likelihood approximations. The same holds for the nuisance parameters.
+Functions are provided to query a likelihood file and obtain this info. More precisely, three such function are available.</p>
+<blockquote>
+<div><ul class="simple">
+<li>clik_get_has_cl: retrieve an array of 6 flags, describing the power spectra needed (1 if needed 0 otherwise). The order is TT, EE, BB, TE, TB, EB. Thus if this function answers (1,1,0,1,0,0) it means that the input vector of the compute function must contain, in that order, the power spectra for TT, EE an TE.</li>
+<li>clik_get_lmax: retrieve an array of 6 integer giving the lmax value for each power spectra. Order is same as above. -1 means that the spectra is not needed. Thus if this function answer (2000,1000,-1,2000,-1,-1). This means that the vector must contain, in that order, the first 2001 multipoles of the TT power spectra (from 0 to 2000 included) followed by the first 1001 multipoles of the EE power spectra (0 to 1000 included) and next by the first 2001 multipoles of the TE power spectra (0 to 2000 included). Thus the first 5003 elements of the parameter vectors are the values of different power spectra. Note that this is also the sum of the result array of clik_get_lmax plus 6. Isn&#8217;t this fantastic ?</li>
+<li>clik_get_parameter_names: returns the number of nuisance parameters and fills an array of string giving their names. For example, if this function returns 2, and (&#8216;sigma8&#8217;, &#8216;fwhm_error&#8217;) it means that the last two elements of the parameter vector must be the value of sigma8 and fwhm_error, whatever those parameters mean.</li>
+</ul>
+</div></blockquote>
+<p>To sumarize, the input vector of the compute function must be an array of N = Ncl + Nnuis doubles. Ncl being the sum + 6 of the return array of clik_get_lmax, and Nnuis is the return of clik_get_parameter_names. The power spectra must be the Ncl first elements of that array. They start at C0 and en up at some Clmax[i] (included), the ith elements of the return of clik_get_lmax. The ordering of the power spectra is always TT EE BB TE TB EB. The Cls are in microK^2. The nuisnce parameters are the Nnuis last element of the parameter vector. Their names are given by the return array of the function clik_get_parameter_names.</p>
+</div>
+<div class="section" id="pitfalls">
+<h2>Pitfalls<a class="headerlink" href="#pitfalls" title="Permalink to this headline">¶</a></h2>
+<p>Did I said that the function computes the log likelihood ?</p>
+<p>You correctly read that the Cls must be given in that order TT, EE, BB, TE, TB, EB. And, yes, the library expects C0 and C1 for each power spectra. Put them to zero if you want, but provide something.</p>
+<p>Definitly, the library expect power spectra and not l(l+1)Cl/2pi or other combination.</p>
+<p>The library really wants power spectra in microK^2.</p>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Design choices</a><ul>
+<li><a class="reference internal" href="#a-likelihood-is-entirely-defined-by-a-likelihood-file">A likelihood is entirely defined by a likelihood file.</a></li>
+<li><a class="reference internal" href="#the-library-computes-an-approximation-of-the-log-likelihood">The library computes an approximation of the log likelihood</a></li>
+<li><a class="reference internal" href="#the-input-of-the-compute-function-are-multipoles-of-the-power-spectra-and-nuisance-parameters">The input of the compute function are multipoles of the power spectra and nuisance parameters.</a></li>
+<li><a class="reference internal" href="#pitfalls">Pitfalls</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="contribution.html"
+                        title="previous chapter">Authors</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="installing.html"
+                        title="next chapter">Installing</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="_sources/designchoices.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="installing.html" title="Installing"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="contribution.html" title="Authors"
+             >previous</a> |</li>
+        <li><a href="index.html">clik 5.0 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2011, K. Benabed, S. Prunet, E. Hivon, J.F. Cardoso.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+  </body>
+</html>

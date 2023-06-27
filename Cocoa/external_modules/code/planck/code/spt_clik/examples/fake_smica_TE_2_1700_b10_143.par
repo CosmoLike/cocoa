@@ -1,0 +1,55 @@
+#cl file
+cl = bestfit_lensedCls.dat
+
+#lmax
+lmax = 1700
+
+# optional lmin
+lmin = 2
+
+# list of flags for the presence of each power spectra
+# order is TT EE BB TE TB EB
+has_cl =    1  1  0  1  0  0
+
+
+# optional list of mix values
+mixcol = 1 1 
+# or file containing the same info
+# Acmb = 
+
+# optional file containing the binning matrix
+# bins = 
+# or size for each bin
+binsz = 1
+
+
+# number of Temperature channels
+nT = 1
+# number of Polar channels
+nP = 1
+
+# optional offset matrix file
+# Rq_0 = 
+
+# optional noise matrix file
+# nQ = 
+# or list of noise level for each channel (T then P)
+noise = 0.0001 0.0002
+
+# list of full width half max for each channel (T then P)
+fwhm = 7 7
+
+# optional fsky
+fsky = .8
+# or weight for each bin (in a file)
+# wq = 
+
+# name of the resulting lkl file
+res_object = fake_smica_TE_2_1700_b10_143.clik
+cl_save = fake_smica_TE_2_1700_b10_143.cl_theo
+
+# optional set meanfield to 1 to avoid sampling fake data
+ meanfield = 1
+
+# optional seed for fake data
+# seed = 123456

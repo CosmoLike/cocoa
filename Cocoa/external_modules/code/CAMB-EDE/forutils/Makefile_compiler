@@ -1,0 +1,83 @@
+
+MAKEOPT = --no-print-directory
+
+# There are ___ kinds of F90 flags defined:
+# F90COMMONFLAGS: These flags are specified for each kind (Debug, Release) of compilation
+# F90DEBUGFLAGS: These flags are only used for creating Debug artefacts
+# F90RELEASEFLAGS: These flags are only used for creating Release artefacts
+
+# For standalone compiling set the compiler
+#ifneq ($(COMPILER),gfortran)
+#ifortErr = $(shell which ifort >/dev/null 2>&1; echo $$?)
+#else
+#ifortErr = 1
+#endif
+ifortErr = 1
+ifeq "$(ifortErr)" "0"
+
+ifortVer_major = $(shell ifort -v 2>&1 | cut -d " " -f 3 | cut -d. -f 1)
+compiler_ver = $(shell ifort -v 2>&1)
+ifeq ($(shell test $(ifortVer_major) -lt 14; echo $$?),0)
+$(error You need ifort 14 or higher [preferably 18.0.1+], or use gfortran 6+)
+endif
+
+#Intel compiler
+F90C     ?= ifort
+
+mpierr= $(shell which mpiifort >/dev/null 2>&1; echo $$?)
+ifeq "$(mpierr)" "0"
+MPIF90C  ?= mpiifort -fc=ifort
+endif
+
+F90DEBUGFLAGS ?= -g -traceback
+F90RELEASEFLAGS ?= -fast
+ifeq ($(shell test $(ifortVer_major) -gt 15; echo $$?),0)
+F90COMMONFLAGS ?= -fpp -W0 -WB -qopenmp
+else
+F90COMMONFLAGS ?= -fpp -W0 -WB -openmp
+endif
+ifneq ($(shell uname -s),Darwin)
+F90COMMONFLAGS += -fpic
+endif
+
+MODLINK=-I
+# Intel has a special archiver for libraries.
+AREXE ?= xiar
+ifneq "$(ifortVer_major)" "14"
+# Check whether FORUTILS_SRC_DIR is set to prevent adding gen-dep multiple times.
+ifdef FORUTILS_SRC_DIR
+F90COMMONFLAGS += -gen-dep=$*.d
+endif
+endif
+
+else
+
+#major_version = $(shell gfortran -dumpversion 2>&1 | cut -d " " -f 3 | cut -d. -f 1)
+#ifneq ($(shell test $(major_version) -gt 5; echo $$?),0)
+#$(error gfortran version 6.3 or higher (or ifort 14+) is required)
+#endif
+#compiler_ver = $(shell gfortran -dumpversion 2>&1)
+
+F90C ?= $(FORTRAN_COMPILER)
+F90COMMONFLAGS ?= -cpp -ffree-line-length-none -fmax-errors=4 -MMD -fopenmp -fPIC
+F90DEBUGFLAGS ?= -g -O0 -fbacktrace
+F90RELEASEFLAGS ?= -O3 -ffast-math
+MODLINK=-J
+
+endif
+
+
+ifneq ($(NERSC_HOST),)
+#special-case setting for NERSC machines
+MPIF90C = ftn
+endif
+MPIF90C ?= mpif90
+#Check if MPI compiler found
+MPIF90_EXE = $(word 1, $(MPIF90C))
+mpierr= $(shell which $(MPIF90_EXE) >/dev/null 2>&1; echo $$?)
+ifneq "$(mpierr)" "0"
+MPIF90C =
+endif
+
+# When no library archiver is set yet, use ar.
+AREXE ?= ar

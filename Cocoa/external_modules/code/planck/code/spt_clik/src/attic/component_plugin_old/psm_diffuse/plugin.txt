@@ -1,0 +1,3 @@
+source : psm_diffuse.c
+data   : psm_diffuse.dat
+python : psm_diffuse.pyx

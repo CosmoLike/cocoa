@@ -9,11 +9,33 @@ source start_cocoa
 # ------------------------------ COMPILE COBAYA ------------------------------
 # ----------------------------------------------------------------------------
 # ----------------------------------------------------------------------------
-
-if [ -z "${IGNORE_ALL_PIP_INSTALLATION}" ]; then
-    $PIP3 install --editable cobaya --prefix=$ROOTDIR/.local --find-links file:$ROOTDIR/../cocoa_installation_libraries/pip_cache --no-index
+if [ -z "${DEBUG_PIP_OUTPUT}" ]; then
+  export OUTPUT_PIP_1="/dev/null"
+  export OUTPUT_PIP_2="/dev/null"
 else
-    $PIP3 install --editable cobaya --prefix=$ROOTDIR/.local
+  export OUTPUT_PIP_1="/dev/tty"
+  export OUTPUT_PIP_2="/dev/tty"
+fi
+
+echo 'INSTALLING COBAYA VIA PIP'
+if [ -z "${IGNORE_ALL_PIP_INSTALLATION}" ]; then
+    $PIP3 install --editable cobaya --prefix=$ROOTDIR/.local \
+        --find-links file:$ROOTDIR/../cocoa_installation_libraries/pip_cache \
+        --no-index > ${OUTPUT_PIP_1} 2> ${OUTPUT_PIP_2}
+    if [ $? -ne 0 ]; then
+      echo "PROBLEM PIP INSTALL COBAYA" >&2
+      return 1
+    else
+      echo "PIP then WHEEL DONE"
+    fi
+else
+    $PIP3 install --editable cobaya --prefix=$ROOTDIR/.local > ${OUTPUT_PIP_1} 2> ${OUTPUT_PIP_2}
+    if [ $? -ne 0 ]; then
+      echo "PROBLEM PIP INSTALL COBAYA" >&2
+      return 1
+    else
+      echo "PIP then WHEEL DONE"
+    fi
 fi
 
 # ----------------------------------------------------------------------------
@@ -24,11 +46,15 @@ fi
 
 source $ROOTDIR/installation_scripts/compile_camb
 
+source $ROOTDIR/installation_scripts/compile_cambede
+
 source $ROOTDIR/installation_scripts/compile_class
 
 source $ROOTDIR/installation_scripts/compile_polychord
 
 source $ROOTDIR/installation_scripts/compile_planck
+
+source $ROOTDIR/installation_scripts/compile_act
 
 # ----------------------------------------------------------------------------
 # ----------------------------------------------------------------------------

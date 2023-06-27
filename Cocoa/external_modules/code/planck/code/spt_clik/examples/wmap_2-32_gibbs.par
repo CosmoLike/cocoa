@@ -1,0 +1,13 @@
+# prepare a file for calling the wmap full likelihood through clik
+
+res_object = wmap_7_2-32_gibbs.clik
+
+ttmin = 2
+ttmax = 32
+temin = 2
+temax = 32
+use_gibbs = 1
+use_lowl_pol = 1
+
+wmap_data = /Users/benabed/likelihood_v4p1
+cl_save = wmap_7_2-32_gibbs.cltest

@@ -122,8 +122,7 @@ def make_library(cluster=False):
             print('WARNING: gfortran %s or higher not in path (if you just installed '
                   'you may need to log off and on again).' % _compile.gfortran_min)
             print('         You can get a Windows gfortran build from https://sourceforge.net/projects/mingw-w64/')
-            print(
-                '         (get the %s version to match this python installation)' % _compile.gfortran_bits)
+            print('         - go to Files, and download MinGW-W64 Online Installer.')
             if _compile.is_32_bit:
                 raise IOError('No 32bit Windows DLL provided, you need to build or use 64 bit python')
             else:
@@ -273,10 +272,10 @@ if __name__ == "__main__":
           author='Antony Lewis',
           url="https://camb.info/",
           project_urls={
-              'Documentation': 'https://camb.readthedocs.org',
+              'Documentation': 'https://camb.readthedocs.io',
               'Source': 'https://github.com/cmbant/camb',
               'Tracker': 'https://github.com/cmbant/camb/issues',
-              'Reference': 'http://arxiv.org/abs/astro-ph/9911177',
+              'Reference': 'https://arxiv.org/abs/astro-ph/9911177',
               'Licensing': 'https://github.com/cmbant/CAMB/blob/master/LICENCE.txt'
           },
           zip_safe=False,
@@ -287,7 +286,7 @@ if __name__ == "__main__":
           platforms="any",
           package_data={'camb': [DLLNAME, 'HighLExtrapTemplate_lenspotentialCls.dat',
                                  'PArthENoPE_880.2_marcucci.dat', 'PArthENoPE_880.2_standard.dat',
-                                 'PRIMAT_Yp_DH_Error.dat']},
+                                 'PRIMAT_Yp_DH_Error.dat', 'PRIMAT_Yp_DH_ErrorMC_2021.dat']},
           test_suite='camb.tests',
           entry_points={
               'console_scripts': [

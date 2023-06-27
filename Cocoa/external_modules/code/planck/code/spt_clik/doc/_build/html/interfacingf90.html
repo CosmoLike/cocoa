@@ -1,0 +1,264 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Interfacing the library with a f90 executable &mdash; clik 5.0 documentation</title>
+    
+    <link rel="stylesheet" href="_static/nature.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '',
+        VERSION:     '5.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="clik 5.0 documentation" href="index.html" />
+    <link rel="next" title="Interfacing the library with python" href="interfacingpy.html" />
+    <link rel="prev" title="Interfacing the library with a c executable" href="interfacingc.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="interfacingpy.html" title="Interfacing the library with python"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="interfacingc.html" title="Interfacing the library with a c executable"
+             accesskey="P">previous</a> |</li>
+        <li><a href="index.html">clik 5.0 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="interfacing-the-library-with-a-f90-executable">
+<h1>Interfacing the library with a f90 executable<a class="headerlink" href="#interfacing-the-library-with-a-f90-executable" title="Permalink to this headline">¶</a></h1>
+<p>The following gives a description of the f90 API of the library, and how to correctly compile and link against it.</p>
+<div class="section" id="compiling-and-linking">
+<h2>Compiling and linking<a class="headerlink" href="#compiling-and-linking" title="Permalink to this headline">¶</a></h2>
+<p>The program <cite>clik_f90-config</cite> (installed in PREFIX/bin) spits out on the standard output the barbaric option and link line to give to your prefered c compiler when compiling and linking against the clik lib.</p>
+<p>The file <tt class="docutils literal"><span class="pre">click_example_f90.f90</span></tt> gives a simple example of the use of the f90 API. It is compiled and installed as <strong class="program">clik_example_f90</strong>.</p>
+</div>
+<div class="section" id="api-cmb-likelihood">
+<h2>API - CMB likelihood<a class="headerlink" href="#api-cmb-likelihood" title="Permalink to this headline">¶</a></h2>
+<p>All codes calling clik functions must</p>
+<div class="highlight-fortran"><div class="highlight"><pre><span class="k">use </span><span class="nv">clik</span>
+</pre></div>
+</div>
+<p>The library can initialize more than one likelihood. Likelihood are represented by a variable (in the following, named <tt class="docutils literal"><span class="pre">clikid</span></tt>) of type <tt class="docutils literal"><span class="pre">type(clik_object)</span></tt>.</p>
+<div class="section" id="initialization">
+<h3>Initialization<a class="headerlink" href="#initialization" title="Permalink to this headline">¶</a></h3>
+<p>The library must be initialized by calling</p>
+<dl class="function">
+<dt id="clik_init">
+subroutine <tt class="descname">clik_init</tt><big>(</big>clikid, hdffilepath<big>)</big><a class="headerlink" href="#clik_init" title="Permalink to this definition">¶</a></dt>
+<dd><p>The subroutine sets the argument <tt class="docutils literal"><span class="pre">clikid</span></tt>, which is of type <tt class="docutils literal"><span class="pre">type(clik_object)</span></tt> to a handle on an object containing the definition of the likelihood. It expects two arguments, <tt class="docutils literal"><span class="pre">hdffilepath</span></tt> a string containing the path to a likelihood file. In case of error, the library will only print out a message and force the calling program to exit.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="querying-the-likelihood-object">
+<h3>Querying the likelihood object<a class="headerlink" href="#querying-the-likelihood-object" title="Permalink to this headline">¶</a></h3>
+<dl class="function">
+<dt id="clik_get_has_cl">
+subroutine <tt class="descname">clik_get_has_cl</tt><big>(</big>clikid, has_cl<big>)</big><a class="headerlink" href="#clik_get_has_cl" title="Permalink to this definition">¶</a></dt>
+<dd><p>This function fills the <tt class="docutils literal"><span class="pre">integer(kind=4),</span> <span class="pre">dimension(6)::</span> <span class="pre">has_cl</span></tt> array with flags describing which power spectra are needed by the likelihood compute function (see <a class="reference internal" href="designchoices.html#querying"><em>The input of the compute function are multipoles of the power spectra and nuisance parameters.</em></a>). The first argument of the function must be the return value from a previous call to <a class="reference internal" href="#clik_init" title="clik_init"><tt class="xref c c-func docutils literal"><span class="pre">clik_init()</span></tt></a>. In case of error the program exit with an explaining message.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="clik_get_lmax">
+subroutine <tt class="descname">clik_get_lmax</tt><big>(</big>clikid, lmax<big>)</big><a class="headerlink" href="#clik_get_lmax" title="Permalink to this definition">¶</a></dt>
+<dd><p>This function fills the array <tt class="docutils literal"><span class="pre">integer(kind=4),</span> <span class="pre">dimension(6)::</span> <span class="pre">lmax</span></tt> with the lmax value for each power spectra needed by the likelihood compute function (see <a class="reference internal" href="designchoices.html#querying"><em>The input of the compute function are multipoles of the power spectra and nuisance parameters.</em></a>). The first argument of the function must be the return value from a previous call to <a class="reference internal" href="#clik_init" title="clik_init"><tt class="xref c c-func docutils literal"><span class="pre">clik_init()</span></tt></a>. In case of error the program exit with an explaining message in case of an error.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="clik_get_extra_parameter_names">
+subroutine <tt class="descname">clik_get_extra_parameter_names</tt><big>(</big>clikid, names, numnames<big>)</big><a class="headerlink" href="#clik_get_extra_parameter_names" title="Permalink to this definition">¶</a></dt>
+<dd><p>This function sets <tt class="docutils literal"><span class="pre">integer::numnames</span></tt> to the number of nuisance parameters needed by the likelihood compute function (see <a class="reference internal" href="designchoices.html#querying"><em>The input of the compute function are multipoles of the power spectra and nuisance parameters.</em></a>) and fills with their names the array <tt class="docutils literal"><span class="pre">character(len=256),</span> <span class="pre">dimension(numnames)::names</span></tt>. This array is allocated by the function and MUST be deallocated by the caller after use. The first argument of the function must be the return value from a previous call to <a class="reference internal" href="#clik_init" title="clik_init"><tt class="xref c c-func docutils literal"><span class="pre">clik_init()</span></tt></a>. In case of error the program exit with an explaining message.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="computing-the-log-likelihood">
+<h3>Computing the log likelihood<a class="headerlink" href="#computing-the-log-likelihood" title="Permalink to this headline">¶</a></h3>
+<dl class="function">
+<dt id="real">
+<tt class="descname">real</tt><big>(</big>kind=8) function<em>&nbsp;clik_compute(clikid</em>, cl_and_pars<big>)</big><a class="headerlink" href="#real" title="Permalink to this definition">¶</a></dt>
+<dd><p>This function returns the value of the log likelihood for the parameter vector <tt class="docutils literal"><span class="pre">cl_and_pars</span></tt>. The content of this vector is described in <a class="reference internal" href="designchoices.html#querying"><em>The input of the compute function are multipoles of the power spectra and nuisance parameters.</em></a>. The first argument of the function must be the return value from a previous call to <a class="reference internal" href="#clik_init" title="clik_init"><tt class="xref c c-func docutils literal"><span class="pre">clik_init()</span></tt></a>.  In case of error the program exit with an explaining message. This function can be called as many time as the user wants.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="cleanup">
+<h3>Cleanup<a class="headerlink" href="#cleanup" title="Permalink to this headline">¶</a></h3>
+<p>When a likelihood object is no more needed (i.e. when no more computation will be needed in the program), the memory it uses can be cleaned up calling</p>
+<blockquote>
+<div><dl class="function">
+<dt id="clik_cleanup">
+subroutine <tt class="descname">clik_cleanup</tt><big>(</big>clikid<big>)</big><a class="headerlink" href="#clik_cleanup" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>The first argument of the function must be the return value from a previous call to <a class="reference internal" href="#clik_init" title="clik_init"><tt class="xref c c-func docutils literal"><span class="pre">clik_init()</span></tt></a>.</p>
+</div></blockquote>
+</div>
+</div>
+<div class="section" id="api-lensing-likelihood">
+<h2>API - lensing likelihood<a class="headerlink" href="#api-lensing-likelihood" title="Permalink to this headline">¶</a></h2>
+<p>All codes calling clik functions must</p>
+<div class="highlight-fortran"><div class="highlight"><pre><span class="k">use </span><span class="nv">clik</span>
+</pre></div>
+</div>
+<p>The library can initialize more than one likelihood. Likelihood are represented by a variable (in the following, named <tt class="docutils literal"><span class="pre">clikid</span></tt>) of type <tt class="docutils literal"><span class="pre">type(clik_object)</span></tt>.</p>
+<div class="section" id="testing-whether-a-file-contains-a-lensing-likelihood">
+<h3>Testing whether a file contains a lensing likelihood<a class="headerlink" href="#testing-whether-a-file-contains-a-lensing-likelihood" title="Permalink to this headline">¶</a></h3>
+<p>One can test whether a file contains a lensing likelihood by calling</p>
+<dl class="function">
+<dt>
+<tt class="descname">subroutine clik_try_lensing(hdffilepath, is_lensing);</tt></dt>
+<dd><p>On return the logical argument <tt class="docutils literal"><span class="pre">is_lensing</span></tt> is set to true or false depending whether the <tt class="docutils literal"><span class="pre">hdffilepath</span></tt> argument points toward a lensing likelihood file. In case of error, the library will only print out a message and force the calling program to exit.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="id1">
+<h3>Initialization<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h3>
+<p>The library must be initialized by calling</p>
+<dl class="function">
+<dt id="clik_lensing_init">
+subroutine <tt class="descname">clik_lensing_init</tt><big>(</big>clikid, hdffilepath<big>)</big><a class="headerlink" href="#clik_lensing_init" title="Permalink to this definition">¶</a></dt>
+<dd><p>The subroutine sets the argument <tt class="docutils literal"><span class="pre">clikid</span></tt>, which is of type <tt class="docutils literal"><span class="pre">type(clik_object)</span></tt> to a handle on an object containing the definition of the likelihood. It expects two arguments, <tt class="docutils literal"><span class="pre">hdffilepath</span></tt> a string containing the path to a likelihood file. In case of error, the library will only print out a message and force the calling program to exit.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="querying-the-lensing-likelihood-object">
+<h3>Querying the lensing likelihood object<a class="headerlink" href="#querying-the-lensing-likelihood-object" title="Permalink to this headline">¶</a></h3>
+<dl class="function">
+<dt>
+subroutine <tt class="descname">clik_get_lmax</tt><big>(</big>clikid, lmax<big>)</big></dt>
+<dd><p>On return the integer argument <tt class="docutils literal"><span class="pre">lmax</span></tt> take as value the lmax of both the clpp and cltt. The first argument of the function must be the return value from a previous call to <a class="reference internal" href="#clik_lensing_init" title="clik_lensing_init"><tt class="xref c c-func docutils literal"><span class="pre">clik_lensing_init()</span></tt></a>. In case of error the program exit with an explaining message in case of an error.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="clik_lensing_get_extra_parameter_names">
+subroutine <tt class="descname">clik_lensing_get_extra_parameter_names</tt><big>(</big>clikid, names, numnames<big>)</big><a class="headerlink" href="#clik_lensing_get_extra_parameter_names" title="Permalink to this definition">¶</a></dt>
+<dd><p>This function sets <tt class="docutils literal"><span class="pre">integer::numnames</span></tt> to the number of nuisance parameters needed by the likelihood compute function (see <a class="reference internal" href="designchoices.html#querying"><em>The input of the compute function are multipoles of the power spectra and nuisance parameters.</em></a>) and fills with their names the array <tt class="docutils literal"><span class="pre">character(len=256),</span> <span class="pre">dimension(numnames)::names</span></tt>. This array is allocated by the function and MUST be deallocated by the caller after use. The first argument of the function must be the return value from a previous call to <a class="reference internal" href="#clik_init" title="clik_init"><tt class="xref c c-func docutils literal"><span class="pre">clik_init()</span></tt></a>. In case of error the program exit with an explaining message.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="id2">
+<h3>Computing the log likelihood<a class="headerlink" href="#id2" title="Permalink to this headline">¶</a></h3>
+<dl class="function">
+<dt>
+<tt class="descname">real</tt><big>(</big>kind=8) function<em>&nbsp;clik_lensing_compute(clikid</em>, cl_and_pars<big>)</big></dt>
+<dd><p>This function returns the value of the log likelihood for the parameter vector <tt class="docutils literal"><span class="pre">cl_and_pars</span></tt>. This vector must have 2*(lmax_lensing+1) + number_of_lensing_extra_parameters elements. They are first the lensing_lmax+1 values of clpp, then the lensing_lmax+1 values of the cltt, the the extra parameter values. The first argument of the function must be the return value from a previous call to <a class="reference internal" href="#clik_init" title="clik_init"><tt class="xref c c-func docutils literal"><span class="pre">clik_init()</span></tt></a>.  In case of error the program exit with an explaining message. This function can be called as many time as the user wants.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="id3">
+<h3>Cleanup<a class="headerlink" href="#id3" title="Permalink to this headline">¶</a></h3>
+<p>When a likelihood object is no more needed (i.e. when no more computation will be needed in the program), the memory it uses can be cleaned up calling</p>
+<blockquote>
+<div><dl class="function">
+<dt id="clik_lensing_cleanup">
+subroutine <tt class="descname">clik_lensing_cleanup</tt><big>(</big>clikid<big>)</big><a class="headerlink" href="#clik_lensing_cleanup" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>The first argument of the function must be the return value from a previous call to <a class="reference internal" href="#clik_lensing_init" title="clik_lensing_init"><tt class="xref c c-func docutils literal"><span class="pre">clik_lensing_init()</span></tt></a>.</p>
+</div></blockquote>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Interfacing the library with a f90 executable</a><ul>
+<li><a class="reference internal" href="#compiling-and-linking">Compiling and linking</a></li>
+<li><a class="reference internal" href="#api-cmb-likelihood">API - CMB likelihood</a><ul>
+<li><a class="reference internal" href="#initialization">Initialization</a></li>
+<li><a class="reference internal" href="#querying-the-likelihood-object">Querying the likelihood object</a></li>
+<li><a class="reference internal" href="#computing-the-log-likelihood">Computing the log likelihood</a></li>
+<li><a class="reference internal" href="#cleanup">Cleanup</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#api-lensing-likelihood">API - lensing likelihood</a><ul>
+<li><a class="reference internal" href="#testing-whether-a-file-contains-a-lensing-likelihood">Testing whether a file contains a lensing likelihood</a></li>
+<li><a class="reference internal" href="#id1">Initialization</a></li>
+<li><a class="reference internal" href="#querying-the-lensing-likelihood-object">Querying the lensing likelihood object</a></li>
+<li><a class="reference internal" href="#id2">Computing the log likelihood</a></li>
+<li><a class="reference internal" href="#id3">Cleanup</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="interfacingc.html"
+                        title="previous chapter">Interfacing the library with a c executable</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="interfacingpy.html"
+                        title="next chapter">Interfacing the library with python</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="_sources/interfacingf90.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="interfacingpy.html" title="Interfacing the library with python"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="interfacingc.html" title="Interfacing the library with a c executable"
+             >previous</a> |</li>
+        <li><a href="index.html">clik 5.0 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2011, K. Benabed, S. Prunet, E. Hivon, J.F. Cardoso.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+  </body>
+</html>

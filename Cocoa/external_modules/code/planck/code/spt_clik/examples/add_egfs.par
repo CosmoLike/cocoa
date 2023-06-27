@@ -1,0 +1,19 @@
+freq = 143
+norm_freq = 143
+
+rg_flux_cut = 330
+norm_rg_flux_cut = 330
+
+input_object = fake_smica_T_2_1700_b10_143.clik
+res_object = fake_smica_T_2_1700_b10_143_with_egfs.clik
+
+#undef freq
+
+pars = norm_rg
+
+testme = 1 2 3 4 5 &
+         6 7 8 9 10
+
+testmef.file = ttt.par
+
+#include "op.par"

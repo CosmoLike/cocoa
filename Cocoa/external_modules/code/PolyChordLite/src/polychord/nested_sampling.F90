@@ -117,17 +117,23 @@ module nested_sampling_module
 #ifdef MPI
         ! MPI specific variables
         ! ----------------------
-        integer                            :: i_slave       ! Slave iterator
-        integer                            :: slave_id      ! Slave identifier
-        integer, dimension(:), allocatable :: slave_cluster ! The cluster the slave is currently working on
+        integer                            :: i_worker       ! Worker iterator
+        integer                            :: worker_id      ! Worker identifier
+        integer, dimension(:), allocatable :: worker_cluster ! The cluster the worker is currently working on
         real(dp) :: time0,time1,slice_time,wait_time
 
-        ! Slave switch
-        ! ------------
-        ! This prevents slaves delivering points to incorrect clusters after clustering
+        ! Worker switch
+        ! -------------
+        ! This prevents workers delivering points to incorrect clusters after clustering
         ! has reorganised the cluster indices
-        integer ::  slave_epoch
-        integer ::  master_epoch
+        integer ::  worker_epoch
+        integer ::  administrator_epoch
+
+        ! Nursary for storing babies in synchronous parallel mode
+        real(dp), allocatable, dimension(:,:,:) :: nursary
+        integer :: i_nursary
+        integer, allocatable, dimension(:) :: worker_epochs
+        integer, allocatable, dimension(:,:) :: nlikes
 #endif
 
 
@@ -137,12 +143,13 @@ module nested_sampling_module
         mpi_information = get_mpi_information(mpi_communicator)
 
 #ifdef MPI
-        allocate(slave_cluster(mpi_information%nprocs-1)) ! Allocate the slave arrays
-        slave_cluster = 1                          ! initialise with 1
+        allocate(worker_cluster(mpi_information%nprocs-1)) ! Allocate the worker arrays
+        worker_cluster = 1                          ! initialise with 1
 
-        ! slave switch
-        slave_epoch=0
-        master_epoch=0
+        ! worker switch
+        worker_epoch=0
+        administrator_epoch=0
+        i_nursary=0
 #endif
 
         ! Rolling loglikelihood calculation
@@ -217,6 +224,8 @@ module nested_sampling_module
         end if
 #ifdef MPI
         call broadcast_integers(num_repeats,mpi_information)
+        allocate(nursary(settings%nTotal,sum(num_repeats), mpi_information%nprocs-1))
+        allocate(worker_epochs(mpi_information%nprocs-1), nlikes(size(settings%grade_dims),mpi_information%nprocs-1))
 #endif
         allocate(baby_points(settings%nTotal,sum(num_repeats)))
 
@@ -252,21 +261,48 @@ module nested_sampling_module
 
                     ! Generate a new set of points within the likelihood bound of the late point
                     baby_points = SliceSampling(loglikelihood,prior,settings,logL,seed_point,cholesky,nlike,num_repeats)
+                    baby_points(settings%b0,:) = logL ! Note the moment it is born at
 #ifdef MPI
+                else if(settings%synchronous) then
+                    ! Parallel synchronous mode
+                    ! -------------------------
+
+                    if(i_nursary == 0) then
+                        do worker_id=1,mpi_information%nprocs-1
+                            seed_point = GenerateSeed(settings,RTI,cluster_id)
+                            cholesky = RTI%cholesky(:,:,cluster_id)
+                            logL = RTI%logLp(cluster_id)
+                            call throw_seed(seed_point,cholesky,logL,mpi_information,worker_id,administrator_epoch,.true.)
+                            worker_cluster(worker_id) = cluster_id
+                        end do
+                        do i_worker=1,mpi_information%nprocs-1
+                            i_nursary = catch_babies(baby_points,nlike,worker_epoch,mpi_information)
+                            nursary(:,:,i_nursary) = baby_points
+                            worker_epochs(i_nursary) = worker_epoch
+                            nlikes(:,i_nursary) = nlike
+                        end do
+                        i_nursary = mpi_information%nprocs-1
+                    end if
+                    baby_points = nursary(:,:,i_nursary)
+                    cluster_id = worker_cluster(i_nursary)
+                    worker_epoch = worker_epochs(i_nursary)
+                    nlike = nlikes(:,i_nursary)
+                    i_nursary = i_nursary-1
+
                 else
                     ! Parallel mode
                     ! -------------
 
-                    ! Recieve any new baby points from any slave currently sending
-                    slave_id = catch_babies(baby_points,nlike,slave_epoch,mpi_information)
+                    ! Recieve any new baby points from any worker currently sending
+                    worker_id = catch_babies(baby_points,nlike,worker_epoch,mpi_information)
 
-                    ! and throw seeding information back to slave (true => keep going)
-                    call throw_seed(seed_point,cholesky,logL,mpi_information,slave_id,master_epoch,.true.)
+                    ! and throw seeding information back to worker (true => keep going)
+                    call throw_seed(seed_point,cholesky,logL,mpi_information,worker_id,administrator_epoch,.true.)
 
                     ! set cluster_id to be the cluster identity of the babies just recieved 
-                    ! (saved in slave_cluster from the last send) and set slave_cluster to 
+                    ! (saved in worker_cluster from the last send) and set worker_cluster to 
                     ! be the bound just sent off.
-                    call swap_integers(cluster_id,slave_cluster(slave_id))
+                    call swap_integers(cluster_id,worker_cluster(worker_id))
 
 #endif
                 end if
@@ -278,7 +314,7 @@ module nested_sampling_module
 
                 ! See if this point is suitable to be added to the arrays
 #ifdef MPI
-                if( linear_mode(mpi_information) .or. master_epoch==slave_epoch ) then
+                if( linear_mode(mpi_information) .or. administrator_epoch==worker_epoch ) then
 #endif
                     if(replace_point(settings,RTI,baby_points,cluster_id)) then
                         failures = 0
@@ -306,7 +342,7 @@ module nested_sampling_module
 
                     if(delete_cluster(settings,RTI)) then
 #ifdef MPI
-                        master_epoch = master_epoch+1
+                        administrator_epoch = administrator_epoch+1
 #endif
                     end if! Delete any clusters as necessary
                     if (RTI%ncluster == 0) exit
@@ -322,14 +358,14 @@ module nested_sampling_module
                             if(allocated(settings%sub_clustering_dimensions)) then
                                 if( do_clustering(settings,RTI,settings%sub_clustering_dimensions) )  then
 #ifdef MPI
-                                    master_epoch = master_epoch+1
+                                    administrator_epoch = administrator_epoch+1
 #endif
                                 end if
                             end if
 
                             if( do_clustering(settings,RTI) )  then
 #ifdef MPI
-                                master_epoch = master_epoch+1
+                                administrator_epoch = administrator_epoch+1
 #endif
                             end if
                         end if
@@ -388,43 +424,51 @@ module nested_sampling_module
 #ifdef MPI
             ! MPI cleanup
             ! -----------
-            ! Kill off the final slaves.
+            ! Kill off the final workers.
             ! If we're done, then clean up by receiving the last piece of
             ! data from each node (and throw it away) and then send a kill signal back to it
-            do i_slave=mpi_information%nprocs-1,1,-1
+            if (settings%synchronous) then
+                do worker_id=mpi_information%nprocs-1,1,-1
+                    call throw_seed(seed_point,cholesky,logL,mpi_information,worker_id,administrator_epoch,.false.) 
+                end do
+            else
+                do i_worker=mpi_information%nprocs-1,1,-1
 
-                ! Recieve baby point from slave slave_id
-                slave_id = catch_babies(baby_points,nlike,slave_epoch,mpi_information)
+                    ! Recieve baby point from worker worker_id
+                    worker_id = catch_babies(baby_points,nlike,worker_epoch,mpi_information)
 
-                ! Add the likelihood calls to our counter
-                RTI%nlike = RTI%nlike + nlike
+                    ! Add the likelihood calls to our counter
+                    RTI%nlike = RTI%nlike + nlike
 
-                ! Send kill signal to slave slave_id (note that we no longer care about seed_point, so we'll just use the last one
-                call throw_seed(seed_point,cholesky,logL,mpi_information,slave_id,master_epoch,.false.) 
-
-            end do
+                    ! Send kill signal to worker worker_id (note that we no longer care about seed_point, so we'll just use the last one
+                    call throw_seed(seed_point,cholesky,logL,mpi_information,worker_id,administrator_epoch,.false.) 
+                end do
+            end if
 
 
         else !(myrank/=root)
 
-            ! These are the slave tasks
-            ! -------------------------
+            ! These are the worker tasks
+            ! --------------------------
             !
-            ! This is considerably simpler than that of the master.
-            ! All slaves do is:
+            ! This is considerably simpler than that of the administrator.
+            ! All workers do is:
             ! 1) recieve a seed point,cholesky decomposition and loglikelihood
-            !    contour from the master
+            !    contour from the administrator
             ! 2) using the above, generate a new set of baby points
-            ! 3) send the baby points and nlike back to the master.
+            ! 3) send the baby points and nlike back to the administrator.
 
 
             ! On the first loop, send a nonsense set of baby_points
             ! to indicate that we're ready to start receiving
 
-            baby_points = 0d0                              ! Avoid sending nonsense
-            baby_points(settings%l0,:) = settings%logzero  ! zero contour to ensure these are all thrown away
-            nlike = 0                                      ! no likelihood calls in this round
-            call throw_babies(baby_points,nlike,slave_epoch,mpi_information)
+            if (.not. settings%synchronous) then
+                baby_points = 0d0                              ! Avoid sending nonsense
+                baby_points(settings%l0,:) = settings%logzero  ! zero contour to ensure these are all thrown away
+                baby_points(settings%b0,:) = settings%logzero  ! zero birth contour
+                nlike = 0                                      ! no likelihood calls in this round
+                call throw_babies(baby_points,nlike,worker_epoch,mpi_information)
+            end if
             wait_time = 0
             slice_time = 0
             time1 = time()
@@ -432,12 +476,13 @@ module nested_sampling_module
 
 
 
-            ! 1) Listen for a seed point being sent by the master
-            !    Note that this also tests for a kill signal sent by the master
-            do while(catch_seed(seed_point,cholesky,logL,slave_epoch,mpi_information))
+            ! 1) Listen for a seed point being sent by the administrator
+            !    Note that this also tests for a kill signal sent by the administrator
+            do while(catch_seed(seed_point,cholesky,logL,worker_epoch,mpi_information))
                 time0 = time()
                 ! 2) Generate a new set of baby points
                 baby_points = SliceSampling(loglikelihood,prior,settings,logL,seed_point,cholesky,nlike,num_repeats)
+                baby_points(settings%b0,:) = logL ! Note the moment it is born at
 
 
                 wait_time = wait_time + time0-time1
@@ -446,14 +491,14 @@ module nested_sampling_module
 
 
                 ! 3) Send the baby points back
-                call throw_babies(baby_points,nlike,slave_epoch,mpi_information)
+                call throw_babies(baby_points,nlike,worker_epoch,mpi_information)
 
             end do
 
             if(slice_time<wait_time) then
-                if(settings%feedback>=normal_fb) write(stdout_unit,'("Slave",I3,": Inefficient MPI parallisation, I spend more time waiting than slicing ", E17.8, ">", E17.8 )') mpi_information%rank, wait_time,slice_time
+                if(settings%feedback>=normal_fb) write(stdout_unit,'("Worker",I3,": Inefficient MPI parallelisation, I spend more time waiting than slicing ", E17.8, ">", E17.8 )') mpi_information%rank, wait_time,slice_time
             else
-                if(settings%feedback>=normal_fb) write(stdout_unit,'("Slave",I3,": efficient MPI parallisation; wait_time/slice_time= ", E17.8 )') mpi_information%rank, wait_time/slice_time 
+                if(settings%feedback>=normal_fb) write(stdout_unit,'("Worker",I3,": efficient MPI parallelisation; wait_time/slice_time= ", E17.8 )') mpi_information%rank, wait_time/slice_time 
             end if
 
 #endif

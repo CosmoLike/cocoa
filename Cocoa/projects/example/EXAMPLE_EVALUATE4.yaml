@@ -1,12 +1,20 @@
-timing: True
-debug: True
-stop_at_error: True
+stop_at_error: False
+timing: False
+debug: true
 
 likelihood:
-  des_y1.shear:
-    path: ./external_modules/data/des_data
-
+  pyactlike.ACTPol_lite_DR4:
+    components:
+      - tt
+      - te
+      - ee
+    lmax: 4000
+    
 params:
+  yp2:
+    prior:
+      min: 0.9
+      max: 1.1
   logA:
     prior:
       min: 1.61
@@ -31,16 +39,25 @@ params:
       scale: 0.004
     proposal: 0.002
     latex: n_\mathrm{s}
-  H0:
+  theta_MC_100:
     prior:
-      min: 20
-      max: 100
+      min: 0.5
+      max: 10
     ref:
       dist: norm
-      loc: 67.00
-      scale: 2
-    proposal: 2
+      loc: 1.04109
+      scale: 0.0004
+    proposal: 0.0002
+    latex: 100\theta_\mathrm{MC}
+    drop: true
+    renames: theta
+  cosmomc_theta:
+    value: 'lambda theta_MC_100: 1.e-2*theta_MC_100'
+    derived: false
+  H0:
     latex: H_0
+    min: 20
+    max: 100
   omegabh2:
     prior:
       min: 0.005
@@ -65,14 +82,40 @@ params:
     value: 0.06
   tau:
     prior:
-      min: 0.01
-      max: 0.8
+      dist: norm
+      loc: 0.0544
+      scale: 0.0073
     ref:
       dist: norm
       loc: 0.055
       scale: 0.006
     proposal: 0.003
     latex: \tau_\mathrm{reio}
+  w0pwa:
+    prior:
+      min: -5 
+      max: -0.01
+    ref:
+      dist: norm
+      loc: -0.99
+      scale: 0.05
+    proposal: 0.05
+    latex: w_{0,\mathrm{DE}}+w_{a,\mathrm{DE}}
+    drop: true
+  w:
+    prior:
+      min: -3
+      max: -0.01
+    ref:
+      dist: norm
+      loc: -0.99
+      scale: 0.05
+    proposal: 0.05
+    latex: w_{0,\mathrm{DE}}
+  wa:
+    value: 'lambda w0pwa, w: w0pwa - w'
+    derived: false
+    latex: w_{a,\mathrm{DE}}
   omegal:
     latex: \Omega_\Lambda
   omegam:
@@ -113,31 +156,34 @@ params:
 theory:
   camb:
     path: ./external_modules/code/CAMB
-    stop_at_error: True
-    use_renames: True
     extra_args:
-      AccuracyBoost: 1.1
+      halofit_version: takahashi
+      dark_energy_model: ppf
+      DoLateRadTruncation: False
+      lmax: 5000
+      lens_potential_accuracy: 2
+      AccuracyBoost: 1.25
+      lSampleBoost: 1.1
+      lAccuracyBoost: 1.0
+      #lens_potential_accuracy: 8
+      #AccuracyBoost: 3.0
+      #lSampleBoost: 3.0
+      #lAccuracyBoost: 3.0
       num_massive_neutrinos: 1
       nnu: 3.046
+      accurate_massive_neutrino_transfers: false
 
 sampler:
   evaluate:
     override:
+      yp2: 1.06758
       logA: 3.0448
       ns: 0.96605
-      H0: 67.32
+      theta_MC_100: 1.04088
       omegabh2: 0.022383
       omegach2: 0.12011
       tau: 0.0543
-      DES_DzS1: 0.0
-      DES_DzS2: 0.0
-      DES_DzS3: 0.0
-      DES_DzS4: 0.0
-      DES_m1: 0.0
-      DES_m2: 0.0
-      DES_m3: 0.0
-      DES_m4: 0.0
-      DES_AIA: 1.0
-      DES_alphaIA: 1.0
+      w0pwa: -0.968859
+      w: -0.909098
 
 output: ./projects/example/chains/EXAMPLE_EVALUATE4

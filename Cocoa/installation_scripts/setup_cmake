@@ -1,17 +1,21 @@
 if [ -z "${ROOTDIR}" ]; then
-    echo 'ERROR ROOTDIR not defined'
+    echo 'ERROR ENV VARIABLE ROOTDIR IS NOT DEFINED' >&2
     return 1
 fi
 if [ -z "${CXX_COMPILER}" ]; then
-    echo 'ERROR CXX_COMPILER not defined'
+    echo 'ERROR ENV VARIABLE CXX_COMPILER IS NOT DEFINED' >&2
     return 1
 fi
 if [ -z "${C_COMPILER}" ]; then
-    echo 'ERROR C_COMPILER not defined'
+    echo 'ERROR ENV VARIABLE C_COMPILER IS NOT DEFINED' >&2
+    return 1
+fi
+if [ -z "${FORTRAN_COMPILER}" ]; then
+    echo 'ERROR ENV VARIABLE FORTRAN_COMPILER IS NOT DEFINED' >&2
     return 1
 fi
 if [ -z "${MAKE_NUM_THREADS}" ]; then
-    echo 'ERROR MAKE_NUM_THREADS not defined'
+    echo 'ERROR ENV VARIABLE MAKE_NUM_THREADS IS NOT DEFINED' >&2
     return 1
 fi
 # ----------------------------------------------------------------------------
@@ -21,36 +25,56 @@ fi
 # ----------------------------------------------------------------------------
 
 if [ -z "${IGNORE_CMAKE_INSTALLATION}" ]; then
-    echo 'INSTALLING CMAKE - THAT WILL TAKE A WHILE'
+  echo 'INSTALLING CMAKE - THAT WILL TAKE A WHILE'
 
-    cd $ROOTDIR/../cocoa_installation_libraries/cmake-3.17.1
+  cd $ROOTDIR/../cocoa_installation_libraries/cmake-3.17.1
 
+  if [ -z "${DEBUG_CMAKE_PACKAGE}" ]; then
     env CC=$C_COMPILER CXX=$CPP_COMPILER ./bootstrap --prefix=$ROOTDIR/.local > /dev/null 2> /dev/null
-    if [ $? -eq 0 ] 
-    then
-      echo "BOOTSTRAP CMAKE OK"
+    if [ $? -eq 0 ]; then
+      echo "CMAKE BOOTSTRAP RUN DONE"
     else
-      echo "CMAKE COULD NOT BOOTSTRAP" >&2
+      echo "CMAKE COULD NOT RUN BOOTSTRAP" >&2
+      cd $ROOTDIR
       return 1
     fi
 
     make -j $MAKE_NUM_THREADS > /dev/null 2> /dev/null
-    if [ $? -eq 0 ] 
-    then
-      echo "MAKE CMAKE OK"
+    if [ $? -eq 0 ]; then
+      echo "CMAKE MAKE RUN DONE"
     else
-      echo "CMAKE COULD NOT MAKE" >&2
+      echo "CMAKE COULD NOT RUN MAKE" >&2
+      cd $ROOTDIR
       return 1
     fi
 
     make install > /dev/null 2> /dev/null
-    if [ $? -eq 0 ] 
-    then
-      echo "MAKE INSTALL CMAKE OK"
+    if [ $? -eq 0 ]; then
+      echo "CMAKE MAKE INSTALL RUN DONE"
     else
-      echo "CMAKE COULD NOT MAKE INSTALL" >&2
+      echo "CMAKE COULD NOT RUN MAKE INSTALL" >&2
+      cd $ROOTDIR
+      return 1
+    fi
+  else
+    env CC=$C_COMPILER CXX=$CPP_COMPILER ./bootstrap --prefix=$ROOTDIR/.local
+    if [ $? -ne 0 ];then
+      cd $ROOTDIR
       return 1
     fi
 
-    cd $ROOTDIR
+    make
+    if [ $? -ne 0 ];then
+      cd $ROOTDIR
+      return 1
+    fi
+    
+    make install
+    if [ $? -ne 0 ];then
+      cd $ROOTDIR
+      return 1
+    fi
+  fi
+
+  cd $ROOTDIR
 fi

@@ -2,7 +2,7 @@
 !! details required to perform a nested sampling run.
 module settings_module
     use utils_module, only: dp
-    use utils_module,   only: STR_LENGTH
+    use utils_module, only: STR_LENGTH
     implicit none
 
     integer, parameter :: live_type    = 1
@@ -142,6 +142,8 @@ module settings_module
         real(dp), dimension(:), allocatable :: loglikes   !> The contours for nlive_list
         
         real(dp) :: compression_factor = exp(-1d0)
+
+        logical :: synchronous = .true.
 
     end type program_settings
 

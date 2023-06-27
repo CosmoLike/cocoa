@@ -34,7 +34,7 @@ def get_field_rotation_power(params, kmax=100, lmax=20000, non_linear=True, z_so
                              k_per_logint=None, acc=1, lsamp=None):
     r"""
     Get field rotation power spectrum, :math:`C_L^{\omega\omega}`,
-    following `arXiv:1605.05662 <https://arxiv.org/abs/1605.05662>`_. Uses lowest Limber approximation.
+    following `arXiv:1605.05662 <https://arxiv.org/abs/1605.05662>`_. Uses the lowest Limber approximation.
 
     :param params: :class:`.model.CAMBparams` instance with cosmological parameters etc.
     :param kmax: maximum k (in :math:`{\rm Mpc}^{-1}` units)
@@ -107,7 +107,7 @@ def get_field_rotation_power_from_PK(params, PK, chi_source, lmax=20000, acc=1, 
     diagmsp = InterpolatedUnivariateSpline(ls, diagm)
 
     def high_curl_integrand(_ll, _lp):
-        _lp = _lp.astype(np.int)
+        _lp = _lp.astype(int)
         r2 = (np.float64(_ll) / _lp) ** 2
         return _lp * r2 * diagmsp(_lp) / np.pi
 

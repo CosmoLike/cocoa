@@ -1,3 +1,12 @@
+if [ -z "${ROOTDIR}" ]; then
+    echo 'ERROR ENV VARIABLE ROOTDIR IS NOT DEFINED' >&2
+    return 1
+fi
+
+cd ${ROOTDIR}/../cocoa_installation_libraries
+
+echo 'CLEAN ALL INSTALLATION LIBRARIES - THAT MIGHT TAKE A WHILE'
+
 rm -rf ./armadillo-10.6.2
 
 rm -rf ./binutils-2.34
@@ -11,6 +20,9 @@ rm -rf ./cmake-3.17.1
 rm -rf ./carma
 
 rm -rf ./fftw-3.3.8
+rm -rf ./fftw-3.3.10/
+
+rm -rf ./gsl-2.6
 
 rm -rf ./gsl-2.7
 
@@ -20,13 +32,23 @@ rm -rf ./lapack-build
 
 rm -rf ./OpenBLAS
 
-rm -rf  ./pip_cache
+rm -rf ./pip_cache
 
 rm -rf ./spdlog
 
 rm -rf ./texinfo-6.7
 
 rm -rf ./xz-5.2.5
+rm -f ./xz-5.2.5.tar.gz
 
 rm -rf ./expat241
 
+rm -rf ./cocoa_build
+
+rm -rf ./CMake-hdf5-1.10.10
+
+rm -rf ./binutils-2.37
+
+echo 'CLEAN ALL INSTALLATION LIBRARIES DONE'
+
+cd ${ROOTDIR}

@@ -1,10 +1,29 @@
-from ._InstallableLikelihood import _InstallableLikelihood
-from ._bao_prototype import _bao_prototype
-from ._DataSetLikelihood import _DataSetLikelihood, _fast_chi_square
-from ._cmblikes import _CMBlikes
-from ._des_prototype import _des_prototype
-from ._H0_prototype import _H0_prototype
-from ._planck_2018_CamSpec_python import _planck_2018_CamSpec_python
-from ._planck_clik_prototype import _planck_clik_prototype, Planck2018Clik, Planck2015Clik
-from ._planck_pliklite_prototype import _planck_pliklite_prototype
-from ._sn_prototype import _sn_prototype
+from ..base_classes import InstallableLikelihood, DataSetLikelihood, CMBlikes
+
+warn_msg = ("*DEPRECATION*: Likelihood class '_base_classes._{name}' has been renamed to "
+            "'base_classes.{name}' (no leading underscores!). Please use the new name,"
+            " since the old one will be deprecated in the near future")
+
+
+class _InstallableLikelihood(InstallableLikelihood):
+
+    def __init__(self, *args, **kwargs):
+        # MARKED FOR DEPRECATION IN v3.0
+        raise ValueError(warn_msg.format(name="InstallableLikelihood"))
+        # END OF DEPRECATION BLOCK
+
+
+class _DataSetLikelihood(DataSetLikelihood):
+
+    def __init__(self, *args, **kwargs):
+        # MARKED FOR DEPRECATION IN v3.0
+        raise ValueError(warn_msg.format(name="DataSetLikelihood"))
+        # END OF DEPRECATION BLOCK
+
+
+class _CMBlikes(CMBlikes):
+
+    def __init__(self, *args, **kwargs):
+        # MARKED FOR DEPRECATION IN v3.0
+        raise ValueError(warn_msg.format(name="CMBlikes"))
+        # END OF DEPRECATION BLOCK

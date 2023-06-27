@@ -38,7 +38,8 @@ class _ClTransferData(CAMB_Structure):
 
 def save_cmb_power_array(filename, array, labels, lmin=0):
     """
-    Save an zero-based 2-d array of CL to a text file, with each line startin with L.
+    Save a zero-based 2-d array of CL to a text file, with each line starting with L.
+
     :param filename: filename to save
     :param array: 2D array of power spectra
     :param labels:  header names for each column in the output
@@ -195,14 +196,17 @@ class CAMBdata(F2003Class):
 
     _methods_ = [('AngularDiameterDistance', [d_arg], c_double),
                  ('AngularDiameterDistanceArr', [numpy_1d, numpy_1d, int_arg]),
-                 ('AngularDiameterDistance2', [d_arg], c_double),
+                 ('AngularDiameterDistance2', [d_arg, d_arg], c_double),
+                 ('AngularDiameterDistance2Arr', [numpy_1d, numpy_1d, numpy_1d, int_arg]),
                  ('ComovingRadialDistance', [d_arg], c_double),
                  ('ComovingRadialDistanceArr', [numpy_1d, numpy_1d, int_arg, d_arg]),
                  ('Hofz', [d_arg], c_double),
                  ('HofzArr', [numpy_1d, numpy_1d, int_arg]),
                  ('DeltaPhysicalTimeGyr', [d_arg, d_arg, d_arg], c_double),
+                 ('DeltaPhysicalTimeGyrArr', [numpy_1d, numpy_1d, numpy_1d, int_arg, d_arg]),
                  ('GetBackgroundDensities', [int_arg, numpy_1d, numpy_2d]),
                  ('DeltaTime', [d_arg, d_arg, d_arg], c_double),
+                 ('DeltaTimeArr', [numpy_1d, numpy_1d, numpy_1d, int_arg, d_arg]),
                  ('TimeOfzArr', [numpy_1d, numpy_1d, int_arg, d_arg]),
                  ('sound_horizon_zArr', [numpy_1d, numpy_1d, int_arg]),
                  ('RedshiftAtTimeArr', [numpy_1d, numpy_1d, int_arg]),
@@ -299,8 +303,8 @@ class CAMBdata(F2003Class):
 
         :param params: :class:`~.model.CAMBparams` instance with parameters to use
         :param only_transfers: only calculate transfer functions, no power spectra
-        :param only_time_sources: only calculate time transfer functions, no (p,l,k) transfer functions or non-
-                                  linear scaling
+        :param only_time_sources: only calculate time transfer functions, no (p,l,k) transfer functions or
+                                    non-linear scaling
         :return: non-zero if error, zero if OK
         """
         self._check_params(params)
@@ -646,15 +650,15 @@ class CAMBdata(F2003Class):
 
     def get_dark_energy_rho_w(self, a):
         """
-        Get dark energy density in units of the dark energy density today, and w=P/rho
+        Get dark energy density in units of the dark energy density today, and :math:`w=P/\rho`
 
         :param a: scalar factor or array of scale factors
-        :return: rho, w arrays at redshifts 1/a-1 [or scalars if a is scalar]
+        :return: rho, w arrays at redshifts :math:`1/a-1` [or scalars if :math:`a` is scalar]
         """
         if np.isscalar(a):
             scales = np.array([a])
         else:
-            scales = np.asarray(a)
+            scales = np.ascontiguousarray(a)
         rho = np.zeros(scales.shape)
         w = np.zeros(scales.shape)
         self.f_DarkEnergyStressEnergy(scales, rho, w, byref(c_int(len(scales))))
@@ -733,7 +737,7 @@ class CAMBdata(F2003Class):
         :param params: if have_power_spectra=False, optional :class:`~.model.CAMBparams` instance
                        to specify new parameters
         :param nonlinear: include non-linear correction from halo model
-        :return: k/h or k, z, PK, where kz an z are arrays of k/h or k and z respectively,
+        :return: k/h or k, z, PK, where kz and z are arrays of k/h or k and z respectively,
                  and PK[i,j] is the value at z[i], k[j]/h or k[j]
         """
         if self.OnlyTransfers or params is not None or not have_power_spectra:
@@ -781,7 +785,7 @@ class CAMBdata(F2003Class):
         :param have_power_spectra: set to False if not already computed power spectra
         :param params: if have_power_spectra=False, optional :class:`~.model.CAMBparams` instance
                        to specify new parameters
-        :return: k/h or k, z, PK, where kz an z are arrays of k/h or k and z respectively,
+        :return: k/h or k, z, PK, where kz and z are arrays of k/h or k and z respectively,
                  and PK[i,j] is the value at z[i], k[j]/h or k[j]
         """
         return self.get_linear_matter_power_spectrum(var1=var1, var2=var2, hubble_units=hubble_units, k_hunit=k_hunit,
@@ -807,13 +811,14 @@ class CAMBdata(F2003Class):
                            (where R always Mpc units not h^{-1}Mpc and R, z are arrays)
         :return: array of :math:`\sigma_R` values, or 2D array indexed by (redshift, R)
         """
+        assert self.Params.WantTransfer
         var1, var2 = self._transfer_var(var1, var2)
         if hubble_units:
             if not np.isscalar(R):
                 R = np.array(R, dtype=np.float64)
             R = R / (self.Params.H0 / 100)
 
-        radii = np.atleast_1d(np.asarray(R, dtype=np.float64)) * self.Params.H0 / 100
+        radii = np.atleast_1d(np.ascontiguousarray(R, dtype=np.float64)) * self.Params.H0 / 100
         valid_indices = np.array(self.PK_redshifts_index[:self.Params.Transfer.PK_num_redshifts], dtype=np.int32)
         if z_indices is None:
             z_ix = valid_indices
@@ -839,6 +844,7 @@ class CAMBdata(F2003Class):
 
         :return: array of :math:`\sigma_8` values, in order of increasing time (decreasing redshift)
         """
+        assert self.Params.WantTransfer
         sigma8 = np.empty(self.Params.Transfer.PK_num_redshifts, dtype=np.float64)
         CAMBdata_GetSigma8(byref(self), sigma8, byref(c_int(0)))
         return sigma8
@@ -862,6 +868,7 @@ class CAMBdata(F2003Class):
 
         :return: array of f*sigma_8 values, in order of increasing time (decreasing redshift)
         """
+        assert self.Params.WantTransfer
         fsigma8 = np.empty(self.Params.Transfer.PK_num_redshifts, dtype=np.float64)
         CAMBdata_GetSigma8(byref(self), fsigma8, byref(c_int(1)))
         return fsigma8
@@ -883,7 +890,7 @@ class CAMBdata(F2003Class):
         :param have_power_spectra: set to True if already computed power spectra
         :param params: if have_power_spectra=False and want to specify new parameters,
                        a :class:`~.model.CAMBparams` instance
-        :return: kh, z, PK, where kz an z are arrays of k/h and z respectively, and PK[i,j] is value at z[i], k/h[j]
+        :return: kh, z, PK, where kz and z are arrays of k/h and z respectively, and PK[i,j] is value at z[i], k/h[j]
         """
 
         if not have_power_spectra:
@@ -1253,7 +1260,7 @@ class CAMBdata(F2003Class):
                 params.Want_cl_2D_array = old_val
         return result
 
-    def get_lensed_gradient_cls(self, lmax=None, CMB_unit=None, raw_cl=False):
+    def get_lensed_gradient_cls(self, lmax=None, CMB_unit=None, raw_cl=False, clpp=None):
         r"""
         Get lensed gradient scalar CMB power spectra in flat sky approximation
         (`arXiv:1101.2234 <https://arxiv.org/abs/1101.2234>`_).
@@ -1264,6 +1271,8 @@ class CAMBdata(F2003Class):
         :param lmax: lmax to output to
         :param CMB_unit: scale results from dimensionless. Use 'muK' for :math:`\mu K^2` units for CMB :math:`C_\ell`
         :param raw_cl: return :math:`C_\ell` rather than :math:`\ell(\ell+1)C_\ell/2\pi`
+        :param clpp: custom array of :math:`[L(L+1)]^2 C_L^{\phi\phi}/2\pi` lensing potential power spectrum
+             to use (zero based), rather than calculated specturm from this model
         :return: numpy array CL[0:lmax+1,0:8], where CL[:,i] are :math:`T\nabla T`, :math:`E\nabla E`,
                  :math:`B\nabla B`, :math:`PP_\perp`, :math:`T\nabla E`, :math:`TP_\perp`, :math:`(\nabla T)^2`,
                  :math:`\nabla T\nabla T` where the first six are as defined in appendix C
@@ -1273,9 +1282,17 @@ class CAMBdata(F2003Class):
         lmax = self._lmax_setting(lmax)
         res = np.empty((lmax + 1, 8))
         opt = c_int(lmax)
-        GetFlatSkyCgrads = lib_import('lensing', '', 'getflatskycgrads')
-        GetFlatSkyCgrads.argtypes = [POINTER(CAMBdata), int_arg, numpy_1d]
-        GetFlatSkyCgrads(byref(self), byref(opt), res)
+        if clpp is not None:
+            if clpp.shape[0] < self.Params.max_l + 1:
+                raise CAMBValueError('clpp must go to at least Params.max_l (zero based)')
+            clpp = np.array(clpp, dtype=np.float64)
+            GetFlatSkyCgrads = lib_import('lensing', '', 'getflatskycgradswithspectrum')
+            GetFlatSkyCgrads.argtypes = [POINTER(CAMBdata), numpy_1d, int_arg, numpy_1d]
+            GetFlatSkyCgrads(byref(self), clpp, byref(opt), res)
+        else:
+            GetFlatSkyCgrads = lib_import('lensing', '', 'getflatskycgrads')
+            GetFlatSkyCgrads.argtypes = [POINTER(CAMBdata), int_arg, numpy_1d]
+            GetFlatSkyCgrads(byref(self), byref(opt), res)
         self._scale_cls(res, CMB_unit, raw_cl)
         return res
 
@@ -1304,19 +1321,25 @@ class CAMBdata(F2003Class):
         self._scale_cls(res, CMB_unit, raw_cl)
         return res
 
-    def get_partially_lensed_cls(self, Alens: float, lmax=None, CMB_unit=None, raw_cl=False):
+    def get_partially_lensed_cls(self, Alens, lmax=None, CMB_unit=None, raw_cl=False):
         r"""
            Get lensed CMB power spectra using curved-sky correlation function method, using
-           true lensing spectrum scaled by Alens.
+           true lensing spectrum scaled by Alens. Alens can be an array in L for realistic delensing estimates.
            Note that if Params.Alens is also set, the result is scaled by the product of both
 
-           :param Alens: scaling of the lensing relative to true, with Alens=1 being the standard result
+           :param Alens: scaling of the lensing relative to true, with Alens=1 being the standard result.
+              Can be a scalar in which case all L are scaled, or a zero-based array with the L by L scaling
+              (with L larger than the size of the array having Alens_L=1).
            :param lmax: lmax to output to
            :param CMB_unit: scale results from dimensionless. Use 'muK' for :math:`\mu K^2` units for CMB :math:`C_\ell`
            :param raw_cl: return :math:`C_\ell` rather than :math:`\ell(\ell+1)C_\ell/2\pi`
            :return: numpy array CL[0:lmax+1,0:4], where 0..3 indexes TT, EE, BB, TE.
            """
-        clpp = self.get_lens_potential_cls()[:, 0] * Alens
+        clpp = self.get_lens_potential_cls()[:, 0]
+        if np.isscalar(Alens):
+            clpp *= Alens
+        else:
+            clpp[:Alens.size] *= Alens
         return self.get_lensed_cls_with_spectrum(clpp, lmax, CMB_unit, raw_cl)
 
     def angular_diameter_distance(self, z):
@@ -1340,22 +1363,43 @@ class CAMBdata(F2003Class):
             arr[indices] = arr.copy()
             return arr
 
+    def _make_scalar_or_arrays(self, z1, z2):
+        if np.isscalar(z1):
+            if np.isscalar(z2):
+                return z1, z2
+            else:
+                z1 = np.ones(len(z2)) * z1
+        else:
+            z1 = np.ascontiguousarray(z1, dtype=np.float64)
+            if np.isscalar(z2):
+                z2 = np.ones(len(z1)) * z2
+            else:
+                z2 = np.ascontiguousarray(z2, dtype=np.float64)
+                if len(z1) != len(z2):
+                    raise CAMBError('z1 nand z2 must be scalar or same-length 1D arrays')
+        return z1, z2
+
     def angular_diameter_distance2(self, z1, z2):
         r"""
         Get angular diameter distance between two redshifts
         :math:`\frac{r}{1+z_2}\text{sin}_K\left(\frac{\chi(z_2) - \chi(z_1)}{r}\right)`
         where :math:`r` is curvature radius and :math:`\chi` is the comoving radial distance.
+        If z_1 >= z_2 returns zero.
 
         Must have called :meth:`calc_background`, :meth:`calc_background_no_thermo` or calculated transfer
         functions or power spectra.
 
-        :param z1: redshift 1
-        :param z2: redshift 2
-        :return: result
+        :param z1: redshift 1, or orray of redshifts
+        :param z2: redshift 2, or orray of redshifts
+        :return: result (scalar or array of distances between pairs of z1, z2)
         """
-        if not np.isscalar(z1) or not np.isscalar(z2):
-            raise CAMBError('vector z not supported yet')
-        return self.f_AngularDiameterDistance2(byref(c_double(z1)), byref(c_double(z2)))
+        z1, z2 = self._make_scalar_or_arrays(z1, z2)
+        if not np.isscalar(z1):
+            dists = np.empty(z1.shape)
+            self.f_AngularDiameterDistance2Arr(dists, z1, z2, byref(c_int(dists.shape[0])))
+            return dists
+        else:
+            return self.f_AngularDiameterDistance2(byref(c_double(z1)), byref(c_double(z2)))
 
     def comoving_radial_distance(self, z, tol=1e-4):
         """
@@ -1400,7 +1444,7 @@ class CAMBdata(F2003Class):
         if np.isscalar(eta):
             times = np.array([eta], dtype=np.float64)
         else:
-            times = np.asarray(eta, dtype=np.float64)
+            times = np.ascontiguousarray(eta, dtype=np.float64)
         redshifts = np.empty(times.shape)
         self.f_RedshiftAtTimeArr(redshifts, times, byref(c_int(times.shape[0])))
         config.check_global_error('redshift_at_conformal_time')
@@ -1467,9 +1511,13 @@ class CAMBdata(F2003Class):
         :param a2: scale factor 2
         :return: (age(a2)-age(a1))/Gigayear
         """
-        if not np.isscalar(a1) or not np.isscalar(a2):
-            raise CAMBError('vector inputs not supported yet')
-        return self.f_DeltaPhysicalTimeGyr(byref(c_double(a1)), byref(c_double(a2)), None)
+        a1, a2 = self._make_scalar_or_arrays(a1, a2)
+        if not np.isscalar(a1):
+            times = np.empty(a1.shape)
+            self.f_DeltaPhysicalTimeGyrArr(times, a1, a2, byref(c_int(times.shape[0])), None)
+            return times
+        else:
+            return self.f_DeltaPhysicalTimeGyr(byref(c_double(a1)), byref(c_double(a2)), None)
 
     def physical_time(self, z):
         """
@@ -1478,6 +1526,8 @@ class CAMBdata(F2003Class):
         :param z:  redshift
         :return: t(z)/Gigayear
         """
+        if not np.isscalar(z):
+            z = np.asarray(z, dtype=np.float64)
         return self.physical_time_a1_a2(0, 1.0 / (1 + z))
 
     def conformal_time_a1_a2(self, a1, a2):
@@ -1488,11 +1538,13 @@ class CAMBdata(F2003Class):
         :param a2: scale factor 2
         :return: eta(a2)-eta(a1) = chi(a1)-chi(a2) in Megaparsec
         """
-
-        if not np.isscalar(a1) or not np.isscalar(a2):
-            raise CAMBError('vector inputs not supported yet')
-
-        return self.f_DeltaTime(byref(c_double(a1)), byref(c_double(a2)), None)
+        a1, a2 = self._make_scalar_or_arrays(a1, a2)
+        if not np.isscalar(a1):
+            times = np.empty(a1.shape)
+            self.f_DeltaTimeArr(times, a1, a2, byref(c_int(times.shape[0])), None)
+            return times
+        else:
+            return self.f_DeltaTime(byref(c_double(a1)), byref(c_double(a2)), None)
 
     def conformal_time(self, z, presorted=None, tol=None):
         """

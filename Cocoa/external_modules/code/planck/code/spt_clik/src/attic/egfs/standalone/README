@@ -1,0 +1,41 @@
+To install
+----------
+
+First edit and run make
+
+Then edit setup.py and do
+python setup.py install
+
+To test  without installation
+python setup.py build_ext --inplace
+
+To use
+------
+First change you LD_LIBRARY_PATH to include the current location (the location where libegfs.so is installed) then
+
+simple test :
+
+python
+import egfs
+ego,pv = egfs.testme("data")
+rq,drq = ego(pv)
+
+
+Something more complicated :
+import egfs
+
+lmin = 0
+lmax=2500
+
+freq = [100,143,217,353,545,857]
+norm_freq = 143 #normalize against this freq
+
+# let's vary only the norms fo cib clustering, cib poisson and radio gal
+pn = ["norm_dg_cl","norm_dg_po","norm_rg"]
+
+# let's include all models and fix them to their default values
+defmod = ["cib poisson","cib clustering","radio poisson","tsz","ksz"]
+
+ego,pv = egfs.simple_egfs(lmin,lmax,freq,norm_freq,varpars=pn,defmodels=defmod,datapath="./")
+rq,drq = ego(pv)
+

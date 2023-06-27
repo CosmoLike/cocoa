@@ -1,0 +1,9 @@
+input_object = plik_v2.clik
+res_object = plik_toto.clik
+
+freq = 100 100 143 143 143 143 143 217 217 217 217 217 217 353 353 353 353 353 353
+parameter = norm
+name = radiogal
+color = 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 
+rename_from = norm
+rename_to   = radiogal_norm

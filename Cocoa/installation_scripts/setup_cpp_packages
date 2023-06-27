@@ -1,145 +1,226 @@
 if [ -z "${ROOTDIR}" ]; then
-    echo 'ERROR ROOTDIR not defined'
+    echo 'ERROR ENV VARIABLE ROOTDIR IS NOT DEFINED' >&2
     return 1
 fi
 if [ -z "${CXX_COMPILER}" ]; then
-    echo 'ERROR CXX_COMPILER not defined'
+    echo 'ERROR ENV VARIABLE CXX_COMPILER IS NOT DEFINED' >&2
     return 1
 fi
 if [ -z "${C_COMPILER}" ]; then
-    echo 'ERROR C_COMPILER not defined'
-    return 1
-fi
-if [ -z "${FORTRAN_COMPILER}" ]; then
-    echo 'ERROR C_COMPILER not defined'
+    echo 'ERROR ENV VARIABLE C_COMPILER IS NOT DEFINED' >&2
     return 1
 fi
 if [ -z "${CMAKE}" ]; then
-    echo 'ERROR CMAKE not defined'
+    echo 'ERROR ENV VARIABLE MAKE IS NOT DEFINED' >&2
+    return 1
+fi
+if [ -z "${FORTRAN_COMPILER}" ]; then
+    echo 'ERROR ENV VARIABLE FORTRAN_COMPILER IS NOT DEFINED' >&2
     return 1
 fi
 if [ -z "${MAKE_NUM_THREADS}" ]; then
-    echo 'ERROR MAKE_NUM_THREADS not defined'
+    echo 'ERROR ENV VARIABLE MAKE_NUM_THREADS IS NOT DEFINED' >&2
     return 1
 fi
-# ----------------------------------------------------------------------------
-# ----------------------------------------------------------------------------
-# ------------------------------- C++ PACKAGES -------------------------------
-# ----------------------------------------------------------------------------
-# ----------------------------------------------------------------------------
 
+# --------------------------------------------------------------------------------------
+# --------------------------------------------------------------------------------------
+# --------------------------------------------------------------------------------------
+# ------------------------------------ C++ PACKAGES ------------------------------------
+# --------------------------------------------------------------------------------------
+# --------------------------------------------------------------------------------------
+# --------------------------------------------------------------------------------------
+
+# --------------------------------------------------------------------------------------
+# --------------------------------------- SPDLOG ---------------------------------------
+# --------------------------------------------------------------------------------------
 if [ -z "${IGNORE_CPP_SPDLOG_INSTALLATION}" ]; then
-    echo 'INSTALLING CPP SPDLOG - THAT MIGHT TAKE A WHILE'
+  echo 'INSTALLING CPP SPDLOG LIBRARY - THIS MIGHT TAKE A WHILE'
 
-    cd $ROOTDIR/../cocoa_installation_libraries/spdlog
+  cd $ROOTDIR/../cocoa_installation_libraries/spdlog
 
-    rm -f CMakeCache.txt
+  rm -f CMakeCache.txt
 
-    $CMAKE -DCMAKE_INSTALL_PREFIX=$ROOTDIR/.local -DCMAKE_C_COMPILER=$C_COMPILER -DCMAKE_CXX_COMPILER=$CXX_COMPILER --log-level=ERROR . > /dev/null 2> /dev/null
-    if [ $? -eq 0 ] 
-    then
-      echo "CMAKE SPDLOG OK"
+  if [ -z "${DEBUG_CPP_PACKAGES}" ]; then
+    $CMAKE -DCMAKE_INSTALL_PREFIX=$ROOTDIR/.local -DCMAKE_C_COMPILER=$C_COMPILER \
+    -DCMAKE_CXX_COMPILER=$CXX_COMPILER --log-level=ERROR . > /dev/null 2> /dev/null
+    if [ $? -eq 0 ];then
+      echo "SPDLOG CMAKE RUN DONE"
     else
-      echo "SPDLOG COULD NOT CMAKE" >&2
+      echo "SPDLOG COULD NOT RUN CMAKE - CHECK SETUP_CPP_PACKAGES SCRIPT" >&2
+      cd $ROOTDIR
       return 1
     fi
 
     make -j $MAKE_NUM_THREADS > /dev/null 2> /dev/null
-    if [ $? -eq 0 ] 
-    then
-      echo "MAKE SPDLOG OK"
+    if [ $? -eq 0 ]; then
+      echo "SPDLOG MAKE RUN DONE"
     else
-      echo "SPDLOG COULD NOT MAKE" >&2
+      echo "SPDLOG COULD NOT RUN MAKE - CHECK SETUP_CPP_PACKAGES SCRIPT" >&2
+      cd $ROOTDIR
       return 1
     fi
 
     make install > /dev/null
-    if [ $? -eq 0 ] 
-    then
-      echo "MAKE INSTALL SPDLOG OK"
+    if [ $? -eq 0 ]; then
+      echo "SPDLOG MAKE INSTALL RUN DONE"
     else
-      echo "SPDLOG COULD NOT MAKE INSTALL" >&2
+      echo "SPDLOG COULD NOT RUN MAKE INSTALL - CHECK SETUP_CPP_PACKAGES SCRIPT" >&2
+      cd $ROOTDIR
+      return 1
+    fi
+  else
+    $CMAKE -DCMAKE_INSTALL_PREFIX=$ROOTDIR/.local -DCMAKE_C_COMPILER=$C_COMPILER \
+    -DCMAKE_CXX_COMPILER=$CXX_COMPILER .
+    if [ $? -ne 0 ];then
+      cd $ROOTDIR
       return 1
     fi
 
-    cd $ROOTDIR
+    make 
+    if [ $? -ne 0 ];then
+      cd $ROOTDIR
+      return 1
+    fi
+    make install
+    if [ $? -ne 0 ];then
+      cd $ROOTDIR
+      return 1
+    fi
+  fi
+
+  cd $ROOTDIR
 fi
+
+# --------------------------------------------------------------------------------------
+# ------------------------------------- ARMADILLO --------------------------------------
+# --------------------------------------------------------------------------------------
 if [ -z "${IGNORE_CPP_ARMA_INSTALLATION}" ]; then
-    echo 'INSTALLING CPP ARMADILLO - THAT MIGHT TAKE A WHILE'
+  echo 'INSTALLING CPP ARMADILLO LIBRARY - THIS MIGHT TAKE A WHILE'
 
-    cd $ROOTDIR/../cocoa_installation_libraries/armadillo-10.6.2
+  cd $ROOTDIR/../cocoa_installation_libraries/armadillo-10.6.2
 
-    rm -f CMakeCache.txt
+  rm -f CMakeCache.txt
 
+  if [ -z "${DEBUG_CPP_PACKAGES}" ]; then
     $CMAKE -DBUILD_SHARED_LIBS=TRUE -DCMAKE_INSTALL_PREFIX=$ROOTDIR/.local \
     -DCMAKE_C_COMPILER=$C_COMPILER -DCMAKE_CXX_COMPILER=$CXX_COMPILER \
     -DLAPACK_FOUND=YES -DLAPACK_LIBRARIES=$ROOTDIR/.local/lib/liblapack.so \
     -DBLAS_FOUND=NO --log-level=ERROR . > /dev/null 2> /dev/null
-    if [ $? -eq 0 ] 
-    then
-      echo "CMAKE ARMA OK"
+    if [ $? -eq 0 ]; then
+      echo "ARMADILLO CMAKE RUN DONE"
     else
-      echo "ARMA COULD NOT CMAKE" >&2
+      echo "ARMADILLO COULD NOT RUN CMAKE - CHECK SETUP_CPP_PACKAGES SCRIPT" >&2
+      cd $ROOTDIR
       return 1
     fi
+
     make clean
     make -j $MAKE_NUM_THREADS all -Wno-dev > /dev/null 2> /dev/null
-    if [ $? -eq 0 ] 
-    then
-      echo "MAKE ARMA OK"
+    if [ $? -eq 0 ]; then
+      echo "ARMADILLO MAKE RUN DONE"
     else
-      echo "ARMA COULD NOT MAKE" >&2
+      echo "ARMADILLO COULD NOT RUN MAKE - CHECK SETUP_CPP_PACKAGES SCRIPT" >&2
+      cd $ROOTDIR
       return 1
     fi
 
     make install > /dev/null
-    if [ $? -eq 0 ] 
-    then
-      echo "MAKE INSTALL ARMA OK"
+    if [ $? -eq 0 ]; then
+      echo "ARMADILLO MAKE INSTALL RUN DONE"
     else
-      echo "ARMA COULD NOT MAKE INSTALL" >&2
+      echo "ARMADILLO COULD NOT RUN MAKE INSTALL - CHECK SETUP_CPP_PACKAGES SCRIPT" >&2
+      cd $ROOTDIR
+      return 1
+    fi
+  else
+    $CMAKE -DBUILD_SHARED_LIBS=TRUE -DCMAKE_INSTALL_PREFIX=$ROOTDIR/.local \
+      -DCMAKE_C_COMPILER=$C_COMPILER -DCMAKE_CXX_COMPILER=$CXX_COMPILER \
+      -DLAPACK_FOUND=YES -DLAPACK_LIBRARIES=$ROOTDIR/.local/lib/liblapack.so \
+      -DBLAS_FOUND=NO .
+    if [ $? -ne 0 ];then
+      cd $ROOTDIR
       return 1
     fi
 
-    cd $ROOTDIR
+    make clean
+    make all
+    if [ $? -ne 0 ];then
+      cd $ROOTDIR
+      return 1
+    fi
+    make install 
+    if [ $? -ne 0 ];then
+      cd $ROOTDIR
+      return 1
+    fi
+  fi
+
+  cd $ROOTDIR
 fi
+
+# --------------------------------------------------------------------------------------
+# --------------------------- CARMA (ARMADILLO <-> PYBIND11) ---------------------------
+# --------------------------------------------------------------------------------------
 if [ -z "${IGNORE_CPP_CARMA_INSTALLATION}" ]; then
-    echo 'INSTALLING CARMA -  THE PYTHON <-> ARMADILLO CONVERSION - THAT MIGHT TAKE A WHILE'
+  echo 'INSTALLING CARMA -  THE PYTHON <-> ARMADILLO CONVERSION - THIS MIGHT TAKE A WHILE'
 
-    cd $ROOTDIR/../cocoa_installation_libraries/carma
+  cd $ROOTDIR/../cocoa_installation_libraries/carma
 
-    rm -rf $ROOTDIR/.local/include/carma/
-    
-    mkdir $ROOTDIR/.local/include/carma/ 
+  rm -rf $ROOTDIR/.local/include/carma/
+  
+  mkdir $ROOTDIR/.local/include/carma/ 
 
-    cp ./carma.h $ROOTDIR/.local/include/
+  cp ./carma.h $ROOTDIR/.local/include/
 
-    cp -r ./carma_bits $ROOTDIR/.local/include/
+  cp -r ./carma_bits $ROOTDIR/.local/include/
 
-    cd $ROOTDIR
+  cd $ROOTDIR
 fi
+
+# --------------------------------------------------------------------------------------
+# ---------------------------------------- BOOST ---------------------------------------
+# --------------------------------------------------------------------------------------
 if [ -z "${IGNORE_CPP_BOOST_INSTALLATION}" ]; then
-    echo 'INSTALLING CPP BOOST - THAT WILL TAKE A WHILE'
+  echo 'INSTALLING CPP BOOST LIBRARY - THIS WILL TAKE A WHILE'
 
-    cd $ROOTDIR/../cocoa_installation_libraries/boost_1_72_0/
+  cd $ROOTDIR/../cocoa_installation_libraries/boost_1_72_0/
 
+  if [ -z "${DEBUG_CPP_PACKAGES}" ]; then
     ./bootstrap.sh --prefix=$ROOTDIR/.local > /dev/null 2> /dev/null
-    if [ $? -eq 0 ] 
-    then
-      echo "bootstrap BOOST OK"
+    if [ $? -eq 0 ]; then
+      echo "BOOST BOOTSTRAP RUN DONE"
     else
-      echo "BOOST COULD NOT bootstrap" >&2
+      echo "BOOST COULD NOT RUN BOOTSTRAP - CHECK SETUP_CPP_PACKAGES SCRIPT" >&2
       return 1
     fi
 
-    ./b2 --with=regex install > /dev/null 2> /dev/null
-    if [ $? -eq 0 ] 
-    then
-      echo "B2 BOOST OK"
+    ./b2 --with=regex install --without-python --without-thread \
+    --without-timer --without-mpi --without-atomic > /dev/null 2> /dev/null
+    if [ $? -eq 0 ]; then
+      echo "BOOST B2 RUN DONE"
     else
-      echo "BOOST COULD NOT B2" >&2
+      echo "BOOST COULD NOT RUN B2 - CHECK SETUP_CPP_PACKAGES SCRIPT" >&2
+      return 1
+    fi
+  else
+    ./bootstrap.sh --prefix=$ROOTDIR/.local 
+    if [ $? -ne 0 ];then
+      cd $ROOTDIR
       return 1
     fi
     
-    cd $ROOTDIR
+    ./b2 --with=regex install --without-python --without-thread \
+    --without-timer --without-mpi --without-atomic
+    if [ $? -ne 0 ];then
+      cd $ROOTDIR
+      return 1
+    fi
+  fi
+  
+  cd $ROOTDIR
 fi
+
+# --------------------------------------------------------------------------------------
+# --------------------------------------------------------------------------------------
+# --------------------------------------------------------------------------------------

@@ -17,84 +17,138 @@ function addvar () {
 }
 
 if [ -n "${OMP_NUM_THREADS}" ]; then
-  export OLD_OMP_NUM_THREADS=$OMP_NUM_THREADS
+    export OLD_OMP_NUM_THREADS=$OMP_NUM_THREADS
+else
+    export OLD_OMP_NUM_THREADS="x"
 fi
 
 if [ -n "${LD_LIBRARY_PATH}" ]; then
-  export OLD_LD_LIBRARY_PATH=$LD_LIBRARY_PATH
+    export OLD_LD_LIBRARY_PATH=$LD_LIBRARY_PATH
+else
+    # -n fails if string is null
+    export OLD_LD_LIBRARY_PATH="x"
 fi
 
 if [ -n "${PYTHONPATH}" ]; then
-  export OLD_PYTHONPATH=$PYTHONPATH
+    export OLD_PYTHONPATH=$PYTHONPATH
+else
+    export OLD_PYTHONPATH="x"
 fi
 
 if [ -n "${PATH}" ]; then
-  export OLD_PATH=$PATH
+    export OLD_PATH=$PATH
+else
+    export OLD_PATH="x"
 fi
 
 if [ -n "${C_INCLUDE_PATH}" ]; then
-  export OLD_C_INCLUDE_PATH=$C_INCLUDE_PATH
+    export OLD_C_INCLUDE_PATH=$C_INCLUDE_PATH
+else
+    export OLD_C_INCLUDE_PATH="x"
 fi
 
 if [ -n "${CPLUS_INCLUDE_PATH}" ]; then
-  export OLD_CPLUS_INCLUDE_PATH=$CPLUS_INCLUDE_PATH
+    export OLD_CPLUS_INCLUDE_PATH=$CPLUS_INCLUDE_PATH
+else
+    export OLD_CPLUS_INCLUDE_PATH="x"
 fi
 
 if [ -n "${LDFLAGS}" ]; then
-  export OLD_LDFLAGS=$LDFLAGS
+    export OLD_LDFLAGS=$LDFLAGS
+else
+    export OLD_LDFLAGS="x"
 fi
 
 if [ -n "${CPATH}" ]; then
-  export OLD_CPATH=$CPATH
+    export OLD_CPATH=$CPATH
+else
+    export OLD_CPATH="x"
 fi
 
 if [ -n "${LD_RUN_PATH}" ]; then
     export OLD_LD_RUN_PATH=$LD_RUN_PATH
+else
+    export OLD_LD_RUN_PATH="x"
 fi
 
 if [ -n "${CMAKE_LIBRARY_PATH}" ]; then
     export OLD_CMAKE_LIBRARY_PATH=$CMAKE_LIBRARY_PATH
+else
+    export OLD_CMAKE_LIBRARY_PATH="x"
 fi
 
 if [ -n "${CMAKE_INCLUDE_PATH}" ]; then
     export OLD_CMAKE_INCLUDE_PATH=$CMAKE_INCLUDE_PATH
+else
+    export OLD_CMAKE_INCLUDE_PATH="x"
 fi
 
 if [ -n "${LIBRARY_PATH}" ]; then
     export OLD_LIBRARY_PATH=$LIBRARY_PATH
+else
+    export OLD_LIBRARY_PATH="x"
 fi
 
 if [ -n "${INCLUDEPATH}" ]; then
     export OLD_INCLUDEPATH=$INCLUDEPATH
+else
+    export OLD_INCLUDEPATH="x"
 fi
 
 if [ -n "${INCLUDE}" ]; then
     export OLD_INCLUDE=$INCLUDE
+else
+    export OLD_INCLUDE="x"
+fi
+
+if [ -n "${CPATH}" ]; then
+    export OLD_CPATH=$CPATH
+else
+    export OLD_CPATH="x"
 fi
 
 if [ -n "${NUMPY_HEADERS}" ]; then
-  export OLD_NUMPY_HEADERS=$NUMPY_HEADERS
+    export OLD_NUMPY_HEADERS=$NUMPY_HEADERS
+else
+    export OLD_NUMPY_HEADERS="x"
 fi
 
 if [ -n "${OBJC_INCLUDE_PATH}" ]; then
-  export OLD_OBJC_INCLUDE_PATH=$OBJC_INCLUDE_PATH
+    export OLD_OBJC_INCLUDE_PATH=$OBJC_INCLUDE_PATH
+else
+    export OLD_OBJC_INCLUDE_PATH="x"
 fi
 
 if [ -n "${OBJC_PATH}" ]; then
-  export OLD_OBJC_PATH=$OBJC_PATH
+    export OLD_OBJC_PATH=$OBJC_PATH
+else
+    export OLD_OBJC_PATH="x"
 fi
 
-# ----------------------------------------------------------------------------
-# ----------------------------------------------------------------------------
-# ----------------------------------------------------------------------------
-# ----------------------------------------------------------------------------
+if [ -n "${CFLAGS}" ]; then
+    export OLD_CFLAGS=$CFLAGS
+else
+    export OLD_CFLAGS="x"
+fi
+
+if [ -n "${INCLUDE_PATH}" ]; then
+    export OLD_INCLUDE_PATH=$INCLUDE_PATH
+else
+    export OLD_INCLUDE_PATH="x"
+fi
 
 if [ -n "${SET_INSTALLATION_OPTIONS}" ]; then
   source $SET_INSTALLATION_OPTIONS
 else
   source set_installation_options
 fi
-
+if [ -n "${MINICONDA_INSTALLATION}" ]; then
+  if [ ${CONDA_SHLVL} -ne 1 ]; then
+    echo "MINICONDA_INSTALLATION SET BUT CONDA ENVIRONMENT NOT ACTIVATED"
+    source stop_cocoa
+    return 1
+  fi
+fi
 # ----------------------------------------------------------------------------
 # ----------------------------------------------------------------------------
 # ---------------------- Activate Virtual Enviroment -------------------------
@@ -102,41 +156,53 @@ fi
 # ----------------------------------------------------------------------------
 
 source $ROOTDIR/.local/bin/activate
+if [ $? -ne 0 ]; then
+  echo "COCOA PRIVATE PYTHON ENV ACTIVATION FAILED" >&2
+  echo "PLEASE RUN STOP_COCOA TO CLEN ENVIRONMENTAL FLAGS" >&2
+  return 1
+fi
 
 export PATH=$ROOTDIR/.local/bin:$PATH
 
-addvar PYTHONPATH $ROOTDIR/.local/lib/python$PYTHON_VERSION/site-packages
-addvar PYTHONPATH $ROOTDIR/.local/lib
+export CFLAGS="${CFLAGS} -I$ROOTDIR/.local/lib/python$PYTHON_VERSION/site-packages/numpy/core/include"
+
+export LDFLAGS="${LDFLAGS} -L$ROOTDIR/.local/lib"
 
 export C_INCLUDE_PATH=$C_INCLUDE_PATH:$ROOTDIR/.local/lib/python$PYTHON_VERSION/site-packages/numpy/core/include
+
 export CPLUS_INCLUDE_PATH=$CPLUS_INCLUDE_PATH:$ROOTDIR/.local/lib/python$PYTHON_VERSION/site-packages/numpy/core/include
-export C_INCLUDE_PATH=$C_INCLUDE_PATH:$ROOTDIR/.local/lib/python$PYTHON_VERSION/site-packages/numpy/core/include/numpy
-export CPLUS_INCLUDE_PATH=$CPLUS_INCLUDE_PATH:$ROOTDIR/.local/lib/python$PYTHON_VERSION/site-packages/numpy/core/include/numpy
 
-export NUMPY_HEADERS=$ROOTDIR/.local/lib/python$PYTHON_VERSION/site-packages/numpy/core/include
-export LD_LIBRARY_PATH=$ROOTDIR/.local/lib/python$PYTHON_VERSION/site-packages/numpy/core/lib:$LD_LIBRARY_PATH
-export CPATH=$CPATH:$ROOTDIR/.local/lib/python$PYTHON_VERSION/site-packages/numpy/core/include
-export CFLAGS=$CFLAGS:$ROOTDIR/.local/lib/python$PYTHON_VERSION/site-packages/numpy/core/include
-export CPATH=$CPATH:$ROOTDIR/.local/lib/python$PYTHON_VERSION/site-packages/numpy/core/include/numpy
-export CFLAGS=$CFLAGS:$ROOTDIR/.local/lib/python$PYTHON_VERSION/site-packages/numpy/core/include/numpy
+export PYTHONPATH=$ROOTDIR/.local/lib/python$PYTHON_VERSION/site-packages:$PYTHONPATH
+export PYTHONPATH=$ROOTDIR/.local/lib:$PYTHONPATH
+export PYTHONPATH=$ROOTDIR/.local/lib/python/site-packages:$PYTHONPATH
 
-export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$ROOTDIR/.local/lib
-export LDFLAGS="-L$ROOTDIR/.local/lib":$LDFLAGS
 export LD_RUN_PATH=$ROOTDIR/.local/lib:$LD_RUN_PATH
+
 export LIBRARY_PATH=$ROOTDIR/.local/lib:$LIBRARY_PATH
 
 export CMAKE_INCLUDE_PATH=$ROOTDIR/.local/include/python${PYTHON_VERSION}m/:$CMAKE_INCLUDE_PATH
 export CMAKE_INCLUDE_PATH=$ROOTDIR/.local/include/:$CMAKE_INCLUDE_PATH    
+
 export CMAKE_LIBRARY_PATH=$ROOTDIR/.local/lib/python$PYTHON_VERSION/site-packages:$CMAKE_LIBRARY_PATH
 export CMAKE_LIBRARY_PATH=$ROOTDIR/.local/lib:$CMAKE_LIBRARY_PATH
 
 export INCLUDE_PATH=$ROOTDIR/.local/include/:$INCLUDE_PATH
+
 export INCLUDEPATH=$ROOTDIR/.local/include/:$INCLUDEPATH
+
 export INCLUDE=$ROOTDIR/.local/include/:$INCLUDE
+
+export CPATH=$ROOTDIR/.local/lib/python$PYTHON_VERSION/site-packages/numpy/core/include:$CPATH
 export CPATH=$ROOTDIR/.local/include/:$CPATH
 
 export OBJC_INCLUDE_PATH=$ROOTDIR/.local/:OBJC_INCLUDE_PATH
+
 export OBJC_PATH=$ROOTDIR/.local/:OBJC_PATH
+
+export LD_LIBRARY_PATH=$ROOTDIR/.local/lib:$LD_LIBRARY_PATH
+export LD_LIBRARY_PATH=$ROOTDIR/.local/lib/python$PYTHON_VERSION/site-packages/numpy/core/lib
+
+export NUMPY_HEADERS=$ROOTDIR/.local/lib/python$PYTHON_VERSION/site-packages/numpy/core/include
 
 # ----------------------------------------------------------------------------
 # ----------------------------------------------------------------------------
@@ -147,22 +213,22 @@ export OBJC_PATH=$ROOTDIR/.local/:OBJC_PATH
 if [ -z "${IGNORE_PLANCK_COMPILATION}" ]; then
   if [ -n "${CLIK_PATH}" ]; then
     export OLD_CLIK_PATH=$CLIK_PATH
+  else
+    export OLD_CLIK_PATH="x"
   fi
 
   if [ -n "${CLIK_DATA}" ]; then
     export OLD_CLIK_DATA=$CLIK_DATA
+  else
+    export OLD_CLIK_DATA="x"
   fi
 
   if [ -n "${CLIK_PLUGIN}" ]; then
     export OLD_CLIK_PLUGIN=$CLIK_PLUGIN
+  else
+    export OLD_CLIK_PLUGIN="x"
   fi
-
-  export PYTHONPATH=$ROOTDIR/.local/lib/python/site-packages:$PYTHONPATH
-
-  if [ -n "${GLOBAL_PACKAGES_LOCATION}" ]; then
-    export PYTHONPATH=$GLOBAL_PACKAGES_LOCATION/lib/python$PYTHON_VERSION/site-packages:$PYTHONPATH
-  fi
-
+  
   export CLIK_PATH=$ROOTDIR/.local
 
   export CLIK_DATA=$ROOTDIR/.local/share/clik
@@ -182,4 +248,5 @@ source $ROOTDIR/projects/start_all.sh
 # ----------------------------------------------------------------------------
 # ----------------------------------------------------------------------------
 # ----------------------------------------------------------------------------
+
 export START_COCOA_DONE=1

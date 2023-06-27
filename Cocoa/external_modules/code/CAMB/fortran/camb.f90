@@ -255,7 +255,7 @@
     integer i, status
     real(dl) nmassive
     character(LEN=*), intent(inout) :: ErrMsg
-    character(LEN=:), allocatable :: NumStr, S, DarkEneryModel, RecombinationModel
+    character(LEN=:), allocatable :: NumStr, S, DarkEnergyModel, RecombinationModel
     logical :: DoCounts
 
     CAMB_ReadParams = .false.
@@ -401,18 +401,18 @@
     endif
 
     !  Read initial parameters.
-    DarkEneryModel = UpperCase(Ini%Read_String_Default('dark_energy_model', 'fluid'))
+    DarkEnergyModel = UpperCase(Ini%Read_String_Default('dark_energy_model', 'fluid'))
     if (allocated(P%DarkEnergy)) deallocate(P%DarkEnergy)
-    if (DarkEneryModel == 'FLUID') then
+    if (DarkEnergyModel == 'FLUID') then
         allocate (TDarkEnergyFluid::P%DarkEnergy)
-    else if (DarkEneryModel == 'PPF') then
+    else if (DarkEnergyModel == 'PPF') then
         allocate (TDarkEnergyPPF::P%DarkEnergy)
-    else if (DarkEneryModel == 'AXIONEFFECTIVEFLUID') then
+    else if (DarkEnergyModel == 'AXIONEFFECTIVEFLUID') then
         allocate (TAxionEffectiveFluid::P%DarkEnergy)
-    else if (DarkEneryModel == 'EARLYQUINTESSENCE') then
+    else if (DarkEnergyModel == 'EARLYQUINTESSENCE') then
         allocate (TEarlyQuintessence::P%DarkEnergy)
     else
-        ErrMsg = 'Unknown dark energy model: '//trim(DarkEneryModel)
+        ErrMsg = 'Unknown dark energy model: '//trim(DarkEnergyModel)
         return
     end if
     call P%DarkEnergy%ReadParams(Ini)

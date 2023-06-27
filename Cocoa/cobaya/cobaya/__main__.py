@@ -20,7 +20,6 @@ commands = {"install": ["install", "install_script"],
             "run-job": ["grid_tools.runMPI", "run_single"],
             }
 
-
 help_msg = ("Add a one of the following commands and its arguments "
             "(`<command> -h` for help): %r" % list(commands))
 
@@ -31,18 +30,19 @@ if __name__ == "__main__":
     except IndexError:  # no command
         print(help_msg)
         exit()
-
-    module, func = commands.get(command_or_input, (None, None))
-
-    if module is not None:
-        sys.argv.pop(1)
-        getattr(import_module("cobaya." + module), func)()
     else:
-        if command_or_input in ["-h", "--help"]:
-            print(help_msg)
-            exit()
+        module, func = commands.get(command_or_input, (None, None))
+
+        if module is not None:
+            sys.argv.pop(1)
+            assert func is not None
+            getattr(import_module("cobaya." + module), func)()
         else:
-            # no command --> assume run with input file as 1st arg (don't pop!)
-            module, func = commands["run"]
-            getattr(import_module("cobaya." + module), func)(
-                help_commands=str(list(commands)))
+            if command_or_input in ["-h", "--help"]:
+                print(help_msg)
+                exit()
+            else:
+                # no command --> assume run with input file as 1st arg (don't pop!)
+                module, func = commands["run"]
+                getattr(import_module("cobaya." + module), func)(
+                    help_commands=str(list(commands)))

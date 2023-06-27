@@ -1,19 +1,28 @@
 if [ -z "${ROOTDIR}" ]; then
-    echo 'ERROR ROOTDIR not defined'
-    return
+    echo 'ERROR ENV VARIABLE ROOTDIR IS NOT DEFINED' >&2
+    return 1
 fi
 if [ -z "${CXX_COMPILER}" ]; then
-    echo 'ERROR CXX_COMPILER not defined'
-    return
+    echo 'ERROR ENV VARIABLE CXX_COMPILER IS NOT DEFINED' >&2
+    return 1
 fi
 if [ -z "${C_COMPILER}" ]; then
-    echo 'ERROR C_COMPILER not defined'
-    return
+    echo 'ERROR ENV VARIABLE C_COMPILER IS NOT DEFINED' >&2
+    return 1
+fi
+if [ -z "${CMAKE}" ]; then
+    echo 'ERROR ENV VARIABLE MAKE IS NOT DEFINED' >&2
+    return 1
+fi
+if [ -z "${FORTRAN_COMPILER}" ]; then
+    echo 'ERROR ENV VARIABLE C_COMPILER IS NOT DEFINED' >&2
+    return 1
 fi
 if [ -z "${MAKE_NUM_THREADS}" ]; then
-    echo 'ERROR MAKE_NUM_THREADS not defined'
-    return
+    echo 'ERROR ENV VARIABLE MAKE_NUM_THREADS IS NOT DEFINED' >&2
+    return 1
 fi
+
 # ----------------------------------------------------------------------------
 # ----------------------------------------------------------------------------
 # ----------------------------- DISTUTILS LIBRARY  ----------------------------
@@ -21,23 +30,111 @@ fi
 # ----------------------------------------------------------------------------
 
 if [ -z "${IGNORE_DISTUTILS_INSTALLATION}" ]; then
-    echo 'INSTALLING DISTUTILS - THAT WILL TAKE A WHILE'
+  echo 'INSTALLING TEXINFO - THAT WILL TAKE A WHILE'
 
-    cd $ROOTDIR/../cocoa_installation_libraries/texinfo-6.7
+  cd $ROOTDIR/../cocoa_installation_libraries/texinfo-6.7
 
-    FC=$FORTRAN_COMPILER CC=$C_COMPILER ./configure --prefix=$ROOTDIR/.local > /dev/null 2> /dev/null
+  if [ -z "${DEBUG_DISTUTILS_PACKAGE}" ]; then
+    FC=$FORTRAN_COMPILER CC=$C_COMPILER ./configure --prefix=$ROOTDIR/.local --disable-perl-xs \
+      > /dev/null 2> /dev/null
+    if [ $? -eq 0 ]; then
+      echo "TEXINFO CONFIGURE RUN DONE"
+    else
+      echo "TEXINFO COULD NOT RUN CONFIGURE" >&2
+      cd $ROOTDIR
+      return 1
+    fi
 
     make -j $MAKE_NUM_THREADS > /dev/null 2> /dev/null
+    if [ $? -eq 0 ]; then
+      echo "TEXINFO MAKE RUN DONE"
+    else
+      echo "TEXINFO COULD NOT RUN MAKE" >&2
+      cd $ROOTDIR
+      return 1
+    fi
 
     make install > /dev/null 2> /dev/null
+    if [ $? -eq 0 ]; then
+      echo "TEXINFO MAKE INSTALL RUN DONE"
+    else
+      echo "TEXINFO COULD NOT RUN MAKE INSTALL" >&2
+      cd $ROOTDIR
+      return 1
+    fi
+  else
+    FC=$FORTRAN_COMPILER CC=$C_COMPILER ./configure --disable-perl-xs --prefix=$ROOTDIR/.local
+    if [ $? -ne 0 ];then
+      cd $ROOTDIR
+      return 1
+    fi 
 
-    cd $ROOTDIR/../cocoa_installation_libraries/binutils-2.37
+    make
+    if [ $? -ne 0 ];then
+      cd $ROOTDIR
+      return 1
+    fi 
 
+    make install
+    if [ $? -ne 0 ];then
+      cd $ROOTDIR
+      return 1
+    fi 
+  fi
+
+  # ----------------------------------------------------------------------------------------
+  # ----------------------------------------------------------------------------------------
+  # ----------------------------------------------------------------------------------------
+  echo 'INSTALLING BINUTILS - THAT WILL TAKE A WHILE'
+
+  cd $ROOTDIR/../cocoa_installation_libraries/binutils-2.37
+
+  if [ -z "${DEBUG_DISTUTILS_PACKAGE}" ]; then
     FC=$FORTRAN_COMPILER CC=$C_COMPILER ./configure --prefix=$ROOTDIR/.local > /dev/null 2> /dev/null
+    if [ $? -eq 0 ]; then
+      echo "BINUTILS CONFIGURE RUN DONE"
+    else
+      echo "BINUTILS COULD NOT RUN CONFIGURE" >&2
+      cd $ROOTDIR
+      return 1
+    fi
 
     make -j $MAKE_NUM_THREADS > /dev/null 2> /dev/null
+    if [ $? -eq 0 ]; then
+      echo "BINUTILS MAKE RUN DONE"
+    else
+      echo "BINUTILS COULD NOT RUN MAKE" >&2
+      cd $ROOTDIR
+      return 1
+    fi
 
     make install > /dev/null 2> /dev/null
+    if [ $? -eq 0 ]; then
+      echo "BINUTILS MAKE INSTALL RUN DONE"
+    else
+      echo "BINUTILS COULD NOT RUN MAKE INSTALL" >&2
+      cd $ROOTDIR
+      return 1
+    fi
+  else
+    FC=$FORTRAN_COMPILER CC=$C_COMPILER ./configure --prefix=$ROOTDIR/.local --disable-perl-xs
+    if [ $? -ne 0 ];then
+      cd $ROOTDIR
+      return 1
+    fi
 
-    cd $ROOTDIR/
+    make
+    if [ $? -ne 0 ];then
+      cd $ROOTDIR
+      return 1
+    fi
+
+    make install
+    if [ $? -ne 0 ];then
+      cd $ROOTDIR
+      return 1
+    fi
+  fi
+
+  cd $ROOTDIR/
 fi

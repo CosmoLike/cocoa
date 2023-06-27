@@ -40,7 +40,7 @@ def setup(app):
 
 
 # If your documentation needs a minimal Sphinx version, state it here.
-needs_sphinx = '1.3'
+needs_sphinx = '4.0'
 
 # Add any Sphinx extension module names here, as strings. They can be
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
@@ -72,9 +72,9 @@ source_encoding = 'utf-8-sig'
 master_doc = 'index'
 
 # General information about the project.
-project = u'Code for Anisotropies in the Microwave Background (CAMB)'
-copyright = u'Antony Lewis'
-author = u'Antony Lewis'
+project = 'Code for Anisotropies in the Microwave Background (CAMB)'
+copyright = 'Antony Lewis'
+author = 'Antony Lewis'
 
 version = camb.__version__
 release = camb.__version__

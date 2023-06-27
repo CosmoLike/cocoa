@@ -1,21 +1,21 @@
 if [ -z "${ROOTDIR}" ]; then
-  echo 'ERROR ROOTDIR not defined'
-  return
+    echo 'ERROR ENV VARIABLE ROOTDIR IS NOT DEFINED' >&2
+    return 1
 fi
 if [ -z "${CXX_COMPILER}" ]; then
-  echo 'ERROR CXX_COMPILER not defined'
-  return 1
+    echo 'ERROR ENV VARIABLE CXX_COMPILER IS NOT DEFINED' >&2
+    return 1
 fi
 if [ -z "${C_COMPILER}" ]; then
-  echo 'ERROR C_COMPILER not defined'
-  return 1
+    echo 'ERROR ENV VARIABLE C_COMPILER IS NOT DEFINED' >&2
+    return 1
 fi
 if [ -z "${FORTRAN_COMPILER}" ]; then
-  echo 'ERROR FORTRAN_COMPILER not defined'
-  return 1
+    echo 'ERROR ENV VARIABLE FORTRAN_COMPILER IS NOT DEFINED' >&2
+    return 1
 fi
 if [ -z "${PYTHON3}" ]; then
-  echo 'ERROR PYTHON3 not defined'
+  echo 'ERROR ENV VARIABLE PYTHON3 IS NOT DEFINED' >&2
   return 1
 fi
 
@@ -24,64 +24,65 @@ fi
 # ------------------------- COMPILE PLANCK LIKELIHOOD ------------------------
 # ----------------------------------------------------------------------------
 # ----------------------------------------------------------------------------
-
 if [ -z "${IGNORE_PLANCK_COMPILATION}" ]; then
-  if [ -n "${CLIK_PATH}" ]; then
-      export OLD_CLIK_PATH=$CLIK_PATH
+  echo 'COMPILING PLANCK'
+
+  if [ -z "${DEBUG_PLANCK_OUTPUT}" ]; then
+    export OUTPUT_PLANCK_1="/dev/null"
+    export OUTPUT_PLANCK_2="/dev/null"
+  else
+    export OUTPUT_PLANCK_1="/dev/tty"
+    export OUTPUT_PLANCK_2="/dev/tty"
+  fi
+  
+  if [ -z "${IGNORE_C_CFITSIO_INSTALLATION}" ]; then
+    export CFITSLIBS=$ROOTDIR/.local/lib
+  else
+    export CFITSLIBS=$GLOBAL_PACKAGES_LOCATION
+  fi
+  
+  if [ -z "${IGNORE_FORTRAN_INSTALLATION}" ]; then
+    export LAPALIBS=$ROOTDIR/.local
+  else
+    export LAPALIBS=$GLOBAL_PACKAGES_LOCATION
   fi
 
-  if [ -n "${CLIK_DATA}" ]; then
-      export OLD_CLIK_DATA=$CLIK_DATA
+  if [ -z "${USE_SPT_CLIK_PLANCK}" ]; then
+    cd $ROOTDIR/external_modules/code/planck/code/plc_3.0/plc-3.1/
+  else
+    cd $ROOTDIR/external_modules/code/planck/code/spt_clik/
   fi
-
-  if [ -n "${CLIK_PLUGIN}" ]; then
-      export OLD_CLIK_PLUGIN=$CLIK_PLUGIN
-  fi
-
-  cd $ROOTDIR/external_modules/code/planck/code/plc_3.0/plc-3.1/
   
   rm -rf .waf*
 
-  $PYTHON3 waf distclean
-
-  if [ -z "${IGNORE_C_CFITSIO_INSTALLATION}" ]; then
-    if [ $? -ne 0 ] 
-    then
-      echo "PROBLEM CONF PLANCK"
-    fi
-    if [ -z "${IGNORE_FORTRAN_INSTALLATION}" ]; then
-      FC=$FORTRAN_COMPILER CC=$C_COMPILER CXX=$CXX_COMPILER $PYTHON3 waf configure --gcc --gfortran --cfitsio_islocal --prefix $ROOTDIR/.local --lapack_prefix=$ROOTDIR/.local --cfitsio_lib=$ROOTDIR/.local/lib --python=$ROOTDIR/.local/bin/python
-      if [ $? -ne 0 ] 
-      then
-        echo "PROBLEM CONF PLANCK"
-      fi
-    else
-      FC=$FORTRAN_COMPILER CC=$C_COMPILER CXX=$CXX_COMPILER $PYTHON3 waf configure --gcc --gfortran --cfitsio_islocal --prefix $ROOTDIR/.local --lapack_prefix=$GLOBAL_PACKAGES_LOCATION --cfitsio_lib=$ROOTDIR/.local/lib --python=$ROOTDIR/.local/bin/python
-      if [ $? -ne 0 ] 
-      then
-        echo "PROBLEM CONF PLANCK"
-      fi
-    fi
+  $PYTHON3 waf distclean > ${OUTPUT_PLANCK_1} 2> ${OUTPUT_PLANCK_2}
+  if [ $? -ne 0 ]; then
+    echo "PLANCK COULD NOT RUN WAF DISTCLEAN"
+    cd $ROOTDIR
+    return 1
   else
-    if [ -z "${IGNORE_FORTRAN_INSTALLATION}" ]; then
-      FC=$FORTRAN_COMPILER CC=$C_COMPILER CXX=$CXX_COMPILER $PYTHON3 waf configure --gcc --gfortran --cfitsio_islocal --prefix $ROOTDIR/.local --lapack_prefix=$ROOTDIR/.local --cfitsio_prefix=$GLOBAL_PACKAGES_LOCATION --python=$ROOTDIR/.local/bin/python
-      if [ $? -ne 0 ] 
-      then
-        echo "PROBLEM CONF PLANCK"
-      fi
-    else
-      FC=$FORTRAN_COMPILER CC=$C_COMPILER CXX=$CXX_COMPILER $PYTHON3 waf configure --gcc --gfortran --cfitsio_islocal --prefix $ROOTDIR/.local --lapack_prefix=$GLOBAL_PACKAGES_LOCATION --cfitsio_prefix=$GLOBAL_PACKAGES_LOCATION --python=$ROOTDIR/.local/bin/python
-      if [ $? -ne 0 ] 
-      then
-        echo "PROBLEM CONF PLANCK"
-      fi
-    fi
+    echo "PLANCK WAF CLEAN RUN DONE"
   fi
-
-  $PYTHON3 waf install -v
-  if [ $? -ne 0 ] 
-  then
-    echo "PROBLEM INSTALLING PLANCK"
+  
+  FC=$FORTRAN_COMPILER CC=$C_COMPILER CXX=$CXX_COMPILER $PYTHON3 waf configure \
+    --gcc --gfortran --cfitsio_islocal --prefix $ROOTDIR/.local \
+    --lapack_prefix=${LAPALIBS} --cfitsio_lib=${CFITSLIBS} \
+    --python=${PYTHON3} > ${OUTPUT_PLANCK_1} 2> ${OUTPUT_PLANCK_2}
+  if [ $? -ne 0 ]; then
+    echo "PLANCK COULD NOT RUN WAF CONFIGURE"
+    cd $ROOTDIR
+    return 1
+  else
+    echo "PLANCK WAF CONFIGURE RUN DONE"
+  fi
+  
+  $PYTHON3 waf install -v > ${OUTPUT_PLANCK_1} 2> ${OUTPUT_PLANCK_2}
+  if [ $? -ne 0 ]; then
+    echo "PLANCK COULD NOT RUN WAF INSTALL"
+    cd $ROOTDIR
+    return 1
+  else
+    echo "PLANCK WAF INSTALL RUN DONE"
   fi
 
   cd $ROOTDIR

@@ -71,9 +71,7 @@ To install **cobaya** or upgrade it to the latest release, simply type in a term
 
 .. code:: bash
 
-   $ python -m pip install cobaya[gui] --upgrade
-
-For a **cluster** install, you may want to remove the ``[gui]`` to avoid errors due to non-essential dependencies.
+   $ python -m pip install cobaya --upgrade
 
 To go on installing **cosmological requisites**, see :doc:`installation_cosmo`.
 
@@ -139,6 +137,17 @@ Simply do, from anywhere
 Installation troubleshooting
 ----------------------------
 
+Problems with file locks
+^^^^^^^^^^^^^^^^^^^^^^^^
+
+By default Cobaya uses  `Portalocker <https://pypi.org/project/portalocker/>`_ to lock output chain files to check that MPI is being used correctly, that only one process is accessing each file, and to clean up files from aborted runs.
+If Portalocker is uninstalled it will still work, but files may need to be cleaned up manually. You can also set an environment variable to turn off file locking if it causes problems (e.g. on NERSC home).
+
+.. code:: bash
+
+     export COBAYA_USE_FILE_LOCKING=false
+
+
 .. note::
 
    This section will be filled with the most common problems that our users encounter, so if you followed the instructions above and still something failed (or if you think that the instructions were not clear enough), don't hesitate to contact us!
@@ -200,16 +209,16 @@ The recommended way is to get a `GitHub <https://github.com>`_ user and `fork th
 .. code:: bash
 
    $ git clone https://YOUR_USERNAME@github.com/YOUR_USERNAME/cobaya.git
-   $ python -m pip install --editable cobaya[test,gui] --upgrade
+   $ python -m pip install --editable cobaya[test] --upgrade
 
-Here ``cobaya[test,gui]`` should include the square brackets. Remove ``,gui`` if desired to avoid unnecessary dependencies.
+Here ``cobaya[test]`` should include the square brackets.
 
 Alternatively, you can clone from the official **cobaya** repo (but this way you won't be able to upload your changes!).
 
 .. code:: bash
 
    $ git clone https://github.com/CobayaSampler/cobaya.git
-   $ python -m pip install --editable cobaya[test,gui] --upgrade
+   $ python -m pip install --editable cobaya[test] --upgrade
 
 In any of both cases, this puts you in the last commit of **cobaya**, and install the requisites for both running and testing (to ignore the testing requisites, remove ``[test]`` from the commands above). If you want to start from the last release, say version 1.0, do, from the cobaya folder,
 

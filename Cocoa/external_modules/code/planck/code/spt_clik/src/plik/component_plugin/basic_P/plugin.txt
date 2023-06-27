@@ -1,0 +1,2 @@
+source : basic_P.c
+python : basic_P.pyx

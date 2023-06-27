@@ -1,0 +1,2 @@
+source : basic.c, basic_tools.c
+python : basic.pyx

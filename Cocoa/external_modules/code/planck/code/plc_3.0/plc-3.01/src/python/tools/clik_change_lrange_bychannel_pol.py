@@ -164,7 +164,24 @@ def change_smica(inhf,lklfile,outfile,lmins,lmaxs,beg,nd):
 def main(argv):
 
   if len(sys.argv)!=2:
-    print "usage : %s parfile\n  copy input_clik to output_clik, change lmin and lmax of output_clik.\n  lmin and lmax can be set to -1 to keep the input_clik values.\n  input_clik, must be a plik or commander file.\n  if input_clik is a binned plik file, the effective lmin and lmax will be the set to the closest bins.\n  Here is an example parfile\n    #input and output clik files\n    input_clik = plik_dx11dr2_HM_v18_TT.clik\n\n    output_clik = plik_dx11dr2_HM_v18_TT_no143x143.clik\n\n    #set to -1 to use default value\n    #set to anything else to change lmin\n    lmin = -1    -1    -1    &\n           -1    -1    -1    &\n           -1    -1    -1   \n\n \n    #set to -1 to use default value\n    #set to anything else to change lmax\n    #set any non negative value inferior than lmin (0 is a good example) ro remove a cross spectra\n    lmax = -1    -1    -1    &\n           -1     0    -1    &\n           -1    -1    -1   \n\n "%osp.basename(sys.argv[0])
+    print """usage : %s parfile\n  copy input_clik to output_clik, change lmin and 
+      lmax of output_clik.\n  lmin and lmax can be set to -1 to keep the input_clik 
+      values.\n  input_clik, must be a plik or commander file.\n  if input_clik is 
+      a binned plik file, the effective lmin and lmax will be the set to the closest 
+      bins.\n  Here is an example parfile\n    #input and output clik files\n    
+      input_clik = plik_dx11dr2_HM_v18_TT.clik\n\n    
+      output_clik = plik_dx11dr2_HM_v18_TT_no143x143.clik\n\n   
+      #set to -1 to use default value\n    
+      #set to anything else to change lmin\n    lmin = -1    -1    -1    &\n   
+                                                       -1    -1    -1    &\n          
+                                                       -1    -1    -1   \n\n \n    
+      #set to -1 to use default value\n    #set to anything else to change lmax\n    
+      #set any non negative value inferior than lmin (0 is a good example) ro r
+      emove a cross spectra\n    lmax = -1    -1    -1    &\n           
+                                        -1     0    -1    &\n           
+                                        -1    -1    -1   \n\n 
+                                        "%osp.basename(sys.argv[0])
+    """
     sys.exit(0)
   pars = clik.miniparse(argv[1])
   lklfile = pars.str.input_clik

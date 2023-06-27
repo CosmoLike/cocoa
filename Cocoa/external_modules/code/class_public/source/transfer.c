@@ -14,7 +14,7 @@
  *
  * Hence the following functions can be called from other modules:
  *
- * -# transfer_init() at the beginning (but after perturb_init()
+ * -# transfer_init() at the beginning (but after perturbations_init()
  *    and bessel_init())
  *
  * -# transfer_functions_at_q() at any later time
@@ -59,7 +59,7 @@
  */
 
 int transfer_functions_at_q(
-                            struct transfers * ptr,
+                            struct transfer * ptr,
                             int index_md,
                             int index_ic,
                             int index_tt,
@@ -90,13 +90,13 @@ int transfer_functions_at_q(
 }
 
 /**
- * This routine initializes the transfers structure, (in particular,
+ * This routine initializes the transfer structure, (in particular,
  * computes table of transfer functions \f$ \Delta_l^{X} (q) \f$)
  *
  * Main steps:
  *
- * - initialize all indices in the transfers structure
- *   and allocate all its arrays using transfer_indices_of_transfers().
+ * - initialize all indices in the transfer structure
+ *   and allocate all its arrays using transfer_indices().
  *
  * - for each thread (in case of parallel run), initialize the fields of a memory zone called the transfer_workspace with transfer_workspace_init()
  *
@@ -107,18 +107,18 @@ int transfer_functions_at_q(
  * @param pba Input: pointer to background structure
  * @param pth Input: pointer to thermodynamics structure
  * @param ppt Input: pointer to perturbation structure
- * @param pnl Input: pointer to nonlinear structure
- * @param ptr Output: pointer to initialized transfers structure
+ * @param pfo Input: pointer to fourier structure
+ * @param ptr Output: pointer to initialized transfer structure
  * @return the error status
  */
 
 int transfer_init(
                   struct precision * ppr,
                   struct background * pba,
-                  struct thermo * pth,
-                  struct perturbs * ppt,
-                  struct nonlinear * pnl,
-                  struct transfers * ptr
+                  struct thermodynamics * pth,
+                  struct perturbations * ppt,
+                  struct fourier * pfo,
+                  struct transfer * ptr
                   ) {
 
   /** Summary: */
@@ -213,10 +213,10 @@ int transfer_init(
 
   q_period = 2.*_PI_/(tau0-tau_rec)*ptr->angular_rescaling;
 
-  /** - initialize all indices in the transfers structure and
-      allocate all its arrays using transfer_indices_of_transfers() */
+  /** - initialize all indices in the transfer structure and
+      allocate all its arrays using transfer_indices() */
 
-  class_call(transfer_indices_of_transfers(ppr,ppt,ptr,q_period,pba->K,pba->sgnK),
+  class_call(transfer_indices(ppr,ppt,ptr,q_period,pba->K,pba->sgnK),
              ptr->error_message,
              ptr->error_message);
 
@@ -226,7 +226,7 @@ int transfer_init(
               ptr->md_size*sizeof(double**),
               ptr->error_message);
 
-  class_call(transfer_perturbation_copy_sources_and_nl_corrections(ppt,pnl,ptr,sources),
+  class_call(transfer_perturbation_copy_sources_and_nl_corrections(ppt,pfo,ptr,sources),
              ptr->error_message,
              ptr->error_message);
 
@@ -293,16 +293,18 @@ int transfer_init(
              ptr->error_message);
 
   /** - precompute window function for integrated nCl/sCl quantities*/
-  double* window;
-  class_call(transfer_precompute_selection(ppr,
-                                           pba,
-                                           ppt,
-                                           ptr,
-                                           tau_rec,
-                                           tau_size_max,
-                                           &(window)),
-             ptr->error_message,
-             ptr->error_message);
+  double* window = NULL;
+  if ((ppt->has_cl_lensing_potential == _TRUE_) || (ppt->has_cl_number_count == _TRUE_)) {
+    class_call(transfer_precompute_selection(ppr,
+                                            pba,
+                                            ppt,
+                                            ptr,
+                                            tau_rec,
+                                            tau_size_max,
+                                            &(window)),
+              ptr->error_message,
+              ptr->error_message);
+  }
 
   /* (a.3.) workspace, allocated in a parallel zone since in openmp
      version there is one workspace per thread */
@@ -406,7 +408,7 @@ int transfer_init(
              ptr->error_message,
              ptr->error_message);
 
-  class_call(transfer_perturbation_sources_free(ppt,pnl,ptr,sources),
+  class_call(transfer_perturbation_sources_free(ppt,pfo,ptr,sources),
              ptr->error_message,
              ptr->error_message);
 
@@ -426,12 +428,12 @@ int transfer_init(
  * To be called at the end of each run, only when no further calls to
  * transfer_functions_at_k() are needed.
  *
- * @param ptr Input: pointer to transfers structure (which fields must be freed)
+ * @param ptr Input: pointer to transfer structure (which fields must be freed)
  * @return the error status
  */
 
 int transfer_free(
-                  struct transfers * ptr
+                  struct transfer * ptr
                   ) {
 
   int index_md;
@@ -472,10 +474,10 @@ int transfer_free(
 
 /**
  * This routine defines all indices and allocates all tables
- * in the transfers structure
+ * in the transfer structure
  *
  * Compute list of (k, l) values, allocate and fill corresponding
- * arrays in the transfers structure. Allocate the array of transfer
+ * arrays in the transfer structure. Allocate the array of transfer
  * function tables.
  *
  * @param ppr      Input: pointer to precision structure
@@ -487,14 +489,14 @@ int transfer_free(
  * @return the error status
  */
 
-int transfer_indices_of_transfers(
-                                  struct precision * ppr,
-                                  struct perturbs * ppt,
-                                  struct transfers * ptr,
-                                  double q_period,
-                                  double K,
-                                  int sgnK
-                                  ) {
+int transfer_indices(
+                     struct precision * ppr,
+                     struct perturbations * ppt,
+                     struct transfer * ptr,
+                     double q_period,
+                     double K,
+                     int sgnK
+                     ) {
 
   /** Summary: */
 
@@ -635,9 +637,9 @@ int transfer_indices_of_transfers(
 }
 
 int transfer_perturbation_copy_sources_and_nl_corrections(
-                                                          struct perturbs * ppt,
-                                                          struct nonlinear * pnl,
-                                                          struct transfers * ptr,
+                                                          struct perturbations * ppt,
+                                                          struct fourier * pfo,
+                                                          struct transfer * ptr,
                                                           double *** sources
                                                           ) {
   int index_md;
@@ -656,7 +658,7 @@ int transfer_perturbation_copy_sources_and_nl_corrections(
 
       for (index_tp = 0; index_tp < ppt->tp_size[index_md]; index_tp++) {
 
-        if ((pnl->method != nl_none) && (_scalars_) &&
+        if ((pfo->method != nl_none) && (_scalars_) &&
             (((ppt->has_source_delta_m == _TRUE_) && (index_tp == ppt->index_tp_delta_m)) ||
              ((ppt->has_source_delta_cb == _TRUE_) && (index_tp == ppt->index_tp_delta_cb)) ||
              ((ppt->has_source_theta_m == _TRUE_) && (index_tp == ppt->index_tp_theta_m)) ||
@@ -680,7 +682,7 @@ int transfer_perturbation_copy_sources_and_nl_corrections(
                   ppt->sources[index_md]
                   [index_ic * ppt->tp_size[index_md] + index_tp]
                   [index_tau * ppt->k_size[index_md] + index_k]
-                  * pnl->nl_corr_density[pnl->index_pk_cb][index_tau * ppt->k_size[index_md] + index_k];
+                  * pfo->nl_corr_density[pfo->index_pk_cb][index_tau * ppt->k_size[index_md] + index_k];
               }
               else{
                 sources[index_md]
@@ -689,7 +691,7 @@ int transfer_perturbation_copy_sources_and_nl_corrections(
                   ppt->sources[index_md]
                   [index_ic * ppt->tp_size[index_md] + index_tp]
                   [index_tau * ppt->k_size[index_md] + index_k]
-                  * pnl->nl_corr_density[pnl->index_pk_m][index_tau * ppt->k_size[index_md] + index_k];
+                  * pfo->nl_corr_density[pfo->index_pk_m][index_tau * ppt->k_size[index_md] + index_k];
               }
             }
           }
@@ -708,8 +710,8 @@ int transfer_perturbation_copy_sources_and_nl_corrections(
 
 
 int transfer_perturbation_source_spline(
-                                        struct perturbs * ppt,
-                                        struct transfers * ptr,
+                                        struct perturbations * ppt,
+                                        struct transfer * ptr,
                                         double *** sources,
                                         double *** sources_spline
                                         ) {
@@ -750,9 +752,9 @@ int transfer_perturbation_source_spline(
 }
 
 int transfer_perturbation_sources_free(
-                                       struct perturbs * ppt,
-                                       struct nonlinear * pnl,
-                                       struct transfers * ptr,
+                                       struct perturbations * ppt,
+                                       struct fourier * pfo,
+                                       struct transfer * ptr,
                                        double *** sources
                                        ) {
   int index_md;
@@ -762,7 +764,7 @@ int transfer_perturbation_sources_free(
   for (index_md = 0; index_md < ptr->md_size; index_md++) {
     for (index_ic = 0; index_ic < ppt->ic_size[index_md]; index_ic++) {
       for (index_tp = 0; index_tp < ppt->tp_size[index_md]; index_tp++) {
-        if ((pnl->method != nl_none) && (_scalars_) &&
+        if ((pfo->method != nl_none) && (_scalars_) &&
             (((ppt->has_source_delta_m == _TRUE_) && (index_tp == ppt->index_tp_delta_m)) ||
              ((ppt->has_source_theta_m == _TRUE_) && (index_tp == ppt->index_tp_theta_m)) ||
              ((ppt->has_source_delta_cb == _TRUE_) && (index_tp == ppt->index_tp_delta_cb)) ||
@@ -784,8 +786,8 @@ int transfer_perturbation_sources_free(
 }
 
 int transfer_perturbation_sources_spline_free(
-                                              struct perturbs * ppt,
-                                              struct transfers * ptr,
+                                              struct perturbations * ppt,
+                                              struct transfer * ptr,
                                               double *** sources_spline
                                               ) {
   int index_md;
@@ -810,14 +812,14 @@ int transfer_perturbation_sources_spline_free(
  *
  * @param ppr  Input: pointer to precision structure
  * @param ppt  Input: pointer to perturbation structure
- * @param ptr  Input/Output: pointer to transfers structure containing l's
+ * @param ptr  Input/Output: pointer to transfer structure containing l's
  * @return the error status
  */
 
 int transfer_get_l_list(
                         struct precision * ppr,
-                        struct perturbs * ppt,
-                        struct transfers * ptr
+                        struct perturbations * ppt,
+                        struct transfer * ptr
                         ) {
 
   int index_l;
@@ -1006,7 +1008,7 @@ int transfer_get_l_list(
  *
  * @param ppr     Input: pointer to precision structure
  * @param ppt     Input: pointer to perturbation structure
- * @param ptr     Input/Output: pointer to transfers structure containing q's
+ * @param ptr     Input/Output: pointer to transfer structure containing q's
  * @param q_period Input: order of magnitude of the oscillation period of transfer functions
  * @param K        Input: spatial curvature (in absolute value)
  * @param sgnK     Input: spatial curvature sign (open/closed/flat)
@@ -1015,8 +1017,8 @@ int transfer_get_l_list(
 
 int transfer_get_q_list(
                         struct precision * ppr,
-                        struct perturbs * ppt,
-                        struct transfers * ptr,
+                        struct perturbations * ppt,
+                        struct transfer * ptr,
                         double q_period,
                         double K,
                         int sgnK
@@ -1239,14 +1241,14 @@ int transfer_get_q_list(
  * values for each mode.
  *
  * @param ppt     Input: pointer to perturbation structure
- * @param ptr     Input/Output: pointer to transfers structure containing q's
+ * @param ptr     Input/Output: pointer to transfer structure containing q's
  * @param K       Input: spatial curvature
  * @return the error status
  */
 
 int transfer_get_k_list(
-                        struct perturbs * ppt,
-                        struct transfers * ptr,
+                        struct perturbations * ppt,
+                        struct transfer * ptr,
                         double K
                         ) {
 
@@ -1316,14 +1318,14 @@ int transfer_get_k_list(
  * perturbation and transfer module.
  *
  * @param ppt  Input: pointer to perturbation structure
- * @param ptr  Input: pointer to transfers structure containing l's
+ * @param ptr  Input: pointer to transfer structure containing l's
  * @param tp_of_tt Input/Output: array with the correspondence (allocated before, filled here)
  * @return the error status
  */
 
 int transfer_get_source_correspondence(
-                                       struct perturbs * ppt,
-                                       struct transfers * ptr,
+                                       struct perturbations * ppt,
+                                       struct transfer * ptr,
                                        int ** tp_of_tt
                                        ) {
   /** Summary: */
@@ -1430,7 +1432,7 @@ int transfer_get_source_correspondence(
 }
 
 int transfer_free_source_correspondence(
-                                        struct transfers * ptr,
+                                        struct transfer * ptr,
                                         int ** tp_of_tt
                                         ) {
 
@@ -1448,8 +1450,8 @@ int transfer_free_source_correspondence(
 int transfer_source_tau_size_max(
                                  struct precision * ppr,
                                  struct background * pba,
-                                 struct perturbs * ppt,
-                                 struct transfers * ptr,
+                                 struct perturbations * ppt,
+                                 struct transfer * ptr,
                                  double tau_rec,
                                  double tau0,
                                  int * tau_size_max
@@ -1496,7 +1498,7 @@ int transfer_source_tau_size_max(
  * @param ppr                   Input: pointer to precision structure
  * @param pba                   Input: pointer to background structure
  * @param ppt                   Input: pointer to perturbation structure
- * @param ptr                   Input: pointer to transfers structure
+ * @param ptr                   Input: pointer to transfer structure
  * @param tau_rec               Input: recombination time
  * @param tau0                  Input: time today
  * @param index_md              Input: index of the mode (scalar, tensor)
@@ -1508,8 +1510,8 @@ int transfer_source_tau_size_max(
 int transfer_source_tau_size(
                              struct precision * ppr,
                              struct background * pba,
-                             struct perturbs * ppt,
-                             struct transfers * ptr,
+                             struct perturbations * ppt,
+                             struct transfer * ptr,
                              double tau_rec,
                              double tau0,
                              int index_md,
@@ -1681,8 +1683,8 @@ int transfer_source_tau_size(
 int transfer_compute_for_each_q(
                                 struct precision * ppr,
                                 struct background * pba,
-                                struct perturbs * ppt,
-                                struct transfers * ptr,
+                                struct perturbations * ppt,
+                                struct transfer * ptr,
                                 int ** tp_of_tt,
                                 int index_q,
                                 int tau_size_max,
@@ -1940,7 +1942,7 @@ int transfer_compute_for_each_q(
 }
 
 int transfer_radial_coordinates(
-                                struct transfers * ptr,
+                                struct transfer * ptr,
                                 struct transfer_workspace * ptw,
                                 int index_md,
                                 int index_q
@@ -1985,7 +1987,7 @@ int transfer_radial_coordinates(
  * the right values of k, using the spline interpolation method.
  *
  * @param ppt                   Input: pointer to perturbation structure
- * @param ptr                   Input: pointer to transfers structure
+ * @param ptr                   Input: pointer to transfer structure
  * @param index_q               Input: index of wavenumber
  * @param index_md              Input: index of mode
  * @param index_ic              Input: index of initial condition
@@ -1997,8 +1999,8 @@ int transfer_radial_coordinates(
  */
 
 int transfer_interpolate_sources(
-                                 struct perturbs * ppt,
-                                 struct transfers * ptr,
+                                 struct perturbations * ppt,
+                                 struct transfer * ptr,
                                  int index_q,
                                  int index_md,
                                  int index_ic,
@@ -2067,7 +2069,7 @@ int transfer_interpolate_sources(
  * @param ppr                   Input: pointer to precision structure
  * @param pba                   Input: pointer to background structure
  * @param ppt                   Input: pointer to perturbation structure
- * @param ptr                   Input: pointer to transfers structure
+ * @param ptr                   Input: pointer to transfer structure
  * @param interpolated_sources  Input: interpolated perturbation source
  * @param tau_rec               Input: recombination time
  * @param index_q               Input: index of wavenumber
@@ -2085,8 +2087,8 @@ int transfer_interpolate_sources(
 int transfer_sources(
                      struct precision * ppr,
                      struct background * pba,
-                     struct perturbs * ppt,
-                     struct transfers * ptr,
+                     struct perturbations * ppt,
+                     struct transfer * ptr,
                      double * interpolated_sources,
                      double tau_rec,
                      int index_q,
@@ -2406,7 +2408,7 @@ int transfer_sources(
  *
  * @param ppr                   Input: pointer to precision structure
  * @param ppt                   Input: pointer to perturbation structure
- * @param ptr                   Input: pointer to transfers structure
+ * @param ptr                   Input: pointer to transfer structure
  * @param bin                   Input: redshift bin number
  * @param z                     Input: one value of redshift
  * @param selection             Output: pointer to selection function
@@ -2415,8 +2417,8 @@ int transfer_sources(
 
 int transfer_selection_function(
                                 struct precision * ppr,
-                                struct perturbs * ppt,
-                                struct transfers * ptr,
+                                struct perturbations * ppt,
+                                struct transfer * ptr,
                                 int bin,
                                 double z,
                                 double * selection) {
@@ -2559,7 +2561,7 @@ int transfer_selection_function(
  */
 
 int transfer_dNdz_analytic(
-                           struct transfers * ptr,
+                           struct transfer * ptr,
                            double z,
                            double * dNdz,
                            double * dln_dNdz_dz) {
@@ -2595,7 +2597,7 @@ int transfer_dNdz_analytic(
  * @param ppr                   Input: pointer to precision structure
  * @param pba                   Input: pointer to background structure
  * @param ppt                   Input: pointer to perturbation structure
- * @param ptr                   Input: pointer to transfers structure
+ * @param ptr                   Input: pointer to transfer structure
  * @param bin                   Input: redshift bin number
  * @param tau0_minus_tau        Output: values of (tau0-tau) at which source are sample
  * @param tau_size              Output: pointer to size of previous array
@@ -2605,8 +2607,8 @@ int transfer_dNdz_analytic(
 int transfer_selection_sampling(
                                 struct precision * ppr,
                                 struct background * pba,
-                                struct perturbs * ppt,
-                                struct transfers * ptr,
+                                struct perturbations * ppt,
+                                struct transfer * ptr,
                                 int bin,
                                 double * tau0_minus_tau,
                                 int tau_size) {
@@ -2662,7 +2664,7 @@ int transfer_selection_sampling(
  * @param ppr                   Input: pointer to precision structure
  * @param pba                   Input: pointer to background structure
  * @param ppt                   Input: pointer to perturbation structure
- * @param ptr                   Input: pointer to transfers structure
+ * @param ptr                   Input: pointer to transfer structure
  * @param bin                   Input: redshift bin number
  * @param tau0                  Input: time today
  * @param tau0_minus_tau        Output: values of (tau0-tau) at which source are sample
@@ -2673,8 +2675,8 @@ int transfer_selection_sampling(
 int transfer_lensing_sampling(
                               struct precision * ppr,
                               struct background * pba,
-                              struct perturbs * ppt,
-                              struct transfers * ptr,
+                              struct perturbations * ppt,
+                              struct transfer * ptr,
                               int bin,
                               double tau0,
                               double * tau0_minus_tau,
@@ -2716,7 +2718,7 @@ int transfer_lensing_sampling(
  * @param ppr                   Input: pointer to precision structure
  * @param pba                   Input: pointer to background structure
  * @param ppt                   Input: pointer to perturbation structure
- * @param ptr                   Input: pointer to transfers structure
+ * @param ptr                   Input: pointer to transfer structure
  * @param bin                   Input: redshift bin number
  * @param tau0_minus_tau        Output: values of (tau0-tau) at which source are sample
  * @param tau_size              Output: pointer to size of previous array
@@ -2730,8 +2732,8 @@ int transfer_lensing_sampling(
 int transfer_source_resample(
                              struct precision * ppr,
                              struct background * pba,
-                             struct perturbs * ppt,
-                             struct transfers * ptr,
+                             struct perturbations * ppt,
+                             struct transfer * ptr,
                              int bin,
                              double * tau0_minus_tau,
                              int tau_size,
@@ -2786,7 +2788,7 @@ int transfer_source_resample(
  * @param ppr                   Input: pointer to precision structure
  * @param pba                   Input: pointer to background structure
  * @param ppt                   Input: pointer to perturbation structure
- * @param ptr                   Input: pointer to transfers structure
+ * @param ptr                   Input: pointer to transfer structure
  * @param bin                   Input: redshift bin number
  * @param tau_min               Output: smallest time in the selection interval
  * @param tau_mean              Output: time corresponding to z_mean
@@ -2797,8 +2799,8 @@ int transfer_source_resample(
 int transfer_selection_times(
                              struct precision * ppr,
                              struct background * pba,
-                             struct perturbs * ppt,
-                             struct transfers * ptr,
+                             struct perturbations * ppt,
+                             struct transfer * ptr,
                              int bin,
                              double * tau_min,
                              double * tau_mean,
@@ -2863,7 +2865,7 @@ int transfer_selection_times(
  * @param ppr                   Input: pointer to precision structure
  * @param pba                   Input: pointer to background structure
  * @param ppt                   Input: pointer to perturbation structure
- * @param ptr                   Input: pointer to transfers structure
+ * @param ptr                   Input: pointer to transfer structure
  * @param selection             Output: normalized selection function
  * @param tau0_minus_tau        Input: values of (tau0-tau) at which source are sample
  * @param w_trapz               Input: trapezoidal weights for integration over tau
@@ -2877,8 +2879,8 @@ int transfer_selection_times(
 int transfer_selection_compute(
                                struct precision * ppr,
                                struct background * pba,
-                               struct perturbs * ppt,
-                               struct transfers * ptr,
+                               struct perturbations * ppt,
+                               struct transfer * ptr,
                                double * selection,
                                double * tau0_minus_tau,
                                double * w_trapz,
@@ -2913,15 +2915,15 @@ int transfer_selection_compute(
       /* get background quantities at this time */
       class_call(background_at_tau(pba,
                                    tau,
-                                   pba->long_info,
-                                   pba->inter_normal,
+                                   long_info,
+                                   inter_normal,
                                    &last_index,
                                    pvecback),
                  pba->error_message,
                  ptr->error_message);
 
-      /* infer redshift */
-      z = pba->a_today/pvecback[pba->index_bg_a]-1.;
+      /* infer redshift (remember that a in the code is in fact a/a_0) */
+      z = 1./pvecback[pba->index_bg_a]-1.;
 
       /* get corresponding dN/dz(z,bin) */
       class_call(transfer_selection_function(ppr,
@@ -2982,7 +2984,7 @@ int transfer_selection_compute(
  * @param ptw                   Input: pointer to transfer_workspace structure (allocated in transfer_init() to avoid numerous reallocation)
  * @param ppr                   Input: pointer to precision structure
  * @param ppt                   Input: pointer to perturbation structure
- * @param ptr                   Input/output: pointer to transfers structure (result stored there)
+ * @param ptr                   Input/output: pointer to transfer structure (result stored there)
  * @param index_q               Input: index of wavenumber
  * @param index_md              Input: index of mode
  * @param index_ic              Input: index of initial condition
@@ -2997,8 +2999,8 @@ int transfer_selection_compute(
 int transfer_compute_for_each_l(
                                 struct transfer_workspace * ptw,
                                 struct precision * ppr,
-                                struct perturbs * ppt,
-                                struct transfers * ptr,
+                                struct perturbations * ppt,
+                                struct transfer * ptr,
                                 int index_q,
                                 int index_md,
                                 int index_ic,
@@ -3093,8 +3095,8 @@ int transfer_compute_for_each_l(
 
 int transfer_use_limber(
                         struct precision * ppr,
-                        struct perturbs * ppt,
-                        struct transfers * ptr,
+                        struct perturbations * ppt,
+                        struct transfer * ptr,
                         double q_max_bessel,
                         int index_md,
                         int index_tt,
@@ -3167,7 +3169,7 @@ int transfer_use_limber(
  * bessels structure).
  *
  * @param ppt            Input: pointer to perturbation structure
- * @param ptr            Input: pointer to transfers structure
+ * @param ptr            Input: pointer to transfer structure
  * @param ptw            Input: pointer to transfer_workspace structure (allocated in transfer_init() to avoid numerous reallocation)
  * @param index_q        Input: index of wavenumber
  * @param index_md       Input: index of mode
@@ -3181,8 +3183,8 @@ int transfer_use_limber(
  */
 
 int transfer_integrate(
-                       struct perturbs * ppt,
-                       struct transfers * ptr,
+                       struct perturbations * ppt,
+                       struct transfer * ptr,
                        struct transfer_workspace *ptw,
                        int index_q,
                        int index_md,
@@ -3350,7 +3352,7 @@ int transfer_integrate(
  * tau (the Bessel function being approximated as a Dirac distribution).
  *
  *
- * @param ptr            Input: pointer to transfers structure
+ * @param ptr            Input: pointer to transfer structure
  * @param ptw            Input: pointer to transfer workspace structure
  * @param index_md       Input: index of mode
  * @param index_q        Input: index of wavenumber
@@ -3362,7 +3364,7 @@ int transfer_integrate(
  */
 
 int transfer_limber(
-                    struct transfers * ptr,
+                    struct transfer * ptr,
                     struct transfer_workspace * ptw,
                     int index_md,
                     int index_q,
@@ -3519,7 +3521,7 @@ int transfer_limber(
 }
 
 int transfer_limber_interpolate(
-                                struct transfers * ptr,
+                                struct transfer * ptr,
                                 double * tau0_minus_tau,
                                 double * sources,
                                 int tau_size,
@@ -3593,7 +3595,7 @@ int transfer_limber_interpolate(
  * at a single value of tau
  *
  * @param tau_size        Input: size of conformal time array
- * @param ptr             Input: pointer to transfers structure
+ * @param ptr             Input: pointer to transfer structure
  * @param index_md        Input: index of mode
  * @param index_k         Input: index of wavenumber
  * @param l               Input: multipole
@@ -3607,7 +3609,7 @@ int transfer_limber_interpolate(
 
 int transfer_limber2(
                      int tau_size,
-                     struct transfers * ptr,
+                     struct transfer * ptr,
                      int index_md,
                      int index_k,
                      double l,
@@ -3672,8 +3674,8 @@ int transfer_limber2(
 
 int transfer_can_be_neglected(
                               struct precision * ppr,
-                              struct perturbs * ppt,
-                              struct transfers * ptr,
+                              struct perturbations * ppt,
+                              struct transfer * ptr,
                               int index_md,
                               int index_ic,
                               int index_tt,
@@ -3724,8 +3726,8 @@ int transfer_can_be_neglected(
 
 int transfer_late_source_can_be_neglected(
                                           struct precision * ppr,
-                                          struct perturbs * ppt,
-                                          struct transfers * ptr,
+                                          struct perturbations * ppt,
+                                          struct transfer * ptr,
                                           int index_md,
                                           int index_tt,
                                           double l,
@@ -3776,8 +3778,8 @@ int transfer_late_source_can_be_neglected(
 
 int transfer_radial_function(
                              struct transfer_workspace * ptw,
-                             struct perturbs * ppt,
-                             struct transfers * ptr,
+                             struct perturbations * ppt,
+                             struct transfer * ptr,
                              double k,
                              int index_q,
                              int index_l,
@@ -4051,8 +4053,8 @@ int transfer_radial_function(
 }
 
 int transfer_select_radial_function(
-                                    struct perturbs * ppt,
-                                    struct transfers * ptr,
+                                    struct perturbations * ppt,
+                                    struct transfer * ptr,
                                     int index_md,
                                     int index_tt,
                                     radial_function_type * radial_type
@@ -4149,7 +4151,7 @@ int transfer_select_radial_function(
 /* for reading global selection function (ie the one multiplying the selection function of each bin) */
 
 int transfer_global_selection_read(
-                                   struct transfers * ptr
+                                   struct transfer * ptr
                                    ) {
 
   /* for reading selection function */
@@ -4261,10 +4263,10 @@ int transfer_global_selection_read(
 };
 
 int transfer_workspace_init(
-                            struct transfers * ptr,
+                            struct transfer * ptr,
                             struct precision * ppr,
                             struct transfer_workspace **ptw,
-                            int perturb_tau_size,
+                            int perturbations_tau_size,
                             int tau_size_max,
                             double K,
                             int sgnK,
@@ -4282,7 +4284,7 @@ int transfer_workspace_init(
   (*ptw)->tau0_minus_tau_cut = tau0_minus_tau_cut;
   (*ptw)->neglect_late_source = _FALSE_;
 
-  class_alloc((*ptw)->interpolated_sources,perturb_tau_size*sizeof(double),ptr->error_message);
+  class_alloc((*ptw)->interpolated_sources,perturbations_tau_size*sizeof(double),ptr->error_message);
   class_alloc((*ptw)->sources,tau_size_max*sizeof(double),ptr->error_message);
   class_alloc((*ptw)->tau0_minus_tau,tau_size_max*sizeof(double),ptr->error_message);
   class_alloc((*ptw)->w_trapz,tau_size_max*sizeof(double),ptr->error_message);
@@ -4294,7 +4296,7 @@ int transfer_workspace_init(
 }
 
 int transfer_workspace_free(
-                            struct transfers * ptr,
+                            struct transfer * ptr,
                             struct transfer_workspace *ptw
                             ) {
 
@@ -4318,7 +4320,7 @@ int transfer_workspace_free(
 
 int transfer_update_HIS(
                         struct precision * ppr,
-                        struct transfers * ptr,
+                        struct transfer * ptr,
                         struct transfer_workspace * ptw,
                         int index_q,
                         double tau0
@@ -4588,7 +4590,7 @@ int transfer_get_lmax(int (*get_xmin_generic)(int sgnK,
  * @param ppr                   Input: pointer to precision structure
  * @param pba                   Input: pointer to background structure
  * @param ppt                   Input: pointer to perturbation structure
- * @param ptr                   Input: pointer to transfers structure
+ * @param ptr                   Input: pointer to transfer structure
  * @param tau_rec               Input: recombination time
  * @param tau_size_max          Input: maximum size that tau array can have
  * @param window                Output: pointer to array of selection functions
@@ -4598,8 +4600,8 @@ int transfer_get_lmax(int (*get_xmin_generic)(int sgnK,
 int transfer_precompute_selection(
                      struct precision * ppr,
                      struct background * pba,
-                     struct perturbs * ppt,
-                     struct transfers * ptr,
+                     struct perturbations * ppt,
+                     struct transfer * ptr,
                      double tau_rec,
                      int tau_size_max,
                      double ** window /* Pass a pointer to the pointer, so the pointer can be allocated inside of the function */
@@ -4754,8 +4756,8 @@ int transfer_precompute_selection(
         /* corresponding background quantities */
         class_call(background_at_tau(pba,
                                      tau,
-                                     pba->long_info,
-                                     pba->inter_normal,
+                                     long_info,
+                                     inter_normal,
                                      &last_index,
                                      pvecback),
                    pba->error_message,
@@ -5005,8 +5007,8 @@ int transfer_precompute_selection(
 
                 class_call(background_at_tau(pba,
                                              tau0-tau0_minus_tau_lensing_sources[index_tau_sources],
-                                             pba->long_info,
-                                             pba->inter_normal,
+                                             long_info,
+                                             inter_normal,
                                              &last_index,
                                              pvecback),
                            pba->error_message,
@@ -5060,7 +5062,7 @@ int transfer_precompute_selection(
 
 int transfer_f_evo(
                    struct background* pba,
-                   struct transfers * ptr,
+                   struct transfer * ptr,
                    double* pvecback,
                    int last_index,
                    double cotKgen, /* Should be FILLED with values of corresponding time */
@@ -5077,7 +5079,8 @@ int transfer_f_evo(
     temp_f_evo = 2./pvecback[pba->index_bg_H]/pvecback[pba->index_bg_a]*cotKgen
       + pvecback[pba->index_bg_H_prime]/pvecback[pba->index_bg_H]/pvecback[pba->index_bg_H]/pvecback[pba->index_bg_a];
 
-    z = pba->a_today/pvecback[pba->index_bg_a]-1.;
+    /* z = a_0/a-1 (remember that a in the code is in fact a/a_0) */
+    z = 1./pvecback[pba->index_bg_a]-1.;
 
     if (ptr->has_nz_evo_file ==_TRUE_) {
 

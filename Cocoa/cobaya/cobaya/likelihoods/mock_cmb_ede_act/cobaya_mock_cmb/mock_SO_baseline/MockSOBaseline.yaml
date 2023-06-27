@@ -1,0 +1,17 @@
+# Here, Simons Observatory (SO) is modelled with TT, EE deproj0 noise curves from https://simonsobservatory.org/assets/supplements/20180822_SO_Noise_Public.tgz (baseline sensitivity)
+
+# where to read/write fiducial model:
+
+data_directory: null
+fiducial_file: mock_SO_baseline_fiducial.dat
+
+# noise from file
+
+noise_from_file: True
+noise_file: SO_LAT_Nell_T_E_baseline_fsky0p4_ILC_CMB.txt
+
+# noise file provides data from ell = 10 to 5000
+
+l_min: 10
+l_max: 5000
+f_sky: 0.4

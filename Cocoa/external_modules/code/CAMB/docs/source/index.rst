@@ -1,4 +1,4 @@
-Python CAMB
+CAMB
 =============
 
 CAMB (Code for Anisotropies in the Microwave Background), a cosmology code for calculating CMB, lensing,
@@ -6,7 +6,7 @@ galaxy count, dark-age 21cm power spectra, matter power spectra and transfer fun
 There are also general utility function for cosmological calculations such as the background expansion, distances, etc.
 The main code is Python with numerical calculations implemented efficiently in Python-wrapped modern Fortran.
 
-See the `CAMB python example notebook <https://camb.readthedocs.org/en/latest/CAMBdemo.html>`_ for an
+See the `CAMB python example notebook <https://camb.readthedocs.io/en/latest/CAMBdemo.html>`_ for an
 introductory set of examples of how to use the CAMB package. This is usually the fastest way to learn how to use it
 and quickly see some of the capabilities.
 
@@ -75,6 +75,25 @@ Other modules:
    fortran_compilers
    mathutils
 
-* `Example notebook <https://camb.readthedocs.org/en/latest/CAMBdemo.html>`_
+* `Example notebook <https://camb.readthedocs.io/en/latest/CAMBdemo.html>`_
 * :ref:`genindex`
 
+===================
+
+.. image:: https://cdn.cosmologist.info/antony/Sussex_white.svg
+   :alt: University of Sussex
+   :target: https://www.sussex.ac.uk/astronomy/
+   :height: 170px
+   :width: 170px
+
+.. image:: https://cdn.cosmologist.info/antony/ERC_white.svg
+   :alt: European Research Council
+   :target: https://erc.europa.eu/
+   :height: 170px
+   :width: 170px
+
+.. image:: https://cdn.cosmologist.info/antony/STFC_white.svg
+   :alt: Science and Technology Facilities Council
+   :target: https://stfc.ukri.org/
+   :height: 170px
+   :width: 170px

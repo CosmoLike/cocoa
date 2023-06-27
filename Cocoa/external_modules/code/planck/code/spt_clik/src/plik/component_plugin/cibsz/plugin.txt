@@ -1,0 +1,3 @@
+source : cibsz.c, cibsz_tools.c
+data   : tsz_143_eps0.50.dat, sz_x_cib_template.dat, ksz_fromcamspec.dat, cib_model_100_143_217_353.dat, ratio_cib_model_100_143_217_353.dat, cib_tot_100_353_Jsr-1_GL_2013_10.dat, cib_1h_2h_100_353_Jsr-1_GL_2014_2.dat, cib_1h_2h_100_353_Jsr-1_PS_2014_09.dat, cibsz_1h_2h_100_353_Jsr-1_PS_2014_09.dat, cibsz_1h_2h_100_353_Jsr-1_GL_2014_2.dat, cibsz_PS_dl_sept_14.dat
+python : cibsz.pyx

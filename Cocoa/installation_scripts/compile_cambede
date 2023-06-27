@@ -1,0 +1,72 @@
+if [ -z "${ROOTDIR}" ]; then
+    echo 'ERROR ENV VARIABLE ROOTDIR IS NOT DEFINED' >&2
+    return 1
+fi
+if [ -z "${CXX_COMPILER}" ]; then
+    echo 'ERROR ENV VARIABLE CXX_COMPILER IS NOT DEFINED' >&2
+    return 1
+fi
+if [ -z "${C_COMPILER}" ]; then
+    echo 'ERROR ENV VARIABLE C_COMPILER IS NOT DEFINED' >&2
+    return 1
+fi
+if [ -z "${FORTRAN_COMPILER}" ]; then
+    echo 'ERROR ENV VARIABLE FORTRAN_COMPILER IS NOT DEFINED' >&2
+    return 1
+fi
+if [ -z "${PYTHON3}" ]; then
+    echo 'ERROR ENV VARIABLE PYTHON3 IS NOT DEFINED' >&2
+    return 1
+fi
+if [ -z "${MAKE_NUM_THREADS}" ]; then
+    echo 'ERROR ENV VARIABLE MAKE_NUM_THREADS IS NOT DEFINED' >&2
+    return 1
+fi
+# ----------------------------------------------------------------------------
+# ----------------------------------------------------------------------------
+# ------------------------------- COMPILE CAMB -------------------------------
+# ----------------------------------------------------------------------------
+# ----------------------------------------------------------------------------
+
+if [ -z "${IGNORE_CAMB_COMPILATION}" ]; then
+    echo 'COMPILING CAMB EDE'
+
+    cd $ROOTDIR/external_modules/code/CAMB-EDE/
+
+    rm -rf ./build/
+
+    rm -rf ./camb/__pycache__/
+
+    rm -f ./camb/camblib.so
+
+    rm -rf ./forutils/Releaselib/
+
+    if [ -z "${DEBUG_CAMB_OUTPUT}" ]; then
+      export OUTPUT_CAMB_1="/dev/null"
+      export OUTPUT_CAMB_2="/dev/null"
+    else
+      export OUTPUT_CAMB_1="/dev/tty"
+      export OUTPUT_CAMB_2="/dev/tty"
+    fi
+
+    $PYTHON3 setup.py clean > ${OUTPUT_CAMB_1} 2> ${OUTPUT_CAMB_2}
+    if [ $? -ne 0 ]; then
+      echo "CAMB EDE COULD NOT RUN PYTHON3 SETUP.PY CLEAN"
+      cd $ROOTDIR
+      return 1
+    else
+      echo "CAMB EDE PYTHON3 SETUP.PY CLEAN DONE"
+    fi
+
+    COMPILER=$FORTRAN_COMPILER F90C=$FORTRAN_COMPILER $PYTHON3 setup.py build \
+      > ${OUTPUT_CAMB_1} 2> ${OUTPUT_CAMB_2}
+    if [ $? -ne 0 ]; then
+      echo "CAMB COULD NOT RUN PYTHON3 SETUP.PY BUILD"
+      cd $ROOTDIR
+      return 1
+    else
+      echo "CAMB EDE PYTHON3 SETUP.PY BUILD DONE"
+    fi
+
+    cd $ROOTDIR
+fi

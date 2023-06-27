@@ -5,7 +5,7 @@ It uses the covariant perturbation notation, but includes functions to project i
 Newtonian or synchronous gauge, as well as constructing general gauge invariant quantities.
 It uses "t" as the conformal time variable (=tau in the fortran code).
 
-For a guide to usage and content see the `ScalEqs notebook <http://camb.readthedocs.org/en/latest/ScalEqs.html>`_
+For a guide to usage and content see the `ScalEqs notebook <https://camb.readthedocs.io/en/latest/ScalEqs.html>`_
 
 As well as defining standard quantities, and how they map to CAMB variables, there are also functions for
 converting a symbolic expression to CAMB source code, and compiling custom sources for use with CAMB
@@ -106,7 +106,7 @@ def LinearPerturbation(name, species=None, camb_var=None, camb_sub=None, frame_d
     :param camb_var: relevant CAMB fortran variable
     :param camb_sub:  if not equal to camb_var, and string giving the expression in CAMB variables
     :param frame_dependence: the change in the perturbation when the frame 4-velocity u change
-             from u to u + delta_frame. Should be a sumpy expression involving delta_frame.
+             from u to u + delta_frame. Should be a numpy expression involving delta_frame.
     :param description: string describing variable
     :return: sympy Function instance (function of t), with attributes set to the arguments above.
     """

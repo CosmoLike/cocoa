@@ -1,15 +1,28 @@
 if [ -z "${ROOTDIR}" ]; then
-    echo 'ERROR ROOTDIR not defined'
-    return
+    echo 'ERROR ENV VARIABLE ROOTDIR IS NOT DEFINED' >&2
+    return 1
 fi
 if [ -z "${CXX_COMPILER}" ]; then
-    echo 'ERROR CXX_COMPILER not defined'
-    return
+    echo 'ERROR ENV VARIABLE CXX_COMPILER IS NOT DEFINED' >&2
+    return 1
 fi
 if [ -z "${C_COMPILER}" ]; then
-    echo 'ERROR C_COMPILER not defined'
-    return
+    echo 'ERROR ENV VARIABLE C_COMPILER IS NOT DEFINED' >&2
+    return 1
 fi
+if [ -z "${CMAKE}" ]; then
+    echo 'ERROR ENV VARIABLE MAKE IS NOT DEFINED' >&2
+    return 1
+fi
+if [ -z "${FORTRAN_COMPILER}" ]; then
+    echo 'ERROR ENV VARIABLE C_COMPILER IS NOT DEFINED' >&2
+    return 1
+fi
+if [ -z "${MAKE_NUM_THREADS}" ]; then
+    echo 'ERROR ENV VARIABLE MAKE_NUM_THREADS IS NOT DEFINED' >&2
+    return 1
+fi
+
 # ----------------------------------------------------------------------------
 # ----------------------------------------------------------------------------
 # -------------------------- XZ COMPRESSION Library --------------------------
@@ -17,34 +30,63 @@ fi
 # ----------------------------------------------------------------------------
 
 if [ -z "${IGNORE_XZ_INSTALLATION}" ]; then
-    echo 'INSTALLING XZ LIBRARY - THAT MIGHT TAKE A WHILE'
+  echo 'INSTALLING XZ LIBRARY - THAT MIGHT TAKE A WHILE'
 
-    cd ../cocoa_installation_libraries/
+  cd ../cocoa_installation_libraries/
 
-    #False xz file: just to trigger GIT LFS
-    cp xz-5.2.5.tar.gz.xz xz-5.2.5.tar.gz
+  #False xz file: just to trigger GIT LFS
+  cp xz-5.2.5.tar.gz.xz xz-5.2.5.tar.gz
 
-    tar -xf xz-5.2.5.tar.gz.xz
+  tar -xf xz-5.2.5.tar.gz.xz
 
-    cd ./xz-5.2.5/
+  cd ./xz-5.2.5/
 
-    CC=$C_COMPILER ./configure --prefix=$ROOTDIR/.local > /dev/null
-
-    make -j $MAKE_NUM_THREADS all > /dev/null
-    if [ $? -eq 0 ] 
-    then
-      echo "MAKE XZ OK"
+  if [ -z "${DEBUG_XZ_PACKAGE}" ]; then
+    CC=$C_COMPILER ./configure --prefix=$ROOTDIR/.local > /dev/null 2> /dev/null
+    if [ $? -eq 0 ]; then
+      echo "XZ CONFIGURE RUN DONE"
     else
-      echo "XZ COULD NOT MAKE" >&2
+      echo "XZ COULD NOT RUN CONFIGURE" >&2
+      cd $ROOTDIR
+      return 1
     fi
 
-    make install > /dev/null
-    if [ $? -eq 0 ] 
-    then
-      echo "MAKE INSTALL XZ OK"
+    make -j $MAKE_NUM_THREADS all > /dev/null 2> /dev/null
+    if [ $? -eq 0 ]; then
+      echo "XZ MAKE RUN DONE"
     else
-      echo "XZ COULD NOT MAKE INSTALL" >&2
+      echo "XZ COULD NOT RUN MAKE" >&2
+      cd $ROOTDIR
+      return 1
     fi
 
-    cd ../../Cocoa
+    make install > /dev/null 2> /dev/null
+    if [ $? -eq 0 ]; then
+      echo "XZ MAKE INSTALL RUN DONE"
+    else
+      echo "XZ COULD NOT RUN MAKE INSTALL" >&2
+      cd $ROOTDIR
+      return 1
+    fi
+  else
+    CC=$C_COMPILER ./configure --prefix=$ROOTDIR/.local
+    if [ $? -ne 0 ];then
+      cd $ROOTDIR
+      return 1
+    fi 
+
+    make all
+    if [ $? -ne 0 ];then
+      cd $ROOTDIR
+      return 1
+    fi  
+        
+    make install
+    if [ $? -ne 0 ];then
+      cd $ROOTDIR
+      return 1
+    fi 
+  fi
+
+  cd $ROOTDIR
 fi

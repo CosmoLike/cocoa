@@ -6,7 +6,7 @@
  *
  * The following functions can be called from other modules or from the main:
  *
- * -# output_init() (must be called after spectra_init())
+ * -# output_init() (must be called after harmonic_init())
  * -# output_total_cl_at_l() (can be called even before output_init())
  *
  * No memory needs to be deallocated after that,
@@ -16,7 +16,7 @@
 #include "output.h"
 
 int output_total_cl_at_l(
-                         struct spectra * psp,
+                         struct harmonic * phr,
                          struct lensing * ple,
                          struct output * pop,
                          int l,
@@ -24,7 +24,7 @@ int output_total_cl_at_l(
                          ){
 
   double ** cl_md_ic; /* array with argument
-                         cl_md_ic[index_md][index_ic1_ic2*psp->ct_size+index_ct] */
+                         cl_md_ic[index_md][index_ic1_ic2*phr->ct_size+index_ct] */
 
   double ** cl_md;    /* array with argument
                          cl_md[index_md][index_ct] */
@@ -41,42 +41,42 @@ int output_total_cl_at_l(
   else {
 
     class_alloc(cl_md_ic,
-                psp->md_size*sizeof(double *),
+                phr->md_size*sizeof(double *),
                 pop->error_message);
 
     class_alloc(cl_md,
-                psp->md_size*sizeof(double *),
+                phr->md_size*sizeof(double *),
                 pop->error_message);
 
-    for (index_md = 0; index_md < psp->md_size; index_md++) {
+    for (index_md = 0; index_md < phr->md_size; index_md++) {
 
-      if (psp->md_size > 1)
+      if (phr->md_size > 1)
 
         class_alloc(cl_md[index_md],
-                    psp->ct_size*sizeof(double),
+                    phr->ct_size*sizeof(double),
                     ple->error_message);
 
-      if (psp->ic_size[index_md] > 1)
+      if (phr->ic_size[index_md] > 1)
 
         class_alloc(cl_md_ic[index_md],
-                    psp->ic_ic_size[index_md]*psp->ct_size*sizeof(double),
+                    phr->ic_ic_size[index_md]*phr->ct_size*sizeof(double),
                     ple->error_message);
     }
 
-    class_call(spectra_cl_at_l(psp,
-                               (double)l,
-                               cl,
-                               cl_md,
-                               cl_md_ic),
-               psp->error_message,
+    class_call(harmonic_cl_at_l(phr,
+                                (double)l,
+                                cl,
+                                cl_md,
+                                cl_md_ic),
+               phr->error_message,
                pop->error_message);
 
-    for (index_md = 0; index_md < psp->md_size; index_md++) {
+    for (index_md = 0; index_md < phr->md_size; index_md++) {
 
-      if (psp->md_size > 1)
+      if (phr->md_size > 1)
         free(cl_md[index_md]);
 
-      if (psp->ic_size[index_md] > 1)
+      if (phr->ic_size[index_md] > 1)
         free(cl_md_ic[index_md]);
 
     }
@@ -94,26 +94,28 @@ int output_total_cl_at_l(
  * This routine writes the output in files.
  *
  *
- * @param pba Input: pointer to background structure (needed for calling spectra_pk_at_z())
+ * @param pba Input: pointer to background structure (needed for calling harmonic_pk_at_z())
  * @param pth Input: pointer to thermodynamics structure
  * @param ppt Input: pointer perturbation structure
  * @param ppm Input: pointer to primordial structure
  * @param ptr Input: pointer to transfer structure
- * @param psp Input: pointer to spectra structure
- * @param pnl Input: pointer to nonlinear structure
+ * @param phr Input: pointer to harmonic structure
+ * @param pfo Input: pointer to fourier structure
  * @param ple Input: pointer to lensing structure
+ * @param psd Input: pointer to distortions structure
  * @param pop Input: pointer to output structure
  */
 
 int output_init(
                 struct background * pba,
-                struct thermo * pth,
-                struct perturbs * ppt,
+                struct thermodynamics * pth,
+                struct perturbations * ppt,
                 struct primordial * ppm,
-                struct transfers * ptr,
-                struct spectra * psp,
-                struct nonlinear * pnl,
+                struct transfer * ptr,
+                struct harmonic * phr,
+                struct fourier * pfo,
                 struct lensing * ple,
+                struct distortions * psd,
                 struct output * pop
                 ) {
 
@@ -135,7 +137,7 @@ int output_init(
 
   if (ppt->has_cls == _TRUE_) {
 
-    class_call(output_cl(pba,ppt,psp,ple,pop),
+    class_call(output_cl(pba,ppt,phr,ple,pop),
                pop->error_message,
                pop->error_message);
   }
@@ -144,13 +146,13 @@ int output_init(
 
   if (ppt->has_pk_matter == _TRUE_) {
 
-    class_call(output_pk(pba,ppt,pnl,pop,pk_linear),
+    class_call(output_pk(pba,ppt,pfo,pop,pk_linear),
                pop->error_message,
                pop->error_message);
 
-    if (pnl->method != nl_none) {
+    if (pfo->method != nl_none) {
 
-      class_call(output_pk(pba,ppt,pnl,pop,pk_nonlinear),
+      class_call(output_pk(pba,ppt,pfo,pop,pk_nonlinear),
                  pop->error_message,
                  pop->error_message);
 
@@ -189,7 +191,7 @@ int output_init(
 
   /** - deal with perturbation quantities */
 
-  if (pop->write_perturbations == _TRUE_) {
+  if (pop->write_perturbations == _TRUE_ && ppt->has_perturbations) {
 
     class_call(output_perturbations(pba,ppt,pop),
                pop->error_message,
@@ -199,12 +201,30 @@ int output_init(
 
   /** - deal with primordial spectra */
 
-  if (pop->write_primordial == _TRUE_) {
+  if (pop->write_primordial == _TRUE_ && ppt->has_perturbations) {
 
     class_call(output_primordial(ppt,ppm,pop),
                pop->error_message,
                pop->error_message);
 
+  }
+
+  /** - deal with heating */
+
+  if (pop->write_exotic_injection == _TRUE_ || pop->write_noninjection == _TRUE_) {
+
+    class_call(output_heating(&(pth->in),&(psd->ni),pop),
+               pop->error_message,
+               pop->error_message);
+  }
+
+  /** - deal with spectral distortions */
+
+  if (pop->write_distortions == _TRUE_) {
+
+    class_call(output_distortions(psd,pop),
+               pop->error_message,
+               pop->error_message);
   }
 
   return _SUCCESS_;
@@ -216,15 +236,15 @@ int output_init(
  *
  * @param pba Input: pointer to background structure (needed for \f$ T_{cmb}\f$)
  * @param ppt Input: pointer perturbation structure
- * @param psp Input: pointer to spectra structure
+ * @param phr Input: pointer to harmonic structure
  * @param ple Input: pointer to lensing structure
  * @param pop Input: pointer to output structure
  */
 
 int output_cl(
               struct background * pba,
-              struct perturbs * ppt,
-              struct spectra * psp,
+              struct perturbations * ppt,
+              struct harmonic * phr,
               struct lensing * ple,
               struct output * pop
               ) {
@@ -246,7 +266,7 @@ int output_cl(
   FILE * out_lensed;         /* (will contain total lensed cl's) */
 
   double ** cl_md_ic; /* array with argument
-                         cl_md_ic[index_md][index_ic1_ic2*psp->ct_size+index_ct] */
+                         cl_md_ic[index_md][index_ic1_ic2*phr->ct_size+index_ct] */
 
   double ** cl_md;    /* array with argument
                          cl_md[index_md][index_ct] */
@@ -264,25 +284,25 @@ int output_cl(
   /** - first, allocate all arrays of files and \f$ C_l\f$'s */
 
   class_alloc(out_md_ic,
-              psp->md_size*sizeof(FILE * *),
+              phr->md_size*sizeof(FILE * *),
               pop->error_message);
 
   class_alloc(cl_md_ic,
-              psp->md_size*sizeof(double *),
+              phr->md_size*sizeof(double *),
               pop->error_message);
 
   class_alloc(out_md,
-              psp->md_size*sizeof(FILE *),
+              phr->md_size*sizeof(FILE *),
               pop->error_message);
 
   class_alloc(cl_md,
-              psp->md_size*sizeof(double *),
+              phr->md_size*sizeof(double *),
               pop->error_message);
 
   for (index_md = 0; index_md < ppt->md_size; index_md++) {
 
     class_alloc(out_md_ic[index_md],
-                psp->ic_ic_size[index_md]*sizeof(FILE *),
+                phr->ic_ic_size[index_md]*sizeof(FILE *),
                 pop->error_message);
 
   }
@@ -291,18 +311,18 @@ int output_cl(
 
   sprintf(file_name,"%s%s",pop->root,"cl.dat");
 
-  class_call(output_open_cl_file(psp,
+  class_call(output_open_cl_file(phr,
                                  pop,
                                  &out,
                                  file_name,
                                  "total [l(l+1)/2pi] C_l's",
-                                 psp->l_max_tot
+                                 phr->l_max_tot
                                  ),
              pop->error_message,
              pop->error_message);
 
   class_alloc(cl_tot,
-              psp->ct_size*sizeof(double),
+              phr->ct_size*sizeof(double),
               pop->error_message);
 
 
@@ -310,7 +330,7 @@ int output_cl(
 
     sprintf(file_name,"%s%s",pop->root,"cl_lensed.dat");
 
-    class_call(output_open_cl_file(psp,
+    class_call(output_open_cl_file(phr,
                                    pop,
                                    &out_lensed,
                                    file_name,
@@ -339,18 +359,18 @@ int output_cl(
 
       }
 
-      class_call(output_open_cl_file(psp,
+      class_call(output_open_cl_file(phr,
                                      pop,
                                      &(out_md[index_md]),
                                      file_name,
                                      first_line,
-                                     psp->l_max[index_md]
+                                     phr->l_max[index_md]
                                      ),
                  pop->error_message,
                  pop->error_message);
 
       class_alloc(cl_md[index_md],
-                  psp->ct_size*sizeof(double),
+                  phr->ct_size*sizeof(double),
                   pop->error_message);
 
     }
@@ -481,16 +501,16 @@ int output_cl(
 
           }
 
-          index_ic1_ic2 = index_symmetric_matrix(index_ic1,index_ic2,psp->ic_size[index_md]);
+          index_ic1_ic2 = index_symmetric_matrix(index_ic1,index_ic2,phr->ic_size[index_md]);
 
-          if (psp->is_non_zero[index_md][index_ic1_ic2] == _TRUE_) {
+          if (phr->is_non_zero[index_md][index_ic1_ic2] == _TRUE_) {
 
-            class_call(output_open_cl_file(psp,
+            class_call(output_open_cl_file(phr,
                                            pop,
                                            &(out_md_ic[index_md][index_ic1_ic2]),
                                            file_name,
                                            first_line,
-                                           psp->l_max[index_md]
+                                           phr->l_max[index_md]
                                            ),
                        pop->error_message,
                        pop->error_message);
@@ -500,22 +520,22 @@ int output_cl(
       }
 
       class_alloc(cl_md_ic[index_md],
-                  psp->ic_ic_size[index_md]*psp->ct_size*sizeof(double),
+                  phr->ic_ic_size[index_md]*phr->ct_size*sizeof(double),
                   pop->error_message);
     }
   }
 
   /** - third, perform loop over l. For each multipole, get all \f$ C_l\f$'s
-      by calling spectra_cl_at_l() and distribute the results to
+      by calling harmonic_cl_at_l() and distribute the results to
       relevant files */
 
-  for (l = 2; l <= psp->l_max_tot; l++) {
+  for (l = 2; l <= phr->l_max_tot; l++) {
 
-    class_call(spectra_cl_at_l(psp,(double)l,cl_tot,cl_md,cl_md_ic),
-               psp->error_message,
+    class_call(harmonic_cl_at_l(phr,(double)l,cl_tot,cl_md,cl_md_ic),
+               phr->error_message,
                pop->error_message);
 
-    class_call(output_one_line_of_cl(pba,psp,pop,out,(double)l,cl_tot,psp->ct_size),
+    class_call(output_one_line_of_cl(pba,phr,pop,out,(double)l,cl_tot,phr->ct_size),
                pop->error_message,
                pop->error_message);
 
@@ -527,16 +547,16 @@ int output_cl(
                  ple->error_message,
                  pop->error_message);
 
-      class_call(output_one_line_of_cl(pba,psp,pop,out_lensed,l,cl_tot,psp->ct_size),
+      class_call(output_one_line_of_cl(pba,phr,pop,out_lensed,l,cl_tot,phr->ct_size),
                  pop->error_message,
                  pop->error_message);
     }
 
     if (ppt->md_size > 1) {
       for (index_md = 0; index_md < ppt->md_size; index_md++) {
-        if (l <= psp->l_max[index_md]) {
+        if (l <= phr->l_max[index_md]) {
 
-          class_call(output_one_line_of_cl(pba,psp,pop,out_md[index_md],l,cl_md[index_md],psp->ct_size),
+          class_call(output_one_line_of_cl(pba,phr,pop,out_md[index_md],l,cl_md[index_md],phr->ct_size),
                      pop->error_message,
                      pop->error_message);
         }
@@ -544,11 +564,11 @@ int output_cl(
     }
 
     for (index_md = 0; index_md < ppt->md_size; index_md++) {
-      if ((ppt->ic_size[index_md] > 1) && (l <= psp->l_max[index_md])) {
-        for (index_ic1_ic2 = 0; index_ic1_ic2 < psp->ic_ic_size[index_md]; index_ic1_ic2++) {
-          if (psp->is_non_zero[index_md][index_ic1_ic2] == _TRUE_) {
+      if ((ppt->ic_size[index_md] > 1) && (l <= phr->l_max[index_md])) {
+        for (index_ic1_ic2 = 0; index_ic1_ic2 < phr->ic_ic_size[index_md]; index_ic1_ic2++) {
+          if (phr->is_non_zero[index_md][index_ic1_ic2] == _TRUE_) {
 
-            class_call(output_one_line_of_cl(pba,psp,pop,out_md_ic[index_md][index_ic1_ic2],l,&(cl_md_ic[index_md][index_ic1_ic2*psp->ct_size]),psp->ct_size),
+            class_call(output_one_line_of_cl(pba,phr,pop,out_md_ic[index_md][index_ic1_ic2],l,&(cl_md_ic[index_md][index_ic1_ic2*phr->ct_size]),phr->ct_size),
                        pop->error_message,
                        pop->error_message);
           }
@@ -561,8 +581,8 @@ int output_cl(
 
   for (index_md = 0; index_md < ppt->md_size; index_md++) {
     if (ppt->ic_size[index_md] > 1) {
-      for (index_ic1_ic2 = 0; index_ic1_ic2 < psp->ic_ic_size[index_md]; index_ic1_ic2++) {
-        if (psp->is_non_zero[index_md][index_ic1_ic2] == _TRUE_) {
+      for (index_ic1_ic2 = 0; index_ic1_ic2 < phr->ic_ic_size[index_md]; index_ic1_ic2++) {
+        if (phr->is_non_zero[index_md][index_ic1_ic2] == _TRUE_) {
           fclose(out_md_ic[index_md][index_ic1_ic2]);
         }
       }
@@ -596,17 +616,17 @@ int output_cl(
  * This routines writes the output in files for Fourier matter power spectra P(k)'s
  * (linear or non-linear)
  *
- * @param pba       Input: pointer to background structure (needed for calling spectra_pk_at_z())
+ * @param pba       Input: pointer to background structure (needed for calling harmonic_pk_at_z())
  * @param ppt       Input: pointer perturbation structure
- * @param pnl       Input: pointer to nonlinear structure
+ * @param pfo       Input: pointer to fourier structure
  * @param pop       Input: pointer to output structure
  * @param pk_output Input: pk_linear or pk_nonlinear
  */
 
 int output_pk(
               struct background * pba,
-              struct perturbs * ppt,
-              struct nonlinear * pnl,
+              struct perturbations * ppt,
+              struct fourier * pfo,
               struct output * pop,
               enum pk_outputs pk_output
               ) {
@@ -618,7 +638,7 @@ int output_pk(
   FILE ** out_pk_ic = NULL;  /* out_pk_ic[index_ic1_ic2] is a pointer to a file with P(k) for each pair of ic */
   FILE * out_pk;             /* out_pk[index_pk] is a pointer to a file with total P(k) summed over ic */
 
-  double * ln_pk_ic = NULL;  /* array ln_pk_ic[index_k * pnl->ic_ic_size + index_ic1_ic2] */
+  double * ln_pk_ic = NULL;  /* array ln_pk_ic[index_k * pfo->ic_ic_size + index_ic1_ic2] */
   double * ln_pk;            /* array ln_pk[index_k] */
 
   int index_ic1,index_ic2;
@@ -636,39 +656,39 @@ int output_pk(
 
   /** - preliminary: check whether we need to output the decomposition into contributions from each initial condition */
 
-  if ((pk_output == pk_linear) && (pnl->ic_size > 1))
+  if ((pk_output == pk_linear) && (pfo->ic_size > 1))
     do_ic = _TRUE_;
 
   /** - allocate arrays to store the P(k) */
 
   class_alloc(ln_pk,
-              pnl->k_size*sizeof(double),
+              pfo->k_size*sizeof(double),
               pop->error_message);
 
   if (do_ic == _TRUE_) {
 
     class_alloc(ln_pk_ic,
-                pnl->k_size*pnl->ic_ic_size*sizeof(double),
+                pfo->k_size*pfo->ic_ic_size*sizeof(double),
                 pop->error_message);
 
     /** - allocate pointer to output files */
 
     class_alloc(out_pk_ic,
-                pnl->ic_ic_size*sizeof(FILE *),
+                pfo->ic_ic_size*sizeof(FILE *),
                 pop->error_message);
   }
 
   /** - loop over pk type (_cb, _m) */
 
-  for (index_pk=0; index_pk<pnl->pk_size; index_pk++) {
+  for (index_pk=0; index_pk<pfo->pk_size; index_pk++) {
 
-    if ((pnl->has_pk_m == _TRUE_) && (index_pk == pnl->index_pk_m)) {
+    if ((pfo->has_pk_m == _TRUE_) && (index_pk == pfo->index_pk_m)) {
       if (pk_output == pk_linear)
         sprintf(type_suffix,"pk");
       else
         sprintf(type_suffix,"pk_nl");
     }
-    if ((pnl->has_pk_cb == _TRUE_) && (index_pk == pnl->index_pk_cb)) {
+    if ((pfo->has_pk_cb == _TRUE_) && (index_pk == pfo->index_pk_cb)) {
       if (pk_output == pk_linear)
         sprintf(type_suffix,"pk_cb");
       else
@@ -695,7 +715,7 @@ int output_pk(
       sprintf(file_name,"%s%s%s%s",pop->root,redshift_suffix,type_suffix,".dat");
 
       class_call(output_open_pk_file(pba,
-                                     pnl,
+                                     pfo,
                                      pop,
                                      &out_pk,
                                      file_name,
@@ -707,9 +727,9 @@ int output_pk(
 
       if (do_ic == _TRUE_) {
 
-        for (index_ic1 = 0; index_ic1 < pnl->ic_size; index_ic1++) {
+        for (index_ic1 = 0; index_ic1 < pfo->ic_size; index_ic1++) {
 
-          for (index_ic2 = index_ic1; index_ic2 < pnl->ic_size; index_ic2++) {
+          for (index_ic2 = index_ic1; index_ic2 < pfo->ic_size; index_ic2++) {
 
             if ((ppt->has_ad == _TRUE_) && (index_ic1 == ppt->index_ic_ad) && (index_ic2 == ppt->index_ic_ad)) {
               sprintf(file_name,"%s%s%s%s",pop->root,redshift_suffix,type_suffix,"_ad.dat");
@@ -786,12 +806,12 @@ int output_pk(
               strcpy(first_line,"for cross NIDxNIV mode ");
             }
 
-            index_ic1_ic2 = index_symmetric_matrix(index_ic1,index_ic2,pnl->ic_size);
+            index_ic1_ic2 = index_symmetric_matrix(index_ic1,index_ic2,pfo->ic_size);
 
-            if (pnl->is_non_zero[index_ic1_ic2] == _TRUE_) {
+            if (pfo->is_non_zero[index_ic1_ic2] == _TRUE_) {
 
               class_call(output_open_pk_file(pba,
-                                             pnl,
+                                             pfo,
                                              pop,
                                              &(out_pk_ic[index_ic1_ic2]),
                                              file_name,
@@ -807,24 +827,24 @@ int output_pk(
 
       /** - third, compute P(k) for each k */
 
-      class_call(nonlinear_pk_at_z(pba,
-                                   pnl,
-                                   logarithmic,
-                                   pk_output,
-                                   pop->z_pk[index_z],
-                                   index_pk,
-                                   ln_pk,
-                                   ln_pk_ic
-                                   ),
-                 pnl->error_message,
+      class_call(fourier_pk_at_z(pba,
+                                 pfo,
+                                 logarithmic,
+                                 pk_output,
+                                 pop->z_pk[index_z],
+                                 index_pk,
+                                 ln_pk,
+                                 ln_pk_ic
+                                 ),
+                 pfo->error_message,
                  pop->error_message);
 
       /** - fourth, write in files */
 
-      for (index_k=0; index_k<pnl->k_size; index_k++) {
+      for (index_k=0; index_k<pfo->k_size; index_k++) {
 
         class_call(output_one_line_of_pk(out_pk,
-                                         exp(pnl->ln_k[index_k])/pba->h,
+                                         exp(pfo->ln_k[index_k])/pba->h,
                                          exp(ln_pk[index_k])*pow(pba->h,3)
                                          ),
                    pop->error_message,
@@ -832,13 +852,13 @@ int output_pk(
 
         if (do_ic == _TRUE_) {
 
-          for (index_ic1_ic2 = 0; index_ic1_ic2 < pnl->ic_ic_size; index_ic1_ic2++) {
+          for (index_ic1_ic2 = 0; index_ic1_ic2 < pfo->ic_ic_size; index_ic1_ic2++) {
 
-            if (pnl->is_non_zero[index_ic1_ic2] == _TRUE_) {
+            if (pfo->is_non_zero[index_ic1_ic2] == _TRUE_) {
 
               class_call(output_one_line_of_pk(out_pk_ic[index_ic1_ic2],
-                                               exp(pnl->ln_k[index_k])/pba->h,
-                                               exp(ln_pk_ic[index_k * pnl->ic_ic_size + index_ic1_ic2])*pow(pba->h,3)),
+                                               exp(pfo->ln_k[index_k])/pba->h,
+                                               exp(ln_pk_ic[index_k * pfo->ic_ic_size + index_ic1_ic2])*pow(pba->h,3)),
                          pop->error_message,
                          pop->error_message);
             }
@@ -851,8 +871,8 @@ int output_pk(
       fclose(out_pk);
 
       if (do_ic == _TRUE_) {
-        for (index_ic1_ic2 = 0; index_ic1_ic2 < pnl->ic_ic_size; index_ic1_ic2++) {
-          if (pnl->is_non_zero[index_ic1_ic2] == _TRUE_) {
+        for (index_ic1_ic2 = 0; index_ic1_ic2 < pfo->ic_ic_size; index_ic1_ic2++) {
+          if (pfo->is_non_zero[index_ic1_ic2] == _TRUE_) {
             fclose(out_pk_ic[index_ic1_ic2]);
           }
         }
@@ -875,14 +895,14 @@ int output_pk(
 /**
  * This routines writes the output in files for matter transfer functions \f$ T_i(k)\f$'s.
  *
- * @param pba Input: pointer to background structure (needed for calling spectra_pk_at_z())
+ * @param pba Input: pointer to background structure (needed for calling harmonic_pk_at_z())
  * @param ppt Input: pointer perturbation structure
  * @param pop Input: pointer to output structure
  */
 
 int output_tk(
               struct background * pba,
-              struct perturbs * ppt,
+              struct perturbations * ppt,
               struct output * pop
               ) {
 
@@ -904,7 +924,7 @@ int output_tk(
   FileName file_name;
   char redshift_suffix[7]; // 7 is enough to write "z%d_" as long as there are at most 10'000 bins
   char first_line[_LINE_LENGTH_MAX_];
-  char ic_suffix[4];   // 4 is enough to write "ad", "bi", "cdi", "nid", "niv", ...
+  char ic_suffix[_SUFFIXNAMESIZE_];   // 4 is enough to write "ad", "bi", "cdi", "nid", "niv", ...
 
 
   index_md=ppt->index_md_scalars;
@@ -921,7 +941,7 @@ int output_tk(
   }
 
 
-  class_call(perturb_output_titles(pba,ppt,pop->output_format,titles),
+  class_call(perturbations_output_titles(pba,ppt,pop->output_format,titles),
              pba->error_message,
              pop->error_message);
   number_of_titles = get_number_of_titles(titles);
@@ -946,19 +966,19 @@ int output_tk(
 
     /** - second, open only the relevant files, and write a heading in each of them */
 
-    class_call(perturb_output_data(pba,
-                                      ppt,
-                                      pop->output_format,
-                                      pop->z_pk[index_z],
-                                      number_of_titles,
-                                      data
-                                      ),
+    class_call(perturbations_output_data(pba,
+                                         ppt,
+                                         pop->output_format,
+                                         pop->z_pk[index_z],
+                                         number_of_titles,
+                                         data
+                                         ),
                ppt->error_message,
                pop->error_message);
 
     for (index_ic = 0; index_ic < ppt->ic_size[index_md]; index_ic++) {
 
-      class_call(perturb_output_firstline_and_ic_suffix(ppt, index_ic, first_line, ic_suffix),
+      class_call(perturbations_output_firstline_and_ic_suffix(ppt, index_ic, first_line, ic_suffix),
                  ppt->error_message, pop->error_message);
 
       if ((ppt->has_ad == _TRUE_) && (ppt->ic_size[index_md] == 1) )
@@ -1070,7 +1090,7 @@ int output_background(
 
 int output_thermodynamics(
                           struct background * pba,
-                          struct thermo * pth,
+                          struct thermodynamics * pth,
                           struct output * pop
                           ) {
 
@@ -1136,7 +1156,7 @@ int output_thermodynamics(
 
 int output_perturbations(
                          struct background * pba,
-                         struct perturbs * ppt,
+                         struct perturbations * ppt,
                          struct output * pop
                          ) {
 
@@ -1194,7 +1214,7 @@ int output_perturbations(
 }
 
 int output_primordial(
-                      struct perturbs * ppt,
+                      struct perturbations * ppt,
                       struct primordial * ppm,
                       struct output * pop
                       ) {
@@ -1231,6 +1251,213 @@ int output_primordial(
 
   free(data);
   fclose(out);
+
+  return _SUCCESS_;
+}
+
+int output_heating(struct injection* pin, struct noninjection* pni, struct output * pop) {
+
+  /** Local variables*/
+  FileName file_name_injection;
+  FILE * out_injection;
+  FileName file_name_noninjection;
+  FILE * out_noninjection;
+
+  char titles_injection[_MAXTITLESTRINGLENGTH_]={0};
+
+  double * data_injection;
+  int size_data_injection;
+  int number_of_titles_injection;
+
+  char titles_noninjection[_MAXTITLESTRINGLENGTH_]={0};
+
+  double * data_noninjection;
+  int size_data_noninjection;
+  int number_of_titles_noninjection;
+
+  if(pop->write_exotic_injection == _TRUE_){
+
+    /* File name */
+    sprintf(file_name_injection,"%s%s",pop->root,"exotic_injection.dat");
+
+    /* Titles */
+    class_call(injection_output_titles(pin,titles_injection),
+               pin->error_message,
+               pin->error_message);
+    number_of_titles_injection = get_number_of_titles(titles_injection);
+
+    /* Data array */
+    size_data_injection = number_of_titles_injection*pin->z_size;
+    class_alloc(data_injection,
+                sizeof(double)*size_data_injection,
+                pop->error_message);
+    class_call(injection_output_data(pin,
+                                     number_of_titles_injection,
+                                     data_injection),
+               pin->error_message,
+               pop->error_message);
+
+    /* File IO */
+    class_open(out_injection,
+               file_name_injection,
+               "w",
+               pop->error_message);
+
+    if(pop->write_header == _TRUE_){
+      fprintf(out_injection,"# Table of energy injection and deposition from exotic processes \n");
+      fprintf(out_injection,"# Heat is dE/dt|dep_h\n");
+    }
+
+    output_print_data(out_injection,
+                      titles_injection,
+                      data_injection,
+                      size_data_injection);
+    free(data_injection);
+    fclose(out_injection);
+
+  }
+
+  if(pop->write_noninjection == _TRUE_){
+
+    /* File name */
+    sprintf(file_name_noninjection,"%s%s",pop->root,"photon_noninjection.dat");
+
+    /* Titles */
+    class_call(noninjection_output_titles(pni,titles_noninjection),
+               pni->error_message,
+               pni->error_message);
+    number_of_titles_noninjection = get_number_of_titles(titles_noninjection);
+
+    /* Data array */
+    size_data_noninjection = number_of_titles_noninjection*pin->z_size;
+    class_alloc(data_noninjection,
+                sizeof(double)*size_data_noninjection,
+                pop->error_message);
+    class_call(noninjection_output_data(pni,
+                                        number_of_titles_noninjection,
+                                        data_noninjection),
+               pni->error_message,
+               pop->error_message);
+
+    /* File IO */
+    class_open(out_noninjection,
+               file_name_noninjection,
+               "w",
+               pop->error_message);
+
+    if(pop->write_header == _TRUE_){
+      fprintf(out_noninjection,"# Table of non-injected energy influencing the photon spectral distortions \n");
+    }
+
+    output_print_data(out_noninjection,
+                      titles_noninjection,
+                      data_noninjection,
+                      size_data_noninjection);
+    free(data_noninjection);
+    fclose(out_noninjection);
+
+  }
+
+  return _SUCCESS_;
+}
+
+int output_distortions(
+                       struct distortions * psd,
+                       struct output * pop
+                       ) {
+
+  /** Local variables*/
+  FileName file_name_heat, file_name_distortion;
+  FILE * out_heat, * out_distortion;
+
+  char titles_heat[_MAXTITLESTRINGLENGTH_]={0};
+  char titles_distortion[_MAXTITLESTRINGLENGTH_]={0};
+
+  double * data_heat, * data_distortion;
+  int size_data_heat, size_data_distortion;
+  int number_of_titles_heat, number_of_titles_distortion;
+
+  if(pop->write_distortions==_TRUE_ && psd->has_distortions == _TRUE_){
+
+    /* File name */
+    sprintf(file_name_heat,"%s%s",pop->root,"sd_heating.dat");
+
+    /* Titles */
+    class_call(distortions_output_heat_titles(psd,titles_heat),
+               psd->error_message,
+               pop->error_message);
+    number_of_titles_heat = get_number_of_titles(titles_heat);
+
+    /* Data array */
+    size_data_heat = number_of_titles_heat*psd->z_size;
+    class_alloc(data_heat,
+                sizeof(double)*size_data_heat,
+                pop->error_message);
+    class_call(distortions_output_heat_data(psd,
+                                            number_of_titles_heat,
+                                            data_heat),
+               psd->error_message,
+               pop->error_message);
+
+    /* File IO */
+    class_open(out_heat,
+               file_name_heat,
+               "w",
+               pop->error_message);
+
+    if(pop->write_header == _TRUE_){
+      fprintf(out_heat,"# Heat is d(Q/rho)/dz\n");
+      fprintf(out_heat,"# LHeat is d(Q/rho)/dlnz\n");
+      fprintf(out_heat,"#\n");
+    }
+
+    output_print_data(out_heat,
+                      titles_heat,
+                      data_heat,
+                      size_data_heat);
+    free(data_heat);
+    fclose(out_heat);
+
+    /* File name */
+    sprintf(file_name_distortion,"%s%s",pop->root,"sd_distortions.dat");
+
+    /* Titles */
+    class_call(distortions_output_sd_titles(psd,titles_distortion),
+               psd->error_message,
+               pop->error_message);
+    number_of_titles_distortion = get_number_of_titles(titles_distortion);
+
+    /* Data array */
+    size_data_distortion = number_of_titles_distortion*psd->x_size;
+    class_alloc(data_distortion,
+                sizeof(double)*size_data_distortion,
+                pop->error_message);
+    class_call(distortions_output_sd_data(psd,
+                                          number_of_titles_distortion,
+                                          data_distortion),
+               psd->error_message,
+               pop->error_message);
+
+    /* File IO */
+    class_open(out_distortion,
+               file_name_distortion,
+               "w",
+               pop->error_message);
+
+    if(pop->write_header == _TRUE_){
+      fprintf(out_distortion,"# SD_tot is the amplitude of the overall spectral distortion (SD)\n");
+      fprintf(out_distortion,"# The SD[i] are the amplitudes of the individual SDs\n");
+      fprintf(out_distortion,"# The SDs are given in units [10^-26 W m^-2 Hz^-1 sr^-1] \n");
+      fprintf(out_distortion,"#\n");
+    }
+
+    output_print_data(out_distortion,
+                      titles_distortion,
+                      data_distortion,
+                      size_data_distortion);
+    free(data_distortion);
+    fclose(out_distortion);
+  }
 
   return _SUCCESS_;
 }
@@ -1277,7 +1504,7 @@ int output_print_data(FILE *out,
  * This routine opens one file where some \f$ C_l\f$'s will be written, and writes
  * a heading with some general information concerning its content.
  *
- * @param psp        Input: pointer to spectra structure
+ * @param phr        Input: pointer to harmonic structure
  * @param pop        Input: pointer to output structure
  * @param clfile     Output: returned pointer to file pointer
  * @param filename   Input: name of the file
@@ -1287,7 +1514,7 @@ int output_print_data(FILE *out,
  */
 
 int output_open_cl_file(
-                        struct spectra * psp,
+                        struct harmonic * phr,
                         struct output * pop,
                         FILE * * clfile,
                         FileName filename,
@@ -1322,7 +1549,7 @@ int output_open_cl_file(
 
     fprintf(*clfile,"# -> if you don't want to see such a header, set 'headers' to 'no' in input file\n");
 
-    if (psp->has_pp == _TRUE_) {
+    if (phr->has_pp == _TRUE_) {
       if (pop->output_format == class_format) {
         fprintf(*clfile,"# -> for CMB lensing (phi), these are C_l^phi-phi for the lensing potential.\n");
       }
@@ -1331,11 +1558,11 @@ int output_open_cl_file(
       }
     }
 
-    if (psp->has_ll == _TRUE_) {
+    if (phr->has_ll == _TRUE_) {
       fprintf(*clfile,"# -> for galaxy lensing (lens[i]), these are C_l^phi-phi for the lensing potential.\n");
     }
 
-    if (psp->has_pp == _TRUE_ || psp->has_ll == _TRUE_) {
+    if (phr->has_pp == _TRUE_ || phr->has_ll == _TRUE_) {
       fprintf(*clfile,"#    Remember the conversion factors:\n");
       fprintf(*clfile,"#    C_l^dd (deflection) = l(l+1) C_l^phi-phi\n");
       fprintf(*clfile,"#    C_l^gg (shear/convergence) = 1/4 (l(l+1))^2 C_l^phi-phi\n");
@@ -1352,63 +1579,63 @@ int output_open_cl_file(
       colnum++;
     }
     if (pop->output_format == class_format) {
-      class_fprintf_columntitle(*clfile,"TT",psp->has_tt,colnum);
-      class_fprintf_columntitle(*clfile,"EE",psp->has_ee,colnum);
-      class_fprintf_columntitle(*clfile,"TE",psp->has_te,colnum);
-      class_fprintf_columntitle(*clfile,"BB",psp->has_bb,colnum);
-      class_fprintf_columntitle(*clfile,"phiphi",psp->has_pp,colnum);
-      class_fprintf_columntitle(*clfile,"TPhi",psp->has_tp,colnum);
-      class_fprintf_columntitle(*clfile,"Ephi",psp->has_ep,colnum);
+      class_fprintf_columntitle(*clfile,"TT",phr->has_tt,colnum);
+      class_fprintf_columntitle(*clfile,"EE",phr->has_ee,colnum);
+      class_fprintf_columntitle(*clfile,"TE",phr->has_te,colnum);
+      class_fprintf_columntitle(*clfile,"BB",phr->has_bb,colnum);
+      class_fprintf_columntitle(*clfile,"phiphi",phr->has_pp,colnum);
+      class_fprintf_columntitle(*clfile,"TPhi",phr->has_tp,colnum);
+      class_fprintf_columntitle(*clfile,"Ephi",phr->has_ep,colnum);
     }
     else if (pop->output_format == camb_format) {
-      class_fprintf_columntitle(*clfile,"TT",psp->has_tt,colnum);
-      class_fprintf_columntitle(*clfile,"EE",psp->has_ee,colnum);
-      class_fprintf_columntitle(*clfile,"BB",psp->has_bb,colnum);
-      class_fprintf_columntitle(*clfile,"TE",psp->has_te,colnum);
-      class_fprintf_columntitle(*clfile,"dd",psp->has_pp,colnum);
-      class_fprintf_columntitle(*clfile,"dT",psp->has_tp,colnum);
-      class_fprintf_columntitle(*clfile,"dE",psp->has_ep,colnum);
+      class_fprintf_columntitle(*clfile,"TT",phr->has_tt,colnum);
+      class_fprintf_columntitle(*clfile,"EE",phr->has_ee,colnum);
+      class_fprintf_columntitle(*clfile,"BB",phr->has_bb,colnum);
+      class_fprintf_columntitle(*clfile,"TE",phr->has_te,colnum);
+      class_fprintf_columntitle(*clfile,"dd",phr->has_pp,colnum);
+      class_fprintf_columntitle(*clfile,"dT",phr->has_tp,colnum);
+      class_fprintf_columntitle(*clfile,"dE",phr->has_ep,colnum);
     }
 
     /** - Next deal with entries that are independent of format type */
 
-    if (psp->has_dd == _TRUE_){
-      for (index_d1=0; index_d1<psp->d_size; index_d1++){
-        for (index_d2=index_d1; index_d2<=MIN(index_d1+psp->non_diag,psp->d_size-1); index_d2++){
+    if (phr->has_dd == _TRUE_){
+      for (index_d1=0; index_d1<phr->d_size; index_d1++){
+        for (index_d2=index_d1; index_d2<=MIN(index_d1+phr->non_diag,phr->d_size-1); index_d2++){
           sprintf(tmp,"dens[%d]-dens[%d]",index_d1+1,index_d2+1);
           class_fprintf_columntitle(*clfile,tmp,_TRUE_,colnum);
         }
       }
     }
-    if (psp->has_td == _TRUE_){
-      for (index_d1=0; index_d1<psp->d_size; index_d1++){
+    if (phr->has_td == _TRUE_){
+      for (index_d1=0; index_d1<phr->d_size; index_d1++){
         sprintf(tmp,"T-dens[%d]",index_d1+1);
         class_fprintf_columntitle(*clfile,tmp,_TRUE_,colnum);
       }
     }
-    if (psp->has_pd == _TRUE_){
-      for (index_d1=0; index_d1<psp->d_size; index_d1++){
+    if (phr->has_pd == _TRUE_){
+      for (index_d1=0; index_d1<phr->d_size; index_d1++){
         sprintf(tmp,"phi-dens[%d]",index_d1+1);
         class_fprintf_columntitle(*clfile,tmp,_TRUE_,colnum);
       }
     }
-    if (psp->has_ll == _TRUE_){
-      for (index_d1=0; index_d1<psp->d_size; index_d1++){
-        for (index_d2=index_d1; index_d2<=MIN(index_d1+psp->non_diag,psp->d_size-1); index_d2++){
+    if (phr->has_ll == _TRUE_){
+      for (index_d1=0; index_d1<phr->d_size; index_d1++){
+        for (index_d2=index_d1; index_d2<=MIN(index_d1+phr->non_diag,phr->d_size-1); index_d2++){
           sprintf(tmp,"lens[%d]-lens[%d]",index_d1+1,index_d2+1);
           class_fprintf_columntitle(*clfile,tmp,_TRUE_,colnum);
         }
       }
     }
-    if (psp->has_tl == _TRUE_){
-      for (index_d1=0; index_d1<psp->d_size; index_d1++){
+    if (phr->has_tl == _TRUE_){
+      for (index_d1=0; index_d1<phr->d_size; index_d1++){
         sprintf(tmp,"T-lens[%d]",index_d1+1);
         class_fprintf_columntitle(*clfile,tmp,_TRUE_,colnum);
       }
     }
-    if (psp->has_dl == _TRUE_){
-      for (index_d1=0; index_d1<psp->d_size; index_d1++){
-        for (index_d2=MAX(index_d1-psp->non_diag,0); index_d2<=MIN(index_d1+psp->non_diag,psp->d_size-1); index_d2++) {
+    if (phr->has_dl == _TRUE_){
+      for (index_d1=0; index_d1<phr->d_size; index_d1++){
+        for (index_d2=MAX(index_d1-phr->non_diag,0); index_d2<=MIN(index_d1+phr->non_diag,phr->d_size-1); index_d2++) {
           sprintf(tmp,"dens[%d]-lens[%d]",index_d1+1,index_d2+1);
           class_fprintf_columntitle(*clfile,tmp,_TRUE_,colnum);
         }
@@ -1425,7 +1652,7 @@ int output_open_cl_file(
  * This routine write one line with l and all \f$ C_l\f$'s for all types (TT, TE...)
  *
  * @param pba        Input: pointer to background structure (needed for \f$ T_{cmb}\f$)
- * @param psp        Input: pointer to spectra structure
+ * @param phr        Input: pointer to harmonic structure
  * @param pop        Input: pointer to output structure
  * @param clfile  Input: file pointer
  * @param l       Input: multipole
@@ -1436,7 +1663,7 @@ int output_open_cl_file(
 
 int output_one_line_of_cl(
                           struct background * pba,
-                          struct spectra * psp,
+                          struct harmonic * phr,
                           struct output * pop,
                           FILE * clfile,
                           double l,
@@ -1466,27 +1693,27 @@ int output_one_line_of_cl(
   }
 
   if (pop->output_format == camb_format) {
-    class_fprintf_double(clfile, factor*pow(pba->T_cmb*1.e6,2)*cl[psp->index_ct_tt], psp->has_tt);
-    class_fprintf_double(clfile, factor*pow(pba->T_cmb*1.e6,2)*cl[psp->index_ct_ee], psp->has_ee);
-    class_fprintf_double(clfile, factor*pow(pba->T_cmb*1.e6,2)*cl[psp->index_ct_bb], psp->has_bb);
-    class_fprintf_double(clfile, factor*pow(pba->T_cmb*1.e6,2)*cl[psp->index_ct_te], psp->has_te);
-    class_fprintf_double(clfile, l*(l+1)*factor*cl[psp->index_ct_pp], psp->has_pp);
-    class_fprintf_double(clfile, sqrt(l*(l+1))*factor*pba->T_cmb*1.e6*cl[psp->index_ct_tp], psp->has_tp);
-    class_fprintf_double(clfile, sqrt(l*(l+1))*factor*pba->T_cmb*1.e6*cl[psp->index_ct_ep], psp->has_ep);
+    class_fprintf_double(clfile, factor*pow(pba->T_cmb*1.e6,2)*cl[phr->index_ct_tt], phr->has_tt);
+    class_fprintf_double(clfile, factor*pow(pba->T_cmb*1.e6,2)*cl[phr->index_ct_ee], phr->has_ee);
+    class_fprintf_double(clfile, factor*pow(pba->T_cmb*1.e6,2)*cl[phr->index_ct_bb], phr->has_bb);
+    class_fprintf_double(clfile, factor*pow(pba->T_cmb*1.e6,2)*cl[phr->index_ct_te], phr->has_te);
+    class_fprintf_double(clfile, l*(l+1)*factor*cl[phr->index_ct_pp], phr->has_pp);
+    class_fprintf_double(clfile, sqrt(l*(l+1))*factor*pba->T_cmb*1.e6*cl[phr->index_ct_tp], phr->has_tp);
+    class_fprintf_double(clfile, sqrt(l*(l+1))*factor*pba->T_cmb*1.e6*cl[phr->index_ct_ep], phr->has_ep);
     index_ct_rest = 0;
-    if (psp->has_tt == _TRUE_)
+    if (phr->has_tt == _TRUE_)
       index_ct_rest++;
-    if (psp->has_ee == _TRUE_)
+    if (phr->has_ee == _TRUE_)
       index_ct_rest++;
-    if (psp->has_bb == _TRUE_)
+    if (phr->has_bb == _TRUE_)
       index_ct_rest++;
-    if (psp->has_te == _TRUE_)
+    if (phr->has_te == _TRUE_)
       index_ct_rest++;
-    if (psp->has_pp == _TRUE_)
+    if (phr->has_pp == _TRUE_)
       index_ct_rest++;
-    if (psp->has_tp == _TRUE_)
+    if (phr->has_tp == _TRUE_)
       index_ct_rest++;
-    if (psp->has_ep == _TRUE_)
+    if (phr->has_ep == _TRUE_)
       index_ct_rest++;
     /* Now print the remaining (if any) entries:*/
     for (index_ct=index_ct_rest; index_ct < ct_size; index_ct++) {
@@ -1505,7 +1732,7 @@ int output_one_line_of_cl(
  * a heading with some general information concerning its content.
  *
  * @param pba        Input: pointer to background structure (needed for h)
- * @param pnl        Input: pointer to nonlinear structure
+ * @param pfo        Input: pointer to fourier structure
  * @param pop        Input: pointer to output structure
  * @param pkfile     Output: returned pointer to file pointer
  * @param filename   Input: name of the file
@@ -1516,7 +1743,7 @@ int output_one_line_of_cl(
 
 int output_open_pk_file(
                         struct background * pba,
-                        struct nonlinear * pnl,
+                        struct fourier * pfo,
                         struct output * pop,
                         FILE * * pkfile,
                         FileName filename,
@@ -1530,9 +1757,9 @@ int output_open_pk_file(
   if (pop->write_header == _TRUE_) {
     fprintf(*pkfile,"# Matter power spectrum P(k) %sat redshift z=%g\n",first_line,z);
     fprintf(*pkfile,"# for k=%g to %g h/Mpc,\n",
-            exp(pnl->ln_k[0])/pba->h,
-            exp(pnl->ln_k[pnl->k_size-1])/pba->h);
-    fprintf(*pkfile,"# number of wavenumbers equal to %d\n",pnl->k_size);
+            exp(pfo->ln_k[0])/pba->h,
+            exp(pfo->ln_k[pfo->k_size-1])/pba->h);
+    fprintf(*pkfile,"# number of wavenumbers equal to %d\n",pfo->k_size);
 
     fprintf(*pkfile,"#");
     class_fprintf_columntitle(*pkfile,"k (h/Mpc)",_TRUE_,colnum);

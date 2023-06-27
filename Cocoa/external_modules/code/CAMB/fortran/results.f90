@@ -238,12 +238,15 @@
 
     contains
     procedure :: DeltaTime => CAMBdata_DeltaTime
+    procedure :: DeltaTimeArr => CAMBdata_DeltaTimeArr
     procedure :: TimeOfz => CAMBdata_TimeOfz
     procedure :: TimeOfzArr => CAMBdata_TimeOfzArr
     procedure :: DeltaPhysicalTimeGyr => CAMBdata_DeltaPhysicalTimeGyr
+    procedure :: DeltaPhysicalTimeGyrArr => CAMBdata_DeltaPhysicalTimeGyrArr
     procedure :: AngularDiameterDistance => CAMBdata_AngularDiameterDistance
     procedure :: AngularDiameterDistanceArr => CAMBdata_AngularDiameterDistanceArr
     procedure :: AngularDiameterDistance2 => CAMBdata_AngularDiameterDistance2
+    procedure :: AngularDiameterDistance2Arr => CAMBdata_AngularDiameterDistance2Arr
     procedure :: LuminosityDistance => CAMBdata_LuminosityDistance
     procedure :: ComovingRadialDistance => CAMBdata_ComovingRadialDistance
     procedure :: ComovingRadialDistanceArr => CAMBdata_ComovingRadialDistanceArr
@@ -370,7 +373,7 @@
             if (sum(this%CP%Nu_mass_numbers(1:this%CP%Nu_mass_eigenstates))/=0) &
                 call GlobalError('Num_Nu_Massive is not sum of Nu_mass_numbers', error_unsupported_params)
         end if
-        if (this%CP%Omnuh2 < 1.e-7_dl) this%CP%Omnuh2 = 0
+10      if (this%CP%Omnuh2 < 1.e-7_dl) this%CP%Omnuh2 = 0
         if (this%CP%Omnuh2==0 .and. this%CP%Num_Nu_Massive /=0) then
             if (this%CP%share_delta_neff) then
                 this%CP%Num_Nu_Massless = this%CP%Num_Nu_Massless + this%CP%Num_Nu_Massive
@@ -476,12 +479,19 @@
                 this%nu_masses(nu_i)= ThermalNuBackground%find_nu_mass_for_rho(this%CP%omnuh2/h2*this%CP%Nu_mass_fractions(nu_i)&
                     *this%grhocrit/this%grhormass(nu_i))
             end do
+            if (all(this%nu_masses(1:this%CP%Nu_mass_eigenstates)==0)) then
+                !All density accounted for by massless, so just use massless
+                this%CP%Omnuh2 = 0
+                goto 10
+            end if
+            !Just prevent divide by zero
+            this%nu_masses(1:this%CP%Nu_mass_eigenstates) = max(this%nu_masses(1:this%CP%Nu_mass_eigenstates),1e-3_dl)
         else
             this%nu_masses = 0
         end if
         call this%CP%DarkEnergy%Init(this)
+        if (global_error_flag==0) this%tau0=this%TimeOfz(0._dl)
         if (global_error_flag==0) then
-            this%tau0=this%TimeOfz(0._dl)
             this%chi0=this%rofChi(this%tau0/this%curvature_radius)
             this%scale= this%chi0*this%curvature_radius/this%tau0  !e.g. change l sampling depending on approx peak spacing
             if (this%closed .and. this%tau0/this%curvature_radius >3.14) then
@@ -596,6 +606,21 @@
 
     end function CAMBdata_DeltaTime
 
+    subroutine CAMBdata_DeltaTimeArr(this, arr,  a1, a2, n, tol)
+    class(CAMBdata) :: this
+    integer, intent(in) :: n
+    real(dl), intent(out) :: arr(n)
+    real(dl), intent(in) :: a1(n), a2(n)
+    real(dl), intent(in), optional :: tol
+    integer i
+
+    !$OMP PARALLEL DO DEFAULT(SHARED),SCHEDULE(STATIC)
+    do i = 1, n
+        arr(i) = this%DeltaTime(a1(i), a2(i), tol)
+    end do
+
+    end subroutine CAMBdata_DeltaTimeArr
+
     function CAMBdata_TimeOfz(this, z, tol)
     class(CAMBdata) :: this
     real(dl) CAMBdata_TimeOfz
@@ -646,6 +671,22 @@
     CAMBdata_DeltaPhysicalTimeGyr = Integrate_Romberg(this, dtda,a1,a2,atol)*Mpc/c/Gyr
     end function CAMBdata_DeltaPhysicalTimeGyr
 
+    subroutine CAMBdata_DeltaPhysicalTimeGyrArr(this, arr,  a1, a2, n, tol)
+    class(CAMBdata) :: this
+    integer, intent(in) :: n
+    real(dl), intent(out) :: arr(n)
+    real(dl), intent(in) :: a1(n), a2(n)
+    real(dl), intent(in), optional :: tol
+    integer i
+
+    !$OMP PARALLEL DO DEFAULT(SHARED),SCHEDULE(STATIC)
+    do i = 1, n
+        arr(i) = this%DeltaPhysicalTimeGyr(a1(i), a2(i), tol)
+    end do
+
+    end subroutine CAMBdata_DeltaPhysicalTimeGyrArr
+
+
     function CAMBdata_AngularDiameterDistance(this,z)
     class(CAMBdata) :: this
     !This is the physical (non-comoving) angular diameter distance in Mpc
@@ -678,17 +719,37 @@
     end subroutine CAMBdata_AngularDiameterDistanceArr
 
 
-    function CAMBdata_AngularDiameterDistance2(this,z1, z2) ! z1 < z2
+    function CAMBdata_AngularDiameterDistance2(this,z1, z2)
+    ! z1 < z2, otherwise returns zero
     !From http://www.slac.stanford.edu/~amantz/work/fgas14/#cosmomc
     class(CAMBdata) :: this
     real(dl) CAMBdata_AngularDiameterDistance2
     real(dl), intent(in) :: z1, z2
 
-    CAMBdata_AngularDiameterDistance2 = this%curvature_radius/(1+z2)* &
-        this%rofchi(this%ComovingRadialDistance(z2)/this%curvature_radius &
-        - this%ComovingRadialDistance(z1)/this%curvature_radius)
+    if (z2 < z1 + 1e-4) then
+        CAMBdata_AngularDiameterDistance2=0
+    else
+        CAMBdata_AngularDiameterDistance2 = this%curvature_radius/(1+z2)* &
+            this%rofchi( this%DeltaTime(1/(1+z2),1/(1+z1))/this%curvature_radius)
+    end if
 
     end function CAMBdata_AngularDiameterDistance2
+
+    subroutine CAMBdata_AngularDiameterDistance2Arr(this, arr, z1, z2, n)
+    class(CAMBdata) :: this
+    real(dl), intent(out) :: arr(n)
+    real(dl), intent(in) :: z1(n), z2(n)
+    integer, intent(in) :: n
+    integer i
+
+    !$OMP PARALLEL DO DEFAULT(SHARED),SCHEDULE(STATIC)
+    do i = 1, n
+        arr(i) = this%AngularDiameterDistance2(z1(i),z2(i))
+    end do
+    !$OMP END PARALLEL DO
+
+    end subroutine CAMBdata_AngularDiameterDistance2Arr
+
 
     function CAMBdata_LuminosityDistance(this,z)
     class(CAMBdata) :: this
@@ -1167,7 +1228,7 @@
     end if
 
     end function grho_no_de
-    
+
     function GetReionizationOptDepth(this)
     class(CAMBdata) :: this
     real(dl) GetReionizationOptDepth

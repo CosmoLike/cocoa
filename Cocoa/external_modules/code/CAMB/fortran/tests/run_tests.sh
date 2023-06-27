@@ -2,15 +2,19 @@ set -e
 
 gfortran --version
 python --version
-python setup.py install
+pip install -e .
 python -c "import camb; print(camb.__version__)"
 python -m unittest camb.tests.camb_test
+rm -Rf HMcode_test_outputs
+git clone https://github.com/alexander-mead/HMcode_test_outputs.git
+python -m unittest camb.tests.hmcode_test
+rm -Rf HMcode_test_outputs
 pip uninstall -y camb
 rm -Rf dist/*
 rm -Rf build/*
 rm -f camb/*.so
 
-if [[ $TRAVIS_REPO_SLUG == "cmbant/CAMB" && $CHANNEL == "defaults" && "$TRAVIS_PULL_REQUEST" == "false" ]]
+if [[ $TRAVIS_REPO_SLUG == "cmbant/CAMB" && $PYPI_DIST == "true" && "$TRAVIS_PULL_REQUEST" == "false" ]]
 then
  case "$TRAVIS_BRANCH" in
  devel*) export CAMB_PACKAGE_NAME=camb_devel ;;
@@ -18,7 +22,7 @@ then
  esac
  python setup.py sdist
  pip install twine
- twine upload -r pypitest --repository-url https://test.pypi.org/legacy/ dist/*
+ twine upload -r pypitest --repository-url https://test.pypi.org/legacy/ dist/* || true
 #too much delay on test.pypi to reliably immediately test install
 # mkdir -p test_dir
 # pushd test_dir
@@ -43,7 +47,7 @@ pushd fortran
 make clean
 make
 
-mkdir testfiles
+mkdir -p testfiles
 python tests/CAMB_test_files.py testfiles --make_ini
 
 pushd testfiles

@@ -1,19 +1,28 @@
 if [ -z "${ROOTDIR}" ]; then
-    echo 'ERROR ROOTDIR not defined'
+    echo 'ERROR ENV VARIABLE ROOTDIR IS NOT DEFINED' >&2
     return 1
 fi
 if [ -z "${CXX_COMPILER}" ]; then
-    echo 'ERROR CXX_COMPILER not defined'
+    echo 'ERROR ENV VARIABLE CXX_COMPILER IS NOT DEFINED' >&2
     return 1
 fi
 if [ -z "${C_COMPILER}" ]; then
-    echo 'ERROR C_COMPILER not defined'
+    echo 'ERROR ENV VARIABLE C_COMPILER IS NOT DEFINED' >&2
+    return 1
+fi
+if [ -z "${CMAKE}" ]; then
+    echo 'ERROR ENV VARIABLE MAKE IS NOT DEFINED' >&2
+    return 1
+fi
+if [ -z "${FORTRAN_COMPILER}" ]; then
+    echo 'ERROR ENV VARIABLE FORTRAN_COMPILER IS NOT DEFINED' >&2
     return 1
 fi
 if [ -z "${MAKE_NUM_THREADS}" ]; then
-    echo 'ERROR MAKE_NUM_THREADS not defined'
+    echo 'ERROR ENV VARIABLE MAKE_NUM_THREADS IS NOT DEFINED' >&2
     return 1
 fi
+
 # ----------------------------------------------------------------------------
 # ----------------------------------------------------------------------------
 # ----------------------------- OPENBLAS LIBRARY  ----------------------------
@@ -21,30 +30,44 @@ fi
 # ----------------------------------------------------------------------------
 
 if [ -z "${IGNORE_OPENBLAS_INSTALLATION}" ]; then
-    echo 'INSTALLING OPENBLAS - THAT WILL TAKE A WHILE'
+  echo 'INSTALLING OPENBLAS - THAT WILL TAKE A WHILE'
 
-    cd $ROOTDIR/../cocoa_installation_libraries/OpenBLAS
+  cd $ROOTDIR/../cocoa_installation_libraries/OpenBLAS
 
-    export MAKE_NB_JOBS=$MAKE_NUM_THREADS
-    
+  export MAKE_NB_JOBS=$MAKE_NUM_THREADS
+  make clean > /dev/null 2> /dev/null
+
+  if [ -z "${DEBUG_OPENBLAS_PACKAGE}" ]; then
     make CC=$C_COMPILER FC=$FORTRAN_COMPILER USE_OPENMP=1 > /dev/null 2> /dev/null
-    if [ $? -eq 0 ] 
-    then
-      echo "MAKE OPENBLAS OK"
+    if [ $? -eq 0 ]; then
+      echo "OPENBLAS MAKE RUN DONE"
     else
-      echo "OPENBLAS COULD NOT MAKE" >&2
+      echo "OPENBLAS COULD NOT RUN MAKE" >&2
       return 1
     fi
 
     make install PREFIX=$ROOTDIR/.local > /dev/null 2> /dev/null
-    if [ $? -eq 0 ] 
-    then
-      echo "MAKE INSTALL OPENBLAS OK"
+    if [ $? -eq 0 ]; then
+      echo "OPENBLAS MAKE INSTALL RUN DONE"
     else
-      echo "OPENBLAS COULD NOT MAKE INSTALL" >&2
+      echo "OPENBLAS COULD NOT RUN MAKE INSTALL" >&2
       return 1
     fi
-    unset MAKE_NB_JOBS
+  else
+    make CC=$C_COMPILER FC=$FORTRAN_COMPILER USE_OPENMP=1
+    if [ $? -ne 0 ];then
+      cd $ROOTDIR
+      return 1
+    fi 
+    
+    make install PREFIX=$ROOTDIR/.local
+    if [ $? -ne 0 ];then
+      cd $ROOTDIR
+      return 1
+    fi 
+  fi
 
-    cd $ROOTDIR/
+  unset MAKE_NB_JOBS
+
+  cd $ROOTDIR/
 fi

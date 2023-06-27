@@ -1,0 +1,198 @@
+stop_at_error: False
+timing: False
+debug: true
+
+likelihood:
+  pyactlike.ACTPol_lite_DR4:
+    components:
+      - tt
+      - te
+      - ee
+    lmax: 4000
+    
+params:
+  yp2:
+    prior:
+      min: 0.9
+      max: 1.1
+  logA:
+    prior:
+      min: 1.61
+      max: 3.91
+    ref:
+      dist: norm
+      loc: 3.05
+      scale: 0.001
+    proposal: 0.001
+    latex: \log(10^{10} A_\mathrm{s})
+    drop: true
+  As:
+    value: 'lambda logA: 1e-10*np.exp(logA)'
+    latex: A_\mathrm{s}
+  ns:
+    prior:
+      min: 0.8
+      max: 1.2
+    ref:
+      dist: norm
+      loc: 0.965
+      scale: 0.004
+    proposal: 0.002
+    latex: n_\mathrm{s}
+  theta_MC_100:
+    prior:
+      min: 0.5
+      max: 10
+    ref:
+      dist: norm
+      loc: 1.04109
+      scale: 0.0004
+    proposal: 0.0002
+    latex: 100\theta_\mathrm{MC}
+    drop: true
+    renames: theta
+  cosmomc_theta:
+    value: 'lambda theta_MC_100: 1.e-2*theta_MC_100'
+    derived: false
+  H0:
+    latex: H_0
+    min: 20
+    max: 100
+  omegabh2:
+    prior:
+      min: 0.005
+      max: 0.1
+    ref:
+      dist: norm
+      loc: 0.0224
+      scale: 0.0001
+    proposal: 0.0001
+    latex: \Omega_\mathrm{b} h^2
+  omegach2:
+    prior:
+      min: 0.001
+      max: 0.99
+    ref:
+      dist: norm
+      loc: 0.12
+      scale: 0.001
+    proposal: 0.0005
+    latex: \Omega_\mathrm{c} h^2
+  mnu:
+    value: 0.06
+  tau:
+    prior:
+      dist: norm
+      loc: 0.0544
+      scale: 0.0073
+    ref:
+      dist: norm
+      loc: 0.055
+      scale: 0.006
+    proposal: 0.003
+    latex: \tau_\mathrm{reio}
+  omegal:
+    latex: \Omega_\Lambda
+  omegam:
+    latex: \Omega_\mathrm{m}
+  omegamh2:
+    derived: 'lambda omegam, H0: omegam*(H0/100)**2'
+    latex: \Omega_\mathrm{m} h^2
+  omegab:
+    derived: 'lambda omegabh2, H0: omegabh2/((H0/100)**2)'
+    latex: \Omega_\mathrm{b}
+  omegac:
+    derived: 'lambda omegach2, H0: omegach2/((H0/100)**2)'
+    latex: \Omega_\mathrm{c}
+  sigma8:
+    latex: \sigma_8
+  s8h5:
+    derived: 'lambda sigma8, H0: sigma8*(H0*1e-2)**(-0.5)'
+    latex: \sigma_8/h^{0.5}
+  s8omegamp5:
+    derived: 'lambda sigma8, omegam: sigma8*omegam**0.5'
+    latex: \sigma_8 \Omega_\mathrm{m}^{0.5}
+  s8omegamp25:
+    derived: 'lambda sigma8, omegam: sigma8*omegam**0.25'
+    latex: \sigma_8 \Omega_\mathrm{m}^{0.25}
+  A:
+    derived: 'lambda As: 1e9*As'
+    latex: 10^9 A_\mathrm{s}
+  clamp:
+    derived: 'lambda As, tau: 1e9*As*np.exp(-2*tau)'
+    latex: 10^9 A_\mathrm{s} e^{-2\tau}
+  age:
+    latex: '{\rm{Age}}/\mathrm{Gyr}'
+  rdrag:
+    latex: r_\mathrm{drag}
+  yheused:
+    latex: Y_P^\mathrm{BBN}
+
+theory:
+  camb:
+    path: ./external_modules/code/CAMB
+    extra_args:
+      halofit_version: takahashi
+      dark_energy_model: ppf
+      DoLateRadTruncation: False
+      lmax: 5000
+      lens_potential_accuracy: 2
+      AccuracyBoost: 1.25
+      lSampleBoost: 1.1
+      lAccuracyBoost: 1.0
+      num_massive_neutrinos: 1
+      nnu: 3.046
+      accurate_massive_neutrino_transfers: false
+
+sampler:
+  mcmc:
+    # ---------------------------------------------------------------------
+    # File (w/ path) or matrix defining a covariance matrix for the proposal:
+    # - null (default): will be generated from params info (prior and proposal)
+    # - matrix: remember to set `covmat_params` to the parameters in the matrix
+    covmat: "./projects/example/EXAMPLE_MCMC4.covmat"
+    covmat_params:
+    # ---------------------------------------------------------------------
+    # ---------------------------------------------------------------------
+    # Proposal covariance matrix learning
+    # ---------------------------------------------------------------------
+    # ---------------------------------------------------------------------
+    learn_proposal: True
+    # Don't learn if convergence better than...
+    learn_proposal_Rminus1_min: 0.035
+    # ---------------------------------------------------------------------
+    # ---------------------------------------------------------------------
+    # Convergence and stopping
+    # ---------------------------------------------------------------------
+    # ---------------------------------------------------------------------
+    # Maximum number of posterior evaluations
+    max_samples: .inf
+    # Gelman-Rubin R-1 on means
+    Rminus1_stop: 0.015
+    # Gelman-Rubin R-1 on std deviations
+    Rminus1_cl_stop: 0.18
+    Rminus1_cl_level: 0.95
+    # ---------------------------------------------------------------------
+    # ---------------------------------------------------------------------
+    # Exploiting speed hierarchy
+    # ---------------------------------------------------------------------
+    # ---------------------------------------------------------------------
+    measure_speeds: True
+    drag: False
+    oversample_power: 0
+    oversample_thin: True
+    # ---------------------------------------------------------------------
+    # ---------------------------------------------------------------------
+    # Avoid chain getting suck forever
+    # ---------------------------------------------------------------------
+    # ---------------------------------------------------------------------
+    max_tries: 10000
+    burn_in: 0
+    # ---------------------------------------------------------------------
+    # ---------------------------------------------------------------------
+    # When no MPI used, number of fractions of the chain to compare
+    # ---------------------------------------------------------------------
+    # ---------------------------------------------------------------------
+    Rminus1_single_split: 4
+
+output: ./projects/example/chains/EXAMPLE_MCMC4

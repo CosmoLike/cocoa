@@ -1,77 +1,35 @@
-# ----------------------------------------------------------------------------
-# ----------------------------------------------------------------------------
-# ------------------------------ Basic Settings ------------------------------
-# ----------------------------------------------------------------------------
-# ----------------------------------------------------------------------------
 
-if [ -n "${SET_INSTALLATION_OPTIONS}" ]; then
-  source $SET_INSTALLATION_OPTIONS
-else
-  source set_installation_options
+if [ -z "${ROOTDIR}" ]; then
+    echo 'ERROR ENV VARIABLE ROOTDIR IS NOT DEFINED' >&2
+    return 1
 fi
-
-source $ROOTDIR/installation_scripts/clean_camb
-source $ROOTDIR/installation_scripts/clean_class
-source $ROOTDIR/installation_scripts/clean_cosmolike
-source $ROOTDIR/installation_scripts/clean_planck
-source $ROOTDIR/installation_scripts/clean_polychord
-source $ROOTDIR/installation_scripts/clean_required
-
-deactivate
-
-if [ -n "${OLD_OMP_NUM_THREADS}" ]; then
-  export OMP_NUM_THREADS=$OLD_OMP_NUM_THREADS
-  unset OLD_OMP_NUM_THREADS
+# --------------------------------------------------------------------------------------
+# --------------------------------------------------------------------------------------
+# --------------------------------------------------------------------------------------
+# --------------------------------------------------------------------------------------
+if [ -z "${IGNORE_CAMB_COMPILATION}" ]; then
+    source $ROOTDIR/installation_scripts/clean_camb
+    source $ROOTDIR/installation_scripts/clean_cambede
 fi
-
-if [ -n "${OLD_LD_LIBRARY_PATH}" ]; then
-  export LD_LIBRARY_PATH=$OLD_LD_LIBRARY_PATH
-  unset OLD_LD_LIBRARY_PATH
+if [ -z "${IGNORE_CLASS_COMPILATION}" ]; then
+    source $ROOTDIR/installation_scripts/clean_class
 fi
-
-if [ -n "${OLD_PYTHONPATH}" ]; then
-  export PYTHONPATH=$OLD_PYTHONPATH
-  unset OLD_PYTHONPATH
+if [ -z "${IGNORE_PLANCK_COMPILATION}" ]; then
+    source $ROOTDIR/installation_scripts/clean_planck
 fi
-
-if [ -n "${OLD_PATH}" ]; then
-  export PATH=$OLD_PATH
-  unset OLD_PATH
+if [ -z "${IGNORE_POLYCHORD_COMPILATION}" ]; then
+    source $ROOTDIR/installation_scripts/clean_polychord
 fi
-
-if [ -n "${OLD_C_INCLUDE_PATH}" ]; then
-  export C_INCLUDE_PATH=$OLD_C_INCLUDE_PATH
-  unset OLD_C_INCLUDE_PATH
+# --------------------------------------------------------------------------------------
+# --------------------------------------------------------------------------------------
+# --------------------------------------------------------------------------------------
+# --------------------------------------------------------------------------------------
+if [ -z "${ROOTDIR}" ]; then
+    echo 'ERROR ENV VARIABLE ROOTDIR IS NOT DEFINED' >&2
+    return 1
 fi
-
-if [ -n "${OLD_CPLUS_INCLUDE_PATH}" ]; then
-  export CPLUS_INCLUDE_PATH=$OLD_CPLUS_INCLUDE_PATH
-  unset OLD_CPLUS_INCLUDE_PATH
-fi
-
-if [ -n "${OLD_LDFLAGS}" ]; then
-  export LDFLAGS=$OLD_LDFLAGS
-  unset OLD_LDFLAGS
-fi
-
-if [ -n "${OLD_CPATH}" ]; then
-  export CPATH=$OLD_CPATH
-  unset OLD_CPATH
-fi
-
-if [ -n "${OLD_NUMPY_HEADERS}" ]; then
-  export NUMPY_HEADERS=$OLD_NUMPY_HEADERS
-  unset OLD_NUMPY_HEADERS
-fi
-
-# ----------------------------------------------------------------------------
-# ----------------------------------------------------------------------------
-# ----------------------------------------------------------------------------
-# ----------------------------------------------------------------------------
-# ----------------------------------------------------------------------------
 
 cd $ROOTDIR/external_modules
-
 find . -maxdepth 12 -name '*.pyc' -delete
 find . -maxdepth 12 -name '*.o' -delete
 find . -maxdepth 12 -name '*.pyo' -delete
@@ -79,40 +37,18 @@ find . -maxdepth 12 -name '*.mod' -delete
 find . -maxdepth 12 -name '*.so' -delete
 find . -maxdepth 12 -name '*.a' -delete
 
-cd ./data
-
+cd $ROOTDIR/external_modules/data
 sh clean_all.sh
+# --------------------------------------------------------------------------------------
+# --------------------------------------------------------------------------------------
+# --------------------------------------------------------------------------------------
+# --------------------------------------------------------------------------------------
+if [ -z "${ROOTDIR}" ]; then
+    echo 'ERROR ENV VARIABLE ROOTDIR IS NOT DEFINED' >&2
+    return 1
+fi
 
+source $ROOTDIR/../cocoa_installation_libraries/clean_all
 cd $ROOTDIR
-
-# ----------------------------------------------------------------------------
-# ----------------------------------------------------------------------------
-# ----------------------------------------------------------------------------
-# ----------------------------------------------------------------------------
-# ----------------------------------------------------------------------------
-
-if [ -n "${OLD_OMP_NUM_THREADS}" ]; then
-    export OMP_NUM_THREADS=$OLD_OMP_NUM_THREADS
-    unset OLD_OMP_NUM_THREADS
-fi
-
-if [ -n "${OLD_LD_LIBRARY_PATH}" ]; then
-    export LD_LIBRARY_PATH=$OLD_LD_LIBRARY_PATH
-    unset OLD_LD_LIBRARY_PATH
-fi
-
-if [ -n "${OLD_PYTHONPATH}" ]; then
-    export PYTHONPATH=$OLD_PYTHONPATH
-    unset OLD_PYTHONPATH
-fi
-
-if [ -n "${OLD_PATH}" ]; then
-    export PATH=$OLD_PATH
-    unset OLD_PATH
-fi
-
-source ./installation_scripts/impl_unset_keys.sh
-unset ROOTDIR
-unset SETUP_COBAYA
-unset SETUP_PREREQUISITE_DONE
-unset SET_INSTALLATION_OPTIONS
+source stop_cocoa
+rm -rf ./.local/

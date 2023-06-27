@@ -1,11 +1,7 @@
 if [ -z "${ROOTDIR}" ]; then
-    echo 'ERROR ROOTDIR not define'
-    return
+  echo 'ERROR ENV VARIABLE ROOTDIR IS NOT DEFINED' >&2
+  return 1
 fi
-
-echo 'Warning: all local required packages will be deleted'
-
-rm -rf $ROOTDIR/.local/
 
 cd $ROOTDIR/../cocoa_installation_libraries
 

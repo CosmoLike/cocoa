@@ -6,7 +6,7 @@ import numpy as np
 
 try:
     import camb
-except ImportError as e:
+except ImportError:
     sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..')))
     import camb
 from camb import model, correlations, bbn, dark_energy, initialpower
@@ -71,6 +71,8 @@ class CambTest(unittest.TestCase):
         self.assertEqual(pars.InitPower.ns, 1.2)
         self.assertTrue(pars.WantTransfer)
         pars.DarkEnergy = None
+        pars = camb.set_params(**{'H0': 67, 'ombh2': 0.002, 'r': 0.1, 'Accuracy.AccurateBB': True})
+        self.assertEqual(pars.Accuracy.AccurateBB, True)
 
         from camb.sources import GaussianSourceWindow
         pars = camb.CAMBparams()
@@ -88,9 +90,9 @@ class CambTest(unittest.TestCase):
         self.assertTrue(len(pars.SourceWindows) == 0)
         params = camb.get_valid_numerical_params()
         self.assertEqual(params, {'ombh2', 'deltazrei', 'omnuh2', 'tau', 'omk', 'zrei', 'thetastar', 'nrunrun',
-                                  'meffsterile', 'nnu', 'ntrun', 'HMCode_A_baryon', 'HMCode_eta_baryon', 'HMCode_logT_AGN',
-                                  'cosmomc_theta', 'YHe', 'wa', 'cs2', 'H0', 'mnu', 'Alens', 'TCMB', 'ns',
-                                  'nrun', 'As', 'nt', 'r', 'w', 'omch2'})
+                                  'meffsterile', 'nnu', 'ntrun', 'HMCode_A_baryon', 'HMCode_eta_baryon',
+                                  'HMCode_logT_AGN', 'cosmomc_theta', 'YHe', 'wa', 'cs2', 'H0', 'mnu', 'Alens',
+                                  'TCMB', 'ns', 'nrun', 'As', 'nt', 'r', 'w', 'omch2'})
         params2 = camb.get_valid_numerical_params(dark_energy_model='AxionEffectiveFluid')
         self.assertEqual(params2.difference(params), {'fde_zc', 'w_n', 'zc', 'theta_i'})
 
@@ -232,6 +234,21 @@ class CambTest(unittest.TestCase):
         results = camb.get_background(pars)
         self.assertEqual(results.Params.Reion.redshift, zre)
 
+        pars = camb.CAMBparams()
+        pars.set_cosmology(H0=68.5, ombh2=0.022, omch2=0.122, YHe=0.2453, mnu=0.07, omk=-0.05)
+        data = camb.get_background(pars)
+        delta2 = data.curvature_radius / (1 + 0.25) * (
+            np.sin((data.comoving_radial_distance(0.25) - data.comoving_radial_distance(0.05)) / data.curvature_radius))
+        np.testing.assert_allclose(delta2, data.angular_diameter_distance2(0.05, 0.25))
+        dists = data.angular_diameter_distance2([0.3, 0.05, 0.25], [1, 0.25, 0.05])
+        self.assertAlmostEqual(delta2, dists[1])
+        self.assertEqual(0, dists[2])
+
+        self.assertEqual(data.physical_time(0.4), data.physical_time([0.2, 0.4])[1])
+        d = data.conformal_time_a1_a2(0, 0.5) + data.conformal_time_a1_a2(0.5, 1)
+        self.assertAlmostEqual(d, data.conformal_time_a1_a2(0, 1))
+        self.assertAlmostEqual(d, sum(data.conformal_time_a1_a2([0, 0.5], [0.5, 1])))
+
     def testEvolution(self):
         redshifts = [0.4, 31.5]
         pars = camb.set_params(H0=67.5, ombh2=0.022, omch2=0.122, As=2e-9, ns=0.95,
@@ -352,10 +369,17 @@ class CambTest(unittest.TestCase):
         pars.set_for_lmax(lmax)
         cls = data.get_cmb_power_spectra(pars)
         data.get_total_cls(2000)
-        data.get_unlensed_scalar_cls(2500)
+        cls_unlensed = data.get_unlensed_scalar_cls(2500)
         data.get_tensor_cls(2000)
         cls_lensed = data.get_lensed_scalar_cls(3000)
-        cphi = data.get_lens_potential_cls(2000)
+        data.get_lens_potential_cls(2000)
+
+        cls_lensed2 = data.get_lensed_cls_with_spectrum(data.get_lens_potential_cls()[:, 0], lmax=3000)
+        np.testing.assert_allclose(cls_lensed2[2:, :], cls_lensed[2:, :], rtol=1e-4)
+        cls_lensed2 = data.get_partially_lensed_cls(1, lmax=3000)
+        np.testing.assert_allclose(cls_lensed2[2:, :], cls_lensed[2:, :], rtol=1e-4)
+        cls_lensed2 = data.get_partially_lensed_cls(0, lmax=2500)
+        np.testing.assert_allclose(cls_lensed2[2:, :], cls_unlensed[2:, :], rtol=1e-4)
 
         # check lensed CL against python; will only agree well for high lmax as python has no extrapolation template
         cls_lensed2 = correlations.lensed_cls(cls['unlensed_scalar'], cls['lens_potential'][:, 0], delta_cls=False)
@@ -615,7 +639,7 @@ class CambTest(unittest.TestCase):
         # test something sharp with redshift distortions (tricky..)
         from scipy import signal
         zs = np.arange(1.9689, 2.1057, (2.1057 - 1.9689) / 2000)
-        W = signal.tukey(len(zs), alpha=0.1)
+        W = signal.windows.tukey(len(zs), alpha=0.1)
         pars = camb.CAMBparams()
         pars.set_cosmology(H0=67.5, ombh2=0.022, omch2=0.122)
         pars.InitPower.set_params(As=2e-9, ns=0.965)
@@ -709,7 +733,7 @@ class CambTest(unittest.TestCase):
             for i in range(3):
                 pars = camb.CAMBparams()
                 pars.set_cosmology(H0=70, ombh2=0.022, omch2=0.12, mnu=0.06, omk=0, tau=0.17)
-                results = camb.get_results(pars)
+                results = camb.get_results(pars)  # noqa
                 del pars, results
                 gc.collect()
                 usage = round(resource.getrusage(resource.RUSAGE_SELF).ru_maxrss / 1024.0, 1)

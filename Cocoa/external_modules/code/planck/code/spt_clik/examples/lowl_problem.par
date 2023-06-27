@@ -1,0 +1,22 @@
+#cl file
+cl = bestfit_lensedCls.dat
+
+#lmax
+lmax = 12
+has_cl =    1  1  0  1  0  0
+
+nside = 4
+
+#beamtype = gauss
+#fwhm = 10
+beamtype = cos
+cos_start = 9
+cos_end=12
+
+noiseunit = muK^2.pixel
+
+noise = 4
+
+mapfile = lowl_map_4.fits
+beamfile = lowl_beam_4.dat
+clbffile = lowl_cl_4.dat

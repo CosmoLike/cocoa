@@ -1,0 +1,20 @@
+# Path to local emcee, if desired, or 'global' to force global-scope import
+path: null
+
+nwalkers: 5
+nsteps: 1000
+thin_by: 1
+
+moves:
+  kind: StretchMove
+  args:
+    a: 2.
+
+# parallel:
+#   kind: multiprocessing
+#   args:
+#     threads: 1
+
+progress: true
+
+output_format: hdf5

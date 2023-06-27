@@ -1,0 +1,10 @@
+freq = 143 143 217
+norm_freq = 143
+
+rg_flux_cut = 330
+norm_rg_flux_cut = 330
+
+input_object = fake_smica_T_32_1500_b10_100x143x217.clik
+res_object = fake_smica_T_32_1500_b10_100x143x217_with_egfs.clik
+
+pars = norm_rg norm_dg_po

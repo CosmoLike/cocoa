@@ -1,10 +1,10 @@
 if [ -z "${ROOTDIR}" ]; then
-    echo 'ERROR ROOTDIR not define'
-    return
+    echo 'ERROR ENV VARIABLE ROOTDIR IS NOT DEFINED' >&2
+    return 1
 fi
 if [ -z "${PYTHON3}" ]; then
-    echo 'ERROR PYTHON3 not define'
-    return
+    echo 'ERROR ENV VARIABLE PYTHON3 IS NOT DEFINED' >&2
+    return 1
 fi
 
 # ----------------------------------------------------------------------------
@@ -12,6 +12,7 @@ fi
 # ------------------------- REMOVE PLANCK LIKELIHOOD -------------------------
 # ----------------------------------------------------------------------------
 # ----------------------------------------------------------------------------
+echo 'CLEANING PLANCK LIKELIHOOD'
 
 rm -f $ROOTDIR/.local/bin/clik*
 
@@ -25,35 +26,28 @@ rm -rf $ROOTDIR/.local/share/clik
 
 rm -f $ROOTDIR/.local/include/clik*
 
-cd $ROOTDIR/external_modules/code/planck/code/plc_3.0/plc-3.01/
+if [ -z "${USE_SPT_CLIK_PLANCK}" ]; then
+  cd $ROOTDIR/external_modules/code/planck/code/plc_3.0/plc-3.1/
+else
+  cd $ROOTDIR/external_modules/code/planck/code/spt_clik/
+fi
 
 rm -f .lock-waf_*
 
-$PYTHON3 waf uninstall
-
-$PYTHON3 waf clean
-
-$PYTHON3 waf distclean
-
-if [ -n "${OLD_CLIK_PATH}" ]; then
-    export CLIK_PATH=$OLD_CLIK_PATH
-    unset OLD_CLIK_PATH
+if [ -z "${DEBUG_PLANCK_OUTPUT}" ]; then
+  export OUTPUT_PLANCK_1="/dev/null"
+  export OUTPUT_PLANCK_2="/dev/null"
 else
-    unset CLIK_PATH
+  export OUTPUT_PLANCK_1="/dev/tty"
+  export OUTPUT_PLANCK_2="/dev/tty"
 fi
 
-if [ -n "${OLD_CLIK_DATA}" ]; then
-    export CLIK_DATA=$OLD_CLIK_DATA
-    unset OLD_CLIK_DATA
+$PYTHON3 waf distclean > ${OUTPUT_PLANCK_1} 2> ${OUTPUT_PLANCK_2}
+if [ $? -ne 0 ]; then
+  echo "PLANCK COULD NOT RUN WAF DISTCLEAN"
 else
-    unset CLIK_DATA
+  echo "PLANCK WAF DISTCLEAN DONE"
 fi
 
-if [ -n "${OLD_CLIK_PLUGIN}" ]; then
-    export CLIK_PLUGIN=$OLD_CLIK_PLUGIN
-    unset OLD_CLIK_PLUGIN
-else
-    unset CLIK_PLUGIN
-fi
-
+echo 'CLEANING PLANCK LIKELIHOOD DONE'
 cd $ROOTDIR

@@ -262,7 +262,7 @@ class CAMBparams(F2003Class):
         Set parameters determining overall calculation accuracy (large values may give big slow down).
         For finer control you can set individual accuracy parameters by changing CAMBParams.Accuracy
         (:class:`.model.AccuracyParams`) .
-
+    
         :param AccuracyBoost: increase AccuracyBoost to decrease integration step size, increase density of k
                               sampling, etc.
         :param lSampleBoost: increase lSampleBoost to increase density of L sampling for CMB
@@ -330,7 +330,7 @@ class CAMBparams(F2003Class):
         if effective_ns_for_nonlinear is not None:
             initpower.effective_ns_for_nonlinear = effective_ns_for_nonlinear
         if pk is None:
-            pk = np.asarray([])
+            pk = np.empty(0)
         elif len(k) != len(pk):
             raise CAMBValueError("k and P(k) arrays must be same size")
         if pk_tensor is not None:
@@ -399,7 +399,6 @@ class CAMBparams(F2003Class):
                 # iterate with recalculation of recombination and zstar
                 self.set_H0_for_theta(theta, theta_H0_range=theta_H0_range, est_H0=self.H0,
                                       iteration_threshold=iteration_threshold)
-
         except ValueError:
             raise CAMBParamRangeError('No solution for H0 inside of theta_H0_range')
 
@@ -613,6 +612,9 @@ class CAMBparams(F2003Class):
 
     def get_zre(self):
         return self.Reion.get_zre(self)
+
+    # alias consistent with input parameter name
+    get_zrei = get_zre
 
     def get_Y_p(self, ombh2=None, delta_neff=None):
         r"""

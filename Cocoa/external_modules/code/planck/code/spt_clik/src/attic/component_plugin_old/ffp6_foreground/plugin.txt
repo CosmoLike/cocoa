@@ -1,0 +1,3 @@
+source : ffp6_foreground.c
+data   : ffp6_thermaldust.dat ffp6_firb.dat 
+python : ffp6_foreground.pyx

@@ -2,10 +2,10 @@
 ForUtils
 ===================
 :ForUtils: Various fortran 2003/2008 utility classes.
-:Version: 0.1
+:Version: 1.0
 :Author: Antony Lewis
 :Homepage: https://github.com/cmbant/forutils
-:Code documentation: http://cosmologist.info/forutils/
+:Code documentation: https://cosmologist.info/forutils/
 
 
 Description
@@ -25,7 +25,7 @@ Fortran 2003/2008 programs. The utilities comprise these areas:
 * RangeUtils - Maintain sets of equally spaced intervals, e.g. for integration ranges.
 * StringUtils - Utilities for strings, like concat of distinct types a.s.o.
 
-For a class summary see the `class trees <http://cosmologist.info/forutils/classes/_index.html>`_.
+For a class summary see the `class trees <https://cosmologist.info/forutils/classes/_index.html>`_.
 
 Getting Started
 ================

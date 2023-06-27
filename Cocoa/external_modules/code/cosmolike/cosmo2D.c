@@ -3148,7 +3148,7 @@ double C_gs_tomo_limber(double l, int ni, int nj)
     update_nuisance(&N);
     update_galpara(&G);
   }
-    
+
   const int q = N_ggl(ni, nj);
   if (q < 0 || q > NSIZE - 1)
   {

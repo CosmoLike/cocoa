@@ -1,7 +1,11 @@
-.. image:: https://travis-ci.org/PolyChord/PolyChordLite.svg?branch=master
-    :target: https://travis-ci.org/PolyChord/PolyChordLite
+.. image:: https://github.com/PolyChord/PolyChordLite/workflows/CI/badge.svg?branch=master
+   :target: https://github.com/PolyChord/PolyChordLite/actions?query=workflow%3ACI+branch%3Amaster
+   :alt: Build Status
+.. image:: https://img.shields.io/badge/arXiv-1506.00171-b31b1b.svg
+   :target: https://arxiv.org/abs/1506.00171
+   :alt: Open-access paper
 
-PolyChord v 1.16
+PolyChord v 1.20.0
 
 Will Handley, Mike Hobson & Anthony Lasenby
 
@@ -11,7 +15,7 @@ arXiv:1502.01856
 
 arXiv:1506.00171
 
-Released Mar 2019
+Latest version Released Apr 2020
 
 
 PolyChord Licence
@@ -27,15 +31,48 @@ Users are also required to cite the PolyChord papers:
 
 in their publications.
 
+Python quickstart
+=================
+
+For Python users in a hurry:
+
+.. code:: bash
+
+    pip install git+https://github.com/PolyChord/PolyChordLite@master
+    wget https://raw.githubusercontent.com/PolyChord/PolyChordLite/master/run_pypolychord.py
+    python run_pypolychord.py
+
+You can then modify the file run_pypolychord.py to your needs. If you have mpi compilers available, this version can be run in parallel with mpi.
+
+You should make sure that you have gfortran (or equivalent) fortran compilers installed. 
+
+If any of the above steps fail (this can in general happen for certain Mac OSX versions), then try installing without pip:
+
+.. code:: bash
+
+    git clone https://github.com/PolyChord/PolyChordLite.git
+    cd PolyChordLite
+    python setup.py install
+
+If you do not have sudo access/virtual environments/anaconda, then appending `--user` to the install command may be necessary.
+
+Post Processing
+===============
+
+We recommend the tool `anesthetic <https://github.com/williamjameshandley/anesthetic>`_ for post-processing your nested sampling runs. A plot gallery can be found `here <http://htmlpreview.github.io/?https://github.com/williamjameshandley/cosmo_example/blob/master/demos/demo.html>`_
+
+
+https://github.com/williamjameshandley/anesthetic
+
 MPI Support
 ===========
 
 The code is MPI compatible with openMPI. To disable the MPI parallelization, 
-set MPI= in ./Makefile, or compile with
+set MPI=0 in ./Makefile, or compile with
 
 .. code::
 
-    make <target>  MPI=
+    make <target>  MPI=0
 
 Additional Libraries  
 ====================
@@ -163,15 +200,25 @@ please email Will (wh260@mrao.cam.ac.uk).
 
 Python likelihoods (pypolychord)
 --------------------------------
-Being python, this interface is much more self-explanatory. You need to compile
-the library with:
+Being python, this interface is the most self-explanatory. 
+You can install direct from the git repository using:
 
 .. code:: bash
 
-    make pypolychord
-    python setup.py install --user
+    pip install https://github.com/PolyChord/PolyChordLite/archive/master.zip
 
-You can then import pypolychord from anywhere with the lines:
+(N.B. PyPi coming soon)
+or you can install locally with the command:
+
+.. code:: bash
+
+   git clone https://github.com/PolyChord/PolyChordLite.git
+   cd PolyChordLite
+   pip install . --user
+
+This has the advantage of using intel compilers if you have them (e.g. on a HPC machine). You may wish to consider installing pypolychord in a `virtual environment <https://packaging.python.org/guides/installing-using-pip-and-virtual-environments>`, in which case you don't need the --user argument.
+
+Once installed, you can then import pypolychord from anywhere with the lines:
 
 .. code:: python
 
@@ -272,8 +319,8 @@ simulate dynamic nested sampling.  The format & contents of these two files
 are as follows: They have has ndims+nderived+2 columns. The first
 ndims+nderived columns are the ndim parameter values along with the nderived
 additional parameters that are being passed by the likelihood routine for
-PolyChord to save along with the ndims parameters. The ndims+nderived+2 column
-is the log-likelihood value.  The ndims+nderived+1 column is the log-likelihood
+PolyChord to save along with the ndims parameters. The ndims+nderived+1 column
+is the log-likelihood value.  The ndims+nderived+2 column is the log-likelihood
 value that the point was born at. They are is identical to the
 [root]_phys_live.txt and [root]_dead.txt file, except for an additional column
 including the birth contours

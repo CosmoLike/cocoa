@@ -1,18 +1,12 @@
-timing: True
-debug: True
-stop_at_error: True
+stop_at_error: False
+debug: true
 
 likelihood:
-  planck_2018_lowl.TT:
+  sn.roman_o:
+    path: ./external_modules/data/sn_data
+  planck_2018_highl_plik.TT:
     path: ./external_modules/
-  planck_2018_lowl.EE:
-    path: ./external_modules/
-  planck_2018_highl_plik.TTTEEE:
-    path: ./external_modules/
-  planck_2018_highl_plik.TTTEEE_lite:
-    path: ./external_modules/
-  planck_2018_lensing.clik:
-    path: ./external_modules/
+    clik_file: plc_3.0/hi_l/plik/plik_rd12_HM_v22_TT.clik
 
 params:
   logA:
@@ -21,9 +15,9 @@ params:
       max: 3.91
     ref:
       dist: norm
-      loc: 3.05
-      scale: 0.001
-    proposal: 0.001
+      loc: 3.0448
+      scale: 0.05
+    proposal: 0.05
     latex: \log(10^{10} A_\mathrm{s})
     drop: true
   As:
@@ -31,57 +25,91 @@ params:
     latex: A_\mathrm{s}
   ns:
     prior:
-      min: 0.8
-      max: 1.2
+      min: 0.92
+      max: 1.05
     ref:
       dist: norm
-      loc: 0.965
-      scale: 0.004
-    proposal: 0.002
+      loc: 0.96605
+      scale: 0.005
+    proposal: 0.005
     latex: n_\mathrm{s}
-  H0:
+  theta_MC_100:
     prior:
-      min: 20
-      max: 100
+      min: 0.5
+      max: 10
     ref:
       dist: norm
-      loc: 67
-      scale: 2
-    proposal: 2
+      loc: 1.04109
+      scale: 0.001
+    proposal: 0.001
+    latex: 100\theta_\mathrm{MC}
+    drop: true
+    renames: theta
+  cosmomc_theta:
+    value: 'lambda theta_MC_100: 1.e-2*theta_MC_100'
+    derived: false
+  H0:
     latex: H_0
+    min: 20
+    max: 100
   omegabh2:
     prior:
-      min: 0.005
-      max: 0.1
+      min: 0.01
+      max: 0.04
     ref:
       dist: norm
-      loc: 0.0224
-      scale: 0.0001
-    proposal: 0.0001
+      loc: 0.022383
+      scale: 0.005
+    proposal: 0.005
     latex: \Omega_\mathrm{b} h^2
   omegach2:
     prior:
-      min: 0.001
-      max: 0.99
+      min: 0.06
+      max: 0.2
     ref:
       dist: norm
-      loc: 0.12
-      scale: 0.001
-    proposal: 0.0005
+      loc: 0.12011
+      scale: 0.03
+    proposal: 0.03
     latex: \Omega_\mathrm{c} h^2
-  m_ncdm:
+  mnu:
     value: 0.06
-    renames: mnu
   tau:
     prior:
-      min: 0.01
-      max: 0.8
+      dist: norm
+      loc: 0.0544
+      scale: 0.0073
     ref:
       dist: norm
       loc: 0.055
       scale: 0.006
     proposal: 0.003
     latex: \tau_\mathrm{reio}
+  w0pwa:
+    prior:
+      min: -5 
+      max: -0.01
+    ref:
+      dist: norm
+      loc: -0.99
+      scale: 0.05
+    proposal: 0.05
+    latex: w_{0,\mathrm{DE}}+w_{a,\mathrm{DE}}
+    drop: true
+  w:
+    prior:
+      min: -3
+      max: -0.01
+    ref:
+      dist: norm
+      loc: -0.99
+      scale: 0.05
+    proposal: 0.05
+    latex: w_{0,\mathrm{DE}}
+  wa:
+    value: 'lambda w0pwa, w: w0pwa - w'
+    derived: false
+    latex: w_{a,\mathrm{DE}}
   omegal:
     latex: \Omega_\Lambda
   omegam:
@@ -109,60 +137,89 @@ params:
   A:
     derived: 'lambda As: 1e9*As'
     latex: 10^9 A_\mathrm{s}
-  clamp:
-    derived: 'lambda As, tau: 1e9*As*np.exp(-2*tau)'
-    latex: 10^9 A_\mathrm{s} e^{-2\tau}
   age:
     latex: '{\rm{Age}}/\mathrm{Gyr}'
   rdrag:
     latex: r_\mathrm{drag}
   yheused:
     latex: Y_P^\mathrm{BBN}
-  omegan:
-    latex: \Omega_\mathrm{\\nu}
   omegan2:
-    derived: 'lambda omegan, H0: omegan*(H0/100)**2'
     latex: \Omega_\mathrm{\\nu} h^2
-
+  omegan:
+    derived: 'lambda omegan2, H0: omegan2/((H0/100)**2)'
+    latex: \Omega_\mathrm{\\nu}
+  zstar:
+    latex: z_*
+  rstar:
+    latex: r_*
+  thetastar:
+    latex: 100\theta_*
+  DAstar:
+    latex: D_\mathrm{A}/\mathrm{Gpc}
+  zdrag:
+    latex: z_\mathrm{drag}
+  kd:
+    latex: k_\mathrm{D}
+  thetad:
+    latex: 100\theta_\mathrm{D}
+  zeq:
+    latex: z_\mathrm{eq}
+  keq:
+    latex: k_\mathrm{eq}
+  thetaeq:
+    latex: 100\theta_\mathrm{eq}
+  thetarseq:
+    latex: 100\theta_\mathrm{s,eq}
+  DHBBN:
+    derived: "lambda DH: 10**5*DH"
+    latex: 10^5 \mathrm{D}/\mathrm{H}
+  zrei:
+    latex: z_\mathrm{re}
+  nrun:
+    value: 0.0
+    latex: n_\mathrm{run}
+  nrunrun:
+    value: 0.0
+    latex: n_\mathrm{run,run}
+  omegak:
+    value: 0.0
+    latex: \Omega_k
+    
 theory:
-  classy:
-    path: ./external_modules/code/class_public
+  camb:
+    path: ./external_modules/code/CAMB
     use_renames: True
     extra_args:
-      non linear: hmcode
-      l_max_scalars: 2800
-      N_ncdm: 1
-      N_ur: 2.0328
+      AccuracyBoost: 1.05
+      num_massive_neutrinos: 1
+      nnu: 3.046
+      dark_energy_model: ppf
 
 sampler:
   evaluate:
     override:
       logA: 3.0448
       ns: 0.96605
-      H0: 67.32
+      theta_MC_100: 1.04088
       omegabh2: 0.022383
       omegach2: 0.12011
       tau: 0.0543
-      A_planck: 1.0
-      calib_100T: 0.9987983397505178
-      calib_217T: 0.9987920200754659
-      A_cib_217: 65.73042744689862
-      xi_sz_cib: 0.014846669030139295
-      A_sz: 7.578566683767703
-      ksz_norm: 1.830268477586373
-      gal545_A_100: 7.125299946661039
-      gal545_A_143: 8.131426090291662
-      gal545_A_143_217: 15.761217543468344
-      gal545_A_217: 77.5214280531049
-      ps_A_100_100: 261.2823535136313
-      ps_A_143_143: 74.28290799465884
-      ps_A_143_217: 41.22322908951794
-      ps_A_217_217: 125.31939118418777
-      galf_TE_A_100: 0.15314307440243102
-      galf_TE_A_100_143: 0.07963000762154462
-      galf_TE_A_100_217: 0.46305342686237344
-      galf_TE_A_143: 0.104139430567495
-      galf_TE_A_143_217: 0.7243969435429755
-      galf_TE_A_217: 1.9172389532222787
-
+      w0pwa: -0.968859
+      w: -0.909098
+      A_planck: 1.00138
+      calib_100T: 1.00136
+      calib_217T: 0.997534
+      A_cib_217: 74.4119
+      xi_sz_cib: 0.127483
+      A_sz: 5.954
+      ksz_norm: 2.93033
+      gal545_A_100: 7.06323
+      gal545_A_143: 8.49817
+      gal545_A_143_217: 23.3975
+      gal545_A_217: 78.1438
+      ps_A_100_100: 222.559
+      ps_A_143_143: 60.2773
+      ps_A_143_217: 30.2718
+      ps_A_217_217: 109.975
+    
 output: ./projects/example/chains/EXAMPLE_EVALUATE3

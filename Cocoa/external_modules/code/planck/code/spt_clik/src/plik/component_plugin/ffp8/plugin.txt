@@ -1,0 +1,3 @@
+source : ffp8.c
+python : ffp8.pyx
+data : cib_ffp8_100_353.dat, dust_ffp8_100_353_TEB.dat,cib_ffp8_v2_100_353.dat, dust_ffp8_v2_100_353_TEB.dat ,cib_e2e_2015_11.dat, gal_e2e_2015_11.dat, ksz_e2e_2015_11.dat, tsz_e2e_2015_11.dat, cib_NOPS_e2e_2015_11.dat, e2e_2017_fgs.dat, e2e_2017_fgs_v2.dat, e2e_2017_fgs_v3.dat

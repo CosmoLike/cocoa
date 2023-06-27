@@ -1,0 +1,19 @@
+# extra environment variable
+
+# where to find the automatically downloaded and installed packages
+
+#cfitsio
+cfitsio_url = https://heasarc.gsfc.nasa.gov/FTP/software/fitsio/c/cfitsio_latest.tar.gz
+cfitsio_tar = cfitsio_latest.tar.gz
+
+#numpy
+numpy_url = https://files.pythonhosted.org/packages/cf/8d/6345b4f32b37945fedc1e027e83970005fc9c699068d2f566b82826515f2/numpy-1.16.2.zip
+numpy_tar = numpy-1.16.2.zip
+
+#cython
+cython_url = https://files.pythonhosted.org/packages/36/da/fcb979fc8cb486a67a013d6aefefbb95a3e19e67e49dff8a35e014046c5e/Cython-0.29.6.tar.gz
+cython_tar = Cython-0.29.6.tar.gz
+
+#pyfits
+pyfits_url = https://files.pythonhosted.org/packages/c0/5d/ffae283cea526bce7c1154e7309a040a3e8c02e973b2360bcfc8f30134ef/pyfits-3.5.tar.gz
+pyfits_tar = pyfits-3.5.tar.gz 

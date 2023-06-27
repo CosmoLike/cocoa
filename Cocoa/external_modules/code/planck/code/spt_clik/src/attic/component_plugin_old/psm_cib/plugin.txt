@@ -1,0 +1,3 @@
+source : psm_cib.c
+data   : psm_cib.dat psm_cib_free.dat
+python : psm_cib.pyx
