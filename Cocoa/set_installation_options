@@ -34,7 +34,7 @@ export USE_SPT_CLIK_PLANCK=1
 # ----------------- CONTROL OVER THE COMPILATION OF EXTERNAL CODES ---------------------
 # --------------------------------------------------------------------------------------
 #export IGNORE_CAMB_COMPILATION=1
-export IGNORE_CLASS_COMPILATION=1
+#export IGNORE_CLASS_COMPILATION=1
 #export IGNORE_COSMOLIKE_COMPILATION=1
 #export IGNORE_POLYCHORD_COMPILATION=1
 #export IGNORE_PLANCK_COMPILATION=1
