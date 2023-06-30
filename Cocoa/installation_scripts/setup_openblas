@@ -32,7 +32,7 @@ fi
 if [ -z "${IGNORE_OPENBLAS_INSTALLATION}" ]; then
   echo 'INSTALLING OPENBLAS - THAT WILL TAKE A WHILE'
 
-  cd $ROOTDIR/../cocoa_installation_libraries/OpenBLAS
+  cd $ROOTDIR/../cocoa_installation_libraries/$COCOA_OPENBLAS_DIR
 
   export MAKE_NB_JOBS=$MAKE_NUM_THREADS
   make clean > /dev/null 2> /dev/null

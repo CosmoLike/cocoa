@@ -1,11 +1,80 @@
-## 3.X.Y – YYYY-MM-DD
+## 3.3.1 –
+
+- added planck_2018_lowl.EE_sroll2 low-E Planck likelihood
+
+## 3.3.1 – 2023-04-04
+
+- Updates for Pandas 2 compatibility
+- Fixed bug in MCMC oversampling and simplified proposal code (#288) (thanks @JiangJQ2000)
+
+## 3.3 – 2023-03-29
+
+### General
+
+- Minimum Python version updated to 3.8
+- `Prior.bounds()` can now return bounds at particular confidence levels when passed `confidence<1`.
+- `SampleCollection` slicing now allows for advanced pandas slicing, e.g. `samples[samples["param"] > value]`.
+- Fixed bug when setting reference pdf in MPI runs (thanks @schoeneberg!)
+- Components in yaml files referring to external Python modules can now give `package_install` settings to specify whether installed from pip, github or URL when cobaya-install is run.
+- Fix for `post` when likelihoods return different number of derived parameters (#285) (thanks @zhaoruiyang98)
+
+### MCMC
+
+- Added tempered sampling.
+- `products` method revamped; can produce GetDist chains directly.
+
+### Cosmology
+
+- Replaced default planck_2018_lowl.EE and planck_2018_low.TT with native versions, and using GitHub-hosted clik version.
+- Updated planck likelihoods to all load calibration parameter from same yaml
+- Removed clik version of planck 2018 CamSpec, defaults to native (avoids inconsistent calibration parameter naming)
+- GUI inclues latest NPIPE fully Python likelihood configuration
+
+## 3.2.2 – 2022-11-03
+
+### General
+
+- Deprecated `debug_file` in input, in favour of `debug: [filename]`.
+- `Prior` now has method `set_reference`, to update the reference pdf's if needed (MPI-aware).
+- Warning for stuck chains not more tolerant of many fast prior rejections
+- Environment variables supported in input .yaml files, and {YAML_ROOT} placeholder for paths.
+- Improved error messages for .yaml boolean options and install logs
+- Fixes for max_tries .inf and old version checks
+- fix for 'KeyError: _manual' bug caused by unmet requirements. #275 (thanks @HTJense)
+
+### Cosmology
+
+- Added CAMBspec NPIPE Planck 2020 likelihood (#271) ) (thanks @earosenberg)
+- Added native version of `planck_2018_lowl.EE`.
+- Added native version of `planck_2018_low.TT`. (thanks @eirikgje)
+- Added links to external likelihoods Planck PR4 Lensing, pyWMAP.
+- GUI now support PySide6
+- Fixed bug in BAO likelihood (#250, thanks @Pablo-Lemos)
+- Added files for the BAO DR12 and DR16 LRG likelihoods (PR #235; thanks @markm42)
+- Test updates for CAMB 1.4 with updated constants, BBN model and neutrino nnu=3.044
+
+## 3.2.1 – 2022-05-17
+
+### General
+
+- Fixed PyPI installation error (thanks Paul Shah!).
+- Cleaner logging and better advice and error messages for missing component requirements.
+
+## 3.2 – 2022-05-13
 
 ### General
 
 - Documented uses of `Model` class in general contexts (previously only cosmo)
 - `Model` methods to compute log-probabilities and derived parameters now have an `as_dict` keyword (default `False`), for more informative return value.
-- Added ``--minimize`` flag to ``cobaya-run`` for quick minimization (replaces sampler, uses previous output).
-- Add COBAYA_USE_FILE_LOCKING environment variable to allow disabling of file locks. Warning not to use --test with MPI.
+- Added `--minimize` flag to `cobaya-run` for quick minimization (replaces sampler, uses previous output).
+- Add `COBAYA_USE_FILE_LOCKING` environment variable to allow disabling of file locks. Warning not to use `--test` with MPI.
+- Installation of external packages is now version-aware for some packages; added `--upgrade` option to `cobaya-install`, off by default to preserve possible user changes.
+- Introduced `cobaya.component.ComponentNotFoundError` to handle cases in which internal or external components cannot be found.
+- In Linux terminals, added `COBAYA_COLOR` environment variable to get colourful output, useful e.g. for debugging, but *not* recommended for output to a file (e.g. running in a cluster).
+
+### PolyChord
+
+- Updated to v1.20.1: adds `nfail` to control failed initialisation, `synchronous` to choose sync/async parallelisation, variable number of live points, and the possibility to use an internal maximiser. Merges #232 (thanks @williamjameshandley).
 
 ### Cosmological likelihoods and theory codes
 
@@ -19,11 +88,15 @@
 - Support setting individual Accuracy parameters, e.g. Accuracy.AccurateBB
 - Calculate accurate BB when tensors are requested
 - Fix for using derived parameters with post-processing
+- Added `ignore_obsolete` option to be able to run with user-modified older CAMB versions.
 
 #### CLASS
 
-- Updated to v3.1.2
+- Updated to v3.2.0
 - Added `Omega_b|cdm|nu_massive(z)`, `angular_diameter_distance_2`, `sigmaR(z)`, `sigma8(z)`, `fsgima8(z)` and Weyl potential power spectrum.
+- Added `ignore_obsolete` option to be able to run with user-modified older CLASS versions.
+- Added direct access to some CLASS computation products, via new requisites `CLASS_[background|thermodynamics|primordial|perturbations|sources]`.
+- Changed behaviour for `non_linear`: if not present in `extra_args`, uses the current default non-linear code (HMcode) instead of no non-linear code. To impose no non-linear corrections, pass `non_linear: False`.
 
 #### BAO
 
@@ -33,6 +106,10 @@
 
 - Bugfix in decorrelation function #196 (by Caterina Umilta, @umilta)
 - Updated to 2021 data release (2018 data) and bugfix, #204 and #209 (by Dominic Beck, @doicbek)
+
+#### Planck
+
+- Fixed segfault in clik when receiving NaN in the Cl's. Partially implements #231 (thanks @lukashergt and @williamjameshandley)
 
 ## 3.1.1 – 2021-07-22
 

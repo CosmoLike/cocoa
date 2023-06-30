@@ -19,9 +19,12 @@ vpath .base build
 
 # your C compiler:
 #VM BEGINS
+#COCOA BEGINS
+#CC       = gcc
 CC       ?= $(C_COMPILER)
 #CC       = icc
 #CC       = pgcc
+#COCOA ENDS
 #VM ENDS
 
 # your tool for creating static libraries:

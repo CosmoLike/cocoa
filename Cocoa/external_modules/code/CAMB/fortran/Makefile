@@ -30,12 +30,14 @@ endif
 
 #Will detect ifort/gfortran or edit for your compiler
 #VM BEGINS
+#COCOA BEGINS
 #ifneq ($(COMPILER),gfortran)
 #ifortErr = $(shell which ifort >/dev/null 2>&1; echo $$?)
 #else
 #ifortErr = 1
 #endif
 ifortErr = 1
+#COCOA ENDS
 #VM ENDS
 
 ifeq "$(ifortErr)" "0"
@@ -89,15 +91,21 @@ endif
 
 else
 #VM BEGINS
+#COCOA BEGINS
 #gfortErr = $(shell which gfortran >/dev/null; echo $$?)
 gfortErr = 0
+#COCOA ENDS
+#VM ENDS
 ifeq "$(gfortErr)" "0"
 #Gfortran compiler (version 6+):
-#compiler_ver = $(shell gfortran -dumpversion 2>&1)
-COMPILER ?= $(FORTRAN_COMPILER)
-F90C     ?= $(FORTRAN_COMPILER)
+compiler_ver = $(shell gfortran -dumpversion 2>&1)
+#VM BEGINS
+#COCOA BEGINS
 #COMPILER = gfortran
 #F90C     = gfortran
+COMPILER ?= $(FORTRAN_COMPILER)
+F90C     ?= $(FORTRAN_COMPILER)
+#COCOA ENDS
 #VM ENDS
 COMMON_FFLAGS = -MMD -cpp -ffree-line-length-none -fmax-errors=4 -fopenmp
 # Using -ffast-math causes differences between Debug and Release configurations.
@@ -121,9 +129,7 @@ NONNATIVE = 1
 endif
 ifndef NONNATIVE
 #Note this seems to make code slightly slower in some cases, use CLUSTER_SAFE=1 to test without
-#VM BEGINS
-#FFLAGS+=-march=native
-#VM ENDS
+FFLAGS+=-march=native
 endif
 endif
 endif

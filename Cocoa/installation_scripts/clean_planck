@@ -34,6 +34,7 @@ fi
 
 rm -f .lock-waf_*
 
+
 if [ -z "${DEBUG_PLANCK_OUTPUT}" ]; then
   export OUTPUT_PLANCK_1="/dev/null"
   export OUTPUT_PLANCK_2="/dev/null"
@@ -51,3 +52,4 @@ fi
 
 echo 'CLEANING PLANCK LIKELIHOOD DONE'
 cd $ROOTDIR
+

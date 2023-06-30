@@ -185,7 +185,7 @@
     end subroutine CAMB_GetCls
 
     function CAMB_GetAge(P)
-    !Return age in gigayears, returns -1 on error
+    !Return age in Julian gigayears, returns -1 on error
     type(CAMBparams), intent(in) :: P
     real(dl) CAMB_GetAge
     integer error
@@ -255,7 +255,7 @@
     integer i, status
     real(dl) nmassive
     character(LEN=*), intent(inout) :: ErrMsg
-    character(LEN=:), allocatable :: NumStr, S, DarkEnergyModel, RecombinationModel
+    character(LEN=:), allocatable :: NumStr, S, DarkEneryModel, RecombinationModel
     logical :: DoCounts
 
     CAMB_ReadParams = .false.
@@ -401,18 +401,18 @@
     endif
 
     !  Read initial parameters.
-    DarkEnergyModel = UpperCase(Ini%Read_String_Default('dark_energy_model', 'fluid'))
+    DarkEneryModel = UpperCase(Ini%Read_String_Default('dark_energy_model', 'fluid'))
     if (allocated(P%DarkEnergy)) deallocate(P%DarkEnergy)
-    if (DarkEnergyModel == 'FLUID') then
+    if (DarkEneryModel == 'FLUID') then
         allocate (TDarkEnergyFluid::P%DarkEnergy)
-    else if (DarkEnergyModel == 'PPF') then
+    else if (DarkEneryModel == 'PPF') then
         allocate (TDarkEnergyPPF::P%DarkEnergy)
-    else if (DarkEnergyModel == 'AXIONEFFECTIVEFLUID') then
+    else if (DarkEneryModel == 'AXIONEFFECTIVEFLUID') then
         allocate (TAxionEffectiveFluid::P%DarkEnergy)
-    else if (DarkEnergyModel == 'EARLYQUINTESSENCE') then
+    else if (DarkEneryModel == 'EARLYQUINTESSENCE') then
         allocate (TEarlyQuintessence::P%DarkEnergy)
     else
-        ErrMsg = 'Unknown dark energy model: '//trim(DarkEnergyModel)
+        ErrMsg = 'Unknown dark energy model: '//trim(DarkEneryModel)
         return
     end if
     call P%DarkEnergy%ReadParams(Ini)

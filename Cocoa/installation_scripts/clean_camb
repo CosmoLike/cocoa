@@ -39,4 +39,5 @@ else
   echo "CAMB PYTHON3 SETUP.PY CLEAN DONE"
 fi
 
+echo 'CLEANING CAMB DONE'
 cd $ROOTDIR

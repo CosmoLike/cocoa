@@ -384,16 +384,9 @@ class ProcessState:
             status = _mpi.Status()
             _mpi_comm.Recv(self._recv_state, source=_mpi.ANY_SOURCE, tag=self.tag,
                            status=status)
-            #VM BEGINS
-            #VM WEIRD BUG WHERE self._recv_state[0] is a gigantic number
-            if(self._recv_state[0] != 3):
-                if(self._recv_state[0] != 2):
-                    if(self._recv_state[0] != 1):
-                        self._recv_state[0] = 1
-            #VM ENDS
             state = self._recv_state[0]
             self.states[status.Get_source()] = state
-            if check_error and state == 3: #VM State.ERROR = 3 
+            if check_error and state == State.ERROR:
                 self.fire_error(SyncError)
             if log:
                 log.info('SYNC %s %s %s', self.name, self.tag, self.states)
@@ -425,9 +418,9 @@ class ProcessState:
         Test is all processes in READY state (and if they are reset to NONE).
         """
         self.sync(check_error=True)
-        all_ready = all(self.states == 1) # State.READY = 1
+        all_ready = all(self.states == State.READY)
         if all_ready:
-            self.states[:] = 0 # VM: State.NONE = 0
+            self.states[:] = State.NONE
         return all_ready
 
     def __enter__(self):
@@ -435,7 +428,7 @@ class ProcessState:
             self.tag = share(self.tag)
             self.last_process_state = process_state
             set_current_process_state(self)
-        self.states[:] = 0 # VM: State.NONE = 0
+        self.states[:] = State.NONE
         return self
 
     @more_than_one
@@ -443,7 +436,7 @@ class ProcessState:
         if log:
             log.info('END %s %s', self.name, self.tag)
         if exc_type:
-            self.set(3) #VM State.ERROR = 3
+            self.set(State.ERROR)
             if not self.wait_all_ended(
                     timeout=not issubclass(exc_type, OtherProcessError)):
                 from cobaya.log import get_traceback_text, LoggedError, get_logger
@@ -453,10 +446,10 @@ class ProcessState:
                 self.timeout_abort_proc()
                 self.wait_all_ended()  # if didn't actually MPI abort
         else:
-            self.set(2) #VM State.END = 2
+            self.set(State.END)
             self.wait_all_ended()
         set_current_process_state(self.last_process_state)
-        if not exc_type and any(self.states == 3): #VM State.ERROR = 3
+        if not exc_type and any(self.states == State.ERROR):
             self.fire_error()
 
 

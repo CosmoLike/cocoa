@@ -37,12 +37,9 @@ fi
 if [ -z "${IGNORE_C_FFTW_INSTALLATION}" ]; then
   echo 'INSTALLING C FFTW LIBRARY - THIS MIGHT TAKE A WHILE'
 
-  if [ -z "${FFTW_NEW_VERSION}" ]; then
-    cd $ROOTDIR/../cocoa_installation_libraries/fftw-3.3.8
-  else
-    cd $ROOTDIR/../cocoa_installation_libraries/fftw-3.3.10
-  fi
-
+  
+  cd $ROOTDIR/../cocoa_installation_libraries/$COCOA_FFTW_DIR
+  
   if [ -z "${DEBUG_C_PACKAGES}" ]; then
     FC=$FORTRAN_COMPILER CC=$C_COMPILER ./configure --enable-openmp \
     --prefix=$ROOTDIR/.local --enable-shared=yes --enable-static=yes > /dev/null 2> /dev/null
@@ -93,6 +90,7 @@ if [ -z "${IGNORE_C_FFTW_INSTALLATION}" ]; then
   fi
 
   cd $ROOTDIR
+  echo 'INSTALLING C FFTW LIBRARY - DONE'
 fi
 
 # --------------------------------------------------------------------------------------
@@ -101,14 +99,17 @@ fi
 if [ -z "${IGNORE_C_CFITSIO_INSTALLATION}" ]; then
   echo 'INSTALLING C CFITSIO LIBRARY - THIS MIGHT TAKE A WHILE'
 
-  cd $ROOTDIR/../cocoa_installation_libraries/cfitsio-3.47
+  cd $ROOTDIR/../cocoa_installation_libraries/$COCOA_CFITSIO_DIR
 
   rm -f CMakeCache.txt
+
+  mkdir ./CFITSIOBUILD
+  cd ./CFITSIOBUILD
 
   if [ -z "${DEBUG_C_PACKAGES}" ]; then
     $CMAKE -DBUILD_SHARED_LIBS=TRUE -DCMAKE_INSTALL_PREFIX=$ROOTDIR/.local \
     -DCMAKE_C_COMPILER=$C_COMPILER -DCMAKE_CXX_COMPILER=$CXX_COMPILER \
-    -DCMAKE_FC_COMPILER=FORTRAN_COMPILER --log-level=ERROR .  > /dev/null 2> /dev/null
+    -DCMAKE_FC_COMPILER=FORTRAN_COMPILER --log-level=ERROR ..  > /dev/null 2> /dev/null
     if [ $? -eq 0 ]; then
       echo "CFITSIO CMAKE RUN DONE"
     else
@@ -137,7 +138,7 @@ if [ -z "${IGNORE_C_CFITSIO_INSTALLATION}" ]; then
   else
     $CMAKE -DBUILD_SHARED_LIBS=TRUE -DCMAKE_INSTALL_PREFIX=$ROOTDIR/.local \
     -DCMAKE_C_COMPILER=$C_COMPILER -DCMAKE_CXX_COMPILER=$CXX_COMPILER \
-    -DCMAKE_FC_COMPILER=FORTRAN_COMPILER .
+    -DCMAKE_FC_COMPILER=FORTRAN_COMPILER ..
     if [ $? -ne 0 ];then
       cd $ROOTDIR
       return 1
@@ -156,7 +157,11 @@ if [ -z "${IGNORE_C_CFITSIO_INSTALLATION}" ]; then
     fi
   fi
 
+  cd ../
+  rm -rf ./CFITSIOBUILD
+
   cd $ROOTDIR
+  echo 'INSTALLING C CFITSIO LIBRARY - DONE'
 fi
 
 # --------------------------------------------------------------------------------------
@@ -165,7 +170,7 @@ fi
 if [ -z "${IGNORE_C_GSL_INSTALLATION}" ]; then
   echo 'INSTALLING C GSL LIBRARY - THIS MIGHT TAKE A WHILE'
 
-  cd $ROOTDIR/../cocoa_installation_libraries/gsl-2.7/
+  cd $ROOTDIR/../cocoa_installation_libraries/$COCOA_GSL_DIR
 
   if [ -z "${DEBUG_C_PACKAGES}" ]; then
     CC=$C_COMPILER ./configure --prefix=$ROOTDIR/.local --enable-shared=yes \
@@ -218,6 +223,7 @@ if [ -z "${IGNORE_C_GSL_INSTALLATION}" ]; then
   fi
 
   cd $ROOTDIR
+  echo 'INSTALLING C GSL LIBRARY - DONE'
 fi
 
 # --------------------------------------------------------------------------------------

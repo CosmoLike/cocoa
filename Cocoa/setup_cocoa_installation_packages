@@ -125,28 +125,28 @@ else
 fi
 
 if [ -n "${CFLAGS}" ]; then
-  export OLD_CFLAGS=$CFLAGS
+    export OLD_CFLAGS=$CFLAGS
 else
-  export OLD_CFLAGS="x"
+    export OLD_CFLAGS="x"
 fi
 
 if [ -n "${INCLUDE_PATH}" ]; then
-  export OLD_INCLUDE_PATH=$INCLUDE_PATH
+    export OLD_INCLUDE_PATH=$INCLUDE_PATH
 else
-  export OLD_INCLUDE_PATH="x"
+    export OLD_INCLUDE_PATH="x"
 fi
 
 if [ -n "${SET_INSTALLATION_OPTIONS}" ]; then
-  source $SET_INSTALLATION_OPTIONS
+    source $SET_INSTALLATION_OPTIONS
 else
-  source set_installation_options
+    source set_installation_options
 fi
 if [ -n "${MINICONDA_INSTALLATION}" ]; then
-  if [ ${CONDA_SHLVL} -ne 1 ]; then
-    echo "MINICONDA_INSTALLATION SET BUT CONDA ENVIRONMENT NOT ACTIVATED"
-    source stop_cocoa
-    return 1
-  fi
+    if [ ${CONDA_SHLVL} -ne 1 ]; then
+        echo "MINICONDA_INSTALLATION SET BUT CONDA ENVIRONMENT NOT ACTIVATED"
+        source stop_cocoa
+        return 1
+    fi
 fi
 # ----------------------------------------------------------------------------
 # ----------------------------------------------------------------------------

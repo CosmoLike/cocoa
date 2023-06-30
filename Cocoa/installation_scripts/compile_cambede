@@ -29,44 +29,45 @@ fi
 # ----------------------------------------------------------------------------
 
 if [ -z "${IGNORE_CAMB_COMPILATION}" ]; then
-    echo 'COMPILING CAMB EDE'
+  echo 'COMPILING CAMB EDE'
 
-    cd $ROOTDIR/external_modules/code/CAMB-EDE/
+  cd $ROOTDIR/external_modules/code/CAMB-EDE/
 
-    rm -rf ./build/
+  rm -rf ./build/
 
-    rm -rf ./camb/__pycache__/
+  rm -rf ./camb/__pycache__/
 
-    rm -f ./camb/camblib.so
+  rm -f ./camb/camblib.so
 
-    rm -rf ./forutils/Releaselib/
+  rm -rf ./forutils/Releaselib/
 
-    if [ -z "${DEBUG_CAMB_OUTPUT}" ]; then
-      export OUTPUT_CAMB_1="/dev/null"
-      export OUTPUT_CAMB_2="/dev/null"
-    else
-      export OUTPUT_CAMB_1="/dev/tty"
-      export OUTPUT_CAMB_2="/dev/tty"
-    fi
+  if [ -z "${DEBUG_CAMB_OUTPUT}" ]; then
+    export OUTPUT_CAMB_1="/dev/null"
+    export OUTPUT_CAMB_2="/dev/null"
+  else
+    export OUTPUT_CAMB_1="/dev/tty"
+    export OUTPUT_CAMB_2="/dev/tty"
+  fi
 
-    $PYTHON3 setup.py clean > ${OUTPUT_CAMB_1} 2> ${OUTPUT_CAMB_2}
-    if [ $? -ne 0 ]; then
-      echo "CAMB EDE COULD NOT RUN PYTHON3 SETUP.PY CLEAN"
-      cd $ROOTDIR
-      return 1
-    else
-      echo "CAMB EDE PYTHON3 SETUP.PY CLEAN DONE"
-    fi
-
-    COMPILER=$FORTRAN_COMPILER F90C=$FORTRAN_COMPILER $PYTHON3 setup.py build \
-      > ${OUTPUT_CAMB_1} 2> ${OUTPUT_CAMB_2}
-    if [ $? -ne 0 ]; then
-      echo "CAMB COULD NOT RUN PYTHON3 SETUP.PY BUILD"
-      cd $ROOTDIR
-      return 1
-    else
-      echo "CAMB EDE PYTHON3 SETUP.PY BUILD DONE"
-    fi
-
+  $PYTHON3 setup.py clean > ${OUTPUT_CAMB_1} 2> ${OUTPUT_CAMB_2}
+  if [ $? -ne 0 ]; then
+    echo "CAMB EDE COULD NOT RUN PYTHON3 SETUP.PY CLEAN"
     cd $ROOTDIR
+    return 1
+  else
+    echo "CAMB EDE PYTHON3 SETUP.PY CLEAN DONE"
+  fi
+
+  COMPILER=$FORTRAN_COMPILER F90C=$FORTRAN_COMPILER $PYTHON3 setup.py build \
+    > ${OUTPUT_CAMB_1} 2> ${OUTPUT_CAMB_2}
+  if [ $? -ne 0 ]; then
+    echo "CAMB COULD NOT RUN PYTHON3 SETUP.PY BUILD"
+    cd $ROOTDIR
+    return 1
+  else
+    echo "CAMB EDE PYTHON3 SETUP.PY BUILD DONE"
+  fi
+
+  cd $ROOTDIR
+  echo 'COMPILING CAMB EDE DONE'
 fi

@@ -8,17 +8,27 @@ import subprocess as sbp
 import os.path as osp
 
 # Recover the gcc compiler
-GCCPATH_STRING = sbp.Popen(
-    ['$C_COMPILER -print-libgcc-file-name'],
-    stdout=sbp.PIPE, shell=True).communicate()[0]
+#VM BEGINS
+#COCOA BEGINS
+#GCCPATH_STRING = sbp.Popen(
+#    ['gcc', '-print-libgcc-file-name'],
+#    stdout=sbp.PIPE).communicate()[0]
+GCCPATH_STRING = sbp.check_output(["$C_COMPILER -print-libgcc-file-name"], shell=True)
+print(GCCPATH_STRING)
+#COCOA ENDS
+#VM ENDS
 GCCPATH = osp.normpath(osp.dirname(GCCPATH_STRING)).decode()
 
 liblist = ["class"]
-MVEC_STRING = sbp.Popen(
-    ['gcc', '-lmvec'],
-    stderr=sbp.PIPE).communicate()[1]
-if b"mvec" not in MVEC_STRING:
-    liblist += ["mvec","m"]
+#VM BEGINS
+#COCOA BEGINS
+#MVEC_STRING = sbp.Popen(
+#    ['gcc', '-lmvec'],
+#    stderr=sbp.PIPE).communicate()[1]
+#if b"mvec" not in MVEC_STRING:
+#    liblist += ["mvec","m"]
+#COCOA ENDS
+#VM ENDS
 
 # define absolute paths
 root_folder = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..")

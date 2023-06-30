@@ -26,7 +26,7 @@ if [ -z "${IGNORE_ALL_PIP_INSTALLATION}" ]; then
       echo "PROBLEM PIP INSTALL COBAYA" >&2
       return 1
     else
-      echo "PIP then WHEEL DONE"
+      echo "PIP INSTALL COBAYA DONE"
     fi
 else
     $PIP3 install --editable cobaya --prefix=$ROOTDIR/.local > ${OUTPUT_PIP_1} 2> ${OUTPUT_PIP_2}
@@ -34,7 +34,7 @@ else
       echo "PROBLEM PIP INSTALL COBAYA" >&2
       return 1
     else
-      echo "PIP then WHEEL DONE"
+      echo "PIP INSTALL COBAYA DONE"
     fi
 fi
 
@@ -63,3 +63,5 @@ source $ROOTDIR/installation_scripts/compile_act
 # ----------------------------------------------------------------------------
 
 source stop_cocoa
+
+echo 'COMPILE EXTERNAL MODULES DONE'

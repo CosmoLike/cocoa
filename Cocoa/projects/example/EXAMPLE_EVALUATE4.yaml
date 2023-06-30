@@ -1,6 +1,6 @@
 stop_at_error: False
 timing: False
-debug: true
+debug: false
 
 likelihood:
   pyactlike.ACTPol_lite_DR4:

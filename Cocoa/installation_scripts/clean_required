@@ -1,6 +1,6 @@
 if [ -z "${ROOTDIR}" ]; then
-  echo 'ERROR ENV VARIABLE ROOTDIR IS NOT DEFINED' >&2
-  return 1
+    echo 'ERROR ENV VARIABLE ROOTDIR IS NOT DEFINED' >&2
+    return 1
 fi
 
 cd $ROOTDIR/../cocoa_installation_libraries

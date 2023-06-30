@@ -1,6 +1,5 @@
 source ./installation_scripts/impl_unset_keys.sh
 export ROOTDIR=$(pwd -P)
-
 # --------------------------------------------------------------------------------------
 # --------------------------------------------------------------------------------------
 # --------------------------------------------------------------------------------------
@@ -62,198 +61,198 @@ export IGNORE_CLASS_COMPILATION=1
 # --------------------------------------------------------------------------------------
 if [ -n "${MANUAL_INSTALLATION}" ]; then
     
-  # --------------------------------------------------------------------------------------
-  # IF SET, THEN COCOA ADOPTS FFTW10. OTHERWISE, COCOA ADOPTS FFTW8
-  # --------------------------------------------------------------------------------------
-  #export FFTW_NEW_VERSION=1
-  
-  # --------------------------------------------------------------------------------------
-  # IF SET, COCOA DOES NOT USE SYSTEM PIP PACKAGES (RELIES EXCLUSIVELY ON PIP CACHE FOLDER)
-  # --------------------------------------------------------------------------------------
-  export DONT_USE_SYSTEM_PIP_PACKAGES=1
-  
-  # --------------------------------------------------------------------------------------
-  # IF SET, COCOA WILL NOT INSTALL TENSORFLOW, KERAS, PYTORCH, GPY
-  # --------------------------------------------------------------------------------------
-  export IGNORE_EMULATOR_CPU_PIP_PACKAGES=1
-  export IGNORE_EMULATOR_GPU_PIP_PACKAGES=1
+    # --------------------------------------------------------------------------------------
+    # IF SET, THEN COCOA ADOPTS FFTW10. OTHERWISE, COCOA ADOPTS FFTW8
+    # --------------------------------------------------------------------------------------
+    #export FFTW_NEW_VERSION=1
+    
+    # --------------------------------------------------------------------------------------
+    # IF SET, COCOA DOES NOT USE SYSTEM PIP PACKAGES (RELIES EXCLUSIVELY ON PIP CACHE FOLDER)
+    # --------------------------------------------------------------------------------------
+    export DONT_USE_SYSTEM_PIP_PACKAGES=1
+    
+    # --------------------------------------------------------------------------------------
+    # IF NOT SET, COCOA WILL INSTALL TENSORFLOW, KERAS, PYTORCH (NOT FROM PIP_CACHE)
+    # --------------------------------------------------------------------------------------
+    export IGNORE_EMULATOR_CPU_PIP_PACKAGES=1
+    export IGNORE_EMULATOR_GPU_PIP_PACKAGES=1
 
-  # --------------------------------------------------------------------------------------
-  # WE USE CONDA COLASLIM ENV WITH JUST PYTHON AND GCC TO TEST MANUAL INSTALLATION
-  # --------------------------------------------------------------------------------------
-  #conda create --name cocoalite python=3.7 --quiet --yes \
-  #   && conda install -n cocoalite --quiet --yes  \
-  #   'conda-forge::libgcc-ng=10.3.0' \
-  #   'conda-forge::libstdcxx-ng=10.3.0' \
-  #   'conda-forge::libgfortran-ng=10.3.0' \
-  #   'conda-forge::gxx_linux-64=10.3.0' \
-  #   'conda-forge::gcc_linux-64=10.3.0' \
-  #   'conda-forge::gfortran_linux-64=10.3.0' \
-  #   'conda-forge::openmpi=4.1.1' \
-  #   'conda-forge::sysroot_linux-64=2.17' \
-  #   'conda-forge::git=2.33.1' \
-  #   'conda-forge::git-lfs=3.0.2'
-  # --------------------------------------------------------------------------------------
-  
-  export PYTHON_VERSION=3.7
-  export GLOBAL_PACKAGES_LOCATION=$CONDA_PREFIX
-  export GLOBALPYTHON3=$CONDA_PREFIX/bin/python${PYTHON_VERSION}
-  
-  # --------------------------------------------------------------------------------------
-  # USER NEEDS TO SPECIFY THE FLAGS BELOW SO COCOA CAN FIND PYTHON / GCC / HDF5
-  # --------------------------------------------------------------------------------------
-  export PATH=$CONDA_PREFIX/bin:$PATH
-  
-  export CFLAGS="${CFLAGS} -I$CONDA_PREFIX/include"
-  
-  export LDFLAGS="${LDFLAGS} -L$CONDA_PREFIX/lib"
-  
-  export C_INCLUDE_PATH=$CONDA_PREFIX/include:$C_INCLUDE_PATH
-  export C_INCLUDE_PATH=$CONDA_PREFIX/include/python${PYTHON_VERSION}m/:$C_INCLUDE_PATH
-  
-  export CPLUS_INCLUDE_PATH=$CONDA_PREFIX/include:$CPLUS_INCLUDE_PATH
-  export CPLUS_INCLUDE_PATH=$CONDA_PREFIX/include/python${PYTHON_VERSION}m/:$CPLUS_INCLUDE_PATH
-  
-  export PYTHONPATH=$CONDA_PREFIX/lib/python$PYTHON_VERSION/site-packages:$PYTHONPATH
-  export PYTHONPATH=$CONDA_PREFIX/lib:$PYTHONPATH
-  
-  export LD_RUN_PATH=$CONDA_PREFIX/lib/python$PYTHON_VERSION/site-packages:$LD_RUN_PATH
-  export LD_RUN_PATH=$CONDA_PREFIX/lib:$LD_RUN_PATH
-  
-  export LIBRARY_PATH=$CONDA_PREFIX/lib/python$PYTHON_VERSION/site-packages:$LIBRARY_PATH
-  export LIBRARY_PATH=$CONDA_PREFIX/lib:$LIBRARY_PATH
+    # --------------------------------------------------------------------------------------
+    # WE USE CONDA COLASLIM ENV WITH JUST PYTHON AND GCC TO TEST MANUAL INSTALLATION
+    # --------------------------------------------------------------------------------------
+    #conda create --name cocoalitepy38 python=3.8 --quiet --yes \
+    #   && conda install -n cocoalitepy38 --quiet --yes  \
+    #   'conda-forge::libgcc-ng=12.3.0' \
+    #   'conda-forge::libstdcxx-ng=12.3.0' \
+    #   'conda-forge::libgfortran-ng=12.3.0' \
+    #   'conda-forge::gxx_linux-64=12.3.0' \
+    #   'conda-forge::gcc_linux-64=12.3.0' \
+    #   'conda-forge::gfortran_linux-64=12.3.0' \
+    #   'conda-forge::openmpi=4.1.5' \
+    #   'conda-forge::sysroot_linux-64=2.17' \
+    #   'conda-forge::git=2.40.0' \
+    #   'conda-forge::git-lfs=3.3.0'
+    # --------------------------------------------------------------------------------------
+    
+    export PYTHON_VERSION=3.8
+    export GLOBAL_PACKAGES_LOCATION=$CONDA_PREFIX
+    export GLOBALPYTHON3=$CONDA_PREFIX/bin/python${PYTHON_VERSION}
+   
+    # --------------------------------------------------------------------------------------
+    # USER NEEDS TO SPECIFY THE FLAGS BELOW SO COCOA CAN FIND PYTHON / GCC / HDF5
+    # --------------------------------------------------------------------------------------
+    export PATH=$CONDA_PREFIX/bin:$PATH
+    
+    export CFLAGS="${CFLAGS} -I$CONDA_PREFIX/include"
+    
+    export LDFLAGS="${LDFLAGS} -L$CONDA_PREFIX/lib"
+    
+    export C_INCLUDE_PATH=$CONDA_PREFIX/include:$C_INCLUDE_PATH
+    export C_INCLUDE_PATH=$CONDA_PREFIX/include/python${PYTHON_VERSION}m/:$C_INCLUDE_PATH
+    
+    export CPLUS_INCLUDE_PATH=$CONDA_PREFIX/include:$CPLUS_INCLUDE_PATH
+    export CPLUS_INCLUDE_PATH=$CONDA_PREFIX/include/python${PYTHON_VERSION}m/:$CPLUS_INCLUDE_PATH
+    
+    export PYTHONPATH=$CONDA_PREFIX/lib/python$PYTHON_VERSION/site-packages:$PYTHONPATH
+    export PYTHONPATH=$CONDA_PREFIX/lib:$PYTHONPATH
+    
+    export LD_RUN_PATH=$CONDA_PREFIX/lib/python$PYTHON_VERSION/site-packages:$LD_RUN_PATH
+    export LD_RUN_PATH=$CONDA_PREFIX/lib:$LD_RUN_PATH
+    
+    export LIBRARY_PATH=$CONDA_PREFIX/lib/python$PYTHON_VERSION/site-packages:$LIBRARY_PATH
+    export LIBRARY_PATH=$CONDA_PREFIX/lib:$LIBRARY_PATH
 
-  export CMAKE_INCLUDE_PATH=$CONDA_PREFIX/include/:$CMAKE_INCLUDE_PATH
-  export CMAKE_INCLUDE_PATH=$CONDA_PREFIX/include/python${PYTHON_VERSION}m/:$CMAKE_INCLUDE_PATH    
-  
-  export CMAKE_LIBRARY_PATH=$CONDA_PREFIX/lib/python$PYTHON_VERSION/site-packages:$CMAKE_LIBRARY_PATH
-  export CMAKE_LIBRARY_PATH=$CONDA_PREFIX/lib:$CMAKE_LIBRARY_PATH
+    export CMAKE_INCLUDE_PATH=$CONDA_PREFIX/include/:$CMAKE_INCLUDE_PATH
+    export CMAKE_INCLUDE_PATH=$CONDA_PREFIX/include/python${PYTHON_VERSION}m/:$CMAKE_INCLUDE_PATH    
+    
+    export CMAKE_LIBRARY_PATH=$CONDA_PREFIX/lib/python$PYTHON_VERSION/site-packages:$CMAKE_LIBRARY_PATH
+    export CMAKE_LIBRARY_PATH=$CONDA_PREFIX/lib:$CMAKE_LIBRARY_PATH
 
-  export INCLUDE_PATH=$CONDA_PREFIX/include/:$INCLUDE_PATH
-  
-  export INCLUDEPATH=$CONDA_PREFIX/include/:$INCLUDEPATH
-  
-  export INCLUDE=$CONDA_PREFIX/x86_64-conda-linux-gnu/include:$INCLUDE
-  export INCLUDE=$CONDA_PREFIX/include/:$INCLUDE
-  
-  export CPATH=$CONDA_PREFIX/include/:$CPATH
-  
-  export OBJC_INCLUDE_PATH=$CONDA_PREFIX/include/:OBJC_INCLUDE_PATH
-  
-  export OBJC_PATH=$CONDA_PREFIX/include/:OBJC_PATH
+    export INCLUDE_PATH=$CONDA_PREFIX/include/:$INCLUDE_PATH
+    
+    export INCLUDEPATH=$CONDA_PREFIX/include/:$INCLUDEPATH
+    
+    export INCLUDE=$CONDA_PREFIX/x86_64-conda-linux-gnu/include:$INCLUDE
+    export INCLUDE=$CONDA_PREFIX/include/:$INCLUDE
+    
+    export CPATH=$CONDA_PREFIX/include/:$CPATH
+    
+    export OBJC_INCLUDE_PATH=$CONDA_PREFIX/include/:OBJC_INCLUDE_PATH
+    
+    export OBJC_PATH=$CONDA_PREFIX/include/:OBJC_PATH
 
-  # --------------------------------------------------------------------------------------
-  # COMPILER
-  # --------------------------------------------------------------------------------------
-  export C_COMPILER=$CONDA_PREFIX/bin/x86_64-conda-linux-gnu-cc
-  export CXX_COMPILER=$CONDA_PREFIX/bin/x86_64-conda-linux-gnu-g++
-  export FORTRAN_COMPILER=$CONDA_PREFIX/bin/x86_64-conda-linux-gnu-gfortran
-  export MPI_FORTRAN_COMPILER=$CONDA_PREFIX/bin/mpif90
-  export MPI_CC_COMPILER=$CONDA_PREFIX/bin/mpicc
-  export MPI_CXX_COMPILER=$CONDA_PREFIX/bin/mpicxx
-  
-  # --------------------------------------------------------------------------------------
-  # FINE-TUNNING OVER THE USE OF SYSTEM-WIDE PACKAGES INSTEAD OF COCOA's LOCAL COPY
-  # --------------------------------------------------------------------------------------
-  #export IGNORE_XZ_INSTALLATION=1
-  #export IGNORE_DISTUTILS_INSTALLATION=1
-  #export IGNORE_CMAKE_INSTALLATION=1
-  #export IGNORE_HDF5_INSTALLATION=1
-  #export IGNORE_C_GSL_INSTALLATION=1
-  #export IGNORE_C_CFITSIO_INSTALLATION=1
-  #export IGNORE_C_FFTW_INSTALLATION=1
-  #export IGNORE_OPENBLAS_INSTALLATION=1
-  #export IGNORE_FORTRAN_LAPACK_INSTALLATION=1
-  #export IGNORE_CPP_BOOST_INSTALLATION=1
-  #export IGNORE_CPP_ARMA_INSTALLATION=1
+    # --------------------------------------------------------------------------------------
+    # COMPILER
+    # --------------------------------------------------------------------------------------
+    export C_COMPILER=$CONDA_PREFIX/bin/x86_64-conda-linux-gnu-cc
+    export CXX_COMPILER=$CONDA_PREFIX/bin/x86_64-conda-linux-gnu-g++
+    export FORTRAN_COMPILER=$CONDA_PREFIX/bin/x86_64-conda-linux-gnu-gfortran
+    export MPI_FORTRAN_COMPILER=$CONDA_PREFIX/bin/mpif90
+    export MPI_CC_COMPILER=$CONDA_PREFIX/bin/mpicc
+    export MPI_CXX_COMPILER=$CONDA_PREFIX/bin/mpicxx
 
+    # --------------------------------------------------------------------------------------
+    # FINE-TUNNING OVER THE USE OF SYSTEM-WIDE PACKAGES INSTEAD OF COCOA's LOCAL COPY
+    # --------------------------------------------------------------------------------------
+    #export IGNORE_XZ_INSTALLATION=1
+    #export IGNORE_DISTUTILS_INSTALLATION=1
+    #export IGNORE_CMAKE_INSTALLATION=1
+    #export IGNORE_HDF5_INSTALLATION=1
+    #export IGNORE_C_GSL_INSTALLATION=1
+    #export IGNORE_C_CFITSIO_INSTALLATION=1
+    #export IGNORE_C_FFTW_INSTALLATION=1
+    #export IGNORE_OPENBLAS_INSTALLATION=1
+    #exportIGNORE_FORTRAN_LAPACK_INSTALLATION
+    #export IGNORE_CPP_BOOST_INSTALLATION=1
+    #export IGNORE_CPP_ARMA_INSTALLATION=1
+    
 # --------------------------------------------------------------------------------------
 # --------------------------------------------------------------------------------------
 elif [ -n "${MINICONDA_INSTALLATION}" ]; then
 # --------------------------------------------------------------------------------------
 # --------------------------------------------------------------------------------------
 
-  export PYTHON_VERSION=3.7
-  export GLOBALPYTHON3=$CONDA_PREFIX/bin/python${PYTHON_VERSION}
-  export GLOBAL_PACKAGES_LOCATION=$CONDA_PREFIX
+    export PYTHON_VERSION=3.8
+    export GLOBALPYTHON3=$CONDA_PREFIX/bin/python${PYTHON_VERSION}
+    export GLOBAL_PACKAGES_LOCATION=$CONDA_PREFIX
 
-  export PATH=$CONDA_PREFIX/bin:$PATH
-  export CFLAGS="${CFLAGS} -I$CONDA_PREFIX/include"
-  export LDFLAGS="${LDFLAGS} -L$CONDA_PREFIX/lib"
+    export PATH=$CONDA_PREFIX/bin:$PATH
+    export CFLAGS="${CFLAGS} -I$CONDA_PREFIX/include"
+    export LDFLAGS="${LDFLAGS} -L$CONDA_PREFIX/lib"
 
-  export C_INCLUDE_PATH=$CONDA_PREFIX/include:$C_INCLUDE_PATH
-  export C_INCLUDE_PATH=$CONDA_PREFIX/include/python${PYTHON_VERSION}m/:$C_INCLUDE_PATH
-  export C_INCLUDE_PATH=$CONDA_PREFIX/lib/python${PYTHON_VERSION}/site-packages/numpy/core/include:$C_INCLUDE_PATH
+    export C_INCLUDE_PATH=$CONDA_PREFIX/include:$C_INCLUDE_PATH
+    export C_INCLUDE_PATH=$CONDA_PREFIX/include/python${PYTHON_VERSION}m/:$C_INCLUDE_PATH
+    export C_INCLUDE_PATH=$CONDA_PREFIX/lib/python${PYTHON_VERSION}/site-packages/numpy/core/include:$C_INCLUDE_PATH
 
-  export CPLUS_INCLUDE_PATH=$CONDA_PREFIX/include:$CPLUS_INCLUDE_PATH
-  export CPLUS_INCLUDE_PATH=$CONDA_PREFIX/include/python${PYTHON_VERSION}m/:$CPLUS_INCLUDE_PATH
-  export CPLUS_INCLUDE_PATH=$CONDA_PREFIX/lib/python${PYTHON_VERSION}/site-packages/numpy/core/include/:$CPLUS_INCLUDE_PATH
+    export CPLUS_INCLUDE_PATH=$CONDA_PREFIX/include:$CPLUS_INCLUDE_PATH
+    export CPLUS_INCLUDE_PATH=$CONDA_PREFIX/include/python${PYTHON_VERSION}m/:$CPLUS_INCLUDE_PATH
+    export CPLUS_INCLUDE_PATH=$CONDA_PREFIX/lib/python${PYTHON_VERSION}/site-packages/numpy/core/include/:$CPLUS_INCLUDE_PATH
 
-  export PYTHONPATH=$CONDA_PREFIX/lib/python$PYTHON_VERSION/site-packages:$PYTHONPATH
-  export PYTHONPATH=$CONDA_PREFIX/lib:$PYTHONPATH
-  
-  export LD_RUN_PATH=$CONDA_PREFIX/lib/python$PYTHON_VERSION/site-packages:$LD_RUN_PATH
-  export LD_RUN_PATH=$CONDA_PREFIX/lib:$LD_RUN_PATH
-  
-  export LIBRARY_PATH=$CONDA_PREFIX/lib/python$PYTHON_VERSION/site-packages:$LIBRARY_PATH
-  export LIBRARY_PATH=$CONDA_PREFIX/lib:$LIBRARY_PATH
+    export PYTHONPATH=$CONDA_PREFIX/lib/python$PYTHON_VERSION/site-packages:$PYTHONPATH
+    export PYTHONPATH=$CONDA_PREFIX/lib:$PYTHONPATH
+    
+    export LD_RUN_PATH=$CONDA_PREFIX/lib/python$PYTHON_VERSION/site-packages:$LD_RUN_PATH
+    export LD_RUN_PATH=$CONDA_PREFIX/lib:$LD_RUN_PATH
+    
+    export LIBRARY_PATH=$CONDA_PREFIX/lib/python$PYTHON_VERSION/site-packages:$LIBRARY_PATH
+    export LIBRARY_PATH=$CONDA_PREFIX/lib:$LIBRARY_PATH
 
-  export CMAKE_INCLUDE_PATH=$CONDA_PREFIX/include/:$CMAKE_INCLUDE_PATH
-  export CMAKE_INCLUDE_PATH=$CONDA_PREFIX/include/python${PYTHON_VERSION}m/:$CMAKE_INCLUDE_PATH    
-  
-  export CMAKE_LIBRARY_PATH=$CONDA_PREFIX/lib/python$PYTHON_VERSION/site-packages:$CMAKE_LIBRARY_PATH
-  export CMAKE_LIBRARY_PATH=$CONDA_PREFIX/lib:$CMAKE_LIBRARY_PATH
+    export CMAKE_INCLUDE_PATH=$CONDA_PREFIX/include/:$CMAKE_INCLUDE_PATH
+    export CMAKE_INCLUDE_PATH=$CONDA_PREFIX/include/python${PYTHON_VERSION}m/:$CMAKE_INCLUDE_PATH    
+    
+    export CMAKE_LIBRARY_PATH=$CONDA_PREFIX/lib/python$PYTHON_VERSION/site-packages:$CMAKE_LIBRARY_PATH
+    export CMAKE_LIBRARY_PATH=$CONDA_PREFIX/lib:$CMAKE_LIBRARY_PATH
 
-  export INCLUDE_PATH=$CONDA_PREFIX/include/:$INCLUDE_PATH
-  
-  export INCLUDEPATH=$CONDA_PREFIX/include/:$INCLUDEPATH
-  
-  export INCLUDE=$CONDA_PREFIX/x86_64-conda-linux-gnu/include:$INCLUDE
-  export INCLUDE=$CONDA_PREFIX/include/:$INCLUDE
-  
-  export CPATH=$CONDA_PREFIX/include/:$CPATH
-  
-  export OBJC_INCLUDE_PATH=$CONDA_PREFIX/include/:OBJC_INCLUDE_PATH
-  
-  export OBJC_PATH=$CONDA_PREFIX/include/:OBJC_PATH
+    export INCLUDE_PATH=$CONDA_PREFIX/include/:$INCLUDE_PATH
+    
+    export INCLUDEPATH=$CONDA_PREFIX/include/:$INCLUDEPATH
+    
+    export INCLUDE=$CONDA_PREFIX/x86_64-conda-linux-gnu/include:$INCLUDE
+    export INCLUDE=$CONDA_PREFIX/include/:$INCLUDE
+    
+    export CPATH=$CONDA_PREFIX/include/:$CPATH
+    
+    export OBJC_INCLUDE_PATH=$CONDA_PREFIX/include/:OBJC_INCLUDE_PATH
+    
+    export OBJC_PATH=$CONDA_PREFIX/include/:OBJC_PATH
 
-  # --------------------------------------------------------------------------------------
-  # COMPILER
-  # --------------------------------------------------------------------------------------
-  export C_COMPILER=$CONDA_PREFIX/bin/x86_64-conda-linux-gnu-cc
-  export CXX_COMPILER=$CONDA_PREFIX/bin/x86_64-conda-linux-gnu-g++
-  export FORTRAN_COMPILER=$CONDA_PREFIX/bin/x86_64-conda-linux-gnu-gfortran
-  export MPI_FORTRAN_COMPILER=$CONDA_PREFIX/bin/mpif90
-  export MPI_CC_COMPILER=$CONDA_PREFIX/bin/mpicc
-  export MPI_CXX_COMPILER=$CONDA_PREFIX/bin/mpicxx
+    # --------------------------------------------------------------------------------------
+    # COMPILER
+    # --------------------------------------------------------------------------------------
+    export C_COMPILER=$CONDA_PREFIX/bin/x86_64-conda-linux-gnu-cc
+    export CXX_COMPILER=$CONDA_PREFIX/bin/x86_64-conda-linux-gnu-g++
+    export FORTRAN_COMPILER=$CONDA_PREFIX/bin/x86_64-conda-linux-gnu-gfortran
+    export MPI_FORTRAN_COMPILER=$CONDA_PREFIX/bin/mpif90
+    export MPI_CC_COMPILER=$CONDA_PREFIX/bin/mpicc
+    export MPI_CXX_COMPILER=$CONDA_PREFIX/bin/mpicxx
 
-  # --------------------------------------------------------------------------------------
-  # IGNORE MOST PACKAGES (ALREADY ON CONDA)
-  # --------------------------------------------------------------------------------------
-  export IGNORE_XZ_INSTALLATION=1
-  export IGNORE_DISTUTILS_INSTALLATION=1
-  export IGNORE_CMAKE_INSTALLATION=1
-  export IGNORE_HDF5_INSTALLATION=1
-  export IGNORE_OPENBLAS_INSTALLATION=1
-  export IGNORE_FORTRAN_LAPACK_INSTALLATION=1
-  export IGNORE_CPP_BOOST_INSTALLATION=1
-  export IGNORE_CPP_ARMA_INSTALLATION=1
-  export IGNORE_C_CFITSIO_INSTALLATION=1
-  export IGNORE_C_FFTW_INSTALLATION=1
-  export IGNORE_C_GSL_INSTALLATION=1
+    # --------------------------------------------------------------------------------------
+    # IGNORE MOST PACKAGES (ALREADY ON CONDA)
+    # --------------------------------------------------------------------------------------
+    export IGNORE_XZ_INSTALLATION=1
+    export IGNORE_DISTUTILS_INSTALLATION=1
+    export IGNORE_C_GSL_INSTALLATION=1
+    export IGNORE_C_CFITSIO_INSTALLATION=1
+    export IGNORE_C_FFTW_INSTALLATION=1
+    export IGNORE_CPP_BOOST_INSTALLATION=1
+    export IGNORE_CMAKE_INSTALLATION=1
+    export IGNORE_OPENBLAS_INSTALLATION=1
+    export IGNORE_FORTRAN_LAPACK_INSTALLATION=1
+    export IGNORE_CPP_ARMA_INSTALLATION=1
+    export IGNORE_HDF5_INSTALLATION=1
 
-  # --------------------------------------------------------------------------------------
-  # IF NOT SET, COCOA WILL INSTALL TENSORFLOW, KERAS, PYTORCH, GPY (NOT FROM PIP_CACHE)
-  # --------------------------------------------------------------------------------------
-  export IGNORE_EMULATOR_CPU_PIP_PACKAGES=1
-  export IGNORE_EMULATOR_GPU_PIP_PACKAGES=1
-
-  # --------------------------------------------------------------------------------------
-  # DEBUG THE COMPILATION OF PREREQUISITES PACKAGES. BY DEFAULT, THE COMPILATION'S -------
-  # OUTPUT IS NOT WRITTEN ON THE TERMINAL. THESE FLAGS ENABLE THAT OUTPUT ---------------- 
-  # --------------------------------------------------------------------------------------
-  #export DEBUG_CPP_PACKAGES=1
-  #export DEBUG_PIP_OUTPUT=1
+    # --------------------------------------------------------------------------------------
+    # IF NOT SET, COCOA WILL INSTALL TENSORFLOW, KERAS, PYTORCH (NOT FROM PIP_CACHE)
+    # --------------------------------------------------------------------------------------
+    export IGNORE_EMULATOR_CPU_PIP_PACKAGES=1
+    export IGNORE_EMULATOR_GPU_PIP_PACKAGES=1
+    
+    # --------------------------------------------------------------------------------------
+    # DEBUG THE COMPILATION OF PREREQUISITES PACKAGES. BY DEFAULT, THE COMPILATION'S -------
+    # OUTPUT IS NOT WRITTEN ON THE TERMINAL. THESE FLAGS ENABLE THAT OUTPUT ---------------- 
+    # --------------------------------------------------------------------------------------
+    #export DEBUG_CPP_PACKAGES=1
+    #export DEBUG_PIP_OUTPUT=1
 fi
 
 # --------------------------------------------------------------------------------------
@@ -283,38 +282,39 @@ fi
 # --------------------------------------------------------------------------------------
 # --------------------------------------------------------------------------------------
 ulimit -s unlimited
+export COBAYA_PACKAGES_PATH=$ROOTDIR/external_modules
 # --------------------------------------------------------------------------------------
 if [ -z "${IGNORE_CMAKE_INSTALLATION}" ]; then
-  export CMAKE_ROOT=$ROOTDIR/.local/bin/cmake
-  export CMAKE=$ROOTDIR/.local/bin/cmake
+    export CMAKE_ROOT=$ROOTDIR/.local/bin/cmake
+    export CMAKE=$ROOTDIR/.local/bin/cmake
 else
-  export CMAKE=cmake
+    export CMAKE=cmake
 fi
 # --------------------------------------------------------------------------------------
 if [ -n "${IGNORE_CPP_INSTALLATION}" ]; then
-  export IGNORE_CPP_BOOST_INSTALLATION=1
-  export IGNORE_CPP_ARMA_INSTALLATION=1
-  export IGNORE_CPP_SPDLOG_INSTALLATION=1
-  export IGNORE_CPP_CARMA_INSTALLATION=1
+    export IGNORE_CPP_BOOST_INSTALLATION=1
+    export IGNORE_CPP_ARMA_INSTALLATION=1
+    export IGNORE_CPP_SPDLOG_INSTALLATION=1
+    export IGNORE_CPP_CARMA_INSTALLATION=1
 fi
 # --------------------------------------------------------------------------------------
 if [ -n "${IGNORE_C_INSTALLATION}" ]; then
-  export IGNORE_C_CFITSIO_INSTALLATION=1
-  export IGNORE_C_FFTW_INSTALLATION=1
-  export IGNORE_C_GSL_INSTALLATION=1
+    export IGNORE_C_CFITSIO_INSTALLATION=1
+    export IGNORE_C_FFTW_INSTALLATION=1
+    export IGNORE_C_GSL_INSTALLATION=1
 fi
 # --------------------------------------------------------------------------------------
 if [ -n "${IGNORE_FORTRAN_INSTALLATION}" ]; then
-  export IGNORE_FORTRAN_LAPACK_INSTALLATION=1
+    export IGNORE_FORTRAN_LAPACK_INSTALLATION=1
 fi
 # --------------------------------------------------------------------------------------
 if [ -n "${GLOBAL_PACKAGES_LOCATION}" ]; then
-  export GLOBAL_PACKAGES_INCLUDE=$GLOBAL_PACKAGES_LOCATION/include
-  export GLOBAL_PACKAGES_LIB=$GLOBAL_PACKAGES_LOCATION/lib
+    export GLOBAL_PACKAGES_INCLUDE=$GLOBAL_PACKAGES_LOCATION/include
+    export GLOBAL_PACKAGES_LIB=$GLOBAL_PACKAGES_LOCATION/lib
 fi
 # --------------------------------------------------------------------------------------
 if [ -z "${THREAD_UNXZ}" ]; then
-  export MAKE_NUM_THREADS=1
+    export MAKE_NUM_THREADS=1
 fi
 # --------------------------------------------------------------------------------------
 export PIP3=$ROOTDIR/.local/bin/pip$PYTHON_VERSION
@@ -322,11 +322,36 @@ export PYTHON3=$ROOTDIR/.local/bin/python$PYTHON_VERSION
 export COBAYA_PACKAGES_PATH=external_modules
 # --------------------------------------------------------------------------------------
 if [ -n "${COSMOLIKE_DEBUG_MODE}" ]; then
-  export SPDLOG_LEVEL=debug
+    export SPDLOG_LEVEL=debug
 else
-  export SPDLOG_LEVEL=info
+    export SPDLOG_LEVEL=info
 fi
 # --------------------------------------------------------------------------------------
 export COCOA_RUN_EVALUATE="mpirun -n 1 --mca btl tcp,self --bind-to core:overload-allowed --rank-by core --map-by numa:pe=4 cobaya-run"
 
 export COCOA_RUN_MCMC="mpirun -n 4 --mca btl tcp,self --bind-to core:overload-allowed --rank-by core --map-by numa:pe=4 cobaya-run"
+# --------------------------------------------------------------------------------------
+# --------------------------------------------------------------------------------------
+# --------------------------------------------------------------------------------------
+# ------------------------------- PACKAGES LOCATION  -----------------------------------
+# --------------------------------------------------------------------------------------
+# --------------------------------------------------------------------------------------
+# --------------------------------------------------------------------------------------
+export COCOA_ARMADILLO_DIR=armadillo-11.4.4/
+export COCOA_BOOST_DIR=boost_1_81_0/
+export COCOA_CMAKE_DIR=cmake-3.26.4/
+export COCOA_CFITSIO_DIR=cfitsio-4.0.0/
+export COCOA_HDF5_DIR1=CMake-hdf5-1.14.1/
+export COCOA_HDF5_DIR2=CMake-hdf5-1.14.1/hdf5-1.14.1/
+export COCOA_CARMA_DIR=carma/
+export COCOA_SPDLOG_DIR=spdlog/
+export COCOA_EXPAT_DIR=expat-2.5.0/
+export COCOA_OPENBLAS_DIR=OpenBLAS-0.3.23/
+export COCOA_LAPACK_DIR=lapack-3.9.0/
+export COCOA_GSL_DIR=gsl-2.7/
+export COCOA_FFTW_DIR=fftw-3.3.10/
+export COCOA_TEXINFO_DIR=texinfo-7.0.3/
+export COCOA_BINUTILS_DIR=binutils-2.37/
+export COCOA_XZ_DIR=xz-5.2.5/
+export COCOA_XZ_FILE=xz-5.2.5.tar.gz
+# --------------------------------------------------------------------------------------

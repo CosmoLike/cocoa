@@ -1,7 +1,10 @@
 LICENSE
 MANIFEST.in
+PKG-INFO
 README.md
+ee2_bindata.dat
 setup.py
+dist/euclidemu2-1.2.0-py3.7-linux-x86_64.egg
 euclidemu2.egg-info/PKG-INFO
 euclidemu2.egg-info/SOURCES.txt
 euclidemu2.egg-info/dependency_links.txt

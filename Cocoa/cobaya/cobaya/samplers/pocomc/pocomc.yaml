@@ -1,8 +1,0 @@
-confidence_for_unbounded: 0.9999995 #  0.999534741841929 is about 3.5sigma; Polychord uses 5sigma: 0.9999995
-
-n_walkers: 1000
-
-parallel:
-  kind: multiprocessing
-  args:
-    threads: -1

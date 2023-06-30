@@ -223,7 +223,7 @@ class Parameterization(HasLogger):
         labels_inv_repeated = invert_dict(self.labels())
         labels_inv_repeated = {k: v for k, v in labels_inv_repeated.items() if len(v) > 1}
         if labels_inv_repeated:
-            self.log.warning(
+            self.mpi_warning(
                 "There are repeated parameter labels: %r", labels_inv_repeated)
 
     def dropped_param_set(self) -> Set[str]:
@@ -250,6 +250,10 @@ class Parameterization(HasLogger):
 
     def derived_params(self) -> ParamValuesDict:
         return self._derived.copy()
+
+    def derived_params_info(self) -> ExpandedParamsDict:
+        return {p: deepcopy_where_possible(info) for p, info
+                in self._infos.items() if p in self._derived}
 
     def sampled_input_dependence(self) -> Dict[str, List[str]]:
         return deepcopy(self._sampled_input_dependence)
@@ -297,12 +301,9 @@ class Parameterization(HasLogger):
         if self._wrapped_derived_funcs:
             for p, (func, args, to_set) in self._wrapped_derived_funcs.items():
                 for arg in to_set:
-                    val = self._input.get(arg)
-                    if val is None:
-                        val = output_params_values.get(arg)
-                        if val is None:
+                    if (val := self._input.get(arg)) is None:
+                        if (val := output_params_values.get(arg)) is None:
                             val = self._derived.get(arg)
-
                     args[arg] = val
                 self._derived[p] = self._call_param_func(p, func, args)
         return self._derived
@@ -326,7 +327,8 @@ class Parameterization(HasLogger):
         else:
             if len(sampled_params) != len(self._sampled):
                 raise LoggedError(self.log, "Wrong number of sampled parameters passed: "
-                                  "%d given vs %d expected", len(sampled_params),
+                                            "%d given vs %d expected",
+                                  len(sampled_params),
                                   len(self._sampled))
             return sampled_params
 

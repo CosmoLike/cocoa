@@ -39,6 +39,7 @@ else
   echo "CAMB EDE PYTHON3 SETUP.PY CLEAN DONE"
 fi
 
+echo 'CLEANING CAMB EDE DONE'
 cd $ROOTDIR
 
 

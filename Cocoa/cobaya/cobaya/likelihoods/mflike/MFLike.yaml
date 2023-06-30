@@ -1,5 +1,5 @@
 # A simple cobaya likelihood for SO/LAT
-
+ 
 data_folder: simons_observatory/v0.7.1
 # Path to the input SACC file, containing, minimally,
 # information about the different tracers (i.e. frequency

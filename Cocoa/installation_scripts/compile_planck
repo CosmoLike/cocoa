@@ -86,4 +86,5 @@ if [ -z "${IGNORE_PLANCK_COMPILATION}" ]; then
   fi
 
   cd $ROOTDIR
+  echo 'COMPILING PLANCK DONE'
 fi

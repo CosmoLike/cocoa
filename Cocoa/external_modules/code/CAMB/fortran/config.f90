@@ -3,7 +3,7 @@
     use constants, only: const_twopi
     implicit none
 
-    character(LEN=*), parameter :: version = '1.3.5'
+    character(LEN=*), parameter :: version = '1.4.2.1'
 
     integer :: FeedbackLevel = 0 !if >0 print out useful information about the model
 
@@ -40,9 +40,6 @@
     real(dl), parameter :: OmegaKFlat = 5e-7_dl !Value at which to use flat code
 
     real(dl), parameter :: tol=1.0d-4 !Base tolerance for perturbation integrations
-
-    !     used as parameter for spline - tells it to use 'natural' end values
-    real(dl), parameter :: spl_large=1.e40_dl
 
     character(LEN=1024) :: highL_unlensed_cl_template = 'HighLExtrapTemplate_lenspotentialCls.dat'
     !fiducial high-accuracy high-L C_L used for making small cosmology-independent numerical corrections

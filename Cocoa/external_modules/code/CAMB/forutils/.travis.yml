@@ -1,0 +1,39 @@
+os: linux
+language: shell
+dist: bionic
+
+git:
+  depth: false
+
+jobs:
+  include:
+    - name: "GCC7" 
+      env:
+        - GCC_VERSION="7"
+        - HUB="cmbant/docker-gcc-build:gcc7"
+    - name: "GCC8"
+      env:
+        - GCC_VERSION="8"
+        - HUB="cmbant/docker-gcc-build:gcc8"
+    - name: "GCC9"
+      env:
+        - GCC_VERSION="9"
+        - HUB="cmbant/docker-gcc-build:gcc9"
+    - name: "trunk"
+      env:
+        - GCC_VERSION="trunk"
+        - HUB="cmbant/docker-gcc-build:devel"
+ 
+services:
+  - docker
+
+before_install:
+  - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
+  - docker pull $HUB
+
+install:
+  - chmod +x tests/run_tests.sh
+     
+script:
+  - docker run -v $(pwd):/forutils -t $HUB /bin/bash -c /forutils/tests/run_tests.sh
+

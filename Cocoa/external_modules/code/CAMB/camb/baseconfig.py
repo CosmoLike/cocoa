@@ -48,7 +48,7 @@ class IfortGfortranLoader(ctypes.CDLL):
         return res
 
 
-mock_load = os.environ.get('READTHEDOCS', None)
+mock_load = os.environ.get('CAMB_MOCK_LOAD', None)
 if mock_load:
     # noinspection PyCompatibility
     from unittest.mock import MagicMock
@@ -504,7 +504,7 @@ class CAMBStructureMeta(type(Structure)):
                             "sized fields only allowed for ctypes Arrays")
                     if dic["size"] not in [x[0] for x in _fields]:
                         raise CAMBFortranError(
-                            "size must be name of field in same structure (%s for %s)" % (
+                            "size must be the name of a field in same structure (%s for %s)" % (
                                 dic["size"], field_name))
                     new_field = SizedArrayField(field_name, dic["size"])
                     ctypes_fields.append(("_" + field_name, field_type))

@@ -27,7 +27,7 @@ fi
 if [ -z "${IGNORE_CMAKE_INSTALLATION}" ]; then
   echo 'INSTALLING CMAKE - THAT WILL TAKE A WHILE'
 
-  cd $ROOTDIR/../cocoa_installation_libraries/cmake-3.17.1
+  cd $ROOTDIR/../cocoa_installation_libraries/$COCOA_CMAKE_DIR
 
   if [ -z "${DEBUG_CMAKE_PACKAGE}" ]; then
     env CC=$C_COMPILER CXX=$CPP_COMPILER ./bootstrap --prefix=$ROOTDIR/.local > /dev/null 2> /dev/null
@@ -77,4 +77,5 @@ if [ -z "${IGNORE_CMAKE_INSTALLATION}" ]; then
   fi
 
   cd $ROOTDIR
+  echo 'INSTALLING CMAKE - DONE'
 fi

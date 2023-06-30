@@ -43,7 +43,8 @@ if [ -z "${IGNORE_FORTRAN_LAPACK_INSTALLATION}" ]; then
 
   if [ -z "${DEBUG_FORTRAN_PACKAGES}" ]; then
     $CMAKE -DBUILD_SHARED_LIBS=TRUE -DCMAKE_INSTALL_PREFIX=$ROOTDIR/.local \
-    -DCMAKE_C_COMPILER=$C_COMPILER --log-level=ERROR ../lapack-3.9.0/ > /dev/null 2> /dev/null
+      -DCMAKE_C_COMPILER=$C_COMPILER --log-level=ERROR \
+      ../${COCOA_LAPACK_DIR} > /dev/null 2> /dev/null
     if [ $? -eq 0 ]; then
       echo "LAPACK CMAKE RUN DONE"
     else
@@ -71,7 +72,7 @@ if [ -z "${IGNORE_FORTRAN_LAPACK_INSTALLATION}" ]; then
     fi
   else
     $CMAKE -DBUILD_SHARED_LIBS=TRUE -DCMAKE_INSTALL_PREFIX=$ROOTDIR/.local \
-    -DCMAKE_C_COMPILER=$C_COMPILER --log-level=ERROR ../lapack-3.9.0/
+      -DCMAKE_C_COMPILER=$C_COMPILER --log-level=ERROR ../${COCOA_LAPACK_DIR}
     if [ $? -ne 0 ];then
       cd $ROOTDIR
       return 1

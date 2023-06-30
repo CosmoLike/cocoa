@@ -31,10 +31,10 @@ fi
 
 if [ -z "${IGNORE_ALL_PIP_INSTALLATION}" ]; then
   if [ -z "${MINICONDA_INSTALLATION}" ]; then
-    cd $ROOTDIR/../cocoa_installation_libraries/expat241
+    cd $ROOTDIR/../cocoa_installation_libraries/$COCOA_EXPAT_DIR
     
     FC=$FORTRAN_COMPILER CC=$C_COMPILER ./configure --prefix=$ROOTDIR/.local \
-    --enable-shared=yes --enable-static=yes > ${OUTPUT_PIP_1} 2> ${OUTPUT_PIP_2}
+      --enable-shared=yes --enable-static=yes > ${OUTPUT_PIP_1} 2> ${OUTPUT_PIP_2}
 
     make -j $MAKE_NUM_THREADS > ${OUTPUT_PIP_1} 2> ${OUTPUT_PIP_2}
     if [ $? -eq 0 ]; then
@@ -65,405 +65,136 @@ fi
 
 if [ -z "${IGNORE_ALL_PIP_INSTALLATION}" ]; then
   if [ -z "${MINICONDA_INSTALLATION}" ]; then
-    env CXX=$CXX_COMPILER CC=$C_COMPILER $PIP3 install 'setuptools==59.8.0' \
-      --prefix=$ROOTDIR/.local --find-links file:$ROOTDIR/../cocoa_installation_libraries/pip_cache \
-      --no-index > ${OUTPUT_PIP_1} 2> ${OUTPUT_PIP_2}
+    env CXX=$CXX_COMPILER CC=$C_COMPILER $PIP3 install \
+        'cython==0.29.35' \
+        'mpi4py==3.1.4' \
+        'scipy==1.10.1' \
+        'pandas==1.5.3' \
+        'numpy==1.23.5' \
+        'matplotlib==3.7.1' \
+      --prefix=$ROOTDIR/.local \
+      --find-links file:$ROOTDIR/../cocoa_installation_libraries/pip_cache \
+      --no-index > ${OUTPUT_PIP_1} 2> ${OUTPUT_PIP_2}  
     if [ $? -ne 0 ]; then
-      echo "PROBLEM PIP INSTALL SETUPTOOLS" >&2
+      echo "PROBLEM PIP INSTALL (BASIC PACKAGES)" >&2
       return 1
     else
-      echo "PIP INSTALL SETUPTOOLS DONE"
+      echo "PIP INSTALL DONE (BASIC PACKAGES)"
+    fi
+  else
+    #PS: --force-reinstall - this helps CARMA to see numpy files
+    env CXX=$CXX_COMPILER CC=$C_COMPILER $PIP3 install \
+        'numpy==1.24.3' \
+      --prefix=$ROOTDIR/.local \
+      --find-links file:$ROOTDIR/../cocoa_installation_libraries/pip_cache --no-index \
+      --force-reinstall > ${OUTPUT_PIP_1} 2> ${OUTPUT_PIP_2}
+    if [ $? -ne 0 ]; then
+      echo "PROBLEM PIP INSTALL (BASIC PACKAGES)" >&2
+      return 1
+    else
+      echo "PIP INSTALL DONE (BASIC PACKAGES)"
     fi
   fi
 
-  env CXX=$CXX_COMPILER CC=$C_COMPILER $PIP3 install 'six==1.16.0' \
+  env CXX=$CXX_COMPILER CC=$C_COMPILER $PIP3 install \
+      'appdirs==1.4.4' \
+      'anytree==2.8.0' \
+      'astropy==5.2.2' \
+      'Babel==2.12.1' \
+      'certifi==2023.5.7' \
+      'contourpy==1.1.0' \
+      'cachetools==5.3.1' \
+      'cycler==0.11.0' \
+      'charset-normalizer==3.1.0' \
+      'configparser==5.3.0' \
+      'corner==2.2.1' \
+      'dill==0.3.6' \
+      'decorator==5.1.1' \
+      'docutils==0.20.1' \
+      'fonttools==4.40.0' \
+      'fuzzywuzzy==0.18.0' \
+      'h5py==3.8.0' \
+      'idna==3.4' \
+      'imageio==2.31.1' \
+      'imagesize==1.4.1' \
+      'importlib-resources==5.12.0' \
+      'importlib_metadata==6.6.0' \
+      'iminuit==2.21.3' \
+      'GetDist==1.4.3' \
+      'GPy==1.10.0' \
+      'Jinja2==3.1.2' \
+      'jax==0.4.12' \
+      'johnnydep==1.20.2' \
+      'importlib-metadata==6.6.0' \
+      'kiwisolver==1.4.4' \
+      'lazy_loader==0.2' \
+      'llvmlite==0.40.1' \
+      'lenstronomy==1.11.2' \
+      'MarkupSafe==2.1.3' \
+      'mpmath==1.3.0' \
+      'multiprocess==0.70.14' \
+      'numba==0.57.0' \
+      'numpydoc==1.5.0' \
+      'networkx==3.1' \
+      'oauthlib==3.2.2' \
+      'oyaml==1.0' \
+      'pyDOE2==1.3.0' \
+      'PyWavelets==1.4.1' \
+      'packaging==23.1' \
+      'pyparsing==3.0.9' \
+      'python-dateutil==2.8.2' \
+      'pytz==2023.3' \
+      'Pillow==9.5.0' \
+      'PyYAML==6.0' \
+      'pyerfa==2.0.0.3' \
+      'protobuf==4.23.2' \
+      'Py-BOBYQA==1.4' \
+      'pybind11==2.10.4' \
+      'PGen==0.2.1' \
+      'portalocker==2.7.0' \
+      'paramz==0.9.5' \
+      'qp-prob==0.8.3' \
+      'requests==2.31.0' \
+      'sympy==1.12' \
+      'sacc==0.8.1' \
+      'six==1.16.0' \
+      'setuptools==67.7.2' \
+      'setuptools-scm==7.1.0' \
+      'scikit-image==0.21.0' \
+      'scikit-learn==1.2.2' \
+      'syslibrary==0.1' \
+      'schwimmbad==0.3.2' \
+      'tables-io==0.8.1' \
+      'tifffile==2023.4.12' \
+      'tzdata==2023.3' \
+      'threadpoolctl==3.1.0' \
+      'typing_extensions==4.6.3' \
+      'tokenizers==0.13.3' \
+      'tqdm==4.65.0' \
+      'tomli==2.0.1' \
+      'toml==0.10.2' \
+      'tabulate==0.9.0' \
+      'urllib3==1.26.16' \
+      'wrapt==1.14.1' \
+      'wheel==0.40.0' \
+      'wget==3.2' \
+      'wimpy==0.6' \
+      'zipp==3.15.0' \
+      'zipfile38==0.0.3' \
+      'structlog==23.1.0' \
     --prefix=$ROOTDIR/.local \
     --find-links file:$ROOTDIR/../cocoa_installation_libraries/pip_cache \
     --no-index > ${OUTPUT_PIP_1} 2> ${OUTPUT_PIP_2}
   if [ $? -ne 0 ]; then
-    echo "PROBLEM PIP INSTALL SIX" >&2
+    echo "PROBLEM PIP INSTALL CORE PACKAGES" >&2
     return 1
   else
-    echo "PIP INSTALL SIX DONE"
-  fi
-
-  if [ -z "${MINICONDA_INSTALLATION}" ]; then
-    env CXX=$CXX_COMPILER CC=$C_COMPILER $PIP3 install \
-    $ROOTDIR/../cocoa_installation_libraries/pip_cache/wheel-0.40.0.tar.gz \
-    --prefix=$ROOTDIR/.local --find-links file:$ROOTDIR/../cocoa_installation_libraries/pip_cache \
-    --no-index > ${OUTPUT_PIP_1} 2> ${OUTPUT_PIP_2}
-    if [ $? -ne 0 ]; then
-      echo "PROBLEM PIP INSTALL WHEEL" >&2
-      return 1
-    else
-      echo "PIP INSTALL WHEEL DONE"
-    fi
-  fi
-
-  env CXX=$CXX_COMPILER CC=$C_COMPILER $PIP3 install 'wget==3.2' --prefix=$ROOTDIR/.local \
-    --find-links file:$ROOTDIR/../cocoa_installation_libraries/pip_cache \
-    --no-index > ${OUTPUT_PIP_1} 2> ${OUTPUT_PIP_2}
-  if [ $? -ne 0 ]; then
-    echo "PROBLEM PIP INSTALL WGET" >&2
-    return 1
-  else
-    echo "PIP INSTALL WGET DONE"
-  fi
-
-  env CXX=$CXX_COMPILER CC=$C_COMPILER $PIP3 install 'packaging==23.1' --prefix=$ROOTDIR/.local \
-    --find-links file:$ROOTDIR/../cocoa_installation_libraries/pip_cache \
-    --no-index > ${OUTPUT_PIP_1} 2> ${OUTPUT_PIP_2} 
-  if [ $? -ne 0 ]; then
-    echo "PROBLEM PIP INSTALL PACKAGING" >&2
-    return 1
-  else
-    echo "PIP INSTALL PACKAGING DONE"
+    echo "PIP INSTALL CORE PACKAGES DONE"
   fi
 
   env CXX=$CXX_COMPILER CC=$C_COMPILER $PIP3 install \
-    $ROOTDIR/../cocoa_installation_libraries/pip_cache/PGen-0.2.1.zip  --prefix=$ROOTDIR/.local \
-    --find-links file:$ROOTDIR/../cocoa_installation_libraries/pip_cache \
-    --no-index > ${OUTPUT_PIP_1} 2> ${OUTPUT_PIP_2}
-  if [ $? -ne 0 ]; then
-    echo "PROBLEM PIP INSTALL PGEN" >&2
-    return 1
-  else
-    echo "PIP INSTALL PGEN DONE"
-  fi
-
-  env CXX=$CXX_COMPILER CC=$C_COMPILER $PIP3 install appdirs --prefix=$ROOTDIR/.local \
-    --find-links  file:$ROOTDIR/../cocoa_installation_libraries/pip_cache \
-    --no-index > ${OUTPUT_PIP_1} 2> ${OUTPUT_PIP_2}
-  if [ $? -ne 0 ]; then
-    echo "PROBLEM PIP INSTALL APPDIRS" >&2
-    return 1
-  else
-    echo "PIP INSTALL APPDIRS DONE"
-  fi
-
-  env CXX=$CXX_COMPILER CC=$C_COMPILER $PIP3 install 'tokenizers==0.10.3' --prefix=$ROOTDIR/.local \
-    --find-links file:$ROOTDIR/../cocoa_installation_libraries/pip_cache \
-    --no-index > ${OUTPUT_PIP_1} 2> ${OUTPUT_PIP_2}
-  if [ $? -ne 0 ]; then
-    echo "PROBLEM PIP INSTALL TOKENIZERS" >&2
-    return 1
-  else
-    echo "PIP INSTALL TOKENIZERS DONE"
-  fi
-
-  if [ -z "${MINICONDA_INSTALLATION}" ]; then
-    env CXX=$CXX_COMPILER CC=$C_COMPILER $PIP3 install 'cython==0.29.24' \
-      --prefix=$ROOTDIR/.local --find-links file:$ROOTDIR/../cocoa_installation_libraries/pip_cache \
-      --no-index > ${OUTPUT_PIP_1} 2> ${OUTPUT_PIP_2}
-    if [ $? -ne 0 ]; then
-      echo "PROBLEM PIP INSTALL CYTHON" >&2
-      return 1
-    else
-      echo "PIP INSTALL CYTHON DONE"
-    fi
-  fi
-
-  env CXX=$CXX_COMPILER CC=$C_COMPILER $PIP3 install requests --prefix=$ROOTDIR/.local \
-    --find-links file:$ROOTDIR/../cocoa_installation_libraries/pip_cache \
-    --no-index > ${OUTPUT_PIP_1} 2> ${OUTPUT_PIP_2}
-  if [ $? -ne 0 ]; then
-    echo "PROBLEM PIP INSTALL REQUESTS" >&2
-    return 1
-  else
-    echo "PIP INSTALL REQUESTS DONE"
-  fi
-
-  env CXX=$CXX_COMPILER CC=$C_COMPILER $PIP3 install urllib3 --prefix=$ROOTDIR/.local \
-    --find-links file:$ROOTDIR/../cocoa_installation_libraries/pip_cache \
-    --no-index > ${OUTPUT_PIP_1} 2> ${OUTPUT_PIP_2}
-  if [ $? -ne 0 ]; then
-    echo "PROBLEM PIP INSTALL URLLIB3" >&2
-    return 1
-  else
-    echo "PIP INSTALL URLLIB3 DONE"
-  fi
-
-  env CXX=$CXX_COMPILER CC=$C_COMPILER $PIP3 install chardet --prefix=$ROOTDIR/.local \
-    --find-links file:$ROOTDIR/../cocoa_installation_libraries/pip_cache \
-    --no-index > ${OUTPUT_PIP_1} 2> ${OUTPUT_PIP_2}
-  if [ $? -ne 0 ]; then
-    echo "PROBLEM PIP INSTALL CHARDET" >&2
-    return 1
-  else
-    echo "PIP INSTALL CHARDET DONE"
-  fi
-
-  env CXX=$CXX_COMPILER CC=$C_COMPILER $PIP3 install 'pyparsing==3.0.9' --prefix=$ROOTDIR/.local \
-    --find-links file:$ROOTDIR/../cocoa_installation_libraries/pip_cache \
-    --no-index > ${OUTPUT_PIP_1} 2> ${OUTPUT_PIP_2}
-  if [ $? -ne 0 ]; then
-    echo "PROBLEM PIP INSTALL PYPARSING" >&2
-    return 1
-  else
-    echo "PIP INSTALL PYPARSING DONE"
-  fi
-
-  env CXX=$CXX_COMPILER CC=$C_COMPILER $PIP3 install certifi --prefix=$ROOTDIR/.local \
-    --find-links file:$ROOTDIR/../cocoa_installation_libraries/pip_cache \
-    --no-index > ${OUTPUT_PIP_1} 2> ${OUTPUT_PIP_2}
-  if [ $? -ne 0 ]; then
-    echo "PROBLEM PIP INSTALL CERTIFI" >&2
-    return 1
-  else
-    echo "PIP INSTALL CERTIFI DONE"
-  fi
-
-  env CXX=$CXX_COMPILER CC=$C_COMPILER $PIP3 install 'idna==3.4' --prefix=$ROOTDIR/.local \
-    --find-links file:$ROOTDIR/../cocoa_installation_libraries/pip_cache \
-    --no-index > ${OUTPUT_PIP_1} 2> ${OUTPUT_PIP_2}
-  if [ $? -ne 0 ]; then
-    echo "PROBLEM PIP INSTALL IDNA" >&2
-    return 1
-  else
-    echo "PIP INSTALL IDNA DONE"
-  fi
-
-  env CXX=$CXX_COMPILER CC=$C_COMPILER $PIP3 install 'python-dateutil==2.8.2' --prefix=$ROOTDIR/.local \
-    --find-links file:$ROOTDIR/../cocoa_installation_libraries/pip_cache \
-    --no-index > ${OUTPUT_PIP_1} 2> ${OUTPUT_PIP_2}
-  if [ $? -ne 0 ]; then
-    echo "PROBLEM PIP INSTALL PYTHON-DATEUTIL" >&2
-    return 1
-  else
-    echo "PIP INSTALL PYTHON-DATEUTIL DONE"
-  fi
-
-  env CXX=$CXX_COMPILER CC=$C_COMPILER $PIP3 install 'pytz==2022.1' --prefix=$ROOTDIR/.local \
-    --find-links file:$ROOTDIR/../cocoa_installation_libraries/pip_cache \
-    --no-index > ${OUTPUT_PIP_1} 2> ${OUTPUT_PIP_2}
-  if [ $? -ne 0 ]; then
-    echo "PROBLEM PIP INSTALL PYTZ" >&2
-    return 1
-  else
-    echo "PIP INSTALL PYTZ DONE"
-  fi
-
-  #PS: --force-reinstall install numpy on $ROOTDIR/.local - this helps CARMA to see numpy files
-  env CXX=$CXX_COMPILER CC=$C_COMPILER $PIP3 install 'numpy==1.21.4' --prefix=$ROOTDIR/.local \
-    --find-links file:$ROOTDIR/../cocoa_installation_libraries/pip_cache --no-index \
-    --force-reinstall > ${OUTPUT_PIP_1} 2> ${OUTPUT_PIP_2}
-  if [ $? -ne 0 ]; then
-    echo "PROBLEM PIP INSTALL NUMPY" >&2
-    return 1
-  else
-    echo "PIP INSTALL NUMPY DONE"
-  fi
-
-  env CXX=$CXX_COMPILER CC=$C_COMPILER $PIP3 install 'mpmath==1.3.0' --prefix=$ROOTDIR/.local \
-    --find-links file:$ROOTDIR/../cocoa_installation_libraries/pip_cache \
-    --no-index > ${OUTPUT_PIP_1} 2> ${OUTPUT_PIP_2}
-  if [ $? -ne 0 ]; then
-    echo "PROBLEM PIP INSTALL MPMATH" >&2
-    return 1
-  else
-    echo "PIP INSTALL MPMATH DONE"
-  fi
-
-  env CXX=$CXX_COMPILER CC=$C_COMPILER $PIP3 install 'PyYAML==6.0' --prefix=$ROOTDIR/.local \
-    --find-links file:$ROOTDIR/../cocoa_installation_libraries/pip_cache \
-    --no-index > ${OUTPUT_PIP_1} 2> ${OUTPUT_PIP_2}
-  if [ $? -ne 0 ]; then
-    echo "PROBLEM PIP INSTALL PYYAML" >&2
-    return 1
-  else
-    echo "PIP INSTALL PYYAML DONE"
-  fi
-
-  env CXX=$CXX_COMPILER CC=$C_COMPILER $PIP3 install 'fuzzywuzzy==0.18' --prefix=$ROOTDIR/.local  \
-    --find-links file:$ROOTDIR/../cocoa_installation_libraries/pip_cache \
-    --no-index > ${OUTPUT_PIP_1} 2> ${OUTPUT_PIP_2}
-  if [ $? -ne 0 ]; then
-    echo "PROBLEM PIP INSTALL FUZZYWUZZY" >&2
-    return 1
-  else
-    echo "PIP INSTALL FUZZYWUZZY DONE"
-  fi
-
-  env CXX=$CXX_COMPILER CC=$C_COMPILER $PIP3 install 'cycler==0.11.0' --prefix=$ROOTDIR/.local \
-    --find-links file:$ROOTDIR/../cocoa_installation_libraries/pip_cache \
-    --no-index > ${OUTPUT_PIP_1} 2> ${OUTPUT_PIP_2}
-  if [ $? -ne 0 ]; then
-    echo "PROBLEM PIP INSTALL CYCLER" >&2
-    return 1
-  else
-    echo "PIP INSTALL CYCLER DONE"
-  fi
-
-  env CXX=$CXX_COMPILER CC=$C_COMPILER $PIP3 install 'kiwisolver==1.4.4' --prefix=$ROOTDIR/.local \
-    --find-links file:$ROOTDIR/../cocoa_installation_libraries/pip_cache \
-    --no-index > ${OUTPUT_PIP_1} 2> ${OUTPUT_PIP_2}
-  if [ $? -ne 0 ]; then
-    echo "PROBLEM PIP INSTALL KIWISOLVER" >&2
-    return 1
-  else
-    echo "PIP INSTALL KIWISOLVER DONE"
-  fi
-
-  env CXX=$CXX_COMPILER CC=$C_COMPILER $PIP3 install 'pillow==9.5.0' --prefix=$ROOTDIR/.local \
-    --find-links file:$ROOTDIR/../cocoa_installation_libraries/pip_cache \
-    --no-index > ${OUTPUT_PIP_1} 2> ${OUTPUT_PIP_2}
-  if [ $? -ne 0 ]; then
-    echo "PROBLEM PIP INSTALL PILLOW" >&2
-    return 1
-  else
-    echo "PIP INSTALL PILLOW DONE"
-  fi
-  
-  env CXX=$CXX_COMPILER CC=$C_COMPILER $PIP3 install 'pybind11==2.10.4' --prefix=$ROOTDIR/.local \
-    --find-links file:$ROOTDIR/../cocoa_installation_libraries/pip_cache \
-    --no-index > ${OUTPUT_PIP_1} 2> ${OUTPUT_PIP_2}
-  if [ $? -ne 0 ]; then
-    echo "PROBLEM PIP INSTALL PYBIND11" >&2
-    return 1
-  else
-    echo "PIP INSTALL PYBIND11 DONE"
-  fi
-  
-  env CXX=$CXX_COMPILER CC=$C_COMPILER $PIP3 install pythran --prefix=$ROOTDIR/.local \
-    --find-links file:$ROOTDIR/../cocoa_installation_libraries/pip_cache \
-    --no-index > ${OUTPUT_PIP_1} 2> ${OUTPUT_PIP_2}
-  if [ $? -ne 0 ]; then
-    echo "PROBLEM PIP INSTALL PYTHRAN" >&2
-    return 1
-  else
-    echo "PIP INSTALL PYTHRAN DONE"
-  fi
-  
-  if [ -z "${MINICONDA_INSTALLATION}" ]; then
-    env CXX=$CXX_COMPILER CC=$C_COMPILER $PIP3 install 'scipy==1.7.2' --prefix=$ROOTDIR/.local \
-      --find-links file:$ROOTDIR/../cocoa_installation_libraries/pip_cache \
-      --no-index > ${OUTPUT_PIP_1} 2> ${OUTPUT_PIP_2}
-    if [ $? -ne 0 ]; then
-      echo "PROBLEM PIP INSTALL SCIPY" >&2
-      return 1
-    else
-      echo "PIP INSTALL SCIPY DONE"
-    fi
-  fi
-
-  env CXX=$CXX_COMPILER CC=$C_COMPILER $PIP3 install 'sympy==1.10.1' --prefix=$ROOTDIR/.local \
-    --find-links file:$ROOTDIR/../cocoa_installation_libraries/pip_cache \
-    --no-index > ${OUTPUT_PIP_1} 2> ${OUTPUT_PIP_2}
-  if [ $? -ne 0 ]; then
-    echo "PROBLEM PIP INSTALL SYMPY" >&2
-    return 1
-  else
-    echo "PIP INSTALL SYMPY DONE"
-  fi
-
-  env CXX=$CXX_COMPILER CC=$C_COMPILER $PIP3 install 'imageio==2.19.3' --prefix=$ROOTDIR/.local \
-    --find-links file:$ROOTDIR/../cocoa_installation_libraries/pip_cache \
-    --no-index > ${OUTPUT_PIP_1} 2> ${OUTPUT_PIP_2}
-  if [ $? -ne 0 ]; then
-    echo "PROBLEM PIP INSTALL IMAGEIO" >&2
-    return 1
-  else
-    echo "PIP INSTALL IMAGEIO DONE"
-  fi
-
-  if [ -z "${MINICONDA_INSTALLATION}" ]; then
-    env CXX=$CXX_COMPILER CC=$C_COMPILER $PIP3 install 'pandas==1.3.4' --prefix=$ROOTDIR/.local \
-      --find-links file:$ROOTDIR/../cocoa_installation_libraries/pip_cache \
-      --no-index > ${OUTPUT_PIP_1} 2> ${OUTPUT_PIP_2}
-    if [ $? -ne 0 ]; then
-      echo "PROBLEM PIP INSTALL PANDAS" >&2
-      return 1
-    else
-      echo "PIP INSTALL PANDAS DONE"
-    fi
-  fi
-
-  env CXX=$CXX_COMPILER CC=$C_COMPILER $PIP3 install 'ordered_set==4.1.0' --prefix=$ROOTDIR/.local \
-    --find-links file:$ROOTDIR/../cocoa_installation_libraries/pip_cache \
-    --no-index > ${OUTPUT_PIP_1} 2> ${OUTPUT_PIP_2}
-  if [ $? -ne 0 ]; then
-    echo "PROBLEM PIP INSTALL ORDERED_SET" >&2
-    return 1
-  else
-    echo "PIP INSTALL ORDERED_SET DONE"
-  fi
-
-  if [ -z "${MINICONDA_INSTALLATION}" ]; then
-    env CXX=$CXX_COMPILER CC=$C_COMPILER $PIP3 install 'mpi4py==3.1.2' --prefix=$ROOTDIR/.local \
-      --find-links file:$ROOTDIR/../cocoa_installation_libraries/pip_cache \
-      --no-index > ${OUTPUT_PIP_1} 2> ${OUTPUT_PIP_2}
-    if [ $? -ne 0 ]; then
-      echo "PROBLEM PIP INSTALL MPI4PY" >&2
-      return 1
-    else
-      echo "PIP INSTALL MPI4PY DONE"
-    fi
-  fi
-
-  env CXX=$CXX_COMPILER CC=$C_COMPILER $PIP3 install 'py-bobyqa==1.3' --prefix=$ROOTDIR/.local \
-    --find-links file:$ROOTDIR/../cocoa_installation_libraries/pip_cache \
-    --no-index > ${OUTPUT_PIP_1} 2> ${OUTPUT_PIP_2}
-  if [ $? -ne 0 ]; then
-    echo "PROBLEM PIP INSTALL PY-BOBYQA" >&2
-    return 1
-  else
-    echo "PIP INSTALL PY-BOBYQA DONE"
-  fi
-
-  if [ -z "${MINICONDA_INSTALLATION}" ]; then
-    env CXX=$CXX_COMPILER CC=$C_COMPILER $PIP3 install 'matplotlib==3.5.1' --prefix=$ROOTDIR/.local \
-      --find-links file:$ROOTDIR/../cocoa_installation_libraries/pip_cache \
-      --no-index > ${OUTPUT_PIP_1} 2> ${OUTPUT_PIP_2}
-    if [ $? -ne 0 ]; then
-      echo "PROBLEM PIP INSTALL MATPLOTLIB" >&2
-      return 1
-    else
-      echo "PIP INSTALL MATPLOTLIB DONE"
-    fi
-
-    env CXX=$CXX_COMPILER CC=$C_COMPILER $PIP3 install 'astropy==4.3.1' --prefix=$ROOTDIR/.local \
-      --find-links file:$ROOTDIR/../cocoa_installation_libraries/pip_cache \
-      --no-index > ${OUTPUT_PIP_1} 2> ${OUTPUT_PIP_2}
-    if [ $? -ne 0 ]; then
-      echo "PROBLEM PIP INSTALL ASTROPY" >&2
-      return 1
-    else
-      echo "PIP INSTALL ASTROPY DONE"
-    fi
-  fi
-
-  env CXX=$CXX_COMPILER CC=$C_COMPILER $PIP3 install 'GetDist==1.3.4' --prefix=$ROOTDIR/.local \
-    --find-links file:$ROOTDIR/../cocoa_installation_libraries/pip_cache \
-    --no-index > ${OUTPUT_PIP_1} 2> ${OUTPUT_PIP_2}
-  if [ $? -ne 0 ]; then
-    echo "PROBLEM PIP INSTALL GETDIST" >&2
-    return 1
-  else
-    echo "PIP INSTALL GETDIST DONE"
-  fi
-
-  env CXX=$CXX_COMPILER CC=$C_COMPILER $PIP3 install 'sacc==0.8.1' --prefix=$ROOTDIR/.local \
-    --find-links file:$ROOTDIR/../cocoa_installation_libraries/pip_cache \
-    --no-index > ${OUTPUT_PIP_1} 2> ${OUTPUT_PIP_2}
-  if [ $? -ne 0 ]; then
-    echo "PROBLEM PIP INSTALL SACC" >&2
-    return 1
-  else
-    echo "PIP INSTALL SACC DONE"
-  fi
-
-  env CXX=$CXX_COMPILER CC=$C_COMPILER $PIP3 install 'iminuit==2.12.1' --prefix=$ROOTDIR/.local \
-    --find-links file:$ROOTDIR/../cocoa_installation_libraries/pip_cache \
-    --no-index > ${OUTPUT_PIP_1} 2> ${OUTPUT_PIP_2}
-  if [ $? -ne 0 ]; then
-    echo "PROBLEM PIP INSTALL IMINUIT" >&2
-    return 1
-  else
-    echo "PIP INSTALL IMINUIT DONE"
-  fi
-
-  env CXX=$CXX_COMPILER CC=$C_COMPILER $PIP3 install \
-    $ROOTDIR/../cocoa_installation_libraries/pip_cache/fgspectra --prefix=$ROOTDIR/.local \
+    $ROOTDIR/../cocoa_installation_libraries/pip_cache/fgspectra \
+    --prefix=$ROOTDIR/.local \
     --no-index > ${OUTPUT_PIP_1} 2> ${OUTPUT_PIP_2}
   if [ $? -ne 0 ]; then
     echo "PROBLEM PIP INSTALL FGSPECTRA" >&2
@@ -472,195 +203,42 @@ if [ -z "${IGNORE_ALL_PIP_INSTALLATION}" ]; then
     echo "PIP INSTALL FGSPECTRA DONE"
   fi
 
-  env CXX=$CXX_COMPILER CC=$C_COMPILER $PIP3 install \
-    $ROOTDIR/../cocoa_installation_libraries/pip_cache/syslibrary --prefix=$ROOTDIR/.local \
-    --no-index > ${OUTPUT_PIP_1} 2> ${OUTPUT_PIP_2}
-  if [ $? -ne 0 ]; then
-    echo "PROBLEM PIP INSTALL SYSLIBRARY" >&2
-    return 1
-  else
-    echo "PIP INSTALL SYSLIBRARY DONE"
-  fi
-
-  # ------------------------------------------------------------------------
-  # ------------------------------------------------------------------------
-  # WE MIGRATED euclidemu2 TO setup_c_packages SCRIPT BECAUSE IT DEPENDS ON 
-  # GSL-GNU LIB (PROBLEM W/ MANUAL INSTALLATION)
-  # ------------------------------------------------------------------------
-  # ------------------------------------------------------------------------
-  #env CXX=$CXX_COMPILER CC=$C_COMPILER  $PIP3 install --global-option=build_ext \
-  #  $ROOTDIR/../cocoa_installation_libraries/euclidemu2-1.2.0 --no-dependencies \
-  #  --prefix=$ROOTDIR/.local --no-index > ${OUTPUT_PIP_1} 2> ${OUTPUT_PIP_2}
-  #if [ $? -ne 0 ]; then
-  #  echo "PROBLEM PIP INSTALL euclidemul" >&2
-  #  return 1
-  #else
-  #  echo "PIP INSTALL euclidemul DONE"
-  #fi
-
-  env CXX=$CXX_COMPILER CC=$C_COMPILER $PIP3 install 'numba==0.56.4' --prefix=$ROOTDIR/.local  \
-    --find-links file:$ROOTDIR/../cocoa_installation_libraries/pip_cache \
-    --no-index > ${OUTPUT_PIP_1} 2> ${OUTPUT_PIP_2}
-  if [ $? -ne 0 ]; then
-    echo "PROBLEM PIP INSTALL NUMBA" >&2
-    return 1
-  else
-    echo "PIP INSTALL NUMBA DONE"
-  fi
-
-  env CXX=$CXX_COMPILER CC=$C_COMPILER $PIP3 install 'PyWavelets==1.3.0' --prefix=$ROOTDIR/.local  \
-    --find-links file:$ROOTDIR/../cocoa_installation_libraries/pip_cache \
-    --no-index > ${OUTPUT_PIP_1} 2> ${OUTPUT_PIP_2}
-  if [ $? -ne 0 ]; then
-    echo "PROBLEM PIP INSTALL PYWAVELETS" >&2
-    return 1
-  else
-    echo "PIP INSTALL PYWAVELETS DONE"
-  fi
-
-  env CXX=$CXX_COMPILER CC=$C_COMPILER $PIP3 install 'lenstronomy==1.11.2' \
-    --prefix=$ROOTDIR/.local --find-links file:$ROOTDIR/../cocoa_installation_libraries/pip_cache \
-    --no-index > ${OUTPUT_PIP_1} 2> ${OUTPUT_PIP_2}
-  if [ $? -ne 0 ]; then
-    echo "PROBLEM PIP INSTALL LENSASTRONOMY" >&2
-    return 1
-  else
-    echo "PIP INSTALL LENSASTRONOMY DONE"
-  fi
-
-  if [ -z "${MINICONDA_INSTALLATION}" ]; then
-    if [ -z "${IGNORE_EMULATOR_CPU_PIP_PACKAGES}" ]; then
-      # ------------------------------------------------------------------------
-      # ------------------------------------------------------------------------
-      # THE EMULATOR PACKAGES WILL REQUIRE INTERNET ACCESS (too large even for GIT-LFS)
-      # ------------------------------------------------------------------------
-      # ------------------------------------------------------------------------
-      env CXX=$CXX_COMPILER CC=$C_COMPILER $PIP3 install 'tensorflow-cpu==2.8.0' \
-        --prefix=$ROOTDIR/.local > ${OUTPUT_PIP_1} 2> ${OUTPUT_PIP_2}
-      if [ $? -ne 0 ]; then
-        echo "PROBLEM PIP INSTALL TENSORFLOW" >&2
-        return 1
-      else
-        echo "PIP INSTALL TENSORFLOW DONE"
-      fi
-
-      env CXX=$CXX_COMPILER CC=$C_COMPILER $PIP3 install 'keras==2.8.0' \
-        --prefix=$ROOTDIR/.local > ${OUTPUT_PIP_1} 2> ${OUTPUT_PIP_2}
-      if [ $? -ne 0 ]; then
-        echo "PROBLEM PIP INSTALL KERAS" >&2
-        return 1
-      else
-        echo "PIP INSTALL KERAS DONE"
-      fi
-
-      env CXX=$CXX_COMPILER CC=$C_COMPILER $PIP3 install 'keras-preprocessing==1.1.2' \
-        --prefix=$ROOTDIR/.local > ${OUTPUT_PIP_1} 2> ${OUTPUT_PIP_2}
-      if [ $? -ne 0 ]; then
-        echo "PROBLEM PIP INSTALL KERAS-PREPROCESSING" >&2
-        return 1
-      else
-        echo "PIP INSTALL KERAS-PREPROCESSING DONE"
-      fi
-      
-      env CXX=$CXX_COMPILER CC=$C_COMPILER $PIP3 install 'torch==1.11.0+cpu' \
-        'torchvision==0.12.0+cpu' \
-        --extra-index-url https://download.pytorch.org/whl/cpu \
-        --prefix=$ROOTDIR/.local > ${OUTPUT_PIP_1} 2> ${OUTPUT_PIP_2}
-      if [ $? -ne 0 ]; then
-        echo "PROBLEM PIP INSTALL TORCH/TORCHVISION" >&2
-        return 1
-      else
-        echo "PIP INSTALL TORCH/TORCHVISION DONE"
-      fi
-
-      env CXX=$CXX_COMPILER CC=$C_COMPILER $PIP3 install 'gpy==1.10' --prefix=$ROOTDIR/.local \
-        --find-links file:$ROOTDIR/../cocoa_installation_libraries/pip_cache \
-        --no-index > ${OUTPUT_PIP_1} 2> ${OUTPUT_PIP_2}
-      if [ $? -ne 0 ]; then
-        echo "PROBLEM PIP INSTALL GPY" >&2
-        return 1
-      else
-        echo "PIP INSTALL GPY DONE"
-      fi
-
-      env CXX=$CXX_COMPILER CC=$C_COMPILER $PIP3 install 'pyDOE2==1.2.1' --prefix=$ROOTDIR/.local \
-        --find-links file:$ROOTDIR/../cocoa_installation_libraries/pip_cache \
-        --no-index > ${OUTPUT_PIP_1} 2> ${OUTPUT_PIP_2}
-      if [ $? -ne 0 ]; then
-        echo "PROBLEM PIP INSTALL PYDOE2" >&2
-        return 1
-      else
-        echo "PIP INSTALL PYDOE2 DONE"
-      fi
+  if [ -z "${IGNORE_EMULATOR_CPU_PIP_PACKAGES}" ]; then
+    env CXX=$CXX_COMPILER CC=$C_COMPILER $PIP3 install \
+        'tensorflow-cpu==2.12.0' \
+        'keras==2.12.0' \
+        'keras-preprocessing==1.1.2' \
+        'torch==1.13.1+cpu' \
+        'torchvision==0.14.1+cpu' \
+        'torchaudio==0.13.1' \
+      --extra-index-url https://download.pytorch.org/whl/cpu
+      --prefix=$ROOTDIR/.local > ${OUTPUT_PIP_1} 2> ${OUTPUT_PIP_2}
+    if [ $? -ne 0 ]; then
+      echo "PROBLEM PIP INSTALL ML CPU-ONLY PACKAGES" >&2
+      return 1
+    else
+      echo "PIP INSTALL ML CPU-ONLY PACKAGES DONE"
     fi
   fi
-
   if [ -z "${IGNORE_EMULATOR_GPU_PIP_PACKAGES}" ]; then
-    # ------------------------------------------------------------------------
-    # ------------------------------------------------------------------------
-    # THE EMULATOR PACKAGES WILL REQUIRE INTERNET ACCESS (too large even for GIT-LFS)
-    # ------------------------------------------------------------------------
-    # ------------------------------------------------------------------------
-    env CXX=$CXX_COMPILER CC=$C_COMPILER $PIP3 install 'tensorflow==2.8.0' \
+    env CXX=$CXX_COMPILER CC=$C_COMPILER $PIP3 install \
+        'tensorflow==2.12.0' \
+        'keras==2.12.0' \
+        'keras-preprocessing==1.1.2' \
+        'torch==1.13.1+cu116' \
+        'torchvision==0.14.1+cu116' \
+        'torchaudio==0.13.1' \
+      --extra-index-url https://download.pytorch.org/whl/cu116 \
       --prefix=$ROOTDIR/.local > ${OUTPUT_PIP_1} 2> ${OUTPUT_PIP_2}
     if [ $? -ne 0 ]; then
-      echo "PROBLEM PIP INSTALL TENSORFLOW-GPU" >&2
+      echo "PROBLEM PIP INSTALL ML GPU" >&2
       return 1
     else
-      echo "PIP INSTALL TENSORFLOW-GPU DONE" 
-    fi
-
-    env CXX=$CXX_COMPILER CC=$C_COMPILER $PIP3 install 'keras==2.8.0' \
-      --prefix=$ROOTDIR/.local > ${OUTPUT_PIP_1} 2> ${OUTPUT_PIP_2}
-    if [ $? -ne 0 ]; then
-      echo "PROBLEM PIP INSTALL KERAS"
-      return 1
-    else
-      echo "PIP INSTALL KERAS DONE"
-    fi
-
-    env CXX=$CXX_COMPILER CC=$C_COMPILER $PIP3 install 'keras-preprocessing==1.1.2' \
-      --prefix=$ROOTDIR/.local > ${OUTPUT_PIP_1} 2> ${OUTPUT_PIP_2}
-    if [ $? -ne 0 ]; then
-      echo "PROBLEM PIP INSTALL KERAS-PREPROCESSING" >&2
-      return 1
-    else
-      echo "PIP INSTALL KERAS-PREPROCESSING DONE"
-    fi
-
-    # WE ASSUME CUDA 10.2
-    
-    env CXX=$CXX_COMPILER CC=$C_COMPILER $PIP3 install 'torch==1.11.0+cu102' \
-      'torchvision==0.12.0+cu102' \
-      --extra-index-url https://download.pytorch.org/whl/cu102 \
-      --prefix=$ROOTDIR/.local > ${OUTPUT_PIP_1} 2> ${OUTPUT_PIP_2}
-    if [ $? -ne 0 ]; then
-      echo "PROBLEM PIP INSTALL TORCH/TORCHVISION" >&2
-      return 1
-    else
-      echo "PIP INSTALL TORCH/TORCHVISION DONE"
-    fi
-
-    env CXX=$CXX_COMPILER CC=$C_COMPILER $PIP3 install 'gpy==1.10' --prefix=$ROOTDIR/.local \
-      --find-links file:$ROOTDIR/../cocoa_installation_libraries/pip_cache \
-      --no-index > ${OUTPUT_PIP_1} 2> ${OUTPUT_PIP_2}
-    if [ $? -ne 0 ]; then
-      echo "PROBLEM PIP INSTALL GPY" >&2
-      return 1
-    else
-      echo "PIP INSTALL GPY DONE"
-    fi
-
-    env CXX=$CXX_COMPILER CC=$C_COMPILER $PIP3 install 'pyDOE2==1.2.1' --prefix=$ROOTDIR/.local \
-      --find-links file:$ROOTDIR/../cocoa_installation_libraries/pip_cache \
-      --no-index > ${OUTPUT_PIP_1} 2> ${OUTPUT_PIP_2}
-    if [ $? -ne 0 ]; then
-      echo "PROBLEM PIP INSTALL PYDOE2" >&2
-      return 1
-    else
-      echo "PIP INSTALL PYDOE2 DONE"
+      echo "PIP INSTALL ML GPU DONE" 
     fi
   fi
 fi
+
+echo 'INSTALLING PYTHON PACKAGES VIA PIP - DONE'
 
 # PS: --no-index option prevent pip from using internet (forces to use our local cache)

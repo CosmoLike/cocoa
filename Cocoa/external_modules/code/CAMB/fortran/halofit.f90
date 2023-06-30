@@ -42,6 +42,7 @@
     !AL Jul 19: Speedups, use linear interpolation for pk; find index using fixed spacing; precompute growth(z)
     !AL Sep 19: Propagate errors rather than stop, decrease jmax for integration time out (prevent very slow error)
     !AM Sep 20: Added HMcode-2020 model
+    !AM Jan 23: Fixed HMcode-2020 feedback low-k predictions
     !%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
     module NonLinear
@@ -617,7 +618,7 @@
                 DO i=1,nk
                     k=exp(CAMB_Pk%log_kh(i))
                     plin=p_lin(k,z,0,cosi)
-                    CALL this%halomod(k,z,p1h,p2h,pfull,plin,lut,cosi)
+                    CALL this%halomod(k,p1h,p2h,pfull,plin,lut,cosi)
                     IF(this%imead==3) THEN
                         CAMB_Pk%nonlin_ratio(i,j)=sqrt(pfull/plin)
                     ELSE IF(this%imead==4) THEN
@@ -641,7 +642,7 @@
             DO i=1,nk
                 k=exp(CAMB_Pk%log_kh(i))
                 plin=p_lin(k,z,0,cosi)
-                CALL this%halomod(k,z,p1h,p2h,pfull,plin,lut,cosi)
+                CALL this%halomod(k,p1h,p2h,pfull,plin,lut,cosi)
                 CAMB_Pk%nonlin_ratio(i,j)=sqrt(pfull/plin)
             END DO
             !$OMP END PARALLEL DO
@@ -734,14 +735,14 @@
     REAL(dl) :: kstar
     TYPE(HM_tables), INTENT(IN) :: lut
 
-    IF(this%imead==0 .OR. this%imead==4 .OR. this%imead==5) THEN
+    IF(this%imead==0) THEN
         !Set to zero for the standard Poisson one-halo term
         kstar=0.
     ELSE IF(this%imead==1 .or. this%imead==2) THEN
         !One-halo cut-off wavenumber
         !Mead et al. (2015; arXiv 1505.07833) value
         kstar=0.584*(lut%sigv)**(-1.)
-    ELSE IF(this%imead==3) THEN
+    ELSE IF(this%imead==3 .OR. this%imead==4 .OR. this%imead==5) THEN
         kstar=0.05618*lut%sig8z_cold**(-1.013)
     END IF
 
@@ -844,11 +845,11 @@
 
     END FUNCTION r_nl
 
-    SUBROUTINE halomod(this,k,z,p1h,p2h,pfull,plin,lut,cosm)
+    SUBROUTINE halomod(this,k,p1h,p2h,pfull,plin,lut,cosm)
     class(THalofit) :: this
     !Calcuates 1-halo and 2-halo terms and combines them to form the full halomodel power
     REAL(dl), INTENT(OUT) :: p1h, p2h, pfull
-    REAL(dl), INTENT(IN) :: plin, k, z
+    REAL(dl), INTENT(IN) :: plin, k
     REAL(dl) :: a
     TYPE(HM_cosmology), INTENT(IN) :: cosm
     TYPE(HM_tables), INTENT(IN) :: lut
@@ -859,7 +860,7 @@
         p1h=0.
         p2h=0.
     ELSE
-        p1h=this%p_1h(k,z,lut,cosm)
+        p1h=this%p_1h(k,lut,cosm)
         p2h=this%p_2h(k,plin,lut,cosm)
     END IF
 
@@ -1705,7 +1706,7 @@
         kdamp=0.05699*lut%sig8z_cold**(-1.089)
         ndamp=2.85
         x=(k/kdamp)**ndamp
-        p_2h=p_dewiggle(k, lut%z, lut%sigv, cosm)*(1.-frac*x/(1.+x))
+        p_2h=p_dewiggle(k, lut%z, plin, lut%sigv, cosm)*(1.-frac*x/(1.+x))
     END IF
 
     !For some strange cosmologies frac>1. so this must be added to prevent p_2h<0.
@@ -1713,14 +1714,14 @@
 
     END FUNCTION p_2h
 
-    FUNCTION p_1h(this,k,z,lut,cosm)
+    FUNCTION p_1h(this,k,lut,cosm)
     class(THalofit) :: this
     !Calculates the 1-halo term
     REAL(dl) :: p_1h
-    REAL(dl), INTENT(IN) :: k, z
+    REAL(dl), INTENT(IN) :: k
     TYPE(HM_tables), INTENT(IN) :: lut
     TYPE(HM_cosmology), INTENT(IN) :: cosm
-    REAL(dl) :: Dv, g, fac, et, ks, wk, x, m
+    REAL(dl) :: g, fac, et, ks, wk, x, m
     REAL(dl) :: integrand(lut%n)
     REAL(dl) :: sum
     INTEGER :: i
@@ -1759,7 +1760,7 @@
         END IF
         !Damping of the one-halo term at very large scales
         p_1h=p_1h*(1.-fac)
-    ELSE IF(this%imead==3) THEN
+    ELSE IF(this%imead==3 .OR. this%imead==4 .OR. this%imead==5) THEN
         ks=this%kstar(lut)
         x=(k/ks)**4
         p_1h=p_1h*x/(1.+x)
@@ -1767,27 +1768,23 @@
 
     END FUNCTION p_1h
 
-    REAL FUNCTION p_dewiggle(k, z, sigv, cosm)
+    REAL FUNCTION p_dewiggle(k, z, p_linear, sigv, cosm)
     ! Call the dewiggled power spectrum, which is linear but with damped wiggles
-    REAL(dl), INTENT(IN) :: k
-    REAL(dl), INTENT(IN) :: z
-    REAL(dl), INTENT(IN) :: sigv
+    REAL(dl), INTENT(IN) :: k, z, p_linear, sigv
     TYPE(HM_cosmology), INTENT(IN) :: cosm
-    REAL(dl) :: p_wiggle, f, p_linear, logk
-    INTEGER, PARAMETER :: itype = 0 ! Matter power here
+    REAL(dl) :: p_wiggle, f, logk
     INTEGER, PARAMETER :: iorder = iorder_wiggle
     INTEGER, PARAMETER :: ifind = ifind_wiggle
     INTEGER, PARAMETER :: imeth = imeth_wiggle
 
-    p_linear = p_lin(k, z, itype, cosm)
     logk = log(k)
     IF (logk < cosm%log_k_wiggle(1) .OR. logk > cosm%log_k_wiggle(nk_wiggle)) THEN
-        p_wiggle = 0.
+        p_wiggle = 0
     ELSE
-        p_wiggle = find(log(k), cosm%log_k_wiggle, cosm%pk_wiggle, nk_wiggle, iorder, ifind, imeth)
+        p_wiggle = find(logk, cosm%log_k_wiggle, cosm%pk_wiggle, nk_wiggle, iorder, ifind, imeth)
     END IF
     f = exp(-(k*sigv)**2)
-    p_dewiggle = p_linear+(f-1.)*p_wiggle*grow(z, cosm)**2
+    p_dewiggle = p_linear+(f-1)*p_wiggle*grow(z, cosm)**2
 
     END FUNCTION p_dewiggle
 
@@ -1795,7 +1792,6 @@
     ! Isolate the power spectrum wiggle
     TYPE(HM_cosmology), INTENT(INOUT) :: cosm
     REAL(dl), ALLOCATABLE :: k(:), Pk(:)
-    REAL(dl), ALLOCATABLE :: logk(:), logPk(:)
     REAL(dl), ALLOCATABLE :: Pk_smooth(:), Pk_wiggle(:)
     INTEGER :: i
     REAL(dl), PARAMETER :: kmin = kmin_wiggle
@@ -1857,7 +1853,6 @@
     REAL(dl), ALLOCATABLE, INTENT(OUT) :: Pk_smt(:)
     REAL(dl), ALLOCATABLE :: Pk_nw(:)
     TYPE(HM_cosmology), INTENT(IN) :: cosm
-    INTEGER :: ia, na
     REAL(dl), PARAMETER :: sig = wiggle_sigma
 
     ! Reduce dynamic range
@@ -1880,7 +1875,7 @@
     REAL(dl), INTENT(IN) :: Pk(:)
     REAL(dl), ALLOCATABLE, INTENT(OUT) :: Pk_nw(:)
     TYPE(HM_cosmology), INTENT(IN) :: cosm
-    INTEGER :: ik, ia, nk
+    INTEGER :: ik, nk
     REAL(dl) :: Pk_norm, Pk_nw_norm
     REAL(dl), PARAMETER :: knorm = knorm_nowiggle
     INTEGER, PARAMETER :: type = 0 ! Matter here
@@ -3329,7 +3324,7 @@
     IMPLICIT NONE
     REAL(dl), INTENT(IN) :: z
     TYPE(HM_cosmology), INTENT(IN) :: cosm
-    REAL(dl) :: lg, bG, Om_m, ai, a
+    REAL(dl) :: lg, bG, Om_m, a
 
     ! See Appendix A of Mead (2017) for naming convention
     REAL(dl), PARAMETER :: p10 = -0.0069
@@ -3430,7 +3425,7 @@
     wa_hf=0._dl
     w_lam=w_true
     wa_ppf=wa_true
-    !write(*,*)'at z = ',real(redshift),' equivalent w_const =', real(w_hf)
+    write(*,*)'at z = ',real(redshift),' equivalent w_const =', real(w_hf)
 
     end subroutine PKequal
 

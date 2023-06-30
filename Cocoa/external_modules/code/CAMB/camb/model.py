@@ -16,7 +16,7 @@ import logging
 from typing import Union, Optional
 
 max_nu = 5
-max_transfer_redshifts = 150
+max_transfer_redshifts = 256
 nthermo_derived = 13
 Transfer_kh = 1
 Transfer_cdm = 2
@@ -32,6 +32,11 @@ Transfer_Newt_vel_cdm = 11
 Transfer_Newt_vel_baryon = 12
 Transfer_vel_baryon_cdm = 13
 Transfer_max = Transfer_vel_baryon_cdm
+
+# for 21cm case
+Transfer_monopole = 4
+Transfer_vnewt = 5
+Transfer_Tmat = 6
 
 NonLinear_none = "NonLinear_none"
 NonLinear_pk = "NonLinear_pk"
@@ -231,6 +236,7 @@ class CAMBparams(F2003Class):
         ("Log_lvalues", c_bool, "Use log spacing for sampling in L"),
         ("use_cl_spline_template", c_bool,
          "When interpolating use a fiducial spectrum shape to define ratio to spline"),
+        ("min_l_logl_sampling", c_int, "Minimum L to use log sampling for L"),
         ("SourceWindows", AllocatableObjectArray(SourceWindow)),
         ("CustomSources", CustomSources)
     ]
@@ -257,23 +263,28 @@ class CAMBparams(F2003Class):
         """
         return self.f_Validate() != 0
 
-    def set_accuracy(self, AccuracyBoost=1., lSampleBoost=1., lAccuracyBoost=1., DoLateRadTruncation=True):
+    def set_accuracy(self, AccuracyBoost=1., lSampleBoost=1., lAccuracyBoost=1., DoLateRadTruncation=True,
+                     min_l_logl_sampling=None):
         """
         Set parameters determining overall calculation accuracy (large values may give big slow down).
         For finer control you can set individual accuracy parameters by changing CAMBParams.Accuracy
         (:class:`.model.AccuracyParams`) .
-    
+
         :param AccuracyBoost: increase AccuracyBoost to decrease integration step size, increase density of k
                               sampling, etc.
         :param lSampleBoost: increase lSampleBoost to increase density of L sampling for CMB
         :param lAccuracyBoost: increase lAccuracyBoost to increase the maximum L included in the Boltzmann hierarchies
         :param DoLateRadTruncation: If True, use approximation to radiation perturbation evolution at late times
+        :param min_l_logl_sampling: at L>min_l_logl_sampling uses sparser log sampling for L interpolation;
+                                    increase above 5000 for better accuracy at L > 5000
         :return: self
         """
         self.Accuracy.lSampleBoost = lSampleBoost
         self.Accuracy.AccuracyBoost = AccuracyBoost
         self.Accuracy.lAccuracyBoost = lAccuracyBoost
         self.DoLateRadTruncation = DoLateRadTruncation
+        if min_l_logl_sampling:
+            self.min_l_logl_sampling = min_l_logl_sampling
         return self
 
     def set_initial_power_function(self, P_scalar, P_tensor=None, kmin=1e-6, kmax=100., N_min=200, rtol=5e-5,
@@ -360,8 +371,8 @@ class CAMBparams(F2003Class):
         :param cosmomc_approx: if true, use approximate fitting formula for :math:`z_\star`,
                                if false do full numerical calculation
         :param theta_H0_range: min, max iterval to search for H0 (in km/s/Mpc)
-        :param est_H0: an initial guess for H0 in km/s/Mpc, used in the case comsomc_approx=False.
-        :param iteration_threshold: differnce in H0 from est_H0 for which to iterate, used for cosmomc_approx=False
+        :param est_H0: an initial guess for H0 in km/s/Mpc, used in the case cosmomc_approx=False.
+        :param iteration_threshold: difference in H0 from est_H0 for which to iterate, used for cosmomc_approx=False
         """
 
         if not (0.001 < theta < 0.1):
@@ -420,7 +431,7 @@ class CAMBparams(F2003Class):
         (cosmomc_theta, which is based on a fitting forumula for simple models, or thetastar, which is numerically
         calculated more generally). Note that you must have already set the dark energy model, you can't use
         set_cosmology with theta and then change the background evolution (which would change theta at the calculated
-        H0 value).Likewise the dark energy model cannot depend explicitly on H0.
+        H0 value). Likewise the dark energy model cannot depend explicitly on H0.
 
         :param H0: Hubble parameter today in km/s/Mpc. Can leave unset and instead set thetastar or cosmomc_theta
                   (which solves for the required H0).
@@ -623,7 +634,7 @@ class CAMBparams(F2003Class):
         (or the default one, if `Y_He` has not been set).
 
         :param ombh2: :math:`\Omega_b h^2` (default: value passed to :meth:`set_cosmology`)
-        :param delta_neff:  additional :math:`N_{\rm eff}` relative to standard value (of 3.046)
+        :param delta_neff:  additional :math:`N_{\rm eff}` relative to standard value (of 3.044)
                            (default: from values passed to :meth:`set_cosmology`)
         :return:  :math:`Y_p^{\rm BBN}` helium nucleon fraction predicted by BBN.
         """
@@ -641,7 +652,7 @@ class CAMBparams(F2003Class):
         (or the default one, if `Y_He` has not been set).
 
         :param ombh2: :math:`\Omega_b h^2` (default: value passed to :meth:`set_cosmology`)
-        :param delta_neff:  additional :math:`N_{\rm eff}` relative to standard value (of 3.046)
+        :param delta_neff:  additional :math:`N_{\rm eff}` relative to standard value (of 3.044)
                            (default: from values passed to :meth:`set_cosmology`)
         :return: BBN helium nucleon fraction D/H
         """
@@ -713,7 +724,7 @@ class CAMBparams(F2003Class):
                 self.NonLinear = NonLinear_none
 
     def set_for_lmax(self, lmax, max_eta_k=None, lens_potential_accuracy=0,
-                     lens_margin=150, k_eta_fac=2.5, lens_k_eta_reference=18000.0):
+                     lens_margin=150, k_eta_fac=2.5, lens_k_eta_reference=18000.0, nonlinear=None):
         r"""
         Set parameters to get CMB power spectra accurate to specific a l_lmax.
         Note this does not fix the actual output L range, spectra may be calculated above l_max
@@ -730,6 +741,8 @@ class CAMBparams(F2003Class):
         :param k_eta_fac:  k_eta_fac default factor for setting max_eta_k = k_eta_fac*lmax if max_eta_k=None
         :param lens_k_eta_reference:  value of max_eta_k to use when lens_potential_accuracy>0; use
                                       k_eta_max = lens_k_eta_reference*lens_potential_accuracy
+        :param nonlinear: use non-linear power spectrum; if None, sets nonlinear if lens_potential_accuracy>0 otherwise
+                          preserves current setting
         :return: self
         """
         if self.DoLensing:
@@ -738,8 +751,10 @@ class CAMBparams(F2003Class):
             self.max_l = lmax
         self.max_eta_k = max_eta_k or self.max_l * k_eta_fac
         if lens_potential_accuracy:
-            self.set_nonlinear_lensing(True)
+            self.set_nonlinear_lensing(nonlinear is not False)
             self.max_eta_k = max(self.max_eta_k, lens_k_eta_reference * lens_potential_accuracy)
+        elif nonlinear is not None:
+            self.set_nonlinear_lensing(nonlinear)
         return self
 
     def scalar_power(self, k):

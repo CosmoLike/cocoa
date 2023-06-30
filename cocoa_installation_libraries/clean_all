@@ -7,48 +7,44 @@ cd ${ROOTDIR}/../cocoa_installation_libraries
 
 echo 'CLEAN ALL INSTALLATION LIBRARIES - THAT MIGHT TAKE A WHILE'
 
-rm -rf ./armadillo-10.6.2
+rm -rf ./$COCOA_ARMADILLO_DIR
 
-rm -rf ./binutils-2.34
+rm -rf ./$COCOA_BINUTILS_DIR
 
-rm -rf ./boost_1_72_0
+rm -rf ./$COCOA_BOOST_DIR
 
-rm -rf ./cfitsio-3.47
+rm -rf ./$COCOA_CFITSIO_DIR
 
-rm -rf ./cmake-3.17.1
+rm -rf ./$COCOA_CMAKE_DIR
 
-rm -rf ./carma
+rm -rf ./$COCOA_CARMA_DIR
 
-rm -rf ./fftw-3.3.8
-rm -rf ./fftw-3.3.10/
+rm -rf ./$COCOA_FFTW_DIR
 
-rm -rf ./gsl-2.6
+rm -rf ./$COCOA_GSL_DIR
 
-rm -rf ./gsl-2.7
-
-rm -rf ./lapack-3.9.0
+rm -rf ./$COCOA_LAPACK_DIR
 
 rm -rf ./lapack-build
 
-rm -rf ./OpenBLAS
+rm -rf ./$COCOA_OPENBLAS_DIR
 
 rm -rf ./pip_cache
 
-rm -rf ./spdlog
+rm -rf ./$COCOA_SPDLOG_DIR
 
-rm -rf ./texinfo-6.7
+rm -rf ./$COCOA_TEXINFO_DIR
 
-rm -rf ./xz-5.2.5
-rm -f ./xz-5.2.5.tar.gz
+rm -rf ./$COCOA_XZ_DIR
+rm -f $COCOA_XZ_FILE
 
-rm -rf ./expat241
+rm -rf ./$COCOA_EXPAT_DIR
+
+rm -rf ./$COCOA_HDF5_DIR1
 
 rm -rf ./cocoa_build
-
-rm -rf ./CMake-hdf5-1.10.10
-
-rm -rf ./binutils-2.37
 
 echo 'CLEAN ALL INSTALLATION LIBRARIES DONE'
 
 cd ${ROOTDIR}
+

@@ -34,11 +34,7 @@ cd $ROOTDIR
 
 # files under ./external_modules/code/
 if [ -z "${NO_UNXZ_EXTERNAL_MODULES_CODE}" ]; then
-    cd $ROOTDIR/external_modules/code/planck/code/plc_3.0/plc-3.01/src/plik/component_plugin/rel2015/
-
-    sh unxv_all.sh
-
-    cd $ROOTDIR
+    # no xz files under code so far
 fi
 
 # files under ./external_modules/data/

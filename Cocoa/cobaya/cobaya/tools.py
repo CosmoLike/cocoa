@@ -21,18 +21,15 @@ from importlib import import_module
 from copy import deepcopy
 from packaging import version
 from itertools import permutations
-from typing import Mapping, Sequence, Any, List, TypeVar, Optional, Union, \
-    Iterable, Set, Dict
+from typing import Mapping, Sequence, Any, List, TypeVar, Optional, Union, Iterable, Dict
 from types import ModuleType
 from inspect import cleandoc, getfullargspec
 from ast import parse
 from abc import ABC, abstractmethod
-import traceback
 
 # Local
-from cobaya.conventions import cobaya_package, subfolders, kinds, \
-    packages_path_config_file, packages_path_env, packages_path_arg, dump_sort_cosmetic, \
-    packages_path_input
+from cobaya.conventions import subfolders, kinds, packages_path_config_file, \
+    packages_path_env, packages_path_arg, dump_sort_cosmetic, packages_path_input
 from cobaya.log import LoggedError, HasLogger, get_logger
 from cobaya.typing import Kind
 
@@ -85,6 +82,9 @@ def get_internal_class_component_name(name, kind) -> str:
 
 
 def get_base_classes() -> Dict[Kind, Any]:
+    """
+    Return the base classes for the different kinds.
+    """
     from cobaya.likelihood import Likelihood
     from cobaya.theory import Theory
     from cobaya.sampler import Sampler
@@ -92,28 +92,10 @@ def get_base_classes() -> Dict[Kind, Any]:
             "theory": Theory}
 
 
-def get_kind(name: str, allow_external=True) -> Kind:
-    """
-    Given a helpfully unique component name, tries to determine it's kind:
-    ``sampler``, ``theory`` or ``likelihood``.
-    """
-    for i, kind in enumerate(kinds):
-        cls = get_class(name, kind, allow_external=allow_external and i == len(kinds) - 1,
-                        None_if_not_found=True)
-        if cls is not None:
-            break
-    else:
-        raise LoggedError(log, "Could not find component with name %r", name)
-    for kind, tp in get_base_classes().items():
-        if issubclass(cls, tp):
-            return kind
-
-    raise LoggedError(log, "Class %r is not a standard class type %r", name, kinds)
-
-
 class PythonPath:
     """
-    A context that keeps sys.path unchanged, optionally adding path during the context.
+    A context that keeps sys.path unchanged, optionally adding path during the context
+    at the beginning of the directory search list.
     """
 
     def __init__(self, path=None, when=True):
@@ -129,144 +111,103 @@ class PythonPath:
         sys.path[:] = self.old_path
 
 
+def check_module_path(module, path):
+    """
+    Raises ``ModuleNotFoundError`` is ``module`` was not loaded from the given ``path``.
+    """
+    module_path = os.path.dirname(os.path.realpath(os.path.abspath(module.__file__)))
+    if not module_path.startswith(os.path.realpath(os.path.abspath(path))):
+        raise ModuleNotFoundError(
+            f"Module {module.__name__} successfully loaded, but not from requested path:"
+            f" {path}, but instead from {module_path}")
+
+
 class VersionCheckError(ValueError):
-    pass
+    """
+    Exception to be raised when the installed version of a component (or its requisites)
+    is older than a reference one.
+    """
+
+    pass  # necessary or it won't print the given error message!
 
 
-def check_component_path(component, path):
-    if not os.path.realpath(os.path.abspath(component.__file__)).startswith(
-            os.path.realpath(os.path.abspath(path))):
-        raise LoggedError(
-            log, "Component %s successfully loaded, but not from requested path: %s.",
-            component.__name__, path)
-
-
-def check_component_version(component: Any, min_version):
-    if not hasattr(component, "__version__") or \
-            version.parse(component.__version__) < version.parse(min_version):
+def check_module_version(module: Any, min_version):
+    """
+    Tries to get the module version and raises :class:`tools.VersionCheckError` if not
+    found or older than the specified ``min_version``.
+    """
+    if not hasattr(module, "__version__") or \
+            version.parse(module.__version__) < version.parse(min_version):
         raise VersionCheckError(
-            "component %s at %s is version %s but required %s or higher" %
-            (component.__name__, os.path.dirname(component.__file__),
-             getattr(component, "__version__", "(non-given)"), min_version))
+            "Module %s at %s is version %s but the minimum required version is %s." %
+            (module.__name__, os.path.dirname(module.__file__),
+             getattr(module, "__version__", "(non-given)"), min_version))
 
 
 def load_module(name, package=None, path=None, min_version=None,
-                check_path=False) -> ModuleType:
+                check_path=False, reload=False) -> ModuleType:
+    """
+    Loads and returns the Python module ``name`` from ``path`` (default: ``None``, meaning
+    current working directory) and as part of ``package`` (default: ``None``).
+
+    Because of the way Python looks for modules to import, it is not guaranteed by default
+    that the module will be loaded from the given ``path``. This can be enforced with
+    ``check_path=True`` (default: ``False``), which will raise ``ModuleNotFoundError`` if
+    a module was loaded but not from the given ``path``.
+
+    If some version tag is passed as ``min_version``, it will try to get the module
+    version, and may raise :class:`tools.VersionCheckError` if no version tag is found
+    or if the found one is older than the specified ``min_version``.
+
+    If ``reload=True`` (default: ``False``), deletes the module from memory previous to
+    loading it.
+
+    This is a low-level function. You may want to use instead
+    :func:`component.load_external_module`, which interacts with Cobaya's installation and
+    logging systems.
+    """
     with PythonPath(path):
-        component = import_module(name, package=package)
+        # Force reload if requested.
+        # Use with care and only in install checks (e.g. for version upgrade checks):
+        # will delete all references from previous imports!
+        if reload and name in sys.modules:
+            del sys.modules[name]
+        module = import_module(name, package=package)
     if path and check_path:
-        check_component_path(component, path)
+        check_module_path(module, path)
     if min_version:
-        check_component_version(component, min_version)
-    return component
+        check_module_version(module, str(min_version))
+    return module
 
 
-def get_class(name, kind=None, None_if_not_found=False, allow_external=True,
-              allow_internal=True, component_path=None):
+def get_compiled_import_path(source_path):
     """
-    Retrieves the requested class from its reference name. The name can be a
-    fully-qualified package.module.classname string, or an internal name of the particular
-    kind. If the last element of name is not a class, assume class has the same name and
-    is in that module.
+    Returns the folder containing the compiled ``.so`` Python wrapper of a low-level
+    language (C, Fortran) code package within the given ``source_path``, e.g.
+    ``[source_path]/build/lib.linux-x86_64-3.8``.
 
-    By default tries to load internal components first, then if that fails external ones.
-    component_path can be used to specify a specific external location.
-
-    Raises ``ImportError`` if class not found in the appropriate place in the source tree
-    and is not a fully qualified external name.
-
-    If 'kind=None' is not given, tries to guess it if the name is unique (slow!).
-
-    If allow_external=True, allows loading explicit name from anywhere on path.
-    If allow_internal=True, will first try to load internal components
+    Raises ``FileNotFoundError`` if either the ``build`` or ``lib.[...]`` subfolder does
+    not exist, which may indicate a failed compilation of the source package.
     """
-    if allow_internal and kind is None:
-        kind = get_kind(name)
-    if '.' in name:
-        module_name, class_name = name.rsplit('.', 1)
-    else:
-        module_name = name
-        class_name = None
-    assert allow_internal or allow_external
-
-    def get_matching_class_name(_module: Any, _class_name, none=False):
-        cls = getattr(_module, _class_name, None)
-        if cls is None and _class_name == _class_name.lower():
-            # where the _class_name may be a module name, find CamelCased class
-            cls = module_class_for_name(_module, _class_name)
-        if cls or none:
-            return cls
-        else:
-            return getattr(_module, _class_name)
-
-    def return_class(_module_name, package=None):
-        _module: Any = load_module(_module_name, package=package, path=component_path)
-        if not class_name and hasattr(_module, "get_cobaya_class"):
-            return _module.get_cobaya_class()
-        _class_name = class_name or module_name
-        cls = get_matching_class_name(_module, _class_name, none=True)
-        if not cls:
-            _module = load_module(_module_name + '.' + _class_name,
-                                  package=package, path=component_path)
-            cls = get_matching_class_name(_module, _class_name)
-        if not isinstance(cls, type):
-            return get_matching_class_name(cls, _class_name)
-        else:
-            return cls
-
+    if not os.path.isdir(source_path):
+        raise FileNotFoundError(f"Source path {source_path} not found.")
+    build_path = os.path.join(source_path, "build")
+    if not os.path.isdir(build_path):
+        raise FileNotFoundError(f"`build` folder not found for source path {source_path}."
+                                f" Maybe compilation failed?")
+    # Folder starts with `lib.` and ends with either MAJOR.MINOR (standard) or
+    # MAJORMINOR (some anaconda versions)
+    re_lib = re.compile(
+        f"^lib\\..*{sys.version_info.major}\\.*{sys.version_info.minor}$")
     try:
-        if component_path:
-            return return_class(module_name)
-        elif allow_internal:
-            internal_module_name = get_internal_class_component_name(module_name, kind)
-            return return_class(internal_module_name, package=cobaya_package)
-        else:
-            raise Exception()
-    except:
-        exc_info = sys.exc_info()
-    if allow_external and not component_path:
-        try:
-            import_module(module_name)
-        except Exception:
-            exc_info = sys.exc_info()
-        else:
-            try:
-                return return_class(module_name)
-            except:
-                exc_info = sys.exc_info()
-    if None_if_not_found:
-        return None
-    if ((exc_info[0] is ModuleNotFoundError and
-         str(exc_info[1]).rstrip("'").endswith(name))):
-        if allow_internal:
-            suggestions = fuzzy_match(name, get_available_internal_class_names(kind), n=3)
-            if suggestions:
-                raise LoggedError(
-                    log, "%s '%s' not found. Maybe you meant one of the following "
-                         "(capitalization is important!): %s",
-                    kind.capitalize(), name, suggestions)
-        raise LoggedError(log, "'%s' not found", name)
-    else:
-        log.error("".join(list(traceback.format_exception(*exc_info))))
-        log.error("There was a problem when importing %s '%s':", kind or "external",
-                  name)
-        raise exc_info[1]
-
-
-def get_resolved_class(component_or_class, kind=None, component_path=None,
-                       class_name=None, None_if_not_found=False):
-    """
-    Returns the class corresponding to the component indicated as first argument.
-
-    If the first argument is a class, it is simply returned. If it is a string, it
-    retrieves the corresponding class name, using the value of `class_name` instead if
-    present.`
-    """
-    if isinstance(component_or_class, str):
-        component_or_class = get_class(class_name or component_or_class, kind,
-                                       component_path=component_path,
-                                       None_if_not_found=None_if_not_found)
-    return component_or_class
+        post = next(d for d in os.listdir(build_path) if re.fullmatch(re_lib, d))
+    except StopIteration:
+        raise FileNotFoundError(
+            f"No `lib.[...]` folder found containing compiled products at {source_path}. "
+            "This may mean that the compilation process failed, of that it was assuming "
+            "the wrong python version (current version: "
+            f"{sys.version_info.major}.{sys.version_info.minor})")
+    return os.path.join(build_path, post)
 
 
 def import_all_classes(path, pkg, subclass_of, hidden=False, helpers=False):
@@ -287,26 +228,6 @@ def import_all_classes(path, pkg, subclass_of, hidden=False, helpers=False):
                 if ispkg:
                     result.update(import_all_classes(os.path.dirname(m.__file__),
                                                      m.__name__, subclass_of, hidden))
-    return result
-
-
-def classes_in_module(m, subclass_of=None, allow_imported=False) -> Set[type]:
-    return set(cls for _, cls in inspect.getmembers(m, inspect.isclass)
-               if (not subclass_of or issubclass(cls, subclass_of))
-               and (allow_imported or cls.__module__ == m.__name__))
-
-
-def module_class_for_name(m, name):
-    # Get Camel- or uppercase class name matching name in module m
-    result = None
-    valid_names = {name, name[:1] + name[1:].replace('_', '')}
-    from cobaya.component import CobayaComponent
-    for cls in classes_in_module(m, subclass_of=CobayaComponent):
-        if cls.__name__.lower() in valid_names:
-            if result is not None:
-                raise ValueError('More than one class with same lowercase name %s',
-                                 name)
-            result = cls
     return result
 
 
@@ -470,13 +391,20 @@ class NumberWithUnits:
 
         def cast(x):
             try:
-                if dtype == int:
+                val = float(x)
+                if dtype == int and np.isfinite(val):
                     # in case ints are given in exponential notation, make int(float())
-                    return int(float(x))
-                else:
-                    return float(x)
-            except ValueError:
-                raise LoggedError(log, "Could not convert '%r' to a number.", x)
+                    if val == 0:
+                        return val
+                    sign = 1 if val > 0 else -1
+                    return sign * int(max(abs(val), 1))
+                return val
+            except ValueError as excpt:
+                raise LoggedError(
+                    log,
+                    "Could not convert '%r' to a number.",
+                    x
+                ) from excpt
 
         if isinstance(n_with_unit, str):
             n_with_unit = n_with_unit.lower()
@@ -497,6 +425,7 @@ class NumberWithUnits:
         self.set_scale(scale if scale is not None else 1)
 
     def set_scale(self, scale):
+        """Applies a numerical value for the scale, updating the attr. `value`."""
         if self.unit:
             self.scale = scale
             self.value = self.unit_value * scale
@@ -647,7 +576,15 @@ def _fast_norm_logpdf(self, x):
     return self.dist._logpdf(x_) + self._cobaya_mlogscale
 
 
-def KL_norm(m1=None, S1=np.array([]), m2=None, S2=np.array([])):
+def _KL_norm(m1, S1, m2, S2):
+    """Performs the Guassian KL computation, without input testing."""
+    dim = S1.shape[0]
+    S2inv = np.linalg.inv(S2)
+    return 0.5 * (np.trace(S2inv.dot(S1)) + (m1 - m2).dot(S2inv).dot(m1 - m2) -
+                  dim + np.log(np.linalg.det(S2) / np.linalg.det(S1)))
+
+
+def KL_norm(m1=None, S1=np.array([]), m2=None, S2=np.array([]), symmetric=False):
     """Kullback-Leibler divergence between 2 gaussians."""
     S1, S2 = [np.atleast_2d(S) for S in [S1, S2]]
     assert S1.shape[0], "Must give at least S1"
@@ -658,10 +595,10 @@ def KL_norm(m1=None, S1=np.array([]), m2=None, S2=np.array([])):
         S2 = np.identity(dim)
     if m2 is None:
         m2 = np.zeros(dim)
-    S2inv = np.linalg.inv(S2)
-    KL = 0.5 * (np.trace(S2inv.dot(S1)) + (m1 - m2).dot(S2inv).dot(m1 - m2) -
-                dim + np.log(np.linalg.det(S2) / np.linalg.det(S1)))
-    return KL
+    if symmetric:
+        # pylint: disable=arguments-out-of-order
+        return _KL_norm(m1, S1, m2, S2) + _KL_norm(m2, S2, m1, S1)
+    return _KL_norm(m1, S1, m2, S2)
 
 
 def choleskyL(M, return_scale_free=False):
@@ -760,6 +697,9 @@ def progress_bar(logger, percentage, final_text=""):
 
 
 def fuzzy_match(input_string, choices, n=3, score_cutoff=50):
+    """
+    Simple wrapper for fuzzy search of strings within a list.
+    """
     with warnings.catch_warnings():
         warnings.filterwarnings("ignore")
         # Suppress message about optional dependency
@@ -769,6 +709,29 @@ def fuzzy_match(input_string, choices, n=3, score_cutoff=50):
             input_string, choices, score_cutoff=score_cutoff))))[0][:n]
     except IndexError:
         return []
+
+
+def similar_internal_class_names(name, kind=None):
+    """
+    Returns a list of suggestions for class names similar to the given one.
+
+    To be used e.g. when no class was found with the given name.
+
+    If a ``kind`` is not given, a dictionary of ``{kind: [list of suggestions]}`` is
+    returned instead.
+    """
+    if kind is None:
+        suggestions = {
+            kind: fuzzy_match(name, get_available_internal_class_names(kind), n=3)
+            for kind in kinds}
+        # Further trim the set by pooling them all and selecting again.
+        all_names = list(chain(*suggestions.values()))
+        best_names = fuzzy_match(name, all_names, n=3)
+        suggestions = {kind: [n for n in names if n in best_names]
+                       for kind, names in suggestions.items()}
+        return {kind: sugg for kind, sugg in suggestions.items() if sugg}
+    else:
+        return fuzzy_match(name, get_available_internal_class_names(kind), n=3)
 
 
 def has_non_yaml_reproducible(info):
@@ -792,7 +755,7 @@ def deepcopy_where_possible(base: _R) -> _R:
     and to do that it works on a copy of it; but some of the values passed to cobaya
     may not be copyable (if they are not pickleable). This function provides a
     compromise solution. To allow dict comparisons and make the copy mutable it converts
-    MappingProxyType, OrderedDict and other Mapping types into plain dict.
+    MappingProxyType and other Mapping types into plain dict.
     """
     if isinstance(base, Mapping):
         _copy = {}
@@ -859,7 +822,7 @@ def sort_parameter_blocks(blocks, speeds, footprints, oversample_power=0.):
          for this_cost in permuted_costs_per_param_per_block])
     total_costs = np.array(
         [(n_params_per_block[list(o)] * permuted_oversample_factors[i])
-             .dot(permuted_costs_per_param_per_block[i])
+         .dot(permuted_costs_per_param_per_block[i])
          for i, o in enumerate(orderings)])
     i_optimal: int = np.argmin(total_costs)  # type: ignore
     optimal_ordering = orderings[i_optimal]
@@ -875,6 +838,8 @@ def find_with_regexp(regexp, root, walk_tree=False):
 
     Set walk_tree=True if there is more than one directory level (default: `False`).
     """
+    if isinstance(regexp, str):
+        regexp = re.compile(regexp)
     try:
         if walk_tree:
             files = []
@@ -1029,12 +994,6 @@ def resolve_packages_path(infos=None):
         infos = []
     elif isinstance(infos, Mapping):
         infos = [infos]
-    # MARKED FOR DEPRECATION IN v3.0
-    for info in infos:
-        if info.get("modules"):
-            raise LoggedError(log, "The input field 'modules' has been deprecated."
-                                   "Please use instead %r", packages_path_input)
-    # END OF DEPRECATION BLOCK
     paths = set(os.path.realpath(p) for p in
                 [info.get(packages_path_input) for info in infos] if p)
     if len(paths) == 1:
@@ -1046,13 +1005,6 @@ def resolve_packages_path(infos=None):
                  "Maybe specify one via a command line argument '-%s [...]'?",
             packages_path_arg[0])
     path_env = os.environ.get(packages_path_env)
-    # MARKED FOR DEPRECATION IN v3.0
-    old_env = "COBAYA_MODULES"
-    path_old_env = os.environ.get(old_env)
-    if path_old_env and not path_env:
-        raise LoggedError(log, "The env var %r has been deprecated in favor of %r",
-                          old_env, packages_path_env)
-    # END OF DEPRECATION BLOCK
     if path_env:
         return path_env
     return load_packages_path_from_config_file()

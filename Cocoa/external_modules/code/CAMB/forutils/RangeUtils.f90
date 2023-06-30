@@ -226,7 +226,7 @@
         associate(R => this%R(i))
             if (NewR%Low >= R%Low .and. NewR%High <= R%High .and. &
                 (NewR%Delta_min >= R%Delta_max .or. (NewR%IsLog .eqv. R%IsLog)  .and. NewR%delta >= R%delta)) then
-                !New range wider than existing
+                !New range narrower than existing range and with wider spacing
                 return
             else if (NewR%Low <= R%Low .and. NewR%High >= R%High .and. &
                 (NewR%Delta_min <= R%Delta_min .or. (NewR%IsLog .eqv. R%IsLog)  .and. NewR%delta <= R%delta)) then
@@ -436,7 +436,7 @@
                 if (i/=1) then
                     associate (LastReg => this%R(i-1))
                         if (RequestDelta(i) >= AReg%delta .and. Diff <= LastReg%Delta_max &
-                            .and. LastReg%Delta_max <= min_request) then
+                            .and. (LastReg%Delta_max <= min_request .or. diff < LastReg%Delta_min*this%RangeTol)) then
                             LastReg%High = AReg%High
                             if (Diff > LastReg%Delta_max*this%RangeTol) then
                                 LastReg%steps =  LastReg%steps + 1

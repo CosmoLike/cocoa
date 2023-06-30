@@ -37,7 +37,7 @@ fi
 if [ -z "${IGNORE_CPP_SPDLOG_INSTALLATION}" ]; then
   echo 'INSTALLING CPP SPDLOG LIBRARY - THIS MIGHT TAKE A WHILE'
 
-  cd $ROOTDIR/../cocoa_installation_libraries/spdlog
+  cd $ROOTDIR/../cocoa_installation_libraries/$COCOA_SPDLOG_DIR
 
   rm -f CMakeCache.txt
 
@@ -90,6 +90,7 @@ if [ -z "${IGNORE_CPP_SPDLOG_INSTALLATION}" ]; then
   fi
 
   cd $ROOTDIR
+  echo 'INSTALLING CPP SPDLOG LIBRARY - DONE'
 fi
 
 # --------------------------------------------------------------------------------------
@@ -98,7 +99,7 @@ fi
 if [ -z "${IGNORE_CPP_ARMA_INSTALLATION}" ]; then
   echo 'INSTALLING CPP ARMADILLO LIBRARY - THIS MIGHT TAKE A WHILE'
 
-  cd $ROOTDIR/../cocoa_installation_libraries/armadillo-10.6.2
+  cd $ROOTDIR/../cocoa_installation_libraries/$COCOA_ARMADILLO_DIR
 
   rm -f CMakeCache.txt
 
@@ -157,6 +158,7 @@ if [ -z "${IGNORE_CPP_ARMA_INSTALLATION}" ]; then
   fi
 
   cd $ROOTDIR
+  echo 'INSTALLING CPP ARMADILLO LIBRARY - DONE'
 fi
 
 # --------------------------------------------------------------------------------------
@@ -165,7 +167,7 @@ fi
 if [ -z "${IGNORE_CPP_CARMA_INSTALLATION}" ]; then
   echo 'INSTALLING CARMA -  THE PYTHON <-> ARMADILLO CONVERSION - THIS MIGHT TAKE A WHILE'
 
-  cd $ROOTDIR/../cocoa_installation_libraries/carma
+  cd $ROOTDIR/../cocoa_installation_libraries/$COCOA_CARMA_DIR
 
   rm -rf $ROOTDIR/.local/include/carma/
   
@@ -176,6 +178,7 @@ if [ -z "${IGNORE_CPP_CARMA_INSTALLATION}" ]; then
   cp -r ./carma_bits $ROOTDIR/.local/include/
 
   cd $ROOTDIR
+  echo 'INSTALLING CARMA -  THE PYTHON <-> ARMADILLO CONVERSION - DONE'
 fi
 
 # --------------------------------------------------------------------------------------
@@ -184,7 +187,7 @@ fi
 if [ -z "${IGNORE_CPP_BOOST_INSTALLATION}" ]; then
   echo 'INSTALLING CPP BOOST LIBRARY - THIS WILL TAKE A WHILE'
 
-  cd $ROOTDIR/../cocoa_installation_libraries/boost_1_72_0/
+  cd $ROOTDIR/../cocoa_installation_libraries/$COCOA_BOOST_DIR
 
   if [ -z "${DEBUG_CPP_PACKAGES}" ]; then
     ./bootstrap.sh --prefix=$ROOTDIR/.local > /dev/null 2> /dev/null
@@ -219,6 +222,7 @@ if [ -z "${IGNORE_CPP_BOOST_INSTALLATION}" ]; then
   fi
   
   cd $ROOTDIR
+  echo 'INSTALLING CPP BOOST LIBRARY - DONE'
 fi
 
 # --------------------------------------------------------------------------------------

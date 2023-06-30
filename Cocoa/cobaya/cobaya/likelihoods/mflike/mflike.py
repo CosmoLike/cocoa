@@ -10,14 +10,19 @@ import os
 from typing import Optional
 
 import numpy as np
-from cobaya.likelihoods.base_classes import InstallableLikelihood
+#VM BEGINS
+#from cobaya.likelihoods.base_classes import InstallableLikelihood
+from cobaya.likelihood import Likelihood
+#VM ENDS
 from cobaya.log import LoggedError
 from cobaya.tools import are_different_params_lists
 
 from .theoryforge_MFLike import TheoryForge_MFLike
 
-
-class MFLike(InstallableLikelihood):
+#VM BEGINS
+#class MFLike(InstallableLikelihood):
+class MFLike(Likelihood):
+#VM ENDS
     _url = "https://portal.nersc.gov/cfs/sobs/users/MFLike_data"
     _release = "v0.7"
     install_options = {"download_url": "{}/{}.tar.gz".format(_url, _release)}
@@ -32,7 +37,6 @@ class MFLike(InstallableLikelihood):
     systematics_template: dict
 
     def initialize(self):
-
         # Set default values to data member not initialized via yaml file
         self.l_bpws = None
         self.freqs = None
@@ -49,7 +53,6 @@ class MFLike(InstallableLikelihood):
         data_file_path = os.path.normpath(
             getattr(self, "path", None) or os.path.join(self.packages_path, "data")
         )
-
         self.data_folder = os.path.join(data_file_path, self.data_folder)
         if not os.path.exists(self.data_folder):
             raise LoggedError(

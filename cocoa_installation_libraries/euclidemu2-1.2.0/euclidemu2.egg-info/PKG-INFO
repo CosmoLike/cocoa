@@ -5,8 +5,6 @@ Summary: Python wrapper for EuclidEmulator2
 Home-page: https://github.com/PedroCarrilho/EuclidEmulator2/tree/pywrapper
 Author: Pedro Carrilho,  Mischa Knabenhans
 Author-email: pedromgcarrilho@gmail.com
-License: UNKNOWN
-Platform: UNKNOWN
 Description-Content-Type: text/markdown
 License-File: LICENSE
 
@@ -101,5 +99,3 @@ If `classy` is not installed, a warning will appear when loading `euclidemu2` an
 
 ## License
 EuclidEmulator2 is free software, distributed under the GNU General Public License. This implies that you may freely distribute and copy the software. You may also modify it as you wish, and distribute these modified versions. You must always indicate prominently any changes you made in the original code and leave the copyright notices, and the no-warranty notice intact. Please read the General Public License for more details.
-
-

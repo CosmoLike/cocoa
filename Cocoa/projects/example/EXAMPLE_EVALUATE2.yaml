@@ -1,5 +1,5 @@
 stop_at_error: False
-debug: true
+debug: False
 
 likelihood:
   sn.roman_c:

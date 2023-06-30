@@ -189,10 +189,19 @@ PS: you can also use `source compile_external_modules` instead of `source ./inst
     
     (...)
     
-    GCCPATH_STRING = sbp.Popen(
-        ['$C_COMPILER -print-libgcc-file-name'],
-        stdout=sbp.PIPE, shell=True).communicate()[0]
+    #GCCPATH_STRING = sbp.Popen(
+    #    ['gcc -print-libgcc-file-name'],
+    #    stdout=sbp.PIPE, shell=True).communicate()[0]
+    GCCPATH_STRING = sbp.check_output(["$C_COMPILER -print-libgcc-file-name"], shell=True)
     GCCPATH = osp.normpath(osp.dirname(GCCPATH_STRING)).decode()
+    
+    (...)
+    
+    #MVEC_STRING = sbp.Popen(
+    #    ['gcc', '-lmvec'],
+    #    stderr=sbp.PIPE).communicate()[1]
+    #if b"mvec" not in MVEC_STRING:
+    #    liblist += ["mvec","m"]
     
     (...)
     
