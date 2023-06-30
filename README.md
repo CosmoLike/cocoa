@@ -22,8 +22,6 @@
 
 Cocoa allows users to run [CosmoLike](https://github.com/CosmoLike) routines inside the [Cobaya](https://github.com/CobayaSampler) framework. [CosmoLike](https://github.com/CosmoLike) can analyze data primarily from the [Dark Energy Survey](https://www.darkenergysurvey.org) and simulate future multi-probe analyses for LSST and Roman Space Telescope. Besides integrating [Cobaya](https://github.com/CobayaSampler) and [CosmoLike](https://github.com/CosmoLike), Cocoa introduces shell scripts and readme instructions that allow users to containerize [Cobaya](https://github.com/CobayaSampler). The container structure ensures that users will adopt the same compiler and libraries (including their versions), and that they will be able to use multiple [Cobaya](https://github.com/CobayaSampler) instances consistently. This readme file presents basic and advanced instructions for installing all [Cobaya](https://github.com/CobayaSampler) and [CosmoLike](https://github.com/CosmoLike) components.
 
-:warning: **Warning** :warning: This port to Python3.8, newer compiler and required packages is still experimental. 
-
 ## Installation of Cocoa's required packages via Conda <a name="required_packages_conda"></a>
 
 There are two installation methods. Users must choose one of them:
@@ -86,13 +84,13 @@ Assuming the user opted for the easier *Conda installation*, type:
 
         $ conda activate cocoapy38
     
-        $(cocoapy38) git clone --depth 1 -b v3.0 https://github.com/CosmoLike/cocoa.git
+        $(cocoapy38) git clone --depth 1 https://github.com/CosmoLike/cocoa.git
 
 to clone the repository. 
 
 Cocoa developers should drop the shallow clone option `--depth 1`; they should also authenticate to GitHub via ssh keys and use the command instead
 
-        $(cocoapy38) git clone -b v3.0 git@github.com:CosmoLike/cocoa.git
+        $(cocoapy38) git clone git@github.com:CosmoLike/cocoa.git
 
 :warning: **Warning** :warning: We have a limited monthly quota in bandwidth for Git LFS files, and therefore we ask users to use good judgment in the number of times they clone files from Cocoa's main repository.
  
@@ -173,7 +171,7 @@ Assuming the user opted for the easier *Conda installation* and located the term
 
         $(cocoapy38) source start_cocoa
 
-Users will see a terminal that looks like this: `$(Cocoa)(.local)`. *This is a feature, not a bug*! 
+Users will see a terminal that looks like this: `$(cocoapy38)(.local)`. *This is a feature, not a bug*! 
 
 Why did we choose to have two separate bash environments? Users should be able to manipulate multiple Cocoa instances seamlessly, which is particularly useful when running chains in one instance while experimenting with code development in another. Consistency of the environment across all Cocoa instances is crucial, and the start_cocoa/stop_cocoa scripts handle the loading and unloading of environmental path variables for each Cocoa. All of them, however, depends on many of the same prerequisites, so it is advantageous to maintain the basic packages inside the shared conda cocoa environment. 
 
