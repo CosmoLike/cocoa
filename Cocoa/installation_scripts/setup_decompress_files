@@ -33,9 +33,9 @@ sh unxv_all.sh
 cd $ROOTDIR
 
 # files under ./external_modules/code/
-if [ -z "${NO_UNXZ_EXTERNAL_MODULES_CODE}" ]; then
-    # no xz files under code so far
-fi
+#if [ -z "${NO_UNXZ_EXTERNAL_MODULES_CODE}" ]; then
+#    # no xz files under code so far
+#fi
 
 # files under ./external_modules/data/
 if [ -z "${NO_UNXZ_EXTERNAL_MODULES_DATA}" ]; then

@@ -232,6 +232,7 @@ source ./installation_scripts/setup_cmake
 if [ $? -ne 0 ]; then
   echo "FAILED setup_cmake SCRIPT" >&2
   cd $ROOTDIR
+  source stop_cocoa
   return 1
 fi
 
@@ -246,6 +247,7 @@ source ./installation_scripts/setup_hdf5
 if [ $? -ne 0 ]; then
   echo "FAILED setup_hdf5 SCRIPT" >&2
   cd $ROOTDIR
+  source stop_cocoa
   return 1
 fi
 
@@ -258,9 +260,10 @@ fi
 
 source ./installation_scripts/setup_pip_packages
 if [ $? -ne 0 ]; then
-echo "FAILED setup_pip_packages SCRIPT" >&2
-cd $ROOTDIR
-return 1
+  echo "FAILED setup_pip_packages SCRIPT" >&2
+  cd $ROOTDIR
+  source stop_cocoa
+  return 1
 fi
 
 source ./installation_scripts/setup_fortran_packages
@@ -274,6 +277,7 @@ source ./installation_scripts/setup_cpp_packages
 if [ $? -ne 0 ]; then
   echo "FAILED setup_cpp_packages SCRIPT" >&2
   cd $ROOTDIR
+  source stop_cocoa
   return 1
 fi
 
@@ -281,9 +285,10 @@ source ./installation_scripts/setup_c_packages
 if [ $? -ne 0 ]; then
   echo "FAILED setup_c_packages SCRIPT" >&2
   cd $ROOTDIR
+  source stop_cocoa
   return 1
 fi
 
-echo 'INSTALLATION DONE'
-
 source stop_cocoa
+echo 'SETUP COCOA INSTALLATION PACKAGES - DONE'
+
