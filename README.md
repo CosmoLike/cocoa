@@ -695,7 +695,7 @@ Users can now proceed to the section [Installation of Cobaya base code](#cobaya_
 
 If the user wants to add Tensorflow, Keras and Pytorch for an emulator-based project via Conda, then type
 
-        $ conda activate cocoa 
+        $ conda activate cocoapy38 
       
         $(cocoapy38) $CONDA_PREFIX/bin/pip install --no-cache-dir \
             'tensorflow-cpu==2.12.0' \
