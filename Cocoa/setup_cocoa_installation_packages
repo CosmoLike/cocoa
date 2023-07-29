@@ -141,13 +141,14 @@ if [ -n "${SET_INSTALLATION_OPTIONS}" ]; then
 else
     source set_installation_options
 fi
-if [ -n "${MINICONDA_INSTALLATION}" ]; then
-    if [ ${CONDA_SHLVL} -ne 1 ]; then
-        echo "MINICONDA_INSTALLATION SET BUT CONDA ENVIRONMENT NOT ACTIVATED"
-        source stop_cocoa
-        return 1
-    fi
-fi
+
+#if [ -n "${MINICONDA_INSTALLATION}" ]; then
+#    if [ ${CONDA_SHLVL} -ne 1 ]; then
+#        echo "MINICONDA_INSTALLATION SET BUT CONDA ENVIRONMENT NOT ACTIVATED"
+#        source stop_cocoa
+#        return 1
+#    fi
+#fi
 # ----------------------------------------------------------------------------
 # ----------------------------------------------------------------------------
 # ---------------------- Activate Virtual Enviroment -------------------------
