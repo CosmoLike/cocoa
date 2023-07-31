@@ -47,8 +47,8 @@ export USE_SPT_CLIK_PLANCK=1
 #export COSMOLIKE_DEBUG_MODE=1
 
 # --------------------------------------------------------------------------------------
-# IN CASE COMPILATION FAILS, THESE FLAGS WILL BE USEFUL. BY DEFAULT, THE COMPILATION'S -
-# OUTPUT IS NOT WRITTEN ON THE TERMINAL. THESE FLAGS ENABLE THAT OUTPUT ---------------- 
+# IN CASE COMPILATION FAILS, THESE FLAGS WILL BE USEFUL. BY DEFAULT, THE OUTPUT --------
+# IS NOT WRITTEN ON THE TERMINAL. THESE FLAGS ENABLE THAT OUTPUT ----------------------- 
 # --------------------------------------------------------------------------------------
 #export DEBUG_PLANCK_OUTPUT=1
 #export DEBUG_CAMB_OUTPUT=1

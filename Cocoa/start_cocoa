@@ -25,7 +25,7 @@ fi
 if [ -n "${LD_LIBRARY_PATH}" ]; then
     export OLD_LD_LIBRARY_PATH=$LD_LIBRARY_PATH
 else
-    # -n fails if string is null
+    # "-n" fails if the string is null
     export OLD_LD_LIBRARY_PATH="x"
 fi
 
