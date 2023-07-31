@@ -144,7 +144,8 @@ else
 fi
 
 #if [ -n "${MINICONDA_INSTALLATION}" ]; then
-#  if [ ${CONDA_SHLVL} -ne 1 ]; then
+# BASIC TEST IF A CONDA ENV IS ACTIVATED
+#  if [ -z ${CONDA_PREFIX} ]; then
 #    echo "MINICONDA_INSTALLATION SET BUT CONDA ENVIRONMENT NOT ACTIVATED"
 #    source stop_cocoa
 #    return 1
