@@ -10,6 +10,7 @@ core.*
 *.pyc
 *.egg-info/
 *.out
+*.egg
 
 Cocoa/external_modules/code/planck/code/spt_clik/svnversion
 Cocoa/external_modules/code/PolyChordLite/dist/
