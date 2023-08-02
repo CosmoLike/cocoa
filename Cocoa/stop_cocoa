@@ -3,9 +3,11 @@
 # ----------------------------------------------------------------------------
 # ----------------------------------------------------------------------------
 
-deactivate
-if [ $? -ne 0 ]; then
-  echo "COCOA PRIVATE PYTHON ENV DEACTIVATION FAILED" >&2
+if ! command -v deactivate &> /dev/null
+then
+  echo "WARNING: COCOA PRIVATE PYTHON ENV DEACTIVATION FAILED"
+else
+  deactivate
 fi
 
 if [ -n "${OLD_OMP_NUM_THREADS}" ]; then

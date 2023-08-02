@@ -143,14 +143,14 @@ else
   source set_installation_options
 fi
 
-#if [ -n "${MINICONDA_INSTALLATION}" ]; then
 # BASIC TEST IF A CONDA ENV IS ACTIVATED
-#  if [ -z ${CONDA_PREFIX} ]; then
-#    echo "MINICONDA_INSTALLATION SET BUT CONDA ENVIRONMENT NOT ACTIVATED"
-#    source stop_cocoa
-#    return 1
-#  fi
-#fi
+if [ -n "${MINICONDA_INSTALLATION}" ]; then
+  if [ -z ${CONDA_PREFIX} ]; then
+    echo "MINICONDA_INSTALLATION SET BUT CONDA ENVIRONMENT NOT ACTIVATED"
+    source stop_cocoa
+    return 1
+  fi
+fi
 
 # ----------------------------------------------------------------------------
 # ----------------------------------------------------------------------------
