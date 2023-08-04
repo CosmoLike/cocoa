@@ -19,6 +19,10 @@
 static int GSL_WORKSPACE_SIZE = 1024;
 static double SQRT2 = 1.41421356237;
 
+// In lens = source LSST systematic paper, Supranta made a case where photo-z = 4 
+// with one important change: the test_overlap would be given by 
+// tomo.clustering_zmax[ni] <= tomo.shear_zmin[nj]. We will call this IA = 7
+
 // ----------------------------------------------------------------------------------
 // ----------------------------------------------------------------------------------
 // ----------------------------------------------------------------------------------
@@ -29,26 +33,29 @@ static double SQRT2 = 1.41421356237;
 
 double amin_source(int ni) 
 {
-  const int photoz = redshift.shear_photoz;
-  
-  if (ni == -1 || photoz == 1 || photoz == 2 || photoz == 4) 
-  {
-    return 1. / (redshift.shear_zdistrpar_zmax + 1.);
-  }
-  
   if(ni < -1 || ni > tomo.shear_Nbin - 1)
   {
     log_fatal("invalid bin input ni = %d", ni);
     exit(1);
   }
 
-  if (photoz == 0) 
+  const int photoz = (redshift.shear_photoz == 7) ? 4 : redshift.shear_photoz;
+  
+  if (ni == -1 || photoz == 1 || photoz == 2 || photoz == 4) 
+  {
+    return 1. / (redshift.shear_zdistrpar_zmax + 1.);
+  }
+  else if (photoz == 0) 
   {
     return 1. / (1 + tomo.shear_zmax[ni]);
   }
-  
-  return 1. /(1 + fmin(tomo.shear_zmax[ni] + 5.0 * nuisance.sigma_zphot_shear[ni] +
-    fabs(nuisance.bias_zphot_shear[ni]), redshift.shear_zdistrpar_zmax));
+  else if (photoz == 3)
+  {
+    return 1. /(1 + fmin(tomo.shear_zmax[ni] + 5.0 * nuisance.sigma_zphot_shear[ni] +
+      fabs(nuisance.bias_zphot_shear[ni]), redshift.shear_zdistrpar_zmax));
+  }
+
+  return 1. / (redshift.shear_zdistrpar_zmax + 1.);
 }
 
 double amax_source(int i __attribute__((unused))) 
@@ -58,17 +65,17 @@ double amax_source(int i __attribute__((unused)))
 
 double amax_source_IA(int ni) 
 {
-  const int photoz = redshift.shear_photoz;
-  
-  if (ni == -1 || photoz == 1 || photoz == 2 || photoz == 4) 
-  {
-    return 1. / (1. + fmax(redshift.shear_zdistrpar_zmin, 0.001));
-  }
-
   if(ni < -1 || ni > tomo.shear_Nbin - 1)
   {
     log_fatal("invalid bin input ni = %d", ni);
     exit(1);
+  }
+
+  const int photoz = (redshift.shear_photoz == 7) ? 4 : redshift.shear_photoz;
+  
+  if (ni == -1 || photoz == 1 || photoz == 2 || photoz == 4) 
+  {
+    return 1. / (1. + fmax(redshift.shear_zdistrpar_zmin, 0.001));
   }
 
   if (photoz == 0)
@@ -82,28 +89,32 @@ double amax_source_IA(int ni)
 
 double amin_lens(int ni) 
 {
-  const int photoz = redshift.clustering_photoz;
-  
-  if (ni == -1 || photoz == 1 || photoz == 2) 
-  {
-    return 1. / (redshift.clustering_zdistrpar_zmax + 1.);
-  }
-
   if(ni < -1 || ni > tomo.clustering_Nbin - 1)
   {
     log_fatal("invalid bin input ni = %d", ni);
     exit(1);
   }
 
+  const int photoz = (redshift.clustering_photoz == 7) ? 4 : redshift.clustering_photoz;
+  
+  if (ni == -1 || photoz == 1 || photoz == 2) 
+  {
+    return 1. / (redshift.clustering_zdistrpar_zmax + 1.);
+  }
+
   if (photoz == 0) 
   {
     return 1. / (1 + tomo.clustering_zmax[ni]);
   }
-  else if (photoz == 4) 
+  if (photoz == 4) 
   {
     return 1. / (1 + tomo.clustering_zmax[ni] + 2. * fabs(nuisance.bias_zphot_clustering[ni]));
   }
-  
+  if (photoz == 5) 
+  {
+    return 1.0/(redshift.clustering_zdistrpar_zmax + 1.0);
+  }
+
   return 1. / (1 + fmin(tomo.clustering_zmax[ni] + 5. * nuisance.sigma_zphot_clustering[ni] +
     fabs(nuisance.bias_zphot_clustering[ni]), redshift.clustering_zdistrpar_zmax));
 }
@@ -121,19 +132,17 @@ double amax_lens(int ni)
     return 1. / (1. + fmax(redshift.shear_zdistrpar_zmin, 0.001));
   }
   
-  const int photoz = redshift.clustering_photoz;
+  const int photoz = (redshift.clustering_photoz == 7) ? 4 : redshift.clustering_photoz;
 
   if (ni == -1 || photoz == 1 || photoz == 2) 
   {
     return 1. / (1. + fmax(redshift.clustering_zdistrpar_zmin, 0.001));
   }
-  
-  if (photoz == 0) 
+  else if (photoz == 0) 
   {
     return 1. / (1. + fmax(tomo.clustering_zmin[ni], 0.001));
   }
-  
-  if (photoz == 4) 
+  else if (photoz == 4) 
   {
     return 1. / (1 + fmax(tomo.clustering_zmin[ni] -
       2. * fabs(nuisance.bias_zphot_clustering[ni]), 0.001));
@@ -191,6 +200,7 @@ int test_kmax(double l, int ni) // return 1 if true, 0 otherwise
 // ----------------------------------------------------------------------------------
 // ----------------------------------------------------------------------------------
 
+
 int test_zoverlap(int ni, int nj) // test whether source bin nj is behind lens bin ni
 { 
   if(ni < 0 || ni > tomo.clustering_Nbin - 1 || nj < 0 || nj > tomo.shear_Nbin - 1)
@@ -205,9 +215,13 @@ int test_zoverlap(int ni, int nj) // test whether source bin nj is behind lens b
   
   const int lphotoz = redshift.clustering_photoz;
   const int sphotoz = redshift.shear_photoz;
-  if (sphotoz < 4 && tomo.clustering_zmax[ni] <= tomo.shear_zmin[nj]) 
+
+  if (sphotoz < 4 || sphotoz == 5 || sphotoz == 6 || sphotoz == 7) 
   {
-    return 1;
+    if (tomo.clustering_zmax[ni] <= tomo.shear_zmin[nj])
+    {
+      return 1;
+    }
   }
   
   const double zmeanlens = zmean(ni);
@@ -746,14 +760,16 @@ double sigma_zphot_shear(double z, int ni)
 
 double zdistr_histo_1(double z, void* params __attribute__((unused))) 
 { // return nz(z) based on redshift file with one redshift distribution
-  static double *tab = 0;
-  static double zhisto_max, zhisto_min, dz;
-  static int nimax;
+  static double* tab = 0;
+  static double zhisto_max; 
+  static double zhisto_min;
+  static double dz;
+
+  const int photoz = redshift.shear_photoz;
 
   if (tab == 0) 
   {
     const int zbins = line_count(redshift.shear_REDSHIFT_FILE);
-    nimax = zbins;
     tab = (double*) malloc(sizeof(double)*zbins);
     double* z_v = (double*) malloc(sizeof(double)*zbins);
     
@@ -764,27 +780,55 @@ double zdistr_histo_1(double z, void* params __attribute__((unused)))
       exit(1);
     }
     
-    int p = 0;
-    for (int i=0; i<zbins; i++) 
+    if(photoz == 5)
     {
-      double space1, space2;
-      fscanf(ein, "%le %le %le %le\n", &z_v[i], &space1, &space2, &tab[i]);
-      p++;
-      if (i > 0 && z_v[i] < z_v[i - 1]) 
+      int p = 0;
+      for (int i=0; i<zbins; i++) 
       {
-        break;
+        double space1, space2, space3, space4;
+        fscanf(ein,"%le %le %le %le %le %le", &z_v[i], &space1, &space2, 
+            &tab[i], &space3, &space4);
+
+        for (int j=0; j<tomo.shear_Nbin; j++) 
+        {
+          fscanf(ein,"%le", &space1);
+        }
+        
+        p++;
+        if (i > 0 && z_v[i] < z_v[i - 1])
+        {
+          break;
+        }
       }
+      fclose(ein);
+      dz = (z_v[p - 1] - z_v[0]) / ((double) p - 1.);
+      zhisto_min = z_v[0];
+      zhisto_max = z_v[p - 1] + dz;
+      zbins = p; // VM: added JULY 2003
+      free(z_v);
     }
-    fclose(ein);
-    
-    dz = (z_v[p - 1] - z_v[0]) / (p - 1.);
-    zhisto_max = z_v[p - 1] + dz;
-    zhisto_min = z_v[0];
-    
+    else
+    {
+      int p = 0;
+      for (int i=0; i<zbins; i++) 
+      {
+        double space1, space2;
+        fscanf(ein, "%le %le %le %le\n", &z_v[i], &space1, &space2, &tab[i]);
+        p++;
+        if (i > 0 && z_v[i] < z_v[i - 1]) 
+        {
+          break;
+        }
+      }
+      fclose(ein);
+      dz = (z_v[p - 1] - z_v[0]) / ((double) p - 1.);
+      zhisto_min = z_v[0];
+      zhisto_max = z_v[p - 1] + dz;
+      zbins = p; // VM: added JULY 2003
+      free(z_v);
+    }
     redshift.shear_zdistrpar_zmin = zhisto_min;
     redshift.shear_zdistrpar_zmax = zhisto_max;
-
-    free(z_v);
   }
 
   double res = 0.0;
@@ -792,7 +836,7 @@ double zdistr_histo_1(double z, void* params __attribute__((unused)))
   {
     const int ni = (int) floor((z - zhisto_min) / dz);
     
-    if(ni < 0 || ni > nimax - 1)
+    if(ni < 0)
     {
       log_fatal("invalid bin input ni = %d", ni);
       exit(1);
@@ -807,13 +851,13 @@ double zdistr_histo_1(double z, void* params __attribute__((unused)))
 double zdistr_histo_n(double z, void* params)
 { // return nz(z,j) based on redshift file with structure z[i] nz[0][i] .. nz[tomo.shear_Nbin-1][i]
   static double** tab;
-  static double zhisto_max, zhisto_min, dz;
-  static int njmax;
+  static double zhisto_max; 
+  static double zhisto_min; 
+  static double dz;
   
   if (tab == 0) 
   {
     int zbins = line_count(redshift.shear_REDSHIFT_FILE);
-    njmax = zbins;
     tab = (double**) malloc(sizeof(double*)*tomo.shear_Nbin);
     for (int i=0; i<tomo.shear_Nbin; i++)
     {
@@ -832,24 +876,23 @@ double zdistr_histo_n(double z, void* params)
     for (int i=0; i<zbins; i++) 
     {
       fscanf(ein, "%le", &z_v[i]);
+      for (int k=0; k<tomo.shear_Nbin; k++) 
+      {
+        fscanf(ein, "%le", &tab[k][i]);
+      }
       p++;
       if (i > 0 && z_v[i] < z_v[i - 1]) 
       {
         break;
       }
-      
-      for (int k=0; k<tomo.shear_Nbin; k++) 
-      {
-        fscanf(ein, "%le", &tab[k][i]);
-      }
     }
     fclose(ein);
     
-    dz = (z_v[p - 1] - z_v[0]) / (p - 1.);
-    zhisto_max = z_v[p - 1] + dz;
+    dz = (z_v[p - 1] - z_v[0]) / ((double) p - 1.);
     zhisto_min = z_v[0];
+    zhisto_max = z_v[p - 1] + dz;
     zbins = p;
-    
+
     // now, set tomography bin boundaries
     for (int k=0; k<tomo.shear_Nbin; k++) 
     {
@@ -902,7 +945,7 @@ double zdistr_histo_n(double z, void* params)
     const int ni = (int) ar[0];
     const int nj = (int) floor((z - zhisto_min) / dz);
     
-    if(ni < 0 || ni > tomo.shear_Nbin - 1 || nj < 0 || nj > njmax - 1)
+    if(ni < 0 || ni > tomo.shear_Nbin - 1 || nj < 0)
     {
       log_fatal("invalid bin input (ni, nj) = (%d, %d)", ni, nj);
       exit(1);
@@ -929,12 +972,20 @@ double zdistr_photoz(double zz, int nj)
   static nuisancepara N;
   static int zbins = -1;
   static gsl_spline* photoz_splines[MAX_SIZE_ARRAYS];
+  // BEGIN static variables only unsed on IA==5,6
+  static double* nz_old = 0;
+  static double* nz_diag = 0; 
+  static double* nz_ext = 0;
+  static double** nz_ext_bin=0;
+  // END static variables only unsed on IA==5,6
 
-  if (redshift.shear_photoz == -1) 
+  const int photoz = (redshift.shear_photoz == 7) ? 4 : redshift.shear_photoz;
+
+  if (photoz == -1) 
   {
     return n_of_z(zz, nj);
   } 
-  else if ((redshift.shear_photoz != 4 && recompute_zphot_shear(N)) || table == 0) 
+  else if ((photoz != 4 && recompute_zphot_shear(N)) || table == 0) 
   {
     update_nuisance(&N);
     
@@ -942,7 +993,7 @@ double zdistr_photoz(double zz, int nj)
     {
       const int zbins1 = line_count(redshift.shear_REDSHIFT_FILE);
       
-      if (redshift.shear_photoz != 4) 
+      if (photoz != 4) 
       {
         zbins = zbins1 * 20;
       } 
@@ -968,7 +1019,7 @@ double zdistr_photoz(double zz, int nj)
         }
       }
 
-      if (redshift.shear_photoz == 4) 
+      if (photoz == 4) 
       { // if multihisto, force zmin, zmax, tomo bins to match supplied file
         
         FILE* ein = fopen(redshift.shear_REDSHIFT_FILE, "r");
@@ -982,6 +1033,11 @@ double zdistr_photoz(double zz, int nj)
         for (int i=0; i<zbins1; i++) 
         {
           fscanf(ein, "%le", &z_v[i]);
+          for (int k=0; k<tomo.shear_Nbin; k++) 
+          {
+            double space;
+            fscanf(ein, "%le", &space);
+          }
           p++;
           if (i > 0) 
           {
@@ -990,26 +1046,69 @@ double zdistr_photoz(double zz, int nj)
               break;
             }
           }
-          for (int k=0; k<tomo.shear_Nbin; k++) 
-          {
-            double space;
-            fscanf(ein, "%le", &space);
-          }
         }
         fclose(ein);
         
+        //VM: UPDATED JULY 2003
+        //VM: denominator change from (zbin1 - 1) to (p - 1)
+        const double dz = (z_v[p - 1] - z_v[0]) / ((double) p - 1.);
+        zbins1 = p;
+        
         redshift.shear_zdistrpar_zmin = fmax(z_v[0], 1.e-5);
-        redshift.shear_zdistrpar_zmax = z_v[p - 1] + (z_v[p - 1] - z_v[0]) / (zbins1 - 1.);
+        redshift.shear_zdistrpar_zmax = z_v[p - 1] + dz;
+      }
+      else if (photoz == 5) 
+      { // extreme outlier nz from simulation
+        nz_old     = (double*) malloc(sizeof(double)*zbins);
+        nz_diag    = (double*) malloc(sizeof(double)*zbins);
+        nz_ext     = (double*) malloc(sizeof(double)*zbins);
+        nz_ext_bin = (double**) malloc(sizeof(double*)*tomo.shear_Nbin);
+        for (int i=0; i<tomo.shear_Nbin; i++)
+        {
+          nz_ext_bin[i] = (double*) malloc(sizeof(double)*zbins);
+        }
+
+        FILE* ein = fopen(redshift.shear_REDSHIFT_FILE, "r");
+        if (ein == NULL)
+        {
+          log_fatal("file not opened");
+          exit(1);
+        }
+        
+        int p=0;
+        for (int i=0; i<zbins1; i++) 
+        {
+          double space1, space2;
+          fscanf(ein,"%le %le %le %le %le %le", &z_v[i], &space1, &space2, 
+            &nz_old[i], &nz_diag[i], &nz_ext[i]);
+          
+          for(int k=0; k<tomo.shear_Nbin; k++) 
+          {
+            fscanf(ein,"%le", &nz_ext_bin[k][i]);
+          }
+          p++;
+          if (i > 0) 
+          {
+            if (z_v[i] < z_v[i - 1])
+            {
+              break;
+            }
+          }
+        }
+        fclose(ein);
+
+        //VM: BUG REPORT
+        //redshift.shear_zdistrpar_zmin = ??
+        //redshift.shear_zdistrpar_zmax = ??
       }
     }
 
     const double zhisto_min = redshift.shear_zdistrpar_zmin;
     const double zhisto_max = redshift.shear_zdistrpar_zmax;
-    const double da = (zhisto_max - zhisto_min) / ((double) zbins);
-    
+    const double dz_v = (zhisto_max - zhisto_min) / ((double) zbins);  
     for (int i=0; i<zbins; i++) 
     {
-      z_v[i] = zhisto_min + (i + 0.5) * da;
+      z_v[i] = zhisto_min + (i + 0.5) * dz_v;
     }
     
 // the outlier fraction (outfrac) should be specified externally. This is a temporary hack.
@@ -1031,7 +1130,7 @@ double zdistr_photoz(double zz, int nj)
 // effective FWHM is 1.64 that of the Guassian case. For equivalent rescalings, [which is the 
 // currently implemented case] eta=0.736 and the effective FWHM is 1.79 that of the Gaussian case.
 
-    switch (redshift.shear_photoz) 
+    switch (photoz) 
     { // initialization that allows openmp threading of the next loop
       case 0:
       {
@@ -1061,6 +1160,11 @@ double zdistr_photoz(double zz, int nj)
         zdistr_histo_n(0.0, (void*) ar);
         break;
       }
+      case 6:
+      {
+        zdistr_histo_1(0.0, NULL);
+        break;
+      }
     }
 
     double NORM[MAX_SIZE_ARRAYS];
@@ -1069,7 +1173,7 @@ double zdistr_photoz(double zz, int nj)
     {
       double norm;
 
-      switch (redshift.shear_photoz) 
+      switch (photoz) 
       {
         case 0: // no photo-zs, split 'true' n(z) histogram in bins
         {  
@@ -1101,13 +1205,11 @@ double zdistr_photoz(double zz, int nj)
           }
 
           norm = 0.0;
-          double ar[2] = {tomo.shear_zmin[i], tomo.shear_zmax[i]};
-
           for (int k=0; k<zbins; k++) 
           {
-            const double x1 = (ar[0] - z_v[k] + bias_zphot_shear(z_v[k], i)) /
+            const double x1 = (tomo.shear_zmin[i] - z_v[k] + bias_zphot_shear(z_v[k], i)) /
                  (M_SQRT2 * sigma_zphot_shear(z_v[k], i));
-            const double x2 = (ar[1] - z_v[k] + bias_zphot_shear(z_v[k], i)) /
+            const double x2 = (tomo.shear_zmax[i] - z_v[k] + bias_zphot_shear(z_v[k], i)) /
                  (M_SQRT2 * sigma_zphot_shear(z_v[k], i));
             
             table[i + 1][k] = zdistr_histo_1(z_v[k], NULL) * (eta * 0.3183 * (atan(x2) - atan(x1)) +
@@ -1116,7 +1218,7 @@ double zdistr_photoz(double zz, int nj)
             // with a tophat) with the correct weights. See, eg, the Wikipedia article on Voigt 
             // profiles for an explanation of where the numbers come from.
             
-            norm += table[i + 1][k] * da;
+            norm += table[i + 1][k] * dz_v;
           }
           for (int k=0; k < zbins; k++) 
           {
@@ -1126,56 +1228,54 @@ double zdistr_photoz(double zz, int nj)
         }
         case 2: // Pseudo Voigt (Lorentzian + Gaussian) + outlier (currently flat) photo-zs
         {
-          norm = 0.0;
-          double ar[2] = {tomo.shear_zmin[i], tomo.shear_zmax[i]};
-
           if (sigma_zphot_shear(0., i) == 0.) 
           {
             log_fatal("Source galaxy photo-z model underdetermined!\nredshift.shear_photoz = 2,"
               " but nuisance.sigma_zphot_shear[%d] not set",i);
             exit(1);
           }
+
+          norm = 0.0;
           for (int k=0; k < zbins; k++) 
           {
-            const double x1 = (ar[0] - z_v[k] + bias_zphot_shear(z_v[k], i)) /
+            const double x1 = (tomo.shear_zmin[i] - z_v[k] + bias_zphot_shear(z_v[k], i)) /
                  (M_SQRT2 * sigma_zphot_shear(z_v[k], i));
 
-            const double x2 = (ar[1] - z_v[k] + bias_zphot_shear(z_v[k], i)) /
+            const double x2 = (tomo.shear_zmax[i] - z_v[k] + bias_zphot_shear(z_v[k], i)) /
                  (M_SQRT2 * sigma_zphot_shear(z_v[k], i));
 
             table[i + 1][k] = zdistr_histo_1(z_v[k], NULL) * (eta * 0.3183 * (atan(x2) - atan(x1)) +
               ((1.0 - eta) * 0.5 * (gsl_sf_erf(x2) - gsl_sf_erf(x1))));
 
-            norm += table[i + 1][k] * da;
+            norm += table[i + 1][k] * dz_v;
           }
           for (int k=0; k < zbins; k++) 
           {
-            table[i + 1][k] = outfrac / da + (1. - outfrac) * table[i + 1][k] / norm;
+            table[i + 1][k] = outfrac / dz_v + (1. - outfrac) * table[i + 1][k] / norm;
           }
           break;
         }
         case 3: // Gaussian photo-zs
         {
-          norm = 0.0;
-          double ar[2] = {tomo.shear_zmin[i], tomo.shear_zmax[i]};
-
           if (sigma_zphot_shear(0., i) == 0.) 
           {
-            log_fatal("Source galaxy photo-z model underdetermined!\nredshift.shear_photoz = 3,"
-              " but nuisance.sigma_zphot_shear[%d] not set", i);
+            log_fatal("Source galaxy photo-z model underdetermined!\n"
+              "redshift.shear_photoz = 3, "
+              "but nuisance.sigma_zphot_shear[%d] not set", i);
             exit(1);
           }
+
+          norm = 0.0;
           for (int k=0; k<zbins; k++) 
           {
-            const double x1 = (ar[0] - z_v[k] + bias_zphot_shear(z_v[k], i)) /
+            const double x1 = (tomo.shear_zmin[i] - z_v[k] + bias_zphot_shear(z_v[k], i)) /
                  (M_SQRT2 * sigma_zphot_shear(z_v[k], i));
-            const double x2 = (ar[1] - z_v[k] + bias_zphot_shear(z_v[k], i)) /
+            const double x2 = (tomo.shear_zmax[i] - z_v[k] + bias_zphot_shear(z_v[k], i)) /
                  (M_SQRT2 * sigma_zphot_shear(z_v[k], i));
             
-            table[i + 1][k] = 0.5 * zdistr_histo_1(z_v[k], (void*) ar) *
-                              (gsl_sf_erf(x2) - gsl_sf_erf(x1));
+            table[i + 1][k] = 0.5 * zdistr_histo_1(z_v[k], NULL) * (gsl_sf_erf(x2) - gsl_sf_erf(x1));
             
-            norm += table[i + 1][k] * da;
+            norm += table[i + 1][k] * dz_v;
           }
           for (int k=0; k<zbins; k++) 
           {
@@ -1191,7 +1291,140 @@ double zdistr_photoz(double zz, int nj)
           for (int k=0; k<zbins; k++) 
           {
             table[i + 1][k] = zdistr_histo_n(z_v[k], (void*) ar); 
-            norm += table[i + 1][k] * da;
+            norm += table[i + 1][k] * dz_v;
+          }
+          for (int k=0; k<zbins; k++) 
+          {
+            table[i + 1][k] /= norm;
+          }
+          break;
+        }
+        case 5: 
+        { //Gaussian photo-zs + outlier probability matrix
+          
+          if (sigma_zphot_shear(0., i) == 0.) 
+          {
+            log_fatal("Source galaxy photo-z model underdetermined!\n"
+              "redshift.shear_photoz = 5, "
+              "but nuisance.sigma_zphot_shear[%d] not set", i);
+            exit(1);
+          }
+
+          norm = 0.0;
+          for (int k = 0; k<zbins; k++)
+          {
+            const double x1 = (tomo.shear_zmin[i] - z_v[k] + bias_zphot_shear(z_v[k], i)) / 
+                  (M_SQRT2 * sigma_zphot_shear(z_v[k], i));
+            const double x2 = (tomo.shear_zmax[i] - z_v[k] + bias_zphot_shear(z_v[k], i)) / 
+                  (M_SQRT2 * sigma_zphot_shear(z_v[k], i));
+            
+            const int z_index = (int) floor((z_v[k] - zhisto_min) / dz_v);
+            
+            table[i + 1][k] = nz_ext_bin[i][z_index] + 
+                  0.5*nz_diag[z_index]*(gsl_sf_erf(x2) - gsl_sf_erf(x1));
+            
+            norm += table[i + 1][k]*dz_v;
+          }
+          for (int k=0; k<zbins; k++) 
+          {
+            table[i + 1][k] /= norm;
+          }
+          break;
+        }
+        case 6:
+        { // simple outlier model: 2 islands + Gaussian photo-zs
+          if (sigma_zphot_shear(0., i) == 0.) 
+          {
+            log_fatal("Source galaxy photo-z model underdetermined!\n"
+              "redshift.shear_photoz = 5, "
+              "but nuisance.sigma_zphot_shear[%d] not set", i);
+            exit(1);
+          }
+
+          double ar = {tomo.shear_zmin[i], tomo.shear_zmax[i]};
+
+          int zpart = 0;
+          double zlow, zhigh;
+          if (ar[0] < 0.5) 
+          {
+            zlow = ar[0];
+            zhigh = ((ar[1] >= 0.5) ? 0.5 : ar[1]);
+            zpart = 1; // denote low-z
+          }
+          else if (ar[1] > 2.0) 
+          {
+            zlow = ((ar[0] <= 2.0) ? 2.0 : ar[0]);
+            zhigh = ar[1];
+            zpart = 2; // denote high-z
+          }
+
+          double n_out = 0.;
+          if(zpart > 0) 
+          {
+            for (int k = 0; k<zbins; k++)
+            {
+              const double zi = z_v[k];
+              if ((zi >= zlow) && (zi <= zhigh))
+              {
+                n_out += zdistr_histo_1(zi, NULL);
+              }
+            }
+            if (zpart == 1)
+            {
+              n_out *= (nuisance.frac_lowz * dz_v);
+            }
+            else if (zpart == 2)
+            {
+              n_out *= (nuisance.frac_highz * dz_v);
+            }
+          }
+
+          norm = 0.0;
+          for (int k = 0; k<zbins; k++)
+          {
+            const double x1 = (ar[0] - z_v[k] + bias_zphot_shear(z_v[k], i)) / 
+                  (M_SQRT2 * sigma_zphot_shear(z_v[k], i));
+            const double x2 = (ar[1] - z_v[k] + bias_zphot_shear(z_v[k], i)) / 
+                  (M_SQRT2 * sigma_zphot_shear(z_v[k], i));
+            const double DELTA = (gsl_sf_erf(x2) - gsl_sf_erf(x1));
+            const double ZDIST = zdistr_histo_1(z_v[k], NULL);
+            
+            if (zpart == 0) 
+            {
+              table[i+1][k] = 0.5*ZDIST*DELTA;
+            }
+            else if (zpart == 1) 
+            {
+              if (z_v[k] <= 0.5)
+              {
+                table[i+1][k] = 0.5*(1. - nuisance.frac_lowz)*ZDIST*DELTA;
+              }
+              else if (z_v[k] > 2.0)
+              {
+                table[i+1][k] = n_out/(3.5 - 2.0) + 0.5*(1.0 - nuisance.frac_highz)*ZDIST*DELTA;
+              }
+              else
+              {
+                table[i+1][k] = 0.5*ZDIST*DELTA;
+              }
+            }
+            else if (zpart == 2) 
+            {
+              if(z_v[k] <= 0.5)
+              {
+                table[i+1][k] = n_out/(0.5) + 0.5*(1.0 - nuisance.frac_lowz)*ZDIST*DELTA;
+              }
+              else if (z_v[k] > 2.0)
+              {
+                table[i+1][k] = 0.5*(1.0 - nuisance.frac_highz)*ZDIST*DELTA;
+              }
+              else
+              {
+                table[i+1][k] = 0.5*ZDIST*DELTA;
+              }
+            }
+
+            norm += table[i+1][k]*dz_v;
           }
           for (int k=0; k<zbins; k++) 
           {
@@ -1201,8 +1434,7 @@ double zdistr_photoz(double zz, int nj)
         }
         default:
         {
-          log_fatal("redshift.shear_photoz = %d not supported in this cosmolike version", 
-            redshift.shear_photoz);
+          log_fatal("redshift.shear_photoz = %d not supported in this cosmolike version", photoz);
           exit(1);          
         }
       }
@@ -1243,7 +1475,7 @@ double zdistr_photoz(double zz, int nj)
     exit(1);
   }
   
-  if (redshift.shear_photoz == 4) 
+  if (photoz == 4) 
   {
     zz = zz - nuisance.bias_zphot_shear[nj];
   }
@@ -1292,11 +1524,15 @@ double sigma_zphot_clustering(double z, int ni)
 double pf_histo(double z, void* params __attribute__((unused))) 
 { // return pf(z) based on redshift file with one redshift distribution
   static double *tab = 0;
-  static double zhisto_max, zhisto_min, dz;
+  static double zhisto_max; 
+  static double zhisto_min; 
+  static double dz;
+
+  const int photoz = (redshift.clustering_photoz == 7) ? 4 : redshift.clustering_photoz;
 
   if (tab == 0) 
   {
-    const int zbins = line_count(redshift.clustering_REDSHIFT_FILE);
+    int zbins = line_count(redshift.clustering_REDSHIFT_FILE);
     tab = (double*) malloc(sizeof(double)*zbins);
     double* z_v = (double*) malloc(sizeof(double)*zbins);
 
@@ -1307,25 +1543,50 @@ double pf_histo(double z, void* params __attribute__((unused)))
       exit(1);
     }
 
-    int p = 0;
-    for (int i=0; i<zbins; i++) 
+    if (photoz == 5)
     {
-      double space1, space2;
-      fscanf(ein, "%le %le %le %le\n", &z_v[i], &space1, &space2, &tab[i]);
-      p++;
-      if (i > 0 && z_v[i] < z_v[i - 1]) 
+      int p = 0;
+      for (int i=0; i<zbins; i++) 
       {
-        break;
+        double space1, space2, space3, space4;
+        fscanf(ein, "%le %le %le %le %le %le\n", &z_v[i], &space1, &space2, 
+          &tab[i], &space3, &space4);
+        p++;
+        if (i > 0 && z_v[i] < z_v[i - 1]) 
+        {
+          break;
+        }
       }
+      fclose(ein);
+
+      dz = (z_v[p - 1] - z_v[0]) / ((double) p - 1.);
+      zhisto_min = z_v[0];
+      zhisto_max = z_v[p - 1] + dz;
+      zbins = p; //VM: added JULY 2003
+      free(z_v);
     }
-    fclose(ein);
+    else
+    {
+      int p = 0;
+      for (int i=0; i<zbins; i++) 
+      {
+        double space1, space2;
+        fscanf(ein, "%le %le %le %le\n", &z_v[i], &space1, &space2, &tab[i]);
+        p++;
+        if (i > 0 && z_v[i] < z_v[i - 1]) 
+        {
+          break;
+        }
+      }
+      fclose(ein);
 
-    dz = (z_v[p - 1] - z_v[0]) / (p - 1.);
-    zhisto_max = z_v[p - 1] + dz;
-    zhisto_min = z_v[0];
+      dz = (z_v[p - 1] - z_v[0]) / ((double) p - 1.);
+      zhisto_min = z_v[0];
+      zhisto_max = z_v[p - 1] + dz;
+      zbins = p; //VM: added JULY 2003
+      free(z_v);
+    }
 
-    free(z_v);
-    
     if (zhisto_max < tomo.clustering_zmax[tomo.clustering_Nbin - 1] ||
         zhisto_min > tomo.clustering_zmin[0]) 
     {
@@ -1340,7 +1601,7 @@ double pf_histo(double z, void* params __attribute__((unused)))
   {
     const int ni = (int) floor((z - zhisto_min) / dz);
     
-    if (ni < 0 || ni > tomo.clustering_Nbin - 1)
+    if (ni < 0)
     {
       log_fatal("invalid bin input ni = %d", ni);
       exit(1);
@@ -1355,13 +1616,13 @@ double pf_histo(double z, void* params __attribute__((unused)))
 double pf_histo_n(double z, void* params) 
 { // return pf(z, nj) based on z file with structure z[i] nz[0][i] .. nz[tomo.clustering_Nbin-1][i]
   static double** tab;
-  static double zhisto_max, zhisto_min, dz;
-  static int njmax;
+  static double zhisto_max; 
+  static double zhisto_min;
+  static double dz;
 
   if (tab == 0) 
   {
-    const int zbins = line_count(redshift.clustering_REDSHIFT_FILE);
-    njmax = zbins;
+    int zbins = line_count(redshift.clustering_REDSHIFT_FILE);
     tab = (double**) malloc(sizeof(double*)*tomo.clustering_Nbin);
     for (int i=0; i<tomo.clustering_Nbin; i++)
     {
@@ -1380,25 +1641,25 @@ double pf_histo_n(double z, void* params)
     for (int i=0; i<zbins; i++) 
     {
       fscanf(ein, "%le", &z_v[i]);
+      for (int k=0; k < tomo.clustering_Nbin; k++) 
+      {
+        fscanf(ein, " %le", &tab[k][i]);
+      }
       p++;
       if (i > 0 && z_v[i] < z_v[i - 1]) 
       {
         break;
       }
-
-      for (int k=0; k < tomo.clustering_Nbin; k++) 
-      {
-        fscanf(ein, " %le", &tab[k][i]);
-      }
     }
     fclose(ein);
     
-    dz = (z_v[p - 1] - z_v[0]) / (p - 1.);
-    zhisto_max = z_v[p - 1] + dz;
+    dz = (z_v[p - 1] - z_v[0]) / ((double) p - 1.);
     zhisto_min = z_v[0];
+    zhisto_max = z_v[p - 1] + dz;
+    zbins = p; //VM: added JULY 2003 (we read table up to zbin)
     
     // now, set tomography bin boundaries
-    for (int k=0; k < tomo.clustering_Nbin; k++) 
+    for (int k=0; k<tomo.clustering_Nbin; k++) 
     {
       double max = tab[k][0];
       for (int i = 1; i < zbins; i++) 
@@ -1448,7 +1709,7 @@ double pf_histo_n(double z, void* params)
     const int ni = (int) ar[0];
     const int nj = (int) floor((z - zhisto_min) / dz);
     
-    if(ni < 0 || ni > tomo.clustering_Nbin - 1 || nj < 0 || nj > njmax - 1)
+    if(ni < 0 || ni > tomo.clustering_Nbin - 1 || nj < 0)
     {
       log_fatal("invalid bin input (ni, nj) = (%d, %d)", ni, nj);
       exit(1);
@@ -1466,12 +1727,23 @@ double pf_photoz(double zz, int nj)
   static nuisancepara N;
   static int zbins = -1;
   static gsl_spline* photoz_splines[MAX_SIZE_ARRAYS];
+  // begins: static variables below only used if clustering photo-z == 5
+  static double *nz_old=0; 
+  static double *nz_diag=0; 
+  static double *nz_ext=0;
+  static double **nz_ext_bin=0;
+  static double zmin_file; 
+  static double zmax_file; 
+  static double dz_file;
+  // ends: static variables below only used if clustering photo-z == 5
 
-  if (redshift.clustering_photoz == -1) 
+  const int photoz = (redshift.clustering_photoz == 7) ? 4 : redshift.clustering_photoz;
+
+  if (photoz == -1) 
   {
     return n_of_z(zz, nj);
   }
-  else if ((redshift.clustering_photoz != 4 && recompute_zphot_clustering(N)) || table == 0) 
+  else if ((photoz != 4 && recompute_zphot_clustering(N)) || table == 0) 
   {
     update_nuisance(&N);
 
@@ -1479,7 +1751,7 @@ double pf_photoz(double zz, int nj)
     {
       zbins = line_count(redshift.clustering_REDSHIFT_FILE);
       
-      if (redshift.clustering_photoz != 4 && redshift.clustering_photoz != 0) 
+      if (photoz != 5 && photoz != 4 && photoz != 0) 
       {
         pf_histo(0.5, NULL);
         zbins *= 20;
@@ -1502,7 +1774,7 @@ double pf_photoz(double zz, int nj)
         }
       }
       
-      if (redshift.clustering_photoz == 4) 
+      if (photoz == 4) 
       { // if multihisto, force zmin, zmax, tomo bins to match supplied file   
         FILE* ein = fopen(redshift.clustering_REDSHIFT_FILE, "r");
         if (ein == NULL)
@@ -1515,6 +1787,11 @@ double pf_photoz(double zz, int nj)
         for (int i=0; i<zbins; i++) 
         {
           fscanf(ein, "%le", &z_v[i]);
+          for (int k=0; k < tomo.clustering_Nbin; k++) 
+          {
+            double space;
+            fscanf(ein, "%le", &space);
+          }
           p++;
           if (i > 0) 
           {
@@ -1523,25 +1800,70 @@ double pf_photoz(double zz, int nj)
               break;
             }
           }
-          for (int k=0; k < tomo.clustering_Nbin; k++) 
-          {
-            double space;
-            fscanf(ein, "%le", &space);
-          }
         }
         fclose(ein);
         
+        //VM: fixed JULY 2003: denominator should be (p-1) not (nbins -1)
+        const double dz = (z_v[p - 1] - z_v[0]) / ((double) p - 1.0);
         redshift.clustering_zdistrpar_zmin = fmax(z_v[0], 1.e-5);
-        redshift.clustering_zdistrpar_zmax = z_v[p - 1] + (z_v[p - 1] - z_v[0]) / (zbins - 1.);
+        redshift.clustering_zdistrpar_zmax = z_v[p - 1] + dz;
+      }
+      if (photoz == 5)
+      {
+        nz_old  = (double*) malloc(sizeof(double)*zbins);
+        nz_diag = (double*) malloc(sizeof(double)*zbins);
+        nz_ext  = (double*) malloc(sizeof(double)*zbins);
+        nz_ext_bin = (double**) malloc(sizeof(double*)*tomo.clustering_Nbin);
+        for (int i=0; i<tomo.clustering_Nbin; i++)
+        {
+          nz_ext_bin[i] = (double*) malloc(sizeof(double)*zbins);
+        }
+
+        FILE* ein = fopen(redshift.clustering_REDSHIFT_FILE, "r");
+        if (ein == NULL)
+        {
+          log_fatal("file not opened");
+          exit(1);
+        }
+
+        int p = 0;
+        for (int i=0; i<zbins; i++) 
+        {
+          double space1, space2;
+          fscanf(ein,"%le %le %le %le %le %le", &z_v[i], &space1, &space2,
+            &nz_old[i], &nz_diag[i], &nz_ext[i]);
+          for(int k=0; k<tomo.clustering_Nbin; k++) 
+          {
+            fscanf(ein,"%le", &nz_ext_bin[k][i]);
+          }
+          
+          p++;
+          if (i > 0) 
+          {
+            if (z_v[i] < z_v[i - 1])
+            {
+              break;
+            }
+          }
+        }
+        
+        dz_file   = (z_v[p-1] - zmin_file) / ((double) p - 1.0);
+        zmin_file = z_v[0];
+        zmax_file = z_v[p-1] + dz_file;
+
+        //VM: bug report
+        // redshift.clustering_zdistrpar_zmin = ??
+        // redshift.clustering_zdistrpar_zmax = ??
       }
     }
 
     const double zhisto_min = redshift.clustering_zdistrpar_zmin;
     const double zhisto_max = redshift.clustering_zdistrpar_zmax;
-    const double da = (zhisto_max - zhisto_min) / ((double) zbins);
+    //VM: calling the var below da is bad idea (JULY 2003 from old cosmolike)
+    const double dz_v = (zhisto_max - zhisto_min) / ((double) zbins);
     for (int i=0; i<zbins; i++) 
     {
-      z_v[i] = zhisto_min + (i + 0.5) * da;
+      z_v[i] = zhisto_min + (i + 0.5) * dz_v;
     }
     
 // the outlier fraction (outfrac) should be specified externally. This is a temporary hack.
@@ -1563,7 +1885,7 @@ double pf_photoz(double zz, int nj)
 // effective FWHM is 1.64 that of the Guassian case. For equivalent rescalings, [which is the 
 // currently implemented case] eta=0.736 and the effective FWHM is 1.79 that of the Gaussian case.
 
-    switch (redshift.clustering_photoz) 
+    switch (photoz) 
     { // initialization that allows openmp threading of the next loop
       case 0:
       {
@@ -1594,6 +1916,11 @@ double pf_photoz(double zz, int nj)
         
         break;
       }
+      case 6:
+      {
+        pf_histo(0.0, NULL);
+        break;
+      }
     }
 
     double NORM[MAX_SIZE_ARRAYS]; 
@@ -1602,7 +1929,7 @@ double pf_photoz(double zz, int nj)
     {
       double norm = 0.0;
 
-      switch (redshift.clustering_photoz) 
+      switch (photoz) 
       {
         case 0: // no photo-zs, split 'true' n(z) histogram in bins
         {
@@ -1633,7 +1960,6 @@ double pf_photoz(double zz, int nj)
           }
 
           norm = 0.0;
-
           for (int k=0; k<zbins; k++) 
           {
             const double zi = z_v[k];
@@ -1649,7 +1975,7 @@ double pf_photoz(double zz, int nj)
             // this creates a pseudo Voigt profile by adding a Gaussian and Lorentian (convolved  
             // with a tophat) with the correct weights. See, eg, the Wikipedia article on Voigt
             // profiles for an explanation of where the numbers come from.
-            norm += table[i + 1][k] * da;
+            norm += table[i + 1][k] * dz_v;
           }
           
           for (int k=0; k<zbins; k++) 
@@ -1668,7 +1994,6 @@ double pf_photoz(double zz, int nj)
           }
           
           norm = 0.0;
-
           for (int k=0; k<zbins; k++)
           {
             const double zi = z_v[k];
@@ -1681,11 +2006,11 @@ double pf_photoz(double zz, int nj)
             table[i + 1][k] = pf_histo(zi, NULL)*(eta * 0.3183 * (atan(x2) - atan(x1)) +
               ((1.0 - eta) * 0.5 * (gsl_sf_erf(x2) - gsl_sf_erf(x1))));
             
-            norm += table[i + 1][k] * da;
+            norm += table[i + 1][k] * dz_v;
           }
           for (int k=0; k<zbins; k++) 
           {
-            table[i + 1][k] = outfrac / da + (1. - outfrac) * table[i + 1][k] / norm;
+            table[i + 1][k] = outfrac / dz_v + (1. - outfrac) * table[i + 1][k] / norm;
           }
           break;
         }
@@ -1697,21 +2022,20 @@ double pf_photoz(double zz, int nj)
               "but nuisance.sigma_zphot_clustering[%d] not set", i);
             exit(1);
           }
-          
+         
           norm = 0.0;
-
           for (int k=0; k<zbins; k++)
           {
             const double zi = z_v[k];
             
-            const double x1 = (tomo.clustering_zmin[i] - zi + 
-              bias_zphot_clustering(zi, i))/(M_SQRT2*sigma_zphot_clustering(zi, i));
-            const double x2 = (tomo.clustering_zmax[i] - zi + 
-              bias_zphot_clustering(zi, i))/(M_SQRT2*sigma_zphot_clustering(zi, i));
+            const double x1 = (tomo.clustering_zmin[i] - zi + bias_zphot_clustering(zi, i)) /
+                (M_SQRT2*sigma_zphot_clustering(zi, i));
+            const double x2 = (tomo.clustering_zmax[i] - zi + bias_zphot_clustering(zi, i)) /
+                (M_SQRT2*sigma_zphot_clustering(zi, i));
             
             table[i + 1][k] = 0.5 * pf_histo(zi, NULL)*(gsl_sf_erf(x2) - gsl_sf_erf(x1));
             
-            norm += table[i + 1][k] * da;
+            norm += table[i + 1][k] * dz_v;
           }
           for (int k=0; k < zbins; k++) 
           {
@@ -1740,9 +2064,146 @@ double pf_photoz(double zz, int nj)
           }
           break;
         }
+        case 5: //Gaussian photo-zs + outlier probability matrix
+        {
+          if (sigma_zphot_clustering(0., i) == 0.) 
+          {
+            log_fatal("Lens galaxy photo-z model underdetermined!\nredshift.clustering_photoz = 3,"
+              "but nuisance.sigma_zphot_clustering[%d] not set", i);
+            exit(1);
+          }
+          
+          norm = 0.0;
+
+          for (int k=0; k<zbins; k++)
+          {
+            const double zi = z_v[k];
+
+            const double x1 = (tomo.clustering_zmin[i] - zi + 
+              bias_zphot_clustering(zi, i))/(M_SQRT2*sigma_zphot_clustering(zi, i));
+            const double x2 = (tomo.clustering_zmax[i] - zi + 
+              bias_zphot_clustering(zi, i))/(M_SQRT2*sigma_zphot_clustering(zi, i));
+            
+            if ((zi >= zmin_file) && (zi < zmax_file)) 
+            {
+              const int z_index = (int) floor((zi - zmin_file)/dz_file);
+              
+              table[i+1][k] = nz_ext_bin[i][z_index] 
+                + 0.5*nz_diag[z_index]*(gsl_sf_erf(x2) - gsl_sf_erf(x1));
+            }
+            else
+            {
+              table[i+1][k] = 0.;
+            }
+
+            norm += table[i+1][k]*dz_v;
+          }
+          break;
+        }
+        case 6: // simple outlier model: 2 islands + Gaussian photo-zs
+        { 
+           if (sigma_zphot_clustering(0., i) == 0.) 
+          {
+            log_fatal("Lens galaxy photo-z model underdetermined!\nredshift.clustering_photoz = 3,"
+              "but nuisance.sigma_zphot_clustering[%d] not set", i);
+            exit(1);
+          }
+
+          double ar[2] = {tomo.clustering_zmin[i], tomo.clustering_zmax[i]};
+          
+          int zpart=0;
+          double zlow, zhigh;
+          if (ar[0] < 0.5) 
+          {
+            zlow = ar[0];
+            zhigh = (ar[1] >= 0.5) ? 0.5 : ar[1];
+            zpart = 1; // denote low-z
+          }
+          else if (array[1] > 2.0) 
+          {
+            zhigh = ar[1];
+            zlow = (ar[0] <= 2.0) ? 2.0 : ar[0];
+            zpart = 2; // denote high-z
+          }
+
+          double n_out=0.;
+          if (zpart > 0) 
+          {
+            for (int k = 0;k<zbins; k++)
+            {
+              const double zi = z_v[k];
+              if ((zi >= zlow) && (zi <= zhigh))
+              {
+                n_out += pf_histo(zi, NULL);
+              }
+            }
+            if (zpart == 1)
+            {
+              n_out *= (nuisance.frac_lowz * dz_v);
+            }
+            else if (zpart == 2)
+            {
+              n_out *= (nuisance.frac_highz * dz_v);
+            }
+          }
+
+          norm = 0.;
+          for (int k = 0;k<zbins; k++)
+          {
+            const double zi = z_v[k];
+            
+            const double x1 = (tomo.clustering_zmin[i] - zi + bias_zphot_clustering(zi, i)) /
+                (M_SQRT2*sigma_zphot_clustering(zi, i));
+            const double x2 = (tomo.clustering_zmax[i] - zi + bias_zphot_clustering(zi, i)) /
+                (M_SQRT2*sigma_zphot_clustering(zi, i));
+            const double DELTA = gsl_sf_erf(x2)-gsl_sf_erf(x1);
+            const double ZDIST = pf_histo(zi, NULL);
+
+            if (zpart == 0) 
+            {
+              table[i+1][k] = 0.5*ZDIST*DELTA;
+            }
+            else if (zpart == 1) 
+            {
+              if (zi <= 0.5)
+              {
+                table[i+1][k] = 0.5*(1.0 - nuisance.frac_lowz)*ZDIST*DELTA;
+              }
+              else ifv(zi > 2.0)
+              {
+                table[i+1][k] = n_out/(3.5-2.0) + 0.5*(1.0 - nuisance.frac_highz)*ZDIST*DELTA;
+              }
+              else
+              {
+                table[i+1][k] = 0.5*ZDIST*DELTA;
+              }
+            }
+            else if (zpart == 2) 
+            {
+              if (zi <= 0.5)
+              {
+                table[i+1][k] = n_out/(0.5) + 0.5*(1.-nuisance.frac_lowz)*ZDIST*DELTA;
+              }
+              else if (zi > 2.0)
+              {
+                table[i+1][k] = 0.5*(1.-nuisance.frac_highz)*ZDIST*DELTA;
+              }
+              else
+              {
+                table[i+1][k] = 0.5*ZDIST*DELTA;
+              }
+            }
+            norm += table[i+1][k]*da;
+          }
+          for (int k = 0; k<zbins; k++)
+          {
+            table[i+1][k]/= norm;
+          }
+          break;
+        }
         default:
         {
-          log_fatal("%d not supported in this cosmolike version", redshift.clustering_photoz);
+          log_fatal("%d not supported in this cosmolike version", photoz);
           exit(1);
         }
       }
@@ -1784,7 +2245,7 @@ double pf_photoz(double zz, int nj)
     exit(1);
   }
   
-  if (redshift.clustering_photoz == 4) 
+  if (photoz == 4) 
   {
     zz = zz - nuisance.bias_zphot_clustering[nj];
   }
@@ -2145,7 +2606,9 @@ double nsource(const int ni) // ni =-1 -> no tomography; ni>= 0 -> tomography bi
       
     }
     #pragma GCC diagnostic pop
-    if (redshift.shear_photoz == 4) 
+
+    const int photoz = (redshift.shear_photoz == 7) ? 4 : redshift.shear_photoz;
+    if (photoz == 4) 
     {
       for (int i=0; i<tomo.shear_Nbin; i++) 
       {
@@ -2162,18 +2625,18 @@ double nsource(const int ni) // ni =-1 -> no tomography; ni>= 0 -> tomography bi
     {
       const double norm = like.high_def_integration > 0 ?
         int_gsl_integrate_high_precision(int_nsource, NULL, redshift.shear_zdistrpar_zmin,
-         redshift.shear_zdistrpar_zmax, NULL, GSL_WORKSPACE_SIZE) :
+          redshift.shear_zdistrpar_zmax, NULL, GSL_WORKSPACE_SIZE) :
         int_gsl_integrate_medium_precision(int_nsource, NULL, redshift.shear_zdistrpar_zmin,
-         redshift.shear_zdistrpar_zmax, NULL, GSL_WORKSPACE_SIZE);
+          redshift.shear_zdistrpar_zmax, NULL, GSL_WORKSPACE_SIZE);
 
       #pragma omp parallel for
       for (int i=0; i<tomo.shear_Nbin; i++) 
       {        
         const double res = like.high_def_integration > 0 ?
-          int_gsl_integrate_high_precision(int_nsource, NULL, tomo.shear_zmin[i], 
-            tomo.shear_zmax[i], NULL, GSL_WORKSPACE_SIZE) :
-          int_gsl_integrate_medium_precision(int_nsource, NULL, tomo.shear_zmin[i], 
-            tomo.shear_zmax[i], NULL, GSL_WORKSPACE_SIZE);
+          int_gsl_integrate_high_precision(int_nsource, NULL, 
+            tomo.shear_zmin[i], tomo.shear_zmax[i], NULL, GSL_WORKSPACE_SIZE) :
+          int_gsl_integrate_medium_precision(int_nsource, NULL, 
+            tomo.shear_zmin[i], tomo.shear_zmax[i], NULL, GSL_WORKSPACE_SIZE);
         
         table[i + 1] = res / norm * survey.n_gal;
         
@@ -2213,7 +2676,8 @@ double nlens(int ni) // ni =-1 -> no tomography; ni>= 0 -> tomography bin ni
       double init = pf_photoz(0., 0);
     }
     #pragma GCC diagnostic pop
-    if (redshift.clustering_photoz == 4) 
+    const int photoz = (redshift.clustering_photoz == 7) ? 4 : redshift.clustering_photoz;
+    if (photoz == 4) 
     {      
       for (int i=0; i<tomo.clustering_Nbin; i++) 
       {
