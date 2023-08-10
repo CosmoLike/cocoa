@@ -761,18 +761,29 @@ double sigma_zphot_shear(double z, int ni)
 double zdistr_histo_1(double z, void* params __attribute__((unused))) 
 { // return nz(z) based on redshift file with one redshift distribution
   static double* tab = 0;
+  static int zbins;
   static double zhisto_max; 
   static double zhisto_min;
-  static double dz;
+  static double dz_histo;
 
   const int photoz = redshift.shear_photoz;
 
   if (tab == 0) 
   {
-    const int zbins = line_count(redshift.shear_REDSHIFT_FILE);
-    tab = (double*) malloc(sizeof(double)*zbins);
-    double* z_v = (double*) malloc(sizeof(double)*zbins);
+    zbins = line_count(redshift.shear_REDSHIFT_FILE);
     
+    tab = (double*) malloc(sizeof(double)*zbins);
+    if (tab == NULL)
+    {
+      log_fatal("array allocation failed");
+      exit(1);
+    }
+    double* z_v = (double*) malloc(sizeof(double)*zbins);
+    if (z_v == NULL)
+    {
+      log_fatal("array allocation failed");
+      exit(1);
+    }
     FILE* ein = fopen(redshift.shear_REDSHIFT_FILE, "r");
     if (ein == NULL)
     {
@@ -782,116 +793,162 @@ double zdistr_histo_1(double z, void* params __attribute__((unused)))
     
     if(photoz == 5)
     {
-      int p = 0;
       for (int i=0; i<zbins; i++) 
       {
         double space1, space2, space3, space4;
-        fscanf(ein,"%le %le %le %le %le %le", &z_v[i], &space1, &space2, 
-            &tab[i], &space3, &space4);
-
+        
+        int count = fscanf(ein,"%le %le %le %le %le %le", &z_v[i], &space1, 
+            &space2, &tab[i], &space3, &space4);
+        if(count != 6)
+        {
+          log_fatal("fscanf failed to read the file");
+          exit(1);
+        }
+        if (i > 0) 
+        {
+          if (z_v[i] < z_v[i - 1])
+          {
+            log_fatal("bad n(z) file (dz not monotonic)");
+            exit(1);
+          }
+        }
         for (int j=0; j<tomo.shear_Nbin; j++) 
         {
-          fscanf(ein,"%le", &space1);
+          count = fscanf(ein,"%le", &space1);
+          if(count != 1)
+          {
+            log_fatal("fscanf failed to read the file");
+            exit(1);
+          } 
         }
-        
-        p++;
-        if (i > 0 && z_v[i] < z_v[i - 1])
-        {
-          break;
-        }
-      }
-      fclose(ein);
-      dz = (z_v[p - 1] - z_v[0]) / ((double) p - 1.);
-      zhisto_min = z_v[0];
-      zhisto_max = z_v[p - 1] + dz;
-      zbins = p; // VM: added JULY 2003
-      free(z_v);
+      } 
     }
     else
     {
-      int p = 0;
       for (int i=0; i<zbins; i++) 
       {
         double space1, space2;
-        fscanf(ein, "%le %le %le %le\n", &z_v[i], &space1, &space2, &tab[i]);
-        p++;
-        if (i > 0 && z_v[i] < z_v[i - 1]) 
+        
+        int count = fscanf(ein, "%le %le %le %le\n", &z_v[i], &space1, 
+            &space2, &tab[i]);
+        if(count != 4)
         {
-          break;
+          log_fatal("fscanf failed to read the file");
+          exit(1);
+        }
+        if (i > 0) 
+        {
+          if (z_v[i] < z_v[i - 1])
+          {
+            log_fatal("bad n(z) file (dz not monotonic)");
+            exit(1);
+          }
         }
       }
-      fclose(ein);
-      dz = (z_v[p - 1] - z_v[0]) / ((double) p - 1.);
-      zhisto_min = z_v[0];
-      zhisto_max = z_v[p - 1] + dz;
-      zbins = p; // VM: added JULY 2003
-      free(z_v);
     }
+
+    dz_histo = (z_v[zbins - 1] - z_v[0]) / ((double) zbins - 1.);
+    zhisto_min = z_v[0];
+    zhisto_max = z_v[zbins - 1] + dz_histo;
+
     redshift.shear_zdistrpar_zmin = zhisto_min;
     redshift.shear_zdistrpar_zmax = zhisto_max;
+
+    fclose(ein);
+    free(z_v);
   }
 
   double res = 0.0;
   if ((z >= zhisto_min) && (z < zhisto_max)) 
   {
-    const int ni = (int) floor((z - zhisto_min) / dz);
-    
-    if(ni < 0)
+    const int ni = (int) floor((z - zhisto_min) / dz_histo);  
+    if(ni < 0 || ni > zbins - 1)
     {
       log_fatal("invalid bin input ni = %d", ni);
       exit(1);
     } 
-    
-    res =  tab[ni];
+    res = tab[ni];
   }
-
   return res;
 }
 
 double zdistr_histo_n(double z, void* params)
-{ // return nz(z,j) based on redshift file with structure z[i] nz[0][i] .. nz[tomo.shear_Nbin-1][i]
+{ //VM: function is called if photo-z = 4
+  // return nz(z, j) based on redshift file with structure 
+  // z[i] nz[0][i] .. nz[tomo.shear_Nbin-1][i]
   static double** tab;
+  static int zbins;
   static double zhisto_max; 
   static double zhisto_min; 
-  static double dz;
+  static double dz_histo;
   
   if (tab == 0) 
   {
-    int zbins = line_count(redshift.shear_REDSHIFT_FILE);
+    zbins = line_count(redshift.shear_REDSHIFT_FILE);
+    
     tab = (double**) malloc(sizeof(double*)*tomo.shear_Nbin);
+    if (tab == NULL)
+    {
+      log_fatal("array allocation failed");
+      exit(1);
+    }
     for (int i=0; i<tomo.shear_Nbin; i++)
     {
       tab[i] = (double*) malloc(sizeof(double)*zbins);
+      if (tab[i] == NULL)
+      {
+        log_fatal("array allocation failed");
+        exit(1);
+      }
     }
     double* z_v = (double*) malloc(sizeof(double)*zbins);
-    
+    if (z_v == NULL)
+    {
+      log_fatal("array allocation failed");
+      exit(1);
+    }
+
     FILE* ein = fopen(redshift.shear_REDSHIFT_FILE, "r");
     if (ein == NULL)
     {
       log_fatal("file not opened");
       exit(1);
     }
-    
-    int p = 0;
+
     for (int i=0; i<zbins; i++) 
     {
-      fscanf(ein, "%le", &z_v[i]);
+      int count = fscanf(ein, "%le", &z_v[i]);
+      if(count != 1)
+      {
+        log_fatal("fscanf failed to read the file");
+        exit(1);
+      }
+      if (i > 0) 
+      {
+        if (z_v[i] < z_v[i - 1])
+        {
+          log_fatal("bad n(z) file (dz not monotonic)");
+          exit(1);
+        }
+      }
       for (int k=0; k<tomo.shear_Nbin; k++) 
       {
-        fscanf(ein, "%le", &tab[k][i]);
-      }
-      p++;
-      if (i > 0 && z_v[i] < z_v[i - 1]) 
-      {
-        break;
+        cout = fscanf(ein, "%le", &tab[k][i]);
+        if(count != 1)
+        {
+          log_fatal("fscanf failed to read the file");
+          exit(1);
+        }
       }
     }
-    fclose(ein);
     
-    dz = (z_v[p - 1] - z_v[0]) / ((double) p - 1.);
+    dz_histo = (z_v[zbins - 1] - z_v[0]) / ((double) zbins - 1.);
     zhisto_min = z_v[0];
-    zhisto_max = z_v[p - 1] + dz;
-    zbins = p;
+    zhisto_max = z_v[zbins - 1] + dz_histo;
+
+    // VM: added lines below (JULY 2003)
+    redshift.shear_zdistrpar_zmin = fmax(zhisto_min, 1.e-5);
+    redshift.shear_zdistrpar_zmax = zhisto_max;
 
     // now, set tomography bin boundaries
     for (int k=0; k<tomo.shear_Nbin; k++) 
@@ -925,15 +982,20 @@ double zdistr_histo_n(double z, void* params)
         tomo.shear_zmin[k], k, tomo.shear_zmax[k]);
     }
     
+    fclose(ein);
     free(z_v);
     
-    if (zhisto_max < tomo.shear_zmax[tomo.shear_Nbin - 1] || zhisto_min > tomo.shear_zmin[0]) 
+    if (zhisto_max < tomo.shear_zmax[tomo.shear_Nbin - 1] || 
+        zhisto_min > tomo.shear_zmin[0]) 
     {
       log_fatal("zhisto_min = %e,zhisto_max = %e", zhisto_min, zhisto_max);
-      log_fatal("tomo.shear_zmin[0] = %e, tomo.shear_zmax[N-1] = %e", tomo.shear_zmin[0], 
-        tomo.shear_zmax[tomo.shear_Nbin - 1]);
+      
+      log_fatal("tomo.shear_zmin[0] = %e, tomo.shear_zmax[N-1] = %e", 
+        tomo.shear_zmin[0], tomo.shear_zmax[tomo.shear_Nbin - 1]);
+      
       log_fatal("%s parameters incompatible with tomo.shear bin choice", 
         redshift.shear_REDSHIFT_FILE);
+      
       exit(1);
     }
   }
@@ -943,17 +1005,15 @@ double zdistr_histo_n(double z, void* params)
   {
     double* ar = (double*) params; 
     const int ni = (int) ar[0];
-    const int nj = (int) floor((z - zhisto_min) / dz);
+    const int nj = (int) floor((z - zhisto_min) / dz_histo);
     
-    if(ni < 0 || ni > tomo.shear_Nbin - 1 || nj < 0)
+    if(ni < 0 || ni > tomo.shear_Nbin - 1 || nj < 0 || nj > zbins - 1)
     {
       log_fatal("invalid bin input (ni, nj) = (%d, %d)", ni, nj);
       exit(1);
     } 
-    
     res = tab[ni][nj];
   }
-
   return res;
 }
 
@@ -972,12 +1032,13 @@ double zdistr_photoz(double zz, int nj)
   static nuisancepara N;
   static int zbins = -1;
   static gsl_spline* photoz_splines[MAX_SIZE_ARRAYS];
-  // BEGIN static variables only unsed on IA==5,6
+  // PZ == 4 || PZ == 5
+  static int zbins_file = -1;
+  static double* z_v_file=0;
   static double* nz_old = 0;
   static double* nz_diag = 0; 
   static double* nz_ext = 0;
-  static double** nz_ext_bin=0;
-  // END static variables only unsed on IA==5,6
+  static double** nz_ext_bin = 0;
 
   const int photoz = (redshift.shear_photoz == 7) ? 4 : redshift.shear_photoz;
 
@@ -991,124 +1052,199 @@ double zdistr_photoz(double zz, int nj)
     
     if (table == 0) 
     {
-      const int zbins1 = line_count(redshift.shear_REDSHIFT_FILE);
-      
-      if (photoz != 4) 
+      if (photoz == 4) 
       {
-        zbins = zbins1 * 20;
-      } 
-      else 
-      {
-        zbins = zbins1;
+        zbins_file = line_count(redshift.shear_REDSHIFT_FILE);
+        z_v_file = (double*) malloc(sizeof(double)*zbins_file);
+        if (z_v_file == NULL)
+        {
+          log_fatal("array allocation failed");
+          exit(1);
+        }
+
+        FILE* ein = fopen(redshift.shear_REDSHIFT_FILE, "r");
+        if (ein == NULL)
+        {
+          log_fatal("file not opened");
+          exit(1);
+        }
+
+        for (int i=0; i<zbins_file; i++) 
+        {
+          int count = fscanf(ein, "%le", &z_v_file[i]);
+          if(count != 1)
+          {
+            log_fatal("fscanf failed to read the file");
+            exit(1);
+          }
+          if (i > 0) 
+          {
+            if (z_v_file[i] < z_v_file[i - 1])
+            {
+              log_fatal("bad n(z) file (dz not monotonic)");
+              exit(1);
+            }
+          }
+          for (int k=0; k<tomo.shear_Nbin; k++) 
+          {
+            double space;
+            count = fscanf(ein, "%le", &space);
+            if(count != 1)
+            {
+              log_fatal("fscanf failed to read the file");
+              exit(1);
+            }
+          }
+        }
+        
+        const double zmin_file = z_v_file[0];
+        const double zmax_file = z_v_file[zbins_file - 1];
+        const double dz_file = (zmax_file - zmin_file) / ((double) zbins_file - 1.0);
+
+        redshift.shear_zdistrpar_zmin = fmax(zmin_file, 1.e-5);
+        redshift.shear_zdistrpar_zmax = zmax_file + dz_file;
+
+        fclose(ein);
       }
+      else if (photoz == 5) 
+      { // extreme outlier nz from simulation
+        zbins_file = line_count(redshift.shear_REDSHIFT_FILE);
+        z_v_file = (double*) malloc(sizeof(double)*zbins_file);
+        if (z_v_file == NULL)
+        {
+          log_fatal("array allocation failed");
+          exit(1);
+        }
+        nz_old = (double*) malloc(sizeof(double)*zbins_file);
+        if (nz_old == NULL)
+        {
+          log_fatal("array allocation failed");
+          exit(1);
+        }
+        nz_diag = (double*) malloc(sizeof(double)*zbins_file);
+        if (nz_diag == NULL)
+        {
+          log_fatal("array allocation failed");
+          exit(1);
+        }
+        nz_ext = (double*) malloc(sizeof(double)*zbins_file);
+        if (nz_ext == NULL)
+        {
+          log_fatal("array allocation failed");
+          exit(1);
+        }
+        nz_ext_bin = (double**) malloc(sizeof(double*)*tomo.shear_Nbin);
+        if (nz_ext_bin == NULL)
+        {
+          log_fatal("array allocation failed");
+          exit(1);
+        }
+        for (int i=0; i<tomo.shear_Nbin; i++)
+        {
+          nz_ext_bin[i] = (double*) malloc(sizeof(double)*zbins_file);
+          if (nz_ext_bin[i] == NULL)
+          {
+            log_fatal("array allocation failed");
+            exit(1);
+          }
+        }
+
+        FILE* ein = fopen(redshift.shear_REDSHIFT_FILE, "r");
+        if (ein == NULL)
+        {
+          log_fatal("file not opened");
+          exit(1);
+        }
+        
+        for (int i=0; i<zbins_file; i++) 
+        {
+          double space1, space2;
+          int count = fscanf(ein,"%le %le %le %le %le %le", &z_v_file[i], &space1, 
+            &space2, &nz_old[i], &nz_diag[i], &nz_ext[i]);
+          if(count != 6)
+          {
+            log_fatal("fscanf failed to read the file");
+            exit(1);
+          }
+          if (i > 0) 
+          {
+            if (z_v_file[i] < z_v_file[i - 1])
+            {
+              log_fatal("bad n(z) file (dz not monotonic)");
+              exit(1);
+            }
+          }
+          for(int k=0; k<tomo.shear_Nbin; k++) 
+          {
+            count = fscanf(ein, "%le", &nz_ext_bin[k][i]);
+            if(count != 1)
+            {
+              log_fatal("fscanf failed to read the file");
+              exit(1);
+            }
+          }
+        }
+        
+        // VM: added lines below (JULY 2003). They are already in `zdistr_histo_1` function
+        const double zmin_file = z_v_file[0];
+        const double zmax_file = z_v_file[zbins_file - 1];
+        const double dz_file = (zmax_file - zmin_file) / ((double) zbins_file - 1.0);
+
+        redshift.shear_zdistrpar_zmin = zmin_file;
+        redshift.shear_zdistrpar_zmax = zmax_file + dz_file;
+
+        fclose(ein);
+      }
+      else
+      {
+        // VM: this seems not well designed for analytical photo-z
+        zbins_file = line_count(redshift.shear_REDSHIFT_FILE);
+      }
+
+      zbins = zbins_file; //VM: code allows upsampling if needed
+      if (photoz != 4 && photoz != 5) 
+      {
+        zbins *= 20;
+      } // upsample if convolving with analytic photo-z model
       
       table = (double**) malloc(sizeof(double*)*(tomo.shear_Nbin+1));
+      if (table == NULL)
+      {
+        log_fatal("array allocation failed");
+        exit(1);
+      }
       for (int i=0; i<(tomo.shear_Nbin+1); i++)
       {
         table[i] = (double*) malloc(sizeof(double)*zbins);
+        if (table[i] == NULL)
+        {
+          log_fatal("array allocation failed");
+          exit(1);
+        }
       }
       z_v = (double*) malloc(sizeof(double)*zbins);
-      
+      if (z_v == NULL)
+      {
+        log_fatal("array allocation failed");
+        exit(1);
+      }
       for (int i=0; i<tomo.shear_Nbin+1; i++) 
       {
         photoz_splines[i] = gsl_spline_alloc(Z_SPLINE_TYPE, zbins);
         if (photoz_splines[i] == NULL)
         {
-          log_fatal("fail allocation");
+          log_fatal("array allocation failed");
           exit(1);
         }
-      }
-
-      if (photoz == 4) 
-      { // if multihisto, force zmin, zmax, tomo bins to match supplied file
-        
-        FILE* ein = fopen(redshift.shear_REDSHIFT_FILE, "r");
-        if (ein == NULL)
-        {
-          log_fatal("file not opened");
-          exit(1);
-        }
-
-        int p=0;
-        for (int i=0; i<zbins1; i++) 
-        {
-          fscanf(ein, "%le", &z_v[i]);
-          for (int k=0; k<tomo.shear_Nbin; k++) 
-          {
-            double space;
-            fscanf(ein, "%le", &space);
-          }
-          p++;
-          if (i > 0) 
-          {
-            if (z_v[i] < z_v[i - 1])
-            {
-              break;
-            }
-          }
-        }
-        fclose(ein);
-        
-        //VM: UPDATED JULY 2003
-        //VM: denominator change from (zbin1 - 1) to (p - 1)
-        const double dz = (z_v[p - 1] - z_v[0]) / ((double) p - 1.);
-        zbins1 = p;
-        
-        redshift.shear_zdistrpar_zmin = fmax(z_v[0], 1.e-5);
-        redshift.shear_zdistrpar_zmax = z_v[p - 1] + dz;
-      }
-      else if (photoz == 5) 
-      { // extreme outlier nz from simulation
-        nz_old     = (double*) malloc(sizeof(double)*zbins);
-        nz_diag    = (double*) malloc(sizeof(double)*zbins);
-        nz_ext     = (double*) malloc(sizeof(double)*zbins);
-        nz_ext_bin = (double**) malloc(sizeof(double*)*tomo.shear_Nbin);
-        for (int i=0; i<tomo.shear_Nbin; i++)
-        {
-          nz_ext_bin[i] = (double*) malloc(sizeof(double)*zbins);
-        }
-
-        FILE* ein = fopen(redshift.shear_REDSHIFT_FILE, "r");
-        if (ein == NULL)
-        {
-          log_fatal("file not opened");
-          exit(1);
-        }
-        
-        int p=0;
-        for (int i=0; i<zbins1; i++) 
-        {
-          double space1, space2;
-          fscanf(ein,"%le %le %le %le %le %le", &z_v[i], &space1, &space2, 
-            &nz_old[i], &nz_diag[i], &nz_ext[i]);
-          
-          for(int k=0; k<tomo.shear_Nbin; k++) 
-          {
-            fscanf(ein,"%le", &nz_ext_bin[k][i]);
-          }
-          p++;
-          if (i > 0) 
-          {
-            if (z_v[i] < z_v[i - 1])
-            {
-              break;
-            }
-          }
-        }
-        fclose(ein);
-
-        //VM: BUG REPORT
-        //redshift.shear_zdistrpar_zmin = ??
-        //redshift.shear_zdistrpar_zmax = ??
       }
     }
 
     const double zhisto_min = redshift.shear_zdistrpar_zmin;
     const double zhisto_max = redshift.shear_zdistrpar_zmax;
-    const double dz_v = (zhisto_max - zhisto_min) / ((double) zbins);  
+    const double dz_histo = (zhisto_max - zhisto_min) / ((double) zbins);  
     for (int i=0; i<zbins; i++) 
     {
-      z_v[i] = zhisto_min + (i + 0.5) * dz_v;
+      z_v[i] = zhisto_min + (i + 0.5) * dz_histo;
     }
     
 // the outlier fraction (outfrac) should be specified externally. This is a temporary hack.
@@ -1212,13 +1348,14 @@ double zdistr_photoz(double zz, int nj)
             const double x2 = (tomo.shear_zmax[i] - z_v[k] + bias_zphot_shear(z_v[k], i)) /
                  (M_SQRT2 * sigma_zphot_shear(z_v[k], i));
             
-            table[i + 1][k] = zdistr_histo_1(z_v[k], NULL) * (eta * 0.3183 * (atan(x2) - atan(x1)) +
+            table[i + 1][k] = 
+              zdistr_histo_1(z_v[k], NULL) * (eta * 0.3183 * (atan(x2) - atan(x1)) +
               ((1.0 - eta) * 0.5 * (gsl_sf_erf(x2) - gsl_sf_erf(x1))));
             // this creates a pseudo Voigt profile by adding a Gaussian and Lorentian (convolved
             // with a tophat) with the correct weights. See, eg, the Wikipedia article on Voigt 
             // profiles for an explanation of where the numbers come from.
             
-            norm += table[i + 1][k] * dz_v;
+            norm += table[i + 1][k] * dz_histo;
           }
           for (int k=0; k < zbins; k++) 
           {
@@ -1247,11 +1384,11 @@ double zdistr_photoz(double zz, int nj)
             table[i + 1][k] = zdistr_histo_1(z_v[k], NULL) * (eta * 0.3183 * (atan(x2) - atan(x1)) +
               ((1.0 - eta) * 0.5 * (gsl_sf_erf(x2) - gsl_sf_erf(x1))));
 
-            norm += table[i + 1][k] * dz_v;
+            norm += table[i + 1][k] * dz_histo;
           }
           for (int k=0; k < zbins; k++) 
           {
-            table[i + 1][k] = outfrac / dz_v + (1. - outfrac) * table[i + 1][k] / norm;
+            table[i + 1][k] = outfrac / dz_histo + (1. - outfrac) * table[i + 1][k] / norm;
           }
           break;
         }
@@ -1275,7 +1412,7 @@ double zdistr_photoz(double zz, int nj)
             
             table[i + 1][k] = 0.5 * zdistr_histo_1(z_v[k], NULL) * (gsl_sf_erf(x2) - gsl_sf_erf(x1));
             
-            norm += table[i + 1][k] * dz_v;
+            norm += table[i + 1][k] * dz_histo;
           }
           for (int k=0; k<zbins; k++) 
           {
@@ -1291,7 +1428,7 @@ double zdistr_photoz(double zz, int nj)
           for (int k=0; k<zbins; k++) 
           {
             table[i + 1][k] = zdistr_histo_n(z_v[k], (void*) ar); 
-            norm += table[i + 1][k] * dz_v;
+            norm += table[i + 1][k] * dz_histo;
           }
           for (int k=0; k<zbins; k++) 
           {
@@ -1311,6 +1448,10 @@ double zdistr_photoz(double zz, int nj)
           }
 
           norm = 0.0;
+          const double zmin_file = z_v_file[0];
+          const double dz_file = 
+            (z_v_file[zbins_file - 1] - zmin_file)/((double) zbins_file - 1.0);
+          
           for (int k = 0; k<zbins; k++)
           {
             const double x1 = (tomo.shear_zmin[i] - z_v[k] + bias_zphot_shear(z_v[k], i)) / 
@@ -1318,12 +1459,12 @@ double zdistr_photoz(double zz, int nj)
             const double x2 = (tomo.shear_zmax[i] - z_v[k] + bias_zphot_shear(z_v[k], i)) / 
                   (M_SQRT2 * sigma_zphot_shear(z_v[k], i));
             
-            const int z_index = (int) floor((z_v[k] - zhisto_min) / dz_v);
-            
+            const int z_index = (int) floor((z_v[k] - zmin_file)/dz_file);
+
             table[i + 1][k] = nz_ext_bin[i][z_index] + 
                   0.5*nz_diag[z_index]*(gsl_sf_erf(x2) - gsl_sf_erf(x1));
             
-            norm += table[i + 1][k]*dz_v;
+            norm += table[i + 1][k]*dz_histo;
           }
           for (int k=0; k<zbins; k++) 
           {
@@ -1371,11 +1512,11 @@ double zdistr_photoz(double zz, int nj)
             }
             if (zpart == 1)
             {
-              n_out *= (nuisance.frac_lowz * dz_v);
+              n_out *= (nuisance.frac_lowz * dz_histo);
             }
             else if (zpart == 2)
             {
-              n_out *= (nuisance.frac_highz * dz_v);
+              n_out *= (nuisance.frac_highz * dz_histo);
             }
           }
 
@@ -1386,6 +1527,7 @@ double zdistr_photoz(double zz, int nj)
                   (M_SQRT2 * sigma_zphot_shear(z_v[k], i));
             const double x2 = (ar[1] - z_v[k] + bias_zphot_shear(z_v[k], i)) / 
                   (M_SQRT2 * sigma_zphot_shear(z_v[k], i));
+            
             const double DELTA = (gsl_sf_erf(x2) - gsl_sf_erf(x1));
             const double ZDIST = zdistr_histo_1(z_v[k], NULL);
             
@@ -1397,7 +1539,7 @@ double zdistr_photoz(double zz, int nj)
             {
               if (z_v[k] <= 0.5)
               {
-                table[i+1][k] = 0.5*(1. - nuisance.frac_lowz)*ZDIST*DELTA;
+                table[i+1][k] = 0.5*(1.0 - nuisance.frac_lowz)*ZDIST*DELTA;
               }
               else if (z_v[k] > 2.0)
               {
@@ -1424,7 +1566,7 @@ double zdistr_photoz(double zz, int nj)
               }
             }
 
-            norm += table[i+1][k]*dz_v;
+            norm += table[i+1][k]*dz_histo;
           }
           for (int k=0; k<zbins; k++) 
           {
@@ -1523,18 +1665,30 @@ double sigma_zphot_clustering(double z, int ni)
 
 double pf_histo(double z, void* params __attribute__((unused))) 
 { // return pf(z) based on redshift file with one redshift distribution
-  static double *tab = 0;
-  static double zhisto_max; 
+  static double* tab = 0;
+  static int zbins;
   static double zhisto_min; 
-  static double dz;
+  static double zhisto_max; 
+  static double dz_histo;
 
   const int photoz = (redshift.clustering_photoz == 7) ? 4 : redshift.clustering_photoz;
 
   if (tab == 0) 
   {
-    int zbins = line_count(redshift.clustering_REDSHIFT_FILE);
+    zbins = line_count(redshift.clustering_REDSHIFT_FILE);
+    
     tab = (double*) malloc(sizeof(double)*zbins);
+    if (tab == NULL)
+    {
+      log_fatal("array allocation failed");
+      exit(1);
+    }
     double* z_v = (double*) malloc(sizeof(double)*zbins);
+    if (z_v == NULL)
+    {
+      log_fatal("array allocation failed");
+      exit(1);
+    }
 
     FILE* ein = fopen(redshift.clustering_REDSHIFT_FILE, "r");
     if (ein == NULL)
@@ -1545,47 +1699,57 @@ double pf_histo(double z, void* params __attribute__((unused)))
 
     if (photoz == 5)
     {
-      int p = 0;
       for (int i=0; i<zbins; i++) 
       {
         double space1, space2, space3, space4;
-        fscanf(ein, "%le %le %le %le %le %le\n", &z_v[i], &space1, &space2, 
-          &tab[i], &space3, &space4);
-        p++;
-        if (i > 0 && z_v[i] < z_v[i - 1]) 
+
+        int count = fscanf(ein, "%le %le %le %le %le %le", &z_v[i], &space1, 
+          &space2, &tab[i], &space3, &space4);
+        if(count != 6)
         {
-          break;
+          log_fatal("fscanf failed to read the file");
+          exit(1);
+        }
+        if (i > 0) 
+        {
+          if (z_v[i] < z_v[i - 1])
+          {
+            log_fatal("bad n(z) file (redshift not monotonic)");
+            exit(1);
+          }
         }
       }
-      fclose(ein);
-
-      dz = (z_v[p - 1] - z_v[0]) / ((double) p - 1.);
-      zhisto_min = z_v[0];
-      zhisto_max = z_v[p - 1] + dz;
-      zbins = p; //VM: added JULY 2003
-      free(z_v);
     }
     else
     {
-      int p = 0;
       for (int i=0; i<zbins; i++) 
       {
         double space1, space2;
-        fscanf(ein, "%le %le %le %le\n", &z_v[i], &space1, &space2, &tab[i]);
-        p++;
-        if (i > 0 && z_v[i] < z_v[i - 1]) 
+        
+        int count = fscanf(ein, "%le %le %le %le\n", &z_v[i], &space1, 
+          &space2, &tab[i]);
+        if(count != 4)
         {
-          break;
+          log_fatal("fscanf failed to read the file");
+          exit(1);
+        }
+        if (i > 0) 
+        {
+          if (z_v[i] < z_v[i - 1])
+          {
+            log_fatal("bad n(z) file (redshift not monotonic)");
+            exit(1);
+          }
         }
       }
-      fclose(ein);
-
-      dz = (z_v[p - 1] - z_v[0]) / ((double) p - 1.);
-      zhisto_min = z_v[0];
-      zhisto_max = z_v[p - 1] + dz;
-      zbins = p; //VM: added JULY 2003
-      free(z_v);
     }
+
+    dz_histo = (z_v[zbins - 1]  - z_v[0]) / ((double) zbins - 1.0);
+    zhisto_min = z_v[0];
+    zhisto_max = z_v[zbins - 1] + dz_histo;
+    
+    fclose(ein);
+    free(z_v);
 
     if (zhisto_max < tomo.clustering_zmax[tomo.clustering_Nbin - 1] ||
         zhisto_min > tomo.clustering_zmin[0]) 
@@ -1599,37 +1763,53 @@ double pf_histo(double z, void* params __attribute__((unused)))
   double res = 0.0;
   if ((z >= zhisto_min) && (z < zhisto_max)) 
   {
-    const int ni = (int) floor((z - zhisto_min) / dz);
+    const int ni = (int) floor((z - zhisto_min) / dz_histo);
     
-    if (ni < 0)
+    if (ni < 0 || ni > zbins - 1)
     {
       log_fatal("invalid bin input ni = %d", ni);
       exit(1);
     } 
-    
     res = tab[ni];
   }
-
   return res;
 }
 
+// Function only called on photo-z = 4
 double pf_histo_n(double z, void* params) 
 { // return pf(z, nj) based on z file with structure z[i] nz[0][i] .. nz[tomo.clustering_Nbin-1][i]
   static double** tab;
-  static double zhisto_max; 
+  static int zbins;
   static double zhisto_min;
-  static double dz;
+  static double zhisto_max; 
+  static double dz_histo;
 
   if (tab == 0) 
   {
-    int zbins = line_count(redshift.clustering_REDSHIFT_FILE);
+    zbins = line_count(redshift.clustering_REDSHIFT_FILE);
+    
     tab = (double**) malloc(sizeof(double*)*tomo.clustering_Nbin);
+    if (tab == NULL)
+    {
+      log_fatal("array allocation failed");
+      exit(1);
+    }
     for (int i=0; i<tomo.clustering_Nbin; i++)
     {
       tab[i] = (double*) malloc(sizeof(double)*zbins);
+      if (tab[i] == NULL)
+      {
+        log_fatal("array allocation failed");
+        exit(1);
+      }
     }
     double* z_v = (double*) malloc(sizeof(double)*zbins);
-    
+    if (z_v == NULL)
+    {
+      log_fatal("array allocation failed");
+      exit(1);
+    }
+
     FILE* ein = fopen(redshift.clustering_REDSHIFT_FILE, "r");
     if (ein == NULL)
     {
@@ -1637,27 +1817,42 @@ double pf_histo_n(double z, void* params)
       exit(1);
     }
 
-    int p = 0;
     for (int i=0; i<zbins; i++) 
     {
-      fscanf(ein, "%le", &z_v[i]);
+      int count = fscanf(ein, "%le", &z_v[i]);
+      if(count != 1)
+      {
+        log_fatal("fscanf failed to read the file");
+        exit(1);
+      }
+      if (i > 0) 
+      {
+        if (z_v[i] < z_v[i - 1])
+        {
+          log_fatal("bad n(z) file (redshift not monotonic)");
+          exit(1);
+        }
+      }
       for (int k=0; k < tomo.clustering_Nbin; k++) 
       {
-        fscanf(ein, " %le", &tab[k][i]);
-      }
-      p++;
-      if (i > 0 && z_v[i] < z_v[i - 1]) 
-      {
-        break;
+        count = fscanf(ein, "%le", &tab[k][i]);
+        if(count != 1)
+        {
+          log_fatal("fscanf failed to read the file");
+          exit(1);
+        }
       }
     }
     fclose(ein);
-    
-    dz = (z_v[p - 1] - z_v[0]) / ((double) p - 1.);
+
+    dz_histo = (z_v[zbins - 1] - z_v[0]) / ((double) zbins - 1.0);
     zhisto_min = z_v[0];
-    zhisto_max = z_v[p - 1] + dz;
-    zbins = p; //VM: added JULY 2003 (we read table up to zbin)
+    zhisto_max = z_v[zbins - 1] + dz_histo;
     
+    // VM: added lines below (JULY 2003). They are already in `pf_photoz` function
+    redshift.clustering_zdistrpar_zmin = fmax(zhisto_min, 1.e-5);
+    redshift.clustering_zdistrpar_zmax = zhisto_max;
+
     // now, set tomography bin boundaries
     for (int k=0; k<tomo.clustering_Nbin; k++) 
     {
@@ -1702,21 +1897,21 @@ double pf_histo_n(double z, void* params)
       exit(1);
     }
   }
+
   double res = 0.0;
   if ((z >= zhisto_min) && (z < zhisto_max)) 
   {
     double* ar = (double*) params;
     const int ni = (int) ar[0];
-    const int nj = (int) floor((z - zhisto_min) / dz);
+    const int nj = (int) floor((z - zhisto_min) / dz_histo);
     
-    if(ni < 0 || ni > tomo.clustering_Nbin - 1 || nj < 0)
+    if(ni < 0 || ni > tomo.clustering_Nbin - 1 || nj < 0 || nj > zbins - 1)
     {
       log_fatal("invalid bin input (ni, nj) = (%d, %d)", ni, nj);
       exit(1);
     } 
     res = tab[ni][nj];
   }
-
   return res;
 }
 
@@ -1727,15 +1922,12 @@ double pf_photoz(double zz, int nj)
   static nuisancepara N;
   static int zbins = -1;
   static gsl_spline* photoz_splines[MAX_SIZE_ARRAYS];
-  // begins: static variables below only used if clustering photo-z == 5
-  static double *nz_old=0; 
-  static double *nz_diag=0; 
-  static double *nz_ext=0;
-  static double **nz_ext_bin=0;
-  static double zmin_file; 
-  static double zmax_file; 
-  static double dz_file;
-  // ends: static variables below only used if clustering photo-z == 5
+  static int zbins_file = -1;    // PZ == 4 || PZ == 5
+  static double* z_v_file=0;     // PZ == 4 || PZ == 5
+  static double* nz_old=0;       // PZ == 5
+  static double* nz_diag=0;      // PZ == 5
+  static double* nz_ext=0;       // PZ == 5
+  static double** nz_ext_bin=0;  // PZ == 5
 
   const int photoz = (redshift.clustering_photoz == 7) ? 4 : redshift.clustering_photoz;
 
@@ -1749,21 +1941,182 @@ double pf_photoz(double zz, int nj)
 
     if (table == 0) 
     {
-      zbins = line_count(redshift.clustering_REDSHIFT_FILE);
-      
-      if (photoz != 5 && photoz != 4 && photoz != 0) 
+      if (photoz == 4) 
+      { 
+        zbins_file = line_count(redshift.clustering_REDSHIFT_FILE);
+        z_v_file = (double*) malloc(sizeof(double)*zbins_file);
+        if (z_v_file == NULL)
+        {
+          log_fatal("array allocation failed");
+          exit(1);
+        }
+
+        FILE* ein = fopen(redshift.clustering_REDSHIFT_FILE, "r");
+        if (ein == NULL)
+        {
+          log_fatal("file not opened");
+          exit(1);
+        }
+
+        for (int i=0; i<zbins_file; i++) 
+        {
+          int count = fscanf(ein, "%le", &z_v_file[i]);
+          if(count != 1)
+          {
+            log_fatal("fscanf failed to read the file");
+            exit(1);
+          }
+          if (i > 0) 
+          {
+            if (z_v_file[i] < z_v_file[i - 1])
+            {
+              log_fatal("bad n(z) file (redshift not monotonic)");
+              exit(1);
+            }
+          }
+          for (int k=0; k<tomo.clustering_Nbin; k++) 
+          {
+            double space;
+            fscanf(ein, "%le", &space);
+            if(count != 1)
+            {
+              log_fatal("fscanf failed to read the file");
+              exit(1);
+            }
+          }
+        }
+        
+        const double zmin_file = z_v_file[0];
+        const double zmax_file = z_v_file[zbins - 1];
+        const double dz_file = (zmax_file - zmin_file)/ ((double) zbins_file - 1.0);
+        
+        redshift.clustering_zdistrpar_zmin = fmax(zmin_file, 1.e-5);
+        redshift.clustering_zdistrpar_zmax = zmax_file + dz_file;
+        
+        fclose(ein);
+      }
+      else if (photoz == 5)
+      {
+        zbins_file = line_count(redshift.clustering_REDSHIFT_FILE);
+        z_v_file = (double*) malloc(sizeof(double)*zbins_file);
+        if (z_v_file == NULL)
+        {
+          log_fatal("array allocation failed");
+          exit(1);
+        }
+        nz_old  = (double*) malloc(sizeof(double)*zbins_file);
+        if (nz_old == NULL)
+        {
+          log_fatal("array allocation failed");
+          exit(1);
+        }
+        nz_diag = (double*) malloc(sizeof(double)*zbins_file);
+        if (nz_diag == NULL)
+        {
+          log_fatal("array allocation failed");
+          exit(1);
+        }
+        nz_ext  = (double*) malloc(sizeof(double)*zbins_file);
+        if (nz_ext == NULL)
+        {
+          log_fatal("array allocation failed");
+          exit(1);
+        }
+        nz_ext_bin = (double**) malloc(sizeof(double*)*tomo.clustering_Nbin);
+        if (nz_ext_bin == NULL)
+        {
+          log_fatal("array allocation failed");
+          exit(1);
+        }
+        for (int i=0; i<tomo.clustering_Nbin; i++)
+        {
+          nz_ext_bin[i] = (double*) malloc(sizeof(double)*zbins_file);
+          if (nz_ext_bin[i] == NULL)
+          {
+            log_fatal("array allocation failed");
+            exit(1);
+          }
+        }
+
+        FILE* ein = fopen(redshift.clustering_REDSHIFT_FILE, "r");
+        if (ein == NULL)
+        {
+          log_fatal("file not opened");
+          exit(1);
+        }
+
+        for (int i=0; i<zbins_file; i++) 
+        {
+          double space1, space2;       
+          int count = fscanf(ein,"%le %le %le %le %le %le", &z_v_file[i], &space1, 
+              &space2, &nz_old[i], &nz_diag[i], &nz_ext[i]);
+          if(count != 6)
+          {
+            log_fatal("fscanf failed to read the file");
+            exit(1);
+          }
+          if (i > 0) 
+          {
+            if (z_v_file[i] < z_v_file[i - 1])
+            {
+              log_fatal("bad n(z) file (redshift not monotonic)");
+              exit(1);
+            }
+          }
+          for(int k=0; k<tomo.clustering_Nbin; k++) 
+          {
+            count = fscanf(ein,"%le", &nz_ext_bin[k][i]);
+            if(count != 1)
+            {
+              log_fatal("fscanf failed to read the file");
+              exit(1);
+            }
+          }
+        }
+
+        const double zmin_file = z_v_file[0];
+        const double zmax_file = z_v_file[zbins - 1];
+        const double dz_file = (zmax_file - zmin_file)/ ((double) zbins_file - 1.0);
+
+        redshift.clustering_zdistrpar_zmin = zmin_file;
+        redshift.clustering_zdistrpar_zmax = zmax_file + dz_file;
+        
+        fclose(ein);
+      }
+      else
+      {
+        // VM: this seems not well designed for analytical photo-z
+        zbins_file = line_count(redshift.clustering_REDSHIFT_FILE);
+      }
+
+      zbins = zbins_file; //VM: code allows upsampling if needed
+      if (photoz != 0 && photoz != 4 && photoz != 5) 
       {
         pf_histo(0.5, NULL);
         zbins *= 20;
       } // upsample if convolving with analytic photo-z model
       
       table = (double**) malloc(sizeof(double*)*(tomo.clustering_Nbin+1));
+      if (table == NULL)
+      {
+        log_fatal("array allocation failed");
+        exit(1);
+      }
       for (int i=0; i<(tomo.clustering_Nbin+1); i++)
       {
         table[i] = (double*) malloc(sizeof(double)*zbins);
+        if (table[i] == NULL)
+        {
+          log_fatal("array allocation failed");
+          exit(1);
+        }
       }
       z_v = (double*) malloc(sizeof(double)*zbins);
-      
+      if (z_v == NULL)
+      {
+        log_fatal("array allocation failed");
+        exit(1);
+      }
       for (int i=0; i<tomo.clustering_Nbin+1; i++) 
       {
         photoz_splines[i] = gsl_spline_alloc(Z_SPLINE_TYPE, zbins);
@@ -1773,97 +2126,14 @@ double pf_photoz(double zz, int nj)
           exit(1);
         }
       }
-      
-      if (photoz == 4) 
-      { // if multihisto, force zmin, zmax, tomo bins to match supplied file   
-        FILE* ein = fopen(redshift.clustering_REDSHIFT_FILE, "r");
-        if (ein == NULL)
-        {
-          log_fatal("file not opened");
-          exit(1);
-        }
-
-        int p = 0;
-        for (int i=0; i<zbins; i++) 
-        {
-          fscanf(ein, "%le", &z_v[i]);
-          for (int k=0; k < tomo.clustering_Nbin; k++) 
-          {
-            double space;
-            fscanf(ein, "%le", &space);
-          }
-          p++;
-          if (i > 0) 
-          {
-            if (z_v[i] < z_v[i - 1])
-            {
-              break;
-            }
-          }
-        }
-        fclose(ein);
-        
-        //VM: fixed JULY 2003: denominator should be (p-1) not (nbins -1)
-        const double dz = (z_v[p - 1] - z_v[0]) / ((double) p - 1.0);
-        redshift.clustering_zdistrpar_zmin = fmax(z_v[0], 1.e-5);
-        redshift.clustering_zdistrpar_zmax = z_v[p - 1] + dz;
-      }
-      if (photoz == 5)
-      {
-        nz_old  = (double*) malloc(sizeof(double)*zbins);
-        nz_diag = (double*) malloc(sizeof(double)*zbins);
-        nz_ext  = (double*) malloc(sizeof(double)*zbins);
-        nz_ext_bin = (double**) malloc(sizeof(double*)*tomo.clustering_Nbin);
-        for (int i=0; i<tomo.clustering_Nbin; i++)
-        {
-          nz_ext_bin[i] = (double*) malloc(sizeof(double)*zbins);
-        }
-
-        FILE* ein = fopen(redshift.clustering_REDSHIFT_FILE, "r");
-        if (ein == NULL)
-        {
-          log_fatal("file not opened");
-          exit(1);
-        }
-
-        int p = 0;
-        for (int i=0; i<zbins; i++) 
-        {
-          double space1, space2;
-          fscanf(ein,"%le %le %le %le %le %le", &z_v[i], &space1, &space2,
-            &nz_old[i], &nz_diag[i], &nz_ext[i]);
-          for(int k=0; k<tomo.clustering_Nbin; k++) 
-          {
-            fscanf(ein,"%le", &nz_ext_bin[k][i]);
-          }
-          
-          p++;
-          if (i > 0) 
-          {
-            if (z_v[i] < z_v[i - 1])
-            {
-              break;
-            }
-          }
-        }
-        
-        dz_file   = (z_v[p-1] - zmin_file) / ((double) p - 1.0);
-        zmin_file = z_v[0];
-        zmax_file = z_v[p-1] + dz_file;
-
-        //VM: bug report
-        // redshift.clustering_zdistrpar_zmin = ??
-        // redshift.clustering_zdistrpar_zmax = ??
-      }
     }
 
     const double zhisto_min = redshift.clustering_zdistrpar_zmin;
     const double zhisto_max = redshift.clustering_zdistrpar_zmax;
-    //VM: calling the var below da is bad idea (JULY 2003 from old cosmolike)
-    const double dz_v = (zhisto_max - zhisto_min) / ((double) zbins);
+    const dz_histo = (zhisto_max - zhisto_min) / ((double) zbins);
     for (int i=0; i<zbins; i++) 
     {
-      z_v[i] = zhisto_min + (i + 0.5) * dz_v;
+      z_v[i] = zhisto_min + (i + 0.5) * dz_histo;
     }
     
 // the outlier fraction (outfrac) should be specified externally. This is a temporary hack.
@@ -1961,21 +2231,20 @@ double pf_photoz(double zz, int nj)
 
           norm = 0.0;
           for (int k=0; k<zbins; k++) 
-          {
-            const double zi = z_v[k];
+          {            
+            const double x1 = (tomo.clustering_zmin[i] - z_v[k] + 
+              bias_zphot_clustering(z_v[k], i))/(M_SQRT2*sigma_zphot_clustering(z_v[k], i));
+            const double x2 = (tomo.clustering_zmax[i] - z_v[k] + 
+                bias_zphot_clustering(z_v[k], i))/(M_SQRT2*sigma_zphot_clustering(z_v[k], i));
             
-            const double x1 = (tomo.clustering_zmin[i] - zi + 
-              bias_zphot_clustering(zi, i))/(M_SQRT2*sigma_zphot_clustering(zi, i));
-            const double x2 = (tomo.clustering_zmax[i] - zi + 
-                bias_zphot_clustering(zi, i))/(M_SQRT2*sigma_zphot_clustering(zi, i));
-            
-            table[i + 1][k] = pf_histo(zi, NULL)*(eta * 0.3183 * (atan(x2) - atan(x1)) +
+            table[i + 1][k] = 
+              pf_histo(z_v[k], NULL)*(eta * 0.3183 * (atan(x2) - atan(x1)) +
               ((1.0 - eta) * 0.5 * (gsl_sf_erf(x2) - gsl_sf_erf(x1))));
             
             // this creates a pseudo Voigt profile by adding a Gaussian and Lorentian (convolved  
             // with a tophat) with the correct weights. See, eg, the Wikipedia article on Voigt
             // profiles for an explanation of where the numbers come from.
-            norm += table[i + 1][k] * dz_v;
+            norm += table[i + 1][k] * dz_histo;
           }
           
           for (int k=0; k<zbins; k++) 
@@ -1995,22 +2264,20 @@ double pf_photoz(double zz, int nj)
           
           norm = 0.0;
           for (int k=0; k<zbins; k++)
-          {
-            const double zi = z_v[k];
+          {            
+            const double x1 = (tomo.clustering_zmin[i] - z_v[k] + 
+              bias_zphot_clustering(z_v[k], i))/(M_SQRT2*sigma_zphot_clustering(z_v[k], i));
+            const double x2 = (tomo.clustering_zmax[i] - z_v[k] + 
+              bias_zphot_clustering(z_v[k], i))/(M_SQRT2*sigma_zphot_clustering(z_v[k], i));
             
-            const double x1 = (tomo.clustering_zmin[i] - zi + 
-              bias_zphot_clustering(zi, i))/(M_SQRT2*sigma_zphot_clustering(zi, i));
-            const double x2 = (tomo.clustering_zmax[i] - zi + 
-              bias_zphot_clustering(zi, i))/(M_SQRT2*sigma_zphot_clustering(zi, i));
-            
-            table[i + 1][k] = pf_histo(zi, NULL)*(eta * 0.3183 * (atan(x2) - atan(x1)) +
+            table[i + 1][k] = pf_histo(z_v[k], NULL)*(eta * 0.3183 * (atan(x2) - atan(x1)) +
               ((1.0 - eta) * 0.5 * (gsl_sf_erf(x2) - gsl_sf_erf(x1))));
             
-            norm += table[i + 1][k] * dz_v;
+            norm += table[i + 1][k] * dz_histo;
           }
           for (int k=0; k<zbins; k++) 
           {
-            table[i + 1][k] = outfrac / dz_v + (1. - outfrac) * table[i + 1][k] / norm;
+            table[i + 1][k] = outfrac / dz_histo + (1. - outfrac) * table[i + 1][k] / norm;
           }
           break;
         }
@@ -2026,18 +2293,18 @@ double pf_photoz(double zz, int nj)
           norm = 0.0;
           for (int k=0; k<zbins; k++)
           {
-            const double zi = z_v[k];
+            const double x1 = 
+                (tomo.clustering_zmin[i] - z_v[k] + bias_zphot_clustering(z_v[k], i)) /
+                (M_SQRT2*sigma_zphot_clustering(z_v[k], i));
+            const double x2 = 
+                (tomo.clustering_zmax[i] - z_v[k] + bias_zphot_clustering(z_v[k], i)) /
+                (M_SQRT2*sigma_zphot_clustering(z_v[k], i));
             
-            const double x1 = (tomo.clustering_zmin[i] - zi + bias_zphot_clustering(zi, i)) /
-                (M_SQRT2*sigma_zphot_clustering(zi, i));
-            const double x2 = (tomo.clustering_zmax[i] - zi + bias_zphot_clustering(zi, i)) /
-                (M_SQRT2*sigma_zphot_clustering(zi, i));
+            table[i + 1][k] = 0.5 * pf_histo(z_v[k], NULL)*(gsl_sf_erf(x2) - gsl_sf_erf(x1));
             
-            table[i + 1][k] = 0.5 * pf_histo(zi, NULL)*(gsl_sf_erf(x2) - gsl_sf_erf(x1));
-            
-            norm += table[i + 1][k] * dz_v;
+            norm += table[i + 1][k] * dz_histo;
           }
-          for (int k=0; k < zbins; k++) 
+          for (int k=0; k<zbins; k++) 
           {
             table[i + 1][k] /= norm;
           } 
@@ -2074,19 +2341,22 @@ double pf_photoz(double zz, int nj)
           }
           
           norm = 0.0;
-
+          const double zmin_file = z_v_file[0];
+          const double dz_file = 
+            (z_v_file[zbins_file - 1] - zmin_file)/((double) zbins_file - 1.0);
+  
           for (int k=0; k<zbins; k++)
           {
             const double zi = z_v[k];
 
-            const double x1 = (tomo.clustering_zmin[i] - zi + 
-              bias_zphot_clustering(zi, i))/(M_SQRT2*sigma_zphot_clustering(zi, i));
-            const double x2 = (tomo.clustering_zmax[i] - zi + 
-              bias_zphot_clustering(zi, i))/(M_SQRT2*sigma_zphot_clustering(zi, i));
+            const double x1 = (tomo.clustering_zmin[i] - z_v[k] + 
+              bias_zphot_clustering(z_v[k], i))/(M_SQRT2*sigma_zphot_clustering(z_v[k], i));
+            const double x2 = (tomo.clustering_zmax[i] - z_v[k] + 
+              bias_zphot_clustering(z_v[k], i))/(M_SQRT2*sigma_zphot_clustering(z_v[k], i));
             
-            if ((zi >= zmin_file) && (zi < zmax_file)) 
+            if ((z_v[k] >= zmin_file) && (z_v[k] < zmax_file)) 
             {
-              const int z_index = (int) floor((zi - zmin_file)/dz_file);
+              const int z_index = (int) floor((z_v[k] - zmin_file)/dz_file);
               
               table[i+1][k] = nz_ext_bin[i][z_index] 
                 + 0.5*nz_diag[z_index]*(gsl_sf_erf(x2) - gsl_sf_erf(x1));
@@ -2096,7 +2366,7 @@ double pf_photoz(double zz, int nj)
               table[i+1][k] = 0.;
             }
 
-            norm += table[i+1][k]*dz_v;
+            norm += table[i+1][k]*dz_file;
           }
           break;
         }
@@ -2131,19 +2401,18 @@ double pf_photoz(double zz, int nj)
           {
             for (int k = 0;k<zbins; k++)
             {
-              const double zi = z_v[k];
-              if ((zi >= zlow) && (zi <= zhigh))
+              if ((z_v[k] >= zlow) && (z_v[k] <= zhigh))
               {
                 n_out += pf_histo(zi, NULL);
               }
             }
             if (zpart == 1)
             {
-              n_out *= (nuisance.frac_lowz * dz_v);
+              n_out *= (nuisance.frac_lowz * dz_file);
             }
             else if (zpart == 2)
             {
-              n_out *= (nuisance.frac_highz * dz_v);
+              n_out *= (nuisance.frac_highz * dz_file);
             }
           }
 
@@ -2152,10 +2421,12 @@ double pf_photoz(double zz, int nj)
           {
             const double zi = z_v[k];
             
-            const double x1 = (tomo.clustering_zmin[i] - zi + bias_zphot_clustering(zi, i)) /
-                (M_SQRT2*sigma_zphot_clustering(zi, i));
-            const double x2 = (tomo.clustering_zmax[i] - zi + bias_zphot_clustering(zi, i)) /
-                (M_SQRT2*sigma_zphot_clustering(zi, i));
+            const double x1 = 
+                (tomo.clustering_zmin[i] - z_v[k] + bias_zphot_clustering(z_v[k], i)) /
+                (M_SQRT2*sigma_zphot_clustering(z_v[k], i));
+            const double x2 = 
+                (tomo.clustering_zmax[i] - z_v[k] + bias_zphot_clustering(z_v[k], i)) /
+                (M_SQRT2*sigma_zphot_clustering(z_v[k], i));
             const double DELTA = gsl_sf_erf(x2)-gsl_sf_erf(x1);
             const double ZDIST = pf_histo(zi, NULL);
 
@@ -2193,7 +2464,7 @@ double pf_photoz(double zz, int nj)
                 table[i+1][k] = 0.5*ZDIST*DELTA;
               }
             }
-            norm += table[i+1][k]*da;
+            norm += table[i+1][k]*dz_file;
           }
           for (int k = 0; k<zbins; k++)
           {

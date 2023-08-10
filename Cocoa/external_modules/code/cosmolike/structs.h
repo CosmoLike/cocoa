@@ -216,6 +216,9 @@ typedef struct
   // Variables for the 4x2pt+N (see: 2008.10757 & 2010.01138)
   double cluster_MOR[MAX_SIZE_ARRAYS];
   double cluster_selection[MAX_SIZE_ARRAYS];
+
+  double frac_lowz;   // photo-z = 5 model (see: 2108.00658)
+  double frac_highz;  // photo-z = 5 model (see: 2108.00658)
 } nuisancepara;
 
 typedef struct
