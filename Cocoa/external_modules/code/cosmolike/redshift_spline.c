@@ -933,7 +933,7 @@ double zdistr_histo_n(double z, void* params)
       }
       for (int k=0; k<tomo.shear_Nbin; k++) 
       {
-        cout = fscanf(ein, "%le", &tab[k][i]);
+        count = fscanf(ein, "%le", &tab[k][i]);
         if(count != 1)
         {
           log_fatal("fscanf failed to read the file");
@@ -1460,10 +1460,17 @@ double zdistr_photoz(double zz, int nj)
                   (M_SQRT2 * sigma_zphot_shear(z_v[k], i));
             
             const int z_index = (int) floor((z_v[k] - zmin_file)/dz_file);
-
-            table[i + 1][k] = nz_ext_bin[i][z_index] + 
-                  0.5*nz_diag[z_index]*(gsl_sf_erf(x2) - gsl_sf_erf(x1));
             
+            if ((z_index >= 0) && z_index < zbins_file) 
+            {
+              table[i + 1][k] = nz_ext_bin[i][z_index] + 
+                  0.5*nz_diag[z_index]*(gsl_sf_erf(x2) - gsl_sf_erf(x1));
+            }
+            else
+            {
+              log_fatal("bad index z_index");
+              exit(1);
+            }
             norm += table[i + 1][k]*dz_histo;
           }
           for (int k=0; k<zbins; k++) 
@@ -1482,7 +1489,7 @@ double zdistr_photoz(double zz, int nj)
             exit(1);
           }
 
-          double ar = {tomo.shear_zmin[i], tomo.shear_zmax[i]};
+          double ar[2] = {tomo.shear_zmin[i], tomo.shear_zmax[i]};
 
           int zpart = 0;
           double zlow, zhigh;
@@ -1504,10 +1511,9 @@ double zdistr_photoz(double zz, int nj)
           {
             for (int k = 0; k<zbins; k++)
             {
-              const double zi = z_v[k];
-              if ((zi >= zlow) && (zi <= zhigh))
+              if ((z_v[k] >= zlow) && (z_v[k] <= zhigh))
               {
-                n_out += zdistr_histo_1(zi, NULL);
+                n_out += zdistr_histo_1(z_v[k], NULL);
               }
             }
             if (zpart == 1)
@@ -2130,7 +2136,7 @@ double pf_photoz(double zz, int nj)
 
     const double zhisto_min = redshift.clustering_zdistrpar_zmin;
     const double zhisto_max = redshift.clustering_zdistrpar_zmax;
-    const dz_histo = (zhisto_max - zhisto_min) / ((double) zbins);
+    const double dz_histo = (zhisto_max - zhisto_min) / ((double) zbins);
     for (int i=0; i<zbins; i++) 
     {
       z_v[i] = zhisto_min + (i + 0.5) * dz_histo;
@@ -2211,11 +2217,10 @@ double pf_photoz(double zz, int nj)
 
           for (int k=0; k<zbins; k++)
           {
-            const double zi = z_v[k];
             table[i + 1][k] = 0.;
-            if (zi >= tomo.clustering_zmin[i] && zi <= tomo.clustering_zmax[i]) 
+            if (z_v[k] >= tomo.clustering_zmin[i] && z_v[k] <= tomo.clustering_zmax[i]) 
             {
-              table[i + 1][k] = pf_histo(zi, NULL) / norm;
+              table[i + 1][k] = pf_histo(z_v[k], NULL) / norm;
             }
           } 
           break;
@@ -2347,23 +2352,21 @@ double pf_photoz(double zz, int nj)
   
           for (int k=0; k<zbins; k++)
           {
-            const double zi = z_v[k];
-
             const double x1 = (tomo.clustering_zmin[i] - z_v[k] + 
               bias_zphot_clustering(z_v[k], i))/(M_SQRT2*sigma_zphot_clustering(z_v[k], i));
             const double x2 = (tomo.clustering_zmax[i] - z_v[k] + 
               bias_zphot_clustering(z_v[k], i))/(M_SQRT2*sigma_zphot_clustering(z_v[k], i));
             
-            if ((z_v[k] >= zmin_file) && (z_v[k] < zmax_file)) 
+            const int z_index = (int) floor((z_v[k] - zmin_file)/dz_file);
+            if ((z_index >= 0) && z_index < zbins_file) 
             {
-              const int z_index = (int) floor((z_v[k] - zmin_file)/dz_file);
-              
               table[i+1][k] = nz_ext_bin[i][z_index] 
                 + 0.5*nz_diag[z_index]*(gsl_sf_erf(x2) - gsl_sf_erf(x1));
             }
             else
             {
-              table[i+1][k] = 0.;
+              log_fatal("bad index z_index");
+              exit(1);
             }
 
             norm += table[i+1][k]*dz_file;
@@ -2389,7 +2392,7 @@ double pf_photoz(double zz, int nj)
             zhigh = (ar[1] >= 0.5) ? 0.5 : ar[1];
             zpart = 1; // denote low-z
           }
-          else if (array[1] > 2.0) 
+          else if (ar[1] > 2.0) 
           {
             zhigh = ar[1];
             zlow = (ar[0] <= 2.0) ? 2.0 : ar[0];
@@ -2403,32 +2406,31 @@ double pf_photoz(double zz, int nj)
             {
               if ((z_v[k] >= zlow) && (z_v[k] <= zhigh))
               {
-                n_out += pf_histo(zi, NULL);
+                n_out += pf_histo(z_v[k], NULL);
               }
             }
             if (zpart == 1)
             {
-              n_out *= (nuisance.frac_lowz * dz_file);
+              n_out *= (nuisance.frac_lowz * dz_histo);
             }
             else if (zpart == 2)
             {
-              n_out *= (nuisance.frac_highz * dz_file);
+              n_out *= (nuisance.frac_highz * dz_histo);
             }
           }
 
           norm = 0.;
           for (int k = 0;k<zbins; k++)
-          {
-            const double zi = z_v[k];
-            
+          {            
             const double x1 = 
                 (tomo.clustering_zmin[i] - z_v[k] + bias_zphot_clustering(z_v[k], i)) /
                 (M_SQRT2*sigma_zphot_clustering(z_v[k], i));
             const double x2 = 
                 (tomo.clustering_zmax[i] - z_v[k] + bias_zphot_clustering(z_v[k], i)) /
                 (M_SQRT2*sigma_zphot_clustering(z_v[k], i));
-            const double DELTA = gsl_sf_erf(x2)-gsl_sf_erf(x1);
-            const double ZDIST = pf_histo(zi, NULL);
+            
+            const double DELTA = gsl_sf_erf(x2) - gsl_sf_erf(x1);
+            const double ZDIST = pf_histo(z_v[k], NULL);
 
             if (zpart == 0) 
             {
@@ -2436,11 +2438,11 @@ double pf_photoz(double zz, int nj)
             }
             else if (zpart == 1) 
             {
-              if (zi <= 0.5)
+              if (z_v[k] <= 0.5)
               {
                 table[i+1][k] = 0.5*(1.0 - nuisance.frac_lowz)*ZDIST*DELTA;
               }
-              else ifv(zi > 2.0)
+              else if(z_v[k] > 2.0)
               {
                 table[i+1][k] = n_out/(3.5-2.0) + 0.5*(1.0 - nuisance.frac_highz)*ZDIST*DELTA;
               }
@@ -2451,11 +2453,11 @@ double pf_photoz(double zz, int nj)
             }
             else if (zpart == 2) 
             {
-              if (zi <= 0.5)
+              if (z_v[k] <= 0.5)
               {
                 table[i+1][k] = n_out/(0.5) + 0.5*(1.-nuisance.frac_lowz)*ZDIST*DELTA;
               }
-              else if (zi > 2.0)
+              else if (z_v[k] > 2.0)
               {
                 table[i+1][k] = 0.5*(1.-nuisance.frac_highz)*ZDIST*DELTA;
               }
@@ -2464,7 +2466,7 @@ double pf_photoz(double zz, int nj)
                 table[i+1][k] = 0.5*ZDIST*DELTA;
               }
             }
-            norm += table[i+1][k]*dz_file;
+            norm += table[i+1][k]*dz_histo;
           }
           for (int k = 0; k<zbins; k++)
           {
