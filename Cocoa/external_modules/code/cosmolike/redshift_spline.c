@@ -1348,9 +1348,30 @@ double zdistr_photoz(double zz, int nj)
             const double x2 = (tomo.shear_zmax[i] - z_v[k] + bias_zphot_shear(z_v[k], i)) /
                  (M_SQRT2 * sigma_zphot_shear(z_v[k], i));
             
+            
+            gsl_sf_result result;
+            {
+              int status = gsl_sf_erf_e(x1, &result);
+              if (status)
+              {
+                log_fatal(gsl_strerror(status));
+                exit(1);
+              }
+            }
+            const double erf_sf_x1 = result.val;
+            {
+              int status = gsl_sf_erf_e(x2, &result);
+              if (status)
+              {
+                log_fatal(gsl_strerror(status));
+                exit(1);
+              }
+            }
+            const double erf_sf_x2 = result.val;
+
             table[i + 1][k] = 
               zdistr_histo_1(z_v[k], NULL) * (eta * 0.3183 * (atan(x2) - atan(x1)) +
-              ((1.0 - eta) * 0.5 * (gsl_sf_erf(x2) - gsl_sf_erf(x1))));
+              ((1.0 - eta) * 0.5 * (erf_sf_x2 - erf_sf_x1)));
             // this creates a pseudo Voigt profile by adding a Gaussian and Lorentian (convolved
             // with a tophat) with the correct weights. See, eg, the Wikipedia article on Voigt 
             // profiles for an explanation of where the numbers come from.
@@ -1381,8 +1402,28 @@ double zdistr_photoz(double zz, int nj)
             const double x2 = (tomo.shear_zmax[i] - z_v[k] + bias_zphot_shear(z_v[k], i)) /
                  (M_SQRT2 * sigma_zphot_shear(z_v[k], i));
 
+            gsl_sf_result result;
+            {
+              int status = gsl_sf_erf_e(x1, &result);
+              if (status)
+              {
+                log_fatal(gsl_strerror(status));
+                exit(1);
+              }
+            }
+            const double erf_sf_x1 = result.val;
+            {
+              int status = gsl_sf_erf_e(x2, &result);
+              if (status)
+              {
+                log_fatal(gsl_strerror(status));
+                exit(1);
+              }
+            }
+            const double erf_sf_x2 = result.val;
+
             table[i + 1][k] = zdistr_histo_1(z_v[k], NULL) * (eta * 0.3183 * (atan(x2) - atan(x1)) +
-              ((1.0 - eta) * 0.5 * (gsl_sf_erf(x2) - gsl_sf_erf(x1))));
+              ((1.0 - eta) * 0.5 * (erf_sf_x2 - erf_sf_x1)));
 
             norm += table[i + 1][k] * dz_histo;
           }
@@ -1410,7 +1451,27 @@ double zdistr_photoz(double zz, int nj)
             const double x2 = (tomo.shear_zmax[i] - z_v[k] + bias_zphot_shear(z_v[k], i)) /
                  (M_SQRT2 * sigma_zphot_shear(z_v[k], i));
             
-            table[i + 1][k] = 0.5 * zdistr_histo_1(z_v[k], NULL) * (gsl_sf_erf(x2) - gsl_sf_erf(x1));
+            gsl_sf_result result;
+            {
+              int status = gsl_sf_erf_e(x1, &result);
+              if (status)
+              {
+                log_fatal(gsl_strerror(status));
+                exit(1);
+              }
+            }
+            const double erf_sf_x1 = result.val;
+            {
+              int status = gsl_sf_erf_e(x2, &result);
+              if (status)
+              {
+                log_fatal(gsl_strerror(status));
+                exit(1);
+              }
+            }
+            const double erf_sf_x2 = result.val;
+
+            table[i + 1][k] = 0.5 * zdistr_histo_1(z_v[k], NULL) * (erf_sf_x2 - erf_sf_x1);
             
             norm += table[i + 1][k] * dz_histo;
           }
@@ -1463,8 +1524,28 @@ double zdistr_photoz(double zz, int nj)
             
             if ((z_index >= 0) && z_index < zbins_file) 
             {
+              gsl_sf_result result;
+              {
+                int status = gsl_sf_erf_e(x1, &result);
+                if (status)
+                {
+                  log_fatal(gsl_strerror(status));
+                  exit(1);
+                }
+              }
+              const double erf_sf_x1 = result.val;
+              {
+                int status = gsl_sf_erf_e(x2, &result);
+                if (status)
+                {
+                  log_fatal(gsl_strerror(status));
+                  exit(1);
+                }
+              }
+              const double erf_sf_x2 = result.val;
+
               table[i + 1][k] = nz_ext_bin[i][z_index] + 
-                  0.5*nz_diag[z_index]*(gsl_sf_erf(x2) - gsl_sf_erf(x1));
+                  0.5*nz_diag[z_index]*(erf_sf_x2 - erf_sf_x1);
             }
             else
             {
@@ -1533,8 +1614,28 @@ double zdistr_photoz(double zz, int nj)
                   (M_SQRT2 * sigma_zphot_shear(z_v[k], i));
             const double x2 = (ar[1] - z_v[k] + bias_zphot_shear(z_v[k], i)) / 
                   (M_SQRT2 * sigma_zphot_shear(z_v[k], i));
-            
-            const double DELTA = (gsl_sf_erf(x2) - gsl_sf_erf(x1));
+
+            gsl_sf_result result;
+            {
+              int status = gsl_sf_erf_e(x1, &result);
+              if (status)
+              {
+                log_fatal(gsl_strerror(status));
+                exit(1);
+              }
+            }
+            const double erf_sf_x1 = result.val;
+            {
+              int status = gsl_sf_erf_e(x2, &result);
+              if (status)
+              {
+                log_fatal(gsl_strerror(status));
+                exit(1);
+              }
+            }
+            const double erf_sf_x2 = result.val;            
+
+            const double DELTA = (erf_sf_x2 - erf_sf_x1);
             const double ZDIST = zdistr_histo_1(z_v[k], NULL);
             
             if (zpart == 0) 
@@ -2429,7 +2530,27 @@ double pf_photoz(double zz, int nj)
                 (tomo.clustering_zmax[i] - z_v[k] + bias_zphot_clustering(z_v[k], i)) /
                 (M_SQRT2*sigma_zphot_clustering(z_v[k], i));
             
-            const double DELTA = gsl_sf_erf(x2) - gsl_sf_erf(x1);
+            gsl_sf_result result;
+            {
+              int status = gsl_sf_erf_e(x1, &result);
+              if (status)
+              {
+                log_fatal(gsl_strerror(status));
+                exit(1);
+              }
+            }
+            const double erf_sf_x1 = result.val;
+            {
+              int status = gsl_sf_erf_e(x2, &result);
+              if (status)
+              {
+                log_fatal(gsl_strerror(status));
+                exit(1);
+              }
+            }
+            const double erf_sf_x2 = result.val;
+
+            const double DELTA = erf_sf_x2 - erf_sf_x1;
             const double ZDIST = pf_histo(z_v[k], NULL);
 
             if (zpart == 0) 
