@@ -218,7 +218,9 @@ Ntab Ntable =
   .binned_P_lambda_obs_given_M_size_M_table = 50,
   .binned_p_cm_size_a_table = 30,
   .halo_uKS_nc = 20,
-  .halo_uks_nx = 200
+  .halo_uks_nx = 200,
+  .acc_boost_photoz_sampling = 1,
+  .photoz_interpolation_type = 0
 };
 
 pre precision = 

@@ -69,6 +69,8 @@ typedef struct
   int binned_p_cm_size_a_table;
   int halo_uKS_nc;                 // halo.c u_KS(double c, double k, double rv)
   int halo_uks_nx;                 // halo.c u_KS(double c, double k, double rv)
+  int acc_boost_photoz_sampling;
+  int photoz_interpolation_type;
 } Ntab;
 
 typedef struct 

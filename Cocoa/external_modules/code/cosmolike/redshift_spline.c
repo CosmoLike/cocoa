@@ -15,7 +15,7 @@
 
 #include "log.c/src/log.h"
 
-#define Z_SPLINE_TYPE gsl_interp_cspline
+
 static int GSL_WORKSPACE_SIZE = 1024;
 static double SQRT2 = 1.41421356237;
 
@@ -1185,7 +1185,6 @@ double zdistr_photoz(double zz, int nj)
           }
         }
         
-        // VM: added lines below (JULY 2003). They are already in `zdistr_histo_1` function
         const double zmin_file = z_v_file[0];
         const double zmax_file = z_v_file[zbins_file - 1];
         const double dz_file = (zmax_file - zmin_file) / ((double) zbins_file - 1.0);
@@ -1201,7 +1200,7 @@ double zdistr_photoz(double zz, int nj)
         zbins_file = line_count(redshift.shear_REDSHIFT_FILE);
       }
 
-      zbins = zbins_file; //VM: code allows upsampling if needed
+      zbins = zbins_file * Ntable.acc_boost_photoz_sampling; //VM: upsampling if needed
       if (photoz != 4 && photoz != 5) 
       {
         zbins *= 20;
@@ -1230,7 +1229,18 @@ double zdistr_photoz(double zz, int nj)
       }
       for (int i=0; i<tomo.shear_Nbin+1; i++) 
       {
-        photoz_splines[i] = gsl_spline_alloc(Z_SPLINE_TYPE, zbins);
+        if (Ntable.photoz_interpolation_type == 0)
+        {
+          photoz_splines[i] = gsl_spline_alloc(gsl_interp_cspline, zbins);
+        }
+        else if (Ntable.photoz_interpolation_type == 1)
+        {
+          photoz_splines[i] = gsl_spline_alloc(gsl_interp_linear, zbins);
+        }
+        else
+        {
+          photoz_splines[i] = gsl_spline_alloc(gsl_interp_steffen, zbins);
+        }
         if (photoz_splines[i] == NULL)
         {
           log_fatal("array allocation failed");
@@ -1661,15 +1671,15 @@ double zdistr_photoz(double zz, int nj)
             {
               if(z_v[k] <= 0.5)
               {
-                table[i+1][k] = n_out/(0.5) + 0.5*(1.0 - nuisance.frac_lowz)*ZDIST*DELTA;
+                table[i + 1][k] = n_out/(0.5) + 0.5*(1.0 - nuisance.frac_lowz)*ZDIST*DELTA;
               }
               else if (z_v[k] > 2.0)
               {
-                table[i+1][k] = 0.5*(1.0 - nuisance.frac_highz)*ZDIST*DELTA;
+                table[i + 1][k] = 0.5*(1.0 - nuisance.frac_highz)*ZDIST*DELTA;
               }
               else
               {
-                table[i+1][k] = 0.5*ZDIST*DELTA;
+                table[i + 1][k] = 0.5*ZDIST*DELTA;
               }
             }
 
@@ -1736,7 +1746,12 @@ double zdistr_photoz(double zz, int nj)
   }
   else
   {
-    res = gsl_spline_eval(photoz_splines[nj + 1], zz, NULL);
+    int status = gsl_spline_eval_e(photoz_splines[nj + 1], zz, NULL, &res);
+    if (status) 
+    {
+      log_fatal(gsl_strerror(status));
+      exit(1);
+    }
   }
 
   return res;
@@ -2196,7 +2211,7 @@ double pf_photoz(double zz, int nj)
         zbins_file = line_count(redshift.clustering_REDSHIFT_FILE);
       }
 
-      zbins = zbins_file; //VM: code allows upsampling if needed
+      zbins = zbins_file * Ntable.acc_boost_photoz_sampling; //VM: upsampling if needed
       if (photoz != 0 && photoz != 4 && photoz != 5) 
       {
         pf_histo(0.5, NULL);
@@ -2226,7 +2241,18 @@ double pf_photoz(double zz, int nj)
       }
       for (int i=0; i<tomo.clustering_Nbin+1; i++) 
       {
-        photoz_splines[i] = gsl_spline_alloc(Z_SPLINE_TYPE, zbins);
+        if (Ntable.photoz_interpolation_type == 0)
+        {
+          photoz_splines[i] = gsl_spline_alloc(gsl_interp_cspline, zbins);
+        }
+        else if (Ntable.photoz_interpolation_type == 1)
+        {
+          photoz_splines[i] = gsl_spline_alloc(gsl_interp_linear, zbins);
+        }
+        else
+        {
+          photoz_splines[i] = gsl_spline_alloc(gsl_interp_steffen, zbins);
+        }
         if (photoz_splines[i] == NULL)
         {
           log_fatal("fail allocation");
@@ -2651,14 +2677,12 @@ double pf_photoz(double zz, int nj)
   }
   else
   {
-    double result = 0.0;
-    int status = gsl_spline_eval_e(photoz_splines[nj + 1], zz, NULL, &result);
+    int status = gsl_spline_eval_e(photoz_splines[nj + 1], zz, NULL, &res);
     if (status) 
     {
       log_fatal(gsl_strerror(status));
       exit(1);
     }
-    res = result;
   }
   return res;
 }
@@ -2810,7 +2834,18 @@ double pz_cluster(const double zz, const int nz)
 
     for (int i=0; i<tomo.clustering_Nbin+1; i++) 
     {
-      photoz_splines[i] = gsl_spline_alloc(Z_SPLINE_TYPE, zbins);
+      if (Ntable.photoz_interpolation_type == 0)
+      {
+        photoz_splines[i] = gsl_spline_alloc(gsl_interp_cspline, zbins);
+      }
+      else if (Ntable.photoz_interpolation_type == 1)
+      {
+        photoz_splines[i] = gsl_spline_alloc(gsl_interp_linear, zbins);
+      }
+      else
+      {
+        photoz_splines[i] = gsl_spline_alloc(gsl_interp_steffen, zbins);
+      }
       if (photoz_splines[i] == NULL)
       {
         log_fatal("fail allocation");
