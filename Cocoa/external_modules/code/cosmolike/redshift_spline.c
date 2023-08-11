@@ -1034,7 +1034,7 @@ double zdistr_photoz(double zz, int nj)
   static gsl_spline* photoz_splines[MAX_SIZE_ARRAYS];
   // PZ == 4 || PZ == 5
   static int zbins_file = -1;
-  static double* z_v_file=0;
+  static double* z_v_file = 0;
   static double* nz_old = 0;
   static double* nz_diag = 0; 
   static double* nz_ext = 0;
@@ -1357,7 +1357,7 @@ double zdistr_photoz(double zz, int nj)
             
             norm += table[i + 1][k] * dz_histo;
           }
-          for (int k=0; k < zbins; k++) 
+          for (int k=0; k<zbins; k++) 
           {
             table[i + 1][k] /= norm;
           }
@@ -1373,7 +1373,7 @@ double zdistr_photoz(double zz, int nj)
           }
 
           norm = 0.0;
-          for (int k=0; k < zbins; k++) 
+          for (int k=0; k<zbins; k++) 
           {
             const double x1 = (tomo.shear_zmin[i] - z_v[k] + bias_zphot_shear(z_v[k], i)) /
                  (M_SQRT2 * sigma_zphot_shear(z_v[k], i));
@@ -1386,7 +1386,7 @@ double zdistr_photoz(double zz, int nj)
 
             norm += table[i + 1][k] * dz_histo;
           }
-          for (int k=0; k < zbins; k++) 
+          for (int k=0; k<zbins; k++) 
           {
             table[i + 1][k] = outfrac / dz_histo + (1. - outfrac) * table[i + 1][k] / norm;
           }
@@ -1672,10 +1672,10 @@ double sigma_zphot_clustering(double z, int ni)
 double pf_histo(double z, void* params __attribute__((unused))) 
 { // return pf(z) based on redshift file with one redshift distribution
   static double* tab = 0;
-  static int zbins;
-  static double zhisto_min; 
-  static double zhisto_max; 
-  static double dz_histo;
+  static int zbins = 0;
+  static double zhisto_min = 0; 
+  static double zhisto_max = 0; 
+  static double dz_histo = 0;
 
   const int photoz = (redshift.clustering_photoz == 7) ? 4 : redshift.clustering_photoz;
 
@@ -1785,10 +1785,10 @@ double pf_histo(double z, void* params __attribute__((unused)))
 double pf_histo_n(double z, void* params) 
 { // return pf(z, nj) based on z file with structure z[i] nz[0][i] .. nz[tomo.clustering_Nbin-1][i]
   static double** tab;
-  static int zbins;
-  static double zhisto_min;
-  static double zhisto_max; 
-  static double dz_histo;
+  static int zbins = 0; 
+  static double zhisto_min = 0;
+  static double zhisto_max = 0; 
+  static double dz_histo = 0;
 
   if (tab == 0) 
   {
@@ -1993,7 +1993,7 @@ double pf_photoz(double zz, int nj)
         }
         
         const double zmin_file = z_v_file[0];
-        const double zmax_file = z_v_file[zbins - 1];
+        const double zmax_file = z_v_file[zbins_file - 1];
         const double dz_file = (zmax_file - zmin_file)/ ((double) zbins_file - 1.0);
         
         redshift.clustering_zdistrpar_zmin = fmax(zmin_file, 1.e-5);
@@ -2081,7 +2081,7 @@ double pf_photoz(double zz, int nj)
         }
 
         const double zmin_file = z_v_file[0];
-        const double zmax_file = z_v_file[zbins - 1];
+        const double zmax_file = z_v_file[zbins_file - 1];
         const double dz_file = (zmax_file - zmin_file)/ ((double) zbins_file - 1.0);
 
         redshift.clustering_zdistrpar_zmin = zmin_file;
