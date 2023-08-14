@@ -124,7 +124,26 @@ void* arg, double a, double b, double* error, int niter)
   gsl_integration_cquad_workspace_free(w);
   return res;
 }
+
+double int_gsl_integrate_medium_precision(double (*func)(double, void*),
+void* arg, double a, double b, double* error, int niter)
+{
+  double res, err;
+  
+  gsl_integration_cquad_workspace *w = gsl_integration_cquad_workspace_alloc(niter);
+  gsl_function F;
+  F.function = func;
+  F.params = arg;
+  gsl_integration_cquad(&F, a, b, 0, precision.medium/2, w, &res, &err, 0);
+  if (NULL != error) 
+  {
+    *error = err;
+  }
+  return res;
+}
 */
+
+
 
 double int_gsl_integrate_high_precision(double (*func)(double, void*),
 void* arg, double a, double b, double* error, int niter)
@@ -173,7 +192,6 @@ void* arg, double a, double b, double* error, int niter)
   }
   return res;
 }
-
 double int_gsl_integrate_low_precision(double (*func)(double, void*),
 void* arg, double a, double b, double* error __attribute__((unused)),
 int niter __attribute__((unused))) 
@@ -200,32 +218,46 @@ void error(char *s) {
 // extrapolation. If no	extrapolation desired, set these to 0
 // ============================================================
 
-double interpol(double *f, int n, double a, double b, double dx, double x,
-double lower, double upper) {
-  double r;
-  int i;
-  if (x < a) {
-    if (lower == 0.) {
+double interpol(const double* const f, const int n, const double a, 
+const double b, const double dx, const double x, const double lower, 
+const double upper) 
+{
+  if (x < a) 
+  {
+    if (lower == 0.) 
+    {
       return 0.0;
     }
     return f[0] + lower * (x - a);
   }
-  r = (x - a) / dx;
-  i = (int)(floor(r));
-  if (i + 1 >= n) {
-    if (upper == 0.0) {
-      if (i + 1 == n) {
+
+  const double r = (x - a) / dx;
+  const int i = (int) floor(r);
+  
+  if (i + 1 >= n) 
+  {
+    if (upper == 0.0) 
+    {
+      if (i + 1 == n) 
+      {
         return f[i]; // constant extrapolation
-      } else {
+      } 
+      else 
+      {
         return 0.0;
       }
-    } else {
-      return f[n - 1] + upper * (x - b); /* linear extrapolation */
+    } 
+    else 
+    {
+      return f[n - 1] + upper * (x - b); // linear extrapolation
     }
-  } else {
-    return (r - i) * (f[i + 1] - f[i]) + f[i]; /* interpolation */
+  } 
+  else 
+  {
+    return (r - i) * (f[i + 1] - f[i]) + f[i]; // interpolation
   }
 }
+
 
 int line_count(char *filename) {
   FILE *n;

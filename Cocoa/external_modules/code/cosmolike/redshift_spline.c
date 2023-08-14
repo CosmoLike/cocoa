@@ -313,6 +313,7 @@ int N_ggl(int ni, int nj)
       }
     }
   }
+  
   if (ni < 0 || ni > tomo.clustering_Nbin - 1 || nj < 0 || nj > tomo.shear_Nbin - 1)
   {
     log_fatal("invalid bin input (ni, nj) = (%d, %d)", ni, nj);

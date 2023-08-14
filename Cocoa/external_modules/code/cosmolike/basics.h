@@ -32,8 +32,9 @@ double interpol2d(double **f, int nx, double ax, double bx, double dx, double x,
 double interpol2d_fitslope(double **f, int nx, double ax, double bx, double dx,
   double x, int ny, double ay, double by, double dy, double y, double lower);
 
-double interpol(double *f, int n, double a, double b, double dx, double x,
-  double lower, double upper);
+double interpol(const double* const f, const int n, const double a, 
+const double b, const double dx, const double x, const double lower, 
+const double upper);
 
 double interpol_fitslope(double *f, int n, double a, double b, double dx,
   double x, double lower);
