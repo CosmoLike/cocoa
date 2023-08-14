@@ -401,13 +401,21 @@ double xi_pm_tomo(const int pm, const int nt, const int ni, const int nj, const 
         #pragma omp parallel for collapse(2)
         for (int nz=0; nz<NSIZE; nz++)
         {
-          for (int l=2; l<nell; l++)
+          for (int l=2; l<limits.LMIN_tab; l++)
           {
             const int Z1NZ = Z1(nz);
             const int Z2NZ = Z2(nz);
-            Cl[nz][l] = (l > limits.LMIN_tab) ?
-              C_ss_tomo_limber((double) l, Z1NZ, Z2NZ, 1) :
-              C_ss_tomo_limber_nointerp((double) l, Z1NZ, Z2NZ, use_linear_ps_limber, 0);
+            Cl[nz][l] = C_ss_tomo_limber_nointerp((double) l, Z1NZ, Z2NZ, use_linear_ps_limber, 0);
+          }
+        }
+        #pragma omp parallel for collapse(2)
+        for (int nz=0; nz<NSIZE; nz++)
+        {
+          for (int l=limits.LMIN_tab; l<nell; l++)
+          {
+            const int Z1NZ = Z1(nz);
+            const int Z2NZ = Z2(nz);
+            Cl[nz][l] = C_ss_tomo_limber((double) l, Z1NZ, Z2NZ, 1);
           }
         }
 
@@ -827,14 +835,23 @@ double w_gg_tomo(const int nt, const int ni, const int nj, const int limber)
       #pragma omp parallel for collapse(2)
       for (int nz=0; nz<NSIZE; nz++)
       {
-        for (int l=1; l<nell; l++)
+        for (int l=1; l<limits.LMIN_tab; l++)
         {
           const int q = nz;
           const int Z1 = nz; // cross redshift bin not supported so not using ZCL1(k)
           const int Z2 = nz; // cross redshift bin not supported so not using ZCL2(k)
-          Cl[q][l] = (l > limits.LMIN_tab) ?
-            C_gg_tomo_limber((double) l, Z1, Z2, 1) :
-            C_gg_tomo_limber_nointerp((double) l, Z1, Z2, use_linear_ps_limber, 0);
+          Cl[q][l] = C_gg_tomo_limber_nointerp((double) l, Z1, Z2, use_linear_ps_limber, 0);
+        }
+      }
+      #pragma omp parallel for collapse(2)
+      for (int nz=0; nz<NSIZE; nz++)
+      {
+        for (int l=limits.LMIN_tab; l<nell; l++)
+        {
+          const int q = nz;
+          const int Z1 = nz; // cross redshift bin not supported so not using ZCL1(k)
+          const int Z2 = nz; // cross redshift bin not supported so not using ZCL2(k)
+          Cl[q][l] = C_gg_tomo_limber((double) l, Z1, Z2, 1);
         }
       }
     }
@@ -1049,11 +1066,17 @@ double w_gk_tomo(const int nt, const int ni, const int limber)
       #pragma omp parallel for collapse(2)
       for (int nz=0; nz<NSIZE; nz++)
       {
-        for (int l=1; l<nell; l++)
+        for (int l=1; l<limits.LMIN_tab; l++)
         {
-          Cl[nz][l] = (l > limits.LMIN_tab) ?
-            C_gk_tomo_limber_wrapper((double) l, nz, 1) :
-            C_gk_tomo_limber_nointerp_wrapper((double) l, nz, use_linear_ps_limber, 0);
+          Cl[nz][l] = C_gk_tomo_limber_nointerp_wrapper((double) l, nz, use_linear_ps_limber, 0);
+        }
+      }
+      #pragma omp parallel for collapse(2)
+      for (int nz=0; nz<NSIZE; nz++)
+      {
+        for (int l=limits.LMIN_tab; l<nell; l++)
+        {
+          Cl[nz][l] = C_gk_tomo_limber_wrapper((double) l, nz, 1);
         }
       }
 
