@@ -3983,6 +3983,7 @@ double C_gg_tomo_limber(double l, int ni, int nj, const int force_no_recompute)
           table[k][p] = (res <= 0) ? -100 : log(res);
         }
       }
+
       update_galpara(&G);
       update_cosmopara(&C);
       update_nuisance(&N);
@@ -4267,6 +4268,7 @@ double C_gk_tomo_limber(double l, int ni, const int force_no_recompute)
         double init = C_gk_tomo_limber_nointerp(exp(lnl), k, use_linear_ps_limber, 1);
       }
       #pragma GCC diagnostic pop
+      
       #pragma omp parallel for collapse(2)
       for (int k=0; k<NSIZE; k++)
       {
@@ -4276,6 +4278,7 @@ double C_gk_tomo_limber(double l, int ni, const int force_no_recompute)
           table[k][i]= log(C_gk_tomo_limber_nointerp(exp(lnl), k, use_linear_ps_limber, 0));
         }
       }
+      
       update_cosmopara(&C);
       update_nuisance(&N);
       update_galpara(&G);
@@ -4467,6 +4470,7 @@ double C_ks_tomo_limber(double l, int ni, const int force_no_recompute)
         double init = C_ks_tomo_limber_nointerp(exp(lnlmin), 0, use_linear_ps_limber, 1);
       }
       #pragma GCC diagnostic pop
+      
       #pragma omp parallel for collapse(2)
       for (int k=0; k<NSIZE; k++)
       {
@@ -4476,6 +4480,7 @@ double C_ks_tomo_limber(double l, int ni, const int force_no_recompute)
           table[k][i] = C_ks_tomo_limber_nointerp(exp(lnl), k, use_linear_ps_limber, 0);
         }
       }
+
       #pragma omp parallel for
       for (int k=0; k<NSIZE; k++)
       {
@@ -4620,6 +4625,7 @@ double C_kk_limber(double l, const int force_no_recompute)
         double init = C_kk_limber_nointerp(exp(lnlmin), use_linear_ps_limber, 1);
       }
       #pragma GCC diagnostic pop
+      
       #pragma omp parallel for
       for (int i=0; i<nell; i++)
       {
@@ -4791,6 +4797,7 @@ double C_gy_tomo_limber(double l, int ni, const int force_no_recompute)
         double init = C_gy_tomo_limber_nointerp(exp(lnl), k, use_linear_ps_limber, 1);
       }
       #pragma GCC diagnostic pop
+      
       #pragma omp parallel for collapse(2)
       for (int k=0; k<NSIZE; k++)
       {
@@ -4800,6 +4807,7 @@ double C_gy_tomo_limber(double l, int ni, const int force_no_recompute)
           table[k][i]= log(C_gy_tomo_limber_nointerp(exp(lnl), k, use_linear_ps_limber, 0));
         }
       }
+
       update_cosmopara(&C);
       update_nuisance(&N);
       update_galpara(&G);
@@ -4975,6 +4983,7 @@ double C_ys_tomo_limber(double l, int ni, const int force_no_recompute)
         double init = C_ys_tomo_limber_nointerp(exp(lnlmin), 0, use_linear_ps_limber, 1);
       }
       #pragma GCC diagnostic pop
+      
       #pragma omp parallel for collapse(2)
       for (int k=0; k<NSIZE; k++)
       {
@@ -4983,6 +4992,7 @@ double C_ys_tomo_limber(double l, int ni, const int force_no_recompute)
           table[k][i] = C_ys_tomo_limber_nointerp(exp(lnlmin + i*dlnl), k, use_linear_ps_limber, 0);
         }
       }
+      
       #pragma omp parallel for
       for (int k=0; k<NSIZE; k++)
       {
@@ -5007,6 +5017,7 @@ double C_ys_tomo_limber(double l, int ni, const int force_no_recompute)
           }
         }
       }
+      
       update_cosmopara(&C);
       update_nuisance(&N);
       update_ynuisance(&N2);
@@ -5233,11 +5244,13 @@ double C_yy_limber(double l, const int force_no_recompute)
         double init = C_yy_limber_nointerp(exp(lnlmin), use_linear_ps_limber, 1);
       }
       #pragma GCC diagnostic pop
+      
       #pragma omp parallel for
       for (int i=0; i<nell; i++)
       {
         table[i] = log(C_yy_limber_nointerp(exp(lnlmin + i*dlnl), use_linear_ps_limber, 0));
       }
+      
       update_ynuisance(&N);
       update_cosmopara(&C);
     }
