@@ -11,6 +11,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <gsl/gsl_integration.h>
 
 #include "log.c/src/log.h"
 
@@ -830,7 +831,7 @@ double F_KS_nointerp(double c, double krs, const int init_static_vars_only)
     int_gsl_integrate_medium_precision(int_F_KS, (void*) ar, xmin, xmax, NULL, GSL_WORKSPACE_SIZE);
 }
 
-double int_F0_KS(double x, void* params)
+double int_F0_KS(double x, void* params __attribute__((unused)))
 {
   return x*x*pow(log(1.0 + x)/x, 1.0/(ynuisance.gas_Gamma_KS - 1.0));
 }
@@ -2035,7 +2036,7 @@ void set_HOD(int n)
       log_debug("HOD quantities in bin %d at <z> = %.2f: lg(<M_h> h/M_sun) = %.3f", n, z, 
         log10(m_mean_nointerp(n, a, 0)));
       
-      log_debug("HOD quantities in bin %d at <z> = %.2f: f_sat = %.3f"),n, z, fsat_nointerp(n, a, 0);
+      log_debug("HOD quantities in bin %d at <z> = %.2f: f_sat = %.3f",n, z, fsat_nointerp(n, a, 0));
       
       break;
     }
@@ -2057,7 +2058,7 @@ void set_HOD(int n)
       log_debug("HOD quantities in bin %d at <z> = %.2f: lg(<M_h> h/M_sun) = %.3f", n, z, 
         log10(m_mean_nointerp(n, a, 0)));
       
-      log_debug("HOD quantities in bin %d at <z> = %.2f: f_sat = %.3f"),n, z, fsat_nointerp(n, a, 0);
+      log_debug("HOD quantities in bin %d at <z> = %.2f: f_sat = %.3f",n, z, fsat_nointerp(n, a, 0));
 
       break;
     }
@@ -2079,7 +2080,7 @@ void set_HOD(int n)
       log_debug("HOD quantities in bin %d at <z> = %.2f: lg(<M_h> h/M_sun) = %.3f", n, z, 
         log10(m_mean_nointerp(n, a, 0)));
       
-      log_debug("HOD quantities in bin %d at <z> = %.2f: f_sat = %.3f"),n, z, fsat_nointerp(n, a, 0);
+      log_debug("HOD quantities in bin %d at <z> = %.2f: f_sat = %.3f",n, z, fsat_nointerp(n, a, 0));
 
       break;
     }
@@ -2101,7 +2102,7 @@ void set_HOD(int n)
       log_debug("HOD quantities in bin %d at <z> = %.2f: lg(<M_h> h/M_sun) = %.3f", n, z, 
         log10(m_mean_nointerp(n, a, 0)));
       
-      log_debug("HOD quantities in bin %d at <z> = %.2f: f_sat = %.3f"),n, z, fsat_nointerp(n, a, 0);
+      log_debug("HOD quantities in bin %d at <z> = %.2f: f_sat = %.3f",n, z, fsat_nointerp(n, a, 0));
 
       break;
     }
@@ -2124,7 +2125,7 @@ void set_HOD(int n)
       log_debug("HOD quantities in bin %d at <z> = %.2f: lg(<M_h> h/M_sun) = %.3f", n, z, 
         log10(m_mean_nointerp(n, a, 0)));
       
-      log_debug("HOD quantities in bin %d at <z> = %.2f: f_sat = %.3f"),n, z, fsat_nointerp(n, a, 0);
+      log_debug("HOD quantities in bin %d at <z> = %.2f: f_sat = %.3f",n, z, fsat_nointerp(n, a, 0));
 
       break;
     }

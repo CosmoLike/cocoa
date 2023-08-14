@@ -192,6 +192,7 @@ void* arg, double a, double b, double* error, int niter)
   }
   return res;
 }
+
 double int_gsl_integrate_low_precision(double (*func)(double, void*),
 void* arg, double a, double b, double* error __attribute__((unused)),
 int niter __attribute__((unused))) 

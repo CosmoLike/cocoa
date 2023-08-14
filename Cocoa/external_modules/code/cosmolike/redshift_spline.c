@@ -1,4 +1,5 @@
 #include <assert.h>
+#include <gsl/gsl_integration.h>
 #include <gsl/gsl_math.h>
 #include <gsl/gsl_sf.h>
 #include <gsl/gsl_spline.h>
@@ -14,10 +15,6 @@
 #include "structs.h"
 
 #include "log.c/src/log.h"
-
-
-static int GSL_WORKSPACE_SIZE = 1024;
-static double SQRT2 = 1.41421356237;
 
 // In lens = source LSST systematic paper, Supranta made a case where photo-z = 4 
 // with one important change: the test_overlap would be given by 
@@ -1033,6 +1030,7 @@ double zdistr_photoz(double zz, int nj)
   static nuisancepara N;
   static int zbins = -1;
   static gsl_spline* photoz_splines[MAX_SIZE_ARRAYS];
+  static gsl_integration_glfixed_table* w = 0;
   // PZ == 4 || PZ == 5
   static int zbins_file = -1;
   static double* z_v_file = 0;
@@ -1053,6 +1051,9 @@ double zdistr_photoz(double zz, int nj)
     
     if (table == 0) 
     {
+      const size_t nsize_integration = 2500 + 500 * (like.high_def_integration);
+      w = gsl_integration_glfixed_table_alloc(nsize_integration);
+
       if (photoz == 4) 
       {
         zbins_file = line_count(redshift.shear_REDSHIFT_FILE);
@@ -1326,11 +1327,10 @@ double zdistr_photoz(double zz, int nj)
         {  
           double ar[2] = {tomo.shear_zmin[i], tomo.shear_zmax[i]};
 
-          norm = like.high_def_integration > 0 ?
-            int_gsl_integrate_high_precision(zdistr_histo_1, NULL, tomo.shear_zmin[i],
-              tomo.shear_zmax[i], NULL, GSL_WORKSPACE_SIZE) :
-            int_gsl_integrate_medium_precision(zdistr_histo_1, NULL, tomo.shear_zmin[i],
-              tomo.shear_zmax[i], NULL, GSL_WORKSPACE_SIZE);
+          gsl_function F;
+          F.params = (void*) ar;
+          F.function = zdistr_histo_1;
+          norm =  gsl_integration_glfixed(&F, tomo.shear_zmin[i], tomo.shear_zmax[i], w);
           
           for (int k=0; k<zbins; k++) 
           {
@@ -2051,6 +2051,7 @@ double pf_photoz(double zz, int nj)
   static double* nz_diag=0;      // PZ == 5
   static double* nz_ext=0;       // PZ == 5
   static double** nz_ext_bin=0;  // PZ == 5
+  static gsl_integration_glfixed_table* w = 0;
 
   const int photoz = (redshift.clustering_photoz == 7) ? 4 : redshift.clustering_photoz;
 
@@ -2064,6 +2065,9 @@ double pf_photoz(double zz, int nj)
 
     if (table == 0) 
     {
+      const size_t nsize_integration = 2250 + 500 * (like.high_def_integration);
+      w = gsl_integration_glfixed_table_alloc(nsize_integration);
+
       if (photoz == 4) 
       { 
         zbins_file = line_count(redshift.clustering_REDSHIFT_FILE);
@@ -2337,11 +2341,11 @@ double pf_photoz(double zz, int nj)
       {
         case 0: // no photo-zs, split 'true' n(z) histogram in bins
         {
-          norm = like.high_def_integration > 0  ?
-            int_gsl_integrate_high_precision(pf_histo, NULL, tomo.clustering_zmin[i],
-              tomo.clustering_zmax[i], NULL, GSL_WORKSPACE_SIZE) :
-            int_gsl_integrate_medium_precision(pf_histo, NULL, tomo.clustering_zmin[i],
-              tomo.clustering_zmax[i], NULL, GSL_WORKSPACE_SIZE);
+          gsl_function F;
+          F.params = NULL;
+          F.function = pf_histo;
+
+          norm = gsl_integration_glfixed(&F, tomo.clustering_zmin[i], tomo.clustering_zmax[i], w);
 
           for (int k=0; k<zbins; k++)
           {
@@ -2447,17 +2451,17 @@ double pf_photoz(double zz, int nj)
         { 
           double ar[1] = {(double) i};
 
-          norm = like.high_def_integration > 0 ?
-            int_gsl_integrate_high_precision(pf_histo_n, (void*) ar,
-              tomo.clustering_zmin[i], tomo.clustering_zmax[i], NULL, GSL_WORKSPACE_SIZE) :
-            int_gsl_integrate_medium_precision(pf_histo_n, (void*) ar,
-              tomo.clustering_zmin[i], tomo.clustering_zmax[i], NULL, GSL_WORKSPACE_SIZE);
+          gsl_function F;
+          F.params = (void*) ar;
+          F.function = pf_histo_n;
 
+          norm = gsl_integration_glfixed(&F, tomo.clustering_zmin[i], tomo.clustering_zmax[i], w);
           if (norm == 0) 
           {
             log_fatal("pf_photoz: norm(nz = %d) = 0", i);
             exit(1);
           }
+
           for (int k=0; k<zbins; k++) 
           {
             table[i + 1][k] = pf_histo_n(z_v[k], (void*) ar)/norm;
@@ -2803,6 +2807,7 @@ double pz_cluster(const double zz, const int nz)
   static double* z_v = 0;
   static int zbins = -1;
   static gsl_spline* photoz_splines[MAX_SIZE_ARRAYS];
+  static gsl_integration_glfixed_table* w = 0;
 
   if (nz < -1 || nz > tomo.cluster_Nbin - 1)
   {
@@ -2824,6 +2829,9 @@ double pz_cluster(const double zz, const int nz)
 
   if (table == 0)
   {
+    const size_t nsize_integration = 2250 + 500 * (like.high_def_integration);
+    w = gsl_integration_glfixed_table_alloc(nsize_integration);
+
     zbins = line_count(redshift.clusters_REDSHIFT_FILE);
  
     table = (double**) malloc(sizeof(double*)*(tomo.cluster_Nbin+1));
@@ -2887,13 +2895,17 @@ double pz_cluster(const double zz, const int nz)
       pf_cluster_histo_n(0., (void*) ar);
     }
     double NORM[11]; 
+    
     #pragma omp parallel for
     for (int i=0; i<tomo.cluster_Nbin; i++)
     {
       double ar[1] = {(double) i};
 
-      const double norm = int_gsl_integrate_medium_precision(pf_cluster_histo_n, (void*) ar, 1E-5, 
-        tomo.cluster_zmax[i] + 1.0, NULL, GSL_WORKSPACE_SIZE) / 
+      gsl_function F;
+      F.params = (void*) ar;
+      F.function = pf_cluster_histo_n;
+      const double norm = 
+        gsl_integration_glfixed(&F, 1E-5, tomo.cluster_zmax[i] + 1.0, w) / 
         (tomo.cluster_zmax[i] - tomo.cluster_zmin[i]);
       
       if (norm == 0) 
@@ -2976,6 +2988,7 @@ double norm_z_cluster(const int nz)
 {
   static cosmopara C;
   static double* table;
+  static gsl_integration_glfixed_table* w = 0;
 
   const int N_z = tomo.clustering_Nbin;
   const double zmin = tomo.cluster_zmin[nz];
@@ -2984,6 +2997,8 @@ double norm_z_cluster(const int nz)
   if (table == 0) 
   {
     table = (double*) malloc(sizeof(double)*N_z);
+    const size_t nsize_integration = 2500 + 50 * (like.high_def_integration);
+    w = gsl_integration_glfixed_table_alloc(nsize_integration);
   }
   if (recompute_cosmo3D(C))
   {
@@ -2995,9 +3010,12 @@ double norm_z_cluster(const int nz)
     #pragma omp parallel for
     for (int i=0; i<N_z; i++)
     {
-      double params[1] = {(double) i};
-      table[i] = int_gsl_integrate_high_precision(dV_cluster, (void*) params, zmin, zmax, NULL, 
-        GSL_WORKSPACE_SIZE);
+      double ar[1] = {(double) i};
+
+      gsl_function F;
+      F.params = (void*) ar;
+      F.function = dV_cluster;
+      table[i] = gsl_integration_glfixed(&F, zmin, zmax, w);
     }
     update_cosmopara(&C);
   }
@@ -3026,9 +3044,14 @@ double int_nsource(double z, void* param __attribute__((unused)))
 double nsource(const int ni) // ni =-1 -> no tomography; ni>= 0 -> tomography bin ni
 { // returns n_gal for shear tomography bin j, works only with binned
   static double* table = 0;
+  static gsl_integration_glfixed_table* w = 0;
+
   if (table == 0) 
   {
     table = (double*) malloc(sizeof(double)*(tomo.shear_Nbin+1));
+    const size_t nsize_integration = 300 + 50 * (like.high_def_integration);
+    w = gsl_integration_glfixed_table_alloc(nsize_integration);
+    
     #pragma GCC diagnostic push
     #pragma GCC diagnostic ignored "-Wunused-variable"
     {
@@ -3053,20 +3076,17 @@ double nsource(const int ni) // ni =-1 -> no tomography; ni>= 0 -> tomography bi
     } 
     else 
     {
-      const double norm = like.high_def_integration > 0 ?
-        int_gsl_integrate_high_precision(int_nsource, NULL, redshift.shear_zdistrpar_zmin,
-          redshift.shear_zdistrpar_zmax, NULL, GSL_WORKSPACE_SIZE) :
-        int_gsl_integrate_medium_precision(int_nsource, NULL, redshift.shear_zdistrpar_zmin,
-          redshift.shear_zdistrpar_zmax, NULL, GSL_WORKSPACE_SIZE);
+      gsl_function F;
+      F.params = NULL;
+      F.function = int_nsource;
+
+      const double norm = gsl_integration_glfixed(&F, 
+        redshift.shear_zdistrpar_zmin, redshift.shear_zdistrpar_zmax, w);
 
       #pragma omp parallel for
       for (int i=0; i<tomo.shear_Nbin; i++) 
       {        
-        const double res = like.high_def_integration > 0 ?
-          int_gsl_integrate_high_precision(int_nsource, NULL, 
-            tomo.shear_zmin[i], tomo.shear_zmax[i], NULL, GSL_WORKSPACE_SIZE) :
-          int_gsl_integrate_medium_precision(int_nsource, NULL, 
-            tomo.shear_zmin[i], tomo.shear_zmax[i], NULL, GSL_WORKSPACE_SIZE);
+        const double res = gsl_integration_glfixed(&F, tomo.shear_zmin[i], tomo.shear_zmax[i], w);
         
         table[i + 1] = res / norm * survey.n_gal;
         
@@ -3077,13 +3097,16 @@ double nsource(const int ni) // ni =-1 -> no tomography; ni>= 0 -> tomography bi
         }
       }
     }
+
     table[0] = survey.n_gal;
   }
+  
   if (ni < -1 || ni > tomo.shear_Nbin - 1)
   {
     log_fatal("invalid bin input ni = %d", ni);
     exit(1);
   } 
+  
   return table[ni + 1];
 }
 
@@ -3095,10 +3118,14 @@ double int_nlens(double z, void *param __attribute__((unused)))
 // returns n_gal for clustering tomography bin ni, works only with binned distributions
 double nlens(int ni) // ni =-1 -> no tomography; ni>= 0 -> tomography bin ni
 {
+  static gsl_integration_glfixed_table* w = 0;
   static double* table = 0;
+  
   if (table == 0) 
   {
     table = (double*) malloc(sizeof(double)*(tomo.clustering_Nbin+1));
+    const size_t nsize_integration = 300 + 50 * (like.high_def_integration);
+    w = gsl_integration_glfixed_table_alloc(nsize_integration);
 
     #pragma GCC diagnostic push
     #pragma GCC diagnostic ignored "-Wunused-variable"
@@ -3106,7 +3133,9 @@ double nlens(int ni) // ni =-1 -> no tomography; ni>= 0 -> tomography bin ni
       double init = pf_photoz(0., 0);
     }
     #pragma GCC diagnostic pop
+    
     const int photoz = (redshift.clustering_photoz == 7) ? 4 : redshift.clustering_photoz;
+    
     if (photoz == 4) 
     {      
       for (int i=0; i<tomo.clustering_Nbin; i++) 
@@ -3116,22 +3145,18 @@ double nlens(int ni) // ni =-1 -> no tomography; ni>= 0 -> tomography bin ni
     } 
     else 
     {
-      const double norm = like.high_def_integration > 0 ?
-        int_gsl_integrate_high_precision(int_nlens, NULL, 
-          tomo.clustering_zmin[0], tomo.clustering_zmax[tomo.clustering_Nbin - 1], NULL,
-          GSL_WORKSPACE_SIZE) :
-        int_gsl_integrate_medium_precision(int_nlens, NULL, 
-          tomo.clustering_zmin[0], tomo.clustering_zmax[tomo.clustering_Nbin - 1], NULL,
-          GSL_WORKSPACE_SIZE);
+      gsl_function F;
+      F.params = NULL;
+      F.function = int_nlens;
+
+      const double norm = gsl_integration_glfixed(&F, 
+        tomo.clustering_zmin[0], tomo.clustering_zmax[tomo.clustering_Nbin - 1], w);
 
       #pragma omp parallel for 
       for (int i=0; i<tomo.clustering_Nbin; i++) 
-      { // OMP: nlens depends on pf_photoz which is already initialized        
-        const double res = like.high_def_integration > 0  ?
-          int_gsl_integrate_high_precision(int_nlens, NULL, 
-            tomo.clustering_zmin[i], tomo.clustering_zmax[i], NULL, GSL_WORKSPACE_SIZE) :
-          int_gsl_integrate_medium_precision(int_nlens, NULL, 
-            tomo.clustering_zmin[i], tomo.clustering_zmax[i], NULL, GSL_WORKSPACE_SIZE);
+      { // OMP: nlens depends on pf_photoz which is already initialized
+        const double res = 
+          gsl_integration_glfixed(&F, tomo.clustering_zmin[i], tomo.clustering_zmax[i], w);
 
         table[i + 1] = res / norm * survey.n_lens;
 
@@ -3144,11 +3169,13 @@ double nlens(int ni) // ni =-1 -> no tomography; ni>= 0 -> tomography bin ni
     }
     table[0] = survey.n_lens;
   }
+  
   if (ni < -1 || ni > tomo.clustering_Nbin - 1)
   {
     log_fatal("invalid bin input ni = %d", ni);
     exit(1);
   } 
+  
   return table[ni + 1];
 }
 
@@ -3168,6 +3195,7 @@ double norm_for_zmean(double z, void* params)
 {
   double* ar = (double*) params;
   const int ni = (int) ar[0];
+  
   if (ni < -1 || ni > tomo.clustering_Nbin - 1)
   {
     log_fatal("invalid bin input ni = %d", ni);
@@ -3178,43 +3206,51 @@ double norm_for_zmean(double z, void* params)
 
 double zmean(const int ni)
 { // mean true redshift of galaxies in tomography bin j
+  static gsl_integration_glfixed_table* w = 0;
   static double* table = 0;
   
   if (table == 0) 
   {
     table = (double*) malloc(sizeof(double)*(tomo.clustering_Nbin+1));
+    const size_t nsize_integration = 300 + 50 * (like.high_def_integration);
+    w = gsl_integration_glfixed_table_alloc(nsize_integration);
+
     #pragma GCC diagnostic push
     #pragma GCC diagnostic ignored "-Wunused-variable"
+    #pragma GCC diagnostic push
+    #pragma GCC diagnostic ignored "-Wunused-but-set-variable"
     {
       double init = pf_photoz(0., 0);
     }
     #pragma GCC diagnostic pop
+    #pragma GCC diagnostic pop
+    
     #pragma omp parallel for
     for (int i=0; i<tomo.clustering_Nbin; i++) 
     {
       double ar[1] = {(double) i};
-      table[i] = 
-        like.high_def_integration == 2 ?
-        int_gsl_integrate_high_precision(int_for_zmean, (void*) ar, 
-          tomo.clustering_zmin[i], tomo.clustering_zmax[i], NULL, GSL_WORKSPACE_SIZE) /
-        int_gsl_integrate_high_precision(norm_for_zmean, (void*) ar, tomo.clustering_zmin[i],
-          tomo.clustering_zmax[i], NULL, GSL_WORKSPACE_SIZE) :
-        like.high_def_integration == 1 ?
-        int_gsl_integrate_medium_precision(int_for_zmean, (void*) ar, 
-          tomo.clustering_zmin[i], tomo.clustering_zmax[i], NULL, GSL_WORKSPACE_SIZE) /
-        int_gsl_integrate_medium_precision(norm_for_zmean, (void*) ar, tomo.clustering_zmin[i],
-          tomo.clustering_zmax[i], NULL, GSL_WORKSPACE_SIZE) :
-        int_gsl_integrate_low_precision(int_for_zmean, (void*) ar, 
-          tomo.clustering_zmin[i], tomo.clustering_zmax[i], NULL, GSL_WORKSPACE_SIZE) /
-        int_gsl_integrate_low_precision(norm_for_zmean, (void*) ar, tomo.clustering_zmin[i],
-          tomo.clustering_zmax[i], NULL, GSL_WORKSPACE_SIZE);
+      
+      gsl_function F;
+      F.params = ar;
+      
+      F.function = int_for_zmean;
+      const double num = 
+        gsl_integration_glfixed(&F, tomo.clustering_zmin[i], tomo.clustering_zmax[i], w);
+
+      F.function = norm_for_zmean;
+      const double den = 
+         gsl_integration_glfixed(&F, tomo.clustering_zmin[i], tomo.clustering_zmax[i], w);
+
+      table[i] = num/den;
     }
   }
+
   if (ni < -1 || ni > tomo.clustering_Nbin - 1)
   {
     log_fatal("invalid bin input ni = %d", ni);
     exit(1);
   } 
+  
   return table[ni];
 }
 
@@ -3222,6 +3258,7 @@ double int_for_zmean_source(double z, void* params)
 {
   double* ar = (double*) params;
   const int ni = (int) ar[0];
+  
   if (ni < -1 || ni > tomo.shear_Nbin - 1)
   {
     log_fatal("invalid bin input ni = %d", ni);
@@ -3232,33 +3269,44 @@ double int_for_zmean_source(double z, void* params)
 
 double zmean_source(int ni) 
 { // mean true redshift of source galaxies in tomography bin j
+  static gsl_integration_glfixed_table* w = 0;
   static double* table = 0;
   
   if (table == 0) 
   {
     table = (double*) malloc(sizeof(double)*tomo.shear_Nbin);
+    const size_t nsize_integration = 300 + 50 * (like.high_def_integration);
+    w = gsl_integration_glfixed_table_alloc(nsize_integration);
+
     #pragma GCC diagnostic push
     #pragma GCC diagnostic ignored "-Wunused-variable"
+    #pragma GCC diagnostic push
+    #pragma GCC diagnostic ignored "-Wunused-but-set-variable"
     {
       double init = zdistr_photoz(0., 0);
     }
     #pragma GCC diagnostic pop
+    #pragma GCC diagnostic pop
+
     #pragma omp parallel for
     for (int i=0; i<tomo.shear_Nbin; i++) 
     {
       double ar[1] = {(double) i};
-      table[i] = like.high_def_integration > 0 ? 
-        int_gsl_integrate_high_precision(int_for_zmean_source, (void*) ar, 
-          tomo.shear_zmin[i], tomo.shear_zmax[i], NULL, GSL_WORKSPACE_SIZE) :
-        int_gsl_integrate_medium_precision(int_for_zmean_source, (void*) ar, 
-          tomo.shear_zmin[i], tomo.shear_zmax[i], NULL, GSL_WORKSPACE_SIZE);
+      gsl_function F;
+      F.params = ar;
+      F.function = int_for_zmean_source;
+      
+      table[i] = 
+        gsl_integration_glfixed(&F, tomo.shear_zmin[i], tomo.shear_zmax[i], w);
     }
   }
+
   if (ni < 0 || ni > tomo.shear_Nbin - 1)
   {
     log_fatal("invalid bin input ni = %d", ni);
     exit(1);
-  } 
+  }
+
   return table[ni];
 }
 
@@ -3266,11 +3314,12 @@ double max_g_tomo(int zs)
 {
   int i = 0;
   double max = 0;
+  
   for (double z=0.; z<tomo.shear_zmax[zs]; z += tomo.shear_zmax[zs] / 50.) 
   {
     if (i != 0)
     {
-      if (!fabs(z>0))
+      if (!(fabs(z) > 0))
       {
         log_fatal("z = 0 with 1/z needed");
         exit(1);
@@ -3287,6 +3336,7 @@ double max_g_tomo(int zs)
       i++;
     }
   }
+  
   return max;
 }
 
@@ -3323,7 +3373,8 @@ double g_tomo(double ainput, int ni) // for tomography bin ni
   static nuisancepara N;
   static cosmopara C;
   static double** table = 0;
-  
+  static gsl_integration_glfixed_table* w = 0;
+
   const int N_z = tomo.shear_Nbin;
   const int N_a = Ntable.N_a; 
   const double amin = 1.0/(redshift.shear_zdistrpar_zmax + 1.0);
@@ -3337,7 +3388,10 @@ double g_tomo(double ainput, int ni) // for tomography bin ni
     {
       table[i] = (double*) malloc(sizeof(double)*N_a);
     }
+    const size_t nsize_integration = 210 + 50 * (like.high_def_integration);
+    w = gsl_integration_glfixed_table_alloc(nsize_integration);
   }
+
   if (recompute_zphot_shear(N) || recompute_cosmo3D(C)) 
   {
     { // init static variables
@@ -3348,9 +3402,12 @@ double g_tomo(double ainput, int ni) // for tomography bin ni
         ar[0] = (double) j; 
         #pragma GCC diagnostic push
         #pragma GCC diagnostic ignored "-Wunused-variable"
+        #pragma GCC diagnostic push
+        #pragma GCC diagnostic ignored "-Wunused-but-set-variable"
         {
           double init = int_for_g_tomo(amin, (void*) ar);
         }
+        #pragma GCC diagnostic pop
         #pragma GCC diagnostic pop
       } 
       if (tomo.shear_Nbin > 0) 
@@ -3360,12 +3417,16 @@ double g_tomo(double ainput, int ni) // for tomography bin ni
 
         #pragma GCC diagnostic push
         #pragma GCC diagnostic ignored "-Wunused-variable"
+        #pragma GCC diagnostic push
+        #pragma GCC diagnostic ignored "-Wunused-but-set-variable"
         {
           double init = int_for_g_tomo(amin, (void*) ar);
         }
         #pragma GCC diagnostic pop
+        #pragma GCC diagnostic pop
       }
-    }    
+    }
+
     #pragma omp parallel for collapse(2)
     for (int j=-1; j<tomo.shear_Nbin; j++) 
     {
@@ -3376,18 +3437,15 @@ double g_tomo(double ainput, int ni) // for tomography bin ni
         double ar[2];
         ar[0] = (double) j;          
         ar[1] = chi(a);
+
+        gsl_function F;
+        F.params = ar;
+        F.function = int_for_g_tomo;
         
-        table[j+1][i] = 
-          like.high_def_integration == 2 ?
-          int_gsl_integrate_high_precision(int_for_g_tomo,
-            (void*) ar, amin, a, NULL, GSL_WORKSPACE_SIZE) :          
-          like.high_def_integration == 1 ? 
-          int_gsl_integrate_medium_precision(int_for_g_tomo,
-            (void*) ar, amin, a, NULL, GSL_WORKSPACE_SIZE) :
-          int_gsl_integrate_low_precision(int_for_g_tomo,
-            (void*) ar, amin, a, NULL, GSL_WORKSPACE_SIZE);
+        table[j+1][i] = gsl_integration_glfixed(&F, amin, a, w);
       }
     }
+
     update_nuisance(&N);
     update_cosmopara(&C);
   }
@@ -3407,7 +3465,6 @@ double g_tomo(double ainput, int ni) // for tomography bin ni
   {
     res = interpol(table[ni + 1], Ntable.N_a, amin, amax, da, ainput, 1.0, 1.0); 
   }
-
   return res;
 }
 
@@ -3436,6 +3493,7 @@ double g2_tomo(double a, int ni)
   static nuisancepara N;
   static cosmopara C;
   static double** table = 0;
+  static gsl_integration_glfixed_table* w = 0;
 
   const int N_z = tomo.shear_Nbin; 
   const int N_a = Ntable.N_a; 
@@ -3450,6 +3508,8 @@ double g2_tomo(double a, int ni)
     {
       table[i] = (double*) malloc(sizeof(double)*N_a);
     }
+    const size_t nsize_integration = 200 + 50 * (like.high_def_integration);
+    w = gsl_integration_glfixed_table_alloc(nsize_integration);
   }
   if (recompute_zphot_shear(N) || recompute_cosmo3D(C)) 
   {
@@ -3461,9 +3521,12 @@ double g2_tomo(double a, int ni)
         ar[0] = (double) j; 
         #pragma GCC diagnostic push
         #pragma GCC diagnostic ignored "-Wunused-variable"
+        #pragma GCC diagnostic push
+        #pragma GCC diagnostic ignored "-Wunused-but-set-variable"
         {
           double init = int_for_g2_tomo(amin, (void*) ar);
         }
+        #pragma GCC diagnostic pop
         #pragma GCC diagnostic pop
       } 
       if (tomo.shear_Nbin > 0) 
@@ -3473,12 +3536,16 @@ double g2_tomo(double a, int ni)
 
         #pragma GCC diagnostic push
         #pragma GCC diagnostic ignored "-Wunused-variable"
+        #pragma GCC diagnostic push
+        #pragma GCC diagnostic ignored "-Wunused-but-set-variable"
         {
           double init = int_for_g2_tomo(amin, (void*) ar);
         }
         #pragma GCC diagnostic pop
+        #pragma GCC diagnostic pop
       }
-    }     
+    }
+
     #pragma omp parallel for collapse(2)
     for (int j=-1; j<tomo.shear_Nbin; j++) 
     {
@@ -3490,13 +3557,14 @@ double g2_tomo(double a, int ni)
         ar[0] = (double) j;          
         ar[1] = chi(a);
 
-        table[j+1][i] = like.high_def_integration > 0 ? 
-          int_gsl_integrate_high_precision(int_for_g2_tomo,
-            (void*) ar, amin, a, NULL, GSL_WORKSPACE_SIZE) :
-          int_gsl_integrate_medium_precision(int_for_g2_tomo,
-            (void*) ar, amin, a, NULL, GSL_WORKSPACE_SIZE);
+        gsl_function F;
+        F.params = ar;
+        F.function = int_for_g2_tomo;
+
+        table[j+1][i] = gsl_integration_glfixed(&F, amin, a, w);
       }
     }
+
     update_nuisance(&N);
     update_cosmopara(&C);
   }
@@ -3542,7 +3610,8 @@ double g_lens(double a, int ni)
   static nuisancepara N;
   static cosmopara C;
   static double** table = 0;
-  
+  static gsl_integration_glfixed_table* w = 0;
+
   const int N_z = tomo.clustering_Nbin; 
   const int N_a = Ntable.N_a;
   const double amin = 1.0/(redshift.clustering_zdistrpar_zmax + 1.0);
@@ -3557,7 +3626,10 @@ double g_lens(double a, int ni)
     {
       table[i] = (double*) malloc(sizeof(double)*N_a);
     }
+    const size_t nsize_integration = 200 + 50 * (like.high_def_integration);
+    w = gsl_integration_glfixed_table_alloc(nsize_integration);
   }
+
   if (recompute_zphot_clustering(N) || recompute_cosmo3D(C)) 
   {
     {
@@ -3568,9 +3640,12 @@ double g_lens(double a, int ni)
         ar[0] = (double) j; // j = -1, no tomography is being done        
         #pragma GCC diagnostic push
         #pragma GCC diagnostic ignored "-Wunused-variable"
+        #pragma GCC diagnostic push
+        #pragma GCC diagnostic ignored "-Wunused-but-set-variable"
         {
           double init = int_for_g_lens(amin_shear, (void*) ar);
         }
+        #pragma GCC diagnostic pop
         #pragma GCC diagnostic pop
         if (tomo.clustering_Nbin > 0) 
         {
@@ -3578,13 +3653,17 @@ double g_lens(double a, int ni)
           ar[0] = (double) j;
           #pragma GCC diagnostic push
           #pragma GCC diagnostic ignored "-Wunused-variable"
+          #pragma GCC diagnostic push
+          #pragma GCC diagnostic ignored "-Wunused-but-set-variable"
           {
             double init = int_for_g_lens(amin_shear, (void*) ar);
           }
           #pragma GCC diagnostic pop 
+          #pragma GCC diagnostic pop
         }
       }
     }
+
     #pragma omp parallel for collapse(2)
     for (int j=-1; j<tomo.clustering_Nbin; j++) 
     {
@@ -3595,15 +3674,12 @@ double g_lens(double a, int ni)
 
         const double a =  amin + i*da;
         ar[1] = chi(a);
-        
-        table[j + 1][i] = like.high_def_integration == 2 ?
-          int_gsl_integrate_high_precision(int_for_g_lens,
-            (void*) ar, amin_shear, a, NULL, GSL_WORKSPACE_SIZE) : 
-          like.high_def_integration == 1 ?
-          int_gsl_integrate_medium_precision(int_for_g_lens,
-            (void*) ar, amin_shear, a, NULL, GSL_WORKSPACE_SIZE) :
-          int_gsl_integrate_low_precision(int_for_g_lens,
-            (void*) ar, amin_shear, a, NULL, GSL_WORKSPACE_SIZE);
+
+        gsl_function F;
+        F.params = ar;
+        F.function = int_for_g_lens;
+
+        table[j + 1][i] = gsl_integration_glfixed(&F, amin_shear, a, w);
       }
     }
     update_nuisance(&N);
@@ -3615,6 +3691,7 @@ double g_lens(double a, int ni)
     log_fatal("invalid bin input ni = %d", ni);
     exit(1);
   }
+
   double res;
   if (a < amin || a > 1.0 - da) 
   {
@@ -3667,6 +3744,7 @@ double g_lens_cluster(const double a, const int nz, const int nl)
 { 
   static cosmopara C;
   static double** table = 0;
+  static gsl_integration_glfixed_table* w = 0;
 
   const int N_z = tomo.cluster_Nbin;
   const int N_l = Cluster.N200_Nbin;
@@ -3675,6 +3753,7 @@ double g_lens_cluster(const double a, const int nz, const int nl)
     log_fatal("invalid bin input ni = %d (max %d)", nl, N_l);
     exit(1);
   } 
+  
   const int na =  Ntable.N_a; 
   const double amin = 1.0/(tomo.cluster_zmax[tomo.cluster_Nbin - 1] + 1.);
   const double amax = 0.999999;
@@ -3687,7 +3766,11 @@ double g_lens_cluster(const double a, const int nz, const int nl)
     {
       table[i] = (double*) malloc(sizeof(double)*na);
     }
+
+    const size_t nsize_integration = 300 + 50 * (like.high_def_integration);
+    w = gsl_integration_glfixed_table_alloc(nsize_integration);
   }
+
   if (recompute_cosmo3D(C) /* there is no nuisance bias/sigma parameters yet*/)
   {
     { // init static vars only, if j=-1, no tomography is being done
@@ -3701,7 +3784,8 @@ double g_lens_cluster(const double a, const int nz, const int nl)
         ar[0] = (double) 0;
         int_for_g_lens_cl(amin, (void*) ar);
       }
-    } 
+    }
+
     #pragma omp parallel for collapse(2)
     for (int j=-1; j<N_z; j++) 
     { 
@@ -3712,12 +3796,19 @@ double g_lens_cluster(const double a, const int nz, const int nl)
         ar[0] = (double) j; 
         ar[1] = aa;
         ar[2] = nl;
-        table[j + 1][i] = int_gsl_integrate_medium_precision(int_for_g_lens_cl, (void*) ar, 
-          1.0/(redshift.shear_zdistrpar_zmax + 1.0), aa, NULL, 4000); 
+
+        gsl_function F;
+        F.params = ar;
+        F.function = int_for_g_lens_cl;
+
+        table[j + 1][i] = 
+          gsl_integration_glfixed(&F, 1.0/(redshift.shear_zdistrpar_zmax + 1.0), aa, w);
       }      
-    }  
+    } 
+
     update_cosmopara(&C);
   }
+
   if (nz < -1 || nz > N_z - 1)
   {
     log_fatal("invalid bin input ni = %d (max %d)", nz, N_z);
@@ -3741,7 +3832,7 @@ double g_lens_cluster(const double a, const int nz, const int nl)
 
 double int_for_ggl_efficiency(double z, void* params) 
 {
-  if (!fabs(z>0)) 
+  if (!(fabs(z) > 0)) 
   {
     log_fatal("z = 0 with 1/z needed");
     exit(1);
@@ -3763,15 +3854,19 @@ double int_for_ggl_efficiency(double z, void* params)
 double ggl_efficiency(int ni, int nj) 
 {
   static double** table = 0;
-  
+  static gsl_integration_glfixed_table* w = 0;
+
   if (table == 0) 
   {
     #pragma GCC diagnostic push
     #pragma GCC diagnostic ignored "-Wunused-variable"
+    #pragma GCC diagnostic push
+    #pragma GCC diagnostic ignored "-Wunused-but-set-variable"
     {
-      double init = pf_photoz(0, 0);
+      double init  = pf_photoz(0, 0);
       double init2 = zdistr_photoz(0, 0);
     }
+    #pragma GCC diagnostic pop
     #pragma GCC diagnostic pop
     
     table = (double**) malloc(sizeof(double*)*(tomo.clustering_Nbin+1));
@@ -3779,6 +3874,10 @@ double ggl_efficiency(int ni, int nj)
     {
       table[i] = (double*) malloc(sizeof(double)*(tomo.shear_Nbin+1));
     }
+
+    const size_t nsize_integration = 300 + 50 * (like.high_def_integration);
+    w = gsl_integration_glfixed_table_alloc(nsize_integration);
+
     {
       const int i = 0;
       const int j = 0;
@@ -3787,10 +3886,13 @@ double ggl_efficiency(int ni, int nj)
       ar[1] = (double) j;
       #pragma GCC diagnostic push
       #pragma GCC diagnostic ignored "-Wunused-variable"
+      #pragma GCC diagnostic ignored "-Wunused-but-set-variable"
       double init = int_for_ggl_efficiency(tomo.clustering_zmin[i], (void*) ar);
-      double init2 = max_g_tomo(j);
+      init = max_g_tomo(j);
+      #pragma GCC diagnostic pop
       #pragma GCC diagnostic pop
     }
+
     #pragma omp parallel for collapse (2)
     for (int i=0; i<tomo.clustering_Nbin; i++) 
     {
@@ -3799,16 +3901,17 @@ double ggl_efficiency(int ni, int nj)
         double ar[2];
         ar[0] = (double) i;
         ar[1] = (double) j;
-        table[i][j] = like.high_def_integration > 0 ?
-          int_gsl_integrate_high_precision(int_for_ggl_efficiency, (void*) ar,
-            tomo.clustering_zmin[i], tomo.clustering_zmax[i], NULL, 
-            GSL_WORKSPACE_SIZE)/max_g_tomo(j) :
-          int_gsl_integrate_medium_precision(int_for_ggl_efficiency, (void*) ar,
-            tomo.clustering_zmin[i], tomo.clustering_zmax[i], NULL, 
-            GSL_WORKSPACE_SIZE)/max_g_tomo(j);
+    
+        gsl_function F;
+        F.params = ar;
+        F.function = int_for_ggl_efficiency;
+
+        table[i][j] = gsl_integration_glfixed(&F, tomo.clustering_zmin[i], 
+          tomo.clustering_zmax[i], w)/max_g_tomo(j);
       }
     }
   }
+
   if(ni < 0 || ni > tomo.clustering_Nbin - 1 || nj < 0 || nj > tomo.shear_Nbin - 1)
   {
     log_fatal("invalid bin input (ni, nj) = (%d, %d)", ni, nj);

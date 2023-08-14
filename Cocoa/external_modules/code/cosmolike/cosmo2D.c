@@ -7,6 +7,7 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include <gsl/gsl_integration.h>
 #include "../cfftlog/cfftlog.h"
 #include <fftw3.h>
 
@@ -24,7 +25,6 @@
 
 #include "log.c/src/log.h"
 
-static int GSL_WORKSPACE_SIZE = 250;
 static int use_linear_ps_limber = 0; // 0 or 1 
 
 static int include_HOD_GX = 0; // 0 or 1
@@ -479,7 +479,7 @@ double w_gammat_tomo(const int nt, const int ni, const int nj, const int limber)
   static cosmopara C;
   static nuisancepara N;
   static galpara G;
-    
+
   const int nell = limits.LMAX;
   const int ntheta = like.Ntheta;
   const int NSIZE = tomo.ggl_Npowerspectra;
@@ -595,20 +595,28 @@ double w_gammat_tomo(const int nt, const int ni, const int nj, const int limber)
     {
       double init_static_vars_only = C_gs_tomo_limber(limits.LMIN_tab, ZL(0), ZS(0), 0);
     }
-    
     #pragma GCC diagnostic pop
+
     if (limber == 1)
     {
       #pragma omp parallel for collapse(2)
       for (int nz=0; nz<NSIZE; nz++)
       {
-        for (int l=2; l<nell; l++)
+        for (int l=2; l<limits.LMIN_tab; l++)
         {
           const int ZLNZ = ZL(nz);
           const int ZSNZ = ZS(nz);
-          Cl[nz][l] = (l > limits.LMIN_tab) ?
-            C_gs_tomo_limber((double) l, ZLNZ, ZSNZ, 1) :
-            C_gs_tomo_limber_nointerp((double) l, ZLNZ, ZSNZ, use_linear_ps_limber, 0);
+          Cl[nz][l] = C_gs_tomo_limber_nointerp((double) l, ZLNZ, ZSNZ, use_linear_ps_limber, 0);
+        }
+      }
+      #pragma omp parallel for collapse(2)
+      for (int nz=0; nz<NSIZE; nz++)
+      {
+        for (int l=limits.LMIN_tab; l<nell; l++)
+        {
+          const int ZLNZ = ZL(nz);
+          const int ZSNZ = ZS(nz);
+          Cl[nz][l] = C_gs_tomo_limber((double) l, ZLNZ, ZSNZ, 1);
         }
       }
     }
@@ -2612,6 +2620,8 @@ double int_for_C_ss_tomo_TATT_BB_limber(double a, void* params)
 
 double C_ss_tomo_TATT_EE_limber_nointerp(double l, int ni, int nj, const int init_static_vars_only)
 {
+  static gsl_integration_glfixed_table* w = 0;
+
   if(ni < -1 || ni > tomo.shear_Nbin -1 || nj < -1 || nj > tomo.shear_Nbin -1)
   {
     log_fatal("invalid bin input (ni, nj) = (%d, %d)", ni, nj);
@@ -2621,19 +2631,30 @@ double C_ss_tomo_TATT_EE_limber_nointerp(double l, int ni, int nj, const int ini
   const double amin = fmax(amin_source(ni), amin_source(nj));
   const double amax = fmin(amax_source(ni), amax_source(nj));
 
-  return (init_static_vars_only == 1) ? int_for_C_ss_tomo_TATT_EE_limber(amin, (void*) ar) : 
-    like.high_def_integration == 2 ?
-      int_gsl_integrate_high_precision(int_for_C_ss_tomo_TATT_EE_limber, (void*) ar, 
-        amin, amax, NULL, GSL_WORKSPACE_SIZE) :
-    like.high_def_integration == 1 ?
-      int_gsl_integrate_medium_precision(int_for_C_ss_tomo_TATT_EE_limber, (void*) ar, 
-        amin, amax, NULL, GSL_WORKSPACE_SIZE) :
-      int_gsl_integrate_low_precision(int_for_C_ss_tomo_TATT_EE_limber, (void*) ar, 
-        amin, amax, NULL, GSL_WORKSPACE_SIZE);
+  double res = 0.0;
+  if (init_static_vars_only == 1)
+  {
+    if (w == 0)
+    {
+      const size_t nsize_integration = 60 + 50 * (like.high_def_integration);
+      w = gsl_integration_glfixed_table_alloc(nsize_integration);
+    }
+    res = int_for_C_ss_tomo_TATT_EE_limber(amin, (void*) ar);
+  } 
+  else
+  {
+    gsl_function F;
+    F.params = (void*) ar;
+    F.function = int_for_C_ss_tomo_TATT_EE_limber;
+    res = gsl_integration_glfixed(&F, amin, amax, w);
+  }
+  return res;
 }
 
 double C_ss_tomo_TATT_BB_limber_nointerp(double l, int ni, int nj, const int init_static_vars_only)
 {
+  static gsl_integration_glfixed_table* w = 0;
+
   if(ni < -1 || ni > tomo.shear_Nbin -1 || nj < -1 || nj > tomo.shear_Nbin -1)
   {
     log_fatal("invalid bin input (ni, nj) = (%d, %d)", ni, nj);
@@ -2649,15 +2670,24 @@ double C_ss_tomo_TATT_BB_limber_nointerp(double l, int ni, int nj, const int ini
     exit(1);
   }
 
-  return (init_static_vars_only == 1) ? int_for_C_ss_tomo_TATT_BB_limber(amin, (void*) ar) : 
-    like.high_def_integration == 2 ?
-    int_gsl_integrate_high_precision(int_for_C_ss_tomo_TATT_BB_limber, (void*) ar,
-      amin, amax, NULL, GSL_WORKSPACE_SIZE) :
-    like.high_def_integration == 1 ?
-    int_gsl_integrate_medium_precision(int_for_C_ss_tomo_TATT_BB_limber, (void*) ar,
-      amin, amax, NULL, GSL_WORKSPACE_SIZE) :
-    int_gsl_integrate_low_precision(int_for_C_ss_tomo_TATT_BB_limber, (void*) ar,
-      amin, amax, NULL, GSL_WORKSPACE_SIZE);
+  double res = 0.0;
+  if (init_static_vars_only == 1)
+  {
+    if (w == 0)
+    {
+      const size_t nsize_integration = 60 + 50 * (like.high_def_integration);
+      w = gsl_integration_glfixed_table_alloc(nsize_integration);
+    }
+    res = int_for_C_ss_tomo_TATT_BB_limber(amin, (void*) ar);
+  }
+  else
+  {
+    gsl_function F;
+    F.params = (void*) ar;
+    F.function = int_for_C_ss_tomo_TATT_BB_limber;
+    res = gsl_integration_glfixed(&F, amin, amax, w);
+  }
+  return res;
 }
 
 double C_ss_tomo_TATT_EE_limber(const double l, const int ni, const int nj, 
@@ -3035,6 +3065,8 @@ double int_for_C_ss_tomo_limber(double a, void* params)
 double C_ss_tomo_limber_nointerp(double l, int ni, int nj, int use_linear_ps, 
 const int init_static_vars_only)
 {
+  static gsl_integration_glfixed_table* w = 0;
+
   if(ni < -1 || ni > tomo.shear_Nbin -1 || nj < -1 || nj > tomo.shear_Nbin -1)
   {
     log_fatal("invalid bin input (ni, nj) = (%d, %d)", ni, nj);
@@ -3050,15 +3082,24 @@ const int init_static_vars_only)
     exit(1);
   }
 
-  return (init_static_vars_only == 1) ? int_for_C_ss_tomo_limber(amin, (void*) ar) :
-    like.high_def_integration == 2 ?
-    int_gsl_integrate_high_precision(int_for_C_ss_tomo_limber, (void*) ar, amin, amax, NULL, 
-      GSL_WORKSPACE_SIZE) :
-    like.high_def_integration == 1 ?
-    int_gsl_integrate_medium_precision(int_for_C_ss_tomo_limber, (void*) ar, amin, amax, NULL, 
-      GSL_WORKSPACE_SIZE) :
-    int_gsl_integrate_low_precision(int_for_C_ss_tomo_limber, (void*) ar, amin, amax, NULL, 
-      GSL_WORKSPACE_SIZE);       
+  double res = 0.0;
+  if (init_static_vars_only == 1)
+  {
+    if (w == 0)
+    {
+      const size_t nsize_integration = 60 + 50 * (like.high_def_integration);
+      w = gsl_integration_glfixed_table_alloc(nsize_integration);
+    }
+    res = int_for_C_ss_tomo_limber(amin, (void*) ar);
+  }
+  else
+  {
+    gsl_function F;
+    F.params = (void*) ar;
+    F.function = int_for_C_ss_tomo_limber;
+    res = gsl_integration_glfixed(&F, amin, amax, w);
+  }
+  return res;     
 }
 
 double C_ss_tomo_limber(double l, int ni, int nj, const int force_no_recompute)
@@ -3153,6 +3194,7 @@ double C_ss_tomo_limber(double l, int ni, int nj, const int force_no_recompute)
   }
   return f1;
 }
+
 
 // ---------------------------------------------------------------------------
 // ---------------------------------------------------------------------------
@@ -3458,6 +3500,8 @@ double int_for_C_gs_tomo_limber_withb2(double a, void* params)
 double C_gs_tomo_limber_nointerp(double l, int nl, int ns, int use_linear_ps,
 const int init_static_vars_only)
 {
+  static gsl_integration_glfixed_table* w = 0;
+  
   if(nl < -1 || nl > tomo.clustering_Nbin -1 || ns < -1 || ns > tomo.shear_Nbin -1)
   {
     log_fatal("invalid bin input (ni, nj) = (%d, %d)", nl, ns);
@@ -3479,59 +3523,70 @@ const int init_static_vars_only)
   }
 
   double res;
-  if (like.IA == 0 || like.IA == 1 || like.IA == 3 || like.IA == 4)
+  if (init_static_vars_only == 1)
   {
-    if (has_b2_galaxies() && use_linear_ps == 0)
+    if (w == 0)
     {
-      res = (init_static_vars_only == 1) ? int_for_C_gs_tomo_limber_withb2(amin, (void*) ar) :
-        like.high_def_integration == 2 ?
-        int_gsl_integrate_high_precision(int_for_C_gs_tomo_limber_withb2, (void*) ar, amin, amax, 
-          NULL, GSL_WORKSPACE_SIZE) :
-        like.high_def_integration == 1 ?
-        int_gsl_integrate_medium_precision(int_for_C_gs_tomo_limber_withb2, (void*) ar, amin, amax, 
-          NULL, GSL_WORKSPACE_SIZE) :
-        int_gsl_integrate_low_precision(int_for_C_gs_tomo_limber_withb2, (void*) ar, amin, amax, 
-          NULL, GSL_WORKSPACE_SIZE);
+      const size_t nsize_integration = 120 + 50 * (like.high_def_integration);
+      w = gsl_integration_glfixed_table_alloc(nsize_integration);
     }
-    else 
+
+    if (like.IA == 0 || like.IA == 1 || like.IA == 3 || like.IA == 4)
     {
-      res = (init_static_vars_only == 1) ? int_for_C_gs_tomo_limber(amin, (void*) ar) :
-        like.high_def_integration == 2 ?
-        int_gsl_integrate_high_precision(int_for_C_gs_tomo_limber, (void*) ar, amin, amax, NULL, 
-          GSL_WORKSPACE_SIZE) :
-        like.high_def_integration == 1 ?
-        int_gsl_integrate_medium_precision(int_for_C_gs_tomo_limber, (void*) ar, amin, amax, NULL, 
-          GSL_WORKSPACE_SIZE) :
-        int_gsl_integrate_low_precision(int_for_C_gs_tomo_limber, (void*) ar, amin, amax, NULL, 
-          GSL_WORKSPACE_SIZE); 
+      if (has_b2_galaxies() && use_linear_ps == 0)
+      {
+        res = int_for_C_gs_tomo_limber_withb2(amin, (void*) ar);
+      }
+      else 
+      {
+        res = int_for_C_gs_tomo_limber(amin, (void*) ar);
+      }
     }
-  }
-  else if (like.IA == 5 || like.IA == 6)
-  {
-    if (use_linear_ps == 1)
+    else if (like.IA == 5 || like.IA == 6)
     {
-      log_fatal("use linear power spectrum option not implemented with TATT");
-      exit(1);
-      return 0;
+      res = int_for_C_gs_tomo_limber_TATT(amin, (void*) ar);
     }
     else
     {
-      res = (init_static_vars_only == 1) ? int_for_C_gs_tomo_limber_TATT(amin, (void*) ar) :
-        like.high_def_integration == 2 ?
-        int_gsl_integrate_high_precision(int_for_C_gs_tomo_limber_TATT, (void*) ar, amin, amax, 
-          NULL, GSL_WORKSPACE_SIZE) :
-        like.high_def_integration == 1 ?
-        int_gsl_integrate_medium_precision(int_for_C_gs_tomo_limber_TATT, (void*) ar, amin, amax, 
-          NULL, GSL_WORKSPACE_SIZE) :
-        int_gsl_integrate_low_precision(int_for_C_gs_tomo_limber_TATT, (void*) ar, amin, amax, 
-          NULL, GSL_WORKSPACE_SIZE);
+      log_fatal("like.IA = %d not supported", like.IA);
+      exit(1);
+      return 0;
     }
   }
   else
-  {
-    log_fatal("like.IA = %d not supported", like.IA);
-    exit(1);
-    return 0;
+  {    
+    gsl_function F;
+    F.params = (void*) ar;
+    
+    if (like.IA == 0 || like.IA == 1 || like.IA == 3 || like.IA == 4)
+    {
+      if (has_b2_galaxies() && use_linear_ps == 0)
+      {    
+        F.function = int_for_C_gs_tomo_limber_withb2;
+      }
+      else 
+      {
+        F.function = int_for_C_gs_tomo_limber;
+      }
+    }
+    else if (like.IA == 5 || like.IA == 6)
+    {
+      if (use_linear_ps == 1)
+      {
+        log_fatal("use linear power spectrum option not implemented with TATT");
+        exit(1);
+        return 0;
+      }
+      F.function = int_for_C_gs_tomo_limber_TATT;
+    }
+    else
+    {
+      log_fatal("like.IA = %d not supported", like.IA);
+      exit(1);
+      return 0;
+    }
+
+    res = gsl_integration_glfixed(&F, amin, amax, w);
   }
   return res;
 }
@@ -3681,6 +3736,7 @@ double C_gs_tomo_limber(double l, int ni, int nj, const int force_no_recompute)
 
   return isnan(f1) ? 0.0 : f1;
 }
+
 
 // ---------------------------------------------------------------------------
 // ---------------------------------------------------------------------------
@@ -3857,6 +3913,8 @@ double int_for_C_gg_tomo_limber_withb2(double a, void* params)
 double C_gg_tomo_limber_nointerp(double l, int ni, int nj, int use_linear_ps,
 const int init_static_vars_only)
 {
+  static gsl_integration_glfixed_table* w = 0;
+
   if (ni < 0 || ni > tomo.clustering_Nbin - 1 || nj < 0 || nj > tomo.clustering_Nbin - 1)
   {
     log_fatal("error in selecting bin number (ni, nj) = [%d,%d]", ni, nj);
@@ -3881,27 +3939,37 @@ const int init_static_vars_only)
     exit(1);
   }
 
-  double res;
-  if (has_b2_galaxies() && use_linear_ps == 0)
+  double res = 0.0;
+  if (init_static_vars_only == 1)
   {
-    res = (init_static_vars_only == 1) ? int_for_C_gg_tomo_limber_withb2(amin, (void*) ar) :
-      like.high_def_integration == 2 ?
-      int_gsl_integrate_high_precision(int_for_C_gg_tomo_limber_withb2, (void*) ar, amin, amax, 
-        NULL, GSL_WORKSPACE_SIZE) :
-      like.high_def_integration == 1 ?
-      int_gsl_integrate_medium_precision(int_for_C_gg_tomo_limber_withb2, (void*) ar, amin, amax, 
-        NULL, GSL_WORKSPACE_SIZE) :
-      int_gsl_integrate_low_precision(int_for_C_gg_tomo_limber_withb2, (void*) ar, amin, amax, NULL, 
-        GSL_WORKSPACE_SIZE);
+    if (w == 0)
+    {
+      const size_t nsize_integration = 175 + 50 * (like.high_def_integration);
+      w = gsl_integration_glfixed_table_alloc(nsize_integration);
+    }
+    if (has_b2_galaxies() && use_linear_ps == 0)
+    {
+      res = int_for_C_gg_tomo_limber_withb2(amin, (void*) ar);
+    }
+    else
+    {
+      res = int_for_C_gg_tomo_limber(amin, (void*) ar);
+    }
   }
   else
   {
-    res = (init_static_vars_only == 1) ? int_for_C_gg_tomo_limber(amin, (void*) ar) :
-      like.high_def_integration > 0 ?
-      int_gsl_integrate_high_precision(int_for_C_gg_tomo_limber, (void*) ar, amin, amax, NULL,
-        GSL_WORKSPACE_SIZE) :
-      int_gsl_integrate_medium_precision(int_for_C_gg_tomo_limber, (void*) ar, amin, amax, NULL,
-        GSL_WORKSPACE_SIZE);
+    gsl_function F;
+    F.params = (void*) ar;
+    
+    if (has_b2_galaxies() && use_linear_ps == 0)
+    {
+      F.function = int_for_C_gg_tomo_limber_withb2;
+    }
+    else
+    {
+      F.function = int_for_C_gg_tomo_limber;
+    }
+    res = gsl_integration_glfixed(&F, amin, amax, w);
   }
   return res;
 }
@@ -4161,11 +4229,14 @@ double int_for_C_gk_limber_withb2(double a, void* params)
 double C_gk_tomo_limber_nointerp(double l, int ni, int use_linear_ps, 
 const int init_static_vars_only)
 {
+  static gsl_integration_glfixed_table* w = 0;
+
   if (ni < 0 || ni > tomo.clustering_Nbin - 1)
   {
     log_fatal("error in selecting bin number ni = %d", ni);
     exit(1);
   }
+  
   double ar[3] = {(double) ni, l, (double) use_linear_ps};
   const double amin = amin_lens(ni);
   const double amax = amax_lens(ni);
@@ -4179,27 +4250,39 @@ const int init_static_vars_only)
     log_fatal("amin < amax not true");
     exit(1);
   }
-  if (has_b2_galaxies() && use_linear_ps == 0)
+
+  double res = 0.0;
+  if (init_static_vars_only == 1)
   {
-    return (init_static_vars_only == 1) ? int_for_C_gk_limber_withb2(amin, (void*) ar) :
-      like.high_def_integration > 0 ?
-      int_gsl_integrate_high_precision(int_for_C_gk_limber_withb2, (void*) ar, amin, amax, NULL, 
-        GSL_WORKSPACE_SIZE) :
-      int_gsl_integrate_medium_precision(int_for_C_gk_limber_withb2, (void*) ar, amin, amax, NULL, 
-        GSL_WORKSPACE_SIZE);
+    if (w == 0)
+    {
+      const size_t nsize_integration = 200 + 50 * (like.high_def_integration);
+      w = gsl_integration_glfixed_table_alloc(nsize_integration);
+    }
+    if (has_b2_galaxies() && use_linear_ps == 0)
+    {
+      res = int_for_C_gk_limber_withb2(amin, (void*) ar);
+    }
+    else
+    {
+      res = int_for_C_gk_limber(amin, (void*) ar);
+    }
   }
   else
   {
-    return (init_static_vars_only == 1) ? int_for_C_gk_limber(amin, (void*) ar) :
-      like.high_def_integration == 2 ?
-      int_gsl_integrate_high_precision(int_for_C_gk_limber, (void*) ar, amin, amax, NULL, 
-        GSL_WORKSPACE_SIZE) :
-      like.high_def_integration == 1 ?
-      int_gsl_integrate_medium_precision(int_for_C_gk_limber, (void*) ar, amin, amax, NULL, 
-        GSL_WORKSPACE_SIZE) :
-      int_gsl_integrate_low_precision(int_for_C_gk_limber, (void*) ar, amin, amax, NULL, 
-        GSL_WORKSPACE_SIZE);
+    gsl_function F;
+    F.params = (void*) ar;
+    if (has_b2_galaxies() && use_linear_ps == 0)
+    {
+      F.function = int_for_C_gk_limber_withb2;
+    }
+    else
+    {
+      F.function = int_for_C_gk_limber;
+    }
+    res =  gsl_integration_glfixed(&F, amin, amax, w);
   }
+  return res;
 }
 
 double C_gk_tomo_limber(double l, int ni, const int force_no_recompute)
@@ -4379,11 +4462,14 @@ double int_for_C_ks_limber(double a, void* params)
 double C_ks_tomo_limber_nointerp(double l, int ni, int use_linear_ps,
 const int init_static_vars_only)
 {
+  static gsl_integration_glfixed_table* w = 0;
+
   if (ni < -1 || ni > tomo.shear_Nbin - 1)
   {
     log_fatal("error in selecting bin number ni = %d", ni);
     exit(1);
   }
+  
   double ar[3] = {(double) ni, l, (double) use_linear_ps};
   const double amin = amin_source(ni);
   const double amax = amax_source(ni);
@@ -4392,15 +4478,25 @@ const int init_static_vars_only)
     log_fatal("0 < amin/amax < 1 not true");
     exit(1);
   }
-  return (init_static_vars_only == 1) ? int_for_C_ks_limber(amin, (void*) ar) :
-    like.high_def_integration == 2 ?
-    int_gsl_integrate_high_precision(int_for_C_ks_limber, (void*) ar, amin, amax, NULL,
-     GSL_WORKSPACE_SIZE) :
-    like.high_def_integration == 1 ?
-    int_gsl_integrate_medium_precision(int_for_C_ks_limber, (void*) ar, amin, amax, NULL,
-     GSL_WORKSPACE_SIZE) :
-    int_gsl_integrate_low_precision(int_for_C_ks_limber, (void*) ar, amin, amax, NULL,
-     GSL_WORKSPACE_SIZE);
+ 
+  double res = 0.0;
+  if (init_static_vars_only == 1)
+  {
+    if (w == 0)
+    {
+      const size_t nsize_integration = 200 + 50 * (like.high_def_integration);
+      w = gsl_integration_glfixed_table_alloc(nsize_integration);
+    }
+    res = int_for_C_ks_limber(amin, (void*) ar);
+  }
+  else
+  {
+    gsl_function F;
+    F.params = (void*) ar;
+    F.function = int_for_C_ks_limber;
+    res = gsl_integration_glfixed(&F, amin, amax, w);
+  }
+  return res;  
 }
 
 double C_ks_tomo_limber(double l, int ni, const int force_no_recompute)
@@ -4567,15 +4663,30 @@ double int_for_C_kk_limber(double a, void* params)
 
 double C_kk_limber_nointerp(double l, int use_linear_ps, const int init_static_vars_only)
 {
+  static gsl_integration_glfixed_table* w = 0;
+
   double ar[2] = {l, (double) use_linear_ps};
   const double amin = limits.a_min*(1. + 1.e-5);
   const double amax = 0.99999;
-  return (init_static_vars_only == 1) ? int_for_C_kk_limber(amin, (void*) ar) :
-    like.high_def_integration > 0 ?
-    int_gsl_integrate_high_precision(int_for_C_kk_limber, (void*) ar, amin, amax, 
-      NULL, GSL_WORKSPACE_SIZE) :
-    int_gsl_integrate_medium_precision(int_for_C_kk_limber, (void*) ar, amin, amax, 
-      NULL, GSL_WORKSPACE_SIZE);
+  
+  double res = 0.0;
+  if (init_static_vars_only == 1)
+  {
+    if (w == 0)
+    {
+      const size_t nsize_integration = 200 + 50 * (like.high_def_integration);
+      w = gsl_integration_glfixed_table_alloc(nsize_integration);
+    }
+    res = int_for_C_kk_limber(amin, (void*) ar);
+  }
+  else
+  {
+    gsl_function F;
+    F.params = (void*) ar;
+    F.function = int_for_C_kk_limber;
+    res =  gsl_integration_glfixed(&F, amin, amax, w);
+  }
+  return res;
 }
 
 double C_kk_limber(double l, const int force_no_recompute)
@@ -4709,25 +4820,51 @@ double int_for_C_gy_tomo_limber(double a, void* params)
 double C_gy_tomo_limber_nointerp(double l, int ni, int use_linear_ps, 
 const int init_static_vars_only)
 {
+  static gsl_integration_glfixed_table* w = 0;
   double ar[3] = {(double)ni, l, (double) use_linear_ps};
   const double amin = amin_lens(ni);
   const double amax = 0.99999;
 
-  if (gbias.b2[ni] || gbias.b2[ni]) 
+  double res = 0.0;
+  if (init_static_vars_only == 1)
   {
-    log_fatal("b2 not supported in C_gy_nointerp");
-    exit(1);
-    return 0.0; // avoid gcc warning
+    if (w == 0)
+    {
+      const size_t nsize_integration = 200 + 50 * (like.high_def_integration);
+      w = gsl_integration_glfixed_table_alloc(nsize_integration);
+    }
+    
+    if (has_b2_galaxies() && use_linear_ps == 0)
+    {
+      log_fatal("b2 not supported in C_gy_nointerp");
+      exit(1);
+      return 0.0; // avoid gcc warning
+    }
+    else
+    {
+      res = int_for_C_gy_tomo_limber(amin, (void*) ar);
+    }
   }
   else
   {
-    return  (init_static_vars_only == 1) ? int_for_C_gy_tomo_limber(amin, (void*) ar) :
-      like.high_def_integration > 0 ?
-      int_gsl_integrate_high_precision(int_for_C_gy_tomo_limber, (void*) ar, amin, amax, 
-        NULL, GSL_WORKSPACE_SIZE) :
-      int_gsl_integrate_medium_precision(int_for_C_gy_tomo_limber, (void*) ar, amin, amax, 
-        NULL, GSL_WORKSPACE_SIZE);
+    gsl_function F;
+    F.params = (void*) ar;
+
+    if (has_b2_galaxies() && use_linear_ps == 0)
+    {
+      log_fatal("b2 not supported in C_gy_nointerp");
+      exit(1);
+      return 0.0; // avoid gcc warning
+    }
+    else
+    {
+      F.function = int_for_C_gy_tomo_limber;
+    }
+    
+    res =  gsl_integration_glfixed(&F, amin, amax, w);
   }
+
+  return res;
 }
 
 double C_gy_tomo_limber(double l, int ni, const int force_no_recompute)
@@ -4898,16 +5035,30 @@ double int_for_C_ys_tomo_limber(double a, void* params)
 double C_ys_tomo_limber_nointerp(double l, int ni, int use_linear_ps, 
 const int init_static_vars_only)
 {
+  static gsl_integration_glfixed_table* w = 0;
+  
   double ar[3] = {(double) ni, l, (double) use_linear_ps};
   const double amin = amin_source(ni);
   const double amax = 0.99999;
-   
-  return  (init_static_vars_only == 1) ? int_for_C_ys_tomo_limber(amin, (void*) ar) :
-    like.high_def_integration > 0 ?
-    int_gsl_integrate_high_precision(int_for_C_ys_tomo_limber, (void*) ar, amin, amax, 
-      NULL, GSL_WORKSPACE_SIZE) :
-    int_gsl_integrate_medium_precision(int_for_C_ys_tomo_limber, (void*) ar, amin, amax, 
-      NULL, GSL_WORKSPACE_SIZE);
+
+  double res = 0.0;
+  if (init_static_vars_only == 1)
+  {
+    if (w == 0)
+    {
+      const size_t nsize_integration = 200 + 50 * (like.high_def_integration);
+      w = gsl_integration_glfixed_table_alloc(nsize_integration);
+    }
+    res = int_for_C_ys_tomo_limber(amin, (void*) ar);
+  }
+  else
+  {
+    gsl_function F;
+    F.params = (void*) ar;
+    F.function = int_for_C_ys_tomo_limber;
+    res =  gsl_integration_glfixed(&F, amin, amax, w);
+  }
+  return res;
 }
 
 double C_ys_tomo_limber(double l, int ni, const int force_no_recompute)
@@ -5085,16 +5236,29 @@ double int_for_C_ky_limber(double a, void*params)
 
 double C_ky_limber_nointerp(double l, int use_linear_ps, const int init_static_vars_only)
 {
+  static gsl_integration_glfixed_table* w = 0;
   double ar[2] = {l, (double) use_linear_ps};
   const double amin = limits.a_min_hm;
   const double amax = 1.0 - 1.e-5;
 
-  return (init_static_vars_only == 1) ? int_for_C_ky_limber(amin, (void*) ar) :
-    like.high_def_integration > 0 ?
-    int_gsl_integrate_high_precision(int_for_C_ky_limber, (void*) ar, amin, amax, 
-      NULL, GSL_WORKSPACE_SIZE) :
-    int_gsl_integrate_medium_precision(int_for_C_ky_limber, (void*) ar, amin, amax, 
-      NULL, GSL_WORKSPACE_SIZE);
+  double res = 0.0;
+  if (init_static_vars_only == 1)
+  {
+    if (w == 0)
+    {
+      const size_t nsize_integration = 200 + 50 * (like.high_def_integration);
+      w = gsl_integration_glfixed_table_alloc(nsize_integration);
+    }
+    res = int_for_C_ky_limber(amin, (void*) ar);
+  }
+  else
+  {
+    gsl_function F;
+    F.params = (void*) ar;
+    F.function = int_for_C_ky_limber;
+    res =  gsl_integration_glfixed(&F, amin, amax, w);
+  }
+  return res;
 }
 
 double C_ky_limber(double l, const int force_no_recompute)
@@ -5184,16 +5348,30 @@ double int_for_C_yy_limber(double a, void *params)
 
 double C_yy_limber_nointerp(double l, int use_linear_ps, const int init_static_vars_only)
 {
+  static gsl_integration_glfixed_table* w = 0;
+  
   double ar[2] = {l, (double) use_linear_ps};
   const double amin = limits.a_min;
   const double amax = 1.0 - 1.e-5;
 
-  return (init_static_vars_only == 1) ? int_for_C_yy_limber(amin, (void*) ar) :
-    like.high_def_integration > 0 ?
-    int_gsl_integrate_high_precision(int_for_C_yy_limber, (void*) ar, amin, amax, 
-      NULL, GSL_WORKSPACE_SIZE) :
-    int_gsl_integrate_medium_precision(int_for_C_yy_limber, (void*) ar, amin, amax, 
-      NULL, GSL_WORKSPACE_SIZE);
+  double res = 0.0;
+  if (init_static_vars_only == 1)
+  {
+    if (w == 0)
+    {
+      const size_t nsize_integration = 200 + 50 * (like.high_def_integration);
+      w = gsl_integration_glfixed_table_alloc(nsize_integration);
+    }
+    res = int_for_C_yy_limber(amin, (void*) ar);
+  }
+  else
+  {
+    gsl_function F;
+    F.params = (void*) ar;
+    F.function = int_for_C_yy_limber;
+    res =  gsl_integration_glfixed(&F, amin, amax, w);
+  }
+  return res;
 }
 
 double C_yy_limber(double l, const int force_no_recompute)
@@ -5585,13 +5763,13 @@ void C_gl_tomo(int L, int nl, int ns, double *const Cl, double dev, double toler
     exit(1);
   }
 
-  static double** k1;
-  static double** k2;
-  static double** Fk1;
-  static double** Fk2;
-  static double** Fk1_Mag;
-  static double** Fk2_Mag;
-  static double* chi_ar;
+  static double** k1 = 0;
+  static double** k2 = 0;
+  static double** Fk1 = 0;
+  static double** Fk2 = 0;
+  static double** Fk1_Mag = 0;
+  static double** Fk2_Mag = 0;
+  static double* chi_ar = 0;
 
   const int Nell_block = Ntable.NL_Nell_block;
   const int Nchi = Ntable.NL_Nchi;  
@@ -5757,6 +5935,8 @@ void C_gl_tomo(int L, int nl, int ns, double *const Cl, double dev, double toler
   L++;
 
   Cl[limits.LMAX_NOLIMBER] = C_gs_tomo_limber((double) limits.LMAX_NOLIMBER, nl, ns, 0);
+  
+
   #pragma omp parallel for
   for (int l=L; l<limits.LMAX_NOLIMBER; l++)
   {
