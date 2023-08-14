@@ -3108,6 +3108,7 @@ double C_ss_tomo_limber(double l, int ni, int nj, const int force_no_recompute)
         double init = C_ss_tomo_limber_nointerp(exp(lnlmin), Z1(k), Z2(k), use_linear_ps_limber, 1);
       }
       #pragma GCC diagnostic pop
+      
       #pragma omp parallel for collapse(2)
       for (int k=0; k<NSIZE; k++)
       {
@@ -3592,33 +3593,16 @@ double C_gs_tomo_limber(double l, int ni, int nj, const int force_no_recompute)
       }
       #pragma GCC diagnostic pop
 
-      if (like.IA == 5 || like.IA == 6) // TATT MODELING
-      { 
-        #pragma omp parallel for collapse(2)
-        for (int k=0; k<NSIZE; k++)
-        {
-          for (int i=0; i<nell; i++)
-          {
-            const int ZLNZ = ZL(k);
-            const int ZSNZ = ZS(k);
-            const double lnl = lnlmin + i*dlnl;
-            table[k][i] = C_gs_tomo_limber_nointerp(exp(lnl), ZLNZ, ZSNZ, use_linear_ps_limber, 0);
-          }
-        }
-      }
-      else
+      #pragma omp parallel for collapse(2)
+      for (int k=0; k<NSIZE; k++)
       {
-        #pragma omp parallel for collapse(2)
-        for (int k=0; k<NSIZE; k++)
+        for (int i=0; i<nell; i++)
         {
-          for (int i=0; i<nell; i++)
-          {
-            const int ZLNZ = ZL(k);
-            const int ZSNZ = ZS(k);
-            const double lnl = lnlmin + i*dlnl;
-            const double ll = exp(lnl);
-            table[k][i] = C_gs_tomo_limber_nointerp(ll, ZLNZ, ZSNZ, use_linear_ps_limber, 0);
-          }
+          const int ZLNZ = ZL(k);
+          const int ZSNZ = ZS(k);
+          const double lnl = lnlmin + i*dlnl;
+          const double ll = exp(lnl);
+          table[k][i] = C_gs_tomo_limber_nointerp(ll, ZLNZ, ZSNZ, use_linear_ps_limber, 0);
         }
       }
 
