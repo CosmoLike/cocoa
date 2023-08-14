@@ -328,9 +328,9 @@ double xi_pm_tomo(const int pm, const int nt, const int ni, const int nj, const 
           double x = C_ss_tomo_TATT_EE_limber(limits.LMIN_tab + 1, Z1(0), Z2(0), 0); 
           x = (BM == 1) ? C_ss_tomo_TATT_BB_limber(limits.LMIN_tab + 1, Z1(0), Z2(0), 0) : 0.0;
         }
+        #pragma GCC diagnostic pop
+        #pragma GCC diagnostic pop
         
-        #pragma GCC diagnostic pop
-        #pragma GCC diagnostic pop
         #pragma omp parallel for collapse(2)
         for (int nz=0; nz<NSIZE; nz++) 
         {
@@ -1145,7 +1145,6 @@ double w_ks_tomo(const int nt, const int ni, const int limber)
 
     double xmin[ntheta];
     double xmax[ntheta];
-    
     // Cocoa: dont thread (init of static variables inside set_bin_average)
     for (int i=0; i<ntheta; i++)
     {
