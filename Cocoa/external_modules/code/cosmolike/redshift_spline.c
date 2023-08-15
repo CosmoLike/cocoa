@@ -205,35 +205,70 @@ int test_zoverlap(int ni, int nj) // test whether source bin nj is behind lens b
     log_fatal("invalid bin input (ni, nj) = (%d, %d)", ni, nj);
     exit(1);
   }
-  if (ggl_efficiency(ni, nj) > survey.ggl_overlap_cut) 
-  {
-    return 1;
-  }
-  
-  const int lphotoz = redshift.clustering_photoz;
-  const int sphotoz = redshift.shear_photoz;
 
-  if (sphotoz < 4 || sphotoz == 5 || sphotoz == 6 || sphotoz == 7) 
+  if (like.use_ggl_efficiency_zoverlap == 1)
   {
-    if (tomo.clustering_zmax[ni] <= tomo.shear_zmin[nj])
+    if (ggl_efficiency(ni, nj) > survey.ggl_overlap_cut) 
     {
       return 1;
     }
+    else
+    {
+      return 0;
+    }
   }
-  
-  const double zmeanlens = zmean(ni);
-  const double zmeansource = zmean_source(nj);
+  else
+  {
+    const int lphotoz = redshift.clustering_photoz;
+    const int sphotoz = redshift.shear_photoz;
 
-  if (sphotoz == 4 && lphotoz != 4 && tomo.clustering_zmax[ni] < zmeansource) 
-  {
-    return 1;
+    if (sphotoz < 4 || sphotoz == 5 || sphotoz == 6) 
+    {
+      if (tomo.clustering_zmax[ni] <= tomo.shear_zmin[nj])
+      {
+        return 1;
+      }
+      else
+      {
+        return 0;
+      }
+    }
+    
+    if (sphotoz == 7) 
+    {
+      if (tomo.shear_zmax[nj] >= tomo.clustering_zmin[ni])
+      {
+        return 1;
+      }
+      else
+      {
+        return 0;
+      }
+    }
+
+    const double zmeanlens = zmean(ni);
+    const double zmeansource = zmean_source(nj);
+
+    if (sphotoz == 4 && lphotoz != 4 && tomo.clustering_zmax[ni] < zmeansource) 
+    {
+      return 1;
+    }
+    else
+    {
+      return 0;
+    }
+    
+    if (sphotoz == 4 && lphotoz == 4 && zmeanlens + 0.1 < zmeansource) 
+    {
+      return 1;
+    }
+    else
+    {
+      return 0;
+    }
+
+    return 0;
   }
-  if (sphotoz == 4 && lphotoz == 4 && zmeanlens + 0.1 < zmeansource) 
-  {
-    return 1;
-  }
-  
-  return 0;
 }
 
 int ZL(int ni) 
@@ -884,21 +919,21 @@ double zdistr_histo_n(double z, void* params)
   {
     zbins = line_count(redshift.shear_REDSHIFT_FILE);
     
-    tab = (double**) malloc(sizeof(double*)*tomo.shear_Nbin);
-    if (tab == NULL)
     {
-      log_fatal("array allocation failed");
-      exit(1);
-    }
-    for (int i=0; i<tomo.shear_Nbin; i++)
-    {
-      tab[i] = (double*) malloc(sizeof(double)*zbins);
-      if (tab[i] == NULL)
+      const int len = sizeof(double*)*tomo.shear_Nbin + sizeof(double)*tomo.shear_Nbin*zbins;
+      tab = (double**) malloc(len);
+      if (tab == NULL)
       {
         log_fatal("array allocation failed");
         exit(1);
       }
+      for (int i=0; i<tomo.shear_Nbin; i++)
+      {
+        tab[i] = ((double*)(tab + tomo.shear_Nbin) + zbins*i);
+
+      }
     }
+
     double* z_v = (double*) malloc(sizeof(double)*zbins);
     if (z_v == NULL)
     {
@@ -983,8 +1018,7 @@ double zdistr_histo_n(double z, void* params)
     fclose(ein);
     free(z_v);
     
-    if (zhisto_max < tomo.shear_zmax[tomo.shear_Nbin - 1] || 
-        zhisto_min > tomo.shear_zmin[0]) 
+    if (zhisto_max < tomo.shear_zmax[tomo.shear_Nbin - 1] || zhisto_min > tomo.shear_zmin[0]) 
     {
       log_fatal("zhisto_min = %e,zhisto_max = %e", zhisto_min, zhisto_max);
       
@@ -1029,7 +1063,7 @@ double zdistr_photoz(double zz, int nj)
   static double* z_v = 0;
   static nuisancepara N;
   static int zbins = -1;
-  static gsl_spline* photoz_splines[MAX_SIZE_ARRAYS];
+  static gsl_spline* photoz_splines[MAX_SIZE_ARRAYS+1];
   static gsl_integration_glfixed_table* w = 0;
   // PZ == 4 || PZ == 5
   static int zbins_file = -1;
@@ -1208,21 +1242,25 @@ double zdistr_photoz(double zz, int nj)
         zbins *= 20;
       } // upsample if convolving with analytic photo-z model
       
-      table = (double**) malloc(sizeof(double*)*(tomo.shear_Nbin+1));
-      if (table == NULL)
       {
-        log_fatal("array allocation failed");
-        exit(1);
-      }
-      for (int i=0; i<(tomo.shear_Nbin+1); i++)
-      {
-        table[i] = (double*) malloc(sizeof(double)*zbins);
-        if (table[i] == NULL)
+        const int szrow = (tomo.shear_Nbin+1);
+        const int len   = sizeof(double*)*szrow + sizeof(double)*szrow*zbins;
+        table = (double**) malloc(len);
+        if (table == NULL)
         {
           log_fatal("array allocation failed");
           exit(1);
         }
+        for (int i=0; i<szrow; i++)
+        {
+          table[i]  = ((double*)(table + szrow) + zbins*i);
+          for (int j=0; j<zbins; j++)
+          {
+            table[i][j] = 0.0;
+          }
+        }
       }
+    
       z_v = (double*) malloc(sizeof(double)*zbins);
       if (z_v == NULL)
       {
@@ -1806,6 +1844,7 @@ double pf_histo(double z, void* params __attribute__((unused)))
       log_fatal("array allocation failed");
       exit(1);
     }
+
     double* z_v = (double*) malloc(sizeof(double)*zbins);
     if (z_v == NULL)
     {
@@ -1911,21 +1950,25 @@ double pf_histo_n(double z, void* params)
   {
     zbins = line_count(redshift.clustering_REDSHIFT_FILE);
     
-    tab = (double**) malloc(sizeof(double*)*tomo.clustering_Nbin);
-    if (tab == NULL)
     {
-      log_fatal("array allocation failed");
-      exit(1);
-    }
-    for (int i=0; i<tomo.clustering_Nbin; i++)
-    {
-      tab[i] = (double*) malloc(sizeof(double)*zbins);
-      if (tab[i] == NULL)
+      const int szrow = tomo.clustering_Nbin;
+      const int len   = sizeof(double*)*szrow + sizeof(double)*szrow*zbins;
+      tab = (double**) malloc(len);
+      if (tab == NULL)
       {
         log_fatal("array allocation failed");
         exit(1);
       }
+      for (int i=0; i<szrow; i++)
+      {
+        tab[i]  = ((double*)(tab + szrow) + zbins*i);
+        for (int j=0; j<zbins; j++)
+        {
+          tab[i][j] = 0.0;
+        }
+      }
     }
+
     double* z_v = (double*) malloc(sizeof(double)*zbins);
     if (z_v == NULL)
     {
@@ -2044,7 +2087,7 @@ double pf_photoz(double zz, int nj)
   static double* z_v = 0;
   static nuisancepara N;
   static int zbins = -1;
-  static gsl_spline* photoz_splines[MAX_SIZE_ARRAYS];
+  static gsl_spline* photoz_splines[MAX_SIZE_ARRAYS+1];
   static int zbins_file = -1;    // PZ == 4 || PZ == 5
   static double* z_v_file=0;     // PZ == 4 || PZ == 5
   static double* nz_old=0;       // PZ == 5
@@ -2223,27 +2266,33 @@ double pf_photoz(double zz, int nj)
         zbins *= 20;
       } // upsample if convolving with analytic photo-z model
       
-      table = (double**) malloc(sizeof(double*)*(tomo.clustering_Nbin+1));
-      if (table == NULL)
+
       {
-        log_fatal("array allocation failed");
-        exit(1);
-      }
-      for (int i=0; i<(tomo.clustering_Nbin+1); i++)
-      {
-        table[i] = (double*) malloc(sizeof(double)*zbins);
-        if (table[i] == NULL)
+        const int szrow = (tomo.clustering_Nbin+1);
+        const int len   = sizeof(double*)*szrow + sizeof(double)*szrow*zbins;
+        table = (double**) malloc(len);
+        if (table == NULL)
         {
           log_fatal("array allocation failed");
           exit(1);
         }
+        for (int i=0; i<szrow; i++)
+        {
+          table[i]  = ((double*)(table + szrow) + zbins*i);
+          for (int j=0; j<zbins; j++)
+          {
+            table[i][j] = 0.0;
+          }
+        }
       }
+
       z_v = (double*) malloc(sizeof(double)*zbins);
       if (z_v == NULL)
       {
         log_fatal("array allocation failed");
         exit(1);
       }
+
       for (int i=0; i<tomo.clustering_Nbin+1; i++) 
       {
         if (Ntable.photoz_interpolation_type == 0)
@@ -2894,7 +2943,8 @@ double pz_cluster(const double zz, const int nz)
       double ar[1] = {(double) 0};
       pf_cluster_histo_n(0., (void*) ar);
     }
-    double NORM[11]; 
+
+    double NORM[MAX_SIZE_ARRAYS]; 
     
     #pragma omp parallel for
     for (int i=0; i<tomo.cluster_Nbin; i++)
@@ -2904,8 +2954,7 @@ double pz_cluster(const double zz, const int nz)
       gsl_function F;
       F.params = (void*) ar;
       F.function = pf_cluster_histo_n;
-      const double norm = 
-        gsl_integration_glfixed(&F, 1E-5, tomo.cluster_zmax[i] + 1.0, w) / 
+      const double norm = gsl_integration_glfixed(&F, 1E-5, tomo.cluster_zmax[i] + 1.0, w) / 
         (tomo.cluster_zmax[i] - tomo.cluster_zmin[i]);
       
       if (norm == 0) 

@@ -300,6 +300,7 @@ typedef struct
   int high_def_integration;
   int adopt_limber_gg;
   int adopt_limber_gammat;
+  int use_ggl_efficiency_zoverlap;
 } likepara;
 
 typedef double (*B1_model)(double z, int nz);
