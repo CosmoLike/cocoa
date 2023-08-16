@@ -5,13 +5,13 @@ EXAMPLES = gaussian pyramidal rastrigin twin_gaussian random_gaussian himmelblau
 PROGRAMS = polychord_fortran polychord_CC polychord_CC_ini
 
 # Directories
-SRC_DIR = $(PWD)/src
+SRC_DIR = $(CURDIR)/src
 DRIVERS_DIR = $(SRC_DIR)/drivers
 POLYCHORD_DIR = $(SRC_DIR)/polychord
-LIKELIHOOD_DIR = $(PWD)/likelihoods
+LIKELIHOOD_DIR = $(CURDIR)/likelihoods
 EXAMPLES_DIR = $(LIKELIHOOD_DIR)/examples
-BIN_DIR = $(PWD)/bin
-LIB_DIR = $(PWD)/lib
+BIN_DIR = $(CURDIR)/bin
+LIB_DIR = $(CURDIR)/lib
 export DRIVERS_DIR POLYCHORD_DIR PYPOLYCHORD_DIR LIKELIHOOD_DIR EXAMPLES_DIR BIN_DIR LIB_DIR 
 
 # Whether to use MPI 
@@ -108,11 +108,9 @@ print_CC:
 print_CXX:
 	@echo $(CXX)
 
-#VM BEGINS
-#VM - ELIMINATED BIN/DIR
-CLEANDIRS = $(POLYCHORD_DIR) $(PYPOLYCHORD_DIR) $(LIKELIHOOD_DIR) $(LIB_DIR) $(DRIVERS_DIR) 
+CLEANDIRS = $(POLYCHORD_DIR) $(PYPOLYCHORD_DIR) $(LIKELIHOOD_DIR) $(BIN_DIR) $(LIB_DIR) $(DRIVERS_DIR) 
 .PHONY: clean veryclean print_CC print_CXX $(addsuffix clean,$(CLEANDIRS)) $(addsuffix veryclean,$(CLEANDIRS)) 
-#VM ENDS
+
 clean: $(addsuffix clean,$(CLEANDIRS))
 	$(RM) *.o *.mod *.MOD
 $(addsuffix clean,$(CLEANDIRS)): %clean: 
@@ -122,3 +120,4 @@ veryclean: clean $(addsuffix veryclean,$(CLEANDIRS))
 	$(RM) *~ build dist pypolychord.egg-info pypolychord/*.pyc pypolychord/__pycache__ __pycache__ pypolychord/lib/*.so
 $(addsuffix veryclean,$(CLEANDIRS))  : %veryclean: 
 	$(MAKE) -C $* veryclean
+	
