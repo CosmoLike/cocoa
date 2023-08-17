@@ -1296,7 +1296,7 @@ double zdistr_photoz(double zz, int nj)
     {
       z_v[i] = zhisto_min + (i + 0.5) * dz_histo;
     }
-    
+
 // the outlier fraction (outfrac) should be specified externally. This is a temporary hack.
 
     const double outfrac = 0.05;  
