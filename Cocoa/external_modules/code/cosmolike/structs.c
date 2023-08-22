@@ -552,27 +552,28 @@ void update_galpara(galpara *G)
   }
 }
 
-void update_nuisance(nuisancepara *N)
+void update_nuisance(nuisancepara* N)
 {
-  N->A_ia = nuisance.A_ia;
-  N->beta_ia = nuisance.beta_ia;
-  N->eta_ia = nuisance.eta_ia;
-  N->eta_ia_highz = nuisance.eta_ia_highz;
-  N->A2_ia = nuisance.A2_ia;
-  N->eta_ia_tt = nuisance.eta_ia_tt;
+  N->A_ia          = nuisance.A_ia;
+  N->beta_ia       = nuisance.beta_ia;
+  N->eta_ia        = nuisance.eta_ia;
+  N->eta_ia_highz  = nuisance.eta_ia_highz;
+  N->A2_ia         = nuisance.A2_ia;
+  N->eta_ia_tt     = nuisance.eta_ia_tt;
   
   for (int i=0; i<tomo.clustering_Nbin; i++) 
   {
     N->sigma_zphot_clustering[i] = nuisance.sigma_zphot_clustering[i];
-    N->bias_zphot_clustering[i] = nuisance.bias_zphot_clustering[i];
+    N->bias_zphot_clustering[i]  = nuisance.bias_zphot_clustering[i];
   }
   
   for (int i=0; i<tomo.shear_Nbin; i++) 
   {
     N->sigma_zphot_shear[i] = nuisance.sigma_zphot_shear[i];
-    N->bias_zphot_shear[i] = nuisance.bias_zphot_shear[i];
-    N->A_z[i] = nuisance.A_z[i];
-    N->A2_z[i] = nuisance.A2_z[i];
+    N->bias_zphot_shear[i]  = nuisance.bias_zphot_shear[i];
+    
+    N->A_z[i]    = nuisance.A_z[i];
+    N->A2_z[i]   = nuisance.A2_z[i];
     N->b_ta_z[i] = nuisance.b_ta_z[i];
   }
   

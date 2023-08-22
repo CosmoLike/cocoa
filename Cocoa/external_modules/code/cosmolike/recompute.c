@@ -51,7 +51,7 @@ int recompute_zphot_shear(nuisancepara N)
   for (int i = 0; i<tomo.shear_Nbin; i++)
   {
     if (N.sigma_zphot_shear[i] != nuisance.sigma_zphot_shear[i] ||
-        N.bias_zphot_shear[i] != nuisance.bias_zphot_shear[i])
+        N.bias_zphot_shear[i]  != nuisance.bias_zphot_shear[i])
     {
       res = 1;
     }
@@ -85,8 +85,10 @@ int recompute_zphot_clustering(nuisancepara N)
 
 int recompute_IA(nuisancepara N) 
 {
-  if (N.A_ia != nuisance.A_ia || N.eta_ia != nuisance.eta_ia ||
-      N.A2_ia != nuisance.A2_ia || N.eta_ia_tt != nuisance.eta_ia_tt)
+  if ((N.A_ia      != nuisance.A_ia)   || 
+      (N.eta_ia    != nuisance.eta_ia) ||
+      (N.A2_ia     != nuisance.A2_ia)  || 
+      (N.eta_ia_tt != nuisance.eta_ia_tt))
   {
     return 1;
   }
@@ -110,16 +112,14 @@ int recompute_IA(nuisancepara N)
 
 int recompute_galaxies(galpara G, int i) 
 {
-  if(i < -1 || i > tomo.clustering_Nbin -1)
+  if(i < 0 || i > tomo.clustering_Nbin -1)
   {
     log_fatal("invalid bin input ni = %d", i);
     exit(1);
   }
-  if (i == -1)
-  {
-    return 0;
-  }
-  return (G.b[i] != gbias.b[i] || G.b2[i] != gbias.b2[i] || G.bs2[i] != gbias.bs2[i]) ? 1 : 0;
+  return ((G.b[i] != gbias.b[i])   || 
+          (G.b2[i] != gbias.b2[i]) || 
+          (G.bs2[i] != gbias.bs2[i])) ? 1 : 0;
 }
 
 int recompute_all_galaxies(galpara G) 
@@ -189,15 +189,13 @@ int recompute_gs(cosmopara C, galpara G, nuisancepara N)
   {
     return 1;
   }
-  for(int i=0; i<tomo.ggl_Npowerspectra; i++) 
+  for(int i=0; i<tomo.clustering_Nbin; i++) 
   {
-    const int ZLNZ = ZL(i);
-    const int ZSNZ = ZS(i);
-    if(recompute_galaxies(G, ZLNZ) || recompute_galaxies(G, ZSNZ))
+    if(recompute_galaxies(G, i))
     {
       return 1;
     }
-  }  
+  } 
   return 0;
 }
 

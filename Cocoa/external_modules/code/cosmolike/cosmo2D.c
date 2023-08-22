@@ -4058,8 +4058,8 @@ double C_gg_tomo_limber(double l, int ni, int nj, const int force_no_recompute)
         }
       }
 
-      update_galpara(&G);
       update_cosmopara(&C);
+      update_galpara(&G);
       update_nuisance(&N);
     }
   }
