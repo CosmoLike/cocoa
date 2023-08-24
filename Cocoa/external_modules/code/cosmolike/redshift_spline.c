@@ -3557,7 +3557,7 @@ double g2_tomo(double a, int ni)
     {
       table[i] = (double*) malloc(sizeof(double)*N_a);
     }
-    const size_t nsize_integration = 200 + 50 * (like.high_def_integration);
+    const size_t nsize_integration = 250 + 50 * (like.high_def_integration);
     w = gsl_integration_glfixed_table_alloc(nsize_integration);
   }
   if (recompute_zphot_shear(N) || recompute_cosmo3D(C)) 
@@ -3675,7 +3675,7 @@ double g_lens(double a, int ni)
     {
       table[i] = (double*) malloc(sizeof(double)*N_a);
     }
-    const size_t nsize_integration = 200 + 50 * (like.high_def_integration);
+    const size_t nsize_integration = 250 + 50 * (like.high_def_integration);
     w = gsl_integration_glfixed_table_alloc(nsize_integration);
   }
 
@@ -3924,7 +3924,7 @@ double ggl_efficiency(int ni, int nj)
       table[i] = (double*) malloc(sizeof(double)*(tomo.shear_Nbin+1));
     }
 
-    const size_t nsize_integration = 200 + 50 * (like.high_def_integration);
+    const size_t nsize_integration = 250 + 50 * (like.high_def_integration);
     w = gsl_integration_glfixed_table_alloc(nsize_integration);
 
     {
