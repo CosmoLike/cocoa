@@ -1,4 +1,14 @@
 #VM BEGINS
+#ifeq ($(MPI),1)
+#FC = mpifort
+#CC = mpicc
+#CXX = mpicxx
+#else
+#FC = gfortran
+#CC = gcc
+#CXX = g++
+#endif
+
 ifdef MPI
 FC = $(MPI_FORTRAN_COMPILER)
 CC = $(MPI_CC_COMPILER)
@@ -7,6 +17,7 @@ else
 FC = $(FORTRAN_COMPILER)
 endif
 #VM ENDS
+
 
 LD = $(FC)
 
@@ -23,11 +34,12 @@ FFLAGS += -ffree-line-length-none -cpp -fPIC -fno-stack-arrays
 CXXFLAGS += -std=c++11 -fPIC
 CFLAGS += -fPIC
 
-#VM BEGINS
 # This is now needed for gfortran versions >=10
+#VM BEGINS
 #ifeq "$(shell expr `gfortran -dumpversion | cut -f1 -d.` \>= 10)" "1"
-	FFLAGS += -fallow-argument-mismatch
+#	FFLAGS += -fallow-argument-mismatch
 #endif
+FFLAGS += -fallow-argument-mismatch
 #VM ENDS
 
 # clang uses a different libstdc++ than GCC

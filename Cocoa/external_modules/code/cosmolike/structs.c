@@ -38,7 +38,8 @@ likepara like =
   .use_full_sky_sk = 1,
   .high_def_integration = 0,
   .adopt_limber_gg = 0,
-  .adopt_limber_gammat = 1
+  .adopt_limber_gammat = 1,
+  .use_ggl_efficiency_zoverlap = 1
 };
 
 cosmopara cosmology =
@@ -218,7 +219,9 @@ Ntab Ntable =
   .binned_P_lambda_obs_given_M_size_M_table = 50,
   .binned_p_cm_size_a_table = 30,
   .halo_uKS_nc = 20,
-  .halo_uks_nx = 200
+  .halo_uks_nx = 200,
+  .acc_boost_photoz_sampling = 1,
+  .photoz_interpolation_type = 0
 };
 
 pre precision = 
@@ -549,27 +552,28 @@ void update_galpara(galpara *G)
   }
 }
 
-void update_nuisance(nuisancepara *N)
+void update_nuisance(nuisancepara* N)
 {
-  N->A_ia = nuisance.A_ia;
-  N->beta_ia = nuisance.beta_ia;
-  N->eta_ia = nuisance.eta_ia;
-  N->eta_ia_highz = nuisance.eta_ia_highz;
-  N->A2_ia = nuisance.A2_ia;
-  N->eta_ia_tt = nuisance.eta_ia_tt;
+  N->A_ia          = nuisance.A_ia;
+  N->beta_ia       = nuisance.beta_ia;
+  N->eta_ia        = nuisance.eta_ia;
+  N->eta_ia_highz  = nuisance.eta_ia_highz;
+  N->A2_ia         = nuisance.A2_ia;
+  N->eta_ia_tt     = nuisance.eta_ia_tt;
   
   for (int i=0; i<tomo.clustering_Nbin; i++) 
   {
     N->sigma_zphot_clustering[i] = nuisance.sigma_zphot_clustering[i];
-    N->bias_zphot_clustering[i] = nuisance.bias_zphot_clustering[i];
+    N->bias_zphot_clustering[i]  = nuisance.bias_zphot_clustering[i];
   }
   
   for (int i=0; i<tomo.shear_Nbin; i++) 
   {
     N->sigma_zphot_shear[i] = nuisance.sigma_zphot_shear[i];
-    N->bias_zphot_shear[i] = nuisance.bias_zphot_shear[i];
-    N->A_z[i] = nuisance.A_z[i];
-    N->A2_z[i] = nuisance.A2_z[i];
+    N->bias_zphot_shear[i]  = nuisance.bias_zphot_shear[i];
+    
+    N->A_z[i]    = nuisance.A_z[i];
+    N->A2_z[i]   = nuisance.A2_z[i];
     N->b_ta_z[i] = nuisance.b_ta_z[i];
   }
   

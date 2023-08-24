@@ -69,6 +69,8 @@ typedef struct
   int binned_p_cm_size_a_table;
   int halo_uKS_nc;                 // halo.c u_KS(double c, double k, double rv)
   int halo_uks_nx;                 // halo.c u_KS(double c, double k, double rv)
+  int acc_boost_photoz_sampling;
+  int photoz_interpolation_type;
 } Ntab;
 
 typedef struct 
@@ -216,6 +218,9 @@ typedef struct
   // Variables for the 4x2pt+N (see: 2008.10757 & 2010.01138)
   double cluster_MOR[MAX_SIZE_ARRAYS];
   double cluster_selection[MAX_SIZE_ARRAYS];
+
+  double frac_lowz;   // photo-z = 5 model (see: 2108.00658)
+  double frac_highz;  // photo-z = 5 model (see: 2108.00658)
 } nuisancepara;
 
 typedef struct
@@ -295,6 +300,7 @@ typedef struct
   int high_def_integration;
   int adopt_limber_gg;
   int adopt_limber_gammat;
+  int use_ggl_efficiency_zoverlap;
 } likepara;
 
 typedef double (*B1_model)(double z, int nz);

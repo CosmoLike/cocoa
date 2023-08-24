@@ -11,6 +11,8 @@ core.*
 *.egg-info/
 *.out
 *.egg
+*.vfproj
+*.sln
 
 Cocoa/external_modules/code/planck/code/spt_clik/svnversion
 Cocoa/external_modules/code/PolyChordLite/dist/

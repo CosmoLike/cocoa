@@ -56,8 +56,6 @@ endif
 endif
 
 else
-
-#VM BEGINS
 #COCOA BEGINS
 #major_version = $(shell gfortran -dumpversion 2>&1 | cut -d " " -f 3 | cut -d. -f 1)
 #ifneq ($(shell test $(major_version) -gt 5; echo $$?),0)

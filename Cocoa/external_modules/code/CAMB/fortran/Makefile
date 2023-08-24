@@ -98,7 +98,6 @@ gfortErr = 0
 #VM ENDS
 ifeq "$(gfortErr)" "0"
 #Gfortran compiler (version 6+):
-compiler_ver = $(shell gfortran -dumpversion 2>&1)
 #VM BEGINS
 #COCOA BEGINS
 #COMPILER = gfortran

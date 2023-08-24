@@ -25,17 +25,15 @@ def call_command(cmd):
 def get_ifort_version():
     return call_command("ifort -v")
 
-
 #VM BEGINS
 #COCOA BEGINS
-def get_gfortran_version():
+def get_gfortran_version(command='gfortran'):
     ver = call_command("$FORTRAN_COMPILER -dumpversion")
     if ver and '.' not in ver:
         ver = call_command("$FORTRAN_COMPILER -dumpfullversion")
     return ver
 #COCOA ENDS
 #VM ENDS
-
 
 def check_ifort():
     return get_ifort_version() or False
