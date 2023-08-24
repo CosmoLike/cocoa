@@ -1079,7 +1079,7 @@ double zdistr_photoz(double zz, int nj)
   {
     return n_of_z(zz, nj);
   } 
-  else if ((photoz != 4 && recompute_zphot_shear(N)) || table == 0) 
+  else if (table == 0 || (photoz != 4 && recompute_zphot_shear(N))) 
   {
     update_nuisance(&N);
     
@@ -3495,8 +3495,8 @@ double g_tomo(double ainput, int ni) // for tomography bin ni
       }
     }
 
-    update_nuisance(&N);
     update_cosmopara(&C);
+    update_nuisance(&N); 
   }
 
   if(ni < -1 || ni > tomo.shear_Nbin - 1)
@@ -3924,7 +3924,7 @@ double ggl_efficiency(int ni, int nj)
       table[i] = (double*) malloc(sizeof(double)*(tomo.shear_Nbin+1));
     }
 
-    const size_t nsize_integration = 300 + 50 * (like.high_def_integration);
+    const size_t nsize_integration = 200 + 50 * (like.high_def_integration);
     w = gsl_integration_glfixed_table_alloc(nsize_integration);
 
     {
@@ -3952,7 +3952,7 @@ double ggl_efficiency(int ni, int nj)
         ar[1] = (double) j;
     
         gsl_function F;
-        F.params = ar;
+        F.params   = ar;
         F.function = int_for_ggl_efficiency;
 
         table[i][j] = gsl_integration_glfixed(&F, tomo.clustering_zmin[i], 

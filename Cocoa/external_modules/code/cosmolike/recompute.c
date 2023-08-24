@@ -37,22 +37,23 @@ int recompute_cosmo3D(cosmopara C)
 
 int recompute_zphot_shear(nuisancepara N)
 {
+  static int first = 0;
   static int photoz = -1;
-  if (photoz != redshift.shear_photoz)
+  if (first == 0)
   {
-    //photoz = redshift.shear_photoz;
+    first = 1;
     photoz = (redshift.shear_photoz == 7) ? 4 : redshift.shear_photoz;
     return 1;
   }
-  if (redshift.shear_photoz != 3 && redshift.shear_photoz != 4)
+  if (photoz != 3 && photoz != 4)
   {
     return 0;
   }
   int res = 0;
   for (int i=0; i<tomo.shear_Nbin; i++)
   {
-    if (N.sigma_zphot_shear[i] != nuisance.sigma_zphot_shear[i] ||
-        N.bias_zphot_shear[i]  != nuisance.bias_zphot_shear[i])
+    if ((N.sigma_zphot_shear[i] != nuisance.sigma_zphot_shear[i]) ||
+        (N.bias_zphot_shear[i]  != nuisance.bias_zphot_shear[i]))
     {
       res = 1;
     }
@@ -62,14 +63,15 @@ int recompute_zphot_shear(nuisancepara N)
 
 int recompute_zphot_clustering(nuisancepara N) 
 {
+  static int first = 0;
   static int photoz = -1;
-  if (photoz != redshift.clustering_photoz) 
+  if (first == 0)
   {
-    //photoz = redshift.clustering_photoz;
+    first = 1;
     photoz = (redshift.clustering_photoz == 7) ? 4 : redshift.clustering_photoz;
     return 1;
   }
-  if (redshift.clustering_photoz != 3 && redshift.clustering_photoz != 4) 
+  if (photoz != 3 && photoz != 4) 
   {
     return 0;
   }
