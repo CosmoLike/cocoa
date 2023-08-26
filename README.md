@@ -253,7 +253,13 @@ The following is not an exhaustive list of the codes we use
 
 - [Polychord](https://github.com/PolyChord/PolyChordLite) is a sampler code developed by Dr. Will Handley, Prof. Lasenby, and Prof. M. Hobson
 
-By no means, we want to discourage people from cloning code from their original repositories. We've included these codes as compressed [xz file format](https://tukaani.org/xz/format.html) in our repository for convenience in the initial development. The work of those authors is extraordinary, and they must be properly cited.
+- [CLIK]([https://github.com/PolyChord/PolyChordLite](https://github.com/benabed/clik)) is the likelihood code used to analyze Planck and SPT data, maintained by Prof. Karim Benabed
+
+- [SPT](https://github.com/SouthPoleTelescope/spt3g_y1_dist) is the official likelihood of the South Pole Telescope 3G Year 1 (TTTEEE)
+
+- [MFLike](https://github.com/simonsobs/LAT_MFLike) is the official likelihood of the Simons Observatory
+
+We do not want to discourage people from cloning code from their original repositories. We've included these codes as compressed [xz file format](https://tukaani.org/xz/format.html) in our repository for convenience in the initial development. The work of those authors is extraordinary, and they must be properly cited.
 
 ### The whovian-cocoa docker container <a name="appendix_jupyter_whovian"></a>
 
