@@ -263,9 +263,9 @@ To download and run the container for the first time, type:
 
          docker run --platform linux/amd64 --hostname cocoa --name cocoa2023 -it -p 8080:8888 -v $(pwd):/home/whovian/host/ -v ~/.ssh:/home/whovian/.ssh:ro vivianmiranda/whovian-cocoa
 
-Following the command above, users should see the following text on the screen terminal
+Following the command above, users should see the following text on the screen terminal:
 
-<img width="1121" alt="Screen Shot 2023-06-09 at 2 48 23 PM" src="https://github.com/vivianmiranda/cocoa3_testing/assets/3210728/8ad62524-ed62-4560-9e8e-0187a8f8cb3b">
+<img width="873" alt="Screenshot 2023-08-25 at 8 20 56 PM" src="https://github.com/SBU-COSMOLIKE/cocoa/assets/3210728/a5b1f93c-b47c-4f25-a4e4-aae9b7be3d66">
 
 :books: **expert** :books: The flag `-v $(pwd):/home/whovian/host/` ensures that files on the host computer, where the user should install Cocoa to avoid losing work in case the docker image needs to be deleted, have been mounted to the directory `/home/whovian/host/`. Therefore, the user should see the host files of the directory where the whovian-cocoa container was initialized after typing `cd /home/whovian/host/; ls`
 
