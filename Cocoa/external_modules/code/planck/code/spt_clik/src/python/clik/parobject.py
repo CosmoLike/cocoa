@@ -22,7 +22,13 @@ def baseCreateParobject(parobject):
   root_grp.attrs["lmax"] = [-1,-1,-1,-1,-1,-1]
   
   return root_grp,hf
-  
+
+def add_option_list(lkl_grp,options):
+  opt_group = lkl_grp.create_group("options_table")
+  opt_group.attrs["noptions"] = len(options)
+  for i, opt in enumerate(options):
+    opt_group.attrs["option_%d"%i]=opt
+
 def add_external_data(directory,lkl_grp,tar=False):
   import os.path as osp
   import os

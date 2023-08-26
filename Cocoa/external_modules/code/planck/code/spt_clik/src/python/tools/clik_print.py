@@ -49,7 +49,12 @@ def main_CMB(argv):
     nms = [nms[i*256:i*256+256].strip() for i in range(len(loc))]
     for n,l in zip(nms,loc):
       print("    %s = %g"%(n,l))
-
+  options = clikl.get_options()
+  if len(options)!=0:
+    print("  number of initialization options %d"%(len(options)))
+    for n in options:
+      print("    %s"%n)
+  
   ilkl = 0
   for lkli_n in ("lkl_%d"%v for v in range(lkl.attrs["n_lkl_object"])):
     lkli = lkl[lkli_n]

@@ -1,0 +1,56 @@
+# this code cannot be run directly
+# do 'source PREFIX/bin/clik_profile.sh' from your sh shell or put it in your profile
+
+add_path_element() {
+    local tmp="${1//:${2}:/:}"
+    tmp="${tmp/#${2}:/}"
+    tmp="${tmp/%:${2}/}"
+    echo -n "${tmp}:${2}"
+} 
+
+if [ -z "${PATH}" ]; then 
+PATH=PREFIX/bin
+export PATH
+else
+export PATH=$(add_path_element "$PATH" PREFIX/bin)
+fi
+if [ -z "${PYTHONPATH}" ]; then 
+PYTHONPATH=MPYTHONPATH
+export PYTHONPATH
+else
+export PYTHONPATH=$(add_path_element "$PYTHONPATH"  MPYTHONPATH)
+fi
+if [ -z "${DYLD_LIBRARY_PATH}" ]; then 
+DYLD_LIBRARY_PATH=FORTRANLIBPATH
+export DYLD_LIBRARY_PATH
+else
+export DYLD_LIBRARY_PATH=$(add_path_element "$DYLD_LIBRARY_PATH"  FORTRANLIBPATH)
+fi
+if [ -z "${DYLD_LIBRARY_PATH}" ]; then 
+DYLD_LIBRARY_PATH=PREFIX/lib
+export DYLD_LIBRARY_PATH
+else
+export DYLD_LIBRARY_PATH=$(add_path_element "$DYLD_LIBRARY_PATH"  PREFIX/lib)
+fi
+if [ -z "${DYLD_LIBRARY_PATH}" ]; then 
+DYLD_LIBRARY_PATH=LAPACKLIBPATH
+export DYLD_LIBRARY_PATH
+else
+export DYLD_LIBRARY_PATH=$(add_path_element "$DYLD_LIBRARY_PATH"  LAPACKLIBPATH)
+fi
+if [ -z "${DYLD_LIBRARY_PATH}" ]; then 
+DYLD_LIBRARY_PATH=CFITSIOLIBPATH
+export DYLD_LIBRARY_PATH
+else
+export DYLD_LIBRARY_PATH=$(add_path_element "$DYLD_LIBRARY_PATH"  CFITSIOLIBPATH)
+fi
+
+CLIK_PATH=PREFIX
+export CLIK_PATH
+
+CLIK_DATA=PREFIX/share/clik
+export CLIK_DATA
+
+CLIK_PLUGIN=rel2015
+export CLIK_PLUGIN
+

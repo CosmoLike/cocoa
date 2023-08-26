@@ -706,9 +706,37 @@ fi"""
     
   __dofile(ctx,name,shell,extra,multi_tmpl,single_tmpl,full_libpath)
   
+  #zsh
+  shell = "zsh"
+  name = "clik_profile.zsh"
+  shebang = "#! /bin/zsh"
+  extra= """add_path_element() {
+    local tmp="${1//:${2}:/:}"
+    tmp="${tmp/#${2}:/}"
+    tmp="${tmp/%:${2}/}"
+    echo -n "${tmp}:${2}"
+}"""
+  single_tmpl = "%(VAR)s=%(PATH)s\nexport %(VAR)s\n"
+  block_tmpl = """
+if [ -z "${%(VAR)s}" ]; then 
+%(VAR)s=%(PATH)s
+else
+%(VAR)s=%(PATH)s:${%(VAR)s}
+fi
+export %(VAR)s
+"""
+  multi_tmpl = """if [ -z "${%(VAR)s}" ]; then 
+%(VAR)s=%(PATH)s
+export %(VAR)s
+else
+export %(VAR)s=$(add_path_element "$%(VAR)s" %(PATH)s)
+fi"""
+    
+  __dofile(ctx,name,shell,extra,multi_tmpl,single_tmpl,full_libpath)
   print("\n%s*----------------------------------------------------*"%(colors.PINK+colors.BOLD))
   print("%s|%s                                                    %s|"%(colors.PINK+colors.BOLD,colors.NORMAL,colors.PINK+colors.BOLD))
-  print("%s|%s   Source clik_profile.sh (or clik_profile.csh)     %s|"%(colors.PINK+colors.BOLD,colors.NORMAL,colors.PINK+colors.BOLD))
+  print("%s|%s   Source clik_profile.sh                           %s|"%(colors.PINK+colors.BOLD,colors.NORMAL,colors.PINK+colors.BOLD))
+  print("%s|%s   (or clik_profile.csh or clik_profile.zsh)        %s|"%(colors.PINK+colors.BOLD,colors.NORMAL,colors.PINK+colors.BOLD))
   print("%s|%s   to set the environment variables needed by clik  %s|"%(colors.PINK+colors.BOLD,colors.NORMAL,colors.PINK+colors.BOLD))
   print("%s|%s                                                    %s|"%(colors.PINK+colors.BOLD,colors.NORMAL,colors.PINK+colors.BOLD))
   print("%s*----------------------------------------------------*%s\n"%(colors.PINK+colors.BOLD,colors.NORMAL))

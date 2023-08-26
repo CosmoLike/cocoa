@@ -39,7 +39,18 @@ char* clik_get_version(clik_object *clikid,error **_err) {
   return version_str;
 }
 
+
+
 clik_object* clik_init(char* hdffilepath, error **_err) {
+  clik_object *target;
+  _dealwitherr;
+  target = clik_init_with_options(hdffilepath, NULL, err);
+  _forwardError(*err,__LINE__,NULL);
+  return target;
+}
+
+
+clik_object* clik_init_with_options(char* hdffilepath, cdic* options, error **_err) {
   int n_lkl,i_lkl;
   int *lmax;
   int sz;
@@ -74,7 +85,7 @@ clik_object* clik_init(char* hdffilepath, error **_err) {
     cdf = cldf_openchild(df,cur_lkl,err);
     _forwardError(*err,__LINE__,NULL);
 
-    clkl[i_lkl] = clik_lklobject_init(cdf,err);
+    clkl[i_lkl] = clik_lklobject_init_with_options(cdf,options,err);
     _forwardError(*err,__LINE__,NULL);
     
     cmblkl_check_lmax(clkl[i_lkl],lmax,err);
@@ -285,6 +296,38 @@ void clik_get_lmax(clik_object *clikid, int lmax[6],error **_err) {
     lmax[cli] = zbs->lmax[cli];
   }
 }
+
+int clik_get_options(clik_object* clikid, parname **names, error **_err) {
+  distribution *target;
+  lklbs *lbs;
+  int totoptions,j,i,ii;
+  parname *pn;
+  _dealwitherr;
+
+  target = _clik_dig2(clikid,err);
+  _forwardError(*err,__LINE__,-1);
+  lbs = _clik_dig(clikid,err);
+  _forwardError(*err,__LINE__,-1);
+  totoptions = 0;
+  for (j=0;j<lbs->nlkl;j++) {
+    totoptions += lbs->lkls[j]->noptions;
+  }
+  if (names!=NULL) {
+    pn = malloc_err((1+totoptions)*sizeof(parname),err);
+    _forwardError(*err,__LINE__,-1);
+    ii = 0;
+    for (j=0;j<lbs->nlkl;j++) {
+      for (i=0;i<lbs->lkls[j]->noptions;i++) {
+        sprintf(pn[ii],"%s",lbs->lkls[j]->options_table[i]);
+  
+        ii++;
+      }
+    }
+    _testErrorRetVA(ii!=totoptions,-11011,"error when couting options (%d %d)",*err,__LINE__,-1,ii,totoptions);
+    *names=pn;
+  }
+  return totoptions;
+}  
 
 int clik_get_extra_parameter_names(clik_object* clikid, parname **names, error **_err) {
   parname *pn;

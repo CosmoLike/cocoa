@@ -118,7 +118,7 @@ def change_smica(inhf,lklfile,outfile,lmin,lmax):
   kp = nm.concatenate(kp)
   
   siginv = inhf["clik/lkl_0/criterion_gauss_mat"]
-  siginv.shape=(int(siginv.shape[0]**.5),-1)
+  siginv.shape=(siginv.shape[0]**.5,-1)
   sig = nm.linalg.inv(siginv)
   del(siginv)
   nsig = ((sig[kp])[:,kp])*1.

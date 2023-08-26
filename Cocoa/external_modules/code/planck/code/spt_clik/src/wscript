@@ -89,11 +89,12 @@ def build(bld):
   if bld.env.has_f90 and bld.env.has_spt3g:
     bld.objects(
       features = 'fc',
-      source = "spt3g/clik_spt3g.f90",
+      source = ["spt3g/clik_spt3g.f90", "spt3g/CMB_SPT3G_2018_TTTEEE.f90", "spt3g/CMB_SPT3G_2018_TTTEEE_foregrounds.f90", "spt3g/CMB_SPT3G_2018_TTTEEE_utils.f90"], 
       target = 'spt3g',
       uselib = 'lapack fc_omp fc_runtime',
-      fcflags = bld.env.FCFLAGS_fpic,
-      cflags = bld.env.CFLAGS_cpic,
+      fcflags = bld.env.FCFLAGS_fpic + ["-cpp"],
+      cflags = bld.env.CFLAGS_cpic + ["-cpp"],
+      defines = ["_STANDALONE_"],
       )
     uselib_spt3g = [ff for ff in ('pmc fc_omp fc_runtime').split() if ff]
 

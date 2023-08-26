@@ -662,3 +662,129 @@ SUBROUTINE SPT3G_FREE()
   BOK =0
   !deallocate(cltt)
 END SUBROUTINE  SPT3G_FREE
+
+
+Module CMB_SPT3G_TTEEE_2018_clik
+use CMB_SPT3G_2018_TTTEEE
+use SPT3G_utils
+implicit None
+
+
+
+class(TSPT3G_2018_TTTEEE_Likelihood), allocatable :: single_lkl
+
+integer::bok=0
+real(8), dimension(:), allocatable :: cl_clik,Dataparam,CMBparam 
+integer::clik_lmax
+
+
+
+end module 
+
+SUBROUTINE spt3g_ttteee2018_parameter_init(eSPT3G_windows_lmin, eSPT3G_windows_lmax, full_bandpower, full_bandpower_list_string, l_full_bandpower_list_string, full_covariance_matrix, &
+                                          full_covariance_list_string, l_full_covariance_list_string, full_beam_covariance_matrix,  full_beam_covariance_list_string ,l_full_beam_covariance_list_string ,      &
+                                          full_cal_covariance_matrix, full_windows, full_window_list_string, l_full_window_list_string,     &
+                                          nu_eff_matrix,nu_eff_list_string, l_nu_eff_list_string, spectra_to_fit_list_string, l_spectra_to_fit_list_string,      &
+                                          spec_bin_min_list_string, l_spec_bin_min_list_string,  spec_bin_max_list_string, l_spec_bin_max_list_string,late_crop_msk_string, l_late_crop_msk_string,&
+                                          ecov_eval_cut_threshold,ecov_eval_large_number_replacement,beam_cov_scale, &
+                                          aberration_coefficient, enu_0_galdust, eT_galdust, enu_0_CIB, eT_CIB, enu_0_tSZ, etSZCosmologyScalingEnabled,full_tSZ_template,ekSZCosmologyScalingEnabled,full_kSZ_template,einclude_logdet)
+
+  USE CMB_SPT3G_TTEEE_2018_clik
+  use CMB_SPT3G_2018_TTTEEE
+  use SPT3G_utils
+  implicit none
+
+  integer,intent(in) :: eSPT3G_windows_lmin, eSPT3G_windows_lmax
+  real(mcp),intent(in) :: full_bandpower(N_b_0_total)
+  integer,intent(in)::l_full_bandpower_list_string,l_full_covariance_list_string, &
+                      l_full_beam_covariance_list_string,l_full_window_list_string, &
+                      l_nu_eff_list_string, l_spectra_to_fit_list_string, l_spec_bin_min_list_string, &
+                      l_spec_bin_max_list_string, l_late_crop_msk_string
+
+  character(LEN=l_full_bandpower_list_string),intent(in) :: full_bandpower_list_string
+
+  real(mcp),intent(in) :: full_covariance_matrix(N_b_0_total,N_b_0_total)
+  character(LEN=l_full_covariance_list_string),intent(in) :: full_covariance_list_string
+
+  real(mcp),intent(in) :: full_beam_covariance_matrix(N_b_0_total,N_b_0_total)
+  character(LEN=l_full_beam_covariance_list_string),intent(in) :: full_beam_covariance_list_string
+
+  real(mcp),intent(in)::full_cal_covariance_matrix(N_freq_0*2,N_freq_0*2)
+  
+
+  real(mcp),intent(in):: full_windows(N_b_0_EE,1+eSPT3G_windows_lmax-eSPT3G_windows_lmin,N_s_0)
+  character(LEN=l_full_window_list_string),intent(in) :: full_window_list_string
+
+  real(mcp),intent(in) :: nu_eff_matrix(5,N_freq_0)
+  character(LEN=l_nu_eff_list_string),intent(in) :: nu_eff_list_string
+
+  character(LEN=l_spectra_to_fit_list_string),intent(in) :: spectra_to_fit_list_string
+
+  character(LEN=l_spec_bin_min_list_string),intent(in) :: spec_bin_min_list_string
+  character(LEN=l_spec_bin_max_list_string),intent(in) :: spec_bin_max_list_string 
+
+  character(LEN=l_late_crop_msk_string),intent(in) :: late_crop_msk_string
+  real(mcp),intent(in):: ecov_eval_cut_threshold,ecov_eval_large_number_replacement,beam_cov_scale,aberration_coefficient
+  real(mcp),intent(in):: enu_0_galdust, eT_galdust, enu_0_CIB, eT_CIB, enu_0_tSZ
+  integer,intent(in) :: etSZCosmologyScalingEnabled,ekSZCosmologyScalingEnabled,einclude_logdet
+
+  real(mcp),intent(in) :: full_tSZ_template(1+eSPT3G_windows_lmax-eSPT3G_windows_lmin)
+  real(mcp),intent(in) :: full_kSZ_template(1+eSPT3G_windows_lmax-eSPT3G_windows_lmin)
+
+
+  allocate(single_lkl)
+  call SPT3G_2018_TTTEEE_Ini_external(single_lkl,eSPT3G_windows_lmin, eSPT3G_windows_lmax, full_bandpower, full_bandpower_list_string, full_covariance_matrix, &
+                                          full_covariance_list_string, full_beam_covariance_matrix,  full_beam_covariance_list_string ,      &
+                                          full_cal_covariance_matrix, full_windows, full_window_list_string,     &
+                                          nu_eff_matrix,nu_eff_list_string, spectra_to_fit_list_string,      &
+                                          spec_bin_min_list_string,  spec_bin_max_list_string,late_crop_msk_string, &
+                                          ecov_eval_cut_threshold,ecov_eval_large_number_replacement,beam_cov_scale, &
+                                          aberration_coefficient, enu_0_galdust, eT_galdust, enu_0_CIB, eT_CIB, enu_0_tSZ, etSZCosmologyScalingEnabled,full_tSZ_template,ekSZCosmologyScalingEnabled,full_kSZ_template,einclude_logdet)
+  
+  clik_lmax = eSPT3G_windows_lmax
+
+  allocate(cl_clik(3*(clik_lmax+1)))
+  allocate(Dataparam(37))
+  allocate(CMBparam(6))
+
+end subroutine spt3g_ttteee2018_parameter_init
+
+subroutine spt3g_ttteee2018_lkl(LKL,CL)
+  USE CMB_SPT3G_TTEEE_2018_clik
+  use CMB_SPT3G_2018_TTTEEE
+  use CMB_SPT3G_2018_TTTEEE_foregrounds
+  use SPT3G_utils
+  REAL(8),INTENT(OUT)::LKL
+  REAL(8),INTENT(IN),DIMENSION((SPT3G_windows_lmax+1)*3+37+7)::CL
+  integer::i,ell
+
+  do ell=1,SPT3G_windows_lmax
+    cl_clik(ell) = CL(ell+1)*ell*(ell+1.)/2./pi
+    cl_clik(ell+SPT3G_windows_lmax+1) = CL(ell+1+SPT3G_windows_lmax+1)*ell*(ell+1.)/2./pi
+    cl_clik(ell+(SPT3G_windows_lmax+1)*2) = CL(ell+1+(SPT3G_windows_lmax+1)*2)*ell*(ell+1.)/2./pi
+  end do
+  Dataparam(:) = CL((SPT3G_windows_lmax+1)*3+1:(SPT3G_windows_lmax+1)*3+37)
+  if (tSZCosmologyScalingEnabled.or.kSZCosmologyScalingEnabled) then
+    CMBparam = CL((SPT3G_windows_lmax+1)*3+37+1:(SPT3G_windows_lmax+1)*3+37+6)
+  else
+    CMBparam = (/0,0,0,0,0,0/)
+  endif
+
+  lkl = SPT3G_2018_TTTEEE_LogLike_external(single_lkl, cl_clik,CMBparam,Dataparam)
+end subroutine spt3g_ttteee2018_lkl
+
+SUBROUTINE SPT3G_ttteee2018_ONLY_ONE(MOK)
+  USE CMB_SPT3G_TTEEE_2018_clik
+  INTEGER,INTENT(OUT)::MOK
+  MOK = BOK
+  BOK = 1
+END SUBROUTINE  SPT3G_ttteee2018_ONLY_ONE
+
+SUBROUTINE SPT3G_ttteee2018_FREE()
+  USE CMB_SPT3G_TTEEE_2018_clik
+  BOK =0
+  deallocate(single_lkl)
+  deallocate(cl_clik)
+  deallocate(CMBParam)
+  deallocate(Dataparam)
+END SUBROUTINE  SPT3G_ttteee2018_FREE

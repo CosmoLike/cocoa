@@ -20,6 +20,7 @@ extern "C" {
 
 #include "errorlist.h"
 #include "io.h"
+#include "clik_dic.h"
 
 #define _pn_size 256
 typedef char parname[_pn_size];
@@ -30,6 +31,10 @@ typedef void clik_object;
 
 // initialize the planck likelihood from an cldf file
 clik_object* clik_init(char* hdffilepath, error **err);
+clik_object* clik_init_with_options(char* hdffilepath, cdic* options, error **_err);
+
+int clik_get_options(clik_object* clikid, parname **names, error **err);
+
 
 // retrieve the list of cls as a list of flags 
 // order is  TT EE BB TE TB EB

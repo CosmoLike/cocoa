@@ -574,6 +574,9 @@ char* cldf_readstr(cldf *df, char *key, int *sz,error **err) {
       res = malloc_err(sizeof(char)*(strlen(cdf->metavalue[i])+1),err);
       forwardError(*err,__LINE__,NULL);
       strcpy(res,cdf->metavalue[i]);
+      if (nsz<0 && sz !=NULL) {
+        *sz = strlen(cdf->metavalue[i]);
+      }
       return res;
     }
   }

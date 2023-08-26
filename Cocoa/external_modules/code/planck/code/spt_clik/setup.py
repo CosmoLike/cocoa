@@ -1,12 +1,19 @@
-from distutils.core import setup
-from distutils.extension import Extension
+try: 
+   from setuptools import setup, Extension
+except Exception as e:
+   print("distutils is going to be deprecated, install setuptools instead")
+   print(e)
+   from distutils.core import setup
+   from distutils.extension import Extension
+
 from Cython.Distutils import build_ext
 
 import numpy as nm
 import os
 import re
 
-version = open("svnversion").read()+" MAKEFILE"
+version = open("svnversion").read()
+version = re.findall("[0-9]+\\.[0-9]+(?:(?:a|b)[0-9]*)?",version)[0]
 prefix = "./"
 includes = [nm.get_include(),prefix+"/include","src/","src/python/clik","src/plik/"]
 defines = [("HAS_LAPACK",None),("LAPACK_CLIK",None),("NOHEALPIX",None),("CLIK_LENSING",None)]

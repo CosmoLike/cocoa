@@ -65,7 +65,7 @@ int main(int argc, char **argv) {
   int has_cl[6],lmax[6];
   parname clnames[6];
   parname *names;
-  int nextra;
+  int nextra,noptions;
   int ndim;
   double *cl_and_pars;
   double log_clikid;
@@ -134,6 +134,18 @@ int main(int argc, char **argv) {
   }
   
   fprintf(stdout,"parameter vector has %d elements\n",ndim);
+  quitOnError(*err,__LINE__,stderr);
+  
+  noptions = clik_get_options(clikid,&names,err);
+  quitOnError(*err,__LINE__,stderr);
+
+  if (noptions!=0) {
+    fprintf(stdout,"With %d initialization options\n",nextra);
+    for(i=0;i<noptions;i++) { 
+      fprintf(stdout,"  %s\n",names[i]);
+    }    
+  }
+  free(names);
   
   for(i=2;i<argc;i++) {
     // read cl as ascii file
