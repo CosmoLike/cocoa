@@ -14,10 +14,6 @@ core.*
 *.vfproj
 *.sln
 
-external_modules/code/planck/code/spt_clik/build/
-Cocoa/external_modules/code/planck/code/spt_clik/svnversion
-Cocoa/external_modules/code/PolyChordLite/dist/
-Cocoa/external_modules/code/PolyChordLite/dist/pypolychord-1.20.0-py3.7-linux-x86_64.egg
 cobaya/cobaya/likelihoods/.gitignore
 external_modules/code/.gitignore
 external_modules/data/.gitignore
@@ -58,6 +54,10 @@ external_modules/data/kids*
 external_modules/data/cocoa_*
 external_modules/data/ede*
 
+external_modules/code/planck/code/spt_clik/.waf*
+external_modules/code/planck/code/spt_clik/build/
+external_modules/code/planck/code/spt_clik/svnversion
+external_modules/code/PolyChordLite/dist/
 external_modules/code/XXX
 external_modules/code/des_y1
 external_modules/code/des_*
@@ -72,12 +72,10 @@ external_modules/code/kids
 external_modules/code/kids*
 external_modules/code/cocoa_*
 external_modules/code/ede*
-
 external_modules/code/PolyChordLite/build/lib.linux-x86_64-cpython-37/
 external_modules/code/PolyChordLite/dist/
 external_modules/code/planck/code/spt_clik/svnversion
 external_modules/code/class_public/build/
-
 external_modules/code/pyactlike/build/
 external_modules/code/PolyChordLite/build/
 
