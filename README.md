@@ -88,7 +88,7 @@ Assuming the user opted for the easier *Conda installation*, type:
 
 to clone the repository. 
 
-Cocoa developers should drop the shallow clone option `--depth 1`; they should also authenticate to GitHub via ssh keys and use the command instead
+:warning: **Warning** :warning: Cocoa developers should drop the shallow clone option `--depth 1`; they should also authenticate to GitHub via ssh keys and use the command instead.
 
         $(cocoapy38) git clone git@github.com:CosmoLike/cocoa.git
 
