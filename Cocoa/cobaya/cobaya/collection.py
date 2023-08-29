@@ -90,8 +90,10 @@ def remove_temperature_cov(cov, temperature):
     """
     return cov / temperature
 
-
-def compute_temperature(logpost, logprior, loglike, check=True):
+#VM BEGINS
+#def compute_temperature(logpost, logprior, loglike, check=True):
+def compute_temperature(logpost, logprior, loglike, check=False):
+#VM ENDS
     """
     Returns the temperature of a sample.
 
@@ -276,17 +278,21 @@ class SampleCollection(BaseCollection):
         samples_loaded = len(self) > 0
         if samples_loaded:
             try:
-                self.temperature = self._check_logps()
-                if temperature is not None and \
-                   not np.isclose(temperature, self.temperature):
-                    raise LoggedError(
-                        self.log,
-                        "Sample temperature appears to be %r, but the collection was "
-                        "explicitly initialized with temperature %r.",
-                        self.temperature,
-                        temperature,
-                    )
-                self._check_weights()
+                #VM BEGINS
+                #self.temperature = self._check_logps()
+                #if temperature is not None and \
+                #   not np.isclose(temperature, self.temperature):
+                #    raise LoggedError(
+                #        self.log,
+                #        "Sample temperature appears to be %r, but the collection was "
+                #        "explicitly initialized with temperature %r.",
+                #        self.temperature,
+                #        temperature,
+                #    )
+                #self._check_weights()
+                print("Cocoa (TEMPERATURE): ", temperature)
+                self.temperature = temperature if temperature is not None else 1
+                #VM ENDS
             except LoggedError as excpt:
                 raise LoggedError(
                     self.log,
