@@ -18,10 +18,10 @@ if [ -z "${THREAD_UNXZ}" ]; then
 	echo 'DECOMPRESSING BICEP 2015 DATA'
 	tar xf bicep_keck_2015.xz
 	# ---------------------------------------------
-	cd ./planck
-	# ---------------------------------------------
 	echo 'DECOMPRESSING SPT-3G Y1 DATA'
 	tar xf spt_3g.xz
+	# ---------------------------------------------
+	cd ./planck
 	# ---------------------------------------------
 	echo 'DECOMPRESSING SUPPLEMENTAL DATA AND COVARIANCES'
 	tar xf planck_supp_data_and_covmats.xz
@@ -47,10 +47,10 @@ else
 	tar xf bicep_keck_2015.xz &
 	proc10=$!
 	# ---------------------------------------------
-	cd ./planck
-	# ---------------------------------------------
 	tar xf spt_3g.xz &
 	proc1=$!
+	# ---------------------------------------------
+	cd ./planck
 	# ---------------------------------------------
 	tar xf planck_supp_data_and_covmats.xz &
 	proc2=$!

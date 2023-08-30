@@ -13,6 +13,7 @@ rm -rf des_data
 rm -rf sn_data
 rm -rf simons_observatory
 rm -rf spt_hiell_2020
+rm -rf spt_3g/
 rm -rf planck/CamSpec2018
 rm -rf planck/plc_2.0
 rm -rf planck/plc_3.0/low_l
