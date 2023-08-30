@@ -1,4 +1,5 @@
 #include "clik.h"
+#include "clik_dic.h"
 #include "lklbs.h"
 #include <dlfcn.h>
 #include <string.h>
@@ -30,7 +31,9 @@ int clik_getenviron_numthread(char* name, int sfg, error **err);
 
 // init lkls
 cmblkl * clik_lklobject_init(cldf *df,error **err);
+cmblkl * clik_lklobject_init_with_options(cldf *df,cdic *options, error **err);
 typedef cmblkl* clik_lkl_init_func(cldf *df, int nell, int* ell, int* has_cl, double unit,double* wl, double *bins, int nbins, error **err);
+typedef cmblkl* clik_lkl_init_with_options_func(cldf *df, int nell, int* ell, int* has_cl, double unit,double* wl, double *bins, int nbins, cdic *options,error **err);
 //typedef cmblkl* clik_addon_init_func(cmblkl* base, hid_t group_id, char* cur_lkl, error **err);
 
 //void clik_external_data_init(char *pwd,char * dirname,hid_t group_id, char* cur_lkl,error **err);
@@ -48,5 +51,16 @@ double* wcmblkl_lkl(void* data, double *pars, error **err);
 */
 
 int mtot(int mT,int mP,int *has_cl);
+
+int opdf_haskey(cldf *df, char *key, cdic* options, error **err);
+long opdf_readint(cldf *df, char *key, cdic* options, error **err);
+double opdf_readfloat(cldf *df, char *key, cdic* options, error **err);
+long opdf_readint_default(cldf *df, char *key, long def,cdic* options, error **err);
+double opdf_readfloat_default(cldf *df, char *key,double def, cdic* options, error **err);
+char* opdf_readstr(cldf *df, char *key, int* sz, cdic* options, error **err);
+long* opdf_readlongarray(cldf *df, char *key, int* sz, cdic* options, error **err);
+int* opdf_readintarray(cldf *df, char *key, int* sz, cdic* options, error **err);
+double* opdf_readfloatarray(cldf *df, char *key, int* sz, cdic* options, error **err);
+
 
 #endif

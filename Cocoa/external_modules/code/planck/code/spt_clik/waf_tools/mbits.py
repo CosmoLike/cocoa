@@ -21,7 +21,13 @@ def configure(ctx):
   if sys.platform.lower()=="darwin":
     mopt = []
     if ctx.options.m64:
-      mopt += ["-arch", "x86_64"]
+      # need to check I am on on arm !
+      import platform
+      if platform.processor() == "arm":
+        mopt += ["-arch","arm64"]
+      else:
+        #I could be on rosetta...
+        mopt += ["-arch", "x86_64"]
     if ctx.options.m32:    
       mopt += ["-arch", "i386"]    
   else:

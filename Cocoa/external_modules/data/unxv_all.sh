@@ -20,8 +20,8 @@ if [ -z "${THREAD_UNXZ}" ]; then
 	# ---------------------------------------------
 	cd ./planck
 	# ---------------------------------------------
-	echo 'DECOMPRESSING SPT-3G Y1 EETE DATA'
-	tar xf spt3g_Y1_EETE.clik.xz
+	echo 'DECOMPRESSING SPT-3G Y1 DATA'
+	tar xf spt_3g.xz
 	# ---------------------------------------------
 	echo 'DECOMPRESSING SUPPLEMENTAL DATA AND COVARIANCES'
 	tar xf planck_supp_data_and_covmats.xz
@@ -49,7 +49,7 @@ else
 	# ---------------------------------------------
 	cd ./planck
 	# ---------------------------------------------
-	tar xf spt3g_Y1_EETE.clik.xz &
+	tar xf spt_3g.xz &
 	proc1=$!
 	# ---------------------------------------------
 	tar xf planck_supp_data_and_covmats.xz &
@@ -74,7 +74,7 @@ else
 	echo 'DECOMPRESSING SUPPLEMENTAL DATA AND COVARIANCES'
 	echo 'DECOMPRESSING PLANCK-2015 (PLC-2.0) DATA'
 	echo 'DECOMPRESSING PLANCK-2018 (PLC-3.0) DATA'
-	echo 'DECOMPRESSING SPT-3G Y1 EETE DATA'
+	echo 'DECOMPRESSING SPT-3G Y1 DATA'
 	echo 'DECOMPRESSING SPT-3G HIELL DATA'
 	echo 'DECOMPRESSING SIMONS OBSERVATORY'
 	echo 'DECOMPRESSING BICEP 2015 DATA'

@@ -50,6 +50,8 @@ typedef struct {
   char version[100];
   int free_calib_id;
   int self_calib_id;
+  int noptions;
+  extraname *options_table;
   } cmblkl;
 
 typedef struct {
@@ -110,6 +112,7 @@ double* cmblkl_select_cls(cmblkl *llkl,lklbs* self,double calib);
 void cmblkl_max_lmax(cmblkl *lkl,int *lmax, error **err);
 void cmblkl_set_names(cmblkl *lkl, char **names, error **err);
 void cmblkl_check_xnames(cmblkl *self,int ii,error **err);
+void cmblkl_set_options(cmblkl *lkl, int noptions, char **options, error **err);
 
 void cmblkl_set_version(cmblkl *lkl, char *version);
 

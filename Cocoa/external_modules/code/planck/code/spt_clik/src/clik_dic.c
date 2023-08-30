@@ -155,6 +155,9 @@ int cdic_key_index(cdic *pf, char *key, error **err) {
   int i;
   long hash;
 
+  if (pf==NULL) {
+    return -1;
+  }
   //_DEBUGHERE_("","");
   hash = cdic_hash(key);
   //_DEBUGHERE_("","");

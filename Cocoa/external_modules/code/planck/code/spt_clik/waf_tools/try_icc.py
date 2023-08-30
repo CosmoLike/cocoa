@@ -17,6 +17,7 @@ def options(ctx):
   grp.add_option("--gcc",action="store_true",default=False,help="Do not test for icc and only use gcc")
   grp.add_option("--icc",action="store_true",default=False,help="Do not test for gcc and only use icc")
   grp.add_option("--clang",action="store_true",default=False,help="Do not test for gcc and only use clang")
+  ctx.add_option("--clang_libomppath",action="store",default="",help="libpath for omp lib for clang (homebrw install it in a weird location")
   ctx.add_option_group(grp)  
 
 def show_linkline(ctx):
@@ -89,7 +90,20 @@ def do_clang(ctx):
   # try if omp is installed somewhere !
   try:
     ctx.env["CCFLAGS_cc_omp"]=['-Xpreprocessor','-fopenmp','-lomp']
-    ctx.check_cc(lib="omp", libpath = "/usr/local/lib",rpath="/usr/local/lib" ,uselib_store="cc_omp",mandatory=1,uselib="cc_omp")
+    libompath = "/usr/local/lib"
+    if ctx.options.clang_libomppath:
+      libompath = ctx.options.clang_libomppath
+    ctx.check_cc(lib="omp", libpath = libompath,rpath=libompath ,
+                 cflags =['-Xpreprocessor','-fopenmp','-lomp'],
+                  uselib_store="cc_omp",mandatory=1,uselib="cc_omp",
+                  fragment = """int main(int argc, char **argv) {
+  int a;
+  (void)argc; (void)argv;
+  #pragma omp single
+  {a=2;}
+  return 0;
+}"""
+                  )
   except Exception as e:
     ctx.env["CCFLAGS_cc_omp"]=[]
     

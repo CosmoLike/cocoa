@@ -45,14 +45,40 @@ def retrieve_intel_linkline(ctx,flavour,wafname,execnm,flags,rl0=[],optionname="
           ldpath = nloc.split(",")[-1]
           ldname = re.escape(ldpath+"/ld")
           
+          stillnot=True
           parts = re.split("^\s*%s\s*\\\\"%ldname,llge,flags=re.M)
-          if len(parts)!=2:
-            # ah ! That did not work ! I am getting a bit desperate here...
-            # at this point I will grab anything that starts from the begining of the line with something different from a space and ends with  /ld some spaces and a trailing \ in it you know !
-            parts = re.split("^\S.+?/ld\s+\\\\",llge,flags=re.M)
-            if len(parts)!=2:
-              # ok, I call it quit...
-              raise
+          if len(parts)==2:
+            stillnot=False
+        
+        if stillnot:
+          # ah ! That did not work ! I am getting a bit desperate here...
+          # at this point I will grab anything that starts from the begining of the line with something different from a space and ends with  /ld some spaces and a trailing \ in it you know !
+          parts = re.split("^\S.+?/ld\s+\\\\",llge,flags=re.M)
+          if len(parts)==2:
+            # ok, I call it quit...
+            stillnot = False
+        if stillnot:
+          # really deperate now !
+          # ok, now I will decide that the link part is whatever is between the first line after a \n and the rm lines
+          llgeli = llge.split("\n")
+          i = len(llgeli)
+          while True:
+            i=i-1
+            if not(re.match("^\s*rm\s+",llgeli[i]) or llgeli[i].strip()==''):
+              break
+          last = i+1
+          i=0
+          first=False
+          while True:
+            if llgeli[i].strip()!='':
+              first=True
+            if llgeli[i].strip()=='' and first:
+              break              
+            i=i+1
+          parts = [""]+["\n"].join(llgeli[i+2:last])
+
+
+
               
       # now parts[1] contains the link command ! Yeah !
       
@@ -215,14 +241,14 @@ def gfortran_conf(ctx):
     ctx.env.append_value('FCFLAGS',ctx.env.mopt)
   ctx.start_msg("Check gfortran version") 
   v90 = ctx.cmd_and_log(" ".join(ctx.env.FC)+" --version",quiet=Context.STDOUT).split("\n")[0].strip()
-  version90 = re.findall("(4\.[0-9]\.[0-9])",v90)
+  version90 = re.findall("([0-9]+\.[0-9]+\.[0-9]+)",v90)
   if len(version90)<1:
     #Logs.pprint("PINK","Can't get gfortran version... Let's hope for the best")
     ctx.end_msg("not found, let's hope for the best...",color="PINK")
   else:
     version90 = version90[0]
-    vmid = int(version90.split(".")[1])
-    if vmid<3:
+    vtrio = [int(v) for v in version90.split(".")]
+    if (vtrio[0]<4) or (vtrio[0]==4 and vmid<3):
       ctx.end_msg(v90,color="YELLOW")
       raise Errors.WafError("gfortran version need to be above 4.3 got %s"%version90)
     ctx.end_msg(v90)

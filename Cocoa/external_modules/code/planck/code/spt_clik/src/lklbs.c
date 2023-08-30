@@ -269,6 +269,9 @@ void free_cmblkl(void **pelf) {
   if (self->xnames!=NULL) {
     free(self->xnames);
   }
+  if (self->options_table!=NULL) {
+    free(self->options_table);
+  }
   //_DEBUGHERE_("","");
   free(self);
   *pelf = NULL;
@@ -483,6 +486,10 @@ cmblkl *init_cmblkl(void* lkl_data, posterior_log_pdf_func* lkl_func,
 
   self->free_calib_id = -1;
   self->self_calib_id = -1;
+
+  self->noptions = 0;
+  self->options_table = NULL;
+
   return self;
 }
   
@@ -502,6 +509,21 @@ void cmblkl_set_names(cmblkl *lkl, char **names, error **err) {
   
   for(i=0;i<lkl->xdim;i++) {
     sprintf(lkl->xnames[i],"%s",names[i]);
+  }
+}
+
+void cmblkl_set_options(cmblkl *lkl, int noptions, char **options, error **err) {
+  int i;
+  
+  if (lkl->options_table!=NULL) {
+    free(lkl->options_table);
+  }
+  lkl->noptions = noptions;
+  lkl->options_table = malloc_err(sizeof(extraname)*lkl->noptions,err);
+  forwardError(*err,__LINE__,);
+  
+  for(i=0;i<lkl->noptions;i++) {
+    sprintf(lkl->options_table[i],"%s",options[i]);
   }
 }
 

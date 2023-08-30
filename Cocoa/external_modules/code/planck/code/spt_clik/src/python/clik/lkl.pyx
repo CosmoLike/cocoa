@@ -35,7 +35,8 @@ cdef doError(error **err):
 cdef extern from "clik.h":
   ctypedef char parname[256]
   ctypedef void clik_object
-  
+  ctypedef void cdic
+
   clik_object* clik_init(char* hdffilepath, error **err)
   void clik_get_has_cl(clik_object *self, int has_cl[6],error **err)
   int clik_get_extra_parameter_names(clik_object* self, parname **names, error **err)
@@ -44,6 +45,11 @@ cdef extern from "clik.h":
   void clik_cleanup(clik_object** pself)
   int clik_get_extra_parameter_names_by_lkl(clik_object* clikid, int ilkl,parname **names, error **_err)
   char* clik_get_version(clik_object *clikid,error **_err)
+  cdic* cdic_init(error **err)
+  void cdic_add_item(cdic* pf,int nit, char** key, char **value,error **err)
+  void cdic_free(void **ppf)
+  clik_object* clik_init_with_options(char* hdffilepath, cdic* options, error **_err)
+  int clik_get_options(clik_object* clikid, parname **names, error **err)
 
 
 def version():
@@ -79,15 +85,42 @@ cdef class clik:
     stdlib.free(ver_str)
     return pyver
     
-  def __init__(self,filename):
+  def __init__(self,filename,**options):
+    cdef cdic* opt_dic
+    cdef char *ck
+    cdef char *cv
+    cdef bytes bk,bv
+
     self.celf=NULL
     self._err = NULL
     self.err = &self._err
     
-    self.celf = clik_init(filename.encode(),self.err)
-    er=doError(self.err)
-    if er:
-      raise er
+    if len(options):
+      opt_dic = cdic_init(self.err)
+      er=doError(self.err)
+      if er:
+        raise er
+      for k in options:
+        v = options[k]
+        bk = k.encode()
+        bv = v.encode()
+        ck = bk
+        cv = bv
+        cdic_add_item(opt_dic,1,&ck,&cv,self.err)
+        er=doError(self.err)
+        if er:
+          raise er
+        
+      self.celf = clik_init_with_options(filename.encode(),opt_dic,self.err)
+      er=doError(self.err)
+      if er:
+        raise er
+      cdic_free(&opt_dic)
+    else:
+      self.celf = clik_init(filename.encode(),self.err)
+      er=doError(self.err)
+      if er:
+        raise er
     lmax = self.lmax
     extra = self.extra_parameter_names
     nn = nm.sum(nm.array(lmax)+1)
@@ -127,6 +160,20 @@ cdef class clik:
       return self.get_has_cl()
   
   
+  def get_options(self):
+    cdef parname *names
+    noptions = clik_get_options(self.celf, &names, self.err)
+    er=doError(self.err)
+    if er:
+      raise er
+    
+    if noptions<=0:
+      return ()
+    res = [str(names[i].decode()) for i in range(noptions)]
+    res = tuple(res)
+    return res
+
+
   def get_lmax(self):
     cdef int lmax[6]
     clik_get_lmax(self.celf, lmax,self.err)
