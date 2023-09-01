@@ -259,7 +259,9 @@ The following is not an exhaustive list of the codes we use
 
 - [MFLike](https://github.com/simonsobs/LAT_MFLike) is the official likelihood of the Simons Observatory
 
-We do not want to discourage people from cloning code from their original repositories. We've included these codes as compressed [xz file format](https://tukaani.org/xz/format.html) in our repository for convenience in the initial development. The work of those authors is extraordinary, and they must be properly cited.
+- [ACTLensing](https://github.com/ACTCollaboration/act_dr6_lenslike) is the official lensing likelihood of the ACT collaborated developed by Prof. Mathew Madhavacheril
+
+We do not want to discourage people from cloning code from their original repositories. We've included these codes as compressed [xz file format](https://tukaani.org/xz/format.html) in our repository for convenience in the initial development (speed in setting up Cocoa). The work of those authors is extraordinary, and they must be properly cited.
 
 ### The whovian-cocoa docker container <a name="appendix_jupyter_whovian"></a>
 
