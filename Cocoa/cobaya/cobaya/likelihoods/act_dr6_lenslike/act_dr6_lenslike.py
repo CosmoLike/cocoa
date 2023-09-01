@@ -6,9 +6,13 @@ try:
 except:
     InstallableLikelihood = object
 import os
-file_dir = os.path.abspath(os.path.dirname(__file__))
-data_dir = f"{file_dir}/data/v1.1/"
 
+#VM BEGINS
+#file_dir = os.path.abspath(os.path.dirname(__file__))
+#data_dir = f"{file_dir}/data/v1.1/"
+file_dir = os.environ['ROOTDIR']
+data_dir = f"{file_dir}/external_modules/data/act/lensing/v1.1/"
+#VM ENDS
 variants =[x.strip() for x in  '''
 act_baseline,
 act_extended,
