@@ -64,7 +64,6 @@ class PlanckClik(Likelihood):
         # Loading the likelihood data
         data_path = get_data_path(self.__class__.get_qualified_class_name())
         #VM BEGINS
-        print("VM TESTING, ", data_path)
         data_path = 'planck'
         #VM ENDS
         if not os.path.isabs(self.clik_file):
