@@ -317,8 +317,8 @@ if [ -z "${THREAD_UNXZ}" ]; then
     export MAKE_NUM_THREADS=1
 fi
 # --------------------------------------------------------------------------------------
-export PIP3=$ROOTDIR/.local/bin/pip$PYTHON_VERSION
-export PYTHON3=$ROOTDIR/.local/bin/python$PYTHON_VERSION
+export PIP3=$ROOTDIR/.local/bin/pip3
+export PYTHON3=$ROOTDIR/.local/bin/python3
 export COBAYA_PACKAGES_PATH=external_modules
 # --------------------------------------------------------------------------------------
 if [ -n "${COSMOLIKE_DEBUG_MODE}" ]; then

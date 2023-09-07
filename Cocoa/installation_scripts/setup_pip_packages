@@ -84,7 +84,7 @@ if [ -z "${IGNORE_ALL_PIP_INSTALLATION}" ]; then
   else
     #PS: --force-reinstall - this helps CARMA to see numpy files
     env CXX=$CXX_COMPILER CC=$C_COMPILER $PIP3 install \
-        'numpy==1.24.3' \
+        'numpy==1.23.5' \
       --prefix=$ROOTDIR/.local \
       --find-links file:$ROOTDIR/../cocoa_installation_libraries/pip_cache --no-index \
       --force-reinstall > ${OUTPUT_PIP_1} 2> ${OUTPUT_PIP_2}

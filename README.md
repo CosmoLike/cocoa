@@ -64,7 +64,8 @@ Type the following commands to create the cocoa Conda environment.
            'conda-forge::pandas=1.5.3' \
            'conda-forge::numpy=1.23.5' \
            'conda-forge::matplotlib=3.7.1' \
-           'conda-forge::mpi4py=3.1.4'
+           'conda-forge::mpi4py=3.1.4' \
+           'conda-forge::pip=23.1.2'
       
 For those working on projects that utilize machine-learning-based emulators, the Appendix [Setting-up conda environment for Machine Learning emulators](#ml_emulators) provides additional commands for installing the necessary packages.
 
@@ -259,7 +260,9 @@ The following is not an exhaustive list of the codes we use
 
 - [MFLike](https://github.com/simonsobs/LAT_MFLike) is the official likelihood of the Simons Observatory
 
-We do not want to discourage people from cloning code from their original repositories. We've included these codes as compressed [xz file format](https://tukaani.org/xz/format.html) in our repository for convenience in the initial development. The work of those authors is extraordinary, and they must be properly cited.
+- [ACTLensing](https://github.com/ACTCollaboration/act_dr6_lenslike) is the official lensing likelihood of the ACT collaborated developed by Prof. Mathew Madhavacheril
+
+We do not want to discourage people from cloning code from their original repositories. We've included these codes as compressed [xz file format](https://tukaani.org/xz/format.html) in our repository for convenience in the initial development (speed in setting up Cocoa). The work of those authors is extraordinary, and they must be properly cited.
 
 ### The whovian-cocoa docker container <a name="appendix_jupyter_whovian"></a>
 
