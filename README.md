@@ -93,7 +93,9 @@ to clone the repository.
 
 :warning: **Warning** :warning: Cocoa developers should drop the shallow clone option `--depth 1`; they should also authenticate to GitHub via ssh keys and use the command instead.
 
-        $(cocoapy38) git clone git@github.com:CosmoLike/cocoa.git
+        $(cocoapy38) git clone git@github.com:CosmoLike/cocoa.git cocoa
+
+        $(cocoapy38) cd ./cocoa/
 
 :warning: **Warning** :warning: We have a limited monthly quota in bandwidth for Git LFS files, and therefore we ask users to use good judgment in the number of times they clone files from Cocoa's main repository.
  
