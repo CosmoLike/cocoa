@@ -85,7 +85,9 @@ Assuming the user opted for the easier *Conda installation*, type:
 
         $ conda activate cocoapy38
     
-        $(cocoapy38) git clone --depth 1 https://github.com/CosmoLike/cocoa.git
+        $(cocoapy38) git clone --depth 1 https://github.com/CosmoLike/cocoa.git cocoa
+
+        $(cocoapy38) cd ./cocoa/
 
 to clone the repository. 
 
