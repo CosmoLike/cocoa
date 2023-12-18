@@ -139,6 +139,13 @@ to compile CAMB, CLASS, Planck and Polychord. If the user wants to compile only 
 
         [Extracted from set_installation_options script]
         # --------------------------------------------------------------------------------------
+        # --------------------------------------------------------------------------------------
+        # --------------------------- VERBOSE AS DEBUG TOOL ------------------------------------
+        # --------------------------------------------------------------------------------------
+        # --------------------------------------------------------------------------------------
+        export COCOA_OUTPUT_VERBOSE=1
+
+        # --------------------------------------------------------------------------------------
         # --------- IF TRUE, THEN COCOA USES CLIK FROM https://github.com/benabed/clik ---------
         # --------------------------------------------------------------------------------------
         export USE_SPT_CLIK_PLANCK=1
@@ -152,16 +159,6 @@ to compile CAMB, CLASS, Planck and Polychord. If the user wants to compile only 
         #export IGNORE_POLYCHORD_COMPILATION=1
         #export IGNORE_PLANCK_COMPILATION=1
         #export IGNORE_ACT_COMPILATION=1
-
-        # --------------------------------------------------------------------------------------
-        # IN CASE COMPILATION FAILS, THESE FLAGS WILL BE USEFUL. BY DEFAULT, THE COMPILATION'S -
-        # OUTPUT IS NOT WRITTEN ON THE TERMINAL. THESE FLAGS ENABLE THAT OUTPUT ---------------- 
-        # --------------------------------------------------------------------------------------
-        #export DEBUG_PLANCK_OUTPUT=1
-        #export DEBUG_CAMB_OUTPUT=1
-        #export DEBUG_CLASS_OUTPUT=1
-        #export DEBUG_POLY_OUTPUT=1
-        #export DEBUG_ACT_OUTPUT=1
 
 ## Running Cobaya Examples <a name="cobaya_base_code_examples"></a>
 
