@@ -21,6 +21,9 @@ if [ -z "${THREAD_UNXZ}" ]; then
 	echo 'DECOMPRESSING SPT-3G Y1 DATA'
 	tar xf spt_3g.xz
 	# ---------------------------------------------
+	echo 'DECOMPRESSING ACT-DR6 DATA'
+	tar xf act.xz
+	# ---------------------------------------------
 	cd ./planck
 	# ---------------------------------------------
 	echo 'DECOMPRESSING SUPPLEMENTAL DATA AND COVARIANCES'

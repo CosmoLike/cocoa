@@ -112,7 +112,7 @@ class MFLike(Likelihood):
         return dict(Cl={k: max(c, self.lmax_theory + 1) for k, c in self.lcuts.items()})
 
     def logp(self, **params_values):
-        cl = self.theory.get_Cl(ell_factor=True)
+        cl = self.provider.get_Cl(ell_factor=True)
         params_values_nocosmo = {
             k: params_values[k] for k in self.expected_params_fg + self.expected_params_nuis
         }

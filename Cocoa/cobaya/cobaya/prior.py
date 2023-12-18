@@ -344,7 +344,7 @@ Just give it a try and it should work fine, but, in case you need the details:
 # Global
 import numbers
 from types import MethodType
-from typing import Sequence, NamedTuple, Callable, Optional, Mapping, List
+from typing import Sequence, NamedTuple, Callable, Optional, Mapping, List, Any
 import numpy as np
 
 # Local
@@ -385,7 +385,13 @@ class Prior(HasLogger):
         for i, p in enumerate(sampled_params_info):
             self.params += [p]
             prior = sampled_params_info[p].get("prior")
-            self.pdf += [get_scipy_1d_pdf({p: prior})]
+            try:
+                self.pdf += [get_scipy_1d_pdf(prior)]
+            except ValueError as excpt:
+                raise LoggedError(
+                    self.log,
+                    f"Error when creating prior for parameter '{p}': {str(excpt)}"
+                ) from excpt
             fast_logpdf = fast_logpdfs.get(self.pdf[-1].dist.name)
             if fast_logpdf:
                 self.pdf[-1].logpdf = MethodType(fast_logpdf, self.pdf[-1])
@@ -626,7 +632,7 @@ class Prior(HasLogger):
         """
         if not hasattr(self, "ref_pdf"):
             # Initialised with nan's in case ref==None: no ref -> uses prior
-            self.ref_pdf = [np.nan] * self.d()
+            self.ref_pdf: List[Any] = [np.nan] * self.d()
         unknown = set(ref_info).difference(self.params)
         if unknown:
             raise LoggedError(self.log,
@@ -646,7 +652,14 @@ class Prior(HasLogger):
             if isinstance(ref, numbers.Real):
                 self.ref_pdf[i] = float(ref)
             elif isinstance(ref, Mapping):
-                self.ref_pdf[i] = get_scipy_1d_pdf({p: ref})
+                try:
+                    self.ref_pdf[i] = get_scipy_1d_pdf(ref)
+                except ValueError as excpt:
+                    raise LoggedError(
+                        self.log,
+                        f"Error when creating reference pdf for parameter '{p}': "
+                        f"{str(excpt)}"
+                    ) from excpt
             elif ref is None:
                 # We only get here if explicit `param: None` mention!
                 self.ref_pdf[i] = np.nan
@@ -664,7 +677,7 @@ class Prior(HasLogger):
         Whether there is a fixed reference point for all parameters, such that calls to
         :func:`Prior.reference` would always return the same.
         """
-        if not hasattr(self, "_ref_is_pointlike"):
+        if self._ref_is_pointlike is None:
             self._set_pointlike()
         return self._ref_is_pointlike
 
@@ -699,7 +712,7 @@ class Prior(HasLogger):
                 "Sampling from the prior instead for those parameters.")
         # As a curiosity, `r is np.nan` was returning False after `r = np.nan` if
         # it had been passed via MPI before the test, since this creates a "new" np.nan
-        # NB: isinstance(np.nan, numers.Real) --> True
+        # NB: isinstance(np.nan, numbers.Real) --> True
         where_ignore_ref = [
             isinstance(r, numbers.Real) and (np.isnan(r) or ignore_fixed)
             for r in self.ref_pdf

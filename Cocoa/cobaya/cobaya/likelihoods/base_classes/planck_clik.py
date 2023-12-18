@@ -18,7 +18,8 @@ from cobaya.log import LoggedError, get_logger
 from cobaya.input import get_default_info
 from cobaya.install import pip_install, download_file
 from cobaya.component import ComponentNotInstalledError, load_external_module
-from cobaya.tools import are_different_params_lists, create_banner, VersionCheckError
+from cobaya.tools import (are_different_params_lists, create_banner,
+                          VersionCheckError, working_directory)
 
 _deprecation_msg_2015 = create_banner("""
 The likelihoods from the Planck 2015 data release have been superseded
@@ -302,12 +303,12 @@ def get_clik_import_path(path, min_version=min_version_clik):
 def load_clik(*args, **kwargs):
     """
     Just a wrapper around :func:`component.load_external_module`, that checks that we are
-    not being fooled by the wrong `clik <https://pypi.org/project/click/>`_.
+    not being fooled by the wrong `clik <https://pypi.org/project/clik/>`_.
     """
     clik = load_external_module(*args, **kwargs)
     if not hasattr(clik, "try_lensing"):
         raise ComponentNotInstalledError(
-            kwargs.get("logger"), "Loaded wrong clik: `https://pypi.org/project/click/`")
+            kwargs.get("logger"), "Loaded wrong clik: `https://pypi.org/project/clik/`")
     return clik
 
 
@@ -359,9 +360,7 @@ def install_clik(path, no_progress_bars=False):
         return False
     source_dir = get_clik_source_folder(path)
     log.info('Installing from directory %s' % source_dir)
-    cwd = os.getcwd()
-    try:
-        os.chdir(source_dir)
+    with working_directory(source_dir):
         log.info("Configuring... (and maybe installing dependencies...)")
         flags = ["--install_all_deps",
                  "--extra_lib=m"]  # missing for some reason in some systems, but harmless
@@ -372,8 +371,6 @@ def install_clik(path, no_progress_bars=False):
         if not execute([sys.executable, "waf", "install"]):
             log.error("Compilation failed!")
             return False
-    finally:
-        os.chdir(cwd)
     log.info("Finished!")
     return True
 

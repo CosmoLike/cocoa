@@ -33,6 +33,10 @@ if [ -z "${IGNORE_CLASS_COMPILATION}" ]; then
 
   cd $ROOTDIR/external_modules/code/class_public/
 
+  #Workaround Cocoa .gitignore entry on /include
+  rm -rf $ROOTDIR/external_modules/code/class_public/include
+  cp -r $ROOTDIR/external_modules/code/class_public/include2 $ROOTDIR/external_modules/code/class_public/include
+
   if [ -z "${DEBUG_CLASS_OUTPUT}" ]; then
     export OUTPUT_CLASS_1="/dev/null"
     export OUTPUT_CLASS_2="/dev/null"
@@ -73,7 +77,7 @@ if [ -z "${IGNORE_CLASS_COMPILATION}" ]; then
   fi
 
   rm -rf ./build/
-
+ 
   CC=$C_COMPILER $PYTHON3 setup.py build > ${OUTPUT_CLASS_1} 2> ${OUTPUT_CLASS_2}
   if [ $? -ne 0 ]; then
     echo "CLASS COULD NOT PYTHON3 SETUP.PY BUILD"

@@ -31,7 +31,7 @@ class BoltzmannBase(Theory):
 
         # Dict of named tuples to collect requirements and computation methods
         self.collectors = {}
-        # Additional input parameters to pass to CAMB, and attributes to set_ manually
+        # Additional input parameters (e.g. to pass to setter function, to set as attr...)
         self.extra_args = deepcopy_where_possible(self.extra_args) or {}
         self._must_provide = {}
 
@@ -220,7 +220,7 @@ class BoltzmannBase(Theory):
                        "sigma8_z", "fsigma8"}:
                 if k not in self._must_provide:
                     self._must_provide[k] = {}
-                if not isinstance(v, Iterable) or "z" not in v:
+                if not isinstance(v, Mapping) or "z" not in v:
                     raise LoggedError(
                         self.log,
                         f"The value in the dictionary of requisites {k} must be a "
@@ -329,8 +329,9 @@ class BoltzmannBase(Theory):
         The ``muK2`` and ``K2`` options use the model's CMB temperature.
 
         If ``ell_factor=True`` (default: ``False``), multiplies the spectra by
-        :math:`\ell(\ell+1)/(2\pi)` (or by :math:`\ell^2(\ell+1)^2/(2\pi)` in the case of
-        the lensing potential ``pp`` spectrum).
+        :math:`\ell(\ell+1)/(2\pi)` (or by :math:`[\ell(\ell+1)]^2/(2\pi)` in the case of
+        the lensing potential ``pp`` spectrum, and :math:`[\ell(\ell+1)]^{3/2}/(2\pi)` for
+        the the cross spectra ``tp`` and ``ep``).
         """
 
     @abstract
@@ -543,16 +544,16 @@ class BoltzmannBase(Theory):
         """
         return self._get_z_dependent("fsigma8", z)
 
-    def get_auto_covmat(self, params_info, likes_info, random_state=None):
+    def get_auto_covmat(self, params_info, likes_info):
         r"""
         Tries to get match to a database of existing covariance matrix files for the
         current model and data.
 
         ``params_info`` should contain preferably the slow parameters only.
         """
-        from cobaya.cosmo_input import get_best_covmat_ext
-        return get_best_covmat_ext(self.packages_path, params_info, likes_info,
-                                   random_state)
+        from cobaya.cosmo_input import get_best_covmat_ext, get_covmat_package_folders
+        return get_best_covmat_ext(get_covmat_package_folders(self.packages_path),
+                                   params_info, likes_info)
 
 
 class PowerSpectrumInterpolator(RectBivariateSpline):

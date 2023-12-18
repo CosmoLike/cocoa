@@ -3,7 +3,12 @@ timing: False
 debug: False
 
 likelihood:
-  SPT3G_Y1.TEEE: 
+  SPT3G_Y1.TTTEEE: 
+    clik_file: spt3g_Y1_v1_TTTEEE.clik
+    # uncomment the 3 next lines to compute TEEE only likelihood
+    SPT3G_2018_TTTEEE_spectra_to_fit : "90_Tx90_E 90_Tx150_E 90_Tx220_E 150_Tx150_E 150_Tx220_E 220_Tx220_E 90_Ex90_E 90_Ex150_E 90_Ex220_E 150_Ex150_E 150_Ex220_E 220_Ex220_E"
+    SPT3G_2018_TTTEEE_spectra_to_fit_bin_min : "1 1 1 1 1 1 1 1 1 1 1 1"
+    SPT3G_2018_TTTEEE_spectra_to_fit_bin_max : "44 44 44 44 44 44 44 44 44 44 44 44"
    
 params:
   logA:

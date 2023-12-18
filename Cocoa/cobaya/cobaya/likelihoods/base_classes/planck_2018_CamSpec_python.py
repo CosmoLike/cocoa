@@ -14,6 +14,8 @@ or other combination with TE and EE.
 Set use_range to string representation of L range to use, e.g. 50-100, 200-500, 1470-2500,
 or pass a dictionary of ranges for each spectrum.
 
+It is used by the 2018 and more recent CamSpec Planck likelihoods.
+
 """
 
 # Global
@@ -38,6 +40,7 @@ def range_to_ells(use_range):
                 ranges.append(range(mn, mx + 1))
             else:
                 ranges.append(int(ell_range))
+        # noinspection PyTypeChecker
         return np.concatenate(ranges)
     else:
         return use_range
@@ -318,9 +321,9 @@ class Planck2018CamSpecPython(DataSetLikelihood):
         dL = np.zeros(n_p)
         ix1 = 0
         ell_offsets = [LS - lmin for LS in self.ell_ranges[:4]]
-        contiguous = not np.any(np.count_nonzero(LS - np.arange(LS[0],
-                                                                LS[-1] + 1, dtype=int))
-                                for LS in self.ell_ranges[:4])
+        contiguous = not any(np.count_nonzero(LS - np.arange(LS[0],
+                                                             LS[-1] + 1, dtype=int))
+                             for LS in self.ell_ranges[:4])
         for i, (cal, LS, n) in enumerate(zip(cals[:4], ell_offsets, self.used_sizes[:4])):
             dL[LS] += d[ix1:ix1 + n] / cal
             ix = 0
