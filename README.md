@@ -321,13 +321,13 @@ PS: The docker container also has the conda environment `cocoalite` that is usef
 
 Download and run Miniconda installation script (please adapt `CONDA_DIR`):
 
-        export CONDA_DIR=/gpfs/home/vinmirandabr/miniconda
+        export CONDA_DIR=/gpfs/home/XXX/miniconda
 
         mkdir $CONDA_DIR
 
-        wget https://repo.continuum.io/miniconda/Miniconda3-py38_4.12.0-Linux-x86_64.sh
+        wget https://repo.continuum.io/miniconda/Miniconda3-py38_4.14.0-Linux-x86_64.sh
 
-        /bin/bash Miniconda3-py38_4.12.0-Linux-x86_64.sh -f -b -p $CONDA_DIR
+        /bin/bash Miniconda3-py38_4.14.0-Linux-x86_64.sh -f -b -p $CONDA_DIR
 
 After installation, users must source conda configuration file
 
