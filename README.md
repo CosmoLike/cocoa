@@ -66,6 +66,9 @@ Type the following commands to create the cocoa Conda environment.
            'conda-forge::matplotlib=3.7.1' \
            'conda-forge::mpi4py=3.1.4' \
            'conda-forge::pip=23.1.2'
+        conda activate cocoapy38
+        $CONDA_PREFIX/bin/pip install --no-cache-dir 'virtualenv==20.17.1'
+        conda deactivate
       
 For those working on projects that utilize machine-learning-based emulators, the Appendix [Setting-up conda environment for Machine Learning emulators](#ml_emulators) provides additional commands for installing the necessary packages.
 
@@ -325,9 +328,9 @@ Download and run Miniconda installation script (please adapt `CONDA_DIR`):
 
         mkdir $CONDA_DIR
 
-        wget https://repo.continuum.io/miniconda/Miniconda3-py38_4.14.0-Linux-x86_64.sh
+        wget https://repo.continuum.io/miniconda/Miniconda3-py38_23.9.0-0-Linux-x86_64.sh
 
-        /bin/bash Miniconda3-py38_4.14.0-Linux-x86_64.sh -f -b -p $CONDA_DIR
+        /bin/bash Miniconda3-py38_23.9.0-0-Linux-x86_64.sh -f -b -p $CONDA_DIR
 
 After installation, users must source conda configuration file
 
