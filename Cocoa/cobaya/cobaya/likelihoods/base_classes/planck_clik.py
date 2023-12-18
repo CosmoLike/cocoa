@@ -29,7 +29,7 @@ by the 2018 ones, and will eventually be deprecated.
 clik_url = 'https://github.com/benabed/clik/archive/refs/heads/main.zip'
 pla_url_prefix = r"https://pla.esac.esa.int/pla-sl/data-action?COSMOLOGY.COSMOLOGY_OID="
 
-last_version_supp_data_and_covmats = "v2.01"
+last_version_supp_data_and_covmats = "v2.1"
 last_version_clik = "16.0"
 min_version_clik = "3.1"
 
@@ -270,7 +270,6 @@ def get_clik_source_folder(starting_path):
         source_dir = os.path.join(source_dir, folders[0])
     return source_dir
 
-
 def get_clik_import_path(path, min_version=min_version_clik):
     """
     Starting from the installation folder, returns the subdirectory from which the
@@ -300,6 +299,7 @@ def get_clik_import_path(path, min_version=min_version_clik):
     #COCOA ENDS
     #VM ENDS
 
+
 def load_clik(*args, **kwargs):
     """
     Just a wrapper around :func:`component.load_external_module`, that checks that we are
@@ -315,15 +315,13 @@ def load_clik(*args, **kwargs):
 def is_installed_clik(path, reload=False):
     # min_version here is checked inside get_clik_import_path, since it is displayed
     # in the folder name and cannot be retrieved from the module.
-    #VM BEGINS
-    #try:
-    #    return bool(load_clik(
-    #        "clik", path=path, get_import_path=get_clik_import_path,
-    #        reload=reload, logger=get_logger("clik"), not_installed_level="debug"))
-    #except ComponentNotInstalledError:
-    #    return False
-    return True
-    #VM ENDS
+    try:
+        return bool(load_clik(
+            "clik", path=path, get_import_path=get_clik_import_path,
+            reload=reload, logger=get_logger("clik"), not_installed_level="debug"))
+    except ComponentNotInstalledError:
+        return False
+
 
 def execute(command):
     from subprocess import Popen, PIPE, STDOUT
