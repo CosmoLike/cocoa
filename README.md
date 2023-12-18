@@ -180,8 +180,6 @@ Assuming the user opted for the easier *Conda installation* and located the term
 
 Users will see a terminal that looks like this: `$(cocoapy38)(.local)`. *This is a feature, not a bug*! 
 
-Why did we choose to have two separate bash environments? Users should be able to manipulate multiple Cocoa instances seamlessly, which is particularly useful when running chains in one instance while experimenting with code development in another. Consistency of the environment across all Cocoa instances is crucial, and the start_cocoa/stop_cocoa scripts handle the loading and unloading of environmental path variables for each Cocoa. All of them, however, depends on many of the same prerequisites, so it is advantageous to maintain the basic packages inside the shared conda cocoa environment. 
-
 :four: **Step 4 of 5**: select the number of OpenMP cores
     
         $(cocoapy38)(.local) export OMP_PROC_BIND=close; export OMP_NUM_THREADS=4
@@ -208,6 +206,8 @@ Once the work is done, type:
 :books: **expert** :books: Why the `--mca btl vader,tcp,self` flag? Conda-forge developers don't [compile OpenMPI with Infiniband compatibility](https://github.com/conda-forge/openmpi-feedstock/issues/38).
 
 :books: **expert** :books: Why the `--bind-to core:overload-allowed --map-by numa:pe=${OMP_NUM_THREADS}` flag? This flag enables efficient hybrid MPI + OpenMP runs on NUMA architecture.
+
+:books: **expert** :books: Why did we choose to have two separate bash environments? Users should be able to manipulate multiple Cocoa instances seamlessly, which is particularly useful when running chains in one instance while experimenting with code development in another. Consistency of the environment across all Cocoa instances is crucial, and the start_cocoa/stop_cocoa scripts handle the loading and unloading of environmental path variables for each Cocoa. All of them, however, depends on many of the same prerequisites, so it is advantageous to maintain the basic packages inside the shared conda cocoa environment. 
 
 ## Running Cosmolike projects <a name="running_cosmolike_projects"></a> 
 
