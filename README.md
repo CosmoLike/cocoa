@@ -66,6 +66,9 @@ Type the following commands to create the cocoa Conda environment.
            'conda-forge::matplotlib=3.7.1' \
            'conda-forge::mpi4py=3.1.4' \
            'conda-forge::pip=23.1.2'
+        conda activate cocoapy38
+        $CONDA_PREFIX/bin/pip install --no-cache-dir 'virtualenv==20.17.1'
+        conda deactivate
       
 For those working on projects that utilize machine-learning-based emulators, the Appendix [Setting-up conda environment for Machine Learning emulators](#ml_emulators) provides additional commands for installing the necessary packages.
 
@@ -136,6 +139,13 @@ to compile CAMB, CLASS, Planck and Polychord. If the user wants to compile only 
 
         [Extracted from set_installation_options script]
         # --------------------------------------------------------------------------------------
+        # --------------------------------------------------------------------------------------
+        # --------------------------- VERBOSE AS DEBUG TOOL ------------------------------------
+        # --------------------------------------------------------------------------------------
+        # --------------------------------------------------------------------------------------
+        export COCOA_OUTPUT_VERBOSE=1
+
+        # --------------------------------------------------------------------------------------
         # --------- IF TRUE, THEN COCOA USES CLIK FROM https://github.com/benabed/clik ---------
         # --------------------------------------------------------------------------------------
         export USE_SPT_CLIK_PLANCK=1
@@ -149,16 +159,6 @@ to compile CAMB, CLASS, Planck and Polychord. If the user wants to compile only 
         #export IGNORE_POLYCHORD_COMPILATION=1
         #export IGNORE_PLANCK_COMPILATION=1
         #export IGNORE_ACT_COMPILATION=1
-
-        # --------------------------------------------------------------------------------------
-        # IN CASE COMPILATION FAILS, THESE FLAGS WILL BE USEFUL. BY DEFAULT, THE COMPILATION'S -
-        # OUTPUT IS NOT WRITTEN ON THE TERMINAL. THESE FLAGS ENABLE THAT OUTPUT ---------------- 
-        # --------------------------------------------------------------------------------------
-        #export DEBUG_PLANCK_OUTPUT=1
-        #export DEBUG_CAMB_OUTPUT=1
-        #export DEBUG_CLASS_OUTPUT=1
-        #export DEBUG_POLY_OUTPUT=1
-        #export DEBUG_ACT_OUTPUT=1
 
 ## Running Cobaya Examples <a name="cobaya_base_code_examples"></a>
 
@@ -321,13 +321,13 @@ PS: The docker container also has the conda environment `cocoalite` that is usef
 
 Download and run Miniconda installation script (please adapt `CONDA_DIR`):
 
-        export CONDA_DIR=/gpfs/home/vinmirandabr/miniconda
+        export CONDA_DIR=/gpfs/home/XXX/miniconda
 
         mkdir $CONDA_DIR
 
-        wget https://repo.continuum.io/miniconda/Miniconda3-py38_4.12.0-Linux-x86_64.sh
+        wget https://repo.continuum.io/miniconda/Miniconda3-py38_23.9.0-0-Linux-x86_64.sh
 
-        /bin/bash Miniconda3-py38_4.12.0-Linux-x86_64.sh -f -b -p $CONDA_DIR
+        /bin/bash Miniconda3-py38_23.9.0-0-Linux-x86_64.sh -f -b -p $CONDA_DIR
 
 After installation, users must source conda configuration file
 

@@ -13,6 +13,13 @@ export MINICONDA_INSTALLATION=1
 
 # --------------------------------------------------------------------------------------
 # --------------------------------------------------------------------------------------
+# --------------------------- VERBOSE AS DEBUG TOOL ------------------------------------
+# --------------------------------------------------------------------------------------
+# --------------------------------------------------------------------------------------
+export COCOA_OUTPUT_VERBOSE=1
+
+# --------------------------------------------------------------------------------------
+# --------------------------------------------------------------------------------------
 # --------------------------------------------------------------------------------------
 # ---------------------------------- GLOBAL SETTINGS -----------------------------------
 # --------------------------------------------------------------------------------------
@@ -50,11 +57,13 @@ export USE_SPT_CLIK_PLANCK=1
 # IN CASE COMPILATION FAILS, THESE FLAGS WILL BE USEFUL. BY DEFAULT, THE OUTPUT --------
 # IS NOT WRITTEN ON THE TERMINAL. THESE FLAGS ENABLE THAT OUTPUT ----------------------- 
 # --------------------------------------------------------------------------------------
-#export DEBUG_PLANCK_OUTPUT=1
-#export DEBUG_CAMB_OUTPUT=1
-#export DEBUG_CLASS_OUTPUT=1
-#export DEBUG_POLY_OUTPUT=1
-#export DEBUG_ACT_OUTPUT=1
+if [ -n "${COCOA_OUTPUT_VERBOSE}" ]; then
+    export DEBUG_PLANCK_OUTPUT=1
+    export DEBUG_CAMB_OUTPUT=1
+    export DEBUG_CLASS_OUTPUT=1
+    export DEBUG_POLY_OUTPUT=1
+    export DEBUG_ACT_OUTPUT=1
+fi
 
 # --------------------------------------------------------------------------------------
 # SET ENV FLAGS FOR LINKING/RUNNING/COMPILATION OF PROGRAMS ----------------------------
@@ -261,15 +270,17 @@ fi
 # DEBUG THE COMPILATION OF PREREQUISITES PACKAGES. BY DEFAULT, THE COMPILATION'S -------
 # OUTPUT IS NOT WRITTEN ON THE TERMINAL. THESE FLAGS ENABLE THAT OUTPUT ---------------- 
 # --------------------------------------------------------------------------------------
-#export DEBUG_CPP_PACKAGES=1
-#export DEBUG_C_PACKAGES=1
-#export DEBUG_FORTRAN_PACKAGES=1
-#export DEBUG_PIP_OUTPUT=1
-#export DEBUG_XZ_PACKAGE=1
-#export DEBUG_CMAKE_PACKAGE=1
-#export DEBUG_OPENBLAS_PACKAGE=1
-#export DEBUG_DISTUTILS_PACKAGE=1
-#export DEBUG_HDF5_PACKAGES=1
+if [ -n "${COCOA_OUTPUT_VERBOSE}" ]; then
+    export DEBUG_CPP_PACKAGES=1
+    export DEBUG_C_PACKAGES=1
+    export DEBUG_FORTRAN_PACKAGES=1
+    export DEBUG_PIP_OUTPUT=1
+    export DEBUG_XZ_PACKAGE=1
+    export DEBUG_CMAKE_PACKAGE=1
+    export DEBUG_OPENBLAS_PACKAGE=1
+    export DEBUG_DISTUTILS_PACKAGE=1
+    export DEBUG_HDF5_PACKAGES=1
+fi
 # --------------------------------------------------------------------------------------
 # DEBUG THE COMPILATION OF PREREQUISITES PACKAGES. IF YOU NEED TO RUN ------------------
 # SETUP_COCOA_INSTALLATION_PACKAGES >1x AND WANT TO SKIP PACKAGE FILE DECOMPRESSION ---- 
