@@ -55,6 +55,7 @@ external_modules/data/kids*
 external_modules/data/cocoa_*
 external_modules/data/ede*
 
+Cocoa/external_modules/code/planck/code/spt_clik/.lock-waf_*
 external_modules/code/planck/code/spt_clik/.waf*
 external_modules/code/planck/code/spt_clik/build/
 external_modules/code/planck/code/spt_clik/svnversion
