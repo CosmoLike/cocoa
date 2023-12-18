@@ -145,7 +145,7 @@ This behavior is critical to enable users to work on multiple instances of Cocoa
         # --------------------------- VERBOSE AS DEBUG TOOL ------------------------------------
         # --------------------------------------------------------------------------------------
         # --------------------------------------------------------------------------------------
-        export COCOA_OUTPUT_VERBOSE=1
+        #export COCOA_OUTPUT_VERBOSE=1
 
         # --------------------------------------------------------------------------------------
         # --------- IF TRUE, THEN COCOA USES CLIK FROM https://github.com/benabed/clik ---------
