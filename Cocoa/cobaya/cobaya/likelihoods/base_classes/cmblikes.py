@@ -195,7 +195,7 @@ class CMBlikes(DataSetLikelihood):
                 if self.pcl_lmin <= L <= self.pcl_lmax:
                     bins.binning_matrix[:, b, L - self.pcl_lmin] = window[i, 1:]
                 else:
-                    err = err or any(window[i, 1:] != 0)
+                    err = err or np.count_nonzero(window[i, 1:])
             if err:
                 self.log.warning('%s %u outside pcl_lmin-cl_max range: %s' %
                                  (file_stem, b, windows % (b + 1)))
@@ -212,7 +212,7 @@ class CMBlikes(DataSetLikelihood):
             theory_ij: List[int]
             CL: np.ndarray
 
-        cls = np.empty((nmaps, nmaps), dtype=object)
+        cls = np.empty((nmaps, nmaps), dtype=CrossPowerSpectrum)
         for i in range(nmaps):
             for j in range(i + 1):
                 CL = CrossPowerSpectrum()
@@ -438,7 +438,7 @@ class CMBlikes(DataSetLikelihood):
             with open(froot + '_lensing_fiducial_correction', 'w', encoding="utf-8") as f:
                 f.write("#%4s %12s \n" % ('bin', 'PP'))
                 for b in range(self.nbins):
-                    f.write("%5u %12.5e\n" % (b + 1, self.fid_correction[b]))
+                    f.write("%5u %12.5e\n" % (b + 1, float(self.fid_correction[b])))
 
     def diag_sigma(self):
         return np.sqrt(np.diag(self.full_cov))

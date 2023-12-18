@@ -13,7 +13,8 @@ import platform
 from copy import deepcopy
 from itertools import chain
 from functools import reduce
-from typing import Mapping, Union, Optional, TypeVar, Callable, Dict, List
+from typing import Mapping, MutableMapping, Union, Optional, TypeVar, Callable, Dict, \
+    List
 from collections import defaultdict
 
 # Local
@@ -219,7 +220,8 @@ def get_used_components(*infos, return_infos=False):
                     kind, kind)
             if return_infos:
                 for c in comps[kind]:
-                    comp_infos[c].update(info[kind][c] or {})
+                    comp_infos[c].update((info[kind][c] or {}) if
+                                         isinstance(info[kind], Mapping) else {})
     # return dictionary of non-empty blocks
     components = {k: v for k, v in comps.items() if v}
     return (components, dict(comp_infos)) if return_infos else components
@@ -273,14 +275,13 @@ def update_info(info: _Dict, strict: bool = True, add_aggr_chi2: bool = True) ->
     updated_info: _Dict = {}
     default_params_info = {}
     default_prior_info = {}
-    used_kind_members = get_used_components(input_info)
     from cobaya.component import CobayaComponent
-    for block in used_kind_members:
+    for block, block_info in get_used_components(input_info).items():
         updated: InfoDict = {}
         updated_info[block] = updated
         input_block = input_info[block]
         name: str
-        for name in used_kind_members[block]:
+        for name in block_info:
             # Preprocess "no options" and "external function" in input
             try:
                 input_block[name] = input_block[name] or {}
@@ -298,9 +299,9 @@ def update_info(info: _Dict, strict: bool = True, add_aggr_chi2: bool = True) ->
             if isinstance(input_block[name], type) or \
                     not isinstance(input_block[name], dict):
                 input_block[name] = {"external": input_block[name]}
-            ext = input_block[name].get("external")
+
             annotations = {}
-            if ext:
+            if ext := input_block[name].get("external"):
                 if isinstance(ext, type):
                     default_class_info, annotations = \
                         get_default_info(ext, block, input_options=input_block[name],
@@ -326,9 +327,9 @@ def update_info(info: _Dict, strict: bool = True, add_aggr_chi2: bool = True) ->
             reserved = {"external", "class", "provides", "requires", "renames",
                         "input_params", "output_params", "python_path", "aliases",
                         "package_install"}
-            options_not_recognized = set(input_block[name]).difference(
-                chain(reserved, updated[name], annotations))
-            if options_not_recognized:
+
+            if options_not_recognized := set(input_block[name]).difference(
+                    chain(reserved, updated[name], annotations)):
                 alternatives = {}
                 available = {"external", "class", "requires", "renames"}.union(
                     updated_info[block][name])
@@ -376,8 +377,7 @@ def update_info(info: _Dict, strict: bool = True, add_aggr_chi2: bool = True) ->
     for name in ("theory", "likelihood"):
         if isinstance(updated_info.get(name), dict):
             for item in updated_info[name].values():
-                renames = item.get("renames")
-                if renames:
+                if renames := item.get("renames"):
                     if not isinstance(renames, Mapping):
                         raise LoggedError(
                             logger, ("'renames' should be a dictionary of name mappings "
@@ -468,6 +468,8 @@ def merge_info(*infos):
         return previous_info
     current_info = None
     for new_info in infos[1:]:
+        if isinstance(previous_info, str):
+            raise LoggedError(logger, previous_info)
         previous_params_info = deepcopy(previous_info.pop("params", {}) or {})
         new_params_info = deepcopy(new_info).pop("params", {}) or {}
         # NS: params have been popped, since they have their own merge function
@@ -556,17 +558,27 @@ def is_equal_info(info_old, info_new, strict=True, print_not_log=False, ignore_b
                                 k, kind=block_name, component_path=component_path,
                                 class_name=(block1[k] or {}).get("class"), logger=logger)
                             ignore_k_this.update(set(
-                                getattr(cls, "_at_resume_prefer_new", {})))
+                                getattr(cls, "_at_resume_prefer_new", [])))
                         except ImportError:
                             pass
                     # Pop ignored and kept options
                     for j in ignore_k_this:
                         block1[k].pop(j, None)
                         block2[k].pop(j, None)
+            if not strict:
+                # For Mapping values, homogenize to None empty lists, sets, maps, etc.
+                # e.g. {value: {}} should be equal to {value: None}
+                for value in [block1[k], block2[k]]:
+                    if isinstance(value, MutableMapping):
+                        for kk in value:
+                            if hasattr(value[kk], "__len__") and len(value[kk]) == 0:
+                                value[kk] = None
             if block1[k] != block2[k]:
                 # For clarity, pop common stuff before printing
-                to_pop = [j for j in block1[k] if (block1[k].get(j) == block2[k].get(j))]
-                [(block1[k].pop(j, None), block2[k].pop(j, None)) for j in to_pop]
+                to_pop = [j for j in block1[k] if block1[k].get(j) == block2[k].get(j)]
+                for j in to_pop:
+                    block1[k].pop(j, None)
+                    block2[k].pop(j, None)
                 myprint(
                     myname + ": different content of [%s:%s]" % (block_name, k) +
                     " -- (re-run with `debug: True` for more info)")
@@ -590,7 +602,7 @@ def get_preferred_old_values(info_old):
                 cls = get_component_class(
                     k, kind=block_name, component_path=component_path,
                     class_name=(block[k] or {}).get("class"), logger=logger)
-                prefer_old_k_this = getattr(cls, "_at_resume_prefer_old", {})
+                prefer_old_k_this = getattr(cls, "_at_resume_prefer_old", [])
                 if prefer_old_k_this:
                     if block_name not in keep_old:
                         keep_old[block_name] = {}

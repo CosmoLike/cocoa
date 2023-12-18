@@ -97,7 +97,8 @@ if [ -n "${MANUAL_INSTALLATION}" ]; then
     export PYTHON_VERSION=3.8
     export GLOBAL_PACKAGES_LOCATION=$CONDA_PREFIX
     export GLOBALPYTHON3=$CONDA_PREFIX/bin/python${PYTHON_VERSION}
-   
+    export GLOBALPIP3=$CONDA_PREFIX/bin/pip3
+
     # --------------------------------------------------------------------------------------
     # USER NEEDS TO SPECIFY THE FLAGS BELOW SO COCOA CAN FIND PYTHON / GCC / HDF5
     # --------------------------------------------------------------------------------------
@@ -175,6 +176,7 @@ elif [ -n "${MINICONDA_INSTALLATION}" ]; then
     export PYTHON_VERSION=3.8
     export GLOBALPYTHON3=$CONDA_PREFIX/bin/python${PYTHON_VERSION}
     export GLOBAL_PACKAGES_LOCATION=$CONDA_PREFIX
+    export GLOBALPIP3=$CONDA_PREFIX/bin/pip3
 
     export PATH=$CONDA_PREFIX/bin:$PATH
     export CFLAGS="${CFLAGS} -I$CONDA_PREFIX/include"
@@ -317,8 +319,8 @@ if [ -z "${THREAD_UNXZ}" ]; then
     export MAKE_NUM_THREADS=1
 fi
 # --------------------------------------------------------------------------------------
-export PIP3=$ROOTDIR/.local/bin/pip3
 export PYTHON3=$ROOTDIR/.local/bin/python3
+export PIP3="$PYTHON3 -m pip"
 export COBAYA_PACKAGES_PATH=external_modules
 # --------------------------------------------------------------------------------------
 if [ -n "${COSMOLIKE_DEBUG_MODE}" ]; then

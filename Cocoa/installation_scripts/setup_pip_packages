@@ -65,6 +65,7 @@ fi
 
 if [ -z "${IGNORE_ALL_PIP_INSTALLATION}" ]; then
   if [ -z "${MINICONDA_INSTALLATION}" ]; then
+    echo "PIP INSTALL (BASIC PACKAGES)"
     env CXX=$CXX_COMPILER CC=$C_COMPILER $PIP3 install \
         'cython==0.29.35' \
         'mpi4py==3.1.4' \
@@ -96,6 +97,8 @@ if [ -z "${IGNORE_ALL_PIP_INSTALLATION}" ]; then
     fi
   fi
 
+  echo "PIP INSTALL CORE PACKAGES"
+  
   env CXX=$CXX_COMPILER CC=$C_COMPILER $PIP3 install \
       'appdirs==1.4.4' \
       'anytree==2.8.0' \
