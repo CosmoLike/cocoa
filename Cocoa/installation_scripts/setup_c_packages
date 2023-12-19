@@ -31,62 +31,48 @@ fi
 # --------------------------------------------------------------------------------------
 # --------------------------------------------------------------------------------------
 
+if [ -z "${DEBUG_C_PACKAGES}" ]; then
+  export OUTPUT_CPACKAGES_1="/dev/null"
+  export OUTPUT_CPACKAGES_2="/dev/null"
+else
+  export OUTPUT_CPACKAGES_1="/dev/tty"
+  export OUTPUT_CPACKAGES_2="/dev/tty"
+fi
+
 # --------------------------------------------------------------------------------------
 # ---------------------------------------- FFTW ----------------------------------------
 # --------------------------------------------------------------------------------------
 if [ -z "${IGNORE_C_FFTW_INSTALLATION}" ]; then
-  echo 'INSTALLING C FFTW LIBRARY - THIS MIGHT TAKE A WHILE'
+  echo -e '\033[1;34m''INSTALLING FFTW C LIBRARY - \e[4mIT WILL TAKE A WHILE''\033[0m'
 
-  
   cd $ROOTDIR/../cocoa_installation_libraries/$COCOA_FFTW_DIR
   
-  if [ -z "${DEBUG_C_PACKAGES}" ]; then
-    FC=$FORTRAN_COMPILER CC=$C_COMPILER ./configure --enable-openmp \
-    --prefix=$ROOTDIR/.local --enable-shared=yes --enable-static=yes > /dev/null 2> /dev/null
-    if [ $? -eq 0 ]; then
-      echo "FFTW CONFIGURE RUN DONE"
-    else
-      echo "FFTW COULD NOT RUN CONFIGURE - CHECK SETUP_C_PACKAGES SCRIPT" >&2
-      cd $ROOTDIR
-      return 1
-    fi
-
-    make -j $MAKE_NUM_THREADS all > /dev/null 2> /dev/null
-    if [ $? -eq 0 ]; then
-      echo "FFTW MAKE RUN DONE"
-    else
-      echo "FFTW COULD NOT RUN MAKE - CHECK SETUP_C_PACKAGES SCRIPT" >&2
-      cd $ROOTDIR
-      return 1
-    fi
-
-    make install > /dev/null 2> /dev/null
-    if [ $? -eq 0 ]; then
-      echo "FFTW MAKE INSTALL RUN DONE"
-    else
-      echo "FFTW COULD NOT RUN MAKE INSTALL - CHECK SETUP_C_PACKAGES SCRIPT" >&2
-      cd $ROOTDIR
-      return 1
-    fi
+  FC=$FORTRAN_COMPILER CC=$C_COMPILER ./configure --enable-openmp \
+  --prefix=$ROOTDIR/.local --enable-shared=yes --enable-static=yes > ${OUTPUT_CPACKAGES_1} 2> ${OUTPUT_CPACKAGES_2}
+  if [ $? -eq 0 ]; then
+    echo "FFTW RUN CONFIGURE DONE"
   else
-    FC=$FORTRAN_COMPILER CC=$C_COMPILER ./configure --enable-openmp \
-    --prefix=$ROOTDIR/.local --enable-shared=yes --enable-static=yes
-    if [ $? -ne 0 ];then
-      cd $ROOTDIR
-      return 1
-    fi
+    echo "FFTW COULD NOT RUN CONFIGURE"
+    cd $ROOTDIR
+    return 1
+  fi
 
-    make all
-    if [ $? -ne 0 ];then
-      cd $ROOTDIR
-      return 1
-    fi
+  make -j $MAKE_NUM_THREADS all > ${OUTPUT_CPACKAGES_1} 2> ${OUTPUT_CPACKAGES_2}
+  if [ $? -eq 0 ]; then
+    echo "FFTW RUN MAKE DONE"
+  else
+    echo "FFTW COULD NOT RUN MAKE"
+    cd $ROOTDIR
+    return 1
+  fi
 
-    make install
-    if [ $? -ne 0 ];then
-      cd $ROOTDIR
-      return 1
-    fi
+  make install > ${OUTPUT_CPACKAGES_1} 2> ${OUTPUT_CPACKAGES_2}
+  if [ $? -eq 0 ]; then
+    echo "FFTW MAKE INSTALL RUN DONE"
+  else
+    echo "FFTW COULD NOT RUN MAKE INSTALL"
+    cd $ROOTDIR
+    return 1
   fi
 
   cd $ROOTDIR
@@ -97,7 +83,7 @@ fi
 # --------------------------------------- CFITSIO --------------------------------------
 # --------------------------------------------------------------------------------------
 if [ -z "${IGNORE_C_CFITSIO_INSTALLATION}" ]; then
-  echo 'INSTALLING C CFITSIO LIBRARY - THIS MIGHT TAKE A WHILE'
+  echo -e '\033[1;34m''INSTALLING CFITSIO C LIBRARY - \e[4mIT MIGHT TAKE A WHILE''\033[0m'
 
   cd $ROOTDIR/../cocoa_installation_libraries/$COCOA_CFITSIO_DIR
 
@@ -106,55 +92,34 @@ if [ -z "${IGNORE_C_CFITSIO_INSTALLATION}" ]; then
   mkdir ./CFITSIOBUILD
   cd ./CFITSIOBUILD
 
-  if [ -z "${DEBUG_C_PACKAGES}" ]; then
-    $CMAKE -DBUILD_SHARED_LIBS=TRUE -DCMAKE_INSTALL_PREFIX=$ROOTDIR/.local \
+  $CMAKE -DBUILD_SHARED_LIBS=TRUE -DCMAKE_INSTALL_PREFIX=$ROOTDIR/.local \
     -DCMAKE_C_COMPILER=$C_COMPILER -DCMAKE_CXX_COMPILER=$CXX_COMPILER \
-    -DCMAKE_FC_COMPILER=FORTRAN_COMPILER --log-level=ERROR ..  > /dev/null 2> /dev/null
-    if [ $? -eq 0 ]; then
-      echo "CFITSIO CMAKE RUN DONE"
-    else
-      echo "CFITSIO COULD NOT RUN CMAKE - CHECK SETUP_C_PACKAGES SCRIPT" >&2
-      cd $ROOTDIR
-      return 1
-    fi
-
-    make -j $MAKE_NUM_THREADS all > /dev/null 2> /dev/null
-    if [ $? -eq 0 ]; then
-      echo "CFITSIO MAKE RUN DONE"
-    else
-      echo "CFITSIO COULD NOT RUN MAKE - CHECK SETUP_C_PACKAGES SCRIPT" >&2
-      cd $ROOTDIR
-      return 1
-    fi
-
-    make install > /dev/null 2> /dev/null
-    if [ $? -eq 0 ]; then
-      echo "CFITSIO MAKE INSTALL RUN DONE"
-    else
-      echo "CFITSIO COULD NOT RUN MAKE INSTALL - CHECK SETUP_C_PACKAGES SCRIPT" >&2
-      cd $ROOTDIR
-      return 1
-    fi
+    -DCMAKE_FC_COMPILER=FORTRAN_COMPILER \
+    --log-level=ERROR .. > ${OUTPUT_CPACKAGES_1} 2> ${OUTPUT_CPACKAGES_2}
+  if [ $? -eq 0 ]; then
+    echo "CFITSIO RUN CMAKE DONE"
   else
-    $CMAKE -DBUILD_SHARED_LIBS=TRUE -DCMAKE_INSTALL_PREFIX=$ROOTDIR/.local \
-    -DCMAKE_C_COMPILER=$C_COMPILER -DCMAKE_CXX_COMPILER=$CXX_COMPILER \
-    -DCMAKE_FC_COMPILER=FORTRAN_COMPILER ..
-    if [ $? -ne 0 ];then
-      cd $ROOTDIR
-      return 1
-    fi
+    echo "CFITSIO COULD NOT RUN CMAKE"
+    cd $ROOTDIR
+    return 1
+  fi
 
-    make all
-    if [ $? -ne 0 ];then
-      cd $ROOTDIR
-      return 1
-    fi
+  make -j $MAKE_NUM_THREADS all > ${OUTPUT_CPACKAGES_1} 2> ${OUTPUT_CPACKAGES_2}
+  if [ $? -eq 0 ]; then
+    echo "CFITSIO RUN MAKE DONE"
+  else
+    echo "CFITSIO COULD NOT RUN MAKE"
+    cd $ROOTDIR
+    return 1
+  fi
 
-    make install
-    if [ $? -ne 0 ];then
-      cd $ROOTDIR
-      return 1
-    fi
+  make install > ${OUTPUT_CPACKAGES_1} 2> ${OUTPUT_CPACKAGES_2}
+  if [ $? -eq 0 ]; then
+    echo "CFITSIO RUN MAKE INSTALL DONE"
+  else
+    echo "CFITSIO COULD NOT RUN MAKE INSTALL"
+    cd $ROOTDIR
+    return 1
   fi
 
   cd ../
@@ -168,58 +133,36 @@ fi
 # ----------------------------------------- GSL ----------------------------------------
 # --------------------------------------------------------------------------------------
 if [ -z "${IGNORE_C_GSL_INSTALLATION}" ]; then
-  echo 'INSTALLING C GSL LIBRARY - THIS MIGHT TAKE A WHILE'
+  echo -e '\033[1;34m''INSTALLING GSL C LIBRARY - \e[4mIT WILL TAKE A WHILE''\033[0m'
 
   cd $ROOTDIR/../cocoa_installation_libraries/$COCOA_GSL_DIR
 
-  if [ -z "${DEBUG_C_PACKAGES}" ]; then
-    CC=$C_COMPILER ./configure --prefix=$ROOTDIR/.local --enable-shared=yes \
-    --enable-static=yes > /dev/null 2> /dev/null
-    if [ $? -eq 0 ] 
-    then
-      echo "GSL CONFIGURE RUN DONE"
-    else
-      echo "GSL COULD NOT RUN CONFIGURE - CHECK SETUP_C_PACKAGES SCRIPT" >&2
-      cd $ROOTDIR
-      return 1
-    fi
-
-    make -j $MAKE_NUM_THREADS all > /dev/null 2> /dev/null
-    if [ $? -eq 0 ]; then
-      echo "GSL MAKE RUN DONE"
-    else
-      echo "GSL COULD NOT RUN MAKE - CHECK SETUP_C_PACKAGES SCRIPT" >&2
-      cd $ROOTDIR
-      return 1
-    fi
-
-    make install > /dev/null 2> /dev/null
-    if [ $? -eq 0 ]; then
-      echo "MAKE INSTALL GSL OK"
-    else
-      echo "GSL COULD NOT RUN MAKE INSTALL - CHECK SETUP_C_PACKAGES SCRIPT" >&2
-      cd $ROOTDIR
-      return 1
-    fi
+  CC=$C_COMPILER ./configure --prefix=$ROOTDIR/.local --enable-shared=yes \
+    --enable-static=yes > ${OUTPUT_CPACKAGES_1} 2> ${OUTPUT_CPACKAGES_2}
+  if [ $? -eq 0 ]; then
+    echo "GSL RUN CONFIGURE DONE"
   else
-    CC=$C_COMPILER ./configure --prefix=$ROOTDIR/.local --enable-shared=yes \
-    --enable-static=yes
-    if [ $? -ne 0 ];then
-      cd $ROOTDIR
-      return 1
-    fi
+    echo "GSL COULD NOT RUN CONFIGURE"
+    cd $ROOTDIR
+    return 1
+  fi
 
-    make all
-    if [ $? -ne 0 ];then
-      cd $ROOTDIR
-      return 1
-    fi
-    
-    make install
-    if [ $? -ne 0 ];then
-      cd $ROOTDIR
-      return 1
-    fi
+  make -j $MAKE_NUM_THREADS all > ${OUTPUT_CPACKAGES_1} 2> ${OUTPUT_CPACKAGES_2}
+  if [ $? -eq 0 ]; then
+    echo "GSL RUN MAKE DONE"
+  else
+    echo "GSL COULD NOT RUN MAKE"
+    cd $ROOTDIR
+    return 1
+  fi
+
+  make install > ${OUTPUT_CPACKAGES_1} 2> ${OUTPUT_CPACKAGES_2}
+  if [ $? -eq 0 ]; then
+    echo "GSL RUN MAKE INSTALL DONE"
+  else
+    echo "GSL COULD NOT RUN MAKE INSTALL"
+    cd $ROOTDIR
+    return 1
   fi
 
   cd $ROOTDIR

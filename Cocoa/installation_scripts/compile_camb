@@ -29,9 +29,13 @@ fi
 # ----------------------------------------------------------------------------
 
 if [ -z "${IGNORE_CAMB_COMPILATION}" ]; then
-  echo 'COMPILING CAMB'
+  echo -e '\033[1;34m''COMPILING CAMB''\033[0m'
 
+  # ---------------------------------------------------------------------------
+  # ---------------------------------------------------------------------------
   cd $ROOTDIR/external_modules/code/CAMB/
+  # ---------------------------------------------------------------------------
+  # ---------------------------------------------------------------------------
 
   rm -rf ./build/
 
@@ -51,23 +55,23 @@ if [ -z "${IGNORE_CAMB_COMPILATION}" ]; then
 
   $PYTHON3 setup.py clean > ${OUTPUT_CAMB_1} 2> ${OUTPUT_CAMB_2}
   if [ $? -ne 0 ]; then
-    echo "CAMB COULD NOT RUN PYTHON3 SETUP.PY CLEAN"
+    echo -e '\033[0;31m'"CAMB COULD NOT RUN \e[3mPYTHON3 SETUP.PY CLEAN"'\033[0m'
     cd $ROOTDIR
     return 1
   else
-    echo "CAMB PYTHON3 SETUP.PY CLEAN DONE"
+    echo -e '\033[0;32m'"CAMB RUN \e[3mPYTHON3 SETUP.PY CLEAN\e[0m\e\033[0;32m DONE"'\033[0m'
   fi
 
   COMPILER=$FORTRAN_COMPILER F90C=$FORTRAN_COMPILER $PYTHON3 setup.py build \
     > ${OUTPUT_CAMB_1} 2> ${OUTPUT_CAMB_2}
   if [ $? -ne 0 ]; then
-    echo "CAMB COULD NOT RUN PYTHON3 SETUP.PY BUILD"
+    echo -e '\033[0;31m'"CAMB COULD NOT RUN \e[3mPYTHON3 SETUP.PY BUILD"'\033[0m'
     cd $ROOTDIR
     return 1
   else
-    echo "CAMB PYTHON3 SETUP.PY BUILD DONE"
+    echo -e '\033[0;32m'"CAMB RUN \e[3mPYTHON3 SETUP.PY BUILD\e[0m\e\033[0;32m DONE"'\033[0m'
   fi
 
   cd $ROOTDIR
-  echo 'COMPILING CAMB DONE'
+  echo -e '\033[1;34m''\e[4mCOMPILING CAMB DONE''\033[0m'
 fi

@@ -30,9 +30,13 @@ fi
 # ----------------------------------------------------------------------------
 
 if [ -z "${IGNORE_ACT_COMPILATION}" ]; then
-  echo 'COMPILING ACT'
+  echo -e '\033[1;34m''COMPILING ACT''\033[0m'
 
+  # ---------------------------------------------------------------------------
+  # ---------------------------------------------------------------------------
   cd $ROOTDIR/external_modules/code/pyactlike/
+  # ---------------------------------------------------------------------------
+  # ---------------------------------------------------------------------------
 
   rm -rf ./build/
   rm -rf ./pyactlike.egg-info/
@@ -47,21 +51,22 @@ if [ -z "${IGNORE_ACT_COMPILATION}" ]; then
 
   $PYTHON3 setup.py clean  > ${OUTPUT_ACT_1} 2> ${OUTPUT_ACT_2}
   if [ $? -ne 0 ]; then
-    echo "ACT COULD NOT RUN PYTHON3 SETUP.PY CLEAN"
+    echo -e '\033[0;31m'"ACT COULD NOT RUN \e[3mPYTHON3 SETUP.PY CLEAN"'\033[0m'
     cd $ROOTDIR
     return 1
   else
-    echo "ACT PYTHON3 SETUP.PY CLEAN RUN DONE"
+    echo -e '\033[0;32m'"ACT RUN \e[3mPYTHON3 SETUP.PY CLEAN\e[0m\e\033[0;32m DONE"'\033[0m'
   fi
 
   $PIP3 install . --prefix=$ROOTDIR/.local > ${OUTPUT_ACT_1} 2> ${OUTPUT_ACT_2}
   if [ $? -ne 0 ]; then
-    echo "ACT COULD NOT RUN PIP3 INSTALL ."
+    echo -e '\033[0;31m'"ACT COULD NOT RUN \e[3mPIP3 INSTALL ."'\033[0m'
     cd $ROOTDIR
     return 1
   else
-    echo "ACT PIP3 INSTALL . RUN DONE"
+    echo -e '\033[0;32m'"ACT RUN \e[3mPIP3 INSTALL . RUN\e[0m\e\033[0;32m DONE"'\033[0m'
   fi
 
   cd $ROOTDIR
+  echo -e '\033[1;34m''\e[4mCOMPILING ACT DONE''\033[0m'
 fi

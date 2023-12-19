@@ -25,7 +25,7 @@ fi
 # ----------------------------------------------------------------------------
 # ----------------------------------------------------------------------------
 if [ -z "${IGNORE_PLANCK_COMPILATION}" ]; then
-  echo 'COMPILING PLANCK'
+  echo -e '\033[1;34m''COMPILING PLANCK''\033[0m'
 
   if [ -z "${DEBUG_PLANCK_OUTPUT}" ]; then
     export OUTPUT_PLANCK_1="/dev/null"
@@ -47,21 +47,25 @@ if [ -z "${IGNORE_PLANCK_COMPILATION}" ]; then
     export LAPALIBS=$GLOBAL_PACKAGES_LOCATION
   fi
 
+  # ---------------------------------------------------------------------------
+  # ---------------------------------------------------------------------------
   if [ -z "${USE_SPT_CLIK_PLANCK}" ]; then
     cd $ROOTDIR/external_modules/code/planck/code/plc_3.0/plc-3.1/
   else
     cd $ROOTDIR/external_modules/code/planck/code/spt_clik/
   fi
-  
+  # ---------------------------------------------------------------------------
+  # ---------------------------------------------------------------------------
+
   rm -rf .waf*
 
   $PYTHON3 waf distclean > ${OUTPUT_PLANCK_1} 2> ${OUTPUT_PLANCK_2}
   if [ $? -ne 0 ]; then
-    echo "PLANCK COULD NOT RUN WAF DISTCLEAN"
+    echo -e '\033[0;31m'"PLANCK COULD NOT RUN WAF DISTCLEAN"'\033[0m'
     cd $ROOTDIR
     return 1
   else
-    echo "PLANCK WAF CLEAN RUN DONE"
+    echo -e '\033[0;32m'"PLANCK RUN \e[3mWAF CLEAN RUN\e[0m\e\033[0;32m DONE"'\033[0m'
   fi
   
   FC=$FORTRAN_COMPILER CC=$C_COMPILER CXX=$CXX_COMPILER $PYTHON3 waf configure \
@@ -69,22 +73,22 @@ if [ -z "${IGNORE_PLANCK_COMPILATION}" ]; then
     --lapack_prefix=${LAPALIBS} --cfitsio_lib=${CFITSLIBS} \
     --python=${PYTHON3} > ${OUTPUT_PLANCK_1} 2> ${OUTPUT_PLANCK_2}
   if [ $? -ne 0 ]; then
-    echo "PLANCK COULD NOT RUN WAF CONFIGURE"
+    echo -e '\033[0;31m'"PLANCK COULD NOT RUN WAF CONFIGURE"'\033[0m'
     cd $ROOTDIR
     return 1
   else
-    echo "PLANCK WAF CONFIGURE RUN DONE"
+    echo -e '\033[0;32m'"PLANCK RUN \e[3mWAF CONFIGURE RUN\e[0m\e\033[0;32m DONE"'\033[0m'
   fi
   
   $PYTHON3 waf install -v > ${OUTPUT_PLANCK_1} 2> ${OUTPUT_PLANCK_2}
   if [ $? -ne 0 ]; then
-    echo "PLANCK COULD NOT RUN WAF INSTALL"
+    echo -e '\033[0;31m'"PLANCK COULD NOT RUN WAF INSTALL"'\033[0m'
     cd $ROOTDIR
     return 1
   else
-    echo "PLANCK WAF INSTALL RUN DONE"
+    echo -e '\033[0;32m'"PLANCK RUN \e[3mWAF INSTALL RUN\e[0m\e\033[0;32m DONE"'\033[0m'
   fi
 
   cd $ROOTDIR
-  echo 'COMPILING PLANCK DONE'
+  echo -e '\033[1;34m''\e[4mCOMPILING PLANCK DONE''\033[0m'
 fi

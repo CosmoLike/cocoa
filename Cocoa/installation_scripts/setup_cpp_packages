@@ -35,7 +35,7 @@ fi
 # --------------------------------------- SPDLOG ---------------------------------------
 # --------------------------------------------------------------------------------------
 if [ -z "${IGNORE_CPP_SPDLOG_INSTALLATION}" ]; then
-  echo 'INSTALLING CPP SPDLOG LIBRARY - THIS MIGHT TAKE A WHILE'
+  echo -e '\033[1;34m''INSTALLING SPDLOG C++ LIBRARY - \e[4mIT MAY TAKE A WHILE''\033[0m'
 
   cd $ROOTDIR/../cocoa_installation_libraries/$COCOA_SPDLOG_DIR
 
@@ -45,7 +45,7 @@ if [ -z "${IGNORE_CPP_SPDLOG_INSTALLATION}" ]; then
     $CMAKE -DCMAKE_INSTALL_PREFIX=$ROOTDIR/.local -DCMAKE_C_COMPILER=$C_COMPILER \
     -DCMAKE_CXX_COMPILER=$CXX_COMPILER --log-level=ERROR . > /dev/null 2> /dev/null
     if [ $? -eq 0 ];then
-      echo "SPDLOG CMAKE RUN DONE"
+      echo "SPDLOG RUN CMAKE DONE"
     else
       echo "SPDLOG COULD NOT RUN CMAKE - CHECK SETUP_CPP_PACKAGES SCRIPT" >&2
       cd $ROOTDIR
@@ -54,18 +54,18 @@ if [ -z "${IGNORE_CPP_SPDLOG_INSTALLATION}" ]; then
 
     make -j $MAKE_NUM_THREADS > /dev/null 2> /dev/null
     if [ $? -eq 0 ]; then
-      echo "SPDLOG MAKE RUN DONE"
+      echo "SPDLOG RUN MAKE DONE"
     else
-      echo "SPDLOG COULD NOT RUN MAKE - CHECK SETUP_CPP_PACKAGES SCRIPT" >&2
+      echo "SPDLOG COULD NOT RUN MAKE" >&2
       cd $ROOTDIR
       return 1
     fi
 
     make install > /dev/null
     if [ $? -eq 0 ]; then
-      echo "SPDLOG MAKE INSTALL RUN DONE"
+      echo "SPDLOG RUN MAKE INSTALL DONE"
     else
-      echo "SPDLOG COULD NOT RUN MAKE INSTALL - CHECK SETUP_CPP_PACKAGES SCRIPT" >&2
+      echo "SPDLOG COULD NOT RUN MAKE INSTALL" >&2
       cd $ROOTDIR
       return 1
     fi
@@ -90,14 +90,14 @@ if [ -z "${IGNORE_CPP_SPDLOG_INSTALLATION}" ]; then
   fi
 
   cd $ROOTDIR
-  echo 'INSTALLING CPP SPDLOG LIBRARY - DONE'
+  echo -e '\033[1;34m''\e[4mINSTALLING SPDLOG C++ LIBRARY DONE''\033[0m'
 fi
 
 # --------------------------------------------------------------------------------------
 # ------------------------------------- ARMADILLO --------------------------------------
 # --------------------------------------------------------------------------------------
 if [ -z "${IGNORE_CPP_ARMA_INSTALLATION}" ]; then
-  echo 'INSTALLING CPP ARMADILLO LIBRARY - THIS MIGHT TAKE A WHILE'
+  echo -e '\033[1;34m''INSTALLING ARMADILLO C++ LIBRARY - \e[4mIT MAY TAKE A WHILE''\033[0m'
 
   cd $ROOTDIR/../cocoa_installation_libraries/$COCOA_ARMADILLO_DIR
 
@@ -109,9 +109,9 @@ if [ -z "${IGNORE_CPP_ARMA_INSTALLATION}" ]; then
     -DLAPACK_FOUND=YES -DLAPACK_LIBRARIES=$ROOTDIR/.local/lib/liblapack.so \
     -DBLAS_FOUND=NO --log-level=ERROR . > /dev/null 2> /dev/null
     if [ $? -eq 0 ]; then
-      echo "ARMADILLO CMAKE RUN DONE"
+      echo "ARMADILLO RUN CMAKE DONE"
     else
-      echo "ARMADILLO COULD NOT RUN CMAKE - CHECK SETUP_CPP_PACKAGES SCRIPT" >&2
+      echo "ARMADILLO COULD NOT RUN CMAKE"
       cd $ROOTDIR
       return 1
     fi
@@ -119,18 +119,18 @@ if [ -z "${IGNORE_CPP_ARMA_INSTALLATION}" ]; then
     make clean
     make -j $MAKE_NUM_THREADS all -Wno-dev > /dev/null 2> /dev/null
     if [ $? -eq 0 ]; then
-      echo "ARMADILLO MAKE RUN DONE"
+      echo "ARMADILLO RUN MAKE DONE"
     else
-      echo "ARMADILLO COULD NOT RUN MAKE - CHECK SETUP_CPP_PACKAGES SCRIPT" >&2
+      echo "ARMADILLO COULD NOT RUN MAKE"
       cd $ROOTDIR
       return 1
     fi
 
     make install > /dev/null
     if [ $? -eq 0 ]; then
-      echo "ARMADILLO MAKE INSTALL RUN DONE"
+      echo "ARMADILLO RUN MAKE INSTALL DONE"
     else
-      echo "ARMADILLO COULD NOT RUN MAKE INSTALL - CHECK SETUP_CPP_PACKAGES SCRIPT" >&2
+      echo "ARMADILLO COULD NOT RUN MAKE INSTALL"
       cd $ROOTDIR
       return 1
     fi
@@ -158,14 +158,14 @@ if [ -z "${IGNORE_CPP_ARMA_INSTALLATION}" ]; then
   fi
 
   cd $ROOTDIR
-  echo 'INSTALLING CPP ARMADILLO LIBRARY - DONE'
+  echo -e '\033[1;34m''\e[4mINSTALLING ARMADILLO C++ LIBRARY DONE''\033[0m'
 fi
 
 # --------------------------------------------------------------------------------------
 # --------------------------- CARMA (ARMADILLO <-> PYBIND11) ---------------------------
 # --------------------------------------------------------------------------------------
 if [ -z "${IGNORE_CPP_CARMA_INSTALLATION}" ]; then
-  echo 'INSTALLING CARMA -  THE PYTHON <-> ARMADILLO CONVERSION - THIS MIGHT TAKE A WHILE'
+  echo -e '\033[1;34m''INSTALLING CARMA C++ LIBRARY''\033[0m'
 
   cd $ROOTDIR/../cocoa_installation_libraries/$COCOA_CARMA_DIR
 
@@ -178,32 +178,32 @@ if [ -z "${IGNORE_CPP_CARMA_INSTALLATION}" ]; then
   cp -r ./carma_bits $ROOTDIR/.local/include/
 
   cd $ROOTDIR
-  echo 'INSTALLING CARMA -  THE PYTHON <-> ARMADILLO CONVERSION - DONE'
+  echo -e '\033[1;34m''\e[4mINSTALLING CARMA C++ LIBRARY DONE''\033[0m'
 fi
 
 # --------------------------------------------------------------------------------------
 # ---------------------------------------- BOOST ---------------------------------------
 # --------------------------------------------------------------------------------------
 if [ -z "${IGNORE_CPP_BOOST_INSTALLATION}" ]; then
-  echo 'INSTALLING CPP BOOST LIBRARY - THIS WILL TAKE A WHILE'
+  echo -e '\033[1;34m''INSTALLING BOOST C++ LIBRARY - \e[4mIT WILL TAKE A WHILE''\033[0m'
 
   cd $ROOTDIR/../cocoa_installation_libraries/$COCOA_BOOST_DIR
 
   if [ -z "${DEBUG_CPP_PACKAGES}" ]; then
     ./bootstrap.sh --prefix=$ROOTDIR/.local > /dev/null 2> /dev/null
     if [ $? -eq 0 ]; then
-      echo "BOOST BOOTSTRAP RUN DONE"
+      echo "BOOST RUN BOOTSTRAP DONE"
     else
-      echo "BOOST COULD NOT RUN BOOTSTRAP - CHECK SETUP_CPP_PACKAGES SCRIPT" >&2
+      echo "BOOST COULD NOT RUN BOOTSTRAP" >&2
       return 1
     fi
 
     ./b2 --with=regex install --without-python --without-thread \
     --without-timer --without-mpi --without-atomic > /dev/null 2> /dev/null
     if [ $? -eq 0 ]; then
-      echo "BOOST B2 RUN DONE"
+      echo "BOOST RUN B2 DONE"
     else
-      echo "BOOST COULD NOT RUN B2 - CHECK SETUP_CPP_PACKAGES SCRIPT" >&2
+      echo "BOOST COULD NOT RUN B2"
       return 1
     fi
   else
@@ -222,7 +222,7 @@ if [ -z "${IGNORE_CPP_BOOST_INSTALLATION}" ]; then
   fi
   
   cd $ROOTDIR
-  echo 'INSTALLING CPP BOOST LIBRARY - DONE'
+  echo -e '\033[1;34m''\e[4mINSTALLING BOSST C++ LIBRARY DONE''\033[0m'
 fi
 
 # --------------------------------------------------------------------------------------

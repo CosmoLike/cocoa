@@ -30,7 +30,7 @@ fi
 # ----------------------------------------------------------------------------
 
 if [ -z "${IGNORE_OPENBLAS_INSTALLATION}" ]; then
-  echo 'INSTALLING OPENBLAS - THAT WILL TAKE A WHILE'
+  echo -e '\033[1;34m''INSTALLING OPENBLAS LIBRARY - \e[4mIT WILL TAKE A WHILE''\033[0m'
 
   cd $ROOTDIR/../cocoa_installation_libraries/$COCOA_OPENBLAS_DIR
 
@@ -40,7 +40,7 @@ if [ -z "${IGNORE_OPENBLAS_INSTALLATION}" ]; then
   if [ -z "${DEBUG_OPENBLAS_PACKAGE}" ]; then
     make CC=$C_COMPILER FC=$FORTRAN_COMPILER USE_OPENMP=1 > /dev/null 2> /dev/null
     if [ $? -eq 0 ]; then
-      echo "OPENBLAS MAKE RUN DONE"
+      echo "OPENBLAS RUN MAKE DONE"
     else
       echo "OPENBLAS COULD NOT RUN MAKE" >&2
       return 1
@@ -48,7 +48,7 @@ if [ -z "${IGNORE_OPENBLAS_INSTALLATION}" ]; then
 
     make install PREFIX=$ROOTDIR/.local > /dev/null 2> /dev/null
     if [ $? -eq 0 ]; then
-      echo "OPENBLAS MAKE INSTALL RUN DONE"
+      echo "OPENBLAS RUN MAKE INSTALL DONE"
     else
       echo "OPENBLAS COULD NOT RUN MAKE INSTALL" >&2
       return 1
@@ -70,4 +70,5 @@ if [ -z "${IGNORE_OPENBLAS_INSTALLATION}" ]; then
   unset MAKE_NB_JOBS
 
   cd $ROOTDIR/
+  echo -e '\033[1;34m''\e[4mCOMPILING OPENBLAS LIBRARY''\033[0m'
 fi

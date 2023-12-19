@@ -24,5 +24,6 @@ rm -f class
 cd ./python
 
 $PYTHON3 setup.py clean
+rm -rf $ROOTDIR/external_modules/code/class_public/python/classy.egg-info
 
 cd $ROOTDIR

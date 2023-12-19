@@ -30,7 +30,7 @@ fi
 # ----------------------------------------------------------------------------
 
 if [ -z "${IGNORE_HDF5_INSTALLATION}" ]; then
-  echo 'INSTALLING HDF5 LIBRARY - THIS MIGHT TAKE A WHILE'
+  echo -e '\033[1;34m''INSTALLING HDF5 LIBRARY - \e[4mIT MAY TAKE A WHILE''\033[0m'
 
   cd $ROOTDIR/../cocoa_installation_libraries/$COCOA_HDF5_DIR2
   
@@ -45,7 +45,7 @@ if [ -z "${IGNORE_HDF5_INSTALLATION}" ]; then
       -DCMAKE_C_COMPILER=$C_COMPILER -DCMAKE_CXX_COMPILER=$CXX_COMPILER \
       -DCMAKE_FC_COMPILER=FORTRAN_COMPILER --log-level=ERROR .. > /dev/null 2> /dev/null
     if [ $? -eq 0 ]; then
-      echo "HDF5 CMAKE RUN DONE"
+      echo "HDF5 RUN CMAKE  DONE"
     else
       echo "HDF5 COULD NOT RUN CMAKE"
       cd $ROOTDIR
@@ -54,7 +54,7 @@ if [ -z "${IGNORE_HDF5_INSTALLATION}" ]; then
 
     make -j $MAKE_NUM_THREADS > /dev/null 2> /dev/null
     if [ $? -eq 0 ]; then
-      echo "HDF5 MAKE RUN DONE"
+      echo "HDF5 RUN MAKE DONE"
     else
       echo "HDF5 COULD NOT RUN MAKE"
       cd $ROOTDIR
@@ -63,7 +63,7 @@ if [ -z "${IGNORE_HDF5_INSTALLATION}" ]; then
 
     make install > /dev/null 2> /dev/null
     if [ $? -eq 0 ]; then
-      echo "HDF5 MAKE INSTALL RUN DONE"
+      echo "HDF5 RUN MAKE INSTALL DONE"
     else
       echo "HDF5 COULD NOT RUN MAKE INSTALL"
       cd $ROOTDIR
@@ -92,5 +92,5 @@ if [ -z "${IGNORE_HDF5_INSTALLATION}" ]; then
   fi
 
   cd $ROOTDIR
-  echo 'INSTALLING HDF5 LIBRARY - DONE'
+  echo -e '\033[1;34m''\e[4mCOMPILING HDF5 LIBRARY''\033[0m'
 fi

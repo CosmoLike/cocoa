@@ -29,14 +29,14 @@ fi
 # ----------------------------------------------------------------------------
 
 if [ -z "${IGNORE_CLASS_COMPILATION}" ]; then
-  echo 'COMPILING CLASS'
+  echo -e '\033[1;34m''COMPILING CLASS''\033[0m'
 
+  # ---------------------------------------------------------------------------
+  # ---------------------------------------------------------------------------
   cd $ROOTDIR/external_modules/code/class_public/
-
-  #Workaround Cocoa .gitignore entry on /include
-  rm -rf $ROOTDIR/external_modules/code/class_public/include
-  cp -r $ROOTDIR/external_modules/code/class_public/include2 $ROOTDIR/external_modules/code/class_public/include
-
+  # ---------------------------------------------------------------------------
+  # ---------------------------------------------------------------------------
+  
   if [ -z "${DEBUG_CLASS_OUTPUT}" ]; then
     export OUTPUT_CLASS_1="/dev/null"
     export OUTPUT_CLASS_2="/dev/null"
@@ -45,48 +45,59 @@ if [ -z "${IGNORE_CLASS_COMPILATION}" ]; then
     export OUTPUT_CLASS_2="/dev/tty"
   fi
 
+  # ---------------------------------------------------------------------------
+  # ---------------------------------------------------------------------------
+  #Workaround Cocoa .gitignore entry on /include
+  rm -rf ./include > ${OUTPUT_CLASS_1} 2> ${OUTPUT_CLASS_2}
+  cp -r  ./include2 ./include > ${OUTPUT_CLASS_1} 2> ${OUTPUT_CLASS_2}
+
   make clean > ${OUTPUT_CLASS_1} 2> ${OUTPUT_CLASS_2}
   if [ $? -ne 0 ]; then
-    echo "CLASS COULD NOT RUN MAKE CLEAN"
+    echo -e '\033[0;31m'"CLASS COULD NOT RUN \e[3mMAKE CLEAN\e[0m"'\033[0m'
     cd $ROOTDIR
     return 1
   else
-    echo "CLASS MAKE CLEAN RUN DONE"
+    echo -e '\033[0;32m'"CLASS RUN \e[3mMAKE CLEAN RUN\e[0m\e\033[0;32m DONE"'\033[0m'
   fi
 
   rm -f class
-
-  CC=$C_COMPILER PYTHON=$PYTHON3 make -j $MAKE_NUM_THREADS > ${OUTPUT_CLASS_1} 2> ${OUTPUT_CLASS_2}
-  if [ $? -ne 0 ]; then
-    echo "CLASS COULD NOT RUN MAKE"
-    cd $ROOTDIR
-    return 1
-  else
-    echo "CLASS MAKE RUN DONE"
-  fi
 
   cd ./python
 
   $PYTHON3 setup.py clean > ${OUTPUT_CLASS_1} 2> ${OUTPUT_CLASS_2}
   if [ $? -ne 0 ]; then
-    echo "CLASS COULD NOT PYTHON3 SETUP.PY CLEAN"
+    echo -e '\033[0;31m'"CLASS COULD NOT RUN \e[3mPYTHON3 SETUP.PY CLEAN\e[0m"'\033[0m'
     cd $ROOTDIR
     return 1
   else
-    echo "CLASS PYTHON3 SETUP.PY CLEAN DONE"
+    echo -e '\033[0;32m'"CLASS RUN \e[3mPYTHON3 SETUP.PY CLEAN\e[0m\e\033[0;32m DONE"'\033[0m'
   fi
 
   rm -rf ./build/
- 
-  CC=$C_COMPILER $PYTHON3 setup.py build > ${OUTPUT_CLASS_1} 2> ${OUTPUT_CLASS_2}
+  cd ../
+  # ---------------------------------------------------------------------------
+  # ---------------------------------------------------------------------------
+
+  CC=$C_COMPILER PYTHON=$PYTHON3 make all > ${OUTPUT_CLASS_1} 2> ${OUTPUT_CLASS_2}
   if [ $? -ne 0 ]; then
-    echo "CLASS COULD NOT PYTHON3 SETUP.PY BUILD"
+    echo -e '\033[0;31m'"CLASS COULD NOT RUN \e[3mMAKE ALL\e[0m"'\033[0m'
     cd $ROOTDIR
     return 1
   else
-    echo "CLASS PYTHON3 SETUP.PY BUILD DONE"
+    echo -e '\033[0;32m'"CLASS RUN \e[3mMAKE ALL\e[0m\e\033[0;32m DONE"'\033[0m'
+  fi
+   
+  cd ./python
+
+  CC=$C_COMPILER $PYTHON3 setup.py build > ${OUTPUT_CLASS_1} 2> ${OUTPUT_CLASS_2}
+  if [ $? -ne 0 ]; then
+    echo -e '\033[0;31m'"CLASS COULD NOT RUN \e[3mPYTHON3 SETUP.PY BUILD\e[0m"'\033[0m'
+    cd $ROOTDIR
+    return 1
+  else
+    echo -e '\033[0;32m'"CLASS RUN \e[3mPYTHON3 SETUP.PY BUILD\e[0m\e\033[0;32m DONE"'\033[0m'
   fi
 
   cd $ROOTDIR
-  echo 'COMPILING CLASS DONE'
+  echo -e '\033[1;34m''\e[4mCOMPILING CLASS DONE''\033[0m'
 fi
