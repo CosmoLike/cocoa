@@ -32,8 +32,21 @@ fi
 if [ -z "${IGNORE_HDF5_INSTALLATION}" ]; then
   echo -e '\033[1;34m''INSTALLING HDF5 LIBRARY - \e[4mIT MAY TAKE A WHILE''\033[0m'
 
+  if [ -z "${DEBUG_HDF5_PACKAGES}" ]; then
+    export OUTPUT_HDF5_1="/dev/null"
+    export OUTPUT_HDF5_2="/dev/null"
+    export HDF5_MAKE_NUM_THREADS="${MAKE_NUM_THREADS}"
+  else
+    export OUTPUT_HDF5_1="/dev/tty"
+    export OUTPUT_HDF5_2="/dev/tty"
+    export HDF5_MAKE_NUM_THREADS=1
+  fi
+
+  # --------------------------------------------------------------------------------------
+  # --------------------------------------------------------------------------------------
   cd $ROOTDIR/../cocoa_installation_libraries/$COCOA_HDF5_DIR2
-  
+  # --------------------------------------------------------------------------------------
+  # --------------------------------------------------------------------------------------
   rm -f  CMakeCache.txt
   rm -rf CMakeFiles/
   rm -rf cocoa_build/
@@ -43,53 +56,33 @@ if [ -z "${IGNORE_HDF5_INSTALLATION}" ]; then
   if [ -z "${DEBUG_HDF5_PACKAGES}" ]; then
     $CMAKE -DBUILD_SHARED_LIBS=TRUE -DCMAKE_INSTALL_PREFIX=$ROOTDIR/.local \
       -DCMAKE_C_COMPILER=$C_COMPILER -DCMAKE_CXX_COMPILER=$CXX_COMPILER \
-      -DCMAKE_FC_COMPILER=FORTRAN_COMPILER --log-level=ERROR .. > /dev/null 2> /dev/null
+      -DCMAKE_FC_COMPILER=FORTRAN_COMPILER \
+      --log-level=ERROR .. > ${OUTPUT_HDF5_1} 2> ${OUTPUT_HDF5_2}
     if [ $? -eq 0 ]; then
-      echo "HDF5 RUN CMAKE  DONE"
+      echo -e '\033[0;32m'"HDF5 RUN CMAKE DONE"'\033[0m'
     else
-      echo "HDF5 COULD NOT RUN CMAKE"
+      echo -e '\033[0;31m'"HDF5 COULD NOT RUN CMAKE"'\033[0m'
       cd $ROOTDIR
       return 1
     fi
 
-    make -j $MAKE_NUM_THREADS > /dev/null 2> /dev/null
+    make -j $HDF5_MAKE_NUM_THREADS > ${OUTPUT_HDF5_1} 2> ${OUTPUT_HDF5_2}
     if [ $? -eq 0 ]; then
-      echo "HDF5 RUN MAKE DONE"
+      echo -e '\033[0;32m'"HDF5 RUN MAKE DONE"'\033[0m'
     else
-      echo "HDF5 COULD NOT RUN MAKE"
+      echo -e '\033[0;31m'"HDF5 COULD NOT RUN MAKE"'\033[0m'
       cd $ROOTDIR
       return 1
     fi
 
-    make install > /dev/null 2> /dev/null
+    make install > ${OUTPUT_HDF5_1} 2> ${OUTPUT_HDF5_2}
     if [ $? -eq 0 ]; then
-      echo "HDF5 RUN MAKE INSTALL DONE"
+      echo -e '\033[0;32m'"HDF5 RUN MAKE INSTALL DONE"'\033[0m'
     else
-      echo "HDF5 COULD NOT RUN MAKE INSTALL"
+      echo -e '\033[0;31m'"HDF5 COULD NOT RUN MAKE INSTALL"'\033[0m'
       cd $ROOTDIR
       return 1
     fi
-  else
-    $CMAKE -DBUILD_SHARED_LIBS=TRUE -DCMAKE_INSTALL_PREFIX=$ROOTDIR/.local \
-      -DCMAKE_C_COMPILER=$C_COMPILER -DCMAKE_CXX_COMPILER=$CXX_COMPILER \
-      -DCMAKE_FC_COMPILER=FORTRAN_COMPILER ..
-    if [ $? -ne 0 ];then
-      cd $ROOTDIR
-      return 1
-    fi
-
-    make
-    if [ $? -ne 0 ];then
-      cd $ROOTDIR
-      return 1
-    fi
-
-    make install
-    if [ $? -ne 0 ];then
-      cd $ROOTDIR
-      return 1
-    fi
-  fi
 
   cd $ROOTDIR
   echo -e '\033[1;34m''\e[4mCOMPILING HDF5 LIBRARY''\033[0m'
