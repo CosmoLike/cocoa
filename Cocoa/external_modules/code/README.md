@@ -216,8 +216,8 @@ The script `$ROOTDIR/installation_scripts/compile_class` that compiles CLASS kno
      (...)
      [Extracted from installation_scripts/compile_class]
      #Workaround around Cocoa .gitignore entry on /include
-     rm -rf $ROOTDIR/external_modules/code/class_public/include
-     cp -r $ROOTDIR/external_modules/code/class_public/include2 $ROOTDIR/external_modules/code/class_public/include
+     rm -rf ./include
+     cp -r ./include2 ./include
      (...)
      
 **Step 6 of 13**: Copy `./installation_scripts/compile_class` to `./installation_scripts/compile_XXX` via the command.
