@@ -278,7 +278,7 @@ To download and run the container for the first time, type:
 
 Following the command above, users should see the following text on the screen terminal:
 
-<img width="873" alt="Screenshot 2023-08-25 at 8 20 56 PM" src="https://github.com/SBU-COSMOLIKE/cocoa/assets/3210728/a5b1f93c-b47c-4f25-a4e4-aae9b7be3d66">
+<img width="872" alt="Screenshot 2023-12-19 at 1 26 50 PM" src="https://github.com/CosmoLike/cocoa/assets/3210728/eb1fe7ec-e463-48a6-90d2-2d84e5b61aa1">
 
 :books: **expert** :books: The flag `-v $(pwd):/home/whovian/host/` ensures that files on the host computer, where the user should install Cocoa to avoid losing work in case the docker image needs to be deleted, have been mounted to the directory `/home/whovian/host/`. Therefore, the user should see the host files of the directory where the whovian-cocoa container was initialized after typing `cd /home/whovian/host/; ls`
 
@@ -286,6 +286,7 @@ When running the container the first time, the user needs to init conda with `co
 
         whovian@cocoa:~$ conda init bash
         whovian@cocoa:~$ source ~/.bashrc
+        whovian@cocoa:~$ git lfs install 
 
 The container already comes with conda Cocoa environment pre-installed:
 
