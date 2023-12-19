@@ -12,18 +12,39 @@ fi
 # ------------------------------- REMOVE CLASS -------------------------------
 # ----------------------------------------------------------------------------
 # ----------------------------------------------------------------------------
+echo -e '\033[1;34m''CLEANING CLASS''\033[0m'
+
+if [ -z "${DEBUG_CLASS_OUTPUT}" ]; then
+export OUTPUT_CLASS_1="/dev/null"
+export OUTPUT_CLASS_2="/dev/null"
+else
+export OUTPUT_CLASS_1="/dev/tty"
+export OUTPUT_CLASS_2="/dev/tty"
+fi
 
 rm $ROOTDIR/.local/lib/python$PYTHON_VERSION/site-packages/classy*
 
 cd $ROOTDIR/external_modules/code/class_public/
 
-make clean
+make clean > ${OUTPUT_CLASS_1} 2> ${OUTPUT_CLASS_2}
+if [ $? -ne 0 ]; then
+  echo -e '\033[0;31m'"CLASS COULD NOT RUN MAKE CLEAN"'\033[0m'
+else
+  echo -e '\033[0;32m'"CLASS RUN PMAKE CLEAN DONE"'\033[0m'
+fi
 
 rm -f class
 
 cd ./python
 
-$PYTHON3 setup.py clean
+$PYTHON3 setup.py clean > ${OUTPUT_CLASS_1} 2> ${OUTPUT_CLASS_2}
+if [ $? -ne 0 ]; then
+  echo -e '\033[0;31m'"CLASS COULD NOT RUN PYTHON3 SETUP.PY CLEAN"'\033[0m'
+else
+  echo -e '\033[0;32m'"CLASS RUN PYTHON3 SETUP.PY CLEAN DONE"'\033[0m'
+fi
+
 rm -rf $ROOTDIR/external_modules/code/class_public/python/classy.egg-info
 
 cd $ROOTDIR
+echo -e '\033[1;34m''\e[4mCLEANING CLASS DONE''\033[0m'

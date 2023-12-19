@@ -12,8 +12,10 @@ fi
 # ------------------------------- REMOVE CAMB --------------------------------
 # ----------------------------------------------------------------------------
 # ----------------------------------------------------------------------------
-echo 'CLEANING CAMB'
+echo -e '\033[1;34m''CLEANING CAMB''\033[0m'
 
+# ---------------------------------------------------------------------------
+# ---------------------------------------------------------------------------
 cd $ROOTDIR/external_modules/code/CAMB/
 
 rm -rf ./build/
@@ -34,10 +36,10 @@ fi
 
 $PYTHON3 setup.py clean > ${OUTPUT_CAMB_1} 2> ${OUTPUT_CAMB_2}
 if [ $? -ne 0 ]; then
-  echo "CAMB COULD NOT RUN PYTHON3 SETUP.PY CLEAN"
+  echo -e '\033[0;31m'"CAMB COULD NOT RUN PYTHON3 SETUP.PY CLEAN"'\033[0m'
 else
-  echo "CAMB PYTHON3 SETUP.PY CLEAN DONE"
+  echo -e '\033[0;32m'"CAMB RUN PYTHON3 SETUP.PY CLEAN DONE"'\033[0m'
 fi
 
-echo 'CLEANING CAMB DONE'
 cd $ROOTDIR
+echo -e '\033[1;34m''\e[4mCLEANING CAMB DONE''\033[0m'

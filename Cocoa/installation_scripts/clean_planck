@@ -12,7 +12,7 @@ fi
 # ------------------------- REMOVE PLANCK LIKELIHOOD -------------------------
 # ----------------------------------------------------------------------------
 # ----------------------------------------------------------------------------
-echo 'CLEANING PLANCK LIKELIHOOD'
+echo -e '\033[1;34m''CLEANING PLANCK LIKELIHOOD''\033[0m'
 
 rm -f $ROOTDIR/.local/bin/clik*
 
@@ -45,11 +45,12 @@ fi
 
 $PYTHON3 waf distclean > ${OUTPUT_PLANCK_1} 2> ${OUTPUT_PLANCK_2}
 if [ $? -ne 0 ]; then
-  echo "PLANCK COULD NOT RUN WAF DISTCLEAN"
+  echo -e '\033[0;31m'"PLANCK COULD NOT RUN WAF DISTCLEAN"'\033[0m'
 else
-  echo "PLANCK WAF DISTCLEAN DONE"
+  echo -e '\033[0;32m'"PLANCK RUN WAF DISTCLEAN DONE"'\033[0m'
 fi
 
-echo 'CLEANING PLANCK LIKELIHOOD DONE'
 cd $ROOTDIR
+echo -e '\033[1;34m''\e[4mCLEANING PLANCK LIKELIHOOD DONE''\033[0m'
+
 
