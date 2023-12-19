@@ -126,7 +126,7 @@ PS: you can also use `source compile_external_modules` instead of `source ./inst
 
     $(cocoa)(.local) cp $ROOTDIR/installation_scripts/clean_camb $ROOTDIR/installation_scripts/clean_XXX
 
-**Step 11 of 13**: Modify he following lines located in the file `$ROOTDIR/installation_scripts/clean_XXX`
+**Step 11 of 13**: Modify the following lines located in the file `$ROOTDIR/installation_scripts/clean_XXX`
 
     (...) 
     #cd $ROOTDIR/external_modules/code/camb/
@@ -153,17 +153,17 @@ PS: you can also use `source compile_external_modules` instead of `source ./inst
     
 ## Adding a new modified CLASS <a name="appendix_new_class"></a> 
 
-**Step 1 of 12**: Activate Conda environment, go to the Cocoa main folder and start the private python environment
+**Step 1 of 13**: Activate Conda environment, go to the Cocoa main folder and start the private python environment
 
     $ conda activate cocoa
     $(cocoa) cd ./cocoa/Cocoa
     $(cocoa) source start_cocoa
     
-**Step 2 of 12**: Move the Boltzmann code to `./external_modules/code/XXX`
+**Step 2 of 13**: Move the Boltzmann code to `$ROOTDIR/external_modules/code/XXX`
 
 `XXX` should be replaced by whatever name the user adopts to their modified CLASS (e.g., CLASSQ). 
 
-**Step 3 of 12**: Modify the file `./external_modules/code/XXX/Makefile` 
+**Step 3 of 13**: Modify the file `$ROOTDIR/external_modules/code/XXX/Makefile` 
     
     (...)
     
@@ -185,7 +185,7 @@ PS: you can also use `source compile_external_modules` instead of `source ./inst
     
     (...)
 
-**Step 4 of 12**: Modify the file `./external_modules/code/XXX/python/setup.py` 
+**Step 4 of 13**: Modify the file `$ROOTDIR/external_modules/code/XXX/python/setup.py` 
     
     (...)
     
@@ -204,12 +204,27 @@ PS: you can also use `source compile_external_modules` instead of `source ./inst
     #    liblist += ["mvec","m"]
     
     (...)
-    
-**Step 5 of 12**: Copy `./installation_scripts/compile_class` to `./installation_scripts/compile_XXX` via the command.
+
+**Step 5 of 13**: Move the folder the file `external_modules/code/XXX/include` to `external_modules/code/XXX/include2`
+
+Cocoa git repository has a restriction on `.gitignore` against adding `include/` folders. So move `/include/` to `/include2`. 
+
+     $(cocoa)(.local) mv `$ROOTDIR/external_modules/code/XXX/include` `$ROOTDIR/external_modules/code/XXX/include2`
+
+The script `$ROOTDIR/installation_scripts/compile_class` that compiles CLASS knows that the headers should be located on `/include2` as shown below
+
+     (...)
+     [Extracted from installation_scripts/compile_class]
+     #Workaround around Cocoa .gitignore entry on /include
+     rm -rf $ROOTDIR/external_modules/code/class_public/include
+     cp -r $ROOTDIR/external_modules/code/class_public/include2 $ROOTDIR/external_modules/code/class_public/include
+     (...)
+     
+**Step 6 of 13**: Copy `./installation_scripts/compile_class` to `./installation_scripts/compile_XXX` via the command.
 
     $(cocoa)(.local) cp ./installation_scripts/compile_class ./installation_scripts/compile_XXX
 
-**Step 6 of 12**: Modify `./installation_scripts/compile_XXX`
+**Step 7 of 13**: Modify `./installation_scripts/compile_XXX`
 
     (...)
     
@@ -219,8 +234,8 @@ PS: you can also use `source compile_external_modules` instead of `source ./inst
         cd $ROOTDIR/external_modules/code/XXX/
         
         (...)
-        
-**Step 7 of 12**: Modify [compile_external_modules](https://github.com/CosmoLike/cocoa/blob/main/Cocoa/compile_external_modules)
+
+**Step 8 of 13**: Modify [compile_external_modules](https://github.com/CosmoLike/cocoa/blob/main/Cocoa/compile_external_modules)
 
     (...)
     
@@ -232,15 +247,15 @@ PS: you can also use `source compile_external_modules` instead of `source ./inst
 
 (**expert**) This step ensures that the command `source compile_external_modules` compiles all modules including the new modified CLASS
 
-**Step 8 of 12**: Compile CLASS
+**Step 9 of 13**: Compile CLASS
 
     $(cocoa)(.local) source ./installation_scripts/compile_XXX
 
-**Step 9 of 12**: Copy `./installation_scripts/clean_class` to `./installation_scripts/clean_XXX` via the command.
+**Step 10 of 13**: Copy `./installation_scripts/clean_class` to `./installation_scripts/clean_XXX` via the command.
 
     $(cocoa)(.local) cp ./installation_scripts/clean_class ./installation_scripts/clean_XXX
 
-**Step 10 of 12**: Modify `./installation_scripts/clean_XXX`
+**Step 11 of 13**: Modify `./installation_scripts/clean_XXX`
 
     (...) 
     
