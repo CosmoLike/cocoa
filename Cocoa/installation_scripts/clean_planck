@@ -45,9 +45,9 @@ fi
 
 $PYTHON3 waf distclean > ${OUTPUT_PLANCK_1} 2> ${OUTPUT_PLANCK_2}
 if [ $? -ne 0 ]; then
-  echo -e '\033[0;31m'"PLANCK COULD NOT RUN WAF DISTCLEAN"'\033[0m'
+  echo -e '\033[0;31m'"PLANCK COULD NOT RUN \e[3mWAF DISTCLEAN"'\033[0m'
 else
-  echo -e '\033[0;32m'"PLANCK RUN WAF DISTCLEAN DONE"'\033[0m'
+  echo -e '\033[0;32m'"PLANCK RUN \e[3mWAF CLEAN\e[0m\e\033[0;32m DONE"'\033[0m'
 fi
 
 cd $ROOTDIR

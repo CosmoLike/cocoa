@@ -60,27 +60,27 @@ if [ -z "${IGNORE_CPP_SPDLOG_INSTALLATION}" ]; then
     -DCMAKE_CXX_COMPILER=$CXX_COMPILER \
     --log-level=ERROR . > ${OUTPUT_CPP_PACKAGES_1} 2> ${OUTPUT_CPP_PACKAGES_2}
   if [ $? -eq 0 ];then
-    echo -e '\033[0;32m'"SPDLOG RUN CMAKE DONE"'\033[0m'
+    echo -e '\033[0;32m'"SPDLOG RUN \e[3mCMAKE\e[0m\e\033[0;32m DONE"'\033[0m'
   else
-    echo -e '\033[0;31m'"SPDLOG COULD NOT RUN CMAKE"'\033[0m'
+    echo -e '\033[0;31m'"SPDLOG COULD NOT RUN \e[3mCMAKE"'\033[0m'
     cd $ROOTDIR
     return 1
   fi
 
   make -j $CPP_MAKE_NUM_THREADS > ${OUTPUT_CPP_PACKAGES_1} 2> ${OUTPUT_CPP_PACKAGES_2}
   if [ $? -eq 0 ]; then
-    echo -e '\033[0;32m'"SPDLOG RUN MAKE DONE"'\033[0m'
+    echo -e '\033[0;32m'"SPDLOG RUN \e[3mMAKE\e[0m\e\033[0;32m DONE"'\033[0m'
   else
-    echo -e '\033[0;31m'"SPDLOG COULD NOT RUN MAKE"'\033[0m'
+    echo -e '\033[0;31m'"SPDLOG COULD NOT RUN \e[3mMAKE"'\033[0m'
     cd $ROOTDIR
     return 1
   fi
 
   make install > ${OUTPUT_CPP_PACKAGES_1} 2> ${OUTPUT_CPP_PACKAGES_2}
   if [ $? -eq 0 ]; then
-    echo -e '\033[0;32m'"SPDLOG RUN MAKE INSTALL DONE"'\033[0m'
+    echo -e '\033[0;32m'"SPDLOG RUN \e[3mMAKE INSTALL\e[0m\e\033[0;32m DONE"'\033[0m'
   else
-    echo -e '\033[0;31m'"SPDLOG COULD NOT RUN MAKE INSTALL"'\033[0m'
+    echo -e '\033[0;31m'"SPDLOG COULD NOT RUN \e[3mMAKE INSTALL"'\033[0m'
     cd $ROOTDIR
     return 1
   fi
@@ -108,36 +108,36 @@ if [ -z "${IGNORE_CPP_ARMA_INSTALLATION}" ]; then
     -DLAPACK_FOUND=YES -DLAPACK_LIBRARIES=$ROOTDIR/.local/lib/liblapack.so \
     -DBLAS_FOUND=NO --log-level=ERROR . > ${OUTPUT_CPP_PACKAGES_1} 2> ${OUTPUT_CPP_PACKAGES_2}
   if [ $? -eq 0 ]; then
-    echo -e '\033[0;32m'"ARMADILLO RUN CMAKE DONE"'\033[0m'
+    echo -e '\033[0;32m'"ARMADILLO RUN \e[3mCMAKE\e[0m\e\033[0;32m DONE"'\033[0m'
   else
-    echo -e '\033[0;31m'"ARMADILLO COULD NOT RUN CMAKE"'\033[0m'
+    echo -e '\033[0;31m'"ARMADILLO COULD NOT RUN \e[3mCMAKE"'\033[0m'
     cd $ROOTDIR
     return 1
   fi
 
   make clean > ${OUTPUT_CPP_PACKAGES_1} 2> ${OUTPUT_CPP_PACKAGES_2}
   if [ $? -eq 0 ]; then
-    echo -e '\033[0;32m'"ARMADILLO RUN MAKE CLEAN DONE"'\033[0m'
+    echo -e '\033[0;32m'"ARMADILLO RUN \e[3mMAKE CLEAN\e[0m\e\033[0;32m DONE"'\033[0m'
   else
-    echo -e '\033[0;31m'"ARMADILLO COULD NOT RUN MAKE CLEAN"'\033[0m'
+    echo -e '\033[0;31m'"ARMADILLO COULD NOT RUN \e[3mMAKE CLEAN"'\033[0m'
     cd $ROOTDIR
     return 1
   fi
 
   make -j $CPP_MAKE_NUM_THREADS all -Wno-dev > ${OUTPUT_CPP_PACKAGES_1} 2> ${OUTPUT_CPP_PACKAGES_2}
   if [ $? -eq 0 ]; then
-    echo -e '\033[0;32m'"ARMADILLO RUN MAKE DONE"'\033[0m'
+    echo -e '\033[0;32m'"ARMADILLO RUN \e[3mMAKE\e[0m\e\033[0;32m DONE"'\033[0m'
   else
-    echo -e '\033[0;31m'"ARMADILLO COULD NOT RUN MAKE"'\033[0m'
+    echo -e '\033[0;31m'"ARMADILLO COULD NOT RUN \e[3mMAKE"'\033[0m'
     cd $ROOTDIR
     return 1
   fi
 
   make install > ${OUTPUT_CPP_PACKAGES_1} 2> ${OUTPUT_CPP_PACKAGES_2}
   if [ $? -eq 0 ]; then
-    echo -e '\033[0;32m'"ARMADILLO RUN MAKE INSTALL DONE"'\033[0m'
+    echo -e '\033[0;32m'"ARMADILLO RUN \e[3mMAKE INSTALL\e[0m\e\033[0;32m DONE"'\033[0m'
   else
-    echo -e '\033[0;31m'"ARMADILLO COULD NOT RUN MAKE INSTALL"'\033[0m'
+    echo -e '\033[0;31m'"ARMADILLO COULD NOT RUN \e[3mMAKE INSTALL"'\033[0m'
     cd $ROOTDIR
     return 1
   fi
@@ -185,9 +185,9 @@ if [ -z "${IGNORE_CPP_BOOST_INSTALLATION}" ]; then
   ./bootstrap.sh \
     --prefix=$ROOTDIR/.local > ${OUTPUT_CPP_PACKAGES_1} 2> ${OUTPUT_CPP_PACKAGES_2}
   if [ $? -eq 0 ]; then
-    echo -e '\033[0;32m'"BOOST RUN BOOTSTRAP DONE"'\033[0m'
+    echo -e '\033[0;32m'"BOOST RUN \e[3mBOOTSTRAP\e[0m\e\033[0;32m DONE"'\033[0m'
   else
-    echo -e '\033[0;31m'"BOOST COULD NOT RUN BOOTSTRAP"'\033[0m'
+    echo -e '\033[0;31m'"BOOST COULD NOT RUN \e[3mBOOTSTRAP"'\033[0m'
     cd $ROOTDIR
     return 1
   fi
@@ -196,9 +196,9 @@ if [ -z "${IGNORE_CPP_BOOST_INSTALLATION}" ]; then
     --without-timer --without-mpi \
     --without-atomic > ${OUTPUT_CPP_PACKAGES_1} 2> ${OUTPUT_CPP_PACKAGES_2}
   if [ $? -eq 0 ]; then
-    echo -e '\033[0;32m'"BOOST RUN B2 DONE"'\033[0m'
+    echo -e '\033[0;32m'"BOOST RUN \e[3mB2\e[0m\e\033[0;32m DONE"'\033[0m'
   else
-    echo -e '\033[0;31m'"BOOST COULD NOT RUN B2"'\033[0m'
+    echo -e '\033[0;31m'"BOOST COULD NOT RUN \e[3mB2"'\033[0m'
     cd $ROOTDIR
     return 1
   fi

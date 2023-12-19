@@ -6,13 +6,17 @@ if [ -z "${PYTHON3}" ]; then
   echo 'ERROR ENV VARIABLE PYTHON3 IS NOT DEFINED' >&2
   return 1
 fi
+if [ -z "${PYTHON_VERSION}" ]; then
+  echo 'ERROR ENV VARIABLE PYTHON_VERSION IS NOT DEFINED' >&2
+  return 1
+fi
 
 # ----------------------------------------------------------------------------
 # ----------------------------------------------------------------------------
 # ----------------------------- REMOVE POLYCHORD ------------------------------
 # ----------------------------------------------------------------------------
 # ----------------------------------------------------------------------------
-echo 'CLEANING POLYCHORD'
+echo -e '\033[1;34m''CLEANING POLYCHORD''\033[0m'
 
 if [ -z "${DEBUG_POLY_OUTPUT}" ]; then
   export OUTPUT_POLY_1="/dev/null"
@@ -22,16 +26,16 @@ else
   export OUTPUT_POLY_2="/dev/tty"
 fi
 
-rm -rf $ROOTDIR/.local/lib/python3.6/site-packages/pypolychord-1.16-py3.6-linux-x86_64.egg
+rm -rf $ROOTDIR/.local/lib/python$PYTHON_VERSION/site-packages/pypolychord-*
 
 cd $ROOTDIR/external_modules/code/PolyChordLite/
 
 make clean > ${OUTPUT_POLY_1} 2> ${OUTPUT_POLY_2}
 if [ $? -ne 0 ]; then
-  echo "POLYCHORD COULD NOT RUN MAKE CLEAN"
+  echo -e '\033[0;31m'"POLYCHORD COULD NOT RUN \e[3mMAKE CLEAN"'\033[0m'
 else
-  echo "POLYCHORD MAKE CLEAN RUN DONE"
+  echo -e '\033[0;32m'"POLYCHORD RUN \e[3mMAKE CLEAN\e[0m\e\033[0;32m DONE"'\033[0m'
 fi
 
-echo 'CLEANING POLYCHORD DONE'
 cd $ROOTDIR
+echo -e '\033[1;34m''\e[4mCLEANING POLYCHORD DONE''\033[0m'

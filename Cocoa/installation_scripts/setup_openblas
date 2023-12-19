@@ -55,9 +55,9 @@ if [ -z "${IGNORE_OPENBLAS_INSTALLATION}" ]; then
   make CC=$C_COMPILER FC=$FORTRAN_COMPILER \
     USE_OPENMP=1 > ${OUTPUT_OPENBLAS_1} 2> ${OUTPUT_OPENBLAS_2}
   if [ $? -eq 0 ]; then
-    echo -e '\033[0;32m'"OPENBLAS RUN MAKE DONE"'\033[0m'
+    echo -e '\033[0;32m'"OPENBLAS RUN \e[3mMAKE\e[0m\e\033[0;32m DONE"'\033[0m'
   else
-    echo -e '\033[0;31m'"OPENBLAS COULD NOT RUN MAKE"'\033[0m'
+    echo -e '\033[0;31m'"OPENBLAS COULD NOT RUN \e[3mMAKE"'\033[0m'
     unset MAKE_NB_JOBS
     cd $ROOTDIR
     return 1
@@ -65,9 +65,9 @@ if [ -z "${IGNORE_OPENBLAS_INSTALLATION}" ]; then
 
   make install PREFIX=$ROOTDIR/.local > ${OUTPUT_OPENBLAS_1} 2> ${OUTPUT_OPENBLAS_2}
   if [ $? -eq 0 ]; then
-    echo -e '\033[0;32m'"OPENBLAS RUN MAKE INSTALL DONE"'\033[0m'
+    echo -e '\033[0;32m'"OPENBLAS RUN \e[3mMAKE INSTALL\e[0m\e\033[0;32m DONE"'\033[0m'
   else
-    echo -e '\033[0;31m'"OPENBLAS COULD NOT RUN MAKE INSTALL"'\033[0m'
+    echo -e '\033[0;31m'"OPENBLAS COULD NOT RUN \e[3mMAKE INSTALL"'\033[0m'
     unset MAKE_NB_JOBS
     cd $ROOTDIR
     return 1

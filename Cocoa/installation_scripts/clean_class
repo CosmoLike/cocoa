@@ -28,9 +28,9 @@ cd $ROOTDIR/external_modules/code/class_public/
 
 make clean > ${OUTPUT_CLASS_1} 2> ${OUTPUT_CLASS_2}
 if [ $? -ne 0 ]; then
-  echo -e '\033[0;31m'"CLASS COULD NOT RUN MAKE CLEAN"'\033[0m'
+  echo -e '\033[0;31m'"CLASS COULD NOT RUN \e[3mMAKE CLEAN"'\033[0m'
 else
-  echo -e '\033[0;32m'"CLASS RUN PMAKE CLEAN DONE"'\033[0m'
+  echo -e '\033[0;32m'"CLASS RUN \e[3mMAKE CLEAN\e[0m\e\033[0;32m DONE"'\033[0m'
 fi
 
 rm -f class
@@ -39,9 +39,9 @@ cd ./python
 
 $PYTHON3 setup.py clean > ${OUTPUT_CLASS_1} 2> ${OUTPUT_CLASS_2}
 if [ $? -ne 0 ]; then
-  echo -e '\033[0;31m'"CLASS COULD NOT RUN PYTHON3 SETUP.PY CLEAN"'\033[0m'
+  echo -e '\033[0;31m'"CLASS COULD NOT RUN \e[3mPYTHON3 SETUP.PY CLEAN"'\033[0m'
 else
-  echo -e '\033[0;32m'"CLASS RUN PYTHON3 SETUP.PY CLEAN DONE"'\033[0m'
+  echo -e '\033[0;32m'"CLASS RUN \e[3mPYTHON3 SETUP.PY CLEAN\e[0m\e\033[0;32m DONE"'\033[0m'
 fi
 
 rm -rf $ROOTDIR/external_modules/code/class_public/python/classy.egg-info

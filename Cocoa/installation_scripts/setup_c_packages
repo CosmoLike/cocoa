@@ -57,27 +57,27 @@ if [ -z "${IGNORE_C_FFTW_INSTALLATION}" ]; then
     --prefix=$ROOTDIR/.local --enable-shared=yes \
     --enable-static=yes > ${OUTPUT_CPACKAGES_1} 2> ${OUTPUT_CPACKAGES_2}
   if [ $? -eq 0 ]; then
-    echo -e '\033[0;32m'"FFTW RUN CONFIGURE DONE"'\033[0m'
+    echo -e '\033[0;32m'"FFTW RUN \e[3mCONFIGURE\e[0m\e\033[0;32m DONE"'\033[0m'
   else
-    echo -e '\033[0;31m'"FFTW COULD NOT RUN CONFIGURE"'\033[0m'
+    echo -e '\033[0;31m'"FFTW COULD NOT RUN \e[3mCONFIGURE"'\033[0m'
     cd $ROOTDIR
     return 1
   fi
 
   make -j $C_MAKE_NUM_THREADS all > ${OUTPUT_CPACKAGES_1} 2> ${OUTPUT_CPACKAGES_2}
   if [ $? -eq 0 ]; then
-    echo -e '\033[0;32m'"FFTW RUN MAKE DONE"'\033[0m'
+    echo -e '\033[0;32m'"FFTW RUN \e[3mMAKE\e[0m\e\033[0;32m DONE"'\033[0m'
   else
-    echo -e '\033[0;31m'"FFTW COULD NOT RUN MAKE"'\033[0m'
+    echo -e '\033[0;31m'"FFTW COULD NOT RUN \e[3mMAKE"'\033[0m'
     cd $ROOTDIR
     return 1
   fi
 
   make install > ${OUTPUT_CPACKAGES_1} 2> ${OUTPUT_CPACKAGES_2}
   if [ $? -eq 0 ]; then
-    echo -e '\033[0;32m'"FFTW RUN MAKE INSTALL DONE"'\033[0m'
+    echo -e '\033[0;32m'"FFTW RUN \e[3mMAKE INSTALL\e[0m\e\033[0;32m DONE"'\033[0m'
   else
-    echo -e '\033[0;31m'"FFTW COULD NOT RUN MAKE INSTALL"'\033[0m'
+    echo -e '\033[0;31m'"FFTW COULD NOT RUN \e[3mMAKE INSTALL"'\033[0m'
     cd $ROOTDIR
     return 1
   fi
@@ -108,27 +108,27 @@ if [ -z "${IGNORE_C_CFITSIO_INSTALLATION}" ]; then
     -DCMAKE_FC_COMPILER=FORTRAN_COMPILER \
     --log-level=ERROR .. > ${OUTPUT_CPACKAGES_1} 2> ${OUTPUT_CPACKAGES_2}
   if [ $? -eq 0 ]; then
-    echo -e '\033[0;32m' "CFITSIO RUN CMAKE DONE"'\033[0m'
+    echo -e '\033[0;32m' "CFITSIO RUN \e[3mCMAKE\e[0m\e\033[0;32m DONE"'\033[0m'
   else
-    echo -e '\033[0;31m'"CFITSIO COULD NOT RUN CMAKE"'\033[0m'
+    echo -e '\033[0;31m'"CFITSIO COULD NOT RUN \e[3mCMAKE"'\033[0m'
     cd $ROOTDIR
     return 1
   fi
 
   make -j $C_MAKE_NUM_THREADS all > ${OUTPUT_CPACKAGES_1} 2> ${OUTPUT_CPACKAGES_2}
   if [ $? -eq 0 ]; then
-    echo -e '\033[0;32m'"CFITSIO RUN MAKE DONE"'\033[0m'
+    echo -e '\033[0;32m'"CFITSIO RUN \e[3mMAKE\e[0m\e\033[0;32m DONE"'\033[0m'
   else
-    echo -e '\033[0;31m'"CFITSIO COULD NOT RUN MAKE"'\033[0m'
+    echo -e '\033[0;31m'"CFITSIO COULD NOT RUN \e[3mMAKE"'\033[0m'
     cd $ROOTDIR
     return 1
   fi
 
   make install > ${OUTPUT_CPACKAGES_1} 2> ${OUTPUT_CPACKAGES_2}
   if [ $? -eq 0 ]; then
-    echo -e '\033[0;32m' "CFITSIO RUN MAKE INSTALL DONE"'\033[0m'
+    echo -e '\033[0;32m' "CFITSIO RUN \e[3mMAKE INSTALL\e[0m\e\033[0;32m DONE"'\033[0m'
   else
-    echo -e '\033[0;31m'"CFITSIO COULD NOT RUN MAKE INSTALL"'\033[0m'
+    echo -e '\033[0;31m'"CFITSIO COULD NOT RUN \e[3mMAKE INSTALL"'\033[0m'
     cd $ROOTDIR
     return 1
   fi
@@ -155,27 +155,27 @@ if [ -z "${IGNORE_C_GSL_INSTALLATION}" ]; then
   CC=$C_COMPILER ./configure --prefix=$ROOTDIR/.local --enable-shared=yes \
     --enable-static=yes > ${OUTPUT_CPACKAGES_1} 2> ${OUTPUT_CPACKAGES_2}
   if [ $? -eq 0 ]; then
-    echo -e '\033[0;32m' "GSL RUN CONFIGURE DONE"'\033[0m'
+    echo -e '\033[0;32m' "GSL RUN \e[3mCONFIGURE\e[0m\e\033[0;32m DONE"'\033[0m'
   else
-    echo -e '\033[0;31m'"GSL COULD NOT RUN CONFIGURE"'\033[0m'
+    echo -e '\033[0;31m'"GSL COULD NOT RUN \e[3mCONFIGURE"'\033[0m'
     cd $ROOTDIR
     return 1
   fi
 
   make -j $C_MAKE_NUM_THREADS all > ${OUTPUT_CPACKAGES_1} 2> ${OUTPUT_CPACKAGES_2}
   if [ $? -eq 0 ]; then
-    echo -e '\033[0;32m'"GSL RUN MAKE DONE"'\033[0m'
+    echo -e '\033[0;32m'"GSL RUN \e[3mMAKE\e[0m\e\033[0;32m DONE"'\033[0m'
   else
-    echo -e '\033[0;31m'"GSL COULD NOT RUN MAKE"'\033[0m'
+    echo -e '\033[0;31m'"GSL COULD NOT RUN \e[3mMAKE"'\033[0m'
     cd $ROOTDIR
     return 1
   fi
 
   make install > ${OUTPUT_CPACKAGES_1} 2> ${OUTPUT_CPACKAGES_2}
   if [ $? -eq 0 ]; then
-    echo -e '\033[0;32m'"GSL RUN MAKE INSTALL DONE"'\033[0m'
+    echo -e '\033[0;32m'"GSL RUN \e[3mMAKE INSTALL\e[0m\e\033[0;32m DONE"'\033[0m'
   else
-    echo -e '\033[0;31m'"GSL COULD NOT RUN MAKE INSTALL"'\033[0m'
+    echo -e '\033[0;31m'"GSL COULD NOT RUN \e[3mMAKE INSTALL"'\033[0m'
     cd $ROOTDIR
     return 1
   fi
@@ -201,7 +201,7 @@ env CXX=$CXX_COMPILER CC=$C_COMPILER  $PIP3 install --global-option=build_ext \
   $ROOTDIR/../cocoa_installation_libraries/euclidemu2-1.2.0 --no-dependencies \
   --prefix=$ROOTDIR/.local --no-index > ${OUTPUT_PIP_1} 2> ${OUTPUT_PIP_2}
 if [ $? -ne 0 ]; then
-  echo -e '\033[0;31m'"PIP COULD NOT RUN PIP INSTALL EUCLUDEMUL"'\033[0m'
+  echo -e '\033[0;31m'"PIP COULD NOT RUN \e[3mPIP INSTALL EUCLUDEMUL"'\033[0m'
   cd $ROOTDIR
   return 1
 else

@@ -61,11 +61,11 @@ if [ -z "${IGNORE_PLANCK_COMPILATION}" ]; then
 
   $PYTHON3 waf distclean > ${OUTPUT_PLANCK_1} 2> ${OUTPUT_PLANCK_2}
   if [ $? -ne 0 ]; then
-    echo -e '\033[0;31m'"PLANCK COULD NOT RUN WAF DISTCLEAN"'\033[0m'
+    echo -e '\033[0;31m'"PLANCK COULD NOT RUN \e[3mWAF DISTCLEAN"'\033[0m'
     cd $ROOTDIR
     return 1
   else
-    echo -e '\033[0;32m'"PLANCK RUN \e[3mWAF CLEAN RUN\e[0m\e\033[0;32m DONE"'\033[0m'
+    echo -e '\033[0;32m'"PLANCK RUN \e[3mWAF CLEAN\e[0m\e\033[0;32m DONE"'\033[0m'
   fi
   
   FC=$FORTRAN_COMPILER CC=$C_COMPILER CXX=$CXX_COMPILER $PYTHON3 waf configure \
@@ -82,11 +82,11 @@ if [ -z "${IGNORE_PLANCK_COMPILATION}" ]; then
   
   $PYTHON3 waf install -v > ${OUTPUT_PLANCK_1} 2> ${OUTPUT_PLANCK_2}
   if [ $? -ne 0 ]; then
-    echo -e '\033[0;31m'"PLANCK COULD NOT RUN WAF INSTALL"'\033[0m'
+    echo -e '\033[0;31m'"PLANCK COULD NOT RUN \e[3mWAF INSTALL"'\033[0m'
     cd $ROOTDIR
     return 1
   else
-    echo -e '\033[0;32m'"PLANCK RUN \e[3mWAF INSTALL RUN\e[0m\e\033[0;32m DONE"'\033[0m'
+    echo -e '\033[0;32m'"PLANCK RUN \e[3mWAF INSTALL\e[0m\e\033[0;32m DONE"'\033[0m'
   fi
 
   cd $ROOTDIR

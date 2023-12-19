@@ -36,9 +36,9 @@ fi
 
 $PYTHON3 setup.py clean > ${OUTPUT_CAMB_1} 2> ${OUTPUT_CAMB_2}
 if [ $? -ne 0 ]; then
-  echo -e '\033[0;31m'"CAMB COULD NOT RUN PYTHON3 SETUP.PY CLEAN"'\033[0m'
+  echo -e '\033[0;31m'"CAMB COULD NOT RUN \e[3mPYTHON3 SETUP.PY CLEAN"'\033[0m'
 else
-  echo -e '\033[0;32m'"CAMB RUN PYTHON3 SETUP.PY CLEAN DONE"'\033[0m'
+  echo -e '\033[0;32m'"CAMB \e[3mRUN PYTHON3 SETUP.PY CLEAN\e[0m\e\033[0;32m DONE"'\033[0m'
 fi
 
 cd $ROOTDIR
