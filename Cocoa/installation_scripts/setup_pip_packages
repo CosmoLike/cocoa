@@ -24,9 +24,11 @@ echo -e '\033[1;34m''INSTALLING PYTHON PACKAGES VIA PIP - \e[4mIT MAY TAKE A WHI
 if [ -z "${DEBUG_PIP_OUTPUT}" ]; then
   export OUTPUT_PIP_1="/dev/null"
   export OUTPUT_PIP_2="/dev/null"
+  export PIP_MAKE_NUM_THREADS="${MAKE_NUM_THREADS}"
 else
   export OUTPUT_PIP_1="/dev/tty"
   export OUTPUT_PIP_2="/dev/tty"
+  export PIP_MAKE_NUM_THREADS=1
 fi
 
 if [ -z "${IGNORE_ALL_PIP_INSTALLATION}" ]; then
@@ -36,7 +38,7 @@ if [ -z "${IGNORE_ALL_PIP_INSTALLATION}" ]; then
     FC=$FORTRAN_COMPILER CC=$C_COMPILER ./configure --prefix=$ROOTDIR/.local \
       --enable-shared=yes --enable-static=yes > ${OUTPUT_PIP_1} 2> ${OUTPUT_PIP_2}
 
-    make -j $MAKE_NUM_THREADS > ${OUTPUT_PIP_1} 2> ${OUTPUT_PIP_2}
+    make -j $PIP_MAKE_NUM_THREADS > ${OUTPUT_PIP_1} 2> ${OUTPUT_PIP_2}
     if [ $? -eq 0 ]; then
       echo -e '\033[0;32m'"LIBEXPAT RUN \e[3mMAKE\e[0m\e\033[0;32m DONE"'\033[0m'
     else

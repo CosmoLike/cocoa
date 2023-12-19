@@ -40,14 +40,16 @@ if [ -z "${IGNORE_POLYCHORD_COMPILATION}" ]; then
   if [ -z "${DEBUG_POLY_OUTPUT}" ]; then
     export OUTPUT_POLY_1="/dev/null"
     export OUTPUT_POLY_2="/dev/null"
+    export POLY_MAKE_NUM_THREADS="${MAKE_NUM_THREADS}"
   else
     export OUTPUT_POLY_1="/dev/tty"
     export OUTPUT_POLY_2="/dev/tty"
+    export POLY_MAKE_NUM_THREADS=1
   fi
 
   make clean > ${OUTPUT_POLY_1} 2> ${OUTPUT_POLY_2}
   if [ $? -ne 0 ]; then
-    echo -e '\033[0;31m'"POLYCHORD COULD NOT RUN MAKE CLEAN"
+    echo -e '\033[0;31m'"POLYCHORD COULD NOT RUN \e[3mMAKE CLEAN"'\033[0m'
     cd $ROOTDIR
     return 1
   else
@@ -57,28 +59,28 @@ if [ -z "${IGNORE_POLYCHORD_COMPILATION}" ]; then
   rm -rf ./lib/*.a
   rm -rf ./lib/*.so
 
-  make all  > ${OUTPUT_POLY_1} 2> ${OUTPUT_POLY_2}
+  make all > ${OUTPUT_POLY_1} 2> ${OUTPUT_POLY_2}
   if [ $? -ne 0 ]; then
-    echo -e '\033[0;31m'"POLYCHORD COULD NOT RUN MAKE ALL"
+    echo -e '\033[0;31m'"POLYCHORD COULD NOT RUN \e[3mMAKE ALL"'\033[0m'
     cd $ROOTDIR
     return 1
   else
     echo -e '\033[0;32m'"POLYCHORD RUN \e[3mMAKE ALL\e[0m\e\033[0;32m DONE"'\033[0m'
   fi
 
-  make -j $MAKE_NUM_THREADS pypolychord > ${OUTPUT_POLY_1} 2> ${OUTPUT_POLY_2}
+  make -j $POLY_MAKE_NUM_THREADS pypolychord > ${OUTPUT_POLY_1} 2> ${OUTPUT_POLY_2}
   if [ $? -ne 0 ]; then
-    echo-e '\033[0;31m' "POLYCHORD COULD NOT RUN MAKE PYPOLYCHORD"
+    echo -e '\033[0;31m'"POLYCHORD COULD NOT RUN \e[3mMAKE PYPOLYCHORD"'\033[0m'
     cd $ROOTDIR
     return 1
   else
-    echo -e '\033[0;32m'"POLYCHORD RUN \e[3mMAKE CLEAN PYPOLYCHORD\e[0m\e\033[0;32m DONE"'\033[0m'
+    echo -e '\033[0;32m'"POLYCHORD RUN \e[3mMAKE PYPOLYCHORD\e[0m\e\033[0;32m DONE"'\033[0m'
   fi
 
   CC=$MPI_CC_COMPILER CXX=$MPI_CXX_COMPILER $PYTHON3 setup.py install \
       --prefix $ROOTDIR/.local  > ${OUTPUT_POLY_1} 2> ${OUTPUT_POLY_2}
   if [ $? -ne 0 ]; then
-    echo "POLYCHORD COULD NOT RUN PYTHON3 SETUP.PY INSTALL"
+    echo -e '\033[0;31m'"POLYCHORD COULD NOT RUN \e[3mPYTHON3 SETUP.PY INSTALL"'\033[0m'
     cd $ROOTDIR
     return 1
   else

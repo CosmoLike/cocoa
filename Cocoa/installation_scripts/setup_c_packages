@@ -34,9 +34,11 @@ fi
 if [ -z "${DEBUG_C_PACKAGES}" ]; then
   export OUTPUT_CPACKAGES_1="/dev/null"
   export OUTPUT_CPACKAGES_2="/dev/null"
+  export C_MAKE_NUM_THREADS="${MAKE_NUM_THREADS}"
 else
   export OUTPUT_CPACKAGES_1="/dev/tty"
   export OUTPUT_CPACKAGES_2="/dev/tty"
+  export C_MAKE_NUM_THREADS=1
 fi
 
 # --------------------------------------------------------------------------------------
@@ -45,38 +47,43 @@ fi
 if [ -z "${IGNORE_C_FFTW_INSTALLATION}" ]; then
   echo -e '\033[1;34m''INSTALLING FFTW C LIBRARY - \e[4mIT WILL TAKE A WHILE''\033[0m'
 
+  # --------------------------------------------------------------------------------------
+  # --------------------------------------------------------------------------------------
   cd $ROOTDIR/../cocoa_installation_libraries/$COCOA_FFTW_DIR
-  
+  # --------------------------------------------------------------------------------------
+  # --------------------------------------------------------------------------------------
+
   FC=$FORTRAN_COMPILER CC=$C_COMPILER ./configure --enable-openmp \
-  --prefix=$ROOTDIR/.local --enable-shared=yes --enable-static=yes > ${OUTPUT_CPACKAGES_1} 2> ${OUTPUT_CPACKAGES_2}
+    --prefix=$ROOTDIR/.local --enable-shared=yes \
+    --enable-static=yes > ${OUTPUT_CPACKAGES_1} 2> ${OUTPUT_CPACKAGES_2}
   if [ $? -eq 0 ]; then
-    echo "FFTW RUN CONFIGURE DONE"
+    echo -e '\033[0;32m'"FFTW RUN CONFIGURE DONE"'\033[0m'
   else
-    echo "FFTW COULD NOT RUN CONFIGURE"
+    echo -e '\033[0;31m'"FFTW COULD NOT RUN CONFIGURE"'\033[0m'
     cd $ROOTDIR
     return 1
   fi
 
-  make -j $MAKE_NUM_THREADS all > ${OUTPUT_CPACKAGES_1} 2> ${OUTPUT_CPACKAGES_2}
+  make -j $C_MAKE_NUM_THREADS all > ${OUTPUT_CPACKAGES_1} 2> ${OUTPUT_CPACKAGES_2}
   if [ $? -eq 0 ]; then
-    echo "FFTW RUN MAKE DONE"
+    echo -e '\033[0;32m'"FFTW RUN MAKE DONE"'\033[0m'
   else
-    echo "FFTW COULD NOT RUN MAKE"
+    echo -e '\033[0;31m'"FFTW COULD NOT RUN MAKE"'\033[0m'
     cd $ROOTDIR
     return 1
   fi
 
   make install > ${OUTPUT_CPACKAGES_1} 2> ${OUTPUT_CPACKAGES_2}
   if [ $? -eq 0 ]; then
-    echo "FFTW MAKE INSTALL RUN DONE"
+    echo -e '\033[0;32m'"FFTW RUN MAKE INSTALL DONE"'\033[0m'
   else
-    echo "FFTW COULD NOT RUN MAKE INSTALL"
+    echo -e '\033[0;31m'"FFTW COULD NOT RUN MAKE INSTALL"'\033[0m'
     cd $ROOTDIR
     return 1
   fi
 
   cd $ROOTDIR
-  echo 'INSTALLING C FFTW LIBRARY - DONE'
+  echo -e '\033[1;34m''\e[4mINSTALLING FFTW C LIBRARY DONE''\033[0m'
 fi
 
 # --------------------------------------------------------------------------------------
@@ -85,7 +92,11 @@ fi
 if [ -z "${IGNORE_C_CFITSIO_INSTALLATION}" ]; then
   echo -e '\033[1;34m''INSTALLING CFITSIO C LIBRARY - \e[4mIT MIGHT TAKE A WHILE''\033[0m'
 
+  # --------------------------------------------------------------------------------------
+  # --------------------------------------------------------------------------------------
   cd $ROOTDIR/../cocoa_installation_libraries/$COCOA_CFITSIO_DIR
+  # --------------------------------------------------------------------------------------
+  # --------------------------------------------------------------------------------------
 
   rm -f CMakeCache.txt
 
@@ -97,27 +108,27 @@ if [ -z "${IGNORE_C_CFITSIO_INSTALLATION}" ]; then
     -DCMAKE_FC_COMPILER=FORTRAN_COMPILER \
     --log-level=ERROR .. > ${OUTPUT_CPACKAGES_1} 2> ${OUTPUT_CPACKAGES_2}
   if [ $? -eq 0 ]; then
-    echo "CFITSIO RUN CMAKE DONE"
+    echo -e '\033[0;32m' "CFITSIO RUN CMAKE DONE"'\033[0m'
   else
-    echo "CFITSIO COULD NOT RUN CMAKE"
+    echo -e '\033[0;31m'"CFITSIO COULD NOT RUN CMAKE"'\033[0m'
     cd $ROOTDIR
     return 1
   fi
 
-  make -j $MAKE_NUM_THREADS all > ${OUTPUT_CPACKAGES_1} 2> ${OUTPUT_CPACKAGES_2}
+  make -j $C_MAKE_NUM_THREADS all > ${OUTPUT_CPACKAGES_1} 2> ${OUTPUT_CPACKAGES_2}
   if [ $? -eq 0 ]; then
-    echo "CFITSIO RUN MAKE DONE"
+    echo -e '\033[0;32m'"CFITSIO RUN MAKE DONE"'\033[0m'
   else
-    echo "CFITSIO COULD NOT RUN MAKE"
+    echo -e '\033[0;31m'"CFITSIO COULD NOT RUN MAKE"'\033[0m'
     cd $ROOTDIR
     return 1
   fi
 
   make install > ${OUTPUT_CPACKAGES_1} 2> ${OUTPUT_CPACKAGES_2}
   if [ $? -eq 0 ]; then
-    echo "CFITSIO RUN MAKE INSTALL DONE"
+    echo -e '\033[0;32m' "CFITSIO RUN MAKE INSTALL DONE"'\033[0m'
   else
-    echo "CFITSIO COULD NOT RUN MAKE INSTALL"
+    echo -e '\033[0;31m'"CFITSIO COULD NOT RUN MAKE INSTALL"'\033[0m'
     cd $ROOTDIR
     return 1
   fi
@@ -126,7 +137,7 @@ if [ -z "${IGNORE_C_CFITSIO_INSTALLATION}" ]; then
   rm -rf ./CFITSIOBUILD
 
   cd $ROOTDIR
-  echo 'INSTALLING C CFITSIO LIBRARY - DONE'
+  echo -e '\033[1;34m''\e[4mINSTALLING CFITSIO C LIBRARY DONE''\033[0m'
 fi
 
 # --------------------------------------------------------------------------------------
@@ -135,38 +146,42 @@ fi
 if [ -z "${IGNORE_C_GSL_INSTALLATION}" ]; then
   echo -e '\033[1;34m''INSTALLING GSL C LIBRARY - \e[4mIT WILL TAKE A WHILE''\033[0m'
 
+  # --------------------------------------------------------------------------------------
+  # --------------------------------------------------------------------------------------
   cd $ROOTDIR/../cocoa_installation_libraries/$COCOA_GSL_DIR
+  # --------------------------------------------------------------------------------------
+  # --------------------------------------------------------------------------------------
 
   CC=$C_COMPILER ./configure --prefix=$ROOTDIR/.local --enable-shared=yes \
     --enable-static=yes > ${OUTPUT_CPACKAGES_1} 2> ${OUTPUT_CPACKAGES_2}
   if [ $? -eq 0 ]; then
-    echo "GSL RUN CONFIGURE DONE"
+    echo -e '\033[0;32m' "GSL RUN CONFIGURE DONE"'\033[0m'
   else
-    echo "GSL COULD NOT RUN CONFIGURE"
+    echo -e '\033[0;31m'"GSL COULD NOT RUN CONFIGURE"'\033[0m'
     cd $ROOTDIR
     return 1
   fi
 
-  make -j $MAKE_NUM_THREADS all > ${OUTPUT_CPACKAGES_1} 2> ${OUTPUT_CPACKAGES_2}
+  make -j $C_MAKE_NUM_THREADS all > ${OUTPUT_CPACKAGES_1} 2> ${OUTPUT_CPACKAGES_2}
   if [ $? -eq 0 ]; then
-    echo "GSL RUN MAKE DONE"
+    echo -e '\033[0;32m'"GSL RUN MAKE DONE"'\033[0m'
   else
-    echo "GSL COULD NOT RUN MAKE"
+    echo -e '\033[0;31m'"GSL COULD NOT RUN MAKE"'\033[0m'
     cd $ROOTDIR
     return 1
   fi
 
   make install > ${OUTPUT_CPACKAGES_1} 2> ${OUTPUT_CPACKAGES_2}
   if [ $? -eq 0 ]; then
-    echo "GSL RUN MAKE INSTALL DONE"
+    echo -e '\033[0;32m'"GSL RUN MAKE INSTALL DONE"'\033[0m'
   else
-    echo "GSL COULD NOT RUN MAKE INSTALL"
+    echo -e '\033[0;31m'"GSL COULD NOT RUN MAKE INSTALL"'\033[0m'
     cd $ROOTDIR
     return 1
   fi
 
   cd $ROOTDIR
-  echo 'INSTALLING C GSL LIBRARY - DONE'
+  echo -e '\033[1;34m''\e[4mINSTALLING GSL C LIBRARY DONE''\033[0m'
 fi
 
 # --------------------------------------------------------------------------------------
@@ -186,10 +201,11 @@ env CXX=$CXX_COMPILER CC=$C_COMPILER  $PIP3 install --global-option=build_ext \
   $ROOTDIR/../cocoa_installation_libraries/euclidemu2-1.2.0 --no-dependencies \
   --prefix=$ROOTDIR/.local --no-index > ${OUTPUT_PIP_1} 2> ${OUTPUT_PIP_2}
 if [ $? -ne 0 ]; then
-  echo "PROBLEM PIP euclidemul"
+  echo -e '\033[0;31m'"PIP COULD NOT RUN PIP INSTALL EUCLUDEMUL"'\033[0m'
+  cd $ROOTDIR
   return 1
 else
-  echo "PIP euclidemul DONE"
+  echo -e '\033[0;32m'"PIP RUN \e[3mPIP INSTALL EUCLUDEMUL\e[0m\e\033[0;32m DONE"'\033[0m'
 fi
 
 # --------------------------------------------------------------------------------------
