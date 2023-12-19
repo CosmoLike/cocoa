@@ -64,7 +64,7 @@ Now, we add the sampler information and run. Notice the high number of samples r
 
     info["sampler"] = {"mcmc": {"Rminus1_stop": 0.001, "max_tries": 1000}}
 
-    from cobaya import run
+    from cobaya.run import run
     updated_info, sampler = run(info)
 
 Here ``Rminus1_stop`` is the tolerance for deciding when the chains are converged, with a smaller number
@@ -79,9 +79,10 @@ Let us plot the posterior for ``x``, ``y``, the radius and the angle:
 .. code:: python
 
     %matplotlib inline
+    from getdist.mcsamples import MCSamplesFromCobaya
     import getdist.plots as gdplt
 
-    gdsamples = sampler.products(to_getdist=True)["sample"]
+    gdsamples = MCSamplesFromCobaya(updated_info, sampler.products()["sample"])
     gdplot = gdplt.get_subplot_plotter(width_inch=5)
     gdplot.triangle_plot(gdsamples, ["x", "y"], filled=True)
     gdplot = gdplt.get_subplot_plotter(width_inch=5)

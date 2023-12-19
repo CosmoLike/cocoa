@@ -93,14 +93,6 @@ Assuming the user opted for the easier *Conda installation*, type:
         $(cocoapy38) cd ./cocoa/
 
 to clone the repository. 
-
-:warning: **Warning** :warning: Cocoa developers should drop the shallow clone option `--depth 1`; they should also authenticate to GitHub via ssh keys and use the command instead.
-
-        $(cocoapy38) git clone git@github.com:CosmoLike/cocoa.git cocoa
-
-        $(cocoapy38) cd ./cocoa/
-
-:warning: **Warning** :warning: We have a limited monthly quota in bandwidth for Git LFS files, and therefore we ask users to use good judgment in the number of times they clone files from Cocoa's main repository.
  
 Cocoa is made aware of the chosen installation method of required packages via special environment keys located on the *Cocoa/set_installation_options* script, as shown below:
 
@@ -115,12 +107,28 @@ Cocoa is made aware of the chosen installation method of required packages via s
         export MINICONDA_INSTALLATION=1
         #export MANUAL_INSTALLATION=1
     
-The user must uncomment the appropriate key (here, we assume `MINICONDA_INSTALLATION` which is the default option), and then type the following command
+The user must uncomment the appropriate key, and then type the following command
 
         $(cocoapy38) cd ./Cocoa/
         $(cocoapy38) source setup_cocoa_installation_packages
 
-The script `setup_cocoa_installation_packages` decompresses the data files, which only takes a few minutes, and installs any remaining necessary packages. Typical package installation time ranges, depending on the installation method, from a few minutes (installation via Conda) to ~1/2 hour (installation via Cocoa's internal cache). It is important to note that our scripts never install packages on `$HOME/.local`. All requirements for Cocoa are installed at
+The script `setup_cocoa_installation_packages` decompresses the data files, which only takes a few minutes, and installs any remaining necessary packages. 
+
+Finally, type
+
+        $(cocoapy38) source compile_external_modules
+    
+to compile CAMB, Planck and Polychord. If the user wants to compile only a subset of these packages, then refer to the appendix [Compiling Boltzmann, CosmoLike and Likelihood codes separatelly](#appendix_compile_separatelly).
+
+:warning: **Warning** :warning: We have a limited monthly quota in bandwidth for Git LFS files, and therefore we ask users to use good judgment in the number of times they clone files from Cocoa's main repository.
+
+:books: **expert** :books: Cocoa developers should drop the shallow clone option `--depth 1`; they should also authenticate to GitHub via ssh keys and use the command instead.
+
+        $(cocoapy38) git clone git@github.com:CosmoLike/cocoa.git cocoa
+
+        $(cocoapy38) cd ./cocoa/
+        
+:books: **expert** :books:  It is important to note that our scripts never install packages on `$HOME/.local`. All requirements for Cocoa are installed at
 
         Cocoa/.local/bin
         Cocoa/.local/include
@@ -128,12 +136,6 @@ The script `setup_cocoa_installation_packages` decompresses the data files, whic
         Cocoa/.local/share
 
 This behavior is critical to enable users to work on multiple instances of Cocoa simultaneously.
-
-Finally, type
-
-        $(cocoapy38) source compile_external_modules
-    
-to compile CAMB, CLASS, Planck and Polychord. If the user wants to compile only a subset of these packages, then refer to the appendix [Compiling Boltzmann, CosmoLike and Likelihood codes separatelly](#appendix_compile_separatelly).
 
 :books: **expert** :books: The script *set_installation_options script* contains a few additional flags that may be useful if something goes wrong. They are shown below:
 
@@ -143,7 +145,7 @@ to compile CAMB, CLASS, Planck and Polychord. If the user wants to compile only 
         # --------------------------- VERBOSE AS DEBUG TOOL ------------------------------------
         # --------------------------------------------------------------------------------------
         # --------------------------------------------------------------------------------------
-        export COCOA_OUTPUT_VERBOSE=1
+        #export COCOA_OUTPUT_VERBOSE=1
 
         # --------------------------------------------------------------------------------------
         # --------- IF TRUE, THEN COCOA USES CLIK FROM https://github.com/benabed/clik ---------
@@ -178,8 +180,6 @@ Assuming the user opted for the easier *Conda installation* and located the term
 
 Users will see a terminal that looks like this: `$(cocoapy38)(.local)`. *This is a feature, not a bug*! 
 
-Why did we choose to have two separate bash environments? Users should be able to manipulate multiple Cocoa instances seamlessly, which is particularly useful when running chains in one instance while experimenting with code development in another. Consistency of the environment across all Cocoa instances is crucial, and the start_cocoa/stop_cocoa scripts handle the loading and unloading of environmental path variables for each Cocoa. All of them, however, depends on many of the same prerequisites, so it is advantageous to maintain the basic packages inside the shared conda cocoa environment. 
-
 :four: **Step 4 of 5**: select the number of OpenMP cores
     
         $(cocoapy38)(.local) export OMP_PROC_BIND=close; export OMP_NUM_THREADS=4
@@ -198,14 +198,16 @@ MCMC:
 
 PS: We offer the flag `COCOA_RUN_MCMC` as an alias (syntax-sugar) for `mpirun -n 4 --oversubscribe --mca btl vader,tcp,self --bind-to core:overload-allowed --rank-by core --map-by numa:pe=4 cobaya-run`. 
 
-:books: **expert** :books: Why the `--mca btl vader,tcp,self` flag? Conda-forge developers don't [compile OpenMPI with Infiniband compatibility](https://github.com/conda-forge/openmpi-feedstock/issues/38).
-
-:books: **expert** :books: Why the `--bind-to core:overload-allowed --map-by numa:pe=${OMP_NUM_THREADS}` flag? This flag enables efficient hybrid MPI + OpenMP runs on NUMA architecture.
-
 Once the work is done, type:
 
         $(cocoapy38)(.local) source stop_cocoa
         $(cocoapy38) conda deactivate cocoa
+
+:books: **expert** :books: Why the `--mca btl vader,tcp,self` flag? Conda-forge developers don't [compile OpenMPI with Infiniband compatibility](https://github.com/conda-forge/openmpi-feedstock/issues/38).
+
+:books: **expert** :books: Why the `--bind-to core:overload-allowed --map-by numa:pe=${OMP_NUM_THREADS}` flag? This flag enables efficient hybrid MPI + OpenMP runs on NUMA architecture.
+
+:books: **expert** :books: Why did we choose to have two separate bash environments? Users should be able to manipulate multiple Cocoa instances seamlessly, which is particularly useful when running chains in one instance while experimenting with code development in another. Consistency of the environment across all Cocoa instances is crucial, and the start_cocoa/stop_cocoa scripts handle the loading and unloading of environmental path variables for each Cocoa. All of them, however, depends on many of the same prerequisites, so it is advantageous to maintain the basic packages inside the shared conda cocoa environment. 
 
 ## Running Cosmolike projects <a name="running_cosmolike_projects"></a> 
 

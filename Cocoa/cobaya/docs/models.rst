@@ -104,7 +104,7 @@ Conversely, you can also recover the model created by a call to :func:`~run.run`
 
 .. code-block:: python
 
-   from cobaya import run
+   from cobaya.run import run
    updated_info, sampler = run("sample_r_theta.yaml")
    # Here is the model:
    model = sampler.model

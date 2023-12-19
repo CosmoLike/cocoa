@@ -174,11 +174,14 @@ hubble = {
                         'extra_args': {'theta_H0_range': [H0_min, H0_max]}},
                    'classy': {
                        'params': {
-                           'theta_s_100': {'prior': {'min': 0.5, 'max': 10},
+                           'theta_s_1e2': {'prior': {'min': 0.5, 'max': 10},
                                            'ref': {'dist': 'norm', 'loc': 1.0416,
                                                    'scale': 0.0004},
                                            'proposal': 0.0002,
-                                           'latex': '100\\theta_\\mathrm{s}'},
+                                           'latex': '100\\theta_\\mathrm{s}',
+                                           'drop': True}, '100*theta_s': {
+                               'value': 'lambda theta_s_1e2: theta_s_1e2',
+                               'derived': False},
                            'H0': {'latex': 'H_0'}}}}},
     'sound_horizon_lensonly': {
         'desc': 'Angular size of the sound horizon (h>0.4; approximate, if using CAMB)',
@@ -724,12 +727,14 @@ for name, pre in preset.items():
 # BASIC INSTALLATION #####################################################################
 install_basic: InfoDict = {
     "theory": theory,
-    "likelihood": dict(like_cmb["planck_NPIPE"]["likelihood"], **{
-        # 2018 lensing ensured covmat database also installed
+    "likelihood": {
+        # Native first: avoids reinstalling clik code+data if supp data obsolete
         "planck_2018_lensing.native": None,
+        "planck_2018_lowl.TT": None,
+        "planck_2018_lowl.EE": None,
         "sn.pantheon": None,
         "bao.sdss_dr12_consensus_final": None,
-        "des_y1.joint": None})}
+        "des_y1.joint": None}}
 
 install_tests = deepcopy(install_basic)
 install_tests["likelihood"].update({"planck_2015_lowl": None,

@@ -11,7 +11,7 @@ import os
 import functools
 import warnings
 from copy import deepcopy
-from typing import Union, Sequence, Optional, Tuple, List
+from typing import Union, Sequence, Optional, Tuple, Iterable
 from numbers import Number
 import numpy as np
 import pandas as pd
@@ -21,10 +21,9 @@ from getdist.chains import WeightedSamples, WeightedSampleError  # type: ignore
 # Local
 from cobaya.conventions import OutPar, minuslogprior_names, chi2_names, \
     derived_par_name_separator, minuslogprior_labels, chi2_labels, minuslogpost_label
-from cobaya.parameterization import get_literal_param_ranges
 from cobaya.tools import load_DataFrame
 from cobaya.log import LoggedError, HasLogger, NoLogging
-from cobaya.model import Model, LogPosterior
+from cobaya.model import Model, LogPosterior, DummyModel
 
 # Suppress getdist output
 chains.print_load_details = False
@@ -91,8 +90,10 @@ def remove_temperature_cov(cov, temperature):
     """
     return cov / temperature
 
-
-def compute_temperature(logpost, logprior, loglike, check=True):
+#VM BEGINS
+#def compute_temperature(logpost, logprior, loglike, check=True):
+def compute_temperature(logpost, logprior, loglike, check=False):
+#VM ENDS
     """
     Returns the temperature of a sample.
 
@@ -100,37 +101,27 @@ def compute_temperature(logpost, logprior, loglike, check=True):
     of the sample temperature, and raises ``AssertionError`` if inconsistent.
     """
     temp = (logprior + loglike) / logpost
-    if not isinstance(temp, Number):
-        if len(temp) > 1:
-            if check:
-                assert np.allclose(temp, temp[0], rtol=1e-3), \
-                    "Inconsistent temperature in sample."
-            temp = np.mean(temp)
-        else:
-            temp = float(temp[0])
+    #VM BEGINS
+    if check and isinstance(temp, Iterable) and len(temp) > 1:
+        assert np.allclose(temp, temp[0]), "Inconsistent temperature in sample."
+        temp = temp[0]
+    #VM ENDS
     return temp
 
 
-def detempering_weights_factor(tempered_logpost, temperature, max_tempered_logpost=None):
+def detempering_weights_factor(tempered_logpost, temperature):
     """
     Returns the detempering factors for the weights of a tempered sample, i.e. if ``w_t``
     is the weight of the tempered sample, then the weight of the unit-temperature one is
     ``w_t * f``, where the ``f`` returned by this method is
     ``exp(logp * (1 - 1/temperature))``, where ``logp`` is the (untempered) logposterior.
 
-    Factors are normalized so that the largest equals one, according to the maximum
-    logposterior (can be overridden with argument ``max_tempered_logpost``, useful for
-    detempering chain batches).
+    Factors are normalized so that the largest equals one.
     """
     if temperature == 1:
         return np.ones(np.atleast_1d(tempered_logpost).shape)
     log_ratio = remove_temperature(tempered_logpost, temperature) - tempered_logpost
-    if max_tempered_logpost is None:
-        max_log_ratio = max(log_ratio)
-    else:
-        max_log_ratio = \
-            remove_temperature(max_tempered_logpost, temperature) - max_tempered_logpost
-    return np.exp(log_ratio - max_log_ratio)
+    return np.exp(log_ratio - max(log_ratio))
 
 
 class BaseCollection(HasLogger):
@@ -163,15 +154,16 @@ class BaseCollection(HasLogger):
         self._cached_labels.update(minuslogprior_labels(model.prior))
         self._cached_labels.update(chi2_labels(model.likelihood))
         self._cached_renames = deepcopy(model.parameterization.sampled_params_renames())
-        # For unbound sampled params only, we take the most permissive bounds between
-        # a 5-sigma prior interval and the samples extrema (with some enlargement factor)
-        self._cached_ranges = get_literal_param_ranges(
-            model.parameterization, confidence_for_unbounded=1)
-        self._cached_ranges_sampled_5sigma = {
-            p: bounds for p, bounds in get_literal_param_ranges(
-                model.parameterization, confidence_for_unbounded=0.9999995).items()
-            if p in self.sampled_params
-        }
+        self._cached_ranges = None
+        if not isinstance(model, DummyModel):  # can happen during post-processing
+            self._cached_ranges = dict(zip(
+                self.sampled_params,
+                model.prior.bounds(confidence_for_unbounded=0.9999995)))  # 5 sigmas
+        for p, p_info in model.parameterization.derived_params_info().items():
+            mini, maxi = p_info.get("min", -np.inf), p_info.get("max", np.inf)
+            some_bound_specified = np.isfinite(mini) or np.isfinite(maxi)
+            if some_bound_specified:
+                self._cached_ranges[p] = [mini, maxi]
 
 
 def ensure_cache_dumped(method):
@@ -209,15 +201,13 @@ class SampleCollection(BaseCollection):
 
     def __init__(self, model, output=None, cache_size=_default_cache_size, name=None,
                  extension=None, file_name=None, resuming=False, load=False,
-                 temperature=None, onload_skip=0, onload_thin=1, sample_type=None,
-                 is_batch=False):
+                 temperature=None, onload_skip=0, onload_thin=1, sample_type=None):
         super().__init__(model, name)
         if sample_type is not None and (not isinstance(sample_type, str) or
                                         not sample_type.lower() in sample_types):
             raise LoggedError(self.log, "'sample_type' must be one of %r.", sample_types)
         self.sample_type = sample_type.lower() if sample_type is not None else sample_type
         self.cache_size = cache_size
-        self.is_batch = is_batch
         self._data = None
         self._n = None
         # Create/load the main data frame and the tracking indices
@@ -288,17 +278,21 @@ class SampleCollection(BaseCollection):
         samples_loaded = len(self) > 0
         if samples_loaded:
             try:
-                self.temperature = self._check_logps()
-                if temperature is not None and \
-                        not np.isclose(temperature, self.temperature):
-                    raise LoggedError(
-                        self.log,
-                        "Sample temperature appears to be %r, but the collection was "
-                        "explicitly initialized with temperature %r.",
-                        self.temperature,
-                        temperature,
-                    )
-                self._check_weights()
+                #VM BEGINS
+                #self.temperature = self._check_logps()
+                #if temperature is not None and \
+                #   not np.isclose(temperature, self.temperature):
+                #    raise LoggedError(
+                #        self.log,
+                #        "Sample temperature appears to be %r, but the collection was "
+                #        "explicitly initialized with temperature %r.",
+                #        self.temperature,
+                #        temperature,
+                #    )
+                #self._check_weights()
+                print("Cocoa (TEMPERATURE): ", temperature)
+                self.temperature = temperature if temperature is not None else 1
+                #VM ENDS
             except LoggedError as excpt:
                 raise LoggedError(
                     self.log,
@@ -487,8 +481,7 @@ class SampleCollection(BaseCollection):
                         np.atleast_2d(
                             self[self.minuslogprior_names].to_numpy(dtype=np.float64)),
                         axis=-1,
-                    ),
-                    rtol=1e-4,
+                    )
             ):
                 raise LoggedError(
                     self.log,
@@ -499,8 +492,7 @@ class SampleCollection(BaseCollection):
                     np.sum(
                         np.atleast_2d(self[self.chi2_names].to_numpy(dtype=np.float64)),
                         axis=-1,
-                    ),
-                    rtol=1e-4,
+                    )
             ):
                 raise LoggedError(
                     self.log,
@@ -513,40 +505,37 @@ class SampleCollection(BaseCollection):
     def _check_weights(
             self,
             weights: Optional[np.ndarray] = None,
-            length: Optional[Union[int, List[int]]] = None
+            length: Optional[int] = None
     ):
         """
         Checks correct length, shape and signs of the ``weights``.
 
         If no weights passed, checks internal consistency.
 
-        If ``length`` passed, checks for specific length(s) of the weights vector(s).
+        If ``length`` passed, checks for specific length of the weights vector.
 
         Raises ``LoggedError`` if the weights are badly arranged or invalid.
         """
         if weights is None:
-            weights = [self[OutPar.weight].to_numpy(dtype=np.float64)]
+            weights_array = self[OutPar.weight].to_numpy(dtype=np.float64)
         else:
-            if not hasattr(weights[0], "__len__"):
-                weights = [weights]
-            weights = [np.array(ws) for ws in weights]
-            if length is None:
-                length = [len(w) for w in weights]
-            lengths_array = np.atleast_1d(length)
-            if len(weights) != len(lengths_array):
-                expected_msg = f"Expected a list of {len(lengths_array)} 1d arrays"
+            weights_array = np.atleast_1d(weights)
+            if len(weights_array.shape) != 1:
                 raise LoggedError(
                     self.log,
-                    f"The shape of the weights is wrong. {expected_msg}, "
-                    f"but got {weights}."
+                    "The shape of the weights is wrong. Expected a 1d array, "
+                    "but got shape %r.",
+                    weights_array.shape
                 )
-            if any(len(w) != l for w, l in zip(weights, lengths_array)):
+            check_length = len(self) if length is None else length
+            if len(weights_array) != check_length:
                 raise LoggedError(
                     self.log,
-                    f"The lengths of the weights vectors are wrong. Expected "
-                    f"{[len(w) for w in weights]} but got {lengths_array}."
+                    "The length of the weights vector is wrong. Expected %d but got %d.",
+                    check_length,
+                    len(weights_array)
                 )
-        if any(np.any(ws < 0) for ws in weights):
+        if np.any(weights_array < 0):
             raise LoggedError(
                 self.log,
                 "The weight vector contains negative elements."
@@ -568,47 +557,17 @@ class SampleCollection(BaseCollection):
         weights = self[OutPar.weight]
         return np.allclose(np.round(weights), weights)
 
-    # pylint: disable=protected-access
-    def _detempered_weights(self, with_batch=None):
-        """
-        Computes the detempered weights.
-
-        If this sample is part of a batch, call this method passing the rest of the batch
-        as a list using the argument ``with_batch`` (otherwise inconsistent weights
-        between samples will be introduced). If additional chains are passed with
-        ``with_batch``, their temperature will be reset in-place.
-
-        Returns always a list of weight vectors: one element per collection in the batch.
-        """
-        batch = [self]
-        if with_batch is not None:
-            batch += list(with_batch)
-        elif self.is_batch:
-            self.log.warning(
-                "Trying to get detempered weights for individual sample collection that "
-                "appears to be part of a batch (e.g. of parallel MCMC chains). This will "
-                "produce inconsistent weights across chains, unless passing the rest of "
-                "the batch as ``with_batch=[collection_1, collection_2,... ]``.")
-        temps = [c.temperature for c in batch]
-        if not np.allclose(temps, temps[0]):
-            raise LoggedError(
-                self.log,
-                f"Temperature inconsistent across the batch: {temps}."
-            )
-        for c in batch:
-            c._cache_dump()
+    def _detempered_weights(self):
+        """Computes the detempered weights."""
         if self.temperature == 1:
-            return [c._data[OutPar.weight].to_numpy(dtype=np.float64) for c in batch]
-        max_logpost = np.max(np.concatenate(
-            [-c._data[OutPar.minuslogpost].to_numpy(dtype=np.float64) for c in batch]))
-        return [
-            c._data[OutPar.weight].to_numpy(dtype=np.float64) *
+            return self._data[OutPar.weight].to_numpy(dtype=np.float64)
+        return (
+            self._data[OutPar.weight].to_numpy(dtype=np.float64) *
             detempering_weights_factor(
-                -c._data[OutPar.minuslogpost].to_numpy(dtype=np.float64),
-                c.temperature,
-                max_tempered_logpost=max_logpost
-            ) for c in batch
-        ]
+                -self._data[OutPar.minuslogpost].to_numpy(dtype=np.float64),
+                self.temperature
+            )
+        )
 
     def _detempered_minuslogpost(self):
         """Computes the detempered -log-posterior."""
@@ -619,30 +578,21 @@ class SampleCollection(BaseCollection):
             self.temperature
         )
 
-    # pylint: disable=protected-access
-    def reset_temperature(self, with_batch=None):
+    def reset_temperature(self):
         """
         Drops the information about sampling temperature: ``weight`` and ``minuslogpost``
         columns will now correspond to those of a unit-temperature posterior sample.
 
-        If this sample is part of a batch, call this method passing the rest of the batch
-        as a list using the argument ``with`` (otherwise inconsistent weights between
-        samples will be introduced). If additional chains are passed with ``with``, their
-        temperature will be reset in-place.
-
         This cannot be undone: (e.g. recovering original integer tempered weights).
         You may want to call this method on a copy (see :func:`SampleCollection.copy`).
         """
-        weights_batch = self._detempered_weights(with_batch=with_batch)
-        # Calling *after* getting weights, since that call checks consistency across batch
+        self._cache_dump()
         if self.temperature == 1:
             return
-        batch = [self] + list(with_batch or [])
-        for c, weights in zip(batch, weights_batch):
-            c._data[OutPar.weight] = weights
-            c._drop_samples_null_weight()
-            c._data[OutPar.minuslogpost] = c._detempered_minuslogpost()
-            c.temperature = 1
+        self._data[OutPar.weight] = self._detempered_weights()
+        self._drop_samples_null_weight()
+        self._data[OutPar.minuslogpost] = self._detempered_minuslogpost()
+        self.temperature = 1
 
     def _enlarge(self, n):
         """
@@ -699,13 +649,13 @@ class SampleCollection(BaseCollection):
     @property
     def values(self) -> np.ndarray:
         """
-        Deprecated in favour of ``SampleCollection.to_numpy``, following Pandas.
+        Returns the sample collection as a numpy array; to be deprecated in favour of
+        ``Collection.to_numpy``, following Pandas.
         """
-        raise LoggedError(
-            self.log,
-            "Following Pandas, the 'SampleCollection.values()' method has been deprecated"
-            " in favour of 'SampleCollection.to_numpy()'."
-        )
+        print("*WARNING* Following Pandas, the 'Collection.values()' method will soon be "
+              "deprecated in favour of 'Collection.to_numpy()'.")
+        # BEHAVIOUR TO BE REPLACED BY AN ERROR
+        return self.data.to_numpy(dtype=np.float64)
         # END OF DEPRECATION BLOCK
 
     def to_numpy(self, dtype=None, copy=False) -> np.ndarray:
@@ -772,9 +722,8 @@ class SampleCollection(BaseCollection):
             weights /= max(weights)
             return weights, np.allclose(np.round(weights), weights)
         if self.is_tempered and not tempered:
-            # For sure the weights are not integer in this case
-            # NB: Index [0] below bc a list is returned, in case of batch processing
-            return self._detempered_weights()[0][first:last], False
+            # For sure the weights are not integer
+            return self._detempered_weights()[first:last], False
         return (
             self[OutPar.weight][first:last].to_numpy(dtype=np.float64),
             self.has_int_weights
@@ -786,7 +735,7 @@ class SampleCollection(BaseCollection):
             last: Optional[int] = None,
             weights: Optional[np.ndarray] = None,
             derived: bool = False,
-            tempered: bool = False,
+            tempered: bool = False
     ) -> np.ndarray:
         """
         Returns the (weighted) mean of the parameters in the chain,
@@ -824,7 +773,7 @@ class SampleCollection(BaseCollection):
             last: Optional[int] = None,
             weights: Optional[np.ndarray] = None,
             derived: bool = False,
-            tempered: bool = False,
+            tempered: bool = False
     ) -> np.ndarray:
         """
         Returns the (weighted) covariance matrix of the parameters in the chain,
@@ -854,8 +803,7 @@ class SampleCollection(BaseCollection):
         return np.atleast_2d(np.cov(  # type: ignore
             self[list(self.sampled_params) +
                  (list(self.derived_params) if derived else [])][first:last].to_numpy(
-                     dtype=np.float64).T,
-            ddof=0,  # does simple mean w/o bias factor; weights are used as probabilities
+                dtype=np.float64).T,
             **{weight_type_kwarg: weights_cov}))
 
     def _drop_samples_null_weight(self):
@@ -863,19 +811,11 @@ class SampleCollection(BaseCollection):
         self._data = self.data[self._data.weight > 0].reset_index(drop=True)
         self._n = self._data.last_valid_index() + 1
 
-    def reweight(self, importance_weights, with_batch=None, check=True):
+    def reweight(self, importance_weights, check=True):
         """
-        Reweights the sample in-place with the given ``importance_weights``.
+        Reweights the sample with the given ``importance_weights``.
 
         Temperature information is dropped.
-
-        If this sample is part of a batch, call this method passing the rest of the batch
-        as a list using the argument ``with_match`` (otherwise inconsistent weights
-        between samples will be introduced). If additional chains are passed with
-        ``with_batch``, they will also be reweighted in-place. In that case,
-        ``importance_weights`` needs to be a list of weight vectors, the first of which to
-        be applied to the current instance, and the rest to the collections passed with
-        ``with_batch``.
 
         This cannot be fully undone (e.g. recovering original integer weights).
         You may want to call this method on a copy (see :func:`SampleCollection.copy`).
@@ -883,18 +823,11 @@ class SampleCollection(BaseCollection):
         For the sake of speed, length and positivity checks on the importance weights can
         be skipped with ``check=False`` (default ``True``).
         """
-        self.reset_temperature(with_batch=with_batch)  # includes a self._cache_dump()
-        if not hasattr(importance_weights[0], "__len__"):
-            importance_weights = [importance_weights]
+        self.reset_temperature()  # includes a self._cache_dump()
         if check:
-            self._check_weights(
-                importance_weights,
-                length=[len(self)] + [len(c) for c in with_batch or []]
-            )
-        batch = [self] + list(with_batch or [])
-        for c, iweights in zip(batch, importance_weights):
-            c._data[OutPar.weight] *= iweights
-            c._drop_samples_null_weight()
+            self._check_weights(importance_weights)
+        self._data[OutPar.weight] *= importance_weights
+        self._drop_samples_null_weight()
 
     def filtered_copy(self, where) -> 'SampleCollection':
         """Returns a copy of the collection with some condition ``where`` imposed."""
@@ -909,7 +842,7 @@ class SampleCollection(BaseCollection):
         Parameters
         ----------
         skip: float
-            Specifies the amount of initial samples to be skipped, either directly if
+            Specified the amount of initial samples to be skipped, either directly if
             ``skip>1`` (rounded up to next integer), or as a fraction if ``0<skip<1``.
 
         inplace: bool, default: False
@@ -1006,8 +939,8 @@ class SampleCollection(BaseCollection):
 
     def MAP(self):
         """Maximum-a-posteriori (MAP) sample. Returns a copy."""
-        return self.data.loc[self.data[OutPar.minuslogpost].astype(np.float64).idxmin()] \
-            .copy()
+        return self.data.loc[self.data[OutPar.minuslogpost].astype(np.float64).idxmin()]\
+                        .copy()
 
     def _sampled_to_getdist(
             self,
@@ -1038,7 +971,6 @@ class SampleCollection(BaseCollection):
             self,
             label: Optional[str] = None,
             model: Optional[Model] = None,
-            combine_with: Optional[List["SampleCollection"]] = None,
     ) -> MCSamples:
         """
         Parameters
@@ -1048,9 +980,6 @@ class SampleCollection(BaseCollection):
         model: :class:`cobaya.model.Model`, optional
             `Model` with which the sample was created. Needed only if parameter labels or
             aliases have changed since the collection was generated.
-        combine_with: list of :class:`cobaya.collection.SampleCollection`, optional
-            Additional collections to be added when creating a getdist object.
-            Compatibility between the collections is assumed and not checked.
 
         Returns
         -------
@@ -1065,51 +994,19 @@ class SampleCollection(BaseCollection):
         if isinstance(model, Model):
             self._cache_aux_model_quantities(model)
         elif model is not None:
-            raise LoggedError(
-                self.log,
-                "Optional argument `model` must be a Cobaya Model instance."
-            )
+            LoggedError("Optional argument `model` must be a Cobaya Model instance.")
         used_names_dict = {p: p + ("*" if p not in self.sampled_params else "")
                            for p in self.data.columns[2:]}
-        if combine_with is None:
-            combine_with = []
-        all_collections = [self] + list(combine_with)
-        samples, weights, loglikes = [], [], []
-        for c in all_collections:
-            samples.append(c[c.data.columns[2:]].to_numpy(np.float64, copy=True))
-            weights.append(c[OutPar.weight].to_numpy(np.float64, copy=True))
-            loglikes.append(c[OutPar.minuslogpost].to_numpy(np.float64, copy=True))
-        # Ranges (unbounded sampled params are updated with extrema, see comment above)
-        min_samples, max_samples = (
-            self.data.min(axis=0, skipna=True).to_dict(),
-            self.data.max(axis=0, skipna=True).to_dict(),
-        )
-        enlarge_factor = 0.1
-        ranges = {}
-        for p, p_range in self._cached_ranges.items():
-            ranges[p] = list(p_range)
-            if p in self.sampled_params:
-                range_from_sample = max_samples[p] - min_samples[p]
-                if p_range[0] is None:
-                    ranges[p][0] = min(
-                        self._cached_ranges_sampled_5sigma[p][0],
-                        min_samples[p] - enlarge_factor * range_from_sample,
-                    )
-                if p_range[1] is None:
-                    ranges[p][1] = max(
-                        self._cached_ranges_sampled_5sigma[p][1],
-                        max_samples[p] + enlarge_factor * range_from_sample,
-                    )
         return MCSamples(
-            samples=samples,
-            weights=weights,
-            loglikes=loglikes,
+            samples=self[self.data.columns[2:]].to_numpy(np.float64, copy=True),
+            weights=self[OutPar.weight].to_numpy(np.float64, copy=True),
+            loglikes=self[OutPar.minuslogpost].to_numpy(np.float64, copy=True),
             temperature=self.temperature,
             sampler=deepcopy(self.sample_type),
             names=list(used_names_dict.values()),
             labels=[deepcopy(self._cached_labels[p]) for p in used_names_dict
                     if p in self._cached_labels],
-            ranges=ranges,
+            ranges=deepcopy(self._cached_ranges),
             renames=deepcopy(self._cached_renames),
             name_tag=label,
             label=deepcopy(self.name),

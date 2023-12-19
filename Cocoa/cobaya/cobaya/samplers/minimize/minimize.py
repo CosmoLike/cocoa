@@ -5,11 +5,10 @@ r"""
 :Author: Jesus Torrado
 
 This is a **maximizer** for posteriors or likelihoods, based on
-`scipy.optimize.Minimize <https://docs.scipy.org/doc/scipy/reference/generated/scipy.optimize.minimize.html>`_,
- `Py-BOBYQA <https://numericalalgorithmsgroup.github.io/pybobyqa/build/html/index.html>`_, and
- `iminuit <https://iminuit.readthedocs.io/>`_.
+`scipy.optimize.Minimize <https://docs.scipy.org/doc/scipy/reference/generated/scipy.optimize.minimize.html>`_
+and `Py-BOBYQA <https://numericalalgorithmsgroup.github.io/pybobyqa/build/html/index.html>`_.
 
-The default is BOBYQA, which tends to work better than scipy on Cosmological problems with default
+The default is BOBYQA, which tends to work better on Cosmological problems with default
 settings.
 
 .. |br| raw:: html
@@ -30,13 +29,10 @@ settings.
    `M.J.D. Powell,
    "The BOBYQA Algorithm for Bound Constrained Optimization without Derivatives",
    (Technical Report 2009/NA06, DAMTP, University of Cambridge)
-   <https://www.damtp.cam.ac.uk/user/na/NA_papers/NA2009_06.pdf>`_
+   <http://www.damtp.cam.ac.uk/user/na/NA_papers/NA2009_06.pdf>`_
 
    **If you use scipy**, you can find `the appropriate references here
    <https://docs.scipy.org/doc/scipy/reference/generated/scipy.optimize.minimize.html>`_.
-
-   **If you use iminuit**, see the `references here
-   <https://iminuit.readthedocs.io/en/stable/citation.html>`_.
 
 It works more effectively when run on top of a Monte Carlo sample: it will use the maximum
 a posteriori as a starting point (or the best fit, depending on whether the prior is
@@ -114,8 +110,8 @@ from cobaya.tools import read_dnumber, recursive_update
 from cobaya.sampler import CovmatSampler
 from cobaya import mpi
 
-# Handling scipy vs BOBYQA vs iMinuit
-evals_attr = {"scipy": "fun", "bobyqa": "f", "iminuit": "fun"}
+# Handling scipy vs BOBYQA
+evals_attr = {"scipy": "fun", "bobyqa": "f"}
 valid_methods = tuple(evals_attr)
 
 # Conventions conventions
@@ -150,7 +146,6 @@ class Minimize(Minimizer, CovmatSampler):
     best_of: int
     override_bobyqa: Optional[dict]
     override_scipy: Optional[dict]
-    override_iminuit: Optional[dict]
     max_evals: Union[str, int]
 
     def initialize(self):
@@ -239,7 +234,6 @@ class Minimize(Minimizer, CovmatSampler):
         self.kwargs = None
         self.result = None
         self.minimum = None
-        self.full_set_of_mins = None
 
     def affine_transform(self, x):
         """Transforms a point into the search space."""
@@ -253,7 +247,7 @@ class Minimize(Minimizer, CovmatSampler):
 
     def run(self):
         """
-        Runs minimization functions
+        Runs `scipy.Minimize`
         """
         results = []
         successes = []
@@ -291,32 +285,6 @@ class Minimize(Minimizer, CovmatSampler):
                             "Finished unsuccessfully. Reason: %s",
                             _bobyqa_errors[result.flag]
                         )
-                elif self.method.lower() == "iminuit":
-                    try:
-                        import iminuit
-                    except ImportError:
-                        raise LoggedError(
-                            self.log, "You need to install iminuit to use the "
-                                      "'iminuit' minimizer. Try 'pip install iminuit'.")
-                    self.kwargs = {
-                        "fun": minuslogp_transf,
-                        "x0": initial_point,
-                        "bounds": bounds,
-                        "options": {
-                            "maxfun": self.max_iter,
-                            "disp": self.is_debug()}}
-                    self.kwargs = recursive_update(
-                        self.kwargs, self.override_iminuit or {}
-                    )
-                    self.log.debug(
-                        "Arguments for iminuit.Minimize:\n%r",
-                        {k: v for k, v in self.kwargs.items() if k != "fun"},
-                    )
-                    result = iminuit.minimize(**self.kwargs, method="migrad")
-                    if not (success := result.success):
-                        self.log.error(result.message)
-                    if mpi.get_mpi_size() > 1:
-                        result.pop("minuit")  # problem with pickle/mpi?
                 else:
                     self.kwargs = {
                         "fun": minuslogp_transf,
@@ -329,10 +297,13 @@ class Minimize(Minimizer, CovmatSampler):
                     self.log.debug("Arguments for scipy.optimize.Minimize:\n%r",
                                    {k: v for k, v in self.kwargs.items() if k != "fun"})
                     result = optimize.minimize(**self.kwargs)
-                    if not (success := result.success):
+                    success = result.success
+                    if not success:
                         self.log.error("Finished unsuccessfully.")
                 if success:
-                    self.log.info("Run %d/%d converged.", i + 1, len(self.initial_points))
+                    self.log.info(
+                        "Run %d/%d converged.", i + 1, len(self.initial_points)
+                    )
             except Exception as excpt:
                 self.log.error("Minimizer '%s' raised an unexpected error:", self.method)
                 raise excpt
@@ -343,7 +314,7 @@ class Minimize(Minimizer, CovmatSampler):
              [self._inv_affine_transform_matrix] * len(self.initial_points)]))
 
     @mpi.set_from_root(("_inv_affine_transform_matrix", "_affine_transform_baseline",
-                        "result", "minimum", "full_set_of_mins"))
+                        "result", "minimum"))
     def process_results(self, results, successes, affine_transform_baselines,
                         transform_matrices):
         """
@@ -400,13 +371,6 @@ class Minimize(Minimizer, CovmatSampler):
             "Parameter values at minimum:\n%s", self.minimum.data.to_string())
         self.minimum.out_update()
         self.dump_getdist()
-        if len(results) > 1:
-            all_mins = {
-                f"{i}": (getattr(res[0], evals_attr_), res[1])
-                for i, res in enumerate(zip(results, successes))
-            }
-            self.full_set_of_mins = all_mins
-            self.log.info("Full set of minima:\n%s", self.full_set_of_mins)
 
     def products(self):
         r"""
@@ -420,11 +384,6 @@ class Minimize(Minimizer, CovmatSampler):
           or `pyBOBYQA
           <https://numericalalgorithmsgroup.github.io/pybobyqa/build/html/userguide.html>`_.
 
-        - ``full_set_of_mins``: dictionary of minima obtained from multiple initial
-          points. For each it stores the value of the minimized function and a boolean
-          indicating whether the minimization was successful or not.
-          ``None`` if only one initial point was run.
-
         - ``M``: inverse of the affine transform matrix (see below).
           ``None`` if no transformation applied.
 
@@ -433,12 +392,11 @@ class Minimize(Minimizer, CovmatSampler):
 
         If non-trivial ``M`` and ``X0`` are returned, this means that the minimizer has
         been working on an affine-transformed parameter space :math:`x^\prime`, from which
-        the real space points can be obtained as :math:`x = M x^\prime + X_0`.
-        This inverse transformation needs to be applied to the coordinates appearing
-        inside the ``result_object``.
+        the real space points can be obtained as :math:`x = M x^\prime + X_0`. This inverse
+        transformation needs to be applied to the coordinates appearing inside the
+        ``result_object``.
         """
         return {"minimum": self.minimum, "result_object": self.result,
-                "full_set_of_mins": self.full_set_of_mins,
                 "M": self._inv_affine_transform_matrix,
                 "X0": self._affine_transform_baseline}
 
@@ -465,7 +423,6 @@ class Minimize(Minimizer, CovmatSampler):
                     lines.append("%5d  %-17.9e %-*s %s" % (num, val, width, p, lab))
                 else:
                     lines.append("%5d  %-17s %-*s %s" % (num, val, width, p, lab))
-
         add_section(
             [(p, params[p]) for p in self.model.parameterization.sampled_params()])
         lines.append('')
@@ -538,14 +495,10 @@ class Minimize(Minimizer, CovmatSampler):
         desc_scipy = (r"Scipy minimizer \cite{2020SciPy-NMeth} (check citation for the "
                       r"actual algorithm used at \url{https://docs.scipy.org/doc/scipy/re"
                       r"ference/generated/scipy.optimize.Minimize.html}")
-        desc_iminuit = (r"iminuit minimizer(check citation for the "
-                        r"actual algorithm used at \url{https://iminuit.readthedocs.io/en/stable/reference.html#scipy-like-interface}")
         if method and method.lower() == "bobyqa":
             return desc_bobyqa
         elif method and method.lower() == "scipy":
             return desc_scipy
-        elif method and method.lower() == "iminuit":
-            return desc_iminuit
         else:  # unknown method or no info passed (None)
             return ("Minimizer -- method unknown, possibly one of:"
                     "\na) " + desc_bobyqa + "\nb) " + desc_scipy)

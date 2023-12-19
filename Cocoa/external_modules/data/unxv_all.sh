@@ -53,6 +53,9 @@ else
 	tar xf spt_3g.xz &
 	proc1=$!
 	# ---------------------------------------------
+	tar xf act.xz &
+	proc11=$!
+	# ---------------------------------------------
 	cd ./planck
 	# ---------------------------------------------
 	tar xf planck_supp_data_and_covmats.xz &
@@ -78,9 +81,9 @@ else
 	echo 'DECOMPRESSING PLANCK-2015 (PLC-2.0) DATA'
 	echo 'DECOMPRESSING PLANCK-2018 (PLC-3.0) DATA'
 	echo 'DECOMPRESSING SPT-3G Y1 DATA'
-	echo 'DECOMPRESSING SPT-3G HIELL DATA'
+	echo 'DECOMPRESSING ACT-DR6 DATA'
 	echo 'DECOMPRESSING SIMONS OBSERVATORY'
 	echo 'DECOMPRESSING BICEP 2015 DATA'
 	echo 'DECOMPRESSION IS HAPPENING IN PARALLEL - WAITING ALL OF THEM TO FINISH'
-	wait "$proc1" "$proc2" "$proc3" "$proc4" "$proc5" "$proc6" "$proc7" "$proc8" "$proc9" "$proc10" 
+	wait "$proc1" "$proc2" "$proc3" "$proc4" "$proc5" "$proc6" "$proc7" "$proc8" "$proc9" "$proc10" "$proc11"
 fi

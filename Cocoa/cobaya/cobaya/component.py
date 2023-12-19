@@ -1,5 +1,4 @@
 import os
-import sys
 import time
 import inspect
 from inspect import cleandoc
@@ -201,15 +200,7 @@ class HasDefaults:
         """
         package = inspect.getmodule(cls).__package__
         try:
-            if os.path.split(str(file_name))[0]:
-                raise ValueError(f"{file_name} must be a bare file name, without path.")
-            # NB: resources.read_text is considered deprecated from 3.9, and will fail
-            if sys.version_info < (3, 9):
-                return resources.read_text(package, file_name)
-            with (resources.files(package) / file_name).open(
-                    "r", encoding="utf-8-sig", errors="strict") as fp:
-                text_content = fp.read()
-            return text_content
+            return resources.read_text(package, file_name)
         except Exception:
             return None
 
@@ -632,10 +623,10 @@ def get_component_class(name, kind=None, component_path=None, class_name=None,
     if allow_internal:
         # If unknown type, loop recursive call with all possible types
         if kind is None:
-            for this_kind in kinds:
+            for kind in kinds:
                 try:
                     return get_component_class(
-                        name, this_kind, allow_external=False, allow_internal=True,
+                        name, kind, allow_external=False, allow_internal=True,
                         logger=logger, not_found_level="debug")
                 except ComponentNotFoundError:
                     pass  # do not raise it yet. check all kinds.
