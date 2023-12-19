@@ -125,8 +125,6 @@ to compile CAMB, Planck and Polychord. If the user wants to compile only a subse
 :books: **expert** :books: Cocoa developers should drop the shallow clone option `--depth 1`; they should also authenticate to GitHub via ssh keys and use the command instead.
 
         $(cocoapy38) git clone git@github.com:CosmoLike/cocoa.git cocoa
-
-        $(cocoapy38) cd ./cocoa/
         
 :books: **expert** :books:  It is important to note that our scripts never install packages on `$HOME/.local`. All requirements for Cocoa are installed at
 
