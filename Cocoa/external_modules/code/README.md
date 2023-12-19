@@ -205,7 +205,7 @@ PS: you can also use `source compile_external_modules` instead of `source ./inst
     
     (...)
 
-**Step 5 of 13**: Move the folder the file `external_modules/code/XXX/include` to `external_modules/code/XXX/include2`
+**Step 5 of 13**: Move the folder the file `$ROOTDIR/external_modules/code/XXX/include` to `$ROOTDIR/external_modules/code/XXX/include2`
 
 Cocoa git repository has a restriction on `.gitignore` against adding `include/` folders. So move `/include/` to `/include2`. 
 
