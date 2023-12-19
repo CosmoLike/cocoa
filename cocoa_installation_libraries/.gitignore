@@ -57,3 +57,8 @@ spdlog/
 pip_cache/
 .DS_Store
 euclidemu2-1.2.0/build/
+euclidemu2-1.2.0/dist/
+euclidemu2-1.2.0/euclidemu2.egg-info/
+euclidemu2-*/build/
+euclidemu2-*/dist/
+euclidemu2-*/euclidemu2.egg-info/
