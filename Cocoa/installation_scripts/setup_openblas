@@ -32,39 +32,45 @@ fi
 if [ -z "${IGNORE_OPENBLAS_INSTALLATION}" ]; then
   echo -e '\033[1;34m''INSTALLING OPENBLAS LIBRARY - \e[4mIT WILL TAKE A WHILE''\033[0m'
 
-  cd $ROOTDIR/../cocoa_installation_libraries/$COCOA_OPENBLAS_DIR
-
-  export MAKE_NB_JOBS=$MAKE_NUM_THREADS
-  make clean > /dev/null 2> /dev/null
-
   if [ -z "${DEBUG_OPENBLAS_PACKAGE}" ]; then
-    make CC=$C_COMPILER FC=$FORTRAN_COMPILER USE_OPENMP=1 > /dev/null 2> /dev/null
-    if [ $? -eq 0 ]; then
-      echo "OPENBLAS RUN MAKE DONE"
-    else
-      echo "OPENBLAS COULD NOT RUN MAKE" >&2
-      return 1
-    fi
-
-    make install PREFIX=$ROOTDIR/.local > /dev/null 2> /dev/null
-    if [ $? -eq 0 ]; then
-      echo "OPENBLAS RUN MAKE INSTALL DONE"
-    else
-      echo "OPENBLAS COULD NOT RUN MAKE INSTALL" >&2
-      return 1
-    fi
+    export OUTPUT_OPENBLAS_1="/dev/null"
+    export OUTPUT_OPENBLAS_2="/dev/null"
+    export OPENBLAS_MAKE_NUM_THREADS="${MAKE_NUM_THREADS}"
   else
-    make CC=$C_COMPILER FC=$FORTRAN_COMPILER USE_OPENMP=1
-    if [ $? -ne 0 ];then
-      cd $ROOTDIR
-      return 1
-    fi 
-    
-    make install PREFIX=$ROOTDIR/.local
-    if [ $? -ne 0 ];then
-      cd $ROOTDIR
-      return 1
-    fi 
+    export OUTPUT_OPENBLAS_1="/dev/tty"
+    export OUTPUT_OPENBLAS_2="/dev/tty"
+    export OPENBLAS_MAKE_NUM_THREADS=1
+  fi
+
+  # --------------------------------------------------------------------------------------
+  # --------------------------------------------------------------------------------------
+  cd $ROOTDIR/../cocoa_installation_libraries/$COCOA_OPENBLAS_DIR
+  # --------------------------------------------------------------------------------------
+  # --------------------------------------------------------------------------------------
+  
+  export MAKE_NB_JOBS=$OPENBLAS_MAKE_NUM_THREADS
+  
+  make clean > ${OUTPUT_OPENBLAS_1} 2> ${OUTPUT_OPENBLAS_2}
+
+  make CC=$C_COMPILER FC=$FORTRAN_COMPILER \
+    USE_OPENMP=1 > ${OUTPUT_OPENBLAS_1} 2> ${OUTPUT_OPENBLAS_2}
+  if [ $? -eq 0 ]; then
+    echo -e '\033[0;32m'"OPENBLAS RUN MAKE DONE"'\033[0m'
+  else
+    echo -e '\033[0;31m'"OPENBLAS COULD NOT RUN MAKE"'\033[0m'
+    unset MAKE_NB_JOBS
+    cd $ROOTDIR
+    return 1
+  fi
+
+  make install PREFIX=$ROOTDIR/.local > ${OUTPUT_OPENBLAS_1} 2> ${OUTPUT_OPENBLAS_2}
+  if [ $? -eq 0 ]; then
+    echo -e '\033[0;32m'"OPENBLAS RUN MAKE INSTALL DONE"'\033[0m'
+  else
+    echo -e '\033[0;31m'"OPENBLAS COULD NOT RUN MAKE INSTALL"'\033[0m'
+    unset MAKE_NB_JOBS
+    cd $ROOTDIR
+    return 1
   fi
 
   unset MAKE_NB_JOBS
