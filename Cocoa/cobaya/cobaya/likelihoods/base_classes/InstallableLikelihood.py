@@ -68,7 +68,8 @@ class InstallableLikelihood(Likelihood):
         if repo := opts.get("directory", opts.get("github_repository")):
             data_path = repo.split('/')[-1]
         else:
-            data_path = opts.get("data_path", cls.__name__)
+            data_path = opts.get("data_path")
+            print("What?", data_path, opts.get("data_path", cls.__name__))
         install_path = os.path.realpath(os.path.join(path, "data", data_path))
         # Idempotent: return if input == proposed output
         if path.rstrip(os.sep).endswith(data_path.rstrip(os.sep)):

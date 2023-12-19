@@ -5,16 +5,16 @@ import os
 from . import jobqueue
 
 
-def run_single(args=None):
+def run_single():
     parser = argparse.ArgumentParser(
-        prog="cobaya-run-job",
+        prog="cobaya run-job",
         description="Submit a single job to queue")
 
     parser.add_argument('input_file', nargs='+')
 
     jobqueue.addArguments(parser)
 
-    args = parser.parse_args(args)
+    args = parser.parse_args()
 
     ini = [ini.replace('.ini', '').replace('.yaml', '') for ini in args.input_file]
 

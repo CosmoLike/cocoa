@@ -50,7 +50,6 @@ import numpy as np
 from scipy.interpolate import InterpolatedUnivariateSpline
 from scipy import special
 import copy
-from typing import List, Tuple
 
 # Local
 from cobaya.likelihoods.base_classes import DataSetLikelihood
@@ -210,7 +209,7 @@ class DES(DataSetLikelihood):
         self.nwbins = ini.int('num_gal_bins', 0)  # for galaxies
         maxbin = max(self.nzbins, self.nwbins)
         cov_ix = 0
-        self.bin_pairs: List[List[Tuple]] = []
+        self.bin_pairs = []
         self.data_arrays = []
         self.thetas = []
         for i, tp in enumerate(self.data_types):
@@ -262,7 +261,7 @@ class DES(DataSetLikelihood):
         self.ranges = ranges
         self.fullcov = hdulist['COVMAT'].data
         cov_ix = 0
-        self.bin_pairs: List[List[Tuple]] = []
+        self.bin_pairs = []
         self.data_types = def_DES_types
         self.used_types = def_DES_types
         for i, tp in enumerate(def_DES_types):
@@ -271,7 +270,7 @@ class DES(DataSetLikelihood):
             for f1, f2, ix, dat, theta in zip(xi.field(0) - 1, xi.field(1) - 1,
                                               xi.field(2), xi.field(3), xi.field(4)):
                 self.indices.append((i, f1, f2, ix))
-                if (f1, f2) not in self.bin_pairs[i]:
+                if not (f1, f2) in self.bin_pairs[i]:
                     self.bin_pairs[i].append((f1, f2))
                 mn, mx = ranges[tp][f1, f2]
                 if mn < theta < mx:

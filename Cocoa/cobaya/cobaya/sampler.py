@@ -45,14 +45,14 @@ implement only the methods ``initialize``, ``_run``, and ``products``.
 """
 # Global
 import os
-from itertools import chain
-from typing import Optional, Sequence, Mapping, Union, Dict, TYPE_CHECKING
 import numpy as np
+from typing import Optional, Sequence, Mapping, Union
+from itertools import chain
 from numpy.random import SeedSequence, default_rng
 
 # Local
 from cobaya.conventions import Extension, packages_path_input
-from cobaya.typing import SamplersDict, SamplerDict
+from cobaya.typing import InfoDict, SamplersDict, SamplerDict
 from cobaya.tools import deepcopy_where_possible, find_with_regexp, recursive_update, \
     str_to_list
 from cobaya.model import Model
@@ -62,11 +62,6 @@ from cobaya.component import CobayaComponent, get_component_class
 from cobaya.input import update_info, is_equal_info, get_preferred_old_values
 from cobaya.output import OutputDummy, Output
 from cobaya import mpi
-
-# Avoid importing GetDist if not necessary
-if TYPE_CHECKING:
-    from cobaya.collection import SampleCollection
-    from getdist import MCSamples
 
 
 def get_sampler_name_and_class(info_sampler: SamplersDict, logger=None):
@@ -85,10 +80,9 @@ def check_sane_info_sampler(info_sampler: SamplersDict):
         raise LoggedError(__name__, "No sampler given!")
     try:
         list(info_sampler)[0]
-    except AttributeError as excpt:
+    except AttributeError:
         raise LoggedError(
-            __name__, "The sampler block must be a dictionary 'sampler: {options}'."
-        ) from excpt
+            __name__, "The sampler block must be a dictionary 'sampler: {options}'.")
     if len(info_sampler) > 1:
         raise LoggedError(__name__, "Only one sampler currently supported at a time.")
 
@@ -103,7 +97,7 @@ def check_sampler_info(info_old: Optional[SamplersDict],
     """
     logger_sampler = get_logger(__name__)
     if not info_old:
-        return info_new
+        return
     # TODO: restore this at some point: just append minimize info to the old one
     # There is old info, but the new one is Minimizer and the old one is not
     # if (len(info_old) == 1 and list(info_old) != ["minimize"] and
@@ -132,7 +126,6 @@ def check_sampler_info(info_old: Optional[SamplersDict],
                                 "with the new one. Delete the previous output manually, "
                                 "or automatically with either "
                                 "'-f', '--force', 'force: True'")
-    return info_new
 
 
 def get_sampler(info_sampler: SamplersDict, model: Model, output: Optional[Output] = None,
@@ -157,8 +150,8 @@ def get_sampler(info_sampler: SamplersDict, model: Model, output: Optional[Outpu
     # Get sampler class & check resume/force compatibility
     sampler_name, sampler_class = get_sampler_name_and_class(
         updated_info_sampler, logger=logger_sampler)
-    updated_info_sampler = check_sampler_info(
-        (output.get_updated_info(use_cache=True) or {}).get("sampler"),
+    check_sampler_info(
+        (output.reload_updated_info(use_cache=True) or {}).get("sampler"),
         updated_info_sampler, is_resuming=output.is_resuming())
     # Check if resumable run
     sampler_class.check_force_resume(output, info=updated_info_sampler[sampler_name])
@@ -196,6 +189,7 @@ class Sampler(CobayaComponent):
         The prior and likelihood are also accessible through the attributes with the same
         names.
         """
+        pass
 
     def run(self):
         """
@@ -208,18 +202,14 @@ class Sampler(CobayaComponent):
                [do one more step]
                [update the collection of samples]
         """
+        pass
 
-    def samples(self, **kwargs) -> Union["SampleCollection", "MCSamples"]:
+    def products(self) -> InfoDict:
         """
         Returns the products expected in a scripted call of cobaya,
         (e.g. a collection of samples or a list of them).
         """
-
-    def products(self, **kwargs) -> Dict:
-        """
-        Returns the products expected in a scripted call of cobaya,
-        (e.g. a collection of samples or a list of them).
-        """
+        return {}
 
     @property
     def random_state(self) -> np.random.Generator:
@@ -306,7 +296,7 @@ class Sampler(CobayaComponent):
         for k, v in checkpoint_info["sampler"][self.get_name()].items():
             setattr(self, k, v)
         # check if convergence parameters changed, and if so converged=False
-        old_info = self.output.get_updated_info(use_cache=True)
+        old_info = self.output.reload_updated_info(use_cache=True)
         assert old_info
         if self.converge_info_changed(old_info["sampler"][self.get_name()],
                                       self._updated_info):
@@ -415,7 +405,6 @@ class CovmatSampler(Sampler):
     """
     Parent class for samplers that are initialised with a covariance matrix.
     """
-
     covmat_params: Sequence[str]
     # Amount by which to shrink covmat diagonals when set from priors or reference.
     fallback_covmat_scale: float = 4
@@ -474,20 +463,12 @@ class CovmatSampler(Sampler):
                 with open(self.covmat, "r", encoding="utf-8-sig") as file_covmat:
                     header = file_covmat.readline()
                 loaded_covmat = np.loadtxt(self.covmat)
-                self.log.debug("Loaded a covariance matrix from '%r'", self.covmat)
-            except TypeError as texcpt:
-                raise LoggedError(
-                    self.log,
-                    "The property 'covmat' must be a file name,"
-                    "but it's '%s'.",
-                    str(self.covmat),
-                ) from texcpt
-            except IOError as ioexcpt:
-                raise LoggedError(
-                    self.log,
-                    "Can't open covmat file '%s'.",
-                    self.covmat,
-                ) from ioexcpt
+                self.log.debug(f"Loaded a covariance matrix from '{self.covmat}'")
+            except TypeError:
+                raise LoggedError(self.log, "The property 'covmat' must be a file name,"
+                                            "but it's '%s'.", str(self.covmat))
+            except IOError:
+                raise LoggedError(self.log, "Can't open covmat file '%s'.", self.covmat)
             if header[0] != "#":
                 raise LoggedError(
                     self.log, "The first line of the covmat file '%s' "
@@ -515,12 +496,12 @@ class CovmatSampler(Sampler):
                 raise LoggedError(
                     self.log,
                     "Parameter(s) %r appear more than once in %s", duplicated, str_msg)
-            loaded_covmat = np.atleast_2d(loaded_covmat)
             if len(loaded_params) != loaded_covmat.shape[0]:
                 raise LoggedError(
                     self.log, "The number of parameters in %s and the "
                               "dimensions of the matrix do not agree: %d vs %r",
                     str_msg, len(loaded_params), loaded_covmat.shape)
+            loaded_covmat = np.atleast_2d(loaded_covmat)
             is_square_symmetric = (len(loaded_covmat.shape) == 2 and
                                    loaded_covmat.shape[0] == loaded_covmat.shape[1] and
                                    np.allclose(loaded_covmat.T, loaded_covmat))

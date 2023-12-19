@@ -6,23 +6,19 @@
 
 """
 
+# TODO many things not yet updated for cobaya formats
+
 import os
 import shutil
 import pickle
 import copy
 import sys
 import time
-from typing import Callable, Any
+from typing import Callable
 from getdist import types, IniFile
 from getdist.mcsamples import loadMCSamples
-from getdist.paramnames import makeList as make_list
 
-from .conventions import input_folder, script_folder, input_folder_post, yaml_ext
-import cobaya
-from cobaya.conventions import Extension
-from cobaya.yaml import yaml_load_file
-from cobaya.output import use_portalocker
-from cobaya.tools import PythonPath
+from .conventions import input_folder, script_folder, log_folder
 
 
 def grid_cache_file(directory):
@@ -43,23 +39,24 @@ def readobject(directory=None):
         directory = sys.argv[1]
     fname = grid_cache_file(directory)
     if not os.path.exists(fname):
-        if gridconfig.path_is_grid(directory):
+        if gridconfig.pathIsGrid(directory):
             return gridconfig.makeGrid(directory, read_only=True, interactive=False)
         return None
     try:
         config_dir = os.path.abspath(directory) + os.sep + 'config'
-        with PythonPath(config_dir, when=os.path.exists(config_dir)):
+        if os.path.exists(config_dir):
             # set path in case using functions defined
             # and hence imported from in settings file
-            with open(fname, 'rb') as inp:
-                grid = pickle.load(inp)
-        if not os.path.exists(grid.batchPath):
-            raise FileNotFoundError('Directory not found %s' % grid.batchPath)
+            sys.path.insert(0, config_dir)
+        with open(fname, 'rb') as inp:
+            grid = pickle.load(inp)
+        if not os.path.exists(grid.basePath):
+            raise FileNotFoundError('Directory not found %s' % grid.basePath)
         return grid
     except Exception as e:
         print('Error loading cached batch object: ', e)
         resetGrid(directory)
-        if gridconfig.path_is_grid(directory):
+        if gridconfig.pathIsGrid(directory):
             return gridconfig.makeGrid(directory, read_only=True, interactive=False)
         raise
 
@@ -69,8 +66,17 @@ def saveobject(obj, filename):
         pickle.dump(obj, output, pickle.HIGHEST_PROTOCOL)
 
 
+def makePath(s):
+    if not os.path.exists(s):
+        os.makedirs(s)
+
+
 def nonEmptyFile(fname):
     return os.path.exists(fname) and os.path.getsize(fname) > 0
+
+
+def getCodeRootPath():
+    return os.path.normpath(os.path.join(os.path.dirname(__file__), '..', '..')) + os.sep
 
 
 class PropertiesItem:
@@ -89,19 +95,19 @@ class DataSet:
     importanceNames: list
     importanceParams: list
 
-    def __init__(self, names, option_dicts=None, covmat=None, dist_settings=None):
+    def __init__(self, names, params=None, covmat=None, dist_settings=None):
         if not dist_settings:
             dist_settings = {}
         if isinstance(names, str):
             names = [names]
-        if option_dicts is None:
-            option_dicts = [(name + yaml_ext) for name in names]
+        if params is None:
+            params = [(name + '.ini') for name in names]
         else:
-            option_dicts = self.standardizeParams(option_dicts)
+            params = self.standardizeParams(params)
         if covmat is not None:
             self.covmat = covmat
         self.names = names
-        self.infos = option_dicts
+        self.params = params
         # can be an array of items, either ini file name or dictionaries of parameters
         self.tag = "_".join(self.names)
         self.dist_settings = dist_settings
@@ -113,10 +119,10 @@ class DataSet:
         if dist_settings:
             self.dist_settings.update(dist_settings)
         if overrideExisting:
-            self.infos = params + self.infos
+            self.params = params + self.params
             # can be an array of items, either ini file name or dictionaries of parameters
         else:
-            self.infos += params
+            self.params += params
         if name is not None:
             self.names += [name]
             self.tag = "_".join(self.names)
@@ -132,22 +138,22 @@ class DataSet:
 
     def extendForImportance(self, names, params):
         data = copy.deepcopy(self)
-        if '.post.' not in data.tag:
-            data.tag += '.post.' + "_".join(names)
+        if '_post_' not in data.tag:
+            data.tag += '_post_' + "_".join(names)
         else:
             data.tag += '_' + "_".join(names)
         data.importanceNames = names
         data.importanceParams = data.standardizeParams(params)
         data.names += data.importanceNames
-        # data.infos += data.importanceParams
+        data.params += data.importanceParams
         return data
 
     def standardizeParams(self, params):
         if isinstance(params, dict) or isinstance(params, str):
             params = [params]
         for i in range(len(params)):
-            if isinstance(params[i], str) and yaml_ext not in params[i]:
-                params[i] += yaml_ext
+            if isinstance(params[i], str) and '.ini' not in params[i]:
+                params[i] += '.ini'
         return params
 
     def hasName(self, name):
@@ -189,7 +195,6 @@ class DataSet:
         return "_".join(sorted(self.namesReplacing(dic)))
 
 
-# not currently used
 class JobGroup:
     def __init__(self, name, params=None, importanceRuns=None, datasets=None):
         if importanceRuns is None:
@@ -197,22 +202,23 @@ class JobGroup:
         if params is None:
             params = [[]]
         if datasets is None:
+            datasets = []
             self.params = params
             self.groupName = name
             self.importanceRuns = importanceRuns
-            self.datasets = []
+            self.datasets = datasets
 
 
 class ImportanceSetting:
     def __init__(self, names, inis=None, dist_settings=None, minimize=True):
         if not inis:
             inis = []
-        self.names = make_list(names)
-        self.inis = make_list(inis)
+        self.names = names
+        self.inis = inis
         self.dist_settings = dist_settings or {}
         self.want_minimize = minimize
 
-    def want_importance(self, _jobItem):
+    def wantImportance(self, _jobItem):
         return True
 
 
@@ -230,14 +236,13 @@ class JobItem(PropertiesItem):
     importanceSettings: list
     importanceFilter: ImportanceFilter
 
-    def __init__(self, path, param_set, data_set, base='base', group_name=None,
-                 minimize=True):
+    def __init__(self, path, param_set, data_set, base='base', minimize=True):
         self.param_set = param_set
         if not isinstance(data_set, DataSet):
-            data_set = DataSet(data_set[0], data_set[1])
+            data_set = DataSet(data_set)
         self.data_set = data_set
         self.base = base
-        self.paramtag = "_".join([base] + param_set)
+        self.paramtag = base + "_" + param_set
         self.datatag = data_set.tag
         self.name = self.paramtag + '_' + self.datatag
         self.batchPath = path
@@ -250,18 +255,22 @@ class JobItem(PropertiesItem):
         self.importanceItems = []
         self.want_minimize = minimize
         self.result_converge = None
-        self.group = group_name
+        self.group = None
         self.parent = None
         self.dist_settings = copy.copy(data_set.dist_settings)
         self.makeIDs()
+        self.iniFile_path = input_folder
+        self.iniFile_ext = ".yaml"
+        self.scriptFile_path = script_folder
+        self.logFile_path = log_folder
 
-    def yaml_file(self, variant=''):
+    def iniFile(self, variant=''):
         if not self.isImportanceJob:
-            return (self.batchPath + input_folder + os.sep +
-                    self.name + variant + yaml_ext)
+            return (self.batchPath + self.iniFile_path + os.sep +
+                    self.name + variant + self.iniFile_ext)
         else:
-            return (self.batchPath + input_folder_post + os.sep +
-                    self.name + variant + yaml_ext)
+            return (self.batchPath + 'postIniFiles' + os.sep +
+                    self.name + variant + self.iniFile_ext)
 
     def propertiesIniFile(self):
         return self.chainRoot + '.properties.ini'
@@ -269,30 +278,26 @@ class JobItem(PropertiesItem):
     def isBurnRemoved(self):
         return self.propertiesIni().bool('burn_removed')
 
-    def makeImportance(self, importance_runs):
-        for imp_run in importance_runs:
-            if isinstance(imp_run, ImportanceSetting):
-                if not imp_run.want_importance(self):
+    def makeImportance(self, importanceRuns):
+        for impRun in importanceRuns:
+            if isinstance(impRun, ImportanceSetting):
+                if not impRun.wantImportance(self):
                     continue
             else:
-                if len(imp_run) not in (2, 3):
-                    raise ValueError('importance_runs must be list of tuples of '
-                                     '(names, infos, [ImportanceFilter]) or '
-                                     'ImportanceSetting instances')
-                if len(imp_run) > 2 and not imp_run[2].want_importance(self):
+                if len(impRun) > 2 and not impRun[2].wantImportance(self):
                     continue
-                imp_run = ImportanceSetting(imp_run[0], imp_run[1])
-            if len(set(imp_run.names).intersection(self.data_set.names)) > 0:
+                impRun = ImportanceSetting(impRun[0], impRun[1])
+            if len(set(impRun.names).intersection(self.data_set.names)) > 0:
                 print('importance job duplicating parent data set: %s with %s' % (
-                    self.name, imp_run.names))
+                    self.name, impRun.names))
                 continue
-            data = self.data_set.extendForImportance(imp_run.names, imp_run.inis)
+            data = self.data_set.extendForImportance(impRun.names, impRun.inis)
             job = JobItem(self.batchPath, self.param_set, data,
-                          minimize=imp_run.want_minimize)
-            job.importanceTag = "_".join(imp_run.names)
-            job.importanceSettings = imp_run.inis
-            if '.post.' not in self.name:
-                tag = '.post.' + job.importanceTag
+                          minimize=impRun.want_minimize)
+            job.importanceTag = "_".join(impRun.names)
+            job.importanceSettings = impRun.inis
+            if '_post_' not in self.name:
+                tag = '_post_' + job.importanceTag
             else:
                 tag = '_' + job.importanceTag
             job.name = self.name + tag
@@ -305,9 +310,9 @@ class JobItem(PropertiesItem):
             job.isImportanceJob = True
             job.parent = self
             job.group = self.group
-            job.dist_settings.update(imp_run.dist_settings)
-            if isinstance(imp_run, ImportanceFilter):
-                job.importanceFilter = imp_run
+            job.dist_settings.update(impRun.dist_settings)
+            if isinstance(impRun, ImportanceFilter):
+                job.importanceFilter = impRun
             job.makeIDs()
             self.importanceItems.append(job)
 
@@ -326,14 +331,14 @@ class JobItem(PropertiesItem):
     def matchesDatatag(self, tagList):
         if self.datatag in tagList or self.normed_data in tagList:
             return True
-        return self.datatag.replace('.post.', '_') \
-            in [tag.replace('.post.', '_') for tag in tagList]
+        return self.datatag.replace('_post', '') in [tag.replace('_post', '') for tag in
+                                                     tagList]
 
     def hasParam(self, name):
         if isinstance(name, str):
             return name in self.param_set
         else:
-            return any(True for i in name if i in self.param_set)
+            return any([True for i in name if i in self.param_set])
 
     def importanceJobs(self):
         return self.importanceItems
@@ -352,11 +357,16 @@ class JobItem(PropertiesItem):
                 j.removeImportance(job)
 
     def makeChainPath(self):
-        os.makedirs(self.chainPath, exist_ok=True)
+        makePath(self.chainPath)
         return self.chainPath
 
+    def writeIniLines(self, f):
+        outfile = open(self.iniFile(), 'w', encoding="utf-8")
+        outfile.write("\n".join(f))
+        outfile.close()
+
     def chainName(self, chain=1):
-        return self.chainRoot + '.' + str(chain) + '.txt'
+        return self.chainRoot + '_' + str(chain) + '.txt'
 
     def chainExists(self, chain=1):
         fname = self.chainName(chain)
@@ -374,7 +384,7 @@ class JobItem(PropertiesItem):
             return chains
 
     def allChainExists(self, num_chains):
-        return all(self.chainExists(i + 1) for i in range(num_chains))
+        return all([self.chainExists(i + 1) for i in range(num_chains)])
 
     def chainFileDate(self, chain=1):
         return os.path.getmtime(self.chainName(chain))
@@ -387,32 +397,11 @@ class JobItem(PropertiesItem):
             i += 1
         return os.path.exists(self.chainName(i + 1)) or max(dates) - min(dates) > interval
 
-    def notRunning(self, age_qualify_minutes=5):
+    def notRunning(self):
         if not self.chainExists():
             return False  # might be in queue
-        if use_portalocker():
-            lock_file = self.chainRoot + '.input.yaml.locked'
-            if not os.path.exists(lock_file):
-                return True
-            h: Any = None
-            import portalocker  # pylint: disable=import-outside-toplevel
-            try:
-                h = open(lock_file, 'wb')
-                portalocker.lock(h, portalocker.LOCK_EX + portalocker.LOCK_NB)
-            except (portalocker.exceptions.BaseLockException, OSError):
-                if h:
-                    h.close()
-                return False
-            else:
-                h.close()
-                del h
-                try:
-                    os.remove(lock_file)
-                except OSError:
-                    return False
-        # if no locking, just check if files updated recently
         lastWrite = self.chainFileDate()
-        return lastWrite < time.time() - age_qualify_minutes * 60
+        return lastWrite < time.time() - 5 * 60
 
     def chainMinimumExists(self):
         fname = self.chainRoot + '.minimum'
@@ -431,16 +420,14 @@ class JobItem(PropertiesItem):
         return bf.logLike < 1e29
 
     def convergeStat(self):
-        fname = self.chainRoot + Extension.checkpoint
+        fname = self.chainRoot + '.converge_stat'
         if not nonEmptyFile(fname):
             return None, None
-        yaml = yaml_load_file(fname)
-        try:
-            sampler = next(iter(yaml["sampler"].values()))
-            R = float(sampler.get("Rminus1_last"))
-            return R, sampler.get('converged')
-        except Exception:
-            return None, None
+        textFileHandle = open(fname, encoding="utf-8")
+        textFileLines = textFileHandle.readlines()
+        textFileHandle.close()
+        return (float(textFileLines[0].strip()), len(textFileLines) > 1
+                and textFileLines[1].strip() == 'Done')
 
     def chainFinished(self):
         if self.isImportanceJob:
@@ -457,7 +444,7 @@ class JobItem(PropertiesItem):
         R, done = self.convergeStat()
         if R is None:
             return False
-        if not os.path.exists(self.chainRoot + Extension.covmat):
+        if not os.path.exists(self.chainRoot + '_1.chk'):
             return False
         return not done and R > minR
 
@@ -479,10 +466,7 @@ class JobItem(PropertiesItem):
             if not nonEmptyFile(fname):
                 return None
             self.result_converge = types.ConvergeStats(fname)
-        try:
-            return float(self.result_converge.worstR())
-        except (TypeError, IndexError):
-            return None
+        return float(self.result_converge.worstR())
 
     def hasConvergeBetterThan(self, R, returnNotExist=False):
         try:
@@ -525,74 +509,38 @@ class BatchJob(PropertiesItem):
         self.subBatches = []
         # self.jobItems = None
         self.getdist_options = {}
+        self.iniFile_path = input_folder
+        self.scriptFile_path = script_folder
+        self.logFile_path = log_folder
 
     def propertiesIniFile(self):
         return os.path.join(self.batchPath, 'config', 'config.ini')
 
-    def make_items(self, settings, messages=True, base_name='base'):
+    def makeItems(self, settings, messages=True):
         self.jobItems = []
-        dic = settings if isinstance(settings, dict) else settings.__dict__
-        self.getdist_options = dic.get('getdist_options') or self.getdist_options
-        all_importance = dic.get('importance_runs') or []
-        self.skip = dic.get("skip") or []
-
-        dataset_infos = dic.get("datasets") or {}
-        model_infos = dic.get("models") or {}
-        for group_name, group in dic["groups"].items():
-            skip = group.get("skip") or {}
-            data_used = set()
+        self.getdist_options = getattr(settings, 'getdist_options', self.getdist_options)
+        allImportance = getattr(settings, 'importanceRuns', [])
+        for group_name, group in settings["grid"]["groups"].items():
             for data_set in group["datasets"]:
-                if isinstance(data_set, str):
-                    if data_set not in dataset_infos:
-                        raise ValueError(
-                            "Dataset name '%s' must be defined." % data_set)
-                    info = (dataset_infos.get(data_set) or {}).copy()
-                    dataset = DataSet(info.pop("tags", data_set.split('_')), info)
-                else:
-                    dataset = data_set
-
-                if (data_tags := frozenset(dataset.names if isinstance(dataset, DataSet)
-                                           else dataset[0])) in data_used:
-                    raise ValueError("Duplicate dataset tags %s" % data_tags)
-                data_used.add(data_tags)
-                models_used = set()
-                for model in group["models"]:
-                    model_info = None
-                    if isinstance(model, str):
-                        if isinstance(skip, dict) and isinstance(data_set, str) \
-                                and data_set in skip.get(model, {}):
-                            continue
-                        if model not in model_infos:
-                            raise ValueError("Model '%s' must be defined." % model)
-                        model_info = (model_infos[model] or {}).copy()
-                        model = (model_info.pop('tags', []) or []) \
-                            if "tags" in model_info else model.split('_')
-                    elif not isinstance(model, (list, tuple)):
-                        raise ValueError(
-                            "models must be model name strings or list of model names")
-                    if frozenset(model) in models_used:
-                        raise ValueError("Duplicate model (parameter) tags %s" % model)
-                    models_used.add(frozenset(model))
-                    item = JobItem(self.batchPath, model, dataset,
-                                   base=group.get('base') or dic.get('base') or base_name,
-                                   group_name=group_name)
-                    item.model_info = model_info
-                    item.defaults = group.get("defaults") or {}
-                    item.param_extra_opts = group.get("param_extra_opts") or {}
-                    if item.name not in self.skip and item.name not in skip:
-                        item.makeImportance(group.get("importance_runs") or [])
-                        item.makeImportance(all_importance)
+                for param_set in group["models"]:
+                    if any(data_set in (x.get("skip", {}) or {}).get(param_set, {})
+                           for x in (settings["grid"], group)):
+                        continue
+                    item = JobItem(self.batchPath, param_set, data_set, base=group_name)
+                    if hasattr(group, 'groupName'):
+                        item.group = group.groupName
+                    if item.name not in self.skip:
+                        item.makeImportance(group.get("importanceRuns", []))
+                        item.makeImportance(allImportance)
                         self.jobItems.append(item)
-
-        for item in (dic.get('job_items') or []):
+        for item in getattr(settings, 'jobItems', []):
             self.jobItems.append(item)
-            item.makeImportance(all_importance)
-        if filters := dic.get('importance_filters'):
+            item.makeImportance(allImportance)
+        if hasattr(settings, 'importance_filters'):
             for job in self.jobItems:
                 for item in job.importanceJobs():
-                    item.makeImportance(filters)
-                job.makeImportance(filters)
-
+                    item.makeImportance(settings.importance_filters)
+                job.makeImportance(settings.importance_filters)
         for item in list(self.items()):
             for x in [imp for imp in item.importanceJobsRecursive()]:
                 if self.has_normed_name(x.normed_name):
@@ -637,9 +585,8 @@ class BatchJob(PropertiesItem):
                 return jobItem
         return None
 
-    @staticmethod
-    def normalizeDataTag(tag):
-        return "_".join(sorted(tag.replace('.post.', '_').split('_')))
+    def normalizeDataTag(self, tag):
+        return "_".join(sorted(tag.replace('_post', '').split('_')))
 
     def resolveName(self, paramtag, datatag, wantSubItems=True, wantImportance=True,
                     raiseError=True, base='base',
@@ -652,34 +599,33 @@ class BatchJob(PropertiesItem):
             paramtag = [base]
             paramtags = [base]
         name = "_".join(paramtags) + '_' + self.normalizeDataTag(datatag)
-
-        if jobItem := self.normed_name_item(name, wantSubItems, wantImportance):
-            return jobItem if returnJobItem else jobItem.name
+        jobItem = self.normed_name_item(name, wantSubItems, wantImportance)
+        if jobItem is not None:
+            return (jobItem.name, jobItem)[returnJobItem]
         if raiseError:
             raise Exception('No match for paramtag, datatag... ' + "_".join(
                 paramtag) + ', ' + datatag)
         else:
             return None
 
-    def resolve_root(self, root):
+    def resolveRoot(self, root):
         for jobItem in self.items(True, True):
             if jobItem.name == root:
                 return jobItem
         return self.normed_name_item(root, True, True)
 
     def save(self, filename=''):
-        saveobject(self, filename if filename else grid_cache_file(self.batchPath))
+        saveobject(self, (grid_cache_file(self.batchPath), filename)[filename != ''])
 
-    def make_directories(self, setting_file=None):
-        os.makedirs(self.batchPath, exist_ok=True)
+    def makeDirectories(self, setting_file=None):
+        makePath(self.batchPath)
         if setting_file:
-            s = self.batchPath + 'config'
-            os.makedirs(s, exist_ok=True)
+            makePath(self.batchPath + 'config')
             setting_file = setting_file.replace('.pyc', '.py')
             shutil.copy(setting_file, self.batchPath + 'config')
             props = self.propertiesIni()
             props.params['setting_file'] = os.path.split(setting_file)[-1]
-            props.params['cobaya_version'] = cobaya.__version__
             props.saveFile()
-        for p in (input_folder, input_folder_post, script_folder):
-            os.makedirs(self.batchPath + p, exist_ok=True)
+        makePath(self.batchPath + self.iniFile_path)
+        makePath(self.batchPath + self.scriptFile_path)
+        makePath(self.batchPath + self.logFile_path)

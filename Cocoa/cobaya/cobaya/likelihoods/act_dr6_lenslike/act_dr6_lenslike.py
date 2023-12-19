@@ -11,7 +11,7 @@ import os
 #file_dir = os.path.abspath(os.path.dirname(__file__))
 #data_dir = f"{file_dir}/data/v1.1/"
 file_dir = os.environ['ROOTDIR']
-data_dir = f"{file_dir}/external_modules/data/act/lensing/v1.1"
+data_dir = f"{file_dir}/external_modules/data/act/lensing/v1.1/"
 #VM ENDS
 variants =[x.strip() for x in  '''
 act_baseline,
@@ -401,11 +401,11 @@ class ACTDR6LensLike(InstallableLikelihood):
         return ret
 
     def logp(self, **params_values):
-        cl = self.provider.get_Cl(ell_factor=False, units='FIRASmuK2')
+        cl = self.theory.get_Cl(ell_factor=False, units='FIRASmuK2')
         return self.loglike(cl, **params_values)
 
     def get_limber_clkk(self,**params_values):
-        Pfunc = self.provider.get_Pk_interpolator(var_pair=("Weyl", "Weyl"), nonlinear=True, extrap_kmax=30.)
+        Pfunc = self.theory.get_Pk_interpolator(var_pair=("Weyl", "Weyl"), nonlinear=True, extrap_kmax=30.)
         results = self.provider.get_CAMBdata()
         return get_limber_clkk_flat_universe(results,Pfunc,self.trim_lmax,self.kmax,nz,zstar=None)
 

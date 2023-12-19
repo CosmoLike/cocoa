@@ -1,5 +1,4 @@
 # Just plotting (loading on-the-fly)
-# Notice that GetDist requires a full path when loading samples
 import getdist.plots as gdplt
 import os
 
