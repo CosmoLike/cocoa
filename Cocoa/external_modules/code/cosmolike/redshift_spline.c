@@ -2081,6 +2081,61 @@ double pf_histo_n(double z, void* params)
   return res;
 }
 
+typedef struct
+{
+  double min;
+  double max;
+  gsl_spline* spline;
+} params_int_for_zmean;
+
+double int_for_zmean_stretch(double z, void* params)
+{
+  params_int_for_zmean* p = (params_int_for_zmean*) params;
+  const double min = p->min;
+  const double max = p->max;
+  gsl_spline* spline =  p->spline;
+    
+  if (z <= min || z >= max) 
+  {
+    return 0.0;
+  }
+  else
+  {
+    double res=0;
+    int status = gsl_spline_eval_e(spline, z, NULL, &res);
+    if (status) 
+    {
+      log_fatal(gsl_strerror(status));
+      exit(1);
+    }
+    return z*res;
+  }
+}
+
+double norm_for_zmean_stretch(double z, void* params)
+{
+  params_int_for_zmean* p = (params_int_for_zmean*) params;
+  const double min = p->min;
+  const double max = p->max;
+  gsl_spline* spline =  p->spline;
+    
+  if (z <= min || z >= max) 
+  {
+    return 0.0;
+  }
+  else
+  {
+    double res=0;
+    int status = gsl_spline_eval_e(spline, z, NULL, &res);
+    if (status) 
+    {
+      log_fatal(gsl_strerror(status));
+      exit(1);
+    }
+    return res;
+  }
+}
+
 double pf_photoz(double zz, int nj) 
 { // works only with binned distributions; nj =-1 -> no tomo; nj>= 0 -> tomo bin nj
   static double** table = 0;
@@ -2095,6 +2150,7 @@ double pf_photoz(double zz, int nj)
   static double* nz_ext=0;       // PZ == 5
   static double** nz_ext_bin=0;  // PZ == 5
   static gsl_integration_glfixed_table* w = 0;
+  static double* zmean_stretch=0;
 
   const int photoz = (redshift.clustering_photoz == 7) ? 4 : redshift.clustering_photoz;
 
@@ -2376,6 +2432,14 @@ double pf_photoz(double zz, int nj)
       case 6:
       {
         pf_histo(0.0, NULL);
+        break;
+      }
+      case 8:
+      {
+        const int i = 0;
+        double ar[1];        
+        ar[0] = (double) i;
+        pf_histo_n(0., (void*) ar);
         break;
       }
     }
@@ -2675,6 +2739,30 @@ double pf_photoz(double zz, int nj)
           }
           break;
         }
+        case 8: // histogram file contains n(z) estimates for each bin w/ strech
+        {
+          double ar[1] = {(double) i};
+          
+          gsl_function F;
+          F.params = (void*) ar;
+          F.function = pf_histo_n;
+
+          norm  = gsl_integration_glfixed(&F, 
+            tomo.clustering_zmin[i], tomo.clustering_zmax[i], w);
+          if (norm == 0)
+          {
+            log_fatal("pf_photoz: norm(nz = %d) = 0", i);
+            exit(1);
+          }
+          
+          for (int k=0; k<zbins; k++) 
+          {
+            table[i + 1][k] = pf_histo_n(z_v[k], (void*) ar);
+            table[i + 1][k] /= norm;
+          }
+
+          break;
+        }
         default:
         {
           log_fatal("%d not supported in this cosmolike version", photoz);
@@ -2711,6 +2799,44 @@ double pf_photoz(double zz, int nj)
         exit(1);
       }
     }
+
+    if (photoz == 8)
+    {   
+      if (zmean_stretch == 0)
+      {
+        log_info("Calculating mean redshift with no tomography for MAGLIM sample");
+
+        zmean_stretch = (double*) malloc(sizeof(double)*tomo.clustering_Nbin);
+        if (zmean_stretch == NULL)
+        {
+          log_fatal("array allocation failed");
+          exit(1);
+        }
+      
+        for (int i=0; i<tomo.clustering_Nbin; i++)
+        {
+          params_int_for_zmean param;
+          param.min = z_v[0];
+          param.max = z_v[zbins - 1];
+          param.spline = photoz_splines[i + 1];
+
+          gsl_function F;
+          F.params = (void*) &param;
+          F.function = int_for_zmean_stretch;
+
+          zmean_stretch[i] = gsl_integration_glfixed(&F, 
+            tomo.clustering_zmin[i], tomo.clustering_zmax[i], w);
+
+          F.params = (void*) &param;
+          F.function = norm_for_zmean_stretch;
+
+          zmean_stretch[i] /= gsl_integration_glfixed(&F, 
+            tomo.clustering_zmin[i], tomo.clustering_zmax[i], w);
+           
+          log_info("MAGLIM zmean_stretch[%d] = %f\n", i, zmean_stretch[i]);
+        }
+      }
+    }
   }
   
   if (nj > tomo.clustering_Nbin - 1 || nj < -1)  
@@ -2722,6 +2848,11 @@ double pf_photoz(double zz, int nj)
   if (photoz == 4) 
   {
     zz = zz - nuisance.bias_zphot_clustering[nj];
+  }
+  else if (photoz == 8)
+  {
+    zz =  zz - nuisance.bias_zphot_clustering[nj] - zmean_stretch[nj];
+    zz /= nuisance.zphot_stretch[nj] + zmean_stretch[nj];
   }
   
   double res;
@@ -2736,6 +2867,10 @@ double pf_photoz(double zz, int nj)
     {
       log_fatal(gsl_strerror(status));
       exit(1);
+    }
+    if (photoz == 8)
+    {
+      res /= nuisance.zphot_stretch[nj];
     }
   }
   return res;

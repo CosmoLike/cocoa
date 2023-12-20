@@ -215,6 +215,9 @@ typedef struct
   double sigma_zphot_clustering[MAX_SIZE_ARRAYS];
   double bias_zphot_clustering[MAX_SIZE_ARRAYS];
   
+  // maglim
+  double zphot_stretch[MAX_SIZE_ARRAYS];
+
   // Variables for the 4x2pt+N (see: 2008.10757 & 2010.01138)
   double cluster_MOR[MAX_SIZE_ARRAYS];
   double cluster_selection[MAX_SIZE_ARRAYS];
