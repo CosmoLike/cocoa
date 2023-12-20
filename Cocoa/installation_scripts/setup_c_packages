@@ -1,36 +1,41 @@
-if [ -z "${ROOTDIR}" ]; then
-    echo 'ERROR ENV VARIABLE ROOTDIR IS NOT DEFINED' >&2
-    return 1
-fi
-if [ -z "${CXX_COMPILER}" ]; then
-    echo 'ERROR ENV VARIABLE CXX_COMPILER IS NOT DEFINED' >&2
-    return 1
-fi
-if [ -z "${C_COMPILER}" ]; then
-    echo 'ERROR ENV VARIABLE C_COMPILER IS NOT DEFINED' >&2
-    return 1
-fi
-if [ -z "${CMAKE}" ]; then
-    echo 'ERROR ENV VARIABLE MAKE IS NOT DEFINED' >&2
-    return 1
-fi
-if [ -z "${FORTRAN_COMPILER}" ]; then
-    echo 'ERROR ENV VARIABLE FORTRAN_COMPILER IS NOT DEFINED' >&2
-    return 1
-fi
-if [ -z "${MAKE_NUM_THREADS}" ]; then
-    echo 'ERROR ENV VARIABLE MAKE_NUM_THREADS IS NOT DEFINED' >&2
-    return 1
-fi
-
-# --------------------------------------------------------------------------------------
-# --------------------------------------------------------------------------------------
-# --------------------------------------------------------------------------------------
-# ------------------------------------- C PACKAGES -------------------------------------
 # --------------------------------------------------------------------------------------
 # --------------------------------------------------------------------------------------
 # --------------------------------------------------------------------------------------
 echo -e '\033[1;44m''SETUP_C_PACKAGES''\033[0m'
+
+if [ -z "${ROOTDIR}" ]; then
+    echo -e '\033[0;31m''ERROR ENV VARIABLE ROOTDIR IS NOT DEFINED''\033[0m'
+    return 1
+fi
+if [ -z "${CXX_COMPILER}" ]; then
+    echo -e '\033[0;31m''ERROR ENV VARIABLE CXX_COMPILER IS NOT DEFINED''\033[0m'
+    cd $ROOTDIR
+    return 1
+fi
+if [ -z "${C_COMPILER}" ]; then
+    echo -e '\033[0;31m''ERROR ENV VARIABLE C_COMPILER IS NOT DEFINED''\033[0m'
+    cd $ROOTDIR
+    return 1
+fi
+if [ -z "${CMAKE}" ]; then
+    echo -e '\033[0;31m''ERROR ENV VARIABLE MAKE IS NOT DEFINED''\033[0m'
+    return 1
+fi
+if [ -z "${FORTRAN_COMPILER}" ]; then
+    echo -e '\033[0;31m''ERROR ENV VARIABLE FORTRAN_COMPILER IS NOT DEFINED''\033[0m'
+    cd $ROOTDIR
+    return 1
+fi
+if [ -z "${PYTHON3}" ]; then
+    echo -e '\033[0;31m''ERROR ENV VARIABLE PYTHON3 IS NOT DEFINED''\033[0m'
+    cd $ROOTDIR
+    return 1
+fi
+if [ -z "${MAKE_NUM_THREADS}" ]; then
+    echo -e '\033[0;31m''ERROR ENV VARIABLE MAKE_NUM_THREADS IS NOT DEFINED''\033[0m'
+    cd $ROOTDIR
+    return 1
+fi
 
 if [ -z "${DEBUG_C_PACKAGES}" ]; then
   export OUTPUT_CPACKAGES_1="/dev/null"
@@ -188,30 +193,31 @@ fi
 # --------------------------------------------------------------------------------------
 # ----------------------------------- EUCLID EMU ---------------------------------------
 # --------------------------------------------------------------------------------------
+if [ -z "${IGNORE_ALL_PIP_INSTALLATION}" ]; then
+  if [ -z "${DEBUG_PIP_OUTPUT}" ]; then
+    export OUTPUT_PIP_1="/dev/null"
+    export OUTPUT_PIP_2="/dev/null"
+  else
+    export OUTPUT_PIP_1="/dev/tty"
+    export OUTPUT_PIP_2="/dev/tty"
+  fi
 
-if [ -z "${DEBUG_PIP_OUTPUT}" ]; then
-  export OUTPUT_PIP_1="/dev/null"
-  export OUTPUT_PIP_2="/dev/null"
-else
-  export OUTPUT_PIP_1="/dev/tty"
-  export OUTPUT_PIP_2="/dev/tty"
+  echo -e '\033[1;34m''INSTALLING EUCLIDEMU2''\033[0m'
+
+  # WE MIGRATED euclidemu2 TO setup_c_packages SCRIPT BECAUSE IT DEPENDS ON GSL-GNU LIB
+  env CXX=$CXX_COMPILER CC=$C_COMPILER  $PIP3 install --global-option=build_ext \
+    $ROOTDIR/../cocoa_installation_libraries/euclidemu2-1.2.0 --no-dependencies \
+    --prefix=$ROOTDIR/.local --no-index > ${OUTPUT_PIP_1} 2> ${OUTPUT_PIP_2}
+  if [ $? -ne 0 ]; then
+    echo -e '\033[0;31m'"PIP COULD NOT RUN \e[3mPIP INSTALL EUCLUDEMUL"'\033[0m'
+    cd $ROOTDIR
+    return 1
+  else
+    echo -e '\033[0;32m'"PIP RUN \e[3mPIP INSTALL EUCLUDEMUL\e[0m\e\033[0;32m DONE"'\033[0m'
+  fi
+
+  echo -e '\033[1;34m''\e[4mINSTALLING EUCLIDEMU2 DONE''\033[0m'
 fi
-
-echo -e '\033[1;34m''INSTALLING EUCLIDEMU2''\033[0m'
-
-# WE MIGRATED euclidemu2 TO setup_c_packages SCRIPT BECAUSE IT DEPENDS ON GSL-GNU LIB
-env CXX=$CXX_COMPILER CC=$C_COMPILER  $PIP3 install --global-option=build_ext \
-  $ROOTDIR/../cocoa_installation_libraries/euclidemu2-1.2.0 --no-dependencies \
-  --prefix=$ROOTDIR/.local --no-index > ${OUTPUT_PIP_1} 2> ${OUTPUT_PIP_2}
-if [ $? -ne 0 ]; then
-  echo -e '\033[0;31m'"PIP COULD NOT RUN \e[3mPIP INSTALL EUCLUDEMUL"'\033[0m'
-  cd $ROOTDIR
-  return 1
-else
-  echo -e '\033[0;32m'"PIP RUN \e[3mPIP INSTALL EUCLUDEMUL\e[0m\e\033[0;32m DONE"'\033[0m'
-fi
-
-echo -e '\033[1;34m''\e[4mINSTALLING EUCLIDEMU2 DONE''\033[0m'
 
 echo -e '\033[1;44m''\e[4mSETUP_C_PACKAGES DONE''\033[0m'
 # --------------------------------------------------------------------------------------

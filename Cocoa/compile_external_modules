@@ -1,15 +1,18 @@
+echo -e '\033[1;44m''COMPILING EXTERNAL MODULES''\033[0m'
+
 if [ -n "${ROOTDIR}" ]; then
     source stop_cocoa
 fi
 
 source start_cocoa
-echo -e '\033[1;44m''COMPILING EXTERNAL MODULES''\033[0m'
 
 # ----------------------------------------------------------------------------
 # ----------------------------------------------------------------------------
 # ------------------------------ COMPILE COBAYA ------------------------------
 # ----------------------------------------------------------------------------
 # ----------------------------------------------------------------------------
+echo -e '\033[1;34m''INSTALLING COBAYA (VIA PIP)''\033[0m'
+
 if [ -z "${DEBUG_PIP_OUTPUT}" ]; then
   export OUTPUT_PIP_1="/dev/null"
   export OUTPUT_PIP_2="/dev/null"
@@ -18,28 +21,29 @@ else
   export OUTPUT_PIP_2="/dev/tty"
 fi
 
-echo 'INSTALLING COBAYA VIA PIP'
 if [ -z "${IGNORE_ALL_PIP_INSTALLATION}" ]; then
     $PIP3 install --editable cobaya --prefix=$ROOTDIR/.local \
         --find-links file:$ROOTDIR/../cocoa_installation_libraries/pip_cache \
         --no-index > ${OUTPUT_PIP_1} 2> ${OUTPUT_PIP_2}
     if [ $? -ne 0 ]; then
-      echo "PROBLEM PIP INSTALL COBAYA" >&2
+      echo -e '\033[0;31m'"PIP COULD NOT RUN \e[3mPIP INSTALL COBAYA"'\033[0m'
       cd $ROOTDIR
       return 1
     else
-      echo "PIP INSTALL COBAYA DONE"
+      echo -e '\033[0;32m'"PIP RUN \e[3mPIP INSTALL COBAYA\e[0m\e\033[0;32m DONE"'\033[0m'
     fi
 else
     $PIP3 install --editable cobaya --prefix=$ROOTDIR/.local > ${OUTPUT_PIP_1} 2> ${OUTPUT_PIP_2}
     if [ $? -ne 0 ]; then
-      echo "PROBLEM PIP INSTALL COBAYA" >&2
+      echo -e '\033[0;31m'"PIP COULD NOT RUN \e[3mPIP INSTALL COBAYA"'\033[0m'
       cd $ROOTDIR
       return 1
     else
-      echo "PIP INSTALL COBAYA DONE"
+      echo -e '\033[0;32m'"PIP RUN \e[3mPIP INSTALL COBAYA\e[0m\e\033[0;32m DONE"'\033[0m'
     fi
 fi
+
+echo -e '\033[1;34m''\e[4mINSTALLING COBAYA (VIA PIP) DONE''\033[0m'
 
 # ----------------------------------------------------------------------------
 # ----------------------------------------------------------------------------
