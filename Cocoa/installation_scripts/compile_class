@@ -54,8 +54,6 @@ if [ -z "${IGNORE_CLASS_COMPILATION}" ]; then
   make clean > ${OUTPUT_CLASS_1} 2> ${OUTPUT_CLASS_2}
   if [ $? -ne 0 ]; then
     echo -e '\033[0;31m'"CLASS COULD NOT RUN \e[3mMAKE CLEAN\e[0m"'\033[0m'
-    cd $ROOTDIR
-    return 1
   else
     echo -e '\033[0;32m'"CLASS RUN \e[3mMAKE CLEAN RUN\e[0m\e\033[0;32m DONE"'\033[0m'
   fi

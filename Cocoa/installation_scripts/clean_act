@@ -12,6 +12,13 @@ fi
 # ------------------------------- REMOVE ACT ---------------------------------
 # ----------------------------------------------------------------------------
 # ----------------------------------------------------------------------------
+if [ -z "${DEBUG_ACT_OUTPUT}" ]; then
+export OUTPUT_ACT_1="/dev/null"
+export OUTPUT_ACT_2="/dev/null"
+else
+export OUTPUT_ACT_1="/dev/tty"
+export OUTPUT_ACT_2="/dev/tty"
+fi
 
 cd $ROOTDIR/external_modules/code/pyactlike/
 
@@ -19,6 +26,11 @@ rm -rf ./build/
 
 rm -rf ./pyactlike.egg-info/
 
-$PYTHON3 setup.py clean
+$PYTHON3 setup.py clean > ${OUTPUT_ACT_1} 2> ${OUTPUT_ACT_2}
+if [ $? -ne 0 ]; then
+echo -e '\033[0;31m'"ACT COULD NOT RUN \e[3mPYTHON3 SETUP.PY CLEAN"'\033[0m'
+else
+echo -e '\033[0;32m'"ACT RUN \e[3mPYTHON3 SETUP.PY CLEAN\e[0m\e\033[0;32m DONE"'\033[0m'
+fi
 
 cd $ROOTDIR

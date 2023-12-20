@@ -50,8 +50,6 @@ if [ -z "${IGNORE_POLYCHORD_COMPILATION}" ]; then
   make clean > ${OUTPUT_POLY_1} 2> ${OUTPUT_POLY_2}
   if [ $? -ne 0 ]; then
     echo -e '\033[0;31m'"POLYCHORD COULD NOT RUN \e[3mMAKE CLEAN"'\033[0m'
-    cd $ROOTDIR
-    return 1
   else
     echo -e '\033[0;32m'"POLYCHORD RUN \e[3mMAKE CLEAN\e[0m\e\033[0;32m DONE"'\033[0m'
   fi

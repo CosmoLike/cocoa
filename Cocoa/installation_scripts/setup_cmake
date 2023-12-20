@@ -25,57 +25,52 @@ fi
 # ----------------------------------------------------------------------------
 
 if [ -z "${IGNORE_CMAKE_INSTALLATION}" ]; then
-  echo 'INSTALLING CMAKE - THAT WILL TAKE A WHILE'
-
-  cd $ROOTDIR/../cocoa_installation_libraries/$COCOA_CMAKE_DIR
+  echo -e '\033[1;34m''INSTALLING CMAKE LIBRARY - \e[4mIT WILL TAKE A WHILE''\033[0m'
 
   if [ -z "${DEBUG_CMAKE_PACKAGE}" ]; then
-    env CC=$C_COMPILER CXX=$CPP_COMPILER ./bootstrap --prefix=$ROOTDIR/.local > /dev/null 2> /dev/null
-    if [ $? -eq 0 ]; then
-      echo "CMAKE BOOTSTRAP RUN DONE"
-    else
-      echo "CMAKE COULD NOT RUN BOOTSTRAP" >&2
-      cd $ROOTDIR
-      return 1
-    fi
-
-    make -j $MAKE_NUM_THREADS > /dev/null 2> /dev/null
-    if [ $? -eq 0 ]; then
-      echo "CMAKE MAKE RUN DONE"
-    else
-      echo "CMAKE COULD NOT RUN MAKE" >&2
-      cd $ROOTDIR
-      return 1
-    fi
-
-    make install > /dev/null 2> /dev/null
-    if [ $? -eq 0 ]; then
-      echo "CMAKE MAKE INSTALL RUN DONE"
-    else
-      echo "CMAKE COULD NOT RUN MAKE INSTALL" >&2
-      cd $ROOTDIR
-      return 1
-    fi
+    export OUTPUT_CMAKE_PACKAGES_1="/dev/null"
+    export OUTPUT_CMAKE_PACKAGES_2="/dev/null"
+    export CMAKE_MAKE_NUM_THREADS="${MAKE_NUM_THREADS}"
   else
-    env CC=$C_COMPILER CXX=$CPP_COMPILER ./bootstrap --prefix=$ROOTDIR/.local
-    if [ $? -ne 0 ];then
-      cd $ROOTDIR
-      return 1
-    fi
+    export OUTPUT_CMAKE_PACKAGES_1="/dev/tty"
+    export OUTPUT_CMAKE_PACKAGES_2="/dev/tty"
+    export CMAKE_MAKE_NUM_THREADS=1
+  fi
 
-    make
-    if [ $? -ne 0 ];then
-      cd $ROOTDIR
-      return 1
-    fi
-    
-    make install
-    if [ $? -ne 0 ];then
-      cd $ROOTDIR
-      return 1
-    fi
+# --------------------------------------------------------------------------------------
+# --------------------------------------------------------------------------------------
+  cd $ROOTDIR/../cocoa_installation_libraries/$COCOA_CMAKE_DIR
+# --------------------------------------------------------------------------------------
+# --------------------------------------------------------------------------------------
+
+  env CC=$C_COMPILER CXX=$CPP_COMPILER ./bootstrap \
+    --prefix=$ROOTDIR/.local > ${OUTPUT_CMAKE_PACKAGES_1} 2> ${OUTPUT_CMAKE_PACKAGES_2}
+  if [ $? -eq 0 ]; then
+    echo -e '\033[0;32m'"CMAKE RUN \e[3mBOOTSTRAP\e[0m\e\033[0;32m DONE"'\033[0m'
+  else
+    echo -e '\033[0;31m'"CMAKE COULD NOT RUN \e[3mBOOTSTRAP"'\033[0m'
+    cd $ROOTDIR
+    return 1
+  fi
+
+  make -j $CMAKE_MAKE_NUM_THREADS > ${OUTPUT_CMAKE_PACKAGES_1} 2> ${OUTPUT_CMAKE_PACKAGES_2}
+  if [ $? -eq 0 ]; then
+    echo -e '\033[0;32m'"CMAKE RUN \e[3mMAKE\e[0m\e\033[0;32m DONE"'\033[0m'
+  else
+    echo -e '\033[0;31m'"CMAKE COULD NOT RUN \e[3mMAKE"'\033[0m'
+    cd $ROOTDIR
+    return 1
+  fi
+
+  make install > ${OUTPUT_CMAKE_PACKAGES_1} 2> ${OUTPUT_CMAKE_PACKAGES_2}
+  if [ $? -eq 0 ]; then
+    echo -e '\033[0;32m'"CMAKE RUN \e[3mMAKE INSTALL\e[0m\e\033[0;32m DONE"'\033[0m'
+  else
+    echo -e '\033[0;31m'"CMAKE COULD NOT RUN \e[3mMAKE INSTALL"'\033[0m'
+    cd $ROOTDIR
+    return 1
   fi
 
   cd $ROOTDIR
-  echo 'INSTALLING CMAKE - DONE'
+  echo -e '\033[1;34m''\e[4mINSTALLING CMAKE LIBRARY DONE''\033[0m'
 fi
