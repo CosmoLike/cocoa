@@ -434,7 +434,6 @@ double xi_pm_tomo(const int pm, const int nt, const int ni, const int nj, const 
             }
           }
         }
-
         free(Cl);
       }
     }
@@ -1320,1193 +1319,6 @@ double w_ks_tomo(const int nt, const int ni, const int limber)
   return w_vec[q];
 }
 
-// --------------------------------------------------------------------------------------
-// --------------------------------------------------------------------------------------
-// --------------------------------------------------------------------------------------
-// Correlation Functions (real space) - flat sky
-// --------------------------------------------------------------------------------------
-// --------------------------------------------------------------------------------------
-// --------------------------------------------------------------------------------------
-
-double xi_pm_tomo_flatsky(int pm, double theta, int ni, int nj, int limber)
-{
-  static cosmopara C;
-  static nuisancepara N;
-  static double** table;
-
-  const int NSIZE = tomo.shear_Npowerspectra;
-  const int ntheta = Ntable.N_thetaH;
-  const double l_min = limits.LMIN_hankel;
-  const double l_max = limits.LMAX_hankel;
-  const double lnlmax = log(l_max);
-  const double lnlmin = log(l_min);
-  const double dlnl = (lnlmax - lnlmin)/(1.0*ntheta);
-  const double lnrc = 0.5*(lnlmax + lnlmin);
-  const double nc = ntheta/2 + 1;
-  
-  const double lnthetamin = (nc-ntheta+1)*dlnl-lnrc;
-  const double lnthetamax = nc*dlnl - lnrc;
-  const double dlntheta = (lnthetamax - lnthetamin)/((double) ntheta);
-
-  if (table == 0)
-  {
-    table = (double**) malloc(sizeof(double*)*2*NSIZE);  // 2 NSIZE = {xi+, xi-}
-    if (table == NULL)
-    {
-      log_fatal("array allocation failed");
-      exit(1);
-    }
-    for (int i=0; i<2*NSIZE; i++) 
-    {
-      table[i] = (double*) calloc(ntheta, sizeof(double));
-      if (table[i] == NULL)
-      {
-        log_fatal("array allocation failed");
-        exit(1);
-      }
-    }
-  }
-
-  if (recompute_shear(C, N))
-  {
-    typedef fftw_complex fftwZ;
-
-    if (limber != 1)
-    {
-      log_fatal("NonLimber not implemented");
-      exit(1);
-    }
-    else
-    {
-      if (like.IA == 5 || like.IA == 6)
-      { // NEW TATT MODELING
-        log_fatal("Limber && TATT not implemented");
-        exit(1);
-      }
-      else
-      {
-        fftwZ** flP = (fftwZ**) malloc(sizeof(fftwZ*)*NSIZE);
-        for (int j=0; j<NSIZE; j++)
-        {
-          flP[j] = (fftwZ*) fftw_malloc((Ntable.N_thetaH/2+1)*sizeof(fftwZ));
-        }
-        {
-          double** lP = (double**) malloc(sizeof(double*)*NSIZE);
-          fftw_plan* plan = (fftw_plan*) malloc(sizeof(fftw_plan)*NSIZE);
-          for (int j=0; j<NSIZE; j++)
-          {
-            lP[j] = (double*) malloc(ntheta*sizeof(double));
-            plan[j] = fftw_plan_dft_r2c_1d(ntheta,lP[j],flP[j],FFTW_ESTIMATE);
-          }
-          
-          // --------------------------------------------------------------------------------
-          // Power spectrum on logarithmic bins (begins)
-          // --------------------------------------------------------------------------------
-          if (like.IA == 5 || like.IA == 6)
-          { // NEW TATT MODELING
-            log_fatal("Limber && TATT not implemented");
-            exit(1);
-          }
-          else
-          {
-            #pragma GCC diagnostic push
-            #pragma GCC diagnostic ignored "-Wunused-variable"
-            {
-              double init_static_vars_only = C_ss_tomo_limber(limits.LMIN_tab + 1, Z1(0), Z2(0), 0);
-            }
-            #pragma GCC diagnostic pop
-            #pragma omp parallel for collapse(2)
-            for (int k=0; k<NSIZE; k++)
-            {
-              for (int p=0; p<ntheta; p++)
-              {
-                const int Z1NZ = Z1(k);
-                const int Z2NZ = Z2(k);
-                const double l = exp(lnrc+(p - nc)*dlnl);
-                lP[k][p] = (l > limits.LMIN_tab) ?
-                  l*C_ss_tomo_limber(l, Z1NZ, Z2NZ, 1) :
-                  l*C_ss_tomo_limber_nointerp(l, Z1NZ, Z2NZ, use_linear_ps_limber, 0);
-              }
-            }
-          }
-          // --------------------------------------------------------------------------------
-          // Power spectrum on logarithmic bins (ends)
-          // --------------------------------------------------------------------------------
-          #pragma omp parallel for
-          for (int j=0; j<NSIZE; j++)
-          {
-            fftw_execute(plan[j]); // Execute FFTW in parallel (thread-safe)
-          }
-          for (int j = 0; j < NSIZE; j++)
-          {
-            fftw_free(lP[j]);
-            fftw_destroy_plan(plan[j]);
-          }
-          free(lP);
-          free(plan);
-        }
-        
-        double*** lP = (double***) malloc(sizeof(double**)*NSIZE);
-        fftwZ*** kernel = (fftwZ***) malloc(sizeof(fftwZ**)*NSIZE);
-        fftwZ*** conv = (fftwZ***) malloc(sizeof(fftwZ**)*NSIZE);
-        fftw_plan** plan = (fftw_plan**) malloc(sizeof(fftw_plan*)*NSIZE);
-        double*** tab = (double***) malloc(sizeof(double**)*NSIZE);
-        for (int j=0; j<NSIZE; j++)
-        {
-          lP[j] = (double**) malloc(sizeof(double*)*2);
-          kernel[j] = (fftwZ**) malloc(sizeof(fftwZ*)*2);
-          conv[j] = (fftwZ**) malloc(sizeof(fftwZ*)*2);
-          plan[j] = (fftw_plan*) malloc(sizeof(fftw_plan)*2);
-          tab[j] = (double**) malloc(sizeof(double*)*2);
-          tab[j][0] = (double*) malloc(sizeof(double)*ntheta);
-          tab[j][1] = (double*) malloc(sizeof(double)*ntheta);
-          for (int m=0; m<2; m++)
-          {
-            const int COVSZ = (ntheta/2+1);
-            lP[j][m] = (double*) malloc(ntheta*sizeof(double));
-            kernel[j][m] = (fftwZ*) fftw_malloc(sizeof(fftwZ));
-            conv[j][m] = (fftwZ*) fftw_malloc(COVSZ*sizeof(fftwZ));
-            plan[j][m] = fftw_plan_dft_c2r_1d(ntheta,conv[j][m],lP[j][m],FFTW_ESTIMATE);
-          }
-        }
-        #pragma omp parallel for
-        for (int j=0; j<NSIZE; j++)
-        {
-          for (int m=0; m<2; m++)
-          {
-            double arg[2];
-            arg[0] = 0; // bias
-            arg[1] = (m == 0 ? 0 : 4); // order of Bessel function
-
-            // perform the convolution, negative sign for kernel (complex conj.)
-            for(int i=0; i<(ntheta/2+1); i++)
-            {
-              const double k = 2*M_PI*i/(dlnl*ntheta);
-              hankel_kernel_FT(k, kernel[j][m], arg, 2);
-              conv[j][m][i][0] = flP[j][i][0]*(kernel[j][m][0][0]) - flP[j][i][1]*(kernel[j][m][0][1]);
-              conv[j][m][i][1] = flP[j][i][1]*(kernel[j][m][0][0]) + flP[j][i][0]*(kernel[j][m][0][1]);
-            }
-
-            // force Nyquist- and 0-frequency-components to be double
-            conv[j][m][0][1] = 0;
-            conv[j][m][ntheta/2][1] = 0;
-
-            fftw_execute(plan[j][m]);
-
-            for(int k=0; k<ntheta; k++)
-            {
-              const double t = exp((nc-k)*dlnl-lnrc); // theta=1/l
-              tab[j][m][ntheta-k-1] = lP[j][m][k]/(t*2*M_PI*ntheta);
-            }
-          }
-          for (int k=0; k<ntheta; k++)
-          {
-            table[2*j][k] = tab[j][0][k];
-            table[2*j+1][k] = tab[j][1][k];
-          }
-        }
-        for (int j=0; j<NSIZE; j++)
-        {
-          for (int m=0; m<2; m++)
-          {
-            fftw_free(lP[j][m]);
-            fftw_free(kernel[j][m]);
-            fftw_free(conv[j][m]);
-            fftw_destroy_plan(plan[j][m]);
-          }
-          fftw_free(flP[j]);
-          free(lP[j]);
-          free(kernel[j]);
-          free(conv[j]);
-          free(plan[j]);
-          free(tab[j][0]);
-          free(tab[j][1]);
-          free(tab[j]);
-        }
-        free(flP);
-        free(lP);
-        free(kernel);
-        free(conv);
-        free(plan);
-        free(tab);
-        // --------------------------------------------------------------------
-        // Cocoa: code extracted (& adapted) from xipm_via_hankel (ends)
-        // --------------------------------------------------------------------
-      }
-    } 
-    update_cosmopara(&C);
-    update_nuisance(&N);
-  }
-
-  if(ni < -1 || ni > tomo.shear_Nbin -1 || nj < -1 || nj > tomo.shear_Nbin -1)
-  {
-    log_fatal("invalid bin input (ni, nj) = (%d, %d)", ni, nj);
-    exit(1);
-  }
-
-  const int q = 2*N_shear(ni, nj) + (1 - pm)/2;
-  if(q > 2*NSIZE - 1)
-  {
-    log_fatal("error in selecting bin number, q = %d and max bin = %d", q, 2*NSIZE);
-    exit(1);
-  }
-
-  const double lntheta = log(theta);
-  if (lntheta < lnthetamin || lntheta > lnthetamax)
-  {
-    const double theta = exp(lntheta);
-    const double theta_min = exp(lnthetamin);
-    const double theta_max = exp(lnthetamax);
-    log_fatal("theta = %e outside look-up table range [%e, %e]", theta, theta_min, theta_max);
-    exit(1);
-  }
-
-  return interpol(table[q], ntheta, lnthetamin, lnthetamax, dlntheta, lntheta, 0, 0);
-}
-
-// ---------------------------------------------------------------------------
-
-double w_gammat_tomo_flatsky(const double theta, const int ni, const int nj, const int limber)
-{
-  static cosmopara C;
-  static nuisancepara N;
-  static galpara G;
-  static double** table;
-
-  const int NSIZE = tomo.ggl_Npowerspectra;
-  const int ntheta = Ntable.N_thetaH;
-  const double l_min = limits.LMIN_hankel;
-  const double l_max = limits.LMAX_hankel;
-  const double lnlmax = log(l_max);
-  const double lnlmin = log(l_min);
-  const double dlnl = (lnlmax - lnlmin)/((double) ntheta - 1.0);
-  const double lnrc = 0.5*(lnlmax + lnlmin);
-  const double nc = ntheta/2 + 1;
-  const double lnthetamin = (nc - ntheta + 1)*dlnl - lnrc;
-  const double lnthetamax = nc*dlnl - lnrc;
-  const double dlntheta = (lnthetamax - lnthetamin)/((double) ntheta);
-
-  if (table == 0)
-  {
-    table = (double**) malloc(sizeof(double*)*NSIZE);
-    if (table == NULL)
-    {
-      log_fatal("array allocation failed");
-      exit(1);
-    }
-    for (int i=0; i<NSIZE; i++) 
-    {
-      table[i] = (double*) malloc(sizeof(double)*ntheta);
-      if (table[i] == NULL)
-      {
-        log_fatal("array allocation failed");
-        exit(1);
-      }
-    }
-  }
-
-  if (recompute_gs(C, G, N)) 
-  {
-    typedef fftw_complex fftwZ;
-
-    fftwZ** flP = (fftwZ**) malloc(sizeof(fftwZ*)*NSIZE); // go to log-Fourier-space
-    if (flP == NULL)
-    {
-      log_fatal("array allocation failed");
-      exit(1);
-    }
-    for (int j=0; j<NSIZE; j++)
-    {
-      flP[j] = fftw_malloc((ntheta/2 + 1)*sizeof(fftwZ));
-      if (flP[j] == NULL)
-      {
-        log_fatal("array allocation failed");
-        exit(1);
-      }
-    }
-    {
-      double** lP = (double**) malloc(sizeof(double*)*NSIZE);
-      if (lP == NULL)
-      {
-        log_fatal("array allocation failed");
-        exit(1);
-      }
-      fftw_plan* plan = (fftw_plan*) malloc(sizeof(fftw_plan)*NSIZE);
-      if (plan == NULL)
-      {
-        log_fatal("array allocation failed");
-        exit(1);
-      }
-      for (int j=0; j<NSIZE; j++)
-      {
-        lP[j] = (double*) malloc(ntheta*sizeof(double));
-        if (lP[j] == NULL)
-        {
-          log_fatal("array allocation failed");
-          exit(1);
-        }
-        plan[j] = fftw_plan_dft_r2c_1d(ntheta, lP[j], flP[j], FFTW_ESTIMATE);
-      }
-      // --------------------------------------------------------------------------------
-      // Power spectrum on logarithmic bins (begins) 
-      // --------------------------------------------------------------------------------
-      gsl_spline** fCL_NL = NULL; 
-      
-      if (limber != 1)
-      { 
-        fCL_NL = (gsl_spline**) malloc(sizeof(gsl_spline*)*NSIZE);
-        if (fCL_NL == NULL)
-        {
-          log_fatal("array allocation failed");
-          exit(1);
-        }
-
-        double** Cl_NL = (double**) malloc(sizeof(double*)*NSIZE);
-        if (Cl_NL == NULL)
-        {
-          log_fatal("array allocation failed");
-          exit(1);
-        }
-        for (int i=0; i<NSIZE; i++)
-        {
-          Cl_NL[i] = calloc(limits.LMAX_NOLIMBER, sizeof(double));
-          if (Cl_NL[i] == NULL)
-          {
-            log_fatal("array allocation failed");
-            exit(1);
-          }
-        }
-        
-        double* ll = calloc(limits.LMAX_NOLIMBER, sizeof(double));
-        if (ll == NULL)
-        {
-          log_fatal("array allocation failed");
-          exit(1);
-        }
-        for (int i=0; i<limits.LMAX_NOLIMBER; i++)
-        {
-          ll[i] = i;
-        }
-
-        const int L = 1;
-        const double tolerance = 0.0075;    // required fractional accuracy in C(l)
-        const double dev = 10. * tolerance; // will be diff exact vs Limber init to large
-                                            // value in order to start while loop
-        for (int k=0; k<NSIZE; k++)
-        { // Cocoa: no threading allowed here - (fftw allocation @C_gl_tomo)
-          const int Z1 = ZL(k);
-          const int Z2 = ZS(k);
-          C_gl_tomo(L, Z1, Z2, Cl_NL[k], dev, tolerance);
-
-          const gsl_interp_type* T = gsl_interp_linear;
-          fCL_NL[k] = gsl_spline_alloc(T, limits.LMAX_NOLIMBER);
-          if (fCL_NL[k] == NULL)
-          {
-            log_fatal("fail allocation");
-            exit(1);
-          }
-        }
-        #pragma omp parallel for
-        for (int k=0; k<NSIZE; k++)
-        {
-          int status = gsl_spline_init(fCL_NL[k], ll, Cl_NL[k], limits.LMAX_NOLIMBER);
-          if (status) 
-          {
-            log_fatal(gsl_strerror(status));
-            exit(1);
-          }
-        }
-        for (int i=0; i<NSIZE; i++)
-        {
-          free(Cl_NL[i]);   // gsl_spline_init copies the data
-        }
-        free(Cl_NL);        // gsl_spline_init copies the data
-        free(ll);           // gsl_spline_init copies the data
-      }
-      
-      #pragma GCC diagnostic push
-      #pragma GCC diagnostic ignored "-Wunused-variable"
-      {
-        double init_static_vars_only = C_gs_tomo_limber(limits.LMIN_tab + 1, ZL(0), ZS(0), 0);
-      }
-      #pragma GCC diagnostic pop
-      
-      #pragma omp parallel for collapse(2)
-      for (int k=0; k<NSIZE; k++)
-      {
-        for (int p=0; p<ntheta; p++)
-        {
-          const int ZLNZ = ZL(k);
-          const int ZSNZ = ZS(k);
-          const double l = exp(lnrc + (p - nc)*dlnl);
-          if (limber == 1 || (limber != 1 && l > limits.LMAX_NOLIMBER - 1))
-          {
-            lP[k][p] = (l > limits.LMIN_tab) ?
-              l*C_gs_tomo_limber(l, ZLNZ, ZSNZ, 1) :
-              l*C_gs_tomo_limber_nointerp(l, ZLNZ, ZSNZ, use_linear_ps_limber, 0);
-          }
-          else
-          {
-            double CLNL;
-            int status = gsl_spline_eval_e(fCL_NL[k], l, NULL, &CLNL);
-            if (status) 
-            {
-              log_fatal(gsl_strerror(status));
-              exit(1);
-            }
-            lP[k][p] = l*CLNL;
-          }
-        }
-      }
-      if (limber != 1)
-      {
-        for (int i=0; i<NSIZE; i++)
-        {
-           gsl_spline_free(fCL_NL[i]);
-        }
-        free(fCL_NL);
-      }
-      // --------------------------------------------------------------------------------
-      // Power spectrum on logarithmic bins (ends)
-      // --------------------------------------------------------------------------------
-      #pragma omp parallel for
-      for (int j=0; j<NSIZE; j++)
-      {
-        fftw_execute(plan[j]); // Execute FFTW in parallel (thread-safe)
-      }
-      for (int j=0; j<NSIZE; j++)
-      {
-        fftw_free(lP[j]);
-        fftw_destroy_plan(plan[j]);
-      }
-      free(lP);
-      free(plan);
-    }
-
-    double** lP = (double**) malloc(sizeof(double*)*NSIZE);
-    fftwZ** kernel = (fftwZ**) fftw_malloc(sizeof(fftwZ*)*NSIZE);
-    fftwZ** conv = (fftwZ**) fftw_malloc(sizeof(fftwZ*)*NSIZE);
-    fftw_plan* plan = (fftw_plan*) malloc(sizeof(fftw_plan)*NSIZE);
-    double*** tab = (double***) malloc(sizeof(double**)*NSIZE);
-    for (int j=0; j<NSIZE; j++)
-    {
-      const int COVSZ = (ntheta/2+1);
-      lP[j] = (double*) malloc(ntheta*sizeof(double));
-      kernel[j] = (fftwZ*) fftw_malloc(sizeof(fftwZ));
-      conv[j] = (fftwZ*) fftw_malloc(COVSZ*sizeof(fftwZ));
-      plan[j] = fftw_plan_dft_c2r_1d(ntheta, conv[j], lP[j], FFTW_ESTIMATE);
-      tab[j] = (double**) malloc(sizeof(double*)*1);
-      tab[j][0] = (double*) malloc(sizeof(double)*ntheta);
-    }
-    #pragma omp parallel for
-    for (int j=0; j<NSIZE; j++)
-    {
-      double arg[2];
-      arg[0] = 0; // bias
-      arg[1] = 2; // order of Bessel function
-
-      for (int i=0; i<(ntheta/2+1); i++)
-      {
-        const double kk = 2*M_PI*i/(dlnl*ntheta);
-        hankel_kernel_FT(kk, kernel[j], arg, 2);
-        conv[j][i][0] = flP[j][i][0]*kernel[j][0][0] - flP[j][i][1]*kernel[j][0][1];
-        conv[j][i][1] = flP[j][i][1]*kernel[j][0][0] + flP[j][i][0]*kernel[j][0][1];
-      }
-
-      // force Nyquist- and 0-frequency-components to be double
-      conv[j][0][1] = 0;
-      conv[j][ntheta/2][1] = 0;
-
-      fftw_execute(plan[j]); // Execute FFTW in parallel (thread-safe)
-
-      for (int k=0; k<ntheta; k++)
-      {
-        const double t = exp((nc - k)*dlnl - lnrc); // theta=1/l
-        tab[j][0][ntheta-k-1] = lP[j][k]/(t*2*M_PI*ntheta);
-      }
-      
-      for (int k=0; k<ntheta; k++)
-      {
-        table[j][k] = tab[j][0][k];
-      }
-    }
-    for (int j=0; j<NSIZE; j++)
-    {
-      fftw_free(flP[j]);
-      fftw_free(lP[j]);
-      fftw_free(conv[j]);
-      fftw_free(kernel[j]);
-      fftw_destroy_plan(plan[j]);
-      free(tab[j][0]);
-      free(tab[j]);
-    }
-    free(flP);
-    free(lP);
-    free(conv);
-    free(kernel);
-    free(plan);
-    free(tab);
-
-    update_cosmopara(&C);
-    update_galpara(&G);
-    update_nuisance(&N);
-  }
-
-  if (ni < -1 || ni > tomo.clustering_Nbin - 1 || nj < -1 || nj > tomo.shear_Nbin - 1)
-  {
-    log_fatal("error in selecting bin number (ni, nj) = [%d,%d]", ni, nj);
-    exit(1);
-  }
-  
-  const double lntheta = log(theta);
-  
-  if (lntheta < lnthetamin || lntheta > lnthetamax)
-  {
-    const double theta = exp(lntheta);
-    const double theta_min = exp(lnthetamin);
-    const double theta_max = exp(lnthetamax);
-    log_fatal("theta = %e outside look-up table range [%e, %e]", theta, theta_min, theta_max);
-    exit(1);
-  }
-  
-  if (test_zoverlap(ni, nj))
-  {
-    const int q = N_ggl(ni, nj);
-    if (q  < 0 || q > NSIZE - 1)
-    {
-      log_fatal("internal logic error in selecting bin number");
-      exit(1);
-    }
-    return interpol(table[q], ntheta, lnthetamin, lnthetamax, dlntheta, lntheta, 1, 1);
-  } 
-  else
-  {
-    return 0.0;
-  }
-}
-
-// ---------------------------------------------------------------------------
-
-double w_gg_tomo_flatsky(double theta, int ni, int nj, int limber)
-{
-  static cosmopara C;
-  static nuisancepara N;
-  static galpara G;
-  static double** table;
-
-  const int NSIZE = tomo.clustering_Npowerspectra;
-  const int ntheta = Ntable.N_thetaH;
-  const double l_min = limits.LMIN_hankel;
-  const double l_max = limits.LMAX_hankel;
-  const double lnlmax = log(l_max);
-  const double lnlmin = log(l_min);
-  const double dlnl = (lnlmax - lnlmin)/((double) ntheta - 1.0);
-  const double lnrc = 0.5*(lnlmax + lnlmin);
-  const double nc = ntheta/2 + 1;
-  const double lnthetamin = (nc - ntheta + 1)*dlnl - lnrc;
-  const double lnthetamax = nc*dlnl - lnrc;
-  const double dlntheta = (lnthetamax - lnthetamin)/((double) ntheta);
-
-  if (table == 0)
-  {
-    table = (double**) malloc(sizeof(double*)*NSIZE);
-    for (int i=0; i<NSIZE; i++) 
-    {
-      table[i] = (double*) malloc(sizeof(double)*ntheta);
-    }
-  }  
-  if (recompute_gg(C, G, N)) 
-  {
-    typedef fftw_complex fftwZ;
-
-    fftwZ** flP = (fftwZ**) malloc(sizeof(fftwZ*)*NSIZE); // go to log-Fourier-space
-    for (int j=0; j<NSIZE; j++)
-    {
-      flP[j] = fftw_malloc((ntheta/2 + 1)*sizeof(fftwZ));
-    }
-    {
-      double** lP = (double**) malloc(sizeof(double*)*NSIZE);
-      fftw_plan* plan = (fftw_plan*) malloc(sizeof(fftw_plan)*NSIZE);
-      for (int j=0; j<NSIZE; j++)
-      {
-        int ARRAYSZ = ntheta;
-        lP[j] = (double*) malloc(ARRAYSZ*sizeof(double));
-        plan[j] = fftw_plan_dft_r2c_1d(ARRAYSZ, lP[j], flP[j], FFTW_ESTIMATE);
-      }
-      // --------------------------------------------------------------------------------
-      // Power spectrum on logarithmic bins (begins)
-      // --------------------------------------------------------------------------------
-      { 
-        gsl_spline** fCL_NL = NULL; 
-        if (limber != 1)
-        { 
-          fCL_NL = (gsl_spline**) malloc(sizeof(gsl_spline*)*NSIZE);
-          double** Cl_NL = (double**) malloc(sizeof(double*)*NSIZE);
-          for (int i=0; i<NSIZE; i++)
-          {
-            Cl_NL[i] = calloc(limits.LMAX_NOLIMBER, sizeof(double));
-          }
-          double* ll = calloc(limits.LMAX_NOLIMBER, sizeof(double));
-          for (int i=0; i<limits.LMAX_NOLIMBER; i++)
-          {
-            ll[i] = i;
-          }
-
-          const int L = 1;
-          const double tolerance = 0.0075;    // required fractional accuracy in C(l)
-          const double dev = 10. * tolerance; // will be diff exact vs Limber init to large
-                                              // value in order to start while loop
-          for (int k=0; k<NSIZE; k++)
-          { // Cocoa: no threading allowed here - (fftw allocation @C_gl_tomo)
-            const int ZCL1 = k; // cross redshift bin not supported so not using ZCL1(k)
-            const int ZCL2 = k; // cross redshift bin not supported so not using ZCL2(k) 
-            C_cl_tomo(L, ZCL1, ZCL2, Cl_NL[k], dev, tolerance);
-
-            const gsl_interp_type* T = gsl_interp_linear;
-            fCL_NL[k] = gsl_spline_alloc(T, limits.LMAX_NOLIMBER);
-            if (fCL_NL[k] == NULL)
-            {
-              log_fatal("fail allocation");
-              exit(1);
-            }
-          }
-          #pragma omp parallel for
-          for (int k=0; k<NSIZE; k++)
-          {
-            int status = gsl_spline_init(fCL_NL[k], ll, Cl_NL[k], limits.LMAX_NOLIMBER);
-            if (status) 
-            {
-              log_fatal(gsl_strerror(status));
-              exit(1);
-            }
-          } 
-          for (int i=0; i<NSIZE; i++)
-          {
-            free(Cl_NL[i]);
-          }
-          free(Cl_NL);
-          free(ll);
-        } 
-        #pragma GCC diagnostic push
-        #pragma GCC diagnostic ignored "-Wunused-variable"
-        {
-          double init_static_vars_only = C_gg_tomo_limber(limits.LMIN_tab + 1, 0, 0, 0);
-        }
-        #pragma GCC diagnostic pop
-        #pragma omp parallel for collapse(2)
-        for (int k=0; k<NSIZE; k++) 
-        { 
-          for (int p=0; p<ntheta; p++)
-          {
-            const int ZCL1 = k; // cross redshift bin not supported so not using ZCL1(k)
-            const int ZCL2 = k; // cross redshift bin not supported so not using ZCL2(k) 
-            const double l = exp(lnrc + (p - nc)*dlnl);
-            if (limber == 1 || (limber != 1 && l > limits.LMAX_NOLIMBER - 1))
-            {
-              lP[k][p] = (l > limits.LMIN_tab) ?
-                l*C_gg_tomo_limber(l, ZCL1, ZCL2, 1) :
-                l*C_gg_tomo_limber_nointerp(l, ZCL1, ZCL2, use_linear_ps_limber, 0);
-            }
-            else
-            {
-              double CLNL;
-              int status = gsl_spline_eval_e(fCL_NL[k], l, NULL, &CLNL);
-              if (status) 
-              {
-                log_fatal(gsl_strerror(status));
-                exit(1);
-              }
-              lP[k][p] = l*CLNL;
-            }
-          }
-        }
-        if (limber != 1)
-        {
-          for (int i=0; i<NSIZE; i++)
-          {
-             gsl_spline_free(fCL_NL[i]);
-          }
-          free(fCL_NL);
-        }
-      } 
-      // --------------------------------------------------------------------------------
-      // Power spectrum on logarithmic bins (ends)
-      // --------------------------------------------------------------------------------
-      #pragma omp parallel for
-      for (int j=0; j<NSIZE; j++)
-      {
-        fftw_execute(plan[j]); // Execute FFTW in parallel (thread-safe)
-      }
-      for (int j=0; j<NSIZE; j++)
-      {
-        fftw_free(lP[j]);
-        fftw_destroy_plan(plan[j]);
-      }
-      free(lP);
-      free(plan);
-    }
-
-    double** lP = (double**) malloc(sizeof(double*)*NSIZE);
-    fftwZ** kernel = (fftwZ**) fftw_malloc(sizeof(fftwZ*)*NSIZE);
-    fftwZ** conv = (fftwZ**) fftw_malloc(sizeof(fftwZ*)*NSIZE);
-    fftw_plan* plan = (fftw_plan*) malloc(sizeof(fftw_plan)*NSIZE);
-    double*** tab = (double***) malloc(sizeof(double**)*NSIZE);
-    for (int j=0; j<NSIZE; j++)
-    {
-      const int ARRAYSZ = ntheta;
-      const int COVSZ = (ntheta/2+1);
-      lP[j] = (double*) malloc(ARRAYSZ*sizeof(double));
-      kernel[j] = (fftwZ*) fftw_malloc(sizeof(fftwZ));
-      conv[j] = (fftwZ*) fftw_malloc(COVSZ*sizeof(fftwZ));
-      plan[j] = fftw_plan_dft_c2r_1d(ARRAYSZ, conv[j], lP[j], FFTW_ESTIMATE);
-      tab[j] = (double**) malloc(sizeof(double*)*1);
-      tab[j][0] = (double*) malloc(sizeof(double)*ntheta);
-    }
-    #pragma omp parallel for
-    for (int j=0; j<NSIZE; j++)
-    {
-      double arg[2];
-      arg[0] = 0; // bias
-      arg[1] = 0; // order of Bessel function
-
-      for (int i=0; i<(ntheta/2+1); i++)
-      {
-        const double kk = 2*M_PI*i/(dlnl*ntheta);
-        hankel_kernel_FT(kk, kernel[j], arg, 2);
-        conv[j][i][0] = flP[j][i][0]*kernel[j][0][0] - flP[j][i][1]*kernel[j][0][1];
-        conv[j][i][1] = flP[j][i][1]*kernel[j][0][0] + flP[j][i][0]*kernel[j][0][1];
-      }
-
-      // force Nyquist- and 0-frequency-components to be double
-      conv[j][0][1] = 0;
-      conv[j][ntheta/2][1] = 0;
-
-      fftw_execute(plan[j]); // Execute FFTW in parallel (thread-safe)
-
-      for (int k=0; k<ntheta; k++)
-      {
-        const double t = exp((nc - k)*dlnl - lnrc); // theta=1/l
-        tab[j][0][ntheta-k-1] = lP[j][k]/(t*2*M_PI*ntheta);
-      }
-      for (int k=0; k<ntheta; k++)
-      {
-        table[j][k] = tab[j][0][k];
-      }
-    }
-    for (int j=0; j<NSIZE; j++)
-    {
-      fftw_free(flP[j]);
-      fftw_free(lP[j]);
-      fftw_free(conv[j]);
-      fftw_free(kernel[j]);
-      fftw_destroy_plan(plan[j]);
-      free(tab[j][0]);
-      free(tab[j]);
-
-    }
-    free(flP);
-    free(lP);
-    free(conv);
-    free(kernel);
-    free(plan);
-    free(tab);
-    
-    update_cosmopara(&C);
-    update_galpara(&G);
-    update_nuisance(&N);
-  }
-  if (ni != nj) 
-  {
-    log_fatal("cross-tomography not supported");
-    exit(1);
-  }
-  if (ni < -1 || ni > tomo.clustering_Nbin - 1 || nj < -1 || nj > tomo.clustering_Nbin - 1)
-  {
-    log_fatal("error in selecting bin number (ni, nj) = [%d,%d]", ni, nj);
-    exit(1);
-  }
-  const double lntheta = log(theta);
-  if (lntheta < lnthetamin || lntheta > lnthetamax)
-  {
-    const double theta = exp(lntheta);
-    const double theta_min = exp(lnthetamin);
-    const double theta_max = exp(lnthetamax);
-    log_fatal("theta = %e outside look-up table range [%e, %e]", theta, theta_min, theta_max);
-    exit(1);
-  }
-  const int q = ni; // cross redshift bin not supported so not using N_CL(ni, nj) instead of ni
-  if (q < 0 || q > NSIZE - 1)
-  {
-    log_fatal("internal logic error in selecting bin number");
-    exit(1);
-  }
-  return interpol(table[q], ntheta, lnthetamin, lnthetamax, dlntheta, lntheta, 1, 1);
-}
-
-// ---------------------------------------------------------------------------
-
-double w_gk_tomo_flatsky(const double theta, const int ni, const int limber)
-{
-  static cosmopara C;
-  static nuisancepara N;
-  static galpara G;
-  static double** table;
-
-  const int nisize = tomo.clustering_Nbin;
-  const int ntheta = Ntable.N_thetaH;
-  const int NSIZE = nisize;
-  const double l_min = limits.LMIN_hankel;
-  const double l_max = limits.LMAX_hankel;
-  const double lnlmax = log(l_max);
-  const double lnlmin = log(l_min);
-  const double dlnl = (lnlmax - lnlmin)/((double) ntheta - 1.0);
-  const double lnrc = 0.5*(lnlmax + lnlmin);
-  const double nc = ntheta/2 + 1;
-  const double lnthetamin = (nc - ntheta + 1)*dlnl - lnrc;
-  const double lnthetamax = nc*dlnl - lnrc;
-  const double dlntheta = (lnthetamax-lnthetamin)/((double)ntheta);
-
-  if (table == 0)
-  {
-    table = (double**) malloc(sizeof(double*)*NSIZE);
-    for (int i=0; i<NSIZE; i++) 
-    {
-      table[i] = (double*) malloc(sizeof(double)*ntheta);
-    }
-  }
-  if (recompute_gk(C, G, N))
-  {
-    if (limber == 1)
-    {
-      typedef fftw_complex fftwZ;
-
-      // go to log-Fourier-space
-      fftwZ** flP = (fftwZ**) malloc(sizeof(fftwZ*)*NSIZE);
-      for (int i=0; i<NSIZE; i++)
-      {
-        flP[i] = fftw_malloc((ntheta/2 + 1)*sizeof(fftwZ));
-      }
-      {
-        double** lP = (double**) malloc(sizeof(double*)*NSIZE);
-        fftw_plan* plan = (fftw_plan*) malloc(sizeof(fftw_plan)*NSIZE);
-        for (int i=0; i<NSIZE; i++)
-        {
-          lP[i] = (double*) malloc(ntheta*sizeof(double));
-          plan[i] = fftw_plan_dft_r2c_1d(ntheta, lP[i], flP[i], FFTW_ESTIMATE);
-        }
-        #pragma GCC diagnostic push
-        #pragma GCC diagnostic ignored "-Wunused-variable"
-        {
-          double init_static_vars_only = C_gk_tomo_limber_wrapper(limits.LMIN_tab + 1, 0, 0);
-        }
-        #pragma GCC diagnostic pop 
-        // --------------------------------------------------------------------------------
-        // Power spectrum on logarithmic bins (begins)
-        // --------------------------------------------------------------------------------
-        #pragma omp parallel for collapse(2)
-        for (int i=0; i<NSIZE; i++)
-        {
-          for (int p=0; p<ntheta; p++)
-          {
-            const double l = exp(lnrc + (p - nc)*dlnl);
-            lP[i][p] = (l > limits.LMIN_tab) ?
-              l*C_gk_tomo_limber_wrapper(l, i, 1) :
-              l*C_gk_tomo_limber_nointerp_wrapper(l, i, use_linear_ps_limber, 0);
-          }
-        }
-        // --------------------------------------------------------------------------------
-        // Power spectrum on logarithmic bins (ends)
-        // --------------------------------------------------------------------------------
-        #pragma omp parallel for
-        for (int i=0; i<NSIZE; i++)
-        {
-          fftw_execute(plan[i]); // Execute FFTW in parallel (thread-safe)
-        }
-        for (int i=0; i<NSIZE; i++)
-        {
-          fftw_free(lP[i]);
-          fftw_destroy_plan(plan[i]);
-        } 
-        free(lP);
-        free(plan);
-      }
-
-      double** lP = (double**) fftw_malloc(sizeof(double**)*NSIZE);
-      fftwZ** kernel = (fftwZ**) malloc(sizeof(fftwZ*)*NSIZE);
-      fftwZ** conv = (fftwZ**) malloc(sizeof(fftwZ*)*NSIZE);
-      fftw_plan* plan = (fftw_plan*) malloc(sizeof(fftw_plan)*NSIZE);
-      double*** tab = (double***) malloc(sizeof(double**)*NSIZE);
-      for (int i=0; i<NSIZE; i++)
-      {
-        lP[i] = (double*) fftw_malloc(ntheta*sizeof(double));
-        kernel[i] = (fftwZ*) fftw_malloc(sizeof(fftwZ));
-        conv[i] = (fftwZ*) fftw_malloc((ntheta/2 + 1)*sizeof(fftwZ));
-        plan[i] = fftw_plan_dft_c2r_1d(ntheta, conv[i], lP[i], FFTW_ESTIMATE);
-        tab[i] = (double**) malloc(sizeof(double*)*1);
-        tab[i][0] = (double*) malloc(sizeof(double)*ntheta);
-      }
-      #pragma omp parallel for
-      for (int i=0; i<NSIZE; i++)
-      {
-        double arg[2];
-        arg[0] = 0; // bias
-        arg[1] = 0; // order of Bessel function
-
-        for (int k=0; k<(ntheta/2+1); k++)
-        {
-          const double kk = 2*M_PI*i/(dlnl*ntheta);
-          hankel_kernel_FT(kk, kernel[i], arg, 2);
-          
-          conv[i][k][0] = flP[i][k][0]*kernel[i][0][0] - flP[i][k][1]*kernel[i][0][1];
-          conv[i][k][1] = flP[i][k][1]*kernel[i][0][0] + flP[i][k][0]*kernel[i][0][1];
-        }
-
-        // force Nyquist- and 0-frequency-components to be double
-        conv[i][0][1] = 0;
-        conv[i][ntheta/2][1] = 0;
-
-        fftw_execute(plan[i]); // Execute FFTW in parallel (thread-safe)
-
-        for (int k=0; k<ntheta; k++)
-        {
-          const double t = exp((nc - k)*dlnl - lnrc); // theta=1/l
-          tab[i][0][ntheta-k-1] = lP[i][k]/(t*2*M_PI*ntheta);
-        }
-        for (int k=0; k<ntheta; k++)
-        {
-          table[i][k] = tab[i][0][k];
-        }
-      }
-      for (int i=0; i<NSIZE; i++)
-      {
-        fftw_free(flP[i]);
-        fftw_free(lP[i]);
-        fftw_free(kernel[i]);
-        fftw_free(conv[i]);
-        fftw_destroy_plan(plan[i]);
-        free(tab[i][0]);
-        free(tab[i]);
-      }
-      free(flP);
-      free(lP);
-      free(kernel);
-      free(conv);
-      free(plan);
-      free(tab);
-    }
-    else
-    {
-      log_fatal("NonLimber not implemented");
-      exit(1);
-    }
-    update_cosmopara(&C);
-    update_galpara(&G);
-    update_nuisance(&N);
-  }
-  if (ni < -1 || ni > tomo.clustering_Nbin - 1)
-  {
-    log_fatal("error in selecting bin number ni = %d", ni);
-    exit(1);
-  }
-  const double lntheta = log(theta);
-  if (lntheta < lnthetamin || lntheta > lnthetamax)
-  {
-    const double theta = exp(lntheta);
-    const double theta_min = exp(lnthetamin);
-    const double theta_max = exp(lnthetamax);
-    log_fatal("theta = %e outside look-up table range [%e, %e]", theta, theta_min, theta_max);
-    exit(1);
-  }
-  const int q = ni;
-  if (q < 0 || q > NSIZE - 1)
-  {
-    log_fatal("internal logic error in selecting bin number");
-    exit(1);
-  }
-  return interpol(table[q], ntheta, lnthetamin, lnthetamax, dlntheta, lntheta, 1, 1);
-}
-
-// ---------------------------------------------------------------------------
-
-double w_ks_tomo_flatsky(const double theta, const int ni, const int limber)
-{
-  static cosmopara C;
-  static nuisancepara N;
-  static double** table;
-
-  const int nisize = tomo.shear_Nbin;
-  const int ntheta = Ntable.N_thetaH;
-  const int NSIZE = nisize;
-  const double l_min = limits.LMIN_hankel;
-  const double l_max = limits.LMAX_hankel;
-  const double lnlmax = log(l_max);
-  const double lnlmin = log(l_min);
-  const double dlnl = (lnlmax - lnlmin)/((double) ntheta - 1.0);
-  const double lnrc = 0.5*(lnlmax + lnlmin);
-  const double nc = ntheta/2 + 1;
-  const double lnthetamin = (nc - ntheta + 1)*dlnl - lnrc;
-  const double lnthetamax = nc*dlnl - lnrc;
-  const double dlntheta = (lnthetamax - lnthetamin)/((double) ntheta);
-
-  if (table == 0) 
-  {
-    table = (double**) malloc(sizeof(double*)*NSIZE);
-    for (int i=0; i<NSIZE; i++) 
-    {
-      table[i] = (double*) malloc(sizeof(double)*ntheta);
-    }
-  }
-  if (recompute_shear(C, N))
-  {
-    if (limber == 1)
-    {
-      typedef fftw_complex fftwZ;
-
-      // go to log-Fourier-space
-      fftwZ** flP = (fftwZ**) malloc(sizeof(fftwZ*)*NSIZE);
-      for (int i=0; i<NSIZE; i++)
-      {
-        flP[i] = fftw_malloc((ntheta/2 + 1)*sizeof(fftwZ));
-      }
-      {
-        double** lP = (double**) malloc(sizeof(double*)*NSIZE);
-        fftw_plan* plan = (fftw_plan*) malloc(sizeof(fftw_plan)*NSIZE);
-        for (int i=0; i<NSIZE; i++)
-        {
-          lP[i] = (double*) malloc(ntheta*sizeof(double));
-          plan[i] = fftw_plan_dft_r2c_1d(ntheta, lP[i], flP[i], FFTW_ESTIMATE);
-        }
-        #pragma GCC diagnostic push
-        #pragma GCC diagnostic ignored "-Wunused-variable"
-        {
-          double init_static_vars_only = C_ks_tomo_limber_wrapper(limits.LMIN_tab + 1, 0, 0);
-        }
-        #pragma GCC diagnostic pop        
-        // --------------------------------------------------------------------------------
-        // Power spectrum on logarithmic bins (begins)
-        // --------------------------------------------------------------------------------
-        #pragma omp parallel for collapse(2)
-        for (int i=0; i<NSIZE; i++)
-        {
-          for (int p=0; p<ntheta; p++)
-          {
-            const double l = exp(lnrc + (p - nc)*dlnl);
-            lP[i][p] = (l > limits.LMIN_tab) ?
-              l*C_ks_tomo_limber_wrapper(l, i, 1) :
-              l*C_ks_tomo_limber_nointerp_wrapper(l, i, use_linear_ps_limber, 0);
-          }
-        }
-        // --------------------------------------------------------------------------------
-        // Power spectrum on logarithmic bins (ends)
-        // --------------------------------------------------------------------------------
-        #pragma omp parallel for
-        for (int i=0; i<NSIZE; i++)
-        {
-          fftw_execute(plan[i]); // Execute FFTW in parallel (thread-safe)
-        }
-        for (int i=0; i<NSIZE; i++)
-        {
-          fftw_free(lP[i]);
-          fftw_destroy_plan(plan[i]);
-        }
-        free(lP);
-        free(plan);
-      }
-
-      double** lP = (double**) fftw_malloc(sizeof(double**)*NSIZE);
-      fftwZ** kernel = (fftwZ**) malloc(sizeof(fftwZ*)*NSIZE);
-      fftwZ** conv = (fftwZ**) malloc(sizeof(fftwZ*)*NSIZE);
-      fftw_plan* plan = (fftw_plan*) malloc(sizeof(fftw_plan)*NSIZE);
-      double*** tab = (double***) malloc(sizeof(double**)*NSIZE);
-      for (int i=0; i<NSIZE; i++)
-      {
-        lP[i] = (double*) fftw_malloc(ntheta*sizeof(double));
-        kernel[i] = (fftwZ*) fftw_malloc(sizeof(fftwZ));
-        conv[i] = (fftwZ*) fftw_malloc((ntheta/2 + 1)*sizeof(fftwZ));
-        plan[i] = fftw_plan_dft_c2r_1d(ntheta, conv[i], lP[i], FFTW_ESTIMATE);
-        tab[i] = (double**) malloc(sizeof(double*)*1);
-        tab[i][0] = (double*) malloc(sizeof(double)*ntheta);
-      }
-      
-      #pragma omp parallel for
-      for (int i=0; i<NSIZE; i++)
-      {
-        double arg[2];
-        arg[0] = 0; // bias
-        arg[1] = 2; // order of Bessel function
-
-        for (int k=0; k<(ntheta/2+1); k++)
-        {
-          const double kk = 2*M_PI*i/(dlnl*ntheta);
-          hankel_kernel_FT(kk, kernel[i], arg, 2);
-          conv[i][k][0] = flP[i][k][0]*kernel[i][0][0] - flP[i][k][1]*kernel[i][0][1];
-          conv[i][k][1] = flP[i][k][1]*kernel[i][0][0] + flP[i][k][0]*kernel[i][0][1];
-        }
-
-        // force Nyquist- and 0-frequency-components to be double
-        conv[i][0][1] = 0;
-        conv[i][ntheta/2][1] = 0;
-
-        fftw_execute(plan[i]); // Execute FFTW in parallel (thread-safe)
-
-        for (int k=0; k<ntheta; k++)
-        {
-          const double t = exp((nc - k)*dlnl - lnrc); // theta=1/l
-          tab[i][0][ntheta-k-1] = lP[i][k]/(t*2*M_PI*ntheta);
-        }
-        for (int k=0; k<ntheta; k++)
-        {
-          table[i][k] = tab[i][0][k];
-        }
-      }
-      for (int i=0; i<NSIZE; i++)
-      {
-        fftw_free(flP[i]);
-        fftw_free(lP[i]);
-        fftw_free(kernel[i]);
-        fftw_free(conv[i]);
-        fftw_destroy_plan(plan[i]);
-        free(tab[i][0]);
-        free(tab[i]);
-      }  
-      free(flP);
-      free(lP);
-      free(kernel);
-      free(conv);
-      free(plan);
-      free(tab);
-    }
-    else
-    {
-      log_fatal("NonLimber not implemented");
-      exit(1);
-    }
-    update_cosmopara(&C);
-    update_nuisance(&N);
-  }
-  if (ni < 0 || ni > tomo.shear_Nbin - 1)
-  {
-    log_fatal("error in selecting bin number ni = %d", ni);
-    exit(1);
-  }
-  const double lntheta = log(theta);    
-  if (lntheta < lnthetamin || lntheta > lnthetamax)
-  {
-    const double theta = exp(lntheta);
-    const double theta_min = exp(lnthetamin);
-    const double theta_max = exp(lnthetamax);
-    log_fatal("theta = %e outside look-up table range [%e, %e]", theta, theta_min, theta_max);
-    exit(1);
-  }
-  const int q = ni;
-  if (q < 0 || q > NSIZE - 1)
-  {
-    log_fatal("internal logic error in selecting bin number");
-    exit(1);
-  }
-  return interpol(table[q], ntheta, lnthetamin, lnthetamax, dlntheta, lntheta, 1, 1);
-}
-
 // ----------------------------------------------------------------------------
 // ----------------------------------------------------------------------------
 // ----------------------------------------------------------------------------
@@ -3036,8 +1848,6 @@ double int_for_C_ss_tomo_limber(double a, void* params)
   const double fK = f_K(chidchi.chi);
   const double k = ell/fK;
  
-  const double ws1 = W_source(a, n1, hoverh0);
-  const double ws2 = W_source(a, n2, hoverh0);
   const double wk1 = W_kappa(a, fK, n1);
   const double wk2 = W_kappa(a, fK, n2);
   const double PK = (use_linear_ps == 1) ? p_lin(k,a) : Pdelta(k,a);
@@ -3045,42 +1855,45 @@ double int_for_C_ss_tomo_limber(double a, void* params)
   const double ell4 = ell*ell*ell*ell; // correction (1812.05995 eqs 74-79)
   const double ell_prefactor = l*(l - 1.)*(l + 1.)*(l + 2.)/ell4; 
 
-  double res = 0.0;
-  switch(like.IA)
+  double res = wk1*wk2;
+
+  if(like.IA != NO_IA)
   {
-    case 0:
+    const double norm = cosmology.Omega_m*nuisance.c1rhocrit_ia/growfac_a;
+    double IA_A1 = 0.0;
+    double IA_A2 = 0.0;
+    
+    switch(like.IA)
     {
-      res = wk1*wk2;
+      case IA_JOACHIMI:
+      {
+        IA_A1 = A_IA_Joachimi(a);
+        IA_A2 = IA_A1;
+        break;
+      }
+      case IA_REDSHIFT_BINNING:
+      { 
+        IA_A1 = nuisance.A_z[n1];
+        IA_A2 = nuisance.A_z[n2];
+        break;
+      }
+      case IA_REDSHIFT_EVOLUTION:
+      {
+        const double x = (1.0/a)/nuisance.oneplusz0_ia;
+        IA_A1 = nuisance.A_ia*pow(x, nuisance.eta_ia);
+        IA_A2 = IA_A1;
+        break;
+      }
+      default:
+      {
+        log_fatal("like.IA = %d not supported", like.IA);
+        exit(1);
+      }
+    }
 
-      break;
-    }
-    case 1:
-    {
-      const double norm = A_IA_Joachimi(a)*cosmology.Omega_m*nuisance.c1rhocrit_ia/growfac_a;
-      res = ws1*ws2*norm*norm - (ws1*wk2+ws2*wk1)*norm + wk1*wk2;
-
-      break;
-    }
-    case 3:
-    {
-      const double norm = cosmology.Omega_m*nuisance.c1rhocrit_ia/growfac_a;
-      res = ws1*ws2*norm*norm - (ws1*wk2+ws2*wk1)*norm + wk1*wk2;
-
-      break;
-    }
-    case 4:
-    {
-      const double norm = cosmology.Omega_m*nuisance.c1rhocrit_ia/growfac_a*
-        nuisance.A_ia*pow(1./(a*nuisance.oneplusz0_ia), nuisance.eta_ia);
-      res = ws1*ws2*norm*norm - (ws1*wk2+ws2*wk1)*norm + wk1*wk2;
-
-      break;
-    }
-    default:
-    {
-      log_fatal("like.IA = %d not supported", like.IA);
-      exit(1);
-    }
+    const double ws1 = W_source(a, n1, hoverh0) * IA_A1;
+    const double ws2 = W_source(a, n2, hoverh0) * IA_A2; 
+    res += ws1*ws2*norm*norm - (ws1*wk2 + ws2*wk1)*norm;
   }
   return res*PK*(chidchi.dchida/(fK*fK))*ell_prefactor;
 }
@@ -3218,7 +2031,6 @@ double C_ss_tomo_limber(double l, int ni, int nj, const int force_no_recompute)
   return f1;
 }
 
-
 // ---------------------------------------------------------------------------
 // ---------------------------------------------------------------------------
 // ---------------------------------------------------------------------------
@@ -3310,7 +2122,6 @@ double int_for_C_gs_tomo_limber(double a, void* params)
   const double b1 = gbias.b1_function(z, nl);
   const double bmag = gbias.b_mag[nl];
 
-  const double WS = W_source(a, ns, hoverh0);
   const double WK = W_kappa(a, fK, ns);
   const double WGAL = W_gal(a, nl, hoverh0);
   const double WMAG = W_mag(a, fK, nl);
@@ -3319,45 +2130,38 @@ double int_for_C_gs_tomo_limber(double a, void* params)
   const double tmp = (l - 1.)*l*(l + 1.)*(l + 2.);            // correction (1812.05995 eqs 74-79)
   const double ell_prefactor2 = (tmp > 0) ? sqrt(tmp)/(ell*ell) : 0.0;
 
-  double res = 0.0;
-  switch(like.IA)
+  double res = WK;
+  if(like.IA != NO_IA)
   {
-    case 0:
+    const double norm = cosmology.Omega_m*nuisance.c1rhocrit_ia/growfac_a;
+    double IA_A = 0.0;
+
+    switch(like.IA)
     {
-      res = WK;
-
-      break;
+      case IA_JOACHIMI:
+      {
+        IA_A = A_IA_Joachimi(a);
+        break;
+      }
+      case IA_REDSHIFT_BINNING:
+      {
+        IA_A = nuisance.A_z[ns];
+        break;
+      }
+      case IA_REDSHIFT_EVOLUTION:
+      {
+        const double x = (1.0/a)/nuisance.oneplusz0_ia;
+        IA_A = nuisance.A_ia*pow(x, nuisance.eta_ia);
+        break;
+      }
+      default:
+      {
+        log_fatal("like.IA = %d not supported", like.IA);
+        exit(1);
+      }
     }
-    case 1:
-    {
-      const double norm = A_IA_Joachimi(a)*cosmology.Omega_m*nuisance.c1rhocrit_ia/growfac_a;
-
-      res = (WK - WS*norm);
-
-      break;
-    }
-    case 3:
-    {
-      const double norm = nuisance.A_z[ns]*cosmology.Omega_m*nuisance.c1rhocrit_ia/growfac_a;
-
-      res = (WK - WS*norm);
-
-      break;
-    }
-    case 4:
-    {
-      const double norm = cosmology.Omega_m*nuisance.c1rhocrit_ia/growfac_a*
-        nuisance.A_ia*pow(1./(a*nuisance.oneplusz0_ia),nuisance.eta_ia);
-
-      res = (WK - WS*norm);
-
-      break;
-    }
-    default:
-    {
-      log_fatal("like.IA = %d not supported", like.IA);
-      exit(1);
-    }
+    const double WS = W_source(a, ns, hoverh0)*IA_A;
+    res -= WS*norm;
   }
 
   if (include_HOD_GX == 1)
@@ -3432,7 +2236,6 @@ double int_for_C_gs_tomo_limber_withb2(double a, void* params)
   const double b3 = b3nl_from_b1(b1);
   const double bmag = gbias.b_mag[nl];
 
-  const double WS = W_source(a, ns, hoverh0);
   const double WK = W_kappa(a, fK, ns);
   const double WGAL = W_gal(a, nl, hoverh0);
   const double WMAG = W_mag(a, fK, nl);
@@ -3441,52 +2244,41 @@ double int_for_C_gs_tomo_limber_withb2(double a, void* params)
   const double tmp = (l - 1.)*l*(l + 1.)*(l + 2.);         // correction (1812.05995 eqs 74-79)
   const double ell_prefactor2 = (tmp > 0) ? sqrt(tmp)/(ell*ell) : 0.0;
   
-  double linear_part;
-  double non_linear_part;
-  switch(like.IA)
+  double linear_part = WK;
+  if(like.IA != NO_IA)
   {
-    case 0:
+    const double norm = cosmology.Omega_m*nuisance.c1rhocrit_ia/growfac_a;
+    double IA_A = 0.0;
+
+    switch(like.IA)
     {
-      linear_part = WK;
-      non_linear_part = WK;
-
-      break;
+      case IA_JOACHIMI:
+      {
+        IA_A = A_IA_Joachimi(a);
+        break;
+      }
+      case IA_REDSHIFT_BINNING:
+      {
+        IA_A = nuisance.A_z[ns];
+        break;
+      }
+      case IA_REDSHIFT_EVOLUTION:
+      {
+        const double x = (1.0/a)/nuisance.oneplusz0_ia;
+        IA_A = nuisance.A_ia*pow(x, nuisance.eta_ia);
+        break;
+      }
+      default:
+      {
+        log_fatal("like.IA = %d not supported", like.IA);
+        exit(1);
+      }
     }
-    case 1:
-    {
-      const double norm = A_IA_Joachimi(a)*cosmology.Omega_m*nuisance.c1rhocrit_ia/growfac_a;
 
-      linear_part = (WK - WS*norm);
-      non_linear_part = (WK - WS*norm);
-
-      break;
-    }
-    case 3:
-    {
-      const double norm = nuisance.A_z[(int)ar[1]]*cosmology.Omega_m*
-        nuisance.c1rhocrit_ia/growfac_a;
-
-      linear_part = (WK - WS*norm);
-      non_linear_part = (WK - WS*norm);
-
-      break;
-    }
-    case 4:
-    {
-      const double norm = cosmology.Omega_m*nuisance.c1rhocrit_ia/growfac_a*
-        nuisance.A_ia*pow(1./(a*nuisance.oneplusz0_ia),nuisance.eta_ia);
-
-      linear_part = (WK - WS*norm);
-      non_linear_part = (WK - WS*norm);
-
-      break;
-    }
-    default:
-    {
-      log_fatal("like.IA = %d not supported", like.IA);
-      exit(1);
-    }
+    const double WS = W_source(a, ns, hoverh0) * IA_A;
+    linear_part -= WS*norm;
   }
+  double non_linear_part = linear_part;
 
   if(include_RSD_GS == 1)
   {
@@ -3505,12 +2297,12 @@ double int_for_C_gs_tomo_limber_withb2(double a, void* params)
     const double a_1 = a_chi(chi_1);
     const double WRSD = W_RSD(ell, a_0, a_1, nl);
 
-    linear_part *= (WGAL*b1 + WMAG*ell_prefactor*bmag) + WRSD;
+    linear_part     *= (WGAL*b1 + WMAG*ell_prefactor*bmag) + WRSD;
     non_linear_part *= WGAL;
   }
   else
   {
-    linear_part *= (WGAL*b1 + WMAG*ell_prefactor*bmag);
+    linear_part     *= (WGAL*b1 + WMAG*ell_prefactor*bmag);
     non_linear_part *= WGAL;
   }
 
@@ -4433,7 +3225,6 @@ double int_for_C_ks_limber(double a, void* params)
   const double k = ell/fK;
   const double PK = use_linear_ps == 1 ? p_lin(k,a) : Pdelta(k,a);
 
-  const double WS1 = W_source(a, ni, hoverh0);
   const double WK1 = W_kappa(a, fK, ni);
   const double WK2 = W_k(a, fK);
 
@@ -4441,42 +3232,39 @@ double int_for_C_ks_limber(double a, void* params)
   const double tmp = (l - 1.)*l*(l + 1.)*(l + 2.);    // prefactor correction (1812.05995 eqs 74-79)
   const double ell_prefactor2 = (tmp > 0) ? sqrt(tmp)/(ell*ell) : 0.0; 
 
-  double res = 0;
-  switch(like.IA)
+  double res = WK1*WK2;
+  if(like.IA != NO_IA)
   {
-    case 0:
-    {
-      res = WK1*WK2;
+    const double norm = cosmology.Omega_m*nuisance.c1rhocrit_ia/growfac_a;
+    double IA_A = 0.0;
 
-      break;
-    }
-    case 1:
+    switch(like.IA)
     {
-      const double norm = A_IA_Joachimi(a)*cosmology.Omega_m*nuisance.c1rhocrit_ia/growfac_a;
-      res = (-WS1*WK2*norm + WK1*WK2);
+      case IA_JOACHIMI:
+      {
+        IA_A = A_IA_Joachimi(a);
+        break;
+      }
+      case IA_REDSHIFT_BINNING:
+      {
+        IA_A = nuisance.A_z[ni];
+        break;
+      }
+      case IA_REDSHIFT_EVOLUTION:
+      {
+        const double x = (1.0/a)/nuisance.oneplusz0_ia;
+        IA_A = nuisance.A_ia*pow(x, nuisance.eta_ia);
+        break;
+      }
+      default:
+      {
+        log_fatal("like.IA = %d not supported", like.IA);
+        exit(1);
+      }
+    }
 
-      break;
-    }
-    case 3:
-    {
-      const double norm = cosmology.Omega_m*nuisance.c1rhocrit_ia/growfac_a;
-      res = (-WS1*WK2*norm + WK1*WK2);
-
-      break;
-    }
-    case 4:
-    {
-      const double norm = (cosmology.Omega_m*nuisance.c1rhocrit_ia/growfac_a)*
-        nuisance.A_ia*pow(1.0/(a*nuisance.oneplusz0_ia), nuisance.eta_ia);
-      res = (-WS1*WK2*norm + WK1*WK2);
-
-      break;
-    }
-    default:
-    {
-      log_fatal("like.IA = %d not supported", like.IA);
-      exit(1);
-    }
+    const double WS1 = W_source(a, ni, hoverh0) * IA_A;
+    res -= WS1*WK2*norm;
   }
 
   return (res*PK*chidchi.dchida/(fK*fK))*ell_prefactor1*ell_prefactor2;
@@ -5012,46 +3800,46 @@ double int_for_C_ys_tomo_limber(double a, void* params)
   
   const double PK = p_my(k, a, use_2h_only);
 
-  const double WS = W_source(a, ni, hoverh0);
-  const double WK = W_kappa(a, fK, ni);
+  const double WK1 = W_kappa(a, fK, ni);
   const double WY = W_y(a);
 
   const double tmp = (l - 1.0)*l*(l + 1.0)*(l + 2.0); // prefactor correction (1812.05995 eqs 74-79)
   const double ell_prefactor2 = (tmp > 0) ? sqrt(tmp)/(ell*ell) : 0.0;
 
-  double res = 0;
-  switch(like.IA)
+  double res = WK1*WY;
+  if(like.IA != NO_IA)
   {
-    case 0:
-    {
-      res = WS*WY;
+    const double norm = cosmology.Omega_m*nuisance.c1rhocrit_ia/growfac_a;
+    double IA_A = 0.0;
 
-      break;
-    }
-    case 1:
+    switch(like.IA)
     {
-      const double norm = A_IA_Joachimi(a)*cosmology.Omega_m*nuisance.c1rhocrit_ia/growfac_a;
-      
-      res = WK*WY - WS*WY*norm;
-      
-      break;
+      case IA_JOACHIMI:
+      {
+        IA_A = A_IA_Joachimi(a);
+        break;
+      }
+      case IA_REDSHIFT_BINNING:
+      {
+        IA_A = nuisance.A_z[ni];
+        break;
+      }
+      case IA_REDSHIFT_EVOLUTION:
+      {
+        const double x = (1.0/a)/nuisance.oneplusz0_ia;
+        IA_A = nuisance.A_ia*pow(x, nuisance.eta_ia);
+        break;
+      }
+      default:
+      {
+        log_fatal("like.IA = %d not supported", like.IA);
+        exit(1);
+      }
     }
-    case 4:
-    {
-      const double norm = (cosmology.Omega_m*nuisance.c1rhocrit_ia/growfac_a)*
-        nuisance.A_ia*pow(1./(a*nuisance.oneplusz0_ia),nuisance.eta_ia);
-      
-      res = WK*WY - WS*WY*norm;
 
-      break;
-    }
-    default:
-    {
-      log_fatal("like.IA = %d not supported", like.IA);
-      exit(1);
-    }
+    const double WS1 = W_source(a, ni, hoverh0) * IA_A;
+    res -= WS1*WY*norm;
   }
-
   return res*PK*(chidchi.dchida/(fK*fK))*ell_prefactor2;
 }
 

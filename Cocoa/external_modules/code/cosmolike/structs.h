@@ -9,6 +9,11 @@ extern "C" {
 #define CHAR_MAX_SIZE 1024
 #define MAX_SIZE_ARRAYS 10
 
+#define NO_IA 0
+#define IA_JOACHIMI 1
+#define IA_REDSHIFT_BINNING 3
+#define IA_REDSHIFT_EVOLUTION 4
+
 typedef struct 
 {
   double a_min;
