@@ -45,11 +45,7 @@ if [ -z "${IGNORE_CMAKE_INSTALLATION}" ]; then
     export CMAKE_MAKE_NUM_THREADS=1
   fi
 
-# --------------------------------------------------------------------------------------
-# --------------------------------------------------------------------------------------
   cd $ROOTDIR/../cocoa_installation_libraries/$COCOA_CMAKE_DIR
-# --------------------------------------------------------------------------------------
-# --------------------------------------------------------------------------------------
 
   env CC=$C_COMPILER CXX=$CPP_COMPILER ./bootstrap \
     --prefix=$ROOTDIR/.local > ${OUTPUT_CMAKE_PACKAGES_1} 2> ${OUTPUT_CMAKE_PACKAGES_2}
