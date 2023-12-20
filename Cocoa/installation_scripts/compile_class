@@ -39,11 +39,8 @@ fi
 # ----------------------------------------------------------------------------
 
 if [ -z "${IGNORE_CLASS_COMPILATION}" ]; then
-  # ---------------------------------------------------------------------------
-  # ---------------------------------------------------------------------------
+
   cd $ROOTDIR/external_modules/code/class_public/
-  # ---------------------------------------------------------------------------
-  # ---------------------------------------------------------------------------
   
   if [ -z "${DEBUG_CLASS_OUTPUT}" ]; then
     export OUTPUT_CLASS_1="/dev/null"
@@ -53,8 +50,6 @@ if [ -z "${IGNORE_CLASS_COMPILATION}" ]; then
     export OUTPUT_CLASS_2="/dev/tty"
   fi
 
-  # ---------------------------------------------------------------------------
-  # ---------------------------------------------------------------------------
   #Workaround Cocoa .gitignore entry on /include
   rm -rf ./include > ${OUTPUT_CLASS_1} 2> ${OUTPUT_CLASS_2}
   cp -r  ./include2 ./include > ${OUTPUT_CLASS_1} 2> ${OUTPUT_CLASS_2}
@@ -80,9 +75,8 @@ if [ -z "${IGNORE_CLASS_COMPILATION}" ]; then
   fi
 
   rm -rf ./build/
+
   cd ../
-  # ---------------------------------------------------------------------------
-  # ---------------------------------------------------------------------------
 
   CC=$C_COMPILER PYTHON=$PYTHON3 make all > ${OUTPUT_CLASS_1} 2> ${OUTPUT_CLASS_2}
   if [ $? -ne 0 ]; then

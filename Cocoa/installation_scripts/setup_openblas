@@ -1,25 +1,30 @@
+# ----------------------------------------------------------------------------
+# ----------------------------------------------------------------------------
+# ----------------------------------------------------------------------------
+echo -e '\033[1;44m''SETUP_OPENBLAS''\033[0m'
+
 if [ -z "${ROOTDIR}" ]; then
-    echo 'ERROR ENV VARIABLE ROOTDIR IS NOT DEFINED' >&2
+    echo -e '\033[0;31m''ERROR ENV VARIABLE ROOTDIR IS NOT DEFINED''\033[0m'
     return 1
 fi
 if [ -z "${CXX_COMPILER}" ]; then
-    echo 'ERROR ENV VARIABLE CXX_COMPILER IS NOT DEFINED' >&2
+    echo -e '\033[0;31m''ERROR ENV VARIABLE CXX_COMPILER IS NOT DEFINED''\033[0m'
+    cd $ROOTDIR
     return 1
 fi
 if [ -z "${C_COMPILER}" ]; then
-    echo 'ERROR ENV VARIABLE C_COMPILER IS NOT DEFINED' >&2
-    return 1
-fi
-if [ -z "${CMAKE}" ]; then
-    echo 'ERROR ENV VARIABLE MAKE IS NOT DEFINED' >&2
+    echo -e '\033[0;31m''ERROR ENV VARIABLE C_COMPILER IS NOT DEFINED''\033[0m'
+    cd $ROOTDIR
     return 1
 fi
 if [ -z "${FORTRAN_COMPILER}" ]; then
-    echo 'ERROR ENV VARIABLE FORTRAN_COMPILER IS NOT DEFINED' >&2
+    echo -e '\033[0;31m''ERROR ENV VARIABLE FORTRAN_COMPILER IS NOT DEFINED''\033[0m'
+    cd $ROOTDIR
     return 1
 fi
 if [ -z "${MAKE_NUM_THREADS}" ]; then
-    echo 'ERROR ENV VARIABLE MAKE_NUM_THREADS IS NOT DEFINED' >&2
+    echo -e '\033[0;31m''ERROR ENV VARIABLE MAKE_NUM_THREADS IS NOT DEFINED''\033[0m'
+    cd $ROOTDIR
     return 1
 fi
 
@@ -78,3 +83,8 @@ if [ -z "${IGNORE_OPENBLAS_INSTALLATION}" ]; then
   cd $ROOTDIR/
   echo -e '\033[1;34m''\e[4mINSTALLING OPENBLAS LIBRARY DONE''\033[0m'
 fi
+
+echo -e '\033[1;44m''\e[4mSETUP_OPENBLAS DONE''\033[0m'
+# ----------------------------------------------------------------------------
+# ----------------------------------------------------------------------------
+# ----------------------------------------------------------------------------

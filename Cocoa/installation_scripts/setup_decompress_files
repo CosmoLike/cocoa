@@ -1,47 +1,69 @@
+# ----------------------------------------------------------------------------
+# ----------------------------------------------------------------------------
+# ----------------------------------------------------------------------------
+echo -e '\033[1;44m''SETUP_DECOMPRESS_FILES''\033[0m'
+
 if [ -z "${ROOTDIR}" ]; then
-    echo 'ERROR ROOTDIR not defined'
+    echo -e '\033[0;31m''ERROR ENV VARIABLE ROOTDIR IS NOT DEFINED''\033[0m'
     return 1
 fi
 if [ -z "${CXX_COMPILER}" ]; then
-    echo 'ERROR CXX_COMPILER not defined'
+    echo -e '\033[0;31m''ERROR ENV VARIABLE CXX_COMPILER IS NOT DEFINED''\033[0m'
+    cd $ROOTDIR
     return 1
 fi
 if [ -z "${C_COMPILER}" ]; then
-    echo 'ERROR C_COMPILER not defined'
+    echo -e '\033[0;31m''ERROR ENV VARIABLE C_COMPILER IS NOT DEFINED''\033[0m'
+    cd $ROOTDIR
     return 1
 fi
 if [ -z "${FORTRAN_COMPILER}" ]; then
-    echo 'ERROR C_COMPILER not defined'
+    echo -e '\033[0;31m''ERROR ENV VARIABLE FORTRAN_COMPILER IS NOT DEFINED''\033[0m'
+    cd $ROOTDIR
     return 1
 fi
 if [ -z "${CMAKE}" ]; then
-    echo 'ERROR CMAKE not defined'
+    echo -e '\033[0;31m''ERROR ENV VARIABLE MAKE IS NOT DEFINED''\033[0m'
     return 1
 fi
+
 # ----------------------------------------------------------------------------
+# ----------------- COCOA_INSTALLATION_LIBRARIES -----------------------------
 # ----------------------------------------------------------------------------
-# ----------------------------- DECOMPRESS FILES -----------------------------
+if [ -z "${NO_UNXZ_COCOA_INSTALLATION_LIBRARIES}" ]; then
+    echo -e '\033[1;34m''DECOMPRESSING FILES ON /COCOA_INSTALLATION_LIBRARIES''\033[0m'
+
+    cd $ROOTDIR/../cocoa_installation_libraries/
+
+    sh unxv_all.sh
+
+    cd $ROOTDIR
+
+    echo -e '\033[1;34m''\e[4mDECOMPRESSING FILES ON /COCOA_INSTALLATION_LIBRARIES DONE''\033[0m'
+fi
 # ----------------------------------------------------------------------------
+# ----------------------- /EXTERNAL_MODULES/CODE -----------------------------
 # ----------------------------------------------------------------------------
-
-echo 'DECOMPRESSING NECESSARY FILES - THAT MIGHT TAKE A WHILE'
-
-cd $ROOTDIR/../cocoa_installation_libraries/
-
-sh unxv_all.sh
-
-cd $ROOTDIR
-
-# files under ./external_modules/code/
 #if [ -z "${NO_UNXZ_EXTERNAL_MODULES_CODE}" ]; then
 #    # no xz files under code so far
 #fi
 
-# files under ./external_modules/data/
+# ----------------------------------------------------------------------------
+# ----------------------- /EXTERNAL_MODULES/DATA -----------------------------
+# ----------------------------------------------------------------------------
 if [ -z "${NO_UNXZ_EXTERNAL_MODULES_DATA}" ]; then
+    echo -e '\033[1;34m''DECOMPRESSING FILES ON /EXTERNAL_MODULES/DATA''\033[0m'
+
     cd $ROOTDIR/external_modules/data/
 
     sh unxv_all.sh
 
     cd $ROOTDIR
+
+    echo -e '\033[1;34m''\e[4mDECOMPRESSING FILES ON /EXTERNAL_MODULES/DATA DONE''\033[0m'
 fi
+
+echo -e '\033[1;44m''\e[4mSETUP_DECOMPRESS_FILES DONE''\033[0m'
+# ----------------------------------------------------------------------------
+# ----------------------------------------------------------------------------
+# ----------------------------------------------------------------------------

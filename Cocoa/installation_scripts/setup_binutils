@@ -1,27 +1,30 @@
+# ----------------------------------------------------------------------------
+# ----------------------------------------------------------------------------
+# ----------------------------------------------------------------------------
 echo -e '\033[1;44m''SETUP_BINUTILS''\033[0m'
 
 if [ -z "${ROOTDIR}" ]; then
-    echo 'ERROR ENV VARIABLE ROOTDIR IS NOT DEFINED' >&2
+    echo -e '\033[0;31m''ERROR ENV VARIABLE ROOTDIR IS NOT DEFINED''\033[0m'
     return 1
 fi
 if [ -z "${CXX_COMPILER}" ]; then
-    echo 'ERROR ENV VARIABLE CXX_COMPILER IS NOT DEFINED' >&2
+    echo -e '\033[0;31m''ERROR ENV VARIABLE CXX_COMPILER IS NOT DEFINED''\033[0m'
+    cd $ROOTDIR
     return 1
 fi
 if [ -z "${C_COMPILER}" ]; then
-    echo 'ERROR ENV VARIABLE C_COMPILER IS NOT DEFINED' >&2
-    return 1
-fi
-if [ -z "${CMAKE}" ]; then
-    echo 'ERROR ENV VARIABLE MAKE IS NOT DEFINED' >&2
+    echo -e '\033[0;31m''ERROR ENV VARIABLE C_COMPILER IS NOT DEFINED''\033[0m'
+    cd $ROOTDIR
     return 1
 fi
 if [ -z "${FORTRAN_COMPILER}" ]; then
-    echo 'ERROR ENV VARIABLE C_COMPILER IS NOT DEFINED' >&2
+    echo -e '\033[0;31m''ERROR ENV VARIABLE FORTRAN_COMPILER IS NOT DEFINED''\033[0m'
+    cd $ROOTDIR
     return 1
 fi
 if [ -z "${MAKE_NUM_THREADS}" ]; then
-    echo 'ERROR ENV VARIABLE MAKE_NUM_THREADS IS NOT DEFINED' >&2
+    echo -e '\033[0;31m''ERROR ENV VARIABLE MAKE_NUM_THREADS IS NOT DEFINED''\033[0m'
+    cd $ROOTDIR
     return 1
 fi
 
@@ -42,11 +45,7 @@ fi
 if [ -z "${IGNORE_DISTUTILS_INSTALLATION}" ]; then
   echo -e '\033[1;34m''INSTALLING TEXINFO LIBRARY - \e[4mIT WILL TAKE A WHILE''\033[0m'
 
-# --------------------------------------------------------------------------------------
-# --------------------------------------------------------------------------------------
   cd $ROOTDIR/../cocoa_installation_libraries/$COCOA_TEXINFO_DIR
-# --------------------------------------------------------------------------------------
-# --------------------------------------------------------------------------------------
 
   FC=$FORTRAN_COMPILER CC=$C_COMPILER ./configure --prefix=$ROOTDIR/.local \
     --disable-perl-xs > ${OUTPUT_DISTUTILS_PACKAGES_1} 2> ${OUTPUT_DISTUTILS_PACKAGES_2}
@@ -87,14 +86,11 @@ fi
 if [ -z "${IGNORE_DISTUTILS_INSTALLATION}" ]; then
   echo -e '\033[1;34m''INSTALLING BINUTILS LIBRARY - \e[4mIT WILL TAKE A WHILE''\033[0m'
 
-# --------------------------------------------------------------------------------------
-# --------------------------------------------------------------------------------------
   cd $ROOTDIR/../cocoa_installation_libraries/$COCOA_BINUTILS_DIR
-# --------------------------------------------------------------------------------------
-# --------------------------------------------------------------------------------------
 
   FC=$FORTRAN_COMPILER CC=$C_COMPILER ./configure \
-    --prefix=$ROOTDIR/.local > ${OUTPUT_DISTUTILS_PACKAGES_1} 2> ${OUTPUT_DISTUTILS_PACKAGES_2}
+    --prefix=$ROOTDIR/.local \
+    > ${OUTPUT_DISTUTILS_PACKAGES_1} 2> ${OUTPUT_DISTUTILS_PACKAGES_2}
   if [ $? -eq 0 ]; then
     echo -e '\033[0;32m'"BINUTILS RUN \e[3mCONFIGURE\e[0m\e\033[0;32m DONE"'\033[0m'
   else
@@ -103,7 +99,8 @@ if [ -z "${IGNORE_DISTUTILS_INSTALLATION}" ]; then
     return 1
   fi
 
-  make -j $DISTUTILS_MAKE_NUM_THREADS > ${OUTPUT_DISTUTILS_PACKAGES_1} 2> ${OUTPUT_DISTUTILS_PACKAGES_2}
+  make -j $DISTUTILS_MAKE_NUM_THREADS \
+    > ${OUTPUT_DISTUTILS_PACKAGES_1} 2> ${OUTPUT_DISTUTILS_PACKAGES_2}
   if [ $? -eq 0 ]; then
     echo -e '\033[0;32m'"BINUTILS RUN \e[3mMAKE\e[0m\e\033[0;32m DONE"'\033[0m'
   else

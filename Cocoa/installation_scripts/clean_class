@@ -1,18 +1,17 @@
-if [ -z "${ROOTDIR}" ]; then
-    echo 'ERROR ROOTDIR not define'
-    return
-fi
-if [ -z "${PYTHON3}" ]; then
-    echo 'ERROR PYTHON3 not define'
-    return
-fi
-
 # ----------------------------------------------------------------------------
-# ----------------------------------------------------------------------------
-# ------------------------------- REMOVE CLASS -------------------------------
 # ----------------------------------------------------------------------------
 # ----------------------------------------------------------------------------
 echo -e '\033[1;34m''CLEANING CLASS''\033[0m'
+
+if [ -z "${ROOTDIR}" ]; then
+    echo -e '\033[0;31m''ERROR ENV VARIABLE ROOTDIR IS NOT DEFINED''\033[0m'
+    return 1
+fi
+if [ -z "${PYTHON3}" ]; then
+    echo -e '\033[0;31m''ERROR ENV VARIABLE PYTHON3 IS NOT DEFINED''\033[0m'
+    cd $ROOTDIR
+    return 1
+fi
 
 if [ -z "${DEBUG_CLASS_OUTPUT}" ]; then
 export OUTPUT_CLASS_1="/dev/null"
@@ -24,7 +23,11 @@ fi
 
 rm $ROOTDIR/.local/lib/python$PYTHON_VERSION/site-packages/classy*
 
+# ---------------------------------------------------------------------------
+# ---------------------------------------------------------------------------
 cd $ROOTDIR/external_modules/code/class_public/
+# ---------------------------------------------------------------------------
+# ---------------------------------------------------------------------------
 
 make clean > ${OUTPUT_CLASS_1} 2> ${OUTPUT_CLASS_2}
 if [ $? -ne 0 ]; then
@@ -48,3 +51,6 @@ rm -rf $ROOTDIR/external_modules/code/class_public/python/classy.egg-info
 
 cd $ROOTDIR
 echo -e '\033[1;34m''\e[4mCLEANING CLASS DONE''\033[0m'
+# ----------------------------------------------------------------------------
+# ----------------------------------------------------------------------------
+# ----------------------------------------------------------------------------

@@ -1,27 +1,34 @@
+# ----------------------------------------------------------------------------
+# ----------------------------------------------------------------------------
+# ----------------------------------------------------------------------------
 echo -e '\033[1;44m''SETUP_HDF5''\033[0m'
 
 if [ -z "${ROOTDIR}" ]; then
-    echo 'ERROR ENV VARIABLE ROOTDIR IS NOT DEFINED' >&2
+    echo -e '\033[0;31m''ERROR ENV VARIABLE ROOTDIR IS NOT DEFINED''\033[0m'
     return 1
 fi
 if [ -z "${CXX_COMPILER}" ]; then
-    echo 'ERROR ENV VARIABLE CXX_COMPILER IS NOT DEFINED' >&2
+    echo -e '\033[0;31m''ERROR ENV VARIABLE CXX_COMPILER IS NOT DEFINED''\033[0m'
+    cd $ROOTDIR
     return 1
 fi
 if [ -z "${C_COMPILER}" ]; then
-    echo 'ERROR ENV VARIABLE C_COMPILER IS NOT DEFINED' >&2
-    return 1
-fi
-if [ -z "${CMAKE}" ]; then
-    echo 'ERROR ENV VARIABLE MAKE IS NOT DEFINED' >&2
+    echo -e '\033[0;31m''ERROR ENV VARIABLE C_COMPILER IS NOT DEFINED''\033[0m'
+    cd $ROOTDIR
     return 1
 fi
 if [ -z "${FORTRAN_COMPILER}" ]; then
-    echo 'ERROR ENV VARIABLE FORTRAN_COMPILER IS NOT DEFINED' >&2
+    echo -e '\033[0;31m''ERROR ENV VARIABLE FORTRAN_COMPILER IS NOT DEFINED''\033[0m'
+    cd $ROOTDIR
     return 1
 fi
 if [ -z "${MAKE_NUM_THREADS}" ]; then
-    echo 'ERROR ENV VARIABLE MAKE_NUM_THREADS IS NOT DEFINED' >&2
+    echo -e '\033[0;31m''ERROR ENV VARIABLE MAKE_NUM_THREADS IS NOT DEFINED''\033[0m'
+    cd $ROOTDIR
+    return 1
+fi
+if [ -z "${CMAKE}" ]; then
+    echo -e '\033[0;31m''ERROR ENV VARIABLE MAKE IS NOT DEFINED''\033[0m'
     return 1
 fi
 
@@ -41,16 +48,12 @@ if [ -z "${IGNORE_HDF5_INSTALLATION}" ]; then
     export HDF5_MAKE_NUM_THREADS=1
   fi
 
-# --------------------------------------------------------------------------------------
-# --------------------------------------------------------------------------------------
   cd $ROOTDIR/../cocoa_installation_libraries/$COCOA_HDF5_DIR2
   rm -f  CMakeCache.txt
   rm -rf CMakeFiles/
   rm -rf cocoa_HDF5_build/
   mkdir cocoa_HDF5_build
   cd cocoa_HDF5_build
-# --------------------------------------------------------------------------------------
-# --------------------------------------------------------------------------------------
 
   $CMAKE -DBUILD_SHARED_LIBS=TRUE -DCMAKE_INSTALL_PREFIX=$ROOTDIR/.local \
     -DCMAKE_C_COMPILER=$C_COMPILER -DCMAKE_CXX_COMPILER=$CXX_COMPILER \
@@ -87,6 +90,6 @@ if [ -z "${IGNORE_HDF5_INSTALLATION}" ]; then
 fi
 
 echo -e '\033[1;44m''\e[4mSETUP_HDF5 DONE''\033[0m'
-# --------------------------------------------------------------------------------------
-# --------------------------------------------------------------------------------------
-# --------------------------------------------------------------------------------------
+# ----------------------------------------------------------------------------
+# ----------------------------------------------------------------------------
+# ----------------------------------------------------------------------------
