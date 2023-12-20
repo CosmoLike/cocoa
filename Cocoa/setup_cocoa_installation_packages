@@ -1,3 +1,8 @@
+# ----------------------------------------------------------------------------
+# ----------------------------------------------------------------------------
+# ----------------------------------------------------------------------------
+echo -e '\033[1;45m''SETUP COCOA INSTALLATION PACKAGES''\033[0m'
+
 if [ -n "${ROOTDIR}" ]; then
     source stop_cocoa
 fi
@@ -145,7 +150,7 @@ fi
 # BASIC TEST IF A CONDA ENV IS ACTIVATED
 if [ -n "${MINICONDA_INSTALLATION}" ]; then
   if [ -z ${CONDA_PREFIX} ]; then
-    echo "MINICONDA_INSTALLATION SET BUT CONDA ENVIRONMENT NOT ACTIVATED"
+    echo -e '\033[0;31m'"MINICONDA_INSTALLATION SET BUT CONDA ENVIRONMENT NOT ACTIVATED"'\033[0m'
     source stop_cocoa
     return 1
   fi
@@ -217,23 +222,25 @@ export NUMPY_HEADERS=$ROOTDIR/.local/lib/python$PYTHON_VERSION/site-packages/num
 
 source ./installation_scripts/setup_xz
 if [ $? -ne 0 ]; then
-  echo "FAILED setup_xz SCRIPT" >&2
+  echo  -e '\033[0;31m'"SCRIPT setup_xz FAILED"'\033[0m'
   cd $ROOTDIR
+  source stop_cocoa
   return 1
 fi
 
 if [ -z "${DEBUG_SKIP_FILE_DECOMPRESSION_SETUP_COCOA}" ]; then
   source ./installation_scripts/setup_decompress_files
   if [ $? -ne 0 ]; then
-    echo "FAILED setup_decompress_files SCRIPT" >&2
+    echo  -e '\033[0;31m'"SCRIPT setup_decompress_files FAILED"'\033[0m'
     cd $ROOTDIR
+    source stop_cocoa
     return 1
   fi
 fi
 
 source ./installation_scripts/setup_cmake
 if [ $? -ne 0 ]; then
-  echo "FAILED setup_cmake SCRIPT" >&2
+  echo -e '\033[0;31m'"SCRIPT setup_cmake FAILED"'\033[0m'
   cd $ROOTDIR
   source stop_cocoa
   return 1
@@ -241,14 +248,15 @@ fi
 
 source ./installation_scripts/setup_binutils
 if [ $? -ne 0 ]; then
-  echo "FAILED setup_binutils SCRIPT" >&2
+  echo -e '\033[0;31m'"SCRIPT setup_binutils FAILED"'\033[0m'
   cd $ROOTDIR
+  source stop_cocoa
   return 1
 fi
 
 source ./installation_scripts/setup_hdf5
 if [ $? -ne 0 ]; then
-  echo "FAILED setup_hdf5 SCRIPT" >&2
+  echo -e '\033[0;31m'"SCRIPT setup_hdf5 FAILED"'\033[0m'
   cd $ROOTDIR
   source stop_cocoa
   return 1
@@ -256,14 +264,14 @@ fi
 
 source ./installation_scripts/setup_openblas
 if [ $? -ne 0 ]; then
-echo "FAILED setup_openblas SCRIPT" >&2
+echo -e '\033[0;31m'"SCRIPT setup_openblas FAILED"'\033[0m'
 cd $ROOTDIR
 return 1
 fi
 
 source ./installation_scripts/setup_pip_packages
 if [ $? -ne 0 ]; then
-  echo "FAILED setup_pip_packages SCRIPT" >&2
+  echo -e '\033[0;31m'"SCRIPT setup_pip_packages FAILED"'\033[0m'
   cd $ROOTDIR
   source stop_cocoa
   return 1
@@ -271,14 +279,15 @@ fi
 
 source ./installation_scripts/setup_fortran_packages
 if [ $? -ne 0 ]; then
-  echo "FAILED setup_fortran_packages SCRIPT" >&2
+  echo -e '\033[0;31m'"SCRIPT setup_fortran_packages FAILED"'\033[0m'
   cd $ROOTDIR
+  source stop_cocoa
   return 1
 fi
 
 source ./installation_scripts/setup_cpp_packages
 if [ $? -ne 0 ]; then
-  echo "FAILED setup_cpp_packages SCRIPT" >&2
+  echo -e '\033[0;31m'"SCRIPT setup_cpp_packages FAILED"'\033[0m'
   cd $ROOTDIR
   source stop_cocoa
   return 1
@@ -286,12 +295,16 @@ fi
 
 source ./installation_scripts/setup_c_packages
 if [ $? -ne 0 ]; then
-  echo "FAILED setup_c_packages SCRIPT" >&2
+  echo -e '\033[0;31m'"SCRIPT setup_c_packages FAILED"'\033[0m'
   cd $ROOTDIR
   source stop_cocoa
   return 1
 fi
 
+# ----------------------------------------------------------------------------
+# ----------------------------------------------------------------------------
 source stop_cocoa
-echo 'SETUP COCOA INSTALLATION PACKAGES - DONE'
-
+echo -e '\033[1;45m''\e[4mSETUP COCOA INSTALLATION PACKAGES DONE''\033[0m'
+# ----------------------------------------------------------------------------
+# ----------------------------------------------------------------------------
+# ----------------------------------------------------------------------------
