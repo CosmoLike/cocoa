@@ -3,6 +3,7 @@ if [ -n "${ROOTDIR}" ]; then
 fi
 
 source start_cocoa
+echo -e '\033[1;44m''COMPILING EXTERNAL MODULES''\033[0m'
 
 # ----------------------------------------------------------------------------
 # ----------------------------------------------------------------------------
@@ -24,6 +25,7 @@ if [ -z "${IGNORE_ALL_PIP_INSTALLATION}" ]; then
         --no-index > ${OUTPUT_PIP_1} 2> ${OUTPUT_PIP_2}
     if [ $? -ne 0 ]; then
       echo "PROBLEM PIP INSTALL COBAYA" >&2
+      cd $ROOTDIR
       return 1
     else
       echo "PIP INSTALL COBAYA DONE"
@@ -32,6 +34,7 @@ else
     $PIP3 install --editable cobaya --prefix=$ROOTDIR/.local > ${OUTPUT_PIP_1} 2> ${OUTPUT_PIP_2}
     if [ $? -ne 0 ]; then
       echo "PROBLEM PIP INSTALL COBAYA" >&2
+      cd $ROOTDIR
       return 1
     else
       echo "PIP INSTALL COBAYA DONE"
@@ -61,5 +64,4 @@ source $ROOTDIR/installation_scripts/compile_act
 # ----------------------------------------------------------------------------
 
 source stop_cocoa
-
-echo 'COMPILE EXTERNAL MODULES DONE'
+echo -e '\033[1;44m''\e[4mCOMPILING EXTERNAL MODULES DONE''\033[0m'

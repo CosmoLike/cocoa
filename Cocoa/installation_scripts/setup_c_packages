@@ -30,6 +30,7 @@ fi
 # --------------------------------------------------------------------------------------
 # --------------------------------------------------------------------------------------
 # --------------------------------------------------------------------------------------
+echo -e '\033[1;44m''SETUP_C_PACKAGES''\033[0m'
 
 if [ -z "${DEBUG_C_PACKAGES}" ]; then
   export OUTPUT_CPACKAGES_1="/dev/null"
@@ -196,6 +197,8 @@ else
   export OUTPUT_PIP_2="/dev/tty"
 fi
 
+echo -e '\033[1;34m''INSTALLING EUCLIDEMU2''\033[0m'
+
 # WE MIGRATED euclidemu2 TO setup_c_packages SCRIPT BECAUSE IT DEPENDS ON GSL-GNU LIB
 env CXX=$CXX_COMPILER CC=$C_COMPILER  $PIP3 install --global-option=build_ext \
   $ROOTDIR/../cocoa_installation_libraries/euclidemu2-1.2.0 --no-dependencies \
@@ -208,6 +211,9 @@ else
   echo -e '\033[0;32m'"PIP RUN \e[3mPIP INSTALL EUCLUDEMUL\e[0m\e\033[0;32m DONE"'\033[0m'
 fi
 
+echo -e '\033[1;34m''\e[4mINSTALLING EUCLIDEMU2 DONE''\033[0m'
+
+echo -e '\033[1;44m''\e[4mSETUP_C_PACKAGES DONE''\033[0m'
 # --------------------------------------------------------------------------------------
 # --------------------------------------------------------------------------------------
 # --------------------------------------------------------------------------------------
