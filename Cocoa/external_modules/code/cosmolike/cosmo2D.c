@@ -1331,44 +1331,19 @@ double w_ks_tomo(const int nt, const int ni, const int limber)
 // SS ANGULAR CORRELATION FUNCTION - TATT
 // -----------------------------------------------------------------------------
 
-// NLA/TA amplitude C1, nz argument only need if per-bin amplitude
-double C1_TA(double a, double nz, double growfac_a)
+double C1_TA(const double a, const double growfac_a, const int nz)
 {
-  // per-bin IA parameters
-  if (like.IA == 3 || like.IA == 5)
-  {
-    return -nuisance.A_z[(int)nz]*cosmology.Omega_m*nuisance.c1rhocrit_ia/ growfac_a;
-  }
-  // power law evolution
-  return -cosmology.Omega_m * nuisance.c1rhocrit_ia /
-         growfac_a * nuisance.A_ia *
-         pow(1. / (a * nuisance.oneplusz0_ia), nuisance.eta_ia);
+  return -1.0 * IA_A1_Z1(a, growfac_a, nz);
 }
 
-// TA source bias parameter, nz argument only need if per-bin amplitude
-double b_TA(double a __attribute__((unused)), double nz)
+double C2_TT(const double a, const double growfac_a, const int nz)
 {
-  // per-bin IA parameters
-  if (like.IA == 5) {
-    return nuisance.b_ta_z[(int)nz];
-  }
-  // power law evolution
-  return nuisance.b_ta_z[0];
+  return 5.0 * IA_A2_Z1(a, growfac_a, nz);
 }
 
-// TT amplitude C2, nz argument only need if per-bin amplitude
-double C2_TT(double a, double nz, double growfac_a)
+double b_TA(const double a, const double growfac_a, const int nz)
 {
-  // per-bin IA parameters
-  if (like.IA == 5)
-  {
-    return 5. * nuisance.A2_z[(int)nz] * cosmology.Omega_m *
-           nuisance.c1rhocrit_ia * pow(1.0/growfac_a, 2.0);
-  }
-  // power law evolution
-  return 5. * nuisance.A2_ia * cosmology.Omega_m * nuisance.c1rhocrit_ia *
-         (1.0 /(growfac_a*growfac_a)) *
-         pow(1. / (a * nuisance.oneplusz0_ia), nuisance.eta_ia_tt);
+  return IA_BTA_Z1(a, growfac_a, nz);
 }
 
 double int_for_C_ss_tomo_TATT_EE_limber(double a, void* params)
@@ -1397,22 +1372,26 @@ double int_for_C_ss_tomo_TATT_EE_limber(double a, void* params)
 
   const double ws1 = W_source(a, n1, hoverh0); // radial n_z weight for first source bin
   const double ws2 = W_source(a, n2, hoverh0); // radial n_z weight for second source bin
-  const double wk1 = W_kappa(a, fK, n1); // radial lens efficiency for first source bin
-  const double wk2 = W_kappa(a, fK, n2); // radial lens efficiency for second source bin
+  const double wk1 = W_kappa(a, fK, n1);       // radial lens efficiency for first source bin
+  const double wk2 = W_kappa(a, fK, n2);       // radial lens efficiency for second source bin
 
-  const double C1 = C1_TA(a, n1, growfac_a);   // IA parameters for first source bin
-  const double b_ta = b_TA(a, n1);             // IA parameters for first source bin
-  const double C2 = C2_TT(a, n1, growfac_a);   // IA parameters for first source bin
+  const double C1_1   = C1_TA(a, growfac_a, n1);  // IA params for 1st source bin
+  const double b_ta_1 = b_TA(a, growfac_a, n1);   // IA params for 1st source bin
+  const double C2_1   = C2_TT(a, growfac_a, n1);  // IA params for 1st source bin
 
-  const double C1_2 = C1_TA(a, n2, growfac_a);  // IA parameters for second source bin
-  const double b_ta_2 = b_TA(a, n2);            // IA parameters for second source bin
-  const double C2_2 = C2_TT(a, n2, growfac_a);  // IA parameters for second source bin
+  const double C1_2   = C1_TA(a, growfac_a, n2);  // IA params for 2nd source bin
+  const double b_ta_2 = b_TA(a, growfac_a, n2);   // IA params for 2nd source bin
+  const double C2_2   = C2_TT(a, growfac_a, n2);  // IA params for 2nd source bin
   
-  const double tmp1 = TATT_II_EE(k, a, C1, C2, b_ta, C1_2, C2_2, b_ta_2, growfac_a, PK);
-  const double tmp2 = TATT_GI_E(k, a, C1, C2, b_ta, growfac_a, PK);
+  const double tmp1 = TATT_II_EE(k, a, C1_1, C2_1, b_ta_1, C1_2, C2_2, b_ta_2, growfac_a, PK);
+  const double tmp2 = TATT_GI_E(k, a, C1_1, C2_1, b_ta_1, growfac_a, PK);
   const double tmp3 = TATT_GI_E(k, a, C1_2, C2_2, b_ta_2, growfac_a, PK);
   
-  const double res = wk1 * wk2 * PK + ws1 * ws2 * tmp1 + ws1 * wk2 * tmp2 + ws2 * wk1 * tmp3;
+  const double res = wk1 * wk2 * PK   + 
+                     ws1 * ws2 * tmp1 + 
+                     ws1 * wk2 * tmp2 + 
+                     ws2 * wk1 * tmp3;
+
   return res * chidchi.dchida / (fK * fK);
 }
 
@@ -1439,15 +1418,15 @@ double int_for_C_ss_tomo_TATT_BB_limber(double a, void* params)
   const double fK = f_K(chidchi.chi);
   const double k = ell / fK;
 
-  const double ws_1 = W_source(a, n1, hoverh0);  // radial n_z weight for first source bin 
-  const double C1_1 = C1_TA(a, n1, growfac_a);   // IA parameters for first source bin
-  const double b_ta_1 = b_TA(a, n1);             // IA parameters for first source bin
-  const double C2_1 = C2_TT(a, n1, growfac_a);   // IA parameters for first source bin
+  const double ws_1 = W_source(a, n1, hoverh0);   // radial n_z weight for first source bin 
+  const double C1_1   = C1_TA(a, growfac_a, n1);  // IA params for 1st source bin
+  const double b_ta_1 = b_TA(a, growfac_a, n1);   // IA params for 1st source bin
+  const double C2_1   = C2_TT(a, growfac_a, n1);  // IA params for 1st source bin
 
-  const double ws_2 = W_source(a, n2, hoverh0); // radial n_z weight for second source bin
-  const double C1_2 = C1_TA(a, n2, growfac_a);  // IA parameters for second source bin
-  const double b_ta_2 = b_TA(a, n2);            // IA parameters for second source bin
-  const double C2_2 = C2_TT(a, n2, growfac_a);  // IA parameters for second source bin
+  const double ws_2 = W_source(a, n2, hoverh0);   // radial n_z weight for second source bin
+  const double C1_2   = C1_TA(a, growfac_a, n2);  // IA params for 2nd source bin
+  const double b_ta_2 = b_TA(a, growfac_a, n2);   // IA params for 2nd source bin
+  const double C2_2   = C2_TT(a, growfac_a, n2);  // IA params for 2nd source bin
 
   const double tmp1 = TATT_II_BB(k, a, C1_1, C2_1, b_ta_1, C1_2, C2_2, b_ta_2, growfac_a);
   return (ws_1 * ws_2 * tmp1) * chidchi.dchida / (fK * fK);
@@ -1848,53 +1827,22 @@ double int_for_C_ss_tomo_limber(double a, void* params)
   const double fK = f_K(chidchi.chi);
   const double k = ell/fK;
  
-  const double wk1 = W_kappa(a, fK, n1);
-  const double wk2 = W_kappa(a, fK, n2);
+  const double WK1 = W_kappa(a, fK, n1);
+  const double WK2 = W_kappa(a, fK, n2);
   const double PK = (use_linear_ps == 1) ? p_lin(k,a) : Pdelta(k,a);
   
   const double ell4 = ell*ell*ell*ell; // correction (1812.05995 eqs 74-79)
   const double ell_prefactor = l*(l - 1.)*(l + 1.)*(l + 2.)/ell4; 
 
-  double res = wk1*wk2;
+  double IA_A1[2];
+  IA_A1_Z1Z2(a, growfac_a, n1, n2, IA_A1);
+  const double A_Z1 = IA_A1[0];
+  const double A_Z2 = IA_A1[1];
+  const double WS1  = W_source(a, n1, hoverh0) * A_Z1;
+  const double WS2  = W_source(a, n2, hoverh0) * A_Z2; 
 
-  if(like.IA != NO_IA)
-  {
-    const double norm = cosmology.Omega_m*nuisance.c1rhocrit_ia/growfac_a;
-    double IA_A1 = 0.0;
-    double IA_A2 = 0.0;
-    
-    switch(like.IA)
-    {
-      case IA_JOACHIMI:
-      {
-        IA_A1 = A_IA_Joachimi(a);
-        IA_A2 = IA_A1;
-        break;
-      }
-      case IA_REDSHIFT_BINNING:
-      { 
-        IA_A1 = nuisance.A_z[n1];
-        IA_A2 = nuisance.A_z[n2];
-        break;
-      }
-      case IA_REDSHIFT_EVOLUTION:
-      {
-        const double x = (1.0/a)/nuisance.oneplusz0_ia;
-        IA_A1 = nuisance.A_ia*pow(x, nuisance.eta_ia);
-        IA_A2 = IA_A1;
-        break;
-      }
-      default:
-      {
-        log_fatal("like.IA = %d not supported", like.IA);
-        exit(1);
-      }
-    }
+  const double res = (WK1 - WS1) * (WK2 - WS2);
 
-    const double ws1 = W_source(a, n1, hoverh0) * IA_A1;
-    const double ws2 = W_source(a, n2, hoverh0) * IA_A2; 
-    res += ws1*ws2*norm*norm - (ws1*wk2 + ws2*wk1)*norm;
-  }
   return res*PK*(chidchi.dchida/(fK*fK))*ell_prefactor;
 }
 
@@ -2080,10 +2028,10 @@ double int_for_C_gs_tomo_limber_TATT(double a, void* params)
   const double tmp1 = 0.5*g4*(b2 * PT_d1d2(k) + bs2 * PT_d1s2(k) + b3 * PT_d1d3(k));
   const double PK1loop = (WGAL*b2 != 0) ? tmp1 : 0.0; 
 
-  const double C1 = C1_TA(a, ns, growfac_a);
-  const double b_ta = b_TA(a, ns);
-  const double C2 = C2_TT(a, ns, growfac_a);
-  const double GIE = TATT_GI_E(k, a, C1, C2, b_ta, growfac_a, PK);
+  const double C1_ZS   = C1_TA(a, growfac_a, ns);
+  const double b_ta_zs = b_TA(a, growfac_a, ns);
+  const double C2_ZS   = C2_TT(a, growfac_a, ns);
+  const double GIE  = TATT_GI_E(k, a, C1_ZS, C2_ZS, b_ta_zs, growfac_a, PK);
 
   const double res = WK*(WMAG*bmag*PK + WGAL*(b1*PK + PK1loop)) + (WGAL*b1 + WMAG*bmag)*WS*GIE;
   return res*chidchi.dchida/(fK*fK);
@@ -2130,39 +2078,10 @@ double int_for_C_gs_tomo_limber(double a, void* params)
   const double tmp = (l - 1.)*l*(l + 1.)*(l + 2.);            // correction (1812.05995 eqs 74-79)
   const double ell_prefactor2 = (tmp > 0) ? sqrt(tmp)/(ell*ell) : 0.0;
 
-  double res = WK;
-  if(like.IA != NO_IA)
-  {
-    const double norm = cosmology.Omega_m*nuisance.c1rhocrit_ia/growfac_a;
-    double IA_A = 0.0;
-
-    switch(like.IA)
-    {
-      case IA_JOACHIMI:
-      {
-        IA_A = A_IA_Joachimi(a);
-        break;
-      }
-      case IA_REDSHIFT_BINNING:
-      {
-        IA_A = nuisance.A_z[ns];
-        break;
-      }
-      case IA_REDSHIFT_EVOLUTION:
-      {
-        const double x = (1.0/a)/nuisance.oneplusz0_ia;
-        IA_A = nuisance.A_ia*pow(x, nuisance.eta_ia);
-        break;
-      }
-      default:
-      {
-        log_fatal("like.IA = %d not supported", like.IA);
-        exit(1);
-      }
-    }
-    const double WS = W_source(a, ns, hoverh0)*IA_A;
-    res -= WS*norm;
-  }
+  const double A_ZS = IA_A1_Z1(a, growfac_a, ns);
+  const double WS   = W_source(a, ns, hoverh0)*A_ZS;
+  
+  double res = WK - WS;
 
   if (include_HOD_GX == 1)
   {
@@ -2244,42 +2163,13 @@ double int_for_C_gs_tomo_limber_withb2(double a, void* params)
   const double tmp = (l - 1.)*l*(l + 1.)*(l + 2.);         // correction (1812.05995 eqs 74-79)
   const double ell_prefactor2 = (tmp > 0) ? sqrt(tmp)/(ell*ell) : 0.0;
   
-  double linear_part = WK;
-  if(like.IA != NO_IA)
-  {
-    const double norm = cosmology.Omega_m*nuisance.c1rhocrit_ia/growfac_a;
-    double IA_A = 0.0;
-
-    switch(like.IA)
-    {
-      case IA_JOACHIMI:
-      {
-        IA_A = A_IA_Joachimi(a);
-        break;
-      }
-      case IA_REDSHIFT_BINNING:
-      {
-        IA_A = nuisance.A_z[ns];
-        break;
-      }
-      case IA_REDSHIFT_EVOLUTION:
-      {
-        const double x = (1.0/a)/nuisance.oneplusz0_ia;
-        IA_A = nuisance.A_ia*pow(x, nuisance.eta_ia);
-        break;
-      }
-      default:
-      {
-        log_fatal("like.IA = %d not supported", like.IA);
-        exit(1);
-      }
-    }
-
-    const double WS = W_source(a, ns, hoverh0) * IA_A;
-    linear_part -= WS*norm;
-  }
+  
+  const double A_ZS = IA_A1_Z1(a, growfac_a, ns);
+  const double WS   = W_source(a, ns, hoverh0) * A_ZS;
+  
+  double linear_part = WK - WS;
   double non_linear_part = linear_part;
-
+  
   if(include_RSD_GS == 1)
   {
     static double chi_a_min = 0;
@@ -3232,40 +3122,10 @@ double int_for_C_ks_limber(double a, void* params)
   const double tmp = (l - 1.)*l*(l + 1.)*(l + 2.);    // prefactor correction (1812.05995 eqs 74-79)
   const double ell_prefactor2 = (tmp > 0) ? sqrt(tmp)/(ell*ell) : 0.0; 
 
-  double res = WK1*WK2;
-  if(like.IA != NO_IA)
-  {
-    const double norm = cosmology.Omega_m*nuisance.c1rhocrit_ia/growfac_a;
-    double IA_A = 0.0;
+  const double A_Z1 = IA_A1_Z1(a, growfac_a, ni);
+  const double WS1  = W_source(a, ni, hoverh0) * A_Z1;
 
-    switch(like.IA)
-    {
-      case IA_JOACHIMI:
-      {
-        IA_A = A_IA_Joachimi(a);
-        break;
-      }
-      case IA_REDSHIFT_BINNING:
-      {
-        IA_A = nuisance.A_z[ni];
-        break;
-      }
-      case IA_REDSHIFT_EVOLUTION:
-      {
-        const double x = (1.0/a)/nuisance.oneplusz0_ia;
-        IA_A = nuisance.A_ia*pow(x, nuisance.eta_ia);
-        break;
-      }
-      default:
-      {
-        log_fatal("like.IA = %d not supported", like.IA);
-        exit(1);
-      }
-    }
-
-    const double WS1 = W_source(a, ni, hoverh0) * IA_A;
-    res -= WS1*WK2*norm;
-  }
+  const double res = (WK1 - WS1)*WK2;
 
   return (res*PK*chidchi.dchida/(fK*fK))*ell_prefactor1*ell_prefactor2;
 }
@@ -3806,40 +3666,11 @@ double int_for_C_ys_tomo_limber(double a, void* params)
   const double tmp = (l - 1.0)*l*(l + 1.0)*(l + 2.0); // prefactor correction (1812.05995 eqs 74-79)
   const double ell_prefactor2 = (tmp > 0) ? sqrt(tmp)/(ell*ell) : 0.0;
 
-  double res = WK1*WY;
-  if(like.IA != NO_IA)
-  {
-    const double norm = cosmology.Omega_m*nuisance.c1rhocrit_ia/growfac_a;
-    double IA_A = 0.0;
+  const double A_Z1 = IA_A1_Z1(a, growfac_a, ni);
+  const double WS1  = W_source(a, ni, hoverh0) * A_Z1;
 
-    switch(like.IA)
-    {
-      case IA_JOACHIMI:
-      {
-        IA_A = A_IA_Joachimi(a);
-        break;
-      }
-      case IA_REDSHIFT_BINNING:
-      {
-        IA_A = nuisance.A_z[ni];
-        break;
-      }
-      case IA_REDSHIFT_EVOLUTION:
-      {
-        const double x = (1.0/a)/nuisance.oneplusz0_ia;
-        IA_A = nuisance.A_ia*pow(x, nuisance.eta_ia);
-        break;
-      }
-      default:
-      {
-        log_fatal("like.IA = %d not supported", like.IA);
-        exit(1);
-      }
-    }
+  const double res = (WK1 - WS1)*WY;
 
-    const double WS1 = W_source(a, ni, hoverh0) * IA_A;
-    res -= WS1*WY*norm;
-  }
   return res*PK*(chidchi.dchida/(fK*fK))*ell_prefactor2;
 }
 
