@@ -216,7 +216,9 @@ void IA_A1_Z1Z2(const double a, const double growfac_a,
   double A_Z1 = 0.0;
   double A_Z2 = 0.0;
   
-  switch(like.IA)
+  const int IA = abs(like.IA);
+
+  switch(IA)
   {
     case NO_IA:
     {
@@ -237,14 +239,6 @@ void IA_A1_Z1Z2(const double a, const double growfac_a,
       break;
     }
     case IA_REDSHIFT_EVOLUTION:
-    {
-      const double oneplusz = (1.0/a);
-      const double x = oneplusz/nuisance.oneplusz0_ia;
-      A_Z1 = nuisance.A_ia*pow(x, nuisance.eta_ia);
-      A_Z2 = A_Z1;
-      break;
-    }
-    case 6:
     {
       const double oneplusz = (1.0/a);
       const double x = oneplusz/nuisance.oneplusz0_ia;
@@ -289,7 +283,9 @@ void IA_A2_Z1Z2(const double a, const double growfac_a,
   double A2_Z1 = 0.0;
   double A2_Z2 = 0.0;
 
-  switch(like.IA)
+  const int IA = abs(like.IA);
+
+  switch(IA)
   {
     case NO_IA:
     {
@@ -338,7 +334,9 @@ void IA_BTA_Z1Z2(const double a, const double growfac_a,
 //    exit(1);
 //  }
 
-  switch(like.IA)
+  const int IA = abs(like.IA);
+  
+  switch(IA)
   {
     case NO_IA:
     {
