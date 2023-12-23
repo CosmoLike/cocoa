@@ -293,6 +293,11 @@ void IA_A2_Z1Z2(const double a, const double growfac_a,
       A2_Z2 = 0.0;
       break;
     }
+    case IA_NLA_LF:
+    {
+      log_fatal("IA_NLA_LF TT not supported");
+      exit(1);      
+    }
     case IA_REDSHIFT_BINNING:
     { 
       A2_Z1 = nuisance.A2_z[n1];
@@ -305,7 +310,6 @@ void IA_A2_Z1Z2(const double a, const double growfac_a,
       const double x = oneplusz/nuisance.oneplusz0_ia;
       A2_Z1 = nuisance.A2_ia*pow(x, nuisance.eta_ia_tt);
       A2_Z2 = A2_Z1;
-      break;
     } 
   }
 
@@ -322,7 +326,8 @@ double IA_A2_Z1(const double a, const double growfac_a, const int n1)
   return res[0];
 }
 
-void IA_BTA_Z1Z2(const double a, const double growfac_a, 
+void IA_BTA_Z1Z2(const double a __attribute__((unused)), 
+  const double growfac_a __attribute__((unused)), 
   const int n1, const int n2, double res[2])
 {
   double BTA_Z1 = 0.0;
@@ -335,7 +340,7 @@ void IA_BTA_Z1Z2(const double a, const double growfac_a,
 //  }
 
   const int IA = abs(like.IA);
-  
+
   switch(IA)
   {
     case NO_IA:
@@ -344,10 +349,16 @@ void IA_BTA_Z1Z2(const double a, const double growfac_a,
       BTA_Z2 = 1.0;
       break;
     }
+    case IA_NLA_LF:
+    {
+      log_fatal("IA_NLA_LF BTA not supported");
+      exit(1);      
+    }
     case IA_REDSHIFT_BINNING:
     {
       BTA_Z1 = nuisance.b_ta_z[n1];
       BTA_Z2 = nuisance.b_ta_z[n2];
+      break;
     }
     default:
     {

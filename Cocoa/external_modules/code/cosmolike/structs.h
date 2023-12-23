@@ -14,6 +14,9 @@ extern "C" {
 #define IA_REDSHIFT_BINNING 3
 #define IA_REDSHIFT_EVOLUTION 4
 
+#define IA_MODEL_NLA 0
+#define IA_MODEL_TATT 1
+
 typedef struct 
 {
   double a_min;
@@ -285,6 +288,7 @@ typedef struct
   double lmin_kappacmb;
   double lmax_kappacmb;
   int IA;
+  int IA_MODEL;
   int bias;
   int shear_shear;
   int shear_pos;
