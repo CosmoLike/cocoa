@@ -3815,8 +3815,11 @@ double int_for_C_ks_limber(double a, void* params)
     }
     default:
     {
-      log_fatal("like.IA = %d not supported", like.IA);
-      exit(1);
+      //log_warn("like.IA = %d not supported, fall back to like.IA=4", like.IA);
+      const double norm = (cosmology.Omega_m*nuisance.c1rhocrit_ia/growfac_a)*
+        nuisance.A_ia*pow(1.0/(a*nuisance.oneplusz0_ia), nuisance.eta_ia);
+      res = (-WS1*WK2*norm + WK1*WK2);
+      //exit(1);
     }
   }
 
