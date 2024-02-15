@@ -118,7 +118,7 @@ elif [ -n "${MINICONDA_INSTALLATION}" ]; then
     export CPLUS_INCLUDE_PATH=$CONDA_PREFIX/lib/python3.7/site-packages/numpy/core/include/:$CPLUS_INCLUDE_PATH
     export C_INCLUDE_PATH=$CONDA_PREFIX/lib/python3.7/site-packages/numpy/core/include:$C_INCLUDE_PATH
 
-    export GLOBALPYTHON3=$CONDA_PREFIX/bin/python3.7
+    export GLOBALPYTHON3=$CONDA_PREFIX/bin/python3
     export GLOBAL_PACKAGES_LOCATION=$CONDA_PREFIX
 
     export PYTHON_VERSION=3.7
