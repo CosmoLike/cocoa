@@ -125,7 +125,7 @@ nuisancepara nuisance =
   .bias_zphot_shear = {0},
   .sigma_zphot_clustering = {0},
   .bias_zphot_clustering = {0},
-  .stretch_zphot_clustering = { [0 ... MAX_SIZE_ARRAYS] = 1.0},// gcc-only
+  .stretch_zphot_clustering = { [0 ... MAX_SIZE_ARRAYS-1] = 1.0},// gcc-only
 };
 
 ynuisancepara ynuisance =
