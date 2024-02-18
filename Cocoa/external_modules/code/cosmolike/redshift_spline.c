@@ -1468,7 +1468,7 @@ double int_for_zmean_histo_n(double z, void* params)
     log_fatal("invalid bin input ni = %d", ni);
     exit(1);
   } 
-  return z * pf_histo_n(z, ni);
+  return z * pf_histo_n(z, (void *)ar);
 }
 
 double norm_for_zmean_histo_n(double z, void* params) 
@@ -1480,7 +1480,7 @@ double norm_for_zmean_histo_n(double z, void* params)
     log_fatal("invalid bin input ni = %d", ni);
     exit(1);
   } 
-  return pf_histo_n(z, ni);
+  return pf_histo_n(z, (void *)ar);
 }
 
 double pf_photoz(double zz, int nj) 
