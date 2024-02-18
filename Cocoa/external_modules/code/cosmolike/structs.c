@@ -71,6 +71,14 @@ redshiftpara redshift =
   .shear_zdistrpar_zmin = 0.0,
   .shear_zdistrpar_zmax = 0.0,
   .shear_histogram_zbins = 0,
+  /* photometric redshift format 
+    -1 - no tomography, just use histogram
+    0  - no photo-zs, split 'true' n(z) histogram in bins
+    1  - Pseudo Voigt (Lorentzian + Gaussian) photo-zs
+    2  - Pseudo Voigt (Lorentzian + Gaussian) + outlier photo-zs
+    3  - Gaussian photo-zs
+    4  - multi-histogram, n(z) for each tomography bin; including stretch param
+  */
   .clustering_photoz = 0,
   .clustering_zdistrpar_zmin = 0.0,
   .clustering_zdistrpar_zmax = 0.0,
@@ -117,6 +125,7 @@ nuisancepara nuisance =
   .bias_zphot_shear = {0},
   .sigma_zphot_clustering = {0},
   .bias_zphot_clustering = {0},
+  .stretch_zphot_clustering = { [0 ... MAX_SIZE_ARRAYS] = 1.0},// gcc-only
 };
 
 ynuisancepara ynuisance =
@@ -457,6 +466,7 @@ void reset_nuisance_struct()
     
     nuisance.sigma_zphot_clustering[i] = 0.0;
     nuisance.bias_zphot_clustering[i] = 0.0;
+    nuisance.stretch_zphot_clustering[i] = 1.0;
     
     nuisance.cluster_MOR[i] = 0.0;
     nuisance.cluster_selection[i] = 0.0;
@@ -562,6 +572,7 @@ void update_nuisance(nuisancepara *N)
   {
     N->sigma_zphot_clustering[i] = nuisance.sigma_zphot_clustering[i];
     N->bias_zphot_clustering[i] = nuisance.bias_zphot_clustering[i];
+    N->stretch_zphot_clustering[i] = nuisance.stretch_zphot_clustering[i];
   }
   
   for (int i=0; i<tomo.shear_Nbin; i++) 
