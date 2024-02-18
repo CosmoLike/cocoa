@@ -1459,6 +1459,30 @@ double pf_histo_n(double z, void* params)
   return res;
 }
 
+double int_for_zmean_histo_n(double z, void* params) 
+{
+  double* ar = (double*) params;
+  const int ni = (int) ar[0];
+  if (ni < -1 || ni > tomo.clustering_Nbin - 1)
+  {
+    log_fatal("invalid bin input ni = %d", ni);
+    exit(1);
+  } 
+  return z * pf_histo_n(z, ni);
+}
+
+double norm_for_zmean_histo_n(double z, void* params) 
+{
+  double* ar = (double*) params;
+  const int ni = (int) ar[0];
+  if (ni < -1 || ni > tomo.clustering_Nbin - 1)
+  {
+    log_fatal("invalid bin input ni = %d", ni);
+    exit(1);
+  } 
+  return pf_histo_n(z, ni);
+}
+
 double pf_photoz(double zz, int nj) 
 { // works only with binned distributions; nj =-1 -> no tomo; nj>= 0 -> tomo bin nj
   static double** table = 0;
@@ -2303,18 +2327,6 @@ double int_for_zmean(double z, void* params)
   return z * pf_photoz(z, ni);
 }
 
-double int_for_zmean_histo_n(double z, void* params) 
-{
-  double* ar = (double*) params;
-  const int ni = (int) ar[0];
-  if (ni < -1 || ni > tomo.clustering_Nbin - 1)
-  {
-    log_fatal("invalid bin input ni = %d", ni);
-    exit(1);
-  } 
-  return z * pf_histo_n(z, ni);
-}
-
 double norm_for_zmean(double z, void* params) 
 {
   double* ar = (double*) params;
@@ -2325,18 +2337,6 @@ double norm_for_zmean(double z, void* params)
     exit(1);
   } 
   return pf_photoz(z, ni);
-}
-
-double norm_for_zmean_histo_n(double z, void* params) 
-{
-  double* ar = (double*) params;
-  const int ni = (int) ar[0];
-  if (ni < -1 || ni > tomo.clustering_Nbin - 1)
-  {
-    log_fatal("invalid bin input ni = %d", ni);
-    exit(1);
-  } 
-  return pf_histo_n(z, ni);
 }
 
 double zmean(const int ni)
