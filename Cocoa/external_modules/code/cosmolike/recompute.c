@@ -75,7 +75,8 @@ int recompute_zphot_clustering(nuisancepara N)
   for (int i=0; i<tomo.clustering_Nbin; i++) 
   {
     if (N.sigma_zphot_clustering[i] != nuisance.sigma_zphot_clustering[i] ||
-        N.bias_zphot_clustering[i] != nuisance.bias_zphot_clustering[i]) 
+        N.bias_zphot_clustering[i] != nuisance.bias_zphot_clustering[i] ||
+        N.stretch_zphot_clustering[i] != nuisance.stretch_zphot_clustering[i]) 
     {
       res = 1;
     }
