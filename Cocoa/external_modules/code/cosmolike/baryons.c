@@ -10449,6 +10449,91 @@ void set_bary_parameters_to_BAHAMAS_T80()
   }
 }
 
+void set_bary_parameters_to_ANTILLES()
+{
+  if(bary.a_bins != NULL || bary.logk_bins != NULL || bary.log_PkR != NULL || bary.interp2d != NULL)
+  {
+    reset_bary_struct();
+  }
+
+  bary.is_Pk_bary = 1;
+  bary.Na_bins = ;
+  bary.Nk_bins = ;
+
+  if(bary.a_bins == NULL)
+  {
+    bary.a_bins = (double*) malloc(sizeof(double)*bary.Na_bins);
+    if (bary.a_bins == NULL)
+    {
+      log_fatal("\x1b[90m{}\x1b[0m: Failed Allocation of {}",
+        "set_bary_parameters_to_ANTILLES", "a_bins array");
+      exit(1);
+    }
+  }
+  if(bary.logk_bins == NULL)
+  {
+    bary.logk_bins = (double*) malloc(sizeof(double)*bary.Nk_bins);
+    if (bary.logk_bins == NULL)
+    {
+      log_fatal("\x1b[90m{}\x1b[0m: Failed Allocation of {}",
+        "set_bary_parameters_to_ANTILLES", "logk_bins array");
+      exit(1);
+    }
+  }
+  if(bary.log_PkR == NULL)
+  {
+    bary.log_PkR = (double*) malloc(sizeof(double)*bary.Nk_bins*bary.Na_bins);
+    if (bary.log_PkR == NULL)
+    {
+      log_fatal("\x1b[90m{}\x1b[0m: Failed Allocation of {}",
+        "set_bary_parameters_to_ANTILLES", "log_PkR array");
+      exit(1);
+    }
+  }
+
+  bary.T = (gsl_interp2d_type*) gsl_interp2d_bilinear;
+  if(bary.interp2d == NULL)
+  {
+    bary.interp2d = gsl_interp2d_alloc((const gsl_interp2d_type*) bary.T,
+      bary.Nk_bins, bary.Na_bins);
+    if (bary.interp2d == NULL)
+    {
+      log_fatal("\x1b[90m{}\x1b[0m: Failed Allocation of {}",
+        "set_bary_parameters_to_ANTILLES", "interp2d struct");
+      exit(1);
+    }
+  }
+
+  #pragma omp parallel for
+  for (int i=0; i<bary.Na_bins; i++)
+  {
+  	bary.a_bins[i] = 1./(1 + zBins_BAHAMAS[i]);
+  	for (int j=0; j<bary.Nk_bins; j++)
+    {
+  	  if (i == 0)
+      {
+  		bary.logk_bins[j] = logkBins_ANTILLES[j];
+  	  }
+	  int status = gsl_interp2d_set(bary.interp2d, bary.log_PkR, j, i, logPkR_ANTILLES[j][i]);
+      if (status)
+      {
+        log_fatal("\x1b[90m{}\x1b[0m: gsl error {}",
+          "set_bary_parameters_to_ANTILLES", gsl_strerror(status));
+        exit(1);
+      }
+  	}
+  }
+
+  int status = gsl_interp2d_init(bary.interp2d, bary.logk_bins, bary.a_bins,
+ 		bary.log_PkR, bary.Nk_bins, bary.Na_bins);
+  if (status)
+  {
+    log_fatal("\x1b[90m{}\x1b[0m: gsl error {}",
+      "set_bary_parameters_to_ANTILLES", gsl_strerror(status));
+    exit(1);
+  }
+}
+
 void init_baryons(const char* scenario)
 {
   if (strcmp(scenario, "TNG100") == 0)
@@ -10494,6 +10579,12 @@ void init_baryons(const char* scenario)
   else if (strcmp(scenario, "BAHAMAS_T80") == 0)
   {
   	set_bary_parameters_to_BAHAMAS_T80();
+  }
+  // the Antilles simulations suite
+  // See https://arxiv.org/abs/2305.09710
+  else if (strcmp(scenario, "ANTILLES") == 0)
+  {
+  	set_bary_parameters_to_ANTILLES();
   }
   else
   {
