@@ -10495,12 +10495,6 @@ void init_baryons(const char* scenario)
   {
   	set_bary_parameters_to_BAHAMAS_T80();
   }
-  // the Antilles simulations suite
-  // See https://arxiv.org/abs/2305.09710
-  else if (strcmp(scenario, "ANTILLES") == 0)
-  {
-  	set_bary_parameters_to_ANTILLES();
-  }
   else
   {
     log_fatal("option not implemented");
