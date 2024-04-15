@@ -85,7 +85,7 @@ void set_bary_parameters_to_scenario(const char* scenario, const char* lib_file,
     exit(1);
   }
   H5Aclose(attr_id_Na_bins);H5Aclose(attr_id_Nk_bins);
-  log_info("Na_bins = %d; Nk_bins = %d\n", bary.Na_bins, bary.Nk_bins);
+  log_info("Na_bins = %d; Nk_bins = %d", bary.Na_bins, bary.Nk_bins);
 
   // Read data into zBins, logkBins, and logPkR
   float* zBins = (float*) calloc(bary.Na_bins, sizeof(float));
