@@ -33,7 +33,7 @@ void set_bary_parameters_to_scenario(const char* scenario, const char* lib_file,
   hid_t dst_id_logkBins, dsp_id_logkBins;
   hid_t dst_id_logPkR, dsp_id_logPkR;
   hid_t attr_id_Na_bins, attr_id_Nk_bins;
-  herr_t status;
+  herr_t status_h5;
   file_id = H5Fopen(lib_file, H5F_ACC_RDONLY, H5P_DEFAULT);
   if (file_id < 0){
     log_fatal("Failed to open file %s!", lib_file);
@@ -80,8 +80,8 @@ void set_bary_parameters_to_scenario(const char* scenario, const char* lib_file,
     H5Fclose(file_id);
     exit(1);
   }
-  status = H5Aread(attr_id_Na_bins, H5T_NATIVE_INT32, &bary.Na_bins);
-  if (status < 0){
+  status_h5 = H5Aread(attr_id_Na_bins, H5T_NATIVE_INT32, &bary.Na_bins);
+  if (status_h5 < 0){
     log_fatal("Failed to read attribute Na_bins!");
     H5Aclose(attr_id_Na_bins);H5Aclose(attr_id_Nk_bins);
     H5Sclose(dsp_id_zBins);H5Sclose(dsp_id_logkBins);H5Sclose(dsp_id_logPkR);
@@ -89,8 +89,8 @@ void set_bary_parameters_to_scenario(const char* scenario, const char* lib_file,
     H5Fclose(file_id);
     exit(1);
   }
-  status = H5Aread(attr_id_Nk_bins, H5T_NATIVE_INT32, &bary.Nk_bins);
-  if (status < 0){
+  status_h5 = H5Aread(attr_id_Nk_bins, H5T_NATIVE_INT32, &bary.Nk_bins);
+  if (status_h5 < 0){
     log_fatal("Failed to read attribute Na_bins!");
     H5Aclose(attr_id_Na_bins);H5Aclose(attr_id_Nk_bins);
     H5Sclose(dsp_id_zBins);H5Sclose(dsp_id_logkBins);H5Sclose(dsp_id_logPkR);
@@ -170,9 +170,9 @@ void set_bary_parameters_to_scenario(const char* scenario, const char* lib_file,
   log_info("%s: Reading HDF5 dataset", "set_bary_parameters_to_scenario");
   //sp_zBins.selectAll();
   //dst_zBins.read(zBins, H5::PredType::NATIVE_FLOAT, sp_zBins);
-  status = H5Dread(dst_id_zBins, H5T_NATIVE_FLOAT, H5S_ALL, H5S_ALL, 
+  status_h5 = H5Dread(dst_id_zBins, H5T_NATIVE_FLOAT, H5S_ALL, H5S_ALL, 
     H5P_DEFAULT, zBins);
-    if (status < 0) {
+    if (status_h5 < 0) {
         log_fatal("Failed to read zBins!");
         H5Sclose(dsp_id_zBins);H5Sclose(dsp_id_logkBins);H5Sclose(dsp_id_logPkR);
         H5Dclose(dst_id_zBins);H5Dclose(dst_id_logkBins);H5Dclose(dst_id_logPkR);
@@ -181,9 +181,9 @@ void set_bary_parameters_to_scenario(const char* scenario, const char* lib_file,
     }
   //sp_logkBins.selectAll();
   //dst_logkBins.read(logkBins, H5::PredType::NATIVE_FLOAT, sp_logkBins);
-  status = H5Dread(dst_id_logkBins, H5T_NATIVE_FLOAT, H5S_ALL, H5S_ALL, 
+  status_h5 = H5Dread(dst_id_logkBins, H5T_NATIVE_FLOAT, H5S_ALL, H5S_ALL, 
     H5P_DEFAULT, logkBins);
-    if (status < 0) {
+    if (status_h5 < 0) {
         log_fatal("Failed to read logkBins!");
         H5Sclose(dsp_id_zBins);H5Sclose(dsp_id_logkBins);H5Sclose(dsp_id_logPkR);
         H5Dclose(dst_id_zBins);H5Dclose(dst_id_logkBins);H5Dclose(dst_id_logPkR);
@@ -192,9 +192,9 @@ void set_bary_parameters_to_scenario(const char* scenario, const char* lib_file,
     }
   //sp_logPkR.selectAll();
   //dst_logPkR.read(logPkR, H5::PredType::NATIVE_FLOAT, sp_logPkR);
-  status = H5Dread(dst_id_logPkR, H5T_NATIVE_FLOAT, H5S_ALL, H5S_ALL, 
+  status_h5 = H5Dread(dst_id_logPkR, H5T_NATIVE_FLOAT, H5S_ALL, H5S_ALL, 
     H5P_DEFAULT, logPkR);
-    if (status < 0) {
+    if (status_h5 < 0) {
         log_fatal("Failed to read logPkR!");
         H5Sclose(dsp_id_zBins);H5Sclose(dsp_id_logkBins);H5Sclose(dsp_id_logPkR);
         H5Dclose(dst_id_zBins);H5Dclose(dst_id_logkBins);H5Dclose(dst_id_logPkR);
