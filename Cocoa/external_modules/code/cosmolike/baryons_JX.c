@@ -10,8 +10,6 @@
 #include "structs.h"
 
 #include "log.c/src/log.h"
-//#include "log.c/src/log.c"
-//#include "H5Cpp.h"
 #include <hdf5.h>
 
 void set_bary_parameters_to_scenario(const char* scenario, const char* lib_file, int sim_id)
@@ -57,17 +55,6 @@ void set_bary_parameters_to_scenario(const char* scenario, const char* lib_file,
     H5Fclose(file_id);
     exit(1);
   }
-  //const H5std_string FILE_NAME(lib_file);
-  //const H5std_string DST_ZBINS(sim_zBins);
-  //const H5std_string DST_LOGKBINS(sim_logkBins);
-  //const H5std_string DST_LOGPKR(sim_logPkR);
-  // H5::H5File file(FILE_NAME, H5F_ACC_RDONLY);
-  // H5::DataSet dst_zBins  = file.openDataSet(DST_ZBINS);
-  // H5::DataSet dst_logkBins  = file.openDataSet(DST_LOGKBINS);
-  // H5::DataSet dst_logPkR  = file.openDataSet(DST_LOGPKR);
-  // H5::DataSpace sp_zBins = dst_zBins.getSpace();
-  // H5::DataSpace sp_logkBins = dst_logkBins.getSpace();
-  // H5::DataSpace sp_logPkR = dst_logPkR.getSpace();
 
   // Read metadata from HDF5 dataset attributes
   attr_id_Na_bins = H5Aopen(dst_id_zBins, "Na_bins", H5P_DEFAULT);
@@ -99,77 +86,13 @@ void set_bary_parameters_to_scenario(const char* scenario, const char* lib_file,
   }
   H5Aclose(attr_id_Na_bins);H5Aclose(attr_id_Nk_bins);
   log_info("Na_bins = %d; Nk_bins = %d\n", bary.Na_bins, bary.Nk_bins);
-  /*
-  const H5std_string NA_BINS("Na_bins");
-  const H5std_string NK_BINS("Nk_bins");
-  H5::Attribute Na_bins, Nk_bins;
-  try {
-  	Na_bins = dst_zBins.openAttribute(NA_BINS);
-  	Nk_bins = dst_logkBins.openAttribute(NK_BINS);
-  } catch(const H5::Exception& e)
-  {
-  	log_fatal("%s: Attribute Na_Bins or Nk_Bins not found!",
-        "set_bary_parameters_to_scenario");
-  }
-  H5T_class_t Na_bins_type = Na_bins.getTypeClass();
-  H5T_class_t Nk_bins_type = Nk_bins.getTypeClass();
-  // Check the data type of meta info
-  if (Na_bins_type == H5T_INTEGER) {
-  	H5::IntType intType = Na_bins.getIntType();
-  	size_t size = intType.getSize();
-  	if (size == sizeof(int)){
-  		Na_bins.read(intType, &bary.Na_bins);
-  		log_info("%s: bary.Na_bins = %d (int)",
-        "set_bary_parameters_to_scenario", bary.Na_bins);
-  	} else if (size == sizeof(long)){
-  		long longValue;
-  		Na_bins.read(intType, &longValue);
-  		bary.Na_bins = static_cast<int>(longValue);
-   		log_info("%s: bary.Na_bins = %d (long)",
-        "set_bary_parameters_to_scenario", bary.Na_bins);
- 	} else if (size == sizeof(long long)) {
-  		long long longlongValue;
-  		Na_bins.read(intType, &longlongValue);
-  		bary.Na_bins = static_cast<int>(longlongValue);
-   		log_info("%s: bary.Na_bins = %d (long long)",
-        "set_bary_parameters_to_scenario", bary.Na_bins);
- 	}
-  } else{
-  	log_fatal("%s: Attribute NA_BINS must be integer!",
-        "set_bary_parameters_to_scenario");
-  }
-  if (Nk_bins_type == H5T_INTEGER) {
-  	H5::IntType intType = Nk_bins.getIntType();
-  	size_t size = intType.getSize();
-  	if (size == sizeof(int)){
-  		Nk_bins.read(intType, &bary.Nk_bins);
-   		log_info("%s: bary.Nk_bins = %d (int)",
-        "set_bary_parameters_to_scenario", bary.Nk_bins);
- 	} else if (size == sizeof(long)){
-  		long longValue;
-  		Nk_bins.read(intType, &longValue);
-  		bary.Nk_bins = static_cast<int>(longValue);
-    	log_info("%s: bary.Nk_bins = %d (long)",
-        "set_bary_parameters_to_scenario", bary.Nk_bins);
- 	} else if (size == sizeof(long long)) {
-  		long long longlongValue;
-  		Nk_bins.read(intType, &longlongValue);
-  		bary.Nk_bins = static_cast<int>(longlongValue);
-    	log_info("%s: bary.Nk_bins = %d (long long)",
-        "set_bary_parameters_to_scenario", bary.Nk_bins);
- 	}
-  } else{
-  	log_fatal("%s: Attribute NK_BINS must be integer!",
-        "set_bary_parameters_to_scenario");
-  }*/
-  // End data type check
+
   // Read data into zBins, logkBins, and logPkR
   float* zBins = (float*) calloc(bary.Na_bins, sizeof(float));
   float* logkBins = (float *) calloc(bary.Nk_bins, sizeof(float));
   float* logPkR = (float *) calloc(bary.Nk_bins*bary.Na_bins, sizeof(float));
-  log_info("%s: Reading HDF5 dataset", "set_bary_parameters_to_scenario");
-  //sp_zBins.selectAll();
-  //dst_zBins.read(zBins, H5::PredType::NATIVE_FLOAT, sp_zBins);
+  log_info("Reading HDF5 dataset");
+  
   status_h5 = H5Dread(dst_id_zBins, H5T_NATIVE_FLOAT, H5S_ALL, H5S_ALL, 
     H5P_DEFAULT, zBins);
     if (status_h5 < 0) {
@@ -179,8 +102,7 @@ void set_bary_parameters_to_scenario(const char* scenario, const char* lib_file,
         H5Fclose(file_id);
         exit(1);
     }
-  //sp_logkBins.selectAll();
-  //dst_logkBins.read(logkBins, H5::PredType::NATIVE_FLOAT, sp_logkBins);
+  
   status_h5 = H5Dread(dst_id_logkBins, H5T_NATIVE_FLOAT, H5S_ALL, H5S_ALL, 
     H5P_DEFAULT, logkBins);
     if (status_h5 < 0) {
@@ -190,8 +112,7 @@ void set_bary_parameters_to_scenario(const char* scenario, const char* lib_file,
         H5Fclose(file_id);
         exit(1);
     }
-  //sp_logPkR.selectAll();
-  //dst_logPkR.read(logPkR, H5::PredType::NATIVE_FLOAT, sp_logPkR);
+  
   status_h5 = H5Dread(dst_id_logPkR, H5T_NATIVE_FLOAT, H5S_ALL, H5S_ALL, 
     H5P_DEFAULT, logPkR);
     if (status_h5 < 0) {
@@ -202,35 +123,17 @@ void set_bary_parameters_to_scenario(const char* scenario, const char* lib_file,
         exit(1);
     }
   // Close data set
-  //Na_bins.close();Nk_bins.close();
-  //dst_zBins.close();dst_logkBins.close();dst_logPkR.close();
-  //file.close();
   H5Sclose(dsp_id_zBins);H5Sclose(dsp_id_logkBins);H5Sclose(dsp_id_logPkR);
   H5Dclose(dst_id_zBins);H5Dclose(dst_id_logkBins);H5Dclose(dst_id_logPkR);
   H5Fclose(file_id);
 
-  // Test dataset reading
-  log_info("%s: Test HDF5 dataset reading", "set_bary_parameters_to_scenario");
-  char output_fn[500];
-  sprintf(output_fn, "test_Baryon_read_%s_%d_HDF5C.txt", scenario, sim_id);
-  FILE * fp_test = fopen(output_fn, "w");
-  if (fp_test != NULL){
-    fprintf(fp_test, "# z lgk lgPkR\n");
-    for (int i=0; i<bary.Na_bins; i++){
-  	  for (int j=0; j<bary.Nk_bins; j++){
-        fprintf(fp_test, "%le %le %le\n", zBins[i], logkBins[j], logPkR[j*bary.Na_bins+i]);
-  	  }
-    }
-  }
   // Allocate memory
   if(bary.a_bins == NULL)
   {
     bary.a_bins = (double*) malloc(sizeof(double)*bary.Na_bins);
     if (bary.a_bins == NULL)
     {
-      log_fatal("%s: Failed Allocation of %s",
-        "set_bary_parameters_to_scenario",
-        "a_bins array");
+      log_fatal("Failed Allocation of a_bins array");
       exit(1);
     }
   }
@@ -239,9 +142,7 @@ void set_bary_parameters_to_scenario(const char* scenario, const char* lib_file,
     bary.logk_bins = (double*) malloc(sizeof(double)*bary.Nk_bins);
     if (bary.logk_bins == NULL)
     {
-      log_fatal("%s: Failed Allocation of %s",
-        "set_bary_parameters_to_scenario",
-        "logk_bins array");
+      log_fatal("Failed Allocation of logk_bins array");
       exit(1);
     }
   }
@@ -250,9 +151,7 @@ void set_bary_parameters_to_scenario(const char* scenario, const char* lib_file,
     bary.log_PkR = (double*) malloc(sizeof(double)*bary.Nk_bins*bary.Na_bins);
     if (bary.log_PkR == NULL)
     {
-      log_fatal("%s: Failed Allocation of %s",
-        "set_bary_parameters_to_scenario",
-        "log_PkR array");
+      log_fatal("Failed Allocation of log_PkR array");
       exit(1);
     }
   }
@@ -264,8 +163,7 @@ void set_bary_parameters_to_scenario(const char* scenario, const char* lib_file,
       bary.Nk_bins, bary.Na_bins);
     if (bary.interp2d == NULL)
     {
-      log_fatal("%s: Failed Allocation of %s",
-        "set_bary_parameters_to_scenario", "interp2d struct");
+      log_fatal("Failed Allocation of interp2d struct");
       exit(1);
     }
   }
@@ -281,8 +179,7 @@ void set_bary_parameters_to_scenario(const char* scenario, const char* lib_file,
       int status = gsl_interp2d_set(bary.interp2d, bary.log_PkR, j, i, logPkR[j*bary.Na_bins+i]);
       if (status)
       {
-        log_fatal("%s: gsl error %s",
-          "set_bary_parameters_to_scenario", gsl_strerror(status));
+        log_fatal("gsl error %s", gsl_strerror(status));
         exit(1);
       }
   	}
@@ -292,8 +189,7 @@ void set_bary_parameters_to_scenario(const char* scenario, const char* lib_file,
  		bary.log_PkR, bary.Nk_bins, bary.Na_bins);
   if (status)
   {
-    log_fatal("%s: gsl error %s",
-      "set_bary_parameters_to_scenario", gsl_strerror(status));
+    log_fatal("gsl error %s", gsl_strerror(status));
     exit(1);
   }
   free(zBins);free(logkBins);free(logPkR);
@@ -311,8 +207,7 @@ void init_baryons(const char* scenario, int sim_id)
     pathLen = lastSeparator - libPath + 1;// +1 to include the last /
     filenameLen = pathLen + strlen(libName);  
   } else{
-    log_fatal("%s: Error in reading source code %s dir!",
-	"init_baryons", libPath);
+    log_fatal("Error in reading the path of %s!", libPath);
     exit(1);
   }
   filename = (char*) malloc(filenameLen + 1);
