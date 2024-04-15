@@ -7,7 +7,7 @@
 #include <stdlib.h>
 
 #include "basics.h"
-#include "baryons.h"
+#include "baryons_JX.h"
 #include "structs.h"
 
 #include "log.c/src/log.h"
