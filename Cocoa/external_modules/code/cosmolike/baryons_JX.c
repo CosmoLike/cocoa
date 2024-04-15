@@ -4,7 +4,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <stdlib.h>
 
 #include "basics.h"
 #include "baryons_JX.h"
@@ -99,6 +98,7 @@ void set_bary_parameters_to_scenario(const char* scenario, const char* lib_file,
     exit(1);
   }
   H5Aclose(attr_id_Na_bins);H5Aclose(attr_id_Nk_bins);
+  log_info("Na_bins = %s; Nk_bins = %d\n", bary.Na_bins, bary.Nk_bins);
   /*
   const H5std_string NA_BINS("Na_bins");
   const H5std_string NK_BINS("Nk_bins");
