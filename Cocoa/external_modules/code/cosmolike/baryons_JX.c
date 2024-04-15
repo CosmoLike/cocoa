@@ -53,7 +53,7 @@ void set_bary_parameters_to_scenario(const char* scenario, const char* lib_file,
   if ((dst_id_zBins < 0) || (dsp_id_logkBins < 0) || (dsp_id_logPkR < 0)){
     log_fatal("Failed to get dataspace %s/%s/%s!", sim_zBins, sim_logkBins, 
       sim_logPkR);
-    H5Dclose(dst_zBins);H5Dclose(dst_logkBins);H5Dclose(dst_logPkR);
+    H5Dclose(dst_id_zBins);H5Dclose(dst_id_logkBins);H5Dclose(dst_id_logPkR);
     H5Fclose(file_id);
     exit(1);
   }
@@ -75,7 +75,7 @@ void set_bary_parameters_to_scenario(const char* scenario, const char* lib_file,
   if ((attr_id_Na_bins < 0) || (attr_id_Nk_bins < 0)){
     log_fatal("Failed to open attribute Na_bins/Nk_bins!");
     H5Sclose(dsp_id_zBins);H5Sclose(dsp_id_logkBins);H5Sclose(dsp_id_logPkR);
-    H5Dclose(dst_zBins);H5Dclose(dst_logkBoins);H5Dclose(dst_logPkR);
+    H5Dclose(dst_id_zBins);H5Dclose(dst_id_logkBins);H5Dclose(dst_id_logPkR);
     H5Fclose(file_id);
     exit(1);
   }
@@ -84,7 +84,7 @@ void set_bary_parameters_to_scenario(const char* scenario, const char* lib_file,
     log_fatal("Failed to read attribute Na_bins!");
     H5Aclose(attr_id_Na_bins);H5Aclose(attr_id_Nk_bins);
     H5Sclose(dsp_id_zBins);H5Sclose(dsp_id_logkBins);H5Sclose(dsp_id_logPkR);
-    H5Dclose(dst_zBins);H5Dclose(dst_logkBins);H5Dclose(dst_logPkR);
+    H5Dclose(dst_id_zBins);H5Dclose(dst_id_logkBins);H5Dclose(dst_id_logPkR);
     H5Fclose(file_id);
     exit(1);
   }
@@ -93,7 +93,7 @@ void set_bary_parameters_to_scenario(const char* scenario, const char* lib_file,
     log_fatal("Failed to read attribute Na_bins!");
     H5Aclose(attr_id_Na_bins);H5Aclose(attr_id_Nk_bins);
     H5Sclose(dsp_id_zBins);H5Sclose(dsp_id_logkBins);H5Sclose(dsp_id_logPkR);
-    H5Dclose(dst_zBins);H5Dclose(dst_logkBins);H5Dclose(dst_logPkR);
+    H5Dclose(dst_id_zBins);H5Dclose(dst_id_logkBins);H5Dclose(dst_id_logPkR);
     H5Fclose(file_id);
     exit(1);
   }
@@ -174,7 +174,7 @@ void set_bary_parameters_to_scenario(const char* scenario, const char* lib_file,
     if (status < 0) {
         log_fatal("Failed to read zBins!");
         H5Sclose(dsp_id_zBins);H5Sclose(dsp_id_logkBins);H5Sclose(dsp_id_logPkR);
-        H5Dclose(dst_zBins);H5Dclose(dst_logkBins);H5Dclose(dst_logPkR);
+        H5Dclose(dst_id_zBins);H5Dclose(dst_id_logkBins);H5Dclose(dst_id_logPkR);
         H5Fclose(file_id);
         exit(1);
     }
@@ -185,7 +185,7 @@ void set_bary_parameters_to_scenario(const char* scenario, const char* lib_file,
     if (status < 0) {
         log_fatal("Failed to read logkBins!");
         H5Sclose(dsp_id_zBins);H5Sclose(dsp_id_logkBins);H5Sclose(dsp_id_logPkR);
-        H5Dclose(dst_zBins);H5Dclose(dst_logkBins);H5Dclose(dst_logPkR);
+        H5Dclose(dst_id_zBins);H5Dclose(dst_id_logkBins);H5Dclose(dst_id_logPkR);
         H5Fclose(file_id);
         exit(1);
     }
@@ -196,7 +196,7 @@ void set_bary_parameters_to_scenario(const char* scenario, const char* lib_file,
     if (status < 0) {
         log_fatal("Failed to read logPkR!");
         H5Sclose(dsp_id_zBins);H5Sclose(dsp_id_logkBins);H5Sclose(dsp_id_logPkR);
-        H5Dclose(dst_zBins);H5Dclose(dst_logkBins);H5Dclose(dst_logPkR);
+        H5Dclose(dst_id_zBins);H5Dclose(dst_id_logkBins);H5Dclose(dst_id_logPkR);
         H5Fclose(file_id);
         exit(1);
     }
@@ -205,7 +205,7 @@ void set_bary_parameters_to_scenario(const char* scenario, const char* lib_file,
   //dst_zBins.close();dst_logkBins.close();dst_logPkR.close();
   //file.close();
   H5Sclose(dsp_id_zBins);H5Sclose(dsp_id_logkBins);H5Sclose(dsp_id_logPkR);
-  H5Dclose(dst_zBins);H5Dclose(dst_logkBins);H5Dclose(dst_logPkR);
+  H5Dclose(dst_id_zBins);H5Dclose(dst_id_logkBins);H5Dclose(dst_id_logPkR);
   H5Fclose(file_id);
 
   // Test dataset reading
