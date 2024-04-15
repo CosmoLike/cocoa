@@ -32,6 +32,7 @@ void set_bary_parameters_to_scenario(const char* scenario, const char* lib_file,
   hid_t dst_id_zBins, dsp_id_zBins;
   hid_t dst_id_logkBins, dsp_id_logkBins;
   hid_t dst_id_logPkR, dsp_id_logPkR;
+  hid_t attr_id_Na_bins, attr_id_Nk_bins;
   herr_t status;
   file_id = H5Fopen(lib_file, H5F_ACC_RDONLY, H5P_DEFAULT);
   if (file_id < 0){
