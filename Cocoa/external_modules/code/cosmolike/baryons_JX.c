@@ -40,7 +40,7 @@ void set_bary_parameters_to_scenario(const char* scenario, const char* lib_file,
   dst_id_logkBins = H5Dopen2(file_id, sim_logkBins, H5P_DEFAULT);
   dst_id_logPkR = H5Dopen2(file_id, sim_logPkR, H5P_DEFAULT);
   if ((dst_id_zBins < 0) || (dst_id_logkBins < 0) || (dst_id_logPkR < 0)){
-    log_fatal("Failed to read dataset %s/%s/%s!", sim_zBins, sim_logkBins, 
+    log_fatal("Failed to read dataset %s, %s, or %s!", sim_zBins, sim_logkBins, 
       sim_logPkR);
     H5Fclose(file_id);
     exit(1);
@@ -49,8 +49,8 @@ void set_bary_parameters_to_scenario(const char* scenario, const char* lib_file,
   dsp_id_logkBins = H5Dget_space(dst_id_logkBins);
   dsp_id_logPkR = H5Dget_space(dst_id_logPkR);
   if ((dst_id_zBins < 0) || (dsp_id_logkBins < 0) || (dsp_id_logPkR < 0)){
-    log_fatal("Failed to get dataspace %s/%s/%s!", sim_zBins, sim_logkBins, 
-      sim_logPkR);
+    log_fatal("Failed to get dataspace %s, %s, or %s!", sim_zBins, 
+      sim_logkBins, sim_logPkR);
     H5Dclose(dst_id_zBins);H5Dclose(dst_id_logkBins);H5Dclose(dst_id_logPkR);
     H5Fclose(file_id);
     exit(1);
