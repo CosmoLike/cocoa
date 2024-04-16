@@ -176,6 +176,7 @@ void set_bary_parameters_to_scenario(const char* scenario, const char* lib_file,
   	for (int j=0; j<bary.Nk_bins; j++)
     {
   	  if (i == 0) bary.logk_bins[j] = logkBins[j];
+      // NOTE: here the axes has changed from (Nk, Na) to (Na, Nk)
       int status = gsl_interp2d_set(bary.interp2d, bary.log_PkR, j, i, logPkR[j*bary.Na_bins+i]);
       if (status)
       {
