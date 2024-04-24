@@ -65,6 +65,7 @@ Type the following commands to create the cocoa Conda environment.
            'conda-forge::numpy=1.23.5' \
            'conda-forge::matplotlib=3.7.1' \
            'conda-forge::mpi4py=3.1.4' \
+           'conda-forge::libxcrypt' \
            'conda-forge::pip=23.1.2'
         conda activate cocoapy38
         $CONDA_PREFIX/bin/pip install --no-cache-dir 'virtualenv==20.17.1'
