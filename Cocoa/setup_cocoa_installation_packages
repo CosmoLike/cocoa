@@ -220,12 +220,14 @@ export NUMPY_HEADERS=$ROOTDIR/.local/lib/python$PYTHON_VERSION/site-packages/num
 # ----------------------------------------------------------------------------
 # ----------------------------------------------------------------------------
 
-source ./installation_scripts/setup_xz
-if [ $? -ne 0 ]; then
-  echo  -e '\033[0;31m'"SCRIPT setup_xz FAILED"'\033[0m'
-  cd $ROOTDIR
-  source stop_cocoa
-  return 1
+if [ -z "${MINICONDA_INSTALLATION}" ]; then
+  source ./installation_scripts/setup_xz
+  if [ $? -ne 0 ]; then
+    echo  -e '\033[0;31m'"SCRIPT setup_xz FAILED"'\033[0m'
+    cd $ROOTDIR
+    source stop_cocoa
+    return 1
+  fi
 fi
 
 if [ -z "${DEBUG_SKIP_FILE_DECOMPRESSION_SETUP_COCOA}" ]; then
@@ -238,35 +240,43 @@ if [ -z "${DEBUG_SKIP_FILE_DECOMPRESSION_SETUP_COCOA}" ]; then
   fi
 fi
 
-source ./installation_scripts/setup_cmake
-if [ $? -ne 0 ]; then
-  echo -e '\033[0;31m'"SCRIPT setup_cmake FAILED"'\033[0m'
-  cd $ROOTDIR
-  source stop_cocoa
-  return 1
+if [ -z "${MINICONDA_INSTALLATION}" ]; then
+  source ./installation_scripts/setup_cmake
+  if [ $? -ne 0 ]; then
+    echo -e '\033[0;31m'"SCRIPT setup_cmake FAILED"'\033[0m'
+    cd $ROOTDIR
+    source stop_cocoa
+    return 1
+  fi
 fi
 
-source ./installation_scripts/setup_binutils
-if [ $? -ne 0 ]; then
-  echo -e '\033[0;31m'"SCRIPT setup_binutils FAILED"'\033[0m'
-  cd $ROOTDIR
-  source stop_cocoa
-  return 1
+if [ -z "${MINICONDA_INSTALLATION}" ]; then
+  source ./installation_scripts/setup_binutils
+  if [ $? -ne 0 ]; then
+    echo -e '\033[0;31m'"SCRIPT setup_binutils FAILED"'\033[0m'
+    cd $ROOTDIR
+    source stop_cocoa
+    return 1
+  fi
 fi
 
-source ./installation_scripts/setup_hdf5
-if [ $? -ne 0 ]; then
-  echo -e '\033[0;31m'"SCRIPT setup_hdf5 FAILED"'\033[0m'
-  cd $ROOTDIR
-  source stop_cocoa
-  return 1
+if [ -z "${MINICONDA_INSTALLATION}" ]; then
+  source ./installation_scripts/setup_hdf5
+  if [ $? -ne 0 ]; then
+    echo -e '\033[0;31m'"SCRIPT setup_hdf5 FAILED"'\033[0m'
+    cd $ROOTDIR
+    source stop_cocoa
+    return 1
+  fi
 fi
 
-source ./installation_scripts/setup_openblas
-if [ $? -ne 0 ]; then
-echo -e '\033[0;31m'"SCRIPT setup_openblas FAILED"'\033[0m'
-cd $ROOTDIR
-return 1
+if [ -z "${MINICONDA_INSTALLATION}" ]; then
+  source ./installation_scripts/setup_openblas
+  if [ $? -ne 0 ]; then
+    echo -e '\033[0;31m'"SCRIPT setup_openblas FAILED"'\033[0m'
+    cd $ROOTDIR
+    return 1
+  fi
 fi
 
 source ./installation_scripts/setup_pip_packages

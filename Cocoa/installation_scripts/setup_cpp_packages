@@ -51,7 +51,7 @@ fi
 # --------------------------------------- SPDLOG -------------------------------
 # ------------------------------------------------------------------------------
 if [ -z "${IGNORE_CPP_SPDLOG_INSTALLATION}" ]; then
-  echo -e '\033[1;34m''INSTALLING SPDLOG C++ LIBRARY - \e[4mIT MAY TAKE A WHILE''\033[0m'
+  echo -e '\033[1;34m''\t INSTALLING SPDLOG C++ LIBRARY''\033[0m'
 
   cd $ROOTDIR/../cocoa_installation_libraries/$COCOA_SPDLOG_DIR
 
@@ -62,7 +62,7 @@ if [ -z "${IGNORE_CPP_SPDLOG_INSTALLATION}" ]; then
     -DCMAKE_CXX_COMPILER=$CXX_COMPILER \
     --log-level=ERROR . > ${OUTPUT_CPP_PACKAGES_1} 2> ${OUTPUT_CPP_PACKAGES_2}
   if [ $? -eq 0 ];then
-    echo -e '\033[0;32m'"SPDLOG RUN \e[3mCMAKE\e[0m\e\033[0;32m DONE"'\033[0m'
+    echo -e '\033[0;32m'"\t\t SPDLOG RUN \e[3mCMAKE\e[0m\e\033[0;32m DONE"'\033[0m'
   else
     echo -e '\033[0;31m'"SPDLOG COULD NOT RUN \e[3mCMAKE"'\033[0m'
     cd $ROOTDIR
@@ -71,7 +71,7 @@ if [ -z "${IGNORE_CPP_SPDLOG_INSTALLATION}" ]; then
 
   make -j $CPP_MAKE_NUM_THREADS > ${OUTPUT_CPP_PACKAGES_1} 2> ${OUTPUT_CPP_PACKAGES_2}
   if [ $? -eq 0 ]; then
-    echo -e '\033[0;32m'"SPDLOG RUN \e[3mMAKE\e[0m\e\033[0;32m DONE"'\033[0m'
+    echo -e '\033[0;32m'"\t\t SPDLOG RUN \e[3mMAKE\e[0m\e\033[0;32m DONE"'\033[0m'
   else
     echo -e '\033[0;31m'"SPDLOG COULD NOT RUN \e[3mMAKE"'\033[0m'
     cd $ROOTDIR
@@ -80,7 +80,7 @@ if [ -z "${IGNORE_CPP_SPDLOG_INSTALLATION}" ]; then
 
   make install > ${OUTPUT_CPP_PACKAGES_1} 2> ${OUTPUT_CPP_PACKAGES_2}
   if [ $? -eq 0 ]; then
-    echo -e '\033[0;32m'"SPDLOG RUN \e[3mMAKE INSTALL\e[0m\e\033[0;32m DONE"'\033[0m'
+    echo -e '\033[0;32m'"\t\t SPDLOG RUN \e[3mMAKE INSTALL\e[0m\e\033[0;32m DONE"'\033[0m'
   else
     echo -e '\033[0;31m'"SPDLOG COULD NOT RUN \e[3mMAKE INSTALL"'\033[0m'
     cd $ROOTDIR
@@ -88,14 +88,14 @@ if [ -z "${IGNORE_CPP_SPDLOG_INSTALLATION}" ]; then
   fi
 
   cd $ROOTDIR
-  echo -e '\033[1;34m''\e[4mINSTALLING SPDLOG C++ LIBRARY DONE''\033[0m'
+  echo -e '\033[1;34m''\t \e[4mINSTALLING SPDLOG C++ LIBRARY DONE''\033[0m'
 fi
 
 # ------------------------------------------------------------------------------
 # ------------------------------------- ARMADILLO ------------------------------
 # ------------------------------------------------------------------------------
 if [ -z "${IGNORE_CPP_ARMA_INSTALLATION}" ]; then
-  echo -e '\033[1;34m''INSTALLING ARMADILLO C++ LIBRARY - \e[4mIT MAY TAKE A WHILE''\033[0m'
+  echo -e '\033[1;34m''\t INSTALLING ARMADILLO C++ LIBRARY - \e[4mIT MAY TAKE A WHILE''\033[0m'
 
   cd $ROOTDIR/../cocoa_installation_libraries/$COCOA_ARMADILLO_DIR
 
@@ -106,7 +106,7 @@ if [ -z "${IGNORE_CPP_ARMA_INSTALLATION}" ]; then
     -DLAPACK_FOUND=YES -DLAPACK_LIBRARIES=$ROOTDIR/.local/lib/liblapack.so \
     -DBLAS_FOUND=NO --log-level=ERROR . > ${OUTPUT_CPP_PACKAGES_1} 2> ${OUTPUT_CPP_PACKAGES_2}
   if [ $? -eq 0 ]; then
-    echo -e '\033[0;32m'"ARMADILLO RUN \e[3mCMAKE\e[0m\e\033[0;32m DONE"'\033[0m'
+    echo -e '\033[0;32m'"\t\t ARMADILLO RUN \e[3mCMAKE\e[0m\e\033[0;32m DONE"'\033[0m'
   else
     echo -e '\033[0;31m'"ARMADILLO COULD NOT RUN \e[3mCMAKE"'\033[0m'
     cd $ROOTDIR
@@ -115,7 +115,7 @@ if [ -z "${IGNORE_CPP_ARMA_INSTALLATION}" ]; then
 
   make clean > ${OUTPUT_CPP_PACKAGES_1} 2> ${OUTPUT_CPP_PACKAGES_2}
   if [ $? -eq 0 ]; then
-    echo -e '\033[0;32m'"ARMADILLO RUN \e[3mMAKE CLEAN\e[0m\e\033[0;32m DONE"'\033[0m'
+    echo -e '\033[0;32m'"\t\t ARMADILLO RUN \e[3mMAKE CLEAN\e[0m\e\033[0;32m DONE"'\033[0m'
   else
     echo -e '\033[0;31m'"ARMADILLO COULD NOT RUN \e[3mMAKE CLEAN"'\033[0m'
     cd $ROOTDIR
@@ -124,7 +124,7 @@ if [ -z "${IGNORE_CPP_ARMA_INSTALLATION}" ]; then
 
   make -j $CPP_MAKE_NUM_THREADS all -Wno-dev > ${OUTPUT_CPP_PACKAGES_1} 2> ${OUTPUT_CPP_PACKAGES_2}
   if [ $? -eq 0 ]; then
-    echo -e '\033[0;32m'"ARMADILLO RUN \e[3mMAKE\e[0m\e\033[0;32m DONE"'\033[0m'
+    echo -e '\033[0;32m'"\t\t ARMADILLO RUN \e[3mMAKE\e[0m\e\033[0;32m DONE"'\033[0m'
   else
     echo -e '\033[0;31m'"ARMADILLO COULD NOT RUN \e[3mMAKE"'\033[0m'
     cd $ROOTDIR
@@ -133,7 +133,7 @@ if [ -z "${IGNORE_CPP_ARMA_INSTALLATION}" ]; then
 
   make install > ${OUTPUT_CPP_PACKAGES_1} 2> ${OUTPUT_CPP_PACKAGES_2}
   if [ $? -eq 0 ]; then
-    echo -e '\033[0;32m'"ARMADILLO RUN \e[3mMAKE INSTALL\e[0m\e\033[0;32m DONE"'\033[0m'
+    echo -e '\033[0;32m'"\t\t ARMADILLO RUN \e[3mMAKE INSTALL\e[0m\e\033[0;32m DONE"'\033[0m'
   else
     echo -e '\033[0;31m'"ARMADILLO COULD NOT RUN \e[3mMAKE INSTALL"'\033[0m'
     cd $ROOTDIR
@@ -141,14 +141,14 @@ if [ -z "${IGNORE_CPP_ARMA_INSTALLATION}" ]; then
   fi
 
   cd $ROOTDIR
-  echo -e '\033[1;34m''\e[4mINSTALLING ARMADILLO C++ LIBRARY DONE''\033[0m'
+  echo -e '\033[1;34m''\t \e[4mINSTALLING ARMADILLO C++ LIBRARY DONE''\033[0m'
 fi
 
 # ------------------------------------------------------------------------------
 # ------------------------ CARMA (ARMADILLO <-> PYBIND11) ----------------------
 # ------------------------------------------------------------------------------
 if [ -z "${IGNORE_CPP_CARMA_INSTALLATION}" ]; then
-  echo -e '\033[1;34m''INSTALLING CARMA C++ LIBRARY''\033[0m'
+  echo -e '\033[1;34m''\t INSTALLING CARMA C++ LIBRARY''\033[0m'
 
   cd $ROOTDIR/../cocoa_installation_libraries/$COCOA_CARMA_DIR
 
@@ -161,21 +161,21 @@ if [ -z "${IGNORE_CPP_CARMA_INSTALLATION}" ]; then
   cp -r ./carma_bits $ROOTDIR/.local/include/
 
   cd $ROOTDIR
-  echo -e '\033[1;34m''\e[4mINSTALLING CARMA C++ LIBRARY DONE''\033[0m'
+  echo -e '\033[1;34m''\t \e[4mINSTALLING CARMA C++ LIBRARY DONE''\033[0m'
 fi
 
 # ------------------------------------------------------------------------------
 # ------------------------------------- BOOST ----------------------------------
 # ------------------------------------------------------------------------------
 if [ -z "${IGNORE_CPP_BOOST_INSTALLATION}" ]; then
-  echo -e '\033[1;34m''INSTALLING BOOST C++ LIBRARY - \e[4mIT WILL TAKE A WHILE''\033[0m'
+  echo -e '\033[1;34m''\t INSTALLING BOOST C++ LIBRARY - \e[4mIT WILL TAKE A WHILE''\033[0m'
 
   cd $ROOTDIR/../cocoa_installation_libraries/$COCOA_BOOST_DIR
 
   ./bootstrap.sh \
     --prefix=$ROOTDIR/.local > ${OUTPUT_CPP_PACKAGES_1} 2> ${OUTPUT_CPP_PACKAGES_2}
   if [ $? -eq 0 ]; then
-    echo -e '\033[0;32m'"BOOST RUN \e[3mBOOTSTRAP\e[0m\e\033[0;32m DONE"'\033[0m'
+    echo -e '\033[0;32m'"\t\t BOOST RUN \e[3mBOOTSTRAP\e[0m\e\033[0;32m DONE"'\033[0m'
   else
     echo -e '\033[0;31m'"BOOST COULD NOT RUN \e[3mBOOTSTRAP"'\033[0m'
     cd $ROOTDIR
@@ -186,7 +186,7 @@ if [ -z "${IGNORE_CPP_BOOST_INSTALLATION}" ]; then
     --without-timer --without-mpi \
     --without-atomic > ${OUTPUT_CPP_PACKAGES_1} 2> ${OUTPUT_CPP_PACKAGES_2}
   if [ $? -eq 0 ]; then
-    echo -e '\033[0;32m'"BOOST RUN \e[3mB2\e[0m\e\033[0;32m DONE"'\033[0m'
+    echo -e '\033[0;32m'"\t\t BOOST RUN \e[3mB2\e[0m\e\033[0;32m DONE"'\033[0m'
   else
     echo -e '\033[0;31m'"BOOST COULD NOT RUN \e[3mB2"'\033[0m'
     cd $ROOTDIR
@@ -194,7 +194,7 @@ if [ -z "${IGNORE_CPP_BOOST_INSTALLATION}" ]; then
   fi
   
   cd $ROOTDIR
-  echo -e '\033[1;34m''\e[4mINSTALLING BOOST C++ LIBRARY DONE''\033[0m'
+  echo -e '\033[1;34m''\t \e[4mINSTALLING BOOST C++ LIBRARY DONE''\033[0m'
 fi
 
 echo -e '\033[1;44m''\e[4mSETUP_CPP_PACKAGES DONE''\033[0m'

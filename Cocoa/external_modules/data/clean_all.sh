@@ -3,7 +3,15 @@ if [ -z "${ROOTDIR}" ]; then
     return
 fi
 
-echo 'CLEAN DATA FOLDERS - THAT MIGHT TAKE A WHILE'
+if [ -z "${DEBUG_UNXV_CLEAN_ALL}" ]; then
+  export OUTPUT_CLEAN_ALL_1="/dev/null"
+  export OUTPUT_CLEAN_ALL_2="/dev/null"
+else
+  export OUTPUT_CLEAN_ALL_1="/dev/tty"
+  export OUTPUT_CLEAN_ALL_2="/dev/tty"
+fi
+
+echo 'CLEAN DATA FOLDERS - THAT MIGHT TAKE A WHILE' > ${OUTPUT_CLEAN_ALL_1} 2> ${OUTPUT_CLEAN_ALL_2}
 
 cd $ROOTDIR/external_modules/data
 
@@ -28,4 +36,4 @@ rm -rf h0licow_distance_chains
 
 cd $ROOTDIR/
 
-echo 'CLEAN DATA FOLDERS - DONE'
+echo 'CLEAN DATA FOLDERS - DONE' > ${OUTPUT_CLEAN_ALL_1} 2> ${OUTPUT_CLEAN_ALL_2}

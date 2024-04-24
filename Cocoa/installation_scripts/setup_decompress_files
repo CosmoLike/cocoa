@@ -31,7 +31,7 @@ fi
 # ----------------- COCOA_INSTALLATION_LIBRARIES -----------------------------
 # ----------------------------------------------------------------------------
 if [ -z "${NO_UNXZ_COCOA_INSTALLATION_LIBRARIES}" ]; then
-    echo -e '\033[1;34m''DECOMPRESSING FILES ON /COCOA_INSTALLATION_LIBRARIES''\033[0m'
+    echo -e '\033[1;34m''\t DECOMPRESSING FILES ON /COCOA_INSTALLATION_LIBRARIES''\033[0m'
 
     cd $ROOTDIR/../cocoa_installation_libraries/
 
@@ -39,7 +39,7 @@ if [ -z "${NO_UNXZ_COCOA_INSTALLATION_LIBRARIES}" ]; then
 
     cd $ROOTDIR
 
-    echo -e '\033[1;34m''\e[4mDECOMPRESSING FILES ON /COCOA_INSTALLATION_LIBRARIES DONE''\033[0m'
+    echo -e '\033[1;34m''\t \e[4mDECOMPRESSING FILES ON /COCOA_INSTALLATION_LIBRARIES DONE''\033[0m'
 fi
 # ----------------------------------------------------------------------------
 # ----------------------- /EXTERNAL_MODULES/CODE -----------------------------
@@ -52,7 +52,7 @@ fi
 # ----------------------- /EXTERNAL_MODULES/DATA -----------------------------
 # ----------------------------------------------------------------------------
 if [ -z "${NO_UNXZ_EXTERNAL_MODULES_DATA}" ]; then
-    echo -e '\033[1;34m''DECOMPRESSING FILES ON /EXTERNAL_MODULES/DATA''\033[0m'
+    echo -e '\033[1;34m''\t DECOMPRESSING FILES ON /EXTERNAL_MODULES/DATA''\033[0m'
 
     cd $ROOTDIR/external_modules/data/
 
@@ -60,7 +60,7 @@ if [ -z "${NO_UNXZ_EXTERNAL_MODULES_DATA}" ]; then
 
     cd $ROOTDIR
 
-    echo -e '\033[1;34m''\e[4mDECOMPRESSING FILES ON /EXTERNAL_MODULES/DATA DONE''\033[0m'
+    echo -e '\033[1;34m''\t \e[4mDECOMPRESSING FILES ON /EXTERNAL_MODULES/DATA DONE''\033[0m'
 fi
 
 echo -e '\033[1;44m''\e[4mSETUP_DECOMPRESS_FILES DONE''\033[0m'
