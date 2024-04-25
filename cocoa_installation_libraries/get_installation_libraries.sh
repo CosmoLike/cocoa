@@ -10,10 +10,18 @@ if [ -z "${IGNORE_CMAKE_INSTALLATION}" ]; then
         return 1
     fi
     
-    cd ./cmake-3.26.4
+    cd $ROOTDIR/../cocoa_installation_libraries/cmake-3.26.4
+    
     git checkout v3.26.4
-    rm -rf ./.git/
-    cd ../
+    if [ $? -neq 0 ];then
+        echo -e '\033[0;31m'"CMAKE: COULD NOT RUN \e[3mGIT CHECKOUT"'\033[0m'
+        cd $ROOTDIR
+        return 1
+    fi
+
+    rm -rf $ROOTDIR/../cocoa_installation_libraries/cmake-3.26.4/.git/
+    
+    cd $ROOTDIR/../cocoa_installation_libraries/
     
     tar -cf - cmake-3.26.4/ | xz -k -1 --threads=$MAKE_NUM_THREADS -c - > cmake.xz
     if [ $? -neq 0 ];then
@@ -36,6 +44,10 @@ if [ -z "${IGNORE_FORTRAN_LAPACK_INSTALLATION}" ]; then
     fi
 
 fi
+
+# --------------------------------------------------------------------------------
+# --------------------------------------------------------------------------------
+# --------------------------------------------------------------------------------
 
 if [ -z "${IGNORE_C_CFITSIO_INSTALLATION}" ]; then
     echo -e '\033[0;32m'"\t\tGETTING CFITSIO LIBRARY"'\033[0m'
@@ -123,7 +135,44 @@ if [ -z "${IGNORE_C_GSL_INSTALLATION}" ]; then
         return 1
     fi
 
-    echo -e '\033[0;32m'"\t\tGETTING FFTW LIBRARY DONE"'\033[0m'
+    echo -e '\033[0;32m'"\t\tGETTING GSL LIBRARY DONE"'\033[0m'
+fi
+
+# --------------------------------------------------------------------------------
+# --------------------------------------------------------------------------------
+# --------------------------------------------------------------------------------
+
+if [ -z "${IGNORE_CPP_SPDLOG_INSTALLATION}" ]; then
+    echo -e '\033[0;32m'"\t\tGETTING SPDLOG LIBRARY"'\033[0m'
+    
+    cd $ROOTDIR/../cocoa_installation_libraries/
+
+    git clone https://github.com/gabime/spdlog.git spdlog
+    if [ $? -neq 0 ];then
+        echo -e '\033[0;31m'"SPDLOG: COULD NOT RUN \e[3mGIT CLONE"'\033[0m'
+        cd $ROOTDIR
+        
+    fi
+
+    cd $ROOTDIR/../cocoa_installation_libraries/spdlog
+
+    git checkout v1.13.0
+    if [ $? -neq 0 ];then
+        echo -e '\033[0;31m'"SPDLOG: COULD NOT RUN \e[3mGIT CHECKOUT"'\033[0m'
+        cd $ROOTDIR
+        return 1
+    fi
+
+    rm -rf $ROOTDIR/../cocoa_installation_libraries/spdlog/.git/
+
+    tar -cf - spdlog/ | xz -k -1 --threads=$MAKE_NUM_THREADS -c - > spdlog.xz
+    if [ $? -neq 0 ];then
+        echo -e '\033[0;31m'"SPDLOG: COULD NOT COMPRESS \e[3mGSL FOLDER"'\033[0m'
+        cd $ROOTDIR
+        return 1
+    fi
+
+    echo -e '\033[0;32m'"\t\tGETTING SPDLOG LIBRARY DOONE"'\033[0m'
 fi
 
 if [ -z "${IGNORE_CPP_ARMA_INSTALLATION}" ]; then
@@ -195,16 +244,23 @@ if [ -z "${IGNORE_CPP_CARMA_INSTALLATION}" ]; then
 
     git clone https://github.com/RUrlus/carma.git carma_tmp
     if [ $? -neq 0 ];then
-        echo -e '\033[0;31m'"CARMA: COULD NOT RUN \e[3mWGET"'\033[0m'
+        echo -e '\033[0;31m'"CARMA: COULD NOT RUN \e[3mGIT CLONE"'\033[0m'
         cd $ROOTDIR
         
     fi
 
     cd $ROOTDIR/../cocoa_installation_libraries/carma_tmp
 
+    git checkout v0.7.0
+    if [ $? -neq 0 ];then
+        echo -e '\033[0;31m'"CARMA: COULD NOT RUN \e[3mGIT CHECKOUT"'\033[0m'
+        cd $ROOTDIR
+        return 1
+    fi
+
     mv ./include ../
 
-    cd ../
+    cd $ROOTDIR/../cocoa_installation_libraries/
 
     mv ./include carma
 
@@ -219,3 +275,7 @@ if [ -z "${IGNORE_CPP_CARMA_INSTALLATION}" ]; then
 
     echo -e '\033[0;32m'"\t\tGETTING CARMA LIBRARY DONE"'\033[0m'  
 fi
+
+# --------------------------------------------------------------------------------
+# --------------------------------------------------------------------------------
+# --------------------------------------------------------------------------------
