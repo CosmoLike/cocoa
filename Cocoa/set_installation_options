@@ -349,7 +349,7 @@ export COCOA_RUN_MCMC="mpirun -n 4 --oversubscribe --mca btl vader,tcp,self --bi
 # --------------------------------------------------------------------------------------
 # --------------------------------------------------------------------------------------
 # --------------------------------------------------------------------------------------
-export COCOA_ARMADILLO_DIR=armadillo-11.4.4/
+export COCOA_ARMADILLO_DIR=armadillo-12.8.2/
 export COCOA_BOOST_DIR=boost_1_81_0/
 export COCOA_CMAKE_DIR=cmake-3.26.4/
 export COCOA_CFITSIO_DIR=cfitsio-4.0.0/

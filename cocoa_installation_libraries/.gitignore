@@ -78,3 +78,7 @@ gsl.xz
 spdlog.xz
 boost.xz
 hdf5.xz
+armadillo.xz
+armadillo-*/
+carma_tmp/
+carma_*
