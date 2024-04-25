@@ -1,3 +1,7 @@
+# --------------------------------------------------------------------------------
+# --------------------------------------------------------------------------------
+# --------------------------------------------------------------------------------
+
 if [ -z "${IGNORE_CMAKE_INSTALLATION}" ]; then
     echo -e '\033[0;32m'"\t\tGETTING CMAKE LIBRARY"'\033[0m'
 
@@ -32,6 +36,73 @@ if [ -z "${IGNORE_CMAKE_INSTALLATION}" ]; then
 
     echo -e '\033[0;32m'"\t\tGETTING CMAKE LIBRARY DONE"'\033[0m'
 fi
+
+# --------------------------------------------------------------------------------
+# --------------------------------------------------------------------------------
+# --------------------------------------------------------------------------------
+
+if [ -z "${IGNORE_DISTUTILS_INSTALLATION}" ]; then
+    echo -e '\033[0;32m'"\t\tGETTING BINUTILS LIBRARY"'\033[0m'
+
+    cd $ROOTDIR/../cocoa_installation_libraries/
+
+    wget -q https://ftp.gnu.org/gnu/binutils/binutils-2.37.tar.gz
+    if [ $? -neq 0 ];then
+        echo -e '\033[0;31m'"BINUTILS: COULD NOT RUN \e[3mWGET"'\033[0m'
+        cd $ROOTDIR
+        return 1
+    fi
+
+    tar zxvf binutils-2.37.tar.gz
+    if [ $? -neq 0 ];then
+        echo -e '\033[0;31m'"BINUTILS: COULD NOT RUN \e[3mTAR"'\033[0m'
+        cd $ROOTDIR
+        return 1
+    fi
+    rm -f $ROOTDIR/../cocoa_installation_libraries/binutils-2.37.tar.gz
+
+    
+    tar -cf - binutils-2.37/ | xz -k -1 --threads=$MAKE_NUM_THREADS -c - > binutils.xz
+    if [ $? -neq 0 ];then
+        echo -e '\033[0;31m'"BINUTILS: COULD NOT COMPRESS \e[3mBINUTILS FOLDER"'\033[0m'
+        cd $ROOTDIR
+        return 1
+    fi
+
+    echo -e '\033[0;32m'"\t\tGETTING BINUTILS LIBRARY DONE"'\033[0m'
+fi
+
+if [ -z "${IGNORE_DISTUTILS_INSTALLATION}" ]; then
+    echo -e '\033[0;32m'"\t\tGETTING TEXINFO LIBRARY"'\033[0m'
+
+    cd $ROOTDIR/../cocoa_installation_libraries/
+
+    wget -q https://ftp.gnu.org/gnu/texinfo/texinfo-7.0.3.tar.xz
+    if [ $? -neq 0 ];then
+        echo -e '\033[0;31m'"TEXINFO: COULD NOT RUN \e[3mWGET"'\033[0m'
+        cd $ROOTDIR
+        return 1
+    fi
+
+    tar xf texinfo-7.0.3.tar.xz
+    if [ $? -neq 0 ];then
+        echo -e '\033[0;31m'"TEXINFO: COULD NOT RUN \e[3mTAR"'\033[0m'
+        cd $ROOTDIR
+        return 1
+    fi
+    rm -f $ROOTDIR/../cocoa_installation_libraries/texinfo-7.0.3.tar.xz
+
+
+    tar -cf - texinfo-7.0.3/ | xz -k -1 --threads=$MAKE_NUM_THREADS -c - > texinfo.xz
+    if [ $? -neq 0 ];then
+        echo -e '\033[0;31m'"TEXINFO: COULD NOT COMPRESS \e[3mTEXINFO FOLDER"'\033[0m'
+        cd $ROOTDIR
+        return 1
+    fi
+
+    echo -e '\033[0;32m'"\t\tGETTING BINUTILS LIBRARY DONE"'\033[0m'
+fi
+
 
 # --------------------------------------------------------------------------------
 # --------------------------------------------------------------------------------
