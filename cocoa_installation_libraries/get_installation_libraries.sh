@@ -38,6 +38,13 @@ fi
 # --------------------------------------------------------------------------------
 
 if [ -z "${IGNORE_FORTRAN_LAPACK_INSTALLATION}" ]; then
+    echo -e '\033[0;32m'"\t\tGETTING OPENBLAS LIBRARY"'\033[0m'
+    
+
+    echo -e '\033[0;32m'"\t\tGETTING OPENBLAS LIBRARY DONE"'\033[0m'
+fi
+
+if [ -z "${IGNORE_FORTRAN_LAPACK_INSTALLATION}" ]; then
     echo -e '\033[0;32m'"\t\tGETTING LAPACK LIBRARY"'\033[0m'
     
     cd $ROOTDIR/../cocoa_installation_libraries/
@@ -58,25 +65,19 @@ if [ -z "${IGNORE_FORTRAN_LAPACK_INSTALLATION}" ]; then
         
     fi
 
-    echo -e '\033[0;32m'"\t\tGETTING LAPACK LIBRARY DONE"'\033[0m'
-fi
+    rm -rf $ROOTDIR/../cocoa_installation_libraries/lapack-3.11.0/.git/
 
+    cd $ROOTDIR/../cocoa_installation_libraries/
 
-    git clone https://github.com/RUrlus/carma.git carma_tmp
+    tar -cf - lapack-3.11.0/ | xz -k -1 --threads=$MAKE_NUM_THREADS -c - > lapack.xz
     if [ $? -neq 0 ];then
-        echo -e '\033[0;31m'"CARMA: COULD NOT RUN \e[3mGIT CLONE"'\033[0m'
-        cd $ROOTDIR
-        
-    fi
-
-    cd $ROOTDIR/../cocoa_installation_libraries/carma_tmp
-
-    git checkout v0.7.0
-    if [ $? -neq 0 ];then
-        echo -e '\033[0;31m'"CARMA: COULD NOT RUN \e[3mGIT CHECKOUT"'\033[0m'
+        echo -e '\033[0;31m'"CFITSIO: COULD NOT COMPRESS \e[3mCFITSIO FOLDER"'\033[0m'
         cd $ROOTDIR
         return 1
     fi
+
+    echo -e '\033[0;32m'"\t\tGETTING LAPACK LIBRARY DONE"'\033[0m'
+fi
 
 # --------------------------------------------------------------------------------
 # --------------------------------------------------------------------------------
