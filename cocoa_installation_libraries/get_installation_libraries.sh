@@ -1,9 +1,30 @@
-# --------------------------------------------------------------------------------
-# --------------------------------------------------------------------------------
-# --------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
+
+echo -e '\033[1;34m''\t GET_INSTALLATION_LIBRARIES''\033[0m'
+
+if [ -z "${ROOTDIR}" ]; then
+    echo -e '\033[0;31m''ERROR ENV VARIABLE ROOTDIR IS NOT DEFINED''\033[0m'
+    return 1
+fi
+
+if [ -z "${DEBUG_GET_INSTALLATION_LIBRARIES_OUTPUT}" ]; then
+  export OUTPUT_GIL_1="/dev/null"
+  export OUTPUT_GIL_2="/dev/null"
+else
+  export OUTPUT_GIL_1="/dev/tty"
+  export OUTPUT_GIL_2="/dev/tty"
+  export CPP_MAKE_NUM_THREADS=1
+fi
+
+
+# ------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 
 if [ -z "${IGNORE_CMAKE_INSTALLATION}" ]; then
-    echo -e '\033[0;32m'"\t\tGETTING CMAKE LIBRARY"'\033[0m'
+    echo -e '\033[0;32m'"\t\tGETTING CMAKE LIBRARY"'\033[0m' > ${OUTPUT_GIL_1} 2> ${OUTPUT_GIL_2}
 
     cd $ROOTDIR/../cocoa_installation_libraries/
     
@@ -34,7 +55,7 @@ if [ -z "${IGNORE_CMAKE_INSTALLATION}" ]; then
         return 1
     fi
 
-    echo -e '\033[0;32m'"\t\tGETTING CMAKE LIBRARY DONE"'\033[0m'
+    echo -e '\033[0;32m'"\t\tGETTING CMAKE LIBRARY DONE"'\033[0m' > ${OUTPUT_GIL_1} 2> ${OUTPUT_GIL_2}
 fi
 
 # --------------------------------------------------------------------------------
@@ -42,7 +63,7 @@ fi
 # --------------------------------------------------------------------------------
 
 if [ -z "${IGNORE_DISTUTILS_INSTALLATION}" ]; then
-    echo -e '\033[0;32m'"\t\tGETTING BINUTILS LIBRARY"'\033[0m'
+    echo -e '\033[0;32m'"\t\tGETTING BINUTILS LIBRARY"'\033[0m' > ${OUTPUT_GIL_1} 2> ${OUTPUT_GIL_2}
 
     cd $ROOTDIR/../cocoa_installation_libraries/
 
@@ -69,15 +90,15 @@ if [ -z "${IGNORE_DISTUTILS_INSTALLATION}" ]; then
         return 1
     fi
 
-    echo -e '\033[0;32m'"\t\tGETTING BINUTILS LIBRARY DONE"'\033[0m'
+    echo -e '\033[0;32m'"\t\tGETTING BINUTILS LIBRARY DONE"'\033[0m' > ${OUTPUT_GIL_1} 2> ${OUTPUT_GIL_2}
 fi
 
-# --------------------------------------------------------------------------------
-# --------------------------------------------------------------------------------
-# --------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 
 if [ -z "${IGNORE_DISTUTILS_INSTALLATION}" ]; then
-    echo -e '\033[0;32m'"\t\tGETTING TEXINFO LIBRARY"'\033[0m'
+    echo -e '\033[0;32m'"\t\tGETTING TEXINFO LIBRARY"'\033[0m' > ${OUTPUT_GIL_1} 2> ${OUTPUT_GIL_2}
 
     cd $ROOTDIR/../cocoa_installation_libraries/
 
@@ -104,16 +125,15 @@ if [ -z "${IGNORE_DISTUTILS_INSTALLATION}" ]; then
         return 1
     fi
 
-    echo -e '\033[0;32m'"\t\tGETTING TEXINFO LIBRARY DONE"'\033[0m'
+    echo -e '\033[0;32m'"\t\tGETTING TEXINFO LIBRARY DONE"'\033[0m' > ${OUTPUT_GIL_1} 2> ${OUTPUT_GIL_2}
 fi
 
-
-# --------------------------------------------------------------------------------
-# --------------------------------------------------------------------------------
-# --------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 
 if [ -z "${IGNORE_OPENBLAS_INSTALLATION}" ]; then
-    echo -e '\033[0;32m'"\t\tGETTING OPENBLAS LIBRARY"'\033[0m'
+    echo -e '\033[0;32m'"\t\tGETTING OPENBLAS LIBRARY"'\033[0m' > ${OUTPUT_GIL_1} 2> ${OUTPUT_GIL_2}
     
     cd $ROOTDIR/../cocoa_installation_libraries/
 
@@ -135,15 +155,15 @@ if [ -z "${IGNORE_OPENBLAS_INSTALLATION}" ]; then
 
     rm -rf $ROOTDIR/../cocoa_installation_libraries/OpenBLAS-0.3.23/.git/
 
-    echo -e '\033[0;32m'"\t\tGETTING OPENBLAS LIBRARY DONE"'\033[0m'
+    echo -e '\033[0;32m'"\t\tGETTING OPENBLAS LIBRARY DONE"'\033[0m' > ${OUTPUT_GIL_1} 2> ${OUTPUT_GIL_2}
 fi
 
-# --------------------------------------------------------------------------------
-# --------------------------------------------------------------------------------
-# --------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 
 if [ -z "${IGNORE_FORTRAN_LAPACK_INSTALLATION}" ]; then
-    echo -e '\033[0;32m'"\t\tGETTING LAPACK LIBRARY"'\033[0m'
+    echo -e '\033[0;32m'"\t\tGETTING LAPACK LIBRARY"'\033[0m' > ${OUTPUT_GIL_1} 2> ${OUTPUT_GIL_2}
     
     cd $ROOTDIR/../cocoa_installation_libraries/
 
@@ -174,14 +194,14 @@ if [ -z "${IGNORE_FORTRAN_LAPACK_INSTALLATION}" ]; then
         return 1
     fi
 
-    echo -e '\033[0;32m'"\t\tGETTING LAPACK LIBRARY DONE"'\033[0m'
+    echo -e '\033[0;32m'"\t\tGETTING LAPACK LIBRARY DONE"'\033[0m' > ${OUTPUT_GIL_1} 2> ${OUTPUT_GIL_2}
 fi
 
 # --------------------------------------------------------------------------------
 # --------------------------------------------------------------------------------
 # --------------------------------------------------------------------------------
 if [ -z "${IGNORE_HDF5_INSTALLATION}" ]; then
-    echo -e '\033[0;32m'"\t\tGETTING HDF5 LIBRARY"'\033[0m'
+    echo -e '\033[0;32m'"\t\tGETTING HDF5 LIBRARY"'\033[0m' > ${OUTPUT_GIL_1} 2> ${OUTPUT_GIL_2}
 
     cd $ROOTDIR/../cocoa_installation_libraries/
 
@@ -207,7 +227,7 @@ if [ -z "${IGNORE_HDF5_INSTALLATION}" ]; then
         return 1
     fi
 
-    echo -e '\033[0;32m'"\t\tGETTING HDF5 LIBRARY DONE"'\033[0m'
+    echo -e '\033[0;32m'"\t\tGETTING HDF5 LIBRARY DONE"'\033[0m' > ${OUTPUT_GIL_1} 2> ${OUTPUT_GIL_2}
 fi
 
 # --------------------------------------------------------------------------------
@@ -215,7 +235,7 @@ fi
 # --------------------------------------------------------------------------------
 
 if [ -z "${IGNORE_C_CFITSIO_INSTALLATION}" ]; then
-    echo -e '\033[0;32m'"\t\tGETTING CFITSIO LIBRARY"'\033[0m'
+    echo -e '\033[0;32m'"\t\tGETTING CFITSIO LIBRARY"'\033[0m' > ${OUTPUT_GIL_1} 2> ${OUTPUT_GIL_2}
 
     cd $ROOTDIR/../cocoa_installation_libraries/
 
@@ -241,11 +261,11 @@ if [ -z "${IGNORE_C_CFITSIO_INSTALLATION}" ]; then
         return 1
     fi
 
-    echo -e '\033[0;32m'"\t\tGETTING CFITSIO LIBRARY DONE"'\033[0m'
+    echo -e '\033[0;32m'"\t\tGETTING CFITSIO LIBRARY DONE"'\033[0m' > ${OUTPUT_GIL_1} 2> ${OUTPUT_GIL_2}
 fi
 
 if [ -z "${IGNORE_C_FFTW_INSTALLATION}" ]; then
-    echo -e '\033[0;32m'"\t\tGETTING FFTW LIBRARY"'\033[0m'
+    echo -e '\033[0;32m'"\t\tGETTING FFTW LIBRARY"'\033[0m' > ${OUTPUT_GIL_1} 2> ${OUTPUT_GIL_2}
     
     wget -q http://www.fftw.org/fftw-3.3.10.tar.gz 
     if [ $? -neq 0 ];then
@@ -270,11 +290,11 @@ if [ -z "${IGNORE_C_FFTW_INSTALLATION}" ]; then
         return 1
     fi
 
-    echo -e '\033[0;32m'"\t\tGETTING FFTW LIBRARY DONE"'\033[0m'
+    echo -e '\033[0;32m'"\t\tGETTING FFTW LIBRARY DONE"'\033[0m' > ${OUTPUT_GIL_1} 2> ${OUTPUT_GIL_2}
 fi
 
 if [ -z "${IGNORE_C_GSL_INSTALLATION}" ]; then
-    echo -e '\033[0;32m'"\t\tGETTING GSL LIBRARY"'\033[0m'
+    echo -e '\033[0;32m'"\t\tGETTING GSL LIBRARY"'\033[0m' > ${OUTPUT_GIL_1} 2> ${OUTPUT_GIL_2}
 
     cd $ROOTDIR/../cocoa_installation_libraries/
 
@@ -301,7 +321,7 @@ if [ -z "${IGNORE_C_GSL_INSTALLATION}" ]; then
         return 1
     fi
 
-    echo -e '\033[0;32m'"\t\tGETTING GSL LIBRARY DONE"'\033[0m'
+    echo -e '\033[0;32m'"\t\tGETTING GSL LIBRARY DONE"'\033[0m' > ${OUTPUT_GIL_1} 2> ${OUTPUT_GIL_2}
 fi
 
 # --------------------------------------------------------------------------------
@@ -309,7 +329,7 @@ fi
 # --------------------------------------------------------------------------------
 
 if [ -z "${IGNORE_CPP_SPDLOG_INSTALLATION}" ]; then
-    echo -e '\033[0;32m'"\t\tGETTING SPDLOG LIBRARY"'\033[0m'
+    echo -e '\033[0;32m'"\t\tGETTING SPDLOG LIBRARY"'\033[0m' > ${OUTPUT_GIL_1} 2> ${OUTPUT_GIL_2}
     
     cd $ROOTDIR/../cocoa_installation_libraries/
 
@@ -338,11 +358,11 @@ if [ -z "${IGNORE_CPP_SPDLOG_INSTALLATION}" ]; then
         return 1
     fi
 
-    echo -e '\033[0;32m'"\t\tGETTING SPDLOG LIBRARY DOONE"'\033[0m'
+    echo -e '\033[0;32m'"\t\tGETTING SPDLOG LIBRARY DOONE"'\033[0m' > ${OUTPUT_GIL_1} 2> ${OUTPUT_GIL_2}
 fi
 
 if [ -z "${IGNORE_CPP_ARMA_INSTALLATION}" ]; then
-    echo -e '\033[0;32m'"\t\tGETTING ARMA LIBRARY"'\033[0m'
+    echo -e '\033[0;32m'"\t\tGETTING ARMA LIBRARY"'\033[0m' > ${OUTPUT_GIL_1} 2> ${OUTPUT_GIL_2}
     
     cd $ROOTDIR/../cocoa_installation_libraries/
 
@@ -369,11 +389,11 @@ if [ -z "${IGNORE_CPP_ARMA_INSTALLATION}" ]; then
         return 1
     fi
 
-    echo -e '\033[0;32m'"\t\tGETTING ARMA LIBRARY DONE"'\033[0m'
+    echo -e '\033[0;32m'"\t\tGETTING ARMA LIBRARY DONE"'\033[0m' > ${OUTPUT_GIL_1} 2> ${OUTPUT_GIL_2}
 fi
 
 if [ -z "${IGNORE_CPP_BOOST_INSTALLATION}" ]; then
-    echo -e '\033[0;32m'"\t\tGETTING BOOST LIBRARY"'\033[0m'
+    echo -e '\033[0;32m'"\t\tGETTING BOOST LIBRARY"'\033[0m' > ${OUTPUT_GIL_1} 2> ${OUTPUT_GIL_2}
     
     cd $ROOTDIR/../cocoa_installation_libraries/
 
@@ -400,11 +420,11 @@ if [ -z "${IGNORE_CPP_BOOST_INSTALLATION}" ]; then
         return 1
     fi
 
-    echo -e '\033[0;32m'"\t\tGETTING BOOST LIBRARY DONE"'\033[0m'  
+    echo -e '\033[0;32m'"\t\tGETTING BOOST LIBRARY DONE"'\033[0m' > ${OUTPUT_GIL_1} 2> ${OUTPUT_GIL_2}
 fi
 
 if [ -z "${IGNORE_CPP_CARMA_INSTALLATION}" ]; then
-    echo -e '\033[0;32m'"\t\tGETTING CARMA LIBRARY"'\033[0m'
+    echo -e '\033[0;32m'"\t\tGETTING CARMA LIBRARY"'\033[0m' > ${OUTPUT_GIL_1} 2> ${OUTPUT_GIL_2}
     
     cd $ROOTDIR/../cocoa_installation_libraries/
 
@@ -439,9 +459,12 @@ if [ -z "${IGNORE_CPP_CARMA_INSTALLATION}" ]; then
         return 1
     fi  
 
-    echo -e '\033[0;32m'"\t\tGETTING CARMA LIBRARY DONE"'\033[0m'  
+    echo -e '\033[0;32m'"\t\tGETTING CARMA LIBRARY DONE"'\033[0m' > ${OUTPUT_GIL_1} 2> ${OUTPUT_GIL_2}
 fi
 
-# --------------------------------------------------------------------------------
-# --------------------------------------------------------------------------------
-# --------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
+
+echo -e '\033[1;34m''\t \e[4mGET_INSTALLATION_LIBRARIES''\033[0m'
+
