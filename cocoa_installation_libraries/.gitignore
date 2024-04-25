@@ -85,3 +85,8 @@ carma_*
 euclidemu2-1.2.0/
 euclidemu2-*/
 armadillo-*/
+armadillo-*.tar.xz
+hdf5-1.12.3/
+hdf5-*/
+hdf5-*.tar.xz
+armadillo-*.tar.xz
