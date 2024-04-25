@@ -137,7 +137,7 @@ if [ -z "${IGNORE_CPP_ARMA_INSTALLATION}" ]; then
         cd $ROOTDIR
         return 1
     fi
-    
+
     tar xf armadillo-12.8.2.tar.xz
     if [ $? -neq 0 ];then
         echo -e '\033[0;31m'"ARMA: COULD NOT RUN \e[3mTAR"'\033[0m'
@@ -157,4 +157,33 @@ if [ -z "${IGNORE_CPP_ARMA_INSTALLATION}" ]; then
     echo -e '\033[0;32m'"\t\tGETTING ARMA LIBRARY"'\033[0m'
 fi
 
+if [ -z "${IGNORE_CPP_BOOST_INSTALLATION}" ]; then
+    echo -e '\033[0;32m'"\t\tGETTING BOOST LIBRARY"'\033[0m'
+    
+    cd $ROOTDIR/../cocoa_installation_libraries/
 
+    wget -q https://boostorg.jfrog.io/artifactory/main/release/1.81.0/source/boost_1_81_0.tar.gz
+    if [ $? -neq 0 ];then
+        echo -e '\033[0;31m'"BOOST: COULD NOT RUN \e[3mWGET"'\033[0m'
+        cd $ROOTDIR
+        
+    fi
+    
+    tar xvzf boost_1_81_0.tar.gz
+    if [ $? -neq 0 ];then
+        echo -e '\033[0;31m'"ARMA: COULD NOT RUN \e[3mTAR"'\033[0m'
+        cd $ROOTDIR
+        return 1
+    fi
+
+    rm -f ROOTDIR/../cocoa_installation_libraries/boost_1_81_0.tar.gz
+    
+    tar -cf - boost_1_81_0/ | xz -k -1 --threads=$MAKE_NUM_THREADS -c - > boost.xz
+    if [ $? -neq 0 ];then
+        echo -e '\033[0;31m'"BOOST: COULD NOT COMPRESS \e[3mGSL FOLDER"'\033[0m'
+        cd $ROOTDIR
+        return 1
+    fi
+
+    echo -e '\033[0;32m'"\t\tGETTING BOOST LIBRARY"'\033[0m'  
+fi
