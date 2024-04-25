@@ -33,17 +33,50 @@ if [ -z "${IGNORE_CMAKE_INSTALLATION}" ]; then
     echo -e '\033[0;32m'"\t\tGETTING CMAKE LIBRARY DONE"'\033[0m'
 fi
 
+# --------------------------------------------------------------------------------
+# --------------------------------------------------------------------------------
+# --------------------------------------------------------------------------------
+
 if [ -z "${IGNORE_FORTRAN_LAPACK_INSTALLATION}" ]; then
-    if [ -z "${THREAD_UNXZ}" ]; then
-      echo '\033[0;32m'"\t\t DECOMPRESSING FORTRAN LAPACK LIBRARY"'\033[0m' > ${OUTPUT_UNXV_ALL_1} 2> ${OUTPUT_UNXV_ALL_2}
-      tar xf lapack.xz
-      proc11=$!
-    else
-      tar xf lapack.xz &
-      proc11=$!
+    echo -e '\033[0;32m'"\t\tGETTING LAPACK LIBRARY"'\033[0m'
+    
+    cd $ROOTDIR/../cocoa_installation_libraries/
+
+    git clone https://github.com/Reference-LAPACK/lapack.git lapack
+    if [ $? -neq 0 ];then
+        echo -e '\033[0;31m'"LAPACK: COULD NOT RUN \e[3mGIT CLONE"'\033[0m'
+        cd $ROOTDIR
+        
     fi
 
+    cd $ROOTDIR/../cocoa_installation_libraries/lapack-3.11.0
+    
+    git checkout lapack-3.11.0
+    if [ $? -neq 0 ];then
+        echo -e '\033[0;31m'"LAPACK: COULD NOT RUN \e[3mGIT CHECKOUT"'\033[0m'
+        cd $ROOTDIR
+        
+    fi
+
+    echo -e '\033[0;32m'"\t\tGETTING LAPACK LIBRARY DONE"'\033[0m'
 fi
+
+
+    git clone https://github.com/RUrlus/carma.git carma_tmp
+    if [ $? -neq 0 ];then
+        echo -e '\033[0;31m'"CARMA: COULD NOT RUN \e[3mGIT CLONE"'\033[0m'
+        cd $ROOTDIR
+        
+    fi
+
+    cd $ROOTDIR/../cocoa_installation_libraries/carma_tmp
+
+    git checkout v0.7.0
+    if [ $? -neq 0 ];then
+        echo -e '\033[0;31m'"CARMA: COULD NOT RUN \e[3mGIT CHECKOUT"'\033[0m'
+        cd $ROOTDIR
+        return 1
+    fi
 
 # --------------------------------------------------------------------------------
 # --------------------------------------------------------------------------------
