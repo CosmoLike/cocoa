@@ -1,16 +1,16 @@
 #!/bin/bash
 
+if [ -z "${ROOTDIR}" ]; then
+    echo '\033[0;31m''ERROR ENV VARIABLE ROOTDIR IS NOT DEFINED''\033[0m'
+    return 1
+fi
+
 if [ -z "${DEBUG_UNXV_CLEAN_ALL}" ]; then
   export OUTPUT_UNXV_ALL_1="/dev/null"
   export OUTPUT_UNXV_ALL_2="/dev/null"
 else
   export OUTPUT_UNXV_ALL_1="/dev/tty"
   export OUTPUT_UNXV_ALL_2="/dev/tty"
-fi
-
-if [ -z "${ROOTDIR}" ]; then
-    echo '\033[0;31m''ERROR ENV VARIABLE ROOTDIR IS NOT DEFINED''\033[0m'
-    return 1
 fi
 
 sh $ROOTDIR/../cocoa_installation_libraries/clean_all
@@ -210,6 +210,15 @@ if [ -z "${IGNORE_HDF5_INSTALLATION}" ]; then
     fi
 else
     proc14=1
+fi
+
+if [ -z "${THREAD_UNXZ}" ]; then
+    echo '\033[0;32m'"\t\t DECOMPRESSING EE2 LIBRARY"'\033[0m' > ${OUTPUT_UNXV_ALL_1} 2> ${OUTPUT_UNXV_ALL_2}
+    tar xf ee2.xz
+    proc15=$!
+else
+    tar xf ee2.xz &
+    proc15=$!
 fi
 
 if [ -n "${THREAD_UNXZ}" ]; then

@@ -168,7 +168,7 @@ fi
 # ------------------------------------- BOOST ----------------------------------
 # ------------------------------------------------------------------------------
 if [ -z "${IGNORE_CPP_BOOST_INSTALLATION}" ]; then
-  echo -e '\033[1;34m''\t INSTALLING BOOST C++ LIBRARY - \e[4mIT WILL TAKE A WHILE''\033[0m'
+  echo -e '\033[1;34m''\t INSTALLING BOOST C++ LIBRARY''\033[0m'
 
   cd $ROOTDIR/../cocoa_installation_libraries/$COCOA_BOOST_DIR
 
