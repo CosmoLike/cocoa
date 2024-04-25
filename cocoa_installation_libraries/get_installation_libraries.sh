@@ -72,6 +72,10 @@ if [ -z "${IGNORE_DISTUTILS_INSTALLATION}" ]; then
     echo -e '\033[0;32m'"\t\tGETTING BINUTILS LIBRARY DONE"'\033[0m'
 fi
 
+# --------------------------------------------------------------------------------
+# --------------------------------------------------------------------------------
+# --------------------------------------------------------------------------------
+
 if [ -z "${IGNORE_DISTUTILS_INSTALLATION}" ]; then
     echo -e '\033[0;32m'"\t\tGETTING TEXINFO LIBRARY"'\033[0m'
 
@@ -100,7 +104,7 @@ if [ -z "${IGNORE_DISTUTILS_INSTALLATION}" ]; then
         return 1
     fi
 
-    echo -e '\033[0;32m'"\t\tGETTING BINUTILS LIBRARY DONE"'\033[0m'
+    echo -e '\033[0;32m'"\t\tGETTING TEXINFO LIBRARY DONE"'\033[0m'
 fi
 
 
@@ -176,6 +180,39 @@ fi
 # --------------------------------------------------------------------------------
 # --------------------------------------------------------------------------------
 # --------------------------------------------------------------------------------
+if [ -z "${IGNORE_HDF5_INSTALLATION}" ]; then
+    echo -e '\033[0;32m'"\t\tGETTING HDF5 LIBRARY"'\033[0m'
+
+    cd $ROOTDIR/../cocoa_installation_libraries/
+
+    wget -q https://hdf-wordpress-1.s3.amazonaws.com/wp-content/uploads/manual/HDF5/HDF5_1_12_3/src/hdf5-1.12.3.tar.gz
+    if [ $? -neq 0 ];then
+        echo -e '\033[0;31m'"HDF5: COULD NOT RUN \e[3mWGET"'\033[0m'
+        cd $ROOTDIR
+        return 1
+    fi
+
+    tar zxvf hdf5-1.12.3.tar.gz
+    if [ $? -neq 0 ];then
+        echo -e '\033[0;31m'"HDF5: COULD NOT RUN \e[3mTAR"'\033[0m'
+        cd $ROOTDIR
+        return 1
+    fi
+    rm -f $ROOTDIR/../cocoa_installation_libraries/hdf5-1.12.3.tar.gz
+
+    tar -cf - hdf5-1.12.3/ | xz -k -1 --threads=$MAKE_NUM_THREADS -c - > hdf5.xz
+    if [ $? -neq 0 ];then
+        echo -e '\033[0;31m'"HDF5: COULD NOT COMPRESS \e[3mHDF5 FOLDER"'\033[0m'
+        cd $ROOTDIR
+        return 1
+    fi
+
+    echo -e '\033[0;32m'"\t\tGETTING HDF5 LIBRARY DONE"'\033[0m'
+fi
+
+# --------------------------------------------------------------------------------
+# --------------------------------------------------------------------------------
+# --------------------------------------------------------------------------------
 
 if [ -z "${IGNORE_C_CFITSIO_INSTALLATION}" ]; then
     echo -e '\033[0;32m'"\t\tGETTING CFITSIO LIBRARY"'\033[0m'
@@ -188,13 +225,14 @@ if [ -z "${IGNORE_C_CFITSIO_INSTALLATION}" ]; then
         cd $ROOTDIR
         return 1
     fi
+
     tar zxvf cfitsio-4.0.0.tar.gz
     if [ $? -neq 0 ];then
         echo -e '\033[0;31m'"CFITSIO: COULD NOT RUN \e[3mTAR"'\033[0m'
         cd $ROOTDIR
         return 1
     fi
-    rm -f cfitsio-4.0.0.tar.gz
+    rm -f $ROOTDIR/../cocoa_installation_libraries/cfitsio-4.0.0.tar.gz
 
     tar -cf - cfitsio-4.0.0/ | xz -k -1 --threads=$MAKE_NUM_THREADS -c - > cfitsio.xz
     if [ $? -neq 0 ];then
