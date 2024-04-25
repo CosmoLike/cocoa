@@ -156,7 +156,7 @@ if [ -z "${IGNORE_OPENBLAS_INSTALLATION}" ]; then
 
     tar -cf - OpenBLAS-0.3.23/ | xz -k -1 --threads=$MAKE_NUM_THREADS -c - > OpenBLAS.xz
     if [ $? -neq 0 ];then
-        echo '\033[0;31m'"OPENBLAS: COULD NOT COMPRESS \e[3mCFITSIO FOLDER"'\033[0m'
+        echo '\033[0;31m'"OPENBLAS: COULD NOT COMPRESS \e[3mOPENBLAS FOLDER"'\033[0m'
         cd $ROOTDIR
         return 1
     fi
@@ -195,7 +195,7 @@ if [ -z "${IGNORE_FORTRAN_LAPACK_INSTALLATION}" ]; then
 
     tar -cf - lapack-3.11.0/ | xz -k -1 --threads=$MAKE_NUM_THREADS -c - > lapack.xz
     if [ $? -neq 0 ];then
-        echo '\033[0;31m'"LAPACK: COULD NOT COMPRESS \e[3mCFITSIO FOLDER"'\033[0m'
+        echo '\033[0;31m'"LAPACK: COULD NOT COMPRESS \e[3mLAPACK FOLDER"'\033[0m'
         cd $ROOTDIR
         return 1
     fi
@@ -359,7 +359,7 @@ if [ -z "${IGNORE_CPP_SPDLOG_INSTALLATION}" ]; then
 
     tar -cf - spdlog/ | xz -k -1 --threads=$MAKE_NUM_THREADS -c - > spdlog.xz
     if [ $? -neq 0 ];then
-        echo '\033[0;31m'"SPDLOG: COULD NOT COMPRESS \e[3mGSL FOLDER"'\033[0m'
+        echo '\033[0;31m'"SPDLOG: COULD NOT COMPRESS \e[3mSPDLOG FOLDER"'\033[0m'
         cd $ROOTDIR
         return 1
     fi
@@ -390,7 +390,7 @@ if [ -z "${IGNORE_CPP_ARMA_INSTALLATION}" ]; then
 
     tar -cf - armadillo-12.8.2/ | xz -k -1 --threads=$MAKE_NUM_THREADS -c - > armadillo.xz
     if [ $? -neq 0 ];then
-        echo '\033[0;31m'"ARMA: COULD NOT COMPRESS \e[3mGSL FOLDER"'\033[0m'
+        echo '\033[0;31m'"ARMA: COULD NOT COMPRESS \e[3mARMA FOLDER"'\033[0m'
         cd $ROOTDIR
         return 1
     fi
@@ -421,7 +421,7 @@ if [ -z "${IGNORE_CPP_BOOST_INSTALLATION}" ]; then
     
     tar -cf - boost_1_81_0/ | xz -k -1 --threads=$MAKE_NUM_THREADS -c - > boost.xz
     if [ $? -neq 0 ];then
-        echo '\033[0;31m'"BOOST: COULD NOT COMPRESS \e[3mGSL FOLDER"'\033[0m'
+        echo '\033[0;31m'"BOOST: COULD NOT COMPRESS \e[3mBOOST FOLDER"'\033[0m'
         cd $ROOTDIR
         return 1
     fi
@@ -460,7 +460,7 @@ if [ -z "${IGNORE_CPP_CARMA_INSTALLATION}" ]; then
 
     tar -cf - carma/ | xz -k -1 --threads=$MAKE_NUM_THREADS -c - > carma.xz
     if [ $? -neq 0 ];then
-        echo '\033[0;31m'"CARMA: COULD NOT COMPRESS \e[3mGSL FOLDER"'\033[0m'
+        echo '\033[0;31m'"CARMA: COULD NOT COMPRESS \e[3mCARMA FOLDER"'\033[0m'
         cd $ROOTDIR
         return 1
     fi  
