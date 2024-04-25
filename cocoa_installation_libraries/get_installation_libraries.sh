@@ -37,12 +37,35 @@ fi
 # --------------------------------------------------------------------------------
 # --------------------------------------------------------------------------------
 
-if [ -z "${IGNORE_FORTRAN_LAPACK_INSTALLATION}" ]; then
+if [ -z "${IGNORE_OPENBLAS_INSTALLATION}" ]; then
     echo -e '\033[0;32m'"\t\tGETTING OPENBLAS LIBRARY"'\033[0m'
     
+    cd $ROOTDIR/../cocoa_installation_libraries/
+
+    git clone https://github.com/OpenMathLib/OpenBLAS.git OpenBLAS-0.3.23
+    if [ $? -neq 0 ];then
+        echo -e '\033[0;31m'"OPENBLAS: COULD NOT RUN \e[3mGIT CLONE"'\033[0m'
+        cd $ROOTDIR
+        
+    fi
+
+    cd $ROOTDIR/../cocoa_installation_libraries/OpenBLAS-0.3.23
+
+    git checkout v0.3.23
+    if [ $? -neq 0 ];then
+        echo -e '\033[0;31m'"OPENBLAS: COULD NOT RUN \e[3mGIT CHECKOUT"'\033[0m'
+        cd $ROOTDIR
+        
+    fi
+
+    rm -rf $ROOTDIR/../cocoa_installation_libraries/OpenBLAS-0.3.23/.git/
 
     echo -e '\033[0;32m'"\t\tGETTING OPENBLAS LIBRARY DONE"'\033[0m'
 fi
+
+# --------------------------------------------------------------------------------
+# --------------------------------------------------------------------------------
+# --------------------------------------------------------------------------------
 
 if [ -z "${IGNORE_FORTRAN_LAPACK_INSTALLATION}" ]; then
     echo -e '\033[0;32m'"\t\tGETTING LAPACK LIBRARY"'\033[0m'
