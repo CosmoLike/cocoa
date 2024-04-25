@@ -1,4 +1,3 @@
-
 if [ -z "${IGNORE_CMAKE_INSTALLATION}" ]; then
     echo -e '\033[0;32m'"\t\tGETTING CMAKE LIBRARY"'\033[0m'
 
@@ -6,7 +5,7 @@ if [ -z "${IGNORE_CMAKE_INSTALLATION}" ]; then
     
     git clone  https://github.com/Kitware/CMake.git cmake-3.26.4
     if [ $? -neq 0 ];then
-        echo -e '\033[0;31m'"CMAKE COULD NOT RUN \e[3mGIT CLONE"'\033[0m'
+        echo -e '\033[0;31m'"CMAKE: COULD NOT RUN \e[3mGIT CLONE"'\033[0m'
         cd $ROOTDIR
         return 1
     fi
@@ -18,7 +17,7 @@ if [ -z "${IGNORE_CMAKE_INSTALLATION}" ]; then
     
     tar -cf - cmake-3.26.4/ | xz -k -1 --threads=$MAKE_NUM_THREADS -c - > cmake.xz
     if [ $? -neq 0 ];then
-        echo -e '\033[0;31m'"CMAKE COULD NOT COMPRESS \e[3mCMAKE FOLDER"'\033[0m'
+        echo -e '\033[0;31m'"CMAKE: COULD NOT COMPRESS \e[3mCMAKE FOLDER"'\033[0m'
         cd $ROOTDIR
         return 1
     fi
@@ -38,94 +37,124 @@ if [ -z "${IGNORE_FORTRAN_LAPACK_INSTALLATION}" ]; then
 
 fi
 
+if [ -z "${IGNORE_C_CFITSIO_INSTALLATION}" ]; then
+    echo -e '\033[0;32m'"\t\tGETTING CFITSIO LIBRARY"'\033[0m'
 
-if [ -z "${IGNORE_C_INSTALLATION}" ]; then
-    if [ -z "${IGNORE_C_CFITSIO_INSTALLATION}" ]; then
-        echo -e '\033[0;32m'"\t\tGETTING CFITSIO LIBRARY"'\033[0m'
+    cd $ROOTDIR/../cocoa_installation_libraries/
 
-        cd $ROOTDIR/../cocoa_installation_libraries/
+    wget -q http://heasarc.gsfc.nasa.gov/FTP/software/fitsio/c/cfitsio-4.0.0.tar.gz
+    if [ $? -neq 0 ];then
+        echo -e '\033[0;31m'"CFITSIO: COULD NOT RUN \e[3mWGET"'\033[0m'
+        cd $ROOTDIR
+        return 1
+    fi
+    tar zxvf cfitsio-4.0.0.tar.gz
+    if [ $? -neq 0 ];then
+        echo -e '\033[0;31m'"CFITSIO: COULD NOT RUN \e[3mTAR"'\033[0m'
+        cd $ROOTDIR
+        return 1
+    fi
+    rm -f cfitsio-4.0.0.tar.gz
 
-        wget -q http://heasarc.gsfc.nasa.gov/FTP/software/fitsio/c/cfitsio-4.0.0.tar.gz
-        if [ $? -neq 0 ];then
-            echo -e '\033[0;31m'"CFITSIO COULD NOT RUN \e[3mWGET"'\033[0m'
-            cd $ROOTDIR
-            return 1
-        fi
-        tar zxvf cfitsio-4.0.0.tar.gz
-        if [ $? -neq 0 ];then
-            echo -e '\033[0;31m'"CFITSIO COULD NOT RUN \e[3mTAR"'\033[0m'
-            cd $ROOTDIR
-            return 1
-        fi
-        rm -f cfitsio-4.0.0.tar.gz
-
-        tar -cf - cfitsio-4.0.0/ | xz -k -1 --threads=$MAKE_NUM_THREADS -c - > cfitsio.xz
-        if [ $? -neq 0 ];then
-            echo -e '\033[0;31m'"CMAKE COULD NOT COMPRESS \e[3mCFITSIO FOLDER"'\033[0m'
-            cd $ROOTDIR
-            return 1
-        fi
-
-        echo -e '\033[0;32m'"\t\tGETTING CFITSIO LIBRARY DONE"'\033[0m'
+    tar -cf - cfitsio-4.0.0/ | xz -k -1 --threads=$MAKE_NUM_THREADS -c - > cfitsio.xz
+    if [ $? -neq 0 ];then
+        echo -e '\033[0;31m'"CFITSIO: COULD NOT COMPRESS \e[3mCFITSIO FOLDER"'\033[0m'
+        cd $ROOTDIR
+        return 1
     fi
 
-    if [ -z "${IGNORE_C_FFTW_INSTALLATION}" ]; then
-        echo -e '\033[0;32m'"\t\tGETTING FFTW LIBRARY"'\033[0m'
-        
-        wget -q http://www.fftw.org/fftw-3.3.10.tar.gz 
-        if [ $? -neq 0 ];then
-            echo -e '\033[0;31m'"FFTW COULD NOT RUN \e[3mWGET"'\033[0m'
-            cd $ROOTDIR
-            return 1
-        fi
+    echo -e '\033[0;32m'"\t\tGETTING CFITSIO LIBRARY DONE"'\033[0m'
+fi
 
-        tar zxvf fftw-3.3.10.tar.gz
-        if [ $? -neq 0 ];then
-            echo -e '\033[0;31m'"FFTW COULD NOT RUN \e[3mTAR"'\033[0m'
-            cd $ROOTDIR
-            return 1
-        fi
-
-        rm -f fftw-3.3.10.tar.gz
-
-        tar -cf - fftw-3.3.10/ | xz -k -1 --threads=$MAKE_NUM_THREADS -c - > fftw.xz
-        if [ $? -neq 0 ];then
-            echo -e '\033[0;31m'"FFTW COULD NOT COMPRESS \e[3mFFTW FOLDER"'\033[0m'
-            cd $ROOTDIR
-            return 1
-        fi
-
-        echo -e '\033[0;32m'"\t\tGETTING FFTW LIBRARY DONE"'\033[0m'
+if [ -z "${IGNORE_C_FFTW_INSTALLATION}" ]; then
+    echo -e '\033[0;32m'"\t\tGETTING FFTW LIBRARY"'\033[0m'
+    
+    wget -q http://www.fftw.org/fftw-3.3.10.tar.gz 
+    if [ $? -neq 0 ];then
+        echo -e '\033[0;31m'"FFTW: COULD NOT RUN \e[3mWGET"'\033[0m'
+        cd $ROOTDIR
+        return 1
     fi
 
-    if [ -z "${IGNORE_C_GSL_INSTALLATION}" ]; then
-        echo -e '\033[0;32m'"\t\tGETTING GSL LIBRARY"'\033[0m'
-
-        wget -q http://ftp.wayne.edu/gnu/gsl/gsl-2.7.tar.gz
-        if [ $? -neq 0 ];then
-            echo -e '\033[0;31m'"GSL COULD NOT RUN \e[3mWGET"'\033[0m'
-            cd $ROOTDIR
-            return 1
-        fi
-
-        tar zxvf gsl-2.7.tar.gz
-        if [ $? -neq 0 ];then
-            echo -e '\033[0;31m'"GSL COULD NOT RUN \e[3mTAR"'\033[0m'
-            cd $ROOTDIR
-            return 1
-        fi
-
-        rm -f gsl-2.7.tar.gz
-
-        tar -cf - gsl-2.7/ | xz -k -1 --threads=$MAKE_NUM_THREADS -c - > gsl.xz
-        if [ $? -neq 0 ];then
-            echo -e '\033[0;31m'"GSL COULD NOT COMPRESS \e[3mGSL FOLDER"'\033[0m'
-            cd $ROOTDIR
-            return 1
-        fi
-
-        echo -e '\033[0;32m'"\t\tGETTING FFTW LIBRARY DONE"'\033[0m'
+    tar zxvf fftw-3.3.10.tar.gz
+    if [ $? -neq 0 ];then
+        echo -e '\033[0;31m'"FFTW: COULD NOT RUN \e[3mTAR"'\033[0m'
+        cd $ROOTDIR
+        return 1
     fi
+
+    rm -f fftw-3.3.10.tar.gz
+
+    tar -cf - fftw-3.3.10/ | xz -k -1 --threads=$MAKE_NUM_THREADS -c - > fftw.xz
+    if [ $? -neq 0 ];then
+        echo -e '\033[0;31m'"FFTW: COULD NOT COMPRESS \e[3mFFTW FOLDER"'\033[0m'
+        cd $ROOTDIR
+        return 1
+    fi
+
+    echo -e '\033[0;32m'"\t\tGETTING FFTW LIBRARY DONE"'\033[0m'
+fi
+
+if [ -z "${IGNORE_C_GSL_INSTALLATION}" ]; then
+    echo -e '\033[0;32m'"\t\tGETTING GSL LIBRARY"'\033[0m'
+
+    cd $ROOTDIR/../cocoa_installation_libraries/
+
+    wget -q http://ftp.wayne.edu/gnu/gsl/gsl-2.7.tar.gz
+    if [ $? -neq 0 ];then
+        echo -e '\033[0;31m'"GSL: COULD NOT RUN \e[3mWGET"'\033[0m'
+        cd $ROOTDIR
+        return 1
+    fi
+
+    tar zxvf gsl-2.7.tar.gz
+    if [ $? -neq 0 ];then
+        echo -e '\033[0;31m'"GSL: COULD NOT RUN \e[3mTAR"'\033[0m'
+        cd $ROOTDIR
+        return 1
+    fi
+
+    rm -f ROOTDIR/../cocoa_installation_libraries/gsl-2.7.tar.gz
+
+    tar -cf - gsl-2.7/ | xz -k -1 --threads=$MAKE_NUM_THREADS -c - > gsl.xz
+    if [ $? -neq 0 ];then
+        echo -e '\033[0;31m'"GSL: COULD NOT COMPRESS \e[3mGSL FOLDER"'\033[0m'
+        cd $ROOTDIR
+        return 1
+    fi
+
+    echo -e '\033[0;32m'"\t\tGETTING FFTW LIBRARY DONE"'\033[0m'
+fi
+
+if [ -z "${IGNORE_CPP_ARMA_INSTALLATION}" ]; then
+    echo -e '\033[0;32m'"\t\tGETTING ARMA LIBRARY"'\033[0m'
+    
+    cd $ROOTDIR/../cocoa_installation_libraries/
+
+    wget -q https://sourceforge.net/projects/arma/files/armadillo-12.8.2.tar.xz
+    if [ $? -neq 0 ];then
+        echo -e '\033[0;31m'"ARMA: COULD NOT RUN \e[3mWGET"'\033[0m'
+        cd $ROOTDIR
+        return 1
+    fi
+    
+    tar xf armadillo-12.8.2.tar.xz
+    if [ $? -neq 0 ];then
+        echo -e '\033[0;31m'"ARMA: COULD NOT RUN \e[3mTAR"'\033[0m'
+        cd $ROOTDIR
+        return 1
+    fi
+    
+    rm -f ROOTDIR/../cocoa_installation_libraries/armadillo-12.8.2.tar.xz
+
+    tar -cf - armadillo-12.8.2/ | xz -k -1 --threads=$MAKE_NUM_THREADS -c - > armadillo.xz
+    if [ $? -neq 0 ];then
+        echo -e '\033[0;31m'"ARMA: COULD NOT COMPRESS \e[3mGSL FOLDER"'\033[0m'
+        cd $ROOTDIR
+        return 1
+    fi
+
+    echo -e '\033[0;32m'"\t\tGETTING ARMA LIBRARY"'\033[0m'
 fi
 
 

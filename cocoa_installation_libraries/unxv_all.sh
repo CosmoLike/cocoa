@@ -216,6 +216,6 @@ if [ -n "${THREAD_UNXZ}" ]; then
   echo '\033[0;32m'"\t\t DECOMPRESSION IS HAPPENING IN PARALLEL - WAITING ALL OF THEM TO FINISH"'\033[0m' > ${OUTPUT_UNXV_ALL_1} 2> ${OUTPUT_UNXV_ALL_2}
 fi
 
-wait "$proc1" "$proc2" "$proc2A" "$proc3" "$proc4" "$proc5" "$proc6" "$proc7" "$proc8" "$proc9" "$proc10" "$proc11" "$proc12" "$proc13" "$proc14" 2>/dev/null > /dev/null
+wait "$proc1" "$proc2" "$proc2A" "$proc3" "$proc4" "$proc5" "$proc6" "$proc7" "$proc8" "$proc9" "$proc10" "$proc11" "$proc12" "$proc13" "$proc14" "$proc15" 2>/dev/null > /dev/null
 
 cd $ROOTDIR/
