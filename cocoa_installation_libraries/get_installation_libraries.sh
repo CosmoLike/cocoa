@@ -154,7 +154,7 @@ if [ -z "${IGNORE_CPP_ARMA_INSTALLATION}" ]; then
         return 1
     fi
 
-    echo -e '\033[0;32m'"\t\tGETTING ARMA LIBRARY"'\033[0m'
+    echo -e '\033[0;32m'"\t\tGETTING ARMA LIBRARY DONE"'\033[0m'
 fi
 
 if [ -z "${IGNORE_CPP_BOOST_INSTALLATION}" ]; then
@@ -171,7 +171,7 @@ if [ -z "${IGNORE_CPP_BOOST_INSTALLATION}" ]; then
     
     tar xvzf boost_1_81_0.tar.gz
     if [ $? -neq 0 ];then
-        echo -e '\033[0;31m'"ARMA: COULD NOT RUN \e[3mTAR"'\033[0m'
+        echo -e '\033[0;31m'"BOOST: COULD NOT RUN \e[3mTAR"'\033[0m'
         cd $ROOTDIR
         return 1
     fi
@@ -185,5 +185,37 @@ if [ -z "${IGNORE_CPP_BOOST_INSTALLATION}" ]; then
         return 1
     fi
 
-    echo -e '\033[0;32m'"\t\tGETTING BOOST LIBRARY"'\033[0m'  
+    echo -e '\033[0;32m'"\t\tGETTING BOOST LIBRARY DONE"'\033[0m'  
+fi
+
+if [ -z "${IGNORE_CPP_CARMA_INSTALLATION}" ]; then
+    echo -e '\033[0;32m'"\t\tGETTING CARMA LIBRARY"'\033[0m'
+    
+    cd $ROOTDIR/../cocoa_installation_libraries/
+
+    git clone https://github.com/RUrlus/carma.git carma_tmp
+    if [ $? -neq 0 ];then
+        echo -e '\033[0;31m'"CARMA: COULD NOT RUN \e[3mWGET"'\033[0m'
+        cd $ROOTDIR
+        
+    fi
+
+    cd $ROOTDIR/../cocoa_installation_libraries/carma_tmp
+
+    mv ./include ../
+
+    cd ../
+
+    mv ./include carma
+
+    rm -rf $ROOTDIR/../cocoa_installation_libraries/carma_tmp
+
+    tar -cf - carma/ | xz -k -1 --threads=$MAKE_NUM_THREADS -c - > carma.xz
+    if [ $? -neq 0 ];then
+        echo -e '\033[0;31m'"CARMA: COULD NOT COMPRESS \e[3mGSL FOLDER"'\033[0m'
+        cd $ROOTDIR
+        return 1
+    fi  
+
+    echo -e '\033[0;32m'"\t\tGETTING CARMA LIBRARY DONE"'\033[0m'  
 fi
