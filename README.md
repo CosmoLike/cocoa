@@ -37,8 +37,6 @@ Cocoa allows users to run [CosmoLike](https://github.com/CosmoLike) routines ins
 
         $(cocoa) git-lfs install
 
-**Users can now proceed** to the section [Installation of Cobaya base code](#cobaya_base_code).
-
 ## Installation of Cobaya base code <a name="cobaya_base_code"></a>
 
 **Step :one:**: Activate the conda cocoa environment.
