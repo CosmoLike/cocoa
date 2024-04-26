@@ -279,7 +279,7 @@ if [ -n "${COCOA_OUTPUT_VERBOSE}" ]; then
     export DEBUG_DISTUTILS_PACKAGE=1
     export DEBUG_HDF5_PACKAGES=1
     export DEBUG_UNXV_CLEAN_ALL=1
-    export DEBUG_GET_INSTALLATION_LIBRARIES_OUTPUT=1
+    export DEBUG_SIL_OUTPUT=1
 fi
 # --------------------------------------------------------------------------------------
 # DEBUG THE COMPILATION OF PREREQUISITES PACKAGES. IF YOU NEED TO RUN ------------------
