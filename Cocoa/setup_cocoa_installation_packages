@@ -232,7 +232,14 @@ if [ -z "${MINICONDA_INSTALLATION}" ]; then
 fi
 
 source ./installation_scripts/setup_intallation_libraries
+if [ $? -ne 0 ]; then
+  echo  -e '\033[0;31m'"SCRIPT setup_intallation_libraries FAILED"'\033[0m'
+  cd $ROOTDIR
+  source stop_cocoa
+  return 1
+fi
 
+  
 if [ -z "${DEBUG_SKIP_FILE_DECOMPRESSION_SETUP_COCOA}" ]; then
   source ./installation_scripts/setup_decompress_files
   if [ $? -ne 0 ]; then
