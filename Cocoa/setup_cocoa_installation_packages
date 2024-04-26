@@ -220,6 +220,8 @@ export NUMPY_HEADERS=$ROOTDIR/.local/lib/python$PYTHON_VERSION/site-packages/num
 # ----------------------------------------------------------------------------
 # ----------------------------------------------------------------------------
 
+
+
 if [ -z "${MINICONDA_INSTALLATION}" ]; then
   source ./installation_scripts/setup_xz
   if [ $? -ne 0 ]; then

@@ -52,6 +52,30 @@ rm -rf ./$COCOA_HDF5_DIR1
 
 rm -rf ./cocoa_build
 
+rm -f cmake.xz
+
+rm -f armadillo.xz
+
+rm -f boost.xz
+
+rm -f spdlog.xz
+
+rm -f carma.xz
+
+rm -f fftw.xz
+
+rm -f cfitsio.xz
+
+rm -f gsl.xz
+
+rm -f lapack.xz
+
+rm -f texinfo.xz
+
+rm -f binutils.xz
+
+rm -f hdf5.xz
+
 echo 'CLEAN ALL INSTALLATION LIBRARIES DONE' > ${OUTPUT_CLEAN_ALL_1} 2> ${OUTPUT_CLEAN_ALL_2}
 
 cd ${ROOTDIR}

@@ -82,6 +82,8 @@ armadillo.xz
 armadillo-*/
 carma_tmp/
 carma_*
+carma*.xz
+carma.xz
 euclidemu2-1.2.0/
 euclidemu2-*/
 armadillo-*/
