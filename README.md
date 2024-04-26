@@ -38,7 +38,7 @@ Cocoa allows users to run [CosmoLike](https://github.com/CosmoLike) routines ins
 
 **Users can now proceed** to the section [Installation of Cobaya base code](#cobaya_base_code).
 
-:books: *Additional Notes* :books:
+:books: *Additional Notes for experts and developers* :books:
 
 - For those working on projects that utilize machine-learning-based emulators, the Appendix [Setting-up conda environment for Machine Learning emulators](#ml_emulators) provides additional commands for installing the necessary packages.
 
@@ -46,7 +46,7 @@ Cocoa allows users to run [CosmoLike](https://github.com/CosmoLike) routines ins
 
 - We assume here the user has previously installed either [Minicoda](https://docs.conda.io/en/latest/miniconda.html) or [Anaconda](https://www.anaconda.com/products/individual), so conda environments can be created. If this is not the case, refer to the Appendix [Miniconda Installation](#overview_miniconda) for further instructions.
 
-- The conda installation method should be the chosen installation method in the overwhelming majority of cases. In the rare cases the user cannot work with conda, then see Appendix [Installation of Cocoa's required packages via Cocoa's internal cache](#required_packages_cache) as it contains instructions for a much slower but conda-independent installation method.
+- The conda installation method should be the chosen installation method in the overwhelming majority of cases. In the rare cases the user cannot work with conda, refer to the Appendix [Installation of Cocoa's required packages via Cocoa's internal cache](#required_packages_cache) as it contains instructions for a much slower but conda-independent installation method.
   
 ## Installation of Cobaya base code <a name="cobaya_base_code"></a>
 
