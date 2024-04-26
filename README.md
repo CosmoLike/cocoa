@@ -63,8 +63,6 @@ The script `setup_cocoa_installation_packages` decompresses the data files and i
     
 to compile CAMB/Class Boltzmann codes, Planck likelihood and Polychord sampler. 
 
-**Users can now proceed** to the section [Running Cobaya Examples](#cobaya_base_code_examples).
-
 ## Running Cobaya Examples <a name="cobaya_base_code_examples"></a>
 
 Assuming the user opted for the easier *Conda installation* and located the terminal at the folder *where Cocoa was cloned*, this is how to run some example YAML files we provide (*no Cosmolike code involved*): 
