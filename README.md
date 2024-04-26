@@ -24,21 +24,21 @@ Cocoa allows users to run [CosmoLike](https://github.com/CosmoLike) routines ins
 
 ## Installation of Cocoa's required packages via Conda <a name="required_packages_conda"></a>
 
-**Step 1:** Download the file `cocoapy38.yml` yml file and create the cocoa environment via
+**Step :one:**: Download the file `cocoapy38.yml` yml file and create the cocoa environment via
 
      $ conda env create --name cocoa --file=cocoapy38.yml
            
-**Step 2:** Activate the Conda environment, as shown below.
+**Step :two:**: Activate the Conda environment, as shown below.
 
         $ conda activate cocoa
     
-**Step 3:** Install `git-lfs` when loading the Conda cocoa environment for the first time..
+**Step :three:**: Install `git-lfs` when loading the Conda cocoa environment for the first time..
 
         $(cocoa) git-lfs install
 
 **Users can now proceed** to the section [Installation of Cobaya base code](#cobaya_base_code).
 
-:books: *Additional Notes:* :books:
+:books: *Additional Notes* :books:
 
 - For those working on projects that utilize machine-learning-based emulators, the Appendix [Setting-up conda environment for Machine Learning emulators](#ml_emulators) provides additional commands for installing the necessary packages.
 
@@ -46,29 +46,29 @@ Cocoa allows users to run [CosmoLike](https://github.com/CosmoLike) routines ins
 
 - We assume here the user has previously installed either [Minicoda](https://docs.conda.io/en/latest/miniconda.html) or [Anaconda](https://www.anaconda.com/products/individual), so conda environments can be created. If this is not the case, refer to the Appendix [Miniconda Installation](#overview_miniconda) for further instructions.
 
-- The conda installation method should be the preferable method in the vast majority of cases. If, for some reason, the user cannot work with conda, then see Appendix [Installation of Cocoa's required packages via Cocoa's internal cache](#required_packages_cache) as it contains instructions for a much slower but conda-independent installation method.
+- The conda installation method should be the chosen installation method in the overwhelming majority of cases. In the rare cases the user cannot work with conda, then see Appendix [Installation of Cocoa's required packages via Cocoa's internal cache](#required_packages_cache) as it contains instructions for a much slower but conda-independent installation method.
   
 ## Installation of Cobaya base code <a name="cobaya_base_code"></a>
 
-**Step 1:** Activate the conda cocoa environment.
+**Step :one:**: Activate the conda cocoa environment.
 
         $ conda activate cocoapy38
 
-**Step 2:** Clone the repository. 
+**Step :two:**: Clone the repository. 
 
         $(cocoa) git clone --depth 1 https://github.com/CosmoLike/cocoa.git cocoa
 
-**Step 3:** Go to cocoa main folder,        
+**Step :three:**: Go to `cocoa` main folder,        
     
         $(cocoa) cd ./cocoa/Cocoa
 
-**Step 4:** Run the script `setup_cocoa_installation_packages` via
+**Step :four:**: Run the script `setup_cocoa_installation_packages` via
         
         $(cocoa) source setup_cocoa_installation_packages
 
 The script `setup_cocoa_installation_packages` decompresses the data files and installs a few necessary packages that have not been installed via conda.
 
-**Step 5:** Finally, run the script `compile_external_modules` by typing 
+**Step :five:**: Run the script `compile_external_modules` by typing 
 
         $(cocoapy38) source compile_external_modules
     
@@ -76,7 +76,7 @@ to compile CAMB/Class Boltzmann codes, Planck likelihood and Polychord sampler.
 
 **Users can now proceed** to the section [Running Cobaya Examples](#cobaya_base_code_examples).
 
-:books: *Additional Notes:* :books:
+:books: *Additional Notes for experts and developers* :books:
 
 - If the user wants to compile only a subset of these packages, then refer to the appendix [Compiling Boltzmann, CosmoLike and Likelihood codes separatelly](#appendix_compile_separatelly).
         
@@ -105,11 +105,11 @@ to compile CAMB/Class Boltzmann codes, Planck likelihood and Polychord sampler.
         #export IGNORE_PLANCK_COMPILATION=1
         #export IGNORE_ACT_COMPILATION=1
 
-- **expert/developers:** Cocoa developers should drop the shallow clone option `--depth 1`; they should also authenticate to GitHub via ssh keys and use the command instead.
+- Cocoa developers should drop the shallow clone option `--depth 1`; they should also authenticate to GitHub via ssh keys and use the command instead.
 
         $(cocoapy38) git clone git@github.com:CosmoLike/cocoa.git cocoa
   
-- **expert/developers:** Our scripts never install packages on `$HOME/.local` as that would make them global to the user. All requirements for Cocoa are installed at
+- Our scripts never install packages on `$HOME/.local` as that would make them global to the user. All requirements for Cocoa are installed at
 
         Cocoa/.local/bin
         Cocoa/.local/include
@@ -122,36 +122,36 @@ This behavior enables users to work on multiple instances of Cocoa simultaneousl
 
 Assuming the user opted for the easier *Conda installation* and located the terminal at the folder *where Cocoa was cloned*, this is how to run some example YAML files we provide (*no Cosmolike code involved*): 
 
-:one: **Step 1 of 5**: activate the conda environment
+ **Step :one:**: Activate the conda environment
 
         $ conda activate cocoapy38
      
-:two: **Step 2 of 5**: go to the Cocoa main folder 
+ **Step :two:**: Go to `cocoa` main folder 
 
-        $(cocoapy38) cd ./cocoa/Cocoa
+        $(cocoa) cd ./cocoa/Cocoa
 
-3️⃣ **Step 3 of 5**: activate the private python environment
+ **Step :three:**: Activate the private python environment by sourcing the script `start_cocoa`
 
-        $(cocoapy38) source start_cocoa
+        $(cocoa) source start_cocoa
 
-Users will see a terminal that looks like this: `$(cocoapy38)(.local)`. *This is a feature, not a bug*! 
+Users will see a terminal that looks like this: `$(cocoa)(.local)`. *This is a feature, not a bug*! 
 
-:four: **Step 4 of 5**: select the number of OpenMP cores
+ **Step :four:**: Select the number of OpenMP cores
     
-        $(cocoapy38)(.local) export OMP_PROC_BIND=close; export OMP_NUM_THREADS=4
+        $(cocoa)(.local) export OMP_PROC_BIND=close; export OMP_NUM_THREADS=4
 
-:five: **Step 5 of 5**: run `cobaya-run` on a the first example YAML files we provide.
+ **Step :five:**: Run `cobaya-run` on a the first example YAML files we provide.
 
 One model evaluation:
 
-        $(cocoapy38)(.local) mpirun -n 1 --oversubscribe --mca btl vader,tcp,self --bind-to core:overload-allowed --rank-by core --map-by numa:pe=${OMP_NUM_THREADS} cobaya-run  ./projects/example/EXAMPLE_EVALUATE1.yaml -f
+        $(cocoa)(.local) mpirun -n 1 --oversubscribe --mca btl vader,tcp,self --bind-to core:overload-allowed --rank-by core --map-by numa:pe=${OMP_NUM_THREADS} cobaya-run  ./projects/example/EXAMPLE_EVALUATE1.yaml -f
         
-PS: We offer the flag `COCOA_RUN_EVALUATE` as an alias (syntax-sugar) for `mpirun -n 1 --oversubscribe --mca btl vader,tcp,self --bind-to core:overload-allowed --rank-by core --map-by numa:pe=4 cobaya-run`. 
-
 MCMC:
 
         $(cocoapy38)(.local) mpirun -n 4 --oversubscribe --mca btl vader,tcp,self --bind-to core:overload-allowed --rank-by core --map-by numa:pe=${OMP_NUM_THREADS} cobaya-run ./projects/example/EXAMPLE_MCMC1.yaml -f
 
+
+PS: We offer the flag `COCOA_RUN_EVALUATE` as an alias (syntax-sugar) for `mpirun -n 1 --oversubscribe --mca btl vader,tcp,self --bind-to core:overload-allowed --rank-by core --map-by numa:pe=4 cobaya-run`. 
 PS: We offer the flag `COCOA_RUN_MCMC` as an alias (syntax-sugar) for `mpirun -n 4 --oversubscribe --mca btl vader,tcp,self --bind-to core:overload-allowed --rank-by core --map-by numa:pe=4 cobaya-run`. 
 
 Once the work is done, type:
