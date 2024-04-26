@@ -231,7 +231,7 @@ if [ -z "${MINICONDA_INSTALLATION}" ]; then
   fi
 fi
 
-source ./installation_scripts/setup_intallation_libraries
+source ./installation_scripts/setup_installation_libraries
 if [ $? -ne 0 ]; then
   echo  -e '\033[0;31m'"SCRIPT setup_intallation_libraries FAILED"'\033[0m'
   cd $ROOTDIR
