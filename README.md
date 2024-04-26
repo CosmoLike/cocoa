@@ -7,16 +7,17 @@
 6. [Creating Cosmolike projects (external readme)](Cocoa/projects/)
 7. [Appendix](#appendix)
     1. [Proper Credits](#appendix_proper_credits)
-    2. [The whovian-cocoa docker container](#appendix_jupyter_whovian)
-    3. [Miniconda Installation](#overview_miniconda)
-    4. [Compiling Boltzmann, CosmoLike and Likelihood codes separatelly](#appendix_compile_separatelly)
-    5. [Warning about Weak Lensing YAML files in Cobaya](#appendix_example_runs)
-    6. [Manual Blocking of Cosmolike Parameters](#manual_blocking_cosmolike)
-    7. [Adding a new modified CAMB/CLASS to Cocoa (external readme)](Cocoa/external_modules/code)
-    8. [Fine-tunning CAMB Accuracy](#camb_accuracy)
-    9. [Bash/C/C++ Notes](#lectnotes)
-    10. [Installation of Cocoa's required packages via Cocoa's internal cache](#required_packages_cache)
-    11. [Setting-up conda environment for Machine Learning emulators](#ml_emulators)
+    2. [Additional Notes For Experts and Developers](#additional_notes)
+    3. [The whovian-cocoa docker container](#appendix_jupyter_whovian)
+    4. [Miniconda Installation](#overview_miniconda)
+    5. [Compiling Boltzmann, CosmoLike and Likelihood codes separatelly](#appendix_compile_separatelly)
+    6. [Warning about Weak Lensing YAML files in Cobaya](#appendix_example_runs)
+    7. [Manual Blocking of Cosmolike Parameters](#manual_blocking_cosmolike)
+    8. [Adding a new modified CAMB/CLASS to Cocoa (external readme)](Cocoa/external_modules/code)
+    9. [Fine-tunning CAMB Accuracy](#camb_accuracy)
+    10. [Bash/C/C++ Notes](#lectnotes)
+    11. [Installation of Cocoa's required packages via Cocoa's internal cache](#required_packages_cache)
+    12. [Setting-up conda environment for Machine Learning emulators](#ml_emulators)
 
 ## Overview of the [Cobaya](https://github.com/CobayaSampler)-[CosmoLike](https://github.com/CosmoLike) Joint Architecture (Cocoa) <a name="overview"></a>
 
@@ -32,27 +33,17 @@ Cocoa allows users to run [CosmoLike](https://github.com/CosmoLike) routines ins
 
         $ conda activate cocoa
     
-**Step :three:**: Install `git-lfs` when loading the Conda cocoa environment for the first time..
+**Step :three:**: Install `git-lfs` when loading the Conda cocoa environment for the first time.
 
         $(cocoa) git-lfs install
 
 **Users can now proceed** to the section [Installation of Cobaya base code](#cobaya_base_code).
 
-:books: *Additional Notes for experts and developers* :books:
-
-- For those working on projects that utilize machine-learning-based emulators, the Appendix [Setting-up conda environment for Machine Learning emulators](#ml_emulators) provides additional commands for installing the necessary packages.
-
-- We provide a docker image named `whovian-cocoa` that facilitates cocoa installation on Windows and MacOS. For further instructions, refer to the Appendix [whovian-cocoa docker container](#appendix_jupyter_whovian).
-
-- We assume here the user has previously installed either [Minicoda](https://docs.conda.io/en/latest/miniconda.html) or [Anaconda](https://www.anaconda.com/products/individual), so conda environments can be created. If this is not the case, refer to the Appendix [Miniconda Installation](#overview_miniconda) for further instructions.
-
-- The conda installation method should be the chosen installation method in the overwhelming majority of cases. In the rare cases the user cannot work with conda, refer to the Appendix [Installation of Cocoa's required packages via Cocoa's internal cache](#required_packages_cache) as it contains instructions for a much slower but conda-independent installation method.
-  
 ## Installation of Cobaya base code <a name="cobaya_base_code"></a>
 
 **Step :one:**: Activate the conda cocoa environment.
 
-        $ conda activate cocoapy38
+        $ conda activate cocoa
 
 **Step :two:**: Clone the repository. 
 
@@ -75,48 +66,6 @@ The script `setup_cocoa_installation_packages` decompresses the data files and i
 to compile CAMB/Class Boltzmann codes, Planck likelihood and Polychord sampler. 
 
 **Users can now proceed** to the section [Running Cobaya Examples](#cobaya_base_code_examples).
-
-:books: *Additional Notes for experts and developers* :books:
-
-- If the user wants to compile only a subset of these packages, then refer to the appendix [Compiling Boltzmann, CosmoLike and Likelihood codes separatelly](#appendix_compile_separatelly).
-        
-- The script *set_installation_options script* contains a few additional flags that may be useful if something goes wrong. They are shown below:
-
-        [Extracted from set_installation_options script]
-        # --------------------------------------------------------------------------------------
-        # --------------------------------------------------------------------------------------
-        # --------------------------- VERBOSE AS DEBUG TOOL ------------------------------------
-        # --------------------------------------------------------------------------------------
-        # --------------------------------------------------------------------------------------
-        #export COCOA_OUTPUT_VERBOSE=1
-
-        # --------------------------------------------------------------------------------------
-        # --------- IF TRUE, THEN COCOA USES CLIK FROM https://github.com/benabed/clik ---------
-        # --------------------------------------------------------------------------------------
-        export USE_SPT_CLIK_PLANCK=1
-
-        # --------------------------------------------------------------------------------------
-        # ----------------- CONTROL OVER THE COMPILATION OF EXTERNAL CODES ---------------------
-        # --------------------------------------------------------------------------------------
-        #export IGNORE_CAMB_COMPILATION=1
-        export IGNORE_CLASS_COMPILATION=1
-        #export IGNORE_COSMOLIKE_COMPILATION=1
-        #export IGNORE_POLYCHORD_COMPILATION=1
-        #export IGNORE_PLANCK_COMPILATION=1
-        #export IGNORE_ACT_COMPILATION=1
-
-- Cocoa developers should drop the shallow clone option `--depth 1`; they should also authenticate to GitHub via ssh keys and use the command instead.
-
-        $(cocoapy38) git clone git@github.com:CosmoLike/cocoa.git cocoa
-  
-- Our scripts never install packages on `$HOME/.local` as that would make them global to the user. All requirements for Cocoa are installed at
-
-        Cocoa/.local/bin
-        Cocoa/.local/include
-        Cocoa/.local/lib
-        Cocoa/.local/share
-
-This behavior enables users to work on multiple instances of Cocoa simultaneously.
 
 ## Running Cobaya Examples <a name="cobaya_base_code_examples"></a>
 
@@ -148,22 +97,15 @@ One model evaluation:
         
 MCMC:
 
-        $(cocoapy38)(.local) mpirun -n 4 --oversubscribe --mca btl vader,tcp,self --bind-to core:overload-allowed --rank-by core --map-by numa:pe=${OMP_NUM_THREADS} cobaya-run ./projects/example/EXAMPLE_MCMC1.yaml -f
+        $(cocoa)(.local) mpirun -n 4 --oversubscribe --mca btl vader,tcp,self --bind-to core:overload-allowed --rank-by core --map-by numa:pe=${OMP_NUM_THREADS} cobaya-run ./projects/example/EXAMPLE_MCMC1.yaml -f
 
+**Step :six:**: Once the work is done, type:
 
-PS: We offer the flag `COCOA_RUN_EVALUATE` as an alias (syntax-sugar) for `mpirun -n 1 --oversubscribe --mca btl vader,tcp,self --bind-to core:overload-allowed --rank-by core --map-by numa:pe=4 cobaya-run`. 
-PS: We offer the flag `COCOA_RUN_MCMC` as an alias (syntax-sugar) for `mpirun -n 4 --oversubscribe --mca btl vader,tcp,self --bind-to core:overload-allowed --rank-by core --map-by numa:pe=4 cobaya-run`. 
+        $(cocoa)(.local) source stop_cocoa
+        
+        $(cocoa) conda deactivate cocoa
 
-Once the work is done, type:
-
-        $(cocoapy38)(.local) source stop_cocoa
-        $(cocoapy38) conda deactivate cocoa
-
-:books: **expert** :books: Why the `--mca btl vader,tcp,self` flag? Conda-forge developers don't [compile OpenMPI with Infiniband compatibility](https://github.com/conda-forge/openmpi-feedstock/issues/38).
-
-:books: **expert** :books: Why the `--bind-to core:overload-allowed --map-by numa:pe=${OMP_NUM_THREADS}` flag? This flag enables efficient hybrid MPI + OpenMP runs on NUMA architecture.
-
-:books: **expert** :books: Why did we choose to have two separate bash environments? Users should be able to manipulate multiple Cocoa instances seamlessly, which is particularly useful when running chains in one instance while experimenting with code development in another. Consistency of the environment across all Cocoa instances is crucial, and the start_cocoa/stop_cocoa scripts handle the loading and unloading of environmental path variables for each Cocoa. All of them, however, depends on many of the same prerequisites, so it is advantageous to maintain the basic packages inside the shared conda cocoa environment. 
+This will clean your environment. 
 
 ## Running Cosmolike projects <a name="running_cosmolike_projects"></a> 
 
@@ -225,6 +167,73 @@ The following is not an exhaustive list of the codes we use
 - [ACTLensing](https://github.com/ACTCollaboration/act_dr6_lenslike) is the official lensing likelihood of the ACT collaborated developed by Prof. Mathew Madhavacheril
 
 We do not want to discourage people from cloning code from their original repositories. We've included these codes as compressed [xz file format](https://tukaani.org/xz/format.html) in our repository for convenience in the initial development (speed in setting up Cocoa). The work of those authors is extraordinary, and they must be properly cited.
+
+### Additional Notes for experts and developers <a name="additional_notes"></a>
+
+:books::books: *Additional Notes for experts and developers on Installation of Cocoa's required packages via Conda* :books::books:
+ 
+- For those working on projects that utilize machine-learning-based emulators, the Appendix [Setting-up conda environment for Machine Learning emulators](#ml_emulators) provides additional commands for installing the necessary packages.
+
+- We provide a docker image named `whovian-cocoa` that facilitates cocoa installation on Windows and MacOS. For further instructions, refer to the Appendix [whovian-cocoa docker container](#appendix_jupyter_whovian).
+
+- We assume here the user has previously installed either [Minicoda](https://docs.conda.io/en/latest/miniconda.html) or [Anaconda](https://www.anaconda.com/products/individual), so conda environments can be created. If this is not the case, refer to the Appendix [Miniconda Installation](#overview_miniconda) for further instructions.
+
+- The conda installation method should be the chosen installation method in the overwhelming majority of cases. In the rare cases the user cannot work with conda, refer to the Appendix [Installation of Cocoa's required packages via Cocoa's internal cache](#required_packages_cache) as it contains instructions for a much slower but conda-independent installation method.
+
+:books::books: *Additional Notes for experts and developers on Installation of Cobaya base code* :books::books:
+
+- If the user wants to compile only a subset of these packages, then refer to the appendix [Compiling Boltzmann, CosmoLike and Likelihood codes separatelly](#appendix_compile_separatelly).
+        
+- The script *set_installation_options script* contains a few additional flags that may be useful if something goes wrong. Some of these flags are shown below:
+
+        [Extracted from set_installation_options script]
+        # --------------------------------------------------------------------------------------
+        # --------------------------------------------------------------------------------------
+        # --------------------------- VERBOSE AS DEBUG TOOL ------------------------------------
+        # --------------------------------------------------------------------------------------
+        # --------------------------------------------------------------------------------------
+        #export COCOA_OUTPUT_VERBOSE=1
+
+        # --------------------------------------------------------------------------------------
+        # --------- IF TRUE, THEN COCOA USES CLIK FROM https://github.com/benabed/clik ---------
+        # --------------------------------------------------------------------------------------
+        export USE_SPT_CLIK_PLANCK=1
+
+        # --------------------------------------------------------------------------------------
+        # ----------------- CONTROL OVER THE COMPILATION OF EXTERNAL CODES ---------------------
+        # --------------------------------------------------------------------------------------
+        #export IGNORE_CAMB_COMPILATION=1
+        export IGNORE_CLASS_COMPILATION=1
+        #export IGNORE_COSMOLIKE_COMPILATION=1
+        #export IGNORE_POLYCHORD_COMPILATION=1
+        #export IGNORE_PLANCK_COMPILATION=1
+        #export IGNORE_ACT_COMPILATION=1
+
+- Cocoa developers should drop the shallow clone option `--depth 1`; they should also authenticate to GitHub via ssh keys and use the command instead.
+
+        $(cocoa) git clone git@github.com:CosmoLike/cocoa.git cocoa
+  
+- Our scripts never install packages on `$HOME/.local` as that would make them global to the user. All requirements for Cocoa are installed at
+
+        Cocoa/.local/bin
+        Cocoa/.local/include
+        Cocoa/.local/lib
+        Cocoa/.local/share
+
+This behavior enables users to work on multiple instances of Cocoa simultaneously.
+
+:books::books: *Additional Notes for experts and developers on Running Cobaya Examples* :books::books:
+
+- We offer the flag `COCOA_RUN_EVALUATE` as an alias (syntax-sugar) for `mpirun -n 1 --oversubscribe --mca btl vader,tcp,self --bind-to core:overload-allowed --rank-by core --map-by numa:pe=4 cobaya-run`.
+
+- We offer the flag `COCOA_RUN_MCMC` as an alias (syntax-sugar) for `mpirun -n 4 --oversubscribe --mca btl vader,tcp,self --bind-to core:overload-allowed --rank-by core --map-by numa:pe=4 cobaya-run`. 
+
+- Additional explanations about our `mpirun` flags: Why the `--mca btl vader,tcp,self` flag? Conda-forge developers don't [compile OpenMPI with Infiniband compatibility](https://github.com/conda-forge/openmpi-feedstock/issues/38).
+
+- Additional explanations about our `mpirun` flags: Why the `--bind-to core:overload-allowed --map-by numa:pe=${OMP_NUM_THREADS}` flag? This flag enables efficient hybrid MPI + OpenMP runs on NUMA architecture.
+
+- Additional explanations about the `start_cocoa`/`stop_cocoa` scripts: Why did we choose to create two separate bash environments `(cocoa)` and `(.local)`? Users should be able to manipulate multiple Cocoa instances seamlessly, which is particularly useful when running chains in one instance while experimenting with code development in another. Consistency of the environment across all Cocoa instances is crucial, and the start_cocoa/stop_cocoa scripts handle the loading and unloading of environmental path variables for each Cocoa.
+
 
 ### The whovian-cocoa docker container <a name="appendix_jupyter_whovian"></a>
 
