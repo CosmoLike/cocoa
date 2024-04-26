@@ -55,6 +55,8 @@ if [ -z "${IGNORE_CMAKE_INSTALLATION}" ]; then
         return 1
     fi
 
+    cd $ROOTDIR
+
     echo -e '\033[0;32m'"\t\tGETTING CMAKE LIBRARY DONE"'\033[0m' > ${OUTPUT_SIL_1} 2> ${OUTPUT_SIL_2}
 fi
 
@@ -90,6 +92,8 @@ if [ -z "${IGNORE_DISTUTILS_INSTALLATION}" ]; then
         return 1
     fi
 
+    cd $ROOTDIR
+
     echo -e '\033[0;32m'"\t\tGETTING BINUTILS LIBRARY DONE"'\033[0m' > ${OUTPUT_SIL_1} 2> ${OUTPUT_SIL_2}
 fi
 
@@ -124,6 +128,8 @@ if [ -z "${IGNORE_DISTUTILS_INSTALLATION}" ]; then
         cd $ROOTDIR
         return 1
     fi
+
+    cd $ROOTDIR
 
     echo -e '\033[0;32m'"\t\tGETTING TEXINFO LIBRARY DONE"'\033[0m' > ${OUTPUT_SIL_1} 2> ${OUTPUT_SIL_2}
 fi
@@ -161,6 +167,8 @@ if [ -z "${IGNORE_OPENBLAS_INSTALLATION}" ]; then
         cd $ROOTDIR
         return 1
     fi
+
+    cd $ROOTDIR
 
     echo -e '\033[0;32m'"\t\tGETTING OPENBLAS LIBRARY DONE"'\033[0m' > ${OUTPUT_SIL_1} 2> ${OUTPUT_SIL_2}
 fi
@@ -201,6 +209,8 @@ if [ -z "${IGNORE_FORTRAN_LAPACK_INSTALLATION}" ]; then
         return 1
     fi
 
+    cd $ROOTDIR
+
     echo -e '\033[0;32m'"\t\tGETTING LAPACK LIBRARY DONE"'\033[0m' > ${OUTPUT_SIL_1} 2> ${OUTPUT_SIL_2}
 fi
 
@@ -233,6 +243,8 @@ if [ -z "${IGNORE_HDF5_INSTALLATION}" ]; then
         cd $ROOTDIR
         return 1
     fi
+
+    cd $ROOTDIR
 
     echo -e '\033[0;32m'"\t\tGETTING HDF5 LIBRARY DONE"'\033[0m' > ${OUTPUT_SIL_1} 2> ${OUTPUT_SIL_2}
 fi
@@ -268,12 +280,16 @@ if [ -z "${IGNORE_C_CFITSIO_INSTALLATION}" ]; then
         return 1
     fi
 
+    cd $ROOTDIR
+
     echo -e '\033[0;32m'"\t\tGETTING CFITSIO LIBRARY DONE"'\033[0m' > ${OUTPUT_SIL_1} 2> ${OUTPUT_SIL_2}
 fi
 
 if [ -z "${IGNORE_C_FFTW_INSTALLATION}" ]; then
     echo -e '\033[0;32m'"\t\tGETTING FFTW LIBRARY"'\033[0m' > ${OUTPUT_SIL_1} 2> ${OUTPUT_SIL_2}
     
+    cd $ROOTDIR/../cocoa_installation_libraries/
+
     wget -q http://www.fftw.org/fftw-3.3.10.tar.gz 
     if [ $? -neq 0 ];then
         echo -e '\033[0;31m'"FFTW: COULD NOT RUN \e[3mWGET"'\033[0m'
@@ -296,6 +312,8 @@ if [ -z "${IGNORE_C_FFTW_INSTALLATION}" ]; then
         cd $ROOTDIR
         return 1
     fi
+
+    cd $ROOTDIR
 
     echo -e '\033[0;32m'"\t\tGETTING FFTW LIBRARY DONE"'\033[0m' > ${OUTPUT_SIL_1} 2> ${OUTPUT_SIL_2}
 fi
@@ -327,6 +345,8 @@ if [ -z "${IGNORE_C_GSL_INSTALLATION}" ]; then
         cd $ROOTDIR
         return 1
     fi
+
+    cd $ROOTDIR
 
     echo -e '\033[0;32m'"\t\tGETTING GSL LIBRARY DONE"'\033[0m' > ${OUTPUT_SIL_1} 2> ${OUTPUT_SIL_2}
 fi
@@ -365,6 +385,8 @@ if [ -z "${IGNORE_CPP_SPDLOG_INSTALLATION}" ]; then
         return 1
     fi
 
+    cd $ROOTDIR
+
     echo -e '\033[0;32m'"\t\tGETTING SPDLOG LIBRARY DOONE"'\033[0m' > ${OUTPUT_SIL_1} 2> ${OUTPUT_SIL_2}
 fi
 
@@ -396,6 +418,8 @@ if [ -z "${IGNORE_CPP_ARMA_INSTALLATION}" ]; then
         return 1
     fi
 
+    cd $ROOTDIR
+
     echo -e '\033[0;32m'"\t\tGETTING ARMA LIBRARY DONE"'\033[0m' > ${OUTPUT_SIL_1} 2> ${OUTPUT_SIL_2}
 fi
 
@@ -426,6 +450,8 @@ if [ -z "${IGNORE_CPP_BOOST_INSTALLATION}" ]; then
         cd $ROOTDIR
         return 1
     fi
+
+    cd $ROOTDIR
 
     echo -e '\033[0;32m'"\t\tGETTING BOOST LIBRARY DONE"'\033[0m' > ${OUTPUT_SIL_1} 2> ${OUTPUT_SIL_2}
 fi
@@ -466,12 +492,13 @@ if [ -z "${IGNORE_CPP_CARMA_INSTALLATION}" ]; then
         return 1
     fi  
 
+    cd $ROOTDIR
+
     echo -e '\033[0;32m'"\t\tGETTING CARMA LIBRARY DONE"'\033[0m' > ${OUTPUT_SIL_1} 2> ${OUTPUT_SIL_2}
 fi
 
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
-cd $ROOTDIR
 echo -e '\033[1;34m''\t \e[4mSETUP_INSTALLATION_LIBRARIES DONE''\033[0m'
 
