@@ -108,7 +108,7 @@ if [ -z "${IGNORE_ALL_PIP_INSTALLATION}" ]; then
       cd $ROOTDIR
       return 1
     else
-      echo -e '\033[0;32m'"\t\t PIP RUN \e[3mPIP INSTALL (BASIC PACKAGES)\e[0m\e\033[0;32m DONE"'\033[0m'
+      echo -e '\033[0;32m'"\t\tPIP RUN \e[3mPIP INSTALL (BASIC PACKAGES)\e[0m\e\033[0;32m DONE"'\033[0m'
     fi
   fi
 
