@@ -56,8 +56,6 @@ if [ -n "${COCOA_OPENBLAS_DIR}" ]; then
   rm -rf ./$COCOA_OPENBLAS_DIR
 fi
 
-rm -rf ./pip_cache
-
 if [ -n "${COCOA_SPDLOG_DIR}" ]; then
   rm -rf ./$COCOA_SPDLOG_DIR
 fi
@@ -66,12 +64,16 @@ if [ -n "${COCOA_TEXINFO_DIR}" ]; then
   rm -rf ./$COCOA_TEXINFO_DIR
 fi
 
+if [ -n "${COCOA_HDF5_DIR1}" ]; then
+  rm -rf ./$COCOA_HDF5_DIR1
+fi
+
+rm -rf ./pip_cache
+
 rm -rf ./$COCOA_XZ_DIR
 rm -f $COCOA_XZ_FILE
 
 rm -rf ./$COCOA_EXPAT_DIR
-
-rm -rf ./$COCOA_HDF5_DIR1
 
 rm -rf ./cocoa_build
 
