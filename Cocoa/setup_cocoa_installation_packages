@@ -231,6 +231,8 @@ if [ -z "${MINICONDA_INSTALLATION}" ]; then
   fi
 fi
 
+source ./installation_scripts/setup_intallation_libraries
+
 if [ -z "${DEBUG_SKIP_FILE_DECOMPRESSION_SETUP_COCOA}" ]; then
   source ./installation_scripts/setup_decompress_files
   if [ $? -ne 0 ]; then
