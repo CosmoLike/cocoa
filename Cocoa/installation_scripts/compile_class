@@ -1,7 +1,7 @@
 # --------------------------------------------------------------------------------------
 # --------------------------------------------------------------------------------------
 # --------------------------------------------------------------------------------------
-echo -e '\033[1;34m''COMPILING CLASS''\033[0m'
+echo -e '\033[1;34m''\tCOMPILING CLASS''\033[0m'
 
 if [ -z "${ROOTDIR}" ]; then
     echo -e '\033[0;31m''ERROR ENV VARIABLE ROOTDIR IS NOT DEFINED''\033[0m'
@@ -53,7 +53,7 @@ if [ -z "${IGNORE_CLASS_COMPILATION}" ]; then
   if [ $? -ne 0 ]; then
     echo -e '\033[0;31m'"CLASS COULD NOT RUN \e[3mMAKE CLEAN\e[0m"'\033[0m'
   else
-    echo -e '\033[0;32m'"CLASS RUN \e[3mMAKE CLEAN RUN\e[0m\e\033[0;32m DONE"'\033[0m'
+    echo -e '\033[0;32m'"\t\tCLASS RUN \e[3mMAKE CLEAN RUN\e[0m\e\033[0;32m DONE"'\033[0m'
   fi
 
   rm -f class
@@ -66,7 +66,7 @@ if [ -z "${IGNORE_CLASS_COMPILATION}" ]; then
     cd $ROOTDIR
     return 1
   else
-    echo -e '\033[0;32m'"CLASS RUN \e[3mPYTHON3 SETUP.PY CLEAN\e[0m\e\033[0;32m DONE"'\033[0m'
+    echo -e '\033[0;32m'"\t\tCLASS RUN \e[3mPYTHON3 SETUP.PY CLEAN\e[0m\e\033[0;32m DONE"'\033[0m'
   fi
 
   rm -rf ./build/
@@ -79,7 +79,7 @@ if [ -z "${IGNORE_CLASS_COMPILATION}" ]; then
     cd $ROOTDIR
     return 1
   else
-    echo -e '\033[0;32m'"CLASS RUN \e[3mMAKE ALL\e[0m\e\033[0;32m DONE"'\033[0m'
+    echo -e '\033[0;32m'"\t\tCLASS RUN \e[3mMAKE ALL\e[0m\e\033[0;32m DONE"'\033[0m'
   fi
    
   cd ./python
@@ -90,13 +90,13 @@ if [ -z "${IGNORE_CLASS_COMPILATION}" ]; then
     cd $ROOTDIR
     return 1
   else
-    echo -e '\033[0;32m'"CLASS RUN \e[3mPYTHON3 SETUP.PY BUILD\e[0m\e\033[0;32m DONE"'\033[0m'
+    echo -e '\033[0;32m'"\t\tCLASS RUN \e[3mPYTHON3 SETUP.PY BUILD\e[0m\e\033[0;32m DONE"'\033[0m'
   fi
 
   cd $ROOTDIR
 fi
 
-echo -e '\033[1;34m''\e[4mCOMPILING CLASS DONE''\033[0m'
+echo -e '\033[1;34m''\t\e[4mCOMPILING CLASS DONE''\033[0m'
 # --------------------------------------------------------------------------------------
 # --------------------------------------------------------------------------------------
 # --------------------------------------------------------------------------------------

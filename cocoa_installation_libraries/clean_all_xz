@@ -1,0 +1,46 @@
+if [ -z "${ROOTDIR}" ]; then
+    echo 'ERROR ENV VARIABLE ROOTDIR IS NOT DEFINED' >&2
+    return 1
+fi
+
+if [ -z "${DEBUG_UNXV_CLEAN_ALL}" ]; then
+  export OUTPUT_CLEAN_ALL_1="/dev/null"
+  export OUTPUT_CLEAN_ALL_2="/dev/null"
+else
+  export OUTPUT_CLEAN_ALL_1="/dev/tty"
+  export OUTPUT_CLEAN_ALL_2="/dev/tty"
+fi
+
+cd ${ROOTDIR}/../cocoa_installation_libraries
+
+echo 'CLEAN ALL INSTALLATION LIBRARIES' > ${OUTPUT_CLEAN_ALL_1} 2> ${OUTPUT_CLEAN_ALL_2}
+
+rm -f armadillo.xz
+
+rm -f OpenBLAS.xz
+
+rm -f binutils.xz
+
+rm -f boost.xz
+
+rm -f carma.xz
+
+rm -f cfitsio.xz
+
+rm -f cmake.xz
+
+rm -f fftw.xz
+
+rm -f spdlog.xz
+
+rm -f gsl.xz
+
+rm -f hdf5.xz
+
+rm -f lapack.xz
+
+rm -f texinfo.xz
+
+echo 'CLEAN ALL INSTALLATION LIBRARIES XZ FILES DONE' > ${OUTPUT_CLEAN_ALL_1} 2> ${OUTPUT_CLEAN_ALL_2}
+
+cd ${ROOTDIR}

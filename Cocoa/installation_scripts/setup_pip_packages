@@ -112,7 +112,7 @@ if [ -z "${IGNORE_ALL_PIP_INSTALLATION}" ]; then
     fi
   fi
 
-  echo -e '\033[1;34m''\t \e[4mPIP INSTALL (BASIC PACKAGES) DONE''\033[0m'
+  echo -e '\033[1;34m''\t\e[4mPIP INSTALL (BASIC PACKAGES) DONE''\033[0m'
 fi
 
 # ----------------------------------------------------------------------------
@@ -232,7 +232,7 @@ if [ -z "${IGNORE_ALL_PIP_INSTALLATION}" ]; then
     echo -e '\033[0;32m'"\t\t PIP RUN \e[3mPIP INSTALL FGSPECTRA\e[0m\e\033[0;32m DONE"'\033[0m'
   fi
 
-  echo -e '\033[1;34m''\t \e[4mPIP INSTALL (CORE PACKAGES) DONE''\033[0m'
+  echo -e '\033[1;34m''\t\e[4mPIP INSTALL (CORE PACKAGES) DONE''\033[0m'
 fi
 
 # ----------------------------------------------------------------------------
@@ -241,8 +241,6 @@ fi
 # ----------------------------------------------------------------------------
 # ----------------------------------------------------------------------------
 if [ -z "${IGNORE_ALL_PIP_INSTALLATION}" ]; then
-  echo -e '\033[1;34m''\t PIP INSTALL ML PACKAGES''\033[0m'
-
   if [ -z "${IGNORE_EMULATOR_CPU_PIP_PACKAGES}" ]; then
     echo -e '\033[1;34m''\t PIP INSTALL MACHINE LEARNING CPU-ONLY PACKAGES''\033[0m'
 
@@ -262,6 +260,8 @@ if [ -z "${IGNORE_ALL_PIP_INSTALLATION}" ]; then
     else
       echo -e '\033[0;32m'"\t\t PIP RUN \e[3mPIP INSTALL (MACHINE LEARNING CPU-ONLY PACKAGES)\e[0m\e\033[0;32m DONE"'\033[0m'
     fi
+
+    echo -e '\033[1;34m''\t\e[4mPIP INSTALL MACHINE LEARNING CPU-ONLY PACKAGES DONE''\033[0m'
   fi
   if [ -z "${IGNORE_EMULATOR_GPU_PIP_PACKAGES}" ]; then
     echo -e '\033[1;34m''\t PIP INSTALL MACHINE LEARNING GPU PACKAGES''\033[0m'
@@ -282,9 +282,10 @@ if [ -z "${IGNORE_ALL_PIP_INSTALLATION}" ]; then
     else
       echo -e '\033[0;32m'"\t\t PIP RUN \e[3mPIP INSTALL (MACHINE LEARNING GPU PACKAGES)\e[0m\e\033[0;32m DONE"'\033[0m'
     fi
+
+    echo -e '\033[1;34m''\t\e[4mPIP INSTALL MACHINE LEARNING GPU PACKAGES DONE''\033[0m'
   fi
 
-  echo -e '\033[1;34m''\t \e[4mPIP INSTALL ML PACKAGES DONE''\033[0m'
 fi
 
 echo -e '\033[1;44m''\e[4mINSTALLING PYTHON PACKAGES VIA PIP DONE''\033[0m'

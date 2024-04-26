@@ -1,7 +1,7 @@
 # --------------------------------------------------------------------------------------
 # --------------------------------------------------------------------------------------
 # --------------------------------------------------------------------------------------
-echo -e '\033[1;34m''COMPILING POLYCHORD''\033[0m'
+echo -e '\033[1;34m''\tCOMPILING POLYCHORD''\033[0m'
 
 if [ -z "${ROOTDIR}" ]; then
     echo -e '\033[0;31m''ERROR ENV VARIABLE ROOTDIR IS NOT DEFINED''\033[0m'
@@ -51,7 +51,7 @@ if [ -z "${IGNORE_POLYCHORD_COMPILATION}" ]; then
   if [ $? -ne 0 ]; then
     echo -e '\033[0;31m'"POLYCHORD COULD NOT RUN \e[3mMAKE CLEAN"'\033[0m'
   else
-    echo -e '\033[0;32m'"POLYCHORD RUN \e[3mMAKE CLEAN\e[0m\e\033[0;32m DONE"'\033[0m'
+    echo -e '\033[0;32m'"\t\tPOLYCHORD RUN \e[3mMAKE CLEAN\e[0m\e\033[0;32m DONE"'\033[0m'
   fi
 
   rm -rf ./lib/*.a
@@ -63,7 +63,7 @@ if [ -z "${IGNORE_POLYCHORD_COMPILATION}" ]; then
     cd $ROOTDIR
     return 1
   else
-    echo -e '\033[0;32m'"POLYCHORD RUN \e[3mMAKE ALL\e[0m\e\033[0;32m DONE"'\033[0m'
+    echo -e '\033[0;32m'"\t\tPOLYCHORD RUN \e[3mMAKE ALL\e[0m\e\033[0;32m DONE"'\033[0m'
   fi
 
   make -j $POLY_MAKE_NUM_THREADS pypolychord > ${OUTPUT_POLY_1} 2> ${OUTPUT_POLY_2}
@@ -72,7 +72,7 @@ if [ -z "${IGNORE_POLYCHORD_COMPILATION}" ]; then
     cd $ROOTDIR
     return 1
   else
-    echo -e '\033[0;32m'"POLYCHORD RUN \e[3mMAKE PYPOLYCHORD\e[0m\e\033[0;32m DONE"'\033[0m'
+    echo -e '\033[0;32m'"\t\tPOLYCHORD RUN \e[3mMAKE PYPOLYCHORD\e[0m\e\033[0;32m DONE"'\033[0m'
   fi
 
   CC=$MPI_CC_COMPILER CXX=$MPI_CXX_COMPILER $PYTHON3 setup.py install \
@@ -82,14 +82,14 @@ if [ -z "${IGNORE_POLYCHORD_COMPILATION}" ]; then
     cd $ROOTDIR
     return 1
   else
-    echo -e '\033[0;32m'"POLYCHORD RUN \e[3mPYTHON3 SETUP.PY INSTALL\e[0m\e\033[0;32m DONE"'\033[0m'
+    echo -e '\033[0;32m'"\t\tPOLYCHORD RUN \e[3mPYTHON3 SETUP.PY INSTALL\e[0m\e\033[0;32m DONE"'\033[0m'
   fi
 
   cd $ROOTDIR
   
 fi
 
-echo -e '\033[1;34m''\e[4mCOMPILING POLYCHORD DONE''\033[0m'
+echo -e '\033[1;34m''\t\e[4mCOMPILING POLYCHORD DONE''\033[0m'
 # --------------------------------------------------------------------------------------
 # --------------------------------------------------------------------------------------
 # --------------------------------------------------------------------------------------

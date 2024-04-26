@@ -13,7 +13,7 @@ fi
 
 cd ${ROOTDIR}/../cocoa_installation_libraries
 
-echo 'CLEAN ALL INSTALLATION LIBRARIES - THAT MIGHT TAKE A WHILE' > ${OUTPUT_CLEAN_ALL_1} 2> ${OUTPUT_CLEAN_ALL_2}
+echo 'CLEAN ALL INSTALLATION LIBRARIES' > ${OUTPUT_CLEAN_ALL_1} 2> ${OUTPUT_CLEAN_ALL_2}
 
 if [ -n "${COCOA_ARMADILLO_DIR}" ]; then
 rm -rf ./$COCOA_ARMADILLO_DIR
@@ -77,31 +77,6 @@ rm -rf ./$COCOA_EXPAT_DIR
 
 rm -rf ./cocoa_build
 
-rm -f armadillo.xz
-
-rm -f OpenBLAS.xz
-
-rm -f binutils.xz
-
-rm -f boost.xz
-
-rm -f carma.xz
-
-rm -f cfitsio.xz
-
-rm -f cmake.xz
-
-rm -f fftw.xz
-
-rm -f spdlog.xz
-
-rm -f gsl.xz
-
-rm -f hdf5.xz
-
-rm -f lapack.xz
-
-rm -f texinfo.xz
 
 echo 'CLEAN ALL INSTALLATION LIBRARIES DONE' > ${OUTPUT_CLEAN_ALL_1} 2> ${OUTPUT_CLEAN_ALL_2}
 

@@ -238,7 +238,7 @@ if [ $? -ne 0 ]; then
   source stop_cocoa
   return 1
 fi
-return 1
+
   
 if [ -z "${DEBUG_SKIP_FILE_DECOMPRESSION_SETUP_COCOA}" ]; then
   source ./installation_scripts/setup_decompress_files

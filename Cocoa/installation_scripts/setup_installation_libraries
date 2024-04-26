@@ -61,7 +61,7 @@ if [ -z "${IGNORE_CMAKE_INSTALLATION}" ]; then
         return 1
     fi
 
-    export COCOA_CMAKE_DIR=cmake-3.26.4/
+    rm -f $ROOTDIR/../cocoa_installation_libraries/cmake-3.26.4
 
     cd $ROOTDIR
 
@@ -104,8 +104,7 @@ if [ -z "${IGNORE_DISTUTILS_INSTALLATION}" ]; then
         cd $ROOTDIR
         return 1
     fi
-
-    export COCOA_BINUTILS_DIR=binutils-2.37/
+    rm -rf $ROOTDIR/../cocoa_installation_libraries/binutils-2.37
 
     cd $ROOTDIR
 
@@ -149,8 +148,7 @@ if [ -z "${IGNORE_DISTUTILS_INSTALLATION}" ]; then
         cd $ROOTDIR
         return 1
     fi
-
-    export COCOA_TEXINFO_DIR=texinfo-7.0.3/
+    rm -rf $ROOTDIR/../cocoa_installation_libraries/texinfo-7.0.3
 
     cd $ROOTDIR
 
@@ -196,8 +194,7 @@ if [ -z "${IGNORE_OPENBLAS_INSTALLATION}" ]; then
         cd $ROOTDIR
         return 1
     fi
-
-    export COCOA_OPENBLAS_DIR=OpenBLAS-0.3.23/
+    rm -rf $ROOTDIR/../cocoa_installation_libraries/OpenBLAS-0.3.23
 
     cd $ROOTDIR
 
@@ -245,8 +242,7 @@ if [ -z "${IGNORE_FORTRAN_LAPACK_INSTALLATION}" ]; then
         cd $ROOTDIR
         return 1
     fi
-
-    export COCOA_LAPACK_DIR=lapack-3.11.0/
+    rm -rf $ROOTDIR/../cocoa_installation_libraries/lapack-3.11.0
 
     cd $ROOTDIR
 
@@ -289,9 +285,7 @@ if [ -z "${IGNORE_HDF5_INSTALLATION}" ]; then
         cd $ROOTDIR
         return 1
     fi
-
-    export COCOA_HDF5_DIR1=hdf5-1.12.3/
-    export COCOA_HDF5_DIR2=hdf5-1.12.3/hdf5-1.12.3/
+    rm -rf $ROOTDIR/../cocoa_installation_libraries/hdf5-1.12.3
 
     cd $ROOTDIR
 
@@ -335,8 +329,7 @@ if [ -z "${IGNORE_C_CFITSIO_INSTALLATION}" ]; then
         cd $ROOTDIR
         return 1
     fi
-
-    export COCOA_CFITSIO_DIR=cfitsio-4.0.0/
+    rm -rf $ROOTDIR/../cocoa_installation_libraries/cfitsio-4.0.0
 
     cd $ROOTDIR
 
@@ -376,8 +369,7 @@ if [ -z "${IGNORE_C_FFTW_INSTALLATION}" ]; then
         cd $ROOTDIR
         return 1
     fi
-
-    export COCOA_FFTW_DIR=fftw-3.3.10/
+    rm -rf $ROOTDIR/../cocoa_installation_libraries/fftw-3.3.10
 
     cd $ROOTDIR
 
@@ -417,8 +409,7 @@ if [ -z "${IGNORE_C_GSL_INSTALLATION}" ]; then
         cd $ROOTDIR
         return 1
     fi
-
-    export COCOA_GSL_DIR=gsl-2.7/
+    rm -rf $ROOTDIR/../cocoa_installation_libraries/gsl-2.7
 
     cd $ROOTDIR
 
@@ -457,7 +448,7 @@ if [ -z "${IGNORE_CPP_SPDLOG_INSTALLATION}" ]; then
     rm -rf $ROOTDIR/../cocoa_installation_libraries/spdlog/.git/
 
     cd $ROOTDIR/../cocoa_installation_libraries/
-    
+
     # Why this compress? In the old Cocoa we saved the libraries in 
     # the github repo using git lfs. So this way preserves the old scripts
     tar -cf - spdlog/ | xz -k -1 --threads=$MAKE_NUM_THREADS -c - > spdlog.xz
@@ -466,8 +457,7 @@ if [ -z "${IGNORE_CPP_SPDLOG_INSTALLATION}" ]; then
         cd $ROOTDIR
         return 1
     fi
-
-    export COCOA_SPDLOG_DIR=spdlog/
+    rm -rf $ROOTDIR/../cocoa_installation_libraries/spdlog
 
     cd $ROOTDIR
 
@@ -507,8 +497,9 @@ if [ -z "${IGNORE_CPP_ARMA_INSTALLATION}" ]; then
         cd $ROOTDIR
         return 1
     fi
+    rm -rf $ROOTDIR/../cocoa_installation_libraries/armadillo-12.8.2
 
-    export COCOA_ARMADILLO_DIR=armadillo-12.8.2/
+    
 
     cd $ROOTDIR
 
@@ -548,8 +539,7 @@ if [ -z "${IGNORE_CPP_BOOST_INSTALLATION}" ]; then
         cd $ROOTDIR
         return 1
     fi
-
-    export COCOA_BOOST_DIR=boost_1_81_0/
+    rm -rf $ROOTDIR/../cocoa_installation_libraries/boost_1_81_0
 
     cd $ROOTDIR
 
@@ -590,6 +580,12 @@ if [ -z "${IGNORE_CPP_CARMA_INSTALLATION}" ]; then
 
     rm -rf $ROOTDIR/../cocoa_installation_libraries/carma_tmp
 
+    cd ./carma
+
+    mv carma carma.h
+
+    cd ../
+    
     # Why this compress? In the old Cocoa we saved the libraries in 
     # the github repo using git lfs. So this way preserves the old scripts
     tar -cf - carma/ | xz -k -1 --threads=$MAKE_NUM_THREADS -c - > carma.xz
@@ -598,8 +594,7 @@ if [ -z "${IGNORE_CPP_CARMA_INSTALLATION}" ]; then
         cd $ROOTDIR
         return 1
     fi  
-
-    export COCOA_CARMA_DIR=carma/
+    rm -rf $ROOTDIR/../cocoa_installation_libraries/carma
 
     cd $ROOTDIR
 
