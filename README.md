@@ -16,8 +16,8 @@
     8. [Adding a new modified CAMB/CLASS to Cocoa (external readme)](Cocoa/external_modules/code)
     9. [Fine-tunning CAMB Accuracy](#camb_accuracy)
     10. [Bash/C/C++ Notes](#lectnotes)
-    11. [Installation of Cocoa's required packages via Cocoa's internal cache](#required_packages_cache)
-    12. [Setting-up conda environment for Machine Learning emulators](#ml_emulators)
+    11. [Setting-up conda environment for Machine Learning emulators](#ml_emulators)
+    12. [Installation of Cocoa's required packages via Cocoa's internal cache](#required_packages_cache)
 
 ## Overview of the [Cobaya](https://github.com/CobayaSampler)-[CosmoLike](https://github.com/CosmoLike) Joint Architecture (Cocoa) <a name="overview"></a>
 
@@ -233,7 +233,6 @@ This behavior enables users to work on multiple instances of Cocoa simultaneousl
 - Additional explanations about our `mpirun` flags: Why the `--bind-to core:overload-allowed --map-by numa:pe=${OMP_NUM_THREADS}` flag? This flag enables efficient hybrid MPI + OpenMP runs on NUMA architecture.
 
 - Additional explanations about the `start_cocoa`/`stop_cocoa` scripts: Why did we choose to create two separate bash environments `(cocoa)` and `(.local)`? Users should be able to manipulate multiple Cocoa instances seamlessly, which is particularly useful when running chains in one instance while experimenting with code development in another. Consistency of the environment across all Cocoa instances is crucial, and the start_cocoa/stop_cocoa scripts handle the loading and unloading of environmental path variables for each Cocoa.
-
 
 ### The whovian-cocoa docker container <a name="appendix_jupyter_whovian"></a>
 
@@ -466,47 +465,47 @@ Below we provide an example YAML configuration for an MCMC chain that with DES 3
                 max_tries: 10000
                 burn_in: 0
                 Rminus1_single_split: 4
-                
-
-
-### Fine-tunning CAMB Accuracy <a name="camb_accuracy"></a>
-
-The accurate computation of many CMB and large-scale-structure data vectors requires high `AccuracyBoost` values in CAMB. However, this parameter is particularly inefficient, causing an exponential increase in CAMB's runtime. This issue has been frequent enough that we provide below a simple but partial remedy. 
-
-The underlying reason for `AccuracyBoost` inefficiency is that this flag raises the required accuracy of multiple modules in CAMB. The appropriate boost must be fine-tuned until the $\chi^2$ of the adopted experiments remain stable. However, we do not need to raise the boost factor in all CAMB modules by the same amount to achieve such stability. 
-
-The Python function `set_accuracy`,  located in the file `$ROOTDIR/external_modules/code/CAMB/camb`, can be modified for a more fine-tuned change to CAMB accuracy. Below is an example of possible modifications: 
-
-    def set_accuracy(self, AccuracyBoost=1., lSampleBoost=1., lAccuracyBoost=1., DoLateRadTruncation=True): 
-        #COCOA: BEGINS
-        self.Accuracy.AccuracyBoost = AccuracyBoost       
-        
-        #COCOA: below, actual boost = 1.0 + 2*(AccuracyBoost-1.0)
-        self.Accuracy.BessIntBoost = (1.0 + 2*(AccuracyBoost-1.0))/AccuracyBoost
-        self.Accuracy.IntkAccuracyBoost = (1.0 + 2*(AccuracyBoost-1.0))/AccuracyBoost
-        self.Accuracy.TransferkBoost = (1.0 + 2*(AccuracyBoost-1.0))/AccuracyBoost
-        self.Accuracy.KmaxBoost = (1.0 + 2*(AccuracyBoost-1.0))/AccuracyBoost
-        self.Accuracy.TimeStepBoost = (1.0 + 2*(AccuracyBoost-1.0))/AccuracyBoost
-        
-        #COCOA: below, actual boost = 1.0 + 5*(AccuracyBoost-1.0)
-        self.Accuracy.SourcekAccuracyBoost = (1.0 + 5*(AccuracyBoost-1.0))/AccuracyBoost
-        self.Accuracy.BesselBoost = (1.0 + 5*(AccuracyBoost-1.0))/AccuracyBoost
-        #COCOA: ENDS
-        
-        self.Accuracy.lSampleBoost = lSampleBoost
-        self.Accuracy.lAccuracyBoost = lAccuracyBoost
-        self.DoLateRadTruncation = DoLateRadTruncation
-        return self
-        
-With the code above, the theoretical error in Simons Observatory $\chi^2$ seems to be under control (i.e., $\Delta \chi^2 =$ O(few)) with `AccuracyBoost: 1.06` and `lens_potential_accuracy: 4` even a bit away from the best-fit model so that chains can be later corrected via Importance Sampling. As a reminder, corrections based on Importance Sampling are much faster when compared to running MCMC chains with insane accuracy because they can be computed on thinned versions of converged chains and are trivially parallelizable. 
-
-Out of caution, we have not implemented these changes in `$ROOTDIR/external_modules/code/CAMB/`.
-        
+                        
 ### :book: Bash/C/C++ Notes :book: <a name="lectnotes"></a>
 
 To effectively work with the Cobaya framework and Cosmolike codes at the developer level, a working knowledge of Python to understand Cobaya and Bash language to comprehend Cocoa's scripts is required. Proficiency in C and C++ is also needed to manipulate Cosmolike and the C++ Cobaya-Cosmolike C++ interface. Finally, users need to understand the Fortran-2003 language to modify CAMB.
 
 Learning all these languages can be overwhelming, so to enable new users to do research that demands modifications on the inner workings of these codes, we include [here](cocoa_installation_libraries/LectNotes.pdf) a link to approximately 600 slides that provide an overview of Bash (slides 1-137), C (slides 138-371), and C++ (slides 372-599). In the future, we aim to add lectures about Python and Fortran. 
+
+### Setting-up conda environment for Machine Learning emulators <a name="ml_emulators"></a>
+
+If the user wants to add Tensorflow, Keras and Pytorch for an emulator-based project via Conda, then type
+
+        $ conda activate cocoapy38 
+      
+        $(cocoapy38) $CONDA_PREFIX/bin/pip install --no-cache-dir \
+            'tensorflow-cpu==2.12.0' \
+            'keras==2.12.0' \
+            'keras-preprocessing==1.1.2' \
+            'torch==1.13.1+cpu' \
+            'torchvision==0.14.1+cpu' \
+            'torchaudio==0.13.1' --extra-index-url https://download.pytorch.org/whl/cpu
+
+In case there are GPUs available, the following commands will install the GPU version of 
+Tensorflow, Keras and Pytorch (assuming CUDA 11.6, click [here](https://pytorch.org/get-started/previous-versions/) for additional information).
+
+        $(cocoapy38) $CONDA_PREFIX/bin/pip install --no-cache-dir \
+            'tensorflow==2.12.0' \
+            'keras==2.12.0' \
+            'keras-preprocessing==1.1.2' \
+            'torch==1.13.1+cu116' \
+            'torchvision==0.14.1+cu116' \
+            'torchaudio==0.13.1' --extra-index-url https://download.pytorch.org/whl/cu116
+
+Based on our experience, we recommend utilizing the GPU versions to train the emulator while using the CPU versions to run the MCMCs. This is because our supercomputers possess a greater number of CPU-only nodes. It may be helpful to create two separate conda environments for this purpose. One could be named `cocoa` (CPU-only), while the other could be named `cocoaemu` and contain the GPU versions of the machine learning packages.
+
+Commenting out the environmental flags shown below, located at *set_installation_options* script, will enable the installation of machine-learning-related libraries via pip.  
+
+        # IF TRUE, THEN COCOA WON'T INSTALL TENSORFLOW, KERAS and PYTORCH
+        #export IGNORE_EMULATOR_CPU_PIP_PACKAGES=1
+        #export IGNORE_EMULATOR_GPU_PIP_PACKAGES=1
+
+Unlike most installed pip prerequisites, which are cached at `cocoa_installation_libraries/pip_cache.xz`, the installation of the Machine Learning packages listed above requires an active internet connection.
 
 ### Installation of Cocoa's required packages via Cocoa's internal cache <a name="required_packages_cache"></a>
 
@@ -657,37 +656,4 @@ The fine-tunning over the use of system-wide packages instead of our local copie
     
 Users can now proceed to the section [Installation of Cobaya base code](#cobaya_base_code)
 
-### Setting-up conda environment for Machine Learning emulators <a name="ml_emulators"></a>
 
-If the user wants to add Tensorflow, Keras and Pytorch for an emulator-based project via Conda, then type
-
-        $ conda activate cocoapy38 
-      
-        $(cocoapy38) $CONDA_PREFIX/bin/pip install --no-cache-dir \
-            'tensorflow-cpu==2.12.0' \
-            'keras==2.12.0' \
-            'keras-preprocessing==1.1.2' \
-            'torch==1.13.1+cpu' \
-            'torchvision==0.14.1+cpu' \
-            'torchaudio==0.13.1' --extra-index-url https://download.pytorch.org/whl/cpu
-
-In case there are GPUs available, the following commands will install the GPU version of 
-Tensorflow, Keras and Pytorch (assuming CUDA 11.6, click [here](https://pytorch.org/get-started/previous-versions/) for additional information).
-
-        $(cocoapy38) $CONDA_PREFIX/bin/pip install --no-cache-dir \
-            'tensorflow==2.12.0' \
-            'keras==2.12.0' \
-            'keras-preprocessing==1.1.2' \
-            'torch==1.13.1+cu116' \
-            'torchvision==0.14.1+cu116' \
-            'torchaudio==0.13.1' --extra-index-url https://download.pytorch.org/whl/cu116
-
-Based on our experience, we recommend utilizing the GPU versions to train the emulator while using the CPU versions to run the MCMCs. This is because our supercomputers possess a greater number of CPU-only nodes. It may be helpful to create two separate conda environments for this purpose. One could be named `cocoa` (CPU-only), while the other could be named `cocoaemu` and contain the GPU versions of the machine learning packages.
-
-Commenting out the environmental flags shown below, located at *set_installation_options* script, will enable the installation of machine-learning-related libraries via pip.  
-
-        # IF TRUE, THEN COCOA WON'T INSTALL TENSORFLOW, KERAS and PYTORCH
-        #export IGNORE_EMULATOR_CPU_PIP_PACKAGES=1
-        #export IGNORE_EMULATOR_GPU_PIP_PACKAGES=1
-
-Unlike most installed pip prerequisites, which are cached at `cocoa_installation_libraries/pip_cache.xz`, the installation of the Machine Learning packages listed above requires an active internet connection.
