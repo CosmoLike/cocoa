@@ -48,6 +48,8 @@ if [ -z "${IGNORE_CMAKE_INSTALLATION}" ]; then
   
     cd $ROOTDIR/../cocoa_installation_libraries/
     
+    # Why this compress? In the old Cocoa we saved the libraries in 
+    # the github repo using git lfs. So this way preserves the old scripts
     tar -cf - cmake-3.26.4/ | xz -k -1 --threads=$MAKE_NUM_THREADS -c - > cmake.xz
     if [ $? -neq 0 ];then
         echo -e '\033[0;31m'"CMAKE: COULD NOT COMPRESS \e[3mCMAKE FOLDER"'\033[0m'
@@ -84,7 +86,8 @@ if [ -z "${IGNORE_DISTUTILS_INSTALLATION}" ]; then
     fi
     rm -f $ROOTDIR/../cocoa_installation_libraries/binutils-2.37.tar.gz
 
-    
+    # Why this compress? In the old Cocoa we saved the libraries in 
+    # the github repo using git lfs. So this way preserves the old scripts
     tar -cf - binutils-2.37/ | xz -k -1 --threads=$MAKE_NUM_THREADS -c - > binutils.xz
     if [ $? -neq 0 ];then
         echo -e '\033[0;31m'"BINUTILS: COULD NOT COMPRESS \e[3mBINUTILS FOLDER"'\033[0m'
@@ -119,9 +122,11 @@ if [ -z "${IGNORE_DISTUTILS_INSTALLATION}" ]; then
         cd $ROOTDIR
         return 1
     fi
+
     rm -f $ROOTDIR/../cocoa_installation_libraries/texinfo-7.0.3.tar.xz
 
-
+    # Why this compress? In the old Cocoa we saved the libraries in 
+    # the github repo using git lfs. So this way preserves the old scripts
     tar -cf - texinfo-7.0.3/ | xz -k -1 --threads=$MAKE_NUM_THREADS -c - > texinfo.xz
     if [ $? -neq 0 ];then
         echo -e '\033[0;31m'"TEXINFO: COULD NOT COMPRESS \e[3mTEXINFO FOLDER"'\033[0m'
@@ -161,6 +166,8 @@ if [ -z "${IGNORE_OPENBLAS_INSTALLATION}" ]; then
 
     rm -rf $ROOTDIR/../cocoa_installation_libraries/OpenBLAS-0.3.23/.git/
 
+    # Why this compress? In the old Cocoa we saved the libraries in 
+    # the github repo using git lfs. So this way preserves the old scripts
     tar -cf - OpenBLAS-0.3.23/ | xz -k -1 --threads=$MAKE_NUM_THREADS -c - > OpenBLAS.xz
     if [ $? -neq 0 ];then
         echo -e '\033[0;31m'"OPENBLAS: COULD NOT COMPRESS \e[3mOPENBLAS FOLDER"'\033[0m'
@@ -202,6 +209,8 @@ if [ -z "${IGNORE_FORTRAN_LAPACK_INSTALLATION}" ]; then
 
     cd $ROOTDIR/../cocoa_installation_libraries/
 
+    # Why this compress? In the old Cocoa we saved the libraries in 
+    # the github repo using git lfs. So this way preserves the old scripts
     tar -cf - lapack-3.11.0/ | xz -k -1 --threads=$MAKE_NUM_THREADS -c - > lapack.xz
     if [ $? -neq 0 ];then
         echo -e '\033[0;31m'"LAPACK: COULD NOT COMPRESS \e[3mLAPACK FOLDER"'\033[0m'
@@ -235,8 +244,11 @@ if [ -z "${IGNORE_HDF5_INSTALLATION}" ]; then
         cd $ROOTDIR
         return 1
     fi
+
     rm -f $ROOTDIR/../cocoa_installation_libraries/hdf5-1.12.3.tar.gz
 
+    # Why this compress? In the old Cocoa we saved the libraries in 
+    # the github repo using git lfs. So this way preserves the old scripts
     tar -cf - hdf5-1.12.3/ | xz -k -1 --threads=$MAKE_NUM_THREADS -c - > hdf5.xz
     if [ $? -neq 0 ];then
         echo -e '\033[0;31m'"HDF5: COULD NOT COMPRESS \e[3mHDF5 FOLDER"'\033[0m'
@@ -271,8 +283,11 @@ if [ -z "${IGNORE_C_CFITSIO_INSTALLATION}" ]; then
         cd $ROOTDIR
         return 1
     fi
+
     rm -f $ROOTDIR/../cocoa_installation_libraries/cfitsio-4.0.0.tar.gz
 
+    # Why this compress? In the old Cocoa we saved the libraries in 
+    # the github repo using git lfs. So this way preserves the old scripts
     tar -cf - cfitsio-4.0.0/ | xz -k -1 --threads=$MAKE_NUM_THREADS -c - > cfitsio.xz
     if [ $? -neq 0 ];then
         echo -e '\033[0;31m'"CFITSIO: COULD NOT COMPRESS \e[3mCFITSIO FOLDER"'\033[0m'
@@ -306,6 +321,8 @@ if [ -z "${IGNORE_C_FFTW_INSTALLATION}" ]; then
 
     rm -f fftw-3.3.10.tar.gz
 
+    # Why this compress? In the old Cocoa we saved the libraries in 
+    # the github repo using git lfs. So this way preserves the old scripts
     tar -cf - fftw-3.3.10/ | xz -k -1 --threads=$MAKE_NUM_THREADS -c - > fftw.xz
     if [ $? -neq 0 ];then
         echo -e '\033[0;31m'"FFTW: COULD NOT COMPRESS \e[3mFFTW FOLDER"'\033[0m'
@@ -339,6 +356,8 @@ if [ -z "${IGNORE_C_GSL_INSTALLATION}" ]; then
 
     rm -f ROOTDIR/../cocoa_installation_libraries/gsl-2.7.tar.gz
 
+    # Why this compress? In the old Cocoa we saved the libraries in 
+    # the github repo using git lfs. So this way preserves the old scripts
     tar -cf - gsl-2.7/ | xz -k -1 --threads=$MAKE_NUM_THREADS -c - > gsl.xz
     if [ $? -neq 0 ];then
         echo -e '\033[0;31m'"GSL: COULD NOT COMPRESS \e[3mGSL FOLDER"'\033[0m'
@@ -378,6 +397,8 @@ if [ -z "${IGNORE_CPP_SPDLOG_INSTALLATION}" ]; then
 
     rm -rf $ROOTDIR/../cocoa_installation_libraries/spdlog/.git/
 
+    # Why this compress? In the old Cocoa we saved the libraries in 
+    # the github repo using git lfs. So this way preserves the old scripts
     tar -cf - spdlog/ | xz -k -1 --threads=$MAKE_NUM_THREADS -c - > spdlog.xz
     if [ $? -neq 0 ];then
         echo -e '\033[0;31m'"SPDLOG: COULD NOT COMPRESS \e[3mSPDLOG FOLDER"'\033[0m'
@@ -411,6 +432,8 @@ if [ -z "${IGNORE_CPP_ARMA_INSTALLATION}" ]; then
     
     rm -f ROOTDIR/../cocoa_installation_libraries/armadillo-12.8.2.tar.xz
 
+    # Why this compress? In the old Cocoa we saved the libraries in 
+    # the github repo using git lfs. So this way preserves the old scripts
     tar -cf - armadillo-12.8.2/ | xz -k -1 --threads=$MAKE_NUM_THREADS -c - > armadillo.xz
     if [ $? -neq 0 ];then
         echo -e '\033[0;31m'"ARMA: COULD NOT COMPRESS \e[3mARMA FOLDER"'\033[0m'
@@ -444,6 +467,8 @@ if [ -z "${IGNORE_CPP_BOOST_INSTALLATION}" ]; then
 
     rm -f ROOTDIR/../cocoa_installation_libraries/boost_1_81_0.tar.gz
     
+    # Why this compress? In the old Cocoa we saved the libraries in 
+    # the github repo using git lfs. So this way preserves the old scripts
     tar -cf - boost_1_81_0/ | xz -k -1 --threads=$MAKE_NUM_THREADS -c - > boost.xz
     if [ $? -neq 0 ];then
         echo -e '\033[0;31m'"BOOST: COULD NOT COMPRESS \e[3mBOOST FOLDER"'\033[0m'
@@ -485,6 +510,8 @@ if [ -z "${IGNORE_CPP_CARMA_INSTALLATION}" ]; then
 
     rm -rf $ROOTDIR/../cocoa_installation_libraries/carma_tmp
 
+    # Why this compress? In the old Cocoa we saved the libraries in 
+    # the github repo using git lfs. So this way preserves the old scripts
     tar -cf - carma/ | xz -k -1 --threads=$MAKE_NUM_THREADS -c - > carma.xz
     if [ $? -neq 0 ];then
         echo -e '\033[0;31m'"CARMA: COULD NOT COMPRESS \e[3mCARMA FOLDER"'\033[0m'
