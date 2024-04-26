@@ -24,119 +24,63 @@ Cocoa allows users to run [CosmoLike](https://github.com/CosmoLike) routines ins
 
 ## Installation of Cocoa's required packages via Conda <a name="required_packages_conda"></a>
 
-There are two installation methods. Users must choose one of them:
+**Step 1:** Download the file `cocoapy38.yml` yml file and create the cocoa environment via
 
-1. Via Conda - easier, best overall.
-2. Via Cocoa's internal cache - slow, not advisable. See Appendix [Installation of Cocoa's required packages via Cocoa's internal cache](#required_packages_cache) 
+     $ conda env create --name cocoa --file=cocoapy38.yml
+           
+**Step 2:** Activate the Conda environment, as shown below.
 
-We also provide the docker image whovian-cocoa to facilitate the installation of Cocoa on Windows and MacOS. For further instructions, refer to the Appendix [whovian-cocoa docker container](#appendix_jupyter_whovian).
-
-We assume here the user has previously installed either [Minicoda](https://docs.conda.io/en/latest/miniconda.html) or [Anaconda](https://www.anaconda.com/products/individual). If this is not the case, refer to the Appendix [Miniconda Installation](#overview_miniconda) for further instructions.
-
-Type the following commands to create the cocoa Conda environment.
-
-        conda create --name cocoapy38 python=3.8 --quiet --yes \
-           && conda install -n cocoapy38 --quiet --yes  \
-           'conda-forge::libgcc-ng=12.3.0' \
-           'conda-forge::libstdcxx-ng=12.3.0' \
-           'conda-forge::libgfortran-ng=12.3.0' \
-           'conda-forge::gxx_linux-64=12.3.0' \
-           'conda-forge::gcc_linux-64=12.3.0' \
-           'conda-forge::gfortran_linux-64=12.3.0' \
-           'conda-forge::openmpi=4.1.5' \
-           'conda-forge::sysroot_linux-64=2.17' \
-           'conda-forge::git=2.40.0' \
-           'conda-forge::git-lfs=3.3.0' \
-           'conda-forge::fftw=3.3.10' \
-           'conda-forge::cfitsio=4.0.0' \
-           'conda-forge::hdf5=1.14.0' \
-           'conda-forge::lapack=3.9.0' \
-           'conda-forge::openblas=0.3.23' \
-           'conda-forge::lapack=3.9.0' \
-           'conda-forge::gsl=2.7' \
-           'conda-forge::cmake=3.26.4' \
-           'conda-forge::xz==5.2.6' \
-           'conda-forge::armadillo=11.4.4' \
-           'conda-forge::boost-cpp=1.81.0' \
-           'conda-forge::expat=2.5.0' \
-           'conda-forge::cython=0.29.35' \
-           'conda-forge::scipy=1.10.1' \
-           'conda-forge::pandas=1.5.3' \
-           'conda-forge::numpy=1.23.5' \
-           'conda-forge::matplotlib=3.7.1' \
-           'conda-forge::mpi4py=3.1.4' \
-           'conda-forge::libxcrypt' \
-           'conda-forge::pip=23.1.2'
-        conda activate cocoapy38
-        $CONDA_PREFIX/bin/pip install --no-cache-dir 'virtualenv==20.17.1'
-        conda deactivate
-      
-For those working on projects that utilize machine-learning-based emulators, the Appendix [Setting-up conda environment for Machine Learning emulators](#ml_emulators) provides additional commands for installing the necessary packages.
-
-When adopting this installation method, users must activate the Conda environment whenever working with Cocoa, as shown below.
-
-        $ conda activate cocoapy38
+        $ conda activate cocoa
     
-Furthermore, users must install GIT-LFS on the first loading of the Conda cocoa environment.
+**Step 3:** Install `git-lfs` when loading the Conda cocoa environment for the first time..
 
-        $(cocoapy38) git-lfs install
+        $(cocoa) git-lfs install
 
-Users can now proceed to the section [Installation of Cobaya base code](#cobaya_base_code).
+**Users can now proceed** to the section [Installation of Cobaya base code](#cobaya_base_code).
 
+:books: *Additional Notes:* :books:
+
+- For those working on projects that utilize machine-learning-based emulators, the Appendix [Setting-up conda environment for Machine Learning emulators](#ml_emulators) provides additional commands for installing the necessary packages.
+
+- We also provide the docker image whovian-cocoa to facilitate the installation of Cocoa on Windows and MacOS. For further instructions, refer to the Appendix [whovian-cocoa docker container](#appendix_jupyter_whovian).
+
+- We assume here the user has previously installed either [Minicoda](https://docs.conda.io/en/latest/miniconda.html) or [Anaconda](https://www.anaconda.com/products/individual), so conda environments can be created. If this is not the case, refer to the Appendix [Miniconda Installation](#overview_miniconda) for further instructions.
+
+- The conda installation method should be the preferable method in the vast majority of cases. If, for some reason, the user cannot work with conda, then see Appendix [Installation of Cocoa's required packages via Cocoa's internal cache](#required_packages_cache) as it contains instructions for a much slower but conda-independent installation method.
+  
 ## Installation of Cobaya base code <a name="cobaya_base_code"></a>
 
-Assuming the user opted for the easier *Conda installation*, type:
+**Step 1:** Activate the conda cocoa environment.
 
         $ conda activate cocoapy38
+
+**Step 2:** Clone the repository. 
+
+        $(cocoa) git clone --depth 1 https://github.com/CosmoLike/cocoa.git cocoa
+
+**Step 3:** Go to cocoa main folder,        
     
-        $(cocoapy38) git clone --depth 1 https://github.com/CosmoLike/cocoa.git cocoa
+        $(cocoa) cd ./cocoa/Cocoa
 
-        $(cocoapy38) cd ./cocoa/
+**Step 4:** Run the script `setup_cocoa_installation_packages` via
+        
+        $(cocoa) source setup_cocoa_installation_packages
 
-to clone the repository. 
- 
-Cocoa is made aware of the chosen installation method of required packages via special environment keys located on the *Cocoa/set_installation_options* script, as shown below:
+The script `setup_cocoa_installation_packages` decompresses the data files and installs a few necessary packages that have not been installed via conda.
 
-        [Extracted from set_installation_options script]
-        # --------------------------------------------------------------------------------------
-        # --------------------------------------------------------------------------------------
-        # --------------------------------------------------------------------------------------
-        # ----------------------- HOW COCOA SHOULD BE INSTALLED? -------------------------------
-        # --------------------------------------------------------------------------------------
-        # --------------------------------------------------------------------------------------
-        # --------------------------------------------------------------------------------------
-        export MINICONDA_INSTALLATION=1
-        #export MANUAL_INSTALLATION=1
-    
-The user must uncomment the appropriate key, and then type the following command
-
-        $(cocoapy38) cd ./Cocoa/
-        $(cocoapy38) source setup_cocoa_installation_packages
-
-The script `setup_cocoa_installation_packages` decompresses the data files, which only takes a few minutes, and installs any remaining necessary packages. 
-
-Finally, type
+**Step 5:** Finally, run the script `compile_external_modules` by typing 
 
         $(cocoapy38) source compile_external_modules
     
-to compile CAMB, Planck and Polychord. If the user wants to compile only a subset of these packages, then refer to the appendix [Compiling Boltzmann, CosmoLike and Likelihood codes separatelly](#appendix_compile_separatelly).
+to compile CAMB/Class Boltzmann codes, Planck likelihood and Polychord sampler. 
 
-:warning: **Warning** :warning: We have a limited monthly quota in bandwidth for Git LFS files, and therefore we ask users to use good judgment in the number of times they clone files from Cocoa's main repository.
+**Users can now proceed** to the section [Running Cobaya Examples](#cobaya_base_code_examples).
 
-:books: **expert** :books: Cocoa developers should drop the shallow clone option `--depth 1`; they should also authenticate to GitHub via ssh keys and use the command instead.
+:books: *Additional Notes:* :books:
 
-        $(cocoapy38) git clone git@github.com:CosmoLike/cocoa.git cocoa
+- If the user wants to compile only a subset of these packages, then refer to the appendix [Compiling Boltzmann, CosmoLike and Likelihood codes separatelly](#appendix_compile_separatelly).
         
-:books: **expert** :books:  It is important to note that our scripts never install packages on `$HOME/.local`. All requirements for Cocoa are installed at
-
-        Cocoa/.local/bin
-        Cocoa/.local/include
-        Cocoa/.local/lib
-        Cocoa/.local/share
-
-This behavior is critical to enable users to work on multiple instances of Cocoa simultaneously.
-
-:books: **expert** :books: The script *set_installation_options script* contains a few additional flags that may be useful if something goes wrong. They are shown below:
+- The script *set_installation_options script* contains a few additional flags that may be useful if something goes wrong. They are shown below:
 
         [Extracted from set_installation_options script]
         # --------------------------------------------------------------------------------------
@@ -160,6 +104,19 @@ This behavior is critical to enable users to work on multiple instances of Cocoa
         #export IGNORE_POLYCHORD_COMPILATION=1
         #export IGNORE_PLANCK_COMPILATION=1
         #export IGNORE_ACT_COMPILATION=1
+
+- **expert/developers:** Cocoa developers should drop the shallow clone option `--depth 1`; they should also authenticate to GitHub via ssh keys and use the command instead.
+
+        $(cocoapy38) git clone git@github.com:CosmoLike/cocoa.git cocoa
+  
+- **expert/developers:** Our scripts never install packages on `$HOME/.local` as that would make them global to the user. All requirements for Cocoa are installed at
+
+        Cocoa/.local/bin
+        Cocoa/.local/include
+        Cocoa/.local/lib
+        Cocoa/.local/share
+
+This behavior enables users to work on multiple instances of Cocoa simultaneously.
 
 ## Running Cobaya Examples <a name="cobaya_base_code_examples"></a>
 
@@ -549,27 +506,12 @@ This method is slow and not advisable :stop_sign::thumbsdown:. When Conda is una
    - [Bash](https://www.amazon.com/dp/B0043GXMSY/ref=cm_sw_em_r_mt_dp_x3UoFbDXSXRBT);
    - [Git](https://git-scm.com) v1.8+;
    - [Git LFS](https://git-lfs.github.com);
-   - [gcc](https://gcc.gnu.org) v12.*;
-   - [gfortran](https://gcc.gnu.org) v12.*;
-   - [g++](https://gcc.gnu.org) v12.*;
+   - [gcc](https://gcc.gnu.org) v12.*+;
+   - [gfortran](https://gcc.gnu.org) v12.*+;
+   - [g++](https://gcc.gnu.org) v12.*+;
    - [Python](https://www.python.org) v3.8.*;
    - [PIP package manager](https://pip.pypa.io/en/stable/installing/)
    - [Python Virtual Environment](https://www.geeksforgeeks.org/python-virtual-environment/)
-
-The conda environment `cocoalitepy38` contains the minimum packages necessary for this installation method
-
-        conda create --name cocoalitepy38 python=3.8 --quiet --yes \
-        && conda install -n cocoalitepy38 --quiet --yes  \
-            'conda-forge::libgcc-ng=12.3.0' \
-            'conda-forge::libstdcxx-ng=12.3.0' \
-            'conda-forge::libgfortran-ng=12.3.0' \
-            'conda-forge::gxx_linux-64=12.3.0' \
-            'conda-forge::gcc_linux-64=12.3.0' \
-            'conda-forge::gfortran_linux-64=12.3.0' \
-            'conda-forge::openmpi=4.1.5' \
-            'conda-forge::sysroot_linux-64=2.17' \
-            'conda-forge::git=2.40.0' \
-            'conda-forge::git-lfs=3.3.0'
     
 To perform the local semi-autonomous installation, users must modify flags written on the file *set_installation_options* because the default behavior corresponds to an installation via Conda. First, select the environmental key `MANUAL_INSTALLATION` as shown below:
 
