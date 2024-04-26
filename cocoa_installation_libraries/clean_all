@@ -15,33 +15,56 @@ cd ${ROOTDIR}/../cocoa_installation_libraries
 
 echo 'CLEAN ALL INSTALLATION LIBRARIES - THAT MIGHT TAKE A WHILE' > ${OUTPUT_CLEAN_ALL_1} 2> ${OUTPUT_CLEAN_ALL_2}
 
+if [ -n "${COCOA_ARMADILLO_DIR}" ]; then
 rm -rf ./$COCOA_ARMADILLO_DIR
+fi
 
-rm -rf ./$COCOA_BINUTILS_DIR
+if [ -n "${COCOA_BINUTILS_DIR}" ]; then
+  rm -rf ./$COCOA_BINUTILS_DIR
+fi
 
-rm -rf ./$COCOA_BOOST_DIR
+if [ -n "${COCOA_BOOST_DIR}" ]; then
+  rm -rf ./$COCOA_BOOST_DIR
+fi
 
-rm -rf ./$COCOA_CFITSIO_DIR
+if [ -n "${COCOA_CFITSIO_DIR}" ]; then
+  rm -rf ./$COCOA_CFITSIO_DIR
+fi
 
-rm -rf ./$COCOA_CMAKE_DIR
+if [ -n "${COCOA_CMAKE_DIR}" ]; then
+  rm -rf ./$COCOA_CMAKE_DIR
+fi
 
-rm -rf ./$COCOA_CARMA_DIR
+if [ -n "${COCOA_CARMA_DIR}" ]; then
+  rm -rf ./$COCOA_CARMA_DIR
+fi
 
-rm -rf ./$COCOA_FFTW_DIR
+if [ -n "${COCOA_FFTW_DIR}" ]; then
+  rm -rf ./$COCOA_FFTW_DIR
+fi
 
-rm -rf ./$COCOA_GSL_DIR
+if [ -n "${COCOA_GSL_DIR}" ]; then
+  rm -rf ./$COCOA_GSL_DIR
+fi
 
-rm -rf ./$COCOA_LAPACK_DIR
+if [ -n "${COCOA_LAPACK_DIR}" ]; then
+  rm -rf ./$COCOA_LAPACK_DIR
+  rm -rf ./lapack-build
+fi
 
-rm -rf ./lapack-build
-
-rm -rf ./$COCOA_OPENBLAS_DIR
+if [ -n "${COCOA_OPENBLAS_DIR}" ]; then
+  rm -rf ./$COCOA_OPENBLAS_DIR
+fi
 
 rm -rf ./pip_cache
 
-rm -rf ./$COCOA_SPDLOG_DIR
+if [ -n "${COCOA_SPDLOG_DIR}" ]; then
+  rm -rf ./$COCOA_SPDLOG_DIR
+fi
 
-rm -rf ./$COCOA_TEXINFO_DIR
+if [ -n "${COCOA_TEXINFO_DIR}" ]; then
+  rm -rf ./$COCOA_TEXINFO_DIR
+fi
 
 rm -rf ./$COCOA_XZ_DIR
 rm -f $COCOA_XZ_FILE
