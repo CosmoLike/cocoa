@@ -669,7 +669,5 @@ The fine-tunning over the use of system-wide packages instead of our local copie
         export IGNORE_FORTRAN_LAPACK_INSTALLATION=1
         export IGNORE_CPP_ARMA_INSTALLATION=1
        
-    
-Users can now proceed to the section [Installation of Cobaya base code](#cobaya_base_code)
 
 
