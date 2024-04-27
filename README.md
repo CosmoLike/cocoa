@@ -239,7 +239,7 @@ We do not want to discourage people from cloning code from their original reposi
         Cocoa/.local/lib
         Cocoa/.local/share
 
-This behavior enables users to work on multiple instances of Cocoa simultaneously.
+This behavior enables users to work on multiple instances of Cocoa simultaneously similar to what was possible with [CosmoMC](https://github.com/cmbant/CosmoMC).
 
 :books::books: *Additional Notes for experts and developers on Running Cobaya Examples* :books::books:
 
