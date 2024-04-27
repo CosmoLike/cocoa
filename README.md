@@ -4,8 +4,9 @@
 3. [Installation of Cobaya base code](#cobaya_base_code)
 4. [Running Cobaya Examples](#cobaya_base_code_examples)
 5. [Running Cosmolike projects](#running_cosmolike_projects)
-6. [Creating Cosmolike projects (external readme)](Cocoa/projects/)
-7. [Appendix](#appendix)
+6. [What should you do if something goes wrong?](#running_wrong)
+7. [Creating Cosmolike projects (external readme)](Cocoa/projects/)
+8. [Appendix](#appendix)
     1. [Proper Credits](#appendix_proper_credits)
     2. [Additional Notes For Experts and Developers](#additional_notes)
     3. [The whovian-cocoa docker container](#appendix_jupyter_whovian)
@@ -59,7 +60,7 @@ The script `setup_cocoa_installation_packages` decompresses the data files and i
 
 **Step :five:**: Run the script `compile_external_modules` by typing 
 
-        $(cocoapy38) source compile_external_modules
+        $(cocoa) source compile_external_modules
     
 to compile CAMB/Class Boltzmann codes, Planck likelihood and Polychord sampler. 
 
@@ -69,7 +70,7 @@ Assuming the user opted for the easier *Conda installation* and located the term
 
  **Step :one:**: Activate the conda environment
 
-        $ conda activate cocoapy38
+        $ conda activate cocoa
      
  **Step :two:**: Go to `cocoa` main folder 
 
@@ -107,36 +108,86 @@ This will clean your environment.
 
 The *projects* folder was designed to include Cosmolike projects. Similar to the previous section, we assume the user opted for the more direct *Conda installation* method. We also presume the user's terminal is in the folder where Cocoa was cloned.
 
-:one: **Step 1 of 5**: activate the Conda Cocoa environment
+**Step :one:**: activate the Conda Cocoa environment
     
         $ conda activate cocoapy38
 
-:two: **Step 2 of 5**: go to the project folder (`./cocoa/Cocoa/projects`) and clone a Cosmolike project, with fictitious name `XXX`:
+**Step :two:**: Go to the project folder (`./cocoa/Cocoa/projects`)
     
         $(cocoapy38) cd ./cocoa/Cocoa/projects
+
+**Step :three:**: Clone a Cosmolike project, with fictitious name `XXX`:
+
         $(cocoapy38) $CONDA_PREFIX/bin/git clone git@github.com:CosmoLike/cocoa_XXX.git XXX
 
 By convention, the Cosmolike Organization hosts a Cobaya-Cosmolike project named XXX at `CosmoLike/cocoa_XXX`. However, our provided scripts and template YAML files assume the removal of the `cocoa_` prefix when cloning the repository.
 
 Example of cosmolike projects: [lsst_y1](https://github.com/CosmoLike/cocoa_lsst_y1).
  
-:three: **Step 3 of 5**: go back to Cocoa main folder, and activate the private python environment
+**Step :four:**: Go back to Cocoa main folder
     
         $(cocoapy38) cd ../
-        $(cocoapy38) source start_cocoa
- 
-:warning: (**warning**) :warning: Remember to run the start_cocoa script only after cloning the project repository. The script *start_cocoa* creates the necessary symbolic links and adds the *Cobaya-Cosmolike interface* of all projects to `LD_LIBRARY_PATH` and `PYTHONPATH` paths.
 
-:four: **Step 4 of 5**: compile the project
+**Step :five:**: Activate the private python environment
+
+        $(cocoa) source start_cocoa
  
-        $(cocoapy38)(.local) source ./projects/XXX/scripts/compile_XXX
+:warning: (**warning**) :warning: Remember to run the start_cocoa script only after cloning the project repository.
+
+**Step :six:**: Compile the project, as shown below
+ 
+        $(cocoa)(.local) source ./projects/XXX/scripts/compile_XXX
   
-:five:  **Step 5 of 5**: select the number of OpenMP cores and run a template YAML file
+**Step :seven:**: Select the number of OpenMP cores and run a template YAML file
     
-        $(cocoapy38)(.local) export OMP_PROC_BIND=close; export OMP_NUM_THREADS=4
-        $(cocoapy38)(.local) mpirun -n 1 --oversubscribe --mca btl vader,tcp,self --bind-to core --rank-by core --map-by numa:pe=${OMP_NUM_THREADS} cobaya-run ./projects/XXX/EXAMPLE_EVALUATE1.yaml -f
+        $(cocoa)(.local) export OMP_PROC_BIND=close; export OMP_NUM_THREADS=4
+        $(cocoa)(.local) mpirun -n 1 --oversubscribe --mca btl vader,tcp,self --bind-to core --rank-by core --map-by numa:pe=${OMP_NUM_THREADS} cobaya-run ./projects/XXX/EXAMPLE_EVALUATE1.yaml -f
 
 :warning: **Warning** :warning: Be careful when creating YAML for weak lensing projects in Cobaya using the $\Omega_m/\Omega_b$ parameterization. See Appendix [warning about weak lensing YAML files](#appendix_example_runs) for further details.
+
+## What should you do if something goes wrong? <a name="running_wrong"></a>
+
+- The script *set_installation_options script* contains a few additional flags that may be useful. Some of these flags are shown below:
+
+        [Extracted from set_installation_options script]
+        # --------------------------------------------------------------------------------------
+        # --------------------------------------------------------------------------------------
+        # --------------------------- VERBOSE AS DEBUG TOOL ------------------------------------
+        # --------------------------------------------------------------------------------------
+        # --------------------------------------------------------------------------------------
+        #export COCOA_OUTPUT_VERBOSE=1
+
+        # --------------------------------------------------------------------------------------
+        # --------- IF TRUE, THEN COCOA USES CLIK FROM https://github.com/benabed/clik ---------
+        # --------------------------------------------------------------------------------------
+        export USE_SPT_CLIK_PLANCK=1
+
+        # --------------------------------------------------------------------------------------
+        # ----------------- CONTROL OVER THE COMPILATION OF EXTERNAL CODES ---------------------
+        # --------------------------------------------------------------------------------------
+        #export IGNORE_CAMB_COMPILATION=1
+        export IGNORE_CLASS_COMPILATION=1
+        #export IGNORE_COSMOLIKE_COMPILATION=1
+        #export IGNORE_POLYCHORD_COMPILATION=1
+        #export IGNORE_PLANCK_COMPILATION=1
+        #export IGNORE_ACT_COMPILATION=1
+
+        # --------------------------------------------------------------------------------------
+        # ----- IF DEFINED, COSMOLIKE WILL BE COMPILED WITH DEBUG FLAG -------------------------
+        # ----- DEBUG FLAG = ALL COMPILER WARNINGS + NO MATH OPTIMIZATION + NO OPENMP ----------
+        # --------------------------------------------------------------------------------------
+        #export COSMOLIKE_DEBUG_MODE=1
+
+The first step in debugging cocoa is to define the `COCOA_OUTPUT_VERBOSE` and `COSMOLIKE_DEBUG_MODE` flags to obtain a more detailed output. The second step consists of reruning the particular script that failed. The scripts `setup_cocoa_installation_packages` and `compile_external_modules` rerun too many things. It may be advantageous to rerun only the part the routine that failed. To do that, first go to `cocoa` main folder and  start the cocoa environment
+
+    $(cocoa) cd ./cocoa/Cocoa
+    $(cocoa) source start_cocoa
+  
+Look the scripts in the `installation_scripts` folder. If, for example, the compilation of CAMB boltzmann code fail, then run
+
+    $(cocoa)(.local) source ./installation_scripts/compile_camb
+
+If you can fix the issue, rerun `setup_cocoa_installation_packages` and `compile_external_modules` to ensure all installation scripts are called and you have a complete installation.
 
 ## Appendix <a name="appendix"></a>
 
@@ -180,31 +231,6 @@ We do not want to discourage people from cloning code from their original reposi
 
 - If the user wants to compile only a subset of these packages, then refer to the appendix [Compiling Boltzmann, CosmoLike and Likelihood codes separatelly](#appendix_compile_separatelly).
         
-- The script *set_installation_options script* contains a few additional flags that may be useful if something goes wrong. Some of these flags are shown below:
-
-        [Extracted from set_installation_options script]
-        # --------------------------------------------------------------------------------------
-        # --------------------------------------------------------------------------------------
-        # --------------------------- VERBOSE AS DEBUG TOOL ------------------------------------
-        # --------------------------------------------------------------------------------------
-        # --------------------------------------------------------------------------------------
-        #export COCOA_OUTPUT_VERBOSE=1
-
-        # --------------------------------------------------------------------------------------
-        # --------- IF TRUE, THEN COCOA USES CLIK FROM https://github.com/benabed/clik ---------
-        # --------------------------------------------------------------------------------------
-        export USE_SPT_CLIK_PLANCK=1
-
-        # --------------------------------------------------------------------------------------
-        # ----------------- CONTROL OVER THE COMPILATION OF EXTERNAL CODES ---------------------
-        # --------------------------------------------------------------------------------------
-        #export IGNORE_CAMB_COMPILATION=1
-        export IGNORE_CLASS_COMPILATION=1
-        #export IGNORE_COSMOLIKE_COMPILATION=1
-        #export IGNORE_POLYCHORD_COMPILATION=1
-        #export IGNORE_PLANCK_COMPILATION=1
-        #export IGNORE_ACT_COMPILATION=1
-
 - Cocoa developers should drop the shallow clone option `--depth 1`; they should also authenticate to GitHub via ssh keys and use the command instead.
 
         $(cocoa) git clone git@github.com:CosmoLike/cocoa.git cocoa
@@ -248,17 +274,14 @@ When running the container the first time, the user needs to init conda with `co
 
         whovian@cocoa:~$ conda init bash
         whovian@cocoa:~$ source ~/.bashrc
-        whovian@cocoa:~$ git lfs install 
 
-The container already comes with conda Cocoa environment pre-installed:
+Now procede with the normal cocoa installation
 
-        whovian@cocoa:~$ conda activate cocoa
-
-When the user exits the container, how to restart it? Type 
+- When the user exits the container, how to restart it? Type 
     
         $ docker start -ai cocoa2023
 
-How to run Jupyter Notebooks remotely when using Cocoa within the whovian-cocoa container? First, type the following command:
+- How to run Jupyter Notebooks remotely when using Cocoa within the whovian-cocoa container? First, type the following command:
 
         whovian@cocoa:~$ jupyter notebook --no-browser --port=8080
 
@@ -277,8 +300,6 @@ Below, we assume the user runs the container in a server with the URL `your_seve
         $ ssh your_username@your_sever.com -L 8080:localhost:8080
 
 Finally, go to a browser and type `http://localhost:8080/?token=XXX`, where `XXX` is the previously saved token.
-
-PS: The docker container also has the conda environment `cocoalite` that is useful in the rare case someone want to install Cocoa via the slow/not-advisable instructions on section [Installation of Cocoa's required packages via Cocoa's internal cache](#required_packages_cache)
 
 ### Miniconda Installation <a name="overview_miniconda"></a>
 
