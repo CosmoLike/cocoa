@@ -109,15 +109,15 @@ The *projects* folder was designed to include Cosmolike projects. Similar to the
 
 **Step :one:**: activate the Conda Cocoa environment
     
-        $ conda activate cocoapy38
+        $ conda activate cocoa
 
 **Step :two:**: Go to the project folder (`./cocoa/Cocoa/projects`)
     
-        $(cocoapy38) cd ./cocoa/Cocoa/projects
+        $(cocoa) cd ./cocoa/Cocoa/projects
 
 **Step :three:**: Clone a Cosmolike project, with fictitious name `XXX`:
 
-        $(cocoapy38) $CONDA_PREFIX/bin/git clone git@github.com:CosmoLike/cocoa_XXX.git XXX
+        $(cocoa) $CONDA_PREFIX/bin/git clone git@github.com:CosmoLike/cocoa_XXX.git XXX
 
 By convention, the Cosmolike Organization hosts a Cobaya-Cosmolike project named XXX at `CosmoLike/cocoa_XXX`. However, our provided scripts and template YAML files assume the removal of the `cocoa_` prefix when cloning the repository.
 
@@ -125,7 +125,7 @@ Example of cosmolike projects: [lsst_y1](https://github.com/CosmoLike/cocoa_lsst
  
 **Step :four:**: Go back to Cocoa main folder
     
-        $(cocoapy38) cd ../
+        $(cocoa) cd ../
 
 **Step :five:**: Activate the private python environment
 
@@ -326,11 +326,11 @@ After installation, users must source conda configuration file
 
 To avoid excessive compilation times during development, users can use specialized scripts located at `Cocoa/installation_scripts/` that compile only a specific module. A few examples of these scripts are: 
 
-        $(cocoapy38)(.local) source ./installation_scripts/compile_class
-        $(cocoapy38)(.local) source ./installation_scripts/compile_camb
-        $(cocoapy38)(.local) source ./installation_scripts/compile_planck
-        $(cocoapy38)(.local) source ./installation_scripts/compile_act
-        $(cocoapy38)(.local) source ./installation_scripts/setup_polychord
+        $(cocoa)(.local) source ./installation_scripts/compile_class
+        $(cocoa)(.local) source ./installation_scripts/compile_camb
+        $(cocoa)(.local) source ./installation_scripts/compile_planck
+        $(cocoa)(.local) source ./installation_scripts/compile_act
+        $(cocoa)(.local) source ./installation_scripts/setup_polychord
     
 ### :warning: Warning :warning: Weak Lensing YAML files in Cobaya <a name="appendix_example_runs"></a>
 
@@ -492,9 +492,9 @@ Learning all these languages can be overwhelming, so to enable new users to do r
 
 If the user wants to add Tensorflow, Keras and Pytorch for an emulator-based project via Conda, then type
 
-        $ conda activate cocoapy38 
+        $ conda activate cocoa
       
-        $(cocoapy38) $CONDA_PREFIX/bin/pip install --no-cache-dir \
+        $(cocoa) $CONDA_PREFIX/bin/pip install --no-cache-dir \
             'tensorflow-cpu==2.12.0' \
             'keras==2.12.0' \
             'keras-preprocessing==1.1.2' \
@@ -505,7 +505,7 @@ If the user wants to add Tensorflow, Keras and Pytorch for an emulator-based pro
 In case there are GPUs available, the following commands will install the GPU version of 
 Tensorflow, Keras and Pytorch (assuming CUDA 11.6, click [here](https://pytorch.org/get-started/previous-versions/) for additional information).
 
-        $(cocoapy38) $CONDA_PREFIX/bin/pip install --no-cache-dir \
+        $(cocoa) $CONDA_PREFIX/bin/pip install --no-cache-dir \
             'tensorflow==2.12.0' \
             'keras==2.12.0' \
             'keras-preprocessing==1.1.2' \
@@ -571,7 +571,7 @@ Finally, set the following environmental keys
         # WE USE CONDA COLASLIM ENV WITH JUST PYTHON AND GCC TO TEST MANUAL INSTALLATION
         # --------------------------------------------------------------------------------------
         #conda create --name cocoalite python=3.8 --quiet --yes \
-        #   && conda install -n cocoapy38 --quiet --yes  \
+        #   && conda install -n cocoalite --quiet --yes  \
         #   'conda-forge::libgcc-ng=12.3.0' \
         #   'conda-forge::libstdcxx-ng=12.3.0' \
         #   'conda-forge::libgfortran-ng=12.3.0' \
