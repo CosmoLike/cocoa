@@ -15,10 +15,9 @@
     6. [Warning about Weak Lensing YAML files in Cobaya](#appendix_example_runs)
     7. [Manual Blocking of Cosmolike Parameters](#manual_blocking_cosmolike)
     8. [Adding a new modified CAMB/CLASS to Cocoa (external readme)](Cocoa/external_modules/code)
-    9. [Fine-tunning CAMB Accuracy](#camb_accuracy)
-    10. [Bash/C/C++ Notes](#lectnotes)
-    11. [Setting-up conda environment for Machine Learning emulators](#ml_emulators)
-    12. [Installation of Cocoa's required packages via Cocoa's internal cache](#required_packages_cache)
+    9. [Bash/C/C++ Notes](#lectnotes)
+    10. [Setting-up conda environment for Machine Learning emulators](#ml_emulators)
+    11. [Installation of Cocoa's required packages via Cocoa's internal cache](#required_packages_cache)
 
 ## Overview of the [Cobaya](https://github.com/CobayaSampler)-[CosmoLike](https://github.com/CosmoLike) Joint Architecture (Cocoa) <a name="overview"></a>
 
