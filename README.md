@@ -4,20 +4,20 @@
 3. [Installation of Cobaya base code](#cobaya_base_code)
 4. [Running Cobaya Examples](#cobaya_base_code_examples)
 5. [Running Cosmolike projects](#running_cosmolike_projects)
-6. [What should you do if something goes wrong?](#running_wrong)
-7. [Creating Cosmolike projects (external readme)](Cocoa/projects/)
-8. [Appendix](#appendix)
+6. [Creating Cosmolike projects (external readme)](Cocoa/projects/)
+7. [Appendix](#appendix)
     1. [Proper Credits](#appendix_proper_credits)
-    2. [Additional Notes For Experts and Developers](#additional_notes)
-    3. [The whovian-cocoa docker container](#appendix_jupyter_whovian)
-    4. [Miniconda Installation](#overview_miniconda)
-    5. [Compiling Boltzmann, CosmoLike and Likelihood codes separatelly](#appendix_compile_separatelly)
-    6. [Warning about Weak Lensing YAML files in Cobaya](#appendix_example_runs)
-    7. [Manual Blocking of Cosmolike Parameters](#manual_blocking_cosmolike)
-    8. [Adding a new modified CAMB/CLASS to Cocoa (external readme)](Cocoa/external_modules/code)
-    9. [Bash/C/C++ Notes](#lectnotes)
-    10. [Setting-up conda environment for Machine Learning emulators](#ml_emulators)
-    11. [Installation of Cocoa's required packages without conda](#required_packages_cache)
+    2. [FAQ: What should you do if something goes wrong?](#running_wrong)
+    3. [Additional Notes For Experts and Developers](#additional_notes)
+    4. [The whovian-cocoa docker container](#appendix_jupyter_whovian)
+    5. [Miniconda Installation](#overview_miniconda)
+    6. [Compiling Boltzmann, CosmoLike and Likelihood codes separatelly](#appendix_compile_separatelly)
+    7. [Warning about Weak Lensing YAML files in Cobaya](#appendix_example_runs)
+    8. [Manual Blocking of Cosmolike Parameters](#manual_blocking_cosmolike)
+    9. [Adding a new modified CAMB/CLASS to Cocoa (external readme)](Cocoa/external_modules/code)
+    10. [Bash/C/C++ Notes](#lectnotes)
+    11. [Setting-up conda environment for Machine Learning emulators](#ml_emulators)
+    12. [Installation of Cocoa's required packages without conda](#required_packages_cache)
 
 ## Overview of the [Cobaya](https://github.com/CobayaSampler)-[CosmoLike](https://github.com/CosmoLike) Joint Architecture (Cocoa) <a name="overview"></a>
 
@@ -142,7 +142,33 @@ Example of cosmolike projects: [lsst_y1](https://github.com/CosmoLike/cocoa_lsst
         $(cocoa)(.local) export OMP_PROC_BIND=close; export OMP_NUM_THREADS=4
         $(cocoa)(.local) mpirun -n 1 --oversubscribe --mca btl vader,tcp,self --bind-to core --rank-by core --map-by numa:pe=${OMP_NUM_THREADS} cobaya-run ./projects/XXX/EXAMPLE_EVALUATE1.yaml -f
 
-## What should you do if something goes wrong? <a name="running_wrong"></a>
+## Appendix <a name="appendix"></a>
+
+### Proper Credits <a name="appendix_proper_credits"></a>
+
+The following is not an exhaustive list of the codes we use
+
+- [Cobaya](https://github.com/CobayaSampler) is a framework developed by Dr. Jesus Torrado and Prof. Anthony Lewis
+
+- [Cosmolike](https://github.com/CosmoLike) is a framework developed by Prof. Elisabeth Krause and Prof. Tim Eifler
+
+- [CAMB](https://github.com/cmbant/CAMB) is a Boltzmann code developed by Prof. Anthony Lewis
+
+- [CLASS](https://github.com/lesgourg/class_public) is a Boltzmann code developed by Prof. Julien Lesgourgues and Dr. Thomas Tram
+
+- [Polychord](https://github.com/PolyChord/PolyChordLite) is a sampler code developed by Dr. Will Handley, Prof. Lasenby, and Prof. M. Hobson
+
+- [CLIK](https://github.com/benabed/clik) is the likelihood code used to analyze Planck and SPT data, maintained by Prof. Karim Benabed
+
+- [SPT](https://github.com/SouthPoleTelescope/spt3g_y1_dist) is the official likelihood of the South Pole Telescope 3G Year 1 (TTTEEE)
+
+- [MFLike](https://github.com/simonsobs/LAT_MFLike) is the official likelihood of the Simons Observatory
+
+- [ACTLensing](https://github.com/ACTCollaboration/act_dr6_lenslike) is the official lensing likelihood of the ACT collaborated developed by Prof. Mathew Madhavacheril
+
+We do not want to discourage people from cloning code from their original repositories. We've included these codes as compressed [xz file format](https://tukaani.org/xz/format.html) in our repository for convenience in the initial development (speed in setting up Cocoa). The work of those authors is extraordinary, and they must be properly cited.
+
+## FAQ: What should you do if something goes wrong? <a name="running_wrong"></a>
 
 - The script *set_installation_options script* contains a few additional flags that may be useful. Some of these flags are shown below:
 
@@ -185,32 +211,6 @@ Look the scripts in the `installation_scripts` folder. If, for example, the comp
     $(cocoa)(.local) source ./installation_scripts/compile_camb
 
 If you can fix the issue, rerun `setup_cocoa_installation_packages` and `compile_external_modules` to ensure all installation scripts are called and you have a complete installation.
-
-## Appendix <a name="appendix"></a>
-
-### Proper Credits <a name="appendix_proper_credits"></a>
-
-The following is not an exhaustive list of the codes we use
-
-- [Cobaya](https://github.com/CobayaSampler) is a framework developed by Dr. Jesus Torrado and Prof. Anthony Lewis
-
-- [Cosmolike](https://github.com/CosmoLike) is a framework developed by Prof. Elisabeth Krause and Prof. Tim Eifler
-
-- [CAMB](https://github.com/cmbant/CAMB) is a Boltzmann code developed by Prof. Anthony Lewis
-
-- [CLASS](https://github.com/lesgourg/class_public) is a Boltzmann code developed by Prof. Julien Lesgourgues and Dr. Thomas Tram
-
-- [Polychord](https://github.com/PolyChord/PolyChordLite) is a sampler code developed by Dr. Will Handley, Prof. Lasenby, and Prof. M. Hobson
-
-- [CLIK](https://github.com/benabed/clik) is the likelihood code used to analyze Planck and SPT data, maintained by Prof. Karim Benabed
-
-- [SPT](https://github.com/SouthPoleTelescope/spt3g_y1_dist) is the official likelihood of the South Pole Telescope 3G Year 1 (TTTEEE)
-
-- [MFLike](https://github.com/simonsobs/LAT_MFLike) is the official likelihood of the Simons Observatory
-
-- [ACTLensing](https://github.com/ACTCollaboration/act_dr6_lenslike) is the official lensing likelihood of the ACT collaborated developed by Prof. Mathew Madhavacheril
-
-We do not want to discourage people from cloning code from their original repositories. We've included these codes as compressed [xz file format](https://tukaani.org/xz/format.html) in our repository for convenience in the initial development (speed in setting up Cocoa). The work of those authors is extraordinary, and they must be properly cited.
 
 ### Additional Notes for experts and developers <a name="additional_notes"></a>
 
