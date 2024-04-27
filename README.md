@@ -142,8 +142,6 @@ Example of cosmolike projects: [lsst_y1](https://github.com/CosmoLike/cocoa_lsst
         $(cocoa)(.local) export OMP_PROC_BIND=close; export OMP_NUM_THREADS=4
         $(cocoa)(.local) mpirun -n 1 --oversubscribe --mca btl vader,tcp,self --bind-to core --rank-by core --map-by numa:pe=${OMP_NUM_THREADS} cobaya-run ./projects/XXX/EXAMPLE_EVALUATE1.yaml -f
 
-:warning: **Warning** :warning: Be careful when creating YAML for weak lensing projects in Cobaya using the $\Omega_m/\Omega_b$ parameterization. See Appendix [warning about weak lensing YAML files](#appendix_example_runs) for further details.
-
 ## What should you do if something goes wrong? <a name="running_wrong"></a>
 
 - The script *set_installation_options script* contains a few additional flags that may be useful. Some of these flags are shown below:
