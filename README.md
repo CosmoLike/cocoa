@@ -11,7 +11,7 @@
     3. [Additional Notes For Experts and Developers](#additional_notes)
     4. [The whovian-cocoa docker container](#appendix_jupyter_whovian)
     5. [Miniconda Installation](#overview_miniconda)
-    6. [Compiling Boltzmann, CosmoLike and Likelihood codes separatelly](#appendix_compile_separatelly)
+    6. [FAQ: How to compile the Boltzmann, CosmoLike and Likelihood codes separatelly](#appendix_compile_separatelly)
     7. [Warning about Weak Lensing YAML files in Cobaya](#appendix_example_runs)
     8. [Manual Blocking of Cosmolike Parameters](#manual_blocking_cosmolike)
     9. [Adding a new modified CAMB/CLASS to Cocoa (external readme)](Cocoa/external_modules/code)
@@ -168,7 +168,7 @@ The following is not an exhaustive list of the codes we use
 
 We do not want to discourage people from cloning code from their original repositories. We've included these codes as compressed [xz file format](https://tukaani.org/xz/format.html) in our repository for convenience in the initial development (speed in setting up Cocoa). The work of those authors is extraordinary, and they must be properly cited.
 
-### FAQ: What should you do if something goes wrong? <a name="running_wrong"></a>
+### :interrobang: FAQ: What should you do if something goes wrong? <a name="running_wrong"></a>
 
 - The script *set_installation_options script* contains a few additional flags that may be useful. Some of these flags are shown below:
 
@@ -272,11 +272,11 @@ When running the container the first time, the user needs to init conda with `co
 
 Now procede with the normal cocoa installation
 
-- When the user exits the container, how to restart it? Type 
+- :interrobang: FAQ: When the user exits the container, how to restart it? Type 
     
         $ docker start -ai cocoa2023
 
-- How to run Jupyter Notebooks remotely when using Cocoa within the whovian-cocoa container? First, type the following command:
+- :interrobang: FAQ: How to run Jupyter Notebooks remotely when using Cocoa within the whovian-cocoa container? First, type the following command:
 
         whovian@cocoa:~$ jupyter notebook --no-browser --port=8080
 
@@ -322,7 +322,7 @@ After installation, users must source conda configuration file
             && conda config --set channel_priority strict \
             && conda init bash
     
-### Compiling Boltzmann, CosmoLike and Likelihood codes separatelly <a name="appendix_compile_separatelly"></a>
+### :interrobang: FAQ: How to compile the Boltzmann, CosmoLike and Likelihood codes separatelly <a name="appendix_compile_separatelly"></a>
 
 To avoid excessive compilation times during development, users can use specialized scripts located at `Cocoa/installation_scripts/` that compile only a specific module. A few examples of these scripts are: 
 
