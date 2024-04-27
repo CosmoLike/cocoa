@@ -17,7 +17,7 @@
     8. [Adding a new modified CAMB/CLASS to Cocoa (external readme)](Cocoa/external_modules/code)
     9. [Bash/C/C++ Notes](#lectnotes)
     10. [Setting-up conda environment for Machine Learning emulators](#ml_emulators)
-    11. [Installation of Cocoa's required packages via Cocoa's internal cache](#required_packages_cache)
+    11. [Installation of Cocoa's required packages without conda](#required_packages_cache)
 
 ## Overview of the [Cobaya](https://github.com/CobayaSampler)-[CosmoLike](https://github.com/CosmoLike) Joint Architecture (Cocoa) <a name="overview"></a>
 
@@ -222,7 +222,7 @@ We do not want to discourage people from cloning code from their original reposi
 
 - We assume here the user has previously installed either [Minicoda](https://docs.conda.io/en/latest/miniconda.html) or [Anaconda](https://www.anaconda.com/products/individual), so conda environments can be created. If this is not the case, refer to the Appendix [Miniconda Installation](#overview_miniconda) for further instructions.
 
-- The conda installation method should be the chosen installation method in the overwhelming majority of cases. In the rare cases the user cannot work with conda, refer to the Appendix [Installation of Cocoa's required packages via Cocoa's internal cache](#required_packages_cache) as it contains instructions for a much slower but conda-independent installation method.
+- The conda installation method should be the chosen installation method in the overwhelming majority of cases. In the rare cases the user cannot work with conda, refer to the Appendix [Installation of Cocoa's required packages without conda](#required_packages_cache) as it contains instructions for a much slower but conda-independent installation method.
 
 :books::books: *Additional Notes for experts and developers on Installation of Cobaya base code* :books::books:
 
@@ -265,8 +265,6 @@ Following the command above, users should see the following text on the screen t
 
 <img width="872" alt="Screenshot 2023-12-19 at 1 26 50 PM" src="https://github.com/CosmoLike/cocoa/assets/3210728/eb1fe7ec-e463-48a6-90d2-2d84e5b61aa1">
 
-:books: **expert** :books: The flag `-v $(pwd):/home/whovian/host/` ensures that files on the host computer, where the user should install Cocoa to avoid losing work in case the docker image needs to be deleted, have been mounted to the directory `/home/whovian/host/`. Therefore, the user should see the host files of the directory where the whovian-cocoa container was initialized after typing `cd /home/whovian/host/; ls`
-
 When running the container the first time, the user needs to init conda with `conda init bash` followed by `source ~/.bashrc`, as shown below.
 
         whovian@cocoa:~$ conda init bash
@@ -298,6 +296,10 @@ Below, we assume the user runs the container in a server with the URL `your_seve
 
 Finally, go to a browser and type `http://localhost:8080/?token=XXX`, where `XXX` is the previously saved token.
 
+:books::books: *Additional Notes* :books::books:
+
+-  The flag `-v $(pwd):/home/whovian/host/` ensures that files on the host computer, where the user should install Cocoa to avoid losing work in case the docker image needs to be deleted, have been mounted to the directory `/home/whovian/host/`. Therefore, the user should see the host files of the directory where the whovian-cocoa container was initialized after typing `cd /home/whovian/host/; ls`
+  
 ### Miniconda Installation <a name="overview_miniconda"></a>
 
 Download and run Miniconda installation script (please adapt `CONDA_DIR`):
@@ -521,9 +523,9 @@ Commenting out the environmental flags shown below, located at *set_installation
 
 Unlike most installed pip prerequisites, which are cached at `cocoa_installation_libraries/pip_cache.xz`, the installation of the Machine Learning packages listed above requires an active internet connection.
 
-### Installation of Cocoa's required packages via Cocoa's internal cache <a name="required_packages_cache"></a>
+### Installation of Cocoa's required packages without conda <a name="required_packages_cache"></a>
 
-This method is slow and not advisable :stop_sign::thumbsdown:. When Conda is unavailable, the user can still perform a local semi-autonomous installation on Linux based on a few scripts we implemented. We provide a local copy of almost all required packages on Cocoa's cache folder named *cocoa_installation_libraries*. We assume the pre-installation of the following packages:
+This method is slow and not advisable :stop_sign::thumbsdown:. When Conda is unavailable, the user can still perform a local semi-autonomous installation on Linux based on a few scripts we implemented. We require the pre-installation of the following packages:
 
    - [Bash](https://www.amazon.com/dp/B0043GXMSY/ref=cm_sw_em_r_mt_dp_x3UoFbDXSXRBT);
    - [Git](https://git-scm.com) v1.8+;
