@@ -25,122 +25,95 @@ Cocoa allows users to run [CosmoLike](https://github.com/CosmoLike) routines ins
 
 ## Installation of Cocoa's required packages via Conda <a name="required_packages_conda"></a>
 
-**Step :one:**: Download the file `cocoapy38.yml` yml file and create the cocoa environment via
+**Step :one:**: Download the file `cocoapy38.yml` yml file, create the cocoa environment, and activate it
 
-     $ conda env create --name cocoa --file=cocoapy38.yml
-           
-**Step :two:**: Activate the Conda environment, as shown below.
-
-        $ conda activate cocoa
+    conda env create --name cocoa --file=cocoapy38.yml
+    conda activate cocoa
     
-**Step :three:**: Install `git-lfs` when loading the Conda cocoa environment for the first time.
+**Step :two:**: Install `git-lfs` when loading the Conda cocoa environment for the first time.
 
-        $(cocoa) git-lfs install
+    git-lfs install
 
 ## Installation of Cobaya base code <a name="cobaya_base_code"></a>
 
-**Step :one:**: Activate the conda cocoa environment.
+**Step :one:**: We assume that you are still in the conda cocoa environment from the previous `conda activate cocoa` command. Now, clone the repository and go to `cocoa` main folder,
 
-        $ conda activate cocoa
+    $CONDA_PREFIX/bin/git clone --depth 1 https://github.com/CosmoLike/cocoa.git cocoa
+    cd ./cocoa/Cocoa
 
-**Step :two:**: Clone the repository. 
-
-        $(cocoa) git clone --depth 1 https://github.com/CosmoLike/cocoa.git cocoa
-
-**Step :three:**: Go to `cocoa` main folder,        
-    
-        $(cocoa) cd ./cocoa/Cocoa
-
-**Step :four:**: Run the script `setup_cocoa_installation_packages` via
+**Step :two:**: Run the script `setup_cocoa_installation_packages` via
         
-        $(cocoa) source setup_cocoa_installation_packages
+    source setup_cocoa_installation_packages
 
 The script `setup_cocoa_installation_packages` decompresses the data files and installs a few necessary packages that have not been installed via conda.
 
-**Step :five:**: Run the script `compile_external_modules` by typing 
+**Step :three:**: Run the script `compile_external_modules` by typing 
 
-        $(cocoa) source compile_external_modules
+    source compile_external_modules
     
-to compile CAMB/Class Boltzmann codes, Planck likelihood and Polychord sampler. 
+This compiles CAMB/Class Boltzmann codes, Planck likelihood and Polychord sampler. 
 
 ## Running Cobaya Examples <a name="cobaya_base_code_examples"></a>
 
-Assuming the user opted for the easier *Conda installation* and located the terminal at the folder *where Cocoa was cloned*, this is how to run some example YAML files we provide (*no Cosmolike code involved*): 
+We assume that you are still in the conda cocoa environment from the previous `conda activate cocoa` command and that you are in the cocoa main folder `cocoa/Cocoa`, 
 
- **Step :one:**: Activate the conda environment
+ **Step :one:**: Activate the private python environment by sourcing the script `start_cocoa`
 
-        $ conda activate cocoa
-     
- **Step :two:**: Go to `cocoa` main folder 
-
-        $(cocoa) cd ./cocoa/Cocoa
-
- **Step :three:**: Activate the private python environment by sourcing the script `start_cocoa`
-
-        $(cocoa) source start_cocoa
+    source start_cocoa
 
 Users will see a terminal that looks like this: `$(cocoa)(.local)`. *This is a feature, not a bug*! 
 
- **Step :four:**: Select the number of OpenMP cores
+ **Step :two:**: Select the number of OpenMP cores
     
-        $(cocoa)(.local) export OMP_PROC_BIND=close; export OMP_NUM_THREADS=4
+    export OMP_PROC_BIND=close; export OMP_NUM_THREADS=4
 
- **Step :five:**: Run `cobaya-run` on a the first example YAML files we provide.
+ **Step :three:**: Run `cobaya-run` on a the first example YAML files we provide.
 
 One model evaluation:
 
-        $(cocoa)(.local) mpirun -n 1 --oversubscribe --mca btl vader,tcp,self --bind-to core:overload-allowed --rank-by core --map-by numa:pe=${OMP_NUM_THREADS} cobaya-run  ./projects/example/EXAMPLE_EVALUATE1.yaml -f
+    mpirun -n 1 --oversubscribe --mca btl vader,tcp,self --bind-to core:overload-allowed --rank-by core --map-by numa:pe=${OMP_NUM_THREADS} cobaya-run  ./projects/example/EXAMPLE_EVALUATE1.yaml -f
         
 MCMC:
 
-        $(cocoa)(.local) mpirun -n 4 --oversubscribe --mca btl vader,tcp,self --bind-to core:overload-allowed --rank-by core --map-by numa:pe=${OMP_NUM_THREADS} cobaya-run ./projects/example/EXAMPLE_MCMC1.yaml -f
+    mpirun -n 4 --oversubscribe --mca btl vader,tcp,self --bind-to core:overload-allowed --rank-by core --map-by numa:pe=${OMP_NUM_THREADS} cobaya-run ./projects/example/EXAMPLE_MCMC1.yaml -f
 
-**Step :six:**: Once the work is done, type:
+Once the work is done, clean your environment via :
 
-        $(cocoa)(.local) source stop_cocoa
-        
-        $(cocoa) conda deactivate cocoa
+    source stop_cocoa
+    conda deactivate cocoa
 
-This will clean your environment. 
+
 
 ## Running Cosmolike projects <a name="running_cosmolike_projects"></a> 
 
-The *projects* folder was designed to include Cosmolike projects. Similar to the previous section, we assume the user opted for the more direct *Conda installation* method. We also presume the user's terminal is in the folder where Cocoa was cloned.
+The *projects* folder was designed to include Cosmolike projects. We assume that you are still in the conda cocoa environment from the previous `conda activate cocoa` command and that you are in the cocoa main folder `cocoa/Cocoa`, 
 
-**Step :one:**: activate the Conda Cocoa environment
+**Step :one:**: Go to the project folder (`./cocoa/Cocoa/projects`) and clone a Cosmolike project, with fictitious name `XXX`:
     
-        $ conda activate cocoa
+    cd ./cocoa/Cocoa/projects
+    $CONDA_PREFIX/bin/git clone git@github.com:CosmoLike/cocoa_XXX.git XXX
 
-**Step :two:**: Go to the project folder (`./cocoa/Cocoa/projects`)
-    
-        $(cocoa) cd ./cocoa/Cocoa/projects
-
-**Step :three:**: Clone a Cosmolike project, with fictitious name `XXX`:
-
-        $(cocoa) $CONDA_PREFIX/bin/git clone git@github.com:CosmoLike/cocoa_XXX.git XXX
-
-By convention, the Cosmolike Organization hosts a Cobaya-Cosmolike project named XXX at `CosmoLike/cocoa_XXX`. However, our provided scripts and template YAML files assume the removal of the `cocoa_` prefix when cloning the repository.
+By convention, the Cosmolike Organization hosts a Cobaya-Cosmolike project named XXX at `CosmoLike/cocoa_XXX`. When cloning the repository the `cocoa_` prefix must be dropped (see above).
 
 Example of cosmolike projects: [lsst_y1](https://github.com/CosmoLike/cocoa_lsst_y1).
  
-**Step :four:**: Go back to Cocoa main folder
+**Step :two:**: Go back to Cocoa main folder and activate the private python environment
     
-        $(cocoa) cd ../
-
-**Step :five:**: Activate the private python environment
-
-        $(cocoa) source start_cocoa
+    cd ../
+    source start_cocoa
  
-:warning: (**warning**) :warning: Remember to run the start_cocoa script only after cloning the project repository.
+:warning: :warning: The `start_cocoa` script must be run after cloning the project repository. 
 
-**Step :six:**: Compile the project, as shown below
+Users will see a terminal that looks like this: `$(cocoa)(.local)`. *This is a feature, not a bug*!
+
+**Step :three:**: Compile the project, as shown below
  
-        $(cocoa)(.local) source ./projects/XXX/scripts/compile_XXX
+    source ./projects/XXX/scripts/compile_XXX
   
-**Step :seven:**: Select the number of OpenMP cores and run a template YAML file
+**Step :four:**: Select the number of OpenMP cores and run a template YAML file
     
-        $(cocoa)(.local) export OMP_PROC_BIND=close; export OMP_NUM_THREADS=4
-        $(cocoa)(.local) mpirun -n 1 --oversubscribe --mca btl vader,tcp,self --bind-to core --rank-by core --map-by numa:pe=${OMP_NUM_THREADS} cobaya-run ./projects/XXX/EXAMPLE_EVALUATE1.yaml -f
+    export OMP_PROC_BIND=close; export OMP_NUM_THREADS=4
+    mpirun -n 1 --oversubscribe --mca btl vader,tcp,self --bind-to core --rank-by core --map-by numa:pe=${OMP_NUM_THREADS} cobaya-run ./projects/XXX/EXAMPLE_EVALUATE1.yaml -f
 
 ## Appendix <a name="appendix"></a>
 
