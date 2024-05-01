@@ -174,7 +174,7 @@ We do not want to discourage people from cloning code from their original reposi
         # --------------------------------------------------------------------------------------
         #export COSMOLIKE_DEBUG_MODE=1
 
-The first step in debugging cocoa is to define the `COCOA_OUTPUT_VERBOSE` and `COSMOLIKE_DEBUG_MODE` flags to obtain a more detailed output. The second step consists of reruning the particular script that failed. The scripts `setup_cocoa_installation_packages` and `compile_external_modules` rerun too many things. It may be advantageous to rerun only the part the routine that failed. To do that, first go to `cocoa` main folder and  start the cocoa environment
+The first step in debugging cocoa is to define the `COCOA_OUTPUT_VERBOSE` and `COSMOLIKE_DEBUG_MODE` flags to obtain a more detailed output. The second step consists of reruning the particular script that failed. The scripts `setup_cocoa_installation_packages` and `compile_external_modules` run many things. It may be advantageous to run only the part the routine that failed. To do that, first go to `cocoa` main folder and  start the cocoa environment
 
     $(cocoa) cd ./cocoa/Cocoa
     $(cocoa) source start_cocoa
