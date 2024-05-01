@@ -9,7 +9,7 @@
     1. [Proper Credits](#appendix_proper_credits)
     2. [FAQ: What should you do if something goes wrong?](#running_wrong)
     3. [Additional Notes For Experts and Developers](#additional_notes)
-    4. [The whovian-cocoa docker container](#appendix_jupyter_whovian)
+    4. [Run cocoa on your laptop - The "whovian-cocoa" docker container](#appendix_jupyter_whovian)
     5. [Miniconda Installation](#overview_miniconda)
     6. [FAQ: How to compile the Boltzmann, CosmoLike and Likelihood codes separately](#appendix_compile_separately)
     7. [Warning about Weak Lensing YAML files in Cobaya](#appendix_example_runs)
@@ -191,7 +191,7 @@ If you can fix the issue, rerun `setup_cocoa_installation_packages` and `compile
  
 - For those working on projects that utilize machine-learning-based emulators, the Appendix [Setting-up conda environment for Machine Learning emulators](#ml_emulators) provides additional commands for installing the necessary packages.
 
-- We provide a docker image named `whovian-cocoa` that facilitates cocoa installation on Windows and MacOS. For further instructions, refer to the Appendix [whovian-cocoa docker container](#appendix_jupyter_whovian).
+- We provide a docker image named "whovian-cocoa" that facilitates cocoa installation on Windows and MacOS. For further instructions, refer to the Appendix [Run cocoa on your laptop - The "whovian-cocoa" docker container](#appendix_jupyter_whovian).
 
 - We assume here the user has previously installed either [Minicoda](https://docs.conda.io/en/latest/miniconda.html) or [Anaconda](https://www.anaconda.com/products/individual), so conda environments can be created. If this is not the case, refer to the Appendix [Miniconda Installation](#overview_miniconda) for further instructions.
 
@@ -226,7 +226,7 @@ This behavior enables users to work on multiple instances of Cocoa simultaneousl
 
 - Additional explanations about the `start_cocoa`/`stop_cocoa` scripts: Why did we choose to create two separate bash environments `(cocoa)` and `(.local)`? Users should be able to manipulate multiple Cocoa instances seamlessly, which is particularly useful when running chains in one instance while experimenting with code development in another. Consistency of the environment across all Cocoa instances is crucial, and the start_cocoa/stop_cocoa scripts handle the loading and unloading of environmental path variables for each Cocoa.
 
-### The whovian-cocoa docker container <a name="appendix_jupyter_whovian"></a>
+### Run cocoa on your laptop - The "whovian-cocoa" docker container <a name="appendix_jupyter_whovian"></a>
 
 We provide the docker image [whovian-cocoa](https://hub.docker.com/r/vivianmiranda/whovian-cocoa) to facilitate the installation of Cocoa on Windows and MacOS. This appendix assumes the users already have the docker engine installed on their local PC. For instructions on installing the docker engine in specific operating systems, please refer to [Docker's official documentation](https://docs.docker.com/engine/install/). 
 
