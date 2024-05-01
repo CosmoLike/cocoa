@@ -11,7 +11,7 @@
     3. [Additional Notes For Experts and Developers](#additional_notes)
     4. [The whovian-cocoa docker container](#appendix_jupyter_whovian)
     5. [Miniconda Installation](#overview_miniconda)
-    6. [FAQ: How to compile the Boltzmann, CosmoLike and Likelihood codes separatelly](#appendix_compile_separatelly)
+    6. [FAQ: How to compile the Boltzmann, CosmoLike and Likelihood codes separately](#appendix_compile_separately)
     7. [Warning about Weak Lensing YAML files in Cobaya](#appendix_example_runs)
     8. [Manual Blocking of Cosmolike Parameters](#manual_blocking_cosmolike)
     9. [Adding a new modified CAMB/CLASS to Cocoa (external readme)](Cocoa/external_modules/code)
@@ -199,7 +199,7 @@ If you can fix the issue, rerun `setup_cocoa_installation_packages` and `compile
 
 :books::books: *Additional Notes for experts and developers on Installation of Cobaya base code* :books::books:
 
-- If the user wants to compile only a subset of these packages, then refer to the appendix [Compiling Boltzmann, CosmoLike and Likelihood codes separatelly](#appendix_compile_separatelly).
+- If the user wants to compile only a subset of these packages, then refer to the appendix [Compiling Boltzmann, CosmoLike and Likelihood codes separately](#appendix_compile_separately).
         
 - Cocoa developers should drop the shallow clone option `--depth 1`; they should also authenticate to GitHub via ssh keys and use the command instead.
 
@@ -295,7 +295,7 @@ After installation, users must source conda configuration file
             && conda config --set channel_priority strict \
             && conda init bash
     
-### :interrobang: FAQ: How to compile the Boltzmann, CosmoLike and Likelihood codes separatelly <a name="appendix_compile_separatelly"></a>
+### :interrobang: FAQ: How to compile the Boltzmann, CosmoLike and Likelihood codes separately <a name="appendix_compile_separately"></a>
 
 To avoid excessive compilation times during development, users can use specialized scripts located at `Cocoa/installation_scripts/` that compile only a specific module. A few examples of these scripts are: 
 
