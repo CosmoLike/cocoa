@@ -15,7 +15,7 @@
     8. [FAQ: How can we set the Slow/Fast decomposition on MCMC Chains with Cosmolike? Manual Blocking](#manual_blocking_cosmolike)
     9. [FAQ: How can we add new modified versions of CAMB/CLASS? (external readme)](Cocoa/external_modules/code)
     10. [FAQ: How do users set the environment for projects involving Machine Learning emulators?](#ml_emulators)
-    11. [FAQ: How can users improve their Bash/C/C++ knowledge to develop Cosmolike?](#lectnotes)
+    11. [FAQ: How can users improve their Bash/C/C++ knowledge to develop Cocoa/Cosmolike?](#lectnotes)
     12. [Warning about Weak Lensing YAML files in Cobaya](#appendix_example_runs)
     13. [(not recommended) Installation of Cocoa's required packages without conda](#required_packages_cache)
 
@@ -429,7 +429,7 @@ Commenting out the environmental flags shown below, located at *set_installation
         
 We recommend using the GPU versions to train the emulator while using the CPU versions to run the MCMCs. For this purpose, we suggest creating two separate conda environments. One could be named `cocoa`, while the other could be called `cocoaemu` and contain the GPU versions of the machine learning packages.
                      
-### :interrobang: FAQ: How can users improve their Bash/C/C++ knowledge to develop Cosmolike? :book::book: <a name="lectnotes"></a>
+### :interrobang: FAQ: How can users improve their Bash/C/C++ knowledge to develop Cocoa/Cosmolike? :book::book: <a name="lectnotes"></a>
 
 A working knowledge of Python is required to understand the Cobaya framework at the developer level. Users must also know the Bash language to understand Cocoa's scripts. Proficiency in C and C++ is also needed to manipulate Cosmolike and the C++ Cobaya-Cosmolike C++ interface. Finally, users need to understand the Fortran-2003 language to modify CAMB.
 
