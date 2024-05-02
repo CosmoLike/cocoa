@@ -15,8 +15,8 @@
     7. [Warning about Weak Lensing YAML files in Cobaya](#appendix_example_runs)
     8. [Manual Blocking of Cosmolike Parameters](#manual_blocking_cosmolike)
     9. [Adding a new modified CAMB/CLASS to Cocoa (external readme)](Cocoa/external_modules/code)
-    10. [FAQ: How to set the conda environment for projects involving Machine Learning emulators?](#ml_emulators)
-    11. [FAQ: How users can improve their Bash/C/C++ knowledge to develop Cosmolike? Bash/C/C++ Notes](#lectnotes)
+    10. [FAQ: How do users set the environment for projects involving Machine Learning emulators?](#ml_emulators)
+    11. [FAQ: How can users improve their Bash/C/C++ knowledge to develop Cosmolike? Bash/C/C++ Notes](#lectnotes)
     12. [(not recommended) Installation of Cocoa's required packages without conda](#required_packages_cache)
 
 ## Overview of the [Cobaya](https://github.com/CobayaSampler)-[CosmoLike](https://github.com/CosmoLike) Joint Architecture (Cocoa) <a name="overview"></a>
@@ -36,7 +36,7 @@ Cocoa allows users to run [CosmoLike](https://github.com/CosmoLike) routines ins
 
 ## Installation of Cobaya base code <a name="cobaya_base_code"></a>
 
-**Step :one:**: We assume that you are still in the Conda cocoa environment from the previous `conda activate cocoa` command. Now, clone the repository and go to the `cocoa` main folder,
+**Step :one:**: We assume you are still in the Conda cocoa environment from the previous `conda activate cocoa` command. Now, clone the repository and go to the `cocoa` main folder,
 
     $CONDA_PREFIX/bin/git clone --depth 1 https://github.com/CosmoLike/cocoa.git cocoa
     cd ./cocoa/Cocoa
@@ -61,13 +61,13 @@ We assume that you are still in the Conda cocoa environment from the previous `c
 
     source start_cocoa
 
-Users will see a terminal that looks like this: `$(cocoa)(.local)`. *This is a feature, not a bug*! 
+Users will see a terminal like this: `$(cocoa)(.local)`. *This is a feature, not a bug*! 
 
- **Step :two:**: Select the number of OpenMP cores
+ **Step :two:**: Select the number of OpenMP cores (below, we set it to 4)
     
     export OMP_PROC_BIND=close; export OMP_NUM_THREADS=4
 
- **Step :three:**: Run `cobaya-run` on a the first example YAML files we provide.
+ **Step :three:**: Run `cobaya-run` on the first example YAML files we provide.
 
 One model evaluation:
 
@@ -84,9 +84,9 @@ Once the work is done, clean your environment via :
 
 ## Running Cosmolike projects <a name="running_cosmolike_projects"></a> 
 
-The *projects* folder was designed to include Cosmolike projects. We assume that you are still in the conda cocoa environment from the previous `conda activate cocoa` command and that you are in the cocoa main folder `cocoa/Cocoa`, 
+The *projects* folder was designed to include Cosmolike projects. We assume that you are still in the Conda cocoa environment from the previous `conda activate cocoa` command and that you are in the cocoa main folder `cocoa/Cocoa`, 
 
-**Step :one:**: Go to the project folder (`./cocoa/Cocoa/projects`) and clone a Cosmolike project, with fictitious name `XXX`:
+**Step :one:**: Go to the project folder (`./cocoa/Cocoa/projects`) and clone a Cosmolike project with the fictitious name `XXX`:
     
     cd ./cocoa/Cocoa/projects
     $CONDA_PREFIX/bin/git clone git@github.com:CosmoLike/cocoa_XXX.git XXX
@@ -102,7 +102,7 @@ Example of cosmolike projects: [lsst_y1](https://github.com/CosmoLike/cocoa_lsst
  
 :warning: :warning: The `start_cocoa` script must be run after cloning the project repository. 
 
-Users will see a terminal that looks like this: `$(cocoa)(.local)`. *This is a feature, not a bug*!
+Users will see a terminal like this: `$(cocoa)(.local)`. *This is a feature, not a bug*!
 
 **Step :three:**: Compile the project, as shown below
  
@@ -166,7 +166,7 @@ The conda installation method should be chosen in the overwhelming majority of c
       Cocoa/.local/lib
       Cocoa/.local/share
 
-This behavior enables users to work on multiple instances of Cocoa simultaneously, which is similar to what was possible with [CosmoMC](https://github.com/cmbant/CosmoMC).
+This behavior enables users to work on multiple instances of Cocoa simultaneously, similar to what was possible with [CosmoMC](https://github.com/cmbant/CosmoMC).
 
 :books::books: *Additional Notes for experts and developers on Running Cobaya Examples* :books::books:
 
@@ -226,8 +226,13 @@ To avoid excessive compilation times during development, users can use specializ
         $(cocoa)(.local) source ./installation_scripts/compile_planck
         $(cocoa)(.local) source ./installation_scripts/compile_act
         $(cocoa)(.local) source ./installation_scripts/setup_polychord
+        # Below, we show subroutines associated with the setup_cocoa_installation_packages script
+        $(cocoa)(.local) source ./installation_scripts/setup_cpp_packages
+        $(cocoa)(.local) source ./installation_scripts/setup_c_packages
+        $(cocoa)(.local) source ./installation_scripts/setup_decompress_files
+        $(cocoa)(.local) source ./installation_scripts/setup_pip_packages
 
-In the commands above, we displayed `$(cocoa)(.local)` to emphasize that the users must first activate the cocoa conda environment and run `source start_cocoa` in the main Cocoa folder before running the scripts inside the `Cocoa/installation_scripts` folder
+In the commands above, we displayed `$(cocoa)(.local)` to emphasize that the users must first activate the cocoa conda environment and run `source start_cocoa` in the main Cocoa folder before running the scripts inside the `Cocoa/installation_scripts` folder.
 
 ### :interrobang: FAQ: How do you run cocoa on your laptop? The docker container named *whovian-cocoa* <a name="appendix_jupyter_whovian"></a>
 
@@ -360,7 +365,7 @@ The CosmoLike pipeline takes $\Omega_m$ and $\Omega_b$, but the CAMB Boltzmann c
 
 2. Weak Lensing parameterization: $\big(\Omega_m,\Omega_b\big)$ as primary MCMC parameters and $\big(\Omega_c h^2, \Omega_b h^2\big)$ as derived quantities.
 
-Adopting $\big(\Omega_m,\Omega_b\big)$ as main MCMC parameters can create a silent bug in Cobaya. The problem occurs when the option `drop: true` is absent in $\big(\Omega_m,\Omega_b\big)$ parameters, and there are no expressions that define the derived $\big(\Omega_c h^2, \Omega_b h^2\big)$ quantities. The bug is silent because the MCMC runs without any warnings, but the CAMB Boltzmann code does not update the cosmological parameters at every MCMC iteration. As a result, the resulting posteriors are flawed, but they may seem reasonable to those unfamiliar with the issue. It's important to be aware of this bug to avoid any potential inaccuracies in the results. 
+Adopting $\big(\Omega_m,\Omega_b\big)$ as main MCMC parameters can create a silent bug in Cobaya. The problem occurs when the option `drop: true` is absent in $\big(\Omega_m,\Omega_b\big)$ parameters, and there are no expressions that define the derived $\big(\Omega_c h^2, \Omega_b h^2\big)$ quantities. The bug is silent because the MCMC runs without any warnings, but the CAMB Boltzmann code does not update the cosmological parameters at every MCMC iteration. As a result, the resulting posteriors are flawed, but they may seem reasonable to those unfamiliar with the issue. Please be aware of this bug to avoid any potential inaccuracies in the results. 
 
 The correct way to create YAML files with $\big(\Omega_m,\Omega_b\big)$ as primary MCMC parameters is exemplified below
 
@@ -403,11 +408,11 @@ The correct way to create YAML files with $\big(\Omega_m,\Omega_b\big)$ as prima
 
 Cosmolike Weak Lensing pipeline contains parameters with different speed hierarchies. For example, Cosmolike execution time is reduced by approximately 50% when fixing the cosmological parameters. When varying only multiplicative shear calibration, Cosmolike execution time is reduced by two orders of magnitude. 
 
-Cobaya can't automatically handle parameters associated with the same likelihood that have different speed hierarchies. Luckily, we can manually impose the speed hierarchy in Cobaya using the `blocking:` option. The only drawback of this method is that parameters of all adopted likelihoods need to be manually specified, not only the ones required by Cosmolike.
+Cobaya can't automatically handle parameters associated with the same likelihood that have different speed hierarchies. Luckily, we can manually impose the speed hierarchy in Cobaya using the `blocking:` option. The only drawback of this method is that parameters of all adopted likelihoods, not only the ones required by Cosmolike, must be manually specified.
 
 In addition to that, Cosmolike can't cache the intermediate products of the last two evaluations, which is necessary to exploit optimizations associated with dragging (`drag: True`). However, Cosmolike caches the intermediate products of the previous evaluation, thereby enabling the user to take advantage of the slow/fast decomposition of parameters in Cobaya's main MCMC sampler. 
 
-Below we provide an example YAML configuration for an MCMC chain that with DES 3x2pt likelihood.
+Below, we provide an example YAML configuration for an MCMC chain with DES 3x2pt likelihood.
 
         likelihood: 
             des_y3.des_3x2pt:
@@ -433,14 +438,16 @@ Below we provide an example YAML configuration for an MCMC chain that with DES 3
                 # Maximum number of posterior evaluations
                 max_samples: .inf
                 # Gelman-Rubin R-1 on means
-                Rminus1_stop: 0.02
+                Rminus1_stop: 0.015
                 # Gelman-Rubin R-1 on std deviations
-                Rminus1_cl_stop: 0.2
+                Rminus1_cl_stop: 0.17
                 Rminus1_cl_level: 0.95
                 # ---------------------------------------------------------------------
                 # Exploiting Cosmolike speed hierarchy
                 # ---------------------------------------------------------------------
-                measure_speeds: False
+                measure_speeds: False # We provide the approximate speeds in the blocking
+                # drag = false. The drag sampler requires the intermediate products of the last
+                # two evaluations to be cached. Cosmolike can only cache the last evaluation.
                 drag: False
                 oversample_power: 0.2
                 oversample_thin: True
@@ -463,17 +470,16 @@ Below we provide an example YAML configuration for an MCMC chain that with DES 3
                     ]
                   ]
                 # ---------------------------------------------------------------------
-                max_tries: 10000
+                max_tries: 100000
                 burn_in: 0
                 Rminus1_single_split: 4
 
-### :interrobang: FAQ: How to set the conda environment for projects involving Machine Learning emulators? <a name="ml_emulators"></a>
+### :interrobang: FAQ: How do users set the environment for projects involving Machine Learning emulators? <a name="ml_emulators"></a>
 
-If the user wants to add Tensorflow, Keras and Pytorch for an emulator-based project via Conda, then type
+If the user wants to add, without GPU support, Tensorflow, Keras, and PyTorch for an emulator-based project via Conda, then type
 
-        $ conda activate cocoa
-      
-        $(cocoa) $CONDA_PREFIX/bin/pip install --no-cache-dir \
+        conda activate cocoa
+        $CONDA_PREFIX/bin/pip install --no-cache-dir \
             'tensorflow-cpu==2.12.0' \
             'keras==2.12.0' \
             'keras-preprocessing==1.1.2' \
@@ -481,10 +487,10 @@ If the user wants to add Tensorflow, Keras and Pytorch for an emulator-based pro
             'torchvision==0.14.1+cpu' \
             'torchaudio==0.13.1' --extra-index-url https://download.pytorch.org/whl/cpu
 
-In case there are GPUs available, the following commands will install the GPU version of 
-Tensorflow, Keras and Pytorch (assuming CUDA 11.6, click [here](https://pytorch.org/get-started/previous-versions/) for additional information).
+In case the users want GPU support, the following commands will install the GPU version of 
+these packages, assuming CUDA 11.6, click [here](https://pytorch.org/get-started/previous-versions/) for additional information).
 
-        $(cocoa) $CONDA_PREFIX/bin/pip install --no-cache-dir \
+        $CONDA_PREFIX/bin/pip install --no-cache-dir \
             'tensorflow==2.12.0' \
             'keras==2.12.0' \
             'keras-preprocessing==1.1.2' \
@@ -492,22 +498,18 @@ Tensorflow, Keras and Pytorch (assuming CUDA 11.6, click [here](https://pytorch.
             'torchvision==0.14.1+cu116' \
             'torchaudio==0.13.1' --extra-index-url https://download.pytorch.org/whl/cu116
 
-Based on our experience, we recommend utilizing the GPU versions to train the emulator while using the CPU versions to run the MCMCs. This is because our supercomputers possess a greater number of CPU-only nodes. It may be helpful to create two separate conda environments for this purpose. One could be named `cocoa` (CPU-only), while the other could be named `cocoaemu` and contain the GPU versions of the machine learning packages.
-
 Commenting out the environmental flags shown below, located at *set_installation_options* script, will enable the installation of machine-learning-related libraries via pip.  
 
-        # IF TRUE, THEN COCOA WON'T INSTALL TENSORFLOW, KERAS and PYTORCH
         #export IGNORE_EMULATOR_CPU_PIP_PACKAGES=1
         #export IGNORE_EMULATOR_GPU_PIP_PACKAGES=1
+        
+We recommend using the GPU versions to train the emulator while using the CPU versions to run the MCMCs. For this purpose, we suggest creating two separate conda environments. One could be named `cocoa`, while the other could be called `cocoaemu` and contain the GPU versions of the machine learning packages.
+                     
+### :interrobang: FAQ: How can users improve their Bash/C/C++ knowledge to develop Cosmolike? :book: Bash/C/C++ Notes :book: <a name="lectnotes"></a>
 
-Unlike most installed pip prerequisites, which are cached at `cocoa_installation_libraries/pip_cache.xz`, the installation of the Machine Learning packages listed above requires an active internet connection.
+A working knowledge of Python is required to understand the Cobaya framework at the developer level. Users must also know the Bash language to understand Cocoa's scripts. Proficiency in C and C++ is also needed to manipulate Cosmolike and the C++ Cobaya-Cosmolike C++ interface. Finally, users need to understand the Fortran-2003 language to modify CAMB.
 
-                        
-### :interrobang: FAQ: How users can improve their Bash/C/C++ knowledge to develop Cosmolike? :book: Bash/C/C++ Notes :book: <a name="lectnotes"></a>
-
-To effectively work with the Cobaya framework and Cosmolike codes at the developer level, a working knowledge of Python to understand Cobaya and Bash language to comprehend Cocoa's scripts is required. Proficiency in C and C++ is also needed to manipulate Cosmolike and the C++ Cobaya-Cosmolike C++ interface. Finally, users need to understand the Fortran-2003 language to modify CAMB.
-
-Learning all these languages can be overwhelming, so to enable new users to do research that demands modifications on the inner workings of these codes, we include [here](cocoa_installation_libraries/LectNotes.pdf) a link to approximately 600 slides that provide an overview of Bash (slides 1-137), C (slides 138-371), and C++ (slides 372-599). In the future, we aim to add lectures about Python and Fortran. 
+Learning all these languages can be overwhelming, so to enable new users to do research that demands modifications on the inner workings of these codes, we include [here](cocoa_installation_libraries/LectNotes.pdf) a link to approximately 600 slides that provide an overview of Bash (slides ~1-137), C (slides ~138-371), and C++ (slides ~372-599). In the future, we aim to add lectures about Python and Fortran. 
 
 ### (not recommended) 💀 ☠️ :stop_sign::thumbsdown: Installation of Cocoa's required packages without conda <a name="required_packages_cache"></a>
 
@@ -537,7 +539,7 @@ To perform the local semi-autonomous installation, users must modify flags writt
     #export MINICONDA_INSTALLATION=1
     export MANUAL_INSTALLATION=1
     
-Finally, set the following environmental keys
+Finally, set the following environmental keys:
  
     [Extracted from set_installation_options script]
   
