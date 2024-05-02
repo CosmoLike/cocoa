@@ -13,7 +13,7 @@
     5. [FAQ: How do you run cocoa on your laptop? The docker image named *whovian-cocoa*](#appendix_jupyter_whovian)
     6. [FAQ: What should you do if you do not have Miniconda installed? Miniconda Installation Guide](#overview_miniconda)
     7. [Warning about Weak Lensing YAML files in Cobaya](#appendix_example_runs)
-    8. [FAQ: How can we set the Slow/Fast decomposition on MCMC Chains with Cosmolike?](#manual_blocking_cosmolike)
+    8. [FAQ: How can we set the Slow/Fast decomposition on MCMC Chains with Cosmolike? Manual Blocking](#manual_blocking_cosmolike)
     9. [FAQ: How can we add new modified versions of CAMB/CLASS? Adding a new modified CAMB/CLASS to Cocoa (external readme)](Cocoa/external_modules/code)
     10. [FAQ: How do users set the environment for projects involving Machine Learning emulators?](#ml_emulators)
     11. [FAQ: How can users improve their Bash/C/C++ knowledge to develop Cosmolike? Bash/C/C++ Notes](#lectnotes)
@@ -404,7 +404,7 @@ The correct way to create YAML files with $\big(\Omega_m,\Omega_b\big)$ as prima
             derived: 'lambda omegam, H0: omegam*(H0/100)**2'
             latex: \Omega_\mathrm{m} h^2
 
-### :interrobang: FAQ: How can we set the Slow/Fast decomposition on MCMC Chains with Cosmolike? Manual Blocking of Cosmolike Parameters <a name="manual_blocking_cosmolike"></a>
+### :interrobang: FAQ: How can we set the Slow/Fast decomposition on MCMC Chains with Cosmolike? Manual Blocking <a name="manual_blocking_cosmolike"></a>
 
 Cosmolike Weak Lensing pipeline contains parameters with different speed hierarchies. For example, Cosmolike execution time is reduced by approximately 50% when fixing the cosmological parameters. When varying only multiplicative shear calibration, Cosmolike execution time is reduced by two orders of magnitude. 
 
