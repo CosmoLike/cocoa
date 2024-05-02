@@ -9,7 +9,7 @@
     1. [Proper Credits](#appendix_proper_credits)
     2. [FAQ: What should you do if installation or compilation goes wrong?](#running_wrong)
     3. [Additional Notes For Experts and Developers](#additional_notes)
-    4. [FAQ: How do you run cocoa on your laptop? The docker container named "whovian-cocoa"](#appendix_jupyter_whovian)
+    4. [FAQ: How do you run cocoa on your laptop? The docker container named *whovian-cocoa*](#appendix_jupyter_whovian)
     5. [Miniconda Installation](#overview_miniconda)
     6. [FAQ: How to compile the Boltzmann, CosmoLike and Likelihood codes separately](#appendix_compile_separately)
     7. [Warning about Weak Lensing YAML files in Cobaya](#appendix_example_runs)
