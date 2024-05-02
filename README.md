@@ -36,7 +36,7 @@ Cocoa allows users to run [CosmoLike](https://github.com/CosmoLike) routines ins
 
 ## Installation of Cobaya base code <a name="cobaya_base_code"></a>
 
-**Step :one:**: We assume that you are still in the conda cocoa environment from the previous `conda activate cocoa` command. Now, clone the repository and go to `cocoa` main folder,
+**Step :one:**: We assume that you are still in the Conda cocoa environment from the previous `conda activate cocoa` command. Now, clone the repository and go to the `cocoa` main folder,
 
     $CONDA_PREFIX/bin/git clone --depth 1 https://github.com/CosmoLike/cocoa.git cocoa
     cd ./cocoa/Cocoa
@@ -51,13 +51,13 @@ The script `setup_cocoa_installation_packages` decompresses the data files and i
 
     source compile_external_modules
     
-This compiles CAMB/Class Boltzmann codes, Planck likelihood and Polychord sampler. 
+This compiles CAMB/Class Boltzmann codes, Planck likelihood, and Polychord sampler. 
 
 ## Running Cobaya Examples <a name="cobaya_base_code_examples"></a>
 
-We assume that you are still in the conda cocoa environment from the previous `conda activate cocoa` command and that you are in the cocoa main folder `cocoa/Cocoa`, 
+We assume that you are still in the Conda cocoa environment from the previous `conda activate cocoa` command and that you are in the cocoa main folder `cocoa/Cocoa`, 
 
- **Step :one:**: Activate the private python environment by sourcing the script `start_cocoa`
+ **Step :one:**: Activate the private Python environment by sourcing the script `start_cocoa`
 
     source start_cocoa
 
@@ -82,8 +82,6 @@ Once the work is done, clean your environment via :
     source stop_cocoa
     conda deactivate cocoa
 
-
-
 ## Running Cosmolike projects <a name="running_cosmolike_projects"></a> 
 
 The *projects* folder was designed to include Cosmolike projects. We assume that you are still in the conda cocoa environment from the previous `conda activate cocoa` command and that you are in the cocoa main folder `cocoa/Cocoa`, 
@@ -93,11 +91,11 @@ The *projects* folder was designed to include Cosmolike projects. We assume that
     cd ./cocoa/Cocoa/projects
     $CONDA_PREFIX/bin/git clone git@github.com:CosmoLike/cocoa_XXX.git XXX
 
-By convention, the Cosmolike Organization hosts a Cobaya-Cosmolike project named XXX at `CosmoLike/cocoa_XXX`. When cloning the repository the `cocoa_` prefix must be dropped (see above).
+By convention, the Cosmolike Organization hosts a Cobaya-Cosmolike project named XXX at `CosmoLike/cocoa_XXX`. When cloning the repository, the `cocoa_` prefix must be dropped (see above).
 
 Example of cosmolike projects: [lsst_y1](https://github.com/CosmoLike/cocoa_lsst_y1).
  
-**Step :two:**: Go back to Cocoa main folder and activate the private python environment
+**Step :two:**: Go back to the Cocoa main folder and activate the private Python environment
     
     cd ../
     source start_cocoa
@@ -133,13 +131,13 @@ The following is not an exhaustive list of the codes we use
 
 - [CLIK](https://github.com/benabed/clik) is the likelihood code used to analyze Planck and SPT data, maintained by Prof. Karim Benabed
 
-- [SPT](https://github.com/SouthPoleTelescope/spt3g_y1_dist) is the official likelihood of the South Pole Telescope 3G Year 1 (TTTEEE)
+- [SPT](https://github.com/SouthPoleTelescope/spt3g_y1_dist) is the official likelihood of the South Pole Telescope 3G Year 1
 
 - [MFLike](https://github.com/simonsobs/LAT_MFLike) is the official likelihood of the Simons Observatory
 
 - [ACTLensing](https://github.com/ACTCollaboration/act_dr6_lenslike) is the official lensing likelihood of the ACT collaboration developed by Prof. Mathew Madhavacheril
 
-We do not want to discourage people from cloning code from their original repositories. We've included these codes as compressed [xz file format](https://tukaani.org/xz/format.html) in our repository for convenience in the initial development (speed in setting up Cocoa). The work of those authors is extraordinary, and they must be properly cited.
+We do not want to discourage people from cloning code from their original repositories. We've included some likelihoods as compressed [xz file format](https://tukaani.org/xz/format.html) in our repository for convenience in the initial development. The work of those authors is extraordinary, and they must be appropriately cited.
 
 ### Additional Notes for experts and developers <a name="additional_notes"></a>
 
@@ -151,13 +149,13 @@ We do not want to discourage people from cloning code from their original reposi
 
 We assume here that the user has previously installed either [Minicoda](https://docs.conda.io/en/latest/miniconda.html) or [Anaconda](https://www.anaconda.com/products/individual) so that conda environments can be created. If this is not the case, refer to the Appendix [Miniconda Installation](#overview_miniconda) for further instructions.
 
-- The conda installation method should be the chosen installation method in the overwhelming majority of cases. In the rare cases the user cannot work with conda, refer to the Appendix [Installation of Cocoa's required packages without conda](#required_packages_cache) as it contains instructions for a much slower but conda-independent installation method.
+The conda installation method should be chosen in the overwhelming majority of cases. In the rare instances in which the user cannot work with Conda, refer to the Appendix [Installation of Cocoa's required packages without Conda](#required_packages_cache), as it contains instructions for a much slower (and prone to errors) but conda-independent installation method.
 
 :books::books: *Additional Notes for experts and developers on Installation of Cobaya base code* :books::books:
 
-- If the user wants to compile only a subset of these packages, then refer to the appendix [Compiling Boltzmann, CosmoLike and Likelihood codes separately](#appendix_compile_separately).
+- If the user wants to compile only a subset of these packages, refer to the appendix [Compiling Boltzmann, CosmoLike, and Likelihood codes separately](#appendix_compile_separately).
         
-- Cocoa developers should drop the shallow clone option `--depth 1`; they should also authenticate to GitHub via ssh keys and use the command instead.
+- Cocoa developers should drop the shallow clone option `--depth 1`; they should also authenticate to GitHub via SSH keys and use the command instead.
 
       git clone git@github.com:CosmoLike/cocoa.git cocoa
   
@@ -168,7 +166,7 @@ We assume here that the user has previously installed either [Minicoda](https://
       Cocoa/.local/lib
       Cocoa/.local/share
 
-This behavior enables users to work on multiple instances of Cocoa simultaneously similar to what was possible with [CosmoMC](https://github.com/cmbant/CosmoMC).
+This behavior enables users to work on multiple instances of Cocoa simultaneously, which is similar to what was possible with [CosmoMC](https://github.com/cmbant/CosmoMC).
 
 :books::books: *Additional Notes for experts and developers on Running Cobaya Examples* :books::books:
 
@@ -180,7 +178,7 @@ This behavior enables users to work on multiple instances of Cocoa simultaneousl
 
 - Additional explanations about our `mpirun` flags: Why the `--bind-to core:overload-allowed --map-by numa:pe=${OMP_NUM_THREADS}` flag? This flag enables efficient hybrid MPI + OpenMP runs on NUMA architecture.
 
-- Additional explanations about the `start_cocoa`/`stop_cocoa` scripts: Why did we choose to create two separate bash environments, `(cocoa)` and `(.local)`? Users should be able to manipulate multiple Cocoa instances seamlessly, which is particularly useful when running chains in one instance while experimenting with code development in another. Consistency of the environment across all Cocoa instances is crucial, and the start_cocoa/stop_cocoa scripts handle the loading and unloading of environmental path variables for each Cocoa.
+- Additional explanations about the `start_cocoa`/`stop_cocoa` scripts: Why did we create two separate bash environments, `(cocoa)` and `(.local)`? Users should be able to manipulate multiple Cocoa instances seamlessly, which is particularly useful when running chains in one instance while experimenting with code development in another. Consistency of the environment across all Cocoa instances is crucial, and the start_cocoa/stop_cocoa scripts handle the loading and unloading of environmental path variables for each Cocoa.
 
 ### :interrobang: FAQ: What should you do if installation or compilation goes wrong? <a name="running_wrong"></a>
 
@@ -268,10 +266,10 @@ Once installation is complete, the user must learn how to start, use, and exit t
 
 - :interrobang: FAQ: How do you manipulate files on the host computer from within the Docker container?
 
-    The flag `-v $(pwd):/home/whovian/host/` in the `docker run` command ensures that files on the host computer have been mounted to the directory `/home/whovian/host/`. Files within the folder where the contained was initiated are accessible on `/home/whovian/host/`. When the user accesses the container, they should see the host's directory where the Docker container was initiated after typing 
+    The flag `-v $(pwd):/home/whovian/host/` in the `docker run` command ensures that files on the host computer have been mounted to the directory `/home/whovian/host/`. Files within the folder where the Docker container was initialized are accessible in the `/home/Whovian/host/` folder. When the user accesses the container, they should see the host's directory where the Docker container was initiated after typing: 
 
       cd /home/whovian/host/
-	  ls 
+      ls 
 
     Users should work inside the `/home/whovian/host/` directory to avoid losing work in case the docker image needs to be deleted,
 
