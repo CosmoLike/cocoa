@@ -159,14 +159,14 @@ We assume here that the user has previously installed either [Minicoda](https://
         
 - Cocoa developers should drop the shallow clone option `--depth 1`; they should also authenticate to GitHub via ssh keys and use the command instead.
 
-        $(cocoa) git clone git@github.com:CosmoLike/cocoa.git cocoa
+      git clone git@github.com:CosmoLike/cocoa.git cocoa
   
 - Our scripts never install packages on `$HOME/.local` as that would make them global to the user. All requirements for Cocoa are installed at
 
-        Cocoa/.local/bin
-        Cocoa/.local/include
-        Cocoa/.local/lib
-        Cocoa/.local/share
+      Cocoa/.local/bin
+      Cocoa/.local/include
+      Cocoa/.local/lib
+      Cocoa/.local/share
 
 This behavior enables users to work on multiple instances of Cocoa simultaneously similar to what was possible with [CosmoMC](https://github.com/cmbant/CosmoMC).
 
@@ -186,34 +186,34 @@ This behavior enables users to work on multiple instances of Cocoa simultaneousl
 
 - The script *set_installation_options script* contains a few additional flags that may be useful. Some of these flags are shown below:
 
-        [Extracted from set_installation_options script]
-        # --------------------------------------------------------------------------------------
-        # --------------------------------------------------------------------------------------
-        # --------------------------- VERBOSE AS DEBUG TOOL ------------------------------------
-        # --------------------------------------------------------------------------------------
-        # --------------------------------------------------------------------------------------
-        #export COCOA_OUTPUT_VERBOSE=1
-
-        # --------------------------------------------------------------------------------------
-        # --------- IF TRUE, THEN COCOA USES CLIK FROM https://github.com/benabed/clik ---------
-        # --------------------------------------------------------------------------------------
-        export USE_SPT_CLIK_PLANCK=1
-
-        # --------------------------------------------------------------------------------------
-        # ----------------- CONTROL OVER THE COMPILATION OF EXTERNAL CODES ---------------------
-        # --------------------------------------------------------------------------------------
-        #export IGNORE_CAMB_COMPILATION=1
-        export IGNORE_CLASS_COMPILATION=1
-        #export IGNORE_COSMOLIKE_COMPILATION=1
-        #export IGNORE_POLYCHORD_COMPILATION=1
-        #export IGNORE_PLANCK_COMPILATION=1
-        #export IGNORE_ACT_COMPILATION=1
-
-        # --------------------------------------------------------------------------------------
-        # ----- IF DEFINED, COSMOLIKE WILL BE COMPILED WITH DEBUG FLAG -------------------------
-        # ----- DEBUG FLAG = ALL COMPILER WARNINGS + NO MATH OPTIMIZATION + NO OPENMP ----------
-        # --------------------------------------------------------------------------------------
-        #export COSMOLIKE_DEBUG_MODE=1
+      [Extracted from set_installation_options script]
+      # --------------------------------------------------------------------------------------
+      # --------------------------------------------------------------------------------------
+      # --------------------------- VERBOSE AS DEBUG TOOL ------------------------------------
+      # --------------------------------------------------------------------------------------
+      # --------------------------------------------------------------------------------------
+      #export COCOA_OUTPUT_VERBOSE=1
+    
+      # --------------------------------------------------------------------------------------
+      # --------- IF TRUE, THEN COCOA USES CLIK FROM https://github.com/benabed/clik ---------
+      # --------------------------------------------------------------------------------------
+      export USE_SPT_CLIK_PLANCK=1
+    
+      # --------------------------------------------------------------------------------------
+      # ----------------- CONTROL OVER THE COMPILATION OF EXTERNAL CODES ---------------------
+      # --------------------------------------------------------------------------------------
+      #export IGNORE_CAMB_COMPILATION=1
+      export IGNORE_CLASS_COMPILATION=1
+      #export IGNORE_COSMOLIKE_COMPILATION=1
+      #export IGNORE_POLYCHORD_COMPILATION=1
+      #export IGNORE_PLANCK_COMPILATION=1
+      #export IGNORE_ACT_COMPILATION=1
+    
+      # --------------------------------------------------------------------------------------
+      # ----- IF DEFINED, COSMOLIKE WILL BE COMPILED WITH DEBUG FLAG -------------------------
+      # ----- DEBUG FLAG = ALL COMPILER WARNINGS + NO MATH OPTIMIZATION + NO OPENMP ----------
+      # --------------------------------------------------------------------------------------
+      #export COSMOLIKE_DEBUG_MODE=1
 
 The first step in debugging cocoa is to define the `COCOA_OUTPUT_VERBOSE` and `COSMOLIKE_DEBUG_MODE` flags to obtain a more detailed output. The second step consists of reruning the particular script that failed. The scripts `setup_cocoa_installation_packages` and `compile_external_modules` run many things. It may be advantageous to run only the routine that failed. For further information, see the appendix [FAQ: How to compile the Boltzmann, CosmoLike, and Likelihood codes separately](#appendix_compile_separately).
 
@@ -225,7 +225,7 @@ We provide the docker image [whovian-cocoa](https://hub.docker.com/r/vivianmiran
 
 To download, name it `cocoa2023`, and run the container for the first time, type:
 
-         docker run --platform linux/amd64 --hostname cocoa --name cocoa2023 -it -p 8080:8888 -v $(pwd):/home/whovian/host/ -v ~/.ssh:/home/whovian/.ssh:ro vivianmiranda/whovian-cocoa
+      docker run --platform linux/amd64 --hostname cocoa --name cocoa2023 -it -p 8080:8888 -v $(pwd):/home/whovian/host/ -v ~/.ssh:/home/whovian/.ssh:ro vivianmiranda/whovian-cocoa
 
 Following the command above, users should see the following text on the screen terminal:
 
@@ -233,47 +233,55 @@ Following the command above, users should see the following text on the screen t
 
 The user needs to init Conda when running the container the first time, as shown below.
 
-        conda init bash
-        source ~/.bashrc
+      conda init bash
+      source ~/.bashrc
 
 Now, proceed with the standard cocoa installation. 
 
 Once installation is complete, the user must learn how to start, use, and exit the container. Below, we answer a few common questions about how to use/manage Docker containers.  
 
-- :interrobang: FAQ: How do users restart the container when they exit? Assuming the user maintained the container name `cocoa2023` via the flag `--name cocoa2023` on the `docker run` command, type:
+- :interrobang: FAQ: How do users restart the container when they exit?
+
+    Assuming the user maintained the container name `cocoa2023` via the flag `--name cocoa2023` on the `docker run` command, type:
     
-        docker start -ai cocoa2023
+      docker start -ai cocoa2023
 
-- :interrobang: FAQ: How do I run Jupyter Notebooks remotely when using Cocoa within the *whovian-cocoa* container? First, type the following command:
+- :interrobang: FAQ: How do I run Jupyter Notebooks remotely when using Cocoa within the *whovian-cocoa* container?
 
-        jupyter notebook --no-browser --port=8080
+    First, type the following command:
 
-The terminal will show a message similar to the following template:
+      jupyter notebook --no-browser --port=8080
 
-        [... NotebookApp] Writing notebook server cookie secret to /home/whovian/.local/share/jupyter/runtime/notebook_cookie_secret
-        [... NotebookApp] WARNING: The notebook server is listening on all IP addresses and not using encryption. This is not recommended.
-        [... NotebookApp] Serving notebooks from local directory: /home/whovian/host
-        [... NotebookApp] Jupyter Notebook 6.1.1 is running at:
-        [... NotebookApp] http://f0a13949f6b5:8888/?token=XXX
-        [... NotebookApp] or http://127.0.0.1:8888/?token=XXX
-        [... NotebookApp] Use Control-C to stop this server and shut down all kernels (twice to skip confirmation).
+    The terminal will show a message similar to the following template:
 
-If you are running the Docker container on your laptop, there is only one remaining step. The flag `-p 8080:8888` in the `docker run` command maps the container port `8888` to the host (your laptop) port `8080`. To access the Jupyter Notebook, open a browser and enter `http://localhost:8080/?token=XXX`, where `XXX` is the token displayed in the output line `[... NotebookApp] or http://127.0.0.1:8888/?token=XXX`. If you need to use a different port than `8080`, adjust the flag `-p 8080:8888` in the `docker run` command accordingly.
+      [... NotebookApp] Writing notebook server cookie secret to /home/whovian/.local/share/jupyter/runtime/notebook_cookie_secret
+      [... NotebookApp] WARNING: The notebook server is listening on all IP addresses and not using encryption. This is not recommended.
+      [... NotebookApp] Serving notebooks from local directory: /home/whovian/host
+      [... NotebookApp] Jupyter Notebook 6.1.1 is running at:
+      [... NotebookApp] http://f0a13949f6b5:8888/?token=XXX
+      [... NotebookApp] or http://127.0.0.1:8888/?token=XXX
+      [... NotebookApp] Use Control-C to stop this server and shut down all kernels (twice to skip confirmation).
 
-:books::books: *Additional Notes* :books::books:
+    If you are running the Docker container on your laptop, there is only one remaining step. The flag `-p 8080:8888` in the `docker run` command maps the container port `8888` to the host (your laptop) port `8080`. Therefore, open a browser and enter `http://localhost:8080/?token=XXX`, where `XXX` is the token displayed in the output line `[... NotebookApp] or http://127.0.0.1:8888/?token=XXX`, to access the Jupyter Notebook. 
 
--  :books: The flag `-v $(pwd):/home/whovian/host/` in the `docker run` command ensures that files on the host computer have been mounted to the directory `/home/whovian/host/`. When the user accesses the container, they should see the host's directory where the Docker container was initiated after typing 
+    If you need to use a different port than `8080`, adjust the flag `-p 8080:8888` in the `docker run` command accordingly.
 
-	cd /home/whovian/host/
-	ls 
+- :interrobang: FAQ: How do you manipulate files on the host computer from within the Docker container?
 
-Users should work inside the `/home/whovian/host/` directory to avoid losing work in case the docker image needs to be deleted,
+    The flag `-v $(pwd):/home/whovian/host/` in the `docker run` command ensures that files on the host computer have been mounted to the directory `/home/whovian/host/`. Files within the folder where the contained was initiated are accessible on `/home/whovian/host/`. When the user accesses the container, they should see the host's directory where the Docker container was initiated after typing 
 
-- :interrobang: FAQ: What if you run the docker container on a remote server? Below, we assume the user runs the container in a server with the URL `your_sever.com`. We also presume the server can be accessed via SSH protocol. On your local PC/laptop, type:
+      cd /home/whovian/host/
+	  ls 
 
-        ssh your_username@your_sever.com -L 8080:localhost:8080
+    Users should work inside the `/home/whovian/host/` directory to avoid losing work in case the docker image needs to be deleted,
 
-This will bind the port `8080` on the server to the local. Then, go to a browser and type `http://localhost:8080/?token=XXX`, where `XXX` is the previously saved token displayed in the line `[... NotebookApp] or http://127.0.0.1:8888/?token=XXX`.  
+- :interrobang: FAQ: What if you run the docker container on a remote server?
+
+    Below, we assume the user runs the container in a server with the URL `your_sever.com`. We also presume the server can be accessed via SSH protocol. On your local PC/laptop, type:
+
+      ssh your_username@your_sever.com -L 8080:localhost:8080
+
+    This will bind the port `8080` on the server to the local. Then, go to a browser and type `http://localhost:8080/?token=XXX`, where `XXX` is the previously saved token displayed in the line `[... NotebookApp] or http://127.0.0.1:8888/?token=XXX`.  
 
 ### Miniconda Installation <a name="overview_miniconda"></a>
 
