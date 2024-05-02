@@ -11,7 +11,7 @@
     3. [Additional Notes For Experts and Developers](#additional_notes)
     4. [FAQ: How do you run cocoa on your laptop? The docker container named *whovian-cocoa*](#appendix_jupyter_whovian)
     5. [Miniconda Installation](#overview_miniconda)
-    6. [FAQ: How to compile the Boltzmann, CosmoLike and Likelihood codes separately](#appendix_compile_separately)
+    6. [FAQ: How to compile the Boltzmann, CosmoLike, and Likelihood codes separately](#appendix_compile_separately)
     7. [Warning about Weak Lensing YAML files in Cobaya](#appendix_example_runs)
     8. [Manual Blocking of Cosmolike Parameters](#manual_blocking_cosmolike)
     9. [Adding a new modified CAMB/CLASS to Cocoa (external readme)](Cocoa/external_modules/code)
@@ -141,6 +141,47 @@ The following is not an exhaustive list of the codes we use
 
 We do not want to discourage people from cloning code from their original repositories. We've included these codes as compressed [xz file format](https://tukaani.org/xz/format.html) in our repository for convenience in the initial development (speed in setting up Cocoa). The work of those authors is extraordinary, and they must be properly cited.
 
+### Additional Notes for experts and developers <a name="additional_notes"></a>
+
+:books::books: *Additional Notes for experts and developers on Installation of Cocoa's required packages via Conda* :books::books:
+ 
+- For those working on projects that utilize machine-learning-based emulators, the Appendix [Setting-up conda environment for Machine Learning emulators](#ml_emulators) provides additional commands for installing the necessary packages.
+
+- We provide a docker image named *whovian-cocoa* that facilitates cocoa installation on Windows and MacOS. For further instructions, refer to the Appendix [FAQ: How do you run cocoa on your laptop? The docker container is named *whovian-cocoa*](#appendix_jupyter_whovian).
+
+We assume here that the user has previously installed either [Minicoda](https://docs.conda.io/en/latest/miniconda.html) or [Anaconda](https://www.anaconda.com/products/individual) so that conda environments can be created. If this is not the case, refer to the Appendix [Miniconda Installation](#overview_miniconda) for further instructions.
+
+- The conda installation method should be the chosen installation method in the overwhelming majority of cases. In the rare cases the user cannot work with conda, refer to the Appendix [Installation of Cocoa's required packages without conda](#required_packages_cache) as it contains instructions for a much slower but conda-independent installation method.
+
+:books::books: *Additional Notes for experts and developers on Installation of Cobaya base code* :books::books:
+
+- If the user wants to compile only a subset of these packages, then refer to the appendix [Compiling Boltzmann, CosmoLike and Likelihood codes separately](#appendix_compile_separately).
+        
+- Cocoa developers should drop the shallow clone option `--depth 1`; they should also authenticate to GitHub via ssh keys and use the command instead.
+
+        $(cocoa) git clone git@github.com:CosmoLike/cocoa.git cocoa
+  
+- Our scripts never install packages on `$HOME/.local` as that would make them global to the user. All requirements for Cocoa are installed at
+
+        Cocoa/.local/bin
+        Cocoa/.local/include
+        Cocoa/.local/lib
+        Cocoa/.local/share
+
+This behavior enables users to work on multiple instances of Cocoa simultaneously similar to what was possible with [CosmoMC](https://github.com/cmbant/CosmoMC).
+
+:books::books: *Additional Notes for experts and developers on Running Cobaya Examples* :books::books:
+
+- We offer the flag `COCOA_RUN_EVALUATE` as an alias (syntax-sugar) for `mpirun -n 1 --oversubscribe --mca btl vader,tcp,self --bind-to core:overload-allowed --rank-by core --map-by numa:pe=4 cobaya-run`.
+
+- We offer the flag `COCOA_RUN_MCMC` as an alias (syntax-sugar) for `mpirun -n 4 --oversubscribe --mca btl vader,tcp,self --bind-to core:overload-allowed --rank-by core --map-by numa:pe=4 cobaya-run`. 
+
+- Additional explanations about our `mpirun` flags: Why the `--mca btl vader,tcp,self` flag? Conda-forge developers don't [compile OpenMPI with Infiniband compatibility](https://github.com/conda-forge/openmpi-feedstock/issues/38).
+
+- Additional explanations about our `mpirun` flags: Why the `--bind-to core:overload-allowed --map-by numa:pe=${OMP_NUM_THREADS}` flag? This flag enables efficient hybrid MPI + OpenMP runs on NUMA architecture.
+
+- Additional explanations about the `start_cocoa`/`stop_cocoa` scripts: Why did we choose to create two separate bash environments, `(cocoa)` and `(.local)`? Users should be able to manipulate multiple Cocoa instances seamlessly, which is particularly useful when running chains in one instance while experimenting with code development in another. Consistency of the environment across all Cocoa instances is crucial, and the start_cocoa/stop_cocoa scripts handle the loading and unloading of environmental path variables for each Cocoa.
+
 ### :interrobang: FAQ: What should you do if installation or compilation goes wrong? <a name="running_wrong"></a>
 
 - The script *set_installation_options script* contains a few additional flags that may be useful. Some of these flags are shown below:
@@ -174,63 +215,15 @@ We do not want to discourage people from cloning code from their original reposi
         # --------------------------------------------------------------------------------------
         #export COSMOLIKE_DEBUG_MODE=1
 
-The first step in debugging cocoa is to define the `COCOA_OUTPUT_VERBOSE` and `COSMOLIKE_DEBUG_MODE` flags to obtain a more detailed output. The second step consists of reruning the particular script that failed. The scripts `setup_cocoa_installation_packages` and `compile_external_modules` run many things. It may be advantageous to run only the routine that failed. To do that, first go to the `cocoa` main folder and start the cocoa environment
-
-    $(cocoa) cd ./cocoa/Cocoa
-    $(cocoa) source start_cocoa
-  
-Look at the scripts in the `installation_scripts` folder. If, for example, the compilation of CAMB Boltzmann code fails, then run
-
-    $(cocoa)(.local) source ./installation_scripts/compile_camb
+The first step in debugging cocoa is to define the `COCOA_OUTPUT_VERBOSE` and `COSMOLIKE_DEBUG_MODE` flags to obtain a more detailed output. The second step consists of reruning the particular script that failed. The scripts `setup_cocoa_installation_packages` and `compile_external_modules` run many things. It may be advantageous to run only the routine that failed. For further information, see the appendix [FAQ: How to compile the Boltzmann, CosmoLike, and Likelihood codes separately](#appendix_compile_separately).
 
 If you can fix the issue, rerun `setup_cocoa_installation_packages` and `compile_external_modules` to ensure all installation scripts are called and the installation is complete.
 
-### Additional Notes for experts and developers <a name="additional_notes"></a>
-
-:books::books: *Additional Notes for experts and developers on Installation of Cocoa's required packages via Conda* :books::books:
- 
-- For those working on projects that utilize machine-learning-based emulators, the Appendix [Setting-up conda environment for Machine Learning emulators](#ml_emulators) provides additional commands for installing the necessary packages.
-
-- We provide a docker image named "whovian-cocoa" that facilitates cocoa installation on Windows and MacOS. For further instructions, refer to the Appendix [Run cocoa on your laptop - The "whovian-cocoa" docker container](#appendix_jupyter_whovian).
-
-We assume here that the user has previously installed either [Minicoda](https://docs.conda.io/en/latest/miniconda.html) or [Anaconda](https://www.anaconda.com/products/individual) so that conda environments can be created. If this is not the case, refer to the Appendix [Miniconda Installation](#overview_miniconda) for further instructions.
-
-- The conda installation method should be the chosen installation method in the overwhelming majority of cases. In the rare cases the user cannot work with conda, refer to the Appendix [Installation of Cocoa's required packages without conda](#required_packages_cache) as it contains instructions for a much slower but conda-independent installation method.
-
-:books::books: *Additional Notes for experts and developers on Installation of Cobaya base code* :books::books:
-
-- If the user wants to compile only a subset of these packages, then refer to the appendix [Compiling Boltzmann, CosmoLike and Likelihood codes separately](#appendix_compile_separately).
-        
-- Cocoa developers should drop the shallow clone option `--depth 1`; they should also authenticate to GitHub via ssh keys and use the command instead.
-
-        $(cocoa) git clone git@github.com:CosmoLike/cocoa.git cocoa
-  
-- Our scripts never install packages on `$HOME/.local` as that would make them global to the user. All requirements for Cocoa are installed at
-
-        Cocoa/.local/bin
-        Cocoa/.local/include
-        Cocoa/.local/lib
-        Cocoa/.local/share
-
-This behavior enables users to work on multiple instances of Cocoa simultaneously similar to what was possible with [CosmoMC](https://github.com/cmbant/CosmoMC).
-
-:books::books: *Additional Notes for experts and developers on Running Cobaya Examples* :books::books:
-
-- We offer the flag `COCOA_RUN_EVALUATE` as an alias (syntax-sugar) for `mpirun -n 1 --oversubscribe --mca btl vader,tcp,self --bind-to core:overload-allowed --rank-by core --map-by numa:pe=4 cobaya-run`.
-
-- We offer the flag `COCOA_RUN_MCMC` as an alias (syntax-sugar) for `mpirun -n 4 --oversubscribe --mca btl vader,tcp,self --bind-to core:overload-allowed --rank-by core --map-by numa:pe=4 cobaya-run`. 
-
-- Additional explanations about our `mpirun` flags: Why the `--mca btl vader,tcp,self` flag? Conda-forge developers don't [compile OpenMPI with Infiniband compatibility](https://github.com/conda-forge/openmpi-feedstock/issues/38).
-
-- Additional explanations about our `mpirun` flags: Why the `--bind-to core:overload-allowed --map-by numa:pe=${OMP_NUM_THREADS}` flag? This flag enables efficient hybrid MPI + OpenMP runs on NUMA architecture.
-
-- Additional explanations about the `start_cocoa`/`stop_cocoa` scripts: Why did we choose to create two separate bash environments `(cocoa)` and `(.local)`? Users should be able to manipulate multiple Cocoa instances seamlessly, which is particularly useful when running chains in one instance while experimenting with code development in another. Consistency of the environment across all Cocoa instances is crucial, and the start_cocoa/stop_cocoa scripts handle the loading and unloading of environmental path variables for each Cocoa.
-
-### How do you run cocoa on your laptop? The docker container named *whovian-cocoa* <a name="appendix_jupyter_whovian"></a>
+### :interrobang: FAQ: How do you run cocoa on your laptop? The docker container named *whovian-cocoa* <a name="appendix_jupyter_whovian"></a>
 
 We provide the docker image [whovian-cocoa](https://hub.docker.com/r/vivianmiranda/whovian-cocoa) to facilitate the installation of Cocoa on Windows and MacOS. This appendix assumes the users already have the docker engine installed on their local PC. For instructions on installing the docker engine in specific operating systems, please refer to [Docker's official documentation](https://docs.docker.com/engine/install/). 
 
-To download and run the container for the first time, type:
+To download, name it `cocoa2023`, and run the container for the first time, type:
 
          docker run --platform linux/amd64 --hostname cocoa --name cocoa2023 -it -p 8080:8888 -v $(pwd):/home/whovian/host/ -v ~/.ssh:/home/whovian/.ssh:ro vivianmiranda/whovian-cocoa
 
@@ -238,20 +231,22 @@ Following the command above, users should see the following text on the screen t
 
 <img width="872" alt="Screenshot 2023-12-19 at 1 26 50 PM" src="https://github.com/CosmoLike/cocoa/assets/3210728/eb1fe7ec-e463-48a6-90d2-2d84e5b61aa1">
 
-When running the container the first time, the user needs to init conda with `conda init bash` followed by `source ~/.bashrc`, as shown below.
+The user needs to init Conda when running the container the first time, as shown below.
 
-        whovian@cocoa:~$ conda init bash
-        whovian@cocoa:~$ source ~/.bashrc
+        conda init bash
+        source ~/.bashrc
 
-Now procede with the normal cocoa installation
+Now, proceed with the standard cocoa installation. 
 
-- :interrobang: FAQ: When the user exits the container, how to restart it? Type 
+Once installation is complete, the user must learn how to start, use, and exit the container. Below, we answer a few common questions about how to use/manage Docker containers.  
+
+- :interrobang: FAQ: How do users restart the container when they exit? Assuming the user maintained the container name `cocoa2023` via the flag `--name cocoa2023` on the `docker run` command, type:
     
-        $ docker start -ai cocoa2023
+        docker start -ai cocoa2023
 
-- :interrobang: FAQ: How to run Jupyter Notebooks remotely when using Cocoa within the whovian-cocoa container? First, type the following command:
+- :interrobang: FAQ: How do I run Jupyter Notebooks remotely when using Cocoa within the *whovian-cocoa* container? First, type the following command:
 
-        whovian@cocoa:~$ jupyter notebook --no-browser --port=8080
+        jupyter notebook --no-browser --port=8080
 
 The terminal will show a message similar to the following template:
 
@@ -263,19 +258,26 @@ The terminal will show a message similar to the following template:
         [... NotebookApp] or http://127.0.0.1:8888/?token=XXX
         [... NotebookApp] Use Control-C to stop this server and shut down all kernels (twice to skip confirmation).
 
-Below, we assume the user runs the container in a server with the URL `your_sever.com`. We also presume the server can be accessed via ssh protocol. From a local PC, type:
-
-        $ ssh your_username@your_sever.com -L 8080:localhost:8080
-
-Finally, go to a browser and type `http://localhost:8080/?token=XXX`, where `XXX` is the previously saved token.
+If you are running the Docker container on your laptop, there is only one remaining step. The flag `-p 8080:8888` in the `docker run` command maps the container port `8888` to the host (your laptop) port `8080`. To access the Jupyter Notebook, open a browser and enter `http://localhost:8080/?token=XXX`, where `XXX` is the token displayed in the output line `[... NotebookApp] or http://127.0.0.1:8888/?token=XXX`. If you need to use a different port than `8080`, adjust the flag `-p 8080:8888` in the `docker run` command accordingly.
 
 :books::books: *Additional Notes* :books::books:
 
--  The flag `-v $(pwd):/home/whovian/host/` ensures that files on the host computer, where the user should install Cocoa to avoid losing work in case the docker image needs to be deleted, have been mounted to the directory `/home/whovian/host/`. Therefore, the user should see the host files of the directory where the whovian-cocoa container was initialized after typing `cd /home/whovian/host/; ls`
-  
+-  :books: The flag `-v $(pwd):/home/whovian/host/` in the `docker run` command ensures that files on the host computer have been mounted to the directory `/home/whovian/host/`. When the user accesses the container, they should see the host's directory where the Docker container was initiated after typing 
+
+	cd /home/whovian/host/
+	ls 
+
+Users should work inside the `/home/whovian/host/` directory to avoid losing work in case the docker image needs to be deleted,
+
+- :interrobang: FAQ: What if you run the docker container on a remote server? Below, we assume the user runs the container in a server with the URL `your_sever.com`. We also presume the server can be accessed via SSH protocol. On your local PC/laptop, type:
+
+        ssh your_username@your_sever.com -L 8080:localhost:8080
+
+This will bind the port `8080` on the server to the local. Then, go to a browser and type `http://localhost:8080/?token=XXX`, where `XXX` is the previously saved token displayed in the line `[... NotebookApp] or http://127.0.0.1:8888/?token=XXX`.  
+
 ### Miniconda Installation <a name="overview_miniconda"></a>
 
-Download and run Miniconda installation script (please adapt `CONDA_DIR`):
+Download and run the Miniconda installation script. 
 
         export CONDA_DIR=/gpfs/home/XXX/miniconda
 
@@ -285,7 +287,9 @@ Download and run Miniconda installation script (please adapt `CONDA_DIR`):
 
         /bin/bash Miniconda3-py38_23.9.0-0-Linux-x86_64.sh -f -b -p $CONDA_DIR
 
-After installation, users must source conda configuration file
+Please don't forget to adapt the path assigned to `CONDA_DIR` in the command above:
+
+After installation, users must source the conda configuration file, as shown below:
 
         source $CONDA_DIR/etc/profile.d/conda.sh \
             && conda config --set auto_update_conda false \
@@ -295,7 +299,7 @@ After installation, users must source conda configuration file
             && conda config --set channel_priority strict \
             && conda init bash
     
-### :interrobang: FAQ: How to compile the Boltzmann, CosmoLike and Likelihood codes separately <a name="appendix_compile_separately"></a>
+### :interrobang: FAQ: How to compile the Boltzmann, CosmoLike, and Likelihood codes separately <a name="appendix_compile_separately"></a>
 
 To avoid excessive compilation times during development, users can use specialized scripts located at `Cocoa/installation_scripts/` that compile only a specific module. A few examples of these scripts are: 
 
