@@ -13,9 +13,9 @@
     5. [FAQ: How do you run cocoa on your laptop? The docker image named *whovian-cocoa*](#appendix_jupyter_whovian)
     6. [FAQ: What should you do if you do not have Miniconda installed? Miniconda Installation Guide](#overview_miniconda)
     8. [FAQ: How can we set the Slow/Fast decomposition on MCMC Chains with Cosmolike? Manual Blocking](#manual_blocking_cosmolike)
-    9. [FAQ: How can we add new modified versions of CAMB/CLASS? Adding a new modified CAMB/CLASS to Cocoa (external readme)](Cocoa/external_modules/code)
+    9. [FAQ: How can we add new modified versions of CAMB/CLASS? (external readme)](Cocoa/external_modules/code)
     10. [FAQ: How do users set the environment for projects involving Machine Learning emulators?](#ml_emulators)
-    11. [FAQ: How can users improve their Bash/C/C++ knowledge to develop Cosmolike? Bash/C/C++ Notes](#lectnotes)
+    11. [FAQ: How can users improve their Bash/C/C++ knowledge to develop Cosmolike? Programming Notes](#lectnotes)
     12. [Warning about Weak Lensing YAML files in Cobaya](#appendix_example_runs)
     13. [(not recommended) Installation of Cocoa's required packages without conda](#required_packages_cache)
 
@@ -472,7 +472,7 @@ The CosmoLike pipeline takes $\Omega_m$ and $\Omega_b$, but the CAMB Boltzmann c
 
 2. Weak Lensing parameterization: $\big(\Omega_m,\Omega_b\big)$ as primary MCMC parameters and $\big(\Omega_c h^2, \Omega_b h^2\big)$ as derived quantities.
 
-Adopting $\big(\Omega_m,\Omega_b\big)$ as main MCMC parameters can create a silent bug in Cobaya; we are unsure if this problem persists in newer Cobaya versions, so this report should be a warning. The problem occurs when the option `drop: true` is absent in $\big(\Omega_m,\Omega_b\big)$ parameters, and there are no expressions that define the derived $\big(\Omega_c h^2, \Omega_b h^2\big)$ quantities. The bug is silent because the MCMC runs without any warnings, but the CAMB Boltzmann code does not update the cosmological parameters at every MCMC iteration. As a result, the resulting posteriors are flawed, but they may seem reasonable to those unfamiliar with the issue. Please be aware of this bug to avoid any potential inaccuracies in the results. 
+Adopting $\big(\Omega_m,\Omega_b\big)$ as main MCMC parameters can create a silent bug in Cobaya; *we are unsure if this problem persists in newer Cobaya versions, so this report should be a warning*. The problem occurs when the option `drop: true` is absent in $\big(\Omega_m,\Omega_b\big)$ parameters, and there are no expressions that define the derived $\big(\Omega_c h^2, \Omega_b h^2\big)$ quantities. *The bug is silent* because the MCMC runs without any warnings, but the CAMB Boltzmann code does not update the cosmological parameters at every MCMC iteration. As a result, the resulting posteriors are flawed, but they may seem reasonable to those unfamiliar with the issue. Please be aware of this bug to avoid any potential inaccuracies in the results. 
 
 The correct way to create YAML files with $\big(\Omega_m,\Omega_b\big)$ as primary MCMC parameters is exemplified below
 
