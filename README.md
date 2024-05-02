@@ -141,7 +141,7 @@ We do not want to discourage people from cloning code from their original reposi
 
 ### Additional Installation Notes for experts and developers <a name="additional_notes"></a>
 
-:books::books: *Additional Notes for experts and developers on Installation of Cocoa's required packages via Conda* :books::books:
+:books::books: *Installation of Cocoa's required packages via Conda* :books::books:
  
 - For those working on projects that utilize machine-learning-based emulators, the Appendix [Setting-up conda environment for Machine Learning emulators](#ml_emulators) provides additional commands for installing the necessary packages.
 
@@ -151,7 +151,7 @@ We assume here that the user has previously installed either [Minicoda](https://
 
 The conda installation method should be chosen in the overwhelming majority of cases. In the rare instances in which the user cannot work with Conda, refer to the Appendix [Installation of Cocoa's required packages without Conda](#required_packages_cache), as it contains instructions for a much slower (and prone to errors) but conda-independent installation method.
 
-:books::books: *Additional Notes for experts and developers on Installation of Cobaya base code* :books::books:
+:books::books: *Installation of Cobaya base code* :books::books:
 
 - If the user wants to compile only a subset of these packages, refer to the appendix [Compiling Boltzmann, CosmoLike, and Likelihood codes separately](#appendix_compile_separately).
         
@@ -168,7 +168,7 @@ The conda installation method should be chosen in the overwhelming majority of c
 
 This behavior enables users to work on multiple instances of Cocoa simultaneously, similar to what was possible with [CosmoMC](https://github.com/cmbant/CosmoMC).
 
-:books::books: *Additional Notes for experts and developers on Running Cobaya Examples* :books::books:
+:books::books: *Running Cobaya Examples* :books::books:
 
 - We offer the flag `COCOA_RUN_EVALUATE` as an alias (syntax-sugar) for `mpirun -n 1 --oversubscribe --mca btl vader,tcp,self --bind-to core:overload-allowed --rank-by core --map-by numa:pe=4 cobaya-run`.
 
