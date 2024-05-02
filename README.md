@@ -7,17 +7,17 @@
 6. [Creating Cosmolike projects (external readme)](Cocoa/projects/)
 7. [Appendix](#appendix)
     1. [Proper Credits](#appendix_proper_credits)
-    2. [FAQ: What should you do if installation or compilation goes wrong?](#running_wrong)
-    3. [Additional Notes For Experts and Developers](#additional_notes)
-    4. [FAQ: How do you run cocoa on your laptop? The docker container named *whovian-cocoa*](#appendix_jupyter_whovian)
-    5. [Miniconda Installation](#overview_miniconda)
-    6. [FAQ: How to compile the Boltzmann, CosmoLike, and Likelihood codes separately](#appendix_compile_separately)
+    2. [Additional Installation Notes For Experts and Developers](#additional_notes)
+    3. [FAQ: What should you do if installation or compilation goes wrong?](#running_wrong)
+    4. [FAQ: How to compile the Boltzmann, CosmoLike, and Likelihood codes separately](#appendix_compile_separately)
+    5. [FAQ: How do you run cocoa on your laptop? The docker container named *whovian-cocoa*](#appendix_jupyter_whovian)
+    6. [FAQ: What should you do if you do not have Anaconda/Miniconda installed? Miniconda Installation Guide](#overview_miniconda)
     7. [Warning about Weak Lensing YAML files in Cobaya](#appendix_example_runs)
     8. [Manual Blocking of Cosmolike Parameters](#manual_blocking_cosmolike)
     9. [Adding a new modified CAMB/CLASS to Cocoa (external readme)](Cocoa/external_modules/code)
-    10. [Bash/C/C++ Notes](#lectnotes)
-    11. [Setting-up conda environment for Machine Learning emulators](#ml_emulators)
-    12. [Installation of Cocoa's required packages without conda](#required_packages_cache)
+    10. [FAQ: How to set the conda environment for projects involving Machine Learning emulators?](#ml_emulators)
+    11. [FAQ: How users can improve their Bash/C/C++ knowledge to develop Cosmolike? Bash/C/C++ Notes](#lectnotes)
+    12. [(not recommended) Installation of Cocoa's required packages without conda](#required_packages_cache)
 
 ## Overview of the [Cobaya](https://github.com/CobayaSampler)-[CosmoLike](https://github.com/CosmoLike) Joint Architecture (Cocoa) <a name="overview"></a>
 
@@ -139,7 +139,7 @@ The following is not an exhaustive list of the codes we use
 
 We do not want to discourage people from cloning code from their original repositories. We've included some likelihoods as compressed [xz file format](https://tukaani.org/xz/format.html) in our repository for convenience in the initial development. The work of those authors is extraordinary, and they must be appropriately cited.
 
-### Additional Notes for experts and developers <a name="additional_notes"></a>
+### Additional Installation Notes for experts and developers <a name="additional_notes"></a>
 
 :books::books: *Additional Notes for experts and developers on Installation of Cocoa's required packages via Conda* :books::books:
  
@@ -217,6 +217,18 @@ The first step in debugging cocoa is to define the `COCOA_OUTPUT_VERBOSE` and `C
 
 If you can fix the issue, rerun `setup_cocoa_installation_packages` and `compile_external_modules` to ensure all installation scripts are called and the installation is complete.
 
+### :interrobang: FAQ: How to compile the Boltzmann, CosmoLike, and Likelihood codes separately <a name="appendix_compile_separately"></a>
+
+To avoid excessive compilation times during development, users can use specialized scripts located at `Cocoa/installation_scripts/` that compile only a specific module. A few examples of these scripts are: 
+
+        $(cocoa)(.local) source ./installation_scripts/compile_class
+        $(cocoa)(.local) source ./installation_scripts/compile_camb
+        $(cocoa)(.local) source ./installation_scripts/compile_planck
+        $(cocoa)(.local) source ./installation_scripts/compile_act
+        $(cocoa)(.local) source ./installation_scripts/setup_polychord
+
+In the commands above, we displayed `$(cocoa)(.local)` to emphasize that the users must first activate the cocoa conda environment and run `source start_cocoa` in the main Cocoa folder before running 
+
 ### :interrobang: FAQ: How do you run cocoa on your laptop? The docker container named *whovian-cocoa* <a name="appendix_jupyter_whovian"></a>
 
 We provide the docker image [whovian-cocoa](https://hub.docker.com/r/vivianmiranda/whovian-cocoa) to facilitate the installation of Cocoa on Windows and MacOS. This appendix assumes the users already have the docker engine installed on their local PC. For instructions on installing the docker engine in specific operating systems, please refer to [Docker's official documentation](https://docs.docker.com/engine/install/). 
@@ -281,7 +293,7 @@ Once installation is complete, the user must learn how to start, use, and exit t
 
     This will bind the port `8080` on the server to the local. Then, go to a browser and type `http://localhost:8080/?token=XXX`, where `XXX` is the previously saved token displayed in the line `[... NotebookApp] or http://127.0.0.1:8888/?token=XXX`.  
 
-### Miniconda Installation <a name="overview_miniconda"></a>
+### :interrobang: FAQ: What should you do if you do not have Anaconda/Miniconda installed? Miniconda Installation Guide <a name="overview_miniconda"></a>
 
 Download and run the Miniconda installation script. 
 
@@ -305,15 +317,7 @@ After installation, users must source the conda configuration file, as shown bel
             && conda config --set channel_priority strict \
             && conda init bash
     
-### :interrobang: FAQ: How to compile the Boltzmann, CosmoLike, and Likelihood codes separately <a name="appendix_compile_separately"></a>
 
-To avoid excessive compilation times during development, users can use specialized scripts located at `Cocoa/installation_scripts/` that compile only a specific module. A few examples of these scripts are: 
-
-        $(cocoa)(.local) source ./installation_scripts/compile_class
-        $(cocoa)(.local) source ./installation_scripts/compile_camb
-        $(cocoa)(.local) source ./installation_scripts/compile_planck
-        $(cocoa)(.local) source ./installation_scripts/compile_act
-        $(cocoa)(.local) source ./installation_scripts/setup_polychord
     
 ### :warning: Warning :warning: Weak Lensing YAML files in Cobaya <a name="appendix_example_runs"></a>
 
@@ -464,14 +468,8 @@ Below we provide an example YAML configuration for an MCMC chain that with DES 3
                 max_tries: 10000
                 burn_in: 0
                 Rminus1_single_split: 4
-                        
-### :book: Bash/C/C++ Notes :book: <a name="lectnotes"></a>
 
-To effectively work with the Cobaya framework and Cosmolike codes at the developer level, a working knowledge of Python to understand Cobaya and Bash language to comprehend Cocoa's scripts is required. Proficiency in C and C++ is also needed to manipulate Cosmolike and the C++ Cobaya-Cosmolike C++ interface. Finally, users need to understand the Fortran-2003 language to modify CAMB.
-
-Learning all these languages can be overwhelming, so to enable new users to do research that demands modifications on the inner workings of these codes, we include [here](cocoa_installation_libraries/LectNotes.pdf) a link to approximately 600 slides that provide an overview of Bash (slides 1-137), C (slides 138-371), and C++ (slides 372-599). In the future, we aim to add lectures about Python and Fortran. 
-
-### Setting-up conda environment for Machine Learning emulators <a name="ml_emulators"></a>
+### :interrobang: FAQ: How to set the conda environment for projects involving Machine Learning emulators? <a name="ml_emulators"></a>
 
 If the user wants to add Tensorflow, Keras and Pytorch for an emulator-based project via Conda, then type
 
@@ -506,7 +504,14 @@ Commenting out the environmental flags shown below, located at *set_installation
 
 Unlike most installed pip prerequisites, which are cached at `cocoa_installation_libraries/pip_cache.xz`, the installation of the Machine Learning packages listed above requires an active internet connection.
 
-### Installation of Cocoa's required packages without conda <a name="required_packages_cache"></a>
+                        
+### :interrobang: FAQ: How users can improve their Bash/C/C++ knowledge to develop Cosmolike? :book: Bash/C/C++ Notes :book: <a name="lectnotes"></a>
+
+To effectively work with the Cobaya framework and Cosmolike codes at the developer level, a working knowledge of Python to understand Cobaya and Bash language to comprehend Cocoa's scripts is required. Proficiency in C and C++ is also needed to manipulate Cosmolike and the C++ Cobaya-Cosmolike C++ interface. Finally, users need to understand the Fortran-2003 language to modify CAMB.
+
+Learning all these languages can be overwhelming, so to enable new users to do research that demands modifications on the inner workings of these codes, we include [here](cocoa_installation_libraries/LectNotes.pdf) a link to approximately 600 slides that provide an overview of Bash (slides 1-137), C (slides 138-371), and C++ (slides 372-599). In the future, we aim to add lectures about Python and Fortran. 
+
+### (not recommended) 💀 ☠️ :stop_sign::thumbsdown: Installation of Cocoa's required packages without conda <a name="required_packages_cache"></a>
 
 This method is slow and not advisable :stop_sign::thumbsdown:. When Conda is unavailable, the user can still perform a local semi-autonomous installation on Linux based on a few scripts we implemented. We require the pre-installation of the following packages:
 
