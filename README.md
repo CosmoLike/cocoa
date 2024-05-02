@@ -227,7 +227,7 @@ To avoid excessive compilation times during development, users can use specializ
         $(cocoa)(.local) source ./installation_scripts/compile_act
         $(cocoa)(.local) source ./installation_scripts/setup_polychord
 
-In the commands above, we displayed `$(cocoa)(.local)` to emphasize that the users must first activate the cocoa conda environment and run `source start_cocoa` in the main Cocoa folder before running 
+In the commands above, we displayed `$(cocoa)(.local)` to emphasize that the users must first activate the cocoa conda environment and run `source start_cocoa` in the main Cocoa folder before running the scripts inside the `Cocoa/installation_scripts` folder
 
 ### :interrobang: FAQ: How do you run cocoa on your laptop? The docker container named *whovian-cocoa* <a name="appendix_jupyter_whovian"></a>
 
