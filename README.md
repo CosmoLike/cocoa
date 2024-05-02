@@ -11,7 +11,7 @@
     3. [FAQ: What should you do if installation or compilation goes wrong?](#running_wrong)
     4. [FAQ: How to compile the Boltzmann, CosmoLike, and Likelihood codes separately](#appendix_compile_separately)
     5. [FAQ: How do you run cocoa on your laptop? The docker container named *whovian-cocoa*](#appendix_jupyter_whovian)
-    6. [FAQ: What should you do if you do not have Anaconda/Miniconda installed? Miniconda Installation Guide](#overview_miniconda)
+    6. [FAQ: What should you do if you do not have Miniconda installed? Miniconda Installation Guide](#overview_miniconda)
     7. [Warning about Weak Lensing YAML files in Cobaya](#appendix_example_runs)
     8. [Manual Blocking of Cosmolike Parameters](#manual_blocking_cosmolike)
     9. [Adding a new modified CAMB/CLASS to Cocoa (external readme)](Cocoa/external_modules/code)
@@ -293,7 +293,7 @@ Once installation is complete, the user must learn how to start, use, and exit t
 
     This will bind the port `8080` on the server to the local. Then, go to a browser and type `http://localhost:8080/?token=XXX`, where `XXX` is the previously saved token displayed in the line `[... NotebookApp] or http://127.0.0.1:8888/?token=XXX`.  
 
-### :interrobang: FAQ: What should you do if you do not have Anaconda/Miniconda installed? Miniconda Installation Guide <a name="overview_miniconda"></a>
+### :interrobang: FAQ: What should you do if you do not have Miniconda installed? Miniconda Installation Guide <a name="overview_miniconda"></a>
 
 Download and run the Miniconda installation script. 
 
@@ -316,8 +316,6 @@ After installation, users must source the conda configuration file, as shown bel
             && conda config --prepend channels conda-forge \
             && conda config --set channel_priority strict \
             && conda init bash
-    
-
     
 ### :warning: Warning :warning: Weak Lensing YAML files in Cobaya <a name="appendix_example_runs"></a>
 
