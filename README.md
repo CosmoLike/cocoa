@@ -12,12 +12,12 @@
     4. [FAQ: How to compile the Boltzmann, CosmoLike, and Likelihood codes separately](#appendix_compile_separately)
     5. [FAQ: How do you run cocoa on your laptop? The docker image named *whovian-cocoa*](#appendix_jupyter_whovian)
     6. [FAQ: What should you do if you do not have Miniconda installed? Miniconda Installation Guide](#overview_miniconda)
-    7. [Warning about Weak Lensing YAML files in Cobaya](#appendix_example_runs)
     8. [FAQ: How can we set the Slow/Fast decomposition on MCMC Chains with Cosmolike? Manual Blocking](#manual_blocking_cosmolike)
     9. [FAQ: How can we add new modified versions of CAMB/CLASS? Adding a new modified CAMB/CLASS to Cocoa (external readme)](Cocoa/external_modules/code)
     10. [FAQ: How do users set the environment for projects involving Machine Learning emulators?](#ml_emulators)
     11. [FAQ: How can users improve their Bash/C/C++ knowledge to develop Cosmolike? Bash/C/C++ Notes](#lectnotes)
-    12. [(not recommended) Installation of Cocoa's required packages without conda](#required_packages_cache)
+    12. [Warning about Weak Lensing YAML files in Cobaya](#appendix_example_runs)
+    13. [(not recommended) Installation of Cocoa's required packages without conda](#required_packages_cache)
 
 ## Overview of the [Cobaya](https://github.com/CobayaSampler)-[CosmoLike](https://github.com/CosmoLike) Joint Architecture (Cocoa) <a name="overview"></a>
 
@@ -322,88 +322,6 @@ After installation, users must source the conda configuration file, as shown bel
           && conda config --set channel_priority strict \
           && conda init bash
     
-### :warning: Warning :warning: Weak Lensing YAML files in Cobaya <a name="appendix_example_runs"></a>
-
-The CosmoLike pipeline takes $\Omega_m$ and $\Omega_b$, but the CAMB Boltzmann code only accepts $\Omega_c h^2$ and $\Omega_b h^2$ in Cobaya. Therefore, there are two ways of creating YAML compatible with CAMB and Cosmolike: 
-
-1. CMB parameterization: $\big(\Omega_c h^2,\Omega_b h^2\big)$ as primary MCMC parameters and $\big(\Omega_m,\Omega_b\big)$ as derived quantities.
-
-        omegabh2:
-            prior:
-                min: 0.01
-                max: 0.04
-            ref:
-                dist: norm
-                loc: 0.022383
-                scale: 0.005
-            proposal: 0.005
-            latex: \Omega_\mathrm{b} h^2
-        omegach2:
-            prior:
-                min: 0.06
-                max: 0.2
-            ref:
-                dist: norm
-                loc: 0.12011
-                scale: 0.03
-            proposal: 0.03
-            latex: \Omega_\mathrm{c} h^2
-        mnu:
-            value: 0.06
-            latex: m_\\nu
-        omegam:
-            latex: \Omega_\mathrm{m}
-        omegamh2:
-            derived: 'lambda omegam, H0: omegam*(H0/100)**2'
-            latex: \Omega_\mathrm{m} h^2
-        omegab:
-            derived: 'lambda omegabh2, H0: omegabh2/((H0/100)**2)'
-            latex: \Omega_\mathrm{b}
-        omegac:
-            derived: 'lambda omegach2, H0: omegach2/((H0/100)**2)'
-            latex: \Omega_\mathrm{c}
-
-2. Weak Lensing parameterization: $\big(\Omega_m,\Omega_b\big)$ as primary MCMC parameters and $\big(\Omega_c h^2, \Omega_b h^2\big)$ as derived quantities.
-
-Adopting $\big(\Omega_m,\Omega_b\big)$ as main MCMC parameters can create a silent bug in Cobaya; we are unsure if this problem persists in newer Cobaya versions, so this report should be a warning. The problem occurs when the option `drop: true` is absent in $\big(\Omega_m,\Omega_b\big)$ parameters, and there are no expressions that define the derived $\big(\Omega_c h^2, \Omega_b h^2\big)$ quantities. The bug is silent because the MCMC runs without any warnings, but the CAMB Boltzmann code does not update the cosmological parameters at every MCMC iteration. As a result, the resulting posteriors are flawed, but they may seem reasonable to those unfamiliar with the issue. Please be aware of this bug to avoid any potential inaccuracies in the results. 
-
-The correct way to create YAML files with $\big(\Omega_m,\Omega_b\big)$ as primary MCMC parameters is exemplified below
-
-        omegab:
-            prior:
-                min: 0.03
-                max: 0.07
-            ref:
-                dist: norm
-                loc: 0.0495
-                scale: 0.004
-            proposal: 0.004
-            latex: \Omega_\mathrm{b}
-            drop: true
-        omegam:
-            prior:
-                min: 0.1
-                max: 0.9
-            ref:
-                dist: norm
-                loc: 0.316
-                scale: 0.02
-            proposal: 0.02
-            latex: \Omega_\mathrm{m}
-            drop: true
-        mnu:
-            value: 0.06
-            latex: m_\\nu
-        omegabh2:
-            value: 'lambda omegab, H0: omegab*(H0/100)**2'
-            latex: \Omega_\mathrm{b} h^2
-        omegach2:
-            value: 'lambda omegam, omegab, mnu, H0: (omegam-omegab)*(H0/100)**2-(mnu*(3.046/3)**0.75)/94.0708'
-            latex: \Omega_\mathrm{c} h^2
-        omegamh2:
-            derived: 'lambda omegam, H0: omegam*(H0/100)**2'
-            latex: \Omega_\mathrm{m} h^2
-
 ### :interrobang: FAQ: How can we set the Slow/Fast decomposition on MCMC Chains with Cosmolike? Manual Blocking <a name="manual_blocking_cosmolike"></a>
 
 Cosmolike Weak Lensing pipeline contains parameters with different speed hierarchies. For example, Cosmolike execution time is reduced by approximately 50% when fixing the cosmological parameters. When varying only multiplicative shear calibration, Cosmolike execution time is reduced by two orders of magnitude. 
@@ -511,6 +429,88 @@ A working knowledge of Python is required to understand the Cobaya framework at 
 
 Learning all these languages can be overwhelming, so to enable new users to do research that demands modifications on the inner workings of these codes, we include [here](cocoa_installation_libraries/LectNotes.pdf) a link to approximately 600 slides that provide an overview of Bash (slides ~1-137), C (slides ~138-371), and C++ (slides ~372-599). In the future, we aim to add lectures about Python and Fortran. 
 
+### :warning::warning: Warning about Weak Lensing YAML files in Cobaya <a name="appendix_example_runs"></a>
+
+The CosmoLike pipeline takes $\Omega_m$ and $\Omega_b$, but the CAMB Boltzmann code only accepts $\Omega_c h^2$ and $\Omega_b h^2$ in Cobaya. Therefore, there are two ways of creating YAML compatible with CAMB and Cosmolike: 
+
+1. CMB parameterization: $\big(\Omega_c h^2,\Omega_b h^2\big)$ as primary MCMC parameters and $\big(\Omega_m,\Omega_b\big)$ as derived quantities.
+
+        omegabh2:
+            prior:
+                min: 0.01
+                max: 0.04
+            ref:
+                dist: norm
+                loc: 0.022383
+                scale: 0.005
+            proposal: 0.005
+            latex: \Omega_\mathrm{b} h^2
+        omegach2:
+            prior:
+                min: 0.06
+                max: 0.2
+            ref:
+                dist: norm
+                loc: 0.12011
+                scale: 0.03
+            proposal: 0.03
+            latex: \Omega_\mathrm{c} h^2
+        mnu:
+            value: 0.06
+            latex: m_\\nu
+        omegam:
+            latex: \Omega_\mathrm{m}
+        omegamh2:
+            derived: 'lambda omegam, H0: omegam*(H0/100)**2'
+            latex: \Omega_\mathrm{m} h^2
+        omegab:
+            derived: 'lambda omegabh2, H0: omegabh2/((H0/100)**2)'
+            latex: \Omega_\mathrm{b}
+        omegac:
+            derived: 'lambda omegach2, H0: omegach2/((H0/100)**2)'
+            latex: \Omega_\mathrm{c}
+
+2. Weak Lensing parameterization: $\big(\Omega_m,\Omega_b\big)$ as primary MCMC parameters and $\big(\Omega_c h^2, \Omega_b h^2\big)$ as derived quantities.
+
+Adopting $\big(\Omega_m,\Omega_b\big)$ as main MCMC parameters can create a silent bug in Cobaya; we are unsure if this problem persists in newer Cobaya versions, so this report should be a warning. The problem occurs when the option `drop: true` is absent in $\big(\Omega_m,\Omega_b\big)$ parameters, and there are no expressions that define the derived $\big(\Omega_c h^2, \Omega_b h^2\big)$ quantities. The bug is silent because the MCMC runs without any warnings, but the CAMB Boltzmann code does not update the cosmological parameters at every MCMC iteration. As a result, the resulting posteriors are flawed, but they may seem reasonable to those unfamiliar with the issue. Please be aware of this bug to avoid any potential inaccuracies in the results. 
+
+The correct way to create YAML files with $\big(\Omega_m,\Omega_b\big)$ as primary MCMC parameters is exemplified below
+
+        omegab:
+            prior:
+                min: 0.03
+                max: 0.07
+            ref:
+                dist: norm
+                loc: 0.0495
+                scale: 0.004
+            proposal: 0.004
+            latex: \Omega_\mathrm{b}
+            drop: true
+        omegam:
+            prior:
+                min: 0.1
+                max: 0.9
+            ref:
+                dist: norm
+                loc: 0.316
+                scale: 0.02
+            proposal: 0.02
+            latex: \Omega_\mathrm{m}
+            drop: true
+        mnu:
+            value: 0.06
+            latex: m_\\nu
+        omegabh2:
+            value: 'lambda omegab, H0: omegab*(H0/100)**2'
+            latex: \Omega_\mathrm{b} h^2
+        omegach2:
+            value: 'lambda omegam, omegab, mnu, H0: (omegam-omegab)*(H0/100)**2-(mnu*(3.046/3)**0.75)/94.0708'
+            latex: \Omega_\mathrm{c} h^2
+        omegamh2:
+            derived: 'lambda omegam, H0: omegam*(H0/100)**2'
+            latex: \Omega_\mathrm{m} h^2
+            
 ### 💀 ☠️ :stop_sign::thumbsdown: Installation of Cocoa's required packages without conda  (not recommended) <a name="required_packages_cache"></a>
 
 This method is slow and not advisable :stop_sign::thumbsdown:. When Conda is unavailable, the user can still perform a local semi-autonomous installation on Linux based on a few scripts we implemented. We require the pre-installation of the following packages:
