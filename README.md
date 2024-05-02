@@ -11,7 +11,7 @@
     3. [FAQ: What should you do if installation or compilation goes wrong?](#running_wrong)
     4. [FAQ: How to compile the Boltzmann, CosmoLike, and Likelihood codes separately](#appendix_compile_separately)
     5. [FAQ: How do you run cocoa on your laptop? The docker image named *whovian-cocoa*](#appendix_jupyter_whovian)
-    6. [FAQ: What should you do if you do not have Miniconda installed? Miniconda Installation Guide](#overview_miniconda)
+    6. [FAQ: What should you do if you do not have Miniconda installed? Installation Guide](#overview_miniconda)
     8. [FAQ: How can we set the Slow/Fast decomposition on MCMC Chains with Cosmolike? Manual Blocking](#manual_blocking_cosmolike)
     9. [FAQ: How can we add new modified versions of CAMB/CLASS? (external readme)](Cocoa/external_modules/code)
     10. [FAQ: How do users set the environment for projects involving Machine Learning emulators?](#ml_emulators)
@@ -147,7 +147,7 @@ We do not want to discourage people from cloning code from their original reposi
 
 - We provide a docker image named *whovian-cocoa* that facilitates cocoa installation on Windows and MacOS. For further instructions, refer to the Appendix [FAQ: How do you run cocoa on your laptop? The docker container is named *whovian-cocoa*](#appendix_jupyter_whovian).
 
-We assume here that the user has previously installed either [Minicoda](https://docs.conda.io/en/latest/miniconda.html) or [Anaconda](https://www.anaconda.com/products/individual) so that conda environments can be created. If this is not the case, refer to the Appendix [Miniconda Installation](#overview_miniconda) for further instructions.
+We assume here that the user has previously installed either [Minicoda](https://docs.conda.io/en/latest/miniconda.html) or [Anaconda](https://www.anaconda.com/products/individual) so that conda environments can be created. If this is not the case, refer to the Appendix [What should you do if you do not have Miniconda installed? Installation Guide](#overview_miniconda) for further instructions.
 
 The conda installation method should be chosen in the overwhelming majority of cases. In the rare instances in which the user cannot work with Conda, refer to the Appendix [Installation of Cocoa's required packages without Conda](#required_packages_cache), as it contains instructions for a much slower (and prone to errors) but conda-independent installation method.
 
@@ -298,7 +298,7 @@ Once installation is complete, the user must learn how to start, use, and exit t
 
     This will bind the port `8080` on the server to the local. Then, go to a browser and type `http://localhost:8080/?token=XXX`, where `XXX` is the previously saved token displayed in the line `[... NotebookApp] or http://127.0.0.1:8888/?token=XXX`.  
 
-### :interrobang: FAQ: What should you do if you do not have Miniconda installed? Miniconda Installation Guide <a name="overview_miniconda"></a>
+### :interrobang: FAQ: What should you do if you do not have Miniconda installed? Installation Guide <a name="overview_miniconda"></a>
 
 Download and run the Miniconda installation script. 
 
