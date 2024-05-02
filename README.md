@@ -10,7 +10,7 @@
     2. [Additional Installation Notes For Experts and Developers](#additional_notes)
     3. [FAQ: What should you do if installation or compilation goes wrong?](#running_wrong)
     4. [FAQ: How to compile the Boltzmann, CosmoLike, and Likelihood codes separately](#appendix_compile_separately)
-    5. [FAQ: How do you run cocoa on your laptop? The docker container named *whovian-cocoa*](#appendix_jupyter_whovian)
+    5. [FAQ: How do you run cocoa on your laptop? The docker image named *whovian-cocoa*](#appendix_jupyter_whovian)
     6. [FAQ: What should you do if you do not have Miniconda installed? Miniconda Installation Guide](#overview_miniconda)
     7. [Warning about Weak Lensing YAML files in Cobaya](#appendix_example_runs)
     8. [Manual Blocking of Cosmolike Parameters](#manual_blocking_cosmolike)
@@ -234,11 +234,11 @@ To avoid excessive compilation times during development, users can use specializ
 
 In the commands above, we displayed `$(cocoa)(.local)` to emphasize that the users must first activate the cocoa conda environment and run `source start_cocoa` in the main Cocoa folder before running the scripts inside the `Cocoa/installation_scripts` folder.
 
-### :interrobang: FAQ: How do you run cocoa on your laptop? The docker container named *whovian-cocoa* <a name="appendix_jupyter_whovian"></a>
+### :interrobang: FAQ: How do you run cocoa on your laptop? The docker image named *whovian-cocoa* <a name="appendix_jupyter_whovian"></a>
 
 We provide the docker image [whovian-cocoa](https://hub.docker.com/r/vivianmiranda/whovian-cocoa) to facilitate the installation of Cocoa on Windows and MacOS. This appendix assumes the users already have the docker engine installed on their local PC. For instructions on installing the docker engine in specific operating systems, please refer to [Docker's official documentation](https://docs.docker.com/engine/install/). 
 
-To download, name it `cocoa2023`, and run the container for the first time, type:
+To download the docker image *whovian-cocoa*, name the associated container `cocoa2023`, and run the container for the first time, type:
 
       docker run --platform linux/amd64 --hostname cocoa --name cocoa2023 -it -p 8080:8888 -v $(pwd):/home/whovian/host/ -v ~/.ssh:/home/whovian/.ssh:ro vivianmiranda/whovian-cocoa
 
