@@ -7,7 +7,7 @@
 6. [Creating Cosmolike projects (external readme)](Cocoa/projects/)
 7. [Appendix](#appendix)
     1. [Proper Credits](#appendix_proper_credits)
-    2. [FAQ: What should you do if something goes wrong?](#running_wrong)
+    2. [FAQ: What should you do if installation or compilation goes wrong?](#running_wrong)
     3. [Additional Notes For Experts and Developers](#additional_notes)
     4. [Run cocoa on your laptop - The "whovian-cocoa" docker container](#appendix_jupyter_whovian)
     5. [Miniconda Installation](#overview_miniconda)
@@ -141,7 +141,7 @@ The following is not an exhaustive list of the codes we use
 
 We do not want to discourage people from cloning code from their original repositories. We've included these codes as compressed [xz file format](https://tukaani.org/xz/format.html) in our repository for convenience in the initial development (speed in setting up Cocoa). The work of those authors is extraordinary, and they must be properly cited.
 
-### :interrobang: FAQ: What should you do if something goes wrong? <a name="running_wrong"></a>
+### :interrobang: FAQ: What should you do if installation or compilation goes wrong? <a name="running_wrong"></a>
 
 - The script *set_installation_options script* contains a few additional flags that may be useful. Some of these flags are shown below:
 
