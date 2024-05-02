@@ -302,25 +302,25 @@ Once installation is complete, the user must learn how to start, use, and exit t
 
 Download and run the Miniconda installation script. 
 
-        export CONDA_DIR=/gpfs/home/XXX/miniconda
-
-        mkdir $CONDA_DIR
-
-        wget https://repo.continuum.io/miniconda/Miniconda3-py38_23.9.0-0-Linux-x86_64.sh
-
-        /bin/bash Miniconda3-py38_23.9.0-0-Linux-x86_64.sh -f -b -p $CONDA_DIR
+      export CONDA_DIR=/gpfs/home/XXX/miniconda
+    
+      mkdir $CONDA_DIR
+    
+      wget https://repo.continuum.io/miniconda/Miniconda3-py38_23.9.0-0-Linux-x86_64.sh
+    
+      /bin/bash Miniconda3-py38_23.9.0-0-Linux-x86_64.sh -f -b -p $CONDA_DIR
 
 Please don't forget to adapt the path assigned to `CONDA_DIR` in the command above:
 
 After installation, users must source the conda configuration file, as shown below:
 
-        source $CONDA_DIR/etc/profile.d/conda.sh \
-            && conda config --set auto_update_conda false \
-            && conda config --set show_channel_urls true \
-            && conda config --set auto_activate_base false \
-            && conda config --prepend channels conda-forge \
-            && conda config --set channel_priority strict \
-            && conda init bash
+      source $CONDA_DIR/etc/profile.d/conda.sh \
+          && conda config --set auto_update_conda false \
+          && conda config --set show_channel_urls true \
+          && conda config --set auto_activate_base false \
+          && conda config --prepend channels conda-forge \
+          && conda config --set channel_priority strict \
+          && conda init bash
     
 ### :warning: Warning :warning: Weak Lensing YAML files in Cobaya <a name="appendix_example_runs"></a>
 
@@ -478,30 +478,30 @@ Below, we provide an example YAML configuration for an MCMC chain with DES 3x2pt
 
 If the user wants to add, without GPU support, Tensorflow, Keras, and PyTorch for an emulator-based project via Conda, then type
 
-        conda activate cocoa
-        $CONDA_PREFIX/bin/pip install --no-cache-dir \
-            'tensorflow-cpu==2.12.0' \
-            'keras==2.12.0' \
-            'keras-preprocessing==1.1.2' \
-            'torch==1.13.1+cpu' \
-            'torchvision==0.14.1+cpu' \
-            'torchaudio==0.13.1' --extra-index-url https://download.pytorch.org/whl/cpu
+      conda activate cocoa
+      $CONDA_PREFIX/bin/pip install --no-cache-dir \
+        'tensorflow-cpu==2.12.0' \
+        'keras==2.12.0' \
+        'keras-preprocessing==1.1.2' \
+        'torch==1.13.1+cpu' \
+        'torchvision==0.14.1+cpu' \
+        'torchaudio==0.13.1' --extra-index-url https://download.pytorch.org/whl/cpu
 
 In case the users want GPU support, the following commands will install the GPU version of 
 these packages, assuming CUDA 11.6, click [here](https://pytorch.org/get-started/previous-versions/) for additional information).
 
-        $CONDA_PREFIX/bin/pip install --no-cache-dir \
-            'tensorflow==2.12.0' \
-            'keras==2.12.0' \
-            'keras-preprocessing==1.1.2' \
-            'torch==1.13.1+cu116' \
-            'torchvision==0.14.1+cu116' \
-            'torchaudio==0.13.1' --extra-index-url https://download.pytorch.org/whl/cu116
+      $CONDA_PREFIX/bin/pip install --no-cache-dir \
+        'tensorflow==2.12.0' \
+        'keras==2.12.0' \
+        'keras-preprocessing==1.1.2' \
+        'torch==1.13.1+cu116' \
+        'torchvision==0.14.1+cu116' \
+        'torchaudio==0.13.1' --extra-index-url https://download.pytorch.org/whl/cu116
 
 Commenting out the environmental flags shown below, located at *set_installation_options* script, will enable the installation of machine-learning-related libraries via pip.  
 
-        #export IGNORE_EMULATOR_CPU_PIP_PACKAGES=1
-        #export IGNORE_EMULATOR_GPU_PIP_PACKAGES=1
+      #export IGNORE_EMULATOR_CPU_PIP_PACKAGES=1
+      #export IGNORE_EMULATOR_GPU_PIP_PACKAGES=1
         
 We recommend using the GPU versions to train the emulator while using the CPU versions to run the MCMCs. For this purpose, we suggest creating two separate conda environments. One could be named `cocoa`, while the other could be called `cocoaemu` and contain the GPU versions of the machine learning packages.
                      
@@ -511,7 +511,7 @@ A working knowledge of Python is required to understand the Cobaya framework at 
 
 Learning all these languages can be overwhelming, so to enable new users to do research that demands modifications on the inner workings of these codes, we include [here](cocoa_installation_libraries/LectNotes.pdf) a link to approximately 600 slides that provide an overview of Bash (slides ~1-137), C (slides ~138-371), and C++ (slides ~372-599). In the future, we aim to add lectures about Python and Fortran. 
 
-### (not recommended) 💀 ☠️ :stop_sign::thumbsdown: Installation of Cocoa's required packages without conda <a name="required_packages_cache"></a>
+### 💀 ☠️ :stop_sign::thumbsdown: Installation of Cocoa's required packages without conda  (not recommended) <a name="required_packages_cache"></a>
 
 This method is slow and not advisable :stop_sign::thumbsdown:. When Conda is unavailable, the user can still perform a local semi-autonomous installation on Linux based on a few scripts we implemented. We require the pre-installation of the following packages:
 
