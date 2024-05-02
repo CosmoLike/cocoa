@@ -79,7 +79,7 @@ fi
 # ----------------------------------------------------------------------------
 
 if [ -z "${IGNORE_ALL_PIP_INSTALLATION}" ]; then
-  echo -e '\033[1;34m''\t PIP INSTALL BASIC PACKAGES''\033[0m'
+  echo -e '\033[1;34m''\tPIP INSTALL BASIC PACKAGES''\033[0m'
 
   if [ -z "${MINICONDA_INSTALLATION}" ]; then
     env CXX=$CXX_COMPILER CC=$C_COMPILER $PIP3 install \
@@ -121,7 +121,7 @@ fi
 # ----------------------------------------------------------------------------
 # ----------------------------------------------------------------------------
 if [ -z "${IGNORE_ALL_PIP_INSTALLATION}" ]; then
-  echo -e '\033[1;34m''\t PIP INSTALL CORE PACKAGES''\033[0m'
+  echo -e '\033[1;34m''\tPIP INSTALL CORE PACKAGES''\033[0m'
   
   if [ -z "${MINICONDA_INSTALLATION}" ]; then
     env CXX=$CXX_COMPILER CC=$C_COMPILER $PIP3 install \
@@ -242,7 +242,7 @@ fi
 # ----------------------------------------------------------------------------
 if [ -z "${IGNORE_ALL_PIP_INSTALLATION}" ]; then
   if [ -z "${IGNORE_EMULATOR_CPU_PIP_PACKAGES}" ]; then
-    echo -e '\033[1;34m''\t PIP INSTALL MACHINE LEARNING CPU-ONLY PACKAGES''\033[0m'
+    echo -e '\033[1;34m''\tPIP INSTALL MACHINE LEARNING CPU-ONLY PACKAGES''\033[0m'
 
     env CXX=$CXX_COMPILER CC=$C_COMPILER $PIP3 install \
         'tensorflow-cpu==2.12.0' \
@@ -264,7 +264,7 @@ if [ -z "${IGNORE_ALL_PIP_INSTALLATION}" ]; then
     echo -e '\033[1;34m''\t\e[4mPIP INSTALL MACHINE LEARNING CPU-ONLY PACKAGES DONE''\033[0m'
   fi
   if [ -z "${IGNORE_EMULATOR_GPU_PIP_PACKAGES}" ]; then
-    echo -e '\033[1;34m''\t PIP INSTALL MACHINE LEARNING GPU PACKAGES''\033[0m'
+    echo -e '\033[1;34m''\tPIP INSTALL MACHINE LEARNING GPU PACKAGES''\033[0m'
 
     env CXX=$CXX_COMPILER CC=$C_COMPILER $PIP3 install \
         'tensorflow==2.12.0' \

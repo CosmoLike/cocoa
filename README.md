@@ -9,7 +9,7 @@
     1. [Proper Credits](#appendix_proper_credits)
     2. [FAQ: What should you do if installation or compilation goes wrong?](#running_wrong)
     3. [Additional Notes For Experts and Developers](#additional_notes)
-    4. [Run cocoa on your laptop - The "whovian-cocoa" docker container](#appendix_jupyter_whovian)
+    4. [FAQ: How do you run cocoa on your laptop? The docker container named "whovian-cocoa"](#appendix_jupyter_whovian)
     5. [Miniconda Installation](#overview_miniconda)
     6. [FAQ: How to compile the Boltzmann, CosmoLike and Likelihood codes separately](#appendix_compile_separately)
     7. [Warning about Weak Lensing YAML files in Cobaya](#appendix_example_runs)
@@ -137,7 +137,7 @@ The following is not an exhaustive list of the codes we use
 
 - [MFLike](https://github.com/simonsobs/LAT_MFLike) is the official likelihood of the Simons Observatory
 
-- [ACTLensing](https://github.com/ACTCollaboration/act_dr6_lenslike) is the official lensing likelihood of the ACT collaborated developed by Prof. Mathew Madhavacheril
+- [ACTLensing](https://github.com/ACTCollaboration/act_dr6_lenslike) is the official lensing likelihood of the ACT collaboration developed by Prof. Mathew Madhavacheril
 
 We do not want to discourage people from cloning code from their original repositories. We've included these codes as compressed [xz file format](https://tukaani.org/xz/format.html) in our repository for convenience in the initial development (speed in setting up Cocoa). The work of those authors is extraordinary, and they must be properly cited.
 
@@ -174,16 +174,16 @@ We do not want to discourage people from cloning code from their original reposi
         # --------------------------------------------------------------------------------------
         #export COSMOLIKE_DEBUG_MODE=1
 
-The first step in debugging cocoa is to define the `COCOA_OUTPUT_VERBOSE` and `COSMOLIKE_DEBUG_MODE` flags to obtain a more detailed output. The second step consists of reruning the particular script that failed. The scripts `setup_cocoa_installation_packages` and `compile_external_modules` run many things. It may be advantageous to run only the part the routine that failed. To do that, first go to `cocoa` main folder and  start the cocoa environment
+The first step in debugging cocoa is to define the `COCOA_OUTPUT_VERBOSE` and `COSMOLIKE_DEBUG_MODE` flags to obtain a more detailed output. The second step consists of reruning the particular script that failed. The scripts `setup_cocoa_installation_packages` and `compile_external_modules` run many things. It may be advantageous to run only the routine that failed. To do that, first go to the `cocoa` main folder and start the cocoa environment
 
     $(cocoa) cd ./cocoa/Cocoa
     $(cocoa) source start_cocoa
   
-Look the scripts in the `installation_scripts` folder. If, for example, the compilation of CAMB boltzmann code fail, then run
+Look at the scripts in the `installation_scripts` folder. If, for example, the compilation of CAMB Boltzmann code fails, then run
 
     $(cocoa)(.local) source ./installation_scripts/compile_camb
 
-If you can fix the issue, rerun `setup_cocoa_installation_packages` and `compile_external_modules` to ensure all installation scripts are called and you have a complete installation.
+If you can fix the issue, rerun `setup_cocoa_installation_packages` and `compile_external_modules` to ensure all installation scripts are called and the installation is complete.
 
 ### Additional Notes for experts and developers <a name="additional_notes"></a>
 
@@ -193,7 +193,7 @@ If you can fix the issue, rerun `setup_cocoa_installation_packages` and `compile
 
 - We provide a docker image named "whovian-cocoa" that facilitates cocoa installation on Windows and MacOS. For further instructions, refer to the Appendix [Run cocoa on your laptop - The "whovian-cocoa" docker container](#appendix_jupyter_whovian).
 
-- We assume here the user has previously installed either [Minicoda](https://docs.conda.io/en/latest/miniconda.html) or [Anaconda](https://www.anaconda.com/products/individual), so conda environments can be created. If this is not the case, refer to the Appendix [Miniconda Installation](#overview_miniconda) for further instructions.
+We assume here that the user has previously installed either [Minicoda](https://docs.conda.io/en/latest/miniconda.html) or [Anaconda](https://www.anaconda.com/products/individual) so that conda environments can be created. If this is not the case, refer to the Appendix [Miniconda Installation](#overview_miniconda) for further instructions.
 
 - The conda installation method should be the chosen installation method in the overwhelming majority of cases. In the rare cases the user cannot work with conda, refer to the Appendix [Installation of Cocoa's required packages without conda](#required_packages_cache) as it contains instructions for a much slower but conda-independent installation method.
 
@@ -226,7 +226,7 @@ This behavior enables users to work on multiple instances of Cocoa simultaneousl
 
 - Additional explanations about the `start_cocoa`/`stop_cocoa` scripts: Why did we choose to create two separate bash environments `(cocoa)` and `(.local)`? Users should be able to manipulate multiple Cocoa instances seamlessly, which is particularly useful when running chains in one instance while experimenting with code development in another. Consistency of the environment across all Cocoa instances is crucial, and the start_cocoa/stop_cocoa scripts handle the loading and unloading of environmental path variables for each Cocoa.
 
-### Run cocoa on your laptop - The "whovian-cocoa" docker container <a name="appendix_jupyter_whovian"></a>
+### How do you run cocoa on your laptop? The docker container named *whovian-cocoa* <a name="appendix_jupyter_whovian"></a>
 
 We provide the docker image [whovian-cocoa](https://hub.docker.com/r/vivianmiranda/whovian-cocoa) to facilitate the installation of Cocoa on Windows and MacOS. This appendix assumes the users already have the docker engine installed on their local PC. For instructions on installing the docker engine in specific operating systems, please refer to [Docker's official documentation](https://docs.docker.com/engine/install/). 
 
