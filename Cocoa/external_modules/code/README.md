@@ -211,7 +211,7 @@ PS: you can also use `source compile_external_modules` instead of `source ./inst
     
 **Step :two:**: Move the Boltzmann code to `$ROOTDIR/external_modules/code/XXX`
 
-`XXX` should be replaced by whatever name the user adopts to their modified CLASS (e.g., CLASSQ). 
+The string `XXX` should be replaced by whatever name the user adopts on their modified CLASS (e.g., CLASSQ). 
 
 **Step :three:**: Modify the file `$ROOTDIR/external_modules/code/XXX/Makefile` 
     
