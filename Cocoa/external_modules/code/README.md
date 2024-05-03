@@ -4,40 +4,51 @@
  
 ## Adding a new modified CAMB <a name="appendix_new_camb"></a> 
 
-Installing a new CAMB code in Cocoa requires a few changes to the existing code that ensures the CAMB scripts use the correct compiler and that Cocoa's shell scripts can compile and link CAMB. In this section, we summarize these steps, which can be helpful for users who maintain modified versions of the Boltzmann code. We assume the user opted for the easier Cocoa Conda installation and located the terminal in the folder where Cocoa was cloned.
+Installing a new CAMB code in Cocoa requires a few changes to the existing code that ensure the CAMB scripts use the correct compiler and that Cocoa's shell scripts can compile and link CAMB. In this section, we summarize these steps, which can be helpful for users who maintain modified versions of the Boltzmann code. We assume the user performed the Cocoa Conda installation and located the terminal in the folder where Cocoa was cloned.
 
-**Step 1 of 13**: Activate the Cocoa conda environment, then go to the Cocoa main folder, and start the `(.local)` Python private environment.
+**Step :one:**: Activate the Cocoa conda environment, go to the Cocoa main folder, and start the `(.local)` Python private environment.
 
-    $ conda activate cocoa
-    $(cocoa) cd ./cocoa/Cocoa
-    $(cocoa) source start_cocoa
+    conda activate cocoa
+    cd ./cocoa/Cocoa
+    source start_cocoa
     
-**Step 2 of 13**: Move the modified CAMB code to the folder `$ROOTDIR/external_modules/code/XXX`. The string `XXX` should be replaced by the new code's adopted name (e.g., CAMBQ). 
+**Step :two:**: Move (or clone) the modified CAMB code to the folder `$ROOTDIR/external_modules/code/XXX`. The string `XXX` should be replaced by the new code's adopted name (e.g., CAMBQ). 
+
+If the user does not want this modified CAMB to be added to the Cocoa repo, then add its path to the `.gitignore` file located in the `/cocoa/Cocoa` main folder.
     
-**Step 3 of 13**: Modify the `get_gfortran_version` Python function located in the file `$ROOTDIR/external_modules/code/XXX/camb/_compilers.py`. `$ROOTDIR` is the absolute path of the main `Cocoa/` folder.
+**Step :three:**: Modify the `get_gfortran_version` Python function located in the file `$ROOTDIR/external_modules/code/XXX/camb/_compilers.py`. Here, `$ROOTDIR` is the absolute path of the main `cocoa/Cocoa/` folder.
     
     (...)
+    [Extracted and adapted from $ROOTDIR/external_modules/code/XXX/camb/_compilers.py]
     
     def get_gfortran_version(command='gfortran'):
-        #ver = call_command(command + " -dumpversion")
+        #ver = call_command(command + " -dumpversion")           # Original line - commented
+        
+        # add the line below
         ver = call_command("$FORTRAN_COMPILER -dumpversion")
+        
         if ver and '.' not in ver:
-            #ver = call_command(command + " -dumpfullversion")
+            #ver = call_command(command + " -dumpfullversion")   # Original line - commented
+
+            # add the line below
             ver = call_command("$FORTRAN_COMPILER -dumpfullversion")
         return ver
     
     (...)
     
-**Step 4 of 13**: Modify the following lines located in the file `$ROOTDIR/external_modules/code/XXX/fortran/Makefile`
+**Step 4️⃣**: Modify the following lines located in the file `$ROOTDIR/external_modules/code/XXX/fortran/Makefile`.
 
     (...)
+    [Extracted and adapted from $ROOTDIR/external_modules/code/CAMB/fortran/Makefile]
     
-    #Will detect ifort/gfortran or edit for your compiler
-    #ifneq ($(COMPILER),gfortran)
-    #  ifortErr = $(shell which ifort >/dev/null 2>&1; echo $$?)
-    #else
-    #  ifortErr = 1
-    #endif
+    #Will detect ifort/gfortran or edit for your compiler            # Original line - commented
+    #ifneq ($(COMPILER),gfortran)                                    # Original line - commented
+    #  ifortErr = $(shell which ifort >/dev/null 2>&1; echo $$?)     # Original line - commented
+    #else                                                            # Original line - commented
+    #  ifortErr = 1                                                  # Original line - commented
+    #endif                                                           # Original line - commented
+    
+    # add the line below
     ifortErr = 1
     
     (...)
@@ -45,29 +56,42 @@ Installing a new CAMB code in Cocoa requires a few changes to the existing code 
     ifeq "$(ifortErr)" "0"
         (...)
     else
-        #gfortErr = $(shell which gfortran >/dev/null; echo $$?)
+        #gfortErr = $(shell which gfortran >/dev/null; echo $$?)    # Original line - commented
+        
+        # add the line below
         gfortErr = 0
+        
         ifeq "$(gfortErr)" "0"
-          #Gfortran compiler (version 6+):
-          #compiler_ver = $(shell gfortran -dumpversion 2>&1)
-          #COMPILER = gfortran
-          #F90C     = gfortran
-          COMPILER ?= $(FORTRAN_COMPILER)
-          F90C     ?= $(FORTRAN_COMPILER)
+          #Gfortran compiler (version 6+):                          # Original line - commented
+          #compiler_ver = $(shell gfortran -dumpversion 2>&1)       # Original line - commented
+          #COMPILER = gfortran                                      # Original line - commented
+          #F90C     = gfortran                                      # Original line - commented
+          
+          # add the line below
+          COMPILER ?= $(FORTRAN_COMPILER)  
+          # add the line below
+          F90C     ?= $(FORTRAN_COMPILER)                           
+          
           (...)
-          #FFLAGS+=-march=native
+          #FFLAGS+=-march=native                                    # Original line - commented
           (...)
         endif
      endif
 
-**Step 5 of 13**: Modify the following lines located in the file `$ROOTDIR/external_modules/code/XXX/forutils/Makefile_compiler`
+These modifications will force CAMB to adopt the conda gfortran compiler. 
+
+**Step :five:**: Modify the following lines located in the file `$ROOTDIR/external_modules/code/XXX/forutils/Makefile_compiler`
 
     (...)
-    #ifneq ($(COMPILER),gfortran)
-    #  ifortErr = $(shell which ifort >/dev/null 2>&1; echo $$?)
-    #else
-    #  ifortErr = 1
-    #endif
+    [Extracted and adapted from $ROOTDIR/external_modules/code/CAMB/forutils/Makefile_compiler]
+    
+    #ifneq ($(COMPILER),gfortran)                                 # Original line - commented
+    #  ifortErr = $(shell which ifort >/dev/null 2>&1; echo $$?)  # Original line - commented
+    #else                                                         # Original line - commented
+    #  ifortErr = 1                                               # Original line - commented
+    #endif                                                        # Original line - commented
+    
+    # add the line below
     ifortErr = 1
     
     (...)
@@ -75,76 +99,102 @@ Installing a new CAMB code in Cocoa requires a few changes to the existing code 
     ifeq "$(ifortErr)" "0"
         (...)
     else
-        #major_version = $(shell gfortran -dumpversion 2>&1 | cut -d " " -f 3 | cut -d. -f 1)
-        #ifneq ($(shell test $(major_version) -gt 5; echo $$?),0)
-        #  $(error gfortran version 6.3 or higher (or ifort 14+) is required)
-        #endif
-        #compiler_ver = $(shell gfortran -dumpversion 2>&1)
+        #major_version = $(shell gfortran -dumpversion 2>&1 | cut -d " " -f 3 | cut -d. -f 1)  # Original line - commented
+        #ifneq ($(shell test $(major_version) -gt 5; echo $$?),0)                              # Original line - commented
+        #  $(error gfortran version 6.3 or higher (or ifort 14+) is required)                  # Original line - commented
+        #endif                                                                                 # Original line - commented
+        #compiler_ver = $(shell gfortran -dumpversion 2>&1)                                    # Original line - commented
+        
+        # add the line below
         F90C ?= $(FORTRAN_COMPILER)
+        
         (...)
      endif
 
-**Step 6 of 13**: Copy the file `$ROOTDIR/installation_scripts/compile_camb` to `$ROOTDIR/installation_scripts/` and rename it to compile_XXX via the command.
+These modifications will force the `forutils` package inside CAMB to adopt the conda gfortran compiler. 
 
-    $(cocoa)(.local) cp $ROOTDIR/installation_scripts/compile_camb $ROOTDIR/installation_scripts/compile_XXX
+**Step :six:**: Copy the file `$ROOTDIR/installation_scripts/compile_camb` to `$ROOTDIR/installation_scripts/` and rename it to compile_XXX via the command.
 
-**Step 7 of 13**: Modify the following lines located in the file `$ROOTDIR/installation_scripts/compile_XXX`
+    cp $ROOTDIR/installation_scripts/compile_camb $ROOTDIR/installation_scripts/compile_XXX
+
+This script will manage CAMB compilation
+
+**Step :seven:**: Modify the following lines located in the file `$ROOTDIR/installation_scripts/compile_XXX`
 
     (...)
+    [Extracted and adapted from $ROOTDIR/installation_scripts/compile_camb]
     
     if [ -z "${IGNORE_CAMB_COMPILATION}" ]; then
-        #echo 'COMPILING CAMB'
-        #cd $ROOTDIR/external_modules/code/CAMB/
-        echo 'COMPILING XXX'
+        #cd $ROOTDIR/external_modules/code/CAMB/                      # Original line - commented
+        
+        # add the line below
         cd $ROOTDIR/external_modules/code/XXX/
+        
         (...)
     fi
 
-**Step 8 of 13**: Modify the following lines located in the file `compile_external_modules` located at $ROOTDIR
+    (...)
+
+**Step :eight:**: Modify the following lines located in the file `compile_external_modules` located at $ROOTDIR
 
     (...)
+    [Extracted and adapted from $ROOTDIR/compile_external_modules]
+    
     # ----------------------------------------------------------------------------
     # ----------------------------------------------------------------------------
     # ------------------------ COMPILE EXTERNAL MODULES --------------------------
     # ----------------------------------------------------------------------------
     # ----------------------------------------------------------------------------
+    
+    (...)
+    
     source $ROOTDIR/installation_scripts/compile_camb
+    
     # add the line below
     source $ROOTDIR/installation_scripts/compile_XXX
+    
     (...)
 
 This step ensures that the command `source compile_external_modules` compiles all modules including the new modified CAMB
 
-**Step 9 of 13**: Go to Cocoa main directory and compile the new modified CAMB
+**Step :nine:**: Go to Cocoa main directory and compile the new modified CAMB
 
-    $(cocoa)(.local) cd $ROOTDIR
-    $(cocoa)(.local) source ./installation_scripts/compile_XXX
+    cd $ROOTDIR
+    source ./installation_scripts/compile_XXX
 
 PS: you can also use `source compile_external_modules` instead of `source ./installation_scripts/compile_XXX`
 
-**Step 10 of 13**: Copy the file `$ROOTDIR/installation_scripts/clean_camb` to `$ROOTDIR/installation_scripts/` and rename it to clean_XXX via the command.
+**Step :ten:**: Copy the file `$ROOTDIR/installation_scripts/clean_camb` to `$ROOTDIR/installation_scripts/` and rename it to clean_XXX via the command.
 
-    $(cocoa)(.local) cp $ROOTDIR/installation_scripts/clean_camb $ROOTDIR/installation_scripts/clean_XXX
+    cp $ROOTDIR/installation_scripts/clean_camb $ROOTDIR/installation_scripts/clean_XXX
 
-**Step 11 of 13**: Modify the following lines located in the file `$ROOTDIR/installation_scripts/clean_XXX`
+**Step :eleven:**: Modify the following lines located in the file `$ROOTDIR/installation_scripts/clean_XXX`
 
     (...) 
-    #cd $ROOTDIR/external_modules/code/camb/
+    [Extracted and adapted from $ROOTDIR/installation_scripts/clean_camb]
+    
+    #cd $ROOTDIR/external_modules/code/camb/                            # Original line - commented
+    
+    # add the line below
     cd $ROOTDIR/external_modules/code/XXX/
+    
     (...)
 
-**Step 12 of 13**: Modify the script `clean_all` located at $ROOTDIR (Cocoa main folder)
+**Step :twelve:**: Modify the script `clean_all` located at $ROOTDIR (Cocoa main folder)
 
     (...)
+    
     source $ROOTDIR/installation_scripts/clean_camb
+    
     # add the line below
     source $ROOTDIR/installation_scripts/clean_XXX
     
     (...)
 
-**Step 13 of 13**: Modify any YAML file that should load the new CAMB, adding the option `path` to the CAMB section
+**Step :thirteen:**: Modify any YAML file that should load the new CAMB, adding the option `path` to the CAMB section
 
     (...)
+    
     theory:
         camb:
             path: ./external_modules/code/XXX   
@@ -153,17 +203,17 @@ PS: you can also use `source compile_external_modules` instead of `source ./inst
     
 ## Adding a new modified CLASS <a name="appendix_new_class"></a> 
 
-**Step 1 of 13**: Activate Conda environment, go to the Cocoa main folder and start the private python environment
+**Step :one:**: Activate Conda environment, go to the Cocoa main folder and start the private python environment
 
-    $ conda activate cocoa
-    $(cocoa) cd ./cocoa/Cocoa
-    $(cocoa) source start_cocoa
+    conda activate cocoa
+    cd ./cocoa/Cocoa
+    source start_cocoa
     
-**Step 2 of 13**: Move the Boltzmann code to `$ROOTDIR/external_modules/code/XXX`
+**Step :two:**: Move the Boltzmann code to `$ROOTDIR/external_modules/code/XXX`
 
 `XXX` should be replaced by whatever name the user adopts to their modified CLASS (e.g., CLASSQ). 
 
-**Step 3 of 13**: Modify the file `$ROOTDIR/external_modules/code/XXX/Makefile` 
+**Step :three:**: Modify the file `$ROOTDIR/external_modules/code/XXX/Makefile` 
     
     (...)
     
@@ -185,7 +235,7 @@ PS: you can also use `source compile_external_modules` instead of `source ./inst
     
     (...)
 
-**Step 4 of 13**: Modify the file `$ROOTDIR/external_modules/code/XXX/python/setup.py` 
+**Step :four:**: Modify the file `$ROOTDIR/external_modules/code/XXX/python/setup.py` 
     
     (...)
     
@@ -205,28 +255,29 @@ PS: you can also use `source compile_external_modules` instead of `source ./inst
     
     (...)
 
-**Step 5 of 13**: Move the folder `$ROOTDIR/external_modules/code/XXX/include` to `$ROOTDIR/external_modules/code/XXX/include2`
+**Step :five:**: Move the folder `$ROOTDIR/external_modules/code/XXX/include` to `$ROOTDIR/external_modules/code/XXX/include2`
 
 Cocoa git repository has a restriction on `.gitignore` against adding `include/` folders. So move `/include/` to `/include2`. 
 
-     $(cocoa)(.local) mv `$ROOTDIR/external_modules/code/XXX/include` `$ROOTDIR/external_modules/code/XXX/include2`
+     mv `$ROOTDIR/external_modules/code/XXX/include` `$ROOTDIR/external_modules/code/XXX/include2`
 
-The script `$ROOTDIR/installation_scripts/compile_class` that compiles CLASS knows that the headers should be located on `/include2` as shown below
-
-     (...)
-     [Extracted from installation_scripts/compile_class]
-     #Workaround around Cocoa .gitignore entry on /include
-     rm -rf ./include
-     cp -r ./include2 ./include
-     (...)
-     
-**Step 6 of 13**: Copy `./installation_scripts/compile_class` to `./installation_scripts/compile_XXX` via the command.
-
-    $(cocoa)(.local) cp ./installation_scripts/compile_class ./installation_scripts/compile_XXX
-
-**Step 7 of 13**: Modify `./installation_scripts/compile_XXX`
+This will not break the code. The script `$ROOTDIR/installation_scripts/compile_class` that compiles CLASS knows that the headers should be located on `/include2` as shown below
 
     (...)
+    [Extracted and adapted from $ROOTDIR/installation_scripts/compile_class]
+    #Workaround around Cocoa .gitignore entry on /include
+    rm -rf ./include
+    cp -r ./include2 ./include
+    (...)
+     
+**Step :six:**: Copy `$ROOTDIR/installation_scripts/compile_class` to `$ROOTDIR/installation_scripts/compile_XXX` via the command.
+
+    cp $ROOTDIR/installation_scripts/compile_class $ROOTDIR/installation_scripts/compile_XXX
+
+**Step :seven:**: Modify `$ROOTDIR/installation_scripts/compile_XXX`
+
+    (...)
+    [Extracted from $ROOTDIR/installation_scripts/compile_class]
     
     if [ -z "${IGNORE_CLASS_COMPILATION}" ]; then
         echo 'COMPILING XXX'
@@ -234,46 +285,58 @@ The script `$ROOTDIR/installation_scripts/compile_class` that compiles CLASS kno
         cd $ROOTDIR/external_modules/code/XXX/
         
         (...)
-
-**Step 8 of 13**: Modify [compile_external_modules](https://github.com/CosmoLike/cocoa/blob/main/Cocoa/compile_external_modules)
-
+    
     (...)
     
+**Step :eight:**: Modify [compile_external_modules](https://github.com/CosmoLike/cocoa/blob/main/Cocoa/compile_external_modules)
+
+    (...)
+    [Extracted and adapted from from $ROOTDIR/compile_external_modules]
+     
     source $ROOTDIR/installation_scripts/compile_class
-    
+     
+    # add the line below
     source $ROOTDIR/installation_scripts/compile_XXX
     
     (...)
 
-(**expert**) This step ensures that the command `source compile_external_modules` compiles all modules including the new modified CLASS
+This step ensures that the command `source compile_external_modules` compiles all modules including the new modified CLASS
 
-**Step 9 of 13**: Compile CLASS
+**Step :nine:**: Compile CLASS
 
-    $(cocoa)(.local) source ./installation_scripts/compile_XXX
+    source ./installation_scripts/compile_XXX
 
-**Step 10 of 13**: Copy `./installation_scripts/clean_class` to `./installation_scripts/clean_XXX` via the command.
+**Step :ten:**: Copy `$ROOTDIR/installation_scripts/clean_class` to `$ROOTDIR/installation_scripts/clean_XXX` via the command.
 
-    $(cocoa)(.local) cp ./installation_scripts/clean_class ./installation_scripts/clean_XXX
+    cp $ROOTDIR/installation_scripts/clean_class $ROOTDIR/installation_scripts/clean_XXX
 
-**Step 11 of 13**: Modify `./installation_scripts/clean_XXX`
+**Step :eleven:**: Modify `$ROOTDIR/installation_scripts/clean_XXX`
 
     (...) 
-    
+    [Extracted and adapted from from $ROOTDIR/installation_scripts/clean_class]
+
+    # ---------------------------------------------------------------------------
+    # ---------------------------------------------------------------------------
+    #cd $ROOTDIR/external_modules/code/class_public/
     cd $ROOTDIR/external_modules/code/XXX/
+    # ---------------------------------------------------------------------------
+    # ---------------------------------------------------------------------------
+   
+    (...)
+
+**Step :twelve:**: Modify [clean_all](https://github.com/CosmoLike/cocoa/blob/main/Cocoa/clean_all)
+
+    (...)
+    [Extracted and adapted from from $ROOTDIR/clean_all]
     
-    (...)
-
-**Step 11 of 12**: Modify [clean_all](https://github.com/CosmoLike/cocoa/blob/main/Cocoa/clean_all)
-
-    (...)
-
     source $ROOTDIR/installation_scripts/clean_camb
     
+    # add the line below
     source $ROOTDIR/installation_scripts/clean_XXX
     
     (...)
     
-**Step 12 of 12**: Modify any YAML file that loads the new CLASS, adding the option `path` to the CLASS section
+**Step :thirteen:**: Modify any YAML file that loads the new CLASS, adding the option `path` to the CLASS section
 
     (...)
     
