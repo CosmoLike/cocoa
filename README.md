@@ -97,7 +97,7 @@ The *projects* folder was designed to include Cosmolike projects. We assume that
     cd ./cocoa/Cocoa/projects
     $CONDA_PREFIX/bin/git clone git@github.com:CosmoLike/cocoa_XXX.git XXX
 
-By convention, the Cosmolike Organization hosts a Cobaya-Cosmolike project named XXX at `CosmoLike/cocoa_XXX`. When cloning the repository, the `cocoa_` prefix must be dropped (see above).
+By convention, the Cosmolike Organization hosts a Cobaya-Cosmolike project named XXX at `CosmoLike/cocoa_XXX`. When cloning the repository, the `cocoa_` prefix must be dropped. In the above `git clone` command, we eliminate the `cocoa_` prefix that with the second `XXX` argument.
 
 Example of cosmolike projects: [lsst_y1](https://github.com/CosmoLike/cocoa_lsst_y1).
  
