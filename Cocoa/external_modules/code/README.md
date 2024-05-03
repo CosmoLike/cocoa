@@ -164,11 +164,11 @@ This step ensures that the command `source compile_external_modules` compiles al
 
 PS: you can also use `source compile_external_modules` instead of `source ./installation_scripts/compile_XXX`
 
-**Step :ten:**: Copy the file `$ROOTDIR/installation_scripts/clean_camb` to `$ROOTDIR/installation_scripts/` and rename it to clean_XXX via the command.
+**Step :one:0️⃣**: Copy the file `$ROOTDIR/installation_scripts/clean_camb` to `$ROOTDIR/installation_scripts/` and rename it to clean_XXX via the command.
 
     cp $ROOTDIR/installation_scripts/clean_camb $ROOTDIR/installation_scripts/clean_XXX
 
-**Step :eleven:**: Modify the following lines located in the file `$ROOTDIR/installation_scripts/clean_XXX`
+**Step :one::one:**: Modify the following lines located in the file `$ROOTDIR/installation_scripts/clean_XXX`
 
     (...) 
     [Extracted and adapted from $ROOTDIR/installation_scripts/clean_camb]
@@ -180,7 +180,7 @@ PS: you can also use `source compile_external_modules` instead of `source ./inst
     
     (...)
 
-**Step :twelve:**: Modify the script `clean_all` located at $ROOTDIR (Cocoa main folder)
+**Step :one::two:**: Modify the script `clean_all` located at $ROOTDIR (Cocoa main folder)
 
     (...)
     
@@ -191,7 +191,7 @@ PS: you can also use `source compile_external_modules` instead of `source ./inst
     
     (...)
 
-**Step :thirteen:**: Modify any YAML file that should load the new CAMB, adding the option `path` to the CAMB section
+**Step :one::three:**: Modify any YAML file that should load the new CAMB, adding the option `path` to the CAMB section
 
     (...)
     
@@ -299,11 +299,11 @@ This step ensures that the command `source compile_external_modules` compiles al
 
     source ./installation_scripts/compile_XXX
 
-**Step :ten:**: Copy `$ROOTDIR/installation_scripts/clean_class` to `$ROOTDIR/installation_scripts/clean_XXX` via the command.
+**Step :one::zero:**: Copy `$ROOTDIR/installation_scripts/clean_class` to `$ROOTDIR/installation_scripts/clean_XXX` via the command.
 
     cp $ROOTDIR/installation_scripts/clean_class $ROOTDIR/installation_scripts/clean_XXX
 
-**Step :eleven:**: Modify `$ROOTDIR/installation_scripts/clean_XXX`
+**Step :one::one:**: Modify `$ROOTDIR/installation_scripts/clean_XXX`
 
     (...) 
     [Extracted and adapted from from $ROOTDIR/installation_scripts/clean_class]
@@ -319,7 +319,7 @@ This step ensures that the command `source compile_external_modules` compiles al
    
     (...)
 
-**Step :twelve:**: Modify [clean_all](https://github.com/CosmoLike/cocoa/blob/main/Cocoa/clean_all)
+**Step :one::two:**: Modify [clean_all](https://github.com/CosmoLike/cocoa/blob/main/Cocoa/clean_all)
 
     (...)
     [Extracted and adapted from from $ROOTDIR/clean_all]
@@ -331,7 +331,7 @@ This step ensures that the command `source compile_external_modules` compiles al
     
     (...)
     
-**Step :thirteen:**: Modify any YAML file that loads the new CLASS, adding the option `path` to the CLASS section
+**Step :one::three:**: Modify any YAML file that loads the new CLASS, adding the option `path` to the CLASS section
 
     (...)
     
