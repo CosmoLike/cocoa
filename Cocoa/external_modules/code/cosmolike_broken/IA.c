@@ -199,3 +199,183 @@ double A_IA_Joachimi(const double a)
     return A_red*pow((1. + z)/nuisance.oneplusz0_ia, nuisance.eta_ia);
   }
 }
+
+void IA_A1_Z1Z2(const double a, const double growfac_a, 
+  const int n1, const int n2, double res[2])
+{ 
+  // COCOA (WARNING): THERE IS MINUS SIGN DIFFERENCE COMPARED TO C1_TA 
+  // COCOA (WARNING): IN ORIGINAL COSMOLIKE (SEE: cosmo2D_fullsky_TATT.c)
+
+  if (!(a>0)) 
+  {
+    log_fatal("a>0 not true");
+    exit(1);
+  }
+
+  const double norm = cosmology.Omega_m*nuisance.c1rhocrit_ia/growfac_a;
+  double A_Z1 = 0.0;
+  double A_Z2 = 0.0;
+  
+  const int IA = abs(like.IA);
+
+  switch(IA)
+  {
+    case NO_IA:
+    {
+      A_Z1 = 0.0;
+      A_Z2 = 0.0;
+      break;
+    }
+    case IA_NLA_LF:
+    {
+      A_Z1 = A_IA_Joachimi(a);
+      A_Z2 = A_Z1;
+      break;
+    }
+    case IA_REDSHIFT_BINNING:
+    { 
+      A_Z1 = nuisance.A_z[n1];
+      A_Z2 = nuisance.A_z[n2];
+      break;
+    }
+    case IA_REDSHIFT_EVOLUTION:
+    {
+      const double oneplusz = (1.0/a);
+      const double x = oneplusz/nuisance.oneplusz0_ia;
+      A_Z1 = nuisance.A_ia*pow(x, nuisance.eta_ia);
+      A_Z2 = A_Z1;
+      break;
+    }
+    default:
+    {
+      log_fatal("like.IA = %d not supported", like.IA);
+      exit(1);
+    }
+  }
+  
+  res[0] = A_Z1 * norm;
+  res[1] = A_Z2 * norm;
+
+  return;
+}
+
+double IA_A1_Z1(const double a, const double growfac_a, const int n1)
+{
+  double res[2];
+  IA_A1_Z1Z2(a, growfac_a, n1, n1, res);
+  return res[0];
+}
+
+void IA_A2_Z1Z2(const double a, const double growfac_a, 
+  const int n1, const int n2, double res[2])
+{
+  // COCOA (WARNING): THERE IS factor x5 DIFFERENCE COMPARED TO C2_TT 
+  // COCOA (WARNING): IN ORIGINAL COSMOLIKE (SEE: cosmo2D_fullsky_TATT.c)
+
+  if (!(a>0)) 
+  {
+    log_fatal("a>0 not true");
+    exit(1);
+  }
+
+  const double norm_a2 = 
+    cosmology.Omega_m*nuisance.c1rhocrit_ia/(growfac_a*growfac_a);
+  double A2_Z1 = 0.0;
+  double A2_Z2 = 0.0;
+
+  const int IA = abs(like.IA);
+
+  switch(IA)
+  {
+    case NO_IA:
+    {
+      A2_Z1 = 0.0;
+      A2_Z2 = 0.0;
+      break;
+    }
+    case IA_NLA_LF:
+    {
+      log_fatal("IA_NLA_LF TT not supported");
+      exit(1);      
+    }
+    case IA_REDSHIFT_BINNING:
+    { 
+      A2_Z1 = nuisance.A2_z[n1];
+      A2_Z2 = nuisance.A2_z[n2];
+      break;
+    }
+    default:
+    {
+      const double oneplusz = (1.0/a);
+      const double x = oneplusz/nuisance.oneplusz0_ia;
+      A2_Z1 = nuisance.A2_ia*pow(x, nuisance.eta_ia_tt);
+      A2_Z2 = A2_Z1;
+    } 
+  }
+
+  res[0] = A2_Z1 * norm_a2;
+  res[1] = A2_Z2 * norm_a2;
+
+  return;
+}
+
+double IA_A2_Z1(const double a, const double growfac_a, const int n1)
+{
+  double res[2];
+  IA_A2_Z1Z2(a, growfac_a, n1, n1, res);
+  return res[0];
+}
+
+void IA_BTA_Z1Z2(const double a __attribute__((unused)), 
+  const double growfac_a __attribute__((unused)), 
+  const int n1, const int n2, double res[2])
+{
+  double BTA_Z1 = 0.0;
+  double BTA_Z2 = 0.0;
+
+//  if (!(a>0)) 
+//  {
+//    log_fatal("a>0 not true");
+//    exit(1);
+//  }
+
+  const int IA = abs(like.IA);
+
+  switch(IA)
+  {
+    case NO_IA:
+    {
+      BTA_Z1 = 1.0;
+      BTA_Z2 = 1.0;
+      break;
+    }
+    case IA_NLA_LF:
+    {
+      log_fatal("IA_NLA_LF BTA not supported");
+      exit(1);      
+    }
+    case IA_REDSHIFT_BINNING:
+    {
+      BTA_Z1 = nuisance.b_ta_z[n1];
+      BTA_Z2 = nuisance.b_ta_z[n2];
+      break;
+    }
+    default:
+    {
+      BTA_Z1 = nuisance.b_ta_z[0];
+      BTA_Z2 = BTA_Z1;
+    }
+  }
+
+  res[0] = BTA_Z1;
+  res[1] = BTA_Z2;
+
+  return;
+}
+
+double IA_BTA_Z1(const double a, const double growfac_a, const int n1)
+{
+  double res[2];
+  IA_BTA_Z1Z2(a, growfac_a, n1, n1, res);
+  return res[0];
+}

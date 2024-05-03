@@ -9,6 +9,14 @@ extern "C" {
 #define CHAR_MAX_SIZE 1024
 #define MAX_SIZE_ARRAYS 10
 
+#define NO_IA 0
+#define IA_NLA_LF 1
+#define IA_REDSHIFT_BINNING 2
+#define IA_REDSHIFT_EVOLUTION 3
+
+#define IA_MODEL_NLA 0
+#define IA_MODEL_TATT 1
+
 typedef struct 
 {
   double a_min;
@@ -215,6 +223,9 @@ typedef struct
   double sigma_zphot_clustering[MAX_SIZE_ARRAYS];
   double bias_zphot_clustering[MAX_SIZE_ARRAYS];
   
+  // maglim
+  double zphot_stretch[MAX_SIZE_ARRAYS];
+
   // Variables for the 4x2pt+N (see: 2008.10757 & 2010.01138)
   double cluster_MOR[MAX_SIZE_ARRAYS];
   double cluster_selection[MAX_SIZE_ARRAYS];
@@ -277,6 +288,7 @@ typedef struct
   double lmin_kappacmb;
   double lmax_kappacmb;
   int IA;
+  int IA_MODEL;
   int bias;
   int shear_shear;
   int shear_pos;
@@ -300,7 +312,6 @@ typedef struct
   int high_def_integration;
   int adopt_limber_gg;
   int adopt_limber_gammat;
-  int use_ggl_efficiency_zoverlap;
 } likepara;
 
 typedef double (*B1_model)(double z, int nz);
