@@ -206,9 +206,12 @@ int test_zoverlap(int ni, int nj) // test whether source bin nj is behind lens b
     exit(1);
   }
 
-  if (like.use_ggl_efficiency_zoverlap == 1)
+  const int lphotoz = redshift.clustering_photoz;
+  const int sphotoz = redshift.shear_photoz;
+
+  if (sphotoz < 4 || sphotoz == 5 || sphotoz == 6) 
   {
-    if (ggl_efficiency(ni, nj) > survey.ggl_overlap_cut) 
+    if (tomo.clustering_zmax[ni] <= tomo.shear_zmin[nj])
     {
       return 1;
     }
@@ -216,59 +219,42 @@ int test_zoverlap(int ni, int nj) // test whether source bin nj is behind lens b
     {
       return 0;
     }
+  }
+  
+  if (sphotoz == 7) 
+  {
+    if (tomo.shear_zmax[nj] >= tomo.clustering_zmin[ni])
+    {
+      return 1;
+    }
+    else
+    {
+      return 0;
+    }
+  }
+
+  const double zmeanlens = zmean(ni);
+  const double zmeansource = zmean_source(nj);
+
+  if (sphotoz == 4 && lphotoz != 4 && tomo.clustering_zmax[ni] < zmeansource) 
+  {
+    return 1;
   }
   else
   {
-    const int lphotoz = redshift.clustering_photoz;
-    const int sphotoz = redshift.shear_photoz;
-
-    if (sphotoz < 4 || sphotoz == 5 || sphotoz == 6) 
-    {
-      if (tomo.clustering_zmax[ni] <= tomo.shear_zmin[nj])
-      {
-        return 1;
-      }
-      else
-      {
-        return 0;
-      }
-    }
-    
-    if (sphotoz == 7) 
-    {
-      if (tomo.shear_zmax[nj] >= tomo.clustering_zmin[ni])
-      {
-        return 1;
-      }
-      else
-      {
-        return 0;
-      }
-    }
-
-    const double zmeanlens = zmean(ni);
-    const double zmeansource = zmean_source(nj);
-
-    if (sphotoz == 4 && lphotoz != 4 && tomo.clustering_zmax[ni] < zmeansource) 
-    {
-      return 1;
-    }
-    else
-    {
-      return 0;
-    }
-    
-    if (sphotoz == 4 && lphotoz == 4 && zmeanlens + 0.1 < zmeansource) 
-    {
-      return 1;
-    }
-    else
-    {
-      return 0;
-    }
-
     return 0;
   }
+  
+  if (sphotoz == 4 && lphotoz == 4 && zmeanlens + 0.1 < zmeansource) 
+  {
+    return 1;
+  }
+  else
+  {
+    return 0;
+  }
+
+  return 0;
 }
 
 int ZL(int ni) 
@@ -4004,102 +3990,4 @@ double g_lens_cluster(const double a, const int nz, const int nl)
     exit(1);
   }
   return interpol(table[nz + 1], na, amin, amax, da, a, 1.0, 1.0); 
-}
-
-// ---------------------------------------------------------------------------------------
-// ---------------------------------------------------------------------------------------
-// ---------------------------------------------------------------------------------------
-// routines for association of a pair redshift bin numbers and power spectrum tomography bin
-// ---------------------------------------------------------------------------------------
-// ---------------------------------------------------------------------------------------
-// ---------------------------------------------------------------------------------------
-
-double int_for_ggl_efficiency(double z, void* params) 
-{
-  if (!(fabs(z) > 0)) 
-  {
-    log_fatal("z = 0 with 1/z needed");
-    exit(1);
-  }
-  
-  double* ar = (double*) params;
-  const int ni = (int) ar[0];
-  const int nj = (int) ar[1];
-  if (ni < -1 || ni > tomo.clustering_Nbin - 1 || nj < -1 || nj > tomo.shear_Nbin - 1)
-  {
-    log_fatal("invalid bin input (ni, nj) = (%d, %d)", ni, nj);
-    exit(1);
-  }
-
-  const double a = 1. / (1. + z);
-  return pf_photoz(z, ni)*g_tomo(a, nj) * (1.0 + z)*f_K(chi(a));
-}
-
-double ggl_efficiency(int ni, int nj) 
-{
-  static double** table = 0;
-  static gsl_integration_glfixed_table* w = 0;
-
-  if (table == 0) 
-  {
-    #pragma GCC diagnostic push
-    #pragma GCC diagnostic ignored "-Wunused-variable"
-    #pragma GCC diagnostic push
-    #pragma GCC diagnostic ignored "-Wunused-but-set-variable"
-    {
-      double init  = pf_photoz(0, 0);
-      double init2 = zdistr_photoz(0, 0);
-    }
-    #pragma GCC diagnostic pop
-    #pragma GCC diagnostic pop
-    
-    table = (double**) malloc(sizeof(double*)*(tomo.clustering_Nbin+1));
-    for (int i=0; i<(tomo.clustering_Nbin+1); i++)
-    {
-      table[i] = (double*) malloc(sizeof(double)*(tomo.shear_Nbin+1));
-    }
-
-    const size_t nsize_integration = 250 + 50 * (like.high_def_integration);
-    w = gsl_integration_glfixed_table_alloc(nsize_integration);
-
-    {
-      const int i = 0;
-      const int j = 0;
-      double ar[2];
-      ar[0] = (double) i;
-      ar[1] = (double) j;
-      #pragma GCC diagnostic push
-      #pragma GCC diagnostic ignored "-Wunused-variable"
-      #pragma GCC diagnostic ignored "-Wunused-but-set-variable"
-      double init = int_for_ggl_efficiency(tomo.clustering_zmin[i], (void*) ar);
-      init = max_g_tomo(j);
-      #pragma GCC diagnostic pop
-      #pragma GCC diagnostic pop
-    }
-
-    #pragma omp parallel for collapse (2)
-    for (int i=0; i<tomo.clustering_Nbin; i++) 
-    {
-      for (int j=0; j<tomo.shear_Nbin; j++) 
-      {
-        double ar[2];
-        ar[0] = (double) i;
-        ar[1] = (double) j;
-    
-        gsl_function F;
-        F.params   = ar;
-        F.function = int_for_ggl_efficiency;
-
-        table[i][j] = gsl_integration_glfixed(&F, tomo.clustering_zmin[i], 
-          tomo.clustering_zmax[i], w)/max_g_tomo(j);
-      }
-    }
-  }
-
-  if(ni < 0 || ni > tomo.clustering_Nbin - 1 || nj < 0 || nj > tomo.shear_Nbin - 1)
-  {
-    log_fatal("invalid bin input (ni, nj) = (%d, %d)", ni, nj);
-    exit(1);
-  }  
-  return table[ni][nj];
 }
