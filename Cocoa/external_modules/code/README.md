@@ -85,11 +85,11 @@ These modifications will force CAMB to adopt the conda gfortran compiler.
     (...)
     [Extracted and adapted from $ROOTDIR/external_modules/code/CAMB/forutils/Makefile_compiler]
     
-    #ifneq ($(COMPILER),gfortran)                                 # Original line - commented
-    #  ifortErr = $(shell which ifort >/dev/null 2>&1; echo $$?)  # Original line - commented
-    #else                                                         # Original line - commented
-    #  ifortErr = 1                                               # Original line - commented
-    #endif                                                        # Original line - commented
+    #ifneq ($(COMPILER),gfortran)                                     # Original line - commented
+    #  ifortErr = $(shell which ifort >/dev/null 2>&1; echo $$?)      # Original line - commented
+    #else                                                             # Original line - commented
+    #  ifortErr = 1                                                   # Original line - commented
+    #endif                                                            # Original line - commented
     
     # add the line below
     ifortErr = 1
@@ -216,42 +216,35 @@ PS: you can also use `source compile_external_modules` instead of `source ./inst
 **Step :three:**: Modify the file `$ROOTDIR/external_modules/code/XXX/Makefile` 
     
     (...)
-    
+    [Extracted and adapted from $ROOTDIR/external_modules/code/class_public/]
+     
     # your C compiler:
+    #CC       = gcc                           # Original line - commented
+    #CC       = icc                           # Original line - commented
+    #CC       = pgcc                          # Original line - commented   
+    
+    # add the line below
     CC       ?= $(C_COMPILER) 
-    #CC       = icc
-    #CC       = pgcc
-    
-    (...)
-    
-    classy: libclass.a python/classy.pyx python/cclassy.pxd
-    #ifdef OMPFLAG
-    #cp python/setup.py python/autosetup.py
-    #else
-    #grep -v "lgomp" python/setup.py > python/autosetup.py
-    #endif
-    #cd python; export CC=$(CC); $(PYTHON) autosetup.py install || $(PYTHON) autosetup.py install --user
-    #rm python/autosetup.py
-    
-    (...)
-
+   
 **Step :four:**: Modify the file `$ROOTDIR/external_modules/code/XXX/python/setup.py` 
     
     (...)
+    [Extracted and adapted from $ROOTDIR/external_modules/code/class_public//python/setup.py]
     
-    #GCCPATH_STRING = sbp.Popen(
-    #    ['gcc -print-libgcc-file-name'],
-    #    stdout=sbp.PIPE, shell=True).communicate()[0]
+    #GCCPATH_STRING = sbp.Popen(                                     # Original line - commented
+    #    ['gcc -print-libgcc-file-name'],                            # Original line - commented
+    #    stdout=sbp.PIPE, shell=True).communicate()[0]               # Original line - commented
+    
+    # add the line below
     GCCPATH_STRING = sbp.check_output(["$C_COMPILER -print-libgcc-file-name"], shell=True)
-    GCCPATH = osp.normpath(osp.dirname(GCCPATH_STRING)).decode()
     
     (...)
     
-    #MVEC_STRING = sbp.Popen(
-    #    ['gcc', '-lmvec'],
-    #    stderr=sbp.PIPE).communicate()[1]
-    #if b"mvec" not in MVEC_STRING:
-    #    liblist += ["mvec","m"]
+    #MVEC_STRING = sbp.Popen(                                        # Original line - commented
+    #    ['gcc', '-lmvec'],                                          # Original line - commented
+    #    stderr=sbp.PIPE).communicate()[1]                           # Original line - commented
+    #if b"mvec" not in MVEC_STRING:                                  # Original line - commented
+    #    liblist += ["mvec","m"]                                     # Original line - commented
     
     (...)
 
@@ -317,7 +310,9 @@ This step ensures that the command `source compile_external_modules` compiles al
 
     # ---------------------------------------------------------------------------
     # ---------------------------------------------------------------------------
-    #cd $ROOTDIR/external_modules/code/class_public/
+    #cd $ROOTDIR/external_modules/code/class_public/                # Original line - commented
+    
+    # add the line below
     cd $ROOTDIR/external_modules/code/XXX/
     # ---------------------------------------------------------------------------
     # ---------------------------------------------------------------------------
