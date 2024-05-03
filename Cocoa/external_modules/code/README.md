@@ -14,7 +14,7 @@ Installing a new CAMB code in Cocoa requires a few changes to the existing code 
     
 **Step :two:**: Move (or clone) the modified CAMB code to the folder `$ROOTDIR/external_modules/code/XXX`. The string `XXX` should be replaced by the new code's adopted name (e.g., CAMBQ). 
 
-If the user does not want this modified CAMB to be added to the Cocoa repo, then add its path to the `.gitignore` file located in the `/cocoa/Cocoa` main folder.
+If the user does not want this modified CAMB to be added to the Cocoa repo, then add its path to the `.gitignore` file located in the Cocoa main folder.
     
 **Step :three:**: Modify the `get_gfortran_version` Python function located in the file `$ROOTDIR/external_modules/code/XXX/camb/_compilers.py`. Here, `$ROOTDIR` is the absolute path of the main `cocoa/Cocoa/` folder.
     
