@@ -120,6 +120,30 @@ static int has_b2_galaxies()
   return res;
 }
 
+int number_ell_fourier_2pt()
+{
+  int res = 0;
+  switch(like.IA_MODEL)
+  {
+    case IA_MODEL_TATT:
+    { 
+      res = Ntable.N_ell_TATT;
+      break;
+    }
+    case IA_MODEL_NLA:
+    {
+      res = Ntable.N_ell;
+      break;
+    }
+    default:
+    {
+      log_fatal("like.IA_MODEL = %d not supported", like.IA_MODEL);
+      exit(1);
+    }
+  }
+  return res;
+}
+
 // ----------------------------------------------------------------------------
 // ----------------------------------------------------------------------------
 // ----------------------------------------------------------------------------
@@ -286,156 +310,192 @@ double xi_pm_tomo(const int pm, const int nt, const int ni, const int nj, const 
   {
     if (limber == 1)
     {
-      if (like.IA == 5 || like.IA == 6)
-      { // NEW TATT MODELING
-        const int len = sizeof(double*)*NSIZE + sizeof(double)*NSIZE*nell;
-        double** Cl_EE = (double**) malloc(len);
-        if (Cl_EE == NULL)
-        {
-          log_fatal("array allocation failed");
-          exit(1);
-        }
-        double** Cl_BB = (double**) malloc(len);
-        if (Cl_BB == NULL)
-        {
-          log_fatal("array allocation failed");
-          exit(1);
-        }
-        for (int i=0; i<NSIZE; i++)
-        {
-          Cl_EE[i]  = ((double*)(Cl_EE + NSIZE) + nell*i);
-          Cl_BB[i]  = ((double*)(Cl_BB + NSIZE) + nell*i);
-          for (int l=0; l<2; l++)
-          {
-            Cl_EE[i][l] = 0.0;
-            Cl_BB[i][l] = 0.0;
-          }
-        }
-
-        #pragma GCC diagnostic push
-        #pragma GCC diagnostic ignored "-Wunused-variable"
-        #pragma GCC diagnostic push
-        #pragma GCC diagnostic ignored "-Wunused-but-set-variable"
-        { // init the functions C_ss_tomo_TATT_EE/BB_limber
-          // only compute BB if the TATT parameters allow for B-mode terms
-          const int nz = 0;
-          const int Z1NZ = Z1(nz);
-          const int Z2NZ = Z2(nz);
-
-          const int BM = (nuisance.b_ta_z[0] || nuisance.b_ta_z[Z1NZ] ||
-                          nuisance.b_ta_z[Z2NZ] || nuisance.A2_ia ||
-                          nuisance.A2_z[Z1NZ] || nuisance.A2_z[Z2NZ]) ? 1 : 0;
-          double x = C_ss_tomo_TATT_EE_limber(limits.LMIN_tab + 1, Z1(0), Z2(0), 0); 
-          x = (BM == 1) ? C_ss_tomo_TATT_BB_limber(limits.LMIN_tab + 1, Z1(0), Z2(0), 0) : 0.0;
-        }
-        #pragma GCC diagnostic pop
-        #pragma GCC diagnostic pop
-        
-        #pragma omp parallel for collapse(2)
-        for (int nz=0; nz<NSIZE; nz++) 
-        {
-          for (int l=2; l<nell; l++)
-          {
-            const int Z1NZ = Z1(nz);
-            const int Z2NZ = Z2(nz);
-          
-            // only compute BB if the TATT parameters allow for B-mode terms
-            const int BM = (nuisance.b_ta_z[0] || nuisance.b_ta_z[Z1NZ] ||
-                          nuisance.b_ta_z[Z2NZ] || nuisance.A2_ia ||
-                          nuisance.A2_z[Z1NZ] || nuisance.A2_z[Z2NZ]) ? 1 : 0;
-
-            Cl_EE[nz][l] = (l > limits.LMIN_tab) ?
-              C_ss_tomo_TATT_EE_limber((double) l, Z1NZ, Z2NZ, 1) :
-              C_ss_tomo_TATT_EE_limber_nointerp((double) l, Z1NZ, Z2NZ, 0);
-        
-            Cl_BB[nz][l] = (BM == 1) ? (l > limits.LMIN_tab) ? 
-              C_ss_tomo_TATT_BB_limber((double) l, Z1NZ, Z2NZ, 1) :
-              C_ss_tomo_TATT_BB_limber_nointerp((double) l, Z1NZ, Z2NZ, 0) : 0.0;
-          }
-        }
-
-        #pragma omp parallel for collapse(2)
-        for (int nz=0; nz<NSIZE; nz++)
-        {
-          for (int i=0; i<ntheta; i++)
-          {
-            const int q = nz*ntheta + i;
-            xi_vec_plus[q] = 0;
-            xi_vec_minus[q] = 0;
-            for (int l=2; l<nell; l++)
-            {
-              xi_vec_plus[q] += Glplus[i][l] * (Cl_EE[nz][l] + Cl_BB[nz][l]);
-              xi_vec_minus[q] += Glminus[i][l] * (Cl_EE[nz][l] - Cl_BB[nz][l]);
-            }
-          }
-        }
-
-        free(Cl_EE);
-        free(Cl_BB);
-      }
-      else
+      switch(like.IA_MODEL)
       {
-        const int len = sizeof(double*)*NSIZE + sizeof(double)*NSIZE*nell;
-        double** Cl = (double**) malloc(len);
-        if (Cl == NULL)
-        {
-          log_fatal("array allocation failed");
-          exit(1);
-        }
-        for (int i=0; i<NSIZE; i++)
-        {
-          Cl[i]  = ((double*)(Cl + NSIZE) + nell*i);
-          for (int l=0; l<2; l++)
+        case IA_MODEL_TATT:
+        { // TATT MODELING
+          const int len = sizeof(double*)*NSIZE + sizeof(double)*NSIZE*nell;
+          double** Cl_EE = (double**) malloc(len);
+          if (Cl_EE == NULL)
           {
-            Cl[i][l] = 0.0;
+            log_fatal("array allocation failed");
+            exit(1);
           }
-        }
-
-        #pragma GCC diagnostic push
-        #pragma GCC diagnostic ignored "-Wunused-variable"
-        {
-          double init_static_vars_only = C_ss_tomo_limber(limits.LMIN_tab, Z1(0), Z2(0), 0); 
-        }
-        #pragma GCC diagnostic pop
-        
-        #pragma omp parallel for collapse(2)
-        for (int nz=0; nz<NSIZE; nz++)
-        {
-          for (int l=2; l<limits.LMIN_tab; l++)
+          double** Cl_BB = (double**) malloc(len);
+          if (Cl_BB == NULL)
           {
-            const int Z1NZ = Z1(nz);
-            const int Z2NZ = Z2(nz);
-            Cl[nz][l] = C_ss_tomo_limber_nointerp((double) l, Z1NZ, Z2NZ, use_linear_ps_limber, 0);
+            log_fatal("array allocation failed");
+            exit(1);
           }
-        }
-        #pragma omp parallel for collapse(2)
-        for (int nz=0; nz<NSIZE; nz++)
-        {
-          for (int l=limits.LMIN_tab; l<nell; l++)
+          for (int i=0; i<NSIZE; i++)
           {
-            const int Z1NZ = Z1(nz);
-            const int Z2NZ = Z2(nz);
-            Cl[nz][l] = C_ss_tomo_limber((double) l, Z1NZ, Z2NZ, 1);
-          }
-        }
-
-        #pragma omp parallel for collapse(2)
-        for (int nz=0; nz<NSIZE; nz++)
-        {
-          for (int i=0; i<ntheta; i++)
-          {
-            const int q = nz*ntheta + i;
-            xi_vec_plus[q] = 0;
-            xi_vec_minus[q] = 0;
-            for (int l=2; l<nell; l++)
+            Cl_EE[i]  = ((double*)(Cl_EE + NSIZE) + nell*i);
+            Cl_BB[i]  = ((double*)(Cl_BB + NSIZE) + nell*i);
+            for (int l=0; l<2; l++)
             {
-              xi_vec_plus[q] += Glplus[i][l]*Cl[nz][l];
-              xi_vec_minus[q] += Glminus[i][l]*Cl[nz][l];
+              Cl_EE[i][l] = 0.0;
+              Cl_BB[i][l] = 0.0;
             }
           }
-        }
 
-        free(Cl);
+          #pragma GCC diagnostic push
+          #pragma GCC diagnostic ignored "-Wunused-variable"
+          #pragma GCC diagnostic push
+          #pragma GCC diagnostic ignored "-Wunused-but-set-variable"
+          { // init static variables inside the C_XY_limber function
+            const int force_no_recompute = 0; // FALSE
+            const int Z1NZ = Z1(0);
+            const int Z2NZ = Z2(0);
+
+            const int BM = (nuisance.b_ta_z[0]    || nuisance.b_ta_z[Z1NZ] ||
+                            nuisance.b_ta_z[Z2NZ] || nuisance.A2_ia        ||
+                            nuisance.A2_z[Z1NZ]   || nuisance.A2_z[Z2NZ]) ? 1 : 0;
+            const int l = limits.LMIN_tab + 1;
+
+            double trash = C_ss_tomo_TATT_EE_limber((double) l, Z1NZ, Z2NZ, force_no_recompute); 
+            trash = (BM == 1) ? C_ss_tomo_TATT_BB_limber((double) l, Z1NZ, Z2NZ, 0) : 0.0;
+          }
+          #pragma GCC diagnostic pop
+          #pragma GCC diagnostic pop
+
+          #pragma omp parallel for collapse(2)
+          for (int nz=0; nz<NSIZE; nz++) 
+          {
+            for (int l=2; l<limits.LMIN_tab; l++)
+            {
+              const int init_static_vars_only = 0; // FALSE
+              const int Z1NZ = Z1(nz);
+              const int Z2NZ = Z2(nz);
+
+              const int BM = (nuisance.b_ta_z[0]    || nuisance.b_ta_z[Z1NZ] ||
+                              nuisance.b_ta_z[Z2NZ] || nuisance.A2_ia        ||
+                              nuisance.A2_z[Z1NZ]   || nuisance.A2_z[Z2NZ]) ? 1 : 0;
+
+              Cl_EE[nz][l] = C_ss_tomo_TATT_EE_limber_nointerp(
+                (double) l, Z1NZ, Z2NZ, init_static_vars_only);
+          
+              Cl_BB[nz][l] = (BM == 1) ? C_ss_tomo_TATT_BB_limber_nointerp(
+                (double) l, Z1NZ, Z2NZ, init_static_vars_only) : 0.0;
+            }
+          }          
+          #pragma omp parallel for collapse(2)
+          for (int nz=0; nz<NSIZE; nz++) 
+          {
+            for (int l=limits.LMIN_tab; l<nell; l++)
+            {
+              const int force_no_recompute = 1;    // TRUE
+              const int Z1NZ = Z1(nz);
+              const int Z2NZ = Z2(nz);
+
+              const int BM = (nuisance.b_ta_z[0]    || nuisance.b_ta_z[Z1NZ] ||
+                              nuisance.b_ta_z[Z2NZ] || nuisance.A2_ia        ||
+                              nuisance.A2_z[Z1NZ]   || nuisance.A2_z[Z2NZ]) ? 1 : 0;
+
+              Cl_EE[nz][l] = C_ss_tomo_TATT_EE_limber((double) l, Z1NZ, Z2NZ, force_no_recompute);
+          
+              Cl_BB[nz][l] = (BM == 1) ? 
+                C_ss_tomo_TATT_BB_limber((double) l, Z1NZ, Z2NZ, force_no_recompute) : 0.0;
+            }
+          }
+
+          #pragma omp parallel for collapse(2)
+          for (int nz=0; nz<NSIZE; nz++)
+          {
+            for (int i=0; i<ntheta; i++)
+            {
+              const int q = nz*ntheta + i;
+              xi_vec_plus[q]  = 0;
+              xi_vec_minus[q] = 0;
+              for (int l=2; l<nell; l++)
+              {
+                xi_vec_plus[q]  += Glplus[i][l] * (Cl_EE[nz][l] + Cl_BB[nz][l]);
+                xi_vec_minus[q] += Glminus[i][l] * (Cl_EE[nz][l] - Cl_BB[nz][l]);
+              }
+            }
+          }
+
+          free(Cl_EE);
+          free(Cl_BB);
+          break;
+        }
+        case IA_MODEL_NLA:
+        { // OLD NLA INTERFACE (SIMPLER TO MOD IN EXTENSIONS TO WCDM)
+          const int len = sizeof(double*)*NSIZE + sizeof(double)*NSIZE*nell;
+          double** Cl = (double**) malloc(len);
+          if (Cl == NULL)
+          {
+            log_fatal("array allocation failed");
+            exit(1);
+          }
+          for (int i=0; i<NSIZE; i++)
+          {
+            Cl[i]  = ((double*)(Cl + NSIZE) + nell*i);
+            for (int l=0; l<2; l++)
+            {
+              Cl[i][l] = 0.0;
+            }
+          }
+
+          #pragma GCC diagnostic push
+          #pragma GCC diagnostic ignored "-Wunused-variable"
+          { // init static variables inside the C_XY_limber function
+            const int force_no_recompute = 0; // FALSE
+            const int Z1NZ = Z1(0);
+            const int Z2NZ = Z2(0);
+            const int l = limits.LMIN_tab + 1;
+            double trash = C_ss_tomo_limber((double) l, Z1NZ, Z2NZ, force_no_recompute); 
+          }
+          #pragma GCC diagnostic pop
+          
+          #pragma omp parallel for collapse(2)
+          for (int nz=0; nz<NSIZE; nz++)
+          {
+            for (int l=2; l<limits.LMIN_tab; l++)
+            {
+              const int init_static_vars_only = 0; // FALSE
+              const int Z1NZ = Z1(nz);
+              const int Z2NZ = Z2(nz);
+              
+              Cl[nz][l] = C_ss_tomo_limber_nointerp((double) l, Z1NZ, Z2NZ, 
+                use_linear_ps_limber, init_static_vars_only);
+            }
+          }
+          #pragma omp parallel for collapse(2)
+          for (int nz=0; nz<NSIZE; nz++)
+          {
+            for (int l=limits.LMIN_tab; l<nell; l++)
+            {
+              const int force_no_recompute = 1;    // TRUE
+              const int Z1NZ = Z1(nz);
+              const int Z2NZ = Z2(nz);
+              Cl[nz][l] = C_ss_tomo_limber((double) l, Z1NZ, Z2NZ, force_no_recompute);
+            }
+          }
+
+          #pragma omp parallel for collapse(2)
+          for (int nz=0; nz<NSIZE; nz++)
+          {
+            for (int i=0; i<ntheta; i++)
+            {
+              const int q = nz*ntheta + i;
+              xi_vec_plus[q] = 0;
+              xi_vec_minus[q] = 0;
+              for (int l=2; l<nell; l++)
+              {
+                xi_vec_plus[q]  += Glplus[i][l]*Cl[nz][l];
+                xi_vec_minus[q] += Glminus[i][l]*Cl[nz][l];
+              }
+            }
+          }
+
+          free(Cl);
+          break;
+        }
+        default:
+        {
+          log_fatal("like.IA_MODEL = %d not supported", like.IA_MODEL);
+          exit(1);
+        }
       }
     }
     else
@@ -600,8 +660,13 @@ double w_gammat_tomo(const int nt, const int ni, const int nj, const int limber)
 
     #pragma GCC diagnostic push
     #pragma GCC diagnostic ignored "-Wunused-variable"
-    {
-      double init_static_vars_only = C_gs_tomo_limber(limits.LMIN_tab, ZL(0), ZS(0), 0);
+    { // init static variables inside the C_XY_limber function
+      const int force_no_recompute = 0;    // FALSE
+      const int nz = 0;
+      const int ZLNZ = ZL(nz);
+      const int ZSNZ = ZS(nz);
+      const int l = limits.LMIN_tab + 1;
+      double trash = C_gs_tomo_limber((double) l, ZLNZ, ZSNZ, force_no_recompute);
     }
     #pragma GCC diagnostic pop
 
@@ -612,9 +677,12 @@ double w_gammat_tomo(const int nt, const int ni, const int nj, const int limber)
       {
         for (int l=2; l<limits.LMIN_tab; l++)
         {
+          const int init_static_vars_only = 0; // FALSE
           const int ZLNZ = ZL(nz);
           const int ZSNZ = ZS(nz);
-          Cl[nz][l] = C_gs_tomo_limber_nointerp((double) l, ZLNZ, ZSNZ, use_linear_ps_limber, 0);
+          
+          Cl[nz][l] = C_gs_tomo_limber_nointerp((double) l, ZLNZ, ZSNZ, 
+            use_linear_ps_limber, init_static_vars_only);
         }
       }
       #pragma omp parallel for collapse(2)
@@ -622,15 +690,16 @@ double w_gammat_tomo(const int nt, const int ni, const int nj, const int limber)
       {
         for (int l=limits.LMIN_tab; l<nell; l++)
         {
+          const int force_no_recompute = 1;    // TRUE
           const int ZLNZ = ZL(nz);
           const int ZSNZ = ZS(nz);
-          Cl[nz][l] = C_gs_tomo_limber((double) l, ZLNZ, ZSNZ, 1);
+          Cl[nz][l] = C_gs_tomo_limber((double) l, ZLNZ, ZSNZ, force_no_recompute);
         }
       }
     }
     else
     {
-      for (int nz=0; nz<NSIZE; nz++) // NONLIMBER PART
+      for (int nz=0; nz<NSIZE; nz++) // NONLIMBER
       { 
         const int L = 1;
         const double tolerance = 0.0075;    // required fractional accuracy in C(l)
@@ -645,9 +714,11 @@ double w_gammat_tomo(const int nt, const int ni, const int nj, const int limber)
       {
         for (int l=limits.LMAX_NOLIMBER+1; l<nell; l++)
         {
+          const int force_no_recompute = 1;    // TRUE
           const int ZLNZ = ZL(nz);
           const int ZSNZ = ZS(nz);
-          Cl[nz][l] = C_gs_tomo_limber((double) l, ZLNZ, ZSNZ, 1);
+
+          Cl[nz][l] = C_gs_tomo_limber((double) l, ZLNZ, ZSNZ, force_no_recompute);
         }
       }
     }
@@ -1332,44 +1403,19 @@ double w_ks_tomo(const int nt, const int ni, const int limber)
 // SS ANGULAR CORRELATION FUNCTION - TATT
 // -----------------------------------------------------------------------------
 
-// NLA/TA amplitude C1, nz argument only need if per-bin amplitude
-double C1_TA(double a, double nz, double growfac_a)
+double C1_TA(const double a, const double growfac_a, const int nz)
 {
-  // per-bin IA parameters
-  if (like.IA == 3 || like.IA == 5)
-  {
-    return -nuisance.A_z[(int)nz]*cosmology.Omega_m*nuisance.c1rhocrit_ia/ growfac_a;
-  }
-  // power law evolution
-  return -cosmology.Omega_m * nuisance.c1rhocrit_ia /
-         growfac_a * nuisance.A_ia *
-         pow(1. / (a * nuisance.oneplusz0_ia), nuisance.eta_ia);
+  return -1.0 * IA_A1_Z1(a, growfac_a, nz);
 }
 
-// TA source bias parameter, nz argument only need if per-bin amplitude
-double b_TA(double a __attribute__((unused)), double nz)
+double C2_TT(const double a, const double growfac_a, const int nz)
 {
-  // per-bin IA parameters
-  if (like.IA == 5) {
-    return nuisance.b_ta_z[(int)nz];
-  }
-  // power law evolution
-  return nuisance.b_ta_z[0];
+  return 5.0 * IA_A2_Z1(a, growfac_a, nz);
 }
 
-// TT amplitude C2, nz argument only need if per-bin amplitude
-double C2_TT(double a, double nz, double growfac_a)
+double b_TA(const double a, const double growfac_a, const int nz)
 {
-  // per-bin IA parameters
-  if (like.IA == 5)
-  {
-    return 5. * nuisance.A2_z[(int)nz] * cosmology.Omega_m *
-           nuisance.c1rhocrit_ia * pow(1.0/growfac_a, 2.0);
-  }
-  // power law evolution
-  return 5. * nuisance.A2_ia * cosmology.Omega_m * nuisance.c1rhocrit_ia *
-         (1.0 /(growfac_a*growfac_a)) *
-         pow(1. / (a * nuisance.oneplusz0_ia), nuisance.eta_ia_tt);
+  return IA_BTA_Z1(a, growfac_a, nz);
 }
 
 double int_for_C_ss_tomo_TATT_EE_limber(double a, void* params)
@@ -1401,19 +1447,23 @@ double int_for_C_ss_tomo_TATT_EE_limber(double a, void* params)
   const double wk1 = W_kappa(a, fK, n1); // radial lens efficiency for first source bin
   const double wk2 = W_kappa(a, fK, n2); // radial lens efficiency for second source bin
 
-  const double C1 = C1_TA(a, n1, growfac_a);   // IA parameters for first source bin
-  const double b_ta = b_TA(a, n1);             // IA parameters for first source bin
-  const double C2 = C2_TT(a, n1, growfac_a);   // IA parameters for first source bin
+  const double C1_1   = C1_TA(a, growfac_a, n1);  // IA params for 1st source bin
+  const double b_ta_1 = b_TA(a, growfac_a, n1);   // IA params for 1st source bin
+  const double C2_1   = C2_TT(a, growfac_a, n1);  // IA params for 1st source bin
 
-  const double C1_2 = C1_TA(a, n2, growfac_a);  // IA parameters for second source bin
-  const double b_ta_2 = b_TA(a, n2);            // IA parameters for second source bin
-  const double C2_2 = C2_TT(a, n2, growfac_a);  // IA parameters for second source bin
+  const double C1_2   = C1_TA(a, growfac_a, n2);  // IA params for 2nd source bin
+  const double b_ta_2 = b_TA(a, growfac_a, n2);   // IA params for 2nd source bin
+  const double C2_2   = C2_TT(a, growfac_a, n2);  // IA params for 2nd source bin
   
-  const double tmp1 = TATT_II_EE(k, a, C1, C2, b_ta, C1_2, C2_2, b_ta_2, growfac_a, PK);
-  const double tmp2 = TATT_GI_E(k, a, C1, C2, b_ta, growfac_a, PK);
+  const double tmp1 = TATT_II_EE(k, a, C1_1, C2_1, b_ta_1, C1_2, C2_2, b_ta_2, growfac_a, PK);
+  const double tmp2 = TATT_GI_E(k, a, C1_1, C2_1, b_ta_1, growfac_a, PK);
   const double tmp3 = TATT_GI_E(k, a, C1_2, C2_2, b_ta_2, growfac_a, PK);
   
-  const double res = wk1 * wk2 * PK + ws1 * ws2 * tmp1 + ws1 * wk2 * tmp2 + ws2 * wk1 * tmp3;
+  const double res = wk1 * wk2 * PK   + 
+                     ws1 * ws2 * tmp1 + 
+                     ws1 * wk2 * tmp2 + 
+                     ws2 * wk1 * tmp3;
+
   return res * chidchi.dchida / (fK * fK);
 }
 
@@ -1440,15 +1490,15 @@ double int_for_C_ss_tomo_TATT_BB_limber(double a, void* params)
   const double fK = f_K(chidchi.chi);
   const double k = ell / fK;
 
-  const double ws_1 = W_source(a, n1, hoverh0);  // radial n_z weight for first source bin 
-  const double C1_1 = C1_TA(a, n1, growfac_a);   // IA parameters for first source bin
-  const double b_ta_1 = b_TA(a, n1);             // IA parameters for first source bin
-  const double C2_1 = C2_TT(a, n1, growfac_a);   // IA parameters for first source bin
+  const double ws_1 = W_source(a, n1, hoverh0);   // radial n_z weight for first source bin 
+  const double C1_1   = C1_TA(a, growfac_a, n1);  // IA params for 1st source bin
+  const double b_ta_1 = b_TA(a, growfac_a, n1);   // IA params for 1st source bin
+  const double C2_1   = C2_TT(a, growfac_a, n1);  // IA params for 1st source bin
 
-  const double ws_2 = W_source(a, n2, hoverh0); // radial n_z weight for second source bin
-  const double C1_2 = C1_TA(a, n2, growfac_a);  // IA parameters for second source bin
-  const double b_ta_2 = b_TA(a, n2);            // IA parameters for second source bin
-  const double C2_2 = C2_TT(a, n2, growfac_a);  // IA parameters for second source bin
+  const double ws_2 = W_source(a, n2, hoverh0);   // radial n_z weight for second source bin
+  const double C1_2   = C1_TA(a, growfac_a, n2);  // IA params for 2nd source bin
+  const double b_ta_2 = b_TA(a, growfac_a, n2);   // IA params for 2nd source bin
+  const double C2_2   = C2_TT(a, growfac_a, n2);  // IA params for 2nd source bin
 
   const double tmp1 = TATT_II_BB(k, a, C1_1, C2_1, b_ta_1, C1_2, C2_2, b_ta_2, growfac_a);
   return (ws_1 * ws_2 * tmp1) * chidchi.dchida / (fK * fK);
@@ -1849,52 +1899,22 @@ double int_for_C_ss_tomo_limber(double a, void* params)
   const double fK = f_K(chidchi.chi);
   const double k = ell/fK;
  
-  const double ws1 = W_source(a, n1, hoverh0);
-  const double ws2 = W_source(a, n2, hoverh0);
-  const double wk1 = W_kappa(a, fK, n1);
-  const double wk2 = W_kappa(a, fK, n2);
+  const double WK1 = W_kappa(a, fK, n1);
+  const double WK2 = W_kappa(a, fK, n2);
   const double PK = (use_linear_ps == 1) ? p_lin(k,a) : Pdelta(k,a);
   
   const double ell4 = ell*ell*ell*ell; // correction (1812.05995 eqs 74-79)
   const double ell_prefactor = l*(l - 1.)*(l + 1.)*(l + 2.)/ell4; 
 
-  double res = 0.0;
-  switch(like.IA)
-  {
-    case 0:
-    {
-      res = wk1*wk2;
+  double IA_A1[2];
+  IA_A1_Z1Z2(a, growfac_a, n1, n2, IA_A1);
+  const double A_Z1 = IA_A1[0];
+  const double A_Z2 = IA_A1[1];
+  const double WS1  = W_source(a, n1, hoverh0) * A_Z1;
+  const double WS2  = W_source(a, n2, hoverh0) * A_Z2; 
 
-      break;
-    }
-    case 1:
-    {
-      const double norm = A_IA_Joachimi(a)*cosmology.Omega_m*nuisance.c1rhocrit_ia/growfac_a;
-      res = ws1*ws2*norm*norm - (ws1*wk2+ws2*wk1)*norm + wk1*wk2;
+  const double res = (WK1 - WS1) * (WK2 - WS2);
 
-      break;
-    }
-    case 3:
-    {
-      const double norm = cosmology.Omega_m*nuisance.c1rhocrit_ia/growfac_a;
-      res = ws1*ws2*norm*norm - (ws1*wk2+ws2*wk1)*norm + wk1*wk2;
-
-      break;
-    }
-    case 4:
-    {
-      const double norm = cosmology.Omega_m*nuisance.c1rhocrit_ia/growfac_a*
-        nuisance.A_ia*pow(1./(a*nuisance.oneplusz0_ia), nuisance.eta_ia);
-      res = ws1*ws2*norm*norm - (ws1*wk2+ws2*wk1)*norm + wk1*wk2;
-
-      break;
-    }
-    default:
-    {
-      log_fatal("like.IA = %d not supported", like.IA);
-      exit(1);
-    }
-  }
   return res*PK*(chidchi.dchida/(fK*fK))*ell_prefactor;
 }
 
@@ -2080,10 +2100,10 @@ double int_for_C_gs_tomo_limber_TATT(double a, void* params)
   const double tmp1 = 0.5*g4*(b2 * PT_d1d2(k) + bs2 * PT_d1s2(k) + b3 * PT_d1d3(k));
   const double PK1loop = (WGAL*b2 != 0) ? tmp1 : 0.0; 
 
-  const double C1 = C1_TA(a, ns, growfac_a);
-  const double b_ta = b_TA(a, ns);
-  const double C2 = C2_TT(a, ns, growfac_a);
-  const double GIE = TATT_GI_E(k, a, C1, C2, b_ta, growfac_a, PK);
+  const double C1_ZS   = C1_TA(a, growfac_a, ns);
+  const double b_ta_zs = b_TA(a, growfac_a, ns);
+  const double C2_ZS   = C2_TT(a, growfac_a, ns);
+  const double GIE  = TATT_GI_E(k, a, C1_ZS, C2_ZS, b_ta_zs, growfac_a, PK);
 
   const double res = WK*(WMAG*bmag*PK + WGAL*(b1*PK + PK1loop)) + (WGAL*b1 + WMAG*bmag)*WS*GIE;
   return res*chidchi.dchida/(fK*fK);
@@ -2122,7 +2142,6 @@ double int_for_C_gs_tomo_limber(double a, void* params)
   const double b1 = gbias.b1_function(z, nl);
   const double bmag = gbias.b_mag[nl];
 
-  const double WS = W_source(a, ns, hoverh0);
   const double WK = W_kappa(a, fK, ns);
   const double WGAL = W_gal(a, nl, hoverh0);
   const double WMAG = W_mag(a, fK, nl);
@@ -2131,46 +2150,10 @@ double int_for_C_gs_tomo_limber(double a, void* params)
   const double tmp = (l - 1.)*l*(l + 1.)*(l + 2.);            // correction (1812.05995 eqs 74-79)
   const double ell_prefactor2 = (tmp > 0) ? sqrt(tmp)/(ell*ell) : 0.0;
 
-  double res = 0.0;
-  switch(like.IA)
-  {
-    case 0:
-    {
-      res = WK;
-
-      break;
-    }
-    case 1:
-    {
-      const double norm = A_IA_Joachimi(a)*cosmology.Omega_m*nuisance.c1rhocrit_ia/growfac_a;
-
-      res = (WK - WS*norm);
-
-      break;
-    }
-    case 3:
-    {
-      const double norm = nuisance.A_z[ns]*cosmology.Omega_m*nuisance.c1rhocrit_ia/growfac_a;
-
-      res = (WK - WS*norm);
-
-      break;
-    }
-    case 4:
-    {
-      const double norm = cosmology.Omega_m*nuisance.c1rhocrit_ia/growfac_a*
-        nuisance.A_ia*pow(1./(a*nuisance.oneplusz0_ia),nuisance.eta_ia);
-
-      res = (WK - WS*norm);
-
-      break;
-    }
-    default:
-    {
-      log_fatal("like.IA = %d not supported", like.IA);
-      exit(1);
-    }
-  }
+  const double A_ZS = IA_A1_Z1(a, growfac_a, ns);
+  const double WS   = W_source(a, ns, hoverh0)*A_ZS;
+  
+  double res = WK - WS;
 
   if (include_HOD_GX == 1)
   {
@@ -2244,7 +2227,6 @@ double int_for_C_gs_tomo_limber_withb2(double a, void* params)
   const double b3 = b3nl_from_b1(b1);
   const double bmag = gbias.b_mag[nl];
 
-  const double WS = W_source(a, ns, hoverh0);
   const double WK = W_kappa(a, fK, ns);
   const double WGAL = W_gal(a, nl, hoverh0);
   const double WMAG = W_mag(a, fK, nl);
@@ -2253,53 +2235,13 @@ double int_for_C_gs_tomo_limber_withb2(double a, void* params)
   const double tmp = (l - 1.)*l*(l + 1.)*(l + 2.);         // correction (1812.05995 eqs 74-79)
   const double ell_prefactor2 = (tmp > 0) ? sqrt(tmp)/(ell*ell) : 0.0;
   
-  double linear_part;
-  double non_linear_part;
-  switch(like.IA)
-  {
-    case 0:
-    {
-      linear_part = WK;
-      non_linear_part = WK;
-
-      break;
-    }
-    case 1:
-    {
-      const double norm = A_IA_Joachimi(a)*cosmology.Omega_m*nuisance.c1rhocrit_ia/growfac_a;
-
-      linear_part = (WK - WS*norm);
-      non_linear_part = (WK - WS*norm);
-
-      break;
-    }
-    case 3:
-    {
-      const double norm = nuisance.A_z[(int)ar[1]]*cosmology.Omega_m*
-        nuisance.c1rhocrit_ia/growfac_a;
-
-      linear_part = (WK - WS*norm);
-      non_linear_part = (WK - WS*norm);
-
-      break;
-    }
-    case 4:
-    {
-      const double norm = cosmology.Omega_m*nuisance.c1rhocrit_ia/growfac_a*
-        nuisance.A_ia*pow(1./(a*nuisance.oneplusz0_ia),nuisance.eta_ia);
-
-      linear_part = (WK - WS*norm);
-      non_linear_part = (WK - WS*norm);
-
-      break;
-    }
-    default:
-    {
-      log_fatal("like.IA = %d not supported", like.IA);
-      exit(1);
-    }
-  }
-
+  
+  const double A_ZS = IA_A1_Z1(a, growfac_a, ns);
+  const double WS   = W_source(a, ns, hoverh0) * A_ZS;
+  
+  double linear_part = WK - WS;
+  double non_linear_part = linear_part;
+  
   if(include_RSD_GS == 1)
   {
     static double chi_a_min = 0;
@@ -2317,12 +2259,12 @@ double int_for_C_gs_tomo_limber_withb2(double a, void* params)
     const double a_1 = a_chi(chi_1);
     const double WRSD = W_RSD(ell, a_0, a_1, nl);
 
-    linear_part *= (WGAL*b1 + WMAG*ell_prefactor*bmag) + WRSD;
+    linear_part     *= (WGAL*b1 + WMAG*ell_prefactor*bmag) + WRSD;
     non_linear_part *= WGAL;
   }
   else
   {
-    linear_part *= (WGAL*b1 + WMAG*ell_prefactor*bmag);
+    linear_part     *= (WGAL*b1 + WMAG*ell_prefactor*bmag);
     non_linear_part *= WGAL;
   }
 
@@ -2356,36 +2298,40 @@ const int init_static_vars_only)
     log_fatal("amin < amax not true");
     exit(1);
   }
+  if (w == 0)
+  {
+    const size_t nsize_integration = 120 + 50 * (like.high_def_integration);
+    w = gsl_integration_glfixed_table_alloc(nsize_integration);
+  }
 
   double res;
+  
   if (init_static_vars_only == 1)
   {
-    if (w == 0)
+    switch(like.IA_MODEL)
     {
-      const size_t nsize_integration = 120 + 50 * (like.high_def_integration);
-      w = gsl_integration_glfixed_table_alloc(nsize_integration);
-    }
-
-    if (like.IA == 0 || like.IA == 1 || like.IA == 3 || like.IA == 4)
-    {
-      if (has_b2_galaxies() && use_linear_ps == 0)
+      case IA_MODEL_TATT:
       {
-        res = int_for_C_gs_tomo_limber_withb2(amin, (void*) ar);
+        res = int_for_C_gs_tomo_limber_TATT(amin, (void*) ar);
+        break;
       }
-      else 
+      case IA_MODEL_NLA:
       {
-        res = int_for_C_gs_tomo_limber(amin, (void*) ar);
+        if (has_b2_galaxies() && use_linear_ps == 0)
+        {
+          res = int_for_C_gs_tomo_limber_withb2(amin, (void*) ar);
+        }
+        else 
+        {
+          res = int_for_C_gs_tomo_limber(amin, (void*) ar);
+        }
+        break;
       }
-    }
-    else if (like.IA == 5 || like.IA == 6)
-    {
-      res = int_for_C_gs_tomo_limber_TATT(amin, (void*) ar);
-    }
-    else
-    {
-      log_fatal("like.IA = %d not supported", like.IA);
-      exit(1);
-      return 0;
+      default:
+      {
+        log_fatal("like.IA_MODEL = %d not supported", like.IA_MODEL);
+        exit(1);
+      }
     }
   }
   else
@@ -2393,36 +2339,41 @@ const int init_static_vars_only)
     gsl_function F;
     F.params = (void*) ar;
     
-    if (like.IA == 0 || like.IA == 1 || like.IA == 3 || like.IA == 4)
+    switch(like.IA_MODEL)
     {
-      if (has_b2_galaxies() && use_linear_ps == 0)
-      {    
-        F.function = int_for_C_gs_tomo_limber_withb2;
-      }
-      else 
+      case IA_MODEL_NLA:
       {
-        F.function = int_for_C_gs_tomo_limber;
+        if (has_b2_galaxies() && use_linear_ps == 0)
+        {    
+          F.function = int_for_C_gs_tomo_limber_withb2;
+        }
+        else 
+        {
+          F.function = int_for_C_gs_tomo_limber;
+        }
+        break;
       }
-    }
-    else if (like.IA == 5 || like.IA == 6)
-    {
-      if (use_linear_ps == 1)
+      case IA_MODEL_TATT:
       {
-        log_fatal("use linear power spectrum option not implemented with TATT");
+        if (use_linear_ps == 1)
+        {
+          log_fatal("use linear power spectrum option not implemented with TATT");
+          exit(1);
+          return 0;
+        }
+        F.function = int_for_C_gs_tomo_limber_TATT;
+        break;
+      }
+      default:
+      {
+        log_fatal("like.IA_MODEL = %d not supported", like.IA_MODEL);
         exit(1);
-        return 0;
       }
-      F.function = int_for_C_gs_tomo_limber_TATT;
-    }
-    else
-    {
-      log_fatal("like.IA = %d not supported", like.IA);
-      exit(1);
-      return 0;
     }
 
     res = gsl_integration_glfixed(&F, amin, amax, w);
   }
+
   return res;
 }
 
@@ -2443,7 +2394,7 @@ double C_gs_tomo_limber(double l, int ni, int nj, const int force_no_recompute)
   if (table == 0) 
   {
     NSIZE = tomo.ggl_Npowerspectra;
-    nell = (like.IA == 5 || like.IA == 6) ? Ntable.N_ell_TATT :  Ntable.N_ell;
+    nell = number_ell_fourier_2pt();
     lnlmin = log(fmax(limits.LMIN_tab, 1.0));
     lnlmax = log(fmax(limits.LMAX, limits.LMAX_hankel) + 1);
     dlnl = (lnlmax - lnlmin) / ((double) nell - 1.0);
@@ -3245,7 +3196,6 @@ double int_for_C_ks_limber(double a, void* params)
   const double k = ell/fK;
   const double PK = use_linear_ps == 1 ? p_lin(k,a) : Pdelta(k,a);
 
-  const double WS1 = W_source(a, ni, hoverh0);
   const double WK1 = W_kappa(a, fK, ni);
   const double WK2 = W_k(a, fK);
 
@@ -3253,46 +3203,14 @@ double int_for_C_ks_limber(double a, void* params)
   const double tmp = (l - 1.)*l*(l + 1.)*(l + 2.);    // prefactor correction (1812.05995 eqs 74-79)
   const double ell_prefactor2 = (tmp > 0) ? sqrt(tmp)/(ell*ell) : 0.0; 
 
-  double res = 0;
-  switch(like.IA)
-  {
-    case 0:
-    {
-      res = WK1*WK2;
+  const double A_Z1 = IA_A1_Z1(a, growfac_a, ni);
+  const double WS1  = W_source(a, ni, hoverh0) * A_Z1;
 
-      break;
-    }
-    case 1:
-    {
-      const double norm = A_IA_Joachimi(a)*cosmology.Omega_m*nuisance.c1rhocrit_ia/growfac_a;
-      res = (-WS1*WK2*norm + WK1*WK2);
-
-      break;
-    }
-    case 3:
-    {
-      const double norm = cosmology.Omega_m*nuisance.c1rhocrit_ia/growfac_a;
-      res = (-WS1*WK2*norm + WK1*WK2);
-
-      break;
-    }
-    case 4:
-    {
-      const double norm = (cosmology.Omega_m*nuisance.c1rhocrit_ia/growfac_a)*
-        nuisance.A_ia*pow(1.0/(a*nuisance.oneplusz0_ia), nuisance.eta_ia);
-      res = (-WS1*WK2*norm + WK1*WK2);
-
-      break;
-    }
-    default:
-    {
-      log_fatal("like.IA = %d not supported", like.IA);
-      exit(1);
-    }
-  }
+  const double res = (WK1 - WS1)*WK2;
 
   return (res*PK*chidchi.dchida/(fK*fK))*ell_prefactor1*ell_prefactor2;
 }
+
 
 double C_ks_tomo_limber_nointerp(double l, int ni, int use_linear_ps,
 const int init_static_vars_only)
@@ -3823,45 +3741,16 @@ double int_for_C_ys_tomo_limber(double a, void* params)
   
   const double PK = p_my(k, a, use_2h_only);
 
-  const double WS = W_source(a, ni, hoverh0);
-  const double WK = W_kappa(a, fK, ni);
-  const double WY = W_y(a);
+  const double WK1 = W_kappa(a, fK, ni);
+  const double WY  = W_y(a);
 
   const double tmp = (l - 1.0)*l*(l + 1.0)*(l + 2.0); // prefactor correction (1812.05995 eqs 74-79)
   const double ell_prefactor2 = (tmp > 0) ? sqrt(tmp)/(ell*ell) : 0.0;
 
-  double res = 0;
-  switch(like.IA)
-  {
-    case 0:
-    {
-      res = WS*WY;
+  const double A_Z1 = IA_A1_Z1(a, growfac_a, ni);
+  const double WS1  = W_source(a, ni, hoverh0) * A_Z1;
 
-      break;
-    }
-    case 1:
-    {
-      const double norm = A_IA_Joachimi(a)*cosmology.Omega_m*nuisance.c1rhocrit_ia/growfac_a;
-      
-      res = WK*WY - WS*WY*norm;
-      
-      break;
-    }
-    case 4:
-    {
-      const double norm = (cosmology.Omega_m*nuisance.c1rhocrit_ia/growfac_a)*
-        nuisance.A_ia*pow(1./(a*nuisance.oneplusz0_ia),nuisance.eta_ia);
-      
-      res = WK*WY - WS*WY*norm;
-
-      break;
-    }
-    default:
-    {
-      log_fatal("like.IA = %d not supported", like.IA);
-      exit(1);
-    }
-  }
+  const double res = (WK1 - WS1)*WY;
 
   return res*PK*(chidchi.dchida/(fK*fK))*ell_prefactor2;
 }
