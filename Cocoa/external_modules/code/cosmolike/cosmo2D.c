@@ -30,7 +30,7 @@ static int use_linear_ps_limber = 0; // 0 or 1
 static int include_HOD_GX = 0; // 0 or 1
 
 static int include_RSD_GS = 0; // 0 or 1 
-static int include_RSD_GG = 0; // 0 or 1 
+static int include_RSD_GG = 1; // 0 or 1 
 static int include_RSD_GK = 0; // 0 or 1
 static int include_RSD_GY = 0; // 0 or 1
 
