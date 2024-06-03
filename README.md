@@ -31,7 +31,7 @@ This readme file presents basic and advanced instructions for installing all [Co
 
 ## Installation of Cocoa's required packages via Conda <a name="required_packages_conda"></a>
 
-**Step :one:**: Download the file `cocoapy38.yml` yml file, create the cocoa environment, and activate it
+**Step :one:**: Download the file `cocoapy38.yml` yml file, create the cocoa environment, activate it, and create symbolic links that will give better names for the GNU compiler installed by conda.
 
     conda env create --name cocoa --file=cocoapy38.yml
     conda activate cocoa
