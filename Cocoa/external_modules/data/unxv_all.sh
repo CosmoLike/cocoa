@@ -22,9 +22,9 @@ tar xf h0licow_distance_chains.xz
 
 echo '\033[0;32m'"\t\t DECOMPRESSING ACT-DR6 DATA"'\033[0m'
 mkdir -p act
-cd $ROOTDIR/external_modules/act
+cd $ROOTDIR/external_modules/data/act
 mkdir -p lensing
-cd $ROOTDIR/external_modules/act/lensing
+cd $ROOTDIR/external_modules/data/act/lensing
 wget https://lambda.gsfc.nasa.gov/data/suborbital/ACT/ACT_dr6/likelihood/data/ACT_dr6_likelihood_v1.2.tgz
 tar -zxvf ACT_dr6_likelihood_v1.2.tgz
 cd $ROOTDIR/external_modules/data
