@@ -1,0 +1,403 @@
+Kappa :
+  latex:  \kappa
+  prior:
+    min: -0.01
+    max: 0.01
+  ref:
+    dist: norm
+    loc: 0
+    scale: 0.00045
+  proposal: 0.00045
+
+Tcal90 :
+  latex:  T_{\rm cal}^{90}
+  prior:
+    min: 0.9
+    max: 1.1
+  ref:
+    dist: norm
+    loc: 1
+    scale: 0.01
+  proposal: 0.01
+
+Tcal150 :
+  latex:  T_{\rm cal}^{150}
+  prior:
+    min: 0.9
+    max: 1.1
+  ref:
+    dist: norm
+    loc: 1
+    scale: 0.01
+  proposal: 0.01
+
+Tcal220 :
+  latex:  T_{\rm cal}^{220}
+  prior:
+    min: 0.9
+    max: 1.1
+  ref:
+    dist: norm
+    loc: 1
+    scale: 0.01
+  proposal: 0.01
+
+Ecal90 :
+  latex:  E_{\rm cal}^{90}
+  prior:
+    min: 0.9
+    max: 1.1
+  ref:
+    dist: norm
+    loc: 1
+    scale: 0.01
+  proposal: 0.01
+
+Ecal150 :
+  latex:  E_{\rm cal}^{150}
+  prior:
+    min: 0.9
+    max: 1.1
+  ref:
+    dist: norm
+    loc: 1
+    scale: 0.01
+  proposal: 0.01
+
+Ecal220 :
+  latex:  E_{\rm cal}^{220}
+  prior:
+    min: 0.9
+    max: 1.1
+  ref:
+    dist: norm
+    loc: 1
+    scale: 0.01
+  proposal: 0.01
+
+EE_Poisson_90x90 :
+  latex:  D^{\rm EE, Poisson, 90x90}_{3000}
+  prior:
+    min: 0
+    max: 5
+  ref:
+    dist: norm
+    loc: 0.040469
+    scale: 0.01
+  proposal: 0.01
+
+EE_Poisson_90x150 :
+  latex:  D^{\rm EE, Poisson, 90x150}_{3000}
+  prior:
+    min: 0
+    max: 5
+  ref:
+    dist: norm
+    loc: 0.018048
+    scale: 0.01
+  proposal: 0.01
+
+EE_Poisson_90x220 :
+  latex:  D^{\rm EE, Poisson, 90x220}_{3000}
+  prior:
+    min: 0
+    max: 5
+  ref:
+    dist: norm
+    loc: 0.015719
+    scale: 0.01
+  proposal: 0.01
+
+EE_Poisson_150x150 :
+  latex:  D^{\rm EE, Poisson, 150x150}_{3000}
+  prior:
+    min: 0
+    max: 5
+  ref:
+    dist: norm
+    loc: 0.011495
+    scale: 0.01
+  proposal: 0.01
+
+EE_Poisson_150x220 :
+  latex:  D^{\rm EE, Poisson, 150x220}_{3000}
+  prior:
+    min: 0
+    max: 5
+  ref:
+    dist: norm
+    loc: 0.018962
+    scale: 0.01
+  proposal: 0.01
+
+EE_Poisson_220x220 :
+  latex:  D^{\rm EE, Poisson, 220x220}_{3000}
+  prior:
+    min: 0
+    max: 5
+  ref:
+    dist: norm
+    loc: 0.047557
+    scale: 0.01
+  proposal: 0.01
+
+EE_PolGalDust_Amp :
+  latex:  A^{\rm EE, PGD}_{80}
+  prior:
+    min: 0
+    max: 5
+  ref:
+    dist: norm
+    loc: 0.05
+    scale: 0.02
+  proposal: 0.02
+
+EE_PolGalDust_Alpha :
+  latex:  \alpha^{\rm EE, PGD}
+  prior:
+    min: -5
+    max: -1
+  ref:
+    dist: norm
+    loc: -2.42
+    scale: 0.04
+  proposal: 0.04
+
+EE_PolGalDust_Beta :
+  latex:  \beta^{\rm EE, PGD}
+  prior:
+    min: 0.5
+    max: 2.5
+  ref:
+    dist: norm
+    loc: 1.51
+    scale: 0.04
+  proposal: 0.04
+
+TE_PolGalDust_Amp :
+  latex:  A^{\rm TE, PGD}_{80}
+  prior:
+    min: 0
+    max: 5
+  ref:
+    dist: norm
+    loc: 0.12
+    scale: 0.051
+  proposal: 0.051
+
+TE_PolGalDust_Alpha :
+  latex:  \alpha^{\rm TE, PGD}
+  prior:
+    min: -5
+    max: -1
+  ref:
+    dist: norm
+    loc: -2.42
+    scale: 0.04
+  proposal: 0.04
+
+TE_PolGalDust_Beta :
+  latex:  \beta^{\rm TE, PGD}
+  prior:
+    min: 0.5
+    max: 2.5
+  ref:
+    dist: norm
+    loc: 1.51
+    scale: 0.04
+  proposal: 0.04
+
+TT_Poisson_90x90 :
+  latex:  D^{\rm TT, Poisson, 90x90}_{3000}
+  prior:
+    min: 0
+    max: 200
+  ref:
+    dist: norm
+    loc: 52.8146
+    scale: 5
+  proposal: 5
+
+TT_Poisson_90x150 :
+  latex:  D^{\rm TT, Poisson, 90x150}_{3000}
+  prior:
+    min: 0
+    max: 200
+  ref:
+    dist: norm
+    loc: 23.9268
+    scale: 5
+  proposal: 5
+
+TT_Poisson_90x220 :
+  latex:  D^{\rm TT, Poisson, 90x220}_{3000}
+  prior:
+    min: 0
+    max: 200
+  ref:
+    dist: norm
+    loc: 21.5341
+    scale: 5
+  proposal: 5
+
+TT_Poisson_150x150 :
+  latex:  D^{\rm TT, Poisson, 150x150}_{3000}
+  prior:
+    min: 0
+    max: 200
+  ref:
+    dist: norm
+    loc: 15.8306
+    scale: 5
+  proposal: 5
+
+TT_Poisson_150x220 :
+  latex:  D^{\rm TT, Poisson, 150x220}_{3000}
+  prior:
+    min: 0
+    max: 200
+  ref:
+    dist: norm
+    loc: 26.9362
+    scale: 5
+  proposal: 5
+
+TT_Poisson_220x220 :
+  latex:  D^{\rm TT, Poisson, 220x220}_{3000}
+  prior:
+    min: 0
+    max: 200
+  ref:
+    dist: norm
+    loc: 68.2457
+    scale: 5
+  proposal: 5
+
+TT_GalCirrus_Amp :
+  latex:  A^{\rm TT, cirrus}_{80}
+  prior:
+    min: 0
+    max: 10
+  ref:
+    dist: norm
+    loc: 1.88
+    scale: 0.2
+  proposal: 0.2
+
+TT_GalCirrus_Alpha :
+  latex:  \alpha^{\rm TT, cirrus}
+  prior:
+    min: -3
+    max: -2
+  ref:
+    dist: norm
+    loc: -2.53
+    scale: 0.05
+  proposal: 0.05
+
+TT_GalCirrus_Beta :
+  latex:  \beta^{\rm TT, cirrus}
+  prior:
+    min: 0
+    max: 2
+  ref:
+    dist: norm
+    loc: 1.48
+    scale: 0.1
+  proposal: 0.1
+
+TT_CIBClustering_Amp :
+  latex:  A^{\rm TT, CIB clustering}_{3000}
+  prior:
+    min: 0
+    max: 20
+  ref:
+    dist: norm
+    loc: 3.2263
+    scale: 1
+  proposal: 1
+
+TT_CIBClustering_Alpha :
+  latex:  \alpha^{\rm TT, CIB clustering}
+  value:  0.8
+TT_CIBClustering_Beta :
+  latex:  \beta^{\rm TT, CIB clustering}
+  prior:
+    min: 0
+    max: 5
+  ref:
+    dist: norm
+    loc: 2.2952
+    scale: 0.5
+  proposal: 0.5
+
+TT_CIBClustering_decorr_90 :
+  latex:  \zeta^{\rm TT, CIB clustering, 90}
+  value:  1.0
+TT_CIBClustering_decorr_150 :
+  latex:  \zeta^{\rm TT, CIB clustering, 150}
+  value:  1.0
+TT_CIBClustering_decorr_220 :
+  latex:  \zeta^{\rm TT, CIB clustering, 220}
+  value:  1.0
+TT_tSZ_Amp :
+  latex:  A^{\rm tSZ}_{3000}
+  prior:
+    min: 0
+    max: 20
+  ref:
+    dist: norm
+    loc: 3.42
+    scale: 0.5
+  proposal: 0.5
+
+TT_tSZ_CIB_corr :
+  latex:  \xi^{\rm tSZ-CIB}
+  prior:
+    min: -1
+    max: 1
+  ref:
+    dist: norm
+    loc: 0.1144
+    scale: 0.1
+  proposal: 0.1
+
+TT_kSZ_Amp :
+  latex:  A^{\rm kSZ}_{3000}
+  prior:
+    min: 0
+    max: 20
+  ref:
+    dist: norm
+    loc: 3
+    scale: 1
+  proposal: 1
+
+#prior:
+#  Kappa_prior: 'lambda Kappa:stats.norm.logpdf(Kappa, loc=0, scale=0.00045)'
+#  TT_Poisson_90x90_prior: 'lambda TT_Poisson_90x90:stats.norm.logpdf(TT_Poisson_90x90, loc=51.3204, scale=9.442)'
+#  TT_Poisson_90x150_prior: 'lambda TT_Poisson_90x150:stats.norm.logpdf(TT_Poisson_90x150, loc=22.4417, scale=7.0881)'
+#  TT_Poisson_90x220_prior: 'lambda TT_Poisson_90x220:stats.norm.logpdf(TT_Poisson_90x220, loc=20.7004, scale=5.9235)'
+#  TT_Poisson_150x150_prior: 'lambda TT_Poisson_150x150:stats.norm.logpdf(TT_Poisson_150x150, loc=15.3455, scale=4.132)'
+#  TT_Poisson_150x220_prior: 'lambda TT_Poisson_150x220:stats.norm.logpdf(TT_Poisson_150x220, loc=28.3573, scale=4.1925)'
+#  TT_Poisson_220x220_prior: 'lambda TT_Poisson_220x220:stats.norm.logpdf(TT_Poisson_220x220, loc=75.9719, scale=14.8624)'
+#  TT_CIBClustering_Amp_prior: 'lambda TT_CIBClustering_Amp:stats.norm.logpdf(TT_CIBClustering_Amp, loc=3.2263, scale=1.8354)'
+#  TT_CIBClustering_Beta_prior: 'lambda TT_CIBClustering_Beta:stats.norm.logpdf(TT_CIBClustering_Beta, loc=2.2642, scale=0.3814)'
+#  TT_tSZ_Amp_prior: 'lambda TT_tSZ_Amp:stats.norm.logpdf(TT_tSZ_Amp, loc=3.2279, scale=2.3764)'
+#  TT_tSZ_CIB_corr_prior: 'lambda TT_tSZ_CIB_corr:stats.norm.logpdf(TT_tSZ_CIB_corr, loc=0.1801, scale=0.3342)'
+#  TT_kSZ_Amp_prior: 'lambda TT_kSZ_Amp:stats.norm.logpdf(TT_kSZ_Amp, loc=3.7287, scale=4.644)'
+#  TT_GalCirrus_Amp_prior: 'lambda TT_GalCirrus_Amp:stats.norm.logpdf(TT_GalCirrus_Amp, loc=1.88, scale=0.48)'
+#  TT_GalCirrus_Alpha_prior: 'lambda TT_GalCirrus_Alpha:stats.norm.logpdf(TT_GalCirrus_Alpha, loc=-2.53, scale=0.05)'
+#  TT_GalCirrus_Beta_prior: 'lambda TT_GalCirrus_Beta:stats.norm.logpdf(TT_GalCirrus_Beta, loc=1.48, scale=0.02)'
+#  EE_Poisson_90x90_prior: 'lambda EE_Poisson_90x90:stats.norm.logpdf(EE_Poisson_90x90, loc=0.040469, scale=0.012141)'
+#  EE_Poisson_90x150_prior: 'lambda EE_Poisson_90x150:stats.norm.logpdf(EE_Poisson_90x150, loc=0.018048, scale=0.005414)'
+#  EE_Poisson_90x220_prior: 'lambda EE_Poisson_90x220:stats.norm.logpdf(EE_Poisson_90x220, loc=0.015719, scale=0.004716)'
+#  EE_Poisson_150x150_prior: 'lambda EE_Poisson_150x150:stats.norm.logpdf(EE_Poisson_150x150, loc=0.011495, scale=0.003448)'
+#  EE_Poisson_150x220_prior: 'lambda EE_Poisson_150x220:stats.norm.logpdf(EE_Poisson_150x220, loc=0.018962, scale=0.005689)'
+#  EE_Poisson_220x220_prior: 'lambda EE_Poisson_220x220:stats.norm.logpdf(EE_Poisson_220x220, loc=0.047557, scale=0.014267)'
+#  EE_PolGalDust_Amp_prior: 'lambda EE_PolGalDust_Amp:stats.norm.logpdf(EE_PolGalDust_Amp, loc=0.05, scale=0.022)'
+#  EE_PolGalDust_Beta_prior: 'lambda EE_PolGalDust_Beta:stats.norm.logpdf(EE_PolGalDust_Beta, loc=1.51, scale=0.04)'
+#  EE_PolGalDust_Alpha_prior: 'lambda EE_PolGalDust_Alpha:stats.norm.logpdf(EE_PolGalDust_Alpha, loc=-2.42, scale=0.04)'
+#  TE_PolGalDust_Amp_prior: 'lambda TE_PolGalDust_Amp:stats.norm.logpdf(TE_PolGalDust_Amp, loc=0.12, scale=0.051)'
+#  TE_PolGalDust_Beta_prior: 'lambda TE_PolGalDust_Beta:stats.norm.logpdf(TE_PolGalDust_Beta, loc=1.51, scale=0.04)'
+#  TE_PolGalDust_Alpha_prior: 'lambda TE_PolGalDust_Alpha:stats.norm.logpdf(TE_PolGalDust_Alpha, loc=-2.42, scale=0.04)'

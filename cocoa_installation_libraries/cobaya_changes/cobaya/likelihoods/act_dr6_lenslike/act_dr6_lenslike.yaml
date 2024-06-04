@@ -1,0 +1,4 @@
+lens_only: False
+stop_at_error: True
+lmax: 4000
+variant: act_baseline

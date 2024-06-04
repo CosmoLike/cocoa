@@ -45,9 +45,8 @@ texinfo-7.0.3/
 xz-5.2.5/
 xz-*/
 CAMB/
-class_public/
-cobaya/
 cosmolike_core/
+./cobaya/
 des_real/
 des_y3/
 fmt/
