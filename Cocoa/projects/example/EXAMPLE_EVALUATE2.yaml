@@ -4,6 +4,8 @@ debug: False
 likelihood:
   sn.roman_c:
     path: ./external_modules/data/sn_data
+  sn.roman_o:
+    path: ./external_modules/data/sn_data
   planck_2018_highl_plik.TT:
     path: ./external_modules/
     clik_file: plc_3.0/hi_l/plik/plik_rd12_HM_v22_TT.clik

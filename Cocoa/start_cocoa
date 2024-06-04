@@ -137,6 +137,7 @@ else
     export OLD_INCLUDE_PATH="x"
 fi
 
+
 if [ -n "${SET_INSTALLATION_OPTIONS}" ]; then
   source $SET_INSTALLATION_OPTIONS
 else
@@ -200,7 +201,7 @@ export CPATH=$ROOTDIR/.local/include/:$CPATH
 
 export OBJC_INCLUDE_PATH=$ROOTDIR/.local/:OBJC_INCLUDE_PATH
 
-export OBJC_PATH=$ROOTDIR/.local/:OBJC_PATH
+export OBJC_PATH=$ROOTDIR/.local/:$OBJC_PATH
 
 export LD_LIBRARY_PATH=$ROOTDIR/.local/lib:$LD_LIBRARY_PATH
 export LD_LIBRARY_PATH=$ROOTDIR/.local/lib/python$PYTHON_VERSION/site-packages/numpy/core/lib

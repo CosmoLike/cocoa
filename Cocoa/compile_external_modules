@@ -22,26 +22,13 @@ else
   export OUTPUT_PIP_2="/dev/tty"
 fi
 
-if [ -z "${IGNORE_ALL_PIP_INSTALLATION}" ]; then
-  $PIP3 install --editable cobaya --prefix=$ROOTDIR/.local \
-      --find-links file:$ROOTDIR/../cocoa_installation_libraries/pip_cache \
-      --no-index > ${OUTPUT_PIP_1} 2> ${OUTPUT_PIP_2}
-  if [ $? -ne 0 ]; then
-    echo -e '\033[0;31m'"PIP COULD NOT RUN \e[3mPIP INSTALL COBAYA"'\033[0m'
-    cd $ROOTDIR
-    return 1
-  else
-    echo -e '\033[0;32m'"\t\tPIP RUN \e[3mPIP INSTALL COBAYA\e[0m\e\033[0;32m DONE"'\033[0m'
-  fi
+$PIP3 install --editable cobaya --prefix=$ROOTDIR/.local > ${OUTPUT_PIP_1} 2> ${OUTPUT_PIP_2}
+if [ $? -ne 0 ]; then
+  echo -e '\033[0;31m'"PIP COULD NOT RUN \e[3mPIP INSTALL COBAYA"'\033[0m'
+  cd $ROOTDIR
+  return 1
 else
-  $PIP3 install --editable cobaya --prefix=$ROOTDIR/.local > ${OUTPUT_PIP_1} 2> ${OUTPUT_PIP_2}
-  if [ $? -ne 0 ]; then
-    echo -e '\033[0;31m'"PIP COULD NOT RUN \e[3mPIP INSTALL COBAYA"'\033[0m'
-    cd $ROOTDIR
-    return 1
-  else
-    echo -e '\033[0;32m'"PIP RUN \e[3mPIP INSTALL COBAYA\e[0m\e\033[0;32m DONE"'\033[0m'
-  fi
+  echo -e '\033[0;32m'"PIP RUN \e[3mPIP INSTALL COBAYA\e[0m\e\033[0;32m DONE"'\033[0m'
 fi
 
 echo -e '\033[1;34m''\t\e[4mINSTALLING COBAYA (VIA PIP) DONE''\033[0m'
