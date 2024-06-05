@@ -24,10 +24,9 @@ if [ -z "${IGNORE_ALL_PIP_INSTALLATION}" ]; then
   fi
 fi
 
-if [ -z -e "${IGNORE_CPP_INSTALLATION}" ]; then
-
+if [ -z "${IGNORE_CPP_INSTALLATION}" ]; then
   if [ -z "${IGNORE_CPP_SPDLOG_INSTALLATION}" ]; then
-    echo '\033[0;32m'"\t\t DECOMPRESSING CPP SPDLOG LIBRARY"'\033[0m' > ${OUTPUT_UNXV_ALL_1} 2> ${OUTPUT_UNXV_ALL_2}
+    echo -e '\033[0;32m'"\t\t DECOMPRESSING CPP SPDLOG LIBRARY"'\033[0m' > ${OUTPUT_UNXV_ALL_1} 2> ${OUTPUT_UNXV_ALL_2}
     tar xf spdlog.xz
   fi
 
@@ -37,9 +36,8 @@ if [ -z -e "${IGNORE_CPP_INSTALLATION}" ]; then
   fi
 fi
 
-
 if [ -z "${THREAD_UNXZ}" ]; then
-  echo '\033[0;32m'"\t\t DECOMPRESSING EE2 LIBRARY"'\033[0m' > ${OUTPUT_UNXV_ALL_1} 2> ${OUTPUT_UNXV_ALL_2}
+  echo -e '\033[0;32m'"\t\t DECOMPRESSING EE2 LIBRARY"'\033[0m' > ${OUTPUT_UNXV_ALL_1} 2> ${OUTPUT_UNXV_ALL_2}
   tar xf ee2.xz
 fi
 
