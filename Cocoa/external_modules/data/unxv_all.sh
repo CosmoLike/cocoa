@@ -33,59 +33,32 @@ cd $ROOTDIR/external_modules/data
 echo -e '\033[0;32m'"\t\t DECOMPRESSING SIMONS OBSERVATORY"'\033[0m'
 mkdir -p simons_observatory
 cd $ROOTDIR/external_modules/data/simons_observatory
-wget https://portal.nersc.gov/cfs/sobs/users/MFLike_data/v0.7.1.tar.gz
-tar -zxvf v0.7.1.tar.gz
-wget https://portal.nersc.gov/cfs/sobs/users/MFLike_data/v0.8.tar.gz
-tar -zxvf v0.8.tar.gz
+wget https://portal.nersc.gov/cfs/sobs/users/MFLike_data/v0.7.1.tar.gz > ${OUTPUT_UNXV_ALL_1} 2> ${OUTPUT_UNXV_ALL_2}
+tar -zxvf v0.7.1.tar.gz > ${OUTPUT_UNXV_ALL_1} 2> ${OUTPUT_UNXV_ALL_2}
+wget https://portal.nersc.gov/cfs/sobs/users/MFLike_data/v0.8.tar.gz > ${OUTPUT_UNXV_ALL_1} 2> ${OUTPUT_UNXV_ALL_2}
+tar -zxvf v0.8.tar.gz > ${OUTPUT_UNXV_ALL_1} 2> ${OUTPUT_UNXV_ALL_2}
 cd $ROOTDIR/external_modules/data
 
-if [ -z "${THREAD_UNXZ}" ]; then
-	echo -e '\033[0;32m'"\t\t DECOMPRESSING BICEP 2015 DATA"'\033[0m'
-	tar xf bicep_keck_2015.xz
-	# ---------------------------------------------
-	echo -e '\033[0;32m'"\t\t DECOMPRESSING SPT-3G Y1 DATA"'\033[0m'
-	tar xf spt_3g.xz
-	# ---------------------------------------------
-	cd ./planck
-	# ---------------------------------------------
-	echo -e '\033[0;32m'"\t\t DECOMPRESSING SUPPLEMENTAL DATA AND COVARIANCES"'\033[0m'
-	tar xf planck_supp_data_and_covmats.xz
-	# ---------------------------------------------
-	echo -e '\033[0;32m'"\t\t DECOMPRESSING PLANCK-2018 (PLC-3.0) DATA"'\033[0m'
-	cd ./plc_3.0
-	tar xf lensing.xz
-	tar xf low_l.xz
-	cd ./hi_l
-	rm -rf ./plik/
-	tar xf plik.xz
-	rm -rf ./plik_lite/
-	tar xf plik_lite.xz
-	# ---------------------------------------------
-else
-	echo -e '\033[0;32m'"\t\t DECOMPRESSING THE REMAINING PACKAGES IN PARALLEL"'\033[0m'
-	tar xf bicep_keck_2015.xz &
-	proc10=$!
-	# ---------------------------------------------
-	tar xf spt_3g.xz &
-	proc1=$!
-	# ---------------------------------------------
-	cd ./planck
-	# ---------------------------------------------
-	tar xf planck_supp_data_and_covmats.xz &
-	proc2=$!
-	# ---------------------------------------------
-	cd ./plc_3.0
-	tar xf lensing.xz &
-	proc4=$!
-	tar xf low_l.xz &
-	proc5=$!
-	cd ./hi_l
-	tar xf plik.xz &
-	proc6=$!
-	tar xf plik_lite.xz	&
-	proc7=$!
-	# ---------------------------------------------
-	# ---------------------------------------------
-	# ---------------------------------------------
-	wait "$proc1" "$proc2" "$proc4" "$proc5" "$proc6" "$proc7" "$proc10"
-fi
+echo -e '\033[0;32m'"\t\t DECOMPRESSING BICEP 2015 DATA"'\033[0m'
+tar xf bicep_keck_2015.xz
+# ---------------------------------------------
+echo -e '\033[0;32m'"\t\t DECOMPRESSING SPT-3G Y1 DATA"'\033[0m'
+tar xf spt_3g.xz
+# ---------------------------------------------
+cd ./planck
+# ---------------------------------------------
+echo -e '\033[0;32m'"\t\t DECOMPRESSING SUPPLEMENTAL DATA AND COVARIANCES"'\033[0m'
+tar xf planck_supp_data_and_covmats.xz
+# ---------------------------------------------
+echo -e '\033[0;32m'"\t\t DECOMPRESSING PLANCK-2018 (PLC-3.0) DATA"'\033[0m'
+cd ./plc_3.0
+tar xf lensing.xz
+tar xf low_l.xz
+cd ./hi_l
+rm -rf ./plik/
+tar xf plik.xz
+rm -rf ./plik_lite/
+tar xf plik_lite.xz
+# ---------------------------------------------
+
+cd $ROOTDIR
