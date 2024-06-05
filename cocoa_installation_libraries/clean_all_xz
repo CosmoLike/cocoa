@@ -1,3 +1,5 @@
+#!/bin/bash
+
 if [ -z "${ROOTDIR}" ]; then
     echo 'ERROR ENV VARIABLE ROOTDIR IS NOT DEFINED' >&2
     return 1
@@ -13,7 +15,7 @@ fi
 
 cd ${ROOTDIR}/../cocoa_installation_libraries
 
-echo 'CLEAN ALL INSTALLATION LIBRARIES' > ${OUTPUT_CLEAN_ALL_1} 2> ${OUTPUT_CLEAN_ALL_2}
+echo -e '\033[0;32m'"\t\t CLEAN ALL INSTALLATION LIBRARIES"'\033[0m' > ${OUTPUT_CLEAN_ALL_1} 2> ${OUTPUT_CLEAN_ALL_2}
 
 rm -f armadillo.xz
 
@@ -41,6 +43,6 @@ rm -f lapack.xz
 
 rm -f texinfo.xz
 
-echo 'CLEAN ALL INSTALLATION LIBRARIES XZ FILES DONE' > ${OUTPUT_CLEAN_ALL_1} 2> ${OUTPUT_CLEAN_ALL_2}
+echo -e '\033[0;32m'"\t\t CLEAN ALL INSTALLATION LIBRARIES XZ FILES DONE"'\033[0m' > ${OUTPUT_CLEAN_ALL_1} 2> ${OUTPUT_CLEAN_ALL_2}
 
 cd ${ROOTDIR}
