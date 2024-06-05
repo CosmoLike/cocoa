@@ -166,7 +166,7 @@ The conda installation method should be chosen in the overwhelming majority of c
         
 - Cocoa developers should drop the shallow clone option `--depth 1`; they should also authenticate to GitHub via SSH keys and use the command instead.
 
-      git clone git@github.com:CosmoLike/cocoa.git cocoa
+      $CONDA_PREFIX/bin/git clone git@github.com:CosmoLike/cocoa.git cocoa
   
 - Our scripts never install packages on `$HOME/.local` as that would make them global to the user. All requirements for Cocoa are installed at
 
