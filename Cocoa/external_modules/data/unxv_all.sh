@@ -20,7 +20,7 @@ tar xf bao_data.xz
 echo -e '\033[0;32m'"\t\t DECOMPRESSING H0LICOW DATA"'\033[0m'
 tar xf h0licow_distance_chains.xz
 
-echo '\033[0;32m'"\t\t DECOMPRESSING ACT-DR6 DATA"'\033[0m'
+echo -e '\033[0;32m'"\t\t DECOMPRESSING ACT-DR6 DATA"'\033[0m'
 mkdir -p act
 cd $ROOTDIR/external_modules/data/act
 mkdir -p lensing
