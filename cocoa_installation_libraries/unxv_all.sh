@@ -36,7 +36,7 @@ if [ -z "${IGNORE_CPP_INSTALLATION}" ]; then
   fi
 fi
 
-if [ -z "${THREAD_UNXZ}" ]; then
+if [ -z "${IGNORE_C_INSTALLATION}" ]; then
   echo -e '\033[0;32m'"\t\t DECOMPRESSING EE2 LIBRARY"'\033[0m' > ${OUTPUT_UNXV_ALL_1} 2> ${OUTPUT_UNXV_ALL_2}
   tar xf ee2.xz
 fi
