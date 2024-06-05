@@ -11,7 +11,7 @@ else
   export OUTPUT_CLEAN_ALL_2="/dev/tty"
 fi
 
-echo 'CLEAN DATA FOLDERS - THAT MIGHT TAKE A WHILE' > ${OUTPUT_CLEAN_ALL_1} 2> ${OUTPUT_CLEAN_ALL_2}
+echo -e '\033[0;32m'"\t\t CLEAN DATA FOLDERS"'\033[0m' > ${OUTPUT_CLEAN_ALL_1} 2> ${OUTPUT_CLEAN_ALL_2}
 
 cd $ROOTDIR/external_modules/data
 
@@ -36,4 +36,4 @@ rm -rf h0licow_distance_chains
 
 cd $ROOTDIR/
 
-echo 'CLEAN DATA FOLDERS - DONE' > ${OUTPUT_CLEAN_ALL_1} 2> ${OUTPUT_CLEAN_ALL_2}
+echo -e '\033[0;32m'"\t\t CLEAN DATA FOLDERS - DONE"'\033[0m' > ${OUTPUT_CLEAN_ALL_1} 2> ${OUTPUT_CLEAN_ALL_2}

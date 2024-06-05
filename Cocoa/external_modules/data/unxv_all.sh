@@ -25,8 +25,8 @@ mkdir -p act
 cd $ROOTDIR/external_modules/data/act
 mkdir -p lensing
 cd $ROOTDIR/external_modules/data/act/lensing
-wget https://lambda.gsfc.nasa.gov/data/suborbital/ACT/ACT_dr6/likelihood/data/ACT_dr6_likelihood_v1.2.tgz
-tar -zxvf ACT_dr6_likelihood_v1.2.tgz
+wget https://lambda.gsfc.nasa.gov/data/suborbital/ACT/ACT_dr6/likelihood/data/ACT_dr6_likelihood_v1.2.tgz > ${OUTPUT_UNXV_ALL_1} 2> ${OUTPUT_UNXV_ALL_2}
+tar -zxvf ACT_dr6_likelihood_v1.2.tgz > ${OUTPUT_UNXV_ALL_1} 2> ${OUTPUT_UNXV_ALL_2}
 cd $ROOTDIR/external_modules/data
 
 if [ -z "${THREAD_UNXZ}" ]; then
