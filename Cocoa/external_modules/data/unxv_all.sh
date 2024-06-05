@@ -29,9 +29,17 @@ wget https://lambda.gsfc.nasa.gov/data/suborbital/ACT/ACT_dr6/likelihood/data/AC
 tar -zxvf ACT_dr6_likelihood_v1.2.tgz > ${OUTPUT_UNXV_ALL_1} 2> ${OUTPUT_UNXV_ALL_2}
 cd $ROOTDIR/external_modules/data
 
+
+echo -e '\033[0;32m'"\t\t DECOMPRESSING SIMONS OBSERVATORY"'\033[0m'
+mkdir -p simons_observatory
+cd $ROOTDIR/external_modules/data/simons_observatory
+wget https://portal.nersc.gov/cfs/sobs/users/MFLike_data/v0.7.1.tar.gz
+tar -zxvf v0.7.1.tar.gz
+wget https://portal.nersc.gov/cfs/sobs/users/MFLike_data/v0.8.tar.gz
+tar -zxvf v0.8.tar.gz
+cd $ROOTDIR/external_modules/data
+
 if [ -z "${THREAD_UNXZ}" ]; then
-	echo -e '\033[0;32m'"\t\t DECOMPRESSING SIMONS OBSERVATORY"'\033[0m'
-	tar xf simons_observatory.xz
 	echo -e '\033[0;32m'"\t\t DECOMPRESSING BICEP 2015 DATA"'\033[0m'
 	tar xf bicep_keck_2015.xz
 	# ---------------------------------------------
@@ -54,9 +62,7 @@ if [ -z "${THREAD_UNXZ}" ]; then
 	tar xf plik_lite.xz
 	# ---------------------------------------------
 else
-	echo -e '\033[0;32m'"\t\t DECOMPRESSING THE REMAINING PACKAGES (SO, Planck, SPT...) IN PARALLEL"'\033[0m'
-	tar xf simons_observatory.xz &
-	proc8=$!
+	echo -e '\033[0;32m'"\t\t DECOMPRESSING THE REMAINING PACKAGES IN PARALLEL"'\033[0m'
 	tar xf bicep_keck_2015.xz &
 	proc10=$!
 	# ---------------------------------------------
@@ -81,5 +87,5 @@ else
 	# ---------------------------------------------
 	# ---------------------------------------------
 	# ---------------------------------------------
-	wait "$proc1" "$proc2" "$proc4" "$proc5" "$proc6" "$proc7" "$proc8" "$proc10"
+	wait "$proc1" "$proc2" "$proc4" "$proc5" "$proc6" "$proc7" "$proc10"
 fi
