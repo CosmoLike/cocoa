@@ -1,5 +1,5 @@
 #!/bin/bash
-
+sou
 if [ -z "${ROOTDIR}" ]; then
     echo 'ERROR ENV VARIABLE ROOTDIR IS NOT DEFINED' >&2
     return 1

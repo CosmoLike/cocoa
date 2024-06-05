@@ -17,7 +17,7 @@ sh $ROOTDIR/../cocoa_installation_libraries/clean_all
 cd $ROOTDIR/../cocoa_installation_libraries/
 
 if [ -z "${IGNORE_ALL_PIP_INSTALLATION}" ]; then
-  echo -e '\033[0;32m'"\t\tDECOMPRESSING PIP CACHE"'\033[0m' > ${OUTPUT_UNXV_ALL_1} 2> ${OUTPUT_UNXV_ALL_2}
+  echo -e '\033[0;32m'"\t\t DECOMPRESSING PIP CACHE"'\033[0m' > ${OUTPUT_UNXV_ALL_1} 2> ${OUTPUT_UNXV_ALL_2}
   tar xf pip_cache.xz
   if [ -z "${MINICONDA_INSTALLATION}" ]; then
     tar xf expat.xz
