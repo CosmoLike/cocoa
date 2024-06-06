@@ -27,4 +27,5 @@ if [ -z "${SKIP_DECOMM_STRONG_LENSING}" ]; then
 
   echo -e '\033[0;32m'"\t\t DECOMPRESSING H0LICOW DATA DONE"'\033[0m'
 fi
+
 cd $ROOTDIR/

@@ -76,8 +76,6 @@ fi
 # export SKIP_DECOMM_SPT
 # export SKIP_DECOMM_PLANCK
 # export SKIP_DECOMM_BICEP
-# export SKIP_DECOMM_SN
-# export SKIP_DECOMM_BAO
 # export SKIP_DECOMM_STRONG_LENSING
 # --------------------------------------------------------------------------------------
 

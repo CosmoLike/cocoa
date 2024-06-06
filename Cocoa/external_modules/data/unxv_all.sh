@@ -28,14 +28,9 @@ sh unxv_act_dr6.sh
 
 sh unxv_simons_observatory.sh
 
-# ---------------------------------------------
-echo -e '\033[0;32m'"\t\t DECOMPRESSING BICEP 2015 DATA"'\033[0m'
-cd $ROOTDIR/external_modules/data
-tar xf bicep_keck_2015.xz
-# ---------------------------------------------
-echo -e '\033[0;32m'"\t\t DECOMPRESSING SPT-3G Y1 DATA"'\033[0m'
-cd $ROOTDIR/external_modules/data
-tar xf spt_3g.xz
+sh unxv_bicep.sh
+
+sh unxv_spt.sh
 
 sh unxv_planck2018_basic.sh
 
