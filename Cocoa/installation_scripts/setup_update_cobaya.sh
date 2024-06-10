@@ -45,6 +45,9 @@ export COBAYA_COCOA=$ROOTDIR/../cocoa_installation_libraries/cobaya_changes
 export CBLIKE=cobaya/likelihoods
 export CBTH=cobaya/theories
 export HGL=planck_2018_highl_plik
+export COBAYA_GIT_COMMIT="2636ea9ed399c35c5d276de1acb15aaafbcab10c"
+export HILLIPOP_GIT_COMMIT="cc9cbe31991d4662522241543a46d44d2cdec251"
+export LOLLIPOP_GIT_COMMIT="280a9c93d33bc6a058d6bf769ec82d9f7fdbd2b6"
 #-------------------------------------------------------------------------------
 #-------------------------------------------------------------------------------
 #-------------------------------------------------------------------------------
@@ -59,10 +62,22 @@ rm -rf $ROOTDIR/cobaya
 #-------------------------------------------------------------------------------
 #-------------------------------------------------------------------------------
 #-------------------------------------------------------------------------------
-export COBAYA_GIT_COMMIT="2636ea9ed399c35c5d276de1acb15aaafbcab10c"
-git clone https://github.com/CobayaSampler/cobaya.git cobaya
+git clone https://github.com/CobayaSampler/cobaya.git cobaya > ${OUTPUT_UPDATE_COBAYA_1} 2> ${OUTPUT_UPDATE_COBAYA_2}
+if [ $? -ne 0 ]; then
+  echo -e '\033[0;31m'"\t\t SETUP UPDATE COBAYA FAILED"'\033[0m'
+  cd $ROOTDIR
+  return 1
+fi
+
 cd $COBAYA
+
 git reset --hard $COBAYA_GIT_COMMIT
+if [ $? -ne 0 ]; then
+  echo -e '\033[0;31m'"\t\t SETUP UPDATE COBAYA FAILED"'\033[0m'
+  cd $ROOTDIR
+  return 1
+fi
+
 cd $ROOTDIR
 #-------------------------------------------------------------------------------
 #-------------------------------------------------------------------------------
@@ -111,7 +126,13 @@ rm -rf $COBAYA/$CBLIKE/planck_2015_*
 #-------------------------------------------------------------------------------
 cp -r $COBAYA_COCOA/$CBLIKE/base_classes/change_planck_clik.sh $COBAYA/$CBLIKE/base_classes/
 cd $COBAYA/$CBLIKE/base_classes/
+
 sh change_planck_clik.sh
+if [ $? -ne 0 ]; then
+  cd $ROOTDIR
+  return 1
+fi
+
 cd $ROOTDIR
 #-------------------------------------------------------------------------------
 #-------------------------------------------------------------------------------
@@ -125,9 +146,15 @@ rm -rf $COBAYA/$CBLIKE/planck_2018_highl_CamSpec
 
 cp $COBAYA_COCOA/$CBLIKE/base_classes/InstallableLikelihood.patch $COBAYA/$CBLIKE/base_classes/
 cd COBAYA/$CBLIKE/base_classes/
-patch -u InstallableLikelihood.py -i InstallableLikelihood.patch
-cd $ROOTDIR
 
+patch -u InstallableLikelihood.py -i InstallableLikelihood.patch
+if [ $? -ne 0 ]; then
+  echo -e '\033[0;31m'"\t\t SETUP UPDATE COBAYA (PATCH CAMSPEC) FAILED"'\033[0m'
+  cd $ROOTDIR
+  return 1
+fi
+
+cd $ROOTDIR
 #-------------------------------------------------------------------------------
 #-------------------------------------------------------------------------------
 #-------------------------------------------------------------------------------
@@ -221,15 +248,85 @@ cp -r $COBAYA_COCOA/$CBLIKE/mflike $COBAYA/$CBLIKE/mflike
 # FIX RENAMING IN CAMB ---------------------------------------------------------
 #-------------------------------------------------------------------------------
 cp $COBAYA_COCOA/$CBTH/camb/camb.yaml $COBAYA/$CBTH/camb/camb.yaml
+#-------------------------------------------------------------------------------
+#-------------------------------------------------------------------------------
+#-------------------------------------------------------------------------------
 
 #-------------------------------------------------------------------------------
+# INSTALL HILLIPOP -------------------------------------------------------------
 #-------------------------------------------------------------------------------
+rm -rf $COBAYA/$CBLIKE/planck_2020_hillipop
+rm -rf $COBAYA/$CBLIKE/hillipop_tmp
+
+cd $COBAYA/$CBLIKE
+
+git clone https://github.com/planck-npipe/hillipop.git hillipop_tmp > ${OUTPUT_UPDATE_COBAYA_1} 2> ${OUTPUT_UPDATE_COBAYA_2}
+if [ $? -ne 0 ]; then
+  echo -e '\033[0;31m'"\t\t SETUP UPDATE COBAYA (HILLIPOP) FAILED"'\033[0m'
+  cd $ROOTDIR
+  return 1
+fi
+
+cd $COBAYA/$CBLIKE/hillipop_tmp
+
+git reset --hard $HILLIPOP_GIT_COMMIT > ${OUTPUT_UPDATE_COBAYA_1} 2> ${OUTPUT_UPDATE_COBAYA_2}
+if [ $? -ne 0 ]; then
+  echo -e '\033[0;31m'"\t\t SETUP UPDATE COBAYA (HILLIPOP) FAILED"'\033[0m'
+  cd $ROOTDIR
+  return 1
+fi
+
+mv planck_2020_hillipop/ $COBAYA/$CBLIKE
+
+cd $ROOTDIR
+
+rm -rf $COBAYA/$CBLIKE/hillipop_tmp
+#-------------------------------------------------------------------------------
+#-------------------------------------------------------------------------------
+#-------------------------------------------------------------------------------
+
+#-------------------------------------------------------------------------------
+# INSTALL LOWLLIPOP -------------------------------------------------------------
+#-------------------------------------------------------------------------------
+rm -rf $COBAYA/$CBLIKE/planck_2020_lollipop
+rm -rf $COBAYA/$CBLIKE/lollipop_tmp
+
+cd $COBAYA/$CBLIKE
+
+git clone https://github.com/planck-npipe/lollipop.git lollipop_tmp
+if [ $? -ne 0 ]; then
+  echo -e '\033[0;31m'"\t\t SETUP UPDATE COBAYA (LOLLIPOP) FAILED"'\033[0m'
+  cd $ROOTDIR
+  return 1
+fi
+
+cd $COBAYA/$CBLIKE/lollipop_tmp
+git reset --hard $LOLLIPOP_GIT_COMMIT > ${OUTPUT_UPDATE_COBAYA_1} 2> ${OUTPUT_UPDATE_COBAYA_2}
+if [ $? -ne 0 ]; then
+  echo -e '\033[0;31m'"\t\t SETUP UPDATE COBAYA (LOLLIPOP) FAILED"'\033[0m'
+  cd $ROOTDIR
+  return 1
+fi
+
+mv planck_2020_lollipop/ $COBAYA/$CBLIKE
+
+cd $ROOTDIR
+
+rm -rf $COBAYA/$CBLIKE/lollipop_tmp
+#-------------------------------------------------------------------------------
+#-------------------------------------------------------------------------------
+#-------------------------------------------------------------------------------
+
+#-------------------------------------------------------------------------------
+# UNSETKEYS --------------------------------------------------------------------
 #-------------------------------------------------------------------------------
 unset COBAYA
 unset COBAYA_COCOA
 unset CBLIKE
 unset CBTH
 unset HGL
+unset OUTPUT_UPDATE_COBAYA_1
+unset OUTPUT_UPDATE_COBAYA_2
 #-------------------------------------------------------------------------------
 #-------------------------------------------------------------------------------
 #-------------------------------------------------------------------------------

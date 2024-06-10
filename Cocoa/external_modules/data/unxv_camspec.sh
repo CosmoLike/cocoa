@@ -25,14 +25,14 @@ if [ -z "${SKIP_DECOMM_CAMSPEC}" ]; then
   
   wget "https://github.com/CobayaSampler/planck_native_data/releases/download/v1/CamSpec2021.zip" > ${OUTPUT_UNXV_ALL_1} 2> ${OUTPUT_UNXV_ALL_2}
   if [ $? -ne 0 ]; then 
-    echo -e '\033[0;31m'"\t\t DECOMPRESSING BAO CAMSPEC FAILED"'\033[0m'
+    echo -e '\033[0;31m'"\t\t DECOMPRESSING CAMSPEC FAILED"'\033[0m'
     cd $ROOTDIR
     return 1
   fi
   
   unzip CamSpec2021.zip > ${OUTPUT_UNXV_ALL_1} 2> ${OUTPUT_UNXV_ALL_2}
   if [ $? -ne 0 ]; then
-    echo -e '\033[0;31m'"\t\t DECOMPRESSING BAO CAMSPEC FAILED"'\033[0m'
+    echo -e '\033[0;31m'"\t\t DECOMPRESSING CAMSPEC FAILED"'\033[0m'
     cd $ROOTDIR
     return 1
   fi

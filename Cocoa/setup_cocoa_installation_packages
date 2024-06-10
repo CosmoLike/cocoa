@@ -319,7 +319,7 @@ if [ $? -ne 0 ]; then
   return 1
 fi
 
-source $ROOTDIR/installation_scripts/setup_update_cobaya
+source $ROOTDIR/installation_scripts/setup_update_cobaya.sh
 if [ $? -ne 0 ]; then
   echo -e '\033[0;31m'"SCRIPT setup_update_cobaya FAILED"'\033[0m'
   cd $ROOTDIR
