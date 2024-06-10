@@ -18,10 +18,10 @@ cd $ROOTDIR/external_modules/data
 if [ -z "${SKIP_DECOMM_CAMSPEC}" ]; then
   echo -e '\033[0;32m'"\t\t DECOMPRESSING CAMSPEC DATA"'\033[0m'
 
-  rm -f  $ROOTDIR/external_modules/data/planck/plc_3.0/CamSpec/CamSpec2021.zip
-  rm -rf $ROOTDIR/external_modules/data/planck/plc_3.0/CamSpec/CamSpec2021
+  rm -f  $ROOTDIR/external_modules/data/planck/CamSpec/CamSpec2021.zip
+  rm -rf $ROOTDIR/external_modules/data/planck/CamSpec/CamSpec2021
 
-  cd  $ROOTDIR/external_modules/data/planck/plc_3.0/CamSpec/
+  cd  $ROOTDIR/external_modules/data/planck/CamSpec/
   
   wget "https://github.com/CobayaSampler/planck_native_data/releases/download/v1/CamSpec2021.zip" > ${OUTPUT_UNXV_ALL_1} 2> ${OUTPUT_UNXV_ALL_2}
   if [ $? -ne 0 ]; then 
@@ -37,7 +37,7 @@ if [ -z "${SKIP_DECOMM_CAMSPEC}" ]; then
     return 1
   fi
 
-  rm -f  $ROOTDIR/external_modules/data/planck/plc_3.0/CamSpec/CamSpec2021.zip
+  rm -f  $ROOTDIR/external_modules/data/planck/CamSpec/CamSpec2021.zip
 
   echo -e '\033[0;32m'"\t\t DECOMPRESSING CAMSPEC DATA DONE"'\033[0m'
 fi
