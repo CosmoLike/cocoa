@@ -13,23 +13,17 @@ else
   export OUTPUT_UNXV_ALL_2="/dev/tty"
 fi
 
-sh $ROOTDIR/external_modules/data/clean_all.sh 
 cd $ROOTDIR/external_modules/data
 
-sh unxv_sn.sh
+if [ -z "${SKIP_DECOMM_BAO}" ]; then
+  echo -e '\033[0;32m'"\t\t DECOMPRESSING BAO DATA"'\033[0m'
+  
+  rm -rf $ROOTDIR/external_modules/data/bao_data
+  
+  cd $ROOTDIR/external_modules/data
+  tar xf bao_data.xz
+  
+  echo -e '\033[0;32m'"\t\t DECOMPRESSING BAO DATA DONE"'\033[0m'
+fi
 
-sh unxv_bao.sh
-
-sh unxv_h0licow.sh
-
-sh unxv_act_dr6.sh
-
-sh unxv_simons_observatory.sh
-
-sh unxv_bicep.sh
-
-sh unxv_spt.sh
-
-sh unxv_planck2018_basic.sh
-
-cd $ROOTDIR
+cd $ROOTDIR/
