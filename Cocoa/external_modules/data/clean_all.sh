@@ -32,6 +32,7 @@ rm -rf planck/plc_3.0/hi_l/plik_lite
 rm -rf h0licow_distance_chains
 rm -f $ROOTDIR/external_modules/data/camspec2020.tgz
 rm -rf $ROOTDIR/external_modules/data/camspec
+rm -rf $ROOTDIR/external_modules/data/CamSpec2021
 
 cd $ROOTDIR/
 

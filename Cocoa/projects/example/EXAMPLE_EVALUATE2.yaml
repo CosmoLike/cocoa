@@ -9,6 +9,10 @@ likelihood:
   planck_2018_highl_plik.TT:
     path: ./external_modules/
     clik_file: plc_3.0/hi_l/plik/plik_rd12_HM_v22_TT.clik
+  planck_2018_lowl.TT:
+    path: ./external_modules
+  planck_2018_lowl.EE:
+    path: ./external_modules
 
 params:
   logA:

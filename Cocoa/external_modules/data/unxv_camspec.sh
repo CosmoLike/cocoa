@@ -18,8 +18,10 @@ cd $ROOTDIR/external_modules/data
 if [ -z "${SKIP_DECOMM_CAMSPEC}" ]; then
   echo -e '\033[0;32m'"\t\t DECOMPRESSING CAMSPEC DATA"'\033[0m'
   
-  rm -rf $ROOTDIR/external_modules/data/camspec
-  rm -f $ROOTDIR/external_modules/data/camspec2020.tgz
+  cd  $ROOTDIR/external_modules/data/planck/plc_3.0/CamSpec/
+
+  rm -r  $ROOTDIR/external_modules/data/planck/plc_3.0/CamSpec/CamSpec2021.zip
+  rm -rf $ROOTDIR/external_modules/data/planck/plc_3.0/CamSpec/CamSpec2021
 
   cd $ROOTDIR/external_modules/data
   
@@ -38,6 +40,8 @@ if [ -z "${SKIP_DECOMM_CAMSPEC}" ]; then
   fi
 
   rm -f $ROOTDIR/external_modules/data/camspec2020.tgz
+
+  mv $ROOTDIR/external_modules/data/camspec $ROOTDIR/external_modules/data/CamSpec2021
 
   echo -e '\033[0;32m'"\t\t DECOMPRESSING CAMSPEC DATA DONE"'\033[0m'
 fi
