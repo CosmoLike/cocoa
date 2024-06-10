@@ -204,5 +204,14 @@ sampler:
       tau: 0.0543
       w0pwa: -0.968859
       w: -0.909098
+      A_planck: 1.00133
+      amp_143: 9.5291
+      amp_217: 18.329
+      amp_143x217: 9.76466
+      n_143: 0.893946
+      n_217: 0.932117
+      n_143x217: 1.02539
+      calTE: 1.00764
+      calEE: 0.983792
 
 output: ./projects/example/chains/EXAMPLE_EVALUATE1
