@@ -17,31 +17,27 @@ cd $ROOTDIR/external_modules/data
 
 if [ -z "${SKIP_DECOMM_CAMSPEC}" ]; then
   echo -e '\033[0;32m'"\t\t DECOMPRESSING CAMSPEC DATA"'\033[0m'
-  
-  cd  $ROOTDIR/external_modules/data/planck/plc_3.0/CamSpec/
 
-  rm -r  $ROOTDIR/external_modules/data/planck/plc_3.0/CamSpec/CamSpec2021.zip
+  rm -f  $ROOTDIR/external_modules/data/planck/plc_3.0/CamSpec/CamSpec2021.zip
   rm -rf $ROOTDIR/external_modules/data/planck/plc_3.0/CamSpec/CamSpec2021
 
-  cd $ROOTDIR/external_modules/data
+  cd  $ROOTDIR/external_modules/data/planck/plc_3.0/CamSpec/
   
-  wget "https://people.ast.cam.ac.uk/~stg20/camspec/camspec2020.tgz" > ${OUTPUT_UNXV_ALL_1} 2> ${OUTPUT_UNXV_ALL_2}
+  wget "https://github.com/CobayaSampler/planck_native_data/releases/download/v1/CamSpec2021.zip" > ${OUTPUT_UNXV_ALL_1} 2> ${OUTPUT_UNXV_ALL_2}
   if [ $? -ne 0 ]; then 
     echo -e '\033[0;31m'"\t\t DECOMPRESSING BAO CAMSPEC FAILED"'\033[0m'
     cd $ROOTDIR
     return 1
   fi
   
-  tar xzf camspec2020.tgz > ${OUTPUT_UNXV_ALL_1} 2> ${OUTPUT_UNXV_ALL_2}
+  unzip CamSpec2021.zip > ${OUTPUT_UNXV_ALL_1} 2> ${OUTPUT_UNXV_ALL_2}
   if [ $? -ne 0 ]; then
     echo -e '\033[0;31m'"\t\t DECOMPRESSING BAO CAMSPEC FAILED"'\033[0m'
     cd $ROOTDIR
     return 1
   fi
 
-  rm -f $ROOTDIR/external_modules/data/camspec2020.tgz
-
-  mv $ROOTDIR/external_modules/data/camspec $ROOTDIR/external_modules/data/CamSpec2021
+  rm -f  $ROOTDIR/external_modules/data/planck/plc_3.0/CamSpec/CamSpec2021.zip
 
   echo -e '\033[0;32m'"\t\t DECOMPRESSING CAMSPEC DATA DONE"'\033[0m'
 fi
