@@ -15,12 +15,20 @@ fi
 
 cd $ROOTDIR/external_modules/data
 
-if [ -z "${SKIP_DECOMM_SPT}" ]; then
+if [ -z "${SKIP_DECOMM_BICEP}" ]; then
   echo -e '\033[0;32m'"\t\t DECOMPRESSING BICEP 2015 DATA"'\033[0m'
   
-  cd $ROOTDIR/external_modules/data
-  tar xf bicep_keck_2015.xz
+  rm -rf $ROOTDIR/external_modules/data/bicep_keck_2015
   
+  cd $ROOTDIR/external_modules/data
+  
+  tar xf bicep_keck_2015.xz > ${OUTPUT_UNXV_ALL_1} 2> ${OUTPUT_UNXV_ALL_2}
+  if [ $? -ne 0 ]; then
+    echo -e '\033[0;31m'"\t\t DECOMPRESSING BICEP 2015 DATA FAILED"'\033[0m'
+    cd $ROOTDIR
+    return 1
+  fi
+
   echo -e '\033[0;32m'"\t\t DECOMPRESSING BICEP 2015 DATA DONE"'\033[0m'
 fi
 

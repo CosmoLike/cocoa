@@ -79,6 +79,7 @@ fi
 # export SKIP_DECOMM_STRONG_LENSING
 # export SKIP_DECOMM_SN
 # export SKIP_DECOMM_BAO
+export SKIP_DECOMM_CAMSPEC
 # --------------------------------------------------------------------------------------
 
 # --------------------------------------------------------------------------------------

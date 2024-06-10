@@ -19,10 +19,16 @@ if [ -z "${SKIP_DECOMM_BAO}" ]; then
   echo -e '\033[0;32m'"\t\t DECOMPRESSING BAO DATA"'\033[0m'
   
   rm -rf $ROOTDIR/external_modules/data/bao_data
-  
+
   cd $ROOTDIR/external_modules/data
-  tar xf bao_data.xz
-  
+
+  tar xf bao_data.xz > ${OUTPUT_UNXV_ALL_1} 2> ${OUTPUT_UNXV_ALL_2}
+  if [ $? -ne 0 ]; then
+    echo -e '\033[0;31m'"\t\t DECOMPRESSING BAO DATA FAILED"'\033[0m'
+    cd $ROOTDIR
+    return 1
+  fi
+
   echo -e '\033[0;32m'"\t\t DECOMPRESSING BAO DATA DONE"'\033[0m'
 fi
 

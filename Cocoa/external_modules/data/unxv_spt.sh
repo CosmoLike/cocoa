@@ -20,9 +20,22 @@ if [ -z "${SKIP_DECOMM_SPT}" ]; then
   
   rm -rf $ROOTDIR/external_modules/data/spt_3g/
   cd $ROOTDIR/external_modules/data
-  git clone https://github.com/SouthPoleTelescope/spt3g_y1_dist.git spt_3g
+  
+  git clone https://github.com/SouthPoleTelescope/spt3g_y1_dist.git spt_3g > ${OUTPUT_UNXV_ALL_1} 2> ${OUTPUT_UNXV_ALL_2}
+  if [ $? -ne 0 ]; then
+    echo -e '\033[0;31m'"\t\t DECOMPRESSING SPT-3G Y1 DATA FAILED"'\033[0m'
+    cd $ROOTDIR
+    return 1
+  fi
+
   cd $ROOTDIR/external_modules/data/spt_3g
-  git checkout 66da8e9e2f325024566fe13245788bf8ede897bc
+  
+  git checkout 66da8e9e2f325024566fe13245788bf8ede897bc > ${OUTPUT_UNXV_ALL_1} 2> ${OUTPUT_UNXV_ALL_2}
+  if [ $? -ne 0 ]; then
+    echo -e '\033[0;31m'"\t\t DECOMPRESSING SPT-3G Y1 DATA FAILED"'\033[0m'
+    cd $ROOTDIR
+    return 1
+  fi
 
   echo -e '\033[0;32m'"\t\t DECOMPRESSING SPT-3G Y1 DATA DONE"'\033[0m'
 fi

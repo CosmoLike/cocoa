@@ -16,20 +16,42 @@ fi
 cd $ROOTDIR/external_modules/data
 
 if [ -z "${SKIP_DECOMM_SIMONS_OBSERVATORY}" ]; then
-    echo -e '\033[0;32m'"\t\t DECOMPRESSING SIMONS OBSERVATORY"'\033[0m'
+  echo -e '\033[0;32m'"\t\t DECOMPRESSING SIMONS OBSERVATORY"'\033[0m'
 
-    rm -rf $ROOTDIR/external_modules/data/simons_observatory/
+  rm -rf $ROOTDIR/external_modules/data/simons_observatory/
 
-    mkdir -p simons_observatory
-    cd $ROOTDIR/external_modules/data/simons_observatory
-    
-    wget https://portal.nersc.gov/cfs/sobs/users/MFLike_data/v0.7.1.tar.gz > ${OUTPUT_UNXV_ALL_1} 2> ${OUTPUT_UNXV_ALL_2}
-    tar -zxvf v0.7.1.tar.gz > ${OUTPUT_UNXV_ALL_1} 2> ${OUTPUT_UNXV_ALL_2}
-    
-    wget https://portal.nersc.gov/cfs/sobs/users/MFLike_data/v0.8.tar.gz > ${OUTPUT_UNXV_ALL_1} 2> ${OUTPUT_UNXV_ALL_2}
-    tar -zxvf v0.8.tar.gz > ${OUTPUT_UNXV_ALL_1} 2> ${OUTPUT_UNXV_ALL_2}
+  mkdir -p simons_observatory
+  cd $ROOTDIR/external_modules/data/simons_observatory
+  
+  wget https://portal.nersc.gov/cfs/sobs/users/MFLike_data/v0.7.1.tar.gz > ${OUTPUT_UNXV_ALL_1} 2> ${OUTPUT_UNXV_ALL_2}
+  if [ $? -ne 0 ]; then
+    echo -e '\033[0;31m'"\t\t DECOMPRESSING SIMONS OBSERVATORY DATA FAILED"'\033[0m'
+    cd $ROOTDIR
+    return 1
+  fi
 
-    echo -e '\033[0;32m'"\t\t DECOMPRESSING SIMONS OBSERVATORY DONE"'\033[0m'
+  tar -zxvf v0.7.1.tar.gz > ${OUTPUT_UNXV_ALL_1} 2> ${OUTPUT_UNXV_ALL_2}
+  if [ $? -ne 0 ]; then
+    echo -e '\033[0;31m'"\t\t DECOMPRESSING SIMONS OBSERVATORY DATA FAILED"'\033[0m'
+    cd $ROOTDIR
+    return 1
+  fi
+
+  wget https://portal.nersc.gov/cfs/sobs/users/MFLike_data/v0.8.tar.gz > ${OUTPUT_UNXV_ALL_1} 2> ${OUTPUT_UNXV_ALL_2}
+   if [ $? -ne 0 ]; then
+    echo -e '\033[0;31m'"\t\t DECOMPRESSING SIMONS OBSERVATORY DATA FAILED"'\033[0m'
+    cd $ROOTDIR
+    return 1
+  fi
+
+  tar -zxvf v0.8.tar.gz > ${OUTPUT_UNXV_ALL_1} 2> ${OUTPUT_UNXV_ALL_2}
+  if [ $? -ne 0 ]; then
+    echo -e '\033[0;31m'"\t\t DECOMPRESSING SIMONS OBSERVATORY DATA FAILED"'\033[0m'
+    cd $ROOTDIR
+    return 1
+  fi
+
+  echo -e '\033[0;32m'"\t\t DECOMPRESSING SIMONS OBSERVATORY DONE"'\033[0m'
 fi
 
 cd $ROOTDIR/
