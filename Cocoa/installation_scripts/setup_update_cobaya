@@ -122,8 +122,12 @@ cd $ROOTDIR
 #-------------------------------------------------------------------------------
 # WE REMOVE UNBINNED PLANCK CAMSPEC (TODO IN THE FUTURE: FIX THEIR YAML)
 rm -rf $COBAYA/$CBLIKE/planck_2018_highl_CamSpec
-rm -rf $COBAYA/$CBLIKE/planck_2018_highl_CamSpec2021
-rm -rf $COBAYA/$CBLIKE/planck_NPIPE_highl_CamSpec
+
+cp $COBAYA_COCOA/$CBLIKE/base_classes/InstallableLikelihood.patch $COBAYA/$CBLIKE/base_classes/
+cd COBAYA/$CBLIKE/base_classes/
+patch -u InstallableLikelihood.py -i InstallableLikelihood.patch
+cd $ROOTDIR
+
 #-------------------------------------------------------------------------------
 #-------------------------------------------------------------------------------
 #-------------------------------------------------------------------------------

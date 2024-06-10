@@ -4,7 +4,7 @@ timing: false
 
 likelihood:
   planck_2018_highl_CamSpec2021.TTTEEE:
-    path: ./external_modules/data/planck/plc_3.0/CamSpec
+    path: ./external_modules/data/planck/CamSpec
   planck_2018_lowl.TT:
     path: ./external_modules
   planck_2018_lowl.EE:
