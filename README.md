@@ -52,13 +52,13 @@ This readme file presents basic and advanced instructions for installing all [Co
 
 **Step :two:**: Run the script `setup_cocoa_installation_packages` via
         
-    source setup_cocoa_installation_packages
+    source setup_cocoa_installation_packages.sh
 
 The script `setup_cocoa_installation_packages` decompresses the data files and installs a few necessary packages that have not been installed via conda.
 
 **Step :three:**: Run the script `compile_external_modules` by typing 
 
-    source compile_external_modules
+    source compile_external_modules.sh
     
 This compiles CAMB/Class Boltzmann codes, Planck likelihood, and Polychord sampler. 
 
@@ -230,16 +230,16 @@ If you can fix the issue, rerun `setup_cocoa_installation_packages` and `compile
 
 To avoid excessive compilation times during development, users can use specialized scripts located at `Cocoa/installation_scripts/` that compile only a specific module. A few examples of these scripts are: 
 
-        $(cocoa)(.local) source ./installation_scripts/compile_class
-        $(cocoa)(.local) source ./installation_scripts/compile_camb
-        $(cocoa)(.local) source ./installation_scripts/compile_planck
-        $(cocoa)(.local) source ./installation_scripts/compile_act
-        $(cocoa)(.local) source ./installation_scripts/setup_polychord
+        $(cocoa)(.local) source ./installation_scripts/compile_class.sh
+        $(cocoa)(.local) source ./installation_scripts/compile_camb.sh
+        $(cocoa)(.local) source ./installation_scripts/compile_planck.sh
+        $(cocoa)(.local) source ./installation_scripts/compile_act.sh
+        $(cocoa)(.local) source ./installation_scripts/setup_polychord.sh
         # Below, we show subroutines associated with the setup_cocoa_installation_packages script
-        $(cocoa)(.local) source ./installation_scripts/setup_cpp_packages
-        $(cocoa)(.local) source ./installation_scripts/setup_c_packages
-        $(cocoa)(.local) source ./installation_scripts/setup_decompress_files
-        $(cocoa)(.local) source ./installation_scripts/setup_pip_packages
+        $(cocoa)(.local) source ./installation_scripts/setup_cpp_packages.sh
+        $(cocoa)(.local) source ./installation_scripts/setup_c_packages.sh
+        $(cocoa)(.local) source ./installation_scripts/setup_decompress_files.sh
+        $(cocoa)(.local) source ./installation_scripts/setup_pip_packages.sh
 
 In the commands above, we displayed `$(cocoa)(.local)` to emphasize that the users must first activate the cocoa conda environment and run `source start_cocoa` in the main Cocoa folder before running the scripts inside the `Cocoa/installation_scripts` folder.
 
