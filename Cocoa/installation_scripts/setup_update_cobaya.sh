@@ -1,7 +1,7 @@
 #!/bin/bash
-# ------------------------------------------------------------------------------
-# ------------------------------------------------------------------------------
-# ------------------------------------------------------------------------------
+# --------------------------------------------------------------------------------------
+# --------------------------------------------------------------------------------------
+# --------------------------------------------------------------------------------------
 if [ -z "${IGNORE_ALL_COBAYA_INSTALLATION}" ]; then
   echo -e '\033[1;44m''Updating Cobaya Package''\033[0m'
 
@@ -9,37 +9,34 @@ if [ -z "${IGNORE_ALL_COBAYA_INSTALLATION}" ]; then
     echo -e '\033[0;31m''ERROR ENV VARIABLE ROOTDIR IS NOT DEFINED''\033[0m'
     return 1
   fi
-  if [ -z "${GIT}" ]; then
-    echo -e '\033[0;31m''ERROR ENV VARIABLE GIT IS NOT DEFINED''\033[0m'
-    cd $ROOTDIR
-    return 1
-  fi
+   if [ -z "${GIT}" ]; then
+      echo -e '\033[0;31m''ERROR ENV VARIABLE GIT IS NOT DEFINED''\033[0m'
+      cd $ROOTDIR
+      return 1
+    fi
   if [ -z "${DEBUG_PIP_OUTPUT}" ]; then
-    export OUT_UPT_CB_1="/dev/null"
-    export OUT_UPT_CB_2="/dev/null"
+    export OUT_UCB_1="/dev/null"
+    export OUT_UCB_2="/dev/null"
   else
-    export OUT_UPT_CB_1="/dev/tty"
-    export OUT_UPT_CB_2="/dev/tty"
+    export OUT_UCB_1="/dev/tty"
+    export OUT_UCB_2="/dev/tty"
   fi
 
   export COBAYA=$ROOTDIR/cobaya/
   export COBAYA_COCOA=$ROOTDIR/../cocoa_installation_libraries/cobaya_changes
   export CBLIKE=cobaya/likelihoods
   export CBTH=cobaya/theories
-  export HGL=planck_2018_highl_plik
-
-  cd $ROOTDIR
-
+  
   if [ -z "${IGNORE_COBAYA_INSTALLATION}" ]; then
-    #---------------------------------------------------------------------------
-    # Remove any previous installed cobaya folder ------------------------------
-    #---------------------------------------------------------------------------
+    #-------------------------------------------------------------------------------
+    # Remove any previous installed cobaya folder
     rm -rf $ROOTDIR/cobaya
+
+    cd $ROOTDIR
     
-    #---------------------------------------------------------------------------
-    # CLONE COBAYA FROM ORIGINAL REPO ------------------------------------------
-    #---------------------------------------------------------------------------
-    $GIT clone https://github.com/CobayaSampler/cobaya.git cobaya > ${OUT_UPT_CB_1} 2> ${OUT_UPT_CB_2}
+    export CBURL="https://github.com/CobayaSampler/cobaya.git"
+
+    $GIT clone $CBURL cobaya > ${OUT_UCB_1} 2> ${OUT_UCB_2}
     if [ $? -ne 0 ]; then
       echo -e '\033[0;31m'"\t\t SETUP UPDATE COBAYA FAILED"'\033[0m'
       cd $ROOTDIR
@@ -47,12 +44,13 @@ if [ -z "${IGNORE_ALL_COBAYA_INSTALLATION}" ]; then
       unset COBAYA_COCOA
       unset CBLIKE
       unset CBTH
-      unset HGL
-      unset OUT_UPT_CB_1
-      unset OUT_UPT_CB_2
+      unset OUT_UCB_1
+      unset OUT_UCB_2
+      unset CBURL
       return 1
     fi
-
+    unset CBURL
+    
     cd $COBAYA
 
     $GIT reset --hard $COBAYA_GIT_COMMIT
@@ -63,9 +61,8 @@ if [ -z "${IGNORE_ALL_COBAYA_INSTALLATION}" ]; then
       unset COBAYA_COCOA
       unset CBLIKE
       unset CBTH
-      unset HGL
-      unset OUT_UPT_CB_1
-      unset OUT_UPT_CB_2
+      unset OUT_UCB_1
+      unset OUT_UCB_2
       return 1
     fi
 
@@ -86,13 +83,13 @@ if [ -z "${IGNORE_ALL_COBAYA_INSTALLATION}" ]; then
     cp -r $COBAYA_COCOA/$CBLIKE/h0licow/ $COBAYA/$CBLIKE/
 
     #---------------------------------------------------------------------------
-    # Native DES-Y1 ------------------------------------------------------------
+    # NATIVE DES-Y1 ------------------------------------------------------------
     #---------------------------------------------------------------------------
     # WE REMOVE COBAYA NATIVE DES-Y1
     rm -rf $COBAYA/$CBLIKE/des_y1
-    
+
     #---------------------------------------------------------------------------
-    # Planck 2015 --------------------------------------------------------------
+    # 2015 ---------------------------------------------------------------------
     #---------------------------------------------------------------------------
     # WE REMOVE PLANCK 2015 DATA
     rm -rf $COBAYA/$CBLIKE/planck_2015_*
@@ -100,9 +97,11 @@ if [ -z "${IGNORE_ALL_COBAYA_INSTALLATION}" ]; then
     #---------------------------------------------------------------------------
     # CHANGE PLANCK CLIK -------------------------------------------------------
     #---------------------------------------------------------------------------
-    cp -r $COBAYA_COCOA/$CBLIKE/base_classes/change_planck_clik.sh $COBAYA/$CBLIKE/base_classes/
-
-    cd $COBAYA/$CBLIKE/base_classes/
+    export BASECL="${CBLIKE}/base_classes"
+    
+    cp -r $COBAYA_COCOA/$BASECL/change_planck_clik.sh $COBAYA/$BASECL
+    cd $COBAYA/$CBLIKE/
+    
     sh change_planck_clik.sh
     if [ $? -ne 0 ]; then
       cd $ROOTDIR
@@ -110,64 +109,78 @@ if [ -z "${IGNORE_ALL_COBAYA_INSTALLATION}" ]; then
       unset COBAYA_COCOA
       unset CBLIKE
       unset CBTH
-      unset HGL
-      unset OUT_UPT_CB_1
-      unset OUT_UPT_CB_2
+      unset OUT_UCB_1
+      unset OUT_UCB_2
+      unset BASECL
       return 1
     fi
+    unset BASECL
+    
     cd $ROOTDIR
 
     #---------------------------------------------------------------------------
     # PLANCK 2018 LOWELL -------------------------------------------------------
     #---------------------------------------------------------------------------
     # WE REMOVE LEWIS NATIVE LIKELIHOOD 
-    rm -f $COBAYA/$CBLIKE/planck_2018_lowl/EE_clik.py
-    rm -f $COBAYA/$CBLIKE/planck_2018_lowl/EE_clik.yaml
-    rm -f $COBAYA/$CBLIKE/planck_2018_lowl/EE_sroll2.py
-    rm -f $COBAYA/$CBLIKE/planck_2018_lowl/EE_sroll2.bibtex
+    export PL_LWL="${CBLIKE}/planck_2018_lowl"
+    
+    rm -f $COBAYA/$PL_LWL/EE_clik.py
+    rm -f $COBAYA/$PL_LWL/EE_clik.yaml
+    rm -f $COBAYA/$PL_LWL/EE_sroll2.py
+    rm -f $COBAYA/$PL_LWL/EE_sroll2.bibtex
 
     #WE RENAME TT/EE.py to also mean TT/EE_clik.py
-    cp $COBAYA_COCOA/$CBLIKE/planck_2018_lowl/EE.py $COBAYA/$CBLIKE/planck_2018_lowl/EE.py
-    cp $COBAYA_COCOA/$CBLIKE/planck_2018_lowl/EE.yaml $COBAYA/$CBLIKE/planck_2018_lowl/EE.yaml
+    cp $COBAYA_COCOA/$PL_LWL/EE.py $COBAYA/$PL_LWL/EE.py
+    cp $COBAYA_COCOA/$PL_LWL/EE.yaml $COBAYA/$PL_LWL/EE.yaml
 
-    cp $COBAYA_COCOA/$CBLIKE/planck_2018_lowl/TT.py $COBAYA/$CBLIKE/planck_2018_lowl/TT.py
-    cp $COBAYA_COCOA/$CBLIKE/planck_2018_lowl/TT.yaml $COBAYA/$CBLIKE/planck_2018_lowl/TT.yaml
+    cp $COBAYA_COCOA/$PL_LWL/TT.py $COBAYA/$PL_LWL/TT.py
+    cp $COBAYA_COCOA/$PL_LWL/TT.yaml $COBAYA/$PL_LWL/TT.yaml
 
+    unset PL_LWL
+    
     #---------------------------------------------------------------------------
     # PLANCK 2018 LENSING ------------------------------------------------------
     #---------------------------------------------------------------------------
     # WE REMOVE LEWIS NATIVE LIKELIHOOD
-    rm -f $COBAYA/$CBLIKE/planck_2018_lensing/CMBMarged.yaml
-    rm -f $COBAYA/$CBLIKE/planck_2018_lensing/native.yaml
+    export PL_LL="${CBLIKE}/planck_2018_lensing"
+    
+    rm -f $COBAYA/$PL_LL/CMBMarged.yaml
+    rm -f $COBAYA/$PL_LL/native.yaml
 
     # WE COPY FIXED YAML FILE
-    cp $COBAYA_COCOA/$CBLIKE/planck_2018_lensing/clik.yaml $COBAYA/$CBLIKE/planck_2018_lensing/clik.yaml
+    cp $COBAYA_COCOA/$PL_LL/clik.yaml $COBAYA/$PL_LL/clik.yaml
 
+    unset PL_LL
+    
     #---------------------------------------------------------------------------
     # HIGHELL_PLIK -------------------------------------------------------------
     #---------------------------------------------------------------------------
     # WE REMOVE UNBINNED
-    rm -f $COBAYA/$CBLIKE/$HGL/TTTEEE_unbinned.py
-    rm -f $COBAYA/$CBLIKE/$HGL/TTTEEE_unbinned.yaml
-    rm -f $COBAYA/$CBLIKE/$HGL/TT_unbinned.py
-    rm -f $COBAYA/$CBLIKE/$HGL/TT_unbinned.yaml
+    export HGL="${CBLIKE}/planck_2018_highl_plik"
+    
+    rm -f $COBAYA/$HGL/TTTEEE_unbinned.py
+    rm -f $COBAYA/$HGL/TTTEEE_unbinned.yaml
+    rm -f $COBAYA/$HGL/TT_unbinned.py
+    rm -f $COBAYA/$HGL/TT_unbinned.yaml
 
     # REMOVE LEWIS NATIVE REIMPLEMENTATION
-    rm -f $COBAYA/$CBLIKE/$HGL/TTTEEE_lite_native.py
-    rm -f $COBAYA/$CBLIKE/$HGL/TTTEEE_lite_native.yaml
+    rm -f $COBAYA/$HGL/TTTEEE_lite_native.py
+    rm -f $COBAYA/$HGL/TTTEEE_lite_native.yaml
 
-    rm -f $COBAYA/$CBLIKE/$HGL/TT_lite_native.py
-    rm -f $COBAYA/$CBLIKE/$HGL/TT_lite_native.yaml
+    rm -f $COBAYA/$HGL/TT_lite_native.py
+    rm -f $COBAYA/$HGL/TT_lite_native.yaml
 
     # FIX YAML
-    cp $COBAYA_COCOA/$CBLIKE/$HGL/EE.yaml $COBAYA/$CBLIKE/$HGL/EE.yaml
-    cp $COBAYA_COCOA/$CBLIKE/$HGL/TE.yaml $COBAYA/$CBLIKE/$HGL/TE.yaml
+    cp $COBAYA_COCOA/$HGL/EE.yaml $COBAYA/$HGL/EE.yaml
+    cp $COBAYA_COCOA/$HGL/TE.yaml $COBAYA/$HGL/TE.yaml
 
-    cp $COBAYA_COCOA/$CBLIKE/$HGL/TT.yaml $COBAYA/$CBLIKE/$HGL/TT.yaml
-    cp $COBAYA_COCOA/$CBLIKE/$HGL/TTTEEE.yaml $COBAYA/$CBLIKE/$HGL/TTTEEE.yaml
+    cp $COBAYA_COCOA/$HGL/TT.yaml $COBAYA/$HGL/TT.yaml
+    cp $COBAYA_COCOA/$HGL/TTTEEE.yaml $COBAYA/$HGL/TTTEEE.yaml
 
-    cp $COBAYA_COCOA/$CBLIKE/$HGL/TT_lite.yaml $COBAYA/$CBLIKE/$HGL/TT_lite.yaml
-    cp $COBAYA_COCOA/$CBLIKE/$HGL/TTTEEE_lite.yaml $COBAYA/$CBLIKE/$HGL/TTTEEE_lite.yaml
+    cp $COBAYA_COCOA/$HGL/TT_lite.yaml $COBAYA/$HGL/TT_lite.yaml
+    cp $COBAYA_COCOA/$HGL/TTTEEE_lite.yaml $COBAYA/$HGL/TTTEEE_lite.yaml
+
+    unset HGL
 
     #---------------------------------------------------------------------------
     # SPT3G Y1 -----------------------------------------------------------------
@@ -177,23 +190,38 @@ if [ -z "${IGNORE_ALL_COBAYA_INSTALLATION}" ]; then
     #---------------------------------------------------------------------------
     # ACT DR6 LENSLIKE ---------------------------------------------------------
     #---------------------------------------------------------------------------
-    cp -r $COBAYA_COCOA/$CBLIKE/act_dr6_lenslike $COBAYA/$CBLIKE/act_dr6_lenslike
+    export ACTDR6_LL="${CBLIKE}/act_dr6_lenslike"
+    cp -r $COBAYA_COCOA/$ACTDR6_LL $COBAYA/$ACTDR6_LL
+
+    unset ACTDR6_LL
 
     #---------------------------------------------------------------------------
     # FIX RENAMING IN CAMB -----------------------------------------------------
     #---------------------------------------------------------------------------
     cp $COBAYA_COCOA/$CBTH/camb/camb.yaml $COBAYA/$CBTH/camb/camb.yaml
+
+    #---------------------------------------------------------------------------
+    cd $ROOTDIR
+  fi
+
+  #-----------------------------------------------------------------------------
+  # SO -------------------------------------------------------------------------
+  #-----------------------------------------------------------------------------
+  if [ -z "${SKIP_DECOMM_SIMONS_OBSERVATORY}" ]; then
+    cp -r $COBAYA_COCOA/$CBLIKE/mflike $COBAYA/$CBLIKE/mflike
+    cd $ROOTDIR
   fi
 
   #-------------------------------------------------------------------------------
   # CAMSPEC ----------------------------------------------------------------------
   #-------------------------------------------------------------------------------
-  if [ -z "${IGNORE_CAMSPEC_INSTALLATION}" ]; then
-    # WE REMOVE UNBINNED PLANCK CAMSPEC (TODO IN THE FUTURE: FIX THEIR YAML)
+  if [ -z "${SKIP_DECOMM_CAMSPEC}" ]; then
     rm -rf $COBAYA/$CBLIKE/planck_2018_highl_CamSpec
-
-    cp $COBAYA_COCOA/$CBLIKE/base_classes/InstallableLikelihood.patch $COBAYA/$CBLIKE/base_classes/
-    cd COBAYA/$CBLIKE/base_classes/
+    
+    export BASECL="${CBLIKE}/base_classes"
+    
+    cp $COBAYA_COCOA/$BASECL/InstallableLikelihood.patch $COBAYA/$BASECL
+    cd COBAYA/$BASECL/
 
     patch -u InstallableLikelihood.py -i InstallableLikelihood.patch
     if [ $? -ne 0 ]; then
@@ -203,35 +231,35 @@ if [ -z "${IGNORE_ALL_COBAYA_INSTALLATION}" ]; then
       unset COBAYA_COCOA
       unset CBLIKE
       unset CBTH
-      unset HGL
-      unset OUT_UPT_CB_1
-      unset OUT_UPT_CB_2
+      unset OUT_UCB_1
+      unset OUT_UCB_2
+      unset BASECL
       return 1
     fi
 
+    unset BASECL
     cd $ROOTDIR
   else
     rm -rf $COBAYA/$CBLIKE/planck_2018_highl_CamSpec
     rm -rf $COBAYA/$CBLIKE/planck_2018_highl_CamSpec2021
-  fi
-
-  #-----------------------------------------------------------------------------
-  # SO -------------------------------------------------------------------------
-  #-----------------------------------------------------------------------------
-  if [ -z "${IGNORE_SO_INSTALLATION}" ]; then
-    cp -r $COBAYA_COCOA/$CBLIKE/mflike $COBAYA/$CBLIKE/mflike
+    cd $ROOTDIR
   fi
 
   #-----------------------------------------------------------------------------
   # INSTALL HILLIPOP -----------------------------------------------------------
   #-----------------------------------------------------------------------------
-  if [ -z "${IGNORE_LIPOP_INSTALLATION}" ]; then
-    rm -rf $COBAYA/$CBLIKE/planck_2020_hillipop
+  if [ -z "${SKIP_DECOMM_LIPOP}" ]; then
+    
+    export PL2020="${CBLIKE}/planck_2020_hillipop"
+
+    rm -rf $COBAYA/$PL2020
     rm -rf $COBAYA/$CBLIKE/hillipop_tmp
 
     cd $COBAYA/$CBLIKE
 
-    $GIT clone https://github.com/planck-npipe/hillipop.git hillipop_tmp > ${OUT_UPT_CB_1} 2> ${OUT_UPT_CB_2}
+    export NPIPE_URL="https://github.com/planck-npipe"
+
+    $GIT clone "${NPIPE_URL}/hillipop.git" hillipop_tmp > ${OUT_UCB_1} 2> ${OUT_UCB_2}
     if [ $? -ne 0 ]; then
       echo -e '\033[0;31m'"\t\t SETUP UPDATE COBAYA (HILLIPOP) FAILED"'\033[0m'
       cd $ROOTDIR
@@ -240,14 +268,16 @@ if [ -z "${IGNORE_ALL_COBAYA_INSTALLATION}" ]; then
       unset CBLIKE
       unset CBTH
       unset HGL
-      unset OUT_UPT_CB_1
-      unset OUT_UPT_CB_2
+      unset OUT_UCB_1
+      unset OUT_UCB_2
+      unset NPIPE_URL
+      unset PL2020
       return 1
     fi
 
     cd $COBAYA/$CBLIKE/hillipop_tmp
 
-    $GIT reset --hard $HILLIPOP_GIT_COMMIT > ${OUT_UPT_CB_1} 2> ${OUT_UPT_CB_2}
+    $GIT reset --hard $HILLIPOP_GIT_COMMIT > ${OUT_UCB_1} 2> ${OUT_UCB_2}
     if [ $? -ne 0 ]; then
       echo -e '\033[0;31m'"\t\t SETUP UPDATE COBAYA (HILLIPOP) FAILED"'\033[0m'
       cd $ROOTDIR
@@ -256,32 +286,39 @@ if [ -z "${IGNORE_ALL_COBAYA_INSTALLATION}" ]; then
       unset CBLIKE
       unset CBTH
       unset HGL
-      unset OUT_UPT_CB_1
-      unset OUT_UPT_CB_2
+      unset OUT_UCB_1
+      unset OUT_UCB_2
+      unset NPIPE_URL
+      unset PL2020
       return 1
     fi
     mv planck_2020_hillipop/ $COBAYA/$CBLIKE
 
     # now patch the likelihood __init__ file
-    cp $COBAYA_COCOA/$CBLIKE/planck_2020_hillipop/init.patch $COBAYA/$CBLIKE/planck_2020_hillipop/
-    cd $COBAYA/$CBLIKE/planck_2020_hillipop/
+    cp $COBAYA_COCOA/$PL2020/init.patch $COBAYA/$PL2020
+    cd $COBAYA/$PL2020
     patch -u __init__.py -i init.patch
 
-    cd $ROOTDIR
-
     rm -rf $COBAYA/$CBLIKE/hillipop_tmp
+    unset PL2020
+    cd $ROOTDIR
   fi
 
   #-----------------------------------------------------------------------------
   # INSTALL LOWLLIPOP ----------------------------------------------------------
   #-----------------------------------------------------------------------------
   if [ -z "${SKIP_DECOMM_LIPOP}" ]; then
-    rm -rf $COBAYA/$CBLIKE/planck_2020_lollipop
+    
+    export PL2020="${CBLIKE}/planck_2020_lollipop"
+
+    rm -rf $COBAYA/$PL2020
     rm -rf $COBAYA/$CBLIKE/lollipop_tmp
 
     cd $COBAYA/$CBLIKE
 
-    $GIT clone https://github.com/planck-npipe/lollipop.git lollipop_tmp
+    export NPIPE_URL="https://github.com/planck-npipe" 
+
+    $GIT clone "${NPIPE_URL}/lollipop.git" lollipop_tmp > ${OUT_UCB_1} 2> ${OUT_UCB_2}
     if [ $? -ne 0 ]; then
       echo -e '\033[0;31m'"\t\t SETUP UPDATE COBAYA (LOLLIPOP) FAILED"'\033[0m'
       cd $ROOTDIR
@@ -289,15 +326,15 @@ if [ -z "${IGNORE_ALL_COBAYA_INSTALLATION}" ]; then
       unset COBAYA_COCOA
       unset CBLIKE
       unset CBTH
-      unset HGL
-      unset OUT_UPT_CB_1
-      unset OUT_UPT_CB_2
+      unset OUT_UCB_1
+      unset OUT_UCB_2
+      unset NPIPE_URL
+      unset PL2020
       return 1
     fi
 
     cd $COBAYA/$CBLIKE/lollipop_tmp
-
-    $GIT reset --hard $LOLLIPOP_GIT_COMMIT > ${OUT_UPT_CB_1} 2> ${OUT_UPT_CB_2}
+    $GIT reset --hard $LOLLIPOP_GIT_COMMIT > ${OUT_UCB_1} 2> ${OUT_UCB_2}
     if [ $? -ne 0 ]; then
       echo -e '\033[0;31m'"\t\t SETUP UPDATE COBAYA (LOLLIPOP) FAILED"'\033[0m'
       cd $ROOTDIR
@@ -305,35 +342,35 @@ if [ -z "${IGNORE_ALL_COBAYA_INSTALLATION}" ]; then
       unset COBAYA_COCOA
       unset CBLIKE
       unset CBTH
-      unset HGL
-      unset OUT_UPT_CB_1
-      unset OUT_UPT_CB_2
+      unset OUT_UCB_1
+      unset OUT_UCB_2
+      unset NPIPE_URL
+      unset PL2020
       return 1
     fi
-
     mv planck_2020_lollipop/ $COBAYA/$CBLIKE
 
     # now patch the likelihood __init__ file
-    cp $COBAYA_COCOA/$CBLIKE/planck_2020_lollipop/init.patch $COBAYA/$CBLIKE/planck_2020_lollipop/
-    cd $COBAYA/$CBLIKE/planck_2020_lollipop/
+    cp $COBAYA_COCOA/$PL2020/init.patch $COBAYA/$PL2020
+    cd $COBAYA/$PL2020
     patch -u __init__.py -i init.patch
 
-    cd $ROOTDIR
     rm -rf $COBAYA/$CBLIKE/lollipop_tmp
-  fi
 
-  #-----------------------------------------------------------------------------
-  # UNSETKEYS ------------------------------------------------------------------
-  #-----------------------------------------------------------------------------
+    cd $ROOTDIR
+  fi
+    
+  #-------------------------------------------------------------------------------
+  # UNSETKEYS --------------------------------------------------------------------
+  #-------------------------------------------------------------------------------
   cd $ROOTDIR
   unset COBAYA
   unset COBAYA_COCOA
   unset CBLIKE
   unset CBTH
-  unset HGL
-  unset OUT_UPT_CB_1
-  unset OUT_UPT_CB_2
+  unset OUT_UCB_1
+  unset OUT_UCB_2
 fi
-# ------------------------------------------------------------------------------
-# ------------------------------------------------------------------------------
-# ------------------------------------------------------------------------------
+#-------------------------------------------------------------------------------
+#-------------------------------------------------------------------------------
+#-------------------------------------------------------------------------------

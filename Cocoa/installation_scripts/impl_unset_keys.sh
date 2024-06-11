@@ -183,3 +183,12 @@ unset PL2020_URL
 unset PLK_DIR
 unset LPVS
 unset CAMSPEC_URL
+unset OUT_UCB_2
+unset OUT_UCB_1
+unset OUT_SIL_1
+unset OUT_SIL_2
+unset ACTDR6_LL
+unset PL_LWL
+unset BASECL
+unset PL2020
+unset CBURL
