@@ -34,6 +34,9 @@ if [ -z "${IGNORE_POLYCHORD_COMPILATION}" ]; then
     cd $ROOTDIR
     return 1
   fi
+
+  source $ROOTDIR/installation_scripts/clean_polychord.sh
+
   if [ -z "${DEBUG_POLY_OUTPUT}" ]; then
     export OUTPUT_POLY_1="/dev/null"
     export OUTPUT_POLY_2="/dev/null"
@@ -43,8 +46,6 @@ if [ -z "${IGNORE_POLYCHORD_COMPILATION}" ]; then
     export OUTPUT_POLY_2="/dev/tty"
     export POLY_MAKE_NUM_THREADS=1
   fi
-
-  source $ROOTDIR/installation_scripts/clean_polychord.sh
 
   # ---------------------------------------------------------------------------
   # ---------------------------------------------------------------------------

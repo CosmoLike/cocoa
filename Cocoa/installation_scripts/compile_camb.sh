@@ -34,6 +34,9 @@ if [ -z "${IGNORE_CAMB_COMPILATION}" ]; then
     cd $ROOTDIR
     return 1
   fi
+
+  source $ROOTDIR/installation_scripts/clean_camb.sh
+
   if [ -z "${DEBUG_CAMB_OUTPUT}" ]; then
     export OUTPUT_CAMB_1="/dev/null"
     export OUTPUT_CAMB_2="/dev/null"
@@ -41,8 +44,6 @@ if [ -z "${IGNORE_CAMB_COMPILATION}" ]; then
     export OUTPUT_CAMB_1="/dev/tty"
     export OUTPUT_CAMB_2="/dev/tty"
   fi
-
-  source $ROOTDIR/installation_scripts/clean_camb.sh
 
   # ---------------------------------------------------------------------------
   # ---------------------------------------------------------------------------

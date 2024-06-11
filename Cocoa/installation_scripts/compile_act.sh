@@ -34,6 +34,9 @@ if [ -z "${IGNORE_ACT_COMPILATION}" ]; then
     cd $ROOTDIR
     return 1
   fi
+
+  source $ROOTDIR/installation_scripts/clean_act.sh
+
   if [ -z "${DEBUG_ACT_OUTPUT}" ]; then
     export OUTPUT_ACT_1="/dev/null"
     export OUTPUT_ACT_2="/dev/null"
@@ -41,8 +44,6 @@ if [ -z "${IGNORE_ACT_COMPILATION}" ]; then
     export OUTPUT_ACT_1="/dev/tty"
     export OUTPUT_ACT_2="/dev/tty"
   fi
-
-  source $ROOTDIR/installation_scripts/clean_act.sh
 
   # ---------------------------------------------------------------------------
   # ---------------------------------------------------------------------------

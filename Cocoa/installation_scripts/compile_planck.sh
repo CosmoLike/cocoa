@@ -34,6 +34,9 @@ if [ -z "${IGNORE_PLANCK_COMPILATION}" ]; then
     cd $ROOTDIR
     return 1
   fi
+
+  source $ROOTDIR/installation_scripts/clean_planck.sh
+
   if [ -z "${DEBUG_PLANCK_OUTPUT}" ]; then
     export OUTPUT_PLANCK_1="/dev/null"
     export OUTPUT_PLANCK_2="/dev/null"
@@ -52,8 +55,6 @@ if [ -z "${IGNORE_PLANCK_COMPILATION}" ]; then
   else
     export CLIK_LAPALIBS=$GLOBAL_PACKAGES_LOCATION
   fi
-
-  source $ROOTDIR/installation_scripts/clean_planck.sh
 
   # ----------------------------------------------------------------------------
   # ----------------------------------------------------------------------------
