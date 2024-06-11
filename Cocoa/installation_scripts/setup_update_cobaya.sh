@@ -3,7 +3,7 @@
 # --------------------------------------------------------------------------------------
 # --------------------------------------------------------------------------------------
 if [ -z "${IGNORE_ALL_COBAYA_INSTALLATION}" ]; then
-  echo -e '\033[1;44m''Updating Cobaya Package''\033[0m'
+  echo -e '\033[1;44m''UPDATING COBAYA PACKAGE''\033[0m'
 
   if [ -z "${ROOTDIR}" ]; then
     echo -e '\033[0;31m''ERROR ENV VARIABLE ROOTDIR IS NOT DEFINED''\033[0m'
@@ -28,7 +28,7 @@ if [ -z "${IGNORE_ALL_COBAYA_INSTALLATION}" ]; then
   export CBTH=cobaya/theories
   
   if [ -z "${IGNORE_COBAYA_INSTALLATION}" ]; then
-    echo -e '\033[1;34m''\t INSTALLING COBAYA''\033[0m'
+    echo -e '\033[1;34m''\tINSTALLING COBAYA''\033[0m'
 
     #-------------------------------------------------------------------------------
     # Remove any previous installed cobaya folder
@@ -103,8 +103,6 @@ if [ -z "${IGNORE_ALL_COBAYA_INSTALLATION}" ]; then
     
     cp -r $COBAYA_COCOA/$BASECL/change_planck_clik.sh $COBAYA/$BASECL
     cd $COBAYA/$BASECL/
-
-    ls $COBAYA_COCOA/$BASECL/
     
     sh change_planck_clik.sh
     if [ $? -ne 0 ]; then
@@ -228,9 +226,9 @@ if [ -z "${IGNORE_ALL_COBAYA_INSTALLATION}" ]; then
     export BASECL="${CBLIKE}/base_classes"
     
     cp $COBAYA_COCOA/$BASECL/InstallableLikelihood.patch $COBAYA/$BASECL
-    cd COBAYA/$BASECL/
+    cd $COBAYA/$BASECL/
 
-    patch -u InstallableLikelihood.py -i InstallableLikelihood.patch
+    patch -u InstallableLikelihood.py -i InstallableLikelihood.patch > ${OUT_UCB_1} 2> ${OUT_UCB_2}
     if [ $? -ne 0 ]; then
       echo -e '\033[0;31m'"\t\t SETUP UPDATE COBAYA (PATCH CAMSPEC) FAILED"'\033[0m'
       cd $ROOTDIR
@@ -304,7 +302,7 @@ if [ -z "${IGNORE_ALL_COBAYA_INSTALLATION}" ]; then
     # now patch the likelihood __init__ file
     cp $COBAYA_COCOA/$PL2020/init.patch $COBAYA/$PL2020
     cd $COBAYA/$PL2020
-    patch -u __init__.py -i init.patch
+    patch -u __init__.py -i init.patch > ${OUT_UCB_1} 2> ${OUT_UCB_2}
 
     rm -rf $COBAYA/$CBLIKE/hipoptmp
     unset PL2020
@@ -361,7 +359,7 @@ if [ -z "${IGNORE_ALL_COBAYA_INSTALLATION}" ]; then
     # now patch the likelihood __init__ file
     cp $COBAYA_COCOA/$PL2020/init.patch $COBAYA/$PL2020
     cd $COBAYA/$PL2020
-    patch -u __init__.py -i init.patch
+    patch -u __init__.py -i init.patch > ${OUT_UCB_1} 2> ${OUT_UCB_2}
 
     rm -rf $COBAYA/$CBLIKE/lipoptmp
 
@@ -378,6 +376,7 @@ if [ -z "${IGNORE_ALL_COBAYA_INSTALLATION}" ]; then
   unset CBTH
   unset OUT_UCB_1
   unset OUT_UCB_2
+  echo -e '\033[1;44m''\e[4mUPDATING COBAYA PACKAGE DONE''\033[0m'
 fi
 #-------------------------------------------------------------------------------
 #-------------------------------------------------------------------------------
