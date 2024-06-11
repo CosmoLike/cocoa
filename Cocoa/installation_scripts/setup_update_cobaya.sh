@@ -278,6 +278,11 @@ fi
 
 mv planck_2020_hillipop/ $COBAYA/$CBLIKE
 
+# now patch the likelihood __init__ file
+cp $COBAYA_COCOA/$CBLIKE/planck_2020_hillipop/init.patch $COBAYA/$CBLIKE/planck_2020_hillipop/
+cd $COBAYA/$CBLIKE/planck_2020_hillipop/
+patch -u __init__.py -i init.patch
+
 cd $ROOTDIR
 
 rm -rf $COBAYA/$CBLIKE/hillipop_tmp
@@ -309,6 +314,11 @@ if [ $? -ne 0 ]; then
 fi
 
 mv planck_2020_lollipop/ $COBAYA/$CBLIKE
+
+# now patch the likelihood __init__ file
+cp $COBAYA_COCOA/$CBLIKE/planck_2020_lollipop/init.patch $COBAYA/$CBLIKE/planck_2020_lollipop/
+cd $COBAYA/$CBLIKE/planck_2020_lollipop/
+patch -u __init__.py -i init.patch
 
 cd $ROOTDIR
 

@@ -1,0 +1,6 @@
+--- __init__.py	2024-06-10 22:13:08.980610190 -0400
++++ __init2__.py	2024-06-10 22:13:15.324666601 -0400
+@@ -1,2 +1,2 @@
+-from ._version import __version__
++from cobaya.__init__ import __version__
+ from .hillipop import EE, TE, TT, TTTEEE
