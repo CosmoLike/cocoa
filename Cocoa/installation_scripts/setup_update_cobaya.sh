@@ -31,11 +31,9 @@ fi
 if [ -z "${DEBUG_PIP_OUTPUT}" ]; then
   export OUTPUT_UPDATE_COBAYA_1="/dev/null"
   export OUTPUT_UPDATE_COBAYA_2="/dev/null"
-  export UPDATE_COBAYA_MAKE_NUM_THREADS="${MAKE_NUM_THREADS}"
 else
   export OUTPUT_UPDATE_COBAYA_1="/dev/tty"
   export OUTPUT_UPDATE_COBAYA_2="/dev/tty"
-  export PIP_MAKE_NUM_THREADS=1
 fi
 #-------------------------------------------------------------------------------
 #-------------------------------------------------------------------------------
@@ -45,9 +43,6 @@ export COBAYA_COCOA=$ROOTDIR/../cocoa_installation_libraries/cobaya_changes
 export CBLIKE=cobaya/likelihoods
 export CBTH=cobaya/theories
 export HGL=planck_2018_highl_plik
-export COBAYA_GIT_COMMIT="2636ea9ed399c35c5d276de1acb15aaafbcab10c"
-export HILLIPOP_GIT_COMMIT="cc9cbe31991d4662522241543a46d44d2cdec251"
-export LOLLIPOP_GIT_COMMIT="280a9c93d33bc6a058d6bf769ec82d9f7fdbd2b6"
 #-------------------------------------------------------------------------------
 #-------------------------------------------------------------------------------
 #-------------------------------------------------------------------------------

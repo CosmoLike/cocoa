@@ -5,6 +5,11 @@ if [ -z "${ROOTDIR}" ]; then
     return
 fi
 
+if [ -z "${HOLICOW_DATA_GIT_COMMIT}" ]; then
+    echo 'ERROR HOLICOW_DATA_GIT_COMMIT not defined'
+    return
+fi
+
 if [ -z "${DEBUG_UNXV_CLEAN_ALL}" ]; then
   export OUTPUT_UNXV_ALL_1="/dev/null"
   export OUTPUT_UNXV_ALL_2="/dev/null"
@@ -29,7 +34,7 @@ if [ -z "${SKIP_DECOMM_STRONG_LENSING}" ]; then
 
   cd $ROOTDIR/external_modules/data/holicow_tmp
 
-  git checkout f792647d1fd6c09d9e052fef526669cbd702ab82 > ${OUTPUT_UNXV_ALL_1} 2> ${OUTPUT_UNXV_ALL_2}
+  git checkout $HOLICOW_DATA_GIT_COMMIT > ${OUTPUT_UNXV_ALL_1} 2> ${OUTPUT_UNXV_ALL_2}
   if [ $? -ne 0 ]; then
     echo -e '\033[0;31m'"\t\t DECOMPRESSING H0LICOW DATA FAILED"'\033[0m'
     cd $ROOTDIR

@@ -221,7 +221,7 @@ export NUMPY_HEADERS=$ROOTDIR/.local/lib/python$PYTHON_VERSION/site-packages/num
 # ----------------------------------------------------------------------------
 
 if [ -z "${MINICONDA_INSTALLATION}" ]; then
-  source $ROOTDIR/installation_scripts/setup_xz
+  source $ROOTDIR/installation_scripts/setup_xz.sh
   if [ $? -ne 0 ]; then
     echo  -e '\033[0;31m'"SCRIPT setup_xz FAILED"'\033[0m'
     cd $ROOTDIR
@@ -230,7 +230,7 @@ if [ -z "${MINICONDA_INSTALLATION}" ]; then
   fi
 fi
 
-source ./installation_scripts/setup_installation_libraries
+source ./installation_scripts/setup_installation_libraries.sh
 if [ $? -ne 0 ]; then
   echo  -e '\033[0;31m'"SCRIPT setup_intallation_libraries FAILED"'\033[0m'
   cd $ROOTDIR
@@ -239,7 +239,7 @@ if [ $? -ne 0 ]; then
 fi
   
 if [ -z "${DEBUG_SKIP_FILE_DECOMPRESSION_SETUP_COCOA}" ]; then
-  source $ROOTDIR/installation_scripts/setup_decompress_files
+  source $ROOTDIR/installation_scripts/setup_decompress_files.sh
   if [ $? -ne 0 ]; then
     echo  -e '\033[0;31m'"SCRIPT setup_decompress_files FAILED"'\033[0m'
     cd $ROOTDIR
@@ -249,7 +249,7 @@ if [ -z "${DEBUG_SKIP_FILE_DECOMPRESSION_SETUP_COCOA}" ]; then
 fi
 
 if [ -z "${MINICONDA_INSTALLATION}" ]; then
-  source ./installation_scripts/setup_cmake
+  source ./installation_scripts/setup_cmake.sh
   if [ $? -ne 0 ]; then
     echo -e '\033[0;31m'"SCRIPT setup_cmake FAILED"'\033[0m'
     cd $ROOTDIR
@@ -259,7 +259,7 @@ if [ -z "${MINICONDA_INSTALLATION}" ]; then
 fi
 
 if [ -z "${MINICONDA_INSTALLATION}" ]; then
-  source $ROOTDIR/installation_scripts/setup_binutils
+  source $ROOTDIR/installation_scripts/setup_binutils.sh
   if [ $? -ne 0 ]; then
     echo -e '\033[0;31m'"SCRIPT setup_binutils FAILED"'\033[0m'
     cd $ROOTDIR
@@ -269,7 +269,7 @@ if [ -z "${MINICONDA_INSTALLATION}" ]; then
 fi
 
 if [ -z "${MINICONDA_INSTALLATION}" ]; then
-  source $ROOTDIR/installation_scripts/setup_hdf5
+  source $ROOTDIR/installation_scripts/setup_hdf5.sh
   if [ $? -ne 0 ]; then
     echo -e '\033[0;31m'"SCRIPT setup_hdf5 FAILED"'\033[0m'
     cd $ROOTDIR
@@ -279,7 +279,7 @@ if [ -z "${MINICONDA_INSTALLATION}" ]; then
 fi
 
 if [ -z "${MINICONDA_INSTALLATION}" ]; then
-  source $ROOTDIR/installation_scripts/setup_openblas
+  source $ROOTDIR/installation_scripts/setup_openblas.sh
   if [ $? -ne 0 ]; then
     echo -e '\033[0;31m'"SCRIPT setup_openblas FAILED"'\033[0m'
     cd $ROOTDIR
@@ -287,7 +287,7 @@ if [ -z "${MINICONDA_INSTALLATION}" ]; then
   fi
 fi
 
-source $ROOTDIR/installation_scripts/setup_pip_packages
+source $ROOTDIR/installation_scripts/setup_pip_packages.sh
 if [ $? -ne 0 ]; then
   echo -e '\033[0;31m'"SCRIPT setup_pip_packages FAILED"'\033[0m'
   cd $ROOTDIR
@@ -295,7 +295,7 @@ if [ $? -ne 0 ]; then
   return 1
 fi
 
-source $ROOTDIR/installation_scripts/setup_fortran_packages
+source $ROOTDIR/installation_scripts/setup_fortran_packages.sh
 if [ $? -ne 0 ]; then
   echo -e '\033[0;31m'"SCRIPT setup_fortran_packages FAILED"'\033[0m'
   cd $ROOTDIR
@@ -303,7 +303,7 @@ if [ $? -ne 0 ]; then
   return 1
 fi
 
-source $ROOTDIR/installation_scripts/setup_cpp_packages
+source $ROOTDIR/installation_scripts/setup_cpp_packages.sh
 if [ $? -ne 0 ]; then
   echo -e '\033[0;31m'"SCRIPT setup_cpp_packages FAILED"'\033[0m'
   cd $ROOTDIR
@@ -311,7 +311,7 @@ if [ $? -ne 0 ]; then
   return 1
 fi
 
-source $ROOTDIR/installation_scripts/setup_c_packages
+source $ROOTDIR/installation_scripts/setup_c_packages.sh
 if [ $? -ne 0 ]; then
   echo -e '\033[0;31m'"SCRIPT setup_c_packages FAILED"'\033[0m'
   cd $ROOTDIR

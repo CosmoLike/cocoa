@@ -71,7 +71,6 @@ fi
 
 # --------------------------------------------------------------------------------------
 # SKIP DOWNLOADING/DECOMPRESSING SPECIFIC DATA SET (CAN SAVE TIME WHEN INSTALLING COCOA)
-# export SKIP_DECOMM_SIMONS_OBSERVATORY
 # export SKIP_DECOMM_ACT
 # export SKIP_DECOMM_SPT
 # export SKIP_DECOMM_PLANCK
@@ -79,11 +78,19 @@ fi
 # export SKIP_DECOMM_STRONG_LENSING
 # export SKIP_DECOMM_SN
 # export SKIP_DECOMM_BAO
+export SKIP_DECOMM_SIMONS_OBSERVATORY
 export SKIP_DECOMM_CAMSPEC
 export SKIP_DECOMM_LIPOP
 # --------------------------------------------------------------------------------------
 
 # --------------------------------------------------------------------------------------
+# COBAYA/LIKELIHOOD VERSIONS. BE CAREFUL, CHANGES IN THE SELECTED COMMIT MAY BREAK COCOA
+export COBAYA_GIT_COMMIT="2636ea9ed399c35c5d276de1acb15aaafbcab10c"
+export HILLIPOP_GIT_COMMIT="cc9cbe31991d4662522241543a46d44d2cdec251"
+export LOLLIPOP_GIT_COMMIT="280a9c93d33bc6a058d6bf769ec82d9f7fdbd2b6"
+export LIPOP_DATA_VERSION=4.2
+export SPT3G_DATA_GIT_COMMIT="66da8e9e2f325024566fe13245788bf8ede897bc"
+export HOLICOW_DATA_GIT_COMMIT="f792647d1fd6c09d9e052fef526669cbd702ab82"
 # --------------------------------------------------------------------------------------
 # --------------------------------------------------------------------------------------
 # --------------------------------------------------------------------------------------
@@ -91,6 +98,8 @@ export SKIP_DECOMM_LIPOP
 # --------------------------------------------------------------------------------------
 # --------------------------------------------------------------------------------------
 # --------------------------------------------------------------------------------------
+# --------------------------------------------------------------------------------------
+# ----------------------------- END OF OPTIONS -----------------------------------------
 # --------------------------------------------------------------------------------------
 # --------------------------------------------------------------------------------------
 # --------------------------------------------------------------------------------------

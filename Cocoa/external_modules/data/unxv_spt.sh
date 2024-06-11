@@ -30,7 +30,7 @@ if [ -z "${SKIP_DECOMM_SPT}" ]; then
 
   cd $ROOTDIR/external_modules/data/spt_3g
   
-  git checkout 66da8e9e2f325024566fe13245788bf8ede897bc > ${OUTPUT_UNXV_ALL_1} 2> ${OUTPUT_UNXV_ALL_2}
+  git checkout $SPT3G_DATA_GIT_COMMIT > ${OUTPUT_UNXV_ALL_1} 2> ${OUTPUT_UNXV_ALL_2}
   if [ $? -ne 0 ]; then
     echo -e '\033[0;31m'"\t\t DECOMPRESSING SPT-3G Y1 DATA FAILED"'\033[0m'
     cd $ROOTDIR
