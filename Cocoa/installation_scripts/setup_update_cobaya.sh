@@ -275,7 +275,6 @@ if [ $? -ne 0 ]; then
   cd $ROOTDIR
   return 1
 fi
-
 mv planck_2020_hillipop/ $COBAYA/$CBLIKE
 
 # now patch the likelihood __init__ file
@@ -312,7 +311,6 @@ if [ $? -ne 0 ]; then
   cd $ROOTDIR
   return 1
 fi
-
 mv planck_2020_lollipop/ $COBAYA/$CBLIKE
 
 # now patch the likelihood __init__ file
