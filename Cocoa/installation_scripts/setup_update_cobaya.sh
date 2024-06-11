@@ -28,6 +28,8 @@ if [ -z "${IGNORE_ALL_COBAYA_INSTALLATION}" ]; then
   export CBTH=cobaya/theories
   
   if [ -z "${IGNORE_COBAYA_INSTALLATION}" ]; then
+    echo -e '\033[1;34m''\t INSTALLING COBAYA''\033[0m'
+
     #-------------------------------------------------------------------------------
     # Remove any previous installed cobaya folder
     rm -rf $ROOTDIR/cobaya
@@ -53,7 +55,7 @@ if [ -z "${IGNORE_ALL_COBAYA_INSTALLATION}" ]; then
     
     cd $COBAYA
 
-    $GIT reset --hard $COBAYA_GIT_COMMIT
+    $GIT reset --hard $COBAYA_GIT_COMMIT > ${OUT_UCB_1} 2> ${OUT_UCB_2}
     if [ $? -ne 0 ]; then
       echo -e '\033[0;31m'"\t\t SETUP UPDATE COBAYA FAILED"'\033[0m'
       cd $ROOTDIR
@@ -100,10 +102,13 @@ if [ -z "${IGNORE_ALL_COBAYA_INSTALLATION}" ]; then
     export BASECL="${CBLIKE}/base_classes"
     
     cp -r $COBAYA_COCOA/$BASECL/change_planck_clik.sh $COBAYA/$BASECL
-    cd $COBAYA/$CBLIKE/
+    cd $COBAYA/$BASECL/
+
+    ls $COBAYA_COCOA/$BASECL/
     
     sh change_planck_clik.sh
     if [ $? -ne 0 ]; then
+      echo -e '\033[0;31m'"\t\t SETUP UPDATE COBAYA (CHANGE PLANCK) FAILED"'\033[0m'
       cd $ROOTDIR
       unset COBAYA
       unset COBAYA_COCOA
@@ -202,6 +207,8 @@ if [ -z "${IGNORE_ALL_COBAYA_INSTALLATION}" ]; then
 
     #---------------------------------------------------------------------------
     cd $ROOTDIR
+
+    echo -e '\033[1;34m''\t\e[4mINSTALLING COBAYA DONE''\033[0m'
   fi
 
   #-----------------------------------------------------------------------------
