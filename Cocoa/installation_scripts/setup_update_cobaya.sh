@@ -253,13 +253,13 @@ if [ -z "${IGNORE_ALL_COBAYA_INSTALLATION}" ]; then
     export PL2020="${CBLIKE}/planck_2020_hillipop"
 
     rm -rf $COBAYA/$PL2020
-    rm -rf $COBAYA/$CBLIKE/hillipop_tmp
+    rm -rf $COBAYA/$CBLIKE/hipoptmp
 
     cd $COBAYA/$CBLIKE
 
     export NPIPE_URL="https://github.com/planck-npipe"
 
-    $GIT clone "${NPIPE_URL}/hillipop.git" hillipop_tmp > ${OUT_UCB_1} 2> ${OUT_UCB_2}
+    $GIT clone "${NPIPE_URL}/hillipop.git" hipoptmp > ${OUT_UCB_1} 2> ${OUT_UCB_2}
     if [ $? -ne 0 ]; then
       echo -e '\033[0;31m'"\t\t SETUP UPDATE COBAYA (HILLIPOP) FAILED"'\033[0m'
       cd $ROOTDIR
@@ -275,7 +275,7 @@ if [ -z "${IGNORE_ALL_COBAYA_INSTALLATION}" ]; then
       return 1
     fi
 
-    cd $COBAYA/$CBLIKE/hillipop_tmp
+    cd $COBAYA/$CBLIKE/hipoptmp
 
     $GIT reset --hard $HILLIPOP_GIT_COMMIT > ${OUT_UCB_1} 2> ${OUT_UCB_2}
     if [ $? -ne 0 ]; then
@@ -299,8 +299,9 @@ if [ -z "${IGNORE_ALL_COBAYA_INSTALLATION}" ]; then
     cd $COBAYA/$PL2020
     patch -u __init__.py -i init.patch
 
-    rm -rf $COBAYA/$CBLIKE/hillipop_tmp
+    rm -rf $COBAYA/$CBLIKE/hipoptmp
     unset PL2020
+    
     cd $ROOTDIR
   fi
 
@@ -312,13 +313,13 @@ if [ -z "${IGNORE_ALL_COBAYA_INSTALLATION}" ]; then
     export PL2020="${CBLIKE}/planck_2020_lollipop"
 
     rm -rf $COBAYA/$PL2020
-    rm -rf $COBAYA/$CBLIKE/lollipop_tmp
+    rm -rf $COBAYA/$CBLIKE/lipoptmp
 
     cd $COBAYA/$CBLIKE
 
     export NPIPE_URL="https://github.com/planck-npipe" 
 
-    $GIT clone "${NPIPE_URL}/lollipop.git" lollipop_tmp > ${OUT_UCB_1} 2> ${OUT_UCB_2}
+    $GIT clone "${NPIPE_URL}/lollipop.git" lipoptmp > ${OUT_UCB_1} 2> ${OUT_UCB_2}
     if [ $? -ne 0 ]; then
       echo -e '\033[0;31m'"\t\t SETUP UPDATE COBAYA (LOLLIPOP) FAILED"'\033[0m'
       cd $ROOTDIR
@@ -333,7 +334,7 @@ if [ -z "${IGNORE_ALL_COBAYA_INSTALLATION}" ]; then
       return 1
     fi
 
-    cd $COBAYA/$CBLIKE/lollipop_tmp
+    cd $COBAYA/$CBLIKE/lipoptmp
     $GIT reset --hard $LOLLIPOP_GIT_COMMIT > ${OUT_UCB_1} 2> ${OUT_UCB_2}
     if [ $? -ne 0 ]; then
       echo -e '\033[0;31m'"\t\t SETUP UPDATE COBAYA (LOLLIPOP) FAILED"'\033[0m'
@@ -355,7 +356,7 @@ if [ -z "${IGNORE_ALL_COBAYA_INSTALLATION}" ]; then
     cd $COBAYA/$PL2020
     patch -u __init__.py -i init.patch
 
-    rm -rf $COBAYA/$CBLIKE/lollipop_tmp
+    rm -rf $COBAYA/$CBLIKE/lipoptmp
 
     cd $ROOTDIR
   fi
