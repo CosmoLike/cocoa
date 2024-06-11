@@ -179,3 +179,7 @@ unset OUT_UNXV_1
 unset OUT_UNXV_2 
 unset SPTURL
 unset HOLIURL
+unset PL2020_URL
+unset PLK_DIR
+unset LPVS
+unset CAMSPEC_URL
