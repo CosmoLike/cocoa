@@ -37,15 +37,15 @@ echo -e '\033[1;34m''\t\e[4mINSTALLING COBAYA (VIA PIP) DONE''\033[0m'
 # ------------------------ COMPILE EXTERNAL MODULES --------------------------
 # ----------------------------------------------------------------------------
 
-source $ROOTDIR/installation_scripts/compile_camb
+source $ROOTDIR/installation_scripts/compile_camb.sh
 
-source $ROOTDIR/installation_scripts/compile_class
+source $ROOTDIR/installation_scripts/compile_class.sh
 
-source $ROOTDIR/installation_scripts/compile_polychord
+source $ROOTDIR/installation_scripts/compile_polychord.sh
 
-source $ROOTDIR/installation_scripts/compile_planck
+source $ROOTDIR/installation_scripts/compile_planck.sh
 
-source $ROOTDIR/installation_scripts/compile_act
+source $ROOTDIR/installation_scripts/compile_act.sh
 
 # ----------------------------------------------------------------------------
 # ----------------------------------------------------------------------------
