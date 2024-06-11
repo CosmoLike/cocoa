@@ -9,23 +9,8 @@ if [ -z "${IGNORE_ALL_COBAYA_INSTALLATION}" ]; then
     echo -e '\033[0;31m''ERROR ENV VARIABLE ROOTDIR IS NOT DEFINED''\033[0m'
     return 1
   fi
-  if [ -z "${CXX_COMPILER}" ]; then
-    echo -e '\033[0;31m''ERROR ENV VARIABLE CXX_COMPILER IS NOT DEFINED''\033[0m'
-    cd $ROOTDIR
-    return 1
-  fi
-  if [ -z "${C_COMPILER}" ]; then
-    echo -e '\033[0;31m''ERROR ENV VARIABLE C_COMPILER IS NOT DEFINED''\033[0m'
-    cd $ROOTDIR
-    return 1
-  fi
-  if [ -z "${PIP3}" ]; then
-    echo -e '\033[0;31m''ERROR ENV VARIABLE IS NOT DEFINED''\033[0m'
-    cd $ROOTDIR
-    return 1
-  fi
-  if [ -z "${PYTHON3}" ]; then
-    echo -e '\033[0;31m''ERROR ENV VARIABLE PIP3 IS NOT DEFINED''\033[0m'
+  if [ -z "${GIT}" ]; then
+    echo -e '\033[0;31m''ERROR ENV VARIABLE GIT IS NOT DEFINED''\033[0m'
     cd $ROOTDIR
     return 1
   fi
@@ -311,7 +296,7 @@ if [ -z "${IGNORE_ALL_COBAYA_INSTALLATION}" ]; then
     fi
 
     cd $COBAYA/$CBLIKE/lollipop_tmp
-    
+
     $GIT reset --hard $LOLLIPOP_GIT_COMMIT > ${OUT_UPT_CB_1} 2> ${OUT_UPT_CB_2}
     if [ $? -ne 0 ]; then
       echo -e '\033[0;31m'"\t\t SETUP UPDATE COBAYA (LOLLIPOP) FAILED"'\033[0m'

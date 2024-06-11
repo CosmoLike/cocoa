@@ -20,12 +20,12 @@ if [ -z "${IGNORE_ALL_PIP_INSTALLATION}" ]; then
       return 1
   fi
   if [ -z "${PIP3}" ]; then
-    echo -e '\033[0;31m''ERROR ENV VARIABLE IS NOT DEFINED''\033[0m'
+    echo -e '\033[0;31m''ERROR ENV VARIABLE PIP3 IS NOT DEFINED''\033[0m'
     cd $ROOTDIR
     return 1
   fi
   if [ -z "${PYTHON3}" ]; then
-    echo -e '\033[0;31m''ERROR ENV VARIABLE PIP3 IS NOT DEFINED''\033[0m'
+    echo -e '\033[0;31m''ERROR ENV VARIABLE PYTHON3 IS NOT DEFINED''\033[0m'
     cd $ROOTDIR
     return 1
   fi

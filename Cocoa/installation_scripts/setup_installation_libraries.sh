@@ -9,6 +9,11 @@ if [ -z "${ROOTDIR}" ]; then
   echo -e '\033[0;31m''ERROR ENV VARIABLE ROOTDIR IS NOT DEFINED''\033[0m'
   return 1
 fi
+if [ -z "${GIT}" ]; then
+  echo -e '\033[0;31m''ERROR ENV VARIABLE GIT IS NOT DEFINED''\033[0m'
+  cd $ROOTDIR
+  return 1
+fi
 
 if [ -z "${DEBUG_SIL_OUTPUT}" ]; then
   export OUTPUT_SIL_1="/dev/null"
