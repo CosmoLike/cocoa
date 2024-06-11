@@ -9,11 +9,11 @@ if [ -z "${IGNORE_ALL_COBAYA_INSTALLATION}" ]; then
     echo -e '\033[0;31m''ERROR ENV VARIABLE ROOTDIR IS NOT DEFINED''\033[0m'
     return 1
   fi
-   if [ -z "${GIT}" ]; then
-      echo -e '\033[0;31m''ERROR ENV VARIABLE GIT IS NOT DEFINED''\033[0m'
-      cd $ROOTDIR
-      return 1
-    fi
+  if [ -z "${GIT}" ]; then
+    echo -e '\033[0;31m''ERROR ENV VARIABLE GIT IS NOT DEFINED''\033[0m'
+    cd $ROOTDIR
+    return 1
+  fi
   if [ -z "${DEBUG_PIP_OUTPUT}" ]; then
     export OUT_UCB_1="/dev/null"
     export OUT_UCB_2="/dev/null"
