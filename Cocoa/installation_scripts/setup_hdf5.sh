@@ -2,42 +2,39 @@
 # ----------------------------------------------------------------------------
 # ----------------------------------------------------------------------------
 # ----------------------------------------------------------------------------
-echo -e '\033[1;44m''SETUP_HDF5''\033[0m'
-
-if [ -z "${ROOTDIR}" ]; then
-    echo -e '\033[0;31m''ERROR ENV VARIABLE ROOTDIR IS NOT DEFINED''\033[0m'
-    return 1
-fi
-if [ -z "${CXX_COMPILER}" ]; then
-    echo -e '\033[0;31m''ERROR ENV VARIABLE CXX_COMPILER IS NOT DEFINED''\033[0m'
-    cd $ROOTDIR
-    return 1
-fi
-if [ -z "${C_COMPILER}" ]; then
-    echo -e '\033[0;31m''ERROR ENV VARIABLE C_COMPILER IS NOT DEFINED''\033[0m'
-    cd $ROOTDIR
-    return 1
-fi
-if [ -z "${FORTRAN_COMPILER}" ]; then
-    echo -e '\033[0;31m''ERROR ENV VARIABLE FORTRAN_COMPILER IS NOT DEFINED''\033[0m'
-    cd $ROOTDIR
-    return 1
-fi
-if [ -z "${MAKE_NUM_THREADS}" ]; then
-    echo -e '\033[0;31m''ERROR ENV VARIABLE MAKE_NUM_THREADS IS NOT DEFINED''\033[0m'
-    cd $ROOTDIR
-    return 1
-fi
-if [ -z "${CMAKE}" ]; then
-    echo -e '\033[0;31m''ERROR ENV VARIABLE MAKE IS NOT DEFINED''\033[0m'
-    return 1
-fi
-
-# ----------------------------------------------------------------------------
-# ------------------------------- HDF5 LIBRARY -------------------------------
-# ----------------------------------------------------------------------------
 if [ -z "${IGNORE_HDF5_INSTALLATION}" ]; then
-  echo -e '\033[1;34m''INSTALLING HDF5 LIBRARY - \e[4mIT MAY TAKE A WHILE''\033[0m'
+  echo -e '\033[1;44m''SETUP_HDF5''\033[0m'
+
+  if [ -z "${ROOTDIR}" ]; then
+      echo -e '\033[0;31m''ERROR ENV VARIABLE ROOTDIR IS NOT DEFINED''\033[0m'
+      return 1
+  fi
+  if [ -z "${CXX_COMPILER}" ]; then
+      echo -e '\033[0;31m''ERROR ENV VARIABLE CXX_COMPILER IS NOT DEFINED''\033[0m'
+      cd $ROOTDIR
+      return 1
+  fi
+  if [ -z "${C_COMPILER}" ]; then
+      echo -e '\033[0;31m''ERROR ENV VARIABLE C_COMPILER IS NOT DEFINED''\033[0m'
+      cd $ROOTDIR
+      return 1
+  fi
+  if [ -z "${FORTRAN_COMPILER}" ]; then
+      echo -e '\033[0;31m''ERROR ENV VARIABLE FORTRAN_COMPILER IS NOT DEFINED''\033[0m'
+      cd $ROOTDIR
+      return 1
+  fi
+  if [ -z "${MAKE_NUM_THREADS}" ]; then
+      echo -e '\033[0;31m''ERROR ENV VARIABLE MAKE_NUM_THREADS IS NOT DEFINED''\033[0m'
+      cd $ROOTDIR
+      return 1
+  fi
+  if [ -z "${CMAKE}" ]; then
+      echo -e '\033[0;31m''ERROR ENV VARIABLE MAKE IS NOT DEFINED''\033[0m'
+      return 1
+  fi
+
+  echo -e '\033[1;34m''\tINSTALLING HFD5 LIBRARY - \e[4mIT WILL TAKE A WHILE''\033[0m'
 
   if [ -z "${DEBUG_HDF5_PACKAGES}" ]; then
     export OUTPUT_HDF5_1="/dev/null"
@@ -61,36 +58,47 @@ if [ -z "${IGNORE_HDF5_INSTALLATION}" ]; then
     -DCMAKE_FC_COMPILER=FORTRAN_COMPILER \
     --log-level=ERROR .. > ${OUTPUT_HDF5_1} 2> ${OUTPUT_HDF5_2}
   if [ $? -eq 0 ]; then
-    echo -e '\033[0;32m'"HDF5 RUN \e[3mCMAKE\e[0m\e\033[0;32m DONE"'\033[0m'
+    echo -e '\033[0;32m'"\t\t HDF5 RUN \e[3mCMAKE\e[0m\e\033[0;32m DONE"'\033[0m'
   else
     echo -e '\033[0;31m'"HDF5 COULD NOT RUN \e[3mCMAKE"'\033[0m'
     cd $ROOTDIR
+    unset OUTPUT_HDF5_1
+    unset OUTPUT_HDF5_2
+    unset HDF5_MAKE_NUM_THREADS
     return 1
   fi
 
   make -j $HDF5_MAKE_NUM_THREADS > ${OUTPUT_HDF5_1} 2> ${OUTPUT_HDF5_2}
   if [ $? -eq 0 ]; then
-    echo -e '\033[0;32m'"HDF5 RUN \e[3mMAKE\e[0m\e\033[0;32m DONE"'\033[0m'
+    echo -e '\033[0;32m'"\t\t HDF5 RUN \e[3mMAKE\e[0m\e\033[0;32m DONE"'\033[0m'
   else
     echo -e '\033[0;31m'"HDF5 COULD NOT RUN \e[3mMAKE"'\033[0m'
     cd $ROOTDIR
+    unset OUTPUT_HDF5_1
+    unset OUTPUT_HDF5_2
+    unset HDF5_MAKE_NUM_THREADS
     return 1
   fi
 
   make install > ${OUTPUT_HDF5_1} 2> ${OUTPUT_HDF5_2}
   if [ $? -eq 0 ]; then
-    echo -e '\033[0;32m'"HDF5 RUN \e[3mMAKE INSTALL\e[0m\e\033[0;32m DONE"'\033[0m'
+    echo -e '\033[0;32m'"\t\t HDF5 RUN \e[3mMAKE INSTALL\e[0m\e\033[0;32m DONE"'\033[0m'
   else
     echo -e '\033[0;31m'"HDF5 COULD NOT RUN \e[3mMAKE INSTALL"'\033[0m'
     cd $ROOTDIR
+    unset OUTPUT_HDF5_1
+    unset OUTPUT_HDF5_2
+    unset HDF5_MAKE_NUM_THREADS
     return 1
   fi
 
   cd $ROOTDIR
-  echo -e '\033[1;34m''\e[4mINSTALLING HDF5 LIBRARY DONE''\033[0m'
+  unset OUTPUT_HDF5_1
+  unset OUTPUT_HDF5_2
+  unset HDF5_MAKE_NUM_THREADS
+  echo -e '\033[1;34m''\t\e[4mINSTALLING HDF5 LIBRARY DONE''\033[0m'
+  echo -e '\033[1;44m''\e[4mSETUP_HDF5 DONE''\033[0m'
 fi
-
-echo -e '\033[1;44m''\e[4mSETUP_HDF5 DONE''\033[0m'
 # ----------------------------------------------------------------------------
 # ----------------------------------------------------------------------------
 # ----------------------------------------------------------------------------
