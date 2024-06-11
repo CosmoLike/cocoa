@@ -54,7 +54,7 @@ if [ -z "${IGNORE_ALL_COBAYA_INSTALLATION}" ]; then
     #---------------------------------------------------------------------------
     # CLONE COBAYA FROM ORIGINAL REPO ------------------------------------------
     #---------------------------------------------------------------------------
-    git clone https://github.com/CobayaSampler/cobaya.git cobaya > ${OUT_UPT_CB_1} 2> ${OUT_UPT_CB_2}
+    $GIT clone https://github.com/CobayaSampler/cobaya.git cobaya > ${OUT_UPT_CB_1} 2> ${OUT_UPT_CB_2}
     if [ $? -ne 0 ]; then
       echo -e '\033[0;31m'"\t\t SETUP UPDATE COBAYA FAILED"'\033[0m'
       cd $ROOTDIR
@@ -70,7 +70,7 @@ if [ -z "${IGNORE_ALL_COBAYA_INSTALLATION}" ]; then
 
     cd $COBAYA
 
-    git reset --hard $COBAYA_GIT_COMMIT
+    $GIT reset --hard $COBAYA_GIT_COMMIT
     if [ $? -ne 0 ]; then
       echo -e '\033[0;31m'"\t\t SETUP UPDATE COBAYA FAILED"'\033[0m'
       cd $ROOTDIR
@@ -246,7 +246,7 @@ if [ -z "${IGNORE_ALL_COBAYA_INSTALLATION}" ]; then
 
     cd $COBAYA/$CBLIKE
 
-    git clone https://github.com/planck-npipe/hillipop.git hillipop_tmp > ${OUT_UPT_CB_1} 2> ${OUT_UPT_CB_2}
+    $GIT clone https://github.com/planck-npipe/hillipop.git hillipop_tmp > ${OUT_UPT_CB_1} 2> ${OUT_UPT_CB_2}
     if [ $? -ne 0 ]; then
       echo -e '\033[0;31m'"\t\t SETUP UPDATE COBAYA (HILLIPOP) FAILED"'\033[0m'
       cd $ROOTDIR
@@ -262,7 +262,7 @@ if [ -z "${IGNORE_ALL_COBAYA_INSTALLATION}" ]; then
 
     cd $COBAYA/$CBLIKE/hillipop_tmp
 
-    git reset --hard $HILLIPOP_GIT_COMMIT > ${OUT_UPT_CB_1} 2> ${OUT_UPT_CB_2}
+    $GIT reset --hard $HILLIPOP_GIT_COMMIT > ${OUT_UPT_CB_1} 2> ${OUT_UPT_CB_2}
     if [ $? -ne 0 ]; then
       echo -e '\033[0;31m'"\t\t SETUP UPDATE COBAYA (HILLIPOP) FAILED"'\033[0m'
       cd $ROOTDIR
@@ -296,7 +296,7 @@ if [ -z "${IGNORE_ALL_COBAYA_INSTALLATION}" ]; then
 
     cd $COBAYA/$CBLIKE
 
-    git clone https://github.com/planck-npipe/lollipop.git lollipop_tmp
+    $GIT clone https://github.com/planck-npipe/lollipop.git lollipop_tmp
     if [ $? -ne 0 ]; then
       echo -e '\033[0;31m'"\t\t SETUP UPDATE COBAYA (LOLLIPOP) FAILED"'\033[0m'
       cd $ROOTDIR
@@ -311,7 +311,8 @@ if [ -z "${IGNORE_ALL_COBAYA_INSTALLATION}" ]; then
     fi
 
     cd $COBAYA/$CBLIKE/lollipop_tmp
-    git reset --hard $LOLLIPOP_GIT_COMMIT > ${OUT_UPT_CB_1} 2> ${OUT_UPT_CB_2}
+    
+    $GIT reset --hard $LOLLIPOP_GIT_COMMIT > ${OUT_UPT_CB_1} 2> ${OUT_UPT_CB_2}
     if [ $? -ne 0 ]; then
       echo -e '\033[0;31m'"\t\t SETUP UPDATE COBAYA (LOLLIPOP) FAILED"'\033[0m'
       cd $ROOTDIR

@@ -154,7 +154,8 @@ if [ -n "${MANUAL_INSTALLATION}" ]; then
     export GLOBAL_PACKAGES_LOCATION=$CONDA_PREFIX
     export GLOBALPYTHON3=$CONDA_PREFIX/bin/python${PYTHON_VERSION}
     export GLOBALPIP3=$CONDA_PREFIX/bin/pip3
-
+    export GIT=$CONDA_PREFIX/bin/git
+    
     # --------------------------------------------------------------------------------------
     # USER NEEDS TO SPECIFY THE FLAGS BELOW SO COCOA CAN FIND PYTHON / GCC / HDF5
     # --------------------------------------------------------------------------------------
@@ -233,6 +234,7 @@ elif [ -n "${MINICONDA_INSTALLATION}" ]; then
     export GLOBALPYTHON3=$CONDA_PREFIX/bin/python${PYTHON_VERSION}
     export GLOBAL_PACKAGES_LOCATION=$CONDA_PREFIX
     export GLOBALPIP3=$CONDA_PREFIX/bin/pip3
+    export GIT=$CONDA_PREFIX/bin/git
 
     export PATH=$CONDA_PREFIX/bin:$PATH
     export CFLAGS="${CFLAGS} -I$CONDA_PREFIX/include"
