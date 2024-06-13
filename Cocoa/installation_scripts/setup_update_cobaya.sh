@@ -14,6 +14,22 @@ if [ -z "${IGNORE_ALL_COBAYA_INSTALLATION}" ]; then
     cd $ROOTDIR
     return 1
   fi
+
+  unset_env_vars () {
+    cd $ROOTDIR
+    unset COBAYA
+    unset COBAYA_COCOA
+    unset CBLIKE
+    unset CBTH
+    unset OUT_UCB_1
+    unset OUT_UCB_2
+    unset CBURL
+    unset PL2020
+    unset PL_LL
+    unset BASECL
+    unset NPIPE_URL
+  }
+  
   if [ -z "${DEBUG_PIP_OUTPUT}" ]; then
     export OUT_UCB_1="/dev/null"
     export OUT_UCB_2="/dev/null"
@@ -41,14 +57,8 @@ if [ -z "${IGNORE_ALL_COBAYA_INSTALLATION}" ]; then
     $GIT clone $CBURL cobaya > ${OUT_UCB_1} 2> ${OUT_UCB_2}
     if [ $? -ne 0 ]; then
       echo -e '\033[0;31m'"\t\t SETUP UPDATE COBAYA FAILED"'\033[0m'
-      cd $ROOTDIR
-      unset COBAYA
-      unset COBAYA_COCOA
-      unset CBLIKE
-      unset CBTH
-      unset OUT_UCB_1
-      unset OUT_UCB_2
-      unset CBURL
+      unset_env_vars
+      unset unset_env_vars
       return 1
     fi
     unset CBURL
@@ -58,13 +68,8 @@ if [ -z "${IGNORE_ALL_COBAYA_INSTALLATION}" ]; then
     $GIT reset --hard $COBAYA_GIT_COMMIT > ${OUT_UCB_1} 2> ${OUT_UCB_2}
     if [ $? -ne 0 ]; then
       echo -e '\033[0;31m'"\t\t SETUP UPDATE COBAYA FAILED"'\033[0m'
-      cd $ROOTDIR
-      unset COBAYA
-      unset COBAYA_COCOA
-      unset CBLIKE
-      unset CBTH
-      unset OUT_UCB_1
-      unset OUT_UCB_2
+      unset_env_vars
+      unset unset_env_vars
       return 1
     fi
 
@@ -107,14 +112,8 @@ if [ -z "${IGNORE_ALL_COBAYA_INSTALLATION}" ]; then
     sh change_planck_clik.sh
     if [ $? -ne 0 ]; then
       echo -e '\033[0;31m'"\t\t SETUP UPDATE COBAYA (CHANGE PLANCK) FAILED"'\033[0m'
-      cd $ROOTDIR
-      unset COBAYA
-      unset COBAYA_COCOA
-      unset CBLIKE
-      unset CBTH
-      unset OUT_UCB_1
-      unset OUT_UCB_2
-      unset BASECL
+      unset_env_vars
+      unset unset_env_vars
       return 1
     fi
     unset BASECL
@@ -231,14 +230,8 @@ if [ -z "${IGNORE_ALL_COBAYA_INSTALLATION}" ]; then
     patch -u InstallableLikelihood.py -i InstallableLikelihood.patch > ${OUT_UCB_1} 2> ${OUT_UCB_2}
     if [ $? -ne 0 ]; then
       echo -e '\033[0;31m'"\t\t SETUP UPDATE COBAYA (PATCH CAMSPEC) FAILED"'\033[0m'
-      cd $ROOTDIR
-      unset COBAYA
-      unset COBAYA_COCOA
-      unset CBLIKE
-      unset CBTH
-      unset OUT_UCB_1
-      unset OUT_UCB_2
-      unset BASECL
+      unset_env_vars
+      unset unset_env_vars
       return 1
     fi
 
@@ -267,16 +260,8 @@ if [ -z "${IGNORE_ALL_COBAYA_INSTALLATION}" ]; then
     $GIT clone "${NPIPE_URL}/hillipop.git" hipoptmp > ${OUT_UCB_1} 2> ${OUT_UCB_2}
     if [ $? -ne 0 ]; then
       echo -e '\033[0;31m'"\t\t SETUP UPDATE COBAYA (HILLIPOP) FAILED"'\033[0m'
-      cd $ROOTDIR
-      unset COBAYA
-      unset COBAYA_COCOA
-      unset CBLIKE
-      unset CBTH
-      unset HGL
-      unset OUT_UCB_1
-      unset OUT_UCB_2
-      unset NPIPE_URL
-      unset PL2020
+      unset_env_vars
+      unset unset_env_vars
       return 1
     fi
 
@@ -285,16 +270,8 @@ if [ -z "${IGNORE_ALL_COBAYA_INSTALLATION}" ]; then
     $GIT reset --hard $HILLIPOP_GIT_COMMIT > ${OUT_UCB_1} 2> ${OUT_UCB_2}
     if [ $? -ne 0 ]; then
       echo -e '\033[0;31m'"\t\t SETUP UPDATE COBAYA (HILLIPOP) FAILED"'\033[0m'
-      cd $ROOTDIR
-      unset COBAYA
-      unset COBAYA_COCOA
-      unset CBLIKE
-      unset CBTH
-      unset HGL
-      unset OUT_UCB_1
-      unset OUT_UCB_2
-      unset NPIPE_URL
-      unset PL2020
+      unset_env_vars
+      unset unset_env_vars
       return 1
     fi
     mv planck_2020_hillipop/ $COBAYA/$CBLIKE
@@ -303,6 +280,12 @@ if [ -z "${IGNORE_ALL_COBAYA_INSTALLATION}" ]; then
     cp $COBAYA_COCOA/$PL2020/init.patch $COBAYA/$PL2020
     cd $COBAYA/$PL2020
     patch -u __init__.py -i init.patch > ${OUT_UCB_1} 2> ${OUT_UCB_2}
+    if [ $? -ne 0 ]; then
+      echo -e '\033[0;31m'"\t\t SETUP UPDATE COBAYA (HILLIPOP) FAILED"'\033[0m'
+      unset_env_vars
+      unset unset_env_vars
+      return 1
+    fi
 
     rm -rf $COBAYA/$CBLIKE/hipoptmp
     unset PL2020
@@ -327,15 +310,8 @@ if [ -z "${IGNORE_ALL_COBAYA_INSTALLATION}" ]; then
     $GIT clone "${NPIPE_URL}/lollipop.git" lipoptmp > ${OUT_UCB_1} 2> ${OUT_UCB_2}
     if [ $? -ne 0 ]; then
       echo -e '\033[0;31m'"\t\t SETUP UPDATE COBAYA (LOLLIPOP) FAILED"'\033[0m'
-      cd $ROOTDIR
-      unset COBAYA
-      unset COBAYA_COCOA
-      unset CBLIKE
-      unset CBTH
-      unset OUT_UCB_1
-      unset OUT_UCB_2
-      unset NPIPE_URL
-      unset PL2020
+      unset_env_vars
+      unset unset_env_vars
       return 1
     fi
 
@@ -343,15 +319,8 @@ if [ -z "${IGNORE_ALL_COBAYA_INSTALLATION}" ]; then
     $GIT reset --hard $LOLLIPOP_GIT_COMMIT > ${OUT_UCB_1} 2> ${OUT_UCB_2}
     if [ $? -ne 0 ]; then
       echo -e '\033[0;31m'"\t\t SETUP UPDATE COBAYA (LOLLIPOP) FAILED"'\033[0m'
-      cd $ROOTDIR
-      unset COBAYA
-      unset COBAYA_COCOA
-      unset CBLIKE
-      unset CBTH
-      unset OUT_UCB_1
-      unset OUT_UCB_2
-      unset NPIPE_URL
-      unset PL2020
+      unset_env_vars
+      unset unset_env_vars
       return 1
     fi
     mv planck_2020_lollipop/ $COBAYA/$CBLIKE
@@ -360,6 +329,12 @@ if [ -z "${IGNORE_ALL_COBAYA_INSTALLATION}" ]; then
     cp $COBAYA_COCOA/$PL2020/init.patch $COBAYA/$PL2020
     cd $COBAYA/$PL2020
     patch -u __init__.py -i init.patch > ${OUT_UCB_1} 2> ${OUT_UCB_2}
+    if [ $? -ne 0 ]; then
+      echo -e '\033[0;31m'"\t\t SETUP UPDATE COBAYA (LOLLIPOP) FAILED"'\033[0m'
+      unset_env_vars
+      unset unset_env_vars
+      return 1
+    fi
 
     rm -rf $COBAYA/$CBLIKE/lipoptmp
 
@@ -369,13 +344,8 @@ if [ -z "${IGNORE_ALL_COBAYA_INSTALLATION}" ]; then
   #-------------------------------------------------------------------------------
   # UNSETKEYS --------------------------------------------------------------------
   #-------------------------------------------------------------------------------
-  cd $ROOTDIR
-  unset COBAYA
-  unset COBAYA_COCOA
-  unset CBLIKE
-  unset CBTH
-  unset OUT_UCB_1
-  unset OUT_UCB_2
+  unset_env_vars
+  unset unset_env_vars
   echo -e '\033[1;44m''\e[4mUPDATING COBAYA PACKAGE DONE''\033[0m'
 fi
 #-------------------------------------------------------------------------------

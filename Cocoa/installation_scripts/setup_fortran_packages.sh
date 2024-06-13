@@ -39,6 +39,12 @@ if [ -z "${IGNORE_FORTRAN_INSTALLATION}" ]; then
       return 1
   fi
 
+  unset_env_vars () {
+    cd $ROOTDIR
+    unset OUTPUT_FORTRAN_1
+    unset OUTPUT_FORTRAN_2
+    unset FORTRAN_MAKE_NUM_THREADS
+  }
 
   if [ -z "${DEBUG_FORTRAN_PACKAGES}" ]; then
     export OUTPUT_FORTRAN_1="/dev/null"
@@ -68,10 +74,8 @@ if [ -z "${IGNORE_FORTRAN_INSTALLATION}" ]; then
       echo -e '\033[0;32m'"\t\t  LAPACK RUN \e[3mCMAKE\e[0m\e\033[0;32m DONE"'\033[0m'
     else
       echo -e '\033[0;31m'"LAPACK COULD NOT RUN \e[3mCMAKE"'\033[0m'
-      cd $ROOTDIR
-      unset OUTPUT_FORTRAN_1
-      unset OUTPUT_FORTRAN_2
-      unset FORTRAN_MAKE_NUM_THREADS
+      unset_env_vars
+      unset unset_env_vars
       return 1
     fi
 
@@ -80,10 +84,8 @@ if [ -z "${IGNORE_FORTRAN_INSTALLATION}" ]; then
       echo -e '\033[0;32m'"\t\t  LAPACK RUN \e[3mMAKE\e[0m\e\033[0;32m DONE"'\033[0m'
     else
       echo -e '\033[0;31m'"LAPACK COULD NOT RUN \e[3mMAKE"'\033[0m'
-      cd $ROOTDIR
-      unset OUTPUT_FORTRAN_1
-      unset OUTPUT_FORTRAN_2
-      unset FORTRAN_MAKE_NUM_THREADS
+      unset_env_vars
+      unset unset_env_vars
       return 1
     fi
 
@@ -92,10 +94,8 @@ if [ -z "${IGNORE_FORTRAN_INSTALLATION}" ]; then
       echo -e '\033[0;32m'"\t\t LAPACK RUN \e[3mMAKE INSTALL\e[0m\e\033[0;32m DONE"'\033[0m'
     else
       echo -e '\033[0;31m'"LAPACK COULD NOT RUN \e[3mMAKE INSTALL"'\033[0m'
-      cd $ROOTDIR
-      unset OUTPUT_FORTRAN_1
-      unset OUTPUT_FORTRAN_2
-      unset FORTRAN_MAKE_NUM_THREADS
+      unset_env_vars
+      unset unset_env_vars
       return 1
     fi
     
@@ -103,14 +103,8 @@ if [ -z "${IGNORE_FORTRAN_INSTALLATION}" ]; then
     echo -e '\033[1;34m''\t\e[4mINSTALLING LAPACK FORTRAN LIBRARY DONE''\033[0m'
   fi
   
-  # ----------------------------------------------------------------------------
-  # ----------------------------------------------------------------------------
-  # ----------------------------------------------------------------------------
-  cd $ROOTDIR
-  unset OUTPUT_FORTRAN_1
-  unset OUTPUT_FORTRAN_2
-  unset FORTRAN_MAKE_NUM_THREADS
-
+  unset_env_vars
+  unset unset_env_vars
   echo -e '\033[1;44m''\e[4mSETUP_FORTRAN_PACKAGES DONE''\033[0m'
 fi
 # ------------------------------------------------------------------------------

@@ -39,13 +39,22 @@ if [ -z "${IGNORE_C_INSTALLATION}" ]; then
       return 1
   fi
 
+  unset_env_vars () {
+    cd $ROOTDIR
+    unset OUT_C_PACK_1
+    unset OUT_C_PACK_2
+    unset C_MAKE_NUM_THREADS
+    unset OUTPUT_PIP_1
+    unset OUTPUT_PIP_2
+  }
+
   if [ -z "${DEBUG_C_PACKAGES}" ]; then
-    export OUTPUT_CPACKAGES_1="/dev/null"
-    export OUTPUT_CPACKAGES_2="/dev/null"
+    export z="/dev/null"
+    export OUT_C_PACK_2="/dev/null"
     export C_MAKE_NUM_THREADS="${MAKE_NUM_THREADS}"
   else
-    export OUTPUT_CPACKAGES_1="/dev/tty"
-    export OUTPUT_CPACKAGES_2="/dev/tty"
+    export OUT_C_PACK_1="/dev/tty"
+    export OUT_C_PACK_2="/dev/tty"
     export C_MAKE_NUM_THREADS=1
   fi
 
@@ -61,39 +70,33 @@ if [ -z "${IGNORE_C_INSTALLATION}" ]; then
       --enable-openmp \
       --prefix=$ROOTDIR/.local \
       --enable-shared=yes \
-      --enable-static=yes > ${OUTPUT_CPACKAGES_1} 2> ${OUTPUT_CPACKAGES_2}
+      --enable-static=yes > ${OUT_C_PACK_1} 2> ${OUT_C_PACK_2}
     if [ $? -eq 0 ]; then
       echo -e '\033[0;32m'"\t\t FFTW RUN \e[3mCONFIGURE\e[0m\e\033[0;32m DONE"'\033[0m'
     else
       echo -e '\033[0;31m'"FFTW COULD NOT RUN \e[3mCONFIGURE"'\033[0m'
-      cd $ROOTDIR
-      unset OUTPUT_CPACKAGES_1
-      unset OUTPUT_CPACKAGES_2
-      unset C_MAKE_NUM_THREADS
+      unset_env_vars
+      unset unset_env_vars
       return 1
     fi
 
-    make -j $C_MAKE_NUM_THREADS all > ${OUTPUT_CPACKAGES_1} 2> ${OUTPUT_CPACKAGES_2}
+    make -j $C_MAKE_NUM_THREADS all > ${OUT_C_PACK_1} 2> ${OUT_C_PACK_2}
     if [ $? -eq 0 ]; then
       echo -e '\033[0;32m'"\t\t FFTW RUN \e[3mMAKE\e[0m\e\033[0;32m DONE"'\033[0m'
     else
       echo -e '\033[0;31m'"FFTW COULD NOT RUN \e[3mMAKE"'\033[0m'
-      cd $ROOTDIR
-      unset OUTPUT_CPACKAGES_1
-      unset OUTPUT_CPACKAGES_2
-      unset C_MAKE_NUM_THREADS
+      unset_env_vars
+      unset unset_env_vars
       return 1
     fi
 
-    make install > ${OUTPUT_CPACKAGES_1} 2> ${OUTPUT_CPACKAGES_2}
+    make install > ${OUT_C_PACK_1} 2> ${OUT_C_PACK_2}
     if [ $? -eq 0 ]; then
       echo -e '\033[0;32m'"\t\t FFTW RUN \e[3mMAKE INSTALL\e[0m\e\033[0;32m DONE"'\033[0m'
     else
       echo -e '\033[0;31m'"FFTW COULD NOT RUN \e[3mMAKE INSTALL"'\033[0m'
-      cd $ROOTDIR
-      unset OUTPUT_CPACKAGES_1
-      unset OUTPUT_CPACKAGES_2
-      unset C_MAKE_NUM_THREADS
+      unset_env_vars
+      unset unset_env_vars
       return 1
     fi
 
@@ -119,38 +122,34 @@ if [ -z "${IGNORE_C_INSTALLATION}" ]; then
       -DCMAKE_C_COMPILER=$C_COMPILER \
       -DCMAKE_CXX_COMPILER=$CXX_COMPILER \
       -DCMAKE_FC_COMPILER=FORTRAN_COMPILER \
-      --log-level=ERROR .. > ${OUTPUT_CPACKAGES_1} 2> ${OUTPUT_CPACKAGES_2}
+      --log-level=ERROR .. > ${OUT_C_PACK_1} 2> ${OUT_C_PACK_2}
     if [ $? -eq 0 ]; then
       echo -e '\033[0;32m' "\t\t CFITSIO RUN \e[3mCMAKE\e[0m\e\033[0;32m DONE"'\033[0m'
     else
       echo -e '\033[0;31m'"CFITSIO COULD NOT RUN \e[3mCMAKE"'\033[0m'
-      cd $ROOTDIR
-      unset OUTPUT_CPACKAGES_1
-      unset OUTPUT_CPACKAGES_2
-      unset C_MAKE_NUM_THREADS
+      unset_env_vars
+      unset unset_env_vars
       return 1
     fi
 
-    make -j $C_MAKE_NUM_THREADS all > ${OUTPUT_CPACKAGES_1} 2> ${OUTPUT_CPACKAGES_2}
+    make -j $C_MAKE_NUM_THREADS all > ${OUT_C_PACK_1} 2> ${OUT_C_PACK_2}
     if [ $? -eq 0 ]; then
       echo -e '\033[0;32m'"\t\t CFITSIO RUN \e[3mMAKE\e[0m\e\033[0;32m DONE"'\033[0m'
     else
       echo -e '\033[0;31m'"CFITSIO COULD NOT RUN \e[3mMAKE"'\033[0m'
-      cd $ROOTDIR
-      unset OUTPUT_CPACKAGES_1
-      unset OUTPUT_CPACKAGES_2
-      unset C_MAKE_NUM_THREADS
+      unset_env_vars
+      unset unset_env_vars
       return 1
     fi
 
-    make install > ${OUTPUT_CPACKAGES_1} 2> ${OUTPUT_CPACKAGES_2}
+    make install > ${OUT_C_PACK_1} 2> ${OUT_C_PACK_2}
     if [ $? -eq 0 ]; then
       echo -e '\033[0;32m' "\t\t CFITSIO RUN \e[3mMAKE INSTALL\e[0m\e\033[0;32m DONE"'\033[0m'
     else
       echo -e '\033[0;31m'"CFITSIO COULD NOT RUN \e[3mMAKE INSTALL"'\033[0m'
       cd $ROOTDIR
-      unset OUTPUT_CPACKAGES_1
-      unset OUTPUT_CPACKAGES_2
+      unset OUT_C_PACK_1
+      unset OUT_C_PACK_2
       unset C_MAKE_NUM_THREADS
       return 1
     fi
@@ -173,39 +172,33 @@ if [ -z "${IGNORE_C_INSTALLATION}" ]; then
     CC=$C_COMPILER ./configure \
       --prefix=$ROOTDIR/.local \
       --enable-shared=yes \
-      --enable-static=yes > ${OUTPUT_CPACKAGES_1} 2> ${OUTPUT_CPACKAGES_2}
+      --enable-static=yes > ${OUT_C_PACK_1} 2> ${OUT_C_PACK_2}
     if [ $? -eq 0 ]; then
       echo -e '\033[0;32m' "\t\t GSL RUN \e[3mCONFIGURE\e[0m\e\033[0;32m DONE"'\033[0m'
     else
       echo -e '\033[0;31m'"GSL COULD NOT RUN \e[3mCONFIGURE"'\033[0m'
-      cd $ROOTDIR
-      unset OUTPUT_CPACKAGES_1
-      unset OUTPUT_CPACKAGES_2
-      unset C_MAKE_NUM_THREADS
+      unset_env_vars
+      unset unset_env_vars
       return 1
     fi
 
-    make -j $C_MAKE_NUM_THREADS all > ${OUTPUT_CPACKAGES_1} 2> ${OUTPUT_CPACKAGES_2}
+    make -j $C_MAKE_NUM_THREADS all > ${OUT_C_PACK_1} 2> ${OUT_C_PACK_2}
     if [ $? -eq 0 ]; then
       echo -e '\033[0;32m'"\t\t GSL RUN \e[3mMAKE\e[0m\e\033[0;32m DONE"'\033[0m'
     else
       echo -e '\033[0;31m'"GSL COULD NOT RUN \e[3mMAKE"'\033[0m'
-      cd $ROOTDIR
-      unset OUTPUT_CPACKAGES_1
-      unset OUTPUT_CPACKAGES_2
-      unset C_MAKE_NUM_THREADS
+      unset_env_vars
+      unset unset_env_vars
       return 1
     fi
 
-    make install > ${OUTPUT_CPACKAGES_1} 2> ${OUTPUT_CPACKAGES_2}
+    make install > ${OUT_C_PACK_1} 2> ${OUT_C_PACK_2}
     if [ $? -eq 0 ]; then
       echo -e '\033[0;32m'"\t\t GSL RUN \e[3mMAKE INSTALL\e[0m\e\033[0;32m DONE"'\033[0m'
     else
       echo -e '\033[0;31m'"GSL COULD NOT RUN \e[3mMAKE INSTALL"'\033[0m'
-      cd $ROOTDIR
-      unset OUTPUT_CPACKAGES_1
-      unset OUTPUT_CPACKAGES_2
-      unset C_MAKE_NUM_THREADS
+      unset_env_vars
+      unset unset_env_vars
       return 1
     fi
 
@@ -216,8 +209,8 @@ if [ -z "${IGNORE_C_INSTALLATION}" ]; then
   # ----------------------------------------------------------------------------
   # ----------------------------------------------------------------------------
   cd $ROOTDIR
-  unset OUTPUT_CPACKAGES_1
-  unset OUTPUT_CPACKAGES_2
+  unset OUT_C_PACK_1
+  unset OUT_C_PACK_2
   unset C_MAKE_NUM_THREADS
   echo -e '\033[1;44m''\e[4mSETUP_C_PACKAGES DONE''\033[0m'
 fi
@@ -243,17 +236,15 @@ if [ -z "${IGNORE_ALL_PIP_INSTALLATION}" ]; then
     --prefix=$ROOTDIR/.local --no-index > ${OUTPUT_PIP_1} 2> ${OUTPUT_PIP_2}
   if [ $? -ne 0 ]; then
     echo -e '\033[0;31m'"PIP COULD NOT RUN \e[3mPIP INSTALL EUCLUDEMUL"'\033[0m'
-    cd $ROOTDIR
-    unset OUTPUT_PIP_1
-    unset OUTPUT_PIP_2
+    unset_env_vars
+    unset unset_env_vars
     return 1
   else
     echo -e '\033[0;32m'"\t\t PIP RUN \e[3mPIP INSTALL EUCLUDEMUL\e[0m\e\033[0;32m DONE"'\033[0m'
   fi
 
-  cd $ROOTDIR
-  unset OUTPUT_PIP_1
-  unset OUTPUT_PIP_2
+  unset_env_vars
+  unset unset_env_vars
   echo -e '\033[1;34m''\e[4mINSTALLING EUCLIDEMU2 DONE''\033[0m'
 fi
 # ------------------------------------------------------------------------------

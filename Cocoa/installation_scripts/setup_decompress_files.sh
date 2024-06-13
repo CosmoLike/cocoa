@@ -8,25 +8,6 @@ if [ -z "${ROOTDIR}" ]; then
     echo -e '\033[0;31m''ERROR ENV VARIABLE ROOTDIR IS NOT DEFINED''\033[0m'
     return 1
 fi
-if [ -z "${CXX_COMPILER}" ]; then
-    echo -e '\033[0;31m''ERROR ENV VARIABLE CXX_COMPILER IS NOT DEFINED''\033[0m'
-    cd $ROOTDIR
-    return 1
-fi
-if [ -z "${C_COMPILER}" ]; then
-    echo -e '\033[0;31m''ERROR ENV VARIABLE C_COMPILER IS NOT DEFINED''\033[0m'
-    cd $ROOTDIR
-    return 1
-fi
-if [ -z "${FORTRAN_COMPILER}" ]; then
-    echo -e '\033[0;31m''ERROR ENV VARIABLE FORTRAN_COMPILER IS NOT DEFINED''\033[0m'
-    cd $ROOTDIR
-    return 1
-fi
-if [ -z "${CMAKE}" ]; then
-    echo -e '\033[0;31m''ERROR ENV VARIABLE MAKE IS NOT DEFINED''\033[0m'
-    return 1
-fi
 
 # ----------------------------------------------------------------------------
 # ----------------- COCOA_INSTALLATION_LIBRARIES -----------------------------
@@ -37,6 +18,10 @@ if [ -z "${NO_UNXZ_COCOA_INSTALLATION_LIBRARIES}" ]; then
     cd $ROOTDIR/../cocoa_installation_libraries/
 
     sh unxv_all.sh
+    if [ $? -ne 0 ]; then
+      cd $ROOTDIR
+      return 1
+    fi
 
     cd $ROOTDIR
 
@@ -58,6 +43,10 @@ if [ -z "${NO_UNXZ_EXTERNAL_MODULES_DATA}" ]; then
     cd $ROOTDIR/external_modules/data/
 
     sh unxv_all.sh
+    if [ $? -ne 0 ]; then
+      cd $ROOTDIR
+      return 1
+    fi
 
     cd $ROOTDIR
 

@@ -29,6 +29,14 @@ if [ -z "${IGNORE_ALL_PIP_INSTALLATION}" ]; then
     cd $ROOTDIR
     return 1
   fi
+
+  unset_env_vars () {
+    cd $ROOTDIR
+    unset OUTPUT_PIP_1
+    unset OUTPUT_PIP_2
+    unset PIP_MAKE_NUM_THREADS
+  }
+
   if [ -z "${DEBUG_PIP_OUTPUT}" ]; then
     export OUTPUT_PIP_1="/dev/null"
     export OUTPUT_PIP_2="/dev/null"
@@ -56,9 +64,8 @@ if [ -z "${IGNORE_ALL_PIP_INSTALLATION}" ]; then
       echo -e '\033[0;32m'"LIBEXPAT RUN \e[3mMAKE\e[0m\e\033[0;32m DONE"'\033[0m'
     else
       echo -e '\033[0;31m'"LIBEXPAT COULD NOT RUN \e[3mMAKE"'\033[0m'
-      unset OUTPUT_PIP_1
-      unset OUTPUT_PIP_2
-      unset PIP_MAKE_NUM_THREADS
+      unset_env_vars
+      unset unset_env_vars
       return 1
     fi
 
@@ -67,9 +74,8 @@ if [ -z "${IGNORE_ALL_PIP_INSTALLATION}" ]; then
       echo -e '\033[0;32m'"LIBEXPAT RUN \e[3m MAKE INSTALL\e[0m\e\033[0;32m DONE"'\033[0m'
     else
       echo -e '\033[0;31m'"LIBEXPAT COULD NOT RUN \e[3mMAKE INSTALL"'\033[0m'
-      unset OUTPUT_PIP_1
-      unset OUTPUT_PIP_2
-      unset PIP_MAKE_NUM_THREADS
+      unset_env_vars
+      unset unset_env_vars
       return 1
     fi
 
@@ -198,10 +204,8 @@ if [ -z "${IGNORE_ALL_PIP_INSTALLATION}" ]; then
       --prefix=$ROOTDIR/.local > ${OUTPUT_PIP_1} 2> ${OUTPUT_PIP_2}
     if [ $? -ne 0 ]; then
       echo -e '\033[0;31m'"PIP COULD NOT RUN \e[3mPIP INSTALL (CORE PACKAGES)"'\033[0m'
-      cd $ROOTDIR
-      unset OUTPUT_PIP_1
-      unset OUTPUT_PIP_2
-      unset PIP_MAKE_NUM_THREADS
+      unset_env_vars
+      unset unset_env_vars
       return 1
     else
       echo -e '\033[0;32m'"\t\t PIP RUN \e[3mPIP INSTALL (CORE PACKAGES)\e[0m\e\033[0;32m DONE"'\033[0m'
@@ -214,10 +218,8 @@ if [ -z "${IGNORE_ALL_PIP_INSTALLATION}" ]; then
       --force-reinstall > ${OUTPUT_PIP_1} 2> ${OUTPUT_PIP_2}
     if [ $? -ne 0 ]; then
       echo -e '\033[0;31m'"PIP COULD NOT RUN \e[3mPIP INSTALL (CORE PACKAGES)"'\033[0m'
-      cd $ROOTDIR
-      unset OUTPUT_PIP_1
-      unset OUTPUT_PIP_2
-      unset PIP_MAKE_NUM_THREADS
+      unset_env_vars
+      unset unset_env_vars
       return 1
     else
       echo -e '\033[0;32m'"\t\t PIP RUN \e[3mPIP INSTALL (CORE PACKAGES)\e[0m\e\033[0;32m DONE"'\033[0m'
@@ -230,10 +232,8 @@ if [ -z "${IGNORE_ALL_PIP_INSTALLATION}" ]; then
     --no-index > ${OUTPUT_PIP_1} 2> ${OUTPUT_PIP_2}
   if [ $? -ne 0 ]; then
     echo -e '\033[0;31m'"PIP COULD NOT RUN \e[3mPIP INSTALL FGSPECTRA"'\033[0m'
-    cd $ROOTDIR
-    unset OUTPUT_PIP_1
-    unset OUTPUT_PIP_2
-    unset PIP_MAKE_NUM_THREADS
+    unset_env_vars
+    unset unset_env_vars
     return 1
   else
     echo -e '\033[0;32m'"\t\t PIP RUN \e[3mPIP INSTALL FGSPECTRA\e[0m\e\033[0;32m DONE"'\033[0m'
@@ -260,10 +260,8 @@ if [ -z "${IGNORE_ALL_PIP_INSTALLATION}" ]; then
       --prefix=$ROOTDIR/.local > ${OUTPUT_PIP_1} 2> ${OUTPUT_PIP_2}
     if [ $? -ne 0 ]; then
       echo -e '\033[0;31m'"PIP COULD NOT RUN \e[3mPIP INSTALL (MACHINE LEARNING CPU-ONLY PACKAGES)"'\033[0m'
-      cd $ROOTDIR
-      unset OUTPUT_PIP_1
-      unset OUTPUT_PIP_2
-      unset PIP_MAKE_NUM_THREADS
+      unset_env_vars
+      unset unset_env_vars
       return 1
     else
       echo -e '\033[0;32m'"\t\t PIP RUN \e[3mPIP INSTALL (MACHINE LEARNING CPU-ONLY PACKAGES)\e[0m\e\033[0;32m DONE"'\033[0m'
@@ -285,10 +283,8 @@ if [ -z "${IGNORE_ALL_PIP_INSTALLATION}" ]; then
       --prefix=$ROOTDIR/.local > ${OUTPUT_PIP_1} 2> ${OUTPUT_PIP_2}
     if [ $? -ne 0 ]; then
       echo -e '\033[0;31m'"PIP COULD NOT RUN \e[3mPIP INSTALL (MACHINE LEARNING GPU PACKAGES)"'\033[0m'
-      cd $ROOTDIR
-      unset OUTPUT_PIP_1
-      unset OUTPUT_PIP_2
-      unset PIP_MAKE_NUM_THREADS
+      unset_env_vars
+      unset unset_env_vars
       return 1
     else
       echo -e '\033[0;32m'"\t\t PIP RUN \e[3mPIP INSTALL (MACHINE LEARNING GPU PACKAGES)\e[0m\e\033[0;32m DONE"'\033[0m'
@@ -297,10 +293,8 @@ if [ -z "${IGNORE_ALL_PIP_INSTALLATION}" ]; then
     echo -e '\033[1;34m''\t\e[4mPIP INSTALL MACHINE LEARNING GPU PACKAGES DONE''\033[0m'
   fi
 
-  cd $ROOTDIR
-  unset OUTPUT_PIP_1
-  unset OUTPUT_PIP_2
-  unset PIP_MAKE_NUM_THREADS
+  unset_env_vars
+  unset unset_env_vars
   echo -e '\033[1;44m''\e[4mINSTALLING PYTHON PACKAGES VIA PIP DONE''\033[0m'
 fi
 # ------------------------------------------------------------------------------

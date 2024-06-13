@@ -36,6 +36,13 @@ if [ -z "${IGNORE_HDF5_INSTALLATION}" ]; then
 
   echo -e '\033[1;34m''\tINSTALLING HFD5 LIBRARY - \e[4mIT WILL TAKE A WHILE''\033[0m'
 
+  unset_env_vars () {
+    cd $ROOTDIR
+    unset OUTPUT_HDF5_1
+    unset OUTPUT_HDF5_2
+    unset HDF5_MAKE_NUM_THREADS
+  }
+
   if [ -z "${DEBUG_HDF5_PACKAGES}" ]; then
     export OUTPUT_HDF5_1="/dev/null"
     export OUTPUT_HDF5_2="/dev/null"
@@ -61,10 +68,8 @@ if [ -z "${IGNORE_HDF5_INSTALLATION}" ]; then
     echo -e '\033[0;32m'"\t\t HDF5 RUN \e[3mCMAKE\e[0m\e\033[0;32m DONE"'\033[0m'
   else
     echo -e '\033[0;31m'"HDF5 COULD NOT RUN \e[3mCMAKE"'\033[0m'
-    cd $ROOTDIR
-    unset OUTPUT_HDF5_1
-    unset OUTPUT_HDF5_2
-    unset HDF5_MAKE_NUM_THREADS
+    unset_env_vars
+    unset unset_env_vars
     return 1
   fi
 
@@ -73,10 +78,8 @@ if [ -z "${IGNORE_HDF5_INSTALLATION}" ]; then
     echo -e '\033[0;32m'"\t\t HDF5 RUN \e[3mMAKE\e[0m\e\033[0;32m DONE"'\033[0m'
   else
     echo -e '\033[0;31m'"HDF5 COULD NOT RUN \e[3mMAKE"'\033[0m'
-    cd $ROOTDIR
-    unset OUTPUT_HDF5_1
-    unset OUTPUT_HDF5_2
-    unset HDF5_MAKE_NUM_THREADS
+    unset_env_vars
+    unset unset_env_vars
     return 1
   fi
 
@@ -85,17 +88,13 @@ if [ -z "${IGNORE_HDF5_INSTALLATION}" ]; then
     echo -e '\033[0;32m'"\t\t HDF5 RUN \e[3mMAKE INSTALL\e[0m\e\033[0;32m DONE"'\033[0m'
   else
     echo -e '\033[0;31m'"HDF5 COULD NOT RUN \e[3mMAKE INSTALL"'\033[0m'
-    cd $ROOTDIR
-    unset OUTPUT_HDF5_1
-    unset OUTPUT_HDF5_2
-    unset HDF5_MAKE_NUM_THREADS
+    unset_env_vars
+    unset unset_env_vars
     return 1
   fi
 
-  cd $ROOTDIR
-  unset OUTPUT_HDF5_1
-  unset OUTPUT_HDF5_2
-  unset HDF5_MAKE_NUM_THREADS
+  unset_env_vars
+  unset unset_env_vars
   echo -e '\033[1;34m''\t\e[4mINSTALLING HDF5 LIBRARY DONE''\033[0m'
   echo -e '\033[1;44m''\e[4mSETUP_HDF5 DONE''\033[0m'
 fi

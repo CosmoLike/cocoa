@@ -33,10 +33,12 @@
 -        extra_link_args=RPATH_FLAG + CPPRUNTIMELIB_FLAG,
 -        extra_compile_args= ["-std=c++11"] + RPATH_FLAG + CPPRUNTIMELIB_FLAG,
 -        runtime_library_dirs=['lib'],
++        # NOTHING
 +        extra_compile_args= ["-std=c++11"],
++        #runtime_library_dirs=[" " + os.path.join(BASE_PATH, "lib/")],
          sources=['pypolychord/_pypolychord.cpp']
 -        )
 +    )
- 
+
  setup(name=NAME,
        version=get_version(),

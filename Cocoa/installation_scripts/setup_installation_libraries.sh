@@ -15,6 +15,14 @@ if [ -z "${GIT}" ]; then
   return 1
 fi
 
+unset_env_vars () {
+  cd $ROOTDIR
+  unset MAKE_NB_JOBS
+  unset OUT_SIL_1
+  unset OUT_SIL_2
+  unset OPENBLAS_MAKE_NUM_THREADS
+}
+
 if [ -z "${DEBUG_SIL_OUTPUT}" ]; then
   export OUT_SIL_1="/dev/null"
   export OUT_SIL_2="/dev/null"
@@ -37,9 +45,8 @@ if [ -z "${IGNORE_CMAKE_INSTALLATION}" ]; then
   $GIT clone https://github.com/Kitware/CMake.git cmake-3.26.4 > ${OUT_SIL_1} 2> ${OUT_SIL_2}
   if [ $? -ne 0 ];then
     echo -e '\033[0;31m'"CMAKE: COULD NOT RUN \e[3mGIT CLONE"'\033[0m'
-    cd $ROOTDIR
-    unset OUT_SIL_1
-    unset OUT_SIL_2
+    unset_env_vars
+    unset unset_env_vars
     return 1
   fi
   
@@ -48,9 +55,8 @@ if [ -z "${IGNORE_CMAKE_INSTALLATION}" ]; then
   $GIT checkout v3.26.4 > ${OUT_SIL_1} 2> ${OUT_SIL_2}
   if [ $? -ne 0 ];then
     echo -e '\033[0;31m'"CMAKE: COULD NOT RUN \e[3mGIT CHECKOUT"'\033[0m'
-    cd $ROOTDIR
-    unset OUT_SIL_1
-    unset OUT_SIL_2
+    unset_env_vars
+    unset unset_env_vars
     return 1
   fi
 
@@ -63,9 +69,8 @@ if [ -z "${IGNORE_CMAKE_INSTALLATION}" ]; then
   tar -cf - cmake-3.26.4/ | xz -k -1 --threads=$MAKE_NUM_THREADS -c - > cmake.xz
   if [ $? -ne 0 ];then
     echo -e '\033[0;31m'"CMAKE: COULD NOT COMPRESS \e[3mCMAKE FOLDER"'\033[0m'
-    cd $ROOTDIR
-    unset OUT_SIL_1
-    unset OUT_SIL_2
+    unset_env_vars
+    unset unset_env_vars
     return 1
   fi
 
@@ -88,18 +93,16 @@ if [ -z "${IGNORE_DISTUTILS_INSTALLATION}" ]; then
   wget -q https://ftp.gnu.org/gnu/binutils/binutils-2.37.tar.gz
   if [ $? -ne 0 ];then
     echo -e '\033[0;31m'"BINUTILS: COULD NOT RUN \e[3mWGET"'\033[0m'
-    cd $ROOTDIR
-    unset OUT_SIL_1
-    unset OUT_SIL_2
+    unset_env_vars
+    unset unset_env_vars
     return 1
   fi
 
   tar zxvf binutils-2.37.tar.gz
   if [ $? -ne 0 ];then
     echo -e '\033[0;31m'"BINUTILS: COULD NOT RUN \e[3mTAR (UNCOMPRESS)"'\033[0m'
-    cd $ROOTDIR
-    unset OUT_SIL_1
-    unset OUT_SIL_2
+    unset_env_vars
+    unset unset_env_vars
     return 1
   fi
   rm -f $ROOTDIR/../cocoa_installation_libraries/binutils-2.37.tar.gz
@@ -109,9 +112,8 @@ if [ -z "${IGNORE_DISTUTILS_INSTALLATION}" ]; then
   tar -cf - binutils-2.37/ | xz -k -1 --threads=$MAKE_NUM_THREADS -c - > binutils.xz
   if [ $? -ne 0 ];then
     echo -e '\033[0;31m'"BINUTILS: COULD NOT COMPRESS \e[3mBINUTILS FOLDER"'\033[0m'
-    cd $ROOTDIR
-    unset OUT_SIL_1
-    unset OUT_SIL_2
+    unset_env_vars
+    unset unset_env_vars
     return 1
   fi
   rm -rf $ROOTDIR/../cocoa_installation_libraries/binutils-2.37
@@ -133,16 +135,16 @@ if [ -z "${IGNORE_DISTUTILS_INSTALLATION}" ]; then
   wget -q https://ftp.gnu.org/gnu/texinfo/texinfo-7.0.3.tar.xz
   if [ $? -ne 0 ];then
     echo -e '\033[0;31m'"TEXINFO: COULD NOT RUN \e[3mWGET"'\033[0m'
-    cd $ROOTDIR
-    unset OUT_SIL_1
-    unset OUT_SIL_2
+    unset_env_vars
+    unset unset_env_vars
     return 1
   fi
 
   tar xf texinfo-7.0.3.tar.xz
   if [ $? -ne 0 ];then
       echo -e '\033[0;31m'"TEXINFO: COULD NOT RUN \e[3mTAR (UNCOMPRESS)"'\033[0m'
-      cd $ROOTDIR
+      unset_env_vars
+      unset unset_env_vars
       return 1
   fi
 
@@ -153,9 +155,8 @@ if [ -z "${IGNORE_DISTUTILS_INSTALLATION}" ]; then
   tar -cf - texinfo-7.0.3/ | xz -k -1 --threads=$MAKE_NUM_THREADS -c - > texinfo.xz
   if [ $? -ne 0 ];then
     echo -e '\033[0;31m'"TEXINFO: COULD NOT COMPRESS \e[3mTEXINFO FOLDER"'\033[0m'
-    cd $ROOTDIR
-    unset OUT_SIL_1
-    unset OUT_SIL_2
+    unset_env_vars
+    unset unset_env_vars
     return 1
   fi
   rm -rf $ROOTDIR/../cocoa_installation_libraries/texinfo-7.0.3
@@ -174,12 +175,12 @@ if [ -z "${IGNORE_OPENBLAS_INSTALLATION}" ]; then
   rm -rf $ROOTDIR/../cocoa_installation_libraries/OpenBLAS-0.3.23
   rm -f $ROOTDIR/../cocoa_installation_libraries/OpenBLAS.xz
 
-  $GIT clonehttps://github.com/OpenMathLib/OpenBLAS.git OpenBLAS-0.3.23 > ${OUT_SIL_1} 2> ${OUT_SIL_2}
+  $GIT clone https://github.com/OpenMathLib/OpenBLAS.git OpenBLAS-0.3.23 > ${OUT_SIL_1} 2> ${OUT_SIL_2}
   if [ $? -ne 0 ];then
     echo -e '\033[0;31m'"OPENBLAS: COULD NOT RUN \e[3mGIT CLONE"'\033[0m'
-    cd $ROOTDIR
-    unset OUT_SIL_1
-    unset OUT_SIL_2      
+    unset_env_vars
+    unset unset_env_vars
+    return 1   
   fi
 
   cd $ROOTDIR/../cocoa_installation_libraries/OpenBLAS-0.3.23
@@ -187,9 +188,9 @@ if [ -z "${IGNORE_OPENBLAS_INSTALLATION}" ]; then
   $GIT checkout v0.3.23 > ${OUT_SIL_1} 2> ${OUT_SIL_2}
   if [ $? -ne 0 ];then
     echo -e '\033[0;31m'"OPENBLAS: COULD NOT RUN \e[3mGIT CHECKOUT"'\033[0m'
-    cd $ROOTDIR
-    unset OUT_SIL_1
-    unset OUT_SIL_2  
+    unset_env_vars
+    unset unset_env_vars
+    return 1
   fi
 
   rm -rf $ROOTDIR/../cocoa_installation_libraries/OpenBLAS-0.3.23/.git/
@@ -199,9 +200,8 @@ if [ -z "${IGNORE_OPENBLAS_INSTALLATION}" ]; then
   tar -cf - OpenBLAS-0.3.23/ | xz -k -1 --threads=$MAKE_NUM_THREADS -c - > OpenBLAS.xz
   if [ $? -ne 0 ];then
     echo -e '\033[0;31m'"OPENBLAS: COULD NOT COMPRESS \e[3mOPENBLAS FOLDER"'\033[0m'
-    cd $ROOTDIR
-    unset OUT_SIL_1
-    unset OUT_SIL_2
+    unset_env_vars
+    unset unset_env_vars
     return 1
   fi
   rm -rf $ROOTDIR/../cocoa_installation_libraries/OpenBLAS-0.3.23
@@ -223,9 +223,8 @@ if [ -z "${IGNORE_FORTRAN_LAPACK_INSTALLATION}" ]; then
   $GIT clone https://github.com/Reference-LAPACK/lapack.git lapack > ${OUT_SIL_1} 2> ${OUT_SIL_2}
   if [ $? -ne 0 ];then
     echo -e '\033[0;31m'"LAPACK: COULD NOT RUN \e[3mGIT CLONE"'\033[0m'
-    cd $ROOTDIR
-    unset OUT_SIL_1
-    unset OUT_SIL_2
+    unset_env_vars
+    unset unset_env_vars
     return 1
   fi
 
@@ -234,9 +233,8 @@ if [ -z "${IGNORE_FORTRAN_LAPACK_INSTALLATION}" ]; then
   $GIT checkout lapack-3.11.0 > ${OUT_SIL_1} 2> ${OUT_SIL_2}
   if [ $? -ne 0 ];then
     echo -e '\033[0;31m'"LAPACK: COULD NOT RUN \e[3mGIT CHECKOUT"'\033[0m'
-    cd $ROOTDIR
-    unset OUT_SIL_1
-    unset OUT_SIL_2
+    unset_env_vars
+    unset unset_env_vars
     return 1
   fi
 
@@ -249,9 +247,8 @@ if [ -z "${IGNORE_FORTRAN_LAPACK_INSTALLATION}" ]; then
   tar -cf - lapack-3.11.0/ | xz -k -1 --threads=$MAKE_NUM_THREADS -c - > lapack.xz
   if [ $? -ne 0 ];then
     echo -e '\033[0;31m'"LAPACK: COULD NOT COMPRESS \e[3mLAPACK FOLDER"'\033[0m'
-    cd $ROOTDIR
-    unset OUT_SIL_1
-    unset OUT_SIL_2
+    unset_env_vars
+    unset unset_env_vars
     return 1
   fi
   rm -rf $ROOTDIR/../cocoa_installation_libraries/lapack-3.11.0
@@ -273,18 +270,16 @@ if [ -z "${IGNORE_HDF5_INSTALLATION}" ]; then
   wget -q https://hdf-wordpress-1.s3.amazonaws.com/wp-content/uploads/manual/HDF5/HDF5_1_12_3/src/hdf5-1.12.3.tar.gz
   if [ $? -ne 0 ];then
     echo -e '\033[0;31m'"HDF5: COULD NOT RUN \e[3mWGET"'\033[0m'
-    cd $ROOTDIR
-    unset OUT_SIL_1
-    unset OUT_SIL_2
+    unset_env_vars
+    unset unset_env_vars
     return 1
   fi
 
   tar zxvf hdf5-1.12.3.tar.gz
   if [ $? -ne 0 ];then
     echo -e '\033[0;31m'"HDF5: COULD NOT RUN \e[3mTAR (UNCOMPRESS)"'\033[0m'
-    cd $ROOTDIR
-    unset OUT_SIL_1
-    unset OUT_SIL_2
+    unset_env_vars
+    unset unset_env_vars
     return 1
   fi
 
@@ -295,9 +290,8 @@ if [ -z "${IGNORE_HDF5_INSTALLATION}" ]; then
   tar -cf - hdf5-1.12.3/ | xz -k -1 --threads=$MAKE_NUM_THREADS -c - > hdf5.xz
   if [ $? -ne 0 ];then
     echo -e '\033[0;31m'"HDF5: COULD NOT COMPRESS \e[3mHDF5 FOLDER"'\033[0m'
-    cd $ROOTDIR
-    unset OUT_SIL_1
-    unset OUT_SIL_2
+    unset_env_vars
+    unset unset_env_vars
     return 1
   fi
   rm -rf $ROOTDIR/../cocoa_installation_libraries/hdf5-1.12.3
@@ -319,16 +313,16 @@ if [ -z "${IGNORE_C_CFITSIO_INSTALLATION}" ]; then
   wget -q http://heasarc.gsfc.nasa.gov/FTP/software/fitsio/c/cfitsio-4.0.0.tar.gz
   if [ $? -ne 0 ];then
       echo -e '\033[0;31m'"CFITSIO: COULD NOT RUN \e[3mWGET"'\033[0m'
-      cd $ROOTDIR
+      unset_env_vars
+      unset unset_env_vars
       return 1
   fi
 
   tar zxvf cfitsio-4.0.0.tar.gz
   if [ $? -ne 0 ];then
     echo -e '\033[0;31m'"CFITSIO: COULD NOT RUN \e[3mTAR (UNCOMPRESS)"'\033[0m'
-    cd $ROOTDIR
-    unset OUT_SIL_1
-    unset OUT_SIL_2
+    unset_env_vars
+    unset unset_env_vars
     return 1
   fi
 
@@ -339,9 +333,8 @@ if [ -z "${IGNORE_C_CFITSIO_INSTALLATION}" ]; then
   tar -cf - cfitsio-4.0.0/ | xz -k -1 --threads=$MAKE_NUM_THREADS -c - > cfitsio.xz
   if [ $? -ne 0 ];then
     echo -e '\033[0;31m'"CFITSIO: COULD NOT COMPRESS \e[3mCFITSIO FOLDER"'\033[0m'
-    cd $ROOTDIR
-    unset OUT_SIL_1
-    unset OUT_SIL_2
+    unset_env_vars
+    unset unset_env_vars
     return 1
   fi
   rm -rf $ROOTDIR/../cocoa_installation_libraries/cfitsio-4.0.0
@@ -363,18 +356,16 @@ if [ -z "${IGNORE_C_FFTW_INSTALLATION}" ]; then
   wget -q http://www.fftw.org/fftw-3.3.10.tar.gz 
   if [ $? -ne 0 ];then
     echo -e '\033[0;31m'"FFTW: COULD NOT RUN \e[3mWGET"'\033[0m'
-    cd $ROOTDIR
-    unset OUT_SIL_1
-    unset OUT_SIL_2
+    unset_env_vars
+    unset unset_env_vars
     return 1
   fi
 
   tar zxvf fftw-3.3.10.tar.gz
   if [ $? -ne 0 ];then
     echo -e '\033[0;31m'"FFTW: COULD NOT RUN \e[3mTAR (UNCOMPRESS)"'\033[0m'
-    cd $ROOTDIR
-    unset OUT_SIL_1
-    unset OUT_SIL_2
+    unset_env_vars
+    unset unset_env_vars
     return 1
   fi
 
@@ -385,9 +376,8 @@ if [ -z "${IGNORE_C_FFTW_INSTALLATION}" ]; then
   tar -cf - fftw-3.3.10/ | xz -k -1 --threads=$MAKE_NUM_THREADS -c - > fftw.xz
   if [ $? -ne 0 ];then
     echo -e '\033[0;31m'"FFTW: COULD NOT COMPRESS \e[3mFFTW FOLDER"'\033[0m'
-    cd $ROOTDIR
-    unset OUT_SIL_1
-    unset OUT_SIL_2
+    unset_env_vars
+    unset unset_env_vars
     return 1
   fi
   rm -rf $ROOTDIR/../cocoa_installation_libraries/fftw-3.3.10
@@ -409,18 +399,16 @@ if [ -z "${IGNORE_C_GSL_INSTALLATION}" ]; then
   wget -q http://ftp.wayne.edu/gnu/gsl/gsl-2.7.tar.gz
   if [ $? -ne 0 ];then
     echo -e '\033[0;31m'"GSL: COULD NOT RUN \e[3mWGET"'\033[0m'
-    cd $ROOTDIR
-    unset OUT_SIL_1
-    unset OUT_SIL_2
+    unset_env_vars
+    unset unset_env_vars
     return 1
   fi
 
   tar zxvf gsl-2.7.tar.gz
   if [ $? -ne 0 ];then
     echo -e '\033[0;31m'"GSL: COULD NOT RUN \e[3mTAR (UNCOMPRESS)"'\033[0m'
-    cd $ROOTDIR
-    unset OUT_SIL_1
-    unset OUT_SIL_2
+    unset_env_vars
+    unset unset_env_vars
     return 1
   fi
 
@@ -431,9 +419,8 @@ if [ -z "${IGNORE_C_GSL_INSTALLATION}" ]; then
   tar -cf - gsl-2.7/ | xz -k -1 --threads=$MAKE_NUM_THREADS -c - > gsl.xz
   if [ $? -ne 0 ];then
     echo -e '\033[0;31m'"GSL: COULD NOT COMPRESS \e[3mGSL FOLDER"'\033[0m'
-    cd $ROOTDIR
-    unset OUT_SIL_1
-    unset OUT_SIL_2
+    unset_env_vars
+    unset unset_env_vars
     return 1
   fi
   rm -rf $ROOTDIR/../cocoa_installation_libraries/gsl-2.7
@@ -455,9 +442,8 @@ if [ -z "${IGNORE_CPP_SPDLOG_INSTALLATION}" ]; then
   $GIT clone https://github.com/gabime/spdlog.git spdlog > ${OUT_SIL_1} 2> ${OUT_SIL_2}
   if [ $? -ne 0 ];then
     echo -e '\033[0;31m'"SPDLOG: COULD NOT RUN \e[3mGIT CLONE"'\033[0m'
-    cd $ROOTDIR
-    unset OUT_SIL_1
-    unset OUT_SIL_2
+    unset_env_vars
+    unset unset_env_vars
     return 1  
   fi
 
@@ -466,9 +452,8 @@ if [ -z "${IGNORE_CPP_SPDLOG_INSTALLATION}" ]; then
   $GIT checkout v1.13.0 > ${OUT_SIL_1} 2> ${OUT_SIL_2}
   if [ $? -ne 0 ];then
     echo -e '\033[0;31m'"SPDLOG: COULD NOT RUN \e[3mGIT CHECKOUT"'\033[0m'
-    cd $ROOTDIR
-    unset OUT_SIL_1
-    unset OUT_SIL_2
+    unset_env_vars
+    unset unset_env_vars
     return 1
   fi
 
@@ -481,9 +466,8 @@ if [ -z "${IGNORE_CPP_SPDLOG_INSTALLATION}" ]; then
   tar -cf - spdlog/ | xz -k -1 --threads=$MAKE_NUM_THREADS -c - > spdlog.xz
   if [ $? -ne 0 ];then
     echo -e '\033[0;31m'"SPDLOG: COULD NOT COMPRESS \e[3mSPDLOG FOLDER"'\033[0m'
-    cd $ROOTDIR
-    unset OUT_SIL_1
-    unset OUT_SIL_2
+    unset_env_vars
+    unset unset_env_vars
     return 1
   fi
   rm -rf $ROOTDIR/../cocoa_installation_libraries/spdlog
@@ -505,18 +489,16 @@ if [ -z "${IGNORE_CPP_ARMA_INSTALLATION}" ]; then
   wget -q https://sourceforge.net/projects/arma/files/armadillo-12.8.2.tar.xz
   if [ $? -ne 0 ];then
     echo -e '\033[0;31m'"ARMA: COULD NOT RUN \e[3mWGET"'\033[0m'
-    cd $ROOTDIR
-    unset OUT_SIL_1
-    unset OUT_SIL_2
+    unset_env_vars
+    unset unset_env_vars
     return 1
   fi
 
   tar xf armadillo-12.8.2.tar.xz
   if [ $? -ne 0 ];then
     echo -e '\033[0;31m'"ARMA: COULD NOT RUN \e[3mTAR (UNCOMPRESS)"'\033[0m'
-    cd $ROOTDIR
-    unset OUT_SIL_1
-    unset OUT_SIL_2
+    unset_env_vars
+    unset unset_env_vars
     return 1
   fi
   
@@ -527,9 +509,8 @@ if [ -z "${IGNORE_CPP_ARMA_INSTALLATION}" ]; then
   tar -cf - armadillo-12.8.2/ | xz -k -1 --threads=$MAKE_NUM_THREADS -c - > armadillo.xz
   if [ $? -ne 0 ];then
     echo -e '\033[0;31m'"ARMA: COULD NOT COMPRESS \e[3mARMA FOLDER"'\033[0m'
-    cd $ROOTDIR
-    unset OUT_SIL_1
-    unset OUT_SIL_2
+    unset_env_vars
+    unset unset_env_vars
     return 1
   fi
   rm -rf $ROOTDIR/../cocoa_installation_libraries/armadillo-12.8.2
@@ -551,9 +532,8 @@ if [ -z "${IGNORE_CPP_BOOST_INSTALLATION}" ]; then
   wget -q https://boostorg.jfrog.io/artifactory/main/release/1.81.0/source/boost_1_81_0.tar.gz
   if [ $? -ne 0 ];then
     echo -e '\033[0;31m'"BOOST: COULD NOT RUN \e[3mWGET"'\033[0m'
-    cd $ROOTDIR
-    unset OUT_SIL_1
-    unset OUT_SIL_2
+    unset_env_vars
+    unset unset_env_vars
     return 1
   fi
   
@@ -571,9 +551,8 @@ if [ -z "${IGNORE_CPP_BOOST_INSTALLATION}" ]; then
   tar -cf - boost_1_81_0/ | xz -k -1 --threads=$MAKE_NUM_THREADS -c - > boost.xz
   if [ $? -ne 0 ];then
     echo -e '\033[0;31m'"BOOST: COULD NOT COMPRESS \e[3mBOOST FOLDER"'\033[0m'
-    cd $ROOTDIR
-    unset OUT_SIL_1
-    unset OUT_SIL_2
+    unset_env_vars
+    unset unset_env_vars
     return 1
   fi
   rm -rf $ROOTDIR/../cocoa_installation_libraries/boost_1_81_0
@@ -596,9 +575,8 @@ if [ -z "${IGNORE_CPP_CARMA_INSTALLATION}" ]; then
   $GIT clone https://github.com/RUrlus/carma.git carma_tmp > ${OUT_SIL_1} 2> ${OUT_SIL_2}
   if [ $? -ne 0 ];then
     echo -e '\033[0;31m'"CARMA: COULD NOT RUN \e[3mGIT CLONE"'\033[0m'
-    cd $ROOTDIR
-    unset OUT_SIL_1
-    unset OUT_SIL_2
+    unset_env_vars
+    unset unset_env_vars
     return 1
   fi
 
@@ -607,9 +585,8 @@ if [ -z "${IGNORE_CPP_CARMA_INSTALLATION}" ]; then
   $GIT checkout v0.7.0 > ${OUT_SIL_1} 2> ${OUT_SIL_2}
   if [ $? -ne 0 ];then
     echo -e '\033[0;31m'"CARMA: COULD NOT RUN \e[3mGIT CHECKOUT"'\033[0m'
-    cd $ROOTDIR
-    unset OUT_SIL_1
-    unset OUT_SIL_2
+    unset_env_vars
+    unset unset_env_vars
     return 1
   fi
 
@@ -632,9 +609,8 @@ if [ -z "${IGNORE_CPP_CARMA_INSTALLATION}" ]; then
   tar -cf - carma/ | xz -k -1 --threads=$MAKE_NUM_THREADS -c - > carma.xz
   if [ $? -ne 0 ];then
     echo -e '\033[0;31m'"CARMA: COULD NOT COMPRESS \e[3mCARMA FOLDER"'\033[0m'
-    cd $ROOTDIR
-    unset OUT_SIL_1
-    unset OUT_SIL_2
+    unset_env_vars
+    unset unset_env_vars
     return 1
   fi  
   rm -rf $ROOTDIR/../cocoa_installation_libraries/carma
@@ -644,9 +620,8 @@ if [ -z "${IGNORE_CPP_CARMA_INSTALLATION}" ]; then
   echo -e '\033[0;32m'"\t\tGETTING CARMA LIBRARY DONE"'\033[0m' > ${OUT_SIL_1} 2> ${OUT_SIL_2}
 fi
 
-cd $ROOTDIR
-unset OUT_SIL_1
-unset OUT_SIL_2
+unset_env_vars
+unset unset_env_vars
 echo -e '\033[1;34m''\t \e[4mSETUP_INSTALLATION_LIBRARIES DONE''\033[0m'
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------

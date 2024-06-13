@@ -94,10 +94,11 @@ export LIPOP_DATA_VERSION=4.2
 export SPT3G_DATA_GIT_COMMIT="66da8e9e2f325024566fe13245788bf8ede897bc"
 export HOLICOW_DATA_GIT_COMMIT="f792647d1fd6c09d9e052fef526669cbd702ab82"
 export POLYCHORD_GIT_COMMIT="daba49d1385d065122db76a2b384050f9e95d278"
-
+export CAMB_GIT_COMMIT=""
 # --------------------------------------------------------------------------------------
 # POLYCHORD LOCATION
 export POLY_NAME="PolyChordLite"
+export CAMB_NAME="CAMB"
 # --------------------------------------------------------------------------------------
 # --------------------------------------------------------------------------------------
 # --------------------------------------------------------------------------------------
