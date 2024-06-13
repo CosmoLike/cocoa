@@ -2950,7 +2950,7 @@ double ggl_efficiency(int ni, int nj)
       ar[1] = (double) j;
       #pragma GCC diagnostic push
       #pragma GCC diagnostic ignored "-Wunused-variable"
-      double init = int_for_ggl_efficiency(tomo.clustering_zmin[i], (void*) ar);
+      double init = int_for_ggl_efficiency(fmax(tomo.clustering_zmin[i], 0.001), (void*) ar);
       double init2 = max_g_tomo(j);
       #pragma GCC diagnostic pop
     }
@@ -2964,10 +2964,10 @@ double ggl_efficiency(int ni, int nj)
         ar[1] = (double) j;
         table[i][j] = like.high_def_integration > 0 ?
           int_gsl_integrate_high_precision(int_for_ggl_efficiency, (void*) ar,
-            tomo.clustering_zmin[i], tomo.clustering_zmax[i], NULL, 
+            fmax(tomo.clustering_zmin[i], 0.001), tomo.clustering_zmax[i], NULL, 
             GSL_WORKSPACE_SIZE)/max_g_tomo(j) :
           int_gsl_integrate_medium_precision(int_for_ggl_efficiency, (void*) ar,
-            tomo.clustering_zmin[i], tomo.clustering_zmax[i], NULL, 
+            fmax(tomo.clustering_zmin[i], 0.001), tomo.clustering_zmax[i], NULL, 
             GSL_WORKSPACE_SIZE)/max_g_tomo(j);
       }
     }
