@@ -1,0 +1,44 @@
+--- setup.py	2024-06-13 17:34:49.966057000 -0400
++++ setup2.py	2024-06-13 17:35:17.384235000 -0400
+@@ -36,20 +36,8 @@
+ 
+ 
+ # Deal with annoying differences between clang and the other compilers
+-CC_FAMILY = check_compiler()
+-CPPRUNTIMELIB_FLAG = []
+-RPATH_FLAG = []
+-
+-if CC_FAMILY == "clang":
+-    CPPRUNTIMELIB_FLAG += ["-stdlib=libc++"]
+-    if sys.platform == "darwin":
+-        # macOS idiosyncrasies
+-        CPPRUNTIMELIB_FLAG += ["-mmacosx-version-min=10.9"]
+-
+-if sys.platform != "darwin":
+-    # Set RPATH on Linux machines
+-    RPATH_FLAG += ["-Wl,-rpath,$ORIGIN/pypolychord/lib"]
+-
++#CC_FAMILY = check_compiler()
++CC_FAMILY = "gcc"
+ 
+ def readme():
+     with open('pypolychord_README.rst') as f:
+@@ -113,14 +101,13 @@
+ 
+ pypolychord_module = Extension(
+         name='_pypolychord',
+-        library_dirs=['lib'],
++        library_dirs=[" " + os.path.join(BASE_PATH, "lib/")],
+         include_dirs=['src/polychord', numpy.get_include()],
+         libraries=['chord',],
+-        extra_link_args=RPATH_FLAG + CPPRUNTIMELIB_FLAG,
+-        extra_compile_args= ["-std=c++11"] + RPATH_FLAG + CPPRUNTIMELIB_FLAG,
+-        runtime_library_dirs=['lib'],
++        extra_compile_args= ["-std=c++11"],
++        #runtime_library_dirs=[" " + os.path.join(BASE_PATH, "lib/")],
+         sources=['pypolychord/_pypolychord.cpp']
+-        )
++    )
+ 
+ setup(name=NAME,
+       version=get_version(),
