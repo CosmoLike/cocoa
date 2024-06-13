@@ -57,7 +57,7 @@ if [ -z "${IGNORE_CLASS_COMPILATION}" ]; then
   cd $ROOTDIR
   unset OUTPUT_CLASS_1
   unset OUTPUT_CLASS_2
-  echo -e '\033[1;34m''\t\eCLEANING CLASS DONE''\033[0m'
+  echo -e '\033[1;34m''\t\e CLEANING CLASS DONE''\033[0m'
 fi
 # ----------------------------------------------------------------------------
 # ----------------------------------------------------------------------------

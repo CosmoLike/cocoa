@@ -39,14 +39,39 @@ echo -e '\033[1;34m''\t\e[4mINSTALLING COBAYA (VIA PIP) DONE''\033[0m'
 # ----------------------------------------------------------------------------
 
 source $ROOTDIR/installation_scripts/compile_camb.sh
+if [ $? -ne 0 ]; then
+  cd $ROOTDIR
+  source stop_cocoa
+  return 1
+fi
 
 source $ROOTDIR/installation_scripts/compile_class.sh
-
-source $ROOTDIR/installation_scripts/compile_polychord.sh
+if [ $? -ne 0 ]; then
+  cd $ROOTDIR
+  source stop_cocoa
+  return 1
+fi
 
 source $ROOTDIR/installation_scripts/compile_planck.sh
+if [ $? -ne 0 ]; then
+  cd $ROOTDIR
+  source stop_cocoa
+  return 1
+fi
 
 source $ROOTDIR/installation_scripts/compile_act.sh
+if [ $? -ne 0 ]; then
+  cd $ROOTDIR
+  source stop_cocoa
+  return 1
+fi
+
+source $ROOTDIR/installation_scripts/compile_polychord.sh
+if [ $? -ne 0 ]; then
+  cd $ROOTDIR
+  source stop_cocoa
+  return 1
+fi
 
 # ----------------------------------------------------------------------------
 # ----------------------------------------------------------------------------

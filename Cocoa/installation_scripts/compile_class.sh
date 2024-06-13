@@ -34,15 +34,16 @@ if [ -z "${IGNORE_CLASS_COMPILATION}" ]; then
       cd $ROOTDIR
       return 1
   fi
-  if [ -z "${DEBUG_CLASS_OUTPUT}" ]; then
-    export OUTPUT_CLASS_1="/dev/null"
-    export OUTPUT_CLASS_2="/dev/null"
-  else
-    export OUTPUT_CLASS_1="/dev/tty"
-    export OUTPUT_CLASS_2="/dev/tty"
-  fi
 
   source $ROOTDIR/installation_scripts/clean_class.sh
+
+  if [ -z "${DEBUG_CLASS_OUTPUT}" ]; then
+    export OU_CL_1="/dev/null"
+    export OU_CL_2="/dev/null"
+  else
+    export OU_CL_1="/dev/tty"
+    export OU_CL_2="/dev/tty"
+  fi
 
   # ---------------------------------------------------------------------------
   # ---------------------------------------------------------------------------
@@ -51,14 +52,14 @@ if [ -z "${IGNORE_CLASS_COMPILATION}" ]; then
   # ---------------------------------------------------------------------------
   
   #Workaround Cocoa .gitignore entry on /include
-  cp -r  ./include2 ./include > ${OUTPUT_CLASS_1} 2> ${OUTPUT_CLASS_2}
+  cp -r  ./include2 ./include > ${OU_CL_1} 2> ${OU_CL_2}
 
-  CC=$C_COMPILER PYTHON=$PYTHON3 make all > ${OUTPUT_CLASS_1} 2> ${OUTPUT_CLASS_2}
+  CC=$C_COMPILER PYTHON=$PYTHON3 make all > ${OU_CL_1} 2> ${OU_CL_2}
   if [ $? -ne 0 ]; then
     echo -e '\033[0;31m'"CLASS COULD NOT RUN \e[3mMAKE ALL\e[0m"'\033[0m'
     cd $ROOTDIR
-    unset OUTPUT_CLASS_1
-    unset OUTPUT_CLASS_2
+    unset OU_CL_1
+    unset OU_CL_2
     return 1
   else
     echo -e '\033[0;32m'"\t\tCLASS RUN \e[3mMAKE ALL\e[0m\e\033[0;32m DONE"'\033[0m'
@@ -66,20 +67,20 @@ if [ -z "${IGNORE_CLASS_COMPILATION}" ]; then
    
   cd ./python
 
-  CC=$C_COMPILER $PYTHON3 setup.py build > ${OUTPUT_CLASS_1} 2> ${OUTPUT_CLASS_2}
+  CC=$C_COMPILER $PYTHON3 setup.py build > ${OU_CL_1} 2> ${OU_CL_2}
   if [ $? -ne 0 ]; then
     echo -e '\033[0;31m'"CLASS COULD NOT RUN \e[3mPYTHON3 SETUP.PY BUILD\e[0m"'\033[0m'
     cd $ROOTDIR
-    unset OUTPUT_CLASS_1
-    unset OUTPUT_CLASS_2
+    unset OU_CL_1
+    unset OU_CL_2
     return 1
   else
     echo -e '\033[0;32m'"\t\t CLASS RUN \e[3mPYTHON3 SETUP.PY BUILD\e[0m\e\033[0;32m DONE"'\033[0m'
   fi
 
   cd $ROOTDIR
-  unset OUTPUT_CLASS_1
-  unset OUTPUT_CLASS_2
+  unset OU_CL_1
+  unset OU_CL_2
   echo -e '\033[1;34m''\t\e[4mCOMPILING CLASS DONE''\033[0m'
 fi
 # --------------------------------------------------------------------------------------

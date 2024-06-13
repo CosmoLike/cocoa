@@ -80,9 +80,9 @@ fi
 # export SKIP_DECOMM_STRONG_LENSING
 # export SKIP_DECOMM_SN
 # export SKIP_DECOMM_BAO
-export SKIP_DECOMM_SIMONS_OBSERVATORY
-export SKIP_DECOMM_CAMSPEC
-export SKIP_DECOMM_LIPOP
+export SKIP_DECOMM_SIMONS_OBSERVATORY=1
+export SKIP_DECOMM_CAMSPEC=1
+export SKIP_DECOMM_LIPOP=1
 # --------------------------------------------------------------------------------------
 
 # --------------------------------------------------------------------------------------

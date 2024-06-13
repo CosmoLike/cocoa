@@ -1,0 +1,83 @@
+#VM BEGINS
+#ifeq ($(MPI),1)
+#FC = mpifort
+#CC = mpicc
+#CXX = mpicxx
+#else
+#FC = gfortran
+#CC = gcc
+#CXX = g++
+#endif
+
+ifdef MPI
+FC = $(MPI_FORTRAN_COMPILER)
+CC = $(MPI_CC_COMPILER)
+CXX = $(MPI_CXX_COMPILER)
+else
+FC = $(FORTRAN_COMPILER)
+endif
+#VM ENDS
+
+
+LD = $(FC)
+
+
+# Archive tool
+AR = ar rv
+
+# default flags
+# --------------
+# free-line-length-none : turn of line length limitation (why is this not a default??)
+# cpp  					: perform preprocessing
+# fPIC                  : for compiling a shared object library
+FFLAGS += -ffree-line-length-none -cpp -fPIC -fno-stack-arrays 
+CXXFLAGS += -std=c++11 -fPIC
+CFLAGS += -fPIC
+
+# This is now needed for gfortran versions >=10
+#VM BEGINS
+#ifeq "$(shell expr `gfortran -dumpversion | cut -f1 -d.` \>= 10)" "1"
+#	FFLAGS += -fallow-argument-mismatch
+#endif
+FFLAGS += -fallow-argument-mismatch
+#VM ENDS
+
+# clang uses a different libstdc++ than GCC
+ifneq (,$(findstring clang,$(shell '$(CXX)' -v 2>&1)))
+LDLIBS += -lc++
+else
+LDLIBS += -lstdc++
+endif
+
+
+detected_OS := $(shell uname -s)
+ifeq ($(detected_OS),Darwin)
+RPATH=-install_name @loader_path/pypolychord/lib/libchord.so
+else
+RPATH= 
+endif
+
+ifeq ($(DEBUG),1)
+# Debugging mode
+# --------------
+# g             : enable gnu debugger compatibility
+# O0            : no optimisation
+# Wall          : all warnings
+# Wextra        : even more warnings
+# pedantic      : check for language features not part of f95 standard
+# implicit-none : specify no implicit typing 
+# backtrace     : produce backtrace of error
+# fpe-trap      : search for floating point exceptions (dividing by zero etc)
+# fbounds-check : check array indices
+FFLAGS += -g -O0 -Wall -Wextra -pedantic -fcheck=all -fimplicit-none -fbacktrace -ffpe-trap=zero,overflow 
+#
+CXXFLAGS += -g -O0 -Wall -Wextra -Wshadow -Weffc++
+CFLAGS += -g -O0 -Wall -Wextra -Wshadow -Weffc++
+else
+# Optimised mode
+# --------------
+# Ofast : maximum optimisation
+FFLAGS += -Ofast
+CXXFLAGS += -Ofast
+CXFLAGS += -Ofast
+endif
