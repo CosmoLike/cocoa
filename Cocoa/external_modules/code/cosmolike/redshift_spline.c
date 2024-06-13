@@ -1431,10 +1431,10 @@ double pf_histo_n(double z, void* params)
         _zmean += (z_v[i]+0.5*dz)*tab[k][i]; // Note that z_v is Z_LOW now
         _norm += tab[k][i];
       }
-      tomo.clustering_zmean[i] = _zmean / _norm;
+      tomo.clustering_zmean[k] = _zmean / _norm;
 
       log_info("tomo.clustering_zmin[%d] = %.3f,tomo.clustering_zmax[%d] = %.3f,tomo.clustering_zmean[%d] = %.3f",
-          k, tomo.clustering_zmin[k], k, tomo.clustering_zmax[k], k, tomo.clustering_zmean);
+          k, tomo.clustering_zmin[k], k, tomo.clustering_zmax[k], k, tomo.clustering_zmean[k]);
     }
 
     free(z_v);
