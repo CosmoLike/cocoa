@@ -343,6 +343,7 @@ void reset_tomo_struct()
 
     tomo.clustering_zmax[i] = 0.0;
     tomo.clustering_zmin[i] = 0.0;
+    tomo.clustering_zmean[i] = 0.0;
     tomo.n_lens[i] = 0.0;
 
     tomo.cluster_zmax[i] = 0.0;

@@ -132,6 +132,7 @@ typedef struct
 
   double clustering_zmax[MAX_SIZE_ARRAYS];
   double clustering_zmin[MAX_SIZE_ARRAYS];
+  double clustering_zmean[MAX_SIZE_ARRAYS];
   double n_lens[MAX_SIZE_ARRAYS];
   
   double cluster_zmax[MAX_SIZE_ARRAYS];

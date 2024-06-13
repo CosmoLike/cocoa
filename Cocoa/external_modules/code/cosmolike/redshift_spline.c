@@ -1009,7 +1009,7 @@ double zdistr_photoz(double zz, int nj)
     
     for (int i=0; i<zbins; i++) 
     {
-      z_v[i] = zhisto_min + (i + 0.5) * da;
+      z_v[i] = zhisto_min + (i + 0.5) * da; // Z_LOW to Z_MID
     }
     
 // the outlier fraction (outfrac) should be specified externally. This is a temporary hack.
@@ -1397,7 +1397,7 @@ double pf_histo_n(double z, void* params)
     zhisto_max = z_v[p - 1] + dz;
     zhisto_min = z_v[0];
     
-    // now, set tomography bin boundaries
+    // now, set tomography bin boundaries and zmean
     for (int k=0; k < tomo.clustering_Nbin; k++) 
     {
       double max = tab[k][0];
@@ -1424,9 +1424,17 @@ double pf_histo_n(double z, void* params)
         }
         tomo.clustering_zmax[k] = z_v[i]; 
       }
+      double _zmean = 0.0;
+      double _norm = 0.0;
+      for (int i = 0; i < zbins; i++)
+      {
+        _zmean += (z_v[i]+0.5*dz)*tab[k][i]; // Note that z_v is Z_LOW now
+        _norm += tab[k][i];
+      }
+      tomo.clustering_zmean[i] = _zmean / _norm;
 
-      log_info("tomo.clustering_zmin[%d] = %.3f,tomo.clustering_zmax[%d] = %.3f",
-          k, tomo.clustering_zmin[k], k, tomo.clustering_zmax[k]);
+      log_info("tomo.clustering_zmin[%d] = %.3f,tomo.clustering_zmax[%d] = %.3f,tomo.clustering_zmean[%d] = %.3f",
+          k, tomo.clustering_zmin[k], k, tomo.clustering_zmax[k], k, tomo.clustering_zmean);
     }
 
     free(z_v);
@@ -1566,7 +1574,7 @@ double pf_photoz(double zz, int nj)
     const double da = (zhisto_max - zhisto_min) / ((double) zbins);
     for (int i=0; i<zbins; i++) 
     {
-      z_v[i] = zhisto_min + (i + 0.5) * da;
+      z_v[i] = zhisto_min + (i + 0.5) * da; // Z_LOW to Z_MID
     }
     
 // the outlier fraction (outfrac) should be specified externally. This is a temporary hack.
@@ -1641,6 +1649,7 @@ double pf_photoz(double zz, int nj)
               int_gsl_integrate_low_precision(norm_for_zmean_histo_n, 
                 (void*) ar, tomo.clustering_zmin[j], tomo.clustering_zmax[j],
                 NULL, GSL_WORKSPACE_SIZE);
+              log_info("z_mean_tomo[%d] Integration v.s. Summation: %.4f - %.4f", j+1, zmean_tomo[j], tomo.clustering_zmean[j]);
           }
         }
         break;
@@ -2044,7 +2053,7 @@ double pz_cluster(const double zz, const int nz)
       const double da = (zhisto_max - zhisto_min)/((double) zbins);
       for (int i=0; i<zbins; i++)
       { 
-        z_v[i] = zhisto_min + (i + 0.5)*da;
+        z_v[i] = zhisto_min + (i + 0.5)*da; // Z_LOW to Z_MID
       }
     }
     
