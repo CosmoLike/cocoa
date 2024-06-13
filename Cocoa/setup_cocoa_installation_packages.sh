@@ -327,6 +327,14 @@ if [ $? -ne 0 ]; then
   return 1
 fi
 
+source $ROOTDIR/installation_scripts/setup_polychord.sh
+if [ $? -ne 0 ]; then
+  echo -e '\033[0;31m'"SCRIPT setup_polychord FAILED"'\033[0m'
+  cd $ROOTDIR
+  source stop_cocoa
+  return 1
+fi
+
 # ----------------------------------------------------------------------------
 # ----------------------------------------------------------------------------
 source stop_cocoa
