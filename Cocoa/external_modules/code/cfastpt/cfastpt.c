@@ -682,8 +682,8 @@ int *J1, int *J2, int *Jk, int Nterms, fastpt_config *config, double **Fy) {
   free(out);
   free(out2);
   free(out_vary);
-  free(out_pad1);
-  free(out_pad2);
+  fftw_free(out_pad1);
+  fftw_free(out_pad2);
   free(a);
   free(b);
   free(a1);
@@ -692,7 +692,7 @@ int *J1, int *J2, int *Jk, int Nterms, fastpt_config *config, double **Fy) {
   free(fb1);
   free(fb2);
   free(out_ifft);
-  free(pads_convolve);
+  fftw_free(pads_convolve);
 }
 
 void Pd1d2(double *k, double *Pin, long Nk, double *Pout)
