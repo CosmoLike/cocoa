@@ -322,16 +322,16 @@ int *isP13type __attribute__((unused)), int Nterms, fastpt_config *config, doubl
     fftw_destroy_plan(pc[i_term]);
   }
 
-  free(plan_forward);
+  fftw_destroy_plan(plan_forward);
   free(plan_backward);
   free(out_ifft);
   fftw_free(out);
   free(fb);
   free(out_vary);
 
-  free(out_pad1);
-  free(out_pad2);
-  free(pads_convolve);
+  fftw_free(out_pad1);
+  fftw_free(out_pad2);
+  fftw_free(pads_convolve);
   free(a);
   free(b);
   free(a1);
