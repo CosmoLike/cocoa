@@ -101,7 +101,11 @@ double amin_lens(int ni)
   }
   else if (photoz == 4) 
   {
-    return 1. / (1 + tomo.clustering_zmax[ni] + 2. * fabs(nuisance.bias_zphot_clustering[ni]));
+    double new_zmax = (tomo.clustering_zmax[ni]-tomo.clustering_zmean[ni])\
+            *nuisance.stretch_zphot_clustering[ni]+tomo.clustering_zmean[ni];
+    new_zmax += 2. * fabs(nuisance.bias_zphot_clustering[ni]);
+    return 1. / (1 + new_zmax);
+    //return 1. / (1 + tomo.clustering_zmax[ni] + 2. * fabs(nuisance.bias_zphot_clustering[ni]));
   }
   
   return 1. / (1 + fmin(tomo.clustering_zmax[ni] + 5. * nuisance.sigma_zphot_clustering[ni] +
@@ -135,8 +139,11 @@ double amax_lens(int ni)
   
   if (photoz == 4) 
   {
-    return 1. / (1 + fmax(tomo.clustering_zmin[ni] -
-      2. * fabs(nuisance.bias_zphot_clustering[ni]), 0.001));
+    double new_zmin = (tomo.clustering_zmin[ni]-tomo.clustering_zmean[ni])\
+            *nuisance.stretch_zphot_clustering[ni]+tomo.clustering_zmean[ni];
+    new_zmin -= 2. * fabs(nuisance.bias_zphot_clustering[ni]);
+    return 1. / (1 + fmax(new_zmin, 0.001));
+    //return 1. / (1 + fmax(tomo.clustering_zmin[ni] - 2. * fabs(nuisance.bias_zphot_clustering[ni]), 0.001));
   }
   
   return 1. / (1 + fmax(tomo.clustering_zmin[ni] - 5. * nuisance.sigma_zphot_clustering[ni] -
@@ -1467,30 +1474,6 @@ double pf_histo_n(double z, void* params)
   return res;
 }
 
-double int_for_zmean_histo_n(double z, void* params) 
-{
-  double* ar = (double*) params;
-  const int ni = (int) ar[0];
-  if (ni < -1 || ni > tomo.clustering_Nbin - 1)
-  {
-    log_fatal("invalid bin input ni = %d", ni);
-    exit(1);
-  } 
-  return z * pf_histo_n(z, (void *)ar);
-}
-
-double norm_for_zmean_histo_n(double z, void* params) 
-{
-  double* ar = (double*) params;
-  const int ni = (int) ar[0];
-  if (ni < -1 || ni > tomo.clustering_Nbin - 1)
-  {
-    log_fatal("invalid bin input ni = %d", ni);
-    exit(1);
-  } 
-  return pf_histo_n(z, (void *)ar);
-}
-
 double pf_photoz(double zz, int nj) 
 { // works only with binned distributions; nj =-1 -> no tomo; nj>= 0 -> tomo bin nj
   static double** table = 0;
@@ -1498,7 +1481,6 @@ double pf_photoz(double zz, int nj)
   static nuisancepara N;
   static int zbins = -1;
   static gsl_spline* photoz_splines[MAX_SIZE_ARRAYS];
-  static double* zmean_tomo = 0;
 
   if (redshift.clustering_photoz == -1) 
   {
@@ -1624,34 +1606,6 @@ double pf_photoz(double zz, int nj)
         double ar[1];        
         ar[0] = (double) i;
         pf_histo_n(0., (void*) ar);
-        // init the z_mean for each tomography bin
-        if(zmean_tomo==0){
-          zmean_tomo = (double*) malloc(sizeof(double)*(tomo.clustering_Nbin));
-          for(int j=0; j<tomo.clustering_Nbin; j++){
-            ar[0] = j;
-            zmean_tomo[j] = like.high_def_integration == 2 ?
-              int_gsl_integrate_high_precision(int_for_zmean_histo_n, 
-                (void*) ar, tomo.clustering_zmin[j], tomo.clustering_zmax[j],
-                NULL, GSL_WORKSPACE_SIZE) /
-              int_gsl_integrate_high_precision(norm_for_zmean_histo_n, 
-                (void*) ar, tomo.clustering_zmin[j], tomo.clustering_zmax[j],
-                NULL, GSL_WORKSPACE_SIZE) :
-              like.high_def_integration == 1 ?
-              int_gsl_integrate_medium_precision(int_for_zmean_histo_n, 
-                (void*) ar, tomo.clustering_zmin[j], tomo.clustering_zmax[j],
-                NULL, GSL_WORKSPACE_SIZE) /
-              int_gsl_integrate_medium_precision(norm_for_zmean_histo_n, 
-                (void*) ar, tomo.clustering_zmin[j], tomo.clustering_zmax[j],
-                NULL, GSL_WORKSPACE_SIZE) :
-              int_gsl_integrate_low_precision(int_for_zmean_histo_n, 
-                (void*) ar, tomo.clustering_zmin[j], tomo.clustering_zmax[j],
-                NULL, GSL_WORKSPACE_SIZE) /
-              int_gsl_integrate_low_precision(norm_for_zmean_histo_n, 
-                (void*) ar, tomo.clustering_zmin[j], tomo.clustering_zmax[j],
-                NULL, GSL_WORKSPACE_SIZE);
-              log_info("z_mean_tomo[%d] Integration v.s. Summation: %.4f - %.4f", j+1, zmean_tomo[j], tomo.clustering_zmean[j]);
-          }
-        }
         break;
       }
     }
@@ -1846,8 +1800,8 @@ double pf_photoz(double zz, int nj)
   
   if (redshift.clustering_photoz == 4) 
   {
-    zz = (zz - nuisance.bias_zphot_clustering[nj]- zmean_tomo[nj])/
-            nuisance.stretch_zphot_clustering[nj] + zmean_tomo[nj];
+    zz = (zz - nuisance.bias_zphot_clustering[nj]- tomo.clustering_zmean[nj])/
+            nuisance.stretch_zphot_clustering[nj]+ tomo.clustering_zmean[nj];
   }
   
   double res;
