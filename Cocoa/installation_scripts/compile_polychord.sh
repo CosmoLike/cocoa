@@ -34,7 +34,12 @@ if [ -z "${IGNORE_POLYCHORD_COMPILATION}" ]; then
     cd $ROOTDIR
     return 1
   fi
-
+  if [ -z "${POLY_NAME}" ]; then
+    echo -e '\033[0;31m''ERROR ENV VARIABLE POLY_NAME IS NOT DEFINED''\033[0m'
+    cd $ROOTDIR
+    return 1
+  fi
+  
   source $ROOTDIR/installation_scripts/clean_polychord.sh
 
   if [ -z "${DEBUG_POLY_OUTPUT}" ]; then
@@ -49,7 +54,7 @@ if [ -z "${IGNORE_POLYCHORD_COMPILATION}" ]; then
 
   # ---------------------------------------------------------------------------
   # ---------------------------------------------------------------------------
-  cd $ROOTDIR/external_modules/code/PolyChordLite/
+  cd $ROOTDIR/external_modules/code/$POLY_NAME/
   # ---------------------------------------------------------------------------
   # ---------------------------------------------------------------------------
 
@@ -57,6 +62,9 @@ if [ -z "${IGNORE_POLYCHORD_COMPILATION}" ]; then
   if [ $? -ne 0 ]; then
     echo -e '\033[0;31m'"POLYCHORD COULD NOT RUN \e[3mMAKE ALL"'\033[0m'
     cd $ROOTDIR
+    unset OUTPUT_POLY_1
+    unset OUTPUT_POLY_2
+    unset POLY_MAKE_NUM_THREADS
     return 1
   else
     echo -e '\033[0;32m'"\t\t POLYCHORD RUN \e[3mMAKE ALL\e[0m\e\033[0;32m DONE"'\033[0m'

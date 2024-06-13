@@ -208,6 +208,9 @@ export LD_LIBRARY_PATH=$ROOTDIR/.local/lib/python$PYTHON_VERSION/site-packages/n
 
 export NUMPY_HEADERS=$ROOTDIR/.local/lib/python$PYTHON_VERSION/site-packages/numpy/core/include
 
+export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$ROOTDIR/external_modules/code/${POLY_NAME}/lib
+export LDFLAGS="${LDFLAGS} -L$ROOTDIR/external_modules/code/${POLY_NAME}/lib  -Wl,-rpath-link,$ROOTDIR/external_modules/code/${POLY_NAME}/lib"
+
 # ----------------------------------------------------------------------------
 # ----------------------------------------------------------------------------
 # ----------------------------- PLANCK LIKELIHOOD ----------------------------

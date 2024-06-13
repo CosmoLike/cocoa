@@ -1,3 +1,0 @@
-numpy
-scipy
-anesthetic>=2.0.0
