@@ -194,3 +194,4 @@ unset BASECL
 unset PL2020
 unset CBURL
 unset OU_CL_1
+unset POLY_NAME
