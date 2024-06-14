@@ -2,31 +2,33 @@
 # ----------------------------------------------------------------------------
 # ----------------------------------------------------------------------------
 # ----------------------------------------------------------------------------
-echo -e '\033[1;44m''SETUP_DECOMPRESS_FILES''\033[0m'
-
 if [ -z "${ROOTDIR}" ]; then
     echo -e '\033[0;31m''ERROR ENV VARIABLE ROOTDIR IS NOT DEFINED''\033[0m'
     return 1
 fi
 
+ptop2 'SETUP_DECOMPRESS_FILES'
+
+
 # ----------------------------------------------------------------------------
 # ----------------- COCOA_INSTALLATION_LIBRARIES -----------------------------
 # ----------------------------------------------------------------------------
 if [ -z "${NO_UNXZ_COCOA_INSTALLATION_LIBRARIES}" ]; then
-    echo -e '\033[1;34m''\t DECOMPRESSING FILES ON /COCOA_INSTALLATION_LIBRARIES''\033[0m'
+  ptop 'DECOMPRESSING FILES ON /COCOA_INSTALLATION_LIBRARIES'
 
-    cd $ROOTDIR/../cocoa_installation_libraries/
+  cd $ROOTDIR/../cocoa_installation_libraries/
 
-    sh unxv_all.sh
-    if [ $? -ne 0 ]; then
-      cd $ROOTDIR
-      return 1
-    fi
-
+  sh unxv_all.sh
+  if [ $? -ne 0 ]; then
     cd $ROOTDIR
+    return 1
+  fi
 
-    echo -e '\033[1;34m''\t \e[4mDECOMPRESSING FILES ON /COCOA_INSTALLATION_LIBRARIES DONE''\033[0m'
+  cd $ROOTDIR
+
+  pbottom 'DECOMPRESSING FILES ON /COCOA_INSTALLATION_LIBRARIES'
 fi
+
 # ----------------------------------------------------------------------------
 # ----------------------- /EXTERNAL_MODULES/CODE -----------------------------
 # ----------------------------------------------------------------------------
@@ -38,22 +40,24 @@ fi
 # ----------------------- /EXTERNAL_MODULES/DATA -----------------------------
 # ----------------------------------------------------------------------------
 if [ -z "${NO_UNXZ_EXTERNAL_MODULES_DATA}" ]; then
-    echo -e '\033[1;34m''\t DECOMPRESSING FILES ON /EXTERNAL_MODULES/DATA''\033[0m'
+  ptop 'DECOMPRESSING FILES ON /EXTERNAL_MODULES/DATA'
 
-    cd $ROOTDIR/external_modules/data/
+  cd $ROOTDIR/external_modules/data/
 
-    sh unxv_all.sh
-    if [ $? -ne 0 ]; then
-      cd $ROOTDIR
-      return 1
-    fi
-
+  sh unxv_all.sh
+  if [ $? -ne 0 ]; then
     cd $ROOTDIR
+    return 1
+  fi
 
-    echo -e '\033[1;34m''\t \e[4mDECOMPRESSING FILES ON /EXTERNAL_MODULES/DATA DONE''\033[0m'
+  cd $ROOTDIR
+
+  pbottom 'DECOMPRESSING FILES ON /EXTERNAL_MODULES/DATA'
 fi
 
-echo -e '\033[1;44m''\e[4mSETUP_DECOMPRESS_FILES DONE''\033[0m'
+# ----------------------------------------------------------------------------
+# ----------------------------------------------------------------------------
+pbottom2 'SETUP_DECOMPRESS_FILES DONE'
 # ----------------------------------------------------------------------------
 # ----------------------------------------------------------------------------
 # ----------------------------------------------------------------------------

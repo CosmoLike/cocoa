@@ -3,64 +3,72 @@
 # ----------------------------------------------------------------------------
 # ----------------------------------------------------------------------------
 if [ -z "${IGNORE_POLYCHORD_COMPILATION}" ]; then
-  echo -e '\033[1;34m''\tINSTALLING CAMB VIA SETUP_CAMB''\033[0m'
-
+  pfail() {
+    echo -e "\033[0;31m ERROR ENV VARIABLE ${1} IS NOT DEFINED \033[0m"
+    unset pfail
+  }
   if [ -z "${ROOTDIR}" ]; then
-    echo -e '\033[0;31m''ERROR ENV VARIABLE ROOTDIR IS NOT DEFINED''\033[0m'
+    pfail 'ROOTDIR'
     return 1
   fi
   if [ -z "${GIT}" ]; then
-    echo -e '\033[0;31m''ERROR ENV VARIABLE GIT IS NOT DEFINED''\033[0m'
+    pfail 'GIT'
     cd $ROOTDIR
     return 1
   fi
-  if [ -z "${CAMB_GIT_COMMIT}" ]; then
-    echo -e '\033[0;31m''ERROR ENV VARIABLE POLYCHORD_GIT_COMMIT IS NOT DEFINED''\033[0m'
+  if [ -z "${POLYCHORD_GIT_COMMIT}" ]; then
+    pfail 'POLYCHORD_GIT_COMMIT'
     cd $ROOTDIR
     return 1
   fi
-
+  if [ -z "${POLY_NAME}" ]; then
+    pfail 'POLY_NAME'
+    cd $ROOTDIR
+    return 1
+  fi
+  if [ -z "${ptop}" || -z "${ptop2}" || -z "${pbottom}" || -z "${pbottom2}" ]; then
+    pfail "PTOP/PBOTTOM"
+    cd $ROOTDIR
+    return 1
+  fi
   unset_env_vars () {
     cd $ROOTDIR
-    unset OUT_POLY_1
-    unset OUT_POLY_2
-    unset POLYCHORD_URL
-    unset POLY_NAME
+    unset OUT1
+    unset OUT2
+    unset POLY_URL
+    unset POLY_CHANGES
+    unset pfail
+    unset unset_env_vars
+  }
+  fail () {
+    export FAILMSG="\033[0;31m WE CANNOT RUN \e[3m"
+    export FAILMSG2="\033[0m"
+    echo -e "${FAILMSG} ${1} ${FAILMSG2}"  
+    unset_env_vars
     unset FAILMSG
     unset FAILMSG2
     unset fail
-    unset unset_env_vars
   }
-
-  fail () {
-    export FAILMSG="\033[0;31m SETUP POLYCHORD COULD NOT RUN \e[3m"
-    export FAILMSG2="\033[0m"
-    
-    echo -e "${FAILMSG} ${ARG} ${FAILMSG2}"
-    
-    unset_env_vars
-  }
-
   if [ -z "${DEBUG_POLY_OUTPUT}" ]; then
-    export OUT_POLY_1="/dev/null"
-    export OUT_POLY_2="/dev/null"
+    export OUT1="/dev/null"
+    export OUT2="/dev/null"
   else
-    export OUT_POLY_1="/dev/tty"
-    export OUT_POLY_2="/dev/tty"
+    export OUT1="/dev/tty"
+    export OUT2="/dev/tty"
   fi
+  
+  # ---------------------------------------------------------------------------
+  ptop 'INSTALLING POLYCHORD'
 
-  #-----------------------------------------------------------------------------
-  #-----------------------------------------------------------------------------
-  export POLY_NAME="PolyChordLite"
-  export POLYCHORD_URL="https://github.com/PolyChord/PolyChordLite.git"
-  #-----------------------------------------------------------------------------
-  #-----------------------------------------------------------------------------
+  export POLY_URL="https://github.com/PolyChord/PolyChordLite.git"
+  export POLY_CHANGES="${ROOTDIR}/../cocoa_installation_libraries/polychord_changes"
+
 
   rm -rf $ROOTDIR/external_modules/code/$POLY_NAME
 
   cd $ROOTDIR/external_modules/code/
 
-  $GIT clone $POLYCHORD_URL $POLY_NAME > ${OUT_POLY_1} 2> ${OUT_POLY_2}
+  $GIT clone $POLY_URL $POLY_NAME > ${OUT1} 2> ${OUT2}
   if [ $? -ne 0 ]; then
     fail "GIT CLONE"
     return 1
@@ -68,38 +76,38 @@ if [ -z "${IGNORE_POLYCHORD_COMPILATION}" ]; then
 
   cd $ROOTDIR/external_modules/code/$POLY_NAME
 
-  $GIT checkout $POLYCHORD_GIT_COMMIT > ${OUT_POLY_1} 2> ${OUT_POLY_2}
+  $GIT checkout $POLYCHORD_GIT_COMMIT > ${OUT1} 2> ${OUT2}
   if [ $? -ne 0 ]; then
     fail "GIT CHECKOUT"
     return 1
   fi
 
-  cp $ROOTDIR/../cocoa_installation_libraries/polychord_changes/Makefile.patch .
+  cp $POLY_CHANGES/Makefile.patch .
   if [ $? -ne 0 ]; then
-    fail "CP FILE PATCH"
+    fail "CP FILE PATCH (MAKEFILE)"
     return 1
   fi
 
-  patch -u Makefile -i Makefile.patch > ${OUT_POLY_1} 2> ${OUT_POLY_2}
+  patch -u Makefile -i Makefile.patch > ${OUT1} 2> ${OUT2}
   if [ $? -ne 0 ]; then
-    fail "PATCH FILE"
+    fail "PATCH FILE (MAKEFILE)"
     return 1
   fi
 
-  cp $ROOTDIR/../cocoa_installation_libraries/polychord_changes/setup.patch .
+  cp $POLY_CHANGES/setup.patch .
   if [ $? -ne 0 ]; then
-    fail "CP FILE PATCH"
+    fail "CP FILE PATCH (SETUP)"
     return 1
   fi
 
-  patch -u setup.py -i setup.patch > ${OUT_POLY_1} 2> ${OUT_POLY_2}
+  patch -u setup.py -i setup.patch > ${OUT1} 2> ${OUT2}
   if [ $? -ne 0 ]; then
-    fail "PATCH FILE"
+    fail "PATCH FILE (SETUP)"
     return 1
   fi
 
   unset_env_vars
-  echo -e '\033[1;34m''\t\e[4mSETUP POLYCHORD DONE''\033[0m'
+  pbottom 'INSTALLING POLYCHORD'
 fi
 # ----------------------------------------------------------------------------
 # ----------------------------------------------------------------------------

@@ -3,109 +3,120 @@
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
 if [ -z "${IGNORE_FORTRAN_INSTALLATION}" ]; then
-  echo -e '\033[1;44m''SETUP_FORTRAN_PACKAGES''\033[0m'
-
+  pfail() {
+    echo -e "\033[0;31m ERROR ENV VARIABLE ${1} IS NOT DEFINED \033[0m"
+    unset pfail
+  }
   if [ -z "${ROOTDIR}" ]; then
-      echo -e '\033[0;31m''ERROR ENV VARIABLE ROOTDIR IS NOT DEFINED''\033[0m'
-      return 1
+    pfail 'ROOTDIR'
+    return 1
   fi
   if [ -z "${CXX_COMPILER}" ]; then
-      echo -e '\033[0;31m''ERROR ENV VARIABLE CXX_COMPILER IS NOT DEFINED''\033[0m'
-      cd $ROOTDIR
-      return 1
+    pfail 'CXX_COMPILER'
+    cd $ROOTDIR
+    return 1
   fi
   if [ -z "${C_COMPILER}" ]; then
-      echo -e '\033[0;31m''ERROR ENV VARIABLE C_COMPILER IS NOT DEFINED''\033[0m'
-      cd $ROOTDIR
-      return 1
-  fi
-  if [ -z "${CMAKE}" ]; then
-      echo -e '\033[0;31m''ERROR ENV VARIABLE MAKE IS NOT DEFINED''\033[0m'
-      return 1
+    pfail 'C_COMPILER'
+    cd $ROOTDIR
+    return 1
   fi
   if [ -z "${FORTRAN_COMPILER}" ]; then
-      echo -e '\033[0;31m''ERROR ENV VARIABLE FORTRAN_COMPILER IS NOT DEFINED''\033[0m'
-      cd $ROOTDIR
-      return 1
+    pfail 'FORTRAN_COMPILER'
+    cd $ROOTDIR
+    return 1
   fi
-  if [ -z "${PYTHON3}" ]; then
-      echo -e '\033[0;31m''ERROR ENV VARIABLE PYTHON3 IS NOT DEFINED''\033[0m'
-      cd $ROOTDIR
-      return 1
+  if [ -z "${CMAKE}" ]; then
+    pfail 'CMAKE'
+    cd $ROOTDIR
+    return 1
   fi
-  if [ -z "${MAKE_NUM_THREADS}" ]; then
-      echo -e '\033[0;31m''ERROR ENV VARIABLE MAKE_NUM_THREADS IS NOT DEFINED''\033[0m'
-      cd $ROOTDIR
-      return 1
-  fi
-
   unset_env_vars () {
     cd $ROOTDIR
-    unset OUTPUT_FORTRAN_1
-    unset OUTPUT_FORTRAN_2
-    unset FORTRAN_MAKE_NUM_THREADS
+    unset OUT1
+    unset OUT2
+    unset FMNT
+    unset pfail
+    unset unset_env_vars
   }
-
+  fail () {
+    export FAILMSG="\033[0;31m WE CANNOT RUN \e[3m"
+    export FAILMSG2="\033[0m"
+    echo -e "${FAILMSG} ${1} ${FAILMSG2}"
+    unset_env_vars
+    unset FAILMSG
+    unset FAILMSG2
+    unset fail
+  }
   if [ -z "${DEBUG_FORTRAN_PACKAGES}" ]; then
-    export OUTPUT_FORTRAN_1="/dev/null"
-    export OUTPUT_FORTRAN_2="/dev/null"
-    export FORTRAN_MAKE_NUM_THREADS="${MAKE_NUM_THREADS}"
+    if [ -z "${MAKE_NUM_THREADS}" ]; then
+      pfail 'MAKE_NUM_THREADS'
+      cd $ROOTDIR
+      return 1
+    fi
+    export OUT1="/dev/null"
+    export OUT2="/dev/null"
+    export FMNT="${MAKE_NUM_THREADS}"
   else
-    export OUTPUT_FORTRAN_1="/dev/tty"
-    export OUTPUT_FORTRAN_2="/dev/tty"
-    export FORTRAN_MAKE_NUM_THREADS=1
+    export OUT1="/dev/tty"
+    export OUT2="/dev/tty"
+    export FMNT=1
   fi
+
+  ptop2 'SETUP_FORTRAN_PACKAGES'
 
   # ----------------------------------------------------------------------------
   # ---------------------------------- FORTRAN LAPACK --------------------------
   # ----------------------------------------------------------------------------
   if [ -z "${IGNORE_FORTRAN_LAPACK_INSTALLATION}" ]; then
-    echo -e '\033[1;34m''INSTALLING LAPACK FORTRAN LIBRARY - \e[4mIT WILL TAKE A WHILE''\033[0m'
+    ptop 'INSTALLING LAPACK FORTRAN LIBRARY'
 
     cd $ROOTDIR/../cocoa_installation_libraries/
+    if [ $? -ne 0 ]; then
+      fail "CD COCOA_INSTALLATION_LIBRARIES"
+      return 1
+    fi
+
     rm -rf lapack-build
+    
     mkdir lapack-build
+    if [ $? -ne 0 ]; then
+      fail "MKDIR LAPACK-BUILD"
+      return 1
+    fi
+
     cd ./lapack-build
 
-    $CMAKE -DBUILD_SHARED_LIBS=TRUE -DCMAKE_INSTALL_PREFIX=$ROOTDIR/.local \
-      -DCMAKE_C_COMPILER=$C_COMPILER --log-level=ERROR \
-      ../${COCOA_LAPACK_DIR} > ${OUTPUT_FORTRAN_1} 2> ${OUTPUT_FORTRAN_2}
-    if [ $? -eq 0 ]; then
-      echo -e '\033[0;32m'"\t\t  LAPACK RUN \e[3mCMAKE\e[0m\e\033[0;32m DONE"'\033[0m'
-    else
-      echo -e '\033[0;31m'"LAPACK COULD NOT RUN \e[3mCMAKE"'\033[0m'
-      unset_env_vars
-      unset unset_env_vars
+    $CMAKE -DBUILD_SHARED_LIBS=TRUE \
+      -DCMAKE_INSTALL_PREFIX=$ROOTDIR/.local \
+      -DCMAKE_C_COMPILER=$C_COMPILER \
+      --log-level=ERROR \
+      ../${COCOA_LAPACK_DIR} > ${OUT1} 2> ${OUT2}
+    if [ $? -ne 0 ]; then
+      fail "CMAKE"
       return 1
     fi
 
-    make -j $FORTRAN_MAKE_NUM_THREADS all > ${OUTPUT_FORTRAN_1} 2> ${OUTPUT_FORTRAN_2}
-    if [ $? -eq 0 ]; then
-      echo -e '\033[0;32m'"\t\t  LAPACK RUN \e[3mMAKE\e[0m\e\033[0;32m DONE"'\033[0m'
-    else
-      echo -e '\033[0;31m'"LAPACK COULD NOT RUN \e[3mMAKE"'\033[0m'
-      unset_env_vars
-      unset unset_env_vars
+    make -j $FMNT all > ${OUT1} 2> ${OUT2}
+    if [ $? -ne 0 ]; then
+      fail "MAKE"
       return 1
     fi
 
-    make install > ${OUTPUT_FORTRAN_1} 2> ${OUTPUT_FORTRAN_2}
-    if [ $? -eq 0 ]; then
-      echo -e '\033[0;32m'"\t\t LAPACK RUN \e[3mMAKE INSTALL\e[0m\e\033[0;32m DONE"'\033[0m'
-    else
-      echo -e '\033[0;31m'"LAPACK COULD NOT RUN \e[3mMAKE INSTALL"'\033[0m'
-      unset_env_vars
-      unset unset_env_vars
+    make install > ${OUT1} 2> ${OUT2}
+    if [ $? -ne 0 ]; then
+      fail "MAKE INSTALL"
       return 1
     fi
     
     cd $ROOTDIR    
-    echo -e '\033[1;34m''\t\e[4mINSTALLING LAPACK FORTRAN LIBRARY DONE''\033[0m'
+    pbottom 'INSTALLING LAPACK FORTRAN LIBRARY'
   fi
-  
+
+  # ----------------------------------------------------------------------------
+  # ---------------------------------------------------------------------------- 
   unset_env_vars
-  unset unset_env_vars
-  echo -e '\033[1;44m''\e[4mSETUP_FORTRAN_PACKAGES DONE''\033[0m'
+  pbottom2 'SETUP_FORTRAN_PACKAGES'
 fi
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------

@@ -3,95 +3,98 @@
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
 if [ -z "${IGNORE_ALL_PIP_INSTALLATION}" ]; then
-  echo -e '\033[1;44m''INSTALLING PYTHON PACKAGES VIA PIP''\033[0m'
-
+  pfail() {
+    echo -e "\033[0;31m ERROR ENV VARIABLE ${1} IS NOT DEFINED \033[0m"
+    unset pfail
+  }  
   if [ -z "${ROOTDIR}" ]; then
-      echo -e '\033[0;31m''ERROR ENV VARIABLE ROOTDIR IS NOT DEFINED''\033[0m'
-      return 1
+    pfail 'ROOTDIR'
+    return 1
   fi
   if [ -z "${CXX_COMPILER}" ]; then
-      echo -e '\033[0;31m''ERROR ENV VARIABLE CXX_COMPILER IS NOT DEFINED''\033[0m'
-      cd $ROOTDIR
-      return 1
+    pfail 'CXX_COMPILER'
+    return 1
   fi
   if [ -z "${C_COMPILER}" ]; then
-      echo -e '\033[0;31m''ERROR ENV VARIABLE C_COMPILER IS NOT DEFINED''\033[0m'
-      cd $ROOTDIR
-      return 1
+    pfail 'C_COMPILER'
+    return 1
   fi
   if [ -z "${PIP3}" ]; then
-    echo -e '\033[0;31m''ERROR ENV VARIABLE PIP3 IS NOT DEFINED''\033[0m'
-    cd $ROOTDIR
+    pfail 'PIP3'
     return 1
   fi
   if [ -z "${PYTHON3}" ]; then
-    echo -e '\033[0;31m''ERROR ENV VARIABLE PYTHON3 IS NOT DEFINED''\033[0m'
-    cd $ROOTDIR
+    pfail "PYTHON3"
     return 1
   fi
-
   unset_env_vars () {
     cd $ROOTDIR
-    unset OUTPUT_PIP_1
-    unset OUTPUT_PIP_2
-    unset PIP_MAKE_NUM_THREADS
+    unset OUT1
+    unset OUT2
+    unset PIP_MNT
+    unset unset_env_vars
+  }
+  fail () {
+    export FAILMSG="\033[0;31m SETUP PIP PACKAGES COULD NOT RUN \e[3m"
+    export FAILMSG2="\033[0m"
+    echo -e "${FAILMSG} ${1} ${FAILMSG2}"
+    unset_env_vars
   }
 
+  ptop2 "INSTALLING PYTHON PACKAGES VIA PIP"
+
   if [ -z "${DEBUG_PIP_OUTPUT}" ]; then
-    export OUTPUT_PIP_1="/dev/null"
-    export OUTPUT_PIP_2="/dev/null"
-    export PIP_MAKE_NUM_THREADS="${MAKE_NUM_THREADS}"
+    export OUT1="/dev/null"
+    export OUT2="/dev/null"
+    export PIP_MNT="${MAKE_NUM_THREADS}"
   else
-    export OUTPUT_PIP_1="/dev/tty"
-    export OUTPUT_PIP_2="/dev/tty"
-    export PIP_MAKE_NUM_THREADS=1
+    export OUT1="/dev/tty"
+    export OUT2="/dev/tty"
+    export PIP_MNT=1
   fi
 
   # ----------------------------------------------------------------------------
-  # ----------------------------------------------------------------------------
   # --------------------------------- LIBEXPAT ---------------------------------
-  # ----------------------------------------------------------------------------
   # ----------------------------------------------------------------------------
 
   if [ -z "${MINICONDA_INSTALLATION}" ]; then
     cd $ROOTDIR/../cocoa_installation_libraries/$COCOA_EXPAT_DIR
     
     FC=$FORTRAN_COMPILER CC=$C_COMPILER ./configure --prefix=$ROOTDIR/.local \
-      --enable-shared=yes --enable-static=yes > ${OUTPUT_PIP_1} 2> ${OUTPUT_PIP_2}
-
-    make -j $PIP_MAKE_NUM_THREADS > ${OUTPUT_PIP_1} 2> ${OUTPUT_PIP_2}
-    if [ $? -eq 0 ]; then
-      echo -e '\033[0;32m'"LIBEXPAT RUN \e[3mMAKE\e[0m\e\033[0;32m DONE"'\033[0m'
-    else
-      echo -e '\033[0;31m'"LIBEXPAT COULD NOT RUN \e[3mMAKE"'\033[0m'
-      unset_env_vars
-      unset unset_env_vars
+      --enable-shared=yes --enable-static=yes > ${OUT1} 2> ${OUT2}
+    if [ $? -ne 0 ]; then
+      fail "LIBEXPAT CONFIGURE"
       return 1
     fi
 
-    make install > ${OUTPUT_PIP_1} 2> ${OUTPUT_PIP_2}
-    if [ $? -eq 0 ]; then
-      echo -e '\033[0;32m'"LIBEXPAT RUN \e[3m MAKE INSTALL\e[0m\e\033[0;32m DONE"'\033[0m'
-    else
-      echo -e '\033[0;31m'"LIBEXPAT COULD NOT RUN \e[3mMAKE INSTALL"'\033[0m'
-      unset_env_vars
-      unset unset_env_vars
+    make -j $PIP_MNT > ${OUT1} 2> ${OUT2}
+    if [ $? -ne 0 ]; then
+      fail "LIBEXPAT MAKE"
       return 1
     fi
 
-   cp $ROOTDIR/.local/lib/libexpat.so.1 $ROOTDIR/.local/lib/libexpat.so.0
+    make install > ${OUT1} 2> ${OUT2}
+    if [ $? -ne 0 ]; then
+      fail "LIBEXPAT MAKE INSTALL"
+      return 1
+    fi
+
+    cp $ROOTDIR/.local/lib/libexpat.so.1 $ROOTDIR/.local/lib/libexpat.so.0
+    if [ $? -ne 0 ]; then
+      fail "LIBEXPAT CP LIBEXPAT.SO.1"
+      return 1
+    fi
+
    cd $ROOTDIR
   fi
 
-
-  # ----------------------------------------------------------------------------
   # ----------------------------------------------------------------------------
   # --------------------------- PIP CORE PACKAGES ------------------------------
   # ----------------------------------------------------------------------------
-  # ----------------------------------------------------------------------------
-  echo -e '\033[1;34m''\tPIP INSTALL CORE PACKAGES''\033[0m'
+  ptop "PIP INSTALL CORE PACKAGES"
   
   if [ -z "${MINICONDA_INSTALLATION}" ]; then
+    
     env CXX=$CXX_COMPILER CC=$C_COMPILER $PIP3 install \
         'alabaster==0.7.13' \
         'appdirs==1.4.4' \
@@ -201,53 +204,42 @@ if [ -z "${IGNORE_ALL_PIP_INSTALLATION}" ]; then
         'wrapt==1.14.1' \
         'zipfile38==0.0.3' \
         'zipp==3.15.0' \
-      --prefix=$ROOTDIR/.local > ${OUTPUT_PIP_1} 2> ${OUTPUT_PIP_2}
+      --prefix=$ROOTDIR/.local > ${OUT1} 2> ${OUT2}
     if [ $? -ne 0 ]; then
-      echo -e '\033[0;31m'"PIP COULD NOT RUN \e[3mPIP INSTALL (CORE PACKAGES)"'\033[0m'
-      unset_env_vars
-      unset unset_env_vars
+      fail "PIP INSTALL (CORE PACKAGES)"
       return 1
-    else
-      echo -e '\033[0;32m'"\t\t PIP RUN \e[3mPIP INSTALL (CORE PACKAGES)\e[0m\e\033[0;32m DONE"'\033[0m'
     fi
+  
   else
+  
     #PS: --force-reinstall - this helps CARMA to see numpy files
     env CXX=$CXX_COMPILER CC=$C_COMPILER $PIP3 install \
         'numpy==1.23.5' \
       --prefix=$ROOTDIR/.local \
-      --force-reinstall > ${OUTPUT_PIP_1} 2> ${OUTPUT_PIP_2}
+      --force-reinstall > ${OUT1} 2> ${OUT2}
     if [ $? -ne 0 ]; then
-      echo -e '\033[0;31m'"PIP COULD NOT RUN \e[3mPIP INSTALL (CORE PACKAGES)"'\033[0m'
-      unset_env_vars
-      unset unset_env_vars
+      fail "PIP INSTALL (CORE PACKAGES)"
       return 1
-    else
-      echo -e '\033[0;32m'"\t\t PIP RUN \e[3mPIP INSTALL (CORE PACKAGES)\e[0m\e\033[0;32m DONE"'\033[0m'
     fi
+  
   fi
 
   env CXX=$CXX_COMPILER CC=$C_COMPILER $PIP3 install \
     $ROOTDIR/../cocoa_installation_libraries/pip_cache/fgspectra \
     --prefix=$ROOTDIR/.local \
-    --no-index > ${OUTPUT_PIP_1} 2> ${OUTPUT_PIP_2}
+    --no-index > ${OUT1} 2> ${OUT2}
   if [ $? -ne 0 ]; then
-    echo -e '\033[0;31m'"PIP COULD NOT RUN \e[3mPIP INSTALL FGSPECTRA"'\033[0m'
-    unset_env_vars
-    unset unset_env_vars
+    fail "PIP INSTALL FGSPECTRA"
     return 1
-  else
-    echo -e '\033[0;32m'"\t\t PIP RUN \e[3mPIP INSTALL FGSPECTRA\e[0m\e\033[0;32m DONE"'\033[0m'
   fi
 
-  echo -e '\033[1;34m''\t\e[4mPIP INSTALL (CORE PACKAGES) DONE''\033[0m'
+  pbottom "PIP INSTALL CORE PACKAGES"
 
-  # ----------------------------------------------------------------------------
   # ----------------------------------------------------------------------------
   # ----------------------------- PIP ML PACKAGES ------------------------------
   # ----------------------------------------------------------------------------
-  # ----------------------------------------------------------------------------
   if [ -z "${IGNORE_EMULATOR_CPU_PIP_PACKAGES}" ]; then
-    echo -e '\033[1;34m''\tPIP INSTALL MACHINE LEARNING CPU-ONLY PACKAGES''\033[0m'
+    ptop "PIP INSTALL MACHINE LEARNING CPU-ONLY PACKAGES"
 
     env CXX=$CXX_COMPILER CC=$C_COMPILER $PIP3 install \
         'tensorflow-cpu==2.12.0' \
@@ -257,20 +249,17 @@ if [ -z "${IGNORE_ALL_PIP_INSTALLATION}" ]; then
         'torchvision==0.14.1+cpu' \
         'torchaudio==0.13.1' \
       --extra-index-url https://download.pytorch.org/whl/cpu
-      --prefix=$ROOTDIR/.local > ${OUTPUT_PIP_1} 2> ${OUTPUT_PIP_2}
+      --prefix=$ROOTDIR/.local > ${OUT1} 2> ${OUT2}
     if [ $? -ne 0 ]; then
-      echo -e '\033[0;31m'"PIP COULD NOT RUN \e[3mPIP INSTALL (MACHINE LEARNING CPU-ONLY PACKAGES)"'\033[0m'
-      unset_env_vars
-      unset unset_env_vars
+      fail "PIP INSTALL (MACHINE LEARNING CPU-ONLY PACKAGES)"
       return 1
-    else
-      echo -e '\033[0;32m'"\t\t PIP RUN \e[3mPIP INSTALL (MACHINE LEARNING CPU-ONLY PACKAGES)\e[0m\e\033[0;32m DONE"'\033[0m'
     fi
 
-    echo -e '\033[1;34m''\t\e[4mPIP INSTALL MACHINE LEARNING CPU-ONLY PACKAGES DONE''\033[0m'
+    pbottom "PIP INSTALL MACHINE LEARNING CPU-ONLY PACKAGES"
   fi
+
   if [ -z "${IGNORE_EMULATOR_GPU_PIP_PACKAGES}" ]; then
-    echo -e '\033[1;34m''\tPIP INSTALL MACHINE LEARNING GPU PACKAGES''\033[0m'
+    ptop "PIP INSTALL MACHINE LEARNING GPU PACKAGES"
 
     env CXX=$CXX_COMPILER CC=$C_COMPILER $PIP3 install \
         'tensorflow==2.12.0' \
@@ -280,22 +269,19 @@ if [ -z "${IGNORE_ALL_PIP_INSTALLATION}" ]; then
         'torchvision==0.14.1+cu116' \
         'torchaudio==0.13.1' \
       --extra-index-url https://download.pytorch.org/whl/cu116 \
-      --prefix=$ROOTDIR/.local > ${OUTPUT_PIP_1} 2> ${OUTPUT_PIP_2}
+      --prefix=$ROOTDIR/.local > ${OUT1} 2> ${OUT2}
     if [ $? -ne 0 ]; then
-      echo -e '\033[0;31m'"PIP COULD NOT RUN \e[3mPIP INSTALL (MACHINE LEARNING GPU PACKAGES)"'\033[0m'
-      unset_env_vars
-      unset unset_env_vars
+      fail "PIP INSTALL (MACHINE LEARNING GPU PACKAGES)"
       return 1
-    else
-      echo -e '\033[0;32m'"\t\t PIP RUN \e[3mPIP INSTALL (MACHINE LEARNING GPU PACKAGES)\e[0m\e\033[0;32m DONE"'\033[0m'
     fi
 
-    echo -e '\033[1;34m''\t\e[4mPIP INSTALL MACHINE LEARNING GPU PACKAGES DONE''\033[0m'
+    pbottom "PIP INSTALL MACHINE LEARNING GPU PACKAGES"
   fi
 
+  # ----------------------------------------------------------------------------
+  # ----------------------------------------------------------------------------
   unset_env_vars
-  unset unset_env_vars
-  echo -e '\033[1;44m''\e[4mINSTALLING PYTHON PACKAGES VIA PIP DONE''\033[0m'
+  pbottom2 'INSTALLING PYTHON PACKAGES VIA PIP DONE'
 fi
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------

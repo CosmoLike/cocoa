@@ -199,3 +199,6 @@ unset CAMB_NAME
 unset OUT_CAMB_1
 unset OUT_CAMB_2
 unset CAMB_GIT_COMMIT
+unset cocoa_HDF5_build
+unset OUT1
+unset OUT2

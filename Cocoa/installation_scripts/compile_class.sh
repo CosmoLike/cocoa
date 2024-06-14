@@ -1,88 +1,103 @@
 #!/bin/bash
-# --------------------------------------------------------------------------------------
-# --------------------------------------------------------------------------------------
-# --------------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 if [ -z "${IGNORE_CLASS_COMPILATION}" ]; then
-  echo -e '\033[1;34m''\tCOMPILING CLASS''\033[0m'
-
+  # ---------------------------------------------------------------------------
+  source $ROOTDIR/installation_scripts/clean_class.sh
+  # ---------------------------------------------------------------------------
+  pfail() {
+    echo -e "\033[0;31m ERROR ENV VARIABLE ${1} IS NOT DEFINED \033[0m"
+    unset pfail
+  }
   if [ -z "${ROOTDIR}" ]; then
-    echo -e '\033[0;31m''ERROR ENV VARIABLE ROOTDIR IS NOT DEFINED''\033[0m'
+    pfail 'ROOTDIR'
     return 1
   fi
   if [ -z "${CXX_COMPILER}" ]; then
-    echo -e '\033[0;31m''ERROR ENV VARIABLE CXX_COMPILER IS NOT DEFINED''\033[0m'
+    pfail 'CXX_COMPILER'
     cd $ROOTDIR
     return 1
   fi
   if [ -z "${C_COMPILER}" ]; then
-    echo -e '\033[0;31m''ERROR ENV VARIABLE C_COMPILER IS NOT DEFINED''\033[0m'
+    pfail 'C_COMPILER'
     cd $ROOTDIR
     return 1
   fi
-  if [ -z "${FORTRAN_COMPILER}" ]; then
-    echo -e '\033[0;31m''ERROR ENV VARIABLE FORTRAN_COMPILER IS NOT DEFINED''\033[0m'
+  if [ -z "${PIP3}" ]; then
+    pfail 'PIP3'
     cd $ROOTDIR
     return 1
   fi
   if [ -z "${PYTHON3}" ]; then
-    echo -e '\033[0;31m''ERROR ENV VARIABLE PYTHON3 IS NOT DEFINED''\033[0m'
+    pfail "PYTHON3"
+    cd $ROOTDIR
+    return 1
+  fi
+  if [ -z "${ptop}" || -z "${ptop2}" || -z "${pbottom}" || -z "${pbottom2}" ]; then
+    pfail "PTOP/PBOTTOM"
     cd $ROOTDIR
     return 1
   fi
   if [ -z "${MAKE_NUM_THREADS}" ]; then
-      echo -e '\033[0;31m''ERROR ENV VARIABLE MAKE_NUM_THREADS IS NOT DEFINED''\033[0m'
-      cd $ROOTDIR
-      return 1
+    pfail 'MAKE_NUM_THREADS'
+    cd $ROOTDIR
+    return 1
   fi
-
-  source $ROOTDIR/installation_scripts/clean_class.sh
-
+  if [ -z "${CLASS_NAME}" ]; then
+    pfail 'CLASS_NAME'
+    cd $ROOTDIR
+    return 1
+  fi
+  unset_env_vars () {
+    cd $ROOTDIR
+    unset OUT1
+    unset OUT2
+    unset pfail
+    unset unset_env_vars
+  }
+  fail () {
+    export FAILMSG="\033[0;31m WE CANNOT RUN \e[3m"
+    export FAILMSG2="\033[0m"
+    echo -e "${FAILMSG} ${1} ${FAILMSG2}"
+    unset_env_vars
+    unset FAILMSG
+    unset FAILMSG2
+    unset fail
+  }
   if [ -z "${DEBUG_CLASS_OUTPUT}" ]; then
-    export OU_CL_1="/dev/null"
-    export OU_CL_2="/dev/null"
+    export OUT1="/dev/null"
+    export OUT2="/dev/null"
   else
-    export OU_CL_1="/dev/tty"
-    export OU_CL_2="/dev/tty"
+    export OUT1="/dev/tty"
+    export OUT2="/dev/tty"
   fi
 
   # ---------------------------------------------------------------------------
-  # ---------------------------------------------------------------------------
-  cd $ROOTDIR/external_modules/code/class_public/
-  # ---------------------------------------------------------------------------
-  # ---------------------------------------------------------------------------
+  ptop 'COMPILING CLASS'
+
+  cd $ROOTDIR/external_modules/code/$CLASS_NAME/
   
   #Workaround Cocoa .gitignore entry on /include
-  cp -r  ./include2 ./include > ${OU_CL_1} 2> ${OU_CL_2}
+  cp -r  ./include2 ./include > ${OUT1} 2> ${OUT2}
 
-  CC=$C_COMPILER PYTHON=$PYTHON3 make all > ${OU_CL_1} 2> ${OU_CL_2}
+  CC=$C_COMPILER PYTHON=$PYTHON3 make all > ${OUT1} 2> ${OUT2}
   if [ $? -ne 0 ]; then
-    echo -e '\033[0;31m'"CLASS COULD NOT RUN \e[3mMAKE ALL\e[0m"'\033[0m'
-    cd $ROOTDIR
-    unset OU_CL_1
-    unset OU_CL_2
+    fail "MAKE ALL"
     return 1
-  else
-    echo -e '\033[0;32m'"\t\tCLASS RUN \e[3mMAKE ALL\e[0m\e\033[0;32m DONE"'\033[0m'
   fi
    
   cd ./python
 
-  CC=$C_COMPILER $PYTHON3 setup.py build > ${OU_CL_1} 2> ${OU_CL_2}
+  CC=$C_COMPILER $PYTHON3 setup.py build > ${OUT1} 2> ${OUT2}
   if [ $? -ne 0 ]; then
-    echo -e '\033[0;31m'"CLASS COULD NOT RUN \e[3mPYTHON3 SETUP.PY BUILD\e[0m"'\033[0m'
-    cd $ROOTDIR
-    unset OU_CL_1
-    unset OU_CL_2
+    fail "PYTHON3 SETUP.PY BUILD"
     return 1
-  else
-    echo -e '\033[0;32m'"\t\t CLASS RUN \e[3mPYTHON3 SETUP.PY BUILD\e[0m\e\033[0;32m DONE"'\033[0m'
   fi
 
-  cd $ROOTDIR
-  unset OU_CL_1
-  unset OU_CL_2
-  echo -e '\033[1;34m''\t\e[4mCOMPILING CLASS DONE''\033[0m'
+  unset_env_vars
+  pbottom 'COMPILING CLASS'
 fi
-# --------------------------------------------------------------------------------------
-# --------------------------------------------------------------------------------------
-# --------------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------

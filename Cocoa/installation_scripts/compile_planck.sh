@@ -1,48 +1,73 @@
 #!/bin/bash
-# --------------------------------------------------------------------------------------
-# --------------------------------------------------------------------------------------
-# --------------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 if [ -z "${IGNORE_PLANCK_COMPILATION}" ]; then
-  echo -e '\033[1;34m''\tCOMPILING PLANCK''\033[0m'
-
+  # ----------------------------------------------------------------------------
+  source $ROOTDIR/installation_scripts/clean_planck.sh
+  # ----------------------------------------------------------------------------
+  pfail() {
+    echo -e "\033[0;31m ERROR ENV VARIABLE ${1} IS NOT DEFINED \033[0m"
+    unset pfail
+  }
   if [ -z "${ROOTDIR}" ]; then
-    echo -e '\033[0;31m''ERROR ENV VARIABLE ROOTDIR IS NOT DEFINED''\033[0m'
+    pfail 'ROOTDIR'
     return 1
   fi
   if [ -z "${CXX_COMPILER}" ]; then
-    echo -e '\033[0;31m''ERROR ENV VARIABLE CXX_COMPILER IS NOT DEFINED''\033[0m'
+    pfail 'CXX_COMPILER'
     cd $ROOTDIR
     return 1
   fi
   if [ -z "${C_COMPILER}" ]; then
-    echo -e '\033[0;31m''ERROR ENV VARIABLE C_COMPILER IS NOT DEFINED''\033[0m'
+    pfail 'C_COMPILER'
     cd $ROOTDIR
     return 1
   fi
-  if [ -z "${FORTRAN_COMPILER}" ]; then
-    echo -e '\033[0;31m''ERROR ENV VARIABLE FORTRAN_COMPILER IS NOT DEFINED''\033[0m'
+  if [ -z "${PIP3}" ]; then
+    pfail 'PIP3'
     cd $ROOTDIR
     return 1
   fi
   if [ -z "${PYTHON3}" ]; then
-    echo -e '\033[0;31m''ERROR ENV VARIABLE PYTHON3 IS NOT DEFINED''\033[0m'
+    pfail "PYTHON3"
+    cd $ROOTDIR
+    return 1
+  fi
+  if [ -z "${ptop}" || -z "${ptop2}" || -z "${pbottom}" || -z "${pbottom2}" ]; then
+    pfail "PTOP/PBOTTOM"
     cd $ROOTDIR
     return 1
   fi
   if [ -z "${MAKE_NUM_THREADS}" ]; then
-    echo -e '\033[0;31m''ERROR ENV VARIABLE MAKE_NUM_THREADS IS NOT DEFINED''\033[0m'
+    pfail 'MAKE_NUM_THREADS'
     cd $ROOTDIR
     return 1
   fi
-
-  source $ROOTDIR/installation_scripts/clean_planck.sh
-
+  unset_env_vars () {
+    cd $ROOTDIR
+    unset OUT1
+    unset OUT2
+    unset pfail
+    unset CLIK_LAPALIBS
+    unset CLIK_CFITSLIBS
+    unset unset_env_vars
+  }
+  fail () {
+    export FAILMSG="\033[0;31m WE CANNOT RUN \e[3m"
+    export FAILMSG2="\033[0m"
+    echo -e "${FAILMSG} ${1} ${FAILMSG2}"
+    unset_env_vars
+    unset FAILMSG
+    unset FAILMSG2
+    unset fail
+  }
   if [ -z "${DEBUG_PLANCK_OUTPUT}" ]; then
-    export OUTPUT_PLANCK_1="/dev/null"
-    export OUTPUT_PLANCK_2="/dev/null"
+    export OUT1="/dev/null"
+    export OUT2="/dev/null"
   else
-    export OUTPUT_PLANCK_1="/dev/tty"
-    export OUTPUT_PLANCK_2="/dev/tty"
+    export OUT1="/dev/tty"
+    export OUT2="/dev/tty"
   fi
   if [ -z "${IGNORE_C_CFITSIO_INSTALLATION}" ]; then
     export CLIK_CFITSLIBS=$ROOTDIR/.local/lib
@@ -56,50 +81,33 @@ if [ -z "${IGNORE_PLANCK_COMPILATION}" ]; then
     export CLIK_LAPALIBS=$GLOBAL_PACKAGES_LOCATION
   fi
 
-  # ----------------------------------------------------------------------------
-  # ----------------------------------------------------------------------------
+  # ---------------------------------------------------------------------------
+  ptop 'COMPILING PLANCK'
+
   if [ -z "${USE_SPT_CLIK_PLANCK}" ]; then
     cd $ROOTDIR/external_modules/code/planck/code/plc_3.0/plc-3.1/
   else
     cd $ROOTDIR/external_modules/code/planck/code/spt_clik/
   fi
-  # ----------------------------------------------------------------------------
-  # ----------------------------------------------------------------------------
   
   FC=$FORTRAN_COMPILER CC=$C_COMPILER CXX=$CXX_COMPILER $PYTHON3 waf configure \
     --gcc --gfortran --cfitsio_islocal --prefix $ROOTDIR/.local \
     --lapack_prefix=${CLIK_LAPALIBS} --cfitsio_lib=${CLIK_CFITSLIBS} \
-    --python=${PYTHON3} > ${OUTPUT_PLANCK_1} 2> ${OUTPUT_PLANCK_2}
+    --python=${PYTHON3} > ${OUT1} 2> ${OUT2}
   if [ $? -ne 0 ]; then
-    echo -e '\033[0;31m'"PLANCK COULD NOT RUN WAF CONFIGURE"'\033[0m'
-    unset CLIK_LAPALIBS
-    unset CLIK_CFITSLIBS
-    unset OUTPUT_PLANCK_1
-    unset OUTPUT_PLANCK_2
-    cd $ROOTDIR
+    fail "WAF CONFIGURE"
     return 1
-  else
-    unset CLIK_LAPALIBS
-    unset CLIK_CFITSLIBS
-    echo -e '\033[0;32m'"PLANCK RUN \e[3mWAF CONFIGURE RUN\e[0m\e\033[0;32m DONE"'\033[0m'
   fi
   
-  $PYTHON3 waf install -v > ${OUTPUT_PLANCK_1} 2> ${OUTPUT_PLANCK_2}
+  $PYTHON3 waf install -v > ${OUT1} 2> ${OUT2}
   if [ $? -ne 0 ]; then
-    echo -e '\033[0;31m'"PLANCK COULD NOT RUN \e[3mWAF INSTALL"'\033[0m'
-    cd $ROOTDIR
-    unset OUTPUT_PLANCK_1
-    unset OUTPUT_PLANCK_2
+    fail "WAF INSTALL"
     return 1
-  else
-    echo -e '\033[0;32m'"\t\t PLANCK RUN \e[3mWAF INSTALL\e[0m\e\033[0;32m DONE"'\033[0m'
   fi
 
-  cd $ROOTDIR
-  unset OUTPUT_PLANCK_1
-  unset OUTPUT_PLANCK_2
-  echo -e '\033[1;34m''\t\e[4mCOMPILING PLANCK DONE''\033[0m'
+  unset_env_vars
+  pbottom 'COMPILING PLANCK'
 fi
-# --------------------------------------------------------------------------------------
-# --------------------------------------------------------------------------------------
-# --------------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------

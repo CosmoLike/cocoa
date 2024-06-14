@@ -3,45 +3,64 @@
 # ----------------------------------------------------------------------------
 # ----------------------------------------------------------------------------
 if [ -z "${IGNORE_ACT_COMPILATION}" ]; then
-  echo -e '\033[1;34m''CLEANING ACT''\033[0m'
-
+  pfail() {
+    echo -e "\033[0;31m ERROR ENV VARIABLE ${1} IS NOT DEFINED \033[0m"
+    unset pfail
+  }
   if [ -z "${ROOTDIR}" ]; then
-    echo -e '\033[0;31m''ERROR ENV VARIABLE ROOTDIR IS NOT DEFINED''\033[0m'
+    pfail 'ROOTDIR'
     return 1
   fi
   if [ -z "${PYTHON3}" ]; then
-    echo -e '\033[0;31m''ERROR ENV VARIABLE PYTHON3 IS NOT DEFINED''\033[0m'
+    pfail "PYTHON3"
     cd $ROOTDIR
     return 1
   fi
+  if [ -z "${ptop}" || -z "${ptop2}" || -z "${pbottom}" || -z "${pbottom2}" ]; then
+    pfail "PTOP/PBOTTOM"
+    cd $ROOTDIR
+    return 1
+  fi
+  unset_env_vars () {
+    cd $ROOTDIR
+    unset OUT1
+    unset OUT2
+    unset pfail
+    unset unset_env_vars
+  }
+  fail () {
+    export FAILMSG="\033[0;31m WE CANNOT RUN \e[3m"
+    export FAILMSG2="\033[0m"
+    echo -e "${FAILMSG} ${1} ${FAILMSG2}"
+    unset_env_vars
+    unset FAILMSG
+    unset FAILMSG2
+    unset fail
+  }
   if [ -z "${DEBUG_ACT_OUTPUT}" ]; then
-    export OUTPUT_ACT_1="/dev/null"
-    export OUTPUT_ACT_2="/dev/null"
+    export OUT1="/dev/null"
+    export OUT2="/dev/null"
   else
-    export OUTPUT_ACT_1="/dev/tty"
-    export OUTPUT_ACT_2="/dev/tty"
+    export OUT1="/dev/tty"
+    export OUT2="/dev/tty"
   fi
 
-  # ---------------------------------------------------------------------------
-  # ---------------------------------------------------------------------------
+  # --------------------------------------------------------------------------- 
+  ptop 'CLEANING ACT'
+
   cd $ROOTDIR/external_modules/code/pyactlike/
-  # ---------------------------------------------------------------------------
-  # ---------------------------------------------------------------------------
 
   rm -rf ./build/
   rm -rf ./pyactlike.egg-info/
 
-  $PYTHON3 setup.py clean > ${OUTPUT_ACT_1} 2> ${OUTPUT_ACT_2}
+  $PYTHON3 setup.py clean > ${OUT1} 2> ${OUT2}
   if [ $? -ne 0 ]; then
-    echo -e '\033[0;31m'"ACT COULD NOT RUN \e[3mPYTHON3 SETUP.PY CLEAN"'\033[0m'
-  else
-    echo -e '\033[0;32m'"\t\t ACT RUN \e[3mPYTHON3 SETUP.PY CLEAN\e[0m\e\033[0;32m DONE"'\033[0m'
+    fail "PYTHON SETUP CLEAN"
+    return 1
   fi
 
-  cd $ROOTDIR
-  unset OUTPUT_ACT_1
-  unset OUTPUT_ACT_2
-  echo -e '\033[1;34m''\t\e[4mCLEANING ACT DONE''\033[0m'
+  unset_env_vars
+  pbottom 'CLEANING ACT'
 fi
 # ----------------------------------------------------------------------------
 # ----------------------------------------------------------------------------

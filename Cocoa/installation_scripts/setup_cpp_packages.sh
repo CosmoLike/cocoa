@@ -3,224 +3,249 @@
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
 if [ -z "${IGNORE_CPP_INSTALLATION}" ]; then
-  echo -e '\033[1;44m''SETUP_CPP_PACKAGES''\033[0m'
-
+  pfail() {
+    echo -e "\033[0;31m ERROR ENV VARIABLE ${1} IS NOT DEFINED \033[0m"
+    unset pfail
+  }
   if [ -z "${ROOTDIR}" ]; then
-      echo -e '\033[0;31m''ERROR ENV VARIABLE ROOTDIR IS NOT DEFINED''\033[0m'
-      return 1
+    pfail 'ROOTDIR'
+    return 1
   fi
   if [ -z "${CXX_COMPILER}" ]; then
-      echo -e '\033[0;31m''ERROR ENV VARIABLE CXX_COMPILER IS NOT DEFINED''\033[0m'
-      cd $ROOTDIR
-      return 1
+    pfail 'CXX_COMPILER'
+    cd $ROOTDIR
+    return 1
   fi
   if [ -z "${C_COMPILER}" ]; then
-      echo -e '\033[0;31m''ERROR ENV VARIABLE C_COMPILER IS NOT DEFINED''\033[0m'
-      cd $ROOTDIR
-      return 1
-  fi
-  if [ -z "${CMAKE}" ]; then
-      echo -e '\033[0;31m''ERROR ENV VARIABLE MAKE IS NOT DEFINED''\033[0m'
-      return 1
+    pfail 'C_COMPILER'
+    cd $ROOTDIR
+    return 1
   fi
   if [ -z "${FORTRAN_COMPILER}" ]; then
-      echo -e '\033[0;31m''ERROR ENV VARIABLE FORTRAN_COMPILER IS NOT DEFINED''\033[0m'
-      cd $ROOTDIR
-      return 1
+    pfail 'FORTRAN_COMPILER'
+    cd $ROOTDIR
+    return 1
   fi
-  if [ -z "${PYTHON3}" ]; then
-      echo -e '\033[0;31m''ERROR ENV VARIABLE PYTHON3 IS NOT DEFINED''\033[0m'
-      cd $ROOTDIR
-      return 1
+  if [ -z "${CMAKE}" ]; then
+    pfail 'CMAKE'
+    cd $ROOTDIR
+    return 1
   fi
-  if [ -z "${MAKE_NUM_THREADS}" ]; then
-      echo -e '\033[0;31m''ERROR ENV VARIABLE MAKE_NUM_THREADS IS NOT DEFINED''\033[0m'
-      cd $ROOTDIR
-      return 1
-  fi
-
   unset_env_vars () {
     cd $ROOTDIR
-    unset OUT_CPP_PACK_1
-    unset OUT_CPP_PACK_2
-    unset CPP_MAKE_NUM_THREADS
+    unset OUT1
+    unset OUT2
+    unset CPP_MNT
+    unset pfail
+    unset unset_env_vars
   }
-
+  fail () {
+    export FAILMSG="\033[0;31m WE CANNOT RUN \e[3m"
+    export FAILMSG2="\033[0m"
+    echo -e "${FAILMSG} ${1} ${FAILMSG2}"
+    unset_env_vars
+    unset FAILMSG
+    unset FAILMSG2
+    unset fail
+  }
   if [ -z "${DEBUG_CPP_PACKAGES}" ]; then
-    export OUT_CPP_PACK_1="/dev/null"
-    export OUT_CPP_PACK_2="/dev/null"
-    export CPP_MAKE_NUM_THREADS="${MAKE_NUM_THREADS}"
+    if [ -z "${MAKE_NUM_THREADS}" ]; then
+      pfail 'MAKE_NUM_THREADS'
+      cd $ROOTDIR
+      return 1
+    fi
+    export OUT1="/dev/null"
+    export OUT2="/dev/null"
+    export CPP_MNT="${MAKE_NUM_THREADS}"
   else
-    export OUT_CPP_PACK_1="/dev/tty"
-    export OUT_CPP_PACK_2="/dev/tty"
-    export CPP_MAKE_NUM_THREADS=1
+    export OUT1="/dev/tty"
+    export OUT2="/dev/tty"
+    export CPP_MNT=1
   fi
 
-  # ------------------------------------------------------------------------------
-  # --------------------------------------- SPDLOG -------------------------------
-  # ------------------------------------------------------------------------------
+  ptop2 'SETUP_CPP_PACKAGES'
+
+  # ----------------------------------------------------------------------------
+  # ---------------------------------- SPDLOG ----------------------------------
+  # ----------------------------------------------------------------------------
   if [ -z "${IGNORE_CPP_SPDLOG_INSTALLATION}" ]; then
-    echo -e '\033[1;34m''\tINSTALLING SPDLOG C++ LIBRARY''\033[0m'
+    ptop 'INSTALLING SPDLOG C++ LIBRARY'
+
+    if [ -z "${COCOA_SPDLOG_DIR}" ]; then
+      pfail 'COCOA_SPDLOG_DIR'
+      cd $ROOTDIR
+      return 1
+    fi
 
     cd $ROOTDIR/../cocoa_installation_libraries/$COCOA_SPDLOG_DIR
-
+    if [ $? -ne 0 ]; then
+      fail "CD COCOA_SPDLOG_DIR"
+      return 1
+    fi
+    
     rm -f CMakeCache.txt
 
     $CMAKE -DCMAKE_INSTALL_PREFIX=$ROOTDIR/.local \
       -DCMAKE_C_COMPILER=$C_COMPILER \
       -DCMAKE_CXX_COMPILER=$CXX_COMPILER \
-      --log-level=ERROR . > ${OUT_CPP_PACK_1} 2> ${OUT_CPP_PACK_2}
-    if [ $? -eq 0 ];then
-      echo -e '\033[0;32m'"\t\t SPDLOG RUN \e[3mCMAKE\e[0m\e\033[0;32m DONE"'\033[0m'
-    else
-      echo -e '\033[0;31m'"SPDLOG COULD NOT RUN \e[3mCMAKE"'\033[0m'
-      unset_env_vars
-      unset unset_env_vars
+      --log-level=ERROR . > ${OUT1} 2> ${OUT2}
+    if [ $? -ne 0 ]; then
+      fail "CMAKE"
       return 1
     fi
 
-    make -j $CPP_MAKE_NUM_THREADS > ${OUT_CPP_PACK_1} 2> ${OUT_CPP_PACK_2}
-    if [ $? -eq 0 ]; then
-      echo -e '\033[0;32m'"\t\t SPDLOG RUN \e[3mMAKE\e[0m\e\033[0;32m DONE"'\033[0m'
-    else
-      echo -e '\033[0;31m'"SPDLOG COULD NOT RUN \e[3mMAKE"'\033[0m'
-      unset_env_vars
-      unset unset_env_vars
+    make -j $CPP_MNT > ${OUT1} 2> ${OUT2}
+    if [ $? -ne 0 ]; then
+      fail "MAKE"
       return 1
     fi
 
-    make install > ${OUT_CPP_PACK_1} 2> ${OUT_CPP_PACK_2}
-    if [ $? -eq 0 ]; then
-      echo -e '\033[0;32m'"\t\t SPDLOG RUN \e[3mMAKE INSTALL\e[0m\e\033[0;32m DONE"'\033[0m'
-    else
-      echo -e '\033[0;31m'"SPDLOG COULD NOT RUN \e[3mMAKE INSTALL"'\033[0m'
-      unset_env_vars
-      unset unset_env_vars
+    make install > ${OUT1} 2> ${OUT2}
+    if [ $? -ne 0 ]; then
+      fail "MAKE INSTALL"
       return 1
     fi
 
     cd $ROOTDIR
-    echo -e '\033[1;34m''\t\e[4mINSTALLING SPDLOG C++ LIBRARY DONE''\033[0m'
+    pbottom 'INSTALLING SPDLOG C++ LIBRARY'
   fi
 
-  # ------------------------------------------------------------------------------
-  # ------------------------------------- ARMADILLO ------------------------------
-  # ------------------------------------------------------------------------------
+  # ----------------------------------------------------------------------------
+  # ------------------------------ ARMADILLO -----------------------------------
+  # ----------------------------------------------------------------------------
   if [ -z "${IGNORE_CPP_ARMA_INSTALLATION}" ]; then
-    echo -e '\033[1;34m''\tINSTALLING ARMADILLO C++ LIBRARY - \e[4mIT MAY TAKE A WHILE''\033[0m'
+    ptop 'INSTALLING ARMADILLO C++ LIBRARY'
+
+    if [ -z "${COCOA_ARMADILLO_DIR}" ]; then
+      pfail 'COCOA_ARMADILLO_DIR'
+      cd $ROOTDIR
+      return 1
+    fi
 
     cd $ROOTDIR/../cocoa_installation_libraries/$COCOA_ARMADILLO_DIR
+    if [ $? -ne 0 ]; then
+      fail "CD COCOA_ARMADILLO_DIR"
+      return 1
+    fi
 
     rm -f CMakeCache.txt
 
-    $CMAKE -DBUILD_SHARED_LIBS=TRUE -DCMAKE_INSTALL_PREFIX=$ROOTDIR/.local \
-      -DCMAKE_C_COMPILER=$C_COMPILER -DCMAKE_CXX_COMPILER=$CXX_COMPILER \
-      -DLAPACK_FOUND=YES -DLAPACK_LIBRARIES=$ROOTDIR/.local/lib/liblapack.so \
-      -DBLAS_FOUND=NO --log-level=ERROR . > ${OUT_CPP_PACK_1} 2> ${OUT_CPP_PACK_2}
-    if [ $? -eq 0 ]; then
-      echo -e '\033[0;32m'"\t\t ARMADILLO RUN \e[3mCMAKE\e[0m\e\033[0;32m DONE"'\033[0m'
-    else
-      echo -e '\033[0;31m'"ARMADILLO COULD NOT RUN \e[3mCMAKE"'\033[0m'
-      unset_env_vars
-      unset unset_env_vars
+    $CMAKE -DBUILD_SHARED_LIBS=TRUE \
+      -DCMAKE_INSTALL_PREFIX=$ROOTDIR/.local \
+      -DCMAKE_C_COMPILER=$C_COMPILER \
+      -DCMAKE_CXX_COMPILER=$CXX_COMPILER \
+      -DLAPACK_FOUND=YES \
+      -DLAPACK_LIBRARIES=$ROOTDIR/.local/lib/liblapack.so \
+      -DBLAS_FOUND=NO \
+      --log-level=ERROR . > ${OUT1} 2> ${OUT2}
+    if [ $? -ne 0 ]; then
+      fail "CMAKE"
       return 1
     fi
 
-    make clean > ${OUT_CPP_PACK_1} 2> ${OUT_CPP_PACK_2}
-    if [ $? -eq 0 ]; then
-      echo -e '\033[0;32m'"\t\t ARMADILLO RUN \e[3mMAKE CLEAN\e[0m\e\033[0;32m DONE"'\033[0m'
-    else
-      echo -e '\033[0;31m'"ARMADILLO COULD NOT RUN \e[3mMAKE CLEAN"'\033[0m'
-      unset_env_vars
-      unset unset_env_vars
+    make clean > ${OUT1} 2> ${OUT2}
+    if [ $? -ne 0 ]; then
+      fail "MAKE CLEAN"
       return 1
     fi
 
-    make -j $CPP_MAKE_NUM_THREADS all -Wno-dev > ${OUT_CPP_PACK_1} 2> ${OUT_CPP_PACK_2}
-    if [ $? -eq 0 ]; then
-      echo -e '\033[0;32m'"\t\t ARMADILLO RUN \e[3mMAKE\e[0m\e\033[0;32m DONE"'\033[0m'
-    else
-      echo -e '\033[0;31m'"ARMADILLO COULD NOT RUN \e[3mMAKE"'\033[0m'
-      unset_env_vars
-      unset unset_env_vars
+    make -j $CPP_MNT all -Wno-dev > ${OUT1} 2> ${OUT2}
+    if [ $? -ne 0 ]; then
+      fail "MAKE"
       return 1
     fi
 
-    make install > ${OUT_CPP_PACK_1} 2> ${OUT_CPP_PACK_2}
-    if [ $? -eq 0 ]; then
-      echo -e '\033[0;32m'"\t\t ARMADILLO RUN \e[3mMAKE INSTALL\e[0m\e\033[0;32m DONE"'\033[0m'
-    else
-      echo -e '\033[0;31m'"ARMADILLO COULD NOT RUN \e[3mMAKE INSTALL"'\033[0m'
-      unset_env_vars
-      unset unset_env_vars
+    make install > ${OUT1} 2> ${OUT2}
+    if [ $? -ne 0 ]; then
+      fail "MAKE INSTALL"
       return 1
     fi
 
     cd $ROOTDIR
-    echo -e '\033[1;34m''\t\e[4mINSTALLING ARMADILLO C++ LIBRARY DONE''\033[0m'
+    pbottom 'INSTALLING ARMADILLO C++ LIBRARY'
   fi
 
-  # ------------------------------------------------------------------------------
-  # ------------------------ CARMA (ARMADILLO <-> PYBIND11) ----------------------
-  # ------------------------------------------------------------------------------
+  # ----------------------------------------------------------------------------
+  # ---------------------- CARMA (ARMADILLO <-> PYBIND11) ----------------------
+  # ----------------------------------------------------------------------------
   if [ -z "${IGNORE_CPP_CARMA_INSTALLATION}" ]; then
-    echo -e '\033[1;34m''\tINSTALLING CARMA C++ LIBRARY''\033[0m'
+    ptop 'INSTALLING CARMA C++ LIBRARY'
+
+    if [ -z "${COCOA_CARMA_DIR}" ]; then
+      pfail 'COCOA_CARMA_DIR'
+      cd $ROOTDIR
+      return 1
+    fi
 
     cd $ROOTDIR/../cocoa_installation_libraries/$COCOA_CARMA_DIR
+    if [ $? -ne 0 ]; then
+      fail "CD COCOA_CARMA_DIR"
+      return 1
+    fi
 
-    rm -rf $ROOTDIR/.local/include/carma/
-    
+    rm -rf $ROOTDIR/.local/include/carma/    
     mkdir $ROOTDIR/.local/include/carma/ 
+    if [ $? -ne 0 ]; then
+      fail "MKDIR CARMA FOLDER"
+      return 1
+    fi
 
     cp ./carma.h $ROOTDIR/.local/include/
+    if [ $? -ne 0 ]; then
+      fail "CP CARMA HEADER"
+      return 1
+    fi
 
     cp -r ./carma_bits $ROOTDIR/.local/include/
+    if [ $? -ne 0 ]; then
+      fail "CP CARMA_BITS"
+      return 1
+    fi
 
     cd $ROOTDIR
-    echo -e '\033[1;34m''\t\e[4mINSTALLING CARMA C++ LIBRARY DONE''\033[0m'
+    pbottom 'INSTALLING CARMA C++ LIBRARY'
   fi
 
-  # ------------------------------------------------------------------------------
-  # ------------------------------------- BOOST ----------------------------------
-  # ------------------------------------------------------------------------------
+  # ----------------------------------------------------------------------------
+  # ---------------------------------- BOOST -----------------------------------
+  # ----------------------------------------------------------------------------
   if [ -z "${IGNORE_CPP_BOOST_INSTALLATION}" ]; then
-    echo -e '\033[1;34m''\tINSTALLING BOOST C++ LIBRARY''\033[0m'
+    ptop 'INSTALLING BOOST C++ LIBRARY'
+
+    if [ -z "${COCOA_BOOST_DIR}" ]; then
+      pfail 'COCOA_BOOST_DIR'
+      cd $ROOTDIR
+      return 1
+    fi
 
     cd $ROOTDIR/../cocoa_installation_libraries/$COCOA_BOOST_DIR
+    if [ $? -ne 0 ]; then
+      fail "CD COCOA_BOOST_DIR"
+      return 1
+    fi
 
-    ./bootstrap.sh \
-      --prefix=$ROOTDIR/.local > ${OUT_CPP_PACK_1} 2> ${OUT_CPP_PACK_2}
-    if [ $? -eq 0 ]; then
-      echo -e '\033[0;32m'"\t\t BOOST RUN \e[3mBOOTSTRAP\e[0m\e\033[0;32m DONE"'\033[0m'
-    else
-      echo -e '\033[0;31m'"BOOST COULD NOT RUN \e[3mBOOTSTRAP"'\033[0m'
-      unset_env_vars
-      unset unset_env_vars
+    ./bootstrap.sh --prefix=$ROOTDIR/.local > ${OUT1} 2> ${OUT2}
+    if [ $? -ne 0 ]; then
+      fail "BOOTSTRAP"
       return 1
     fi
 
     ./b2 --with=regex install --without-python --without-thread \
       --without-timer --without-mpi \
-      --without-atomic > ${OUT_CPP_PACK_1} 2> ${OUT_CPP_PACK_2}
-    if [ $? -eq 0 ]; then
-      echo -e '\033[0;32m'"\t\t BOOST RUN \e[3mB2\e[0m\e\033[0;32m DONE"'\033[0m'
-    else
-      echo -e '\033[0;31m'"BOOST COULD NOT RUN \e[3mB2"'\033[0m'
-      unset_env_vars
-      unset unset_env_vars
+      --without-atomic > ${OUT1} 2> ${OUT2}
+    if [ $? -ne 0 ]; then
+      fail "B2 INSTALL"
       return 1
     fi
     
     cd $ROOTDIR
-    echo -e '\033[1;34m''\t\e[4mINSTALLING BOOST C++ LIBRARY DONE''\033[0m'
+    pbottom 'INSTALLING BOOST C++ LIBRARY'
   fi
 
   # ----------------------------------------------------------------------------
   # ----------------------------------------------------------------------------
-  # ----------------------------------------------------------------------------
-  unset_env_vars
   unset unset_env_vars
-  echo -e '\033[1;44m''\e[4mSETUP_CPP_PACKAGES DONE''\033[0m'
+  pbottom2 'SETUP_CPP_PACKAGES DONE'
 fi
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------

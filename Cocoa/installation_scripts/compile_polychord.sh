@@ -1,106 +1,108 @@
 #!/bin/bash
-# --------------------------------------------------------------------------------------
-# --------------------------------------------------------------------------------------
-# --------------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 if [ -z "${IGNORE_POLYCHORD_COMPILATION}" ]; then
-  echo -e '\033[1;34m''\tCOMPILING POLYCHORD''\033[0m'
-
+  # ----------------------------------------------------------------------------
+  source $ROOTDIR/installation_scripts/clean_polychord.sh
+  # ----------------------------------------------------------------------------
+  pfail() {
+    echo -e "\033[0;31m ERROR ENV VARIABLE ${1} IS NOT DEFINED \033[0m"
+    unset pfail
+  }
   if [ -z "${ROOTDIR}" ]; then
-    echo -e '\033[0;31m''ERROR ENV VARIABLE ROOTDIR IS NOT DEFINED''\033[0m'
+    pfail 'ROOTDIR'
     return 1
   fi
   if [ -z "${CXX_COMPILER}" ]; then
-    echo -e '\033[0;31m''ERROR ENV VARIABLE CXX_COMPILER IS NOT DEFINED''\033[0m'
+    pfail 'CXX_COMPILER'
     cd $ROOTDIR
     return 1
   fi
   if [ -z "${C_COMPILER}" ]; then
-    echo -e '\033[0;31m''ERROR ENV VARIABLE C_COMPILER IS NOT DEFINED''\033[0m'
+    pfail 'C_COMPILER'
     cd $ROOTDIR
     return 1
   fi
-  if [ -z "${FORTRAN_COMPILER}" ]; then
-    echo -e '\033[0;31m''ERROR ENV VARIABLE FORTRAN_COMPILER IS NOT DEFINED''\033[0m'
+  if [ -z "${PIP3}" ]; then
+    pfail 'PIP3'
     cd $ROOTDIR
     return 1
   fi
   if [ -z "${PYTHON3}" ]; then
-    echo -e '\033[0;31m''ERROR ENV VARIABLE PYTHON3 IS NOT DEFINED''\033[0m'
+    pfail "PYTHON3"
+    cd $ROOTDIR
+    return 1
+  fi
+  if [ -z "${ptop}" || -z "${ptop2}" || -z "${pbottom}" || -z "${pbottom2}" ]; then
+    pfail "PTOP/PBOTTOM"
     cd $ROOTDIR
     return 1
   fi
   if [ -z "${MAKE_NUM_THREADS}" ]; then
-    echo -e '\033[0;31m''ERROR ENV VARIABLE MAKE_NUM_THREADS IS NOT DEFINED''\033[0m'
+    pfail 'MAKE_NUM_THREADS'
     cd $ROOTDIR
     return 1
   fi
   if [ -z "${POLY_NAME}" ]; then
-    echo -e '\033[0;31m''ERROR ENV VARIABLE POLY_NAME IS NOT DEFINED''\033[0m'
+    pfail 'POLY_NAME'
     cd $ROOTDIR
     return 1
   fi
-  
-  source $ROOTDIR/installation_scripts/clean_polychord.sh
-
+  unset_env_vars () {
+    cd $ROOTDIR
+    unset OUT1
+    unset OUT2
+    unset POLY_MAKE_NUM_THREADS
+    unset pfail
+    unset unset_env_vars
+  }
+  fail () {
+    export FAILMSG="\033[0;31m WE CANNOT RUN \e[3m"
+    export FAILMSG2="\033[0m"
+    echo -e "${FAILMSG} ${1} ${FAILMSG2}"
+    unset_env_vars
+    unset FAILMSG
+    unset FAILMSG2
+    unset fail
+  }
   if [ -z "${DEBUG_POLY_OUTPUT}" ]; then
-    export OUTPUT_POLY_1="/dev/null"
-    export OUTPUT_POLY_2="/dev/null"
+    export OUT1="/dev/null"
+    export OUT2="/dev/null"
     export POLY_MAKE_NUM_THREADS="${MAKE_NUM_THREADS}"
   else
-    export OUTPUT_POLY_1="/dev/tty"
-    export OUTPUT_POLY_2="/dev/tty"
+    export OUT1="/dev/tty"
+    export OUT2="/dev/tty"
     export POLY_MAKE_NUM_THREADS=1
   fi
 
   # ---------------------------------------------------------------------------
-  # ---------------------------------------------------------------------------
-  cd $ROOTDIR/external_modules/code/$POLY_NAME/
-  # ---------------------------------------------------------------------------
-  # ---------------------------------------------------------------------------
+  ptop 'COMPILING POLYCHORD'
 
-  make all > ${OUTPUT_POLY_1} 2> ${OUTPUT_POLY_2}
+  cd $ROOTDIR/external_modules/code/$POLY_NAME/
+
+  make all > ${OUT1} 2> ${OUT2}
   if [ $? -ne 0 ]; then
-    echo -e '\033[0;31m'"POLYCHORD COULD NOT RUN \e[3mMAKE ALL"'\033[0m'
-    cd $ROOTDIR
-    unset OUTPUT_POLY_1
-    unset OUTPUT_POLY_2
-    unset POLY_MAKE_NUM_THREADS
+    fail "MAKE ALL"
     return 1
-  else
-    echo -e '\033[0;32m'"\t\t POLYCHORD RUN \e[3mMAKE ALL\e[0m\e\033[0;32m DONE"'\033[0m'
   fi
 
-  make -j $POLY_MAKE_NUM_THREADS pypolychord > ${OUTPUT_POLY_1} 2> ${OUTPUT_POLY_2}
+  make -j $POLY_MAKE_NUM_THREADS pypolychord > ${OUT1} 2> ${OUT2}
   if [ $? -ne 0 ]; then
-    echo -e '\033[0;31m'"POLYCHORD COULD NOT RUN \e[3mMAKE PYPOLYCHORD"'\033[0m'
-    cd $ROOTDIR
-    unset OUTPUT_POLY_1
-    unset OUTPUT_POLY_2
-    unset POLY_MAKE_NUM_THREADS
+    fail "MAKE PYPOLYCHORD"
     return 1
-  else
-    echo -e '\033[0;32m'"\t\t POLYCHORD RUN \e[3mMAKE PYPOLYCHORD\e[0m\e\033[0;32m DONE"'\033[0m'
   fi
 
   CC=$MPI_CC_COMPILER CXX=$MPI_CXX_COMPILER $PYTHON3 setup.py install \
-      --prefix $ROOTDIR/.local  > ${OUTPUT_POLY_1} 2> ${OUTPUT_POLY_2}
+      --prefix $ROOTDIR/.local  > ${OUT1} 2> ${OUT2}
   if [ $? -ne 0 ]; then
-    echo -e '\033[0;31m'"POLYCHORD COULD NOT RUN \e[3mPYTHON3 SETUP.PY INSTALL"'\033[0m'
-    cd $ROOTDIR
-    unset OUTPUT_POLY_1
-    unset OUTPUT_POLY_2
-    unset POLY_MAKE_NUM_THREADS
+    fail "PYTHON3 SETUP INSTALL"
     return 1
-  else
-    echo -e '\033[0;32m'"\t\t POLYCHORD RUN \e[3mPYTHON3 SETUP.PY INSTALL\e[0m\e\033[0;32m DONE"'\033[0m'
   fi
 
-  cd $ROOTDIR
-  unset OUTPUT_POLY_1
-  unset OUTPUT_POLY_2
-  unset POLY_MAKE_NUM_THREADS
-  echo -e '\033[1;34m''\t\e[4mCOMPILING POLYCHORD DONE''\033[0m'
+  unset_env_vars
+  pbottom 'COMPILING POLYCHORD'
 fi
-# --------------------------------------------------------------------------------------
-# --------------------------------------------------------------------------------------
-# --------------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
