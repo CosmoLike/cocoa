@@ -29,7 +29,7 @@ if [ -z "${IGNORE_ALL_COBAYA_INSTALLATION}" ]; then
     unset BASECL
     unset NPIPE_URL
   }
-  
+
   if [ -z "${DEBUG_PIP_OUTPUT}" ]; then
     export OUT_UCB_1="/dev/null"
     export OUT_UCB_2="/dev/null"
@@ -46,13 +46,17 @@ if [ -z "${IGNORE_ALL_COBAYA_INSTALLATION}" ]; then
   if [ -z "${IGNORE_COBAYA_INSTALLATION}" ]; then
     echo -e '\033[1;34m''\tINSTALLING COBAYA''\033[0m'
 
-    #-------------------------------------------------------------------------------
+    #---------------------------------------------------------------------------
     # Remove any previous installed cobaya folder
     rm -rf $ROOTDIR/cobaya
 
     cd $ROOTDIR
     
+    #---------------------------------------------------------------------------
+    #---------------------------------------------------------------------------
     export CBURL="https://github.com/CobayaSampler/cobaya.git"
+    #---------------------------------------------------------------------------
+    #---------------------------------------------------------------------------
 
     $GIT clone $CBURL cobaya > ${OUT_UCB_1} 2> ${OUT_UCB_2}
     if [ $? -ne 0 ]; then
