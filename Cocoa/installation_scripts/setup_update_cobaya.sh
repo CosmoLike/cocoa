@@ -3,45 +3,58 @@
 # --------------------------------------------------------------------------------------
 # --------------------------------------------------------------------------------------
 if [ -z "${IGNORE_ALL_COBAYA_INSTALLATION}" ]; then
-  echo -e '\033[1;44m''UPDATING COBAYA PACKAGE''\033[0m'
-
+  pfail() {
+    echo -e "\033[0;31m ERROR ENV VARIABLE ${1} IS NOT DEFINED \033[0m"
+    unset pfail
+  }
   if [ -z "${ROOTDIR}" ]; then
-    echo -e '\033[0;31m''ERROR ENV VARIABLE ROOTDIR IS NOT DEFINED''\033[0m'
+    pfail 'ROOTDIR'
     return 1
   fi
+  fi
   if [ -z "${GIT}" ]; then
-    echo -e '\033[0;31m''ERROR ENV VARIABLE GIT IS NOT DEFINED''\033[0m'
+    pfail 'GIT'
     cd $ROOTDIR
     return 1
   fi
-
   unset_env_vars () {
     cd $ROOTDIR
     unset COBAYA
     unset COBAYA_COCOA
     unset CBLIKE
     unset CBTH
-    unset OUT_UCB_1
-    unset OUT_UCB_2
+    unset OUT1
+    unset OUT2
     unset CBURL
     unset PL2020
     unset PL_LL
     unset BASECL
     unset NPIPE_URL
+    unset unset_env_vars
   }
-
+  fail () {
+    export FAILMSG="\033[0;31m WE CANNOT RUN \e[3m"
+    export FAILMSG2="\033[0m"
+    echo -e "${FAILMSG} ${1} ${FAILMSG2}"
+    unset_env_vars
+    unset FAILMSG
+    unset FAILMSG2
+    unset fail
+  }
   if [ -z "${DEBUG_PIP_OUTPUT}" ]; then
-    export OUT_UCB_1="/dev/null"
-    export OUT_UCB_2="/dev/null"
+    export OUT1="/dev/null"
+    export OUT2="/dev/null"
   else
-    export OUT_UCB_1="/dev/tty"
-    export OUT_UCB_2="/dev/tty"
+    export OUT1="/dev/tty"
+    export OUT2="/dev/tty"
   fi
 
   export COBAYA=$ROOTDIR/cobaya/
   export COBAYA_COCOA=$ROOTDIR/../cocoa_installation_libraries/cobaya_changes
   export CBLIKE=cobaya/likelihoods
   export CBTH=cobaya/theories
+
+  ptop2 "UPDATING COBAYA PACKAGE"
   
   if [ -z "${IGNORE_COBAYA_INSTALLATION}" ]; then
     echo -e '\033[1;34m''\tINSTALLING COBAYA''\033[0m'
@@ -52,28 +65,20 @@ if [ -z "${IGNORE_ALL_COBAYA_INSTALLATION}" ]; then
 
     cd $ROOTDIR
     
-    #---------------------------------------------------------------------------
-    #---------------------------------------------------------------------------
     export CBURL="https://github.com/CobayaSampler/cobaya.git"
-    #---------------------------------------------------------------------------
-    #---------------------------------------------------------------------------
 
-    $GIT clone $CBURL cobaya > ${OUT_UCB_1} 2> ${OUT_UCB_2}
+    $GIT clone $CBURL cobaya > ${OUT1} 2> ${OUT2}
     if [ $? -ne 0 ]; then
-      echo -e '\033[0;31m'"\t\t SETUP UPDATE COBAYA FAILED"'\033[0m'
-      unset_env_vars
-      unset unset_env_vars
+      fail "GIT CLONE"
       return 1
     fi
     unset CBURL
     
     cd $COBAYA
 
-    $GIT reset --hard $COBAYA_GIT_COMMIT > ${OUT_UCB_1} 2> ${OUT_UCB_2}
+    $GIT reset --hard $COBAYA_GIT_COMMIT > ${OUT1} 2> ${OUT2}
     if [ $? -ne 0 ]; then
-      echo -e '\033[0;31m'"\t\t SETUP UPDATE COBAYA FAILED"'\033[0m'
-      unset_env_vars
-      unset unset_env_vars
+      fail "GIT CHECKOUT"
       return 1
     fi
 
@@ -115,9 +120,7 @@ if [ -z "${IGNORE_ALL_COBAYA_INSTALLATION}" ]; then
     
     sh change_planck_clik.sh
     if [ $? -ne 0 ]; then
-      echo -e '\033[0;31m'"\t\t SETUP UPDATE COBAYA (CHANGE PLANCK) FAILED"'\033[0m'
-      unset_env_vars
-      unset unset_env_vars
+      fail "SCRIPT CHANGE_PLANCK_CLIK"
       return 1
     fi
     unset BASECL
@@ -231,11 +234,9 @@ if [ -z "${IGNORE_ALL_COBAYA_INSTALLATION}" ]; then
     cp $COBAYA_COCOA/$BASECL/InstallableLikelihood.patch $COBAYA/$BASECL
     cd $COBAYA/$BASECL/
 
-    patch -u InstallableLikelihood.py -i InstallableLikelihood.patch > ${OUT_UCB_1} 2> ${OUT_UCB_2}
+    patch -u InstallableLikelihood.py -i InstallableLikelihood.patch > ${OUT1} 2> ${OUT2}
     if [ $? -ne 0 ]; then
-      echo -e '\033[0;31m'"\t\t SETUP UPDATE COBAYA (PATCH CAMSPEC) FAILED"'\033[0m'
-      unset_env_vars
-      unset unset_env_vars
+      fail "PATCH LIKELIHOOD FILES (CAMSPEC)"
       return 1
     fi
 
@@ -261,21 +262,17 @@ if [ -z "${IGNORE_ALL_COBAYA_INSTALLATION}" ]; then
 
     export NPIPE_URL="https://github.com/planck-npipe"
 
-    $GIT clone "${NPIPE_URL}/hillipop.git" hipoptmp > ${OUT_UCB_1} 2> ${OUT_UCB_2}
+    $GIT clone "${NPIPE_URL}/hillipop.git" hipoptmp > ${OUT1} 2> ${OUT2}
     if [ $? -ne 0 ]; then
-      echo -e '\033[0;31m'"\t\t SETUP UPDATE COBAYA (HILLIPOP) FAILED"'\033[0m'
-      unset_env_vars
-      unset unset_env_vars
+      fail "GIT CLONE (HILLIPOP)"
       return 1
     fi
 
     cd $COBAYA/$CBLIKE/hipoptmp
 
-    $GIT reset --hard $HILLIPOP_GIT_COMMIT > ${OUT_UCB_1} 2> ${OUT_UCB_2}
+    $GIT reset --hard $HILLIPOP_GIT_COMMIT > ${OUT1} 2> ${OUT2}
     if [ $? -ne 0 ]; then
-      echo -e '\033[0;31m'"\t\t SETUP UPDATE COBAYA (HILLIPOP) FAILED"'\033[0m'
-      unset_env_vars
-      unset unset_env_vars
+      fail "GIT RESET (HILLIPOP)"
       return 1
     fi
     mv planck_2020_hillipop/ $COBAYA/$CBLIKE
@@ -283,11 +280,9 @@ if [ -z "${IGNORE_ALL_COBAYA_INSTALLATION}" ]; then
     # now patch the likelihood __init__ file
     cp $COBAYA_COCOA/$PL2020/init.patch $COBAYA/$PL2020
     cd $COBAYA/$PL2020
-    patch -u __init__.py -i init.patch > ${OUT_UCB_1} 2> ${OUT_UCB_2}
+    patch -u __init__.py -i init.patch > ${OUT1} 2> ${OUT2}
     if [ $? -ne 0 ]; then
-      echo -e '\033[0;31m'"\t\t SETUP UPDATE COBAYA (HILLIPOP) FAILED"'\033[0m'
-      unset_env_vars
-      unset unset_env_vars
+      fail "PATCH LIKELIHOOD FILES (HILLIPOP)"
       return 1
     fi
 
@@ -311,20 +306,16 @@ if [ -z "${IGNORE_ALL_COBAYA_INSTALLATION}" ]; then
 
     export NPIPE_URL="https://github.com/planck-npipe" 
 
-    $GIT clone "${NPIPE_URL}/lollipop.git" lipoptmp > ${OUT_UCB_1} 2> ${OUT_UCB_2}
+    $GIT clone "${NPIPE_URL}/lollipop.git" lipoptmp > ${OUT1} 2> ${OUT2}
     if [ $? -ne 0 ]; then
-      echo -e '\033[0;31m'"\t\t SETUP UPDATE COBAYA (LOLLIPOP) FAILED"'\033[0m'
-      unset_env_vars
-      unset unset_env_vars
+      fail "GIT CLONE (LOLLIPOP)"
       return 1
     fi
 
     cd $COBAYA/$CBLIKE/lipoptmp
-    $GIT reset --hard $LOLLIPOP_GIT_COMMIT > ${OUT_UCB_1} 2> ${OUT_UCB_2}
+    $GIT reset --hard $LOLLIPOP_GIT_COMMIT > ${OUT1} 2> ${OUT2}
     if [ $? -ne 0 ]; then
-      echo -e '\033[0;31m'"\t\t SETUP UPDATE COBAYA (LOLLIPOP) FAILED"'\033[0m'
-      unset_env_vars
-      unset unset_env_vars
+      fail "GIT RESET (LOLLIPOP)"
       return 1
     fi
     mv planck_2020_lollipop/ $COBAYA/$CBLIKE
@@ -332,11 +323,9 @@ if [ -z "${IGNORE_ALL_COBAYA_INSTALLATION}" ]; then
     # now patch the likelihood __init__ file
     cp $COBAYA_COCOA/$PL2020/init.patch $COBAYA/$PL2020
     cd $COBAYA/$PL2020
-    patch -u __init__.py -i init.patch > ${OUT_UCB_1} 2> ${OUT_UCB_2}
+    patch -u __init__.py -i init.patch > ${OUT1} 2> ${OUT2}
     if [ $? -ne 0 ]; then
-      echo -e '\033[0;31m'"\t\t SETUP UPDATE COBAYA (LOLLIPOP) FAILED"'\033[0m'
-      unset_env_vars
-      unset unset_env_vars
+      fail "PATCH LIKELIHOOD FILES (LOLLIPOP)"
       return 1
     fi
 
@@ -346,11 +335,9 @@ if [ -z "${IGNORE_ALL_COBAYA_INSTALLATION}" ]; then
   fi
     
   #-------------------------------------------------------------------------------
-  # UNSETKEYS --------------------------------------------------------------------
   #-------------------------------------------------------------------------------
   unset_env_vars
-  unset unset_env_vars
-  echo -e '\033[1;44m''\e[4mUPDATING COBAYA PACKAGE DONE''\033[0m'
+  pbottom2 "UPDATING COBAYA PACKAGE"
 fi
 #-------------------------------------------------------------------------------
 #-------------------------------------------------------------------------------

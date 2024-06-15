@@ -63,7 +63,6 @@ if [ -z "${IGNORE_POLYCHORD_COMPILATION}" ]; then
   export POLY_URL="https://github.com/PolyChord/PolyChordLite.git"
   export POLY_CHANGES="${ROOTDIR}/../cocoa_installation_libraries/polychord_changes"
 
-
   rm -rf $ROOTDIR/external_modules/code/$POLY_NAME
 
   cd $ROOTDIR/external_modules/code/
