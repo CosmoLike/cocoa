@@ -19,8 +19,10 @@ unset_env_vars () {
   unset OUT1
   unset OUT2
   unset pfail
-  unset CMAKE_URL
-  unset ARMA_FILE
+  unset URL
+  unset FOLDER
+  unset VERSION
+  unset FILENAME
   unset unset_env_vars
 }
 fail () {
@@ -47,392 +49,241 @@ else
   export SIL_MNT=1
 fi
 
-ptop2 'SETUP_INSTALLATION_LIBRARIES'
-
-if [ -z "${IGNORE_CMAKE_INSTALLATION}" ]; then
-  ptop "GETTING CMAKE LIBRARY"
-
+wget_action() {
+  #ARGUMENTS: FOLDER, FILE, URL, NEW_FOLDER, XZFILE
   cd $ROOTDIR/../cocoa_installation_libraries/
+
+  export FILENAME="${1}.${2}"
+
+  # In case this script runs twice
+  rm -rf $ROOTDIR/../cocoa_installation_libraries/$1
+  rm -f $ROOTDIR/../cocoa_installation_libraries/$FILENAME
+  rm -f $ROOTDIR/../cocoa_installation_libraries/$4
+  rm -f $ROOTDIR/../cocoa_installation_libraries/$5
+
+  wget -q $3 > ${OUT1} 2> ${OUT2}
   if [ $? -ne 0 ]; then
-    fail "CD COCOA_INSTALLATION_LIBRARIES"
+    fail "WGET"
     return 1
   fi
 
-  # In case this script runs twice
-  rm -rf $ROOTDIR/../cocoa_installation_libraries/cmake-3.26.4
-  rm -f $ROOTDIR/../cocoa_installation_libraries/cmake.xz
+  if [ "$2" == "tar.gz" ]; then
+    tar zxvf $FILENAME > ${OUT1} 2> ${OUT2}
+    if [ $? -ne 0 ]; then
+      fail "TAR (UNCOMPRESS tar.gz)"
+      return 1
+    fi
+  elif [ "$2" == "tar.xz" ]; then
+    tar xf $FILENAME > ${OUT1} 2> ${OUT2}
+    if [ $? -ne 0 ]; then
+      fail "TAR (UNCOMPRESS tar.xz)"
+      return 1
+    fi
+  else
+    fail "UNKNOWN FILE EXTENSION"
+  fi
 
-  export CMAKE_URL='https://github.com/Kitware/CMake.git'
-  export CMAKE_FOLDER='cmake-3.26.4'
-  $GIT clone $CMAKE_URL $CMAKE_FOLDER > ${OUT1} 2> ${OUT2}
+  mv "${1}/" $4
+  if [ $? -ne 0 ]; then
+    fail "MV FOLDER"
+    return 1
+  fi
+
+  # Why this compress? In the old Cocoa we saved the libraries in 
+  # the github repo using git lfs. So this way preserves the old scripts
+  tar -cf - $4 | xz -k -1 --threads=$SIL_MNT -c - > $5
+  if [ $? -ne 0 ]; then
+    fail "TAR (COMPRESS)"
+    return 1
+  fi 
+
+  rm -rf $ROOTDIR/../cocoa_installation_libraries/$1
+  rm -f $ROOTDIR/../cocoa_installation_libraries/$FILENAME
+  rm -f $ROOTDIR/../cocoa_installation_libraries/$4
+}
+
+git_action() {
+  #ARGUMENTS: FOLDER, VERSION, URL, NEW_FOLDER, XZFILE
+  cd $ROOTDIR/../cocoa_installation_libraries/
+
+  # In case this script runs twice
+  rm -rf $ROOTDIR/../cocoa_installation_libraries/$1
+  rm -f $ROOTDIR/../cocoa_installation_libraries/$4
+  rm -f $ROOTDIR/../cocoa_installation_libraries/$5
+
+  $GIT clone $3 $1 > ${OUT1} 2> ${OUT2}
   if [ $? -ne 0 ]; then
     fail "GIT CLONE"
     return 1
   fi
   
-  cd $ROOTDIR/../cocoa_installation_libraries/$CMAKE_FOLDER
+  cd $ROOTDIR/../cocoa_installation_libraries/$1
   
-  $GIT checkout v3.26.4 > ${OUT1} 2> ${OUT2}
+  $GIT checkout $2 > ${OUT1} 2> ${OUT2}
   if [ $? -ne 0 ]; then
     fail "GIT CHECKOUT"
     return 1
   fi
 
-  rm -rf $ROOTDIR/../cocoa_installation_libraries/$CMAKE_FOLDER/.git/
-
+  rm -rf ./.git/
   cd $ROOTDIR/../cocoa_installation_libraries/
-  
-  # Why this compress? In the old Cocoa we saved the libraries in 
-  # the github repo using git lfs. So this way preserves the old scripts
-  tar -cf - $CMAKE_FOLDER | xz -k -1 --threads=$SIL_MNT -c - > cmake.xz
+
+  mv "${1}/" $4
   if [ $? -ne 0 ]; then
-    fail "TAR"
+    fail "MV FOLDER"
     return 1
   fi
 
-  rm -rf $ROOTDIR/../cocoa_installation_libraries/$CMAKE_FOLDER
-  
-  cd $ROOTDIR
+  # Why this compress? In the old Cocoa we saved the libraries in 
+  # the github repo using git lfs. So this way preserves the old scripts
+  tar -cf - $4 | xz -k -1 --threads=$SIL_MNT -c - > $5
+  if [ $? -ne 0 ]; then
+    fail "TAR (COMPRESS)"
+    return 1
+  fi 
 
+  rm -rf $ROOTDIR/../cocoa_installation_libraries/$1
+  rm -f $ROOTDIR/../cocoa_installation_libraries/$4
+}
+ 
+ptop2 'SETUP_INSTALLATION_LIBRARIES'
+
+if [ -z "${IGNORE_CMAKE_INSTALLATION}" ]; then
+  ptop "GETTING CMAKE LIBRARY"
+
+  export URL='https://github.com/Kitware/CMake.git'
+  export FOLDER='cmake-3.26.4'
+  export VERSION=v3.26.4
+  export XZFILE="cmake.xz"
+
+  git_action $FOLDER $VERSION $URL $COCOA_CMAKE_DIR $XZFILE
+
+  cd $ROOTDIR
   pbottom "GETTING CMAKE LIBRARY"
 fi
 
 if [ -z "${IGNORE_DISTUTILS_INSTALLATION}" ]; then
-  echo -e '\033[0;32m'"\t\tGETTING BINUTILS LIBRARY"'\033[0m' > ${OUT1} 2> ${OUT2}
+  ptop "GETTING BINUTILS LIBRARY"
 
-  cd $ROOTDIR/../cocoa_installation_libraries/
+  export FOLDER="binutils-2.37"
+  export FILE="tar.gz"
+  export URL="https://ftp.gnu.org/gnu/binutils/${FOLDER}.${FILE}"
+  export XZFILE="binutils.xz"
 
-  # In case this script runs twice
-  rm -f $ROOTDIR/../cocoa_installation_libraries/binutils-2.37.tar.gz
-  rm -f $ROOTDIR/../cocoa_installation_libraries/binutils.xz
-
-  wget -q https://ftp.gnu.org/gnu/binutils/binutils-2.37.tar.gz
-  if [ $? -ne 0 ]; then
-    fail "WGET"
-    return 1
-  fi
-
-  tar zxvf binutils-2.37.tar.gz
-  if [ $? -ne 0 ]; then
-    fail "TAR (UNCOMPRESS)"
-    return 1
-  fi
-
-  rm -f $ROOTDIR/../cocoa_installation_libraries/binutils-2.37.tar.gz
-
-  # Why this compress? In the old Cocoa we saved the libraries in 
-  # the github repo using git lfs. So this way preserves the old scripts
-  tar -cf - binutils-2.37/ | xz -k -1 --threads=$SIL_MNT -c - > binutils.xz
-  if [ $? -ne 0 ];then
-    echo -e '\033[0;31m'"BINUTILS: COULD NOT COMPRESS \e[3mBINUTILS FOLDER"'\033[0m'
-    unset_env_vars
-    unset unset_env_vars
-    return 1
-  fi
-  rm -rf $ROOTDIR/../cocoa_installation_libraries/binutils-2.37
+  wget_action $FOLDER, $FILE, $URL, $COCOA_BINUTILS_DIR, $XZFILE
 
   cd $ROOTDIR
-
-  echo -e '\033[0;32m'"\t\tGETTING BINUTILS LIBRARY DONE"'\033[0m' > ${OUT1} 2> ${OUT2}
+  pbottom "GETTING BINUTILS LIBRARY"
 fi
 
 if [ -z "${IGNORE_DISTUTILS_INSTALLATION}" ]; then
-  echo -e '\033[0;32m'"\t\tGETTING TEXINFO LIBRARY"'\033[0m' > ${OUT1} 2> ${OUT2}
+  ptop "GETTING TEXINFO LIBRARY"
 
-  cd $ROOTDIR/../cocoa_installation_libraries/
+  export FOLDER="texinfo-7.0.3"
+  export FILE="tar.xz"
+  export URL="https://ftp.gnu.org/gnu/texinfo/${FOLDER}.${FILE}"
+  export XZFILE="texinfo.xz"
 
-  # In case this script runs twice
-  rm -f $ROOTDIR/../cocoa_installation_libraries/texinfo-7.0.3.tar.xz
-  rm -f $ROOTDIR/../cocoa_installation_libraries/texinfo.xz
-
-  wget -q https://ftp.gnu.org/gnu/texinfo/texinfo-7.0.3.tar.xz
-  if [ $? -ne 0 ]; then
-    fail "WGET"
-    return 1
-  fi
-
-  tar xf texinfo-7.0.3.tar.xz
-  if [ $? -ne 0 ]; then
-    fail "TAR (UNCOMPRESS)"
-    return 1
-  fi
-
-  rm -f $ROOTDIR/../cocoa_installation_libraries/texinfo-7.0.3.tar.xz
-
-  # Why this compress? In the old Cocoa we saved the libraries in 
-  # the github repo using git lfs. So this way preserves the old scripts
-  tar -cf - texinfo-7.0.3/ | xz -k -1 --threads=$SIL_MNT -c - > texinfo.xz
-  if [ $? -ne 0 ];then
-    echo -e '\033[0;31m'"TEXINFO: COULD NOT COMPRESS \e[3mTEXINFO FOLDER"'\033[0m'
-    unset_env_vars
-    unset unset_env_vars
-    return 1
-  fi
-  rm -rf $ROOTDIR/../cocoa_installation_libraries/texinfo-7.0.3
+  wget_action $FOLDER, $FILE, $URL, $COCOA_TEXINFO_DIR $XZFILE
 
   cd $ROOTDIR
-
-  echo -e '\033[0;32m'"\t\tGETTING TEXINFO LIBRARY DONE"'\033[0m' > ${OUT1} 2> ${OUT2}
+  pbottom "GETTING TEXINFO LIBRARY"
 fi
 
 if [ -z "${IGNORE_OPENBLAS_INSTALLATION}" ]; then
-  echo -e '\033[0;32m'"\t\tGETTING OPENBLAS LIBRARY"'\033[0m' > ${OUT1} 2> ${OUT2}
-  
-  cd $ROOTDIR/../cocoa_installation_libraries/
+  ptop "GETTING OPENBLAS LIBRARY"
 
-  # In case this script runs twice
-  rm -rf $ROOTDIR/../cocoa_installation_libraries/OpenBLAS-0.3.23
-  rm -f $ROOTDIR/../cocoa_installation_libraries/OpenBLAS.xz
+  export URL='https://github.com/OpenMathLib/OpenBLAS.git'
+  export FOLDER='OpenBLAS-0.3.23'
+  export VERSION=v0.3.23
+  export XZFILE="OpenBLAS.xz"
 
-  $GIT clone https://github.com/OpenMathLib/OpenBLAS.git OpenBLAS-0.3.23 > ${OUT1} 2> ${OUT2}
-  if [ $? -ne 0 ];then
-    echo -e '\033[0;31m'"OPENBLAS: COULD NOT RUN \e[3mGIT CLONE"'\033[0m'
-    unset_env_vars
-    unset unset_env_vars
-    return 1   
-  fi
-
-  cd $ROOTDIR/../cocoa_installation_libraries/OpenBLAS-0.3.23
-
-  $GIT checkout v0.3.23 > ${OUT1} 2> ${OUT2}
-  if [ $? -ne 0 ];then
-    echo -e '\033[0;31m'"OPENBLAS: COULD NOT RUN \e[3mGIT CHECKOUT"'\033[0m'
-    unset_env_vars
-    unset unset_env_vars
-    return 1
-  fi
-
-  rm -rf $ROOTDIR/../cocoa_installation_libraries/OpenBLAS-0.3.23/.git/
-
-  # Why this compress? In the old Cocoa we saved the libraries in 
-  # the github repo using git lfs. So this way preserves the old scripts
-  tar -cf - OpenBLAS-0.3.23/ | xz -k -1 --threads=$SIL_MNT -c - > OpenBLAS.xz
-  if [ $? -ne 0 ];then
-    echo -e '\033[0;31m'"OPENBLAS: COULD NOT COMPRESS \e[3mOPENBLAS FOLDER"'\033[0m'
-    unset_env_vars
-    unset unset_env_vars
-    return 1
-  fi
-  rm -rf $ROOTDIR/../cocoa_installation_libraries/OpenBLAS-0.3.23
+  git_action $FOLDER $VERSION $URL $COCOA_OPENBLAS_DIR $XZFILE
 
   cd $ROOTDIR
-
-  echo -e '\033[0;32m'"\t\tGETTING OPENBLAS LIBRARY DONE"'\033[0m' > ${OUT1} 2> ${OUT2}
+  pbottom "GETTING OPENBLAS LIBRARY"
 fi
 
 if [ -z "${IGNORE_FORTRAN_LAPACK_INSTALLATION}" ]; then
-  echo -e '\033[0;32m'"\t\tGETTING LAPACK LIBRARY"'\033[0m' > ${OUT1} 2> ${OUT2}
-  
-  cd $ROOTDIR/../cocoa_installation_libraries/
+  ptop "GETTING LAPACK LIBRARY"
 
-  # In case this script runs twice
-  rm -rf $ROOTDIR/../cocoa_installation_libraries/lapack
-  rm -f $ROOTDIR/../cocoa_installation_libraries/lapack.xz
+  export URL='https://github.com/Reference-LAPACK/lapack.git'
+  export FOLDER='lapack-3.11.0'
+  export VERSION=v3.11
+  export XZFILE="lapack.xz"
 
-  $GIT clone https://github.com/Reference-LAPACK/lapack.git lapack > ${OUT1} 2> ${OUT2}
-  if [ $? -ne 0 ];then
-    echo -e '\033[0;31m'"LAPACK: COULD NOT RUN \e[3mGIT CLONE"'\033[0m'
-    unset_env_vars
-    unset unset_env_vars
-    return 1
-  fi
-
-  cd $ROOTDIR/../cocoa_installation_libraries/lapack-3.11.0
-  
-  $GIT checkout lapack-3.11.0 > ${OUT1} 2> ${OUT2}
-  if [ $? -ne 0 ];then
-    echo -e '\033[0;31m'"LAPACK: COULD NOT RUN \e[3mGIT CHECKOUT"'\033[0m'
-    unset_env_vars
-    unset unset_env_vars
-    return 1
-  fi
-
-  rm -rf $ROOTDIR/../cocoa_installation_libraries/lapack-3.11.0/.git/
-
-  cd $ROOTDIR/../cocoa_installation_libraries/
-
-  # Why this compress? In the old Cocoa we saved the libraries in 
-  # the github repo using git lfs. So this way preserves the old scripts
-  tar -cf - lapack-3.11.0/ | xz -k -1 --threads=$SIL_MNT -c - > lapack.xz
-  if [ $? -ne 0 ];then
-    echo -e '\033[0;31m'"LAPACK: COULD NOT COMPRESS \e[3mLAPACK FOLDER"'\033[0m'
-    unset_env_vars
-    unset unset_env_vars
-    return 1
-  fi
-  rm -rf $ROOTDIR/../cocoa_installation_libraries/lapack-3.11.0
+  git_action $FOLDER $VERSION $URL $COCOA_LAPACK_DIR $XZFILE
 
   cd $ROOTDIR
-
-  echo -e '\033[0;32m'"\t\tGETTING LAPACK LIBRARY DONE"'\033[0m' > ${OUT1} 2> ${OUT2}
+  pbottom "GETTING LAPACK LIBRARY DONE"
 fi
 
 # ----------------------------------------------------------------------------
 # ----------------------------------------------------------------------------
 # ----------------------------------------------------------------------------
 if [ -z "${IGNORE_HDF5_INSTALLATION}" ]; then
-  echo -e '\033[0;32m'"\t\tGETTING HDF5 LIBRARY"'\033[0m' > ${OUT1} 2> ${OUT2}
+  ptop "GETTING HDF5 LIBRARY"
 
-  cd $ROOTDIR/../cocoa_installation_libraries/
+  export FOLDER="hdf5-1.12.3"
+  export FILE="tar.gz"
+  export URL="https://hdf-wordpress-1.s3.amazonaws.com/wp-content/uploads/manual/HDF5/HDF5_1_12_3/src/${FOLDER}.${FILE}"
+  export XZFILE="hdf5.xz"
 
-  # In case this script runs twice
-  rm -f $ROOTDIR/../cocoa_installation_libraries/hdf5-1.12.3.tar.gz
-  rm -f $ROOTDIR/../cocoa_installation_libraries/hdf5.xz
-
-  wget -q https://hdf-wordpress-1.s3.amazonaws.com/wp-content/uploads/manual/HDF5/HDF5_1_12_3/src/hdf5-1.12.3.tar.gz
-  if [ $? -ne 0 ]; then
-    fail "WGET"
-    return 1
-  fi
-
-  tar zxvf hdf5-1.12.3.tar.gz
-  if [ $? -ne 0 ]; then
-    fail "TAR (UNCOMPRESS)"
-    return 1
-  fi
-
-  rm -f $ROOTDIR/../cocoa_installation_libraries/hdf5-1.12.3.tar.gz
-
-  # Why this compress? In the old Cocoa we saved the libraries in 
-  # the github repo using git lfs. So this way preserves the old scripts
-  tar -cf - hdf5-1.12.3/ | xz -k -1 --threads=$SIL_MNT -c - > hdf5.xz
-  if [ $? -ne 0 ];then
-    echo -e '\033[0;31m'"HDF5: COULD NOT COMPRESS \e[3mHDF5 FOLDER"'\033[0m'
-    unset_env_vars
-    unset unset_env_vars
-    return 1
-  fi
-  rm -rf $ROOTDIR/../cocoa_installation_libraries/hdf5-1.12.3
+  wget_action $FOLDER, $FILE, $URL, $XZFILE
 
   cd $ROOTDIR
-
-  echo -e '\033[0;32m'"\t\tGETTING HDF5 LIBRARY DONE"'\033[0m' > ${OUT1} 2> ${OUT2}
+  pbottom "GETTING HDF5 LIBRARY DONE"
 fi
 
 # ----------------------------------------------------------------------------
 # ----------------------------------------------------------------------------
 # ----------------------------------------------------------------------------
 if [ -z "${IGNORE_C_CFITSIO_INSTALLATION}" ]; then
-  echo -e '\033[0;32m'"\t\tGETTING CFITSIO LIBRARY"'\033[0m' > ${OUT1} 2> ${OUT2}
+  ptop "GETTING CFITSIO LIBRARY"
 
-  cd $ROOTDIR/../cocoa_installation_libraries/
+  export FOLDER="cfitsio-4.0.0"
+  export FILE="tar.gz"
+  export URL="http://heasarc.gsfc.nasa.gov/FTP/software/fitsio/c/${FOLDER}.${FILE}"
+  export XZFILE="cfitsio.xz"
 
-  # In case this script runs twice
-  rm -f $ROOTDIR/../cocoa_installation_libraries/cfitsio-4.0.0.tar.gz
-  rm -f $ROOTDIR/../cocoa_installation_libraries/cfitsio.xz
-
-  wget -q http://heasarc.gsfc.nasa.gov/FTP/software/fitsio/c/cfitsio-4.0.0.tar.gz
-  if [ $? -ne 0 ]; then
-    fail "WGET"
-    return 1
-  fi
-
-  tar zxvf cfitsio-4.0.0.tar.gz
-  if [ $? -ne 0 ]; then
-    fail "TAR (UNCOMPRESS)"
-    return 1
-  fi
-
-  rm -f $ROOTDIR/../cocoa_installation_libraries/cfitsio-4.0.0.tar.gz
-
-  # Why this compress? In the old Cocoa we saved the libraries in 
-  # the github repo using git lfs. So this way preserves the old scripts
-  tar -cf - cfitsio-4.0.0/ | xz -k -1 --threads=$SIL_MNT -c - > cfitsio.xz
-  if [ $? -ne 0 ];then
-    echo -e '\033[0;31m'"CFITSIO: COULD NOT COMPRESS \e[3mCFITSIO FOLDER"'\033[0m'
-    unset_env_vars
-    unset unset_env_vars
-    return 1
-  fi
-  rm -rf $ROOTDIR/../cocoa_installation_libraries/cfitsio-4.0.0
+  wget_action $FOLDER, $FILE, $URL, $XZFILE
 
   cd $ROOTDIR
-
-  echo -e '\033[0;32m'"\t\tGETTING CFITSIO LIBRARY DONE"'\033[0m' > ${OUT1} 2> ${OUT2}
+  pbottom "GETTING CFITSIO LIBRARY DONE"
 fi
 
 # ----------------------------------------------------------------------------
 # ----------------------------------------------------------------------------
 # ----------------------------------------------------------------------------
 if [ -z "${IGNORE_C_FFTW_INSTALLATION}" ]; then
-  echo -e '\033[0;32m'"\t\tGETTING FFTW LIBRARY"'\033[0m' > ${OUT1} 2> ${OUT2}
-  
-  cd $ROOTDIR/../cocoa_installation_libraries/
+  ptop "GETTING FFTW LIBRARY"
 
-  # In case this script runs twice
-  rm -f $ROOTDIR/../cocoa_installation_libraries/fftw-3.3.10.tar.gz 
-  rm -f $ROOTDIR/../cocoa_installation_libraries/fftw.xz
+  export FOLDER="fftw-3.3.10"
+  export FILE="tar.gz"
+  export URL="http://www.fftw.org/${FOLDER}.${FILE}"
+  export XZFILE="fftw.xz"
 
-  wget -q http://www.fftw.org/fftw-3.3.10.tar.gz 
-  if [ $? -ne 0 ]; then
-    fail "WGET"
-    return 1
-  fi
-
-  tar zxvf fftw-3.3.10.tar.gz
-  if [ $? -ne 0 ]; then
-    fail "TAR (UNCOMPRESS)"
-    return 1
-  fi
-
-  rm -f fftw-3.3.10.tar.gz
-
-  # Why this compress? In the old Cocoa we saved the libraries in 
-  # the github repo using git lfs. So this way preserves the old scripts
-  tar -cf - fftw-3.3.10/ | xz -k -1 --threads=$SIL_MNT -c - > fftw.xz
-  if [ $? -ne 0 ];then
-    echo -e '\033[0;31m'"FFTW: COULD NOT COMPRESS \e[3mFFTW FOLDER"'\033[0m'
-    unset_env_vars
-    unset unset_env_vars
-    return 1
-  fi
-  rm -rf $ROOTDIR/../cocoa_installation_libraries/fftw-3.3.10
+  wget_action $FOLDER, $FILE, $URL, $XZFILE
 
   cd $ROOTDIR
-
-  echo -e '\033[0;32m'"\t\tGETTING FFTW LIBRARY DONE"'\033[0m' > ${OUT1} 2> ${OUT2}
+  pbottom "GETTING FFTW LIBRARY DONE"
 fi
 
 # ----------------------------------------------------------------------------
 # ----------------------------------------------------------------------------
 # ----------------------------------------------------------------------------
 if [ -z "${IGNORE_C_GSL_INSTALLATION}" ]; then
-  echo -e '\033[0;32m'"\t\tGETTING GSL LIBRARY"'\033[0m' > ${OUT1} 2> ${OUT2}
+  ptop "GETTING GSL LIBRARY"
 
-  cd $ROOTDIR/../cocoa_installation_libraries/
+  export FOLDER="gsl-2.7"
+  export FILE="tar.gz"
+  export URL="http://ftp.wayne.edu/gnu/gsl/${FOLDER}.${FILE}"
+  export XZFILE="gsl-2.7.xz"
 
-  # In case this script runs twice
-  rm -f $ROOTDIR/../cocoa_installation_libraries/gsl-2.7.tar.gz
-  rm -f $ROOTDIR/../cocoa_installation_libraries/gsl.xz
-
-  wget -q http://ftp.wayne.edu/gnu/gsl/gsl-2.7.tar.gz
-  if [ $? -ne 0 ]; then
-    fail "WGET"
-    return 1
-  fi
-
-  tar zxvf gsl-2.7.tar.gz
-  if [ $? -ne 0 ]; then
-    fail "TAR (UNCOMPRESS)"
-    return 1
-  fi
-
-  rm -f ROOTDIR/../cocoa_installation_libraries/gsl-2.7.tar.gz
-
-  # Why this compress? In the old Cocoa we saved the libraries in 
-  # the github repo using git lfs. So this way preserves the old scripts
-  tar -cf - gsl-2.7/ | xz -k -1 --threads=$SIL_MNT -c - > gsl.xz
-  if [ $? -ne 0 ];then
-    echo -e '\033[0;31m'"GSL: COULD NOT COMPRESS \e[3mGSL FOLDER"'\033[0m'
-    unset_env_vars
-    unset unset_env_vars
-    return 1
-  fi
-  rm -rf $ROOTDIR/../cocoa_installation_libraries/gsl-2.7
+  wget_action $FOLDER, $FILE, $URL, $XZFILE
 
   cd $ROOTDIR
-
-  echo -e '\033[0;32m'"\t\tGETTING GSL LIBRARY DONE"'\033[0m' > ${OUT1} 2> ${OUT2}
+  pbottom "GETTING GSL LIBRARY DONE"
 fi
 
 # ----------------------------------------------------------------------------
@@ -468,12 +319,11 @@ if [ -z "${IGNORE_CPP_SPDLOG_INSTALLATION}" ]; then
   # Why this compress? In the old Cocoa we saved the libraries in 
   # the github repo using git lfs. So this way preserves the old scripts
   tar -cf - spdlog/ | xz -k -1 --threads=$SIL_MNT -c - > spdlog.xz
-  if [ $? -ne 0 ];then
-    echo -e '\033[0;31m'"SPDLOG: COULD NOT COMPRESS \e[3mSPDLOG FOLDER"'\033[0m'
-    unset_env_vars
-    unset unset_env_vars
+  if [ $? -ne 0 ]; then
+    fail "TAR (COMPRESS)"
     return 1
-  fi
+  fi 
+
   rm -rf $ROOTDIR/../cocoa_installation_libraries/spdlog
 
   cd $ROOTDIR
