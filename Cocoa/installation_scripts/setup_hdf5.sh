@@ -66,15 +66,15 @@ if [ -z "${IGNORE_HDF5_INSTALLATION}" ]; then
   ptop2 'SETUP_HDF5'
   ptop 'INSTALLING HFD5 LIBRARY'
 
-  if [ -z "${COCOA_HDF5_DIR2}" ]; then
-    pfail 'COCOA_HDF5_DIR2'
+  if [ -z "${COCOA_HDF5_DIR}" ]; then
+    pfail 'COCOA_HDF5_DIR'
     cd $ROOTDIR
     return 1
   fi
   
-  cd $ROOTDIR/../cocoa_installation_libraries/$COCOA_HDF5_DIR2
+  cd $ROOTDIR/../cocoa_installation_libraries/$COCOA_HDF5_DIR
   if [ $? -ne 0 ]; then
-    fail "CD COCOA_HDF5_DIR2"
+    fail "CD COCOA_HDF5_DIR"
     return 1
   fi
 
