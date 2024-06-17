@@ -84,6 +84,9 @@ external_modules/code/planck/code/spt_clik/svnversion
 external_modules/code/class_public/build/
 external_modules/code/pyactlike/build/
 external_modules/code/PolyChordLite/build/
+external_modules/code/CAMB2/
+external_modules/code/CAMB/
+external_modules/code/CAMB*/
 
 external_modules/code/class_public/python/classy.egg-info
 
