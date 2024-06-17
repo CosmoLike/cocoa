@@ -87,6 +87,9 @@ external_modules/code/PolyChordLite/build/
 external_modules/code/CAMB2/
 external_modules/code/CAMB/
 external_modules/code/CAMB*/
+external_modules/code/class_public/
+external_modules/code/class_public2/
+external_modules/code/class_public*/
 
 external_modules/code/class_public/python/classy.egg-info
 

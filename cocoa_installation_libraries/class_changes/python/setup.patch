@@ -1,0 +1,33 @@
+--- ./class_public/python/setup.py	2024-06-17 15:12:09.436463605 -0400
++++ ./class_public2/python/setup.py	2024-06-11 18:29:16.500241453 -0400
+@@ -8,17 +8,22 @@
+ import os.path as osp
+ 
+ # Recover the gcc compiler
+-GCCPATH_STRING = sbp.Popen(
+-    ['gcc', '-print-libgcc-file-name'],
+-    stdout=sbp.PIPE).communicate()[0]
++#GCCPATH_STRING = sbp.Popen(
++#    ['gcc', '-print-libgcc-file-name'],
++#    stdout=sbp.PIPE).communicate()[0]
++#GCCPATH = osp.normpath(osp.dirname(GCCPATH_STRING)).decode()
++#GCCPATH_STRING = sbp.Popen(
++#    ['gcc -print-libgcc-file-name'],
++#    stdout=sbp.PIPE, shell=True).communicate()[0]
++GCCPATH_STRING = sbp.check_output(["$C_COMPILER -print-libgcc-file-name"], shell=True)
+ GCCPATH = osp.normpath(osp.dirname(GCCPATH_STRING)).decode()
+ 
+ liblist = ["class"]
+-MVEC_STRING = sbp.Popen(
+-    ['gcc', '-lmvec'],
+-    stderr=sbp.PIPE).communicate()[1]
+-if b"mvec" not in MVEC_STRING:
+-    liblist += ["mvec","m"]
++#MVEC_STRING = sbp.Popen(
++#    ['gcc', '-lmvec'],
++#    stderr=sbp.PIPE).communicate()[1]
++#if b"mvec" not in MVEC_STRING:
++#    liblist += ["mvec","m"]
+ 
+ # define absolute paths
+ root_folder = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..")

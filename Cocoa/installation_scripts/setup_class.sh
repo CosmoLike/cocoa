@@ -2,7 +2,7 @@
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
-if [ -z "${IGNORE_CAMB_COMPILATION}" ]; then
+if [ -z "${IGNORE_CLASS_COMPILATION}" ]; then
   pfail() {
     echo -e "\033[0;31m ERROR ENV VARIABLE ${1} IS NOT DEFINED \033[0m"
     unset pfail
@@ -21,8 +21,8 @@ if [ -z "${IGNORE_CAMB_COMPILATION}" ]; then
     cd $ROOTDIR
     return 1
   fi
-  if [ -z "${CAMB_NAME}" ]; then
-    pfail 'CAMB_NAME'
+  if [ -z "${CLASS_NAME}" ]; then
+    pfail 'CLASS_NAME'
     cd $ROOTDIR
     return 1
   fi
@@ -51,81 +51,70 @@ if [ -z "${IGNORE_CAMB_COMPILATION}" ]; then
     export OUT1="/dev/tty"
     export OUT2="/dev/tty"
   fi
-  
-  # ---------------------------------------------------------------------------
-  ptop2 'SETUP_CAMB'
-  ptop 'INSTALLING CAMB'
 
-  export URL="https://github.com/cmbant/CAMB"
-  export CHANGES="${ROOTDIR}/../cocoa_installation_libraries/camb_changes"
+  # ---------------------------------------------------------------------------
+  ptop2 'SETUP_CLASS'
+  ptop 'INSTALLING CLASS'
+
+  export URL="https://github.com/lesgourg/class_public.git"
+  export CHANGES="${ROOTDIR}/../cocoa_installation_libraries/class_changes"
 
   # ---------------------------------------------------------------------------
   # in case this script is called twice
   # ---------------------------------------------------------------------------
-  rm -rf $ROOTDIR/external_modules/code/$CAMB_NAME
+  rm -rf $ROOTDIR/external_modules/code/$CLASS_NAME
 
   # ---------------------------------------------------------------------------
   # clone from original repo
   # ---------------------------------------------------------------------------
   cd $ROOTDIR/external_modules/code/
 
-  $GIT clone $URL --recursive $CAMB_NAME > ${OUT1} 2> ${OUT2}
+  $GIT clone $URL --recursive $CLASS_NAME > ${OUT1} 2> ${OUT2}
   if [ $? -ne 0 ]; then
-    fail "GIT CLONE FROM CAMB REPO"
+    fail "GIT CLONE FROM CLASS REPO"
     return 1
   fi
 
-  cd $ROOTDIR/external_modules/code/$CAMB_NAME
+  cd $ROOTDIR/external_modules/code/$CLASS_NAME
 
-  $GIT checkout $CAMB_GIT_COMMIT > ${OUT1} 2> ${OUT2}
+  $GIT checkout $CLASS_GIT_COMMIT > ${OUT1} 2> ${OUT2}
   if [ $? -ne 0 ]; then
-    fail "GIT CHECKOUT CAMB"
+    fail "GIT CHECKOUT CLASS"
     return 1
   fi
   
   # ---------------------------------------------------------------------------
-  # patch CAMB to be compatible w/ COCOA
+  # patch CLASS to be compatible w/ COCOA
   # ---------------------------------------------------------------------------
-  cd $ROOTDIR/external_modules/$CAMB_NAME/camb/
-  cp $CHANGES/camb/_compilers.patch .
+  cd $ROOTDIR/external_modules/$CLASS_NAME/
+  cp $CHANGES/Makefile.patch .
   if [ $? -ne 0 ]; then
     fail "CP FILE PATCH (_compilers)"
     return 1
   fi
-  patch -u _compilers.py -i _compilers.patch > ${OUT1} 2> ${OUT2}
+  patch -u Makefile -i Makefile.patch > ${OUT1} 2> ${OUT2}
   if [ $? -ne 0 ]; then
     fail "SCRIPT FILE PATCH (_compilers)"
     return 1
   fi
 
-  cd $ROOTDIR/external_modules/$CAMB_NAME/fortran
-  cp $CHANGES/fortran/Makefile.patch .
+  cd $ROOTDIR/external_modules/$CLASS_NAME/python
+  cp $CHANGES/python/setup.patch .
   if [ $? -ne 0 ]; then
     fail "CP FILE PATCH (Makefile)"
     return 1
   fi
-  patch -u Makefile -i Makefile.patch > ${OUT1} 2> ${OUT2}
+  patch -u setup.py -i setup.patch > ${OUT1} 2> ${OUT2}
   if [ $? -ne 0 ]; then
-    fail "SCRIPT FILE PATCH (Makefile)"
+    fail "SCRIPT FILE PATCH (_compilers)"
     return 1
   fi
 
-  cd $ROOTDIR/external_modules/$CAMB_NAME/forutils
-  cp $CHANGES/forutils/Makefile_compiler.patch .
-  if [ $? -ne 0 ]; then
-    fail "CP FILE PATCH (Makefile_compiler)"
-    return 1
-  fi
-  patch -u Makefile_compiler -i Makefile_compiler.patch > ${OUT1} 2> ${OUT2}
-  if [ $? -ne 0 ]; then
-    fail "SCRIPT FILE PATCH (Makefile)"
-    return 1
-  fi
   # ----------------------------------------------------------------------------
   # ----------------------------------------------------------------------------
   unset_env_vars
-  pbottom 'INSTALLING CAMB'
-  pbottom2 'SETUP_CAMB'
+  pbottom 'INSTALLING CLASS'
+  pbottom2 'SETUP_CLASS'
 fi
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
