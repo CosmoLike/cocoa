@@ -95,24 +95,24 @@ if [ -z "${IGNORE_CLASS_COMPILATION}" ]; then
   cd $ROOTDIR/external_modules/$CLASS_NAME/
   cp $CHANGES/Makefile.patch .
   if [ $? -ne 0 ]; then
-    fail "CP FILE PATCH (_compilers)"
+    fail "CP FILE PATCH (Makefile)"
     return 1
   fi
   patch -u Makefile -i Makefile.patch > ${OUT1} 2> ${OUT2}
   if [ $? -ne 0 ]; then
-    fail "SCRIPT FILE PATCH (_compilers)"
+    fail "SCRIPT FILE PATCH (Makefile)"
     return 1
   fi
 
   cd $ROOTDIR/external_modules/$CLASS_NAME/python
   cp $CHANGES/python/setup.patch .
   if [ $? -ne 0 ]; then
-    fail "CP FILE PATCH (Makefile)"
+    fail "CP FILE PATCH (setup)"
     return 1
   fi
   patch -u setup.py -i setup.patch > ${OUT1} 2> ${OUT2}
   if [ $? -ne 0 ]; then
-    fail "SCRIPT FILE PATCH (_compilers)"
+    fail "SCRIPT FILE PATCH (setup)"
     return 1
   fi
 
