@@ -72,9 +72,22 @@ if [ -z "${IGNORE_CLASS_COMPILATION}" ]; then
   ptop2 'COMPILING CLASS'
 
   cd $ROOTDIR/external_modules/code/$CLASS_NAME/
-  
-  #Workaround Cocoa .gitignore entry on /include
+  if [ $? -ne 0 ]; then
+    fail "CD CLASS FOLDER"
+    return 1
+  fi
+
+  # ---------------------------------------------------------------------------
+  # in case this script is called twice
+  # ---------------------------------------------------------------------------  
+  rm -rf ./include
+
+  # historical: workaround Cocoa .gitignore entry on /include
   cp -r  ./include2 ./include > ${OUT1} 2> ${OUT2}
+  if [ $? -ne 0 ]; then
+    fail "CP INCLUDE2 FOLDER"
+    return 1
+  fi
 
   CC=$C_COMPILER PYTHON=$PYTHON3 make all > ${OUT1} 2> ${OUT2}
   if [ $? -ne 0 ]; then

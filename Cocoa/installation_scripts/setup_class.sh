@@ -82,6 +82,12 @@ if [ -z "${IGNORE_CLASS_COMPILATION}" ]; then
     fail "GIT CHECKOUT CLASS"
     return 1
   fi
+
+  # ---------------------------------------------------------------------------
+  # historical reasons (we used to save class_python on Cocoa Branch)
+  # historical: Workaround Cocoa .gitignore entry on /include
+  # ---------------------------------------------------------------------------
+  mv ./include ./include2/
   
   # ---------------------------------------------------------------------------
   # patch CLASS to be compatible w/ COCOA

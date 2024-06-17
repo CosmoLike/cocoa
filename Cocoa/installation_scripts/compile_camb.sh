@@ -73,7 +73,11 @@ if [ -z "${IGNORE_CAMB_COMPILATION}" ]; then
   ptop 'COMPILING CAMB'
 
   cd $ROOTDIR/external_modules/code/$CAMB_NAME/
-  
+  if [ $? -ne 0 ]; then
+    fail "CD CAMB FOLDER"
+    return 1
+  fi
+
   COMPILER=$FORTRAN_COMPILER F90C=$FORTRAN_COMPILER $PYTHON3 setup.py build > ${OUT1} 2> ${OUT2}
   if [ $? -ne 0 ]; then
     fail "PYTHON3 SETUP.PY BUILD"
