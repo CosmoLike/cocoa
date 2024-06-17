@@ -11,7 +11,6 @@ if [ -z "${IGNORE_ALL_COBAYA_INSTALLATION}" ]; then
     pfail 'ROOTDIR'
     return 1
   fi
-  fi
   if [ -z "${GIT}" ]; then
     pfail 'GIT'
     cd $ROOTDIR
@@ -30,6 +29,8 @@ if [ -z "${IGNORE_ALL_COBAYA_INSTALLATION}" ]; then
     unset PL_LL
     unset BASECL
     unset NPIPE_URL
+    unset HGL
+    unset ACTDR6_LL
     unset unset_env_vars
   }
   fail () {
@@ -57,12 +58,16 @@ if [ -z "${IGNORE_ALL_COBAYA_INSTALLATION}" ]; then
   ptop2 "UPDATING COBAYA PACKAGE"
   
   if [ -z "${IGNORE_COBAYA_INSTALLATION}" ]; then
-    echo -e '\033[1;34m''\tINSTALLING COBAYA''\033[0m'
+    ptop "INSTALLING COBAYA"
 
     #---------------------------------------------------------------------------
-    # Remove any previous installed cobaya folder
+    # Remove any previous installed cobaya folder ------------------------------
+    #---------------------------------------------------------------------------
     rm -rf $ROOTDIR/cobaya
 
+    #---------------------------------------------------------------------------
+    # Clone Cobaya from original git repo --------------------------------------
+    #---------------------------------------------------------------------------
     cd $ROOTDIR
     
     export CBURL="https://github.com/CobayaSampler/cobaya.git"
@@ -88,34 +93,57 @@ if [ -z "${IGNORE_ALL_COBAYA_INSTALLATION}" ]; then
     # Adjust Cobaya Files ------------------------------------------------------
     #---------------------------------------------------------------------------
     cp $COBAYA_COCOA/cobaya/change_python_files.sh $COBAYA/cobaya/
+    if [ $? -ne 0 ]; then
+      fail "CP CHANGE_PYTHON_FILES SCRIPT (COBAYA)"
+      return 1
+    fi
+
     cd $COBAYA/cobaya/
     sh change_python_files.sh
+    if [ $? -ne 0 ]; then
+      fail "SCRIPT CHANGE_PYTHON_FILES (COBAYA)"
+      return 1
+    fi
+
     cd $ROOTDIR
 
     #---------------------------------------------------------------------------
     # Adjust SN / STRONG LENSING -----------------------------------------------
     #---------------------------------------------------------------------------
     cp $COBAYA_COCOA/$CBLIKE/sn/roman_* $COBAYA/$CBLIKE/sn/
+    if [ $? -ne 0 ]; then
+      fail "CP ROMAN FILES (COBAYA)"
+      return 1
+    fi
+
     cp -r $COBAYA_COCOA/$CBLIKE/h0licow/ $COBAYA/$CBLIKE/
+    if [ $? -ne 0 ]; then
+      fail "CP HOLICOW LIKELIHOOD (COBAYA)"
+      return 1
+    fi
 
     #---------------------------------------------------------------------------
-    # NATIVE DES-Y1 ------------------------------------------------------------
+    # Remove native DES-Y1 cobaya likelihood -----------------------------------
     #---------------------------------------------------------------------------
-    # WE REMOVE COBAYA NATIVE DES-Y1
     rm -rf $COBAYA/$CBLIKE/des_y1
 
     #---------------------------------------------------------------------------
-    # 2015 ---------------------------------------------------------------------
+    # Remove Planck 2015 likelihood files --------------------------------------
     #---------------------------------------------------------------------------
     # WE REMOVE PLANCK 2015 DATA
     rm -rf $COBAYA/$CBLIKE/planck_2015_*
 
     #---------------------------------------------------------------------------
-    # CHANGE PLANCK CLIK -------------------------------------------------------
+    # Adjust Planck 2018 CLIK --------------------------------------------------
     #---------------------------------------------------------------------------
     export BASECL="${CBLIKE}/base_classes"
     
-    cp -r $COBAYA_COCOA/$BASECL/change_planck_clik.sh $COBAYA/$BASECL
+    cp $COBAYA_COCOA/$BASECL/change_planck_clik.sh $COBAYA/$BASECL
+    if [ $? -ne 0 ]; then
+      fail "CP CHANGE_PLANCK_CLIK SCRIPT"
+      return 1
+    fi
+
     cd $COBAYA/$BASECL/
     
     sh change_planck_clik.sh
@@ -123,12 +151,12 @@ if [ -z "${IGNORE_ALL_COBAYA_INSTALLATION}" ]; then
       fail "SCRIPT CHANGE_PLANCK_CLIK"
       return 1
     fi
-    unset BASECL
-    
+ 
+    unset BASECL   
     cd $ROOTDIR
 
     #---------------------------------------------------------------------------
-    # PLANCK 2018 LOWELL -------------------------------------------------------
+    # Adjust Planck 2018 low-ell -----------------------------------------------
     #---------------------------------------------------------------------------
     # WE REMOVE LEWIS NATIVE LIKELIHOOD 
     export PL_LWL="${CBLIKE}/planck_2018_lowl"
@@ -140,15 +168,33 @@ if [ -z "${IGNORE_ALL_COBAYA_INSTALLATION}" ]; then
 
     #WE RENAME TT/EE.py to also mean TT/EE_clik.py
     cp $COBAYA_COCOA/$PL_LWL/EE.py $COBAYA/$PL_LWL/EE.py
+    if [ $? -ne 0 ]; then
+      fail "CP PLANCK 2018 LIKELIHOOD FILES (LOW-ELL EE.PY)"
+      return 1
+    fi
+
     cp $COBAYA_COCOA/$PL_LWL/EE.yaml $COBAYA/$PL_LWL/EE.yaml
+    if [ $? -ne 0 ]; then
+      fail "CP PLANCK 2018 LIKELIHOOD FILES (LOW-ELL EE.YAML)"
+      return 1
+    fi
 
     cp $COBAYA_COCOA/$PL_LWL/TT.py $COBAYA/$PL_LWL/TT.py
+    if [ $? -ne 0 ]; then
+      fail "CP PLANCK 2018 LIKELIHOOD FILES (LOW-ELL TT.PY)"
+      return 1
+    fi
+
     cp $COBAYA_COCOA/$PL_LWL/TT.yaml $COBAYA/$PL_LWL/TT.yaml
+    if [ $? -ne 0 ]; then
+      fail "CP PLANCK 2018 LIKELIHOOD FILES (LOW-ELL TT.YAML)"
+      return 1
+    fi
 
     unset PL_LWL
     
     #---------------------------------------------------------------------------
-    # PLANCK 2018 LENSING ------------------------------------------------------
+    # Adjust Planck 2018 lensing -----------------------------------------------
     #---------------------------------------------------------------------------
     # WE REMOVE LEWIS NATIVE LIKELIHOOD
     export PL_LL="${CBLIKE}/planck_2018_lensing"
@@ -158,11 +204,15 @@ if [ -z "${IGNORE_ALL_COBAYA_INSTALLATION}" ]; then
 
     # WE COPY FIXED YAML FILE
     cp $COBAYA_COCOA/$PL_LL/clik.yaml $COBAYA/$PL_LL/clik.yaml
+    if [ $? -ne 0 ]; then
+      fail "CP PLANCK 2018 LIKELIHOOD FILES (LENSING CLIK.YAML)"
+      return 1
+    fi
 
     unset PL_LL
     
     #---------------------------------------------------------------------------
-    # HIGHELL_PLIK -------------------------------------------------------------
+    # Adjust Planck 2018 high-ell (Plik) ---------------------------------------
     #---------------------------------------------------------------------------
     # WE REMOVE UNBINNED
     export HGL="${CBLIKE}/planck_2018_highl_plik"
@@ -181,13 +231,40 @@ if [ -z "${IGNORE_ALL_COBAYA_INSTALLATION}" ]; then
 
     # FIX YAML
     cp $COBAYA_COCOA/$HGL/EE.yaml $COBAYA/$HGL/EE.yaml
+    if [ $? -ne 0 ]; then
+      fail "CP PLANCK 2018 LIKELIHOOD FILES (HIGH-ELL EE.YAML)"
+      return 1
+    fi
+
     cp $COBAYA_COCOA/$HGL/TE.yaml $COBAYA/$HGL/TE.yaml
+    if [ $? -ne 0 ]; then
+      fail "CP PLANCK 2018 LIKELIHOOD FILES (HIGH-ELL TE.YAML)"
+      return 1
+    fi
 
     cp $COBAYA_COCOA/$HGL/TT.yaml $COBAYA/$HGL/TT.yaml
+    if [ $? -ne 0 ]; then
+      fail "CP PLANCK 2018 LIKELIHOOD FILES (HIGH-ELL TT.YAML)"
+      return 1
+    fi
+
     cp $COBAYA_COCOA/$HGL/TTTEEE.yaml $COBAYA/$HGL/TTTEEE.yaml
+    if [ $? -ne 0 ]; then
+      fail "CP PLANCK 2018 LIKELIHOOD FILES (HIGH-ELL TTTEEE.YAML)"
+      return 1
+    fi
 
     cp $COBAYA_COCOA/$HGL/TT_lite.yaml $COBAYA/$HGL/TT_lite.yaml
+    if [ $? -ne 0 ]; then
+      fail "CP PLANCK 2018 LIKELIHOOD FILES (HIGH-ELL TT_LITE.YAML)"
+      return 1
+    fi
+
     cp $COBAYA_COCOA/$HGL/TTTEEE_lite.yaml $COBAYA/$HGL/TTTEEE_lite.yaml
+    if [ $? -ne 0 ]; then
+      fail "CP PLANCK 2018 LIKELIHOOD FILES (HIGH-ELL TTTEEE_LITE.YAML)"
+      return 1
+    fi
 
     unset HGL
 
@@ -195,53 +272,78 @@ if [ -z "${IGNORE_ALL_COBAYA_INSTALLATION}" ]; then
     # SPT3G Y1 -----------------------------------------------------------------
     #---------------------------------------------------------------------------
     cp -r $COBAYA_COCOA/$CBLIKE/SPT3G_Y1 $COBAYA/$CBLIKE/SPT3G_Y1
+    if [ $? -ne 0 ]; then
+      fail "CP SPT-3G Y1 LIKELIHOOD FILES"
+      return 1
+    fi
 
     #---------------------------------------------------------------------------
     # ACT DR6 LENSLIKE ---------------------------------------------------------
     #---------------------------------------------------------------------------
     export ACTDR6_LL="${CBLIKE}/act_dr6_lenslike"
+    
     cp -r $COBAYA_COCOA/$ACTDR6_LL $COBAYA/$ACTDR6_LL
+    if [ $? -ne 0 ]; then
+      fail "CP ACT-DR6 LENSING LIKELIHOOD FILES"
+      return 1
+    fi
 
     unset ACTDR6_LL
 
     #---------------------------------------------------------------------------
-    # FIX RENAMING IN CAMB -----------------------------------------------------
+    # Fix renaming parameters in CAMB ------------------------------------------
     #---------------------------------------------------------------------------
     cp $COBAYA_COCOA/$CBTH/camb/camb.yaml $COBAYA/$CBTH/camb/camb.yaml
+    if [ $? -ne 0 ]; then
+      fail "CP CAMB COBAYA THEORY FILES (CAMB.YAML)"
+      return 1
+    fi
 
     #---------------------------------------------------------------------------
     cd $ROOTDIR
-
-    echo -e '\033[1;34m''\t\e[4mINSTALLING COBAYA DONE''\033[0m'
+    pbottom "INSTALLING COBAYA"
   fi
 
   #-----------------------------------------------------------------------------
   # SO -------------------------------------------------------------------------
   #-----------------------------------------------------------------------------
+  # TODO - download from original git repo
   if [ -z "${SKIP_DECOMM_SIMONS_OBSERVATORY}" ]; then
+    ptop "INSTALLING SIMONS OBSERVATORY LIKELIHOOD"
+
     cp -r $COBAYA_COCOA/$CBLIKE/mflike $COBAYA/$CBLIKE/mflike
     cd $ROOTDIR
+
+    pbottom "INSTALLING SIMONS OBSERVATORY LIKELIHOOD"
   fi
 
-  #-------------------------------------------------------------------------------
-  # CAMSPEC ----------------------------------------------------------------------
-  #-------------------------------------------------------------------------------
+  #-----------------------------------------------------------------------------
+  # CAMSPEC --------------------------------------------------------------------
+  #-----------------------------------------------------------------------------
   if [ -z "${SKIP_DECOMM_CAMSPEC}" ]; then
+    ptop "INSTALLING CAMSPEC LIKELIHOOD"
+
     rm -rf $COBAYA/$CBLIKE/planck_2018_highl_CamSpec
     
     export BASECL="${CBLIKE}/base_classes"
     
     cp $COBAYA_COCOA/$BASECL/InstallableLikelihood.patch $COBAYA/$BASECL
+    if [ $? -ne 0 ]; then
+      fail "CP CAMSPEC BASE LIKELIHOOD INSTALLABLELIKELIHOOD PATCH"
+      return 1
+    fi 
     cd $COBAYA/$BASECL/
 
     patch -u InstallableLikelihood.py -i InstallableLikelihood.patch > ${OUT1} 2> ${OUT2}
     if [ $? -ne 0 ]; then
-      fail "PATCH LIKELIHOOD FILES (CAMSPEC)"
+      fail "PATCH CAMSPEC BASE LIKELIHOOD INSTALLABLELIKELIHOOD.PY FILE"
       return 1
     fi
 
     unset BASECL
     cd $ROOTDIR
+
+    pbottom "INSTALLING CAMSPEC LIKELIHOOD"
   else
     rm -rf $COBAYA/$CBLIKE/planck_2018_highl_CamSpec
     rm -rf $COBAYA/$CBLIKE/planck_2018_highl_CamSpec2021
@@ -252,7 +354,8 @@ if [ -z "${IGNORE_ALL_COBAYA_INSTALLATION}" ]; then
   # INSTALL HILLIPOP -----------------------------------------------------------
   #-----------------------------------------------------------------------------
   if [ -z "${SKIP_DECOMM_LIPOP}" ]; then
-    
+    ptop "INSTALLING HILLIPOP LIKELIHOOD"
+
     export PL2020="${CBLIKE}/planck_2020_hillipop"
 
     rm -rf $COBAYA/$PL2020
@@ -264,7 +367,7 @@ if [ -z "${IGNORE_ALL_COBAYA_INSTALLATION}" ]; then
 
     $GIT clone "${NPIPE_URL}/hillipop.git" hipoptmp > ${OUT1} 2> ${OUT2}
     if [ $? -ne 0 ]; then
-      fail "GIT CLONE (HILLIPOP)"
+      fail "GIT CLONE (Planck 2020 HILLIPOP)"
       return 1
     fi
 
@@ -272,31 +375,40 @@ if [ -z "${IGNORE_ALL_COBAYA_INSTALLATION}" ]; then
 
     $GIT reset --hard $HILLIPOP_GIT_COMMIT > ${OUT1} 2> ${OUT2}
     if [ $? -ne 0 ]; then
-      fail "GIT RESET (HILLIPOP)"
+      fail "GIT RESET (Planck 2020 HILLIPOP)"
       return 1
     fi
+
     mv planck_2020_hillipop/ $COBAYA/$CBLIKE
 
     # now patch the likelihood __init__ file
     cp $COBAYA_COCOA/$PL2020/init.patch $COBAYA/$PL2020
+    if [ $? -ne 0 ]; then
+      fail "CP INIT.PATCH (Planck 2020 HILLIPOP)"
+      return 1
+    fi
+
     cd $COBAYA/$PL2020
+    
     patch -u __init__.py -i init.patch > ${OUT1} 2> ${OUT2}
     if [ $? -ne 0 ]; then
-      fail "PATCH LIKELIHOOD FILES (HILLIPOP)"
+      fail "PATCH LIKELIHOOD FILES (Planck 2020 HILLIPOP)"
       return 1
     fi
 
     rm -rf $COBAYA/$CBLIKE/hipoptmp
     unset PL2020
-    
     cd $ROOTDIR
+
+    pbottom "INSTALLING HILLIPOP LIKELIHOOD"
   fi
 
   #-----------------------------------------------------------------------------
   # INSTALL LOWLLIPOP ----------------------------------------------------------
   #-----------------------------------------------------------------------------
   if [ -z "${SKIP_DECOMM_LIPOP}" ]; then
-    
+    ptop "INSTALLING LOLLIPOP LIKELIHOOD"
+
     export PL2020="${CBLIKE}/planck_2020_lollipop"
 
     rm -rf $COBAYA/$PL2020
@@ -308,34 +420,42 @@ if [ -z "${IGNORE_ALL_COBAYA_INSTALLATION}" ]; then
 
     $GIT clone "${NPIPE_URL}/lollipop.git" lipoptmp > ${OUT1} 2> ${OUT2}
     if [ $? -ne 0 ]; then
-      fail "GIT CLONE (LOLLIPOP)"
+      fail "GIT CLONE (Planck 2020 LOLLIPOP)"
       return 1
     fi
 
     cd $COBAYA/$CBLIKE/lipoptmp
     $GIT reset --hard $LOLLIPOP_GIT_COMMIT > ${OUT1} 2> ${OUT2}
     if [ $? -ne 0 ]; then
-      fail "GIT RESET (LOLLIPOP)"
+      fail "GIT RESET (Planck 2020 LOLLIPOP)"
       return 1
     fi
     mv planck_2020_lollipop/ $COBAYA/$CBLIKE
 
     # now patch the likelihood __init__ file
     cp $COBAYA_COCOA/$PL2020/init.patch $COBAYA/$PL2020
+    if [ $? -ne 0 ]; then
+      fail "CP INIT.PATCH (Planck 2020 LOLLIPOP)"
+      return 1
+    fi
+
     cd $COBAYA/$PL2020
+    
     patch -u __init__.py -i init.patch > ${OUT1} 2> ${OUT2}
     if [ $? -ne 0 ]; then
-      fail "PATCH LIKELIHOOD FILES (LOLLIPOP)"
+      fail "PATCH LIKELIHOOD FILES (Planck 2020 LOLLIPOP)"
       return 1
     fi
 
     rm -rf $COBAYA/$CBLIKE/lipoptmp
-
+    unset PL2020
     cd $ROOTDIR
+
+    pbottom "INSTALLING LOLLIPOP LIKELIHOOD"
   fi
     
-  #-------------------------------------------------------------------------------
-  #-------------------------------------------------------------------------------
+  #-----------------------------------------------------------------------------
+  #-----------------------------------------------------------------------------
   unset_env_vars
   pbottom2 "UPDATING COBAYA PACKAGE"
 fi

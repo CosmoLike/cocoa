@@ -26,11 +26,6 @@ if [ -z "${IGNORE_POLYCHORD_COMPILATION}" ]; then
     cd $ROOTDIR
     return 1
   fi
-  if [ -z "${ptop}" || -z "${ptop2}" || -z "${pbottom}" || -z "${pbottom2}" ]; then
-    pfail "PTOP/PBOTTOM"
-    cd $ROOTDIR
-    return 1
-  fi
   unset_env_vars () {
     cd $ROOTDIR
     unset OUT1
@@ -56,7 +51,7 @@ if [ -z "${IGNORE_POLYCHORD_COMPILATION}" ]; then
   fi
 
   # ---------------------------------------------------------------------------
-  ptop 'CLEANING POLYCHORD'
+  ptop2 'CLEANING POLYCHORD'
 
   rm -rf $ROOTDIR/.local/lib/python$PYTHON_VERSION/site-packages/pypolychord-*
 
@@ -72,7 +67,7 @@ if [ -z "${IGNORE_POLYCHORD_COMPILATION}" ]; then
   rm -rf ./lib/*.so
 
   unset_env_vars
-  pbottom 'CLEANING POLYCHORD'
+  pbottom2 'CLEANING POLYCHORD'
 fi
 # ----------------------------------------------------------------------------
 # ----------------------------------------------------------------------------

@@ -16,11 +16,6 @@ if [ -z "${IGNORE_ACT_COMPILATION}" ]; then
     cd $ROOTDIR
     return 1
   fi
-  if [ -z "${ptop}" || -z "${ptop2}" || -z "${pbottom}" || -z "${pbottom2}" ]; then
-    pfail "PTOP/PBOTTOM"
-    cd $ROOTDIR
-    return 1
-  fi
   unset_env_vars () {
     cd $ROOTDIR
     unset OUT1
@@ -46,7 +41,7 @@ if [ -z "${IGNORE_ACT_COMPILATION}" ]; then
   fi
 
   # --------------------------------------------------------------------------- 
-  ptop 'CLEANING ACT'
+  ptop2 'CLEANING ACT'
 
   cd $ROOTDIR/external_modules/code/pyactlike/
 
@@ -60,7 +55,7 @@ if [ -z "${IGNORE_ACT_COMPILATION}" ]; then
   fi
 
   unset_env_vars
-  pbottom 'CLEANING ACT'
+  pbottom2 'CLEANING ACT'
 fi
 # ----------------------------------------------------------------------------
 # ----------------------------------------------------------------------------

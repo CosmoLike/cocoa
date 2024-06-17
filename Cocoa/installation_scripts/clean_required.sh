@@ -10,11 +10,6 @@ if [ -z "${ROOTDIR}" ]; then
   pfail 'ROOTDIR'
   return 1
 fi
-if [ -z "${ptop}" || -z "${pbottom}" ]; then
-  pfail "PTOP/PBOTTOM"
-  cd $ROOTDIR
-  return 1
-fi
 unset_env_vars () {
   cd $ROOTDIR
   unset SETUP_PREREQUISITE_DONE
@@ -22,7 +17,7 @@ unset_env_vars () {
 }
 
 # ---------------------------------------------------------------------------
-ptop 'COCOA REQUIRED LIBRARIES'
+ptop2 'COCOA REQUIRED LIBRARIES'
 
 cd $ROOTDIR/../cocoa_installation_libraries
 
@@ -33,7 +28,7 @@ if [ $? -ne 0 ]; then
 fi
 
 unset_env_vars
-pbottom 'COCOA REQUIRED LIBRARIES'
+pbottom2 'COCOA REQUIRED LIBRARIES'
 # ----------------------------------------------------------------------------
 # ----------------------------------------------------------------------------
 # ----------------------------------------------------------------------------

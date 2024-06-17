@@ -34,11 +34,6 @@ if [ -z "${IGNORE_POLYCHORD_COMPILATION}" ]; then
     cd $ROOTDIR
     return 1
   fi
-  if [ -z "${ptop}" || -z "${ptop2}" || -z "${pbottom}" || -z "${pbottom2}" ]; then
-    pfail "PTOP/PBOTTOM"
-    cd $ROOTDIR
-    return 1
-  fi
   if [ -z "${MAKE_NUM_THREADS}" ]; then
     pfail 'MAKE_NUM_THREADS'
     cd $ROOTDIR
@@ -77,7 +72,7 @@ if [ -z "${IGNORE_POLYCHORD_COMPILATION}" ]; then
   fi
 
   # ---------------------------------------------------------------------------
-  ptop 'COMPILING POLYCHORD'
+  ptop2 'COMPILING POLYCHORD'
 
   cd $ROOTDIR/external_modules/code/$POLY_NAME/
 
@@ -101,7 +96,7 @@ if [ -z "${IGNORE_POLYCHORD_COMPILATION}" ]; then
   fi
 
   unset_env_vars
-  pbottom 'COMPILING POLYCHORD'
+  pbottom2 'COMPILING POLYCHORD'
 fi
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------

@@ -31,11 +31,6 @@ if [ -z "${IGNORE_DISTUTILS_INSTALLATION}" ]; then
     cd $ROOTDIR
     return 1
   fi
-  if [ -z "${ptop}" || -z "${ptop2}" || -z "${pbottom}" || -z "${pbottom2}" ]; then
-    pfail "PTOP/PBOTTOM"
-    cd $ROOTDIR
-    return 1
-  fi
   if [ -z "${DEBUG_DISTUTILS_PACKAGE}" ]; then
     export OUT1="/dev/null"
     export OUT2="/dev/null"

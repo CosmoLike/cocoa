@@ -88,10 +88,12 @@ wget_action() {
     fail "UNKNOWN FILE EXTENSION"
   fi
 
-  mv "${1}/" $4
-  if [ $? -ne 0 ]; then
-    fail "MV FOLDER"
-    return 1
+  if [ "${1}/" != "${4}" && "${1}" != "${4}" ]; then
+    mv "${1}/" $4
+    if [ $? -ne 0 ]; then
+      fail "MV FOLDER"
+      return 1
+    fi
   fi
 
   # Why this compress? In the old Cocoa we saved the libraries in 
@@ -133,10 +135,12 @@ git_action() {
   rm -rf ./.git/
   cd $ROOTDIR/../cocoa_installation_libraries/
 
-  mv "${1}/" $4
-  if [ $? -ne 0 ]; then
-    fail "MV FOLDER"
-    return 1
+  if [ "${1}/" != "${4}" && "${1}" != "${4}" ]; then
+    mv "${1}/" $4
+    if [ $? -ne 0 ]; then
+      fail "MV FOLDER"
+      return 1
+    fi
   fi
 
   # Why this compress? In the old Cocoa we saved the libraries in 

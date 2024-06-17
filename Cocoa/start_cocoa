@@ -17,16 +17,16 @@ function addvar () {
 }
 
 ptop() {
-  echo -e "\033[1;34m\t ${1} \033[0m"
+  echo -e "\033[1;34m\t${1} \033[0m"
 }
 pbottom() {
-  echo -e "\033[1;34m\t\e[4m ${1} DONE\033[0m"
+  echo -e "\033[1;34m\t\e[4m${1} DONE\033[0m"
 }
 ptop2() {
-  echo -e "\033[1;44m ${1} \033[0m"
+  echo -e "\033[1;44m${1} \033[0m"
 }
 pbottom2() {
-  echo -e "\033[1;44m\e[4m ${1} DONE\033[0m"
+  echo -e "\033[1;44m\e[4m${1} DONE\033[0m"
 }
 
 if [ -n "${OMP_NUM_THREADS}" ]; then

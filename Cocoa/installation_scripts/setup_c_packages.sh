@@ -73,7 +73,6 @@ if [ -z "${IGNORE_C_INSTALLATION}" ]; then
     
     if [ -z "${COCOA_FFTW_DIR}" ]; then
       pfail 'COCOA_FFTW_DIR'
-      cd $ROOTDIR
       return 1
     fi
     

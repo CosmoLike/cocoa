@@ -26,11 +26,6 @@ if [ -z "${IGNORE_POLYCHORD_COMPILATION}" ]; then
     cd $ROOTDIR
     return 1
   fi
-  if [ -z "${ptop}" || -z "${ptop2}" || -z "${pbottom}" || -z "${pbottom2}" ]; then
-    pfail "PTOP/PBOTTOM"
-    cd $ROOTDIR
-    return 1
-  fi
   unset_env_vars () {
     cd $ROOTDIR
     unset OUT1
@@ -58,7 +53,8 @@ if [ -z "${IGNORE_POLYCHORD_COMPILATION}" ]; then
   fi
   
   # ---------------------------------------------------------------------------
-  ptop 'INSTALLING POLYCHORD'
+  ptop2 'SETUP_POLYCHORD'
+  ptop  'INSTALLING POLYCHORD'
 
   export POLY_URL="https://github.com/PolyChord/PolyChordLite.git"
   export POLY_CHANGES="${ROOTDIR}/../cocoa_installation_libraries/polychord_changes"
@@ -105,8 +101,11 @@ if [ -z "${IGNORE_POLYCHORD_COMPILATION}" ]; then
     return 1
   fi
 
+  # ----------------------------------------------------------------------------
+  # ----------------------------------------------------------------------------
   unset_env_vars
   pbottom 'INSTALLING POLYCHORD'
+  pbottom2 'SETUP_POLYCHORD'
 fi
 # ----------------------------------------------------------------------------
 # ----------------------------------------------------------------------------

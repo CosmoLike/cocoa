@@ -16,11 +16,6 @@ if [ -z "${IGNORE_PLANCK_COMPILATION}" ]; then
     cd $ROOTDIR
     return 1
   fi
-  if [ -z "${ptop}" || -z "${ptop2}" || -z "${pbottom}" || -z "${pbottom2}" ]; then
-    pfail "PTOP/PBOTTOM"
-    cd $ROOTDIR
-    return 1
-  fi
   unset_env_vars () {
     cd $ROOTDIR
     unset OUT1
@@ -46,7 +41,7 @@ if [ -z "${IGNORE_PLANCK_COMPILATION}" ]; then
   fi
 
   # ---------------------------------------------------------------------------
-  ptop 'CLEANING PLANCK LIKELIHOOD'
+  ptop2 'CLEANING PLANCK LIKELIHOOD'
 
   if [ -z "${USE_SPT_CLIK_PLANCK}" ]; then
     cd $ROOTDIR/external_modules/code/planck/code/plc_3.0/plc-3.1/
@@ -75,7 +70,7 @@ if [ -z "${IGNORE_PLANCK_COMPILATION}" ]; then
   fi
 
   unset_env_vars
-  pbottom 'CLEANING PLANCK LIKELIHOOD'
+  pbottom2 'CLEANING PLANCK LIKELIHOOD'
 fi
 # ----------------------------------------------------------------------------
 # ----------------------------------------------------------------------------

@@ -34,11 +34,6 @@ if [ -z "${IGNORE_PLANCK_COMPILATION}" ]; then
     cd $ROOTDIR
     return 1
   fi
-  if [ -z "${ptop}" || -z "${ptop2}" || -z "${pbottom}" || -z "${pbottom2}" ]; then
-    pfail "PTOP/PBOTTOM"
-    cd $ROOTDIR
-    return 1
-  fi
   if [ -z "${MAKE_NUM_THREADS}" ]; then
     pfail 'MAKE_NUM_THREADS'
     cd $ROOTDIR
@@ -82,7 +77,7 @@ if [ -z "${IGNORE_PLANCK_COMPILATION}" ]; then
   fi
 
   # ---------------------------------------------------------------------------
-  ptop 'COMPILING PLANCK'
+  ptop2 'COMPILING PLANCK'
 
   if [ -z "${USE_SPT_CLIK_PLANCK}" ]; then
     cd $ROOTDIR/external_modules/code/planck/code/plc_3.0/plc-3.1/
@@ -106,7 +101,7 @@ if [ -z "${IGNORE_PLANCK_COMPILATION}" ]; then
   fi
 
   unset_env_vars
-  pbottom 'COMPILING PLANCK'
+  pbottom2 'COMPILING PLANCK'
 fi
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
