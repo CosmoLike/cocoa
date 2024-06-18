@@ -40,22 +40,22 @@ if [ -z "${IGNORE_DISTUTILS_INSTALLATION}" ]; then
     export OUT2="/dev/tty"
     export DISTUTILS_MAKE_NUM_THREADS=1
   fi
-  unset_env_vars () {
+  unset_env_vars_sbinutils () {
     cd $ROOTDIR
     unset OUT1
     unset OUT2
     unset DISTUTILS_MAKE_NUM_THREADS
     unset pfail
-    unset unset_env_vars
+    unset unset_env_vars_sbinutils
   }
-  fail () {
-    export FAILMSG="\033[0;31m (setup_binutils.sh) WE CANNOT RUN \e[3m"
-    export FAILMSG2="\033[0m"
-    echo -e "${FAILMSG} ${1} ${FAILMSG2}"
-    unset_env_vars
-    unset FAILMSG
-    unset FAILMSG2
-    unset fail
+  fail_sbinutils () {
+    export MSG="\033[0;31m (setup_binutils.sh) WE CANNOT RUN \e[3m"
+    export MSG2="\033[0m"
+    echo -e "${MSG} ${1} ${MSG2}"
+    unset_env_vars_sbinutils
+    unset MSG
+    unset MSG2
+    unset fail_sbinutils
   }
 
   ptop2 'SETUP_BINUTILS'
@@ -76,19 +76,19 @@ if [ -z "${IGNORE_DISTUTILS_INSTALLATION}" ]; then
   FC=$FORTRAN_COMPILER CC=$C_COMPILER ./configure --prefix=$ROOTDIR/.local \
     --disable-perl-xs > ${OUT1} 2> ${OUT2}
   if [ $? -ne 0 ]; then
-    fail "CONFIGURE"
+    fail_sbinutils "CONFIGURE"
     return 1
   fi
 
   make -j $DISTUTILS_MAKE_NUM_THREADS all > ${OUT1} 2> ${OUT2}
   if [ $? -ne 0 ]; then
-    fail "MAKE ALL"
+    fail_sbinutils "MAKE ALL"
     return 1
   fi
 
   make install > ${OUT1} 2> ${OUT2}
   if [ $? -ne 0 ]; then
-    fail "MAKE INSTALL"
+    fail_sbinutils "MAKE INSTALL"
     return 1
   fi
 
@@ -110,28 +110,27 @@ if [ -z "${IGNORE_DISTUTILS_INSTALLATION}" ]; then
 
   FC=$FORTRAN_COMPILER CC=$C_COMPILER ./configure --prefix=$ROOTDIR/.local > ${OUT1} 2> ${OUT2}
   if [ $? -ne 0 ]; then
-    fail "CONFIGURE"
+    fail_sbinutils "CONFIGURE"
     return 1
   fi
 
   make -j $DISTUTILS_MAKE_NUM_THREADS > ${OUT1} 2> ${OUT2}
   if [ $? -ne 0 ]; then
-    fail "MAKE"
+    fail_sbinutils "MAKE"
     return 1
   fi
 
   make install > ${OUT1} 2> ${OUT2}
   if [ $? -ne 0 ]; then
-    fail "MAKE INSTALL"
+    fail_sbinutils "MAKE INSTALL"
     return 1
   fi
 
   cd $ROOTDIR
   pbottom 'INSTALLING BINUTILS LIBRARY'
-
   # ----------------------------------------------------------------------------
   # ----------------------------------------------------------------------------
-  unset_env_vars
+  unset_env_vars_sbinutils
   pbottom2 'SETUP_BINUTILS'
 fi
 # ----------------------------------------------------------------------------

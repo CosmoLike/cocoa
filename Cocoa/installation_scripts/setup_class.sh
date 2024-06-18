@@ -26,23 +26,23 @@ if [ -z "${IGNORE_CLASS_COMPILATION}" ]; then
     cd $ROOTDIR
     return 1
   fi
-  unset_env_vars () {
+  unset_env_vars_sclass () {
     cd $ROOTDIR
     unset OUT1
     unset OUT2
     unset URL
     unset CHANGES
     unset pfail
-    unset unset_env_vars
+    unset unset_env_vars_sclass
   }
-  fail () {
-    export FAILMSG="\033[0;31m WE CANNOT RUN \e[3m"
-    export FAILMSG2="\033[0m"
-    echo -e "${FAILMSG} ${1} ${FAILMSG2}"
-    unset_env_vars
-    unset FAILMSG
-    unset FAILMSG2
-    unset fail
+  fail_sclass () {
+    export MSG="\033[0;31m (setup_class.sh) WE CANNOT RUN \e[3m"
+    export MSG2="\033[0m"
+    echo -e "${MSG} ${1} ${MSG2}"
+    unset_env_vars_sclass
+    unset MSG
+    unset MSG2
+    unset fail_sclass
   }
   if [ -z "${DEBUG_CAMB_OUTPUT}" ]; then
     export OUT1="/dev/null"
@@ -71,7 +71,7 @@ if [ -z "${IGNORE_CLASS_COMPILATION}" ]; then
 
   $GIT clone $URL --recursive $CLASS_NAME > ${OUT1} 2> ${OUT2}
   if [ $? -ne 0 ]; then
-    fail "GIT CLONE FROM CLASS REPO"
+    fail_sclass "GIT CLONE FROM CLASS REPO"
     return 1
   fi
 
@@ -79,7 +79,7 @@ if [ -z "${IGNORE_CLASS_COMPILATION}" ]; then
 
   $GIT checkout $CLASS_GIT_COMMIT > ${OUT1} 2> ${OUT2}
   if [ $? -ne 0 ]; then
-    fail "GIT CHECKOUT CLASS"
+    fail_sclass "GIT CHECKOUT CLASS"
     return 1
   fi
 
@@ -94,40 +94,41 @@ if [ -z "${IGNORE_CLASS_COMPILATION}" ]; then
   # ---------------------------------------------------------------------------
   cd $ROOTDIR/external_modules/code/$CLASS_NAME/
   if [ $? -ne 0 ]; then
-    fail "CD CLASS"
+    fail_sclass "CD CLASS"
     return 1
   fi
   cp $CHANGES/Makefile.patch .
   if [ $? -ne 0 ]; then
-    fail "CP FILE PATCH (Makefile)"
+    fail_sclass "CP FILE PATCH (Makefile)"
     return 1
   fi
   patch -u Makefile -i Makefile.patch > ${OUT1} 2> ${OUT2}
   if [ $? -ne 0 ]; then
-    fail "SCRIPT FILE PATCH (Makefile)"
+    fail_sclass "SCRIPT FILE PATCH (Makefile)"
     return 1
   fi
 
   cd $ROOTDIR/external_modules/code/$CLASS_NAME/python
   if [ $? -ne 0 ]; then
-    fail "CD CLASS PYTHON"
+    fail_sclass "CD CLASS PYTHON"
     return 1
   fi
   cp $CHANGES/python/setup.patch .
   if [ $? -ne 0 ]; then
-    fail "CP FILE PATCH (setup)"
+    fail_sclass "CP FILE PATCH (setup)"
     return 1
   fi
   patch -u setup.py -i setup.patch > ${OUT1} 2> ${OUT2}
   if [ $? -ne 0 ]; then
-    fail "SCRIPT FILE PATCH (setup)"
+    fail_sclass "SCRIPT FILE PATCH (setup)"
     return 1
   fi
 
-  # ----------------------------------------------------------------------------
-  # ----------------------------------------------------------------------------
-  unset_env_vars
+  cd $ROOTDIR
   pbottom 'INSTALLING CLASS'
+  # ----------------------------------------------------------------------------
+  # ----------------------------------------------------------------------------
+  unset_env_vars_sclass
   pbottom2 'SETUP_CLASS'
 fi
 # ------------------------------------------------------------------------------

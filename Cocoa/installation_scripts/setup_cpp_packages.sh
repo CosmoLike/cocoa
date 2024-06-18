@@ -31,22 +31,22 @@ if [ -z "${IGNORE_CPP_INSTALLATION}" ]; then
     cd $ROOTDIR
     return 1
   fi
-  unset_env_vars () {
+  unset_env_vars_scppp () {
     cd $ROOTDIR
     unset OUT1
     unset OUT2
     unset CPP_MNT
     unset pfail
-    unset unset_env_vars
+    unset unset_env_vars_scppp
   }
-  fail () {
-    export FAILMSG="\033[0;31m WE CANNOT RUN \e[3m"
-    export FAILMSG2="\033[0m"
-    echo -e "${FAILMSG} ${1} ${FAILMSG2}"
-    unset_env_vars
-    unset FAILMSG
-    unset FAILMSG2
-    unset fail
+  fail_scppp () {
+    export MSG="\033[0;31m (setup_cpp_packages.sh) WE CANNOT RUN \e[3m"
+    export MSG2="\033[0m"
+    echo -e "${MSG} ${1} ${MSG2}"
+    unset_env_vars_scppp
+    unset MSG
+    unset MSG2
+    unset fail_scppp
   }
   if [ -z "${DEBUG_CPP_PACKAGES}" ]; then
     if [ -z "${MAKE_NUM_THREADS}" ]; then
@@ -79,7 +79,7 @@ if [ -z "${IGNORE_CPP_INSTALLATION}" ]; then
 
     cd $ROOTDIR/../cocoa_installation_libraries/$COCOA_SPDLOG_DIR
     if [ $? -ne 0 ]; then
-      fail "CD COCOA_SPDLOG_DIR"
+      fail_scppp "CD COCOA_SPDLOG_DIR"
       return 1
     fi
     
@@ -90,19 +90,19 @@ if [ -z "${IGNORE_CPP_INSTALLATION}" ]; then
       -DCMAKE_CXX_COMPILER=$CXX_COMPILER \
       --log-level=ERROR . > ${OUT1} 2> ${OUT2}
     if [ $? -ne 0 ]; then
-      fail "CMAKE"
+      fail_scppp "CMAKE"
       return 1
     fi
 
     make -j $CPP_MNT > ${OUT1} 2> ${OUT2}
     if [ $? -ne 0 ]; then
-      fail "MAKE"
+      fail_scppp "MAKE"
       return 1
     fi
 
     make install > ${OUT1} 2> ${OUT2}
     if [ $? -ne 0 ]; then
-      fail "MAKE INSTALL"
+      fail_scppp "MAKE INSTALL"
       return 1
     fi
 
@@ -124,7 +124,7 @@ if [ -z "${IGNORE_CPP_INSTALLATION}" ]; then
 
     cd $ROOTDIR/../cocoa_installation_libraries/$COCOA_ARMADILLO_DIR
     if [ $? -ne 0 ]; then
-      fail "CD COCOA_ARMADILLO_DIR"
+      fail_scppp "CD COCOA_ARMADILLO_DIR"
       return 1
     fi
 
@@ -139,25 +139,25 @@ if [ -z "${IGNORE_CPP_INSTALLATION}" ]; then
       -DBLAS_FOUND=NO \
       --log-level=ERROR . > ${OUT1} 2> ${OUT2}
     if [ $? -ne 0 ]; then
-      fail "CMAKE"
+      fail_scppp "CMAKE"
       return 1
     fi
 
     make clean > ${OUT1} 2> ${OUT2}
     if [ $? -ne 0 ]; then
-      fail "MAKE CLEAN"
+      fail_scppp "MAKE CLEAN"
       return 1
     fi
 
     make -j $CPP_MNT all -Wno-dev > ${OUT1} 2> ${OUT2}
     if [ $? -ne 0 ]; then
-      fail "MAKE"
+      fail_scppp "MAKE"
       return 1
     fi
 
     make install > ${OUT1} 2> ${OUT2}
     if [ $? -ne 0 ]; then
-      fail "MAKE INSTALL"
+      fail_scppp "MAKE INSTALL"
       return 1
     fi
 
@@ -179,26 +179,26 @@ if [ -z "${IGNORE_CPP_INSTALLATION}" ]; then
 
     cd $ROOTDIR/../cocoa_installation_libraries/$COCOA_CARMA_DIR
     if [ $? -ne 0 ]; then
-      fail "CD COCOA_CARMA_DIR"
+      fail_scppp "CD COCOA_CARMA_DIR"
       return 1
     fi
 
     rm -rf $ROOTDIR/.local/include/carma/    
     mkdir $ROOTDIR/.local/include/carma/ 
     if [ $? -ne 0 ]; then
-      fail "MKDIR CARMA FOLDER"
+      fail_scppp "MKDIR CARMA FOLDER"
       return 1
     fi
 
     cp ./carma.h $ROOTDIR/.local/include/
     if [ $? -ne 0 ]; then
-      fail "CP CARMA HEADER"
+      fail_scppp "CP CARMA HEADER"
       return 1
     fi
 
     cp -r ./carma_bits $ROOTDIR/.local/include/
     if [ $? -ne 0 ]; then
-      fail "CP CARMA_BITS"
+      fail_scppp "CP CARMA_BITS"
       return 1
     fi
 
@@ -220,13 +220,13 @@ if [ -z "${IGNORE_CPP_INSTALLATION}" ]; then
 
     cd $ROOTDIR/../cocoa_installation_libraries/$COCOA_BOOST_DIR
     if [ $? -ne 0 ]; then
-      fail "CD COCOA_BOOST_DIR"
+      fail_scppp "CD COCOA_BOOST_DIR"
       return 1
     fi
 
     ./bootstrap.sh --prefix=$ROOTDIR/.local > ${OUT1} 2> ${OUT2}
     if [ $? -ne 0 ]; then
-      fail "BOOTSTRAP"
+      fail_scppp "BOOTSTRAP"
       return 1
     fi
 
@@ -234,7 +234,7 @@ if [ -z "${IGNORE_CPP_INSTALLATION}" ]; then
       --without-timer --without-mpi \
       --without-atomic > ${OUT1} 2> ${OUT2}
     if [ $? -ne 0 ]; then
-      fail "B2 INSTALL"
+      fail_scppp "B2 INSTALL"
       return 1
     fi
     
@@ -244,7 +244,7 @@ if [ -z "${IGNORE_CPP_INSTALLATION}" ]; then
 
   # ----------------------------------------------------------------------------
   # ----------------------------------------------------------------------------
-  unset unset_env_vars
+  unset_env_vars_scppp
   pbottom2 'SETUP_CPP_PACKAGES DONE'
 fi
 # ------------------------------------------------------------------------------

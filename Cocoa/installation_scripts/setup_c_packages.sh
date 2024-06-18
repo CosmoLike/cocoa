@@ -31,22 +31,22 @@ if [ -z "${IGNORE_C_INSTALLATION}" ]; then
     cd $ROOTDIR
     return 1
   fi
-  unset_env_vars () {
+  unset_env_vars_scp () {
     cd $ROOTDIR
     unset OUT1
     unset OUT2
     unset C_MNT
     unset pfail
-    unset unset_env_vars
+    unset unset_env_vars_scp
   }
-  fail () {
-    export FAILMSG="\033[0;31m WE CANNOT RUN \e[3m"
-    export FAILMSG2="\033[0m"
-    echo -e "${FAILMSG} ${1} ${FAILMSG2}"
-    unset_env_vars
-    unset FAILMSG
-    unset FAILMSG2
-    unset fail
+  fail_scp () {
+    export fail_scpMSG="\033[0;31m (setup_c_packages.sh) WE CANNOT RUN \e[3m"
+    export fail_scpMSG2="\033[0m"
+    echo -e "${fail_scpMSG} ${1} ${fail_scpMSG2}"
+    unset_env_vars_scp
+    unset fail_scpMSG
+    unset fail_scpMSG2
+    unset fail_scp
   }
   if [ -z "${DEBUG_C_PACKAGES}" ]; then
     if [ -z "${MAKE_NUM_THREADS}" ]; then
@@ -78,7 +78,7 @@ if [ -z "${IGNORE_C_INSTALLATION}" ]; then
     
     cd $ROOTDIR/../cocoa_installation_libraries/$COCOA_FFTW_DIR
     if [ $? -ne 0 ]; then
-      fail "CD COCOA_FFTW_DIR"
+      fail_scp "CD COCOA_FFTW_DIR"
       return 1
     fi
 
@@ -88,19 +88,19 @@ if [ -z "${IGNORE_C_INSTALLATION}" ]; then
       --enable-shared=yes \
       --enable-static=yes > ${OUT1} 2> ${OUT2}
     if [ $? -ne 0 ]; then
-      fail "CONFIGURE"
+      fail_scp "CONFIGURE"
       return 1
     fi
 
     make -j $C_MNT all > ${OUT1} 2> ${OUT2}
     if [ $? -ne 0 ]; then
-      fail "MAKE"
+      fail_scp "MAKE"
       return 1
     fi
 
     make install > ${OUT1} 2> ${OUT2}
     if [ $? -ne 0 ]; then
-      fail "MAKE INSTALL"
+      fail_scp "MAKE INSTALL"
       return 1
     fi
 
@@ -122,7 +122,7 @@ if [ -z "${IGNORE_C_INSTALLATION}" ]; then
 
     cd $ROOTDIR/../cocoa_installation_libraries/$COCOA_CFITSIO_DIR
     if [ $? -ne 0 ]; then
-      fail "CD COCOA_CFITSIO_DIR"
+      fail_scp "CD COCOA_CFITSIO_DIR"
       return 1
     fi
 
@@ -139,19 +139,19 @@ if [ -z "${IGNORE_C_INSTALLATION}" ]; then
       -DCMAKE_FC_COMPILER=FORTRAN_COMPILER \
       --log-level=ERROR .. > ${OUT1} 2> ${OUT2}
     if [ $? -ne 0 ]; then
-      fail "CMAKE"
+      fail_scp "CMAKE"
       return 1
     fi
 
     make -j $C_MNT all > ${OUT1} 2> ${OUT2}
     if [ $? -ne 0 ]; then
-      fail "MAKE"
+      fail_scp "MAKE"
       return 1
     fi
 
     make install > ${OUT1} 2> ${OUT2}
     if [ $? -ne 0 ]; then
-      fail "MAKE INSTALL"
+      fail_scp "MAKE INSTALL"
       return 1
     fi
 
@@ -176,7 +176,7 @@ if [ -z "${IGNORE_C_INSTALLATION}" ]; then
 
     cd $ROOTDIR/../cocoa_installation_libraries/$COCOA_GSL_DIR
     if [ $? -ne 0 ]; then
-      fail "CD COCOA_GSL_DIR"
+      fail_scp "CD COCOA_GSL_DIR"
       return 1
     fi
 
@@ -185,19 +185,19 @@ if [ -z "${IGNORE_C_INSTALLATION}" ]; then
       --enable-shared=yes \
       --enable-static=yes > ${OUT1} 2> ${OUT2}
     if [ $? -ne 0 ]; then
-      fail "CONFIGURE"
+      fail_scp "CONFIGURE"
       return 1
     fi
 
     make -j $C_MNT all > ${OUT1} 2> ${OUT2}
     if [ $? -ne 0 ]; then
-      fail "MAKE"
+      fail_scp "MAKE"
       return 1
     fi
 
     make install > ${OUT1} 2> ${OUT2}
     if [ $? -ne 0 ]; then
-      fail "MAKE INSTALL"
+      fail_scp "MAKE INSTALL"
       return 1
     fi
 
@@ -207,8 +207,7 @@ if [ -z "${IGNORE_C_INSTALLATION}" ]; then
 
   # ----------------------------------------------------------------------------
   # ----------------------------------------------------------------------------
-  cd $ROOTDIR
-  unset_env_vars
+  unset_env_vars_scp
   pbottom2 'SETUP_C_PACKAGES DONE'
 fi
 
@@ -221,19 +220,19 @@ if [ -z "${IGNORE_ALL_PIP_INSTALLATION}" ]; then
     cd $ROOTDIR
     return 1
   fi
-  unset_env_vars () {
+  unset_env_vars_scp_eemul2 () {
     cd $ROOTDIR
     unset OUT1
     unset OUT2
   }
-  fail () {
-    export FAILMSG="\033[0;31m WE CANNOT RUN \e[3m"
-    export FAILMSG2="\033[0m"
-    echo -e "${FAILMSG} ${1} ${FAILMSG2}"
-    unset_env_vars
-    unset FAILMSG
-    unset FAILMSG2
-    unset fail
+  fail_scp () {
+    export MSG="\033[0;31m (setup_c_packages.sh / euclidemul2) WE CANNOT RUN \e[3m"
+    export MSG2="\033[0m"
+    echo -e "${MSG} ${1} ${MSG2}"
+    unset_env_vars_scp_eemul2
+    unset MSG
+    unset MSG2
+    unset fail_scp
   }
   if [ -z "${DEBUG_PIP_PACKAGES}" ]; then
     export OUT1="/dev/null"
@@ -246,17 +245,19 @@ if [ -z "${IGNORE_ALL_PIP_INSTALLATION}" ]; then
   ptop2 'INSTALLING EUCLIDEMU2 DONE'
 
   # WE MIGRATED euclidemu2 TO setup_c_packages SCRIPT BECAUSE IT DEPENDS ON GSL-GNU LIB
-  env CXX=$CXX_COMPILER CC=$C_COMPILER  $PIP3 install --global-option=build_ext \
+  env CXX=$CXX_COMPILER CC=$C_COMPILER $PIP3 install --global-option=build_ext \
     $ROOTDIR/../cocoa_installation_libraries/euclidemu2-1.2.0 \
     --no-dependencies \
     --prefix=$ROOTDIR/.local --no-index > ${OUT1} 2> ${OUT2}
   if [ $? -ne 0 ]; then
-    fail "PIP INSTALL EUCLUDEMUL2"
+    fail_scp "PIP INSTALL EUCLUDEMUL2"
     return 1
   fi
 
   cd $ROOTDIR
-  unset_env_vars
+  # ----------------------------------------------------------------------------
+  # ----------------------------------------------------------------------------
+  unset_env_vars_scp_eemul2
   pbottom2 'INSTALLING EUCLIDEMU2 DONE'
 fi
 # ------------------------------------------------------------------------------
