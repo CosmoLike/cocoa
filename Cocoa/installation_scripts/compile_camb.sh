@@ -70,7 +70,7 @@ if [ -z "${IGNORE_CAMB_COMPILATION}" ]; then
   fi
   
   # --------------------------------------------------------------------------- 
-  ptop 'COMPILING CAMB'
+  ptop2 'COMPILING CAMB'
 
   cd $ROOTDIR/external_modules/code/$CAMB_NAME/
   if [ $? -ne 0 ]; then
@@ -85,7 +85,7 @@ if [ -z "${IGNORE_CAMB_COMPILATION}" ]; then
   fi
 
   unset_env_vars
-  pbottom 'COMPILING CAMB'
+  pbottom2 'COMPILING CAMB'
 fi
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
