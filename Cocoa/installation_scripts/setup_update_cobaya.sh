@@ -16,7 +16,7 @@ if [ -z "${IGNORE_ALL_COBAYA_INSTALLATION}" ]; then
     cd $ROOTDIR
     return 1
   fi
-  unset_env_vars () {
+  unset_env_vars_ucob () {
     cd $ROOTDIR
     unset COBAYA
     unset COBAYA_COCOA
@@ -31,16 +31,16 @@ if [ -z "${IGNORE_ALL_COBAYA_INSTALLATION}" ]; then
     unset NPIPE_URL
     unset HGL
     unset ACTDR6_LL
-    unset unset_env_vars
+    unset unset_env_vars_ucob
   }
-  fail () {
-    export FAILMSG="\033[0;31m WE CANNOT RUN \e[3m"
-    export FAILMSG2="\033[0m"
-    echo -e "${FAILMSG} ${1} ${FAILMSG2}"
-    unset_env_vars
-    unset FAILMSG
-    unset FAILMSG2
-    unset fail
+  fail_ucob () {
+    export MSG="\033[0;31m (setup_update_cobaya.sh) WE CANNOT RUN \e[3m"
+    export MSG2="\033[0m"
+    echo -e "${MSG} ${1} ${MSG2}"
+    unset_env_vars_ucob
+    unset MSG
+    unset MSG2
+    unset fail_ucob_ucob
   }
   if [ -z "${DEBUG_PIP_OUTPUT}" ]; then
     export OUT1="/dev/null"
@@ -74,7 +74,7 @@ if [ -z "${IGNORE_ALL_COBAYA_INSTALLATION}" ]; then
 
     $GIT clone $CBURL cobaya > ${OUT1} 2> ${OUT2}
     if [ $? -ne 0 ]; then
-      fail "GIT CLONE"
+      fail_ucob "GIT CLONE"
       return 1
     fi
     unset CBURL
@@ -83,7 +83,7 @@ if [ -z "${IGNORE_ALL_COBAYA_INSTALLATION}" ]; then
 
     $GIT reset --hard $COBAYA_GIT_COMMIT > ${OUT1} 2> ${OUT2}
     if [ $? -ne 0 ]; then
-      fail "GIT CHECKOUT"
+      fail_ucob "GIT CHECKOUT"
       return 1
     fi
 
@@ -94,14 +94,14 @@ if [ -z "${IGNORE_ALL_COBAYA_INSTALLATION}" ]; then
     #---------------------------------------------------------------------------
     cp $COBAYA_COCOA/cobaya/change_python_files.sh $COBAYA/cobaya/
     if [ $? -ne 0 ]; then
-      fail "CP CHANGE_PYTHON_FILES SCRIPT (COBAYA)"
+      fail_ucob "CP CHANGE_PYTHON_FILES SCRIPT (COBAYA)"
       return 1
     fi
 
     cd $COBAYA/cobaya/
     sh change_python_files.sh
     if [ $? -ne 0 ]; then
-      fail "SCRIPT CHANGE_PYTHON_FILES (COBAYA)"
+      fail_ucob "SCRIPT CHANGE_PYTHON_FILES (COBAYA)"
       return 1
     fi
 
@@ -112,13 +112,13 @@ if [ -z "${IGNORE_ALL_COBAYA_INSTALLATION}" ]; then
     #---------------------------------------------------------------------------
     cp $COBAYA_COCOA/$CBLIKE/sn/roman_* $COBAYA/$CBLIKE/sn/
     if [ $? -ne 0 ]; then
-      fail "CP ROMAN FILES (COBAYA)"
+      fail_ucob "CP ROMAN FILES (COBAYA)"
       return 1
     fi
 
     cp -r $COBAYA_COCOA/$CBLIKE/h0licow/ $COBAYA/$CBLIKE/
     if [ $? -ne 0 ]; then
-      fail "CP HOLICOW LIKELIHOOD (COBAYA)"
+      fail_ucob "CP HOLICOW LIKELIHOOD (COBAYA)"
       return 1
     fi
 
@@ -140,7 +140,7 @@ if [ -z "${IGNORE_ALL_COBAYA_INSTALLATION}" ]; then
     
     cp $COBAYA_COCOA/$BASECL/change_planck_clik.sh $COBAYA/$BASECL
     if [ $? -ne 0 ]; then
-      fail "CP CHANGE_PLANCK_CLIK SCRIPT"
+      fail_ucob "CP CHANGE_PLANCK_CLIK SCRIPT"
       return 1
     fi
 
@@ -148,7 +148,7 @@ if [ -z "${IGNORE_ALL_COBAYA_INSTALLATION}" ]; then
     
     sh change_planck_clik.sh
     if [ $? -ne 0 ]; then
-      fail "SCRIPT CHANGE_PLANCK_CLIK"
+      fail_ucob "SCRIPT CHANGE_PLANCK_CLIK"
       return 1
     fi
  
@@ -169,25 +169,25 @@ if [ -z "${IGNORE_ALL_COBAYA_INSTALLATION}" ]; then
     #WE RENAME TT/EE.py to also mean TT/EE_clik.py
     cp $COBAYA_COCOA/$PL_LWL/EE.py $COBAYA/$PL_LWL/EE.py
     if [ $? -ne 0 ]; then
-      fail "CP PLANCK 2018 LIKELIHOOD FILES (LOW-ELL EE.PY)"
+      fail_ucob "CP PLANCK 2018 LIKELIHOOD FILES (LOW-ELL EE.PY)"
       return 1
     fi
 
     cp $COBAYA_COCOA/$PL_LWL/EE.yaml $COBAYA/$PL_LWL/EE.yaml
     if [ $? -ne 0 ]; then
-      fail "CP PLANCK 2018 LIKELIHOOD FILES (LOW-ELL EE.YAML)"
+      fail_ucob "CP PLANCK 2018 LIKELIHOOD FILES (LOW-ELL EE.YAML)"
       return 1
     fi
 
     cp $COBAYA_COCOA/$PL_LWL/TT.py $COBAYA/$PL_LWL/TT.py
     if [ $? -ne 0 ]; then
-      fail "CP PLANCK 2018 LIKELIHOOD FILES (LOW-ELL TT.PY)"
+      fail_ucob "CP PLANCK 2018 LIKELIHOOD FILES (LOW-ELL TT.PY)"
       return 1
     fi
 
     cp $COBAYA_COCOA/$PL_LWL/TT.yaml $COBAYA/$PL_LWL/TT.yaml
     if [ $? -ne 0 ]; then
-      fail "CP PLANCK 2018 LIKELIHOOD FILES (LOW-ELL TT.YAML)"
+      fail_ucob "CP PLANCK 2018 LIKELIHOOD FILES (LOW-ELL TT.YAML)"
       return 1
     fi
 
@@ -205,7 +205,7 @@ if [ -z "${IGNORE_ALL_COBAYA_INSTALLATION}" ]; then
     # WE COPY FIXED YAML FILE
     cp $COBAYA_COCOA/$PL_LL/clik.yaml $COBAYA/$PL_LL/clik.yaml
     if [ $? -ne 0 ]; then
-      fail "CP PLANCK 2018 LIKELIHOOD FILES (LENSING CLIK.YAML)"
+      fail_ucob "CP PLANCK 2018 LIKELIHOOD FILES (LENSING CLIK.YAML)"
       return 1
     fi
 
@@ -232,37 +232,37 @@ if [ -z "${IGNORE_ALL_COBAYA_INSTALLATION}" ]; then
     # FIX YAML
     cp $COBAYA_COCOA/$HGL/EE.yaml $COBAYA/$HGL/EE.yaml
     if [ $? -ne 0 ]; then
-      fail "CP PLANCK 2018 LIKELIHOOD FILES (HIGH-ELL EE.YAML)"
+      fail_ucob "CP PLANCK 2018 LIKELIHOOD FILES (HIGH-ELL EE.YAML)"
       return 1
     fi
 
     cp $COBAYA_COCOA/$HGL/TE.yaml $COBAYA/$HGL/TE.yaml
     if [ $? -ne 0 ]; then
-      fail "CP PLANCK 2018 LIKELIHOOD FILES (HIGH-ELL TE.YAML)"
+      fail_ucob "CP PLANCK 2018 LIKELIHOOD FILES (HIGH-ELL TE.YAML)"
       return 1
     fi
 
     cp $COBAYA_COCOA/$HGL/TT.yaml $COBAYA/$HGL/TT.yaml
     if [ $? -ne 0 ]; then
-      fail "CP PLANCK 2018 LIKELIHOOD FILES (HIGH-ELL TT.YAML)"
+      fail_ucob "CP PLANCK 2018 LIKELIHOOD FILES (HIGH-ELL TT.YAML)"
       return 1
     fi
 
     cp $COBAYA_COCOA/$HGL/TTTEEE.yaml $COBAYA/$HGL/TTTEEE.yaml
     if [ $? -ne 0 ]; then
-      fail "CP PLANCK 2018 LIKELIHOOD FILES (HIGH-ELL TTTEEE.YAML)"
+      fail_ucob "CP PLANCK 2018 LIKELIHOOD FILES (HIGH-ELL TTTEEE.YAML)"
       return 1
     fi
 
     cp $COBAYA_COCOA/$HGL/TT_lite.yaml $COBAYA/$HGL/TT_lite.yaml
     if [ $? -ne 0 ]; then
-      fail "CP PLANCK 2018 LIKELIHOOD FILES (HIGH-ELL TT_LITE.YAML)"
+      fail_ucob "CP PLANCK 2018 LIKELIHOOD FILES (HIGH-ELL TT_LITE.YAML)"
       return 1
     fi
 
     cp $COBAYA_COCOA/$HGL/TTTEEE_lite.yaml $COBAYA/$HGL/TTTEEE_lite.yaml
     if [ $? -ne 0 ]; then
-      fail "CP PLANCK 2018 LIKELIHOOD FILES (HIGH-ELL TTTEEE_LITE.YAML)"
+      fail_ucob "CP PLANCK 2018 LIKELIHOOD FILES (HIGH-ELL TTTEEE_LITE.YAML)"
       return 1
     fi
 
@@ -273,7 +273,7 @@ if [ -z "${IGNORE_ALL_COBAYA_INSTALLATION}" ]; then
     #---------------------------------------------------------------------------
     cp -r $COBAYA_COCOA/$CBLIKE/SPT3G_Y1 $COBAYA/$CBLIKE/SPT3G_Y1
     if [ $? -ne 0 ]; then
-      fail "CP SPT-3G Y1 LIKELIHOOD FILES"
+      fail_ucob "CP SPT-3G Y1 LIKELIHOOD FILES"
       return 1
     fi
 
@@ -284,7 +284,7 @@ if [ -z "${IGNORE_ALL_COBAYA_INSTALLATION}" ]; then
     
     cp -r $COBAYA_COCOA/$ACTDR6_LL $COBAYA/$ACTDR6_LL
     if [ $? -ne 0 ]; then
-      fail "CP ACT-DR6 LENSING LIKELIHOOD FILES"
+      fail_ucob "CP ACT-DR6 LENSING LIKELIHOOD FILES"
       return 1
     fi
 
@@ -295,7 +295,7 @@ if [ -z "${IGNORE_ALL_COBAYA_INSTALLATION}" ]; then
     #---------------------------------------------------------------------------
     cp $COBAYA_COCOA/$CBTH/camb/camb.yaml $COBAYA/$CBTH/camb/camb.yaml
     if [ $? -ne 0 ]; then
-      fail "CP CAMB COBAYA THEORY FILES (CAMB.YAML)"
+      fail_ucob "CP CAMB COBAYA THEORY FILES (CAMB.YAML)"
       return 1
     fi
 
@@ -329,14 +329,14 @@ if [ -z "${IGNORE_ALL_COBAYA_INSTALLATION}" ]; then
     
     cp $COBAYA_COCOA/$BASECL/InstallableLikelihood.patch $COBAYA/$BASECL
     if [ $? -ne 0 ]; then
-      fail "CP CAMSPEC BASE LIKELIHOOD INSTALLABLELIKELIHOOD PATCH"
+      fail_ucob "CP CAMSPEC BASE LIKELIHOOD INSTALLABLELIKELIHOOD PATCH"
       return 1
     fi 
     cd $COBAYA/$BASECL/
 
     patch -u InstallableLikelihood.py -i InstallableLikelihood.patch > ${OUT1} 2> ${OUT2}
     if [ $? -ne 0 ]; then
-      fail "PATCH CAMSPEC BASE LIKELIHOOD INSTALLABLELIKELIHOOD.PY FILE"
+      fail_ucob "PATCH CAMSPEC BASE LIKELIHOOD INSTALLABLELIKELIHOOD.PY FILE"
       return 1
     fi
 
@@ -367,7 +367,7 @@ if [ -z "${IGNORE_ALL_COBAYA_INSTALLATION}" ]; then
 
     $GIT clone "${NPIPE_URL}/hillipop.git" hipoptmp > ${OUT1} 2> ${OUT2}
     if [ $? -ne 0 ]; then
-      fail "GIT CLONE (Planck 2020 HILLIPOP)"
+      fail_ucob "GIT CLONE (Planck 2020 HILLIPOP)"
       return 1
     fi
 
@@ -375,7 +375,7 @@ if [ -z "${IGNORE_ALL_COBAYA_INSTALLATION}" ]; then
 
     $GIT reset --hard $HILLIPOP_GIT_COMMIT > ${OUT1} 2> ${OUT2}
     if [ $? -ne 0 ]; then
-      fail "GIT RESET (Planck 2020 HILLIPOP)"
+      fail_ucob "GIT RESET (Planck 2020 HILLIPOP)"
       return 1
     fi
 
@@ -384,7 +384,7 @@ if [ -z "${IGNORE_ALL_COBAYA_INSTALLATION}" ]; then
     # now patch the likelihood __init__ file
     cp $COBAYA_COCOA/$PL2020/init.patch $COBAYA/$PL2020
     if [ $? -ne 0 ]; then
-      fail "CP INIT.PATCH (Planck 2020 HILLIPOP)"
+      fail_ucob "CP INIT.PATCH (Planck 2020 HILLIPOP)"
       return 1
     fi
 
@@ -392,7 +392,7 @@ if [ -z "${IGNORE_ALL_COBAYA_INSTALLATION}" ]; then
     
     patch -u __init__.py -i init.patch > ${OUT1} 2> ${OUT2}
     if [ $? -ne 0 ]; then
-      fail "PATCH LIKELIHOOD FILES (Planck 2020 HILLIPOP)"
+      fail_ucob "PATCH LIKELIHOOD FILES (Planck 2020 HILLIPOP)"
       return 1
     fi
 
@@ -420,14 +420,14 @@ if [ -z "${IGNORE_ALL_COBAYA_INSTALLATION}" ]; then
 
     $GIT clone "${NPIPE_URL}/lollipop.git" lipoptmp > ${OUT1} 2> ${OUT2}
     if [ $? -ne 0 ]; then
-      fail "GIT CLONE (Planck 2020 LOLLIPOP)"
+      fail_ucob "GIT CLONE (Planck 2020 LOLLIPOP)"
       return 1
     fi
 
     cd $COBAYA/$CBLIKE/lipoptmp
     $GIT reset --hard $LOLLIPOP_GIT_COMMIT > ${OUT1} 2> ${OUT2}
     if [ $? -ne 0 ]; then
-      fail "GIT RESET (Planck 2020 LOLLIPOP)"
+      fail_ucob "GIT RESET (Planck 2020 LOLLIPOP)"
       return 1
     fi
     mv planck_2020_lollipop/ $COBAYA/$CBLIKE
@@ -435,7 +435,7 @@ if [ -z "${IGNORE_ALL_COBAYA_INSTALLATION}" ]; then
     # now patch the likelihood __init__ file
     cp $COBAYA_COCOA/$PL2020/init.patch $COBAYA/$PL2020
     if [ $? -ne 0 ]; then
-      fail "CP INIT.PATCH (Planck 2020 LOLLIPOP)"
+      fail_ucob "CP INIT.PATCH (Planck 2020 LOLLIPOP)"
       return 1
     fi
 
@@ -443,7 +443,7 @@ if [ -z "${IGNORE_ALL_COBAYA_INSTALLATION}" ]; then
     
     patch -u __init__.py -i init.patch > ${OUT1} 2> ${OUT2}
     if [ $? -ne 0 ]; then
-      fail "PATCH LIKELIHOOD FILES (Planck 2020 LOLLIPOP)"
+      fail_ucob "PATCH LIKELIHOOD FILES (Planck 2020 LOLLIPOP)"
       return 1
     fi
 
@@ -456,7 +456,7 @@ if [ -z "${IGNORE_ALL_COBAYA_INSTALLATION}" ]; then
     
   #-----------------------------------------------------------------------------
   #-----------------------------------------------------------------------------
-  unset_env_vars
+  unset_env_vars_ucob
   pbottom2 "UPDATING COBAYA PACKAGE"
 fi
 #-------------------------------------------------------------------------------

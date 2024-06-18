@@ -21,28 +21,23 @@ if [ -z "${IGNORE_POLYCHORD_COMPILATION}" ]; then
     cd $ROOTDIR
     return 1
   fi
-  if [ -z "${POLY_NAME}" ]; then
-    pfail 'POLY_NAME'
-    cd $ROOTDIR
-    return 1
-  fi
-  unset_env_vars () {
+  unset_env_vars_spoly () {
     cd $ROOTDIR
     unset OUT1
     unset OUT2
     unset POLY_URL
     unset POLY_CHANGES
     unset pfail
-    unset unset_env_vars
+    unset unset_env_vars_spoly
   }
-  fail () {
-    export FAILMSG="\033[0;31m WE CANNOT RUN \e[3m"
-    export FAILMSG2="\033[0m"
-    echo -e "${FAILMSG} ${1} ${FAILMSG2}"  
-    unset_env_vars
-    unset FAILMSG
-    unset FAILMSG2
-    unset fail
+  fail_spoly () {
+    export MSG="\033[0;31m (setup_polychord.sh) WE CANNOT RUN \e[3m"
+    export MSG2="\033[0m"
+    echo -e "${MSG} ${1} ${MSG2}"  
+    unset_env_vars_spoly
+    unset MSG
+    unset MSG2
+    unset fail_spoly
   }
   if [ -z "${DEBUG_POLY_OUTPUT}" ]; then
     export OUT1="/dev/null"
@@ -51,10 +46,18 @@ if [ -z "${IGNORE_POLYCHORD_COMPILATION}" ]; then
     export OUT1="/dev/tty"
     export OUT2="/dev/tty"
   fi
-  
-  # ---------------------------------------------------------------------------
+
   ptop2 'SETUP_POLYCHORD'
+
+  # ---------------------------------------------------------------------------
+  # ---------------------------------------------------------------------------
   ptop  'INSTALLING POLYCHORD'
+
+  if [ -z "${POLY_NAME}" ]; then
+    pfail 'POLY_NAME'
+    cd $ROOTDIR
+    return 1
+  fi
 
   export POLY_URL="https://github.com/PolyChord/PolyChordLite.git"
   export POLY_CHANGES="${ROOTDIR}/../cocoa_installation_libraries/polychord_changes"
@@ -65,7 +68,7 @@ if [ -z "${IGNORE_POLYCHORD_COMPILATION}" ]; then
 
   $GIT clone $POLY_URL $POLY_NAME > ${OUT1} 2> ${OUT2}
   if [ $? -ne 0 ]; then
-    fail "GIT CLONE"
+    fail_spoly "GIT CLONE"
     return 1
   fi
 
@@ -73,38 +76,39 @@ if [ -z "${IGNORE_POLYCHORD_COMPILATION}" ]; then
 
   $GIT checkout $POLYCHORD_GIT_COMMIT > ${OUT1} 2> ${OUT2}
   if [ $? -ne 0 ]; then
-    fail "GIT CHECKOUT"
+    fail_spoly "GIT CHECKOUT"
     return 1
   fi
 
   cp $POLY_CHANGES/Makefile.patch .
   if [ $? -ne 0 ]; then
-    fail "CP FILE PATCH (MAKEFILE)"
+    fail_spoly "CP FILE PATCH (MAKEFILE)"
     return 1
   fi
 
   patch -u Makefile -i Makefile.patch > ${OUT1} 2> ${OUT2}
   if [ $? -ne 0 ]; then
-    fail "PATCH FILE (MAKEFILE)"
+    fail_spoly "PATCH FILE (MAKEFILE)"
     return 1
   fi
 
   cp $POLY_CHANGES/setup.patch .
   if [ $? -ne 0 ]; then
-    fail "CP FILE PATCH (SETUP)"
+    fail_spoly "CP FILE PATCH (SETUP)"
     return 1
   fi
 
   patch -u setup.py -i setup.patch > ${OUT1} 2> ${OUT2}
   if [ $? -ne 0 ]; then
-    fail "PATCH FILE (SETUP)"
+    fail_spoly "PATCH FILE (SETUP)"
     return 1
   fi
 
-  # ----------------------------------------------------------------------------
-  # ----------------------------------------------------------------------------
-  unset_env_vars
+  cd $ROOTDIR
   pbottom 'INSTALLING POLYCHORD'
+  # ----------------------------------------------------------------------------
+  # ----------------------------------------------------------------------------
+  unset_env_vars_spoly
   pbottom2 'SETUP_POLYCHORD'
 fi
 # ----------------------------------------------------------------------------

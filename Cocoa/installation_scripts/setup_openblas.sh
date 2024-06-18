@@ -80,7 +80,7 @@ if [ -z "${IGNORE_OPENBLAS_INSTALLATION}" ]; then
 
   make CC=$C_COMPILER FC=$FORTRAN_COMPILER USE_OPENMP=1 > ${OUT1} 2> ${OUT2}
   if [ $? -ne 0 ]; then
-    fail_sopb "MAKE INSTALL"
+    fail_sopb "MAKE"
     return 1
   fi
 
