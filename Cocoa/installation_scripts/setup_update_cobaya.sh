@@ -40,7 +40,7 @@ if [ -z "${IGNORE_ALL_COBAYA_INSTALLATION}" ]; then
     unset_env_vars_ucob
     unset MSG
     unset MSG2
-    unset fail_ucob_ucob
+    unset fail_ucob
   }
   if [ -z "${DEBUG_PIP_OUTPUT}" ]; then
     export OUT1="/dev/null"

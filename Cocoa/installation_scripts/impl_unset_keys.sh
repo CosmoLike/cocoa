@@ -207,3 +207,4 @@ unset OUT2
 unset URL
 unset CHANGES 
 unset CLASS_NAME
+unset fail_sdf
