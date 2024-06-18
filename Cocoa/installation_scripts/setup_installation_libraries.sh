@@ -88,7 +88,7 @@ wget_action() {
     fail "UNKNOWN FILE EXTENSION"
   fi
 
-  if [ "${1}/" != "${4}" && "${1}" != "${4}" ]; then
+  if [ "${1}/" != "${4}" ] && [ "${1}" != "${4}" ]; then
     mv "${1}/" $4
     if [ $? -ne 0 ]; then
       fail "MV FOLDER"
@@ -135,7 +135,7 @@ git_action() {
   rm -rf ./.git/
   cd $ROOTDIR/../cocoa_installation_libraries/
 
-  if [ "${1}/" != "${4}" && "${1}" != "${4}" ]; then
+  if [ "${1}/" != "${4}" ] && [ "${1}" != "${4}" ]; then
     mv "${1}/" $4
     if [ $? -ne 0 ]; then
       fail "MV FOLDER"

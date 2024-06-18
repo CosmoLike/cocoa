@@ -12,11 +12,11 @@ if [ -z "${SKIP_DECOMM_LIPOP}" ]; then
       return
   fi
   if [ -z "${DEBUG_UNXV_CLEAN_ALL}" ]; then
-    export OUT_UNXV_1="/dev/null"
-    export OUT_UNXV_2="/dev/null"
+    export OUT1="/dev/null"
+    export OUT2="/dev/null"
   else
-    export OUT_UNXV_1="/dev/tty"
-    export OUT_UNXV_2="/dev/tty"
+    export OUT1="/dev/tty"
+    export OUT2="/dev/tty"
   fi
 
   cd $ROOTDIR/external_modules/data
@@ -39,103 +39,103 @@ if [ -z "${SKIP_DECOMM_LIPOP}" ]; then
   
   export PL2020_URL="https://portal.nersc.gov/cfs/cmb/planck2020/likelihoods/planck_2020"
 
-  wget "${PL2020_URL}_hillipop_EE_v${LPVS}.tar.gz" > ${OUT_UNXV_1} 2> ${OUT_UNXV_2}
+  wget "${PL2020_URL}_hillipop_EE_v${LPVS}.tar.gz" > ${OUT1} 2> ${OUT2}
   if [ $? -ne 0 ]; then 
     echo -e '\033[0;31m'"\t\t DECOMPRESSING EE HILLIPOP FAILED"'\033[0m'
     cd $ROOTDIR
-    unset OUT_UNXV_1
-    unset OUT_UNXV_2
+    unset OUT1
+    unset OUT2
     unset PL2020_URL
     unset PLK_DIR
     unset LPVS
     return 1
   fi
 
-  tar -xvzf planck_2020_hillipop_EE_v$LPVS.tar.gz > ${OUT_UNXV_1} 2> ${OUT_UNXV_2}
+  tar -xvzf planck_2020_hillipop_EE_v$LPVS.tar.gz > ${OUT1} 2> ${OUT2}
   if [ $? -ne 0 ]; then
     echo -e '\033[0;31m'"\t\t DECOMPRESSING EE HILLIPOP FAILED"'\033[0m'
     cd $ROOTDIR
-    unset OUT_UNXV_1
-    unset OUT_UNXV_2
+    unset OUT1
+    unset OUT2
     unset PL2020_URL
     unset PLK_DIR
     unset LPVS
     return 1
   fi
   
-  wget "${PL2020_URL}_hillipop_TE_v${LPVS}.tar.gz" > ${OUT_UNXV_1} 2> ${OUT_UNXV_2}
+  wget "${PL2020_URL}_hillipop_TE_v${LPVS}.tar.gz" > ${OUT1} 2> ${OUT2}
   if [ $? -ne 0 ]; then 
     echo -e '\033[0;31m'"\t\t DECOMPRESSING TE HILLIPOP FAILED"'\033[0m'
     cd $ROOTDIR
-    unset OUT_UNXV_1
-    unset OUT_UNXV_2
+    unset OUT1
+    unset OUT2
     unset PL2020_URL
     unset PLK_DIR
     unset LPVS
     return 1
   fi
 
-  tar -xvzf planck_2020_hillipop_TE_v$LPVS.tar.gz > ${OUT_UNXV_1} 2> ${OUT_UNXV_2}
+  tar -xvzf planck_2020_hillipop_TE_v$LPVS.tar.gz > ${OUT1} 2> ${OUT2}
   if [ $? -ne 0 ]; then
     echo -e '\033[0;31m'"\t\t DECOMPRESSING TE HILLIPOP FAILED"'\033[0m'
     cd $ROOTDIR
-    unset OUT_UNXV_1
-    unset OUT_UNXV_2
+    unset OUT1
+    unset OUT2
     unset PL2020_URL
     unset PLK_DIR
     unset LPVS
     return 1
   fi
 
-  wget "${PL2020_URL}_hillipop_TTTEEE_v${LPVS}.tar.gz" > ${OUT_UNXV_1} 2> ${OUT_UNXV_2}
+  wget "${PL2020_URL}_hillipop_TTTEEE_v${LPVS}.tar.gz" > ${OUT1} 2> ${OUT2}
   if [ $? -ne 0 ]; then 
     echo -e '\033[0;31m'"\t\t DECOMPRESSING TTTEEE HILLIPOP FAILED"'\033[0m'
     cd $ROOTDIR
-    unset OUT_UNXV_1
-    unset OUT_UNXV_2
+    unset OUT1
+    unset OUT2
     unset PL2020_URL
     unset PLK_DIR
     unset LPVS
     return 1
   fi
 
-  tar -xvzf planck_2020_hillipop_TTTEEE_v$LPVS.tar.gz > ${OUT_UNXV_1} 2> ${OUT_UNXV_2}
+  tar -xvzf planck_2020_hillipop_TTTEEE_v$LPVS.tar.gz > ${OUT1} 2> ${OUT2}
   if [ $? -ne 0 ]; then
     echo -e '\033[0;31m'"\t\t DECOMPRESSING TTTEEE HILLIPOP FAILED"'\033[0m'
     cd $ROOTDIR
-    unset OUT_UNXV_1
-    unset OUT_UNXV_2
+    unset OUT1
+    unset OUT2
     unset PL2020_URL
     unset PLK_DIR
     unset LPVS
     return 1
   fi
 
-  wget "${PL2020_URL}_hillipop_TT_v${LPVS}.tar.gz" > ${OUT_UNXV_1} 2> ${OUT_UNXV_2}
+  wget "${PL2020_URL}_hillipop_TT_v${LPVS}.tar.gz" > ${OUT1} 2> ${OUT2}
   if [ $? -ne 0 ]; then 
     echo -e '\033[0;31m'"\t\t DECOMPRESSING TT HILLIPOP FAILED"'\033[0m'
     cd $ROOTDIR
-    unset OUT_UNXV_1
-    unset OUT_UNXV_2
+    unset OUT1
+    unset OUT2
     unset PL2020_URL
     unset PLK_DIR
     unset LPVS
     return 1
   fi
 
-  tar -xvzf planck_2020_hillipop_TT_v$LPVS.tar.gz > ${OUT_UNXV_1} 2> ${OUT_UNXV_2}
+  tar -xvzf planck_2020_hillipop_TT_v$LPVS.tar.gz > ${OUT1} 2> ${OUT2}
   if [ $? -ne 0 ]; then
     echo -e '\033[0;31m'"\t\t DECOMPRESSING TT HILLIPOP FAILED"'\033[0m'
     cd $ROOTDIR
-    unset OUT_UNXV_1
-    unset OUT_UNXV_2
+    unset OUT1
+    unset OUT2
     unset PL2020_URL
     unset PLK_DIR
     unset LPVS
     return 1
   fi
 
-  wget "${PL2020_URL}_lollipop.tar.gz" > ${OUT_UNXV_1} 2> ${OUT_UNXV_2}
+  wget "${PL2020_URL}_lollipop.tar.gz" > ${OUT1} 2> ${OUT2}
   if [ $? -ne 0 ]; then 
     echo -e '\033[0;31m'"\t\t DECOMPRESSING LOLLIPOP FAILED"'\033[0m'
     cd $ROOTDIR
@@ -145,12 +145,12 @@ if [ -z "${SKIP_DECOMM_LIPOP}" ]; then
     return 1
   fi
 
-  tar -xvzf planck_2020_lollipop.tar.gz > ${OUT_UNXV_1} 2> ${OUT_UNXV_2}
+  tar -xvzf planck_2020_lollipop.tar.gz > ${OUT1} 2> ${OUT2}
   if [ $? -ne 0 ]; then
     echo -e '\033[0;31m'"\t\t DECOMPRESSING LOLLIPOP FAILED"'\033[0m'
     cd $ROOTDIR
-    unset OUT_UNXV_1
-    unset OUT_UNXV_2
+    unset OUT1
+    unset OUT2
     unset PL2020_URL
     unset PLK_DIR
     unset LPVS
@@ -168,8 +168,8 @@ if [ -z "${SKIP_DECOMM_LIPOP}" ]; then
   rm -rf "${PLK_DIR}/planck_2020"
 
   cd $ROOTDIR/
-  unset OUT_UNXV_1
-  unset OUT_UNXV_2
+  unset OUT1
+  unset OUT2
   unset PL2020_URL
   unset PLK_DIR
   unset LPVS

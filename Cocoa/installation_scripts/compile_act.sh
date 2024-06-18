@@ -39,23 +39,22 @@ if [ -z "${IGNORE_ACT_COMPILATION}" ]; then
     cd $ROOTDIR
     return 1
   fi
-  unset_env_vars () {
+  unset_env_vars_compile_class () {
     cd $ROOTDIR
     unset OUT1
     unset OUT2
     unset pfail
-    unset unset_env_vars
+    unset unset_env_vars_compile_class
   }
-  fail () {
-    export FAILMSG="\033[0;31m WE CANNOT RUN \e[3m"
-    export FAILMSG2="\033[0m"
-    echo -e "${FAILMSG} ${1} ${FAILMSG2}"
-    unset_env_vars
-    unset FAILMSG
-    unset FAILMSG2
-    unset fail
+  fail_comp_class () {
+    export MSG="\033[0;31m (compile_act.sh) WE CANNOT RUN \e[3m"
+    export MSG2="\033[0m"
+    echo -e "${MSG} ${1} ${MSG2}"
+    unset_env_vars_compile_class
+    unset MSG
+    unset MSG2
+    unset fail_comp_class
   }
-
   if [ -z "${DEBUG_ACT_OUTPUT}" ]; then
     export OUT1="/dev/null"
     export OUT2="/dev/null"
@@ -65,18 +64,18 @@ if [ -z "${IGNORE_ACT_COMPILATION}" ]; then
   fi
 
   # ---------------------------------------------------------------------------  
-  ptop2 'COMPILING ACT'
+  ptop 'COMPILING ACT'
 
   cd $ROOTDIR/external_modules/code/pyactlike/
  
   $PIP3 install . --prefix=$ROOTDIR/.local > ${OUT1} 2> ${OUT2}
   if [ $? -ne 0 ]; then
-    fail "PIP3 INSTALL ."
+    fail_comp_class "PIP3 INSTALL ."
     return 1
   fi
 
-  unset_env_vars
-  pbottom2 'COMPILING ACT'
+  unset_env_vars_compile_class
+  pbottom 'COMPILING ACT'
 fi
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------

@@ -16,21 +16,21 @@ if [ -z "${IGNORE_ACT_COMPILATION}" ]; then
     cd $ROOTDIR
     return 1
   fi
-  unset_env_vars () {
+  unset_env_vars_clean_act () {
     cd $ROOTDIR
     unset OUT1
     unset OUT2
     unset pfail
-    unset unset_env_vars
+    unset unset_env_vars_clean_act
   }
-  fail () {
-    export FAILMSG="\033[0;31m WE CANNOT RUN \e[3m"
-    export FAILMSG2="\033[0m"
-    echo -e "${FAILMSG} ${1} ${FAILMSG2}"
-    unset_env_vars
-    unset FAILMSG
-    unset FAILMSG2
-    unset fail
+  fail_clean_act () {
+    export MSG="\033[0;31m (clean_act.sh) WE CANNOT RUN \e[3m"
+    export MSG2="\033[0m"
+    echo -e "${MSG} ${1} ${MSG2}"
+    unset_env_vars_clean_act
+    unset MSG
+    unset MSG2
+    unset fail_clean_act
   }
   if [ -z "${DEBUG_ACT_OUTPUT}" ]; then
     export OUT1="/dev/null"
@@ -41,7 +41,7 @@ if [ -z "${IGNORE_ACT_COMPILATION}" ]; then
   fi
 
   # --------------------------------------------------------------------------- 
-  ptop2 'CLEANING ACT'
+  ptop 'CLEANING ACT'
 
   cd $ROOTDIR/external_modules/code/pyactlike/
 
@@ -50,12 +50,12 @@ if [ -z "${IGNORE_ACT_COMPILATION}" ]; then
 
   $PYTHON3 setup.py clean > ${OUT1} 2> ${OUT2}
   if [ $? -ne 0 ]; then
-    fail "PYTHON SETUP CLEAN"
+    fail_clean_act "PYTHON SETUP CLEAN"
     return 1
   fi
 
-  unset_env_vars
-  pbottom2 'CLEANING ACT'
+  unset_env_vars_clean_act
+  pbottom 'CLEANING ACT'
 fi
 # ----------------------------------------------------------------------------
 # ----------------------------------------------------------------------------

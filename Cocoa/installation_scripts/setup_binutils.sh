@@ -49,7 +49,7 @@ if [ -z "${IGNORE_DISTUTILS_INSTALLATION}" ]; then
     unset unset_env_vars
   }
   fail () {
-    export FAILMSG="\033[0;31m WE CANNOT RUN \e[3m"
+    export FAILMSG="\033[0;31m (setup_binutils.sh) WE CANNOT RUN \e[3m"
     export FAILMSG2="\033[0m"
     echo -e "${FAILMSG} ${1} ${FAILMSG2}"
     unset_env_vars

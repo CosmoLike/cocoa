@@ -18,9 +18,14 @@ vpath .base build
 ########################################################
 
 # your C compiler:
-CC       = gcc
+#VM BEGINS
+#COCOA BEGINS
+#CC       = gcc
+CC       ?= $(C_COMPILER)
 #CC       = icc
 #CC       = pgcc
+#COCOA ENDS
+#VM ENDS
 
 # your tool for creating static libraries:
 AR        = ar rv
@@ -30,7 +35,9 @@ AR        = ar rv
 # substitute python3 to python in the line below, or you can simply
 # add a compilation option on the terminal command line:
 # "PYTHON=python3 make all" (Thanks to Marius Millea for python3 compatibility)
-PYTHON ?= python
+# VM BEGINS
+PYTHON ?= $(CONDA_DIR)/bin/python
+#VM ENDS
 
 # your optimization flag
 OPTFLAG = -O3
@@ -195,7 +202,7 @@ ifdef OMPFLAG
 else
 	grep -v "lgomp" python/setup.py > python/autosetup.py
 endif
-	cd python; export CC=$(CC); $(PYTHON) autosetup.py install || $(PYTHON) autosetup.py install --user
+	cd python; export CC=$(CC); $(PYTHON) autosetup.py install || CC=$(CC) $(PYTHON) autosetup.py install --user
 	rm python/autosetup.py
 
 clean: .base

@@ -44,22 +44,22 @@ if [ -z "${IGNORE_CAMB_COMPILATION}" ]; then
     cd $ROOTDIR
     return 1
   fi
-  unset_env_vars () {
+  unset_env_vars_comp_camb () {
     cd $ROOTDIR
     unset OUT1
     unset OUT2
     unset CAMB_NAME
     unset pfail
-    unset unset_env_vars
+    unset unset_env_vars_comp_camb
   }
-  fail () {
-    export FAILMSG="\033[0;31m WE CANNOT RUN \e[3m"
-    export FAILMSG2="\033[0m"
-    echo -e "${FAILMSG} ${1} ${FAILMSG2}"
-    unset_env_vars
-    unset FAILMSG
-    unset FAILMSG2
-    unset fail
+  fail_comp_camb () {
+    export MSG="\033[0;31m (compile_camb.sh) WE CANNOT RUN \e[3m"
+    export MSG2="\033[0m"
+    echo -e "${MSG} ${1} ${MSG2}"
+    unset_env_vars_comp_camb
+    unset MSG
+    unset MSG2
+    unset fail_comp_camb
   }
   if [ -z "${DEBUG_CAMB_OUTPUT}" ]; then
     export OUT1="/dev/null"
@@ -70,22 +70,22 @@ if [ -z "${IGNORE_CAMB_COMPILATION}" ]; then
   fi
   
   # --------------------------------------------------------------------------- 
-  ptop2 'COMPILING CAMB'
+  ptop 'COMPILING CAMB'
 
   cd $ROOTDIR/external_modules/code/$CAMB_NAME/
   if [ $? -ne 0 ]; then
-    fail "CD CAMB FOLDER"
+    fail_comp_camb "CD CAMB FOLDER"
     return 1
   fi
 
   COMPILER=$FORTRAN_COMPILER F90C=$FORTRAN_COMPILER $PYTHON3 setup.py build > ${OUT1} 2> ${OUT2}
   if [ $? -ne 0 ]; then
-    fail "PYTHON3 SETUP.PY BUILD"
+    fail_comp_camb "PYTHON3 SETUP.PY BUILD"
     return 1
   fi
 
-  unset_env_vars
-  pbottom2 'COMPILING CAMB'
+  unset_env_vars_comp_camb
+  pbottom 'COMPILING CAMB'
 fi
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------

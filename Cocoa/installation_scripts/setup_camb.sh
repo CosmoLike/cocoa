@@ -86,7 +86,7 @@ if [ -z "${IGNORE_CAMB_COMPILATION}" ]; then
   # ---------------------------------------------------------------------------
   # patch CAMB to be compatible w/ COCOA
   # ---------------------------------------------------------------------------
-  cd $ROOTDIR/external_modules/$CAMB_NAME/camb/
+  cd $ROOTDIR/external_modules/code/$CAMB_NAME/camb/
   cp $CHANGES/camb/_compilers.patch .
   if [ $? -ne 0 ]; then
     fail "CP FILE PATCH (_compilers)"
@@ -98,7 +98,7 @@ if [ -z "${IGNORE_CAMB_COMPILATION}" ]; then
     return 1
   fi
 
-  cd $ROOTDIR/external_modules/$CAMB_NAME/fortran
+  cd $ROOTDIR/external_modules/code/$CAMB_NAME/fortran
   cp $CHANGES/fortran/Makefile.patch .
   if [ $? -ne 0 ]; then
     fail "CP FILE PATCH (Makefile)"
@@ -110,7 +110,7 @@ if [ -z "${IGNORE_CAMB_COMPILATION}" ]; then
     return 1
   fi
 
-  cd $ROOTDIR/external_modules/$CAMB_NAME/forutils
+  cd $ROOTDIR/external_modules/code/$CAMB_NAME/forutils
   cp $CHANGES/forutils/Makefile_compiler.patch .
   if [ $? -ne 0 ]; then
     fail "CP FILE PATCH (Makefile_compiler)"

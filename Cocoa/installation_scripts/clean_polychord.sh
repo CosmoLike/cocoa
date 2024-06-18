@@ -26,21 +26,21 @@ if [ -z "${IGNORE_POLYCHORD_COMPILATION}" ]; then
     cd $ROOTDIR
     return 1
   fi
-  unset_env_vars () {
+  unset_env_vars_clean_poly () {
     cd $ROOTDIR
     unset OUT1
     unset OUT2
     unset pfail
-    unset unset_env_vars
+    unset unset_env_vars_clean_poly
   }
-  fail () {
-    export FAILMSG="\033[0;31m WE CANNOT RUN \e[3m"
-    export FAILMSG2="\033[0m"
-    echo -e "${FAILMSG} ${1} ${FAILMSG2}"
-    unset_env_vars
-    unset FAILMSG
-    unset FAILMSG2
-    unset fail
+  fail_clean_poly () {
+    export MSG="\033[0;31m (clean_polychord.sh) WE CANNOT RUN \e[3m"
+    export MSG2="\033[0m"
+    echo -e "${MSG} ${1} ${MSG2}"
+    unset_env_vars_clean_poly
+    unset MSG
+    unset MSG2
+    unset fail_clean_poly
   }
   if [ -z "${DEBUG_POLY_OUTPUT}" ]; then
     export OUT1="/dev/null"
@@ -51,7 +51,7 @@ if [ -z "${IGNORE_POLYCHORD_COMPILATION}" ]; then
   fi
 
   # ---------------------------------------------------------------------------
-  ptop2 'CLEANING POLYCHORD'
+  ptop 'CLEANING POLYCHORD'
 
   rm -rf $ROOTDIR/.local/lib/python$PYTHON_VERSION/site-packages/pypolychord-*
 
@@ -59,15 +59,15 @@ if [ -z "${IGNORE_POLYCHORD_COMPILATION}" ]; then
 
   make clean > ${OUT1} 2> ${OUT2}
   if [ $? -ne 0 ]; then
-    fail "MAKE CLEAN"
+    fail_clean_poly "MAKE CLEAN"
     return 1
   fi
 
   rm -rf ./lib/*.a
   rm -rf ./lib/*.so
 
-  unset_env_vars
-  pbottom2 'CLEANING POLYCHORD'
+  unset_env_vars_clean_poly
+  pbottom 'CLEANING POLYCHORD'
 fi
 # ----------------------------------------------------------------------------
 # ----------------------------------------------------------------------------

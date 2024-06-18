@@ -39,23 +39,23 @@ if [ -z "${IGNORE_PLANCK_COMPILATION}" ]; then
     cd $ROOTDIR
     return 1
   fi
-  unset_env_vars () {
+  unset_env_vars_comp_pl () {
     cd $ROOTDIR
     unset OUT1
     unset OUT2
     unset pfail
     unset CLIK_LAPALIBS
     unset CLIK_CFITSLIBS
-    unset unset_env_vars
+    unset unset_env_vars_comp_pl
   }
-  fail () {
-    export FAILMSG="\033[0;31m WE CANNOT RUN \e[3m"
-    export FAILMSG2="\033[0m"
-    echo -e "${FAILMSG} ${1} ${FAILMSG2}"
-    unset_env_vars
-    unset FAILMSG
-    unset FAILMSG2
-    unset fail
+  fail_comp_pl () {
+    export MSG="\033[0;31m (compile_planck.sh) WE CANNOT RUN \e[3m"
+    export MSG2="\033[0m"
+    echo -e "${MSG} ${1} ${MSG2}"
+    unset_env_vars_comp_pl
+    unset MSG
+    unset MSG2
+    unset fail_comp_pl
   }
   if [ -z "${DEBUG_PLANCK_OUTPUT}" ]; then
     export OUT1="/dev/null"
@@ -69,7 +69,6 @@ if [ -z "${IGNORE_PLANCK_COMPILATION}" ]; then
   else
     export CLIK_CFITSLIBS=$GLOBAL_PACKAGES_LOCATION
   fi
-  
   if [ -z "${IGNORE_FORTRAN_INSTALLATION}" ]; then
     export CLIK_LAPALIBS=$ROOTDIR/.local
   else
@@ -77,7 +76,7 @@ if [ -z "${IGNORE_PLANCK_COMPILATION}" ]; then
   fi
 
   # ---------------------------------------------------------------------------
-  ptop2 'COMPILING PLANCK'
+  ptop 'COMPILING PLANCK'
 
   if [ -z "${USE_SPT_CLIK_PLANCK}" ]; then
     cd $ROOTDIR/external_modules/code/planck/code/plc_3.0/plc-3.1/
@@ -90,18 +89,18 @@ if [ -z "${IGNORE_PLANCK_COMPILATION}" ]; then
     --lapack_prefix=${CLIK_LAPALIBS} --cfitsio_lib=${CLIK_CFITSLIBS} \
     --python=${PYTHON3} > ${OUT1} 2> ${OUT2}
   if [ $? -ne 0 ]; then
-    fail "WAF CONFIGURE"
+    fail_comp_pl "WAF CONFIGURE"
     return 1
   fi
   
   $PYTHON3 waf install -v > ${OUT1} 2> ${OUT2}
   if [ $? -ne 0 ]; then
-    fail "WAF INSTALL"
+    fail_comp_pl "WAF INSTALL"
     return 1
   fi
 
-  unset_env_vars
-  pbottom2 'COMPILING PLANCK'
+  unset_env_vars_comp_pl
+  pbottom 'COMPILING PLANCK'
 fi
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------

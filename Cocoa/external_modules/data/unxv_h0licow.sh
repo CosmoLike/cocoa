@@ -17,11 +17,11 @@ if [ -z "${SKIP_DECOMM_STRONG_LENSING}" ]; then
       return
   fi
   if [ -z "${DEBUG_UNXV_CLEAN_ALL}" ]; then
-    export OUT_UNXV_1="/dev/null"
-    export OUT_UNXV_2="/dev/null"
+    export OUT1="/dev/null"
+    export OUT2="/dev/null"
   else
-    export OUT_UNXV_1="/dev/tty"
-    export OUT_UNXV_2="/dev/tty"
+    export OUT1="/dev/tty"
+    export OUT2="/dev/tty"
   fi
 
   cd $ROOTDIR/external_modules/data
@@ -36,24 +36,24 @@ if [ -z "${SKIP_DECOMM_STRONG_LENSING}" ]; then
   #-----------------------------------------------------------------------------
   #-----------------------------------------------------------------------------
 
-  git clone $HOLIURL holicow_tmp > ${OUT_UNXV_1} 2> ${OUT_UNXV_2}
+  git clone $HOLIURL holicow_tmp > ${OUT1} 2> ${OUT2}
   if [ $? -ne 0 ]; then
     echo -e '\033[0;31m'"\t\t DECOMPRESSING H0LICOW DATA FAILED"'\033[0m'
     cd $ROOTDIR
-    unset OUT_UNXV_1
-    unset OUT_UNXV_2
+    unset OUT1
+    unset OUT2
     unset HOLIURL
     return 1
   fi
 
   cd $ROOTDIR/external_modules/data/holicow_tmp
 
-  git checkout $HOLICOW_DATA_GIT_COMMIT > ${OUT_UNXV_1} 2> ${OUT_UNXV_2}
+  git checkout $HOLICOW_DATA_GIT_COMMIT > ${OUT1} 2> ${OUT2}
   if [ $? -ne 0 ]; then
     echo -e '\033[0;31m'"\t\t DECOMPRESSING H0LICOW DATA FAILED"'\033[0m'
     cd $ROOTDIR
-    unset OUT_UNXV_1
-    unset OUT_UNXV_2
+    unset OUT1
+    unset OUT2
     unset HOLIURL
     return 1
   fi
@@ -63,8 +63,8 @@ if [ -z "${SKIP_DECOMM_STRONG_LENSING}" ]; then
   rm -rf $ROOTDIR/external_modules/data/holicow_tmp
 
   cd $ROOTDIR/
-  unset OUT_UNXV_1
-  unset OUT_UNXV_2
+  unset OUT1
+  unset OUT2
   unset HOLIURL
   echo -e '\033[0;32m'"\t\t DECOMPRESSING H0LICOW DATA DONE"'\033[0m'
 fi

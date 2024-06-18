@@ -21,26 +21,21 @@ if [ -z "${IGNORE_CLASS_COMPILATION}" ]; then
     cd $ROOTDIR
     return 1
   fi
-  if [ -z "${ptop}" || -z "${ptop2}" || -z "${pbottom}" || -z "${pbottom2}" ]; then
-    pfail "PTOP/PBOTTOM"
-    cd $ROOTDIR
-    return 1
-  fi
-  unset_env_vars () {
+  unset_env_vars_clean_class () {
     cd $ROOTDIR
     unset OUT1
     unset OUT2
     unset pfail
-    unset unset_env_vars
+    unset unset_env_vars_clean_class
   }
-  fail () {
-    export FAILMSG="\033[0;31m WE CANNOT RUN \e[3m"
-    export FAILMSG2="\033[0m"
-    echo -e "${FAILMSG} ${1} ${FAILMSG2}"
-    unset_env_vars
-    unset FAILMSG
-    unset FAILMSG2
-    unset fail
+  fail_clean_class () {
+    export MSG="\033[0;31m (clean_class.sh) WE CANNOT RUN \e[3m"
+    export MSG2="\033[0m"
+    echo -e "${MSG} ${1} ${MSG2}"
+    unset_env_vars_clean_class
+    unset MSG
+    unset MSG2
+    unset fail_clean_class
   }
   if [ -z "${DEBUG_CLASS_OUTPUT}" ]; then
     export OUT1="/dev/null"
@@ -55,31 +50,32 @@ if [ -z "${IGNORE_CLASS_COMPILATION}" ]; then
 
   cd $ROOTDIR/external_modules/code/$CLASS_NAME/
 
-  rm $ROOTDIR/.local/lib/python$PYTHON_VERSION/site-packages/classy*
-
-  #Workaround Cocoa .gitignore entry on /include
-  rm -rf ./include > ${OUT1} 2> ${OUT2}
+  rm -rf $ROOTDIR/.local/lib/python$PYTHON_VERSION/site-packages/classy*
 
   make clean > ${OUT1} 2> ${OUT2}
   if [ $? -ne 0 ]; then
-    fail "MAKE CLEAN"
+    fail_clean_class "MAKE CLEAN"
     return 1
   fi
 
   rm -f class
 
   cd ./python
-
   $PYTHON3 setup.py clean > ${OUT1} 2> ${OUT2}
   if [ $? -ne 0 ]; then
-    fail "PYTHON SETUP CLEAN"
+    fail_clean_class "PYTHON SETUP CLEAN"
     return 1
   fi
+
+  # ---------------------------------------------------------------------------
+  # Historical Workaround Cocoa .gitignore entry on /include
+  # ---------------------------------------------------------------------------
+  rm -rf ./include 
 
   rm -rf ./build/
   rm -rf ./classy.egg-info
 
-  unset_env_vars
+  unset_env_vars_clean_class
   pbottom 'CLEANING CLASS'
 fi
 # ----------------------------------------------------------------------------

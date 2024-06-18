@@ -44,21 +44,21 @@ if [ -z "${IGNORE_CLASS_COMPILATION}" ]; then
     cd $ROOTDIR
     return 1
   fi
-  unset_env_vars () {
+  unset_env_vars_comp_class () {
     cd $ROOTDIR
     unset OUT1
     unset OUT2
     unset pfail
-    unset unset_env_vars
+    unset unset_env_vars_comp_class
   }
-  fail () {
-    export FAILMSG="\033[0;31m WE CANNOT RUN \e[3m"
-    export FAILMSG2="\033[0m"
-    echo -e "${FAILMSG} ${1} ${FAILMSG2}"
-    unset_env_vars
-    unset FAILMSG
-    unset FAILMSG2
-    unset fail
+  fail_comp_class () {
+    export MSG="\033[0;31m (compile_class.sh) WE CANNOT RUN \e[3m"
+    export MSG2="\033[0m"
+    echo -e "${MSG} ${1} ${MSG2}"
+    unset_env_vars_comp_class
+    unset MSG
+    unset MSG2
+    unset fail_comp_class
   }
   if [ -z "${DEBUG_CLASS_OUTPUT}" ]; then
     export OUT1="/dev/null"
@@ -69,29 +69,34 @@ if [ -z "${IGNORE_CLASS_COMPILATION}" ]; then
   fi
 
   # ---------------------------------------------------------------------------
-  ptop2 'COMPILING CLASS'
+  ptop 'COMPILING CLASS'
 
   cd $ROOTDIR/external_modules/code/$CLASS_NAME/
   if [ $? -ne 0 ]; then
-    fail "CD CLASS FOLDER"
+    fail_comp_class "CD CLASS FOLDER"
     return 1
   fi
 
   # ---------------------------------------------------------------------------
+  # historical: workaround Cocoa .gitignore entry on /include 
+  # also good because class compilation changes files on /include
   # in case this script is called twice
   # ---------------------------------------------------------------------------  
   rm -rf ./include
 
+  # ---------------------------------------------------------------------------
   # historical: workaround Cocoa .gitignore entry on /include
+  # also good because class compilation changes files on /include
+  # ---------------------------------------------------------------------------
   cp -r  ./include2 ./include > ${OUT1} 2> ${OUT2}
   if [ $? -ne 0 ]; then
-    fail "CP INCLUDE2 FOLDER"
+    fail_comp_class "CP INCLUDE2 FOLDER"
     return 1
   fi
 
   CC=$C_COMPILER PYTHON=$PYTHON3 make all > ${OUT1} 2> ${OUT2}
   if [ $? -ne 0 ]; then
-    fail "MAKE ALL"
+    fail_comp_class "MAKE ALL"
     return 1
   fi
    
@@ -99,12 +104,12 @@ if [ -z "${IGNORE_CLASS_COMPILATION}" ]; then
 
   CC=$C_COMPILER $PYTHON3 setup.py build > ${OUT1} 2> ${OUT2}
   if [ $? -ne 0 ]; then
-    fail "PYTHON3 SETUP.PY BUILD"
+    fail_comp_class "PYTHON3 SETUP.PY BUILD"
     return 1
   fi
 
-  unset_env_vars
-  pbottom2 'COMPILING CLASS'
+  unset_env_vars_comp_class
+  pbottom 'COMPILING CLASS'
 fi
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------

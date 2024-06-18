@@ -92,7 +92,11 @@ if [ -z "${IGNORE_CLASS_COMPILATION}" ]; then
   # ---------------------------------------------------------------------------
   # patch CLASS to be compatible w/ COCOA
   # ---------------------------------------------------------------------------
-  cd $ROOTDIR/external_modules/$CLASS_NAME/
+  cd $ROOTDIR/external_modules/code/$CLASS_NAME/
+  if [ $? -ne 0 ]; then
+    fail "CD CLASS"
+    return 1
+  fi
   cp $CHANGES/Makefile.patch .
   if [ $? -ne 0 ]; then
     fail "CP FILE PATCH (Makefile)"
@@ -104,7 +108,11 @@ if [ -z "${IGNORE_CLASS_COMPILATION}" ]; then
     return 1
   fi
 
-  cd $ROOTDIR/external_modules/$CLASS_NAME/python
+  cd $ROOTDIR/external_modules/code/$CLASS_NAME/python
+  if [ $? -ne 0 ]; then
+    fail "CD CLASS PYTHON"
+    return 1
+  fi
   cp $CHANGES/python/setup.patch .
   if [ $? -ne 0 ]; then
     fail "CP FILE PATCH (setup)"

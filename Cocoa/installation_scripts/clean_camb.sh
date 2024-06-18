@@ -21,21 +21,21 @@ if [ -z "${IGNORE_CAMB_COMPILATION}" ]; then
     cd $ROOTDIR
     return 1
   fi
-  unset_env_vars () {
+  unset_env_vars_clean_camb () {
     cd $ROOTDIR
     unset OUT1
     unset OUT2
     unset pfail
-    unset unset_env_vars
+    unset unset_env_vars_clean_camb
   }
-  fail () {
-    export FAILMSG="\033[0;31m WE CANNOT RUN \e[3m"
-    export FAILMSG2="\033[0m"
-    echo -e "${FAILMSG} ${1} ${FAILMSG2}"
-    unset_env_vars
-    unset FAILMSG
-    unset FAILMSG2
-    unset fail
+  fail_clean_camb () {
+    export MSG="\033[0;31m (clean_camb.sh) WE CANNOT RUN \e[3m"
+    export MSG2="\033[0m"
+    echo -e "${MSG} ${1} ${MSG2}"
+    unset_env_vars_clean_camb
+    unset MSG
+    unset MSG2
+    unset fail_clean_camb
   }
   if [ -z "${DEBUG_CAMB_OUTPUT}" ]; then
     export OUT1="/dev/null"
@@ -46,7 +46,7 @@ if [ -z "${IGNORE_CAMB_COMPILATION}" ]; then
   fi
 
   # ---------------------------------------------------------------------------
-  ptop2 'CLEANING CAMB'
+  ptop 'CLEANING CAMB'
 
   cd $ROOTDIR/external_modules/code/$CAMB_NAME/
 
@@ -60,12 +60,12 @@ if [ -z "${IGNORE_CAMB_COMPILATION}" ]; then
 
   $PYTHON3 setup.py clean > ${OUT1} 2> ${OUT2}
   if [ $? -ne 0 ]; then
-    fail "PYTHON SETUP CLEAN"
+    fail_clean_camb "PYTHON SETUP CLEAN"
     return 1
   fi
 
-  unset_env_vars
-  pbottom2 'CLEANING CAMB'
+  unset_env_vars_clean_camb
+  pbottom 'CLEANING CAMB'
 fi
 # ----------------------------------------------------------------------------
 # ----------------------------------------------------------------------------
