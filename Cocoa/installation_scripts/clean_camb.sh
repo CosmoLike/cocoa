@@ -8,8 +8,7 @@ if [ -z "${IGNORE_CAMB_COMPILATION}" ]; then
     unset pfail
   }
   if [ -z "${ROOTDIR}" ]; then
-    pfail 'ROOTDIR'
-    return 1
+    pfail 'ROOTDIR'; return 1
   fi
   cdroot() {
     cd "${ROOTDIR}" 2>"/dev/null" || { echo -e \
@@ -17,21 +16,17 @@ if [ -z "${IGNORE_CAMB_COMPILATION}" ]; then
     unset cdroot
   }
   if [ -z "${PYTHON3}" ]; then
-    pfail "PYTHON3"
-    cdroot
-    return 1
+    pfail "PYTHON3"; cdroot; return 1
   fi
   if [ -z "${CAMB_NAME}" ]; then
-    pfail 'CAMB_NAME'
-    cdroot
-    return 1
+    pfail 'CAMB_NAME'; cdroot; return 1
   fi
   unset_env_vars_clean_camb () {
     unset OUT1
     unset OUT2
     unset pfail
     unset unset_env_vars_clean_camb
-    cdroot
+    cdroot || return 1;
   }
   fail_clean_camb () {
     local MSG="\033[0;31m\t\t (clean_camb.sh) WE CANNOT RUN \e[3m"

@@ -4,7 +4,7 @@
 # ----------------------------------------------------------------------------
 if [ -z "${IGNORE_ACT_COMPILATION}" ]; then
   pfail() {
-    echo -e "\033[0;31m ERROR ENV VARIABLE ${1} IS NOT DEFINED \033[0m"
+    echo -e "\033[0;31m\t\t ERROR ENV VARIABLE ${1} IS NOT DEFINED \033[0m"
     unset pfail
   }
   if [ -z "${ROOTDIR}" ]; then
@@ -18,13 +18,11 @@ if [ -z "${IGNORE_ACT_COMPILATION}" ]; then
   }
   if [ -z "${PYTHON3}" ]; then
     pfail "PYTHON3"
-    cdroot
-    return 1
+    cdroot; return 1;
   fi
   if [ -z "${ACT_NAME}" ]; then
     pfail 'ACT_NAME'
-    cdroot
-    return 1
+    cdroot; return 1;
   fi
   unset_env_vars_clean_act () {
     unset pfail
@@ -32,7 +30,7 @@ if [ -z "${IGNORE_ACT_COMPILATION}" ]; then
     unset OUT2
     unset cdfolder
     unset unset_env_vars_clean_act
-    cdroot
+    cdroot || return 1;
   }
   fail_clean_act () {
     local MSG="\033[0;31m\t\t (clean_act.sh) WE CANNOT RUN \e[3m"
@@ -52,6 +50,7 @@ if [ -z "${IGNORE_ACT_COMPILATION}" ]; then
     export OUT2="/dev/tty"
   fi
 
+  # ---------------------------------------------------------------------------
   # --------------------------------------------------------------------------- 
   ptop 'CLEANING ACT'
 
@@ -65,6 +64,8 @@ if [ -z "${IGNORE_ACT_COMPILATION}" ]; then
 
   unset_env_vars_clean_act || return 1
   pbottom 'CLEANING ACT'
+  # ---------------------------------------------------------------------------
+  # ---------------------------------------------------------------------------
 fi
 # ----------------------------------------------------------------------------
 # ----------------------------------------------------------------------------

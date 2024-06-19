@@ -7,37 +7,32 @@ if [ -z "${IGNORE_PLANCK_COMPILATION}" ]; then
   source $ROOTDIR/installation_scripts/clean_planck.sh
   # ----------------------------------------------------------------------------
   pfail() {
-    echo -e "\033[0;31m ERROR ENV VARIABLE ${1} IS NOT DEFINED \033[0m"
+    echo -e "\033[0;31m\t\t ERROR ENV VARIABLE ${1} IS NOT DEFINED \033[0m"
     unset pfail
   }
   if [ -z "${ROOTDIR}" ]; then
     pfail 'ROOTDIR'
     return 1
   fi
+  cdroot() {
+    cd "${ROOTDIR}" 2>"/dev/null" || { echo -e \
+      "\033[0;31m\t\t CD ROOTDIR (${ROOTDIR}) FAILED \033[0m"; return 1; }
+    unset cdroot
+  }
   if [ -z "${CXX_COMPILER}" ]; then
-    pfail 'CXX_COMPILER'
-    cd $ROOTDIR
-    return 1
+    pfail 'CXX_COMPILER'; cdroot; return 1;
   fi
   if [ -z "${C_COMPILER}" ]; then
-    pfail 'C_COMPILER'
-    cd $ROOTDIR
-    return 1
+    pfail 'C_COMPILER'; cdroot; return 1;
   fi
   if [ -z "${PIP3}" ]; then
-    pfail 'PIP3'
-    cd $ROOTDIR
-    return 1
+    pfail 'PIP3'; cdroot; return 1;
   fi
   if [ -z "${PYTHON3}" ]; then
-    pfail "PYTHON3"
-    cd $ROOTDIR
-    return 1
+    pfail "PYTHON3"; cdroot; return 1;
   fi
   if [ -z "${MAKE_NUM_THREADS}" ]; then
-    pfail 'MAKE_NUM_THREADS'
-    cd $ROOTDIR
-    return 1
+    pfail 'MAKE_NUM_THREADS'; cd $ROOTDIR; return 1
   fi
   unset_env_vars_comp_pl () {
     cd $ROOTDIR
@@ -49,13 +44,11 @@ if [ -z "${IGNORE_PLANCK_COMPILATION}" ]; then
     unset unset_env_vars_comp_pl
   }
   fail_comp_pl () {
-    export MSG="\033[0;31m (compile_planck.sh) WE CANNOT RUN \e[3m"
-    export MSG2="\033[0m"
+    local MSG="\033[0;31m (compile_planck.sh) WE CANNOT RUN \e[3m"
+    local MSG2="\033[0m"
     echo -e "${MSG} ${1} ${MSG2}"
-    unset_env_vars_comp_pl
-    unset MSG
-    unset MSG2
     unset fail_comp_pl
+    unset_env_vars_comp_pl
   }
   if [ -z "${DEBUG_PLANCK_OUTPUT}" ]; then
     export OUT1="/dev/null"

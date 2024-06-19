@@ -17,19 +17,13 @@ if [ -z "${IGNORE_POLYCHORD_COMPILATION}" ]; then
     unset cdroot
   }
   if [ -z "${PYTHON3}" ]; then
-    pfail "PYTHON3"
-    cdroot
-    return 1
+    pfail "PYTHON3"; cdroot; return 1;
   fi
   if [ -z "${PYTHON_VERSION}" ]; then
-    pfail "PYTHON3"
-    cdroot
-    return 1
+    pfail "PYTHON_VERSION"; cdroot; return 1;
   fi
   if [ -z "${POLY_NAME}" ]; then
-    pfail 'POLY_NAME'
-    cdroot
-    return 1
+    pfail 'POLY_NAME'; cdroot; return 1;
   fi
   unset_env_vars_clean_poly () {
     unset OUT1
@@ -37,7 +31,7 @@ if [ -z "${IGNORE_POLYCHORD_COMPILATION}" ]; then
     unset PLIB
     unset pfail
     unset unset_env_vars_clean_poly
-    cdroot
+    cdroot || return 1;
   }
   fail_clean_poly () {
     local MSG="\033[0;31m\t\t (clean_polychord.sh) WE CANNOT RUN \e[3m"

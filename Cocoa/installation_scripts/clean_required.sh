@@ -19,7 +19,7 @@ unset_env_vars_clean_req () {
   unset SETUP_PREREQUISITE_DONE
   unset pfail
   unset unset_env_vars_clean_req
-  cdroot
+  cdroot || return 1;
 }
 fail_clean_req () {
   local MSG="\033[0;31m\t\t (clean_required.sh) WE CANNOT RUN \e[3m"

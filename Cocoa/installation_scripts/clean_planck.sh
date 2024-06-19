@@ -27,7 +27,7 @@ if [ -z "${IGNORE_PLANCK_COMPILATION}" ]; then
     unset pfail
     unset code_folder
     unset unset_env_vars_clean_planck
-    cdroot
+    cdroot || return 1;
   }
   fail_clean_plc () {
     local MSG="\033[0;31m\t\t (clean_planck.sh) WE CANNOT RUN \e[3m"
