@@ -4,7 +4,7 @@
 # ----------------------------------------------------------------------------
 if [ -z "${IGNORE_CLASS_COMPILATION}" ]; then
   pfail() {
-    echo -e "\033[0;31m ERROR ENV VARIABLE ${1} IS NOT DEFINED \033[0m"
+    echo -e "\033[0;31m ERROR ENV VARIABLE ${1} NOT DEFINED \033[0m"
     unset pfail
   }
   if [ -z "${ROOTDIR}" ]; then

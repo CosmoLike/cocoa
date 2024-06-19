@@ -3,17 +3,17 @@
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
 if [ -z "${IGNORE_ACT_COMPILATION}" ]; then
+  if [ -z "${ROOTDIR}" ]; then
+    echo -e "\033[0;31m\t\t ERROR ENV VARIABLE ${ROOTDIR} IS NOT DEFINED \033[0m"
+    return 1
+  fi
   # ---------------------------------------------------------------------------
-  source "${ROOTDIR}"/installation_scripts/clean_act.sh
+  source "${ROOTDIR}/installation_scripts/clean_act.sh"
   # ---------------------------------------------------------------------------
   pfail() {
     echo -e "\033[0;31m\t\t ERROR ENV VARIABLE ${1} IS NOT DEFINED \033[0m"
     unset pfail
   }
-  if [ -z "${ROOTDIR}" ]; then
-    pfail 'ROOTDIR'
-    return 1
-  fi
   cdroot() {
     cd "${ROOTDIR}" 2>"/dev/null" || { echo -e \
       "\033[0;31m\t\t CD ROOTDIR (${ROOTDIR}) FAILED \033[0m"; return 1; }

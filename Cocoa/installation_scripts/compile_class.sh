@@ -3,62 +3,56 @@
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
 if [ -z "${IGNORE_CLASS_COMPILATION}" ]; then
+  if [ -z "${ROOTDIR}" ]; then
+    echo -e "\033[0;31m\t\t ERROR ENV VARIABLE ${ROOTDIR} NOT DEFINED \033[0m"
+    return 1
+  fi
   # ---------------------------------------------------------------------------
-  source $ROOTDIR/installation_scripts/clean_class.sh
+  source "${ROOTDIR}/installation_scripts/clean_class.sh"
   # ---------------------------------------------------------------------------
   pfail() {
-    echo -e "\033[0;31m ERROR ENV VARIABLE ${1} IS NOT DEFINED \033[0m"
+    echo -e "\033[0;31m\t\t ERROR ENV VARIABLE ${1} NOT DEFINED \033[0m"
     unset pfail
   }
-  if [ -z "${ROOTDIR}" ]; then
-    pfail 'ROOTDIR'
-    return 1
-  fi
+  cdroot() {
+    cd "${ROOTDIR}" 2>"/dev/null" || { echo -e \
+      "\033[0;31m\t\t CD ROOTDIR (${ROOTDIR}) FAILED \033[0m"; return 1; }
+    unset cdroot
+  }
   if [ -z "${CXX_COMPILER}" ]; then
-    pfail 'CXX_COMPILER'
-    cd $ROOTDIR
-    return 1
+    pfail 'CXX_COMPILER'; cdroot; return 1;
   fi
   if [ -z "${C_COMPILER}" ]; then
-    pfail 'C_COMPILER'
-    cd $ROOTDIR
-    return 1
+    pfail 'C_COMPILER'; cdroot; return 1;
   fi
   if [ -z "${PIP3}" ]; then
-    pfail 'PIP3'
-    cd $ROOTDIR
-    return 1
+    pfail 'PIP3'; cdroot; return 1;
   fi
   if [ -z "${PYTHON3}" ]; then
-    pfail "PYTHON3"
-    cd $ROOTDIR
-    return 1
+    pfail "PYTHON3"; cdroot; return 1;
   fi
   if [ -z "${MAKE_NUM_THREADS}" ]; then
-    pfail 'MAKE_NUM_THREADS'
-    cd $ROOTDIR
-    return 1
+    pfail 'MAKE_NUM_THREADS'; cdroot; return 1;
   fi
   if [ -z "${CLASS_NAME}" ]; then
-    pfail 'CLASS_NAME'
-    cd $ROOTDIR
-    return 1
+    pfail 'CLASS_NAME'; cdroot; return 1
   fi
   unset_env_vars_comp_class () {
-    cd $ROOTDIR
     unset OUT1
     unset OUT2
     unset pfail
     unset unset_env_vars_comp_class
+    cdroot || return 1;
   }
   fail_comp_class () {
-    export MSG="\033[0;31m (compile_class.sh) WE CANNOT RUN \e[3m"
-    export MSG2="\033[0m"
+    local MSG="\033[0;31m (compile_class.sh) WE CANNOT RUN \e[3m"
+    local MSG2="\033[0m"
     echo -e "${MSG} ${1} ${MSG2}"
-    unset_env_vars_comp_class
-    unset MSG
-    unset MSG2
     unset fail_comp_class
+    unset_env_vars_comp_class
+  }
+  cdfolder() {
+    cd "${1}" 2>"/dev/null" || { fail_comp_class "CD FOLDER: ${1}"; return 1; }
   }
   if [ -z "${DEBUG_CLASS_OUTPUT}" ]; then
     export OUT1="/dev/null"
@@ -71,11 +65,7 @@ if [ -z "${IGNORE_CLASS_COMPILATION}" ]; then
   # ---------------------------------------------------------------------------
   ptop 'COMPILING CLASS'
 
-  cd $ROOTDIR/external_modules/code/$CLASS_NAME/
-  if [ $? -ne 0 ]; then
-    fail_comp_class "CD CLASS FOLDER"
-    return 1
-  fi
+  cdfolder "${ROOTDIR}/external_modules/code/${CLASS_NAME}/" || return 1
 
   # ---------------------------------------------------------------------------
   # historical: workaround Cocoa .gitignore entry on /include 
@@ -88,27 +78,24 @@ if [ -z "${IGNORE_CLASS_COMPILATION}" ]; then
   # historical: workaround Cocoa .gitignore entry on /include
   # also good because class compilation changes files on /include
   # ---------------------------------------------------------------------------
-  cp -r  ./include2 ./include > ${OUT1} 2> ${OUT2}
+  cp -r  ./include2 ./include >${OUT1} 2>${OUT2}
   if [ $? -ne 0 ]; then
-    fail_comp_class "CP INCLUDE2 FOLDER"
-    return 1
+    fail_comp_class "CP INCLUDE2 FOLDER"; return 1
   fi
 
-  CC=$C_COMPILER PYTHON=$PYTHON3 make all > ${OUT1} 2> ${OUT2}
+  CC=$C_COMPILER PYTHON=$PYTHON3 make all >${OUT1} 2>${OUT2}
   if [ $? -ne 0 ]; then
-    fail_comp_class "MAKE ALL"
-    return 1
+    fail_comp_class "MAKE ALL"; return 1
   fi
    
-  cd ./python
+  cdfolder ./python || return 1
 
-  CC=$C_COMPILER $PYTHON3 setup.py build > ${OUT1} 2> ${OUT2}
+  CC=$C_COMPILER $PYTHON3 setup.py build >${OUT1} 2>${OUT2}
   if [ $? -ne 0 ]; then
-    fail_comp_class "PYTHON3 SETUP.PY BUILD"
-    return 1
+    fail_comp_class "PYTHON3 SETUP.PY BUILD"; return 1
   fi
 
-  unset_env_vars_comp_class
+  unset_env_vars_comp_class || return 1
   pbottom 'COMPILING CLASS'
 fi
 # ------------------------------------------------------------------------------
