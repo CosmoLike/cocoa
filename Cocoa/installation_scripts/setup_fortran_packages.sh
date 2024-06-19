@@ -3,67 +3,62 @@
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
 if [ -z "${IGNORE_FORTRAN_INSTALLATION}" ]; then
-  pfail_sftrp() {
+  pfail() {
     echo -e "\033[0;31m ERROR ENV VARIABLE ${1} IS NOT DEFINED \033[0m"
-    unset pfail_sftrp
+    unset pfail
   }
   if [ -z "${ROOTDIR}" ]; then
-    pfail_sftrp 'ROOTDIR'
-    return 1
+    pfail 'ROOTDIR'; return 1
   fi
+  cdroot() {
+    cd "${ROOTDIR}" 2>"/dev/null" || { echo -e \
+      "\033[0;31m\t\t CD ROOTDIR (${ROOTDIR}) FAILED \033[0m"; return 1; }
+    unset cdroot
+  }
   if [ -z "${CXX_COMPILER}" ]; then
-    pfail_sftrp 'CXX_COMPILER'
-    cd $ROOTDIR
-    return 1
+    pfail 'CXX_COMPILER'; cdroot; return 1;
   fi
   if [ -z "${C_COMPILER}" ]; then
-    pfail_sftrp 'C_COMPILER'
-    cd $ROOTDIR
-    return 1
+    pfail 'C_COMPILER'; cdroot; return 1;
   fi
-  if [ -z "${FORTRAN_COMPILER}" ]; then
-    pfail_sftrp 'FORTRAN_COMPILER'
-    cd $ROOTDIR
-    return 1
+   if [ -z "${FORTRAN_COMPILER}" ]; then
+    pfail 'FORTRAN_COMPILER'; cdroot; return 1;
   fi
   if [ -z "${CMAKE}" ]; then
-    pfail_sftrp 'CMAKE'
-    cd $ROOTDIR
-    return 1
+    pfail 'CMAKE'; cdroot; return 1;
   fi
   unset_env_vars_sftrp () {
-    cd $ROOTDIR
     unset OUT1
     unset OUT2
     unset FMNT
-    unset pfail_sftrp
+    unset CCIL
+    unset pfail
     unset unset_env_vars_sftrp
+    cdroot || return 1;
   }
   fail_sftrp () {
-    export MSG="\033[0;31m (setup_fortran_packages.sh) WE CANNOT RUN \e[3m"
-    export MSG2="\033[0m"
+    local MSG="\033[0;31m\t\t (setup_fortran_packages.sh) WE CANNOT RUN \e[3m"
+    local MSG2="\033[0m"
     echo -e "${MSG} ${1} ${MSG2}"
-    unset_env_vars_sftrp
-    unset MSG
-    unset MSG2
     unset fail_sftrp
+    unset_env_vars_sftrp
   }
   if [ -z "${DEBUG_FORTRAN_PACKAGES}" ]; then
     if [ -z "${MAKE_NUM_THREADS}" ]; then
-      pfail_sftrp 'MAKE_NUM_THREADS'
-      cd $ROOTDIR
-      return 1
+      pfail 'MAKE_NUM_THREADS'; cdroot; return 1;
     fi
-    export OUT1="/dev/null"
-    export OUT2="/dev/null"
+    export OUT1="/dev/null"; export OUT2="/dev/null"
     export FMNT="${MAKE_NUM_THREADS}"
   else
-    export OUT1="/dev/tty"
-    export OUT2="/dev/tty"
+    export OUT1="/dev/tty"; export OUT2="/dev/tty"
     export FMNT=1
   fi
+  # ----------------------------------------------------------------------------
+  # ----------------------------------------------------------------------------
 
   ptop2 'SETUP_FORTRAN_PACKAGES'
+
+  export CCIL="${ROOTDIR}/../cocoa_installation_libraries"
 
   # ----------------------------------------------------------------------------
   # ------------------------------- FORTRAN LAPACK -----------------------------
@@ -72,56 +67,37 @@ if [ -z "${IGNORE_FORTRAN_INSTALLATION}" ]; then
     ptop 'INSTALLING LAPACK FORTRAN LIBRARY'
 
     if [ -z "${COCOA_LAPACK_DIR}" ]; then
-      pfail 'COCOA_LAPACK_DIR'
-      cd $ROOTDIR
-      return 1
+      pfail 'COCOA_LAPACK_DIR'; cdroot; return 1;
     fi
 
-    cd $ROOTDIR/../cocoa_installation_libraries/
-    if [ $? -ne 0 ]; then
-      fail_sftrp "CD COCOA_INSTALLATION_LIBRARIES"
-      return 1
-    fi
+    cdfolder "${CCIL}" || return 1;
 
     rm -rf lapack-build
     
-    mkdir lapack-build
-    if [ $? -ne 0 ]; then
-      fail_sftrp "MKDIR LAPACK-BUILD"
-      return 1
-    fi
+    mkdir lapack-build || { fail_sftrp "MKDIR LAPACK-BUILD"; return 1; }
 
-    cd ./lapack-build
+    cdfolder "${CCIL}/lapack-build" || return 1;
 
     $CMAKE -DBUILD_SHARED_LIBS=TRUE \
-      -DCMAKE_INSTALL_PREFIX=$ROOTDIR/.local \
-      -DCMAKE_C_COMPILER=$C_COMPILER \
-      --log-level=ERROR \
-      ../${COCOA_LAPACK_DIR} > ${OUT1} 2> ${OUT2}
+           -DCMAKE_INSTALL_PREFIX=$ROOTDIR/.local \
+           -DCMAKE_C_COMPILER=$C_COMPILER \
+           --log-level=ERROR ../"${COCOA_LAPACK_DIR}" >${OUT1} 2>${OUT2}
     if [ $? -ne 0 ]; then
-      fail_sftrp "CMAKE"
-      return 1
+      fail_sftrp "CMAKE"; return 1
     fi
 
-    make -j $FMNT all > ${OUT1} 2> ${OUT2}
-    if [ $? -ne 0 ]; then
-      fail_sftrp "MAKE"
-      return 1
-    fi
+    make -j $FMNT all >${OUT1} 2>${OUT2} || { fail_sftrp "MAKE"; return 1; }
 
-    make install > ${OUT1} 2> ${OUT2}
-    if [ $? -ne 0 ]; then
-      fail_sftrp "MAKE INSTALL"
-      return 1
-    fi
+    make install >${OUT1} 2>${OUT2} || { fail_sftrp "MAKE INSTALL"; return 1; }
     
-    cd $ROOTDIR    
+    cdfolder "${ROOTDIR}" || return 1;
+
     pbottom 'INSTALLING LAPACK FORTRAN LIBRARY'
   fi
-
   # ----------------------------------------------------------------------------
   # ---------------------------------------------------------------------------- 
-  unset_env_vars_sftrp
+  
+  unset_env_vars_sftrp || return 1; 
   pbottom2 'SETUP_FORTRAN_PACKAGES'
 fi
 # ------------------------------------------------------------------------------
