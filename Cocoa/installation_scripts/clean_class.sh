@@ -13,29 +13,29 @@ if [ -z "${IGNORE_CLASS_COMPILATION}" ]; then
   fi
   if [ -z "${PYTHON3}" ]; then
     pfail "PYTHON3"
-    cd $ROOTDIR
+    cd "${ROOTDIR}" || return 1
     return 1
   fi
   if [ -z "${CLASS_NAME}" ]; then
     pfail 'CAMB_NAME'
-    cd $ROOTDIR
+    cd "${ROOTDIR}" || return 1
     return 1
   fi
   unset_env_vars_clean_class () {
-    cd $ROOTDIR
     unset OUT1
     unset OUT2
+    unset PLIB
     unset pfail
     unset unset_env_vars_clean_class
+    cd "${ROOTDIR}" || return 1
   }
   fail_clean_class () {
-    export MSG="\033[0;31m (clean_class.sh) WE CANNOT RUN \e[3m"
-    export MSG2="\033[0m"
+    local MSG="\033[0;31m (clean_class.sh) WE CANNOT RUN \e[3m"
+    local MSG2="\033[0m"
     echo -e "${MSG} ${1} ${MSG2}"
-    unset_env_vars_clean_class
-    unset MSG
-    unset MSG2
     unset fail_clean_class
+    unset_env_vars_clean_class
+    return 1
   }
   if [ -z "${DEBUG_CLASS_OUTPUT}" ]; then
     export OUT1="/dev/null"
@@ -46,37 +46,46 @@ if [ -z "${IGNORE_CLASS_COMPILATION}" ]; then
   fi
 
   # ---------------------------------------------------------------------------
+  # ---------------------------------------------------------------------------
   ptop 'CLEANING CLASS'
 
-  cd $ROOTDIR/external_modules/code/$CLASS_NAME/
+  cd "${ROOTDIR}"/external_modules/code/"${CLASS_NAME}"/ 2> ${OUT2}
+  if [ $? -ne 0 ]; then
+    fail_clean_class "CD CLASS FOLDER"
+  fi
 
-  rm -rf $ROOTDIR/.local/lib/python$PYTHON_VERSION/site-packages/classy*
+  export PLIB="${ROOTDIR}/.local/lib/python${PYTHON_VERSION}/site-packages"
+  rm -rf "${PLIB}"/classy*
 
   make clean > ${OUT1} 2> ${OUT2}
   if [ $? -ne 0 ]; then
     fail_clean_class "MAKE CLEAN"
-    return 1
   fi
 
   rm -f class
 
-  cd ./python
+  cd ./python 2> ${OUT2}
+  if [ $? -ne 0 ]; then
+    fail_clean_class "CD PYTHON FOLDER"
+  fi
+
   $PYTHON3 setup.py clean > ${OUT1} 2> ${OUT2}
   if [ $? -ne 0 ]; then
     fail_clean_class "PYTHON SETUP CLEAN"
-    return 1
   fi
 
   # ---------------------------------------------------------------------------
   # Historical Workaround Cocoa .gitignore entry on /include
   # ---------------------------------------------------------------------------
   rm -rf ./include 
-
+  # ---------------------------------------------------------------------------
   rm -rf ./build/
   rm -rf ./classy.egg-info
 
   unset_env_vars_clean_class
   pbottom 'CLEANING CLASS'
+  # ---------------------------------------------------------------------------
+  # ---------------------------------------------------------------------------
 fi
 # ----------------------------------------------------------------------------
 # ----------------------------------------------------------------------------

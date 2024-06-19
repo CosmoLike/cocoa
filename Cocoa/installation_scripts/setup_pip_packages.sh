@@ -27,22 +27,21 @@ if [ -z "${IGNORE_ALL_PIP_INSTALLATION}" ]; then
     pfail "PYTHON3"
     return 1
   fi
-  unset_env_vars () {
+  unset_env_vars_spp () {
     cd $ROOTDIR
     unset OUT1
     unset OUT2
     unset PIP_MNT
-    unset unset_env_vars
+    unset unset_env_vars_spp
   }
-  fail () {
-    export FAILMSG="\033[0;31m SETUP PIP PACKAGES COULD NOT RUN \e[3m"
-    export FAILMSG2="\033[0m"
-    echo -e "${FAILMSG} ${1} ${FAILMSG2}"
-    unset_env_vars
+  fail_spp () {
+    export MSG="\033[0;31m (setup_pip_packages.sh) WE CANNOT RUN \e[3m"
+    export MSG2="\033[0m"
+    echo -e "${MSG} ${1} ${MSG2}"
+    unset_env_vars_spp
+    unset MSG
+    unset MSG2
   }
-
-  ptop2 "INSTALLING PYTHON PACKAGES VIA PIP"
-
   if [ -z "${DEBUG_PIP_OUTPUT}" ]; then
     export OUT1="/dev/null"
     export OUT2="/dev/null"
@@ -53,40 +52,43 @@ if [ -z "${IGNORE_ALL_PIP_INSTALLATION}" ]; then
     export PIP_MNT=1
   fi
 
+  ptop2 "INSTALLING PYTHON PACKAGES VIA PIP"
+
   # ----------------------------------------------------------------------------
   # --------------------------------- LIBEXPAT ---------------------------------
   # ----------------------------------------------------------------------------
-
   if [ -z "${MINICONDA_INSTALLATION}" ]; then
     cd $ROOTDIR/../cocoa_installation_libraries/$COCOA_EXPAT_DIR
     
     FC=$FORTRAN_COMPILER CC=$C_COMPILER ./configure --prefix=$ROOTDIR/.local \
       --enable-shared=yes --enable-static=yes > ${OUT1} 2> ${OUT2}
     if [ $? -ne 0 ]; then
-      fail "LIBEXPAT CONFIGURE"
+      fail_spp "LIBEXPAT CONFIGURE"
       return 1
     fi
 
     make -j $PIP_MNT > ${OUT1} 2> ${OUT2}
     if [ $? -ne 0 ]; then
-      fail "LIBEXPAT MAKE"
+      fail_spp "LIBEXPAT MAKE"
       return 1
     fi
 
     make install > ${OUT1} 2> ${OUT2}
     if [ $? -ne 0 ]; then
-      fail "LIBEXPAT MAKE INSTALL"
+      fail_spp "LIBEXPAT MAKE INSTALL"
       return 1
     fi
 
     cp $ROOTDIR/.local/lib/libexpat.so.1 $ROOTDIR/.local/lib/libexpat.so.0
     if [ $? -ne 0 ]; then
-      fail "LIBEXPAT CP LIBEXPAT.SO.1"
+      fail_spp "LIBEXPAT CP LIBEXPAT.SO.1"
       return 1
     fi
 
    cd $ROOTDIR
   fi
+  # ----------------------------------------------------------------------------
+  # ----------------------------------------------------------------------------
 
   # ----------------------------------------------------------------------------
   # --------------------------- PIP CORE PACKAGES ------------------------------
@@ -206,7 +208,7 @@ if [ -z "${IGNORE_ALL_PIP_INSTALLATION}" ]; then
         'zipp==3.15.0' \
       --prefix=$ROOTDIR/.local > ${OUT1} 2> ${OUT2}
     if [ $? -ne 0 ]; then
-      fail "PIP INSTALL (CORE PACKAGES)"
+      fail_spp "PIP INSTALL (CORE PACKAGES)"
       return 1
     fi
   
@@ -218,7 +220,7 @@ if [ -z "${IGNORE_ALL_PIP_INSTALLATION}" ]; then
       --prefix=$ROOTDIR/.local \
       --force-reinstall > ${OUT1} 2> ${OUT2}
     if [ $? -ne 0 ]; then
-      fail "PIP INSTALL (CORE PACKAGES)"
+      fail_spp "PIP INSTALL (CORE PACKAGES)"
       return 1
     fi
   
@@ -229,11 +231,13 @@ if [ -z "${IGNORE_ALL_PIP_INSTALLATION}" ]; then
     --prefix=$ROOTDIR/.local \
     --no-index > ${OUT1} 2> ${OUT2}
   if [ $? -ne 0 ]; then
-    fail "PIP INSTALL FGSPECTRA"
+    fail_spp "PIP INSTALL FGSPECTRA"
     return 1
   fi
 
   pbottom "PIP INSTALL CORE PACKAGES"
+  # ----------------------------------------------------------------------------
+  # ----------------------------------------------------------------------------
 
   # ----------------------------------------------------------------------------
   # ----------------------------- PIP ML PACKAGES ------------------------------
@@ -251,7 +255,7 @@ if [ -z "${IGNORE_ALL_PIP_INSTALLATION}" ]; then
       --extra-index-url https://download.pytorch.org/whl/cpu
       --prefix=$ROOTDIR/.local > ${OUT1} 2> ${OUT2}
     if [ $? -ne 0 ]; then
-      fail "PIP INSTALL (MACHINE LEARNING CPU-ONLY PACKAGES)"
+      fail_spp "PIP INSTALL (MACHINE LEARNING CPU-ONLY PACKAGES)"
       return 1
     fi
 
@@ -271,16 +275,15 @@ if [ -z "${IGNORE_ALL_PIP_INSTALLATION}" ]; then
       --extra-index-url https://download.pytorch.org/whl/cu116 \
       --prefix=$ROOTDIR/.local > ${OUT1} 2> ${OUT2}
     if [ $? -ne 0 ]; then
-      fail "PIP INSTALL (MACHINE LEARNING GPU PACKAGES)"
+      fail_spp "PIP INSTALL (MACHINE LEARNING GPU PACKAGES)"
       return 1
     fi
 
     pbottom "PIP INSTALL MACHINE LEARNING GPU PACKAGES"
   fi
-
   # ----------------------------------------------------------------------------
   # ----------------------------------------------------------------------------
-  unset_env_vars
+  unset_env_vars_spp
   pbottom2 'INSTALLING PYTHON PACKAGES VIA PIP DONE'
 fi
 # ------------------------------------------------------------------------------

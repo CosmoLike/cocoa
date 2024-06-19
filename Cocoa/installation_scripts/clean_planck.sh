@@ -13,24 +13,24 @@ if [ -z "${IGNORE_PLANCK_COMPILATION}" ]; then
   fi
   if [ -z "${PYTHON3}" ]; then
     pfail "PYTHON3"
-    cd $ROOTDIR
+    cd "${ROOTDIR}" || return 1
     return 1
   fi
-  unset_env_vars_clean_planck () {
-    cd $ROOTDIR
+  unset_env_vars_clean_planck () { 
     unset OUT1
     unset OUT2
     unset pfail
+    unset code_folder
     unset unset_env_vars_clean_planck
+    cd "${ROOTDIR}" || return 1
   }
   fail_clean_planck () {
-    export MSG="\033[0;31m (clean_planck.sh) WE CANNOT RUN \e[3m"
-    export MSG2="\033[0m"
+    local MSG="\033[0;31m (clean_planck.sh) WE CANNOT RUN \e[3m"
+    local MSG2="\033[0m"
     echo -e "${MSG} ${1} ${MSG2}"
-    unset_env_vars_clean_planck
-    unset MSG
-    unset MSG2
     unset fail_clean_planck
+    unset_env_vars_clean_planck
+    return 1
   }
   if [ -z "${DEBUG_PLANCK_OUTPUT}" ]; then
     export OUT1="/dev/null"
@@ -41,36 +41,50 @@ if [ -z "${IGNORE_PLANCK_COMPILATION}" ]; then
   fi
 
   # ---------------------------------------------------------------------------
+  # ---------------------------------------------------------------------------
   ptop 'CLEANING PLANCK LIKELIHOOD'
 
+  export code_folder="external_modules/code/planck/code"
+  
   if [ -z "${USE_SPT_CLIK_PLANCK}" ]; then
-    cd $ROOTDIR/external_modules/code/planck/code/plc_3.0/plc-3.1/
+    
+    cd "${ROOTDIR}/${code_folder}/plc_3.0/plc-3.1/" 2> ${OUT2}
+    if [ $? -ne 0 ]; then
+      fail_clean_planck "CD PLANCK FOLDER"
+    fi
+  
   else
-    cd $ROOTDIR/external_modules/code/planck/code/spt_clik/
+  
+    cd "${ROOTDIR}/${code_folder}/spt_clik/" 2> ${OUT2}
+    if [ $? -ne 0 ]; then
+      fail_clean_planck "CD PLANCK (SPT CLIK) FOLDER"
+    fi
+  
   fi
 
-  rm -f $ROOTDIR/.local/bin/clik*
+  rm -f "${ROOTDIR}"/.local/bin/clik*
 
-  rm -f $ROOTDIR/.local/lib/libclik_f90.so
+  rm -f "${ROOTDIR}"/.local/lib/libclik_f90.so
 
-  rm -f $ROOTDIR/.local/lib/libclik.so
+  rm -f "${ROOTDIR}"/.local/lib/libclik.so
 
-  rm -rf $ROOTDIR/.local/lib/python/site-packages/clik
+  rm -rf "${ROOTDIR}"/.local/lib/python/site-packages/clik
 
-  rm -rf $ROOTDIR/.local/share/clik
+  rm -rf "${ROOTDIR}"/.local/share/clik
 
-  rm -f $ROOTDIR/.local/include/clik*
+  rm -f "${ROOTDIR}"/.local/include/clik*
 
   rm -f .lock-waf_*
 
   $PYTHON3 waf distclean > ${OUT1} 2> ${OUT2}
   if [ $? -ne 0 ]; then
     fail_clean_planck "PYTHON WAF DISTCLEAN"
-    return 1
   fi
 
   unset_env_vars_clean_planck
   pbottom 'CLEANING PLANCK LIKELIHOOD'
+  # ---------------------------------------------------------------------------
+  # ---------------------------------------------------------------------------
 fi
 # ----------------------------------------------------------------------------
 # ----------------------------------------------------------------------------

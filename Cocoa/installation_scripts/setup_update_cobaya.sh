@@ -403,7 +403,7 @@ if [ -z "${IGNORE_ALL_COBAYA_INSTALLATION}" ]; then
       fail_ucob "MV LIKELIHOOD FOLDER (Planck 2020 HILLIPOP)"
       return 1
     fi
-    
+
     # now patch the likelihood __init__ file
     cp $COBAYA_COCOA/$PL2020/init.patch $COBAYA/$PL2020
     if [ $? -ne 0 ]; then
@@ -494,7 +494,6 @@ if [ -z "${IGNORE_ALL_COBAYA_INSTALLATION}" ]; then
     rm -rf $COBAYA/$CBLIKE/lipoptmp
     unset PL2020
     cd $ROOTDIR
-
     pbottom "INSTALLING LOLLIPOP LIKELIHOOD"
   fi
     

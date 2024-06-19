@@ -14,7 +14,7 @@ if [ -z "${GIT}" ]; then
   pfail 'GIT'
   return 1
 fi
-unset_env_vars () {
+unset_env_vars_sil () {
   cd $ROOTDIR
   unset OUT1
   unset OUT2
@@ -27,18 +27,18 @@ unset_env_vars () {
   unset FILENAME
   unset wget_action
   unset git_action
-  unset unset_env_vars
+  unset git_action_1
+  unset unset_env_vars_sil
 }
-fail () {
-  export FAILMSG="\033[0;31m WE CANNOT RUN \e[3m"
-  export FAILMSG2="\033[0m"
-  echo -e "${FAILMSG} ${1} ${FAILMSG2}"
-  unset_env_vars
-  unset FAILMSG
-  unset FAILMSG2
-  unset fail
+fail_sil () {
+  export MSG="\033[0;31m (setup_installation_libraries.sh) WE CANNOT RUN \e[3m"
+  export MSG2="\033[0m"
+  echo -e "${MSG} ${1} ${MSG2}"
+  unset_env_vars_sil
+  unset MSG
+  unset MSG2
+  unset fail_sil
 }
-
 if [ -z "${DEBUG_SIL_OUTPUT}" ]; then
   if [ -z "${MAKE_NUM_THREADS}" ]; then
     pfail 'MAKE_NUM_THREADS'
@@ -56,7 +56,12 @@ fi
 
 wget_action() {
   #ARGUMENTS: FOLDER, FILE, URL, NEW_FOLDER, XZFILE
+  
   cd $ROOTDIR/../cocoa_installation_libraries/
+  if [ $? -ne 0 ]; then
+    fail_sil "CD COCOA SETUP_INSTALLATION_LIBRARIES"
+    return 1
+  fi
 
   export FILENAME="${1}.${2}"
 
@@ -68,39 +73,41 @@ wget_action() {
 
   wget -q $3 > ${OUT1} 2> ${OUT2}
   if [ $? -ne 0 ]; then
-    fail "WGET"
+    fail_sil "WGET"
     return 1
   fi
 
   if [ "$2" == "tar.gz" ]; then
     tar zxvf $FILENAME > ${OUT1} 2> ${OUT2}
     if [ $? -ne 0 ]; then
-      fail "TAR (UNCOMPRESS tar.gz)"
+      fail_sil "TAR (UNCOMPRESS tar.gz)"
       return 1
     fi
   elif [ "$2" == "tar.xz" ]; then
     tar xf $FILENAME > ${OUT1} 2> ${OUT2}
     if [ $? -ne 0 ]; then
-      fail "TAR (UNCOMPRESS tar.xz)"
+      fail_sil "TAR (UNCOMPRESS tar.xz)"
       return 1
     fi
   else
-    fail "UNKNOWN FILE EXTENSION"
+    fail_sil "UNKNOWN FILE EXTENSION"
+    return 1
   fi
 
   if [ "${1}/" != "${4}" ] && [ "${1}" != "${4}" ]; then
     mv "${1}/" $4
     if [ $? -ne 0 ]; then
-      fail "MV FOLDER"
+      fail_sil "MV FOLDER"
       return 1
     fi
   fi
 
   # Why this compress? In the old Cocoa we saved the libraries in 
   # the github repo using git lfs. So this way preserves the old scripts
+  # we set "-k 1" to be the minimum compression
   tar -cf - $4 | xz -k -1 --threads=$SIL_MNT -c - > $5
   if [ $? -ne 0 ]; then
-    fail "TAR (COMPRESS)"
+    fail_sil "TAR (COMPRESS)"
     return 1
   fi 
 
@@ -109,18 +116,21 @@ wget_action() {
   rm -rf $ROOTDIR/../cocoa_installation_libraries/$4
 }
 
-git_action() {
+git_action_1() {
   #ARGUMENTS: FOLDER, VERSION, URL, NEW_FOLDER, XZFILE
+  
   cd $ROOTDIR/../cocoa_installation_libraries/
+  if [ $? -ne 0 ]; then
+    fail_sil "CD COCOA SETUP_INSTALLATION_LIBRARIES"
+    return 1
+  fi
 
   # In case this script runs twice
   rm -rf $ROOTDIR/../cocoa_installation_libraries/$1
-  rm -rf $ROOTDIR/../cocoa_installation_libraries/$4
-  rm -f $ROOTDIR/../cocoa_installation_libraries/$5
 
   $GIT clone $3 $1 > ${OUT1} 2> ${OUT2}
   if [ $? -ne 0 ]; then
-    fail "GIT CLONE"
+    fail_sil "GIT CLONE"
     return 1
   fi
   
@@ -128,26 +138,38 @@ git_action() {
   
   $GIT checkout $2 > ${OUT1} 2> ${OUT2}
   if [ $? -ne 0 ]; then
-    fail "GIT CHECKOUT"
+    fail_sil "GIT CHECKOUT"
     return 1
   fi
 
   rm -rf ./.git/
+}
+
+git_action() {
+  #ARGUMENTS: FOLDER, VERSION, URL, NEW_FOLDER, XZFILE
+  
+  git_action_1 $1 $2 $3 $4 $5
+  
+  # In case this script runs twice (after being killed by CTRL-D)
+  rm -rf $ROOTDIR/../cocoa_installation_libraries/$4
+  rm -f $ROOTDIR/../cocoa_installation_libraries/$5
+
   cd $ROOTDIR/../cocoa_installation_libraries/
 
   if [ "${1}/" != "${4}" ] && [ "${1}" != "${4}" ]; then
     mv "${1}/" $4
     if [ $? -ne 0 ]; then
-      fail "MV FOLDER"
+      fail_sil "MV FOLDER"
       return 1
     fi
   fi
 
   # Why this compress? In the old Cocoa we saved the libraries in 
   # the github repo using git lfs. So this way preserves the old scripts
+  # we set "-k 1" to be the minimum compression
   tar -cf - $4 | xz -k -1 --threads=$SIL_MNT -c - > $5
   if [ $? -ne 0 ]; then
-    fail "TAR (COMPRESS)"
+    fail_sil "TAR (COMPRESS)"
     return 1
   fi 
 
@@ -370,7 +392,7 @@ if [ -z "${IGNORE_CPP_CARMA_INSTALLATION}" ]; then
 
   $GIT clone $URL $FOLDER > ${OUT1} 2> ${OUT2}
   if [ $? -ne 0 ]; then
-    fail "GIT CLONE"
+    fail_sil "GIT CLONE"
     return 1
   fi
 
@@ -378,13 +400,13 @@ if [ -z "${IGNORE_CPP_CARMA_INSTALLATION}" ]; then
 
   $GIT checkout $VERSION > ${OUT1} 2> ${OUT2}
   if [ $? -ne 0 ]; then
-    fail "GIT CHECKOUT"
+    fail_sil "GIT CHECKOUT"
     return 1
   fi
 
   mv ./include $ROOTDIR/../cocoa_installation_libraries/
   if [ $? -ne 0 ]; then
-    fail "MV CARMA INCLUDE FOLDER"
+    fail_sil "MV CARMA INCLUDE FOLDER"
     return 1
   fi
 
@@ -392,7 +414,7 @@ if [ -z "${IGNORE_CPP_CARMA_INSTALLATION}" ]; then
 
   mv ./include $COCOA_CARMA_DIR
   if [ $? -ne 0 ]; then
-    fail "RENANE CARMA INCLUDE FOLDER"
+    fail_sil "RENANE CARMA INCLUDE FOLDER"
     return 1
   fi
 
@@ -400,7 +422,7 @@ if [ -z "${IGNORE_CPP_CARMA_INSTALLATION}" ]; then
 
   mv carma carma.h
   if [ $? -ne 0 ]; then
-    fail "RENANE CARMA HEADER"
+    fail_sil "RENANE CARMA HEADER"
     return 1
   fi
 
@@ -410,7 +432,7 @@ if [ -z "${IGNORE_CPP_CARMA_INSTALLATION}" ]; then
   # the github repo using git lfs. So this way preserves the old scripts
   tar -cf - $COCOA_CARMA_DIR | xz -k -1 --threads=$SIL_MNT -c - > $XZFILE
   if [ $? -ne 0 ]; then
-    fail "TAR (COMPRESS)"
+    fail_sil "TAR (COMPRESS)"
     return 1
   fi 
 
@@ -423,7 +445,7 @@ fi
 
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
-unset_env_vars
+unset_env_vars_sil
 pbottom2 "SETUP_INSTALLATION_LIBRARIES"
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------

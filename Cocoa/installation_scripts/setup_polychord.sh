@@ -65,6 +65,10 @@ if [ -z "${IGNORE_POLYCHORD_COMPILATION}" ]; then
   rm -rf $ROOTDIR/external_modules/code/$POLY_NAME
 
   cd $ROOTDIR/external_modules/code/
+  if [ $? -ne 0 ]; then
+    fail_spoly "CD EXTERNAL_MODULES CODE"
+    return 1
+  fi
 
   $GIT clone $POLY_URL $POLY_NAME > ${OUT1} 2> ${OUT2}
   if [ $? -ne 0 ]; then
@@ -73,6 +77,10 @@ if [ -z "${IGNORE_POLYCHORD_COMPILATION}" ]; then
   fi
 
   cd $ROOTDIR/external_modules/code/$POLY_NAME
+  if [ $? -ne 0 ]; then
+    fail_spoly "CD EXTERNAL_MODULES POLYCHORD CODE"
+    return 1
+  fi
 
   $GIT checkout $POLYCHORD_GIT_COMMIT > ${OUT1} 2> ${OUT2}
   if [ $? -ne 0 ]; then

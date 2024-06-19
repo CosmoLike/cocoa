@@ -423,5 +423,6 @@ export COCOA_GSL_DIR=gsl-2.7/
 export CAMB_NAME='CAMB'
 export POLY_NAME="PolyChordLite"
 export CLASS_NAME="class_public"
+export ACT_NAME="pyactlike"
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
