@@ -11,9 +11,14 @@ if [ -z "${IGNORE_PLANCK_COMPILATION}" ]; then
     pfail 'ROOTDIR'
     return 1
   fi
+  cdroot() {
+    cd "${ROOTDIR}" 2>"/dev/null" || { echo -e \
+      "\033[0;31m\t\t CD ROOTDIR (${ROOTDIR}) FAILED \033[0m"; return 1; }
+    unset cdroot
+  }
   if [ -z "${PYTHON3}" ]; then
     pfail "PYTHON3"
-    cd "${ROOTDIR}" || return 1
+    cdroot
     return 1
   fi
   unset_env_vars_clean_planck () { 
@@ -22,15 +27,17 @@ if [ -z "${IGNORE_PLANCK_COMPILATION}" ]; then
     unset pfail
     unset code_folder
     unset unset_env_vars_clean_planck
-    cd "${ROOTDIR}" || return 1
+    cdroot
   }
-  fail_clean_planck () {
-    local MSG="\033[0;31m (clean_planck.sh) WE CANNOT RUN \e[3m"
+  fail_clean_plc () {
+    local MSG="\033[0;31m\t\t (clean_planck.sh) WE CANNOT RUN \e[3m"
     local MSG2="\033[0m"
     echo -e "${MSG} ${1} ${MSG2}"
-    unset fail_clean_planck
+    unset fail_clean_plc
     unset_env_vars_clean_planck
-    return 1
+  }
+  cdfolder() {
+    cd "${1}" 2>"/dev/null" || { fail_clean_plc "CD FOLDER: ${1}"; return 1; }
   }
   if [ -z "${DEBUG_PLANCK_OUTPUT}" ]; then
     export OUT1="/dev/null"
@@ -47,19 +54,9 @@ if [ -z "${IGNORE_PLANCK_COMPILATION}" ]; then
   export code_folder="external_modules/code/planck/code"
   
   if [ -z "${USE_SPT_CLIK_PLANCK}" ]; then
-    
-    cd "${ROOTDIR}/${code_folder}/plc_3.0/plc-3.1/" 2> ${OUT2}
-    if [ $? -ne 0 ]; then
-      fail_clean_planck "CD PLANCK FOLDER"
-    fi
-  
+    cdfolder "${ROOTDIR}/${code_folder}/plc_3.0/plc-3.1/" || return 1
   else
-  
-    cd "${ROOTDIR}/${code_folder}/spt_clik/" 2> ${OUT2}
-    if [ $? -ne 0 ]; then
-      fail_clean_planck "CD PLANCK (SPT CLIK) FOLDER"
-    fi
-  
+    cdfolder "${ROOTDIR}/${code_folder}/spt_clik/" || return 1
   fi
 
   rm -f "${ROOTDIR}"/.local/bin/clik*
@@ -76,12 +73,10 @@ if [ -z "${IGNORE_PLANCK_COMPILATION}" ]; then
 
   rm -f .lock-waf_*
 
-  $PYTHON3 waf distclean > ${OUT1} 2> ${OUT2}
-  if [ $? -ne 0 ]; then
-    fail_clean_planck "PYTHON WAF DISTCLEAN"
-  fi
+  $PYTHON3 waf distclean >${OUT1} 2>${OUT2} ||
+    { fail_clean_plc "PYTHON WAF DISTCLEAN"; return 1; }
 
-  unset_env_vars_clean_planck
+  unset_env_vars_clean_planck || return 1
   pbottom 'CLEANING PLANCK LIKELIHOOD'
   # ---------------------------------------------------------------------------
   # ---------------------------------------------------------------------------
