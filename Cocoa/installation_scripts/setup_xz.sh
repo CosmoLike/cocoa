@@ -37,7 +37,7 @@ if [ -z "${IGNORE_XZ_INSTALLATION}" ]; then
     unset POLY_URL
     unset POLY_CHANGES
     unset pfail
-    unset unset_env_vars_spoly
+    unset unset_env_vars_sxz
   }
   fail_sxz () {
     export MSG="\033[0;31m (setup_xz.sh) WE CANNOT RUN \e[3m"
@@ -75,7 +75,7 @@ if [ -z "${IGNORE_XZ_INSTALLATION}" ]; then
 
   cd ./xz-5.2.5/
    if [ $? -ne 0 ]; then
-    fail_sxz "CD XZ FOLDEr"
+    fail_sxz "CD XZ FOLDER"
     return 1
   fi 
 

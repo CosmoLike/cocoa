@@ -57,6 +57,8 @@ if [ -z "${IGNORE_ALL_COBAYA_INSTALLATION}" ]; then
 
   ptop2 "UPDATING COBAYA PACKAGE"
   
+  # ----------------------------------------------------------------------------
+  # ----------------------------------------------------------------------------
   if [ -z "${IGNORE_COBAYA_INSTALLATION}" ]; then
     ptop "INSTALLING COBAYA"
 
@@ -225,7 +227,6 @@ if [ -z "${IGNORE_ALL_COBAYA_INSTALLATION}" ]; then
     # REMOVE LEWIS NATIVE REIMPLEMENTATION
     rm -f $COBAYA/$HGL/TTTEEE_lite_native.py
     rm -f $COBAYA/$HGL/TTTEEE_lite_native.yaml
-
     rm -f $COBAYA/$HGL/TT_lite_native.py
     rm -f $COBAYA/$HGL/TT_lite_native.yaml
 
@@ -303,6 +304,8 @@ if [ -z "${IGNORE_ALL_COBAYA_INSTALLATION}" ]; then
     cd $ROOTDIR
     pbottom "INSTALLING COBAYA"
   fi
+  # ----------------------------------------------------------------------------
+  # ----------------------------------------------------------------------------
 
   #-----------------------------------------------------------------------------
   # SO -------------------------------------------------------------------------
@@ -312,10 +315,12 @@ if [ -z "${IGNORE_ALL_COBAYA_INSTALLATION}" ]; then
     ptop "INSTALLING SIMONS OBSERVATORY LIKELIHOOD"
 
     cp -r $COBAYA_COCOA/$CBLIKE/mflike $COBAYA/$CBLIKE/mflike
+    
     cd $ROOTDIR
-
     pbottom "INSTALLING SIMONS OBSERVATORY LIKELIHOOD"
   fi
+  # ----------------------------------------------------------------------------
+  # ----------------------------------------------------------------------------
 
   #-----------------------------------------------------------------------------
   # CAMSPEC --------------------------------------------------------------------
@@ -332,7 +337,12 @@ if [ -z "${IGNORE_ALL_COBAYA_INSTALLATION}" ]; then
       fail_ucob "CP CAMSPEC BASE LIKELIHOOD INSTALLABLELIKELIHOOD PATCH"
       return 1
     fi 
+
     cd $COBAYA/$BASECL/
+    if [ $? -ne 0 ]; then
+      fail_ucob "CD BASE CLASSES (LIKELIHOOD) FOLDER"
+      return 1
+    fi
 
     patch -u InstallableLikelihood.py -i InstallableLikelihood.patch > ${OUT1} 2> ${OUT2}
     if [ $? -ne 0 ]; then
@@ -342,13 +352,14 @@ if [ -z "${IGNORE_ALL_COBAYA_INSTALLATION}" ]; then
 
     unset BASECL
     cd $ROOTDIR
-
     pbottom "INSTALLING CAMSPEC LIKELIHOOD"
   else
     rm -rf $COBAYA/$CBLIKE/planck_2018_highl_CamSpec
     rm -rf $COBAYA/$CBLIKE/planck_2018_highl_CamSpec2021
     cd $ROOTDIR
   fi
+  # ----------------------------------------------------------------------------
+  # ----------------------------------------------------------------------------
 
   #-----------------------------------------------------------------------------
   # INSTALL HILLIPOP -----------------------------------------------------------
@@ -362,6 +373,10 @@ if [ -z "${IGNORE_ALL_COBAYA_INSTALLATION}" ]; then
     rm -rf $COBAYA/$CBLIKE/hipoptmp
 
     cd $COBAYA/$CBLIKE
+    if [ $? -ne 0 ]; then
+      fail_ucob "CD BASE CLASSES (LIKELIHOOD) FOLDER"
+      return 1
+    fi
 
     export NPIPE_URL="https://github.com/planck-npipe"
 
@@ -372,6 +387,10 @@ if [ -z "${IGNORE_ALL_COBAYA_INSTALLATION}" ]; then
     fi
 
     cd $COBAYA/$CBLIKE/hipoptmp
+    if [ $? -ne 0 ]; then
+      fail_ucob "CD LIKELIHOOD TMP FOLDER (Planck 2020 HILLIPOP)"
+      return 1
+    fi
 
     $GIT reset --hard $HILLIPOP_GIT_COMMIT > ${OUT1} 2> ${OUT2}
     if [ $? -ne 0 ]; then
@@ -380,7 +399,11 @@ if [ -z "${IGNORE_ALL_COBAYA_INSTALLATION}" ]; then
     fi
 
     mv planck_2020_hillipop/ $COBAYA/$CBLIKE
-
+    if [ $? -ne 0 ]; then
+      fail_ucob "MV LIKELIHOOD FOLDER (Planck 2020 HILLIPOP)"
+      return 1
+    fi
+    
     # now patch the likelihood __init__ file
     cp $COBAYA_COCOA/$PL2020/init.patch $COBAYA/$PL2020
     if [ $? -ne 0 ]; then
@@ -389,7 +412,11 @@ if [ -z "${IGNORE_ALL_COBAYA_INSTALLATION}" ]; then
     fi
 
     cd $COBAYA/$PL2020
-    
+    if [ $? -ne 0 ]; then
+      fail_ucob "CD LIKELIHOOD FOLDER (Planck 2020 HILLIPOP)"
+      return 1
+    fi
+
     patch -u __init__.py -i init.patch > ${OUT1} 2> ${OUT2}
     if [ $? -ne 0 ]; then
       fail_ucob "PATCH LIKELIHOOD FILES (Planck 2020 HILLIPOP)"
@@ -399,7 +426,6 @@ if [ -z "${IGNORE_ALL_COBAYA_INSTALLATION}" ]; then
     rm -rf $COBAYA/$CBLIKE/hipoptmp
     unset PL2020
     cd $ROOTDIR
-
     pbottom "INSTALLING HILLIPOP LIKELIHOOD"
   fi
 
@@ -415,6 +441,10 @@ if [ -z "${IGNORE_ALL_COBAYA_INSTALLATION}" ]; then
     rm -rf $COBAYA/$CBLIKE/lipoptmp
 
     cd $COBAYA/$CBLIKE
+    if [ $? -ne 0 ]; then
+      fail_ucob "CD BASE CLASSES (LIKELIHOOD) FOLDER"
+      return 1
+    fi
 
     export NPIPE_URL="https://github.com/planck-npipe" 
 
@@ -425,12 +455,22 @@ if [ -z "${IGNORE_ALL_COBAYA_INSTALLATION}" ]; then
     fi
 
     cd $COBAYA/$CBLIKE/lipoptmp
+    if [ $? -ne 0 ]; then
+      fail_ucob "CD LIKELIHOOD TMP FOLDER (Planck 2020 LOLLIPOP)"
+      return 1
+    fi
+
     $GIT reset --hard $LOLLIPOP_GIT_COMMIT > ${OUT1} 2> ${OUT2}
     if [ $? -ne 0 ]; then
       fail_ucob "GIT RESET (Planck 2020 LOLLIPOP)"
       return 1
     fi
+
     mv planck_2020_lollipop/ $COBAYA/$CBLIKE
+    if [ $? -ne 0 ]; then
+      fail_ucob "MV LIKELIHOOD FOLDER (Planck 2020 LOLLIPOP)"
+      return 1
+    fi
 
     # now patch the likelihood __init__ file
     cp $COBAYA_COCOA/$PL2020/init.patch $COBAYA/$PL2020
@@ -440,7 +480,11 @@ if [ -z "${IGNORE_ALL_COBAYA_INSTALLATION}" ]; then
     fi
 
     cd $COBAYA/$PL2020
-    
+    if [ $? -ne 0 ]; then
+      fail_ucob "CD LIKELIHOOD FOLDER (Planck 2020 LOLLIPOP)"
+      return 1
+    fi
+
     patch -u __init__.py -i init.patch > ${OUT1} 2> ${OUT2}
     if [ $? -ne 0 ]; then
       fail_ucob "PATCH LIKELIHOOD FILES (Planck 2020 LOLLIPOP)"
