@@ -3,24 +3,30 @@
 # ----------------------------------------------------------------------------
 # ----------------------------------------------------------------------------
 if [ -z "${IGNORE_CAMB_COMPILATION}" ]; then
+  
   pfail() {
-    echo -e "\033[0;31m ERROR ENV VARIABLE ${1} NOT DEFINED \033[0m"
+    echo -e "\033[0;31m\t\t ERROR ENV VARIABLE ${1} NOT DEFINED \033[0m"
     unset pfail
   }
+  
   if [ -z "${ROOTDIR}" ]; then
     pfail 'ROOTDIR'; return 1
   fi
+  
   cdroot() {
     cd "${ROOTDIR}" 2>"/dev/null" || { echo -e \
       "\033[0;31m\t\t CD ROOTDIR (${ROOTDIR}) FAILED \033[0m"; return 1; }
     unset cdroot
   }
+  
   if [ -z "${PYTHON3}" ]; then
     pfail "PYTHON3"; cdroot; return 1
   fi
+  
   if [ -z "${CAMB_NAME}" ]; then
     pfail 'CAMB_NAME'; cdroot; return 1
   fi
+  
   unset_env_vars_clean_camb () {
     unset OUT1
     unset OUT2
@@ -28,6 +34,7 @@ if [ -z "${IGNORE_CAMB_COMPILATION}" ]; then
     unset unset_env_vars_clean_camb
     cdroot || return 1;
   }
+
   fail_clean_camb () {
     local MSG="\033[0;31m\t\t (clean_camb.sh) WE CANNOT RUN \e[3m"
     local MSG2="\033[0m"
@@ -35,18 +42,15 @@ if [ -z "${IGNORE_CAMB_COMPILATION}" ]; then
     unset fail_clean_camb
     unset_env_vars_clean_camb
   }
+
   cdfolder() {
     cd "${1}" 2>"/dev/null" || { fail_clean_camb "CD FOLDER: ${1}"; return 1; }
   }
-  cdfolder() {
-    cd "${1}" 2>"/dev/null" || fail_clean_camb "CD FOLDER: ${1}"
-  }
+  
   if [ -z "${DEBUG_CAMB_OUTPUT}" ]; then
-    export OUT1="/dev/null"
-    export OUT2="/dev/null"
+    export OUT1="/dev/null"; export OUT2="/dev/null"
   else
-    export OUT1="/dev/tty"
-    export OUT2="/dev/tty"
+    export OUT1="/dev/tty"; export OUT2="/dev/tty"
   fi
 
   # ---------------------------------------------------------------------------
@@ -67,9 +71,12 @@ if [ -z "${IGNORE_CAMB_COMPILATION}" ]; then
     { fail_clean_camb "PYTHON SETUP CLEAN"; return 1; }
 
   unset_env_vars_clean_camb || return 1
+  
   pbottom 'CLEANING CAMB'
+  
   # ---------------------------------------------------------------------------
   # ---------------------------------------------------------------------------
+
 fi
 # ----------------------------------------------------------------------------
 # ----------------------------------------------------------------------------

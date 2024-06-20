@@ -4,7 +4,7 @@
 # ------------------------------------------------------------------------------
 if [ -z "${IGNORE_ALL_PIP_INSTALLATION}" ]; then
   pfail() {
-    echo -e "\033[0;31m ERROR ENV VARIABLE ${1} IS NOT DEFINED \033[0m"
+    echo -e "\033[0;31m\t\t ERROR ENV VARIABLE ${1} IS NOT DEFINED \033[0m"
     unset pfail
   }  
   if [ -z "${ROOTDIR}" ]; then
@@ -51,7 +51,8 @@ if [ -z "${IGNORE_ALL_PIP_INSTALLATION}" ]; then
     export OUT2="/dev/tty"
     export PIP_MNT=1
   fi
-
+  # ----------------------------------------------------------------------------
+  # ----------------------------------------------------------------------------
   ptop2 "INSTALLING PYTHON PACKAGES VIA PIP"
 
   # ----------------------------------------------------------------------------

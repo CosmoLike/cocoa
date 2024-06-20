@@ -3,24 +3,26 @@
 # ----------------------------------------------------------------------------
 # ----------------------------------------------------------------------------
 if [ -z "${IGNORE_PLANCK_COMPILATION}" ]; then
+  
   pfail() {
-    echo -e "\033[0;31m ERROR ENV VARIABLE ${1} NOT DEFINED \033[0m"
+    echo -e "\033[0;31m\t\t ERROR ENV VARIABLE ${1} NOT DEFINED \033[0m"
     unset pfail
   }
+  
   if [ -z "${ROOTDIR}" ]; then
-    pfail 'ROOTDIR'
-    return 1
+    pfail 'ROOTDIR'; return 1
   fi
+  
   cdroot() {
     cd "${ROOTDIR}" 2>"/dev/null" || { echo -e \
       "\033[0;31m\t\t CD ROOTDIR (${ROOTDIR}) FAILED \033[0m"; return 1; }
     unset cdroot
   }
+  
   if [ -z "${PYTHON3}" ]; then
-    pfail "PYTHON3"
-    cdroot
-    return 1
+    pfail "PYTHON3"; cdroot; return 1
   fi
+  
   unset_env_vars_clean_planck () { 
     unset OUT1
     unset OUT2
@@ -29,26 +31,28 @@ if [ -z "${IGNORE_PLANCK_COMPILATION}" ]; then
     unset unset_env_vars_clean_planck
     cdroot || return 1;
   }
+  
   fail_clean_plc () {
-    local MSG="\033[0;31m\t\t (clean_planck.sh) WE CANNOT RUN \e[3m"
+    local MSG="\033[0;31m\t\t (clean_planck.sh) we cannot run \e[3m"
     local MSG2="\033[0m"
     echo -e "${MSG} ${1} ${MSG2}"
     unset fail_clean_plc
     unset_env_vars_clean_planck
   }
+  
   cdfolder() {
     cd "${1}" 2>"/dev/null" || { fail_clean_plc "CD FOLDER: ${1}"; return 1; }
   }
+  
   if [ -z "${DEBUG_PLANCK_OUTPUT}" ]; then
-    export OUT1="/dev/null"
-    export OUT2="/dev/null"
+    export OUT1="/dev/null"; export OUT2="/dev/null"
   else
-    export OUT1="/dev/tty"
-    export OUT2="/dev/tty"
+    export OUT1="/dev/tty"; export OUT2="/dev/tty"
   fi
-
+  
   # ---------------------------------------------------------------------------
   # ---------------------------------------------------------------------------
+  
   ptop 'CLEANING PLANCK LIKELIHOOD'
 
   export code_folder="external_modules/code/planck/code"
@@ -59,17 +63,17 @@ if [ -z "${IGNORE_PLANCK_COMPILATION}" ]; then
     cdfolder "${ROOTDIR}/${code_folder}/spt_clik/" || return 1
   fi
 
-  rm -f "${ROOTDIR}"/.local/bin/clik*
+  rm -f "${ROOTDIR}/.local"/bin/clik*
 
-  rm -f "${ROOTDIR}"/.local/lib/libclik_f90.so
+  rm -f "${ROOTDIR}/.local"/lib/libclik_f90.so
 
-  rm -f "${ROOTDIR}"/.local/lib/libclik.so
+  rm -f "${ROOTDIR}/.local"/lib/libclik.so
 
-  rm -rf "${ROOTDIR}"/.local/lib/python/site-packages/clik
+  rm -rf "${ROOTDIR}/.local"/lib/python/site-packages/clik
 
-  rm -rf "${ROOTDIR}"/.local/share/clik
+  rm -rf "${ROOTDIR}/.local"/share/clik
 
-  rm -f "${ROOTDIR}"/.local/include/clik*
+  rm -f "${ROOTDIR}/.local"/include/clik*
 
   rm -f .lock-waf_*
 
@@ -77,9 +81,12 @@ if [ -z "${IGNORE_PLANCK_COMPILATION}" ]; then
     { fail_clean_plc "PYTHON WAF DISTCLEAN"; return 1; }
 
   unset_env_vars_clean_planck || return 1
+  
   pbottom 'CLEANING PLANCK LIKELIHOOD'
+  
   # ---------------------------------------------------------------------------
   # ---------------------------------------------------------------------------
+
 fi
 # ----------------------------------------------------------------------------
 # ----------------------------------------------------------------------------
