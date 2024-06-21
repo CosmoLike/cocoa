@@ -36,6 +36,7 @@ if [ -z "${IGNORE_ALL_COBAYA_INSTALLATION}" ]; then
     unset BASECL
     unset NPIPE_URL
     unset HGL
+    unset ftmp
     unset ACTDR6_LL
     unset unset_env_vars_ucob
     cdroot || return 1;
@@ -55,6 +56,10 @@ if [ -z "${IGNORE_ALL_COBAYA_INSTALLATION}" ]; then
     export OUT1="/dev/tty"; export OUT2="/dev/tty"
   fi
 
+  cdfolder() {
+    cd "${1}" 2>"/dev/null" || { fail_ucb "CD FOLDER: ${1}"; return 1; }
+  }
+  
   export COB="${ROOTDIR}/cobaya/"
   export COCOACOB="${ROOTDIR}/../cocoa_installation_libraries/cobaya_changes"
   export CBLIKE=cobaya/likelihoods
@@ -330,56 +335,41 @@ if [ -z "${IGNORE_ALL_COBAYA_INSTALLATION}" ]; then
     ptop "INSTALLING HILLIPOP LIKELIHOOD"
 
     export PL2020="${CBLIKE}/planck_2020_hillipop"
+    export ftmp=hipoptmp
 
-    rm -rf "${COB}"/$PL2020
-    rm -rf "${COB}/${CBLIKE}"/hipoptmp
+    rm -rf "${COB}/${PL2020}"
+    rm -rf "${COB}/${CBLIKE}/${ftmp}"
 
     cdfolder "${COB}/${CBLIKE}" || return 1;
 
     export NPIPE_URL="https://github.com/planck-npipe"
 
-    $GIT clone "${NPIPE_URL}/hillipop.git" hipoptmp >${OUT1} 2>${OUT2}
-    if [ $? -ne 0 ]; then
-      fail_ucb "GIT CLONE (Planck 2020 HILLIPOP)"
-      return 1
-    fi
+    $GIT clone "${NPIPE_URL}/hillipop.git" "${ftmp}" >${OUT1} 2>${OUT2} || 
+      { fail_ucb "GIT CLONE (Planck 2020HILLIPOP)"; return 1; }
+  
+    cdfolder "${COB}/${CBLIKE}/${ftmp}" || return 1;
 
-    cdfolder "${COB}/${CBLIKE}/hipoptmp" || return 1;
-
-    $GIT reset --hard $HILLIPOP_GIT_COMMIT >${OUT1} 2>${OUT2}
-    if [ $? -ne 0 ]; then
-      fail_ucb "GIT RESET (Planck 2020 HILLIPOP)"
-      return 1
-    fi
-
-    mv planck_2020_hillipop/ "${COB}/${CBLIKE}"
-    if [ $? -ne 0 ]; then
-      fail_ucb "MV LIKELIHOOD FOLDER (Planck 2020 HILLIPOP)"
-      return 1
-    fi
-
+    $GIT reset --hard $HILLIPOP_GIT_COMMIT >${OUT1} 2>${OUT2} ||
+      { fail_ucb "GIT RESET (Planck2020 HILLIPOP)"; return 1; |
+  
+    mv planck_2020_hillipop/ "${COB}/${CBLIKE}" 2>${OUT2} ||
+      { fail_ucb "MV LIKELIHOOD FOLDER (Planck2020 HILLIPOP)"; return 1; }
+    
+    #---------------------------------------------------------------------------
     # now patch the likelihood __init__ file
-    cp ${COCOACOB}/$PL2020/init.patch ${COB}/$PL2020
-    if [ $? -ne 0 ]; then
-      fail_ucb "CP INIT.PATCH (Planck 2020 HILLIPOP)"
-      return 1
-    fi
+    #---------------------------------------------------------------------------
+    cp "${COCOACOB}/${PL2020}/init.patch" "${COB}/${PL2020}" 2>${OUT2} ||
+      { fail_ucb "CP INIT.PATCH (Planck2020 HILLIPOP)"; return 1; }
+  
+    cdfolder "${COB}/${PL2020}" || return 1;
 
-    cd ${COB}/$PL2020
-    if [ $? -ne 0 ]; then
-      fail_ucb "CD LIKELIHOOD FOLDER (Planck 2020 HILLIPOP)"
-      return 1
-    fi
-
-    patch -u __init__.py -i init.patch >${OUT1} 2>${OUT2}
-    if [ $? -ne 0 ]; then
-      fail_ucb "PATCH LIKELIHOOD FILES (Planck 2020 HILLIPOP)"
-      return 1
-    fi
-
-    rm -rf ${COB}/${CBLIKE}/hipoptmp
+    patch -u __init__.py -i init.patch >${OUT1} 2>${OUT2} || 
+      { fail_ucb "PATCH LIKELIHOOD FILES (Planck2020 HILLIPOP)"; return 1; }
+    
+    rm -rf "${COB}/${CBLIKE}/${ftmp}"
     
     unset PL2020
+    unset ftmp
 
     cdfolder "${ROOTDIR}" || return 1;
     
@@ -395,64 +385,41 @@ if [ -z "${IGNORE_ALL_COBAYA_INSTALLATION}" ]; then
     ptop "INSTALLING LOLLIPOP LIKELIHOOD"
 
     export PL2020="${CBLIKE}/planck_2020_lollipop"
+    export ftmp=lipoptmp
 
-    rm -rf ${COB}/$PL2020
-    rm -rf ${COB}/${CBLIKE}/lipoptmp
+    rm -rf "${COB}/${PL2020}"
+    rm -rf "${COB}/${CBLIKE}/${ftmp}"
 
-    cd ${COB}/${CBLIKE}
-    if [ $? -ne 0 ]; then
-      fail_ucb "CD BASE CLASSES (LIKELIHOOD) FOLDER"
-      return 1
-    fi
+    cdfolder "${COB}/${CBLIKE}" || return 1;
 
     export NPIPE_URL="https://github.com/planck-npipe" 
 
-    $GIT clone "${NPIPE_URL}/lollipop.git" lipoptmp >${OUT1} 2>${OUT2}
-    if [ $? -ne 0 ]; then
-      fail_ucb "GIT CLONE (Planck 2020 LOLLIPOP)"
-      return 1
-    fi
+    $GIT clone "${NPIPE_URL}/lollipop.git" ${ftmp} >${OUT1} 2>${OUT2} || 
+      { fail_ucb "GIT CLONE (Planck2020 LOLLIPOP)"; return 1; }
+    
+    cdfolder "${COB}/${CBLIKE}/${ftmp}" || return 1;
 
-    cd ${COB}/${CBLIKE}/lipoptmp
-    if [ $? -ne 0 ]; then
-      fail_ucb "CD LIKELIHOOD TMP FOLDER (Planck 2020 LOLLIPOP)"
-      return 1
-    fi
-
-    $GIT reset --hard $LOLLIPOP_GIT_COMMIT >${OUT1} 2>${OUT2}
-    if [ $? -ne 0 ]; then
-      fail_ucb "GIT RESET (Planck 2020 LOLLIPOP)"
-      return 1
-    fi
-
-    mv planck_2020_lollipop/ ${COB}/${CBLIKE}
-    if [ $? -ne 0 ]; then
-      fail_ucb "MV LIKELIHOOD FOLDER (Planck 2020 LOLLIPOP)"
-      return 1
-    fi
-
+    $GIT reset --hard $LOLLIPOP_GIT_COMMIT >${OUT1} 2>${OUT2} || 
+      { fail_ucb "GIT RESET (Planck2020 LOLLIPOP)"; return 1; }
+    
+    mv planck_2020_lollipop/ "${COB}/${CBLIKE}" 2>${OUT2} || 
+      { fail_ucb "MV LIKELIHOOD FOLDER (Planck2020 LOLLIPOP)"; return 1; }
+    
+    #---------------------------------------------------------------------------
     # now patch the likelihood __init__ file
-    cp ${COCOACOB}/$PL2020/init.patch ${COB}/$PL2020
-    if [ $? -ne 0 ]; then
-      fail_ucb "CP INIT.PATCH (Planck 2020 LOLLIPOP)"
-      return 1
-    fi
+    #---------------------------------------------------------------------------
+    cp "${COCOACOB}/${PL2020}/init.patch" "${COB}/${PL2020}" 2>${OUT2} || 
+      { fail_ucb "CP INIT.PATCH (Planck2020 LOLLIPOP)"; return 1; }
 
-    cd ${COB}/$PL2020
-    if [ $? -ne 0 ]; then
-      fail_ucb "CD LIKELIHOOD FOLDER (Planck 2020 LOLLIPOP)"
-      return 1
-    fi
+    cdfolder "${COB}/${PL2020}" || return 1;
 
-    patch -u __init__.py -i init.patch >${OUT1} 2>${OUT2}
-    if [ $? -ne 0 ]; then
-      fail_ucb "PATCH LIKELIHOOD FILES (Planck 2020 LOLLIPOP)"
-      return 1
-    fi
-
-    rm -rf ${COB}/${CBLIKE}/lipoptmp
+    patch -u __init__.py -i init.patch >${OUT1} 2>${OUT2} ||
+      { fail_ucb "PATCH LIKELIHOOD FILES (Planck2020 LOLLIPOP)"; return 1; }
+    
+    rm -rf "${COB}/${CBLIKE}/lipoptmp"
     
     unset PL2020
+    unset ftmp
     
     cdfolder "${ROOTDIR}" || return 1;
 
@@ -462,10 +429,13 @@ if [ -z "${IGNORE_ALL_COBAYA_INSTALLATION}" ]; then
     
   #-----------------------------------------------------------------------------
   #-----------------------------------------------------------------------------
-  unset_env_vars_ucob
+  
+  unset_env_vars_ucob | return 1;
+  
   pbottom2 "UPDATING COBAYA PACKAGE"
 
 fi
+
 #-------------------------------------------------------------------------------
 #-------------------------------------------------------------------------------
 #-------------------------------------------------------------------------------

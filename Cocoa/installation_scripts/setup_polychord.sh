@@ -83,7 +83,7 @@ if [ -z "${IGNORE_POLYCHORD_COMPILATION}" ]; then
 
   cdfolder "${ECODEF}" || return 1;
 
-  $GIT clone $POLY_URL $POLY_NAME >${OUT1} 2>${OUT2} || 
+  $GIT clone "${POLY_URL}" "${POLY_NAME}" >${OUT1} 2>${OUT2} || 
     { fail_spoly "GIT CLONE"; return 1; }
   
   cdfolder "${ECODEF}/${POLY_NAME}" || return 1;
@@ -97,13 +97,13 @@ if [ -z "${IGNORE_POLYCHORD_COMPILATION}" ]; then
   patch -u Makefile -i Makefile.patch >${OUT1} 2>${OUT2} ||
     { fail_spoly "PATCH FILE (Makefile.patch)"; return 1; }
   
-  cp $POLY_CHANGES/setup.patch . 2>${OUT2} ||
+  cp "${POLY_CHANGES}/setup.patch" . 2>${OUT2} ||
     { fail_spoly "CP FILE PATCH (SETUP)"; return 1; }
   
   patch -u setup.py -i setup.patch >${OUT1} 2>${OUT2} ||
     { fail_spoly "PATCH FILE (SETUP)"; return 1; }
 
-  cdfolder ${ROOTDIR} || return 1;
+  cdfolder "${ROOTDIR}" || return 1;
   
   pbottom 'INSTALLING POLYCHORD'
   
