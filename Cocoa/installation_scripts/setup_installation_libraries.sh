@@ -45,7 +45,7 @@ unset_env_vars_sil () {
 fail_sil () {
   local MSG="\033[0;31m\t\t (setup_installation_libraries.sh) WE CANNOT RUN \e[3m"
   local MSG2="\033[0m"
-  echo -e "${MSG} ${1:-"empty arg"} ${MSG2}"
+  echo -e "${MSG}${1:-"empty arg"}${MSG2}"
   unset fail_sil
   unset_env_vars_sil
 }
