@@ -82,7 +82,7 @@ if [ -z "${IGNORE_CMAKE_INSTALLATION}" ]; then
 
   make -j $CMKMNT >${OUT1:?} 2>${OUT2:?} || { fail_scmk "MAKE"; return 1; }
 
-  make install >${OUT1:?} 2>${OUT2:?} || { fail_scmk "INSTALL"; return 1 }
+  make install >${OUT1:?} 2>${OUT2:?} || { fail_scmk "INSTALL"; return 1; }
 
   cdfolder "${ROOTDIR}" || return 1;
 
@@ -91,9 +91,12 @@ if [ -z "${IGNORE_CMAKE_INSTALLATION}" ]; then
   # ----------------------------------------------------------------------------
   # ----------------------------------------------------------------------------
   
-  unset_env_vars_scmk
+  unset_env_vars_scmk || return 1
+
   pbottom2 'SETUP_CMAKE'
+
 fi
+
 # --------------------------------------------------------------------------------------
 # --------------------------------------------------------------------------------------
 # --------------------------------------------------------------------------------------

@@ -81,9 +81,9 @@ if [ -z "${IGNORE_DISTUTILS_INSTALLATION}" ]; then
 
   cdfolder "${CCIL:?}/${COCOA_TEXINFO_DIR:?}" || return 1;
 
-  FC="${FORTRAN_COMPILER:?} CC="${C_COMPILER:?} ./configure \
-    --prefix="${ROOTDIR:?}/.local" --disable-perl-xs 
-    >${OUT1:?} 2>${OUT2:?} || {fail_sbin "CONFIGURE"; return 1; }
+  FC="${FORTRAN_COMPILER:?}" CC="${C_COMPILER:?}" ./configure \
+    --prefix="${ROOTDIR:?}/.local" --disable-perl-xs \
+    >${OUT1:?} 2>${OUT2:?} || { fail_sbin "CONFIGURE"; return 1; }
 
   make -j $DMNT all >${OUT1:?} 2>${OUT2:?} || 
     { fail_sbin "MAKE ALL"; return 1; }
@@ -110,7 +110,7 @@ if [ -z "${IGNORE_DISTUTILS_INSTALLATION}" ]; then
   
   cdfolder "${CCIL:?}/${COCOA_BINUTILS_DIR:?}" || return 1;
 
-  FC="${FORTRAN_COMPILER:?} CC="${C_COMPILER:?} ./configure \
+  FC="${FORTRAN_COMPILER:?}" CC="${C_COMPILER:?}" ./configure \
     --prefix="${ROOTDIR:?}/.local" >${OUT1:?} 2>${OUT2:?} || 
     { fail_sbin "CONFIGURE"; return 1; }
 
@@ -130,6 +130,7 @@ if [ -z "${IGNORE_DISTUTILS_INSTALLATION}" ]; then
   pbottom2 'SETUP_BINUTILS'
   # ----------------------------------------------------------------------------
   # ----------------------------------------------------------------------------
+
 fi
 # ----------------------------------------------------------------------------
 # ----------------------------------------------------------------------------
