@@ -42,6 +42,8 @@ if [ -z "${IGNORE_FORTRAN_INSTALLATION}" ]; then
     unset FMNT
     unset CCIL
     unset pfail
+    unset PACKDIR
+    unset BUILDIR
     unset unset_env_vars_sftrp
     cdroot || return 1;
   }
@@ -54,9 +56,10 @@ if [ -z "${IGNORE_FORTRAN_INSTALLATION}" ]; then
     unset_env_vars_sftrp
   }
 
-  if [ -z "${DEBUG_FORTRAN_PACKAGES}" ]; then
+  if [ -z "${COCOA_OUTPUT_VERBOSE}" ]; then
     export OUT1="/dev/null"; export OUT2="/dev/null"
     export FMNT="${MAKE_NUM_THREADS:-1}"
+    [[ ${FMNT} == +([0-9]) ]] || export FMNT=1
   else
     export OUT1="/dev/tty"; export OUT2="/dev/tty"
     export FMNT=1
@@ -80,23 +83,20 @@ if [ -z "${IGNORE_FORTRAN_INSTALLATION}" ]; then
     
     ptop 'INSTALLING LAPACK FORTRAN LIBRARY'
 
-    if [ -z "${COCOA_LAPACK_DIR}" ]; then
-      pfail 'COCOA_LAPACK_DIR'; cdroot; return 1;
-    fi
+    export PACKDIR="${COCOA_LAPACK_DIR:-"lapack-3.11.0/"}"
+    export BUILDIR="lapack-build"
 
-    cdfolder "${CCIL}" || return 1;
-
-    rm -rf "${CCIL:?}/lapack-build"
+    rm -rf "${CCIL:?}/${BUILDIR:?}"
     
-    mkdir lapack-build >${OUT1:?} 2>${OUT2:?} || 
+    mkdir "${CCIL:?}/${BUILDIR:?}" >${OUT1:?} 2>${OUT2:?} || 
       { fail_sftrp "(LAPACK) MKDIR LAPACK-BUILD"; return 1; }
 
-    cdfolder "${CCIL:?}/lapack-build" || return 1;
+    cdfolder "${CCIL:?}/${BUILDIR:?}" || return 1;
 
     "${CMAKE:?}" -DBUILD_SHARED_LIBS=TRUE \
       -DCMAKE_INSTALL_PREFIX="${ROOTDIR:?}/.local" \
       -DCMAKE_C_COMPILER="${C_COMPILER:?}" \
-      --log-level=ERROR "../${COCOA_LAPACK_DIR:?}" >${OUT1:?} 2>${OUT2:?} ||
+      --log-level=ERROR "../${PACKDIR:?}" >${OUT1:?} 2>${OUT2:?} ||
       { fail_sftrp "(LAPACK) CMAKE"; return 1; }
 
     make -j $FMNT all >${OUT1:?} 2>${OUT2:?} || 
@@ -117,6 +117,7 @@ if [ -z "${IGNORE_FORTRAN_INSTALLATION}" ]; then
   
   pbottom2 'SETUP_FORTRAN_PACKAGES'
 fi
+
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------

@@ -23,33 +23,30 @@ if [ -z "${IGNORE_ACT_COMPILATION}" ]; then
   if [ -z "${PYTHON3}" ]; then
     pfail "PYTHON3"; cdroot; return 1;
   fi
-  
-  if [ -z "${ACT_NAME}" ]; then
-    pfail 'ACT_NAME'; cdroot; return 1;
-  fi
-  
+    
   unset_env_vars_clean_act () {
     unset pfail
     unset OUT1
     unset OUT2
     unset cdfolder
+    unset PACKDIR
     unset unset_env_vars_clean_act
     cdroot || return 1;
   }
   
-  fail_clean_act () {
+  fail_clact () {
     local MSG="\033[0;31m\t\t (clean_act.sh) WE CANNOT RUN \e[3m"
     local MSG2="\033[0m"
     echo -e "${MSG} ${1:-"empty arg"} ${MSG2}"
-    unset fail_clean_act
+    unset fail_clact
     unset_env_vars_clean_act
   }
   
   cdfolder() {
-    cd "${1:?}" 2>"/dev/null" || { fail_clean_act "CD FOLDER: ${1}"; return 1; }
+    cd "${1:?}" 2>"/dev/null" || { fail_clact "CD FOLDER: ${1}"; return 1; }
   }
   
-  if [ -z "${DEBUG_ACT_OUTPUT}" ]; then
+  if [ -z "${COCOA_OUTPUT_VERBOSE}" ]; then
     export OUT1="/dev/null"; export OUT2="/dev/null"
   else
     export OUT1="/dev/tty"; export OUT2="/dev/tty"
@@ -60,13 +57,15 @@ if [ -z "${IGNORE_ACT_COMPILATION}" ]; then
   
   ptop 'CLEANING ACT'
 
-  cdfolder "${ROOTDIR:?}/external_modules/code/${ACT_NAME:?}"/ || return 1
+  export PACKDIR="${ROOTDIR:?}/external_modules/code/${ACT_NAME:-"pyactlike"}";
 
-  rm -rf ./build/
-  rm -rf ./pyactlike.egg-info/
+  rm -rf "${PACKDIR:?}/build/"
+  rm -rf "${PACKDIR:?}/pyactlike.egg-info/"
+
+  cdfolder "${PACKDIR}" || return 1
 
   "${PYTHON3:?}" setup.py clean >${OUT1:?} 2>${OUT2:?} ||
-    { fail_clean_act "PYTHON SETUP CLEAN"; return 1; }
+    { fail_clact "PYTHON SETUP CLEAN"; return 1; }
 
   unset_env_vars_clean_act || return 1
   

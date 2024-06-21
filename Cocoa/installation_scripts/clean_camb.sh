@@ -24,31 +24,28 @@ if [ -z "${IGNORE_CAMB_COMPILATION}" ]; then
     pfail "PYTHON3"; cdroot; return 1
   fi
   
-  if [ -z "${CAMB_NAME}" ]; then
-    pfail 'CAMB_NAME'; cdroot; return 1
-  fi
-  
   unset_env_vars_clean_camb () {
     unset OUT1
     unset OUT2
     unset pfail
+    unset PACKDIR
     unset unset_env_vars_clean_camb
     cdroot || return 1;
   }
 
-  fail_cl_camb () {
+  fail_clcb () {
     local MSG="\033[0;31m\t\t (clean_camb.sh) WE CANNOT RUN \e[3m"
     local MSG2="\033[0m"
     echo -e "${MSG} ${1:-"empty arg"} ${MSG2}"
-    unset fail_cl_camb
+    unset fail_clcb
     unset_env_vars_clean_camb
   }
 
   cdfolder() {
-    cd "${1:?}" 2>"/dev/null" || { fail_cl_camb "CD FOLDER: ${1}"; return 1; }
+    cd "${1:?}" 2>"/dev/null" || { fail_clcb "CD FOLDER: ${1}"; return 1; }
   }
   
-  if [ -z "${DEBUG_CAMB_OUTPUT}" ]; then
+  if [ -z "${COCOA_OUTPUT_VERBOSE}" ]; then
     export OUT1="/dev/null"; export OUT2="/dev/null"
   else
     export OUT1="/dev/tty"; export OUT2="/dev/tty"
@@ -58,15 +55,17 @@ if [ -z "${IGNORE_CAMB_COMPILATION}" ]; then
   # ---------------------------------------------------------------------------
   ptop 'CLEANING CAMB'
 
-  cdfolder "${ROOTDIR:?}/external_modules/code/${CAMB_NAME:?}"/ || return 1
+  export PACKDIR="${ROOTDIR:?}/external_modules/code/${CAMB_NAME:-"CAMB"}"
 
-  rm -rf ./build/
-  rm -rf ./camb/__pycache__/
-  rm -f  ./camb/camblib.so
-  rm -rf ./forutils/Releaselib/
+  rm -rf "${PACKDIR:?}/build/"
+  rm -rf "${PACKDIR:?}/camb/__pycache__/"
+  rm -f  "${PACKDIR:?}/camb/camblib.so"
+  rm -rf "${PACKDIR:?}/forutils/Releaselib/"
+
+  cdfolder "${PACKDIR}" || return 1
 
   "${PYTHON3:?}" setup.py clean >${OUT1:?} 2>${OUT2:?} ||
-    { fail_cl_camb "PYTHON SETUP CLEAN"; return 1; }
+    { fail_clcb "PYTHON SETUP CLEAN"; return 1; }
 
   unset_env_vars_clean_camb || return 1
   

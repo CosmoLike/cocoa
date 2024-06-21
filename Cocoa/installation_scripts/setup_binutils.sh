@@ -35,31 +35,33 @@ if [ -z "${IGNORE_DISTUTILS_INSTALLATION}" ]; then
   unset_env_vars_sbinutils () {
     unset OUT1
     unset OUT2
-    unset DMNT
-    unset CCIL
+    unset SBMNT
     unset pfail
+    unset CCIL
+    unset PACKDIR
     unset unset_env_vars_sbinutils
     cdroot || return 1;
   }
   
-  fail_sbin () {
+  fail_sbu () {
     local MSG="\033[0;31m\t\t (setup_binutils.sh) WE CANNOT RUN \e[3m"
     local MSG2="\033[0m"
     echo -e "${MSG} ${1:-"empty arg"} ${MSG2}"
-    unset fail_sbin
+    unset fail_sbu
     unset_env_vars_sbinutils
   }
 
-  if [ -z "${DEBUG_DISTUTILS_PACKAGE}" ]; then
+  if [ -z "${COCOA_OUTPUT_VERBOSE}" ]; then
     export OUT1="/dev/null"; export OUT2="/dev/null"
-    export DMNT="${MAKE_NUM_THREADS:-1}"
+    export SBMNT="${MAKE_NUM_THREADS:-1}"
+    [[ ${SBMNT} == +([0-9]) ]] || export SBMNT=1
   else
     export OUT1="/dev/tty"; export OUT2="/dev/tty"
-    export DMNT=1
+    export SBMNT=1
   fi
 
   cdfolder() {
-    cd "${1:?}" 2>"/dev/null" || { fail_sbin "CD FOLDER: ${1}"; return 1; }
+    cd "${1:?}" 2>"/dev/null" || { fail_sbu "CD FOLDER: ${1}"; return 1; }
   }
 
   # ----------------------------------------------------------------------------
@@ -75,21 +77,17 @@ if [ -z "${IGNORE_DISTUTILS_INSTALLATION}" ]; then
   
   ptop 'INSTALLING TEXINFO LIBRARY'
 
-  if [ -z "${COCOA_TEXINFO_DIR}" ]; then
-    pfail 'COCOA_TEXINFO_DIR'; cdroot; return 1;
-  fi
+  export PACKDIR="${CCIL:?}/${COCOA_TEXINFO_DIR:-"texinfo-7.0.3/"}"
 
-  cdfolder "${CCIL:?}/${COCOA_TEXINFO_DIR:?}" || return 1;
+  cdfolder "${PACKDIR}" || return 1;
 
   FC="${FORTRAN_COMPILER:?}" CC="${C_COMPILER:?}" ./configure \
     --prefix="${ROOTDIR:?}/.local" --disable-perl-xs \
-    >${OUT1:?} 2>${OUT2:?} || { fail_sbin "CONFIGURE"; return 1; }
+    >${OUT1:?} 2>${OUT2:?} || { fail_sbu "CONFIGURE"; return 1; }
 
-  make -j $DMNT all >${OUT1:?} 2>${OUT2:?} || 
-    { fail_sbin "MAKE ALL"; return 1; }
+  make -j $SBMNT all >${OUT1:?} 2>${OUT2:?} || { fail_sbu "MAKE ALL"; return 1; }
     
-  make install >${OUT1:?} 2>${OUT2:?} || 
-    { fail_sbin "MAKE INSTALL"; return 1; }
+  make install >${OUT1:?} 2>${OUT2:?} || { fail_sbu "MAKE INSTALL"; return 1; }
 
   cdfolder "${ROOTDIR}" || return 1;
   
@@ -103,20 +101,18 @@ if [ -z "${IGNORE_DISTUTILS_INSTALLATION}" ]; then
   # ----------------------------------------------------------------------------
   
   ptop 'INSTALLING BINUTILS LIBRARY'
-
-  if [ -z "${COCOA_BINUTILS_DIR}" ]; then
-    pfail 'COCOA_BINUTILS_DIR'; cdroot; return 1;
-  fi
   
-  cdfolder "${CCIL:?}/${COCOA_BINUTILS_DIR:?}" || return 1;
+  export PACKDIR="${CCIL:?}/${COCOA_BINUTILS_DIR:-"binutils-2.37/"}"
+
+  cdfolder "${PACKDIR}" || return 1;
 
   FC="${FORTRAN_COMPILER:?}" CC="${C_COMPILER:?}" ./configure \
     --prefix="${ROOTDIR:?}/.local" >${OUT1:?} 2>${OUT2:?} || 
-    { fail_sbin "CONFIGURE"; return 1; }
+    { fail_sbu "CONFIGURE"; return 1; }
 
-  make -j $DMNT >${OUT1:?} 2>${OUT2:?} || { fail_sbin "MAKE"; return 1; }
+  make -j $SBMNT >${OUT1:?} 2>${OUT2:?} || { fail_sbu "MAKE"; return 1; }
 
-  make install >${OUT1:?} 2>${OUT2:?} || { fail_sbin "MAKE INSTALL"; return 1; }
+  make install >${OUT1:?} 2>${OUT2:?} || { fail_sbu "MAKE INSTALL"; return 1; }
 
   cdfolder "${ROOTDIR}" || return 1;
 

@@ -37,6 +37,7 @@ if [ -z "${IGNORE_OPENBLAS_INSTALLATION}" ]; then
     unset OUT1
     unset OUT2
     unset OPBMNT
+    unset PACKDIR
     unset unset_env_vars_sopb
     cdroot || return 1;
   }
@@ -49,9 +50,10 @@ if [ -z "${IGNORE_OPENBLAS_INSTALLATION}" ]; then
     unset_env_vars_sftrp
   }
   
-  if [ -z "${DEBUG_OPENBLAS_PACKAGE}" ]; then
+  if [ -z "${COCOA_OUTPUT_VERBOSE}" ]; then
     export OUT1="/dev/null"; export OUT2="/dev/null"
     export OPBMNT="${MAKE_NUM_THREADS:-1}"
+    [[ ${OPBMNT} == +([0-9]) ]] || export OPBMNT=1
   else
     export OUT1="/dev/tty"; export OUT2="/dev/tty"
     export OPBMNT=1
@@ -73,11 +75,9 @@ if [ -z "${IGNORE_OPENBLAS_INSTALLATION}" ]; then
   
   ptop  'INSTALLING OPENBLAS LIBRARY'
   
-  if [ -z "${COCOA_OPENBLAS_DIR}" ]; then
-    pfail 'COCOA_OPENBLAS_DIR'; cdroot; return 1;
-  fi
+  export PACKDIR="${COCOA_OPENBLAS_DIR:-"OpenBLAS-0.3.23/"}"
 
-  cdfolder "${CCIL:?}/${COCOA_OPENBLAS_DIR:?}" || return 1;
+  cdfolder "${CCIL:?}/${PACKDIR:?}" || return 1;
 
   export MAKE_NB_JOBS=$OPBMNT
   

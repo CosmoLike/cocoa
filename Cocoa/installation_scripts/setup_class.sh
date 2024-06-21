@@ -32,15 +32,7 @@ if [ -z "${IGNORE_CLASS_COMPILATION}" ]; then
   if [ -z "${GIT}" ]; then
     pfail 'GIT'; cdroot; return 1
   fi
-
-  if [ -z "${CLASS_GIT_COMMIT}" ]; then
-    pfail 'CLASS_GIT_COMMIT'; cdroot; return 1
-  fi
-  
-  if [ -z "${CLASS_NAME}" ]; then
-    pfail 'CLASS_NAME'; cdroot; return 1
-  fi
-  
+    
   unset_env_vars_sclass () {
     unset OUT1
     unset OUT2
@@ -48,6 +40,8 @@ if [ -z "${IGNORE_CLASS_COMPILATION}" ]; then
     unset CHANGES
     unset pfail
     unset ECODEF
+    unset CDIR
+    unset CLNAME
     unset unset_env_vars_sclass
     cdroot || return 1;
   }
@@ -60,7 +54,7 @@ if [ -z "${IGNORE_CLASS_COMPILATION}" ]; then
     unset_env_vars_sclass
   }
 
-  if [ -z "${DEBUG_CAMB_OUTPUT}" ]; then
+  if [ -z "${COCOA_OUTPUT_VERBOSE}" ]; then
     export OUT1="/dev/null"; export OUT2="/dev/null"
   else
     export OUT1="/dev/tty"; export OUT2="/dev/tty"
@@ -86,24 +80,30 @@ if [ -z "${IGNORE_CLASS_COMPILATION}" ]; then
 
   export ECODEF="${ROOTDIR:?}/external_modules/code"
 
+  export CLNAME=${CLASS_NAME:-"class_public"}
+  
+  extern CDIR="${ECODEF:?}/${CLNAME:?}/"
+
   # ---------------------------------------------------------------------------
   # in case this script is called twice
   # ---------------------------------------------------------------------------
-  rm -rf "${ROOTDIR:?}/external_modules/code/${CLASS_NAME:?}"
+  rm -rf "${CDIR:?}"
 
   # ---------------------------------------------------------------------------
   # clone from original repo
   # ---------------------------------------------------------------------------
   cdfolder "${ECODEF}" || return 1;
 
-  $GIT clone "${URL:?}" --recursive "${CLASS_NAME:?}" >${OUT1:?} 2>${OUT2:?} ||
-    { fail_sclass "GIT CLONE FROM CLASS REPO"; return 1; }
+  "${GIT:?}" clone "${URL:?}" --recursive "${CLNAME:?}" >${OUT1:?} \
+    2>${OUT2:?} || { fail_sclass "GIT CLONE FROM CLASS REPO"; return 1; }
   
-  cdfolder "${ECODEF:?}/${CLASS_NAME:?}" || return 1;
+  cdfolder "${CDIR}" || return 1;
 
-  $GIT checkout "${CLASS_GIT_COMMIT:?}" >${OUT1:?} 2>${OUT2:?} ||
-    { fail_sclass "GIT CHECKOUT CLASS"; return 1; }
-
+  if [ -n "${CLASS_GIT_COMMIT}" ]; then
+    "${GIT:?}" checkout "${CLASS_GIT_COMMIT:?}" >${OUT1:?} 2>${OUT2:?} ||
+      { fail_sclass "GIT CHECKOUT CLASS"; return 1; }
+  fi
+  
   # ---------------------------------------------------------------------------
   # historical reasons (we used to save class_python on Cocoa Branch)
   # historical: Workaround Cocoa .gitignore entry on /include
@@ -114,22 +114,26 @@ if [ -z "${IGNORE_CLASS_COMPILATION}" ]; then
   # ---------------------------------------------------------------------------
   # patch CLASS to be compatible w/ COCOA
   # ---------------------------------------------------------------------------
-  cdfolder "${ECODEF:?}/${CLASS_NAME:?}/" || return 1;
+  
+  # ---------------------------------------------------------------------------
+  cdfolder "${CDIR}" || return 1;
 
-  cp "${CHANGES:?}"/Makefile.patch .  2>${OUT2:?} || 
+  cp "${CHANGES:?}/Makefile.patch" .  2>${OUT2:?} || 
     { fail_sclass "CP FILE PATCH (Makefile.patch)"; return 1; }
   
   patch -u Makefile -i Makefile.patch >${OUT1:?} 2>${OUT2:?} ||
     { fail_sclass "SCRIPT FILE PATCH (Makefile.patch)"; return 1; }
   
-  cdfolder "${ECODEF}/${CLASS_NAME}/python" || return 1;
+  # ---------------------------------------------------------------------------
+  cdfolder "${CDIR:?}/python" || return 1;
   
-  cp "${CHANGES:?}/python"/setup.patch . 2>${OUT2:?} ||
+  cp "${CHANGES:?}/python/setup.patch" . 2>${OUT2:?} ||
     { fail_sclass "CP FILE PATCH (setup.patch)"; return 1; }
 
   patch -u setup.py -i setup.patch >${OUT1:?} 2>${OUT2:?} || 
     { fail_sclass "SCRIPT FILE PATCH (setup.patch)"; return 1; }
   
+  # ---------------------------------------------------------------------------
   cdfolder "${ROOTDIR}" || return 1;
 
   pbottom 'INSTALLING CLASS'

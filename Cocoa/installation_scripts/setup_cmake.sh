@@ -32,6 +32,7 @@ if [ -z "${IGNORE_CMAKE_INSTALLATION}" ]; then
     unset OUT1
     unset OUT2
     unset CMKMNT
+    unset CMAKEDIR
     unset pfail
     unset unset_env_vars_scmk
     cdroot || return 1;
@@ -45,9 +46,10 @@ if [ -z "${IGNORE_CMAKE_INSTALLATION}" ]; then
     unset_env_vars_scmk
   }
   
-  if [ -z "${DEBUG_CMAKE_PACKAGE}" ]; then
-    export OUT1="/dev/null"; export OUT2="/dev/null"
-    export CMKMNT="${MAKE_NUM_THREADS:-1}"
+  if [ -z "${COCOA_OUTPUT_VERBOSE}" ]; then
+    export OUT1="/dev/null"; export OUT2="/dev/null";
+    export CMKMNT="${MAKE_NUM_THREADS:-1}";
+    [[ ${CMKMNT} == +([0-9]) ]] || export CMKMNT=1
   else
     export OUT1="/dev/tty"
     export OUT2="/dev/tty"
@@ -70,11 +72,9 @@ if [ -z "${IGNORE_CMAKE_INSTALLATION}" ]; then
   
   ptop 'INSTALLING CMAKE LIBRARY'
 
-  if [ -z "${COCOA_CMAKE_DIR}" ]; then
-    pfail 'COCOA_CMAKE_DIR'; cdroot; return 1;
-  fi
+  export CMAKEDIR=${COCOA_CMAKE_DIR:-"cmake-3.26.4/"}
 
-  cdfolder "${CCIL:?}/${COCOA_CMAKE_DIR:?}" || return 1;
+  cdfolder "${CCIL:?}/${CMAKEDIR:?}" || return 1;
 
   env CC="${C_COMPILER:?}" CXX="${CXX_COMPILER:?}" ./bootstrap \
     --prefix="${ROOTDIR:?}/.local" >${OUT1:?} 2>${OUT2:?} || 

@@ -5,7 +5,7 @@
 if [ -z "${IGNORE_CLASS_COMPILATION}" ]; then
   
   if [ -z "${ROOTDIR}" ]; then
-    echo -e "\033[0;31m\t\t ERROR ENV VARIABLE ${ROOTDIR} NOT DEFINED \033[0m"
+    echo -e "\033[0;31m\t\t ERROR ENV VARIABLE ROOTDIR NOT DEFINED \033[0m"
     return 1
   fi
   
@@ -41,15 +41,12 @@ if [ -z "${IGNORE_CLASS_COMPILATION}" ]; then
   if [ -z "${PYTHON3}" ]; then
     pfail "PYTHON3"; cdroot; return 1;
   fi
-    
-  if [ -z "${CLASS_NAME}" ]; then
-    pfail 'CLASS_NAME'; cdroot; return 1
-  fi
-  
+      
   unset_env_vars_comp_class () {
     unset OUT1
     unset OUT2
     unset pfail
+    unset PACKDIR
     unset unset_env_vars_comp_class
     cdroot || return 1;
   }
@@ -66,7 +63,7 @@ if [ -z "${IGNORE_CLASS_COMPILATION}" ]; then
     cd "${1:?}" 2>"/dev/null" || { fail_comp_class "CD FOLDER: ${1}"; return 1; }
   }
   
-  if [ -z "${DEBUG_CLASS_OUTPUT}" ]; then
+  if [ -z "${COCOA_OUTPUT_VERBOSE}" ]; then
     export OUT1="/dev/null"; export OUT2="/dev/null"
   else
     export OUT1="/dev/tty"; export OUT2="/dev/tty"
@@ -77,30 +74,32 @@ if [ -z "${IGNORE_CLASS_COMPILATION}" ]; then
   
   ptop 'COMPILING CLASS'
 
-  cdfolder "${ROOTDIR}/external_modules/code/${CLASS_NAME}/" || return 1
+  export PACKDIR="${ROOTDIR:?}/external_modules/code/${CLASS_NAME:-"class_public"}/"
+
+  cdfolder "${PACKDIR}" || return 1
 
   # ---------------------------------------------------------------------------
   # historical: workaround Cocoa .gitignore entry on /include 
   # also good because class compilation changes files on /include
   # in case this script is called twice
   # ---------------------------------------------------------------------------  
-  rm -rf ./include
+  rm -rf "${PACKDIR:?}/include"
 
   # ---------------------------------------------------------------------------
   # historical: workaround Cocoa .gitignore entry on /include
   # also good because class compilation changes files on /include
   # ---------------------------------------------------------------------------
-  cp -r  ./include2 ./include >${OUT1:?} 2>${OUT2:?} || 
-    { fail_comp_class "CP INCLUDE2 FOLDER"; return 1; }
+  cp -r  "${PACKDIR:?}/include2" "${PACKDIR:?}/include" >${OUT1:?} \
+    2>${OUT2:?} || { fail_comp_class "CP INCLUDE2 FOLDER"; return 1; }
 
 
-  CC=${C_COMPILER:?} PYTHON=${PYTHON3:?} make all >${OUT1:?} 2>${OUT2:?} || 
-    { fail_comp_class "MAKE ALL"; return 1; }
+  CC="${C_COMPILER:?}" PYTHON="${PYTHON3:?}" make all >${OUT1:?} \
+    2>${OUT2:?} || { fail_comp_class "MAKE ALL"; return 1; }
    
   cdfolder ./python || return 1
 
-  CC=${C_COMPILER:?} "${PYTHON3:?}" setup.py build >${OUT1:?} 2>${OUT2:?} || 
-    { fail_comp_class "PYTHON3 SETUP.PY BUILD"; return 1; }
+  CC="${C_COMPILER:?}" "${PYTHON3:?}" setup.py build >${OUT1:?} \
+    2>${OUT2:?} || { fail_comp_class "PYTHON3 SETUP.PY BUILD"; return 1; }
 
   unset_env_vars_comp_class || return 1
 

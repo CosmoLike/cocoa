@@ -42,6 +42,7 @@ if [ -z "${IGNORE_ALL_PIP_INSTALLATION}" ]; then
     unset PIPMNT
     unset unset_env_vars_spp
     unset CCIL
+    unset PACKDIR
     cdroot || return 1;
   }
 
@@ -56,6 +57,7 @@ if [ -z "${IGNORE_ALL_PIP_INSTALLATION}" ]; then
   if [ -z "${DEBUG_PIP_OUTPUT}" ]; then
     export OUT1="/dev/null"; export OUT2="/dev/null"
     export PIPMNT="${MAKE_NUM_THREADS:-1}"
+    [[ ${PIPMNT} == +([0-9]) ]] || export PIPMNT=1
   else
     export OUT1="/dev/tty"; export OUT2="/dev/tty"
     export PIPMNT=1
@@ -77,7 +79,9 @@ if [ -z "${IGNORE_ALL_PIP_INSTALLATION}" ]; then
     
     export CCIL="${ROOTDIR:?}/../cocoa_installation_libraries"
 
-    cdfolder "${CCIL:?}/${COCOA_EXPAT_DIR:?}" || return 1;
+    export PACKDIR="${COCOA_EXPAT_DIR:-"expat-2.5.0/"}"
+
+    cdfolder "${CCIL:?}/${PACKDIR:?}" || return 1;
     
     FC="${FORTRAN_COMPILER:?}" CC="${C_COMPILER:?}" ./configure \
       --prefix="${ROOTDIR:?}/.local" \
@@ -92,8 +96,8 @@ if [ -z "${IGNORE_ALL_PIP_INSTALLATION}" ]; then
       { fail_spp "(LIBEXPAT) MAKE INSTALL"; return 1; }
 
     cp "${ROOTDIR:?}/.local/lib/libexpat.so.1" \
-      "${ROOTDIR:?}/.local/lib/libexpat.so.0" \
-      2>${OUT2:?} || { fail_spp "(LIBEXPAT) CP LIBEXPAT.SO.1"; return 1; }
+       "${ROOTDIR:?}/.local/lib/libexpat.so.0" \
+       2>${OUT2:?} || { fail_spp "(LIBEXPAT) CP LIBEXPAT.SO.1"; return 1; }
     
     cdfolder "${ROOTDIR}" || return 1;
 

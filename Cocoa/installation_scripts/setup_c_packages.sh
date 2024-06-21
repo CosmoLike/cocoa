@@ -43,6 +43,7 @@ if [ -z "${IGNORE_C_INSTALLATION}" ]; then
     unset CCIL
     unset pfail
     unset BFD
+    unset PACKDIR
     unset unset_env_vars_scp
     cdroot || return 1;
   }
@@ -55,9 +56,10 @@ if [ -z "${IGNORE_C_INSTALLATION}" ]; then
     unset_env_vars_scp
   }
   
-  if [ -z "${DEBUG_C_PACKAGES}" ]; then
+  if [ -z "${COCOA_OUTPUT_VERBOSE}" ]; then
     export OUT1="/dev/null"; export OUT2="/dev/null"
     export CMNT="${MAKE_NUM_THREADS:-1}"
+    [[ ${CMNT} == +([0-9]) ]] || export CMNT=1
   else
     export OUT1="/dev/tty"; export OUT2="/dev/tty"
     export CMNT=1
@@ -82,11 +84,9 @@ if [ -z "${IGNORE_C_INSTALLATION}" ]; then
     
     ptop 'INSTALLING FFTW C LIBRARY'
     
-    if [ -z "${COCOA_FFTW_DIR}" ]; then
-      pfail 'COCOA_FFTW_DIR'; cdroot; return 1;
-    fi
-    
-    cdfolder "${CCIL:?}/${COCOA_FFTW_DIR:?}" || return 1;
+    export PACKDIR="${CCIL:?}/${COCOA_FFTW_DIR:-"fftw-3.3.10/"}"
+
+    cdfolder "${PACKDIR}" || return 1;
 
     FC="${FORTRAN_COMPILER:?}" CC="${C_COMPILER:?}" ./configure \
       --enable-openmp \
@@ -118,22 +118,16 @@ if [ -z "${IGNORE_C_INSTALLATION}" ]; then
     
     ptop 'INSTALLING CFITSIO C LIBRARY'
 
-    if [ -z "${COCOA_CFITSIO_DIR}" ]; then
-      pfail 'COCOA_CFITSIO_DIR'; cdroot; return 1;
-    fi
-
-    cdfolder "${CCIL:?}/${COCOA_CFITSIO_DIR:?}" || return 1;
-    
-    rm -f CMakeCache.txt
-    
+    export PACKDIR="${CCIL:?}/${COCOA_CFITSIO_DIR:-"cfitsio-4.0.0/"}"
     export BFD="CFITSIOBUILD"
-    
-    rm -rf "./${BFD:?}"
 
-    mkdir "${BFD:?}/" >${OUT1:?} 2>${OUT2:?} || 
+    rm -f  "${PACKDIR:?}/CMakeCache.txt"
+    rm -rf "${PACKDIR:?}/${BFD:?}"
+    
+    mkdir "${PACKDIR}/${BFD:?}/" 2>${OUT2:?} || 
       { fail_scp "(CFITSIO) MKDIR BUILD FOLDER"; return 1; }
     
-    cdfolder "${CCIL:?}/${COCOA_CFITSIO_DIR:?}/${BFD:?}" || return 1;
+    cdfolder "${PACKDIR:?}/${BFD:?}" || return 1;
 
     "${CMAKE:?}" -DBUILD_SHARED_LIBS=TRUE \
       -DCMAKE_INSTALL_PREFIX="${ROOTDIR:?}/.local" \
@@ -148,10 +142,8 @@ if [ -z "${IGNORE_C_INSTALLATION}" ]; then
 
     make install >${OUT1:?} 2>${OUT2:?} || 
       { fail_scp "(CFITSIO) MAKE INSTALL"; return 1; }
-
-    cdfolder "${CCIL:?}/${COCOA_CFITSIO_DIR:?}" || return 1;
     
-    rm -rf "./${BFD:?}"
+    rm -rf "${PACKDIR:?}/${BFD:?}"
 
     cdfolder "${ROOTDIR}" || return 1;
 
@@ -170,13 +162,11 @@ if [ -z "${IGNORE_C_INSTALLATION}" ]; then
     
     ptop 'INSTALLING GSL C LIBRARY'
 
-    if [ -z "${COCOA_GSL_DIR}" ]; then
-      pfail 'COCOA_GSL_DIR'; cdroot; return 1;
-    fi
+    export PACKDIR="${CCIL:?}/${COCOA_GSL_DIR:-"gsl-2.7/"}" 
 
-    cdfolder "${CCIL:?}/${COCOA_GSL_DIR:?}" || return 1;
+    cdfolder "${PACKDIR}" || return 1;
 
-    CC=$C_COMPILER ./configure \
+    CC="${C_COMPILER:?}" ./configure \
       --prefix="${ROOTDIR:?}/.local" \
       --enable-shared=yes \
       --enable-static=yes \
@@ -214,34 +204,13 @@ if [ -z "${IGNORE_ALL_PIP_INSTALLATION}" ]; then
     pfail 'PIP3'; cdroot; return 1;
   fi
   
-  unset_env_vars_scp_eemul2 () {
-    unset OUT1
-    unset OUT2
-    cdroot || return 1;
-  }
-  
-  fail_scp () {
-    local MSG="\033[0;31m\t\t (setup_c_packages.sh) we cannot run \e[3m"
-    local MSG2="\033[0m"
-    echo -e "${MSG} ${1:-"empty arg"} ${MSG2}"
-    unset fail_scp
-    unset_env_vars_scp_eemul2
-  }
-  
-  if [ -z "${DEBUG_PIP_PACKAGES}" ]; then
-    export OUT1="/dev/null"; export OUT2="/dev/null"
-  else
-    export OUT1="/dev/tty"; export OUT2="/dev/tty"
-  fi
-
   # ----------------------------------------------------------------------------
   # ----------------------------------------------------------------------------
   
   ptop2 'INSTALLING EUCLIDEMU2 DONE'
 
   env CXX="${CXX_COMPILER:?}" CC="${C_COMPILER:?}" "${PIP3:?}" install \
-    --global-option=build_ext \
-    "${ROOTDIR:?}/../cocoa_installation_libraries/euclidemu2-1.2.0" \
+    --global-option=build_ext "${CCIL:?}/euclidemu2-1.2.0" \
     --no-dependencies \
     --prefix="${ROOTDIR:?}/.local" \
     --no-index >${OUT1:?} 2>${OUT2:?} || 

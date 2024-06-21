@@ -37,6 +37,7 @@ if [ -z "${IGNORE_CPP_INSTALLATION}" ]; then
     unset OUT2
     unset CPPMNT
     unset CCIL
+    unset PACKDIR
     unset pfail
     unset unset_env_vars_scpp
     cdroot || return 1;
@@ -50,9 +51,10 @@ if [ -z "${IGNORE_CPP_INSTALLATION}" ]; then
     unset_env_vars_scpp
   }
 
-  if [ -z "${DEBUG_CPP_PACKAGES}" ]; then
+  if [ -z "${COCOA_OUTPUT_VERBOSE}" ]; then
     export OUT1="/dev/null"; export OUT2="/dev/null"
     export CPPMNT="${MAKE_NUM_THREADS:-1}"
+    [[ ${CPPMNT} == +([0-9]) ]] || export CPPMNT=1
   else
     export OUT1="/dev/tty"; export OUT2="/dev/tty"
     export CPPMNT=1
@@ -76,13 +78,11 @@ if [ -z "${IGNORE_CPP_INSTALLATION}" ]; then
     
     ptop 'INSTALLING SPDLOG C++ LIBRARY'
 
-    if [ -z "${COCOA_SPDLOG_DIR}" ]; then
-      pfail 'COCOA_SPDLOG_DIR'; cdroot; return 1;
-    fi
+    export PACKDIR="${COCOA_SPDLOG_DIR:-"spdlog/"}"
 
-    cdfolder "${CCIL:?}/${COCOA_SPDLOG_DIR:?}" || return 1;
+    cdfolder "${CCIL:?}/${PACKDIR:?}" || return 1;
     
-    rm -f CMakeCache.txt
+    rm -f "${CCIL:?}/${PACKDIR:?}/CMakeCache.txt"
 
     "${CMAKE:?}" -DCMAKE_INSTALL_PREFIX="${ROOTDIR:?}/.local" \
       -DCMAKE_C_COMPILER="${C_COMPILER:?}" \
@@ -111,15 +111,13 @@ if [ -z "${IGNORE_CPP_INSTALLATION}" ]; then
     
     ptop 'INSTALLING ARMADILLO C++ LIBRARY'
 
-    if [ -z "${COCOA_ARMADILLO_DIR}" ]; then
-      pfail 'COCOA_ARMADILLO_DIR'; cdroot; return 1;
-    fi
+    export PACKDIR="${COCOA_ARMADILLO_DIR:-"armadillo-12.8.2/"}"
 
-    cdfolder "${CCIL:?}/${COCOA_ARMADILLO_DIR:?}" || return 1;
+    cdfolder "${CCIL:?}/${PACKDIR:?}" || return 1;
 
-    rm -f CMakeCache.txt
+    rm -f "${CCIL:?}/${PACKDIR:?}/CMakeCache.txt"
 
-    $CMAKE -DBUILD_SHARED_LIBS=TRUE \
+    "${CMAKE:?}" -DBUILD_SHARED_LIBS=TRUE \
       -DCMAKE_INSTALL_PREFIX="${ROOTDIR:?}/.local" \
       -DCMAKE_C_COMPILER="${C_COMPILER:?}" \
       -DCMAKE_CXX_COMPILER="${CXX_COMPILER:?}" \
@@ -153,11 +151,9 @@ if [ -z "${IGNORE_CPP_INSTALLATION}" ]; then
     
     ptop 'INSTALLING CARMA C++ LIBRARY'
 
-    if [ -z "${COCOA_CARMA_DIR}" ]; then
-      pfail 'COCOA_CARMA_DIR'; cdroot; return 1;
-    fi
+    export PACKDIR="${COCOA_CARMA_DIR:-"carma/"}"
 
-    cdfolder "${CCIL:?}/${COCOA_CARMA_DIR:?}" || return 1;
+    cdfolder "${CCIL:?}/${PACKDIR:?}" || return 1;
 
     rm -rf "${ROOTDIR:?}/.local/include/carma/"   
     
@@ -173,19 +169,19 @@ if [ -z "${IGNORE_CPP_INSTALLATION}" ]; then
     cdfolder "${ROOTDIR}" || return 1;
 
     pbottom 'INSTALLING CARMA C++ LIBRARY'
+
   fi
 
   # ----------------------------------------------------------------------------
   # ---------------------------------- BOOST -----------------------------------
   # ----------------------------------------------------------------------------
   if [ -z "${IGNORE_CPP_BOOST_INSTALLATION}" ]; then
+
     ptop 'INSTALLING BOOST C++ LIBRARY'
 
-    if [ -z "${COCOA_BOOST_DIR}" ]; then
-      pfail 'COCOA_BOOST_DIR'; cdroot; return 1;
-    fi
+    export PACKDIR="${COCOA_BOOST_DIR:-"boost_1_81_0/"}"
 
-    cdfolder "${CCIL:?}/${COCOA_BOOST_DIR:?}" || return 1;
+    cdfolder "${CCIL:?}/${PACKDIR:?}" || return 1;
 
     ./bootstrap.sh --prefix="${ROOTDIR:?}/.local" >${OUT1:?} 2>${OUT2:?} || 
       { fail_scpp "(BOOST) SCRIPT BOOTSTRAP"; return 1; }
@@ -199,6 +195,7 @@ if [ -z "${IGNORE_CPP_INSTALLATION}" ]; then
     cdfolder "${ROOTDIR}" || return 1;
 
     pbottom 'INSTALLING BOOST C++ LIBRARY'
+
   fi
   # ----------------------------------------------------------------------------
   # ----------------------------------------------------------------------------

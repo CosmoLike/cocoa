@@ -33,19 +33,19 @@ if [ -z "${IGNORE_PLANCK_COMPILATION}" ]; then
     cdroot || return 1;
   }
   
-  fail_cl_plc () {
+  fail_clplk () {
     local MSG="\033[0;31m\t\t (clean_planck.sh) we cannot run \e[3m"
     local MSG2="\033[0m"
     echo -e "${MSG} ${1:-"empty arg"} ${MSG2}"
-    unset fail_cl_plc
+    unset fail_clplk
     unset_env_vars_clean_planck
   }
   
   cdfolder() {
-    cd "${1:?}" 2>"/dev/null" || { fail_cl_plc "CD FOLDER: ${1}"; return 1; }
+    cd "${1:?}" 2>"/dev/null" || { fail_clplk "CD FOLDER: ${1}"; return 1; }
   }
   
-  if [ -z "${DEBUG_PLANCK_OUTPUT}" ]; then
+  if [ -z "${COCOA_OUTPUT_VERBOSE}" ]; then
     export OUT1="/dev/null"; export OUT2="/dev/null"
   else
     export OUT1="/dev/tty"; export OUT2="/dev/tty"
@@ -73,7 +73,7 @@ if [ -z "${IGNORE_PLANCK_COMPILATION}" ]; then
   rm -f  .lock-waf_*
 
   "${PYTHON3:?}" waf distclean >${OUT1:?} 2>${OUT2:?} ||
-    { fail_cl_plc "PYTHON WAF DISTCLEAN"; return 1; }
+    { fail_clplk "PYTHON WAF DISTCLEAN"; return 1; }
 
   unset_env_vars_clean_planck || return 1
   

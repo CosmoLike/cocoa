@@ -5,7 +5,7 @@
 if [ -z "${IGNORE_PLANCK_COMPILATION}" ]; then
   
   if [ -z "${ROOTDIR}" ]; then
-    echo -e "\033[0;31m\t\t ERROR ENV VARIABLE ${ROOTDIR} NOT DEFINED \033[0m"
+    echo -e "\033[0;31m\t\t ERROR ENV VARIABLE ROOTDIR NOT DEFINED \033[0m"
     return 1
   fi
   
@@ -46,7 +46,7 @@ if [ -z "${IGNORE_PLANCK_COMPILATION}" ]; then
     unset OUT1
     unset OUT2
     unset pfail
-    unset CFL
+    unset EMCPC
     unset CLIK_LAPALIBS
     unset CLIK_CFITSLIBS
     unset unset_env_vars_comp_pl
@@ -65,7 +65,7 @@ if [ -z "${IGNORE_PLANCK_COMPILATION}" ]; then
     cd "${1:?}" 2>"/dev/null" || { fail_comp_pl "CD FOLDER: ${1}"; return 1; }
   }
   
-  if [ -z "${DEBUG_PLANCK_OUTPUT}" ]; then
+  if [ -z "${COCOA_OUTPUT_VERBOSE}" ]; then
     export OUT1="/dev/null"; export OUT2="/dev/null"
   else
     export OUT1="/dev/tty"; export OUT2="/dev/tty"
@@ -94,16 +94,16 @@ if [ -z "${IGNORE_PLANCK_COMPILATION}" ]; then
   
   ptop 'COMPILING PLANCK'
 
-  export CFL="external_modules/code/planck/code"
+  export EMCPC="external_modules/code/planck/code"
   
   if [ -z "${USE_SPT_CLIK_PLANCK}" ]; then
-    cdfolder "${ROOTDIR:?}/${CFL:?}/plc_3.0/plc-3.1/" || return 1
+    cdfolder "${ROOTDIR:?}/${EMCPC:?}/plc_3.0/plc-3.1/" || return 1
   else
-    cdfolder "${ROOTDIR:?}/${CFL:?}/spt_clik/" || return 1
+    cdfolder "${ROOTDIR:?}/${EMCPC:?}/spt_clik/" || return 1
   fi
   
-  FC="${FORTRAN_COMPILER:?}" CC="${C_COMPILER:?}" CXX="${CXX_COMPILER:?}" \
-    "${PYTHON3:?}" waf configure \
+  FC="${FORTRAN_COMPILER:?}" CC="${C_COMPILER:?}" \
+    CXX="${CXX_COMPILER:?}" "${PYTHON3:?}" waf configure \
     --gcc \
     --gfortran \
     --cfitsio_islocal \

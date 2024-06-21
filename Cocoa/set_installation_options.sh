@@ -79,7 +79,6 @@ export POLYCHORD_GIT_COMMIT="daba49d1385d065122db76a2b384050f9e95d278"
 export CAMB_GIT_COMMIT="45d1c3d27e7480c0f9a82c98522c17ed422dd408"
 export CLASS_GIT_COMMIT="8df566c1ff2d0b3e40e106567c435575aea337be"
 
-
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
@@ -345,52 +344,6 @@ fi
 export COCOA_RUN_EVALUATE="mpirun -n 1 --oversubscribe --mca btl vader,tcp,self --bind-to core:overload-allowed --rank-by core --map-by numa:pe=4 cobaya-run"
 
 export COCOA_RUN_MCMC="mpirun -n 4 --oversubscribe --mca btl vader,tcp,self --bind-to core:overload-allowed --rank-by core --map-by numa:pe=4 cobaya-run"
-
-# ------------------------------------------------------------------------------
-# ------------------------------------------------------------------------------
-# ------------------------------------------------------------------------------
-# DEBUG THE COMPILATION/SETUP OF PACKAGES. BY DEFAULT, THE COMPILATION'S ------- 
-# OUTPUT IS NOT WRITTEN ON THE TERMINAL. THESE FLAGS ENABLE THAT OUTPUT -------- 
-# ------------------------------------------------------------------------------
-# ------------------------------------------------------------------------------
-# ------------------------------------------------------------------------------
-if [ -n "${COCOA_OUTPUT_VERBOSE}" ]; then
-  export DEBUG_CPP_PACKAGES=1
-  export DEBUG_C_PACKAGES=1
-  export DEBUG_FORTRAN_PACKAGES=1
-  export DEBUG_PIP_OUTPUT=1
-  export DEBUG_XZ_PACKAGE=1
-  export DEBUG_CMAKE_PACKAGE=1
-  export DEBUG_OPENBLAS_PACKAGE=1
-  export DEBUG_DISTUTILS_PACKAGE=1
-  export DEBUG_HDF5_PACKAGES=1
-  export DEBUG_UNXV_CLEAN_ALL=1
-  export DEBUG_SIL_OUTPUT=1
-
-  export DEBUG_PLANCK_OUTPUT=1
-  export DEBUG_CAMB_OUTPUT=1
-  export DEBUG_CLASS_OUTPUT=1
-  export DEBUG_POLY_OUTPUT=1
-  export DEBUG_ACT_OUTPUT=1
-else
-  unset DEBUG_CPP_PACKAGES
-  unset DEBUG_C_PACKAGES
-  unset DEBUG_FORTRAN_PACKAGES
-  unset DEBUG_PIP_OUTPUT
-  unset DEBUG_XZ_PACKAGE
-  unset DEBUG_CMAKE_PACKAGE
-  unset DEBUG_OPENBLAS_PACKAGE
-  unset DEBUG_DISTUTILS_PACKAGE
-  unset DEBUG_HDF5_PACKAGES
-  unset DEBUG_UNXV_CLEAN_ALL
-  unset DEBUG_SIL_OUTPUT
-
-  unset DEBUG_PLANCK_OUTPUT
-  unset DEBUG_CAMB_OUTPUT
-  unset DEBUG_CLASS_OUTPUT
-  unset DEBUG_POLY_OUTPUT
-  unset DEBUG_ACT_OUTPUT
-fi
 
 # ------------------------------------------------------------------------------
 # DEBUG THE COMPILATION OF PREREQUISITES PACKAGES. IF YOU NEED TO RUN ----------

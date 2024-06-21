@@ -27,16 +27,13 @@ if [ -z "${IGNORE_POLYCHORD_COMPILATION}" ]; then
   if [ -z "${PYTHON_VERSION}" ]; then
     pfail "PYTHON_VERSION"; cdroot; return 1;
   fi
-  
-  if [ -z "${POLY_NAME}" ]; then
-    pfail 'POLY_NAME'; cdroot; return 1;
-  fi
-  
+    
   unset_env_vars_clean_poly () {
     unset OUT1
     unset OUT2
-    unset PLIB
     unset pfail
+    unset PLIB
+    unset PACKDIR
     unset unset_env_vars_clean_poly
     cdroot || return 1;
   }
@@ -54,7 +51,7 @@ if [ -z "${IGNORE_POLYCHORD_COMPILATION}" ]; then
     cd "${1:?}" 2>"/dev/null" || { fail_cl_poly "CD FOLDER: ${1}"; return 1; }
   }
   
-  if [ -z "${DEBUG_POLY_OUTPUT}" ]; then
+  if [ -z "${COCOA_OUTPUT_VERBOSE}" ]; then
     export OUT1="/dev/null"; export OUT2="/dev/null"
   else
     export OUT1="/dev/tty"; export OUT2="/dev/tty"
@@ -65,14 +62,16 @@ if [ -z "${IGNORE_POLYCHORD_COMPILATION}" ]; then
   
   ptop 'CLEANING POLYCHORD'
 
-  cdfolder "${ROOTDIR:?}/external_modules/code/${POLY_NAME:?}" || return 1
+  export PLIB="${ROOTDIR:?}/.local/lib/python${PYTHON_VERSION:?}/site-packages"
+  export PACKDIR="${ROOTDIR:?}/external_modules/code/${POLY_NAME:-"PolyChordLite"}"
+
+  cdfolder "${PACKDIR}" || return 1
 
   make clean >${OUT1:?} 2>${OUT2:?} || { fail_cl_poly "MAKE CLEAN"; return 1; }
   
-  export PLIB="${ROOTDIR:?}/.local/lib/python${PYTHON_VERSION:?}/site-packages"
   rm -rf "${PLIB:?}"/pypolychord-*
-  rm -rf "${ROOTDIR:?}/external_modules/code/${POLY_NAME:?}/lib/*.a"
-  rm -rf "${ROOTDIR:?}/external_modules/code/${POLY_NAME:?}/lib/*.so"
+  rm -rf "${ROOTDIR:?}/external_modules/code/${POLYF:?}/lib/*.a"
+  rm -rf "${ROOTDIR:?}/external_modules/code/${POLYF:?}/lib/*.so"
 
   unset_env_vars_clean_poly || return 1
   

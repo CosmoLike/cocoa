@@ -36,16 +36,13 @@ if [ -z "${IGNORE_POLYCHORD_COMPILATION}" ]; then
   if [ -z "${PYTHON3}" ]; then
     pfail "PYTHON3"; cdroot; return 1;
   fi
-    
-  if [ -z "${POLY_NAME}" ]; then
-    pfail 'POLY_NAME'; cdroot; return 1
-  fi
   
   unset_env_vars_comp_poly () {
     unset OUT1
     unset OUT2
     unset PMNT
     unset pfail
+    unset POLYF
     unset unset_env_vars_comp_poly
     cdroot || return 1;
   }
@@ -58,9 +55,10 @@ if [ -z "${IGNORE_POLYCHORD_COMPILATION}" ]; then
     unset_env_vars_comp_poly 
   }
   
-  if [ -z "${DEBUG_POLY_OUTPUT}" ]; then
+  if [ -z "${COCOA_OUTPUT_VERBOSE}" ]; then
     export OUT1="/dev/null"; export OUT2="/dev/null"
-    export PMNT="${MAKE_NUM_THREADS:-1}"
+    export PMNT="${MAKE_NUM_THREADS:-1}"; 
+    [[ ${PMNT} == +([0-9]) ]] || export PMNT=1
   else
     export OUT1="/dev/tty"; export OUT2="/dev/tty"
     export PMNT=1
@@ -75,7 +73,10 @@ if [ -z "${IGNORE_POLYCHORD_COMPILATION}" ]; then
   
   ptop 'COMPILING POLYCHORD'
 
-  cdfolder "${ROOTDIR:?}/external_modules/code/${POLY_NAME:?}/" || return 1
+  export POLYF=${POLY_NAME:-"PolyChordLite"}
+  export PACKDIR="${ROOTDIR:?}/external_modules/code/${POLYF:?}"
+
+  cdfolder "${PACKDIR}" || return 1
 
   make all >${OUT1:?} 2>${OUT2:?} || { fail_comp_poly "MAKE ALL"; return 1; }
 

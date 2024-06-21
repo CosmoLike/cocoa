@@ -45,7 +45,7 @@ if [ -z "${IGNORE_POLYCHORD_COMPILATION}" ]; then
     unset_env_vars_spoly
   }
   
-  if [ -z "${DEBUG_POLY_OUTPUT}" ]; then
+  if [ -z "${COCOA_OUTPUT_VERBOSE}" ]; then
     export OUT1="/dev/null"; export OUT2="/dev/null"
   else
     export OUT1="/dev/tty"; export OUT2="/dev/tty"

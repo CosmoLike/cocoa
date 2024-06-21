@@ -27,34 +27,30 @@ if [ -z "${IGNORE_CLASS_COMPILATION}" ]; then
   if [ -z "${PYTHON_VERSION}" ]; then
     pfail "PYTHON_VERSION"; cdroot; return 1
   fi
-  
-  if [ -z "${CLASS_NAME}" ]; then
-    pfail 'CAMB_NAME'; cdroot; return 1
-  fi
-  
+    
   unset_env_vars_clean_class () {
     unset OUT1
     unset OUT2
-    unset PLIB
     unset pfail
-    unset CLASSDIR
+    unset PLIB
+    unset PACKDIR
     unset unset_env_vars_clean_class
-    cdroot
+    cdroot || return 1;
   }
   
-  fail_cl_class () {
+  fail_clcls () {
     local MSG="\033[0;31m\t\t (clean_class.sh) we cannot run \e[3m"
     local MSG2="\033[0m"
     echo -e "${MSG} ${1:-"empty arg"} ${MSG2}"
-    unset fail_cl_class
+    unset fail_clcls
     unset_env_vars_clean_class
   }
   
   cdfolder() {
-    cd "${1:?}" 2>"/dev/null" || { fail_cl_class "CD FOLDER: ${1}"; return 1; }
+    cd "${1:?}" 2>"/dev/null" || { fail_clcls "CD FOLDER: ${1}"; return 1; }
   }
   
-  if [ -z "${DEBUG_CLASS_OUTPUT}" ]; then
+  if [ -z "${COCOA_OUTPUT_VERBOSE}" ]; then
     export OUT1="/dev/null"; export OUT2="/dev/null"
   else
     export OUT1="/dev/tty"; export OUT2="/dev/tty"
@@ -65,28 +61,28 @@ if [ -z "${IGNORE_CLASS_COMPILATION}" ]; then
 
   ptop 'CLEANING CLASS'
 
-  extern CLASSDIR="${ROOTDIR:?}/external_modules/code/${CLASS_NAME:?}/"
+  export PLIB="${ROOTDIR:?}/.local/lib/python${PYTHON_VERSION:?}/site-packages"
+  export PACKDIR="${ROOTDIR:?}/external_modules/code/${CLASS_NAME:-"class_public"}/"
 
-  cdfolder "${CLASSDIR:?}" || return 1
+  cdfolder "${PACKDIR}" || return 1
 
-  make clean >${OUT1:?} 2>${OUT2:?} || { fail_cl_class "MAKE CLEAN"; return 1; }
+  make clean >${OUT1:?} 2>${OUT2:?} || { fail_clcls "MAKE CLEAN"; return 1; }
 
-  cdfolder "${CLASSDIR:?}/python"|| return 1
+  cdfolder "${PACKDIR:?}/python"|| return 1
   
   "${PYTHON3:?}" setup.py clean >${OUT1:?} 2>${OUT2:?} ||
-    { fail_cl_class "PYTHON SETUP CLEAN"; return 1; }
+    { fail_clcls "PYTHON SETUP CLEAN"; return 1; }
 
-  export PLIB="${ROOTDIR:?}/.local/lib/python${PYTHON_VERSION:?}/site-packages"
   rm -rf "${PLIB:?}"/classy*
-  rm -rf "${CLASSDIR:?}/python/build/"
-  rm -rf "${CLASSDIR:?}/python/classy.egg-info"  
-  rm -rf "${CLASSDIR:?}/build/"
-  rm -f "${CLASSDIR:?}/class"
-  rm -f "${CLASSDIR:?}/libclass.a"
+  rm -rf "${PACKDIR:?}/python/build/"
+  rm -rf "${PACKDIR:?}/python/classy.egg-info"  
+  rm -rf "${PACKDIR:?}/build/"
+  rm -f "${PACKDIR:?}/class"
+  rm -f "${PACKDIR:?}/libclass.a"
   # ---------------------------------------------------------------------------
   # Historical Workaround Cocoa .gitignore entry on /include
   # ---------------------------------------------------------------------------
-  rm -rf "${CLASSDIR:?}/include"
+  rm -rf "${PACKDIR:?}/include"
 
   unset_env_vars_clean_class || return 1
   
