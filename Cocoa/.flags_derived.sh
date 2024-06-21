@@ -41,11 +41,6 @@ if [ -n "${GLOBAL_PACKAGES_LOCATION}" ]; then
 fi
 
 # ------------------------------------------------------------------------------
-if [ -z "${THREAD_UNXZ}" ]; then
-  export MAKE_NUM_THREADS=1
-fi
-
-# ------------------------------------------------------------------------------
 export PYTHON3="${ROOTDIR}/.local/bin/python3"
 export PIP3="${PYTHON3:?} -m pip"
 export COBAYA_PACKAGES_PATH=external_modules

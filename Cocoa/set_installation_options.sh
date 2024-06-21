@@ -60,21 +60,6 @@ export USE_SPT_CLIK_PLANCK=1
 # ------------------------------------------------------------------------------
 export MAKE_NUM_THREADS=4
 
-# ------------------------------------------------------------------------------
-# ------------------------------------------------------------------------------
-# PACKAGE VERSIONS. BE CAREFUL, CHANGES IN THE COMMIT ID MAY BREAK COCOA
-# ------------------------------------------------------------------------------
-# ------------------------------------------------------------------------------
-export COBAYA_GIT_COMMIT="2636ea9ed399c35c5d276de1acb15aaafbcab10c"
-export HILLIPOP_GIT_COMMIT="cc9cbe31991d4662522241543a46d44d2cdec251"
-export LOLLIPOP_GIT_COMMIT="280a9c93d33bc6a058d6bf769ec82d9f7fdbd2b6"
-export LIPOP_DATA_VERSION=4.2
-export SPT3G_DATA_GIT_COMMIT="66da8e9e2f325024566fe13245788bf8ede897bc"
-export HOLICOW_DATA_GIT_COMMIT="f792647d1fd6c09d9e052fef526669cbd702ab82"
-export POLYCHORD_GIT_COMMIT="daba49d1385d065122db76a2b384050f9e95d278"
-export CAMB_GIT_COMMIT="45d1c3d27e7480c0f9a82c98522c17ed422dd408"
-export CLASS_GIT_COMMIT="8df566c1ff2d0b3e40e106567c435575aea337be"
-
 # --------------------------------------------------------------------------
 # IF NOT SET, COCOA WILL INSTALL TENSORFLOW, KERAS, AND PYTORCH 
 # --------------------------------------------------------------------------
@@ -160,3 +145,15 @@ export CLASS_NAME="class_public"
 export ACT_NAME="pyactlike"
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
+# PACKAGE VERSIONS. BE CAREFUL, CHANGES IN THE COMMIT ID MAY BREAK COCOA
+# ------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
+export COBAYA_GIT_COMMIT="2636ea9ed399c35c5d276de1acb15aaafbcab10c"
+export HILLIPOP_GIT_COMMIT="cc9cbe31991d4662522241543a46d44d2cdec251"
+export LOLLIPOP_GIT_COMMIT="280a9c93d33bc6a058d6bf769ec82d9f7fdbd2b6"
+export LIPOP_DATA_VERSION=4.2
+export SPT3G_DATA_GIT_COMMIT="66da8e9e2f325024566fe13245788bf8ede897bc"
+export HOLICOW_DATA_GIT_COMMIT="f792647d1fd6c09d9e052fef526669cbd702ab82"
+export POLYCHORD_GIT_COMMIT="daba49d1385d065122db76a2b384050f9e95d278"
+export CAMB_GIT_COMMIT="45d1c3d27e7480c0f9a82c98522c17ed422dd408"
+export CLASS_GIT_COMMIT="8df566c1ff2d0b3e40e106567c435575aea337be"
