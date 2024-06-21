@@ -35,9 +35,9 @@ if [ -z "${IGNORE_ACT_COMPILATION}" ]; then
   }
   
   fail_clact () {
-    local MSG="\033[0;31m\t\t (clean_act.sh) WE CANNOT RUN \e[3m"
+    local MSG="\033[0;31m\t\t (clean_act.sh) we cannot run \e[3m"
     local MSG2="\033[0m"
-    echo -e "${MSG} ${1:-"empty arg"} ${MSG2}"
+    echo -e "${MSG}${1:-"empty arg"}${MSG2}"
     unset fail_clact
     unset_env_vars_clean_act
   }

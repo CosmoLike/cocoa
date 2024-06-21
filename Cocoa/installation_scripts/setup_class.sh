@@ -40,7 +40,7 @@ if [ -z "${IGNORE_CLASS_COMPILATION}" ]; then
     unset CHANGES
     unset pfail
     unset ECODEF
-    unset CDIR
+    unset PACKDIR
     unset CLNAME
     unset unset_env_vars_sclass
     cdroot || return 1;
@@ -82,7 +82,7 @@ if [ -z "${IGNORE_CLASS_COMPILATION}" ]; then
 
   export CLNAME=${CLASS_NAME:-"class_public"}
   
-  extern CDIR="${ECODEF:?}/${CLNAME:?}/"
+  extern PACKDIR="${ECODEF:?}/${CLNAME:?}/"
 
   # ---------------------------------------------------------------------------
   # in case this script is called twice
@@ -97,7 +97,7 @@ if [ -z "${IGNORE_CLASS_COMPILATION}" ]; then
   "${GIT:?}" clone "${URL:?}" --recursive "${CLNAME:?}" >${OUT1:?} \
     2>${OUT2:?} || { fail_sclass "GIT CLONE FROM CLASS REPO"; return 1; }
   
-  cdfolder "${CDIR}" || return 1;
+  cdfolder "${PACKDIR}" || return 1;
 
   if [ -n "${CLASS_GIT_COMMIT}" ]; then
     "${GIT:?}" checkout "${CLASS_GIT_COMMIT:?}" >${OUT1:?} 2>${OUT2:?} ||
@@ -116,7 +116,7 @@ if [ -z "${IGNORE_CLASS_COMPILATION}" ]; then
   # ---------------------------------------------------------------------------
   
   # ---------------------------------------------------------------------------
-  cdfolder "${CDIR}" || return 1;
+  cdfolder "${PACKDIR}" || return 1;
 
   cp "${CHANGES:?}/Makefile.patch" .  2>${OUT2:?} || 
     { fail_sclass "CP FILE PATCH (Makefile.patch)"; return 1; }
@@ -125,7 +125,7 @@ if [ -z "${IGNORE_CLASS_COMPILATION}" ]; then
     { fail_sclass "SCRIPT FILE PATCH (Makefile.patch)"; return 1; }
   
   # ---------------------------------------------------------------------------
-  cdfolder "${CDIR:?}/python" || return 1;
+  cdfolder "${PACKDIR:?}/python" || return 1;
   
   cp "${CHANGES:?}/python/setup.patch" . 2>${OUT2:?} ||
     { fail_sclass "CP FILE PATCH (setup.patch)"; return 1; }

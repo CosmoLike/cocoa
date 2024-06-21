@@ -48,7 +48,7 @@ if [ -z "${IGNORE_CAMB_COMPILATION}" ]; then
   fail_scb () {
     local MSG="\033[0;31m\t\t (setup_camb.sh) we cannot run \e[3m"
     local MSG2="\033[0m"
-    echo -e "${MSG} ${1:-"empty arg"} ${MSG2}"
+    echo -e "${MSG}${1:-"empty arg"}${MSG2}"
     unset fail_scb
     unset_env_vars_scamb
   }

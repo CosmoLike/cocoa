@@ -31,6 +31,8 @@ if [ -z "${IGNORE_POLYCHORD_COMPILATION}" ]; then
     unset POLYURL
     unset CIL
     unset ECODEF
+    unset POLYF
+    unset PACKDIR
     unset POLY_CHANGES
     unset pfail
     unset unset_env_vars_spoly
@@ -61,9 +63,6 @@ if [ -z "${IGNORE_POLYCHORD_COMPILATION}" ]; then
   # ---------------------------------------------------------------------------
   ptop  'INSTALLING POLYCHORD'
 
-  if [ -z "${POLYCHORD_GIT_COMMIT}" ]; then
-    pfail 'POLYCHORD_GIT_COMMIT'; cdroot; return 1;
-  fi
 
   if [ -z "${POLY_NAME}" ]; then
     pfail 'POLY_NAME'; cdroot; return 1;
@@ -77,6 +76,10 @@ if [ -z "${IGNORE_POLYCHORD_COMPILATION}" ]; then
 
   export ECODEF="${ROOTDIR:?}/external_modules/code"
 
+  export POLYF=${POLY_NAME:-"PolyChordLite"}
+  
+  export PACKDIR="${ECODEF:?}/${POLYF:?}"
+
   # ---------------------------------------------------------------------------
   # in case this script is called twice
   # ---------------------------------------------------------------------------
@@ -84,13 +87,15 @@ if [ -z "${IGNORE_POLYCHORD_COMPILATION}" ]; then
 
   cdfolder "${ECODEF}" || return 1;
 
-  $GIT clone "${POLYURL:?}" "${POLY_NAME:?}" >${OUT1:?} 2>${OUT2:?} || 
+  $GIT clone "${POLYURL:?}" "${POLYF:?}" >${OUT1:?} 2>${OUT2:?} || 
     { fail_spoly "GIT CLONE"; return 1; }
   
-  cdfolder "${ECODEF}/${POLY_NAME}" || return 1;
+  cdfolder "${PACKDIR}" || return 1;
 
-  $GIT checkout "${POLYCHORD_GIT_COMMIT:?}" >${OUT1:?} 2>${OUT2:?} ||
-    { fail_spoly "GIT CHECKOUT"; return 1; }
+  if [ -n "${POLYCHORD_GIT_COMMIT}" ]; then
+    $GIT checkout "${POLYCHORD_GIT_COMMIT:?}" >${OUT1:?} 2>${OUT2:?} ||
+      { fail_spoly "GIT CHECKOUT"; return 1; }
+  fi
   
   # ---------------------------------------------------------------------------
   cp "${POLY_CHANGES:?}"/Makefile.patch . 2>${OUT2:?} ||

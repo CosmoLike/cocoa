@@ -32,7 +32,7 @@ if [ -z "${IGNORE_CMAKE_INSTALLATION}" ]; then
     unset OUT1
     unset OUT2
     unset CMKMNT
-    unset CMAKEDIR
+    unset PACKDIR
     unset pfail
     unset unset_env_vars_scmk
     cdroot || return 1;
@@ -41,7 +41,7 @@ if [ -z "${IGNORE_CMAKE_INSTALLATION}" ]; then
   fail_scmk () {
     local MSG="\033[0;31m (setup_cmake.sh) we cannot run \e[3m"
     local MSG2="\033[0m"
-    echo -e "${MSG} ${1:-"empty arg"} ${MSG2}"
+    echo -e "${MSG}${1:-"empty arg"}${MSG2}"
     unset fail_scmk
     unset_env_vars_scmk
   }
@@ -72,9 +72,9 @@ if [ -z "${IGNORE_CMAKE_INSTALLATION}" ]; then
   
   ptop 'INSTALLING CMAKE LIBRARY'
 
-  export CMAKEDIR=${COCOA_CMAKE_DIR:-"cmake-3.26.4/"}
+  export PACKDIR=${COCOA_CMAKE_DIR:-"cmake-3.26.4/"}
 
-  cdfolder "${CCIL:?}/${CMAKEDIR:?}" || return 1;
+  cdfolder "${CCIL:?}/${PACKDIR:?}" || return 1;
 
   env CC="${C_COMPILER:?}" CXX="${CXX_COMPILER:?}" ./bootstrap \
     --prefix="${ROOTDIR:?}/.local" >${OUT1:?} 2>${OUT2:?} || 

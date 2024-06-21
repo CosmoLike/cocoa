@@ -51,7 +51,7 @@ if [ -z "${IGNORE_FORTRAN_INSTALLATION}" ]; then
   fail_sftrp () {
     local MSG="\033[0;31m\t\t (setup_fortran_packages.sh) WE CANNOT RUN \e[3m"
     local MSG2="\033[0m"
-    echo -e "${MSG} ${1:-"empty arg"} ${MSG2}"
+    echo -e "${MSG}${1:-"empty arg"}${MSG2}"
     unset fail_sftrp
     unset_env_vars_sftrp
   }
@@ -88,7 +88,7 @@ if [ -z "${IGNORE_FORTRAN_INSTALLATION}" ]; then
 
     rm -rf "${CCIL:?}/${BUILDIR:?}"
     
-    mkdir "${CCIL:?}/${BUILDIR:?}" >${OUT1:?} 2>${OUT2:?} || 
+    mkdir "${CCIL:?}/${BUILDIR:?}" 2>${OUT2:?} || 
       { fail_sftrp "(LAPACK) MKDIR LAPACK-BUILD"; return 1; }
 
     cdfolder "${CCIL:?}/${BUILDIR:?}" || return 1;

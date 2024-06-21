@@ -79,10 +79,6 @@ if [ -z "${IGNORE_ALL_COBAYA_INSTALLATION}" ]; then
     
     ptop "INSTALLING COBAYA"
 
-    if [ -z "${COBAYA_GIT_COMMIT}" ]; then
-      pfail 'COBAYA_GIT_COMMIT'; cdroot; return 1
-    fi
-
     #---------------------------------------------------------------------------
     # Remove any previous installed cobaya folder ------------------------------
     #---------------------------------------------------------------------------
@@ -102,8 +98,10 @@ if [ -z "${IGNORE_ALL_COBAYA_INSTALLATION}" ]; then
     
     cdfolder "${COB}" || return 1;
 
-    "${GIT:?}" reset --hard "${COBAYA_GIT_COMMIT:?}" >${OUT1:?} 2>${OUT2:?} ||
-      { fail_ucb "GIT CHECKOUT"; return 1; }
+    if [ -n "${COBAYA_GIT_COMMIT}" ]; then
+      "${GIT:?}" reset --hard "${COBAYA_GIT_COMMIT:?}" >${OUT1:?} 2>${OUT2:?} ||
+        { fail_ucb "GIT CHECKOUT"; return 1; }
+    fi
 
     cdfolder "${ROOTDIR}" || return 1;
 
@@ -345,10 +343,6 @@ if [ -z "${IGNORE_ALL_COBAYA_INSTALLATION}" ]; then
     
     ptop "INSTALLING HILLIPOP LIKELIHOOD"
 
-    if [ -z "${HILLIPOP_GIT_COMMIT}" ]; then
-      pfail 'HILLIPOP_GIT_COMMIT'; cdroot; return 1;
-    fi
-    
     export PL2020="${CBLIKE:?}/planck_2020_hillipop"
     export ftmp=hipoptmp
 
@@ -364,9 +358,11 @@ if [ -z "${IGNORE_ALL_COBAYA_INSTALLATION}" ]; then
   
     cdfolder "${COB:?}/${CBLIKE}/${ftmp}" || return 1;
 
-    "${GIT:?}" reset --hard "${HILLIPOP_GIT_COMMIT:?}" >${OUT1:?} 2>${OUT2:?} ||
-      { fail_ucb "GIT RESET (Planck2020 HILLIPOP)"; return 1; }
-  
+    if [ -n "${HILLIPOP_GIT_COMMIT}" ]; then
+      "${GIT:?}" reset --hard "${HILLIPOP_GIT_COMMIT:?}" >${OUT1:?} \
+        2>${OUT2:?} || { fail_ucb "GIT RESET (Planck2020 HILLIPOP)"; return 1; }
+    fi
+
     mv planck_2020_hillipop/ "${COB:?}/${CBLIKE:?}" 2>${OUT2:?} ||
       { fail_ucb "MV LIKELIHOOD FOLDER (Planck2020 HILLIPOP)"; return 1; }
     
@@ -399,10 +395,6 @@ if [ -z "${IGNORE_ALL_COBAYA_INSTALLATION}" ]; then
 
     ptop "INSTALLING LOLLIPOP LIKELIHOOD"
 
-    if [ -z "${LOLLIPOP_GIT_COMMIT}" ]; then
-      pfail 'LOLLIPOP_GIT_COMMIT'; cdroot; return 1;
-    fi
-
     export PL2020="${CBLIKE}/planck_2020_lollipop"
     export ftmp=lipoptmp
 
@@ -413,14 +405,16 @@ if [ -z "${IGNORE_ALL_COBAYA_INSTALLATION}" ]; then
 
     export NPIPE_URL="https://github.com/planck-npipe" 
 
-    "${GIT:?}" clone "${NPIPE_URL:?}/lollipop.git" ${ftmp:?} >${OUT1:?} 2>${OUT2:?} || 
-      { fail_ucb "GIT CLONE (Planck2020 LOLLIPOP)"; return 1; }
+    "${GIT:?}" clone "${NPIPE_URL:?}/lollipop.git" ${ftmp:?} >${OUT1:?} \
+      2>${OUT2:?} || { fail_ucb "GIT CLONE (Planck2020 LOLLIPOP)"; return 1; }
     
     cdfolder "${COB:?}/${CBLIKE}/${ftmp}" || return 1;
 
-    "${GIT:?}" reset --hard "${LOLLIPOP_GIT_COMMIT:?}" >${OUT1:?} 2>${OUT2:?} || 
-      { fail_ucb "GIT RESET (Planck2020 LOLLIPOP)"; return 1; }
-    
+    if [ -n "${LOLLIPOP_GIT_COMMIT}" ]; then
+      "${GIT:?}" reset --hard "${LOLLIPOP_GIT_COMMIT:?}" >${OUT1:?} \
+        2>${OUT2:?} || { fail_ucb "GIT RESET (Planck2020 LOLLIPOP)"; return 1; }
+    fi
+
     mv planck_2020_lollipop/ "${COB:?}/${CBLIKE:?}" 2>${OUT2:?} || 
       { fail_ucb "MV LIKELIHOOD FOLDER (Planck2020 LOLLIPOP)"; return 1; }
     

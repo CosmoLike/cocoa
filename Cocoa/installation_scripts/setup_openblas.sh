@@ -45,7 +45,7 @@ if [ -z "${IGNORE_OPENBLAS_INSTALLATION}" ]; then
   fail_sopb () {
     local MSG="\033[0;31m\t\t (setup_openblas.sh) WE CANNOT RUN \e[3m"
     local MSG2="\033[0m"
-    echo -e "${MSG} ${1:-"empty arg"} ${MSG2}"
+    echo -e "${MSG}${1:-"empty arg"}${MSG2}"
     unset fail_sopb
     unset_env_vars_sftrp
   }

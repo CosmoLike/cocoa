@@ -51,7 +51,7 @@ if [ -z "${IGNORE_HDF5_INSTALLATION}" ]; then
   fail_shdf5 () {
     local MSG="\033[0;31m\t\t (setup_hdf5.sh) WE CANNOT RUN \e[3m"
     local MSG2="\033[0m"
-    echo -e "${MSG} ${1:-"empty arg"} ${MSG2}"
+    echo -e "${MSG}${1:-"empty arg"}${MSG2}"
     unset fail_shdf5
     unset_env_vars_shdf5
   }
@@ -59,6 +59,7 @@ if [ -z "${IGNORE_HDF5_INSTALLATION}" ]; then
   if [ -z "${DEBUG_HDF5_PACKAGES}" ]; then
     export OUT1="/dev/null"; export OUT2="/dev/null"
     export HDF5MNT="${MAKE_NUM_THREADS:-1}"
+    [[ ${HDF5MNT} == +([0-9]) ]] || export HDF5MNT=1
   else
     export OUT1="/dev/tty"; export OUT2="/dev/tty"
     export HDF5MNT=1
@@ -79,22 +80,18 @@ if [ -z "${IGNORE_HDF5_INSTALLATION}" ]; then
   # ----------------------------------------------------------------------------
   
   ptop 'INSTALLING HFD5 LIBRARY'
-
-  if [ -z "${COCOA_HDF5_DIR}" ]; then
-    pfail 'COCOA_HDF5_DIR'; cdroot; return 1;
-  fi
   
-  cdfolder "${CCIL:?}/${COCOA_HDF5_DIR:?}" || return 1;
-
+  export PACKDIR="${CCIL:?}/${COCOA_HDF5_DIR:-"hdf5-1.12.3/"}"
   export BDF="cocoa_HDF5_build"
 
-  rm -f  "${CCIL:?}/${COCOA_HDF5_DIR:?}/CMakeCache.txt"
-  rm -rf "${CCIL:?}/${COCOA_HDF5_DIR:?}/CMakeFiles/"
-  rm -rf "${CCIL:?}/${COCOA_HDF5_DIR:?}/${BDF:?}/"
+  rm -f  "${PACKDIR:?}/CMakeCache.txt"
+  rm -rf "${PACKDIR:?}/CMakeFiles/"
+  rm -rf "${PACKDIR:?}/${BDF:?}/"
   
-  mkdir "${BDF:?}" || { fail_shdf5 "MKDIR COCOA_HDF5_BUILD"; return 1; }
+  mkdir "${PACKDIR:?}/${BDF:?}" 2>${OUT2:?} || 
+    { fail_shdf5 "MKDIR COCOA_HDF5_BUILD"; return 1; }
 
-  cdfolder "${CCIL:?}/${COCOA_HDF5_DIR:?}/${BDF:?}" || return 1;
+  cdfolder "${PACKDIR:?}/${BDF:?}" || return 1;
 
   "${CMAKE:?}" -DBUILD_SHARED_LIBS=TRUE \
     -DCMAKE_INSTALL_PREFIX="${ROOTDIR:?}/.local" \
@@ -104,8 +101,7 @@ if [ -z "${IGNORE_HDF5_INSTALLATION}" ]; then
     --log-level=ERROR .. >${OUT1:?} 2>${OUT2:?} || 
     { fail_shdf5 "CMAKE"; return 1; }
 
-  make -j $HDF5MNT >${OUT1:?} 2>${OUT2:?} || 
-    { fail_shdf5 "MAKE"; return 1; }
+  make -j $HDF5MNT >${OUT1:?} 2>${OUT2:?} || { fail_shdf5 "MAKE"; return 1; }
 
   make install >${OUT1:?} 2>${OUT2:?} || 
     { fail_shdf5 "MAKE INSTALL"; return 1; }
