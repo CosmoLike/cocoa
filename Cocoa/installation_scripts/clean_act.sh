@@ -55,7 +55,7 @@ if [ -z "${IGNORE_ACT_COMPILATION}" ]; then
   # ---------------------------------------------------------------------------
   # --------------------------------------------------------------------------- 
   
-  ptop 'CLEANING ACT'
+  ptop 'CLEANING ACT' || return 1
 
   export PACKDIR="${ROOTDIR:?}/external_modules/code/${ACT_NAME:-"pyactlike"}";
 
@@ -69,7 +69,7 @@ if [ -z "${IGNORE_ACT_COMPILATION}" ]; then
 
   unset_env_vars_clean_act || return 1
   
-  pbottom 'CLEANING ACT'
+  pbottom 'CLEANING ACT' || return 1
   
   # ---------------------------------------------------------------------------
   # ---------------------------------------------------------------------------

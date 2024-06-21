@@ -2,71 +2,67 @@
 # ----------------------------------------------------------------------------
 # ----------------------------------------------------------------------------
 # ----------------------------------------------------------------------------
-echo -e '\033[1;45m''COMPILING EXTERNAL MODULES''\033[0m'
-
 if [ -n "${ROOTDIR}" ]; then
   source stop_cocoa.sh
 fi
-
 source start_cocoa.sh
+
+ptop2 'COMPILING EXTERNAL MODULES' || return 1
 
 # ----------------------------------------------------------------------------
 # ------------------------------ COMPILE COBAYA ------------------------------
 # ----------------------------------------------------------------------------
-echo -e '\033[1;34m''\tINSTALLING COBAYA (VIA PIP)''\033[0m'
 
-if [ -z "${DEBUG_PIP_OUTPUT}" ]; then
-  export OUTPUT_PIP_1="/dev/null"
-  export OUTPUT_PIP_2="/dev/null"
+ptop "INSTALLING COBAYA (VIA PIP)" || return 1
+
+if [ -z "${COCOA_OUTPUT_VERBOSE}" ]; then
+  export OUT1="/dev/null"; export OUT2="/dev/null"
 else
-  export OUTPUT_PIP_1="/dev/tty"
-  export OUTPUT_PIP_2="/dev/tty"
+  export OUT1="/dev/tty"; export OUT2="/dev/tty"
 fi
 
-$PIP3 install --editable cobaya --prefix=$ROOTDIR/.local > ${OUTPUT_PIP_1} 2> ${OUTPUT_PIP_2}
+${PIP3:?} install --editable cobaya --prefix="${ROOTDIR:?}/.local" >"${OUT1:?}" 2>"${OUT2:?}"
 if [ $? -ne 0 ]; then
   echo -e '\033[0;31m'"PIP COULD NOT RUN \e[3mPIP INSTALL COBAYA"'\033[0m'
   cd $ROOTDIR
   return 1
-else
-  echo -e '\033[0;32m'"PIP RUN \e[3mPIP INSTALL COBAYA\e[0m\e\033[0;32m DONE"'\033[0m'
 fi
 
-echo -e '\033[1;34m''\t\e[4mINSTALLING COBAYA (VIA PIP) DONE''\033[0m'
+pbottom "INSTALLING COBAYA (VIA PIP)" || return 1
 
 # ----------------------------------------------------------------------------
 # ------------------------ COMPILE EXTERNAL MODULES --------------------------
 # ----------------------------------------------------------------------------
 
-source $ROOTDIR/installation_scripts/compile_camb.sh
+source "${ROOTDIR:?}"/installation_scripts/compile_camb.sh
 if [ $? -ne 0 ]; then
   cd $ROOTDIR
   source stop_cocoa
   return 1
 fi
 
-source $ROOTDIR/installation_scripts/compile_class.sh
+source "${ROOTDIR:?}"/installation_scripts/compile_class.sh
 if [ $? -ne 0 ]; then
   cd $ROOTDIR
   source stop_cocoa
   return 1
 fi
 
-source $ROOTDIR/installation_scripts/compile_planck.sh
+source "${ROOTDIR:?}"/installation_scripts/compile_planck.sh
 if [ $? -ne 0 ]; then
   cd $ROOTDIR
   source stop_cocoa
   return 1
 fi
 
-source $ROOTDIR/installation_scripts/compile_act.sh
+source "${ROOTDIR:?}"/installation_scripts/compile_act.sh
 if [ $? -ne 0 ]; then
   cd $ROOTDIR
   source stop_cocoa
   return 1
 fi
 
-source $ROOTDIR/installation_scripts/compile_polychord.sh
+source "${ROOTDIR:?}"/installation_scripts/compile_polychord.sh
 if [ $? -ne 0 ]; then
   cd $ROOTDIR
   source stop_cocoa
@@ -75,7 +71,7 @@ fi
 
 # ----------------------------------------------------------------------------
 # ----------------------------------------------------------------------------
-pbottom2 "COMPILING EXTERNAL MODULES"
+pbottom2 "COMPILING EXTERNAL MODULES" || return 1
 source stop_cocoa.sh
 # ----------------------------------------------------------------------------
 # ----------------------------------------------------------------------------

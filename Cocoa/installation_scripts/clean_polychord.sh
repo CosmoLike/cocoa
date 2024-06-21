@@ -60,7 +60,7 @@ if [ -z "${IGNORE_POLYCHORD_COMPILATION}" ]; then
   # ---------------------------------------------------------------------------
   # ---------------------------------------------------------------------------
   
-  ptop 'CLEANING POLYCHORD'
+  ptop 'CLEANING POLYCHORD' || return 1
 
   export PLIB="${ROOTDIR:?}/.local/lib/python${PYTHON_VERSION:?}/site-packages"
   export PACKDIR="${ROOTDIR:?}/external_modules/code/${POLY_NAME:-"PolyChordLite"}"
@@ -70,12 +70,12 @@ if [ -z "${IGNORE_POLYCHORD_COMPILATION}" ]; then
   make clean >${OUT1:?} 2>${OUT2:?} || { fail_cl_poly "MAKE CLEAN"; return 1; }
   
   rm -rf "${PLIB:?}"/pypolychord-*
-  rm -rf "${ROOTDIR:?}/external_modules/code/${POLYF:?}/lib/*.a"
-  rm -rf "${ROOTDIR:?}/external_modules/code/${POLYF:?}/lib/*.so"
+  rm -rf "${PACKDIR:?}/lib/*.a"
+  rm -rf "${PACKDIR:?}/lib/*.so"
 
   unset_env_vars_clean_poly || return 1
   
-  pbottom 'CLEANING POLYCHORD'
+  pbottom 'CLEANING POLYCHORD' || return 1
 
   # ---------------------------------------------------------------------------
   # ---------------------------------------------------------------------------

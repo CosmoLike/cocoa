@@ -82,12 +82,12 @@ if [ -z "${IGNORE_CLASS_COMPILATION}" ]; then
 
   export CLNAME=${CLASS_NAME:-"class_public"}
   
-  extern PACKDIR="${ECODEF:?}/${CLNAME:?}/"
+  export PACKDIR="${ECODEF:?}/${CLNAME:?}/"
 
   # ---------------------------------------------------------------------------
   # in case this script is called twice
   # ---------------------------------------------------------------------------
-  rm -rf "${CDIR:?}"
+  rm -rf "${PACKDIR:?}"
 
   # ---------------------------------------------------------------------------
   # clone from original repo

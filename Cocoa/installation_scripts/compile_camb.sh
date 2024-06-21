@@ -11,7 +11,7 @@ if [ -z "${IGNORE_CAMB_COMPILATION}" ]; then
 
   # ----------------------------------------------------------------------------
   # Clean any previous compilation
-  source "${ROOTDIR:?}/installation_scripts/clean_camb.sh"
+  source "${ROOTDIR:?}/installation_scripts/clean_camb.sh" || return 1
   # ----------------------------------------------------------------------------
   
   pfail() {
@@ -72,7 +72,7 @@ if [ -z "${IGNORE_CAMB_COMPILATION}" ]; then
   # --------------------------------------------------------------------------- 
   # --------------------------------------------------------------------------- 
   
-  ptop 'COMPILING CAMB'
+  ptop 'COMPILING CAMB' || return 1
 
   export PACKDIR="${ROOTDIR:?}/external_modules/code/${CAMB_NAME:-"CAMB"}"
 
@@ -84,7 +84,7 @@ if [ -z "${IGNORE_CAMB_COMPILATION}" ]; then
 
   unset_env_vars_comp_camb || return 1
   
-  pbottom 'COMPILING CAMB'
+  pbottom 'COMPILING CAMB' || return 1
   
   # --------------------------------------------------------------------------- 
   # --------------------------------------------------------------------------- 

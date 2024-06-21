@@ -54,7 +54,7 @@ if [ -z "${IGNORE_ALL_PIP_INSTALLATION}" ]; then
     unset_env_vars_spp
   }
 
-  if [ -z "${DEBUG_PIP_OUTPUT}" ]; then
+  if [ -z "${COCOA_OUTPUT_VERBOSE}" ]; then
     export OUT1="/dev/null"; export OUT2="/dev/null"
     export PIPMNT="${MAKE_NUM_THREADS:-1}"
     [[ ${PIPMNT} == +([0-9]) ]] || export PIPMNT=1
@@ -112,7 +112,7 @@ if [ -z "${IGNORE_ALL_PIP_INSTALLATION}" ]; then
   
   if [ -z "${MINICONDA_INSTALLATION}" ]; then
     
-    env CXX="${CXX_COMPILER:?}" CC="${C_COMPILER:?}" "${PIP3:?}" install \
+    env CXX="${CXX_COMPILER:?}" CC="${C_COMPILER:?}" ${PIP3:?} install \
         'alabaster==0.7.13' \
         'appdirs==1.4.4' \
         'anytree==2.8.0' \
@@ -227,7 +227,7 @@ if [ -z "${IGNORE_ALL_PIP_INSTALLATION}" ]; then
   else
   
     #PS: --force-reinstall - this helps CARMA to see numpy files
-    env CXX="${CXX_COMPILER:?}" CC="${C_COMPILER:?}" "${PIP3:?}" install \
+    env CXX="${CXX_COMPILER:?}" CC="${C_COMPILER:?}" ${PIP3:?} install \
         'numpy==1.23.5' \
       --prefix="${ROOTDIR:?}/.local" \
       --force-reinstall >${OUT1:?} 2>${OUT2:?} || 
@@ -235,7 +235,7 @@ if [ -z "${IGNORE_ALL_PIP_INSTALLATION}" ]; then
     
   fi
 
-  env CXX="${CXX_COMPILER:?}" CC="${C_COMPILER:?}" "${PIP3:?}" install \
+  env CXX="${CXX_COMPILER:?}" CC="${C_COMPILER:?}" ${PIP3:?} install \
       "${ROOTDIR:?}/../cocoa_installation_libraries/pip_cache/fgspectra" \
     --prefix="${ROOTDIR:?}/.local" \
     --no-index >${OUT1:?} 2>${OUT2:?} || 
@@ -252,7 +252,7 @@ if [ -z "${IGNORE_ALL_PIP_INSTALLATION}" ]; then
   
     ptop "PIP INSTALL MACHINE LEARNING CPU-ONLY PACKAGES"
 
-    env CXX="${CXX_COMPILER:?}" CC="${C_COMPILER:?}" "${PIP3:?}" install \
+    env CXX="${CXX_COMPILER:?}" CC="${C_COMPILER:?}" ${PIP3:?} install \
         'tensorflow-cpu==2.12.0' \
         'keras==2.12.0' \
         'keras-preprocessing==1.1.2' \
@@ -271,7 +271,7 @@ if [ -z "${IGNORE_ALL_PIP_INSTALLATION}" ]; then
   
     ptop "PIP INSTALL MACHINE LEARNING GPU PACKAGES"
 
-    env CXX="${CXX_COMPILER:?}" CC="${C_COMPILER:?}" "${PIP3:?}" install \
+    env CXX="${CXX_COMPILER:?}" CC="${C_COMPILER:?}" ${PIP3:?} install \
         'tensorflow==2.12.0' \
         'keras==2.12.0' \
         'keras-preprocessing==1.1.2' \

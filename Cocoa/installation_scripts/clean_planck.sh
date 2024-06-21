@@ -54,7 +54,7 @@ if [ -z "${IGNORE_PLANCK_COMPILATION}" ]; then
   # ---------------------------------------------------------------------------
   # ---------------------------------------------------------------------------
   
-  ptop 'CLEANING PLANCK LIKELIHOOD'
+  ptop 'CLEANING PLANCK LIKELIHOOD' || return 1
 
   export ECF="external_modules/code/planck/code"
   
@@ -77,7 +77,7 @@ if [ -z "${IGNORE_PLANCK_COMPILATION}" ]; then
 
   unset_env_vars_clean_planck || return 1
   
-  pbottom 'CLEANING PLANCK LIKELIHOOD'
+  pbottom 'CLEANING PLANCK LIKELIHOOD' || return 1
   
   # ---------------------------------------------------------------------------
   # ---------------------------------------------------------------------------

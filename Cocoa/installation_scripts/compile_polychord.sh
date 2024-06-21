@@ -10,7 +10,7 @@ if [ -z "${IGNORE_POLYCHORD_COMPILATION}" ]; then
   fi
   
   # ----------------------------------------------------------------------------
-  source "${ROOTDIR:?}/installation_scripts/clean_polychord.sh"
+  source "${ROOTDIR:?}/installation_scripts/clean_polychord.sh" || return 1
   # ----------------------------------------------------------------------------
   
   pfail() {
@@ -71,7 +71,7 @@ if [ -z "${IGNORE_POLYCHORD_COMPILATION}" ]; then
   # ---------------------------------------------------------------------------
   # ---------------------------------------------------------------------------
   
-  ptop 'COMPILING POLYCHORD'
+  ptop 'COMPILING POLYCHORD' || return 1
 
   export POLYF=${POLY_NAME:-"PolyChordLite"}
   export PACKDIR="${ROOTDIR:?}/external_modules/code/${POLYF:?}"
@@ -89,7 +89,7 @@ if [ -z "${IGNORE_POLYCHORD_COMPILATION}" ]; then
 
   unset_env_vars_comp_poly || return 1;
   
-  pbottom 'COMPILING POLYCHORD'
+  pbottom 'COMPILING POLYCHORD' || return 1
   
   # ---------------------------------------------------------------------------
   # ---------------------------------------------------------------------------

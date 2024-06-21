@@ -37,7 +37,7 @@ if [ -z "${IGNORE_XZ_INSTALLATION}" ]; then
   fail_sxz () {
     local MSG="\033[0;31m (setup_xz.sh) WE CANNOT RUN \e[3m"
     local MSG2="\033[0m"
-    echo -e "${MSG} ${1:-"empty arg"} ${MSG2}"  
+    echo -e "${MSG}${1:-"empty arg"}${MSG2}"  
     unset fail_sxz
     unset_env_vars_sxz
   }
@@ -46,7 +46,7 @@ if [ -z "${IGNORE_XZ_INSTALLATION}" ]; then
     cd "${1:?}" 2>"/dev/null" || { fail_sxz "CD FOLDER: ${1}"; return 1; }
   }
 
-  if [ -z "${DEBUG_XZ_PACKAGE}" ]; then
+  if [ -z "${COCOA_OUTPUT_VERBOSE}" ]; then
     export OUT1="/dev/null"; export OUT2="/dev/null"
     export XZMNT="${MAKE_NUM_THREADS:-1}"
   else

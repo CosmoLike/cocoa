@@ -185,47 +185,38 @@ if [ -z "${IGNORE_C_INSTALLATION}" ]; then
   fi
 
   # ----------------------------------------------------------------------------
+  # ----------------------------------- EUCLID EMU -----------------------------
   # ----------------------------------------------------------------------------
+  # WE MIGRATED euclidemu2 TO setup_c_packages: IT DEPENDS ON GSL-GNU LIB
+  if [ -z "${IGNORE_ALL_PIP_INSTALLATION}" ]; then
+    
+    if [ -z "${PIP3}" ]; then
+      pfail 'PIP3'; cdroot; return 1;
+    fi
+        
+    ptop 'INSTALLING EUCLIDEMU2'
+
+    env CXX="${CXX_COMPILER:?}" CC="${C_COMPILER:?}" ${PIP3:?} install \
+      --global-option=build_ext "${CCIL:?}/euclidemu2-1.2.0" \
+      --no-dependencies \
+      --prefix="${ROOTDIR:?}/.local" \
+      --no-index >${OUT1:?} 2>${OUT2:?} || 
+      { fail_scp "(EUCLIDEMU2) PIP INSTALL EUCLUDEMUL2"; return 1; }
+
+    cdfolder "${ROOTDIR}" || return 1;  
+    
+    pbottom 'INSTALLING EUCLIDEMU2'
+  
+  fi
 
   unset_env_vars_scp || return 1; 
 
   pbottom2 'SETUP_C_PACKAGES DONE'
+  # ----------------------------------------------------------------------------
+  # ----------------------------------------------------------------------------
 fi
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
-
-# ------------------------------------------------------------------------------
-# ----------------------------------- EUCLID EMU -------------------------------
-# ------------------------------------------------------------------------------
-# WE MIGRATED euclidemu2 TO setup_c_packages: IT DEPENDS ON GSL-GNU LIB
-if [ -z "${IGNORE_ALL_PIP_INSTALLATION}" ]; then
-  
-  if [ -z "${PIP3}" ]; then
-    pfail 'PIP3'; cdroot; return 1;
-  fi
-  
-  # ----------------------------------------------------------------------------
-  # ----------------------------------------------------------------------------
-  
-  ptop2 'INSTALLING EUCLIDEMU2 DONE'
-
-  env CXX="${CXX_COMPILER:?}" CC="${C_COMPILER:?}" "${PIP3:?}" install \
-    --global-option=build_ext "${CCIL:?}/euclidemu2-1.2.0" \
-    --no-dependencies \
-    --prefix="${ROOTDIR:?}/.local" \
-    --no-index >${OUT1:?} 2>${OUT2:?} || 
-    { fail_scp "(EUCLIDEMU2) PIP INSTALL EUCLUDEMUL2"; return 1; }
-
-  cdfolder "${ROOTDIR}" || return 1;  
-  
-  unset_env_vars_scp_eemul2 || return 1;
-
-  pbottom2 'INSTALLING EUCLIDEMU2 DONE'
-  
-  # ----------------------------------------------------------------------------
-  # ----------------------------------------------------------------------------
-
-fi
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------

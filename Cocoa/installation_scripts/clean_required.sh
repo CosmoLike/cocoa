@@ -41,7 +41,7 @@ cdfolder() {
 # ---------------------------------------------------------------------------
 # ---------------------------------------------------------------------------
 
-ptop 'CLEANING COCOA REQUIRED LIBRARIES'
+ptop 'CLEANING COCOA REQUIRED LIBRARIES' || return 1
 
 cdfolder "${ROOTDIR:?}/../cocoa_installation_libraries" || return 1
 
@@ -49,7 +49,7 @@ sh clean_all || { fail_cl_req "SCRIPT clean_all.sh"; return 1; }
 
 unset_env_vars_clean_req || return 1
 
-pbottom 'CLEANING COCOA REQUIRED LIBRARIES'
+pbottom 'CLEANING COCOA REQUIRED LIBRARIES' || return 1
 
 # ---------------------------------------------------------------------------
 # ---------------------------------------------------------------------------

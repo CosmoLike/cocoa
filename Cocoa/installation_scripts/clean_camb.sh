@@ -53,7 +53,7 @@ if [ -z "${IGNORE_CAMB_COMPILATION}" ]; then
 
   # ---------------------------------------------------------------------------
   # ---------------------------------------------------------------------------
-  ptop 'CLEANING CAMB'
+  ptop 'CLEANING CAMB' || return 1
 
   export PACKDIR="${ROOTDIR:?}/external_modules/code/${CAMB_NAME:-"CAMB"}"
 
@@ -69,7 +69,7 @@ if [ -z "${IGNORE_CAMB_COMPILATION}" ]; then
 
   unset_env_vars_clean_camb || return 1
   
-  pbottom 'CLEANING CAMB'
+  pbottom 'CLEANING CAMB' || return 1
   
   # ---------------------------------------------------------------------------
   # ---------------------------------------------------------------------------

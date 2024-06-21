@@ -11,7 +11,7 @@ if [ -z "${IGNORE_PLANCK_COMPILATION}" ]; then
   
   # ----------------------------------------------------------------------------
   # Clean any previous compilation
-  source "${ROOTDIR:?}/installation_scripts/clean_planck.sh"
+  source "${ROOTDIR:?}/installation_scripts/clean_planck.sh" || return 1
   # ----------------------------------------------------------------------------
   
   pfail() {
@@ -92,7 +92,7 @@ if [ -z "${IGNORE_PLANCK_COMPILATION}" ]; then
   # ---------------------------------------------------------------------------
   # ---------------------------------------------------------------------------
   
-  ptop 'COMPILING PLANCK'
+  ptop 'COMPILING PLANCK' || return 1
 
   export EMCPC="external_modules/code/planck/code"
   
@@ -118,7 +118,7 @@ if [ -z "${IGNORE_PLANCK_COMPILATION}" ]; then
 
   unset_env_vars_comp_pl || return 1
   
-  pbottom 'COMPILING PLANCK'
+  pbottom 'COMPILING PLANCK' || return 1
   
   # ---------------------------------------------------------------------------
   # ---------------------------------------------------------------------------

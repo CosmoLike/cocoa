@@ -46,12 +46,12 @@ if [ -z "${IGNORE_ALL_COBAYA_INSTALLATION}" ]; then
   fail_ucb () {
     local MSG="\033[0;31m\t\t (setup_update_cobaya.sh) WE CANNOT RUN \e[3m"
     local MSG2="\033[0m"
-    echo -e "${MSG} ${1:-"empty arg"} ${MSG2}"
+    echo -e "${MSG}${1:-"empty arg"}${MSG2}"
     unset fail_ucb
     unset_env_vars_ucob
   }
 
-  if [ -z "${DEBUG_PIP_OUTPUT}" ]; then
+  if [ -z "${COCOA_OUTPUT_VERBOSE}" ]; then
     export OUT1="/dev/null"; export OUT2="/dev/null"
   else
     export OUT1="/dev/tty"; export OUT2="/dev/tty"

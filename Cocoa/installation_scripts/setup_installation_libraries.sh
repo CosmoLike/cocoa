@@ -50,7 +50,7 @@ fail_sil () {
   unset_env_vars_sil
 }
 
-if [ -z "${DEBUG_SIL_OUTPUT}" ]; then
+if [ -z "${COSMOLIKE_DEBUG_MODE}" ]; then
   export OUT1="/dev/null"; export OUT2="/dev/null"
   export SILMNT="${MAKE_NUM_THREADS:-1}"
 else
@@ -122,8 +122,10 @@ gitact1() {
   
   cdfolder "${CCIL:?}" || return 1;
 
+  # ---------------------------------------------------------------------------
   # In case this script runs twice
   rm -rf "${CCIL:?}/${1:?}"
+  # ---------------------------------------------------------------------------
 
   "${GIT:?}" clone "${3:?}" "${1:?}" >${OUT1:?} 2>${OUT2:?} || 
     { fail_sil "GIT CLONE"; return 1; }
@@ -146,7 +148,7 @@ gitact2() {
 
   cdfolder "${CCIL:?}" || return 1;
 
-  if [ "${1:?}/" != "${2:?}" ] && [ "${1:?}" != "${2:?}" \
+  if [ "${1:?}/" != "${2:?}" ] && [ "${1:?}" != "${2:?}" ] \
     && [ "${1:?}" != "${2:?}/" ]; then
 
     # In case this script runs twice (after being killed by CTRL-D)
@@ -476,6 +478,11 @@ if [ -z "${IGNORE_CPP_CARMA_INSTALLATION}" ]; then
   export XZF="carma.xz"
 
   gitact1 "${FOLDER}" "${VER}" "${URL}" || return 1;
+
+  # ---------------------------------------------------------------------------
+  # In case this script runs twice (after sudden break w/ CTRL-C)
+  rm -rf "${PACKDIR:?}"
+  rm -rf "${CCIL:?}/include"
 
   # -------------------------------------------------------------------------
   # move/rename include file and carma.h folder

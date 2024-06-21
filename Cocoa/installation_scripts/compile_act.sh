@@ -11,7 +11,7 @@ if [ -z "${IGNORE_ACT_COMPILATION}" ]; then
   
   # ---------------------------------------------------------------------------
   # Clean any previous compilation
-  source "${ROOTDIR:?}/installation_scripts/clean_act.sh"
+  source "${ROOTDIR:?}/installation_scripts/clean_act.sh" || return 1
   # ---------------------------------------------------------------------------
   
   pfail() {
@@ -78,10 +78,10 @@ if [ -z "${IGNORE_ACT_COMPILATION}" ]; then
 
   cdfolder "${PACKDIR}" || return 1
  
-  "${PIP3:?}" install . --prefix="${ROOTDIR:?}/.local" \
-    >${OUT1:?} 2>${OUT2:?} || { fail_comp_act "PIP3 INSTALL ."; return 1; }
+  ${PIP3:?} install . --prefix="${ROOTDIR:?}/.local" \
+    >${OUT1:?} 2>${OUT2:?} #|| { fail_comp_act "PIP3 INSTALL ."; return 1; }
 
-  unset_env_vars_comp_act || return 1
+  #unset_env_vars_comp_act || return 1
   
   pbottom 'COMPILING ACT'
   

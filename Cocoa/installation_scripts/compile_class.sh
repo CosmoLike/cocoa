@@ -11,7 +11,7 @@ if [ -z "${IGNORE_CLASS_COMPILATION}" ]; then
   
   # ---------------------------------------------------------------------------
   # Clean any previous compilation
-  source "${ROOTDIR:?}/installation_scripts/clean_class.sh"
+  source "${ROOTDIR:?}/installation_scripts/clean_class.sh" || return 1
   # ---------------------------------------------------------------------------
   
   pfail() {
@@ -72,7 +72,7 @@ if [ -z "${IGNORE_CLASS_COMPILATION}" ]; then
   # ---------------------------------------------------------------------------
   # ---------------------------------------------------------------------------
   
-  ptop 'COMPILING CLASS'
+  ptop 'COMPILING CLASS' || return 1
 
   export PACKDIR="${ROOTDIR:?}/external_modules/code/${CLASS_NAME:-"class_public"}/"
 
@@ -103,7 +103,7 @@ if [ -z "${IGNORE_CLASS_COMPILATION}" ]; then
 
   unset_env_vars_comp_class || return 1
 
-  pbottom 'COMPILING CLASS'
+  pbottom 'COMPILING CLASS' || return 1
 
   # ---------------------------------------------------------------------------
   # ---------------------------------------------------------------------------

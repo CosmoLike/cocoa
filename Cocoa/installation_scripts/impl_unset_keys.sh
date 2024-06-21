@@ -208,3 +208,14 @@ unset URL
 unset CHANGES 
 unset CLASS_NAME
 unset fail_sdf
+unset PACKDIR
+unset cdfolder
+unset pfail
+unset unset_env_vars_comp_act
+unset fail_comp_act
+unset fail_clact
+unset unset_env_vars_clean_act
+unset INT_LIB
+unset INT_INCL
+unset INT_INCL_PY
+unset INT_INCL_PY_SP

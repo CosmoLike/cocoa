@@ -56,7 +56,7 @@ if [ -z "${IGNORE_HDF5_INSTALLATION}" ]; then
     unset_env_vars_shdf5
   }
   
-  if [ -z "${DEBUG_HDF5_PACKAGES}" ]; then
+  if [ -z "${COCOA_OUTPUT_VERBOSE}" ]; then
     export OUT1="/dev/null"; export OUT2="/dev/null"
     export HDF5MNT="${MAKE_NUM_THREADS:-1}"
     [[ ${HDF5MNT} == +([0-9]) ]] || export HDF5MNT=1

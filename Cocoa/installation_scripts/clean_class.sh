@@ -70,8 +70,9 @@ if [ -z "${IGNORE_CLASS_COMPILATION}" ]; then
 
   cdfolder "${PACKDIR:?}/python"|| return 1
   
-  "${PYTHON3:?}" setup.py clean >${OUT1:?} 2>${OUT2:?} ||
-    { fail_clcls "PYTHON SETUP CLEAN"; return 1; }
+  # ---------------------------------------------------------------------------
+  # below we ignore if something goes wrong (related to include/ relocation)
+  "${PYTHON3:?}" setup.py clean >${OUT1:?} 2>${OUT2:?}
 
   rm -rf "${PLIB:?}"/classy*
   rm -rf "${PACKDIR:?}/python/build/"
