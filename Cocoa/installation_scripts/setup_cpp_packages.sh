@@ -85,16 +85,16 @@ if [ -z "${IGNORE_CPP_INSTALLATION}" ]; then
     rm -f CMakeCache.txt
 
     "${CMAKE:?}" -DCMAKE_INSTALL_PREFIX="${ROOTDIR:?}/.local" \
-      -DCMAKE_C_COMPILER=$C_COMPILER \
-      -DCMAKE_CXX_COMPILER=$CXX_COMPILER \
+      -DCMAKE_C_COMPILER="${C_COMPILER:?}" \
+      -DCMAKE_CXX_COMPILER="${CXX_COMPILER:?}" \
       --log-level=ERROR . \
-      >${OUT1} 2>${OUT2} || { fail_scpp "(SPDLOG) CMAKE"; return 1; }
+      >${OUT1:?} 2>${OUT2:?} || { fail_scpp "(SPDLOG) CMAKE"; return 1; }
 
-    make -j $CPPMNT \
-      >${OUT1} 2>${OUT2} || { fail_scpp "(SPDLOG) MAKE"; return 1; }
+    make -j $CPPMNT >${OUT1:?} 2>${OUT2:?} || 
+      { fail_scpp "(SPDLOG) MAKE"; return 1; }
 
-    make install \
-      >${OUT1} 2>${OUT2} || { fail_scpp "(SPDLOG) MAKE INSTALL"; return 1; }
+    make install >${OUT1:?} 2>${OUT2:?} || 
+      { fail_scpp "(SPDLOG) MAKE INSTALL"; return 1; }
 
     cdfolder "${ROOTDIR}" || return 1;
 
@@ -115,28 +115,28 @@ if [ -z "${IGNORE_CPP_INSTALLATION}" ]; then
       pfail 'COCOA_ARMADILLO_DIR'; cdroot; return 1;
     fi
 
-    cdfolder "${CCIL}/${COCOA_ARMADILLO_DIR}" || return 1;
+    cdfolder "${CCIL:?}/${COCOA_ARMADILLO_DIR:?}" || return 1;
 
     rm -f CMakeCache.txt
 
     $CMAKE -DBUILD_SHARED_LIBS=TRUE \
-      -DCMAKE_INSTALL_PREFIX="${ROOTDIR}/.local" \
-      -DCMAKE_C_COMPILER=$C_COMPILER \
-      -DCMAKE_CXX_COMPILER=$CXX_COMPILER \
+      -DCMAKE_INSTALL_PREFIX="${ROOTDIR:?}/.local" \
+      -DCMAKE_C_COMPILER="${C_COMPILER:?}" \
+      -DCMAKE_CXX_COMPILER="${CXX_COMPILER:?}" \
       -DLAPACK_FOUND=YES \
-      -DLAPACK_LIBRARIES="${ROOTDIR}/.local/lib/liblapack.so" \
+      -DLAPACK_LIBRARIES="${ROOTDIR:?}/.local/lib/liblapack.so" \
       -DBLAS_FOUND=NO \
       --log-level=ERROR . \
-      >${OUT1} 2>${OUT2} || { fail_scpp "(ARMA) CMAKE"; return 1; }
+      >${OUT1:?} 2>${OUT2:?} || { fail_scpp "(ARMA) CMAKE"; return 1; }
     
-    make clean >${OUT1} 2>${OUT2} \
-      || { fail_scpp "(ARMA) MAKE CLEAN"; return 1; }
+    make clean >${OUT1:?} 2>${OUT2:?} || 
+      { fail_scpp "(ARMA) MAKE CLEAN"; return 1; }
 
-    make -j $CPPMNT all -Wno-dev \
-      >${OUT1} 2>${OUT2} || { fail_scpp "(ARMA) MAKE"; return 1; }
+    make -j $CPPMNT all -Wno-dev >${OUT1:?} 2>${OUT2:?} || 
+      { fail_scpp "(ARMA) MAKE"; return 1; }
 
-    make install \
-      >${OUT1} 2>${OUT2} || { fail_scpp "(ARMA) MAKE INSTALL"; return 1; }
+    make install >${OUT1:?} 2>${OUT2:?} || 
+      { fail_scpp "(ARMA) MAKE INSTALL"; return 1; }
 
     cdfolder "${ROOTDIR}" || return 1;
 
@@ -157,18 +157,18 @@ if [ -z "${IGNORE_CPP_INSTALLATION}" ]; then
       pfail 'COCOA_CARMA_DIR'; cdroot; return 1;
     fi
 
-    cdfolder "${CCIL}/${COCOA_CARMA_DIR}" || return 1;
+    cdfolder "${CCIL:?}/${COCOA_CARMA_DIR:?}" || return 1;
 
     rm -rf "${ROOTDIR:?}/.local/include/carma/"   
     
-    mkdir "${ROOTDIR}/.local/include/carma/" \
-      || { fail_scpp "(CARMA) MKDIR CARMA FOLDER"; return 1; }
+    mkdir "${ROOTDIR:?}/.local/include/carma/" || 
+      { fail_scpp "(CARMA) MKDIR CARMA FOLDER"; return 1; }
     
-    cp ./carma.h "${ROOTDIR}/.local/include/" \
-      || { fail_scpp "(CARMA) CP CARMA HEADER"; return 1; }
+    cp ./carma.h "${ROOTDIR:?}/.local/include/" || 
+      { fail_scpp "(CARMA) CP CARMA HEADER"; return 1; }
 
-    cp -r ./carma_bits "${ROOTDIR}/.local/include/" \
-      || { fail_scpp "(CARMA) CP CARMA_BITS"; return 1; }
+    cp -r ./carma_bits "${ROOTDIR:?}/.local/include/" || 
+      { fail_scpp "(CARMA) CP CARMA_BITS"; return 1; }
 
     cdfolder "${ROOTDIR}" || return 1;
 
@@ -185,16 +185,16 @@ if [ -z "${IGNORE_CPP_INSTALLATION}" ]; then
       pfail 'COCOA_BOOST_DIR'; cdroot; return 1;
     fi
 
-    cdfolder "${CCIL}/${COCOA_BOOST_DIR}" || return 1;
+    cdfolder "${CCIL:?}/${COCOA_BOOST_DIR:?}" || return 1;
 
-    ./bootstrap.sh --prefix="${ROOTDIR}/.local" \
-      >${OUT1} 2>${OUT2} || { fail_scpp "(BOOST) SCRIPT BOOTSTRAP"; return 1; }
+    ./bootstrap.sh --prefix="${ROOTDIR:?}/.local" >${OUT1:?} 2>${OUT2:?} || 
+      { fail_scpp "(BOOST) SCRIPT BOOTSTRAP"; return 1; }
 
     ./b2 --with=regex install \
       --without-python --without-thread \
       --without-timer  --without-mpi \
-      --without-atomic \
-      >${OUT1} 2>${OUT2} || { fail_scpp "(BOOST) SCRIPT B2 INSTALL"; return 1; }
+      --without-atomic >${OUT1:?} 2>${OUT2:?} || 
+      { fail_scpp "(BOOST) SCRIPT B2 INSTALL"; return 1; }
     
     cdfolder "${ROOTDIR}" || return 1;
 
