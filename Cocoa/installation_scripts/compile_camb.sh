@@ -79,7 +79,7 @@ if [ -z "${IGNORE_CAMB_COMPILATION}" ]; then
 
   cdfolder "${ROOTDIR:?}/external_modules/code/${CAMB_NAME:?}/" || return 1
 
-  COMPILER=${FORTRAN_COMPILER:?} F90C=${FORTRAN_COMPILER:?} ${PYTHON3:?} \
+  COMPILER="${FORTRAN_COMPILER:?}" F90C="${FORTRAN_COMPILER:?}" "${PYTHON3:?}" \
     setup.py build >${OUT1:?} 2>${OUT2:?} || 
     { fail_comp_camb "PYTHON3 SETUP.PY BUILD"; return 1; }
 
