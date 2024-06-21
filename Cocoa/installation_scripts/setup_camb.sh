@@ -95,41 +95,46 @@ if [ -z "${IGNORE_CAMB_COMPILATION}" ]; then
   # ---------------------------------------------------------------------------
   cdfolder "${ECODEF:?}" || return 1;
 
-  $GIT clone $URL --recursive "${CAMB_NAME:?}" >${OUT1} 2>${OUT2:?} || 
+  "${GIT:?}" clone $URL --recursive "${CAMB_NAME:?}" >${OUT1:?} 2>${OUT2:?} || 
     { fail_scamb "GIT CLONE FROM CAMB REPO"; return 1; }
   
   cdfolder "${ECODEF:?}/${CAMB_NAME:?}" || return 1;
 
-  $GIT checkout "${CAMB_GIT_COMMIT:?}" >${OUT1} 2>${OUT2:?} ||
+  "${GIT:?}" checkout "${CAMB_GIT_COMMIT:?}" >${OUT1:?} 2>${OUT2:?} ||
     { fail_scamb "GIT CHECKOUT CAMB"; return 1; }
   
   # ---------------------------------------------------------------------------
   # patch CAMB to be compatible w/ COCOA
+  # ---------------------------------------------------------------------------
+  
   # ---------------------------------------------------------------------------
   cdfolder "${ECODEF:?}/${CAMB_NAME:?}/camb/" || return 1;
 
   cp "${CHANGES:?}"/camb/_compilers.patch . 2>${OUT2:?} ||
     { fail_scamb "CP FILE PATCH (_compilers)"; return 1; }
   
-  patch -u _compilers.py -i _compilers.patch >${OUT1} 2>${OUT2:?} ||
+  patch -u _compilers.py -i _compilers.patch >${OUT1:?} 2>${OUT2:?} ||
     { fail_scamb "SCRIPT FILE PATCH (_compilers)"; return 1; }
 
+  # ---------------------------------------------------------------------------
   cdfolder "${ECODEF}/${CAMB_NAME:?}/fortran/" || return 1;
   
   cp "${CHANGES:?}"/fortran/Makefile.patch . 2>${OUT2:?} ||
-    { fail_scamb "CP FILE PATCH (Makefile)"; return 1 }
+    { fail_scamb "CP FILE PATCH (Makefile)"; return 1; }
   
-  patch -u Makefile -i Makefile.patch >${OUT1} 2>${OUT2:?} ||
+  patch -u Makefile -i Makefile.patch >${OUT1:?} 2>${OUT2:?} ||
     { fail_scamb "SCRIPT FILE PATCH (Makefile)"; return 1; }
 
+  # ---------------------------------------------------------------------------
   cdfolder "${ECODEF:?}/${CAMB_NAME:?}/forutils/" || return 1;
   
   cp "${CHANGES:?}/forutils/Makefile_compiler.patch" . 2>${OUT2:?} ||
     { fail_scamb "CP FILE PATCH (Makefile_compiler)"; return 1; }
   
-  patch -u Makefile_compiler -i Makefile_compiler.patch >${OUT1} \
+  patch -u Makefile_compiler -i Makefile_compiler.patch >${OUT1:?} \
     2>${OUT2:?} || { fail_scamb "SCRIPT FILE PATCH (Makefile)"; return 1; }
   
+  # ---------------------------------------------------------------------------
   cdfolder "${ROOTDIR}" || return 1;
 
   pbottom 'INSTALLING CAMB'
@@ -137,7 +142,7 @@ if [ -z "${IGNORE_CAMB_COMPILATION}" ]; then
   # ----------------------------------------------------------------------------
   # ----------------------------------------------------------------------------
   
-  unset_env_vars_scamb
+  unset_env_vars_scamb || return 1
   
   pbottom2 'SETUP_CAMB'
 

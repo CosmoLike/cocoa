@@ -138,8 +138,8 @@ if [ -z "${IGNORE_C_INSTALLATION}" ]; then
     "${CMAKE:?}" -DBUILD_SHARED_LIBS=TRUE \
       -DCMAKE_INSTALL_PREFIX="${ROOTDIR:?}/.local" \
       -DCMAKE_C_COMPILER="${C_COMPILER:?}" \
-      -DCMAKE_CXX_COMPILER="${CXX_COMPILER:?} \
-      -DCMAKE_FC_COMPILER="${FORTRAN_COMPILER:?} \
+      -DCMAKE_CXX_COMPILER="${CXX_COMPILER:?}" \
+      -DCMAKE_FC_COMPILER="${FORTRAN_COMPILER:?}" \
       --log-level=ERROR .. \
       >${OUT1:?} 2>${OUT2:?} || { fail_scp "(CFITSIO) CMAKE"; return 1; }
 
@@ -215,7 +215,6 @@ if [ -z "${IGNORE_ALL_PIP_INSTALLATION}" ]; then
   fi
   
   unset_env_vars_scp_eemul2 () {
-    cd $ROOTDIR
     unset OUT1
     unset OUT2
     cdroot || return 1;

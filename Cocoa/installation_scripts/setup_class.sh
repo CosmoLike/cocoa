@@ -125,7 +125,7 @@ if [ -z "${IGNORE_CLASS_COMPILATION}" ]; then
   cdfolder "${ECODEF}/${CLASS_NAME}/python" || return 1;
   
   cp "${CHANGES:?}/python"/setup.patch . 2>${OUT2:?} ||
-    { fail_sclass "CP FILE PATCH (setup.patch)"; return 1 }
+    { fail_sclass "CP FILE PATCH (setup.patch)"; return 1; }
 
   patch -u setup.py -i setup.patch >${OUT1:?} 2>${OUT2:?} || 
     { fail_sclass "SCRIPT FILE PATCH (setup.patch)"; return 1; }
@@ -137,7 +137,7 @@ if [ -z "${IGNORE_CLASS_COMPILATION}" ]; then
   # ----------------------------------------------------------------------------
   # ----------------------------------------------------------------------------
 
-  unset_env_vars_sclass
+  unset_env_vars_sclass || return 1
 
   pbottom2 'SETUP_CLASS'
 fi
