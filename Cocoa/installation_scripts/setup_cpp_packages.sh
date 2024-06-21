@@ -5,7 +5,8 @@
 if [ -z "${IGNORE_CPP_INSTALLATION}" ]; then
   
   pfail() {
-    echo -e "\033[0;31m\t\t ERROR ENV VARIABLE ${1} IS NOT DEFINED \033[0m"
+    echo -e \
+    "\033[0;31m\t\t ERROR ENV VARIABLE ${1:-"empty arg"} NOT DEFINED \033[0m"
     unset pfail
   }
   
@@ -14,7 +15,7 @@ if [ -z "${IGNORE_CPP_INSTALLATION}" ]; then
   fi
   
   cdroot() {
-    cd "${ROOTDIR}" 2>"/dev/null" || { echo -e \
+    cd "${ROOTDIR:?}" 2>"/dev/null" || { echo -e \
       "\033[0;31m\t\t CD ROOTDIR (${ROOTDIR}) FAILED \033[0m"; return 1; }
     unset cdroot
   }
@@ -26,11 +27,7 @@ if [ -z "${IGNORE_CPP_INSTALLATION}" ]; then
   if [ -z "${C_COMPILER}" ]; then
     pfail 'C_COMPILER'; cdroot; return 1;
   fi
-  
-  if [ -z "${FORTRAN_COMPILER}" ]; then
-    pfail 'FORTRAN_COMPILER'; cdroot; return 1;
-  fi
-  
+    
   if [ -z "${CMAKE}" ]; then
     pfail 'CMAKE'; cdroot; return 1;
   fi
@@ -165,7 +162,7 @@ if [ -z "${IGNORE_CPP_INSTALLATION}" ]; then
 
     cdfolder "${CCIL}/${COCOA_CARMA_DIR}" || return 1;
 
-    rm -rf "${ROOTDIR}/.local/include/carma/"   
+    rm -rf "${ROOTDIR:?}/.local/include/carma/"   
     
     mkdir "${ROOTDIR}/.local/include/carma/" \
       || { fail_scpp "(CARMA) MKDIR CARMA FOLDER"; return 1; }

@@ -20,8 +20,8 @@ if [ -z "${IGNORE_CMAKE_INSTALLATION}" ]; then
     unset cdroot
   }
     
-  if [ -z "${CPP_COMPILER}" ]; then
-    pfail 'CPP_COMPILER'; cdroot; return 1
+  if [ -z "${CXX_COMPILER}" ]; then
+    pfail 'CXX_COMPILER'; cdroot; return 1
   fi
 
   if [ -z "${C_COMPILER}" ]; then
@@ -76,7 +76,7 @@ if [ -z "${IGNORE_CMAKE_INSTALLATION}" ]; then
 
   cdfolder "${CCIL:?}/${COCOA_CMAKE_DIR:?}" || return 1;
 
-  env CC="${C_COMPILER:?}" CXX="${CPP_COMPILER:?}" ./bootstrap \
+  env CC="${C_COMPILER:?}" CXX="${CXX_COMPILER:?}" ./bootstrap \
     --prefix="${ROOTDIR:?}/.local" >${OUT1:?} 2>${OUT2:?} || 
     { fail_scmk "BOOTSTRAP"; return 1; }
 
