@@ -77,9 +77,9 @@ if [ -z "${IGNORE_ALL_PIP_INSTALLATION}" ]; then
     
     export CCIL="${ROOTDIR:?}/../cocoa_installation_libraries"
 
-    cdfolder "${CCIL}/${COCOA_EXPAT_DIR}" || return 1;
+    cdfolder "${CCIL:?}/${COCOA_EXPAT_DIR:?}" || return 1;
     
-    FC=$FORTRAN_COMPILER CC=$C_COMPILER ./configure \
+    FC="${FORTRAN_COMPILER:?}" CC="${C_COMPILER:?}" ./configure \
       --prefix="${ROOTDIR:?}/.local" \
       --enable-shared=yes \
       --enable-static=yes \
@@ -108,7 +108,7 @@ if [ -z "${IGNORE_ALL_PIP_INSTALLATION}" ]; then
   
   if [ -z "${MINICONDA_INSTALLATION}" ]; then
     
-    env CXX=$CXX_COMPILER CC=$C_COMPILER $PIP3 install \
+    env CXX="${CXX_COMPILER:?}" CC="${C_COMPILER:?}" "${PIP3:?}" install \
         'alabaster==0.7.13' \
         'appdirs==1.4.4' \
         'anytree==2.8.0' \
@@ -217,25 +217,25 @@ if [ -z "${IGNORE_ALL_PIP_INSTALLATION}" ]; then
         'wrapt==1.14.1' \
         'zipfile38==0.0.3' \
         'zipp==3.15.0' \
-      --prefix="${ROOTDIR}/.local" >${OUT1:?} 2>${OUT2:?} || 
+      --prefix="${ROOTDIR:?}/.local" >${OUT1:?} 2>${OUT2:?} || 
       { fail_spp "PIP INSTALL (CORE PACKAGES)"; return 1; }
 
   else
   
     #PS: --force-reinstall - this helps CARMA to see numpy files
-    env CXX=$CXX_COMPILER CC=$C_COMPILER $PIP3 install \
+    env CXX="${CXX_COMPILER:?}" CC="${C_COMPILER:?}" "${PIP3:?}" install \
         'numpy==1.23.5' \
-      --prefix="${ROOTDIR}/.local" \
+      --prefix="${ROOTDIR:?}/.local" \
       --force-reinstall >${OUT1:?} 2>${OUT2:?} || 
       { fail_spp "PIP INSTALL (CORE PACKAGES)"; return 1; }
     
   fi
 
-  env CXX=$CXX_COMPILER CC=$C_COMPILER $PIP3 install \
-    $ROOTDIR/../cocoa_installation_libraries/pip_cache/fgspectra \
-    --prefix="${ROOTDIR}/.local" \
+  env CXX="${CXX_COMPILER:?}" CC="${C_COMPILER:?}" "${PIP3:?}" install \
+      "${ROOTDIR:?}/../cocoa_installation_libraries/pip_cache/fgspectra" \
+    --prefix="${ROOTDIR:?}/.local" \
     --no-index >${OUT1:?} 2>${OUT2:?} || 
-      { fail_spp "PIP INSTALL (FGSPECTRA)"; return 1; }
+    { fail_spp "PIP INSTALL (FGSPECTRA)"; return 1; }
 
   pbottom "PIP INSTALL CORE PACKAGES"
   # ----------------------------------------------------------------------------
@@ -248,7 +248,7 @@ if [ -z "${IGNORE_ALL_PIP_INSTALLATION}" ]; then
   
     ptop "PIP INSTALL MACHINE LEARNING CPU-ONLY PACKAGES"
 
-    env CXX=$CXX_COMPILER CC=$C_COMPILER $PIP3 install \
+    env CXX="${CXX_COMPILER:?}" CC="${C_COMPILER:?}" "${PIP3:?}" install \
         'tensorflow-cpu==2.12.0' \
         'keras==2.12.0' \
         'keras-preprocessing==1.1.2' \
@@ -256,7 +256,7 @@ if [ -z "${IGNORE_ALL_PIP_INSTALLATION}" ]; then
         'torchvision==0.14.1+cpu' \
         'torchaudio==0.13.1' \
       --extra-index-url "https://download.pytorch.org/whl/cpu" \
-      --prefix="${ROOTDIR}/.local" >${OUT1:?} 2>${OUT2:?} || 
+      --prefix="${ROOTDIR:?}/.local" >${OUT1:?} 2>${OUT2:?} || 
       { fail_spp "PIP INSTALL (MACHINE LEARNING CPU-ONLY PACKAGES)"; return 1; }
   
     pbottom "PIP INSTALL MACHINE LEARNING CPU-ONLY PACKAGES"
@@ -267,15 +267,15 @@ if [ -z "${IGNORE_ALL_PIP_INSTALLATION}" ]; then
   
     ptop "PIP INSTALL MACHINE LEARNING GPU PACKAGES"
 
-    env CXX=$CXX_COMPILER CC=$C_COMPILER $PIP3 install \
+    env CXX="${CXX_COMPILER:?}" CC="${C_COMPILER:?}" "${PIP3:?}" install \
         'tensorflow==2.12.0' \
         'keras==2.12.0' \
         'keras-preprocessing==1.1.2' \
         'torch==1.13.1+cu116' \
         'torchvision==0.14.1+cu116' \
         'torchaudio==0.13.1' \
-      --extra-index-url https://download.pytorch.org/whl/cu116 \
-      --prefix="${ROOTDIR}/.local" >${OUT1:?} 2>${OUT2:?} ||
+      --extra-index-url "https://download.pytorch.org/whl/cu116" \
+      --prefix="${ROOTDIR:?}/.local" >${OUT1:?} 2>${OUT2:?} ||
       { fail_spp "PIP INSTALL (MACHINE LEARNING GPU PACKAGES)"; return 1; } 
 
     pbottom "PIP INSTALL MACHINE LEARNING GPU PACKAGES"

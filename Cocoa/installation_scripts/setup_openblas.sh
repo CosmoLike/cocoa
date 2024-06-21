@@ -83,7 +83,7 @@ if [ -z "${IGNORE_OPENBLAS_INSTALLATION}" ]; then
   
   make clean >${OUT1:?} 2>${OUT2:?} || { fail_sopb "MAKE CLEAN"; return 1; }
 
-  make CC=${C_COMPILER:?} FC=${FORTRAN_COMPILER:?} USE_OPENMP=1 \
+  make CC="${C_COMPILER:?}" FC="${FORTRAN_COMPILER:?}" USE_OPENMP=1 \
     >${OUT1:?} 2>${OUT2:?} || { fail_sopb "MAKE"; return 1; }
   
   make install PREFIX="${ROOTDIR:?}/.local" >${OUT1:?} 2>${OUT2:?} || 
