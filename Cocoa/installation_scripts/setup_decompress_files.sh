@@ -49,7 +49,7 @@ if [ -z "${NO_UNXZ_COCOA_INSTALLATION_LIBRARIES}" ]; then
 
   ptop 'DECOMPRESSING FILES ON /COCOA_INSTALLATION_LIBRARIES'
 
-  cdfolder "${ROOTDIR}/../cocoa_installation_libraries/" || return 1;
+  cdfolder "${ROOTDIR:?}/../cocoa_installation_libraries/" || return 1;
 
   sh unxv_all.sh || { fail_sdf "SCRIPT unxv_all.sh"; return 1; }
 
@@ -73,7 +73,7 @@ if [ -z "${NO_UNXZ_EXTERNAL_MODULES_DATA}" ]; then
 
   ptop 'DECOMPRESSING FILES ON /EXTERNAL_MODULES/DATA'
 
-  cdfolder "${ROOTDIR}/external_modules/data/" || return 1;
+  cdfolder "${ROOTDIR:?}/external_modules/data/" || return 1;
 
   sh unxv_all.sh || { fail_sdf "SCRIPT unxv_all.sh"; return 1; }
 

@@ -91,13 +91,13 @@ if [ -z "${IGNORE_FORTRAN_INSTALLATION}" ]; then
     mkdir lapack-build >${OUT1:?} 2>${OUT2:?} || 
       { fail_sftrp "(LAPACK) MKDIR LAPACK-BUILD"; return 1; }
 
-    cdfolder "${CCIL}/lapack-build" || return 1;
+    cdfolder "${CCIL:?}/lapack-build" || return 1;
 
-    $CMAKE -DBUILD_SHARED_LIBS=TRUE \
+    "${CMAKE:?}" -DBUILD_SHARED_LIBS=TRUE \
       -DCMAKE_INSTALL_PREFIX="${ROOTDIR:?}/.local" \
-      -DCMAKE_C_COMPILER=${C_COMPILER:?} \
-      --log-level=ERROR ../"${COCOA_LAPACK_DIR:?}" \
-      >${OUT1:?} 2>${OUT2:?} || { fail_sftrp "(LAPACK) CMAKE"; return 1; }
+      -DCMAKE_C_COMPILER="${C_COMPILER:?}" \
+      --log-level=ERROR "../${COCOA_LAPACK_DIR:?}" >${OUT1:?} 2>${OUT2:?} ||
+      { fail_sftrp "(LAPACK) CMAKE"; return 1; }
 
     make -j $FMNT all >${OUT1:?} 2>${OUT2:?} || 
       { fail_sftrp "MAKE"; return 1; }

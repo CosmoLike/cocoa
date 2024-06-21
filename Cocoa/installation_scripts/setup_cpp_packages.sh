@@ -84,7 +84,7 @@ if [ -z "${IGNORE_CPP_INSTALLATION}" ]; then
     
     rm -f CMakeCache.txt
 
-    $CMAKE -DCMAKE_INSTALL_PREFIX="${ROOTDIR:?}/.local" \
+    "${CMAKE:?}" -DCMAKE_INSTALL_PREFIX="${ROOTDIR:?}/.local" \
       -DCMAKE_C_COMPILER=$C_COMPILER \
       -DCMAKE_CXX_COMPILER=$CXX_COMPILER \
       --log-level=ERROR . \

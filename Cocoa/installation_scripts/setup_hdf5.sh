@@ -42,6 +42,7 @@ if [ -z "${IGNORE_HDF5_INSTALLATION}" ]; then
     unset OUT2
     unset HDF5MNT
     unset CCIL
+    unset BDF
     unset pfail
     unset unset_env_vars_shdf5
     cdroot || return 1;
@@ -50,7 +51,7 @@ if [ -z "${IGNORE_HDF5_INSTALLATION}" ]; then
   fail_shdf5 () {
     local MSG="\033[0;31m\t\t (setup_hdf5.sh) WE CANNOT RUN \e[3m"
     local MSG2="\033[0m"
-    echo -e "${MSG} ${1} ${MSG2}"
+    echo -e "${MSG} ${1:-"empty arg"} ${MSG2}"
     unset fail_shdf5
     unset_env_vars_shdf5
   }
@@ -83,26 +84,25 @@ if [ -z "${IGNORE_HDF5_INSTALLATION}" ]; then
     pfail 'COCOA_HDF5_DIR'; cdroot; return 1;
   fi
   
-  cdfolder "${CCIL}/${COCOA_HDF5_DIR}" || return 1;
+  cdfolder "${CCIL:?}/${COCOA_HDF5_DIR:?}" || return 1;
 
-  export build_folder="cocoa_HDF5_build"
+  export BDF="cocoa_HDF5_build"
 
   rm -f  "${CCIL:?}/${COCOA_HDF5_DIR:?}/CMakeCache.txt"
   rm -rf "${CCIL:?}/${COCOA_HDF5_DIR:?}/CMakeFiles/"
-  rm -rf "${CCIL:?}/${COCOA_HDF5_DIR:?}/${build_folder:?}/"
+  rm -rf "${CCIL:?}/${COCOA_HDF5_DIR:?}/${BDF:?}/"
   
-  mkdir "${build_folder:?}" || 
-    { fail_shdf5 "MKDIR COCOA_HDF5_BUILD"; return 1; }
+  mkdir "${BDF:?}" || { fail_shdf5 "MKDIR COCOA_HDF5_BUILD"; return 1; }
 
-  cdfolder "${CCIL}/${COCOA_HDF5_DIR}/${build_folder}" || return 1;
+  cdfolder "${CCIL:?}/${COCOA_HDF5_DIR:?}/${BDF:?}" || return 1;
 
-  $CMAKE -DBUILD_SHARED_LIBS=TRUE \
+  "${CMAKE:?}" -DBUILD_SHARED_LIBS=TRUE \
     -DCMAKE_INSTALL_PREFIX="${ROOTDIR:?}/.local" \
     -DCMAKE_C_COMPILER="${C_COMPILER:?}" \
     -DCMAKE_CXX_COMPILER="${CXX_COMPILER:?}" \
     -DCMAKE_FC_COMPILER="${FORTRAN_COMPILER:?}" \
-    --log-level=ERROR .. \
-    >${OUT1:?} 2>${OUT2:?} || { fail_shdf5 "CMAKE"; return 1; }
+    --log-level=ERROR .. >${OUT1:?} 2>${OUT2:?} || 
+    { fail_shdf5 "CMAKE"; return 1; }
 
   make -j $HDF5MNT >${OUT1:?} 2>${OUT2:?} || 
     { fail_shdf5 "MAKE"; return 1; }
@@ -122,6 +122,7 @@ if [ -z "${IGNORE_HDF5_INSTALLATION}" ]; then
   pbottom2 'SETUP_HDF5'
 
 fi
+
 # ----------------------------------------------------------------------------
 # ----------------------------------------------------------------------------
 # ----------------------------------------------------------------------------

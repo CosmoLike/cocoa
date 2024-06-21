@@ -115,19 +115,19 @@ wgetact() {
 }
 
 gitact1() {
-  #ARGUMENTS: FOLDER, VERSION, URL, NEW_FOLDER, XZFILE
+  #ARGUMENTS: FOLDER, VERSION, URL
   
   cdfolder "${CCIL:?}" || return 1;
 
   # In case this script runs twice
   rm -rf "${CCIL:?}/${1:?}"
 
-  $GIT clone "${3:?}" "${1:?}" >${OUT1:?} 2>${OUT2:?} || 
+  "${GIT:?}" clone "${3:?}" "${1:?}" >${OUT1:?} 2>${OUT2:?} || 
     { fail_sil "GIT CLONE"; return 1; }
   
   cdfolder "${CCIL:?}/${1:?}" || return 1;
   
-  $GIT checkout "${2:?}" >${OUT1:?} 2>${OUT2:?} || 
+  "${GIT:?}" checkout "${2:?}" >${OUT1:?} 2>${OUT2:?} || 
     { fail_sil "GIT CHECKOUT"; return 1; }
   
   rm -rf "${CCIL:?}/${1:?}/.git/"
@@ -166,7 +166,7 @@ gitact2() {
 
 gitact() {
   #ARGUMENTS: FOLDER, VERSION, URL, NEW_FOLDER, XZFILE
-  gitact1 "${1:?}" "${2:?}" "${3:?}" "${4:?}" "${5:?}" || return 1;
+  gitact1 "${1:?}" "${2:?}" "${3:?}" || return 1;
   
   gitact2 "${1:?}" "${4:?}" "${5:?}" || return 1;
 }
@@ -498,7 +498,7 @@ if [ -z "${IGNORE_CPP_CARMA_INSTALLATION}" ]; then
 
   export XZF="carma.xz"
 
-  gitact1 "${FOLDER}" "${VER}" "${URL}" "${COCOA_CARMA_DIR}" "${XZF}" || return 1;
+  gitact1 "${FOLDER}" "${VER}" "${URL}" || return 1;
 
   # -------------------------------------------------------------------------
   # move/rename include file and carma.h folder
