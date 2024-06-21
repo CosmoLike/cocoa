@@ -95,14 +95,14 @@ if [ -z "${IGNORE_ALL_COBAYA_INSTALLATION}" ]; then
     
     export CBURL="https://github.com/CobayaSampler/cobaya.git"
 
-    $GIT clone "${CBURL:?}" cobaya >${OUT1:?} 2>${OUT2:?} ||
+    "${GIT:?}" clone "${CBURL:?}" cobaya >${OUT1:?} 2>${OUT2:?} ||
       { fail_ucb "GIT CLONE"; return 1; }
     
     unset CBURL
     
     cdfolder "${COB}" || return 1;
 
-    $GIT reset --hard "${COBAYA_GIT_COMMIT:?}" >${OUT1:?} 2>${OUT2:?} ||
+    "${GIT:?}" reset --hard "${COBAYA_GIT_COMMIT:?}" >${OUT1:?} 2>${OUT2:?} ||
       { fail_ucb "GIT CHECKOUT"; return 1; }
 
     cdfolder "${ROOTDIR}" || return 1;
@@ -115,7 +115,7 @@ if [ -z "${IGNORE_ALL_COBAYA_INSTALLATION}" ]; then
       fail_ucb "CP CHANGE_PYTHON_FILES SCRIPT (COBAYA)"; return 1
     fi
 
-    cdfolder "${COB}/cobaya/" || return 1;
+    cdfolder "${COB:?}/cobaya/" || return 1;
     
     sh change_python_files.sh ||
       { fail_ucb "SCRIPT CHANGE_PYTHON_FILES (COBAYA)"; return 1; }
@@ -150,7 +150,7 @@ if [ -z "${IGNORE_ALL_COBAYA_INSTALLATION}" ]; then
     cp "${CCACOB:?}/${BCL:?}/change_planck_clik.sh" "${COB:?}/${BCL:?}" \
       2>${OUT2:?} || { fail_ucb "CP CHANGE_PLANCK_CLIK SCRIPT"; return 1; }
   
-    cdfolder "${COB}/${BCL}/" || return 1;
+    cdfolder "${COB:?}/${BCL}/" || return 1;
     
     sh change_planck_clik.sh || 
       { fail_ucb "SCRIPT CHANGE_PLANCK_CLIK"; return 1; }
@@ -257,7 +257,7 @@ if [ -z "${IGNORE_ALL_COBAYA_INSTALLATION}" ]; then
 
     export ACTDR6_LL="${CBLIKE:?}/act_dr6_lenslike"
     
-    cp -r "${CCACOB:?}/${ACTDR6_LL:?}" "${COB}/${ACTDR6_LL:?}" 2>${OUT2:?} ||
+    cp -r "${CCACOB:?}/${ACTDR6_LL:?}" "${COB:?}/${ACTDR6_LL:?}" 2>${OUT2:?} ||
       { fail_ucb "CP ACT-DR6 LENSING LIKELIHOOD FILES"; return 1; }
     
     unset ACTDR6_LL
@@ -266,8 +266,8 @@ if [ -z "${IGNORE_ALL_COBAYA_INSTALLATION}" ]; then
     # Fix renaming parameters in CAMB ------------------------------------------
     #---------------------------------------------------------------------------
 
-    cp "${CCACOB:?}/${CBTH:?}"/camb/camb.yaml "${COB:?}/${CBTH:?}"/camb/camb.yaml \
-      2>${OUT2:?} || 
+    cp "${CCACOB:?}/${CBTH:?}/camb/camb.yaml" \
+      "${COB:?}/${CBTH:?}/camb/camb.yaml" 2>${OUT2:?} || 
       { fail_ucb "CP CAMB COBAYA THEORY FILES (CAMB.YAML)"; return 1; }
   
     #---------------------------------------------------------------------------
@@ -316,7 +316,7 @@ if [ -z "${IGNORE_ALL_COBAYA_INSTALLATION}" ]; then
       "${COB:?}/${BCL:?}" 2>${OUT2:?} || { fail_ucb \
       "CP CAMSPEC BASE LIKELIHOOD INSTALLABLELIKELIHOOD PATCH"; return 1; }
     
-    cdfolder "${COB}/${BCL}/" || return 1;
+    cdfolder "${COB:?}/${BCL}/" || return 1;
 
     patch -u InstallableLikelihood.py \
       -i InstallableLikelihood.patch >${OUT1:?} 2>${OUT2:?} || 
@@ -355,16 +355,16 @@ if [ -z "${IGNORE_ALL_COBAYA_INSTALLATION}" ]; then
     rm -rf "${COB:?}/${PL2020:?}"
     rm -rf "${COB:?}/${CBLIKE:?}/${ftmp:?}"
 
-    cdfolder "${COB}/${CBLIKE}" || return 1;
+    cdfolder "${COB:?}/${CBLIKE}" || return 1;
 
     export NPIPE_URL="https://github.com/planck-npipe"
 
-    $GIT clone "${NPIPE_URL:?}/hillipop.git" "${ftmp:?}" >${OUT1:?} \
+    "${GIT:?}" clone "${NPIPE_URL:?}/hillipop.git" "${ftmp:?}" >${OUT1:?} \
       2>${OUT2:?} || { fail_ucb "GIT CLONE (Planck 2020HILLIPOP)"; return 1; }
   
-    cdfolder "${COB}/${CBLIKE}/${ftmp}" || return 1;
+    cdfolder "${COB:?}/${CBLIKE}/${ftmp}" || return 1;
 
-    $GIT reset --hard "${HILLIPOP_GIT_COMMIT:?}" >${OUT1:?} 2>${OUT2:?} ||
+    "${GIT:?}" reset --hard "${HILLIPOP_GIT_COMMIT:?}" >${OUT1:?} 2>${OUT2:?} ||
       { fail_ucb "GIT RESET (Planck2020 HILLIPOP)"; return 1; }
   
     mv planck_2020_hillipop/ "${COB:?}/${CBLIKE:?}" 2>${OUT2:?} ||
@@ -373,10 +373,10 @@ if [ -z "${IGNORE_ALL_COBAYA_INSTALLATION}" ]; then
     #---------------------------------------------------------------------------
     # now patch the likelihood __init__ file
     #---------------------------------------------------------------------------
-    cp "${CCACOB}/${PL2020}/init.patch" "${COB}/${PL2020}" 2>${OUT2:?} ||
+    cp "${CCACOB}/${PL2020:?}/init.patch" "${COB:?}/${PL2020:?}" 2>${OUT2:?} ||
       { fail_ucb "CP INIT.PATCH (Planck2020 HILLIPOP)"; return 1; }
   
-    cdfolder "${COB}/${PL2020}" || return 1;
+    cdfolder "${COB:?}/${PL2020:?}" || return 1;
 
     patch -u __init__.py -i init.patch >${OUT1:?} 2>${OUT2:?} || 
       { fail_ucb "PATCH LIKELIHOOD FILES (Planck2020 HILLIPOP)"; return 1; }
@@ -409,16 +409,16 @@ if [ -z "${IGNORE_ALL_COBAYA_INSTALLATION}" ]; then
     rm -rf "${COB:?}/${PL2020:?}"
     rm -rf "${COB:?}/${CBLIKE:?}/${ftmp:?}"
 
-    cdfolder "${COB}/${CBLIKE}" || return 1;
+    cdfolder "${COB:?}/${CBLIKE}" || return 1;
 
     export NPIPE_URL="https://github.com/planck-npipe" 
 
-    $GIT clone "${NPIPE_URL:?}/lollipop.git" ${ftmp:?} >${OUT1:?} 2>${OUT2:?} || 
+    "${GIT:?}" clone "${NPIPE_URL:?}/lollipop.git" ${ftmp:?} >${OUT1:?} 2>${OUT2:?} || 
       { fail_ucb "GIT CLONE (Planck2020 LOLLIPOP)"; return 1; }
     
-    cdfolder "${COB}/${CBLIKE}/${ftmp}" || return 1;
+    cdfolder "${COB:?}/${CBLIKE}/${ftmp}" || return 1;
 
-    $GIT reset --hard "${LOLLIPOP_GIT_COMMIT:?}" >${OUT1:?} 2>${OUT2:?} || 
+    "${GIT:?}" reset --hard "${LOLLIPOP_GIT_COMMIT:?}" >${OUT1:?} 2>${OUT2:?} || 
       { fail_ucb "GIT RESET (Planck2020 LOLLIPOP)"; return 1; }
     
     mv planck_2020_lollipop/ "${COB:?}/${CBLIKE:?}" 2>${OUT2:?} || 
@@ -431,7 +431,7 @@ if [ -z "${IGNORE_ALL_COBAYA_INSTALLATION}" ]; then
       2>${OUT2:?} || 
       { fail_ucb "CP INIT.PATCH (Planck2020 LOLLIPOP)"; return 1; }
 
-    cdfolder "${COB}/${PL2020}" || return 1;
+    cdfolder "${COB:?}/${PL2020:?}" || return 1;
 
     patch -u __init__.py -i init.patch >${OUT1:?} 2>${OUT2:?} ||
       { fail_ucb "PATCH LIKELIHOOD FILES (Planck2020 LOLLIPOP)"; return 1; }

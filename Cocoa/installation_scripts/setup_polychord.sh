@@ -92,18 +92,21 @@ if [ -z "${IGNORE_POLYCHORD_COMPILATION}" ]; then
   $GIT checkout "${POLYCHORD_GIT_COMMIT:?}" >${OUT1:?} 2>${OUT2:?} ||
     { fail_spoly "GIT CHECKOUT"; return 1; }
   
+  # ---------------------------------------------------------------------------
   cp "${POLY_CHANGES:?}"/Makefile.patch . 2>${OUT2:?} ||
     { fail_spoly "CP FILE PATCH (Makefile.patch)"; return 1; }
   
   patch -u Makefile -i Makefile.patch >${OUT1:?} 2>${OUT2:?} ||
     { fail_spoly "PATCH FILE (Makefile.patch)"; return 1; }
   
+  # ---------------------------------------------------------------------------
   cp "${POLY_CHANGES:?}/setup.patch" . 2>${OUT2:?} ||
     { fail_spoly "CP FILE PATCH (SETUP)"; return 1; }
   
   patch -u setup.py -i setup.patch >${OUT1:?} 2>${OUT2:?} ||
     { fail_spoly "PATCH FILE (SETUP)"; return 1; }
 
+  # ---------------------------------------------------------------------------
   cdfolder "${ROOTDIR}" || return 1;
   
   pbottom 'INSTALLING POLYCHORD'
