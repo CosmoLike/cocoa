@@ -45,24 +45,21 @@ if [ -z "${IGNORE_CPP_INSTALLATION}" ]; then
   fail_scpp () {
     local MSG="\033[0;31m\t\t (setup_cpp_packages.sh) we cannot run \e[3m"
     local MSG2="\033[0m"
-    echo -e "${MSG} ${1} ${MSG2}"
+    echo -e "${MSG} ${1:-"empty arg"} ${MSG2}"
     unset fail_scpp
     unset_env_vars_scpp
   }
 
   if [ -z "${DEBUG_CPP_PACKAGES}" ]; then
-    if [ -z "${MAKE_NUM_THREADS}" ]; then
-      pfail 'MAKE_NUM_THREADS'; cdroot; return 1;
-    fi
     export OUT1="/dev/null"; export OUT2="/dev/null"
-    export CPPMNT="${MAKE_NUM_THREADS}"
+    export CPPMNT="${MAKE_NUM_THREADS:-1}"
   else
     export OUT1="/dev/tty"; export OUT2="/dev/tty"
     export CPPMNT=1
   fi
   
   cdfolder() {
-    cd "${1}" 2>"/dev/null" || { fail_scpp "CD FOLDER: ${1}"; return 1; }
+    cd "${1:?}" 2>"/dev/null" || { fail_scpp "CD FOLDER: ${1}"; return 1; }
   }
   
   # ----------------------------------------------------------------------------
@@ -70,7 +67,7 @@ if [ -z "${IGNORE_CPP_INSTALLATION}" ]; then
   
   ptop2 'SETUP_CPP_PACKAGES'
 
-  export CCIL="${ROOTDIR}/../cocoa_installation_libraries"
+  export CCIL="${ROOTDIR:?}/../cocoa_installation_libraries"
 
   # ----------------------------------------------------------------------------
   # ---------------------------------- SPDLOG ----------------------------------
@@ -83,11 +80,11 @@ if [ -z "${IGNORE_CPP_INSTALLATION}" ]; then
       pfail 'COCOA_SPDLOG_DIR'; cdroot; return 1;
     fi
 
-    cdfolder "${CCIL}/${COCOA_SPDLOG_DIR}" || return 1;
+    cdfolder "${CCIL:?}/${COCOA_SPDLOG_DIR:?}" || return 1;
     
     rm -f CMakeCache.txt
 
-    $CMAKE -DCMAKE_INSTALL_PREFIX="${ROOTDIR}/.local" \
+    $CMAKE -DCMAKE_INSTALL_PREFIX="${ROOTDIR:?}/.local" \
       -DCMAKE_C_COMPILER=$C_COMPILER \
       -DCMAKE_CXX_COMPILER=$CXX_COMPILER \
       --log-level=ERROR . \
