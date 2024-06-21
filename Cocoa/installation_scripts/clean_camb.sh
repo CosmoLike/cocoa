@@ -65,7 +65,7 @@ if [ -z "${IGNORE_CAMB_COMPILATION}" ]; then
   rm -f  ./camb/camblib.so
   rm -rf ./forutils/Releaselib/
 
-  ${PYTHON3:?} setup.py clean >${OUT1:?} 2>${OUT2:?} ||
+  "${PYTHON3:?}" setup.py clean >${OUT1:?} 2>${OUT2:?} ||
     { fail_cl_camb "PYTHON SETUP CLEAN"; return 1; }
 
   unset_env_vars_clean_camb || return 1

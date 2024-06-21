@@ -65,7 +65,7 @@ if [ -z "${IGNORE_ACT_COMPILATION}" ]; then
   rm -rf ./build/
   rm -rf ./pyactlike.egg-info/
 
-  ${PYTHON3:?} setup.py clean >${OUT1:?} 2>${OUT2:?} ||
+  "${PYTHON3:?}" setup.py clean >${OUT1:?} 2>${OUT2:?} ||
     { fail_clean_act "PYTHON SETUP CLEAN"; return 1; }
 
   unset_env_vars_clean_act || return 1

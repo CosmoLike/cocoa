@@ -73,7 +73,7 @@ if [ -z "${IGNORE_CLASS_COMPILATION}" ]; then
 
   cdfolder "${CLASSDIR:?}/python"|| return 1
   
-  ${PYTHON3:?} setup.py clean >${OUT1:?} 2>${OUT2:?} ||
+  "${PYTHON3:?}" setup.py clean >${OUT1:?} 2>${OUT2:?} ||
     { fail_cl_class "PYTHON SETUP CLEAN"; return 1; }
 
   export PLIB="${ROOTDIR:?}/.local/lib/python${PYTHON_VERSION:?}/site-packages"

@@ -72,7 +72,7 @@ if [ -z "${IGNORE_PLANCK_COMPILATION}" ]; then
   rm -f  "${ROOTDIR:?}/.local"/include/clik*
   rm -f  .lock-waf_*
 
-  ${PYTHON3:?} waf distclean >${OUT1:?} 2>${OUT2:?} ||
+  "${PYTHON3:?}" waf distclean >${OUT1:?} 2>${OUT2:?} ||
     { fail_cl_plc "PYTHON WAF DISTCLEAN"; return 1; }
 
   unset_env_vars_clean_planck || return 1

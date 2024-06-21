@@ -99,7 +99,7 @@ if [ -z "${IGNORE_CLASS_COMPILATION}" ]; then
    
   cdfolder ./python || return 1
 
-  CC=${C_COMPILER:?} ${PYTHON3:?} setup.py build >${OUT1:?} 2>${OUT2:?} || 
+  CC=${C_COMPILER:?} "${PYTHON3:?}" setup.py build >${OUT1:?} 2>${OUT2:?} || 
     { fail_comp_class "PYTHON3 SETUP.PY BUILD"; return 1; }
 
   unset_env_vars_comp_class || return 1
