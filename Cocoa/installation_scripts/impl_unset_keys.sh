@@ -219,3 +219,9 @@ unset INT_LIB
 unset INT_INCL
 unset INT_INCL_PY
 unset INT_INCL_PY_SP
+unset ptop 
+unset ptop2 
+unset ptop3
+unset pbottom
+unset pbottom3
+unset pbottom2
