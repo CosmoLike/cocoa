@@ -5,7 +5,8 @@
 if [ -z "${IGNORE_XZ_INSTALLATION}" ]; then
   
   pfail() {
-    echo -e "\033[0;31m ERROR ENV VARIABLE ${1} IS NOT DEFINED \033[0m"
+    echo -e \
+    "\033[0;31m ERROR ENV VARIABLE ${1:-"empty arg"} IS NOT DEFINED \033[0m"
     unset pfail
   }
   
@@ -14,8 +15,9 @@ if [ -z "${IGNORE_XZ_INSTALLATION}" ]; then
   fi
 
   cdroot() {
-    cd "${ROOTDIR}" 2>"/dev/null" || { echo -e \
-      "\033[0;31m\t\t CD ROOTDIR (${ROOTDIR}) FAILED \033[0m"; return 1; }
+    cd "${ROOTDIR:?}" 2>"/dev/null" || { echo -e \
+      "\033[0;31m\t\t CD ROOTDIR (${ROOTDIR}) FAILED \033[0m"; \
+      return 1; }
     unset cdroot
   }
 
@@ -35,21 +37,18 @@ if [ -z "${IGNORE_XZ_INSTALLATION}" ]; then
   fail_sxz () {
     local MSG="\033[0;31m (setup_xz.sh) WE CANNOT RUN \e[3m"
     local MSG2="\033[0m"
-    echo -e "${MSG} ${1} ${MSG2}"  
+    echo -e "${MSG} ${1:-"empty arg"} ${MSG2}"  
     unset fail_sxz
     unset_env_vars_sxz
   }
 
   cdfolder() {
-    cd "${1}" 2>"/dev/null" || { fail_sxz "CD FOLDER: ${1}"; return 1; }
+    cd "${1:?}" 2>"/dev/null" || { fail_sxz "CD FOLDER: ${1}"; return 1; }
   }
 
   if [ -z "${DEBUG_XZ_PACKAGE}" ]; then
-    if [ -z "${MAKE_NUM_THREADS}" ]; then
-      pfail 'MAKE_NUM_THREADS'; cdroot; return 1;
-    fi
     export OUT1="/dev/null"; export OUT2="/dev/null"
-    export XZMNT="${MAKE_NUM_THREADS}"
+    export XZMNT="${MAKE_NUM_THREADS:-1}"
   else
     export OUT1="/dev/tty"; export OUT2="/dev/tty"
     export XZMNT=1
@@ -60,7 +59,7 @@ if [ -z "${IGNORE_XZ_INSTALLATION}" ]; then
   
   ptop2 "SETUP_XZ"
   
-  export CCIL="${ROOTDIR}/../cocoa_installation_libraries"
+  export CCIL="${ROOTDIR:?}/../cocoa_installation_libraries"
 
   # ----------------------------------------------------------------------------
   # ----------------------------------------------------------------------------
@@ -78,8 +77,8 @@ if [ -z "${IGNORE_XZ_INSTALLATION}" ]; then
 
   cdfolder "${CCIL}/xz-5.2.5/" || return 1;
 
-  CC=$C_COMPILER ./configure --prefix="${ROOTDIR}/.local" >${OUT1} 2>${OUT2} || 
-    { fail_sxz "CONFIGURE"; return 1; }
+  CC=${C_COMPILER:?} ./configure --prefix="${ROOTDIR:?}/.local" \
+    >${OUT1} 2>${OUT2} || { fail_sxz "CONFIGURE"; return 1; }
 
   make -j $XZMNT all >${OUT1} 2>${OUT2} || { fail_sxz "MAKE"; return 1; }
 

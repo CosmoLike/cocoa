@@ -5,7 +5,8 @@
 if [ -z "${IGNORE_POLYCHORD_COMPILATION}" ]; then
   
   pfail() {
-    echo -e "\033[0;31m\t\t ERROR ENV VARIABLE ${1} NOT DEFINED \033[0m"
+    echo -e \
+    "\033[0;31m\t\t ERROR ENV VARIABLE ${1:-"empty arg"} NOT DEFINED \033[0m"
     unset pfail
   }
   
@@ -14,7 +15,7 @@ if [ -z "${IGNORE_POLYCHORD_COMPILATION}" ]; then
   fi
   
   cdroot() {
-    cd "${ROOTDIR}" 2>"/dev/null" || { echo -e \
+    cd "${ROOTDIR:?}" 2>"/dev/null" || { echo -e \
       "\033[0;31m\t\t CD ROOTDIR (${ROOTDIR}) FAILED \033[0m"; return 1; }
     unset cdroot
   }
@@ -40,17 +41,17 @@ if [ -z "${IGNORE_POLYCHORD_COMPILATION}" ]; then
     cdroot || return 1;
   }
   
-  fail_clean_poly () {
+  fail_cl_poly () {
     local MSG="\033[0;31m\t\t (clean_polychord.sh) we cannot run \e[3m"
     local MSG2="\033[0m"
-    echo -e "${MSG} ${1} ${MSG2}"
-    unset fail_clean_poly
+    echo -e "${MSG} ${1:-"empty arg"} ${MSG2}"
+    unset fail_cl_poly
     unset_env_vars_clean_poly
     return 1
   }
   
   cdfolder() {
-    cd "${1}" 2>"/dev/null" || { fail_clean_poly "CD FOLDER: ${1}"; return 1; }
+    cd "${1:?}" 2>"/dev/null" || { fail_cl_poly "CD FOLDER: ${1}"; return 1; }
   }
   
   if [ -z "${DEBUG_POLY_OUTPUT}" ]; then
@@ -64,16 +65,14 @@ if [ -z "${IGNORE_POLYCHORD_COMPILATION}" ]; then
   
   ptop 'CLEANING POLYCHORD'
 
-  export PLIB="${ROOTDIR}/.local/lib/python${PYTHON_VERSION}/site-packages"
-  rm -rf "${PLIB}"/pypolychord-*
+  cdfolder "${ROOTDIR:?}/external_modules/code/${POLY_NAME:?}" || return 1
 
-  cdfolder "${ROOTDIR}/external_modules/code/${POLY_NAME}" || return 1
-
-  make clean >${OUT1} 2>${OUT2} || { fail_clean_poly "MAKE CLEAN"; return 1; }
-
-  cdfolder "${ROOTDIR}/external_modules/code/${POLY_NAME}" || return 1
-  rm -rf ./lib/*.a
-  rm -rf ./lib/*.so
+  make clean >${OUT1:?} 2>${OUT2:?} || { fail_cl_poly "MAKE CLEAN"; return 1; }
+  
+  export PLIB="${ROOTDIR:?}/.local/lib/python${PYTHON_VERSION:?}/site-packages"
+  rm -rf "${PLIB:?}"/pypolychord-*
+  rm -rf "${ROOTDIR:?}/external_modules/code/${POLY_NAME:?}/lib/*.a"
+  rm -rf "${ROOTDIR:?}/external_modules/code/${POLY_NAME:?}/lib/*.so"
 
   unset_env_vars_clean_poly || return 1
   

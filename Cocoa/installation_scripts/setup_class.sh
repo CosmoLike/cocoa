@@ -5,7 +5,8 @@
 if [ -z "${IGNORE_CLASS_COMPILATION}" ]; then
   
   pfail() {
-    echo -e "\033[0;31m\t\t ERROR ENV VARIABLE ${1} IS NOT DEFINED \033[0m"
+    echo -e \
+    "\033[0;31m\t\t ERROR ENV VARIABLE ${1:-"empty arg"} NOT DEFINED \033[0m"
     unset pfail
   }
 
@@ -15,7 +16,7 @@ if [ -z "${IGNORE_CLASS_COMPILATION}" ]; then
   fi
   
   cdroot() {
-    cd "${ROOTDIR}" 2>"/dev/null" || { echo -e \
+    cd "${ROOTDIR:?}" 2>"/dev/null" || { echo -e \
       "\033[0;31m\t\t CD ROOTDIR (${ROOTDIR}) FAILED \033[0m"; return 1; }
     unset cdroot
   }
@@ -33,7 +34,7 @@ if [ -z "${IGNORE_CLASS_COMPILATION}" ]; then
   fi
 
   if [ -z "${CLASS_GIT_COMMIT}" ]; then
-    pfail 'CAMB_GIT_COMMIT'; cdroot; return 1
+    pfail 'CLASS_GIT_COMMIT'; cdroot; return 1
   fi
   
   if [ -z "${CLASS_NAME}" ]; then
@@ -54,7 +55,7 @@ if [ -z "${IGNORE_CLASS_COMPILATION}" ]; then
   fail_sclass () {
     local MSG="\033[0;31m (setup_class.sh) WE CANNOT RUN \e[3m"
     local MSG2="\033[0m"
-    echo -e "${MSG} ${1} ${MSG2}"
+    echo -e "${MSG} ${1:-"empty arg"} ${MSG2}"
     unset fail_sclass
     unset_env_vars_sclass
   }
@@ -66,7 +67,7 @@ if [ -z "${IGNORE_CLASS_COMPILATION}" ]; then
   fi
 
   cdfolder() {
-    cd "${1}" 2>"/dev/null" || { fail_sclass "CD FOLDER: ${1}"; return 1; }
+    cd "${1:?}" 2>"/dev/null" || { fail_sclass "CD FOLDER: ${1}"; return 1; }
   }
 
   # ---------------------------------------------------------------------------
@@ -81,52 +82,52 @@ if [ -z "${IGNORE_CLASS_COMPILATION}" ]; then
 
   export URL="https://github.com/lesgourg/class_public.git"
   
-  export CHANGES="${ROOTDIR}/../cocoa_installation_libraries/class_changes"
+  export CHANGES="${ROOTDIR:?}/../cocoa_installation_libraries/class_changes"
 
-  export ECODEF="${ROOTDIR}/external_modules/code"
+  export ECODEF="${ROOTDIR:?}/external_modules/code"
 
   # ---------------------------------------------------------------------------
   # in case this script is called twice
   # ---------------------------------------------------------------------------
-  rm -rf $ROOTDIR/external_modules/code/$CLASS_NAME
+  rm -rf "${ROOTDIR:?}/external_modules/code/${CLASS_NAME:?}"
 
   # ---------------------------------------------------------------------------
   # clone from original repo
   # ---------------------------------------------------------------------------
   cdfolder "${ECODEF}" || return 1;
 
-  $GIT clone $URL --recursive $CLASS_NAME >${OUT1} 2>${OUT2} ||
+  $GIT clone "${URL:?}" --recursive "${CLASS_NAME:?}" >${OUT1:?} 2>${OUT2:?} ||
     { fail_sclass "GIT CLONE FROM CLASS REPO"; return 1; }
   
-  cdfolder "${ECODEF}/${CLASS_NAME}" || return 1;
+  cdfolder "${ECODEF:?}/${CLASS_NAME:?}" || return 1;
 
-  $GIT checkout $CLASS_GIT_COMMIT >${OUT1} 2>${OUT2} ||
+  $GIT checkout "${CLASS_GIT_COMMIT:?}" >${OUT1:?} 2>${OUT2:?} ||
     { fail_sclass "GIT CHECKOUT CLASS"; return 1; }
 
   # ---------------------------------------------------------------------------
   # historical reasons (we used to save class_python on Cocoa Branch)
   # historical: Workaround Cocoa .gitignore entry on /include
   # ---------------------------------------------------------------------------
-  mv ./include ./include2/ >${OUT1} 2>${OUT2} || 
+  mv ./include ./include2/ >${OUT1:?} 2>${OUT2:?} || 
     { fail_sclass "MKDIR FROM INCLUDE TO INCLUDE2"; return 1; }
   
   # ---------------------------------------------------------------------------
   # patch CLASS to be compatible w/ COCOA
   # ---------------------------------------------------------------------------
-  cdfolder "${ECODEF}/${CLASS_NAME}/" || return 1;
+  cdfolder "${ECODEF:?}/${CLASS_NAME:?}/" || return 1;
 
-  cp "${CHANGES}"/Makefile.patch .  2>${OUT2} || 
+  cp "${CHANGES:?}"/Makefile.patch .  2>${OUT2:?} || 
     { fail_sclass "CP FILE PATCH (Makefile.patch)"; return 1; }
   
-  patch -u Makefile -i Makefile.patch >${OUT1} 2>${OUT2} ||
+  patch -u Makefile -i Makefile.patch >${OUT1:?} 2>${OUT2:?} ||
     { fail_sclass "SCRIPT FILE PATCH (Makefile.patch)"; return 1; }
   
   cdfolder "${ECODEF}/${CLASS_NAME}/python" || return 1;
   
-  cp "${CHANGES}/python"/setup.patch . 2>${OUT2} ||
+  cp "${CHANGES:?}/python"/setup.patch . 2>${OUT2:?} ||
     { fail_sclass "CP FILE PATCH (setup.patch)"; return 1 }
 
-  patch -u setup.py -i setup.patch >${OUT1} 2>${OUT2} || 
+  patch -u setup.py -i setup.patch >${OUT1:?} 2>${OUT2:?} || 
     { fail_sclass "SCRIPT FILE PATCH (setup.patch)"; return 1; }
   
   cdfolder "${ROOTDIR}" || return 1;

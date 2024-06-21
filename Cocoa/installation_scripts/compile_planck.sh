@@ -11,16 +11,17 @@ if [ -z "${IGNORE_PLANCK_COMPILATION}" ]; then
   
   # ----------------------------------------------------------------------------
   # Clean any previous compilation
-  source "${ROOTDIR}/installation_scripts/clean_planck.sh"
+  source "${ROOTDIR:?}/installation_scripts/clean_planck.sh"
   # ----------------------------------------------------------------------------
   
   pfail() {
-    echo -e "\033[0;31m\t\t ERROR ENV VARIABLE ${1} NOT DEFINED \033[0m"
+    echo -e \
+    "\033[0;31m\t\t ERROR ENV VARIABLE ${1:-"empty arg"} NOT DEFINED \033[0m"
     unset pfail
   }
   
   cdroot() {
-    cd "${ROOTDIR}" 2>"/dev/null" || { echo -e \
+    cd "${ROOTDIR:?}" 2>"/dev/null" || { echo -e \
       "\033[0;31m\t\t CD ROOTDIR (${ROOTDIR}) FAILED \033[0m"; return 1; }
     unset cdroot
   }
@@ -40,16 +41,12 @@ if [ -z "${IGNORE_PLANCK_COMPILATION}" ]; then
   if [ -z "${PYTHON3}" ]; then
     pfail "PYTHON3"; cdroot; return 1;
   fi
-  
-  if [ -z "${MAKE_NUM_THREADS}" ]; then
-    pfail 'MAKE_NUM_THREADS'; cdroot; return 1
-  fi
-  
+    
   unset_env_vars_comp_pl () {
     unset OUT1
     unset OUT2
     unset pfail
-    unset code_folder
+    unset CFL
     unset CLIK_LAPALIBS
     unset CLIK_CFITSLIBS
     unset unset_env_vars_comp_pl
@@ -59,13 +56,13 @@ if [ -z "${IGNORE_PLANCK_COMPILATION}" ]; then
   fail_comp_pl () {
     local MSG="\033[0;31m\t\t (compile_planck.sh) we cannot run \e[3m"
     local MSG2="\033[0m"
-    echo -e "${MSG} ${1} ${MSG2}"
+    echo -e "${MSG} ${1:-"empty arg"} ${MSG2}"
     unset fail_comp_pl
     unset_env_vars_comp_pl
   }
   
   cdfolder() {
-    cd "${1}" 2>"/dev/null" || { fail_comp_pl "CD FOLDER: ${1}"; return 1; }
+    cd "${1:?}" 2>"/dev/null" || { fail_comp_pl "CD FOLDER: ${1}"; return 1; }
   }
   
   if [ -z "${DEBUG_PLANCK_OUTPUT}" ]; then
@@ -75,15 +72,21 @@ if [ -z "${IGNORE_PLANCK_COMPILATION}" ]; then
   fi
   
   if [ -z "${IGNORE_C_CFITSIO_INSTALLATION}" ]; then
-    export CLIK_CFITSLIBS="${ROOTDIR}/.local/lib"
+    export CLIK_CFITSLIBS="${ROOTDIR:?}/.local/lib"
   else
-    export CLIK_CFITSLIBS="${GLOBAL_PACKAGES_LOCATION}"
+    if [ -z "${GLOBAL_PACKAGES_LOCATION}" ]; then
+      pfail "GLOBAL_PACKAGES_LOCATION"; cdroot; return 1;
+    fi
+    export CLIK_CFITSLIBS="${GLOBAL_PACKAGES_LOCATION:?}"
   fi
   
   if [ -z "${IGNORE_FORTRAN_INSTALLATION}" ]; then
-    export CLIK_LAPALIBS="${ROOTDIR}/.local"
+    export CLIK_LAPALIBS="${ROOTDIR:?}/.local"
   else
-    export CLIK_LAPALIBS="${GLOBAL_PACKAGES_LOCATION}"
+    if [ -z "${GLOBAL_PACKAGES_LOCATION}" ]; then
+      pfail "GLOBAL_PACKAGES_LOCATION"; cdroot; return 1;
+    fi
+    export CLIK_LAPALIBS="${GLOBAL_PACKAGES_LOCATION:?}"
   fi
 
   # ---------------------------------------------------------------------------
@@ -91,26 +94,27 @@ if [ -z "${IGNORE_PLANCK_COMPILATION}" ]; then
   
   ptop 'COMPILING PLANCK'
 
-  export code_folder="external_modules/code/planck/code"
+  export CFL="external_modules/code/planck/code"
   
   if [ -z "${USE_SPT_CLIK_PLANCK}" ]; then
-    cdfolder "${ROOTDIR}/${code_folder}/plc_3.0/plc-3.1/" || return 1
+    cdfolder "${ROOTDIR:?}/${CFL:?}/plc_3.0/plc-3.1/" || return 1
   else
-    cdfolder "${ROOTDIR}/${code_folder}/spt_clik/" || return 1
+    cdfolder "${ROOTDIR:?}/${CFL:?}/spt_clik/" || return 1
   fi
   
-  FC=$FORTRAN_COMPILER CC=$C_COMPILER CXX=$CXX_COMPILER $PYTHON3 waf configure \
+  FC="${FORTRAN_COMPILER:?}" CC="${C_COMPILER:?}" CXX="${CXX_COMPILER:?}" \
+    "${PYTHON3:?}" waf configure \
     --gcc \
     --gfortran \
     --cfitsio_islocal \
-    --prefix "${ROOTDIR}/.local" \
-    --lapack_prefix="${CLIK_LAPALIBS}" \
-    --cfitsio_lib="${CLIK_CFITSLIBS}" \
-    --python=${PYTHON3} \
-    >${OUT1} 2>${OUT2} || { fail_comp_pl "PYTHON3 WAF CONFIGURE"; return 1; }
+    --prefix "${ROOTDIR:?}/.local" \
+    --lapack_prefix="${CLIK_LAPALIBS:?}" \
+    --cfitsio_lib="${CLIK_CFITSLIBS:?}" \
+    --python="${PYTHON3:?}" >${OUT1:?} 2>${OUT2:?} || 
+    { fail_comp_pl "PYTHON3 WAF CONFIGURE"; return 1; }
   
-  $PYTHON3 waf install -v >${OUT1} \
-    2>${OUT2} || { fail_comp_pl "PYTHON3 WAF INSTALL"; return 1; }
+  "${PYTHON3:?}" waf install -v >${OUT1:?} 2>${OUT2:?} || 
+    { fail_comp_pl "PYTHON3 WAF INSTALL"; return 1; }
 
   unset_env_vars_comp_pl || return 1
   
@@ -119,6 +123,7 @@ if [ -z "${IGNORE_PLANCK_COMPILATION}" ]; then
   # ---------------------------------------------------------------------------
   # ---------------------------------------------------------------------------
 fi
+
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------

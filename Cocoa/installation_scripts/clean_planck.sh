@@ -5,7 +5,8 @@
 if [ -z "${IGNORE_PLANCK_COMPILATION}" ]; then
   
   pfail() {
-    echo -e "\033[0;31m\t\t ERROR ENV VARIABLE ${1} NOT DEFINED \033[0m"
+    echo -e \
+    "\033[0;31m\t\t ERROR ENV VARIABLE ${1:-"empty arg"} NOT DEFINED \033[0m"
     unset pfail
   }
   
@@ -14,7 +15,7 @@ if [ -z "${IGNORE_PLANCK_COMPILATION}" ]; then
   fi
   
   cdroot() {
-    cd "${ROOTDIR}" 2>"/dev/null" || { echo -e \
+    cd "${ROOTDIR:?}" 2>"/dev/null" || { echo -e \
       "\033[0;31m\t\t CD ROOTDIR (${ROOTDIR}) FAILED \033[0m"; return 1; }
     unset cdroot
   }
@@ -27,21 +28,21 @@ if [ -z "${IGNORE_PLANCK_COMPILATION}" ]; then
     unset OUT1
     unset OUT2
     unset pfail
-    unset code_folder
+    unset ECF
     unset unset_env_vars_clean_planck
     cdroot || return 1;
   }
   
-  fail_clean_plc () {
+  fail_cl_plc () {
     local MSG="\033[0;31m\t\t (clean_planck.sh) we cannot run \e[3m"
     local MSG2="\033[0m"
-    echo -e "${MSG} ${1} ${MSG2}"
-    unset fail_clean_plc
+    echo -e "${MSG} ${1:-"empty arg"} ${MSG2}"
+    unset fail_cl_plc
     unset_env_vars_clean_planck
   }
   
   cdfolder() {
-    cd "${1}" 2>"/dev/null" || { fail_clean_plc "CD FOLDER: ${1}"; return 1; }
+    cd "${1:?}" 2>"/dev/null" || { fail_cl_plc "CD FOLDER: ${1}"; return 1; }
   }
   
   if [ -z "${DEBUG_PLANCK_OUTPUT}" ]; then
@@ -55,30 +56,24 @@ if [ -z "${IGNORE_PLANCK_COMPILATION}" ]; then
   
   ptop 'CLEANING PLANCK LIKELIHOOD'
 
-  export code_folder="external_modules/code/planck/code"
+  export ECF="external_modules/code/planck/code"
   
   if [ -z "${USE_SPT_CLIK_PLANCK}" ]; then
-    cdfolder "${ROOTDIR}/${code_folder}/plc_3.0/plc-3.1/" || return 1
+    cdfolder "${ROOTDIR:?}/${ECF:?}/plc_3.0/plc-3.1/" || return 1
   else
-    cdfolder "${ROOTDIR}/${code_folder}/spt_clik/" || return 1
+    cdfolder "${ROOTDIR:?}/${ECF:?}/spt_clik/" || return 1
   fi
 
-  rm -f "${ROOTDIR}/.local"/bin/clik*
+  rm -f  "${ROOTDIR:?}/.local"/bin/clik*
+  rm -f  "${ROOTDIR:?}/.local"/lib/libclik_f90.so
+  rm -f  "${ROOTDIR:?}/.local"/lib/libclik.so
+  rm -rf "${ROOTDIR:?}/.local"/lib/python/site-packages/clik
+  rm -rf "${ROOTDIR:?}/.local"/share/clik
+  rm -f  "${ROOTDIR:?}/.local"/include/clik*
+  rm -f  .lock-waf_*
 
-  rm -f "${ROOTDIR}/.local"/lib/libclik_f90.so
-
-  rm -f "${ROOTDIR}/.local"/lib/libclik.so
-
-  rm -rf "${ROOTDIR}/.local"/lib/python/site-packages/clik
-
-  rm -rf "${ROOTDIR}/.local"/share/clik
-
-  rm -f "${ROOTDIR}/.local"/include/clik*
-
-  rm -f .lock-waf_*
-
-  $PYTHON3 waf distclean >${OUT1} 2>${OUT2} ||
-    { fail_clean_plc "PYTHON WAF DISTCLEAN"; return 1; }
+  ${PYTHON3:?} waf distclean >${OUT1:?} 2>${OUT2:?} ||
+    { fail_cl_plc "PYTHON WAF DISTCLEAN"; return 1; }
 
   unset_env_vars_clean_planck || return 1
   

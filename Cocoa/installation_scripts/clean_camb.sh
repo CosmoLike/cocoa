@@ -5,7 +5,8 @@
 if [ -z "${IGNORE_CAMB_COMPILATION}" ]; then
   
   pfail() {
-    echo -e "\033[0;31m\t\t ERROR ENV VARIABLE ${1} NOT DEFINED \033[0m"
+    echo -e \
+    "\033[0;31m\t\t ERROR ENV VARIABLE ${1:-"empty arg"} NOT DEFINED \033[0m"
     unset pfail
   }
   
@@ -14,7 +15,7 @@ if [ -z "${IGNORE_CAMB_COMPILATION}" ]; then
   fi
   
   cdroot() {
-    cd "${ROOTDIR}" 2>"/dev/null" || { echo -e \
+    cd "${ROOTDIR:?}" 2>"/dev/null" || { echo -e \
       "\033[0;31m\t\t CD ROOTDIR (${ROOTDIR}) FAILED \033[0m"; return 1; }
     unset cdroot
   }
@@ -35,16 +36,16 @@ if [ -z "${IGNORE_CAMB_COMPILATION}" ]; then
     cdroot || return 1;
   }
 
-  fail_clean_camb () {
+  fail_cl_camb () {
     local MSG="\033[0;31m\t\t (clean_camb.sh) WE CANNOT RUN \e[3m"
     local MSG2="\033[0m"
-    echo -e "${MSG} ${1} ${MSG2}"
-    unset fail_clean_camb
+    echo -e "${MSG} ${1:-"empty arg"} ${MSG2}"
+    unset fail_cl_camb
     unset_env_vars_clean_camb
   }
 
   cdfolder() {
-    cd "${1}" 2>"/dev/null" || { fail_clean_camb "CD FOLDER: ${1}"; return 1; }
+    cd "${1:?}" 2>"/dev/null" || { fail_cl_camb "CD FOLDER: ${1}"; return 1; }
   }
   
   if [ -z "${DEBUG_CAMB_OUTPUT}" ]; then
@@ -57,18 +58,15 @@ if [ -z "${IGNORE_CAMB_COMPILATION}" ]; then
   # ---------------------------------------------------------------------------
   ptop 'CLEANING CAMB'
 
-  cdfolder "${ROOTDIR}/external_modules/code/${CAMB_NAME}"/ || return 1
+  cdfolder "${ROOTDIR:?}/external_modules/code/${CAMB_NAME:?}"/ || return 1
 
   rm -rf ./build/
-
   rm -rf ./camb/__pycache__/
-
-  rm -f ./camb/camblib.so
-
+  rm -f  ./camb/camblib.so
   rm -rf ./forutils/Releaselib/
 
-  $PYTHON3 setup.py clean >${OUT1} 2>${OUT2} ||
-    { fail_clean_camb "PYTHON SETUP CLEAN"; return 1; }
+  ${PYTHON3:?} setup.py clean >${OUT1:?} 2>${OUT2:?} ||
+    { fail_cl_camb "PYTHON SETUP CLEAN"; return 1; }
 
   unset_env_vars_clean_camb || return 1
   

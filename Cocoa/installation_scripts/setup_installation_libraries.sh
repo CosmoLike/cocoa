@@ -3,7 +3,8 @@
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
 pfail() {
-  echo -e "\033[0;31m\t\t ERROR ENV VARIABLE ${1} IS NOT DEFINED \033[0m"
+  echo -e \
+  "\033[0;31m\t\t ERROR ENV VARIABLE ${1:-"empty arg"} NOT DEFINED \033[0m"
   unset pfail
 }
 
@@ -13,7 +14,7 @@ fi
 
 cdroot() {
   cd "${ROOTDIR:?}" 2>"/dev/null" || { echo -e \
-    "\033[0;31m\t\t CD ROOTDIR (${ROOTDIR:?}) FAILED \033[0m"; return 1; }
+    "\033[0;31m\t\t CD ROOTDIR (${ROOTDIR}) FAILED \033[0m"; return 1; }
   unset cdroot
 }
 
@@ -42,24 +43,22 @@ unset_env_vars_sil () {
 fail_sil () {
   local MSG="\033[0;31m\t\t (setup_installation_libraries.sh) WE CANNOT RUN \e[3m"
   local MSG2="\033[0m"
-  echo -e "${MSG} ${1:?} ${MSG2}"
+  echo -e "${MSG} ${1:-"empty arg"} ${MSG2}"
   unset fail_sil
   unset_env_vars_sil
 }
 
 if [ -z "${DEBUG_SIL_OUTPUT}" ]; then
-  if [ -z "${MAKE_NUM_THREADS}" ]; then
-    pfail 'MAKE_NUM_THREADS'; cdroot; return 1;
-  fi
   export OUT1="/dev/null"; export OUT2="/dev/null"
-  export SILMNT="${MAKE_NUM_THREADS}"
+  export SILMNT="${MAKE_NUM_THREADS:-1}"
 else
   export OUT1="/dev/tty"; export OUT2="/dev/tty"
   export SILMNT=1
 fi
 
 cdfolder() {
-  cd "${1}" 2>"/dev/null" || { fail_sil "CD FOLDER: ${1}"; return 1; }
+  cd "${1:?}" 2>"/dev/null" || 
+    { fail_sil "CD FOLDER: ${1:-"empty arg"}"; return 1; }
 }
 
 export CCIL="${ROOTDIR}/../cocoa_installation_libraries"
@@ -77,15 +76,15 @@ wgetact() {
   
   rm -f  "${CCIL:?}/${5:?}"
 
-  wget -q "${3:?}" >${OUT1} 2>${OUT2} || { fail_sil "WGET"; return 1; }
+  wget -q "${3:?}" >${OUT1:?} 2>${OUT2:?} || { fail_sil "WGET"; return 1; }
 
   if [ "${2:?}" == "tar.gz" ]; then
     
-    tar zxvf "${FILE}"  >${OUT1} 2>${OUT2} || { fail_sil "TAR (gz)"; return 1; }
+    tar zxvf "${FILE}"  >${OUT1:?} 2>${OUT2:?} || { fail_sil "TAR (gz)"; return 1; }
   
   elif [ "${2:?}" == "tar.xz" ]; then
   
-    tar xf "${FILE}" >${OUT1} 2>${OUT2} || { fail_sil "TAR (xz)"; return 1; }
+    tar xf "${FILE}" >${OUT1:?} 2>${OUT2:?} || { fail_sil "TAR (xz)"; return 1; }
   
   else
 
@@ -98,15 +97,15 @@ wgetact() {
     # In case this script runs twice (after being killed by CTRL-D)
     rm -rf "${CCIL:?}/${4:?}"
     
-    mv "${1:?}/" "${4:?}" 2>${OUT2} || { fail_sil "MV FOLDER"; return 1; }
+    mv "${1:?}/" "${4:?}" 2>${OUT2:?} || { fail_sil "MV FOLDER"; return 1; }
   
   fi
 
   # Why this compress? In the old Cocoa we saved the libraries in 
   # the github repo using git lfs. So this way preserves the old scripts
   # we set "-k 1" to be the minimum compression
-  tar -cf - "${4:?}" | xz -k -1 --threads=$SILMNT -c - > $5 \
-    2>${OUT2} || { fail_sil "TAR (COMPRESS)"; return 1; }
+  tar -cf - "${4:?}" | xz -k -1 --threads=$SILMNT -c - > "${5}" \
+    2>${OUT2:?} || { fail_sil "TAR (COMPRESS)"; return 1; }
 
   rm -rf "${CCIL:?}/${1:?}"
   rm -f  "${CCIL:?}/${FILE:?}"
@@ -123,12 +122,12 @@ gitact1() {
   # In case this script runs twice
   rm -rf "${CCIL:?}/${1:?}"
 
-  $GIT clone "${3:?}" "${1:?}" >${OUT1} 2>${OUT2} || 
+  $GIT clone "${3:?}" "${1:?}" >${OUT1:?} 2>${OUT2:?} || 
     { fail_sil "GIT CLONE"; return 1; }
   
   cdfolder "${CCIL:?}/${1:?}" || return 1;
   
-  $GIT checkout "${2:?}" >${OUT1} 2>${OUT2} || 
+  $GIT checkout "${2:?}" >${OUT1:?} 2>${OUT2:?} || 
     { fail_sil "GIT CHECKOUT"; return 1; }
   
   rm -rf "${CCIL:?}/${1:?}/.git/"
@@ -149,7 +148,7 @@ gitact2() {
     # In case this script runs twice (after being killed by CTRL-D)
     rm -rf "${CCIL:?}/${2:?}"
 
-    mv "${1:?}/" "${2:?}" 2>${OUT2} || { fail_sil "MV FOLDER"; return 1; }
+    mv "${1:?}/" "${2:?}" 2>${OUT2:?} || { fail_sil "MV FOLDER"; return 1; }
   
   fi
 
@@ -157,7 +156,7 @@ gitact2() {
   # the github repo using git lfs. So this way preserves the old scripts
   # we set "-k 1" to be the minimum compression
   tar -cf - "${2:?}" | xz -k -1 --threads=$SILMNT -c - > "${3}" \
-    2>${OUT2} || { fail_sil "TAR (COMPRESS)"; return 1; }
+    2>${OUT2:?} || { fail_sil "TAR (COMPRESS)"; return 1; }
 
   rm -rf "${CCIL:?}/${1:?}"
   rm -rf "${CCIL:?}/${2:?}"
@@ -180,6 +179,10 @@ ptop2 'SETUP_INSTALLATION_LIBRARIES'
 if [ -z "${IGNORE_CMAKE_INSTALLATION}" ]; then
   ptop "GETTING CMAKE LIBRARY"
 
+  if [ -z "${COCOA_CMAKE_DIR}" ]; then
+    pfail 'COCOA_CMAKE_DIR'; cdroot; return 1;
+  fi
+
   export URL='https://github.com/Kitware/CMake.git'
   export FOLDER='cmake-3.26.4'
   export VER=v3.26.4
@@ -195,6 +198,10 @@ fi
 if [ -z "${IGNORE_DISTUTILS_INSTALLATION}" ]; then
 
   ptop "GETTING BINUTILS LIBRARY"
+
+  if [ -z "${COCOA_BINUTILS_DIR}" ]; then
+    pfail 'COCOA_BINUTILS_DIR'; cdroot; return 1;
+  fi
 
   export FOLDER="binutils-2.37"
   
@@ -216,6 +223,10 @@ fi
 if [ -z "${IGNORE_DISTUTILS_INSTALLATION}" ]; then
   
   ptop "GETTING TEXINFO LIBRARY"
+
+  if [ -z "${COCOA_TEXINFO_DIR}" ]; then
+    pfail 'COCOA_TEXINFO_DIR'; cdroot; return 1;
+  fi
 
   export FOLDER="texinfo-7.0.3"
   
@@ -239,6 +250,10 @@ if [ -z "${IGNORE_OPENBLAS_INSTALLATION}" ]; then
 
   ptop "GETTING OPENBLAS LIBRARY"
 
+  if [ -z "${COCOA_OPENBLAS_DIR}" ]; then
+    pfail 'COCOA_OPENBLAS_DIR'; cdroot; return 1;
+  fi
+
   export URL='https://github.com/OpenMathLib/OpenBLAS.git'
 
   export FOLDER='OpenBLAS-0.3.23'
@@ -260,6 +275,10 @@ fi
 if [ -z "${IGNORE_FORTRAN_LAPACK_INSTALLATION}" ]; then
 
   ptop "GETTING LAPACK LIBRARY"
+
+  if [ -z "${COCOA_LAPACK_DIR}" ]; then
+    pfail 'COCOA_LAPACK_DIR'; cdroot; return 1;
+  fi
 
   export URL='https://github.com/Reference-LAPACK/lapack.git'
 
@@ -283,6 +302,10 @@ if [ -z "${IGNORE_HDF5_INSTALLATION}" ]; then
 
   ptop "GETTING HDF5 LIBRARY"
 
+  if [ -z "${COCOA_HDF5_DIR}" ]; then
+    pfail 'COCOA_HDF5_DIR'; cdroot; return 1;
+  fi
+
   export FOLDER="hdf5-1.12.3"
 
   export FILE="tar.gz"
@@ -304,6 +327,10 @@ fi
 if [ -z "${IGNORE_C_CFITSIO_INSTALLATION}" ]; then
   
   ptop "GETTING CFITSIO LIBRARY"
+
+  if [ -z "${COCOA_CFITSIO_DIR}" ]; then
+    pfail 'COCOA_CFITSIO_DIR'; cdroot; return 1;
+  fi
 
   export FOLDER="cfitsio-4.0.0"
   
@@ -327,6 +354,10 @@ if [ -z "${IGNORE_C_FFTW_INSTALLATION}" ]; then
 
   ptop "GETTING FFTW LIBRARY"
 
+  if [ -z "${COCOA_FFTW_DIR}" ]; then
+    pfail 'COCOA_FFTW_DIR'; cdroot; return 1;
+  fi
+
   export FOLDER="fftw-3.3.10"
 
   export FILE="tar.gz"
@@ -348,6 +379,10 @@ fi
 if [ -z "${IGNORE_C_GSL_INSTALLATION}" ]; then
 
   ptop "GETTING GSL LIBRARY"
+  
+  if [ -z "${COCOA_GSL_DIR}" ]; then
+    pfail 'COCOA_GSL_DIR'; cdroot; return 1;
+  fi
 
   export FOLDER="gsl-2.7"
 
@@ -371,6 +406,10 @@ if [ -z "${IGNORE_CPP_SPDLOG_INSTALLATION}" ]; then
 
   ptop "GETTING SPDLOG LIBRARY"
 
+  if [ -z "${COCOA_SPDLOG_DIR}" ]; then
+    pfail 'COCOA_SPDLOG_DIR'; cdroot; return 1;
+  fi
+
   export URL='https://github.com/gabime/spdlog.git'
 
   export FOLDER='spdlog'
@@ -393,6 +432,10 @@ if [ -z "${IGNORE_CPP_ARMA_INSTALLATION}" ]; then
   
   ptop "GETTING ARMA LIBRARY DONE"
 
+  if [ -z "${COCOA_ARMADILLO_DIR}" ]; then
+    pfail 'COCOA_ARMADILLO_DIR'; cdroot; return 1;
+  fi
+
   export FOLDER="armadillo-12.8.2"
   
   export FILE="tar.xz"
@@ -414,6 +457,10 @@ fi
 if [ -z "${IGNORE_CPP_BOOST_INSTALLATION}" ]; then
 
   ptop "GETTING BOOST LIBRARY"
+
+  if [ -z "${COCOA_BOOST_DIR}" ]; then
+    pfail 'COCOA_BOOST_DIR'; cdroot; return 1;
+  fi
 
   export FOLDER="boost_1_81_0"
 
@@ -439,6 +486,10 @@ if [ -z "${IGNORE_CPP_CARMA_INSTALLATION}" ]; then
 
   ptop "GETTING CARMA LIBRARY DONE"
 
+  if [ -z "${COCOA_CARMA_DIR}" ]; then
+    pfail 'COCOA_CARMA_DIR'; cdroot; return 1;
+  fi
+
   export FOLDER="carma_tmp"
 
   export URL="https://github.com/RUrlus/carma.git"
@@ -449,14 +500,18 @@ if [ -z "${IGNORE_CPP_CARMA_INSTALLATION}" ]; then
 
   gitact1 "${FOLDER}" "${VER}" "${URL}" "${COCOA_CARMA_DIR}" "${XZF}" || return 1;
 
-  mv "${CCIL}/${FOLDER}/include" "${CCIL}" >${OUT1} 2>${OUT2} || 
+  # -------------------------------------------------------------------------
+  # move/rename include file and carma.h folder
+  # -------------------------------------------------------------------------
+  mv "${CCIL:?}/${FOLDER:?}/include" "${CCIL:?}" >${OUT1:?} 2>${OUT2:?} || 
     { fail_sil "MV CARMA INCLUDE FOLDER"; return 1; }
 
-  mv "${CCIL}/include" "${CCIL}/${COCOA_CARMA_DIR}" 2>${OUT2} || 
+  mv "${CCIL:?}/include" "${CCIL:?}/${COCOA_CARMA_DIR:?}" 2>${OUT2:?} || 
     { fail_sil "RENAME CARMA INCLUDE FOLDER"; return 1; }
 
-  mv "${CCIL}/${COCOA_CARMA_DIR}/carma" "${CCIL}/${COCOA_CARMA_DIR}/carma.h" \
-    2>${OUT2} || { fail_sil "RENANE CARMA HEADER"; return 1; }
+  mv "${CCIL:?}/${COCOA_CARMA_DIR:?}/carma" \
+    "${CCIL:?}/${COCOA_CARMA_DIR:?}/carma.h" \
+    2>${OUT2:?} || { fail_sil "RENANE CARMA HEADER"; return 1; }
 
   rm -rf "${CCIL:?}/${FOLDER:?}"
 

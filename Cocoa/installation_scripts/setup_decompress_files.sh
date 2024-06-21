@@ -4,7 +4,8 @@
 # ----------------------------------------------------------------------------
 
 pfail() {
-  echo -e "\033[0;31m\t\t ERROR ENV VARIABLE ${1} IS NOT DEFINED \033[0m"
+  echo -e \
+  "\033[0;31m\t\t ERROR ENV VARIABLE ${1:-"empty arg"} NOT DEFINED \033[0m"
   unset pfail
 }
 
@@ -13,7 +14,7 @@ if [ -z "${ROOTDIR}" ]; then
 fi
 
 cdroot() {
-  cd "${ROOTDIR}" 2>"/dev/null" || { echo -e \
+  cd "${ROOTDIR:?}" 2>"/dev/null" || { echo -e \
     "\033[0;31m\t\t CD ROOTDIR (${ROOTDIR}) FAILED \033[0m"; return 1; }
   unset cdroot
 }
@@ -27,13 +28,13 @@ unset_env_vars_sdf () {
 fail_sdf () {
   local MSG="\033[0;31m\t\t (setup_decompress_files.sh) WE CANNOT RUN \e[3m"
   local MSG2="\033[0m"
-  echo -e "${MSG} ${1} ${MSG2}"  
+  echo -e "${MSG} ${1:-"empty arg"} ${MSG2}"  
   unset fail_sdf
   unset_env_vars_sdf
 }
 
 cdfolder() {
-  cd "${1}" 2>"/dev/null" || { fail_sdf "CD FOLDER: ${1}"; return 1; }
+  cd "${1:?}" 2>"/dev/null" || { fail_sdf "CD FOLDER: ${1}"; return 1; }
 }
 
 # ----------------------------------------------------------------------------

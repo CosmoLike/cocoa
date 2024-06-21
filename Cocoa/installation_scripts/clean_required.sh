@@ -3,7 +3,8 @@
 # ----------------------------------------------------------------------------
 # ----------------------------------------------------------------------------
 pfail() {
-  echo -e "\033[0;31m\t\t ERROR ENV VARIABLE ${1} NOT DEFINED \033[0m"
+  echo -e \
+  "\033[0;31m\t\t ERROR ENV VARIABLE ${1:-"empty arg"} NOT DEFINED \033[0m"
   unset pfail
 }
 
@@ -12,7 +13,7 @@ if [ -z "${ROOTDIR}" ]; then
 fi
 
 cdroot() {
-  cd "${ROOTDIR}" 2>"/dev/null" || { echo -e \
+  cd "${ROOTDIR:?}" 2>"/dev/null" || { echo -e \
     "\033[0;31m\t\t CD ROOTDIR (${ROOTDIR}) FAILED \033[0m"; return 1; }
   unset cdroot
 }
@@ -24,17 +25,17 @@ unset_env_vars_clean_req () {
   cdroot || return 1;
 }
 
-fail_clean_req () {
+fail_cl_req () {
   local MSG="\033[0;31m\t\t (clean_required.sh) WE CANNOT RUN \e[3m"
   local MSG2="\033[0m"
-  echo -e "${MSG} ${1} ${MSG2}"
-  unset fail_clean_req
+  echo -e "${MSG} ${1:-"empty arg"} ${MSG2}"
+  unset fail_cl_req
   unset_env_vars_clean_req
   return 1
 }
 
 cdfolder() {
-  cd "${1}" 2>"/dev/null" || { fail_clean_req "CD FOLDER: ${1}"; return 1; }
+  cd "${1:?}" 2>"/dev/null" || { fail_cl_req "CD FOLDER: ${1}"; return 1; }
 }
 
 # ---------------------------------------------------------------------------
@@ -42,9 +43,9 @@ cdfolder() {
 
 ptop 'CLEANING COCOA REQUIRED LIBRARIES'
 
-cdfolder "${ROOTDIR}/../cocoa_installation_libraries" || return 1
+cdfolder "${ROOTDIR:?}/../cocoa_installation_libraries" || return 1
 
-sh clean_all || { fail_clean_req "SCRIPT clean_all.sh"; return 1; }
+sh clean_all || { fail_cl_req "SCRIPT clean_all.sh"; return 1; }
 
 unset_env_vars_clean_req || return 1
 
