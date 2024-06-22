@@ -84,16 +84,14 @@ if [ -z "${IGNORE_CPP_INSTALLATION}" ]; then
       -DLAPACK_LIBRARIES="${ROOTDIR:?}/.local/lib/liblapack.so" \
       -DBLAS_FOUND=NO \
       --log-level=ERROR . \
-      >${OUT1:?} 2>${OUT2:?} || { error "(ARMA) CMAKE"; return 1; }
+      >${OUT1:?} 2>${OUT2:?} || { error "${EC12:?}"; return 1; }
     
-    make clean >${OUT1:?} \
-      2>${OUT2:?} || { error "(ARMA) ${EC2:?}"; return 1; }
+    make clean >${OUT1:?} 2>${OUT2:?} || { error "${EC2:?}"; return 1; }
 
     make -j $MNT all -Wno-dev \
-      >${OUT1:?} 2>${OUT2:?} || { error "(ARMA) ${EC8:?}"; return 1; }
+      >${OUT1:?} 2>${OUT2:?} || { error "${EC8:?}"; return 1; }
 
-    make install \
-      >${OUT1:?} 2>${OUT2:?} || { error "(ARMA) ${EC10:?}"; return 1; }
+    make install >${OUT1:?} 2>${OUT2:?} || { error "${EC10:?}"; return 1; }
 
     cdfolder "${ROOTDIR}" || return 1;
 
@@ -139,7 +137,7 @@ if [ -z "${IGNORE_CPP_INSTALLATION}" ]; then
     cdfolder "${PACKDIR}" || return 1;
 
     ./bootstrap.sh --prefix="${ROOTDIR:?}/.local" \
-      >${OUT1:?} 2>${OUT2:?} || { error "(BOOST) ${EC19:?}"; return 1; }
+      >${OUT1:?} 2>${OUT2:?} || { error "${EC19:?}"; return 1; }
 
     ./b2 --with=regex install \
       --without-python \
@@ -147,7 +145,7 @@ if [ -z "${IGNORE_CPP_INSTALLATION}" ]; then
       --without-timer  \
       --without-mpi \
       --without-atomic \
-      >${OUT1:?} 2>${OUT2:?} || { error "(BOOST) ${EC21:?}"; return 1; }
+      >${OUT1:?} 2>${OUT2:?} || { error "${EC21:?}"; return 1; }
     
     cdfolder "${ROOTDIR}" || return 1;
 
