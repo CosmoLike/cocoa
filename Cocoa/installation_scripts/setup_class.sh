@@ -5,8 +5,7 @@
 if [ -z "${IGNORE_CLASS_COMPILATION}" ]; then
   
   if [ -z "${ROOTDIR}" ]; then
-    pfail 'ROOTDIR'
-    return 1
+    pfail 'ROOTDIR'; return 1;
   fi
   
   source "${ROOTDIR:?}/installation_scripts/.check_flags.sh" || return 1;
