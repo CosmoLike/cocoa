@@ -13,49 +13,56 @@ export GLOBALPIP3="${CONDA_PREFIX:?}"/bin/pip3
 
 export GIT="${CONDA_PREFIX:?}"/bin/git
 
+# --------------------------------------------------------------------------
+# USER NEEDS TO SPECIFY THE FLAGS BELOW SO COCOA CAN FIND PYTHON/GCC/HDF5...
+# --------------------------------------------------------------------------
+INT_INCL="${CONDA_PREFIX:?}/include"
+
+INT_LIB="${CONDA_PREFIX:?}/lib"
+
+INT_INCL_PY="${INT_INCL:?}/python${PYTHON_VERSION:?}"
+
+INT_INCL_PY_SP="${INT_INCL_PY}/site-packages"
+
+INT_INCL_PY_SP_NP="${INT_INCL_PY_SP:?}/numpy/core/include"
+
+# --------------------------------------------------------------------------
+
 export PATH="${CONDA_PREFIX:?}"/bin:$PATH
-
-export INT_INCL="${CONDA_PREFIX:?}/include"
-
-export INT_LIB="${CONDA_PREFIX:?}/lib"
-
-export INT_INCL_PY="${INT_INCL:?}/python${PYTHON_VERSION}"
-
-export INT_INCL_PY_SP="${INT_INCL_PY}/site-packages"
 
 export CFLAGS="${CFLAGS} -I${CONDA_PREFIX:?}/include"
 
 export LDFLAGS="${LDFLAGS} -L${CONDA_PREFIX:?}/lib"
 
-export C_INCLUDE_PATH="${INT_INCL:?}":$C_INCLUDE_PATH
+export C_INCLUDE_PATH="${INT_INCL:?}/":$C_INCLUDE_PATH
 
 export C_INCLUDE_PATH="${INT_INCL_PY:?}m/":$C_INCLUDE_PATH
 
-export C_INCLUDE_PATH="${INT_INCL_PY_SP:?}/numpy/core/include/":$C_INCLUDE_PATH
+export C_INCLUDE_PATH="${INT_INCL_PY_SP_NP:?}/":$C_INCLUDE_PATH
 
-export CPLUS_INCLUDE_PATH="${INT_INCL:?}":$CPLUS_INCLUDE_PATH
+export CPLUS_INCLUDE_PATH="${INT_INCL:?}/":$CPLUS_INCLUDE_PATH
 
 export CPLUS_INCLUDE_PATH="${INT_INCL_PY:?}m/":$CPLUS_INCLUDE_PATH
 
-export CPLUS_INCLUDE_PATH="${INT_INCL_PY_SP:?}/numpy/core/include/":$CPLUS_INCLUDE_PATH
+export CPLUS_INCLUDE_PATH="${INT_INCL_PY_SP_NP:?}/":$CPLUS_INCLUDE_PATH
 
 export PYTHONPATH="${INT_INCL_PY_SP:?}/":$PYTHONPATH
 
 export PYTHONPATH="${INT_LIB:?}/":$PYTHONPATH
 
-export LD_RUN_PATH="${INT_INCL_PY:?}/site-packages":$LD_RUN_PATH
+export LD_RUN_PATH="${INT_INCL_PY_SP}/":$LD_RUN_PATH
 
 export LD_RUN_PATH="${INT_LIB:?}/":$LD_RUN_PATH
 
-export LIBRARY_PATH="${INT_INCL_PY:?}"/site-packages:$LIBRARY_PATH
+export LIBRARY_PATH="${INT_INCL_PY_SP}/":$LIBRARY_PATH
 
 export LIBRARY_PATH="${INT_LIB:?}/":$LIBRARY_PATH
 
-export CMAKE_INCLUDE_PATH="${INT_INCL:?}"/:$CMAKE_INCLUDE_PATH
+export CMAKE_INCLUDE_PATH="${INT_INCL:?}/":$CMAKE_INCLUDE_PATH
 
 export CMAKE_INCLUDE_PATH="${INT_INCL_PY:?}m/":$CMAKE_INCLUDE_PATH    
 
-export CMAKE_LIBRARY_PATH="${INT_INCL_PY:?}"/site-packages:$CMAKE_LIBRARY_PATH
+export CMAKE_LIBRARY_PATH="${INT_INCL_PY_SP:?}/":$CMAKE_LIBRARY_PATH
 
 export CMAKE_LIBRARY_PATH="${INT_LIB:?}":$CMAKE_LIBRARY_PATH
 
@@ -69,9 +76,13 @@ export INCLUDE="${INT_INCL:?}/":$INCLUDE
 
 export CPATH="${INT_INCL:?}/":${CPATH}
 
-export OBJC_INCLUDE_PATH="${INT_INCL:?}/":OBJC_INCLUDE_PATH
+export OBJC_INCLUDE_PATH="${INT_INCL:?}/":$OBJC_INCLUDE_PATH
 
-export OBJC_PATH="${CONDA_PREFIX:?}"/include/:OBJC_PATH
+export OBJC_PATH="${CONDA_PREFIX:?}/include/":OBJC_PATH
+
+# --------------------------------------------------------------------------
+
+unset -v INT_INCL INT_LIB INT_INCL_PY INT_INCL_PY_SP INT_INCL_PY_SP_NP
 
 # --------------------------------------------------------------------------
 # COMPILER

@@ -121,5 +121,6 @@ export EC17="SCRIPT FILE PATCH"
 export EC18="PYTHON3 WAF DISTCLEAN"
 export EC19="BOOTSTRAP"
 export EC20="MKDIR"
+export EC21="B2"
 
 
