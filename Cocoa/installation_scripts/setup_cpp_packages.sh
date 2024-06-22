@@ -50,13 +50,11 @@ if [ -z "${IGNORE_CPP_INSTALLATION}" ]; then
       -DCMAKE_C_COMPILER="${C_COMPILER:?}" \
       -DCMAKE_CXX_COMPILER="${CXX_COMPILER:?}" \
       --log-level=ERROR . \
-      >${OUT1:?} 2>${OUT2:?} || { error "(SPDLOG) CMAKE"; return 1; }
+      >${OUT1:?} 2>${OUT2:?} || { error "${EC12:?}"; return 1; }
 
-    make -j $MNT \
-      >${OUT1:?} 2>${OUT2:?} || { error "(SPDLOG) ${EC8:?}"; return 1; }
+    make -j $MNT >${OUT1:?} 2>${OUT2:?} || { error "${EC8:?}"; return 1; }
 
-    make install \
-      >${OUT1:?} 2>${OUT2:?} || { error "(SPDLOG) ${EC10:?}"; return 1; }
+    make install >${OUT1:?} 2>${OUT2:?} || { error "${EC10:?}"; return 1; }
 
     cdfolder "${ROOTDIR}" || return 1;
 

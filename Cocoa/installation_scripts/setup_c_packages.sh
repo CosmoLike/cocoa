@@ -51,13 +51,11 @@ if [ -z "${IGNORE_C_INSTALLATION}" ]; then
       --prefix="${ROOTDIR:?}/.local" \
       --enable-shared=yes \
       --enable-static=yes \
-      >${OUT1:?} 2>${OUT2:?} || { error "(FFTW) ${EC11:?}"; return 1; }
+      >${OUT1:?} 2>${OUT2:?} || { error "${EC11:?}"; return 1; }
 
-    make -j $MNT all \
-      >${OUT1:?} 2>${OUT2:?} || { error "(FFTW) ${EC8:?}"; return 1; }
+    make -j $MNT all >${OUT1:?} 2>${OUT2:?} || { error "${EC8:?}"; return 1; }
 
-    make install \
-      >${OUT1:?} 2>${OUT2:?} || { error "(FFTW) ${EC10:?}"; return 1; }
+    make install >${OUT1:?} 2>${OUT2:?} || { error "${EC10:?}"; return 1; }
 
     cdfolder "${ROOTDIR}" || return 1;
 
@@ -80,8 +78,7 @@ if [ -z "${IGNORE_C_INSTALLATION}" ]; then
     rm -f  "${PACKDIR:?}/CMakeCache.txt"
     rm -rf "${PACKDIR:?}/${BFD:?}"
     
-    mkdir "${PACKDIR}/${BFD:?}/" \
-      2>${OUT2:?} || { error "(CFITSIO) ${EC14:?}"; return 1; }
+    mkdir "${PACKDIR}/${BFD:?}/" 2>${OUT2:?} || { error "${EC14:?}"; return 1; }
     
     cdfolder "${PACKDIR:?}/${BFD:?}" || return 1;
 
@@ -91,13 +88,11 @@ if [ -z "${IGNORE_C_INSTALLATION}" ]; then
       -DCMAKE_CXX_COMPILER="${CXX_COMPILER:?}" \
       -DCMAKE_FC_COMPILER="${FORTRAN_COMPILER:?}" \
       --log-level=ERROR .. \
-      >${OUT1:?} 2>${OUT2:?} || { error "(CFITSIO) ${EC12:?}"; return 1; }
+      >${OUT1:?} 2>${OUT2:?} || { error "${EC12:?}"; return 1; }
 
-    make -j $MNT all \
-      >${OUT1:?} 2>${OUT2:?} || { error "(CFITSIO) ${EC8:?}"; return 1; }
+    make -j $MNT all >${OUT1:?} 2>${OUT2:?} || { error "${EC8:?}"; return 1; }
 
-    make install \
-      >${OUT1:?} 2>${OUT2:?} || { error "(CFITSIO) ${EC10:?}"; return 1; }
+    make install >${OUT1:?} 2>${OUT2:?} || { error "${EC10:?}"; return 1; }
     
     rm -rf "${PACKDIR:?}/${BFD:?}"
 
@@ -123,13 +118,11 @@ if [ -z "${IGNORE_C_INSTALLATION}" ]; then
       --prefix="${ROOTDIR:?}/.local" \
       --enable-shared=yes \
       --enable-static=yes \
-      >${OUT1:?} 2>${OUT2:?} || { error "(GSL) ${EC11:?}"; return 1; }
+      >${OUT1:?} 2>${OUT2:?} || { error "${EC11:?}"; return 1; }
  
-    make -j $MNT all \
-      >${OUT1:?} 2>${OUT2:?} || { error "(GSL) ${EC8:?}"; return 1; }
+    make -j $MNT all >${OUT1:?} 2>${OUT2:?} || { error "${EC8:?}"; return 1; }
 
-    make install \
-      >${OUT1:?} 2>${OUT2:?} || { error "(GSL) ${EC10:?}"; return 1; }
+    make install >${OUT1:?} 2>${OUT2:?} || { error "${EC10:?}"; return 1; }
 
     cdfolder "${ROOTDIR}" || return 1;
 
@@ -150,7 +143,7 @@ if [ -z "${IGNORE_C_INSTALLATION}" ]; then
       --no-dependencies \
       --prefix="${ROOTDIR:?}/.local" \
       --no-index 
-      >${OUT1:?} 2>${OUT2:?} || { error "(EUCLIDEMU2) ${EC13:?}"; return 1; }
+      >${OUT1:?} 2>${OUT2:?} || { error "${EC13:?}"; return 1; }
 
     cdfolder "${ROOTDIR}" || return 1;  
     
