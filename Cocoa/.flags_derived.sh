@@ -102,25 +102,45 @@ fail_script_msg () {
 # ------------------------------- ERROR CODES --------------------------------
 # ----------------------------------------------------------------------------
 export EC1="PYTHON SETUP CLEAN"
+
 export EC2="MAKE CLEAN"
+
 export EC3="PIP3 INSTALL"
+
 export EC4="PYTHON3 SETUP.PY BUILD"
+
 export EC5="PYTHON3 WAF CONFIGURE"
+
 export EC6="PYTHON3 WAF INSTALL"
+
 export EC7="MAKE ALL"
+
 export EC8="MAKE"
+
 export EC9="PYTHON3 SETUP INSTALL"
+
 export EC10="MAKE INSTALL"
+
 export EC11="CONFIGURE"
+
 export EC12="CMAKE"
+
 export EC13="PIP INSTALL"
+
 export EC14="MKDIR BUILD FOLDER"
+
 export EC15="GIT CLONE"
+
 export EC16="GIT CHECKOUT"
+
 export EC17="SCRIPT FILE PATCH"
+
 export EC18="PYTHON3 WAF DISTCLEAN"
+
 export EC19="BOOTSTRAP"
+
 export EC20="MKDIR"
+
 export EC21="B2"
 
 

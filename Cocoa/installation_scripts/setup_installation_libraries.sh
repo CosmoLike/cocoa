@@ -2,72 +2,40 @@
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
-pfail() {
-  echo -e \
-  "\033[0;31m\t\t ERROR ENV VARIABLE ${1:-"empty arg"} NOT DEFINED \033[0m"
-  unset pfail
-}
-
 if [ -z "${ROOTDIR}" ]; then
   pfail 'ROOTDIR'; return 1
 fi
 
-cdroot() {
-  cd "${ROOTDIR:?}" 2>"/dev/null" || { echo -e \
-    "\033[0;31m\t\t CD ROOTDIR (${ROOTDIR}) FAILED \033[0m"; return 1; }
-  unset cdroot
-}
-
-if [ -z "${GIT}" ]; then
-  pfail 'GIT'; cdroot; return 1;
-fi
+source "${ROOTDIR:?}/installation_scripts/.check_flags.sh" || return 1;
 
 unset_env_vars_sil () {
-  unset OUT1
-  unset OUT2
-  unset pfail
-  unset URL_BASE
-  unset URL
-  unset FOLDER
-  unset VER
-  unset XZF
-  unset wgetact
-  unset gitact
-  unset gitact1
-  unset gitact2
-  unset CCIL
-  unset CNAME 
-  unset PACKDIR
-  unset unset_env_vars_sil
+  unset -v URL_BASE URL FOLDER VER XZF CCIL CNAME PACKDIR
   cdroot || return 1;
 }
 
-fail_sil () {
-  local MSG="\033[0;31m\t\t (setup_installation_libraries.sh) WE CANNOT RUN \e[3m"
-  local MSG2="\033[0m"
-  echo -e "${MSG}${1:-"empty arg"}${MSG2}"
-  unset fail_sil
-  unset_env_vars_sil
+unset_env_funcs () {
+  unset -f cdfolder cpfolder error wgetact gitact gitact1 gitact2
+  unset -f unset_env_funcs
+  cdroot || return 1;
 }
 
-if [ -z "${COSMOLIKE_DEBUG_MODE}" ]; then
-  export OUT1="/dev/null"; export OUT2="/dev/null"
-  export SILMNT="${MAKE_NUM_THREADS:-1}"
-else
-  export OUT1="/dev/tty"; export OUT2="/dev/tty"
-  export SILMNT=1
-fi
-
-cdfolder() {
-  cd "${1:?}" 2>"/dev/null" || 
-    { fail_sil "CD FOLDER: ${1:-"empty arg"}"; return 1; }
+unset_all () {
+  unset_env_vars
+  unset_env_funcs
+  unset -f unset_all
+  cdroot || return 1;
 }
 
-export CCIL="${ROOTDIR}/../cocoa_installation_libraries"
+error () {
+  fail_script_msg "setup_installation_libraries.sh" "${1}"
+  unset_all || return 1
+}
 
 wgetact() {
   #ARGUMENTS: FOLDER, FILE, URL, NEW_FOLDER, XZFILE
   
+  local CCIL="${ROOTDIR}/../cocoa_installation_libraries"
+
   cdfolder "${CCIL:?}" || return 1;
 
   local FILE="${1}.${2}"
@@ -78,19 +46,19 @@ wgetact() {
   
   rm -f  "${CCIL:?}/${5:?}"
 
-  wget -q "${3:?}" >${OUT1:?} 2>${OUT2:?} || { fail_sil "WGET"; return 1; }
+  wget -q "${3:?}" >${OUT1:?} 2>${OUT2:?} || { error "WGET"; return 1; }
 
   if [ "${2:?}" == "tar.gz" ]; then
     
-    tar zxvf "${FILE}"  >${OUT1:?} 2>${OUT2:?} || { fail_sil "TAR (gz)"; return 1; }
+    tar zxvf "${FILE}"  >${OUT1:?} 2>${OUT2:?} || { error "TAR (gz)"; return 1; }
   
   elif [ "${2:?}" == "tar.xz" ]; then
   
-    tar xf "${FILE}" >${OUT1:?} 2>${OUT2:?} || { fail_sil "TAR (xz)"; return 1; }
+    tar xf "${FILE}" >${OUT1:?} 2>${OUT2:?} || { error "TAR (xz)"; return 1; }
   
   else
 
-    fail_sil "UNKNOWN FILE EXTENSION"; return 1;
+    error "UNKNOWN FILE EXTENSION"; return 1;
   
   fi
 
@@ -100,15 +68,15 @@ wgetact() {
     # In case this script runs twice (after being killed by CTRL-D)
     rm -rf "${CCIL:?}/${4:?}"
     
-    mv "${1:?}/" "${4:?}" 2>${OUT2:?} || { fail_sil "MV FOLDER"; return 1; }
+    mv "${1:?}/" "${4:?}" 2>${OUT2:?} || { error "MV FOLDER"; return 1; }
   
   fi
 
   # Why this compress? In the old Cocoa we saved the libraries in 
   # the github repo using git lfs. So this way preserves the old scripts
   # we set "-k 1" to be the minimum compression
-  tar -cf - "${4:?}" | xz -k -1 --threads=$SILMNT -c - > "${5}" \
-    2>${OUT2:?} || { fail_sil "TAR (COMPRESS)"; return 1; }
+  tar -cf - "${4:?}" | xz -k -1 --threads=$MNT -c - > "${5}" \
+    2>${OUT2:?} || { error "TAR (COMPRESS)"; return 1; }
 
   rm -rf "${CCIL:?}/${1:?}"
   rm -f  "${CCIL:?}/${FILE:?}"
@@ -120,6 +88,8 @@ wgetact() {
 gitact1() {
   #ARGUMENTS: FOLDER, VERSION, URL
   
+  local CCIL="${ROOTDIR}/../cocoa_installation_libraries"
+
   cdfolder "${CCIL:?}" || return 1;
 
   # ---------------------------------------------------------------------------
@@ -128,12 +98,12 @@ gitact1() {
   # ---------------------------------------------------------------------------
 
   "${GIT:?}" clone "${3:?}" "${1:?}" >${OUT1:?} 2>${OUT2:?} || 
-    { fail_sil "GIT CLONE"; return 1; }
+    { error "GIT CLONE"; return 1; }
   
   cdfolder "${CCIL:?}/${1:?}" || return 1;
   
   "${GIT:?}" checkout "${2:?}" >${OUT1:?} 2>${OUT2:?} || 
-    { fail_sil "GIT CHECKOUT"; return 1; }
+    { error "GIT CHECKOUT"; return 1; }
   
   rm -rf "${CCIL:?}/${1:?}/.git/"
 
@@ -143,6 +113,8 @@ gitact1() {
 gitact2() {
   #ARGUMENTS: FOLDER, NEW_FOLDER, XZFILE
   
+  local CCIL="${ROOTDIR}/../cocoa_installation_libraries"
+
   # In case this script runs twice (after being killed by CTRL-D)
   rm -f  "${CCIL:?}/${3:?}"
 
@@ -154,15 +126,15 @@ gitact2() {
     # In case this script runs twice (after being killed by CTRL-D)
     rm -rf "${CCIL:?}/${2:?}"
 
-    mv "${1:?}/" "${2:?}" 2>${OUT2:?} || { fail_sil "MV FOLDER"; return 1; }
+    mv "${1:?}/" "${2:?}" 2>${OUT2:?} || { error "MV FOLDER"; return 1; }
   
   fi
 
   # Why this compress? In the old Cocoa we saved the libraries in 
   # the github repo using git lfs. So this way preserves the old scripts
   # we set "-k 1" to be the minimum compression
-  tar -cf - "${2:?}" | xz -k -1 --threads=$SILMNT -c - > "${3}" \
-    2>${OUT2:?} || { fail_sil "TAR (COMPRESS)"; return 1; }
+  tar -cf - "${2:?}" | xz -k -1 --threads=$MNT -c - > "${3}" \
+    2>${OUT2:?} || { error "TAR (COMPRESS)"; return 1; }
 
   rm -rf "${CCIL:?}/${1:?}"
   rm -rf "${CCIL:?}/${2:?}"
@@ -176,25 +148,38 @@ gitact() {
   
   gitact2 "${1:?}" "${4:?}" "${5:?}" || return 1;
 }
+
+# ----------------------------------------------------------------------------
+# ----------------------------------------------------------------------------
+# ----------------------------------------------------------------------------
  
 ptop2 'SETUP_INSTALLATION_LIBRARIES'
 
+unset_env_vars || return 1;
+
+CCIL="${ROOTDIR}/../cocoa_installation_libraries"
+
 # ----------------------------------------------------------------------------
-# ----------------------------------------------------------------------------
+# --------------------------- CMAKE LIBRARY ----------------------------------
 # ----------------------------------------------------------------------------
 
 if [ -z "${IGNORE_CMAKE_INSTALLATION}" ]; then
-  ptop "GETTING CMAKE LIBRARY"
+  
+  ptop "GETTING CMAKE LIBRARY" || return 1;
 
-  export URL='https://github.com/Kitware/CMake.git'
-  export FOLDER='cmake-3.26.4'
-  export VER=v3.26.4
-  export XZF="cmake.xz"
+  URL='https://github.com/Kitware/CMake.git'
+  
+  FOLDER='cmake-3.26.4'
+  
+  VER=v3.26.4
+  
+  XZF="cmake.xz"
 
   gitact "${FOLDER}" "${VER}" "${URL}" \
     "${COCOA_CMAKE_DIR:-"cmake-3.26.4"}" "${XZF}" || return 1;
 
-  pbottom "GETTING CMAKE LIBRARY"
+  pbottom "GETTING CMAKE LIBRARY" || return 1;
+
 fi
 
 # ----------------------------------------------------------------------------
@@ -203,20 +188,20 @@ fi
 
 if [ -z "${IGNORE_DISTUTILS_INSTALLATION}" ]; then
 
-  ptop "GETTING BINUTILS LIBRARY"
+  ptop "GETTING BINUTILS LIBRARY" || return 1;
 
-  export FOLDER="binutils-2.37"
+  FOLDER="binutils-2.37"
   
-  export FILE="tar.gz"
+  FILE="tar.gz"
   
-  export URL="https://ftp.gnu.org/gnu/binutils/${FOLDER}.${FILE}"
+  URL="https://ftp.gnu.org/gnu/binutils/${FOLDER}.${FILE}"
   
-  export XZF="binutils.xz"
+  XZF="binutils.xz"
 
   wgetact "${FOLDER}" "${FILE}" "${URL}" \
     "${COCOA_BINUTILS_DIR:-"binutils-2.37"}" "${XZF}" || return 1;
 
-  pbottom "GETTING BINUTILS LIBRARY"
+  pbottom "GETTING BINUTILS LIBRARY" || return 1;
 
 fi
 
@@ -224,22 +209,22 @@ fi
 # ----------------------------------------------------------------------------
 # ----------------------------------------------------------------------------
 
-if [ -z "${IGNORE_DISTUTILS_INSTALLATION}" ]; then
+if [ -z "${IGNORE_DISTUTILS_INSTALLATION}" ]; then || return 1;
   
   ptop "GETTING TEXINFO LIBRARY"
 
-  export FOLDER="texinfo-7.0.3"
+  FOLDER="texinfo-7.0.3"
   
-  export FILE="tar.xz"
+  FILE="tar.xz"
   
-  export URL="https://ftp.gnu.org/gnu/texinfo/${FOLDER}.${FILE}"
+  URL="https://ftp.gnu.org/gnu/texinfo/${FOLDER}.${FILE}"
   
-  export XZF="texinfo.xz"
+  XZF="texinfo.xz"
 
   wgetact "${FOLDER}" "${FILE}" "${URL}" \
     "${COCOA_TEXINFO_DIR:-"texinfo-7.0.3"}" "${XZF}" || return 1;
 
-  pbottom "GETTING TEXINFO LIBRARY"
+  pbottom "GETTING TEXINFO LIBRARY" || return 1;
 
 fi
 
@@ -249,233 +234,233 @@ fi
 
 if [ -z "${IGNORE_OPENBLAS_INSTALLATION}" ]; then
 
-  ptop "GETTING OPENBLAS LIBRARY"
+  ptop "GETTING OPENBLAS LIBRARY" || return 1;
 
-  export URL='https://github.com/OpenMathLib/OpenBLAS.git'
+  URL='https://github.com/OpenMathLib/OpenBLAS.git'
 
-  export FOLDER='OpenBLAS-0.3.23'
+  FOLDER='OpenBLAS-0.3.23'
 
-  export VER=v0.3.23
+  VER=v0.3.23
 
-  export XZF="OpenBLAS.xz"
+  XZF="OpenBLAS.xz"
 
   gitact "${FOLDER}" "${VER}" "${URL}" \
     "${COCOA_OPENBLAS_DIR:-"OpenBLAS-0.3.23"}" "${XZF}" || return 1;
 
-  pbottom "GETTING OPENBLAS LIBRARY"
+  pbottom "GETTING OPENBLAS LIBRARY" || return 1;
 
 fi
 
 # ----------------------------------------------------------------------------
-# ----------------------------------------------------------------------------
+# ------------------------------- LPACK LIBRARY ------------------------------
 # ----------------------------------------------------------------------------
 
 if [ -z "${IGNORE_FORTRAN_LAPACK_INSTALLATION}" ]; then
 
-  ptop "GETTING LAPACK LIBRARY"
+  ptop "GETTING LAPACK LIBRARY" || return 1;
 
-  export URL='https://github.com/Reference-LAPACK/lapack.git'
+  URL='https://github.com/Reference-LAPACK/lapack.git'
 
-  export FOLDER='lapack-3.11.0'
+  FOLDER='lapack-3.11.0'
 
-  export VER=v3.11
+  VER=v3.11
 
-  export XZF="lapack.xz"
+  XZF="lapack.xz"
 
   gitact "${FOLDER}" "${VER}" "${URL}" \
     "${COCOA_LAPACK_DIR:-"lapack-3.11.0"}" "${XZF}" || return 1;
 
-  pbottom "GETTING LAPACK LIBRARY DONE"
+  pbottom "GETTING LAPACK LIBRARY DONE" || return 1;
 
 fi
 
 # ----------------------------------------------------------------------------
-# ----------------------------------------------------------------------------
+# ---------------------------- HDF5 LIBRARY ----------------------------------
 # ----------------------------------------------------------------------------
 
 if [ -z "${IGNORE_HDF5_INSTALLATION}" ]; then
 
-  ptop "GETTING HDF5 LIBRARY"
+  ptop "GETTING HDF5 LIBRARY" || return 1;
 
-  export FOLDER="hdf5-1.12.3"
+  FOLDER="hdf5-1.12.3"
 
-  export FILE="tar.gz"
+  FILE="tar.gz"
 
-  export URL_BASE="https://hdf-wordpress-1.s3.amazonaws.com/wp-content/uploads"
-  export URL="${URL_BASE:?}/manual/HDF5/HDF5_1_12_3/src/${FOLDER}.${FILE}"
+  URL_BASE="https://hdf-wordpress-1.s3.amazonaws.com/wp-content/uploads"
+  URL="${URL_BASE:?}/manual/HDF5/HDF5_1_12_3/src/${FOLDER}.${FILE}"
 
-  export XZF="hdf5.xz"
+  XZF="hdf5.xz"
 
   wgetact "${FOLDER}" "${FILE}" "${URL}" \
     "${COCOA_HDF5_DIR:-"hdf5-1.12.3"}" "${XZF}" || return 1;
   
-  pbottom "GETTING HDF5 LIBRARY DONE"
+  pbottom "GETTING HDF5 LIBRARY DONE" || return 1;
 
 fi
 
 # ----------------------------------------------------------------------------
-# ----------------------------------------------------------------------------
+# ------------------------------ CFITSIO LIBRARY -----------------------------
 # ----------------------------------------------------------------------------
 
 if [ -z "${IGNORE_C_CFITSIO_INSTALLATION}" ]; then
   
-  ptop "GETTING CFITSIO LIBRARY"
+  ptop "GETTING CFITSIO LIBRARY" || return 1;
 
-  export FOLDER="cfitsio-4.0.0"
+  FOLDER="cfitsio-4.0.0"
   
-  export FILE="tar.gz"
+  FILE="tar.gz"
   
-  export URL_BASE="http://heasarc.gsfc.nasa.gov"
-  export URL="${URL_BASE}/FTP/software/fitsio/c/${FOLDER}.${FILE}"
+  URL_BASE="http://heasarc.gsfc.nasa.gov"
+  URL="${URL_BASE}/FTP/software/fitsio/c/${FOLDER}.${FILE}"
   
-  export XZF="cfitsio.xz"
+  XZF="cfitsio.xz"
 
   wgetact "${FOLDER}" "${FILE}" "${URL}" \ 
     "${COCOA_CFITSIO_DIR:-"cfitsio-4.0.0"}" "${XZF}" || return 1;
   
-  pbottom "GETTING CFITSIO LIBRARY DONE"
+  pbottom "GETTING CFITSIO LIBRARY DONE" || return 1;
 
 fi
 
 # ----------------------------------------------------------------------------
-# ----------------------------------------------------------------------------
+# ---------------------------- FFTW LIBRARY ----------------------------------
 # ----------------------------------------------------------------------------
 
 if [ -z "${IGNORE_C_FFTW_INSTALLATION}" ]; then
 
-  ptop "GETTING FFTW LIBRARY"
+  ptop "GETTING FFTW LIBRARY" || return 1;
 
-  export FOLDER="fftw-3.3.10"
+  FOLDER="fftw-3.3.10"
 
-  export FILE="tar.gz"
+  FILE="tar.gz"
 
-  export URL="http://www.fftw.org/${FOLDER}.${FILE}"
+  URL="http://www.fftw.org/${FOLDER}.${FILE}"
 
-  export XZF="fftw.xz"
+  XZF="fftw.xz"
 
   wgetact "${FOLDER}" "${FILE}" "${URL}" \
     "${COCOA_FFTW_DIR:-"fftw-3.3.10"}" "${XZF}" || return 1;
 
-  pbottom "GETTING FFTW LIBRARY DONE"
+  pbottom "GETTING FFTW LIBRARY DONE" || return 1;
 
 fi
 
 # ----------------------------------------------------------------------------
-# ----------------------------------------------------------------------------
+# ------------------------------ GSL LIBRARY ---------------------------------
 # ----------------------------------------------------------------------------
 
 if [ -z "${IGNORE_C_GSL_INSTALLATION}" ]; then
 
-  ptop "GETTING GSL LIBRARY"
+  ptop "GETTING GSL LIBRARY" || return 1;
   
-  export FOLDER="gsl-2.7"
+  FOLDER="gsl-2.7"
 
-  export FILE="tar.gz"
+  FILE="tar.gz"
 
-  export URL="http://ftp.wayne.edu/gnu/gsl/${FOLDER}.${FILE}"
+  URL="http://ftp.wayne.edu/gnu/gsl/${FOLDER}.${FILE}"
 
-  export XZF="gsl-2.7.xz"
+  XZF="gsl-2.7.xz"
 
   wgetact "${FOLDER}" "${FILE}" "${URL}" \ 
     "${COCOA_GSL_DIR:-"gsl-2.7"}" "${XZF}" || return 1;
 
-  pbottom "GETTING GSL LIBRARY DONE"
+  pbottom "GETTING GSL LIBRARY DONE" || return 1;
 
 fi
 
 # ----------------------------------------------------------------------------
-# ----------------------------------------------------------------------------
+# ---------------------------- SPDLOG LIBRARY --------------------------------
 # ----------------------------------------------------------------------------
 
 if [ -z "${IGNORE_CPP_SPDLOG_INSTALLATION}" ]; then
 
-  ptop "GETTING SPDLOG LIBRARY"
+  ptop "GETTING SPDLOG LIBRARY" || return 1;
 
-  export URL='https://github.com/gabime/spdlog.git'
+  URL='https://github.com/gabime/spdlog.git'
 
-  export FOLDER='spdlog'
+  FOLDER='spdlog'
 
-  export VER=v1.13.0
+  VER=v1.13.0
 
-  export XZF="spdlog.xz"
+  XZF="spdlog.xz"
 
   gitact "${FOLDER}" "${VER}" "${URL}" \
     "${COCOA_SPDLOG_DIR:-"spdlog"}" "${XZF}" || return 1;
 
-  pbottom "GETTING SPDLOG LIBRARY"
+  pbottom "GETTING SPDLOG LIBRARY" || return 1;
 
 fi
 
 # ----------------------------------------------------------------------------
-# ----------------------------------------------------------------------------
+# -------------------------- ARMA LIBRARY ------------------------------------
 # ----------------------------------------------------------------------------
 
 if [ -z "${IGNORE_CPP_ARMA_INSTALLATION}" ]; then
   
-  ptop "GETTING ARMA LIBRARY DONE"
+  ptop "GETTING ARMA LIBRARY DONE" || return 1;
 
-  export FOLDER="armadillo-12.8.2"
+  FOLDER="armadillo-12.8.2"
   
-  export FILE="tar.xz"
+  FILE="tar.xz"
   
-  export URL="https://sourceforge.net/projects/arma/files/${FOLDER}.${FILE}"
+  URL="https://sourceforge.net/projects/arma/files/${FOLDER}.${FILE}"
   
-  export XZF="armadillo.xz"
+  XZF="armadillo.xz"
 
   wgetact "${FOLDER}" "${FILE}" "${URL}" \
     "${COCOA_ARMADILLO_DIR:-"armadillo-12.8.2"}" "${XZF}" || return 1;
 
-  pbottom "GETTING ARMA LIBRARY DONE"
+  pbottom "GETTING ARMA LIBRARY DONE" || return 1;
 
 fi
 
 # ----------------------------------------------------------------------------
-# ----------------------------------------------------------------------------
+# -------------------------- BOOST LIBRARY -----------------------------------
 # ----------------------------------------------------------------------------
 
 if [ -z "${IGNORE_CPP_BOOST_INSTALLATION}" ]; then
 
-  ptop "GETTING BOOST LIBRARY"
+  ptop "GETTING BOOST LIBRARY" || return 1;
 
   if [ -z "${COCOA_BOOST_DIR}" ]; then
     pfail 'COCOA_BOOST_DIR'; cdroot; return 1;
   fi
 
-  export FOLDER="boost_1_81_0"
+  FOLDER="boost_1_81_0"
 
-  export FILE="tar.gz"
+  FILE="tar.gz"
 
-  export URL_BASE="https://boostorg.jfrog.io/artifactory/main/release/"
-  export URL="${URL_BASE}/1.81.0/source/${FOLDER}.${FILE}"
+  URL_BASE="https://boostorg.jfrog.io/artifactory/main/release/"
+  URL="${URL_BASE}/1.81.0/source/${FOLDER}.${FILE}"
 
-  export XZF="boost.xz"
+  XZF="boost.xz"
 
   wgetact "${FOLDER}" "${FILE}" "${URL}" \
     "${COCOA_BOOST_DIR:-"boost_1_81_0"}" "${XZF}" || return 1;
 
-  pbottom "GETTING BOOST LIBRARY"
+  pbottom "GETTING BOOST LIBRARY" || return 1;
 
 fi
 
 # ----------------------------------------------------------------------------
-# ----------------------------------------------------------------------------
+# ------------------------ CARMA LIBRARY -------------------------------------
 # ----------------------------------------------------------------------------
 
 if [ -z "${IGNORE_CPP_CARMA_INSTALLATION}" ]; then
 
-  ptop "GETTING CARMA LIBRARY DONE"
+  ptop "GETTING CARMA LIBRARY DONE" || return 1;
 
-  export CNAME="${COCOA_CARMA_DIR:-"carma":?}"
+  CNAME="${COCOA_CARMA_DIR:-"carma":?}"
   
-  export PACKDIR="${CCIL:?}/${CNAME:?}"
+  PACKDIR="${CCIL:?}/${CNAME:?}"
 
-  export FOLDER="carma_tmp"
+  FOLDER="carma_tmp"
 
-  export URL="https://github.com/RUrlus/carma.git"
+  URL="https://github.com/RUrlus/carma.git"
 
-  export VER=v0.7.0
+  VER=v0.7.0
 
-  export XZF="carma.xz"
+  XZF="carma.xz"
 
   gitact1 "${FOLDER}" "${VER}" "${URL}" || return 1;
 
@@ -488,29 +473,28 @@ if [ -z "${IGNORE_CPP_CARMA_INSTALLATION}" ]; then
   # move/rename include file and carma.h folder
   # -------------------------------------------------------------------------
   mv "${CCIL:?}/${FOLDER:?}/include" "${CCIL:?}" >${OUT1:?} 2>${OUT2:?} || 
-    { fail_sil "MV CARMA INCLUDE FOLDER"; return 1; }
+    { error "MV CARMA INCLUDE FOLDER"; return 1; }
 
   mv "${CCIL:?}/include" "${PACKDIR:?}" 2>${OUT2:?} || 
-    { fail_sil "RENAME CARMA INCLUDE FOLDER"; return 1; }
+    { error "RENAME CARMA INCLUDE FOLDER"; return 1; }
 
   mv "${PACKDIR:?}/carma" "${PACKDIR:?}/carma.h" \
-    2>${OUT2:?} || { fail_sil "RENANE CARMA HEADER"; return 1; }
+    2>${OUT2:?} || { error "RENANE CARMA HEADER"; return 1; }
 
   rm -rf "${CCIL:?}/${FOLDER:?}"
   # -------------------------------------------------------------------------
   
   gitact2 "${CNAME}" "${CNAME}" "${XZF}" || return 1; 
 
-  pbottom "GETTING CARMA LIBRARY DONE"
+  pbottom "GETTING CARMA LIBRARY DONE" || return 1;
 
 fi
 
 # ------------------------------------------------------------------------------
-# ------------------------------------------------------------------------------
 
-unset_env_vars_sil || return 1;
+unset_all || return 1;
 
-pbottom2 "SETUP_INSTALLATION_LIBRARIES"
+pbottom2 "SETUP_INSTALLATION_LIBRARIES" || return 1;
 
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------

@@ -19,6 +19,10 @@ if [ -z "${C_COMPILER}" ]; then
   pfail 'C_COMPILER'; cdroot; return 1;
 fi
 
+if [ -z "${FORTRAN_COMPILER}" ]; then
+  pfail 'FORTRAN_COMPILER'; cdroot; return 1;
+fi 
+
 if [ -z "${PIP3}" ]; then
   pfail 'PIP3'; cdroot; return 1;
 fi
@@ -30,10 +34,6 @@ fi
 if [ -z "${MPI_CC_COMPILER}" ]; then
   pfail 'MPI_CC_COMPILER'; cdroot; return 1;
 fi
-
-if [ -z "${FORTRAN_COMPILER}" ]; then
-  pfail 'FORTRAN_COMPILER'; cdroot; return 1;
-fi 
 
 if [ -z "${CMAKE}" ]; then
   pfail 'CMAKE'; cdroot; return 1;

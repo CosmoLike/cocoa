@@ -14,11 +14,23 @@ if [ -z "${IGNORE_C_INSTALLATION}" ]; then
     unset -v CCIL BFD PACKDIR
     cdroot || return 1;
   }
-  
+
+  unset_env_funcs () {
+    unset -f cdfolder cpfolder error
+    unset -f unset_env_funcs
+    cdroot || return 1;
+  }
+
+  unset_all () {
+    unset_env_vars
+    unset_env_funcs
+    unset -f unset_all
+    cdroot || return 1;
+  }
+
   error () {
     fail_script_msg "setup_c_packages.sh" "${1}"
-    unset -f error
-    unset_env_vars || return 1
+    unset_all || return 1
   }
     
   cdfolder() {
@@ -27,7 +39,8 @@ if [ -z "${IGNORE_C_INSTALLATION}" ]; then
   
   # ----------------------------------------------------------------------------
   # ----------------------------------------------------------------------------
-  
+  # ----------------------------------------------------------------------------
+
   ptop2 'SETUP_C_PACKAGES' || return 1
 
   unset_env_vars || return 1; 
@@ -150,14 +163,14 @@ if [ -z "${IGNORE_C_INSTALLATION}" ]; then
     pbottom 'INSTALLING EUCLIDEMU2' || return 1
   
   fi
+
   # ----------------------------------------------------------------------------
   # ----------------------------------------------------------------------------
 
-  unset_env_vars || return 1; 
+  unset_all || return 1; 
 
   pbottom2 'SETUP_C_PACKAGES DONE' || return 1
-  # ----------------------------------------------------------------------------
-  # ----------------------------------------------------------------------------
+
 fi
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------

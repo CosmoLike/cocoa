@@ -11,26 +11,45 @@ if [ -z "${IGNORE_CLASS_COMPILATION}" ]; then
   source "${ROOTDIR:?}/installation_scripts/.check_flags.sh" || return 1;
     
   unset_env_vars () {
-    unset -v URL CHANGES ECODEF PACKDIR CLNAME
+    unset -v URL CHANGES ECODEF CLNAME PACKDIR TFOLDER TFILE TFILEP AL
     cdroot || return 1;
   }
-  
+
+  unset_env_funcs () {
+    unset -f cdfolder cpfolder error
+    unset -f unset_env_funcs
+    cdroot || return 1;
+  }
+
+  unset_all () {
+    unset_env_vars
+    unset_env_funcs
+    unset -f unset_all
+    cdroot || return 1;
+  }
+
   error () {
     fail_script_msg "setup_class.sh" "${1}"
-    unset -f error
-    unset_env_vars || return 1
+    unset_all || return 1
   }
 
   cdfolder() {
     cd "${1:?}" 2>"/dev/null" || { error "CD FOLDER: ${1}"; return 1; }
   }
 
+  cpfolder() {
+    cp -r "${1:?}" "${2:?}"  \
+      2>"/dev/null" || { error "CP FOLDER ${1} on ${2}"; return 1; }
+  }
+
+  # ---------------------------------------------------------------------------
   # ---------------------------------------------------------------------------
   # ---------------------------------------------------------------------------
   
   ptop2 'SETUP_CLASS' || return 1
   
-  # ---------------------------------------------------------------------------
+  unset_env_vars || return 1
+
   # ---------------------------------------------------------------------------
 
   ptop 'INSTALLING CLASS' || return 1
@@ -73,40 +92,43 @@ if [ -z "${IGNORE_CLASS_COMPILATION}" ]; then
     >${OUT1:?} 2>${OUT2:?} || { error "MKDIR FROM INCLUDE TO INCLUDE2"; return 1; }
   
   # ---------------------------------------------------------------------------
-  # patch CLASS to be compatible w/ COCOA
+  # ----------------- Patch CLASS to be compatible w/ COCOA  ------------------
+  # We patch the files below so they use the right C compiler
   # ---------------------------------------------------------------------------
+  declare -a TFOLDER=("" 
+                      "python/") # Must include
   
-  # ---------------------------------------------------------------------------
-  cdfolder "${PACKDIR}" || return 1;
+  # T = TMP
+  declare -a TFILE=("Makefile" 
+                    "setup.py")
 
-  cp "${CHANGES:?}/Makefile.patch" .  2>${OUT2:?} || 
-    { error "CP FILE PATCH (Makefile.patch)"; return 1; }
-  
-  patch -u Makefile -i Makefile.patch >${OUT1:?} 2>${OUT2:?} ||
-    { error "SCRIPT FILE PATCH (Makefile.patch)"; return 1; }
-  
-  # ---------------------------------------------------------------------------
-  cdfolder "${PACKDIR:?}/python" || return 1;
-  
-  cp "${CHANGES:?}/python/setup.patch" . 2>${OUT2:?} ||
-    { error "CP FILE PATCH (setup.patch)"; return 1; }
+  #T = TMP, P = PATCH
+  declare -a TFILEP=("Makefile.patch" 
+                     "setup.patch")
 
-  patch -u setup.py -i setup.patch >${OUT1:?} 2>${OUT2:?} || 
-    { error "SCRIPT FILE PATCH (setup.patch)"; return 1; }
-  
-  # ---------------------------------------------------------------------------
+  # AL = Array Length
+  AL=${#TFOLDER[@]}
+
+  for (( i=0; i<${AL}; i++ ));
+  do
+    cdfolder "${PACKDIR:?}/${TFOLDER[$i]}" || return 1;
+
+    cpfolder "${CHANGES:?}/${TFOLDER[$i]}${TFILEP[$i]:?}" . \
+      2>${OUT2:?} || return 1;
+
+    patch -u "${TFILE[$i]:?}" -i "${TFILEP[$i]:?}" >${OUT1:?} \
+      2>${OUT2:?} || { error "${EC17:?} (${TFILE[$i]:?})"; return 1; }
+  done
+
   cdfolder "${ROOTDIR}" || return 1;
 
   pbottom 'INSTALLING CLASS' || return 1
 
   # ----------------------------------------------------------------------------
-  # ----------------------------------------------------------------------------
 
-  unset_env_vars || return 1
+  unset_all || return 1
 
   pbottom2 'SETUP_CLASS' || return 1
-  # ----------------------------------------------------------------------------
-  # ----------------------------------------------------------------------------
 fi
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------

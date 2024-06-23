@@ -15,16 +15,29 @@ if [ -z "${IGNORE_CPP_INSTALLATION}" ]; then
     cdroot || return 1;
   }
   
+  unset_env_funcs () {
+    unset -f cdfolder cpfolder error
+    unset -f unset_env_funcs
+    cdroot || return 1;
+  }
+
+  unset_all () {
+    unset_env_vars
+    unset_env_funcs
+    unset -f unset_all
+    cdroot || return 1;
+  }
+
   error () {
     fail_script_msg "setup_cpp_packages.sh" "${1}"
-    unset -f error
-    unset_env_vars || return 1
+    unset_all || return 1
   }
   
   cdfolder() {
     cd "${1:?}" 2>"/dev/null" || { error "CD FOLDER: ${1}"; return 1; }
   }
   
+  # ----------------------------------------------------------------------------
   # ----------------------------------------------------------------------------
   # ----------------------------------------------------------------------------
   
@@ -154,10 +167,11 @@ if [ -z "${IGNORE_CPP_INSTALLATION}" ]; then
   fi
 
   # ----------------------------------------------------------------------------
-  # ----------------------------------------------------------------------------
-  unset_env_vars || return 1; 
+ 
+  unset_all || return 1; 
   
   pbottom2 'SETUP_CPP_PACKAGES DONE' || return 1
+
 fi
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------

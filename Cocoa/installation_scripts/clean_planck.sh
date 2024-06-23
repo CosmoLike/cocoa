@@ -14,17 +14,30 @@ if [ -z "${IGNORE_PLANCK_COMPILATION}" ]; then
     unset -v ECF
     cdroot || return 1;
   }
+
+  unset_env_funcs () {
+    unset -f cdfolder cpfolder error
+    unset -f unset_env_funcs
+    cdroot || return 1;
+  }
+
+  unset_all () {
+    unset_env_vars
+    unset_env_funcs
+    unset -f unset_all
+    cdroot || return 1;
+  }
   
   error () {
     fail_script_msg "clean_planck.sh" "${1}"
-    unset -f error
-    unset_env_vars || return 1;
+    unset_all || return 1;
   }
   
   cdfolder() {
     cd "${1:?}" 2>"/dev/null" || { error "CD FOLDER: ${1}"; return 1; }
   }
     
+  # ---------------------------------------------------------------------------
   # ---------------------------------------------------------------------------
   # ---------------------------------------------------------------------------
   
@@ -49,12 +62,10 @@ if [ -z "${IGNORE_PLANCK_COMPILATION}" ]; then
   "${PYTHON3:?}" waf distclean \
     >${OUT1:?} 2>${OUT2:?} || { error "${EC18\?}"; return 1; }
 
-  unset_env_vars || return 1
+  unset_all || return 1
   
   pbottom 'CLEANING PLANCK LIKELIHOOD' || return 1
-  
-  # ---------------------------------------------------------------------------
-  # ---------------------------------------------------------------------------
+
 fi
 # ----------------------------------------------------------------------------
 # ----------------------------------------------------------------------------

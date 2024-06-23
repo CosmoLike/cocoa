@@ -11,14 +11,26 @@ if [ -z "${IGNORE_CAMB_COMPILATION}" ]; then
   source "${ROOTDIR:?}/installation_scripts/.check_flags.sh" || return 1;
 
   unset_env_vars () {
-    unset -v URL CHANGES ECODEF CAMBF PACKDIR
+    unset -v URL CHANGES ECODEF CAMBF PACKDIR TFOLDER TFILE TFILEP AL
+    cdroot || return 1;
+  }
+
+  unset_env_funcs () {
+    unset -f cdfolder cpfolder error
+    unset -f unset_env_funcs
+    cdroot || return 1;
+  }
+
+  unset_all () {
+    unset_env_vars
+    unset_env_funcs
+    unset -f unset_all
     cdroot || return 1;
   }
 
   error () {
     fail_script_msg "setup_camb.sh" "${1}"
-    unset error
-    unset_env_vars
+    unset_all || return 1
   }
   
   cdfolder() {
@@ -26,17 +38,18 @@ if [ -z "${IGNORE_CAMB_COMPILATION}" ]; then
   }
 
   cpfolder() {
-    cp -r "${1:?}" 2>"/dev/null" || { error "CP FOLDER ${1} on ${2}"; return 1; }
+    cp -r "${1:?}" "${2:?}"  \
+      2>"/dev/null" || { error "CP FOLDER ${1} on ${2}"; return 1; }
   }
 
   # ---------------------------------------------------------------------------
   # ---------------------------------------------------------------------------
-  
+  # ---------------------------------------------------------------------------
+
   ptop2 'SETUP_CAMB' || return 1;
 
-  unset_env_vars || return 1;
+  unset_env_vars || return 1
 
-  # ---------------------------------------------------------------------------
   # ---------------------------------------------------------------------------
   
   ptop 'INSTALLING CAMB' || return 1;
@@ -45,6 +58,7 @@ if [ -z "${IGNORE_CAMB_COMPILATION}" ]; then
 
   CHANGES="${ROOTDIR:?}/../cocoa_installation_libraries/camb_changes"
 
+  # E = EXTERNAL, CODE, F=FODLER
   ECODEF="${ROOTDIR:?}/external_modules/code"
 
   CAMBF=${CAMB_NAME:-"CAMB"}
@@ -59,12 +73,12 @@ if [ -z "${IGNORE_CAMB_COMPILATION}" ]; then
   # ---------------------------------------------------------------------------
   # clone from original repo
   # ---------------------------------------------------------------------------
-  cdfolder "${ECODEF:?}" || return 1;
+  cdfolder "${ECODEF:?}" || { cdroot; return 1; }
 
   ${GIT:?} clone $URL --recursive "${CAMBF:?}" \
     >${OUT1:?} 2>${OUT2:?} || { error "${EC15:?}"; return 1; }
   
-  cdfolder "${PACKDIR}" || return 1;
+  cdfolder "${PACKDIR}" || { cdroot; return 1; }
 
   if [ -n "${CAMB_GIT_COMMIT}" ]; then
     ${GIT:?} checkout "${CAMB_GIT_COMMIT:?}" \
@@ -72,42 +86,46 @@ if [ -z "${IGNORE_CAMB_COMPILATION}" ]; then
   fi
   
   # ---------------------------------------------------------------------------
-  # patch CAMB to be compatible w/ COCOA
+  # ----------- Patch CAMB to be compatible w/ COCOA environment --------------
+  # We patch the files below so they use the right Fortran compiler
   # ---------------------------------------------------------------------------
-  cdfolder "${PACKDIR:?}/camb/" || return 1;
-
-  cpfolder "${CHANGES:?}"/camb/_compilers.patch . 2>${OUT2:?} || return 1;
+  declare -a TFOLDER=("camb/" 
+                      "fortran/" 
+                      "forutils/") # Must include /
   
-  patch -u _compilers.py -i _compilers.patch \
-    >${OUT1:?} 2>${OUT2:?} || { error "${EC17:?} (_compilers)"; return 1; }
+  # T = TMP
+  declare -a TFILE=("_compilers.py" 
+                    "Makefile" 
+                    "Makefile_compiler")
 
+  #T = TMP, P = PATCH
+  declare -a TFILEP=("_compilers.patch" 
+                     "Makefile.patch" 
+                     "Makefile_compiler.patch")
+
+  # AL = Array Length
+  AL=${#TFOLDER[@]}
+
+  for (( i=0; i<${AL}; i++ ));
+  do
+    cdfolder "${PACKDIR:?}/${TFOLDER[$i]}" || return 1
+
+    cpfolder "${CHANGES:?}/${TFOLDER[$i]}${TFILEP[$i]:?}" . \
+      2>${OUT2:?} || return 1;
+
+    patch -u "${TFILE[$i]:?}" -i "${TFILEP[$i]:?}" >${OUT1:?} \
+      2>${OUT2:?} || { error "${EC17:?} (${TFILE[$i]:?})"; return 1; }
+  done
+  
+  cdfolder "${ROOTDIR}" || return 1
+  
+  pbottom 'INSTALLING CAMB' || return 1
+  
   # ---------------------------------------------------------------------------
-  cdfolder "${PACKDIR:?}/fortran/" || return 1;
-  
-  cpfolder "${CHANGES:?}"/fortran/Makefile.patch . 2>${OUT2:?} || return 1;
-  
-  patch -u Makefile -i Makefile.patch \
-    >${OUT1:?} 2>${OUT2:?} || { error "${EC17:?} (Makefile)"; return 1; }
 
-  # ---------------------------------------------------------------------------
-  cdfolder "${PACKDIR:?}/forutils/" || return 1;
+  unset_all || return 1
   
-  cpfolder "${CHANGES:?}/forutils/Makefile_compiler.patch" . 2>${OUT2:?} || return 1;
-  
-  patch -u Makefile_compiler -i Makefile_compiler.patch \
-    >${OUT1:?} 2>${OUT2:?} || { error "${EC17:?} (Makefile_compiler)"; return 1; }
-  
-  # ---------------------------------------------------------------------------
-  cdfolder "${ROOTDIR}" || return 1;
-
-  pbottom 'INSTALLING CAMB' || return 1;
-
-  # ----------------------------------------------------------------------------
-  # ----------------------------------------------------------------------------
-  
-  unset_env_vars || return 1;
-  
-  pbottom2 'SETUP_CAMB' || return 1;
+  pbottom2 'SETUP_CAMB' || return 1
 fi
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------

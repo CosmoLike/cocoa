@@ -19,17 +19,37 @@ if [ -z "${IGNORE_PLANCK_COMPILATION}" ]; then
     unset -v EMCPC CLIK_LAPALIBS CLIK_CFITSLIBS
     cdroot || return 1;
   }
-  
+
+  unset_env_funcs () {
+    unset -f cdfolder cpfolder error
+    unset -f unset_env_funcs
+    cdroot || return 1;
+  }
+
+  unset_all () {
+    unset_env_vars
+    unset_env_funcs
+    unset -f unset_all
+    cdroot || return 1;
+  }
+
   error () {
     fail_script_msg "compile_planck.sh" "${1}"
-    unset error
-    unset_env_vars || return 1
+    unset_all || return 1
   }
 
   cdfolder() {
     cd "${1:?}" 2>"/dev/null" || { error "CD FOLDER: ${1}"; return 1; }
   }
     
+  # ---------------------------------------------------------------------------
+  # ---------------------------------------------------------------------------
+  # ---------------------------------------------------------------------------
+
+  ptop 'COMPILING PLANCK' || return 1
+
+  unset_env_vars || return 1
+
   if [ -z "${IGNORE_C_CFITSIO_INSTALLATION}" ]; then
     CLIK_CFITSLIBS="${ROOTDIR:?}/.local/lib"
   else
@@ -47,14 +67,7 @@ if [ -z "${IGNORE_PLANCK_COMPILATION}" ]; then
     fi
     CLIK_LAPALIBS="${GLOBAL_PACKAGES_LOCATION:?}"
   fi
-
-  # ---------------------------------------------------------------------------
-  # ---------------------------------------------------------------------------
   
-  ptop 'COMPILING PLANCK' || return 1
-
-  unset_env_vars || return 1
-
   EMCPC="external_modules/code/planck/code"
   
   if [ -z "${USE_SPT_CLIK_PLANCK}" ]; then
@@ -75,12 +88,10 @@ if [ -z "${IGNORE_PLANCK_COMPILATION}" ]; then
   ${PYTHON3:?} waf install -v \
     >${OUT1:?} 2>${OUT2:?} || { error "${EC6:?}"; return 1; }
 
-  unset_env_vars || return 1
+  unset_all || return 1
   
   pbottom 'COMPILING PLANCK' || return 1
-  
-  # ---------------------------------------------------------------------------
-  # ---------------------------------------------------------------------------
+
 fi
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------

@@ -14,11 +14,23 @@ if [ -z "${IGNORE_POLYCHORD_COMPILATION}" ]; then
     unset -v PLIB PACKDIR
     cdroot || return 1;
   }
+
+  unset_env_funcs () {
+    unset -f cdfolder cpfolder error
+    unset -f unset_env_funcs
+    cdroot || return 1;
+  }
+
+  unset_all () {
+    unset_env_vars
+    unset_env_funcs
+    unset -f unset_all
+    cdroot || return 1;
+  }
   
   error () {
     fail_script_msg "clean_polychord.sh" "${1}"
-    unset -f error
-    unset_env_vars || return 1
+    unset_all || return 1
   }
   
   cdfolder() {
@@ -27,7 +39,8 @@ if [ -z "${IGNORE_POLYCHORD_COMPILATION}" ]; then
     
   # ---------------------------------------------------------------------------
   # ---------------------------------------------------------------------------
-  
+  # ---------------------------------------------------------------------------
+
   ptop 'CLEANING POLYCHORD' || return 1
 
   unset_env_vars || return 1
@@ -44,12 +57,9 @@ if [ -z "${IGNORE_POLYCHORD_COMPILATION}" ]; then
   rm -rf "${PACKDIR:?}/lib/*.a"
   rm -rf "${PACKDIR:?}/lib/*.so"
 
-  unset_env_vars || return 1
+  unset_all || return 1
   
   pbottom 'CLEANING POLYCHORD' || return 1
-
-  # ---------------------------------------------------------------------------
-  # ---------------------------------------------------------------------------
   
 fi
 # ----------------------------------------------------------------------------
