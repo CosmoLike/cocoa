@@ -4,111 +4,94 @@
 # ------------------------------------------------------------------------------
 if [ -z "${IGNORE_ALL_PIP_INSTALLATION}" ]; then
   
-  pfail() {
-    echo -e \
-    "\033[0;31m ERROR ENV VARIABLE ${1:-"empty arg"} NOT DEFINED \033[0m"
-    unset pfail
-  } 
-  
   if [ -z "${ROOTDIR}" ]; then
     pfail 'ROOTDIR'; return 1
   fi
 
-  cdroot() {
-    cd "${ROOTDIR:?}" 2>"/dev/null" || { echo -e \
-      "\033[0;31m\t\t CD ROOTDIR (${ROOTDIR}) FAILED \033[0m"; return 1; }
-    unset cdroot
-  }
-
-  if [ -z "${CXX_COMPILER}" ]; then
-    pfail 'CXX_COMPILER'; cdroot; return 1;
-  fi
-
-  if [ -z "${C_COMPILER}" ]; then
-    pfail 'C_COMPILER'; cdroot; return 1;
-  fi
-
-  if [ -z "${PIP3}" ]; then
-    pfail 'PIP3'; cdroot; return 1; 
-  fi
+  source "${ROOTDIR:?}/installation_scripts/.check_flags.sh" || return 1;
   
-  if [ -z "${PYTHON3}" ]; then
-    pfail "PYTHON3"; cdroot; return 1;
-  fi
-  
-  unset_env_vars_spp () {
-    unset OUT1
-    unset OUT2
-    unset PIPMNT
-    unset unset_env_vars_spp
-    unset CCIL
-    unset PACKDIR
+  unset_env_vars () {
+    unset -v CCIL PACKDIR LLIB
     cdroot || return 1;
   }
 
-  fail_spp () {
-    local MSG="\033[0;31m\t\t (setup_pip_packages.sh) WE CANNOT RUN \e[3m"
-    local MSG2="\033[0m"
-    echo -e "${MSG} ${1:-"empty arg"} ${MSG2}"
-    unset fail_spp
-    unset_env_vars_spp
+  unset_env_funcs () {
+    unset -f cdfolder cpfolder error
+    unset -f unset_env_funcs
+    cdroot || return 1;
   }
 
-  if [ -z "${COCOA_OUTPUT_VERBOSE}" ]; then
-    export OUT1="/dev/null"; export OUT2="/dev/null"
-    export PIPMNT="${MAKE_NUM_THREADS:-1}"
-    [[ ${PIPMNT} == +([0-9]) ]] || export PIPMNT=1
-  else
-    export OUT1="/dev/tty"; export OUT2="/dev/tty"
-    export PIPMNT=1
-  fi
+  unset_all () {
+    unset_env_vars
+    unset_env_funcs
+    unset -f unset_all
+    cdroot || return 1;
+  }
+
+  error () {
+    fail_script_msg "setup_pip_packages.sh" "${1}"
+    unset_all || return 1
+  }
 
   cdfolder() {
-    cd "${1:?}" 2>"/dev/null" || { fail_spp "CD FOLDER: ${1}"; return 1; }
+    cd "${1:?}" 2>"/dev/null" || { error "CD FOLDER: ${1}"; return 1; }
+  }
+
+  cpfolder() {
+    cp -r "${1:?}" "${2:?}"  \
+      2>"/dev/null" || { error "CP FOLDER ${1} on ${2}"; return 1; }
+  }
+
+ cpfile() {
+    cp "${1:?}" "${2:?}" \
+      2>"/dev/null" || { error "CP FILE ${1} on ${2}"; return 1; }
   }
 
   # ----------------------------------------------------------------------------
   # ----------------------------------------------------------------------------
+  # ----------------------------------------------------------------------------
   
-  ptop2 "INSTALLING PYTHON PACKAGES VIA PIP"
+  ptop2 "SETUP_PIP_PACKAGES" || return 1
   
+  unset_env_vars || return 1;
+
+  CCIL="${ROOTDIR:?}/../cocoa_installation_libraries"
+
   # ----------------------------------------------------------------------------
   # --------------------------------- LIBEXPAT ---------------------------------
   # ----------------------------------------------------------------------------
   if [ -z "${MINICONDA_INSTALLATION}" ]; then
     
-    export CCIL="${ROOTDIR:?}/../cocoa_installation_libraries"
+    ptop "INSTALLING EXPAT" || return 1
 
-    export PACKDIR="${COCOA_EXPAT_DIR:-"expat-2.5.0/"}"
+    PACKDIR="${CCIL:?}/${COCOA_EXPAT_DIR:-"expat-2.5.0/"}"
 
-    cdfolder "${CCIL:?}/${PACKDIR:?}" || return 1;
+    cdfolder "${PACKDIR:?}" || return 1;
     
     FC="${FORTRAN_COMPILER:?}" CC="${C_COMPILER:?}" ./configure \
       --prefix="${ROOTDIR:?}/.local" \
       --enable-shared=yes \
       --enable-static=yes \
-      >${OUT1:?} 2>${OUT2:?} || { fail_spp "(LIBEXPAT) CONFIGURE"; return 1; }
+      >${OUT1:?} 2>${OUT2:?} || { error "${EC11:?}"; return 1; }
 
-    make -j $PIPMNT >${OUT1:?} 2>${OUT2:?} || 
-      { fail_spp "(LIBEXPAT) MAKE"; return 1; }
+    make -j $MNT >${OUT1:?} 2>${OUT2:?} || { error "${EC8:?}"; return 1; }
 
-    make install >${OUT1:?} 2>${OUT2:?} || 
-      { fail_spp "(LIBEXPAT) MAKE INSTALL"; return 1; }
+    make install >${OUT1:?} 2>${OUT2:?} || { error "${EC10:?}"; return 1; }
 
-    cp "${ROOTDIR:?}/.local/lib/libexpat.so.1" \
-       "${ROOTDIR:?}/.local/lib/libexpat.so.0" \
-       2>${OUT2:?} || { fail_spp "(LIBEXPAT) CP LIBEXPAT.SO.1"; return 1; }
+    LLIB="${ROOTDIR:?}/.local/lib"
+
+    cpfile "${LLIB:?}/libexpat.so.1" "${LLIB:?}/libexpat.so.0" || return 1;
     
     cdfolder "${ROOTDIR}" || return 1;
 
+    pbottom "INSTALLING EXPAT" || return 1
+
   fi
-  # ----------------------------------------------------------------------------
-  # ----------------------------------------------------------------------------
 
   # ----------------------------------------------------------------------------
   # --------------------------- PIP CORE PACKAGES ------------------------------
   # ----------------------------------------------------------------------------
-  ptop "PIP INSTALL CORE PACKAGES"
+  ptop "PIP INSTALL CORE-PACKAGES" || return 1
   
   if [ -z "${MINICONDA_INSTALLATION}" ]; then
     
@@ -221,8 +204,8 @@ if [ -z "${IGNORE_ALL_PIP_INSTALLATION}" ]; then
         'wrapt==1.14.1' \
         'zipfile38==0.0.3' \
         'zipp==3.15.0' \
-      --prefix="${ROOTDIR:?}/.local" >${OUT1:?} 2>${OUT2:?} || 
-      { fail_spp "PIP INSTALL (CORE PACKAGES)"; return 1; }
+      --prefix="${ROOTDIR:?}/.local" \
+      >${OUT1:?} 2>${OUT2:?} || { error "(CORE-PACKAGES) ${EC13:?}"; return 1; }
 
   else
   
@@ -230,18 +213,18 @@ if [ -z "${IGNORE_ALL_PIP_INSTALLATION}" ]; then
     env CXX="${CXX_COMPILER:?}" CC="${C_COMPILER:?}" ${PIP3:?} install \
         'numpy==1.23.5' \
       --prefix="${ROOTDIR:?}/.local" \
-      --force-reinstall >${OUT1:?} 2>${OUT2:?} || 
-      { fail_spp "PIP INSTALL (CORE PACKAGES)"; return 1; }
+      --force-reinstall \
+      >${OUT1:?} 2>${OUT2:?} || { error "(CORE-PACKAGES) ${EC13:?}"; return 1; }
     
   fi
 
   env CXX="${CXX_COMPILER:?}" CC="${C_COMPILER:?}" ${PIP3:?} install \
       "${ROOTDIR:?}/../cocoa_installation_libraries/pip_cache/fgspectra" \
     --prefix="${ROOTDIR:?}/.local" \
-    --no-index >${OUT1:?} 2>${OUT2:?} || 
-    { fail_spp "PIP INSTALL (FGSPECTRA)"; return 1; }
+    --no-index \
+    >${OUT1:?} 2>${OUT2:?} || { error "(FGSPECTRA) ${EC13:?}"; return 1; }
 
-  pbottom "PIP INSTALL CORE PACKAGES"
+  pbottom "PIP INSTALL CORE-PACKAGES" || return 1
   # ----------------------------------------------------------------------------
   # ----------------------------------------------------------------------------
 
@@ -250,7 +233,7 @@ if [ -z "${IGNORE_ALL_PIP_INSTALLATION}" ]; then
   # ----------------------------------------------------------------------------
   if [ -z "${IGNORE_EMULATOR_CPU_PIP_PACKAGES}" ]; then
   
-    ptop "PIP INSTALL MACHINE LEARNING CPU-ONLY PACKAGES"
+    ptop "PIP INSTALL MACHINE LEARNING CPU-ONLY PACKAGES" || return 1
 
     env CXX="${CXX_COMPILER:?}" CC="${C_COMPILER:?}" ${PIP3:?} install \
         'tensorflow-cpu==2.12.0' \
@@ -260,8 +243,8 @@ if [ -z "${IGNORE_ALL_PIP_INSTALLATION}" ]; then
         'torchvision==0.14.1+cpu' \
         'torchaudio==0.13.1' \
       --extra-index-url "https://download.pytorch.org/whl/cpu" \
-      --prefix="${ROOTDIR:?}/.local" >${OUT1:?} 2>${OUT2:?} || 
-      { fail_spp "PIP INSTALL (MACHINE LEARNING CPU-ONLY PACKAGES)"; return 1; }
+      --prefix="${ROOTDIR:?}/.local" \
+      >${OUT1:?} 2>${OUT2:?} || { error "${EC13:?}"; return 1; }
   
     pbottom "PIP INSTALL MACHINE LEARNING CPU-ONLY PACKAGES"
   
@@ -279,20 +262,21 @@ if [ -z "${IGNORE_ALL_PIP_INSTALLATION}" ]; then
         'torchvision==0.14.1+cu116' \
         'torchaudio==0.13.1' \
       --extra-index-url "https://download.pytorch.org/whl/cu116" \
-      --prefix="${ROOTDIR:?}/.local" >${OUT1:?} 2>${OUT2:?} ||
-      { fail_spp "PIP INSTALL (MACHINE LEARNING GPU PACKAGES)"; return 1; } 
+      --prefix="${ROOTDIR:?}/.local" \
+      >${OUT1:?} 2>${OUT2:?} || { error "${EC13:?}"; return 1; } 
 
-    pbottom "PIP INSTALL MACHINE LEARNING GPU PACKAGES"
+    pbottom "PIP INSTALL MACHINE LEARNING GPU PACKAGES" || return 1
   
   fi
-  # ----------------------------------------------------------------------------
-  # ----------------------------------------------------------------------------
   
-  unset_env_vars_spp || return 1;
+  # ---------------------------------------------------------------------------
+
+  unset_all || return 1;
   
   pbottom2 'INSTALLING PYTHON PACKAGES VIA PIP DONE'
 
 fi
+
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------

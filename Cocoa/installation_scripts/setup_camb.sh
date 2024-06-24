@@ -11,7 +11,7 @@ if [ -z "${IGNORE_CAMB_COMPILATION}" ]; then
   source "${ROOTDIR:?}/installation_scripts/.check_flags.sh" || return 1;
 
   unset_env_vars () {
-    unset -v URL CHANGES ECODEF CAMBF PACKDIR TFOLDER TFILE TFILEP AL
+    unset -v URL CCIL ECODEF CAMBF PACKDIR CHANGES TFOLDER TFILE TFILEP AL
     cdroot || return 1;
   }
 
@@ -50,13 +50,15 @@ if [ -z "${IGNORE_CAMB_COMPILATION}" ]; then
 
   unset_env_vars || return 1
 
+  CCIL="${ROOTDIR:?}/../cocoa_installation_libraries"
+
   # ---------------------------------------------------------------------------
   
   ptop 'INSTALLING CAMB' || return 1;
 
   URL="https://github.com/cmbant/CAMB"
 
-  CHANGES="${ROOTDIR:?}/../cocoa_installation_libraries/camb_changes"
+  CHANGES="${CCIL:?}/camb_changes"
 
   # E = EXTERNAL, CODE, F=FODLER
   ECODEF="${ROOTDIR:?}/external_modules/code"
@@ -75,7 +77,7 @@ if [ -z "${IGNORE_CAMB_COMPILATION}" ]; then
   # ---------------------------------------------------------------------------
   cdfolder "${ECODEF:?}" || { cdroot; return 1; }
 
-  ${GIT:?} clone $URL --recursive "${CAMBF:?}" \
+  ${GIT:?} clone "${URL:?}" --recursive "${CAMBF:?}" \
     >${OUT1:?} 2>${OUT2:?} || { error "${EC15:?}"; return 1; }
   
   cdfolder "${PACKDIR}" || { cdroot; return 1; }
@@ -87,11 +89,11 @@ if [ -z "${IGNORE_CAMB_COMPILATION}" ]; then
   
   # ---------------------------------------------------------------------------
   # ----------- Patch CAMB to be compatible w/ COCOA environment --------------
-  # We patch the files below so they use the right Fortran compiler
+  # We patch the files below so they use the right compilers
   # ---------------------------------------------------------------------------
   declare -a TFOLDER=("camb/" 
                       "fortran/" 
-                      "forutils/") # Must include /
+                      "forutils/") # If nonblank, path must include /
   
   # T = TMP
   declare -a TFILE=("_compilers.py" 
@@ -126,7 +128,9 @@ if [ -z "${IGNORE_CAMB_COMPILATION}" ]; then
   unset_all || return 1
   
   pbottom2 'SETUP_CAMB' || return 1
+
 fi
+
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------

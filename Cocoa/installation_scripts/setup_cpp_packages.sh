@@ -16,7 +16,7 @@ if [ -z "${IGNORE_CPP_INSTALLATION}" ]; then
   }
   
   unset_env_funcs () {
-    unset -f cdfolder cpfolder error
+    unset -f cdfolder cpfolder error cpfile
     unset -f unset_env_funcs
     cdroot || return 1;
   }
@@ -35,6 +35,16 @@ if [ -z "${IGNORE_CPP_INSTALLATION}" ]; then
   
   cdfolder() {
     cd "${1:?}" 2>"/dev/null" || { error "CD FOLDER: ${1}"; return 1; }
+  }
+
+  cpfolder() {
+    cp -r "${1:?}" "${2:?}" \
+      2>"/dev/null" || { error "CP FOLDER ${1} on ${2}"; return 1; }
+  }
+
+ cpfile() {
+    cp "${1:?}" "${2:?}" \
+      2>"/dev/null" || { error "CP FILE ${1} on ${2}"; return 1; }
   }
   
   # ----------------------------------------------------------------------------
@@ -125,13 +135,11 @@ if [ -z "${IGNORE_CPP_INSTALLATION}" ]; then
     rm -rf "${ROOTDIR:?}/.local/include/carma/"   
     
     mkdir "${ROOTDIR:?}/.local/include/carma/" \
-      2>${OUT2:?} || { error "(CARMA) ${EC20:?}"; return 1; }
+      2>${OUT2:?} || { error "${EC20:?}"; return 1; }
     
-    cp "${PACKDIR:?}/carma.h" "${ROOTDIR:?}/.local/include/" || 
-      { error "(CARMA) CP CARMA HEADER"; return 1; }
+    cpfile "${PACKDIR:?}/carma.h" "${ROOTDIR:?}/.local/include/" || return 1
 
-    cp -r "${PACKDIR:?}/carma_bits" "${ROOTDIR:?}/.local/include/" || 
-      { error "(CARMA) CP CARMA_BITS"; return 1; }
+    cpfolder "${PACKDIR:?}/carma_bits" "${ROOTDIR:?}/.local/include/" || return 1
 
     pbottom 'INSTALLING CARMA C++ LIBRARY' || return 1
 
@@ -173,6 +181,7 @@ if [ -z "${IGNORE_CPP_INSTALLATION}" ]; then
   pbottom2 'SETUP_CPP_PACKAGES DONE' || return 1
 
 fi
+
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------

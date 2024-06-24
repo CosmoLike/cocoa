@@ -34,7 +34,7 @@ if [ -z "${IGNORE_HDF5_INSTALLATION}" ]; then
   }
     
   cdfolder() {
-    cd "${1:?}" 2>"/dev/null" || { fail_shdf5 "CD FOLDER: ${1}"; return 1; }
+    cd "${1:?}" 2>"/dev/null" || { error "CD FOLDER: ${1}"; return 1; }
   }
   
   # ----------------------------------------------------------------------------
@@ -52,29 +52,27 @@ if [ -z "${IGNORE_HDF5_INSTALLATION}" ]; then
   ptop 'INSTALLING HFD5 LIBRARY' || return 1;
   
   PACKDIR="${CCIL:?}/${COCOA_HDF5_DIR:-"hdf5-1.12.3/"}"
-  BDF="cocoa_HDF5_build"
+  BDF="${PACKDIR:?}/cocoa_HDF5_build"
 
   rm -f  "${PACKDIR:?}/CMakeCache.txt"
   rm -rf "${PACKDIR:?}/CMakeFiles/"
-  rm -rf "${PACKDIR:?}/${BDF:?}/"
+  rm -rf "${BDF:?}/"
   
-  mkdir "${PACKDIR:?}/${BDF:?}" 2>${OUT2:?} || 
-    { fail_shdf5 "MKDIR COCOA_HDF5_BUILD"; return 1; }
+  mkdir "${BDF:?}" 2>${OUT2:?} || { error "${EC20:?}"; return 1; }
 
-  cdfolder "${PACKDIR:?}/${BDF:?}" || return 1;
+  cdfolder "${BDF:?}" || return 1;
 
   "${CMAKE:?}" -DBUILD_SHARED_LIBS=TRUE \
     -DCMAKE_INSTALL_PREFIX="${ROOTDIR:?}/.local" \
     -DCMAKE_C_COMPILER="${C_COMPILER:?}" \
     -DCMAKE_CXX_COMPILER="${CXX_COMPILER:?}" \
     -DCMAKE_FC_COMPILER="${FORTRAN_COMPILER:?}" \
-    --log-level=ERROR .. >${OUT1:?} 2>${OUT2:?} || 
-    { fail_shdf5 "CMAKE"; return 1; }
+    --log-level=ERROR .. \
+    >${OUT1:?} 2>${OUT2:?} || { error "${EC12:?}"; return 1; }
 
-  make -j $MNT >${OUT1:?} 2>${OUT2:?} || { fail_shdf5 "MAKE"; return 1; }
+  make -j $MNT >${OUT1:?} 2>${OUT2:?} || { error "${EC8:?}"; return 1; }
 
-  make install >${OUT1:?} 2>${OUT2:?} || 
-    { fail_shdf5 "MAKE INSTALL"; return 1; }
+  make install >${OUT1:?} 2>${OUT2:?} || { error "${EC10:?}"; return 1; }
 
   cdfolder "${ROOTDIR}" || return 1;
 
@@ -88,6 +86,6 @@ if [ -z "${IGNORE_HDF5_INSTALLATION}" ]; then
 
 fi
 
-# ----------------------------------------------------------------------------
-# ----------------------------------------------------------------------------
-# ----------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
