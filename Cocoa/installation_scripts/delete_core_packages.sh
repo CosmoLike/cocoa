@@ -19,7 +19,7 @@ unset_all () {
 }
 
 error () {
-  fail_script_msg "clean_required.sh" "${1}"
+  fail_script_msg "delete_core_packages.sh" "${1}"
   unset_all
   cdroot || return 1;
 }
@@ -32,7 +32,7 @@ cdfolder() {
 # ---------------------------------------------------------------------------
 # ----------------------------------------------------------------------------
 
-ptop 'CLEANING COCOA CORE LIBRARIES' || return 1
+ptop2 'DELETING CORE PACKAGES' || return 1
 
 cdfolder "${ROOTDIR:?}/../cocoa_installation_libraries" || return 1
 
@@ -42,7 +42,7 @@ cdfolder "${ROOTDIR:?}/../cocoa_installation_libraries" || return 1
 unset -v SETUP_PREREQUISITE_DONE
 unset_all || return 1;
 
-pbottom 'CLEANING COCOA CORE LIBRARIES' || return 1
+pbottom2 'DELETING CORE PACKAGES' || return 1
 
 # ----------------------------------------------------------------------------
 # ----------------------------------------------------------------------------
