@@ -488,7 +488,7 @@ if [ -z "${IGNORE_CPP_CARMA_INSTALLATION}" ]; then
 
   gitact1 "${FOLDER}" "${VER}" "${URL}" || return 1;
 
-  # ---------------------------------------------------------------------------
+  # -------------------------------------------------------------------------
   # In case this script runs twice (after sudden break w/ CTRL-C)
   rm -rf "${PACKDIR:?}"
   rm -rf "${CCIL:?}/include"
@@ -516,7 +516,7 @@ if [ -z "${IGNORE_CPP_CARMA_INSTALLATION}" ]; then
 
 fi
 
-# ------------------------------------------------------------------------------
+# ----------------------------------------------------------------------------
 
 unset_all || return 1;
 
