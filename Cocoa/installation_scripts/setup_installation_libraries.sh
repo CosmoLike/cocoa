@@ -178,6 +178,8 @@ if [ -z "${IGNORE_CMAKE_INSTALLATION}" ]; then
   gitact "${FOLDER}" "${VER}" "${URL}" \
     "${COCOA_CMAKE_DIR:-"cmake-3.26.4"}" "${XZF}" || return 1;
 
+  unset -v URL FOLDER VER XZF
+
   pbottom "GETTING CMAKE LIBRARY" || return 1;
 
 fi
@@ -200,6 +202,8 @@ if [ -z "${IGNORE_DISTUTILS_INSTALLATION}" ]; then
 
   wgetact "${FOLDER}" "${FILE}" "${URL}" \
     "${COCOA_BINUTILS_DIR:-"binutils-2.37"}" "${XZF}" || return 1;
+
+  unset -v URL FOLDER FILE XZF
 
   pbottom "GETTING BINUTILS LIBRARY" || return 1;
 
@@ -224,6 +228,8 @@ if [ -z "${IGNORE_DISTUTILS_INSTALLATION}" ]; then || return 1;
   wgetact "${FOLDER}" "${FILE}" "${URL}" \
     "${COCOA_TEXINFO_DIR:-"texinfo-7.0.3"}" "${XZF}" || return 1;
 
+  unset -v URL FOLDER FILE XZF
+
   pbottom "GETTING TEXINFO LIBRARY" || return 1;
 
 fi
@@ -246,6 +252,8 @@ if [ -z "${IGNORE_OPENBLAS_INSTALLATION}" ]; then
 
   gitact "${FOLDER}" "${VER}" "${URL}" \
     "${COCOA_OPENBLAS_DIR:-"OpenBLAS-0.3.23"}" "${XZF}" || return 1;
+
+  unset -v URL FOLDER VER XZF
 
   pbottom "GETTING OPENBLAS LIBRARY" || return 1;
 
@@ -270,6 +278,8 @@ if [ -z "${IGNORE_FORTRAN_LAPACK_INSTALLATION}" ]; then
   gitact "${FOLDER}" "${VER}" "${URL}" \
     "${COCOA_LAPACK_DIR:-"lapack-3.11.0"}" "${XZF}" || return 1;
 
+  unset -v URL FOLDER VER XZF
+
   pbottom "GETTING LAPACK LIBRARY DONE" || return 1;
 
 fi
@@ -293,7 +303,9 @@ if [ -z "${IGNORE_HDF5_INSTALLATION}" ]; then
 
   wgetact "${FOLDER}" "${FILE}" "${URL}" \
     "${COCOA_HDF5_DIR:-"hdf5-1.12.3"}" "${XZF}" || return 1;
-  
+
+  unset -v URL_BASE URL FOLDER FILE XZF
+
   pbottom "GETTING HDF5 LIBRARY DONE" || return 1;
 
 fi
@@ -317,7 +329,9 @@ if [ -z "${IGNORE_C_CFITSIO_INSTALLATION}" ]; then
 
   wgetact "${FOLDER}" "${FILE}" "${URL}" \ 
     "${COCOA_CFITSIO_DIR:-"cfitsio-4.0.0"}" "${XZF}" || return 1;
-  
+
+  unset -v URL_BASE URL FOLDER FILE XZF
+
   pbottom "GETTING CFITSIO LIBRARY DONE" || return 1;
 
 fi
@@ -340,6 +354,8 @@ if [ -z "${IGNORE_C_FFTW_INSTALLATION}" ]; then
 
   wgetact "${FOLDER}" "${FILE}" "${URL}" \
     "${COCOA_FFTW_DIR:-"fftw-3.3.10"}" "${XZF}" || return 1;
+
+  unset -v URL FOLDER FILE XZF
 
   pbottom "GETTING FFTW LIBRARY DONE" || return 1;
 
@@ -364,6 +380,8 @@ if [ -z "${IGNORE_C_GSL_INSTALLATION}" ]; then
   wgetact "${FOLDER}" "${FILE}" "${URL}" \ 
     "${COCOA_GSL_DIR:-"gsl-2.7"}" "${XZF}" || return 1;
 
+  unset -v URL FOLDER FILE XZF
+
   pbottom "GETTING GSL LIBRARY DONE" || return 1;
 
 fi
@@ -387,6 +405,8 @@ if [ -z "${IGNORE_CPP_SPDLOG_INSTALLATION}" ]; then
   gitact "${FOLDER}" "${VER}" "${URL}" \
     "${COCOA_SPDLOG_DIR:-"spdlog"}" "${XZF}" || return 1;
 
+  unset -v URL FOLDER VER XZF
+
   pbottom "GETTING SPDLOG LIBRARY" || return 1;
 
 fi
@@ -409,6 +429,8 @@ if [ -z "${IGNORE_CPP_ARMA_INSTALLATION}" ]; then
 
   wgetact "${FOLDER}" "${FILE}" "${URL}" \
     "${COCOA_ARMADILLO_DIR:-"armadillo-12.8.2"}" "${XZF}" || return 1;
+
+  unset -v URL FOLDER FILE XZF
 
   pbottom "GETTING ARMA LIBRARY DONE" || return 1;
 
@@ -437,6 +459,8 @@ if [ -z "${IGNORE_CPP_BOOST_INSTALLATION}" ]; then
 
   wgetact "${FOLDER}" "${FILE}" "${URL}" \
     "${COCOA_BOOST_DIR:-"boost_1_81_0"}" "${XZF}" || return 1;
+
+  unset -v URL_BASE URL FOLDER FILE XZF
 
   pbottom "GETTING BOOST LIBRARY" || return 1;
 
@@ -485,6 +509,8 @@ if [ -z "${IGNORE_CPP_CARMA_INSTALLATION}" ]; then
   # -------------------------------------------------------------------------
   
   gitact2 "${CNAME}" "${CNAME}" "${XZF}" || return 1; 
+
+  unset -v CNAME PACKDIR URL FOLDER VER XZF
 
   pbottom "GETTING CARMA LIBRARY DONE" || return 1;
 

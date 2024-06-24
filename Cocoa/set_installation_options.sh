@@ -6,18 +6,24 @@ source ./installation_scripts/impl_unset_keys.sh
 export ROOTDIR=$(pwd -P)
 
 # ------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # ----------------------- HOW COCOA SHOULD BE INSTALLED? -----------------------
+# ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
 export MINICONDA_INSTALLATION=1
 #export MANUAL_INSTALLATION=1
 
 # ------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # --------------------------- VERBOSE AS DEBUG TOOL ----------------------------
+# ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
 #export COCOA_OUTPUT_VERBOSE=1
 
 # ------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # --- SKIP DOWNLOAD/DECOMPRESSING DATASET (SAVE TIME WHEN INSTALLING COCOA) ----
+# ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
 # export SKIP_DECOMM_ACT
 # export SKIP_DECOMM_SPT
@@ -31,8 +37,10 @@ export SKIP_DECOMM_CAMSPEC=1
 export SKIP_DECOMM_LIPOP=1
 
 # ------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # ---- IF DEFINED, COSMOLIKE WILL BE COMPILED WITH DEBUG FLAG ------------------
 # ---- DEBUG FLAG = ALL COMPILER WARNINGS + NO MATH OPTIMIZATION + NO OPENMP ---
+# ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
 export COSMOLIKE_DEBUG_MODE=1
 
@@ -42,7 +50,9 @@ export COSMOLIKE_DEBUG_MODE=1
 export USE_SPT_CLIK_PLANCK=1
 
 # ------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # --------------- CONTROL OVER THE COMPILATION OF EXTERNAL CODES ---------------
+# ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
 #export IGNORE_CAMB_COMPILATION=1
 #export IGNORE_CLASS_COMPILATION=1
@@ -60,17 +70,17 @@ export USE_SPT_CLIK_PLANCK=1
 # ------------------------------------------------------------------------------
 export MAKE_NUM_THREADS=4
 
-# --------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # IF NOT SET, COCOA WILL INSTALL TENSORFLOW, KERAS, AND PYTORCH 
-# --------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 export IGNORE_EMULATOR_CPU_PIP_PACKAGES=1
 export IGNORE_EMULATOR_GPU_PIP_PACKAGES=1
 
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
-# ------------------------------------------------------------------------------
 # ---------------------- DERIVED & RARELY USED FLAGS ---------------------------
-# ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
 
@@ -88,30 +98,11 @@ fi
 source .flags_derived.sh || return 1
 
 # ------------------------------------------------------------------------------
-
-export COCOA_RUN_EVALUATE="mpirun -n 1 --oversubscribe --mca btl vader,tcp,self --bind-to core:overload-allowed --rank-by core --map-by numa:pe=4 cobaya-run"
-
-export COCOA_RUN_MCMC="mpirun -n 4 --oversubscribe --mca btl vader,tcp,self --bind-to core:overload-allowed --rank-by core --map-by numa:pe=4 cobaya-run"
-
-# ------------------------------------------------------------------------------
-# DEBUG THE COMPILATION OF PREREQUISITES PACKAGES. IF YOU NEED TO RUN ----------
-# SETUP_COCOA_INSTALLATION_PACKAGES >1x AND WANT TO SKIP FILE DECOMPRESSION ----
-# ------------------------------------------------------------------------------
-#export DEBUG_SKIP_FILE_DECOMPRESSION_SETUP_COCOA=1
-
-# ------------------------------------------------------------------------------
-# ---------------------------- PACKAGE LOCATION --------------------------------
-# ------------------------------------------------------------------------------
-export COCOA_SPDLOG_DIR=spdlog/
-export COCOA_CARMA_DIR=carma/
-export CAMB_NAME='CAMB'
-export POLY_NAME="PolyChordLite"
-export CLASS_NAME="class_public"
-export ACT_NAME="pyactlike"
-
 # ------------------------------------------------------------------------------
 # ----- PACKAGE URL AND VERSIONS. CHANGES IN THE COMMIT ID MAY BREAK COCOA -----
 # ------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
+
 export COBAYA_URL="https://github.com/CobayaSampler/cobaya.git"
 export COBAYA_GIT_COMMIT="2636ea9ed399c35c5d276de1acb15aaafbcab10c"
 
@@ -129,12 +120,17 @@ export HOLICOW_DATA_GIT_COMMIT="f792647d1fd6c09d9e052fef526669cbd702ab82"
 
 export POLY_URL="https://github.com/PolyChord/PolyChordLite.git"
 export POLYCHORD_GIT_COMMIT="daba49d1385d065122db76a2b384050f9e95d278"
+export POLY_NAME="PolyChordLite"
 
 export CAMB_URL="https://github.com/cmbant/CAMB"
 export CAMB_GIT_COMMIT="45d1c3d27e7480c0f9a82c98522c17ed422dd408"
+export CAMB_NAME='CAMB'
 
 export CLASS_URL="https://github.com/lesgourg/class_public.git"
 export CLASS_GIT_COMMIT="8df566c1ff2d0b3e40e106567c435575aea337be"
+export CLASS_NAME="class_public"
+
+export ACT_NAME="pyactlike"
 
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
