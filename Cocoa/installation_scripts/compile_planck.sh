@@ -77,7 +77,7 @@ if [ -z "${IGNORE_PLANCK_COMPILATION}" ]; then
   fi
   
   FC="${FORTRAN_COMPILER:?}" CC="${C_COMPILER:?}" CXX="${CXX_COMPILER:?}" \
-    ${PYTHON3:?} waf configure \
+    "${PYTHON3:?}" waf configure \
     --gcc --gfortran --cfitsio_islocal \
     --prefix "${ROOTDIR:?}/.local" \
     --lapack_prefix="${CLIK_LAPALIBS:?}" \

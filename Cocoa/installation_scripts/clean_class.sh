@@ -35,7 +35,7 @@ if [ -z "${IGNORE_CLASS_COMPILATION}" ]; then
   }
   
   cdfolder() {
-    cd "${1:?}" 2>"/dev/null" || { error "CD FOLDER ${1}"; return 1; }
+    cd "${1:?}" 2>"/dev/null" || { error "CD FOLDER: ${1}"; return 1; }
   }
   
   # ---------------------------------------------------------------------------
@@ -58,6 +58,7 @@ if [ -z "${IGNORE_CLASS_COMPILATION}" ]; then
   
   # ---------------------------------------------------------------------------
   # below we ignore if something goes wrong (related to include/ relocation)
+  # ---------------------------------------------------------------------------
   "${PYTHON3:?}" setup.py clean >${OUT1:?} 2>${OUT2:?}
 
   rm -rf "${PLIB:?}"/classy*

@@ -85,7 +85,8 @@ if [ -z "${IGNORE_DISTUTILS_INSTALLATION}" ]; then
   cdfolder "${PACKDIR}" || return 1;
 
   FC="${FORTRAN_COMPILER:?}" CC="${C_COMPILER:?}" \
-    ./configure --prefix="${ROOTDIR:?}/.local" \
+    ./configure \
+    --prefix="${ROOTDIR:?}/.local" \
     >${OUT1:?} 2>${OUT2:?} || { error "${EC11:?}"; return 1; }
 
   make -j $MNT \
@@ -98,7 +99,6 @@ if [ -z "${IGNORE_DISTUTILS_INSTALLATION}" ]; then
 
   pbottom 'INSTALLING BINUTILS LIBRARY' || return 1;
   
-  # ----------------------------------------------------------------------------
   # ----------------------------------------------------------------------------
   
   unset_all || return 1;

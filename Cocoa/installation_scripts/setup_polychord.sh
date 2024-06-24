@@ -62,7 +62,7 @@ if [ -z "${IGNORE_POLYCHORD_COMPILATION}" ]; then
 
   ptop  'INSTALLING POLYCHORD' || return 1;
 
-  URL="https://github.com/PolyChord/PolyChordLite.git"
+  URL="${POLY_URL:-"https://github.com/PolyChord/PolyChordLite.git"}"
     
   CHANGES="${CCIL:?}/polychord_changes"
 

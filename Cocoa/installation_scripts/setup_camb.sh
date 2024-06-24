@@ -57,7 +57,7 @@ if [ -z "${IGNORE_CAMB_COMPILATION}" ]; then
   
   ptop 'INSTALLING CAMB' || return 1;
 
-  URL="https://github.com/cmbant/CAMB"
+  URL="${CAMB_URL:-"https://github.com/cmbant/CAMB"}"
 
   CHANGES="${CCIL:?}/camb_changes"
 

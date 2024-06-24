@@ -5,8 +5,7 @@
 if [ -z "${IGNORE_POLYCHORD_COMPILATION}" ]; then
   
   if [ -z "${ROOTDIR}" ]; then
-    echo -e "\033[0;31m\t\t ERROR ENV VARIABLE ${ROOTDIR} NOT DEFINED \033[0m"
-    return 1
+    pfail 'ROOTDIR'; return 1
   fi
   
   # ----------------------------------------------------------------------------
@@ -63,7 +62,7 @@ if [ -z "${IGNORE_POLYCHORD_COMPILATION}" ]; then
     >${OUT1:?} 2>${OUT2:?} || { error "${EC8:?}"; return 1; }
 
   CC="${MPI_CC_COMPILER:?}" CXX="${MPI_CXX_COMPILER:?}" \
-    ${PYTHON3:?} setup.py install --prefix "${ROOTDIR:?}/.local" \
+    "${PYTHON3:?}" setup.py install --prefix "${ROOTDIR:?}/.local" \
     >${OUT1:?} 2> ${OUT2:?} || { error "${EC9:?}"; return 1; }
 
   unset_all || return 1;

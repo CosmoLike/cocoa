@@ -31,7 +31,7 @@ if [ -z "${IGNORE_PLANCK_COMPILATION}" ]; then
   
   error () {
     fail_script_msg "clean_planck.sh" "${1}"
-    unset_all || return 1;
+    unset_all || return 1
   }
   
   cdfolder() {
@@ -43,6 +43,8 @@ if [ -z "${IGNORE_PLANCK_COMPILATION}" ]; then
   # ---------------------------------------------------------------------------
   
   ptop 'CLEANING PLANCK LIKELIHOOD' || return 1
+
+  unset_env_vars || return 1
 
   ECF="external_modules/code/planck/code"
   
@@ -61,7 +63,7 @@ if [ -z "${IGNORE_PLANCK_COMPILATION}" ]; then
   rm -f  .lock-waf_*
 
   "${PYTHON3:?}" waf distclean \
-    >${OUT1:?} 2>${OUT2:?} || { error "${EC18\?}"; return 1; }
+    >${OUT1:?} 2>${OUT2:?} || { error "${EC18:?}"; return 1; }
 
   unset_all || return 1
   

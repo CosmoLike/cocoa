@@ -95,7 +95,7 @@ if [ -z "${IGNORE_ALL_COBAYA_INSTALLATION}" ]; then
     #---------------------------------------------------------------------------
     cdfolder "${ROOTDIR}" || return 1;
     
-    URL="https://github.com/CobayaSampler/cobaya.git"
+    URL="${COBAYA_URL:-https://github.com/CobayaSampler/cobaya.git}"
 
     "${GIT:?}" clone "${URL:?}" cobaya \
       >${OUT1:?} 2>${OUT2:?} || { error "${EC15:?}"; return 1; }
@@ -362,7 +362,7 @@ if [ -z "${IGNORE_ALL_COBAYA_INSTALLATION}" ]; then
 
     TFOLDER="planck_2020_hillipop"
     
-    URL="https://github.com/planck-npipe/hillipop.git"
+    URL="${HILLIPOP_URL:-"https://github.com/planck-npipe/hillipop.git"}"
     
     flipop "${TFOLDER:?}" "${URL:?}" "${HILLIPOP_GIT_COMMIT:-"HEAD~"}"
     
@@ -378,7 +378,7 @@ if [ -z "${IGNORE_ALL_COBAYA_INSTALLATION}" ]; then
 
     TFOLDER="planck_2020_lollipop"
     
-    URL="https://github.com/planck-npipe/lollipop.git"
+    URL="${LOLLIPOP_URL:-"https://github.com/planck-npipe/lollipop.git"}"
     
     flipop "${TFOLDER:?}" "${URL:?}" "${LOLLIPOP_GIT_COMMIT:-"HEAD~"}"
     

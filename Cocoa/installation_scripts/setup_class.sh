@@ -55,7 +55,7 @@ if [ -z "${IGNORE_CLASS_COMPILATION}" ]; then
 
   ptop 'INSTALLING CLASS' || return 1
 
-  URL="https://github.com/lesgourg/class_public.git"
+  URL="${CLASS_URL:-"https://github.com/lesgourg/class_public.git"}"
   
   CHANGES="${ROOTDIR:?}/../cocoa_installation_libraries/class_changes"
 

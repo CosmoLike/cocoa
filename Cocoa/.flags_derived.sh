@@ -146,3 +146,22 @@ export EC21="B2"
 export EC22="SHELL SCRIPT"
 
 export EC23="GIT RESET"
+
+# ------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
+export COCOA_RUN_EVALUATE="mpirun -n 1 --oversubscribe --mca btl vader,tcp,self --bind-to core:overload-allowed --rank-by core --map-by numa:pe=4 cobaya-run"
+
+export COCOA_RUN_MCMC="mpirun -n 4 --oversubscribe --mca btl vader,tcp,self --bind-to core:overload-allowed --rank-by core --map-by numa:pe=4 cobaya-run"
+
+# ------------------------------------------------------------------------------
+# DEBUG THE COMPILATION OF PREREQUISITES PACKAGES. IF YOU NEED TO RUN ----------
+# SETUP_COCOA_INSTALLATION_PACKAGES >1x AND WANT TO SKIP FILE DECOMPRESSION ----
+# ------------------------------------------------------------------------------
+#export DEBUG_SKIP_FILE_DECOMPRESSION_SETUP_COCOA=1
+
+# ------------------------------------------------------------------------------
+# -------- PACKAGE LOCATION (DEBUG/RARELY MODIFIED FLAGS) ----------------------
+# ------------------------------------------------------------------------------
+export COCOA_SPDLOG_DIR=spdlog/
+
+export COCOA_CARMA_DIR=carma/
