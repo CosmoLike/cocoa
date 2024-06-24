@@ -10,7 +10,8 @@ if [ -z "${IGNORE_ACT_COMPILATION}" ]; then
   
   # ---------------------------------------------------------------------------
   # Clean any previous compilation. Parenthesis = run in a subshell
-  ( source "${ROOTDIR:?}/installation_scripts/clean_act.sh" ) || return 1
+  ( TMP="${ROOTDIR:?}/installation_scripts/clean"; 
+    source "${TMP:?}/clean_compile_act.sh" ) || return 1
   # ---------------------------------------------------------------------------
   
   ( source "${ROOTDIR:?}/installation_scripts/.check_flags.sh" ) || return 1;

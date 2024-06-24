@@ -3,58 +3,79 @@
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
 if [ -z "${SKIP_DECOMM_CAMSPEC}" ]; then
+  
   if [ -z "${ROOTDIR}" ]; then
-      echo 'ERROR ROOTDIR not defined'
-      return
+    pfail 'ROOTDIR'; return 1;
   fi
 
-  if [ -z "${DEBUG_UNXV_CLEAN_ALL}" ]; then
-    export OUT1="/dev/null"
-    export OUT2="/dev/null"
-  else
-    export OUT1="/dev/tty"
-    export OUT2="/dev/tty"
-  fi
+  unset_env_vars () {
+    unset -v EDATAF DATAF PACKDIR FILE URL_BASE URL
+    cdroot || return 1;
+  }
 
-  cd $ROOTDIR/external_modules/data
+  unset_env_funcs () {
+    unset -f cdfolder cpfolder error
+    unset -f unset_env_funcs
+    cdroot || return 1;
+  }
 
-  echo -e '\033[0;32m'"\t\t DECOMPRESSING CAMSPEC DATA"'\033[0m'
-
-  rm -f  $ROOTDIR/external_modules/data/planck/CamSpec/CamSpec2021.zip
-  rm -rf $ROOTDIR/external_modules/data/planck/CamSpec/CamSpec2021
-
-  cd  $ROOTDIR/external_modules/data/planck/CamSpec/
+  unset_all () {
+    unset_env_vars
+    unset_env_funcs
+    unset -f unset_all
+    cdroot || return 1;
+  }
   
-  export CAMSPEC_URL="https://github.com/CobayaSampler/planck_native_data/releases/download/v1/CamSpec2021.zip"
-
-  wget $CAMSPEC_URL > ${OUT1} 2> ${OUT2}
-  if [ $? -ne 0 ]; then 
-    echo -e '\033[0;31m'"\t\t DECOMPRESSING CAMSPEC FAILED"'\033[0m'
-    cd $ROOTDIR
-    unset OUT1
-    unset OUT2
-    unset CAMSPEC_URL
-    return 1
-  fi
+  error () {
+    fail_script_msg "unxv_camspec.sh" "${1}"
+    unset_all || return 1
+  }
   
-  unzip CamSpec2021.zip > ${OUT1} 2> ${OUT2}
-  if [ $? -ne 0 ]; then
-    echo -e '\033[0;31m'"\t\t DECOMPRESSING CAMSPEC FAILED"'\033[0m'
-    cd $ROOTDIR
-    unset OUT1
-    unset OUT2
-    unset CAMSPEC_URL
-    return 1
-  fi
+  cdfolder() {
+    cd "${1:?}" 2>"/dev/null" || { error "CD FOLDER ${1}"; return 1; }
+  }
 
-  rm -f  $ROOTDIR/external_modules/data/planck/CamSpec/CamSpec2021.zip
+  # --------------------------------------------------------------------------- 
+  # --------------------------------------------------------------------------- 
+  # ---------------------------------------------------------------------------
 
-  cd $ROOTDIR/
-  unset OUT1
-  unset OUT2
-  unset CAMSPEC_URL
-  echo -e '\033[0;32m'"\t\t DECOMPRESSING CAMSPEC DATA DONE"'\033[0m'
+  ptop "DECOMPRESSING CAMSPEC DATA" || return 1
+
+  unset_env_vars || return 1
+
+  # E = EXTERNAL, DATA, F=FODLER
+  EDATAF="${ROOTDIR:?}/external_modules/data/planck/CamSpec"
+  
+  DATAF="CamSpec2021"
+
+  # PACK = PACKAGE, DIR = DIRECTORY
+  PACKDIR="${EDATAF:?}/${DATAF:?}"
+
+  URL_BASE="https://github.com/CobayaSampler/planck_native_data/"
+
+  FILE="CamSpec2021.zip"
+
+  URL="${URL_BASE:?}/releases/download/v1/${FILE:?}"
+
+  # ---------------------------------------------------------------------------
+  # in case this script is called twice
+  # ---------------------------------------------------------------------------
+  rm -rf "${PACKDIR:?}"
+  rm -rf "${EDATAF:?}/${FILE:?}"
+  
+  cdfolder "${EDATAF:?}" || return 1
+
+  wget "${URL:?}" >${OUT1:?} 2>${OUT2:?} || { error "${EC24:?}"; return 1; }
+  
+  unzip "${FILE:?}" \
+    >${OUT1:?} 2>${OUT2:?} || { error "${EC26:?}"; return 1; }
+  
+  unset_all || return 1
+  
+  pbottom 'DECOMPRESSING CAMSPEC DATA' || return 1
+
 fi
+
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------

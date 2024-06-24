@@ -8,7 +8,8 @@ if [ -z "${IGNORE_FORTRAN_INSTALLATION}" ]; then
     pfail 'ROOTDIR'; return 1
   fi
 
-  source "${ROOTDIR:?}/installation_scripts/.check_flags.sh" || return 1;
+  # Parenthesis = run in a subshell
+  ( source "${ROOTDIR:?}/installation_scripts/.check_flags.sh" ) || return 1;
       
   unset_env_vars () {
     unset -v CCIL PACKDIR BUILDIR
@@ -41,7 +42,7 @@ if [ -z "${IGNORE_FORTRAN_INSTALLATION}" ]; then
   # ----------------------------------------------------------------------------
   # ----------------------------------------------------------------------------
   
-  ptop2 'SETUP_FORTRAN_PACKAGES' || return 1;
+  ptop2 'COMPILE_CORE_FORTRAN_PACKAGES' || return 1;
 
   unset_env_vars || return 1; 
 
@@ -52,9 +53,10 @@ if [ -z "${IGNORE_FORTRAN_INSTALLATION}" ]; then
   # ----------------------------------------------------------------------------
   if [ -z "${IGNORE_FORTRAN_LAPACK_INSTALLATION}" ]; then
     
-    ptop 'INSTALLING LAPACK FORTRAN LIBRARY' || return 1;
+    ptop 'COMPILING LAPACK FORTRAN LIBRARY' || return 1;
 
     PACKDIR="${COCOA_LAPACK_DIR:-"lapack-3.11.0/"}"
+    
     BUILDIR="${CCIL:?}/lapack-build"
 
     rm -rf "${BUILDIR:?}"
@@ -75,7 +77,7 @@ if [ -z "${IGNORE_FORTRAN_INSTALLATION}" ]; then
     
     cdfolder "${ROOTDIR}" || return 1;
 
-    pbottom 'INSTALLING LAPACK FORTRAN LIBRARY' || return 1;
+    pbottom 'COMPILING LAPACK FORTRAN LIBRARY' || return 1;
 
   fi
 
@@ -83,7 +85,7 @@ if [ -z "${IGNORE_FORTRAN_INSTALLATION}" ]; then
   
   unset_all || return 1; 
   
-  pbottom2 'SETUP_FORTRAN_PACKAGES' || return 1;
+  pbottom2 'COMPILE_CORE_FORTRAN_PACKAGES' || return 1;
 
 fi
 

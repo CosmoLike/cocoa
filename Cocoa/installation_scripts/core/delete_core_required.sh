@@ -32,7 +32,7 @@ cdfolder() {
 # ---------------------------------------------------------------------------
 # ----------------------------------------------------------------------------
 
-ptop 'CLEANING COCOA REQUIRED LIBRARIES' || return 1
+ptop 'CLEANING COCOA CORE LIBRARIES' || return 1
 
 cdfolder "${ROOTDIR:?}/../cocoa_installation_libraries" || return 1
 
@@ -42,7 +42,7 @@ cdfolder "${ROOTDIR:?}/../cocoa_installation_libraries" || return 1
 unset -v SETUP_PREREQUISITE_DONE
 unset_all || return 1;
 
-pbottom 'CLEANING COCOA REQUIRED LIBRARIES' || return 1
+pbottom 'CLEANING COCOA CORE LIBRARIES' || return 1
 
 # ----------------------------------------------------------------------------
 # ----------------------------------------------------------------------------

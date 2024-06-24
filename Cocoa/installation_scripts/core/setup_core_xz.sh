@@ -42,7 +42,7 @@ if [ -z "${IGNORE_XZ_INSTALLATION}" ]; then
   # ---------------------------------------------------------------------------
   # ----------------------------------------------------------------------------
 
-  ptop2 "SETUP_XZ" || return 1;
+  ptop2 "SETUP_CORE_XZ" || return 1;
 
   unset_env_vars || return 1;
   
@@ -50,7 +50,7 @@ if [ -z "${IGNORE_XZ_INSTALLATION}" ]; then
 
   # ----------------------------------------------------------------------------
   
-  ptop "INSTALLING XZ LIBRARY" || return 1;
+  ptop "INSTALLING AND COMPILING XZ LIBRARY" || return 1;
 
   cdfolder "${CCIL}" || return 1;
 
@@ -78,7 +78,7 @@ if [ -z "${IGNORE_XZ_INSTALLATION}" ]; then
   
   unset_all || return 1;
 
-  pbottom2 "SETUP_XZ" || return 1;
+  pbottom2 "INSTALLING AND COMPILING XZ LIBRARY" || return 1;
 
 fi
 

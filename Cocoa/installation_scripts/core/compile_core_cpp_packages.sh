@@ -8,7 +8,8 @@ if [ -z "${IGNORE_CPP_INSTALLATION}" ]; then
     pfail 'ROOTDIR'; return 1;
   fi
 
-  source "${ROOTDIR:?}/installation_scripts/.check_flags.sh" || return 1;
+  # Parenthesis = run in a subshell
+  ( source "${ROOTDIR:?}/installation_scripts/.check_flags.sh" ) || return 1;
     
   unset_env_vars () {
     unset -v CCIL PACKDIR
@@ -51,7 +52,7 @@ if [ -z "${IGNORE_CPP_INSTALLATION}" ]; then
   # ----------------------------------------------------------------------------
   # ----------------------------------------------------------------------------
   
-  ptop2 'SETUP_CPP_PACKAGES' || return 1
+  ptop2 'COMPILE_CORE_CPP_PACKAGES' || return 1
 
   CCIL="${ROOTDIR:?}/../cocoa_installation_libraries"
 
@@ -61,7 +62,7 @@ if [ -z "${IGNORE_CPP_INSTALLATION}" ]; then
   
   if [ -z "${IGNORE_CPP_SPDLOG_INSTALLATION}" ]; then
     
-    ptop 'INSTALLING SPDLOG C++ LIBRARY' || return 1
+    ptop 'COMPILING SPDLOG CPP LIBRARY' || return 1
 
     PACKDIR="${CCIL:?}/${COCOA_SPDLOG_DIR:-"spdlog/"}"
 
@@ -81,7 +82,7 @@ if [ -z "${IGNORE_CPP_INSTALLATION}" ]; then
 
     cdfolder "${ROOTDIR}" || return 1;
 
-    pbottom 'INSTALLING SPDLOG C++ LIBRARY' || return 1
+    pbottom 'COMPILING SPDLOG CPP LIBRARY' || return 1
 
   fi
 
@@ -91,7 +92,7 @@ if [ -z "${IGNORE_CPP_INSTALLATION}" ]; then
   
   if [ -z "${IGNORE_CPP_ARMA_INSTALLATION}" ]; then
     
-    ptop 'INSTALLING ARMADILLO C++ LIBRARY' || return 1
+    ptop 'COMPILING ARMADILLO CPP LIBRARY' || return 1
 
     PACKDIR="${CCIL:?}/${COCOA_ARMADILLO_DIR:-"armadillo-12.8.2/"}"
 
@@ -118,7 +119,7 @@ if [ -z "${IGNORE_CPP_INSTALLATION}" ]; then
 
     cdfolder "${ROOTDIR}" || return 1;
 
-    pbottom 'INSTALLING ARMADILLO C++ LIBRARY' || return 1
+    pbottom 'COMPILING ARMADILLO CPP LIBRARY' || return 1
 
   fi
 
@@ -128,7 +129,7 @@ if [ -z "${IGNORE_CPP_INSTALLATION}" ]; then
   
   if [ -z "${IGNORE_CPP_CARMA_INSTALLATION}" ]; then
     
-    ptop 'INSTALLING CARMA C++ LIBRARY' || return 1
+    ptop 'COMPILING CARMA CPP LIBRARY' || return 1
 
     PACKDIR="${CCIL:?}/${COCOA_CARMA_DIR:-"carma/"}"
 
@@ -141,7 +142,7 @@ if [ -z "${IGNORE_CPP_INSTALLATION}" ]; then
 
     cpfolder "${PACKDIR:?}/carma_bits" "${ROOTDIR:?}/.local/include/" || return 1
 
-    pbottom 'INSTALLING CARMA C++ LIBRARY' || return 1
+    pbottom 'COMPILING CARMA CPP LIBRARY' || return 1
 
   fi
 
@@ -151,7 +152,7 @@ if [ -z "${IGNORE_CPP_INSTALLATION}" ]; then
   
   if [ -z "${IGNORE_CPP_BOOST_INSTALLATION}" ]; then
 
-    ptop 'INSTALLING BOOST C++ LIBRARY' || return 1
+    ptop 'COMPILING BOOST CPP LIBRARY' || return 1
 
     PACKDIR="${CCIL:?}/${COCOA_BOOST_DIR:-"boost_1_81_0/"}"
 
@@ -170,7 +171,7 @@ if [ -z "${IGNORE_CPP_INSTALLATION}" ]; then
     
     cdfolder "${ROOTDIR}" || return 1;
 
-    pbottom 'INSTALLING BOOST C++ LIBRARY' || return 1
+    pbottom 'COMPILING BOOST CPP LIBRARY' || return 1
 
   fi
 
@@ -178,7 +179,7 @@ if [ -z "${IGNORE_CPP_INSTALLATION}" ]; then
  
   unset_all || return 1; 
   
-  pbottom2 'SETUP_CPP_PACKAGES DONE' || return 1
+  pbottom2 'COMPILE_CORE_CPP_PACKAGES DONE' || return 1
 
 fi
 

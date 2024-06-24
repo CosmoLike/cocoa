@@ -9,7 +9,7 @@ if [ -z "${SKIP_DECOMM_ACT}" ]; then
   fi
 
   unset_env_vars () {
-    unset -v EDATAF ACTDATAF PACKDIR URL_BASE FILE ACT_DATA_URL
+    unset -v EDATAF DATAF PACKDIR FILE URL_BASE URL
     cdroot || return 1;
   }
 
@@ -46,16 +46,16 @@ if [ -z "${SKIP_DECOMM_ACT}" ]; then
   # E = EXTERNAL, DATA, F=FODLER
   EDATAF="${ROOTDIR:?}/external_modules/data"
   
-  ACTDATAF="act"
+  DATAF="act"
 
   # PACK = PACKAGE, DIR = DIRECTORY
-  PACKDIR="${EDATAF:?}/${ACTDATAF:?}"
+  PACKDIR="${EDATAF:?}/${DATAF:?}"
 
   URL_BASE="https://lambda.gsfc.nasa.gov/data/suborbital/ACT"
 
   FILE="${ACT_DR6_DATA_FILE:-"ACT_dr6_likelihood_v1.2.tgz"}"
 
-  ACT_DATA_URL="${URL_BASE:?}/ACT_dr6/likelihood/data/${FILE:?}"
+  URL="${URL_BASE:?}/ACT_dr6/likelihood/data/${FILE:?}"
 
   # ---------------------------------------------------------------------------
   # in case this script is called twice
@@ -67,13 +67,10 @@ if [ -z "${SKIP_DECOMM_ACT}" ]; then
     
   cdfolder "${PACKDIR:?}/lensing" || return 1
 
-  wget "${ACT_DATA_URL:?}" \
-    >${OUT1:?} 2>${OUT2:?} || { error "${EC24:?}" || return 1 }
+  wget "${URL:?}" >${OUT1:?} 2>${OUT2:?} || { error "${EC24:?}"; return 1; }
 
   tar -zxvf "${FILE:?}" \
-    >${OUT1:?} 2>${OUT2:?} || { error "${EC25:?} (tgz)" || return 1 }
-
-  rm -f "${PACKDIR:?}/lensing/${FILE:?}"
+    >${OUT1:?} 2>${OUT2:?} || { error "${EC25:?}"; return 1; }
 
   unset_all || return 1
   

@@ -147,6 +147,11 @@ export EC22="SHELL SCRIPT"
 
 export EC23="GIT RESET"
 
+export EC24="WGET"
+
+export EC25="TAR (DECOMPRESS)"
+
+export EC26="UNZIP (DECOMPRESS)"
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
 export COCOA_RUN_EVALUATE="mpirun -n 1 --oversubscribe --mca btl vader,tcp,self --bind-to core:overload-allowed --rank-by core --map-by numa:pe=4 cobaya-run"

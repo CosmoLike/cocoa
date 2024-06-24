@@ -3,71 +3,85 @@
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
 if [ -z "${SKIP_DECOMM_STRONG_LENSING}" ]; then
+
   if [ -z "${ROOTDIR}" ]; then
-      echo 'ERROR ROOTDIR not defined'
-      return
-  fi
-  if [ -z "${GIT}" ]; then
-    echo -e '\033[0;31m''ERROR ENV VARIABLE GIT IS NOT DEFINED''\033[0m'
-    cd $ROOTDIR
-    return 1
-  fi
-  if [ -z "${HOLICOW_DATA_GIT_COMMIT}" ]; then
-      echo 'ERROR HOLICOW_DATA_GIT_COMMIT not defined'
-      return
-  fi
-  if [ -z "${DEBUG_UNXV_CLEAN_ALL}" ]; then
-    export OUT1="/dev/null"
-    export OUT2="/dev/null"
-  else
-    export OUT1="/dev/tty"
-    export OUT2="/dev/tty"
+    pfail 'ROOTDIR'; return 1;
   fi
 
-  cd $ROOTDIR/external_modules/data
+  unset_env_vars () {
+    unset -v EDATAF DATAF PACKDIR URL
+    cdroot || return 1;
+  }
 
-  echo -e '\033[0;32m'"\t\t DECOMPRESSING H0LICOW DATA"'\033[0m'
+  unset_env_funcs () {
+    unset -f cdfolder cpfolder error
+    unset -f unset_env_funcs
+    cdroot || return 1;
+  }
 
-  rm -rf $ROOTDIR/external_modules/data/holicow_tmp
+  unset_all () {
+    unset_env_vars
+    unset_env_funcs
+    unset -f unset_all
+    cdroot || return 1;
+  }
+  
+  error () {
+    fail_script_msg "unxv_camspec.sh" "${1}"
+    unset_all || return 1
+  }
+  
+  cdfolder() {
+    cd "${1:?}" 2>"/dev/null" || { error "CD FOLDER ${1}"; return 1; }
+  }
 
-  #-----------------------------------------------------------------------------
-  #-----------------------------------------------------------------------------
-  export HOLIURL='https://github.com/shsuyu/H0LiCOW-public.git'
-  #-----------------------------------------------------------------------------
-  #-----------------------------------------------------------------------------
+  # --------------------------------------------------------------------------- 
+  # --------------------------------------------------------------------------- 
+  # ---------------------------------------------------------------------------
 
-  git clone $HOLIURL holicow_tmp > ${OUT1} 2> ${OUT2}
-  if [ $? -ne 0 ]; then
-    echo -e '\033[0;31m'"\t\t DECOMPRESSING H0LICOW DATA FAILED"'\033[0m'
-    cd $ROOTDIR
-    unset OUT1
-    unset OUT2
-    unset HOLIURL
-    return 1
+  ptop 'DECOMPRESSING H0LICOW DATA' || return 1
+
+  unset_env_vars || return 1
+
+  # E = EXTERNAL, DATA, F=FODLER
+  EDATAF="${ROOTDIR:?}/external_modules/data/"
+  
+  TDATA="holicow_tmp" # = TMP
+
+  DATAF="h0licow_distance_chains"
+
+  # PACK = PACKAGE, DIR = DIRECTORY
+  PACKDIR="${EDATAF:?}/${TDATA:?}"
+
+  URL="${HOLICOW_URL:-"https://github.com/shsuyu/H0LiCOW-public.git"}"
+
+  # ---------------------------------------------------------------------------
+  # in case this script is called twice
+  # ---------------------------------------------------------------------------
+  rm -rf "${PACKDIR:?}"
+
+  cdfolder "${EDATAF:?}" || return 1
+
+  ${GIT:?} clone "${URL:?}" "${TDATA:?}" \
+    >${OUT1:?} 2>${OUT2:?} || { error "${EC15:?}"; return 1; }
+
+  cdfolder "${PACKDIR:?}" || return 1
+
+  if [ -n "${HOLICOW_DATA_GIT_COMMIT}" ]; then
+    ${GIT:?} checkout "${HOLICOW_DATA_GIT_COMMIT:?}" \
+      >${OUT1:?} 2>${OUT2:?} || { error "${EC16:?}"; return 1; }
   fi
 
-  cd $ROOTDIR/external_modules/data/holicow_tmp
+  mv "${DATAF:?}" "${EDATAF:?}"
 
-  git checkout $HOLICOW_DATA_GIT_COMMIT > ${OUT1} 2> ${OUT2}
-  if [ $? -ne 0 ]; then
-    echo -e '\033[0;31m'"\t\t DECOMPRESSING H0LICOW DATA FAILED"'\033[0m'
-    cd $ROOTDIR
-    unset OUT1
-    unset OUT2
-    unset HOLIURL
-    return 1
-  fi
+  rm -rf "${PACKDIR:?}"
 
-  mv h0licow_distance_chains ../
-  cd $ROOTDIR/external_modules/data
-  rm -rf $ROOTDIR/external_modules/data/holicow_tmp
+  unset_all || return 1
+  
+  pbottom 'DECOMPRESSING H0LICOW DATA' || return 1
 
-  cd $ROOTDIR/
-  unset OUT1
-  unset OUT2
-  unset HOLIURL
-  echo -e '\033[0;32m'"\t\t DECOMPRESSING H0LICOW DATA DONE"'\033[0m'
 fi
+
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------

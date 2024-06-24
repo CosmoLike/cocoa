@@ -116,6 +116,7 @@ export LIPOP_DATA_VERSION=4.2
 
 export SPT3G_DATA_GIT_COMMIT="66da8e9e2f325024566fe13245788bf8ede897bc"
 
+export HOLICOW_URL='https://github.com/shsuyu/H0LiCOW-public.git'
 export HOLICOW_DATA_GIT_COMMIT="f792647d1fd6c09d9e052fef526669cbd702ab82"
 
 export POLY_URL="https://github.com/PolyChord/PolyChordLite.git"

@@ -8,7 +8,8 @@ if [ -z "${IGNORE_HDF5_INSTALLATION}" ]; then
     pfail 'ROOTDIR'; return 1
   fi
 
-  source "${ROOTDIR:?}/installation_scripts/.check_flags.sh" || return 1;
+  # Parenthesis = run in a subshell
+  ( source "${ROOTDIR:?}/installation_scripts/.check_flags.sh" ) || return 1;
 
   unset_env_vars () {
     unset -v CCIL BDF
@@ -41,7 +42,7 @@ if [ -z "${IGNORE_HDF5_INSTALLATION}" ]; then
   # ----------------------------------------------------------------------------
   # ----------------------------------------------------------------------------
 
-  ptop2 'SETUP_HDF5' || return 1;
+  ptop2 'COMPILE_CORE_HDF5' || return 1;
   
   unset_env_vars || return 1; 
 
@@ -49,7 +50,7 @@ if [ -z "${IGNORE_HDF5_INSTALLATION}" ]; then
 
   # ----------------------------------------------------------------------------
 
-  ptop 'INSTALLING HFD5 LIBRARY' || return 1;
+  ptop 'COMPILING HFD5 LIBRARY' || return 1;
   
   PACKDIR="${CCIL:?}/${COCOA_HDF5_DIR:-"hdf5-1.12.3/"}"
   BDF="${PACKDIR:?}/cocoa_HDF5_build"
@@ -76,13 +77,13 @@ if [ -z "${IGNORE_HDF5_INSTALLATION}" ]; then
 
   cdfolder "${ROOTDIR}" || return 1;
 
-  pbottom 'INSTALLING HDF5 LIBRARY DONE' || return 1;
+  pbottom 'COMPILING HDF5 LIBRARY DONE' || return 1;
 
   # ---------------------------------------------------------------------------- 
   
   unset_all || return 1; 
 
-  pbottom2 'SETUP_HDF5'  || return 1;
+  pbottom2 'COMPILE_CORE_HDF5'  || return 1;
 
 fi
 

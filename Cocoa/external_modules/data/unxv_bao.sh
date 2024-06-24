@@ -3,40 +3,71 @@
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
 if [ -z "${SKIP_DECOMM_BAO}" ]; then
+
   if [ -z "${ROOTDIR}" ]; then
-      echo 'ERROR ROOTDIR not defined'
-      return
-  fi
-  if [ -z "${DEBUG_UNXV_CLEAN_ALL}" ]; then
-    export OUT1="/dev/null"
-    export OUT2="/dev/null"
-  else
-    export OUT1="/dev/tty"
-    export OUT2="/dev/tty"
+    pfail 'ROOTDIR'; return 1;
   fi
 
-  cd $ROOTDIR/external_modules/data
+  unset_env_vars () {
+    unset -v EDATAF DATAF PACKDIR FILE
+    cdroot || return 1;
+  }
 
-  echo -e '\033[0;32m'"\t\t DECOMPRESSING BAO DATA"'\033[0m'
+  unset_env_funcs () {
+    unset -f cdfolder cpfolder error
+    unset -f unset_env_funcs
+    cdroot || return 1;
+  }
+
+  unset_all () {
+    unset_env_vars
+    unset_env_funcs
+    unset -f unset_all
+    cdroot || return 1;
+  }
   
-  rm -rf $ROOTDIR/external_modules/data/bao_data
+  error () {
+    fail_script_msg "unxv_bao.sh" "${1}"
+    unset_all || return 1
+  }
+  
+  cdfolder() {
+    cd "${1:?}" 2>"/dev/null" || { error "CD FOLDER ${1}"; return 1; }
+  }
 
-  cd $ROOTDIR/external_modules/data
+  # --------------------------------------------------------------------------- 
+  # --------------------------------------------------------------------------- 
+  # ---------------------------------------------------------------------------
 
-  tar xf bao_data.xz > ${OUT1} 2> ${OUT2}
-  if [ $? -ne 0 ]; then
-    echo -e '\033[0;31m'"\t\t DECOMPRESSING BAO DATA FAILED"'\033[0m'
-    cd $ROOTDIR
-    unset OUT1
-    unset OUT2
-    return 1
-  fi
+  ptop 'DECOMPRESSING BAO DATA' || return 1
 
-  cd $ROOTDIR
-  unset OUT1
-  unset OUT2
-  echo -e '\033[0;32m'"\t\t DECOMPRESSING BAO DATA DONE"'\033[0m'
+  unset_env_vars || return 1
+
+  # E = EXTERNAL, DATA, F=FODLER
+  EDATAF="${ROOTDIR:?}/external_modules/data"
+
+  DATAF="bao_data"
+
+  # PACK = PACKAGE, DIR = DIRECTORY
+  PACKDIR="${EDATAF:?}/${DATAF:?}"
+
+  FILE="bao_data.xz"
+
+  # ---------------------------------------------------------------------------
+  # in case this script is called twice
+  # ---------------------------------------------------------------------------
+  rm -rf "${PACKDIR:?}"
+
+  cdfolder "${EDATAF:?}" || return 1
+
+  tar xf ${FILE:?} >${OUT1:?} 2>${OUT2:?} || { error "${EC25:?}"; return 1; }
+
+  unset_all || return 1
+  
+  pbottom 'DECOMPRESSING BAO DATA' || return 1
+
 fi
+
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------

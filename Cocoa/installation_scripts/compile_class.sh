@@ -10,7 +10,8 @@ if [ -z "${IGNORE_CLASS_COMPILATION}" ]; then
   
   # ---------------------------------------------------------------------------
   # Clean any previous compilation. Parenthesis = run in a subshell
-  ( source "${ROOTDIR:?}/installation_scripts/clean_class.sh" ) || return 1
+  ( TMP="${ROOTDIR:?}/installation_scripts/clean"; 
+    source "${TMP:?}/clean_compile_class.sh" ) || return 1
   # ---------------------------------------------------------------------------
   
   ( source "${ROOTDIR:?}/installation_scripts/.check_flags.sh" ) || return 1;

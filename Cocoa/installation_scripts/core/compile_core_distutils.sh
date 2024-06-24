@@ -42,7 +42,7 @@ if [ -z "${IGNORE_DISTUTILS_INSTALLATION}" ]; then
   # ----------------------------------------------------------------------------
   # ----------------------------------------------------------------------------
   
-  ptop2 'SETUP_BINUTILS' || return 1
+  ptop2 'COMPILE_BINUTILS' || return 1
   
   unset_env_vars || return 1;
 
@@ -52,7 +52,7 @@ if [ -z "${IGNORE_DISTUTILS_INSTALLATION}" ]; then
   # ----------------------------- TEXINFO LIBRARY  -----------------------------
   # ----------------------------------------------------------------------------
   
-  ptop 'INSTALLING TEXINFO LIBRARY' || return 1;
+  ptop 'COMPILING TEXINFO LIBRARY' || return 1;
 
   PACKDIR="${CCIL:?}/${COCOA_TEXINFO_DIR:-"texinfo-7.0.3/"}"
 
@@ -72,13 +72,13 @@ if [ -z "${IGNORE_DISTUTILS_INSTALLATION}" ]; then
 
   cdfolder "${ROOTDIR}" || return 1;
   
-  pbottom 'INSTALLING TEXINFO LIBRARY' || return 1;
+  pbottom 'COMPILING TEXINFO LIBRARY' || return 1;
   
   # ----------------------------------------------------------------------------
   # ----------------------------- DISTUTILS LIBRARY  ---------------------------
   # ----------------------------------------------------------------------------
   
-  ptop 'INSTALLING BINUTILS LIBRARY' || return 1;
+  ptop 'COMPILING BINUTILS LIBRARY' || return 1;
   
   PACKDIR="${CCIL:?}/${COCOA_BINUTILS_DIR:-"binutils-2.37/"}"
 
@@ -97,15 +97,16 @@ if [ -z "${IGNORE_DISTUTILS_INSTALLATION}" ]; then
 
   cdfolder "${ROOTDIR}" || return 1;
 
-  pbottom 'INSTALLING BINUTILS LIBRARY' || return 1;
+  pbottom 'COMPILING BINUTILS LIBRARY' || return 1;
   
   # ----------------------------------------------------------------------------
   
   unset_all || return 1;
   
-  pbottom2 'SETUP_BINUTILS' || return 1
+  pbottom2 'COMPILE_BINUTILS' || return 1
 
 fi
+
 # ----------------------------------------------------------------------------
 # ----------------------------------------------------------------------------
 # ----------------------------------------------------------------------------
