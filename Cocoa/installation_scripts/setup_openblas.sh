@@ -50,7 +50,7 @@ if [ -z "${IGNORE_OPENBLAS_INSTALLATION}" ]; then
 
   # ----------------------------------------------------------------------------  
   
-  ptop  'INSTALLING OPENBLAS LIBRARY'
+  ptop  'INSTALLING OPENBLAS LIBRARY' || return 1;
   
   export PACKDIR="${COCOA_OPENBLAS_DIR:-"OpenBLAS-0.3.23/"}"
 

@@ -46,15 +46,17 @@ wgetact() {
   
   rm -f  "${CCIL:?}/${5:?}"
 
-  wget -q "${3:?}" >${OUT1:?} 2>${OUT2:?} || { error "WGET"; return 1; }
+  wget -q "${3:?}" >${OUT1:?} 2>${OUT2:?} || { error "${EC24:?}"; return 1; }
 
   if [ "${2:?}" == "tar.gz" ]; then
     
-    tar zxvf "${FILE}"  >${OUT1:?} 2>${OUT2:?} || { error "TAR (gz)"; return 1; }
+    tar zxvf "${FILE}" \
+      >${OUT1:?} 2>${OUT2:?} || { error "${EC25:?} (gz)"; return 1; }
   
   elif [ "${2:?}" == "tar.xz" ]; then
   
-    tar xf "${FILE}" >${OUT1:?} 2>${OUT2:?} || { error "TAR (xz)"; return 1; }
+    tar xf "${FILE}" \
+      >${OUT1:?} 2>${OUT2:?} || { error "${EC25:?} (xz)"; return 1; }
   
   else
 

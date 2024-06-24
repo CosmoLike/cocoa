@@ -46,7 +46,9 @@ if [ -z "${IGNORE_CMAKE_INSTALLATION}" ]; then
   unset_env_vars || return 1; 
 
   CCIL="${ROOTDIR:?}/../cocoa_installation_libraries"
-  
+
+  # ---------------------------------------------------------------------------
+   
   ptop 'INSTALLING CMAKE LIBRARY' || return 1
 
   PACKDIR=${COCOA_CMAKE_DIR:-"cmake-3.26.4/"}

@@ -3,55 +3,84 @@
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
 if [ -z "${SKIP_DECOMM_ACT}" ]; then
+  
   if [ -z "${ROOTDIR}" ]; then
-      echo 'ERROR ROOTDIR not defined'
-      return
-  fi
-  if [ -z "${DEBUG_UNXV_CLEAN_ALL}" ]; then
-    export OUT_UNXV_1="/dev/null"
-    export OUT_UNXV_2="/dev/null"
-  else
-    export OUT_UNXV_1="/dev/tty"
-    export OUT_UNXV_2="/dev/tty"
+    pfail 'ROOTDIR'; return 1;
   fi
 
-  echo -e '\033[0;32m'"\t\t DECOMPRESSING ACT-DR6 DATA"'\033[0m'
+  unset_env_vars () {
+    unset -v EDATAF ACTDATAF PACKDIR URL_BASE FILE ACT_DATA_URL
+    cdroot || return 1;
+  }
 
-  cd $ROOTDIR/external_modules/data
-  rm -rf $ROOTDIR/external_modules/data/act/
-  mkdir -p act
+  unset_env_funcs () {
+    unset -f cdfolder cpfolder error
+    unset -f unset_env_funcs
+    cdroot || return 1;
+  }
+
+  unset_all () {
+    unset_env_vars
+    unset_env_funcs
+    unset -f unset_all
+    cdroot || return 1;
+  }
   
-  cd $ROOTDIR/external_modules/data/act
-  mkdir -p lensing
+  error () {
+    fail_script_msg "unxv_act_dr6.sh" "${1}"
+    unset_all || return 1
+  }
   
-  cd $ROOTDIR/external_modules/data/act/lensing
+  cdfolder() {
+    cd "${1:?}" 2>"/dev/null" || { error "CD FOLDER ${1}"; return 1; }
+  }
 
-  export ACTURL="https://lambda.gsfc.nasa.gov/data/suborbital/ACT/ACT_dr6/likelihood/data/ACT_dr6_likelihood_v1.2.tgz"
+  # --------------------------------------------------------------------------- 
+  # --------------------------------------------------------------------------- 
+  # ---------------------------------------------------------------------------
+
+  ptop 'DECOMPRESSING ACT-DR6 DATA' || return 1
+
+  unset_env_vars || return 1
+
+  # E = EXTERNAL, DATA, F=FODLER
+  EDATAF="${ROOTDIR:?}/external_modules/data"
   
-  wget $ACTURL > ${OUT_UNXV_1} 2> ${OUT_UNXV_2}
-  if [ $? -ne 0 ]; then 
-    echo -e '\033[0;31m'"\t\t DECOMPRESSING ACT-DR6 DATA FAILED"'\033[0m'
-    cd $ROOTDIR
-    unset OUT_UNXV_1
-    unset OUT_UNXV_2
-    return 1
-  fi
+  ACTDATAF="act"
 
-  tar -zxvf ACT_dr6_likelihood_v1.2.tgz > ${OUT_UNXV_1} 2> ${OUT_UNXV_2}
-  if [ $? -ne 0 ]; then 
-    echo -e '\033[0;31m'"\t\t DECOMPRESSING ACT-DR6 DATA FAILED"'\033[0m'
-    cd $ROOTDIR
-    unset OUT_UNXV_1
-    unset OUT_UNXV_2
-    return 1
-  fi
-  rm -f $ROOTDIR/external_modules/data/act/lensing/ACT_dr6_likelihood_v1.2.tgz
+  # PACK = PACKAGE, DIR = DIRECTORY
+  PACKDIR="${EDATAF:?}/${ACTDATAF:?}"
 
-  cd $ROOTDIR/
-  unset OUT_UNXV_1
-  unset OUT_UNXV_2
-  echo -e '\033[0;32m'"\t\t DECOMPRESSING ACT-DR6 DATA DONE"'\033[0m'
+  URL_BASE="https://lambda.gsfc.nasa.gov/data/suborbital/ACT"
+
+  FILE="${ACT_DR6_DATA_FILE:-"ACT_dr6_likelihood_v1.2.tgz"}"
+
+  ACT_DATA_URL="${URL_BASE:?}/ACT_dr6/likelihood/data/${FILE:?}"
+
+  # ---------------------------------------------------------------------------
+  # in case this script is called twice
+  # ---------------------------------------------------------------------------
+  rm -rf "${PACKDIR:?}"
+
+  mkdir -p "${PACKDIR:?}"
+  mkdir -p "${PACKDIR:?}/lensing"
+    
+  cdfolder "${PACKDIR:?}/lensing" || return 1
+
+  wget "${ACT_DATA_URL:?}" \
+    >${OUT1:?} 2>${OUT2:?} || { error "${EC24:?}" || return 1 }
+
+  tar -zxvf "${FILE:?}" \
+    >${OUT1:?} 2>${OUT2:?} || { error "${EC25:?} (tgz)" || return 1 }
+
+  rm -f "${PACKDIR:?}/lensing/${FILE:?}"
+
+  unset_all || return 1
+  
+  pbottom 'DECOMPRESSING ACT-DR6 DATA' || return 1
+
 fi
+
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------

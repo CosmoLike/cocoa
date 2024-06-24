@@ -130,6 +130,7 @@ export CLASS_URL="https://github.com/lesgourg/class_public.git"
 export CLASS_GIT_COMMIT="8df566c1ff2d0b3e40e106567c435575aea337be"
 export CLASS_NAME="class_public"
 
+export ACT_DR6_DATA_FILE="ACT_dr6_likelihood_v1.2.tgz"
 export ACT_NAME="pyactlike"
 
 # ------------------------------------------------------------------------------
