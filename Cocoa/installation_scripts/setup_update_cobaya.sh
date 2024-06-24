@@ -12,13 +12,12 @@ if [ -z "${IGNORE_ALL_COBAYA_INSTALLATION}" ]; then
   ( source "${ROOTDIR:?}/installation_scripts/.check_flags.sh" ) || return 1;
 
   unset_env_vars () {
-    unset -v COB CCCOB COBLIKE COBTH URL PL2020 URL HGL ftmp
-    unset -v ACTDR6_LL TFILE TFOLDER
+    unset -v COB CCCOB COBLIKE COBTH URL TFILE TFOLDER TFOLDER2
     cdroot || return 1;
   }
 
   unset_env_funcs () {
-    unset -f cdfolder cpfolder error
+    unset -f cdfolder cpfolder error cpfile flipop cppatch cppatchfolder
     unset -f unset_env_funcs
     cdroot || return 1;
   }
@@ -81,7 +80,7 @@ if [ -z "${IGNORE_ALL_COBAYA_INSTALLATION}" ]; then
   }
 
   # ----------------------------------------------------------------------------
-  # ----------------------------------------------------------------------------
+
   if [ -z "${IGNORE_COBAYA_INSTALLATION}" ]; then
     
     ptop "INSTALLING AND PATCHING COBAYA" || return 1;
@@ -115,13 +114,14 @@ if [ -z "${IGNORE_ALL_COBAYA_INSTALLATION}" ]; then
     #---------------------------------------------------------------------------
     # Adjust Cobaya Files ------------------------------------------------------
     #---------------------------------------------------------------------------
+    
     TFILE="change_python_files.sh" # T = TMP
     
-    cpfile "${CCCOB:?}/cobaya/${TFILE:?}" "${COB:?}/cobaya/" || return 1
+    cppatch "cobaya" "${TFILE:?}" || return 1
 
     cdfolder "${COB:?}/cobaya/" || return 1;
     
-    ( sh change_python_files.sh ) || { error "${EC22:?} (PY Files)"; return 1; }
+    ( sh change_python_files.sh ) || { error "${EC22:?} (CPF)"; return 1; }
 
     cdfolder "${ROOTDIR}" || return 1;
 
@@ -130,6 +130,7 @@ if [ -z "${IGNORE_ALL_COBAYA_INSTALLATION}" ]; then
     #---------------------------------------------------------------------------
     # Adjust SN / STRONG LENSING -----------------------------------------------
     #---------------------------------------------------------------------------
+    
     TFOLDER="${COBLIKE:?}/sn" # T = TMP
 
     cp "${CCCOB:?}/${TFOLDER:?}/"roman_* "${COB:?}/${TFOLDER:?}/" \
@@ -142,23 +143,26 @@ if [ -z "${IGNORE_ALL_COBAYA_INSTALLATION}" ]; then
     #---------------------------------------------------------------------------
     # Remove native DES-Y1 cobaya likelihood -----------------------------------
     #---------------------------------------------------------------------------
+    
     rm -rf "${COB:?}/${COBLIKE:?}/des_y1"
 
     #---------------------------------------------------------------------------
     # Remove Planck 2015 likelihood files --------------------------------------
     #---------------------------------------------------------------------------
+    
     rm -rf "${COB:?}/${COBLIKE:?}"/planck_2015_*
 
     #---------------------------------------------------------------------------
     # Adjust Planck 2018 CLIK --------------------------------------------------
     #---------------------------------------------------------------------------
+    
     TFOLDER="${COBLIKE:?}/base_classes" # T = TMP
     
     cppatch "${TFOLDER:?}" "change_planck_clik.sh" || return 1
   
     cdfolder "${COB:?}/${TFOLDER}/" || return 1;
     
-    ( sh change_planck_clik.sh ) || { error "${EC22:?} (PL CLIK)"; return 1; }
+    ( sh change_planck_clik.sh ) || { error "${EC22:?} (CPC)"; return 1; }
     
     unset -v TFOLDER
 
@@ -167,6 +171,7 @@ if [ -z "${IGNORE_ALL_COBAYA_INSTALLATION}" ]; then
     #---------------------------------------------------------------------------
     # Adjust Planck 2018 low-ell -----------------------------------------------
     #---------------------------------------------------------------------------
+    
     # note 1: we remove Cobaya native python CLIK implementation
     # note 2: In the original Cobaya, TT_clik.py/EE_clik.py are the files 
     # note 2: associated with CLIK. We rename them to simply TT/EE.py
@@ -191,6 +196,7 @@ if [ -z "${IGNORE_ALL_COBAYA_INSTALLATION}" ]; then
     #---------------------------------------------------------------------------
     # Adjust Planck 2018 lensing -----------------------------------------------
     #---------------------------------------------------------------------------
+    
     # note: we remove Cobaya native python CLIK implementation
 
     TFOLDER="${COBLIKE:?}/planck_2018_lensing"
@@ -205,6 +211,7 @@ if [ -z "${IGNORE_ALL_COBAYA_INSTALLATION}" ]; then
     #---------------------------------------------------------------------------
     # Adjust Planck 2018 high-ell (Plik) ---------------------------------------
     #---------------------------------------------------------------------------
+    
     # note 1: we remove Cobaya native python CLIK implementation
     # note 2: we remove unbinned likelihood for now 
 
@@ -265,13 +272,13 @@ if [ -z "${IGNORE_ALL_COBAYA_INSTALLATION}" ]; then
   # TODO - download from original git repo
   if [ -z "${SKIP_DECOMM_SIMONS_OBSERVATORY}" ]; then
     
-    ptop "INSTALLING SIMONS OBSERVATORY LIKELIHOOD"
+    ptop "INSTALLING AND PATCHING SIMONS OBSERVATORY LIKELIHOOD"
 
     cppatchfolder "${COBLIKE:?}" "mflike" || return 1
     
     cdfolder "${ROOTDIR}" || return 1;
 
-    pbottom "INSTALLING SIMONS OBSERVATORY LIKELIHOOD"
+    pbottom "INSTALLING AND PATCHING SIMONS OBSERVATORY LIKELIHOOD"
 
   fi
   # ----------------------------------------------------------------------------
@@ -280,7 +287,8 @@ if [ -z "${IGNORE_ALL_COBAYA_INSTALLATION}" ]; then
   #-----------------------------------------------------------------------------
   # CAMSPEC --------------------------------------------------------------------
   #-----------------------------------------------------------------------------
-  # note: we delete CAMSPEC2018 likelihood
+  
+  # note: we always delete CAMSPEC2018 likelihood
   rm -rf "${COB:?}/${COBLIKE:?}"/planck_2018_highl_CamSpec
 
   if [ -z "${SKIP_DECOMM_CAMSPEC}" ]; then
@@ -288,6 +296,7 @@ if [ -z "${IGNORE_ALL_COBAYA_INSTALLATION}" ]; then
     ptop "PATCHING CAMSPEC 2021 LIKELIHOOD"
 
     TFOLDER="${COBLIKE}/base_classes"
+    
     TFILE="InstallableLikelihood"
     
     cppatch "${TFOLDER:?}" "${TFILE:?}.patch"
@@ -310,118 +319,76 @@ if [ -z "${IGNORE_ALL_COBAYA_INSTALLATION}" ]; then
   fi
   
   #-----------------------------------------------------------------------------
-  # INSTALL HILLIPOP -----------------------------------------------------------
+  # INSTALL LIPOP --------------------------------------------------------------
   #-----------------------------------------------------------------------------
-  if [ -z "${SKIP_DECOMM_LIPOP}" ]; then
-    
-    ptop "INSTALLING HILLIPOP LIKELIHOOD"
+  
+  flipop() {
+    local TFOLDER="${COBLIKE:?}/${1:?}"
+    local URL="${2:?}"
 
-    TFOLDER2="planck_2020_hillipop"
-    TFOLDER="${COBLIKE:?}/${TFOLDER2:?}"
-    
     # in case you run this script more than once
     rm -rf "${COB:?}/${TFOLDER:?}"
     rm -rf "${COB:?}/${COBLIKE:?}/tmp"
 
-    cdfolder "${COB:?}/${COBLIKE}" || return 1;
+    cdfolder "${COB:?}/${COBLIKE:?}" || return 1;
 
-    URL="https://github.com/planck-npipe"
-
-    "${GIT:?}" clone "${URL:?}/hillipop.git" "tmp" \
+    ${GIT:?} clone "${URL:?}" "tmp" \
       >${OUT1:?} 2>${OUT2:?} || { error "${EC15:?}"; return 1; }
   
     cdfolder "${COB:?}/${COBLIKE}/tmp" || return 1;
 
-    if [ -n "${HILLIPOP_GIT_COMMIT}" ]; then
-      "${GIT:?}" reset --hard "${HILLIPOP_GIT_COMMIT:?}" \
-        >${OUT1:?} 2>${OUT2:?} || { error "${EC23:?}"; return 1; }
-    fi
+    "${GIT:?}" reset --hard "${3:?}" \
+      >${OUT1:?} 2>${OUT2:?} || { error "${EC23:?}"; return 1; }
 
-    cpfolder ${TFOLDER2:?}/ "${COB:?}/${COBLIKE:?}" || return 1;
+    cpfolder ${1:?}/ "${COB:?}/${COBLIKE:?}" || return 1;
     
-    cdfolder "${ROOTDIR}" || return 1;
+    cdfolder "${COB:?}/${TFOLDER:?}" || return 1;
     
     rm -rf "${COB:?}/${COBLIKE:?}/tmp"
 
-    #---------------------------------------------------------------------------
-    # now patch the likelihood __init__ file
-    #---------------------------------------------------------------------------
-    cp "${CCCOB}/${TFOLDER:?}/init.patch" "${COB:?}/${TFOLDER:?}" 2>${OUT2:?} ||
-      { error "CP INIT.PATCH (Planck2020 HILLIPOP)"; return 1; }
-  
-    cdfolder "${COB:?}/${TFOLDER:?}" || return 1;
+    cppatch "${TFOLDER:?}" "init.patch" || return 1
 
-    patch -u __init__.py -i init.patch >${OUT1:?} 2>${OUT2:?} || 
-      { error "PATCH LIKELIHOOD FILES (Planck2020 HILLIPOP)"; return 1; }
-    
-    rm -rf "${COB:?}/${COBLIKE:?}/${ftmp:?}"
-    
-    unset PL2020
-    unset ftmp
+    patch -u "__init__.py" -i "init.patch" \ 
+      >${OUT1:?} 2>${OUT2:?} || { error "${EC17:?}"; return 1; }
 
-    cdfolder "${ROOTDIR}" || return 1;
+    cdfolder "${ROOTDIR}" || return 1; 
+  }
+
+  if [ -z "${SKIP_DECOMM_LIPOP}" ]; then
     
-    pbottom "INSTALLING HILLIPOP LIKELIHOOD"
+    ptop "INSTALLING AND PATCHING HILLIPOP LIKELIHOOD" || return 1
+
+    TFOLDER="planck_2020_hillipop"
+    
+    URL="https://github.com/planck-npipe/hillipop.git"
+    
+    flipop "${TFOLDER:?}" "${URL:?}" "${HILLIPOP_GIT_COMMIT:-"HEAD~"}"
+    
+    unset -v TFOLDER URL
+
+    pbottom "INSTALLING AND PATCHING HILLIPOP LIKELIHOOD" || return 1
 
   fi
 
-  #-----------------------------------------------------------------------------
-  # INSTALL LOWLLIPOP ----------------------------------------------------------
-  #-----------------------------------------------------------------------------
   if [ -z "${SKIP_DECOMM_LIPOP}" ]; then
 
-    ptop "INSTALLING LOLLIPOP LIKELIHOOD"
+    ptop "INSTALLING AND PATCHING LOLLIPOP LIKELIHOOD" || return 1
 
-    export PL2020="${COBLIKE}/planck_2020_lollipop"
-    export ftmp=lipoptmp
-
-    rm -rf "${COB:?}/${PL2020:?}"
-    rm -rf "${COB:?}/${COBLIKE:?}/${ftmp:?}"
-
-    cdfolder "${COB:?}/${COBLIKE}" || return 1;
-
-    export URL="https://github.com/planck-npipe" 
-
-    "${GIT:?}" clone "${URL:?}/lollipop.git" ${ftmp:?} >${OUT1:?} \
-      2>${OUT2:?} || { error "GIT CLONE (Planck2020 LOLLIPOP)"; return 1; }
+    TFOLDER="planck_2020_lollipop"
     
-    cdfolder "${COB:?}/${COBLIKE}/${ftmp}" || return 1;
-
-    if [ -n "${LOLLIPOP_GIT_COMMIT}" ]; then
-      "${GIT:?}" reset --hard "${LOLLIPOP_GIT_COMMIT:?}" >${OUT1:?} \
-        2>${OUT2:?} || { error "GIT RESET (Planck2020 LOLLIPOP)"; return 1; }
-    fi
-
-    mv planck_2020_lollipop/ "${COB:?}/${COBLIKE:?}" 2>${OUT2:?} || 
-      { error "MV LIKELIHOOD FOLDER (Planck2020 LOLLIPOP)"; return 1; }
+    URL="https://github.com/planck-npipe/lollipop.git"
     
-    #---------------------------------------------------------------------------
-    # now patch the likelihood __init__ file
-    #---------------------------------------------------------------------------
-    cp "${CCCOB:?}/${PL2020:?}/init.patch" "${COB:?}/${PL2020:?}" \
-      2>${OUT2:?} || 
-      { error "CP INIT.PATCH (Planck2020 LOLLIPOP)"; return 1; }
-
-    cdfolder "${COB:?}/${PL2020:?}" || return 1;
-
-    patch -u __init__.py -i init.patch >${OUT1:?} 2>${OUT2:?} ||
-      { error "PATCH LIKELIHOOD FILES (Planck2020 LOLLIPOP)"; return 1; }
+    flipop "${TFOLDER:?}" "${URL:?}" "${LOLLIPOP_GIT_COMMIT:-"HEAD~"}"
     
-    rm -rf "${COB:?}/${COBLIKE:?}/lipoptmp"
-    
-    unset PL2020
-    unset ftmp
-    
-    cdfolder "${ROOTDIR}" || return 1;
+    unset -v TFOLDER URL
 
-    pbottom "INSTALLING LOLLIPOP LIKELIHOOD"
+    pbottom "INSTALLING AND PATCHING LOLLIPOP LIKELIHOOD" || return 1
 
   fi
     
   #-----------------------------------------------------------------------------
-  #-----------------------------------------------------------------------------
   
-  unset_env_vars | return 1;
+  unset_all | return 1;
   
   pbottom2 "UPDATING COBAYA PACKAGE"
 
