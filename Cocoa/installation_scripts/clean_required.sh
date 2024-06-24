@@ -36,7 +36,8 @@ ptop 'CLEANING COCOA REQUIRED LIBRARIES' || return 1
 
 cdfolder "${ROOTDIR:?}/../cocoa_installation_libraries" || return 1
 
-sh clean_all || { error "SCRIPT clean_all.sh"; return 1; }
+# parenthesis = run in a subshell
+( sh clean_all ) || { error "SCRIPT clean_all.sh"; return 1; }
 
 unset -v SETUP_PREREQUISITE_DONE
 unset_all || return 1;

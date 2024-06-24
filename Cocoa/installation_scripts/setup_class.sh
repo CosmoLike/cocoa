@@ -8,7 +8,8 @@ if [ -z "${IGNORE_CLASS_COMPILATION}" ]; then
     pfail 'ROOTDIR'; return 1;
   fi
   
-  source "${ROOTDIR:?}/installation_scripts/.check_flags.sh" || return 1;
+  # Parenthesis = run in a subshell
+  ( source "${ROOTDIR:?}/installation_scripts/.check_flags.sh" ) || return 1;
     
   unset_env_vars () {
     unset -v URL CHANGES ECODEF CLNAME PACKDIR TFOLDER TFILE TFILEP AL

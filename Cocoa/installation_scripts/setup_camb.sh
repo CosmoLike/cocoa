@@ -8,7 +8,8 @@ if [ -z "${IGNORE_CAMB_COMPILATION}" ]; then
     pfail 'ROOTDIR'; return 1;
   fi
 
-  source "${ROOTDIR:?}/installation_scripts/.check_flags.sh" || return 1;
+  # parenthesis = run in a subshell
+  ( source "${ROOTDIR:?}/installation_scripts/.check_flags.sh" ) || return 1;
 
   unset_env_vars () {
     unset -v URL CCIL ECODEF CAMBF PACKDIR CHANGES TFOLDER TFILE TFILEP AL
@@ -16,7 +17,7 @@ if [ -z "${IGNORE_CAMB_COMPILATION}" ]; then
   }
 
   unset_env_funcs () {
-    unset -f cdfolder cpfolder error
+    unset -f cdfolder cpfolder error cpfile
     unset -f unset_env_funcs
     cdroot || return 1;
   }

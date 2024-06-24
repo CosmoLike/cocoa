@@ -9,11 +9,11 @@ if [ -z "${IGNORE_CAMB_COMPILATION}" ]; then
   fi
 
   # ----------------------------------------------------------------------------
-  # Clean any previous compilation
-  source "${ROOTDIR:?}/installation_scripts/clean_camb.sh" || return 1
+  # Clean any previous compilation. Parenthesis = run in a subshell
+  ( source "${ROOTDIR:?}/installation_scripts/clean_camb.sh" ) || return 1
   # ----------------------------------------------------------------------------
   
-  source "${ROOTDIR:?}/installation_scripts/.check_flags.sh" || return 1;
+  ( source "${ROOTDIR:?}/installation_scripts/.check_flags.sh" ) || return 1;
 
   unset_env_vars () {
     unset -v PACKDIR

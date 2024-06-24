@@ -133,7 +133,7 @@ export EC15="GIT CLONE"
 
 export EC16="GIT CHECKOUT"
 
-export EC17="SCRIPT FILE PATCH"
+export EC17="SHELL SCRIPT FILE PATCH"
 
 export EC18="PYTHON3 WAF DISTCLEAN"
 
@@ -143,4 +143,4 @@ export EC20="MKDIR"
 
 export EC21="B2"
 
-
+export EC22="SHELL SCRIPT"

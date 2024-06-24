@@ -4,98 +4,84 @@
 # ----------------------------------------------------------------------------
 if [ -z "${IGNORE_XZ_INSTALLATION}" ]; then
   
-  pfail() {
-    echo -e \
-    "\033[0;31m ERROR ENV VARIABLE ${1:-"empty arg"} IS NOT DEFINED \033[0m"
-    unset pfail
-  }
-  
   if [ -z "${ROOTDIR}" ]; then
     pfail 'ROOTDIR'; return 1
   fi
 
-  cdroot() {
-    cd "${ROOTDIR:?}" 2>"/dev/null" || { echo -e \
-      "\033[0;31m\t\t CD ROOTDIR (${ROOTDIR}) FAILED \033[0m"; \
-      return 1; }
-    unset cdroot
+  # parenthesis = run in a subshell
+  ( source "${ROOTDIR:?}/installation_scripts/.check_flags.sh" ) || return 1;
+
+  unset_env_vars () {
+    unset -v CCIL
+    cdroot || return 1;
   }
 
-  if [ -z "${C_COMPILER}" ]; then
-    pfail 'C_COMPILER'; cdroot; return 1;
-  fi
+  unset_env_funcs () {
+    unset -f cdfolder cpfolder error
+    unset -f unset_env_funcs
+    cdroot || return 1;
+  }
 
-  unset_env_vars_sxz () {
-    unset OUT1
-    unset OUT2
-    unset CCIL
-    unset pfail
-    unset unset_env_vars_sxz
+  unset_all () {
+    unset_env_vars
+    unset_env_funcs
+    unset -f unset_all
     cdroot || return 1;
   }
   
-  fail_sxz () {
-    local MSG="\033[0;31m (setup_xz.sh) WE CANNOT RUN \e[3m"
-    local MSG2="\033[0m"
-    echo -e "${MSG}${1:-"empty arg"}${MSG2}"  
-    unset fail_sxz
-    unset_env_vars_sxz
+  error () {
+    fail_script_msg "setup_xz.sh" "${1}"
+    unset_env_vars
   }
 
   cdfolder() {
-    cd "${1:?}" 2>"/dev/null" || { fail_sxz "CD FOLDER: ${1}"; return 1; }
+    cd "${1:?}" 2>"/dev/null" || { error "CD FOLDER: ${1}"; return 1; }
   }
 
-  if [ -z "${COCOA_OUTPUT_VERBOSE}" ]; then
-    export OUT1="/dev/null"; export OUT2="/dev/null"
-    export XZMNT="${MAKE_NUM_THREADS:-1}"
-  else
-    export OUT1="/dev/tty"; export OUT2="/dev/tty"
-    export XZMNT=1
-  fi
-
   # ---------------------------------------------------------------------------
   # ---------------------------------------------------------------------------
+  # ----------------------------------------------------------------------------
+
+  ptop2 "SETUP_XZ" || return 1;
+
+  unset_env_vars || return 1;
   
-  ptop2 "SETUP_XZ"
-  
-  export CCIL="${ROOTDIR:?}/../cocoa_installation_libraries"
+  CCIL="${ROOTDIR:?}/../cocoa_installation_libraries"
 
   # ----------------------------------------------------------------------------
-  # ----------------------------------------------------------------------------
   
-  ptop "INSTALLING XZ LIBRARY"
+  ptop "INSTALLING XZ LIBRARY" || return 1;
 
   cdfolder "${CCIL}" || return 1;
 
   #False xz file: just to trigger GIT LFS
-  cp xz-5.2.5.tar.gz.xz xz-5.2.5.tar.gz 2>${OUT2} ||  
-    { fail_sxz "CP XZ TAR"; return 1; }
+  cp xz-5.2.5.tar.gz.xz xz-5.2.5.tar.gz \
+    2>${OUT2} ||  { error "CP XZ TAR"; return 1; }
 
-  tar -xf xz-5.2.5.tar.gz.xz >${OUT1} 2>${OUT2} ||  
-    { fail_sxz "TAR XZ TAR"; return 1; }
+  tar -xf xz-5.2.5.tar.gz.xz \
+    >${OUT1} 2>${OUT2} ||  { error "TAR XZ TAR"; return 1; }
 
   cdfolder "${CCIL}/xz-5.2.5/" || return 1;
 
   CC=${C_COMPILER:?} ./configure --prefix="${ROOTDIR:?}/.local" \
-    >${OUT1} 2>${OUT2} || { fail_sxz "CONFIGURE"; return 1; }
+    >${OUT1} 2>${OUT2} || { error "${EC11:?}"; return 1; }
 
-  make -j $XZMNT all >${OUT1} 2>${OUT2} || { fail_sxz "MAKE"; return 1; }
+  make -j $MNT all >${OUT1} 2>${OUT2} || { error "${:EC8?}"; return 1; }
 
-  make install >${OUT1} 2>${OUT2} || { fail_sxz "MAKE INSTALL"; return 1; }
+  make install >${OUT1} 2>${OUT2} || { error "${EC10:?}"; return 1; }
 
   cdfolder "${ROOTDIR}" || return 1;
 
-  pbottom "INSTALLING XZ LIBRARY"
+  pbottom "INSTALLING XZ LIBRARY" || return 1;
   
-  # ----------------------------------------------------------------------------
-  # ----------------------------------------------------------------------------
+  # ---------------------------------------------------------------------------
   
-  unset_env_vars_sxz || return 1;
+  unset_all || return 1;
 
-  pbottom2 "SETUP_XZ"
+  pbottom2 "SETUP_XZ" || return 1;
+
 fi
 
-# ----------------------------------------------------------------------------
-# ----------------------------------------------------------------------------
-# ----------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------

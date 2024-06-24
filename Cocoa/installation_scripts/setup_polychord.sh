@@ -8,7 +8,8 @@ if [ -z "${IGNORE_POLYCHORD_COMPILATION}" ]; then
     pfail 'ROOTDIR'; return 1
   fi
 
-  source "${ROOTDIR:?}/installation_scripts/.check_flags.sh" || return 1;
+  # parenthesis = run in a subshell
+  ( source "${ROOTDIR:?}/installation_scripts/.check_flags.sh" ) || return 1;
 
   unset_env_vars () {
     unset -v URL CCIL ECODEF POLYF PACKDIR CHANGES TFOLDER TFILE TFILEP AL
@@ -40,6 +41,11 @@ if [ -z "${IGNORE_POLYCHORD_COMPILATION}" ]; then
   cpfolder() {
     cp -r "${1:?}" "${2:?}"  \
       2>"/dev/null" || { error "CP FOLDER ${1} on ${2}"; return 1; }
+  }
+
+ cpfile() {
+    cp "${1:?}" "${2:?}" \
+      2>"/dev/null" || { error "CP FILE ${1} on ${2}"; return 1; }
   }
 
   # ----------------------------------------------------------------------------
