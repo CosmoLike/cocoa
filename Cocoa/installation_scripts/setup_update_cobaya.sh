@@ -43,7 +43,7 @@ if [ -z "${IGNORE_ALL_COBAYA_INSTALLATION}" ]; then
       2>"/dev/null" || { error "CP FOLDER ${1} on ${2}"; return 1; }
   }
 
- cpfile() {
+  cpfile() {
     cp "${1:?}" "${2:?}" \
       2>"/dev/null" || { error "CP FILE ${1} on ${2}"; return 1; }
   }
@@ -121,6 +121,7 @@ if [ -z "${IGNORE_ALL_COBAYA_INSTALLATION}" ]; then
 
     cdfolder "${COB:?}/cobaya/" || return 1;
     
+    # parenthesis = run in a subshell
     ( sh change_python_files.sh ) || { error "${EC22:?} (CPF)"; return 1; }
 
     cdfolder "${ROOTDIR}" || return 1;
@@ -160,8 +161,9 @@ if [ -z "${IGNORE_ALL_COBAYA_INSTALLATION}" ]; then
     
     cppatch "${TFOLDER:?}" "change_planck_clik.sh" || return 1
   
-    cdfolder "${COB:?}/${TFOLDER}/" || return 1;
+    cdfolder "${COB:?}/${TFOLDER}" || return 1;
     
+    # parenthesis = run in a subshell
     ( sh change_planck_clik.sh ) || { error "${EC22:?} (CPC)"; return 1; }
     
     unset -v TFOLDER
@@ -272,13 +274,13 @@ if [ -z "${IGNORE_ALL_COBAYA_INSTALLATION}" ]; then
   # TODO - download from original git repo
   if [ -z "${SKIP_DECOMM_SIMONS_OBSERVATORY}" ]; then
     
-    ptop "INSTALLING AND PATCHING SIMONS OBSERVATORY LIKELIHOOD"
+    ptop "INSTALLING AND PATCHING SIMONS OBSERVATORY LIKELIHOOD" || return 1;
 
     cppatchfolder "${COBLIKE:?}" "mflike" || return 1
     
     cdfolder "${ROOTDIR}" || return 1;
 
-    pbottom "INSTALLING AND PATCHING SIMONS OBSERVATORY LIKELIHOOD"
+    pbottom "INSTALLING AND PATCHING SIMONS OBSERVATORY LIKELIHOOD" || return 1;
 
   fi
   # ----------------------------------------------------------------------------
@@ -293,7 +295,7 @@ if [ -z "${IGNORE_ALL_COBAYA_INSTALLATION}" ]; then
 
   if [ -z "${SKIP_DECOMM_CAMSPEC}" ]; then
 
-    ptop "PATCHING CAMSPEC 2021 LIKELIHOOD"
+    ptop "PATCHING CAMSPEC 2021 LIKELIHOOD" || return 1;
 
     TFOLDER="${COBLIKE}/base_classes"
     
@@ -310,7 +312,7 @@ if [ -z "${IGNORE_ALL_COBAYA_INSTALLATION}" ]; then
     
     cdfolder "${ROOTDIR:?}" || return 1;
 
-    pbottom "PATCHING CAMSPEC 2021 LIKELIHOOD"
+    pbottom "PATCHING CAMSPEC 2021 LIKELIHOOD" || return 1;
 
   else
 
@@ -390,7 +392,7 @@ if [ -z "${IGNORE_ALL_COBAYA_INSTALLATION}" ]; then
   
   unset_all | return 1;
   
-  pbottom2 "UPDATING COBAYA PACKAGE"
+  pbottom2 "UPDATING COBAYA PACKAGE" || return 1;
 
 fi
 
