@@ -70,13 +70,9 @@ fi
 # ----------------------------------------------------------------------------
 # ----------------------------------------------------------------------------
 # ----------------------------------------------------------------------------
-source ./installation_scripts/impl_unset_keys.sh
-unset ROOTDIR
-unset SETUP_COBAYA
-unset SETUP_PREREQUISITE_DONE
-unset SET_INSTALLATION_OPTIONS
-unset START_COCOA_DONE
-unset fail
+source ./installation_scripts/.impl_unset_keys.sh
+unset -v ROOTDIR SETUP_COBAYA START_COCOA_DONE fail
+unset -v SETUP_PREREQUISITE_DONE SET_INSTALLATION_OPTIONS
 # ----------------------------------------------------------------------------
 # ----------------------------------------------------------------------------
 # ----------------------------------------------------------------------------
