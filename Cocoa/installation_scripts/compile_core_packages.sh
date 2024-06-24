@@ -125,7 +125,7 @@ if [ -z "${IGNORE_CORE_INSTALLATION}" ]; then
     FC="${FORTRAN_COMPILER:?}" CC="${C_COMPILER:?}" \
       ./configure \
       --prefix="${ROOTDIR:?}/.local" \
-      >${OUT1:?} 2>${OUT2:?} || { error "${EC11:?}"; return 1; }
+      >${OUT1:?} 2>${OUT2:?} || { error "(BINUTILS) ${EC11:?}"; return 1; }
 
     make -j $MNT \
       >${OUT1:?} 2>${OUT2:?} || { error "(BINUTILS) ${EC7:?}"; return 1; }
@@ -269,11 +269,13 @@ if [ -z "${IGNORE_CORE_INSTALLATION}" ]; then
       --prefix="${ROOTDIR:?}/.local" \
       --enable-shared=yes \
       --enable-static=yes \
-      >${OUT1:?} 2>${OUT2:?} || { error "${EC11:?}"; return 1; }
+      >${OUT1:?} 2>${OUT2:?} || { error "(FFTW) ${EC11:?}"; return 1; }
 
-    make -j $MNT all >${OUT1:?} 2>${OUT2:?} || { error "${EC8:?}"; return 1; }
+    make -j $MNT all \
+      >${OUT1:?} 2>${OUT2:?} || { error "(FFTW) ${EC8:?}"; return 1; }
 
-    make install >${OUT1:?} 2>${OUT2:?} || { error "${EC10:?}"; return 1; }
+    make install \
+      >${OUT1:?} 2>${OUT2:?} || { error "(FFTW) ${EC10:?}"; return 1; }
 
     unset -v PACKDIR
 
@@ -308,11 +310,13 @@ if [ -z "${IGNORE_CORE_INSTALLATION}" ]; then
       -DCMAKE_CXX_COMPILER="${CXX_COMPILER:?}" \
       -DCMAKE_FC_COMPILER="${FORTRAN_COMPILER:?}" \
       --log-level=ERROR .. \
-      >${OUT1:?} 2>${OUT2:?} || { error "${EC12:?}"; return 1; }
+      >${OUT1:?} 2>${OUT2:?} || { error "(CFITSIO) ${EC12:?}"; return 1; }
 
-    make -j $MNT all >${OUT1:?} 2>${OUT2:?} || { error "${EC8:?}"; return 1; }
+    make -j $MNT all \
+      >${OUT1:?} 2>${OUT2:?} || { error "(CFITSIO) ${EC8:?}"; return 1; }
 
-    make install >${OUT1:?} 2>${OUT2:?} || { error "${EC10:?}"; return 1; }
+    make install \
+      >${OUT1:?} 2>${OUT2:?} || { error "(CFITSIO) ${EC10:?}"; return 1; }
     
     rm -rf "${PACKDIR:?}/${BFD:?}"
     
@@ -340,11 +344,13 @@ if [ -z "${IGNORE_CORE_INSTALLATION}" ]; then
       --prefix="${ROOTDIR:?}/.local" \
       --enable-shared=yes \
       --enable-static=yes \
-      >${OUT1:?} 2>${OUT2:?} || { error "${EC11:?}"; return 1; }
+      >${OUT1:?} 2>${OUT2:?} || { error "(GSL) ${EC11:?}"; return 1; }
  
-    make -j $MNT all >${OUT1:?} 2>${OUT2:?} || { error "${EC8:?}"; return 1; }
+    make -j $MNT all \
+      >${OUT1:?} 2>${OUT2:?} || { error "(GSL) ${EC8:?}"; return 1; }
 
-    make install >${OUT1:?} 2>${OUT2:?} || { error "${EC10:?}"; return 1; }
+    make install \
+      >${OUT1:?} 2>${OUT2:?} || { error "(GSL) ${EC10:?}"; return 1; }
 
     unset -v PACKDIR
 
@@ -369,7 +375,7 @@ if [ -z "${IGNORE_CORE_INSTALLATION}" ]; then
       --no-dependencies \
       --prefix="${ROOTDIR:?}/.local" \
       --no-index 
-      >${OUT1:?} 2>${OUT2:?} || { error "${EC13:?}"; return 1; }
+      >${OUT1:?} 2>${OUT2:?} || { error "(EUCLIDEMU2) ${EC13:?}"; return 1; }
 
     cdfolder "${ROOTDIR}" || return 1;  
     
@@ -395,11 +401,13 @@ if [ -z "${IGNORE_CORE_INSTALLATION}" ]; then
       -DCMAKE_C_COMPILER="${C_COMPILER:?}" \
       -DCMAKE_CXX_COMPILER="${CXX_COMPILER:?}" \
       --log-level=ERROR . \
-      >${OUT1:?} 2>${OUT2:?} || { error "${EC12:?}"; return 1; }
+      >${OUT1:?} 2>${OUT2:?} || { error "(SPDLOG) ${EC12:?}"; return 1; }
 
-    make -j $MNT >${OUT1:?} 2>${OUT2:?} || { error "${EC8:?}"; return 1; }
+    make -j $MNT \
+      >${OUT1:?} 2>${OUT2:?} || { error "(SPDLOG) ${EC8:?}"; return 1; }
 
-    make install >${OUT1:?} 2>${OUT2:?} || { error "${EC10:?}"; return 1; }
+    make install \
+      >${OUT1:?} 2>${OUT2:?} || { error "(SPDLOG) ${EC10:?}"; return 1; }
 
     unset -v PACKDIR
 
@@ -431,14 +439,16 @@ if [ -z "${IGNORE_CORE_INSTALLATION}" ]; then
       -DLAPACK_LIBRARIES="${ROOTDIR:?}/.local/lib/liblapack.so" \
       -DBLAS_FOUND=NO \
       --log-level=ERROR . \
-      >${OUT1:?} 2>${OUT2:?} || { error "${EC12:?}"; return 1; }
+      >${OUT1:?} 2>${OUT2:?} || { error "(ARMA) ${EC12:?}"; return 1; }
     
-    make clean >${OUT1:?} 2>${OUT2:?} || { error "${EC2:?}"; return 1; }
+    make clean \
+      >${OUT1:?} 2>${OUT2:?} || { error "(ARMA) ${EC2:?}"; return 1; }
 
     make -j $MNT all -Wno-dev \
-      >${OUT1:?} 2>${OUT2:?} || { error "${EC8:?}"; return 1; }
+      >${OUT1:?} 2>${OUT2:?} || { error "(ARMA) ${EC8:?}"; return 1; }
 
-    make install >${OUT1:?} 2>${OUT2:?} || { error "${EC10:?}"; return 1; }
+    make install \
+      >${OUT1:?} 2>${OUT2:?} || { error "(ARMA) ${EC10:?}"; return 1; }
 
     unset -v PACKDIR
 
@@ -488,7 +498,7 @@ if [ -z "${IGNORE_CORE_INSTALLATION}" ]; then
     cdfolder "${PACKDIR}" || return 1;
 
     ./bootstrap.sh --prefix="${ROOTDIR:?}/.local" \
-      >${OUT1:?} 2>${OUT2:?} || { error "${EC19:?}"; return 1; }
+      >${OUT1:?} 2>${OUT2:?} || { error "(BOOST) ${EC19:?}"; return 1; }
 
     ./b2 --with=regex install \
       --without-python \
@@ -496,7 +506,7 @@ if [ -z "${IGNORE_CORE_INSTALLATION}" ]; then
       --without-timer  \
       --without-mpi \
       --without-atomic \
-      >${OUT1:?} 2>${OUT2:?} || { error "${EC21:?}"; return 1; }
+      >${OUT1:?} 2>${OUT2:?} || { error "(BOOST) ${EC21:?}"; return 1; }
     
     unset -v PACKDIR
 
