@@ -144,3 +144,5 @@ export EC20="MKDIR"
 export EC21="B2"
 
 export EC22="SHELL SCRIPT"
+
+export EC23="GIT RESET"
