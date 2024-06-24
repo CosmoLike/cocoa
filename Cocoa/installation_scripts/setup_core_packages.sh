@@ -162,6 +162,35 @@ unset_env_vars || return 1;
 CCIL="${ROOTDIR}/../cocoa_installation_libraries"
 
 # ----------------------------------------------------------------------------
+# ------------------------------ XZ LIBRARY ----------------------------------
+# ----------------------------------------------------------------------------
+if [ -z "${IGNORE_XZ_INSTALLATION}" ]; then
+  ptop "INSTALLING AND COMPILING XZ LIBRARY" || return 1;
+
+  cdfolder "${CCIL}" || return 1;
+
+  #False xz file: just to trigger GIT LFS
+  cp xz-5.2.5.tar.gz.xz xz-5.2.5.tar.gz \
+    2>${OUT2} ||  { error "CP XZ TAR"; return 1; }
+
+  tar -xf xz-5.2.5.tar.gz.xz \
+    >${OUT1} 2>${OUT2} ||  { error "TAR XZ TAR"; return 1; }
+
+  cdfolder "${CCIL}/xz-5.2.5/" || return 1;
+
+  CC=${C_COMPILER:?} ./configure --prefix="${ROOTDIR:?}/.local" \
+    >${OUT1} 2>${OUT2} || { error "${EC11:?}"; return 1; }
+
+  make -j $MNT all >${OUT1} 2>${OUT2} || { error "${:EC8?}"; return 1; }
+
+  make install >${OUT1} 2>${OUT2} || { error "${EC10:?}"; return 1; }
+
+  cdfolder "${ROOTDIR}" || return 1;
+
+  pbottom "INSTALLING XZ LIBRARY" || return 1;
+fi
+
+# ----------------------------------------------------------------------------
 # --------------------------- CMAKE LIBRARY ----------------------------------
 # ----------------------------------------------------------------------------
 
