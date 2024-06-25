@@ -32,7 +32,7 @@ unset_all () {
 }
 
 error () {
-  fail_script_msg "setup_decompress_files.sh" "${1}"
+  fail_script_msg "$(basename ${BASH_SOURCE[0]})" "${1}"
   unset_all || return 1
 }
 
@@ -58,7 +58,7 @@ if [ -z "${NO_UNXZ_COCOA_INSTALLATION_LIBRARIES}" ]; then
   # parenthesis = run in a subshell 
   ( sh unxv_all.sh )  || { error "${EC22:?} unxv_all.sh"; return 1; }
 
-  cdfolder "${ROOTDIR}" || return 1;
+  cdfolder "${ROOTDIR:?}" || return 1;
 
   pbottom 'DECOMPRESSING FILES ON /COCOA_INSTALLATION_LIBRARIES' || return 1
 
@@ -83,7 +83,7 @@ if [ -z "${NO_UNXZ_EXTERNAL_MODULES_DATA}" ]; then
   # parenthesis = run in a subshell
   ( sh unxv_all.sh ) || { error "SCRIPT unxv_all.sh"; return 1; }
 
-  cdfolder "${ROOTDIR}" || return 1;
+  cdfolder "${ROOTDIR:?}" || return 1;
 
   pbottom 'DECOMPRESSING FILES ON /EXTERNAL_MODULES/DATA' || return 1
 

@@ -7,70 +7,32 @@ if [ -z "${ROOTDIR}" ]; then
     return
 fi
 
-sh $ROOTDIR/external_modules/data/clean_all.sh 
-cd $ROOTDIR/external_modules/data
+( sh "${ROOTDIR:?}"/external_modules/data/clean_all.sh )
 
-sh unxv_sn.sh
-if [ $? -ne 0 ]; then
-  cd $ROOTDIR
-  return 1
-fi
+cd "${ROOTDIR:?}/external_modules/data"
 
-sh unxv_bao.sh
-if [ $? -ne 0 ]; then
-  cd $ROOTDIR
-  return 1
-fi
+( sh unxv_sn.sh ) || { cd "${ROOTDIR:?}"; return 1; }
 
-sh unxv_h0licow.sh
-if [ $? -ne 0 ]; then
-  cd $ROOTDIR
-  return 1
-fi
+( sh unxv_bao.sh ) || { cd "${ROOTDIR:?}"; return 1; }
 
-sh unxv_act_dr6.sh
-if [ $? -ne 0 ]; then
-  cd $ROOTDIR
-  return 1
-fi
+( sh unxv_h0licow.sh ) || { cd "${ROOTDIR:?}"; return 1; }
 
-sh unxv_simons_observatory.sh
-if [ $? -ne 0 ]; then
-  cd $ROOTDIR
-  return 1
-fi
+( sh unxv_act_dr6.sh ) || { cd "${ROOTDIR:?}"; return 1; }
 
-sh unxv_bicep.sh
-if [ $? -ne 0 ]; then
-  cd $ROOTDIR
-  return 1
-fi
+( sh unxv_simons_observatory.sh ) || { cd "${ROOTDIR:?}"; return 1; }
 
-sh unxv_spt.sh
-if [ $? -ne 0 ]; then
-  cd $ROOTDIR
-  return 1
-fi
+( sh unxv_bicep.sh ) || { cd "${ROOTDIR:?}"; return 1; }
 
-sh unxv_planck2018_basic.sh
-if [ $? -ne 0 ]; then
-  cd $ROOTDIR
-  return 1
-fi
+( sh unxv_spt.sh ) || { cd "${ROOTDIR:?}"; return 1; }
 
-sh unxv_camspec.sh
-if [ $? -ne 0 ]; then
-  cd $ROOTDIR
-  return 1
-fi
+( sh unxv_planck2018_basic.sh ) || { cd "${ROOTDIR:?}"; return 1; }
 
-sh unxv_lipop.sh
-if [ $? -ne 0 ]; then
-  cd $ROOTDIR
-  return 1
-fi
+( sh unxv_camspec.sh ) || { cd "${ROOTDIR:?}"; return 1; }
 
-cd $ROOTDIR
+( sh unxv_lipop.sh ) || { cd "${ROOTDIR:?}"; return 1; }
+
+cd "${ROOTDIR:?}"
+
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------

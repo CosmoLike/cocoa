@@ -30,7 +30,7 @@ if [ -z "${IGNORE_PLANCK_COMPILATION}" ]; then
   }
 
   error () {
-    fail_script_msg "compile_planck.sh" "${1}"
+    fail_script_msg "$(basename ${BASH_SOURCE[0]})" "${1}"
     unset_all || return 1
   }
 

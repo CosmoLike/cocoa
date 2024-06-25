@@ -80,7 +80,7 @@ export IGNORE_EMULATOR_GPU_PIP_PACKAGES=1
 
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
-# ---------------------- DERIVED & RARELY USED FLAGS ---------------------------
+# --------------------- DERIVED & RARELY CHANGED FLAGS -------------------------
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
 
@@ -114,7 +114,9 @@ export LOLLIPOP_GIT_COMMIT="280a9c93d33bc6a058d6bf769ec82d9f7fdbd2b6"
 
 export LIPOP_DATA_VERSION=4.2
 
+export SPT3G_URL='https://github.com/SouthPoleTelescope/spt3g_y1_dist.git'
 export SPT3G_DATA_GIT_COMMIT="66da8e9e2f325024566fe13245788bf8ede897bc"
+export SPT_3G_NAME="spt_3g"
 
 export HOLICOW_URL='https://github.com/shsuyu/H0LiCOW-public.git'
 export HOLICOW_DATA_GIT_COMMIT="f792647d1fd6c09d9e052fef526669cbd702ab82"

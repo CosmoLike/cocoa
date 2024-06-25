@@ -3,178 +3,115 @@
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
 if [ -z "${SKIP_DECOMM_LIPOP}" ]; then
+
   if [ -z "${ROOTDIR}" ]; then
-      echo 'ERROR ROOTDIR not defined'
-      return
-  fi
-  if [ -z "${LIPOP_DATA_VERSION}" ]; then
-      echo 'ERROR LIPOP_DATA_VERSION not defined'
-      return
-  fi
-  if [ -z "${DEBUG_UNXV_CLEAN_ALL}" ]; then
-    export OUT1="/dev/null"
-    export OUT2="/dev/null"
-  else
-    export OUT1="/dev/tty"
-    export OUT2="/dev/tty"
+    pfail 'ROOTDIR'; return 1
   fi
 
-  cd $ROOTDIR/external_modules/data
+  # parenthesis = run in a subshell 
+  ( source "${ROOTDIR:?}/installation_scripts/.check_flags.sh" ) || return 1;
+    
+  unset_env_vars () { 
+    unset -v EDATAF URL LPDVS FOLDER
+    cdroot || return 1;
+  }
 
-  echo -e '\033[0;32m'"\t\t DECOMPRESSING HIL/LOL-LIPOP DATA"'\033[0m'
+  unset_env_funcs () {
+    unset -f cdfolder cpfolder error
+    unset -f unset_env_funcs
+    cdroot || return 1;
+  }
 
-  export PLK_DIR="${ROOTDIR}/external_modules/data/planck"
-  export LPVS=$LIPOP_DATA_VERSION
+  unset_all () {
+    unset_env_vars
+    unset_env_funcs
+    unset -f unset_all
+    cdroot || return 1;
+  }
 
-  rm -f  "${PLK_DIR}/planck_2020_hillipop_EE_v$LPVS.tar.gz"
-  rm -f  "${PLK_DIR}/planck_2020_hillipop_TE_v$LPVS.tar.gz"
-  rm -f  "${PLK_DIR}/planck_2020_hillipop_TT_v$LPVS.tar.gz"
-  rm -f  "${PLK_DIR}/planck_2020_hillipop_TTTEEE_v$LPVS.tar.gz"
-  rm -f  "${PLK_DIR}/planck_2020_lollipop.tar.gz"
-  rm -rf "${PLK_DIR}/planck_2020"
-  rm -rf "${PLK_DIR}/hillipop"
-  rm -rf "${PLK_DIR}/lollipop"
+  error () {
+    fail_script_msg "$(basename ${BASH_SOURCE[0]})" "${1}"
+    unset_all || return 1
+  }
 
-  cd  $ROOTDIR/external_modules/data/planck/
+  cdfolder() {
+    cd "${1:?}" 2>"/dev/null" || { error "CD FOLDER: ${1}"; return 1; }
+  }
+
+  unset_env_vars || return 1
+
+  # E = EXTERNAL, DATA, F=FODLER
+  EDATAF="${ROOTDIR:?}/external_modules/data"
+
+  URL="https://portal.nersc.gov/cfs/cmb/planck2020/likelihoods"
+
+  LPDVS=${LIPOP_DATA_VERSION:-"4.2"}
+
+  # T = TMP
+  declare -a FILE=( "planck_2020_hillipop_EE_v${LPDVS:?}" 
+                    "planck_2020_hillipop_TE_v${LPDVS:?}" 
+                    "planck_2020_hillipop_TT_v${LPDVS:?}"
+                    "planck_2020_hillipop_TTTEEE_v${LPDVS:?}"
+                    "planck_2020_lollipop")
+
+  # ---------------------------------------------------------------------------
+
+  ptop 'DECOMPRESSING LIPOP DATA' || return 1
   
-  export PL2020_URL="https://portal.nersc.gov/cfs/cmb/planck2020/likelihoods/planck_2020"
-
-  wget "${PL2020_URL}_hillipop_EE_v${LPVS}.tar.gz" > ${OUT1} 2> ${OUT2}
-  if [ $? -ne 0 ]; then 
-    echo -e '\033[0;31m'"\t\t DECOMPRESSING EE HILLIPOP FAILED"'\033[0m'
-    cd $ROOTDIR
-    unset OUT1
-    unset OUT2
-    unset PL2020_URL
-    unset PLK_DIR
-    unset LPVS
-    return 1
-  fi
-
-  tar -xvzf planck_2020_hillipop_EE_v$LPVS.tar.gz > ${OUT1} 2> ${OUT2}
-  if [ $? -ne 0 ]; then
-    echo -e '\033[0;31m'"\t\t DECOMPRESSING EE HILLIPOP FAILED"'\033[0m'
-    cd $ROOTDIR
-    unset OUT1
-    unset OUT2
-    unset PL2020_URL
-    unset PLK_DIR
-    unset LPVS
-    return 1
-  fi
+  # ----------------------------------------------------------------------------
+  # note: in case script run >1x w/ previous run stoped prematurely b/c error
   
-  wget "${PL2020_URL}_hillipop_TE_v${LPVS}.tar.gz" > ${OUT1} 2> ${OUT2}
-  if [ $? -ne 0 ]; then 
-    echo -e '\033[0;31m'"\t\t DECOMPRESSING TE HILLIPOP FAILED"'\033[0m'
-    cd $ROOTDIR
-    unset OUT1
-    unset OUT2
-    unset PL2020_URL
-    unset PLK_DIR
-    unset LPVS
-    return 1
-  fi
+  rm -rf "${EDATAF:?}/planck/planck_2020"
+  rm -rf "${EDATAF:?}/planck/hillipop"
+  rm -rf "${EDATAF:?}/planck/lollipop"
+  
+  for (( i=0; i<${#FILE[@]}; i++ ));
+  do
+    rm -f  "${EDATAF:?}/planck/${FILE[$i]:?}.tar.gz"
+  done  
 
-  tar -xvzf planck_2020_hillipop_TE_v$LPVS.tar.gz > ${OUT1} 2> ${OUT2}
-  if [ $? -ne 0 ]; then
-    echo -e '\033[0;31m'"\t\t DECOMPRESSING TE HILLIPOP FAILED"'\033[0m'
-    cd $ROOTDIR
-    unset OUT1
-    unset OUT2
-    unset PL2020_URL
-    unset PLK_DIR
-    unset LPVS
-    return 1
-  fi
+  # ---------------------------------------------------------------------------
+  
+  cdfolder "${EDATAF:?}/planck"
 
-  wget "${PL2020_URL}_hillipop_TTTEEE_v${LPVS}.tar.gz" > ${OUT1} 2> ${OUT2}
-  if [ $? -ne 0 ]; then 
-    echo -e '\033[0;31m'"\t\t DECOMPRESSING TTTEEE HILLIPOP FAILED"'\033[0m'
-    cd $ROOTDIR
-    unset OUT1
-    unset OUT2
-    unset PL2020_URL
-    unset PLK_DIR
-    unset LPVS
-    return 1
-  fi
+  for (( i=0; i<${#FILE[@]}; i++ ));
+  do
 
-  tar -xvzf planck_2020_hillipop_TTTEEE_v$LPVS.tar.gz > ${OUT1} 2> ${OUT2}
-  if [ $? -ne 0 ]; then
-    echo -e '\033[0;31m'"\t\t DECOMPRESSING TTTEEE HILLIPOP FAILED"'\033[0m'
-    cd $ROOTDIR
-    unset OUT1
-    unset OUT2
-    unset PL2020_URL
-    unset PLK_DIR
-    unset LPVS
-    return 1
-  fi
+    wget "${URL}/${FILE[$i]:?}.tar.gz" \
+      >${OUT1:?} 2>${OUT2:?} || { error "${EC24:?}"; return 1; }
 
-  wget "${PL2020_URL}_hillipop_TT_v${LPVS}.tar.gz" > ${OUT1} 2> ${OUT2}
-  if [ $? -ne 0 ]; then 
-    echo -e '\033[0;31m'"\t\t DECOMPRESSING TT HILLIPOP FAILED"'\033[0m'
-    cd $ROOTDIR
-    unset OUT1
-    unset OUT2
-    unset PL2020_URL
-    unset PLK_DIR
-    unset LPVS
-    return 1
-  fi
+    tar -xvzf "${FILE[$i]:?}.tar.gz" \
+      >${OUT1:?} 2>${OUT2:?} || { error "${EC25:?} (${FILE[$i]:?})"; return 1; }
+  
+  done
 
-  tar -xvzf planck_2020_hillipop_TT_v$LPVS.tar.gz > ${OUT1} 2> ${OUT2}
-  if [ $? -ne 0 ]; then
-    echo -e '\033[0;31m'"\t\t DECOMPRESSING TT HILLIPOP FAILED"'\033[0m'
-    cd $ROOTDIR
-    unset OUT1
-    unset OUT2
-    unset PL2020_URL
-    unset PLK_DIR
-    unset LPVS
-    return 1
-  fi
+  # ---------------------------------------------------------------------------
+  # note: by default, LIPOP saves the likelihoods on planck_2020
+  
+  mv "${EDATAF:?}/planck/planck_2020/hillipop" "${EDATAF:?}/planck"
+  
+  mv "${EDATAF:?}/planck/planck_2020/lollipop" "${EDATAF:?}/planck"
 
-  wget "${PL2020_URL}_lollipop.tar.gz" > ${OUT1} 2> ${OUT2}
-  if [ $? -ne 0 ]; then 
-    echo -e '\033[0;31m'"\t\t DECOMPRESSING LOLLIPOP FAILED"'\033[0m'
-    cd $ROOTDIR
-    unset PL2020_URL
-    unset PLK_DIR
-    unset LPVS
-    return 1
-  fi
+  # ----------------------------------------------------------------------------
+  # clean tar.gz files (saves space) 
+  
+  rm -rf "${EDATAF:?}/planck/planck_2020"
 
-  tar -xvzf planck_2020_lollipop.tar.gz > ${OUT1} 2> ${OUT2}
-  if [ $? -ne 0 ]; then
-    echo -e '\033[0;31m'"\t\t DECOMPRESSING LOLLIPOP FAILED"'\033[0m'
-    cd $ROOTDIR
-    unset OUT1
-    unset OUT2
-    unset PL2020_URL
-    unset PLK_DIR
-    unset LPVS
-    return 1
-  fi
+  for (( i=0; i<${#FILE[@]}; i++ ));
+  do
+    rm -f  "${EDATAF:?}/planck/${FILE$i]:?}.tar.gz"
+  done
+  
+  # ---------------------------------------------------------------------------
+  
+  cdfolder "${ROOTDIR}" || return 1
+  
+  unset_all || return 1;
 
-  mv "${PLK_DIR}/planck_2020/hillipop" $PLK_DIR
-  mv "${PLK_DIR}/planck_2020/lollipop" $PLK_DIR
+  pbottom 'DECOMPRESSING LIPOP DATA' || return 1
 
-  rm -f  "${PLK_DIR}/planck_2020_hillipop_EE_v${LIPOP_DATA_VERSION}.tar.gz"
-  rm -f  "${PLK_DIR}/planck_2020_hillipop_TE_v${LIPOP_DATA_VERSION}.tar.gz"
-  rm -f  "${PLK_DIR}/planck_2020_hillipop_TT_v${LIPOP_DATA_VERSION}.tar.gz"
-  rm -f  "${PLK_DIR}/planck_2020_lollipop.tar.gz"
-  rm -f  "${PLK_DIR}/planck_2020_hillipop_TTTEEE_v${LIPOP_DATA_VERSION}.tar.gz"
-  rm -rf "${PLK_DIR}/planck_2020"
-
-  cd $ROOTDIR/
-  unset OUT1
-  unset OUT2
-  unset PL2020_URL
-  unset PLK_DIR
-  unset LPVS
-  echo -e '\033[0;32m'"\t\t DECOMPRESSING LIPOP DATA DONE"'\033[0m'
 fi
+
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------

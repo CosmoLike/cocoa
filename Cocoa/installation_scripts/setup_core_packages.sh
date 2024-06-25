@@ -6,9 +6,10 @@ if [ -z "${ROOTDIR}" ]; then
   pfail 'ROOTDIR'; return 1
 fi
 
-source "${ROOTDIR:?}/installation_scripts/.check_flags.sh" || return 1;
+# parenthesis = run in a subshell
+( source "${ROOTDIR:?}/installation_scripts/.check_flags.sh" )  || return 1;
 
-unset_env_vars_sil () {
+unset_env_vars () {
   unset -v URL_BASE URL FOLDER VER XZF CCIL CNAME PACKDIR
   cdroot || return 1;
 }
@@ -27,7 +28,7 @@ unset_all () {
 }
 
 error () {
-  fail_script_msg "setup_installation_libraries.sh" "${1}"
+  fail_script_msg "$(basename ${BASH_SOURCE[0]})" "${1}"
   unset_all || return 1
 }
 
@@ -167,23 +168,23 @@ CCIL="${ROOTDIR}/../cocoa_installation_libraries"
 if [ -z "${IGNORE_XZ_INSTALLATION}" ]; then
   ptop "INSTALLING AND COMPILING XZ LIBRARY" || return 1;
 
-  cdfolder "${CCIL}" || return 1;
+  cdfolder "${CCIL:?}" || return 1;
 
   #False xz file: just to trigger GIT LFS
   cp xz-5.2.5.tar.gz.xz xz-5.2.5.tar.gz \
     2>${OUT2} ||  { error "CP XZ TAR"; return 1; }
 
   tar -xf xz-5.2.5.tar.gz.xz \
-    >${OUT1} 2>${OUT2} ||  { error "TAR XZ TAR"; return 1; }
+    >${OUT1:?} 2>${OUT2:?} ||  { error "TAR XZ TAR"; return 1; }
 
-  cdfolder "${CCIL}/xz-5.2.5/" || return 1;
+  cdfolder "${CCIL:?}/xz-5.2.5/" || return 1;
 
-  CC=${C_COMPILER:?} ./configure --prefix="${ROOTDIR:?}/.local" \
-    >${OUT1} 2>${OUT2} || { error "${EC11:?}"; return 1; }
+  CC="${C_COMPILER:?}" ./configure --prefix="${ROOTDIR:?}/.local" \
+    >${OUT1:?} 2>${OUT2:?} || { error "${EC11:?}"; return 1; }
 
-  make -j $MNT all >${OUT1} 2>${OUT2} || { error "${:EC8?}"; return 1; }
+  make -j $MNT all >${OUT1:?} 2>${OUT2:?} || { error "${:EC8?}"; return 1; }
 
-  make install >${OUT1} 2>${OUT2} || { error "${EC10:?}"; return 1; }
+  make install >${OUT1:?} 2>${OUT2:?} || { error "${EC10:?}"; return 1; }
 
   cdfolder "${ROOTDIR}" || return 1;
 
@@ -206,8 +207,8 @@ if [ -z "${IGNORE_CMAKE_INSTALLATION}" ]; then
   
   XZF="cmake.xz"
 
-  gitact "${FOLDER}" "${VER}" "${URL}" \
-    "${COCOA_CMAKE_DIR:-"cmake-3.26.4"}" "${XZF}" || return 1;
+  gitact "${FOLDER:?}" "${VER:?}" "${URL:?}" \
+    "${COCOA_CMAKE_DIR:-"cmake-3.26.4"}" "${XZF:?}" || return 1;
 
   unset -v URL FOLDER VER XZF
 
@@ -231,8 +232,8 @@ if [ -z "${IGNORE_DISTUTILS_INSTALLATION}" ]; then
   
   XZF="binutils.xz"
 
-  wgetact "${FOLDER}" "${FILE}" "${URL}" \
-    "${COCOA_BINUTILS_DIR:-"binutils-2.37"}" "${XZF}" || return 1;
+  wgetact "${FOLDER:?}" "${FILE:?}" "${URL:?}" \
+    "${COCOA_BINUTILS_DIR:-"binutils-2.37"}" "${XZF:?}" || return 1;
 
   unset -v URL FOLDER FILE XZF
 
@@ -256,8 +257,8 @@ if [ -z "${IGNORE_DISTUTILS_INSTALLATION}" ]; then || return 1;
   
   XZF="texinfo.xz"
 
-  wgetact "${FOLDER}" "${FILE}" "${URL}" \
-    "${COCOA_TEXINFO_DIR:-"texinfo-7.0.3"}" "${XZF}" || return 1;
+  wgetact "${FOLDER:?}" "${FILE:?}" "${URL:?}" \
+    "${COCOA_TEXINFO_DIR:-"texinfo-7.0.3"}" "${XZF:?}" || return 1;
 
   unset -v URL FOLDER FILE XZF
 
@@ -281,8 +282,8 @@ if [ -z "${IGNORE_OPENBLAS_INSTALLATION}" ]; then
 
   XZF="OpenBLAS.xz"
 
-  gitact "${FOLDER}" "${VER}" "${URL}" \
-    "${COCOA_OPENBLAS_DIR:-"OpenBLAS-0.3.23"}" "${XZF}" || return 1;
+  gitact "${FOLDER:?}" "${VER:?}" "${URL:?}" \
+    "${COCOA_OPENBLAS_DIR:-"OpenBLAS-0.3.23"}" "${XZF:?}" || return 1;
 
   unset -v URL FOLDER VER XZF
 
@@ -306,8 +307,8 @@ if [ -z "${IGNORE_FORTRAN_LAPACK_INSTALLATION}" ]; then
 
   XZF="lapack.xz"
 
-  gitact "${FOLDER}" "${VER}" "${URL}" \
-    "${COCOA_LAPACK_DIR:-"lapack-3.11.0"}" "${XZF}" || return 1;
+  gitact "${FOLDER:?}" "${VER:?}" "${URL:?}" \
+    "${COCOA_LAPACK_DIR:-"lapack-3.11.0"}" "${XZF:?}" || return 1;
 
   unset -v URL FOLDER VER XZF
 
@@ -328,12 +329,13 @@ if [ -z "${IGNORE_HDF5_INSTALLATION}" ]; then
   FILE="tar.gz"
 
   URL_BASE="https://hdf-wordpress-1.s3.amazonaws.com/wp-content/uploads"
+  
   URL="${URL_BASE:?}/manual/HDF5/HDF5_1_12_3/src/${FOLDER}.${FILE}"
 
   XZF="hdf5.xz"
 
-  wgetact "${FOLDER}" "${FILE}" "${URL}" \
-    "${COCOA_HDF5_DIR:-"hdf5-1.12.3"}" "${XZF}" || return 1;
+  wgetact "${FOLDER:?}" "${FILE:?}" "${URL:?}" \
+    "${COCOA_HDF5_DIR:-"hdf5-1.12.3"}" "${XZF:?}" || return 1;
 
   unset -v URL_BASE URL FOLDER FILE XZF
 
@@ -354,12 +356,13 @@ if [ -z "${IGNORE_C_CFITSIO_INSTALLATION}" ]; then
   FILE="tar.gz"
   
   URL_BASE="http://heasarc.gsfc.nasa.gov"
+  
   URL="${URL_BASE}/FTP/software/fitsio/c/${FOLDER}.${FILE}"
   
   XZF="cfitsio.xz"
 
-  wgetact "${FOLDER}" "${FILE}" "${URL}" \ 
-    "${COCOA_CFITSIO_DIR:-"cfitsio-4.0.0"}" "${XZF}" || return 1;
+  wgetact "${FOLDER:?}" "${FILE:?}" "${URL:?}" \ 
+    "${COCOA_CFITSIO_DIR:-"cfitsio-4.0.0"}" "${XZF:?}" || return 1;
 
   unset -v URL_BASE URL FOLDER FILE XZF
 
@@ -383,8 +386,8 @@ if [ -z "${IGNORE_C_FFTW_INSTALLATION}" ]; then
 
   XZF="fftw.xz"
 
-  wgetact "${FOLDER}" "${FILE}" "${URL}" \
-    "${COCOA_FFTW_DIR:-"fftw-3.3.10"}" "${XZF}" || return 1;
+  wgetact "${FOLDER:?}" "${FILE:?}" "${URL:?}" \
+    "${COCOA_FFTW_DIR:-"fftw-3.3.10"}" "${XZF:?}" || return 1;
 
   unset -v URL FOLDER FILE XZF
 
@@ -408,8 +411,8 @@ if [ -z "${IGNORE_C_GSL_INSTALLATION}" ]; then
 
   XZF="gsl-2.7.xz"
 
-  wgetact "${FOLDER}" "${FILE}" "${URL}" \ 
-    "${COCOA_GSL_DIR:-"gsl-2.7"}" "${XZF}" || return 1;
+  wgetact "${FOLDER:?}" "${FILE:?}" "${URL:?}" \ 
+    "${COCOA_GSL_DIR:-"gsl-2.7"}" "${XZF:?}" || return 1;
 
   unset -v URL FOLDER FILE XZF
 
@@ -433,8 +436,8 @@ if [ -z "${IGNORE_CPP_SPDLOG_INSTALLATION}" ]; then
 
   XZF="spdlog.xz"
 
-  gitact "${FOLDER}" "${VER}" "${URL}" \
-    "${COCOA_SPDLOG_DIR:-"spdlog"}" "${XZF}" || return 1;
+  gitact "${FOLDER:?}" "${VER:?}" "${URL:?}" \
+    "${COCOA_SPDLOG_DIR:-"spdlog"}" "${XZF:?}" || return 1;
 
   unset -v URL FOLDER VER XZF
 
@@ -458,8 +461,8 @@ if [ -z "${IGNORE_CPP_ARMA_INSTALLATION}" ]; then
   
   XZF="armadillo.xz"
 
-  wgetact "${FOLDER}" "${FILE}" "${URL}" \
-    "${COCOA_ARMADILLO_DIR:-"armadillo-12.8.2"}" "${XZF}" || return 1;
+  wgetact "${FOLDER:?}" "${FILE:?}" "${URL:?}" \
+    "${COCOA_ARMADILLO_DIR:-"armadillo-12.8.2"}" "${XZF:?}" || return 1;
 
   unset -v URL FOLDER FILE XZF
 
@@ -484,12 +487,13 @@ if [ -z "${IGNORE_CPP_BOOST_INSTALLATION}" ]; then
   FILE="tar.gz"
 
   URL_BASE="https://boostorg.jfrog.io/artifactory/main/release/"
+  
   URL="${URL_BASE}/1.81.0/source/${FOLDER}.${FILE}"
 
   XZF="boost.xz"
 
-  wgetact "${FOLDER}" "${FILE}" "${URL}" \
-    "${COCOA_BOOST_DIR:-"boost_1_81_0"}" "${XZF}" || return 1;
+  wgetact "${FOLDER:?}" "${FILE:?}" "${URL:?}" \
+    "${COCOA_BOOST_DIR:-"boost_1_81_0"}" "${XZF:?}" || return 1;
 
   unset -v URL_BASE URL FOLDER FILE XZF
 
@@ -505,7 +509,7 @@ if [ -z "${IGNORE_CPP_CARMA_INSTALLATION}" ]; then
 
   ptop "GETTING CARMA LIBRARY DONE" || return 1;
 
-  CNAME="${COCOA_CARMA_DIR:-"carma":?}"
+  CNAME="${COCOA_CARMA_DIR:-"carma"}"
   
   PACKDIR="${CCIL:?}/${CNAME:?}"
 
@@ -517,7 +521,7 @@ if [ -z "${IGNORE_CPP_CARMA_INSTALLATION}" ]; then
 
   XZF="carma.xz"
 
-  gitact1 "${FOLDER}" "${VER}" "${URL}" || return 1;
+  gitact1 "${FOLDER:?}" "${VER:?}" "${URL:?}" || return 1;
 
   # -------------------------------------------------------------------------
   # In case this script runs twice (after sudden break w/ CTRL-C)
@@ -539,7 +543,7 @@ if [ -z "${IGNORE_CPP_CARMA_INSTALLATION}" ]; then
   rm -rf "${CCIL:?}/${FOLDER:?}"
   # -------------------------------------------------------------------------
   
-  gitact2 "${CNAME}" "${CNAME}" "${XZF}" || return 1; 
+  gitact2 "${CNAME:?}" "${CNAME:?}" "${XZF:?}" || return 1; 
 
   unset -v CNAME PACKDIR URL FOLDER VER XZF
 

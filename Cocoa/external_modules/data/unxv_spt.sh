@@ -3,62 +3,82 @@
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
 if [ -z "${SKIP_DECOMM_SPT}" ]; then
+
   if [ -z "${ROOTDIR}" ]; then
-      echo 'ERROR ROOTDIR not defined'
-      return
-  fi
-  if [ -z "${GIT}" ]; then
-    echo -e '\033[0;31m''ERROR ENV VARIABLE GIT IS NOT DEFINED''\033[0m'
-    cd $ROOTDIR
-    return 1
-  fi
-  if [ -z "${DEBUG_UNXV_CLEAN_ALL}" ]; then
-    export OUT1="/dev/null"
-    export OUT2="/dev/null"
-  else
-    export OUT1="/dev/tty"
-    export OUT2="/dev/tty"
+    pfail 'ROOTDIR'; return 1
   fi
 
-  cd $ROOTDIR/external_modules/data
+  # parenthesis = run in a subshell 
+  ( source "${ROOTDIR:?}/installation_scripts/.check_flags.sh" ) || return 1;
+    
+  unset_env_vars () { FOLDER
+    unset -v EDATAF URL
+    cdroot || return 1;
+  }
 
-  echo -e '\033[0;32m'"\t\t DECOMPRESSING SPT-3G Y1 DATA"'\033[0m'
+  unset_env_funcs () {
+    unset -f cdfolder cpfolder error
+    unset -f unset_env_funcs
+    cdroot || return 1;
+  }
+
+  unset_all () {
+    unset_env_vars
+    unset_env_funcs
+    unset -f unset_all
+    cdroot || return 1;
+  }
+
+  error () {
+    fail_script_msg "$(basename ${BASH_SOURCE[0]})" "${1}"
+    unset_all || return 1
+  }
+
+  cdfolder() {
+    cd "${1:?}" 2>"/dev/null" || { error "CD FOLDER: ${1}"; return 1; }
+  }
+
+  unset_env_vars || return 1
+
+  # E = EXTERNAL, DATA, F=FODLER
+  EDATAF="${ROOTDIR:?}/external_modules/data"
+
+  URL="${SPT3G_URL:-"https://github.com/SouthPoleTelescope/spt3g_y1_dist.git"}"
+
+  FOLDER="${SPT_3G_NAME:-"spt_3g"}"
+
+  # ---------------------------------------------------------------------------
+
+  ptop "DECOMPRESSING SPT-3G Y1 DATA" || return 1
   
-  rm -rf $ROOTDIR/external_modules/data/spt_3g/
-  cd $ROOTDIR/external_modules/data
+  # ---------------------------------------------------------------------------
+  # note: in case this script is run twice
+  rm -rf "${EDATAF:?}/${FOLDER:?}"
   
-  #-----------------------------------------------------------------------------
-  #-----------------------------------------------------------------------------
-  export SPTURL='https://github.com/SouthPoleTelescope/spt3g_y1_dist.git'
-  #-----------------------------------------------------------------------------
-  #-----------------------------------------------------------------------------
+  # ---------------------------------------------------------------------------
 
-  $GIT clone $SPTURL spt_3g > ${OUT1} 2> ${OUT2}
-  if [ $? -ne 0 ]; then
-    cd $ROOTDIR
-    unset OUT1
-    unset OUT2
-    unset SPTURL
-    return 1
+  cdfolder "${EDATAF:?}"
+
+  ${GIT:?} clone "${URL:?}" "${FOLDER:?}" \
+    >${OUT1:?} 2>${OUT2:?} || { error "${EC15:?}"; return 1; }
+
+  if [ -n "${SPT3G_DATA_GIT_COMMIT}" ]; then
+    cdfolder "${EDATAF:?}/${FOLDER:?}"
+
+    ${GIT:?} checkout "${SPT3G_DATA_GIT_COMMIT:?}" \
+      >${OUT1:?} 2>${OUT2:?} || { error "${EC16:?}"; return 1; }
   fi
 
-  cd $ROOTDIR/external_modules/data/spt_3g
-  
-  $GIT checkout $SPT3G_DATA_GIT_COMMIT > ${OUT1} 2> ${OUT2}
-  if [ $? -ne 0 ]; then
-    cd $ROOTDIR
-    unset OUT1
-    unset OUT2
-    unset SPTURL
-    return 1
-  fi
+  # ---------------------------------------------------------------------------
 
-  cd $ROOTDIR/
-  unset SPTUR
-  unset OUT1
-  unset OUT2
-  echo -e '\033[0;32m'"\t\t DECOMPRESSING SPT-3G Y1 DATA DONE"'\033[0m'
+  cdfolder "${ROOTDIR}" || return 1
+
+  unset_all || return 1; 
+
+  pbottom 'DECOMPRESSING SPT-3G Y1 DATA' || return 1
+  
 fi
+
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
