@@ -8,16 +8,11 @@ if [ -z "${IGNORE_POLYCHORD_COMPILATION}" ]; then
     pfail 'ROOTDIR'; return 1
   fi
   
-  # ----------------------------------------------------------------------------
-  # Clean any previous compilation. Parenthesis = run in a subshell
-  ( TMP="${ROOTDIR:?}/installation_scripts/clean"; 
-    source "${TMP:?}/clean_compile_polychord.sh" ) || return 1
-  # ----------------------------------------------------------------------------
-  
+  # parenthesis = run in a subshell 
   ( source "${ROOTDIR:?}/installation_scripts/.check_flags.sh" ) || return 1;
   
   unset_env_vars () {
-    unset -v POLYF PACKDIR
+    unset -v ECODEF POLYF PACKDIR PLIB
     cdroot || return 1;
   }
   
@@ -51,13 +46,32 @@ if [ -z "${IGNORE_POLYCHORD_COMPILATION}" ]; then
 
   unset_env_vars || return 1;
 
+  # E = EXTERNAL, CODE, F=FODLER
+  ECODEF="${ROOTDIR:?}/external_modules/code"
+
   POLYF=${POLY_NAME:-"PolyChordLite"}
   
-  PACKDIR="${ROOTDIR:?}/external_modules/code/${POLYF:?}"
+  PACKDIR="${ECODEF:?}/${POLYF:?}"
+
+  PLIB="${ROOTDIR:?}/.local/lib/python${PYTHON_VERSION:?}/site-packages"
 
   cdfolder "${PACKDIR}" || return 1
 
-  make -j $MNT all >${OUT1:?} 2>${OUT2:?} || { error "${EC7:?}"; return 1; }
+  # ---------------------------------------------------------------------------
+  # cleaning any previous compilation
+
+  make clean >${OUT1:?} 2>${OUT2:?} || { error "${EC2:?}"; return 1; }
+  
+  rm -rf "${PLIB:?}"/pypolychord-*
+  rm -rf "${PACKDIR:?}/lib/*.a"
+  rm -rf "${PACKDIR:?}/lib/*.so"
+  
+  # ---------------------------------------------------------------------------
+
+  make >${OUT1:?} 2>${OUT2:?} || { error "${EC7:?}"; return 1; }
+
+  make -j $MNT all \
+    >${OUT1:?} 2>${OUT2:?} || { error "${EC7:?}"; return 1; }
 
   make -j $MNT pypolychord \
     >${OUT1:?} 2>${OUT2:?} || { error "${EC8:?}"; return 1; }

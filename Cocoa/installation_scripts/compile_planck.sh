@@ -8,12 +8,7 @@ if [ -z "${IGNORE_PLANCK_COMPILATION}" ]; then
     pfail 'ROOTDIR'; return 1
   fi
   
-  # ----------------------------------------------------------------------------
-  # Clean any previous compilation. Parenthesis = run in a subshell
-  ( TMP="${ROOTDIR:?}/installation_scripts/clean";
-    source "${TMP:?}/clean_compile_planck.sh" ) || return 1;
-  # ----------------------------------------------------------------------------
-  
+  # parenthesis = run in a subshell 
   ( source "${ROOTDIR:?}/installation_scripts/.check_flags.sh" ) || return 1;
     
   unset_env_vars () {
@@ -76,6 +71,22 @@ if [ -z "${IGNORE_PLANCK_COMPILATION}" ]; then
   else
     cdfolder "${ROOTDIR:?}/${EMCPC:?}/spt_clik/" || return 1
   fi
+
+  # ---------------------------------------------------------------------------
+  # cleaning any previous compilation
+  
+  rm -f  "${ROOTDIR:?}/.local"/bin/clik*
+  rm -f  "${ROOTDIR:?}/.local"/lib/libclik_f90.so
+  rm -f  "${ROOTDIR:?}/.local"/lib/libclik.so
+  rm -rf "${ROOTDIR:?}/.local"/lib/python/site-packages/clik
+  rm -rf "${ROOTDIR:?}/.local"/share/clik
+  rm -f  "${ROOTDIR:?}/.local"/include/clik*
+  rm -f  .lock-waf_*
+
+  "${PYTHON3:?}" waf distclean \
+    >${OUT1:?} 2>${OUT2:?} || { error "${EC18:?}"; return 1; }
+
+  # ---------------------------------------------------------------------------
   
   FC="${FORTRAN_COMPILER:?}" CC="${C_COMPILER:?}" CXX="${CXX_COMPILER:?}" \
     "${PYTHON3:?}" waf configure \

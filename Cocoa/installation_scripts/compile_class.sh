@@ -7,17 +7,12 @@ if [ -z "${IGNORE_CLASS_COMPILATION}" ]; then
   if [ -z "${ROOTDIR}" ]; then
     pfail 'ROOTDIR'; return 1
   fi
-  
-  # ---------------------------------------------------------------------------
-  # Clean any previous compilation. Parenthesis = run in a subshell
-  ( TMP="${ROOTDIR:?}/installation_scripts/clean"; 
-    source "${TMP:?}/clean_compile_class.sh" ) || return 1
-  # ---------------------------------------------------------------------------
-  
+    
+  # parenthesis = run in a subshell 
   ( source "${ROOTDIR:?}/installation_scripts/.check_flags.sh" ) || return 1;
       
   unset_env_vars () {
-    unset -v ECODEF CLASSF PACKDIR 
+    unset -v ECODEF CLASSF PACKDIR PLIB
     cdroot || return 1;
   }
 
@@ -63,16 +58,34 @@ if [ -z "${IGNORE_CLASS_COMPILATION}" ]; then
 
   PACKDIR="${ECODEF:?}/${CLASSF:?}"
 
+  PLIB="${ROOTDIR:?}/.local/lib/python${PYTHON_VERSION:?}/site-packages"
+
   cdfolder "${PACKDIR}" || return 1
 
   # ---------------------------------------------------------------------------
+  # cleaning any previous compilation
+  
+  # note: below we ignore if something goes wrong (related to include/ mv)
+  "${PYTHON3:?}" setup.py clean >${OUT1:?} 2>${OUT2:?}
+
+  rm -rf "${PLIB:?}"/classy*
+  rm -rf "${PACKDIR:?}/python/build/"
+  rm -rf "${PACKDIR:?}/python/classy.egg-info"  
+  rm -rf "${PACKDIR:?}/build/"
+  rm -f "${PACKDIR:?}/class"
+  rm -f "${PACKDIR:?}/libclass.a"
+  
+  # ---------------------------------------------------------------------------
+  # note: historical motivation when class was inside Cocoa git repo
   # (motivation): Cocoa has /include entry on .gitignore. Why? Class compilation
   # (motivation): changes files on /include. Maintaining original files on
   # (motivation): /include2 avoids GIT changes to be triggered on compilation.
   # Delete folder in case this script is called twice
-  # ---------------------------------------------------------------------------  
+  # --------------------------------------------------------------------------- 
   rm -rf "${PACKDIR:?}/include"
 
+  # ---------------------------------------------------------------------------
+  
   cpfolder "${PACKDIR:?}/include2" "${PACKDIR:?}/include" || return 1;
 
   CC="${C_COMPILER:?}" PYTHON=${PYTHON3:?} make all \
@@ -88,6 +101,7 @@ if [ -z "${IGNORE_CLASS_COMPILATION}" ]; then
   pbottom 'COMPILING CLASS' || return 1
 
 fi
+
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------

@@ -8,12 +8,7 @@ if [ -z "${IGNORE_CAMB_COMPILATION}" ]; then
     pfail 'ROOTDIR'; return 1
   fi
 
-  # ----------------------------------------------------------------------------
-  # Clean any previous compilation. Parenthesis = run in a subshell
-  ( TMP="${ROOTDIR:?}/installation_scripts/clean";
-    source "${TMP:?}/clean_compile_camb.sh" ) || return 1;
-  # ----------------------------------------------------------------------------
-  
+  # parenthesis = run in a subshell  
   ( source "${ROOTDIR:?}/installation_scripts/.check_flags.sh" ) || return 1;
 
   unset_env_vars () {
@@ -60,6 +55,19 @@ if [ -z "${IGNORE_CAMB_COMPILATION}" ]; then
 
   cdfolder "${PACKDIR}" || return 1
 
+  # ---------------------------------------------------------------------------
+  # cleaning any previous compilation
+  
+  rm -rf "${PACKDIR:?}/build/"
+  rm -rf "${PACKDIR:?}/camb/__pycache__/"
+  rm -f  "${PACKDIR:?}/camb/camblib.so"
+  rm -rf "${PACKDIR:?}/forutils/Releaselib/"
+  
+  "${PYTHON3:?}" setup.py clean \
+    >${OUT1:?} 2>${OUT2:?} || { error "${EC1:?}"; return 1; }
+  
+  # ---------------------------------------------------------------------------
+  
   COMPILER="${FORTRAN_COMPILER:?}" F90C="${FORTRAN_COMPILER:?}" \
     "${PYTHON3:?}" setup.py build \
     >${OUT1:?} 2>${OUT2:?} || { error "${EC4:?}"; return 1; }

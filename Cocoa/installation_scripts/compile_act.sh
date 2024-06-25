@@ -7,17 +7,11 @@ if [ -z "${IGNORE_ACT_COMPILATION}" ]; then
   if [ -z "${ROOTDIR}" ]; then
     pfail 'ROOTDIR'; return 1
   fi
-  
-  # ---------------------------------------------------------------------------
-  # Clean any previous compilation. Parenthesis = run in a subshell
-  ( TMP="${ROOTDIR:?}/installation_scripts/clean"; 
-    source "${TMP:?}/clean_compile_act.sh" ) || return 1
-  # ---------------------------------------------------------------------------
-  
+    
   ( source "${ROOTDIR:?}/installation_scripts/.check_flags.sh" ) || return 1;
  
   unset_env_vars () {
-    unset -v PACKDIR
+    unset -v ECODEF ACTF PACKDIR
     cdroot || return 1;
   }
 
@@ -51,9 +45,25 @@ if [ -z "${IGNORE_ACT_COMPILATION}" ]; then
 
   unset_env_vars || return 1
 
-  PACKDIR="${ROOTDIR:?}/external_modules/code/${ACT_NAME:-"pyactlike"}"
+  # E = EXTERNAL, CODE, F=FODLER
+  ECODEF="${ROOTDIR:?}/external_modules/code"
+
+  ACTF=${ACT_NAME:-"pyactlike"}
+
+  PACKDIR="${ECODEF:?}/${ACTF:?}"
 
   cdfolder "${PACKDIR}" || return 1
+
+  # ---------------------------------------------------------------------------
+  # cleaning any previous compilation
+
+  rm -rf "${PACKDIR:?}/build/"
+  rm -rf "${PACKDIR:?}/pyactlike.egg-info/"
+
+  "${PYTHON3:?}" setup.py clean \
+    >${OUT1:?} 2>${OUT2:?} || { error "${EC1:?}"; return 1; }
+  
+  # ---------------------------------------------------------------------------  
  
   ${PIP3:?} install . --prefix="${ROOTDIR:?}/.local" \
     >${OUT1:?} 2>${OUT2:?} || { error "${EC3:?}"; return 1; }
