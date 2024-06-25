@@ -112,13 +112,14 @@ export HILLIPOP_GIT_COMMIT="cc9cbe31991d4662522241543a46d44d2cdec251"
 export LOLLIPOP_URL="https://github.com/planck-npipe/lollipop.git"
 export LOLLIPOP_GIT_COMMIT="280a9c93d33bc6a058d6bf769ec82d9f7fdbd2b6"
 
+export LIPOP_DATA_URL="https://portal.nersc.gov/cfs/cmb/planck2020/likelihoods"
 export LIPOP_DATA_VERSION=4.2
 
-export SPT3G_URL='https://github.com/SouthPoleTelescope/spt3g_y1_dist.git'
+export SPT3G_DATA_URL='https://github.com/SouthPoleTelescope/spt3g_y1_dist.git'
 export SPT3G_DATA_GIT_COMMIT="66da8e9e2f325024566fe13245788bf8ede897bc"
 export SPT_3G_NAME="spt_3g"
 
-export HOLICOW_URL='https://github.com/shsuyu/H0LiCOW-public.git'
+export HOLICOW_DATA_URL='https://github.com/shsuyu/H0LiCOW-public.git'
 export HOLICOW_DATA_GIT_COMMIT="f792647d1fd6c09d9e052fef526669cbd702ab82"
 
 export POLY_URL="https://github.com/PolyChord/PolyChordLite.git"
@@ -133,6 +134,7 @@ export CLASS_URL="https://github.com/lesgourg/class_public.git"
 export CLASS_GIT_COMMIT="8df566c1ff2d0b3e40e106567c435575aea337be"
 export CLASS_NAME="class_public"
 
+export ACT_DR6_DATA_URL="https://lambda.gsfc.nasa.gov/data/suborbital/ACT/ACT_dr6/likelihood/data"
 export ACT_DR6_DATA_FILE="ACT_dr6_likelihood_v1.2.tgz"
 export ACT_NAME="pyactlike"
 

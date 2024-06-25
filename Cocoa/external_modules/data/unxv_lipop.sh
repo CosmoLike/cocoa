@@ -43,7 +43,7 @@ if [ -z "${SKIP_DECOMM_LIPOP}" ]; then
   # E = EXTERNAL, DATA, F=FODLER
   EDATAF="${ROOTDIR:?}/external_modules/data"
 
-  URL="https://portal.nersc.gov/cfs/cmb/planck2020/likelihoods"
+  URL="${LIPOP_DATA_URL:-"https://portal.nersc.gov/cfs/cmb/planck2020/likelihoods"}"
 
   LPDVS=${LIPOP_DATA_VERSION:-"4.2"}
 

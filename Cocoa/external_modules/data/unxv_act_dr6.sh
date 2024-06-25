@@ -51,11 +51,11 @@ if [ -z "${SKIP_DECOMM_ACT}" ]; then
   # PACK = PACKAGE, DIR = DIRECTORY
   PACKDIR="${EDATAF:?}/${DATAF:?}"
 
-  URL_BASE="https://lambda.gsfc.nasa.gov/data/suborbital/ACT"
+  URL_BASE="https://lambda.gsfc.nasa.gov/data/suborbital/ACT/ACT_dr6/likelihood/data"
 
   FILE="${ACT_DR6_DATA_FILE:-"ACT_dr6_likelihood_v1.2.tgz"}"
 
-  URL="${URL_BASE:?}/ACT_dr6/likelihood/data/${FILE:?}"
+  URL="${ACT_DR6_DATA_URL:-"${URL_BASE:?}"}/${FILE:?}"
 
   # ---------------------------------------------------------------------------
   # in case this script is called twice

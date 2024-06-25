@@ -53,7 +53,7 @@ if [ -z "${SKIP_DECOMM_STRONG_LENSING}" ]; then
   # PACK = PACKAGE, DIR = DIRECTORY
   PACKDIR="${EDATAF:?}/${TDATA:?}"
 
-  URL="${HOLICOW_URL:-"https://github.com/shsuyu/H0LiCOW-public.git"}"
+  URL="${HOLICOW_DATA_URL:-"https://github.com/shsuyu/H0LiCOW-public.git"}"
 
   # ---------------------------------------------------------------------------
   # in case this script is called twice

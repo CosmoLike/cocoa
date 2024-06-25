@@ -4,7 +4,7 @@
 # --------------------------------------------------------------------------------------
 if [ -z "${IGNORE_ALL_COBAYA_INSTALLATION}" ]; then
 
-  if [ -z "${ROOTDIR}" ]; then
+  if [ -z "${ROOTDIR:?}" ]; then
     pfail 'ROOTDIR'; return 1;
   fi
 
@@ -93,23 +93,23 @@ if [ -z "${IGNORE_ALL_COBAYA_INSTALLATION}" ]; then
     #---------------------------------------------------------------------------
     # Clone Cobaya from original git repo --------------------------------------
     #---------------------------------------------------------------------------
-    cdfolder "${ROOTDIR}" || return 1;
+    cdfolder "${ROOTDIR:?}" || return 1;
     
-    URL="${COBAYA_URL:-https://github.com/CobayaSampler/cobaya.git}"
+    URL="${COBAYA_URL:-"https://github.com/CobayaSampler/cobaya.git"}"
 
     "${GIT:?}" clone "${URL:?}" cobaya \
       >${OUT1:?} 2>${OUT2:?} || { error "${EC15:?}"; return 1; }
     
     unset URL
     
-    cdfolder "${COB}" || return 1;
+    cdfolder "${COB:?}" || return 1;
 
     if [ -n "${COBAYA_GIT_COMMIT}" ]; then
       ${GIT:?} reset --hard "${COBAYA_GIT_COMMIT:?}" \
         >${OUT1:?} 2>${OUT2:?} || { error "${EC16:?}"; return 1; }
     fi
 
-    cdfolder "${ROOTDIR}" || return 1;
+    cdfolder "${ROOTDIR:?}" || return 1;
 
     #---------------------------------------------------------------------------
     # Adjust Cobaya Files ------------------------------------------------------
@@ -124,7 +124,7 @@ if [ -z "${IGNORE_ALL_COBAYA_INSTALLATION}" ]; then
     # parenthesis = run in a subshell
     ( sh change_python_files.sh ) || { error "${EC22:?} (CPF)"; return 1; }
 
-    cdfolder "${ROOTDIR}" || return 1;
+    cdfolder "${ROOTDIR:?}" || return 1;
 
     unset -v TFILE
 
@@ -168,7 +168,7 @@ if [ -z "${IGNORE_ALL_COBAYA_INSTALLATION}" ]; then
     
     unset -v TFOLDER
 
-    cdfolder "${ROOTDIR}" || return 1;
+    cdfolder "${ROOTDIR:?}" || return 1;
 
     #---------------------------------------------------------------------------
     # Adjust Planck 2018 low-ell -----------------------------------------------
@@ -262,7 +262,7 @@ if [ -z "${IGNORE_ALL_COBAYA_INSTALLATION}" ]; then
   
     #---------------------------------------------------------------------------
 
-    cdfolder "${ROOTDIR}" || return 1;
+    cdfolder "${ROOTDIR:?}" || return 1;
 
     pbottom "INSTALLING AND PATCHING COBAYA" || return 1;
 
@@ -278,7 +278,7 @@ if [ -z "${IGNORE_ALL_COBAYA_INSTALLATION}" ]; then
 
     cppatchfolder "${COBLIKE:?}" "mflike" || return 1
     
-    cdfolder "${ROOTDIR}" || return 1;
+    cdfolder "${ROOTDIR:?}" || return 1;
 
     pbottom "INSTALLING AND PATCHING SIMONS OBSERVATORY LIKELIHOOD" || return 1;
 
@@ -351,7 +351,7 @@ if [ -z "${IGNORE_ALL_COBAYA_INSTALLATION}" ]; then
     patch -u "__init__.py" -i "init.patch" \ 
       >${OUT1:?} 2>${OUT2:?} || { error "${EC17:?}"; return 1; }
 
-    cdfolder "${ROOTDIR}" || return 1; 
+    cdfolder "${ROOTDIR:?}" || return 1; 
   }
 
   if [ -z "${SKIP_DECOMM_LIPOP}" ]; then

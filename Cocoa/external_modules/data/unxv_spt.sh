@@ -43,7 +43,7 @@ if [ -z "${SKIP_DECOMM_SPT}" ]; then
   # E = EXTERNAL, DATA, F=FODLER
   EDATAF="${ROOTDIR:?}/external_modules/data"
 
-  URL="${SPT3G_URL:-"https://github.com/SouthPoleTelescope/spt3g_y1_dist.git"}"
+  URL="${SPT3G_DATA_URL:-"https://github.com/SouthPoleTelescope/spt3g_y1_dist.git"}"
 
   FOLDER="${SPT_3G_NAME:-"spt_3g"}"
 
