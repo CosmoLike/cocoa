@@ -12,7 +12,7 @@ if [ -z "${SKIP_DECOMM_SIMONS_OBSERVATORY}" ]; then
   ( source "${ROOTDIR:?}/installation_scripts/.check_flags.sh" ) || return 1;
     
   unset_env_vars () {
-    unset -v EDATAF FOLDER URL VER PACKDIR
+    unset -v EDATAF FOLDER URL VER PACKDIR FILE
     cdroot || return 1;
   }
 
@@ -68,18 +68,20 @@ if [ -z "${SKIP_DECOMM_SIMONS_OBSERVATORY}" ]; then
   # ---------------------------------------------------------------------------
 
   mkdir -p "${PACKDIR:?}"
+  
+  cdfolder "${PACKDIR:?}" || return 1
 
   # note: users can download multiple versions (reproduce existing work)
   # note: For example, SO_DATA_VERSION="v0.7.1 v0.8"
   # note: This is only possible because each ver is saved on a separated folder
   for x in $(echo "${VER:?}")
   do
-    cdfolder "${PACKDIR:?}" || return 1
+    FILE="${x}.tar.gz"
 
-    wget "${URL}/${x}.tar.gz" \
+    wget "${URL}/${FILE:?}" \
       >${OUT1:?} 2>${OUT2:?} || { error "${EC24:?}"; return 1; }
 
-    tar -zxvf "${x}.tar.gz" \
+    tar -zxvf "${FILE:?}" \
       >${OUT1:?} 2>${OUT2:?} || { error "${EC25:?}"; return 1; }
   
   done
