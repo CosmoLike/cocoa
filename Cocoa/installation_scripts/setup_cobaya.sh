@@ -4,8 +4,8 @@
 # --------------------------------------------------------------------------------------
 if [ -z "${IGNORE_ALL_COBAYA_INSTALLATION}" ]; then
 
-  if [ -z "${ROOTDIR:?}" ]; then
-    pfail 'ROOTDIR'; return 1;
+  if [ -z "${ROOTDIR}" ]; then
+    source start_cocoa.sh || { pfail 'ROOTDIR'; return 1; }
   fi
 
   # parenthesis = run in a subshell

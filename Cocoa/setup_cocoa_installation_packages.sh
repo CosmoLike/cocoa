@@ -112,7 +112,7 @@ unset -f error_cip
 
 pbottom2 'SETUP COCOA INSTALLATION PACKAGES'
 
-source stop_cocoa.sh
+source stop_cocoa.sh || return 1;
 
 # ----------------------------------------------------------------------------
 # ----------------------------------------------------------------------------

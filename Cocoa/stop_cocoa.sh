@@ -19,7 +19,7 @@ error_stop_cocoa () {
 }
 
 source $(pwd -P)/.recover_old_flags.sh
-if [ -z "${MAKE_NUM_THREADS}" ]; then
+if [ $? -ne 0 ]; then
   error_stop_cocoa 'script .recover_old_flags.sh'; return 1
 fi
 
@@ -62,12 +62,19 @@ fi
 
 if [ -n "${ROOTDIR}" ]; then
   source $ROOTDIR/projects/stop_all.sh
+  if [ $? -ne 0 ]; then
+    error_stop_cocoa 'script projects/stop_all.sh'; return 1
+  fi
 fi
 
 # ----------------------------------------------------------------------------
 # ----------------------------------------------------------------------------
 # ----------------------------------------------------------------------------
+
 source ./installation_scripts/.impl_unset_keys.sh
+if [ $? -ne 0 ]; then
+  error_stop_cocoa 'script .impl_unset_keys.sh'; return 1
+fi
 
 unset -v ROOTDIR SETUP_COBAYA START_COCOA_DONE fail
 

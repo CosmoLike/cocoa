@@ -5,7 +5,7 @@
 if [ -z "${IGNORE_CORE_INSTALLATION}" ]; then
 
   if [ -z "${ROOTDIR}" ]; then
-    pfail 'ROOTDIR'; return 1;
+    source start_cocoa.sh || { pfail 'ROOTDIR'; return 1; }
   fi
 
   # Parenthesis = run in a subshell

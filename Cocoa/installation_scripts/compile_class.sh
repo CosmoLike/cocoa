@@ -5,7 +5,7 @@
 if [ -z "${IGNORE_CLASS_COMPILATION}" ]; then
   
   if [ -z "${ROOTDIR}" ]; then
-    pfail 'ROOTDIR'; return 1
+    source start_cocoa.sh || { pfail 'ROOTDIR'; return 1; }
   fi
     
   # parenthesis = run in a subshell 

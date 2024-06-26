@@ -2,11 +2,6 @@
 # ----------------------------------------------------------------------------
 # ----------------------------------------------------------------------------
 # ----------------------------------------------------------------------------
-if [ -n "${ROOTDIR}" ]; then
-  source stop_cocoa.sh
-fi
-source start_cocoa.sh || return 1
-
 error_cem () {
   local FILE="$(basename ${BASH_SOURCE[0]})"
   local MSG="\033[0;31m\t\t (${FILE}) we cannot run "
@@ -18,6 +13,11 @@ error_cem () {
   source stop_cocoa 2>"/dev/null"
   return 1
 }
+
+if [ -n "${ROOTDIR}" ]; then
+  source stop_cocoa.sh
+fi
+source start_cocoa.sh || { error_cem "start_cocoa.sh"; return 1; }
 
 # ----------------------------------------------------------------------------
 # ------------------------ COMPILE EXTERNAL MODULES --------------------------
