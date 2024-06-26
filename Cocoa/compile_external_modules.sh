@@ -5,7 +5,7 @@
 if [ -n "${ROOTDIR}" ]; then
   source stop_cocoa.sh
 fi
-source start_cocoa.sh
+source start_cocoa.sh || return 1
 
 error_cem () {
   local FILE="$(basename ${BASH_SOURCE[0]})"
