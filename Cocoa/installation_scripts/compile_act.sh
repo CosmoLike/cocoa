@@ -11,7 +11,7 @@ if [ -z "${IGNORE_ACT_COMPILATION}" ]; then
   ( source "${ROOTDIR:?}/installation_scripts/.check_flags.sh" ) || return 1;
  
   unset_env_vars () {
-    unset -v ECODEF ACTF PACKDIR
+    unset -v ECODEF FOLDER PACKDIR
     cdroot || return 1;
   }
 
@@ -48,9 +48,9 @@ if [ -z "${IGNORE_ACT_COMPILATION}" ]; then
   # E = EXTERNAL, CODE, F=FODLER
   ECODEF="${ROOTDIR:?}/external_modules/code"
 
-  ACTF=${ACT_NAME:-"pyactlike"}
+  FOLDER=${ACT_NAME:-"pyactlike"}
 
-  PACKDIR="${ECODEF:?}/${ACTF:?}"
+  PACKDIR="${ECODEF:?}/${FOLDER:?}"
 
   cdfolder "${PACKDIR}" || return 1
 

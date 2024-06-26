@@ -12,7 +12,7 @@ if [ -z "${IGNORE_CORE_INSTALLATION}" ]; then
   ( source "${ROOTDIR:?}/installation_scripts/.check_flags.sh" ) || return 1;
     
   unset_env_vars () {
-    unset -v CCIL BFD PACKDIR MAKE_NB_JOBS
+    unset -v CCIL BDF PACKDIR FOLDER MAKE_NB_JOBS
     cdroot || return 1;
   }
 
@@ -56,9 +56,11 @@ if [ -z "${IGNORE_CORE_INSTALLATION}" ]; then
     
     ptop 'COMPILING CMAKE LIBRARY' || return 1
 
-    PACKDIR=${COCOA_CMAKE_DIR:-"cmake-3.26.4/"}
+    FOLDER=${COCOA_CMAKE_DIR:-"cmake-3.26.4/"}
 
-    cdfolder "${CCIL:?}/${PACKDIR:?}" || return 1;
+    PACKDIR="${CCIL:?}/${FOLDER:?}"
+
+    cdfolder "${PACKDIR:?}" || return 1;
 
     env CC="${C_COMPILER:?}" CXX="${CXX_COMPILER:?}" \
       ./bootstrap --prefix="${ROOTDIR:?}/.local" \
@@ -70,7 +72,7 @@ if [ -z "${IGNORE_CORE_INSTALLATION}" ]; then
     make install \
       >${OUT1:?} 2>${OUT2:?} || { error "(CMAKE) ${EC10:?}"; return 1; }
 
-    unset -v PACKDIR
+    unset -v PACKDIR FOLDER
 
     cdfolder "${ROOTDIR}" || return 1;
 
@@ -86,7 +88,9 @@ if [ -z "${IGNORE_CORE_INSTALLATION}" ]; then
 
     ptop 'COMPILING TEXINFO LIBRARY' || return 1;
 
-    PACKDIR="${CCIL:?}/${COCOA_TEXINFO_DIR:-"texinfo-7.0.3/"}"
+    FOLDER=${COCOA_TEXINFO_DIR:-"texinfo-7.0.3/"}
+
+    PACKDIR="${CCIL:?}/${FOLDER:?}"
 
     cdfolder "${PACKDIR}" || return 1;
 
@@ -96,13 +100,21 @@ if [ -z "${IGNORE_CORE_INSTALLATION}" ]; then
       --disable-perl-xs \
       >${OUT1:?} 2>${OUT2:?} || { error "(TEXINFO) ${EC11:?}"; return 1; }
 
+    # --------------------------------------------------------------------------
+    # note: in case script run >1x w/ previous run stoped prematurely b/c error
+    
+    make clean \
+      >${OUT1:?} 2>${OUT2:?} || { error "(TEXINFO) ${EC2:?}"; return 1; }
+
+    # --------------------------------------------------------------------------
+
     make -j $MNT all \
       >${OUT1:?} 2>${OUT2:?} || { error "(TEXINFO) ${EC7:?}"; return 1; }
       
     make install \
       >${OUT1:?} 2>${OUT2:?} || { error "(TEXINFO) ${EC10:?}"; return 1; }
 
-    unset -v PACKDIR
+    unset -v PACKDIR FOLDER
 
     cdfolder "${ROOTDIR}" || return 1;
     
@@ -118,7 +130,9 @@ if [ -z "${IGNORE_CORE_INSTALLATION}" ]; then
   
     ptop 'COMPILING BINUTILS LIBRARY' || return 1;
     
-    PACKDIR="${CCIL:?}/${COCOA_BINUTILS_DIR:-"binutils-2.37/"}"
+    FOLDER=${COCOA_BINUTILS_DIR:-"binutils-2.37/"}
+
+    PACKDIR="${CCIL:?}/${FOLDER:?}"
 
     cdfolder "${PACKDIR}" || return 1;
 
@@ -127,13 +141,21 @@ if [ -z "${IGNORE_CORE_INSTALLATION}" ]; then
       --prefix="${ROOTDIR:?}/.local" \
       >${OUT1:?} 2>${OUT2:?} || { error "(BINUTILS) ${EC11:?}"; return 1; }
 
+    # --------------------------------------------------------------------------
+    # note: in case script run >1x w/ previous run stoped prematurely b/c error
+    
+    make clean \
+      >${OUT1:?} 2>${OUT2:?} || { error "(BINUTILS) ${EC2:?}"; return 1; }
+
+    # --------------------------------------------------------------------------
+
     make -j $MNT \
       >${OUT1:?} 2>${OUT2:?} || { error "(BINUTILS) ${EC7:?}"; return 1; }
 
     make install \
       >${OUT1:?} 2>${OUT2:?} || { error "(BINUTILS) ${EC10:?}"; return 1; }
 
-    unset -v PACKDIR
+    unset -v PACKDIR FOLDER
 
     cdfolder "${ROOTDIR}" || return 1;
 
@@ -149,14 +171,21 @@ if [ -z "${IGNORE_CORE_INSTALLATION}" ]; then
   
     ptop 'COMPILING HFD5 LIBRARY' || return 1;
   
-    PACKDIR="${CCIL:?}/${COCOA_HDF5_DIR:-"hdf5-1.12.3/"}"
+    FOLDER=${COCOA_HDF5_DIR:-"hdf5-1.12.3/"}
+
+    PACKDIR="${CCIL:?}/${FOLDER:?}"
     
     BDF="${PACKDIR:?}/cocoa_HDF5_build"
 
+    # --------------------------------------------------------------------------
+    # note: in case script run >1x w/ previous run stoped prematurely b/c error
+
     rm -f  "${PACKDIR:?}/CMakeCache.txt"
     rm -rf "${PACKDIR:?}/CMakeFiles/"
-    rm -rf "${BDF:?}/"
+    rm -rf "${BDF:?}"
     
+    # --------------------------------------------------------------------------
+
     mkdir "${BDF:?}" 2>${OUT2:?} || { error "${EC20:?}"; return 1; }
 
     cdfolder "${BDF:?}" || return 1;
@@ -191,14 +220,21 @@ if [ -z "${IGNORE_CORE_INSTALLATION}" ]; then
     
     ptop  'COMPILING OPENBLAS LIBRARY' || return 1;
   
-    export PACKDIR="${COCOA_OPENBLAS_DIR:-"OpenBLAS-0.3.23/"}"
+    FOLDER=${COCOA_OPENBLAS_DIR:-"OpenBLAS-0.3.23/"}
 
-    cdfolder "${CCIL:?}/${PACKDIR:?}" || return 1;
+    PACKDIR="${CCIL:?}/${FOLDER:?}"
+
+    cdfolder "${PACKDIR:?}" || return 1;
 
     export MAKE_NB_JOBS=$MNT
     
+    # --------------------------------------------------------------------------
+    # note: in case script run >1x w/ previous run stoped prematurely b/c error
+
     make clean \
       >${OUT1:?} 2>${OUT2:?} || { error "(OpenBLAS) ${EC2:?}"; return 1; }
+
+    # --------------------------------------------------------------------------
 
     make CC="${C_COMPILER:?}" FC="${FORTRAN_COMPILER:?}" USE_OPENMP=1 \
       >${OUT1:?} 2>${OUT2:?} || { error "(OpenBLAS) ${EC8:?}"; return 1; }
@@ -206,7 +242,7 @@ if [ -z "${IGNORE_CORE_INSTALLATION}" ]; then
     make install PREFIX="${ROOTDIR:?}/.local" \
       >${OUT1:?} 2>${OUT2:?} || { error "(OpenBLAS) ${EC10:?}"; return 1; }
 
-    unset -v PACKDIR  MAKE_NB_JOBS
+    unset -v PACKDIR  MAKE_NB_JOBS FOLDER
 
     cdfolder "${ROOTDIR:?}" || return 1;
 
@@ -222,15 +258,22 @@ if [ -z "${IGNORE_CORE_INSTALLATION}" ]; then
     
     ptop 'COMPILING LAPACK FORTRAN LIBRARY' || return 1;
 
-    PACKDIR="${COCOA_LAPACK_DIR:-"lapack-3.11.0/"}"
-    
-    BUILDIR="${CCIL:?}/lapack-build"
+    FOLDER=${COCOA_LAPACK_DIR:-"lapack-3.11.0/"}
 
-    rm -rf "${BUILDIR:?}"
+    PACKDIR="${CCIL:?}/${FOLDER:?}"
     
-    mkdir "${BUILDIR:?}" 2>${OUT2:?} || { error "${EC20:?}"; return 1; }
+    BDF="${PACKDIR:?}/lapack-build"
 
-    cdfolder "${BUILDIR:?}" || return 1;
+    # --------------------------------------------------------------------------
+    # note: in case script run >1x w/ previous run stoped prematurely b/c error
+
+    rm -rf "${BDF:?}"
+
+    # --------------------------------------------------------------------------
+    
+    mkdir "${BDF:?}" 2>${OUT2:?} || { error "${EC20:?}"; return 1; }
+
+    cdfolder "${BDF:?}" || return 1;
 
     ${CMAKE:?} -DBUILD_SHARED_LIBS=TRUE \
       -DCMAKE_INSTALL_PREFIX="${ROOTDIR:?}/.local" \
@@ -243,8 +286,15 @@ if [ -z "${IGNORE_CORE_INSTALLATION}" ]; then
 
     make install \
       >${OUT1:?} 2>${OUT2:?} || { error "(LAPACK) ${EC10:?}"; return 1; }
+
+    # --------------------------------------------------------------------------
+    # clean build
+
+    rm -rf "${BDF:?}"
     
-    unset -v PACKDIR  BUILDIR
+    # --------------------------------------------------------------------------
+
+    unset -v PACKDIR BDF FOLDER
 
     cdfolder "${ROOTDIR}" || return 1;
 
@@ -260,7 +310,9 @@ if [ -z "${IGNORE_CORE_INSTALLATION}" ]; then
     
     ptop 'COMPILING FFTW C LIBRARY' || return 1
     
-    PACKDIR="${CCIL:?}/${COCOA_FFTW_DIR:-"fftw-3.3.10/"}"
+    FOLDER=${COCOA_FFTW_DIR:-"fftw-3.3.10/"}
+
+    PACKDIR="${CCIL:?}/${FOLDER:?}"
 
     cdfolder "${PACKDIR}" || return 1;
 
@@ -277,7 +329,7 @@ if [ -z "${IGNORE_CORE_INSTALLATION}" ]; then
     make install \
       >${OUT1:?} 2>${OUT2:?} || { error "(FFTW) ${EC10:?}"; return 1; }
 
-    unset -v PACKDIR
+    unset -v PACKDIR FOLDER
 
     cdfolder "${ROOTDIR}" || return 1;
 
@@ -293,16 +345,23 @@ if [ -z "${IGNORE_CORE_INSTALLATION}" ]; then
     
     ptop 'COMPILING CFITSIO C LIBRARY' || return 1
 
-    PACKDIR="${CCIL:?}/${COCOA_CFITSIO_DIR:-"cfitsio-4.0.0/"}"
+    FOLDER=${COCOA_CFITSIO_DIR:-"cfitsio-4.0.0/"}
+
+    PACKDIR="${CCIL:?}/${FOLDER:?}"
     
-    BFD="CFITSIOBUILD"
+    BDF="${PACKDIR:?}/CFITSIOBUILD"
+
+    # --------------------------------------------------------------------------
+    # note: in case script run >1x w/ previous run stoped prematurely b/c error
 
     rm -f  "${PACKDIR:?}/CMakeCache.txt"
-    rm -rf "${PACKDIR:?}/${BFD:?}"
+    rm -rf "${BDF:?}"
     
-    mkdir "${PACKDIR}/${BFD:?}/" 2>${OUT2:?} || { error "${EC14:?}"; return 1; }
+    # --------------------------------------------------------------------------
+
+    mkdir "${BDF:?}/" 2>${OUT2:?} || { error "${EC14:?}"; return 1; }
     
-    cdfolder "${PACKDIR:?}/${BFD:?}" || return 1;
+    cdfolder "${BDF:?}" || return 1;
 
     ${CMAKE:?} -DBUILD_SHARED_LIBS=TRUE \
       -DCMAKE_INSTALL_PREFIX="${ROOTDIR:?}/.local" \
@@ -318,9 +377,14 @@ if [ -z "${IGNORE_CORE_INSTALLATION}" ]; then
     make install \
       >${OUT1:?} 2>${OUT2:?} || { error "(CFITSIO) ${EC10:?}"; return 1; }
     
-    rm -rf "${PACKDIR:?}/${BFD:?}"
+    # --------------------------------------------------------------------------
+    # clean build
+
+    rm -rf "${BDF:?}"
     
-    unset -v PACKDIR
+    # --------------------------------------------------------------------------
+
+    unset -v PACKDIR BDF FOLDER
 
     cdfolder "${ROOTDIR}" || return 1;
 
@@ -336,7 +400,9 @@ if [ -z "${IGNORE_CORE_INSTALLATION}" ]; then
     
     ptop 'COMPILING GSL C LIBRARY' || return 1
 
-    PACKDIR="${CCIL:?}/${COCOA_GSL_DIR:-"gsl-2.7/"}" 
+    FOLDER=${COCOA_GSL_DIR:-"gsl-2.7/"}
+
+    PACKDIR="${CCIL:?}/${FOLDER:?}" 
 
     cdfolder "${PACKDIR}" || return 1;
 
@@ -352,7 +418,7 @@ if [ -z "${IGNORE_CORE_INSTALLATION}" ]; then
     make install \
       >${OUT1:?} 2>${OUT2:?} || { error "(GSL) ${EC10:?}"; return 1; }
 
-    unset -v PACKDIR
+    unset -v PACKDIR FOLDER
 
     cdfolder "${ROOTDIR}" || return 1;
 
@@ -391,9 +457,16 @@ if [ -z "${IGNORE_CORE_INSTALLATION}" ]; then
     
     ptop 'COMPILING SPDLOG CPP LIBRARY' || return 1
 
-    PACKDIR="${CCIL:?}/${COCOA_SPDLOG_DIR:-"spdlog/"}"
+    FOLDER=${COCOA_SPDLOG_DIR:-"spdlog/"}
+
+    PACKDIR="${CCIL:?}/${FOLDER:?}"
+
+    # --------------------------------------------------------------------------
+    # note: in case script run >1x w/ previous run stoped prematurely b/c error
 
     rm -f "${PACKDIR:?}/CMakeCache.txt"
+
+    # --------------------------------------------------------------------------
 
     cdfolder "${PACKDIR}" || return 1;
     
@@ -409,7 +482,7 @@ if [ -z "${IGNORE_CORE_INSTALLATION}" ]; then
     make install \
       >${OUT1:?} 2>${OUT2:?} || { error "(SPDLOG) ${EC10:?}"; return 1; }
 
-    unset -v PACKDIR
+    unset -v PACKDIR FOLDER
 
     cdfolder "${ROOTDIR}" || return 1;
 
@@ -425,9 +498,16 @@ if [ -z "${IGNORE_CORE_INSTALLATION}" ]; then
     
     ptop 'COMPILING ARMADILLO CPP LIBRARY' || return 1
 
-    PACKDIR="${CCIL:?}/${COCOA_ARMADILLO_DIR:-"armadillo-12.8.2/"}"
+    FOLDER=${COCOA_ARMADILLO_DIR:-"armadillo-12.8.2/"}
+
+    PACKDIR="${CCIL:?}/${FOLDER:?}"
+
+    # --------------------------------------------------------------------------
+    # note: in case script run >1x w/ previous run stoped prematurely b/c error
 
     rm -f "${PACKDIR:?}/CMakeCache.txt"
+
+    # --------------------------------------------------------------------------
 
     cdfolder "${PACKDIR}" || return 1;
 
@@ -450,7 +530,7 @@ if [ -z "${IGNORE_CORE_INSTALLATION}" ]; then
     make install \
       >${OUT1:?} 2>${OUT2:?} || { error "(ARMA) ${EC10:?}"; return 1; }
 
-    unset -v PACKDIR
+    unset -v PACKDIR FOLDER
 
     cdfolder "${ROOTDIR}" || return 1;
 
@@ -466,10 +546,17 @@ if [ -z "${IGNORE_CORE_INSTALLATION}" ]; then
     
     ptop 'COMPILING CARMA CPP LIBRARY' || return 1
 
-    PACKDIR="${CCIL:?}/${COCOA_CARMA_DIR:-"carma/"}"
+    FOLDER=${COCOA_CARMA_DIR:-"carma/"}
+
+    PACKDIR="${CCIL:?}/${FOLDER:?}"
+
+    # --------------------------------------------------------------------------
+    # note: in case script run >1x w/ previous run stoped prematurely b/c error
 
     rm -rf "${ROOTDIR:?}/.local/include/carma/"   
-    
+
+    # --------------------------------------------------------------------------
+
     mkdir "${ROOTDIR:?}/.local/include/carma/" \
       2>${OUT2:?} || { error "${EC20:?}"; return 1; }
     
@@ -477,7 +564,7 @@ if [ -z "${IGNORE_CORE_INSTALLATION}" ]; then
 
     cpfolder "${PACKDIR:?}/carma_bits" "${ROOTDIR:?}/.local/include/" || return 1
 
-    unset -v PACKDIR
+    unset -v PACKDIR FOLDER
     
     cdfolder "${ROOTDIR}" || return 1;
 
@@ -493,7 +580,9 @@ if [ -z "${IGNORE_CORE_INSTALLATION}" ]; then
 
     ptop 'COMPILING BOOST CPP LIBRARY' || return 1
 
-    PACKDIR="${CCIL:?}/${COCOA_BOOST_DIR:-"boost_1_81_0/"}"
+    FOLDER=${COCOA_BOOST_DIR:-"boost_1_81_0/"}
+
+    PACKDIR="${CCIL:?}/${FOLDER:?}"
 
     cdfolder "${PACKDIR}" || return 1;
 
@@ -508,7 +597,7 @@ if [ -z "${IGNORE_CORE_INSTALLATION}" ]; then
       --without-atomic \
       >${OUT1:?} 2>${OUT2:?} || { error "(BOOST) ${EC21:?}"; return 1; }
     
-    unset -v PACKDIR
+    unset -v PACKDIR FOLDER
 
     cdfolder "${ROOTDIR}" || return 1;
 

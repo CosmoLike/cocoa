@@ -12,7 +12,7 @@ if [ -z "${IGNORE_PLANCK_COMPILATION}" ]; then
   ( source "${ROOTDIR:?}/installation_scripts/.check_flags.sh" ) || return 1;
     
   unset_env_vars () {
-    unset -v EMCPC CLIK_LAPALIBS CLIK_CFITSLIBS
+    unset -v ECPCF CLIK_LAPACK_LIBS CLIK_CFITSIO_LIBS
     cdroot || return 1;
   }
 
@@ -47,30 +47,32 @@ if [ -z "${IGNORE_PLANCK_COMPILATION}" ]; then
   unset_env_vars || return 1
 
   if [ -z "${IGNORE_C_CFITSIO_INSTALLATION}" ]; then
-    CLIK_CFITSLIBS="${ROOTDIR:?}/.local/lib"
+    CLIK_CFITSIO_LIBS="${ROOTDIR:?}/.local/lib"
   else
     if [ -z "${GLOBAL_PACKAGES_LOCATION}" ]; then
       pfail "GLOBAL_PACKAGES_LOCATION"; cdroot; return 1;
     fi
-    CLIK_CFITSLIBS="${GLOBAL_PACKAGES_LOCATION:?}"
+    CLIK_CFITSIO_LIBS="${GLOBAL_PACKAGES_LOCATION:?}"
   fi
   
   if [ -z "${IGNORE_FORTRAN_INSTALLATION}" ]; then
-    CLIK_LAPALIBS="${ROOTDIR:?}/.local"
+    CLIK_LAPACK_LIBS="${ROOTDIR:?}/.local"
   else
     if [ -z "${GLOBAL_PACKAGES_LOCATION}" ]; then
       pfail "GLOBAL_PACKAGES_LOCATION"; cdroot; return 1;
     fi
-    CLIK_LAPALIBS="${GLOBAL_PACKAGES_LOCATION:?}"
+    CLIK_LAPACK_LIBS="${GLOBAL_PACKAGES_LOCATION:?}"
   fi
   
-  EMCPC="external_modules/code/planck/code"
+  ECPCF="external_modules/code/planck/code"
   
-  if [ -z "${USE_SPT_CLIK_PLANCK}" ]; then
-    cdfolder "${ROOTDIR:?}/${EMCPC:?}/plc_3.0/plc-3.1/" || return 1
+  if [ -z "${USE_SPT_CLIK_PLANCK}" ]; then 
+    PACKDIR="${ROOTDIR:?}/${ECPCF:?}/plc_3.0/plc-3.1"
   else
-    cdfolder "${ROOTDIR:?}/${EMCPC:?}/spt_clik/" || return 1
+    PACKDIR="${ROOTDIR:?}/${ECPCF:?}/spt_clik"
   fi
+
+  cdfolder "${PACKDIR:?}" || return 1;
 
   # ---------------------------------------------------------------------------
   # cleaning any previous compilation
@@ -81,7 +83,7 @@ if [ -z "${IGNORE_PLANCK_COMPILATION}" ]; then
   rm -rf "${ROOTDIR:?}/.local"/lib/python/site-packages/clik
   rm -rf "${ROOTDIR:?}/.local"/share/clik
   rm -f  "${ROOTDIR:?}/.local"/include/clik*
-  rm -f  .lock-waf_*
+  rm -f  "${PACKDIR:?}/".lock-waf_*
 
   "${PYTHON3:?}" waf distclean \
     >${OUT1:?} 2>${OUT2:?} || { error "${EC18:?}"; return 1; }
@@ -92,12 +94,12 @@ if [ -z "${IGNORE_PLANCK_COMPILATION}" ]; then
     "${PYTHON3:?}" waf configure \
     --gcc --gfortran --cfitsio_islocal \
     --prefix "${ROOTDIR:?}/.local" \
-    --lapack_prefix="${CLIK_LAPALIBS:?}" \
-    --cfitsio_lib="${CLIK_CFITSLIBS:?}" \
+    --lapack_prefix="${CLIK_LAPACK_LIBS:?}" \
+    --cfitsio_lib="${CLIK_CFITSIO_LIBS:?}" \
     --python="${PYTHON3:?}" \
     >${OUT1:?} 2>${OUT2:?} || { error "${EC5:?}"; return 1; }
   
-  ${PYTHON3:?} waf install -v \
+  "${PYTHON3:?}"waf install -v \
     >${OUT1:?} 2>${OUT2:?} || { error "${EC6:?}"; return 1; }
 
   unset_all || return 1

@@ -13,169 +13,96 @@ fi
 # ------------------------------ Basic Settings ------------------------------
 # ----------------------------------------------------------------------------
 # ----------------------------------------------------------------------------
-fail_scipack () {
-  export MSG="\033[0;31m (setup_cocoa_installation_package.sh) WE CANNOT RUN "
-  export MSG2="\033[0m"
-  echo -e "${MSG} ${1} ${MSG2}"
-  unset MSG
-  unset MSG2
-  unset fail_scipack
-  cd $(pwd -P)
-  source stop_cocoa.sh
+error_cip () {
+  local FILE="$(basename ${BASH_SOURCE[0]})"
+  local MSG="\033[0;31m (${FILE}) we cannot run "
+  local MSG2="\033[0m"
+  echo -e "${MSG}${1:?}${MSG2}" 2>"/dev/null"
+  unset TSCRIPTS
+  unset -f error
+  cd $(pwd -P) 2>"/dev/null"
+  source stop_cocoa 2>"/dev/null"
+  return 1
 }
 
-source .save_old_flags.sh
+source $(pwd -P)/.save_old_flags.sh
 if [ $? -ne 0 ]; then
-  fail_scipack 'SCRIPT .SAVE_OLD_FLAGS.SH'
-  return 1
+  error_cip 'script .save_old_flags.sh'; return 1;
 fi
 
-if [ -n "${SET_INSTALLATION_OPTIONS}" ]; then
-  source $SET_INSTALLATION_OPTIONS
-else
-  source set_installation_options.sh
-fi
+# note: here is where we define env flag ROOTDIR as $(pwd -P)
+source ${SET_INSTALLATION_OPTIONS:-"set_installation_options.sh"}
 
-# BASIC TEST IF A CONDA ENV IS ACTIVATED
 if [ -n "${MINICONDA_INSTALLATION}" ]; then
   if [ -z ${CONDA_PREFIX} ]; then
-    fail_scipack "CONDA ENVIRONMENT NOT ACTIVATED"
-    return 1
+    error_cip "conda environment activation"; return 1;
   fi
 fi
 
 # ----------------------------------------------------------------------------
 # ---------------------- Activate Virtual Environment ------------------------
 # ----------------------------------------------------------------------------
-cd $ROOTDIR/../
+
+cd ${ROOTDIR:?}/../
 
 if [ -n "${DONT_USE_SYSTEM_PIP_PACKAGES}" ]; then
-  $GLOBALPYTHON3 -m venv $ROOTDIR/.local/
+  ${GLOBALPYTHON3:?} -m venv "${ROOTDIR:?}/.local/"
 else
-  $GLOBALPYTHON3 -m venv $ROOTDIR/.local/ --system-site-packages
+  ${GLOBALPYTHON3:?} -m venv "${ROOTDIR:?}/.local/" --system-site-packages
 fi
 
-cd $ROOTDIR
-
-source $ROOTDIR/.local/bin/activate
-
-source $(pwd -P)/.set_new_flags.sh
+source "${ROOTDIR:?}/.local/bin/activate"
 if [ $? -ne 0 ]; then
-  fail_scipack 'SCRIPT .SET_NEW_FLAGS.SH'
-  return 1
+  error_cip "cocoa private python environment activation"; return 1;
+fi
+
+source "${ROOTDIR:?}/.set_new_flags.sh"
+if [ $? -ne 0 ]; then
+  error_cip 'script .set_new_flags.sh'; return 1;
 fi
 
 # ----------------------------------------------------------------------------
+# ------------------------------ INSTALL PACKAGES ----------------------------
 # ----------------------------------------------------------------------------
-# ----------------------------------------------------------------------------
 
-if [ -z "${MINICONDA_INSTALLATION}" ]; then
-  source $ROOTDIR/installation_scripts/setup_xz.sh
+declare -a TSCRIPTS=("setup_core_packages.sh" 
+                     "unxv_core_packages.sh" 
+                     "unxv_sn.sh"
+                     "unxv_bao.sh"
+                     "unxv_h0licow.sh" 
+                     "unxv_act_dr6.sh"
+                     "unxv_simons_observatory.sh"
+                     "unxv_bicep.sh"
+                     "unxv_spt.sh"
+                     "unxv_planck2018_basic.sh"
+                     "unxv_camspec.sh"
+                     "unxv_lipop.sh"
+                     "pip_core_packages.sh"
+                     "setup_update_cobaya.sh"
+                     "setup_polychord.sh"
+                     "setup_camb.sh"
+                     "setup_class.sh") # T = TMP
+
+for (( i=0; i<${#TSCRIPTS[@]}; i++ ));
+do
+
+  cdroot; 
+
+  ( source "${ROOTDIR:?}/installation_scripts/${TSCRIPTS[$i]}" )
   if [ $? -ne 0 ]; then
-    fail_scipack 'SCRIPT SETUP_XZ.SH'
+    error_cip "script ${TSCRIPTS[$i]}"; return 1
     return 1
   fi
-fi
 
-source ./installation_scripts/setup_installation_libraries.sh
-if [ $? -ne 0 ]; then
-  fail_scipack 'SCRIPT SETUP_INSTALLATION_LIBRARIES.SH'
-  return 1
-fi
-  
-if [ -z "${DEBUG_SKIP_FILE_DECOMPRESSION_SETUP_COCOA}" ]; then
-  source $ROOTDIR/installation_scripts/setup_decompress_files.sh
-  if [ $? -ne 0 ]; then
-    fail_scipack 'SCRIPT SETUP_DECOMPRESS_FILES.SH'
-    return 1
-  fi
-fi
-
-if [ -z "${MINICONDA_INSTALLATION}" ]; then
-  source ./installation_scripts/setup_cmake.sh
-  if [ $? -ne 0 ]; then
-    fail_scipack 'SCRIPT SETUP_CMAKE.SH'
-    return 1
-  fi
-fi
-
-if [ -z "${MINICONDA_INSTALLATION}" ]; then
-  source $ROOTDIR/installation_scripts/setup_binutils.sh
-  if [ $? -ne 0 ]; then
-    fail_scipack 'SCRIPT SETUP_BUNUTILS.SH'
-    return 1
-  fi
-fi
-
-if [ -z "${MINICONDA_INSTALLATION}" ]; then
-  source $ROOTDIR/installation_scripts/setup_hdf5.sh
-  if [ $? -ne 0 ]; then
-    fail_scipack 'SCRIPT SETUP_HDF5.SH'
-    return 1
-  fi
-fi
-
-if [ -z "${MINICONDA_INSTALLATION}" ]; then
-  source $ROOTDIR/installation_scripts/setup_openblas.sh
-  if [ $? -ne 0 ]; then
-    fail_scipack 'SCRIPT SETUP_OPENBLAS.SH'
-    return 1
-  fi
-fi
-
-source $ROOTDIR/installation_scripts/setup_pip_packages.sh
-if [ $? -ne 0 ]; then
-  fail_scipack 'SCRIPT SETUP_PIP_PACKAGES.SH'
-  return 1
-fi
-
-source $ROOTDIR/installation_scripts/setup_fortran_packages.sh
-if [ $? -ne 0 ]; then
-  fail_scipack 'SCRIPT SETUP_FORTRAN_PACKAGES.SH'
-  return 1
-fi
-
-source $ROOTDIR/installation_scripts/setup_cpp_packages.sh
-if [ $? -ne 0 ]; then
-  fail_scipack 'SCRIPT SETUP_CPP_PACKAGES.SH'
-  return 1
-fi
-
-source $ROOTDIR/installation_scripts/setup_c_packages.sh
-if [ $? -ne 0 ]; then
-  fail_scipack 'SCRIPT SETUP_C_PACKAGES.SH'
-  return 1
-fi
-
-source $ROOTDIR/installation_scripts/setup_update_cobaya.sh
-if [ $? -ne 0 ]; then
-  fail_scipack 'SCRIPT SETUP_UPDATE_COBAYA.SH'
-  return 1
-fi
-
-source $ROOTDIR/installation_scripts/setup_polychord.sh
-if [ $? -ne 0 ]; then
-  fail_scipack 'SCRIPT SETUP_POLYCHORD.SH'
-  return 1
-fi
-
-source $ROOTDIR/installation_scripts/setup_camb.sh
-if [ $? -ne 0 ]; then
-  fail_scipack 'SCRIPT SETUP_CAMB.SH'
-  return 1
-fi
-
-source $ROOTDIR/installation_scripts/setup_class.sh
-if [ $? -ne 0 ]; then
-  fail_scipack 'SCRIPT SETUP_CLASS.SH'
-  return 1
-fi
+done
 
 # ----------------------------------------------------------------------------
-# ----------------------------------------------------------------------------
-unset fail_scipack
+
+unset -f error_cip
 source stop_cocoa.sh
+
 pbottom2 'SETUP COCOA INSTALLATION PACKAGES'
+
 # ----------------------------------------------------------------------------
 # ----------------------------------------------------------------------------
 # ----------------------------------------------------------------------------

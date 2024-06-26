@@ -12,7 +12,7 @@ if [ -z "${IGNORE_CAMB_COMPILATION}" ]; then
   ( source "${ROOTDIR:?}/installation_scripts/.check_flags.sh" ) || return 1;
 
   unset_env_vars () {
-    unset -v ECODEF CAMBF PACKDIR
+    unset -v ECODEF FOLDER PACKDIR
     cdroot || return 1;
   }
 
@@ -49,9 +49,9 @@ if [ -z "${IGNORE_CAMB_COMPILATION}" ]; then
   # E = EXTERNAL, CODE, F=FODLER
   ECODEF="${ROOTDIR:?}/external_modules/code"
 
-  CAMBF=${CAMB_NAME:-"CAMB"}
+  FOLDER=${CAMB_NAME:-"CAMB"}
 
-  PACKDIR="${ECODEF:?}/${CAMBF:?}"
+  PACKDIR="${ECODEF:?}/${FOLDER:?}"
 
   cdfolder "${PACKDIR}" || return 1
 

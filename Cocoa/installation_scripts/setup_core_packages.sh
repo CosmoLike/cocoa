@@ -32,6 +32,15 @@ error () {
   unset_all || return 1
 }
 
+cdfolder() {
+  cd "${1:?}" 2>"/dev/null" || { error "CD FOLDER: ${1}"; return 1; }
+}
+
+cpfolder() {
+  cp -r "${1:?}" "${2:?}"  \
+    2>"/dev/null" || { error "CP FOLDER ${1} on ${2}"; return 1; }
+}
+
 wgetact() {
   #ARGUMENTS: FOLDER, FILE, URL, NEW_FOLDER, XZFILE
   
@@ -245,7 +254,7 @@ fi
 # ----------------------------------------------------------------------------
 # ----------------------------------------------------------------------------
 
-if [ -z "${IGNORE_DISTUTILS_INSTALLATION}" ]; then || return 1;
+if [ -z "${IGNORE_DISTUTILS_INSTALLATION}" ]; then
   
   ptop "GETTING TEXINFO LIBRARY"
 
@@ -409,7 +418,7 @@ if [ -z "${IGNORE_C_GSL_INSTALLATION}" ]; then
 
   URL="http://ftp.wayne.edu/gnu/gsl/${FOLDER}.${FILE}"
 
-  XZF="gsl-2.7.xz"
+  XZF="gsl.xz"
 
   wgetact "${FOLDER:?}" "${FILE:?}" "${URL:?}" \ 
     "${COCOA_GSL_DIR:-"gsl-2.7"}" "${XZF:?}" || return 1;

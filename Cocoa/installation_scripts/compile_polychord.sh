@@ -12,7 +12,7 @@ if [ -z "${IGNORE_POLYCHORD_COMPILATION}" ]; then
   ( source "${ROOTDIR:?}/installation_scripts/.check_flags.sh" ) || return 1;
   
   unset_env_vars () {
-    unset -v ECODEF POLYF PACKDIR PLIB
+    unset -v ECODEF FOLDER PACKDIR PLIB
     cdroot || return 1;
   }
   
@@ -49,11 +49,9 @@ if [ -z "${IGNORE_POLYCHORD_COMPILATION}" ]; then
   # E = EXTERNAL, CODE, F=FODLER
   ECODEF="${ROOTDIR:?}/external_modules/code"
 
-  POLYF=${POLY_NAME:-"PolyChordLite"}
+  FOLDER=${POLY_NAME:-"PolyChordLite"}
   
-  PACKDIR="${ECODEF:?}/${POLYF:?}"
-
-  PLIB="${ROOTDIR:?}/.local/lib/python${PYTHON_VERSION:?}/site-packages"
+  PACKDIR="${ECODEF:?}/${FOLDER:?}"
 
   cdfolder "${PACKDIR}" || return 1
 
@@ -62,6 +60,8 @@ if [ -z "${IGNORE_POLYCHORD_COMPILATION}" ]; then
 
   make clean >${OUT1:?} 2>${OUT2:?} || { error "${EC2:?}"; return 1; }
   
+  PLIB="${ROOTDIR:?}/.local/lib/python${PYTHON_VERSION:?}/site-packages"
+
   rm -rf "${PLIB:?}"/pypolychord-*
   rm -rf "${PACKDIR:?}/lib/*.a"
   rm -rf "${PACKDIR:?}/lib/*.so"

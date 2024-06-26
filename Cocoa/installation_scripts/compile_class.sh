@@ -12,7 +12,7 @@ if [ -z "${IGNORE_CLASS_COMPILATION}" ]; then
   ( source "${ROOTDIR:?}/installation_scripts/.check_flags.sh" ) || return 1;
       
   unset_env_vars () {
-    unset -v ECODEF CLASSF PACKDIR PLIB
+    unset -v ECODEF FOLDER PACKDIR PLIB
     cdroot || return 1;
   }
 
@@ -54,11 +54,9 @@ if [ -z "${IGNORE_CLASS_COMPILATION}" ]; then
   # E = EXTERNAL, CODE, F=FODLER
   ECODEF="${ROOTDIR:?}/external_modules/code"
 
-  CLASSF=${CLASS_NAME:-"class_public"}
+  FOLDER=${CLASS_NAME:-"class_public"}
 
-  PACKDIR="${ECODEF:?}/${CLASSF:?}"
-
-  PLIB="${ROOTDIR:?}/.local/lib/python${PYTHON_VERSION:?}/site-packages"
+  PACKDIR="${ECODEF:?}/${FOLDER:?}"
 
   cdfolder "${PACKDIR}" || return 1
 
@@ -68,7 +66,9 @@ if [ -z "${IGNORE_CLASS_COMPILATION}" ]; then
   # note: below we ignore if something goes wrong (related to include/ mv)
   "${PYTHON3:?}" setup.py clean >${OUT1:?} 2>${OUT2:?}
 
+  PLIB="${ROOTDIR:?}/.local/lib/python${PYTHON_VERSION:?}/site-packages"
   rm -rf "${PLIB:?}"/classy*
+
   rm -rf "${PACKDIR:?}/python/build/"
   rm -rf "${PACKDIR:?}/python/classy.egg-info"  
   rm -rf "${PACKDIR:?}/build/"

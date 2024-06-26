@@ -19,9 +19,8 @@ unset_all () {
 }
 
 error () {
-  fail_script_msg "delete_core_packages.sh" "${1}"
-  unset_all
-  cdroot || return 1;
+  fail_script_msg "$(basename ${BASH_SOURCE[0]})" "${1}"
+  unset_all || return 1
 }
 
 cdfolder() {
@@ -37,7 +36,7 @@ ptop2 'DELETING CORE PACKAGES' || return 1
 cdfolder "${ROOTDIR:?}/../cocoa_installation_libraries" || return 1
 
 # parenthesis = run in a subshell
-( sh clean_all ) || { error "SCRIPT clean_all.sh"; return 1; }
+( sh clean_all ) || { error "script clean_all.sh"; return 1; }
 
 unset -v SETUP_PREREQUISITE_DONE
 unset_all || return 1;
