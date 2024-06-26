@@ -9,9 +9,9 @@ fi
 
 error_stop_cocoa () {
   local FILE="$(basename ${BASH_SOURCE[0]})"
-  local FAILMSG="\033[0;31m (${FILE}) we cannot run "
-  local FAILMSG2="\033[0m"
-  echo -e "${FAILMSG}${1:?}${FAILMSG2}" 2>"/dev/null"
+  local MSG="\033[0;31m (${FILE}) we cannot run "
+  local MSG2="\033[0m"
+  echo -e "${MSG}${1:?}${MSG2}" 2>"/dev/null"
   unset -f error
   cd $(pwd -P) 2>"/dev/null"
   source stop_cocoa 2>"/dev/null"
