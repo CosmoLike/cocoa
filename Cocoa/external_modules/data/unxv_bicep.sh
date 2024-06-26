@@ -9,7 +9,7 @@ if [ -z "${SKIP_DECOMM_BICEP}" ]; then
   fi
 
   unset_env_vars () {
-    unset -v EDATAF DATAF PACKDIR FILE
+    unset -v EDATAF FOLDER PACKDIR FILE
     cdroot || return 1;
   }
 
@@ -27,34 +27,36 @@ if [ -z "${SKIP_DECOMM_BICEP}" ]; then
   }
   
   error () {
-    fail_script_msg "unxv_bicep.sh" "${1}"
+    fail_script_msg "$(basename ${BASH_SOURCE[0]})" "${1}"
     unset_all || return 1
   }
   
   cdfolder() {
-    cd "${1:?}" 2>"/dev/null" || { error "CD FOLDER ${1}"; return 1; }
+    cd "${1:?}" 2>"/dev/null" || { error "CD FOLDER: ${1}"; return 1; }
   }
 
   # --------------------------------------------------------------------------- 
   # --------------------------------------------------------------------------- 
   # ---------------------------------------------------------------------------
-
-  ptop 'DECOMPRESSING BICEP 2015 DATA' || return 1
 
   unset_env_vars || return 1
 
   # E = EXTERNAL, DATA, F=FODLER
   EDATAF="${ROOTDIR:?}/external_modules/data"
 
-  DATAF="bicep_keck_2015"
+  FOLDER="bicep_keck_2015"
 
   # PACK = PACKAGE, DIR = DIRECTORY
-  PACKDIR="${EDATAF:?}/${DATAF:?}"
+  PACKDIR="${EDATAF:?}/${FOLDER:?}"
 
   FILE="bicep_keck_2015.xz"
 
   # ---------------------------------------------------------------------------
-  # in case this script is called twice
+  
+  ptop 'DECOMPRESSING BICEP 2015 DATA' || return 1
+
+  # ---------------------------------------------------------------------------
+  # note: in case script run >1x w/ previous run stoped prematurely b/c error
   
   rm -rf "${PACKDIR:?}"
   
@@ -62,8 +64,11 @@ if [ -z "${SKIP_DECOMM_BICEP}" ]; then
 
   cdfolder "${EDATAF:?}" || return 1
 
-  tar xf ${FILE:?} \
-    >${OUT1:?} 2>${OUT2:?} || { error "${EC25:?} (xz)"; return 1; }
+  tar xf "${FILE:?}" >${OUT1:?} 2>${OUT2:?} || { error "${EC25:?}"; return 1; }
+
+  # ---------------------------------------------------------------------------
+
+  cdfolder "${ROOTDIR}" || return 1
 
   unset_all || return 1
   

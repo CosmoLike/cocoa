@@ -38,6 +38,10 @@ if [ -z "${SKIP_DECOMM_LIPOP}" ]; then
     cd "${1:?}" 2>"/dev/null" || { error "CD FOLDER: ${1}"; return 1; }
   }
 
+  #-----------------------------------------------------------------------------
+  #-----------------------------------------------------------------------------
+  #-----------------------------------------------------------------------------
+
   unset_env_vars || return 1
 
   # E = EXTERNAL, DATA, F=FODLER
@@ -93,7 +97,7 @@ if [ -z "${SKIP_DECOMM_LIPOP}" ]; then
   mv "${EDATAF:?}/planck/planck_2020/lollipop" "${EDATAF:?}/planck"
 
   # ----------------------------------------------------------------------------
-  # clean tar.gz files (saves space) 
+  # clean tar.gz files 
   
   rm -rf "${EDATAF:?}/planck/planck_2020"
 

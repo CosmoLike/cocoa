@@ -8,8 +8,11 @@ if [ -z "${SKIP_DECOMM_BAO}" ]; then
     pfail 'ROOTDIR'; return 1;
   fi
 
+  # parenthesis = run in a subshell 
+  ( source "${ROOTDIR:?}/installation_scripts/.check_flags.sh" ) || return 1;
+
   unset_env_vars () {
-    unset -v EDATAF DATAF PACKDIR FILE
+    unset -v EDATAF FOLDER FILE PACKDIR 
     cdroot || return 1;
   }
 
@@ -27,34 +30,36 @@ if [ -z "${SKIP_DECOMM_BAO}" ]; then
   }
   
   error () {
-    fail_script_msg "unxv_bao.sh" "${1}"
+    fail_script_msg "$(basename ${BASH_SOURCE[0]})" "${1}"
     unset_all || return 1
   }
   
   cdfolder() {
-    cd "${1:?}" 2>"/dev/null" || { error "CD FOLDER ${1}"; return 1; }
+    cd "${1:?}" 2>"/dev/null" || { error "CD FOLDER: ${1}"; return 1; }
   }
 
   # --------------------------------------------------------------------------- 
   # --------------------------------------------------------------------------- 
   # ---------------------------------------------------------------------------
-
-  ptop 'DECOMPRESSING BAO DATA' || return 1
 
   unset_env_vars || return 1
 
   # E = EXTERNAL, DATA, F=FODLER
   EDATAF="${ROOTDIR:?}/external_modules/data"
 
-  DATAF="bao_data"
+  FOLDER="bao_data"
 
   # PACK = PACKAGE, DIR = DIRECTORY
-  PACKDIR="${EDATAF:?}/${DATAF:?}"
+  PACKDIR="${EDATAF:?}/${FOLDER:?}"
 
   FILE="bao_data.xz"
 
   # ---------------------------------------------------------------------------
-  # in case this script is called twice
+
+  ptop 'DECOMPRESSING BAO DATA' || return 1
+
+  # ---------------------------------------------------------------------------
+  # note: in case script run >1x w/ previous run stoped prematurely b/c error
   
   rm -rf "${PACKDIR:?}"
 
@@ -62,7 +67,11 @@ if [ -z "${SKIP_DECOMM_BAO}" ]; then
 
   cdfolder "${EDATAF:?}" || return 1
 
-  tar xf ${FILE:?} >${OUT1:?} 2>${OUT2:?} || { error "${EC25:?}"; return 1; }
+  tar xf "${FILE:?}" >${OUT1:?} 2>${OUT2:?} || { error "${EC25:?}"; return 1; }
+
+  # ---------------------------------------------------------------------------
+
+  cdfolder "${ROOTDIR}" || return 1
 
   unset_all || return 1
   

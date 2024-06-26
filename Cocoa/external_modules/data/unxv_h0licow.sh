@@ -9,7 +9,7 @@ if [ -z "${SKIP_DECOMM_STRONG_LENSING}" ]; then
   fi
 
   unset_env_vars () {
-    unset -v EDATAF DATAF PACKDIR URL
+    unset -v EDATAF DATAF PACKDIR URL TDATA
     cdroot || return 1;
   }
 
@@ -27,7 +27,7 @@ if [ -z "${SKIP_DECOMM_STRONG_LENSING}" ]; then
   }
   
   error () {
-    fail_script_msg "unxv_camspec.sh" "${1}"
+    fail_script_msg "$(basename ${BASH_SOURCE[0]})" "${1}"
     unset_all || return 1
   }
   
@@ -38,8 +38,6 @@ if [ -z "${SKIP_DECOMM_STRONG_LENSING}" ]; then
   # --------------------------------------------------------------------------- 
   # --------------------------------------------------------------------------- 
   # ---------------------------------------------------------------------------
-
-  ptop 'DECOMPRESSING H0LICOW DATA' || return 1
 
   unset_env_vars || return 1
 
@@ -54,6 +52,10 @@ if [ -z "${SKIP_DECOMM_STRONG_LENSING}" ]; then
   PACKDIR="${EDATAF:?}/${TDATA:?}"
 
   URL="${HOLICOW_DATA_URL:-"https://github.com/shsuyu/H0LiCOW-public.git"}"
+
+  # ---------------------------------------------------------------------------
+
+  ptop 'DECOMPRESSING H0LICOW DATA' || return 1
 
   # ---------------------------------------------------------------------------
   # in case this script is called twice
@@ -77,6 +79,10 @@ if [ -z "${SKIP_DECOMM_STRONG_LENSING}" ]; then
   mv "${DATAF:?}" "${EDATAF:?}"
 
   rm -rf "${PACKDIR:?}"
+
+  # ---------------------------------------------------------------------------
+
+  cdfolder "${ROOTDIR}" || return 1
 
   unset_all || return 1
   

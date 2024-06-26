@@ -36,6 +36,10 @@ if [ -z "${SKIP_DECOMM_PLANCK}" ]; then
     cd "${1:?}" 2>"/dev/null" || { error "CD FOLDER: ${1}"; return 1; }
   }
 
+  # --------------------------------------------------------------------------- 
+  # --------------------------------------------------------------------------- 
+  # ---------------------------------------------------------------------------
+
   unset_env_vars || return 1
 
   # E = EXTERNAL, DATA, F=FODLER
@@ -60,6 +64,8 @@ if [ -z "${SKIP_DECOMM_PLANCK}" ]; then
   pbottom 'DECOMPRESSING PLANCK2018 SUPPLEMENTAL DATA/COVARIANCES' || return 1
 
   #-----------------------------------------------------------------------------
+  #-----------------------------------------------------------------------------
+  #-----------------------------------------------------------------------------
   
   ptop 'DECOMPRESSING PLANCK2018 (PLC-3.0) DATA' || return 1
 
@@ -76,26 +82,26 @@ if [ -z "${SKIP_DECOMM_PLANCK}" ]; then
   cdfolder "${EDATAF:?}/planck/plc_3.0" || return 1
   
   tar xf lensing.xz \
-      >${OUT1:?} 2>${OUT2:?} || { error "${EC25:?} (xz)"; return 1; }
+      >${OUT1:?} 2>${OUT2:?} || { error "${EC25:?}"; return 1; }
 
   tar xf low_l.xz \
-      >${OUT1:?} 2>${OUT2:?} || { error "${EC25:?} (xz)"; return 1; }
+      >${OUT1:?} 2>${OUT2:?} || { error "${EC25:?}"; return 1; }
 
   cdfolder "${EDATAF:?}/planck/plc_3.0/hi_l" || return 1
   
   tar xf plik.xz \
-      >${OUT1:?} 2>${OUT2:?} || { error "${EC25:?} (xz)"; return 1; }
+      >${OUT1:?} 2>${OUT2:?} || { error "${EC25:?}"; return 1; }
 
   tar xf plik_lite.xz \
-      >${OUT1:?} 2>${OUT2:?} || { error "${EC25:?} (xz)"; return 1; }
-
-  cdfolder "${ROOTDIR}" || return 1
-  
-  pbottom 'DECOMPRESSING PLANCK2018 (PLC-3.0) DATA' || return 1
-  
+      >${OUT1:?} 2>${OUT2:?} || { error "${EC25:?}"; return 1; }
+    
   # ---------------------------------------------------------------------------
 
+  cdfolder "${ROOTDIR}" || return 1
+
   unset_all || return 1; 
+
+  pbottom 'DECOMPRESSING PLANCK2018 (PLC-3.0) DATA' || return 1
 
 fi
 

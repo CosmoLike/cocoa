@@ -27,7 +27,7 @@ if [ -z "${SKIP_DECOMM_CAMSPEC}" ]; then
   }
   
   error () {
-    fail_script_msg "unxv_camspec.sh" "${1}"
+    fail_script_msg "$(basename ${BASH_SOURCE[0]})" "${1}"
     unset_all || return 1
   }
   
@@ -38,8 +38,6 @@ if [ -z "${SKIP_DECOMM_CAMSPEC}" ]; then
   # --------------------------------------------------------------------------- 
   # --------------------------------------------------------------------------- 
   # ---------------------------------------------------------------------------
-
-  ptop "DECOMPRESSING CAMSPEC DATA" || return 1
 
   unset_env_vars || return 1
 
@@ -58,18 +56,27 @@ if [ -z "${SKIP_DECOMM_CAMSPEC}" ]; then
   URL="${URL_BASE:?}/releases/download/v1/${FILE:?}"
 
   # ---------------------------------------------------------------------------
-  # in case this script is called twice
+
+  ptop "DECOMPRESSING CAMSPEC DATA" || return 1
+
   # ---------------------------------------------------------------------------
+  # note: in case script run >1x w/ previous run stoped prematurely b/c error
+  
   rm -rf "${PACKDIR:?}"
   rm -rf "${EDATAF:?}/${FILE:?}"
   
+  # ---------------------------------------------------------------------------
+
   cdfolder "${EDATAF:?}" || return 1
 
   wget "${URL:?}" >${OUT1:?} 2>${OUT2:?} || { error "${EC24:?}"; return 1; }
   
-  unzip "${FILE:?}" \
-    >${OUT1:?} 2>${OUT2:?} || { error "${EC26:?}"; return 1; }
-  
+  unzip "${FILE:?}" >${OUT1:?} 2>${OUT2:?} || { error "${EC26:?}"; return 1; }
+
+  # ---------------------------------------------------------------------------
+
+  cdfolder "${ROOTDIR}" || return 1
+
   unset_all || return 1
   
   pbottom 'DECOMPRESSING CAMSPEC DATA' || return 1

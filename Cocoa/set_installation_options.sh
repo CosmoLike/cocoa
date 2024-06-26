@@ -138,6 +138,11 @@ export ACT_DR6_DATA_URL="https://lambda.gsfc.nasa.gov/data/suborbital/ACT/ACT_dr
 export ACT_DR6_DATA_FILE="ACT_dr6_likelihood_v1.2.tgz"
 export ACT_NAME="pyactlike"
 
+export SO_DATA_URL="https://portal.nersc.gov/cfs/sobs/users/MFLike_data"
+# Cocoa can download multiple versions of the data (to reproduce existing work)
+# This is only possible because each version is saved on a separated folder
+export SO_DATA_VERSION="v0.7.1 v0.8"
+
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------

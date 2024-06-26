@@ -12,7 +12,7 @@ if [ -z "${SKIP_DECOMM_SN}" ]; then
   ( source "${ROOTDIR:?}/installation_scripts/.check_flags.sh" ) || return 1;
     
   unset_env_vars () { 
-    unset -v EDATAF
+    unset -v EDATAF FOLDER FILE PACKDIR
     cdroot || return 1;
   }
 
@@ -38,38 +38,44 @@ if [ -z "${SKIP_DECOMM_SN}" ]; then
     cd "${1:?}" 2>"/dev/null" || { error "CD FOLDER: ${1}"; return 1; }
   }
 
+  # --------------------------------------------------------------------------- 
+  # --------------------------------------------------------------------------- 
+  # ---------------------------------------------------------------------------
+
   unset_env_vars || return 1
 
   # E = EXTERNAL, DATA, F=FODLER
   EDATAF="${ROOTDIR:?}/external_modules/data"
 
+  FOLDER="sn_data"
+
+  # PACK = PACKAGE, DIR = DIRECTORY
+  PACKDIR="${EDATAF:?}/${FOLDER:?}"
+
+  FILE="sn_data.xz"
+  
   # ---------------------------------------------------------------------------
 
   ptop 'DECOMPRESSING SN DATA' || return 1
 
-  cdfolder "${EDATAF:?}/planck"
-
-  # ----------------------------------------------------------------------------
+  # ---------------------------------------------------------------------------
   # note: in case script run >1x w/ previous run stoped prematurely b/c error
 
-  rm -rf ${EDATAF:?}/sn_data
+  rm -rf "${PACKDIR:?}"
 
-  # ----------------------------------------------------------------------------
+  # ---------------------------------------------------------------------------
 
-  cdfolder "${EDATAF:?}"
+  cdfolder "${EDATAF:?}" || return 1
 
-  tar xf sn_data.xz \
-      >${OUT1:?} 2>${OUT2:?} || { error "${EC25:?} (xz)"; return 1; }
+  tar xf "${FILE:?}" >${OUT1:?} 2>${OUT2:?} || { error "${EC25:?}"; return 1; }
   
   # ---------------------------------------------------------------------------
 
   cdfolder "${ROOTDIR}" || return 1
   
-  unset_all || return 1;
+  unset_all || return 1
 
   pbottom 'DECOMPRESSING SN DATA' || return 1
-
-  # ---------------------------------------------------------------------------
 
 fi
 
