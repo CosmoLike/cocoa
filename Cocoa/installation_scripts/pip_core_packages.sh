@@ -267,7 +267,7 @@ if [ -z "${IGNORE_ALL_PIP_INSTALLATION}" ]; then
     pbottom "PIP INSTALL MACHINE LEARNING GPU PACKAGES" || return 1
   
   fi
-  
+
   # ---------------------------------------------------------------------------
 
   unset_all || return 1;

@@ -73,11 +73,11 @@ fi
 # ----------------------------------------------------------------------------
 
 ptop() {
-  echo -e "\033[1;34m\t${1} \033[0m"
+  echo -e "\033[1;34m  ${1} \033[0m"
 }
 
 pbottom() {
-  echo -e "\033[1;34m\t\e[4m${1} DONE\033[0m"
+  echo -e "\033[1;34m  \e[4m${1} DONE\033[0m"
 }
 
 ptop2() {
@@ -90,7 +90,7 @@ pbottom2() {
 
 pfail() {
   echo -e \
-  "\033[0;31m\t\t ERROR ENV VARIABLE ${1:-"empty arg"} NOT DEFINED \033[0m"
+  "\033[0;31m       ERROR ENV VARIABLE ${1:-"empty arg"} NOT DEFINED \033[0m"
 }
 
 cdroot() {
@@ -108,7 +108,7 @@ else
 fi
 
 fail_script_msg () {
-  local MSG="\033[0;31m\t\t (${1:-"empty arg"}) we cannot run \e[3m"
+  local MSG="\033[0;31m        (${1:-"empty arg"}) we cannot run \e[3m"
   local MSG2="\033[0m"
   echo -e "${MSG} ${2:-"empty arg"} ${MSG2}"
 }

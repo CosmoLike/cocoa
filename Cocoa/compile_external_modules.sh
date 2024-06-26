@@ -7,72 +7,50 @@ if [ -n "${ROOTDIR}" ]; then
 fi
 source start_cocoa.sh
 
-ptop2 'COMPILING EXTERNAL MODULES' || return 1
-
-# ----------------------------------------------------------------------------
-# ------------------------------ COMPILE COBAYA ------------------------------
-# ----------------------------------------------------------------------------
-
-ptop "INSTALLING COBAYA (VIA PIP)" || return 1
-
-if [ -z "${COCOA_OUTPUT_VERBOSE}" ]; then
-  export OUT1="/dev/null"; export OUT2="/dev/null"
-else
-  export OUT1="/dev/tty"; export OUT2="/dev/tty"
-fi
-
-${PIP3:?} install --editable cobaya --prefix="${ROOTDIR:?}/.local" >"${OUT1:?}" 2>"${OUT2:?}"
-if [ $? -ne 0 ]; then
-  echo -e '\033[0;31m'"PIP COULD NOT RUN \e[3mPIP INSTALL COBAYA"'\033[0m'
-  cd $ROOTDIR
+error_cem () {
+  local FILE="$(basename ${BASH_SOURCE[0]})"
+  local MSG="\033[0;31m\t\t (${FILE}) we cannot run "
+  local MSG2="\033[0m"
+  echo -e "${MSG}${1:?}${MSG2}" 2>"/dev/null"
+  unset -v TSCRIPTS
+  unset -f error_cem
+  cd $(pwd -P) 2>"/dev/null"
+  source stop_cocoa 2>"/dev/null"
   return 1
-fi
-
-pbottom "INSTALLING COBAYA (VIA PIP)" || return 1
+}
 
 # ----------------------------------------------------------------------------
 # ------------------------ COMPILE EXTERNAL MODULES --------------------------
 # ----------------------------------------------------------------------------
 
-source "${ROOTDIR:?}"/installation_scripts/compile_camb.sh
-if [ $? -ne 0 ]; then
-  cd $ROOTDIR
-  source stop_cocoa
-  return 1
-fi
+ptop2 'COMPILING ALL EXTERNAL MODULES' || return 1
 
-source "${ROOTDIR:?}"/installation_scripts/compile_class.sh
-if [ $? -ne 0 ]; then
-  cd $ROOTDIR
-  source stop_cocoa
-  return 1
-fi
+declare -a TSCRIPTS=("compile_camb.sh"
+                     "compile_class.sh" 
+                     "compile_planck.sh" 
+                     "compile_act.sh"
+                     "compile_polychord.sh"
+                     ) # T = TMP
 
-source "${ROOTDIR:?}"/installation_scripts/compile_planck.sh
-if [ $? -ne 0 ]; then
-  cd $ROOTDIR
-  source stop_cocoa
-  return 1
-fi
+for (( i=0; i<${#TSCRIPTS[@]}; i++ ));
+do
 
-source "${ROOTDIR:?}"/installation_scripts/compile_act.sh
-if [ $? -ne 0 ]; then
-  cd $ROOTDIR
-  source stop_cocoa
-  return 1
-fi
+  cdroot; 
 
-source "${ROOTDIR:?}"/installation_scripts/compile_polychord.sh
-if [ $? -ne 0 ]; then
-  cd $ROOTDIR
-  source stop_cocoa
-  return 1
-fi
+  ( source "${ROOTDIR:?}/installation_scripts/${TSCRIPTS[$i]}" )
+  if [ $? -ne 0 ]; then
+    error_cem "script ${TSCRIPTS[$i]}"; return 1
+    return 1
+  fi
 
-# ----------------------------------------------------------------------------
-# ----------------------------------------------------------------------------
-pbottom2 "COMPILING EXTERNAL MODULES" || return 1
+done
+
+unset -f error_cem
+
+pbottom2 "COMPILING ALL EXTERNAL MODULES" || return 1
+
 source stop_cocoa.sh
+
 # ----------------------------------------------------------------------------
 # ----------------------------------------------------------------------------
 # ----------------------------------------------------------------------------

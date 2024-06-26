@@ -99,7 +99,7 @@ if [ -z "${IGNORE_PLANCK_COMPILATION}" ]; then
     --python="${PYTHON3:?}" \
     >${OUT1:?} 2>${OUT2:?} || { error "${EC5:?}"; return 1; }
   
-  "${PYTHON3:?}"waf install -v \
+  "${PYTHON3:?}" waf install -v \
     >${OUT1:?} 2>${OUT2:?} || { error "${EC6:?}"; return 1; }
 
   unset_all || return 1
