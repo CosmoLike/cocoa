@@ -25,13 +25,13 @@ export COCOA_OUTPUT_VERBOSE=1
 # --- SKIP DOWNLOAD/DECOMPRESSING DATASET (SAVE TIME WHEN INSTALLING COCOA) ----
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
-# export SKIP_DECOMM_ACT
-# export SKIP_DECOMM_SPT
-# export SKIP_DECOMM_PLANCK
-# export SKIP_DECOMM_BICEP
-# export SKIP_DECOMM_STRONG_LENSING
-# export SKIP_DECOMM_SN
-# export SKIP_DECOMM_BAO
+# export SKIP_DECOMM_ACT=1
+# export SKIP_DECOMM_SPT=1
+# export SKIP_DECOMM_PLANCK=1
+# export SKIP_DECOMM_BICEP=1
+# export SKIP_DECOMM_STRONG_LENSING=1
+# export SKIP_DECOMM_SN=1
+# export SKIP_DECOMM_BAO=1
 export SKIP_DECOMM_SIMONS_OBSERVATORY=1
 export SKIP_DECOMM_CAMSPEC=1
 export SKIP_DECOMM_LIPOP=1

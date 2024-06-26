@@ -2,7 +2,7 @@
 # ----------------------------------------------------------------------------
 # ----------------------------------------------------------------------------
 # ----------------------------------------------------------------------------
-if [ -z "${DEBUG_SKIP_FILE_DECOMPRESSION_SETUP_COCOA}" ]; then
+if [ -z "${SKIP_DECOMM_CORE_PACKAGES}" ]; then
 
   if [ -z "${ROOTDIR}" ]; then
     pfail 'ROOTDIR'; return 1
@@ -11,12 +11,8 @@ if [ -z "${DEBUG_SKIP_FILE_DECOMPRESSION_SETUP_COCOA}" ]; then
   # parenthesis = run in a subshell
   ( source "${ROOTDIR:?}/installation_scripts/.check_flags.sh" ) || return 1;
 
-  if [ -z "${ROOTDIR}" ]; then
-    pfail 'ROOTDIR'; return 1
-  fi
-
   unset_env_vars () {
-    unset -v CCIL
+    unset -v TKEYS TFILES AL CCIL
     cdroot || return 1;
   }
 
@@ -47,12 +43,6 @@ if [ -z "${DEBUG_SKIP_FILE_DECOMPRESSION_SETUP_COCOA}" ]; then
   # ----------------------------------------------------------------------------
 
   CCIL="${ROOTDIR}/../cocoa_installation_libraries"
-
-  # ----------------------------------------------------------------------------
-
-  ptop 'DECOMPRESSING FILES ON COCOA_INSTALLATION_LIBRARIES' || return 1
-
-  cdfolder "${ROOTDIR:?}/../cocoa_installation_libraries/"
 
   declare -a TKEYS=("IGNORE_CMAKE_INSTALLATION"
                     "IGNORE_DISTUTILS_INSTALLATION"
@@ -92,6 +82,31 @@ if [ -z "${DEBUG_SKIP_FILE_DECOMPRESSION_SETUP_COCOA}" ]; then
 
   # ----------------------------------------------------------------------------
 
+  ptop 'DECOMPRESSING FILES ON COCOA_INSTALLATION_LIBRARIES' || return 1
+
+  if [ "${#TKEYS[@]}" -eq "${#TFILES[@]}" ]; then
+    AL=${#TFILES[@]}
+  else
+    error ("logical error - array sizes do not match");
+  fi
+  
+  for (( i=0; i<${AL:?}; i++ ));
+  do
+
+    cdfolder "${CCIL:?}" || return 1
+
+    if [ -z "${TKEYS[$i]}" ]; then
+      
+      tar xf "${ROOTDIR:?}/installation_scripts/${TFILES[$i]}.xz" \ 
+        >${OUT1:?} 2>${OUT2:?} || 
+        { error "${EC25:?} (${TFILES[$i]}.xz)"; return 1; }
+    
+    fi
+  
+  done
+
+  # ----------------------------------------------------------------------------
+
   unset_all || return 1;
 
   pbottom 'DECOMPRESSING FILES ON COCOA_INSTALLATION_LIBRARIES' || return 1
@@ -101,5 +116,3 @@ fi
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
-
-cd $ROOTDIR/

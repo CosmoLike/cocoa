@@ -35,6 +35,21 @@ if [ -n "${IGNORE_FORTRAN_INSTALLATION}" ]; then
 fi
 
 # ------------------------------------------------------------------------------
+if [ -n "${DEBUG_SKIP_FILE_DECOMPRESSION_SETUP_COCOA}" ]; then
+  export SKIP_DECOMM_CORE_PACKAGES=1
+  export SKIP_DECOMM_ACT=1
+  export SKIP_DECOMM_SPT=1
+  export SKIP_DECOMM_PLANCK=1
+  export SKIP_DECOMM_BICEP=1
+  export SKIP_DECOMM_STRONG_LENSING=1
+  export SKIP_DECOMM_SN=1
+  export SKIP_DECOMM_BAO=1
+  export SKIP_DECOMM_SIMONS_OBSERVATORY=1
+  export SKIP_DECOMM_CAMSPEC=1
+  export SKIP_DECOMM_LIPOP=1
+fi
+
+# ------------------------------------------------------------------------------
 if [ -n "${GLOBAL_PACKAGES_LOCATION}" ]; then
   export GLOBAL_PACKAGES_INCLUDE=$GLOBAL_PACKAGES_LOCATION/include
   export GLOBAL_PACKAGES_LIB=$GLOBAL_PACKAGES_LOCATION/lib
@@ -152,8 +167,10 @@ export EC24="WGET"
 export EC25="TAR (DECOMPRESS)"
 
 export EC26="UNZIP (DECOMPRESS)"
+
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
+
 export COCOA_RUN_EVALUATE="mpirun -n 1 --oversubscribe --mca btl vader,tcp,self --bind-to core:overload-allowed --rank-by core --map-by numa:pe=4 cobaya-run"
 
 export COCOA_RUN_MCMC="mpirun -n 4 --oversubscribe --mca btl vader,tcp,self --bind-to core:overload-allowed --rank-by core --map-by numa:pe=4 cobaya-run"
