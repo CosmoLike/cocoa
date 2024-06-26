@@ -8,6 +8,9 @@ if [ -z "${SKIP_DECOMM_BICEP}" ]; then
     pfail 'ROOTDIR'; return 1;
   fi
 
+  # parenthesis = run in a subshell 
+  ( source "${ROOTDIR:?}/installation_scripts/.check_flags.sh" ) || return 1;
+  
   unset_env_vars () {
     unset -v EDATAF FOLDER PACKDIR FILE
     cdroot || return 1;

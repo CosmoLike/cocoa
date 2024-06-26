@@ -5,7 +5,7 @@
 if [ -z "${SKIP_DECOMM_SIMONS_OBSERVATORY}" ]; then
 
   if [ -z "${ROOTDIR}" ]; then
-    pfail 'ROOTDIR'; return 1
+    pfail 'ROOTDIR'; return 1;
   fi
 
   # parenthesis = run in a subshell 

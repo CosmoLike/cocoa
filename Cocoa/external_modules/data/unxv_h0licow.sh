@@ -8,8 +8,11 @@ if [ -z "${SKIP_DECOMM_STRONG_LENSING}" ]; then
     pfail 'ROOTDIR'; return 1;
   fi
 
+  # parenthesis = run in a subshell 
+  ( source "${ROOTDIR:?}/installation_scripts/.check_flags.sh" ) || return 1;
+  
   unset_env_vars () {
-    unset -v EDATAF DATAF PACKDIR URL TDATA
+    unset -v EDATAF FOLDER PACKDIR URL TMP
     cdroot || return 1;
   }
 
@@ -32,7 +35,7 @@ if [ -z "${SKIP_DECOMM_STRONG_LENSING}" ]; then
   }
   
   cdfolder() {
-    cd "${1:?}" 2>"/dev/null" || { error "CD FOLDER ${1}"; return 1; }
+    cd "${1:?}" 2>"/dev/null" || { error "CD FOLDER: ${1}"; return 1; }
   }
 
   # --------------------------------------------------------------------------- 
@@ -44,12 +47,12 @@ if [ -z "${SKIP_DECOMM_STRONG_LENSING}" ]; then
   # E = EXTERNAL, DATA, F=FODLER
   EDATAF="${ROOTDIR:?}/external_modules/data/"
   
-  TDATA="holicow_tmp" # = TMP
+  TMP="holicow_tmp" # = TMP
 
-  DATAF="h0licow_distance_chains"
+  FOLDER="h0licow_distance_chains"
 
   # PACK = PACKAGE, DIR = DIRECTORY
-  PACKDIR="${EDATAF:?}/${TDATA:?}"
+  PACKDIR="${EDATAF:?}/${TMP:?}"
 
   URL="${HOLICOW_DATA_URL:-"https://github.com/shsuyu/H0LiCOW-public.git"}"
 
@@ -66,7 +69,7 @@ if [ -z "${SKIP_DECOMM_STRONG_LENSING}" ]; then
 
   cdfolder "${EDATAF:?}" || return 1
 
-  ${GIT:?} clone "${URL:?}" "${TDATA:?}" \
+  ${GIT:?} clone "${URL:?}" "${TMP:?}" \
     >${OUT1:?} 2>${OUT2:?} || { error "${EC15:?}"; return 1; }
 
   cdfolder "${PACKDIR:?}" || return 1
@@ -76,7 +79,7 @@ if [ -z "${SKIP_DECOMM_STRONG_LENSING}" ]; then
       >${OUT1:?} 2>${OUT2:?} || { error "${EC16:?}"; return 1; }
   fi
 
-  mv "${DATAF:?}" "${EDATAF:?}"
+  mv "${FOLDER:?}" "${EDATAF:?}"
 
   rm -rf "${PACKDIR:?}"
 
