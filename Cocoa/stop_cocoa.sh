@@ -3,27 +3,24 @@
 # ----------------------------------------------------------------------------
 # ----------------------------------------------------------------------------
 
-if ! command -v deactivate &> /dev/null
-then
-  echo "WARNING: COCOA PRIVATE PYTHON ENV DEACTIVATION FAILED"
-else
-  deactivate
+if command -v deactivate &> "/dev/null"; then
+  deactivate 2>"/dev/null"
 fi
 
-fail () {
-    export FAILMSG="\033[0;31m WE CANNOT RUN"
-    export FAILMSG2="\033[0m"
-    echo -e "${FAILMSG} ${1} ${FAILMSG2}"
-    unset FAILMSG
-    unset FAILMSG2
-    unset fail
+error_stop_cocoa () {
+  local FILE="$(basename ${BASH_SOURCE[0]})"
+  local FAILMSG="\033[0;31m (${FILE}) we cannot run "
+  local FAILMSG2="\033[0m"
+  echo -e "${FAILMSG}${1:?}${FAILMSG2}" 2>"/dev/null"
+  unset -f error
+  cd $(pwd -P) 2>"/dev/null"
+  source stop_cocoa 2>"/dev/null"
+  return 1
 }
 
 source $(pwd -P)/.recover_old_flags.sh
 if [ -z "${MAKE_NUM_THREADS}" ]; then
-  fail 'SCRIPT .RECOVER_OLD_FLAGS.SH'
-  source stop_cocoa.sh
-  return 1
+  error_stop_cocoa 'script .recover_old_flags.sh'; return 1
 fi
 
 # ----------------------------------------------------------------------------
@@ -71,8 +68,11 @@ fi
 # ----------------------------------------------------------------------------
 # ----------------------------------------------------------------------------
 source ./installation_scripts/.impl_unset_keys.sh
+
 unset -v ROOTDIR SETUP_COBAYA START_COCOA_DONE fail
+
 unset -v SETUP_PREREQUISITE_DONE SET_INSTALLATION_OPTIONS
+
 # ----------------------------------------------------------------------------
 # ----------------------------------------------------------------------------
 # ----------------------------------------------------------------------------

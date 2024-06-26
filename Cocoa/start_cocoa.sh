@@ -6,13 +6,15 @@ if [ -n "${START_COCOA_DONE}" ]; then
   source stop_cocoa.sh 
 fi
 
-error () {
-    local FAILMSG="\033[0;31m WE CANNOT RUN "
-    local FAILMSG2="\033[0m"
-    echo -e "${FAILMSG}${1:?}${FAILMSG2}"
-    unset -f error
-    cd $(pwd -P)
-    source stop_cocoa
+error_start_cocoa () {
+  local FILE="$(basename ${BASH_SOURCE[0]})"
+  local FAILMSG="\033[0;31m (${FILE}) we cannot run "
+  local FAILMSG2="\033[0m"
+  echo -e "${FAILMSG}${1:?}${FAILMSG2}" 2>"/dev/null"
+  unset -f error
+  cd $(pwd -P) 2>"/dev/null"
+  source stop_cocoa 2>"/dev/null"
+  return 1
 }
 
 # ----------------------------------------------------------------------------
@@ -21,23 +23,16 @@ error () {
 
 source $(pwd -P)/.save_old_flags.sh
 if [ $? -ne 0 ]; then
-  error 'SCRIPT .SAVE_OLD_FLAGS.SH'
-  source stop_cocoa
-  return 1
+  error_start_cocoa 'script .save_old_flags.sh'; return 1;
 fi
 
-# note: Here is where we define ROOTDIR as $(pwd -P)
-if [ -n "${SET_INSTALLATION_OPTIONS}" ]; then
-  source $SET_INSTALLATION_OPTIONS
-else
-  source set_installation_options.sh
-fi
+# note: here is where we define env flag ROOTDIR as $(pwd -P)
+source ${SET_INSTALLATION_OPTIONS:-"set_installation_options.sh"}
 
-# BASIC TEST IF A CONDA ENV IS ACTIVATED
+
 if [ -n "${MINICONDA_INSTALLATION}" ]; then
   if [ -z ${CONDA_PREFIX} ]; then
-    error "start_cocoa.sh: CONDA ENVIRONMENT NOT ACTIVATED"
-    return 1
+    error_start_cocoa "conda environment activation"; return 1;
   fi
 fi
 
@@ -47,14 +42,12 @@ fi
 
 source "${ROOTDIR:?}/.local/bin/activate"
 if [ $? -ne 0 ]; then
-  echo "COCOA PRIVATE PYTHON ENV ACTIVATION"
-  return 1
+  error_start_cocoa "cocoa private python environment activation"; return 1;
 fi
 
 source "${ROOTDIR:?}/.set_new_flags.sh"
-if [ -z "${MAKE_NUM_THREADS}" ]; then
-  error 'SCRIPT .SET_NEW_FLAGS.SH'
-  return 1
+if [ $? -ne 0 ]; then
+  error_start_cocoa 'script .set_new_flags.sh'; return 1;
 fi
 
 # ----------------------------------------------------------------------------
@@ -97,8 +90,10 @@ source "${ROOTDIR:?}/projects/start_all.sh"
 # ----------------------------------------------------------------------------
 # ----------------------------------------------------------------------------
 # ----------------------------------------------------------------------------
-unset error 
+unset -f error_start_cocoa 
+
 export START_COCOA_DONE=1
+
 # ----------------------------------------------------------------------------
 # ----------------------------------------------------------------------------
 # ----------------------------------------------------------------------------
