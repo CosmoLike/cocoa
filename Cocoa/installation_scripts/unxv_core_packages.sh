@@ -82,7 +82,7 @@ if [ -z "${SKIP_DECOMM_CORE_PACKAGES}" ]; then
 
   # ----------------------------------------------------------------------------
 
-  ptop 'DECOMPRESSING FILES ON COCOA_INSTALLATION_LIBRARIES' || return 1
+  ptop 'DECOMPRESSING CORE PACKAGES' || return 1
 
   if [ "${#TKEYS[@]}" -eq "${#TFILES[@]}" ]; then
     AL=${#TFILES[@]}
@@ -109,7 +109,7 @@ if [ -z "${SKIP_DECOMM_CORE_PACKAGES}" ]; then
 
   unset_all || return 1;
 
-  pbottom 'DECOMPRESSING FILES ON COCOA_INSTALLATION_LIBRARIES' || return 1
+  pbottom 'DECOMPRESSING CORE PACKAGES' || return 1
 
 fi
 
