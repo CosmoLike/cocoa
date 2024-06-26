@@ -44,22 +44,22 @@ if [ -z "${SKIP_DECOMM_CORE_PACKAGES}" ]; then
 
   CCIL="${ROOTDIR}/../cocoa_installation_libraries"
 
-  declare -a TKEYS=("IGNORE_CMAKE_INSTALLATION"
-                    "IGNORE_DISTUTILS_INSTALLATION"
-                    "IGNORE_DISTUTILS_INSTALLATION"
-                    "IGNORE_OPENBLAS_INSTALLATION"
-                    "IGNORE_FORTRAN_LAPACK_INSTALLATION"
-                    "IGNORE_HDF5_INSTALLATION"
-                    "IGNORE_C_CFITSIO_INSTALLATION"
-                    "IGNORE_C_FFTW_INSTALLATION"
-                    "IGNORE_C_GSL_INSTALLATION"
-                    "IGNORE_CPP_SPDLOG_INSTALLATION"
-                    "IGNORE_CPP_ARMA_INSTALLATION"
-                    "IGNORE_CPP_BOOST_INSTALLATION"
-                    "IGNORE_CPP_CARMA_INSTALLATION"
-                    "IGNORE_ALL_PIP_INSTALLATION"
-                    "IGNORE_ALL_PIP_INSTALLATION"
-                    "IGNORE_ALL_PIP_INSTALLATION"
+  declare -a TKEYS=(${IGNORE_CMAKE_INSTALLATION:-""}
+                    ${IGNORE_DISTUTILS_INSTALLATION:-""}
+                    ${IGNORE_DISTUTILS_INSTALLATION:-""}
+                    ${IGNORE_OPENBLAS_INSTALLATION:-""}
+                    ${IGNORE_FORTRAN_LAPACK_INSTALLATION:-""}
+                    ${IGNORE_HDF5_INSTALLATION:-""}
+                    ${IGNORE_C_CFITSIO_INSTALLATION:-""}
+                    ${IGNORE_C_FFTW_INSTALLATION:-""}
+                    ${IGNORE_C_GSL_INSTALLATION:-""}
+                    ${IGNORE_CPP_SPDLOG_INSTALLATION:-""}
+                    ${IGNORE_CPP_ARMA_INSTALLATION:-""}
+                    ${IGNORE_CPP_BOOST_INSTALLATION:-""}
+                    ${IGNORE_CPP_CARMA_INSTALLATION:-""}
+                    ${IGNORE_ALL_PIP_INSTALLATION:-""}
+                    ${IGNORE_ALL_PIP_INSTALLATION:-""}
+                    ${IGNORE_ALL_PIP_INSTALLATION:-""}
                    ) # T = TMP
 
   declare -a TFILES=("cmake"
@@ -83,24 +83,33 @@ if [ -z "${SKIP_DECOMM_CORE_PACKAGES}" ]; then
   # ----------------------------------------------------------------------------
 
   ptop 'DECOMPRESSING CORE PACKAGES' || return 1
-
+  
   if [ "${#TKEYS[@]}" -eq "${#TFILES[@]}" ]; then
     AL=${#TFILES[@]}
   else
-    error ("logical error - array sizes do not match");
+    error "logical error - array sizes do not match"; return 1;
   fi
   
   for (( i=0; i<${AL:?}; i++ ));
   do
 
-    cdfolder "${CCIL:?}" || return 1
-
     if [ -z "${TKEYS[$i]}" ]; then
+
+      cdfolder "${CCIL:?}" || return 1
       
-      tar xf "${ROOTDIR:?}/installation_scripts/${TFILES[$i]}.xz" \ 
-        >${OUT1:?} 2>${OUT2:?} || 
+      # ------------------------------------------------------------------------
+      # delete existing folder w/ same name as the folder inside the xz file 
+      
+      FOLDER=$(tar tf "${TFILES[$i]}.xz" | cut -f1 -d"/" | sort | uniq )
+      
+      rm -rf ${FOLDER:?}
+
+      # ------------------------------------------------------------------------
+
+      tar xf "${TFILES[$i]}.xz" >${OUT1:?} 2>${OUT2:?} || 
         { error "${EC25:?} (${TFILES[$i]}.xz)"; return 1; }
     
+      unset -v FOLDER
     fi
   
   done
