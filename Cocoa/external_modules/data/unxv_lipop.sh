@@ -5,7 +5,7 @@
 if [ -z "${SKIP_DECOMM_LIPOP}" ]; then
 
   if [ -z "${ROOTDIR}" ]; then
-    pfail 'ROOTDIR'; return 1
+    pfail 'ROOTDIR'; return 1;
   fi
 
   # parenthesis = run in a subshell 
@@ -66,7 +66,9 @@ if [ -z "${SKIP_DECOMM_LIPOP}" ]; then
   # note: in case script run >1x w/ previous run stoped prematurely b/c error
   
   rm -rf "${EDATAF:?}/planck/planck_2020"
+  
   rm -rf "${EDATAF:?}/planck/hillipop"
+  
   rm -rf "${EDATAF:?}/planck/lollipop"
   
   for (( i=0; i<${#FILE[@]}; i++ ));

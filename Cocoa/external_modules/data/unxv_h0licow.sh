@@ -12,7 +12,7 @@ if [ -z "${SKIP_DECOMM_STRONG_LENSING}" ]; then
   ( source "${ROOTDIR:?}/installation_scripts/.check_flags.sh" ) || return 1;
   
   unset_env_vars () {
-    unset -v EDATAF FOLDER PACKDIR URL TMP
+    unset -v EDATAF FOLDER URL TMP
     cdroot || return 1;
   }
 
@@ -47,13 +47,10 @@ if [ -z "${SKIP_DECOMM_STRONG_LENSING}" ]; then
   # E = EXTERNAL, DATA, F=FODLER
   EDATAF="${ROOTDIR:?}/external_modules/data/"
   
-  TMP="holicow_tmp" # = TMP
-
   FOLDER="h0licow_distance_chains"
 
-  # PACK = PACKAGE, DIR = DIRECTORY
-  PACKDIR="${EDATAF:?}/${TMP:?}"
-
+  TMP="holicow_tmp" # = TMP
+  
   URL="${HOLICOW_DATA_URL:-"https://github.com/shsuyu/H0LiCOW-public.git"}"
 
   # ---------------------------------------------------------------------------
@@ -63,7 +60,9 @@ if [ -z "${SKIP_DECOMM_STRONG_LENSING}" ]; then
   # ---------------------------------------------------------------------------
   # in case this script is called twice
   
-  rm -rf "${PACKDIR:?}"
+  rm -rf "${EDATAF:?}/${TMP:?}"
+
+  rm -rf "${EDATAF:?}/${FOLDER:?}"
   
   # ---------------------------------------------------------------------------
 
@@ -72,7 +71,7 @@ if [ -z "${SKIP_DECOMM_STRONG_LENSING}" ]; then
   ${GIT:?} clone "${URL:?}" "${TMP:?}" \
     >${OUT1:?} 2>${OUT2:?} || { error "${EC15:?}"; return 1; }
 
-  cdfolder "${PACKDIR:?}" || return 1
+  cdfolder "${EDATAF:?}/${TMP:?}" || return 1
 
   if [ -n "${HOLICOW_DATA_GIT_COMMIT}" ]; then
     ${GIT:?} checkout "${HOLICOW_DATA_GIT_COMMIT:?}" \
@@ -81,7 +80,7 @@ if [ -z "${SKIP_DECOMM_STRONG_LENSING}" ]; then
 
   mv "${FOLDER:?}" "${EDATAF:?}"
 
-  rm -rf "${PACKDIR:?}"
+  rm -rf "${EDATAF:?}/${TMP:?}"
 
   # ---------------------------------------------------------------------------
 

@@ -52,12 +52,12 @@ if [ -z "${SKIP_DECOMM_CAMSPEC}" ]; then
   # PACK = PACKAGE, DIR = DIRECTORY
   PACKDIR="${EDATAF:?}/${FOLDER:?}"
 
+  FILE="CamSpec2021.zip"
+
   URL_BASE="https://github.com/CobayaSampler/planck_native_data/"
 
   URL="${URL_BASE:?}/releases/download/v1/${FILE:?}"
-
-  FILE="CamSpec2021.zip"
-
+  
   # ---------------------------------------------------------------------------
 
   ptop "DECOMPRESSING CAMSPEC DATA" || return 1

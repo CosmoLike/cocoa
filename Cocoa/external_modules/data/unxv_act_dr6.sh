@@ -8,8 +8,11 @@ if [ -z "${SKIP_DECOMM_ACT}" ]; then
     pfail 'ROOTDIR'; return 1;
   fi
 
+  # parenthesis = run in a subshell 
+  ( source "${ROOTDIR:?}/installation_scripts/.check_flags.sh" ) || return 1;
+
   unset_env_vars () {
-    unset -v EDATAF DATAF PACKDIR FILE URL_BASE URL
+    unset -v EDATAF FOLDER PACKDIR FILE URL_BASE URL
     cdroot || return 1;
   }
 
@@ -27,43 +30,48 @@ if [ -z "${SKIP_DECOMM_ACT}" ]; then
   }
   
   error () {
-    fail_script_msg "unxv_act_dr6.sh" "${1}"
+    fail_script_msg "$(basename ${BASH_SOURCE[0]})" "${1}"
     unset_all || return 1
   }
   
   cdfolder() {
-    cd "${1:?}" 2>"/dev/null" || { error "CD FOLDER ${1}"; return 1; }
+    cd "${1:?}" 2>"/dev/null" || { error "CD FOLDER: ${1}"; return 1; }
   }
 
   # --------------------------------------------------------------------------- 
   # --------------------------------------------------------------------------- 
   # ---------------------------------------------------------------------------
-
-  ptop 'DECOMPRESSING ACT-DR6 DATA' || return 1
 
   unset_env_vars || return 1
 
   # E = EXTERNAL, DATA, F=FODLER
   EDATAF="${ROOTDIR:?}/external_modules/data"
   
-  DATAF="act"
+  FOLDER="act"
 
   # PACK = PACKAGE, DIR = DIRECTORY
-  PACKDIR="${EDATAF:?}/${DATAF:?}"
-
-  URL_BASE="https://lambda.gsfc.nasa.gov/data/suborbital/ACT/ACT_dr6/likelihood/data"
+  PACKDIR="${EDATAF:?}/${FOLDER:?}"
 
   FILE="${ACT_DR6_DATA_FILE:-"ACT_dr6_likelihood_v1.2.tgz"}"
+
+  URL_BASE="https://lambda.gsfc.nasa.gov/data/suborbital/ACT/ACT_dr6/likelihood/data"
 
   URL="${ACT_DR6_DATA_URL:-"${URL_BASE:?}"}/${FILE:?}"
 
   # ---------------------------------------------------------------------------
-  # in case this script is called twice
+
+  ptop 'DECOMPRESSING ACT-DR6 DATA' || return 1
+
   # ---------------------------------------------------------------------------
+  # note: in case script run >1x w/ previous run stoped prematurely b/c error
+  
   rm -rf "${PACKDIR:?}"
 
-  mkdir -p "${PACKDIR:?}"
-  mkdir -p "${PACKDIR:?}/lensing"
+  # ---------------------------------------------------------------------------
+
+  mkdir -p "${PACKDIR:?}" || { error "${EC20:?}"; return 1; }
+  
+  mkdir -p "${PACKDIR:?}/lensing" || { error "${EC20:?}"; return 1; }
     
   cdfolder "${PACKDIR:?}/lensing" || return 1
 
@@ -71,6 +79,10 @@ if [ -z "${SKIP_DECOMM_ACT}" ]; then
 
   tar -zxvf "${FILE:?}" \
     >${OUT1:?} 2>${OUT2:?} || { error "${EC25:?}"; return 1; }
+
+  # ---------------------------------------------------------------------------
+
+  cdfolder "${ROOTDIR}" || return 1
 
   unset_all || return 1
   
