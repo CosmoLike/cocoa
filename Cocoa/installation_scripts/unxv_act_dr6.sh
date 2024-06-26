@@ -60,7 +60,7 @@ if [ -z "${SKIP_DECOMM_ACT}" ]; then
 
   # ---------------------------------------------------------------------------
 
-  ptop 'DECOMPRESSING ACT-DR6 DATA' || return 1
+  ptop 'DECOMPRESSING ACT-DR6 DATA (MAY TAKE A LONG TIME)' || return 1
 
   # ---------------------------------------------------------------------------
   # note: in case script run >1x w/ previous run stoped prematurely b/c error
@@ -75,7 +75,8 @@ if [ -z "${SKIP_DECOMM_ACT}" ]; then
     
   cdfolder "${PACKDIR:?}/lensing" || return 1
 
-  wget "${URL:?}" >${OUT1:?} 2>${OUT2:?} || { error "${EC24:?}"; return 1; }
+  "${WGET:?}" "${URL:?}" -q --show-progress --progress=bar:force || 
+    { error "${EC24:?}"; return 1; }
 
   tar -zxvf "${FILE:?}" \
     >${OUT1:?} 2>${OUT2:?} || { error "${EC25:?}"; return 1; }

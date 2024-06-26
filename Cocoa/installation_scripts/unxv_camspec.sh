@@ -60,7 +60,7 @@ if [ -z "${SKIP_DECOMM_CAMSPEC}" ]; then
   
   # ---------------------------------------------------------------------------
 
-  ptop "DECOMPRESSING CAMSPEC DATA" || return 1
+  ptop "GETTING AND DECOMPRESSING CAMSPEC DATA (MAY TAKE A LONG TIME)" || return 1
 
   # ---------------------------------------------------------------------------
   # note: in case script run >1x w/ previous run stoped prematurely b/c error
@@ -73,7 +73,8 @@ if [ -z "${SKIP_DECOMM_CAMSPEC}" ]; then
 
   cdfolder "${EDATAF:?}" || return 1
 
-  wget "${URL:?}" >${OUT1:?} 2>${OUT2:?} || { error "${EC24:?}"; return 1; }
+  "${WGET:?}" "${URL:?}" -q --show-progress \
+    --progress=bar:force:noscroll || { error "${EC24:?}"; return 1; }
   
   unzip "${FILE:?}" >${OUT1:?} 2>${OUT2:?} || { error "${EC26:?}"; return 1; }
 
@@ -81,7 +82,7 @@ if [ -z "${SKIP_DECOMM_CAMSPEC}" ]; then
 
   unset_all || return 1
   
-  pbottom 'DECOMPRESSING CAMSPEC DATA' || return 1
+  pbottom 'GETTING AND DECOMPRESSING CAMSPEC DATA' || return 1
 
 fi
 

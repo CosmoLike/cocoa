@@ -52,7 +52,7 @@ if [ -z "${IGNORE_ALL_PIP_INSTALLATION}" ]; then
   # ----------------------------------------------------------------------------
   # ----------------------------------------------------------------------------
   
-  ptop2 "SETUP_CORE_PIP_PACKAGES" || return 1
+  #ptop2 "SETUP_CORE_PIP_PACKAGES" || return 1
   
   unset_env_vars || return 1;
 
@@ -92,7 +92,7 @@ if [ -z "${IGNORE_ALL_PIP_INSTALLATION}" ]; then
   # ----------------------------------------------------------------------------
   # --------------------------- PIP CORE PACKAGES ------------------------------
   # ----------------------------------------------------------------------------
-  ptop "PIP INSTALL CORE-PACKAGES" || return 1
+  ptop "PIP INSTALL CORE LIBRARIES" || return 1
   
   if [ -z "${MINICONDA_INSTALLATION}" ]; then
     
@@ -225,7 +225,7 @@ if [ -z "${IGNORE_ALL_PIP_INSTALLATION}" ]; then
     --no-index \
     >${OUT1:?} 2>${OUT2:?} || { error "(FGSPECTRA) ${EC13:?}"; return 1; }
 
-  pbottom "PIP INSTALL CORE-PACKAGES" || return 1
+  pbottom "PIP INSTALL CORE LIBRARIES" || return 1
 
   # ----------------------------------------------------------------------------
   # ----------------------------- PIP ML PACKAGES ------------------------------
@@ -272,7 +272,7 @@ if [ -z "${IGNORE_ALL_PIP_INSTALLATION}" ]; then
 
   unset_all || return 1;
   
-  pbottom2 'SETUP_CORE_PIP_PACKAGES'
+#  pbottom2 'SETUP_CORE_PIP_PACKAGES'
 
 fi
 

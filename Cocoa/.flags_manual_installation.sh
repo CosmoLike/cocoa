@@ -40,6 +40,8 @@ export GLOBALPIP3="${CONDA_PREFIX:?}"/bin/pip3
 
 export GIT="${CONDA_PREFIX:?}"/bin/git
 
+export WGET="${CONDA_PREFIX:?}/bin/wget"
+
 # --------------------------------------------------------------------------
 # USER NEEDS TO SPECIFY THE FLAGS BELOW SO COCOA CAN FIND PYTHON/GCC/HDF5...
 # --------------------------------------------------------------------------

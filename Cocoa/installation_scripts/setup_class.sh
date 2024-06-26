@@ -47,7 +47,7 @@ if [ -z "${IGNORE_CLASS_COMPILATION}" ]; then
   # ---------------------------------------------------------------------------
   # ---------------------------------------------------------------------------
   
-  ptop2 'SETUP_CLASS' || return 1
+ # ptop2 'SETUP_CLASS' || return 1
   
   unset_env_vars || return 1
 
@@ -129,7 +129,7 @@ if [ -z "${IGNORE_CLASS_COMPILATION}" ]; then
 
   unset_all || return 1
 
-  pbottom2 'SETUP_CLASS' || return 1
+#  pbottom2 'SETUP_CLASS' || return 1
 fi
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------

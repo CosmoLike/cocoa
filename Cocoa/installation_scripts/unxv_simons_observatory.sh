@@ -57,8 +57,8 @@ if [ -z "${SKIP_DECOMM_SIMONS_OBSERVATORY}" ]; then
   PACKDIR="${EDATAF:?}/${FOLDER:?}"
 
   # --------------------------------------------------------------------------
-  
-  ptop "DECOMPRESSING SIMONS OBSERVATORY" || return 1
+
+  ptop "GETTING AND DECOMPRESSING S.O. DATA (MAY TAKE A LONG TIME)" || return 1
 
   # --------------------------------------------------------------------------
   # note: in case script run >1x w/ previous run stoped prematurely b/c error
@@ -78,8 +78,8 @@ if [ -z "${SKIP_DECOMM_SIMONS_OBSERVATORY}" ]; then
   do
     FILE="${x}.tar.gz"
 
-    wget "${URL}/${FILE:?}" \
-      >${OUT1:?} 2>${OUT2:?} || { error "${EC24:?}"; return 1; }
+    "${WGET:?}" "${URL}/${FILE:?}" -q --show-progress --progress=bar:force \
+      || { error "${EC24:?}"; return 1; }
 
     tar -zxvf "${FILE:?}" \
       >${OUT1:?} 2>${OUT2:?} || { error "${EC25:?}"; return 1; }
@@ -90,7 +90,7 @@ if [ -z "${SKIP_DECOMM_SIMONS_OBSERVATORY}" ]; then
 
   unset_all || return 1
 
-  pbottom "DECOMPRESSING SIMONS OBSERVATORY" || return 1
+  pbottom "GETTING AND DECOMPRESSING S.O. DATA" || return 1
 
 fi
 

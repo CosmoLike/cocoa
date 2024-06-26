@@ -56,7 +56,7 @@ if [ -z "${SKIP_DECOMM_SPT}" ]; then
 
   # ---------------------------------------------------------------------------
 
-  ptop "DECOMPRESSING SPT-3G Y1 DATA" || return 1
+  ptop "GETTING AND DECOMPRESSING SPT-3G Y1 DATA" || return 1
   
   # ---------------------------------------------------------------------------
   # note: in case this script is run twice
@@ -83,7 +83,7 @@ if [ -z "${SKIP_DECOMM_SPT}" ]; then
 
   unset_all || return 1; 
 
-  pbottom 'DECOMPRESSING SPT-3G Y1 DATA' || return 1
+  pbottom 'GETTING AND DECOMPRESSING SPT-3G Y1 DATA' || return 1
   
 fi
 

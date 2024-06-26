@@ -10,7 +10,7 @@ fi
 
 error_cip () {
   local FILE="$(basename ${BASH_SOURCE[0]})"
-  local MSG="\033[0;31m (${FILE}) we cannot run "
+  local MSG="\033[0;31m\t\t (${FILE}) we cannot run "
   local MSG2="\033[0m"
   echo -e "${MSG}${1:?}${MSG2}" 2>"/dev/null"
   unset TSCRIPTS
@@ -52,10 +52,14 @@ else
   ${GLOBALPYTHON3:?} -m venv "${ROOTDIR:?}/.local/" --system-site-packages
 fi
 
+ptop 'SETUP COCOA PRIVATE PYTHON ENV'
+
 source "${ROOTDIR:?}/.local/bin/activate"
 if [ $? -ne 0 ]; then
   error_cip "cocoa private python environment activation"; return 1;
 fi
+
+pbottom 'SETUP COCOA PRIVATE PYTHON ENV'
 
 source "${ROOTDIR:?}/.set_new_flags.sh"
 if [ $? -ne 0 ]; then
@@ -79,7 +83,7 @@ declare -a TSCRIPTS=("setup_core_packages.sh"
                      "unxv_camspec.sh"
                      "unxv_lipop.sh"
                      "pip_core_packages.sh"
-                     "setup_update_cobaya.sh"
+                     "setup_cobaya.sh"
                      "setup_polychord.sh"
                      "setup_camb.sh"
                      "setup_class.sh") # T = TMP
@@ -100,9 +104,10 @@ done
 # ----------------------------------------------------------------------------
 
 unset -f error_cip
-source stop_cocoa.sh
 
 pbottom2 'SETUP COCOA INSTALLATION PACKAGES'
+
+source stop_cocoa.sh
 
 # ----------------------------------------------------------------------------
 # ----------------------------------------------------------------------------

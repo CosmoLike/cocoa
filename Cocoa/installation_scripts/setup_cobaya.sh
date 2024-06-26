@@ -52,13 +52,13 @@ if [ -z "${IGNORE_ALL_COBAYA_INSTALLATION}" ]; then
   # ----------------------------------------------------------------------------
   # ----------------------------------------------------------------------------
   
-  ptop2 "UPDATING COBAYA PACKAGE" || return 1
+#  ptop2 "UPDATING COBAYA PACKAGE" || return 1
 
   unset_env_vars || return 1
 
   CCIL="${ROOTDIR:?}/../cocoa_installation_libraries" # IL = installation lib
 
-  COB="${ROOTDIR:?}/cobaya/"        # COB = Cobaya
+  COB="${ROOTDIR:?}/cobaya"        # COB = Cobaya
 
   CCCOB="${CCIL:?}/cobaya_changes"  # CC = CoCoA, COB = Cobaya (Cocoa Cobaya)
   
@@ -83,7 +83,7 @@ if [ -z "${IGNORE_ALL_COBAYA_INSTALLATION}" ]; then
 
   if [ -z "${IGNORE_COBAYA_INSTALLATION}" ]; then
     
-    ptop "INSTALLING AND PATCHING COBAYA" || return 1;
+    ptop "GETTING AND PATCHING COBAYA" || return 1;
 
     #---------------------------------------------------------------------------
     # Remove any previous installed cobaya folder ------------------------------
@@ -206,7 +206,7 @@ if [ -z "${IGNORE_ALL_COBAYA_INSTALLATION}" ]; then
     rm -f "${COB:?}/${TFOLDER:?}/CMBMarged.yaml"
     rm -f "${COB:?}/${TFOLDER:?}/native.yaml"
 
-    cppatch "${TFOLDER:?}" "clik.py" || return 1
+    cppatch "${TFOLDER:?}" "clik.yaml" || return 1
 
     unset -v TFOLDER
 
@@ -264,7 +264,7 @@ if [ -z "${IGNORE_ALL_COBAYA_INSTALLATION}" ]; then
 
     cdfolder "${ROOTDIR:?}" || return 1;
 
-    pbottom "INSTALLING AND PATCHING COBAYA" || return 1;
+    pbottom "GETTING AND PATCHING COBAYA" || return 1;
 
   fi
 
@@ -272,17 +272,15 @@ if [ -z "${IGNORE_ALL_COBAYA_INSTALLATION}" ]; then
   # INSTALL SIMONS OBSERVATORY LIKELIHOOD --------------------------------------
   #-----------------------------------------------------------------------------
   # TODO - download from original git repo
-  if [ -z "${SKIP_DECOMM_SIMONS_OBSERVATORY}" ]; then
     
-    ptop "INSTALLING AND PATCHING SIMONS OBSERVATORY LIKELIHOOD" || return 1;
+  ptop "GETTING AND PATCHING SIMONS OBSERVATORY LIKELIHOOD" || return 1;
 
-    cppatchfolder "${COBLIKE:?}" "mflike" || return 1
-    
-    cdfolder "${ROOTDIR:?}" || return 1;
+  cppatchfolder "${COBLIKE:?}" "mflike" || return 1
+  
+  cdfolder "${ROOTDIR:?}" || return 1;
 
-    pbottom "INSTALLING AND PATCHING SIMONS OBSERVATORY LIKELIHOOD" || return 1;
+  pbottom "GETTING AND PATCHING SIMONS OBSERVATORY LIKELIHOOD" || return 1;
 
-  fi
 
   #-----------------------------------------------------------------------------
   # INSTALL CAMSPEC 2021 LIKELIHOOD --------------------------------------------
@@ -291,32 +289,25 @@ if [ -z "${IGNORE_ALL_COBAYA_INSTALLATION}" ]; then
   # note: we always delete CAMSPEC2018 likelihood
   rm -rf "${COB:?}/${COBLIKE:?}"/planck_2018_highl_CamSpec
 
-  if [ -z "${SKIP_DECOMM_CAMSPEC}" ]; then
+  ptop "PATCHING CAMSPEC 2021 LIKELIHOOD" || return 1;
 
-    ptop "PATCHING CAMSPEC 2021 LIKELIHOOD" || return 1;
+  TFOLDER="${COBLIKE}/base_classes"
+  
+  TFILE="InstallableLikelihood"
+  
+  cppatch "${TFOLDER:?}" "${TFILE:?}.patch"
+  
+  cdfolder "${COB:?}/${TFOLDER}/" || return 1;
 
-    TFOLDER="${COBLIKE}/base_classes"
-    
-    TFILE="InstallableLikelihood"
-    
-    cppatch "${TFOLDER:?}" "${TFILE:?}.patch"
-    
-    cdfolder "${COB:?}/${TFOLDER}/" || return 1;
+  patch -u "${TFILE:?}.py" -i "${TFILE:?}.patch" >${OUT1:?} 2>${OUT2:?} || 
+    { error "${EC17:?}"; return 1; }
+  
+  unset -v TFOLDER TFILE
+  
+  cdfolder "${ROOTDIR:?}" || return 1;
 
-    patch -u "${TFILE:?}.py" -i "${TFILE:?}.patch" \
-      >${OUT1:?} 2>${OUT2:?} || { error "${EC17:?}"; return 1; }
-    
-    unset -v TFOLDER TFILE
-    
-    cdfolder "${ROOTDIR:?}" || return 1;
+  pbottom "PATCHING CAMSPEC 2021 LIKELIHOOD" || return 1;
 
-    pbottom "PATCHING CAMSPEC 2021 LIKELIHOOD" || return 1;
-
-  else
-
-    rm -rf "${COB:?}/${COBLIKE:?}/planck_2018_highl_CamSpec2021"
-
-  fi
   
   #-----------------------------------------------------------------------------
   # INSTALL LIPOP LIKELIHOOD ---------------------------------------------------
@@ -348,49 +339,49 @@ if [ -z "${IGNORE_ALL_COBAYA_INSTALLATION}" ]; then
 
     cppatch "${TFOLDER:?}" "init.patch" || return 1
 
-    patch -u "__init__.py" -i "init.patch" \ 
-      >${OUT1:?} 2>${OUT2:?} || { error "${EC17:?}"; return 1; }
+    patch -u '__init__.py' -i 'init.patch' >${OUT1:?} 2>${OUT2:?} || 
+      { error "${EC17:?}"; return 1; }
 
     cdfolder "${ROOTDIR:?}" || return 1; 
   }
 
-  if [ -z "${SKIP_DECOMM_LIPOP}" ]; then
-    
-    ptop "INSTALLING AND PATCHING HILLIPOP LIKELIHOOD" || return 1
+  #-----------------------------------------------------------------------------
+  # HILLIPOP_URL LIKELIHOOD ----------------------------------------------------
+  #-----------------------------------------------------------------------------
 
-    TFOLDER="planck_2020_hillipop"
-    
-    URL="${HILLIPOP_URL:-"https://github.com/planck-npipe/hillipop.git"}"
-    
-    flipop "${TFOLDER:?}" "${URL:?}" "${HILLIPOP_GIT_COMMIT:-"HEAD~"}"
-    
-    unset -v TFOLDER URL
+  ptop "GETTING AND PATCHING HILLIPOP LIKELIHOOD" || return 1
 
-    pbottom "INSTALLING AND PATCHING HILLIPOP LIKELIHOOD" || return 1
+  TFOLDER="planck_2020_hillipop"
+  
+  URL="${HILLIPOP_URL:-"https://github.com/planck-npipe/hillipop.git"}"
+  
+  flipop "${TFOLDER:?}" "${URL:?}" "${HILLIPOP_GIT_COMMIT:-"HEAD~"}" || return 1;
+  
+  unset -v TFOLDER URL
 
-  fi
+  pbottom "GETTING AND PATCHING HILLIPOP LIKELIHOOD" || return 1
 
-  if [ -z "${SKIP_DECOMM_LIPOP}" ]; then
+  #-----------------------------------------------------------------------------
+  # LOLLIPOP LIKELIHOOD --------------------------------------------------------
+  #-----------------------------------------------------------------------------
 
-    ptop "INSTALLING AND PATCHING LOLLIPOP LIKELIHOOD" || return 1
+  ptop "GETTING AND PATCHING LOLLIPOP LIKELIHOOD" || return 1
 
-    TFOLDER="planck_2020_lollipop"
-    
-    URL="${LOLLIPOP_URL:-"https://github.com/planck-npipe/lollipop.git"}"
-    
-    flipop "${TFOLDER:?}" "${URL:?}" "${LOLLIPOP_GIT_COMMIT:-"HEAD~"}"
-    
-    unset -v TFOLDER URL
+  TFOLDER="planck_2020_lollipop"
+  
+  URL="${LOLLIPOP_URL:-"https://github.com/planck-npipe/lollipop.git"}"
+  
+  flipop "${TFOLDER:?}" "${URL:?}" "${LOLLIPOP_GIT_COMMIT:-"HEAD~"}" || return 1;
+  
+  unset -v TFOLDER URL
 
-    pbottom "INSTALLING AND PATCHING LOLLIPOP LIKELIHOOD" || return 1
+  pbottom "GETTING AND PATCHING LOLLIPOP LIKELIHOOD" || return 1
 
-  fi
-    
   #-----------------------------------------------------------------------------
   
-  unset_all | return 1;
+  unset_all || return 1;
   
-  pbottom2 "UPDATING COBAYA PACKAGE" || return 1;
+#  pbottom2 "UPDATING COBAYA PACKAGE" || return 1;
 
 fi
 

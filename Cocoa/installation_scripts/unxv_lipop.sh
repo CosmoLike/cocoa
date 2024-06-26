@@ -60,7 +60,7 @@ if [ -z "${SKIP_DECOMM_LIPOP}" ]; then
 
   # ---------------------------------------------------------------------------
 
-  ptop 'DECOMPRESSING LIPOP DATA' || return 1
+  ptop 'GETTING AND DECOMPRESSING LIPOP DATA (MAY TAKE A LONG TIME)' || return 1
   
   # ----------------------------------------------------------------------------
   # note: in case script run >1x w/ previous run stoped prematurely b/c error
@@ -83,8 +83,8 @@ if [ -z "${SKIP_DECOMM_LIPOP}" ]; then
   for (( i=0; i<${#FILE[@]}; i++ ));
   do
 
-    wget "${URL}/${FILE[$i]:?}.tar.gz" \
-      >${OUT1:?} 2>${OUT2:?} || { error "${EC24:?}"; return 1; }
+    "${WGET:?}" "${URL}/${FILE[$i]:?}.tar.gz" -q --show-progress \
+      --progress=bar:force:noscroll || { error "${EC24:?}"; return 1; }
 
     tar -xvzf "${FILE[$i]:?}.tar.gz" \
       >${OUT1:?} 2>${OUT2:?} || { error "${EC25:?} (${FILE[$i]:?})"; return 1; }
@@ -105,14 +105,14 @@ if [ -z "${SKIP_DECOMM_LIPOP}" ]; then
 
   for (( i=0; i<${#FILE[@]}; i++ ));
   do
-    rm -f  "${EDATAF:?}/planck/${FILE$i]:?}.tar.gz"
+    rm -f  "${EDATAF:?}/planck/${FILE[$i]:?}.tar.gz"
   done
   
   # ---------------------------------------------------------------------------
     
   unset_all || return 1;
 
-  pbottom 'DECOMPRESSING LIPOP DATA' || return 1
+  pbottom 'GETTING AND DECOMPRESSING LIPOP DATA' || return 1
 
 fi
 

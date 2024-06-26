@@ -165,7 +165,7 @@ gitact() {
 # ----------------------------------------------------------------------------
 # ----------------------------------------------------------------------------
  
-ptop2 'SETUP_CORE_LIBRARIES'
+#ptop2 'SETUP_CORE_LIBRARIES'
 
 unset_env_vars || return 1;
 
@@ -175,7 +175,7 @@ CCIL="${ROOTDIR}/../cocoa_installation_libraries"
 # ------------------------------ XZ LIBRARY ----------------------------------
 # ----------------------------------------------------------------------------
 if [ -z "${IGNORE_XZ_INSTALLATION}" ]; then
-  ptop "INSTALLING AND COMPILING XZ LIBRARY" || return 1;
+  ptop "GETTING AND COMPILING XZ LIBRARY (CORE LIBS)" || return 1;
 
   cdfolder "${CCIL:?}" || return 1;
 
@@ -197,7 +197,7 @@ if [ -z "${IGNORE_XZ_INSTALLATION}" ]; then
 
   cdfolder "${ROOTDIR}" || return 1;
 
-  pbottom "INSTALLING XZ LIBRARY" || return 1;
+  pbottom "GETTING AND COMPILING XZ LIBRARY (CORE LIBS)" || return 1;
 fi
 
 # ----------------------------------------------------------------------------
@@ -206,7 +206,7 @@ fi
 
 if [ -z "${IGNORE_CMAKE_INSTALLATION}" ]; then
   
-  ptop "GETTING CMAKE LIBRARY" || return 1;
+  ptop "GETTING CMAKE LIBRARY (CORE LIBS)" || return 1;
 
   URL='https://github.com/Kitware/CMake.git'
   
@@ -221,7 +221,7 @@ if [ -z "${IGNORE_CMAKE_INSTALLATION}" ]; then
 
   unset -v URL FOLDER VER XZF
 
-  pbottom "GETTING CMAKE LIBRARY" || return 1;
+  pbottom "GETTING CMAKE LIBRARY (CORE LIBS)" || return 1;
 
 fi
 
@@ -231,7 +231,7 @@ fi
 
 if [ -z "${IGNORE_DISTUTILS_INSTALLATION}" ]; then
 
-  ptop "GETTING BINUTILS LIBRARY" || return 1;
+  ptop "GETTING BINUTILS LIBRARY (CORE LIBS)" || return 1;
 
   FOLDER="binutils-2.37"
   
@@ -246,7 +246,7 @@ if [ -z "${IGNORE_DISTUTILS_INSTALLATION}" ]; then
 
   unset -v URL FOLDER FILE XZF
 
-  pbottom "GETTING BINUTILS LIBRARY" || return 1;
+  pbottom "GETTING BINUTILS LIBRARY (CORE LIBS)" || return 1;
 
 fi
 
@@ -256,7 +256,7 @@ fi
 
 if [ -z "${IGNORE_DISTUTILS_INSTALLATION}" ]; then
   
-  ptop "GETTING TEXINFO LIBRARY"
+  ptop "GETTING TEXINFO LIBRARY (CORE LIBS)"
 
   FOLDER="texinfo-7.0.3"
   
@@ -271,7 +271,7 @@ if [ -z "${IGNORE_DISTUTILS_INSTALLATION}" ]; then
 
   unset -v URL FOLDER FILE XZF
 
-  pbottom "GETTING TEXINFO LIBRARY" || return 1;
+  pbottom "GETTING TEXINFO LIBRARY (CORE LIBS)" || return 1;
 
 fi
 
@@ -281,7 +281,7 @@ fi
 
 if [ -z "${IGNORE_OPENBLAS_INSTALLATION}" ]; then
 
-  ptop "GETTING OPENBLAS LIBRARY" || return 1;
+  ptop "GETTING OPENBLAS LIBRARY (CORE LIBS)" || return 1;
 
   URL='https://github.com/OpenMathLib/OpenBLAS.git'
 
@@ -296,7 +296,7 @@ if [ -z "${IGNORE_OPENBLAS_INSTALLATION}" ]; then
 
   unset -v URL FOLDER VER XZF
 
-  pbottom "GETTING OPENBLAS LIBRARY" || return 1;
+  pbottom "GETTING OPENBLAS LIBRARY (CORE LIBS)" || return 1;
 
 fi
 
@@ -306,7 +306,7 @@ fi
 
 if [ -z "${IGNORE_FORTRAN_LAPACK_INSTALLATION}" ]; then
 
-  ptop "GETTING LAPACK LIBRARY" || return 1;
+  ptop "GETTING LAPACK LIBRARY (CORE LIBS)" || return 1;
 
   URL='https://github.com/Reference-LAPACK/lapack.git'
 
@@ -321,7 +321,7 @@ if [ -z "${IGNORE_FORTRAN_LAPACK_INSTALLATION}" ]; then
 
   unset -v URL FOLDER VER XZF
 
-  pbottom "GETTING LAPACK LIBRARY DONE" || return 1;
+  pbottom "GETTING LAPACK LIBRARY DONE (CORE LIBS)" || return 1;
 
 fi
 
@@ -331,7 +331,7 @@ fi
 
 if [ -z "${IGNORE_HDF5_INSTALLATION}" ]; then
 
-  ptop "GETTING HDF5 LIBRARY" || return 1;
+  ptop "GETTING HDF5 LIBRARY (CORE LIBS)" || return 1;
 
   FOLDER="hdf5-1.12.3"
 
@@ -348,7 +348,7 @@ if [ -z "${IGNORE_HDF5_INSTALLATION}" ]; then
 
   unset -v URL_BASE URL FOLDER FILE XZF
 
-  pbottom "GETTING HDF5 LIBRARY DONE" || return 1;
+  pbottom "GETTING HDF5 LIBRARY DONE (CORE LIBS)" || return 1;
 
 fi
 
@@ -358,7 +358,7 @@ fi
 
 if [ -z "${IGNORE_C_CFITSIO_INSTALLATION}" ]; then
   
-  ptop "GETTING CFITSIO LIBRARY" || return 1;
+  ptop "GETTING CFITSIO LIBRARY (CORE LIBS)" || return 1;
 
   FOLDER="cfitsio-4.0.0"
   
@@ -375,7 +375,7 @@ if [ -z "${IGNORE_C_CFITSIO_INSTALLATION}" ]; then
 
   unset -v URL_BASE URL FOLDER FILE XZF
 
-  pbottom "GETTING CFITSIO LIBRARY DONE" || return 1;
+  pbottom "GETTING CFITSIO LIBRARY DONE (CORE LIBS)" || return 1;
 
 fi
 
@@ -385,7 +385,7 @@ fi
 
 if [ -z "${IGNORE_C_FFTW_INSTALLATION}" ]; then
 
-  ptop "GETTING FFTW LIBRARY" || return 1;
+  ptop "GETTING FFTW LIBRARY (CORE LIBS)" || return 1;
 
   FOLDER="fftw-3.3.10"
 
@@ -400,7 +400,7 @@ if [ -z "${IGNORE_C_FFTW_INSTALLATION}" ]; then
 
   unset -v URL FOLDER FILE XZF
 
-  pbottom "GETTING FFTW LIBRARY DONE" || return 1;
+  pbottom "GETTING FFTW LIBRARY DONE (CORE LIBS)" || return 1;
 
 fi
 
@@ -410,7 +410,7 @@ fi
 
 if [ -z "${IGNORE_C_GSL_INSTALLATION}" ]; then
 
-  ptop "GETTING GSL LIBRARY" || return 1;
+  ptop "GETTING GSL LIBRARY (CORE LIBS)" || return 1;
   
   FOLDER="gsl-2.7"
 
@@ -425,7 +425,7 @@ if [ -z "${IGNORE_C_GSL_INSTALLATION}" ]; then
 
   unset -v URL FOLDER FILE XZF
 
-  pbottom "GETTING GSL LIBRARY DONE" || return 1;
+  pbottom "GETTING GSL LIBRARY DONE (CORE LIBS)" || return 1;
 
 fi
 
@@ -435,7 +435,7 @@ fi
 
 if [ -z "${IGNORE_CPP_SPDLOG_INSTALLATION}" ]; then
 
-  ptop "GETTING SPDLOG LIBRARY" || return 1;
+  ptop "GETTING SPDLOG LIBRARY (CORE LIBS)" || return 1;
 
   URL='https://github.com/gabime/spdlog.git'
 
@@ -450,7 +450,7 @@ if [ -z "${IGNORE_CPP_SPDLOG_INSTALLATION}" ]; then
 
   unset -v URL FOLDER VER XZF
 
-  pbottom "GETTING SPDLOG LIBRARY" || return 1;
+  pbottom "GETTING SPDLOG LIBRARY (CORE LIBS)" || return 1;
 
 fi
 
@@ -460,7 +460,7 @@ fi
 
 if [ -z "${IGNORE_CPP_ARMA_INSTALLATION}" ]; then
   
-  ptop "GETTING ARMA LIBRARY DONE" || return 1;
+  ptop "GETTING ARMA LIBRARY DONE (CORE LIBS)" || return 1;
 
   FOLDER="armadillo-12.8.2"
   
@@ -475,7 +475,7 @@ if [ -z "${IGNORE_CPP_ARMA_INSTALLATION}" ]; then
 
   unset -v URL FOLDER FILE XZF
 
-  pbottom "GETTING ARMA LIBRARY DONE" || return 1;
+  pbottom "GETTING ARMA LIBRARY DONE (CORE LIBS)" || return 1;
 
 fi
 
@@ -485,7 +485,7 @@ fi
 
 if [ -z "${IGNORE_CPP_BOOST_INSTALLATION}" ]; then
 
-  ptop "GETTING BOOST LIBRARY" || return 1;
+  ptop "GETTING BOOST LIBRARY (CORE LIBS)" || return 1;
 
   if [ -z "${COCOA_BOOST_DIR}" ]; then
     pfail 'COCOA_BOOST_DIR'; cdroot; return 1;
@@ -506,7 +506,7 @@ if [ -z "${IGNORE_CPP_BOOST_INSTALLATION}" ]; then
 
   unset -v URL_BASE URL FOLDER FILE XZF
 
-  pbottom "GETTING BOOST LIBRARY" || return 1;
+  pbottom "GETTING BOOST LIBRARY (CORE LIBS)" || return 1;
 
 fi
 
@@ -516,7 +516,7 @@ fi
 
 if [ -z "${IGNORE_CPP_CARMA_INSTALLATION}" ]; then
 
-  ptop "GETTING CARMA LIBRARY DONE" || return 1;
+  ptop "GETTING CARMA LIBRARY DONE (CORE LIBS)" || return 1;
 
   CNAME="${COCOA_CARMA_DIR:-"carma"}"
   
@@ -556,7 +556,7 @@ if [ -z "${IGNORE_CPP_CARMA_INSTALLATION}" ]; then
 
   unset -v CNAME PACKDIR URL FOLDER VER XZF
 
-  pbottom "GETTING CARMA LIBRARY DONE" || return 1;
+  pbottom "GETTING CARMA LIBRARY DONE (CORE LIBS)" || return 1;
 
 fi
 
@@ -564,7 +564,7 @@ fi
 
 unset_all || return 1;
 
-pbottom2 "SETUP_CORE_LIBRARIES" || return 1;
+#pbottom2 "SETUP_CORE_LIBRARIES" || return 1;
 
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
