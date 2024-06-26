@@ -187,3 +187,13 @@ export COCOA_RUN_MCMC="mpirun -n 4 --oversubscribe --mca btl vader,tcp,self --bi
 export COCOA_SPDLOG_DIR=spdlog/
 
 export COCOA_CARMA_DIR=carma/
+
+# ------------------------------------------------------------------------------
+# --------------- CONTROL OVER THE COMPILATION OF EXTERNAL CODES ---------------
+# ------------------------------------------------------------------------------
+#export IGNORE_CAMB_COMPILATION=1
+#export IGNORE_CLASS_COMPILATION=1
+#export IGNORE_COSMOLIKE_COMPILATION=1
+#export IGNORE_POLYCHORD_COMPILATION=1
+#export IGNORE_PLANCK_COMPILATION=1
+#export IGNORE_ACT_COMPILATION=1

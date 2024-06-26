@@ -6,24 +6,23 @@ source ./installation_scripts/.impl_unset_keys.sh
 export ROOTDIR=$(pwd -P)
 
 # ------------------------------------------------------------------------------
-# ------------------------------------------------------------------------------
-# ----------------------- HOW COCOA SHOULD BE INSTALLED? -----------------------
-# ------------------------------------------------------------------------------
+# HOW COCOA SHOULD BE INSTALLED? -----------------------------------------------
 # ------------------------------------------------------------------------------
 export MINICONDA_INSTALLATION=1
 #export MANUAL_INSTALLATION=1
 
 # ------------------------------------------------------------------------------
+# VERBOSE AS DEBUG TOOL --------------------------------------------------------
 # ------------------------------------------------------------------------------
-# --------------------------- VERBOSE AS DEBUG TOOL ----------------------------
-# ------------------------------------------------------------------------------
-# ------------------------------------------------------------------------------
-export COCOA_OUTPUT_VERBOSE=1
+#export COCOA_OUTPUT_VERBOSE=1
 
 # ------------------------------------------------------------------------------
+# IF DEFINED, COSMOLIKE WILL BE COMPILED WITH DEBUG FLAGS ----------------------
 # ------------------------------------------------------------------------------
-# --- SKIP DOWNLOAD/DECOMPRESSING DATASET (SAVE TIME WHEN INSTALLING COCOA) ----
+export COSMOLIKE_DEBUG_MODE=1
+
 # ------------------------------------------------------------------------------
+# SKIP DOWNLOAD/DECOMPRESSING DATASET (SAVE TIME WHEN INSTALLING COCOA) --------
 # ------------------------------------------------------------------------------
  export SKIP_DECOMM_ACT=1
 # export SKIP_DECOMM_SPT=1
@@ -37,33 +36,9 @@ export SKIP_DECOMM_CAMSPEC=1
 export SKIP_DECOMM_LIPOP=1
 
 # ------------------------------------------------------------------------------
-# ------------------------------------------------------------------------------
-# ---- IF DEFINED, COSMOLIKE WILL BE COMPILED WITH DEBUG FLAG ------------------
-# ---- DEBUG FLAG = ALL COMPILER WARNINGS + NO MATH OPTIMIZATION + NO OPENMP ---
-# ------------------------------------------------------------------------------
-# ------------------------------------------------------------------------------
-export COSMOLIKE_DEBUG_MODE=1
-
-# ------------------------------------------------------------------------------
-# ----- IF TRUE, THEN COCOA USES CLIK FROM https://github.com/benabed/clik -----
+# IF TRUE, THEN COCOA USES CLIK FROM https://github.com/benabed/clik -----------
 # ------------------------------------------------------------------------------
 export USE_SPT_CLIK_PLANCK=1
-
-# ------------------------------------------------------------------------------
-# ------------------------------------------------------------------------------
-# --------------- CONTROL OVER THE COMPILATION OF EXTERNAL CODES ---------------
-# ------------------------------------------------------------------------------
-# ------------------------------------------------------------------------------
-#export IGNORE_CAMB_COMPILATION=1
-#export IGNORE_CLASS_COMPILATION=1
-#export IGNORE_COSMOLIKE_COMPILATION=1
-#export IGNORE_POLYCHORD_COMPILATION=1
-#export IGNORE_PLANCK_COMPILATION=1
-#export IGNORE_ACT_COMPILATION=1
-#export IGNORE_COBAYA_INSTALLATION=1
-#export IGNORE_CAMSPEC_INSTALLATION=1
-#export IGNORE_LIPOP_INSTALLATION=1
-#export IGNORE_SO_INSTALLATION=1
 
 # ------------------------------------------------------------------------------
 # THREADING COMPILATION/INSTALLATION OF LIBRARIES ------------------------------
@@ -71,17 +46,13 @@ export USE_SPT_CLIK_PLANCK=1
 export MAKE_NUM_THREADS=4
 
 # ------------------------------------------------------------------------------
-# ------------------------------------------------------------------------------
 # IF NOT SET, COCOA WILL INSTALL TENSORFLOW, KERAS, AND PYTORCH 
-# ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
 export IGNORE_EMULATOR_CPU_PIP_PACKAGES=1
 export IGNORE_EMULATOR_GPU_PIP_PACKAGES=1
 
 # ------------------------------------------------------------------------------
-# ------------------------------------------------------------------------------
-# --------------------- DERIVED & RARELY CHANGED FLAGS -------------------------
-# ------------------------------------------------------------------------------
+# DERIVED & RARELY CHANGED FLAGS -----------------------------------------------
 # ------------------------------------------------------------------------------
 
 if [ -n "${MANUAL_INSTALLATION}" ]; then      
@@ -95,12 +66,11 @@ elif [ -n "${MINICONDA_INSTALLATION}" ]; then
 
 fi
 
+# `.flags_derived.sh` also contains many rarely used flags (useful to debug)
 source .flags_derived.sh || return 1
 
 # ------------------------------------------------------------------------------
-# ------------------------------------------------------------------------------
-# ----- PACKAGE URL AND VERSIONS. CHANGES IN THE COMMIT ID MAY BREAK COCOA -----
-# ------------------------------------------------------------------------------
+# PACKAGE URL AND VERSIONS. CHANGES IN THE COMMIT ID MAY BREAK COCOA -----------
 # ------------------------------------------------------------------------------
 
 export COBAYA_URL="https://github.com/CobayaSampler/cobaya.git"

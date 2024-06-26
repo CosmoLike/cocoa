@@ -279,110 +279,120 @@ if [ -z "${IGNORE_ALL_COBAYA_INSTALLATION}" ]; then
   # INSTALL SIMONS OBSERVATORY LIKELIHOOD --------------------------------------
   #-----------------------------------------------------------------------------
   # TODO - download from original git repo
+   
+  if [ -z "${IGNORE_SO_INSTALLATION}" ]; then
+
+    ptop "GETTING AND PATCHING SIMONS OBSERVATORY LIKELIHOOD" || return 1;
+
+    cppatchfolder "${COBLIKE:?}" "mflike" || return 1
     
-  ptop "GETTING AND PATCHING SIMONS OBSERVATORY LIKELIHOOD" || return 1;
+    cdfolder "${ROOTDIR:?}" || return 1;
 
-  cppatchfolder "${COBLIKE:?}" "mflike" || return 1
-  
-  cdfolder "${ROOTDIR:?}" || return 1;
+    pbottom "GETTING AND PATCHING SIMONS OBSERVATORY LIKELIHOOD" || return 1;
 
-  pbottom "GETTING AND PATCHING SIMONS OBSERVATORY LIKELIHOOD" || return 1;
-
+  fi
 
   #-----------------------------------------------------------------------------
   # INSTALL CAMSPEC 2021 LIKELIHOOD --------------------------------------------
   #-----------------------------------------------------------------------------
   
-  # note: we always delete CAMSPEC2018 likelihood
-  rm -rf "${COB:?}/${COBLIKE:?}"/planck_2018_highl_CamSpec
+  if [ -z "${IGNORE_CAMSPEC_INSTALLATION}" ]; then
 
-  ptop "PATCHING CAMSPEC 2021 LIKELIHOOD" || return 1;
+    # note: we always delete CAMSPEC2018 likelihood
+    rm -rf "${COB:?}/${COBLIKE:?}"/planck_2018_highl_CamSpec
 
-  TFOLDER="${COBLIKE}/base_classes"
-  
-  TFILE="InstallableLikelihood"
-  
-  cppatch "${TFOLDER:?}" "${TFILE:?}.patch"
-  
-  cdfolder "${COB:?}/${TFOLDER}/" || return 1;
+    ptop "PATCHING CAMSPEC 2021 LIKELIHOOD" || return 1;
 
-  patch -u "${TFILE:?}.py" -i "${TFILE:?}.patch" >${OUT1:?} 2>${OUT2:?} || 
-    { error "${EC17:?}"; return 1; }
-  
-  unset -v TFOLDER TFILE
-  
-  cdfolder "${ROOTDIR:?}" || return 1;
+    TFOLDER="${COBLIKE}/base_classes"
+    
+    TFILE="InstallableLikelihood"
+    
+    cppatch "${TFOLDER:?}" "${TFILE:?}.patch"
+    
+    cdfolder "${COB:?}/${TFOLDER}/" || return 1;
 
-  pbottom "PATCHING CAMSPEC 2021 LIKELIHOOD" || return 1;
+    patch -u "${TFILE:?}.py" -i "${TFILE:?}.patch" >${OUT1:?} 2>${OUT2:?} || 
+      { error "${EC17:?}"; return 1; }
+    
+    unset -v TFOLDER TFILE
+    
+    cdfolder "${ROOTDIR:?}" || return 1;
 
+    pbottom "PATCHING CAMSPEC 2021 LIKELIHOOD" || return 1;
+
+  fi
   
   #-----------------------------------------------------------------------------
   # INSTALL LIPOP LIKELIHOOD ---------------------------------------------------
   #-----------------------------------------------------------------------------
   
-  flipop() {
-    local TFOLDER="${COBLIKE:?}/${1:?}"
-    local URL="${2:?}"
+  if [ -z "${IGNORE_LIPOP_INSTALLATION}" ]; then
 
-    # in case you run this script more than once
-    rm -rf "${COB:?}/${TFOLDER:?}"
-    rm -rf "${COB:?}/${COBLIKE:?}/tmp"
+    flipop() {
+      local TFOLDER="${COBLIKE:?}/${1:?}"
+      local URL="${2:?}"
 
-    cdfolder "${COB:?}/${COBLIKE:?}" || return 1;
+      # in case you run this script more than once
+      rm -rf "${COB:?}/${TFOLDER:?}"
+      rm -rf "${COB:?}/${COBLIKE:?}/tmp"
 
-    ${GIT:?} clone "${URL:?}" "tmp" \
-      >${OUT1:?} 2>${OUT2:?} || { error "${EC15:?}"; return 1; }
-  
-    cdfolder "${COB:?}/${COBLIKE}/tmp" || return 1;
+      cdfolder "${COB:?}/${COBLIKE:?}" || return 1;
 
-    "${GIT:?}" reset --hard "${3:?}" \
-      >${OUT1:?} 2>${OUT2:?} || { error "${EC23:?}"; return 1; }
-
-    cpfolder ${1:?}/ "${COB:?}/${COBLIKE:?}" || return 1;
+      ${GIT:?} clone "${URL:?}" "tmp" \
+        >${OUT1:?} 2>${OUT2:?} || { error "${EC15:?}"; return 1; }
     
-    cdfolder "${COB:?}/${TFOLDER:?}" || return 1;
+      cdfolder "${COB:?}/${COBLIKE}/tmp" || return 1;
+
+      "${GIT:?}" reset --hard "${3:?}" \
+        >${OUT1:?} 2>${OUT2:?} || { error "${EC23:?}"; return 1; }
+
+      cpfolder ${1:?}/ "${COB:?}/${COBLIKE:?}" || return 1;
+      
+      cdfolder "${COB:?}/${TFOLDER:?}" || return 1;
+      
+      rm -rf "${COB:?}/${COBLIKE:?}/tmp"
+
+      cppatch "${TFOLDER:?}" "init.patch" || return 1
+
+      patch -u '__init__.py' -i 'init.patch' >${OUT1:?} 2>${OUT2:?} || 
+        { error "${EC17:?}"; return 1; }
+
+      cdfolder "${ROOTDIR:?}" || return 1; 
+    }
+
+    #---------------------------------------------------------------------------
+    # HILLIPOP_URL LIKELIHOOD --------------------------------------------------
+    #---------------------------------------------------------------------------
+
+    ptop "GETTING AND PATCHING HILLIPOP LIKELIHOOD" || return 1
+
+    TFOLDER="planck_2020_hillipop"
     
-    rm -rf "${COB:?}/${COBLIKE:?}/tmp"
+    URL="${HILLIPOP_URL:-"https://github.com/planck-npipe/hillipop.git"}"
+    
+    flipop "${TFOLDER:?}" "${URL:?}" "${HILLIPOP_GIT_COMMIT:-"HEAD~"}" || return 1;
+    
+    unset -v TFOLDER URL
 
-    cppatch "${TFOLDER:?}" "init.patch" || return 1
+    pbottom "GETTING AND PATCHING HILLIPOP LIKELIHOOD" || return 1
 
-    patch -u '__init__.py' -i 'init.patch' >${OUT1:?} 2>${OUT2:?} || 
-      { error "${EC17:?}"; return 1; }
+    #---------------------------------------------------------------------------
+    # LOLLIPOP LIKELIHOOD ------------------------------------------------------
+    #---------------------------------------------------------------------------
 
-    cdfolder "${ROOTDIR:?}" || return 1; 
-  }
+    ptop "GETTING AND PATCHING LOLLIPOP LIKELIHOOD" || return 1
 
-  #-----------------------------------------------------------------------------
-  # HILLIPOP_URL LIKELIHOOD ----------------------------------------------------
-  #-----------------------------------------------------------------------------
+    TFOLDER="planck_2020_lollipop"
+    
+    URL="${LOLLIPOP_URL:-"https://github.com/planck-npipe/lollipop.git"}"
+    
+    flipop "${TFOLDER:?}" "${URL:?}" "${LOLLIPOP_GIT_COMMIT:-"HEAD~"}" || return 1;
+    
+    unset -v TFOLDER URL
 
-  ptop "GETTING AND PATCHING HILLIPOP LIKELIHOOD" || return 1
+    pbottom "GETTING AND PATCHING LOLLIPOP LIKELIHOOD" || return 1
 
-  TFOLDER="planck_2020_hillipop"
-  
-  URL="${HILLIPOP_URL:-"https://github.com/planck-npipe/hillipop.git"}"
-  
-  flipop "${TFOLDER:?}" "${URL:?}" "${HILLIPOP_GIT_COMMIT:-"HEAD~"}" || return 1;
-  
-  unset -v TFOLDER URL
-
-  pbottom "GETTING AND PATCHING HILLIPOP LIKELIHOOD" || return 1
-
-  #-----------------------------------------------------------------------------
-  # LOLLIPOP LIKELIHOOD --------------------------------------------------------
-  #-----------------------------------------------------------------------------
-
-  ptop "GETTING AND PATCHING LOLLIPOP LIKELIHOOD" || return 1
-
-  TFOLDER="planck_2020_lollipop"
-  
-  URL="${LOLLIPOP_URL:-"https://github.com/planck-npipe/lollipop.git"}"
-  
-  flipop "${TFOLDER:?}" "${URL:?}" "${LOLLIPOP_GIT_COMMIT:-"HEAD~"}" || return 1;
-  
-  unset -v TFOLDER URL
-
-  pbottom "GETTING AND PATCHING LOLLIPOP LIKELIHOOD" || return 1
+  fi
 
   #-----------------------------------------------------------------------------
   
