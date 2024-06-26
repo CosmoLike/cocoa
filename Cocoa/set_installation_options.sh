@@ -17,14 +17,14 @@ export MINICONDA_INSTALLATION=1
 #export COCOA_OUTPUT_VERBOSE=1
 
 # ------------------------------------------------------------------------------
-# IF DEFINED, COSMOLIKE WILL BE COMPILED WITH DEBUG FLAGS ----------------------
+# If set, COSMOLIKE will compile with DEBUG flags ------------------------------
 # ------------------------------------------------------------------------------
 export COSMOLIKE_DEBUG_MODE=1
 
 # ------------------------------------------------------------------------------
-# SKIP DOWNLOAD/DECOMPRESSING DATASET (SAVE TIME WHEN INSTALLING COCOA) --------
+# skip downloading specific datasets (may save a lot of time) ------------------
 # ------------------------------------------------------------------------------
- export SKIP_DECOMM_ACT=1
+#export SKIP_DECOMM_ACT=1
 # export SKIP_DECOMM_SPT=1
 # export SKIP_DECOMM_PLANCK=1
 # export SKIP_DECOMM_BICEP=1
@@ -36,7 +36,7 @@ export SKIP_DECOMM_CAMSPEC=1
 export SKIP_DECOMM_LIPOP=1
 
 # ------------------------------------------------------------------------------
-# IF TRUE, THEN COCOA USES CLIK FROM https://github.com/benabed/clik -----------
+# If set, compile_planck.sh uses click like code from github.com/benabed/clik
 # ------------------------------------------------------------------------------
 export USE_SPT_CLIK_PLANCK=1
 
@@ -46,7 +46,7 @@ export USE_SPT_CLIK_PLANCK=1
 export MAKE_NUM_THREADS=4
 
 # ------------------------------------------------------------------------------
-# IF NOT SET, COCOA WILL INSTALL TENSORFLOW, KERAS, AND PYTORCH 
+# If not set, pip_core_packages.sh will install several ML packages
 # ------------------------------------------------------------------------------
 export IGNORE_EMULATOR_CPU_PIP_PACKAGES=1
 export IGNORE_EMULATOR_GPU_PIP_PACKAGES=1
