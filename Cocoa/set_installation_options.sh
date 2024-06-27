@@ -58,11 +58,19 @@ export IGNORE_EMULATOR_GPU_PIP_PACKAGES=1
 if [ -n "${MANUAL_INSTALLATION}" ]; then      
   
   # NEED TO ADJUST THE FLAGS IN THE FILE BELOW IF MANUAL INSTALLATION  
-  source .flags_manual_installation.sh || return 1
-
+  source "${ROOTDIR:?}/installation_scripts/flags_manual_installation.sh" 
+  if [ $? -ne 0 ]; then
+    error_sio "script installation_scripts/flags_manual_installation.sh" 
+    return 1;
+  fi
+  
 elif [ -n "${MINICONDA_INSTALLATION}" ]; then
 
   source .flags_miniconda_installation.sh || return 1
+  if [ $? -ne 0 ]; then
+    error_sio "script installation_scripts/flags_miniconda_installation.sh" 
+    return 1;
+  fi
 
 fi
 

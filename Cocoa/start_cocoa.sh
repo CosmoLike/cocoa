@@ -22,9 +22,9 @@ error_start_cocoa () {
 # ------------------------------ Basic Settings ------------------------------
 # ----------------------------------------------------------------------------
 
-source $(pwd -P)/.save_old_flags.sh
+source $(pwd -P)/installation_scripts/flags_save_old.sh
 if [ $? -ne 0 ]; then
-  error_start_cocoa 'script .save_old_flags.sh'; return 1;
+  error_start_cocoa 'script installation_scripts/flags_save_old.sh'; return 1;
 fi
 
 # note: here is where we define env flag ROOTDIR as $(pwd -P)
@@ -46,9 +46,9 @@ if [ $? -ne 0 ]; then
   error_start_cocoa "cocoa private python environment activation"; return 1;
 fi
 
-source "${ROOTDIR:?}/.set_new_flags.sh"
+source "${ROOTDIR:?}/installation_scripts/flags_set_new.sh"
 if [ $? -ne 0 ]; then
-  error_start_cocoa 'script .set_new_flags.sh'; return 1;
+  error_start_cocoa 'script installation_scripts/flags_set_new.sh'; return 1;
 fi
 
 # ----------------------------------------------------------------------------

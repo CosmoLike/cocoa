@@ -23,9 +23,10 @@ error_cip () {
 # ------------------------------ Basic Settings ------------------------------
 # ----------------------------------------------------------------------------
 
-source $(pwd -P)/.save_old_flags.sh
+source $(pwd -P)/installation_scripts/flags_save_old.sh
 if [ $? -ne 0 ]; then
-  error_cip 'script .save_old_flags.sh'; return 1;
+  error_cip 'script installation_scripts/flags_save_old.sh' 
+  return 1
 fi
 
 # note: here is where we define env flag ROOTDIR as $(pwd -P)
@@ -64,9 +65,10 @@ fi
 
 pbottom 'SETUP COCOA PRIVATE PYTHON ENV'
 
-source "${ROOTDIR:?}/.set_new_flags.sh"
+source "${ROOTDIR:?}/installation_scripts/flags_set_new.sh"
 if [ $? -ne 0 ]; then
-  error_cip 'script .set_new_flags.sh'; return 1;
+  error_cip 'script installation_scripts/flags_set_new.sh'
+  return 1
 fi
 
 # ----------------------------------------------------------------------------
