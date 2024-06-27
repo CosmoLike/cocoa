@@ -9,7 +9,7 @@ if [ -z "${IGNORE_ALL_COBAYA_INSTALLATION}" ]; then
   fi
 
   # parenthesis = run in a subshell
-  ( source "${ROOTDIR:?}/installation_scripts/.check_flags.sh" ) || return 1;
+  ( source "${ROOTDIR:?}/installation_scripts/flags_check.sh" ) || return 1;
 
   unset_env_vars () {
     unset -v COB CCCOB COBLIKE COBTH URL TFILE TFOLDER TFOLDER2

@@ -8,7 +8,7 @@ if [ -z "${IGNORE_ACT_COMPILATION}" ]; then
     source start_cocoa.sh || { pfail 'ROOTDIR'; return 1; }
   fi
     
-  ( source "${ROOTDIR:?}/installation_scripts/.check_flags.sh" ) || return 1;
+  ( source "${ROOTDIR:?}/installation_scripts/flags_check.sh" ) || return 1;
  
   unset_env_vars () {
     unset -v ECODEF FOLDER PACKDIR

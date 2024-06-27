@@ -9,7 +9,7 @@ if [ -z "${SKIP_DECOMM_SIMONS_OBSERVATORY}" ]; then
   fi
 
   # parenthesis = run in a subshell 
-  ( source "${ROOTDIR:?}/installation_scripts/.check_flags.sh" ) || return 1;
+  ( source "${ROOTDIR:?}/installation_scripts/flags_check.sh" ) || return 1;
     
   unset_env_vars () {
     unset -v EDATAF FOLDER URL VER PACKDIR FILE
