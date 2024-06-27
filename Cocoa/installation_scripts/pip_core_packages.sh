@@ -61,7 +61,7 @@ if [ -z "${IGNORE_ALL_PIP_INSTALLATION}" ]; then
   # ----------------------------------------------------------------------------
   # --------------------------------- LIBEXPAT ---------------------------------
   # ----------------------------------------------------------------------------
-  if [ -z "${MINICONDA_INSTALLATION}" ]; then
+  if [ -z "${IGNORE_EXPAT_CORE_PACKAGE}" ]; then
     
     ptop "INSTALLING EXPAT" || return 1
 
@@ -94,12 +94,12 @@ if [ -z "${IGNORE_ALL_PIP_INSTALLATION}" ]; then
   # ----------------------------------------------------------------------------
   ptop "PIP INSTALL CORE LIBRARIES" || return 1
   
-  if [ -z "${MINICONDA_INSTALLATION}" ]; then
+  if [ -z "${IGNORE_PIP_CORE_PACKAGES}" ]; then
     
     env CXX="${CXX_COMPILER:?}" CC="${C_COMPILER:?}" ${PIP3:?} install \
         'alabaster==0.7.13' \
-        'appdirs==1.4.4' \
         'anytree==2.8.0' \
+        'appdirs==1.4.4' \
         'astropy==5.2.2' \
         'babel==2.12.1' \
         'cachetools==5.3.1' \
@@ -118,8 +118,8 @@ if [ -z "${IGNORE_ALL_PIP_INSTALLATION}" ]; then
         'filelock==3.13.4' \
         'fonttools==4.40.0' \
         'fuzzywuzzy==0.18.0' \
-        'GetDist==1.4.3' \
-        'GPy==1.10.0' \
+        'getdist==1.4.8' \
+        'gpy==1.10.0' \
         'h5py==3.8.0' \
         'idna==3.4' \
         'imageio==2.31.1' \
@@ -135,8 +135,9 @@ if [ -z "${IGNORE_ALL_PIP_INSTALLATION}" ]; then
         'lazy_loader==0.2' \
         'lenstronomy==1.11.2' \
         'llvmlite==0.40.1' \
-        'MarkupSafe==2.1.3' \
+        'markupsafe==2.1.3' \
         'matplotlib==3.7.5' \
+        'ml-dtypes==0.2.0' \
         'mpi4py==3.1.4' \
         'mpmath==1.3.0' \
         'multiprocess==0.70.14' \
@@ -150,12 +151,12 @@ if [ -z "${IGNORE_ALL_PIP_INSTALLATION}" ]; then
         'packaging==23.1' \
         'pandas==2.0.3' \
         'paramz==0.9.5' \
-        'PGen==0.2.1' \
+        'pgen==0.2.1' \
         'Pillow==9.5.0' \
         'platformdirs==2.6.2' \
         'portalocker==2.7.0' \
         'protobuf==4.23.2' \
-        'Py-BOBYQA==1.4' \
+        'Py-bobyqa==1.4' \
         'pybind11==2.12.0' \
         'pyDOE2==1.3.0' \
         'pyerfa==2.0.0.3' \
