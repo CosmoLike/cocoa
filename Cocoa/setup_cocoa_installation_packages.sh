@@ -25,12 +25,15 @@ error_cip () {
 
 source $(pwd -P)/installation_scripts/flags_save_old.sh
 if [ $? -ne 0 ]; then
-  error_cip 'script installation_scripts/flags_save_old.sh' 
+  error_cip 'script flags_save_old.sh' 
   return 1
 fi
 
 # note: here is where we define env flag ROOTDIR as $(pwd -P)
 source ${SET_INSTALLATION_OPTIONS:-"set_installation_options.sh"}
+if [ $? -ne 0 ]; then
+  error_cip 'script set_installation_options.sh'; return 1;
+fi
 
 if [ -n "${MINICONDA_INSTALLATION}" ]; then
   if [ -z ${CONDA_PREFIX} ]; then
@@ -67,7 +70,7 @@ pbottom 'SETUP COCOA PRIVATE PYTHON ENV'
 
 source "${ROOTDIR:?}/installation_scripts/flags_set_new.sh"
 if [ $? -ne 0 ]; then
-  error_cip 'script installation_scripts/flags_set_new.sh'
+  error_cip 'script flags_set_new.sh'
   return 1
 fi
 
@@ -87,7 +90,7 @@ declare -a TSCRIPTS=("setup_core_packages.sh"
                      "unxv_planck2018_basic.sh"
                      "unxv_camspec.sh"
                      "unxv_lipop.sh"
-                     "pip_core_packages.sh"
+                     "setup_pip_core_packages.sh"
                      "setup_cobaya.sh"
                      "setup_polychord.sh"
                      "setup_camb.sh"

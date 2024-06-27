@@ -24,12 +24,14 @@ error_start_cocoa () {
 
 source $(pwd -P)/installation_scripts/flags_save_old.sh
 if [ $? -ne 0 ]; then
-  error_start_cocoa 'script installation_scripts/flags_save_old.sh'; return 1;
+  error_start_cocoa 'script flags_save_old.sh'; return 1;
 fi
 
 # note: here is where we define env flag ROOTDIR as $(pwd -P)
 source ${SET_INSTALLATION_OPTIONS:-"set_installation_options.sh"}
-
+if [ $? -ne 0 ]; then
+  error_start_cocoa 'script set_installation_options.sh'; return 1;
+fi
 
 if [ -n "${MINICONDA_INSTALLATION}" ]; then
   if [ -z ${CONDA_PREFIX} ]; then
@@ -48,7 +50,7 @@ fi
 
 source "${ROOTDIR:?}/installation_scripts/flags_set_new.sh"
 if [ $? -ne 0 ]; then
-  error_start_cocoa 'script installation_scripts/flags_set_new.sh'; return 1;
+  error_start_cocoa 'script flags_set_new.sh'; return 1;
 fi
 
 # ----------------------------------------------------------------------------

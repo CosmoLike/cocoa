@@ -56,26 +56,22 @@ export IGNORE_EMULATOR_GPU_PIP_PACKAGES=1
 # ------------------------------------------------------------------------------
 
 if [ -n "${MANUAL_INSTALLATION}" ]; then      
-  
-  # NEED TO ADJUST THE FLAGS IN THE FILE BELOW IF MANUAL INSTALLATION  
   source "${ROOTDIR:?}/installation_scripts/flags_manual_installation.sh" 
   if [ $? -ne 0 ]; then
-    error_sio "script installation_scripts/flags_manual_installation.sh" 
     return 1;
   fi
-  
 elif [ -n "${MINICONDA_INSTALLATION}" ]; then
-
-  source .flags_miniconda_installation.sh || return 1
+  source "${ROOTDIR:?}/installation_scripts/flags_miniconda_installation.sh"
   if [ $? -ne 0 ]; then
-    error_sio "script installation_scripts/flags_miniconda_installation.sh" 
     return 1;
   fi
-
 fi
 
-# `.flags_derived.sh` also contains many rarely used flags (useful to debug)
-source .flags_derived.sh || return 1
+# `flags_derived.sh` also contains many rarely used flags (useful to debug)
+source "${ROOTDIR:?}/installation_scripts/flags_derived.sh"
+if [ $? -ne 0 ]; then
+  return 1;
+fi
 
 # ------------------------------------------------------------------------------
 # PACKAGE URL AND VERSIONS. CHANGES IN THE COMMIT ID MAY BREAK COCOA -----------
