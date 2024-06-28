@@ -28,7 +28,7 @@ ptop2 'COMPILING ALL EXTERNAL MODULES' || return 1
 declare -a TSCRIPTS=("compile_camb.sh"
                      "compile_class.sh" 
                      "compile_planck.sh" 
-                     "compile_act.sh"
+                     "compile_act_dr4.sh"
                      "compile_polychord.sh"
                      ) # T = TMP
 

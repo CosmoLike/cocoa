@@ -12,7 +12,7 @@ if [ -z "${IGNORE_CAMB_COMPILATION}" ]; then
   ( source "${ROOTDIR:?}/installation_scripts/flags_check.sh" ) || return 1;
 
   unset_env_vars () {
-    unset -v URL CCIL ECODEF CAMBF PACKDIR CHANGES TFOLDER TFILE TFILEP AL
+    unset -v URL CCIL ECODEF FOLDER PACKDIR CHANGES TFOLDER TFILE TFILEP AL
     cdroot || return 1;
   }
 
@@ -64,9 +64,9 @@ if [ -z "${IGNORE_CAMB_COMPILATION}" ]; then
   # E = EXTERNAL, CODE, F=FODLER
   ECODEF="${ROOTDIR:?}/external_modules/code"
 
-  CAMBF=${CAMB_NAME:-"CAMB"}
+  FOLDER=${CAMB_NAME:-"CAMB"}
 
-  PACKDIR="${ECODEF:?}/${CAMBF:?}"
+  PACKDIR="${ECODEF:?}/${FOLDER:?}"
 
   # ---------------------------------------------------------------------------
   # In case this script is called twice ---------------------------------------
@@ -81,13 +81,13 @@ if [ -z "${IGNORE_CAMB_COMPILATION}" ]; then
   "${CURL:?}" -fsS "${URL:?}" \
     >${OUT1:?} 2>${OUT2:?} || { error "${EC27:?} (URL=${URL:?})"; return 1; }
 
-  ${GIT:?} clone "${URL:?}" --recursive "${CAMBF:?}" \
+  "${GIT:?}" clone "${URL:?}" --recursive "${FOLDER:?}" \
     >${OUT1:?} 2>${OUT2:?} || { error "${EC15:?}"; return 1; }
   
   cdfolder "${PACKDIR}" || { cdroot; return 1; }
 
   if [ -n "${CAMB_GIT_COMMIT}" ]; then
-    ${GIT:?} checkout "${CAMB_GIT_COMMIT:?}" \
+    "${GIT:?}" checkout "${CAMB_GIT_COMMIT:?}" \
       >${OUT1:?} 2>${OUT2:?} || { error "${EC16:?}"; return 1; }
   fi
   
@@ -95,6 +95,7 @@ if [ -z "${IGNORE_CAMB_COMPILATION}" ]; then
   # Patch CAMB to be compatible w/ COCOA environment --------------------------
   # We patch the files below so they use the right compilers ------------------
   # ---------------------------------------------------------------------------
+  # T = TMP
   declare -a TFOLDER=("camb/" 
                       "fortran/" 
                       "forutils/") # If nonblank, path must include /

@@ -117,9 +117,13 @@ export CLASS_URL="https://github.com/lesgourg/class_public.git"
 export CLASS_GIT_COMMIT="8df566c1ff2d0b3e40e106567c435575aea337be"
 export CLASS_NAME="class_public"
 
+export ACTDR4_URL="https://github.com/ACTCollaboration/pyactlike"
+export ACTDR4_GIT_COMMIT="1cac8c5d047bc2cad991890f2ebf1d8e3fb483b3"
+export ACTDR4_NAME="pyactlike"
+
 export ACT_DR6_DATA_URL="https://lambda.gsfc.nasa.gov/data/suborbital/ACT/ACT_dr6/likelihood/data"
 export ACT_DR6_DATA_FILE="ACT_dr6_likelihood_v1.2.tgz"
-export ACT_NAME="pyactlike"
+
 
 export SO_DATA_URL="https://portal.nersc.gov/cfs/sobs/users/MFLike_data"
 # Cocoa can download multiple versions of the data (to reproduce existing work)
@@ -136,8 +140,8 @@ export SO_DATA_VERSION="v0.7.1 v0.8"
 #export IGNORE_COSMOLIKE_COMPILATION=1
 #export IGNORE_POLYCHORD_COMPILATION=1
 #export IGNORE_PLANCK_COMPILATION=1
-#export IGNORE_ACT_COMPILATION=1
-
+#export IGNORE_ACTDR4_COMPILATION=1
+#export IGNORE_ACTDR6_COMPILATION=1
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------

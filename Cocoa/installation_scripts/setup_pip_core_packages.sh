@@ -51,9 +51,7 @@ if [ -z "${IGNORE_ALL_PIP_INSTALLATION}" ]; then
   # ----------------------------------------------------------------------------
   # ----------------------------------------------------------------------------
   # ----------------------------------------------------------------------------
-  
-  #ptop2 "SETUP_CORE_PIP_PACKAGES" || return 1
-  
+    
   unset_env_vars || return 1;
 
   CCIL="${ROOTDIR:?}/../cocoa_installation_libraries"
@@ -273,8 +271,6 @@ if [ -z "${IGNORE_ALL_PIP_INSTALLATION}" ]; then
 
   unset_all || return 1;
   
-#  pbottom2 'SETUP_CORE_PIP_PACKAGES'
-
 fi
 
 # ------------------------------------------------------------------------------

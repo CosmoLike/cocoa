@@ -52,8 +52,6 @@ if [ -z "${IGNORE_ALL_COBAYA_INSTALLATION}" ]; then
   # ----------------------------------------------------------------------------
   # ----------------------------------------------------------------------------
   
-#  ptop2 "UPDATING COBAYA PACKAGE" || return 1
-
   unset_env_vars || return 1
 
   CCIL="${ROOTDIR:?}/../cocoa_installation_libraries" # IL = installation lib
@@ -344,7 +342,7 @@ if [ -z "${IGNORE_ALL_COBAYA_INSTALLATION}" ]; then
       "${CURL:?}" -fsS "${URL:?}" >${OUT1:?} \
         2>${OUT2:?} || { error "${EC27:?} (URL=${URL:?})"; return 1; }
 
-      ${GIT:?} clone "${URL:?}" "tmp" \
+      "${GIT:?}" clone "${URL:?}" "tmp" \
         >${OUT1:?} 2>${OUT2:?} || { error "${EC15:?}"; return 1; }
     
       cdfolder "${COB:?}/${COBLIKE}/tmp" || return 1;
@@ -404,8 +402,6 @@ if [ -z "${IGNORE_ALL_COBAYA_INSTALLATION}" ]; then
   
   unset_all || return 1;
   
-#  pbottom2 "UPDATING COBAYA PACKAGE" || return 1;
-
 fi
 
 #-------------------------------------------------------------------------------

@@ -12,7 +12,7 @@ if [ -z "${IGNORE_CLASS_COMPILATION}" ]; then
   ( source "${ROOTDIR:?}/installation_scripts/flags_check.sh" ) || return 1;
     
   unset_env_vars () {
-    unset -v URL CHANGES ECODEF CLNAME PACKDIR TFOLDER TFILE TFILEP AL
+    unset -v URL CHANGES ECODEF FOLDER PACKDIR TFOLDER TFILE TFILEP AL
     cdroot || return 1;
   }
 
@@ -46,9 +46,7 @@ if [ -z "${IGNORE_CLASS_COMPILATION}" ]; then
   # ---------------------------------------------------------------------------
   # ---------------------------------------------------------------------------
   # ---------------------------------------------------------------------------
-  
- # ptop2 'SETUP_CLASS' || return 1
-  
+    
   unset_env_vars || return 1
 
   # ---------------------------------------------------------------------------
@@ -61,9 +59,9 @@ if [ -z "${IGNORE_CLASS_COMPILATION}" ]; then
 
   ECODEF="${ROOTDIR:?}/external_modules/code"
 
-  CLNAME=${CLASS_NAME:-"class_public"}
+  FOLDER=${CLASS_NAME:-"class_public"}
   
-  PACKDIR="${ECODEF:?}/${CLNAME:?}/"
+  PACKDIR="${ECODEF:?}/${FOLDER:?}/"
 
   # ---------------------------------------------------------------------------
   # in case this script is called twice
@@ -78,13 +76,13 @@ if [ -z "${IGNORE_CLASS_COMPILATION}" ]; then
   "${CURL:?}" -fsS "${URL:?}" \
     >${OUT1:?} 2>${OUT2:?} || { error "${EC27:?} (URL=${URL:?})"; return 1; }
   
-  ${GIT:?} clone "${URL:?}" --recursive "${CLNAME:?}" \
+  "${GIT:?}" clone "${URL:?}" --recursive "${FOLDER:?}" \
     >${OUT1:?} 2>${OUT2:?} || { error "${EC15:?}"; return 1; }
   
   cdfolder "${PACKDIR}" || return 1;
 
   if [ -n "${CLASS_GIT_COMMIT}" ]; then
-    ${GIT:?} checkout "${CLASS_GIT_COMMIT:?}" \
+    "${GIT:?}" checkout "${CLASS_GIT_COMMIT:?}" \
       >${OUT1:?} 2>${OUT2:?} || { error "${EC16\?}"; return 1; }
   fi
   
@@ -99,6 +97,7 @@ if [ -z "${IGNORE_CLASS_COMPILATION}" ]; then
   # ----------------- Patch CLASS to be compatible w/ COCOA  ------------------
   # We patch the files below so they use the right C compiler
   # ---------------------------------------------------------------------------
+  # T = TMP
   declare -a TFOLDER=("" 
                       "python/") # Must include
   
@@ -132,7 +131,6 @@ if [ -z "${IGNORE_CLASS_COMPILATION}" ]; then
 
   unset_all || return 1
 
-#  pbottom2 'SETUP_CLASS' || return 1
 fi
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
