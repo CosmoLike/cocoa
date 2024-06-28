@@ -142,6 +142,7 @@ export SO_DATA_VERSION="v0.7.1 v0.8"
 #export IGNORE_PLANCK_COMPILATION=1
 #export IGNORE_ACTDR4_COMPILATION=1
 #export IGNORE_ACTDR6_COMPILATION=1
+export IGNORE_CPP_CUBA_INSTALLATION=1
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
