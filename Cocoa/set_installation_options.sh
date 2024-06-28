@@ -2,8 +2,15 @@
 # ----------------------------------------------------------------------------
 # ----------------------------------------------------------------------------
 # ----------------------------------------------------------------------------
-source ./installation_scripts/.impl_unset_keys.sh
 export ROOTDIR=$(pwd -P)
+if [ $? -ne 0 ]; then
+  return 1;
+fi
+
+source "${ROOTDIR:?}/installation_scripts/flags_impl_unset_keys.sh" 
+if [ $? -ne 0 ]; then
+  return 1;
+fi
 
 # ------------------------------------------------------------------------------
 # HOW COCOA SHOULD BE INSTALLED? -----------------------------------------------
@@ -117,6 +124,16 @@ export SO_DATA_URL="https://portal.nersc.gov/cfs/sobs/users/MFLike_data"
 # This is only possible because each version is saved on a separated folder
 export SO_DATA_VERSION="v0.7.1 v0.8"
 
+# ------------------------------------------------------------------------------
+# control over which packages will compile -------------------------------------
+# ------------------------------------------------------------------------------
+#export IGNORE_CAMB_COMPILATION=1
+#export IGNORE_CLASS_COMPILATION=1
+#export IGNORE_COSMOLIKE_COMPILATION=1
+#export IGNORE_POLYCHORD_COMPILATION=1
+#export IGNORE_PLANCK_COMPILATION=1
+#export IGNORE_ACT_COMPILATION=1
+      
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------

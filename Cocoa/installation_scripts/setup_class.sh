@@ -75,6 +75,8 @@ if [ -z "${IGNORE_CLASS_COMPILATION}" ]; then
   # ---------------------------------------------------------------------------
   cdfolder "${ECODEF}" || return 1;
 
+  curl -fsS ${URL:?} >${OUT1:?} 2>${OUT2:?} || { error "EC27"; return 1; }
+  
   ${GIT:?} clone "${URL:?}" --recursive "${CLNAME:?}" \
     >${OUT1:?} 2>${OUT2:?} || { error "${EC15:?}"; return 1; }
   
