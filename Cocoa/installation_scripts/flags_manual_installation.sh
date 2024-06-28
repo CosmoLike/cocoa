@@ -30,6 +30,10 @@ export DONT_USE_SYSTEM_PIP_PACKAGES=1
 #   'conda-forge::git-lfs=3.3.0'
 # --------------------------------------------------------------------------
 
+# --------------------------------------------------------------------------
+# USER NEEDS TO SPECIFY THE FLAGS BELOW SO COCOA CAN FIND PYTHON/GCC/HDF5...
+# --------------------------------------------------------------------------
+
 export PYTHON_VERSION=3.8
 
 export GLOBALPYTHON3="${CONDA_PREFIX:?}"/bin/python${PYTHON_VERSION:?}
@@ -42,9 +46,10 @@ export GIT="${CONDA_PREFIX:?}/bin/git"
 
 export WGET="${CONDA_PREFIX:?}/bin/wget"
 
+export CURL="${CONDA_PREFIX:?}/bin/curl"
+
 # --------------------------------------------------------------------------
-# USER NEEDS TO SPECIFY THE FLAGS BELOW SO COCOA CAN FIND PYTHON/GCC/HDF5...
-# --------------------------------------------------------------------------
+
 INT_INCL="${CONDA_PREFIX:?}/include"
 
 INT_LIB="${CONDA_PREFIX:?}/lib"
@@ -107,14 +112,13 @@ export CPATH="${INT_INCL:?}/":${CPATH}
 
 export OBJC_INCLUDE_PATH="${INT_INCL:?}/":$OBJC_INCLUDE_PATH
 
-export OBJC_PATH="${CONDA_PREFIX:?}/include/":OBJC_PATH
+export OBJC_PATH="${CONDA_PREFIX:?}/include/":$OBJC_PATH
 
 # --------------------------------------------------------------------------
 
 unset -v INT_INCL INT_LIB INT_INCL_PY INT_INCL_PY_SP INT_INCL_PY_SP_NP
 
 # --------------------------------------------------------------------------
-# COMPILER
 # --------------------------------------------------------------------------
 export C_COMPILER="${CONDA_PREFIX:?}"/bin/x86_64-conda-linux-gnu-cc
 

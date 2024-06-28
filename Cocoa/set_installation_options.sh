@@ -29,7 +29,9 @@ export MINICONDA_INSTALLATION=1
 export COSMOLIKE_DEBUG_MODE=1
 
 # ------------------------------------------------------------------------------
-# skip downloading specific datasets (may save a lot of time) ------------------
+# The flags below allow users to skip downloading specific datasets ------------
+# (advice) skipping LIPOP, CAMSPEC, Simons Observatory datasets saves ----------
+# (advice) considerable time in the initial cocoa installation -----------------
 # ------------------------------------------------------------------------------
 #export SKIP_DECOMM_ACT=1
 # export SKIP_DECOMM_SPT=1
@@ -125,7 +127,9 @@ export SO_DATA_URL="https://portal.nersc.gov/cfs/sobs/users/MFLike_data"
 export SO_DATA_VERSION="v0.7.1 v0.8"
 
 # ------------------------------------------------------------------------------
-# control over which packages will compile -------------------------------------
+# The keys below control which packages will be installed and compiled when ----  
+# running setup/compile_cocoa.sh. They are mostly helpful when debugging cocoa -
+# (advice) The default settings should be just to compile/install all packages -s
 # ------------------------------------------------------------------------------
 #export IGNORE_CAMB_COMPILATION=1
 #export IGNORE_CLASS_COMPILATION=1
@@ -133,7 +137,7 @@ export SO_DATA_VERSION="v0.7.1 v0.8"
 #export IGNORE_POLYCHORD_COMPILATION=1
 #export IGNORE_PLANCK_COMPILATION=1
 #export IGNORE_ACT_COMPILATION=1
-      
+
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------

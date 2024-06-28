@@ -69,17 +69,17 @@ if [ -z "${IGNORE_CAMB_COMPILATION}" ]; then
   PACKDIR="${ECODEF:?}/${CAMBF:?}"
 
   # ---------------------------------------------------------------------------
-  # in case this script is called twice
+  # In case this script is called twice ---------------------------------------
   # ---------------------------------------------------------------------------
   rm -rf "${PACKDIR:?}"
 
   # ---------------------------------------------------------------------------
-  # clone from original repo
+  # Clone from original repo --------------------------------------------------
   # ---------------------------------------------------------------------------
   cdfolder "${ECODEF:?}" || { cdroot; return 1; }
 
-  curl -fsS ${URL:?} >${OUT1:?} 2>${OUT2:?} || 
-    { error "${EC27:?} (URL=${URL:?}"; return 1; }
+  "${CURL:?}" -fsS "${URL:?}" \
+    >${OUT1:?} 2>${OUT2:?} || { error "${EC27:?} (URL=${URL:?})"; return 1; }
 
   ${GIT:?} clone "${URL:?}" --recursive "${CAMBF:?}" \
     >${OUT1:?} 2>${OUT2:?} || { error "${EC15:?}"; return 1; }
@@ -92,8 +92,8 @@ if [ -z "${IGNORE_CAMB_COMPILATION}" ]; then
   fi
   
   # ---------------------------------------------------------------------------
-  # ----------- Patch CAMB to be compatible w/ COCOA environment --------------
-  # We patch the files below so they use the right compilers
+  # Patch CAMB to be compatible w/ COCOA environment --------------------------
+  # We patch the files below so they use the right compilers ------------------
   # ---------------------------------------------------------------------------
   declare -a TFOLDER=("camb/" 
                       "fortran/" 

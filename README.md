@@ -31,7 +31,7 @@ This readme file presents basic and advanced instructions for installing all [Co
 
 ## Installation of Cocoa's required packages via Conda <a name="required_packages_conda"></a>
 
-**Step :one:**: Download the file `cocoapy38.yml` yml file, create the cocoa environment, activate it, and create symbolic links that will give better names for the GNU compiler installed by conda.
+**Step :one:**: Download the file `cocoapy38.yml` yml file, create the cocoa environment, activate it, and create symbolic links that will give better names for the GNU compiler installed by Conda.
 
     conda env create --name cocoa --file=cocoapy38.yml
     conda activate cocoa
@@ -76,7 +76,7 @@ Users will see a terminal like this: `$(cocoa)(.local)`. *This is a feature, not
     
     export OMP_PROC_BIND=close; export OMP_NUM_THREADS=4
 
- **Step :three:**: Run `cobaya-run` on the first example YAML files we provide.
+ **Step three:**: Run `cobaya-run` on the first example of the YAML files we provide.
 
 One model evaluation:
 
@@ -232,7 +232,7 @@ This behavior enables users to work on multiple instances of Cocoa simultaneousl
       # ------------------------------------------------------------------------------
       # The keys below control which packages will be installed and compiled when  
       # running setup/compile_cocoa.sh. They are mostly helpful when debugging cocoa
-      # (advice) The default settings should be just to compile/install all packages
+      # (advice) The default settings should be to compile/install all packages
       # ------------------------------------------------------------------------------
       #export IGNORE_CAMB_COMPILATION=1
       #export IGNORE_CLASS_COMPILATION=1
@@ -242,7 +242,7 @@ This behavior enables users to work on multiple instances of Cocoa simultaneousl
       #export IGNORE_ACT_COMPILATION=1
       #export IGNORE_ALL_COBAYA_INSTALLATION=1
  
-Steps do debug cocoa
+Steps to debug Cocoa
 
 - The first step is to define the `COCOA_OUTPUT_VERBOSE` and `COSMOLIKE_DEBUG_MODE` flags to obtain a more detailed output. To accomplish that, we advise users to uncomment the lines below that are part of the `set_installation_options.sh` script and then restart the cocoa private environment by running `source stop_cocoa.sh; source start_cocoa.sh`
 
@@ -256,9 +256,9 @@ Steps do debug cocoa
       # ------------------------------------------------------------------------------
       export COSMOLIKE_DEBUG_MODE=1
 
-- The second step consists of reruning the particular script that failed with verbose output set. The scripts `setup_cocoa.sh` and `compile_cocoa.sh` run many shell scripts. Users may find it advantageous to run only the routine that failed. For further information on how to do that, see the appendix [FAQ: How to compile the Boltzmann, CosmoLike, and Likelihood codes separately](#appendix_compile_separately).
+- The second step consists of rerunning the particular script that failed with the verbose output set. The scripts `setup_cocoa.sh` and `compile_cocoa.sh` run many shell scripts. Users may find it advantageous to run only the routine that failed. For further information on how to do that, see the appendix [FAQ: How to compile the Boltzmann, CosmoLike, and Likelihood codes separately](#appendix_compile_separately).
 
-After fixing a particular issue, users should rerun the shell scripts `setup_cocoa.sh` and `compile_cocoa.sh` to ensure all packages are installed and compiled properly.
+After fixing a particular issue, users should rerun the shell scripts `setup_cocoa.sh` and `compile_cocoa.sh` to ensure all packages are installed and compiled correctly.
 
 ### :interrobang: FAQ: How to compile the Boltzmann, CosmoLike, and Likelihood codes separately <a name="appendix_compile_separately"></a>
 
@@ -270,7 +270,7 @@ To avoid excessive compilation or download times during development, users can u
      $(cocoa)(.local) source ./installation_scripts/compile_planck.sh
      $(cocoa)(.local) source ./installation_scripts/compile_polychord.sh
 
-Below, we show the shell subroutines that download external modules from their original git repositories 
+Below, we show the shell subroutines that download external modules from their original Git repositories. 
 
      $(cocoa)(.local) source ./installation_scripts/setup_camb.sh
      $(cocoa)(.local) source ./installation_scripts/setup_class.sh
@@ -332,7 +332,7 @@ The user needs to init Conda when running the container the first time, as shown
 
 Now, proceed with the standard cocoa installation. 
 
-Once installation is complete, the user must learn how to start, use, and exit the container. Below, we answer a few common questions about how to use/manage Docker containers.  
+Once installation is complete, the user must learn how to start, use, and exit the container. Below, we answer a few common questions about using/managing Docker containers.  
 
 - :interrobang: FAQ: How do users restart the container when they exit?
 
@@ -403,7 +403,7 @@ After installation, users must source the conda configuration file, as shown bel
     
 ### :interrobang: FAQ: How can we set the Slow/Fast decomposition on MCMC Chains with Cosmolike? Manual Blocking <a name="manual_blocking_cosmolike"></a>
 
-Cosmolike Weak Lensing pipeline contains parameters with different speed hierarchies. For example, Cosmolike execution time is reduced by approximately 50% when fixing the cosmological parameters. When varying only multiplicative shear calibration, Cosmolike execution time is reduced by two orders of magnitude. 
+The Cosmolike Weak Lensing pipelines contain parameters with different speed hierarchies. For example, Cosmolike execution time is reduced by approximately 50% when fixing the cosmological parameters. When varying only multiplicative shear calibration, Cosmolike execution time is reduced by two orders of magnitude. 
 
 Cobaya can't automatically handle parameters associated with the same likelihood that have different speed hierarchies. Luckily, we can manually impose the speed hierarchy in Cobaya using the `blocking:` option. The only drawback of this method is that parameters of all adopted likelihoods, not only the ones required by Cosmolike, must be manually specified.
 
@@ -601,140 +601,124 @@ This method is slow and not advisable :stop_sign::thumbsdown:. When Conda is una
    - [gfortran](https://gcc.gnu.org) v12.*+;
    - [g++](https://gcc.gnu.org) v12.*+;
    - [Python](https://www.python.org) v3.8.*;
-   - [PIP package manager](https://pip.pypa.io/en/stable/installing/)
-   - [Python Virtual Environment](https://www.geeksforgeeks.org/python-virtual-environment/)
+   - [wget](https://www.gnu.org/software/wget/) v1.16+;
+   - [curl](https://curl.se)
+   - [PIP package manager](https://pip.pypa.io/en/stable/installing/);
+   - [Python Virtual Environment](https://www.geeksforgeeks.org/python-virtual-environment/);
     
-To perform the local semi-autonomous installation, users must modify flags written on the file *set_installation_options* because the default behavior corresponds to an installation via Conda. First, select the environmental key `MANUAL_INSTALLATION` as shown below:
+To perform the local semi-autonomous installation, users must modify flags written on the shell scripts *set_installation_options.sh* and `installation_scripts/flags_manual_installation.sh` because the default behavior corresponds to an installation via Conda. First, select the environmental key `MANUAL_INSTALLATION` as shown below:
 
     [Extracted from set_installation_options script] 
     
-    # --------------------------------------------------------------------------------------
-    # --------------------------------------------------------------------------------------
-    # --------------------------------------------------------------------------------------
-    # ----------------------- HOW COCOA SHOULD BE INSTALLED? -------------------------------
-    # --------------------------------------------------------------------------------------
-    # --------------------------------------------------------------------------------------
-    # --------------------------------------------------------------------------------------
-    #export MINICONDA_INSTALLATION=1
-    export MANUAL_INSTALLATION=1
+	# --------------------------------------------------------------------------------------------------------------
+	# HOW COCOA SHOULD BE INSTALLED? -----------------------------------------------------
+	# --------------------------------------------------------------------------------------------------------------
+	#export MINICONDA_INSTALLATION=1
+	export MANUAL_INSTALLATION=1
     
 Finally, set the following environmental keys:
  
-    [Extracted from set_installation_options script]
+    [Extracted from `installation_scripts/flags_manual_installation.sh` shell script]
   
-    if [ -n "${MANUAL_INSTALLATION}" ]; then
-        # --------------------------------------------------------------------------------------
-        # IF SET, COCOA DOES NOT USE SYSTEM PIP PACKAGES (RELIES EXCLUSIVELY ON PIP CACHE FOLDER)
-        # --------------------------------------------------------------------------------------
+        # ---------------------------------------------------------------------------------------------------------------
+        # IF SET, COCOA DOES NOT USE SYSTEM PIP PACKAGES -----------------------------
+        # ---------------------------------------------------------------------------------------------------------------
         export DONT_USE_SYSTEM_PIP_PACKAGES=1
 
-        # --------------------------------------------------------------------------------------
-        # IF SET, COCOA WILL NOT INSTALL TENSORFLOW, KERAS, PYTORCH, GPY
-        # --------------------------------------------------------------------------------------
-        export IGNORE_EMULATOR_CPU_PIP_PACKAGES=1
-        export IGNORE_EMULATOR_GPU_PIP_PACKAGES=1
+	(...)
 
-        # --------------------------------------------------------------------------------------
-        # WE USE CONDA COLASLIM ENV WITH JUST PYTHON AND GCC TO TEST MANUAL INSTALLATION
-        # --------------------------------------------------------------------------------------
-        #conda create --name cocoalite python=3.8 --quiet --yes \
-        #   && conda install -n cocoalite --quiet --yes  \
-        #   'conda-forge::libgcc-ng=12.3.0' \
-        #   'conda-forge::libstdcxx-ng=12.3.0' \
-        #   'conda-forge::libgfortran-ng=12.3.0' \
-        #   'conda-forge::gxx_linux-64=12.3.0' \
-        #   'conda-forge::gcc_linux-64=12.3.0' \
-        #   'conda-forge::gfortran_linux-64=12.3.0' \
-        #   'conda-forge::openmpi=4.1.5' \
-        #   'conda-forge::sysroot_linux-64=2.17' \
-        #   'conda-forge::git=2.40.0' \
-        #   'conda-forge::git-lfs=3.3.0'
-        # --------------------------------------------------------------------------------------
-
-        export GLOBAL_PACKAGES_LOCATION=$CONDA_PREFIX
-        export GLOBALPYTHON3=$CONDA_PREFIX/bin/python${PYTHON_VERSION}
-        export PYTHON_VERSION=3.8
-
-        # --------------------------------------------------------------------------------------
-        # COMPILER
-        # --------------------------------------------------------------------------------------
-        export C_COMPILER=$CONDA_PREFIX/bin/x86_64-conda-linux-gnu-cc
-        export CXX_COMPILER=$CONDA_PREFIX/bin/x86_64-conda-linux-gnu-g++
-        export FORTRAN_COMPILER=$CONDA_PREFIX/bin/x86_64-conda-linux-gnu-gfortran
-        export MPI_CC_COMPILER=$CONDA_PREFIX/bin/mpicxx
-        export MPI_CXX_COMPILER=$CONDA_PREFIX/bin/mpicc
-        export MPI_FORTRAN_COMPILER=$CONDA_PREFIX/bin/mpif90
-
-        # --------------------------------------------------------------------------------------
+        # -------------------------------------------------------------------------------------------------------------------------
         # USER NEEDS TO SPECIFY THE FLAGS BELOW SO COCOA CAN FIND PYTHON / GCC
-        # --------------------------------------------------------------------------------------
-        export PATH=$CONDA_PREFIX/bin:$PATH
+        # -------------------------------------------------------------------------------------------------------------------------
+	
+	export PYTHON_VERSION=3.8
+	
+	export GLOBALPYTHON3=
+	
+	export GLOBAL_PACKAGES_LOCATION=
+	
+	export GLOBALPIP3=
+	
+	export GIT=
+	
+	export WGET=
+	
+	export CURL=
 
-        export CFLAGS="${CFLAGS} -I$CONDA_PREFIX/include"
+        # -------------------------------------------------------------------------------------------------------------------------
 
-        export LDFLAGS="${LDFLAGS} -L$CONDA_PREFIX/lib"
+        export PATH=XXX:$PATH
 
-        export C_INCLUDE_PATH=$CONDA_PREFIX/include:$C_INCLUDE_PATH
-        export C_INCLUDE_PATH=$CONDA_PREFIX/include/python${PYTHON_VERSION}m/:$C_INCLUDE_PATH
+        export CFLAGS="${CFLAGS} -IXXX"
 
-        export CPLUS_INCLUDE_PATH=$CONDA_PREFIX/include:$CPLUS_INCLUDE_PATH
-        export CPLUS_INCLUDE_PATH=$CONDA_PREFIX/include/python${PYTHON_VERSION}m/:$CPLUS_INCLUDE_PATH
+        export LDFLAGS="${LDFLAGS} -LXXX"
 
-        export PYTHONPATH=$CONDA_PREFIX/lib/python$PYTHON_VERSION/site-packages:$PYTHONPATH
-        export PYTHONPATH=$CONDA_PREFIX/lib:$PYTHONPATH
+        export C_INCLUDE_PATH=XXX:$C_INCLUDE_PATH
 
-        export LD_RUN_PATH=$CONDA_PREFIX/lib/python$PYTHON_VERSION/site-packages:$LD_RUN_PATH
-        export LD_RUN_PATH=$CONDA_PREFIX/lib:$LD_RUN_PATH
+        export CPLUS_INCLUDE_PATH=XXX:$CPLUS_INCLUDE_PATH
 
-        export LIBRARY_PATH=$CONDA_PREFIX/lib/python$PYTHON_VERSION/site-packages:$LIBRARY_PATH
-        export LIBRARY_PATH=$CONDA_PREFIX/lib:$LIBRARY_PATH
+        export PYTHONPATH=XXX:$PYTHONPATH
 
-        export CMAKE_INCLUDE_PATH=$CONDA_PREFIX/include/:$CMAKE_INCLUDE_PATH
-        export CMAKE_INCLUDE_PATH=$CONDA_PREFIX/include/python${PYTHON_VERSION}m/:$CMAKE_INCLUDE_PATH    
+        export LD_RUN_PATH=XXX:$LD_RUN_PATH
+   
+        export LIBRARY_PATH=XXX:$LIBRARY_PATH
 
-        export CMAKE_LIBRARY_PATH=$CONDA_PREFIX/lib/python$PYTHON_VERSION/site-packages:$CMAKE_LIBRARY_PATH
-        export CMAKE_LIBRARY_PATH=$CONDA_PREFIX/lib:$CMAKE_LIBRARY_PATH
+        export CMAKE_INCLUDE_PATH=XXX:$CMAKE_INCLUDE_PATH
 
-        export INCLUDE_PATH=$CONDA_PREFIX/include/:$INCLUDE_PATH
+        export CMAKE_LIBRARY_PATH=XXX:$CMAKE_LIBRARY_PATH
 
-        export INCLUDEPATH=$CONDA_PREFIX/include/:$INCLUDEPATH
+        export INCLUDE_PATH=XXX:$INCLUDE_PATH
 
-        export INCLUDE=$CONDA_PREFIX/x86_64-conda-linux-gnu/include:$INCLUDE
-        export INCLUDE=$CONDA_PREFIX/include/:$INCLUDE
+        export INCLUDE=XXX:$INCLUDE
 
-        export CPATH=$CONDA_PREFIX/include/:$CPATH
+        export CPATH=XXX:$CPATH
 
-        export OBJC_INCLUDE_PATH=$CONDA_PREFIX/include/:OBJC_INCLUDE_PATH
+        export OBJC_INCLUDE_PATH=XXX:$OBJC_INCLUDE_PATH
 
-        export OBJC_PATH=$CONDA_PREFIX/include/:OBJC_PATH
+        export OBJC_PATH=XXX:$OBJC_PATH
+                
+        # ---------------------------------------------------------------------------------------------------------------------
+        # COMPILER ----------------------------------------------------------------------------------------------------
+        # ---------------------------------------------------------------------------------------------------------------------
 
-        # --------------------------------------------------------------------------------------
-        # DEBUG THE COMPILATION OF PREREQUISITES PACKAGES. BY DEFAULT, THE COMPILATION'S -------
-        # OUTPUT IS NOT WRITTEN ON THE TERMINAL. THESE FLAGS ENABLE THAT OUTPUT ---------------- 
-        # --------------------------------------------------------------------------------------
-        #export DEBUG_CPP_PACKAGES=1
-        #export DEBUG_C_PACKAGES=1
-        #export DEBUG_FORTRAN_PACKAGES=1
-        #export DEBUG_PIP_OUTPUT=1
-        #export DEBUG_XZ_PACKAGE=1
-        #export DEBUG_CMAKE_PACKAGE=1
-        #export DEBUG_OPENBLAS_PACKAGE=1
-        #export DEBUG_DISTUTILS_PACKAGE=1
-        #export DEBUG_HDF5_PACKAGES=1
-    
-The fine-tunning over the use of system-wide packages instead of our local copies can be set via the environmental flags
+        export C_COMPILER=
+        
+        export CXX_COMPILER=
+        
+        export FORTRAN_COMPILER=
+        
+        export MPI_CC_COMPILER=
+        
+        export MPI_CXX_COMPILER=
+        
+        export MPI_FORTRAN_COMPILER=
 
-        export IGNORE_XZ_INSTALLATION=1
-        export IGNORE_HDF5_INSTALLATION=1
-        export IGNORE_CMAKE_INSTALLATION=1
-        export IGNORE_DISTUTILS_INSTALLATION=1
-        export IGNORE_C_GSL_INSTALLATION=1
-        export IGNORE_C_CFITSIO_INSTALLATION=1
-        export IGNORE_C_FFTW_INSTALLATION=1
-        export IGNORE_CPP_BOOST_INSTALLATION=1 
-        export IGNORE_OPENBLAS_INSTALLATION=1
-        export IGNORE_FORTRAN_LAPACK_INSTALLATION=1
-        export IGNORE_CPP_ARMA_INSTALLATION=1
-       
+        # ---------------------------------------------------------------------------------------------------------------------
+        # FINE-TUNNING OVER THE USE OF SYSTEM-WIDE PACKAGES ---------------------------
+        # ---------------------------------------------------------------------------------------------------------------------
 
+        #export IGNORE_XZ_INSTALLATION=1
 
+	#export IGNORE_DISTUTILS_INSTALLATION=1
+
+	#export IGNORE_C_GSL_INSTALLATION=1
+
+	#export IGNORE_C_CFITSIO_INSTALLATION=1
+
+	#export IGNORE_C_FFTW_INSTALLATION=1
+
+	#export IGNORE_CPP_BOOST_INSTALLATION=1
+
+	#export IGNORE_CMAKE_INSTALLATION=1
+
+	#export IGNORE_OPENBLAS_INSTALLATION=1
+
+	#export IGNORE_FORTRAN_LAPACK_INSTALLATION=1
+
+	#export IGNORE_CPP_ARMA_INSTALLATION=1
+
+	#export IGNORE_HDF5_INSTALLATION=1
+
+	#export IGNORE_EXPAT_CORE_PACKAGE=1
+
+	#export IGNORE_PIP_CORE_PACKAGES=1

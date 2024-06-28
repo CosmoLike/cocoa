@@ -97,6 +97,9 @@ if [ -z "${IGNORE_ALL_COBAYA_INSTALLATION}" ]; then
     
     URL="${COBAYA_URL:-"https://github.com/CobayaSampler/cobaya.git"}"
 
+    "${CURL:?}" -fsS "${URL:?}" \
+      >${OUT1:?} 2>${OUT2:?} || { error "${EC27:?} (URL=${URL:?})"; return 1; }
+
     "${GIT:?}" clone "${URL:?}" cobaya \
       >${OUT1:?} 2>${OUT2:?} || { error "${EC15:?}"; return 1; }
     
@@ -337,6 +340,9 @@ if [ -z "${IGNORE_ALL_COBAYA_INSTALLATION}" ]; then
       rm -rf "${COB:?}/${COBLIKE:?}/tmp"
 
       cdfolder "${COB:?}/${COBLIKE:?}" || return 1;
+
+      "${CURL:?}" -fsS "${URL:?}" >${OUT1:?} \
+        2>${OUT2:?} || { error "${EC27:?} (URL=${URL:?})"; return 1; }
 
       ${GIT:?} clone "${URL:?}" "tmp" \
         >${OUT1:?} 2>${OUT2:?} || { error "${EC15:?}"; return 1; }

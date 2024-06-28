@@ -83,7 +83,10 @@ if [ -z "${IGNORE_POLYCHORD_COMPILATION}" ]; then
   # ---------------------------------------------------------------------------
   cdfolder "${ECODEF}" || return 1;
 
-  ${GIT:?} clone "${URL:?}" --recursive "${POLYF:?}" \
+  "${CURL:?}" -fsS "${URL:?}" \
+    >${OUT1:?} 2>${OUT2:?} || { error "${EC27:?} (URL=${URL:?})"; return 1; }
+
+  "${GIT:?}" clone "${URL:?}" --recursive "${POLYF:?}" \
     >${OUT1:?} 2>${OUT2:?} || { error "${EC15:?}"; return 1; }
   
   cdfolder "${PACKDIR}" || return 1;

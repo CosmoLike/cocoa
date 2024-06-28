@@ -15,6 +15,8 @@ export GIT="${CONDA_PREFIX:?}/bin/git"
 
 export WGET="${CONDA_PREFIX:?}/bin/wget"
 
+export CURL="${CONDA_PREFIX:?}/bin/curl"
+
 # --------------------------------------------------------------------------
 # USER NEEDS TO SPECIFY THE FLAGS BELOW SO COCOA CAN FIND PYTHON/GCC/HDF5...
 # --------------------------------------------------------------------------

@@ -91,7 +91,9 @@ wgetact() {
     2>${OUT2:?} || { error "TAR (COMPRESS)"; return 1; }
 
   rm -rf "${CCIL:?}/${1:?}"
+  
   rm -f  "${CCIL:?}/${FILE:?}"
+  
   rm -rf "${CCIL:?}/${4:?}"
 
   cdfolder "${ROOTDIR}" || return 1;
@@ -109,13 +111,16 @@ gitact1() {
   rm -rf "${CCIL:?}/${1:?}"
   # ---------------------------------------------------------------------------
 
-  "${GIT:?}" clone "${3:?}" "${1:?}" >${OUT1:?} 2>${OUT2:?} || 
-    { error "GIT CLONE"; return 1; }
+  "${CURL:?}" -fsS "${URL:?}" \
+    >${OUT1:?} 2>${OUT2:?} || { error "${EC27:?} (URL=${URL:?})"; return 1; }
+
+  "${GIT:?}" clone "${3:?}" "${1:?}" \
+    >${OUT1:?} 2>${OUT2:?} || { error "GIT CLONE"; return 1; }
   
   cdfolder "${CCIL:?}/${1:?}" || return 1;
   
-  "${GIT:?}" checkout "${2:?}" >${OUT1:?} 2>${OUT2:?} || 
-    { error "GIT CHECKOUT"; return 1; }
+  "${GIT:?}" checkout "${2:?}" \
+    >${OUT1:?} 2>${OUT2:?} || { error "GIT CHECKOUT"; return 1; }
   
   rm -rf "${CCIL:?}/${1:?}/.git/"
 
@@ -149,6 +154,7 @@ gitact2() {
     2>${OUT2:?} || { error "TAR (COMPRESS)"; return 1; }
 
   rm -rf "${CCIL:?}/${1:?}"
+  
   rm -rf "${CCIL:?}/${2:?}"
 
   cdfolder "${ROOTDIR}" || return 1;
