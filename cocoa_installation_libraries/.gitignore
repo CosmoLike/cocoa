@@ -77,6 +77,14 @@ gsl.xz
 spdlog.xz
 boost.xz
 hdf5.xz
+boost*
+hdf5*
+gsl*
+fftw*
+texinfo*
+OpenBLAS*
+lapack*
+spdlog*
 armadillo.xz
 armadillo-*/
 carma_tmp/
@@ -91,3 +99,5 @@ hdf5-1.12.3/
 hdf5-*/
 hdf5-*.tar.xz
 armadillo-*.tar.xz
+cuba.xz
+cuba*.xz
