@@ -50,13 +50,13 @@ This readme file presents basic and advanced instructions for installing all [Co
     "${CONDA_PREFIX}/bin/git" clone --depth 1 https://github.com/CosmoLike/cocoa.git cocoa
     cd ./cocoa/Cocoa
 
-**Step :two:**: Run the script `setup_cocoa_installation_packages` via
+**Step :two:**: Run the script `setup_cocoa.sh` via
         
     source setup_cocoa.sh
 
 The script `setup_cocoa` decompresses the data files and installs a few necessary packages that have not been installed via conda.
 
-**Step :three:**: Run the script `compile_cocoa` by typing 
+**Step :three:**: Run the script `compile_cocoa.sh` by typing 
 
     source compile_cocoa.sh
     
