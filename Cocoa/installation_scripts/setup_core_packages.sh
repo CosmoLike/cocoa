@@ -28,7 +28,7 @@ unset_all () {
 }
 
 error () {
-  fail_script_msg "$(basename ${BASH_SOURCE[0]})" "${1}"
+  fail_script_msg "$(basename "${BASH_SOURCE[0]}")" "${1}"
   unset_all || return 1
 }
 
@@ -386,7 +386,7 @@ if [ -z "${IGNORE_C_CFITSIO_INSTALLATION}" ]; then
   
   XZF="cfitsio.xz"
 
-  wgetact "${FOLDER:?}" "${FILE:?}" "${URL:?}" \ 
+  wgetact "${FOLDER:?}" "${FILE:?}" "${URL:?}" \
     "${COCOA_CFITSIO_DIR:-"${FOLDER:?}"}" "${XZF:?}" || return 1;
 
   unset -v URL_BASE URL FOLDER FILE XZF PACKAGE_VERSION
@@ -440,7 +440,7 @@ if [ -z "${IGNORE_C_GSL_INSTALLATION}" ]; then
 
   XZF="gsl.xz"
 
-  wgetact "${FOLDER:?}" "${FILE:?}" "${URL:?}" \ 
+  wgetact "${FOLDER:?}" "${FILE:?}" "${URL:?}" \
     "${COCOA_GSL_DIR:-"${FOLDER:?}"}" "${XZF:?}" || return 1;
 
   unset -v URL FOLDER FILE XZF PACKAGE_VERSION

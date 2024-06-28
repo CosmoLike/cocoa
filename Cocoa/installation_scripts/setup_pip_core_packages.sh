@@ -28,9 +28,9 @@ if [ -z "${IGNORE_ALL_PIP_INSTALLATION}" ]; then
     unset -f unset_all
     cdroot || return 1;
   }
-
+  
   error () {
-    fail_script_msg "setup_pip_packages.sh" "${1}"
+    fail_script_msg "$(basename "${BASH_SOURCE[0]}")" "${1}"
     unset_all || return 1
   }
 

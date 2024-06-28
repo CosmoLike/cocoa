@@ -4,7 +4,7 @@
 # ----------------------------------------------------------------------------
 
 error () {
-  fail_script_msg "$(basename ${BASH_SOURCE[0]})" "${1}"
+  fail_script_msg "$(basename "${BASH_SOURCE[0]}")" "${1}"
   cdroot
   unset -f error
   return 1;

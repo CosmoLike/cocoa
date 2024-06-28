@@ -30,7 +30,7 @@ if [ -z "${IGNORE_ACTDR4_COMPILATION}" ]; then
   }
 
   error () {
-    fail_script_msg "$(basename ${BASH_SOURCE[0]})" "${1}"
+    fail_script_msg "$(basename "${BASH_SOURCE[0]}")" "${1}"
     unset_all || return 1
   }
   
