@@ -476,7 +476,7 @@ Below, we provide an example YAML configuration for an MCMC chain with DES 3x2pt
 If the user wants to add, without GPU support, Tensorflow, Keras, and PyTorch for an emulator-based project via Conda, then type
 
       conda activate cocoa
-      $CONDA_PREFIX/bin/pip install --no-cache-dir \
+      "${CONDA_PREFIX:?}"/bin/pip install --no-cache-dir \
         'tensorflow-cpu==2.12.0' \
         'keras==2.12.0' \
         'keras-preprocessing==1.1.2' \
@@ -487,7 +487,7 @@ If the user wants to add, without GPU support, Tensorflow, Keras, and PyTorch fo
 In case the users want GPU support, the following commands will install the GPU version of 
 these packages, assuming CUDA 11.6, click [here](https://pytorch.org/get-started/previous-versions/) for additional information).
 
-      $CONDA_PREFIX/bin/pip install --no-cache-dir \
+      "${CONDA_PREFIX:?}"/bin/pip install --no-cache-dir \
         'tensorflow==2.12.0' \
         'keras==2.12.0' \
         'keras-preprocessing==1.1.2' \
