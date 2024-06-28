@@ -149,7 +149,11 @@ The following is not an exhaustive list of the codes we use
 
 - [ACTLensing](https://github.com/ACTCollaboration/act_dr6_lenslike) is the official lensing likelihood of the ACT collaboration developed by Prof. Mathew Madhavacheril
 
-Following best practices, Cocoa scripts to download the vast majority of code and likelihoods from their original repositories. We do not want to discourage people from cloning code from their original repositories. We've included a few likelihoods as compressed [xz file format](https://tukaani.org/xz/format.html) in our repository. The work of those authors is extraordinary, and users *must cite them* appropriately.
+- [HiLLiPoP CMB likelihood](https://github.com/planck-npipe/hillipop.git) is a multifrequency CMB likelihood for Planck data.
+
+- [Lollipop CMB likelihood](https://github.com/planck-npipe/lollipop.git) is a Planck low-l polarization likelihood.
+  
+Following best practices, Cocoa scripts download most external modules from their original repositories, including Cobaya, CAMB, Class, Polychord, ACT-DR6, HiLLiPoP, and Lollipop. We do not want to discourage people from cloning code from their original repositories. Our repository has included a few likelihoods as compressed [xz file format](https://tukaani.org/xz/format.html). The work of those authors is extraordinary, and users **must cite them** appropriately.
 
 ### Additional Installation Notes for experts and developers <a name="additional_notes"></a>
 
