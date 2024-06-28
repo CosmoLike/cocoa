@@ -169,7 +169,7 @@ The conda installation method should be chosen in the overwhelming majority of c
         
 - Cocoa developers should drop the shallow clone option `--depth 1`; they should also authenticate to GitHub via SSH keys and use the command instead.
 
-      $CONDA_PREFIX/bin/git clone git@github.com:CosmoLike/cocoa.git cocoa
+      "${CONDA_PREFIX}"/bin/git clone git@github.com:CosmoLike/cocoa.git cocoa
   
 - Our scripts never install packages on `$HOME/.local` as that would make them global to the user. All requirements for Cocoa are installed at
 
@@ -377,13 +377,13 @@ Once installation is complete, the user must learn how to start, use, and exit t
 
 Download and run the Miniconda installation script. 
 
-      export CONDA_DIR=/gpfs/home/XXX/miniconda
+      export CONDA_DIR="/gpfs/home/XXX/miniconda"
     
-      mkdir $CONDA_DIR
+      mkdir "${CONDA_DIR:?}"
     
       wget https://repo.continuum.io/miniconda/Miniconda3-py38_23.9.0-0-Linux-x86_64.sh
     
-      /bin/bash Miniconda3-py38_23.9.0-0-Linux-x86_64.sh -f -b -p $CONDA_DIR
+      /bin/bash Miniconda3-py38_23.9.0-0-Linux-x86_64.sh -f -b -p "${CONDA_DIR:?}"
 
 Please don't forget to adapt the path assigned to `CONDA_DIR` in the command above:
 
