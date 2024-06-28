@@ -54,7 +54,7 @@ This readme file presents basic and advanced instructions for installing all [Co
         
     source setup_cocoa.sh
 
-The script `setup_cocoa` decompresses the data files and installs a few necessary packages that have not been installed via conda.
+The script `setup_cocoa.sh` decompresses the data files and installs a few necessary packages that have not been installed via conda.
 
 **Step :three:**: Run the script `compile_cocoa.sh` by typing 
 
@@ -66,7 +66,7 @@ This compiles CAMB and Class Boltzmann codes, Planck likelihood, and Polychord s
 
 We assume that you are still in the Conda cocoa environment from the previous `conda activate cocoa` command and that you are in the cocoa main folder `cocoa/Cocoa`, 
 
- **Step :one:**: Activate the private Python environment by sourcing the script `start_cocoa`
+ **Step :one:**: Activate the private Python environment by sourcing the script `start_cocoa.sh`
 
     source start_cocoa.sh
 
@@ -112,7 +112,7 @@ Example of cosmolike projects: [lsst_y1](https://github.com/CosmoLike/cocoa_lsst
     cd ../
     source start_cocoa.sh
  
-:warning: :warning: The `start_cocoa` script must be run after cloning the project repository. 
+:warning: :warning: The `start_cocoa.sh` script must be run after cloning the project repository. 
 
 Users will see a terminal like this: `$(cocoa)(.local)`. *This is a feature, not a bug*!
 
@@ -194,7 +194,7 @@ This behavior enables users to work on multiple instances of Cocoa simultaneousl
 
 - Additional explanations about our `mpirun` flags: Why the `--bind-to core:overload-allowed --map-by numa:pe=${OMP_NUM_THREADS}` flag? This flag enables efficient hybrid MPI + OpenMP runs on NUMA architecture.
 
-- Additional explanations about the `start_cocoa`/`stop_cocoa` scripts: Why did we create two separate bash environments, `(cocoa)` and `(.local)`? Users should be able to manipulate multiple Cocoa instances seamlessly, which is particularly useful when running chains in one instance while experimenting with code development in another. Consistency of the environment across all Cocoa instances is crucial, and the start_cocoa/stop_cocoa scripts handle the loading and unloading of environmental path variables for each Cocoa.
+- Additional explanations about the `start_cocoa.sh`/`stop_cocoa.sh` scripts: Why did we create two separate bash environments, `(cocoa)` and `(.local)`? Users should be able to manipulate multiple Cocoa instances seamlessly, which is particularly useful when running chains in one instance while experimenting with code development in another. Consistency of the environment across all Cocoa instances is crucial, and the `start_cocoa.sh`/`stop_cocoa.sh` scripts handle the loading and unloading of environmental path variables for each Cocoa.
 
 ### :interrobang: FAQ: What should you do if installation or compilation goes wrong? <a name="running_wrong"></a>
 
