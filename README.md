@@ -267,20 +267,20 @@ After fixing a particular issue, users should rerun the shell scripts `setup_coc
 
 ### :interrobang: FAQ: How to compile the Boltzmann, CosmoLike, and Likelihood codes separately <a name="appendix_compile_separately"></a>
 
-To avoid excessive compilation or download times during development, users can use specialized scripts located at `Cocoa/installation_scripts/` that compile only a specific module or download only a particular dataset. A few examples of these scripts are (the `$(cocoa)(.local)` emphasizes they should run after activating the cocoa environment): 
+To avoid excessive compilation or download times during development, users can use specialized scripts located at `Cocoa/installation_scripts/` that compile only a specific module or download only a particular dataset. A few examples of these scripts are: 
 
-     $(cocoa)(.local) source ./installation_scripts/compile_act.sh
-     $(cocoa)(.local) source ./installation_scripts/compile_camb.sh
-     $(cocoa)(.local) source ./installation_scripts/compile_class.sh
-     $(cocoa)(.local) source ./installation_scripts/compile_planck.sh
-     $(cocoa)(.local) source ./installation_scripts/compile_polychord.sh
+     $(cocoa)(.local) source "${ROOTDIR:?}"/installation_scripts/compile_act.sh
+     $(cocoa)(.local) source "${ROOTDIR:?}"/installation_scripts/compile_camb.sh
+     $(cocoa)(.local) source "${ROOTDIR:?}"/installation_scripts/compile_class.sh
+     $(cocoa)(.local) source "${ROOTDIR:?}"/installation_scripts/compile_planck.sh
+     $(cocoa)(.local) source "${ROOTDIR:?}"/installation_scripts/compile_polychord.sh
 
-Below, we show the shell subroutines that download external modules from their original Git repositories. 
+Above and below, the `$(cocoa)(.local)` emphasizes they should run after activating the cocoa environment). The shell subroutines that download external modules from their original Git repositories are shown below.
 
-     $(cocoa)(.local) source ./installation_scripts/setup_camb.sh
-     $(cocoa)(.local) source ./installation_scripts/setup_class.sh
-     $(cocoa)(.local) source ./installation_scripts/setup_polychord.sh
-     $(cocoa)(.local) source ./installation_scripts/setup_cobaya.sh
+     $(cocoa)(.local) source "${ROOTDIR:?}"/installation_scripts/setup_camb.sh
+     $(cocoa)(.local) source "${ROOTDIR:?}"/installation_scripts/setup_class.sh
+     $(cocoa)(.local) source "${ROOTDIR:?}"/installation_scripts/setup_polychord.sh
+     $(cocoa)(.local) source "${ROOTDIR:?}"/installation_scripts/setup_cobaya.sh
 
 To ensure these scripts can download and install these packages, users must be sure that the environment keys below are *NOT* set. These keys are shown on `set_installation_options.sh`. The command `unset -v` unset them. 
       
@@ -289,7 +289,6 @@ To ensure these scripts can download and install these packages, users must be s
      unset -v IGNORE_POLYCHORD_COMPILATION
      unset -v IGNORE_PLANCK_COMPILATION
      unset -v IGNORE_ACT_COMPILATION
-     unset -v IGNORE_ALL_COBAYA_INSTALLATION
      unset -v IGNORE_ALL_COBAYA_INSTALLATION
 
 Below, we show the shell subroutines that download and unpack data from multiple experiments. 
