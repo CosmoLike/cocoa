@@ -47,20 +47,20 @@ This readme file presents basic and advanced instructions for installing all [Co
 
 **Step :one:**: We assume you are still in the Conda cocoa environment from the previous `conda activate cocoa` command. Now, clone the repository and go to the `cocoa` main folder,
 
-    $CONDA_PREFIX/bin/git clone --depth 1 https://github.com/CosmoLike/cocoa.git cocoa
+    "${CONDA_PREFIX}/bin/git" clone --depth 1 https://github.com/CosmoLike/cocoa.git cocoa
     cd ./cocoa/Cocoa
 
 **Step :two:**: Run the script `setup_cocoa_installation_packages` via
         
-    source setup_cocoa_installation_packages.sh
+    source setup_cocoa.sh
 
-The script `setup_cocoa_installation_packages` decompresses the data files and installs a few necessary packages that have not been installed via conda.
+The script `setup_cocoa` decompresses the data files and installs a few necessary packages that have not been installed via conda.
 
-**Step :three:**: Run the script `compile_external_modules` by typing 
+**Step :three:**: Run the script `compile_cocoa` by typing 
 
-    source compile_external_modules.sh
+    source compile_cocoa.sh
     
-This compiles CAMB/Class Boltzmann codes, Planck likelihood, and Polychord sampler. 
+This compiles CAMB and Class Boltzmann codes, Planck likelihood, and Polychord sampler. 
 
 ## Running Cobaya Examples <a name="cobaya_base_code_examples"></a>
 
@@ -68,7 +68,7 @@ We assume that you are still in the Conda cocoa environment from the previous `c
 
  **Step :one:**: Activate the private Python environment by sourcing the script `start_cocoa`
 
-    source start_cocoa
+    source start_cocoa.sh
 
 Users will see a terminal like this: `$(cocoa)(.local)`. *This is a feature, not a bug*! 
 
@@ -88,7 +88,7 @@ MCMC:
 
 Once the work is done, clean your environment via :
 
-    source stop_cocoa
+    source stop_cocoa.sh
     conda deactivate cocoa
 
 ## Running Cosmolike projects <a name="running_cosmolike_projects"></a> 
@@ -107,7 +107,7 @@ Example of cosmolike projects: [lsst_y1](https://github.com/CosmoLike/cocoa_lsst
 **Step :two:**: Go back to the Cocoa main folder and activate the private Python environment
     
     cd ../
-    source start_cocoa
+    source start_cocoa.sh
  
 :warning: :warning: The `start_cocoa` script must be run after cloning the project repository. 
 
@@ -194,34 +194,42 @@ This behavior enables users to work on multiple instances of Cocoa simultaneousl
 - The script *set_installation_options script* contains a few additional flags that may be useful. Some of these flags are shown below:
 
       [Extracted from set_installation_options script]
-      # --------------------------------------------------------------------------------------
-      # --------------------------------------------------------------------------------------
-      # --------------------------- VERBOSE AS DEBUG TOOL ------------------------------------
-      # --------------------------------------------------------------------------------------
-      # --------------------------------------------------------------------------------------
+      # ------------------------------------------------------------------------------
+      # VERBOSE AS DEBUG TOOL --------------------------------------------------------
+      # ------------------------------------------------------------------------------
       #export COCOA_OUTPUT_VERBOSE=1
-    
-      # --------------------------------------------------------------------------------------
-      # --------- IF TRUE, THEN COCOA USES CLIK FROM https://github.com/benabed/clik ---------
-      # --------------------------------------------------------------------------------------
-      export USE_SPT_CLIK_PLANCK=1
-    
-      # --------------------------------------------------------------------------------------
-      # ----------------- CONTROL OVER THE COMPILATION OF EXTERNAL CODES ---------------------
-      # --------------------------------------------------------------------------------------
+
+      # ------------------------------------------------------------------------------
+      # If set, COSMOLIKE will compile with DEBUG flags ------------------------------
+      # ------------------------------------------------------------------------------
+      #export COSMOLIKE_DEBUG_MODE=1
+  
+      # ------------------------------------------------------------------------------
+      # skip downloading specific datasets (may save a lot of time) ------------------
+      # ------------------------------------------------------------------------------
+      #export SKIP_DECOMM_ACT=1
+      # export SKIP_DECOMM_SPT=1
+      # export SKIP_DECOMM_PLANCK=1
+      # export SKIP_DECOMM_BICEP=1
+      # export SKIP_DECOMM_STRONG_LENSING=1
+      # export SKIP_DECOMM_SN=1
+      # export SKIP_DECOMM_BAO=1
+      export SKIP_DECOMM_SIMONS_OBSERVATORY=1
+      export SKIP_DECOMM_CAMSPEC=1
+      export SKIP_DECOMM_LIPOP=1
+
+      (...)
+  
+      # ------------------------------------------------------------------------------
+      # control over which packages will compile when running compile_cocoa.sh -------
+      # ------------------------------------------------------------------------------
       #export IGNORE_CAMB_COMPILATION=1
-      export IGNORE_CLASS_COMPILATION=1
+      #export IGNORE_CLASS_COMPILATION=1
       #export IGNORE_COSMOLIKE_COMPILATION=1
       #export IGNORE_POLYCHORD_COMPILATION=1
       #export IGNORE_PLANCK_COMPILATION=1
       #export IGNORE_ACT_COMPILATION=1
-    
-      # --------------------------------------------------------------------------------------
-      # ----- IF DEFINED, COSMOLIKE WILL BE COMPILED WITH DEBUG FLAG -------------------------
-      # ----- DEBUG FLAG = ALL COMPILER WARNINGS + NO MATH OPTIMIZATION + NO OPENMP ----------
-      # --------------------------------------------------------------------------------------
-      #export COSMOLIKE_DEBUG_MODE=1
-
+ 
 The first step in debugging cocoa is to define the `COCOA_OUTPUT_VERBOSE` and `COSMOLIKE_DEBUG_MODE` flags to obtain a more detailed output. The second step consists of reruning the particular script that failed. The scripts `setup_cocoa_installation_packages` and `compile_external_modules` run many things. It may be advantageous to run only the routine that failed. For further information, see the appendix [FAQ: How to compile the Boltzmann, CosmoLike, and Likelihood codes separately](#appendix_compile_separately).
 
 If you can fix the issue, rerun `setup_cocoa_installation_packages` and `compile_external_modules` to ensure all installation scripts are called and the installation is complete.
