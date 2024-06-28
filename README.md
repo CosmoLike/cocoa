@@ -89,6 +89,9 @@ MCMC:
 Once the work is done, clean your environment via :
 
     source stop_cocoa.sh
+    
+and
+
     conda deactivate cocoa
 
 ## Running Cosmolike projects <a name="running_cosmolike_projects"></a> 
@@ -98,7 +101,7 @@ The *projects* folder was designed to include Cosmolike projects. We assume that
 **Step :one:**: Go to the project folder (`./cocoa/Cocoa/projects`) and clone a Cosmolike project with the fictitious name `XXX`:
     
     cd ./cocoa/Cocoa/projects
-    $CONDA_PREFIX/bin/git clone git@github.com:CosmoLike/cocoa_XXX.git XXX
+    "${CONDA_PREFIX}/bin/git" clone git@github.com:CosmoLike/cocoa_XXX.git XXX
 
 By convention, the Cosmolike Organization hosts a Cobaya-Cosmolike project named XXX at `CosmoLike/cocoa_XXX`. When cloning the repository, the `cocoa_` prefix must be dropped. In the above `git clone` command, we eliminate the `cocoa_` prefix with the second `XXX` argument.
 
@@ -205,7 +208,9 @@ This behavior enables users to work on multiple instances of Cocoa simultaneousl
       #export COSMOLIKE_DEBUG_MODE=1
   
       # ------------------------------------------------------------------------------
-      # skip downloading specific datasets (may save a lot of time) ------------------
+      # The flags below allow users to skip downloading specific datasets ------------
+      # (advice) skipping LIPOP, CAMSPEC, Simons Observatory datasets saves ----------
+      # (advice) considerable time in the initial cocoa installation -----------------
       # ------------------------------------------------------------------------------
       #export SKIP_DECOMM_ACT=1
       # export SKIP_DECOMM_SPT=1
@@ -221,7 +226,9 @@ This behavior enables users to work on multiple instances of Cocoa simultaneousl
       (...)
   
       # ------------------------------------------------------------------------------
-      # control over which packages will compile when running compile_cocoa.sh -------
+      # The keys below control which packages will be installed and compiled when  
+      # running setup/compile_cocoa.sh. They are mostly helpful when debugging cocoa
+      # (advice) The default settings should be just to compile/install all packages
       # ------------------------------------------------------------------------------
       #export IGNORE_CAMB_COMPILATION=1
       #export IGNORE_CLASS_COMPILATION=1
@@ -229,27 +236,78 @@ This behavior enables users to work on multiple instances of Cocoa simultaneousl
       #export IGNORE_POLYCHORD_COMPILATION=1
       #export IGNORE_PLANCK_COMPILATION=1
       #export IGNORE_ACT_COMPILATION=1
+      #export IGNORE_ALL_COBAYA_INSTALLATION=1
  
-The first step in debugging cocoa is to define the `COCOA_OUTPUT_VERBOSE` and `COSMOLIKE_DEBUG_MODE` flags to obtain a more detailed output. The second step consists of reruning the particular script that failed. The scripts `setup_cocoa_installation_packages` and `compile_external_modules` run many things. It may be advantageous to run only the routine that failed. For further information, see the appendix [FAQ: How to compile the Boltzmann, CosmoLike, and Likelihood codes separately](#appendix_compile_separately).
+Steps do debug cocoa
 
-If you can fix the issue, rerun `setup_cocoa_installation_packages` and `compile_external_modules` to ensure all installation scripts are called and the installation is complete.
+- The first step is to define the `COCOA_OUTPUT_VERBOSE` and `COSMOLIKE_DEBUG_MODE` flags to obtain a more detailed output. To accomplish that, we advise users to uncomment the lines below that are part of the `set_installation_options.sh` script and then restart the cocoa private environment by running `source stop_cocoa.sh; source start_cocoa.sh`
+
+      # ------------------------------------------------------------------------------
+      # VERBOSE AS DEBUG TOOL --------------------------------------------------------
+      # ------------------------------------------------------------------------------
+      export COCOA_OUTPUT_VERBOSE=1
+
+      # ------------------------------------------------------------------------------
+      # If set, COSMOLIKE will compile with DEBUG flags ------------------------------
+      # ------------------------------------------------------------------------------
+      export COSMOLIKE_DEBUG_MODE=1
+
+- The second step consists of reruning the particular script that failed with verbose output set. The scripts `setup_cocoa.sh` and `compile_cocoa.sh` run many shell scripts. Users may find it advantageous to run only the routine that failed. For further information on how to do that, see the appendix [FAQ: How to compile the Boltzmann, CosmoLike, and Likelihood codes separately](#appendix_compile_separately).
+
+After fixing a particular issue, users should rerun the shell scripts `setup_cocoa.sh` and `compile_cocoa.sh` to ensure all packages are installed and compiled properly.
 
 ### :interrobang: FAQ: How to compile the Boltzmann, CosmoLike, and Likelihood codes separately <a name="appendix_compile_separately"></a>
 
-To avoid excessive compilation times during development, users can use specialized scripts located at `Cocoa/installation_scripts/` that compile only a specific module. A few examples of these scripts are: 
+To avoid excessive compilation or download times during development, users can use specialized scripts located at `Cocoa/installation_scripts/` that compile only a specific module or download only a particular dataset. A few examples of these scripts are: 
 
-        $(cocoa)(.local) source ./installation_scripts/compile_class.sh
-        $(cocoa)(.local) source ./installation_scripts/compile_camb.sh
-        $(cocoa)(.local) source ./installation_scripts/compile_planck.sh
-        $(cocoa)(.local) source ./installation_scripts/compile_act.sh
-        $(cocoa)(.local) source ./installation_scripts/setup_polychord.sh
-        # Below, we show subroutines associated with the setup_cocoa_installation_packages script
-        $(cocoa)(.local) source ./installation_scripts/setup_cpp_packages.sh
-        $(cocoa)(.local) source ./installation_scripts/setup_c_packages.sh
-        $(cocoa)(.local) source ./installation_scripts/setup_decompress_files.sh
-        $(cocoa)(.local) source ./installation_scripts/setup_pip_packages.sh
+     $(cocoa)(.local) source ./installation_scripts/compile_act.sh
+     $(cocoa)(.local) source ./installation_scripts/compile_camb.sh
+     $(cocoa)(.local) source ./installation_scripts/compile_class.sh
+     $(cocoa)(.local) source ./installation_scripts/compile_planck.sh
+     $(cocoa)(.local) source ./installation_scripts/compile_polychord.sh
 
-In the commands above, we displayed `$(cocoa)(.local)` to emphasize that the users must first activate the cocoa conda environment and run `source start_cocoa` in the main Cocoa folder before running the scripts inside the `Cocoa/installation_scripts` folder.
+Below, we show the shell subroutines that download packages from their original git repositories 
+
+     $(cocoa)(.local) source ./installation_scripts/setup_camb.sh
+     $(cocoa)(.local) source ./installation_scripts/setup_class.sh
+     $(cocoa)(.local) source ./installation_scripts/setup_polychord.sh
+     $(cocoa)(.local) source ./installation_scripts/setup_cobaya.sh
+
+To ensure these scripts can download and install these packages, users must be sure that the environment keys below are *NOT* set. These keys are shown on `set_installation_options.sh`. The command `unset -v` unset them. 
+      
+     unset -v IGNORE_CAMB_COMPILATION
+     unset -v IGNORE_CLASS_COMPILATION
+     unset -v IGNORE_POLYCHORD_COMPILATION
+     unset -v IGNORE_PLANCK_COMPILATION
+     unset -v IGNORE_ACT_COMPILATION
+     unset -v IGNORE_ALL_COBAYA_INSTALLATION
+     unset -v IGNORE_ALL_COBAYA_INSTALLATION
+
+Below, we show the shell subroutines that download and unpack data from multiple experiments. 
+
+     $(cocoa)(.local) source ./installation_scripts/unxv_act_dr6.sh
+     $(cocoa)(.local) source ./installation_scripts/unxv_bao.sh
+     $(cocoa)(.local) source ./installation_scripts/unxv_bicep.sh
+     $(cocoa)(.local) source ./installation_scripts/unxv_camspec.sh
+     $(cocoa)(.local) source ./installation_scripts/unxv_h0licow.sh
+     $(cocoa)(.local) source ./installation_scripts/unxv_lipop.sh
+     $(cocoa)(.local) source ./installation_scripts/unxv_planck2018_basic.sh
+     $(cocoa)(.local) source ./installation_scripts/unxv_simons_observatory.sh
+     $(cocoa)(.local) source ./installation_scripts/unxv_sn.sh
+     $(cocoa)(.local) source ./installation_scripts/unxv_spt.sh
+
+To ensure these scripts can download these datasets, users must be sure that the environment keys below are *NOT* set. These keys are shown on `set_installation_options.sh`. The command `unset -v` unset them. 
+
+     unset -v SKIP_DECOMM_ACT
+     unset -v SKIP_DECOMM_BAO
+     unset -v SKIP_DECOMM_BICEP
+     unset -v SKIP_DECOMM_CAMSPEC
+     unset -v SKIP_DECOMM_STRONG_LENSING
+     unset -v SKIP_DECOMM_LIPOP
+     unset -v SKIP_DECOMM_PLANCK
+     unset -v SKIP_DECOMM_SIMONS_OBSERVATORY
+     unset -v SKIP_DECOMM_SN
+     unset -v SKIP_DECOMM_SPT
 
 ### :interrobang: FAQ: How do you run cocoa on your laptop? The docker image named *whovian-cocoa* <a name="appendix_jupyter_whovian"></a>
 
