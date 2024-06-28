@@ -270,7 +270,7 @@ To avoid excessive compilation or download times during development, users can u
      $(cocoa)(.local) source ./installation_scripts/compile_planck.sh
      $(cocoa)(.local) source ./installation_scripts/compile_polychord.sh
 
-Below, we show the shell subroutines that download packages from their original git repositories 
+Below, we show the shell subroutines that download external modules from their original git repositories 
 
      $(cocoa)(.local) source ./installation_scripts/setup_camb.sh
      $(cocoa)(.local) source ./installation_scripts/setup_class.sh
