@@ -92,6 +92,7 @@ declare -a TSCRIPTS=("setup_core_packages.sh"
                      "unxv_lipop.sh"
                      "setup_pip_core_packages.sh"
                      "setup_cobaya.sh"
+                     "setup_act_dr4.sh"
                      "setup_polychord.sh"
                      "setup_camb.sh"
                      "setup_class.sh") # T = TMP
