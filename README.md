@@ -200,7 +200,7 @@ This behavior enables users to work on multiple instances of Cocoa simultaneousl
 
 - The script *set_installation_options script* contains a few additional flags that may be useful. Some of these flags are shown below:
 
-      [Extracted from set_installation_options script]
+      [Extracted from set_installation_options.sh script]
       # ------------------------------------------------------------------------------
       # VERBOSE AS DEBUG TOOL --------------------------------------------------------
       # ------------------------------------------------------------------------------
@@ -241,11 +241,14 @@ This behavior enables users to work on multiple instances of Cocoa simultaneousl
       #export IGNORE_PLANCK_COMPILATION=1
       #export IGNORE_ACT_COMPILATION=1
       #export IGNORE_ALL_COBAYA_INSTALLATION=1
+
+      (...)
  
 Steps to debug Cocoa
 
 - The first step is to define the `COCOA_OUTPUT_VERBOSE` and `COSMOLIKE_DEBUG_MODE` flags to obtain a more detailed output. To accomplish that, we advise users to uncomment the lines below that are part of the `set_installation_options.sh` script and then restart the cocoa private environment by running `source stop_cocoa.sh; source start_cocoa.sh`
 
+      [Extracted from set_installation_options.sh script] 
       # ------------------------------------------------------------------------------
       # VERBOSE AS DEBUG TOOL --------------------------------------------------------
       # ------------------------------------------------------------------------------
@@ -256,13 +259,15 @@ Steps to debug Cocoa
       # ------------------------------------------------------------------------------
       export COSMOLIKE_DEBUG_MODE=1
 
+      (....)
+
 - The second step consists of rerunning the particular script that failed with the verbose output set. The scripts `setup_cocoa.sh` and `compile_cocoa.sh` run many shell scripts. Users may find it advantageous to run only the routine that failed. For further information on how to do that, see the appendix [FAQ: How to compile the Boltzmann, CosmoLike, and Likelihood codes separately](#appendix_compile_separately).
 
 After fixing a particular issue, users should rerun the shell scripts `setup_cocoa.sh` and `compile_cocoa.sh` to ensure all packages are installed and compiled correctly.
 
 ### :interrobang: FAQ: How to compile the Boltzmann, CosmoLike, and Likelihood codes separately <a name="appendix_compile_separately"></a>
 
-To avoid excessive compilation or download times during development, users can use specialized scripts located at `Cocoa/installation_scripts/` that compile only a specific module or download only a particular dataset. A few examples of these scripts are: 
+To avoid excessive compilation or download times during development, users can use specialized scripts located at `Cocoa/installation_scripts/` that compile only a specific module or download only a particular dataset. A few examples of these scripts are (the `$(cocoa)(.local)` emphasizes they should run after activating the cocoa environment): 
 
      $(cocoa)(.local) source ./installation_scripts/compile_act.sh
      $(cocoa)(.local) source ./installation_scripts/compile_camb.sh
@@ -608,117 +613,76 @@ This method is slow and not advisable :stop_sign::thumbsdown:. When Conda is una
     
 To perform the local semi-autonomous installation, users must modify flags written on the shell scripts *set_installation_options.sh* and `installation_scripts/flags_manual_installation.sh` because the default behavior corresponds to an installation via Conda. First, select the environmental key `MANUAL_INSTALLATION` as shown below:
 
-    [Extracted from set_installation_options script] 
-    
-	# --------------------------------------------------------------------------------------------------------------
-	# HOW COCOA SHOULD BE INSTALLED? -----------------------------------------------------
-	# --------------------------------------------------------------------------------------------------------------
-	#export MINICONDA_INSTALLATION=1
-	export MANUAL_INSTALLATION=1
+    [Extracted from set_installation_options.sh script] 
+    # ------------------------------------------------------------------------------------
+    # HOW COCOA SHOULD BE INSTALLED? -----------------------------------------------------
+    # ------------------------------------------------------------------------------------
+    #export MINICONDA_INSTALLATION=1
+    export MANUAL_INSTALLATION=1
     
 Finally, set the following environmental keys:
  
     [Extracted from `installation_scripts/flags_manual_installation.sh` shell script]
-  
-        # ---------------------------------------------------------------------------------------------------------------
-        # IF SET, COCOA DOES NOT USE SYSTEM PIP PACKAGES -----------------------------
-        # ---------------------------------------------------------------------------------------------------------------
-        export DONT_USE_SYSTEM_PIP_PACKAGES=1
+    # ------------------------------------------------------------------------------------
+    # IF SET, COCOA DOES NOT USE SYSTEM PIP PACKAGES -------------------------------------
+    # ------------------------------------------------------------------------------------
+    export DONT_USE_SYSTEM_PIP_PACKAGES=1
 
-	(...)
+    (...)
 
-        # -------------------------------------------------------------------------------------------------------------------------
-        # USER NEEDS TO SPECIFY THE FLAGS BELOW SO COCOA CAN FIND PYTHON / GCC
-        # -------------------------------------------------------------------------------------------------------------------------
+    # ------------------------------------------------------------------------------------
+    # USER NEEDS TO SPECIFY THE FLAGS BELOW SO COCOA CAN FIND PYTHON / GCC ---------------
+    # ------------------------------------------------------------------------------------
 	
-	export PYTHON_VERSION=3.8
-	
-	export GLOBALPYTHON3=
-	
-	export GLOBAL_PACKAGES_LOCATION=
-	
-	export GLOBALPIP3=
-	
-	export GIT=
-	
-	export WGET=
-	
-	export CURL=
+    export PYTHON_VERSION=XXX
+    export GLOBALPYTHON3=XXX
+    export GLOBAL_PACKAGES_LOCATION=XXX
+    export GLOBALPIP3=XXX
+    export GIT=XXX
+    export WGET=XXX
+    export CURL=XXX
 
-        # -------------------------------------------------------------------------------------------------------------------------
+    # ------------------------------------------------------------------------------------
 
-        export PATH=XXX:$PATH
-
-        export CFLAGS="${CFLAGS} -IXXX"
-
-        export LDFLAGS="${LDFLAGS} -LXXX"
-
-        export C_INCLUDE_PATH=XXX:$C_INCLUDE_PATH
-
-        export CPLUS_INCLUDE_PATH=XXX:$CPLUS_INCLUDE_PATH
-
-        export PYTHONPATH=XXX:$PYTHONPATH
-
-        export LD_RUN_PATH=XXX:$LD_RUN_PATH
-   
-        export LIBRARY_PATH=XXX:$LIBRARY_PATH
-
-        export CMAKE_INCLUDE_PATH=XXX:$CMAKE_INCLUDE_PATH
-
-        export CMAKE_LIBRARY_PATH=XXX:$CMAKE_LIBRARY_PATH
-
-        export INCLUDE_PATH=XXX:$INCLUDE_PATH
-
-        export INCLUDE=XXX:$INCLUDE
-
-        export CPATH=XXX:$CPATH
-
-        export OBJC_INCLUDE_PATH=XXX:$OBJC_INCLUDE_PATH
-
-        export OBJC_PATH=XXX:$OBJC_PATH
+    export PATH=XXX:$PATH
+    export CFLAGS="${CFLAGS} -IXXX"
+    export LDFLAGS="${LDFLAGS} -LXXX"
+    export C_INCLUDE_PATH=XXX:$C_INCLUDE_PATH
+    export CPLUS_INCLUDE_PATH=XXX:$CPLUS_INCLUDE_PATH
+    export PYTHONPATH=XXX:$PYTHONPATH
+    export LD_RUN_PATH=XXX:$LD_RUN_PATH
+    export LIBRARY_PATH=XXX:$LIBRARY_PATH
+    export CMAKE_INCLUDE_PATH=XXX:$CMAKE_INCLUDE_PATH
+    export CMAKE_LIBRARY_PATH=XXX:$CMAKE_LIBRARY_PATH
+    export INCLUDE_PATH=XXX:$INCLUDE_PATH
+    export INCLUDE=XXX:$INCLUDE
+    export CPATH=XXX:$CPATH
+    export OBJC_INCLUDE_PATH=XXX:$OBJC_INCLUDE_PATH
+    export OBJC_PATH=XXX:$OBJC_PATH
                 
-        # ---------------------------------------------------------------------------------------------------------------------
-        # COMPILER ----------------------------------------------------------------------------------------------------
-        # ---------------------------------------------------------------------------------------------------------------------
+    # ------------------------------------------------------------------------------------
+    # COMPILER ---------------------------------------------------------------------------
+    # ------------------------------------------------------------------------------------
+    export C_COMPILER=
+    export CXX_COMPILER=
+    export FORTRAN_COMPILER=
+    export MPI_CC_COMPILER=
+    export MPI_CXX_COMPILER=    
+    export MPI_FORTRAN_COMPILER=
 
-        export C_COMPILER=
-        
-        export CXX_COMPILER=
-        
-        export FORTRAN_COMPILER=
-        
-        export MPI_CC_COMPILER=
-        
-        export MPI_CXX_COMPILER=
-        
-        export MPI_FORTRAN_COMPILER=
-
-        # ---------------------------------------------------------------------------------------------------------------------
-        # FINE-TUNNING OVER THE USE OF SYSTEM-WIDE PACKAGES ---------------------------
-        # ---------------------------------------------------------------------------------------------------------------------
-
-        #export IGNORE_XZ_INSTALLATION=1
-
-	#export IGNORE_DISTUTILS_INSTALLATION=1
-
-	#export IGNORE_C_GSL_INSTALLATION=1
-
-	#export IGNORE_C_CFITSIO_INSTALLATION=1
-
-	#export IGNORE_C_FFTW_INSTALLATION=1
-
-	#export IGNORE_CPP_BOOST_INSTALLATION=1
-
-	#export IGNORE_CMAKE_INSTALLATION=1
-
-	#export IGNORE_OPENBLAS_INSTALLATION=1
-
-	#export IGNORE_FORTRAN_LAPACK_INSTALLATION=1
-
-	#export IGNORE_CPP_ARMA_INSTALLATION=1
-
-	#export IGNORE_HDF5_INSTALLATION=1
-
-	#export IGNORE_EXPAT_CORE_PACKAGE=1
-
-	#export IGNORE_PIP_CORE_PACKAGES=1
+    # ------------------------------------------------------------------------------------
+    # FINE-TUNNING OVER THE USE OF SYSTEM-WIDE PACKAGES ---------------------------------
+    # ------------------------------------------------------------------------------------
+    #export IGNORE_XZ_INSTALLATION=1
+    #export IGNORE_DISTUTILS_INSTALLATION=1
+    #export IGNORE_C_GSL_INSTALLATION=1
+    #export IGNORE_C_CFITSIO_INSTALLATION=1
+    #export IGNORE_C_FFTW_INSTALLATION=1
+    #export IGNORE_CPP_BOOST_INSTALLATION=1
+    #export IGNORE_CMAKE_INSTALLATION=1
+    #export IGNORE_OPENBLAS_INSTALLATION=1
+    #export IGNORE_FORTRAN_LAPACK_INSTALLATION=1
+    #export IGNORE_CPP_ARMA_INSTALLATION=1
+    #export IGNORE_HDF5_INSTALLATION=1
+    #export IGNORE_EXPAT_CORE_PACKAGE=1
+    #export IGNORE_PIP_CORE_PACKAGES=1
