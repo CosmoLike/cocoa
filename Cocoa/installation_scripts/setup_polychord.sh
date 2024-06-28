@@ -97,8 +97,8 @@ if [ -z "${IGNORE_POLYCHORD_COMPILATION}" ]; then
   fi
   
   # ---------------------------------------------------------------------------
-  # ----------- Patch POLY to be compatible w/ COCOA environment --------------
-  # We patch the files below so they use the right compilers
+  # Patch POLY to be compatible w/ COCOA environment --------------------------
+  # We patch the files below so they use the right compilers ------------------
   # ---------------------------------------------------------------------------
   declare -a TFOLDER=("" 
                       "" ) # If nonblank, path must include /

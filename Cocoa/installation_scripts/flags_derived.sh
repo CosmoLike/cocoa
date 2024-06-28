@@ -116,6 +116,7 @@ fail_script_msg () {
 # ----------------------------------------------------------------------------
 # ------------------------------- ERROR CODES --------------------------------
 # ----------------------------------------------------------------------------
+
 export EC1="PYTHON SETUP CLEAN"
 
 export EC2="MAKE CLEAN"
@@ -190,12 +191,3 @@ export COCOA_SPDLOG_DIR=spdlog/
 
 export COCOA_CARMA_DIR=carma/
 
-# ------------------------------------------------------------------------------
-# --------------- CONTROL OVER THE COMPILATION OF EXTERNAL CODES ---------------
-# ------------------------------------------------------------------------------
-#export IGNORE_CAMB_COMPILATION=1
-#export IGNORE_CLASS_COMPILATION=1
-#export IGNORE_COSMOLIKE_COMPILATION=1
-#export IGNORE_POLYCHORD_COMPILATION=1
-#export IGNORE_PLANCK_COMPILATION=1
-#export IGNORE_ACT_COMPILATION=1
