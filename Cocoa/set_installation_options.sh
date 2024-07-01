@@ -26,7 +26,7 @@ export MINICONDA_INSTALLATION=1
 # ------------------------------------------------------------------------------
 # If set, COSMOLIKE will compile with DEBUG flags ------------------------------
 # ------------------------------------------------------------------------------
-export COSMOLIKE_DEBUG_MODE=1
+#export COSMOLIKE_DEBUG_MODE=1
 
 # ------------------------------------------------------------------------------
 # The flags below allow users to skip downloading specific datasets ------------
