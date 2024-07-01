@@ -101,3 +101,6 @@ hdf5-*.tar.xz
 armadillo-*.tar.xz
 cuba.xz
 cuba*.xz
+cuba*/
+wget.xz
+wget*/
