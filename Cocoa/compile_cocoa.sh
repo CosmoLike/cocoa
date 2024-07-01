@@ -30,6 +30,7 @@ declare -a TSCRIPTS=("compile_camb.sh"
                      "compile_planck.sh" 
                      "compile_act_dr4.sh"
                      "compile_polychord.sh"
+                     "compile_velocileptors.sh"
                      ) # T = TMP
 
 for (( i=0; i<${#TSCRIPTS[@]}; i++ ));
