@@ -12,7 +12,7 @@ if [ -z "${IGNORE_VELOCILEPTORS_COMPILATION}" ]; then
   ( source "${ROOTDIR:?}/installation_scripts/flags_check.sh" ) || return 1;
 
   unset_env_vars () {
-    unset -v URL CCIL ECODEF FOLDER PACKDIR CHANGES TFOLDER TFILE TFILEP AL
+    unset -v URL CCIL ECODEF FOLDER PACKDIR
     cdroot || return 1;
   }
 
@@ -56,8 +56,6 @@ if [ -z "${IGNORE_VELOCILEPTORS_COMPILATION}" ]; then
   ptop 'INSTALLING VELOCILEPTORS' || return 1;
 
   URL="${VELOCILEPTORS_URL:-"https://github.com/sfschen/velocileptors.git"}"
-
-  CHANGES="${CCIL:?}/camb_changes"
 
   # E = EXTERNAL, CODE, F=FODLER
   ECODEF="${ROOTDIR:?}/external_modules/code"

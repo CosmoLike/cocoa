@@ -124,12 +124,10 @@ export ACTDR4_NAME="pyactlike"
 export ACT_DR6_DATA_URL="https://lambda.gsfc.nasa.gov/data/suborbital/ACT/ACT_dr6/likelihood/data"
 export ACT_DR6_DATA_FILE="ACT_dr6_likelihood_v1.2.tgz"
 
-
 export SO_DATA_URL="https://portal.nersc.gov/cfs/sobs/users/MFLike_data"
 # Cocoa can download multiple versions of the data (to reproduce existing work)
 # This is only possible because each version is saved on a separated folder
 export SO_DATA_VERSION="v0.7.1 v0.8"
-
 
 export VELOCILEPTORS_URL="https://github.com/sfschen/velocileptors.git"
 export VELOCILEPTORS_GIT_COMMIT="889a0c98895831eb23b250a26162cfb8a93237bd"
