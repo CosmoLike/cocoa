@@ -95,7 +95,8 @@ declare -a TSCRIPTS=("setup_core_packages.sh"
                      "setup_act_dr4.sh"
                      "setup_polychord.sh"
                      "setup_camb.sh"
-                     "setup_class.sh") # T = TMP
+                     "setup_class.sh"
+                     "setup_velocileptors.sh") # T = TMP
 
 for (( i=0; i<${#TSCRIPTS[@]}; i++ ));
 do

@@ -2,7 +2,7 @@
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
-if [ -z "${IGNORE_CAMB_COMPILATION}" ]; then
+if [ -z "${IGNORE_VELOCILEPTORS_COMPILATION}" ]; then
 
   if [ -z "${ROOTDIR}" ]; then
     source start_cocoa.sh || { pfail 'ROOTDIR'; return 1; }
@@ -53,16 +53,16 @@ if [ -z "${IGNORE_CAMB_COMPILATION}" ]; then
 
   # ---------------------------------------------------------------------------
   
-  ptop 'INSTALLING CAMB' || return 1;
+  ptop 'INSTALLING VELOCILEPTORS' || return 1;
 
-  URL="${CAMB_URL:-"https://github.com/cmbant/CAMB"}"
+  URL="${VELOCILEPTORS_URL:-"https://github.com/sfschen/velocileptors.git"}"
 
   CHANGES="${CCIL:?}/camb_changes"
 
   # E = EXTERNAL, CODE, F=FODLER
   ECODEF="${ROOTDIR:?}/external_modules/code"
 
-  FOLDER=${CAMB_NAME:-"CAMB"}
+  FOLDER=${VELOCILEPTORS_NAME:-"velocileptors"}
 
   PACKDIR="${ECODEF:?}/${FOLDER:?}"
 
@@ -84,47 +84,14 @@ if [ -z "${IGNORE_CAMB_COMPILATION}" ]; then
   
   cdfolder "${PACKDIR}" || { cdroot; return 1; }
 
-  if [ -n "${CAMB_GIT_COMMIT}" ]; then
-    "${GIT:?}" checkout "${CAMB_GIT_COMMIT:?}" \
+  if [ -n "${VELOCILEPTORS_GIT_COMMIT}" ]; then
+    "${GIT:?}" checkout "${VELOCILEPTORS_GIT_COMMIT:?}" \
       >${OUT1:?} 2>${OUT2:?} || { error "${EC16:?}"; return 1; }
   fi
-  
-  # ---------------------------------------------------------------------------
-  # Patch CAMB to be compatible w/ COCOA environment --------------------------
-  # We patch the files below so they use the right compilers ------------------
-  # ---------------------------------------------------------------------------
-  # T = TMP
-  declare -a TFOLDER=("camb/" 
-                      "fortran/" 
-                      "forutils/") # If nonblank, path must include /
-  
-  # T = TMP
-  declare -a TFILE=("_compilers.py" 
-                    "Makefile" 
-                    "Makefile_compiler")
-
-  #T = TMP, P = PATCH
-  declare -a TFILEP=("_compilers.patch" 
-                     "Makefile.patch" 
-                     "Makefile_compiler.patch")
-
-  # AL = Array Length
-  AL=${#TFOLDER[@]}
-
-  for (( i=0; i<${AL}; i++ ));
-  do
-    cdfolder "${PACKDIR:?}/${TFOLDER[$i]}" || return 1
-
-    cpfolder "${CHANGES:?}/${TFOLDER[$i]}${TFILEP[$i]:?}" . \
-      2>${OUT2:?} || return 1;
-
-    patch -u "${TFILE[$i]:?}" -i "${TFILEP[$i]:?}" >${OUT1:?} \
-      2>${OUT2:?} || { error "${EC17:?} (${TFILE[$i]:?})"; return 1; }
-  done
-  
+    
   cdfolder "${ROOTDIR}" || return 1
   
-  pbottom 'INSTALLING CAMB' || return 1
+  pbottom 'INSTALLING VELOCILEPTORS' || return 1
   
   # ---------------------------------------------------------------------------
 

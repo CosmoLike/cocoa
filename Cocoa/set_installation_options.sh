@@ -130,6 +130,10 @@ export SO_DATA_URL="https://portal.nersc.gov/cfs/sobs/users/MFLike_data"
 # This is only possible because each version is saved on a separated folder
 export SO_DATA_VERSION="v0.7.1 v0.8"
 
+
+export VELOCILEPTORS_URL="https://github.com/sfschen/velocileptors.git"
+export VELOCILEPTORS_GIT_COMMIT="889a0c98895831eb23b250a26162cfb8a93237bd"
+export VELOCILEPTORS_NAME="velocileptors"
 # ------------------------------------------------------------------------------
 # The keys below control which packages will be installed and compiled when ----  
 # running setup/compile_cocoa.sh. They are mostly helpful when debugging cocoa -
@@ -142,7 +146,8 @@ export SO_DATA_VERSION="v0.7.1 v0.8"
 #export IGNORE_PLANCK_COMPILATION=1
 #export IGNORE_ACTDR4_COMPILATION=1
 #export IGNORE_ACTDR6_COMPILATION=1
-#export IGNORE_CPP_CUBA_INSTALLATION=1
+export IGNORE_CPP_CUBA_INSTALLATION=1
+#export IGNORE_VELOCILEPTORS_COMPILATION=1
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
