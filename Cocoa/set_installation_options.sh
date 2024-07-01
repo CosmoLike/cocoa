@@ -145,7 +145,7 @@ export VELOCILEPTORS_NAME="velocileptors"
 #export IGNORE_ACTDR4_COMPILATION=1
 #export IGNORE_ACTDR6_COMPILATION=1
 export IGNORE_CPP_CUBA_INSTALLATION=1
-#export IGNORE_VELOCILEPTORS_COMPILATION=1
+export IGNORE_VELOCILEPTORS_COMPILATION=1
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
