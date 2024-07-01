@@ -228,6 +228,8 @@ if [ -z "${IGNORE_CMAKE_INSTALLATION}" ]; then
 
   unset -v URL FOLDER VER XZF PACKAGE_VERSION
 
+  # COMPILING CMAKE
+
   pbottom "GETTING CMAKE LIBRARY (CORE LIBS)" || return 1;
 
 fi
@@ -240,7 +242,7 @@ if [ -z "${IGNORE_WGET_INSTALLATION}" ]; then
   
   ptop "GETTING WGET LIBRARY (CORE LIBS)" || return 1;
 
-  PACKAGE_VERSION="${CMAKE_VERSION:-"1.24.5"}"
+  PACKAGE_VERSION="${WGET_VERSION:-"1.24.5"}"
 
   FOLDER="wget-${PACKAGE_VERSION:?}"
 
@@ -250,6 +252,9 @@ if [ -z "${IGNORE_WGET_INSTALLATION}" ]; then
   
   XZF="wget.xz"
 
+  # note: Circular dependence (wget depends on wget!). Why? 
+  # note: The wget commands show progress bar when downloading large likelihoods
+  # note: The specific progress bar option only exists on recent wget versions  
   wgetact "${FOLDER:?}" "${FILE:?}" "${URL:?}" \
     "${COCOA_WGET_DIR:-"${FOLDER:?}"}" "${XZF:?}" || return 1;
 
@@ -323,9 +328,9 @@ if [ -z "${IGNORE_OPENBLAS_INSTALLATION}" ]; then
 
   PACKAGE_VERSION="${OPENBLAS_VERSION:-"0.3.23"}" 
 
-  URL='https://github.com/OpenMathLib/OpenBLAS.git'
-
   FOLDER="OpenBLAS-${PACKAGE_VERSION:?}"
+
+  URL='https://github.com/OpenMathLib/OpenBLAS.git'
 
   VER="v${PACKAGE_VERSION:?}"
 
@@ -350,9 +355,9 @@ if [ -z "${IGNORE_FORTRAN_LAPACK_INSTALLATION}" ]; then
 
   PACKAGE_VERSION="${LAPACK_VERSION:-"3.11"}" 
 
-  URL='https://github.com/Reference-LAPACK/lapack.git'
-
   FOLDER="lapack-${PACKAGE_VERSION:?}"
+
+  URL='https://github.com/Reference-LAPACK/lapack.git'
 
   VER=v"${PACKAGE_VERSION:?}"
 

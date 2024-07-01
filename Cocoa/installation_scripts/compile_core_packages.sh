@@ -12,7 +12,7 @@ if [ -z "${IGNORE_CORE_INSTALLATION}" ]; then
   ( source "${ROOTDIR:?}/installation_scripts/flags_check.sh" ) || return 1;
     
   unset_env_vars () {
-    unset -v CCIL BDF PACKDIR FOLDER MAKE_NB_JOBS
+    unset -v CCIL BDF PACKDIR FOLDER MAKE_NB_JOBS PACKAGE_VERSION DEFAULT
     cdroot || return 1;
   }
 
@@ -54,9 +54,13 @@ if [ -z "${IGNORE_CORE_INSTALLATION}" ]; then
   
   if [ -z "${IGNORE_CMAKE_INSTALLATION}" ]; then
     
-    ptop 'COMPILING CMAKE LIBRARY' || return 1
+    ptop 'COMPILING CMAKE LIBRARY (CORE LIBS)' || return 1
 
-    FOLDER=${COCOA_CMAKE_DIR:-"cmake-3.26.4/"}
+    PACKAGE_VERSION="${CMAKE_VERSION:-"3.26.4"}"
+
+    DEFAULT="cmake-${PACKAGE_VERSION:?}/"
+
+    FOLDER=${COCOA_CMAKE_DIR:-"${DEFAULT:?}"}
 
     PACKDIR="${CCIL:?}/${FOLDER:?}"
 
@@ -72,12 +76,57 @@ if [ -z "${IGNORE_CORE_INSTALLATION}" ]; then
     make install \
       >${OUT1:?} 2>${OUT2:?} || { error "(CMAKE) ${EC10:?}"; return 1; }
 
-    unset -v PACKDIR FOLDER
+    unset -v PACKDIR FOLDER PACKAGE_VERSION DEFAULT
 
     cdfolder "${ROOTDIR}" || return 1;
 
-    pbottom 'COMPILING CMAKE LIBRARY' || return 1
+    pbottom 'COMPILING CMAKE LIBRARY (CORE LIBS)' || return 1
   
+  fi
+
+  # ----------------------------------------------------------------------------
+  # ------------------------------ WGET LIBRARY --------------------------------
+  # ----------------------------------------------------------------------------
+  
+  if [ -z "${IGNORE_WGET_INSTALLATION}" ]; then
+
+    pbottom "COMPILING WGET LIBRARY (CORE LIBS)" || return 1;
+    
+    PACKAGE_VERSION="${WGET_VERSION:-"1.24.5"}"
+
+    DEFAULT="wget-${PACKAGE_VERSION:?}"
+
+    FOLDER=${COCOA_WGET_DIR:-"${DEFAULT:?}"}
+
+    PACKDIR="${CCIL:?}/${FOLDER:?}"
+
+    cdfolder "${PACKDIR}" || return 1;
+
+    FC="${FORTRAN_COMPILER:?}" CC="${C_COMPILER:?}" \
+      ./configure \
+      --prefix="${ROOTDIR:?}/.local" \
+      >${OUT1:?} 2>${OUT2:?} || { error "(WGET) ${EC11:?}"; return 1; }
+
+    # --------------------------------------------------------------------------
+    # note: in case script run >1x w/ previous run stoped prematurely b/c error
+    
+    make clean \
+      >${OUT1:?} 2>${OUT2:?} || { error "(WGET) ${EC2:?}"; return 1; }
+
+    # --------------------------------------------------------------------------
+    
+    make -j $MNT all \
+      >${OUT1:?} 2>${OUT2:?} || { error "(WGET) ${EC7:?}"; return 1; }
+      
+    make install \
+      >${OUT1:?} 2>${OUT2:?} || { error "(WGET) ${EC10:?}"; return 1; }
+
+    unset -v PACKDIR FOLDER DEFAULT PACKAGE_VERSION
+
+    cdfolder "${ROOTDIR}" || return 1;
+
+    pbottom "COMPILING WGET LIBRARY (CORE LIBS)" || return 1;
+
   fi
 
   # ----------------------------------------------------------------------------
@@ -86,9 +135,13 @@ if [ -z "${IGNORE_CORE_INSTALLATION}" ]; then
   
   if [ -z "${IGNORE_DISTUTILS_INSTALLATION}" ]; then
 
-    ptop 'COMPILING TEXINFO LIBRARY' || return 1;
+    ptop 'COMPILING TEXINFO LIBRARY (CORE LIBS)' || return 1;
+    
+    PACKAGE_VERSION="${TEXTINFO_VERSION:-"7.0.3"}"
 
-    FOLDER=${COCOA_TEXINFO_DIR:-"texinfo-7.0.3/"}
+    DEFAULT="texinfo-${PACKAGE_VERSION:?}"
+
+    FOLDER=${COCOA_TEXINFO_DIR:-"${DEFAULT:?}"}
 
     PACKDIR="${CCIL:?}/${FOLDER:?}"
 
@@ -114,11 +167,11 @@ if [ -z "${IGNORE_CORE_INSTALLATION}" ]; then
     make install \
       >${OUT1:?} 2>${OUT2:?} || { error "(TEXINFO) ${EC10:?}"; return 1; }
 
-    unset -v PACKDIR FOLDER
+    unset -v PACKDIR FOLDER DEFAULT PACKAGE_VERSION
 
     cdfolder "${ROOTDIR}" || return 1;
     
-    pbottom 'COMPILING TEXINFO LIBRARY' || return 1;
+    pbottom 'COMPILING TEXINFO LIBRARY (CORE LIBS)' || return 1;
   
   fi
 
@@ -128,9 +181,13 @@ if [ -z "${IGNORE_CORE_INSTALLATION}" ]; then
   
   if [ -z "${IGNORE_DISTUTILS_INSTALLATION}" ]; then
   
-    ptop 'COMPILING BINUTILS LIBRARY' || return 1;
+    ptop 'COMPILING BINUTILS LIBRARY (CORE LIBS)' || return 1;
     
-    FOLDER=${COCOA_BINUTILS_DIR:-"binutils-2.37/"}
+    PACKAGE_VERSION="${BINUTILS_VERSION:-"2.37"}"
+
+    DEFAULT="binutils-${PACKAGE_VERSION:?}"
+
+    FOLDER=${COCOA_BINUTILS_DIR:-"${DEFAULT:?}"}
 
     PACKDIR="${CCIL:?}/${FOLDER:?}"
 
@@ -155,11 +212,11 @@ if [ -z "${IGNORE_CORE_INSTALLATION}" ]; then
     make install \
       >${OUT1:?} 2>${OUT2:?} || { error "(BINUTILS) ${EC10:?}"; return 1; }
 
-    unset -v PACKDIR FOLDER
+    unset -v PACKDIR FOLDER DEFAULT PACKAGE_VERSION
 
     cdfolder "${ROOTDIR}" || return 1;
 
-    pbottom 'COMPILING BINUTILS LIBRARY' || return 1;
+    pbottom 'COMPILING BINUTILS LIBRARY (CORE LIBS)' || return 1;
   
   fi
 
@@ -169,7 +226,7 @@ if [ -z "${IGNORE_CORE_INSTALLATION}" ]; then
   
   if [ -z "${IGNORE_HDF5_INSTALLATION}" ]; then
   
-    ptop 'COMPILING HFD5 LIBRARY' || return 1;
+    ptop 'COMPILING HFD5 LIBRARY (CORE LIBS)' || return 1;
   
     FOLDER=${COCOA_HDF5_DIR:-"hdf5-1.12.3/"}
 
@@ -208,7 +265,7 @@ if [ -z "${IGNORE_CORE_INSTALLATION}" ]; then
     
     cdfolder "${ROOTDIR}" || return 1;
 
-    pbottom 'COMPILING HDF5 LIBRARY DONE' || return 1;
+    pbottom 'COMPILING HDF5 LIBRARY DONE (CORE LIBS)' || return 1;
   
   fi
 
@@ -218,9 +275,13 @@ if [ -z "${IGNORE_CORE_INSTALLATION}" ]; then
   
   if [ -z "${IGNORE_OPENBLAS_INSTALLATION}" ]; then
     
-    ptop  'COMPILING OPENBLAS LIBRARY' || return 1;
-  
-    FOLDER=${COCOA_OPENBLAS_DIR:-"OpenBLAS-0.3.23/"}
+    ptop  'COMPILING OPENBLAS LIBRARY (CORE LIBS)' || return 1;
+
+    PACKAGE_VERSION="${OPENBLAS_VERSION:-"0.3.23"}" 
+
+    DEFAULT="OpenBLAS-${PACKAGE_VERSION:?}"
+
+    FOLDER=${COCOA_OPENBLAS_DIR:-"${DEFAULT:?}"}
 
     PACKDIR="${CCIL:?}/${FOLDER:?}"
 
@@ -242,11 +303,11 @@ if [ -z "${IGNORE_CORE_INSTALLATION}" ]; then
     make install PREFIX="${ROOTDIR:?}/.local" \
       >${OUT1:?} 2>${OUT2:?} || { error "(OpenBLAS) ${EC10:?}"; return 1; }
 
-    unset -v PACKDIR  MAKE_NB_JOBS FOLDER
+    unset -v PACKDIR  MAKE_NB_JOBS FOLDER DEFAULT PACKAGE_VERSION
 
     cdfolder "${ROOTDIR:?}" || return 1;
 
-    pbottom  'COMPILING OPENBLAS LIBRARY' || return 1;
+    pbottom  'COMPILING OPENBLAS LIBRARY (CORE LIBS)' || return 1;
   
   fi
   
@@ -256,9 +317,13 @@ if [ -z "${IGNORE_CORE_INSTALLATION}" ]; then
   
   if [ -z "${IGNORE_FORTRAN_LAPACK_INSTALLATION}" ]; then
     
-    ptop 'COMPILING LAPACK FORTRAN LIBRARY' || return 1;
+    ptop 'COMPILING LAPACK FORTRAN LIBRARY (CORE LIBS)' || return 1;
 
-    FOLDER=${COCOA_LAPACK_DIR:-"lapack-3.11.0/"}
+    PACKAGE_VERSION="${LAPACK_VERSION:-"3.11"}" 
+
+    DEFAULT="lapack-${PACKAGE_VERSION:?}"
+
+    FOLDER=${COCOA_LAPACK_DIR:-"${DEFAULT:?}"}
 
     PACKDIR="${CCIL:?}/${FOLDER:?}"
     
@@ -294,11 +359,11 @@ if [ -z "${IGNORE_CORE_INSTALLATION}" ]; then
     
     # --------------------------------------------------------------------------
 
-    unset -v PACKDIR BDF FOLDER
+    unset -v PACKDIR BDF FOLDER PACKAGE_VERSION DEFAULT
 
     cdfolder "${ROOTDIR}" || return 1;
 
-    pbottom 'COMPILING LAPACK FORTRAN LIBRARY' || return 1;
+    pbottom 'COMPILING LAPACK FORTRAN LIBRARY (CORE LIBS)' || return 1;
 
   fi
   
@@ -308,9 +373,13 @@ if [ -z "${IGNORE_CORE_INSTALLATION}" ]; then
   
   if [ -z "${IGNORE_C_FFTW_INSTALLATION}" ]; then
     
-    ptop 'COMPILING FFTW C LIBRARY' || return 1
-    
-    FOLDER=${COCOA_FFTW_DIR:-"fftw-3.3.10/"}
+    ptop 'COMPILING FFTW C LIBRARY (CORE LIBS)' || return 1
+
+    PACKAGE_VERSION="${FFTW_VERSION:-"3.3.10"}" 
+
+    DEFAULT="fftw-${PACKAGE_VERSION:?}"
+
+    FOLDER=${COCOA_FFTW_DIR:-"${DEFAULT:?}"}
 
     PACKDIR="${CCIL:?}/${FOLDER:?}"
 
@@ -329,11 +398,11 @@ if [ -z "${IGNORE_CORE_INSTALLATION}" ]; then
     make install \
       >${OUT1:?} 2>${OUT2:?} || { error "(FFTW) ${EC10:?}"; return 1; }
 
-    unset -v PACKDIR FOLDER
+    unset -v PACKDIR FOLDER PACKAGE_VERSION DEFAULT
 
     cdfolder "${ROOTDIR}" || return 1;
 
-    pbottom 'COMPILING FFTW C LIBRARY' || return 1
+    pbottom 'COMPILING FFTW C LIBRARY (CORE LIBS)' || return 1
 
   fi
 
@@ -343,9 +412,13 @@ if [ -z "${IGNORE_CORE_INSTALLATION}" ]; then
   
   if [ -z "${IGNORE_C_CFITSIO_INSTALLATION}" ]; then
     
-    ptop 'COMPILING CFITSIO C LIBRARY' || return 1
+    ptop 'COMPILING CFITSIO C LIBRARY (CORE LIBS)' || return 1
 
-    FOLDER=${COCOA_CFITSIO_DIR:-"cfitsio-4.0.0/"}
+    PACKAGE_VERSION="${CFITSIO_VERSION:-"4.0.0"}" 
+
+    DEFAULT="cfitsio-${PACKAGE_VERSION:?}"
+
+    FOLDER=${COCOA_CFITSIO_DIR:-"${DEFAULT:?}"}
 
     PACKDIR="${CCIL:?}/${FOLDER:?}"
     
@@ -384,11 +457,11 @@ if [ -z "${IGNORE_CORE_INSTALLATION}" ]; then
     
     # --------------------------------------------------------------------------
 
-    unset -v PACKDIR BDF FOLDER
+    unset -v PACKDIR BDF FOLDER DEFAULT PACKAGE_VERSION
 
     cdfolder "${ROOTDIR}" || return 1;
 
-    pbottom 'COMPILING CFITSIO C LIBRARY' || return 1
+    pbottom 'COMPILING CFITSIO C LIBRARY (CORE LIBS)' || return 1
 
   fi
 
@@ -398,9 +471,13 @@ if [ -z "${IGNORE_CORE_INSTALLATION}" ]; then
   
   if [ -z "${IGNORE_C_GSL_INSTALLATION}" ]; then
     
-    ptop 'COMPILING GSL C LIBRARY' || return 1
+    ptop 'COMPILING GSL C LIBRARY (CORE LIBS)' || return 1
 
-    FOLDER=${COCOA_GSL_DIR:-"gsl-2.7/"}
+    PACKAGE_VERSION="${GSL_VERSION:-"2.7"}" 
+
+    DEFAULT="gsl-${PACKAGE_VERSION:?}"
+
+    FOLDER=${COCOA_GSL_DIR:-"${DEFAULT:?}"}
 
     PACKDIR="${CCIL:?}/${FOLDER:?}" 
 
@@ -418,11 +495,11 @@ if [ -z "${IGNORE_CORE_INSTALLATION}" ]; then
     make install \
       >${OUT1:?} 2>${OUT2:?} || { error "(GSL) ${EC10:?}"; return 1; }
 
-    unset -v PACKDIR FOLDER
+    unset -v PACKDIR FOLDER DEFAULT PACKAGE_VERSION
 
     cdfolder "${ROOTDIR}" || return 1;
 
-    pbottom 'COMPILING GSL C LIBRARY' || return 1
+    pbottom 'COMPILING GSL C LIBRARY (CORE LIBS)' || return 1
 
   fi
 
@@ -455,7 +532,7 @@ if [ -z "${IGNORE_CORE_INSTALLATION}" ]; then
   
   if [ -z "${IGNORE_CPP_SPDLOG_INSTALLATION}" ]; then
     
-    ptop 'COMPILING SPDLOG CPP LIBRARY' || return 1
+    ptop 'COMPILING SPDLOG CPP LIBRARY (CORE LIBS)' || return 1
 
     FOLDER=${COCOA_SPDLOG_DIR:-"spdlog/"}
 
@@ -486,7 +563,7 @@ if [ -z "${IGNORE_CORE_INSTALLATION}" ]; then
 
     cdfolder "${ROOTDIR}" || return 1;
 
-    pbottom 'COMPILING SPDLOG CPP LIBRARY' || return 1
+    pbottom 'COMPILING SPDLOG CPP LIBRARY (CORE LIBS)' || return 1
 
   fi
 
@@ -496,9 +573,13 @@ if [ -z "${IGNORE_CORE_INSTALLATION}" ]; then
   
   if [ -z "${IGNORE_CPP_ARMA_INSTALLATION}" ]; then
     
-    ptop 'COMPILING ARMADILLO CPP LIBRARY' || return 1
+    ptop 'COMPILING ARMADILLO CPP LIBRARY (CORE LIBS)' || return 1
 
-    FOLDER=${COCOA_ARMADILLO_DIR:-"armadillo-12.8.2/"}
+    PACKAGE_VERSION="${ARMA_VERSION:-"12.8.2"}" 
+
+    DEFAULT="armadillo-${PACKAGE_VERSION:?}"
+
+    FOLDER=${COCOA_ARMADILLO_DIR:-"${DEFAULT:?}"}
 
     PACKDIR="${CCIL:?}/${FOLDER:?}"
 
@@ -530,11 +611,11 @@ if [ -z "${IGNORE_CORE_INSTALLATION}" ]; then
     make install \
       >${OUT1:?} 2>${OUT2:?} || { error "(ARMA) ${EC10:?}"; return 1; }
 
-    unset -v PACKDIR FOLDER
+    unset -v PACKDIR FOLDER DEFAULT PACKAGE_VERSION
 
     cdfolder "${ROOTDIR}" || return 1;
 
-    pbottom 'COMPILING ARMADILLO CPP LIBRARY' || return 1
+    pbottom 'COMPILING ARMADILLO CPP LIBRARY (CORE LIBS)' || return 1
 
   fi
 
@@ -544,7 +625,7 @@ if [ -z "${IGNORE_CORE_INSTALLATION}" ]; then
   
   if [ -z "${IGNORE_CPP_CARMA_INSTALLATION}" ]; then
     
-    ptop 'COMPILING CARMA CPP LIBRARY' || return 1
+    ptop 'COMPILING CARMA CPP LIBRARY (CORE LIBS)' || return 1
 
     FOLDER=${COCOA_CARMA_DIR:-"carma/"}
 
@@ -568,7 +649,7 @@ if [ -z "${IGNORE_CORE_INSTALLATION}" ]; then
     
     cdfolder "${ROOTDIR}" || return 1;
 
-    pbottom 'COMPILING CARMA CPP LIBRARY' || return 1
+    pbottom 'COMPILING CARMA CPP LIBRARY (CORE LIBS)' || return 1
 
   fi
 
@@ -578,9 +659,13 @@ if [ -z "${IGNORE_CORE_INSTALLATION}" ]; then
   
   if [ -z "${IGNORE_CPP_BOOST_INSTALLATION}" ]; then
 
-    ptop 'COMPILING BOOST CPP LIBRARY' || return 1
+    ptop 'COMPILING BOOST CPP LIBRARY (CORE LIBS)' || return 1
 
-    FOLDER=${COCOA_BOOST_DIR:-"boost_1_81_0/"}
+    PACKAGE_VERSION="${CPP_BOOST_VERSION:-"81"}"
+
+    DEFAULT="boost_1_${PACKAGE_VERSION:?}_0"
+
+    FOLDER=${COCOA_BOOST_DIR:-"${DEFAULT:?}"}
 
     PACKDIR="${CCIL:?}/${FOLDER:?}"
 
@@ -597,11 +682,56 @@ if [ -z "${IGNORE_CORE_INSTALLATION}" ]; then
       --without-atomic \
       >${OUT1:?} 2>${OUT2:?} || { error "(BOOST) ${EC21:?}"; return 1; }
     
-    unset -v PACKDIR FOLDER
+    unset -v PACKDIR FOLDER DEFAULT PACKAGE_VERSION
 
     cdfolder "${ROOTDIR}" || return 1;
 
-    pbottom 'COMPILING BOOST CPP LIBRARY' || return 1
+    pbottom 'COMPILING BOOST CPP LIBRARY (CORE LIBS)' || return 1
+
+  fi
+
+  # ----------------------------------------------------------------------------
+  # ------------------------------ CUBA LIBRARY --------------------------------
+  # ----------------------------------------------------------------------------
+  
+  if [ -z "${IGNORE_CPP_CUBA_INSTALLATION}" ]; then
+
+    pbottom "COMPILING CUBA LIBRARY (CORE LIBS)" || return 1;
+
+    PACKAGE_VERSION="${CPP_CUBA_VERSION:-"4.2.2"}"
+
+    DEFAULT="Cuba-${PACKAGE_VERSION:?}"
+
+    FOLDER=${COCOA_WGET_DIR:-"${DEFAULT:?}"}
+
+    PACKDIR="${CCIL:?}/${FOLDER:?}"
+
+    cdfolder "${PACKDIR}" || return 1;
+
+    FC="${FORTRAN_COMPILER:?}" CC="${C_COMPILER:?}" \
+      ./configure \
+      --prefix="${ROOTDIR:?}/.local" \
+      >${OUT1:?} 2>${OUT2:?} || { error "(CUBA) ${EC11:?}"; return 1; }
+
+    # --------------------------------------------------------------------------
+    # note: in case script run >1x w/ previous run stoped prematurely b/c error
+    
+    make clean \
+      >${OUT1:?} 2>${OUT2:?} || { error "(CUBA) ${EC2:?}"; return 1; }
+
+    # --------------------------------------------------------------------------
+    
+    make -j $MNT all \
+      >${OUT1:?} 2>${OUT2:?} || { error "(CUBA) ${EC7:?}"; return 1; }
+      
+    make install \
+      >${OUT1:?} 2>${OUT2:?} || { error "(CUBA) ${EC10:?}"; return 1; }
+
+    unset -v PACKDIR FOLDER DEFAULT PACKAGE_VERSION
+
+    cdfolder "${ROOTDIR}" || return 1;
+
+    pbottom "COMPILING CUBA LIBRARY (CORE LIBS)" || return 1;
 
   fi
 
