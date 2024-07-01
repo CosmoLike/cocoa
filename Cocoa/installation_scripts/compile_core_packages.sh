@@ -17,7 +17,7 @@ if [ -z "${IGNORE_CORE_INSTALLATION}" ]; then
   }
 
   unset_env_funcs () {
-    unset -f cdfolder cpfolder error
+    unset -f cdfolder cpfolder cpfile error
     unset -f unset_env_funcs
     cdroot || return 1;
   }
@@ -36,6 +36,16 @@ if [ -z "${IGNORE_CORE_INSTALLATION}" ]; then
     
   cdfolder() {
     cd "${1:?}" 2>"/dev/null" || { error "CD FOLDER: ${1}"; return 1; }
+  }
+
+  cpfolder() {
+    cp -r "${1:?}" "${2:?}"  \
+      2>"/dev/null" || { error "CP FOLDER ${1} on ${2}"; return 1; }
+  }
+  
+  cpfile() {
+  cp "${1:?}" "${2:?}" \
+    2>"/dev/null" || { error "CP FILE ${1} on ${2}"; return 1; }
   }
   
   # ----------------------------------------------------------------------------
@@ -548,7 +558,6 @@ if [ -z "${IGNORE_CORE_INSTALLATION}" ]; then
     cdfolder "${PACKDIR}" || return 1;
     
     ${CMAKE:?} -DCMAKE_INSTALL_PREFIX="${ROOTDIR:?}/.local" \
-      -DCMAKE_C_COMPILER="${C_COMPILER:?}" \
       -DCMAKE_CXX_COMPILER="${CXX_COMPILER:?}" \
       --log-level=ERROR . \
       >${OUT1:?} 2>${OUT2:?} || { error "(SPDLOG) ${EC12:?}"; return 1; }

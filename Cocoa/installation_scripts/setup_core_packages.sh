@@ -15,7 +15,7 @@ unset_env_vars () {
 }
 
 unset_env_funcs () {
-  unset -f cdfolder cpfolder error wgetact gitact gitact1 gitact2
+  unset -f cdfolder cpfolder cpfile error wgetact gitact gitact1 gitact2
   unset -f unset_env_funcs
   cdroot || return 1;
 }
@@ -39,6 +39,11 @@ cdfolder() {
 cpfolder() {
   cp -r "${1:?}" "${2:?}"  \
     2>"/dev/null" || { error "CP FOLDER ${1} on ${2}"; return 1; }
+}
+
+cpfile() {
+  cp "${1:?}" "${2:?}" \
+    2>"/dev/null" || { error "CP FILE ${1} on ${2}"; return 1; }
 }
 
 wgetact() {
@@ -220,7 +225,9 @@ if [ -z "${IGNORE_CMAKE_INSTALLATION}" ]; then
   FOLDER="cmake-${PACKAGE_VERSION:?}"
   
   VER=v${PACKAGE_VERSION:?}
-  
+
+  # note: Do not change XFZ filename. 
+  # note: Otherwise the script unxv_core_packages.sh will stop working
   XZF="cmake.xz"
 
   gitact "${FOLDER:?}" "${VER:?}" "${URL:?}" \
@@ -249,7 +256,9 @@ if [ -z "${IGNORE_WGET_INSTALLATION}" ]; then
   FILE="tar.gz"
 
   URL="https://ftp.gnu.org/gnu/wget/${FOLDER:?}.${FILE}"
-  
+
+  # note: Do not change XFZ filename. 
+  # note: Otherwise the script unxv_core_packages.sh will stop working
   XZF="wget.xz"
 
   # note: Circular dependence (wget depends on wget!). Why? 
@@ -280,6 +289,8 @@ if [ -z "${IGNORE_DISTUTILS_INSTALLATION}" ]; then
   
   URL="https://ftp.gnu.org/gnu/binutils/${FOLDER:?}.${FILE:?}"
   
+  # note: Do not change XFZ filename. 
+  # note: Otherwise the script unxv_core_packages.sh will stop working
   XZF="binutils.xz"
 
   wgetact "${FOLDER:?}" "${FILE:?}" "${URL:?}" \
@@ -306,7 +317,9 @@ if [ -z "${IGNORE_DISTUTILS_INSTALLATION}" ]; then
   FILE="tar.xz"
   
   URL="https://ftp.gnu.org/gnu/texinfo/${FOLDER}.${FILE}"
-  
+ 
+  # note: Do not change XFZ filename. 
+  # note: Otherwise the script unxv_core_packages.sh will stop working 
   XZF="texinfo.xz"
 
   wgetact "${FOLDER:?}" "${FILE:?}" "${URL:?}" \
@@ -334,6 +347,8 @@ if [ -z "${IGNORE_OPENBLAS_INSTALLATION}" ]; then
 
   VER="v${PACKAGE_VERSION:?}"
 
+  # note: Do not change XFZ filename. 
+  # note: Otherwise the script unxv_core_packages.sh will stop working
   XZF="OpenBLAS.xz"
 
   gitact "${FOLDER:?}" "${VER:?}" "${URL:?}" \
@@ -361,6 +376,8 @@ if [ -z "${IGNORE_FORTRAN_LAPACK_INSTALLATION}" ]; then
 
   VER=v"${PACKAGE_VERSION:?}"
 
+  # note: Do not change XFZ filename. 
+  # note: Otherwise the script unxv_core_packages.sh will stop working
   XZF="lapack.xz"
 
   gitact "${FOLDER:?}" "${VER:?}" "${URL:?}" \
@@ -388,6 +405,8 @@ if [ -z "${IGNORE_HDF5_INSTALLATION}" ]; then
   
   URL="${URL_BASE:?}/manual/HDF5/HDF5_1_12_3/src/${FOLDER}.${FILE}"
 
+  # note: Do not change XFZ filename. 
+  # note: Otherwise the script unxv_core_packages.sh will stop working
   XZF="hdf5.xz"
 
   wgetact "${FOLDER:?}" "${FILE:?}" "${URL:?}" \
@@ -416,7 +435,9 @@ if [ -z "${IGNORE_C_CFITSIO_INSTALLATION}" ]; then
   URL_BASE="http://heasarc.gsfc.nasa.gov"
   
   URL="${URL_BASE}/FTP/software/fitsio/c/${FOLDER}.${FILE}"
-  
+ 
+  # note: Do not change XFZ filename. 
+  # note: Otherwise the script unxv_core_packages.sh will stop working 
   XZF="cfitsio.xz"
 
   wgetact "${FOLDER:?}" "${FILE:?}" "${URL:?}" \
@@ -444,6 +465,8 @@ if [ -z "${IGNORE_C_FFTW_INSTALLATION}" ]; then
 
   URL="http://www.fftw.org/${FOLDER}.${FILE}"
 
+  # note: Do not change XFZ filename. 
+  # note: Otherwise the script unxv_core_packages.sh will stop working
   XZF="fftw.xz"
 
   wgetact "${FOLDER:?}" "${FILE:?}" "${URL:?}" \
@@ -471,6 +494,8 @@ if [ -z "${IGNORE_C_GSL_INSTALLATION}" ]; then
 
   URL="http://ftp.wayne.edu/gnu/gsl/${FOLDER}.${FILE}"
 
+  # note: Do not change XFZ filename. 
+  # note: Otherwise the script unxv_core_packages.sh will stop working
   XZF="gsl.xz"
 
   wgetact "${FOLDER:?}" "${FILE:?}" "${URL:?}" \
@@ -498,6 +523,8 @@ if [ -z "${IGNORE_CPP_SPDLOG_INSTALLATION}" ]; then
 
   VER="v${PACKAGE_VERSION:?}"
 
+  # note: Do not change XFZ filename. 
+  # note: Otherwise the script unxv_core_packages.sh will stop working
   XZF="spdlog.xz"
 
   gitact "${FOLDER:?}" "${VER:?}" "${URL:?}" \
@@ -525,6 +552,8 @@ if [ -z "${IGNORE_CPP_ARMA_INSTALLATION}" ]; then
   
   URL="https://sourceforge.net/projects/arma/files/${FOLDER}.${FILE}"
   
+  # note: Do not change XFZ filename. 
+  # note: Otherwise the script unxv_core_packages.sh will stop working
   XZF="armadillo.xz"
 
   wgetact "${FOLDER:?}" "${FILE:?}" "${URL:?}" \
@@ -554,6 +583,8 @@ if [ -z "${IGNORE_CPP_BOOST_INSTALLATION}" ]; then
   
   URL="${URL_BASE}/1.${PACKAGE_VERSION:?}.0/source/${FOLDER}.${FILE}"
 
+  # note: Do not change XFZ filename. 
+  # note: Otherwise the script unxv_core_packages.sh will stop working
   XZF="boost.xz"
 
   wgetact "${FOLDER:?}" "${FILE:?}" "${URL:?}" \
@@ -581,6 +612,8 @@ if [ -z "${IGNORE_CPP_CUBA_INSTALLATION}" ]; then
   
   URL="https://feynarts.de/cuba/${FOLDER}.${FILE}"
 
+  # note: Do not change XFZ filename. 
+  # note: Otherwise the script unxv_core_packages.sh will stop working
   XZF="cuba.xz"
 
   wgetact "${FOLDER:?}" "${FILE:?}" "${URL:?}" \

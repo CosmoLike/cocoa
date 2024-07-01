@@ -17,7 +17,7 @@ if [ -z "${SKIP_DECOMM_CORE_PACKAGES}" ]; then
   }
 
   unset_env_funcs () {
-    unset -f cdfolder cpfolder error
+    unset -f cdfolder cpfolder cpfolder cpfile error
     unset -f unset_env_funcs
     cdroot || return 1;
   }
@@ -36,6 +36,16 @@ if [ -z "${SKIP_DECOMM_CORE_PACKAGES}" ]; then
 
   cdfolder() {
     cd "${1:?}" 2>"/dev/null" || { error "CD FOLDER: ${1}"; return 1; }
+  }
+
+  cpfolder() {
+    cp -r "${1:?}" "${2:?}"  \
+      2>"/dev/null" || { error "CP FOLDER ${1} on ${2}"; return 1; }
+  }
+
+  cpfile() {
+    cp "${1:?}" "${2:?}" \
+      2>"/dev/null" || { error "CP FILE ${1} on ${2}"; return 1; }
   }
 
   # ----------------------------------------------------------------------------
@@ -60,6 +70,8 @@ if [ -z "${SKIP_DECOMM_CORE_PACKAGES}" ]; then
                     ${IGNORE_ALL_PIP_INSTALLATION:-""}
                     ${IGNORE_ALL_PIP_INSTALLATION:-""}
                     ${IGNORE_ALL_PIP_INSTALLATION:-""}
+                    ${IGNORE_CPP_CUBA_INSTALLATION:-""}
+                    ${IGNORE_WGET_INSTALLATION:-""}
                    ) # T = TMP
 
   declare -a TFILES=("cmake"
@@ -78,6 +90,8 @@ if [ -z "${SKIP_DECOMM_CORE_PACKAGES}" ]; then
                      "pip_cache"
                      "expat"
                      "ee2"
+                     "cuba"
+                     "wget"
                     ) # T = TMP
 
   # ----------------------------------------------------------------------------
