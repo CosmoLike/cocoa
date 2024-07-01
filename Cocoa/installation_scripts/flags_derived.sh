@@ -171,6 +171,8 @@ export EC26="UNZIP (DECOMPRESS)"
 
 export EC27="GIT REPO NOT FOUND"
 
+export EC28="LOGICAL ERROR: INCOMPATIBLE FLAGS ON"
+
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
 

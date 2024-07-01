@@ -233,6 +233,10 @@ if [ -z "${IGNORE_ALL_PIP_INSTALLATION}" ]; then
   # ----------------------------------------------------------------------------
   if [ -z "${IGNORE_EMULATOR_CPU_PIP_PACKAGES}" ]; then
   
+    if [ -n "${IGNORE_EMULATOR_GPU_PIP_PACKAGES}" ]; then
+      error "${EC28:?} (GPU AND CPU EMULATOR FLAGS)"; return 1;
+    fi
+
     ptop "PIP INSTALL MACHINE LEARNING CPU-ONLY PACKAGES" || return 1
 
     env CXX="${CXX_COMPILER:?}" CC="${C_COMPILER:?}" ${PIP3:?} install \
@@ -254,6 +258,10 @@ if [ -z "${IGNORE_ALL_PIP_INSTALLATION}" ]; then
 
   if [ -z "${IGNORE_EMULATOR_GPU_PIP_PACKAGES}" ]; then
   
+    if [ -n "${IGNORE_EMULATOR_CPU_PIP_PACKAGES}" ]; then
+      error "${EC28:?} (GPU AND CPU EMULATOR FLAGS)"; return 1;
+    fi
+
     ptop "PIP INSTALL MACHINE LEARNING GPU PACKAGES"
 
     env CXX="${CXX_COMPILER:?}" CC="${C_COMPILER:?}" ${PIP3:?} install \
