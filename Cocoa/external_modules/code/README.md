@@ -110,7 +110,7 @@ If users want to create their own `setup_camb.sh` and `compile_camb.sh` scripts 
                          "compile_velocileptors.sh"
                          "compile_cambq.sh")                    
    
-**Step :seven::** Add the following line to the script `installation_scripts/flags_impl_unset_keys.sh` so these new environmental variables don't pollute the shell session
+**Step :seven::** Add the following line to the script `"${ROOTDIR:?}"/installation_scripts/flags_impl_unset_keys.sh` so these new environmental variables don't pollute the shell session
 
     [Extracted and adapted from installation_scripts/flags_impl_unset_keys.sh]
 
@@ -123,7 +123,7 @@ If users want to create their own `setup_camb.sh` and `compile_camb.sh` scripts 
 
 Adding additional patches to the default CAMB/CLASS is pretty straightforward. Here, we assume the users want to add a patch to modify CAMB (the modified class case is similar).
 
-**Step :one::** Copy and save the new patch files to `cocoa_installation_libraries/camb_changes`. 
+**Step :one::** Copy and save the new patch files to `"${ROOTDIR:?}"/../cocoa_installation_libraries/camb_changes`. 
 
 **Step :two::** Modify the `setup_cambq.sh` shell script as shown below
 
@@ -158,7 +158,7 @@ Adding additional patches to the default CAMB/CLASS is pretty straightforward. H
     
 **:one: Patch `camb/_compilers.patch`**: This patch modifies the Python function`get_gfortran_version` located in the file `camb/_compilers.py`. 
     
-    [Extracted and adapted from ${ROOTDIR}/external_modules/code/CAMB/camb/_compilers.py]
+    [Extracted and adapted from "${ROOTDIR:?}"/external_modules/code/CAMB/camb/_compilers.py]
     
     def get_gfortran_version(command='gfortran'):
         #ver = call_command(command + " -dumpversion")           # Original line - commented
@@ -177,7 +177,7 @@ Adding additional patches to the default CAMB/CLASS is pretty straightforward. H
     
 **:two: Patch `fortran/Makefile.patch`**: This patch modifies the file `fortran/Makefile`.
 
-    [Extracted and adapted from ${ROOTDIR}/external_modules/code/CAMB/fortran/Makefile]
+    [Extracted and adapted from "${ROOTDIR:?}"/external_modules/code/CAMB/fortran/Makefile]
     
     #Will detect ifort/gfortran or edit for your compiler            # Original line - commented
     #ifneq ($(COMPILER),gfortran)                                    # Original line - commented
@@ -218,7 +218,7 @@ Adding additional patches to the default CAMB/CLASS is pretty straightforward. H
 
 **:three: Patch `forutils/Makefile.patch`**: This patch modifies the file `forutils/Makefile_compiler`
 
-    [Extracted and adapted from ${ROOTDIR}/external_modules/code/CAMB/forutils/Makefile_compiler]
+    [Extracted and adapted from "${ROOTDIR:?}"/external_modules/code/CAMB/forutils/Makefile_compiler]
     
     #ifneq ($(COMPILER),gfortran)                                    # Original line - commented
     #   ifortErr = $(shell which ifort >/dev/null 2>&1; echo $$?)    # Original line - commented
@@ -255,7 +255,7 @@ Adding additional patches to the default CAMB/CLASS is pretty straightforward. H
 
 **:one: Patch `Makefile.patch`**: This patch modifies the file `Makefile` 
     
-    [Extracted and adapted from ${ROOTDIR}/external_modules/code/class_public/Makefile]
+    [Extracted and adapted from "${ROOTDIR:?}"/external_modules/code/class_public/Makefile]
      
     # your C compiler:
     #CC       = gcc                           # Original line - commented
@@ -267,7 +267,7 @@ Adding additional patches to the default CAMB/CLASS is pretty straightforward. H
    
 **:two: Patch python/setup.patch**: This patch modifies the file `python/setup.py` 
     
-    [Extracted and adapted from ${ROOTDIR}/external_modules/code/class_public/python/setup.py]
+    [Extracted and adapted from "${ROOTDIR:?}"/external_modules/code/class_public/python/setup.py]
     
     #GCCPATH_STRING = sbp.Popen(                           # Original line - commented
     #    ['gcc -print-libgcc-file-name'],                  # Original line - commented
