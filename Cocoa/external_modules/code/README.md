@@ -40,8 +40,8 @@ If users want to create their own `setup_camb.sh` and `compile_camb.sh` scripts,
 
 **Step :one::** Copy the setup and compile scripts. 
 
-    cp ${ROOTDIR:?}/installation_scripts/setup_camb ${ROOTDIR:?}/installation_scripts/setup_cambq
-    cp ${ROOTDIR:?}/installation_scripts/compile_camb ${ROOTDIR:?}/installation_scripts/compile_cambq
+    cp "${ROOTDIR:?}"/installation_scripts/setup_camb "${ROOTDIR:?}"/installation_scripts/setup_cambq
+    cp "${ROOTDIR:?}"/installation_scripts/compile_camb "${ROOTDIR:?}"/installation_scripts/compile_cambq
 
 **Step :two::** Modify the name of the environmental variables `CAMB_URL`, `CAMB_NAME`, and `CAMB_GIT_COMMIT` on `setup_cambq.sh` shell script.
 
@@ -57,11 +57,11 @@ If users want to create their own `setup_camb.sh` and `compile_camb.sh` scripts,
     (...)
 
     # If the default patches work on the modified CAMBQ, there is no need to modify the line below
-    #CHANGES="${CCIL:?}/camb_changes"                      # Original line - commented
+    #CHANGES="${CCIL:?}/camb_changes"                     # Original line - commented
     CHANGES="${CCIL:?}/cambq_changes"
     
-    #FOLDER=${CAMB_NAME:-"CAMB"}                           # Original line - commented
-    FOLDER=${CAMBQ_NAME:-"CAMBQ"}   
+    #FOLDER="${CAMB_NAME:-"CAMB"}"                        # Original line - commented
+    FOLDER="${CAMBQ_NAME:-"CAMBQ"}"
     
     (...)
     
@@ -115,6 +115,7 @@ If users want to create their own `setup_camb.sh` and `compile_camb.sh` scripts,
     [Extracted and adapted from installation_scripts/flags_impl_unset_keys.sh]
 
     (...)
+    
     #add the line below
     unset -v CAMBQ_URL CAMBQ_GIT_COMMIT CAMBQ_NAME
 
