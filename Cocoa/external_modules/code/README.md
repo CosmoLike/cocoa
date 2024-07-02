@@ -156,7 +156,7 @@ Adding additional patches to the default CAMB/CLASS is fairly straighforward. He
                      
 ## Understanding CAMB's patches (developers only) <a name="appendix_patch_camb"></a> 
     
-**Patch `camb/_compilers.patch`**: This patch modifies the Python function`get_gfortran_version` located in the file `camb/_compilers.py`. 
+**:one: Patch `camb/_compilers.patch`**: This patch modifies the Python function`get_gfortran_version` located in the file `camb/_compilers.py`. 
     
     [Extracted and adapted from ${ROOTDIR}/external_modules/code/CAMB/camb/_compilers.py]
     
@@ -175,7 +175,7 @@ Adding additional patches to the default CAMB/CLASS is fairly straighforward. He
     
     (...)
     
-**Patch `fortran/Makefile.patch`**: This patch modifies the file `fortran/Makefile`.
+**:two: Patch `fortran/Makefile.patch`**: This patch modifies the file `fortran/Makefile`.
 
     [Extracted and adapted from ${ROOTDIR}/external_modules/code/CAMB/fortran/Makefile]
     
@@ -216,7 +216,7 @@ Adding additional patches to the default CAMB/CLASS is fairly straighforward. He
         endif
      endif
 
-**Patch `forutils/Makefile.patch`**: This patch modifies the file `forutils/Makefile_compiler`
+**:three: Patch `forutils/Makefile.patch`**: This patch modifies the file `forutils/Makefile_compiler`
 
     [Extracted and adapted from ${ROOTDIR}/external_modules/code/CAMB/forutils/Makefile_compiler]
     
@@ -253,7 +253,7 @@ Adding additional patches to the default CAMB/CLASS is fairly straighforward. He
         
 ## Understanding CLASS's patches (developers only) <a name="appendix_patch_class"></a> 
 
-**Patch `Makefile.patch`**: This patch modifies the file `Makefile` 
+**:one: Patch `Makefile.patch`**: This patch modifies the file `Makefile` 
     
     [Extracted and adapted from ${ROOTDIR}/external_modules/code/class_public/Makefile]
      
@@ -265,7 +265,7 @@ Adding additional patches to the default CAMB/CLASS is fairly straighforward. He
     # add the line below
     CC       ?= $(C_COMPILER) 
    
-**Patch python/setup.patch**: This patch modifies the file `python/setup.py` 
+**:two: Patch python/setup.patch**: This patch modifies the file `python/setup.py` 
     
     [Extracted and adapted from ${ROOTDIR}/external_modules/code/class_public/python/setup.py]
     
