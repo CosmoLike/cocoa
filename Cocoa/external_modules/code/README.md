@@ -124,7 +124,7 @@ Adding additional patches to the default CAMB/CLASS is fairly straighforward. He
 
 **Step :one::** Copy and save the new patch files to `cocoa_installation_libraries/camb_changes`. 
 
-**Step :two::** Modify the `TFOLDER`, `TFILE`, `TFILEP` local arrays on `setup_cambq.sh` shell script as shown below
+**Step :two::** Modify the `setup_cambq.sh` shell script as shown below
 
     [Extracted and adapted from setup_camb.sh]
 
