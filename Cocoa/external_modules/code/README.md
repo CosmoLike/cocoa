@@ -41,6 +41,9 @@ If users want to create their own `setup_camb.sh` and `compile_camb.sh` scripts 
 **Step :one::** Copy the setup and compile scripts. 
 
     cp "${ROOTDIR:?}"/installation_scripts/setup_camb "${ROOTDIR:?}"/installation_scripts/setup_cambq
+
+and
+
     cp "${ROOTDIR:?}"/installation_scripts/compile_camb "${ROOTDIR:?}"/installation_scripts/compile_cambq
 
 **Step :two::** Modify the name of the environmental variables `CAMB_URL`, `CAMB_NAME`, and `CAMB_GIT_COMMIT` on `setup_cambq.sh` shell script.
