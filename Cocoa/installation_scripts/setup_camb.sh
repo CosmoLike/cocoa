@@ -62,7 +62,7 @@ if [ -z "${IGNORE_CAMB_COMPILATION}" ]; then
   # E = EXTERNAL, CODE, F=FODLER
   ECODEF="${ROOTDIR:?}/external_modules/code"
 
-  FOLDER=${CAMB_NAME:-"CAMB"}
+  FOLDER="${CAMB_NAME:-"CAMB"}"
 
   PACKDIR="${ECODEF:?}/${FOLDER:?}"
 

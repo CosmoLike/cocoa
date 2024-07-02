@@ -1,11 +1,11 @@
 # Table of contents
 1. [Switching the default CAMB/CLASS (the easy way)](#appendix_new_camb_class)
-2. [Switching the default CAMB/CLASS (the not so easy way)](#appendix_new_camb_class_medium)
+2. [Switching the default CAMB/CLASS (the not-so-easy way)](#appendix_new_camb_class_medium)
 3. [Adding additional patches to the default CAMB/CLASS](#appendix_new_camb_class_patches)
 4. [Understanding CAMB's patches (developers only)](#appendix_patch_camb)
 5. [Understanding CLASS's patches (developers only)](#appendix_patch_class)
 
-Installing a new CAMB code in Cocoa requires a few changes to the existing CAMB/CLASS code. Fortunately, CoCoA provides the following set of scripts and patches that automatically handle all the necessary changes.
+Installing a new CAMB code in Cocoa requires a few changes to the existing CAMB/CLASS code. Fortunately, CoCoA provides the following set of scripts and patches that automatically handle all the necessary adjustments.
 
     installation_scripts/setup_camb.sh
     installation_scripts/compile_camb.sh
@@ -32,11 +32,11 @@ Swapping the default CAMB/CLASS is simple. Go to Cocoa's main folder and open th
     export CLASS_GIT_COMMIT="8df566c1ff2d0b3e40e106567c435575aea337be"
     export CLASS_NAME="class_public"
 
-As long as your new CAMB/CLASS makefiles are not altered to the extend that the `.patch` files located on `camb_changes`, and also listed above, fail, that is all what is needed.
+As long as your new CAMB/CLASS makefiles are not altered to the extent that the `.patch` files located on `camb_changes`, and also listed above, fail, that is all what is needed.
 
 ## Switching the default CAMB/CLASS (the not-so-easy way) <a name="appendix_new_camb_class_medium"></a> 
 
-If users want to create their own `setup_camb.sh` and `compile_camb.sh` scripts, so they can work seamless with multiple modified Boltznman codes, then they need to follow the steps below. Here, we assume the users want to create a new modified CAMB, named CAMBQ (the modified class case is similar).
+If users want to create their own `setup_camb.sh` and `compile_camb.sh` scripts so they can work seamlessly with multiple modified Boltznman codes, they need to follow the steps below. Here, we assume the users want to create a new modified CAMB named CAMBQ (the modified class case is similar).
 
 **Step :one::** Copy the setup and compile scripts. 
 
@@ -79,7 +79,7 @@ If users want to create their own `setup_camb.sh` and `compile_camb.sh` scripts,
     #FOLDER="${CAMB_NAME:-"CAMB"}"   # Original line - commented
     FOLDER="${CAMBQ_NAME:-"CAMB"}"  
 
-**Step :four::** Add the environmental variables `CAMB_URL`, `CAMB_NAME`, and `CAMB_GIT_COMMIT` to `set_installation_options.sh`. This is optional in case `setup_cambq.sh` and `compile_cambq.sh` provide default reasonable values for these variables. 
+**Step :four::** Add the environmental variables `CAMB_URL`, `CAMB_NAME`, and `CAMB_GIT_COMMIT` to `set_installation_options.sh`. This is optional if `setup_cambq.sh` and `compile_cambq.sh` provide default reasonable values for these variables. 
 
     [Extracted and adapted from set_installation_options.sh]
 
@@ -110,7 +110,7 @@ If users want to create their own `setup_camb.sh` and `compile_camb.sh` scripts,
                          "compile_velocileptors.sh"
                          "compile_cambq.sh")                    
    
-**Step :seven::** Add the following line to the script `installation_scripts/flags_impl_unset_keys.sh` so these new environmental variables don't polute the shell session
+**Step :seven::** Add the following line to the script `installation_scripts/flags_impl_unset_keys.sh` so these new environmental variables don't pollute the shell session
 
     [Extracted and adapted from installation_scripts/flags_impl_unset_keys.sh]
 
@@ -121,7 +121,7 @@ If users want to create their own `setup_camb.sh` and `compile_camb.sh` scripts,
 
 ## Adding additional patches to the default CAMB/CLASS <a name="appendix_new_camb_class_patches"></a> 
 
-Adding additional patches to the default CAMB/CLASS is fairly straighforward. Here, we assume the users want to add a patch to modify CAMB (the modified class case is similar).
+Adding additional patches to the default CAMB/CLASS is pretty straightforward. Here, we assume the users want to add a patch to modify CAMB (the modified class case is similar).
 
 **Step :one::** Copy and save the new patch files to `cocoa_installation_libraries/camb_changes`. 
 
@@ -137,7 +137,7 @@ Adding additional patches to the default CAMB/CLASS is fairly straighforward. He
     declare -a TFOLDER=("camb/" 
                         "fortran/" 
                         "forutils/"
-                        # add the subfolder that the file to be patched is located
+                        # add the subfolder where the file to be patched is located
                         ) # If nonblank, path must include /
   
     # T = TMP

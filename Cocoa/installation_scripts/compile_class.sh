@@ -54,7 +54,7 @@ if [ -z "${IGNORE_CLASS_COMPILATION}" ]; then
   # E = EXTERNAL, CODE, F=FODLER
   ECODEF="${ROOTDIR:?}/external_modules/code"
 
-  FOLDER=${CLASS_NAME:-"class_public"}
+  FOLDER="${CLASS_NAME:-"class_public"}"
 
   PACKDIR="${ECODEF:?}/${FOLDER:?}"
 
