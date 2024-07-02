@@ -76,8 +76,8 @@ If users want to create their own `setup_camb.sh` and `compile_camb.sh` scripts,
 
     [Extracted and adapted from setup_cambq.sh]
     
-    #FOLDER=${CAMB_NAME:-"CAMB"}   # Original line - commented
-    FOLDER=${CAMBQ_NAME:-"CAMB"}   
+    #FOLDER="${CAMB_NAME:-"CAMB"}"   # Original line - commented
+    FOLDER="${CAMBQ_NAME:-"CAMB"}"  
 
 **Step :four::** Add the environmental variables `CAMB_URL`, `CAMB_NAME`, and `CAMB_GIT_COMMIT` to `set_installation_options.sh`. This is optional in case `setup_cambq.sh` and `compile_cambq.sh` provide default reasonable values for these variables. 
 
@@ -177,7 +177,6 @@ Adding additional patches to the default CAMB/CLASS is fairly straighforward. He
     
 **Patch `fortran/Makefile.patch`**: This patch modifies the file `fortran/Makefile`.
 
-    (...)
     [Extracted and adapted from ${ROOTDIR}/external_modules/code/CAMB/fortran/Makefile]
     
     #Will detect ifort/gfortran or edit for your compiler            # Original line - commented
@@ -256,7 +255,6 @@ Adding additional patches to the default CAMB/CLASS is fairly straighforward. He
 
 **Patch `Makefile.patch`**: This patch modifies the file `Makefile` 
     
-    (...)
     [Extracted and adapted from ${ROOTDIR}/external_modules/code/class_public/Makefile]
      
     # your C compiler:
