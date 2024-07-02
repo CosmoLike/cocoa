@@ -711,10 +711,20 @@ if [ -z "${IGNORE_CORE_INSTALLATION}" ]; then
 
     DEFAULT="Cuba-${PACKAGE_VERSION:?}"
 
-    FOLDER=${COCOA_WGET_DIR:-"${DEFAULT:?}"}
+    FOLDER=${COCOA_CUBA_DIR:-"${DEFAULT:?}"}
 
     PACKDIR="${CCIL:?}/${FOLDER:?}"
 
+    # --------------------------------------------------------------------------
+    # In case this script runs twice (after being killed by CTRL-D)
+
+    rm -f "${PACKDIR:?}/libcuba.a"
+    rm -f "${PACKDIR:?}/libcuba.so"
+    rm -f "${PACKDIR:?}/makefile"
+    rm -f "${PACKDIR:?}/makefile.patch"
+    rm -f "${PACKDIR:?}/config.h"
+
+    # --------------------------------------------------------------------------
     cdfolder "${PACKDIR}" || return 1;
 
     FC="${FORTRAN_COMPILER:?}" CC="${C_COMPILER:?}" \
@@ -723,20 +733,46 @@ if [ -z "${IGNORE_CORE_INSTALLATION}" ]; then
       >${OUT1:?} 2>${OUT2:?} || { error "(CUBA) ${EC11:?}"; return 1; }
 
     # --------------------------------------------------------------------------
-    # note: in case script run >1x w/ previous run stoped prematurely b/c error
+    # Patch CUBA so it also compiles an .so dynamic library --------------------
+    # --------------------------------------------------------------------------
+    CHANGES="${CCIL:?}/cuba_changes"
     
-    make clean \
-      >${OUT1:?} 2>${OUT2:?} || { error "(CUBA) ${EC2:?}"; return 1; }
+    declare -a TFOLDER=("" 
+                       ) # If nonblank, path must include /
+    
+    # T = TMP
+    declare -a TFILE=("makefile" 
+                     )
+
+    #T = TMP, P = PATCH
+    declare -a TFILEP=("makefile.patch" 
+                      )
+
+    # AL = Array Length
+    AL=${#TFOLDER[@]}
+
+    for (( i=0; i<${AL}; i++ ));
+    do
+      cdfolder "${PACKDIR:?}/${TFOLDER[$i]}" || return 1
+
+      cpfolder "${CHANGES:?}/${TFOLDER[$i]}${TFILEP[$i]:?}" . \
+        2>${OUT2:?} || return 1;
+
+      patch -u "${TFILE[$i]:?}" -i "${TFILEP[$i]:?}" >${OUT1:?} \
+        2>${OUT2:?} || { error "${EC17:?} (${TFILE[$i]:?})"; return 1; }
+    done
 
     # --------------------------------------------------------------------------
     
-    make -j $MNT all \
-      >${OUT1:?} 2>${OUT2:?} || { error "(CUBA) ${EC7:?}"; return 1; }
+    cdfolder "${PACKDIR}" || return 1;
+
+    make clean \
+      >${OUT1:?} 2>${OUT2:?} || { error "(CUBA) ${EC2:?}"; return 1; }
       
     make install \
       >${OUT1:?} 2>${OUT2:?} || { error "(CUBA) ${EC10:?}"; return 1; }
 
-    unset -v PACKDIR FOLDER DEFAULT PACKAGE_VERSION
+    unset -v PACKDIR FOLDER DEFAULT PACKAGE_VERSION TFOLDER TFILE TFILEP AL
 
     cdfolder "${ROOTDIR}" || return 1;
 

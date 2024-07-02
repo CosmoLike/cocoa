@@ -3,6 +3,10 @@
 # ----------------------------------------------------------------------------
 # ----------------------------------------------------------------------------
 
+if [ -z "${ROOTDIR}" ]; then
+  source start_cocoa.sh || { pfail 'ROOTDIR'; return 1; }
+fi
+  
 if command -v deactivate &> "/dev/null"; then
   deactivate 2>"/dev/null"
 fi

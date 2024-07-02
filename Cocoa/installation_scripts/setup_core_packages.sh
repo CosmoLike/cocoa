@@ -16,7 +16,7 @@ unset_env_vars () {
 
 unset_env_funcs () {
   unset -f cdfolder cpfolder cpfile error wgetact gitact gitact1 gitact2
-  unset -f unset_env_funcs
+  unset -f unset_env_funcs wgetact1 wgetact2
   cdroot || return 1;
 }
 
@@ -46,20 +46,20 @@ cpfile() {
     2>"/dev/null" || { error "CP FILE ${1} on ${2}"; return 1; }
 }
 
-wgetact() {
+wgetact1() {
   #ARGUMENTS: FOLDER, FILE, URL, NEW_FOLDER, XZFILE
   
   local CCIL="${ROOTDIR}/../cocoa_installation_libraries"
 
   cdfolder "${CCIL:?}" || return 1;
 
-  local FILE="${1}.${2}"
+  local FILE="${1:?}.${2:?}"
 
+  # ----------------------------------------------------------------------------
   # In case this script runs twice (after being killed by CTRL-D)
   rm -rf "${CCIL:?}/${1:?}"
   rm -f  "${CCIL:?}/${FILE:?}"
-  
-  rm -f  "${CCIL:?}/${5:?}"
+  # ----------------------------------------------------------------------------
 
   wget "${3:?}" --show-progress --progress=bar:force \
     >${OUT1:?} 2>${OUT2:?} || { error "${EC24:?}"; return 1; }
@@ -90,6 +90,23 @@ wgetact() {
   
   fi
 
+  rm -f  "${CCIL:?}/${FILE:?}"
+
+  cdfolder "${ROOTDIR}" || return 1;
+}
+
+wgetact2() {
+  #ARGUMENTS: FOLDER, FILE, URL, NEW_FOLDER, XZFILE
+  
+  local CCIL="${ROOTDIR}/../cocoa_installation_libraries"
+
+  cdfolder "${CCIL:?}" || return 1;
+
+  # ----------------------------------------------------------------------------
+  # In case this script runs twice (after being killed by CTRL-D)
+  rm -f  "${CCIL:?}/${5:?}"
+  # ----------------------------------------------------------------------------
+
   # Why this compress? In the old Cocoa we saved the libraries in 
   # the github repo using git lfs. So this way preserves the old scripts
   # we set "-k 1" to be the minimum compression
@@ -97,12 +114,18 @@ wgetact() {
     2>${OUT2:?} || { error "TAR (COMPRESS)"; return 1; }
 
   rm -rf "${CCIL:?}/${1:?}"
-  
-  rm -f  "${CCIL:?}/${FILE:?}"
-  
   rm -rf "${CCIL:?}/${4:?}"
 
   cdfolder "${ROOTDIR}" || return 1;
+}
+
+wgetact() {
+  #ARGUMENTS: FOLDER, FILE, URL, NEW_FOLDER, XZFILE
+  
+  wgetact1 "${1:?}" "${2:?}" "${3:?}" "${4:?}" "${5:?}"
+
+  wgetact2 "${1:?}" "${2:?}" "${3:?}" "${4:?}" "${5:?}"
+
 }
 
 gitact1() {
@@ -619,7 +642,7 @@ if [ -z "${IGNORE_CPP_CUBA_INSTALLATION}" ]; then
   wgetact "${FOLDER:?}" "${FILE:?}" "${URL:?}" \
     "${COCOA_CUBA_DIR:-"${FOLDER:?}"}" "${XZF:?}" || return 1;
 
-  unset -v URL FOLDER FILE XZF PACKAGE_VERSION
+  unset -v URL FOLDER FILE XZF PACKAGE_VERSION PACKDIR
 
   pbottom "GETTING CUBA LIBRARY (CORE LIBS)" || return 1;
 
