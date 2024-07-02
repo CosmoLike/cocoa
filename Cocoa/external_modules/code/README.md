@@ -269,9 +269,9 @@ Adding additional patches to the default CAMB/CLASS is pretty straightforward. H
     
     [Extracted and adapted from ${ROOTDIR}/external_modules/code/class_public/python/setup.py]
     
-    #GCCPATH_STRING = sbp.Popen(                                     # Original line - commented
-    #    ['gcc -print-libgcc-file-name'],                            # Original line - commented
-    #    stdout=sbp.PIPE, shell=True).communicate()[0]               # Original line - commented
+    #GCCPATH_STRING = sbp.Popen(                           # Original line - commented
+    #    ['gcc -print-libgcc-file-name'],                  # Original line - commented
+    #    stdout=sbp.PIPE, shell=True).communicate()[0]     # Original line - commented
     
     # add the line below
     GCCPATH_STRING = sbp.check_output(["$C_COMPILER -print-libgcc-file-name"], shell=True)
