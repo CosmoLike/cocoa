@@ -32,14 +32,7 @@ Swapping the default CAMB/CLASS is simple. Go to Cocoa's main folder and open th
     export CLASS_GIT_COMMIT="8df566c1ff2d0b3e40e106567c435575aea337be"
     export CLASS_NAME="class_public"
 
-As long as your new CAMB/CLASS makefiles are not altered to the extend that the `.patch` files located on `camb_changes`, and also listed above, fail, that is all what is needed. In this case, the scripts below will handle the download and compilation of CAMB/CLASS Boltznman codes.
-     
-    # setup scripts: they download CAMB/CLASS and apply the appropriate patches.
-    installation_scripts/setup_class.sh
-    installation_scripts/setup_camb.sh
-     
-    installation_scripts/compile_class.sh
-    installation_scripts/compile_camb.sh
+As long as your new CAMB/CLASS makefiles are not altered to the extend that the `.patch` files located on `camb_changes`, and also listed above, fail, that is all what is needed.
 
 ## Switching the default CAMB/CLASS (the not-so-easy way) <a name="appendix_new_camb_class_medium"></a> 
 
@@ -99,7 +92,25 @@ If users want to create their own `setup_camb.sh` and `compile_camb.sh` scripts,
     export CAMBQ_GIT_COMMIT="XXX"
     export CAMBQ_NAME='CAMBQ'
 
-**Step 5️⃣:** Add the following line to the script `installation_scripts/flags_impl_unset_keys.sh` so these new environmental variables don't polute the shell session
+**Step :five::** Add `setup_cambq.sh` to the list of files run by `setup_cocoa.sh` as shown below.
+
+    [Extracted and adapted from setup_cocoa.sh]
+
+    declare -a TSCRIPTS=("setup_core_packages.sh" 
+                         (...)
+                         "setup_velocileptors.sh"
+                         "setup_cambq.sh) 
+
+**Step :six::** Add `compile_cambq.sh` to the list of files run by `compile_cocoa.sh` as shown below.
+
+    [Extracted and adapted from compile_cocoa.sh]
+
+    declare -a TSCRIPTS=("compile_camb.sh"
+                         (...)
+                         "compile_velocileptors.sh"
+                         "compile_cambq.sh")                    
+   
+**Step :seven::** Add the following line to the script `installation_scripts/flags_impl_unset_keys.sh` so these new environmental variables don't polute the shell session
 
     [Extracted and adapted from installation_scripts/flags_impl_unset_keys.sh]
 
@@ -111,10 +122,37 @@ If users want to create their own `setup_camb.sh` and `compile_camb.sh` scripts,
 
 Adding additional patches to the default CAMB/CLASS is fairly straighforward. Here, we assume the users want to add a patch to modify CAMB (the modified class case is similar).
 
-**Step :one::** Copy and save the patch files to `cocoa_installation_libraries/camb_changes`. 
+**Step :one::** Copy and save the new patch files to `cocoa_installation_libraries/camb_changes`. 
 
 **Step :two::** Modify the `TFOLDER`, `TFILE`, `TFILEP` local arrays on `setup_cambq.sh` shell script as shown below
 
+    [Extracted and adapted from setup_camb.sh]
+
+    # Patch CAMB to be compatible w/ COCOA environment --------------------------
+
+    (...)
+    
+    # T = TMP
+    declare -a TFOLDER=("camb/" 
+                        "fortran/" 
+                        "forutils/"
+                        # add the subfolder that the file to be patched is located
+                        ) # If nonblank, path must include /
+  
+    # T = TMP
+    declare -a TFILE=("_compilers.py" 
+                      "Makefile" 
+                      "Makefile_compiler"
+                      # add here the file that needs to be patched
+                      )
+
+    #T = TMP, P = PATCH
+    declare -a TFILEP=("_compilers.patch" 
+                       "Makefile.patch" 
+                       "Makefile_compiler.patch"
+                       # add here the file that the patch file
+                       )
+                     
 ## Understanding CAMB's patches (developers only) <a name="appendix_patch_camb"></a> 
     
 **Patch `camb/_compilers.patch`**: This patch modifies the Python function`get_gfortran_version` located in the file `camb/_compilers.py`. 
