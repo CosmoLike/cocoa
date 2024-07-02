@@ -14,6 +14,10 @@ if [ -z "${PYTHON3}" ]; then
   error "PYTHON3" || return 1
 fi
 
+if [ ! -d "${ROOTDIR:?}/.local" ]; then
+  echo ".local directory (python private environment) does not exists."
+fi
+
 if [ -z "${PYTHON_VERSION}" ]; then
   error "PYTHON_VERSION" || return 1
 fi
