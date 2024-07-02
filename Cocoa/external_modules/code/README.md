@@ -22,7 +22,7 @@ Installing a new CAMB code in Cocoa requires a few changes to the existing CAMB/
 
 Swapping the default CAMB/CLASS is simple. Go to Cocoa's main folder and open the file `set_installation_options.sh`. Then, adjust the following environmental keys. 
      
-    [Extracted and adapted from set_installation_options.sh]
+    [Extracted and adapted from "${ROOTDIR:?}"/set_installation_options.sh]
     
     export CAMB_URL="https://github.com/cmbant/CAMB"
     export CAMB_GIT_COMMIT="45d1c3d27e7480c0f9a82c98522c17ed422dd408"
@@ -45,7 +45,7 @@ If users want to create their own `setup_camb.sh` and `compile_camb.sh` scripts 
 
 **Step :two::** Modify the name of the environmental variables `CAMB_URL`, `CAMB_NAME`, and `CAMB_GIT_COMMIT` on `setup_cambq.sh` shell script.
 
-    [Extracted and adapted from setup_cambq.sh]
+    [Extracted and adapted from "${ROOTDIR:?}"/installation_scripts/setup_cambq.sh]
   
     CCIL="${ROOTDIR:?}/../cocoa_installation_libraries"
 
@@ -74,14 +74,14 @@ If users want to create their own `setup_camb.sh` and `compile_camb.sh` scripts 
 
 **Step :three::** Modify the name of the environmental variable `CAMB_NAME` on `compile_cambq.sh` shell script.
 
-    [Extracted and adapted from setup_cambq.sh]
+    [Extracted and adapted from "${ROOTDIR:?}"/installation_scripts/setup_cambq.sh]
     
     #FOLDER="${CAMB_NAME:-"CAMB"}"   # Original line - commented
     FOLDER="${CAMBQ_NAME:-"CAMB"}"  
 
 **Step :four::** Add the environmental variables `CAMB_URL`, `CAMB_NAME`, and `CAMB_GIT_COMMIT` to `set_installation_options.sh`. This is optional if `setup_cambq.sh` and `compile_cambq.sh` provide default reasonable values for these variables. 
 
-    [Extracted and adapted from set_installation_options.sh]
+    [Extracted and adapted from "${ROOTDIR:?}"/set_installation_options.sh]
 
     export CAMB_URL="https://github.com/cmbant/CAMB"
     export CAMB_GIT_COMMIT="45d1c3d27e7480c0f9a82c98522c17ed422dd408"
@@ -94,7 +94,7 @@ If users want to create their own `setup_camb.sh` and `compile_camb.sh` scripts 
 
 **Step :five::** Add `setup_cambq.sh` to the list of files run by `setup_cocoa.sh` as shown below.
 
-    [Extracted and adapted from setup_cocoa.sh]
+    [Extracted and adapted from "${ROOTDIR:?}"/setup_cocoa.sh]
 
     declare -a TSCRIPTS=("setup_core_packages.sh" 
                          (...)
@@ -112,7 +112,7 @@ If users want to create their own `setup_camb.sh` and `compile_camb.sh` scripts 
    
 **Step :seven::** Add the following line to the script `"${ROOTDIR:?}"/installation_scripts/flags_impl_unset_keys.sh` so these new environmental variables don't pollute the shell session
 
-    [Extracted and adapted from installation_scripts/flags_impl_unset_keys.sh]
+    [Extracted and adapted from "${ROOTDIR:?}"/installation_scripts/flags_impl_unset_keys.sh]
 
     (...)
     
@@ -127,7 +127,7 @@ Adding additional patches to the default CAMB/CLASS is pretty straightforward. H
 
 **Step :two::** Modify the `setup_cambq.sh` shell script as shown below
 
-    [Extracted and adapted from setup_camb.sh]
+    [Extracted and adapted from "${ROOTDIR:?}"/installation_scripts/setup_camb.sh]
 
     # Patch CAMB to be compatible w/ COCOA environment --------------------------
 
