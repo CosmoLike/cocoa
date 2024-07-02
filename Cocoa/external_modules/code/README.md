@@ -1,7 +1,9 @@
 # Table of contents
 1. [Switching the default CAMB/CLASS (the easy way)](#appendix_new_camb_class)
-2. [Understanding CAMB's patches (developers only)](#appendix_patch_camb)
-3. [Understanding CLASS's patches (developers only)](#appendix_patch_class)
+2. [Switching the default CAMB/CLASS (the not so easy way)](#appendix_new_camb_class_medium)
+3. [Adding additional patches to the default CAMB/CLASS](#appendix_new_camb_class_patches)
+4. [Understanding CAMB's patches (developers only)](#appendix_patch_camb)
+5. [Understanding CLASS's patches (developers only)](#appendix_patch_class)
 
 Installing a new CAMB code in Cocoa requires a few changes to the existing CAMB/CLASS code. Fortunately, CoCoA provides the following set of scripts and patches that automatically handle all the necessary changes.
 
@@ -38,7 +40,81 @@ As long as your CAMB/CLASS makefiles were not altered to the extend that the `.p
      
     installation_scripts/compile_class.sh
     installation_scripts/compile_camb.sh
-       
+
+## Switching the default CAMB/CLASS (the not-so-easy way) <a name="appendix_new_camb_class_medium"></a> 
+
+If users want to create their own `setup_camb.sh` and `compile_camb.sh` scripts, so they can work seamless with multiple modified CAMB/CLASSES, then they need to follow the steps below. Here, we assume the users want to create a new modified CAMB, named CAMBQ (the modified class case is similar).
+
+**Step :one::** Copy the setup and compile scripts. 
+
+    cp ${ROOTDIR:?}/installation_scripts/setup_camb ${ROOTDIR:?}/installation_scripts/setup_cambq
+    cp ${ROOTDIR:?}/installation_scripts/compile_camb ${ROOTDIR:?}/installation_scripts/compile_cambq
+
+**Step :two::** Modify the name of the environmental variables `CAMB_URL`, `CAMB_NAME`, and `CAMB_GIT_COMMIT` on `setup_cambq.sh` shell script.
+
+    [Extracted and adapted from setup_cambq.sh]
+  
+    CCIL="${ROOTDIR:?}/../cocoa_installation_libraries"
+
+    (...)
+    
+    #URL="${CAMB_URL:-"https://github.com/cmbant/CAMB"}"   # Original line - commented
+    URL="${CAMBQ_URL:-"https://github.com/CAMBQ"}"   
+    
+    (...)
+
+    # If the default patches work on the modified CAMBQ, there is no need to modify the line below
+    #CHANGES="${CCIL:?}/camb_changes"                      # Original line - commented
+    CHANGES="${CCIL:?}/cambq_changes"
+    
+    #FOLDER=${CAMB_NAME:-"CAMB"}                           # Original line - commented
+    FOLDER=${CAMBQ_NAME:-"CAMBQ"}   
+    
+    (...)
+    
+    #if [ -n "${CAMB_GIT_COMMIT}" ]; then                 # Original line - commented
+    #  "${GIT:?}" checkout "${CAMB_GIT_COMMIT:?}" \       # Original line - commented
+    if [ -n "${CAMBQ_GIT_COMMIT}" ]; then                
+      "${GIT:?}" checkout "${CAMBQ_GIT_COMMIT:?}" \       
+        >${OUT1:?} 2>${OUT2:?} || { error "${EC16:?}"; return 1; }
+    fi
+
+**Step :three::** Modify the name of the environmental variable `CAMB_NAME` on `compile_cambq.sh` shell script.
+
+    [Extracted and adapted from setup_cambq.sh]
+    
+    #FOLDER=${CAMB_NAME:-"CAMB"}   # Original line - commented
+    FOLDER=${CAMBQ_NAME:-"CAMB"}   
+
+**Step :four::** Add the environmental variables `CAMB_URL`, `CAMB_NAME`, and `CAMB_GIT_COMMIT` to `set_installation_options.sh`. This is optional in case `setup_cambq.sh` and `compile_cambq.sh` shell scripts provide default reasonable values for the appropriate environmental variable. 
+
+    [Extracted and adapted from set_installation_options.sh]
+
+    export CAMB_URL="https://github.com/cmbant/CAMB"
+    export CAMB_GIT_COMMIT="45d1c3d27e7480c0f9a82c98522c17ed422dd408"
+    export CAMB_NAME='CAMB'
+
+    # add and adapt the lines below
+    export CAMBQ_URL="https://github.com/CAMBQ"
+    export CAMBQ_GIT_COMMIT="XXX"
+    export CAMBQ_NAME='CAMBQ'
+
+**Step 5️⃣:** Add the following line to the script `installation_scripts/flags_impl_unset_keys.sh` so these new environmental variables don't polute the shell session
+
+    [Extracted and adapted from installation_scripts/flags_impl_unset_keys.sh]
+
+    (...)
+    #add the line below
+    unset -v CAMBQ_URL CAMBQ_GIT_COMMIT CAMBQ_NAME
+
+## Adding additional patches to the default CAMB/CLASS <a name="appendix_new_camb_class_patches"></a> 
+
+Adding additional patches to the default CAMB/CLASS is fairly straighforward. Here, we assume the users want to add a patch to modify CAMB (the modified class case is similar).
+
+**Step :one::** Copy and save the patch files to `cocoa_installation_libraries/camb_changes`. 
+
+**Step :two::** Modify the `TFOLDER`, `TFILE`, `TFILEP` local arrays on `setup_cambq.sh` shell script as shown below
+
 ## Understanding CAMB's patches (developers only) <a name="appendix_patch_camb"></a> 
     
 **Patch `camb/_compilers.patch`**: This patch modifies the Python function`get_gfortran_version` located in the file `camb/_compilers.py`. 
