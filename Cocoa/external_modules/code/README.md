@@ -86,7 +86,7 @@ If users want to create their own `setup_camb.sh` and `compile_camb.sh` scripts,
     #FOLDER=${CAMB_NAME:-"CAMB"}   # Original line - commented
     FOLDER=${CAMBQ_NAME:-"CAMB"}   
 
-**Step :four::** Add the environmental variables `CAMB_URL`, `CAMB_NAME`, and `CAMB_GIT_COMMIT` to `set_installation_options.sh`. This is optional in case `setup_cambq.sh` and `compile_cambq.sh` shell scripts provide default reasonable values for the appropriate environmental variable. 
+**Step :four::** Add the environmental variables `CAMB_URL`, `CAMB_NAME`, and `CAMB_GIT_COMMIT` to `set_installation_options.sh`. This is optional in case `setup_cambq.sh` and `compile_cambq.sh` provide default reasonable values for these variables. 
 
     [Extracted and adapted from set_installation_options.sh]
 
