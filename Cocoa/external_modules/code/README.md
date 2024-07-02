@@ -1,8 +1,7 @@
 # Table of contents
 1. [Switching the default CAMB/CLASS (the easy way)](#appendix_new_camb_class)
-2. [Adding a new modified CAMB/CLASS (the not-so-easy way)](#appendix_new_camb_class_hard)
-3. [Understanding CAMB's patches (developers only)](#appendix_patch_camb)
-4. [Understanding CLASS's patches (developers only)](#appendix_patch_class)
+2. [Understanding CAMB's patches (developers only)](#appendix_patch_camb)
+3. [Understanding CLASS's patches (developers only)](#appendix_patch_class)
 
 Installing a new CAMB code in Cocoa requires a few changes to the existing CAMB/CLASS code. Fortunately, CoCoA provides the following set of scripts and patches that automatically handle all the necessary changes.
 
