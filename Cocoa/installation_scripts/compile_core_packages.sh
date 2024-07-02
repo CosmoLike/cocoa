@@ -13,6 +13,7 @@ if [ -z "${IGNORE_CORE_INSTALLATION}" ]; then
     
   unset_env_vars () {
     unset -v CCIL BDF PACKDIR FOLDER MAKE_NB_JOBS PACKAGE_VERSION DEFAULT
+    unset -v CHANGES TFOLDER TFILE TFILEP AL
     cdroot || return 1;
   }
 
@@ -772,7 +773,8 @@ if [ -z "${IGNORE_CORE_INSTALLATION}" ]; then
     make install \
       >${OUT1:?} 2>${OUT2:?} || { error "(CUBA) ${EC10:?}"; return 1; }
 
-    unset -v PACKDIR FOLDER DEFAULT PACKAGE_VERSION TFOLDER TFILE TFILEP AL
+    unset -v PACKDIR FOLDER DEFAULT PACKAGE_VERSION 
+    unset -v CHANGES TFOLDER TFILE TFILEP AL
 
     cdfolder "${ROOTDIR}" || return 1;
 
