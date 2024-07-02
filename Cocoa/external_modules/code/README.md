@@ -32,7 +32,7 @@ Swapping the default CAMB/CLASS is simple. Go to Cocoa's main folder and open th
     export CLASS_GIT_COMMIT="8df566c1ff2d0b3e40e106567c435575aea337be"
     export CLASS_NAME="class_public"
 
-As long as your CAMB/CLASS makefiles were not altered to the extend that the `.patch` files shown above would fail, that is all what is needed to switch CAMB/CLASS. In this case, the scripts below will handle the download and compilation of CAMB/CLASS Boltznman codes.
+As long as your new CAMB/CLASS makefiles are not altered to the extend that the `.patch` files located on `camb_changes`, and also listed above, fail, that is all what is needed. In this case, the scripts below will handle the download and compilation of CAMB/CLASS Boltznman codes.
      
     # setup scripts: they download CAMB/CLASS and apply the appropriate patches.
     installation_scripts/setup_class.sh
@@ -43,7 +43,7 @@ As long as your CAMB/CLASS makefiles were not altered to the extend that the `.p
 
 ## Switching the default CAMB/CLASS (the not-so-easy way) <a name="appendix_new_camb_class_medium"></a> 
 
-If users want to create their own `setup_camb.sh` and `compile_camb.sh` scripts, so they can work seamless with multiple modified CAMB/CLASSES, then they need to follow the steps below. Here, we assume the users want to create a new modified CAMB, named CAMBQ (the modified class case is similar).
+If users want to create their own `setup_camb.sh` and `compile_camb.sh` scripts, so they can work seamless with multiple modified Boltznman codes, then they need to follow the steps below. Here, we assume the users want to create a new modified CAMB, named CAMBQ (the modified class case is similar).
 
 **Step :one::** Copy the setup and compile scripts. 
 
