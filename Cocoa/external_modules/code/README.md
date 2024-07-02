@@ -103,7 +103,7 @@ If users want to create their own `setup_camb.sh` and `compile_camb.sh` scripts 
 
 **Step :six::** Add `compile_cambq.sh` to the list of files run by `compile_cocoa.sh` as shown below.
 
-    [Extracted and adapted from compile_cocoa.sh]
+    [Extracted and adapted from "${ROOTDIR:?}"/compile_cocoa.sh]
 
     declare -a TSCRIPTS=("compile_camb.sh"
                          (...)
