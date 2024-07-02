@@ -118,7 +118,7 @@ Users will see a terminal like this: `$(cocoa)(.local)`. *This is a feature, not
 
 **Step :three:**: Compile the project, as shown below
  
-    source ./projects/XXX/scripts/compile_XXX
+    source "${ROOTDIR:?}"/projects/XXX/scripts/compile_XXX
   
 **Step :four:**: Select the number of OpenMP cores and run a template YAML file
     
@@ -200,7 +200,8 @@ This behavior enables users to work on multiple instances of Cocoa simultaneousl
 
 - The script *set_installation_options script* contains a few additional flags that may be useful. Some of these flags are shown below:
 
-      [Extracted from set_installation_options.sh script]
+      [Adapted from Cocoa/set_installation_options.sh shell script] 
+      
       # ------------------------------------------------------------------------------
       # VERBOSE AS DEBUG TOOL --------------------------------------------------------
       # ------------------------------------------------------------------------------
@@ -248,7 +249,8 @@ Steps to debug Cocoa
 
 - The first step is to define the `COCOA_OUTPUT_VERBOSE` and `COSMOLIKE_DEBUG_MODE` flags to obtain a more detailed output. To accomplish that, we advise users to uncomment the lines below that are part of the `set_installation_options.sh` script and then restart the cocoa private environment by running `source stop_cocoa.sh; source start_cocoa.sh`
 
-      [Extracted from set_installation_options.sh script] 
+      [Adapted from Cocoa/set_installation_options.sh shell script] 
+
       # ------------------------------------------------------------------------------
       # VERBOSE AS DEBUG TOOL --------------------------------------------------------
       # ------------------------------------------------------------------------------
@@ -269,14 +271,16 @@ After fixing a particular issue, users should rerun the shell scripts `setup_coc
 
 To avoid excessive compilation or download times during development, users can use specialized scripts located at `Cocoa/installation_scripts/` that compile only a specific module or download only a particular dataset. A few examples of these scripts are: 
 
+     $(cocoa)(.local) cd "${ROOTDIR:?}"
      $(cocoa)(.local) source "${ROOTDIR:?}"/installation_scripts/compile_act.sh
      $(cocoa)(.local) source "${ROOTDIR:?}"/installation_scripts/compile_camb.sh
      $(cocoa)(.local) source "${ROOTDIR:?}"/installation_scripts/compile_class.sh
      $(cocoa)(.local) source "${ROOTDIR:?}"/installation_scripts/compile_planck.sh
      $(cocoa)(.local) source "${ROOTDIR:?}"/installation_scripts/compile_polychord.sh
 
-Above and below, the `$(cocoa)(.local)` emphasizes they should run after activating the cocoa environment). The shell subroutines that download external modules from their original Git repositories are shown below.
+Above and below, the `$(cocoa)(.local)` emphasizes they should run after activating the cocoa environments. The shell subroutines that download external modules from their original Git repositories are shown below.
 
+     $(cocoa)(.local) cd "${ROOTDIR:?}"
      $(cocoa)(.local) source "${ROOTDIR:?}"/installation_scripts/setup_camb.sh
      $(cocoa)(.local) source "${ROOTDIR:?}"/installation_scripts/setup_class.sh
      $(cocoa)(.local) source "${ROOTDIR:?}"/installation_scripts/setup_polychord.sh
@@ -293,16 +297,17 @@ To ensure these scripts can download and install these packages, users must be s
 
 Below, we show the shell subroutines that download and unpack data from multiple experiments. 
 
-     $(cocoa)(.local) source ./installation_scripts/unxv_act_dr6.sh
-     $(cocoa)(.local) source ./installation_scripts/unxv_bao.sh
-     $(cocoa)(.local) source ./installation_scripts/unxv_bicep.sh
-     $(cocoa)(.local) source ./installation_scripts/unxv_camspec.sh
-     $(cocoa)(.local) source ./installation_scripts/unxv_h0licow.sh
-     $(cocoa)(.local) source ./installation_scripts/unxv_lipop.sh
-     $(cocoa)(.local) source ./installation_scripts/unxv_planck2018_basic.sh
-     $(cocoa)(.local) source ./installation_scripts/unxv_simons_observatory.sh
-     $(cocoa)(.local) source ./installation_scripts/unxv_sn.sh
-     $(cocoa)(.local) source ./installation_scripts/unxv_spt.sh
+     $(cocoa)(.local) cd "${ROOTDIR:?}"
+     $(cocoa)(.local) source "${ROOTDIR:?}"/installation_scripts/unxv_act_dr6.sh
+     $(cocoa)(.local) source "${ROOTDIR:?}"/installation_scripts/unxv_bao.sh
+     $(cocoa)(.local) source "${ROOTDIR:?}"/installation_scripts/unxv_bicep.sh
+     $(cocoa)(.local) source "${ROOTDIR:?}"/installation_scripts/unxv_camspec.sh
+     $(cocoa)(.local) source "${ROOTDIR:?}"/installation_scripts/unxv_h0licow.sh
+     $(cocoa)(.local) source "${ROOTDIR:?}"/installation_scripts/unxv_lipop.sh
+     $(cocoa)(.local) source "${ROOTDIR:?}"/installation_scripts/unxv_planck2018_basic.sh
+     $(cocoa)(.local) source "${ROOTDIR:?}"/installation_scripts/unxv_simons_observatory.sh
+     $(cocoa)(.local) source "${ROOTDIR:?}"/installation_scripts/unxv_sn.sh
+     $(cocoa)(.local) source "${ROOTDIR:?}"/installation_scripts/unxv_spt.sh
 
 To ensure these scripts can download these datasets, users must be sure that the environment keys below are *NOT* set. These keys are shown on `set_installation_options.sh`. The command `unset -v` unset them. 
 
@@ -385,19 +390,19 @@ Once installation is complete, the user must learn how to start, use, and exit t
 
 Download and run the Miniconda installation script. 
 
-      export CONDA_DIR="/gpfs/home/XXX/miniconda"
+    export CONDA_DIR="/gpfs/home/XXX/miniconda"
     
-      mkdir "${CONDA_DIR:?}"
+    mkdir "${CONDA_DIR:?}"
     
-      wget https://repo.continuum.io/miniconda/Miniconda3-py38_23.9.0-0-Linux-x86_64.sh
+    wget https://repo.continuum.io/miniconda/Miniconda3-py38_23.9.0-0-Linux-x86_64.sh
     
-      /bin/bash Miniconda3-py38_23.9.0-0-Linux-x86_64.sh -f -b -p "${CONDA_DIR:?}"
+    /bin/bash Miniconda3-py38_23.9.0-0-Linux-x86_64.sh -f -b -p "${CONDA_DIR:?}"
 
 Please don't forget to adapt the path assigned to `CONDA_DIR` in the command above:
 
 After installation, users must source the conda configuration file, as shown below:
 
-      source $CONDA_DIR/etc/profile.d/conda.sh \
+    source $CONDA_DIR/etc/profile.d/conda.sh \
           && conda config --set auto_update_conda false \
           && conda config --set show_channel_urls true \
           && conda config --set auto_activate_base false \
@@ -477,35 +482,48 @@ Below, we provide an example YAML configuration for an MCMC chain with DES 3x2pt
 
 ### :interrobang: FAQ: How do users set the environment for projects involving Machine Learning emulators? <a name="ml_emulators"></a>
 
-If the user wants to add, without GPU support, Tensorflow, Keras, and PyTorch for an emulator-based project via Conda, then type
+Commenting out the environmental flags shown below, located at *set_installation_options* script, will enable the installation of machine-learning-related libraries via pip.  
 
-      conda activate cocoa
-      "${CONDA_PREFIX:?}"/bin/pip install --no-cache-dir \
+    [Adapted from Cocoa/set_installation_options.sh shell script] 
+     
+    # ------------------------------------------------------------------------------
+    # If not set, Cocoa/installation_scripts/setup_pip_core_packages.sh will install several ML packages
+    # ------------------------------------------------------------------------------
+    #export IGNORE_EMULATOR_CPU_PIP_PACKAGES=1
+    #export IGNORE_EMULATOR_GPU_PIP_PACKAGES=1
+        
+We recommend using the GPU versions to train the emulator while using the CPU versions to run the MCMCs. This can be achieved by creating two separate environments, i.e., two independent CoCoA copies. Alternatively, users can manually incorporate the pip ML installation commands located on the shell script `Cocoa/installation_scripts/setup_pip_core_packages.sh` in their conda environments (two conda environments, one for the GPU and one for the CPU runs).
+
+    [Adapted from Cocoa/installation_scripts/setup_pip_core_packages.sh script - the command may not be entirely up to date] 
+     
+    #CPU VERSION
+    env CXX="${CXX_COMPILER:?}" CC="${C_COMPILER:?}" ${PIP3:?} install \
         'tensorflow-cpu==2.12.0' \
+        'tensorflow_probability-0.21.0' \
         'keras==2.12.0' \
         'keras-preprocessing==1.1.2' \
         'torch==1.13.1+cpu' \
         'torchvision==0.14.1+cpu' \
-        'torchaudio==0.13.1' --extra-index-url https://download.pytorch.org/whl/cpu
+        'torchaudio==0.13.1' \
+        'tensiometer==0.1.2' \
+      --extra-index-url "https://download.pytorch.org/whl/cpu" \
+      --prefix="${ROOTDIR:?}/.local" 
 
-In case the users want GPU support, the following commands will install the GPU version of 
-these packages, assuming CUDA 11.6, click [here](https://pytorch.org/get-started/previous-versions/) for additional information).
+    (...)
 
-      "${CONDA_PREFIX:?}"/bin/pip install --no-cache-dir \
+    #GPU VERSION
+    env CXX="${CXX_COMPILER:?}" CC="${C_COMPILER:?}" ${PIP3:?} install \
         'tensorflow==2.12.0' \
+        'tensorflow_probability-0.21.0' \
         'keras==2.12.0' \
         'keras-preprocessing==1.1.2' \
         'torch==1.13.1+cu116' \
         'torchvision==0.14.1+cu116' \
-        'torchaudio==0.13.1' --extra-index-url https://download.pytorch.org/whl/cu116
-
-Commenting out the environmental flags shown below, located at *set_installation_options* script, will enable the installation of machine-learning-related libraries via pip.  
-
-      #export IGNORE_EMULATOR_CPU_PIP_PACKAGES=1
-      #export IGNORE_EMULATOR_GPU_PIP_PACKAGES=1
-        
-We recommend using the GPU versions to train the emulator while using the CPU versions to run the MCMCs. For this purpose, we suggest creating two separate conda environments. One could be named `cocoa`, while the other could be called `cocoaemu` and contain the GPU versions of the machine learning packages.
-                     
+        'torchaudio==0.13.1' \
+        'tensiometer==0.1.2' \
+      --extra-index-url "https://download.pytorch.org/whl/cu116" \
+      --prefix="${ROOTDIR:?}/.local"
+      
 ### :interrobang: FAQ: How can users improve their Bash/C/C++ knowledge to develop Cocoa/Cosmolike? :book::book: <a name="lectnotes"></a>
 
 A working knowledge of Python is required to understand the Cobaya framework at the developer level. Users must also know the Bash language to understand Cocoa's scripts. Proficiency in C and C++ is also needed to manipulate Cosmolike and the C++ Cobaya-Cosmolike C++ interface. Finally, users need to understand the Fortran-2003 language to modify CAMB.
@@ -612,7 +630,8 @@ This method is slow and not advisable :stop_sign::thumbsdown:. When Conda is una
     
 To perform the local semi-autonomous installation, users must modify flags written on the shell scripts *set_installation_options.sh* and `installation_scripts/flags_manual_installation.sh` because the default behavior corresponds to an installation via Conda. First, select the environmental key `MANUAL_INSTALLATION` as shown below:
 
-    [Extracted from set_installation_options.sh script] 
+    [Adapted from Cocoa/set_installation_options.sh script] 
+
     # ------------------------------------------------------------------------------------
     # HOW COCOA SHOULD BE INSTALLED? -----------------------------------------------------
     # ------------------------------------------------------------------------------------
@@ -621,7 +640,7 @@ To perform the local semi-autonomous installation, users must modify flags writt
     
 Finally, set the following environmental keys:
  
-    [Extracted from `installation_scripts/flags_manual_installation.sh` shell script]
+    [Adapted from Cocoa/installation_scripts/flags_manual_installation.sh shell script]
     # ------------------------------------------------------------------------------------
     # IF SET, COCOA DOES NOT USE SYSTEM PIP PACKAGES -------------------------------------
     # ------------------------------------------------------------------------------------
