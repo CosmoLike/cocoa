@@ -712,34 +712,34 @@ Until recently, Cocoa development was unstructured, and developers were allowed 
 
 We will implement the philosophy that **a commit in the main branch should contain an atomic change that takes code from a working state to another working state with improvements that are meaningful and well tested.** So, developers should propose changes to the `main` branch in larger chunks, as shown below. 
 
-Important note: we **strongly** advise users to use the up-to-date `git` given by Cocoa conda environment. 
+Important note: we **strongly** advise developers to use the up-to-date `git` given by Cocoa conda environment. 
 
 **Step :one:**: create a development branch from the `main` branch. Do not call the development branch `dev`, it is reserved for work done by the primary Cocoa developers. Let's call this new branch `xyzdev` for concreteness (tip: the use of developers' initials helps make the branch name unique)
 
-    # (main) = users must input the command below on the main branch.
+    # (main) = developers must input the command below on the main branch.
     (main) git checkout -b xyzdev
 
-In the case where the `xyzdev` already exists, use `git switch` instead of `git checkout -b`. Users also have freedom to push their develop branches to server via the command
+In the case where the `xyzdev` already exists, use `git switch` instead of `git checkout -b`. Developers also have freedom to push their develop branches to server via the command
 
-    # (xyzdev) = users must input the command below on the xyzdev branch.
+    # (xyzdev) = developers must input the command below on the xyzdev branch.
     (xyzdev) git push -u origin xyzdev
 
 
 **Step :two:**: develop the proposed changes. We advise developers to commit frequently. In your branch, a commit does not need to be atomic, changing the code from one working state to another well-tested meaningful working state. In your branch, you have absolute freedom.
 
-**Step :three:**: Once there is an atomic, meaningful, and well-tested improvement to Cocoa, the developer needs first to merge any subsequent changes made in `main` while the user has been working on the `xyzdev` branch.
+**Step :three:**: Once there is an atomic, meaningful, and well-tested improvement to Cocoa, the developer needs first to merge any subsequent changes made in `main` while the developer has been working on the `xyzdev` branch.
 
-    # (xyzdev) = users must input the command below on the xyzdev branch.
+    # (xyzdev) = developers must input the command below on the xyzdev branch.
     (xyzdev) git merge main
 
 This step may create conflicts that must be addressed before step four. 
 
 **Step :four:**: Once you have merge recent changes made on the `main` branch, we will push to the main branch the changes made on the `xyzdev` branch by first **squashing all your changes into a single commit** as shown below
 
-    # (xyzdev) = users must input the command below on the xyzdev branch.
+    # (xyzdev) = developers must input the command below on the xyzdev branch.
     (xyzdev) git switch main
     
-    # (main) = users must input the command below on the main branch.
+    # (main) = developers must input the command below on the main branch.
     (main) git merge --squash xyzdev
 
     (main) git commit -m "squash merge - xyzdev branch: added development on abc features"
