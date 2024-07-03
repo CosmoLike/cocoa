@@ -714,7 +714,7 @@ We will implement the philosophy that **a commit in the main branch should conta
 
 Important note: we **strongly** advise users to use the up-to-date `git` given by Cocoa conda environment. 
 
-**Step :one:**: create a development branch from the `main` branch. Do not call the development branch `dev`, it is reserved for work done by the primary Cocoa developers. Let's call this new branch `xyzdev` for concreteness (the use of developers' initials helps making the branch naming unique).
+**Step :one:**: create a development branch from the `main` branch. Do not call the development branch `dev`, it is reserved for work done by the primary Cocoa developers. Let's call this new branch `xyzdev` for concreteness (tip: the use of developers' initials helps make the branch name unique)
 
     # (main) = users must input the command below on the main branch.
     (main) git checkout -b xyzdev
