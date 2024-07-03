@@ -77,7 +77,7 @@ Users will see a terminal like this: `$(cocoa)(.local)`. *This is a feature, not
     
     export OMP_PROC_BIND=close; export OMP_NUM_THREADS=4
 
- **Step three:**: Run `cobaya-run` on the first example of the YAML files we provide.
+ **Step :three:**: Run `cobaya-run` on the first example of the YAML files we provide.
 
 One model evaluation:
 
