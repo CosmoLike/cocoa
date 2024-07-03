@@ -2,8 +2,8 @@
 1. [Switching the default CAMB/CLASS (the easy way)](#appendix_new_camb_class)
 2. [Switching the default CAMB/CLASS (the not-so-easy way)](#appendix_new_camb_class_medium)
 3. [Adding additional patches to the default CAMB/CLASS](#appendix_new_camb_class_patches)
-4. [Understanding CAMB's patches (developers only ☠️)](#appendix_patch_camb)
-5. [Understanding CLASS's patches (developers only ☠️)](#appendix_patch_class)
+4. [Understanding CAMB's patches (developers only)](#appendix_patch_camb)
+5. [Understanding CLASS's patches (developers only)](#appendix_patch_class)
 
 Installing a new CAMB code in Cocoa requires a few changes to the existing CAMB/CLASS code. Fortunately, CoCoA provides a set of scripts and patches that automatically handle all the necessary adjustments.
       
@@ -23,7 +23,7 @@ Swapping the default CAMB/CLASS is simple. Go to Cocoa's main folder and open th
 
 As long as your new CAMB/CLASS makefiles are not altered to the extent that the `.patch` files located on `camb_changes`, and also listed above, fail, that is all what is needed.
 
-## Switching the default CAMB/CLASS (the not-so-easy way) <a name="appendix_new_camb_class_medium"></a> 
+## Switching the default CAMB/CLASS (the not-so-easy way :heavy_exclamation_mark: :scream: :heavy_exclamation_mark:) <a name="appendix_new_camb_class_medium"></a> 
 
 If users want to create their own `setup_camb.sh` and `compile_camb.sh` scripts so they can work seamlessly with multiple modified Boltznman codes, they need to follow the steps below. Here, we assume the users want to create a new modified CAMB named CAMBQ (the modified class case is similar).
 
@@ -146,7 +146,7 @@ Adding additional patches to the default CAMB/CLASS is pretty straightforward. H
                        # add here the file that the patch file
                        )
                      
-## Understanding CAMB's patches (developers only ☠️) <a name="appendix_patch_camb"></a> 
+## Understanding CAMB's patches (developers only :bangbang: ☠️ :bangbang: ) <a name="appendix_patch_camb"></a> 
 
 To start, we show below the current list of CAMB patches
     
@@ -249,7 +249,7 @@ To start, we show below the current list of CAMB patches
         
     endif
         
-## Understanding CLASS's patches (developers only ☠️) <a name="appendix_patch_class"></a> 
+## Understanding CLASS's patches (developers only :bangbang: ☠️ :bangbang:) <a name="appendix_patch_class"></a> 
 
 To start, we show below the current list of CLASS patches
     
