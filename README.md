@@ -738,3 +738,4 @@ This step may create conflicts that must be addressed before step four.
 
     (main) git merge --squash xyzbranch
     
+Important note: **never** revert the branch ordering on squash merging by squashing the `main` changes to the `xyzbranch` branch.
