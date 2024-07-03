@@ -18,6 +18,7 @@
     11. [FAQ: How can users improve their Bash/C/C++ knowledge to develop Cocoa/Cosmolike?](#lectnotes)
     12. [Warning about Weak Lensing YAML files in Cobaya](#appendix_example_runs)
     13. [(not recommended) Installation of Cocoa's required packages without conda](#required_packages_cache)
+    14. [FAQ: How should developers push changes to the Cocoa main branch?](#push_main)
 
 ## Overview of the [Cobaya](https://github.com/CobayaSampler)-[CosmoLike](https://github.com/CosmoLike) Joint Architecture (Cocoa) <a name="overview"></a>
 
@@ -704,3 +705,7 @@ Finally, set the following environmental keys:
     #export IGNORE_HDF5_INSTALLATION=1
     #export IGNORE_EXPAT_CORE_PACKAGE=1
     #export IGNORE_PIP_CORE_PACKAGES=1
+
+### How should developers push changes to the Cocoa main branch? <a name="required_packages_cache"></a>
+
+[FAQ: ](#push_main)
