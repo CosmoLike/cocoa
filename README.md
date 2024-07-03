@@ -708,13 +708,13 @@ Finally, set the following environmental keys:
 
 ### :interrobang: FAQ: How should developers push changes to the Cocoa main branch? <a name="push_main"></a>
 
-Until recently, Cocoa development was unstructured, and developers were allowed to push directly to the main branch. Small commits were also not discouraged. This loose development will soon change. In particular, we will protect the main branch by requiring every push to be reviewed by Cocoa's leading developers. We also want to reduce the number of commits from now on. 
+Until recently, Cocoa development was unstructured, and developers were allowed to push directly to the `main` branch. Small commits were also not discouraged. This loose development rules will soon change. In particular, we will soon protect the `main` branch by requiring every push to be reviewed by Cocoa's leading developers. We also want to reduce the number of commits from now on. 
 
-We will implement the philosophy that *a commit in the main branch should contain an atomic change that takes code from a working state to another working state with improvements that are meaningful and well tested.* So, developers should propose changes to the main branch in larger chunks, as shown below. 
+We will implement the philosophy that **a commit in the main branch should contain an atomic change that takes code from a working state to another working state with improvements that are meaningful and well tested.** So, developers should propose changes to the `main` branch in larger chunks, as shown below. 
 
 Important note: we **strongly** advise users to use the up-to-date `git` given by Cocoa conda environment. 
 
-**Step :one:**: Assuming the developer is on the main branch, create a development branch from the main branch, not called `dev`, as this branch is reserved for work done by the primary Cocoa developers. Let's call this new branch `xyzbranch` for concreteness (the use of developers initials may help making the branch unique).
+**Step :one:**: create a development branch from the `main` branch. Do not call the development branch `dev`, it is reserved for work done by the primary Cocoa developers. Let's call this new branch `xyzbranch` for concreteness (the use of developers' initials may help making the branch unique).
     
     (main) git checkout -b vmbranch
 
@@ -737,5 +737,9 @@ This step may create conflicts that must be addressed before step four.
     (xyzbranch) git switch main
 
     (main) git merge --squash xyzbranch
-    
+
+    (main) git commit -m "squash merge - xyzbranch - added development on xyz features"
+
+    (main) git push origin main
+
 Important note: **never** revert the branch ordering on squash merging by squashing the `main` changes to the `xyzbranch` branch.
