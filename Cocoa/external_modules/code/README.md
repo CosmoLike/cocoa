@@ -2,27 +2,16 @@
 1. [Switching the default CAMB/CLASS (the easy way)](#appendix_new_camb_class)
 2. [Switching the default CAMB/CLASS (the not-so-easy way)](#appendix_new_camb_class_medium)
 3. [Adding additional patches to the default CAMB/CLASS](#appendix_new_camb_class_patches)
-4. [Understanding CAMB's patches (developers only)](#appendix_patch_camb)
-5. [Understanding CLASS's patches (developers only)](#appendix_patch_class)
+4. [Understanding CAMB's patches (developers only ☠️)](#appendix_patch_camb)
+5. [Understanding CLASS's patches (developers only ☠️)](#appendix_patch_class)
 
-Installing a new CAMB code in Cocoa requires a few changes to the existing CAMB/CLASS code. Fortunately, CoCoA provides the following set of scripts and patches that automatically handle all the necessary adjustments.
-
-    installation_scripts/setup_camb.sh
-    installation_scripts/compile_camb.sh
-    cocoa_installation_libraries/camb_changes/camb/_compilers.patch 
-    cocoa_installation_libraries/camb_changes/fortran/Makefile.patch
-    cocoa_installation_libraries/camb_changes/forutils/Makefile_compiler
-      
-    installation_scripts/setup_class.sh
-    installation_scripts/compile_class.sh
-    cocoa_installation_libraries/class_changes/Makefile.patch
-    cocoa_installation_libraries/class_changes/python/setup.patch
+Installing a new CAMB code in Cocoa requires a few changes to the existing CAMB/CLASS code. Fortunately, CoCoA provides a set of scripts and patches that automatically handle all the necessary adjustments.
       
 ## Switching the default CAMB/CLASS (the easy way) <a name="appendix_new_camb_class"></a> 
 
 Swapping the default CAMB/CLASS is simple. Go to Cocoa's main folder and open the file `set_installation_options.sh`. Then, adjust the following environmental keys. 
      
-    [Extracted and adapted from Cocoa/set_installation_options.sh]
+    [Adapted from Cocoa/set_installation_options.sh]
     
     export CAMB_URL="https://github.com/cmbant/CAMB"
     export CAMB_GIT_COMMIT="45d1c3d27e7480c0f9a82c98522c17ed422dd408"
@@ -48,7 +37,7 @@ and
 
 **Step :two::** Modify the name of the environmental variables `CAMB_URL`, `CAMB_NAME`, and `CAMB_GIT_COMMIT` on `setup_cambq.sh` shell script.
 
-    [Extracted and adapted from Cocoa/installation_scripts/setup_cambq.sh]
+    [Adapted from Cocoa/installation_scripts/setup_cambq.sh]
   
     CCIL="${ROOTDIR:?}/../cocoa_installation_libraries"
 
@@ -77,14 +66,14 @@ and
 
 **Step :three::** Modify the name of the environmental variable `CAMB_NAME` on `compile_cambq.sh` shell script.
 
-    [Extracted and adapted from Cocoa/installation_scripts/setup_cambq.sh]
+    [Adapted from Cocoa/installation_scripts/setup_cambq.sh]
     
     #FOLDER="${CAMB_NAME:-"CAMB"}"   # Original line - commented
     FOLDER="${CAMBQ_NAME:-"CAMB"}"  
 
 **Step :four::** Add the environmental variables `CAMB_URL`, `CAMB_NAME`, and `CAMB_GIT_COMMIT` to `set_installation_options.sh`. This is optional if `setup_cambq.sh` and `compile_cambq.sh` provide default reasonable values for these variables. 
 
-    [Extracted and adapted from Cocoa/set_installation_options.sh]
+    [Adapted from Cocoa/set_installation_options.sh]
 
     export CAMB_URL="https://github.com/cmbant/CAMB"
     export CAMB_GIT_COMMIT="45d1c3d27e7480c0f9a82c98522c17ed422dd408"
@@ -97,7 +86,7 @@ and
 
 **Step :five::** Add `setup_cambq.sh` to the list of files run by `setup_cocoa.sh` as shown below.
 
-    [Extracted and adapted from Cocoa/setup_cocoa.sh]
+    [Adapted from Cocoa/setup_cocoa.sh]
 
     declare -a TSCRIPTS=("setup_core_packages.sh" 
                          (...)
@@ -106,7 +95,7 @@ and
 
 **Step :six::** Add `compile_cambq.sh` to the list of files run by `compile_cocoa.sh` as shown below.
 
-    [Extracted and adapted from Cocoa/compile_cocoa.sh]
+    [Adapted from Cocoa/compile_cocoa.sh]
 
     declare -a TSCRIPTS=("compile_camb.sh"
                          (...)
@@ -124,7 +113,7 @@ and
 
 ## Adding additional patches to the default CAMB/CLASS <a name="appendix_new_camb_class_patches"></a> 
 
-Adding additional patches to the default CAMB/CLASS is pretty straightforward. Here, we assume the users want to add a patch to modify CAMB (the modified class case is similar).
+Adding additional patches to the default CAMB/CLASS is pretty straightforward. Here, we assume the users want to add a patch to modify CAMB (the modified class case is similar). 
 
 **Step :one::** Copy and save the new patch files to `cocoa_installation_libraries/camb_changes`. 
 
@@ -157,7 +146,13 @@ Adding additional patches to the default CAMB/CLASS is pretty straightforward. H
                        # add here the file that the patch file
                        )
                      
-## Understanding CAMB's patches (developers only) <a name="appendix_patch_camb"></a> 
+## Understanding CAMB's patches (developers only ☠️) <a name="appendix_patch_camb"></a> 
+
+To start, we show below the current list of CAMB patches
+    
+    cocoa_installation_libraries/camb_changes/camb/_compilers.patch 
+    cocoa_installation_libraries/camb_changes/fortran/Makefile.patch
+    cocoa_installation_libraries/camb_changes/forutils/Makefile_compiler
     
 **:one: Patch `camb/_compilers.patch`**: This patch modifies the Python function`get_gfortran_version` located in the file `camb/_compilers.py`. 
     
@@ -254,8 +249,13 @@ Adding additional patches to the default CAMB/CLASS is pretty straightforward. H
         
     endif
         
-## Understanding CLASS's patches (developers only) <a name="appendix_patch_class"></a> 
+## Understanding CLASS's patches (developers only ☠️) <a name="appendix_patch_class"></a> 
 
+To start, we show below the current list of CLASS patches
+    
+    cocoa_installation_libraries/class_changes/Makefile.patch
+    cocoa_installation_libraries/class_changes/python/setup.patch
+    
 **:one: Patch `Makefile.patch`**: This patch modifies the file `Makefile` 
     
     [Extracted and adapted from Cocoa/external_modules/code/class_public/Makefile]
