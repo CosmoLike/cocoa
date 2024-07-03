@@ -718,7 +718,9 @@ Important note: we **strongly** advise users to use the up-to-date `git` given b
     
     (main) git checkout -b vmbranch
 
-Here, the `(main)` slogan emphasizes that the users need to input the command on the `main` branch. In the case where the `xyzbranch` already exists, use `git switch` instead of `git checkout -b`. Users also have freedom to push their develop branches to server via the command
+Here, the `(main)` slogan emphasizes that the users need to input the command on the `main` branch. 
+
+In the case where the `xyzbranch` already exists, use `git switch` instead of `git checkout -b`. Users also have freedom to push their develop branches to server via the command
 
     (xyzbranch) git push -u origin xyzbranch
 
