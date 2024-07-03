@@ -716,7 +716,7 @@ Important note: we **strongly** advise users to use the up-to-date `git` given b
 
 **Step :one:**: create a development branch from the `main` branch. Do not call the development branch `dev`, it is reserved for work done by the primary Cocoa developers. Let's call this new branch `xyzbranch` for concreteness (the use of developers' initials may help making the branch unique).
     
-    (main) git checkout -b vmbranch
+    (main) git checkout -b xyzbranch
 
 Here, the `(main)` slogan emphasizes that the users need to input the command on the `main` branch. 
 
