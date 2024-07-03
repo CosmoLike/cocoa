@@ -1,6 +1,6 @@
 # Table of contents
 1. [Overview of the Cobaya-CosmoLike Joint Architecture (Cocoa)](#overview)
-2. [Installation of Cocoa's required packages via Conda](#required_packages_conda)
+2. [Installation of Cocoa's core packages via Conda](#required_packages_conda)
 3. [Installation of Cobaya base code](#cobaya_base_code)
 4. [Running Cobaya Examples](#cobaya_base_code_examples)
 5. [Running Cosmolike projects](#running_cosmolike_projects)
@@ -17,7 +17,7 @@
     10. [FAQ: How do users set the environment for projects involving Machine Learning emulators?](#ml_emulators)
     11. [FAQ: How can users improve their Bash/C/C++ knowledge to develop Cocoa/Cosmolike?](#lectnotes)
     12. [Warning about Weak Lensing YAML files in Cobaya](#appendix_example_runs)
-    13. [(not recommended) Installation of Cocoa's required packages without conda](#required_packages_cache)
+    13. [(not recommended) Installation of Cocoa's core packages without conda](#required_packages_cache)
     14. [FAQ: How should developers push changes to the Cocoa main branch?](#push_main)
 
 ## Overview of the [Cobaya](https://github.com/CobayaSampler)-[CosmoLike](https://github.com/CosmoLike) Joint Architecture (Cocoa) <a name="overview"></a>
@@ -30,7 +30,7 @@ Our scripts never install packages, including Python modules, on `$HOME/.local` 
 
 This readme file presents basic and advanced instructions for installing all [Cobaya](https://github.com/CobayaSampler) and [CosmoLike](https://github.com/CosmoLike) components.
 
-## Installation of Cocoa's required packages via Conda <a name="required_packages_conda"></a>
+## Installation of Cocoa's core packages via Conda <a name="required_packages_conda"></a>
 
 **Step :one:**: Download the file `cocoapy38.yml` yml file, create the cocoa environment, activate it, and create symbolic links that will give better names for the GNU compiler installed by Conda.
 
@@ -158,7 +158,7 @@ Following best practices, Cocoa scripts download most external modules from thei
 
 ### Additional Installation Notes for experts and developers <a name="additional_notes"></a>
 
-:books::books: *Installation of Cocoa's required packages via Conda* :books::books:
+:books::books: *Installation of Cocoa's core packages via Conda* :books::books:
  
 - For those working on projects that utilize machine-learning-based emulators, the Appendix [Setting-up conda environment for Machine Learning emulators](#ml_emulators) provides additional commands for installing the necessary packages.
 
@@ -166,7 +166,7 @@ Following best practices, Cocoa scripts download most external modules from thei
 
 We assume here that the user has previously installed either [Minicoda](https://docs.conda.io/en/latest/miniconda.html) or [Anaconda](https://www.anaconda.com/products/individual) so that conda environments can be created. If this is not the case, refer to the Appendix [What should you do if you do not have Miniconda installed? Installation Guide](#overview_miniconda) for further instructions.
 
-The conda installation method should be chosen in the overwhelming majority of cases. In the rare instances in which the user cannot work with Conda, refer to the Appendix [Installation of Cocoa's required packages without Conda](#required_packages_cache), as it contains instructions for a much slower (and prone to errors) but conda-independent installation method.
+The conda installation method should be chosen in the overwhelming majority of cases. In the rare instances in which the user cannot work with Conda, refer to the Appendix [Installation of Cocoa's core packages without Conda](#required_packages_cache), as it contains instructions for a much slower (and prone to errors) but conda-independent installation method.
 
 :books::books: *Installation of Cobaya base code* :books::books:
 
@@ -415,7 +415,7 @@ After installation, users must source the conda configuration file, as shown bel
 
 The Cosmolike Weak Lensing pipelines contain parameters with different speed hierarchies. For example, Cosmolike execution time is reduced by approximately 50% when fixing the cosmological parameters. When varying only multiplicative shear calibration, Cosmolike execution time is reduced by two orders of magnitude. 
 
-Cobaya can't automatically handle parameters associated with the same likelihood that have different speed hierarchies. Luckily, we can manually impose the speed hierarchy in Cobaya using the `blocking:` option. The only drawback of this method is that parameters of all adopted likelihoods, not only the ones required by Cosmolike, must be manually specified.
+Cobaya cannot automatically handle parameters associated with the same likelihood that have different speed hierarchies. Luckily, we can manually impose the speed hierarchy in Cobaya using the `blocking:` option. The only drawback of this method is that parameters of all adopted likelihoods, not only the ones required by Cosmolike, must be manually specified.
 
 In addition to that, Cosmolike can't cache the intermediate products of the last two evaluations, which is necessary to exploit optimizations associated with dragging (`drag: True`). However, Cosmolike caches the intermediate products of the previous evaluation, thereby enabling the user to take advantage of the slow/fast decomposition of parameters in Cobaya's main MCMC sampler. 
 
@@ -613,7 +613,7 @@ The correct way to create YAML files with $\big(\Omega_m,\Omega_b\big)$ as prima
             derived: 'lambda omegam, H0: omegam*(H0/100)**2'
             latex: \Omega_\mathrm{m} h^2
             
-### 💀 ☠️ :stop_sign::thumbsdown: Installation of Cocoa's required packages without conda  (not recommended) <a name="required_packages_cache"></a>
+### 💀 ☠️ :stop_sign::thumbsdown: Installation of Cocoa's core packages without conda  (not recommended) <a name="required_packages_cache"></a>
 
 This method is slow and not advisable :stop_sign::thumbsdown:. When Conda is unavailable, the user can still perform a local semi-autonomous installation on Linux based on a few scripts we implemented. We require the pre-installation of the following packages:
 
