@@ -729,6 +729,7 @@ In the case where the `xyzdev` already exists, use `git switch` instead of `git 
 
 **Step :three:**: Once there is an atomic, meaningful, and well-tested improvement to Cocoa, the developer needs first to merge any subsequent changes made in `main` while the user has been working on the `xyzdev` branch.
 
+    # (xyzdev) = users must input the command below on the xyzdev branch.
     (xyzdev) git merge main
 
 This step may create conflicts that must be addressed before step four. 
