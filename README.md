@@ -48,7 +48,7 @@ This readme file presents basic and advanced instructions for installing all [Co
 
 **Step :one:**: We assume you are still in the Conda cocoa environment from the previous `conda activate cocoa` command. Now, clone the repository and go to the `cocoa` main folder,
 
-    "${CONDA_PREFIX}/bin/git" clone --depth 1 https://github.com/CosmoLike/cocoa.git cocoa
+    "${CONDA_PREFIX}"/bin/git clone --depth 1 https://github.com/CosmoLike/cocoa.git cocoa
     cd ./cocoa/Cocoa
 
 **Step :two:**: Run the script `setup_cocoa.sh` via
@@ -706,6 +706,35 @@ Finally, set the following environmental keys:
     #export IGNORE_EXPAT_CORE_PACKAGE=1
     #export IGNORE_PIP_CORE_PACKAGES=1
 
-### How should developers push changes to the Cocoa main branch? <a name="required_packages_cache"></a>
+### :interrobang: FAQ: How should developers push changes to the Cocoa main branch? <a name="push_main"></a>
 
-[FAQ: ](#push_main)
+Until recently, Cocoa development was unstructured, and developers were allowed to push directly to the main branch. Small commits were also not discouraged. This loose development will soon change. In particular, we will protect the main branch by requiring every push to be reviewed by Cocoa's leading developers. We also want to reduce the number of commits from now on. 
+
+We will implement the philosophy that *a commit in the main branch should contain an atomic change that takes code from a working state to another working state with improvements that are meaningful and well tested.* So, developers should propose changes to the main branch in larger chunks, as shown below. 
+
+Important note: we **strongly** advise users to use the up-to-date `git` given by Cocoa conda environment. 
+
+**Step :one:**: Assuming the developer is on the main branch, create a development branch from the main branch, not called `dev`, as this branch is reserved for work done by the primary Cocoa developers. Let's call this new branch `xyzbranch` for concreteness (the use of developers initials may help making the branch unique).
+    
+    (main) git checkout -b vmbranch
+
+Here, the `(main)` slogan emphasizes that the users need to input the command on the `main` branch. In the case where the `xyzbranch` already exists, use `git switch` instead of `git checkout -b`. Users also have freedom to push their develop branches to server via the command
+
+    (xyzbranch) git push -u origin xyzbranch
+
+Here, the `(xyzbranch)` slogan emphasizes that the users need to input the command on the `xyzbranch` developer branch.
+
+**Step :two:**: develop the proposed changes. We advise developers to commit frequently. In your branch, a commit does not need to be atomic, changing the code from one working state to another well-tested meaningful working state. In your branch, you have absolute freedom.
+
+**Step :three:**: Once there is an atomic, meaningful, and well-tested improvement to Cocoa, the developer needs first to merge any subsequent changes made in `main` while the user has been working on the `xyzbranch` branch.
+
+    (xyzbranch) git merge main
+
+This step may create conflicts that must be addressed before step four. 
+
+**Step :four:**: Once you have merge recent changes made on the `main` branch, we will push to the main branch the changes made on the `xyzbranch` branch by first **squashing all your changes into a single commit** as shown below
+
+    (xyzbranch) git switch main
+
+    (main) git merge --squash xyzbranch
+    
