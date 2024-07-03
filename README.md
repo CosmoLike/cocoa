@@ -6,7 +6,7 @@
 5. [Running Cosmolike projects](#running_cosmolike_projects)
 6. [Creating Cosmolike projects (external readme)](Cocoa/projects/)
 7. [Appendix](#appendix)
-    1. [Proper Credits](#appendix_proper_credits)
+    1. [Credits](#appendix_proper_credits)
     2. [Additional Installation Notes For Experts and Developers](#additional_notes)
     3. [FAQ: What should you do if installation or compilation goes wrong?](#running_wrong)
     4. [FAQ: How to compile the Boltzmann, CosmoLike, and Likelihood codes separately](#appendix_compile_separately)
@@ -128,9 +128,9 @@ Users will see a terminal like this: `$(cocoa)(.local)`. *This is a feature, not
 
 ## Appendix <a name="appendix"></a>
 
-### Proper Credits <a name="appendix_proper_credits"></a>
+### Credits <a name="appendix_proper_credits"></a>
 
-The following is not an exhaustive list of the codes we use
+The following is not an exhaustive list of the codes we use/download/adopt
 
 - [Cobaya](https://github.com/CobayaSampler) is a framework developed by Dr. Jesus Torrado and Prof. Anthony Lewis
 
