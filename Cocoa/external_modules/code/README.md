@@ -67,7 +67,7 @@ Cocoa selects the URL to download the likelihoods (and the version of the likeli
 
 If users want to create their own `setup_camb.sh` and `compile_camb.sh` scripts to work seamlessly with multiple modified Boltzmann codes, they must follow the steps below. Here, we assume the users want to create a new modified CAMB named CAMBQ (the modified class case is similar).
 
-**Step :one::** Copy the setup and compile scripts. 
+**Step :one::** Copy the setup and compile shell scripts. 
 
     cp "${ROOTDIR:?}"/installation_scripts/setup_camb "${ROOTDIR:?}"/installation_scripts/setup_cambq
 
