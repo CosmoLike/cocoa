@@ -1,6 +1,6 @@
 # Table of contents
-1. [FAQ: How to download modern Planck data](#new_planck_data)
-2. [FAQ: How to create scripts that download data for modern experiments (developers only)](#new_likelihood_and_data)
+1. [FAQ: How to download modern Planck data?](#new_planck_data)
+2. [FAQ: How to create scripts that download data for modern experiments? (developers only)](#new_likelihood_and_data)
 
 How to create scripts that download and compile likelihoods and data for modern experiments? <a name="new_likelihood_and_data"></a>
 
@@ -42,6 +42,6 @@ Cocoa selects the URL to download the data (and the version of the data) via the
     export ACT_DR6_DATA_FILE="ACT_dr6_likelihood_v1.2.tgz"
 
 
-### :interrobang: FAQ: How to create scripts that download data for modern experiments (developers only :bangbang: ☠️ :bangbang: )? <a name="new_likelihood_and_data"></a>
+### :interrobang: FAQ: How to create scripts that download data for modern experiments? (developers only :bangbang: ☠️ :bangbang: ) <a name="new_likelihood_and_data"></a>
 
 TODO
