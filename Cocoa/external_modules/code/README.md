@@ -1,13 +1,14 @@
 # Table of contents
-1. [Switching the default CAMB/CLASS (the easy way)](#appendix_new_camb_class)
-2. [Switching the default CAMB/CLASS (the not-so-easy way)](#appendix_new_camb_class_medium)
-3. [Adding additional patches to the default CAMB/CLASS](#appendix_new_camb_class_patches)
+1. [FAQ: How to switch the default CAMB/CLASS? (the easy way)](#appendix_new_camb_class)
+2. [FAQ: How to switch the default CAMB/CLASS? (the not-so-easy way)](#appendix_new_camb_class_medium)
+3. [FAQ: How to add additional patches to the default CAMB/CLASS?](#appendix_new_camb_class_patches)
 4. [Understanding CAMB's patches (developers only)](#appendix_patch_camb)
 5. [Understanding CLASS's patches (developers only)](#appendix_patch_class)
+6. [FAQ: How to download and compile likelihoods for modern CMB data?](#new_planck_likelihoods)
 
 Installing a new CAMB code in Cocoa requires a few changes to the existing CAMB/CLASS code. Fortunately, CoCoA provides a set of scripts and patches that automatically handle all the necessary adjustments.
       
-## Switching the default CAMB/CLASS (the easy way) <a name="appendix_new_camb_class"></a> 
+## :interrobang: FAQ: How to switch the default CAMB/CLASS? (the easy way) <a name="appendix_new_camb_class"></a> 
 
 Swapping the default CAMB/CLASS is simple. Go to Cocoa's main folder and open the file `set_installation_options.sh`. Then, adjust the following environmental keys. 
      
@@ -23,7 +24,7 @@ Swapping the default CAMB/CLASS is simple. Go to Cocoa's main folder and open th
 
 As long as your new CAMB/CLASS makefiles are not altered to the extent that the `.patch` files located on `camb_changes`, and also listed above, fail, that is all what is needed.
 
-## Switching the default CAMB/CLASS (the not-so-easy way :heavy_exclamation_mark: :scream: :heavy_exclamation_mark:) <a name="appendix_new_camb_class_medium"></a> 
+## :interrobang: FAQ: How to switch the default CAMB/CLASS? (the not-so-easy way :heavy_exclamation_mark: :scream: :heavy_exclamation_mark:) <a name="appendix_new_camb_class_medium"></a> 
 
 If users want to create their own `setup_camb.sh` and `compile_camb.sh` scripts so they can work seamlessly with multiple modified Boltznman codes, they need to follow the steps below. Here, we assume the users want to create a new modified CAMB named CAMBQ (the modified class case is similar).
 
@@ -111,7 +112,7 @@ and
     #add the line below
     unset -v CAMBQ_URL CAMBQ_GIT_COMMIT CAMBQ_NAME
 
-## Adding additional patches to the default CAMB/CLASS <a name="appendix_new_camb_class_patches"></a> 
+## :interrobang: FAQ: How to add additional patches to the default CAMB/CLASS? <a name="appendix_new_camb_class_patches"></a> 
 
 Adding additional patches to the default CAMB/CLASS is pretty straightforward. Here, we assume the users want to add a patch to modify CAMB (the modified class case is similar). 
 
@@ -286,4 +287,41 @@ To start, we show below the current list of CLASS patches
     #    stderr=sbp.PIPE).communicate()[1]             # Original line - commented
     #if b"mvec" not in MVEC_STRING:                    # Original line - commented
     #    liblist += ["mvec","m"]                       # Original line - commented
+
+
+### :interrobang: FAQ: How to download and compile likelihoods for modern CMB data? <a name="new_planck_likelihoods"></a>
+
+The CMB data sets require specialized likelihoods. Cocoa will download, patch and compile them as long as these following keys are not set on `Cocoa/set_installation_options.sh`
+
+    [Adapted from Cocoa/set_installation_options.sh shell script]
+
+    # ------------------------------------------------------------------------------
+    # The keys below control which packages will be installed and compiled when ----  
+    # running setup_cocoa.sh and compile_cocoa.sh. They are mostly helpful when ----
+    # debugging cocoa --------------------------------------------------------------
+    # ------------------------------------------------------------------------------
     
+    (...)
+    
+    #export IGNORE_PLANCK_COMPILATION=1
+    #export IGNORE_ACTDR4_COMPILATION=1
+    #export IGNORE_ACTDR6_COMPILATION=1
+    #export IGNORE_SIMONS_OBSERVATORY_LIKELIHOOD_COMPILATION=1
+    #export IGNORE_CAMSPEC_LIKELIHOOD_COMPILATION=1
+    #export IGNORE_LIPOP_LIKELIHOOD_COMPILATION=1
+
+Cocoa selects the URL to download the likelihoods (and the version of the likelohood) via the following keys also shown on `Cocoa/set_installation_options.sh`
+
+    [Adapted from Cocoa/set_installation_options.sh shell script]
+    
+    # ------------------------------------------------------------------------------
+    # PACKAGE URL AND VERSIONS. CHANGES IN THE COMMIT ID MAY BREAK COCOA -----------
+    # ------------------------------------------------------------------------------
+
+    (...)
+    
+    export HILLIPOP_URL="https://github.com/planck-npipe/hillipop.git"
+    export HILLIPOP_GIT_COMMIT="cc9cbe31991d4662522241543a46d44d2cdec251"
+
+    export LOLLIPOP_URL="https://github.com/planck-npipe/lollipop.git"
+    export LOLLIPOP_GIT_COMMIT="280a9c93d33bc6a058d6bf769ec82d9f7fdbd2b6"
