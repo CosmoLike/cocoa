@@ -1,6 +1,6 @@
 # Table of contents
-1. [FAQ: How to download modern Planck data?](#new_planck_data)
-2. [FAQ: How to create scripts that download data for modern experiments? (developers only)](#new_likelihood_and_data)
+1. [FAQ: How to download modern CMB data?](#new_planck_data)
+2. [FAQ: How to create scripts that download data from current experiments? (developers only)](#new_likelihood_and_data)
 
 How to create scripts that download and compile likelihoods and data for modern experiments? <a name="new_likelihood_and_data"></a>
 
@@ -46,6 +46,6 @@ Cocoa selects the URL to download the data (and the version of the data) via the
      # This is only possible because each version is saved on a separated folder
      export SO_DATA_VERSION="v0.7.1 v0.8"
 
-### :interrobang: FAQ: How to create scripts that download data for modern experiments? (developers only :bangbang: ☠️ :bangbang: ) <a name="new_likelihood_and_data"></a>
+### :interrobang: FAQ: How to create scripts that download data from current experiments? (developers only :bangbang: ☠️ :bangbang: ) <a name="new_likelihood_and_data"></a>
 
 TODO
