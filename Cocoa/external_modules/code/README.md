@@ -1,5 +1,5 @@
 # Table of contents
-1. [FAQ: How to switch the default CAMB/CLASS? (the easy way)](#appendix_new_camb_class)
+1. [FAQ: How to switch the default adopted CAMB/CLASS? (the easy way)](#appendix_new_camb_class)
 2. [FAQ: How to download and compile likelihoods for modern CMB data?](#new_planck_likelihoods)
 3. [FAQ: How to switch the default CAMB/CLASS? (the not-so-easy way)](#appendix_new_camb_class_medium)
 4. [FAQ: How to add additional patches to the default CAMB/CLASS?](#appendix_new_camb_class_patches)
@@ -8,7 +8,7 @@
 
 Installing a new CAMB code in Cocoa requires a few changes to the existing CAMB/CLASS code. Fortunately, Cocoa provides a set of scripts and patches that automatically handle the necessary adjustments.
       
-## :interrobang: FAQ: How to switch the default CAMB/CLASS? (the easy way) <a name="appendix_new_camb_class"></a> 
+## :interrobang: FAQ: How to switch the default adopted CAMB/CLASS? (the easy way) <a name="appendix_new_camb_class"></a> 
 
 Swapping the default CAMB/CLASS is simple. Go to Cocoa's main folder and open the file `set_installation_options.sh`. Then, adjust the following environmental keys. 
      
@@ -22,7 +22,7 @@ Swapping the default CAMB/CLASS is simple. Go to Cocoa's main folder and open th
     export CLASS_GIT_COMMIT="8df566c1ff2d0b3e40e106567c435575aea337be"
     export CLASS_NAME="class_public"
 
-As long as your new CAMB/CLASS makefiles are not altered to the extent that [Cocoa patch files designed to adjust CAMB installation](https://github.com/CosmoLike/cocoa/tree/dev/cocoa_installation_libraries/camb_changes) fail, that is all what is needed.
+As long as your new CAMB/CLASS makefiles are not altered to the extent that Cocoa patch files designed to adjust [CAMB installation](cocoa_installation_libraries/camb_changes) and [CLASS installation](cocoa_installation_libraries/class_changes)  fail, that is all that is needed to change the adopted Boltzmann codes.
 
 What happens if the Cocoa patch files fail? We have three sections dedicated to this problem. Check [FAQ: How to add additional patches to the default CAMB/CLASS?](#appendix_new_camb_class_patches), and [Understanding CAMB's patches (developers only)](#appendix_patch_camb), and [Understanding CLASS's patches (developers only)](#appendix_patch_class).
 
