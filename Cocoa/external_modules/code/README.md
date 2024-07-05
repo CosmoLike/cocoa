@@ -47,7 +47,7 @@ The CMB data sets require specialized likelihoods. Cocoa will download, patch an
     #export IGNORE_CAMSPEC_LIKELIHOOD_COMPILATION=1
     #export IGNORE_LIPOP_LIKELIHOOD_COMPILATION=1
 
-Cocoa selects the URL to download the likelihoods (and the version of the likelohood) via the following keys also shown on `Cocoa/set_installation_options.sh`
+Cocoa selects the URL to download the likelihoods (and the version of the likelohood) via the following keys.
 
     [Adapted from Cocoa/set_installation_options.sh shell script]
     
