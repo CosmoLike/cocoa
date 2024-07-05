@@ -300,7 +300,7 @@ To start, we show below the current list of CLASS patches.
     cocoa_installation_libraries/class_changes/Makefile.patch
     cocoa_installation_libraries/class_changes/python/setup.patch
     
-**:one: Patch `Makefile.patch`**: This patch modifies the file `Makefile` 
+**:one: Patch [Makefile.patch](../../../cocoa_installation_libraries/class_changes/Makefile.patch)**: This patch modifies the file `Makefile` 
     
     [Adapted from Cocoa/external_modules/code/class_public/Makefile]
      
@@ -312,7 +312,7 @@ To start, we show below the current list of CLASS patches.
     # add the line below
     CC       ?= $(C_COMPILER) 
    
-**:two: Patch python/setup.patch**: This patch modifies the file `python/setup.py` 
+**:two: Patch [python/setup.patch](../../../cocoa_installation_libraries/class_changes/python/setup.patch)**: This patch modifies the file `python/setup.py` 
     
     [Adapted from Cocoa/external_modules/code/class_public/python/setup.py]
     
