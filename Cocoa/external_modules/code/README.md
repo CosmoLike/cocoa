@@ -12,7 +12,7 @@ Installing a new CAMB code in Cocoa requires a few changes to the existing CAMB/
 
 Swapping the default CAMB/CLASS is simple. Go to Cocoa's main folder and open the file `set_installation_options.sh`. Then, adjust the following environmental keys. 
      
-    [Adapted from Cocoa/set_installation_options.sh]
+    [Adapted from Cocoa/set_installation_options.sh shell script]
     
     export CAMB_URL="https://github.com/cmbant/CAMB"
     export CAMB_GIT_COMMIT="45d1c3d27e7480c0f9a82c98522c17ed422dd408"
@@ -77,7 +77,7 @@ and
 
 **Step :two::** Modify the name of the environmental variables `CAMB_URL`, `CAMB_NAME`, and `CAMB_GIT_COMMIT` on `setup_cambq.sh` shell script.
 
-    [Adapted from Cocoa/installation_scripts/setup_cambq.sh]
+    [Adapted from Cocoa/installation_scripts/setup_cambq.sh shell script]
   
     CCIL="${ROOTDIR:?}/../cocoa_installation_libraries"
 
@@ -106,14 +106,14 @@ and
 
 **Step :three::** Modify the name of the environmental variable `CAMB_NAME` on `compile_cambq.sh` shell script.
 
-    [Adapted from Cocoa/installation_scripts/setup_cambq.sh]
+    [Adapted from Cocoa/installation_scripts/setup_cambq.sh shell script]
     
     #FOLDER="${CAMB_NAME:-"CAMB"}"   # Original line - commented
     FOLDER="${CAMBQ_NAME:-"CAMB"}"  
 
 **Step :four::** Add the environmental variables `CAMB_URL`, `CAMB_NAME`, and `CAMB_GIT_COMMIT` to `set_installation_options.sh`. This is optional if `setup_cambq.sh` and `compile_cambq.sh` provide default reasonable values for these variables. 
 
-    [Adapted from Cocoa/set_installation_options.sh]
+    [Adapted from Cocoa/set_installation_options.sh shell script]
 
     export CAMB_URL="https://github.com/cmbant/CAMB"
     export CAMB_GIT_COMMIT="45d1c3d27e7480c0f9a82c98522c17ed422dd408"
@@ -126,7 +126,7 @@ and
 
 **Step :five::** Add `setup_cambq.sh` to the list of files run by `setup_cocoa.sh` as shown below.
 
-    [Adapted from Cocoa/setup_cocoa.sh]
+    [Adapted from Cocoa/setup_cocoa.sh shell script]
 
     declare -a TSCRIPTS=("setup_core_packages.sh" 
                          (...)
@@ -135,7 +135,7 @@ and
 
 **Step :six::** Add `compile_cambq.sh` to the list of files run by `compile_cocoa.sh` as shown below.
 
-    [Adapted from Cocoa/compile_cocoa.sh]
+    [Adapted from Cocoa/compile_cocoa.sh shell script]
 
     declare -a TSCRIPTS=("compile_camb.sh"
                          (...)
@@ -144,7 +144,7 @@ and
    
 **Step :seven::** Add the following line to the script `Cocoa/installation_scripts/flags_impl_unset_keys.sh` so these new environmental variables don't pollute the shell session
 
-    [Adapted from Cocoa/installation_scripts/flags_impl_unset_keys.sh]
+    [Adapted from Cocoa/installation_scripts/flags_impl_unset_keys.sh shell script]
 
     (...)
     
@@ -159,7 +159,7 @@ Adding additional patches to the default CAMB/CLASS is pretty straightforward. H
 
 **Step :two::** Modify the `setup_cambq.sh` shell script as shown below
 
-    [Extracted and adapted from Cocoa/installation_scripts/setup_camb.sh]
+    [Adapted from Cocoa/installation_scripts/setup_camb.sh shell script]
 
     # Patch CAMB to be compatible w/ COCOA environment --------------------------
 
@@ -196,7 +196,7 @@ To start, we show below the current list of CAMB patches
     
 **:one: Patch `camb/_compilers.patch`**: This patch modifies the Python function`get_gfortran_version` located in the file `camb/_compilers.py`. 
     
-    [Extracted and adapted from Cocoa/external_modules/code/CAMB/camb/_compilers.py]
+    [Adapted from Cocoa/external_modules/code/CAMB/camb/_compilers.py]
     
     def get_gfortran_version(command='gfortran'):
         #ver = call_command(command + " -dumpversion")           # Original line - commented
@@ -215,7 +215,7 @@ To start, we show below the current list of CAMB patches
     
 **:two: Patch `fortran/Makefile.patch`**: This patch modifies the file `fortran/Makefile`.
 
-    [Extracted and adapted from Cocoa/external_modules/code/CAMB/fortran/Makefile]
+    [Adapted from Cocoa/external_modules/code/CAMB/fortran/Makefile]
     
     #Will detect ifort/gfortran or edit for your compiler            # Original line - commented
     #ifneq ($(COMPILER),gfortran)                                    # Original line - commented
@@ -256,7 +256,7 @@ To start, we show below the current list of CAMB patches
 
 **:three: Patch `forutils/Makefile.patch`**: This patch modifies the file `forutils/Makefile_compiler`
 
-    [Extracted and adapted from Cocoa/external_modules/code/CAMB/forutils/Makefile_compiler]
+    [Adapted from Cocoa/external_modules/code/CAMB/forutils/Makefile_compiler]
     
     #ifneq ($(COMPILER),gfortran)                                    # Original line - commented
     #   ifortErr = $(shell which ifort >/dev/null 2>&1; echo $$?)    # Original line - commented
@@ -298,7 +298,7 @@ To start, we show below the current list of CLASS patches
     
 **:one: Patch `Makefile.patch`**: This patch modifies the file `Makefile` 
     
-    [Extracted and adapted from Cocoa/external_modules/code/class_public/Makefile]
+    [Adapted from Cocoa/external_modules/code/class_public/Makefile]
      
     # your C compiler:
     #CC       = gcc                           # Original line - commented
@@ -310,7 +310,7 @@ To start, we show below the current list of CLASS patches
    
 **:two: Patch python/setup.patch**: This patch modifies the file `python/setup.py` 
     
-    [Extracted and adapted from Cocoa/external_modules/code/class_public/python/setup.py]
+    [Adapted from Cocoa/external_modules/code/class_public/python/setup.py]
     
     #GCCPATH_STRING = sbp.Popen(                           # Original line - commented
     #    ['gcc -print-libgcc-file-name'],                  # Original line - commented
