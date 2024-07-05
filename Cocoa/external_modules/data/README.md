@@ -22,7 +22,7 @@ Cocoa can download [CamSpec](https://people.ast.cam.ac.uk/~stg20/camspec/index.h
     export IGNORE_SETUP_CAMSPEC_CMB_DATA=1
     export IGNORE_SETUP_LIPOP_CMB_DATA=1
 
-Cocoa selects the URL to download the data (and the version of the data) via the following keys.
+Cocoa selects the URL to download the data (and its version) using the following keys.
 
     [Adapted from Cocoa/set_installation_options.sh shell script] 
 
@@ -43,7 +43,7 @@ Cocoa selects the URL to download the data (and the version of the data) via the
 
     export SO_DATA_URL="https://portal.nersc.gov/cfs/sobs/users/MFLike_data"
     # Cocoa can download multiple versions of the data (to reproduce existing work)
-    # This is only possible because each version is saved on a separated folder
+    # This is only possible because each version is saved in a separate folder
     export SO_DATA_VERSION="v0.7.1 v0.8"
 
 ## :interrobang: FAQ: How to create scripts that download data from current experiments? (developers only :bangbang: ☠️ :bangbang: ) <a name="new_likelihood_and_data"></a>

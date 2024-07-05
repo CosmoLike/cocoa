@@ -65,7 +65,7 @@ Cocoa selects the URL to download the likelihoods (and the version of the likeli
 
 ## :interrobang: FAQ: How to switch the default CAMB/CLASS? (the not-so-easy way :heavy_exclamation_mark: :scream: :heavy_exclamation_mark:) <a name="appendix_new_camb_class_medium"></a> 
 
-If users want to create their own setup and compile shell scripts to work seamlessly with multiple modified Boltzmann codes, they must follow the steps below. Here, we assume the users want to create a new modified CAMB named CAMBQ (the modified class case is similar).
+If users want to create their setup and compile shell scripts to work seamlessly with multiple modified Boltzmann codes, they must follow the steps below. Here, we assume the users want to create a new modified CAMB named CAMBQ (the modified class case is similar).
 
 **Step :one::** Copy the setup and compile shell scripts. 
 
@@ -171,26 +171,26 @@ Adding additional patches to the default CAMB/CLASS is pretty straightforward. H
     declare -a TFOLDER=("camb/" 
                         "fortran/" 
                         "forutils/"
-                        # add the subfolder where the file to be patched is located
+                        # Add here the subfolder where the file to be patched is located
                         ) # If nonblank, path must include /
   
     # T = TMP
     declare -a TFILE=("_compilers.py" 
                       "Makefile" 
                       "Makefile_compiler"
-                      # add here the file that needs to be patched
+                      # Add here the file that needs to be patched
                       )
 
     #T = TMP, P = PATCH
     declare -a TFILEP=("_compilers.patch" 
                        "Makefile.patch" 
                        "Makefile_compiler.patch"
-                       # add here the file that the patch file
+                       # Add here the file that the patch file
                        )
                      
 ## Understanding CAMB's patches (developers only :bangbang: ☠️ :bangbang: ) <a name="appendix_patch_camb"></a> 
 
-To start, we show below the current list of CAMB patches.
+To start, we show the current list of CAMB patches below.
     
     cocoa_installation_libraries/camb_changes/camb/_compilers.patch 
     cocoa_installation_libraries/camb_changes/fortran/Makefile.patch
@@ -297,7 +297,7 @@ Below, we explain what these patches do.
         
 ## Understanding CLASS's patches (developers only :bangbang: ☠️ :bangbang:) <a name="appendix_patch_class"></a> 
 
-To start, we show below the current list of CLASS patches.
+To start, we show the current list of CLASS patches below.
     
     cocoa_installation_libraries/class_changes/Makefile.patch
     cocoa_installation_libraries/class_changes/python/setup.patch

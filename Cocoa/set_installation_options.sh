@@ -123,16 +123,17 @@ export ACT_DR6_DATA_FILE="ACT_dr6_likelihood_v1.2.tgz"
 
 export SO_DATA_URL="https://portal.nersc.gov/cfs/sobs/users/MFLike_data"
 # Cocoa can download multiple versions of the data (to reproduce existing work)
-# This is only possible because each version is saved on a separated folder
+# This is only possible because each version is saved in a separate folder
 export SO_DATA_VERSION="v0.7.1 v0.8"
 
 export VELOCILEPTORS_URL="https://github.com/sfschen/velocileptors.git"
 export VELOCILEPTORS_GIT_COMMIT="889a0c98895831eb23b250a26162cfb8a93237bd"
 export VELOCILEPTORS_NAME="velocileptors"
+
 # ------------------------------------------------------------------------------
 # The keys below control which packages will be installed and compiled when ----  
-# running setup/compile_cocoa.sh. They are mostly helpful when debugging cocoa -
-# (advice) The default settings should be just to compile/install all packages -s
+# running setup_cocoa.sh and compile_cocoa.sh. They are mostly helpful when ----
+# debugging cocoa --------------------------------------------------------------
 # ------------------------------------------------------------------------------
 #export IGNORE_CAMB_COMPILATION=1
 #export IGNORE_CLASS_COMPILATION=1
