@@ -2,7 +2,7 @@
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
-if [ -z "${SKIP_DECOMM_SPT}" ]; then
+if [ -z "${IGNORE_SETUP_SPT_CMB_DATA}" ]; then
 
   if [ -z "${ROOTDIR}" ]; then
     source start_cocoa.sh || { pfail 'ROOTDIR'; return 1; }
@@ -12,7 +12,7 @@ if [ -z "${SKIP_DECOMM_SPT}" ]; then
   ( source "${ROOTDIR:?}/installation_scripts/flags_check.sh" ) || return 1;
     
   unset_env_vars () { 
-    unset -v EDATAF URL FOLDER PACKDIR
+    unset -v EDATAF FOLDER URL PACKDIR
     cdroot || return 1;
   }
 

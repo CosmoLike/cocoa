@@ -281,7 +281,7 @@ if [ -z "${IGNORE_ALL_COBAYA_INSTALLATION}" ]; then
   #-----------------------------------------------------------------------------
   # TODO - download from original git repo
    
-  if [ -z "${IGNORE_SO_INSTALLATION}" ]; then
+  if [ -z "${IGNORE_SIMONS_OBSERVATORY_LIKELIHOOD_COMPILATION}" ]; then
 
     ptop "GETTING AND PATCHING SIMONS OBSERVATORY LIKELIHOOD" || return 1;
 
@@ -297,7 +297,7 @@ if [ -z "${IGNORE_ALL_COBAYA_INSTALLATION}" ]; then
   # INSTALL CAMSPEC 2021 LIKELIHOOD --------------------------------------------
   #-----------------------------------------------------------------------------
   
-  if [ -z "${IGNORE_CAMSPEC_INSTALLATION}" ]; then
+  if [ -z "${IGNORE_CAMSPEC_LIKELIHOOD_COMPILATION}" ]; then
 
     # note: we always delete CAMSPEC2018 likelihood
     rm -rf "${COB:?}/${COBLIKE:?}"/planck_2018_highl_CamSpec
@@ -327,7 +327,7 @@ if [ -z "${IGNORE_ALL_COBAYA_INSTALLATION}" ]; then
   # INSTALL LIPOP LIKELIHOOD ---------------------------------------------------
   #-----------------------------------------------------------------------------
   
-  if [ -z "${IGNORE_LIPOP_INSTALLATION}" ]; then
+  if [ -z "${IGNORE_LIPOP_LIKELIHOOD_COMPILATION}" ]; then
 
     flipop() {
       local TFOLDER="${COBLIKE:?}/${1:?}"

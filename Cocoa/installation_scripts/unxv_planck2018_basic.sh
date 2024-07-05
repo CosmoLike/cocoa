@@ -1,6 +1,6 @@
 #!/bin/bash
 
-if [ -z "${SKIP_DECOMM_PLANCK}" ]; then
+if [ -z "${IGNORE_SETUP_PLANCK_CMB_DATA}" ]; then
 
   if [ -z "${ROOTDIR}" ]; then
     source start_cocoa.sh || { pfail 'ROOTDIR'; return 1; }

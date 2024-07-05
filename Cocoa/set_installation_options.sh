@@ -30,19 +30,16 @@ export MINICONDA_INSTALLATION=1
 
 # ------------------------------------------------------------------------------
 # The flags below allow users to skip downloading specific datasets ------------
-# (advice) skipping LIPOP, CAMSPEC, Simons Observatory datasets saves ----------
-# (advice) considerable time in the initial cocoa installation -----------------
 # ------------------------------------------------------------------------------
-#export SKIP_DECOMM_ACT=1
-# export SKIP_DECOMM_SPT=1
-# export SKIP_DECOMM_PLANCK=1
-# export SKIP_DECOMM_BICEP=1
-# export SKIP_DECOMM_STRONG_LENSING=1
-# export SKIP_DECOMM_SN=1
-# export SKIP_DECOMM_BAO=1
-export SKIP_DECOMM_SIMONS_OBSERVATORY=1
-export SKIP_DECOMM_CAMSPEC=1
-export SKIP_DECOMM_LIPOP=1
+# export IGNORE_SETUP_BICEP_CMB_DATA=1
+# export IGNORE_SETUP_HOLICOW_STRONG_LENSING_DATA=1
+# export IGNORE_SETUP_SN_DATA=1
+# export IGNORE_SETUP_BAO_DATA=1
+# export IGNORE_SETUP_SPT_CMB_DATA=1
+export IGNORE_SETUP_SIMONS_OBSERVATORY_CMB_DATA=1
+# export IGNORE_SETUP_PLANCK_CMB_DATA=1
+export IGNORE_SETUP_CAMSPEC_CMB_DATA=1
+export IGNORE_SETUP_LIPOP_CMB_DATA=1
 
 # ------------------------------------------------------------------------------
 # If set, compile_planck.sh uses click like code from github.com/benabed/clik
@@ -146,6 +143,9 @@ export VELOCILEPTORS_NAME="velocileptors"
 #export IGNORE_ACTDR6_COMPILATION=1
 #export IGNORE_CPP_CUBA_INSTALLATION=1
 #export IGNORE_VELOCILEPTORS_COMPILATION=1
+#export IGNORE_SIMONS_OBSERVATORY_LIKELIHOOD_COMPILATION=1
+#export IGNORE_CAMSPEC_LIKELIHOOD_COMPILATION=1
+#export IGNORE_LIPOP_LIKELIHOOD_COMPILATION=1
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
