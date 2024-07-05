@@ -129,7 +129,9 @@ and
     [Adapted from Cocoa/setup_cocoa.sh shell script]
 
     declare -a TSCRIPTS=("setup_core_packages.sh" 
+                         
                          (...)
+                         
                          "setup_velocileptors.sh"
                          "setup_cambq.sh) 
 
@@ -138,15 +140,15 @@ and
     [Adapted from Cocoa/compile_cocoa.sh shell script]
 
     declare -a TSCRIPTS=("compile_camb.sh"
+                         
                          (...)
+                         
                          "compile_velocileptors.sh"
                          "compile_cambq.sh")                    
    
 **Step :seven::** Add the following line to the script `Cocoa/installation_scripts/flags_impl_unset_keys.sh` so these new environmental variables don't pollute the shell session
 
     [Adapted from Cocoa/installation_scripts/flags_impl_unset_keys.sh shell script]
-
-    (...)
     
     #add the line below
     unset -v CAMBQ_URL CAMBQ_GIT_COMMIT CAMBQ_NAME
@@ -230,7 +232,9 @@ To start, we show below the current list of CAMB patches
     (...)
     
     ifeq "$(ifortErr)" "0"
+   
         (...)
+    
     else
         #gfortErr = $(shell which gfortran >/dev/null; echo $$?)    # Original line - commented
         
