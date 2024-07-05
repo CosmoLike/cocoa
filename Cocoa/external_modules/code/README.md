@@ -258,7 +258,7 @@ To start, we show below the current list of CAMB patches.
         endif
      endif
 
-**:three: Patch `forutils/Makefile.patch`**: This patch modifies the file `forutils/Makefile_compiler`
+**:three: Patch [forutils/Makefile_compiler.patch](../../../cocoa_installation_libraries/camb_changes/forutils/Makefile_compiler.patch)**: This patch modifies the file `forutils/Makefile_compiler`
 
     [Adapted from Cocoa/external_modules/code/CAMB/forutils/Makefile_compiler]
     
