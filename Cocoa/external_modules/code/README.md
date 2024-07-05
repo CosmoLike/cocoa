@@ -215,7 +215,7 @@ To start, we show below the current list of CAMB patches.
     
     (...)
     
-**:two: Patch `fortran/Makefile.patch`**: This patch modifies the file `fortran/Makefile`.
+**:two: Patch [fortran/Makefile.patch](../../../cocoa_installation_libraries/camb_changes/fortran/Makefile.patch)**: This patch modifies the file `fortran/Makefile`.
 
     [Adapted from Cocoa/external_modules/code/CAMB/fortran/Makefile]
     
