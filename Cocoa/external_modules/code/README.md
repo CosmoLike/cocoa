@@ -22,7 +22,7 @@ Swapping the default CAMB/CLASS is simple. Go to Cocoa's main folder and open th
     export CLASS_GIT_COMMIT="8df566c1ff2d0b3e40e106567c435575aea337be"
     export CLASS_NAME="class_public"
 
-As long as your new CAMB/CLASS makefiles are not altered to the extent that Cocoa patch files designed to adjust [CAMB installation](../../../cocoa_installation_libraries/camb_changes) and [CLASS installation](cocoa_installation_libraries/class_changes)  fail, that is all that is needed to change the adopted Boltzmann codes.
+As long as your new CAMB/CLASS makefiles are not altered to the extent that Cocoa patch files designed to adjust [CAMB installation](../../../cocoa_installation_libraries/camb_changes) and [CLASS installation](../../../cocoa_installation_libraries/class_changes)  fail, that is all that is needed to change the adopted Boltzmann codes.
 
 What happens if the Cocoa patch files fail? We have three sections dedicated to this problem. Check [FAQ: How to add additional patches to the default CAMB/CLASS?](#appendix_new_camb_class_patches), and [Understanding CAMB's patches (developers only)](#appendix_patch_camb), and [Understanding CLASS's patches (developers only)](#appendix_patch_class).
 
