@@ -144,7 +144,7 @@ and
    
 **Step :seven::** Add the following line to the script `Cocoa/installation_scripts/flags_impl_unset_keys.sh` so these new environmental variables don't pollute the shell session
 
-    [Extracted and adapted from Cocoa/installation_scripts/flags_impl_unset_keys.sh]
+    [Adapted from Cocoa/installation_scripts/flags_impl_unset_keys.sh]
 
     (...)
     
