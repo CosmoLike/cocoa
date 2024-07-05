@@ -6,7 +6,7 @@
 5. [Understanding CAMB's patches (developers only)](#appendix_patch_camb)
 6. [Understanding CLASS's patches (developers only)](#appendix_patch_class)
 
-Installing a new CAMB code in Cocoa requires a few changes to the existing CAMB/CLASS code. Fortunately, CoCoA provides a set of scripts and patches that automatically handle all the necessary adjustments.
+Installing a new CAMB code in Cocoa requires a few changes to the existing CAMB/CLASS code. Fortunately, Cocoa provides a set of scripts and patches that automatically handle the necessary adjustments.
       
 ## :interrobang: FAQ: How to switch the default CAMB/CLASS? (the easy way) <a name="appendix_new_camb_class"></a> 
 
@@ -22,7 +22,9 @@ Swapping the default CAMB/CLASS is simple. Go to Cocoa's main folder and open th
     export CLASS_GIT_COMMIT="8df566c1ff2d0b3e40e106567c435575aea337be"
     export CLASS_NAME="class_public"
 
-As long as your new CAMB/CLASS makefiles are not altered to the extent that the `.patch` files located on `camb_changes`, and also listed above, fail, that is all what is needed.
+As long as your new CAMB/CLASS makefiles are not altered to the extent that Cocoa `.patch` files fail, that is all what is needed.
+
+What happens if the `.patch` files fail? We have three sections dedicated to this problem. Check [FAQ: How to add additional patches to the default CAMB/CLASS?](#appendix_new_camb_class_patches), and [Understanding CAMB's patches (developers only)](#appendix_patch_camb), and [Understanding CLASS's patches (developers only)](#appendix_patch_class). 
 
 ### :interrobang: FAQ: How to download and compile likelihoods for modern CMB data? <a name="new_planck_likelihoods"></a>
 
