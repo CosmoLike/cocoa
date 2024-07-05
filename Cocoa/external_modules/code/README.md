@@ -26,7 +26,7 @@ As long as your new CAMB/CLASS makefiles are not altered to the extent that Coco
 
 What happens if the Cocoa patch files fail? We have three sections dedicated to this problem. Check [FAQ: How to add additional patches to the default CAMB/CLASS?](#appendix_new_camb_class_patches), and [Understanding CAMB's patches](#appendix_patch_camb), and [Understanding CLASS's patches](#appendix_patch_class).
 
-### :interrobang: FAQ: How to download and compile likelihoods for modern CMB data? <a name="new_planck_likelihoods"></a>
+## :interrobang: FAQ: How to download and compile likelihoods for modern CMB data? <a name="new_planck_likelihoods"></a>
 
 The CMB data sets require specialized likelihoods. Cocoa will download, patch and compile them as long as these following keys are not set on `Cocoa/set_installation_options.sh`
 
