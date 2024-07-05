@@ -196,7 +196,7 @@ To start, we show below the current list of CAMB patches.
     cocoa_installation_libraries/camb_changes/fortran/Makefile.patch
     cocoa_installation_libraries/camb_changes/forutils/Makefile_compiler
     
-**:one: Patch `camb/_compilers.patch`**: This patch modifies the Python function`get_gfortran_version` located in the file `camb/_compilers.py`. 
+**:one: Patch [camb/_compilers.patch](../../../cocoa_installation_libraries/camb_changes/camb/_compilers.patch)**: This patch modifies the Python function`get_gfortran_version` located in the file `camb/_compilers.py`. 
     
     [Adapted from Cocoa/external_modules/code/CAMB/camb/_compilers.py]
     
