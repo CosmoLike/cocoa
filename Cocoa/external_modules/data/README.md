@@ -22,7 +22,7 @@ Cocoa can download [CamSpec](https://people.ast.cam.ac.uk/~stg20/camspec/index.h
     export IGNORE_SETUP_CAMSPEC_CMB_DATA=1
     export IGNORE_SETUP_LIPOP_CMB_DATA=1
 
-Cocoa selects the URL to download the data (and the version of the data) via the following keys also shown on `Cocoa/set_installation_options.sh`
+Cocoa selects the URL to download the data (and the version of the data) via the following keys.
 
     [Adapted from Cocoa/set_installation_options.sh shell script] 
 
