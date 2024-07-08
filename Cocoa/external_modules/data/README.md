@@ -52,25 +52,32 @@ Cocoa selects the URL to download the data (and its version) using the following
  Suppose the user wants to download a dataset for which Cocoa does not have an already developed shell script at `Cocoa/installation_scripts`. In that case, the script `unxv_github_template.sh` provides a basic template for adding a new dataset by cloning a git repository. The main lines that need to be modified in this script are shown below.
 
     [Adapted from Cocoa/installation_scripts/unxv_git_template.sh shell script] 
-
-    URL="${XXX_DATA_URL:-"https://github.com/XXX"}"
     
-    # FOLDER = the directory name of the dataset - git clone $URL $FOLDER
-    FOLDER="XXX"
+    if [ -z "${IGNORE_SETUP_XXX__DATA}" ]; then              # Change the IGNORE_SETUP_XXX__DATA key name
 
-    # Name to be printed on this shell script messages
-    PRINTNAME=XXX
+    (....)
+    
+      URL="${XXX_DATA_URL:-"https://github.com/XXX"}"
+    
+                                                            # FOLDER = the dataset directory name
+      FOLDER="XXX"                                          # Change the string associated with the FOLDER key
+
+                                                            # PRINTNAME = Name to be printed on messages
+      PRINTNAME=XXX                                         # Change the string associated with the PRINTNAME key
   
-    (...) 
+      (...) 
+                                                            # XXX_DATA_GIT_COMMIT = commit hash
+      if [ -n "${XXX_DATA_GIT_COMMIT}" ]; then              # Change the XXX_DATA_GIT_COMMIT key name
 
-    # SET XXX_DATA_GIT_COMMIT IN CASE THE USER WANTS TO CHECKOUT A SPECIFIC COMMIT
-    if [ -n "${XXX_DATA_GIT_COMMIT}" ]; then
-
-      (...)
+        (...)
       
-      ${GIT:?} checkout "${XXX_DATA_GIT_COMMIT:?}" \
-        >${OUT1:?} 2>${OUT2:?} || { error "${EC16:?}"; return 1; }
+        ${GIT:?} checkout "${XXX_DATA_GIT_COMMIT:?}" \
+          >${OUT1:?} 2>${OUT2:?} || { error "${EC16:?}"; return 1; }
    
+      fi
+      
+      (...)
+    
     fi
   
 ## :interrobang: FAQ: How to download new data from experiments (using wget)? <a name="new_likelihood_and_data2"></a>
