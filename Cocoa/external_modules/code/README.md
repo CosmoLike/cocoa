@@ -1,5 +1,5 @@
 # Table of contents
-1. [FAQ: How to switch the Cocoa's adopted CAMB/CLASS? (the easy way)](#appendix_new_camb_class)
+1. [FAQ: How to switch Cocoa's adopted CAMB/CLASS? (the easy way)](#appendix_new_camb_class)
 2. [FAQ: How to download and compile likelihoods for modern CMB data?](#new_planck_likelihoods)
 3. [FAQ: How to switch the default CAMB/CLASS? (the not-so-easy way)](#appendix_new_camb_class_medium)
 4. [FAQ: How to add additional patches to the default CAMB/CLASS?](#appendix_new_camb_class_patches)
