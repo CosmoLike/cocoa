@@ -49,7 +49,7 @@ Cocoa selects the URL to download the data (and its version) using the following
 
 ## :interrobang: FAQ: How to download new data from experiments (using git)? <a name="new_likelihood_and_data"></a>
 
- The script `unxv_github_template.sh` provides a basic template for users to add a new dataset by cloning a git repository. In this script, the main lines that need to be modified are shown below.
+ Suppose the user wants to download a dataset for which Cocoa does not have an already developed shell script at `Cocoa/installation_scripts`. In that case, the script `unxv_github_template.sh` provides a basic template for adding a new dataset by cloning a git repository. The main lines that need to be modified in this script are shown below.
 
     [Adapted from Cocoa/installation_scripts/unxv_git_template.sh shell script] 
 
