@@ -49,11 +49,17 @@ Cocoa selects the URL to download the data (and its version) using the following
 
 ## :interrobang: FAQ: How to download new data using git? <a name="new_likelihood_and_data"></a>
 
- Suppose the user wants to download a dataset for which Cocoa does not have an already developed shell script at `Cocoa/installation_scripts`. In that case, the script `unxv_github_template.sh` provides a basic template for adding a new dataset by cloning a git repository. The main lines that need to be modified in this script are shown below.
+ Suppose the user wants to download a dataset for which Cocoa does not have an already developed shell script at `Cocoa/installation_scripts`. In that case, the script `unxv_github_template.sh` provides a basic template for adding a new dataset by cloning a git repository.
+
+**Step :one:**: Go to the project folder (`Cocoa/installation_scripts`) and make a copy of the script `unxv_github_template.sh`
+
+    cp unxv_github_template.sh unxv_mydataset.sh
+
+ **Step :two:**: Modify the lines shown below of the newly created shell script `unxv_mydataset.sh`.
 
     [Adapted from Cocoa/installation_scripts/unxv_git_template.sh shell script] 
     
-    if [ -z "${IGNORE_SETUP_XXX_DATA}" ]; then            # Change the IGNORE_SETUP_XXX__DATA key name
+    if [ -z "${IGNORE_SETUP_XXX_DATA}" ]; then            # Change the IGNORE_SETUP_XXX_DATA key name
 
       (...)
                                                           # URL = GitHub URL where data is located
@@ -79,14 +85,32 @@ Cocoa selects the URL to download the data (and its version) using the following
       (...)
     
     fi
-  
+
+**Step :three:**: Add the following lines to `Cocoa/setup_cocoa.sh` shell script
+
+    [Adapted from Cocoa/setup_cocoa.sh shell script] 
+
+    (...)
+
+    declare -a SCRIPTS=( (...)
+                         "unxv_lipop.sh"
+                         "unxv_mydataset.sh"
+                         (...)
+                       ) 
+
 ## :interrobang: FAQ: How to download new data using wget? <a name="new_likelihood_and_data2"></a>
 
- Suppose the user wants to download a dataset for which Cocoa does not have an already developed shell script at `Cocoa/installation_scripts`. In that case, the script `unxv_wget_template.sh` provides a basic template for adding a new dataset by downloading files from an FTP server. The main lines that need to be modified in this script are shown below.
+Suppose the user wants to download a dataset for which Cocoa does not have an already developed shell script at `Cocoa/installation_scripts`. In that case, the script `unxv_wget_template.sh` provides a basic template for adding a new dataset by downloading files from an FTP server. 
 
+**Step :one:**: Go to the project folder (`Cocoa/installation_scripts`) and make a copy of the script `unxv_wget_template.sh`
+
+    cp unxv_wget_template.sh unxv_mydataset.sh
+    
+**Step :two:**: Modify the lines shown below of the newly created shell script `unxv_mydataset.sh`.
+  
     [Adapted from Cocoa/installation_scripts/unxv_wget_template.sh shell script] 
     
-    if [ -z "${IGNORE_SETUP_XXX_DATA}" ]; then          # Change the IGNORE_SETUP_XXX__DATA key name
+    if [ -z "${IGNORE_SETUP_XXX_DATA}" ]; then          # Change the IGNORE_SETUP_XXX_DATA key name
 
       (...)
                                                         # URL = FTP URL where data is located
@@ -135,3 +159,16 @@ Cocoa selects the URL to download the data (and its version) using the following
       done
     
     fi
+    
+**Step :three:**: Add the following lines to `Cocoa/setup_cocoa.sh` shell script
+
+    [Adapted from Cocoa/setup_cocoa.sh shell script] 
+
+    (...)
+ 
+    declare -a SCRIPTS=( (...)
+                         "unxv_lipop.sh"
+                         "unxv_mydataset.sh"
+                         (...)
+                       )
+                      
