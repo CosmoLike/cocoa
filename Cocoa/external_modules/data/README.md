@@ -1,6 +1,6 @@
 # Table of contents
 1. [FAQ: How to download modern CMB data?](#new_planck_data)
-2. [FAQ: How to create scripts that download data from current experiments? (developers only)](#new_likelihood_and_data)
+2. [FAQ: How to create scripts that download data from current experiments?](#new_likelihood_and_data)
 
 How to create scripts that download and compile likelihoods and data for modern experiments? <a name="new_likelihood_and_data"></a>
 
@@ -46,6 +46,38 @@ Cocoa selects the URL to download the data (and its version) using the following
     # This is only possible because each version is saved in a separate folder
     export SO_DATA_VERSION="v0.7.1 v0.8"
 
-## :interrobang: FAQ: How to create scripts that download data from current experiments? (developers only :bangbang: ☠️ :bangbang: ) <a name="new_likelihood_and_data"></a>
+## :interrobang: FAQ: How to create scripts that download data from current experiments? <a name="new_likelihood_and_data"></a>
 
-TODO
+The following non-comprehensive list of shell scripts, located at `Cocoa/installation_scripts`, manages the download and installation of LIPOP (CMB), CAMSPEC (CMB, SPT (CMB), Simons Observatory (CMB), H0licow (Strong Lensing), and other datasets. They all start with the prefix `unxv_`. 
+
+    unxv_act_dr6.sh
+    unxv_bao.sh
+    unxv_bicep.sh
+    unxv_camspec.sh
+    unxv_h0licow.sh
+    unxv_lipop.sh
+    unxv_planck2018_basic.sh
+    unxv_simons_observatory.sh
+    unxv_sn.sh
+    unxv_spt.sh
+
+ The script `unxv_github_template.sh` provides a basic template for users to add a new dataset by cloning a git repository. In this script, the main lines that need to be modified are shown below
+
+    [Adapted from Cocoa/installation_scripts/unxv_git_template.sh shell script] 
+
+    URL="${XXX_DATA_URL:-"https://github.com/XXX"}"
+    
+    # FOLDER = the directory name of the dataset - git clone $URL $FOLDER
+    FOLDER="XXX"
+
+    # Name to be printed on this shell script messages
+    PRINTNAME=XXX
+  
+    (...) 
+
+    # SET XXX_DATA_GIT_COMMIT IN CASE THE USER WANTS TO CHECKOUT A SPECIFIC COMMIT
+    if [ -n "${XXX_DATA_GIT_COMMIT}" ]; then
+      ${GIT:?} checkout "${XXX_DATA_GIT_COMMIT:?}" \
+        >${OUT1:?} 2>${OUT2:?} || { error "${EC16:?}"; return 1; }
+    fi
+  
