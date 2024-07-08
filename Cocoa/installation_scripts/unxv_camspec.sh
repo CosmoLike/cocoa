@@ -59,7 +59,7 @@ if [ -z "${IGNORE_SETUP_CAMSPEC_CMB_DATA}" ]; then
   URL="${URL_BASE:?}/releases/download/v1/${FILE:?}"
   
   # Name to be printed on this shell script messages
-  PRINTNAME="CAMSPEC"
+  PRINTNAME="CAMSPEC-2021"
 
   # ---------------------------------------------------------------------------
   
