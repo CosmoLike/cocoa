@@ -63,7 +63,7 @@ Cocoa selects the URL to download the likelihoods (and the version of the likeli
     export LOLLIPOP_URL="https://github.com/planck-npipe/lollipop.git"
     export LOLLIPOP_GIT_COMMIT="280a9c93d33bc6a058d6bf769ec82d9f7fdbd2b6"
 
-## :interrobang: FAQ: How to switch the default CAMB/CLASS? (the not-so-easy way :heavy_exclamation_mark: :scream: :heavy_exclamation_mark:) <a name="appendix_new_camb_class_medium"></a> 
+## :interrobang: FAQ: How to switch the default CAMB/CLASS? (the not-so-easy way) <a name="appendix_new_camb_class_medium"></a> 
 
 If users want to create their setup and compile shell scripts to work seamlessly with multiple modified Boltzmann codes, they must follow the steps below. Here, we assume the users want to create a new modified CAMB named CAMBQ (the modified class case is similar).
 
