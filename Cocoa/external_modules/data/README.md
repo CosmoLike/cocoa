@@ -76,8 +76,12 @@ Cocoa selects the URL to download the data (and its version) using the following
 
     # SET XXX_DATA_GIT_COMMIT IN CASE THE USER WANTS TO CHECKOUT A SPECIFIC COMMIT
     if [ -n "${XXX_DATA_GIT_COMMIT}" ]; then
+
+      (...)
+      
       ${GIT:?} checkout "${XXX_DATA_GIT_COMMIT:?}" \
         >${OUT1:?} 2>${OUT2:?} || { error "${EC16:?}"; return 1; }
+   
     fi
   
 ## :interrobang: FAQ: How to download data from current experiments (using wget)? <a name="new_likelihood_and_data2"></a>
