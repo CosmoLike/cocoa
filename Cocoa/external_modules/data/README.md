@@ -1,7 +1,7 @@
 # Table of contents
 1. [FAQ: How to download modern CMB data?](#new_planck_data)
-2. [FAQ: FAQ: How to download new data from current experiments (using git)?](#new_likelihood_and_data)
-3. [FAQ: FAQ: How to download new data from current experiments (using wget)?](#new_likelihood_and_data2)
+2. [FAQ: FAQ: How to download new data using git?](#new_likelihood_and_data)
+3. [FAQ: FAQ: How to download new data using wget?](#new_likelihood_and_data2)
  
 Cocoa provides a list of shell scripts, located at `Cocoa/installation_scripts`, that manages the download and installation of Lipop (CMB), Camspec (CMB), SPT (CMB), Simons Observatory (CMB), H0licow (Strong Lensing), and other datasets. They all start with the prefix `unxv_`. 
 
@@ -47,31 +47,37 @@ Cocoa selects the URL to download the data (and its version) using the following
     # This is only possible because each version is saved in a separate folder
     export SO_DATA_VERSION="v0.7.1 v0.8"
 
-## :interrobang: FAQ: How to download new data from experiments (using git)? <a name="new_likelihood_and_data"></a>
+## :interrobang: FAQ: How to download new data using git? <a name="new_likelihood_and_data"></a>
 
- Suppose the user wants to download a dataset for which Cocoa does not have an already developed shell script at `Cocoa/installation_scripts`. In that case, the script `unxv_github_template.sh` provides a basic template for adding a new dataset by cloning a git repository. The main lines that need to be modified in this script are shown below.
+ Suppose the user wants to download a dataset for which Cocoa does not have an already developed shell script at `Cocoa/installation_scripts`. In that case, the script `unxv_github_template.sh` provides a basic template for adding a new dataset by cloning a git repository.
+
+**Step :one:**: Go to the project folder (`Cocoa/installation_scripts`) and make a copy of the script `unxv_github_template.sh`
+
+    cp unxv_github_template.sh unxv_mydataset.sh
+
+ **Step :two:**: Modify the lines shown below of the newly created shell script `unxv_mydataset.sh`.
 
     [Adapted from Cocoa/installation_scripts/unxv_git_template.sh shell script] 
     
-    if [ -z "${IGNORE_SETUP_XXX_DATA}" ]; then              # Change the IGNORE_SETUP_XXX__DATA key name
+    if [ -z "${IGNORE_SETUP_XXX_DATA}" ]; then            # Change the IGNORE_SETUP_XXX_DATA key name
 
-    (....)
+      (...)
+                                                          # URL = GitHub URL where data is located
+      URL="${XXX_DATA_URL:-"https://github.com/XXX"}"     # Change the string associated with the URL key
     
-      URL="${XXX_DATA_URL:-"https://github.com/XXX"}"
-    
-                                                            # FOLDER = the dataset directory name
-      FOLDER="XXX"                                          # Change the string associated with the FOLDER key
+                                                          # FOLDER = the dataset directory name
+      FOLDER="XXX"                                        # Change the string associated with the FOLDER key
 
-                                                            # PRINTNAME = Name to be printed on messages
-      PRINTNAME=XXX                                         # Change the string associated with the PRINTNAME key
+                                                          # PRINTNAME = Name to be printed on messages
+      PRINTNAME="XXX"                                     # Change the string associated with the PRINTNAME key
   
       (...) 
-                                                            # XXX_DATA_GIT_COMMIT = commit hash
-      if [ -n "${XXX_DATA_GIT_COMMIT}" ]; then              # Change the XXX_DATA_GIT_COMMIT key name
+                                                          # XXX_DATA_GIT_COMMIT = commit hash
+      if [ -n "${XXX_DATA_GIT_COMMIT}" ]; then            # Change the XXX_DATA_GIT_COMMIT key name
 
         (...)
       
-        ${GIT:?} checkout "${XXX_DATA_GIT_COMMIT:?}" \
+        ${GIT:?} checkout "${XXX_DATA_GIT_COMMIT:?}" \    # Change the XXX_DATA_GIT_COMMIT key name
           >${OUT1:?} 2>${OUT2:?} || { error "${EC16:?}"; return 1; }
    
       fi
@@ -79,5 +85,90 @@ Cocoa selects the URL to download the data (and its version) using the following
       (...)
     
     fi
+
+**Step :three:**: Add the following lines to `Cocoa/setup_cocoa.sh` shell script
+
+    [Adapted from Cocoa/setup_cocoa.sh shell script] 
+
+    (...)
+
+    declare -a SCRIPTS=( (...)
+                         "unxv_lipop.sh"
+                         "unxv_mydataset.sh"
+                         (...)
+                       ) 
+
+## :interrobang: FAQ: How to download new data using wget? <a name="new_likelihood_and_data2"></a>
+
+Suppose the user wants to download a dataset for which Cocoa does not have an already developed shell script at `Cocoa/installation_scripts`. In that case, the script `unxv_wget_template.sh` provides a basic template for adding a new dataset by downloading files from an FTP server. 
+
+**Step :one:**: Go to the project folder (`Cocoa/installation_scripts`) and make a copy of the script `unxv_wget_template.sh`
+
+    cp unxv_wget_template.sh unxv_mydataset.sh
+    
+**Step :two:**: Modify the lines shown below of the newly created shell script `unxv_mydataset.sh`.
   
-## :interrobang: FAQ: How to download new data from experiments (using wget)? <a name="new_likelihood_and_data2"></a>
+    [Adapted from Cocoa/installation_scripts/unxv_wget_template.sh shell script] 
+    
+    if [ -z "${IGNORE_SETUP_XXX_DATA}" ]; then          # Change the IGNORE_SETUP_XXX_DATA key name
+
+      (...)
+                                                        # URL = FTP URL where data is located
+      URL="${XXX_DATA_URL:-"https://website/XXX"}"      # Change the string associated with the URL key
+
+                                                        # FOLDER = the directory name of the dataset
+      FOLDER="XXX"                                      # Change the string associated with the FOLDER key
+
+      declare -a FILE=( "filename1"                     # FILE = list the names of the files to be downloaded
+                        "filename2"                     # Change the strings associated with the FILE list 
+                        "filename3"
+                      )
+
+      declare -a EXT=( "tar.gz"                         # EXT = list the extension of the files to be downloaded
+                       "tar.gz"                         # Change the strings associated with the EXT list  
+                       "tar.gz"
+                      )
+                                                        # PRINTNAME = Name to be printed on messages
+      PRINTNAME="XXX"                                   # Change the string associated with the PRINTNAME key
+
+      (...)
+
+      # ------------------------------------------------------------------------------------------
+      # Here, you may need to add an option below related to the file extension of your dataset
+      # if file extension != "tar.gz" or "tar.xz"
+      
+      for (( i=0; i<${#FILE[@]}; i++ ));
+      do
+    
+        (...)
+    
+        if [ "${EXT:?}" == "tar.gz" ]; then
+          
+          (...)
+        
+        elif [ "${EXT:?}" == "DATASET FILE EXTENSION" ]; then
+
+          # Add code on how to decompress the file extension of the dataset
+        
+        else
+        
+          (...)
+ 
+        fi
+    
+      done
+    
+    fi
+    
+**Step :three:**: Add the following lines to `Cocoa/setup_cocoa.sh` shell script
+
+    [Adapted from Cocoa/setup_cocoa.sh shell script] 
+
+    (...)
+ 
+    declare -a SCRIPTS=( (...)
+                         "unxv_lipop.sh"
+                         "unxv_mydataset.sh"
+                         (...)
+                       )
+                      

@@ -1,10 +1,11 @@
 # Table of contents
-1. [FAQ: How to switch the Cocoa's adopted CAMB/CLASS? (the easy way)](#appendix_new_camb_class)
-2. [FAQ: How to download and compile likelihoods for modern CMB data?](#new_planck_likelihoods)
-3. [FAQ: How to switch the default CAMB/CLASS? (the not-so-easy way)](#appendix_new_camb_class_medium)
-4. [FAQ: How to add additional patches to the default CAMB/CLASS?](#appendix_new_camb_class_patches)
-5. [Understanding CAMB's patches](#appendix_patch_camb)
-6. [Understanding CLASS's patches](#appendix_patch_class)
+1. [FAQ: How to switch Cocoa's adopted CAMB/CLASS? (the easy way)](#appendix_new_camb_class)
+2. [FAQ: What about Polychord and Velocileptors?](#appendix_new_polychord)
+3. [FAQ: How to download and compile likelihoods for modern CMB data?](#new_planck_likelihoods)
+4. [FAQ: How to switch the default CAMB/CLASS? (the not-so-easy way)](#appendix_new_camb_class_medium)
+5. [FAQ: How to add additional patches to the default CAMB/CLASS?](#appendix_new_camb_class_patches)
+6. [Understanding CAMB's patches](#appendix_patch_camb)
+7. [Understanding CLASS's patches](#appendix_patch_class)
 
 Installing a new CAMB code in Cocoa requires a few changes to the existing CAMB/CLASS code. Fortunately, Cocoa provides a set of scripts, located at `Cocoa/installation_scripts`, and patches, located at `Cocoa/../cocoa_installation_libraries/XXX_changes` where XXX is the specific code to be patched, that automatically handle the necessary code adjustments.
 
@@ -12,7 +13,7 @@ The shell scripts are split into two categories. The first category of shell scr
 
 The patches are always located at `Cocoa/../cocoa_installation_libraries`. These patches enforce that these codes are compiled with the Cocoa-prescribed compilers and linked against the Cocoa-prescribed version of any necessary numerical library. Consistency when compiling and linking code is one of the main advantages of working within the Cocoa framework.
 
-On an advanced note, three scripts are worth mentioning separately: `setup_core_packages.sh`, `unxv_core_packages.sh`, and `compile_core_packages.sh`. The first two scripts manage the installation, while the third manages the compilation of stable numerical libraries that other codes may need. *The vast majority of these codes are provided by the Cocoa Conda environment*, with a few exceptions, including the CUBA integration library. Nevertheless, these scripts provide a unified and simple interface for users to add new required numerical libraries that may not be available on Conda.
+On an advanced note, three scripts are worth mentioning separately: `setup_core_packages.sh`, `unxv_core_packages.sh`, and `compile_core_packages.sh`. The first two scripts manage the installation, while the third manages the compilation of stable numerical libraries that other codes may need. *The vast majority of these codes are provided by the Cocoa Conda environment*, with a few exceptions, including the CUBA integration library. Nevertheless, these scripts provide a unified and simple interface for users to add new required numerical libraries that may not be available on Conda (or that need some unique way to be compiled).
       
 ## :interrobang: FAQ: How to switch the Cocoa's adopted CAMB/CLASS? (the easy way) <a name="appendix_new_camb_class"></a> 
 
@@ -32,6 +33,33 @@ As long as your new CAMB/CLASS makefiles are not altered to the extent that Coco
 
 What happens if the Cocoa patch files fail? We have three sections dedicated to this problem. Check [FAQ: How to add additional patches to the default CAMB/CLASS?](#appendix_new_camb_class_patches), and [Understanding CAMB's patches](#appendix_patch_camb), and [Understanding CLASS's patches](#appendix_patch_class).
 
+Finally, what if the user wants to skip CAMB or CLASS compilation? In this case, the shell script `Cocoa/set_installation_options.sh` provides the following environmental keys.
+    
+    [Adapted from Cocoa/set_installation_options.sh shell script]
+    #export IGNORE_CAMB_COMPILATION=1
+    #export IGNORE_CLASS_COMPILATION=1
+
+## :interrobang: FAQ: What about the installation of Polychord and Velocileptors? <a name="appendix_new_polychord"></a> 
+
+The shell script `set_installation_options.sh` provides the following keys that manage the download and compilation of Polychord and Velocileptor.
+
+    [Adapted from Cocoa/set_installation_options.sh shell script]
+    
+    #export IGNORE_POLYCHORD_COMPILATION=1
+    #export IGNORE_VELOCILEPTORS_COMPILATION=1
+
+    (...)
+
+    export POLY_URL="https://github.com/PolyChord/PolyChordLite.git"
+    export POLYCHORD_GIT_COMMIT="daba49d1385d065122db76a2b384050f9e95d278"
+    export POLY_NAME="PolyChordLite"
+
+    (...)
+
+    export VELOCILEPTORS_URL="https://github.com/sfschen/velocileptors.git"
+    export VELOCILEPTORS_GIT_COMMIT="889a0c98895831eb23b250a26162cfb8a93237bd"
+    export VELOCILEPTORS_NAME="velocileptors"
+    
 ## :interrobang: FAQ: How to download and compile likelihoods for modern CMB data? <a name="new_planck_likelihoods"></a>
 
 The CMB data sets require specialized likelihoods. Cocoa will download, patch, and compile them as long as these following keys are not set on `Cocoa/set_installation_options.sh`

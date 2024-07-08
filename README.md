@@ -13,12 +13,13 @@
     5. [FAQ: How do you run cocoa on your laptop? The docker image named *whovian-cocoa*](#appendix_jupyter_whovian)
     6. [FAQ: What should you do if you do not have Miniconda installed? Installation Guide](#overview_miniconda)
     8. [FAQ: How can we set the Slow/Fast decomposition on MCMC Chains with Cosmolike? Manual Blocking](#manual_blocking_cosmolike)
-    9. [FAQ: How can we add new modified versions of CAMB/CLASS? (external readme)](Cocoa/external_modules/code)
-    10. [FAQ: How do users set the environment for projects involving Machine Learning emulators?](#ml_emulators)
-    11. [FAQ: How can users improve their Bash/C/C++ knowledge to develop Cocoa/Cosmolike?](#lectnotes)
-    12. [Warning about Weak Lensing YAML files in Cobaya](#appendix_example_runs)
-    13. [(not recommended) Installation of Cocoa's core packages without conda](#required_packages_cache)
-    14. [FAQ: How should developers push changes to the Cocoa main branch?](#push_main)
+    9. [FAQ: How to switch Cocoa's adopted CAMB/CLASS/Polychord? (external readme)](Cocoa/external_modules/code)
+    10. [FAQ: How to download modern CMB data? (external readme)](Cocoa/external_modules/data)
+    11. [FAQ: How do users set the environment for projects involving Machine Learning emulators?](#ml_emulators)
+    12. [FAQ: How can users improve their Bash/C/C++ knowledge to develop Cocoa/Cosmolike?](#lectnotes)
+    13. [Warning about Weak Lensing YAML files in Cobaya](#appendix_example_runs)
+    14. [FAQ: How to install Cocoa without conda](#required_packages_cache)
+    15. [FAQ: How should developers push changes to the Cocoa main branch?](#push_main)
 
 ## Overview of the [Cobaya](https://github.com/CobayaSampler)-[CosmoLike](https://github.com/CosmoLike) Joint Architecture (Cocoa) <a name="overview"></a>
 
@@ -372,7 +373,7 @@ Once installation is complete, the user must learn how to start, use, and exit t
 
     If you need to use a different port than `8080`, adjust the flag `-p 8080:8888` in the `docker run` command accordingly.
 
-- :interrobang: FAQ: How do you manipulate files on the host computer from within the Docker container?
+- :interrobang: **FAQ: How do you manipulate files on the host computer from within the Docker container?**
 
     The flag `-v $(pwd):/home/whovian/host/` in the `docker run` command ensures that files on the host computer have been mounted to the directory `/home/whovian/host/`. Files within the folder where the Docker container was initialized are accessible in the `/home/Whovian/host/` folder. When the user accesses the container, they should see the host's directory where the Docker container was initiated after typing: 
 
@@ -381,7 +382,7 @@ Once installation is complete, the user must learn how to start, use, and exit t
 
     Users should work inside the `/home/whovian/host/` directory to avoid losing work in case the docker image needs to be deleted,
 
-- :interrobang: FAQ: What if you run the docker container on a remote server?
+- :interrobang: **FAQ: What if you run the docker container on a remote server?**
 
     Below, we assume the user runs the container in a server with the URL `your_sever.com`. We also presume the server can be accessed via SSH protocol. On your local PC/laptop, type:
 
@@ -615,7 +616,7 @@ The correct way to create YAML files with $\big(\Omega_m,\Omega_b\big)$ as prima
             derived: 'lambda omegam, H0: omegam*(H0/100)**2'
             latex: \Omega_\mathrm{m} h^2
             
-### 💀 ☠️ :stop_sign::thumbsdown: Installation of Cocoa's core packages without conda  (not recommended) <a name="required_packages_cache"></a>
+### 💀 ☠️ :stop_sign::thumbsdown: FAQ: How to install Cocoa without conda (not recommended) <a name="required_packages_cache"></a>
 
 This method is slow and not advisable :stop_sign::thumbsdown:. When Conda is unavailable, the user can still perform a local semi-autonomous installation on Linux based on a few scripts we implemented. We require the pre-installation of the following packages:
 
