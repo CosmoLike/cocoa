@@ -63,7 +63,7 @@ Cocoa selects the URL to download the data (and its version) using the following
       FOLDER="XXX"                                        # Change the string associated with the FOLDER key
 
                                                           # PRINTNAME = Name to be printed on messages
-      PRINTNAME=XXX                                       # Change the string associated with the PRINTNAME key
+      PRINTNAME="XXX"                                     # Change the string associated with the PRINTNAME key
   
       (...) 
                                                           # XXX_DATA_GIT_COMMIT = commit hash
@@ -105,7 +105,7 @@ Cocoa selects the URL to download the data (and its version) using the following
                        "tar.gz"
                       )
                                                         # PRINTNAME = Name to be printed on messages
-      PRINTNAME=XXX                                     # Change the string associated with the PRINTNAME key
+      PRINTNAME="XXX"                                   # Change the string associated with the PRINTNAME key
 
       (...)
 
