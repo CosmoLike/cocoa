@@ -188,7 +188,7 @@ Adding additional patches to the default CAMB/CLASS is pretty straightforward. H
                        # Add here the file that the patch file
                        )
                      
-## Understanding CAMB's patches (developers only :bangbang: ☠️ :bangbang: ) <a name="appendix_patch_camb"></a> 
+## Understanding CAMB's patches (developers only :bangbang: :scream: ☠️ :bangbang: ) <a name="appendix_patch_camb"></a> 
 
 To start, we show the current list of CAMB patches below.
     
@@ -295,7 +295,7 @@ Below, we explain what these patches do.
         
     endif
         
-## Understanding CLASS's patches (developers only :bangbang: ☠️ :bangbang:) <a name="appendix_patch_class"></a> 
+## Understanding CLASS's patches (developers only :bangbang: :scream: ☠️ :bangbang:) <a name="appendix_patch_class"></a> 
 
 To start, we show the current list of CLASS patches below.
     
