@@ -106,5 +106,32 @@ Cocoa selects the URL to download the data (and its version) using the following
                       )
                                                             # PRINTNAME = Name to be printed on messages
       PRINTNAME=XXX                                         # Change the string associated with the PRINTNAME key
-  
+
+      (...)
+
+      # ------------------------------------------------------------------------------------------
+      # Here, you may need to add an option below related to the file extension of your dataset
+      # if file extension != "tar.gz" or "tar.xz"
+      
+      for (( i=0; i<${#FILE[@]}; i++ ));
+      do
+    
+        (...)
+    
+        if [ "${EXT:?}" == "tar.gz" ]; then
+          
+          (...)
+        
+        elif [ "${EXT:?}" == "DATASET FILE EXTENSION" ]; then
+
+          # Add code on how to decompress the file extension of your dataset
+        
+        else
+        
+          (...)
+ 
+        fi
+    
+      done
+    
     fi
