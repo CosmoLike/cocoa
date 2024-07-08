@@ -12,7 +12,7 @@ if [ -z "${IGNORE_SETUP_HOLICOW_STRONG_LENSING_DATA}" ]; then
   ( source "${ROOTDIR:?}/installation_scripts/flags_check.sh" ) || return 1;
   
   unset_env_vars () {
-    unset -v EDATAF FOLDER URL TMP
+    unset -v EDATAF FOLDER URL TMP PRINTNAME
     cdroot || return 1;
   }
 
@@ -53,9 +53,12 @@ if [ -z "${IGNORE_SETUP_HOLICOW_STRONG_LENSING_DATA}" ]; then
   
   URL="${HOLICOW_DATA_URL:-"https://github.com/shsuyu/H0LiCOW-public.git"}"
 
+  # Name to be printed on this shell script messages
+  PRINTNAME="H0LICOW"
+
   # ---------------------------------------------------------------------------
 
-  ptop 'DECOMPRESSING H0LICOW DATA' || return 1
+  ptop "GETTING AND DECOMPRESSING ${PRINTNAME:?} DATA" || return 1
 
   # ---------------------------------------------------------------------------
   # in case this script is called twice
@@ -86,7 +89,7 @@ if [ -z "${IGNORE_SETUP_HOLICOW_STRONG_LENSING_DATA}" ]; then
 
   unset_all || return 1
   
-  pbottom 'DECOMPRESSING H0LICOW DATA' || return 1
+  pbottom "DECOMPRESSING ${PRINTNAME:?} DATA" || return 1
 
 fi
 

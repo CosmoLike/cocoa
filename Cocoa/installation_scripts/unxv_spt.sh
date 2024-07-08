@@ -12,7 +12,7 @@ if [ -z "${IGNORE_SETUP_SPT_CMB_DATA}" ]; then
   ( source "${ROOTDIR:?}/installation_scripts/flags_check.sh" ) || return 1;
     
   unset_env_vars () { 
-    unset -v EDATAF FOLDER URL PACKDIR
+    unset -v EDATAF FOLDER URL PACKDIR PRINTNAME
     cdroot || return 1;
   }
 
@@ -54,9 +54,12 @@ if [ -z "${IGNORE_SETUP_SPT_CMB_DATA}" ]; then
 
   URL="${SPT3G_DATA_URL:-"https://github.com/SouthPoleTelescope/spt3g_y1_dist.git"}"
 
+  # Name to be printed on this shell script messages
+  PRINTNAME="SPT-3G Y1"
+  
   # ---------------------------------------------------------------------------
 
-  ptop "GETTING AND DECOMPRESSING SPT-3G Y1 DATA" || return 1
+  ptop "GETTING AND DECOMPRESSING ${PRINTNAME:?} DATA" || return 1
   
   # ---------------------------------------------------------------------------
   # note: in case this script is run twice
@@ -83,7 +86,7 @@ if [ -z "${IGNORE_SETUP_SPT_CMB_DATA}" ]; then
 
   unset_all || return 1; 
 
-  pbottom 'GETTING AND DECOMPRESSING SPT-3G Y1 DATA' || return 1
+  pbottom "GETTING AND DECOMPRESSING ${PRINTNAME:?} DATA" || return 1
   
 fi
 

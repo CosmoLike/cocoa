@@ -12,7 +12,7 @@ if [ -z "${IGNORE_SETUP_SIMONS_OBSERVATORY_CMB_DATA}" ]; then
   ( source "${ROOTDIR:?}/installation_scripts/flags_check.sh" ) || return 1;
     
   unset_env_vars () {
-    unset -v EDATAF FOLDER URL VER PACKDIR FILE
+    unset -v EDATAF FOLDER URL VER PACKDIR FILE PRINTNAME
     cdroot || return 1;
   }
 
@@ -56,9 +56,12 @@ if [ -z "${IGNORE_SETUP_SIMONS_OBSERVATORY_CMB_DATA}" ]; then
   # PACK = PACKAGE, DIR = DIRECTORY
   PACKDIR="${EDATAF:?}/${FOLDER:?}"
 
+  # Name to be printed on this shell script messages
+  PRINTNAME="SIMONS OBSERVATORY"
+
   # --------------------------------------------------------------------------
 
-  ptop "GETTING AND DECOMPRESSING S.O. DATA (MAY TAKE A LONG TIME)" || return 1
+  ptop "GETTING AND DECOMPRESSING ${PRINTNAME:?} DATA" || return 1
 
   # --------------------------------------------------------------------------
   # note: in case script run >1x w/ previous run stoped prematurely b/c error
@@ -90,7 +93,7 @@ if [ -z "${IGNORE_SETUP_SIMONS_OBSERVATORY_CMB_DATA}" ]; then
 
   unset_all || return 1
 
-  pbottom "GETTING AND DECOMPRESSING S.O. DATA" || return 1
+  pbottom "GETTING AND DECOMPRESSING ${PRINTNAME:?} DATA" || return 1
 
 fi
 

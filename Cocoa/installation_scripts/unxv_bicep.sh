@@ -12,7 +12,7 @@ if [ -z "${IGNORE_SETUP_BICEP_CMB_DATA}" ]; then
   ( source "${ROOTDIR:?}/installation_scripts/flags_check.sh" ) || return 1;
   
   unset_env_vars () {
-    unset -v EDATAF FOLDER PACKDIR FILE
+    unset -v EDATAF FOLDER PACKDIR FILE PRINTNAME
     cdroot || return 1;
   }
 
@@ -54,9 +54,12 @@ if [ -z "${IGNORE_SETUP_BICEP_CMB_DATA}" ]; then
 
   FILE="bicep_keck_2015.xz"
 
+  # Name to be printed on this shell script messages
+  PRINTNAME="BICEP-2015"
+
   # ---------------------------------------------------------------------------
   
-  ptop 'DECOMPRESSING BICEP 2015 DATA' || return 1
+  ptop "GETTING AND DECOMPRESSING ${PRINTNAME:?} DATA" || return 1
 
   # ---------------------------------------------------------------------------
   # note: in case script run >1x w/ previous run stoped prematurely b/c error
@@ -73,7 +76,7 @@ if [ -z "${IGNORE_SETUP_BICEP_CMB_DATA}" ]; then
 
   unset_all || return 1
   
-  pbottom 'DECOMPRESSING BICEP 2015 DATA' || return 1
+  pbottom "DECOMPRESSING ${PRINTNAME:?} DATA" || return 1
 
 fi
 

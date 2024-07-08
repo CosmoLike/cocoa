@@ -10,7 +10,7 @@ if [ -z "${IGNORE_SETUP_PLANCK_CMB_DATA}" ]; then
   ( source "${ROOTDIR:?}/installation_scripts/flags_check.sh" ) || return 1;
     
   unset_env_vars () {
-    unset -v EDATAF
+    unset -v EDATAF PRINTNAME
     cdroot || return 1;
   }
 
@@ -45,29 +45,12 @@ if [ -z "${IGNORE_SETUP_PLANCK_CMB_DATA}" ]; then
   # E = EXTERNAL, DATA, F=FODLER
   EDATAF="${ROOTDIR:?}/external_modules/data"
 
-  #-----------------------------------------------------------------------------
-  
-  ptop 'DECOMPRESSING PLANCK2018 SUPPLEMENTAL DATA/COVARIANCES' || return 1
+  # Name to be printed on this shell script messages
+  PRINTNAME="PLANCK-2018 (PLC 3.0)"
 
   # ---------------------------------------------------------------------------
-  # note: in case this script is run twice
-
-  rm -rf "${EDATAF:?}/planck/planck_supp_data_and_covmats"
-
-  # ---------------------------------------------------------------------------
-
-  cdfolder "${EDATAF:?}/planck" || return 1
-  
-  tar xf planck_supp_data_and_covmats.xz \
-      >${OUT1:?} 2>${OUT2:?} || { error "${EC25:?} (xz)"; return 1; }
-
-  pbottom 'DECOMPRESSING PLANCK2018 SUPPLEMENTAL DATA/COVARIANCES' || return 1
-
-  #-----------------------------------------------------------------------------
-  #-----------------------------------------------------------------------------
-  #-----------------------------------------------------------------------------
-  
-  ptop 'DECOMPRESSING PLANCK2018 (PLC-3.0) DATA' || return 1
+ 
+  ptop "GETTING AND DECOMPRESSING ${PRINTNAME:?} DATA" || return 1
 
   # ---------------------------------------------------------------------------
   # note: in case this script is run twice
@@ -99,7 +82,7 @@ if [ -z "${IGNORE_SETUP_PLANCK_CMB_DATA}" ]; then
 
   unset_all || return 1; 
 
-  pbottom 'DECOMPRESSING PLANCK2018 (PLC-3.0) DATA' || return 1
+  pbottom "GETTING AND DECOMPRESSING ${PRINTNAME:?} DATA" || return 1
 
 fi
 

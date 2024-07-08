@@ -2,17 +2,17 @@
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
-if [ -z "${IGNORE_ACTDR6_COMPILATION}" ]; then
-  
+if [ -z "${IGNORE_SETUP_HOLICOW_STRONG_LENSING_DATA}" ]; then
+
   if [ -z "${ROOTDIR}" ]; then
     source start_cocoa.sh || { pfail 'ROOTDIR'; return 1; }
   fi
 
   # parenthesis = run in a subshell 
   ( source "${ROOTDIR:?}/installation_scripts/flags_check.sh" ) || return 1;
-
+  
   unset_env_vars () {
-    unset -v EDATAF FOLDER PACKDIR FILE URL_BASE URL PRINTNAME
+    unset -v EDATAF FOLDER URL
     cdroot || return 1;
   }
 
@@ -45,50 +45,46 @@ if [ -z "${IGNORE_ACTDR6_COMPILATION}" ]; then
   unset_env_vars || return 1
 
   # E = EXTERNAL, DATA, F=FODLER
-  EDATAF="${ROOTDIR:?}/external_modules/data"
+  EDATAF="${ROOTDIR:?}/external_modules/data/"
   
-  FOLDER="act"
+  URL="${XXX_DATA_URL:-"https://github.com/XXX"}"
 
-  # PACK = PACKAGE, DIR = DIRECTORY
-  PACKDIR="${EDATAF:?}/${FOLDER:?}"
-
-  FILE="${ACT_DR6_DATA_FILE:-"ACT_dr6_likelihood_v1.2.tgz"}"
-
-  URL_BASE="https://lambda.gsfc.nasa.gov/data/suborbital/ACT/ACT_dr6/likelihood/data"
-
-  URL="${ACT_DR6_DATA_URL:-"${URL_BASE:?}"}/${FILE:?}"
-
+  # FOLDER = the directory name of the dataset
+  FOLDER="XXX"
+  
   # Name to be printed on this shell script messages
-  PRINTNAME=ACT-DR6
+  PRINTNAME=XXX
 
   # ---------------------------------------------------------------------------
 
   ptop "GETTING AND DECOMPRESSING ${PRINTNAME:?} DATA" || return 1
 
   # ---------------------------------------------------------------------------
-  # note: in case script run >1x w/ previous run stoped prematurely b/c error
+  # in case this script is called twice
   
-  rm -rf "${PACKDIR:?}"
-
+  rm -rf "${EDATAF:?}/${FOLDER:?}"
+  
   # ---------------------------------------------------------------------------
 
-  mkdir -p "${PACKDIR:?}" || { error "${EC20:?}"; return 1; }
-  
-  mkdir -p "${PACKDIR:?}/lensing" || { error "${EC20:?}"; return 1; }
-    
-  cdfolder "${PACKDIR:?}/lensing" || return 1
+  cdfolder "${EDATAF:?}" || return 1
 
-  "${WGET:?}" "${URL:?}" -q --show-progress --progress=bar:force || 
-    { error "${EC24:?}"; return 1; }
+  ${GIT:?} clone "${URL:?}" "${FOLDER:?}" \
+    >${OUT1:?} 2>${OUT2:?} || { error "${EC15:?}"; return 1; }
 
-  tar -zxvf "${FILE:?}" \
-    >${OUT1:?} 2>${OUT2:?} || { error "${EC25:?}"; return 1; }
+  cdfolder "${EDATAF:?}/${TMP:?}" || return 1
+
+  # SET XXX_DATA_GIT_COMMIT IN CASE THE USER WANTS TO CHECKOUT A SPECIFIC COMMIT
+  if [ -n "${XXX_DATA_GIT_COMMIT}" ]; then
+    ${GIT:?} checkout "${XXX_DATA_GIT_COMMIT:?}" \
+      >${OUT1:?} 2>${OUT2:?} || { error "${EC16:?}"; return 1; }
+  fi
+
 
   # ---------------------------------------------------------------------------
 
   unset_all || return 1
   
-  pbottom "DECOMPRESSING ${PRINTNAME:?} DATA" || return 1
+  pbottom "GETTING AND DECOMPRESSING ${PRINTNAME:?} DATA" || return 1
 
 fi
 

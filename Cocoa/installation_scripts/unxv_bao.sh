@@ -12,7 +12,7 @@ if [ -z "${IGNORE_SETUP_BAO_DATA}" ]; then
   ( source "${ROOTDIR:?}/installation_scripts/flags_check.sh" ) || return 1;
 
   unset_env_vars () {
-    unset -v EDATAF FOLDER FILE PACKDIR 
+    unset -v EDATAF FOLDER FILE PACKDIR PRINTNAME
     cdroot || return 1;
   }
 
@@ -54,9 +54,12 @@ if [ -z "${IGNORE_SETUP_BAO_DATA}" ]; then
 
   FILE="bao_data.xz"
 
+  # Name to be printed on this shell script messages
+  PRINTNAME=BAO
+
   # ---------------------------------------------------------------------------
 
-  ptop 'DECOMPRESSING BAO DATA' || return 1
+  ptop "GETTING AND DECOMPRESSING ${PRINTNAME:?} DATA" || return 1
 
   # ---------------------------------------------------------------------------
   # note: in case script run >1x w/ previous run stoped prematurely b/c error
@@ -73,7 +76,7 @@ if [ -z "${IGNORE_SETUP_BAO_DATA}" ]; then
 
   unset_all || return 1
   
-  pbottom 'DECOMPRESSING BAO DATA' || return 1
+  pbottom "DECOMPRESSING ${PRINTNAME:?} DATA" || return 1
 
 fi
 
