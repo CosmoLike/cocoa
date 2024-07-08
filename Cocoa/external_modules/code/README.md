@@ -6,7 +6,13 @@
 5. [Understanding CAMB's patches](#appendix_patch_camb)
 6. [Understanding CLASS's patches](#appendix_patch_class)
 
-Installing a new CAMB code in Cocoa requires a few changes to the existing CAMB/CLASS code. Fortunately, Cocoa provides a set of scripts and patches that automatically handle the necessary adjustments.
+Installing a new CAMB code in Cocoa requires a few changes to the existing CAMB/CLASS code. Fortunately, Cocoa provides a set of scripts, located at `Cocoa/installation_scripts`, and patches, located at `Cocoa/../cocoa_installation_libraries/XXX_changes` where XXX is the specific code to be patched, that automatically handle the necessary code adjustments.
+
+The shell scripts are split into two categories. The first category of shell scripts downloads the code and applies necessary patches; they are named `setup_XXX.sh`, where XXX is the specific code to be downloaded. For instance, the script `setup_camb.sh` downloads CAMB Boltzmann code from its original GitHub repository. The second category of shell scripts compiles the code; they are named `compile_XXX.sh`. For instance, the script `setup_camb.sh` compiles CAMB.
+
+The patches are always located at `Cocoa/../cocoa_installation_libraries`. These patches enforce that these codes are compiled with the Cocoa-prescribed compilers and linked against the Cocoa-prescribed version of any necessary library.
+
+On an advanced note, three scripts are worth mentioning separately: `setup_core_packages.sh`, `unxv_core_packages.sh`, and `compile_core_packages.sh`. The first two scripts manage the installation, while the third manages the compilation of stable numerical libraries that other codes may need. *The vast majority of these codes are provided by the Cocoa Conda environment*, with a few exceptions, including the CUBA integration library. Nevertheless, these scripts provide a unified and simple interface for users to add new required numerical libraries that may not be available on Conda.
       
 ## :interrobang: FAQ: How to switch the Cocoa's adopted CAMB/CLASS? (the easy way) <a name="appendix_new_camb_class"></a> 
 
