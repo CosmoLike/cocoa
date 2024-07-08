@@ -84,9 +84,9 @@ if [ -z "${IGNORE_SETUP_SPT_CMB_DATA}" ]; then
 
   # ---------------------------------------------------------------------------
 
-  unset_all || return 1; 
-
   pbottom "GETTING AND DECOMPRESSING ${PRINTNAME:?} DATA" || return 1
+
+  unset_all || return 1; 
   
 fi
 

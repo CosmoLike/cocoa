@@ -38,7 +38,7 @@ export MINICONDA_INSTALLATION=1
 # export IGNORE_SETUP_SPT_CMB_DATA=1
 export IGNORE_SETUP_SIMONS_OBSERVATORY_CMB_DATA=1
 # export IGNORE_SETUP_PLANCK_CMB_DATA=1
-export IGNORE_SETUP_CAMSPEC_CMB_DATA=1
+#export IGNORE_SETUP_CAMSPEC_CMB_DATA=1
 export IGNORE_SETUP_LIPOP_CMB_DATA=1
 
 # ------------------------------------------------------------------------------

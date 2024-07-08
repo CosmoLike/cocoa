@@ -82,10 +82,10 @@ if [ -z "${IGNORE_SETUP_CAMSPEC_CMB_DATA}" ]; then
   unzip "${FILE:?}" >${OUT1:?} 2>${OUT2:?} || { error "${EC26:?}"; return 1; }
 
   # ---------------------------------------------------------------------------
-
-  unset_all || return 1
   
   pbottom "DECOMPRESSING ${PRINTNAME:?} DATA" || return 1
+
+  unset_all || return 1
 
 fi
 

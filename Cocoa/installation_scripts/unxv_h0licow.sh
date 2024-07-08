@@ -86,10 +86,10 @@ if [ -z "${IGNORE_SETUP_HOLICOW_STRONG_LENSING_DATA}" ]; then
   rm -rf "${EDATAF:?}/${TMP:?}"
 
   # ---------------------------------------------------------------------------
-
-  unset_all || return 1
   
   pbottom "DECOMPRESSING ${PRINTNAME:?} DATA" || return 1
+
+  unset_all || return 1
 
 fi
 

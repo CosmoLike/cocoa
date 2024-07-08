@@ -73,11 +73,11 @@ if [ -z "${IGNORE_SETUP_BICEP_CMB_DATA}" ]; then
   tar xf "${FILE:?}" >${OUT1:?} 2>${OUT2:?} || { error "${EC25:?}"; return 1; }
 
   # ---------------------------------------------------------------------------
-
-  unset_all || return 1
   
   pbottom "DECOMPRESSING ${PRINTNAME:?} DATA" || return 1
 
+  unset_all || return 1
+  
 fi
 
 # ------------------------------------------------------------------------------
