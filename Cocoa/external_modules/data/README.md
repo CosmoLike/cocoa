@@ -89,7 +89,7 @@ Cocoa selects the URL to download the data (and its version) using the following
     if [ -z "${IGNORE_SETUP_XXX_DATA}" ]; then          # Change the IGNORE_SETUP_XXX__DATA key name
 
       (...)
-                                                          URL = FTP URL where data is located
+                                                        # URL = FTP URL where data is located
       URL="${XXX_DATA_URL:-"https://website/XXX"}"      # Change the string associated with the URL key
 
                                                         # FOLDER = the directory name of the dataset
