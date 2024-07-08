@@ -12,7 +12,7 @@ error_cip () {
   local MSG="\033[0;31m\t\t (${FILE}) we cannot run "
   local MSG2="\033[0m"
   echo -e "${MSG}${1:?}${MSG2}" 2>"/dev/null"
-  unset -v TSCRIPTS
+  unset -v SCRIPTS
   unset -f error_cip
   cd $(pwd -P) 2>"/dev/null"
   source stop_cocoa 2>"/dev/null"
@@ -78,7 +78,7 @@ fi
 # ------------------------------ INSTALL PACKAGES ----------------------------
 # ----------------------------------------------------------------------------
 
-declare -a TSCRIPTS=("setup_core_packages.sh" 
+declare -a SCRIPTS=("setup_core_packages.sh" 
                      "unxv_core_packages.sh" 
                      "unxv_sn.sh"
                      "unxv_bao.sh"
@@ -96,16 +96,16 @@ declare -a TSCRIPTS=("setup_core_packages.sh"
                      "setup_polychord.sh"
                      "setup_camb.sh"
                      "setup_class.sh"
-                     "setup_velocileptors.sh") # T = TMP
+                     "setup_velocileptors.sh")
 
-for (( i=0; i<${#TSCRIPTS[@]}; i++ ));
+for (( i=0; i<${#SCRIPTS[@]}; i++ ));
 do
 
   cdroot; 
 
-  ( source "${ROOTDIR:?}/installation_scripts/${TSCRIPTS[$i]}" )
+  ( source "${ROOTDIR:?}/installation_scripts/${SCRIPTS[$i]}" )
   if [ $? -ne 0 ]; then
-    error_cip "script ${TSCRIPTS[$i]}"; return 1
+    error_cip "script ${SCRIPTS[$i]}"; return 1
     return 1
   fi
 

@@ -10,9 +10,9 @@ if [ -z "${IGNORE_SETUP_XXX_DATA}" ]; then
 
   # parenthesis = run in a subshell 
   ( source "${ROOTDIR:?}/installation_scripts/flags_check.sh" ) || return 1;
-  
-  unset_env_vars () {
-    unset -v EDATAF FOLDER URL PACKDIR PRINTNAME
+    
+  unset_env_vars () { 
+    unset -v EDATAF URL PACKDIR FOLDER FILE EXT PRINTNAME
     cdroot || return 1;
   }
 
@@ -28,32 +28,42 @@ if [ -z "${IGNORE_SETUP_XXX_DATA}" ]; then
     unset -f unset_all
     cdroot || return 1;
   }
-  
+
   error () {
     fail_script_msg "$(basename "${BASH_SOURCE[0]}")" "${1}"
     unset_all || return 1
   }
-  
+
   cdfolder() {
     cd "${1:?}" 2>"/dev/null" || { error "CD FOLDER: ${1}"; return 1; }
   }
 
-  # --------------------------------------------------------------------------- 
-  # --------------------------------------------------------------------------- 
-  # ---------------------------------------------------------------------------
+  #-----------------------------------------------------------------------------
+  #-----------------------------------------------------------------------------
+  #-----------------------------------------------------------------------------
 
   unset_env_vars || return 1
 
   # E = EXTERNAL, DATA, F=FODLER
-  EDATAF="${ROOTDIR:?}/external_modules/data/"
-  
-  URL="${XXX_DATA_URL:-"https://github.com/XXX"}"
+  EDATAF="${ROOTDIR:?}/external_modules/data"
+
+  URL="${XXX_DATA_URL:-"https://website/XXX"}"
 
   # FOLDER = the directory name of the dataset
   FOLDER="XXX"
-  
+
+  declare -a FILE=( "filename1" 
+                    "filename2" 
+                    "filename3"
+                  )
+
+  declare -a EXT=( "tar.gz" 
+                   "tar.gz" 
+                   "tar.gz"
+                  )
+
   # Name to be printed on this shell script messages
-  PRINTNAME=XXX
+  PRINTNAME="XXX"
 
   # PACK = PACKAGE, DIR = DIRECTORY
   PACKDIR="${EDATAF:?}/${FOLDER:?}"
@@ -61,33 +71,54 @@ if [ -z "${IGNORE_SETUP_XXX_DATA}" ]; then
   # ---------------------------------------------------------------------------
 
   ptop "GETTING AND DECOMPRESSING ${PRINTNAME:?} DATA" || return 1
+  
+  # ----------------------------------------------------------------------------
+  # note: in case script run >1x
+
+  rm -rf "${PACKDIR:?}"
 
   # ---------------------------------------------------------------------------
-  # in case this script is called twice
   
-  rm -rf "${EDATAF:?}/${FOLDER:?}"
-  
-  # ---------------------------------------------------------------------------
+  mkdir ${PACKDIR:?}
 
-  cdfolder "${EDATAF:?}" || return 1
+  cdfolder "${PACKDIR:?}"
 
-  ${GIT:?} clone "${URL:?}" "${FOLDER:?}" \
-    >${OUT1:?} 2>${OUT2:?} || { error "${EC15:?}"; return 1; }
+  for (( i=0; i<${#FILE[@]}; i++ ));
+  do
 
-  # XXX_DATA_GIT_COMMIT = commit hash
-  if [ -n "${XXX_DATA_GIT_COMMIT}" ]; then
+    "${WGET:?}" "${URL}/${FILE[$i]:?}.${EXT[$i]:?}" -q --show-progress \
+      --progress=bar:force:noscroll || { error "${EC24:?}"; return 1; }
+
+    if [ "${EXT:?}" == "tar.gz" ]; then
+      
+      tar -xvzf "${FILE[$i]:?}.${EXT[$i]:?}" \
+        >${OUT1:?} 2>${OUT2:?} || { error "${EC25:?}"; return 1; }
     
-    cdfolder "${PACKDIR:?}" || return 1
-
-    ${GIT:?} checkout "${XXX_DATA_GIT_COMMIT:?}" \
-      >${OUT1:?} 2>${OUT2:?} || { error "${EC16:?}"; return 1; }
+    elif [ "${EXT:?}" == "tar.xz" ]; then
+    
+      tar -xf "${FILE[$i]:?}.${EXT[$i]:?}" \
+        >${OUT1:?} 2>${OUT2:?} || { error "${EC25:?}"; return 1; }
+    
+    else
+      
+      error "${EC29:?}"; return 1;
   
-  fi
+    fi
 
+  done
+
+  # ----------------------------------------------------------------------------
+  # erase compressed files 
+  
+  for (( i=0; i<${#FILE[@]}; i++ ));
+  do
+    rm -f "${PACKDIR:?}/${FILE[$i]:?}.${EXT[$i]:?}"
+  done 
+  
   # ---------------------------------------------------------------------------
+    
+  unset_all || return 1;
 
-  unset_all || return 1
-  
   pbottom "GETTING AND DECOMPRESSING ${PRINTNAME:?} DATA" || return 1
 
 fi

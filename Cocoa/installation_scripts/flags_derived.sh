@@ -173,6 +173,8 @@ export EC27="GIT REPO NOT FOUND"
 
 export EC28="LOGICAL ERROR: INCOMPATIBLE FLAGS ON"
 
+export EC29="UNKNOWN FILE EXTENSION"
+
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
 
