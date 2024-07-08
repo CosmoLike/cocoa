@@ -2,7 +2,7 @@
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
-if [ -z "${IGNORE_SETUP_HOLICOW_STRONG_LENSING_DATA}" ]; then
+if [ -z "${IGNORE_SETUP_XXX__DATA}" ]; then
 
   if [ -z "${ROOTDIR}" ]; then
     source start_cocoa.sh || { pfail 'ROOTDIR'; return 1; }
@@ -12,7 +12,7 @@ if [ -z "${IGNORE_SETUP_HOLICOW_STRONG_LENSING_DATA}" ]; then
   ( source "${ROOTDIR:?}/installation_scripts/flags_check.sh" ) || return 1;
   
   unset_env_vars () {
-    unset -v EDATAF FOLDER URL
+    unset -v EDATAF FOLDER URL PACKDIR PRINTNAME
     cdroot || return 1;
   }
 
@@ -55,6 +55,9 @@ if [ -z "${IGNORE_SETUP_HOLICOW_STRONG_LENSING_DATA}" ]; then
   # Name to be printed on this shell script messages
   PRINTNAME=XXX
 
+  # PACK = PACKAGE, DIR = DIRECTORY
+  PACKDIR="${EDATAF:?}/${FOLDER:?}"
+
   # ---------------------------------------------------------------------------
 
   ptop "GETTING AND DECOMPRESSING ${PRINTNAME:?} DATA" || return 1
@@ -71,12 +74,14 @@ if [ -z "${IGNORE_SETUP_HOLICOW_STRONG_LENSING_DATA}" ]; then
   ${GIT:?} clone "${URL:?}" "${FOLDER:?}" \
     >${OUT1:?} 2>${OUT2:?} || { error "${EC15:?}"; return 1; }
 
-  cdfolder "${EDATAF:?}/${TMP:?}" || return 1
-
-  # SET XXX_DATA_GIT_COMMIT IN CASE THE USER WANTS TO CHECKOUT A SPECIFIC COMMIT
+  # XXX_DATA_GIT_COMMIT = commit hash
   if [ -n "${XXX_DATA_GIT_COMMIT}" ]; then
+    
+    cdfolder "${PACKDIR:?}" || return 1
+
     ${GIT:?} checkout "${XXX_DATA_GIT_COMMIT:?}" \
       >${OUT1:?} 2>${OUT2:?} || { error "${EC16:?}"; return 1; }
+  
   fi
 
 
