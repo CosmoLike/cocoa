@@ -124,7 +124,7 @@ Cocoa selects the URL to download the data (and its version) using the following
         
         elif [ "${EXT:?}" == "DATASET FILE EXTENSION" ]; then
 
-          # Add code on how to decompress the file extension of your dataset
+          # Add code on how to decompress the file extension of the dataset
         
         else
         
