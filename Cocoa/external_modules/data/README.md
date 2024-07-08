@@ -48,7 +48,7 @@ Cocoa selects the URL to download the data (and its version) using the following
 
 ## :interrobang: FAQ: How to create scripts that download data from current experiments? <a name="new_likelihood_and_data"></a>
 
-The following non-comprehensive list of shell scripts, located at `Cocoa/installation_scripts`, manages the download and installation of LIPOP (CMB), CAMSPEC (CMB, SPT (CMB), Simons Observatory (CMB), H0licow (Strong Lensing), and other datasets. They all start with the prefix `unxv_`. 
+The following non-comprehensive list of shell scripts, located at `Cocoa/installation_scripts`, manages the download and installation of Lipop (CMB), Camspec (CMB), SPT (CMB), Simons Observatory (CMB), H0licow (Strong Lensing), and other datasets. They all start with the prefix `unxv_`. 
 
     unxv_act_dr6.sh
     unxv_bao.sh
