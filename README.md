@@ -73,11 +73,13 @@ We assume that you are still in the Conda cocoa environment from the previous `c
 
 Users will see a terminal like this: `$(cocoa)(.local)`. *This is a feature, not a bug*! 
 
- **Step :two:**: Select the number of OpenMP cores (below, we set it to 4)
+ **Step :two:**: Select the number of OpenMP cores. Below, we set it to 4 for concreteness. 
     
     export OMP_PROC_BIND=close; export OMP_NUM_THREADS=4
 
- **Step :three:**: Run `cobaya-run` on the first example of the YAML files we provide.
+The OpenMP affinity flag `OMP_PROC_BIND` is set to close place cores as closely as possible, which is important as current architectures severely limit communication bandwidth between distant cores.
+
+ **Step :three:**: Run the `cobaya-run` command on the first example of the YAML files we provide.
 
 One model evaluation:
 

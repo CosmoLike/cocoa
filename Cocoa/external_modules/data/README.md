@@ -1,9 +1,21 @@
 # Table of contents
 1. [FAQ: How to download modern CMB data?](#new_planck_data)
-2. [FAQ: How to create scripts that download data from current experiments? (developers only)](#new_likelihood_and_data)
+2. [FAQ: FAQ: How to download data from current experiments (using git)?](#new_likelihood_and_data)
+3. [FAQ: FAQ: How to download data from current experiments (using wget)?](#new_likelihood_and_data2)
+ 
+The following non-comprehensive list of shell scripts, located at `Cocoa/installation_scripts`, manages the download and installation of Lipop (CMB), Camspec (CMB), SPT (CMB), Simons Observatory (CMB), H0licow (Strong Lensing), and other datasets. They all start with the prefix `unxv_`. 
 
-How to create scripts that download and compile likelihoods and data for modern experiments? <a name="new_likelihood_and_data"></a>
-
+    unxv_act_dr6.sh
+    unxv_bao.sh
+    unxv_bicep.sh
+    unxv_camspec.sh
+    unxv_h0licow.sh
+    unxv_lipop.sh
+    unxv_planck2018_basic.sh
+    unxv_simons_observatory.sh
+    unxv_sn.sh
+    unxv_spt.sh
+    
 ## :interrobang: FAQ: How to download modern CMB data? <a name="new_planck_data"></a>
 
 Cocoa can download [CamSpec](https://people.ast.cam.ac.uk/~stg20/camspec/index.html), [sroll2](https://web.fe.infn.it/~pagano/low_ell_datasets/sroll2/), [Hillipop](https://github.com/planck-npipe/hillipop.git), and [Lollipop](https://github.com/planck-npipe/lollipop.git) Planck-CMB likelihoods. Cocoa can also download data from some CMB high-resolution ground observatories. These datasets can be quite large, containing files that are several Gigabytes in size, so the shell script  `Cocoa/set_installation_options.sh` contains keys that allow users to skip their download, as shown below.
@@ -46,6 +58,26 @@ Cocoa selects the URL to download the data (and its version) using the following
     # This is only possible because each version is saved in a separate folder
     export SO_DATA_VERSION="v0.7.1 v0.8"
 
-## :interrobang: FAQ: How to create scripts that download data from current experiments? (developers only :bangbang: ☠️ :bangbang: ) <a name="new_likelihood_and_data"></a>
+## :interrobang: FAQ: How to download data from current experiments (using git)? <a name="new_likelihood_and_data"></a>
 
-TODO
+ The script `unxv_github_template.sh` provides a basic template for users to add a new dataset by cloning a git repository. In this script, the main lines that need to be modified are shown below.
+
+    [Adapted from Cocoa/installation_scripts/unxv_git_template.sh shell script] 
+
+    URL="${XXX_DATA_URL:-"https://github.com/XXX"}"
+    
+    # FOLDER = the directory name of the dataset - git clone $URL $FOLDER
+    FOLDER="XXX"
+
+    # Name to be printed on this shell script messages
+    PRINTNAME=XXX
+  
+    (...) 
+
+    # SET XXX_DATA_GIT_COMMIT IN CASE THE USER WANTS TO CHECKOUT A SPECIFIC COMMIT
+    if [ -n "${XXX_DATA_GIT_COMMIT}" ]; then
+      ${GIT:?} checkout "${XXX_DATA_GIT_COMMIT:?}" \
+        >${OUT1:?} 2>${OUT2:?} || { error "${EC16:?}"; return 1; }
+    fi
+  
+## :interrobang: FAQ: How to download data from current experiments (using wget)? <a name="new_likelihood_and_data2"></a>
