@@ -14,11 +14,12 @@
     6. [FAQ: What should you do if you do not have Miniconda installed? Installation Guide](#overview_miniconda)
     8. [FAQ: How can we set the Slow/Fast decomposition on MCMC Chains with Cosmolike? Manual Blocking](#manual_blocking_cosmolike)
     9. [FAQ: How to switch Cocoa's adopted CAMB/CLASS/Polychord? (external readme)](Cocoa/external_modules/code)
-    10. [FAQ: How do users set the environment for projects involving Machine Learning emulators?](#ml_emulators)
-    11. [FAQ: How can users improve their Bash/C/C++ knowledge to develop Cocoa/Cosmolike?](#lectnotes)
-    12. [Warning about Weak Lensing YAML files in Cobaya](#appendix_example_runs)
-    13. [FAQ: How to install Cocoa without conda](#required_packages_cache)
-    14. [FAQ: How should developers push changes to the Cocoa main branch?](#push_main)
+    10. [FAQ: How to download modern CMB data? (external readme)](Cocoa/external_modules/data)
+    11. [FAQ: How do users set the environment for projects involving Machine Learning emulators?](#ml_emulators)
+    12. [FAQ: How can users improve their Bash/C/C++ knowledge to develop Cocoa/Cosmolike?](#lectnotes)
+    13. [Warning about Weak Lensing YAML files in Cobaya](#appendix_example_runs)
+    14. [FAQ: How to install Cocoa without conda](#required_packages_cache)
+    15. [FAQ: How should developers push changes to the Cocoa main branch?](#push_main)
 
 ## Overview of the [Cobaya](https://github.com/CobayaSampler)-[CosmoLike](https://github.com/CosmoLike) Joint Architecture (Cocoa) <a name="overview"></a>
 
