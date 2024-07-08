@@ -1,7 +1,7 @@
 # Table of contents
 1. [FAQ: How to download modern CMB data?](#new_planck_data)
-2. [FAQ: FAQ: How to download new data from current experiments (using git)?](#new_likelihood_and_data)
-3. [FAQ: FAQ: How to download new data from current experiments (using wget)?](#new_likelihood_and_data2)
+2. [FAQ: FAQ: How to download new data using git?](#new_likelihood_and_data)
+3. [FAQ: FAQ: How to download new data using wget?](#new_likelihood_and_data2)
  
 Cocoa provides a list of shell scripts, located at `Cocoa/installation_scripts`, that manages the download and installation of Lipop (CMB), Camspec (CMB), SPT (CMB), Simons Observatory (CMB), H0licow (Strong Lensing), and other datasets. They all start with the prefix `unxv_`. 
 
@@ -47,7 +47,7 @@ Cocoa selects the URL to download the data (and its version) using the following
     # This is only possible because each version is saved in a separate folder
     export SO_DATA_VERSION="v0.7.1 v0.8"
 
-## :interrobang: FAQ: How to download new data from experiments (using git)? <a name="new_likelihood_and_data"></a>
+## :interrobang: FAQ: How to download new data (using git)? <a name="new_likelihood_and_data"></a>
 
  Suppose the user wants to download a dataset for which Cocoa does not have an already developed shell script at `Cocoa/installation_scripts`. In that case, the script `unxv_github_template.sh` provides a basic template for adding a new dataset by cloning a git repository. The main lines that need to be modified in this script are shown below.
 
