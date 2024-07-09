@@ -220,11 +220,11 @@ if [ -z "${IGNORE_ALL_PIP_INSTALLATION}" ]; then
     
   fi
 
-  env CXX="${CXX_COMPILER:?}" CC="${C_COMPILER:?}" ${PIP3:?} install \
-      "${ROOTDIR:?}/../cocoa_installation_libraries/pip_cache/fgspectra" \
-    --prefix="${ROOTDIR:?}/.local" \
-    --no-index \
-    >${OUT1:?} 2>${OUT2:?} || { error "(FGSPECTRA) ${EC13:?}"; return 1; }
+  #env CXX="${CXX_COMPILER:?}" CC="${C_COMPILER:?}" ${PIP3:?} install \
+  #    "${ROOTDIR:?}/../cocoa_installation_libraries/pip_cache/fgspectra" \
+  #  --prefix="${ROOTDIR:?}/.local" \
+  #  --no-index \
+  #  >${OUT1:?} 2>${OUT2:?} || { error "(FGSPECTRA) ${EC13:?}"; return 1; }
 
   pbottom "PIP INSTALL CORE LIBRARIES" || return 1
 

@@ -95,6 +95,8 @@ external_modules/code/class_public/python/classy.egg-info
 external_modules/code/velocileptors/
 external_modules/code/velocileptors*/
 external_modules/code/velo*/
+external_modules/code/fgspectra/
+external_modules/code/fg*/
 
 cobaya/cobaya/likelihoods/XXX
 cobaya/cobaya/likelihoods/des_y1

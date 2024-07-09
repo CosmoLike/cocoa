@@ -131,6 +131,10 @@ export VELOCILEPTORS_URL="https://github.com/sfschen/velocileptors.git"
 export VELOCILEPTORS_GIT_COMMIT="889a0c98895831eb23b250a26162cfb8a93237bd"
 export VELOCILEPTORS_NAME="velocileptors"
 
+export FGSPECTRA_URL="https://github.com/simonsobs/fgspectra.git"
+export FGSPECTRA_GIT_COMMIT="87206ac7f919bcf82b08dee180f0821d038d24d2"
+export FGSPECTRA_NAME="fgspectra"
+
 # ------------------------------------------------------------------------------
 # The keys below control which packages will be installed and compiled 
 # ------------------------------------------------------------------------------
@@ -141,12 +145,13 @@ export VELOCILEPTORS_NAME="velocileptors"
 #export IGNORE_PLANCK_LIKELIHOOD_CODE=1
 #export IGNORE_ACTDR4_CODE=1
 #export IGNORE_ACTDR6_CODE=1
-#export IGNORE_CPP_CUBA_INSTALLATION=1
-#export IGNORE_VELOCILEPTORS_CODE=1
+export IGNORE_CPP_CUBA_INSTALLATION=1
+export IGNORE_VELOCILEPTORS_CODE=1
 #export IGNORE_SIMONS_OBSERVATORY_LIKELIHOOD_CODE=1
-#export IGNORE_CAMSPEC_LIKELIHOOD_CODE=1
-#export IGNORE_LIPOP_LIKELIHOOD_CODE=1
+export IGNORE_CAMSPEC_LIKELIHOOD_CODE=1
+export IGNORE_LIPOP_LIKELIHOOD_CODE=1
 #export IGNORE_COBAYA_CODE=1
+#export IGNORE_FGSPECTRA_CODE=1
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
