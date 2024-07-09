@@ -152,6 +152,7 @@ export IGNORE_CAMSPEC_LIKELIHOOD_CODE=1
 export IGNORE_LIPOP_LIKELIHOOD_CODE=1
 #export IGNORE_COBAYA_CODE=1
 #export IGNORE_FGSPECTRA_CODE=1
+#export IGNORE_EUCLID_EMULATOR_V2_CODE=1
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
