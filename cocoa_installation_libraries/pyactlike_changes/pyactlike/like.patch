@@ -1,0 +1,11 @@
+--- like.py	2024-07-08 16:57:52.569493000 -0400
++++ like2.py	2024-07-09 14:11:23.793271000 -0400
+@@ -300,7 +300,7 @@
+         return {"yp2": None, "Cl": {cl: self.l_max for cl in self.components}}
+ 
+     def _get_Cl(self):
+-        return self.theory.get_Cl(ell_factor=True)
++        return self.provider.get_Cl(ell_factor=True)
+ 
+     def _get_theory(self, **params_values):
+         cl_theory = self._get_Cl()
