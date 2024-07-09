@@ -1,6 +1,6 @@
 # Table of contents
 1. [FAQ: How to switch Cocoa's adopted CAMB/CLASS? (the easy way)](#appendix_new_camb_class)
-2. [FAQ: What about Polychord and Velocileptors?](#appendix_new_polychord)
+2. [FAQ: What about installing Polychord and Velocileptors?](#appendix_new_polychord)
 3. [FAQ: How to download and compile likelihoods for modern CMB data?](#new_planck_likelihoods)
 4. [FAQ: How to switch the default CAMB/CLASS? (the not-so-easy way)](#appendix_new_camb_class_medium)
 5. [FAQ: How to add additional patches to the default CAMB/CLASS?](#appendix_new_camb_class_patches)
@@ -36,17 +36,17 @@ What happens if the Cocoa patch files fail? We have three sections dedicated to 
 Finally, what if the user wants to skip CAMB or CLASS compilation? In this case, the shell script `Cocoa/set_installation_options.sh` provides the following environmental keys.
     
     [Adapted from Cocoa/set_installation_options.sh shell script]
-    #export IGNORE_CAMB_COMPILATION=1
-    #export IGNORE_CLASS_COMPILATION=1
+    #export IGNORE_CAMB_CODE=1
+    #export IGNORE_CLASS_CODE=1
 
-## :interrobang: FAQ: What about the installation of Polychord and Velocileptors? <a name="appendix_new_polychord"></a> 
+## :interrobang: FAQ: What about installing Polychord and Velocileptors? <a name="appendix_new_polychord"></a> 
 
 The shell script `set_installation_options.sh` provides the following keys that manage the download and compilation of Polychord and Velocileptor.
 
     [Adapted from Cocoa/set_installation_options.sh shell script]
     
-    #export IGNORE_POLYCHORD_COMPILATION=1
-    #export IGNORE_VELOCILEPTORS_COMPILATION=1
+    #export IGNORE_POLYCHORD_SAMPLER_CODE=1
+    #export IGNORE_VELOCILEPTORS_CODE=1
 
     (...)
 
@@ -74,12 +74,12 @@ The CMB data sets require specialized likelihoods. Cocoa will download, patch, a
     
     (...)
     
-    #export IGNORE_PLANCK_COMPILATION=1
-    #export IGNORE_ACTDR4_COMPILATION=1
-    #export IGNORE_ACTDR6_COMPILATION=1
-    #export IGNORE_SIMONS_OBSERVATORY_LIKELIHOOD_COMPILATION=1
-    #export IGNORE_CAMSPEC_LIKELIHOOD_COMPILATION=1
-    #export IGNORE_LIPOP_LIKELIHOOD_COMPILATION=1
+    #export IGNORE_PLANCK_LIKELIHOOD_CODE=1
+    #export IGNORE_ACTDR4_CODE=1
+    #export IGNORE_ACTDR6_CODE=1
+    #export IGNORE_SIMONS_OBSERVATORY_LIKELIHOOD_CODE=1
+    #export IGNORE_CAMSPEC_LIKELIHOOD_CODE=1
+    #export IGNORE_LIPOP_LIKELIHOOD_CODE=1
 
 Cocoa selects the URL to download the likelihoods (and the version of the likelihood) using the following keys.
 
