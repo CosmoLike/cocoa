@@ -2,7 +2,7 @@
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
-if [ -z "${IGNORE_POLYCHORD_COMPILATION}" ]; then
+if [ -z "${IGNORE_POLYCHORD_SAMPLER_CODE}" ]; then
   
   if [ -z "${ROOTDIR}" ]; then
     source start_cocoa.sh || { pfail 'ROOTDIR'; return 1; }
@@ -42,9 +42,11 @@ if [ -z "${IGNORE_POLYCHORD_COMPILATION}" ]; then
   # ---------------------------------------------------------------------------
   # ---------------------------------------------------------------------------
 
-  ptop 'COMPILING POLYCHORD' || return 1
+  unset_env_vars || return 1
 
-  unset_env_vars || return 1;
+  # ---------------------------------------------------------------------------
+
+  ptop 'COMPILING POLYCHORD' || return 1
 
   # E = EXTERNAL, CODE, F=FODLER
   ECODEF="${ROOTDIR:?}/external_modules/code"
@@ -80,10 +82,12 @@ if [ -z "${IGNORE_POLYCHORD_COMPILATION}" ]; then
     "${PYTHON3:?}" setup.py install --prefix "${ROOTDIR:?}/.local" \
     >${OUT1:?} 2> ${OUT2:?} || { error "${EC9:?}"; return 1; }
 
-  unset_all || return 1;
-  
+ 
   pbottom 'COMPILING POLYCHORD' || return 1
 
+  # ----------------------------------------------------------------------------
+
+  unset_all || return 1;
 fi
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------

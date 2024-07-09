@@ -2,7 +2,7 @@
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
-if [ -z "${IGNORE_SETUP_XXX_DATA}" ]; then
+if [ -z "${IGNORE_XXX_DATA}" ]; then
 
   if [ -z "${ROOTDIR}" ]; then
     source start_cocoa.sh || { pfail 'ROOTDIR'; return 1; }
@@ -70,7 +70,7 @@ if [ -z "${IGNORE_SETUP_XXX_DATA}" ]; then
 
   # ---------------------------------------------------------------------------
 
-  ptop "GETTING AND DECOMPRESSING ${PRINTNAME:?} DATA" || return 1
+  ptop "SETUP/UNXV ${PRINTNAME:?} DATA" || return 1
   
   # ----------------------------------------------------------------------------
   # note: in case script run >1x
@@ -117,7 +117,7 @@ if [ -z "${IGNORE_SETUP_XXX_DATA}" ]; then
   
   # ---------------------------------------------------------------------------
     
-  pbottom "GETTING AND DECOMPRESSING ${PRINTNAME:?} DATA" || return 1
+  pbottom "SETUP/UNXV ${PRINTNAME:?} DATA" || return 1
 
   unset_all || return 1;
   

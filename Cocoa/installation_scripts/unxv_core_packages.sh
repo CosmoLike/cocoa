@@ -96,7 +96,7 @@ if [ -z "${SKIP_DECOMM_CORE_PACKAGES}" ]; then
 
   # ----------------------------------------------------------------------------
 
-  ptop 'DECOMPRESSING CORE LIBRARIES' || return 1
+  ptop 'UNXV CORE LIBRARIES' || return 1
   
   if [ "${#TKEYS[@]}" -eq "${#TFILES[@]}" ]; then
     AL=${#TFILES[@]}
@@ -133,7 +133,7 @@ if [ -z "${SKIP_DECOMM_CORE_PACKAGES}" ]; then
 
   unset_all || return 1;
 
-  pbottom 'DECOMPRESSING CORE LIBRARIES' || return 1
+  pbottom 'UNXV CORE LIBRARIES' || return 1
 
 fi
 

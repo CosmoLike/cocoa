@@ -2,7 +2,7 @@
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
-if [ -z "${IGNORE_SETUP_SPT_CMB_DATA}" ]; then
+if [ -z "${IGNORE_SPT_CMB_DATA}" ]; then
 
   if [ -z "${ROOTDIR}" ]; then
     source start_cocoa.sh || { pfail 'ROOTDIR'; return 1; }
@@ -59,7 +59,7 @@ if [ -z "${IGNORE_SETUP_SPT_CMB_DATA}" ]; then
   
   # ---------------------------------------------------------------------------
 
-  ptop "GETTING AND DECOMPRESSING ${PRINTNAME:?} DATA" || return 1
+  ptop "SETUP/UNXV ${PRINTNAME:?} DATA" || return 1
   
   # ---------------------------------------------------------------------------
   # note: in case this script is run twice
@@ -70,6 +70,10 @@ if [ -z "${IGNORE_SETUP_SPT_CMB_DATA}" ]; then
 
   cdfolder "${EDATAF:?}" || return 1
 
+  # check if the link exists
+  "${CURL:?}" -fsS "${URL:?}" \
+    >${OUT1:?} 2>${OUT2:?} || { error "${EC27:?} (URL=${URL:?})"; return 1; }
+    
   ${GIT:?} clone "${URL:?}" "${FOLDER:?}" \
     >${OUT1:?} 2>${OUT2:?} || { error "${EC15:?}"; return 1; }
 
@@ -84,7 +88,7 @@ if [ -z "${IGNORE_SETUP_SPT_CMB_DATA}" ]; then
 
   # ---------------------------------------------------------------------------
 
-  pbottom "GETTING AND DECOMPRESSING ${PRINTNAME:?} DATA" || return 1
+  pbottom "SETUP/UNXV ${PRINTNAME:?} DATA" || return 1
 
   unset_all || return 1; 
   

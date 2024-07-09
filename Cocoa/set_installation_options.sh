@@ -31,15 +31,16 @@ export MINICONDA_INSTALLATION=1
 # ------------------------------------------------------------------------------
 # The flags below allow users to skip downloading specific datasets ------------
 # ------------------------------------------------------------------------------
-# export IGNORE_SETUP_BICEP_CMB_DATA=1
-# export IGNORE_SETUP_HOLICOW_STRONG_LENSING_DATA=1
-# export IGNORE_SETUP_SN_DATA=1
-# export IGNORE_SETUP_BAO_DATA=1
-# export IGNORE_SETUP_SPT_CMB_DATA=1
-export IGNORE_SETUP_SIMONS_OBSERVATORY_CMB_DATA=1
-# export IGNORE_SETUP_PLANCK_CMB_DATA=1
-export IGNORE_SETUP_CAMSPEC_CMB_DATA=1
-export IGNORE_SETUP_LIPOP_CMB_DATA=1
+# export IGNORE_ACTDR6_DATA=1
+# export IGNORE_BAO_DATA=1
+# export IGNORE_BICEP_CMB_DATA=1
+# export IGNORE_HOLICOW_STRONG_LENSING_DATA=1
+# export IGNORE_SN_DATA=1
+# export IGNORE_SPT_CMB_DATA=1
+export IGNORE_SIMONS_OBSERVATORY_CMB_DATA=1
+# export IGNORE_PLANCK_CMB_DATA=1
+export IGNORE_CAMSPEC_CMB_DATA=1
+export IGNORE_LIPOP_CMB_DATA=1
 
 # ------------------------------------------------------------------------------
 # If set, compile_planck.sh uses click like code from github.com/benabed/clik
@@ -131,22 +132,21 @@ export VELOCILEPTORS_GIT_COMMIT="889a0c98895831eb23b250a26162cfb8a93237bd"
 export VELOCILEPTORS_NAME="velocileptors"
 
 # ------------------------------------------------------------------------------
-# The keys below control which packages will be installed and compiled when ----  
-# running setup_cocoa.sh and compile_cocoa.sh. They are mostly helpful when ----
-# debugging cocoa --------------------------------------------------------------
+# The keys below control which packages will be installed and compiled 
 # ------------------------------------------------------------------------------
-#export IGNORE_CAMB_COMPILATION=1
-#export IGNORE_CLASS_COMPILATION=1
-#export IGNORE_COSMOLIKE_COMPILATION=1
-#export IGNORE_POLYCHORD_COMPILATION=1
-#export IGNORE_PLANCK_COMPILATION=1
-#export IGNORE_ACTDR4_COMPILATION=1
-#export IGNORE_ACTDR6_COMPILATION=1
+#export IGNORE_CAMB_CODE=1
+#export IGNORE_CLASS_CODE=1
+#export IGNORE_COSMOLIKE_CODE=1
+#export IGNORE_POLYCHORD_SAMPLER_CODE=1
+#export IGNORE_PLANCK_LIKELIHOOD_CODE=1
+#export IGNORE_ACTDR4_CODE=1
+#export IGNORE_ACTDR6_CODE=1
 #export IGNORE_CPP_CUBA_INSTALLATION=1
-#export IGNORE_VELOCILEPTORS_COMPILATION=1
-#export IGNORE_SIMONS_OBSERVATORY_LIKELIHOOD_COMPILATION=1
-#export IGNORE_CAMSPEC_LIKELIHOOD_COMPILATION=1
-#export IGNORE_LIPOP_LIKELIHOOD_COMPILATION=1
+#export IGNORE_VELOCILEPTORS_CODE=1
+#export IGNORE_SIMONS_OBSERVATORY_LIKELIHOOD_CODE=1
+#export IGNORE_CAMSPEC_LIKELIHOOD_CODE=1
+#export IGNORE_LIPOP_LIKELIHOOD_CODE=1
+#export IGNORE_COBAYA_CODE=1
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------

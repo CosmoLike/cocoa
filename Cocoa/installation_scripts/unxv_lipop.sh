@@ -2,7 +2,7 @@
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
-if [ -z "${IGNORE_SETUP_LIPOP_CMB_DATA}" ]; then
+if [ -z "${IGNORE_LIPOP_CMB_DATA}" ]; then
 
   if [ -z "${ROOTDIR}" ]; then
     source start_cocoa.sh || { pfail 'ROOTDIR'; return 1; }
@@ -44,6 +44,8 @@ if [ -z "${IGNORE_SETUP_LIPOP_CMB_DATA}" ]; then
 
   unset_env_vars || return 1
 
+  #-----------------------------------------------------------------------------
+
   # E = EXTERNAL, DATA, F=FODLER
   EDATAF="${ROOTDIR:?}/external_modules/data"
 
@@ -63,7 +65,7 @@ if [ -z "${IGNORE_SETUP_LIPOP_CMB_DATA}" ]; then
 
   # ---------------------------------------------------------------------------
 
-  ptop "GETTING AND DECOMPRESSING ${PRINTNAME:?} DATA" || return 1
+  ptop "SETUP/UNXV ${PRINTNAME:?} DATA" || return 1
   
   # ----------------------------------------------------------------------------
   # note: in case script run >1x w/ previous run stoped prematurely b/c error
@@ -113,7 +115,7 @@ if [ -z "${IGNORE_SETUP_LIPOP_CMB_DATA}" ]; then
   
   # ---------------------------------------------------------------------------
     
-  pbottom "GETTING AND DECOMPRESSING ${PRINTNAME:?} DATA" || return 1
+  pbottom "SETUP/UNXV ${PRINTNAME:?} DATA" || return 1
 
   unset_all || return 1;
 

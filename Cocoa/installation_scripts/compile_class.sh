@@ -2,7 +2,7 @@
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
-if [ -z "${IGNORE_CLASS_COMPILATION}" ]; then
+if [ -z "${IGNORE_CLASS_CODE}" ]; then
   
   if [ -z "${ROOTDIR}" ]; then
     source start_cocoa.sh || { pfail 'ROOTDIR'; return 1; }
@@ -35,7 +35,7 @@ if [ -z "${IGNORE_CLASS_COMPILATION}" ]; then
   }
   
   cdfolder() {
-    cd "${1:?}" 2>"/dev/null" || { error "CD FOLDER ${1}"; return 1; }
+    cd "${1:?}" 2>"/dev/null" || { error "CD FOLDER: ${1}"; return 1; }
   }
 
   cpfolder() {
@@ -46,10 +46,10 @@ if [ -z "${IGNORE_CLASS_COMPILATION}" ]; then
   # ---------------------------------------------------------------------------
   # ---------------------------------------------------------------------------
   # ---------------------------------------------------------------------------
-  
-  ptop 'COMPILING CLASS' || return 1
 
   unset_env_vars || return 1
+
+  # ---------------------------------------------------------------------------
 
   # E = EXTERNAL, CODE, F=FODLER
   ECODEF="${ROOTDIR:?}/external_modules/code"
@@ -57,6 +57,11 @@ if [ -z "${IGNORE_CLASS_COMPILATION}" ]; then
   FOLDER="${CLASS_NAME:-"class_public"}"
 
   PACKDIR="${ECODEF:?}/${FOLDER:?}"
+
+  # Name to be printed on this shell script messages
+  PRINTNAME="CLASS"
+  
+  ptop "COMPILING ${PRINTNAME:?}" || return 1
 
   cdfolder "${PACKDIR}" || return 1
 
@@ -96,12 +101,14 @@ if [ -z "${IGNORE_CLASS_COMPILATION}" ]; then
   CC="${C_COMPILER:?}" ${PYTHON3:?} setup.py build \
     >${OUT1:?} 2>${OUT2:?} || { error "${EC4:?}"; return 1; }
 
+
+  pbottom "COMPILING ${PRINTNAME:?}" || return 1
+
+  # ---------------------------------------------------------------------------
+
   unset_all || return 1
 
-  pbottom 'COMPILING CLASS' || return 1
-
 fi
-
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------

@@ -2,7 +2,7 @@
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
-if [ -z "${IGNORE_CLASS_COMPILATION}" ]; then
+if [ -z "${IGNORE_CLASS_CODE}" ]; then
   
   if [ -z "${ROOTDIR}" ]; then
     source start_cocoa.sh || { pfail 'ROOTDIR'; return 1; }
@@ -12,7 +12,7 @@ if [ -z "${IGNORE_CLASS_COMPILATION}" ]; then
   ( source "${ROOTDIR:?}/installation_scripts/flags_check.sh" ) || return 1;
     
   unset_env_vars () {
-    unset -v URL CHANGES ECODEF FOLDER PACKDIR TFOLDER TFILE TFILEP AL
+    unset -v URL CHANGES ECODEF FOLDER PACKDIR TFOLDER TFILE TFILEP AL PRINTNAME
     cdroot || return 1;
   }
 
@@ -39,7 +39,7 @@ if [ -z "${IGNORE_CLASS_COMPILATION}" ]; then
   }
 
   cpfolder() {
-    cp -r "${1:?}" "${2:?}"  \
+    cp -r "${1:?}" "${2:?}" \
       2>"/dev/null" || { error "CP FOLDER ${1} on ${2}"; return 1; }
   }
 
@@ -51,8 +51,6 @@ if [ -z "${IGNORE_CLASS_COMPILATION}" ]; then
 
   # ---------------------------------------------------------------------------
 
-  ptop 'INSTALLING CLASS' || return 1
-
   URL="${CLASS_URL:-"https://github.com/lesgourg/class_public.git"}"
   
   CHANGES="${ROOTDIR:?}/../cocoa_installation_libraries/class_changes"
@@ -62,6 +60,11 @@ if [ -z "${IGNORE_CLASS_COMPILATION}" ]; then
   FOLDER=${CLASS_NAME:-"class_public"}
   
   PACKDIR="${ECODEF:?}/${FOLDER:?}/"
+
+  # Name to be printed on this shell script messages
+  PRINTNAME="CLASS"
+
+  ptop "INSTALLING ${PRINTNAME:?}" || return 1;
 
   # ---------------------------------------------------------------------------
   # in case this script is called twice
@@ -125,7 +128,7 @@ if [ -z "${IGNORE_CLASS_COMPILATION}" ]; then
 
   cdfolder "${ROOTDIR}" || return 1;
 
-  pbottom 'INSTALLING CLASS' || return 1
+  pbottom "INSTALLING ${PRINTNAME:?}" || return 1
 
   # ----------------------------------------------------------------------------
 

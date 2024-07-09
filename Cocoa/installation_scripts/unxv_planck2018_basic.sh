@@ -1,6 +1,6 @@
 #!/bin/bash
 
-if [ -z "${IGNORE_SETUP_PLANCK_CMB_DATA}" ]; then
+if [ -z "${IGNORE_PLANCK_CMB_DATA}" ]; then
 
   if [ -z "${ROOTDIR}" ]; then
     source start_cocoa.sh || { pfail 'ROOTDIR'; return 1; }
@@ -50,7 +50,7 @@ if [ -z "${IGNORE_SETUP_PLANCK_CMB_DATA}" ]; then
 
   # ---------------------------------------------------------------------------
  
-  ptop "GETTING AND DECOMPRESSING ${PRINTNAME:?} DATA" || return 1
+  ptop "SETUP/UNXV ${PRINTNAME:?} DATA" || return 1
 
   # ---------------------------------------------------------------------------
   # note: in case this script is run twice
@@ -80,7 +80,7 @@ if [ -z "${IGNORE_SETUP_PLANCK_CMB_DATA}" ]; then
     
   # ---------------------------------------------------------------------------
 
-  pbottom "GETTING AND DECOMPRESSING ${PRINTNAME:?} DATA" || return 1
+  pbottom "SETUP/UNXV ${PRINTNAME:?} DATA" || return 1
 
   unset_all || return 1;
 

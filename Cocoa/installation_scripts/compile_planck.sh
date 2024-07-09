@@ -2,7 +2,7 @@
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
-if [ -z "${IGNORE_PLANCK_COMPILATION}" ]; then
+if [ -z "${IGNORE_PLANCK_LIKELIHOOD_CODE}" ]; then
   
   if [ -z "${ROOTDIR}" ]; then
     source start_cocoa.sh || { pfail 'ROOTDIR'; return 1; }
@@ -12,7 +12,7 @@ if [ -z "${IGNORE_PLANCK_COMPILATION}" ]; then
   ( source "${ROOTDIR:?}/installation_scripts/flags_check.sh" ) || return 1;
     
   unset_env_vars () {
-    unset -v ECPCF CLIK_LAPACK_LIBS CLIK_CFITSIO_LIBS
+    unset -v ECPCF CLIK_LAPACK_LIBS CLIK_CFITSIO_LIBS PRINTNAME
     cdroot || return 1;
   }
 
@@ -42,9 +42,13 @@ if [ -z "${IGNORE_PLANCK_COMPILATION}" ]; then
   # ---------------------------------------------------------------------------
   # ---------------------------------------------------------------------------
 
-  ptop 'COMPILING PLANCK' || return 1
-
   unset_env_vars || return 1
+
+  # ---------------------------------------------------------------------------
+  # Name to be printed on this shell script messages
+  PRINTNAME="PLANCK LIKELIHOOD"
+
+  ptop "COMPILING ${PRINTNAME:?}" || return 1
 
   if [ -z "${IGNORE_C_CFITSIO_INSTALLATION}" ]; then
     CLIK_CFITSIO_LIBS="${ROOTDIR:?}/.local/lib"
@@ -102,9 +106,12 @@ if [ -z "${IGNORE_PLANCK_COMPILATION}" ]; then
   "${PYTHON3:?}" waf install -v \
     >${OUT1:?} 2>${OUT2:?} || { error "${EC6:?}"; return 1; }
 
-  unset_all || return 1
   
-  pbottom 'COMPILING PLANCK' || return 1
+  pbottom "COMPILING ${PRINTNAME:?}" || return 1
+
+  # ---------------------------------------------------------------------------
+
+  unset_all || return 1
 
 fi
 # ------------------------------------------------------------------------------

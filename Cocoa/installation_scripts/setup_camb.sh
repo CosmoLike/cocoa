@@ -2,7 +2,7 @@
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
-if [ -z "${IGNORE_CAMB_COMPILATION}" ]; then
+if [ -z "${IGNORE_CAMB_CODE}" ]; then
 
   if [ -z "${ROOTDIR}" ]; then
     source start_cocoa.sh || { pfail 'ROOTDIR'; return 1; }
@@ -12,7 +12,8 @@ if [ -z "${IGNORE_CAMB_COMPILATION}" ]; then
   ( source "${ROOTDIR:?}/installation_scripts/flags_check.sh" ) || return 1;
 
   unset_env_vars () {
-    unset -v URL CCIL ECODEF FOLDER PACKDIR CHANGES TFOLDER TFILE TFILEP AL
+    unset -v URL CCIL ECODEF FOLDER PACKDIR CHANGES TFOLDER 
+    unset -v TFILE TFILEP AL PRINTNAME
     cdroot || return 1;
   }
 
@@ -52,8 +53,6 @@ if [ -z "${IGNORE_CAMB_COMPILATION}" ]; then
   CCIL="${ROOTDIR:?}/../cocoa_installation_libraries"
 
   # ---------------------------------------------------------------------------
-  
-  ptop 'INSTALLING CAMB' || return 1;
 
   URL="${CAMB_URL:-"https://github.com/cmbant/CAMB"}"
 
@@ -65,6 +64,11 @@ if [ -z "${IGNORE_CAMB_COMPILATION}" ]; then
   FOLDER="${CAMB_NAME:-"CAMB"}"
 
   PACKDIR="${ECODEF:?}/${FOLDER:?}"
+
+  # Name to be printed on this shell script messages
+  PRINTNAME="CAMB"
+
+  ptop "INSTALLING ${PRINTNAME:?}" || return 1;
 
   # ---------------------------------------------------------------------------
   # In case this script is called twice ---------------------------------------
@@ -124,7 +128,7 @@ if [ -z "${IGNORE_CAMB_COMPILATION}" ]; then
   
   cdfolder "${ROOTDIR}" || return 1
   
-  pbottom 'INSTALLING CAMB' || return 1
+  pbottom "INSTALLING ${PRINTNAME:?}" || return 1
   
   # ---------------------------------------------------------------------------
 

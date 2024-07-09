@@ -2,7 +2,7 @@
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
-if [ -z "${IGNORE_CAMB_COMPILATION}" ]; then
+if [ -z "${IGNORE_CAMB_CODE}" ]; then
   
   if [ -z "${ROOTDIR}" ]; then
     source start_cocoa.sh || { pfail 'ROOTDIR'; return 1; }
@@ -12,7 +12,7 @@ if [ -z "${IGNORE_CAMB_COMPILATION}" ]; then
   ( source "${ROOTDIR:?}/installation_scripts/flags_check.sh" ) || return 1;
 
   unset_env_vars () {
-    unset -v ECODEF FOLDER PACKDIR
+    unset -v ECODEF FOLDER PACKDIR PRINTNAME
     cdroot || return 1;
   }
 
@@ -38,13 +38,13 @@ if [ -z "${IGNORE_CAMB_COMPILATION}" ]; then
     cd "${1:?}" 2>"/dev/null" || { error "CD FOLDER ${1}"; return 1; }
   }
   
-  # --------------------------------------------------------------------------- 
-  # --------------------------------------------------------------------------- 
+  # ---------------------------------------------------------------------------
+  # ---------------------------------------------------------------------------
   # ---------------------------------------------------------------------------
 
-  ptop 'COMPILING CAMB' || return 1
-
   unset_env_vars || return 1
+
+  # ---------------------------------------------------------------------------
 
   # E = EXTERNAL, CODE, F=FODLER
   ECODEF="${ROOTDIR:?}/external_modules/code"
@@ -52,6 +52,11 @@ if [ -z "${IGNORE_CAMB_COMPILATION}" ]; then
   FOLDER="${CAMB_NAME:-"CAMB"}"
 
   PACKDIR="${ECODEF:?}/${FOLDER:?}"
+
+  # Name to be printed on this shell script messages
+  PRINTNAME="CAMB"
+
+  ptop "COMPILING ${PRINTNAME:?}" || return 1
 
   cdfolder "${PACKDIR}" || return 1
 
@@ -71,11 +76,13 @@ if [ -z "${IGNORE_CAMB_COMPILATION}" ]; then
   COMPILER="${FORTRAN_COMPILER:?}" F90C="${FORTRAN_COMPILER:?}" \
     "${PYTHON3:?}" setup.py build \
     >${OUT1:?} 2>${OUT2:?} || { error "${EC4:?}"; return 1; }
+  
+  pbottom "COMPILING ${PRINTNAME:?}" || return 1
+
+  # ---------------------------------------------------------------------------
 
   unset_all || return 1
-  
-  pbottom 'COMPILING CAMB' || return 1
-  
+
 fi
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
