@@ -11,7 +11,7 @@ if [ -z "${IGNORE_ACTDR4_CODE}" ]; then
   ( source "${ROOTDIR:?}/installation_scripts/flags_check.sh" ) || return 1;
  
   unset_env_vars () {
-    unset -v ECODEF FOLDER PACKDIR
+    unset -v ECODEF FOLDER PACKDIR PRINTNAME PLIB
     cdroot || return 1;
   }
 
@@ -41,9 +41,9 @@ if [ -z "${IGNORE_ACTDR4_CODE}" ]; then
   # ---------------------------------------------------------------------------  
   # ---------------------------------------------------------------------------  
   
-  ptop 'COMPILING ACT' || return 1
-
   unset_env_vars || return 1
+
+  # ---------------------------------------------------------------------------
 
   # E = EXTERNAL, CODE, F=FODLER
   ECODEF="${ROOTDIR:?}/external_modules/code"
@@ -52,6 +52,11 @@ if [ -z "${IGNORE_ACTDR4_CODE}" ]; then
 
   PACKDIR="${ECODEF:?}/${FOLDER:?}"
 
+  # Name to be printed on this shell script messages
+  PRINTNAME="ACT-DR4"
+
+  ptop "COMPILING ${PRINTNAME:?}" || return 1
+
   cdfolder "${PACKDIR}" || return 1
 
   # ---------------------------------------------------------------------------
@@ -59,18 +64,25 @@ if [ -z "${IGNORE_ACTDR4_CODE}" ]; then
 
   rm -rf "${PACKDIR:?}/build/"
   rm -rf "${PACKDIR:?}/pyactlike.egg-info/"
-
+  
   "${PYTHON3:?}" setup.py clean \
     >${OUT1:?} 2>${OUT2:?} || { error "${EC1:?}"; return 1; }
+
+  PLIB="${ROOTDIR:?}/.local/lib/python${PYTHON_VERSION:?}/site-packages"
+
+  rm -rf  "${PLIB:?}"/pyactlike
+  rm -rf  "${PLIB:?}"/pyactlike-*
   
   # ---------------------------------------------------------------------------  
  
   ${PIP3:?} install . --prefix="${ROOTDIR:?}/.local" \
     >${OUT1:?} 2>${OUT2:?} || { error "${EC3:?}"; return 1; }
 
+  pbottom "COMPILING ${PRINTNAME:?}" || return 1
+
+  # ---------------------------------------------------------------------------
+
   unset_all || return 1
-  
-  pbottom 'COMPILING ACT' || return 1
   
 fi
 

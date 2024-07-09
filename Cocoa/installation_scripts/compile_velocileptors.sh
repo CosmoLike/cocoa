@@ -12,7 +12,7 @@ if [ -z "${IGNORE_VELOCILEPTORS_CODE}" ]; then
   ( source "${ROOTDIR:?}/installation_scripts/flags_check.sh" ) || return 1;
 
   unset_env_vars () {
-    unset -v ECODEF FOLDER PACKDIR
+    unset -v ECODEF FOLDER PACKDIR PLIB
     cdroot || return 1;
   }
 
@@ -63,6 +63,10 @@ if [ -z "${IGNORE_VELOCILEPTORS_CODE}" ]; then
   "${PYTHON3:?}" setup.py clean \
     >${OUT1:?} 2>${OUT2:?} || { error "${EC1:?}"; return 1; }
   
+  PLIB="${ROOTDIR:?}/.local/lib/python${PYTHON_VERSION:?}/site-packages"
+
+  rm -f  "${PLIB:?}"/velocileptors-*
+
   # ---------------------------------------------------------------------------
   
   "${PYTHON3:?}" setup.py build \
