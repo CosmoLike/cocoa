@@ -59,7 +59,7 @@ Cocoa selects the URL to download the data (and its version) using the following
 
     [Adapted from Cocoa/installation_scripts/unxv_git_template.sh shell script] 
     
-    if [ -z "${IGNORE_SETUP_XXX_DATA}" ]; then            # Change the IGNORE_SETUP_XXX_DATA key name
+    if [ -z "${IGNORE_XXX_DATA}" ]; then            # Change the IGNORE_SETUP_XXX_DATA key name
 
       (...)
                                                           # URL = GitHub URL where data is located
