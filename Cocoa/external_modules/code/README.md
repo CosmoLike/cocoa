@@ -45,8 +45,8 @@ The shell script `set_installation_options.sh` provides the following keys that 
 
     [Adapted from Cocoa/set_installation_options.sh shell script]
     
-    #export IGNORE_POLYCHORD_COMPILATION=1
-    #export IGNORE_VELOCILEPTORS_COMPILATION=1
+    #export IGNORE_POLYCHORD_SAMPLER_CODE=1
+    #export IGNORE_VELOCILEPTORS_CODE=1
 
     (...)
 
@@ -74,12 +74,12 @@ The CMB data sets require specialized likelihoods. Cocoa will download, patch, a
     
     (...)
     
-    #export IGNORE_PLANCK_COMPILATION=1
-    #export IGNORE_ACTDR4_COMPILATION=1
-    #export IGNORE_ACTDR6_COMPILATION=1
-    #export IGNORE_SIMONS_OBSERVATORY_LIKELIHOOD_COMPILATION=1
-    #export IGNORE_CAMSPEC_LIKELIHOOD_COMPILATION=1
-    #export IGNORE_LIPOP_LIKELIHOOD_COMPILATION=1
+    #export IGNORE_PLANCK_LIKELIHOOD_CODE=1
+    #export IGNORE_ACTDR4_CODE=1
+    #export IGNORE_ACTDR6_CODE=1
+    #export IGNORE_SIMONS_OBSERVATORY_LIKELIHOOD_CODE=1
+    #export IGNORE_CAMSPEC_LIKELIHOOD_CODE=1
+    #export IGNORE_LIPOP_LIKELIHOOD_CODE=1
 
 Cocoa selects the URL to download the likelihoods (and the version of the likelihood) using the following keys.
 
