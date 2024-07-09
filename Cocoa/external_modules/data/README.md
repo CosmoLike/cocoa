@@ -17,11 +17,11 @@ Cocoa can download [CamSpec](https://people.ast.cam.ac.uk/~stg20/camspec/index.h
     
     (...)
 
-    # export IGNORE_SETUP_SPT_CMB_DATA=1
-    export IGNORE_SETUP_SIMONS_OBSERVATORY_CMB_DATA=1
-    # export IGNORE_SETUP_PLANCK_CMB_DATA=1
-    export IGNORE_SETUP_CAMSPEC_CMB_DATA=1
-    export IGNORE_SETUP_LIPOP_CMB_DATA=1
+    # export IGNORE_SPT_CMB_DATA=1
+    export IGNORE_SIMONS_OBSERVATORY_CMB_DATA=1
+    # export IGNORE_PLANCK_CMB_DATA=1
+    export IGNORE_CAMSPEC_CMB_DATA=1
+    export IGNORE_LIPOP_CMB_DATA=1
 
 Cocoa selects the URL to download the data (and its version) using the following keys.
 
@@ -59,7 +59,7 @@ Cocoa selects the URL to download the data (and its version) using the following
 
     [Adapted from Cocoa/installation_scripts/unxv_git_template.sh shell script] 
     
-    if [ -z "${IGNORE_SETUP_XXX_DATA}" ]; then            # Change the IGNORE_SETUP_XXX_DATA key name
+    if [ -z "${IGNORE_XXX_DATA}" ]; then            # Change the IGNORE_SETUP_XXX_DATA key name
 
       (...)
                                                           # URL = GitHub URL where data is located
@@ -110,7 +110,7 @@ Suppose the user wants to download a dataset for which Cocoa does not have an al
   
     [Adapted from Cocoa/installation_scripts/unxv_wget_template.sh shell script] 
     
-    if [ -z "${IGNORE_SETUP_XXX_DATA}" ]; then          # Change the IGNORE_SETUP_XXX_DATA key name
+    if [ -z "${IGNORE_XXX_DATA}" ]; then                # Change the IGNORE_SETUP_XXX_DATA key name
 
       (...)
                                                         # URL = FTP URL where data is located
@@ -160,15 +160,14 @@ Suppose the user wants to download a dataset for which Cocoa does not have an al
     
     fi
     
-**Step :three:**: Add the following lines to `Cocoa/setup_cocoa.sh` shell script
+**Step :three:**: Add the following line to `Cocoa/setup_cocoa.sh` shell script
 
     [Adapted from Cocoa/setup_cocoa.sh shell script] 
 
     (...)
  
     declare -a SCRIPTS=( (...)
-                         "unxv_lipop.sh"
-                         "unxv_mydataset.sh"
+                         "unxv_mydataset.sh"       # add this line
                          (...)
                        )
                       
