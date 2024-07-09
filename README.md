@@ -218,34 +218,34 @@ This behavior enables users to work on multiple instances of Cocoa simultaneousl
   
       # ------------------------------------------------------------------------------
       # The flags below allow users to skip downloading specific datasets ------------
-      # (advice) skipping LIPOP, CAMSPEC, Simons Observatory datasets saves ----------
-      # (advice) considerable time in the initial cocoa installation -----------------
       # ------------------------------------------------------------------------------
-      #export SKIP_DECOMM_ACT=1
-      # export SKIP_DECOMM_SPT=1
-      # export SKIP_DECOMM_PLANCK=1
-      # export SKIP_DECOMM_BICEP=1
-      # export SKIP_DECOMM_STRONG_LENSING=1
-      # export SKIP_DECOMM_SN=1
-      # export SKIP_DECOMM_BAO=1
-      export SKIP_DECOMM_SIMONS_OBSERVATORY=1
-      export SKIP_DECOMM_CAMSPEC=1
-      export SKIP_DECOMM_LIPOP=1
+      # export IGNORE_BICEP_CMB_DATA=1
+      # export IGNORE_HOLICOW_STRONG_LENSING_DATA=1
+      # export IGNORE_SN_DATA=1
+      # export IGNORE_BAO_DATA=1
+      # export IGNORE_SPT_CMB_DATA=1
+      export IGNORE_SIMONS_OBSERVATORY_CMB_DATA=1
+      # export IGNORE_PLANCK_CMB_DATA=1
+      export IGNORE_CAMSPEC_CMB_DATA=1
+      export IGNORE_LIPOP_CMB_DATA=1
 
       (...)
-  
+
       # ------------------------------------------------------------------------------
-      # The keys below control which packages will be installed and compiled when  
-      # running setup/compile_cocoa.sh. They are mostly helpful when debugging cocoa
-      # (advice) The default settings should be to compile/install all packages
+      # The keys below control which packages will be installed and compiled 
       # ------------------------------------------------------------------------------
-      #export IGNORE_CAMB_COMPILATION=1
-      #export IGNORE_CLASS_COMPILATION=1
-      #export IGNORE_COSMOLIKE_COMPILATION=1
-      #export IGNORE_POLYCHORD_COMPILATION=1
-      #export IGNORE_PLANCK_COMPILATION=1
-      #export IGNORE_ACT_COMPILATION=1
-      #export IGNORE_ALL_COBAYA_INSTALLATION=1
+      #export IGNORE_CAMB_CODE=1
+      #export IGNORE_CLASS_CODE=1
+      #export IGNORE_COSMOLIKE_CODE=1
+      #export IGNORE_POLYCHORD_SAMPLER_CODE=1
+      #export IGNORE_PLANCK_LIKELIHOOD_CODE=1
+      #export IGNORE_ACTDR4_CODE=1
+      #export IGNORE_ACTDR6_CODE=1
+      #export IGNORE_CPP_CUBA_INSTALLATION=1
+      #export IGNORE_VELOCILEPTORS_CODE=1
+      #export IGNORE_SIMONS_OBSERVATORY_LIKELIHOOD_CODE=1
+      #export IGNORE_CAMSPEC_LIKELIHOOD_CODE=1
+      #export IGNORE_LIPOP_LIKELIHOOD_CODE=1
 
       (...)
  
@@ -276,7 +276,7 @@ After fixing a particular issue, users should rerun the shell scripts `setup_coc
 To avoid excessive compilation or download times during development, users can use specialized scripts located at `Cocoa/installation_scripts/` that compile only a specific module or download only a particular dataset. A few examples of these scripts are: 
 
      $(cocoa)(.local) cd "${ROOTDIR:?}"
-     $(cocoa)(.local) source "${ROOTDIR:?}"/installation_scripts/compile_act.sh
+     $(cocoa)(.local) source "${ROOTDIR:?}"/installation_scripts/compile_act_dr4.sh
      $(cocoa)(.local) source "${ROOTDIR:?}"/installation_scripts/compile_camb.sh
      $(cocoa)(.local) source "${ROOTDIR:?}"/installation_scripts/compile_class.sh
      $(cocoa)(.local) source "${ROOTDIR:?}"/installation_scripts/compile_planck.sh
@@ -285,6 +285,7 @@ To avoid excessive compilation or download times during development, users can u
 Above and below, the `$(cocoa)(.local)` emphasizes they should run after activating the cocoa environments. The shell subroutines that download external modules from their original Git repositories are shown below.
 
      $(cocoa)(.local) cd "${ROOTDIR:?}"
+     $(cocoa)(.local) source "${ROOTDIR:?}"/installation_scripts/setup_act_dr4.sh
      $(cocoa)(.local) source "${ROOTDIR:?}"/installation_scripts/setup_camb.sh
      $(cocoa)(.local) source "${ROOTDIR:?}"/installation_scripts/setup_class.sh
      $(cocoa)(.local) source "${ROOTDIR:?}"/installation_scripts/setup_polychord.sh
@@ -292,12 +293,12 @@ Above and below, the `$(cocoa)(.local)` emphasizes they should run after activat
 
 To ensure these scripts can download and install these packages, users must be sure that the environment keys below are *NOT* set. These keys are shown on `set_installation_options.sh`. The command `unset -v` unset them. 
       
-     unset -v IGNORE_CAMB_COMPILATION
-     unset -v IGNORE_CLASS_COMPILATION
-     unset -v IGNORE_POLYCHORD_COMPILATION
-     unset -v IGNORE_PLANCK_COMPILATION
-     unset -v IGNORE_ACT_COMPILATION
-     unset -v IGNORE_ALL_COBAYA_INSTALLATION
+     unset -v IGNORE_CAMB_CODE
+     unset -v IGNORE_CLASS_CODE
+     unset -v IGNORE_POLYCHORD_SAMPLER_CODE
+     unset -v IGNORE_PLANCK_LIKELIHOOD_CODE
+     unset -v IGNORE_ACTDR4_CODE
+     unset -v IGNORE_COBAYA_CODE
 
 Below, we show the shell subroutines that download and unpack data from multiple experiments. 
 
@@ -315,16 +316,16 @@ Below, we show the shell subroutines that download and unpack data from multiple
 
 To ensure these scripts can download these datasets, users must be sure that the environment keys below are *NOT* set. These keys are shown on `set_installation_options.sh`. The command `unset -v` unset them. 
 
-     unset -v SKIP_DECOMM_ACT
-     unset -v SKIP_DECOMM_BAO
-     unset -v SKIP_DECOMM_BICEP
-     unset -v SKIP_DECOMM_CAMSPEC
-     unset -v SKIP_DECOMM_STRONG_LENSING
-     unset -v SKIP_DECOMM_LIPOP
-     unset -v SKIP_DECOMM_PLANCK
-     unset -v SKIP_DECOMM_SIMONS_OBSERVATORY
-     unset -v SKIP_DECOMM_SN
-     unset -v SKIP_DECOMM_SPT
+     unset -v IGNORE_ACTDR6_DATA
+     unset -v IGNORE_BAO_DATA
+     unset -v IGNORE_BICEP_CMB_DATA
+     unset -v IGNORE_CAMSPEC_CMB_DATA
+     unset -v IGNORE_HOLICOW_STRONG_LENSING_DATA
+     unset -v IGNORE_LIPOP_CMB_DATA
+     unset -v IGNORE_PLANCK_CMB_DATA
+     unset -v IGNORE_SIMONS_OBSERVATORY_CMB_DATA
+     unset -v IGNORE_SN_DATA
+     unset -v IGNORE_SPT_CMB_DATA
 
 ### :interrobang: FAQ: How do you run cocoa on your laptop? The docker image named *whovian-cocoa* <a name="appendix_jupyter_whovian"></a>
 
