@@ -103,6 +103,10 @@ export MPI_CC_COMPILER="${CONDA_PREFIX:?}"/bin/mpicc
 
 export MPI_CXX_COMPILER="${CONDA_PREFIX:?}"/bin/mpicxx
 
+export AR_COMPILER=="${CONDA_PREFIX:?}"/bin/x86_64-conda-linux-gnu-ar
+
+export RANLIB_COMPILER=="${CONDA_PREFIX:?}"/bin/x86_64-conda-linux-gnu-ranlib
+
 # --------------------------------------------------------------------------
 # IGNORE MOST PACKAGES (ALREADY ON CONDA)
 # --------------------------------------------------------------------------

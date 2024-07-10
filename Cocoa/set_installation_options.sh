@@ -138,6 +138,11 @@ export FGSPECTRA_NAME="fgspectra"
 export EE2_URL="https://github.com/miknab/EuclidEmulator2.git"
 export EE2_GIT_COMMIT="ff59f6683069417f6b4d2fb5d59197044d424445"
 export EE2_NAME="euclidemu2"
+
+export HYREC_URL="https://github.com/nanoomlee/HYREC-2.git"
+export HYREC_GIT_COMMIT="09e8243d0e08edd3603a94dfbc445ae06cafe139"
+export HYREC_NAME="hyrec2"
+
 # ------------------------------------------------------------------------------
 # The keys below control which packages will be installed and compiled 
 # ------------------------------------------------------------------------------
@@ -148,7 +153,7 @@ export EE2_NAME="euclidemu2"
 #export IGNORE_PLANCK_LIKELIHOOD_CODE=1
 #export IGNORE_ACTDR4_CODE=1
 export IGNORE_ACTDR6_CODE=1
-export IGNORE_CPP_CUBA_INSTALLATION=1
+#export IGNORE_CPP_CUBA_INSTALLATION=1
 export IGNORE_VELOCILEPTORS_CODE=1
 #export IGNORE_SIMONS_OBSERVATORY_LIKELIHOOD_CODE=1
 export IGNORE_CAMSPEC_LIKELIHOOD_CODE=1
@@ -156,6 +161,7 @@ export IGNORE_LIPOP_LIKELIHOOD_CODE=1
 #export IGNORE_COBAYA_CODE=1
 #export IGNORE_FGSPECTRA_CODE=1
 export IGNORE_EUCLID_EMULATOR_V2_CODE=1
+#export IGNORE_HYREC_CODE=1
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------

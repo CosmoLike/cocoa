@@ -515,29 +515,6 @@ if [ -z "${IGNORE_CORE_INSTALLATION}" ]; then
   fi
 
   # ----------------------------------------------------------------------------
-  # ----------------------------------- EUCLID EMU -----------------------------
-  # ----------------------------------------------------------------------------
-  #note: we migrated euclidemu2 to setup_c_packages. 
-  #note: Why? it depends on GSL-GNU library
-  
-  if [ -z "${IGNORE_ALL_PIP_INSTALLATION}" ]; then
-            
-    ptop 'COMPILING EUCLIDEMU2' || return 1
-
-    env CXX="${CXX_COMPILER:?}" CC="${C_COMPILER:?}" ${PIP3:?} install \
-      --global-option=build_ext "${CCIL:?}/euclidemu2-1.2.0" \
-      --no-dependencies \
-      --prefix="${ROOTDIR:?}/.local" \
-      --no-index 
-      >${OUT1:?} 2>${OUT2:?} || { error "(EUCLIDEMU2) ${EC13:?}"; return 1; }
-
-    cdfolder "${ROOTDIR}" || return 1;  
-    
-    pbottom 'COMPILING EUCLIDEMU2' || return 1
-  
-  fi
-
-  # ----------------------------------------------------------------------------
   # ---------------------------------- SPDLOG ----------------------------------
   # ----------------------------------------------------------------------------
   

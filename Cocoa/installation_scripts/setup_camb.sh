@@ -94,7 +94,6 @@ if [ -z "${IGNORE_CAMB_CODE}" ]; then
   fi
   
   # ---------------------------------------------------------------------------
-  # Patch CAMB to be compatible w/ COCOA environment --------------------------
   # We patch the files below so they use the right compilers ------------------
   # ---------------------------------------------------------------------------
   # T = TMP

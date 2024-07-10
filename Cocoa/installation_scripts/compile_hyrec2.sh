@@ -2,17 +2,17 @@
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
-if [ -z "${IGNORE_ACTDR6_DATA}" ]; then
+if [ -z "${IGNORE_HYREC_CODE}" ]; then
   
   if [ -z "${ROOTDIR}" ]; then
     source start_cocoa.sh || { pfail 'ROOTDIR'; return 1; }
   fi
 
-  # parenthesis = run in a subshell 
+  # parenthesis = run in a subshell  
   ( source "${ROOTDIR:?}/installation_scripts/flags_check.sh" ) || return 1;
 
   unset_env_vars () {
-    unset -v EDATAF FOLDER PACKDIR FILE URL_BASE URL PRINTNAME
+    unset -v ECODEF FOLDER PACKDIR PRINTNAME
     cdroot || return 1;
   }
 
@@ -35,65 +35,56 @@ if [ -z "${IGNORE_ACTDR6_DATA}" ]; then
   }
   
   cdfolder() {
-    cd "${1:?}" 2>"/dev/null" || { error "CD FOLDER: ${1}"; return 1; }
+    cd "${1:?}" 2>"/dev/null" || { error "CD FOLDER ${1}"; return 1; }
   }
-
-  # --------------------------------------------------------------------------- 
-  # --------------------------------------------------------------------------- 
+  
+  # ---------------------------------------------------------------------------
+  # ---------------------------------------------------------------------------
   # ---------------------------------------------------------------------------
 
   unset_env_vars || return 1
 
-  # E = EXTERNAL, DATA, F=FODLER
-  EDATAF="${ROOTDIR:?}/external_modules/data"
-  
-  FOLDER="act"
+  # ---------------------------------------------------------------------------
 
-  # PACK = PACKAGE, DIR = DIRECTORY
-  PACKDIR="${EDATAF:?}/${FOLDER:?}"
+  # E = EXTERNAL, CODE, F=FODLER
+  ECODEF="${ROOTDIR:?}/external_modules/code"
 
-  FILE="${ACT_DR6_DATA_FILE:-"ACT_dr6_likelihood_v1.2.tgz"}"
+  FOLDER="${HYREC_NAME:-"hyrec2"}"
 
-  URL_BASE="https://lambda.gsfc.nasa.gov/data/suborbital/ACT/ACT_dr6/likelihood/data"
-
-  URL="${ACT_DR6_DATA_URL:-"${URL_BASE:?}"}/${FILE:?}"
+  PACKDIR="${ECODEF:?}/${FOLDER:?}"
 
   # Name to be printed on this shell script messages
-  PRINTNAME=ACT-DR6
+  PRINTNAME="HYREC2 RECOMBINATION CODE"
+
+  ptop "COMPILING ${PRINTNAME:?}" || return 1
 
   # ---------------------------------------------------------------------------
-
-  ptop "SETUP/UNXV ${PRINTNAME:?} DATA" || return 1
-
-  # ---------------------------------------------------------------------------
-  # note: in case script run >1x w/ previous run stoped prematurely b/c error
+  # cleaning any previous compilation
   
-  rm -rf "${PACKDIR:?}"
-
+  rm -f  "${ROOTDIR:?}/.local/lib/libhyrec.a"
+  rm -f  "${ROOTDIR:?}/.local/lib/libhyrec.so"
+  rm -rf "${ROOTDIR:?}/.local/include/hyrec2"
+  
   # ---------------------------------------------------------------------------
-
-  mkdir -p "${PACKDIR:?}" \
+  
+  cdfolder "${PACKDIR}" || return 1
+  
+  # ---------------------------------------------------------------------------
+  # create .local/include/hyrec2 where headers will be located
+  
+  mkdir "${ROOTDIR:?}/.local/include/hyrec2"  \
     >${OUT1:?} 2>${OUT2:?}  || { error "${EC20:?}"; return 1; }
+
+  CC="${C_COMPILER:?}" make install \
+    >${OUT1:?} 2>${OUT2:?} || { error "${EC10:?}"; return 1; }
   
-  mkdir -p "${PACKDIR:?}/lensing" \
-    >${OUT1:?} 2>${OUT2:?} || { error "${EC20:?}"; return 1; }
-    
-  cdfolder "${PACKDIR:?}/lensing" || return 1
-
-  "${WGET:?}" "${URL:?}" -q --show-progress --progress=bar:force || 
-    { error "${EC24:?}"; return 1; }
-
-  tar -zxvf "${FILE:?}" \
-    >${OUT1:?} 2>${OUT2:?} || { error "${EC25:?}"; return 1; }
+  pbottom "COMPILING ${PRINTNAME:?}" || return 1
 
   # ---------------------------------------------------------------------------
-  
-  pbottom "SETUP/UNXV ${PRINTNAME:?} DATA" || return 1
 
   unset_all || return 1
-  
-fi
 
+fi
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------

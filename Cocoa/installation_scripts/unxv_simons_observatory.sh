@@ -70,7 +70,8 @@ if [ -z "${IGNORE_SIMONS_OBSERVATORY_CMB_DATA}" ]; then
   
   # ---------------------------------------------------------------------------
 
-  mkdir -p "${PACKDIR:?}"
+  mkdir -p "${PACKDIR:?}" \
+    >${OUT1:?} 2>${OUT2:?} || { error "${EC20:?}"; return 1; }
   
   cdfolder "${PACKDIR:?}" || return 1
 

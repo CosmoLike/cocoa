@@ -95,7 +95,6 @@ if [ -z "${IGNORE_POLYCHORD_SAMPLER_CODE}" ]; then
   fi
   
   # ---------------------------------------------------------------------------
-  # Patch POLY to be compatible w/ COCOA environment --------------------------
   # We patch the files below so they use the right compilers ------------------
   # ---------------------------------------------------------------------------
   declare -a TFOLDER=("" 
