@@ -63,7 +63,7 @@ if [ -z "${IGNORE_EUCLID_EMULATOR_V2_CODE}" ]; then
   # cleaning any previous compilation
 
   rm -rf "${PACKDIR:?}/build/"
-  rm -rf "${PACKDIR:?}/pyactlike.egg-info/"
+  rm -rf "${PACKDIR:?}/euclidemu2.egg-info/"
   
   PLIB="${ROOTDIR:?}/.local/lib/python${PYTHON_VERSION:?}/site-packages"
 
