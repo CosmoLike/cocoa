@@ -147,7 +147,7 @@ export EE2_NAME="euclidemu2"
 #export IGNORE_POLYCHORD_SAMPLER_CODE=1
 #export IGNORE_PLANCK_LIKELIHOOD_CODE=1
 #export IGNORE_ACTDR4_CODE=1
-#export IGNORE_ACTDR6_CODE=1
+export IGNORE_ACTDR6_CODE=1
 export IGNORE_CPP_CUBA_INSTALLATION=1
 export IGNORE_VELOCILEPTORS_CODE=1
 #export IGNORE_SIMONS_OBSERVATORY_LIKELIHOOD_CODE=1
@@ -155,7 +155,7 @@ export IGNORE_CAMSPEC_LIKELIHOOD_CODE=1
 export IGNORE_LIPOP_LIKELIHOOD_CODE=1
 #export IGNORE_COBAYA_CODE=1
 #export IGNORE_FGSPECTRA_CODE=1
-#export IGNORE_EUCLID_EMULATOR_V2_CODE=1
+export IGNORE_EUCLID_EMULATOR_V2_CODE=1
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
