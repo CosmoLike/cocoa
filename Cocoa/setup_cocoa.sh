@@ -100,7 +100,8 @@ declare -a SCRIPTS=("setup_core_packages.sh"
                      "setup_polychord.sh"
                      "setup_camb.sh"
                      "setup_class.sh"
-                     "setup_velocileptors.sh")
+                     "setup_velocileptors.sh"
+                     "setup_ee2.sh")
 
 for (( i=0; i<${#SCRIPTS[@]}; i++ ));
 do

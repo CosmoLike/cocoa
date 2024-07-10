@@ -135,6 +135,9 @@ export FGSPECTRA_URL="https://github.com/simonsobs/fgspectra.git"
 export FGSPECTRA_GIT_COMMIT="87206ac7f919bcf82b08dee180f0821d038d24d2"
 export FGSPECTRA_NAME="fgspectra"
 
+export EE2_URL="https://github.com/miknab/EuclidEmulator2.git"
+export EE2_GIT_COMMIT="ff59f6683069417f6b4d2fb5d59197044d424445"
+export EE2_NAME="euclidemu2"
 # ------------------------------------------------------------------------------
 # The keys below control which packages will be installed and compiled 
 # ------------------------------------------------------------------------------
