@@ -43,6 +43,27 @@ export IGNORE_CAMSPEC_CMB_DATA=1
 export IGNORE_LIPOP_CMB_DATA=1
 
 # ------------------------------------------------------------------------------
+# The keys below control which packages will be installed and compiled 
+# ------------------------------------------------------------------------------
+#export IGNORE_CAMB_CODE=1
+#export IGNORE_CLASS_CODE=1
+#export IGNORE_COSMOLIKE_CODE=1
+#export IGNORE_POLYCHORD_SAMPLER_CODE=1
+#export IGNORE_PLANCK_LIKELIHOOD_CODE=1
+#export IGNORE_ACTDR4_CODE=1
+export IGNORE_ACTDR6_CODE=1
+export IGNORE_CPP_CUBA_INSTALLATION=1
+export IGNORE_VELOCILEPTORS_CODE=1
+#export IGNORE_SIMONS_OBSERVATORY_LIKELIHOOD_CODE=1
+export IGNORE_CAMSPEC_LIKELIHOOD_CODE=1
+export IGNORE_LIPOP_LIKELIHOOD_CODE=1
+#export IGNORE_COBAYA_CODE=1
+export IGNORE_FGSPECTRA_CODE=1
+export IGNORE_EUCLID_EMULATOR_V2_CODE=1
+export IGNORE_HYREC_CODE=1
+export IGNORE_COSMOREC_CODE=1
+
+# ------------------------------------------------------------------------------
 # If set, compile_planck.sh uses click like code from github.com/benabed/clik
 # ------------------------------------------------------------------------------
 export USE_SPT_CLIK_PLANCK=1
@@ -143,25 +164,11 @@ export HYREC_URL="https://github.com/nanoomlee/HYREC-2.git"
 export HYREC_GIT_COMMIT="09e8243d0e08edd3603a94dfbc445ae06cafe139"
 export HYREC_NAME="hyrec2"
 
-# ------------------------------------------------------------------------------
-# The keys below control which packages will be installed and compiled 
-# ------------------------------------------------------------------------------
-#export IGNORE_CAMB_CODE=1
-#export IGNORE_CLASS_CODE=1
-#export IGNORE_COSMOLIKE_CODE=1
-#export IGNORE_POLYCHORD_SAMPLER_CODE=1
-#export IGNORE_PLANCK_LIKELIHOOD_CODE=1
-#export IGNORE_ACTDR4_CODE=1
-export IGNORE_ACTDR6_CODE=1
-#export IGNORE_CPP_CUBA_INSTALLATION=1
-export IGNORE_VELOCILEPTORS_CODE=1
-#export IGNORE_SIMONS_OBSERVATORY_LIKELIHOOD_CODE=1
-export IGNORE_CAMSPEC_LIKELIHOOD_CODE=1
-export IGNORE_LIPOP_LIKELIHOOD_CODE=1
-#export IGNORE_COBAYA_CODE=1
-#export IGNORE_FGSPECTRA_CODE=1
-export IGNORE_EUCLID_EMULATOR_V2_CODE=1
-#export IGNORE_HYREC_CODE=1
+export COSMOREC_URL="https://www.cita.utoronto.ca/~jchluba/Recombination/_Downloads_/"
+export COSMOREC_CODE_FILE="CosmoRec.v2.0.3b"
+export COSMOREC_CODE_FILE_EXT="tar.gz"
+export COSMOREC_NAME="cosmorec"
+
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------

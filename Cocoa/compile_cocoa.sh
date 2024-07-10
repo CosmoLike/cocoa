@@ -25,13 +25,17 @@ source start_cocoa.sh || { error_cem "start_cocoa.sh"; return 1; }
 
 ptop2 'COMPILING ALL EXTERNAL MODULES' || return 1
 
-declare -a TSCRIPTS=("compile_camb.sh"
+declare -a TSCRIPTS=("compile_hyrec2.sh"
+                     "compile_cosmorec.sh"
+                     "compile_camb.sh"
                      "compile_class.sh" 
                      "compile_planck.sh" 
                      "compile_act_dr4.sh"
                      "compile_polychord.sh"
                      "compile_velocileptors.sh"
                      "compile_ee2.sh"
+                     #"compile_fgspectra.sh"
+                     #"compile_simons_observatory.sh"
                      ) # T = TMP
 
 for (( i=0; i<${#TSCRIPTS[@]}; i++ ));

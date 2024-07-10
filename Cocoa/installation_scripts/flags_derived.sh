@@ -155,7 +155,7 @@ export EC18="PYTHON3 WAF DISTCLEAN"
 
 export EC19="BOOTSTRAP"
 
-export EC20="MKDIR"
+export EC20="MKDIR FOLDER"
 
 export EC21="B2"
 
@@ -174,6 +174,8 @@ export EC27="GIT REPO NOT FOUND"
 export EC28="LOGICAL ERROR: INCOMPATIBLE FLAGS ON"
 
 export EC29="UNKNOWN FILE EXTENSION"
+
+export EC30="MV FOLDER/FILE"
 
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
