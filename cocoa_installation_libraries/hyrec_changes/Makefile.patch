@@ -1,0 +1,120 @@
+--- Makefile	2024-07-10 10:38:31.288974635 -0400
++++ Makefile2	2024-07-10 17:45:35.662170269 -0400
+@@ -1,27 +1,100 @@
+ # Makefile for building CAMB with HYREC-2
+-# By Antony Lewis
++# By Antony Lewis & Vivian Miranda (Makefile compatible w/ Cocoa)
+ 
+-CC = gcc
+-AR = ar rvs
+-CCFLAG = -g -DCAMB -fPIC -DHYRECPATH=\"$(PWD)/\"
+-LDFLAG = -O2
++CC ?= $(C_COMPILER)
++
++RANLIB ?= $(RANLIB_COMPILER)
+ 
+-%.o: %.c 
+-	$(CC) $(CCFLAG) -c $*.c -o $*.o
++AR ?= $(AR_COMPILER) 
+ 
+-HYREC_SRC = hyrectools.o helium.o hydrogen.o history.o energy_injection.o 
+-HYREC_EXE = hyrec.o 
++ARFLAGS = rvs
+ 
+-HYREC_SRC2 = hyrectools.c helium.c hydrogen.c history.c energy_injection.c hyrec.c
++CCFLAG = -g -DCAMB -fPIC -DHYRECPATH=\"$(ROOTDIR)/.local/lib/\"
++
++LDFLAG = -O2
+ 
+-default: libhyrec.a
++LIBDIR = $(ROOTDIR)/.local/lib
+ 
+-clean: 
+-	rm *.o
++INCLUDEDIR = $(ROOTDIR)/.local/include/hyrec2
+ 
+-hyrec: $(HYREC_SRC2) 
+-	$(CC) $(LDFLAG) -o hyrec  $(HYREC_SRC2) -lm
++HYREC_HEADER = hyrectools.h helium.h hydrogen.h history.h energy_injection.h
+ 
++HYREC_SRC = hyrectools.c helium.c hydrogen.c history.c energy_injection.c hyrec.c
+ 
+-libhyrec.a: $(HYREC_SRC)
+-	$(AR) $@ $(HYREC_SRC)
++LIBSTAT = libhyrec.a
++
++LIBDYN = libhyrec.so
++
++all: libstat libdyn
++
++libstat: $(LIBSTAT) $(HYREC_SRC)
++
++libdyn: $(LIBDYN) $(HYREC_SRC)
++
++$(LIBDYN)(hyrectools.o): hyrectools.c
++	$(CC) $(CCFLAG) -fPIC  -c hyrectools.c -o hyrectools.o
++	$(CC) -shared -o $(LIBDYN) hyrectools.o
++	rm -f hyrectools.o
++
++$(LIBSTAT)(hyrectools.o): hyrectools.c
++	$(CC) $(CCFLAG)  -c hyrectools.c -o hyrectools.o
++	$(AR) $(ARFLAGS) $(LIBSTAT) hyrectools.o
++	rm -f hyrectools.o
++
++$(LIBDYN)(hydrogen.o): hydrogen.c
++	$(CC) $(CCFLAG) -fPIC  -c hydrogen.c -o hydrogen.o
++	$(CC) -shared -o $(LIBDYN) hydrogen.o
++	rm -f hydrogen.o
++
++$(LIBSTAT)(hydrogen.o): hydrogen.c
++	$(CC) $(CCFLAG)  -c hydrogen.c -o hydrogen.o
++	$(AR) $(ARFLAGS) $(LIBSTAT) hydrogen.o
++	rm -f hydrogen.o
++
++$(LIBDYN)(helium.o): helium.c
++	$(CC) $(CCFLAG) -fPIC  -c helium.c -o helium.o
++	$(CC) -shared -o $(LIBDYN) helium.o
++	rm -f helium.o
++
++$(LIBSTAT)(helium.o): helium.c
++	$(CC) $(CCFLAG)  -c helium.c -o helium.o
++	$(AR) $(ARFLAGS) $(LIBSTAT) helium.o
++	rm -f helium.o
++
++$(LIBDYN)(history.o): history.c
++	$(CC) $(CCFLAG) -fPIC  -c history.c -o history.o
++	$(CC) -shared -o $(LIBDYN) history.o
++	rm -f history.o
++
++$(LIBSTAT)(history.o): history.c
++	$(CC) $(CCFLAG)  -c history.c -o history.o
++	$(AR) $(ARFLAGS) $(LIBSTAT) history.o
++	rm -f history.o
++
++$(LIBDYN)(energy_injection.o): energy_injection.c
++	$(CC) $(CCFLAG) -fPIC  -c energy_injection.c -o energy_injection.o
++	$(CC) -shared -o $(LIBDYN) energy_injection.o
++	rm -f energy_injection.o
++
++$(LIBSTAT)(energy_injection.o): energy_injection.c
++	$(CC) $(CCFLAG)  -c energy_injection.c -o energy_injection.o
++	$(AR) $(ARFLAGS) $(LIBSTAT) energy_injection.o
++	rm -f energy_injection.o
++
++$(LIBSTAT): $(LIBSTAT)(hyrectools.o)     $(LIBSTAT)(hydrogen.o)     \
++	$(LIBSTAT)(helium.o)   $(LIBSTAT)(history.o)   \
++	$(LIBSTAT)(history.o)  \
++	$(LIBSTAT)(energy_injection.o)
++	-$(RANLIB) $(LIBSTAT)
++
++$(LIBDYN): $(LIBDYN)(hyrectools.o)     $(LIBDYN)(hydrogen.o)     \
++	$(LIBDYN)(helium.o)   $(LIBDYN)(history.o)   \
++	$(LIBDYN)(history.o)  \
++	$(LIBDYN)(energy_injection.o)
++
++install: libstat libdyn
++	mv $(LIBSTAT) $(LIBDIR)
++	mv $(LIBDYN) $(LIBDIR)
++	for FILE in $(HYREC_HEADER) ; do \
++	  cp $${FILE} $(INCLUDEDIR) ; \
++	done
