@@ -34,8 +34,6 @@ export DONT_USE_SYSTEM_PIP_PACKAGES=1
 # USER NEEDS TO SPECIFY THE FLAGS BELOW SO COCOA CAN FIND PYTHON/GCC/HDF5...
 # --------------------------------------------------------------------------
 
-export PYTHON_VERSION=3.8
-
 export GLOBALPYTHON3="${CONDA_PREFIX:?}"/bin/python${PYTHON_VERSION:?}
 
 export GLOBAL_PACKAGES_LOCATION="${CONDA_PREFIX:?}"

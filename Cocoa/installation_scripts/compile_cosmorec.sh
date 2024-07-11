@@ -54,7 +54,7 @@ if [ -z "${IGNORE_COSMOREC_CODE}" ]; then
   PACKDIR="${ECODEF:?}/${FOLDER:?}"
 
   # Name to be printed on this shell script messages
-  PRINTNAME="HYREC2 RECOMBINATION CODE"
+  PRINTNAME="COSMOREC RECOMBINATION CODE"
 
   ptop "COMPILING ${PRINTNAME:?}" || return 1
 

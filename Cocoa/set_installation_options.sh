@@ -62,7 +62,7 @@ export IGNORE_FGSPECTRA_CODE=1
 export IGNORE_EUCLID_EMULATOR_V2_CODE=1
 export IGNORE_HYREC_CODE=1
 export IGNORE_COSMOREC_CODE=1
-#export IGNORE_MGCAMB_CODE=1
+export IGNORE_MGCAMB_CODE=1
 
 # ------------------------------------------------------------------------------
 # If set, compile_planck.sh uses click like code from github.com/benabed/clik
@@ -83,6 +83,8 @@ export IGNORE_EMULATOR_GPU_PIP_PACKAGES=1
 # ------------------------------------------------------------------------------
 # DERIVED & RARELY CHANGED FLAGS -----------------------------------------------
 # ------------------------------------------------------------------------------
+
+export PYTHON_VERSION=3.8
 
 if [ -n "${MANUAL_INSTALLATION}" ]; then      
   source "${ROOTDIR:?}/installation_scripts/flags_manual_installation.sh" 

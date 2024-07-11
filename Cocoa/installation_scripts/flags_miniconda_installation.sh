@@ -3,8 +3,6 @@
 # ----------------------------------------------------------------------------
 # ----------------------------------------------------------------------------
 
-export PYTHON_VERSION=3.8
-
 export GLOBALPYTHON3="${CONDA_PREFIX:?}"/bin/python${PYTHON_VERSION:?}
 
 export GLOBAL_PACKAGES_LOCATION="${CONDA_PREFIX:?}"

@@ -28,6 +28,7 @@ ptop2 'COMPILING ALL EXTERNAL MODULES' || return 1
 declare -a TSCRIPTS=("compile_hyrec2.sh"
                      "compile_cosmorec.sh"
                      "compile_camb.sh"
+                     "compile_mgcamb.sh"
                      "compile_class.sh" 
                      "compile_planck.sh" 
                      "compile_act_dr4.sh"
