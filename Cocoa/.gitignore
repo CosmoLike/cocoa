@@ -103,6 +103,10 @@ external_modules/code/ee2
 external_modules/code/hyrec2
 external_modules/code/hyrec*
 external_modules/code/cosmorec*
+external_modules/code/MG*
+external_modules/code/TMG*
+external_modules/code/TMPMG*
+external_modules/code/MGCAMB
 
 cobaya/cobaya/likelihoods/XXX
 cobaya/cobaya/likelihoods/des_y1

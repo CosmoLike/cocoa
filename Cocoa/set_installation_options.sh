@@ -62,6 +62,7 @@ export IGNORE_FGSPECTRA_CODE=1
 export IGNORE_EUCLID_EMULATOR_V2_CODE=1
 export IGNORE_HYREC_CODE=1
 export IGNORE_COSMOREC_CODE=1
+#export IGNORE_MGCAMB_CODE=1
 
 # ------------------------------------------------------------------------------
 # If set, compile_planck.sh uses click like code from github.com/benabed/clik
@@ -168,6 +169,10 @@ export COSMOREC_URL="https://www.cita.utoronto.ca/~jchluba/Recombination/_Downlo
 export COSMOREC_CODE_FILE="CosmoRec.v2.0.3b"
 export COSMOREC_CODE_FILE_EXT="tar.gz"
 export COSMOREC_NAME="cosmorec"
+
+export MGCAMB_URL="https://github.com/sfu-cosmo/MGCobaya.git"
+export MGCAMB_GIT_COMMIT="443c4a733db687ac18e918b8ed09b45003a8c4ca"
+export MGCAMB_NAME='MGCAMB'
 
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
