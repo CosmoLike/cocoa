@@ -1,8 +1,8 @@
 # Table of contents
 1. [Overview of the Cobaya-CosmoLike Joint Architecture (Cocoa)](#overview)
 2. [Installation of Cocoa's core packages via Conda](#required_packages_conda)
-3. [Installation of Cobaya base code](#cobaya_base_code)
-4. [Running Cobaya Examples](#cobaya_base_code_examples)
+3. [Installation and Compilation of Cocoa base code (Cobaya, likelihoods, and external codes)](#cobaya_base_code)
+4. [Running Examples (not involving Cosmolike)](#cobaya_base_code_examples)
 5. [Running Cosmolike projects](#running_cosmolike_projects)
 6. [Creating Cosmolike projects (external readme)](Cocoa/projects/)
 7. [Appendix](#appendix)
@@ -47,7 +47,7 @@ This readme file presents basic and advanced instructions for installing all [Co
 
     git-lfs install
 
-## Installation of Cobaya base code <a name="cobaya_base_code"></a>
+## Installation and Compilation of Cocoa base code (Cobaya, likelihoods, and external codes) <a name="cobaya_base_code"></a>
 
 **Step :one:**: We assume you are still in the Conda cocoa environment from the previous `conda activate cocoa` command. Now, clone the repository and go to the `cocoa` main folder,
 
@@ -73,7 +73,7 @@ The script `setup_cocoa.sh` decompresses the data files and installs a few neces
     
 This compiles CAMB and Class Boltzmann codes, Planck likelihood, and Polychord sampler. 
 
-## Running Cobaya Examples <a name="cobaya_base_code_examples"></a>
+## Running Examples (not involving Cosmolike)  <a name="cobaya_base_code_examples"></a>
 
 We assume that you are still in the Conda cocoa environment from the previous `conda activate cocoa` command and that you are in the cocoa main folder `cocoa/Cocoa`, 
 
