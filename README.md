@@ -1,6 +1,6 @@
 # Table of contents
 1. [Overview of the Cobaya-CosmoLike Joint Architecture (Cocoa)](#overview)
-2. [Installation of Cocoa's core packages via Conda](#required_packages_conda)
+2. [Installation of core packages via Conda](#required_packages_conda)
 3. [Installation and Compilation of base code (Cobaya, likelihoods, and external codes...)](#cobaya_base_code)
 4. [Running Examples (not involving Cosmolike)](#cobaya_base_code_examples)
 5. [Running Cosmolike projects](#running_cosmolike_projects)
@@ -31,7 +31,7 @@ Our scripts never install packages, including Python modules, on `$HOME/.local` 
 
 This readme file presents basic and advanced instructions for installing all [Cobaya](https://github.com/CobayaSampler) and [CosmoLike](https://github.com/CosmoLike) components.
 
-## Installation of Cocoa's core packages via Conda <a name="required_packages_conda"></a>
+## Installation of core packages via Conda <a name="required_packages_conda"></a>
 
 **Step :one:**: Download the file `cocoapy39.yml` yml file, create the cocoa environment, activate it, and create symbolic links that will give better names for the GNU compiler installed by Conda.
 
