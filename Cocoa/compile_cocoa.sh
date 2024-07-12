@@ -35,8 +35,7 @@ declare -a TSCRIPTS=("compile_hyrec2.sh"
                      "compile_polychord.sh"
                      "compile_velocileptors.sh"
                      "compile_ee2.sh"
-                     #"compile_fgspectra.sh"
-                     #"compile_simons_observatory.sh"
+                     "compile_fgspectra.sh"
                      ) # T = TMP
 
 for (( i=0; i<${#TSCRIPTS[@]}; i++ ));

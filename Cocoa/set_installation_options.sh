@@ -161,7 +161,8 @@ export SO_MFLIKE_URL="https://github.com/simonsobs/LAT_MFLike.git"
 export SO_MFLIKE_GIT_COMMIT="660e0fa06e1c68335b7def416c256dfd316564d4"
 
 export SO_SYSLIB_URL="https://github.com/simonsobs/syslibrary.git"
-export SO_MFLIKE_GIT_COMMIT="c4a112dc2324647395b6c91d4747e3ab19754413"
+export SO_SYSLIB_GIT_COMMIT="c4a112dc2324647395b6c91d4747e3ab19754413"
+export SO_SYSLIB_NAME="SOSYSLIB"
 
 export EE2_URL="https://github.com/miknab/EuclidEmulator2.git"
 export EE2_GIT_COMMIT="ff59f6683069417f6b4d2fb5d59197044d424445"

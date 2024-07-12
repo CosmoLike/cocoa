@@ -12,7 +12,7 @@ if [ -z "${IGNORE_SIMONS_OBSERVATORY_LIKELIHOOD_CODE}" ]; then
   ( source "${ROOTDIR:?}/installation_scripts/flags_check.sh" ) || return 1;
 
   unset_env_vars () {
-    unset -v COB CCCOB COBLIKE URL TFILE TFOLDER
+    unset -v COB CCCOB COBLIKE URL FOLDER PACKDIR PRINTNAME ECODEF URL
     cdroot || return 1;
   }
 
@@ -69,13 +69,15 @@ if [ -z "${IGNORE_SIMONS_OBSERVATORY_LIKELIHOOD_CODE}" ]; then
   }
 
   # ----------------------------------------------------------------------------
-  
+  # ----------------------------------------------------------------------------
+  # ----------------------------------------------------------------------------
+
   URL="${SO_SYSLIB_URL:-"https://github.com/simonsobs/syslibrary.git"}"
     
   # E = EXTERNAL, CODE, F=FODLER
   ECODEF="${ROOTDIR:?}/external_modules/code"
 
-  FOLDER="TMPSO"
+  FOLDER="${SO_SYSLIB_NAME:-"SOSYSLIB"}"
 
   PACKDIR="${ECODEF:?}/${FOLDER:?}"
 
@@ -102,17 +104,14 @@ if [ -z "${IGNORE_SIMONS_OBSERVATORY_LIKELIHOOD_CODE}" ]; then
 
   cdfolder "${PACKDIR}" || return 1;
 
-  if [ -n "${SO_MFLIKE_GIT_COMMIT}" ]; then
-    "${GIT:?}" checkout "${SO_MFLIKE_GIT_COMMIT:?}" \
+  if [ -n "${SO_SYSLIB_GIT_COMMIT}" ]; then
+    "${GIT:?}" checkout "${SO_SYSLIB_GIT_COMMIT:?}" \
       >${OUT1:?} 2>${OUT2:?} || { error "${EC16:?}"; return 1; }
   fi
 
   env CXX="${CXX_COMPILER:?}" CC="${C_COMPILER:?}" ${PIP3:?} install . \
     --prefix="${ROOTDIR:?}/.local" \
     >${OUT1:?} 2>${OUT2:?} || { error "${EC13:?}"; return 1; }
-
-  # ERASE TMP FOLDER
-  rm -rf "${PACKDIR:?}"
 
   cdfolder "${ROOTDIR}" || return 1
 
@@ -123,7 +122,11 @@ if [ -z "${IGNORE_SIMONS_OBSERVATORY_LIKELIHOOD_CODE}" ]; then
   # ----------------------------------------------------------------------------
 
   URL="${SO_MFLIKE_URL:-"https://github.com/simonsobs/LAT_MFLike.git"}"
-      
+  
+  FOLDER="SOMKFLIKE"
+
+  PACKDIR="${ECODEF:?}/${FOLDER:?}"
+
   # Name to be printed on this shell script messages
   PRINTNAME="SIMONS OBSERVATORY MFLIKE"
 
@@ -148,8 +151,8 @@ if [ -z "${IGNORE_SIMONS_OBSERVATORY_LIKELIHOOD_CODE}" ]; then
 
   cdfolder "${PACKDIR}" || return 1;
 
-  if [ -n "${SO_GIT_COMMIT}" ]; then
-    "${GIT:?}" checkout "${SO_GIT_COMMIT:?}" \
+  if [ -n "${SO_MFLIKE_GIT_COMMIT}" ]; then
+    "${GIT:?}" checkout "${SO_MFLIKE_GIT_COMMIT:?}" \
       >${OUT1:?} 2>${OUT2:?} || { error "${EC16:?}"; return 1; }
   fi
 
@@ -171,8 +174,6 @@ if [ -z "${IGNORE_SIMONS_OBSERVATORY_LIKELIHOOD_CODE}" ]; then
 
   patch -u "mflike.py" -i "mflike.patch" >${OUT1:?} \
       2>${OUT2:?} || { error "${EC17:?} (mflike.patch)"; return 1; }
-
-  # ---------------------------------------------------------------------------
 
   cdfolder "${ROOTDIR}" || return 1
 
