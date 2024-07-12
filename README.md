@@ -71,7 +71,9 @@ The script `setup_cocoa.sh` decompresses the data files and installs a few neces
 
     source compile_cocoa.sh
     
-This compiles CAMB and Class Boltzmann codes, Planck likelihood, and Polychord sampler. 
+This command compiles CAMB and Class Boltzmann codes, Planck likelihood, and Polychord sampler. 
+
+:interrobang: Cocoa ignores a few external modules (code and likelihoods) by default, but users may find them helpful. In this case, check the available options on the script `set_installation_options.sh` and restart steps 1-3. 
 
 ## Running Examples (not involving Cosmolike)  <a name="cobaya_base_code_examples"></a>
 
