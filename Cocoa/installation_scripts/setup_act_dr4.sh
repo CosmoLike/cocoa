@@ -53,7 +53,7 @@ if [ -z "${IGNORE_ACTDR4_CODE}" ]; then
 
   # ---------------------------------------------------------------------------
   
-  ptop 'INSTALLING ACTDR4' || return 1;
+  ptop 'SETUP ACTDR4' || return 1;
 
   URL="${ACTDR4_URL:-"https://github.com/ACTCollaboration/pyactlike"}"
 
@@ -121,7 +121,7 @@ if [ -z "${IGNORE_ACTDR4_CODE}" ]; then
   
   cdfolder "${ROOTDIR}" || return 1
   
-  pbottom 'INSTALLING ACTDR4' || return 1
+  pbottom 'SETUP ACTDR4' || return 1
   
   # ---------------------------------------------------------------------------
 

@@ -84,7 +84,7 @@ export IGNORE_EMULATOR_GPU_PIP_PACKAGES=1
 # DERIVED & RARELY CHANGED FLAGS -----------------------------------------------
 # ------------------------------------------------------------------------------
 
-export PYTHON_VERSION=3.8
+export PYTHON_VERSION=3.9
 
 if [ -n "${MANUAL_INSTALLATION}" ]; then      
   source "${ROOTDIR:?}/installation_scripts/flags_manual_installation.sh" 
@@ -147,9 +147,7 @@ export ACT_DR6_DATA_URL="https://lambda.gsfc.nasa.gov/data/suborbital/ACT/ACT_dr
 export ACT_DR6_DATA_FILE="ACT_dr6_likelihood_v1.2.tgz"
 
 export SO_DATA_URL="https://portal.nersc.gov/cfs/sobs/users/MFLike_data"
-# Cocoa can download multiple versions of the data (to reproduce existing work)
-# This is only possible because each version is saved in a separate folder
-export SO_DATA_VERSION="v0.7.1 v0.8"
+export SO_DATA_VERSION="v0.8"
 
 export VELOCILEPTORS_URL="https://github.com/sfschen/velocileptors.git"
 export VELOCILEPTORS_GIT_COMMIT="889a0c98895831eb23b250a26162cfb8a93237bd"
@@ -158,6 +156,12 @@ export VELOCILEPTORS_NAME="velocileptors"
 export FGSPECTRA_URL="https://github.com/simonsobs/fgspectra.git"
 export FGSPECTRA_GIT_COMMIT="87206ac7f919bcf82b08dee180f0821d038d24d2"
 export FGSPECTRA_NAME="fgspectra"
+
+export SO_MFLIKE_URL="https://github.com/simonsobs/LAT_MFLike.git"
+export SO_MFLIKE_GIT_COMMIT="660e0fa06e1c68335b7def416c256dfd316564d4"
+
+export SO_SYSLIB_URL="https://github.com/simonsobs/syslibrary.git"
+export SO_MFLIKE_GIT_COMMIT="c4a112dc2324647395b6c91d4747e3ab19754413"
 
 export EE2_URL="https://github.com/miknab/EuclidEmulator2.git"
 export EE2_GIT_COMMIT="ff59f6683069417f6b4d2fb5d59197044d424445"

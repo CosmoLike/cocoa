@@ -80,6 +80,7 @@ dependencies:
   - python=3.8.19
   - readline=8.2
   - rhash=1.4.3
+  - wget=1.21.4
   - superlu=5.2.2
   - sysroot_linux-64=2.17
   - tk=8.6.13
@@ -192,7 +193,6 @@ dependencies:
       - tzdata==2023.3
       - urllib3==1.26.16
       - virtualenv==20.17.1
-      - wget==3.2
       - wheel==0.40.0
       - wimpy==0.6
       - wrapt==1.14.1

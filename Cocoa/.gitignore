@@ -107,6 +107,8 @@ external_modules/code/MG*
 external_modules/code/TMG*
 external_modules/code/TMPMG*
 external_modules/code/MGCAMB
+external_modules/code/TMPSO
+external_modules/code/TMP*
 
 cobaya/cobaya/likelihoods/XXX
 cobaya/cobaya/likelihoods/des_y1

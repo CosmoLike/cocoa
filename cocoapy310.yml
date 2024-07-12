@@ -80,6 +80,7 @@ dependencies:
   - python=3.10.14
   - readline=8.2
   - rhash=1.4.3
+  - wget=1.21.4
   - superlu=5.2.2
   - sysroot_linux-64=2.17
   - tk=8.6.13
@@ -179,7 +180,6 @@ dependencies:
       - sphinxcontrib-serializinghtml==1.1.5
       - structlog==23.1.0
       - sympy==1.12
-      - syslibrary==0.1
       - tables-io==0.8.1
       - tabulate==0.9.0
       - threadpoolctl==3.1.0
@@ -192,7 +192,6 @@ dependencies:
       - tzdata==2023.3
       - urllib3==1.26.16
       - virtualenv==20.17.1
-      - wget==3.2
       - wheel==0.40.0
       - wimpy==0.6
       - wrapt==1.14.1

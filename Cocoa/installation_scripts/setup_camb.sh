@@ -68,7 +68,7 @@ if [ -z "${IGNORE_CAMB_CODE}" ]; then
   # Name to be printed on this shell script messages
   PRINTNAME="CAMB"
 
-  ptop "INSTALLING ${PRINTNAME:?}" || return 1;
+  ptop "SETUP ${PRINTNAME:?}" || return 1;
 
   # ---------------------------------------------------------------------------
   # In case this script is called twice ---------------------------------------
@@ -127,7 +127,7 @@ if [ -z "${IGNORE_CAMB_CODE}" ]; then
   
   cdfolder "${ROOTDIR}" || return 1
   
-  pbottom "INSTALLING ${PRINTNAME:?}" || return 1
+  pbottom "SETUP ${PRINTNAME:?}" || return 1
   
   # ---------------------------------------------------------------------------
 
