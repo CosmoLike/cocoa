@@ -1,7 +1,7 @@
 # Table of contents
 1. [Overview of the Cobaya-CosmoLike Joint Architecture (Cocoa)](#overview)
 2. [Installation of Cocoa's core packages via Conda](#required_packages_conda)
-3. [Installation and Compilation of Cocoa base code (Cobaya, likelihoods, and external codes)](#cobaya_base_code)
+3. [Installation and Compilation of base code (Cobaya, likelihoods, and external codes...)](#cobaya_base_code)
 4. [Running Examples (not involving Cosmolike)](#cobaya_base_code_examples)
 5. [Running Cosmolike projects](#running_cosmolike_projects)
 6. [Creating Cosmolike projects (external readme)](Cocoa/projects/)
@@ -47,7 +47,7 @@ This readme file presents basic and advanced instructions for installing all [Co
 
     git-lfs install
 
-## Installation and Compilation of Cocoa base code (Cobaya, likelihoods, and external codes) <a name="cobaya_base_code"></a>
+## Installation and Compilation of base code (Cobaya, likelihoods, and external codes...) <a name="cobaya_base_code"></a>
 
 **Step :one:**: We assume you are still in the Conda cocoa environment from the previous `conda activate cocoa` command. Now, clone the repository and go to the `cocoa` main folder,
 
