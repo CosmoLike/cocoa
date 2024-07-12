@@ -109,10 +109,6 @@ if [ -z "${IGNORE_SIMONS_OBSERVATORY_LIKELIHOOD_CODE}" ]; then
       >${OUT1:?} 2>${OUT2:?} || { error "${EC16:?}"; return 1; }
   fi
 
-  env CXX="${CXX_COMPILER:?}" CC="${C_COMPILER:?}" ${PIP3:?} install . \
-    --prefix="${ROOTDIR:?}/.local" \
-    >${OUT1:?} 2>${OUT2:?} || { error "${EC13:?}"; return 1; }
-
   cdfolder "${ROOTDIR}" || return 1
 
   pbottom "SETUP ${PRINTNAME:?}" || return 1;
