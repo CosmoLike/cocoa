@@ -58,7 +58,7 @@ if [ -z "${IGNORE_POLYCHORD_SAMPLER_CODE}" ]; then
 
   # ----------------------------------------------------------------------------
 
-  ptop  'INSTALLING POLYCHORD' || return 1;
+  ptop  'SETUP POLYCHORD' || return 1;
 
   URL="${POLY_URL:-"https://github.com/PolyChord/PolyChordLite.git"}"
     
@@ -124,7 +124,7 @@ if [ -z "${IGNORE_POLYCHORD_SAMPLER_CODE}" ]; then
 
   cdfolder "${ROOTDIR}" || return 1;
   
-  pbottom 'INSTALLING POLYCHORD'
+  pbottom 'SETUP POLYCHORD'
   
   # ---------------------------------------------------------------------------
   
