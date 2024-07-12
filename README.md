@@ -51,7 +51,14 @@ This readme file presents basic and advanced instructions for installing all [Co
 
 **Step :one:**: We assume you are still in the Conda cocoa environment from the previous `conda activate cocoa` command. Now, clone the repository and go to the `cocoa` main folder,
 
-    "${CONDA_PREFIX}"/bin/git clone --depth 1 https://github.com/CosmoLike/cocoa.git cocoa
+    "${CONDA_PREFIX}"/bin/git clone --depth 1 https://github.com/CosmoLike/cocoa.git --branch v4.0-beta1 cocoa
+    cd ./cocoa/Cocoa
+
+*This will download a release and not the latest commit (more stable!)*.
+
+:interrobang: If you are a developer, then type the following instead *(at your own risk!)*
+
+    "${CONDA_PREFIX}"/bin/git clone git@github.com:CosmoLike/cocoa.git cocoa
     cd ./cocoa/Cocoa
 
 **Step :two:**: Run the script `setup_cocoa.sh` via
