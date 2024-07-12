@@ -35,7 +35,7 @@ This readme file presents basic and advanced instructions for installing all [Co
 
 **Step :one:**: Download the file `cocoapy38.yml` yml file, create the cocoa environment, activate it, and create symbolic links that will give better names for the GNU compiler installed by Conda.
 
-    conda env create --name cocoa --file=cocoapy38.yml
+    conda env create --name cocoa --file=cocoapy39.yml
     conda activate cocoa
     ln -s "${CONDA_PREFIX}"/bin/x86_64-conda_cos6-linux-gnu-gcc "${CONDA_PREFIX}"/bin/gcc
     ln -s "${CONDA_PREFIX}"/bin/x86_64-conda_cos6-linux-gnu-g++ "${CONDA_PREFIX}"/bin/g++
