@@ -61,7 +61,9 @@ if [ -z "${IGNORE_HYREC_CODE}" ]; then
   # E = EXTERNAL, CODE, F=FODLER
   ECODEF="${ROOTDIR:?}/external_modules/code"
 
-  FOLDER="${HYREC_NAME:-"hyrec2"}"
+  # Here we don't include an default option like in other codes because
+  # The makefile patch requires HYREC_NAME env variable
+  FOLDER="${HYREC_NAME:?}"
 
   PACKDIR="${ECODEF:?}/${FOLDER:?}"
 
@@ -98,13 +100,17 @@ if [ -z "${IGNORE_HYREC_CODE}" ]; then
   # ---------------------------------------------------------------------------
   # T = TMP
   declare -a TFOLDER=("" 
+                      "" 
                      ) # If nonblank, path must include /
   
   # T = TMP
-  declare -a TFILE=("Makefile")
+  declare -a TFILE=("Makefile"
+                    "history.c"
+                   )
 
   #T = TMP, P = PATCH
   declare -a TFILEP=("Makefile.patch" 
+                     "history.patch" 
                     )
 
   # AL = Array Length

@@ -23,7 +23,7 @@ source start_cocoa.sh || { error_cem "start_cocoa.sh"; return 1; }
 # ------------------------ COMPILE EXTERNAL MODULES --------------------------
 # ----------------------------------------------------------------------------
 
-ptop2 'COMPILING ALL EXTERNAL MODULES' || return 1
+ptop2 'COMPILING EXTERNAL MODULES' || return 1
 
 declare -a TSCRIPTS=("compile_hyrec2.sh"
                      "compile_cosmorec.sh"
@@ -54,7 +54,7 @@ done
 
 unset -f error_cem
 
-pbottom2 "COMPILING ALL EXTERNAL MODULES" || return 1
+pbottom2 "COMPILING EXTERNAL MODULES" || return 1
 
 source stop_cocoa.sh
 

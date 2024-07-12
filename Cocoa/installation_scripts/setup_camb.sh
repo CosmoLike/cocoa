@@ -99,17 +99,20 @@ if [ -z "${IGNORE_CAMB_CODE}" ]; then
   # T = TMP
   declare -a TFOLDER=("camb/" 
                       "fortran/" 
-                      "forutils/") # If nonblank, path must include /
+                      "forutils/"
+                      "fortran/") # If nonblank, path must include /
   
   # T = TMP
   declare -a TFILE=("_compilers.py" 
                     "Makefile" 
-                    "Makefile_compiler")
+                    "Makefile_compiler"
+                    "Makefile_main")
 
   #T = TMP, P = PATCH
   declare -a TFILEP=("_compilers.patch" 
                      "Makefile.patch" 
-                     "Makefile_compiler.patch")
+                     "Makefile_compiler.patch"
+                     "Makefile_main.patch")
 
   # AL = Array Length
   AL=${#TFOLDER[@]}

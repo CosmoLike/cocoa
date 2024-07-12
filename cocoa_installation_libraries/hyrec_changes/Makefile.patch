@@ -22,7 +22,7 @@
 +ARFLAGS = rvs
  
 -HYREC_SRC2 = hyrectools.c helium.c hydrogen.c history.c energy_injection.c hyrec.c
-+CCFLAG = -g -DCAMB -fPIC -DHYRECPATH=\"$(ROOTDIR)/.local/lib/\"
++CCFLAG = -g -DCAMB -fPIC -DHYRECPATH=\"$(ROOTDIR)/external_modules/code/$(HYREC_NAME)/\"
 +
 +LDFLAG = -O2
  

@@ -73,10 +73,33 @@ if [ -z "${IGNORE_CAMB_CODE}" ]; then
   
   # ---------------------------------------------------------------------------
   
-  COMPILER="${FORTRAN_COMPILER:?}" F90C="${FORTRAN_COMPILER:?}" \
-    "${PYTHON3:?}" setup.py build \
-    >${OUT1:?} 2>${OUT2:?} || { error "${EC4:?}"; return 1; }
+  if [ -z "${IGNORE_COSMOREC_CODE}" ] && [ -n "${IGNORE_HYREC_CODE}" ]; then
+
+    RECOMBINATION_FILES="recfast cosmorec" COMPILER="${FORTRAN_COMPILER:?}" \
+      F90C="${FORTRAN_COMPILER:?}" "${PYTHON3:?}" setup.py build \
+      >${OUT1:?} 2>${OUT2:?} || { error "${EC4:?}"; return 1; }
   
+  elif [ -n "${IGNORE_COSMOREC_CODE}" ] && [ -z "${IGNORE_HYREC_CODE}" ]; then
+
+    RECOMBINATION_FILES="recfast hyrec" COMPILER="${FORTRAN_COMPILER:?}" \
+      F90C="${FORTRAN_COMPILER:?}" "${PYTHON3:?}" setup.py build \
+      >${OUT1:?} 2>${OUT2:?} || { error "${EC4:?}"; return 1; }
+  
+  elif [ -z "${IGNORE_COSMOREC_CODE}" ] && [ -z "${IGNORE_HYREC_CODE}" ]; then
+
+    RECOMBINATION_FILES="recfast cosmorec hyrec" \
+      COMPILER="${FORTRAN_COMPILER:?}" F90C="${FORTRAN_COMPILER:?}" \
+      "${PYTHON3:?}" setup.py build \
+      >${OUT1:?} 2>${OUT2:?} || { error "${EC4:?}"; return 1; }
+
+  else
+
+    COMPILER="${FORTRAN_COMPILER:?}" F90C="${FORTRAN_COMPILER:?}" \
+      "${PYTHON3:?}" setup.py build \
+      >${OUT1:?} 2>${OUT2:?} || { error "${EC4:?}"; return 1; }
+
+  fi
+
   pbottom "COMPILING ${PRINTNAME:?}" || return 1
 
   # ---------------------------------------------------------------------------
