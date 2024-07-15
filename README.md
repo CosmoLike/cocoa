@@ -470,7 +470,7 @@ Supercomputers usually enforce strict quota limits on home folders. These limits
 
     source ~/.bashrc
 
-:six: After completing steps :one:-:four:, check that the `$HOME/.condarc` file with the command
+:six: After completing steps :one:-:five:, check that the `$HOME/.condarc` file with the command
 
     more $HOME/.condarc
 
