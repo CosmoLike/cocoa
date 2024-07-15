@@ -426,7 +426,7 @@ There are various reasons why installing the Cocoa conda environment may take a 
 
 :one: *Never install conda environments using the login node*. 
 
-Instead, request an interactive job with a few cores. However, users must know that **some supercomputers do not provide internet access on computing nodes** (e.g., the Midway HPC at the University of Chicago). Ask the HPC staff for a **queue dedicated to installing and compiling code** in this case; they should exist in a well-designed HPC environment. For example, the `build partition` on the Midway supercomputer can be accessed with the command.
+Instead, request an interactive job with a few cores. However, users must know that **some supercomputers do not provide internet access on computing nodes** (e.g., the Midway HPC at the University of Chicago). Ask the HPC staff for a **queue dedicated to installing and compiling code**; they should exist in a well-designed HPC environment. For example, the `build partition` on the Midway supercomputer provides nodes with internet access, which can be accessed with the command.
 
     sinteractive --nodes=1 --ntasks=1 --cpus-per-task=5 --time=3:00:00 --account=pi-XXX --partition=build
 
@@ -440,11 +440,11 @@ The DEBUG mode will ensure conda outputs many more intermediate installation ste
 
 Supercomputers usually enforce strict quota limits on home folders. These limits apply to the total file size and the number of files. By default, Anaconda modules install new environments at `$HOME/.conda/envs`. Anaconda also stores Gigabytes of downloaded packages in the `$HOME/.conda/pkgs` folder; `pkgs` is used by Anaconda as a package cache folder. Therefore, reasonable and widely applied quota limitations to the home folder significantly hinder the installation of new environments without the proposed changes below. 
 
-:one: Create an Anaconda folder in a project folder outside `$HOME` with significantly more tolerant quota restrictions. For instance, on the Midway supercomputer, we used the command to create an Anaconda folder in the KICP projects partition.
+:one: Create an Anaconda folder in a project folder outside `$HOME` with significantly more tolerant quota restrictions. For instance, we used the command below on the Midway supercomputer to create an Anaconda folder in the KICP projects partition.
 
     mkdir /project2/kicp/XXX/anaconda/
 
-:two: Set the pkgs package cache folder to `anaconda/pkgs`.
+:two: Set the `pkgs` package cache folder to `anaconda/pkgs`.
 
     conda config --add pkgs_dirs /project2/kicp/XXX/anaconda/pkgs
 
