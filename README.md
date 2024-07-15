@@ -11,8 +11,8 @@
     3. [FAQ: What if installation or compilation goes wrong?](#running_wrong)
     4. [FAQ: How to compile the Boltzmann, CosmoLike, and Likelihood codes separately](#appendix_compile_separately)
     5. [FAQ: How to run cocoa on a laptop? The docker image named *whovian-cocoa*](#appendix_jupyter_whovian)
-    6. [FAQ: How to use a globally defined Anaconda module in a supercomputer?](#overview_anaconda)
-    7. [FAQ: What if there is no Conda/Anaconda? Miniconda installation guide](#overview_miniconda)
+    6. [FAQ: How to use an available Anaconda module on HPC?](#overview_anaconda)
+    7. [FAQ: What if there is no Conda? Miniconda installation](#overview_miniconda)
     8. [FAQ: How to the Slow/Fast decomposition on MCMC chains with Cosmolike? Manual Blocking](#manual_blocking_cosmolike)
     9. [FAQ: How to switch Cocoa's adopted CAMB/CLASS/Polychord? (external readme)](Cocoa/external_modules/code)
     10. [FAQ: How to download modern CMB data? (external readme)](Cocoa/external_modules/data)
@@ -44,13 +44,13 @@ This readme file presents basic and advanced instructions for installing all [Co
     ln -s "${CONDA_PREFIX}"/bin/x86_64-conda-linux-gnu-gcc-ar "${CONDA_PREFIX}"/bin/gcc-ar
     ln -s "${CONDA_PREFIX}"/bin/x86_64-conda-linux-gnu-gcc-ranlib "${CONDA_PREFIX}"/bin/gcc-ranlib
 
-:interrobang: What if the user wants to install the Cocoa conda environment in a supercomputer using a globally defined Anaconda module (preferred method on HPC)?
+:interrobang: What if the user wants to install the Cocoa environment in a supercomputer using a globally defined Anaconda module?
 
-Check the Appendix [FAQ: How to use a globally defined Anaconda module in a supercomputer?](#overview_anaconda).
+Many HPC environments offer Anaconda as an external module. If this is the case, check the Appendix [FAQ: How to use an available Anaconda module on HPC?](#overview_anaconda).
 
 :interrobang: What if the user does not have conda/Anaconda installed? 
 
-If the user is not working on an HPC environment that offers Anaconda, check the Appendix [FAQ: What if there is no Conda/Anaconda? Miniconda installation guide](#overview_miniconda).
+If the user is not working on an HPC environment that offers Anaconda, check the Appendix [FAQ: What if there is no Conda? Miniconda installation](#overview_miniconda).
 
 **Step :two:**: Install `git-lfs` when loading the Conda cocoa environment for the first time.
 
@@ -63,7 +63,7 @@ If the user is not working on an HPC environment that offers Anaconda, check the
     "${CONDA_PREFIX}"/bin/git clone --depth 1 https://github.com/CosmoLike/cocoa.git --branch v4.0-beta1 cocoa
     cd ./cocoa/Cocoa
 
-*This will download a release and not the latest commit (more stable!)*.
+*This will download the latest release, not the latest commit (more stable!)*.
 
 :interrobang: If the user is a developer, then type the following instead *(at your own risk!)*
 
@@ -411,7 +411,7 @@ Once installation is complete, the user must learn how to start, use, and exit t
 
     This will bind the port `8080` on the server to the local. Then, go to a browser and type `http://localhost:8080/?token=XXX`, where `XXX` is the previously saved token displayed in the line `[... NotebookApp] or http://127.0.0.1:8888/?token=XXX`.  
 
-### :interrobang: FAQ: How to use a globally defined Anaconda module in a supercomputer (preferred method on HPC)? <a name="overview_anaconda"></a>
+### :interrobang: FAQ: How to use an available Anaconda module on HPC? <a name="overview_anaconda"></a>
 
 Below, we list users' most common issues when installing Cocoa conda environments in a supercomputer environment using a globally defined Anaconda module. 
 
@@ -431,11 +431,11 @@ to show all modules with names that start with `An`. The output should resemble 
 
 - :interrobang: **Installation seems to take forever**.
 
-There are various reasons why the installation of the Cocoa conda environment may take a long time. Here is a checklist of good practices to overcome this problem.
+There are various reasons why installing the Cocoa conda environment may take a long time. Here is a checklist of good practices to overcome this problem.
 
 :one: *Never install conda environments using the login node*. 
 
-Instead, request an interactive job with a few cores. However, users must know that **some supercomputers do not provide internet access on computing nodes** (e.g., the Midway HPC at the University of Chicago). Ask the HPC staff for a **queue dedicated to installing and compiling code** in this case; they should exist in a well-designed HPC environment. For example, the `build partition` on the Midway supercomputer can be accessed with the command
+Instead, request an interactive job with a few cores. However, users must know that **some supercomputers do not provide internet access on computing nodes** (e.g., the Midway HPC at the University of Chicago). Ask the HPC staff for a **queue dedicated to installing and compiling code** in this case; they should exist in a well-designed HPC environment. For example, the `build partition` on the Midway supercomputer can be accessed with the command.
 
     sinteractive --nodes=1 --ntasks=1 --cpus-per-task=5 --time=3:00:00 --account=pi-XXX --partition=build
 
@@ -449,7 +449,7 @@ The DEBUG mode will ensure conda outputs many more intermediate installation ste
 
 Supercomputers usually enforce strict quota limits on home folders. These limits apply to the total file size and the number of files. By default, Anaconda modules install new environments at `$HOME/.conda/envs`. Anaconda also stores Gigabytes of downloaded packages in the `$HOME/.conda/pkgs` folder; `pkgs` is used by Anaconda as a package cache folder. Therefore, reasonable and widely applied quota limitations to the home folder significantly hinder the installation of new environments without the proposed changes below. 
 
-:one: Create an Anaconda folder on a project folder outside `$HOME` with significantly more tolerant quota restrictions. For instance, on the Midway supercomputer I create the Anaconda folder at KICP projects folder with the command
+:one: Create an Anaconda folder on a project folder outside `$HOME` with significantly more tolerant quota restrictions. For instance, on the Midway supercomputer I create the Anaconda folder at KICP projects folder with the command.
 
     mkdir /project2/kicp/XXX/anaconda/
 
@@ -493,7 +493,7 @@ to make sure it resembles the one below.
     envs_dirs:
       - /project2/kicp/XXX/anaconda/envs/
 
-### :interrobang: FAQ: What if there is no Miniconda? Miniconda installation guide <a name="overview_miniconda"></a>
+### :interrobang: FAQ: What if there is no Miniconda? Miniconda installation <a name="overview_miniconda"></a>
 
 Download and run the Miniconda installation script. 
 
