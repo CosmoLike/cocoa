@@ -8,18 +8,19 @@
 7. [Appendix](#appendix)
     1. [Credits](#appendix_proper_credits)
     2. [Additional Installation Notes For Experts and Developers](#additional_notes)
-    3. [FAQ: What should you do if installation or compilation goes wrong?](#running_wrong)
+    3. [FAQ: What if installation or compilation goes wrong?](#running_wrong)
     4. [FAQ: How to compile the Boltzmann, CosmoLike, and Likelihood codes separately](#appendix_compile_separately)
-    5. [FAQ: How do you run cocoa on your laptop? The docker image named *whovian-cocoa*](#appendix_jupyter_whovian)
-    6. [FAQ: What should you do if you do not have Miniconda installed? Installation Guide](#overview_miniconda)
-    8. [FAQ: How can we set the Slow/Fast decomposition on MCMC Chains with Cosmolike? Manual Blocking](#manual_blocking_cosmolike)
+    5. [FAQ: How to run cocoa on a laptop? The docker image named *whovian-cocoa*](#appendix_jupyter_whovian)
+    6. [FAQ: What if there is no Miniconda installed? Miniconda installation guide](#overview_miniconda)
+    7. [FAQ: How to use a globally defined Anaconda module in a supercomputer?](#overview_anaconda)
+    8. [FAQ: How to the Slow/Fast decomposition on MCMC chains with Cosmolike? Manual Blocking](#manual_blocking_cosmolike)
     9. [FAQ: How to switch Cocoa's adopted CAMB/CLASS/Polychord? (external readme)](Cocoa/external_modules/code)
     10. [FAQ: How to download modern CMB data? (external readme)](Cocoa/external_modules/data)
-    11. [FAQ: How do users set the environment for projects involving Machine Learning emulators?](#ml_emulators)
+    11. [FAQ: How to set the environment for projects involving Machine Learning emulators?](#ml_emulators)
     12. [FAQ: How can users improve their Bash/C/C++ knowledge to develop Cocoa/Cosmolike?](#lectnotes)
     13. [Warning about Weak Lensing YAML files in Cobaya](#appendix_example_runs)
     14. [FAQ: How to install Cocoa without conda](#required_packages_cache)
-    15. [FAQ: How should developers push changes to the Cocoa main branch?](#push_main)
+    15. [FAQ: How to push changes to the Cocoa main branch?](#push_main)
 
 ## Overview of the [Cobaya](https://github.com/CobayaSampler)-[CosmoLike](https://github.com/CosmoLike) Joint Architecture (Cocoa) <a name="overview"></a>
 
@@ -42,7 +43,15 @@ This readme file presents basic and advanced instructions for installing all [Co
     ln -s "${CONDA_PREFIX}"/bin/x86_64-conda_cos6-linux-gnu-gfortran "${CONDA_PREFIX}"/bin/gfortran
     ln -s "${CONDA_PREFIX}"/bin/x86_64-conda-linux-gnu-gcc-ar "${CONDA_PREFIX}"/bin/gcc-ar
     ln -s "${CONDA_PREFIX}"/bin/x86_64-conda-linux-gnu-gcc-ranlib "${CONDA_PREFIX}"/bin/gcc-ranlib
-    
+
+:interrobang: What if the user does not have Miniconda or Anaconda installed?
+
+Check the Appendix [FAQ: What if there is no Miniconda installed? Miniconda installation guide](#overview_miniconda).
+
+:interrobang: What if the user wants to install the Cocoa conda environment in a supercomputer using a globally defined Anaconda module?
+
+Check the Appendix [FAQ: How to use a globally defined Anaconda module in a supercomputer?](#overview_anaconda).
+
 **Step :two:**: Install `git-lfs` when loading the Conda cocoa environment for the first time.
 
     git-lfs install
@@ -56,7 +65,7 @@ This readme file presents basic and advanced instructions for installing all [Co
 
 *This will download a release and not the latest commit (more stable!)*.
 
-:interrobang: If you are a developer, then type the following instead *(at your own risk!)*
+:interrobang: If the user is a developer, then type the following instead *(at your own risk!)*
 
     "${CONDA_PREFIX}"/bin/git clone git@github.com:CosmoLike/cocoa.git cocoa
     cd ./cocoa/Cocoa
@@ -211,7 +220,7 @@ This behavior enables users to work on multiple instances of Cocoa simultaneousl
 
 - Additional explanations about the functioning `start_cocoa.sh`/`stop_cocoa.sh` scripts, starting from why we created two separate shell environments, `(cocoa)` and `(.local)`? Users should be able to manipulate multiple Cocoa instances seamlessly, which is particularly useful when running chains in one instance while experimenting with code development in another. Consistency of the environment across all Cocoa instances is crucial, and the `start_cocoa.sh`/`stop_cocoa.sh` scripts handle the loading and unloading of environmental path variables for each Cocoa.
 
-### :interrobang: FAQ: What should you do if installation or compilation goes wrong? <a name="running_wrong"></a>
+### :interrobang: FAQ: What if installation or compilation goes wrong? <a name="running_wrong"></a>
 
 - The script *set_installation_options script* contains a few additional flags that may be useful. Some of these flags are shown below:
 
@@ -338,7 +347,7 @@ To ensure these scripts can download these datasets, users must be sure that the
      unset -v IGNORE_SN_DATA
      unset -v IGNORE_SPT_CMB_DATA
 
-### :interrobang: FAQ: How do you run cocoa on your laptop? The docker image named *whovian-cocoa* <a name="appendix_jupyter_whovian"></a>
+### :interrobang: FAQ: How to run cocoa on a laptop? The docker image named *whovian-cocoa* <a name="appendix_jupyter_whovian"></a>
 
 We provide the docker image [whovian-cocoa](https://hub.docker.com/r/vivianmiranda/whovian-cocoa) to facilitate the installation of Cocoa on Windows and MacOS. This appendix assumes the users already have the docker engine installed on their local PC. For instructions on installing the docker engine in specific operating systems, please refer to [Docker's official documentation](https://docs.docker.com/engine/install/). 
 
@@ -385,7 +394,7 @@ Once installation is complete, the user must learn how to start, use, and exit t
 
     If you need to use a different port than `8080`, adjust the flag `-p 8080:8888` in the `docker run` command accordingly.
 
-- :interrobang: **FAQ: How do you manipulate files on the host computer from within the Docker container?**
+- :interrobang: **FAQ: How to manipulate files on the host computer from within the Docker container?**
 
     The flag `-v $(pwd):/home/whovian/host/` in the `docker run` command ensures that files on the host computer have been mounted to the directory `/home/whovian/host/`. Files within the folder where the Docker container was initialized are accessible in the `/home/Whovian/host/` folder. When the user accesses the container, they should see the host's directory where the Docker container was initiated after typing: 
 
@@ -394,7 +403,7 @@ Once installation is complete, the user must learn how to start, use, and exit t
 
     Users should work inside the `/home/whovian/host/` directory to avoid losing work in case the docker image needs to be deleted,
 
-- :interrobang: **FAQ: What if you run the docker container on a remote server?**
+- :interrobang: **FAQ: How to run the docker container on a remote server?**
 
     Below, we assume the user runs the container in a server with the URL `your_sever.com`. We also presume the server can be accessed via SSH protocol. On your local PC/laptop, type:
 
@@ -402,7 +411,7 @@ Once installation is complete, the user must learn how to start, use, and exit t
 
     This will bind the port `8080` on the server to the local. Then, go to a browser and type `http://localhost:8080/?token=XXX`, where `XXX` is the previously saved token displayed in the line `[... NotebookApp] or http://127.0.0.1:8888/?token=XXX`.  
 
-### :interrobang: FAQ: What should you do if you do not have Miniconda installed? Installation Guide <a name="overview_miniconda"></a>
+### :interrobang: FAQ: What if there is no Miniconda installed? Miniconda installation guide <a name="overview_miniconda"></a>
 
 Download and run the Miniconda installation script. 
 
@@ -425,8 +434,34 @@ After installation, users must source the conda configuration file, as shown bel
           && conda config --prepend channels conda-forge \
           && conda config --set channel_priority strict \
           && conda init bash
-    
-### :interrobang: FAQ: How can we set the Slow/Fast decomposition on MCMC Chains with Cosmolike? Manual Blocking <a name="manual_blocking_cosmolike"></a>
+
+### :interrobang: FAQ: How to use a globally defined Anaconda module in a supercomputer? <a name="overview_anaconda"></a>
+
+Below, we list the most common issues users face when trying to install Cocoa conda environments in a supercomputer environment using a globally defined Anaconda module.
+
+- **Installation seems to take forever**. There are various reasons why installing the Cocoa conda environment may take a long time, including the speed of internet connectivity. Here is a checklist of good practices to debug this problem.
+
+:one: *Set conda verbosity to DEBUG*. The DEBUG verbose mode can be set via the command 
+
+    conda config --set verbosity 2
+
+The DEBUG mode will ensure conda outputs many more intermediate installation steps, which helps the user check whether Conda is stuck on some intermediate step. Users can later reset the verbosity level with the command `conda config --set verbosity 0`
+
+:two: *Never install and compile code on the login node*. Instead, request an interactive job with a few cores. However, users must know that some supercomputers do not provide internet access on computing nodes (e.g., the Midway HPC at the University of Chicago). Ask the HPC staff for a queue dedicated to installing and compiling code in this case (they must exists in a well setup HPC environment). For example, the so-called `build partition` on the Midway supercomputer can be accessed with the command
+
+    sinteractive --nodes=1 --ntasks=1 --cpus-per-task=5 --time=3:00:00 --account=pi-XXX --partition=build
+
+- **Conda installation is interrupted due to quota limitations**.
+
+Supercomputers usually enforce strict quota limits on home folders. These limits apply to the total file size and the number of files. By default, Anaconda modules install new environments at `$HOME/.conda/envs`. Anaconda also stores downloaded packages in the folder `$HOME/.conda/pkgs`. Therefore, reasonable and widely applied quota limitations to the home folder significantly hinder the installation of new environments without the proposed changes below. 
+
+:one: Create an Anaconda folder on a project folder outside `$HOME` that has significantly more tolerant quota restrictions. For instance, on the Midway supercomputer I create the Anaconda folder at KICP projects folder with the command
+
+    mkdir /project2/kicp/XXX/anaconda/
+
+:two: 
+  
+### :interrobang: FAQ: How to set the Slow/Fast decomposition on MCMC chains with Cosmolike? Manual Blocking <a name="manual_blocking_cosmolike"></a>
 
 The Cosmolike Weak Lensing pipelines contain parameters with different speed hierarchies. For example, Cosmolike execution time is reduced by approximately 50% when fixing the cosmological parameters. When varying only multiplicative shear calibration, Cosmolike execution time is reduced by two orders of magnitude. 
 
@@ -721,7 +756,7 @@ Finally, set the following environmental keys:
     #export IGNORE_EXPAT_CORE_PACKAGE=1
     #export IGNORE_PIP_CORE_PACKAGES=1
 
-### :interrobang: FAQ: How should developers push changes to the Cocoa main branch? <a name="push_main"></a>
+### :interrobang: FAQ: How to push changes to the Cocoa main branch? <a name="push_main"></a>
 
 Until recently, Cocoa development was unstructured, and developers were allowed to push directly to the `main` branch. Small commits were also not discouraged. This loose development rules will soon change. In particular, we will soon protect the `main` branch by requiring every push to be reviewed by Cocoa's leading developers. We also want to reduce the number of commits from now on. 
 
