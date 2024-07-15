@@ -453,7 +453,7 @@ Supercomputers usually enforce strict quota limits on home folders. These limits
 
     conda config --add pkgs_dirs /project2/kicp/XXX/anaconda/pkgs
 
-:tree: Set the env folder to `anaconda/envs/` 
+3️⃣: Set the env folder to `anaconda/envs/` 
 
     conda config --add envs_dirs /project2/kicp/XXX/anaconda/envs
 
