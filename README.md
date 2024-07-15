@@ -392,12 +392,7 @@ Once installation is complete, the user must learn how to start, use, and exit t
 
 - :interrobang: **FAQ: How to manipulate files on the host computer from within the Docker container?**
 
-    The flag `-v $(pwd):/home/whovian/host/` in the `docker run` command ensures that files on the host computer have been mounted to the directory `/home/whovian/host/`. Files within the folder where the Docker container was initialized are accessible in the `/home/Whovian/host/` folder. When the user accesses the container, they should see the host's directory where the Docker container was initiated after typing: 
-
-      cd /home/whovian/host/
-      ls 
-
-    Users should work inside the `/home/whovian/host/` directory to avoid losing work in case the docker image needs to be deleted,
+    The flag `-v $(pwd):/home/whovian/host/` in the `docker run` command ensures that files on the host computer have been mounted to the directory `/home/whovian/host/`. Files within the folder where the Docker container was initialized are accessible at `/home/Whovian/host/`. Users should work inside this directory to avoid losing work in case the docker image needs to be deleted. **Be careful:** Do not run the Docker container on a general folder (like the home directory); this would provide too much access to the Docker via `/home/whovian/host/`. Accidents happen, especially when dealing with dangerous bash commands such as $rm$ (deletion).
 
 - :interrobang: **FAQ: How to run the docker container on a remote server?**
 
