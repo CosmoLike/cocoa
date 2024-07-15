@@ -68,7 +68,6 @@ if [ -z "${SKIP_DECOMM_CORE_PACKAGES}" ]; then
                     ${IGNORE_CPP_BOOST_INSTALLATION:-""}
                     ${IGNORE_CPP_CARMA_INSTALLATION:-""}
                     ${IGNORE_ALL_PIP_INSTALLATION:-""}
-                    ${IGNORE_ALL_PIP_INSTALLATION:-""}
                     ${IGNORE_CPP_CUBA_INSTALLATION:-""}
                     ${IGNORE_WGET_INSTALLATION:-""}
                    ) # T = TMP
