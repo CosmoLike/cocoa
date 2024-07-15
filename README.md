@@ -439,7 +439,7 @@ After installation, users must source the conda configuration file, as shown bel
 
 Below, we list the most common issues users face when trying to install Cocoa conda environments in a supercomputer environment using a globally defined Anaconda module. 
 
-- **Conda command not found**.
+- :interrobang: **Conda command not found**.
   
 Anaconda is not usually set by default on HPC environments but may be available as a module. For example, on the Midway HPC cluster, it can be loaded using the command below.
 
@@ -451,13 +451,15 @@ If you are not sure about the name of the available Anaconda module, type the co
 
 to show all modules with names that start with `An`. The output should resemble the following
 
-<img width="1114" alt="Screenshot 2024-07-15 at 12 04 56 PM" src="https://github.com/user-attachments/assets/09326f5f-49e0-45b5-a157-25fe2b09918e">
+<img width="700" alt="Anaconda" src="https://github.com/user-attachments/assets/09326f5f-49e0-45b5-a157-25fe2b09918e">
 
-- **Installation seems to take forever**. There are various reasons why installing the Cocoa conda environment may take a long time, including the speed of internet connectivity. Here is a checklist of good practices to debug this problem.
+- :interrobang: **Installation seems to take forever**.
 
-:one: *Never install and compile code on the login node*. 
+There are various reasons why the Cocoa conda environment installation may take a long time. Here is a checklist of good practices to overcome this problem.
 
-Instead, request an interactive job with a few cores. However, users must know that some supercomputers do not provide internet access on computing nodes (e.g., the Midway HPC at the University of Chicago). Ask the HPC staff for a queue dedicated to installing and compiling code in this case (they must exists in a well setup HPC environment). For example, the so-called `build partition` on the Midway supercomputer can be accessed with the command
+:one: *Never install conda environments using the login node*. 
+
+Instead, request an interactive job with a few cores. However, users must know that **some supercomputers do not provide internet access on computing nodes** (e.g., the Midway HPC at the University of Chicago). Ask the HPC staff for a **queue dedicated to installing and compiling code** in this case; they should exist in a well-designed HPC environment. For example, the `build partition` on the Midway supercomputer can be accessed with the command
 
     sinteractive --nodes=1 --ntasks=1 --cpus-per-task=5 --time=3:00:00 --account=pi-XXX --partition=build
 
