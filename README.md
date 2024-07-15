@@ -11,8 +11,8 @@
     3. [FAQ: What if installation or compilation goes wrong?](#running_wrong)
     4. [FAQ: How to compile the Boltzmann, CosmoLike, and Likelihood codes separately](#appendix_compile_separately)
     5. [FAQ: How to run cocoa on a laptop? The docker image named *whovian-cocoa*](#appendix_jupyter_whovian)
-    6. [FAQ: What if there is no Miniconda installed? Miniconda installation guide](#overview_miniconda)
-    7. [FAQ: How to use a globally defined Anaconda module in a supercomputer?](#overview_anaconda)
+    6. [FAQ: How to use a globally defined Anaconda module in a supercomputer?](#overview_anaconda)
+    7. [FAQ: What if there is no Conda/Anaconda? Miniconda installation guide](#overview_miniconda)
     8. [FAQ: How to the Slow/Fast decomposition on MCMC chains with Cosmolike? Manual Blocking](#manual_blocking_cosmolike)
     9. [FAQ: How to switch Cocoa's adopted CAMB/CLASS/Polychord? (external readme)](Cocoa/external_modules/code)
     10. [FAQ: How to download modern CMB data? (external readme)](Cocoa/external_modules/data)
@@ -44,13 +44,13 @@ This readme file presents basic and advanced instructions for installing all [Co
     ln -s "${CONDA_PREFIX}"/bin/x86_64-conda-linux-gnu-gcc-ar "${CONDA_PREFIX}"/bin/gcc-ar
     ln -s "${CONDA_PREFIX}"/bin/x86_64-conda-linux-gnu-gcc-ranlib "${CONDA_PREFIX}"/bin/gcc-ranlib
 
-:interrobang: What if the user does not have Miniconda or Anaconda installed?
-
-Check the Appendix [FAQ: What if there is no Miniconda installed? Miniconda installation guide](#overview_miniconda).
-
-:interrobang: What if the user wants to install the Cocoa conda environment in a supercomputer using a globally defined Anaconda module?
+:interrobang: What if the user wants to install the Cocoa conda environment in a supercomputer using a globally defined Anaconda module (preferred method on HPC)?
 
 Check the Appendix [FAQ: How to use a globally defined Anaconda module in a supercomputer?](#overview_anaconda).
+
+:interrobang: What if the user does not have conda/Anaconda installed? 
+
+If the user is not working on an HPC environment that offers Anaconda, check the Appendix [FAQ: What if there is no Conda/Anaconda? Miniconda installation guide](#overview_miniconda).
 
 **Step :two:**: Install `git-lfs` when loading the Conda cocoa environment for the first time.
 
@@ -411,33 +411,9 @@ Once installation is complete, the user must learn how to start, use, and exit t
 
     This will bind the port `8080` on the server to the local. Then, go to a browser and type `http://localhost:8080/?token=XXX`, where `XXX` is the previously saved token displayed in the line `[... NotebookApp] or http://127.0.0.1:8888/?token=XXX`.  
 
-### :interrobang: FAQ: What if there is no Miniconda installed? Miniconda installation guide <a name="overview_miniconda"></a>
+### :interrobang: FAQ: How to use a globally defined Anaconda module in a supercomputer (preferred method on HPC)? <a name="overview_anaconda"></a>
 
-Download and run the Miniconda installation script. 
-
-    export CONDA_DIR="/gpfs/home/XXX/miniconda"
-    
-    mkdir "${CONDA_DIR:?}"
-    
-    wget https://repo.continuum.io/miniconda/Miniconda3-py38_23.9.0-0-Linux-x86_64.sh
-    
-    /bin/bash Miniconda3-py38_23.9.0-0-Linux-x86_64.sh -f -b -p "${CONDA_DIR:?}"
-
-Please don't forget to adapt the path assigned to `CONDA_DIR` in the command above:
-
-After installation, users must source the conda configuration file, as shown below:
-
-    source $CONDA_DIR/etc/profile.d/conda.sh \
-          && conda config --set auto_update_conda false \
-          && conda config --set show_channel_urls true \
-          && conda config --set auto_activate_base false \
-          && conda config --prepend channels conda-forge \
-          && conda config --set channel_priority strict \
-          && conda init bash
-
-### :interrobang: FAQ: How to use a globally defined Anaconda module in a supercomputer? <a name="overview_anaconda"></a>
-
-Below, we list the most common issues users face when trying to install Cocoa conda environments in a supercomputer environment using a globally defined Anaconda module. 
+Below, we list users' most common issues when installing Cocoa conda environments in a supercomputer environment using a globally defined Anaconda module. 
 
 - :interrobang: **Conda command not found**.
   
@@ -445,17 +421,17 @@ Anaconda is not usually set by default on HPC environments but may be available 
 
     module load Anaconda3/2022.10
 
-If you are not sure about the name of the available Anaconda module, type the command
+If you are not sure about the name of the available Anaconda module, type the command.
 
     module avail An
 
-to show all modules with names that start with `An`. The output should resemble the following
+to show all modules with names that start with `An`. The output should resemble the following.
 
 <img width="700" alt="Anaconda" src="https://github.com/user-attachments/assets/09326f5f-49e0-45b5-a157-25fe2b09918e">
 
 - :interrobang: **Installation seems to take forever**.
 
-There are various reasons why the Cocoa conda environment installation may take a long time. Here is a checklist of good practices to overcome this problem.
+There are various reasons why the installation of the Cocoa conda environment may take a long time. Here is a checklist of good practices to overcome this problem.
 
 :one: *Never install conda environments using the login node*. 
 
@@ -517,6 +493,29 @@ to make sure it resembles the one below.
     envs_dirs:
       - /project2/kicp/XXX/anaconda/envs/
 
+### :interrobang: FAQ: What if there is no Miniconda? Miniconda installation guide <a name="overview_miniconda"></a>
+
+Download and run the Miniconda installation script. 
+
+    export CONDA_DIR="/gpfs/home/XXX/miniconda"
+    
+    mkdir "${CONDA_DIR:?}"
+    
+    wget https://repo.continuum.io/miniconda/Miniconda3-py38_23.9.0-0-Linux-x86_64.sh
+    
+    /bin/bash Miniconda3-py38_23.9.0-0-Linux-x86_64.sh -f -b -p "${CONDA_DIR:?}"
+
+Please don't forget to adapt the path assigned to `CONDA_DIR` in the command above:
+
+After installation, users must source the conda configuration file, as shown below:
+
+    source $CONDA_DIR/etc/profile.d/conda.sh \
+          && conda config --set auto_update_conda false \
+          && conda config --set show_channel_urls true \
+          && conda config --set auto_activate_base false \
+          && conda config --prepend channels conda-forge \
+          && conda config --set channel_priority strict \
+          && conda init bash
 
 ### :interrobang: FAQ: How to set the Slow/Fast decomposition on MCMC chains with Cosmolike? Manual Blocking <a name="manual_blocking_cosmolike"></a>
 
