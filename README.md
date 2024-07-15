@@ -445,7 +445,7 @@ The DEBUG mode will ensure conda outputs many more intermediate installation ste
 
 Supercomputers usually enforce strict quota limits on home folders. These limits apply to the total file size and the number of files. By default, Anaconda modules install new environments at `$HOME/.conda/envs`. Anaconda also stores Gigabytes of downloaded packages in the `$HOME/.conda/pkgs` folder; `pkgs` is used by Anaconda as a package cache folder. Therefore, reasonable and widely applied quota limitations to the home folder significantly hinder the installation of new environments without the proposed changes below. 
 
-:one: Create an Anaconda folder on a project folder outside `$HOME` with significantly more tolerant quota restrictions. For instance, on the Midway supercomputer I create the Anaconda folder at KICP projects folder with the command.
+:one: Create an Anaconda folder in a project folder outside `$HOME` with significantly more tolerant quota restrictions. For instance, on the Midway supercomputer, we used the command to create an Anaconda folder in the KICP projects partition.
 
     mkdir /project2/kicp/XXX/anaconda/
 
