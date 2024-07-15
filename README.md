@@ -484,7 +484,7 @@ to make sure it resembles the one below.
     envs_dirs:
       - /project2/kicp/XXX/anaconda/envs/
 
-### :interrobang: FAQ: What if there is no Miniconda? Miniconda installation <a name="overview_miniconda"></a>
+### :interrobang: FAQ: What if there is no Conda? Miniconda installation <a name="overview_miniconda"></a>
 
 Download and run the Miniconda installation script. 
 
