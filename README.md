@@ -44,11 +44,11 @@ This readme file presents basic and advanced instructions for installing all [Co
     ln -s "${CONDA_PREFIX}"/bin/x86_64-conda-linux-gnu-gcc-ar "${CONDA_PREFIX}"/bin/gcc-ar
     ln -s "${CONDA_PREFIX}"/bin/x86_64-conda-linux-gnu-gcc-ranlib "${CONDA_PREFIX}"/bin/gcc-ranlib
 
-:interrobang: What if the user wants to install the Cocoa environment in a supercomputer using a globally defined Anaconda module?
+:interrobang: What if the user wants to install the Cocoa environment on a supercomputer?
 
 Many HPC environments offer Anaconda as an external module. If this is the case, check the Appendix [FAQ: How to use an available Anaconda module on HPC?](#overview_anaconda).
 
-:interrobang: What if the user does not have conda/Anaconda installed? 
+:interrobang: What if the user does not have conda installed? 
 
 If the user is not working on an HPC environment that offers Anaconda, check the Appendix [FAQ: What if there is no Conda? Miniconda installation](#overview_miniconda).
 
