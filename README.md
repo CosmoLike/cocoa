@@ -437,30 +437,85 @@ After installation, users must source the conda configuration file, as shown bel
 
 ### :interrobang: FAQ: How to use a globally defined Anaconda module in a supercomputer? <a name="overview_anaconda"></a>
 
-Below, we list the most common issues users face when trying to install Cocoa conda environments in a supercomputer environment using a globally defined Anaconda module.
+Below, we list the most common issues users face when trying to install Cocoa conda environments in a supercomputer environment using a globally defined Anaconda module. 
+
+- **Conda command not found**.
+  
+Anaconda is not usually set by default on HPC environments but may be available as a module. For example, on the Midway HPC cluster, it can be loaded using the command below.
+
+    module load Anaconda3/2022.10
+
+If you are not sure about the name of the available Anaconda module, type the command
+
+    module avail An
+
+to show all modules with names that start with `An`. The output should resemble the following
+
+<img width="1114" alt="Screenshot 2024-07-15 at 12 04 56 PM" src="https://github.com/user-attachments/assets/09326f5f-49e0-45b5-a157-25fe2b09918e">
 
 - **Installation seems to take forever**. There are various reasons why installing the Cocoa conda environment may take a long time, including the speed of internet connectivity. Here is a checklist of good practices to debug this problem.
 
-:one: *Set conda verbosity to DEBUG*. The DEBUG verbose mode can be set via the command 
+:one: *Never install and compile code on the login node*. 
 
-    conda config --set verbosity 2
-
-The DEBUG mode will ensure conda outputs many more intermediate installation steps, which helps the user check whether Conda is stuck on some intermediate step. Users can later reset the verbosity level with the command `conda config --set verbosity 0`
-
-:two: *Never install and compile code on the login node*. Instead, request an interactive job with a few cores. However, users must know that some supercomputers do not provide internet access on computing nodes (e.g., the Midway HPC at the University of Chicago). Ask the HPC staff for a queue dedicated to installing and compiling code in this case (they must exists in a well setup HPC environment). For example, the so-called `build partition` on the Midway supercomputer can be accessed with the command
+Instead, request an interactive job with a few cores. However, users must know that some supercomputers do not provide internet access on computing nodes (e.g., the Midway HPC at the University of Chicago). Ask the HPC staff for a queue dedicated to installing and compiling code in this case (they must exists in a well setup HPC environment). For example, the so-called `build partition` on the Midway supercomputer can be accessed with the command
 
     sinteractive --nodes=1 --ntasks=1 --cpus-per-task=5 --time=3:00:00 --account=pi-XXX --partition=build
 
+:two: *Set conda verbosity to DEBUG* in case the installation still takes too much time after step :one:.
+
+    conda config --set verbosity 2
+
+The DEBUG mode will ensure conda outputs many more intermediate installation steps, which helps the user check whether Conda is stuck on some intermediate step. Users can later reset the verbosity level with the command `conda config --set verbosity 0`.
+
 - **Conda installation is interrupted due to quota limitations**.
 
-Supercomputers usually enforce strict quota limits on home folders. These limits apply to the total file size and the number of files. By default, Anaconda modules install new environments at `$HOME/.conda/envs`. Anaconda also stores downloaded packages in the folder `$HOME/.conda/pkgs`. Therefore, reasonable and widely applied quota limitations to the home folder significantly hinder the installation of new environments without the proposed changes below. 
+Supercomputers usually enforce strict quota limits on home folders. These limits apply to the total file size and the number of files. By default, Anaconda modules install new environments at `$HOME/.conda/envs`. Anaconda also stores Gigabytes of downloaded packages in the `$HOME/.conda/pkgs` folder; `pkgs` is used by Anaconda as a package cache folder. Therefore, reasonable and widely applied quota limitations to the home folder significantly hinder the installation of new environments without the proposed changes below. 
 
-:one: Create an Anaconda folder on a project folder outside `$HOME` that has significantly more tolerant quota restrictions. For instance, on the Midway supercomputer I create the Anaconda folder at KICP projects folder with the command
+:one: Create an Anaconda folder on a project folder outside `$HOME` with significantly more tolerant quota restrictions. For instance, on the Midway supercomputer I create the Anaconda folder at KICP projects folder with the command
 
     mkdir /project2/kicp/XXX/anaconda/
 
-:two: 
-  
+:two: Set the pkgs package cache folder to `anaconda/pkgs`.
+
+    conda config --add pkgs_dirs /project2/kicp/XXX/anaconda/pkgs
+
+:tree: Set the env folder to `anaconda/envs/` 
+
+    conda config --add envs_dirs /project2/kicp/XXX/anaconda/envs
+
+:four: Set the following flags for a proper conda environment installation
+
+    conda config --set auto_update_conda false
+    conda config --set show_channel_urls true
+    conda config --set auto_activate_base false
+    conda config --prepend channels conda-forge
+    conda config --set channel_priority strict
+    conda init bash
+
+:five: Source the `.bashrc` file so the new Anaconda settings are loaded. 
+
+    source ~/.bashrc
+
+:six: After completing steps :one:-:four:, check that the `$HOME/.condarc` file with the command
+
+    more $HOME/.condarc
+
+to make sure it resembles the one below.
+
+    auto_update_conda: false
+    show_channel_urls: true
+    auto_activate_base: false
+    channels:
+      - conda-forge
+      - defaults
+    channel_priority: strict
+    verbosity: 0
+    pkgs_dirs:
+      - /project2/kicp/XXX/anaconda/pkgs
+    envs_dirs:
+      - /project2/kicp/XXX/anaconda/envs/
+
+
 ### :interrobang: FAQ: How to set the Slow/Fast decomposition on MCMC chains with Cosmolike? Manual Blocking <a name="manual_blocking_cosmolike"></a>
 
 The Cosmolike Weak Lensing pipelines contain parameters with different speed hierarchies. For example, Cosmolike execution time is reduced by approximately 50% when fixing the cosmological parameters. When varying only multiplicative shear calibration, Cosmolike execution time is reduced by two orders of magnitude. 
