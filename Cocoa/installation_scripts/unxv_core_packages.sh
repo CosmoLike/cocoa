@@ -86,7 +86,6 @@ if [ -z "${SKIP_DECOMM_CORE_PACKAGES}" ]; then
                      "armadillo"
                      "boost"
                      "carma"
-                     "pip_cache"
                      "expat"
                      "cuba"
                      "wget"
