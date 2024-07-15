@@ -1,22 +1,19 @@
 #!/bin/bash
-# ----------------------------------------------------------------------------
-# ----------------------------------------------------------------------------
-# ----------------------------------------------------------------------------
+
+# ------------------------------------------------------------------------------
+# DEFINING ROOTDIR (DO NOT CHANGE) ---------------------------------------------
+# ------------------------------------------------------------------------------
 export ROOTDIR=$(pwd -P)
 if [ $? -ne 0 ]; then
   return 1;
 fi
-
+# ------------------------------------------------------------------------------
+# CLEANING PREVIOUSLY SET ENVIRONMENT (DO NOT CHANGE) --------------------------
+# ------------------------------------------------------------------------------
 source "${ROOTDIR:?}/installation_scripts/flags_impl_unset_keys.sh" 
 if [ $? -ne 0 ]; then
   return 1;
 fi
-
-# ------------------------------------------------------------------------------
-# HOW COCOA SHOULD BE INSTALLED? -----------------------------------------------
-# ------------------------------------------------------------------------------
-export MINICONDA_INSTALLATION=1
-#export MANUAL_INSTALLATION=1
 
 # ------------------------------------------------------------------------------
 # VERBOSE AS DEBUG TOOL --------------------------------------------------------
@@ -31,9 +28,9 @@ export MINICONDA_INSTALLATION=1
 # ------------------------------------------------------------------------------
 # The flags below allow users to skip downloading specific datasets ------------
 # ------------------------------------------------------------------------------
-# export IGNORE_ACTDR6_DATA=1
+export IGNORE_ACTDR6_DATA=1
 # export IGNORE_BAO_DATA=1
-# export IGNORE_BICEP_CMB_DATA=1
+export IGNORE_BICEP_CMB_DATA=1
 # export IGNORE_HOLICOW_STRONG_LENSING_DATA=1
 # export IGNORE_SN_DATA=1
 # export IGNORE_SPT_CMB_DATA=1
@@ -81,11 +78,19 @@ export IGNORE_EMULATOR_CPU_PIP_PACKAGES=1
 export IGNORE_EMULATOR_GPU_PIP_PACKAGES=1
 
 # ------------------------------------------------------------------------------
-# DERIVED & RARELY CHANGED FLAGS -----------------------------------------------
+# Adopted Python version -------------------------------------------------------
 # ------------------------------------------------------------------------------
-
 export PYTHON_VERSION=3.9
 
+# ------------------------------------------------------------------------------
+# HOW COCOA CORE PACKAGES SHOULD BE INSTALLED? ---------------------------------
+# ------------------------------------------------------------------------------
+export MINICONDA_INSTALLATION=1
+#export MANUAL_INSTALLATION=1
+
+# ------------------------------------------------------------------------------
+# DERIVED & RARELY CHANGED FLAGS (DO NOT CHANGE) -------------------------------
+# ------------------------------------------------------------------------------
 if [ -n "${MANUAL_INSTALLATION}" ]; then      
   source "${ROOTDIR:?}/installation_scripts/flags_manual_installation.sh" 
   if [ $? -ne 0 ]; then
