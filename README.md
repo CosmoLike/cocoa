@@ -28,7 +28,7 @@ Cocoa allows users to run [CosmoLike](https://github.com/CosmoLike) routines ins
 
 Besides integrating [Cobaya](https://github.com/CobayaSampler) and [CosmoLike](https://github.com/CosmoLike), Cocoa introduces shell scripts that allow users to containerize [Cobaya](https://github.com/CobayaSampler), the Boltzmann codes and multiple likelihoods. The container structure ensures that users can adopt consistent versions for the Fortran/C/C++ compilers and libraries across multiple machines; this greatly simplifies debugging. 
 
-Our scripts never install packages, including Python modules, on `$HOME/.local` as that would make them global to the user. This behavior enables users to work on multiple instances of Cocoa simultaneously, similar to what was possible with [CosmoMC](https://github.com/cmbant/CosmoMC). 
+Our scripts never install packages, including Python modules, on `$HOME/.local` as that would make them global to the user, interfering with all previously installed packages. This behavior enables users to work on multiple instances of Cocoa simultaneously, similar to what was possible with [CosmoMC](https://github.com/cmbant/CosmoMC). 
 
 This readme file presents basic and advanced instructions for installing all [Cobaya](https://github.com/CobayaSampler) and [CosmoLike](https://github.com/CosmoLike) components.
 
