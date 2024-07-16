@@ -297,6 +297,7 @@ typedef struct
   int high_def_integration;
   int adopt_limber_gg;
   int adopt_limber_gammat;
+  int pm_integration_exact;
 } likepara;
 
 typedef double (*B1_model)(double z, int nz);

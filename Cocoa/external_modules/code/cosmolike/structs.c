@@ -38,7 +38,8 @@ likepara like =
   .use_full_sky_sk = 1,
   .high_def_integration = 0,
   .adopt_limber_gg = 0,
-  .adopt_limber_gammat = 1
+  .adopt_limber_gammat = 1,
+  .pm_integration_exact = 0
 };
 
 cosmopara cosmology =
@@ -312,6 +313,7 @@ void reset_like_struct()
   like.use_full_sky_sk = 1;
   like.high_def_integration = 0;
   like.adopt_limber_gg = 0;
+  like.pm_integration_exact = 0;
 }
 
 void reset_cosmology_struct()
