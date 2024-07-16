@@ -201,6 +201,7 @@ double g_lens_cluster(const double a, const int nz, const int nl);
 // ---------------------------------------------------------------------------------------
 
 double ggl_efficiency(int ni, int nj);
+double max_g_tomo(int zs);
 
 #ifdef __cplusplus
 }
