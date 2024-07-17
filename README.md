@@ -214,7 +214,7 @@ This behavior enables users to work on multiple instances of Cocoa simultaneousl
 
 - Additional explanations about our `mpirun` flags: Why the `--bind-to core:overload-allowed --map-by numa:pe=${OMP_NUM_THREADS}` flag? This flag enables efficient hybrid MPI + OpenMP runs on NUMA architecture.
 
-- Additional explanations about the functioning `start_cocoa.sh`/`stop_cocoa.sh` scripts, starting from why we created two separate shell environments, `(cocoa)` and `(.local)`? Users should be able to manipulate multiple Cocoa instances seamlessly, which is particularly useful when running chains in one instance while experimenting with code development in another. Consistency of the environment across all Cocoa instances is crucial, and the `start_cocoa.sh`/`stop_cocoa.sh` scripts handle the loading and unloading of environmental path variables for each Cocoa.
+- Additional explanations about the functioning `start_cocoa.sh`/`stop_cocoa.sh` scripts, starting from why we created two separate shell environments, `(cocoa)` and `(.local)`? Users should be able to manipulate multiple Cocoa instances seamlessly, which is particularly useful when running chains in one instance while experimenting with code development in another. Consistency of the environment across all Cocoa instances is crucial, and the `start_cocoa.sh`/`stop_cocoa.sh` scripts handle the loading and unloading of environmental path variables.
 
 ### :interrobang: FAQ: What if installation or compilation goes wrong? <a name="running_wrong"></a>
 
