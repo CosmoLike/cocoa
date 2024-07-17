@@ -72,7 +72,7 @@ This readme file presents basic and advanced instructions for installing all [Co
 
 The script `setup_cocoa.sh` decompresses the data files and installs a few necessary packages that have not been installed via conda.
 
-:interrobang: What if the user wants to fine-tune the installed libraries, likelihoods, and external modules? Check the many available options on the `set_installation_libraries.sh` shell script before running (or reruning) step two.
+:interrobang: What if the user wants to fine-tune the installed libraries, likelihoods, and external modules? Check the many available options on the `set_installation_libraries.sh` shell script before running (or reruning) step :two:.
 
 **Step :three:**: Run the script `compile_cocoa.sh` by typing 
 
