@@ -72,15 +72,13 @@ This readme file presents basic and advanced instructions for installing all [Co
 
 The script `setup_cocoa.sh` decompresses the data files and installs a few necessary packages that have not been installed via conda.
 
-:interrobang: What if the user wants to fine-tune the installed libraries, likelihoods, and external modules? Check the many available options on the `set_installation_libraries.sh` shell script before running (or reruning) step :two:.
-
 **Step :three:**: Run the script `compile_cocoa.sh` by typing 
 
     source compile_cocoa.sh
     
 This command compiles CAMB and Class Boltzmann codes, Planck likelihood, and Polychord sampler. 
 
-:interrobang: Cocoa ignores a few external modules (code and likelihoods) by default, but users may find them helpful. In this case, check the available options on the script `set_installation_options.sh` and restart steps 2-3. 
+:interrobang:  What if the user wants to fine-tune the installed libraries, likelihoods, and external modules? Cocoa ignores a few external modules (code and likelihoods) by default, but users may find them helpful. In this case, check the many available options on the shell script `set_installation_options.sh` and restart steps 2-3. 
 
 ## Running Examples (not involving Cosmolike)  <a name="cobaya_base_code_examples"></a>
 
