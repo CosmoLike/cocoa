@@ -71,10 +71,10 @@ for TMP in $(find "${ROOTDIR:?}/projects/" -mindepth 1 -maxdepth 1 -type d ! -na
 
   else
 
-    FILE="start_${TMP2:?}.sh"
-    if [ -f "${FOLDER:?}/${FILE:?}" ]; then
-      source "${FOLDER:?}/${FILE:?}" || 
-        { error "${EC31:?} (${FILE:?})"; return 1; }
+    FILE="${FOLDER:?}/start_${TMP2:?}.sh"
+
+    if [ -f "${FILE:?}" ]; then
+      source "${FILE:?}" || { error "${EC31:?} (${FILE:?})"; return 1; }
     fi
 
   fi
