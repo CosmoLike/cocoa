@@ -4,7 +4,6 @@ dependencies:
   - _libgcc_mutex=0.1
   - _openmp_mutex=4.5
   - _sysroot_linux-64_curr_repodata_hack=3
-  - armadillo=11.4.4
   - arpack=3.7.0
   - binutils_impl_linux-64=2.40
   - binutils_linux-64=2.40
