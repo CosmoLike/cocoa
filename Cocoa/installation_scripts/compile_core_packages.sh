@@ -562,7 +562,7 @@ if [ -z "${IGNORE_CORE_INSTALLATION}" ]; then
     
     ptop 'COMPILING ARMADILLO CPP LIBRARY (CORE LIBS)' || return 1
 
-    PACKAGE_VERSION="${ARMA_VERSION:-"12.8.2"}" 
+    PACKAGE_VERSION="${ARMA_VERSION:-"12.8.4"}" 
 
     DEFAULT="armadillo-${PACKAGE_VERSION:?}"
 
@@ -574,25 +574,32 @@ if [ -z "${IGNORE_CORE_INSTALLATION}" ]; then
     # note: in case script run >1x w/ previous run stoped prematurely b/c error
 
     rm -f "${PACKDIR:?}/CMakeCache.txt"
+    rm -rf "${ROOTDIR:?}"/.local/share/Armadillo/
+    rm -rf "${ROOTDIR:?}"/.local/lib/libarmadillo*
+    rm -rf "${ROOTDIR:?}"/.local/include/armadillo*
+    rm -rf "${ROOTDIR:?}"/.local/lib64/libarmadillo*
 
     # --------------------------------------------------------------------------
 
     cdfolder "${PACKDIR}" || return 1;
 
+    #g++ XXX -std=c++11 -O2 -L${CONDA_PREFIX}/lib -L${ROOTDIR}/.local/lib -larmadillo -lopenblas -larpack -llapack
+    
     ${CMAKE:?} -DBUILD_SHARED_LIBS=TRUE \
       -DCMAKE_INSTALL_PREFIX="${ROOTDIR:?}/.local" \
       -DCMAKE_C_COMPILER="${C_COMPILER:?}" \
       -DCMAKE_CXX_COMPILER="${CXX_COMPILER:?}" \
       -DLAPACK_FOUND=YES \
-      -DLAPACK_LIBRARIES="${ROOTDIR:?}/.local/lib/liblapack.so" \
-      -DBLAS_FOUND=NO \
-      --log-level=ERROR . \
+      -DARPACK_FOUND=YES  \
+      -DATLAS_FOUND=NO \
+      -DOpenBLAS_FOUND=YES \
+      -DBLAS_FOUND=NO  . \
       >${OUT1:?} 2>${OUT2:?} || { error "(ARMA) ${EC12:?}"; return 1; }
     
     make clean \
       >${OUT1:?} 2>${OUT2:?} || { error "(ARMA) ${EC2:?}"; return 1; }
 
-    make -j $MNT all -Wno-dev \
+    make all \
       >${OUT1:?} 2>${OUT2:?} || { error "(ARMA) ${EC8:?}"; return 1; }
 
     make install \

@@ -113,6 +113,12 @@ fail_script_msg () {
   echo -e "${MSG} ${2:-"empty arg"} ${MSG2}"
 }
 
+warning_script_msg () {
+  local MSG="\033[0;31m        (${1:-"empty arg"}) warning: \e[3m"
+  local MSG2="\033[0m"
+  echo -e "${MSG} ${2:-"empty arg"} ${MSG2}"
+}
+
 # ----------------------------------------------------------------------------
 # ------------------------------- ERROR CODES --------------------------------
 # ----------------------------------------------------------------------------
@@ -149,7 +155,7 @@ export EC15="GIT CLONE"
 
 export EC16="GIT CHECKOUT"
 
-export EC17="SHELL SCRIPT FILE PATCH"
+export EC17="SHELL SCRIPT FILE PATCH FAILED"
 
 export EC18="PYTHON3 WAF DISTCLEAN"
 
@@ -175,7 +181,17 @@ export EC28="LOGICAL ERROR: INCOMPATIBLE FLAGS ON"
 
 export EC29="UNKNOWN FILE EXTENSION"
 
-export EC30="MV FOLDER/FILE"
+export EC30="MV FOLDER/FILE/SYMLINK"
+
+export EC31="DIR DOES NOT EXIST"
+
+export EC32="SHELL SCRIPT FAILED"
+
+export EC33="UNLINK SYMLINK FAILED"
+
+export EC34="SYMLINK CREATION FAILED"
+
+export EC35="ECHO >> FILE FIALED"
 
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------

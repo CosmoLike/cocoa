@@ -11,9 +11,6 @@ fi
 # CLEANING PREVIOUSLY SET ENVIRONMENT (DO NOT CHANGE) --------------------------
 # ------------------------------------------------------------------------------
 source "${ROOTDIR:?}/installation_scripts/flags_impl_unset_keys.sh" 
-if [ $? -ne 0 ]; then
-  return 1;
-fi
 
 # ------------------------------------------------------------------------------
 # VERBOSE AS DEBUG TOOL --------------------------------------------------------
@@ -108,6 +105,8 @@ source "${ROOTDIR:?}/installation_scripts/flags_derived.sh"
 if [ $? -ne 0 ]; then
   return 1;
 fi
+
+unset IGNORE_CPP_ARMA_INSTALLATION
 
 # ------------------------------------------------------------------------------
 # PACKAGE URL AND VERSIONS. CHANGES IN THE COMMIT ID MAY BREAK COCOA -----------

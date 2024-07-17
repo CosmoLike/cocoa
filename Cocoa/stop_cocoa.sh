@@ -16,9 +16,11 @@ error_stop_cocoa () {
   local MSG="\033[0;31m (${FILE}) we cannot run "
   local MSG2="\033[0m"
   echo -e "${MSG}${1:?}${MSG2}" 2>"/dev/null"
-  unset -f error
+  unset -f error_stop_cocoa
   cd $(pwd -P) 2>"/dev/null"
-  source stop_cocoa 2>"/dev/null"
+  source "${ROOTDIR:?}/installation_scripts/flags_impl_unset_keys.sh" 2>"/dev/null"
+  unset -v ROOTDIR SETUP_COBAYA START_COCOA_DONE fail
+  unset -v SETUP_PREREQUISITE_DONE SET_INSTALLATION_OPTIONS
   return 1
 }
 
@@ -66,9 +68,9 @@ fi
 # ----------------------------------------------------------------------------
 
 if [ -n "${ROOTDIR}" ]; then
-  source "${ROOTDIR:?}/projects/stop_all.sh"
+  source "${ROOTDIR:?}/installation_scripts/stop_all_projects.sh"
   if [ $? -ne 0 ]; then
-    error_stop_cocoa 'script projects/stop_all.sh'; return 1
+    error_stop_cocoa 'script stop_all_projects.sh'; return 1
   fi
 fi
 
@@ -76,14 +78,8 @@ fi
 # ----------------------------------------------------------------------------
 # ----------------------------------------------------------------------------
 
-source "${ROOTDIR:?}/installation_scripts/flags_impl_unset_keys.sh"
-if [ $? -ne 0 ]; then
-  error_stop_cocoa 'script installation_scripts/flags_impl_unset_keys.sh'; 
-  return 1;
-fi
-
+source "${ROOTDIR:?}/installation_scripts/flags_impl_unset_keys.sh" 2>"/dev/null"
 unset -v ROOTDIR SETUP_COBAYA START_COCOA_DONE fail
-
 unset -v SETUP_PREREQUISITE_DONE SET_INSTALLATION_OPTIONS
 
 # ----------------------------------------------------------------------------

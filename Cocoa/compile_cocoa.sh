@@ -54,6 +54,12 @@ done
 
 unset -f error_cem
 
+# ----------------------------------------------------------------------------
+# ------------------------ COMPILE EXTERNAL PROJECTS -------------------------
+# ----------------------------------------------------------------------------
+
+( source "${ROOTDIR:?}/installation_scripts/compile_all_projects.sh" )
+
 pbottom2 "COMPILING EXTERNAL MODULES" || return 1
 
 source stop_cocoa.sh
