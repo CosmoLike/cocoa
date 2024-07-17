@@ -106,8 +106,8 @@ if [ $? -ne 0 ]; then
   return 1;
 fi
 
-# Here we decided to install armadillo locally so we can 
-# link it against lapack & OpenBlas & arpack
+# We decided to install C++ Armadillo library locally 
+# to link it against lapack & OpenBlas & arpack
 unset IGNORE_CPP_ARMA_INSTALLATION
 
 # ------------------------------------------------------------------------------
