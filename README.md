@@ -56,7 +56,7 @@ This readme file presents basic and advanced instructions for installing all [Co
 
 **Step :one:**: We assume you are still in the Conda cocoa environment from the previous `conda activate cocoa` command. Now, clone the repository and go to the `cocoa` main folder,
 
-    "${CONDA_PREFIX}"/bin/git clone --depth 1 https://github.com/CosmoLike/cocoa.git --branch v4.0-beta2 cocoa
+    "${CONDA_PREFIX}"/bin/git clone --depth 1 https://github.com/CosmoLike/cocoa.git --branch v4.0-beta3 cocoa
     cd ./cocoa/Cocoa
 
 *This will download the latest release, not the latest commit (more stable!)*.
@@ -78,7 +78,7 @@ The script `setup_cocoa.sh` decompresses the data files and installs a few neces
     
 This command compiles CAMB and Class Boltzmann codes, Planck likelihood, and Polychord sampler. 
 
-:interrobang: Cocoa ignores a few external modules (code and likelihoods) by default, but users may find them helpful. In this case, check the available options on the script `set_installation_options.sh` and restart steps 2-3. 
+:interrobang:  What if the user wants to fine-tune the installed libraries, likelihoods, and external modules? Cocoa ignores a few external modules (code and likelihoods) by default, but users may find them helpful. In this case, check the many available options on the shell script `set_installation_options.sh` and rerun steps :two: and :three:. 
 
 ## Running Examples (not involving Cosmolike)  <a name="cobaya_base_code_examples"></a>
 
@@ -214,7 +214,7 @@ This behavior enables users to work on multiple instances of Cocoa simultaneousl
 
 - Additional explanations about our `mpirun` flags: Why the `--bind-to core:overload-allowed --map-by numa:pe=${OMP_NUM_THREADS}` flag? This flag enables efficient hybrid MPI + OpenMP runs on NUMA architecture.
 
-- Additional explanations about the functioning `start_cocoa.sh`/`stop_cocoa.sh` scripts, starting from why we created two separate shell environments, `(cocoa)` and `(.local)`? Users should be able to manipulate multiple Cocoa instances seamlessly, which is particularly useful when running chains in one instance while experimenting with code development in another. Consistency of the environment across all Cocoa instances is crucial, and the `start_cocoa.sh`/`stop_cocoa.sh` scripts handle the loading and unloading of environmental path variables for each Cocoa.
+- Additional explanations about the functioning `start_cocoa.sh`/`stop_cocoa.sh` scripts, starting from why we created two separate shell environments, `(cocoa)` and `(.local)`? Users should be able to manipulate multiple Cocoa instances seamlessly, which is particularly useful when running chains in one instance while experimenting with code development in another. Consistency of the environment across all Cocoa instances is crucial, and the `start_cocoa.sh`/`stop_cocoa.sh` scripts handle the loading and unloading of environmental path variables.
 
 ### :interrobang: FAQ: What if installation or compilation goes wrong? <a name="running_wrong"></a>
 
