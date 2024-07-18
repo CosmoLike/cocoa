@@ -1,3 +1,0 @@
-# Values for tau_reio, see 2016 ACT paper
-tau_prior.mu      = 0.06
-tau_prior.sigma  = 0.01

@@ -2,11 +2,19 @@ stop_at_error: False
 debug: false
 
 likelihood:
-  sn.roman_o:
+  sn.union3: 
+    path: ./external_modules/data/sn_data
+  sn.pantheon: 
+    path: ./external_modules/data/sn_data
+  sn.pantheonplus: 
     path: ./external_modules/data/sn_data
   planck_2018_highl_plik.TT:
     path: ./external_modules/
     clik_file: plc_3.0/hi_l/plik/plik_rd12_HM_v22_TT.clik
+  sn.desy5: 
+    path: ./external_modules/data/sn_data
+  bao.desi_2024_bao_all:
+    path: ./external_modules/data/
 
 params:
   logA:
@@ -202,10 +210,10 @@ sampler:
       ns: 0.96605
       theta_MC_100: 1.04088
       omegabh2: 0.022383
-      omegach2: 0.12011
+      omegach2: 0.118
       tau: 0.0543
-      w0pwa: -0.968859
-      w: -0.909098
+      w0pwa: -0.999
+      w: -0.999
       A_planck: 1.00138
       calib_100T: 1.00136
       calib_217T: 0.997534

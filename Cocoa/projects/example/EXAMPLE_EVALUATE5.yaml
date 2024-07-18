@@ -1,5 +1,5 @@
 stop_at_error: False
-timing: False
+timing: True
 debug: False
 
 likelihood:
@@ -157,21 +157,23 @@ theory:
   camb:
     path: ./external_modules/code/CAMB
     extra_args:
+      kmax: 10
+      #k_per_logint: 130
+      nonlinear: true
       halofit_version: takahashi
       dark_energy_model: ppf
       DoLateRadTruncation: False
       lmax: 5000
-      lens_potential_accuracy: 2
-      AccuracyBoost: 1.25
-      lSampleBoost: 1.1
-      lAccuracyBoost: 1.0
-      #lens_potential_accuracy: 8
-      #AccuracyBoost: 3.0
-      #lSampleBoost: 3.0
-      #lAccuracyBoost: 3.0
+      lens_potential_accuracy: 3
+      AccuracyBoost: 1.2
+      lSampleBoost: 1.0
+      lAccuracyBoost: 1.2
       num_massive_neutrinos: 1
       nnu: 3.046
       accurate_massive_neutrino_transfers: false
+      min_l_logl_sampling: 6000
+      #recombination_model: CosmoRec
+      #recombination_model: HyRec
 
 sampler:
   evaluate:

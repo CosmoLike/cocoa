@@ -1,4 +1,7 @@
+Cocoa/cobaya
 cobaya2/
+./cobaya
+cobaya/
 chains/
 share/
 include/
@@ -28,6 +31,7 @@ external_modules/data/h0licow_distance_chains/
 external_modules/data/spt_hiell_2020
 external_modules/data/spt_3g
 external_modules/data/act
+external_modules/code/PolyChordLite/
 
 projects/desxplanck
 projects/lsst_fourier
@@ -80,6 +84,33 @@ external_modules/code/planck/code/spt_clik/svnversion
 external_modules/code/class_public/build/
 external_modules/code/pyactlike/build/
 external_modules/code/PolyChordLite/build/
+external_modules/code/CAMB2/
+external_modules/code/CAMB/
+external_modules/code/CAMB*/
+external_modules/code/class_public/
+external_modules/code/class_public2/
+external_modules/code/class_public*/
+external_modules/code/pyact*
+external_modules/code/class_public/python/classy.egg-info
+external_modules/code/velocileptors/
+external_modules/code/velocileptors*/
+external_modules/code/velo*/
+external_modules/code/fgspectra/
+external_modules/code/fg*/
+external_modules/code/euclidemu2
+external_modules/code/euclide*
+external_modules/code/ee2
+external_modules/code/hyrec2
+external_modules/code/hyrec*
+external_modules/code/cosmorec*
+external_modules/code/MG*
+external_modules/code/TMG*
+external_modules/code/TMPMG*
+external_modules/code/MGCAMB
+external_modules/code/TMPSO
+external_modules/code/TMP*
+external_modules/code/SOSYSLIB
+external_modules/code/SO*
 
 cobaya/cobaya/likelihoods/XXX
 cobaya/cobaya/likelihoods/des_y1

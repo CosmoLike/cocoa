@@ -4,8 +4,9 @@ debug: False
 
 likelihood:
   mflike.MFLike:
-    data_folder: simons_observatory/v0.7.1
-    input_file: data_sacc_00044.fits
+    #data_folder: simons_observatory/v0.7.1
+    data_folder: simons_observatory/v0.8
+    input_file: LAT_simu_sacc_00044.fits
     cov_Bbl_file: data_sacc_w_covar_and_Bbl.fits
     defaults:
       # Which spectra?
@@ -17,26 +18,29 @@ likelihood:
         ET: [50, 3002]
         EE: [50, 3002]
       symmetrize: False
+
     data:
+      # List the names and frequencies of all the
+      # relevant experiments.
       experiments:
-        LAT:
-          frequencies: [93, 145, 225] 
+        - LAT_93
+        - LAT_145
+        - LAT_225
+        # - PlanckHFI_545:
+
       spectra:
-        - experiments: ['LAT', 'LAT']
-          frequencies: [93, 93]
-          polarizations: ['TT','TE','EE']
-        - experiments: ['LAT', 'LAT']
-          frequencies: [93, 145]
-        - experiments: ['LAT', 'LAT']
-          frequencies: [93, 225]
-        - experiments: ['LAT', 'LAT']
-          frequencies: [145, 145]
-          polarizations: ['TT','TE','EE']
-        - experiments: ['LAT', 'LAT']
-          frequencies: [145, 225]
-        - experiments: ['LAT', 'LAT']
-          frequencies: [225, 225]
-          polarizations: ['TT','TE','EE']
+        # Here, list all the different cross-correlations
+        # between experiments and bands you want to
+        # analyse.
+        # For each of them, you can specify which spectra
+        # and scale cuts you'd like to use. If you don't
+        # specify anything, the defaults will be used.
+        - experiments: [LAT_93, LAT_93]
+        - experiments: [LAT_93, LAT_145]
+        - experiments: [LAT_93, LAT_225]
+        - experiments: [LAT_145, LAT_145]
+        - experiments: [LAT_145, LAT_225]
+        - experiments: [LAT_225, LAT_225]
             
 params:
   logA:

@@ -9,6 +9,15 @@ extern "C" {
 #define CHAR_MAX_SIZE 1024
 #define MAX_SIZE_ARRAYS 10
 
+#define NO_IA 0
+#define IA_NLA_LF 1
+#define IA_REDSHIFT_BINNING 2
+#define IA_REDSHIFT_EVOLUTION 3
+
+#define IA_MODEL_NLA 0
+#define IA_MODEL_TATT 1
+
+
 typedef struct 
 {
   double a_min;
@@ -277,6 +286,7 @@ typedef struct
   double lmin_kappacmb;
   double lmax_kappacmb;
   int IA;
+  int IA_MODEL;
   int bias;
   int shear_shear;
   int shear_pos;

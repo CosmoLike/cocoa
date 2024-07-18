@@ -1,0 +1,11 @@
+--- history.c	2024-07-12 19:04:44.354662290 -0400
++++ history2.c	2024-07-12 19:05:39.839236836 -0400
+@@ -71,7 +71,7 @@
+   char *buffer = (char *) malloc (4096);
+   getcwd (buffer, 4096);
+   chdir(HYRECPATH);
+-  rec_data.path_to_hyrec = "";
++  rec_data.path_to_hyrec = HYRECPATH;
+   hyrec_allocate(&rec_data, zmax, zmin);
+   chdir(buffer);
+   free(buffer);

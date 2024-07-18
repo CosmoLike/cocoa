@@ -206,7 +206,9 @@ int test_zoverlap(int ni, int nj) // test whether source bin nj is behind lens b
     exit(1);
   }
 
-  if (like.use_ggl_efficiency_zoverlap == 1)
+  return 1;
+
+  /*if (like.use_ggl_efficiency_zoverlap == 1)
   {
     if (ggl_efficiency(ni, nj) > survey.ggl_overlap_cut) 
     {
@@ -268,7 +270,7 @@ int test_zoverlap(int ni, int nj) // test whether source bin nj is behind lens b
     }
 
     return 0;
-  }
+  }*/
 }
 
 int ZL(int ni) 

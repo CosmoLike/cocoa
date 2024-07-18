@@ -9,7 +9,7 @@
 
 The `projects` folder includes all the projects linked to Cosmolike; they can also help organize general investigations even if they don't use Cosmolike directly. 
 
-Projects should be hosted on independent GitHub repositories; our convention is to name the repository cocoa_XXX, where XXX is the intended project name. Projects that utilize Cosmolike needs to have more or less the following structure, taken from a [LSST_Y1 project](https://github.com/CosmoLike/cocoa_lsst_y1)
+Projects should be hosted on independent GitHub repositories; our convention is to name the repository cocoa_XXX, where XXX is the intended project name. Projects that utilize Cosmolike need to have more or less the following structure, taken from a [LSST_Y1 project](https://github.com/CosmoLike/cocoa_lsst_y1)
 
     +-- cocoa_lsst_y1
     |    +-- likelihood
@@ -45,7 +45,7 @@ Projects should be hosted on independent GitHub repositories; our convention is 
 
 # Adapting the COCOA_LSST_Y1 repository to a new project <a name="appendix_lsst_y1_new"></a> 
 
-Adapting the LSST_Y1 folder to construct a new project involves many small core changes and a few major ones. They are tedious but straightforward. The easier way to apply most of the minor core changes to the code is via the bash script *transfer_project.sh*.
+Adapting the LSST_Y1 folder to construct a new project involves many small core changes and a few major ones. They are tedious but straightforward. The easier way to apply the minor core changes to the code is via the bash script *transfer_project.sh*.
 
 ## Minor changes: the easy way <a name="appendix_lsst_y1_new_small"></a> 
 
@@ -298,7 +298,7 @@ replacing the `LSST_` prefix as shown below.
             proposal: 0.005
          latex: \Delta z_\mathrm{s, XXX}^1
          
-Similar changes must be made in `params_XXX_cosmic_shear.yaml`. Note that changes either in the number of lenses or source bins will demand the introduction of new paremeters in 
+Similar changes must be made in `params_XXX_cosmic_shear.yaml`. Note that changes either in the number of lenses or source bins will demand the introduction of new parameters in 
 `params_XXX_cosmic_shear.yaml` and `params_XXX_3x2pt.yaml`
 
 ### Changes in the data folder
