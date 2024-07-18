@@ -1,11 +1,10 @@
 # Table of contents
 1. [Overview of the Cobaya-CosmoLike Joint Architecture (Cocoa)](#overview)
 2. [Installation of core packages via Conda](#required_packages_conda)
-3. [Installation and Compilation of base code (Cobaya and external modules)](#cobaya_base_code)
-4. [Running Examples (not involving Cosmolike)](#cobaya_base_code_examples)
-5. [Running Cosmolike projects](#running_cosmolike_projects)
-6. [Creating Cosmolike projects (external readme)](Cocoa/projects/)
-7. [Appendix](#appendix)
+3. [Installation and Compilation of base code](#cobaya_base_code)
+4. [Running Examples](#cobaya_base_code_examples)
+5. [Creating Cosmolike projects (external readme)](Cocoa/projects/)
+6. [Appendix](#appendix)
     1. [Credits](#appendix_proper_credits)
     2. [Additional Installation Notes For Experts and Developers](#additional_notes)
     3. [FAQ: What if installation or compilation goes wrong?](#running_wrong)
@@ -21,6 +20,7 @@
     13. [Warning about Weak Lensing YAML files in Cobaya](#appendix_example_runs)
     14. [FAQ: How to install Cocoa without conda](#required_packages_cache)
     15. [FAQ: How to push changes to the Cocoa main branch?](#push_main)
+    16. [FAQ: How to download and run Cosmolike projects?](#running_cosmolike_projects)
 
 ## Overview of the [Cobaya](https://github.com/CobayaSampler)-[CosmoLike](https://github.com/CosmoLike) Joint Architecture (Cocoa) <a name="overview"></a>
 
@@ -34,7 +34,7 @@ This readme file presents basic and advanced instructions for installing all [Co
 
 ## Installation of core packages via Conda <a name="required_packages_conda"></a>
 
-**Step :one:**: Download the file `cocoapy39.yml` yml file, create the cocoa environment, activate it, and create symbolic links that will give better names for the GNU compiler installed by Conda.
+**Step :one:**: Download the file `cocoapy39.yml` yml file, create the cocoa environment, activate it, and create symbolic links that will give better names for the GNU compilers.
 
     conda env create --name cocoa --file=cocoapy39.yml
     conda activate cocoa
@@ -44,24 +44,30 @@ This readme file presents basic and advanced instructions for installing all [Co
     ln -s "${CONDA_PREFIX}"/bin/x86_64-conda-linux-gnu-gcc-ar "${CONDA_PREFIX}"/bin/gcc-ar
     ln -s "${CONDA_PREFIX}"/bin/x86_64-conda-linux-gnu-gcc-ranlib "${CONDA_PREFIX}"/bin/gcc-ranlib
 
-:interrobang: What if the user wants to install the Cocoa environment on a supercomputer? Many HPC environments provide the [Anaconda installer](https://www.anaconda.com) as an external module. If this is the case, check the Appendix [FAQ: How to use an available Anaconda module on HPC?](#overview_anaconda).
+:interrobang: What if the user wants to install the Cocoa environment in a supercomputer? 
 
-:interrobang: What if the user does not have conda installed? If the user is not working on an HPC environment that offers Anaconda or [Miniconda](https://docs.anaconda.com/miniconda/), check the Appendix [FAQ: What if there is no Conda? Miniconda installation](#overview_miniconda).
+Many HPC environments provide the [Anaconda installer](https://www.anaconda.com) as an external module. If this is the case, check the Appendix [FAQ: How to use an available Anaconda module on HPC?](#overview_anaconda).
+
+:interrobang: What if the user does not have conda installed? 
+
+If the user is not working on an HPC environment that offers Anaconda or [Miniconda](https://docs.anaconda.com/miniconda/), check the Appendix [FAQ: What if there is no Conda? Miniconda installation](#overview_miniconda).
 
 **Step :two:**: Install `git-lfs` when loading the Conda cocoa environment for the first time.
 
     git-lfs install
 
-## Installation and Compilation of base code (Cobaya and external modules) <a name="cobaya_base_code"></a>
+Below, we assume the user loaded the Cocoa conda environment via the `conda activate cocoa` command.
 
-**Step :one:**: We assume you are still in the Conda cocoa environment from the previous `conda activate cocoa` command. Now, clone the repository and go to the `cocoa` main folder,
+## Installation and Compilation of base code <a name="cobaya_base_code"></a>
+
+**Step :one:**: Download Cocoa's latest release and go to the `cocoa` main folder,
 
     "${CONDA_PREFIX}"/bin/git clone --depth 1 https://github.com/CosmoLike/cocoa.git --branch v4.0-beta3 cocoa
     cd ./cocoa/Cocoa
 
-*This will download the latest release, not the latest commit (more stable!)*.
+:interrobang:  What if the user wants to clone the repository in development mode?
 
-:interrobang: If the user is a developer, then type the following instead *(at your own risk!)*
+Type the following command instead to clone the repository.
 
     "${CONDA_PREFIX}"/bin/git clone git@github.com:CosmoLike/cocoa.git cocoa
     cd ./cocoa/Cocoa
@@ -70,17 +76,19 @@ This readme file presents basic and advanced instructions for installing all [Co
         
     source setup_cocoa.sh
 
-The script `setup_cocoa.sh` decompresses the data files and installs a few necessary packages that have not been installed via conda.
+This script downloads and decompresses all likelihoods and packages set on `set_installation_options.sh` (e.g., CAMB and Class Boltzmann codes, Planck likelihood, and Polychord sampler).
 
 **Step :three:**: Run the script `compile_cocoa.sh` by typing 
 
     source compile_cocoa.sh
     
-This command compiles CAMB and Class Boltzmann codes, Planck likelihood, and Polychord sampler. 
+This command compiles likelihoods and packages set on `set_installation_options.sh` (e.g., CAMB and Class Boltzmann codes, Planck likelihood, and Polychord sampler). 
 
-:interrobang:  What if the user wants to fine-tune the installed libraries, likelihoods, and external modules? Cocoa ignores a few external modules (code and likelihoods) by default, but users may find them helpful. In this case, check the many available options on the shell script `set_installation_options.sh` and rerun steps :two: and :three:. 
+:interrobang:  FAQ: What if the user wants to fine-tune the installed libraries, likelihoods, and external modules? 
 
-## Running Examples (not involving Cosmolike)  <a name="cobaya_base_code_examples"></a>
+Cocoa ignores a few external modules (code and likelihoods) by default, but users may find them helpful/useful. In this case, check the many available options on the shell script `set_installation_options.sh` and rerun steps :two: and :three:. 
+
+## Running Examples  <a name="cobaya_base_code_examples"></a>
 
 We assume that you are still in the Conda cocoa environment from the previous `conda activate cocoa` command and that you are in the cocoa main folder `cocoa/Cocoa`, 
 
@@ -96,7 +104,9 @@ Users will see a terminal like this: `$(cocoa)(.local)`. *This is a feature, not
 
 The OpenMP affinity flag `OMP_PROC_BIND` is set to close place cores as closely as possible, which is important as current architectures severely limit communication bandwidth between distant cores.
 
- **Step :three:**: Run the `cobaya-run` command on the first example of the YAML files we provide.
+### Examples not involving Cosmolike
+
+ **Step :three:**: The folder `projects/example` contains a dozen examples involving different likelihoods. So, run the `cobaya-run` on the first example following the commands below.
 
 One model evaluation:
 
@@ -106,44 +116,21 @@ MCMC:
 
     mpirun -n 4 --oversubscribe --mca btl vader,tcp,self --bind-to core:overload-allowed --rank-by core --map-by numa:pe=${OMP_NUM_THREADS} cobaya-run ./projects/example/EXAMPLE_MCMC1.yaml -f
 
-Once the work is done, clean your environment via :
+### Examples involving Cosmolike
 
-    source stop_cocoa.sh
-    
-and
+ **Step :three:**: The folder `projects/lsst-y1` contains a dozen examples involving different likelihoods. So, run the `cobaya-run` on the first example following the commands below.
 
-    conda deactivate cocoa
+One model evaluation:
 
-## Running Cosmolike projects <a name="running_cosmolike_projects"></a> 
+    mpirun -n 1 --oversubscribe --mca btl vader,tcp,self --bind-to core:overload-allowed --rank-by core --map-by numa:pe=${OMP_NUM_THREADS} cobaya-run ./projects/lsst_y1/EXAMPLE_EVALUATE1.yaml -f
+        
+MCMC:
 
-The *projects* folder was designed to include Cosmolike projects. We assume that you are still in the Conda cocoa environment from the previous `conda activate cocoa` command and that you are in the cocoa main folder `cocoa/Cocoa`, 
+    mpirun -n 4 --oversubscribe --mca btl vader,tcp,self --bind-to core:overload-allowed --rank-by core --map-by numa:pe=${OMP_NUM_THREADS} cobaya-run ./projects/lsst_y1/EXAMPLE_MCMC1.yaml -f
 
-**Step :one:**: Go to the project folder (`./cocoa/Cocoa/projects`) and clone a Cosmolike project with the fictitious name `XXX`:
-    
-    cd ./cocoa/Cocoa/projects
-    "${CONDA_PREFIX}/bin/git" clone git@github.com:CosmoLike/cocoa_XXX.git XXX
+:interrobang: FAQ: What if the user wants to download a Cosmolike project not provided by default or wants to download the provided projects on development mode?
 
-By convention, the Cosmolike Organization hosts a Cobaya-Cosmolike project named XXX at `CosmoLike/cocoa_XXX`. When cloning the repository, the `cocoa_` prefix must be dropped. In the above `git clone` command, we eliminate the `cocoa_` prefix with the second `XXX` argument.
-
-Example of cosmolike projects: [lsst_y1](https://github.com/CosmoLike/cocoa_lsst_y1).
- 
-**Step :two:**: Go back to the Cocoa main folder and activate the private Python environment
-    
-    cd ../
-    source start_cocoa.sh
- 
-:warning: :warning: The `start_cocoa.sh` script must be run after cloning the project repository. 
-
-Users will see a terminal like this: `$(cocoa)(.local)`. *This is a feature, not a bug*!
-
-**Step :three:**: Compile the project, as shown below
- 
-    source "${ROOTDIR:?}"/projects/XXX/scripts/compile_XXX
-  
-**Step :four:**: Select the number of OpenMP cores and run a template YAML file
-    
-    export OMP_PROC_BIND=close; export OMP_NUM_THREADS=4
-    mpirun -n 1 --oversubscribe --mca btl vader,tcp,self --bind-to core --rank-by core --map-by numa:pe=${OMP_NUM_THREADS} cobaya-run ./projects/XXX/EXAMPLE_EVALUATE1.yaml -f
+Check the Appendix [FAQ: How to download and run Cosmolike projects?](running_cosmolike_projects).
 
 ## Appendix <a name="appendix"></a>
 
@@ -805,7 +792,7 @@ Finally, set the following environmental keys:
 
 ### :interrobang: FAQ: How to push changes to the Cocoa main branch? <a name="push_main"></a>
 
-Until recently, Cocoa development was unstructured, and developers were allowed to push directly to the `main` branch. Small commits were also not discouraged. This loose development rules will soon change. In particular, we will soon protect the `main` branch by requiring every push to be reviewed by Cocoa's leading developers. We also want to reduce the number of commits from now on. 
+Until recently, Cocoa development was unstructured, and developers could push directly to the `main` branch. Small commits were also not discouraged. These loose development rules will soon change. In particular, we will soon protect the `main` branch by requiring every push to be reviewed by Cocoa's leading developers. We also want to reduce the number of commits from now on. 
 
 We will implement the philosophy that **a commit in the main branch should contain an atomic change that takes code from a working state to another working state with improvements that are meaningful and well tested.** So, developers should propose changes to the `main` branch in larger chunks, as shown below. 
 
@@ -816,13 +803,13 @@ Important note: we **strongly** advise developers to use the up-to-date `git` gi
     # (main) = developers must input the command below on the main branch.
     (main) git checkout -b xyzdev
 
-In the case where the `xyzdev` already exists, use `git switch` instead of `git checkout -b`. Developers also have freedom to push their develop branches to server via the command
+If the `xyzdev` already exists, use `git switch` instead of `git checkout—b`. Developers can also push their development branches to the server via the command.
 
     # (xyzdev) = developers must input the command below on the xyzdev branch.
     (xyzdev) git push -u origin xyzdev
 
 
-**Step :two:**: develop the proposed changes. We advise developers to commit frequently. In your branch, a commit does not need to be atomic, changing the code from one working state to another well-tested meaningful working state. In your branch, you have absolute freedom.
+**Step :two:**: develop the proposed changes. We advise developers to commit frequently. In your branch, a commit does not need to be atomic, changing the code from one working state to another well-tested, meaningful working state. In your branch, you have absolute freedom.
 
 **Step :three:**: Once there is an atomic, meaningful, and well-tested improvement to Cocoa, the developer needs first to merge any subsequent changes made in `main` while the developer has been working on the `xyzdev` branch.
 
@@ -831,7 +818,7 @@ In the case where the `xyzdev` already exists, use `git switch` instead of `git 
 
 This step may create conflicts that must be addressed before step four. 
 
-**Step :four:**: Once you have merge recent changes made on the `main` branch, we will push to the main branch the changes made on the `xyzdev` branch by first **squashing all your changes into a single commit** as shown below
+**Step :four:**: Once the developer has merged recent changes made on the `main` branch, the developer must push to the main branch the modifications made on the `xyzdev` branch by first **squashing all your changes into a single commit** as shown below
 
     # (xyzdev) = developers must input the command below on the xyzdev branch.
     (xyzdev) git switch main
@@ -844,3 +831,30 @@ This step may create conflicts that must be addressed before step four.
     (main) git push origin main
 
 Important note: **never** revert the branch ordering on squash merging by squashing the `main` changes to the `xyzdev` branch.
+
+## FAQ: How to download and run Cosmolike projects? <a name="running_cosmolike_projects"></a> 
+
+The *projects* folder was designed to include Cosmolike projects. We assume that you are still in the Conda cocoa environment from the previous `conda activate cocoa` command and that you are in the cocoa main folder `cocoa/Cocoa`, 
+
+**Step :one:**: Go to the project folder (`./cocoa/Cocoa/projects`) and clone a Cosmolike project with the fictitious name `XXX`:
+    
+    cd ./cocoa/Cocoa/projects
+    "${CONDA_PREFIX}/bin/git" clone git@github.com:CosmoLike/cocoa_XXX.git XXX
+
+By convention, the Cosmolike Organization hosts a Cobaya-Cosmolike project named XXX at `CosmoLike/cocoa_XXX`. The `cocoa_` prefix must be dropped when cloning the repository. In the above `git clone` command, we eliminate the `cocoa_` prefix with the second `XXX` argument. Here, we provide an example of a cosmolike project: [lsst_y1](https://github.com/CosmoLike/cocoa_lsst_y1).
+ 
+**Step :two:**: Go back to the Cocoa main folder and activate the private Python environment
+    
+    cd ../
+    source start_cocoa.sh
+ 
+:warning: The `start_cocoa.sh` script must be run after cloning the project repository. 
+
+**Step :three:**: Compile the project, as shown below
+ 
+    source "${ROOTDIR:?}"/projects/XXX/scripts/compile_XXX
+  
+**Step :four:**: Select the number of OpenMP cores and run a template YAML file
+    
+    export OMP_PROC_BIND=close; export OMP_NUM_THREADS=4
+    mpirun -n 1 --oversubscribe --mca btl vader,tcp,self --bind-to core --rank-by core --map-by numa:pe=${OMP_NUM_THREADS} cobaya-run ./projects/XXX/EXAMPLE_EVALUATE1.yaml -f
