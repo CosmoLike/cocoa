@@ -39,6 +39,8 @@ export IGNORE_LIPOP_CMB_DATA=1
 # ------------------------------------------------------------------------------
 # The keys below control which packages will be installed and compiled 
 # ------------------------------------------------------------------------------
+#export IGNORE_COBAYA_CODE=1
+
 #export IGNORE_CAMB_CODE=1
 #export IGNORE_CLASS_CODE=1
 #export IGNORE_COSMOLIKE_CODE=1
@@ -51,12 +53,28 @@ export IGNORE_VELOCILEPTORS_CODE=1
 export IGNORE_SIMONS_OBSERVATORY_LIKELIHOOD_CODE=1
 export IGNORE_CAMSPEC_LIKELIHOOD_CODE=1
 export IGNORE_LIPOP_LIKELIHOOD_CODE=1
-#export IGNORE_COBAYA_CODE=1
 export IGNORE_FGSPECTRA_CODE=1
-export IGNORE_EUCLID_EMULATOR_V2_CODE=1
 export IGNORE_HYREC_CODE=1
 export IGNORE_COSMOREC_CODE=1
 export IGNORE_MGCAMB_CODE=1
+
+#Warning: Many cosmolike projects (including LSST-Y1) require euclid emulator
+#export IGNORE_EUCLID_EMULATOR_V2_CODE=1
+
+#export IGNORE_COSMOLIKE_LSSTY1_CODE=1
+
+# ------------------------------------------------------------------------------
+# If OVERWRITE_EXISTING_XXX_CODE is set, setup_XXX overwrites existing PACKAGES
+# overwrite = delete existing PACKAGE folder and install it again --------------
+# ------------------------------------------------------------------------------
+#export OVERWRITE_EXISTING_COSMOLIKE_CODE=1
+
+export OVERWRITE_EXISTING_CAMB_CODE=1
+export OVERWRITE_EXISTING_MGCAMB_CODE=1
+export OVERWRITE_EXISTING_CLASS_CODE=1
+
+export OVERWRITE_EXISTING_HYREC_CODE=1
+export OVERWRITE_EXISTING_COSMOREC_CODE=1
 
 # ------------------------------------------------------------------------------
 # If set, compile_planck.sh uses click like code from github.com/benabed/clik
@@ -186,6 +204,10 @@ export COSMOREC_NAME="cosmorec"
 export MGCAMB_URL="https://github.com/sfu-cosmo/MGCobaya.git"
 export MGCAMB_GIT_COMMIT="443c4a733db687ac18e918b8ed09b45003a8c4ca"
 export MGCAMB_NAME='MGCAMB'
+
+export LSSTY1_URL="https://github.com/CosmoLike/cocoa_lsst_y1.git"
+export LSSTY1_NAME="lsst_y1"
+export LSSTY1_COMMIT="v4.0-beta4"
 
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------

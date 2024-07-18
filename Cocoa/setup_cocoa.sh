@@ -103,7 +103,8 @@ declare -a SCRIPTS=("setup_core_packages.sh"
                      "setup_mgcamb.sh"
                      "setup_class.sh"
                      "setup_velocileptors.sh"
-                     "setup_ee2.sh")
+                     "setup_ee2.sh"
+                     "setup_cosmolike_projects.sh")
 
 for (( i=0; i<${#SCRIPTS[@]}; i++ ));
 do
