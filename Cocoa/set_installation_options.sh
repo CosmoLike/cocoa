@@ -207,7 +207,7 @@ export MGCAMB_NAME='MGCAMB'
 
 export LSSTY1_URL="https://github.com/CosmoLike/cocoa_lsst_y1.git"
 export LSSTY1_NAME="lsst_y1"
-export LSSTY1_COMMIT="v4.0-beta4"
+export LSSTY1_COMMIT="v4.0-beta5"
 
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
