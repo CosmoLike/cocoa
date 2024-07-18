@@ -44,7 +44,7 @@ This readme file presents basic and advanced instructions for installing all [Co
     ln -s "${CONDA_PREFIX}"/bin/x86_64-conda-linux-gnu-gcc-ar "${CONDA_PREFIX}"/bin/gcc-ar
     ln -s "${CONDA_PREFIX}"/bin/x86_64-conda-linux-gnu-gcc-ranlib "${CONDA_PREFIX}"/bin/gcc-ranlib
 
-:interrobang: What if the user wants to install the Cocoa environment in a supercomputer? 
+:interrobang: What if the user wants to install the Cocoa environment on a supercomputer? 
 
 Many HPC environments provide the [Anaconda installer](https://www.anaconda.com) as an external module. If this is the case, check the Appendix [FAQ: How to use an available Anaconda module on HPC?](#overview_anaconda).
 
@@ -122,7 +122,7 @@ MCMC:
 
 ### Examples involving Cosmolike
 
- **Step :three:**: The folder `projects/lsst-y1` contains a dozen examples involving different likelihoods. So, run the `cobaya-run` on the first example following the commands below.
+ **Step :three:**: The folder `projects/lsst-y1` contains a dozen examples involving different combinations of two-point correlation functions. So, run the `cobaya-run` on the first example following the commands below.
 
 One model evaluation:
 
@@ -845,7 +845,7 @@ The *projects* folder was designed to include Cosmolike projects. We assume that
     cd ./cocoa/Cocoa/projects
     "${CONDA_PREFIX}/bin/git" clone git@github.com:CosmoLike/cocoa_XXX.git XXX
 
-By convention, the Cosmolike Organization hosts a Cobaya-Cosmolike project named XXX at `CosmoLike/cocoa_XXX`. The `cocoa_` prefix must be dropped when cloning the repository. In the above `git clone` command, we eliminate the `cocoa_` prefix with the second `XXX` argument. Here, we provide an example of a cosmolike project: [lsst_y1](https://github.com/CosmoLike/cocoa_lsst_y1).
+By convention, the Cosmolike Organization hosts a Cobaya-Cosmolike project named XXX at `CosmoLike/cocoa_XXX`. The `cocoa_` prefix must be dropped when cloning the repository.
  
 **Step :two:**: Go back to the Cocoa main folder and activate the private Python environment
     
