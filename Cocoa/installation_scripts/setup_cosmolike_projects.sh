@@ -103,7 +103,7 @@ if [ -z "${IGNORE_COSMOLIKE_LSSTY1_CODE}" ]; then
 
   PACKAGE_VERSION=${LSSTY1_COMMIT:?}
 
-  gitact "${FOLDER:?}" "${URL:?}" "${PACKAGE_VERSION:?}"
+  gitact "${FOLDER:?}" "${PACKAGE_VERSION:?}" "${URL:?}" || return 1
 
   pbottom "GETTING ${PRINTNAME:?}" || return 1
 
