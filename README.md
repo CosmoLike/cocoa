@@ -102,11 +102,11 @@ We assume that you are still in the Conda cocoa environment from the previous `c
 
 Users will see a terminal like this: `$(cocoa)(.local)`. *This is a feature, not a bug*! 
 
- **Step :two:**: Select the number of OpenMP cores.
+ **Step :two:**: Select the number of OpenMP cores (below, we set it to 8).
     
     export OMP_PROC_BIND=close; export OMP_NUM_THREADS=8
 
-:interrobang: FAQ: Why do we need to set the flag `OMP_PROC_BIND`?
+:interrobang: FAQ: Why do we set the flag `OMP_PROC_BIND`?
 
 The environmental variable `OMP_PROC_BIND`, when set to `close`, places the OpenMP cores as closely as possible (in the same chiplet). This setting is important as current architectures limit communications bandwidth between different chiplets (e.g., the cores inside an AMD 96 cores processor are scattered on a dozen chiplets).
 
@@ -858,3 +858,5 @@ By convention, the Cosmolike Organization hosts a Cobaya-Cosmolike project named
     
     export OMP_PROC_BIND=close; export OMP_NUM_THREADS=4
     mpirun -n 1 --oversubscribe --mca btl vader,tcp,self --bind-to core --rank-by core --map-by numa:pe=${OMP_NUM_THREADS} cobaya-run ./projects/XXX/EXAMPLE_EVALUATE1.yaml -f
+
+⚠️ Never delete the `lsst_y1` folder from the project folder without running `stop_cocoa` first; otherwise, Cocoa will have ill-defined soft links. Where the ill-defined soft-links will be located? They will be at `Cocoa/cobaya/cobaya/likelihoods/`, `Cocoa/external_modules/code/` and `Cocoa/external_modules/data/`. The script `stop_cocoa` deletes them. Why this behaviour exists? The script `start_cocoa` creates symbolic links so cobaya can see the likelihood and data files. It also adds the *Cobaya-Cosmolike interface* of all projects to `LD_LIBRARY_PATH` and `PYTHONPATH` paths.
