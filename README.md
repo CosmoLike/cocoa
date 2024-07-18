@@ -66,7 +66,7 @@ Below, we assume the user loaded the Cocoa conda environment via the `conda acti
 
 **Step :one:**: Download Cocoa's latest release and go to the `cocoa` main folder,
 
-    "${CONDA_PREFIX}"/bin/git clone --depth 1 https://github.com/CosmoLike/cocoa.git --branch v4.0-beta5 cocoa
+    "${CONDA_PREFIX}"/bin/git clone --depth 1 https://github.com/CosmoLike/cocoa.git --branch v4.0-beta6 cocoa
     cd ./cocoa/Cocoa
 
 :interrobang:  What if the user wants to clone the repository in development mode?
