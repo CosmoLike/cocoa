@@ -66,7 +66,7 @@ Below, we assume the user loaded the Cocoa conda environment via the `conda acti
 
 **Step :one:**: Download Cocoa's latest release and go to the `cocoa` main folder,
 
-    "${CONDA_PREFIX}"/bin/git clone --depth 1 https://github.com/CosmoLike/cocoa.git --branch v4.0-beta3 cocoa
+    "${CONDA_PREFIX}"/bin/git clone --depth 1 https://github.com/CosmoLike/cocoa.git --branch v4.0-beta5 cocoa
     cd ./cocoa/Cocoa
 
 :interrobang:  What if the user wants to clone the repository in development mode?
@@ -132,7 +132,7 @@ MCMC:
 
     mpirun -n 4 --oversubscribe --mca btl vader,tcp,self --bind-to core:overload-allowed --rank-by core --map-by numa:pe=${OMP_NUM_THREADS} cobaya-run ./projects/lsst_y1/EXAMPLE_MCMC1.yaml -f
 
-:interrobang: FAQ: What if the user wants to download a project not provided by default (or intends to clone existing projects in development mode)?
+:interrobang: FAQ: What if the user wants to download a project not provided by default or intends to clone existing projects in development mode?
 
 Check the Appendix [FAQ: How to download and run Cosmolike projects?](running_cosmolike_projects).
 
