@@ -106,7 +106,9 @@ Users will see a terminal like this: `$(cocoa)(.local)`. *This is a feature, not
     
     export OMP_PROC_BIND=close; export OMP_NUM_THREADS=8
 
-The OpenMP affinity flag `OMP_PROC_BIND` is set to close place cores as closely as possible, which is important as current architectures severely limit communication bandwidth between distant cores.
+:interrobang: FAQ: Why do we need to set the flag `OMP_PROC_BIND`?
+
+The environmental variable `OMP_PROC_BIND`, when set to `close`, places the OpenMP cores as closely as possible (in the same chiplet). This setting is important as current architectures limit communications bandwidth between different chiplets (e.g., the cores inside an AMD 96 cores processor are scattered on a dozen chiplets).
 
 ### Examples not involving Cosmolike
 
