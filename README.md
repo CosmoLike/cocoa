@@ -1,7 +1,7 @@
 # Table of contents
 1. [Overview of the Cobaya-CosmoLike Joint Architecture (Cocoa)](#overview)
 2. [Installation of core packages via Conda](#required_packages_conda)
-3. [Installation and Compilation of base code](#cobaya_base_code)
+3. [Installation and Compilation of external modules](#cobaya_base_code)
 4. [Running Examples](#cobaya_base_code_examples)
 5. [Creating Cosmolike projects (external readme)](Cocoa/projects/)
 6. [Appendix](#appendix)
@@ -62,7 +62,7 @@ Core packages include compilers and numerical libraries (e.g., GSL and FFTW) tha
 
 Below, we assume the user loaded the Cocoa conda environment via the `conda activate cocoa` command.
 
-## Installation and Compilation of base code <a name="cobaya_base_code"></a>
+## Installation and Compilation of external modules <a name="cobaya_base_code"></a>
 
 **Step :one:**: Download Cocoa's latest release and go to the `cocoa` main folder,
 
@@ -80,17 +80,17 @@ Type the following command instead to clone the repository.
         
     source setup_cocoa.sh
 
-This script downloads and decompresses external modules set on `set_installation_options.sh` (e.g., CAMB and Class).
+This script downloads and decompresses external modules set on the `set_installation_options.sh` script (e.g., CAMB and Class).
 
 **Step :three:**: Run the script `compile_cocoa.sh` by typing 
 
     source compile_cocoa.sh
     
-This script compiles external modules set on `set_installation_options.sh` (e.g., CAMB and Class). 
+This script compiles external modules set on the `set_installation_options.sh` script (e.g., CAMB and Class). 
 
 :interrobang:  FAQ: What if the user wants to fine-tune the installed external modules? 
 
-Cocoa ignores a few external modules (code and likelihoods) by default, but users may find them helpful/useful. In this case, check the many available options on the shell script `set_installation_options.sh` and rerun steps :two: and :three:. 
+Cocoa does not install many external modules by default, but users may find them helpful in a particular project. In this case, check the many available options on the `set_installation_options.sh` shell script  and rerun steps :two: and :three:. 
 
 ## Running Examples  <a name="cobaya_base_code_examples"></a>
 
