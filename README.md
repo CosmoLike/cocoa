@@ -427,7 +427,7 @@ Instead, request an interactive job with a few cores. However, users must know t
 
 The DEBUG mode will ensure conda outputs many more intermediate installation steps, which helps the user check whether Conda is stuck on some intermediate step. Users can later reset the verbosity level with the command `conda config --set verbosity 0`.
 
-- **Conda installation is interrupted due to quota limitations**.
+- :interrobang: **Conda installation is interrupted due to quota limitations**.
 
 Supercomputers usually enforce strict quota limits on home folders. These limits apply to the total file size and the number of files. By default, Anaconda modules install new environments at `$HOME/.conda/envs`. Anaconda also stores Gigabytes of downloaded packages in the `$HOME/.conda/pkgs` folder; `pkgs` is used by Anaconda as a package cache folder. Therefore, reasonable and widely applied quota limitations to the home folder significantly hinder the installation of new environments without the proposed changes below. 
 
