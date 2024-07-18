@@ -126,3 +126,7 @@ cobaya/cobaya/likelihoods/kids
 cobaya/cobaya/likelihoods/kids*
 cobaya/cobaya/likelihoods/cocoa_*
 cobaya/cobaya/likelihoods/ede*
+
+Cocoa/projects/lsst_y1/
+Cocoa/projects/lsst*/
+Cocoa/projects/des*/
