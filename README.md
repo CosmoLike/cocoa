@@ -836,7 +836,7 @@ This step may create conflicts that must be addressed before step four.
 
 Important note: **never** revert the branch ordering on squash merging by squashing the `main` changes to the `xyzdev` branch.
 
-## FAQ: How to download and run Cosmolike projects? <a name="running_cosmolike_projects"></a> 
+### FAQ: How to download and run Cosmolike projects? <a name="running_cosmolike_projects"></a> 
 
 The *projects* folder was designed to include Cosmolike projects. We assume that you are still in the Conda cocoa environment from the previous `conda activate cocoa` command and that you are in the cocoa main folder `cocoa/Cocoa`, 
 
