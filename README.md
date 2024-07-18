@@ -181,11 +181,7 @@ The conda installation method should be chosen in the overwhelming majority of c
 :books::books: *Installation of Cobaya base code* :books::books:
 
 - If the user wants to compile only a subset of these packages, refer to the appendix [Compiling Boltzmann, CosmoLike, and Likelihood codes separately](#appendix_compile_separately).
-        
-- Cocoa developers should drop the shallow clone option `--depth 1`; they should also authenticate to GitHub via SSH keys and use the command instead.
-
-      "${CONDA_PREFIX}"/bin/git clone git@github.com:CosmoLike/cocoa.git cocoa
-  
+          
 - Our scripts never install packages on `$HOME/.local` as that would make them global to the user. All requirements for Cocoa are installed at
 
       Cocoa/.local/bin
