@@ -73,77 +73,85 @@ if [ -z "${IGNORE_MGCAMB_CODE}" ]; then
 
   ptop "INSTALLING ${PRINTNAME:?}" || return 1;
 
-  # ---------------------------------------------------------------------------
-  # In case this script is called twice ---------------------------------------
-  # ---------------------------------------------------------------------------
-  rm -rf "${ECODEF:?}/${TFOLDER:?}"
-  rm -rf "${PACKDIR:?}"
-
-  # ---------------------------------------------------------------------------
-  # Clone from original repo --------------------------------------------------
-  # ---------------------------------------------------------------------------
-  cdfolder "${ECODEF:?}" || { cdroot; return 1; }
-
-  "${CURL:?}" -fsS "${URL:?}" \
-    >${OUT1:?} 2>${OUT2:?} || { error "${EC27:?} (URL=${URL:?})"; return 1; }
-
-  "${GIT:?}" clone "${URL:?}" --recursive "${TFOLDER:?}" \
-    >${OUT1:?} 2>${OUT2:?} || { error "${EC15:?}"; return 1; }
-  
-  cdfolder "${ECODEF:?}/${TFOLDER:?}" || { cdroot; return 1; }
-
-  if [ -n "${MGCAMB_GIT_COMMIT}" ]; then
-    "${GIT:?}" checkout "${MGCAMB_GIT_COMMIT:?}" \
-      >${OUT1:?} 2>${OUT2:?} || { error "${EC16:?}"; return 1; }
-  fi
-  
-  # ---------------------------------------------------------------------------
-  # move MGCAMB folders
-  # ---------------------------------------------------------------------------
-  
-  mv "${ECODEF:?}/${TFOLDER:?}/MGCAMB" "${ECODEF:?}"
-  
-  if [ "MGCAMB/" != "${FOLDER:?}" ] && [ "MGCAMB" != "${FOLDER:?}" ] ; then
-
-    mv "${ECODEF:?}/MGCAMB" ${FOLDER:?}
+  # ----------------------------------------------------------------------------
+  # In case this script is called twice ----------------------------------------
+  # ----------------------------------------------------------------------------
+  if [ -n "${OVERWRITE_EXISTING_MGCAMB_CODE}" ]; then
+    
+    rm -rf "${ECODEF:?}/${TFOLDER:?}"
+    rm -rf "${PACKDIR:?}"
   
   fi
 
-  rm -rf "${ECODEF:?}/${TFOLDER:?}"
+  # ----------------------------------------------------------------------------
+  # Clone from original repo ---------------------------------------------------
+  # ----------------------------------------------------------------------------
+  if [ ! -d "${PACKDIR:?}" ]; then
 
-  cdfolder "${PACKDIR}" || { cdroot; return 1; }
+    cdfolder "${ECODEF:?}" || { cdroot; return 1; }
 
-  # ---------------------------------------------------------------------------
-  # We patch the files below so they use the right compilers ------------------
-  # ---------------------------------------------------------------------------
-  # T = TMP
-  declare -a TFOLDER=("camb/" 
-                      "fortran/" 
-                      "forutils/") # If nonblank, path must include /
+    "${CURL:?}" -fsS "${URL:?}" \
+      >${OUT1:?} 2>${OUT2:?} || { error "${EC27:?} (URL=${URL:?})"; return 1; }
+
+    "${GIT:?}" clone "${URL:?}" --recursive "${TFOLDER:?}" \
+      >${OUT1:?} 2>${OUT2:?} || { error "${EC15:?}"; return 1; }
+    
+    cdfolder "${ECODEF:?}/${TFOLDER:?}" || { cdroot; return 1; }
+
+    if [ -n "${MGCAMB_GIT_COMMIT}" ]; then
+      "${GIT:?}" checkout "${MGCAMB_GIT_COMMIT:?}" \
+        >${OUT1:?} 2>${OUT2:?} || { error "${EC16:?}"; return 1; }
+    fi
+    
+    # ---------------------------------------------------------------------------
+    # move MGCAMB folders
+    # ---------------------------------------------------------------------------
+    
+    mv "${ECODEF:?}/${TFOLDER:?}/MGCAMB" "${ECODEF:?}"
+    
+    if [ "MGCAMB/" != "${FOLDER:?}" ] && [ "MGCAMB" != "${FOLDER:?}" ] ; then
+
+      mv "${ECODEF:?}/MGCAMB" ${FOLDER:?}
+    
+    fi
+
+    rm -rf "${ECODEF:?}/${TFOLDER:?}"
+
+    cdfolder "${PACKDIR}" || { cdroot; return 1; }
+
+    # ---------------------------------------------------------------------------
+    # We patch the files below so they use the right compilers ------------------
+    # ---------------------------------------------------------------------------
+    # T = TMP
+    declare -a TFOLDER=("camb/" 
+                        "fortran/" 
+                        "forutils/") # If nonblank, path must include /
+    
+    # T = TMP
+    declare -a TFILE=("_compilers.py" 
+                      "Makefile" 
+                      "Makefile_compiler")
+
+    #T = TMP, P = PATCH
+    declare -a TFILEP=("_compilers.patch" 
+                       "Makefile.patch" 
+                       "Makefile_compiler.patch")
+
+    # AL = Array Length
+    AL=${#TFOLDER[@]}
+
+    for (( i=0; i<${AL}; i++ ));
+    do
+      cdfolder "${PACKDIR:?}/${TFOLDER[$i]}" || return 1
+
+      cpfolder "${CHANGES:?}/${TFOLDER[$i]}${TFILEP[$i]:?}" . \
+        2>${OUT2:?} || return 1;
+
+      patch -u "${TFILE[$i]:?}" -i "${TFILEP[$i]:?}" >${OUT1:?} \
+        2>${OUT2:?} || { error "${EC17:?} (${TFILE[$i]:?})"; return 1; }
+    done
   
-  # T = TMP
-  declare -a TFILE=("_compilers.py" 
-                    "Makefile" 
-                    "Makefile_compiler")
-
-  #T = TMP, P = PATCH
-  declare -a TFILEP=("_compilers.patch" 
-                     "Makefile.patch" 
-                     "Makefile_compiler.patch")
-
-  # AL = Array Length
-  AL=${#TFOLDER[@]}
-
-  for (( i=0; i<${AL}; i++ ));
-  do
-    cdfolder "${PACKDIR:?}/${TFOLDER[$i]}" || return 1
-
-    cpfolder "${CHANGES:?}/${TFOLDER[$i]}${TFILEP[$i]:?}" . \
-      2>${OUT2:?} || return 1;
-
-    patch -u "${TFILE[$i]:?}" -i "${TFILEP[$i]:?}" >${OUT1:?} \
-      2>${OUT2:?} || { error "${EC17:?} (${TFILE[$i]:?})"; return 1; }
-  done
+  fi
   
   cdfolder "${ROOTDIR}" || return 1
   

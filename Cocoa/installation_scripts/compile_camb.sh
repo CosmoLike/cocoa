@@ -58,7 +58,7 @@ if [ -z "${IGNORE_CAMB_CODE}" ]; then
 
   ptop "COMPILING ${PRINTNAME:?}" || return 1
 
-  cdfolder "${PACKDIR}" || return 1
+  cdfolder "${PACKDIR:?}" || return 1
 
   # ---------------------------------------------------------------------------
   # cleaning any previous compilation

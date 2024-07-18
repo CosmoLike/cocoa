@@ -81,59 +81,68 @@ if [ -z "${IGNORE_COSMOREC_CODE}" ]; then
   # ---------------------------------------------------------------------------
   # In case this script is called twice ---------------------------------------
   # ---------------------------------------------------------------------------
-  rm -rf "${PACKDIR:?}"
-  rm -f  "${ECODEF:?}/${FILE}"
-  rm -rf "${ECODEF:?}/${FILENAME}"
+  if [ -n "${OVERWRITE_EXISTING_COSMOREC_CODE}" ]; then
 
-  # ---------------------------------------------------------------------------
-
-  cdfolder "${ECODEF:?}" || { cdroot; return 1; }
-
-  "${WGET:?}" "${URL:?}" -q --show-progress --progress=bar:force || 
-    { error "${EC24:?}"; return 1; }
+    rm -rf "${PACKDIR:?}"
+    rm -f  "${ECODEF:?}/${FILE}"
+    rm -rf "${ECODEF:?}/${FILENAME}"
   
-  tar -zxvf "${FILE:?}" \
-    >${OUT1:?} 2>${OUT2:?} || { error "${EC25:?}"; return 1; }
+  fi
 
-  mv "${FILENAME:?}" "${FOLDER:?}" \
-    >${OUT1:?} 2>${OUT2:?} || { error "${EC30:?}"; return 1; }
-
-  rm -f  "${ECODEF:?}/${FILE}"
-  rm -rf "${ECODEF:?}/${FILENAME}"
-
-  # ---------------------------------------------------------------------------
-  # We patch the files below so they use the right compilers ------------------
-  # ---------------------------------------------------------------------------
-  # T = TMP
-  declare -a TFOLDER=("" 
-                     ) # If nonblank, path must include /
+  # ----------------------------------------------------------------------------
+  # Clone from original repo ---------------------------------------------------
+  # ----------------------------------------------------------------------------
+  if [ ! -d "${PACKDIR:?}" ]; then
   
-  # T = TMP
-  declare -a TFILE=("Makefile.in")
+    cdfolder "${ECODEF:?}" || { cdroot; return 1; }
 
-  #T = TMP, P = PATCH
-  declare -a TFILEP=("Makefile.in.patch" 
-                    )
+    "${WGET:?}" "${URL:?}" -q --show-progress --progress=bar:force || 
+      { error "${EC24:?}"; return 1; }
+    
+    tar -zxvf "${FILE:?}" \
+      >${OUT1:?} 2>${OUT2:?} || { error "${EC25:?}"; return 1; }
 
-  # AL = Array Length
-  AL=${#TFOLDER[@]}
+    mv "${FILENAME:?}" "${FOLDER:?}" \
+      >${OUT1:?} 2>${OUT2:?} || { error "${EC30:?}"; return 1; }
 
-  for (( i=0; i<${AL}; i++ ));
-  do
-    cdfolder "${PACKDIR:?}/${TFOLDER[$i]}" || return 1
+    rm -f  "${ECODEF:?}/${FILE}"
+    rm -rf "${ECODEF:?}/${FILENAME}"
 
-    cpfolder "${CHANGES:?}/${TFOLDER[$i]}${TFILEP[$i]:?}" . \
-      2>${OUT2:?} || return 1;
+    # --------------------------------------------------------------------------
+    # We patch the files below so they use the right compilers -----------------
+    # --------------------------------------------------------------------------
+    # T = TMP
+    declare -a TFOLDER=("" 
+                       ) # If nonblank, path must include /
+    
+    # T = TMP
+    declare -a TFILE=("Makefile.in")
 
-    patch -u "${TFILE[$i]:?}" -i "${TFILEP[$i]:?}" >${OUT1:?} \
-      2>${OUT2:?} || { error "${EC17:?} (${TFILE[$i]:?})"; return 1; }
-  done
+    #T = TMP, P = PATCH
+    declare -a TFILEP=("Makefile.in.patch" 
+                      )
+
+    # AL = Array Length
+    AL=${#TFOLDER[@]}
+
+    for (( i=0; i<${AL}; i++ ));
+    do
+      cdfolder "${PACKDIR:?}/${TFOLDER[$i]}" || return 1
+
+      cpfolder "${CHANGES:?}/${TFOLDER[$i]}${TFILEP[$i]:?}" . \
+        2>${OUT2:?} || return 1;
+
+      patch -u "${TFILE[$i]:?}" -i "${TFILEP[$i]:?}" >${OUT1:?} \
+        2>${OUT2:?} || { error "${EC17:?} (${TFILE[$i]:?})"; return 1; }
+    done
+
+  fi
   
   cdfolder "${ROOTDIR}" || return 1
   
   pbottom "INSTALLING ${PRINTNAME:?}" || return 1
   
-  # ---------------------------------------------------------------------------
+  # ----------------------------------------------------------------------------
 
   unset_all || return 1
   
