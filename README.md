@@ -52,6 +52,10 @@ Many HPC environments provide the [Anaconda installer](https://www.anaconda.com)
 
 If the user is not working on an HPC environment that offers Anaconda or [Miniconda](https://docs.anaconda.com/miniconda/), check the Appendix [FAQ: What if there is no Conda? Miniconda installation](#overview_miniconda).
 
+:interrobang: What is a core package?
+
+Core packages include compilers and numerical libraries (e.g., GSL and FFTW) that we need but will certainly never develop/modify. 
+
 **Step :two:**: Install `git-lfs` when loading the Conda cocoa environment for the first time.
 
     git-lfs install
@@ -76,15 +80,15 @@ Type the following command instead to clone the repository.
         
     source setup_cocoa.sh
 
-This script downloads and decompresses all likelihoods and packages set on `set_installation_options.sh` (e.g., CAMB and Class Boltzmann codes, Planck likelihood, and Polychord sampler).
+This script downloads and decompresses external modules set on `set_installation_options.sh` (e.g., CAMB and Class).
 
 **Step :three:**: Run the script `compile_cocoa.sh` by typing 
 
     source compile_cocoa.sh
     
-This command compiles likelihoods and packages set on `set_installation_options.sh` (e.g., CAMB and Class Boltzmann codes, Planck likelihood, and Polychord sampler). 
+This script compiles external modules set on `set_installation_options.sh` (e.g., CAMB and Class). 
 
-:interrobang:  FAQ: What if the user wants to fine-tune the installed libraries, likelihoods, and external modules? 
+:interrobang:  FAQ: What if the user wants to fine-tune the installed external modules? 
 
 Cocoa ignores a few external modules (code and likelihoods) by default, but users may find them helpful/useful. In this case, check the many available options on the shell script `set_installation_options.sh` and rerun steps :two: and :three:. 
 
@@ -128,7 +132,7 @@ MCMC:
 
     mpirun -n 4 --oversubscribe --mca btl vader,tcp,self --bind-to core:overload-allowed --rank-by core --map-by numa:pe=${OMP_NUM_THREADS} cobaya-run ./projects/lsst_y1/EXAMPLE_MCMC1.yaml -f
 
-:interrobang: FAQ: What if the user wants to download a Cosmolike project not provided by default or wants to download the provided projects on development mode?
+:interrobang: FAQ: What if the user wants to download a project not provided by default (or intends to clone existing projects in development mode)?
 
 Check the Appendix [FAQ: How to download and run Cosmolike projects?](running_cosmolike_projects).
 
