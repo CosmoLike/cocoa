@@ -191,7 +191,9 @@ export EC33="UNLINK SYMLINK FAILED"
 
 export EC34="SYMLINK CREATION FAILED"
 
-export EC35="ECHO >> FILE FIALED"
+export EC35="ECHO >> FILE FAILED"
+
+export EC36="FILE DOES NOT EXIST"
 
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
