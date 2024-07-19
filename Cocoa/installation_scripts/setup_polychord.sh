@@ -98,15 +98,18 @@ if [ -z "${IGNORE_POLYCHORD_SAMPLER_CODE}" ]; then
   # We patch the files below so they use the right compilers ------------------
   # ---------------------------------------------------------------------------
   declare -a TFOLDER=("" 
+                      ""
                       "" ) # If nonblank, path must include /
   
   # T = TMP
   declare -a TFILE=("Makefile" 
-                    "setup.py")
+                    "setup.py"
+                    "Makefile_gnu")
 
   #T = TMP, P = PATCH
   declare -a TFILEP=("Makefile.patch" 
-                     "setup.patch")
+                     "setup.patch"
+                     "Makefile_gnu.patch")
 
   # AL = Array Length
   AL=${#TFOLDER[@]}
