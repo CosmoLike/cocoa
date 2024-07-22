@@ -3,30 +3,46 @@
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
 
-# parenthesis = run in a subshell  
-( source "${ROOTDIR:?}/installation_scripts/flags_check.sh" ) || return 1;
+if [ -z "${ROOTDIR}" ]; then
+  ROOTDIR=$(pwd -P) || { echo -e \
+  "\033[0;31m       ERROR ENV VARIABLE ROOTDIR NOT DEFINED \033[0m"; return 1; }
+fi
+
+fail_script_msg2 () {
+  local MSG="\033[0;31m        (${1:-"empty arg"}) we cannot run \e[3m"
+  local MSG2="\033[0m"
+  echo -e "${MSG} ${2:-"empty arg"} ${MSG2}"
+}
+
+warning_script_msg2 () {
+  local MSG="\033[0;31m        (${1:-"empty arg"}) warning: \e[3m"
+  local MSG2="\033[0m"
+  echo -e "${MSG} ${2:-"empty arg"} ${MSG2}"
+}
 
 unset_env_vars () {
-  unset -v TMP TMP2 FILE FOLDER
-  unset -v 
-  cdroot || return 1;
+  unset -v TMP TMP2 FILE FOLDER 
+  cd "${ROOTDIR:?}" 2>"/dev/null" || { echo -e \
+    "\033[0;31m\t\t CD ROOTDIR (${ROOTDIR}) FAILED \033[0m"; return 1; }
 }
 
 unset_env_funcs () {
-  unset -f cdfolder cpfolder cpfile error warning
-  unset -f unset_env_funcs 
-  cdroot || return 1;
+  unset -f cdfolder cpfolder cpfile error warning fail_script_msg2
+  unset -f unset_env_funcs warning_script_msg2
+  cd "${ROOTDIR:?}" 2>"/dev/null" || { echo -e \
+    "\033[0;31m\t\t CD ROOTDIR (${ROOTDIR}) FAILED \033[0m"; return 1; }
 }
 
 unset_all () {
   unset_env_vars
   unset_env_funcs
   unset -f unset_all
-  cdroot || return 1;
+  cd "${ROOTDIR:?}" 2>"/dev/null" || { echo -e \
+    "\033[0;31m\t\t CD ROOTDIR (${ROOTDIR}) FAILED \033[0m"; return 1; }
 }
 
 error () {
-  fail_script_msg "$(basename "${BASH_SOURCE[0]}")" "${1}"
+  fail_script_msg2 "$(basename "${BASH_SOURCE[0]}")" "${1}"
   unset_all || return 1
 }
 
@@ -35,13 +51,9 @@ cdfolder() {
 }
 
 warning () {
-  warning_script_msg "$(basename "${BASH_SOURCE[0]}")" "${1}"
+  warning_script_msg2 "$(basename "${BASH_SOURCE[0]}")" "${1}"
 }
 
-cpfile() {
-  cp -r "${1:?}" "${2:?}" \
-    2>"/dev/null" || { error "CP FILE ${1} on ${2}"; return 1; }
-}
 
 # ---------------------------------------------------------------------------
 # ---------------------------------------------------------------------------

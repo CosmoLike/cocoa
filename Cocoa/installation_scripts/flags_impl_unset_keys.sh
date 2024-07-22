@@ -47,12 +47,12 @@ unset -v GIT SPTURL HOLIURL PL2020_URL ARPACK_LIBRARY_LOC
 unset -v PLK_DIR LPVS CAMSPEC_URL ACTDR6_LL PL_LWL BASECL PL2020 CBURL
 unset -v POLY_NAME CAMB_NAME CAMB_GIT_COMMIT cocoa_HDF5_build
 unset -v OUT1 OUT2 MNT URL CHANGES CLASS_NAME fail_sdf PACKDIR
-unset -f pfail fail_comp_act fail_clact
+unset -f pfail fail_comp_act fail_clact error_start_cocoa error_stop_cocoa
 unset -v INT_LIB INT_INCL INT_INCL_PY INT_INCL_PY_SP
 unset -f ptop ptop2 ptop3 pbottom pbottom3 pbottom2
 unset -v URL CHANGES ECODEF CLNAME PACKDIR TFOLDER TFILE TFILEP AL
-unset -f cdfolder cpfolder error cpfile
-unset -f unset_env_funcs unset_env_vars unset_all
+unset -f cdfolder cpfolder error cpfile cdroot wgetact1 wgetact2 gitact1 gitact2
+unset -f unset_env_funcs unset_env_vars unset_all error wgetact gitact 
 unset -v EC1 EC2 EC3 EC4 EC5 EC6 EC7 EC8 EC9 EC10 EC11 EC12
 unset -v EC13 EC14 EC15 EC16 EC17 EC18 EC19 EC20 EC21 EC22 EC23 EC24
 unset -v EC25 EC26 EC27 EC28 EC29 EC30 EC31 EC32 EC33 EC34 EC35 EC36 EC37 EC38

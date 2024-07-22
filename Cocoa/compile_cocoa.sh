@@ -25,7 +25,8 @@ source start_cocoa.sh || { error_cem "start_cocoa.sh"; return 1; }
 
 ptop2 'COMPILING EXTERNAL MODULES' || return 1
 
-declare -a TSCRIPTS=("compile_hyrec2.sh"
+declare -a TSCRIPTS=("compile_core_packages.sh"
+                     "compile_hyrec2.sh"
                      "compile_cosmorec.sh"
                      "compile_camb.sh"
                      "compile_mgcamb.sh"

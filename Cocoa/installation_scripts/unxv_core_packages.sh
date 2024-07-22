@@ -108,10 +108,24 @@ if [ -z "${SKIP_DECOMM_CORE_PACKAGES}" ]; then
       cdfolder "${CCIL:?}" || return 1
       
       # ------------------------------------------------------------------------
+      # check if file exists
+      if [ ! -f "${TFILES[$i]}.xz" ]; then
+        error "${EC36:?} (${TFILES[$i]}.xz)"; return 1;
+      fi
+      
+      # ------------------------------------------------------------------------
       # delete existing folder w/ same name as the folder inside the xz file 
       
-      FOLDER=$(tar tf "${TFILES[$i]}.xz" | cut -f1 -d"/" | sort | uniq )
-      
+      # check if the command that defines FOLDER fails
+      tar tf "${TFILES[$i]}.xz" | cut -f1 -d"/" | sort | uniq \
+        >${OUT1:?} 2>${OUT2:?} || 
+        { error "${EC25:?} (${TFILES[$i]}.xz)"; return 1; }
+
+      FOLDER=$(tar tf "${TFILES[$i]}.xz" | cut -f1 -d"/" | sort | uniq)
+      if [ -z ${FOLDER:?} ]; then
+        error "${EC25:?} (${TFILES[$i]}.xz)"; return 1;
+      fi
+
       rm -rf ${FOLDER:?}
 
       # ------------------------------------------------------------------------

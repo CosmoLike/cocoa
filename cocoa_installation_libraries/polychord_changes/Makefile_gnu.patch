@@ -1,0 +1,32 @@
+--- Makefile_gnu	2024-07-18 22:17:54.866140000 -0500
++++ Makefile_gnu2	2024-07-18 22:18:04.974303000 -0500
+@@ -1,11 +1,11 @@
+ ifeq ($(MPI),1)
+-FC = mpifort
+-CC = mpicc
+-CXX = mpicxx
++FC = $(MPI_FORTRAN_COMPILER)
++CC = $(MPI_CC_COMPILER)
++CXX = $(MPI_CXX_COMPILER)
+ else
+-FC = gfortran
+-CC = gcc
+-CXX = g++
++FC = $(FORTRAN_COMPILER)
++CC = $(C_COMPILER)
++CXX = $(CXX_COMPILER)
+ endif
+ 
+ LD = $(FC)
+@@ -23,10 +23,7 @@
+ CXXFLAGS += -std=c++11 -fPIC
+ CFLAGS += -fPIC
+ 
+-# This is now needed for gfortran versions >=10
+-ifeq "$(shell expr `gfortran -dumpversion | cut -f1 -d.` \>= 10)" "1"
+-	FFLAGS += -fallow-argument-mismatch
+-endif
++FFLAGS += -fallow-argument-mismatch
+ 
+ # clang uses a different libstdc++ than GCC
+ ifneq (,$(findstring clang,$(shell '$(CXX)' -v 2>&1)))

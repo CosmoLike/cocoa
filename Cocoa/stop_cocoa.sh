@@ -4,7 +4,8 @@
 # ----------------------------------------------------------------------------
 
 if [ -z "${ROOTDIR}" ]; then
-  source start_cocoa.sh || { pfail 'ROOTDIR'; return 1; }
+  ROOTDIR=$(pwd -P) || { echo -e \
+  "\033[0;31m       ERROR ENV VARIABLE ROOTDIR NOT DEFINED \033[0m"; return 1; }
 fi
   
 if command -v deactivate &> "/dev/null"; then
@@ -29,6 +30,8 @@ if [ $? -ne 0 ]; then
   error_stop_cocoa 'script installation_scripts/flags_recover_old.sh'; 
   return 1;
 fi
+
+
 
 # ----------------------------------------------------------------------------
 # ----------------------------- PLANCK LIKELIHOOD ----------------------------
@@ -66,6 +69,7 @@ fi
 # ----------------------------------------------------------------------------
 # ------------------------ STOP EXTERNAL PROJECTS ---------------------------
 # ----------------------------------------------------------------------------
+
 
 if [ -n "${ROOTDIR}" ]; then
   source "${ROOTDIR:?}/installation_scripts/stop_all_projects.sh"

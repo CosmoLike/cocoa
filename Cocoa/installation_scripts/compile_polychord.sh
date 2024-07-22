@@ -65,8 +65,11 @@ if [ -z "${IGNORE_POLYCHORD_SAMPLER_CODE}" ]; then
   PLIB="${ROOTDIR:?}/.local/lib/python${PYTHON_VERSION:?}/site-packages"
 
   rm -rf "${PLIB:?}"/pypolychord-*
-  rm -rf "${PACKDIR:?}/lib/*.a"
-  rm -rf "${PACKDIR:?}/lib/*.so"
+  rm -rf "${PACKDIR:?}/lib"/*.a
+  rm -rf "${PACKDIR:?}/lib"/*.so
+  rm -rf "${PACKDIR:?}/build"
+  rm -rf "${PACKDIR:?}/dist"
+  rm -rf "${PACKDIR:?}/pypolychord.egg-info"
   
   # ---------------------------------------------------------------------------
 
