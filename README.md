@@ -37,7 +37,13 @@ This readme file presents basic and advanced instructions for installing all [Co
 **Step :one:**: Download the file `cocoapy39.yml` yml file, create the cocoa environment, activate it, and create symbolic links that will give better names for the GNU compilers.
 
     conda env create --name cocoa --file=cocoapy39.yml
+
+and
+
     conda activate cocoa
+
+and
+
     ln -s "${CONDA_PREFIX}"/bin/x86_64-conda_cos6-linux-gnu-gcc "${CONDA_PREFIX}"/bin/gcc
     ln -s "${CONDA_PREFIX}"/bin/x86_64-conda_cos6-linux-gnu-g++ "${CONDA_PREFIX}"/bin/g++
     ln -s "${CONDA_PREFIX}"/bin/x86_64-conda_cos6-linux-gnu-gfortran "${CONDA_PREFIX}"/bin/gfortran
@@ -67,6 +73,9 @@ Below, we assume the user loaded the Cocoa conda environment via the `conda acti
 **Step :one:**: Download Cocoa's latest release and go to the `cocoa` main folder,
 
     "${CONDA_PREFIX}"/bin/git clone --depth 1 https://github.com/CosmoLike/cocoa.git --branch v4.0-beta6 cocoa
+
+and
+
     cd ./cocoa/Cocoa
 
 :interrobang:  What if the user wants to clone the repository in development mode?
