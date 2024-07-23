@@ -7,13 +7,17 @@ if [ -n "${ROOTDIR}" ]; then
   source stop_cocoa.sh
 fi
 
-error_cip () {
+error_cip_msg () {
   local FILE="$(basename "${BASH_SOURCE[0]}")"
   local MSG="\033[0;31m\t\t (${FILE}) we cannot run "
   local MSG2="\033[0m"
   echo -e "${MSG}${1:?}${MSG2}" 2>"/dev/null"
+}
+
+error_cip () {
+  error_cip_msg {1:?}
   unset -v SCRIPTS
-  unset -f error_cip
+  unset -f error_cip error_cip_msg
   cd $(pwd -P) 2>"/dev/null"
   source stop_cocoa 2>"/dev/null"
   return 1
@@ -78,6 +82,8 @@ fi
 # ------------------------------ INSTALL PACKAGES ------------------------------
 # ------------------------------------------------------------------------------
 
+declare -i ERRORCODE=0
+
 declare -a SCRIPTS=("setup_core_packages.sh" 
                      "unxv_core_packages.sh" 
                      "unxv_sn.sh"
@@ -91,7 +97,6 @@ declare -a SCRIPTS=("setup_core_packages.sh"
                      "unxv_camspec.sh"
                      "unxv_lipop.sh"
                      "setup_cobaya.sh"
-                     "setup_fgspectra.sh"
                      "setup_simons_observatory.sh"
                      "setup_camspec.sh"
                      "setup_lipop.sh"
@@ -113,17 +118,32 @@ do
 
   ( source "${ROOTDIR:?}/installation_scripts/${SCRIPTS[$i]}" )
   if [ $? -ne 0 ]; then
-    error_cip "script ${SCRIPTS[$i]}"; return 1
-    return 1
+    if [ -n "${COCOA_OUTPUT_VERBOSE}" ]; then
+      error_cip "script ${SCRIPTS[$i]}"
+      return 1
+    else
+      error_cip_msg "script ${SCRIPTS[$i]}"
+      ERRORCODE=1
+    fi
   fi
 
 done
 
+# ----------------------------------------------------------------------------
+# ----------------------------------------------------------------------------
+# ----------------------------------------------------------------------------
+
+if [ ${ERRORCODE:?} -ne 0 ]; then
+  error_cip "setup_cocoa.py"; return 1
+  return 1
+fi
+
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
 
-unset -f error_cip
+unset -v ERRORCODE SCRIPTS
+unset -f error_cip error_cip_msg
 
 pbottom2 'SETUP COCOA INSTALLATION PACKAGES'
 

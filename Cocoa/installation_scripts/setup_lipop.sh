@@ -88,7 +88,7 @@ if [ -z "${IGNORE_LIPOP_LIKELIHOOD_CODE}" ]; then
     "${CURL:?}" -fsS "${URL:?}" >${OUT1:?} \
       2>${OUT2:?} || { error "${EC27:?} (URL=${URL:?})"; return 1; }
 
-    "${GIT:?}" clone "${URL:?}" "tmp" \
+    "${GIT:?}" clone --depth ${GIT_CLONE_MAXIMUM_DEPTH:?} "${URL:?}" "tmp" \
       >${OUT1:?} 2>${OUT2:?} || { error "${EC15:?}"; return 1; }
   
     cdfolder "${COB:?}/${COBLIKE}/tmp" || return 1;
