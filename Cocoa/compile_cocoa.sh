@@ -47,8 +47,10 @@ do
 
   ( source "${ROOTDIR:?}/installation_scripts/${TSCRIPTS[$i]}" )
   if [ $? -ne 0 ]; then
-    error_cem "script ${TSCRIPTS[$i]}"; return 1
-    return 1
+    if [ -n "${COCOA_OUTPUT_VERBOSE}" ]; then
+      error_cem "script ${TSCRIPTS[$i]}"; return 1
+      return 1
+    fi
   fi
 
 done
