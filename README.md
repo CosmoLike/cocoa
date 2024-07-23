@@ -15,7 +15,7 @@
     8. [FAQ: How to the Slow/Fast decomposition on MCMC chains with Cosmolike? Manual Blocking](#manual_blocking_cosmolike)
     9. [FAQ: How to switch Cocoa's adopted CAMB/CLASS/Polychord? (external readme)](Cocoa/external_modules/code)
     10. [FAQ: How to download modern CMB data? (external readme)](Cocoa/external_modules/data)
-    11. [FAQ: How to set the environment for projects involving Machine Learning emulators?](#ml_emulators)
+    11. [FAQ: How to set the environment for Machine Learning projects?](#ml_emulators)
     12. [FAQ: How can users improve their Bash/C/C++ knowledge to develop Cocoa/Cosmolike?](#lectnotes)
     13. [Warning about Weak Lensing YAML files in Cobaya](#appendix_example_runs)
     14. [FAQ: How to install Cocoa without conda](#required_packages_cache)
@@ -520,7 +520,7 @@ After installation, users must source the conda configuration file, as shown bel
 
 The Cosmolike Weak Lensing pipelines contain parameters with different speed hierarchies. For example, Cosmolike execution time is reduced by approximately 50% when fixing the cosmological parameters. When varying only multiplicative shear calibration, Cosmolike execution time is reduced by two orders of magnitude. 
 
-Cobaya cannot automatically handle parameters associated with the same likelihood that have different speed hierarchies. Luckily, we can manually impose the speed hierarchy in Cobaya using the `blocking:` option. The only drawback of this method is that parameters of all adopted likelihoods, not only the ones required by Cosmolike, must be manually specified.
+Cobaya cannot automatically handle parameters associated with the same likelihood with different speed hierarchies. Luckily, we can manually impose the speed hierarchy in Cobaya using the `blocking:` option. The only drawback of this method is that parameters of all adopted likelihoods, not only the ones required by Cosmolike, must be manually specified.
 
 In addition to that, Cosmolike can't cache the intermediate products of the last two evaluations, which is necessary to exploit optimizations associated with dragging (`drag: True`). However, Cosmolike caches the intermediate products of the previous evaluation, thereby enabling the user to take advantage of the slow/fast decomposition of parameters in Cobaya's main MCMC sampler. 
 
@@ -586,7 +586,7 @@ Below, we provide an example YAML configuration for an MCMC chain with DES 3x2pt
                 burn_in: 0
                 Rminus1_single_split: 4
 
-### :interrobang: FAQ: How do users set the environment for projects involving Machine Learning emulators? <a name="ml_emulators"></a>
+### :interrobang: FAQ: How do users set the environment for Machine Learning projects? <a name="ml_emulators"></a>
 
 Commenting out the environmental flags shown below, located at *set_installation_options* script, will enable the installation of machine-learning-related libraries via pip.  
 
