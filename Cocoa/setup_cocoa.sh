@@ -15,7 +15,7 @@ error_cip_msg () {
 }
 
 error_cip () {
-  error_cip_msg {1:?}
+  error_cip_msg ${1:?}
   unset -v SCRIPTS
   unset -f error_cip error_cip_msg
   cd $(pwd -P) 2>"/dev/null"
