@@ -60,7 +60,7 @@ If the user is not working on an HPC environment that offers Anaconda or [Minico
 
 :interrobang:  What if the user wants to install Python 3.10?
 
-We provide the YML file `cocoapy310.yml` so users can work with either on Python 3.10. Users must also modify the following flag on `set_installation_options.sh` before proceeding further on Cocoa installation.
+We provide the YML file `cocoapy310.yml` so users can work on Python 3.10. Users must also modify the following flag on `set_installation_options.sh` before proceeding further with the Cocoa installation.
 
       [Adapted from Cocoa/set_installation_options.sh shell script] 
       
