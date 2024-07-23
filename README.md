@@ -6,7 +6,7 @@
 5. [Creating Cosmolike projects (external readme)](Cocoa/projects/)
 6. [Appendix](#appendix)
     1. [Credits](#appendix_proper_credits)
-    2. [Additional Installation Notes For Experts and Developers](#additional_notes)
+    2. [Additional Installation Notes](#additional_notes)
     3. [FAQ: What if installation or compilation goes wrong?](#running_wrong)
     4. [FAQ: How to compile the Boltzmann, CosmoLike, and Likelihood codes separately](#appendix_compile_separately)
     5. [FAQ: How to run cocoa on a laptop? The docker image named *whovian-cocoa*](#appendix_jupyter_whovian)
@@ -189,9 +189,9 @@ The following is not an exhaustive list of the codes we use/download/adopt
   
 Following best practices, Cocoa scripts download most external modules from their original repositories, including Cobaya, CAMB, Class, Polychord, ACT-DR6, HiLLiPoP, and Lollipop. We do not want to discourage people from cloning code from their original repositories. Our repository has included a few likelihoods as compressed [xz file format](https://tukaani.org/xz/format.html). The work of those authors is extraordinary, and users **must cite them** appropriately.
 
-### Additional Installation Notes for experts and developers <a name="additional_notes"></a>
+### Additional Installation Notes <a name="additional_notes"></a>
 
-:books::books: *Installation of Cocoa's core packages via Conda* :books::books:
+:books::books: *Installation of core packages via Conda* :books::books:
  
 - For those working on projects that utilize machine-learning-based emulators, the Appendix [Setting-up conda environment for Machine Learning emulators](#ml_emulators) provides additional commands for installing the necessary packages.
 
@@ -199,7 +199,7 @@ Following best practices, Cocoa scripts download most external modules from thei
 
 The conda installation method should be chosen in the overwhelming majority of cases. In the rare instances in which the user cannot work with Conda, refer to the Appendix [Installation of Cocoa's core packages without Conda](#required_packages_cache), as it contains instructions for a much slower (and prone to errors) but conda-independent installation method.
 
-:books::books: *Installation of Cobaya base code* :books::books:
+:books::books: *Installation and Compilation of external modules* :books::books:
 
 - If the user wants to compile only a subset of these packages, refer to the appendix [Compiling Boltzmann, CosmoLike, and Likelihood codes separately](#appendix_compile_separately).
           
@@ -212,7 +212,7 @@ The conda installation method should be chosen in the overwhelming majority of c
 
 This behavior enables users to work on multiple instances of Cocoa simultaneously, similar to what was possible with [CosmoMC](https://github.com/cmbant/CosmoMC).
 
-:books::books: *Running Cobaya Examples* :books::books:
+:books::books: *Running Examples* :books::books:
 
 - We offer the flag `COCOA_RUN_EVALUATE` as an alias (syntax-sugar) for `mpirun -n 1 --oversubscribe --mca btl vader,tcp,self --bind-to core:overload-allowed --rank-by core --map-by numa:pe=4 cobaya-run`.
 
@@ -222,7 +222,7 @@ This behavior enables users to work on multiple instances of Cocoa simultaneousl
 
 - Additional explanations about our `mpirun` flags: Why the `--bind-to core:overload-allowed --map-by numa:pe=${OMP_NUM_THREADS}` flag? This flag enables efficient hybrid MPI + OpenMP runs on NUMA architecture.
 
-- Additional explanations about the functioning `start_cocoa.sh`/`stop_cocoa.sh` scripts, starting from why we created two separate shell environments, `(cocoa)` and `(.local)`? Users should be able to manipulate multiple Cocoa instances seamlessly, which is particularly useful when running chains in one instance while experimenting with code development in another. Consistency of the environment across all Cocoa instances is crucial, and the `start_cocoa.sh`/`stop_cocoa.sh` scripts handle the loading and unloading of environmental path variables.
+- Additional explanations about the functioning `start_cocoa.sh`/`stop_cocoa.sh` scripts: why two separate shell environments, `(cocoa)` and `(.local)`? Users should be able to manipulate multiple Cocoa instances seamlessly, which is particularly useful when running chains in one instance while experimenting with code development in another. Consistency of the environment across all Cocoa instances is crucial, and the `start_cocoa.sh`/`stop_cocoa.sh` scripts handle the loading and unloading of environmental path variables.
 
 ### :interrobang: FAQ: What if installation or compilation goes wrong? <a name="running_wrong"></a>
 
