@@ -143,8 +143,6 @@ void* arg, double a, double b, double* error, int niter)
 }
 */
 
-
-
 double int_gsl_integrate_high_precision(double (*func)(double, void*),
 void* arg, double a, double b, double* error, int niter)
 {
@@ -207,7 +205,8 @@ int niter __attribute__((unused)))
   return res;
 }
 
-void error(char *s) {
+void error(char *s) 
+{
   printf("error:%s\n ", s);
   exit(1);
 }
@@ -260,31 +259,45 @@ const double upper)
 }
 
 
-int line_count(char *filename) {
-  FILE *n;
-  n = fopen(filename, "r");
-  if (!n) {
-    printf("line_count: %s not found!\nEXIT!\n", filename);
+int line_count(char* filename) 
+{  
+  FILE* ein = fopen(filename, "r");
+  if (ein == NULL) 
+  {
+    log_fatal("File not open (%s)", filename);
     exit(1);
   }
-  int ch = 0, prev = 0, number_of_lines = 0;
+  
+  int ch = 0; 
+  int prev = 0; 
+  int nlines = 0;
 
-  do {
+  do 
+  {
     prev = ch;
-    ch = fgetc(n);
+    
+    ch = fgetc(ein);
+    
     if (ch == '\n')
-      number_of_lines++;
+    {
+      nlines++;
+    }
   } while (ch != EOF);
-  fclose(n);
-  // last line might not end with \n, but if previous character does, last line
-  // is empty
-  if (ch != '\n' && prev != '\n' && number_of_lines != 0)
-    number_of_lines++;
-  return number_of_lines;
+  
+  fclose(ein);
+  
+  // last line might not end with "\n". 
+  // However, if previous character does, then the last line is empty
+  if (ch != '\n' && prev != '\n' && nlines != 0) 
+  {
+    nlines++;
+  }
+  return nlines;
 }
 
 double interpol_fitslope(double *f, int n, double a, double b, double dx,
-                         double x, double lower) {
+                         double x, double lower) 
+{
   double r;
   int i, fitrange;
   if (x < a) {
@@ -315,7 +328,8 @@ double interpol_fitslope(double *f, int n, double a, double b, double dx,
  * polation in the second argument				*
  * ============================================================ */
 double interpol2d(double **f, int nx, double ax, double bx, double dx, double x,
-int ny, double ay, double by, double dy, double y, double lower, double upper) {
+int ny, double ay, double by, double dy, double y, double lower, double upper) 
+{
   double t, dt, s, ds;
   int i, j;
   if (x < ax) {
@@ -350,7 +364,8 @@ int ny, double ay, double by, double dy, double y, double lower, double upper) {
 }
 
 double interpol2d_fitslope(double **f, int nx, double ax, double bx, double dx,
-double x, int ny, double ay, double by, double dy, double y, double lower) {
+double x, int ny, double ay, double by, double dy, double y, double lower) 
+{
   double t, dt, s, ds, upper;
   int i, j, fitrange;
   if (x < ax) {
@@ -394,7 +409,8 @@ double x, int ny, double ay, double by, double dy, double y, double lower) {
 }
 
 void hankel_kernel_FT(double x, fftw_complex *res, double *arg,
-int argc __attribute__((unused))) {
+int argc __attribute__((unused))) 
+{
   fftw_complex a1, a2, g1, g2;
 
   // arguments for complex gamma
@@ -420,16 +436,19 @@ int argc __attribute__((unused))) {
   (*res)[1] = pref * (si * d1 + co * d2);
 }
 
-void cdgamma(fftw_complex x, fftw_complex *res) {
+void cdgamma(fftw_complex x, fftw_complex *res) 
+{
   double xr, xi, wr, wi, ur, ui, vr, vi, yr, yi, t;
 
-  xr = (double)x[0];
-  xi = (double)x[1];
+  xr = (double) x[0];
+  xi = (double) x[1];
 
-  if (xr < 0) {
+  if (xr < 0) 
+  {
     wr = 1 - xr;
     wi = -xi;
-  } else {
+  } else 
+  {
     wr = xr;
     wi = xi;
   }
@@ -485,26 +504,26 @@ void cdgamma(fftw_complex x, fftw_complex *res) {
 
 void hankel_kernel_FT_3D(double x, fftw_complex *res, double *arg, int argc __attribute__((unused)))
 {
-      fftw_complex a1, a2, g1, g2;
-      double           mu;
-      double        mod, xln2, si, co, d1, d2, pref, q;
-      q = arg[0];
-      mu = arg[1];
+  fftw_complex a1, a2, g1, g2;
+  double           mu;
+  double        mod, xln2, si, co, d1, d2, pref, q;
+  q = arg[0];
+  mu = arg[1];
 
-      /* arguments for complex gamma */
-      a1[0] = 0.5*(1.0+mu+q);
-      a2[0] = 0.5*(1.0+mu-q);
-      a1[1] = 0.5*x; a2[1]=-a1[1];
-      cdgamma(a1,&g1);
-      cdgamma(a2,&g2);
-      xln2 = x*M_LN2;
-      si   = sin(xln2);
-      co   = cos(xln2);
-      d1   = g1[0]*g2[0]+g1[1]*g2[1]; /* Re */
-      d2   = g1[1]*g2[0]-g1[0]*g2[1]; /* Im */
-      mod  = g2[0]*g2[0]+g2[1]*g2[1];
-      pref = exp(M_LN2*q)/mod;
+  /* arguments for complex gamma */
+  a1[0] = 0.5*(1.0+mu+q);
+  a2[0] = 0.5*(1.0+mu-q);
+  a1[1] = 0.5*x; a2[1]=-a1[1];
+  cdgamma(a1,&g1);
+  cdgamma(a2,&g2);
+  xln2 = x*M_LN2;
+  si   = sin(xln2);
+  co   = cos(xln2);
+  d1   = g1[0]*g2[0]+g1[1]*g2[1]; /* Re */
+  d2   = g1[1]*g2[0]-g1[0]*g2[1]; /* Im */
+  mod  = g2[0]*g2[0]+g2[1]*g2[1];
+  pref = exp(M_LN2*q)/mod;
 
-      (*res)[0] = pref*(co*d1-si*d2);
-      (*res)[1] = pref*(si*d1+co*d2);
+  (*res)[0] = pref*(co*d1-si*d2);
+  (*res)[1] = pref*(si*d1+co*d2);
 }
