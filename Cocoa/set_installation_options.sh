@@ -54,14 +54,12 @@ export IGNORE_VELOCILEPTORS_CODE=1
 export IGNORE_SIMONS_OBSERVATORY_LIKELIHOOD_CODE=1
 export IGNORE_CAMSPEC_LIKELIHOOD_CODE=1
 export IGNORE_LIPOP_LIKELIHOOD_CODE=1
-export IGNORE_FGSPECTRA_CODE=1
 export IGNORE_HYREC_CODE=1
 export IGNORE_COSMOREC_CODE=1
 export IGNORE_MGCAMB_CODE=1
 
-#Warning: Many cosmolike projects (including LSST-Y1) require euclid emulator
+#Many cosmolike projects (including LSST-Y1) require euclid emulator
 #export IGNORE_EUCLID_EMULATOR_V2_CODE=1
-
 #export IGNORE_COSMOLIKE_LSSTY1_CODE=1
 
 # ------------------------------------------------------------------------------
@@ -69,11 +67,9 @@ export IGNORE_MGCAMB_CODE=1
 # overwrite = delete existing PACKAGE folder and install it again --------------
 # ------------------------------------------------------------------------------
 #export OVERWRITE_EXISTING_COSMOLIKE_CODE=1
-
 export OVERWRITE_EXISTING_CAMB_CODE=1
 export OVERWRITE_EXISTING_MGCAMB_CODE=1
 export OVERWRITE_EXISTING_CLASS_CODE=1
-
 export OVERWRITE_EXISTING_HYREC_CODE=1
 export OVERWRITE_EXISTING_COSMOREC_CODE=1
 
@@ -132,6 +128,11 @@ unset IGNORE_CPP_ARMA_INSTALLATION
 # ------------------------------------------------------------------------------
 # PACKAGE URL AND VERSIONS. CHANGES IN THE COMMIT ID MAY BREAK COCOA -----------
 # ------------------------------------------------------------------------------
+
+# This flag saves a lot of time when running setup_cocoa.py 
+# Why? Some git repos can be hundreds of MegaBytes (Class is 500 MegaBytes) 
+# But, this can create problem if GIT_COMMIT < LAST COMMIT - GIT_MAXIMUM_DEPTH
+export GIT_CLONE_MAXIMUM_DEPTH=40
 
 export COBAYA_URL="https://github.com/CobayaSampler/cobaya.git"
 export COBAYA_GIT_COMMIT="2636ea9ed399c35c5d276de1acb15aaafbcab10c"

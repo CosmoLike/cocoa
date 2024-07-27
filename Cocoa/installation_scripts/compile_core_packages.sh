@@ -53,7 +53,7 @@ if [ -z "${IGNORE_CORE_INSTALLATION}" ]; then
   # ----------------------------------------------------------------------------
   # ----------------------------------------------------------------------------
 
-  ptop2 'COMPILE_CORE_PACKAGES' || return 1
+  #ptop2 'COMPILE_CORE_PACKAGES' || return 1
 
   unset_env_vars || return 1; 
 
@@ -999,7 +999,7 @@ if [ -z "${IGNORE_CORE_INSTALLATION}" ]; then
 
   unset_all || return 1; 
 
-  pbottom2 'COMPILE_CORE_PACKAGES' || return 1
+  #pbottom2 'COMPILE_CORE_PACKAGES' || return 1
 
 fi
 

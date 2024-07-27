@@ -93,7 +93,8 @@ if [ -z "${IGNORE_MGCAMB_CODE}" ]; then
     "${CURL:?}" -fsS "${URL:?}" \
       >${OUT1:?} 2>${OUT2:?} || { error "${EC27:?} (URL=${URL:?})"; return 1; }
 
-    "${GIT:?}" clone "${URL:?}" --recursive "${TFOLDER:?}" \
+    "${GIT:?}" clone "${URL:?}" --depth ${GIT_CLONE_MAXIMUM_DEPTH:?} \
+      --recursive "${TFOLDER:?}" \
       >${OUT1:?} 2>${OUT2:?} || { error "${EC15:?}"; return 1; }
     
     cdfolder "${ECODEF:?}/${TFOLDER:?}" || { cdroot; return 1; }

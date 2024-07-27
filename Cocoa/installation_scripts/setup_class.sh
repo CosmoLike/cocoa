@@ -85,7 +85,8 @@ if [ -z "${IGNORE_CLASS_CODE}" ]; then
     "${CURL:?}" -fsS "${URL:?}" \
       >${OUT1:?} 2>${OUT2:?} || { error "${EC27:?} (URL=${URL:?})"; return 1; }
     
-    "${GIT:?}" clone "${URL:?}" --recursive "${FOLDER:?}" \
+    "${GIT:?}" clone --depth ${GIT_CLONE_MAXIMUM_DEPTH:?} "${URL:?}" \
+      --recursive "${FOLDER:?}" \
       >${OUT1:?} 2>${OUT2:?} || { error "${EC15:?}"; return 1; }
     
     cdfolder "${PACKDIR}" || return 1;
