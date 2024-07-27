@@ -388,7 +388,7 @@ double xi_pm_tomo(const int pm, const int nt, const int ni, const int nj, const 
                 (double) l, Z1NZ, Z2NZ, init_static_vars_only) : 0.0;
             }
           }          
-          
+
           #pragma omp parallel for collapse(2)
           for (int nz=0; nz<NSIZE; nz++) 
           {
@@ -471,7 +471,7 @@ double xi_pm_tomo(const int pm, const int nt, const int ni, const int nj, const 
                 use_linear_ps_limber, init_static_vars_only);
             }
           }
-          
+
           #pragma omp parallel for collapse(2)
           for (int nz=0; nz<NSIZE; nz++)
           {
@@ -713,7 +713,7 @@ double w_gammat_tomo(const int nt, const int ni, const int nj, const int limber)
           const int force_no_recompute = 1;    // TRUE
           const int ZLNZ = ZL(nz);
           const int ZSNZ = ZS(nz);
-          
+
           Cl[nz][l] = C_gs_tomo_limber((double) l, ZLNZ, ZSNZ, force_no_recompute);
         }
       }
@@ -2357,6 +2357,11 @@ const int init_static_vars_only)
   {
     log_fatal("amin < amax not true");
     exit(1);
+  }
+  if (w == 0)
+  {
+    const size_t nsize_integration = 120 + 50 * (like.high_def_integration);
+    w = gsl_integration_glfixed_table_alloc(nsize_integration);
   }
 
   double res;
