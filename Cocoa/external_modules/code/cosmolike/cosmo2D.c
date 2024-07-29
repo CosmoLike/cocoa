@@ -362,8 +362,8 @@ double xi_pm_tomo(const int pm, const int nt, const int ni, const int nj, const 
                             nuisance.A2_z[Z1NZ]   || nuisance.A2_z[Z2NZ]) ? 1 : 0;
             const int l = limits.LMIN_tab + 1;
 
-            double trash = C_ss_tomo_TATT_EE_limber((double) l, Z1NZ, Z2NZ, force_no_recompute); 
-            trash = (BM == 1) ? C_ss_tomo_TATT_BB_limber((double) l, Z1NZ, Z2NZ, 0) : 0.0;
+            double trash = C_ss_TATT_EE_tomo_limber((double) l, Z1NZ, Z2NZ, force_no_recompute); 
+            trash = (BM == 1) ? C_ss_TATT_BB_tomo_limber((double) l, Z1NZ, Z2NZ, 0) : 0.0;
           }
           #pragma GCC diagnostic pop
           #pragma GCC diagnostic pop
@@ -381,10 +381,10 @@ double xi_pm_tomo(const int pm, const int nt, const int ni, const int nj, const 
                               nuisance.b_ta_z[Z2NZ] || nuisance.A2_ia        ||
                               nuisance.A2_z[Z1NZ]   || nuisance.A2_z[Z2NZ]) ? 1 : 0;
 
-              Cl_EE[nz][l] = C_ss_tomo_TATT_EE_limber_nointerp(
+              Cl_EE[nz][l] = C_ss_TATT_EE_tomo_limber_nointerp(
                 (double) l, Z1NZ, Z2NZ, init_static_vars_only);
           
-              Cl_BB[nz][l] = (BM == 1) ? C_ss_tomo_TATT_BB_limber_nointerp(
+              Cl_BB[nz][l] = (BM == 1) ? C_ss_TATT_BB_tomo_limber_nointerp(
                 (double) l, Z1NZ, Z2NZ, init_static_vars_only) : 0.0;
             }
           }          
@@ -402,10 +402,10 @@ double xi_pm_tomo(const int pm, const int nt, const int ni, const int nj, const 
                               nuisance.b_ta_z[Z2NZ] || nuisance.A2_ia        ||
                               nuisance.A2_z[Z1NZ]   || nuisance.A2_z[Z2NZ]) ? 1 : 0;
 
-              Cl_EE[nz][l] = C_ss_tomo_TATT_EE_limber((double) l, Z1NZ, Z2NZ, force_no_recompute);
+              Cl_EE[nz][l] = C_ss_TATT_EE_tomo_limber((double) l, Z1NZ, Z2NZ, force_no_recompute);
           
               Cl_BB[nz][l] = (BM == 1) ? 
-                C_ss_tomo_TATT_BB_limber((double) l, Z1NZ, Z2NZ, force_no_recompute) : 0.0;
+                C_ss_TATT_BB_tomo_limber((double) l, Z1NZ, Z2NZ, force_no_recompute) : 0.0;
             }
           }
 
@@ -1460,7 +1460,7 @@ double b_TA(const double a, const double growfac_a, const int nz)
   return IA_BTA_Z1(a, growfac_a, nz);
 }
 
-double int_for_C_ss_tomo_TATT_EE_limber(double a, void* params)
+double int_for_C_ss_TATT_EE_tomo_limber(double a, void* params)
 {
   if (!(a>0) || !(a<1)) 
   {
@@ -1509,7 +1509,7 @@ double int_for_C_ss_tomo_TATT_EE_limber(double a, void* params)
   return res * chidchi.dchida / (fK * fK);
 }
 
-double int_for_C_ss_tomo_TATT_BB_limber(double a, void* params)
+double int_for_C_ss_TATT_BB_tomo_limber(double a, void* params)
 {
   if (!(a>0) || !(a<1)) 
   {
@@ -1546,7 +1546,7 @@ double int_for_C_ss_tomo_TATT_BB_limber(double a, void* params)
   return (ws_1 * ws_2 * tmp1) * chidchi.dchida / (fK * fK);
 }
 
-double C_ss_tomo_TATT_EE_limber_nointerp(double l, int ni, int nj, const int init_static_vars_only)
+double C_ss_TATT_EE_tomo_limber_nointerp(double l, int ni, int nj, const int init_static_vars_only)
 {
   static gsl_integration_glfixed_table* w = 0;
 
@@ -1567,19 +1567,19 @@ double C_ss_tomo_TATT_EE_limber_nointerp(double l, int ni, int nj, const int ini
       const size_t nsize_integration = 60 + 50 * (like.high_def_integration);
       w = gsl_integration_glfixed_table_alloc(nsize_integration);
     }
-    res = int_for_C_ss_tomo_TATT_EE_limber(amin, (void*) ar);
+    res = int_for_C_ss_TATT_EE_tomo_limber(amin, (void*) ar);
   } 
   else
   {
     gsl_function F;
     F.params = (void*) ar;
-    F.function = int_for_C_ss_tomo_TATT_EE_limber;
+    F.function = int_for_C_ss_TATT_EE_tomo_limber;
     res = gsl_integration_glfixed(&F, amin, amax, w);
   }
   return res;
 }
 
-double C_ss_tomo_TATT_BB_limber_nointerp(double l, int ni, int nj, const int init_static_vars_only)
+double C_ss_TATT_BB_tomo_limber_nointerp(double l, int ni, int nj, const int init_static_vars_only)
 {
   static gsl_integration_glfixed_table* w = 0;
 
@@ -1606,19 +1606,19 @@ double C_ss_tomo_TATT_BB_limber_nointerp(double l, int ni, int nj, const int ini
       const size_t nsize_integration = 60 + 50 * (like.high_def_integration);
       w = gsl_integration_glfixed_table_alloc(nsize_integration);
     }
-    res = int_for_C_ss_tomo_TATT_BB_limber(amin, (void*) ar);
+    res = int_for_C_ss_TATT_BB_tomo_limber(amin, (void*) ar);
   }
   else
   {
     gsl_function F;
     F.params = (void*) ar;
-    F.function = int_for_C_ss_tomo_TATT_BB_limber;
+    F.function = int_for_C_ss_TATT_BB_tomo_limber;
     res = gsl_integration_glfixed(&F, amin, amax, w);
   }
   return res;
 }
 
-double C_ss_tomo_TATT_EE_limber(const double l, const int ni, const int nj, 
+double C_ss_TATT_EE_tomo_limber(const double l, const int ni, const int nj, 
 const int force_no_recompute)
 {
   static cosmopara C;
@@ -1677,7 +1677,7 @@ const int force_no_recompute)
         const int Z1NZ = Z1(k);
         const int Z2NZ = Z2(k);
         const double lnl = lnlmin;
-        double init = C_ss_tomo_TATT_EE_limber_nointerp(exp(lnl), Z1NZ, Z2NZ, 1);
+        double init = C_ss_TATT_EE_tomo_limber_nointerp(exp(lnl), Z1NZ, Z2NZ, 1);
       }
       #pragma GCC diagnostic pop
       
@@ -1689,7 +1689,7 @@ const int force_no_recompute)
           const int Z1NZ = Z1(k);
           const int Z2NZ = Z2(k);
           const double lnl = lnlmin + i*dlnl;
-          table[k][i] = C_ss_tomo_TATT_EE_limber_nointerp(exp(lnl), Z1NZ, Z2NZ, 0);
+          table[k][i] = C_ss_TATT_EE_tomo_limber_nointerp(exp(lnl), Z1NZ, Z2NZ, 0);
         }
       }
       
@@ -1700,7 +1700,7 @@ const int force_no_recompute)
         const int Z2NZ = Z2(k);
         sig[k] = 1.;
         osc[k] = 0;
-        if (C_ss_tomo_TATT_EE_limber_nointerp(500., Z1NZ, Z2NZ, 0) < 0)
+        if (C_ss_TATT_EE_tomo_limber_nointerp(500., Z1NZ, Z2NZ, 0) < 0)
         {
           sig[k] = -1.;
         }
@@ -1769,7 +1769,7 @@ const int force_no_recompute)
   return isnan(f1) ? 0.0 : f1;
 }
 
-double C_ss_tomo_TATT_BB_limber(const double l, const int ni, const int nj, 
+double C_ss_TATT_BB_tomo_limber(const double l, const int ni, const int nj, 
 const int force_no_recompute)
 {
   static cosmopara C;
@@ -1828,7 +1828,7 @@ const int force_no_recompute)
         const int Z1NZ = Z1(k);
         const int Z2NZ = Z2(k);
         const double lnl = lnlmin;
-        double init = C_ss_tomo_TATT_BB_limber_nointerp(exp(lnl), Z1NZ, Z2NZ, 1);
+        double init = C_ss_TATT_BB_tomo_limber_nointerp(exp(lnl), Z1NZ, Z2NZ, 1);
       }
       #pragma GCC diagnostic pop
       
@@ -1840,7 +1840,7 @@ const int force_no_recompute)
           const int Z1NZ = Z1(k);
           const int Z2NZ = Z2(k);
           const double lnl = lnlmin + i*dlnl;
-          table[k][i] = C_ss_tomo_TATT_BB_limber_nointerp(exp(lnl), Z1NZ, Z2NZ, 0);
+          table[k][i] = C_ss_TATT_BB_tomo_limber_nointerp(exp(lnl), Z1NZ, Z2NZ, 0);
         }
       }
       
@@ -1851,7 +1851,7 @@ const int force_no_recompute)
         const int Z2NZ = Z2(k);
         sig[k] = 1.;
         osc[k] = 0;
-        if (C_ss_tomo_TATT_BB_limber_nointerp(500., Z1NZ, Z2NZ, 0) < 0)
+        if (C_ss_TATT_BB_tomo_limber_nointerp(500., Z1NZ, Z2NZ, 0) < 0)
         {
           sig[k] = -1.;
         }
@@ -2112,7 +2112,7 @@ double C_ss_tomo_limber(double l, int ni, int nj, const int force_no_recompute)
 // GS ANGULAR CORRELATION FUNCTION - TATT
 // -----------------------------------------------------------------------------
 
-double int_for_C_gs_tomo_limber_TATT(double a, void* params)
+double int_for_C_gs_TATT_tomo_limber(double a, void* params)
 {
   if (!(a>0) || !(a<1)) 
   {
@@ -2372,7 +2372,7 @@ const int init_static_vars_only)
     {
       case IA_MODEL_TATT:
       {
-        res = int_for_C_gs_tomo_limber_TATT(amin, (void*) ar);
+        res = int_for_C_gs_TATT_tomo_limber(amin, (void*) ar);
         break;
       }
       case IA_MODEL_NLA:
@@ -2420,7 +2420,7 @@ const int init_static_vars_only)
           log_fatal("use linear power spectrum option not implemented with TATT");
           exit(1);
         }
-        F.function = int_for_C_gs_tomo_limber_TATT;
+        F.function = int_for_C_gs_TATT_tomo_limber;
         break;
       }
       default:
@@ -3995,7 +3995,7 @@ double C_ys_tomo_limber(double l, int ni, const int force_no_recompute)
 // ---------------------------------------------------------------------------
 // ---------------------------------------------------------------------------
 
-double int_for_C_ky_limber(double a, void*params)
+double int_for_C_ky_limber(double a, void* params)
 {
   if (!(a>0) || !(a<1)) 
   {

@@ -357,6 +357,8 @@ class BaryonScenario
 
     int nscenarios() const;
 
+    void set_scenarios(std::string filename, std::string scenarios);
+
     void set_scenarios(std::string scenarios);
 
     std::string get_scenario(const int i) const;
