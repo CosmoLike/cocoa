@@ -159,7 +159,7 @@ class IP
 
     int get_ndata() const;
 
-    arma::Col<uword> get_mask() const;
+    arma::Col<int> get_mask() const;
 
     Vector get_dv_masked() const;
 
@@ -192,13 +192,13 @@ class IP
     
     std::string data_filename_;
     
-    arma::Col<uword> mask_;
+    arma::Col<int> mask_;
 
     Vector data_masked_;
     
     Matrix cov_masked_;
 
-    arma::Col<uword> index_sqzd_;
+    arma::Col<int> index_sqzd_;
     
     Matrix inv_cov_masked_;
     

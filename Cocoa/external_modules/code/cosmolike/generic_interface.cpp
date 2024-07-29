@@ -41,6 +41,8 @@ namespace py = pybind11;
 #include "cosmolike/redshift_spline.h"
 #include "cosmolike/structs.h"
 
+#include "cosmolike/generic_interface.hpp"
+
 using Vector = arma::Col<double>;
 using STLVector = std::vector<double>;
 using Matrix = arma::Mat<double>;
@@ -135,11 +137,13 @@ void cpp_initial_setup()
     nuisance.b_ta_z[i] = 0.0;
   }
 
+  /*
   // reset clustering photo-z stretch parameters
   for (int i = 0; i < MAX_SIZE_ARRAYS; i++)
   {
     nuisance.stretch_zphot_clustering[i] = 1.0;
   }
+  */
 
   // nonlimber ?
   // nonLimber: 0; Limber: 1;
@@ -923,14 +927,16 @@ void cpp_init_baryons_contamination(
     } 
     else
     { // Second, check whether there's deliminator - for simulation ID
-      if (which_baryonic_sim.rfind('-') != std::string::npos)
+      std::size_t pos = which_baryonic_sim.rfind('-');
+
+      if (pos != std::string::npos)
       { // Found - deliminator, parse simulation name and sim ID
-        sim_name = which_baryonic_sim.substr(0, found1);
-        sim_id = std::stoi(which_baryonic_sim.substr(found1 + 1));
+        sim_name = which_baryonic_sim.substr(0, pos);
+        
+        sim_id = std::stoi(which_baryonic_sim.substr(pos + 1));
       } 
       else
       { // Not found - deliminator, only parse simulation name, sim ID = 1
-        
         sim_name = which_baryonic_sim;
         
         sim_id = 1;
@@ -1766,9 +1772,9 @@ double cpp_compute_baryon_ratio(const double log10k, const double a)
   return PkRatio_baryons(KNL, a);
 }
 
-// ordering = (1,2,3,4,5,6) => Cosmic Shear, ggl, gg, gk, sk, kk
-// ordering = (2,1,3,4,5,6) => ggl, Cosmic Shear, gg, gk, sk, kk ...
-STLVector cpp_compute_data_vector_6x2pt_masked(arma::Col<uword>::fixed<6> ordering)
+// order = (1,2,3,4,5,6) => Cosmic Shear, ggl, gg, gk, sk, kk
+// order = (2,1,3,4,5,6) => ggl, Cosmic Shear, gg, gk, sk, kk ...
+STLVector cpp_compute_data_vector_6x2pt_masked(arma::Col<int>::fixed<6> order)
 { 
   spdlog::debug("\x1b[90m{}\x1b[0m: Begins", "compute_data_vector_masked");
 
@@ -1908,9 +1914,9 @@ STLVector cpp_compute_data_vector_6x2pt_masked(arma::Col<uword>::fixed<6> orderi
     exit(1);
   }
 
-  arma::Col<uword>::fixed<6> indices = arma::sort_index(ordering);
+  arma::Col<int>::fixed<6> indices = arma::sort_index(order);
 
-  arma::Col<uword>::fixed<6> sizes =
+  arma::Col<int>::fixed<6> sizes =
     {
       2*like.Ntheta*tomo.shear_Npowerspectra,
       like.Ntheta*tomo.ggl_Npowerspectra,
@@ -1929,7 +1935,7 @@ STLVector cpp_compute_data_vector_6x2pt_masked(arma::Col<uword>::fixed<6> orderi
     exit(1);
   }
 
-  arma::Col<uword>::fixed<6> start = {0,0,0,0,0,0};
+  arma::Col<int>::fixed<6> start = {0,0,0,0,0,0};
 
   for(int i=0; i<6; i++)
   {
@@ -2100,9 +2106,9 @@ STLVector cpp_compute_data_vector_6x2pt_masked(arma::Col<uword>::fixed<6> orderi
   return data_vector;
 }
 
-// ordering = (1,2,3) => Cosmic Shear, ggl, gg
-// ordering = (2,1,3) => ggl, Cosmic Shear, gg  ...
-STLVector cpp_compute_data_vector_3x2pt_masked(arma::Col<uword>::fixed<3> ordering)
+// order = (1,2,3) => Cosmic Shear, ggl, gg
+// order = (2,1,3) => ggl, Cosmic Shear, gg  ...
+STLVector cpp_compute_data_vector_3x2pt_masked(arma::Col<int>::fixed<3> order)
 { 
   spdlog::debug("\x1b[90m{}\x1b[0m: Begins", "compute_data_vector_masked");
 
@@ -2136,9 +2142,9 @@ STLVector cpp_compute_data_vector_3x2pt_masked(arma::Col<uword>::fixed<3> orderi
     exit(1);
   }
 
-  arma::Col<uword>::fixed<3> indices = arma::sort_index(ordering);
+  arma::Col<int>::fixed<3> indices = arma::sort_index(order);
 
-  arma::Col<uword>::fixed<3> sizes =
+  arma::Col<int>::fixed<3> sizes =
     {
       2*like.Ntheta*tomo.shear_Npowerspectra,
       like.Ntheta*tomo.ggl_Npowerspectra,
@@ -2154,7 +2160,7 @@ STLVector cpp_compute_data_vector_3x2pt_masked(arma::Col<uword>::fixed<3> orderi
     exit(1);
   }
 
-  arma::Col<uword>::fixed<3> start = {0,0,0};
+  arma::Col<int>::fixed<3> start = {0,0,0};
 
   for(int i=0; i<3; i++)
   {
@@ -2382,7 +2388,7 @@ void IP::set_data(std::string DATA)
 // ---------------------------------------------------------------------------
 // ---------------------------------------------------------------------------
 
-void IP::set_mask(std::string MASK, arma::Col<uword>::fixed<6> ordering)
+void IP::set_mask(std::string MASK, arma::Col<int>::fixed<6> order)
 {
   if (!(like.Ndata>0))
   {
@@ -2414,9 +2420,9 @@ void IP::set_mask(std::string MASK, arma::Col<uword>::fixed<6> ordering)
     }
   }
 
-  arma::Col<uword>::fixed<6> indices = arma::sort_index(ordering);
+  arma::Col<int>::fixed<6> indices = arma::sort_index(order);
 
-  arma::Col<uword>::fixed<6> sizes =
+  arma::Col<int>::fixed<6> sizes =
     {
       2*like.Ntheta*tomo.shear_Npowerspectra,
       like.Ntheta*tomo.ggl_Npowerspectra,
@@ -2426,7 +2432,7 @@ void IP::set_mask(std::string MASK, arma::Col<uword>::fixed<6> ordering)
       like.is_cmb_bandpower  == 1 ? like.Nbp : like.Ncl 
     }
 
-  arma::Col<uword>::fixed<6> start = {0,0,0,0,0,0};
+  arma::Col<int>::fixed<6> start = {0,0,0,0,0,0};
 
   for(int i=0; i<6; i++)
   {
@@ -2917,7 +2923,7 @@ int IP::get_ndata_sqzd() const
 // ---------------------------------------------------------------------------
 // ---------------------------------------------------------------------------
 
-arma::Col<uword> IP::get_mask() const
+arma::Col<int> IP::get_mask() const
 {
   return this->mask_;
 }

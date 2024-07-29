@@ -29,7 +29,9 @@
 namespace py = pybind11;
 
 // cosmolike
-#include "cosmo2D.h"
+#include "cosmolike/cosmo2D.h"
+#include "cosmolike/redshift_spline.h"
+#include "cosmolike/structs.h"
 
 using Vector = arma::Col<double>;
 using Matrix = arma::Mat<double>;
@@ -68,7 +70,7 @@ static int nell()
     }
     default:
     {
-      log_fatal("like.IA_MODEL = %d not supported", like.IA_MODEL);
+      spdlog::critical("like.IA_MODEL = {} not supported", like.IA_MODEL);
       exit(1);
     }
   }
@@ -88,14 +90,20 @@ py::tuple xi_pm_tomo_cpp()
 {
   if (tomo.shear_Nbin == 0)
   {
-    spdlog::critical("\x1b[90m{}\x1b[0m: {} = 0 is invalid",
-      "compute_data_vector_masked", "shear_Nbin");
+    spdlog::critical(
+      "\x1b[90m{}\x1b[0m: {} = 0 is invalid",
+      "compute_data_vector_masked", 
+      "shear_Nbin"
+    );
     exit(1);
   }
   if (like.Ntheta == 0)
   {
-    spdlog::critical("\x1b[90m{}\x1b[0m: {} = 0 is invalid",
-      "compute_data_vector_masked", "Ntheta");
+    spdlog::critical(
+      "\x1b[90m{}\x1b[0m: {} = 0 is invalid",
+      "compute_data_vector_masked", 
+      "Ntheta"
+    );
     exit(1);
   }
  
@@ -124,20 +132,31 @@ Vector w_gammat_tomo_cpp()
 {
   if (tomo.shear_Nbin == 0)
   {
-    spdlog::critical("\x1b[90m{}\x1b[0m: {} = 0 is invalid",
-      "compute_data_vector_masked", "shear_Nbin");
+    spdlog::critical(
+      "\x1b[90m{}\x1b[0m: {} = 0 is invalid",
+      "compute_data_vector_masked", 
+      "shear_Nbin"
+    );
     exit(1);
   }
+
   if (tomo.clustering_Nbin == 0)
   {
-    spdlog::critical("\x1b[90m{}\x1b[0m: {} = 0 is invalid",
-      "compute_data_vector_masked", "clustering_Nbin");
+    spdlog::critical(
+      "\x1b[90m{}\x1b[0m: {} = 0 is invalid",
+      "compute_data_vector_masked", 
+      "clustering_Nbin"
+    );
     exit(1);
   }
+
   if (like.Ntheta == 0)
   {
-    spdlog::critical("\x1b[90m{}\x1b[0m: {} = 0 is invalid",
-      "compute_data_vector_masked", "Ntheta");
+    spdlog::critical(
+      "\x1b[90m{}\x1b[0m: {} = 0 is invalid",
+      "compute_data_vector_masked", 
+      "Ntheta"
+    );
     exit(1);
   }
   
@@ -162,14 +181,21 @@ Vector w_gg_tomo_cpp()
 {
   if (tomo.clustering_Nbin == 0)
   {
-    spdlog::critical("\x1b[90m{}\x1b[0m: {} = 0 is invalid",
-      "compute_data_vector_masked", "clustering_Nbin");
+    spdlog::critical(
+      "\x1b[90m{}\x1b[0m: {} = 0 is invalid",
+      "compute_data_vector_masked", 
+      "clustering_Nbin"
+    );
     exit(1);
   }
+
   if (like.Ntheta == 0)
   {
-    spdlog::critical("\x1b[90m{}\x1b[0m: {} = 0 is invalid",
-      "compute_data_vector_masked", "Ntheta");
+    spdlog::critical(
+      "\x1b[90m{}\x1b[0m: {} = 0 is invalid",
+      "compute_data_vector_masked", 
+      "Ntheta"
+    );
     exit(1);
   }
 
@@ -194,14 +220,21 @@ Vector w_gk_tomo_cpp()
 {
   if (tomo.clustering_Nbin == 0)
   {
-    spdlog::critical("\x1b[90m{}\x1b[0m: {} = 0 is invalid",
-      "compute_data_vector_masked", "clustering_Nbin");
+    spdlog::critical(
+      "\x1b[90m{}\x1b[0m: {} = 0 is invalid",
+      "compute_data_vector_masked", 
+      "clustering_Nbin"
+    );
     exit(1);
   }
+
   if (like.Ntheta == 0)
   {
-    spdlog::critical("\x1b[90m{}\x1b[0m: {} = 0 is invalid",
-      "compute_data_vector_masked", "Ntheta");
+    spdlog::critical(
+      "\x1b[90m{}\x1b[0m: {} = 0 is invalid",
+      "compute_data_vector_masked", 
+      "Ntheta"
+    );
     exit(1);
   }
 
@@ -226,14 +259,20 @@ Vector w_ks_tomo_cpp()
 {
   if (tomo.shear_Nbin == 0)
   {
-    spdlog::critical("\x1b[90m{}\x1b[0m: {} = 0 is invalid",
-      "compute_data_vector_masked", "clustering_Nbin");
+    spdlog::critical(
+      "\x1b[90m{}\x1b[0m: {} = 0 is invalid",
+      "compute_data_vector_masked", 
+      "clustering_Nbin"
+    );
     exit(1);
   }
   if (like.Ntheta == 0)
   {
-    spdlog::critical("\x1b[90m{}\x1b[0m: {} = 0 is invalid",
-      "compute_data_vector_masked", "Ntheta");
+    spdlog::critical(
+      "\x1b[90m{}\x1b[0m: {} = 0 is invalid",
+      "compute_data_vector_masked", 
+      "Ntheta"
+    );
     exit(1);
   }
 
@@ -287,7 +326,7 @@ Matrix C_ss_NTATT_tomo_limber_cpp(const Vector l)
   #pragma omp parallel for collapse(2)
   for (int nz=0; nz<tomo.shear_Npowerspectra; nz++)
   {
-    for (int i=0; i<l.n_elem; i++)
+    for (int i=0; i<static_cast<int>(l.n_elem); i++)
     {
       const int ni = Z1(nz);
       const int nj = Z2(nz);
@@ -304,8 +343,8 @@ Matrix C_ss_NTATT_tomo_limber_cpp(const Vector l)
 py::tuple C_ss_TATT_tomo_limber_cpp(const double l, const int ni, const int nj)
 {
   return py::make_tuple(
-    C_ss_tomo_TATT_EE_limber_nointerp(l, ni, nj, 0, 0),
-    C_ss_tomo_TATT_EE_limber_nointerp(l, ni, nj, 0, 0)
+    C_ss_tomo_TATT_EE_limber_nointerp(l, ni, nj, 0),
+    C_ss_tomo_TATT_BB_limber_nointerp(l, ni, nj, 0) 
   );
 }
 
@@ -317,30 +356,29 @@ py::tuple C_ss_TATT_tomo_limber_cpp(const Vector l)
     exit(1);
   }
   
-  const int NSIZE = tomo.shear_Npowerspectra;
   Matrix EE(l.n_elem, tomo.shear_Npowerspectra);
   Matrix BB(l.n_elem, tomo.shear_Npowerspectra);
 
   #pragma GCC diagnostic push
   #pragma GCC diagnostic ignored "-Wunused-variable"
-  for (int nz=0; nz<NSIZE; nz++)
+  for (int nz=0; nz<tomo.shear_Npowerspectra; nz++)
   { // init static variables
     const int ni = Z1(nz);
     const int nj = Z2(nz);
-    double trash = C_ss_tomo_TATT_EE_limber_nointerp(l(0), ni, nj, 0, 1);
-    trash = C_ss_tomo_TATT_BB_limber_nointerp(l(0), ni, nj, 0, 1);
+    double trash = C_ss_tomo_TATT_EE_limber_nointerp(l(0), ni, nj, 1);
+    trash = C_ss_tomo_TATT_BB_limber_nointerp(l(0), ni, nj, 1);
   }
   #pragma GCC diagnostic pop
 
   #pragma omp parallel for collapse(2)
-  for (int nz=0; nz<NSIZE; nz++)
+  for (int nz=0; nz<tomo.shear_Npowerspectra; nz++)
   {
-    for (int i=0; i<l.n_elem; i++)
+    for (int i=0; i<static_cast<int>(l.n_elem); i++)
     {
       const int ni = Z1(nz);
       const int nj = Z2(nz);
-      EE(i, nz) = C_ss_tomo_TATT_EE_limber_nointerp(l(i), ni, nj, 0, 0);
-      BB(i, nz) = C_ss_tomo_TATT_BB_limber_nointerp(l(i), ni, nj, 0, 0);
+      EE(i, nz) = C_ss_tomo_TATT_EE_limber_nointerp(l(i), ni, nj, 0);
+      BB(i, nz) = C_ss_tomo_TATT_BB_limber_nointerp(l(i), ni, nj, 0);
     }
   }
 
@@ -424,7 +462,7 @@ Matrix C_gs_tomo_limber_cpp(const Vector l)
   #pragma omp parallel for collapse(2)
   for (int nz=0; nz<tomo.ggl_Npowerspectra; nz++)
   {
-    for (int i=0; i<l.n_elem; i++)
+    for (int i=0; i<static_cast<int>(l.n_elem); i++)
     {
       result(i, nz) = C_gs_tomo_limber_nointerp(l(i), ZL(nz), ZS(nz), 0, 0);
     }
@@ -464,7 +502,7 @@ Matrix C_gg_tomo_limber_cpp(const Vector l)
   #pragma omp parallel for collapse(2)
   for (int nz=0; nz<tomo.clustering_Nbin; nz++)
   {
-    for (int i=0; i<l.n_elem; i++)
+    for (int i=0; i<static_cast<int>(l.n_elem); i++)
     {
       result(i, nz) = C_gg_tomo_limber_nointerp(l(i), nz, nz, 0, 0);
     }
@@ -485,7 +523,7 @@ Matrix C_gg_tomo_cpp(const Vector l)
 
   for (int nz=0; nz<tomo.clustering_Nbin; nz++)
   {
-    arma::Col<uword> idxs = arma::find(l < limits.LMAX_NOLIMBER);
+    arma::uvec idxs = arma::find(l < limits.LMAX_NOLIMBER);
 
     if (idxs.n_elem > 0)
     {
@@ -493,10 +531,10 @@ Matrix C_gg_tomo_cpp(const Vector l)
       const double tolerance = 0.0075;    
       const double dev = 10. * tolerance;
 
-      Vector Cl(limits.LMAX_NOLIMBER+1)
+      Vector Cl(limits.LMAX_NOLIMBER+1);
       C_cl_tomo(1, nz, nz, Cl.memptr(), dev, tolerance);
       
-      for (int i=0; i<idxs.n_elem; i++)
+      for (int i=0; i<static_cast<int>(idxs.n_elem); i++)
       {
         result(idxs(i), nz) = Cl(static_cast<int>(l(idxs(i))+1e-13));
       }
@@ -537,7 +575,7 @@ Matrix C_gk_tomo_limber_cpp(const Vector l)
   #pragma omp parallel for collapse(2)
   for (int nz=0; nz<tomo.clustering_Nbin; nz++)
   {
-    for (int i=0; i<l.n_elem; i++)
+    for (int i=0; i<static_cast<int>(l.n_elem); i++)
     {
       result(i, nz) = C_gk_tomo_limber_nointerp(l(i), nz, 0, 0);
     }
@@ -576,7 +614,7 @@ Matrix C_ks_tomo_limber_cpp(const Vector l)
   #pragma omp parallel for collapse(2)
   for (int nz=0; nz<tomo.shear_Nbin; nz++)
   {
-    for (int i=0; i<l.n_elem; i++)
+    for (int i=0; i<static_cast<int>(l.n_elem); i++)
     {
       result(i, nz) = C_ks_tomo_limber_nointerp(l(i), nz, 0, 0);
     }
@@ -615,7 +653,7 @@ Matrix C_gy_tomo_limber_cpp(const Vector l)
   #pragma omp parallel for collapse(2)
   for (int nz=0; nz<tomo.clustering_Nbin; nz++)
   {
-    for (int i=0; i<l.n_elem; i++)
+    for (int i=0; i<static_cast<int>(l.n_elem); i++)
     {
       const int ni = nz;
       result(i, nz) = C_gy_tomo_limber_nointerp(l(i), nz, 0, 0);
@@ -708,7 +746,7 @@ double C_ky_limber_cpp(const double l)
   return C_ky_limber_nointerp(l, 0, 0);
 }
 
-Vector C_ky_limber_nointerp(const Vector l)
+Vector C_ky_limber_nointerp_cpp(const Vector l)
 {
   if (!(l.n_elem > 0))
   {
@@ -743,7 +781,7 @@ double C_yy_limber_cpp(double l)
   return C_yy_limber_nointerp(l, 0, 0);
 }
 
-Vector C_yy_limber_nointerp(const Vector l)
+Vector C_yy_limber_nointerp_cpp(const Vector l)
 {
   if (!(l.n_elem > 0))
   {
