@@ -1,10 +1,9 @@
-#define ARMA_DONT_USE_WRAPPER
 #include <carma.h>
 #include <armadillo>
 #include <map>
 
-#ifndef __COSMOLIKE_INTERFACE_HPP
-#define __COSMOLIKE_INTERFACE_HPP
+#ifndef __COSMOLIKE_GENERIC_INTERFACE_HPP
+#define __COSMOLIKE_GENERIC_INTERFACE_HPP
 
 namespace cosmolike_interface
 {
@@ -16,39 +15,7 @@ namespace cosmolike_interface
 // ---------------------------------------------------------------------------
 // ---------------------------------------------------------------------------
 // ---------------------------------------------------------------------------
-// GLOBAL FUNCTIONS
-// ---------------------------------------------------------------------------
-// ---------------------------------------------------------------------------
-// ---------------------------------------------------------------------------
-// ---------------------------------------------------------------------------
-// ---------------------------------------------------------------------------
-// ---------------------------------------------------------------------------
-// ---------------------------------------------------------------------------
-
-arma::Mat<double> read_table(const std::string file_name);
-
-std::vector<double> convert_arma_col_to_stl_vector(arma::Col<double> in);
-
-// https://en.cppreference.com/w/cpp/types/numeric_limits/epsilon
-template<class T>
-typename std::enable_if<!std::numeric_limits<T>::is_integer, bool>::type 
-almost_equal(T x, T y, int ulp = 100)
-{
-  // the machine epsilon has to be scaled to the magnitude of the values used
-  // and multiplied by the desired precision in ULPs (units in the last place)
-  return std::fabs(x-y) <= std::numeric_limits<T>::epsilon() * std::fabs(x+y) * ulp
-      // unless the result is subnormal
-      || std::fabs(x-y) < std::numeric_limits<T>::min();
-}
-
-// ---------------------------------------------------------------------------
-// ---------------------------------------------------------------------------
-// ---------------------------------------------------------------------------
-// ---------------------------------------------------------------------------
-// ---------------------------------------------------------------------------
-// ---------------------------------------------------------------------------
-// ---------------------------------------------------------------------------
-// cia::RandomNumber
+// Class RandomNumber
 // ---------------------------------------------------------------------------
 // ---------------------------------------------------------------------------
 // ---------------------------------------------------------------------------
@@ -131,8 +98,12 @@ class IP
 
     void set_data(std::string DATA);
 
-    void set_mask(std::string MASK);
-    
+    // 3x2pt
+    void set_mask(std::string MASK, arma::Col<int>::fixed<3> order);
+
+    // 6x2pt
+    void set_mask(std::string MASK, arma::Col<int>::fixed<6> order);
+
     void set_inv_cov(std::string COV);
 
     //void set_PMmarg(std::string U_PMmarg_file);
@@ -151,7 +122,7 @@ class IP
 
     double get_inv_cov_masked_sqzd(const int ci, const int cj) const;
 
-    Vector expand_ndata_from_masked_sqzd(Vector input) const;
+    Vector expand_data_vector_from_sqzd(Vector input) const;
 
     double get_chi2(STLVector datavector) const;
 
@@ -176,6 +147,7 @@ class IP
     Matrix get_inv_cov_masked_sqzd() const;
 
   private:
+
     bool is_mask_set_ = false;
     
     bool is_data_set_ = false;
@@ -219,7 +191,7 @@ class IP
 // ---------------------------------------------------------------------------
 // ---------------------------------------------------------------------------
 // ---------------------------------------------------------------------------
-// Class IPCMB (InterfaceProducts - CMB)
+// Class IPCMB (InterfaceProducts - 6x2pt (includes CMB lensing))
 // ---------------------------------------------------------------------------
 // ---------------------------------------------------------------------------
 // ---------------------------------------------------------------------------
@@ -229,7 +201,7 @@ class IP
 // ---------------------------------------------------------------------------
 
 class IPCMB
-{ // InterfaceProducts: Singleton Class that holds a data vector, covariance, maps...
+{
   using Vector = arma::Col<double>;
   using STLVector = std::vector<double>;
   using Matrix = arma::Mat<double>;
@@ -357,11 +329,13 @@ class BaryonScenario
 
     int nscenarios() const;
 
-    void set_scenarios(std::string filename, std::string scenarios);
+    void set_scenarios(std::string data_sims, std::string scenarios);
 
     void set_scenarios(std::string scenarios);
 
     std::string get_scenario(const int i) const;
+
+    std::tuple<std::string,int> select_baryons_sim(const std::string scenario);
 
   private:
     int nscenarios_;
@@ -370,6 +344,331 @@ class BaryonScenario
     BaryonScenario() = default;
     BaryonScenario(BaryonScenario const&) = delete;
 };
+
+// ---------------------------------------------------------------------------
+// ---------------------------------------------------------------------------
+// ---------------------------------------------------------------------------
+// ---------------------------------------------------------------------------
+// ---------------------------------------------------------------------------
+// ---------------------------------------------------------------------------
+// ---------------------------------------------------------------------------
+// GLOBAL FUNCTIONS
+// ---------------------------------------------------------------------------
+// ---------------------------------------------------------------------------
+// ---------------------------------------------------------------------------
+// ---------------------------------------------------------------------------
+// ---------------------------------------------------------------------------
+// ---------------------------------------------------------------------------
+// ---------------------------------------------------------------------------
+
+arma::Mat<double> read_table(const std::string file_name);
+
+// https://en.cppreference.com/w/cpp/types/numeric_limits/epsilon
+template<class T>
+typename std::enable_if<!std::numeric_limits<T>::is_integer, bool>::type 
+almost_equal(T x, T y, int ulp = 100)
+{
+  // the machine epsilon has to be scaled to the magnitude of the values used
+  // and multiplied by the desired precision in ULPs (units in the last place)
+  return std::fabs(x-y) <= std::numeric_limits<T>::epsilon() * std::fabs(x+y) * ulp
+      // unless the result is subnormal
+      || std::fabs(x-y) < std::numeric_limits<T>::min();
+}
+
+// ---------------------------------------------------------------------------
+// ---------------------------------------------------------------------------
+// ---------------------------------------------------------------------------
+// ---------------------------------------------------------------------------
+// ---------------------------------------------------------------------------
+// ---------------------------------------------------------------------------
+// ---------------------------------------------------------------------------
+// GLOBAL INIT FUNCTIONS
+// ---------------------------------------------------------------------------
+// ---------------------------------------------------------------------------
+// ---------------------------------------------------------------------------
+// ---------------------------------------------------------------------------
+// ---------------------------------------------------------------------------
+// ---------------------------------------------------------------------------
+// ---------------------------------------------------------------------------
+
+void init_accuracy_boost(
+    const double accuracy_boost, 
+    const double sampling_boost,
+    const int integration_accuracy
+  );
+
+void init_binning_fourier(
+    const int Ncl, 
+    const double lmin, 
+    const double lmax
+  );
+
+void init_binning_real(
+    const int Ntheta, 
+    const double theta_min_arcmin, 
+    const double theta_max_arcmin
+  );
+
+void init_binning_cmb_bandpower(
+    const int Nbp, 
+    const double lmin, 
+    const double lmax
+  );
+
+void init_cosmo_runmode(
+    const bool is_linear
+  );
+
+void init_cmb(
+    const double lmin_kappa_cmb, 
+    const double lmax_kappa_cmb, 
+    const double fwhm, 
+    std::string pixwin_file
+  );
+
+void init_cmb_bandpower(
+    const int is_cmb_bandpower, 
+    const int is_cmb_kkkk_cov_from_simulation, 
+    const double alpha
+  );
+
+void init_data_vector_size(
+    arma::Col<int>::fixed<6> exclude
+  );
+
+void init_data_vector_size_3x2pt(
+  );
+
+void init_data_vector_size_6x2pt(
+  );
+
+void init_distances(
+    std::vector<double> io_z, 
+    std::vector<double> io_chi
+  );
+
+void init_growth(
+    std::vector<double> io_z, 
+    std::vector<double> io_G
+  );
+
+void init_IA(
+    const int IA_MODEL, 
+    const int IA_REDSHIFT_EVOL
+  );
+
+void init_lens_sample(
+    std::string multihisto_file, 
+    const int Ntomo
+  );
+
+void init_linear_power_spectrum(
+    std::vector<double> io_log10k,
+    std::vector<double> io_z, 
+    std::vector<double> io_lnP
+  );
+
+void init_non_linear_power_spectrum(
+    std::vector<double> io_log10k,
+    std::vector<double> io_z, 
+    std::vector<double> io_lnP
+  );
+
+void init_probes(
+    std::string possible_probes
+  );
+
+void initial_setup(
+  );
+
+void init_source_sample(
+    std::string multihisto_file, 
+    const int Ntomo
+  );
+
+void init_survey(
+    std::string surveyname, 
+    double area, 
+    double sigma_e
+  );
+
+// ---------------------------------------------------------------------------
+// ---------------------------------------------------------------------------
+// ---------------------------------------------------------------------------
+// ---------------------------------------------------------------------------
+// ---------------------------------------------------------------------------
+// ---------------------------------------------------------------------------
+// ---------------------------------------------------------------------------
+// GLOBAL SET FUNCTIONS
+// ---------------------------------------------------------------------------
+// ---------------------------------------------------------------------------
+// ---------------------------------------------------------------------------
+// ---------------------------------------------------------------------------
+// ---------------------------------------------------------------------------
+// ---------------------------------------------------------------------------
+// ---------------------------------------------------------------------------
+
+void set_pm(
+    std::vector<double> PM
+  );
+
+void set_nuisance_bias(
+    std::vector<double> B1, 
+    std::vector<double> B2, 
+    std::vector<double> B_MAG
+  );
+
+void set_nuisance_clustering_photoz(
+    std::vector<double> CP
+  );
+
+void set_nuisance_magnification_bias(
+  std::vector<double> B_MAG
+  );
+
+void set_nuisance_nonlinear_bias(
+    std::vector<double> B1,
+    std::vector<double> B2
+  );
+
+void set_nuisance_shear_calib(
+    std::vector<double> M
+  );
+
+void set_nuisance_shear_photoz(
+    std::vector<double> SP
+  );
+
+// ---------------------------------------------------------------------------
+// ---------------------------------------------------------------------------
+// ---------------------------------------------------------------------------
+// ---------------------------------------------------------------------------
+// ---------------------------------------------------------------------------
+// ---------------------------------------------------------------------------
+// ---------------------------------------------------------------------------
+// ---------------------------------------------------------------------------
+// ---------------------------------------------------------------------------
+// ---------------------------------------------------------------------------
+// ---------------------------------------------------------------------------
+// ---------------------------------------------------------------------------
+// ---------------------------------------------------------------------------
+// ---------------------------------------------------------------------------
+// GET FUNCTIONS
+// ---------------------------------------------------------------------------
+// ---------------------------------------------------------------------------
+// ---------------------------------------------------------------------------
+// ---------------------------------------------------------------------------
+// ---------------------------------------------------------------------------
+// ---------------------------------------------------------------------------
+// ---------------------------------------------------------------------------
+// ---------------------------------------------------------------------------
+// ---------------------------------------------------------------------------
+// ---------------------------------------------------------------------------
+// ---------------------------------------------------------------------------
+// ---------------------------------------------------------------------------
+// ---------------------------------------------------------------------------
+// ---------------------------------------------------------------------------
+// ---------------------------------------------------------------------------
+
+int get_baryon_pca_nscenarios(
+  );
+
+std::string get_baryon_pca_scenario_name(
+    const int i
+  );
+
+std::vector<double> get_data_vector_expanded_from_sqzd(
+    std::vector<double> sqzd
+  );
+
+matrix get_cov_masked(
+  );
+
+matrix get_cov_masked_sqzd(
+  );
+
+int get_mask(
+    const int i
+  );
+
+int get_ndata(
+  );
+
+int get_ndata_sqzd(
+  );
+
+int get_index_sqzd(
+    const int i
+  );
+
+double get_baryon_power_spectrum_ratio(
+    const double log10k, 
+    const double a
+  );
+
+// ---------------------------------------------------------------------------
+// ---------------------------------------------------------------------------
+// ---------------------------------------------------------------------------
+// ---------------------------------------------------------------------------
+// ---------------------------------------------------------------------------
+// ---------------------------------------------------------------------------
+// ---------------------------------------------------------------------------
+// GLOBAL COMPUTE FUNCTIONS
+// ---------------------------------------------------------------------------
+// ---------------------------------------------------------------------------
+// ---------------------------------------------------------------------------
+// ---------------------------------------------------------------------------
+// ---------------------------------------------------------------------------
+// ---------------------------------------------------------------------------
+// ---------------------------------------------------------------------------
+
+double compute_chi2(
+    std::vector<double> datavector
+  );
+
+void compute_ss_real_masked(
+    std::vector<double>& data_vector, 
+    const int start
+  );
+
+void compute_gs_real_masked(
+    std::vector<double>& data_vector, 
+    const int start
+  );
+
+void compute_gg_real_masked(
+    std::vector<double>& data_vector, 
+    const int start
+  );
+
+void compute_gk_real_masked(
+    std::vector<double>& data_vector, 
+    const int start
+  );
+
+void compute_ks_real_masked(
+    std::vector<double>& data_vector, 
+    const int start
+  );
+
+void compute_kk_fourier_masked(
+    std::vector<double>& data_vector, 
+    const int start
+  );
+
+std::vector<double> compute_data_vector_6x2pt_masked(
+    arma::Col<int>::fixed<6> order
+  );
+
+std::vector<double> compute_data_vector_3x2pt_masked(
+    arma::Col<int>::fixed<3> order
+  );
+
+double compute_pm(
+      const int zl, 
+      const int zs, 
+      const double theta
+    );
 
 }  // namespace cosmolike_interface
 #endif // HEADER GUARD

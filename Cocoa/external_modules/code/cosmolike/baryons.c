@@ -1,16 +1,23 @@
 #include <assert.h>
-#include <gsl/gsl_interp2d.h>
 #include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <stdlib.h>
 
+// gsl lib
+#include <gsl/gsl_interp2d.h>
+
+// HDF5 lib
+#include <hdf5.h>
+
+// log lib
+#include "log.c/src/log.h"
+
+// Cosmolike lib
 #include "basics.h"
 #include "baryons.h"
 #include "structs.h"
-
-#include "log.c/src/log.h"
 
 static double zBins_TNG100[13] = {3.71,3.49,3.28,2.90,2.44,2.1,1.74,1.41,1.04,0.7,0.35,0.18,0.0};
 static double zBins_HzAGN[11] = {4.9285,4.249,3.7384,3.33445,3.00295,1.96615,1.02715,0.519195,0.22878,0.017865,0.0};
@@ -9539,10 +9546,14 @@ static double logPkR_BAHAMAS_T80[380][15] = {{-6.576971e-24,-6.576971e-24,0.0000
 // -----------------------------------------------------------------------------
 // -----------------------------------------------------------------------------
 
+// Why do we include nkbins as an argument?
+// answer: https://www.geeksforgeeks.org/pass-2d-array-parameter-c/
+
 void set_baryon_arrays_generic(
-    double* zbins, 
-    double* logkBins, 
-    double** logPkR
+    double zbins[],
+    double logkBins[],
+    int nkbins,
+    double logPkR[][nkbins]
   )
 {
   bary.a_bins = (double*) malloc(sizeof(double)*bary.Na_bins);
@@ -9631,27 +9642,172 @@ void set_baryon_arrays_generic(
 // -----------------------------------------------------------------------------
 // -----------------------------------------------------------------------------
 // -----------------------------------------------------------------------------
-// -----------------------------------------------------------------------------
 
-void init_baryons_from_hdf5_file(
-    const char* scenario, 
-    const char* lib_file, 
-    int sim_id
-  )
+void init_baryons(const char* sim)
 {
   reset_bary_struct();
   
-  hid_t file_id = H5Fopen(lib_file, H5F_ACC_RDONLY, H5P_DEFAULT);
+  if (strcmp(sim, "TNG100") == 0)
+  {
+    bary.Nk_bins = 325;
+    bary.Na_bins = 13;
+
+    set_baryon_arrays_generic(
+        zBins_TNG100, 
+        logkBins_TNG100, 
+        bary.Nk_bins,
+        logPkR_TNG100
+      );
+  }
+  else if (strcmp(sim, "HzAGN") == 0)
+  {
+    bary.Na_bins = 11;
+    bary.Nk_bins = 675;
+
+    set_baryon_arrays_generic(
+        zBins_HzAGN, 
+        logkBins_HzAGN, 
+        bary.Nk_bins,
+        logPkR_HzAGN
+      );
+  }
+  else if (strcmp(sim, "mb2") == 0)
+  {
+    bary.Na_bins = 21;
+    bary.Nk_bins = 350;
+
+    set_baryon_arrays_generic(
+        zBins_mb2, 
+        logkBins_mb2,
+        bary.Nk_bins, 
+        logPkR_mb2
+      );
+  }
+  else if (strcmp(sim, "illustris") == 0)
+  {
+    bary.Na_bins = 23;
+    bary.Nk_bins = 323;
+
+    set_baryon_arrays_generic(
+        zBins_illustris, 
+        logkBins_illustris,
+        bary.Nk_bins,
+        logPkR_illustris
+      );
+  }
+  else if (strcmp(sim, "eagle") == 0)
+  {
+    bary.Na_bins = 13;
+    bary.Nk_bins = 309;
+
+    set_baryon_arrays_generic(
+        zBins_eagle, 
+        logkBins_eagle,
+        bary.Nk_bins, 
+        logPkR_eagle
+      );
+  }
+  else if (strcmp(sim, "owls_AGN-1") == 0)
+  { // owls_AGN_T80 = owls_AGN-1
+    bary.Na_bins = 15;
+    bary.Nk_bins = 326;
+
+    set_baryon_arrays_generic(
+        zBins_cowls_AGN, 
+        logkBins_cowls_AGN_T80, 
+        bary.Nk_bins,
+        logPkR_cowls_AGN_T80
+      );
+  }
+  else if (strcmp(sim, "owls_AGN-2") == 0)
+  { // owls_AGN_T85 = owls_AGN-2
+    bary.Na_bins = 15;
+    bary.Nk_bins = 326;
+
+    set_baryon_arrays_generic(
+        zBins_cowls_AGN, 
+        logkBins_cowls_AGN_T85, 
+        bary.Nk_bins,
+        logPkR_cowls_AGN_T85
+      );
+  }
+  else if (strcmp(sim, "owls_AGN-3") == 0)
+  { // owls_AGN_T87 = owls_AGN-3
+    bary.Na_bins = 15;
+    bary.Nk_bins = 326;
+
+    set_baryon_arrays_generic(
+        zBins_cowls_AGN, 
+        logkBins_cowls_AGN_T87, 
+        bary.Nk_bins,
+        logPkR_cowls_AGN_T87
+      );
+  }
+  else if (strcmp(sim, "BAHAMAS-2") == 0)
+  { // "BAHAMAS_T76" = "BAHAMAS-2"
+    bary.Na_bins = 15;
+    bary.Nk_bins = 380;
+
+    set_baryon_arrays_generic(
+        zBins_BAHAMAS, 
+        logkBins_BAHAMAS_T76, 
+        bary.Nk_bins,
+        logPkR_BAHAMAS_T76
+      );
+  }
+  else if (strcmp(sim, "BAHAMAS-1") == 0)
+  { // "BAHAMAS_T78" = "BAHAMAS-1"
+    bary.Na_bins = 15;
+    bary.Nk_bins = 380;
+
+    set_baryon_arrays_generic(
+        zBins_BAHAMAS, 
+        logkBins_BAHAMAS_T78,
+        bary.Nk_bins, 
+        logPkR_BAHAMAS_T78
+      );
+  }
+  else if (strcmp(sim, "BAHAMAS-3") == 0)
+  { // BAHAMAS_T80 = BAHAMAS-3
+    bary.Na_bins = 15;
+    bary.Nk_bins = 380;
+
+    set_baryon_arrays_generic(
+        zBins_BAHAMAS, 
+        logkBins_BAHAMAS_T80,
+        bary.Nk_bins, 
+        logPkR_BAHAMAS_T80
+      );
+  }
+  else
+  {
+    log_fatal("option not implemented");
+    exit(1);
+  }
+
+  bary.is_Pk_bary = 1;
+}
+
+// -----------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
+
+void init_baryons_from_hdf5_file(const char* sim, int tag, const char* allsims)
+{
+  reset_bary_struct();
+  
+  hid_t file_id = H5Fopen(allsims, H5F_ACC_RDONLY, H5P_DEFAULT);
   if (file_id < 0)
   {
-    log_fatal("Failed to open HDF5 file %s", lib_file);
+    log_fatal("Failed to open HDF5 file %s", allsims);
     exit(1);
   }
 
   { // READ REDSHIFT
     char sim[1000]; 
     {
-      int status = sprintf(sim, "/%s/zBins", scenario);
+      int status = sprintf(sim, "/%s/zBins", sim);
       if (status < 0) 
       {
         log_fatal("array allocation failed");
@@ -9665,7 +9821,7 @@ void init_baryons_from_hdf5_file(
     {
       log_fatal(
           "Failed to open dataset (file %s, dataset %s)",
-          lib_file, 
+          allsims, 
           sim
         );
       H5Fclose(file_id);
@@ -9682,9 +9838,9 @@ void init_baryons_from_hdf5_file(
       if (attribute == H5I_INVALID_HID) 
       {
         log_fatal("Failed to open attribute (file %s, dataset %s, attribute %s)", 
-            lib_file, 
+            allsims, 
             sim,
-            "Na_bins", 
+            "Na_bins"
           );
         H5Dclose(dataset);
         H5Fclose(file_id);
@@ -9701,7 +9857,7 @@ void init_baryons_from_hdf5_file(
       {
         log_fatal(
             "Failed to read metadata (file %s, dataset %s, attribute %s)",
-            lib_file,
+            allsims,
             sim,
             "Na_bins"
           );
@@ -9732,7 +9888,7 @@ void init_baryons_from_hdf5_file(
       {
         log_fatal(
             "Failed to open dataspace (file %s, dataset %s)", 
-            lib_file, 
+            allsims, 
             sim
           );
         
@@ -9742,7 +9898,7 @@ void init_baryons_from_hdf5_file(
         exit(1);
       }
 
-      herr_t status; = H5Dread(
+      herr_t status = H5Dread(
           dataset, 
           H5T_NATIVE_FLOAT, 
           H5S_ALL, 
@@ -9755,7 +9911,7 @@ void init_baryons_from_hdf5_file(
       {
         log_fatal(
             "Failed to read data from dataspace (file %s, dataset %s)", 
-            lib_file, 
+            allsims, 
             sim
           );
         
@@ -9793,7 +9949,7 @@ void init_baryons_from_hdf5_file(
   { // READ LOG(K)
     char sim[1000]; 
     {
-      int status = sprintf(sim, "/%s/logkBins", scenario);
+      int status = sprintf(sim, "/%s/logkBins", sim);
       if (status < 0) 
       {
         log_fatal("array allocation failed");
@@ -9807,7 +9963,7 @@ void init_baryons_from_hdf5_file(
     {
       log_fatal(
         "Failed to open dataset (file %s, dataset %s)", 
-        lib_file, 
+        allsims, 
         sim
       );
       exit(1);
@@ -9824,9 +9980,9 @@ void init_baryons_from_hdf5_file(
       {
         log_fatal(
             "Failed to open attribute (file %s, dataset %s, attribute %s)", 
-            lib_file, 
+            allsims, 
             sim,
-            "Nk_bins", 
+            "Nk_bins"
           );
         H5Dclose(dataset);
         H5Fclose(file_id);
@@ -9843,7 +9999,7 @@ void init_baryons_from_hdf5_file(
       {
         log_fatal(
             "Failed to read metadata (file %s, dataset %s, attribute %s)",
-            lib_file,
+            allsims,
             sim,
             "Nk_bins"
           );
@@ -9874,7 +10030,7 @@ void init_baryons_from_hdf5_file(
       {
         log_fatal(
             "Failed to open dataspace (file %s, dataset %s)", 
-            lib_file, 
+            allsims, 
             sim
           );
         
@@ -9884,7 +10040,7 @@ void init_baryons_from_hdf5_file(
         exit(1);
       }
 
-      herr_t status; = H5Dread(
+      herr_t status = H5Dread(
           dataset, 
           H5T_NATIVE_FLOAT, 
           H5S_ALL, 
@@ -9897,7 +10053,7 @@ void init_baryons_from_hdf5_file(
       {
         log_fatal(
             "Failed to read data from dataspace (file %s, dataset %s)", 
-            lib_file, 
+            allsims, 
             sim
           );
         
@@ -9934,7 +10090,7 @@ void init_baryons_from_hdf5_file(
   { // READ P(K,Z)
     char sim[1000]; 
     {
-      int status = sprintf(sim, "/%s/logPkR/sim%d", scenario, sim_id);
+      int status = sprintf(sim, "/%s/logPkR/sim%d", sim, tag);
       if (status < 0) 
       {
         log_fatal("array allocation failed");
@@ -9948,7 +10104,7 @@ void init_baryons_from_hdf5_file(
     {
       log_fatal(
           "Failed to open dataset (file %s, dataset %s)", 
-          lib_file, 
+          allsims, 
           sim
         );
       exit(1);
@@ -9971,7 +10127,7 @@ void init_baryons_from_hdf5_file(
       {
         log_fatal(
             "Failed to open dataspace (file %s, dataset %s)", 
-            lib_file, 
+            allsims, 
             sim
           );
         
@@ -9981,7 +10137,7 @@ void init_baryons_from_hdf5_file(
         exit(1);
       }
 
-      herr_t status; = H5Dread(
+      herr_t status = H5Dread(
           dataset, 
           H5T_NATIVE_FLOAT, 
           H5S_ALL, 
@@ -9994,7 +10150,7 @@ void init_baryons_from_hdf5_file(
       {
         log_fatal(
             "Failed to read data from dataspace (file %s, dataset %s)", 
-            lib_file, 
+            allsims, 
             sim
           );
         
@@ -10044,7 +10200,7 @@ void init_baryons_from_hdf5_file(
             bary.log_PkR, 
             j, 
             i, 
-            (double) tmp[j*bary.Na_bins+i];
+            (double) tmp[j*bary.Na_bins+i]
           );
         
         if (status)
@@ -10060,7 +10216,7 @@ void init_baryons_from_hdf5_file(
   }
 
   log_debug(
-      "Na_bins = %d; Nk_bins = %d (set_bary_parameters_to_scenario)", 
+      "Na_bins = %d; Nk_bins = %d (set_bary_parameters_to_sim)", 
       bary.Na_bins, 
       bary.Nk_bins
     );
@@ -10083,180 +10239,4 @@ void init_baryons_from_hdf5_file(
   bary.is_Pk_bary = 1;
 }
 
-// -----------------------------------------------------------------------------
-// -----------------------------------------------------------------------------
-// -----------------------------------------------------------------------------
-// -----------------------------------------------------------------------------
-// -----------------------------------------------------------------------------
-// -----------------------------------------------------------------------------
-// -----------------------------------------------------------------------------
-// -----------------------------------------------------------------------------
 
-void init_baryons(const char* scenario)
-{
-  if (strcmp(scenario, "TNG100") == 0)
-  {
-    reset_bary_struct();
-    
-    bary.Nk_bins = 325;
-    bary.Na_bins = 13;
-
-    set_baryon_arrays_generic(
-        zBins_TNG100, 
-        logkBins_TNG100, 
-        logPkR_TNG100
-      );
-
-    bary.is_Pk_bary = 1;
-  }
-  else if (strcmp(scenario, "HzAGN") == 0)
-  {
-    reset_bary_struct();
-
-    bary.Na_bins = 11;
-    bary.Nk_bins = 675;
-
-    set_baryon_arrays_generic(
-        zBins_HzAGN, 
-        logkBins_HzAGN, 
-        logPkR_HzAGN
-      );
-
-    bary.is_Pk_bary = 1;
-  }
-  else if (strcmp(scenario, "mb2") == 0)
-  {
-    reset_bary_struct();
-
-    bary.Na_bins = 21;
-    bary.Nk_bins = 350;
-
-    set_baryon_arrays_generic(
-        zBins_mb2, 
-        logkBins_mb2, 
-        logPkR_mb2
-      );
-
-    bary.is_Pk_bary = 1;
-  }
-  else if (strcmp(scenario, "illustris") == 0)
-  {
-    reset_bary_struct();
-
-    bary.Na_bins = 23;
-    bary.Nk_bins = 323;
-
-    set_baryon_arrays_generic(
-        zBins_illustris, 
-        logkBins_illustris, 
-        logPkR_illustris
-      );
-
-    bary.is_Pk_bary = 1;
-  }
-  else if (strcmp(scenario, "eagle") == 0)
-  {
-    reset_bary_struct();
-
-    bary.Na_bins = 13;
-    bary.Nk_bins = 309;
-
-    set_baryon_arrays_generic(
-        zBins_eagle, 
-        logkBins_eagle, 
-        logPkR_eagle
-      );
-
-    bary.is_Pk_bary = 1;
-  }
-  else if (strcmp(scenario, "owls_AGN_T80") == 0)
-  {
-    reset_bary_struct();
-
-    bary.Na_bins = 15;
-    bary.Nk_bins = 326;
-
-    set_baryon_arrays_generic(
-        zBins_cowls_AGN, 
-        logkBins_cowls_AGN_T80, 
-        logPkR_cowls_AGN_T80
-      );
-
-    bary.is_Pk_bary = 1;
-  }
-  else if (strcmp(scenario, "owls_AGN_T85") == 0)
-  {
-    reset_bary_struct();
-
-    bary.is_Pk_bary = 1;
-    bary.Na_bins = 15;
-    bary.Nk_bins = 326;
-
-    set_baryon_arrays_generic(
-        zBins_cowls_AGN, 
-        logkBins_cowls_AGN_T85, 
-        logPkR_cowls_AGN_T85
-      );
-  }
-  else if (strcmp(scenario, "owls_AGN_T87") == 0)
-  {
-    reset_bary_struct();
-
-    bary.is_Pk_bary = 1;
-    bary.Na_bins = 15;
-    bary.Nk_bins = 326;
-
-    set_baryon_arrays_generic(
-        zBins_cowls_AGN, 
-        logkBins_cowls_AGN_T87, 
-        logPkR_cowls_AGN_T87
-      );
-  }
-  else if (strcmp(scenario, "BAHAMAS_T76") == 0)
-  {
-    reset_bary_struct();
-
-    bary.is_Pk_bary = 1;
-    bary.Na_bins = 15;
-    bary.Nk_bins = 380;
-
-    set_baryon_arrays_generic(
-        zBins_BAHAMAS, 
-        logkBins_BAHAMAS_T76, 
-        logPkR_BAHAMAS_T76
-      );
-  }
-  else if (strcmp(scenario, "BAHAMAS_T78") == 0)
-  {
-    reset_bary_struct();
-    
-    bary.is_Pk_bary = 1;
-    bary.Na_bins = 15;
-    bary.Nk_bins = 380;
-
-    set_baryon_arrays_generic(
-        zBins_BAHAMAS, 
-        logkBins_BAHAMAS_T78, 
-        logPkR_BAHAMAS_T78
-      );
-  }
-  else if (strcmp(scenario, "BAHAMAS_T80") == 0)
-  {
-    reset_bary_struct();
-
-    bary.is_Pk_bary = 1;
-    bary.Na_bins = 15;
-    bary.Nk_bins = 380;
-
-    set_baryon_arrays_generic(
-        zBins_BAHAMAS, 
-        logkBins_BAHAMAS_T80, 
-        logPkR_BAHAMAS_T80
-      );
-  }
-  else
-  {
-    log_fatal("option not implemented");
-    exit(1);
-  }
-}

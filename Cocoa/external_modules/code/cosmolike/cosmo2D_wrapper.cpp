@@ -298,12 +298,12 @@ Vector w_ks_tomo_cpp()
 // ---------------------------------------------------------------------------
 // ---------------------------------------------------------------------------
 
-double C_ss_NTATT_tomo_limber_cpp(const double l, const int ni, const int nj)
+double C_ss_NLA_tomo_limber_cpp(const double l, const int ni, const int nj)
 {
   return C_ss_tomo_limber_nointerp(l, ni, nj, 0, 0);
 }
 
-Matrix C_ss_NTATT_tomo_limber_cpp(const Vector l)
+Matrix C_ss_NLA_tomo_limber_cpp(const Vector l)
 {
   if (!(l.n_elem > 0))
   {
@@ -398,7 +398,7 @@ py::tuple C_ss_tomo_limber_cpp(const double l, const int ni, const int nj)
     }
     case IA_MODEL_NLA:
     {
-      return py::make_tuple(C_ss_NTATT_tomo_limber_cpp(l, ni, nj), 0.0);
+      return py::make_tuple(C_ss_NLA_tomo_limber_cpp(l, ni, nj), 0.0);
     }
     default:
     {
@@ -419,7 +419,7 @@ py::tuple C_ss_tomo_limber_cpp(Vector l)
     case IA_MODEL_NLA:
     {
       py::make_tuple(
-        carma::mat_to_arr(C_ss_NTATT_tomo_limber_cpp(l)),
+        carma::mat_to_arr(C_ss_NLA_tomo_limber_cpp(l)),
         carma::mat_to_arr(Matrix{l.n_elem, tomo.shear_Npowerspectra, 
           arma::fill::zeros})
       );
@@ -533,7 +533,7 @@ Matrix C_gg_tomo_cpp(const Vector l)
       const double dev = 10. * tolerance;
 
       Vector Cl(limits.LMAX_NOLIMBER+1);
-      C_cl_tomo(1, nz, nz, Cl.memptr(), dev, tolerance);
+      //C_cl_tomo(1, nz, nz, Cl.memptr(), dev, tolerance);
       
       for (int i=0; i<static_cast<int>(idxs.n_elem); i++)
       {
@@ -817,14 +817,14 @@ Vector C_yy_limber_nointerp_cpp(const Vector l)
 // ---------------------------------------------------------------------------
 // ---------------------------------------------------------------------------
 
-double int_for_C_ss_NTATT_tomo_limber_cpp(
+double int_for_C_ss_NLA_tomo_limber_cpp(
   const double a, const double l, const int ni, const int nj)
 {
   double ar[4] = {(double) ni, (double) nj, l, (double) 0.0};
   return int_for_C_ss_tomo_limber(a, (void*) ar); 
 }
 
-Cube int_for_C_ss_NTATT_tomo_limber_cpp(Vector a, Vector l)
+Cube int_for_C_ss_NLA_tomo_limber_cpp(Vector a, Vector l)
 {
   if (!(l.n_elem > 0 && a.n_elem > 0))
   {
@@ -839,7 +839,7 @@ Cube int_for_C_ss_NTATT_tomo_limber_cpp(Vector a, Vector l)
   #pragma GCC diagnostic ignored "-Wunused-variable"
   for (int nz=0; nz<tomo.shear_Npowerspectra; nz++)
   { // init static variables
-    double tmp = int_for_C_ss_NTATT_tomo_limber_cpp(a(0), l(0), Z1(nz), Z2(nz));
+    double tmp = int_for_C_ss_NLA_tomo_limber_cpp(a(0), l(0), Z1(nz), Z2(nz));
   }
   #pragma GCC diagnostic pop
 
@@ -850,7 +850,7 @@ Cube int_for_C_ss_NTATT_tomo_limber_cpp(Vector a, Vector l)
     {
       for (int j=0; j<a.n_elem; j++)
       {
-        result(j, i, nz) = int_for_C_ss_NTATT_tomo_limber_cpp(a(j), l(i), Z1(nz), Z2(nz));
+        result(j, i, nz) = int_for_C_ss_NLA_tomo_limber_cpp(a(j), l(i), Z1(nz), Z2(nz));
       }
     }
   }
@@ -923,7 +923,7 @@ py::tuple int_for_C_ss_tomo_limber_cpp(const double a, const double l, const int
     }
     case IA_MODEL_NLA:
     {
-      return py::make_tuple(int_for_C_ss_NTATT_tomo_limber_cpp(a, l, ni, nj), 0.0);
+      return py::make_tuple(int_for_C_ss_NLA_tomo_limber_cpp(a, l, ni, nj), 0.0);
     }
     default:
     {
@@ -944,7 +944,7 @@ py::tuple int_for_C_ss_tomo_limber_cpp(const Vector a, const Vector l)
     case IA_MODEL_NLA:
     {
       return py::make_tuple(
-        carma::cube_to_arr(int_for_C_ss_NTATT_tomo_limber_cpp(a, l)),
+        carma::cube_to_arr(int_for_C_ss_NLA_tomo_limber_cpp(a, l)),
         carma::cube_to_arr(
           Cube{a.n_elem, l.n_elem, tomo.shear_Npowerspectra, arma::fill::zeros})
       );
