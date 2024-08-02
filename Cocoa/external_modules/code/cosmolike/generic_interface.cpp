@@ -73,6 +73,230 @@ namespace cosmolike_interface
 // ---------------------------------------------------------------------------
 // ---------------------------------------------------------------------------
 // ---------------------------------------------------------------------------
+// AUX FUNCTIONS
+// ---------------------------------------------------------------------------
+// ---------------------------------------------------------------------------
+// ---------------------------------------------------------------------------
+// ---------------------------------------------------------------------------
+// ---------------------------------------------------------------------------
+// ---------------------------------------------------------------------------
+// ---------------------------------------------------------------------------
+// ---------------------------------------------------------------------------
+// ---------------------------------------------------------------------------
+// ---------------------------------------------------------------------------
+// ---------------------------------------------------------------------------
+// ---------------------------------------------------------------------------
+// ---------------------------------------------------------------------------
+// ---------------------------------------------------------------------------
+// ---------------------------------------------------------------------------
+
+matrix read_table(const std::string file_name)
+{
+  std::ifstream input_file(file_name);
+
+  if (!input_file.is_open())
+  {
+    spdlog::critical(
+      "\x1b[90m{}\x1b[0m: file {} cannot be opened",
+      "read_table",
+      file_name
+    );
+    exit(1);
+  }
+
+  // --------------------------------------------------------
+  // Read the entire file into memory
+  // --------------------------------------------------------
+
+  std::string tmp;
+  
+  input_file.seekg(0,std::ios::end);
+  
+  tmp.resize(static_cast<size_t>(input_file.tellg()));
+  
+  input_file.seekg(0,std::ios::beg);
+  
+  input_file.read(&tmp[0],tmp.size());
+  
+  input_file.close();
+  
+  if(tmp.empty())
+  {
+    spdlog::critical(
+      "\x1b[90m{}\x1b[0m: file {} is empty",
+      "read_table",
+      file_name
+    );
+    exit(1);
+  }
+  
+  // --------------------------------------------------------
+  // Second: Split file into lines
+  // --------------------------------------------------------
+  
+  std::vector<std::string> lines;
+  lines.reserve(50000);
+
+  boost::trim_if(tmp, boost::is_any_of("\t "));
+  
+  boost::trim_if(tmp, boost::is_any_of("\n"));
+  
+  boost::split(lines, tmp,boost::is_any_of("\n"), boost::token_compress_on);
+  
+  // Erase comment/blank lines
+  auto check = [](std::string mystr) -> bool
+  {
+    return boost::starts_with(mystr, "#");
+  };
+  lines.erase(std::remove_if(lines.begin(), lines.end(), check), lines.end());
+  
+  // --------------------------------------------------------
+  // Third: Split line into words
+  // --------------------------------------------------------
+
+  matrix result;
+  size_t ncols = 0;
+  
+  { // first line
+    std::vector<std::string> words;
+    words.reserve(100);
+    
+    boost::split(
+      words,lines[0], 
+      boost::is_any_of(" \t"),
+      boost::token_compress_on
+    );
+    
+    ncols = words.size();
+    
+    result.set_size(lines.size(), ncols);
+    
+    for (size_t j=0; j<ncols; j++)
+    {
+      result(0,j) = std::stod(words[j]);
+    }
+  }
+
+  #pragma omp parallel for
+  for (size_t i=1; i<lines.size(); i++)
+  {
+    std::vector<std::string> words;
+    
+    boost::split(
+      words, 
+      lines[i], 
+      boost::is_any_of(" \t"),
+      boost::token_compress_on
+    );
+    
+    if (words.size() != ncols)
+    {
+      spdlog::critical(
+        "\x1b[90m{}\x1b[0m: file {} is not well formatted"
+        " (regular table required)", 
+        "read_table", 
+        file_name
+      );
+      exit(1);
+    }
+    
+    for (size_t j=0; j<ncols; j++)
+    {
+      result(i,j) = std::stod(words[j]);
+    }
+  };
+  
+  return result;
+}
+
+// ---------------------------------------------------------------------------
+// ---------------------------------------------------------------------------
+// ---------------------------------------------------------------------------
+
+std::tuple<std::string,int> get_baryon_sim_name_and_tag(std::string sim)
+{
+  // Desired Convention:
+  // (1) Python input: not be case sensitive
+  // (2) simulation names only have "_" as deliminator, e.g., owls_AGN.
+  // (3) simulation IDs are indicated by "-", e.g., antilles-1.
+ 
+  boost::trim_if(sim, boost::is_any_of("\t "));
+  sim = boost::algorithm::to_lower_copy(sim);
+  
+  { // Count occurrences of - (dashes)
+    size_t pos = 0; 
+    size_t count = 0; 
+    while ((pos = sim.find("-", pos)) != std::string::npos) 
+    {
+      ++count;
+    }
+
+    if (count > 1)
+    {
+      spdlog::critical(
+          "\x1b[90m{}\x1b[0m: Scenario {} not supported (too many dashes)", 
+          "get_baryon_sim_name_and_tag",
+          sim
+        );
+      exit(1);
+    }
+  }
+
+  if (sim.rfind("owls_agn") != std::string::npos)
+  {
+    boost::replace_all(sim, "owls_agn", "owls_AGN");
+    boost::replace_all(sim, "_t80", "-1");
+    boost::replace_all(sim, "_t85", "-2");
+    boost::replace_all(sim, "_t87", "-3");
+  } 
+  else if (sim.rfind("bahamas") != std::string::npos)
+  {
+    boost::replace_all(sim, "bahamas", "BAHAMAS");
+    boost::replace_all(sim, "_t78", "-1");
+    boost::replace_all(sim, "_t76", "-2");
+    boost::replace_all(sim, "_t80", "-3");
+  } 
+  else if (sim.rfind("hzagn") != std::string::npos)
+  {
+    boost::replace_all(sim, "hzagn", "HzAGN");
+  }
+  else if (sim.rfind("tng") != std::string::npos)
+  {
+    boost::replace_all(sim, "tng", "TNG");
+  }
+  
+  std::string name;
+  int tag;
+
+  if (sim.rfind('-') != std::string::npos)
+  {
+    const size_t pos = sim.rfind('-');
+    name = sim.substr(0, pos);
+    tag = std::stoi(sim.substr(pos + 1));
+  } 
+  else
+  { 
+    name = sim;
+    tag = 1; 
+  }
+
+  return std::make_tuple(name, tag);
+}
+
+// ---------------------------------------------------------------------------
+// ---------------------------------------------------------------------------
+// ---------------------------------------------------------------------------
+// ---------------------------------------------------------------------------
+// ---------------------------------------------------------------------------
+// ---------------------------------------------------------------------------
+// ---------------------------------------------------------------------------
+// ---------------------------------------------------------------------------
+// ---------------------------------------------------------------------------
+// ---------------------------------------------------------------------------
+// ---------------------------------------------------------------------------
+// ---------------------------------------------------------------------------
+// ---------------------------------------------------------------------------
+// ---------------------------------------------------------------------------
 // INIT FUNCTIONS
 // ---------------------------------------------------------------------------
 // ---------------------------------------------------------------------------
@@ -177,19 +401,26 @@ void init_accuracy_boost(
     const int integration_accuracy
   )
 {
-  Ntable.N_a = static_cast<int>(ceil(Ntable.N_a*sampling_boost));
+  Ntable.N_a = 
+    static_cast<int>(ceil(Ntable.N_a*sampling_boost));
   
-  Ntable.N_ell_TATT = static_cast<int>(ceil(Ntable.N_ell_TATT*sampling_boost));
+  Ntable.N_ell_TATT = 
+    static_cast<int>(ceil(Ntable.N_ell_TATT*sampling_boost));
   
-  Ntable.N_k_lin = static_cast<int>(ceil(Ntable.N_k_lin*sampling_boost));
+  Ntable.N_k_lin = 
+    static_cast<int>(ceil(Ntable.N_k_lin*sampling_boost));
   
-  Ntable.N_k_nlin = static_cast<int>(ceil(Ntable.N_k_nlin*sampling_boost));
+  Ntable.N_k_nlin = 
+    static_cast<int>(ceil(Ntable.N_k_nlin*sampling_boost));
   
-  Ntable.N_ell = static_cast<int>(ceil(Ntable.N_ell*sampling_boost));
+  Ntable.N_ell = 
+    static_cast<int>(ceil(Ntable.N_ell*sampling_boost));
   
-  Ntable.N_theta  = static_cast<int>(ceil(Ntable.N_theta*sampling_boost));
+  Ntable.N_theta  = 
+    static_cast<int>(ceil(Ntable.N_theta*sampling_boost));
 
-  Ntable.N_M = static_cast<int>(ceil(Ntable.N_M*sampling_boost));
+  Ntable.N_M = 
+    static_cast<int>(ceil(Ntable.N_M*sampling_boost));
 
   precision.low /= accuracy_boost;
   
@@ -208,6 +439,9 @@ void init_accuracy_boost(
 
 void init_probes(std::string possible_probes)
 {
+  boost::trim_if(possible_probes, boost::is_any_of("\t "));
+  possible_probes = boost::algorithm::to_lower_copy(possible_probes);
+
   spdlog::info("\x1b[90m{}\x1b[0m: Begins", "init_probes");
 
   if (possible_probes.compare("xi") == 0)
@@ -347,10 +581,18 @@ void init_survey(
 {
   spdlog::info("\x1b[90m{}\x1b[0m: Begins", "init_survey");
 
+  boost::trim_if(surveyname, boost::is_any_of("\t "));
+  surveyname = boost::algorithm::to_lower_copy(surveyname);
+    
   if (surveyname.size() > CHAR_MAX_SIZE - 1)
   {
+    spdlog::critical(
+        "{}: survey name too large for Cosmolike (C char memory overflow)", 
+        "init_survey"
+      );
     exit(1);
   }
+
   if (!(surveyname.size()>0))
   {
     spdlog::critical("{}: incompatible input", "init_survey");
@@ -419,20 +661,20 @@ void init_cmb(
 // ---------------------------------------------------------------------------
 
 void init_binning_cmb_bandpower(
-    const int Nbp, 
-    const double lmin, 
-    const double lmax
+    const int Nbandpower, 
+    const int lmin, 
+    const int lmax
   )
 {
   spdlog::info("\x1b[90m{}\x1b[0m: Begins", "init_binning_cmb_bandpower");
 
-  if (!(Nbp > 0))
+  if (!(Nbandpower > 0))
   {
     spdlog::critical(
       "\x1b[90m{}\x1b[0m: {} = {} not supported", 
       "init_binning_cmb_bandpower", 
-      "like.Nbp", 
-      Nbp
+      "Number of Band Powers (Nbandpower)", 
+      Nbandpower
     );
     exit(1);
   }
@@ -440,8 +682,8 @@ void init_binning_cmb_bandpower(
   spdlog::info(
     "\x1b[90m{}\x1b[0m: {} = {} selected.", 
     "init_binning_cmb_bandpower", 
-    "Nbp", 
-    Nbp
+    "Number of Band Powers (Nbandpower)", 
+    Nbandpower
   );
   
   spdlog::info(
@@ -458,7 +700,7 @@ void init_binning_cmb_bandpower(
     lmax
   );
 
-  like.Nbp = Nbp;
+  like.Nbp = Nbandpower;
   
   like.lmin_bp = lmin;
   
@@ -472,42 +714,46 @@ void init_binning_cmb_bandpower(
 // ---------------------------------------------------------------------------
 
 void init_binning_fourier(
-    const int Ncl, 
-    const double lmin, 
-    const double lmax
+    const int Nells, 
+    const int lmin, 
+    const int lmax
   )
 {
   spdlog::info("\x1b[90m{}\x1b[0m: Begins", "init_binning_fourier");
 
-  if (!(Ncl > 0))
+  if (!(Nells > 0))
   {
     spdlog::critical(
-      "\x1b[90m{}\x1b[0m: {} = {} not supported", 
-      "init_binning_fourier", 
-      "like.Ncl", Ncl
-    );
+        "\x1b[90m{}\x1b[0m: {} = {} not supported", 
+        "init_binning_fourier", 
+        "Number of l modes (Nells)", 
+        Nells
+      );
     exit(1);
   }
 
   spdlog::info(
-    "\x1b[90m{}\x1b[0m: {} = {} selected.", 
-    "init_binning_fourier", 
-    "Ncl", Ncl
-  );
+      "\x1b[90m{}\x1b[0m: {} = {} selected.", 
+      "init_binning_fourier", 
+      "Number of l modes (Nells)",
+      Nells
+    );
 
   spdlog::info(
-    "\x1b[90m{}\x1b[0m: {} = {} selected.", 
-    "init_binning_fourier", 
-    "l_min", lmin
-  );
+      "\x1b[90m{}\x1b[0m: {} = {} selected.", 
+      "init_binning_fourier", 
+      "l_min", 
+      lmin
+    );
   
   spdlog::info(
-    "\x1b[90m{}\x1b[0m: {} = {} selected.", 
-    "init_binning_fourier", 
-    "l_max", lmax
-  );
+      "\x1b[90m{}\x1b[0m: {} = {} selected.", 
+      "init_binning_fourier", 
+      "l_max", 
+      lmax
+    );
 
-  like.Ncl = Ncl;
+  like.Ncl = Nells;
   
   like.lmin = lmin;
   
@@ -517,16 +763,19 @@ void init_binning_fourier(
   
   like.ell = (double*) malloc(sizeof(double)*like.Ncl);
   
-  for (int i = 0; i < like.Ncl; i++)
+  for (int i=0; i<like.Ncl; i++)
   {
-    like.ell[i] = std::exp(std::log(like.lmin)+(i+0.5)*logdl);
+    like.ell[i] = std::exp(std::log(like.lmin) + (i + 0.5)*logdl);
   
     spdlog::debug(
       "\x1b[90m{}\x1b[0m: Bin {:d} - {} = {:.4e}, {} = {:.4e} and {} = {:.4e}",
       "init_binning_fourier", i, 
-      "lmin", lmin, 
-      "ell", like.ell[i], 
-      "lmax", lmax
+      "lmin", 
+      lmin, 
+      "ell", 
+      like.ell[i], 
+      "lmax", 
+      lmax
     );
   }
 
@@ -537,47 +786,51 @@ void init_binning_fourier(
 // ---------------------------------------------------------------------------
 // ---------------------------------------------------------------------------
 
-void init_binning_real(
+void init_binning_real_space(
     const int Ntheta, 
     const double theta_min_arcmin, 
     const double theta_max_arcmin
   )
 {
-  spdlog::info("\x1b[90m{}\x1b[0m: Begins", "init_binning_real");
+  spdlog::info("\x1b[90m{}\x1b[0m: Begins", "init_binning_real_space");
 
   if (!(Ntheta > 0))
   {
     spdlog::critical(
-      "\x1b[90m{}\x1b[0m: {} = {} not supported", 
-      "init_binning_real",
-      "like.Ntheta", Ntheta
-    );
+        "\x1b[90m{}\x1b[0m: {} = {} not supported", 
+        "init_binning_real_space",
+        "like.Ntheta", 
+        Ntheta
+      );
     exit(1);
   }
 
   spdlog::info(
-    "\x1b[90m{}\x1b[0m: {} = {} selected.", 
-    "init_binning_real", 
-    "Ntheta", Ntheta
-  );
+      "\x1b[90m{}\x1b[0m: {} = {} selected.", 
+      "init_binning_real_space", 
+      "Ntheta", 
+      Ntheta
+    );
 
   spdlog::info(
-    "\x1b[90m{}\x1b[0m: {} = {} selected.", 
-    "init_binning_real", 
-    "theta_min_arcmin", theta_min_arcmin
-  );
+      "\x1b[90m{}\x1b[0m: {} = {} selected.", 
+      "init_binning_real_space", 
+      "theta_min_arcmin", 
+      theta_min_arcmin
+    );
 
   spdlog::info(
-    "\x1b[90m{}\x1b[0m: {} = {} selected.", 
-    "init_binning_real", 
-    "theta_max_arcmin",  theta_max_arcmin
-  );
+      "\x1b[90m{}\x1b[0m: {} = {} selected.", 
+      "init_binning_real_space", 
+      "theta_max_arcmin", 
+      theta_max_arcmin
+    );
 
   like.Ntheta = Ntheta;
   
-  like.vtmin = theta_min_arcmin * 2.90888208665721580e-4; // arcmin to rad conversion
+  like.vtmin = theta_min_arcmin * 2.90888208665721580e-4; // arcmin to rad conv
   
-  like.vtmax = theta_max_arcmin * 2.90888208665721580e-4; // arcmin to rad conversion
+  like.vtmax = theta_max_arcmin * 2.90888208665721580e-4; // arcmin to rad conv
   
   const double logdt = (std::log(like.vtmax)-std::log(like.vtmin))/like.Ntheta;
   
@@ -595,15 +848,18 @@ void init_binning_real(
       (thetamax*thetamax - thetamin*thetamin);
 
     spdlog::debug(
-      "\x1b[90m{}\x1b[0m: Bin {:d} - {} = {:.4e}, {} = {:.4e} and {} = {:.4e}",
-      "init_binning_real", i, 
-      "theta_min [rad]", thetamin, 
-      "theta [rad]", like.theta[i], 
-      "theta_max [rad]", thetamax
-    );
+        "\x1b[90m{}\x1b[0m: Bin {:d} - {} = {:.4e}, {} = {:.4e} and {} = {:.4e}",
+        "init_binning_real_space", i, 
+        "theta_min [rad]", 
+        thetamin, 
+        "theta [rad]", 
+        like.theta[i], 
+        "theta_max [rad]", 
+        thetamax
+      );
   }
 
-  spdlog::info("\x1b[90m{}\x1b[0m: Ends", "init_binning_real");
+  spdlog::info("\x1b[90m{}\x1b[0m: Ends", "init_binning_real_space");
 
   return;
 }
@@ -628,6 +884,7 @@ void init_lens_sample(
       );
     exit(1);
   }
+
   if (multihisto_file.size()>CHAR_MAX_SIZE-1)
   {
     spdlog::critical(
@@ -639,6 +896,7 @@ void init_lens_sample(
       );
     exit(1);
   }
+
   if (!(multihisto_file.size() > 0))
   {
     spdlog::critical(
@@ -648,22 +906,24 @@ void init_lens_sample(
       );
     exit(1);
   }
+
   if (!(Ntomo > 0) || Ntomo > MAX_SIZE_ARRAYS)
   {
     spdlog::critical(
         "\x1b[90m{}\x1b[0m: {} = {} not supported (max = {})", 
         "init_lens_sample", 
-        "Ntomo", Ntomo, 
+        "Ntomo", 
+        Ntomo, 
         MAX_SIZE_ARRAYS
       );
     exit(1);
   }
 
   memcpy(
-    redshift.clustering_REDSHIFT_FILE, 
-    multihisto_file.c_str(), 
-    multihisto_file.size()+1
-  );
+      redshift.clustering_REDSHIFT_FILE, 
+      multihisto_file.c_str(), 
+      multihisto_file.size()+1
+    );
 
   redshift.clustering_photoz = 4;
   
@@ -690,6 +950,7 @@ void init_lens_sample(
   pf_photoz(0.1, 0);
   {
     int n = 0;
+    
     for (int i = 0; i < tomo.clustering_Nbin; i++)
     {
       for (int j = 0; j < tomo.shear_Nbin; j++)
@@ -697,6 +958,7 @@ void init_lens_sample(
         n += test_zoverlap(i, j);
       }
     }
+    
     tomo.ggl_Npowerspectra = n;
 
     spdlog::info(
@@ -723,78 +985,78 @@ void init_source_sample(
   if (multihisto_file.size() > CHAR_MAX_SIZE - 1)
   {
     spdlog::critical(
-      "\x1b[90m{}\x1b[0m: insufficient pre-allocated char memory (max = {}) "
-      "for the string: {}", 
-      "init_source_sample", 
-      CHAR_MAX_SIZE-1, 
-      multihisto_file
-    );
+        "\x1b[90m{}\x1b[0m: insufficient pre-allocated char memory (max = {}) "
+        "for the string: {}", 
+        "init_source_sample", 
+        CHAR_MAX_SIZE-1, 
+        multihisto_file
+      );
     exit(1);
   }
   if (!(multihisto_file.size() > 0))
   {
     spdlog::critical(
-      "\x1b[90m{}\x1b[0m: empty {} string not supported",
-      "init_source_sample", 
-      "multihisto_file"
-    );
+        "\x1b[90m{}\x1b[0m: empty {} string not supported",
+        "init_source_sample", 
+        "multihisto_file"
+      );
     exit(1);
   }
   if (!(Ntomo > 0) || Ntomo > MAX_SIZE_ARRAYS)
   {
     spdlog::critical(
-      "\x1b[90m{}\x1b[0m: {} = {} not supported (max = {})",
-      "init_source_sample", 
-      "Ntomo", 
-      Ntomo, 
-      MAX_SIZE_ARRAYS
-    );
+        "\x1b[90m{}\x1b[0m: {} = {} not supported (max = {})",
+        "init_source_sample", 
+        "Ntomo", 
+        Ntomo, 
+        MAX_SIZE_ARRAYS
+      );
     exit(1);
   }
 
   // convert std::string to char*
   memcpy(
-    redshift.shear_REDSHIFT_FILE, 
-    multihisto_file.c_str(), 
-    multihisto_file.size() + 1
-  );
+      redshift.shear_REDSHIFT_FILE, 
+      multihisto_file.c_str(), 
+      multihisto_file.size() + 1
+    );
 
   redshift.shear_photoz = 4;
   tomo.shear_Nbin = Ntomo;
   tomo.shear_Npowerspectra = tomo.shear_Nbin * (tomo.shear_Nbin + 1) / 2;
 
   spdlog::info(
-    "\x1b[90m{}\x1b[0m: tomo.shear_Npowerspectra = {}", 
-    "init_source_sample", 
-    tomo.shear_Npowerspectra
-  );
+      "\x1b[90m{}\x1b[0m: tomo.shear_Npowerspectra = {}", 
+      "init_source_sample", 
+      tomo.shear_Npowerspectra
+    );
 
   for (int i=0; i<tomo.shear_Nbin; i++)
   {
     nuisance.bias_zphot_shear[i] = 0.0;
 
     spdlog::info(
-      "\x1b[90m{}\x1b[0m: bin {} - {} = {}.",
-      "init_source_sample", 
-      i, 
-      "<z_s>", 
-      zmean_source(i)
-    );
+        "\x1b[90m{}\x1b[0m: bin {} - {} = {}.",
+        "init_source_sample", 
+        i, 
+        "<z_s>", 
+        zmean_source(i)
+      );
   }
 
   spdlog::info(
-    "\x1b[90m{}\x1b[0m: {} = {} selected.", 
-    "init_source_sample",
-    "shear_REDSHIFT_FILE", 
-    multihisto_file
-  );
+      "\x1b[90m{}\x1b[0m: {} = {} selected.", 
+      "init_source_sample",
+      "shear_REDSHIFT_FILE", 
+      multihisto_file
+    );
 
   spdlog::info(
-    "\x1b[90m{}\x1b[0m: {} = {} selected.", 
-    "init_source_sample",
-    "shear_Nbin", 
-    Ntomo
-  );
+      "\x1b[90m{}\x1b[0m: {} = {} selected.", 
+      "init_source_sample",
+      "shear_Nbin", 
+      Ntomo
+    );
 
   spdlog::info("\x1b[90m{}\x1b[0m: Ends", "init_source_sample");
 }
@@ -805,7 +1067,7 @@ void init_source_sample(
 
 void init_cmb_bandpower(
     const int is_cmb_bandpower, 
-    const int is_cmb_kkkk_cov_from_simulation, 
+    const int is_cmb_kkkk_covariance_from_simulation, 
     const double alpha
   )
 {
@@ -813,7 +1075,7 @@ void init_cmb_bandpower(
 
   like.is_cmb_bandpower = is_cmb_bandpower;
   
-  like.is_cmb_kkkk_cov_from_sim = is_cmb_kkkk_cov_from_simulation;
+  like.is_cmb_kkkk_cov_from_sim = is_cmb_kkkk_covariance_from_simulation;
   
   like.alpha_Hartlap_kkkk = alpha;
 
@@ -835,80 +1097,6 @@ void init_cmb_bandpower_data(std::string BINMAT, std::string OFFSET)
   spdlog::info("\x1b[90m{}\x1b[0m: Ends", "init_cmb_bandpower_data");
 
   return;
-}
-
-// ---------------------------------------------------------------------------
-// ---------------------------------------------------------------------------
-// ---------------------------------------------------------------------------
-
-std::tuple<std::string,int> get_baryon_sim_name_and_tag(std::string sim)
-{
-  // Desired Convention:
-  // (1) Python input: not be case sensitive
-  // (2) simulation names only have "_" as deliminator, e.g., owls_AGN.
-  // (3) simulation IDs are indicated by "-", e.g., antilles-1.
- 
-  boost::trim_if(sim, boost::is_any_of("\t "));
-  sim = boost::algorithm::to_lower_copy(sim);
-  
-  { // Count occurrences of - (dashes)
-    size_t pos = 0; 
-    size_t count = 0; 
-    while ((pos = sim.find("-", pos)) != std::string::npos) 
-    {
-      ++count;
-    }
-
-    if (count > 1)
-    {
-      spdlog::critical(
-          "\x1b[90m{}\x1b[0m: Scenario {} not supported (too many dashes)", 
-          "get_baryon_sim_name_and_tag",
-          sim
-        );
-      exit(1);
-    }
-  }
-
-  if (sim.rfind("owls_agn") != std::string::npos)
-  {
-    boost::replace_all(sim, "owls_agn", "owls_AGN");
-    boost::replace_all(sim, "_t80", "-1");
-    boost::replace_all(sim, "_t85", "-2");
-    boost::replace_all(sim, "_t87", "-3");
-  } 
-  else if (sim.rfind("bahamas") != std::string::npos)
-  {
-    boost::replace_all(sim, "bahamas", "BAHAMAS");
-    boost::replace_all(sim, "_t78", "-1");
-    boost::replace_all(sim, "_t76", "-2");
-    boost::replace_all(sim, "_t80", "-3");
-  } 
-  else if (sim.rfind("hzagn") != std::string::npos)
-  {
-    boost::replace_all(sim, "hzagn", "HzAGN");
-  }
-  else if (sim.rfind("tng") != std::string::npos)
-  {
-    boost::replace_all(sim, "tng", "TNG");
-  }
-  
-  std::string name;
-  int tag;
-
-  if (sim.rfind('-') != std::string::npos)
-  {
-    const size_t pos = sim.rfind('-');
-    name = sim.substr(0, pos);
-    tag = std::stoi(sim.substr(pos + 1));
-  } 
-  else
-  { 
-    name = sim;
-    tag = 1; 
-  }
-
-  return std::make_tuple(name, tag);
 }
 
 // ---------------------------------------------------------------------------
@@ -946,11 +1134,11 @@ void init_baryons_contamination(std::string sim, std::string allsims)
   auto [name, tag] = get_baryon_sim_name_and_tag(sim);
        
   spdlog::info(
-    "\x1b[90m{}\x1b[0m: Baryon simulation w/ Name = {} & Tag = {} selected",
-    "init_baryons_contamination", 
-    name, 
-    tag
-  );
+      "\x1b[90m{}\x1b[0m: Baryon simulation w/ Name = {} & Tag = {} selected",
+      "init_baryons_contamination", 
+      name, 
+      tag
+    );
 
   init_baryons_from_hdf5_file(name.c_str(), tag, allsims.c_str());
 
@@ -961,7 +1149,7 @@ void init_baryons_contamination(std::string sim, std::string allsims)
 // ---------------------------------------------------------------------------
 // ---------------------------------------------------------------------------
 
-void init_data_vector_size(arma::Col<int>::fixed<6> exclude)
+void init_data_vector_size_real_space(arma::Col<int>::fixed<6> exclude)
 {
   arma::Col<int>::fixed<6> ndv = 
     {
@@ -997,15 +1185,18 @@ void init_data_vector_size(arma::Col<int>::fixed<6> exclude)
 // ---------------------------------------------------------------------------
 // ---------------------------------------------------------------------------
 
-void init_data_vector_size_3x2pt()
+void init_data_vector_size_3x2pt_real_space()
 {
-  spdlog::info("\x1b[90m{}\x1b[0m: Begins", "init_data_vector_size");
+  spdlog::info(
+      "\x1b[90m{}\x1b[0m: Begins", 
+      "init_data_vector_size_2x2pt_real_space"
+    );
 
   if (tomo.shear_Nbin == 0)
   {
     spdlog::debug( 
       "{}: {} not set prior to this function call",
-      "init_data_vector_size", 
+      "init_data_vector_size_2x2pt_real_space", 
       "tomo.shear_Nbin"
     );
   }
@@ -1013,7 +1204,7 @@ void init_data_vector_size_3x2pt()
   {
     spdlog::debug(
       "{}: {} not set prior to this function call",
-      "init_data_vector_size", 
+      "init_data_vector_size_2x2pt_real_space", 
       "tomo.clustering_Nbin"
     );
   }
@@ -1021,7 +1212,7 @@ void init_data_vector_size_3x2pt()
   {
     spdlog::critical(
       "{}: {} not set prior to this function call",
-      "init_data_vector_size", 
+      "init_data_vector_size_2x2pt_real_space", 
       "like.Ntheta"
     );
     exit(1);
@@ -1029,30 +1220,36 @@ void init_data_vector_size_3x2pt()
 
   arma::Col<int>::fixed<6> exclude = {1, 1, 1, -1, -1, -1};
 
-  init_data_vector_size(exclude);
+  init_data_vector_size_real_space(exclude);
   
   spdlog::info("\x1b[90m{}\x1b[0m: {} = {} selected.", 
-               "init_data_vector_size", 
+               "init_data_vector_size_2x2pt_real_space", 
                "Ndata", 
                like.Ndata
               );
   
-  spdlog::info("\x1b[90m{}\x1b[0m: Ends", "init_data_vector_size");
+  spdlog::info(
+      "\x1b[90m{}\x1b[0m: Ends", 
+      "init_data_vector_size_3x2pt_real_space"
+    );
 }
 
 // ---------------------------------------------------------------------------
 // ---------------------------------------------------------------------------
 // ---------------------------------------------------------------------------
 
-void init_data_vector_size_6x2pt()
+void init_data_vector_size_6x2pt_real_space()
 {
-  spdlog::info("\x1b[90m{}\x1b[0m: Begins", "init_data_vector_size");
+  spdlog::info(
+      "\x1b[90m{}\x1b[0m: Begins", 
+      "init_data_vector_size_6x2pt_real_space"
+    );
 
   if (tomo.shear_Nbin == 0)
   {
     spdlog::debug( 
       "{}: {} not set prior to this function call",
-      "init_data_vector_size", 
+      "init_data_vector_size_6x2pt_real_space", 
       "tomo.shear_Nbin"
     );
   }
@@ -1060,7 +1257,7 @@ void init_data_vector_size_6x2pt()
   {
     spdlog::debug(
       "{}: {} not set prior to this function call",
-      "init_data_vector_size", 
+      "init_data_vector_size_6x2pt_real_space", 
       "tomo.clustering_Nbin"
     );
   }
@@ -1068,7 +1265,7 @@ void init_data_vector_size_6x2pt()
   {
     spdlog::critical(
       "{}: {} not set prior to this function call",
-      "init_data_vector_size", 
+      "init_data_vector_size_6x2pt_real_space", 
       "like.Ntheta"
     );
     exit(1);
@@ -1079,7 +1276,7 @@ void init_data_vector_size_6x2pt()
     {
       spdlog::critical(
         "{}: {} not set prior to this function call", 
-        "init_data_vector_size", 
+        "init_data_vector_size_6x2pt_real_space", 
         "like.Ncl"
       );
       exit(1);
@@ -1091,7 +1288,8 @@ void init_data_vector_size_6x2pt()
     {
       spdlog::critical(
         "{}: {} not set prior to this function call", 
-        "init_data_vector_size", "like.Nbp"
+        "init_data_vector_size_6x2pt_real_space", 
+        "like.Nbp"
       );
       exit(1);
     }    
@@ -1100,22 +1298,147 @@ void init_data_vector_size_6x2pt()
   {
     spdlog::critical(
         "{}: {} not set prior to this function call", 
-        "init_data_vector_size", 
+        "init_data_vector_size_6x2pt_real_space", 
         "is_cmb_bandpower"
     );
   }
 
   arma::Col<int>::fixed<6> exclude = {1, 1, 1, 1, 1, 1};
 
-  init_data_vector_size(exclude);
+  init_data_vector_size_real_space(exclude);
 
+  spdlog::info("\x1b[90m{}\x1b[0m: {} = {} selected.", 
+               "init_data_vector_size_6x2pt_real_space", 
+               "Ndata", 
+               like.Ndata
+              );
+  
+  spdlog::info(
+      "\x1b[90m{}\x1b[0m: Ends", 
+      "init_data_vector_size_6x2pt_real_space"
+    );
+}
+
+// ---------------------------------------------------------------------------
+// ---------------------------------------------------------------------------
+// ---------------------------------------------------------------------------
+
+void init_data_3x2pt_real_space(
+    std::string cov, 
+    std::string mask, 
+    std::string data
+  )
+{
+  spdlog::debug("\x1b[90m{}\x1b[0m: Begins", "init_data_3x2pt_real_space");
+
+  if (tomo.shear_Nbin == 0)
+  {
+    spdlog::debug( 
+      "{}: {} not set prior to this function call",
+      "init_data_3x2pt_real_space", 
+      "tomo.shear_Nbin"
+    );
+  }
+
+  if (tomo.clustering_Nbin == 0)
+  {
+    spdlog::debug(
+      "{}: {} not set prior to this function call",
+      "init_data_3x2pt_real_space", 
+      "tomo.clustering_Nbin"
+    );
+  }
+
+  if (like.Ntheta == 0) 
+  {
+    spdlog::critical(
+      "{}: {} not set prior to this function call",
+      "init_data_3x2pt_real_space", 
+      "like.Ntheta"
+    );
+    exit(1);
+  }
+
+  arma::Col<int>::fixed<6> exclude = {1, 1, 1, -1, -1, -1};
+
+  init_data_vector_size_real_space(exclude);
+  
   spdlog::info("\x1b[90m{}\x1b[0m: {} = {} selected.", 
                "init_data_vector_size", 
                "Ndata", 
                like.Ndata
               );
+
+  // We assume the default ordering: Cosmic Shear, GGL, GG
+  arma::Col<int>::fixed<3> order = {0, 1, 2};
+
+  IP::get_instance().set_mask(mask, order);   // set_mask must be called first
+  IP::get_instance().set_data(data);
+  IP::get_instance().set_inv_cov(cov);
+
+  spdlog::debug("\x1b[90m{}\x1b[0m: Ends", "init_data_real");
+
+  return;
+}
+
+// ---------------------------------------------------------------------------
+// ---------------------------------------------------------------------------
+// ---------------------------------------------------------------------------
+
+void init_data_6x2pt_real_space(
+    std::string cov, 
+    std::string mask, 
+    std::string data
+  )
+{
+  spdlog::debug("\x1b[90m{}\x1b[0m: Begins", "init_data_3x2pt_real_space");
+
+  if (tomo.shear_Nbin == 0)
+  {
+    spdlog::debug( 
+      "{}: {} not set prior to this function call",
+      "init_data_3x2pt_real_space", 
+      "tomo.shear_Nbin"
+    );
+  }
+  if (tomo.clustering_Nbin == 0)
+  {
+    spdlog::debug(
+      "{}: {} not set prior to this function call",
+      "init_data_3x2pt_real_space", 
+      "tomo.clustering_Nbin"
+    );
+  }
+  if (like.Ntheta == 0) 
+  {
+    spdlog::critical(
+      "{}: {} not set prior to this function call",
+      "init_data_3x2pt_real_space", 
+      "like.Ntheta"
+    );
+    exit(1);
+  }
+
+  arma::Col<int>::fixed<6> exclude = {1, 1, 1, -1, -1, -1};
+
+  init_data_vector_size_real_space(exclude);
   
-  spdlog::info("\x1b[90m{}\x1b[0m: Ends", "init_data_vector_size");
+  spdlog::info("\x1b[90m{}\x1b[0m: {} = {} selected.", 
+               "init_data_vector_size", 
+               "Ndata", 
+               like.Ndata
+              );
+
+  // The default ordering: Cosmic Shear, GGL, GG, GK, KS, KK
+  arma::Col<int>::fixed<6> order = {0, 1, 2, 3, 4, 5};
+
+  IP::get_instance().set_mask(mask, order);   // set_mask must be called first
+  IP::get_instance().set_data(data);
+  IP::get_instance().set_inv_cov(cov);
+
+  spdlog::debug("\x1b[90m{}\x1b[0m: Ends", "init_data_real");
+
+  return;
 }
 
 // ---------------------------------------------------------------------------
@@ -1132,6 +1455,7 @@ void init_linear_power_spectrum(
 
   {
     bool debug_fail = false;
+    
     if (io_z.size()*io_log10k.size() != io_lnP.size())
     {
       debug_fail = true;
@@ -1143,30 +1467,39 @@ void init_linear_power_spectrum(
         debug_fail = true;
       }
     }
+    
     if (debug_fail)
     {
       spdlog::critical(
-        "\x1b[90m{}\x1b[0m: incompatible input w/ k.size = {}, z.size = {}, "
-        "and lnP.size = {}", "init_linear_power_spectrum", io_log10k.size(),
-        io_z.size(), io_lnP.size());
+          "\x1b[90m{}\x1b[0m: incompatible input w/ k.size = {}, z.size = {}, "
+          "and lnP.size = {}", "init_linear_power_spectrum", 
+          io_log10k.size(),
+          io_z.size(), 
+          io_lnP.size()
+        );
       exit(1);
     }
 
     if(io_z.size() < 5 || io_log10k.size() < 5)
     {
       spdlog::critical(
-        "\x1b[90m{}\x1b[0m: bad input w/ k.size = {}, z.size = {}, "
-        "and lnP.size = {}", "init_linear_power_spectrum", io_log10k.size(),
-        io_z.size(), io_lnP.size());
+          "\x1b[90m{}\x1b[0m: bad input w/ k.size = {}, z.size = {}, "
+          "and lnP.size = {}", "init_linear_power_spectrum", 
+          io_log10k.size(),
+          io_z.size(), 
+          io_lnP.size()
+        );
       exit(1);
     }
   }
 
   int nlog10k = static_cast<int>(io_log10k.size());
   int nz = static_cast<int>(io_z.size());
+  
   double* log10k = io_log10k.data();
   double* z = io_z.data();
   double* lnP = io_lnP.data();
+  
   setup_p_lin(&nlog10k, &nz, &log10k, &z, &lnP, 1);
 
   // force initialization - imp to avoid seg fault when openmp is on
@@ -1289,15 +1622,20 @@ void init_growth(stlvector io_z, stlvector io_G)
   }
 
   int nz = static_cast<int>(io_z.size());
+  
   double* z = io_z.data();
   double* G = io_G.data();
+  
   setup_growth(&nz, &z, &G, 1);
 
   // force initialization - imp to avoid seg fault when openmp is on
   const double io_a = 1.0;
   const double zz = 0.0;
+  
   f_growth(zz);
+  
   growfac_all(io_a);
+  
   growfac(io_a);
 
   spdlog::debug("\x1b[90m{}\x1b[0m: Ends", "init_growth");
@@ -1341,8 +1679,10 @@ void init_distances(stlvector io_z, stlvector io_chi)
   }
 
   int nz = static_cast<int>(io_z.size());
+  
   double* vz = io_z.data();
   double* vchi = io_chi.data();
+  
   setup_chi(&nz, &vz, &vchi, 1);
 
   // force initialization - imp to avoid seg fault when openmp is on
@@ -1720,6 +2060,89 @@ void set_nuisance_bias(stlvector B1, stlvector B2, stlvector B_MAG)
 // ---------------------------------------------------------------------------
 // ---------------------------------------------------------------------------
 
+void set_nuisance_IA(
+    std::vector<double> A1, 
+    std::vector<double> A2,
+    std::vector<double> BTA
+  )
+{
+  spdlog::debug("\x1b[90m{}\x1b[0m: Begins", "set_nuisance_IA");
+
+  if (tomo.shear_Nbin == 0)
+  {
+    spdlog::critical(
+        "\x1b[90m{}\x1b[0m: {} = 0 is invalid",
+        "set_nuisance_IA", 
+        "shear_Nbin"
+      );
+    exit(1);
+  }
+
+  if (tomo.shear_Nbin != static_cast<int>(A1.size()) ||
+      tomo.shear_Nbin != static_cast<int>(A2.size()) ||
+      tomo.shear_Nbin != static_cast<int>(BTA.size()))
+  {
+    spdlog::critical(
+        "\x1b[90m{}\x1b[0m: incompatible input w/ sizes = {}, {} and {} (!= {})",
+        "set_nuisance_IA", 
+        A1.size(), 
+        A2.size(), 
+        BTA.size(), 
+        tomo.shear_Nbin
+      );
+    exit(1);
+  }
+
+  nuisance.c1rhocrit_ia = 0.01389;
+  
+  if (like.IA == 2)
+  {
+    for (int i=0; i<tomo.shear_Nbin; i++)
+    {
+      nuisance.A_z[i]     = A1[i];
+      nuisance.A2_z[i]    = A2[i];
+      nuisance.b_ta_z[i]  = BTA[i];
+    }
+  }
+  else if (like.IA == 3)
+  {
+    nuisance.A_ia         = A1[0];
+    nuisance.eta_ia       = A1[1];
+    nuisance.oneplusz0_ia = 1.62;
+
+    nuisance.A2_ia = A2[0];
+    nuisance.eta_ia_tt = A2[1];
+    nuisance.b_ta_z[0] = BTA[0];
+
+    for (int i=2; i<tomo.shear_Nbin; i++)
+    {
+      if ( !(almost_equal(A1[i], 0.))    || 
+           !(almost_equal(A2[i], 0.))    ||
+           !(almost_equal(BTA[i], 0.))
+          )
+      {
+        spdlog::critical(
+            "set_nuisance_IA: one of nuisance.A_z[{}]={}, nuisance.A2_z[{}]="
+            "{}, nuisance.b_ta[{}]={} was specified w/ power-law evolution\n",
+            i, 
+            nuisance.A_z[i], 
+            i, 
+            nuisance.A2_z[i], 
+            i, 
+            nuisance.b_ta_z[i]
+          );
+        exit(1);
+      }
+    }
+  }
+
+  spdlog::debug("\x1b[90m{}\x1b[0m: Ends", "set_nuisance_ia");
+}
+
+// ---------------------------------------------------------------------------
+// ---------------------------------------------------------------------------
+// ---------------------------------------------------------------------------
+
 void set_pm(stlvector PM)
 {  
   PointMass::get_instance().set_pm_vector(PM); 
@@ -1757,7 +2180,7 @@ void set_pm(stlvector PM)
 // ---------------------------------------------------------------------------
 // ---------------------------------------------------------------------------
 
-matrix get_cov_masked()
+matrix get_covariance_masked()
 {
   return IP::get_instance().get_cov_masked();
 }
@@ -1766,7 +2189,7 @@ matrix get_cov_masked()
 // ---------------------------------------------------------------------------
 // ---------------------------------------------------------------------------
 
-matrix get_cov_masked_sqzd()
+matrix get_covariance_masked_sqzd()
 {
   return IP::get_instance().get_cov_masked_sqzd();
 }
@@ -1892,8 +2315,6 @@ double compute_pm(const int zl, const int zs, const double theta)
 {
   return PointMass::get_instance().get_pm(zl,zs,theta);
 }
-
-
 
 // ---------------------------------------------------------------------------
 // ---------------------------------------------------------------------------
@@ -2096,17 +2517,17 @@ void compute_kk_fourier_masked(stlvector& data_vector, const int start)
 // ---------------------------------------------------------------------------
 // ---------------------------------------------------------------------------
 
-// order = (1,2,3,4,5,6) => Cosmic Shear, ggl, gg, gk, sk, kk
-// order = (2,1,3,4,5,6) => ggl, Cosmic Shear, gg, gk, sk, kk ...
-stlvector compute_data_vector_6x2pt_masked(arma::Col<int>::fixed<6> order)
-{ 
+stlvector compute_data_vector_6x2pt_masked_any_order(
+    arma::Col<int>::fixed<6> order
+  )
+{ // order = (1,2,3,4,5,6) => Cosmic Shear, ggl, gg, gk, sk, kk
   spdlog::debug("\x1b[90m{}\x1b[0m: Begins", "compute_data_vector_masked");
 
   if (tomo.shear_Nbin == 0)
   {
     spdlog::critical(
       "\x1b[90m{}\x1b[0m: {} = 0 is invalid",
-      "compute_data_vector_masked", 
+      "compute_data_vector_6x2pt_masked_any_order", 
       "shear_Nbin"
     );
     exit(1);
@@ -2116,7 +2537,7 @@ stlvector compute_data_vector_6x2pt_masked(arma::Col<int>::fixed<6> order)
   {
     spdlog::critical(
       "\x1b[90m{}\x1b[0m: {} = 0 is invalid",
-      "compute_data_vector_masked", 
+      "compute_data_vector_6x2pt_masked_any_order", 
       "Ntheta"
     );
     exit(1);
@@ -2128,7 +2549,7 @@ stlvector compute_data_vector_6x2pt_masked(arma::Col<int>::fixed<6> order)
     {
       spdlog::critical(
         "\x1b[90m{}\x1b[0m: {} not set prior to this function call",
-        "compute_data_vector_masked", 
+        "compute_data_vector_6x2pt_masked_any_order", 
         "like.Ncl"
       );
       exit(1);
@@ -2138,7 +2559,7 @@ stlvector compute_data_vector_6x2pt_masked(arma::Col<int>::fixed<6> order)
     { // check ell range
       spdlog::critical(
         "\x1b[90m{}\x1b[0m: {} and {} are invalid",
-        "compute_data_vector_masked", 
+        "compute_data_vector_6x2pt_masked_any_order", 
         "like.lmin_bp", 
         "like.lmax_bp"
       );
@@ -2149,7 +2570,7 @@ stlvector compute_data_vector_6x2pt_masked(arma::Col<int>::fixed<6> order)
     { // check binning matrix and CMB lensing band power offset
       spdlog::critical(
         "\x1b[90m{}\x1b[0m: {} not set prior to this function call",
-        "compute_data_vector_masked", 
+        "compute_data_vector_6x2pt_masked_any_order", 
         "cmb_binning_matrix_with_correction"
       );
       exit(1);
@@ -2159,7 +2580,7 @@ stlvector compute_data_vector_6x2pt_masked(arma::Col<int>::fixed<6> order)
     {
       spdlog::critical(
         "\x1b[90m{}\x1b[0m: {} not set prior to this function call",
-        "compute_data_vector_masked", 
+        "compute_data_vector_6x2pt_masked_any_order", 
         "cmb_theory_offset"
       );
       exit(1);
@@ -2171,7 +2592,7 @@ stlvector compute_data_vector_6x2pt_masked(arma::Col<int>::fixed<6> order)
     {
       spdlog::critical(
         "\x1b[90m{}\x1b[0m: {} not set prior to this function call",
-        "compute_data_vector_masked", 
+        "compute_data_vector_6x2pt_masked_any_order", 
         "like.Ncl"
       );
       exit(1);
@@ -2181,7 +2602,7 @@ stlvector compute_data_vector_6x2pt_masked(arma::Col<int>::fixed<6> order)
     {
       spdlog::critical(
         "\x1b[90m{}\x1b[0m: {} and {} are invalid",
-        "compute_data_vector_masked", 
+        "compute_data_vector_6x2pt_masked_any_order", 
         "like.lmin", 
         "like.lmax"
       );
@@ -2192,7 +2613,7 @@ stlvector compute_data_vector_6x2pt_masked(arma::Col<int>::fixed<6> order)
   {
     spdlog::critical(
       "\x1b[90m{}\x1b[0m: {} not set prior to this function call",
-      "compute_data_vector_masked", 
+      "compute_data_vector_6x2pt_masked_any_order", 
       "like.is_cmb_bandpower"
     );
     exit(1);
@@ -2202,7 +2623,7 @@ stlvector compute_data_vector_6x2pt_masked(arma::Col<int>::fixed<6> order)
   {
     spdlog::critical(
       "\x1b[90m{}\x1b[0m: {} not set prior to this function call",
-      "compute_data_vector_masked", 
+      "compute_data_vector_6x2pt_masked_any_order", 
       "mask"
     );
     exit(1);
@@ -2212,7 +2633,7 @@ stlvector compute_data_vector_6x2pt_masked(arma::Col<int>::fixed<6> order)
   {
     spdlog::critical(
       "\x1b[90m{}\x1b[0m: {} not set prior to this function call",
-      "compute_data_vector_masked", 
+      "compute_data_vector_6x2pt_masked_any_order", 
       "like.lmin_kappacmb"
     );
     exit(1);
@@ -2222,7 +2643,7 @@ stlvector compute_data_vector_6x2pt_masked(arma::Col<int>::fixed<6> order)
   {
     spdlog::critical(
       "\x1b[90m{}\x1b[0m: {} not set prior to this function call",
-      "compute_data_vector_masked", 
+      "compute_data_vector_6x2pt_masked_any_order", 
       "like.lmax_kappacmb"
     );
     exit(1);
@@ -2232,7 +2653,7 @@ stlvector compute_data_vector_6x2pt_masked(arma::Col<int>::fixed<6> order)
   {
     spdlog::critical(
       "\x1b[90m{}\x1b[0m: {} not set prior to this function call",
-      "compute_data_vector_masked", 
+      "compute_data_vector_6x2pt_masked_any_order", 
       "cmb.fwhm"
     );
     exit(1);
@@ -2256,7 +2677,7 @@ stlvector compute_data_vector_6x2pt_masked(arma::Col<int>::fixed<6> order)
 
   arma::Col<int>::fixed<sz> start = {0,0,0,0,0,0};
 
-  for(int i=0; i<6; i++)
+  for(int i=0; i<sz; i++)
   {
     for(int j=0; j<indices(i); j++)
     {
@@ -2278,22 +2699,32 @@ stlvector compute_data_vector_6x2pt_masked(arma::Col<int>::fixed<6> order)
   
   compute_kk_fourier_masked(data_vector, start(5));
   
-  spdlog::debug("\x1b[90m{}\x1b[0m: Ends", "compute_data_vector_masked");
+  spdlog::debug(
+      "\x1b[90m{}\x1b[0m: Ends", 
+      "compute_data_vector_6x2pt_masked_any_order"
+    );
 
   return data_vector;
 }
 
-// order = (1,2,3) => Cosmic Shear, ggl, gg
-// order = (2,1,3) => ggl, Cosmic Shear, gg  ...
-stlvector compute_data_vector_3x2pt_masked(arma::Col<int>::fixed<3> order)
-{ 
-  spdlog::debug("\x1b[90m{}\x1b[0m: Begins", "compute_data_vector_masked");
+// ---------------------------------------------------------------------------
+// ---------------------------------------------------------------------------
+// ---------------------------------------------------------------------------
+
+stlvector compute_data_vector_3x2pt_masked_any_order(
+    arma::Col<int>::fixed<3> order
+  )
+{ // order = (1,2,3) => Cosmic Shear, ggl, gg
+  spdlog::debug(
+      "\x1b[90m{}\x1b[0m: Begins", 
+      "compute_data_vector_3x2pt_masked_any_order"
+    );
 
   if (tomo.shear_Nbin == 0)
   {
     spdlog::critical(
       "\x1b[90m{}\x1b[0m: {} = 0 is invalid",
-      "compute_data_vector_masked", 
+      "compute_data_vector_3x2pt_masked_any_order", 
       "shear_Nbin"
     );
     exit(1);
@@ -2303,7 +2734,7 @@ stlvector compute_data_vector_3x2pt_masked(arma::Col<int>::fixed<3> order)
   {
     spdlog::critical(
       "\x1b[90m{}\x1b[0m: {} = 0 is invalid",
-      "compute_data_vector_masked", 
+      "compute_data_vector_3x2pt_masked_any_order", 
       "Ntheta"
     );
     exit(1);
@@ -2313,7 +2744,7 @@ stlvector compute_data_vector_3x2pt_masked(arma::Col<int>::fixed<3> order)
   {
     spdlog::critical(
       "\x1b[90m{}\x1b[0m: {} not set prior to this function call",
-      "compute_data_vector_masked", 
+      "compute_data_vector_3x2pt_masked_any_order", 
       "mask"
     );
     exit(1);
@@ -2334,7 +2765,7 @@ stlvector compute_data_vector_3x2pt_masked(arma::Col<int>::fixed<3> order)
 
   arma::Col<int>::fixed<sz> start = {0,0,0};
 
-  for(int i=0; i<3; i++)
+  for(int i=0; i<sz; i++)
   {
     for(int j=0; j<indices(i); j++)
     {
@@ -2350,9 +2781,32 @@ stlvector compute_data_vector_3x2pt_masked(arma::Col<int>::fixed<3> order)
 
   compute_gg_real_masked(data_vector, start(2));
 
-  spdlog::debug("\x1b[90m{}\x1b[0m: Ends", "compute_data_vector_masked");
+  spdlog::debug(
+      "\x1b[90m{}\x1b[0m: Ends", 
+      "compute_data_vector_3x2pt_masked_any_order"
+    );
 
   return data_vector;
+}
+
+// ---------------------------------------------------------------------------
+// ---------------------------------------------------------------------------
+// ---------------------------------------------------------------------------
+
+stlvector compute_data_vector_6x2pt_masked()
+{
+  arma::Col<int>::fixed<3> order = {0, 1, 2, 3, 4, 5};
+  return compute_data_vector_6x2pt_masked_any_order(order);
+}
+
+// ---------------------------------------------------------------------------
+// ---------------------------------------------------------------------------
+// ---------------------------------------------------------------------------
+
+stlvector compute_data_vector_3x2pt_masked()
+{
+  arma::Col<int>::fixed<3> order = {0, 1, 2};
+  return compute_data_vector_3x2pt_masked_any_order(order);
 }
 
 // ---------------------------------------------------------------------------
@@ -2471,7 +2925,10 @@ void IP::set_data(std::string DATA)
   matrix table = read_table(DATA);
   if (table.n_rows != this->ndata_)
   {
-    spdlog::critical("\x1b[90m{}\x1b[0m: inconsistent data vector", "set_data");
+    spdlog::critical(
+        "\x1b[90m{}\x1b[0m: inconsistent data vector", 
+        "set_data"
+      );
     exit(1);
   }
 
@@ -2523,6 +2980,7 @@ void IP::set_mask(std::string MASK, arma::Col<int>::fixed<3> order)
   this->mask_.set_size(this->ndata_);
 
   matrix table = read_table(MASK);
+
   if (table.n_rows != this->ndata_)
   {
     spdlog::critical("\x1b[90m{}\x1b[0m: inconsistent mask", "set_mask");
@@ -2531,7 +2989,7 @@ void IP::set_mask(std::string MASK, arma::Col<int>::fixed<3> order)
   
   for (int i=0; i<this->ndata_; i++)
   {
-    this->mask_(i) = static_cast<int>(table(i,1)+1e-13);
+    this->mask_(i) = static_cast<int>(table(i,1) + 1e-13);
     
     if (!(this->mask_(i) == 0 || this->mask_(i) == 1))
     {
@@ -3621,155 +4079,6 @@ double PointMass::get_pm(
     g_tomo(a_lens, zs)/(theta*theta)/(chi_lens*a_lens);
 }
 
-// ---------------------------------------------------------------------------
-// ---------------------------------------------------------------------------
-// ---------------------------------------------------------------------------
-// ---------------------------------------------------------------------------
-// ---------------------------------------------------------------------------
-// ---------------------------------------------------------------------------
-// ---------------------------------------------------------------------------
-// ---------------------------------------------------------------------------
-// ---------------------------------------------------------------------------
-// ---------------------------------------------------------------------------
-// ---------------------------------------------------------------------------
-// ---------------------------------------------------------------------------
-// ---------------------------------------------------------------------------
-// ---------------------------------------------------------------------------
-// cia GLOBAL FUNCTIONS
-// ---------------------------------------------------------------------------
-// ---------------------------------------------------------------------------
-// ---------------------------------------------------------------------------
-// ---------------------------------------------------------------------------
-// ---------------------------------------------------------------------------
-// ---------------------------------------------------------------------------
-// ---------------------------------------------------------------------------
-// ---------------------------------------------------------------------------
-// ---------------------------------------------------------------------------
-// ---------------------------------------------------------------------------
-// ---------------------------------------------------------------------------
-// ---------------------------------------------------------------------------
-// ---------------------------------------------------------------------------
-// ---------------------------------------------------------------------------
-// ---------------------------------------------------------------------------
-
-matrix read_table(const std::string file_name)
-{
-  std::ifstream input_file(file_name);
-
-  if (!input_file.is_open())
-  {
-    spdlog::critical(
-      "\x1b[90m{}\x1b[0m: file {} cannot be opened",
-      "read_table",
-      file_name
-    );
-    exit(1);
-  }
-
-  // --------------------------------------------------------
-  // Read the entire file into memory
-  // --------------------------------------------------------
-
-  std::string tmp;
-  
-  input_file.seekg(0,std::ios::end);
-  
-  tmp.resize(static_cast<size_t>(input_file.tellg()));
-  
-  input_file.seekg(0,std::ios::beg);
-  
-  input_file.read(&tmp[0],tmp.size());
-  
-  input_file.close();
-  
-  if(tmp.empty())
-  {
-    spdlog::critical(
-      "\x1b[90m{}\x1b[0m: file {} is empty",
-      "read_table",
-      file_name
-    );
-    exit(1);
-  }
-  
-  // --------------------------------------------------------
-  // Second: Split file into lines
-  // --------------------------------------------------------
-  
-  std::vector<std::string> lines;
-  lines.reserve(50000);
-
-  boost::trim_if(tmp, boost::is_any_of("\t "));
-  
-  boost::trim_if(tmp, boost::is_any_of("\n"));
-  
-  boost::split(lines, tmp,boost::is_any_of("\n"), boost::token_compress_on);
-  
-  // Erase comment/blank lines
-  auto check = [](std::string mystr) -> bool
-  {
-    return boost::starts_with(mystr, "#");
-  };
-  lines.erase(std::remove_if(lines.begin(), lines.end(), check), lines.end());
-  
-  // --------------------------------------------------------
-  // Third: Split line into words
-  // --------------------------------------------------------
-
-  matrix result;
-  size_t ncols = 0;
-  
-  { // first line
-    std::vector<std::string> words;
-    words.reserve(100);
-    
-    boost::split(
-      words,lines[0], 
-      boost::is_any_of(" \t"),
-      boost::token_compress_on
-    );
-    
-    ncols = words.size();
-    
-    result.set_size(lines.size(), ncols);
-    
-    for (size_t j=0; j<ncols; j++)
-    {
-      result(0,j) = std::stod(words[j]);
-    }
-  }
-
-  #pragma omp parallel for
-  for (size_t i=1; i<lines.size(); i++)
-  {
-    std::vector<std::string> words;
-    
-    boost::split(
-      words, 
-      lines[i], 
-      boost::is_any_of(" \t"),
-      boost::token_compress_on
-    );
-    
-    if (words.size() != ncols)
-    {
-      spdlog::critical(
-        "\x1b[90m{}\x1b[0m: file {} is not well formatted"
-        " (regular table required)", 
-        "read_table", 
-        file_name
-      );
-      exit(1);
-    }
-    
-    for (size_t j=0; j<ncols; j++)
-    {
-      result(i,j) = std::stod(words[j]);
-    }
-  };
-  
-  return result;
-}
 
 // ---------------------------------------------------------------------------
 // ---------------------------------------------------------------------------

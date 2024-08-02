@@ -352,7 +352,7 @@ class BaryonScenario
 // ---------------------------------------------------------------------------
 // ---------------------------------------------------------------------------
 // ---------------------------------------------------------------------------
-// GLOBAL FUNCTIONS
+// AUX FUNCTIONS
 // ---------------------------------------------------------------------------
 // ---------------------------------------------------------------------------
 // ---------------------------------------------------------------------------
@@ -403,7 +403,7 @@ void init_binning_fourier(
     const double lmax
   );
 
-void init_binning_real(
+void init_binning_real_space(
     const int Ntheta, 
     const double theta_min_arcmin, 
     const double theta_max_arcmin
@@ -428,18 +428,34 @@ void init_cmb(
 
 void init_cmb_bandpower(
     const int is_cmb_bandpower, 
-    const int is_cmb_kkkk_cov_from_simulation, 
+    const int is_cmb_kkkk_covariance_from_simulation, 
     const double alpha
+  );
+
+void init_data_3x2pt_real_space(
+    std::string cov, 
+    std::string mask, 
+    std::string data
+  );
+
+void init_data_6x2pt_real_space(
+    std::string cov, 
+    std::string mask, 
+    std::string data
   );
 
 void init_data_vector_size(
     arma::Col<int>::fixed<6> exclude
   );
 
-void init_data_vector_size_3x2pt(
+void init_data_vector_size_real_space(
+    arma::Col<int>::fixed<6> exclude
   );
 
-void init_data_vector_size_6x2pt(
+void init_data_vector_size_3x2pt_real_space(
+  );
+
+void init_data_vector_size_6x2pt_real_space(
   );
 
 void init_distances(
@@ -522,6 +538,12 @@ void set_nuisance_clustering_photoz(
     std::vector<double> CP
   );
 
+void set_nuisance_IA(
+    std::vector<double> A1, 
+    std::vector<double> A2,
+    std::vector<double> BTA
+  );
+
 void set_nuisance_magnification_bias(
   std::vector<double> B_MAG
   );
@@ -581,10 +603,10 @@ std::vector<double> get_data_vector_expanded_from_sqzd(
     std::vector<double> sqzd
   );
 
-matrix get_cov_masked(
+arma::Mat<double> get_covariance_masked(
   );
 
-matrix get_cov_masked_sqzd(
+arma::Mat<double> get_covariance_masked_sqzd(
   );
 
 int get_mask(
@@ -626,49 +648,21 @@ double compute_chi2(
     std::vector<double> datavector
   );
 
-void compute_ss_real_masked(
-    std::vector<double>& data_vector, 
-    const int start
-  );
-
-void compute_gs_real_masked(
-    std::vector<double>& data_vector, 
-    const int start
-  );
-
-void compute_gg_real_masked(
-    std::vector<double>& data_vector, 
-    const int start
-  );
-
-void compute_gk_real_masked(
-    std::vector<double>& data_vector, 
-    const int start
-  );
-
-void compute_ks_real_masked(
-    std::vector<double>& data_vector, 
-    const int start
-  );
-
-void compute_kk_fourier_masked(
-    std::vector<double>& data_vector, 
-    const int start
-  );
-
-std::vector<double> compute_data_vector_6x2pt_masked(
+std::vector<double> compute_data_vector_6x2pt_masked_any_order(
     arma::Col<int>::fixed<6> order
   );
 
-std::vector<double> compute_data_vector_3x2pt_masked(
+std::vector<double> compute_data_vector_3x2pt_masked_any_order(
     arma::Col<int>::fixed<3> order
   );
 
-double compute_pm(
-      const int zl, 
-      const int zs, 
-      const double theta
-    );
+// Assume default ordering Cosmic Shear, GGL, GG
+std::vector<double> compute_data_vector_3x2pt_masked(
+  );
+
+// Assume default ordering Cosmic Shear, GGL, GG, GK, KS, KK
+std::vector<double> compute_data_vector_6x2pt_masked(
+  );
 
 }  // namespace cosmolike_interface
 #endif // HEADER GUARD
