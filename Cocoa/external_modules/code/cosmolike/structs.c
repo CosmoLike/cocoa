@@ -422,16 +422,19 @@ void reset_bary_struct()
     free(bary.a_bins);
     bary.a_bins = NULL;
   }
+
   if((bary.logk_bins != NULL))
   {
     free(bary.logk_bins);
     bary.logk_bins = NULL;
   }
+  
   if((bary.log_PkR != NULL))
   {
     free(bary.log_PkR);
     bary.log_PkR = NULL;
   }
+  
   if((bary.interp2d != NULL))
   {
     gsl_interp2d_free(bary.interp2d);

@@ -9552,8 +9552,8 @@ static double logPkR_BAHAMAS_T80[380][15] = {{-6.576971e-24,-6.576971e-24,0.0000
 void set_baryon_arrays_generic(
     double zbins[],
     double logkBins[],
-    int nkbins,
-    double logPkR[][nkbins]
+    int nzbins,
+    double logPkR[][nzbins]
   )
 {
   bary.a_bins = (double*) malloc(sizeof(double)*bary.Na_bins);
@@ -9594,7 +9594,6 @@ void set_baryon_arrays_generic(
     exit(1);
   }
 
-  #pragma omp parallel for
   for (int i=0; i<bary.Na_bins; i++)
   {
     bary.a_bins[i] = 1./(1 + zbins[i]);
@@ -9647,7 +9646,7 @@ void init_baryons(const char* sim)
 {
   reset_bary_struct();
   
-  if (strcmp(sim, "TNG100") == 0)
+  if (strcmp(sim, "TNG100-1") == 0)
   {
     bary.Nk_bins = 325;
     bary.Na_bins = 13;
@@ -9655,127 +9654,132 @@ void init_baryons(const char* sim)
     set_baryon_arrays_generic(
         zBins_TNG100, 
         logkBins_TNG100, 
-        bary.Nk_bins,
+        bary.Na_bins,
         logPkR_TNG100
       );
   }
-  else if (strcmp(sim, "HzAGN") == 0)
+  else if (strcmp(sim, "HzAGN-1") == 0)
   {
-    bary.Na_bins = 11;
     bary.Nk_bins = 675;
-
+    bary.Na_bins = 11;
+    
     set_baryon_arrays_generic(
         zBins_HzAGN, 
         logkBins_HzAGN, 
-        bary.Nk_bins,
+        bary.Na_bins,
         logPkR_HzAGN
       );
   }
-  else if (strcmp(sim, "mb2") == 0)
+  else if (strcmp(sim, "mb2-1") == 0)
   {
-    bary.Na_bins = 21;
     bary.Nk_bins = 350;
+    bary.Na_bins = 21;
 
     set_baryon_arrays_generic(
         zBins_mb2, 
         logkBins_mb2,
-        bary.Nk_bins, 
+        bary.Na_bins, 
         logPkR_mb2
       );
   }
-  else if (strcmp(sim, "illustris") == 0)
+  else if (strcmp(sim, "illustris-1") == 0)
   {
-    bary.Na_bins = 23;
     bary.Nk_bins = 323;
-
+    bary.Na_bins = 23;
+    
     set_baryon_arrays_generic(
         zBins_illustris, 
         logkBins_illustris,
-        bary.Nk_bins,
+        bary.Na_bins,
         logPkR_illustris
       );
   }
-  else if (strcmp(sim, "eagle") == 0)
+  else if (strcmp(sim, "eagle-1") == 0)
   {
-    bary.Na_bins = 13;
     bary.Nk_bins = 309;
-
+    bary.Na_bins = 13;
+    
     set_baryon_arrays_generic(
         zBins_eagle, 
         logkBins_eagle,
-        bary.Nk_bins, 
+        bary.Na_bins, 
         logPkR_eagle
       );
   }
   else if (strcmp(sim, "owls_AGN-1") == 0)
   { // owls_AGN_T80 = owls_AGN-1
-    bary.Na_bins = 15;
+    
     bary.Nk_bins = 326;
-
+    bary.Na_bins = 15;
+    
     set_baryon_arrays_generic(
         zBins_cowls_AGN, 
         logkBins_cowls_AGN_T80, 
-        bary.Nk_bins,
+        bary.Na_bins,
         logPkR_cowls_AGN_T80
       );
   }
   else if (strcmp(sim, "owls_AGN-2") == 0)
   { // owls_AGN_T85 = owls_AGN-2
-    bary.Na_bins = 15;
+    
     bary.Nk_bins = 326;
-
+    bary.Na_bins = 15;
+    
     set_baryon_arrays_generic(
         zBins_cowls_AGN, 
         logkBins_cowls_AGN_T85, 
-        bary.Nk_bins,
+        bary.Na_bins,
         logPkR_cowls_AGN_T85
       );
   }
   else if (strcmp(sim, "owls_AGN-3") == 0)
   { // owls_AGN_T87 = owls_AGN-3
-    bary.Na_bins = 15;
+    
     bary.Nk_bins = 326;
-
+    bary.Na_bins = 15;
+    
     set_baryon_arrays_generic(
         zBins_cowls_AGN, 
         logkBins_cowls_AGN_T87, 
-        bary.Nk_bins,
+        bary.Na_bins,
         logPkR_cowls_AGN_T87
       );
   }
   else if (strcmp(sim, "BAHAMAS-2") == 0)
   { // "BAHAMAS_T76" = "BAHAMAS-2"
-    bary.Na_bins = 15;
+    
     bary.Nk_bins = 380;
-
+    bary.Na_bins = 15;
+    
     set_baryon_arrays_generic(
         zBins_BAHAMAS, 
         logkBins_BAHAMAS_T76, 
-        bary.Nk_bins,
+        bary.Na_bins,
         logPkR_BAHAMAS_T76
       );
   }
   else if (strcmp(sim, "BAHAMAS-1") == 0)
   { // "BAHAMAS_T78" = "BAHAMAS-1"
-    bary.Na_bins = 15;
+    
     bary.Nk_bins = 380;
-
+    bary.Na_bins = 15;
+    
     set_baryon_arrays_generic(
         zBins_BAHAMAS, 
         logkBins_BAHAMAS_T78,
-        bary.Nk_bins, 
+        bary.Na_bins, 
         logPkR_BAHAMAS_T78
       );
   }
   else if (strcmp(sim, "BAHAMAS-3") == 0)
   { // BAHAMAS_T80 = BAHAMAS-3
-    bary.Na_bins = 15;
     bary.Nk_bins = 380;
-
+    bary.Na_bins = 15;
+    
     set_baryon_arrays_generic(
         zBins_BAHAMAS, 
         logkBins_BAHAMAS_T80,
-        bary.Nk_bins, 
+        bary.Na_bins, 
         logPkR_BAHAMAS_T80
       );
   }

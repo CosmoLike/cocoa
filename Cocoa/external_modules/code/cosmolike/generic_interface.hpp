@@ -72,11 +72,6 @@ class RandomNumber
 
 class IP
 { // InterfaceProducts: Singleton Class that holds data vector, covariance...
-  using Vector = arma::Col<double>;
-  using STLVector = std::vector<double>;
-  using Matrix = arma::Mat<double>;
-  using Cube = arma::Cube<double>;
-
   public:
     static IP& get_instance()
     {
@@ -96,15 +91,15 @@ class IP
 
     // ----------------------------------------------
 
-    void set_data(std::string DATA);
+    void set_data(std::string datavector_filename);
 
     // 3x2pt
-    void set_mask(std::string MASK, arma::Col<int>::fixed<3> order);
+    void set_mask(std::string mask_filename, arma::Col<int>::fixed<3> order);
 
     // 6x2pt
-    void set_mask(std::string MASK, arma::Col<int>::fixed<6> order);
+    void set_mask(std::string mask_filename, arma::Col<int>::fixed<6> order);
 
-    void set_inv_cov(std::string COV);
+    void set_inv_cov(std::string covariance_filename);
 
     //void set_PMmarg(std::string U_PMmarg_file);
 
@@ -122,9 +117,11 @@ class IP
 
     double get_inv_cov_masked_sqzd(const int ci, const int cj) const;
 
-    Vector expand_data_vector_from_sqzd(Vector input) const;
+    arma::Col<double> expand_theory_data_vector_from_sqzd(arma::Col<double>) const;
 
-    double get_chi2(STLVector datavector) const;
+    arma::Col<double> sqzd_theory_data_vector(arma::Col<double>) const;
+
+    double get_chi2(std::vector<double> datavector) const;
 
     // ----------------------------------------------
 
@@ -132,19 +129,19 @@ class IP
 
     arma::Col<int> get_mask() const;
 
-    Vector get_dv_masked() const;
+    arma::Col<double> get_dv_masked() const;
 
-    Matrix get_cov_masked() const;
+    arma::Mat<double> get_cov_masked() const;
 
-    Matrix get_inv_cov_masked() const;
+    arma::Mat<double> get_inv_cov_masked() const;
 
     int get_ndata_sqzd() const;
 
-    Vector get_dv_masked_sqzd() const;
+    arma::Col<double> get_dv_masked_sqzd() const;
 
-    Matrix get_cov_masked_sqzd() const;
+    arma::Mat<double> get_cov_masked_sqzd() const;
 
-    Matrix get_inv_cov_masked_sqzd() const;
+    arma::Mat<double> get_inv_cov_masked_sqzd() const;
 
   private:
 
@@ -156,7 +153,7 @@ class IP
     
     int ndata_ = 0;
     
-    int ndata_masked_ = 0;                      // for baryon project, reduced dim
+    int ndata_sqzd_ = 0;                      // for baryon PC, reduced dim
     
     std::string mask_filename_;
     
@@ -166,19 +163,19 @@ class IP
     
     arma::Col<int> mask_;
 
-    Vector data_masked_;
+    arma::Col<double> data_masked_;
     
-    Matrix cov_masked_;
+    arma::Mat<double> cov_masked_;
 
     arma::Col<int> index_sqzd_;
     
-    Matrix inv_cov_masked_;
+    arma::Mat<double> inv_cov_masked_;
     
-    Vector data_masked_sqzd_;             // for baryon project, reduced dim
+    arma::Col<double> data_masked_sqzd_;     // for baryon project, reduced dim
 
-    Matrix cov_masked_sqzd_;              // for baryon project, reduced dim
+    arma::Mat<double> cov_masked_sqzd_;      // for baryon project, reduced dim
 
-    Matrix inv_cov_masked_sqzd_;          // for baryon project, reduced dim
+    arma::Mat<double> inv_cov_masked_sqzd_;  // for baryon project, reduced dim
     
     IP() = default;
     IP(IP const&) = delete;
@@ -202,11 +199,6 @@ class IP
 
 class IPCMB
 {
-  using Vector = arma::Col<double>;
-  using STLVector = std::vector<double>;
-  using Matrix = arma::Mat<double>;
-  using Cube = arma::Cube<double>;
-
   public:
     static IPCMB& get_instance()
     {
@@ -224,9 +216,9 @@ class IPCMB
 
     // ----------------------------------------------
 
-    void set_cmb_binning_mat(std::string BINMAT);
+    void set_cmb_binning_mat(std::string cmb_binned_matrix_filename);
 
-    void set_cmb_theory_offset(std::string OFFSET);
+    void set_cmb_theory_offset(std::string cmb_theory_offset_filename);
 
     // ----------------------------------------------
 
@@ -236,9 +228,9 @@ class IPCMB
 
     // ----------------------------------------------
 
-    Matrix get_binning_matrix_with_correction() const;
+    arma::Mat<double> get_binning_matrix_with_correction() const;
 
-    Matrix get_cmb_theory_offset() const;
+    arma::Mat<double> get_cmb_theory_offset() const;
 
   private:   
     bool is_cmb_binmat_set_ = false;
@@ -253,9 +245,9 @@ class IPCMB
     
     std::string offset_filename_;                // LSS x CMB
     
-    Vector cmb_theory_offset_;                   // LSS x CMB, see Eqn 35 Planck 2018 VIII
+    arma::Col<double> cmb_theory_offset_;                   // LSS x CMB, see Eqn 35 Planck 2018 VIII
 
-    Matrix cmb_binning_matrix_with_correction_;  // LSS x CMB, see Eqn 35 Planck 2018 VIII
+    arma::Mat<double> cmb_binning_matrix_with_correction_;  // LSS x CMB, see Eqn 35 Planck 2018 VIII
     
     IPCMB() = default;
     IPCMB(IP const&) = delete;
@@ -399,8 +391,8 @@ void init_accuracy_boost(
 
 void init_binning_fourier(
     const int Ncl, 
-    const double lmin, 
-    const double lmax
+    const int lmin, 
+    const int lmax
   );
 
 void init_binning_real_space(
@@ -410,9 +402,9 @@ void init_binning_real_space(
   );
 
 void init_binning_cmb_bandpower(
-    const int Nbp, 
-    const double lmin, 
-    const double lmax
+    const int Nbandpower, 
+    const int lmin, 
+    const int lmax
   );
 
 void init_cosmo_runmode(
@@ -435,13 +427,15 @@ void init_cmb_bandpower(
 void init_data_3x2pt_real_space(
     std::string cov, 
     std::string mask, 
-    std::string data
+    std::string data,
+    arma::Col<int>::fixed<3> order
   );
 
 void init_data_6x2pt_real_space(
     std::string cov, 
     std::string mask, 
-    std::string data
+    std::string data,
+    arma::Col<int>::fixed<6> order
   );
 
 void init_data_vector_size(
@@ -568,73 +562,6 @@ void set_nuisance_shear_photoz(
 // ---------------------------------------------------------------------------
 // ---------------------------------------------------------------------------
 // ---------------------------------------------------------------------------
-// ---------------------------------------------------------------------------
-// ---------------------------------------------------------------------------
-// ---------------------------------------------------------------------------
-// ---------------------------------------------------------------------------
-// ---------------------------------------------------------------------------
-// ---------------------------------------------------------------------------
-// ---------------------------------------------------------------------------
-// GET FUNCTIONS
-// ---------------------------------------------------------------------------
-// ---------------------------------------------------------------------------
-// ---------------------------------------------------------------------------
-// ---------------------------------------------------------------------------
-// ---------------------------------------------------------------------------
-// ---------------------------------------------------------------------------
-// ---------------------------------------------------------------------------
-// ---------------------------------------------------------------------------
-// ---------------------------------------------------------------------------
-// ---------------------------------------------------------------------------
-// ---------------------------------------------------------------------------
-// ---------------------------------------------------------------------------
-// ---------------------------------------------------------------------------
-// ---------------------------------------------------------------------------
-// ---------------------------------------------------------------------------
-
-int get_baryon_pca_nscenarios(
-  );
-
-std::string get_baryon_pca_scenario_name(
-    const int i
-  );
-
-std::vector<double> get_data_vector_expanded_from_sqzd(
-    std::vector<double> sqzd
-  );
-
-arma::Mat<double> get_covariance_masked(
-  );
-
-arma::Mat<double> get_covariance_masked_sqzd(
-  );
-
-int get_mask(
-    const int i
-  );
-
-int get_ndata(
-  );
-
-int get_ndata_sqzd(
-  );
-
-int get_index_sqzd(
-    const int i
-  );
-
-double get_baryon_power_spectrum_ratio(
-    const double log10k, 
-    const double a
-  );
-
-// ---------------------------------------------------------------------------
-// ---------------------------------------------------------------------------
-// ---------------------------------------------------------------------------
-// ---------------------------------------------------------------------------
-// ---------------------------------------------------------------------------
-// ---------------------------------------------------------------------------
-// ---------------------------------------------------------------------------
 // GLOBAL COMPUTE FUNCTIONS
 // ---------------------------------------------------------------------------
 // ---------------------------------------------------------------------------
@@ -643,6 +570,14 @@ double get_baryon_power_spectrum_ratio(
 // ---------------------------------------------------------------------------
 // ---------------------------------------------------------------------------
 // ---------------------------------------------------------------------------
+
+arma::Mat<double> compute_baryon_pcas_3x2pt(
+    arma::Col<int>::fixed<3> order
+  );
+
+arma::Mat<double> compute_baryon_pcas_6x2pt(
+    arma::Col<int>::fixed<6> order
+  );
 
 double compute_chi2(
     std::vector<double> datavector
@@ -654,14 +589,6 @@ std::vector<double> compute_data_vector_6x2pt_masked_any_order(
 
 std::vector<double> compute_data_vector_3x2pt_masked_any_order(
     arma::Col<int>::fixed<3> order
-  );
-
-// Assume default ordering Cosmic Shear, GGL, GG
-std::vector<double> compute_data_vector_3x2pt_masked(
-  );
-
-// Assume default ordering Cosmic Shear, GGL, GG, GK, KS, KK
-std::vector<double> compute_data_vector_6x2pt_masked(
   );
 
 }  // namespace cosmolike_interface
