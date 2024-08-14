@@ -121,7 +121,7 @@ class IP
 
     arma::Col<double> sqzd_theory_data_vector(arma::Col<double>) const;
 
-    double get_chi2(std::vector<double> datavector) const;
+    double get_chi2(arma::Col<double> datavector) const;
 
     // ----------------------------------------------
 
@@ -153,7 +153,7 @@ class IP
     
     int ndata_ = 0;
     
-    int ndata_sqzd_ = 0;                      // for baryon PC, reduced dim
+    int ndata_sqzd_ = 0;
     
     std::string mask_filename_;
     
@@ -171,11 +171,11 @@ class IP
     
     arma::Mat<double> inv_cov_masked_;
     
-    arma::Col<double> data_masked_sqzd_;     // for baryon project, reduced dim
+    arma::Col<double> data_masked_sqzd_;
 
-    arma::Mat<double> cov_masked_sqzd_;      // for baryon project, reduced dim
+    arma::Mat<double> cov_masked_sqzd_; 
 
-    arma::Mat<double> inv_cov_masked_sqzd_;  // for baryon project, reduced dim
+    arma::Mat<double> inv_cov_masked_sqzd_;
     
     IP() = default;
     IP(IP const&) = delete;
@@ -279,14 +279,14 @@ class PointMass
     }
     ~PointMass() = default;
 
-    void set_pm_vector(std::vector<double> pm);
+    void set_pm_vector(arma::Col<double> pm);
 
-    std::vector<double> get_pm_vector() const;
+    arma::Col<double> get_pm_vector() const;
 
     double get_pm(const int zl, const int zs, const double theta) const;
 
   private:
-    std::vector<double> pm_;
+    arma::Col<double> pm_;
 
     PointMass() = default;
     
@@ -321,17 +321,34 @@ class BaryonScenario
 
     int nscenarios() const;
 
+    bool is_pcs_set() const;
+
+    bool is_scenarios_set() const;
+
     void set_scenarios(std::string data_sims, std::string scenarios);
 
     void set_scenarios(std::string scenarios);
+
+    void set_pcs(arma::Mat<double> eigenvectors);
 
     std::string get_scenario(const int i) const;
 
     std::tuple<std::string,int> select_baryons_sim(const std::string scenario);
 
+    arma::Mat<double> get_pcs() const;
+
+    double get_pcs(const int ci, const int cj) const;
+
   private:
+    bool is_pcs_set_;
+
+    bool is_scenarios_set_;
+
     int nscenarios_;
+    
     std::map<int, std::string> scenarios_;
+    
+    arma::Mat<double> eigenvectors_;
 
     BaryonScenario() = default;
     BaryonScenario(BaryonScenario const&) = delete;
@@ -388,6 +405,14 @@ void init_accuracy_boost(
     const double sampling_boost,
     const int integration_accuracy
   );
+
+void init_baryons_contamination(
+    std::string sim, std::string all_sims_hdf5_file
+  ); // NEW API
+
+void init_baryons_contamination(
+    std::string sim
+  ); // OLD API
 
 void init_binning_fourier(
     const int Ncl, 
@@ -453,13 +478,13 @@ void init_data_vector_size_6x2pt_real_space(
   );
 
 void init_distances(
-    std::vector<double> io_z, 
-    std::vector<double> io_chi
+    arma::Col<double> io_z, 
+    arma::Col<double> io_chi
   );
 
 void init_growth(
-    std::vector<double> io_z, 
-    std::vector<double> io_G
+    arma::Col<double> io_z, 
+    arma::Col<double> io_G
   );
 
 void init_IA(
@@ -473,15 +498,15 @@ void init_lens_sample(
   );
 
 void init_linear_power_spectrum(
-    std::vector<double> io_log10k,
-    std::vector<double> io_z, 
-    std::vector<double> io_lnP
+    arma::Col<double> io_log10k,
+    arma::Col<double> io_z, 
+    arma::Col<double> io_lnP
   );
 
 void init_non_linear_power_spectrum(
-    std::vector<double> io_log10k,
-    std::vector<double> io_z, 
-    std::vector<double> io_lnP
+    arma::Col<double> io_log10k,
+    arma::Col<double> io_z, 
+    arma::Col<double> io_lnP
   );
 
 void init_probes(
@@ -518,41 +543,37 @@ void init_survey(
 // ---------------------------------------------------------------------------
 // ---------------------------------------------------------------------------
 
-void set_pm(
-    std::vector<double> PM
-  );
-
 void set_nuisance_bias(
-    std::vector<double> B1, 
-    std::vector<double> B2, 
-    std::vector<double> B_MAG
+    arma::Col<double> B1, 
+    arma::Col<double> B2, 
+    arma::Col<double> B_MAG
   );
 
 void set_nuisance_clustering_photoz(
-    std::vector<double> CP
+    arma::Col<double> CP
   );
 
 void set_nuisance_IA(
-    std::vector<double> A1, 
-    std::vector<double> A2,
-    std::vector<double> BTA
+    arma::Col<double> A1, 
+    arma::Col<double> A2,
+    arma::Col<double> BTA
   );
 
 void set_nuisance_magnification_bias(
-  std::vector<double> B_MAG
+    arma::Col<double> B_MAG
   );
 
 void set_nuisance_nonlinear_bias(
-    std::vector<double> B1,
-    std::vector<double> B2
+    arma::Col<double> B1,
+    arma::Col<double> B2
   );
 
 void set_nuisance_shear_calib(
-    std::vector<double> M
+    arma::Col<double> M
   );
 
 void set_nuisance_shear_photoz(
-    std::vector<double> SP
+    arma::Col<double> SP
   );
 
 // ---------------------------------------------------------------------------
@@ -579,15 +600,16 @@ arma::Mat<double> compute_baryon_pcas_6x2pt(
     arma::Col<int>::fixed<6> order
   );
 
-double compute_chi2(
-    std::vector<double> datavector
-  );
-
-std::vector<double> compute_data_vector_6x2pt_masked_any_order(
+arma::Col<double> compute_data_vector_6x2pt_masked_any_order(
     arma::Col<int>::fixed<6> order
   );
 
-std::vector<double> compute_data_vector_3x2pt_masked_any_order(
+arma::Col<double> compute_data_vector_3x2pt_masked_any_order(
+    arma::Col<int>::fixed<3> order
+  );
+
+arma::Col<double> compute_data_vector_3x2pt_masked_any_order(
+    arma::Col<double> Q,                // PC amplitudes
     arma::Col<int>::fixed<3> order
   );
 

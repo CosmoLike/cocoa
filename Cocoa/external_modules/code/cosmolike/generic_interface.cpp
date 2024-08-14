@@ -48,7 +48,6 @@ namespace py = pybind11;
 #include "cosmolike/generic_interface.hpp"
 
 using vector = arma::Col<double>;
-using stlvector = std::vector<double>;
 using matrix = arma::Mat<double>;
 using Cube = arma::Cube<double>;
 
@@ -467,7 +466,7 @@ void init_baryons_contamination(
 // ---------------------------------------------------------------------------
 
 void init_baryons_contamination(
-    std::string sim, std::string allsims
+    std::string sim, std::string all_sims_hdf5_file
   )
 { // NEW API
   spdlog::info("\x1b[90m{}\x1b[0m: Begins", "init_baryons_contamination");
@@ -481,7 +480,7 @@ void init_baryons_contamination(
       tag
     );
 
-  init_baryons_from_hdf5_file(name.c_str(), tag, allsims.c_str());
+  init_baryons_from_hdf5_file(name.c_str(), tag, all_sims_hdf5_file.c_str());
 
   spdlog::info("\x1b[90m{}\x1b[0m: Ends", "init_baryons_contamination");
 }
@@ -663,7 +662,7 @@ void init_binning_real_space(
   
   like.vtmax = theta_max_arcmin * 2.90888208665721580e-4; // arcmin to rad conv
   
-  const double logdt = (std::log(like.vtmax)-std::log(like.vtmin))/like.Ntheta;
+  const double logdt = (std::log(like.vtmax) - std::log(like.vtmin))/like.Ntheta;
   
   like.theta = (double*) calloc(like.Ntheta, sizeof(double));
 
@@ -1140,19 +1139,19 @@ void init_data_6x2pt_real_space(
 // ---------------------------------------------------------------------------
 // ---------------------------------------------------------------------------
 
-void init_distances(stlvector io_z, stlvector io_chi)
+void init_distances(vector io_z, vector io_chi)
 {
   spdlog::debug("\x1b[90m{}\x1b[0m: Begins", "init_distances");
 
   bool debug_fail = false;
   
-  if (io_z.size() != io_chi.size())
+  if (io_z.n_elem != io_chi.n_elem)
   {
     debug_fail = true;
   }
   else
   {
-    if (io_z.size() == 0)
+    if (io_z.n_elem == 0)
     {
       debug_fail = true;
     }
@@ -1163,27 +1162,27 @@ void init_distances(stlvector io_z, stlvector io_chi)
     spdlog::critical(
       "\x1b[90m{}\x1b[0m: incompatible input w/ z.size = {} and G.size = {}",
       "init_distances",
-      io_z.size(),
-      io_chi.size()
+      io_z.n_elem,
+      io_chi.n_elem
     );
     exit(1);
   }
 
-  if(io_z.size() < 5)
+  if(io_z.n_elem < 5)
   {
     spdlog::critical(
         "\x1b[90m{}\x1b[0m: bad input w/ z.size = {} and chi.size = {}"
         "init_distances", 
-        io_z.size(), 
-        io_chi.size()
+        io_z.n_elem, 
+        io_chi.n_elem
       );
     exit(1);
   }
 
-  int nz = static_cast<int>(io_z.size());
+  int nz = static_cast<int>(io_z.n_elem);
   
-  double* vz = io_z.data();
-  double* vchi = io_chi.data();
+  double* vz = io_z.memptr();
+  double* vchi = io_chi.memptr();
   
   setup_chi(&nz, &vz, &vchi, 1);
 
@@ -1201,20 +1200,20 @@ void init_distances(stlvector io_z, stlvector io_chi)
 // ---------------------------------------------------------------------------
 
 // Growth: D = G * a
-void init_growth(stlvector io_z, stlvector io_G)
+void init_growth(vector io_z, vector io_G)
 {
   spdlog::debug("\x1b[90m{}\x1b[0m: Begins", "init_growth");
 
 
   bool debug_fail = false;
   
-  if (io_z.size() != io_G.size())
+  if (io_z.n_elem != io_G.n_elem)
   {
     debug_fail = true;
   }
   else
   {
-    if (io_z.size() == 0)
+    if (io_z.n_elem == 0)
     {
       debug_fail = true;
     }
@@ -1225,27 +1224,27 @@ void init_growth(stlvector io_z, stlvector io_G)
     spdlog::critical(
         "\x1b[90m{}\x1b[0m: incompatible input w/ z.size = {} and G.size = {}",
         "init_growth", 
-        io_z.size(), 
-        io_G.size()
+        io_z.n_elem, 
+        io_G.n_elem
       );
     exit(1);
   }
 
-  if(io_z.size() < 5)
+  if(io_z.n_elem < 5)
   {
     spdlog::critical(
         "\x1b[90m{}\x1b[0m: bad input w/ z.size = {} and G.size = {}"
         "init_growth", 
-        io_z.size(), 
-        io_G.size()
+        io_z.n_elem, 
+        io_G.n_elem
       );
     exit(1);
   }
 
-  int nz = static_cast<int>(io_z.size());
+  int nz = static_cast<int>(io_z.n_elem);
   
-  double* z = io_z.data();
-  double* G = io_G.data();
+  double* z = io_z.memptr();
+  double* G = io_G.memptr();
   
   setup_growth(&nz, &z, &G, 1);
 
@@ -1322,22 +1321,22 @@ void init_IA(const int IA_MODEL, const int IA_REDSHIFT_EVOL)
 // ---------------------------------------------------------------------------
 
 void init_linear_power_spectrum(
-    stlvector io_log10k,
-    stlvector io_z, 
-    stlvector io_lnP
+    vector io_log10k,
+    vector io_z, 
+    vector io_lnP
   )
 {
   spdlog::debug("\x1b[90m{}\x1b[0m: Begins", "init_linear_power_spectrum");
 
   bool debug_fail = false;
   
-  if (io_z.size()*io_log10k.size() != io_lnP.size())
+  if (io_z.n_elem*io_log10k.n_elem != io_lnP.n_elem)
   {
     debug_fail = true;
   }
   else
   {
-    if (io_z.size() == 0 || io_log10k.size() == 0)
+    if (io_z.n_elem == 0 || io_log10k.n_elem == 0)
     {
       debug_fail = true;
     }
@@ -1348,31 +1347,31 @@ void init_linear_power_spectrum(
     spdlog::critical(
         "\x1b[90m{}\x1b[0m: incompatible input w/ k.size = {}, z.size = {}, "
         "and lnP.size = {}", "init_linear_power_spectrum", 
-        io_log10k.size(),
-        io_z.size(), 
-        io_lnP.size()
+        io_log10k.n_elem,
+        io_z.n_elem, 
+        io_lnP.n_elem
       );
     exit(1);
   }
 
-  if(io_z.size() < 5 || io_log10k.size() < 5)
+  if(io_z.n_elem < 5 || io_log10k.n_elem < 5)
   {
     spdlog::critical(
         "\x1b[90m{}\x1b[0m: bad input w/ k.size = {}, z.size = {}, "
         "and lnP.size = {}", "init_linear_power_spectrum", 
-        io_log10k.size(),
-        io_z.size(), 
-        io_lnP.size()
+        io_log10k.n_elem,
+        io_z.n_elem, 
+        io_lnP.n_elem
       );
     exit(1);
   }
 
-  int nlog10k = static_cast<int>(io_log10k.size());
-  int nz = static_cast<int>(io_z.size());
+  int nlog10k = static_cast<int>(io_log10k.n_elem);
+  int nz = static_cast<int>(io_z.n_elem);
   
-  double* log10k = io_log10k.data();
-  double* z = io_z.data();
-  double* lnP = io_lnP.data();
+  double* log10k = io_log10k.memptr();
+  double* z = io_z.memptr();
+  double* lnP = io_lnP.memptr();
   
   setup_p_lin(&nlog10k, &nz, &log10k, &z, &lnP, 1);
 
@@ -1497,22 +1496,22 @@ void init_lens_sample(
 // ---------------------------------------------------------------------------
 
 void init_non_linear_power_spectrum(
-    stlvector io_log10k,
-    stlvector io_z, 
-    stlvector io_lnP
+    vector io_log10k,
+    vector io_z, 
+    vector io_lnP
   )
 {
   spdlog::debug("\x1b[90m{}\x1b[0m: Begins", "init_non_linear_power_spectrum");
 
   bool debug_fail = false;
   
-  if (io_z.size()*io_log10k.size() != io_lnP.size())
+  if (io_z.n_elem*io_log10k.n_elem != io_lnP.n_elem)
   {
     debug_fail = true;
   }
   else
   {
-    if (io_z.size() == 0)
+    if (io_z.n_elem == 0)
     {
       debug_fail = true;
     }
@@ -1524,32 +1523,32 @@ void init_non_linear_power_spectrum(
         "\x1b[90m{}\x1b[0m: incompatible input w/ k.size = {}, z.size = {}, "
         "and lnP.size = {}", 
         "init_non_linear_power_spectrum", 
-        io_log10k.size(),
-        io_z.size(), 
-        io_lnP.size()
+        io_log10k.n_elem,
+        io_z.n_elem, 
+        io_lnP.n_elem
       );
     exit(1);
   }
 
-  if (io_z.size() < 5 || io_log10k.size() < 5)
+  if (io_z.n_elem < 5 || io_log10k.n_elem < 5)
   {
     spdlog::critical(
         "\x1b[90m{}\x1b[0m: bad input w/ k.size = {}, z.size = {}, "
         "and lnP.size = {}", 
         "init_non_linear_power_spectrum", 
-        io_log10k.size(),
-        io_z.size(), 
-        io_lnP.size()
+        io_log10k.n_elem,
+        io_z.n_elem, 
+        io_lnP.n_elem
       );
     exit(1);
   }
 
-  int nlog10k = static_cast<int>(io_log10k.size());
-  int nz = static_cast<int>(io_z.size());
+  int nlog10k = static_cast<int>(io_log10k.n_elem);
+  int nz = static_cast<int>(io_z.n_elem);
   
-  double* log10k = io_log10k.data();
-  double* z = io_z.data();
-  double* lnP = io_lnP.data();
+  double* log10k = io_log10k.memptr();
+  double* z = io_z.memptr();
+  double* lnP = io_lnP.memptr();
   
   setup_p_nonlin(&nlog10k, &nz, &log10k, &z, &lnP, 1);
 
@@ -1868,7 +1867,7 @@ void init_survey(
 // ---------------------------------------------------------------------------
 // ---------------------------------------------------------------------------
 
-void set_nuisance_shear_calib(stlvector M)
+void set_nuisance_shear_calib(vector M)
 {
   spdlog::debug("\x1b[90m{}\x1b[0m: Begins", "set_nuisance_shear_calib");
 
@@ -1882,12 +1881,12 @@ void set_nuisance_shear_calib(stlvector M)
     exit(1);
   }
 
-  if (tomo.shear_Nbin != static_cast<int>(M.size()))
+  if (tomo.shear_Nbin != static_cast<int>(M.n_elem))
   {
     spdlog::critical(
         "\x1b[90m{}\x1b[0m: incompatible input w/ size = {} (!= {})",
         "set_nuisance_shear_calib", 
-        M.size(), 
+        M.n_elem, 
         tomo.shear_Nbin
       );
     exit(1);
@@ -1895,7 +1894,7 @@ void set_nuisance_shear_calib(stlvector M)
 
   for (int i=0; i<tomo.shear_Nbin; i++)
   {
-    nuisance.shear_calibration_m[i] = M[i];
+    nuisance.shear_calibration_m[i] = M(i);
   }
 
    spdlog::debug("\x1b[90m{}\x1b[0m: Ends", "set_nuisance_shear_calib");
@@ -1905,7 +1904,7 @@ void set_nuisance_shear_calib(stlvector M)
 // ---------------------------------------------------------------------------
 // ---------------------------------------------------------------------------
 
-void set_nuisance_shear_photoz(stlvector SP)
+void set_nuisance_shear_photoz(vector SP)
 {
   spdlog::debug("\x1b[90m{}\x1b[0m: Begins", "set_nuisance_shear_photoz");
 
@@ -1919,12 +1918,12 @@ void set_nuisance_shear_photoz(stlvector SP)
     exit(1);
   }
 
-  if (tomo.shear_Nbin != static_cast<int>(SP.size()))
+  if (tomo.shear_Nbin != static_cast<int>(SP.n_elem))
   {
     spdlog::critical(
         "\x1b[90m{}\x1b[0m: incompatible input w/ size = {} (!= {})",
         "set_nuisance_shear_photoz",
-        SP.size(),
+        SP.n_elem,
         tomo.shear_Nbin
       );
     exit(1);
@@ -1932,7 +1931,7 @@ void set_nuisance_shear_photoz(stlvector SP)
 
   for (int i=0; i<tomo.shear_Nbin; i++)
   {
-    nuisance.bias_zphot_shear[i] = SP[i];
+    nuisance.bias_zphot_shear[i] = SP(i);
   }
 
   spdlog::debug("\x1b[90m{}\x1b[0m: Ends", "set_nuisance_shear_photoz");
@@ -1942,7 +1941,7 @@ void set_nuisance_shear_photoz(stlvector SP)
 // ---------------------------------------------------------------------------
 // ---------------------------------------------------------------------------
 
-void set_nuisance_clustering_photoz(stlvector CP)
+void set_nuisance_clustering_photoz(vector CP)
 {
   spdlog::debug("\x1b[90m{}\x1b[0m: Begins", "set_nuisance_clustering_photoz");
 
@@ -1956,12 +1955,12 @@ void set_nuisance_clustering_photoz(stlvector CP)
     exit(1);
   }
 
-  if (tomo.clustering_Nbin != static_cast<int>(CP.size()))
+  if (tomo.clustering_Nbin != static_cast<int>(CP.n_elem))
   {
     spdlog::critical(
         "\x1b[90m{}\x1b[0m: incompatible input w/ size = {} (!= {})",
         "set_nuisance_clustering_photoz",
-        CP.size(),
+        CP.n_elem,
         tomo.clustering_Nbin
       );
     exit(1);
@@ -1969,7 +1968,7 @@ void set_nuisance_clustering_photoz(stlvector CP)
 
   for (int i=0; i<tomo.clustering_Nbin; i++)
   {
-    nuisance.bias_zphot_clustering[i] = CP[i];
+    nuisance.bias_zphot_clustering[i] = CP(i);
   }
 
   spdlog::debug("\x1b[90m{}\x1b[0m: Ends", "set_nuisance_clustering_photoz");
@@ -1980,7 +1979,7 @@ void set_nuisance_clustering_photoz(stlvector CP)
 // ---------------------------------------------------------------------------
 
 /*
-void set_nuisance_clustering_photoz_stretch(stlvector CP)
+void set_nuisance_clustering_photoz_stretch(vector CP)
 {
   spdlog::debug("\x1b[90m{}\x1b[0m: Begins", "set_nuisance_clustering_photoz_stretch");
 
@@ -1994,12 +1993,12 @@ void set_nuisance_clustering_photoz_stretch(stlvector CP)
     exit(1);
   }
 
-  if (tomo.clustering_Nbin != static_cast<int>(CP.size()))
+  if (tomo.clustering_Nbin != static_cast<int>(CP.n_elem))
   {
     spdlog::critical(
       "\x1b[90m{}\x1b[0m: incompatible input w/ size = {} (!= {})",
       "set_nuisance_clustering_photoz_stretch",
-      CP.size(),
+      CP.n_elem,
       tomo.clustering_Nbin
     );
     exit(1);
@@ -2007,7 +2006,7 @@ void set_nuisance_clustering_photoz_stretch(stlvector CP)
 
   for (int i=0; i<tomo.clustering_Nbin; i++)
   {
-    nuisance.stretch_zphot_clustering[i] = CP[i];
+    nuisance.stretch_zphot_clustering[i] = CP(i);
   }
 
   spdlog::debug("\x1b[90m{}\x1b[0m: Ends", "set_nuisance_clustering_photoz_stretch");
@@ -2018,7 +2017,7 @@ void set_nuisance_clustering_photoz_stretch(stlvector CP)
 // ---------------------------------------------------------------------------
 // ---------------------------------------------------------------------------
 
-void set_nuisance_linear_bias(stlvector B1)
+void set_nuisance_linear_bias(vector B1)
 {
   spdlog::debug("\x1b[90m{}\x1b[0m: Begins", "set_nuisance_linear_bias");
 
@@ -2031,12 +2030,12 @@ void set_nuisance_linear_bias(stlvector B1)
     exit(1);
   }
 
-  if (tomo.clustering_Nbin != static_cast<int>(B1.size()))
+  if (tomo.clustering_Nbin != static_cast<int>(B1.n_elem))
   {
     spdlog::critical(
         "\x1b[90m{}\x1b[0m: incompatible input w/ size = {} (!= {})",
         "set_nuisance_linear_bias", 
-        B1.size(), 
+        B1.n_elem, 
         tomo.clustering_Nbin
       );
     exit(1);
@@ -2044,7 +2043,7 @@ void set_nuisance_linear_bias(stlvector B1)
 
   for (int i=0; i<tomo.clustering_Nbin; i++)
   {
-    gbias.b[i] = B1[i];
+    gbias.b[i] = B1(i);
   }
 
   spdlog::debug("\x1b[90m{}\x1b[0m: Ends", "set_nuisance_linear_bias");
@@ -2054,10 +2053,7 @@ void set_nuisance_linear_bias(stlvector B1)
 // ---------------------------------------------------------------------------
 // ---------------------------------------------------------------------------
 
-void set_nuisance_nonlinear_bias(
-    stlvector B1,
-    stlvector B2
-  )
+void set_nuisance_nonlinear_bias(vector B1, vector B2)
 {
   spdlog::debug("\x1b[90m{}\x1b[0m: Begins", "set_nuisance_nonlinear_bias");
 
@@ -2071,14 +2067,14 @@ void set_nuisance_nonlinear_bias(
     exit(1);
   }
 
-  if ( tomo.clustering_Nbin != static_cast<int>(B1.size()) ||
-       tomo.clustering_Nbin != static_cast<int>(B2.size()))
+  if ( tomo.clustering_Nbin != static_cast<int>(B1.n_elem) ||
+       tomo.clustering_Nbin != static_cast<int>(B2.n_elem))
   {
     spdlog::critical(
         "\x1b[90m{}\x1b[0m: incompatible input w/ sizes = {} and {} (!= {})",
         "set_nuisance_nonlinear_bias", 
-        B1.size(), 
-        B2.size(), 
+        B1.n_elem, 
+        B2.n_elem, 
         tomo.clustering_Nbin
       );
     exit(1);
@@ -2088,8 +2084,8 @@ void set_nuisance_nonlinear_bias(
   
   for (int i=0; i<tomo.clustering_Nbin; i++)
   {
-    gbias.b2[i] = B2[i];
-    gbias.bs2[i] = almost_equal(B2[i], 0.) ? 0 : tmp*(B1[i]-1.0);
+    gbias.b2[i] = B2(i);
+    gbias.bs2[i] = almost_equal(B2(i), 0.) ? 0 : tmp*(B1(i)-1.0);
   }
 
   spdlog::debug("\x1b[90m{}\x1b[0m: Ends", "set_nuisance_nonlinear_bias");
@@ -2099,7 +2095,7 @@ void set_nuisance_nonlinear_bias(
 // ---------------------------------------------------------------------------
 // ---------------------------------------------------------------------------
 
-void set_nuisance_magnification_bias(stlvector B_MAG)
+void set_nuisance_magnification_bias(vector B_MAG)
 {
   spdlog::debug("\x1b[90m{}\x1b[0m: Begins", "set_nuisance_magnification_bias");
 
@@ -2113,12 +2109,12 @@ void set_nuisance_magnification_bias(stlvector B_MAG)
     exit(1);
   }
 
-  if (tomo.clustering_Nbin != static_cast<int>(B_MAG.size()))
+  if (tomo.clustering_Nbin != static_cast<int>(B_MAG.n_elem))
   {
     spdlog::critical(
         "\x1b[90m{}\x1b[0m: incompatible input w/ size = {} (!= {})",
         "set_nuisance_magnification_bias", 
-        B_MAG.size(), 
+        B_MAG.n_elem, 
         tomo.clustering_Nbin
       );
     exit(1);
@@ -2126,7 +2122,7 @@ void set_nuisance_magnification_bias(stlvector B_MAG)
 
   for (int i=0; i<tomo.clustering_Nbin; i++)
   {
-    gbias.b_mag[i] = B_MAG[i];
+    gbias.b_mag[i] = B_MAG(i);
   }
 
   spdlog::debug("\x1b[90m{}\x1b[0m: Ends", "set_nuisance_magnification_bias");
@@ -2136,7 +2132,7 @@ void set_nuisance_magnification_bias(stlvector B_MAG)
 // ---------------------------------------------------------------------------
 // ---------------------------------------------------------------------------
 
-void set_nuisance_bias(stlvector B1, stlvector B2, stlvector B_MAG)
+void set_nuisance_bias(vector B1, vector B2, vector B_MAG)
 {
   set_nuisance_linear_bias(B1);
   
@@ -2150,9 +2146,9 @@ void set_nuisance_bias(stlvector B1, stlvector B2, stlvector B_MAG)
 // ---------------------------------------------------------------------------
 
 void set_nuisance_IA(
-    std::vector<double> A1, 
-    std::vector<double> A2,
-    std::vector<double> BTA
+    arma::Col<double> A1, 
+    arma::Col<double> A2,
+    arma::Col<double> BTA
   )
 {
   spdlog::debug("\x1b[90m{}\x1b[0m: Begins", "set_nuisance_IA");
@@ -2167,16 +2163,16 @@ void set_nuisance_IA(
     exit(1);
   }
 
-  if (tomo.shear_Nbin != static_cast<int>(A1.size()) ||
-      tomo.shear_Nbin != static_cast<int>(A2.size()) ||
-      tomo.shear_Nbin != static_cast<int>(BTA.size()))
+  if (tomo.shear_Nbin != static_cast<int>(A1.n_elem) ||
+      tomo.shear_Nbin != static_cast<int>(A2.n_elem) ||
+      tomo.shear_Nbin != static_cast<int>(BTA.n_elem))
   {
     spdlog::critical(
         "\x1b[90m{}\x1b[0m: incompatible input w/ sizes = {}, {} and {} (!= {})",
         "set_nuisance_IA", 
-        A1.size(), 
-        A2.size(), 
-        BTA.size(), 
+        A1.n_elem, 
+        A2.n_elem, 
+        BTA.n_elem, 
         tomo.shear_Nbin
       );
     exit(1);
@@ -2188,15 +2184,15 @@ void set_nuisance_IA(
   {
     for (int i=0; i<tomo.shear_Nbin; i++)
     {
-      nuisance.A_z[i]     = A1[i];
-      nuisance.A2_z[i]    = A2[i];
-      nuisance.b_ta_z[i]  = BTA[i];
+      nuisance.A_z[i]     = A1(i);
+      nuisance.A2_z[i]    = A2(i);
+      nuisance.b_ta_z[i]  = BTA(i);
     }
   }
   else if (like.IA == 3)
   {
-    nuisance.A_ia         = A1[0];
-    nuisance.eta_ia       = A1[1];
+    nuisance.A_ia         = A1(0);
+    nuisance.eta_ia       = A1(1);
     nuisance.oneplusz0_ia = 1.62;
 
     nuisance.A2_ia = A2[0];
@@ -2205,9 +2201,9 @@ void set_nuisance_IA(
 
     for (int i=2; i<tomo.shear_Nbin; i++)
     {
-      if ( !(almost_equal(A1[i], 0.))    || 
-           !(almost_equal(A2[i], 0.))    ||
-           !(almost_equal(BTA[i], 0.))
+      if ( !(almost_equal(A1(i), 0.))    || 
+           !(almost_equal(A2(i), 0.))    ||
+           !(almost_equal(BTA(i), 0.))
           )
       {
         spdlog::critical(
@@ -2229,15 +2225,7 @@ void set_nuisance_IA(
   spdlog::debug("\x1b[90m{}\x1b[0m: Ends", "set_nuisance_ia");
 }
 
-// ---------------------------------------------------------------------------
-// ---------------------------------------------------------------------------
-// ---------------------------------------------------------------------------
 
-void set_pm(stlvector PM)
-{  
-  PointMass::get_instance().set_pm_vector(PM); 
-  return;
-}
 
 // ---------------------------------------------------------------------------
 // ---------------------------------------------------------------------------
@@ -2307,15 +2295,6 @@ double get_baryon_power_spectrum_ratio(const double log10k, const double a)
 // ---------------------------------------------------------------------------
 // ---------------------------------------------------------------------------
 
-double compute_chi2(stlvector datavector)
-{
-  return IP::get_instance().get_chi2(datavector);
-}
-
-// ---------------------------------------------------------------------------
-// ---------------------------------------------------------------------------
-// ---------------------------------------------------------------------------
-
 double compute_pm(const int zl, const int zs, const double theta)
 {
   return PointMass::get_instance().get_pm(zl, zs, theta);
@@ -2325,7 +2304,7 @@ double compute_pm(const int zl, const int zs, const double theta)
 // ---------------------------------------------------------------------------
 // ---------------------------------------------------------------------------
 
-void compute_ss_real_masked(stlvector& data_vector, const int start)
+void compute_ss_real_masked(vector& data_vector, const int start)
 {
   if (like.shear_shear == 1)
   {
@@ -2340,7 +2319,7 @@ void compute_ss_real_masked(stlvector& data_vector, const int start)
         
         if (IP::get_instance().get_mask(index))
         {
-          data_vector[index] = xi_pm_tomo(1, i, z1, z2, 1)*
+          data_vector(index) = xi_pm_tomo(1, i, z1, z2, 1)*
             (1.0 + nuisance.shear_calibration_m[z1])*
             (1.0 + nuisance.shear_calibration_m[z2]);
         }
@@ -2349,7 +2328,7 @@ void compute_ss_real_masked(stlvector& data_vector, const int start)
         
         if (IP::get_instance().get_mask(index))
         {
-          data_vector[index] = xi_pm_tomo(-1, i, z1, z2, 1)*
+          data_vector(index) = xi_pm_tomo(-1, i, z1, z2, 1)*
             (1.0 + nuisance.shear_calibration_m[z1])*
             (1.0 + nuisance.shear_calibration_m[z2]);
         }
@@ -2362,7 +2341,7 @@ void compute_ss_real_masked(stlvector& data_vector, const int start)
 // ---------------------------------------------------------------------------
 // ---------------------------------------------------------------------------
 
-void compute_gs_real_masked(stlvector& data_vector, const int start)
+void compute_gs_real_masked(vector& data_vector, const int start)
 {
   if (like.shear_pos == 1)
   {
@@ -2377,7 +2356,7 @@ void compute_gs_real_masked(stlvector& data_vector, const int start)
         
         if (IP::get_instance().get_mask(index))
         {
-          data_vector[index] = 
+          data_vector(index) = 
             ( w_gammat_tomo(i, zl, zs, like.adopt_limber_gammat) + 
               compute_pm(zl, zs, like.theta[i])
             )*(1.0+nuisance.shear_calibration_m[zs]);
@@ -2391,7 +2370,7 @@ void compute_gs_real_masked(stlvector& data_vector, const int start)
 // ---------------------------------------------------------------------------
 // ---------------------------------------------------------------------------
 
-void compute_gg_real_masked(stlvector& data_vector, const int start)
+void compute_gg_real_masked(vector& data_vector, const int start)
 {
   if (like.pos_pos == 1)
   {
@@ -2403,7 +2382,7 @@ void compute_gg_real_masked(stlvector& data_vector, const int start)
         
         if (IP::get_instance().get_mask(index))
         {
-          data_vector[index] = w_gg_tomo(i, nz, nz, like.adopt_limber_gg);
+          data_vector(index) = w_gg_tomo(i, nz, nz, like.adopt_limber_gg);
         }
       }
     }
@@ -2414,7 +2393,7 @@ void compute_gg_real_masked(stlvector& data_vector, const int start)
 // ---------------------------------------------------------------------------
 // ---------------------------------------------------------------------------
 
-void compute_gk_real_masked(stlvector& data_vector, const int start)
+void compute_gk_real_masked(vector& data_vector, const int start)
 {
   if (like.gk == 1)
   {
@@ -2426,7 +2405,7 @@ void compute_gk_real_masked(stlvector& data_vector, const int start)
         
         if (IP::get_instance().get_mask(index))
         {
-          data_vector[index] = w_gk_tomo(i, nz, 1);
+          data_vector(index) = w_gk_tomo(i, nz, 1);
         }
       }
     }
@@ -2437,7 +2416,7 @@ void compute_gk_real_masked(stlvector& data_vector, const int start)
 // ---------------------------------------------------------------------------
 // ---------------------------------------------------------------------------
 
-void compute_ks_real_masked(stlvector& data_vector, const int start)
+void compute_ks_real_masked(vector& data_vector, const int start)
 {
   if (like.ks == 1) 
   {
@@ -2449,7 +2428,7 @@ void compute_ks_real_masked(stlvector& data_vector, const int start)
         
         if (IP::get_instance().get_mask(index))
         {
-          data_vector[index] = 
+          data_vector(index) = 
             w_ks_tomo(i, nz, 1)*(1.0 + nuisance.shear_calibration_m[nz]);
         }
       }
@@ -2461,7 +2440,7 @@ void compute_ks_real_masked(stlvector& data_vector, const int start)
 // ---------------------------------------------------------------------------
 // ---------------------------------------------------------------------------
 
-void compute_kk_fourier_masked(stlvector& data_vector, const int start)
+void compute_kk_fourier_masked(vector& data_vector, const int start)
 {
   if (like.kk == 1)
   {
@@ -2475,7 +2454,7 @@ void compute_kk_fourier_masked(stlvector& data_vector, const int start)
         {
           const double l = like.ell[i];
           
-          data_vector[index] = (l <= limits.LMIN_tab) ? 
+          data_vector(index) = (l <= limits.LMIN_tab) ? 
             C_kk_limber_nointerp(l, 0, 0) :
             C_kk_limber(l, 0);
         }
@@ -2497,7 +2476,7 @@ void compute_kk_fourier_masked(stlvector& data_vector, const int start)
           
           if (IP::get_instance().get_mask(index))
           {        
-            data_vector[index] += (Ckk * 
+            data_vector(index) += (Ckk * 
               IPCMB::get_instance().get_binning_matrix_with_correction(j, i));
           }
         }
@@ -2509,18 +2488,19 @@ void compute_kk_fourier_masked(stlvector& data_vector, const int start)
         
         if (IP::get_instance().get_mask(index))
         {
-          data_vector[index] -= IPCMB::get_instance().get_cmb_theory_offset(j);
+          data_vector(index) -= IPCMB::get_instance().get_cmb_theory_offset(j);
         }
       }
     }
   }
 }
 
+
 // ---------------------------------------------------------------------------
 // ---------------------------------------------------------------------------
 // ---------------------------------------------------------------------------
 
-stlvector compute_data_vector_6x2pt_masked_any_order(
+vector compute_data_vector_6x2pt_masked_any_order(
     arma::Col<int>::fixed<6> order
   )
 { // order = (1,2,3,4,5,6) => Cosmic Shear, ggl, gg, gk, sk, kk
@@ -2679,7 +2659,7 @@ stlvector compute_data_vector_6x2pt_masked_any_order(
     }
   }
   
-  stlvector data_vector(like.Ndata, 0.0);
+  vector data_vector(like.Ndata, arma::fill::zeros);
   
   compute_ss_real_masked(data_vector, start(0));
 
@@ -2705,7 +2685,7 @@ stlvector compute_data_vector_6x2pt_masked_any_order(
 // ---------------------------------------------------------------------------
 // ---------------------------------------------------------------------------
 
-stlvector compute_data_vector_3x2pt_masked_any_order(
+vector compute_data_vector_3x2pt_masked_any_order(
     arma::Col<int>::fixed<3> order
   )
 { // order = (1,2,3) => Cosmic Shear, ggl, gg
@@ -2769,7 +2749,7 @@ stlvector compute_data_vector_3x2pt_masked_any_order(
     }
   }
   
-  stlvector data_vector(like.Ndata, 0.0);
+  vector data_vector(like.Ndata, arma::fill::zeros);
   
   compute_ss_real_masked(data_vector, start(0));
 
@@ -2783,6 +2763,58 @@ stlvector compute_data_vector_3x2pt_masked_any_order(
     );
 
   return data_vector;
+}
+
+// ---------------------------------------------------------------------------
+// ---------------------------------------------------------------------------
+// ---------------------------------------------------------------------------
+
+arma::Col<double> compute_data_vector_3x2pt_masked_any_order(
+    arma::Col<double> Q,                // PC amplitudes
+    arma::Col<int>::fixed<3> order
+  )
+{
+  if (!BaryonScenario::get_instance().is_pcs_set())
+  {
+    spdlog::critical(
+        "\x1b[90m{}\x1b[0m: {} not set prior to this function call",
+        "compute_data_vector_3x2pt_masked_any_order_with_baryon_pcs", 
+        "baryon PCs"
+      );
+    exit(1);
+  }
+  if (BaryonScenario::get_instance().get_pcs().row(0).n_elem < Q.n_elem)
+  {
+    spdlog::critical(
+        "\x1b[90m{}\x1b[0m: {} invalid PC amplitude vector or PC eigenvectors",
+        "compute_data_vector_3x2pt_masked_any_order_with_baryon_pcs" 
+      );
+    exit(1);
+  }
+
+  arma::Col<double> dv = compute_data_vector_3x2pt_masked_any_order(order);
+  
+  if (BaryonScenario::get_instance().get_pcs().col(0).n_elem != dv.n_elem)
+  {
+    spdlog::critical(
+        "\x1b[90m{}\x1b[0m: {} invalid datavector or PC eigenvectors",
+        "compute_data_vector_3x2pt_masked_any_order_with_baryon_pcs"
+      );
+    exit(1);
+  }
+
+  for (int j=0; j<dv.n_elem; j++)
+  {
+    for (int i=0; i<Q.n_elem; i++)
+    {
+      if (IP::get_instance().get_mask(j))
+      {
+        dv(j) += Q(i) * BaryonScenario::get_instance().get_pcs(j, i);
+      }
+    }
+  }
+
+  return dv;
 }
 
 // ---------------------------------------------------------------------------
@@ -2825,14 +2857,13 @@ matrix compute_baryon_pcas_3x2pt(
     );
 
   cosmology.is_cached = 0;
+  
   cosmology.random = RandomNumber::get_instance().get();
   
   reset_bary_struct(); // make sure there is no baryon contamination
 
   vector dv_dm = IP::get_instance().sqzd_theory_data_vector(
-      arma::conv_to<vector>::from(
-          compute_data_vector_3x2pt_masked_any_order(order)
-        )
+      compute_data_vector_3x2pt_masked_any_order(order)
     );
 
   spdlog::info(
@@ -2853,14 +2884,13 @@ matrix compute_baryon_pcas_3x2pt(
         BaryonScenario::get_instance().get_scenario(i)
       );
 
+    // line below to force clear cosmolike cosmology cache
     cosmology.random = RandomNumber::get_instance().get();
 
     init_baryons_contamination(BaryonScenario::get_instance().get_scenario(i));
 
     vector dv = IP::get_instance().sqzd_theory_data_vector(
-        arma::conv_to<vector>::from(
-          compute_data_vector_3x2pt_masked_any_order(order)
-        )
+        compute_data_vector_3x2pt_masked_any_order(order)
       );
 
     D.col(i) = dv - dv_dm;
@@ -2874,16 +2904,20 @@ matrix compute_baryon_pcas_3x2pt(
   }
 
   reset_bary_struct();
+  
+  // line below to force clear cosmolike cosmology cache
+  cosmology.random = RandomNumber::get_instance().get();
 
   // weight the diff matrix by inv_L; then SVD ----------------------------  
   matrix U, V;
+  
   vector s;
   
   arma::svd(U, s, V, inv_L * D);
 
   // compute PCs ----------------------------------------------------------
 
-  matrix PCs = L * U; 
+  matrix PC = L * U; 
 
   // Expand the number of dims --------------------------------------------
 
@@ -2891,7 +2925,8 @@ matrix compute_baryon_pcas_3x2pt(
 
   for (int i=0; i<nscenarios; i++)
   {
-    R.col(i) = IP::get_instance().expand_theory_data_vector_from_sqzd(PCs.col(i));
+    R.col(i) = 
+      IP::get_instance().expand_theory_data_vector_from_sqzd(PC.col(i));
   }
 
   return R;
@@ -2901,65 +2936,101 @@ matrix compute_baryon_pcas_3x2pt(
 // ---------------------------------------------------------------------------
 // ---------------------------------------------------------------------------
 
-matrix compute_baryon_pcas_6x2pt(
-    arma::Col<int>::fixed<6> order
-  )
+matrix compute_baryon_pcas_6x2pt(arma::Col<int>::fixed<6> order)
 {
   const int ndata = IP::get_instance().get_ndata();
 
   const int ndata_sqzd = IP::get_instance().get_ndata_sqzd();
-
+  
   const int nscenarios = BaryonScenario::get_instance().nscenarios();
 
   // Compute Cholesky Decomposition of the Covariance Matrix --------------
   
+  spdlog::info(
+      "\x1b[90m{}\x1b[0m: Computing Cholesky Decomposition of"
+      " the Covariance Matrix begins", 
+      "compute_baryon_pcas_3x2pt"
+    );
+
   matrix L = arma::chol(IP::get_instance().get_cov_masked_sqzd(), "lower");
 
   matrix inv_L = arma::inv(L);
 
+  spdlog::info(
+      "\x1b[90m{}\x1b[0m: Computing Cholesky Decomposition of"
+      " the Covariance Matrix ends", 
+      "compute_baryon_pcas_3x2pt"
+    );
+
   // Compute Dark Matter data vector --------------------------------------
-  cosmology.random = RandomNumber::get_instance().get();
+  
+  spdlog::info(
+      "\x1b[90m{}\x1b[0m: Computing DM only data vector begins", 
+      "compute_baryon_pcas_3x2pt"
+    );
+
   cosmology.is_cached = 0;
+  
+  cosmology.random = RandomNumber::get_instance().get();
   
   reset_bary_struct(); // make sure there is no baryon contamination
 
   vector dv_dm = IP::get_instance().sqzd_theory_data_vector(
-      arma::conv_to<vector>::from(
-          compute_data_vector_6x2pt_masked_any_order(order)
-        )
+      compute_data_vector_6x2pt_masked_any_order(order)
     );
-  
+
+  spdlog::info(
+      "\x1b[90m{}\x1b[0m: Computing DM only data vector ends", 
+      "compute_baryon_pcas_3x2pt"
+    );
+
   // Compute data vector for all Baryon scenarios -------------------------
   
   matrix D = matrix(ndata_sqzd, nscenarios);
 
   for (int i=0; i<nscenarios; i++)
   {
+    spdlog::info(
+        "\x1b[90m{}\x1b[0m: Computing contaminated data vector"
+        " with baryon scenario {} begins", 
+        "compute_baryon_pcas_3x2pt",
+        BaryonScenario::get_instance().get_scenario(i)
+      );
+
+    // line below to force clear cosmolike cosmology cache
     cosmology.random = RandomNumber::get_instance().get();
-    cosmology.is_cached = 0;
 
     init_baryons_contamination(BaryonScenario::get_instance().get_scenario(i));
 
     vector dv = IP::get_instance().sqzd_theory_data_vector(
-        arma::conv_to<vector>::from(
-          compute_data_vector_6x2pt_masked_any_order(order)
-        )
+        compute_data_vector_6x2pt_masked_any_order(order)
       );
 
     D.col(i) = dv - dv_dm;
+
+    spdlog::info(
+        "\x1b[90m{}\x1b[0m: Computing contaminated data vector"
+        " with baryon scenario {} ends", 
+        "compute_baryon_pcas_3x2pt",
+        BaryonScenario::get_instance().get_scenario(i)
+      );
   }
 
   reset_bary_struct();
+  
+  // line below to force clear cosmolike cosmology cache
+  cosmology.random = RandomNumber::get_instance().get();
 
   // weight the diff matrix by inv_L; then SVD ----------------------------  
   matrix U, V;
+  
   vector s;
   
   arma::svd(U, s, V, inv_L * D);
 
   // compute PCs ----------------------------------------------------------
 
-  matrix PCs = L * U; 
+  matrix PC = L * U; 
 
   // Expand the number of dims --------------------------------------------
 
@@ -2968,7 +3039,7 @@ matrix compute_baryon_pcas_6x2pt(
   for (int i=0; i<nscenarios; i++)
   {
     R.col(i) = 
-      IP::get_instance().expand_theory_data_vector_from_sqzd(PCs.col(i));
+      IP::get_instance().expand_theory_data_vector_from_sqzd(PC.col(i));
   }
 
   return R;
@@ -3017,15 +3088,6 @@ bool IP::is_mask_set() const
 bool IP::is_data_set() const
 {
   return this->is_data_set_;
-}
-
-// ---------------------------------------------------------------------------
-// ---------------------------------------------------------------------------
-// ---------------------------------------------------------------------------
-
-bool IP::is_inv_cov_set() const
-{
-  return this->is_inv_cov_set_;
 }
 
 // ---------------------------------------------------------------------------
@@ -3441,12 +3503,7 @@ void IP::set_inv_cov(std::string covariance_filename)
   matrix table = read_table(covariance_filename); 
   
   this->cov_masked_.set_size(this->ndata_, this->ndata_);
-
   this->cov_masked_.zeros();
-
-  this->inv_cov_masked_.set_size(this->ndata_, this->ndata_);
-  
-  this->inv_cov_masked_.zeros();
 
   switch (table.n_cols)
   {
@@ -3458,7 +3515,6 @@ void IP::set_inv_cov(std::string covariance_filename)
         const int k = static_cast<int>(table(i,1));
 
         this->cov_masked_(j,k) = table(i,2);
-        this->inv_cov_masked_(j,k) = table(i,2);
 
         if (j!=k)
         {
@@ -3466,12 +3522,8 @@ void IP::set_inv_cov(std::string covariance_filename)
           this->cov_masked_(j,k) *= this->get_mask(j);
           this->cov_masked_(j,k) *= this->get_mask(k);
 
-          this->inv_cov_masked_(j,k) *= this->get_mask(j);
-          this->inv_cov_masked_(j,k) *= this->get_mask(k);
-
           // m(i,j) = m(j,i)
           this->cov_masked_(k,j) = this->cov_masked_(j,k);
-          this->inv_cov_masked_(k,j) = this->inv_cov_masked_(j,k);
         }
       };
       break;
@@ -3484,7 +3536,6 @@ void IP::set_inv_cov(std::string covariance_filename)
         const int k = static_cast<int>(table(i,1));
 
         this->cov_masked_(j,k) = table(i,2) + table(i,3);
-        this->inv_cov_masked_(j,k) = table(i,2) + table(i,3);
 
         if (j!=k)
         {
@@ -3492,12 +3543,8 @@ void IP::set_inv_cov(std::string covariance_filename)
           this->cov_masked_(j,k) *= this->get_mask(j);
           this->cov_masked_(j,k) *= this->get_mask(k);
 
-          this->inv_cov_masked_(j,k) *= this->get_mask(j);
-          this->inv_cov_masked_(j,k) *= this->get_mask(k);
-
           // m(i,j) = m(j,i)
           this->cov_masked_(k,j) = this->cov_masked_(j,k);
-          this->inv_cov_masked_(k,j) = this->inv_cov_masked_(j,k);
         }
       };
       break;
@@ -3510,7 +3557,6 @@ void IP::set_inv_cov(std::string covariance_filename)
         const int k = static_cast<int>(table(i,1));
 
         this->cov_masked_(j,k) = table(i,8) + table(i,9);
-        this->inv_cov_masked_(j,k) = table(i,8) + table(i,9);
 
         if (j!=k)
         {
@@ -3518,12 +3564,8 @@ void IP::set_inv_cov(std::string covariance_filename)
           this->cov_masked_(j,k) *= this->get_mask(j);
           this->cov_masked_(j,k) *= this->get_mask(k);
 
-          this->inv_cov_masked_(j,k) *= this->get_mask(j);
-          this->inv_cov_masked_(j,k) *= this->get_mask(k);
-
           // m(i,j) = m(j,i)
           this->cov_masked_(k,j) = this->cov_masked_(j,k);
-          this->inv_cov_masked_(k,j) = this->inv_cov_masked_(j,k);
         }
       }
       break;
@@ -3548,25 +3590,25 @@ void IP::set_inv_cov(std::string covariance_filename)
     {
       for (int j=N5x2pt; j<this->ndata_; j++)
       {
-        this->inv_cov_masked_(i,j) /= like.alpha_Hartlap_kkkk;
+        this->cov_masked_(i,j)     /= like.alpha_Hartlap_kkkk;
       }
     }
   }
 
-  vector eigvals = arma::eig_sym(this->inv_cov_masked_);
+  vector eigvals = arma::eig_sym(this->cov_masked_);
   for(int i=0; i<this->ndata_; i++)
   {
     if(eigvals(i) < 0)
     {
       spdlog::critical(
-          "\x1b[90m{}\x1b[0m: covmat not positive definite!", 
+          "\x1b[90m{}\x1b[0m: covmat (masked) not positive definite!", 
           "IP::set_inv_cov"
         );
       exit(-1);
     }
   }
 
-  this->inv_cov_masked_ = arma::inv(this->inv_cov_masked_);
+  this->inv_cov_masked_ = arma::inv(this->cov_masked_);
 
   // apply mask again to make sure numerical errors in matrix inversion don't 
   // cause problems. Also, set diagonal elements corresponding to datavector
@@ -3854,7 +3896,7 @@ matrix IP::get_cov_masked() const
 // ---------------------------------------------------------------------------
 // ---------------------------------------------------------------------------
 
-double IP::get_chi2(stlvector datavector) const
+double IP::get_chi2(arma::Col<double> datavector) const
 {
   if (!(this->is_data_set_))
   {
@@ -3886,13 +3928,13 @@ double IP::get_chi2(stlvector datavector) const
     exit(1);
   }
 
-  if (datavector.size() != like.Ndata)
+  if (datavector.n_elem != like.Ndata)
   {
     spdlog::critical(
         "\x1b[90m{}\x1b[0m: "
         "incompatible data vector (theory size = {}, data size = {})",
         "IP::get_chi2",
-        datavector.size(),
+        datavector.n_elem,
         like.Ndata
       );
     exit(1);
@@ -3904,13 +3946,13 @@ double IP::get_chi2(stlvector datavector) const
   {
     if (this->get_mask(i))
     {
-      const double x = datavector[i] - this->get_dv_masked(i);
+      const double x = datavector(i) - this->get_dv_masked(i);
       
       for (int j=0; j<like.Ndata; j++)
       {
         if (this->get_mask(j))
         {
-          const double y = datavector[j] - this->get_dv_masked(j);
+          const double y = datavector(j) - this->get_dv_masked(j);
           chi2 += x*this->get_inv_cov_masked(i,j)*y;
         }
       }
@@ -4244,7 +4286,7 @@ matrix IPCMB::get_cmb_theory_offset() const
 // ---------------------------------------------------------------------------
 
 void PointMass::set_pm_vector(
-    stlvector pm
+    arma::Col<double> pm
   )
 {
   this->pm_ = pm;
@@ -4255,7 +4297,7 @@ void PointMass::set_pm_vector(
 // ---------------------------------------------------------------------------
 // ---------------------------------------------------------------------------
 
-stlvector PointMass::get_pm_vector() const
+arma::Col<double> PointMass::get_pm_vector() const
 {
   return this->pm_;
 }
@@ -4279,7 +4321,6 @@ double PointMass::get_pm(
   return 4*G_over_c2*this->pm_[zl]*1.e+13*
     g_tomo(a_lens, zs)/(theta*theta)/(chi_lens*a_lens);
 }
-
 
 // ---------------------------------------------------------------------------
 // ---------------------------------------------------------------------------
@@ -4312,13 +4353,53 @@ double PointMass::get_pm(
 // ---------------------------------------------------------------------------
 // ---------------------------------------------------------------------------
 
+bool BaryonScenario::is_pcs_set() const
+{
+  return this->is_pcs_set_;
+}
+
+// ---------------------------------------------------------------------------
+// ---------------------------------------------------------------------------
+// ---------------------------------------------------------------------------
+
+bool BaryonScenario::is_scenarios_set() const
+{
+  return this->is_scenarios_set_;
+}
+
+// ---------------------------------------------------------------------------
+// ---------------------------------------------------------------------------
+// ---------------------------------------------------------------------------
+
 int BaryonScenario::nscenarios() const
 {
+  if (!this->is_scenarios_set_)
+  {
+    spdlog::critical(
+        "\x1b[90m{}\x1b[0m: {} not set prior to this function call",
+        "BaryonScenario::nscenarios",
+        "Baryon Scenarios"
+      );
+    exit(1);
+  }
   return this->nscenarios_;
 }
 
+// ---------------------------------------------------------------------------
+// ---------------------------------------------------------------------------
+// ---------------------------------------------------------------------------
+
 std::string BaryonScenario::get_scenario(const int i) const
 {
+  if (!this->is_scenarios_set_)
+  {
+    spdlog::critical(
+        "\x1b[90m{}\x1b[0m: {} not set prior to this function call",
+        "BaryonScenario::get_scenario",
+        "Baryon Scenarios"
+      );
+    exit(1);
+  }
   return this->scenarios_.at(i);
 }
 
@@ -4377,6 +4458,7 @@ void BaryonScenario::set_scenarios(std::string scenarios)
       "BaryonScenario::set_scenarios"
     );
   
+  this->is_scenarios_set_ = true;
   return;
 }
 
@@ -4384,6 +4466,51 @@ void BaryonScenario::set_scenarios(std::string scenarios)
 // ---------------------------------------------------------------------------
 // ---------------------------------------------------------------------------
 
+void BaryonScenario::set_pcs(arma::Mat<double> eigenvectors)
+{
+  this->eigenvectors_ = eigenvectors;
+  this->is_pcs_set_ = true;
+}
+
+// ---------------------------------------------------------------------------
+// ---------------------------------------------------------------------------
+// ---------------------------------------------------------------------------
+
+arma::Mat<double> BaryonScenario::get_pcs() const
+{
+  if (!this->is_pcs_set_)
+  {
+    spdlog::critical(
+        "\x1b[90m{}\x1b[0m: {} not set prior to this function call",
+        "BaryonScenario::get_pcs",
+        "PC eigenvectors"
+      );
+    exit(1);
+  }
+  return this->eigenvectors_;
+}
+
+// ---------------------------------------------------------------------------
+// ---------------------------------------------------------------------------
+// ---------------------------------------------------------------------------
+
+double BaryonScenario::get_pcs(const int ci, const int cj) const
+{
+  if (!this->is_pcs_set_)
+  {
+    spdlog::critical(
+        "\x1b[90m{}\x1b[0m: {} not set prior to this function call",
+        "BaryonScenario::get_pcs",
+        "PC eigenvectors"
+      );
+    exit(1);
+  }
+  return this->eigenvectors_(ci, cj); 
+}
+
+// ---------------------------------------------------------------------------
+// ---------------------------------------------------------------------------
+// ---------------------------------------------------------------------------
 
 } // end namespace cosmolike_interface
 
