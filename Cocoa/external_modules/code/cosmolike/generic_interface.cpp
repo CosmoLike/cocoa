@@ -49,7 +49,7 @@ namespace py = pybind11;
 
 using vector = arma::Col<double>;
 using matrix = arma::Mat<double>;
-using Cube = arma::Cube<double>;
+using cube = arma::Cube<double>;
 
 // Why the cpp functions accept and return STL vectors (instead of arma:Col)?
 // Answer: the conversion between STL vector and python np array is cleaner

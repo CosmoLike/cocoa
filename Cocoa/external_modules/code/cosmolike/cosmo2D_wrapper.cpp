@@ -33,11 +33,11 @@ namespace py = pybind11;
 #include "cosmolike/redshift_spline.h"
 #include "cosmolike/structs.h"
 
-using Vector = arma::Col<double>;
-using Matrix = arma::Mat<double>;
-using Cube = arma::Cube<double>;
+using vector = arma::Col<double>;
+using matrix = arma::Mat<double>;
+using cube = arma::Cube<double>;
 
-namespace cosmolike
+namespace cosmolike_interface
 {
 
 static int has_b2_galaxies()
@@ -91,24 +91,24 @@ py::tuple xi_pm_tomo_cpp()
   if (tomo.shear_Nbin == 0)
   {
     spdlog::critical(
-      "\x1b[90m{}\x1b[0m: {} = 0 is invalid",
-      "compute_data_vector_masked", 
-      "shear_Nbin"
-    );
+        "\x1b[90m{}\x1b[0m: {} = 0 is invalid",
+        "compute_data_vector_masked", 
+        "shear_Nbin"
+      );
     exit(1);
   }
   if (like.Ntheta == 0)
   {
     spdlog::critical(
-      "\x1b[90m{}\x1b[0m: {} = 0 is invalid",
-      "compute_data_vector_masked", 
-      "Ntheta"
-    );
+        "\x1b[90m{}\x1b[0m: {} = 0 is invalid",
+        "compute_data_vector_masked", 
+        "Ntheta"
+      );
     exit(1);
   }
  
-  Vector xp(like.Ntheta*tomo.shear_Npowerspectra, arma::fill::none);
-  Vector xm(like.Ntheta*tomo.shear_Npowerspectra, arma::fill::none);
+  vector xp(like.Ntheta*tomo.shear_Npowerspectra, arma::fill::none);
+  vector xm(like.Ntheta*tomo.shear_Npowerspectra, arma::fill::none);
 
   for (int nz=0; nz<tomo.shear_Npowerspectra; nz++)
   {    
@@ -128,39 +128,39 @@ py::tuple xi_pm_tomo_cpp()
 // ---------------------------------------------------------------------------
 // ---------------------------------------------------------------------------
 
-Vector w_gammat_tomo_cpp()
+vector w_gammat_tomo_cpp()
 {
   if (tomo.shear_Nbin == 0)
   {
     spdlog::critical(
-      "\x1b[90m{}\x1b[0m: {} = 0 is invalid",
-      "compute_data_vector_masked", 
-      "shear_Nbin"
-    );
+        "\x1b[90m{}\x1b[0m: {} = 0 is invalid",
+        "compute_data_vector_masked", 
+        "shear_Nbin"
+      );
     exit(1);
   }
 
   if (tomo.clustering_Nbin == 0)
   {
     spdlog::critical(
-      "\x1b[90m{}\x1b[0m: {} = 0 is invalid",
-      "compute_data_vector_masked", 
-      "clustering_Nbin"
-    );
+        "\x1b[90m{}\x1b[0m: {} = 0 is invalid",
+        "compute_data_vector_masked", 
+        "clustering_Nbin"
+      );
     exit(1);
   }
 
   if (like.Ntheta == 0)
   {
     spdlog::critical(
-      "\x1b[90m{}\x1b[0m: {} = 0 is invalid",
-      "compute_data_vector_masked", 
-      "Ntheta"
-    );
+        "\x1b[90m{}\x1b[0m: {} = 0 is invalid",
+        "compute_data_vector_masked", 
+        "Ntheta"
+      );
     exit(1);
   }
   
-  Vector result(like.Ntheta*tomo.ggl_Npowerspectra, arma::fill::none);
+  vector result(like.Ntheta*tomo.ggl_Npowerspectra, arma::fill::none);
 
   for (int nz=0; nz<tomo.ggl_Npowerspectra; nz++)
   {
@@ -177,29 +177,29 @@ Vector w_gammat_tomo_cpp()
 // ---------------------------------------------------------------------------
 // ---------------------------------------------------------------------------
 
-Vector w_gg_tomo_cpp()
+vector w_gg_tomo_cpp()
 {
   if (tomo.clustering_Nbin == 0)
   {
     spdlog::critical(
-      "\x1b[90m{}\x1b[0m: {} = 0 is invalid",
-      "compute_data_vector_masked", 
-      "clustering_Nbin"
-    );
+        "\x1b[90m{}\x1b[0m: {} = 0 is invalid",
+        "compute_data_vector_masked", 
+        "clustering_Nbin"
+      );
     exit(1);
   }
 
   if (like.Ntheta == 0)
   {
     spdlog::critical(
-      "\x1b[90m{}\x1b[0m: {} = 0 is invalid",
-      "compute_data_vector_masked", 
-      "Ntheta"
-    );
+        "\x1b[90m{}\x1b[0m: {} = 0 is invalid",
+        "compute_data_vector_masked", 
+        "Ntheta"
+      );
     exit(1);
   }
 
-  Vector result(like.Ntheta*tomo.clustering_Nbin, arma::fill::none);
+  vector result(like.Ntheta*tomo.clustering_Nbin, arma::fill::none);
 
   for (int nz=0; nz<tomo.clustering_Npowerspectra; nz++)
   {
@@ -216,29 +216,29 @@ Vector w_gg_tomo_cpp()
 // ---------------------------------------------------------------------------
 // ---------------------------------------------------------------------------
 
-Vector w_gk_tomo_cpp()
+vector w_gk_tomo_cpp()
 {
   if (tomo.clustering_Nbin == 0)
   {
     spdlog::critical(
-      "\x1b[90m{}\x1b[0m: {} = 0 is invalid",
-      "compute_data_vector_masked", 
-      "clustering_Nbin"
-    );
+        "\x1b[90m{}\x1b[0m: {} = 0 is invalid",
+        "compute_data_vector_masked", 
+        "clustering_Nbin"
+      );
     exit(1);
   }
 
   if (like.Ntheta == 0)
   {
     spdlog::critical(
-      "\x1b[90m{}\x1b[0m: {} = 0 is invalid",
-      "compute_data_vector_masked", 
-      "Ntheta"
-    );
+        "\x1b[90m{}\x1b[0m: {} = 0 is invalid",
+        "compute_data_vector_masked", 
+        "Ntheta"
+      );
     exit(1);
   }
 
-  Vector result(like.Ntheta*tomo.clustering_Nbin, arma::fill::none);
+  vector result(like.Ntheta*tomo.clustering_Nbin, arma::fill::none);
 
   for (int nz=0; nz<tomo.clustering_Nbin; nz++)
   {
@@ -255,28 +255,28 @@ Vector w_gk_tomo_cpp()
 // ---------------------------------------------------------------------------
 // ---------------------------------------------------------------------------
 
-Vector w_ks_tomo_cpp()
+vector w_ks_tomo_cpp()
 {
   if (tomo.shear_Nbin == 0)
   {
     spdlog::critical(
-      "\x1b[90m{}\x1b[0m: {} = 0 is invalid",
-      "compute_data_vector_masked", 
-      "clustering_Nbin"
-    );
+        "\x1b[90m{}\x1b[0m: {} = 0 is invalid",
+        "compute_data_vector_masked", 
+        "clustering_Nbin"
+      );
     exit(1);
   }
   if (like.Ntheta == 0)
   {
     spdlog::critical(
-      "\x1b[90m{}\x1b[0m: {} = 0 is invalid",
-      "compute_data_vector_masked", 
-      "Ntheta"
-    );
+        "\x1b[90m{}\x1b[0m: {} = 0 is invalid",
+        "compute_data_vector_masked", 
+        "Ntheta"
+      );
     exit(1);
   }
 
-  Vector result(like.Ntheta*tomo.shear_Nbin, arma::fill::none);
+  vector result(like.Ntheta*tomo.shear_Nbin, arma::fill::none);
 
   for (int nz=0; nz<tomo.clustering_Nbin; nz++)
   {
@@ -303,7 +303,7 @@ double C_ss_NLA_tomo_limber_cpp(const double l, const int ni, const int nj)
   return C_ss_tomo_limber_nointerp(l, ni, nj, 0, 0);
 }
 
-Matrix C_ss_NLA_tomo_limber_cpp(const Vector l)
+matrix C_ss_NLA_tomo_limber_cpp(const vector l)
 {
   if (!(l.n_elem > 0))
   {
@@ -311,7 +311,7 @@ Matrix C_ss_NLA_tomo_limber_cpp(const Vector l)
     exit(1);
   }
 
-  Matrix result(l.n_elem, tomo.shear_Npowerspectra);
+  matrix result(l.n_elem, tomo.shear_Npowerspectra);
 
   #pragma GCC diagnostic push
   #pragma GCC diagnostic ignored "-Wunused-variable"
@@ -348,7 +348,7 @@ py::tuple C_ss_TATT_tomo_limber_cpp(const double l, const int ni, const int nj)
   );
 }
 
-py::tuple C_ss_TATT_tomo_limber_cpp(const Vector l)
+py::tuple C_ss_TATT_tomo_limber_cpp(const vector l)
 {
   if (!(l.n_elem > 0))
   {
@@ -356,8 +356,8 @@ py::tuple C_ss_TATT_tomo_limber_cpp(const Vector l)
     exit(1);
   }
   
-  Matrix EE(l.n_elem, tomo.shear_Npowerspectra);
-  Matrix BB(l.n_elem, tomo.shear_Npowerspectra);
+  matrix EE(l.n_elem, tomo.shear_Npowerspectra);
+  matrix BB(l.n_elem, tomo.shear_Npowerspectra);
 
   #pragma GCC diagnostic push
   #pragma GCC diagnostic ignored "-Wunused-variable"
@@ -408,7 +408,7 @@ py::tuple C_ss_tomo_limber_cpp(const double l, const int ni, const int nj)
   }
 }
 
-py::tuple C_ss_tomo_limber_cpp(Vector l)
+py::tuple C_ss_tomo_limber_cpp(vector l)
 {
   switch(like.IA_MODEL)
   {
@@ -420,7 +420,7 @@ py::tuple C_ss_tomo_limber_cpp(Vector l)
     {
       py::make_tuple(
         carma::mat_to_arr(C_ss_NLA_tomo_limber_cpp(l)),
-        carma::mat_to_arr(Matrix{l.n_elem, tomo.shear_Npowerspectra, 
+        carma::mat_to_arr(matrix{l.n_elem, tomo.shear_Npowerspectra, 
           arma::fill::zeros})
       );
     }
@@ -442,7 +442,7 @@ double C_gs_tomo_limber_cpp(const double l, const int ni, const int nj)
   return C_gs_tomo_limber_nointerp(l, ni, nj, 0, 0);
 }
 
-Matrix C_gs_tomo_limber_cpp(const Vector l)
+matrix C_gs_tomo_limber_cpp(const vector l)
 {
   if (!(l.n_elem > 0))
   {
@@ -450,7 +450,7 @@ Matrix C_gs_tomo_limber_cpp(const Vector l)
     exit(1);
   }
 
-  Matrix result(l.n_elem, tomo.ggl_Npowerspectra);
+  matrix result(l.n_elem, tomo.ggl_Npowerspectra);
 
   #pragma GCC diagnostic push
   #pragma GCC diagnostic ignored "-Wunused-variable"
@@ -482,7 +482,7 @@ double C_gg_tomo_limber_cpp(const double l, const int nz)
   return C_gg_tomo_limber_nointerp(l, nz, nz, 0, 0);
 }
 
-Matrix C_gg_tomo_limber_cpp(const Vector l)
+matrix C_gg_tomo_limber_cpp(const vector l)
 {
   if (!(l.n_elem > 0))
   {
@@ -490,7 +490,7 @@ Matrix C_gg_tomo_limber_cpp(const Vector l)
     exit(1);
   }
 
-  Matrix result(l.n_elem, tomo.clustering_Nbin);
+  matrix result(l.n_elem, tomo.clustering_Nbin);
 
   #pragma GCC diagnostic push
   #pragma GCC diagnostic ignored "-Wunused-variable"
@@ -512,7 +512,7 @@ Matrix C_gg_tomo_limber_cpp(const Vector l)
   return result;
 }
 
-Matrix C_gg_tomo_cpp(const Vector l)
+matrix C_gg_tomo_cpp(const vector l)
 {
   if (!(l.n_elem > 0))
   {
@@ -520,7 +520,7 @@ Matrix C_gg_tomo_cpp(const Vector l)
     exit(1);
   }
 
-  Matrix result = C_gg_tomo_limber_cpp(l);
+  matrix result = C_gg_tomo_limber_cpp(l);
 
   for (int nz=0; nz<tomo.clustering_Nbin; nz++)
   {
@@ -532,7 +532,7 @@ Matrix C_gg_tomo_cpp(const Vector l)
       const double tolerance = 0.0075;    
       const double dev = 10. * tolerance;
 
-      Vector Cl(limits.LMAX_NOLIMBER+1);
+      vector Cl(limits.LMAX_NOLIMBER+1);
       //C_cl_tomo(1, nz, nz, Cl.memptr(), dev, tolerance);
       
       for (int i=0; i<static_cast<int>(idxs.n_elem); i++)
@@ -555,7 +555,7 @@ double C_gk_tomo_limber_cpp(const double l, const int ni)
   return C_gk_tomo_limber_nointerp(l, ni, 0, 0);
 }
 
-Matrix C_gk_tomo_limber_cpp(const Vector l)
+matrix C_gk_tomo_limber_cpp(const vector l)
 {
   if (!(l.n_elem > 0))
   {
@@ -563,7 +563,7 @@ Matrix C_gk_tomo_limber_cpp(const Vector l)
     exit(1);
   }
 
-  Matrix result(l.n_elem, tomo.clustering_Nbin);
+  matrix result(l.n_elem, tomo.clustering_Nbin);
 
   #pragma GCC diagnostic push
   #pragma GCC diagnostic ignored "-Wunused-variable"
@@ -594,7 +594,7 @@ double C_ks_tomo_limber_cpp(const double l, const int ni)
   return C_ks_tomo_limber_nointerp(l, ni, 0, 0);
 }
 
-Matrix C_ks_tomo_limber_cpp(const Vector l)
+matrix C_ks_tomo_limber_cpp(const vector l)
 {
   if (!(l.n_elem > 0))
   {
@@ -602,7 +602,7 @@ Matrix C_ks_tomo_limber_cpp(const Vector l)
     exit(1);
   }
 
-  Matrix result(l.n_elem, tomo.shear_Nbin);
+  matrix result(l.n_elem, tomo.shear_Nbin);
 
   #pragma GCC diagnostic push
   #pragma GCC diagnostic ignored "-Wunused-variable"
@@ -633,7 +633,7 @@ double C_gy_tomo_limber_cpp(const double l, const int ni)
   return C_gy_tomo_limber_nointerp(l, ni, 0, 0);
 }
 
-Matrix C_gy_tomo_limber_cpp(const Vector l)
+matrix C_gy_tomo_limber_cpp(const vector l)
 {
   if (!(l.n_elem > 0))
   {
@@ -641,7 +641,7 @@ Matrix C_gy_tomo_limber_cpp(const Vector l)
     exit(1);
   }
 
-  Matrix result(l.n_elem, tomo.clustering_Nbin);
+  matrix result(l.n_elem, tomo.clustering_Nbin);
 
   #pragma GCC diagnostic push
   #pragma GCC diagnostic ignored "-Wunused-variable"
@@ -673,7 +673,7 @@ double C_ys_tomo_limber_cpp(const double l, const int ni)
   return C_ys_tomo_limber_nointerp(l, ni, 0, 0);
 }
 
-Matrix C_ys_tomo_limber_cpp(const Vector l)
+matrix C_ys_tomo_limber_cpp(const vector l)
 {
   if (!(l.n_elem > 0))
   {
@@ -681,7 +681,7 @@ Matrix C_ys_tomo_limber_cpp(const Vector l)
     exit(1);
   }
 
-  Matrix result(l.n_elem, tomo.shear_Nbin);
+  matrix result(l.n_elem, tomo.shear_Nbin);
 
   #pragma GCC diagnostic push
   #pragma GCC diagnostic ignored "-Wunused-variable"
@@ -712,7 +712,7 @@ double C_kk_limber_cpp(const double l)
   return C_kk_limber_nointerp(l, 0, 0);
 }
 
-Vector C_kk_limber_cpp(const Vector l)
+vector C_kk_limber_cpp(const vector l)
 {
   if (!(l.n_elem > 0))
   {
@@ -720,7 +720,7 @@ Vector C_kk_limber_cpp(const Vector l)
     exit(1);
   }
 
-  Vector result(l.n_elem);
+  vector result(l.n_elem);
 
   #pragma GCC diagnostic push
   #pragma GCC diagnostic ignored "-Wunused-variable"
@@ -747,7 +747,7 @@ double C_ky_limber_cpp(const double l)
   return C_ky_limber_nointerp(l, 0, 0);
 }
 
-Vector C_ky_limber_nointerp_cpp(const Vector l)
+vector C_ky_limber_nointerp_cpp(const vector l)
 {
   if (!(l.n_elem > 0))
   {
@@ -755,7 +755,7 @@ Vector C_ky_limber_nointerp_cpp(const Vector l)
     exit(1);
   }
 
-  Vector result(l.n_elem);
+  vector result(l.n_elem);
 
   #pragma GCC diagnostic push
   #pragma GCC diagnostic ignored "-Wunused-variable"
@@ -782,7 +782,7 @@ double C_yy_limber_cpp(double l)
   return C_yy_limber_nointerp(l, 0, 0);
 }
 
-Vector C_yy_limber_nointerp_cpp(const Vector l)
+vector C_yy_limber_nointerp_cpp(const vector l)
 {
   if (!(l.n_elem > 0))
   {
@@ -790,7 +790,7 @@ Vector C_yy_limber_nointerp_cpp(const Vector l)
     exit(1);
   }
 
-  Vector result(l.n_elem);
+  vector result(l.n_elem);
 
   #pragma GCC diagnostic push
   #pragma GCC diagnostic ignored "-Wunused-variable"
@@ -818,13 +818,17 @@ Vector C_yy_limber_nointerp_cpp(const Vector l)
 // ---------------------------------------------------------------------------
 
 double int_for_C_ss_NLA_tomo_limber_cpp(
-  const double a, const double l, const int ni, const int nj)
+    const double a, 
+    const double l, 
+    const int ni, 
+    const int nj
+  )
 {
   double ar[4] = {(double) ni, (double) nj, l, (double) 0.0};
   return int_for_C_ss_tomo_limber(a, (void*) ar); 
 }
 
-Cube int_for_C_ss_NLA_tomo_limber_cpp(Vector a, Vector l)
+cube int_for_C_ss_NLA_tomo_limber_cpp(vector a, vector l)
 {
   if (!(l.n_elem > 0 && a.n_elem > 0))
   {
@@ -833,7 +837,7 @@ Cube int_for_C_ss_NLA_tomo_limber_cpp(Vector a, Vector l)
     exit(1);
   }
 
-  Cube result(a.n_elem, l.n_elem, tomo.shear_Npowerspectra);
+  cube result(a.n_elem, l.n_elem, tomo.shear_Npowerspectra);
 
   #pragma GCC diagnostic push
   #pragma GCC diagnostic ignored "-Wunused-variable"
@@ -861,7 +865,12 @@ Cube int_for_C_ss_NLA_tomo_limber_cpp(Vector a, Vector l)
 // ---------------------------------------------------------------------------
 // ---------------------------------------------------------------------------
 
-py::tuple int_for_C_ss_TATT_tomo_limber_cpp(const double a, const double l, const int ni, const int nj)
+py::tuple int_for_C_ss_TATT_tomo_limber_cpp(
+    const double a, 
+    const double l, 
+    const int ni, 
+    const int nj
+  )
 {
   double ar[4] = {(double) ni, (double) nj, l, (double) 0.0};
 
@@ -871,7 +880,7 @@ py::tuple int_for_C_ss_TATT_tomo_limber_cpp(const double a, const double l, cons
   );
 }
 
-py::tuple int_for_C_ss_TATT_tomo_limber_cpp(const Vector a, const Vector l)
+py::tuple int_for_C_ss_TATT_tomo_limber_cpp(const vector a, const vector l)
 {
   if (!(l.n_elem > 0 && a.n_elem > 0))
   {
@@ -880,8 +889,8 @@ py::tuple int_for_C_ss_TATT_tomo_limber_cpp(const Vector a, const Vector l)
     exit(1);
   }
 
-  Cube EE(a.n_elem, l.n_elem, tomo.shear_Npowerspectra);
-  Cube BB(a.n_elem, l.n_elem, tomo.shear_Npowerspectra);
+  cube EE(a.n_elem, l.n_elem, tomo.shear_Npowerspectra);
+  cube BB(a.n_elem, l.n_elem, tomo.shear_Npowerspectra);
 
   #pragma GCC diagnostic push
   #pragma GCC diagnostic ignored "-Wunused-variable"
@@ -913,7 +922,12 @@ py::tuple int_for_C_ss_TATT_tomo_limber_cpp(const Vector a, const Vector l)
 // ---------------------------------------------------------------------------
 // ---------------------------------------------------------------------------
 
-py::tuple int_for_C_ss_tomo_limber_cpp(const double a, const double l, const int ni, const int nj)
+py::tuple int_for_C_ss_tomo_limber_cpp(
+    const double a, 
+    const double l, 
+    const int ni, 
+    const int nj
+  )
 {
   switch(like.IA_MODEL)
   {
@@ -933,7 +947,7 @@ py::tuple int_for_C_ss_tomo_limber_cpp(const double a, const double l, const int
   }
 }
 
-py::tuple int_for_C_ss_tomo_limber_cpp(const Vector a, const Vector l)
+py::tuple int_for_C_ss_tomo_limber_cpp(const vector a, const vector l)
 {
   switch(like.IA_MODEL)
   {
@@ -946,7 +960,7 @@ py::tuple int_for_C_ss_tomo_limber_cpp(const Vector a, const Vector l)
       return py::make_tuple(
         carma::cube_to_arr(int_for_C_ss_NLA_tomo_limber_cpp(a, l)),
         carma::cube_to_arr(
-          Cube{a.n_elem, l.n_elem, tomo.shear_Npowerspectra, arma::fill::zeros})
+          cube{a.n_elem, l.n_elem, tomo.shear_Npowerspectra, arma::fill::zeros})
       );
     }
     default:
@@ -961,7 +975,12 @@ py::tuple int_for_C_ss_tomo_limber_cpp(const Vector a, const Vector l)
 // ---------------------------------------------------------------------------
 // ---------------------------------------------------------------------------
 
-double int_for_C_gs_tomo_limber_cpp(const double a, const double l, const int nl, const int ns)
+double int_for_C_gs_tomo_limber_cpp(
+    const double a, 
+    const double l, 
+    const int nl, 
+    const int ns
+  )
 {
   double ar[4] = {(double) nl, (double) ns, l, (double) 0.0};
 
@@ -996,7 +1015,7 @@ double int_for_C_gs_tomo_limber_cpp(const double a, const double l, const int nl
   return res;
 }
 
-Cube int_for_C_gs_tomo_limber_cpp(const Vector a, const Vector l)
+cube int_for_C_gs_tomo_limber_cpp(const vector a, const vector l)
 {
   if (!(l.n_elem > 0 && a.n_elem > 0))
   {
@@ -1005,7 +1024,7 @@ Cube int_for_C_gs_tomo_limber_cpp(const Vector a, const Vector l)
     exit(1);
   }
 
-  Cube result(a.n_elem, l.n_elem, tomo.ggl_Npowerspectra);
+  cube result(a.n_elem, l.n_elem, tomo.ggl_Npowerspectra);
 
   #pragma GCC diagnostic push
   #pragma GCC diagnostic ignored "-Wunused-variable"
@@ -1081,8 +1100,11 @@ Cube int_for_C_gs_tomo_limber_cpp(const Vector a, const Vector l)
 // ---------------------------------------------------------------------------
 // ---------------------------------------------------------------------------
 
-double int_for_C_gg_tomo_limber_cpp(const double a, const double l, 
-    const int ni, const int nj
+double int_for_C_gg_tomo_limber_cpp(
+    const double a, 
+    const double l, 
+    const int ni, 
+    const int nj
   )
 {
   double ar[4] = {(double) ni, (double) nj, l, (double) 0};
@@ -1101,7 +1123,7 @@ double int_for_C_gg_tomo_limber_cpp(const double a, const double l,
   return res;
 }
 
-Cube int_for_C_gg_tomo_limber_cpp(const Vector a, const Vector l)
+cube int_for_C_gg_tomo_limber_cpp(const vector a, const vector l)
 {
   if (!(l.n_elem > 0 && a.n_elem > 0))
   {
@@ -1111,7 +1133,7 @@ Cube int_for_C_gg_tomo_limber_cpp(const Vector a, const Vector l)
   }
 
   const int NSIZE = tomo.clustering_Nbin;
-  Cube result(a.n_elem, l.n_elem, NSIZE);
+  cube result(a.n_elem, l.n_elem, NSIZE);
 
   #pragma GCC diagnostic push
   #pragma GCC diagnostic ignored "-Wunused-variable"
@@ -1185,9 +1207,9 @@ double int_for_C_gk_tomo_limber_cpp(
   return res;
 }
 
-Cube int_for_C_gk_tomo_limber_cpp(
-    const Vector a, 
-    const Vector l
+cube int_for_C_gk_tomo_limber_cpp(
+    const vector a, 
+    const vector l
   )
 {
   if (!(l.n_elem > 0 && a.n_elem > 0))
@@ -1197,7 +1219,7 @@ Cube int_for_C_gk_tomo_limber_cpp(
     exit(1);
   }
 
-  Cube result(a.n_elem, l.n_elem, tomo.clustering_Nbin);
+  cube result(a.n_elem, l.n_elem, tomo.clustering_Nbin);
 
   #pragma GCC diagnostic push
   #pragma GCC diagnostic ignored "-Wunused-variable"
@@ -1268,9 +1290,9 @@ double int_for_C_gy_tomo_limber_cpp(
   return res;
 }
 
-Cube int_for_C_gy_tomo_limber_cpp(
-    const Vector a, 
-    const Vector l
+cube int_for_C_gy_tomo_limber_cpp(
+    const vector a, 
+    const vector l
   )
 {
   if (!(l.n_elem > 0 && a.n_elem > 0))
@@ -1280,7 +1302,7 @@ Cube int_for_C_gy_tomo_limber_cpp(
     exit(1);
   }
 
-  Cube result(a.n_elem, l.n_elem, tomo.clustering_Nbin);
+  cube result(a.n_elem, l.n_elem, tomo.clustering_Nbin);
 
   #pragma GCC diagnostic push
   #pragma GCC diagnostic ignored "-Wunused-variable"
@@ -1344,9 +1366,9 @@ double int_for_C_ks_tomo_limber_cpp(
   return res;
 }
 
-Cube int_for_C_ks_tomo_limber_cpp(
-    const Vector a, 
-    const Vector l
+cube int_for_C_ks_tomo_limber_cpp(
+    const vector a, 
+    const vector l
   )
 {
   if (!(l.n_elem > 0 && a.n_elem > 0))
@@ -1356,7 +1378,7 @@ Cube int_for_C_ks_tomo_limber_cpp(
     exit(1);
   }
 
-  Cube result(a.n_elem, l.n_elem, tomo.shear_Nbin);
+  cube result(a.n_elem, l.n_elem, tomo.shear_Nbin);
 
   #pragma GCC diagnostic push
   #pragma GCC diagnostic ignored "-Wunused-variable"
@@ -1411,9 +1433,9 @@ double int_for_C_ys_tomo_limber_cpp(
   return res;
 }
 
-Cube int_for_C_ys_tomo_limber_cpp(
-    const Vector a, 
-    const Vector l
+cube int_for_C_ys_tomo_limber_cpp(
+    const vector a, 
+    const vector l
   )
 {
   if (!(l.n_elem > 0 && a.n_elem > 0))
@@ -1423,7 +1445,7 @@ Cube int_for_C_ys_tomo_limber_cpp(
     exit(1);
   }
 
-  Cube result(a.n_elem, l.n_elem, tomo.shear_Nbin);
+  cube result(a.n_elem, l.n_elem, tomo.shear_Nbin);
 
   #pragma GCC diagnostic push
   #pragma GCC diagnostic ignored "-Wunused-variable"
@@ -1458,7 +1480,7 @@ double int_for_C_kk_limber_cpp(const double a, const double l)
   return int_for_C_kk_limber(a, (void*) ar);
 }
 
-Matrix int_for_C_kk_limber_cpp(const Vector a, const Vector l)
+matrix int_for_C_kk_limber_cpp(const vector a, const vector l)
 {
   if (!(l.n_elem > 0 && a.n_elem > 0))
   {
@@ -1474,7 +1496,7 @@ Matrix int_for_C_kk_limber_cpp(const Vector a, const Vector l)
   }
   #pragma GCC diagnostic pop
 
-  Matrix result(a.n_elem, l.n_elem);
+  matrix result(a.n_elem, l.n_elem);
 
   #pragma omp parallel for collapse(2)
   for (int i=0; i<l.n_elem; i++)
@@ -1498,7 +1520,7 @@ double int_for_C_ky_limber_cpp(const double a, const double l)
   return int_for_C_ky_limber(a, (void*) ar);
 }
 
-Matrix int_for_C_ky_limber_cpp(const Vector a, const Vector l)
+matrix int_for_C_ky_limber_cpp(const vector a, const vector l)
 {
   if (!(l.n_elem > 0 && a.n_elem > 0))
   {
@@ -1514,7 +1536,7 @@ Matrix int_for_C_ky_limber_cpp(const Vector a, const Vector l)
   }
   #pragma GCC diagnostic pop
 
-  Matrix result(a.n_elem, l.n_elem);
+  matrix result(a.n_elem, l.n_elem);
 
   #pragma omp parallel for collapse(2)
   for (int i=0; i<l.n_elem; i++)
@@ -1538,7 +1560,7 @@ double int_for_C_yy_limber_cpp(const double a, const double l)
   return int_for_C_yy_limber(a, (void*) ar);
 }
 
-Matrix int_for_C_yy_limber_cpp(const Vector a, const Vector l)
+matrix int_for_C_yy_limber_cpp(const vector a, const vector l)
 {
   if (!(l.n_elem > 0 && a.n_elem > 0))
   {
@@ -1554,7 +1576,7 @@ Matrix int_for_C_yy_limber_cpp(const Vector a, const Vector l)
   }
   #pragma GCC diagnostic pop
 
-  Matrix result(a.n_elem, l.n_elem);
+  matrix result(a.n_elem, l.n_elem);
 
   #pragma omp parallel for collapse(2)
   for (int i=0; i<l.n_elem; i++)
@@ -1572,7 +1594,7 @@ Matrix int_for_C_yy_limber_cpp(const Vector a, const Vector l)
 // ---------------------------------------------------------------------------
 // ---------------------------------------------------------------------------
 
-} // end namespace cosmolike
+} // end namespace cosmolike_interface
 
 // ---------------------------------------------------------------------------
 // ---------------------------------------------------------------------------
