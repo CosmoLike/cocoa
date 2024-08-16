@@ -465,6 +465,7 @@ void init_baryons_contamination(
 // ---------------------------------------------------------------------------
 // ---------------------------------------------------------------------------
 
+#ifdef HDF5LIB
 void init_baryons_contamination(
     std::string sim, std::string all_sims_hdf5_file
   )
@@ -484,6 +485,7 @@ void init_baryons_contamination(
 
   spdlog::info("\x1b[90m{}\x1b[0m: Ends", "init_baryons_contamination");
 }
+#endif
 
 // ---------------------------------------------------------------------------
 // ---------------------------------------------------------------------------

@@ -9,7 +9,9 @@
 #include <gsl/gsl_interp2d.h>
 
 // HDF5 lib
+#ifdef HDF5LIB
 #include <hdf5.h>
+#endif
 
 // log lib
 #include "log.c/src/log.h"
@@ -9797,6 +9799,7 @@ void init_baryons(const char* sim)
 // -----------------------------------------------------------------------------
 // -----------------------------------------------------------------------------
 
+#ifdef HDF5LIB
 void init_baryons_from_hdf5_file(const char* sim, int tag, const char* allsims)
 {
   reset_bary_struct();
@@ -10242,5 +10245,5 @@ void init_baryons_from_hdf5_file(const char* sim, int tag, const char* allsims)
 
   bary.is_Pk_bary = 1;
 }
-
+#endif
 
