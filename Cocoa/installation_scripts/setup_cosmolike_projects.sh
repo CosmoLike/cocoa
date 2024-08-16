@@ -10,7 +10,7 @@ fi
 ( source "${ROOTDIR:?}/installation_scripts/flags_check.sh" )  || return 1;
 
 unset_env_vars () {
-  unset -v PRINTNAME FOLDER URL PACKAGE_VERSION
+  unset -v PRINTNAME FOLDER URL PACKAGE_VERSION PACKAGE_BRANCH
   cdroot || return 1;
 }
 
@@ -46,9 +46,7 @@ cpfile() {
     2>"/dev/null" || { error "CP FILE ${1} on ${2}"; return 1; }
 }
 
-gitact() {
-  #ARGUMENTS: FOLDER, VERSION, URL
-  
+gitact1() {  
   local PROJECT="${ROOTDIR}/projects"
 
   local PACKDIR="${PROJECT:?}/${1:?}"
@@ -78,7 +76,46 @@ gitact() {
     if [ -n "${3}" ]; then
       cdfolder "${1}" || return 1;
 
-      "${GIT:?}" checkout "${3}" \
+      "${GIT:?}" checkout -b ${3} origin/${3} \
+        >${OUT1:?} 2>${OUT2:?} || { error "${EC16:?}"; return 1; }
+    fi
+
+  fi
+    
+  cdfolder "${ROOTDIR}" || return 1;
+}
+
+gitact2() {  
+  local PROJECT="${ROOTDIR}/projects"
+
+  local PACKDIR="${PROJECT:?}/${1:?}"
+
+  cdfolder "${PROJECT:?}" || return 1;
+
+  # ---------------------------------------------------------------------------
+  # In case this script runs twice --------------------------------------------
+  # ---------------------------------------------------------------------------
+  if [ -n "${OVERWRITE_EXISTING_COSMOLIKE_CODE}" ]; then
+    
+    rm -rf "${PACKDIR:?}"
+  
+  fi
+
+  # ---------------------------------------------------------------------------
+  # clone from original repo --------------------------------------------------
+  # ---------------------------------------------------------------------------
+  if [ ! -d "${PACKDIR:?}" ]; then
+
+    "${CURL:?}" -fsS "${2:?}" \
+      >${OUT1:?} 2>${OUT2:?} || { error "${EC27:?} (URL=${2:?})"; return 1; }
+
+    "${GIT:?}" clone "${2:?}" "${1:?}" \
+      >${OUT1:?} 2>${OUT2:?} || { error "${EC15:?}"; return 1; }
+
+    if [ -n "${3}" ]; then
+      cdfolder "${1}" || return 1;
+
+      "${GIT:?}" checkout ${3} \
         >${OUT1:?} 2>${OUT2:?} || { error "${EC16:?}"; return 1; }
     fi
 
@@ -108,9 +145,11 @@ if [ -z "${IGNORE_COSMOLIKE_LSSTY1_CODE}" ]; then
 
   URL="${LSSTY1_URL:-"https://github.com/CosmoLike/cocoa_lsst_y1.git"}"
 
-  PACKAGE_VERSION=${LSSTY1_COMMIT:?}
-
-  gitact "${FOLDER:?}" "${URL:?}" "${PACKAGE_VERSION:?}" || return 1
+  if [ -n "${LSSTY1_COMMIT}" ]; then
+    gitact2 "${FOLDER:?}" "${URL:?}" "${LSSTY1_COMMIT:?}"  || return 1
+  elif [ -n "${LSSTY1_BRANCH}" ]; then 
+    gitact1 "${FOLDER:?}" "${URL:?}" "${LSSTY1_BRANCH:?}" || return 1
+  fi
 
   pbottom "GETTING ${PRINTNAME:?}" || return 1
 
