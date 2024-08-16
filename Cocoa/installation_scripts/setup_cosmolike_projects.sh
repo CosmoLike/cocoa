@@ -69,11 +69,18 @@ gitact() {
   # ---------------------------------------------------------------------------
   if [ ! -d "${PACKDIR:?}" ]; then
 
-    "${CURL:?}" -fsS "${3:?}" \
-      >${OUT1:?} 2>${OUT2:?} || { error "${EC27:?} (URL=${3:?})"; return 1; }
+    "${CURL:?}" -fsS "${2:?}" \
+      >${OUT1:?} 2>${OUT2:?} || { error "${EC27:?} (URL=${2:?})"; return 1; }
 
-    "${GIT:?}" clone "${3:?}" --branch "${2:?}" "${1:?}" \
-      >${OUT1:?} 2>${OUT2:?} || { error "GIT CLONE"; return 1; }
+    "${GIT:?}" clone "${2:?}" "${1:?}" \
+      >${OUT1:?} 2>${OUT2:?} || { error "${EC15:?}"; return 1; }
+
+    if [ -n "${3}" ]; then
+      cdfolder "${1}" || return 1;
+
+      "${GIT:?}" checkout "${3}" \
+        >${OUT1:?} 2>${OUT2:?} || { error "${EC16:?}"; return 1; }
+    fi
 
   fi
     
@@ -103,7 +110,7 @@ if [ -z "${IGNORE_COSMOLIKE_LSSTY1_CODE}" ]; then
 
   PACKAGE_VERSION=${LSSTY1_COMMIT:?}
 
-  gitact "${FOLDER:?}" "${PACKAGE_VERSION:?}" "${URL:?}" || return 1
+  gitact "${FOLDER:?}" "${URL:?}" "${PACKAGE_VERSION:?}" || return 1
 
   pbottom "GETTING ${PRINTNAME:?}" || return 1
 
