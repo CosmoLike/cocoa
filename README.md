@@ -95,7 +95,6 @@ and
 Type the following command instead to clone the repository.
 
     "${CONDA_PREFIX}"/bin/git clone git@github.com:CosmoLike/cocoa.git cocoa
-    cd ./cocoa/Cocoa
 
 **Step :two:**: Run the script `setup_cocoa.sh` via
         
