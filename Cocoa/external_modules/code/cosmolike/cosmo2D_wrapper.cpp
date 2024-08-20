@@ -311,7 +311,7 @@ matrix C_ss_NLA_tomo_limber_cpp(const vector l)
     exit(1);
   }
 
-  matrix result(l.n_elem, tomo.shear_Npowerspectra);
+  matrix result(l.n_elem, tomo.shear_Npowerspectra,arma::fill::zeros);
 
   #pragma GCC diagnostic push
   #pragma GCC diagnostic ignored "-Wunused-variable"
@@ -336,6 +336,8 @@ matrix C_ss_NLA_tomo_limber_cpp(const vector l)
 
   return result;
 }
+
+
 
 // ---------------------------------------------------------------------------
 // ---------------------------------------------------------------------------
@@ -418,10 +420,9 @@ py::tuple C_ss_tomo_limber_cpp(vector l)
     }
     case IA_MODEL_NLA:
     {
-      py::make_tuple(
+      return py::make_tuple(
         carma::mat_to_arr(C_ss_NLA_tomo_limber_cpp(l)),
-        carma::mat_to_arr(matrix{l.n_elem, tomo.shear_Npowerspectra, 
-          arma::fill::zeros})
+        carma::mat_to_arr(matrix{l.n_elem, tomo.shear_Npowerspectra, arma::fill::zeros})
       );
     }
     default:

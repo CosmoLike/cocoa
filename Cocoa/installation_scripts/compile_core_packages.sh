@@ -899,14 +899,11 @@ if [ -z "${IGNORE_CORE_INSTALLATION}" ]; then
 
     #PS: --force-reinstall - this helps CARMA to see numpy files
     env CXX="${CXX_COMPILER:?}" CC="${C_COMPILER:?}" ${PIP3:?} install \
-        'notebook==7.1.0' \
         'numpy==1.23.5' \
       --prefix="${ROOTDIR:?}/.local" \
       --force-reinstall \
       >${OUT1:?} 2>${OUT2:?} || { error "(CORE-PACKAGES) ${EC13:?}"; return 1; }
     
-    
-
     pbottom "INSTALLING PYTHON CORE LIBRARIES VIA PIP" || return 1
   
   fi

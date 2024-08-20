@@ -239,7 +239,7 @@ dependencies:
     - paramz==0.9.5
     - pgen==0.2.1
     - pillow==9.5.0
-    - platformdirs==2.6.2
+    - platformdirs==3.9.1
     - portalocker==2.7.0
     - protobuf==4.23.2
     - py-bobyqa==1.4
@@ -283,7 +283,7 @@ dependencies:
     - typing-extensions==4.6.3
     - tzdata==2023.3
     - urllib3==1.26.16
-    - virtualenv==20.17.1
+    - virtualenv==20.26.0
     - wheel==0.40.0
     - wimpy==0.6
     - wrapt==1.14.1
