@@ -443,11 +443,11 @@ void init_baryons_contamination(
     std::string sim
   )
 { // OLD API
-  spdlog::info("\x1b[90m{}\x1b[0m: Begins", "init_baryons_contamination");
+  spdlog::debug("\x1b[90m{}\x1b[0m: Begins", "init_baryons_contamination");
 
   auto [name, tag] = get_baryon_sim_name_and_tag(sim);
   
-  spdlog::info(
+  spdlog::debug(
       "\x1b[90m{}\x1b[0m: Baryon simulation w/ Name = {} & Tag = {} selected",
       "init_baryons_contamination", 
       name, 
@@ -458,7 +458,7 @@ void init_baryons_contamination(
 
   init_baryons(tmp.c_str());
   
-  spdlog::info("\x1b[90m{}\x1b[0m: Ends", "init_baryons_contamination");
+  spdlog::debug("\x1b[90m{}\x1b[0m: Ends", "init_baryons_contamination");
 }
 
 // ---------------------------------------------------------------------------
@@ -470,11 +470,11 @@ void init_baryons_contamination(
     std::string sim, std::string all_sims_hdf5_file
   )
 { // NEW API
-  spdlog::info("\x1b[90m{}\x1b[0m: Begins", "init_baryons_contamination");
+  spdlog::debug("\x1b[90m{}\x1b[0m: Begins", "init_baryons_contamination");
 
   auto [name, tag] = get_baryon_sim_name_and_tag(sim);
        
-  spdlog::info(
+  spdlog::debug(
       "\x1b[90m{}\x1b[0m: Baryon simulation w/ Name = {} & Tag = {} selected",
       "init_baryons_contamination", 
       name, 
@@ -483,7 +483,7 @@ void init_baryons_contamination(
 
   init_baryons_from_hdf5_file(name.c_str(), tag, all_sims_hdf5_file.c_str());
 
-  spdlog::info("\x1b[90m{}\x1b[0m: Ends", "init_baryons_contamination");
+  spdlog::debug("\x1b[90m{}\x1b[0m: Ends", "init_baryons_contamination");
 }
 #endif
 
@@ -497,7 +497,7 @@ void init_binning_cmb_bandpower(
     const int lmax
   )
 {
-  spdlog::info("\x1b[90m{}\x1b[0m: Begins", "init_binning_cmb_bandpower");
+  spdlog::debug("\x1b[90m{}\x1b[0m: Begins", "init_binning_cmb_bandpower");
 
   if (!(Nbandpower > 0))
   {
@@ -510,21 +510,21 @@ void init_binning_cmb_bandpower(
     exit(1);
   }
 
-  spdlog::info(
+  spdlog::debug(
       "\x1b[90m{}\x1b[0m: {} = {} selected.", 
       "init_binning_cmb_bandpower", 
       "Number of Band Powers (Nbandpower)", 
       Nbandpower
     );
   
-  spdlog::info(
+  spdlog::debug(
       "\x1b[90m{}\x1b[0m: {} = {} selected.", 
       "init_binning_cmb_bandpower", 
       "l_min", 
       lmin
     );
 
-  spdlog::info(
+  spdlog::debug(
       "\x1b[90m{}\x1b[0m: {} = {} selected.", 
       "init_binning_cmb_bandpower", 
       "l_max", 
@@ -537,7 +537,7 @@ void init_binning_cmb_bandpower(
   
   like.lmax_bp = lmax;
   
-  spdlog::info("\x1b[90m{}\x1b[0m: Ends", "init_binning_cmb_bandpower");
+  spdlog::debug("\x1b[90m{}\x1b[0m: Ends", "init_binning_cmb_bandpower");
 }
 
 // ---------------------------------------------------------------------------
@@ -550,7 +550,7 @@ void init_binning_fourier(
     const int lmax
   )
 {
-  spdlog::info("\x1b[90m{}\x1b[0m: Begins", "init_binning_fourier");
+  spdlog::debug("\x1b[90m{}\x1b[0m: Begins", "init_binning_fourier");
 
   if (!(Nells > 0))
   {
@@ -563,21 +563,21 @@ void init_binning_fourier(
     exit(1);
   }
 
-  spdlog::info(
+  spdlog::debug(
       "\x1b[90m{}\x1b[0m: {} = {} selected.", 
       "init_binning_fourier", 
       "Number of l modes (Nells)",
       Nells
     );
 
-  spdlog::info(
+  spdlog::debug(
       "\x1b[90m{}\x1b[0m: {} = {} selected.", 
       "init_binning_fourier", 
       "l_min", 
       lmin
     );
   
-  spdlog::info(
+  spdlog::debug(
       "\x1b[90m{}\x1b[0m: {} = {} selected.", 
       "init_binning_fourier", 
       "l_max", 
@@ -598,7 +598,7 @@ void init_binning_fourier(
   {
     like.ell[i] = std::exp(std::log(like.lmin) + (i + 0.5)*logdl);
   
-    spdlog::info(
+    spdlog::debug(
         "\x1b[90m{}\x1b[0m: Bin {:d} - {} = {:.4e}, {} = {:.4e} and {} = {:.4e}",
         "init_binning_fourier", 
         i, 
@@ -611,7 +611,7 @@ void init_binning_fourier(
       );
   }
 
-  spdlog::info("\x1b[90m{}\x1b[0m: Ends", "init_binning_fourier");
+  spdlog::debug("\x1b[90m{}\x1b[0m: Ends", "init_binning_fourier");
 }
 
 // ---------------------------------------------------------------------------
@@ -624,7 +624,7 @@ void init_binning_real_space(
     const double theta_max_arcmin
   )
 {
-  spdlog::info("\x1b[90m{}\x1b[0m: Begins", "init_binning_real_space");
+  spdlog::debug("\x1b[90m{}\x1b[0m: Begins", "init_binning_real_space");
 
   if (!(Ntheta > 0))
   {
@@ -637,21 +637,21 @@ void init_binning_real_space(
     exit(1);
   }
 
-  spdlog::info(
+  spdlog::debug(
       "\x1b[90m{}\x1b[0m: {} = {} selected.", 
       "init_binning_real_space", 
       "Ntheta", 
       Ntheta
     );
 
-  spdlog::info(
+  spdlog::debug(
       "\x1b[90m{}\x1b[0m: {} = {} selected.", 
       "init_binning_real_space", 
       "theta_min_arcmin", 
       theta_min_arcmin
     );
 
-  spdlog::info(
+  spdlog::debug(
       "\x1b[90m{}\x1b[0m: {} = {} selected.", 
       "init_binning_real_space", 
       "theta_max_arcmin", 
@@ -679,7 +679,7 @@ void init_binning_real_space(
     like.theta[i] = x * (std::pow(thetamax, 3) - std::pow(thetamin, 3)) /
       (thetamax*thetamax - thetamin*thetamin);
 
-    spdlog::info(
+    spdlog::debug(
         "\x1b[90m{}\x1b[0m: Bin {:d} - {} = {:.4e}, {} = {:.4e} and {} = {:.4e}",
         "init_binning_real_space", 
         i, 
@@ -692,7 +692,7 @@ void init_binning_real_space(
       );
   }
 
-  spdlog::info("\x1b[90m{}\x1b[0m: Ends", "init_binning_real_space");
+  spdlog::debug("\x1b[90m{}\x1b[0m: Ends", "init_binning_real_space");
 
   return;
 }
@@ -708,7 +708,7 @@ void init_cmb(
     std::string pixwin_file
   ) 
 {
-  spdlog::info("\x1b[90m{}\x1b[0m: Begins", "init_cmb");
+  spdlog::debug("\x1b[90m{}\x1b[0m: Begins", "init_cmb");
 
   like.lmin_kappacmb = lmin_kappa_cmb;
   
@@ -719,7 +719,7 @@ void init_cmb(
   
   memcpy(cmb.pathHealpixWinFunc, pixwin_file.c_str(), pixwin_file.size()+1);
   
-  spdlog::info("\x1b[90m{}\x1b[0m: Ends", "init_cmb");
+  spdlog::debug("\x1b[90m{}\x1b[0m: Ends", "init_cmb");
 }
 
 // ---------------------------------------------------------------------------
@@ -732,7 +732,7 @@ void init_cmb_bandpower(
     const double alpha
   )
 {
-  spdlog::info("\x1b[90m{}\x1b[0m: Begins", "init_cmb_bandpower");
+  spdlog::debug("\x1b[90m{}\x1b[0m: Begins", "init_cmb_bandpower");
 
   like.is_cmb_bandpower = is_cmb_bandpower;
   
@@ -740,7 +740,7 @@ void init_cmb_bandpower(
   
   like.alpha_Hartlap_kkkk = alpha;
 
-  spdlog::info("\x1b[90m{}\x1b[0m: Ends", "init_cmb_bandpower");
+  spdlog::debug("\x1b[90m{}\x1b[0m: Ends", "init_cmb_bandpower");
 }
 
 // ---------------------------------------------------------------------------
@@ -752,13 +752,13 @@ void init_cmb_bandpower_data(
     std::string theory_offset
   )
 {
-  spdlog::info("\x1b[90m{}\x1b[0m: Begins", "init_cmb_bandpower_data");
+  spdlog::debug("\x1b[90m{}\x1b[0m: Begins", "init_cmb_bandpower_data");
 
   IPCMB::get_instance().set_cmb_binning_mat(binning_matrix);
   
   IPCMB::get_instance().set_cmb_theory_offset(theory_offset);
   
-  spdlog::info("\x1b[90m{}\x1b[0m: Ends", "init_cmb_bandpower_data");
+  spdlog::debug("\x1b[90m{}\x1b[0m: Ends", "init_cmb_bandpower_data");
 
   return;
 }
@@ -771,7 +771,7 @@ void init_cosmo_runmode(
     const bool is_linear
   )
 {
-  spdlog::info("\x1b[90m{}\x1b[0m: Begins", "init_cosmo_runmode");
+  spdlog::debug("\x1b[90m{}\x1b[0m: Begins", "init_cosmo_runmode");
 
   std::string mode = is_linear ? "linear" : "Halofit";
   
@@ -779,13 +779,13 @@ void init_cosmo_runmode(
   
   memcpy(pdeltaparams.runmode, mode.c_str(), size + 1);
 
-  spdlog::info(
+  spdlog::debug(
       "\x1b[90m{}\x1b[0m: {} = {} selected", 
       "init_cosmo_runmode", 
       "runmode", mode
     );
   
-  spdlog::info("\x1b[90m{}\x1b[0m: Ends", "init_cosmo_runmode");
+  spdlog::debug("\x1b[90m{}\x1b[0m: Ends", "init_cosmo_runmode");
 }
 
 // ---------------------------------------------------------------------------
@@ -832,7 +832,7 @@ void init_data_vector_size_real_space(
 
 void init_data_vector_size_3x2pt_real_space()
 {
-  spdlog::info(
+  spdlog::debug(
       "\x1b[90m{}\x1b[0m: Begins", 
       "init_data_vector_size_2x2pt_real_space"
     );
@@ -871,14 +871,14 @@ void init_data_vector_size_3x2pt_real_space()
 
   init_data_vector_size_real_space(exclude);
   
-  spdlog::info(
+  spdlog::debug(
       "\x1b[90m{}\x1b[0m: {} = {} selected.", 
       "init_data_vector_size_2x2pt_real_space", 
       "Ndata", 
       like.Ndata
     );
   
-  spdlog::info(
+  spdlog::debug(
       "\x1b[90m{}\x1b[0m: Ends", 
       "init_data_vector_size_3x2pt_real_space"
     );
@@ -890,7 +890,7 @@ void init_data_vector_size_3x2pt_real_space()
 
 void init_data_vector_size_6x2pt_real_space()
 {
-  spdlog::info(
+  spdlog::debug(
       "\x1b[90m{}\x1b[0m: Begins", 
       "init_data_vector_size_6x2pt_real_space"
     );
@@ -962,14 +962,14 @@ void init_data_vector_size_6x2pt_real_space()
 
   init_data_vector_size_real_space(exclude);
 
-  spdlog::info(
+  spdlog::debug(
       "\x1b[90m{}\x1b[0m: {} = {} selected.", 
       "init_data_vector_size_6x2pt_real_space", 
       "Ndata", 
       like.Ndata
     );
   
-  spdlog::info(
+  spdlog::debug(
       "\x1b[90m{}\x1b[0m: Ends", 
       "init_data_vector_size_6x2pt_real_space"
     );
@@ -1022,7 +1022,7 @@ void init_data_3x2pt_real_space(
 
   init_data_vector_size_real_space(exclude);
   
-  spdlog::info("\x1b[90m{}\x1b[0m: {} = {} selected.", 
+  spdlog::debug("\x1b[90m{}\x1b[0m: {} = {} selected.", 
                   "init_data_3x2pt_real_space", 
                   "Ndata", 
                   like.Ndata
@@ -1119,7 +1119,7 @@ void init_data_6x2pt_real_space(
 
   init_data_vector_size_real_space(exclude);
   
-  spdlog::info(
+  spdlog::debug(
       "\x1b[90m{}\x1b[0m: {} = {} selected.", 
       "init_data_6x2pt_real_space", 
       "Ndata", 
@@ -1273,7 +1273,7 @@ void init_IA(const int IA_MODEL, const int IA_REDSHIFT_EVOL)
 {
   spdlog::debug("\x1b[90m{}\x1b[0m: Begins", "init_IA");
 
-  spdlog::info(
+  spdlog::debug(
       "\x1b[90m{}\x1b[0m: {} = {} selected.", 
       "init_IA", 
       "IA MODEL", 
@@ -1396,7 +1396,7 @@ void init_lens_sample(
     const int Ntomo
   )
 {
-  spdlog::info("\x1b[90m{}\x1b[0m: Begins", "init_lens_sample");
+  spdlog::debug("\x1b[90m{}\x1b[0m: Begins", "init_lens_sample");
 
   if (tomo.shear_Nbin == 0)
   {
@@ -1454,14 +1454,14 @@ void init_lens_sample(
   
   tomo.clustering_Npowerspectra = tomo.clustering_Nbin;
 
-  spdlog::info(
+  spdlog::debug(
       "\x1b[90m{}\x1b[0m: {} = {} selected.", 
       "init_lens_sample",
       "clustering_REDSHIFT_FILE", 
       multihisto_file
     );
 
-  spdlog::info(
+  spdlog::debug(
       "\x1b[90m{}\x1b[0m: {} = {} selected.", 
       "init_lens_sample",
       "clustering_Nbin", 
@@ -1484,13 +1484,13 @@ void init_lens_sample(
   
   tomo.ggl_Npowerspectra = n;
 
-  spdlog::info(
+  spdlog::debug(
       "\x1b[90m{}\x1b[0m: tomo.ggl_Npowerspectra = {}",
       "init_lens_sample", 
       tomo.ggl_Npowerspectra
     );
 
-  spdlog::info("\x1b[90m{}\x1b[0m: Ends", "init_lens_sample");
+  spdlog::debug("\x1b[90m{}\x1b[0m: Ends", "init_lens_sample");
 }
 
 // ---------------------------------------------------------------------------
@@ -1575,13 +1575,13 @@ void init_probes(
   boost::trim_if(possible_probes, boost::is_any_of("\t "));
   possible_probes = boost::algorithm::to_lower_copy(possible_probes);
 
-  spdlog::info("\x1b[90m{}\x1b[0m: Begins", "init_probes");
+  spdlog::debug("\x1b[90m{}\x1b[0m: Begins", "init_probes");
 
   if (possible_probes.compare("xi") == 0)
   {
     like.shear_shear = 1;
 
-    spdlog::info(
+    spdlog::debug(
         "\x1b[90m{}\x1b[0m: {} = {} selected", 
         "init_probes", 
         "possible_probes", 
@@ -1592,7 +1592,7 @@ void init_probes(
   {
     like.pos_pos = 1;
 
-    spdlog::info(
+    spdlog::debug(
         "\x1b[90m{}\x1b[0m: {} = {} selected", 
         "init_probes", 
         "possible_probes", 
@@ -1603,7 +1603,7 @@ void init_probes(
   {
     like.shear_pos = 1;
 
-    spdlog::info(
+    spdlog::debug(
         "\x1b[90m{}\x1b[0m: {} = {} selected", 
         "init_probes", 
         "possible_probes", 
@@ -1615,7 +1615,7 @@ void init_probes(
     like.shear_pos = 1;
     like.pos_pos = 1;
 
-    spdlog::info(
+    spdlog::debug(
         "\x1b[90m{}\x1b[0m: {} = {} selected", 
         "init_probes", 
         "possible_probes", 
@@ -1628,7 +1628,7 @@ void init_probes(
     like.shear_pos = 1;
     like.pos_pos = 1;
 
-    spdlog::info(
+    spdlog::debug(
         "\x1b[90m{}\x1b[0m: {} = {} selected", 
         "init_probes", 
         "possible_probes", 
@@ -1640,7 +1640,7 @@ void init_probes(
     like.shear_shear = 1;
     like.shear_pos = 1;
 
-    spdlog::info(
+    spdlog::debug(
         "\x1b[90m{}\x1b[0m: {} = {} selected", 
         "init_probes", 
         "possible_probes", 
@@ -1655,7 +1655,7 @@ void init_probes(
     like.gk = 1;
     like.ks = 1;
     
-    spdlog::info(
+    spdlog::debug(
         "\x1b[90m{}\x1b[0m: {} = {} selected", 
         "init_probes", 
         "possible_probes", 
@@ -1671,7 +1671,7 @@ void init_probes(
     like.ks = 1;
     like.kk = 1;
     
-    spdlog::info(
+    spdlog::debug(
         "\x1b[90m{}\x1b[0m: {} = {} selected", 
         "init_probes", 
         "possible_probes", 
@@ -1684,7 +1684,7 @@ void init_probes(
     like.ks = 1;
     like.kk = 1;
     
-    spdlog::info(
+    spdlog::debug(
         "\x1b[90m{}\x1b[0m: {} = {} selected", 
         "init_probes", 
         "possible_probes", 
@@ -1702,7 +1702,7 @@ void init_probes(
     exit(1);
   }
 
-  spdlog::info("\x1b[90m{}\x1b[0m: Ends", "init_probes");
+  spdlog::debug("\x1b[90m{}\x1b[0m: Ends", "init_probes");
 }
 
 // ---------------------------------------------------------------------------
@@ -1714,7 +1714,7 @@ void init_source_sample(
     const int Ntomo
   )
 {
-  spdlog::info("\x1b[90m{}\x1b[0m: Begins", "init_source_sample");
+  spdlog::debug("\x1b[90m{}\x1b[0m: Begins", "init_source_sample");
 
   if (multihisto_file.size() > CHAR_MAX_SIZE - 1)
   {
@@ -1761,7 +1761,7 @@ void init_source_sample(
   tomo.shear_Nbin = Ntomo;
   tomo.shear_Npowerspectra = tomo.shear_Nbin * (tomo.shear_Nbin + 1) / 2;
 
-  spdlog::info(
+  spdlog::debug(
       "\x1b[90m{}\x1b[0m: tomo.shear_Npowerspectra = {}", 
       "init_source_sample", 
       tomo.shear_Npowerspectra
@@ -1771,7 +1771,7 @@ void init_source_sample(
   {
     nuisance.bias_zphot_shear[i] = 0.0;
 
-    spdlog::info(
+    spdlog::debug(
         "\x1b[90m{}\x1b[0m: bin {} - {} = {}.",
         "init_source_sample", 
         i, 
@@ -1780,21 +1780,21 @@ void init_source_sample(
       );
   }
 
-  spdlog::info(
+  spdlog::debug(
       "\x1b[90m{}\x1b[0m: {} = {} selected.", 
       "init_source_sample",
       "shear_REDSHIFT_FILE", 
       multihisto_file
     );
 
-  spdlog::info(
+  spdlog::debug(
       "\x1b[90m{}\x1b[0m: {} = {} selected.", 
       "init_source_sample",
       "shear_Nbin", 
       Ntomo
     );
 
-  spdlog::info("\x1b[90m{}\x1b[0m: Ends", "init_source_sample");
+  spdlog::debug("\x1b[90m{}\x1b[0m: Ends", "init_source_sample");
 }
 
 // ---------------------------------------------------------------------------
@@ -1807,7 +1807,7 @@ void init_survey(
     double sigma_e
   )
 {
-  spdlog::info("\x1b[90m{}\x1b[0m: Begins", "init_survey");
+  spdlog::debug("\x1b[90m{}\x1b[0m: Begins", "init_survey");
 
   boost::trim_if(surveyname, boost::is_any_of("\t "));
   
@@ -1835,7 +1835,7 @@ void init_survey(
   
   survey.sigma_e = sigma_e;
 
-  spdlog::info("\x1b[90m{}\x1b[0m: Ends", "init_survey");
+  spdlog::debug("\x1b[90m{}\x1b[0m: Ends", "init_survey");
 }
 
 // ---------------------------------------------------------------------------
@@ -2835,7 +2835,7 @@ matrix compute_baryon_pcas_3x2pt(
 
   // Compute Cholesky Decomposition of the Covariance Matrix --------------
   
-  spdlog::info(
+  spdlog::debug(
       "\x1b[90m{}\x1b[0m: Computing Cholesky Decomposition of"
       " the Covariance Matrix begins", 
       "compute_baryon_pcas_3x2pt"
@@ -2845,7 +2845,7 @@ matrix compute_baryon_pcas_3x2pt(
 
   matrix inv_L = arma::inv(L);
 
-  spdlog::info(
+  spdlog::debug(
       "\x1b[90m{}\x1b[0m: Computing Cholesky Decomposition of"
       " the Covariance Matrix ends", 
       "compute_baryon_pcas_3x2pt"
@@ -2853,7 +2853,7 @@ matrix compute_baryon_pcas_3x2pt(
 
   // Compute Dark Matter data vector --------------------------------------
   
-  spdlog::info(
+  spdlog::debug(
       "\x1b[90m{}\x1b[0m: Computing DM only data vector begins", 
       "compute_baryon_pcas_3x2pt"
     );
@@ -2868,7 +2868,7 @@ matrix compute_baryon_pcas_3x2pt(
       compute_data_vector_3x2pt_masked_any_order(order)
     );
 
-  spdlog::info(
+  spdlog::debug(
       "\x1b[90m{}\x1b[0m: Computing DM only data vector ends", 
       "compute_baryon_pcas_3x2pt"
     );
@@ -2879,7 +2879,7 @@ matrix compute_baryon_pcas_3x2pt(
 
   for (int i=0; i<nscenarios; i++)
   {
-    spdlog::info(
+    spdlog::debug(
         "\x1b[90m{}\x1b[0m: Computing contaminated data vector"
         " with baryon scenario {} begins", 
         "compute_baryon_pcas_3x2pt",
@@ -2897,7 +2897,7 @@ matrix compute_baryon_pcas_3x2pt(
 
     D.col(i) = dv - dv_dm;
 
-    spdlog::info(
+    spdlog::debug(
         "\x1b[90m{}\x1b[0m: Computing contaminated data vector"
         " with baryon scenario {} ends", 
         "compute_baryon_pcas_3x2pt",
@@ -2948,7 +2948,7 @@ matrix compute_baryon_pcas_6x2pt(arma::Col<int>::fixed<6> order)
 
   // Compute Cholesky Decomposition of the Covariance Matrix --------------
   
-  spdlog::info(
+  spdlog::debug(
       "\x1b[90m{}\x1b[0m: Computing Cholesky Decomposition of"
       " the Covariance Matrix begins", 
       "compute_baryon_pcas_3x2pt"
@@ -2958,7 +2958,7 @@ matrix compute_baryon_pcas_6x2pt(arma::Col<int>::fixed<6> order)
 
   matrix inv_L = arma::inv(L);
 
-  spdlog::info(
+  spdlog::debug(
       "\x1b[90m{}\x1b[0m: Computing Cholesky Decomposition of"
       " the Covariance Matrix ends", 
       "compute_baryon_pcas_3x2pt"
@@ -2966,7 +2966,7 @@ matrix compute_baryon_pcas_6x2pt(arma::Col<int>::fixed<6> order)
 
   // Compute Dark Matter data vector --------------------------------------
   
-  spdlog::info(
+  spdlog::debug(
       "\x1b[90m{}\x1b[0m: Computing DM only data vector begins", 
       "compute_baryon_pcas_3x2pt"
     );
@@ -2981,7 +2981,7 @@ matrix compute_baryon_pcas_6x2pt(arma::Col<int>::fixed<6> order)
       compute_data_vector_6x2pt_masked_any_order(order)
     );
 
-  spdlog::info(
+  spdlog::debug(
       "\x1b[90m{}\x1b[0m: Computing DM only data vector ends", 
       "compute_baryon_pcas_3x2pt"
     );
@@ -2992,7 +2992,7 @@ matrix compute_baryon_pcas_6x2pt(arma::Col<int>::fixed<6> order)
 
   for (int i=0; i<nscenarios; i++)
   {
-    spdlog::info(
+    spdlog::debug(
         "\x1b[90m{}\x1b[0m: Computing contaminated data vector"
         " with baryon scenario {} begins", 
         "compute_baryon_pcas_3x2pt",
@@ -3010,7 +3010,7 @@ matrix compute_baryon_pcas_6x2pt(arma::Col<int>::fixed<6> order)
 
     D.col(i) = dv - dv_dm;
 
-    spdlog::info(
+    spdlog::debug(
         "\x1b[90m{}\x1b[0m: Computing contaminated data vector"
         " with baryon scenario {} ends", 
         "compute_baryon_pcas_3x2pt",
@@ -3262,7 +3262,7 @@ void IP::set_mask(std::string mask_filename, arma::Col<int>::fixed<3> order)
     exit(1);
   }
   
-  spdlog::info(
+  spdlog::debug(
       "\x1b[90m{}\x1b[0m: mask file {} left {} non-masked elements after masking",
       "IP::set_mask", 
       mask_filename, 
@@ -3445,7 +3445,7 @@ void IP::set_mask(std::string mask_filename, arma::Col<int>::fixed<6> order)
     exit(1);
   }
   
-  spdlog::info(
+  spdlog::debug(
       "\x1b[90m{}\x1b[0m: mask file {} left {} non-masked elements "
       "after masking",
       "IP::set_mask", 
@@ -4127,7 +4127,7 @@ void IPCMB::set_cmb_binning_mat(
     }
   }
 
-  spdlog::info(
+  spdlog::debug(
       "\x1b[90m{}\x1b[0m: CMB binning matrix from file {} has {} x {} elements",
       "IPCMB::set_cmb_binning_mat", 
       cmb_binned_matrix_filename, 
@@ -4169,7 +4169,7 @@ void IPCMB::set_cmb_theory_offset(
     this->cmb_theory_offset_(i) = static_cast<double>(table(i,0));
   }
 
-  spdlog::info(
+  spdlog::debug(
       "\x1b[90m{}\x1b[0m: CMB theory offset from file {} has {} elements", 
       "IPCMB::set_cmb_theory_offset", 
       cmb_theory_offset_filename, 
@@ -4426,7 +4426,7 @@ void BaryonScenario::set_scenarios(std::string scenarios)
     exit(1);
   }
   
-  spdlog::info(
+  spdlog::debug(
       "\x1b[90m{}\x1b[0m: Selecting baryon scenarios for PCA", 
       "BaryonScenario::set_scenarios"
     );
@@ -4449,13 +4449,13 @@ void BaryonScenario::set_scenarios(std::string scenarios)
 
   this->nscenarios_ = nscenarios;
 
-  spdlog::info(
+  spdlog::debug(
       "\x1b[90m{}\x1b[0m: {} scenarios are registered", 
       "BaryonScenario::set_scenarios", 
       this->nscenarios_
     );
 
-  spdlog::info(
+  spdlog::debug(
       "\x1b[90m{}\x1b[0m: Registering baryon scenarios for PCA done!", 
       "BaryonScenario::set_scenarios"
     );

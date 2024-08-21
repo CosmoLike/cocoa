@@ -86,6 +86,22 @@ static int nell()
 // ---------------------------------------------------------------------------
 // ---------------------------------------------------------------------------
 
+vector get_binning_real_space()
+{  
+  vector result(like.Ntheta, arma::fill::none);
+
+  for (int i = 0; i < like.Ntheta; i++)
+  {    
+    result(i) = like.theta[i] / 2.90888208665721580e-4; 
+  }
+
+  return result;
+}
+
+// ---------------------------------------------------------------------------
+// ---------------------------------------------------------------------------
+// ---------------------------------------------------------------------------
+
 py::tuple xi_pm_tomo_cpp()
 {
   if (tomo.shear_Nbin == 0)
@@ -107,8 +123,16 @@ py::tuple xi_pm_tomo_cpp()
     exit(1);
   }
  
-  vector xp(like.Ntheta*tomo.shear_Npowerspectra, arma::fill::none);
-  vector xm(like.Ntheta*tomo.shear_Npowerspectra, arma::fill::none);
+  matrix xp(like.Ntheta, tomo.shear_Npowerspectra, arma::fill::none);
+  matrix xm(like.Ntheta, tomo.shear_Npowerspectra, arma::fill::none);
+
+  {
+    const int nz = 0;
+    const int i = 0;
+    const int z1 = Z1(nz);
+    const int z2 = Z2(nz);
+    double tmp = xi_pm_tomo_jupyter(1, i, z1, z2, 1, 1);
+  }
 
   for (int nz=0; nz<tomo.shear_Npowerspectra; nz++)
   {    
@@ -116,12 +140,12 @@ py::tuple xi_pm_tomo_cpp()
     {
       const int z1 = Z1(nz);
       const int z2 = Z2(nz);
-      xp(like.Ntheta*nz+i) = xi_pm_tomo(1, i, z1, z2, 1);
-      xm(like.Ntheta*nz+i) = xi_pm_tomo(-1, i, z1, z2, 1);
+      xp(i,nz) = xi_pm_tomo_jupyter(1, i, z1, z2, 1, 0);
+      xm(i,nz) = xi_pm_tomo_jupyter(-1, i, z1, z2, 1, 0);
     }
   }
 
-  return py::make_tuple(carma::col_to_arr(xp), carma::col_to_arr(xm));
+  return py::make_tuple(carma::mat_to_arr(xp), carma::mat_to_arr(xm));
 }
 
 // ---------------------------------------------------------------------------

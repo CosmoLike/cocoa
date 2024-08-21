@@ -14,6 +14,8 @@ namespace cosmolike_interface
 
 // ---------------------------------------------------------------------------
 
+arma::Col<double> get_binning_real_space();
+
 pybind11::tuple xi_pm_tomo_cpp();
 
 arma::Col<double> w_gammat_tomo_cpp();

@@ -152,7 +152,26 @@ int number_ell_fourier_2pt()
 // ----------------------------------------------------------------------------
 // ----------------------------------------------------------------------------
 
-double xi_pm_tomo(const int pm, const int nt, const int ni, const int nj, const int limber)
+double xi_pm_tomo(
+    const int pm, 
+    const int nt, 
+    const int ni, 
+    const int nj, 
+    const int limber
+  )
+{
+  return xi_pm_tomo_jupyter(pm, nt, ni, nj, limber, 0);
+}
+
+double xi_pm_tomo_jupyter(
+    const int pm, 
+    const int nt, 
+    const int ni, 
+    const int nj, 
+    const int limber, 
+    const int force_recompute // for Jupyter notebook 
+                              // (users which may change theta interactively)
+  )
 {
   if (like.Ntheta == 0)
   {
@@ -171,8 +190,24 @@ double xi_pm_tomo(const int pm, const int nt, const int ni, const int nj, const 
   const int ntheta = like.Ntheta;
   const int NSIZE = tomo.shear_Npowerspectra;
 
-  if (Glplus == 0)
+  if (Glplus == 0 || force_recompute == 1)
   {
+    if (Glplus != 0) 
+    {
+      free(Glplus);
+    }
+    if (Glminus != 0) 
+    {
+      free(Glminus);
+    }
+    if (xi_vec_plus != 0) 
+    {
+      free(xi_vec_plus);
+    }
+    if (xi_vec_minus != 0) 
+    {
+      free(xi_vec_minus);
+    }
     {
       const int len = sizeof(double*)*ntheta + sizeof(double)*ntheta*nell;
       
@@ -220,7 +255,7 @@ double xi_pm_tomo(const int pm, const int nt, const int ni, const int nj, const 
     double xmax[ntheta];
     for (int i=0; i<ntheta; i++)
     { // Cocoa: dont thread (init of static variables inside set_bin_average)
-      bin_avg r = set_bin_average(i,0);
+      bin_avg r = set_bin_average_jupyter(i,0, force_recompute);
       xmin[i] = r.xmin;
       xmax[i] = r.xmax;
     }

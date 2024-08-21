@@ -21,7 +21,23 @@ extern "C" {
 // ----------------------------------------------------------------------------
 
 // ss in real space has a special name
-double xi_pm_tomo(int pm, int nt, int ni, int nj, int limber);
+double xi_pm_tomo(
+    const int pm, 
+    const int nt, 
+    const int ni, 
+    const int nj, 
+    const int limber
+  );
+
+double xi_pm_tomo_jupyter(
+    const int pm, 
+    const int nt, 
+    const int ni, 
+    const int nj, 
+    const int limber, 
+    const int force_recompute // for Jupyter notebook 
+                              // (users which may change theta interactively)
+  );
 
 // gs in real space has a special name
 double w_gammat_tomo(int nt, int ni, int nj, int limber);
@@ -31,27 +47,6 @@ double w_gg_tomo(int nt, int ni, int nj, int limber);
 double w_gk_tomo(int nt, int ni, int limber);
 
 double w_ks_tomo(int nt, int ni, int limber);
-
-// ----------------------------------------------------------------------------
-// ----------------------------------------------------------------------------
-// ----------------------------------------------------------------------------
-// Correlation Functions (real space) - flat sky
-// ----------------------------------------------------------------------------
-// ----------------------------------------------------------------------------
-// ----------------------------------------------------------------------------
-
-// ss in real space has a special name
-double xi_pm_tomo_flatsky(int pm, double theta, int ni, int nj, int limber);
-
-// gs in real space has a special name
-double w_gammat_tomo_flatsky(double theta, int ni, int nj, int limber);
-
-// WARNING: C_gg beyond linear bias for cross-tomography bins not yet supported
-double w_gg_tomo_flatsky(double theta, int ni, int nj, int limber);
-
-double w_gk_tomo_flatsky(double theta, int ni, int limber);
-
-double w_ks_tomo_flatsky(double theta, int ni, int limber);
 
 // ----------------------------------------------------------------------------
 // ----------------------------------------------------------------------------

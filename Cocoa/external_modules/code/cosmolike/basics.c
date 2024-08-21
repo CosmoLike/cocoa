@@ -36,7 +36,20 @@ double fmax(const double a, const double b)
   return a > b ? a : b;
 }
 
-bin_avg set_bin_average(int i_theta, int j_L)
+bin_avg set_bin_average(
+    const int i_theta, 
+    const int j_L
+  )
+{
+  return set_bin_average_jupyter(i_theta, j_L, 0);
+}
+
+bin_avg set_bin_average_jupyter(
+    const int i_theta, 
+    const int j_L,
+    const int force_recompute // for Jupyter notebook 
+                              // (users which may change theta interactively)
+  )
 {
   static double** Pmin  = 0;
   static double** Pmax  = 0;
@@ -61,8 +74,81 @@ bin_avg set_bin_average(int i_theta, int j_L)
     exit(1);
   }
 
-  if (Pmin == 0)
+  if (Pmin == 0 || force_recompute == 1)
   {
+    if (Pmin != 0)
+    {
+      free(Pmin);
+    }
+    if (Pmax != 0)
+    {
+      free(Pmax);
+    }
+    if (dPmin != 0)
+    {
+      free(dPmin);
+    }
+    if (dPmax != 0)
+    {
+      free(dPmax);
+    }
+    if (xmin != 0)
+    {
+      free(xmin);
+    }
+    if (xmax != 0)
+    {
+      free(xmax);
+    }
+
+    const int ntheta = like.Ntheta;
+    const int nell = limits.LMAX;
+    const int len = sizeof(double*)*ntheta + sizeof(double)*ntheta*nell;
+
+    Pmin  = (double**) malloc(len);
+    if (Pmin == NULL)
+    {
+      log_fatal("array allocation failed");
+      exit(1);
+    }
+
+    Pmax  = (double**) malloc(len);
+    if (Pmax == NULL)
+    {
+      log_fatal("array allocation failed");
+      exit(1);
+    }
+
+    dPmin = (double**) malloc(len);
+    if (dPmin == NULL)
+    {
+      log_fatal("array allocation failed");
+      exit(1);
+    }
+
+    dPmax = (double**) malloc(len);
+    if (dPmax == NULL)
+    {
+      log_fatal("array allocation failed");
+      exit(1);
+    }
+
+    for (int i=0; i<ntheta; i++)
+    {
+      Pmin[i]  = ((double*)(Pmin + ntheta) + nell*i);
+      Pmax[i]  = ((double*)(Pmax + ntheta) + nell*i);
+      dPmin[i] = ((double*)(dPmin + ntheta) + nell*i);
+      dPmax[i] = ((double*)(dPmax + ntheta) + nell*i);
+      for (int j=0; j<nell; j++)
+      {
+        Pmin[i][j]  = 0.0;
+        Pmax[i][j]  = 0.0;
+        dPmin[i][j] = 0.0;
+        dPmax[i][j] = 0.0;
+      }
+    }
+
+    /*
     Pmin = (double**) malloc(like.Ntheta*sizeof(double*));
     Pmax = (double**) malloc(like.Ntheta*sizeof(double*));
     dPmin = (double**) malloc(like.Ntheta*sizeof(double*));
@@ -74,24 +160,52 @@ bin_avg set_bin_average(int i_theta, int j_L)
       dPmin[i] = (double*) calloc(limits.LMAX, sizeof(double));
       dPmax[i] = (double*) calloc(limits.LMAX, sizeof(double));
     }
+    */
+
     xmin = (double*) calloc(like.Ntheta, sizeof(double));
+    if (xmin == NULL)
+    {
+      log_fatal("array allocation failed");
+      exit(1);
+    }
+
     xmax = (double*) calloc(like.Ntheta, sizeof(double));
+    if (xmax == NULL)
+    {
+      log_fatal("array allocation failed");
+      exit(1);
+    }
+
     const double logdt=(log(like.vtmax)-log(like.vtmin))/like.Ntheta;
     for(int i=0; i<like.Ntheta ; i++)
     {
       xmin[i] = cos(exp(log(like.vtmin) + (i + 0.0)*logdt));
       xmax[i] = cos(exp(log(like.vtmin) + (i + 1.0)*logdt));
     }
+
     #pragma omp parallel for
     for (int i=0; i<like.Ntheta; i++)
     {
-      int status = gsl_sf_legendre_Pl_deriv_array(limits.LMAX, xmin[i], Pmin[i], dPmin[i]);
+      int status = gsl_sf_legendre_Pl_deriv_array(
+          limits.LMAX, 
+          xmin[i], 
+          Pmin[i], 
+          dPmin[i]
+        );
+
       if (status) 
       {
         log_fatal(gsl_strerror(status));
         exit(1);
       }
-      status = gsl_sf_legendre_Pl_deriv_array(limits.LMAX, xmax[i], Pmax[i], dPmax[i]);
+
+      status = gsl_sf_legendre_Pl_deriv_array(
+          limits.LMAX, 
+          xmax[i], 
+          Pmax[i], 
+          dPmax[i]
+        );
+
       if (status) 
       {
         log_fatal(gsl_strerror(status));
@@ -99,6 +213,7 @@ bin_avg set_bin_average(int i_theta, int j_L)
       } 
     }
   }
+  
   bin_avg r;
   r.xmin = xmin[i_theta];
   r.xmax = xmax[i_theta];
