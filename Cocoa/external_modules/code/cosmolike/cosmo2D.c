@@ -172,17 +172,17 @@ double xi_pm_tomo_jupyter(
     const int force_recompute // for Jupyter notebook 
                               // (users which may change theta interactively)
   )
-{
+{  
   if (like.Ntheta == 0)
   {
     log_fatal("like.Ntheta not initialized");
     exit(1);
   }
 
-  static double** Glplus = 0;
-  static double** Glminus = 0;
-  static double* xi_vec_plus = 0;
-  static double* xi_vec_minus = 0;
+  static double** Glplus = NULL;
+  static double** Glminus = NULL;
+  static double* xi_vec_plus = NULL;
+  static double* xi_vec_minus = NULL;
   static cosmopara C;
   static nuisancepara N;
   
@@ -190,50 +190,53 @@ double xi_pm_tomo_jupyter(
   const int ntheta = like.Ntheta;
   const int NSIZE = tomo.shear_Npowerspectra;
 
-  if (Glplus == 0 || force_recompute == 1)
+  if (Glplus == NULL || force_recompute == 1)
   {
-    if (Glplus != 0) 
+    if (Glplus != NULL) 
     {
       free(Glplus);
+      Glplus = NULL;
     }
-    if (Glminus != 0) 
+    if (Glminus != NULL) 
     {
       free(Glminus);
+      Glminus = NULL;
     }
-    if (xi_vec_plus != 0) 
+    if (xi_vec_plus != NULL) 
     {
       free(xi_vec_plus);
+      xi_vec_plus = NULL;
     }
-    if (xi_vec_minus != 0) 
+    if (xi_vec_minus != NULL) 
     {
       free(xi_vec_minus);
+      xi_vec_minus = NULL;
     }
+      
+    Glplus = (double**) malloc(sizeof(double*)*ntheta + 
+                               sizeof(double)*ntheta*nell);
+    if (Glplus == NULL)
     {
-      const int len = sizeof(double*)*ntheta + sizeof(double)*ntheta*nell;
-      
-      Glplus = (double**) malloc(len);
-      if (Glplus == NULL)
+      log_fatal("array allocation failed");
+      exit(1);
+    }
+    
+    Glminus = (double**) malloc(sizeof(double*)*ntheta + 
+                                sizeof(double)*ntheta*nell);
+    if (Glminus == NULL)
+    {
+      log_fatal("array allocation failed");
+      exit(1);
+    }
+
+    for (int i=0; i<ntheta; i++)
+    {
+      Glplus[i]  = ((double*)(Glplus + ntheta) + nell*i);
+      Glminus[i] = ((double*)(Glminus + ntheta) + nell*i);
+      for (int j=0; j<nell; j++)
       {
-        log_fatal("array allocation failed");
-        exit(1);
-      }
-      
-      Glminus = (double**) malloc(len);
-      if (Glminus == NULL)
-      {
-        log_fatal("array allocation failed");
-        exit(1);
-      }
-      
-      for (int i=0; i<ntheta; i++)
-      {
-        Glplus[i]  = ((double*)(Glplus + ntheta) + nell*i);
-        Glminus[i] = ((double*)(Glminus + ntheta) + nell*i);
-        for (int j=0; j<nell; j++)
-        {
-          Glplus[i][j] = 0.0;
-          Glminus[i][j] = 0.0;
-        }
+        Glplus[i][j] = 0.0;
+        Glminus[i][j] = 0.0;
       }
     }
     
@@ -255,35 +258,37 @@ double xi_pm_tomo_jupyter(
     double xmax[ntheta];
     for (int i=0; i<ntheta; i++)
     { // Cocoa: dont thread (init of static variables inside set_bin_average)
-      bin_avg r = set_bin_average_jupyter(i,0, force_recompute);
+      bin_avg r = set_bin_average_jupyter(i, 0, force_recompute);
       xmin[i] = r.xmin;
       xmax[i] = r.xmax;
     }
-
-    const int len = sizeof(double*)*ntheta + sizeof(double)*ntheta*(nell + 1);
     
-    double** Pmin  = (double**) malloc(len);
+    double** Pmin  = (double**) malloc(sizeof(double*)*ntheta + 
+                                       sizeof(double)*ntheta*(nell + 1));
     if (Pmin == NULL)
     {
       log_fatal("array allocation failed");
       exit(1);
     }
     
-    double** Pmax  = (double**) malloc(len);
+    double** Pmax  = (double**) malloc(sizeof(double*)*ntheta + 
+                                       sizeof(double)*ntheta*(nell + 1));
     if (Pmax == NULL)
     {
       log_fatal("array allocation failed");
       exit(1);
     }
     
-    double** dPmin = (double**) malloc(len);
+    double** dPmin = (double**) malloc(sizeof(double*)*ntheta + 
+                                       sizeof(double)*ntheta*(nell + 1));
     if (dPmin == NULL)
     {
       log_fatal("array allocation failed");
       exit(1);
     }
     
-    double** dPmax = (double**) malloc(len);
+    double** dPmax = (double**) malloc(sizeof(double*)*ntheta + 
+                                       sizeof(double)*ntheta*(nell + 1));
     if (dPmax == NULL)
     {
       log_fatal("array allocation failed");
@@ -292,10 +297,11 @@ double xi_pm_tomo_jupyter(
     
     for (int i=0; i<ntheta; i++)
     {
-      Pmin[i]  = ((double*)(Pmin + ntheta) + (nell + 1)*i);
-      Pmax[i]  = ((double*)(Pmax + ntheta) + (nell + 1)*i);
-      dPmin[i]  = ((double*)(dPmin + ntheta) + (nell + 1)*i);
-      dPmax[i]  = ((double*)(dPmax + ntheta) + (nell + 1)*i);
+      // you need these Legendre evals from l=0 to lmax (inclusive)
+      Pmin[i]  = ((double*)(Pmin + ntheta) + (nell+1)*i);
+      Pmax[i]  = ((double*)(Pmax + ntheta) + (nell+1)*i);
+      dPmin[i]  = ((double*)(dPmin + ntheta) + (nell+1)*i);
+      dPmax[i]  = ((double*)(dPmax + ntheta) + (nell+1)*i);
       for (int j=0; j<(nell + 1); j++)
       {
         Pmin[i][j]  = 0.0;
@@ -308,11 +314,11 @@ double xi_pm_tomo_jupyter(
     #pragma omp parallel for collapse(2)
     for (int i=0; i<ntheta; i++)
     {
-      for (int l=0; l<nell; l++)
+      for (int l=0; l<nell+1; l++)
       {
-        bin_avg r = set_bin_average(i, l);
-        Pmin[i][l] = r.Pmin;
-        Pmax[i][l] = r.Pmax;
+        bin_avg r   = set_bin_average(i, l);
+        Pmin[i][l]  = r.Pmin;
+        Pmax[i][l]  = r.Pmax;
         dPmin[i][l] = r.dPmin;
         dPmax[i][l] = r.dPmax;
       }
@@ -351,7 +357,7 @@ double xi_pm_tomo_jupyter(
     free(dPmax);
   }
 
-  if (recompute_shear(C, N))
+  if (recompute_shear(C, N) || force_recompute == 1)
   {
     if (limber == 1)
     {

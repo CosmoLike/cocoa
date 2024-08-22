@@ -51,12 +51,12 @@ bin_avg set_bin_average_jupyter(
                               // (users which may change theta interactively)
   )
 {
-  static double** Pmin  = 0;
-  static double** Pmax  = 0;
-  static double** dPmin = 0;
-  static double** dPmax = 0;
-  static double* xmin = 0;
-  static double* xmax = 0;
+  static double** Pmin  = NULL;
+  static double** Pmax  = NULL;
+  static double** dPmin = NULL;
+  static double** dPmax = NULL;
+  static double* xmin = NULL;
+  static double* xmax = NULL;
   
   if (like.Ntheta == 0)
   {
@@ -68,42 +68,48 @@ bin_avg set_bin_average_jupyter(
     log_fatal("bad i_theta index");
     exit(1);
   }
-  if (!(j_L < limits.LMAX))
+  if (j_L > limits.LMAX)
   {
     log_fatal("bad j_L index");
     exit(1);
   }
 
-  if (Pmin == 0 || force_recompute == 1)
+  if (Pmin == NULL || force_recompute == 1)
   {
-    if (Pmin != 0)
+    if (Pmin != NULL)
     {
       free(Pmin);
+      Pmin = NULL;
     }
-    if (Pmax != 0)
+    if (Pmax != NULL)
     {
       free(Pmax);
+      Pmax = NULL;
     }
-    if (dPmin != 0)
+    if (dPmin != NULL)
     {
       free(dPmin);
+      dPmin = NULL;
     }
-    if (dPmax != 0)
+    if (dPmax != NULL)
     {
       free(dPmax);
+      dPmax = NULL;
     }
-    if (xmin != 0)
+    if (xmin != NULL)
     {
       free(xmin);
+      xmin = NULL;
     }
-    if (xmax != 0)
+    if (xmax != NULL)
     {
       free(xmax);
+      xmax = NULL;
     }
 
-    const int ntheta = like.Ntheta;
-    const int nell = limits.LMAX;
-    const int len = sizeof(double*)*ntheta + sizeof(double)*ntheta*nell;
+    const int nell = limits.LMAX+1; // Legendre computes l=0,...,lmax (inclusive)
+    const int len  = sizeof(double*)*like.Ntheta + 
+                           sizeof(double)*like.Ntheta*nell;
 
     Pmin  = (double**) malloc(len);
     if (Pmin == NULL)
@@ -133,12 +139,12 @@ bin_avg set_bin_average_jupyter(
       exit(1);
     }
 
-    for (int i=0; i<ntheta; i++)
+    for (int i=0; i<like.Ntheta; i++)
     {
-      Pmin[i]  = ((double*)(Pmin + ntheta) + nell*i);
-      Pmax[i]  = ((double*)(Pmax + ntheta) + nell*i);
-      dPmin[i] = ((double*)(dPmin + ntheta) + nell*i);
-      dPmax[i] = ((double*)(dPmax + ntheta) + nell*i);
+      Pmin[i]  = ((double*)(Pmin + like.Ntheta) + nell*i);
+      Pmax[i]  = ((double*)(Pmax + like.Ntheta) + nell*i);
+      dPmin[i] = ((double*)(dPmin + like.Ntheta) + nell*i);
+      dPmax[i] = ((double*)(dPmax + like.Ntheta) + nell*i);
       for (int j=0; j<nell; j++)
       {
         Pmin[i][j]  = 0.0;
@@ -147,20 +153,6 @@ bin_avg set_bin_average_jupyter(
         dPmax[i][j] = 0.0;
       }
     }
-
-    /*
-    Pmin = (double**) malloc(like.Ntheta*sizeof(double*));
-    Pmax = (double**) malloc(like.Ntheta*sizeof(double*));
-    dPmin = (double**) malloc(like.Ntheta*sizeof(double*));
-    dPmax = (double**) malloc(like.Ntheta*sizeof(double*));
-    for(int i=0; i<like.Ntheta ; i++)
-    {
-      Pmin[i] = (double*) calloc(limits.LMAX, sizeof(double));
-      Pmax[i] = (double*) calloc(limits.LMAX, sizeof(double));
-      dPmin[i] = (double*) calloc(limits.LMAX, sizeof(double));
-      dPmax[i] = (double*) calloc(limits.LMAX, sizeof(double));
-    }
-    */
 
     xmin = (double*) calloc(like.Ntheta, sizeof(double));
     if (xmin == NULL)
@@ -176,7 +168,9 @@ bin_avg set_bin_average_jupyter(
       exit(1);
     }
 
-    const double logdt=(log(like.vtmax)-log(like.vtmin))/like.Ntheta;
+    const double logdt = 
+      (log(like.vtmax)-log(like.vtmin))/ (double) like.Ntheta;
+    
     for(int i=0; i<like.Ntheta ; i++)
     {
       xmin[i] = cos(exp(log(like.vtmin) + (i + 0.0)*logdt));
@@ -186,13 +180,27 @@ bin_avg set_bin_average_jupyter(
     #pragma omp parallel for
     for (int i=0; i<like.Ntheta; i++)
     {
+      if (abs(xmin[i]) > 1)
+      {
+        log_fatal(
+          "logical error: bad Legendre argument xmin = %.3e (> 1)", xmin[i]
+        );
+        exit(1);
+      }
+      if (abs(xmax[i]) > 1)
+      {
+        log_fatal(
+          "logical error: bad Legendre argument xmas = %.3e (> 1)", xmin[i]
+        );
+        exit(1);
+      }
+      
       int status = gsl_sf_legendre_Pl_deriv_array(
           limits.LMAX, 
           xmin[i], 
           Pmin[i], 
           dPmin[i]
         );
-
       if (status) 
       {
         log_fatal(gsl_strerror(status));
@@ -205,7 +213,6 @@ bin_avg set_bin_average_jupyter(
           Pmax[i], 
           dPmax[i]
         );
-
       if (status) 
       {
         log_fatal(gsl_strerror(status));
@@ -213,7 +220,7 @@ bin_avg set_bin_average_jupyter(
       } 
     }
   }
-  
+
   bin_avg r;
   r.xmin = xmin[i_theta];
   r.xmax = xmax[i_theta];

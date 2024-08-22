@@ -664,13 +664,14 @@ void init_binning_real_space(
   
   like.vtmax = theta_max_arcmin * 2.90888208665721580e-4; // arcmin to rad conv
   
-  const double logdt = (std::log(like.vtmax) - std::log(like.vtmin))/like.Ntheta;
+  const double logdt = 
+    (std::log(like.vtmax) - std::log(like.vtmin))/ (double) like.Ntheta;
   
   like.theta = (double*) calloc(like.Ntheta, sizeof(double));
 
   constexpr double x = 2./ 3.;
 
-  for (int i = 0; i < like.Ntheta; i++)
+  for (int i=0; i<like.Ntheta; i++)
   {
     const double thetamin = std::exp(log(like.vtmin) + (i + 0.0) * logdt);
     
