@@ -159,19 +159,6 @@ double xi_pm_tomo(
     const int nj, 
     const int limber
   )
-{
-  return xi_pm_tomo_jupyter(pm, nt, ni, nj, limber, 0);
-}
-
-double xi_pm_tomo_jupyter(
-    const int pm, 
-    const int nt, 
-    const int ni, 
-    const int nj, 
-    const int limber, 
-    const int force_recompute // for Jupyter notebook 
-                              // (users which may change theta interactively)
-  )
 {  
   if (like.Ntheta == 0)
   {
@@ -183,14 +170,14 @@ double xi_pm_tomo_jupyter(
   static double** Glminus = NULL;
   static double* xi_vec_plus = NULL;
   static double* xi_vec_minus = NULL;
+  static int ntheta = 0;
   static cosmopara C;
   static nuisancepara N;
   
   const int nell = limits.LMAX;
-  const int ntheta = like.Ntheta;
   const int NSIZE = tomo.shear_Npowerspectra;
 
-  if (Glplus == NULL || force_recompute == 1)
+  if (Glplus == NULL || (ntheta != like.Ntheta))
   {
     if (Glplus != NULL) 
     {
@@ -213,26 +200,26 @@ double xi_pm_tomo_jupyter(
       xi_vec_minus = NULL;
     }
       
-    Glplus = (double**) malloc(sizeof(double*)*ntheta + 
-                               sizeof(double)*ntheta*nell);
+    Glplus = (double**) malloc(sizeof(double*)*like.Ntheta + 
+                               sizeof(double)*like.Ntheta*nell);
     if (Glplus == NULL)
     {
       log_fatal("array allocation failed");
       exit(1);
     }
     
-    Glminus = (double**) malloc(sizeof(double*)*ntheta + 
-                                sizeof(double)*ntheta*nell);
+    Glminus = (double**) malloc(sizeof(double*)*like.Ntheta + 
+                                sizeof(double)*like.Ntheta*nell);
     if (Glminus == NULL)
     {
       log_fatal("array allocation failed");
       exit(1);
     }
 
-    for (int i=0; i<ntheta; i++)
+    for (int i=0; i<like.Ntheta; i++)
     {
-      Glplus[i]  = ((double*)(Glplus + ntheta) + nell*i);
-      Glminus[i] = ((double*)(Glminus + ntheta) + nell*i);
+      Glplus[i]  = ((double*)(Glplus + like.Ntheta) + nell*i);
+      Glminus[i] = ((double*)(Glminus + like.Ntheta) + nell*i);
       for (int j=0; j<nell; j++)
       {
         Glplus[i][j] = 0.0;
@@ -240,68 +227,68 @@ double xi_pm_tomo_jupyter(
       }
     }
     
-    xi_vec_plus = (double*) calloc(NSIZE*ntheta, sizeof(double));
+    xi_vec_plus = (double*) calloc(NSIZE*like.Ntheta, sizeof(double));
     if (xi_vec_plus == NULL)
     {
       log_fatal("array allocation failed");
       exit(1);
     }
     
-    xi_vec_minus = (double*) calloc(NSIZE*ntheta, sizeof(double));
+    xi_vec_minus = (double*) calloc(NSIZE*like.Ntheta, sizeof(double));
     if (xi_vec_minus == NULL)
     {
       log_fatal("array allocation failed");
       exit(1);
     }
 
-    double xmin[ntheta];
-    double xmax[ntheta];
-    for (int i=0; i<ntheta; i++)
+    double xmin[like.Ntheta];
+    double xmax[like.Ntheta];
+    for (int i=0; i<like.Ntheta; i++)
     { // Cocoa: dont thread (init of static variables inside set_bin_average)
-      bin_avg r = set_bin_average_jupyter(i, 0, force_recompute);
+      bin_avg r = set_bin_average(i, 0);
       xmin[i] = r.xmin;
       xmax[i] = r.xmax;
     }
     
-    double** Pmin  = (double**) malloc(sizeof(double*)*ntheta + 
-                                       sizeof(double)*ntheta*(nell + 1));
+    double** Pmin  = (double**) malloc(sizeof(double*)*like.Ntheta + 
+                                       sizeof(double)*like.Ntheta*(nell+1));
     if (Pmin == NULL)
     {
       log_fatal("array allocation failed");
       exit(1);
     }
     
-    double** Pmax  = (double**) malloc(sizeof(double*)*ntheta + 
-                                       sizeof(double)*ntheta*(nell + 1));
+    double** Pmax  = (double**) malloc(sizeof(double*)*like.Ntheta + 
+                                       sizeof(double)*like.Ntheta*(nell+1));
     if (Pmax == NULL)
     {
       log_fatal("array allocation failed");
       exit(1);
     }
     
-    double** dPmin = (double**) malloc(sizeof(double*)*ntheta + 
-                                       sizeof(double)*ntheta*(nell + 1));
+    double** dPmin = (double**) malloc(sizeof(double*)*like.Ntheta + 
+                                       sizeof(double)*like.Ntheta*(nell+1));
     if (dPmin == NULL)
     {
       log_fatal("array allocation failed");
       exit(1);
     }
     
-    double** dPmax = (double**) malloc(sizeof(double*)*ntheta + 
-                                       sizeof(double)*ntheta*(nell + 1));
+    double** dPmax = (double**) malloc(sizeof(double*)*like.Ntheta + 
+                                       sizeof(double)*like.Ntheta*(nell+1));
     if (dPmax == NULL)
     {
       log_fatal("array allocation failed");
       exit(1);
     }
     
-    for (int i=0; i<ntheta; i++)
+    for (int i=0; i<like.Ntheta; i++)
     {
       // you need these Legendre evals from l=0 to lmax (inclusive)
-      Pmin[i]  = ((double*)(Pmin + ntheta) + (nell+1)*i);
-      Pmax[i]  = ((double*)(Pmax + ntheta) + (nell+1)*i);
-      dPmin[i]  = ((double*)(dPmin + ntheta) + (nell+1)*i);
-      dPmax[i]  = ((double*)(dPmax + ntheta) + (nell+1)*i);
+      Pmin[i]  = ((double*)(Pmin+like.Ntheta) + (nell+1)*i);
+      Pmax[i]  = ((double*)(Pmax+like.Ntheta) + (nell+1)*i);
+      dPmin[i]  = ((double*)(dPmin+like.Ntheta) + (nell+1)*i);
+      dPmax[i]  = ((double*)(dPmax+like.Ntheta) + (nell+1)*i);
       for (int j=0; j<(nell + 1); j++)
       {
         Pmin[i][j]  = 0.0;
@@ -312,7 +299,7 @@ double xi_pm_tomo_jupyter(
     }
     
     #pragma omp parallel for collapse(2)
-    for (int i=0; i<ntheta; i++)
+    for (int i=0; i<like.Ntheta; i++)
     {
       for (int l=0; l<nell+1; l++)
       {
@@ -325,7 +312,7 @@ double xi_pm_tomo_jupyter(
     }
 
     #pragma omp parallel for collapse(2)
-    for (int i=0; i<ntheta; i++)
+    for (int i=0; i<like.Ntheta; i++)
     {
       for (int l=1; l<nell; l++)
       {
@@ -356,8 +343,7 @@ double xi_pm_tomo_jupyter(
     free(dPmin);
     free(dPmax);
   }
-
-  if (recompute_shear(C, N) || force_recompute == 1)
+  if (recompute_shear(C, N) || (ntheta != like.Ntheta))
   {
     if (limber == 1)
     {
@@ -453,9 +439,9 @@ double xi_pm_tomo_jupyter(
           #pragma omp parallel for collapse(2)
           for (int nz=0; nz<NSIZE; nz++)
           {
-            for (int i=0; i<ntheta; i++)
+            for (int i=0; i<like.Ntheta; i++)
             {
-              const int q = nz*ntheta + i;
+              const int q = nz*like.Ntheta + i;
               xi_vec_plus[q]  = 0;
               xi_vec_minus[q] = 0;
               for (int l=2; l<nell; l++)
@@ -528,9 +514,9 @@ double xi_pm_tomo_jupyter(
           #pragma omp parallel for collapse(2)
           for (int nz=0; nz<NSIZE; nz++)
           {
-            for (int i=0; i<ntheta; i++)
+            for (int i=0; i<like.Ntheta; i++)
             {
-              const int q = nz*ntheta + i;
+              const int q = nz*like.Ntheta + i;
               xi_vec_plus[q] = 0;
               xi_vec_minus[q] = 0;
               for (int l=2; l<nell; l++)
@@ -556,9 +542,12 @@ double xi_pm_tomo_jupyter(
       log_fatal("NonLimber not implemented");
       exit(1);
     }
-
     update_cosmopara(&C);
     update_nuisance(&N);
+  }
+  if (ntheta != like.Ntheta)
+  {
+    ntheta = like.Ntheta;
   }
 
   if (nt < 0 || nt > like.Ntheta - 1)

@@ -41,22 +41,13 @@ bin_avg set_bin_average(
     const int j_L
   )
 {
-  return set_bin_average_jupyter(i_theta, j_L, 0);
-}
-
-bin_avg set_bin_average_jupyter(
-    const int i_theta, 
-    const int j_L,
-    const int force_recompute // for Jupyter notebook 
-                              // (users which may change theta interactively)
-  )
-{
   static double** Pmin  = NULL;
   static double** Pmax  = NULL;
   static double** dPmin = NULL;
   static double** dPmax = NULL;
   static double* xmin = NULL;
   static double* xmax = NULL;
+  static int ntheta = 0;
   
   if (like.Ntheta == 0)
   {
@@ -74,7 +65,7 @@ bin_avg set_bin_average_jupyter(
     exit(1);
   }
 
-  if (Pmin == NULL || force_recompute == 1)
+  if (Pmin == NULL || (ntheta != like.Ntheta))
   {
     if (Pmin != NULL)
     {
@@ -219,6 +210,8 @@ bin_avg set_bin_average_jupyter(
         exit(1);
       } 
     }
+
+    ntheta = like.Ntheta;
   }
 
   bin_avg r;

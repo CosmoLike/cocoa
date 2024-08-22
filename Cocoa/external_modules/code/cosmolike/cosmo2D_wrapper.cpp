@@ -126,22 +126,14 @@ py::tuple xi_pm_tomo_cpp()
   matrix xp(like.Ntheta, tomo.shear_Npowerspectra, arma::fill::none);
   matrix xm(like.Ntheta, tomo.shear_Npowerspectra, arma::fill::none);
 
-  {
-    const int nz = 0;
-    const int i = 0;
-    const int z1 = Z1(nz);
-    const int z2 = Z2(nz);
-    double tmp = xi_pm_tomo_jupyter(1, i, z1, z2, 1, 1);
-  }
-
   for (int nz=0; nz<tomo.shear_Npowerspectra; nz++)
   {    
     for (int i=0; i<like.Ntheta; i++)
     {
       const int z1 = Z1(nz);
       const int z2 = Z2(nz);
-      xp(i,nz) = xi_pm_tomo_jupyter(1, i, z1, z2, 1, 0);
-      xm(i,nz) = xi_pm_tomo_jupyter(-1, i, z1, z2, 1, 0);
+      xp(i,nz) = xi_pm_tomo(1, i, z1, z2, 1);
+      xm(i,nz) = xi_pm_tomo(-1, i, z1, z2, 1);
     }
   }
 

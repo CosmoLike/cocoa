@@ -20,13 +20,6 @@ bin_avg set_bin_average(
     const int j_L
   );
 
-bin_avg set_bin_average_jupyter(
-    const int i_theta, 
-    const int j_L,
-    const int force_recompute // for Jupyter notebook 
-                              // (users which may change theta interactively)
-  );
-
 double int_gsl_integrate_high_precision(double (*func)(double, void *),
   void *arg, double a, double b, double *error, int niter);
 

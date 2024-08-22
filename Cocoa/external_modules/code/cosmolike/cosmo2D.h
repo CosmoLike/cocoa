@@ -29,16 +29,6 @@ double xi_pm_tomo(
     const int limber
   );
 
-double xi_pm_tomo_jupyter(
-    const int pm, 
-    const int nt, 
-    const int ni, 
-    const int nj, 
-    const int limber, 
-    const int force_recompute // for Jupyter notebook 
-                              // (users which may change theta interactively)
-  );
-
 // gs in real space has a special name
 double w_gammat_tomo(int nt, int ni, int nj, int limber);
 

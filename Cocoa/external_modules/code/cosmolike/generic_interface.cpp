@@ -2507,7 +2507,8 @@ vector compute_data_vector_6x2pt_masked_any_order(
     arma::Col<int>::fixed<6> order
   )
 { // order = (1,2,3,4,5,6) => Cosmic Shear, ggl, gg, gk, sk, kk
-  spdlog::debug("\x1b[90m{}\x1b[0m: Begins", "compute_data_vector_masked");
+  spdlog::debug("\x1b[90m{}\x1b[0m: Begins", 
+    "compute_data_vector_6x2pt_masked_any_order");
 
   if (tomo.shear_Nbin == 0)
   {
