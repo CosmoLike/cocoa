@@ -18,7 +18,7 @@
     11. [FAQ: How do we set the environment for Machine Learning projects?](#ml_emulators)
     12. [FAQ: How can users improve their Bash/C/C++ knowledge to develop Cocoa/Cosmolike?](#lectnotes)
     13. [Warning about Weak Lensing YAML files in Cobaya](#appendix_example_runs)
-    14. [FAQ: How do we install Cocoa without conda](#required_packages_cache)
+    14. [FAQ: How do we install Cocoa without conda?](#required_packages_cache)
     15. [FAQ: How do we push changes to the Cocoa main branch? A few git hacks](#push_main)
     16. [FAQ: How do we download and run Cosmolike projects?](#running_cosmolike_projects)
 
