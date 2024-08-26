@@ -814,12 +814,14 @@ Finally, set the following environmental keys:
 
 ### :interrobang: FAQ: How do we push changes to the Cocoa main branch? A few git hacks <a name="push_main"></a>
 
-Until recently, Cocoa development was unstructured, and developers could push directly to the `main` branch. Small commits were also not discouraged. These loose development rules will soon change. In particular, we will soon protect the `main` branch by requiring every push to be reviewed by Cocoa's leading developers. We also want to reduce the number of commits from now on. 
+Until recently, Cocoa development was unstructured, and developers could push directly to the `main` branch. Small commits were not discouraged,  and such flexible development rules will soon change. Shortly, we will protect the `main` branch by requiring every push to be reviewed by Cocoa's leading developers. We also want to reduce the number of commits from now on.
 
-We will implement the philosophy that **a commit in the main branch should contain an atomic change that takes code from a working state to another working state with meaningful and well-tested improvements.** So, developers should propose changes to the `main` branch in larger chunks, as shown below. 
+Our new philosophy establishes that **a commit in the main branch should contain an atomic change that takes code from a working state to another working state with meaningful and well-tested improvements.** So, developers should propose changes to the `main` branch in larger chunks (*via squash commits*), as shown below.
 
 Important note: we **strongly** advise developers to use the up-to-date `git` given by Cocoa conda environment. 
 
+- :interrobang: **How to apply squash commits?**
+  
 **Step :one:**: create a development branch from the `main` branch. Do not call the development branch `dev`, it is reserved for work done by the primary Cocoa developers. Let's call this new branch `xyzdev` for concreteness (tip: the use of developers' initials helps make the branch name unique)
 
     # (main) = developers must input the command below on the main branch.
@@ -853,7 +855,9 @@ This step may create conflicts that must be addressed before step four.
 
 Important note: **never** revert the branch ordering on squash merging by squashing the `main` changes to the `xyzdev` branch.
 
-Another useful git hack is related to developing Cocoa from a git tag. We reserve git-tags to set milestones in our development, so they are good starting points for the development of new features. Let's assume the developer wants to clone the git tag `v4.0-beta8`
+- :interrobang: **How to develop starting from a git tag?**
+
+Another useful git hack is related to developing Cocoa from a git tag. We reserve git-tags to set milestones in our development, so they are good starting points for coding new features (or bug fixes). Let's assume the developer wants to clone the git tag `v4.0-beta8`.
 
 **Step :one:** Clone the repository from the desired tag, here assumed to be `v4.0-beta8`.
 
