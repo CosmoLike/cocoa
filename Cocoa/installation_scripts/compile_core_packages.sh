@@ -818,7 +818,6 @@ if [ -z "${IGNORE_CORE_INSTALLATION}" ]; then
         'markupsafe==2.1.3' \
         'matplotlib==3.7.5' \
         'ml-dtypes==0.2.0' \
-        'mpi4py==3.1.4' \
         'mpmath==1.3.0' \
         'multiprocess==0.70.14' \
         'networkx==3.1' \
@@ -888,8 +887,19 @@ if [ -z "${IGNORE_CORE_INSTALLATION}" ]; then
         'wrapt==1.14.1' \
         'zipfile38==0.0.3' \
         'zipp==3.15.0' \
+      --no-cache-dir \
       --prefix="${ROOTDIR:?}/.local" \
       >${OUT1:?} 2>${OUT2:?} || { error "(CORE-PACKAGES) ${EC13:?}"; return 1; }
+
+    # mpi4py has a weird bug when installing from conda on a few machines 
+    # (e.g., midway) no-cache-dir is important to fix this bug
+    # https://github.com/mpi4py/mpi4py/issues/335
+    env MPICC=$MPI_CC_COMPILER ${PIP3:?} install \
+        'mpi4py==3.1.4' \
+      --no-cache-dir \
+      --prefix="${ROOTDIR:?}/.local" \
+      --force \
+      >${OUT1:?} 2>${OUT2:?} || { error "(PIP-CORE-PACKAGES) ${EC13:?}"; return 1; }
 
     pbottom "INSTALLING PYTHON CORE LIBRARIES VIA PIP" || return 1
 
@@ -902,8 +912,18 @@ if [ -z "${IGNORE_CORE_INSTALLATION}" ]; then
         'numpy==1.23.5' \
       --prefix="${ROOTDIR:?}/.local" \
       --force-reinstall \
-      >${OUT1:?} 2>${OUT2:?} || { error "(CORE-PACKAGES) ${EC13:?}"; return 1; }
-    
+      >${OUT1:?} 2>${OUT2:?} || { error "(PIP-CORE-PACKAGES) ${EC13:?}"; return 1; }
+
+    # mpi4py has a weird bug when installing from conda on a few machines 
+    # (e.g., midway) no-cache-dir is important to fix this bug
+    # https://github.com/mpi4py/mpi4py/issues/335
+    env MPICC=$MPI_CC_COMPILER ${PIP3:?} install \
+        'mpi4py==3.1.4' \
+      --no-cache-dir \
+      --prefix="${ROOTDIR:?}/.local" \
+      --force \
+      >${OUT1:?} 2>${OUT2:?} || { error "(PIP-CORE-PACKAGES) ${EC13:?}"; return 1; }
+
     pbottom "INSTALLING PYTHON CORE LIBRARIES VIA PIP" || return 1
   
   fi

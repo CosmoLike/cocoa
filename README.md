@@ -84,7 +84,7 @@ Below, we assume the user loaded the Cocoa conda environment via the `conda acti
 
 **Step :one:**: Download Cocoa's latest release and go to the `cocoa` main folder,
 
-    "${CONDA_PREFIX}"/bin/git clone --depth 1 https://github.com/CosmoLike/cocoa.git --branch v4.0-beta6 cocoa
+    "${CONDA_PREFIX}"/bin/git clone --depth 1 https://github.com/CosmoLike/cocoa.git --branch v4.0-beta7 cocoa
 
 and
 
@@ -95,7 +95,6 @@ and
 Type the following command instead to clone the repository.
 
     "${CONDA_PREFIX}"/bin/git clone git@github.com:CosmoLike/cocoa.git cocoa
-    cd ./cocoa/Cocoa
 
 **Step :two:**: Run the script `setup_cocoa.sh` via
         
