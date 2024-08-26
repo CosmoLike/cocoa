@@ -19,7 +19,7 @@
     12. [FAQ: How can users improve their Bash/C/C++ knowledge to develop Cocoa/Cosmolike?](#lectnotes)
     13. [Warning about Weak Lensing YAML files in Cobaya](#appendix_example_runs)
     14. [FAQ: How to install Cocoa without conda](#required_packages_cache)
-    15. [FAQ: How to push changes to the Cocoa main branch?](#push_main)
+    15. [FAQ: How to push changes to the Cocoa main branch? A few git hacks](#push_main)
     16. [FAQ: How to download and run Cosmolike projects?](#running_cosmolike_projects)
 
 ## Overview of the [Cobaya](https://github.com/CobayaSampler)-[CosmoLike](https://github.com/CosmoLike) Joint Architecture (Cocoa) <a name="overview"></a>
@@ -92,9 +92,11 @@ and
 
 :interrobang:  What if the user wants to clone the repository in development mode?
 
-Type the following command instead to clone the repository.
+Type the following command instead to clone the repository from the latest main commit.
 
     "${CONDA_PREFIX}"/bin/git clone git@github.com:CosmoLike/cocoa.git cocoa
+
+If the developer wants to start coding a new feature or fix a bug from a git tag, check the appendix [FAQ: How to push changes to the Cocoa main branch? A few git hacks](#push_main)
 
 **Step :two:**: Run the script `setup_cocoa.sh` via
         
@@ -810,7 +812,7 @@ Finally, set the following environmental keys:
     #export IGNORE_EXPAT_CORE_PACKAGE=1
     #export IGNORE_PIP_CORE_PACKAGES=1
 
-### :interrobang: FAQ: How to push changes to the Cocoa main branch? <a name="push_main"></a>
+### :interrobang: FAQ: How to push changes to the Cocoa main branch? A few git hacks <a name="push_main"></a>
 
 Until recently, Cocoa development was unstructured, and developers could push directly to the `main` branch. Small commits were also not discouraged. These loose development rules will soon change. In particular, we will soon protect the `main` branch by requiring every push to be reviewed by Cocoa's leading developers. We also want to reduce the number of commits from now on. 
 
@@ -821,13 +823,12 @@ Important note: we **strongly** advise developers to use the up-to-date `git` gi
 **Step :one:**: create a development branch from the `main` branch. Do not call the development branch `dev`, it is reserved for work done by the primary Cocoa developers. Let's call this new branch `xyzdev` for concreteness (tip: the use of developers' initials helps make the branch name unique)
 
     # (main) = developers must input the command below on the main branch.
-    (main) git checkout -b xyzdev
+    (main) git switch -c xyzdev
 
-If the `xyzdev` already exists, use `git switch` instead of `git checkout—b`. Developers can also push their development branches to the server via the command.
+If the `xyzdev` already exists, use `git switch` without the `-c` flag. Developers can also push their development branches to the server via the command.
 
     # (xyzdev) = developers must input the command below on the xyzdev branch.
     (xyzdev) git push -u origin xyzdev
-
 
 **Step :two:**: develop the proposed changes. We advise developers to commit frequently. In your branch, a commit does not need to be atomic, changing the code from one working state to another well-tested, meaningful working state. In your branch, you have absolute freedom.
 
@@ -851,6 +852,32 @@ This step may create conflicts that must be addressed before step four.
     (main) git push origin main
 
 Important note: **never** revert the branch ordering on squash merging by squashing the `main` changes to the `xyzdev` branch.
+
+Another useful git hack is related to developing Cocoa from a git tag. We reserve git-tags to set milestones in our development, so they are good starting points for the development of new features. Let's assume the developer wants to clone the git tag `v4.0-beta8`
+
+**Step :one:** Clone the repository from the desired tag, here assumed to be `v4.0-beta8`.
+
+    "${CONDA_PREFIX}"/bin/git clone git@github.com:CosmoLike/cocoa.git  --branch v4.0-beta8 cocoa
+
+This will put the repository in a detached stated.
+
+**Step :two:** Move the detached state to a new local branch, via the command
+
+    git switch -c mylocalbranch
+
+Now, all commits will be associated with this local branch. 
+
+**Step :three:** At the end of development, fetch and checkout the remote branch the user wants to upload the local development
+
+    git switch -c myremotebranch origin/myremotebranch
+
+This will switch the repository to the `myremotebranch`. Users can verify that this is indeed the case with the command `git branch`.
+
+**Step :four:** Assuming here that `myremotebranch` is the the main branch, merge the changes made on the local branch via the command
+
+    git merge mybranch
+
+If `myremotebranch` is the main branch, then follow the instructions above to perform a `squash merge`.
 
 ### :interrobang: FAQ: How to download and run Cosmolike projects? <a name="running_cosmolike_projects"></a> 
 
