@@ -73,13 +73,10 @@ gitact1() {
     "${GIT:?}" clone "${2:?}" "${1:?}" \
       >${OUT1:?} 2>${OUT2:?} || { error "${EC15:?}"; return 1; }
 
-    if [ -n "${3}" ]; then
-      cdfolder "${1}" || return 1;
+    cdfolder "${1}" || return 1;
 
-      "${GIT:?}" checkout -b ${3} origin/${3} \
-        >${OUT1:?} 2>${OUT2:?} || { error "${EC16:?}"; return 1; }
-    fi
-
+    "${GIT:?}" checkout -b ${3} origin/${3} \
+      >${OUT1:?} 2>${OUT2:?} || { error "${EC16:?}"; return 1; }
   fi
     
   cdfolder "${ROOTDIR}" || return 1;
@@ -96,9 +93,7 @@ gitact2() {
   # In case this script runs twice --------------------------------------------
   # ---------------------------------------------------------------------------
   if [ -n "${OVERWRITE_EXISTING_COSMOLIKE_CODE}" ]; then
-    
     rm -rf "${PACKDIR:?}"
-  
   fi
 
   # ---------------------------------------------------------------------------
@@ -112,13 +107,47 @@ gitact2() {
     "${GIT:?}" clone "${2:?}" "${1:?}" \
       >${OUT1:?} 2>${OUT2:?} || { error "${EC15:?}"; return 1; }
 
-    if [ -n "${3}" ]; then
-      cdfolder "${1}" || return 1;
+    cdfolder "${1}" || return 1;
 
-      "${GIT:?}" checkout ${3} \
-        >${OUT1:?} 2>${OUT2:?} || { error "${EC16:?}"; return 1; }
-    fi
+    "${GIT:?}" checkout ${3} \
+      >${OUT1:?} 2>${OUT2:?} || { error "${EC16:?}"; return 1; }
 
+  fi
+    
+  cdfolder "${ROOTDIR}" || return 1;
+}
+
+gitact3() {  
+  local PROJECT="${ROOTDIR}/projects"
+
+  local PACKDIR="${PROJECT:?}/${1:?}"
+
+  cdfolder "${PROJECT:?}" || return 1;
+
+  # ---------------------------------------------------------------------------
+  # In case this script runs twice --------------------------------------------
+  # ---------------------------------------------------------------------------
+  if [ -n "${OVERWRITE_EXISTING_COSMOLIKE_CODE}" ]; then
+    rm -rf "${PACKDIR:?}"
+  fi
+
+  # ---------------------------------------------------------------------------
+  # clone from original repo --------------------------------------------------
+  # ---------------------------------------------------------------------------
+  if [ ! -d "${PACKDIR:?}" ]; then
+
+    "${CURL:?}" -fsS "${2:?}" \
+      >${OUT1:?} 2>${OUT2:?} || { error "${EC27:?} (URL=${2:?})"; return 1; }
+
+    "${GIT:?}" clone "${2:?}" "${1:?}" \
+      >${OUT1:?} 2>${OUT2:?} || { error "${EC15:?}"; return 1; }
+
+    cdfolder "${1}" || return 1;
+
+    "${GIT:?}" fetch --all --tags --prune
+
+    "${GIT:?}" checkout tags/${3} -b ${3} \
+      >${OUT1:?} 2>${OUT2:?} || { error "${EC16:?}"; return 1; }
   fi
     
   cdfolder "${ROOTDIR}" || return 1;
@@ -149,6 +178,8 @@ if [ -z "${IGNORE_COSMOLIKE_LSSTY1_CODE}" ]; then
     gitact2 "${FOLDER:?}" "${URL:?}" "${LSSTY1_COMMIT:?}"  || return 1
   elif [ -n "${LSSTY1_BRANCH}" ]; then 
     gitact1 "${FOLDER:?}" "${URL:?}" "${LSSTY1_BRANCH:?}" || return 1
+  elif [ -n "${LSSTY1_TAG}" ]; then 
+    gitact3 "${FOLDER:?}" "${URL:?}" "${LSSTY1_TAG:?}" || return 1
   fi
 
   pbottom "GETTING ${PRINTNAME:?}" || return 1
