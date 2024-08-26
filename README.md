@@ -8,19 +8,19 @@
     1. [Credits](#appendix_proper_credits)
     2. [Additional Installation Notes](#additional_notes)
     3. [FAQ: What if installation or compilation goes wrong?](#running_wrong)
-    4. [FAQ: How to compile the Boltzmann, CosmoLike, and Likelihood codes separately](#appendix_compile_separately)
-    5. [FAQ: How to run cocoa on a laptop? The docker image named *whovian-cocoa*](#appendix_jupyter_whovian)
-    6. [FAQ: How to use an available Anaconda module on HPC?](#overview_anaconda)
+    4. [FAQ: How do we compile the Boltzmann, CosmoLike, and Likelihood codes separately](#appendix_compile_separately)
+    5. [FAQ: How do we run cocoa on a laptop? The docker image named *whovian-cocoa*](#appendix_jupyter_whovian)
+    6. [FAQ: How do we use an available Anaconda module on HPC?](#overview_anaconda)
     7. [FAQ: What if there is no Conda? Miniconda installation](#overview_miniconda)
-    8. [FAQ: How to the Slow/Fast decomposition on MCMC chains with Cosmolike? Manual Blocking](#manual_blocking_cosmolike)
-    9. [FAQ: How to switch Cocoa's adopted CAMB/CLASS/Polychord? (external readme)](Cocoa/external_modules/code)
-    10. [FAQ: How to download modern CMB data? (external readme)](Cocoa/external_modules/data)
-    11. [FAQ: How to set the environment for Machine Learning projects?](#ml_emulators)
+    8. [FAQ: How do we make the Slow/Fast decomposition on MCMC chains with Cosmolike? Manual Blocking](#manual_blocking_cosmolike)
+    9. [FAQ: How do we switch Cocoa's adopted CAMB/CLASS/Polychord? (external readme)](Cocoa/external_modules/code)
+    10. [FAQ: How do we download modern CMB data? (external readme)](Cocoa/external_modules/data)
+    11. [FAQ: How do we set the environment for Machine Learning projects?](#ml_emulators)
     12. [FAQ: How can users improve their Bash/C/C++ knowledge to develop Cocoa/Cosmolike?](#lectnotes)
     13. [Warning about Weak Lensing YAML files in Cobaya](#appendix_example_runs)
-    14. [FAQ: How to install Cocoa without conda](#required_packages_cache)
-    15. [FAQ: How to push changes to the Cocoa main branch? A few git hacks](#push_main)
-    16. [FAQ: How to download and run Cosmolike projects?](#running_cosmolike_projects)
+    14. [FAQ: How do we install Cocoa without conda](#required_packages_cache)
+    15. [FAQ: How do we push changes to the Cocoa main branch? A few git hacks](#push_main)
+    16. [FAQ: How do we download and run Cosmolike projects?](#running_cosmolike_projects)
 
 ## Overview of the [Cobaya](https://github.com/CobayaSampler)-[CosmoLike](https://github.com/CosmoLike) Joint Architecture (Cocoa) <a name="overview"></a>
 
@@ -53,7 +53,7 @@ and
 
 :interrobang: What if the user wants to install the Cocoa environment on a supercomputer? 
 
-Many HPC environments provide the [Anaconda installer](https://www.anaconda.com) as an external module. If this is the case, check the Appendix [FAQ: How to use an available Anaconda module on HPC?](#overview_anaconda).
+Many HPC environments provide the [Anaconda installer](https://www.anaconda.com) as an external module. If this is the case, check the Appendix [FAQ: How do we use an available Anaconda module on HPC?](#overview_anaconda).
 
 :interrobang: What if the user does not have conda installed? 
 
@@ -92,11 +92,11 @@ and
 
 :interrobang:  What if the user wants to clone the repository in development mode?
 
-Type the following command instead to clone the repository from the latest main commit.
+Type the following command to clone the repository from the latest main commit.
 
     "${CONDA_PREFIX}"/bin/git clone git@github.com:CosmoLike/cocoa.git cocoa
 
-If the developer wants to start coding a new feature or fix a bug from a git tag, check the appendix [FAQ: How to push changes to the Cocoa main branch? A few git hacks](#push_main)
+If the developer wants to start coding a new feature or fix a bug from a git tag, check the appendix [FAQ: How do we push changes to the Cocoa main branch? A few git hacks](#push_main)
 
 **Step :two:**: Run the script `setup_cocoa.sh` via
         
@@ -112,7 +112,7 @@ This script compiles external modules set on the `set_installation_options.sh` s
 
 :interrobang:  FAQ: What if the user wants to fine-tune the installed external modules? 
 
-Cocoa does not install many external modules by default, but users may find them helpful in a particular project. In this case, check the many available options on the `set_installation_options.sh` shell script  and rerun steps :two: and :three:. 
+Cocoa does not install many external modules by default, but users may find them helpful in a particular project. In this case, check the many available options on the `set_installation_options.sh` shell script. Then, rerun steps :two: and :three:. 
 
 ## Running Examples  <a name="cobaya_base_code_examples"></a>
 
@@ -158,7 +158,7 @@ MCMC:
 
 :interrobang: FAQ: What if the user wants to download a project not provided by default or intends to clone existing projects in development mode?
 
-Check the Appendix [FAQ: How to download and run Cosmolike projects?](running_cosmolike_projects).
+Check the Appendix [FAQ: How do we download and run Cosmolike projects?](running_cosmolike_projects).
 
 ## Appendix <a name="appendix"></a>
 
@@ -292,11 +292,11 @@ Steps to debug Cocoa
 
       (....)
 
-- The second step consists of rerunning the particular script that failed with the verbose output set. The scripts `setup_cocoa.sh` and `compile_cocoa.sh` run many shell scripts. Users may find it advantageous to run only the routine that failed. For further information on how to do that, see the appendix [FAQ: How to compile the Boltzmann, CosmoLike, and Likelihood codes separately](#appendix_compile_separately).
+- The second step consists of rerunning the particular script that failed with the verbose output set. The scripts `setup_cocoa.sh` and `compile_cocoa.sh` run many shell scripts. Users may find it advantageous to run only the routine that failed. For further information on how to do that, see the appendix [FAQ: How do we compile the Boltzmann, CosmoLike, and Likelihood codes separately](#appendix_compile_separately).
 
 After fixing a particular issue, users should rerun the shell scripts `setup_cocoa.sh` and `compile_cocoa.sh` to ensure all packages are installed and compiled correctly.
 
-### :interrobang: FAQ: How to compile the Boltzmann, CosmoLike, and Likelihood codes separately <a name="appendix_compile_separately"></a>
+### :interrobang: FAQ: How do we compile the Boltzmann, CosmoLike, and Likelihood codes separately <a name="appendix_compile_separately"></a>
 
 To avoid excessive compilation or download times during development, users can use specialized scripts located at `Cocoa/installation_scripts/` that compile only a specific module or download only a particular dataset. A few examples of these scripts are: 
 
@@ -352,7 +352,7 @@ To ensure these scripts can download these datasets, users must be sure that the
      unset -v IGNORE_SN_DATA
      unset -v IGNORE_SPT_CMB_DATA
 
-### :interrobang: FAQ: How to run cocoa on a laptop? The docker image named *whovian-cocoa* <a name="appendix_jupyter_whovian"></a>
+### :interrobang: FAQ: How do we run cocoa on a laptop? The docker image named *whovian-cocoa* <a name="appendix_jupyter_whovian"></a>
 
 We provide the docker image [whovian-cocoa](https://hub.docker.com/r/vivianmiranda/whovian-cocoa) to facilitate the installation of Cocoa on Windows and MacOS. This appendix assumes the users already have the docker engine installed on their local PC. For instructions on installing the docker engine in specific operating systems, please refer to [Docker's official documentation](https://docs.docker.com/engine/install/). 
 
@@ -399,11 +399,11 @@ Once installation is complete, the user must learn how to start, use, and exit t
 
     If you need to use a different port than `8080`, adjust the flag `-p 8080:8888` in the `docker run` command accordingly.
 
-- :interrobang: **FAQ: How to manipulate files on the host computer from within the Docker container?**
+- :interrobang: **FAQ: How do we manipulate files on the host computer from within the Docker container?**
 
     The flag `-v $(pwd):/home/whovian/host/` in the `docker run` command ensures that files on the host computer have been mounted to the directory `/home/whovian/host/`. Files within the folder where the Docker container was initialized are accessible at `/home/Whovian/host/`. Users should work inside this directory to avoid losing work in case the docker image needs to be deleted. **Be careful:** Do not run the Docker container on a general folder (like the home directory); this would provide too much access to the Docker via `/home/whovian/host/`. Accidents happen, especially when dealing with dangerous bash commands such as `rm` (deletion).
 
-- :interrobang: **FAQ: How to run the docker container on a remote server?**
+- :interrobang: **FAQ: How do we run the docker container on a remote server?**
 
     Below, we assume the user runs the container in a server with the URL `your_sever.com`. We also presume the server can be accessed via SSH protocol. On your local PC/laptop, type:
 
@@ -411,7 +411,7 @@ Once installation is complete, the user must learn how to start, use, and exit t
 
     This will bind the port `8080` on the server to the local. Then, go to a browser and type `http://localhost:8080/?token=XXX`, where `XXX` is the previously saved token displayed in the line `[... NotebookApp] or http://127.0.0.1:8888/?token=XXX`.  
 
-### :interrobang: FAQ: How to use an available Anaconda module on HPC? <a name="overview_anaconda"></a>
+### :interrobang: FAQ: How do we use an available Anaconda module on HPC? <a name="overview_anaconda"></a>
 
 Below, we list users' most common issues when installing Cocoa conda environments in a supercomputer environment using a globally defined Anaconda module. 
 
@@ -517,7 +517,7 @@ After installation, users must source the conda configuration file, as shown bel
           && conda config --set channel_priority strict \
           && conda init bash
 
-### :interrobang: FAQ: How to set the Slow/Fast decomposition on MCMC chains with Cosmolike? Manual Blocking <a name="manual_blocking_cosmolike"></a>
+### :interrobang: FAQ: How do we set the Slow/Fast decomposition on MCMC chains with Cosmolike? Manual Blocking <a name="manual_blocking_cosmolike"></a>
 
 The Cosmolike Weak Lensing pipelines contain parameters with different speed hierarchies. For example, Cosmolike execution time is reduced by approximately 50% when fixing the cosmological parameters. When varying only multiplicative shear calibration, Cosmolike execution time is reduced by two orders of magnitude. 
 
@@ -719,7 +719,7 @@ The correct way to create YAML files with $\big(\Omega_m,\Omega_b\big)$ as prima
             derived: 'lambda omegam, H0: omegam*(H0/100)**2'
             latex: \Omega_\mathrm{m} h^2
             
-### 💀 ☠️ :stop_sign::thumbsdown: FAQ: How to install Cocoa without conda (not recommended) <a name="required_packages_cache"></a>
+### 💀 ☠️ :stop_sign::thumbsdown: FAQ: How do we install Cocoa without conda (not recommended) <a name="required_packages_cache"></a>
 
 This method is slow and not advisable :stop_sign::thumbsdown:. When Conda is unavailable, the user can still perform a local semi-autonomous installation on Linux based on a few scripts we implemented. We require the pre-installation of the following packages:
 
@@ -812,11 +812,11 @@ Finally, set the following environmental keys:
     #export IGNORE_EXPAT_CORE_PACKAGE=1
     #export IGNORE_PIP_CORE_PACKAGES=1
 
-### :interrobang: FAQ: How to push changes to the Cocoa main branch? A few git hacks <a name="push_main"></a>
+### :interrobang: FAQ: How do we push changes to the Cocoa main branch? A few git hacks <a name="push_main"></a>
 
 Until recently, Cocoa development was unstructured, and developers could push directly to the `main` branch. Small commits were also not discouraged. These loose development rules will soon change. In particular, we will soon protect the `main` branch by requiring every push to be reviewed by Cocoa's leading developers. We also want to reduce the number of commits from now on. 
 
-We will implement the philosophy that **a commit in the main branch should contain an atomic change that takes code from a working state to another working state with improvements that are meaningful and well tested.** So, developers should propose changes to the `main` branch in larger chunks, as shown below. 
+We will implement the philosophy that **a commit in the main branch should contain an atomic change that takes code from a working state to another working state with meaningful and well-tested improvements.** So, developers should propose changes to the `main` branch in larger chunks, as shown below. 
 
 Important note: we **strongly** advise developers to use the up-to-date `git` given by Cocoa conda environment. 
 
@@ -832,7 +832,7 @@ If the `xyzdev` already exists, use `git switch` without the `-c` flag. Develope
 
 **Step :two:**: develop the proposed changes. We advise developers to commit frequently. In your branch, a commit does not need to be atomic, changing the code from one working state to another well-tested, meaningful working state. In your branch, you have absolute freedom.
 
-**Step :three:**: Once there is an atomic, meaningful, and well-tested improvement to Cocoa, the developer needs first to merge any subsequent changes made in `main` while the developer has been working on the `xyzdev` branch.
+**Step :three:**: Once there is an atomic, meaningful, and well-tested improvement to Cocoa, the developer needs to merge any subsequent changes made in `main` while the developer has been working on the `xyzdev` branch.
 
     # (xyzdev) = developers must input the command below on the xyzdev branch.
     (xyzdev) git merge main
@@ -859,15 +859,15 @@ Another useful git hack is related to developing Cocoa from a git tag. We reserv
 
     "${CONDA_PREFIX}"/bin/git clone git@github.com:CosmoLike/cocoa.git  --branch v4.0-beta8 cocoa
 
-This will put the repository in a detached stated.
+This will put the repository in a detached HEAD (meaning you are no longer on a branch).
 
-**Step :two:** Move the detached state to a new local branch, via the command
+**Step :two:** Move the detached state to a new local branch via the command
 
     git switch -c mylocalbranch
 
 Now, all commits will be associated with this local branch. 
 
-**Step :three:** At the end of development, fetch and checkout the remote branch the user wants to upload the local development
+**Step :three:** At the end of development, fetch and download the remote branch the user wants to upload the local development
 
     git switch -c myremotebranch origin/myremotebranch
 
@@ -879,7 +879,7 @@ This will switch the repository to the `myremotebranch`. Users can verify that t
 
 If `myremotebranch` is the main branch, then follow the instructions above to perform a `squash merge`.
 
-### :interrobang: FAQ: How to download and run Cosmolike projects? <a name="running_cosmolike_projects"></a> 
+### :interrobang: FAQ: How do we download and run Cosmolike projects? <a name="running_cosmolike_projects"></a> 
 
 The *projects* folder was designed to include Cosmolike projects. We assume that you are still in the Conda cocoa environment from the previous `conda activate cocoa` command and that you are in the cocoa main folder `cocoa/Cocoa`, 
 
@@ -906,4 +906,4 @@ By convention, the Cosmolike Organization hosts a Cobaya-Cosmolike project named
     export OMP_PROC_BIND=close; export OMP_NUM_THREADS=4
     mpirun -n 1 --oversubscribe --mca btl vader,tcp,self --bind-to core --rank-by core --map-by numa:pe=${OMP_NUM_THREADS} cobaya-run ./projects/XXX/EXAMPLE_EVALUATE1.yaml -f
 
-⚠️ Never delete the `lsst_y1` folder from the project folder without running `stop_cocoa` first; otherwise, Cocoa will have ill-defined soft links. Where the ill-defined soft-links will be located? They will be at `Cocoa/cobaya/cobaya/likelihoods/`, `Cocoa/external_modules/code/` and `Cocoa/external_modules/data/`. The script `stop_cocoa` deletes them. Why this behaviour exists? The script `start_cocoa` creates symbolic links so cobaya can see the likelihood and data files. It also adds the *Cobaya-Cosmolike interface* of all projects to `LD_LIBRARY_PATH` and `PYTHONPATH` paths.
+⚠️ Never delete the `lsst_y1` folder from the project folder without running `stop_cocoa` first; otherwise, Cocoa will have ill-defined soft links. Where the ill-defined soft links will be located? They will be at `Cocoa/cobaya/cobaya/likelihoods/`, `Cocoa/external_modules/code/` and `Cocoa/external_modules/data/`. The script `stop_cocoa` deletes them. Why this behavior exists? The script `start_cocoa` creates symbolic links so cobaya can see the likelihood and data files. It also adds the *Cobaya-Cosmolike interface* of all projects to `LD_LIBRARY_PATH` and `PYTHONPATH` paths.
