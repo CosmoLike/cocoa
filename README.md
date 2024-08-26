@@ -857,7 +857,7 @@ Important note: **never** revert the branch ordering on squash merging by squash
 
 - :interrobang: **How to develop starting from a git tag?**
 
-Another useful git hack is related to developing Cocoa from a git tag. We reserve git-tags to set milestones in our development, so they are good starting points for coding new features (or bug fixes). Let's assume the developer wants to clone the git tag `v4.0-beta8`.
+Another useful git hack is related to developing Cocoa from a git tag. We reserve git tags to set milestones in our development, so they are good starting points for coding localized new features (e.g., changes to a file that other developers have not recently modified) or bug fixes. Let's assume the developer wants to clone the git tag `v4.0-beta8`.
 
 **Step :one:** Clone the repository from the desired tag, here assumed to be `v4.0-beta8`.
 
