@@ -36,7 +36,6 @@ likepara like =
   .use_full_sky_clustering = 1,
   .use_full_sky_gk = 1,
   .use_full_sky_sk = 1,
-  .high_def_integration = 0,
   .adopt_limber_gg = 0,
   .adopt_limber_gammat = 1,
   .use_ggl_efficiency_zoverlap = 1
@@ -201,14 +200,14 @@ lim limits =
 
 Ntab Ntable = 
 {
-  .N_a = 400,                         // N_a        (modified by COCOA from 100 - tested on DES-Y3)
+  .N_a = 350,                         // N_a        (modified by COCOA from 100)
   .N_k_lin = 500,                     // N_k_lin
   .N_k_nlin = 500,                    // N_k_nlin
-  .N_ell = 400,                       // N_ell      (modified by COCOA from 200 - tested on DES-Y3)
-  .N_theta = 250,                     // N_theta    (modified by COCOA from 200 - tested on DES-Y3)
+  .N_ell  = 325,                       // N_ell      (modified by COCOA from 200)
+  .Ntheta = 250,                      // N_theta    (modified by COCOA from 200)
   .N_thetaH = 2048,                   // N_theta for Hankel
   .N_M  = 1000,                       // N_M, M = mass (Halo Model)
-  .N_ell_TATT = 200,                  // N_ell_TATT (modified by COCOA from 60 - tested on DES-Y3)
+  .N_ell_TATT = 200,                  // N_ell_TATT (modified by COCOA from 60)
   .NL_Nell_block = 50,                // Cosmo2D - NL = NonLimber (NL_Nell_block)
   .NL_Nchi = 500,                     // Cosmo2D - NL = NonLimber (NL_Nchi)
   .N_a_halo_exclusion = 100,          // N_a for binned_p_cc_incl_halo_exclusion (cluster_util.c)
@@ -221,7 +220,8 @@ Ntab Ntable =
   .halo_uKS_nc = 20,
   .halo_uks_nx = 200,
   .acc_boost_photoz_sampling = 1,
-  .photoz_interpolation_type = 0
+  .photoz_interpolation_type = 0,
+  .high_def_integration = 0,
 };
 
 pre precision = 
@@ -260,7 +260,6 @@ void reset_like_struct()
   like.IA = 0.;
   like.bias = 0;
   like.Ncl = 0;
-  like.Ntheta = 0;
   like.Ncos = 0;
   like.Ndata = 0;
   like.lmin = 0;
@@ -304,7 +303,6 @@ void reset_like_struct()
   like.use_full_sky_clustering = 1;
   like.use_full_sky_gk = 1;
   like.use_full_sky_sk = 1;
-  like.high_def_integration = 0;
   like.adopt_limber_gg = 0;
 }
 
@@ -442,10 +440,18 @@ void reset_bary_struct()
   }
 }
 
+// ---------------------------------------------------------------------------
+// ---------------------------------------------------------------------------
+// ---------------------------------------------------------------------------
+
 void reset_pdeltaparams_struct()
 {
   sprintf(pdeltaparams.runmode, "%s", "Halofit");
 }
+
+// ---------------------------------------------------------------------------
+// ---------------------------------------------------------------------------
+// ---------------------------------------------------------------------------
 
 void reset_nuisance_struct()
 {
@@ -478,6 +484,10 @@ void reset_nuisance_struct()
   nuisance.c1rhocrit_ia = 0.01389;
 }
 
+// ---------------------------------------------------------------------------
+// ---------------------------------------------------------------------------
+// ---------------------------------------------------------------------------
+
 void reset_ynuisance_struct()
 { // Compton-Y related variables  
   ynuisance.gas_Gamma_KS =  0.0;
@@ -492,6 +502,10 @@ void reset_ynuisance_struct()
   ynuisance.gas_lgT_w = 0.0;
   ynuisance.gas_f_H = 0.0;
 }
+
+// ---------------------------------------------------------------------------
+// ---------------------------------------------------------------------------
+// ---------------------------------------------------------------------------
 
 void reset_cmb_struct()
 {
@@ -525,6 +539,10 @@ void update_cosmopara(cosmopara *C)
   C->random = cosmology.random;
 }
 
+// ---------------------------------------------------------------------------
+// ---------------------------------------------------------------------------
+// ---------------------------------------------------------------------------
+
 void update_galpara(galpara *G) 
 {
   for (int i=0; i<tomo.clustering_Nbin; i++) 
@@ -554,6 +572,10 @@ void update_galpara(galpara *G)
     } 
   }
 }
+
+// ---------------------------------------------------------------------------
+// ---------------------------------------------------------------------------
+// ---------------------------------------------------------------------------
 
 void update_nuisance(nuisancepara* N)
 {
@@ -590,6 +612,10 @@ void update_nuisance(nuisancepara* N)
   }
 }
 
+// ---------------------------------------------------------------------------
+// ---------------------------------------------------------------------------
+// ---------------------------------------------------------------------------
+
 void update_ynuisance(ynuisancepara* N)
 { // Compton-Y related variables
   N->gas_Gamma_KS = ynuisance.gas_Gamma_KS;
@@ -604,3 +630,20 @@ void update_ynuisance(ynuisancepara* N)
   N->gas_lgT_w = ynuisance.gas_lgT_w;
   N->gas_f_H = ynuisance.gas_f_H;
 }
+
+// ---------------------------------------------------------------------------
+// ---------------------------------------------------------------------------
+// ---------------------------------------------------------------------------
+
+void update_table(Ntab* N)
+{
+  N->N_a = Ntable.N_a;
+  N->N_ell = Ntable.N_ell;
+  N->Ntheta = Ntable.Ntheta;
+  N->N_ell_TATT = Ntable.N_ell_TATT;
+  N->high_def_integration = Ntable.high_def_integration;
+}
+
+// ---------------------------------------------------------------------------
+// ---------------------------------------------------------------------------
+// ---------------------------------------------------------------------------

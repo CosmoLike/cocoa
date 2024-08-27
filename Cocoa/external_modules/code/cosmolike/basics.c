@@ -49,12 +49,12 @@ bin_avg set_bin_average(
   static double* xmax = NULL;
   static int ntheta = 0;
   
-  if (like.Ntheta == 0)
+  if (Ntable.Ntheta == 0)
   {
-    log_fatal("like.Ntheta not initialized");
+    log_fatal("Ntable.Ntheta not initialized");
     exit(1);
   }
-  if (!(i_theta < like.Ntheta))
+  if (!(i_theta < Ntable.Ntheta))
   {
     log_fatal("bad i_theta index");
     exit(1);
@@ -65,7 +65,7 @@ bin_avg set_bin_average(
     exit(1);
   }
 
-  if (Pmin == NULL || (ntheta != like.Ntheta))
+  if (Pmin == NULL || (ntheta != Ntable.Ntheta))
   {
     if (Pmin != NULL)
     {
@@ -99,8 +99,8 @@ bin_avg set_bin_average(
     }
 
     const int nell = limits.LMAX+1; // Legendre computes l=0,...,lmax (inclusive)
-    const int len  = sizeof(double*)*like.Ntheta + 
-                           sizeof(double)*like.Ntheta*nell;
+    const int len  = sizeof(double*)*Ntable.Ntheta + 
+                           sizeof(double)*Ntable.Ntheta*nell;
 
     Pmin  = (double**) malloc(len);
     if (Pmin == NULL)
@@ -130,12 +130,12 @@ bin_avg set_bin_average(
       exit(1);
     }
 
-    for (int i=0; i<like.Ntheta; i++)
+    for (int i=0; i<Ntable.Ntheta; i++)
     {
-      Pmin[i]  = ((double*)(Pmin + like.Ntheta) + nell*i);
-      Pmax[i]  = ((double*)(Pmax + like.Ntheta) + nell*i);
-      dPmin[i] = ((double*)(dPmin + like.Ntheta) + nell*i);
-      dPmax[i] = ((double*)(dPmax + like.Ntheta) + nell*i);
+      Pmin[i]  = ((double*)(Pmin + Ntable.Ntheta) + nell*i);
+      Pmax[i]  = ((double*)(Pmax + Ntable.Ntheta) + nell*i);
+      dPmin[i] = ((double*)(dPmin + Ntable.Ntheta) + nell*i);
+      dPmax[i] = ((double*)(dPmax + Ntable.Ntheta) + nell*i);
       for (int j=0; j<nell; j++)
       {
         Pmin[i][j]  = 0.0;
@@ -145,14 +145,14 @@ bin_avg set_bin_average(
       }
     }
 
-    xmin = (double*) calloc(like.Ntheta, sizeof(double));
+    xmin = (double*) calloc(Ntable.Ntheta, sizeof(double));
     if (xmin == NULL)
     {
       log_fatal("array allocation failed");
       exit(1);
     }
 
-    xmax = (double*) calloc(like.Ntheta, sizeof(double));
+    xmax = (double*) calloc(Ntable.Ntheta, sizeof(double));
     if (xmax == NULL)
     {
       log_fatal("array allocation failed");
@@ -160,16 +160,16 @@ bin_avg set_bin_average(
     }
 
     const double logdt = 
-      (log(like.vtmax)-log(like.vtmin))/ (double) like.Ntheta;
+      (log(like.vtmax)-log(like.vtmin))/ (double) Ntable.Ntheta;
     
-    for(int i=0; i<like.Ntheta ; i++)
+    for(int i=0; i<Ntable.Ntheta ; i++)
     {
       xmin[i] = cos(exp(log(like.vtmin) + (i + 0.0)*logdt));
       xmax[i] = cos(exp(log(like.vtmin) + (i + 1.0)*logdt));
     }
 
     #pragma omp parallel for
-    for (int i=0; i<like.Ntheta; i++)
+    for (int i=0; i<Ntable.Ntheta; i++)
     {
       if (abs(xmin[i]) > 1)
       {
@@ -211,7 +211,7 @@ bin_avg set_bin_average(
       } 
     }
 
-    ntheta = like.Ntheta;
+    ntheta = Ntable.Ntheta;
   }
 
   bin_avg r;

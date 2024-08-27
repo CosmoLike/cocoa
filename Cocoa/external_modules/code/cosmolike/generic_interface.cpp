@@ -385,7 +385,7 @@ void initial_setup()
   like.adopt_limber_gg = 0;
   like.adopt_limber_gammat = 1;
 
-  like.high_def_integration = 1;
+  Ntable.high_def_integration = 1;
 
   std::string mode = "Halofit";
   memcpy(pdeltaparams.runmode, mode.c_str(), mode.size() + 1);
@@ -406,6 +406,7 @@ void init_accuracy_boost(
   Ntable.N_a = 
     static_cast<int>(ceil(Ntable.N_a*sampling_boost));
   
+  /*
   Ntable.N_ell_TATT = 
     static_cast<int>(ceil(Ntable.N_ell_TATT*sampling_boost));
   
@@ -414,15 +415,14 @@ void init_accuracy_boost(
   
   Ntable.N_k_nlin = 
     static_cast<int>(ceil(Ntable.N_k_nlin*sampling_boost));
-  
+  */
   Ntable.N_ell = 
     static_cast<int>(ceil(Ntable.N_ell*sampling_boost));
   
-  Ntable.N_theta  = 
-    static_cast<int>(ceil(Ntable.N_theta*sampling_boost));
-
+  /*
   Ntable.N_M = 
     static_cast<int>(ceil(Ntable.N_M*sampling_boost));
+  */
 
   precision.low /= accuracy_boost;
   
@@ -432,7 +432,7 @@ void init_accuracy_boost(
   
   precision.insane /= accuracy_boost; 
 
-  like.high_def_integration = integration_accuracy;
+  Ntable.high_def_integration = integration_accuracy;
 }
 
 // ---------------------------------------------------------------------------
@@ -631,7 +631,7 @@ void init_binning_real_space(
     spdlog::critical(
         "\x1b[90m{}\x1b[0m: {} = {} not supported", 
         "init_binning_real_space",
-        "like.Ntheta", 
+        "NthetaNtheta", 
         Ntheta
       );
     exit(1);
@@ -658,20 +658,20 @@ void init_binning_real_space(
       theta_max_arcmin
     );
 
-  like.Ntheta = Ntheta;
+  Ntable.Ntheta = Ntheta;
   
   like.vtmin = theta_min_arcmin * 2.90888208665721580e-4; // arcmin to rad conv
   
   like.vtmax = theta_max_arcmin * 2.90888208665721580e-4; // arcmin to rad conv
   
   const double logdt = 
-    (std::log(like.vtmax) - std::log(like.vtmin))/ (double) like.Ntheta;
+    (std::log(like.vtmax) - std::log(like.vtmin))/ (double) Ntable.Ntheta;
   
-  like.theta = (double*) calloc(like.Ntheta, sizeof(double));
+  like.theta = (double*) calloc(Ntable.Ntheta, sizeof(double));
 
   constexpr double x = 2./ 3.;
 
-  for (int i=0; i<like.Ntheta; i++)
+  for (int i=0; i<Ntable.Ntheta; i++)
   {
     const double thetamin = std::exp(log(like.vtmin) + (i + 0.0) * logdt);
     
@@ -799,11 +799,11 @@ void init_data_vector_size_real_space(
 {
   arma::Col<int>::fixed<6> ndv = 
     {
-      like.Ntheta*2*tomo.shear_Npowerspectra,
-      like.Ntheta*tomo.ggl_Npowerspectra,
-      like.Ntheta*tomo.clustering_Npowerspectra,
-      like.Ntheta*tomo.shear_Nbin,
-      like.Ntheta*tomo.clustering_Nbin,
+      Ntable.Ntheta*2*tomo.shear_Npowerspectra,
+      Ntable.Ntheta*tomo.ggl_Npowerspectra,
+      Ntable.Ntheta*tomo.clustering_Npowerspectra,
+      Ntable.Ntheta*tomo.shear_Nbin,
+      Ntable.Ntheta*tomo.clustering_Nbin,
       0
     };
 
@@ -858,12 +858,12 @@ void init_data_vector_size_3x2pt_real_space()
     exit(1);
   }
 
-  if (like.Ntheta == 0) 
+  if (Ntable.Ntheta == 0) 
   {
     spdlog::critical(
         "\x1b[90m{}\x1b[0m: {} not set prior to this function call",
         "init_data_vector_size_2x2pt_real_space", 
-        "like.Ntheta"
+        "Ntable.Ntheta"
       );
     exit(1);
   }
@@ -916,12 +916,12 @@ void init_data_vector_size_6x2pt_real_space()
     exit(1);
   }
 
-  if (like.Ntheta == 0) 
+  if (Ntable.Ntheta == 0) 
   {
     spdlog::critical(
         "\x1b[90m{}\x1b[0m: {} not set prior to this function call",
         "init_data_vector_size_6x2pt_real_space", 
-        "like.Ntheta"
+        "Ntable.Ntheta"
       );
     exit(1);
   }
@@ -1009,12 +1009,12 @@ void init_data_3x2pt_real_space(
     exit(1);
   }
 
-  if (like.Ntheta == 0) 
+  if (Ntable.Ntheta == 0) 
   {
     spdlog::critical(
         "\x1b[90m{}\x1b[0m: {} not set prior to this function call",
         "init_data_3x2pt_real_space", 
-        "like.Ntheta"
+        "Ntable.Ntheta"
       );
     exit(1);
   }
@@ -1073,12 +1073,12 @@ void init_data_6x2pt_real_space(
     exit(1);
   }
 
-  if (like.Ntheta == 0) 
+  if (Ntable.Ntheta == 0) 
   {
     spdlog::critical(
         "\x1b[90m{}\x1b[0m: {} not set prior to this function call",
         "init_data_6x2pt_real_space", 
-        "like.Ntheta"
+        "Ntable.Ntheta"
       );
     exit(1);
   }
@@ -2316,9 +2316,9 @@ void compute_ss_real_masked(vector& data_vector, const int start)
       const int z1 = Z1(nz);
       const int z2 = Z2(nz);
 
-      for (int i=0; i<like.Ntheta; i++)
+      for (int i=0; i<Ntable.Ntheta; i++)
       {
-        int index = start + like.Ntheta*nz + i;
+        int index = start + Ntable.Ntheta*nz + i;
         
         if (IP::get_instance().get_mask(index))
         {
@@ -2327,7 +2327,7 @@ void compute_ss_real_masked(vector& data_vector, const int start)
             (1.0 + nuisance.shear_calibration_m[z2]);
         }
         
-        index += like.Ntheta*tomo.shear_Npowerspectra;
+        index += Ntable.Ntheta*tomo.shear_Npowerspectra;
         
         if (IP::get_instance().get_mask(index))
         {
@@ -2353,9 +2353,9 @@ void compute_gs_real_masked(vector& data_vector, const int start)
       const int zl = ZL(nz);
       const int zs = ZS(nz);
       
-      for (int i=0; i<like.Ntheta; i++)
+      for (int i=0; i<Ntable.Ntheta; i++)
       {
-        const int index = start + like.Ntheta*nz + i;
+        const int index = start + Ntable.Ntheta*nz + i;
         
         if (IP::get_instance().get_mask(index))
         {
@@ -2379,9 +2379,9 @@ void compute_gg_real_masked(vector& data_vector, const int start)
   {
     for (int nz=0; nz<tomo.clustering_Npowerspectra; nz++)
     {
-      for (int i=0; i<like.Ntheta; i++)
+      for (int i=0; i<Ntable.Ntheta; i++)
       {
-        const int index = start + like.Ntheta*nz + i;
+        const int index = start + Ntable.Ntheta*nz + i;
         
         if (IP::get_instance().get_mask(index))
         {
@@ -2402,9 +2402,9 @@ void compute_gk_real_masked(vector& data_vector, const int start)
   {
     for (int nz=0; nz<tomo.clustering_Nbin; nz++)
     {
-      for (int i=0; i<like.Ntheta; i++) 
+      for (int i=0; i<Ntable.Ntheta; i++) 
       {
-        const int index = start + like.Ntheta*nz + i;
+        const int index = start + Ntable.Ntheta*nz + i;
         
         if (IP::get_instance().get_mask(index))
         {
@@ -2425,9 +2425,9 @@ void compute_ks_real_masked(vector& data_vector, const int start)
   {
     for (int nz=0; nz<tomo.shear_Nbin; nz++)
     {
-      for (int i=0; i<like.Ntheta; i++)
+      for (int i=0; i<Ntable.Ntheta; i++)
       {
-        const int index = start + like.Ntheta*nz + i; 
+        const int index = start + Ntable.Ntheta*nz + i; 
         
         if (IP::get_instance().get_mask(index))
         {
@@ -2520,7 +2520,7 @@ vector compute_data_vector_6x2pt_masked_any_order(
     exit(1);
   }
 
-  if (like.Ntheta == 0)
+  if (Ntable.Ntheta == 0)
   {
     spdlog::critical(
         "\x1b[90m{}\x1b[0m: {} = 0 is invalid",
@@ -2645,11 +2645,11 @@ vector compute_data_vector_6x2pt_masked_any_order(
 
   arma::Col<int>::fixed<sz> sizes =
     {
-      2*like.Ntheta*tomo.shear_Npowerspectra,
-      like.Ntheta*tomo.ggl_Npowerspectra,
-      like.Ntheta*tomo.clustering_Npowerspectra,
-      like.Ntheta*tomo.clustering_Nbin,
-      like.Ntheta*tomo.shear_Nbin,
+      2*Ntable.Ntheta*tomo.shear_Npowerspectra,
+      Ntable.Ntheta*tomo.ggl_Npowerspectra,
+      Ntable.Ntheta*tomo.clustering_Npowerspectra,
+      Ntable.Ntheta*tomo.clustering_Nbin,
+      Ntable.Ntheta*tomo.shear_Nbin,
       like.is_cmb_bandpower  == 1 ? like.Nbp : like.Ncl 
     };
 
@@ -2708,7 +2708,7 @@ vector compute_data_vector_3x2pt_masked_any_order(
     exit(1);
   }
 
-  if (like.Ntheta == 0)
+  if (Ntable.Ntheta == 0)
   {
     spdlog::critical(
         "\x1b[90m{}\x1b[0m: {} = 0 is invalid",
@@ -2738,9 +2738,9 @@ vector compute_data_vector_3x2pt_masked_any_order(
 
   arma::Col<int>::fixed<sz> sizes =
     {
-      2*like.Ntheta*tomo.shear_Npowerspectra,
-      like.Ntheta*tomo.ggl_Npowerspectra,
-      like.Ntheta*tomo.clustering_Npowerspectra
+      2*Ntable.Ntheta*tomo.shear_Npowerspectra,
+      Ntable.Ntheta*tomo.ggl_Npowerspectra,
+      Ntable.Ntheta*tomo.clustering_Npowerspectra
     };
 
   arma::Col<int>::fixed<sz> start = {0,0,0};
@@ -3207,9 +3207,9 @@ void IP::set_mask(std::string mask_filename, arma::Col<int>::fixed<3> order)
 
   arma::Col<int>::fixed<sz> sizes =
     {
-      2*like.Ntheta*tomo.shear_Npowerspectra,
-      like.Ntheta*tomo.ggl_Npowerspectra,
-      like.Ntheta*tomo.clustering_Npowerspectra,
+      2*Ntable.Ntheta*tomo.shear_Npowerspectra,
+      Ntable.Ntheta*tomo.ggl_Npowerspectra,
+      Ntable.Ntheta*tomo.clustering_Npowerspectra,
     };
 
   arma::Col<int>::fixed<sz> start = {0,0,0};
@@ -3356,11 +3356,11 @@ void IP::set_mask(std::string mask_filename, arma::Col<int>::fixed<6> order)
 
   arma::Col<int>::fixed<sz> sizes =
     {
-      2*like.Ntheta*tomo.shear_Npowerspectra,
-      like.Ntheta*tomo.ggl_Npowerspectra,
-      like.Ntheta*tomo.clustering_Npowerspectra,
-      like.Ntheta*tomo.clustering_Nbin,
-      like.Ntheta*tomo.shear_Nbin,
+      2*Ntable.Ntheta*tomo.shear_Npowerspectra,
+      Ntable.Ntheta*tomo.ggl_Npowerspectra,
+      Ntable.Ntheta*tomo.clustering_Npowerspectra,
+      Ntable.Ntheta*tomo.clustering_Nbin,
+      Ntable.Ntheta*tomo.shear_Nbin,
       like.is_cmb_bandpower  == 1 ? like.Nbp : like.Ncl 
     };
 

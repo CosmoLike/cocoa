@@ -88,9 +88,9 @@ static int nell()
 
 vector get_binning_real_space()
 {  
-  vector result(like.Ntheta, arma::fill::none);
+  vector result(Ntable.Ntheta, arma::fill::none);
 
-  for (int i = 0; i < like.Ntheta; i++)
+  for (int i = 0; i < Ntable.Ntheta; i++)
   {    
     result(i) = like.theta[i] / 2.90888208665721580e-4; 
   }
@@ -113,7 +113,7 @@ py::tuple xi_pm_tomo_cpp()
       );
     exit(1);
   }
-  if (like.Ntheta == 0)
+  if (Ntable.Ntheta == 0)
   {
     spdlog::critical(
         "\x1b[90m{}\x1b[0m: {} = 0 is invalid",
@@ -123,12 +123,12 @@ py::tuple xi_pm_tomo_cpp()
     exit(1);
   }
  
-  matrix xp(like.Ntheta, tomo.shear_Npowerspectra, arma::fill::none);
-  matrix xm(like.Ntheta, tomo.shear_Npowerspectra, arma::fill::none);
+  matrix xp(Ntable.Ntheta, tomo.shear_Npowerspectra, arma::fill::none);
+  matrix xm(Ntable.Ntheta, tomo.shear_Npowerspectra, arma::fill::none);
 
   for (int nz=0; nz<tomo.shear_Npowerspectra; nz++)
   {    
-    for (int i=0; i<like.Ntheta; i++)
+    for (int i=0; i<Ntable.Ntheta; i++)
     {
       const int z1 = Z1(nz);
       const int z2 = Z2(nz);
@@ -166,7 +166,7 @@ vector w_gammat_tomo_cpp()
     exit(1);
   }
 
-  if (like.Ntheta == 0)
+  if (Ntable.Ntheta == 0)
   {
     spdlog::critical(
         "\x1b[90m{}\x1b[0m: {} = 0 is invalid",
@@ -176,13 +176,13 @@ vector w_gammat_tomo_cpp()
     exit(1);
   }
   
-  vector result(like.Ntheta*tomo.ggl_Npowerspectra, arma::fill::none);
+  vector result(Ntable.Ntheta*tomo.ggl_Npowerspectra, arma::fill::none);
 
   for (int nz=0; nz<tomo.ggl_Npowerspectra; nz++)
   {
-    for (int i=0; i<like.Ntheta; i++)
+    for (int i=0; i<Ntable.Ntheta; i++)
     {
-      result(like.Ntheta*nz+i) = w_gammat_tomo(i, ZL(nz), ZS(nz), 1);
+      result(Ntable.Ntheta*nz+i) = w_gammat_tomo(i, ZL(nz), ZS(nz), 1);
     }
   }
 
@@ -205,7 +205,7 @@ vector w_gg_tomo_cpp()
     exit(1);
   }
 
-  if (like.Ntheta == 0)
+  if (Ntable.Ntheta == 0)
   {
     spdlog::critical(
         "\x1b[90m{}\x1b[0m: {} = 0 is invalid",
@@ -215,13 +215,13 @@ vector w_gg_tomo_cpp()
     exit(1);
   }
 
-  vector result(like.Ntheta*tomo.clustering_Nbin, arma::fill::none);
+  vector result(Ntable.Ntheta*tomo.clustering_Nbin, arma::fill::none);
 
   for (int nz=0; nz<tomo.clustering_Npowerspectra; nz++)
   {
-    for (int i=0; i<like.Ntheta; i++)
+    for (int i=0; i<Ntable.Ntheta; i++)
     {
-      result(like.Ntheta*nz + i) = w_gg_tomo(i, nz, nz, 0);
+      result(Ntable.Ntheta*nz + i) = w_gg_tomo(i, nz, nz, 0);
     }
   }
 
@@ -244,7 +244,7 @@ vector w_gk_tomo_cpp()
     exit(1);
   }
 
-  if (like.Ntheta == 0)
+  if (Ntable.Ntheta == 0)
   {
     spdlog::critical(
         "\x1b[90m{}\x1b[0m: {} = 0 is invalid",
@@ -254,13 +254,13 @@ vector w_gk_tomo_cpp()
     exit(1);
   }
 
-  vector result(like.Ntheta*tomo.clustering_Nbin, arma::fill::none);
+  vector result(Ntable.Ntheta*tomo.clustering_Nbin, arma::fill::none);
 
   for (int nz=0; nz<tomo.clustering_Nbin; nz++)
   {
-    for (int i=0; i<like.Ntheta; i++)
+    for (int i=0; i<Ntable.Ntheta; i++)
     {
-      result(like.Ntheta*nz + i) = w_gk_tomo(i, nz, 1);
+      result(Ntable.Ntheta*nz + i) = w_gk_tomo(i, nz, 1);
     }
   }
 
@@ -282,7 +282,7 @@ vector w_ks_tomo_cpp()
       );
     exit(1);
   }
-  if (like.Ntheta == 0)
+  if (Ntable.Ntheta == 0)
   {
     spdlog::critical(
         "\x1b[90m{}\x1b[0m: {} = 0 is invalid",
@@ -292,13 +292,13 @@ vector w_ks_tomo_cpp()
     exit(1);
   }
 
-  vector result(like.Ntheta*tomo.shear_Nbin, arma::fill::none);
+  vector result(Ntable.Ntheta*tomo.shear_Nbin, arma::fill::none);
 
   for (int nz=0; nz<tomo.clustering_Nbin; nz++)
   {
-    for (int i=0; i<like.Ntheta; i++)
+    for (int i=0; i<Ntable.Ntheta; i++)
     {
-      result(like.Ntheta*nz + i) = w_ks_tomo(i, nz, 1);
+      result(Ntable.Ntheta*nz + i) = w_ks_tomo(i, nz, 1);
     }
   }
 
