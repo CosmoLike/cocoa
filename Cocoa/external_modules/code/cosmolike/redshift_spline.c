@@ -1953,7 +1953,7 @@ double g_lens(double a, int ni)
   const double da = (amax - amin)/((double) Ntable.N_a - 1.0);
   const double amin_shear = 1. / (redshift.shear_zdistrpar_zmax + 1.);
 
-  if (table == 0 || recompute_table(numtable)) 
+  if (table == NULL || recompute_table(numtable)) 
   {
     if (table != NULL)
     {
