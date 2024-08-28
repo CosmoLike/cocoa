@@ -403,34 +403,66 @@ void init_accuracy_boost(
     const int integration_accuracy
   )
 {
-  Ntable.N_a = 
-    static_cast<int>(ceil(Ntable.N_a*sampling_boost));
+  static int N_a = 0;
+  if (N_a == 0)
+  { // that saves the initial default value (imp on notebooks where users
+    // can change AccuracyBost back and forth)
+    N_a = Ntable.N_a;
+  }
+  Ntable.N_a = static_cast<int>(ceil(N_a*sampling_boost));
   
-  /*
-  Ntable.N_ell_TATT = 
-    static_cast<int>(ceil(Ntable.N_ell_TATT*sampling_boost));
-  
+  static int N_ell = 0;
+  if (N_ell == 0)
+  { 
+    N_ell = Ntable.N_ell;
+  }
+  Ntable.N_ell = static_cast<int>(ceil(N_ell*sampling_boost));
+
+  static int N_ell_TATT = 0;
+  if (N_ell_TATT == 0)
+  {
+    N_ell_TATT = Ntable.N_ell_TATT;
+  }
+  Ntable.N_ell_TATT = static_cast<int>(ceil(N_ell_TATT*sampling_boost));
+
+  /*  
   Ntable.N_k_lin = 
     static_cast<int>(ceil(Ntable.N_k_lin*sampling_boost));
   
   Ntable.N_k_nlin = 
     static_cast<int>(ceil(Ntable.N_k_nlin*sampling_boost));
-  */
-  Ntable.N_ell = 
-    static_cast<int>(ceil(Ntable.N_ell*sampling_boost));
-  
-  /*
+
   Ntable.N_M = 
     static_cast<int>(ceil(Ntable.N_M*sampling_boost));
   */
 
-  precision.low /= accuracy_boost;
+  static double low = 0;
+  if (low == 0)
+  {
+    low = precision.low;
+  }
+  precision.low = low/accuracy_boost;
   
-  precision.medium /= accuracy_boost;
+  static double medium = 0;
+  if (medium == 0)
+  {
+    medium = precision.medium;
+  }
+  precision.medium = medium/accuracy_boost;
   
-  precision.high /= accuracy_boost;
+  static double high = 0;
+  if (high == 0)
+  {
+    high = precision.high;
+  }
+  precision.high = high/accuracy_boost;
   
-  precision.insane /= accuracy_boost; 
+  static double insane = 0;
+  if (insane == 0)
+  {
+    insane = precision.insane;
+  }
+  precision.insane = insane/accuracy_boost; 
 
   Ntable.high_def_integration = integration_accuracy;
 }
