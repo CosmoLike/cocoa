@@ -124,7 +124,6 @@ dependencies:
   - nbformat=5.10.4
   - ncurses=6.4.20240210
   - nest-asyncio=1.6.0
-  - notebook=7.1.0
   - notebook-shim=0.2.4
   - openblas=0.3.23
   - openmpi=4.1.5
