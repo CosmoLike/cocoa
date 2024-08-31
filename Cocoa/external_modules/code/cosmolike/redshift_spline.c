@@ -635,8 +635,8 @@ double zdistr_histo_n(double z, void* params)
         tomo.shear_zmax[k] = z_v[i];
       }
 
-      log_debug("tomo.shear_zmin[%d] = %.3f,tomo.shear_zmax[%d] = %.3f", k,
-        tomo.shear_zmin[k], k, tomo.shear_zmax[k]);
+      //log_debug("tomo.shear_zmin[%d] = %.3f,tomo.shear_zmax[%d] = %.3f", k,
+      //  tomo.shear_zmin[k], k, tomo.shear_zmax[k]);
     }
     
     fclose(ein);
@@ -1037,8 +1037,8 @@ double pf_histo_n(double z, void* params)
         tomo.clustering_zmax[k] = z_v[i]; 
       }
 
-      log_debug("tomo.clustering_zmin[%d] = %.3f,tomo.clustering_zmax[%d] = %.3f",
-          k, tomo.clustering_zmin[k], k, tomo.clustering_zmax[k]);
+      //log_debug("tomo.clustering_zmin[%d] = %.3f,tomo.clustering_zmax[%d] = %.3f",
+      //    k, tomo.clustering_zmin[k], k, tomo.clustering_zmax[k]);
     }
 
     free(z_v);
