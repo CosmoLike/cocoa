@@ -374,24 +374,17 @@ Following the command above, users should see the following text on the screen t
 
  **Step :one:**: Init Conda when running the container the first time, as shown below.
 
-      conda init bash
-
-and
-
-      source ~/.bashrc
-
-and
-
-      conda activate cocoa
-
-and
-
+     conda init bash
+     source ~/.bashrc
+     conda activate cocoa
      git-lfs install
 
- **Step :four:**: Access the host computer on `/home/whovian/host/` and proceed with the standard cocoa installation on section [Installation and Compilation of external modules](#cobaya_base_code)
+ **Step :four:**: Access the host computer on `/home/whovian/host/`
  
      cd ~/host/
-     
+
+Now proceed with the standard cocoa installation on section [Installation and Compilation of external modules](#cobaya_base_code)
+ 
 Once installation is complete, the user must learn how to **start**, use, and **exit** the container. Below, we answer a few common questions about using/managing Docker containers.  
 
 - :interrobang: FAQ: How do users restart the container when they exit?
