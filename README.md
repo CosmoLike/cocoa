@@ -388,17 +388,17 @@ Once installation is complete, the user must learn how to **start**, use, and **
 
 - :interrobang: FAQ: How do users restart the container when they exit?
 
-    Assuming the user maintained the container name `cocoa2023` via the flag `--name cocoa2023` on the `docker run` command, type:
+Assuming the user maintained the container name `cocoa2023` via the flag `--name cocoa2023` on the `docker run` command, type:
     
     docker start -ai cocoa2023
 
 - :interrobang: FAQ: How do I run Jupyter Notebooks remotely when using Cocoa within the *whovian-cocoa* container?
 
-    First, type the following command:
+First, type the following command:
 
     jupyter notebook --no-browser --port=8888
 
-    The terminal will show a message similar to the following template:
+The terminal will show a message similar to the following template:
 
     [... NotebookApp] Writing notebook server cookie secret to /home/whovian/.local/share/jupyter/runtime/notebook_cookie_secret
     [... NotebookApp] WARNING: The notebook server is listening on all IP addresses and not using encryption. This is not recommended.
