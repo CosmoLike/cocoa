@@ -358,63 +358,56 @@ We provide the docker image [whovian-cocoa](https://hub.docker.com/r/vivianmiran
 
  **Step :one:**: Create a folder and go to the location on the host computer that you want to provide access to the Docker container, as shown below. 
 
-      cd host_parent_folder/
-      mkdir -p host_new_folder
-      cd ./host_new_folder
- 
+     cd host_parent_folder/
+     mkdir -p host_new_folder
+     cd ./host_new_folder
+
  **Be careful:** Do not run the Docker container on a general folder (like the host's home directory); this would provide too much access to the Docker container. Accidents happen, especially when dealing with dangerous bash commands such as `rm` (deletion).
 
  **Step :two:**: Download the docker image *whovian-cocoa*, name the associated container `cocoa2023`, and run the container for the first time, type:
 
-      docker run --platform linux/amd64 --hostname cocoa --name cocoa2023 -it -p 8888:8888 -v $(pwd):/home/whovian/host/ -v ~/.ssh:/home/whovian/.ssh:ro vivianmiranda/whovian-cocoa
+    docker run --platform linux/amd64 --hostname cocoa --name cocoa2023 -it -p 8888:8888 -v $(pwd):/home/whovian/host/ -v ~/.ssh:/home/whovian/.ssh:ro vivianmiranda/whovian-cocoa
 
 Following the command above, users should see the following text on the screen terminal:
 
 <img width="872" alt="Screenshot 2023-12-19 at 1 26 50 PM" src="https://github.com/CosmoLike/cocoa/assets/3210728/eb1fe7ec-e463-48a6-90d2-2d84e5b61aa1">
 
- **Step :one:**: Init Conda when running the container the first time, as shown below.
+ **Step :three:**: Init Conda when running the container the first time, as shown below.
 
-      conda init bash
+    conda init bash
+    source ~/.bashrc
+    conda activate cocoa
+    git-lfs install
 
-and
-
-      source ~/.bashrc
-
-and
-
-      conda activate cocoa
-
-and
-
-     git-lfs install
-
- **Step :four:**: Access the host computer on `/home/whovian/host/` and proceed with the standard cocoa installation on section [Installation and Compilation of external modules](#cobaya_base_code)
+ **Step :four:**: Access the host computer on `/home/whovian/host/`
  
-     cd ~/host/
-     
+    cd ~/host/
+
+Now proceed with the standard cocoa installation on section [Installation and Compilation of external modules](#cobaya_base_code)
+ 
 Once installation is complete, the user must learn how to **start**, use, and **exit** the container. Below, we answer a few common questions about using/managing Docker containers.  
 
 - :interrobang: FAQ: How do users restart the container when they exit?
 
     Assuming the user maintained the container name `cocoa2023` via the flag `--name cocoa2023` on the `docker run` command, type:
     
-      docker start -ai cocoa2023
+    docker start -ai cocoa2023
 
 - :interrobang: FAQ: How do I run Jupyter Notebooks remotely when using Cocoa within the *whovian-cocoa* container?
 
     First, type the following command:
 
-      jupyter notebook --no-browser --port=8888
+    jupyter notebook --no-browser --port=8888
 
     The terminal will show a message similar to the following template:
 
-      [... NotebookApp] Writing notebook server cookie secret to /home/whovian/.local/share/jupyter/runtime/notebook_cookie_secret
-      [... NotebookApp] WARNING: The notebook server is listening on all IP addresses and not using encryption. This is not recommended.
-      [... NotebookApp] Serving notebooks from local directory: /home/whovian/host
-      [... NotebookApp] Jupyter Notebook 6.1.1 is running at:
-      [... NotebookApp] http://f0a13949f6b5:8888/?token=XXX
-      [... NotebookApp] or http://127.0.0.1:8888/?token=XXX
-      [... NotebookApp] Use Control-C to stop this server and shut down all kernels (twice to skip confirmation).
+    [... NotebookApp] Writing notebook server cookie secret to /home/whovian/.local/share/jupyter/runtime/notebook_cookie_secret
+    [... NotebookApp] WARNING: The notebook server is listening on all IP addresses and not using encryption. This is not recommended.
+    [... NotebookApp] Serving notebooks from local directory: /home/whovian/host
+    [... NotebookApp] Jupyter Notebook 6.1.1 is running at:
+    [... NotebookApp] http://f0a13949f6b5:8888/?token=XXX
+    [... NotebookApp] or http://127.0.0.1:8888/?token=XXX
+    [... NotebookApp] Use Control-C to stop this server and shut down all kernels (twice to skip confirmation).
 
 - :interrobang: **FAQ: How do we manipulate files on the host computer from within the Docker container?**
 
