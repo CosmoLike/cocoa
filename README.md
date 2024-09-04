@@ -372,7 +372,7 @@ Following the command above, users should see the following text on the screen t
 
 <img width="872" alt="Screenshot 2023-12-19 at 1 26 50 PM" src="https://github.com/CosmoLike/cocoa/assets/3210728/eb1fe7ec-e463-48a6-90d2-2d84e5b61aa1">
 
- **Step :one:**: Init Conda when running the container the first time, as shown below.
+ **Step :three:**: Init Conda when running the container the first time, as shown below.
 
     conda init bash
     source ~/.bashrc
