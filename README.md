@@ -358,9 +358,8 @@ We provide the docker image [whovian-cocoa](https://hub.docker.com/r/vivianmiran
 
  **Step :one:**: Create a folder and go to the location on the host computer that you want to provide access to the Docker container, as shown below. 
 
-     cd host_parent_folder/
-     mkdir -p host_new_folder
-     cd ./host_new_folder
+     mkdir -p cocoa_docker
+     cd ./cocoa_docker
 
  **Be careful:** Do not run the Docker container on a general folder (like the host's home directory); this would provide too much access to the Docker container. Accidents happen, especially when dealing with dangerous bash commands such as `rm` (deletion).
 
