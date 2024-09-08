@@ -163,23 +163,23 @@ unset_env_vars || return 1
 # -------------------------------- LSST-Y1 -----------------------------------
 # ----------------------------------------------------------------------------
 
-if [ -z "${IGNORE_COSMOLIKE_LSSTY1_CODE}" ]; then 
+if [ -z "${IGNORE_COSMOLIKE_LSST_Y1_CODE}" ]; then 
   
   # Name to be printed on this shell script messages
   PRINTNAME="LSST_Y1"
 
   ptop "GETTING ${PRINTNAME:?}" || return 1
 
-  FOLDER="${LSSTY1_NAME:-"lsst_y1"}"
+  FOLDER="${LSST_Y1_NAME:-"lsst_y1"}"
 
-  URL="${LSSTY1_URL:-"https://github.com/CosmoLike/cocoa_lsst_y1.git"}"
+  URL="${LSST_Y1_URL:-"https://github.com/CosmoLike/cocoa_lsst_y1.git"}"
 
-  if [ -n "${LSSTY1_COMMIT}" ]; then
-    gitact2 "${FOLDER:?}" "${URL:?}" "${LSSTY1_COMMIT:?}"  || return 1
-  elif [ -n "${LSSTY1_BRANCH}" ]; then 
-    gitact1 "${FOLDER:?}" "${URL:?}" "${LSSTY1_BRANCH:?}" || return 1
-  elif [ -n "${LSSTY1_TAG}" ]; then 
-    gitact3 "${FOLDER:?}" "${URL:?}" "${LSSTY1_TAG:?}" || return 1
+  if [ -n "${LSST_Y1_COMMIT}" ]; then
+    gitact2 "${FOLDER:?}" "${URL:?}" "${LSST_Y1_COMMIT:?}"  || return 1
+  elif [ -n "${LSST_Y1_BRANCH}" ]; then 
+    gitact1 "${FOLDER:?}" "${URL:?}" "${LSST_Y1_BRANCH:?}" || return 1
+  elif [ -n "${LSST_Y1_TAG}" ]; then 
+    gitact3 "${FOLDER:?}" "${URL:?}" "${LSST_Y1_TAG:?}" || return 1
   fi
 
   pbottom "GETTING ${PRINTNAME:?}" || return 1
@@ -189,11 +189,11 @@ fi
 # TODO:
 
 # ----------------------------------------------------------------------------
-# -------------------------------- DES-Y3 ------------------------------------
+# -------------------------------- DES_Y3 ------------------------------------
 # ----------------------------------------------------------------------------
 
 # ----------------------------------------------------------------------------
-# ----------------------------- DES-Y1 x Planck ------------------------------
+# ----------------------------- DES_Y1 x Planck ------------------------------
 # ----------------------------------------------------------------------------
 
 # -----------------------------------------------------------------------------
