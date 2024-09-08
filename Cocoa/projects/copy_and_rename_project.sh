@@ -28,7 +28,7 @@ error_cem () {
 OLD_PROJECT="lsst_y1"
 OLD_SURVEY="LSST"
 
-NEW_PROJECT="roman_real"
+NEW_PROJECT="roman_real_y1"
 NEW_SURVEY="ROMAN" 
 
 PRJ="${ROOTDIR:?}/projects/${NEW_PROJECT}"
@@ -46,91 +46,25 @@ cp -r "${ROOTDIR:?}/projects/${OLD_PROJECT:?}" "${PRJ:?}"
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
 
-declare -a TMP=("scripts/compile_"${OLD_PROJECT}".sh"
-                "scripts/start_"${OLD_PROJECT}".sh"
-                "scripts/stop_"${OLD_PROJECT}".sh"
-                "likelihood/${OLD_SURVEY,,}_3x2pt.py"
-                "likelihood/${OLD_SURVEY,,}_3x2pt.yaml"
-                "likelihood/${OLD_SURVEY,,}_2x2pt.py"
-                "likelihood/${OLD_SURVEY,,}_2x2pt.yaml"
-                "likelihood/${OLD_SURVEY,,}_ggl.py"
-                "likelihood/${OLD_SURVEY,,}_ggl.yaml"
-                "likelihood/${OLD_SURVEY,,}_cosmic_shear.py"
-                "likelihood/${OLD_SURVEY,,}_cosmic_shear.yaml"
-                "likelihood/${OLD_SURVEY,,}_xi_ggl.py"
-                "likelihood/${OLD_SURVEY,,}_xi_ggl.yaml"
-                "likelihood/${OLD_SURVEY,,}_clustering.py"
-                "likelihood/${OLD_SURVEY,,}_clustering.yaml"
-                "likelihood/${OLD_SURVEY,,}_xi_gg.py"
-                "likelihood/${OLD_SURVEY,,}_xi_gg.yaml"
-                "likelihood/params_${OLD_SURVEY,,}_lens.yaml"
-                "likelihood/params_${OLD_SURVEY,,}_source.yaml"
-                "data/${OLD_PROJECT}.dataset"
-                "interface/cosmolike_${OLD_PROJECT}_interface.py"
-                ) 
+cd "${PRJ:?}/data/"
+find . -iname "*${OLD_PROJECT}*" -exec rename ${OLD_PROJECT} ${NEW_PROJECT,,} '{}' \;
 
-declare -a TMP2=("scripts/compile_"${NEW_PROJECT,,}".sh"
-                 "scripts/start_"${NEW_PROJECT,,}".sh"
-                 "scripts/stop_"${NEW_PROJECT,,}".sh"
-                 "likelihood/${NEW_SURVEY,,}_3x2pt.py"
-                 "likelihood/${NEW_SURVEY,,}_3x2pt.yaml"
-                 "likelihood/${NEW_SURVEY,,}_2x2pt.py"
-                 "likelihood/${NEW_SURVEY,,}_2x2pt.yaml"
-                 "likelihood/${NEW_SURVEY,,}_ggl.py"
-                 "likelihood/${NEW_SURVEY,,}_ggl.yaml"
-                 "likelihood/${NEW_SURVEY,,}_cosmic_shear.py"
-                 "likelihood/${NEW_SURVEY,,}_cosmic_shear.yaml"
-                 "likelihood/${NEW_SURVEY,,}_xi_ggl.py"
-                 "likelihood/${NEW_SURVEY,,}_xi_ggl.yaml"
-                 "likelihood/${NEW_SURVEY,,}_clustering.py"
-                 "likelihood/${NEW_SURVEY,,}_clustering.yaml"
-                 "likelihood/${NEW_SURVEY,,}_xi_gg.py"
-                 "likelihood/${NEW_SURVEY,,}_xi_gg.yaml"
-                 "likelihood/params_${NEW_SURVEY,,}_lens.yaml"
-                 "likelihood/params_${NEW_SURVEY,,}_source.yaml"
-                 "data/${NEW_PROJECT,,}.dataset"
-                 "interface/cosmolike_${NEW_PROJECT,,}_interface.py"
-                )
+cd "${PRJ:?}/likelihood/"
+find . -iname "*${OLD_PROJECT}*" -exec rename ${OLD_PROJECT} ${NEW_PROJECT,,} '{}' \;
 
-for (( i=0; i<${#TMP[@]}; i++ ));
-do
-  mv "${PRJ:?}/${TMP[$i]:?}" "${PRJ:?}/${TMP2[$i]:?}"     2>/dev/null
+cd "${PRJ:?}/scripts/"
+find . -iname "*${OLD_PROJECT}*" -exec rename ${OLD_PROJECT} ${NEW_PROJECT,,} '{}' \;
 
-  sed --in-place --regexp-extended "s@${OLD_PROJECT}@${NEW_PROJECT,,}@g" \
-    "${PRJ:?}/${TMP2[$i]}" 2>/dev/null
-  sed --in-place --regexp-extended "s@${OLD_PROJECT^^}@${NEW_PROJECT,,}@g" \
-    "${PRJ:?}/${TMP2[$i]}" 2>/dev/null
-  sed --in-place --regexp-extended "s@${OLD_PROJECT,,}@${NEW_PROJECT,,}@g" \
-    "${PRJ:?}/${TMP2[$i]}" 2>/dev/null
-
-  sed --in-place --regexp-extended  "s@"${OLD_SURVEY}"@"${NEW_SURVEY,,}"@g" \
-    "${PRJ:?}/${TMP2[$i]}" 2>/dev/null
-  sed --in-place --regexp-extended  "s@"${OLD_SURVEY^^}"@"${NEW_SURVEY,,}"@g" \
-    "${PRJ:?}/${TMP2[$i]}" 2>/dev/null
-  sed --in-place --regexp-extended  "s@"${OLD_SURVEY,,}"@"${NEW_SURVEY,,}"@g" \
-    "${PRJ:?}/${TMP2[$i]}" 2>/dev/null
-done
+cd "${PRJ:?}/interface/"
+find . -iname "*${OLD_PROJECT}*" -exec rename ${OLD_PROJECT} ${NEW_PROJECT,,} '{}' \;
+find . -iname "*${OLD_SURVEY}*" -exec rename ${OLD_SURVEY} ${NEW_SURVEY,,} '{}' \;
+find . -iname "*${OLD_SURVEY,,}*" -exec rename ${OLD_SURVEY} ${NEW_SURVEY,,} '{}' \;
 
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
-
-# ------------------------------------------------------------------------------
-# ------------------------------------------------------------------------------
-# ------------------------------------------------------------------------------
-# ------------------------------------------------------------------------------
-declare -a TMP=("EXAMPLE_EVALUATE1.yaml"
-                "EXAMPLE_EVALUATE2.yaml"
-                "EXAMPLE_EVALUATE3.yaml"
-                "EXAMPLE_EVALUATE4.yaml"
-                "EXAMPLE_EVALUATE5.yaml"
-                "EXAMPLE_MCMC1.yaml"
-                "EXAMPLE_MCMC2.yaml"
-                "EXAMPLE_MCMC3.yaml"
-                "EXAMPLE_MCMC4.yaml"
-                "EXAMPLE_PROFILE1.yaml"
-                "interface/interface.cpp"
+declare -a TMP=(
                 "interface/MakefileCosmolike"
                ) 
 
@@ -151,18 +85,18 @@ do
     "${PRJ:?}/${TMP[$i]}" 2>/dev/null
 done
 
-# ------------------------------------------------------------------------------------
-# ------------------------------------------------------------------------------------
-# ------------------------------------------------------------------------------------
-# ------------------------------------------------------------------------------------
-# ------------------------------------------------------------------------------------
 
-sed --in-place --regexp-extended \
-  "s@cosmolike_"${OLD_PROJECT:?}"_interface@cosmolike_"${NEW_PROJECT}"_interface@g" \
-  "${PRJ:?}/likelihood/_cosmolike_prototype_base.py" 2>/dev/null
+for f in ${PRJ}/{,likelihood/,interface/,data/,scripts/}*.{sh,py,cpp,dataset,yaml}; do
+  [ -e "$f" ] || continue
 
-sed --in-place --regexp-extended "s@${OLD_SURVEY:?}@${NEW_SURVEY:?}@g" \
-  "${PRJ:?}/likelihood/_cosmolike_prototype_base.py" 2>/dev/null
+  sed --in-place --regexp-extended "s@${OLD_PROJECT}@${NEW_PROJECT,,}@g" "${f}" 2>/dev/null
+  sed --in-place --regexp-extended "s@${OLD_PROJECT^^}@${NEW_PROJECT,,}@g" "${f}" 2>/dev/null
+  sed --in-place --regexp-extended "s@${OLD_PROJECT,,}@${NEW_PROJECT,,}@g" "${f}" 2>/dev/null
+
+  sed --in-place --regexp-extended  "s@"${OLD_SURVEY}"@"${NEW_SURVEY,,}"@g" "${f}" 2>/dev/null
+  sed --in-place --regexp-extended  "s@"${OLD_SURVEY^^}"@"${NEW_SURVEY,,}"@g" "${f}" 2>/dev/null
+  sed --in-place --regexp-extended  "s@"${OLD_SURVEY,,}"@"${NEW_SURVEY,,}"@g" "${f}" 2>/dev/null
+done
 
 # ------------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------------
@@ -184,6 +118,10 @@ rm -f "${PRJ:?}"/chains/*.5.txt         2>/dev/null
 rm -f "${PRJ:?}"/chains/*.6.txt         2>/dev/null
 rm -f "${PRJ:?}"/chains/*.7.txt         2>/dev/null
 rm -f "${PRJ:?}"/chains/*.8.txt         2>/dev/null
+rm -f "${PRJ:?}"/chains/*.progress      2>/dev/null
+rm -f "${PRJ:?}"/chains/*.covmat        2>/dev/null
+rm -f "${PRJ:?}"/chains/*.locked        2>/dev/null
+rm -f "${PRJ:?}"/chains/*.checkpoint    2>/dev/null
 rm -f "${PRJ:?}"/chains/*.py.           2>/dev/null
 rm -f "${PRJ:?}"/chains/*.yaml.         2>/dev/null
 rm -f "${PRJ:?}"/chains/*.input.yaml    2>/dev/null
