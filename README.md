@@ -890,11 +890,9 @@ Now, all commits will be associated with this local branch.
 
 This will switch the repository to the `myremotebranch`. Users can verify that this is indeed the case with the command `git branch`.
 
-**Step :five:** Assuming here that `myremotebranch` is the the main branch, merge the changes made on the local branch via the command
+**Step :five:** Push the changes to GitHub
 
-    git merge mybranch
-
-If `myremotebranch` is the main branch, then follow the instructions above to perform a `squash merge`.
+    git push origin myremotebranch
 
 ### :interrobang: FAQ: How do we download and run Cosmolike projects? <a name="running_cosmolike_projects"></a> 
 
