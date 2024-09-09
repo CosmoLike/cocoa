@@ -20,7 +20,8 @@
     13. [Warning about Weak Lensing YAML files in Cobaya](#appendix_example_runs)
     14. [FAQ: How do we install Cocoa without conda?](#required_packages_cache)
     15. [FAQ: How do we push changes to the Cocoa main branch? A few git hacks](#push_main)
-    16. [FAQ: How do we download and run Cosmolike projects?](#running_cosmolike_projects)
+    16. [FAQ: How do we develop from a git tag? A few more git hacks](#dev_from_tag)
+    17. [FAQ: How do we download and run Cosmolike projects?](#running_cosmolike_projects)
 
 ## Overview of the [Cobaya](https://github.com/CobayaSampler)-[CosmoLike](https://github.com/CosmoLike) Joint Architecture (Cocoa) <a name="overview"></a>
 
@@ -833,66 +834,77 @@ Important note: we **strongly** advise developers to use the up-to-date `git` gi
   
 **Step :one:**: create a development branch from the `main` branch. Do not call the development branch `dev`, it is reserved for work done by the primary Cocoa developers. Let's call this new branch `xyzdev` for concreteness (tip: the use of developers' initials helps make the branch name unique)
 
-    # (main) = developers must input the command below on the main branch.
-    (main) git switch -c xyzdev
+    # Developers must input the command below on the main branch.
+    "${CONDA_PREFIX}"/bin/git switch -c xyzdev
 
 If the `xyzdev` already exists, use `git switch` without the `-c` flag. Developers can also push their development branches to the server via the command.
 
-    # (xyzdev) = developers must input the command below on the xyzdev branch.
-    (xyzdev) git push -u origin xyzdev
+    # Developers must input the command below on the xyzdev branch.
+    "${CONDA_PREFIX}"/bin/git push -u origin xyzdev
 
 **Step :two:**: develop the proposed changes. We advise developers to commit frequently. In your branch, a commit does not need to be atomic, changing the code from one working state to another well-tested, meaningful working state. In your branch, you have absolute freedom.
 
-**Step :three:**: Once there is an atomic, meaningful, and well-tested improvement to Cocoa, the developer needs to merge any subsequent changes made in `main` while the developer has been working on the `xyzdev` branch.
+**Step :three:**: Once the developers created an atomic, meaningful, and well-tested improvement to Cocoa, the developer needs to merge any subsequent changes made in `main` while the developer has been working on the `xyzdev` branch.
 
-    # (xyzdev) = developers must input the command below on the xyzdev branch.
-    (xyzdev) git merge main
+    # Developers must input the command below on the xyzdev branch.
+    "${CONDA_PREFIX}"/bin/git merge main
 
 This step may create conflicts that must be addressed before step four. 
 
 **Step :four:**: Once the developer has merged recent changes made on the `main` branch, the developer must push to the main branch the modifications made on the `xyzdev` branch by first **squashing all your changes into a single commit** as shown below
 
-    # (xyzdev) = developers must input the command below on the xyzdev branch.
-    (xyzdev) git switch main
+    # Developers must input the command below on the xyzdev branch.
+    "${CONDA_PREFIX}"/bin/git switch main
     
-    # (main) = developers must input the command below on the main branch.
-    (main) git merge --squash xyzdev
+    # Developers must input the command below on the main branch.
+    "${CONDA_PREFIX}"/bin/git merge --squash xyzdev
 
-    (main) git commit -m "squash merge - xyzdev branch: added development on abc features"
+    # Developers must input the command below on the main branch.
+    "${CONDA_PREFIX}"/bin/git commit -m "squash merge - xyzdev branch: added development on abc features"
 
-    (main) git push origin main
+    # Developers must input the command below on the main branch.
+    "${CONDA_PREFIX}"/bin/git push origin main
 
 Important note: **never** revert the branch ordering on squash merging by squashing the `main` changes to the `xyzdev` branch.
 
-- :interrobang: **How to develop starting from a git tag?**
+### :interrobang: FAQ: How do we develop from a git tag? A few more git hacks <a name="dev_from_tag"></a>
 
-Another useful git hack is related to developing Cocoa from a git tag. We reserve git tags to set milestones in our development, so they are good starting points for coding localized new features (e.g., changes to a file that other developers have not recently modified) or bug fixes. Let's assume the developer wants to clone the git tag `v4.0-beta8`.
+A useful git hack is related to developing Cocoa from a git tag. We reserve git tags to set milestones in our development, so they are good starting points for coding localized new features (e.g., changes to a file that other developers have not recently modified) or bug fixes.
 
-**Step :one:** Clone the repository from the desired tag, here assumed to be `v4.0-beta8`.
-
-    "${CONDA_PREFIX}"/bin/git clone git@github.com:CosmoLike/cocoa.git  --branch v4.0-beta8 cocoa
-
-This will put the repository in a detached HEAD (meaning you are no longer on a branch).
-
-**Step :two:** If you have cloned using the `https://github.com/CosmoLike/cocoa.git` address instead of `git@github.com:CosmoLike` (which requires ssh-key setup and developer privileges), following the general instructions for users, we reccommend changing the url by typing
+**Step :one: (optional)** If the developer has cloned the repository using the `https` URL address, we change the URL to the SSH-key-based address
 
     "${CONDA_PREFIX}"/bin/git remote set-url origin git@github.com:CosmoLike/cocoa.git
 
-**Step :three:** Move the detached state to a new local branch via the command
+**Step :two:** Move the detached state to a new local branch via the command
 
-    git switch -c mylocalbranch
+    "${CONDA_PREFIX}"/bin/git switch -c mylocalbranch
 
-Now, all commits will be associated with this local branch. 
+Now, all commits will be associated with this local branch. The developer can then make a series of git commits to implement a new feature or fix a bug.
 
-**Step :four:** At the end of development, fetch and download the remote branch the user wants to upload the local development
+**Step :three:** The developer has two options at the end of development. They can **either** create a new remote branch named `mylocalbranch`
 
-    git switch -c myremotebranch origin/myremotebranch
+    # Developers must input the command below on the mylocalbranch branch.
+    "${CONDA_PREFIX}"/bin/git push origin mylocalbranch
 
-This will switch the repository to the `myremotebranch`. Users can verify that this is indeed the case with the command `git branch`.
+**or** they can fetch and download the remote branch, named `myremotebranch`, that will hold the changes made on `mylocalbranch`
 
-**Step :five:** Push the changes to GitHub
+    # Developers must input the command below on the mylocalbranch branch.
+    "${CONDA_PREFIX}"/bin/git switch -c myremotebranch origin/myremotebranch
 
-    git push origin myremotebranch
+This will switch the repository to the `myremotebranch`. Now, the developer needs to merge the changes made on `mylocalbranch`. If `mylocalbranch` is **NOT the main branch**, type
+
+    # Developers must input the command below on the myremotebranch != main branch.
+    "${CONDA_PREFIX}"/bin/git merge mylocalbranch
+
+If the developer wants to merge their changes to the `mylocalbranch = main` branch instead, do a `squash` merge
+
+    # Developers must input the command below on the main branch.
+    "${CONDA_PREFIX}"/bin/git merge --squash mylocalbranch
+
+If this does not create any merge conflicts, type
+
+    # Developers must input the command below on the myremotebranch branch.
+    "${CONDA_PREFIX}"/bin/git push origin myremotebranch
 
 ### :interrobang: FAQ: How do we download and run Cosmolike projects? <a name="running_cosmolike_projects"></a> 
 
