@@ -874,19 +874,23 @@ Another useful git hack is related to developing Cocoa from a git tag. We reserv
 
 This will put the repository in a detached HEAD (meaning you are no longer on a branch).
 
-**Step :two:** Move the detached state to a new local branch via the command
+**Step :two:** If you have cloned using the `https://github.com/CosmoLike/cocoa.git` address instead of `git@github.com:CosmoLike` (which requires ssh-key setup and developer privileges), following the general instructions for users, we reccommend changing the url by typing
+
+    "${CONDA_PREFIX}"/bin/git remote set-url origin git@github.com:CosmoLike/cocoa.git
+
+**Step :three:** Move the detached state to a new local branch via the command
 
     git switch -c mylocalbranch
 
 Now, all commits will be associated with this local branch. 
 
-**Step :three:** At the end of development, fetch and download the remote branch the user wants to upload the local development
+**Step :four:** At the end of development, fetch and download the remote branch the user wants to upload the local development
 
     git switch -c myremotebranch origin/myremotebranch
 
 This will switch the repository to the `myremotebranch`. Users can verify that this is indeed the case with the command `git branch`.
 
-**Step :four:** Assuming here that `myremotebranch` is the the main branch, merge the changes made on the local branch via the command
+**Step :five:** Assuming here that `myremotebranch` is the the main branch, merge the changes made on the local branch via the command
 
     git merge mybranch
 
