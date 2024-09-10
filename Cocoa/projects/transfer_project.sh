@@ -5,11 +5,11 @@ if [ -z "${ROOTDIR}" ]; then
     exit 1
 fi
 
-OLD_PROJECT="des_y3"
-OLD_SURVEY="DES"
+OLD_PROJECT="lsst_y1"
+OLD_SURVEY="LSST"
 
-NEW_PROJECT="lsst_y1"
-NEW_SURVEY="LSST" 
+NEW_PROJECT="roman_real"
+NEW_SURVEY="Roman_real" 
 
 if [ -d $ROOTDIR/projects/$NEW_PROJECT ]; then
   >&2 echo "error: project $NEW_PROJECT already exists at $ROOTDIR/projects/$NEW_PROJECT"

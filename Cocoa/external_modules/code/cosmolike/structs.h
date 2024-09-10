@@ -138,6 +138,8 @@ typedef struct
   int cg_clustering_Npowerspectra;   // number of cluster-galaxy clustering tomography combinations
   int cc_clustering_Npowerspectra;   // number of cluster-cluster clustering tomography combinations
 
+  int ggl_tomo_combo[MAX_SIZE_ARRAYS*MAX_SIZE_ARRAYS][2];
+
   double shear_zmax[MAX_SIZE_ARRAYS];
   double shear_zmin[MAX_SIZE_ARRAYS];
   double n_source[MAX_SIZE_ARRAYS];

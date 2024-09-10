@@ -1501,27 +1501,27 @@ void init_lens_sample(
       Ntomo
     );
 
-  survey.ggl_overlap_cut = 0.0;
+  // survey.ggl_overlap_cut = 0.0;
   
   pf_photoz(0.1, 0);
 
-  int n = 0;
+  // int n = 0;
   
-  for (int i = 0; i < tomo.clustering_Nbin; i++)
-  {
-    for (int j = 0; j < tomo.shear_Nbin; j++)
-    {
-      n += test_zoverlap(i, j);
-    }
-  }
+  // for (int i = 0; i < tomo.clustering_Nbin; i++)
+  // {
+  //   for (int j = 0; j < tomo.shear_Nbin; j++)
+  //   {
+  //     n += test_zoverlap(i, j);
+  //   }
+  // }
   
-  tomo.ggl_Npowerspectra = n;
+  // tomo.ggl_Npowerspectra = n;
 
-  spdlog::debug(
-      "\x1b[90m{}\x1b[0m: tomo.ggl_Npowerspectra = {}",
-      "init_lens_sample", 
-      tomo.ggl_Npowerspectra
-    );
+  // spdlog::debug(
+  //     "\x1b[90m{}\x1b[0m: tomo.ggl_Npowerspectra = {}",
+  //     "init_lens_sample", 
+  //     tomo.ggl_Npowerspectra
+  //   );
 
   spdlog::debug("\x1b[90m{}\x1b[0m: Ends", "init_lens_sample");
 }
@@ -1828,6 +1828,38 @@ void init_source_sample(
     );
 
   spdlog::debug("\x1b[90m{}\x1b[0m: Ends", "init_source_sample");
+}
+
+
+void init_ggl_tomo_combo(arma::Mat<int> combos)
+{
+  spdlog::debug("\x1b[90m{}\x1b[0m: Begins", "init_ggl_tomo_combo");
+
+  const int nrows  = combos.n_rows;
+  const int ncols = combos.n_cols;
+
+  // write some test to make sure ncols = 2 and nrows < max_size_arrays
+
+  if (ncols != 2)
+  {
+    spdlog::critical(
+        "\x1b[90m{}\x1b[0m: Incompatible GGL combo array ",
+        "init_ggl_tomo_combo"
+      );
+    exit(1);
+  }
+
+  for (int i=0; i<nrows; i++)
+  {
+    for (int j=0; j<ncols; j++)
+    {
+      tomo.ggl_tomo_combo[i][j] = combos(i,j);
+    }
+  }
+
+  tomo.ggl_Npowerspectra = combos.n_elem;
+
+  spdlog::debug("\x1b[90m{}\x1b[0m: Ends", "init_ggl_tomo_combo");
 }
 
 // ---------------------------------------------------------------------------
@@ -2382,8 +2414,9 @@ void compute_gs_real_masked(vector& data_vector, const int start)
   {
     for (int nz=0; nz<tomo.ggl_Npowerspectra; nz++)
     {
-      const int zl = ZL(nz);
-      const int zs = ZS(nz);
+
+      const int zl = tomo.ggl_tomo_combo[nz][0]; 
+      const int zs = tomo.ggl_tomo_combo[nz][1];
       
       for (int i=0; i<Ntable.Ntheta; i++)
       {
