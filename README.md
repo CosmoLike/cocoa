@@ -35,15 +35,19 @@ This readme file presents basic and advanced instructions for installing all [Co
 
 ## Installation of core packages via Conda <a name="required_packages_conda"></a>
 
-**Step :one:**: Download the file `cocoapy39.yml` yml file, create the cocoa environment, activate it, and create symbolic links that will give better names for the GNU compilers.
+**Step :one:**: Download the file `cocoapy39.yml` yml file
+
+    wget https://raw.githubusercontent.com/CosmoLike/cocoa/dev/cocoapy39.yml
+
+create the cocoa environment,
 
     conda env create --name cocoa --file=cocoapy39.yml
 
-and
+activate it
 
     conda activate cocoa
 
-and
+and create symbolic links that will give better names for the GNU compilers
 
     ln -s "${CONDA_PREFIX}"/bin/x86_64-conda_cos6-linux-gnu-gcc "${CONDA_PREFIX}"/bin/gcc
     ln -s "${CONDA_PREFIX}"/bin/x86_64-conda_cos6-linux-gnu-g++ "${CONDA_PREFIX}"/bin/g++
