@@ -58,30 +58,27 @@ and create symbolic links that will give better names for the GNU compilers
 
 Users can now proceed to **step :two:**. 
 
-Below, we added some additional notes that clarify a few common questions.
+> [!TIP]
+> *What if the user wants to install the Cocoa environment on a supercomputer?* 
+> Many HPC environments provide the [Anaconda installer](https://www.anaconda.com) as an external module. If this is the case, check the Appendix [FAQ: How do we use an available Anaconda module on HPC?](#overview_anaconda).
 
-:interrobang: What if the user wants to install the Cocoa environment on a supercomputer? 
+> [!TIP]
+> *What if the user does not have conda installed?*
+> If the user is not working on an HPC environment that offers Anaconda or [Miniconda](https://docs.anaconda.com/miniconda/), check the Appendix [FAQ: What if there is no Conda? Miniconda installation](#overview_miniconda).
 
-Many HPC environments provide the [Anaconda installer](https://www.anaconda.com) as an external module. If this is the case, check the Appendix [FAQ: How do we use an available Anaconda module on HPC?](#overview_anaconda).
+> [!TIP]
+> *What if the user wants to install Python 3.10?*
+> We provide the YML file `cocoapy310.yml` so users can work on Python 3.10. Users must also modify the following flag on `set_installation_options.sh` before proceeding further with the Cocoa installation.
+>
+>     [Adapted from Cocoa/set_installation_options.sh shell script] 
+>     # ------------------------------------------------------------------------------
+>     # Adopted Python version -------------------------------------------------------
+>     # ------------------------------------------------------------------------------
+>     export PYTHON_VERSION=3.9
 
-:interrobang: What if the user does not have conda installed? 
-
-If the user is not working on an HPC environment that offers Anaconda or [Miniconda](https://docs.anaconda.com/miniconda/), check the Appendix [FAQ: What if there is no Conda? Miniconda installation](#overview_miniconda).
-
-:interrobang:  What if the user wants to install Python 3.10?
-
-We provide the YML file `cocoapy310.yml` so users can work on Python 3.10. Users must also modify the following flag on `set_installation_options.sh` before proceeding further with the Cocoa installation.
-
-      [Adapted from Cocoa/set_installation_options.sh shell script] 
-      
-      # ------------------------------------------------------------------------------
-      # Adopted Python version -------------------------------------------------------
-      # ------------------------------------------------------------------------------
-      export PYTHON_VERSION=3.9
-
-:interrobang: What is a core package?
-
-Core packages include compilers and numerical libraries (e.g., GSL and FFTW) that we need but will certainly never develop/modify. 
+> [!NOTE]
+> *What is a core package?*
+> Core packages include compilers and numerical libraries (e.g., GSL and FFTW) that we need but will certainly never develop/modify. 
 
 **Step :two:**: Install `git-lfs` when loading the Conda cocoa environment for the first time.
 
