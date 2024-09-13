@@ -84,7 +84,8 @@ Users can now proceed to **step :two:**.
 
     git-lfs install
 
-In the next section, we assume the user loaded the Cocoa conda environment via the `conda activate cocoa` command.
+> [!WARNING]
+> In the next section, we assume the user loaded the Cocoa conda environment via the `conda activate cocoa` command.
 
 ## Installation and Compilation of external modules <a name="cobaya_base_code"></a>
 
@@ -111,7 +112,8 @@ Users can now proceed to **step :two:**.
         
     source setup_cocoa.sh
 
-This script downloads and decompresses external modules set on the `set_installation_options.sh` script (e.g., CAMB and Class).
+> [!NOTE]
+> This script downloads and decompresses external modules set on the `set_installation_options.sh` script (e.g., CAMB and Class).
 
 **Step :three:**: Run the script `compile_cocoa.sh` by typing 
 
@@ -119,9 +121,9 @@ This script downloads and decompresses external modules set on the `set_installa
     
 This script compiles external modules set on the `set_installation_options.sh` script (e.g., CAMB and Class). 
 
-:interrobang:  FAQ: What if the user wants to fine-tune the installed external modules? 
-
-Cocoa does not install many external modules by default, but users may find them helpful in a particular project. In this case, check the many available options on the `set_installation_options.sh` shell script. Then, rerun steps :two: and :three:. 
+> [!TIP]
+> *What if the user wants to fine-tune the installed external modules?*
+> Cocoa does not install many external modules by default, but users may find them helpful in a particular project. In this case, check the many available options on the `set_installation_options.sh` shell script. Then, rerun steps :two: and :three:. 
 
 ## Running Examples  <a name="cobaya_base_code_examples"></a>
 
@@ -131,15 +133,16 @@ We assume that you are still in the Conda cocoa environment from the previous `c
 
     source start_cocoa.sh
 
-Users will see a terminal like this: `$(cocoa)(.local)`. *This is a feature, not a bug*! 
+> [!NOTE]
+> Users will see a terminal like this: `$(cocoa)(.local)`. *This is a feature, not a bug*! 
 
  **Step :two:**: Select the number of OpenMP cores (below, we set it to 8).
     
     export OMP_PROC_BIND=close; export OMP_NUM_THREADS=8
 
-:interrobang: FAQ: Why do we set the flag `OMP_PROC_BIND`?
-
-The environmental variable `OMP_PROC_BIND`, when set to `close`, places the OpenMP cores as closely as possible (in the same chiplet). This setting is important as current architectures limit communications bandwidth between different chiplets (e.g., the cores inside an AMD 96 cores processor are scattered on a dozen chiplets).
+> [!NOTE]
+> Why do we set the flag `OMP_PROC_BIND`?
+> The environmental variable `OMP_PROC_BIND`, when set to `close`, places the OpenMP cores as closely as possible (in the same chiplet). This setting is important as current architectures limit communications bandwidth between different chiplets (e.g., the cores inside an AMD 96 cores processor are scattered on a dozen chiplets).
 
 ### Examples not involving Cosmolike
 
@@ -165,9 +168,9 @@ MCMC:
 
     mpirun -n 4 --oversubscribe --mca btl vader,tcp,self --bind-to core:overload-allowed --rank-by core --map-by numa:pe=${OMP_NUM_THREADS} cobaya-run ./projects/lsst_y1/EXAMPLE_MCMC1.yaml -f
 
-:interrobang: FAQ: What if the user wants to download a project not provided by default or intends to clone existing projects in development mode?
-
-Check the Appendix [FAQ: How do we download and run Cosmolike projects?](running_cosmolike_projects).
+> [!TIP]
+> *What if the user wants to download a project not provided by default or intends to clone existing projects in development mode?*
+> Check the Appendix [FAQ: How do we download and run Cosmolike projects?](running_cosmolike_projects).
 
 ## Appendix <a name="appendix"></a>
 
