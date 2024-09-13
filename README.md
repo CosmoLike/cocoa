@@ -96,13 +96,16 @@ and
 
     cd ./cocoa/Cocoa
 
-:interrobang:  What if the user wants to clone the repository in development mode?
+Users can now proceed to **step :two:**.
 
-Type the following command to clone the repository from the latest main commit.
+> [!NOTE]
+> *What if the user wants to clone the repository in development mode?*
+> Type the following command to clone the repository from the latest main commit.
+>
+>     "${CONDA_PREFIX}"/bin/git clone git@github.com:CosmoLike/cocoa.git cocoa
 
-    "${CONDA_PREFIX}"/bin/git clone git@github.com:CosmoLike/cocoa.git cocoa
-
-If the developer wants to start coding a new feature or fix a bug from a git tag, check the appendix [FAQ: How do we push changes to the Cocoa main branch? A few git hacks](#push_main) subsection *How to develop starting from a git tag?*
+> [!TIP]
+> If the developer wants to start coding a new feature or fix a bug from a git tag, check the appendix [FAQ: How do we push changes to the Cocoa main branch? A few git hacks](#push_main) subsection *How to develop starting from a git tag?*
 
 **Step :two:**: Run the script `setup_cocoa.sh` via
         
