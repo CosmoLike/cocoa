@@ -56,6 +56,10 @@ and create symbolic links that will give better names for the GNU compilers
     ln -s "${CONDA_PREFIX}"/bin/x86_64-conda-linux-gnu-gcc-ranlib "${CONDA_PREFIX}"/bin/gcc-ranlib
     ln -s "${CONDA_PREFIX}"/bin/x86_64-conda-linux-gnu-ld "${CONDA_PREFIX}"/bin/ld
 
+Users can now proceed to **step :two:**. 
+
+Below, we added some additional notes that clarify a few common questions.
+
 :interrobang: What if the user wants to install the Cocoa environment on a supercomputer? 
 
 Many HPC environments provide the [Anaconda installer](https://www.anaconda.com) as an external module. If this is the case, check the Appendix [FAQ: How do we use an available Anaconda module on HPC?](#overview_anaconda).
@@ -83,7 +87,7 @@ Core packages include compilers and numerical libraries (e.g., GSL and FFTW) tha
 
     git-lfs install
 
-Below, we assume the user loaded the Cocoa conda environment via the `conda activate cocoa` command.
+In the next section, we assume the user loaded the Cocoa conda environment via the `conda activate cocoa` command.
 
 ## Installation and Compilation of external modules <a name="cobaya_base_code"></a>
 
