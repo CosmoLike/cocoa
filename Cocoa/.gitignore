@@ -33,6 +33,8 @@ external_modules/data/spt_3g
 external_modules/data/act
 external_modules/code/PolyChordLite/
 
+
+
 projects/desxplanck
 projects/lsst_fourier
 projects/des_y3
@@ -58,6 +60,12 @@ external_modules/data/kids
 external_modules/data/kids*
 external_modules/data/cocoa_*
 external_modules/data/ede*
+external_modules/code/roman_real
+external_modules/code/roman_real*
+external_modules/code/roman_fourier
+external_modules/code/roman_fourier*
+external_modules/code/roman*
+external_modules/code/ROMAN*
 
 external_modules/code/planck/code/spt_clik/.lock-waf_*
 external_modules/code/planck/code/spt_clik/.waf*
