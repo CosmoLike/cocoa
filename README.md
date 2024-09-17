@@ -1,3 +1,6 @@
+
+<img width="780" alt="Screenshot 2024-09-16 at 10 55 14 PM" src="https://github.com/user-attachments/assets/f327e3bf-22c7-46e4-9bb5-14c8e7afc4c1">
+
 # Table of contents
 1. [Overview of the Cobaya-CosmoLike Joint Architecture (Cocoa)](#overview)
 2. [Installation of core packages via Conda](#required_packages_conda)
@@ -20,7 +23,8 @@
     13. [Warning about Weak Lensing YAML files in Cobaya](#appendix_example_runs)
     14. [FAQ: How do we install Cocoa without conda?](#required_packages_cache)
     15. [FAQ: How do we push changes to the Cocoa main branch? A few git hacks](#push_main)
-    16. [FAQ: How do we download and run Cosmolike projects?](#running_cosmolike_projects)
+    16. [FAQ: How do we develop from a git tag? A few more git hacks](#dev_from_tag)
+    17. [FAQ: How do we download and run Cosmolike projects?](#running_cosmolike_projects)
 
 ## Overview of the [Cobaya](https://github.com/CobayaSampler)-[CosmoLike](https://github.com/CosmoLike) Joint Architecture (Cocoa) <a name="overview"></a>
 
@@ -34,15 +38,19 @@ This readme file presents basic and advanced instructions for installing all [Co
 
 ## Installation of core packages via Conda <a name="required_packages_conda"></a>
 
-**Step :one:**: Download the file `cocoapy39.yml` yml file, create the cocoa environment, activate it, and create symbolic links that will give better names for the GNU compilers.
+**Step :one:**: Download the file `cocoapy39.yml` yml file
+
+    wget https://raw.githubusercontent.com/CosmoLike/cocoa/dev/cocoapy39.yml
+
+create the cocoa environment,
 
     conda env create --name cocoa --file=cocoapy39.yml
 
-and
+activate it
 
     conda activate cocoa
 
-and
+and create symbolic links that will give better names for the GNU compilers
 
     ln -s "${CONDA_PREFIX}"/bin/x86_64-conda_cos6-linux-gnu-gcc "${CONDA_PREFIX}"/bin/gcc
     ln -s "${CONDA_PREFIX}"/bin/x86_64-conda_cos6-linux-gnu-g++ "${CONDA_PREFIX}"/bin/g++
@@ -51,34 +59,36 @@ and
     ln -s "${CONDA_PREFIX}"/bin/x86_64-conda-linux-gnu-gcc-ranlib "${CONDA_PREFIX}"/bin/gcc-ranlib
     ln -s "${CONDA_PREFIX}"/bin/x86_64-conda-linux-gnu-ld "${CONDA_PREFIX}"/bin/ld
 
-:interrobang: What if the user wants to install the Cocoa environment on a supercomputer? 
+Users can now proceed to **step :two:**. 
 
-Many HPC environments provide the [Anaconda installer](https://www.anaconda.com) as an external module. If this is the case, check the Appendix [FAQ: How do we use an available Anaconda module on HPC?](#overview_anaconda).
+> [!TIP]
+> *What if the user wants to install the Cocoa environment on a supercomputer?* 
+> Many HPC environments provide the [Anaconda installer](https://www.anaconda.com) as an external module. If this is the case, check the Appendix [FAQ: How do we use an available Anaconda module on HPC?](#overview_anaconda).
 
-:interrobang: What if the user does not have conda installed? 
+> [!TIP]
+> *What if the user does not have conda installed?*
+> If the user is not working on an HPC environment that offers Anaconda or [Miniconda](https://docs.anaconda.com/miniconda/), check the Appendix [FAQ: What if there is no Conda? Miniconda installation](#overview_miniconda).
 
-If the user is not working on an HPC environment that offers Anaconda or [Miniconda](https://docs.anaconda.com/miniconda/), check the Appendix [FAQ: What if there is no Conda? Miniconda installation](#overview_miniconda).
+> [!TIP]
+> *What if the user wants to install Python 3.10?*
+> We provide the YML file `cocoapy310.yml` so users can work on Python 3.10. Users must also modify the following flag on `set_installation_options.sh` before proceeding further with the Cocoa installation.
+>
+>     [Adapted from Cocoa/set_installation_options.sh shell script] 
+>     # ------------------------------------------------------------------------------
+>     # Adopted Python version -------------------------------------------------------
+>     # ------------------------------------------------------------------------------
+>     export PYTHON_VERSION=3.9
 
-:interrobang:  What if the user wants to install Python 3.10?
-
-We provide the YML file `cocoapy310.yml` so users can work on Python 3.10. Users must also modify the following flag on `set_installation_options.sh` before proceeding further with the Cocoa installation.
-
-      [Adapted from Cocoa/set_installation_options.sh shell script] 
-      
-      # ------------------------------------------------------------------------------
-      # Adopted Python version -------------------------------------------------------
-      # ------------------------------------------------------------------------------
-      export PYTHON_VERSION=3.9
-
-:interrobang: What is a core package?
-
-Core packages include compilers and numerical libraries (e.g., GSL and FFTW) that we need but will certainly never develop/modify. 
+> [!NOTE]
+> *What is a core package?*
+> Core packages include compilers and numerical libraries (e.g., GSL and FFTW) that we need but will certainly never develop/modify. 
 
 **Step :two:**: Install `git-lfs` when loading the Conda cocoa environment for the first time.
 
     git-lfs install
 
-Below, we assume the user loaded the Cocoa conda environment via the `conda activate cocoa` command.
+> [!WARNING]
+> In the next section, we assume the user loaded the Cocoa conda environment via the `conda activate cocoa` command.
 
 ## Installation and Compilation of external modules <a name="cobaya_base_code"></a>
 
@@ -90,19 +100,23 @@ and
 
     cd ./cocoa/Cocoa
 
-:interrobang:  What if the user wants to clone the repository in development mode?
+Users can now proceed to **step :two:**.
 
-Type the following command to clone the repository from the latest main commit.
+> [!NOTE]
+> *What if the user wants to clone the repository in development mode?*
+> Type the following command to clone the repository from the latest main commit.
+>
+>     "${CONDA_PREFIX}"/bin/git clone git@github.com:CosmoLike/cocoa.git cocoa
 
-    "${CONDA_PREFIX}"/bin/git clone git@github.com:CosmoLike/cocoa.git cocoa
-
-If the developer wants to start coding a new feature or fix a bug from a git tag, check the appendix [FAQ: How do we push changes to the Cocoa main branch? A few git hacks](#push_main) subsection *How to develop starting from a git tag?*
+> [!TIP]
+> If the developer wants to start coding a new feature or fix a bug from a git tag, check the appendix [FAQ: How do we push changes to the Cocoa main branch? A few git hacks](#push_main) subsection *How to develop starting from a git tag?*
 
 **Step :two:**: Run the script `setup_cocoa.sh` via
         
     source setup_cocoa.sh
 
-This script downloads and decompresses external modules set on the `set_installation_options.sh` script (e.g., CAMB and Class).
+> [!NOTE]
+> This script downloads and decompresses external modules set on the `set_installation_options.sh` script (e.g., CAMB and Class).
 
 **Step :three:**: Run the script `compile_cocoa.sh` by typing 
 
@@ -110,9 +124,9 @@ This script downloads and decompresses external modules set on the `set_installa
     
 This script compiles external modules set on the `set_installation_options.sh` script (e.g., CAMB and Class). 
 
-:interrobang:  FAQ: What if the user wants to fine-tune the installed external modules? 
-
-Cocoa does not install many external modules by default, but users may find them helpful in a particular project. In this case, check the many available options on the `set_installation_options.sh` shell script. Then, rerun steps :two: and :three:. 
+> [!TIP]
+> *What if the user wants to fine-tune the installed external modules?*
+> Cocoa does not install many external modules by default, but users may find them helpful in a particular project. In this case, check the many available options on the `set_installation_options.sh` shell script. Then, rerun steps :two: and :three:. 
 
 ## Running Examples  <a name="cobaya_base_code_examples"></a>
 
@@ -122,15 +136,16 @@ We assume that you are still in the Conda cocoa environment from the previous `c
 
     source start_cocoa.sh
 
-Users will see a terminal like this: `$(cocoa)(.local)`. *This is a feature, not a bug*! 
+> [!NOTE]
+> Users will see a terminal like this: `$(cocoa)(.local)`. *This is a feature, not a bug*! 
 
  **Step :two:**: Select the number of OpenMP cores (below, we set it to 8).
     
     export OMP_PROC_BIND=close; export OMP_NUM_THREADS=8
 
-:interrobang: FAQ: Why do we set the flag `OMP_PROC_BIND`?
-
-The environmental variable `OMP_PROC_BIND`, when set to `close`, places the OpenMP cores as closely as possible (in the same chiplet). This setting is important as current architectures limit communications bandwidth between different chiplets (e.g., the cores inside an AMD 96 cores processor are scattered on a dozen chiplets).
+> [!NOTE]
+> Why do we set the flag `OMP_PROC_BIND`?
+> The environmental variable `OMP_PROC_BIND`, when set to `close`, places the OpenMP cores as closely as possible (in the same chiplet). This setting is important as current architectures limit communications bandwidth between different chiplets (e.g., the cores inside an AMD 96 cores processor are scattered on a dozen chiplets).
 
 ### Examples not involving Cosmolike
 
@@ -156,9 +171,9 @@ MCMC:
 
     mpirun -n 4 --oversubscribe --mca btl vader,tcp,self --bind-to core:overload-allowed --rank-by core --map-by numa:pe=${OMP_NUM_THREADS} cobaya-run ./projects/lsst_y1/EXAMPLE_MCMC1.yaml -f
 
-:interrobang: FAQ: What if the user wants to download a project not provided by default or intends to clone existing projects in development mode?
-
-Check the Appendix [FAQ: How do we download and run Cosmolike projects?](running_cosmolike_projects).
+> [!TIP]
+> *What if the user wants to download a project not provided by default or intends to clone existing projects in development mode?*
+> Check the Appendix [FAQ: How do we download and run Cosmolike projects?](running_cosmolike_projects).
 
 ## Appendix <a name="appendix"></a>
 
@@ -833,64 +848,77 @@ Important note: we **strongly** advise developers to use the up-to-date `git` gi
   
 **Step :one:**: create a development branch from the `main` branch. Do not call the development branch `dev`, it is reserved for work done by the primary Cocoa developers. Let's call this new branch `xyzdev` for concreteness (tip: the use of developers' initials helps make the branch name unique)
 
-    # (main) = developers must input the command below on the main branch.
-    (main) git switch -c xyzdev
+    # Developers must input the command below on the main branch.
+    "${CONDA_PREFIX}"/bin/git switch -c xyzdev
 
 If the `xyzdev` already exists, use `git switch` without the `-c` flag. Developers can also push their development branches to the server via the command.
 
-    # (xyzdev) = developers must input the command below on the xyzdev branch.
-    (xyzdev) git push -u origin xyzdev
+    # Developers must input the command below on the xyzdev branch.
+    "${CONDA_PREFIX}"/bin/git push -u origin xyzdev
 
 **Step :two:**: develop the proposed changes. We advise developers to commit frequently. In your branch, a commit does not need to be atomic, changing the code from one working state to another well-tested, meaningful working state. In your branch, you have absolute freedom.
 
-**Step :three:**: Once there is an atomic, meaningful, and well-tested improvement to Cocoa, the developer needs to merge any subsequent changes made in `main` while the developer has been working on the `xyzdev` branch.
+**Step :three:**: Once the developers created an atomic, meaningful, and well-tested improvement to Cocoa, the developer needs to merge any subsequent changes made in `main` while the developer has been working on the `xyzdev` branch.
 
-    # (xyzdev) = developers must input the command below on the xyzdev branch.
-    (xyzdev) git merge main
+    # Developers must input the command below on the xyzdev branch.
+    "${CONDA_PREFIX}"/bin/git merge main
 
 This step may create conflicts that must be addressed before step four. 
 
 **Step :four:**: Once the developer has merged recent changes made on the `main` branch, the developer must push to the main branch the modifications made on the `xyzdev` branch by first **squashing all your changes into a single commit** as shown below
 
-    # (xyzdev) = developers must input the command below on the xyzdev branch.
-    (xyzdev) git switch main
+    # Developers must input the command below on the xyzdev branch.
+    "${CONDA_PREFIX}"/bin/git switch main
     
-    # (main) = developers must input the command below on the main branch.
-    (main) git merge --squash xyzdev
+    # Developers must input the command below on the main branch.
+    "${CONDA_PREFIX}"/bin/git merge --squash xyzdev
 
-    (main) git commit -m "squash merge - xyzdev branch: added development on abc features"
+    # Developers must input the command below on the main branch.
+    "${CONDA_PREFIX}"/bin/git commit -m "squash merge - xyzdev branch: added development on abc features"
 
-    (main) git push origin main
+    # Developers must input the command below on the main branch.
+    "${CONDA_PREFIX}"/bin/git push origin main
 
 Important note: **never** revert the branch ordering on squash merging by squashing the `main` changes to the `xyzdev` branch.
 
-- :interrobang: **How to develop starting from a git tag?**
+### :interrobang: FAQ: How do we develop from a git tag? A few more git hacks <a name="dev_from_tag"></a>
 
-Another useful git hack is related to developing Cocoa from a git tag. We reserve git tags to set milestones in our development, so they are good starting points for coding localized new features (e.g., changes to a file that other developers have not recently modified) or bug fixes. Let's assume the developer wants to clone the git tag `v4.0-beta8`.
+A useful git hack is related to developing Cocoa from a git tag. We reserve git tags to set milestones in our development, so they are good starting points for coding localized new features (e.g., changes to a file that other developers have not recently modified) or bug fixes.
 
-**Step :one:** Clone the repository from the desired tag, here assumed to be `v4.0-beta8`.
+**Step :one: (optional)** If the developer has cloned the repository using the `https` URL address, we change the URL to the SSH-key-based address
 
-    "${CONDA_PREFIX}"/bin/git clone git@github.com:CosmoLike/cocoa.git  --branch v4.0-beta8 cocoa
-
-This will put the repository in a detached HEAD (meaning you are no longer on a branch).
+    "${CONDA_PREFIX}"/bin/git remote set-url origin git@github.com:CosmoLike/cocoa.git
 
 **Step :two:** Move the detached state to a new local branch via the command
 
-    git switch -c mylocalbranch
+    "${CONDA_PREFIX}"/bin/git switch -c mylocalbranch
 
-Now, all commits will be associated with this local branch. 
+Now, all commits will be associated with this local branch. The developer can then make a series of git commits to implement a new feature or fix a bug.
 
-**Step :three:** At the end of development, fetch and download the remote branch the user wants to upload the local development
+**Step :three:** The developer has two options at the end of development. They can **either** create a new remote branch named `mylocalbranch`
 
-    git switch -c myremotebranch origin/myremotebranch
+    # Developers must input the command below on the mylocalbranch branch.
+    "${CONDA_PREFIX}"/bin/git push origin mylocalbranch
 
-This will switch the repository to the `myremotebranch`. Users can verify that this is indeed the case with the command `git branch`.
+**or** they can fetch and download the remote branch, named `myremotebranch`, that will hold the changes made on `mylocalbranch`
 
-**Step :four:** Assuming here that `myremotebranch` is the the main branch, merge the changes made on the local branch via the command
+    # Developers must input the command below on the mylocalbranch branch.
+    "${CONDA_PREFIX}"/bin/git switch -c myremotebranch origin/myremotebranch
 
-    git merge mybranch
+This will switch the repository to the `myremotebranch`. Now, the developer needs to merge the changes made on `mylocalbranch`. If `mylocalbranch` is **NOT the main branch**, type
 
-If `myremotebranch` is the main branch, then follow the instructions above to perform a `squash merge`.
+    # Developers must input the command below on the myremotebranch != main branch.
+    "${CONDA_PREFIX}"/bin/git merge mylocalbranch
+
+If the developer wants to merge their changes to the `mylocalbranch = main` branch instead, do a `squash` merge
+
+    # Developers must input the command below on the main branch.
+    "${CONDA_PREFIX}"/bin/git merge --squash mylocalbranch
+
+If this does not create any merge conflicts, type
+
+    # Developers must input the command below on the myremotebranch branch.
+    "${CONDA_PREFIX}"/bin/git push origin myremotebranch
 
 ### :interrobang: FAQ: How do we download and run Cosmolike projects? <a name="running_cosmolike_projects"></a> 
 
