@@ -2830,7 +2830,7 @@ arma::Col<double> compute_data_vector_3x2pt_real_masked_any_order(
     exit(1);
   }
 
-  arma::Col<double> dv = compute_data_vector_3x2pt_masked_any_order(order);
+  arma::Col<double> dv = compute_data_vector_3x2pt_real_masked_any_order(order);
   
   if (BaryonScenario::get_instance().get_pcs().col(0).n_elem != dv.n_elem)
   {
@@ -2901,7 +2901,7 @@ matrix compute_baryon_pcas_3x2pt(
   reset_bary_struct(); // make sure there is no baryon contamination
 
   vector dv_dm = IP::get_instance().sqzd_theory_data_vector(
-      compute_data_vector_3x2pt_masked_any_order(order)
+      compute_data_vector_3x2pt_real_masked_any_order(order)
     );
 
   spdlog::debug(
@@ -2928,7 +2928,7 @@ matrix compute_baryon_pcas_3x2pt(
     init_baryons_contamination(BaryonScenario::get_instance().get_scenario(i));
 
     vector dv = IP::get_instance().sqzd_theory_data_vector(
-        compute_data_vector_3x2pt_masked_any_order(order)
+        compute_data_vector_3x2pt_real_masked_any_order(order)
       );
 
     D.col(i) = dv - dv_dm;
@@ -3014,7 +3014,7 @@ matrix compute_baryon_pcas_6x2pt(arma::Col<int>::fixed<6> order)
   reset_bary_struct(); // make sure there is no baryon contamination
 
   vector dv_dm = IP::get_instance().sqzd_theory_data_vector(
-      compute_data_vector_6x2pt_masked_any_order(order)
+      compute_data_vector_6x2pt_real_masked_any_order(order)
     );
 
   spdlog::debug(
@@ -3041,7 +3041,7 @@ matrix compute_baryon_pcas_6x2pt(arma::Col<int>::fixed<6> order)
     init_baryons_contamination(BaryonScenario::get_instance().get_scenario(i));
 
     vector dv = IP::get_instance().sqzd_theory_data_vector(
-        compute_data_vector_6x2pt_masked_any_order(order)
+        compute_data_vector_6x2pt_real_masked_any_order(order)
       );
 
     D.col(i) = dv - dv_dm;
