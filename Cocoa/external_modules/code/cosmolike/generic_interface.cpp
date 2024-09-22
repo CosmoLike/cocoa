@@ -2535,18 +2535,20 @@ void compute_kk_fourier_masked(vector& data_vector, const int start)
 // ---------------------------------------------------------------------------
 // ---------------------------------------------------------------------------
 
-vector compute_data_vector_6x2pt_masked_any_order(
+vector compute_data_vector_6x2pt_real_masked_any_order(
     arma::Col<int>::fixed<6> order
   )
 { // order = (1,2,3,4,5,6) => Cosmic Shear, ggl, gg, gk, sk, kk
-  spdlog::debug("\x1b[90m{}\x1b[0m: Begins", 
-    "compute_data_vector_6x2pt_masked_any_order");
+  spdlog::debug(
+      "\x1b[90m{}\x1b[0m: Begins", 
+      "compute_data_vector_6x2pt_real_masked_any_order")
+    ;
 
   if (tomo.shear_Nbin == 0)
   {
     spdlog::critical(
         "\x1b[90m{}\x1b[0m: {} = 0 is invalid",
-        "compute_data_vector_6x2pt_masked_any_order", 
+        "compute_data_vector_6x2pt_real_masked_any_order", 
         "shear_Nbin"
       );
     exit(1);
@@ -2556,7 +2558,7 @@ vector compute_data_vector_6x2pt_masked_any_order(
   {
     spdlog::critical(
         "\x1b[90m{}\x1b[0m: {} = 0 is invalid",
-        "compute_data_vector_6x2pt_masked_any_order", 
+        "compute_data_vector_6x2pt_real_masked_any_order", 
         "Ntheta"
       );
     exit(1);
@@ -2568,7 +2570,7 @@ vector compute_data_vector_6x2pt_masked_any_order(
     {
       spdlog::critical(
           "\x1b[90m{}\x1b[0m: {} not set prior to this function call",
-          "compute_data_vector_6x2pt_masked_any_order", 
+          "compute_data_vector_6x2pt_real_masked_any_order", 
           "like.Ncl"
         );
       exit(1);
@@ -2578,7 +2580,7 @@ vector compute_data_vector_6x2pt_masked_any_order(
     { // check ell range
       spdlog::critical(
           "\x1b[90m{}\x1b[0m: {} and {} are invalid",
-          "compute_data_vector_6x2pt_masked_any_order", 
+          "compute_data_vector_6x2pt_real_masked_any_order", 
           "like.lmin_bp", 
           "like.lmax_bp"
         );
@@ -2589,7 +2591,7 @@ vector compute_data_vector_6x2pt_masked_any_order(
     { // check binning matrix and CMB lensing band power offset
       spdlog::critical(
           "\x1b[90m{}\x1b[0m: {} not set prior to this function call",
-          "compute_data_vector_6x2pt_masked_any_order", 
+          "compute_data_vector_6x2pt_real_masked_any_order", 
           "cmb_binning_matrix_with_correction"
         );
       exit(1);
@@ -2599,7 +2601,7 @@ vector compute_data_vector_6x2pt_masked_any_order(
     {
       spdlog::critical(
           "\x1b[90m{}\x1b[0m: {} not set prior to this function call",
-          "compute_data_vector_6x2pt_masked_any_order", 
+          "compute_data_vector_6x2pt_real_masked_any_order", 
           "cmb_theory_offset"
         );
       exit(1);
@@ -2611,7 +2613,7 @@ vector compute_data_vector_6x2pt_masked_any_order(
     {
       spdlog::critical(
           "\x1b[90m{}\x1b[0m: {} not set prior to this function call",
-          "compute_data_vector_6x2pt_masked_any_order", 
+          "compute_data_vector_6x2pt_real_masked_any_order", 
           "like.Ncl"
         );
       exit(1);
@@ -2621,7 +2623,7 @@ vector compute_data_vector_6x2pt_masked_any_order(
     {
       spdlog::critical(
           "\x1b[90m{}\x1b[0m: {} and {} are invalid",
-          "compute_data_vector_6x2pt_masked_any_order", 
+          "compute_data_vector_6x2pt_real_masked_any_order", 
           "like.lmin", 
           "like.lmax"
         );
@@ -2633,7 +2635,7 @@ vector compute_data_vector_6x2pt_masked_any_order(
   {
     spdlog::critical(
         "\x1b[90m{}\x1b[0m: {} not set prior to this function call",
-        "compute_data_vector_6x2pt_masked_any_order", 
+        "compute_data_vector_6x2pt_real_masked_any_order", 
         "mask"
       );
     exit(1);
@@ -2643,7 +2645,7 @@ vector compute_data_vector_6x2pt_masked_any_order(
   {
     spdlog::critical(
         "\x1b[90m{}\x1b[0m: {} not set prior to this function call",
-        "compute_data_vector_6x2pt_masked_any_order", 
+        "compute_data_vector_6x2pt_real_masked_any_order", 
         "like.lmin_kappacmb"
       );
     exit(1);
@@ -2653,7 +2655,7 @@ vector compute_data_vector_6x2pt_masked_any_order(
   {
     spdlog::critical(
         "\x1b[90m{}\x1b[0m: {} not set prior to this function call",
-        "compute_data_vector_6x2pt_masked_any_order", 
+        "compute_data_vector_6x2pt_real_masked_any_order", 
         "like.lmax_kappacmb"
       );
     exit(1);
@@ -2663,7 +2665,7 @@ vector compute_data_vector_6x2pt_masked_any_order(
   {
     spdlog::critical(
         "\x1b[90m{}\x1b[0m: {} not set prior to this function call",
-        "compute_data_vector_6x2pt_masked_any_order", 
+        "compute_data_vector_6x2pt_real_masked_any_order", 
         "cmb.fwhm"
       );
     exit(1);
@@ -2711,7 +2713,7 @@ vector compute_data_vector_6x2pt_masked_any_order(
   
   spdlog::debug(
       "\x1b[90m{}\x1b[0m: Ends", 
-      "compute_data_vector_6x2pt_masked_any_order"
+      "compute_data_vector_6x2pt_real_masked_any_order"
     );
 
   return data_vector;
@@ -2721,20 +2723,20 @@ vector compute_data_vector_6x2pt_masked_any_order(
 // ---------------------------------------------------------------------------
 // ---------------------------------------------------------------------------
 
-vector compute_data_vector_3x2pt_masked_any_order(
+vector compute_data_vector_3x2pt_real_masked_any_order(
     arma::Col<int>::fixed<3> order
   )
 { // order = (1,2,3) => Cosmic Shear, ggl, gg
   spdlog::debug(
       "\x1b[90m{}\x1b[0m: Begins", 
-      "compute_data_vector_3x2pt_masked_any_order"
+      "compute_data_vector_3x2pt_real_masked_any_order"
     );
 
   if (tomo.shear_Nbin == 0)
   {
     spdlog::critical(
         "\x1b[90m{}\x1b[0m: {} = 0 is invalid",
-        "compute_data_vector_3x2pt_masked_any_order", 
+        "compute_data_vector_3x2pt_real_masked_any_order", 
         "shear_Nbin"
       );
     exit(1);
@@ -2744,7 +2746,7 @@ vector compute_data_vector_3x2pt_masked_any_order(
   {
     spdlog::critical(
         "\x1b[90m{}\x1b[0m: {} = 0 is invalid",
-        "compute_data_vector_3x2pt_masked_any_order", 
+        "compute_data_vector_3x2pt_real_masked_any_order", 
         "Ntheta"
       );
     exit(1);
@@ -2754,7 +2756,7 @@ vector compute_data_vector_3x2pt_masked_any_order(
   {
     spdlog::critical(
         "\x1b[90m{}\x1b[0m: {} not set prior to this function call",
-        "compute_data_vector_3x2pt_masked_any_order", 
+        "compute_data_vector_3x2pt_real_masked_any_order", 
         "mask"
       );
     exit(1);
@@ -2795,7 +2797,7 @@ vector compute_data_vector_3x2pt_masked_any_order(
 
   spdlog::debug(
       "\x1b[90m{}\x1b[0m: Ends", 
-      "compute_data_vector_3x2pt_masked_any_order"
+      "compute_data_vector_3x2pt_real_masked_any_order"
     );
 
   return data_vector;
@@ -2805,7 +2807,7 @@ vector compute_data_vector_3x2pt_masked_any_order(
 // ---------------------------------------------------------------------------
 // ---------------------------------------------------------------------------
 
-arma::Col<double> compute_data_vector_3x2pt_masked_any_order(
+arma::Col<double> compute_data_vector_3x2pt_real_masked_any_order(
     arma::Col<double> Q,                // PC amplitudes
     arma::Col<int>::fixed<3> order
   )
@@ -2814,7 +2816,7 @@ arma::Col<double> compute_data_vector_3x2pt_masked_any_order(
   {
     spdlog::critical(
         "\x1b[90m{}\x1b[0m: {} not set prior to this function call",
-        "compute_data_vector_3x2pt_masked_any_order_with_baryon_pcs", 
+        "compute_data_vector_3x2pt_real_masked_any_order", 
         "baryon PCs"
       );
     exit(1);
@@ -2823,7 +2825,7 @@ arma::Col<double> compute_data_vector_3x2pt_masked_any_order(
   {
     spdlog::critical(
         "\x1b[90m{}\x1b[0m: {} invalid PC amplitude vector or PC eigenvectors",
-        "compute_data_vector_3x2pt_masked_any_order_with_baryon_pcs" 
+        "compute_data_vector_3x2pt_real_masked_any_order" 
       );
     exit(1);
   }
@@ -2834,7 +2836,7 @@ arma::Col<double> compute_data_vector_3x2pt_masked_any_order(
   {
     spdlog::critical(
         "\x1b[90m{}\x1b[0m: {} invalid datavector or PC eigenvectors",
-        "compute_data_vector_3x2pt_masked_any_order_with_baryon_pcs"
+        "compute_data_vector_3x2pt_real_masked_any_order"
       );
     exit(1);
   }

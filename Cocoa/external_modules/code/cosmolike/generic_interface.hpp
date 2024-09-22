@@ -602,15 +602,15 @@ arma::Mat<double> compute_baryon_pcas_6x2pt(
     arma::Col<int>::fixed<6> order
   );
 
-arma::Col<double> compute_data_vector_6x2pt_masked_any_order(
+arma::Col<double> compute_data_vector_6x2pt_real_masked_any_order(
     arma::Col<int>::fixed<6> order
   );
 
-arma::Col<double> compute_data_vector_3x2pt_masked_any_order(
+arma::Col<double> compute_data_vector_3x2pt_real_masked_any_order(
     arma::Col<int>::fixed<3> order
   );
 
-arma::Col<double> compute_data_vector_3x2pt_masked_any_order(
+arma::Col<double> compute_data_vector_3x2pt_real_masked_any_order(
     arma::Col<double> Q,                // PC amplitudes
     arma::Col<int>::fixed<3> order
   );

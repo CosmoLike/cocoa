@@ -83,30 +83,32 @@ done
 # ------------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------------
 
-rm -f "${PRJ:?}"/*.txt                  2>/dev/null
-rm -f "${PRJ:?}"/*.sbatch               2>/dev/null
-rm -f "${PRJ:?}"/*.ipynb                2>/dev/null
-rm -f "${PRJ:?}"/interface/*.so         2>/dev/null
-rm -f "${PRJ:?}"/interface/*.o          2>/dev/null
-rm -f "${PRJ:?}"/chains/*.txt           2>/dev/null
-rm -f "${PRJ:?}"/chains/*.1.txt         2>/dev/null
-rm -f "${PRJ:?}"/chains/*.2.txt         2>/dev/null
-rm -f "${PRJ:?}"/chains/*.3.txt         2>/dev/null
-rm -f "${PRJ:?}"/chains/*.4.txt         2>/dev/null
-rm -f "${PRJ:?}"/chains/*.5.txt         2>/dev/null
-rm -f "${PRJ:?}"/chains/*.6.txt         2>/dev/null
-rm -f "${PRJ:?}"/chains/*.7.txt         2>/dev/null
-rm -f "${PRJ:?}"/chains/*.8.txt         2>/dev/null
-rm -f "${PRJ:?}"/chains/*.progress      2>/dev/null
-rm -f "${PRJ:?}"/chains/*.covmat        2>/dev/null
-rm -f "${PRJ:?}"/chains/*.locked        2>/dev/null
-rm -f "${PRJ:?}"/chains/*.checkpoint    2>/dev/null
-rm -f "${PRJ:?}"/chains/*.py.           2>/dev/null
-rm -f "${PRJ:?}"/chains/*.yaml.         2>/dev/null
-rm -f "${PRJ:?}"/chains/*.input.yaml    2>/dev/null
-rm -f "${PRJ:?}"/chains/*.updated.yaml  2>/dev/null
-rm -f "${PRJ:?}"/chains/*.pyc           2>/dev/null
-rm -rf "${PRJ:?}"/.git/                 2>/dev/null
+rm -f "${PRJ:?}"/*.txt                   2>/dev/null
+rm -f "${PRJ:?}"/*.sbatch                2>/dev/null
+rm -f "${PRJ:?}"/*.ipynb                 2>/dev/null
+rm -f "${PRJ:?}"/interface/*.so          2>/dev/null
+rm -f "${PRJ:?}"/interface/*.o           2>/dev/null
+rm -f "${PRJ:?}"/chains/*.txt            2>/dev/null
+rm -f "${PRJ:?}"/chains/*.1.txt          2>/dev/null
+rm -f "${PRJ:?}"/chains/*.2.txt          2>/dev/null
+rm -f "${PRJ:?}"/chains/*.3.txt          2>/dev/null
+rm -f "${PRJ:?}"/chains/*.4.txt          2>/dev/null
+rm -f "${PRJ:?}"/chains/*.5.txt          2>/dev/null
+rm -f "${PRJ:?}"/chains/*.6.txt          2>/dev/null
+rm -f "${PRJ:?}"/chains/*.7.txt          2>/dev/null
+rm -f "${PRJ:?}"/chains/*.8.txt          2>/dev/null
+rm -f "${PRJ:?}"/chains/*.progress       2>/dev/null
+rm -f "${PRJ:?}"/chains/*.covmat         2>/dev/null
+rm -f "${PRJ:?}"/chains/*.locked         2>/dev/null
+rm -f "${PRJ:?}"/chains/*.checkpoint     2>/dev/null
+rm -f "${PRJ:?}"/chains/*.py.            2>/dev/null
+rm -f "${PRJ:?}"/chains/*.yaml.          2>/dev/null
+rm -f "${PRJ:?}"/chains/*.input.yaml     2>/dev/null
+rm -f "${PRJ:?}"/chains/*.updated.yaml   2>/dev/null
+rm -f "${PRJ:?}"/chains/*.pyc            2>/dev/null
+rm -rf "${PRJ:?}"/.git/                  2>/dev/null
+rm -rf "${PRJ:?}"/interface/__pycache__  2>/dev/null
+rm -rf "${PRJ:?}"/likelihood/__pycache__ 2>/dev/null
 rm -rf "${PRJ:?}"/scripts/random_scripts_used_by_dev 2>/dev/null
 
 # ------------------------------------------------------------------------------------
