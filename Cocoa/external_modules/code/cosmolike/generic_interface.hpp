@@ -479,6 +479,12 @@ void init_data_vector_size_3x2pt_real_space(
 void init_data_vector_size_6x2pt_real_space(
   );
 
+void init_data_vector_size_3x2pt_fourier_space(
+  );
+
+void init_data_vector_size_6x2pt_fourier_space(
+  );
+
 void init_distances(
     arma::Col<double> io_z, 
     arma::Col<double> io_chi
@@ -594,7 +600,7 @@ void set_nuisance_shear_photoz(
 // ---------------------------------------------------------------------------
 // ---------------------------------------------------------------------------
 
-arma::Mat<double> compute_baryon_pcas_3x2pt(
+arma::Mat<double> compute_baryon_pcas_3x2pt_real(
     arma::Col<int>::fixed<3> order
   );
 

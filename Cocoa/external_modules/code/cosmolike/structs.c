@@ -203,7 +203,7 @@ Ntab Ntable =
   .N_a = 350,                         // N_a        (modified by COCOA from 100)
   .N_k_lin = 500,                     // N_k_lin
   .N_k_nlin = 500,                    // N_k_nlin
-  .N_ell  = 325,                       // N_ell      (modified by COCOA from 200)
+  .N_ell  = 325,                      // N_ell      (modified by COCOA from 200)
   .Ntheta = 250,                      // N_theta    (modified by COCOA from 200)
   .N_thetaH = 2048,                   // N_theta for Hankel
   .N_M  = 1000,                       // N_M, M = mass (Halo Model)
@@ -264,8 +264,6 @@ void reset_like_struct()
   like.Ndata = 0;
   like.lmin = 0;
   like.lmax = 0;
-  like.vtmax = 0;
-  like.vtmin = 0;
   if((like.ell != NULL) == 1)
   {
     free(like.ell);

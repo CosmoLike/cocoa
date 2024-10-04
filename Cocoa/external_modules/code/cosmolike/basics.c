@@ -160,12 +160,12 @@ bin_avg set_bin_average(
     }
 
     const double logdt = 
-      (log(like.vtmax)-log(like.vtmin))/ (double) Ntable.Ntheta;
+      (log(Ntable.vtmax)-log(Ntable.vtmin))/ (double) Ntable.Ntheta;
     
     for(int i=0; i<Ntable.Ntheta ; i++)
     {
-      xmin[i] = cos(exp(log(like.vtmin) + (i + 0.0)*logdt));
-      xmax[i] = cos(exp(log(like.vtmin) + (i + 1.0)*logdt));
+      xmin[i] = cos(exp(log(Ntable.vtmin) + (i + 0.0)*logdt));
+      xmax[i] = cos(exp(log(Ntable.vtmin) + (i + 1.0)*logdt));
     }
 
     #pragma omp parallel for

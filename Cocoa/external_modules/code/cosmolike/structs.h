@@ -81,6 +81,8 @@ typedef struct
   int acc_boost_photoz_sampling;
   int photoz_interpolation_type;
   int high_def_integration;
+  double vtmax;
+  double vtmin;
 } Ntab;
 
 typedef struct 
@@ -273,8 +275,6 @@ typedef struct
   int Nbp; // number of band-power bins for CMB lensing
   double lmin;
   double lmax;
-  double vtmax;
-  double vtmin;
   double* ell;
   double* theta;
   double cosmax;
