@@ -62,15 +62,12 @@ and create symbolic links that will give better names for the GNU compilers
 Users can now proceed to **step :two:**. 
 
 > [!TIP]
-> *What if the user wants to install the Cocoa environment on a supercomputer?* 
-> Many HPC environments provide the [Anaconda installer](https://www.anaconda.com) as an external module. If this is the case, check the Appendix [FAQ: How do we use an available Anaconda module on HPC?](#overview_anaconda).
+> To install the Cocoa environment on a supercomputer, users may take advantage of the fact that many HPC environments provide the [Anaconda installer](https://www.anaconda.com) as an external module. If this is the case, check the Appendix [FAQ: How do we use an available Anaconda module on HPC?](#overview_anaconda).
 
 > [!TIP]
-> *What if the user does not have conda installed?*
 > If the user is not working on an HPC environment that offers Anaconda or [Miniconda](https://docs.anaconda.com/miniconda/), check the Appendix [FAQ: What if there is no Conda? Miniconda installation](#overview_miniconda).
 
 > [!TIP]
-> *What if the user wants to install Python 3.10?*
 > We provide the YML file `cocoapy310.yml` so users can work on Python 3.10. Users must also modify the following flag on `set_installation_options.sh` before proceeding further with the Cocoa installation.
 >
 >     [Adapted from Cocoa/set_installation_options.sh shell script] 
@@ -80,7 +77,6 @@ Users can now proceed to **step :two:**.
 >     export PYTHON_VERSION=3.9
 
 > [!NOTE]
-> *What is a core package?*
 > Core packages include compilers and numerical libraries (e.g., GSL and FFTW) that we need but will certainly never develop/modify. 
 
 **Step :two:**: Install `git-lfs` when loading the Conda cocoa environment for the first time.
@@ -102,9 +98,8 @@ and
 
 Users can now proceed to **step :two:**.
 
-> [!NOTE]
-> *What if the user wants to clone the repository in development mode?*
-> Type the following command to clone the repository from the latest main commit.
+> [!TIP]
+> If the user wants to clone the repository in development mode, type the following command to clone the repository from the latest main commit.
 >
 >     "${CONDA_PREFIX}"/bin/git clone git@github.com:CosmoLike/cocoa.git cocoa
 
@@ -124,9 +119,8 @@ Users can now proceed to **step :two:**.
     
 This script compiles external modules set on the `set_installation_options.sh` script (e.g., CAMB and Class). 
 
-> [!TIP]
-> *What if the user wants to fine-tune the installed external modules?*
-> Cocoa does not install many external modules by default, but users may find them helpful in a particular project. In this case, check the many available options on the `set_installation_options.sh` shell script. Then, rerun steps :two: and :three:. 
+> [!Tip]
+> Cocoa does not install many external modules by default, but users may find them helpful in a particular project. Check the many available options on the `set_installation_options.sh` shell script in this case. Then, rerun steps :two: and :three:. 
 
 ## Running Examples  <a name="cobaya_base_code_examples"></a>
 
@@ -144,7 +138,6 @@ We assume that you are still in the Conda cocoa environment from the previous `c
     export OMP_PROC_BIND=close; export OMP_NUM_THREADS=8
 
 > [!NOTE]
-> Why do we set the flag `OMP_PROC_BIND`?
 > The environmental variable `OMP_PROC_BIND`, when set to `close`, places the OpenMP cores as closely as possible (in the same chiplet). This setting is important as current architectures limit communications bandwidth between different chiplets (e.g., the cores inside an AMD 96 cores processor are scattered on a dozen chiplets).
 
 ### Examples not involving Cosmolike
@@ -172,8 +165,7 @@ MCMC:
     mpirun -n 4 --oversubscribe --mca btl vader,tcp,self --bind-to core:overload-allowed --rank-by core --map-by numa:pe=${OMP_NUM_THREADS} cobaya-run ./projects/lsst_y1/EXAMPLE_MCMC1.yaml -f
 
 > [!TIP]
-> *What if the user wants to download a project not provided by default or intends to clone existing projects in development mode?*
-> Check the Appendix [FAQ: How do we download and run Cosmolike projects?](running_cosmolike_projects).
+> If the user wants to download a project not provided by default or intends to clone existing projects in development mode, check the Appendix [FAQ: How do we download and run Cosmolike projects?](running_cosmolike_projects).
 
 ## Appendix <a name="appendix"></a>
 
@@ -207,38 +199,48 @@ Following best practices, Cocoa scripts download most external modules from thei
 
 ### Additional Installation Notes <a name="additional_notes"></a>
 
-:books::books: *Installation of core packages via Conda* :books::books:
+- *Installation of core packages via Conda* 
  
-- For those working on projects that utilize machine-learning-based emulators, the Appendix [Setting-up conda environment for Machine Learning emulators](#ml_emulators) provides additional commands for installing the necessary packages.
+> [!TIP]
+> For those working on projects that utilize machine-learning-based emulators, the Appendix [Setting-up conda environment for Machine Learning emulators](#ml_emulators) provides additional commands for installing the necessary packages.
 
-- We provide a docker image named *whovian-cocoa* that facilitates cocoa installation on Windows and MacOS. For further instructions, refer to the Appendix [FAQ: How do you run cocoa on your laptop? The docker container is named *whovian-cocoa*](#appendix_jupyter_whovian).
+> [!TIP]
+> We provide a docker image named *whovian-cocoa* that facilitates cocoa installation on Windows and MacOS. For further instructions, refer to the Appendix [FAQ: How do you run cocoa on your laptop? The docker container is named *whovian-cocoa*](#appendix_jupyter_whovian).
 
-The conda installation method should be chosen in the overwhelming majority of cases. In the rare instances in which the user cannot work with Conda, refer to the Appendix [Installation of Cocoa's core packages without Conda](#required_packages_cache), as it contains instructions for a much slower (and prone to errors) but conda-independent installation method.
+> [!NOTE]
+> The conda installation method should be chosen in most cases. In the rare instances in which the user cannot work with Conda, refer to the Appendix [Installation of Cocoa's core packages without Conda](#required_packages_cache), as it contains instructions for a much slower (and prone to errors) but conda-independent installation method.
 
-:books::books: *Installation and Compilation of external modules* :books::books:
+- *Installation and Compilation of external modules* 
 
-- If the user wants to compile only a subset of these packages, refer to the appendix [Compiling Boltzmann, CosmoLike, and Likelihood codes separately](#appendix_compile_separately).
+> [!TIP]
+> If the user wants to compile only a subset of these packages, refer to the appendix [Compiling Boltzmann, CosmoLike, and Likelihood codes separately](#appendix_compile_separately).
           
-- Our scripts never install packages on `$HOME/.local` as that would make them global to the user. All requirements for Cocoa are installed at
+> [!NOTE]
+>  Our scripts never install packages on `$HOME/.local` as that would make them global to the user. All requirements for Cocoa are installed at
+>
+>      Cocoa/.local/bin
+>      Cocoa/.local/include
+>      Cocoa/.local/lib
+>      Cocoa/.local/share
+>
+> This behavior enables users to work on multiple instances of Cocoa simultaneously, similar to what was possible with [CosmoMC](https://github.com/cmbant/CosmoMC).
 
-      Cocoa/.local/bin
-      Cocoa/.local/include
-      Cocoa/.local/lib
-      Cocoa/.local/share
+- *Running Examples*
 
-This behavior enables users to work on multiple instances of Cocoa simultaneously, similar to what was possible with [CosmoMC](https://github.com/cmbant/CosmoMC).
+> [!TIP]
+> We offer the flag `COCOA_RUN_EVALUATE` as an alias (syntax-sugar) for `mpirun -n 1 --oversubscribe --mca btl vader,tcp,self --bind-to core:overload-allowed --rank-by core --map-by numa:pe=4 cobaya-run`.
 
-:books::books: *Running Examples* :books::books:
+> [!TIP]
+> We offer the flag `COCOA_RUN_MCMC` as an alias (syntax-sugar) for `mpirun -n 4 --oversubscribe --mca btl vader,tcp,self --bind-to core:overload-allowed --rank-by core --map-by numa:pe=4 cobaya-run`. 
 
-- We offer the flag `COCOA_RUN_EVALUATE` as an alias (syntax-sugar) for `mpirun -n 1 --oversubscribe --mca btl vader,tcp,self --bind-to core:overload-allowed --rank-by core --map-by numa:pe=4 cobaya-run`.
+> [!NOTE]
+> Additional explanations about our `mpirun` flags: Why the `--mca btl vader,tcp,self` flag? Conda-forge developers don't [compile OpenMPI with Infiniband compatibility](https://github.com/conda-forge/openmpi-feedstock/issues/38).
 
-- We offer the flag `COCOA_RUN_MCMC` as an alias (syntax-sugar) for `mpirun -n 4 --oversubscribe --mca btl vader,tcp,self --bind-to core:overload-allowed --rank-by core --map-by numa:pe=4 cobaya-run`. 
+> [!NOTE]
+> Additional explanations about our `mpirun` flags: Why the `--bind-to core:overload-allowed --map-by numa:pe=${OMP_NUM_THREADS}` flag? This flag enables efficient hybrid MPI + OpenMP runs on NUMA architecture.
 
-- Additional explanations about our `mpirun` flags: Why the `--mca btl vader,tcp,self` flag? Conda-forge developers don't [compile OpenMPI with Infiniband compatibility](https://github.com/conda-forge/openmpi-feedstock/issues/38).
-
-- Additional explanations about our `mpirun` flags: Why the `--bind-to core:overload-allowed --map-by numa:pe=${OMP_NUM_THREADS}` flag? This flag enables efficient hybrid MPI + OpenMP runs on NUMA architecture.
-
-- Additional explanations about the functioning `start_cocoa.sh`/`stop_cocoa.sh` scripts: why two separate shell environments, `(cocoa)` and `(.local)`? Users should be able to manipulate multiple Cocoa instances seamlessly, which is particularly useful when running chains in one instance while experimenting with code development in another. Consistency of the environment across all Cocoa instances is crucial, and the `start_cocoa.sh`/`stop_cocoa.sh` scripts handle the loading and unloading of environmental path variables.
+> [!NOTE]
+> Additional explanations about the functioning `start_cocoa.sh`/`stop_cocoa.sh` scripts: why two separate shell environments, `(cocoa)` and `(.local)`? Users should be able to manipulate multiple Cocoa instances seamlessly, which is particularly useful when running chains in one instance while experimenting with code development in another. Consistency of the environment across all Cocoa instances is crucial, and the `start_cocoa.sh`/`stop_cocoa.sh` scripts handle the loading and unloading of environmental path variables.
 
 ### :interrobang: FAQ: What if installation or compilation goes wrong? <a name="running_wrong"></a>
 
@@ -376,7 +378,11 @@ We provide the docker image [whovian-cocoa](https://hub.docker.com/r/vivianmiran
      mkdir -p cocoa_docker
      cd ./cocoa_docker
 
- **Be careful:** Do not run the Docker container on a general folder (like the host's home directory); this would provide too much access to the Docker container. Accidents happen, especially when dealing with dangerous bash commands such as `rm` (deletion).
+> [!NOTE]
+> The flag `-v $(pwd):/home/whovian/host/` in the `docker run` command ensures that files on the host computer have been mounted to the directory `/home/whovian/host/`. Files within the folder where the Docker  container was initialized are accessible at `/home/Whovian/host/`. Users should work inside this directory to avoid losing work if the docker image needs to be deleted.
+
+> [!WARNING]
+>  Do not run the Docker container on a general folder (like the host's home directory); this would provide too much access to the Docker container. Accidents happen, especially when dealing with dangerous bash commands such as `rm` (deletion).
 
  **Step :two:**: Download the docker image *whovian-cocoa*, name the associated container `cocoa2023`, and run the container for the first time, type:
 
@@ -397,43 +403,44 @@ Following the command above, users should see the following text on the screen t
  
     cd ~/host/
 
-Now proceed with the standard cocoa installation on section [Installation and Compilation of external modules](#cobaya_base_code)
+Now proceed with the standard cocoa installation in section [Installation and Compilation of external modules](#cobaya_base_code)
  
 Once installation is complete, the user must learn how to **start**, use, and **exit** the container. Below, we answer a few common questions about using/managing Docker containers.  
 
-- :interrobang: FAQ: How do users restart the container when they exit?
+> [!TIP]
+> Assuming the user maintained the container name `cocoa2023` via the flag `--name cocoa2023` on the `docker run` command, type:
+>    
+>      docker start -ai cocoa2023
+>
+>  to restart the container after the first exit.
 
-Assuming the user maintained the container name `cocoa2023` via the flag `--name cocoa2023` on the `docker run` command, type:
-    
-    docker start -ai cocoa2023
-
-- :interrobang: FAQ: How do I run Jupyter Notebooks remotely when using Cocoa within the *whovian-cocoa* container?
-
-First, type the following command:
-
-    jupyter notebook --no-browser --port=8888
-
-The terminal will show a message similar to the following template:
-
-    [... NotebookApp] Writing notebook server cookie secret to /home/whovian/.local/share/jupyter/runtime/notebook_cookie_secret
-    [... NotebookApp] WARNING: The notebook server is listening on all IP addresses and not using encryption. This is not recommended.
-    [... NotebookApp] Serving notebooks from local directory: /home/whovian/host
-    [... NotebookApp] Jupyter Notebook 6.1.1 is running at:
-    [... NotebookApp] http://f0a13949f6b5:8888/?token=XXX
-    [... NotebookApp] or http://127.0.0.1:8888/?token=XXX
-    [... NotebookApp] Use Control-C to stop this server and shut down all kernels (twice to skip confirmation).
-
-- :interrobang: **FAQ: How do we manipulate files on the host computer from within the Docker container?**
-
-    The flag `-v $(pwd):/home/whovian/host/` in the `docker run` command ensures that files on the host computer have been mounted to the directory `/home/whovian/host/`. Files within the folder where the Docker container was initialized are accessible at `/home/Whovian/host/`. Users should work inside this directory to avoid losing work in case the docker image needs to be deleted. **Be careful:** Do not run the Docker container on a general folder (like the home directory); this would provide too much access to the Docker via `/home/whovian/host/`. Accidents happen, especially when dealing with dangerous bash commands such as `rm` (deletion).
-
-- :interrobang: **FAQ: How do we run the docker container on a remote server?**
-
-    Below, we assume the user runs the container in a server with the URL `your_sever.com`. We also presume the server can be accessed via SSH protocol. On your local PC/laptop, type:
-
-      ssh your_username@your_sever.com -L 8080:localhost:8080
-
-    This will bind the port `8080` on the server to the local. Then, go to a browser and type `http://localhost:8080/?token=XXX`, where `XXX` is the previously saved token displayed in the line `[... NotebookApp] or http://127.0.0.1:8888/?token=XXX`.  
+> [!TIP]
+> To run Jupyter Notebooks within the *whovian-cocoa* docker container installed on a local machine, type the following command:
+>
+>      jupyter notebook --no-browser --port=8888
+>
+> The terminal will show a message similar to the following template:
+>
+>      [... NotebookApp] Writing notebook server cookie secret to /home/whovian/.local/share/jupyter/runtime/notebook_cookie_secret
+>      [... NotebookApp] WARNING: The notebook server is listening on all IP addresses and not using encryption. This is not recommended.
+>      [... NotebookApp] Serving notebooks from local directory: /home/whovian/host
+>      [... NotebookApp] Jupyter Notebook 6.1.1 is running at:
+>      [... NotebookApp] http://f0a13949f6b5:8888/?token=XXX
+>      [... NotebookApp] or http://127.0.0.1:8888/?token=XXX
+>      [... NotebookApp] Use Control-C to stop this server and shut down all kernels (twice to skip confirmation).
+>
+> Now go to the local internet browser and type `http://127.0.0.1:8888/?token=XXX`, where XXX is the previously saved token displayed on the line
+> 
+>     [... NotebookApp] or http://127.0.0.1:8888/?token=XXX  
+      
+> [!TIP]
+> To run the Jupyter Notebook on the *whovian-cocoa* docker container installed in a remote server, adjust the command below
+>
+>     ssh your_username@your_sever.com -L 8888:localhost:8888
+>
+> before typing `http://127.0.0.1:8888/?token=XXX` on the local desktop/laptop. This will bind the server port `8888` to the local port `8888`.
+> 
+>     [... NotebookApp] or http://127.0.0.1:8888/?token=XXX  
 
 ### :interrobang: FAQ: How do we use an available Anaconda module on HPC? <a name="overview_anaconda"></a>
 
@@ -875,12 +882,18 @@ This step may create conflicts that must be addressed before step four.
 
     # Developers must input the command below on the xyzdev branch.
     "${CONDA_PREFIX}"/bin/git switch main
-    
+
+and
+
     # Developers must input the command below on the main branch.
     "${CONDA_PREFIX}"/bin/git merge --squash xyzdev
 
+and
+
     # Developers must input the command below on the main branch.
     "${CONDA_PREFIX}"/bin/git commit -m "squash merge - xyzdev branch: added development on abc features"
+
+and
 
     # Developers must input the command below on the main branch.
     "${CONDA_PREFIX}"/bin/git push origin main
