@@ -519,7 +519,7 @@ to make sure it resembles the one below.
 
 ### :interrobang: FAQ: What if there is no Conda? Miniconda installation <a name="overview_miniconda"></a>
 
-Download and run the Miniconda installation script. 
+**Step :one:**: Download and run the Miniconda installation script. 
 
     export CONDA_DIR="/gpfs/home/XXX/miniconda"
     
@@ -531,7 +531,7 @@ Download and run the Miniconda installation script.
 
 Please don't forget to adapt the path assigned to `CONDA_DIR` in the command above:
 
-After installation, users must source the conda configuration file, as shown below:
+**Step :two:**: After installation, users must source the conda configuration file, as shown below:
 
     source $CONDA_DIR/etc/profile.d/conda.sh \
           && conda config --set auto_update_conda false \
@@ -540,6 +540,12 @@ After installation, users must source the conda configuration file, as shown bel
           && conda config --prepend channels conda-forge \
           && conda config --set channel_priority strict \
           && conda init bash
+
+**Step :three:**: After running this command, you will see a message in the terminal that ends with the statement *For changes to take effect, close and re-open your current shell*. Then, type
+
+    source ~/.bashrc
+
+After that, the `conda` command will be available.
 
 ### :interrobang: FAQ: How do we set the Slow/Fast decomposition on MCMC chains with Cosmolike? Manual Blocking <a name="manual_blocking_cosmolike"></a>
 
