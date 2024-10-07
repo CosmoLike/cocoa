@@ -4,7 +4,9 @@
 extern "C" {
 #endif
 
-void init_baryons(const char* scenario);
+void init_baryons(const char* sim);
+
+void init_baryons_from_hdf5_file(const char* sim, int tag, const char* allsims);
 
 #ifdef __cplusplus
 }

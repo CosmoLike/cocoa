@@ -207,9 +207,16 @@ export MGCAMB_URL="https://github.com/sfu-cosmo/MGCobaya.git"
 export MGCAMB_GIT_COMMIT="443c4a733db687ac18e918b8ed09b45003a8c4ca"
 export MGCAMB_NAME='MGCAMB'
 
-export LSSTY1_URL="https://github.com/CosmoLike/cocoa_lsst_y1.git"
-export LSSTY1_NAME="lsst_y1"
-export LSSTY1_COMMIT="v4.0-beta5"
+# --------------------------------------------------------------------
+# --------------------------------------------------------------------
+# Cosmolike projects below
+# --------------------------------------------------------------------
+# --------------------------------------------------------------------
+export LSST_Y1_URL="https://github.com/CosmoLike/cocoa_lsst_y1.git"
+export LSST_Y1_NAME="lsst_y1"
+#export LSST_Y1_BRANCH="dev"
+#export LSST_Y1_COMMIT="6450df3392ae5645a68fcaa83a9374fb322189cf"
+export LSST_Y1_TAG="v4.0-beta13"
 
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------

@@ -539,7 +539,7 @@ if [ -z "${IGNORE_CPP_SPDLOG_INSTALLATION}" ]; then
 
   ptop "GETTING SPDLOG LIBRARY (CORE LIBS)" || return 1;
 
-  PACKAGE_VERSION="${SPDLOG_VERSION:-"1.13.0"}" 
+  PACKAGE_VERSION="${SPDLOG_VERSION:-"1.14.1"}" 
 
   URL='https://github.com/gabime/spdlog.git'
 

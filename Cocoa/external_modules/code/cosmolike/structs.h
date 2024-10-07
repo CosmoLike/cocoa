@@ -63,7 +63,7 @@ typedef struct
   int N_k_lin;
   int N_k_nlin;
   int N_ell;
-  int N_theta;
+  int Ntheta;
   int N_thetaH;
   int N_M;
   int N_ell_TATT;                  // Cosmo2D
@@ -80,6 +80,9 @@ typedef struct
   int halo_uks_nx;                 // halo.c u_KS(double c, double k, double rv)
   int acc_boost_photoz_sampling;
   int photoz_interpolation_type;
+  int high_def_integration;
+  double vtmax;
+  double vtmin;
 } Ntab;
 
 typedef struct 
@@ -267,14 +270,11 @@ typedef struct
   int is_cmb_kkkk_cov_from_sim;// if kkkk covmat is from sim, apply Hartlap factor
   double alpha_Hartlap_kkkk;
   int Ncl;
-  int Ntheta;
   int Ncos;
   int Ndata;
   int Nbp; // number of band-power bins for CMB lensing
   double lmin;
   double lmax;
-  double vtmax;
-  double vtmin;
   double* ell;
   double* theta;
   double cosmax;
@@ -410,13 +410,13 @@ extern pre precision;
 
 extern TinkerEmuParameters tinkerEmuParam;
 
-//  ----------------------------------------------------------------------------------
-//  ----------------------------------------------------------------------------------
-//  ----------------------------------------------------------------------------------
+// --------------------------------------------------------------------
+// --------------------------------------------------------------------
+// --------------------------------------------------------------------
 //  RESET STRUCTS 
-//  ----------------------------------------------------------------------------------
-//  ----------------------------------------------------------------------------------
-//  ----------------------------------------------------------------------------------
+// --------------------------------------------------------------------
+// --------------------------------------------------------------------
+// --------------------------------------------------------------------
 
 void reset_bary_struct();
 
@@ -435,6 +435,8 @@ void update_galpara(galpara* G);
 void update_nuisance(nuisancepara* N);
 
 void update_ynuisance(ynuisancepara* N);
+
+void update_table(Ntab* N);
 
 #ifdef __cplusplus
 }

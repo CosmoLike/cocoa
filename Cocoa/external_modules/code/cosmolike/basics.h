@@ -15,7 +15,10 @@ double fmin(const double a, const double b);
 
 double fmax(const double a, const double b);
 
-bin_avg set_bin_average(int i_theta, int j_L);
+bin_avg set_bin_average(
+    const int i_theta, 
+    const int j_L
+  );
 
 double int_gsl_integrate_high_precision(double (*func)(double, void *),
   void *arg, double a, double b, double *error, int niter);

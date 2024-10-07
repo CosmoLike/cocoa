@@ -52,6 +52,8 @@ int recompute_cg(cosmopara C, galpara G, nuisancepara N);
 
 int recompute_cs(cosmopara C, galpara G, nuisancepara N);
 
+int recompute_table(Ntab N);
+
 #ifdef __cplusplus
 }
 #endif

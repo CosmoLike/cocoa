@@ -93,7 +93,7 @@ double sigma2_nointerp(const double M, const int init_static_vars_only)
   const double xmax = 14.1;
 
   return (init_static_vars_only == 1) ? int_for_sigma2((xmin+xmax)/2.0, (void*) ar) :
-    like.high_def_integration > 0 ?
+    Ntable.high_def_integration > 0 ?
     int_gsl_integrate_high_precision(int_for_sigma2, (void*) ar, xmin, xmax, 
       NULL, GSL_WORKSPACE_SIZE) :
     int_gsl_integrate_medium_precision(int_for_sigma2, (void*) ar, xmin, xmax, 
@@ -294,7 +294,7 @@ double mass_norm_nointerp(const double a, const int init_static_vars_only)
   const double xmax = 10.0;
 
   return (init_static_vars_only == 1) ? int_for_mass_norm((xmin+xmax)/2.0, (void*) ar) :
-    like.high_def_integration > 0 ?
+    Ntable.high_def_integration > 0 ?
     int_gsl_integrate_high_precision(int_for_mass_norm, (void*) ar, xmin, xmax, 
       NULL, GSL_WORKSPACE_SIZE) :
     int_gsl_integrate_medium_precision(int_for_mass_norm, (void*) ar, xmin, xmax, 
@@ -382,7 +382,7 @@ double bias_norm_nointerp(const double a, const int init_static_vars_only)
   const double numax = nu(limits.M_max, a);
 
   return (init_static_vars_only == 1) ? int_for_bias_norm((numin+numax)/2.0, (void*) ar) :
-    like.high_def_integration > 0 ?
+    Ntable.high_def_integration > 0 ?
     int_gsl_integrate_high_precision(int_for_bias_norm, (void*) ar, numin, numax, 
       NULL, GSL_WORKSPACE_SIZE) :
     int_gsl_integrate_medium_precision(int_for_bias_norm, (void*) ar, numin, numax, 
@@ -526,7 +526,7 @@ double I02_nointerp(const double k1, const double k2, const double a, const int 
   const double lnMmax = log(limits.M_max);
 
   return init_static_vars_only == 1 ? int_for_I02(lnMmin, (void*) ar) :
-    like.high_def_integration > 0 ?
+    Ntable.high_def_integration > 0 ?
     int_gsl_integrate_high_precision(int_for_I02, (void*) ar, lnMmin, lnMmax, 
       NULL, GSL_WORKSPACE_SIZE) :
     int_gsl_integrate_medium_precision(int_for_I02, (void*) ar, lnMmin, lnMmax, 
@@ -555,7 +555,7 @@ double I11_nointerp(const double k, const double a, const int init_static_vars_o
   const double lnMmax = log(limits.M_max);
   
   return init_static_vars_only == 1 ? int_for_I11(lnMmin, (void*) ar) :
-    like.high_def_integration > 0 ?
+    Ntable.high_def_integration > 0 ?
     int_gsl_integrate_high_precision(int_for_I11, (void*) ar, lnMmin, lnMmax, 
       NULL, GSL_WORKSPACE_SIZE) :
     int_gsl_integrate_medium_precision(int_for_I11, (void*) ar, lnMmin, lnMmax, 
@@ -826,7 +826,7 @@ double F_KS_nointerp(double c, double krs, const int init_static_vars_only)
   const double xmin = 0.0;
   const double xmax = c;
   return (init_static_vars_only == 1) ? int_F_KS((xmin + xmax)/2.0, (void*) ar) :
-    like.high_def_integration > 0 ?
+    Ntable.high_def_integration > 0 ?
     int_gsl_integrate_high_precision(int_F_KS, (void*) ar, xmin, xmax, NULL, GSL_WORKSPACE_SIZE) :
     int_gsl_integrate_medium_precision(int_F_KS, (void*) ar, xmin, xmax, NULL, GSL_WORKSPACE_SIZE);
 }
@@ -842,7 +842,7 @@ double F0_KS_nointerp(double c, const int init_static_vars_only)
   const double xmin = 0.0;
   const double xmax = c;
   return (init_static_vars_only == 1) ? int_F0_KS((xmin + xmax)/2.0, (void*) ar) :
-    like.high_def_integration > 0 ?
+    Ntable.high_def_integration > 0 ?
     int_gsl_integrate_high_precision(int_F0_KS, (void*) ar, xmin, xmax, NULL, GSL_WORKSPACE_SIZE):
     int_gsl_integrate_medium_precision(int_F0_KS, (void*) ar, xmin, xmax, NULL, GSL_WORKSPACE_SIZE);
 }
@@ -988,7 +988,7 @@ double I11_y_nointerp(const double k, const double a, const int init_static_vars
   const double lnMmax = log(limits.M_max);
   
   return init_static_vars_only == 1 ? int_for_I11_y(lnMmin, (void*) ar): 
-    like.high_def_integration > 0 ?
+    Ntable.high_def_integration > 0 ?
     int_gsl_integrate_high_precision(int_for_I11_y, (void*) ar, lnMmin, lnMmax, 
       NULL, GSL_WORKSPACE_SIZE) :
     int_gsl_integrate_medium_precision(int_for_I11_y, (void*) ar, lnMmin, lnMmax, 
@@ -1020,7 +1020,7 @@ const int init_static_vars_only)
   const double lnMmax = log(limits.M_max);
 
   return init_static_vars_only == 1 ? int_for_I02_yy(lnMmin, (void*) ar) :
-    like.high_def_integration > 0 ?
+    Ntable.high_def_integration > 0 ?
     int_gsl_integrate_high_precision(int_for_I02_yy, (void*) ar, lnMmin, lnMmax, 
       NULL, GSL_WORKSPACE_SIZE) :
     int_gsl_integrate_medium_precision(int_for_I02_yy, (void*) ar, lnMmin, lnMmax, 
@@ -1141,7 +1141,7 @@ const int init_static_vars_only)
   const double lnMmax = log(limits.M_max);
 
   return init_static_vars_only == 1 ? int_for_I02_my(lnMmin, (void*) ar) :
-    like.high_def_integration > 0 ?
+    Ntable.high_def_integration > 0 ?
     int_gsl_integrate_high_precision(int_for_I02_my, (void*) ar, lnMmin, lnMmax, 
       NULL, GSL_WORKSPACE_SIZE) :
     int_gsl_integrate_medium_precision(int_for_I02_my, (void*) ar, lnMmin, lnMmax, 
@@ -1372,7 +1372,7 @@ double ngal_nointerp(const int ni, const double a, const int init_static_vars_on
   const double lnMmax = log(limits.M_max);
 
   return (init_static_vars_only == 1) ? int_ngal((lnMmin+lnMmax)/2.0, (void*) ar):
-    like.high_def_integration > 0 ?
+    Ntable.high_def_integration > 0 ?
     int_gsl_integrate_high_precision(int_ngal, (void*) ar, lnMmin, lnMmax, 
       NULL, GSL_WORKSPACE_SIZE) :
     int_gsl_integrate_medium_precision(int_ngal, (void*) ar, lnMmin, lnMmax, 
@@ -1466,7 +1466,7 @@ double m_mean_nointerp(const int ni, const double a, const int init_static_vars_
   const double ngalaxies = ngal(ni, a);
 
   return (init_static_vars_only == 1) ? int_m_mean((lnMmin+lnMmax)/2.0, (void*) ar):
-    like.high_def_integration > 0 ?
+    Ntable.high_def_integration > 0 ?
     int_gsl_integrate_high_precision(int_m_mean, (void*) ar, lnMmin, lnMmax, 
       NULL, GSL_WORKSPACE_SIZE)/ngalaxies :
     int_gsl_integrate_medium_precision(int_m_mean, (void*) ar, lnMmin, lnMmax, 
@@ -1512,7 +1512,7 @@ double bgal_nointerp(const int ni, const double a, const int init_static_vars_on
   const double lnMmax = log(limits.M_max);
 
   return (init_static_vars_only == 1) ? int_bgal((lnMmin+lnMmax)/2.0, (void*) ar):
-    like.high_def_integration > 0 ?
+    Ntable.high_def_integration > 0 ?
     int_gsl_integrate_high_precision(int_bgal, (void*) ar, lnMmin, lnMmax, 
       NULL, GSL_WORKSPACE_SIZE) :
     int_gsl_integrate_medium_precision(int_bgal, (void*) ar, lnMmin, lnMmax, 
@@ -1606,7 +1606,7 @@ double fsat_nointerp(int ni, double a, const int init_static_vars_only)
   const double ngalaxies = ngal(ni, a);
 
   return (init_static_vars_only == 1) ? int_fsat((lnMmin+lnMmax)/2.0, (void*) ar):
-    like.high_def_integration > 0 ?
+    Ntable.high_def_integration > 0 ?
     int_gsl_integrate_high_precision(int_fsat, (void*) ar, lnMmin, lnMmax,
       NULL, GSL_WORKSPACE_SIZE)/ngalaxies :
     int_gsl_integrate_medium_precision(int_fsat, (void*) ar, lnMmin, lnMmax,
@@ -1650,7 +1650,7 @@ double G02_nointerp(double k, double a, int ni, const int init_static_vars_only)
   const double max = log(limits.M_max);
   
   return (init_static_vars_only == 1) ? int_for_G02((min+max)/2.0, (void*) ar) :
-    like.high_def_integration > 0 ? 
+    Ntable.high_def_integration > 0 ? 
     int_gsl_integrate_high_precision(int_for_G02, (void*) ar, min, max, NULL, GSL_WORKSPACE_SIZE) :
     int_gsl_integrate_medium_precision(int_for_G02, (void*) ar, min, max, NULL, GSL_WORKSPACE_SIZE);
 }
@@ -1696,7 +1696,7 @@ double GM02_nointerp(double k, double a, int ni, const int init_static_vars_only
   const double max = log(limits.M_max);
 
   return (init_static_vars_only == 1) ? int_GM02((min+max)/2.0, (void*) ar) :
-    like.high_def_integration > 0 ? 
+    Ntable.high_def_integration > 0 ? 
     int_gsl_integrate_high_precision(int_GM02, (void*) ar, min, max, NULL, GSL_WORKSPACE_SIZE) :
     int_gsl_integrate_medium_precision(int_GM02, (void*) ar, min, max, NULL, GSL_WORKSPACE_SIZE);
 }
@@ -1743,7 +1743,7 @@ double G11_nointerp(double k, double a, int ni, const int init_static_vars_only)
   const double max = log(limits.M_max);
   
   return (init_static_vars_only == 1) ? int_G11((min+max)/2.0, (void*) ar) :
-    like.high_def_integration > 0 ?
+    Ntable.high_def_integration > 0 ?
     int_gsl_integrate_high_precision(int_G11, (void*) ar, min, max, NULL, GSL_WORKSPACE_SIZE) : 
     int_gsl_integrate_medium_precision(int_G11, (void*) ar, min, max, NULL, GSL_WORKSPACE_SIZE);
 }

@@ -4,18 +4,39 @@ dependencies:
   - _libgcc_mutex=0.1
   - _openmp_mutex=4.5
   - _sysroot_linux-64_curr_repodata_hack=3
+  - anyio=3.7.1
+  - argon2-cffi=23.1.0
+  - argon2-cffi-bindings=21.2.0
   - arpack=3.7.0
+  - arrow=1.3.0
+  - asttokens=2.4.1
+  - async-lru=2.0.4
+  - attrs=24.2.0
+  - backcall=0.2.0
+  - beautifulsoup4=4.12.3
   - binutils_impl_linux-64=2.40
   - binutils_linux-64=2.40
+  - bleach=6.1.0
   - boost-cpp=1.81.0
+  - brotli-python=1.1.0
   - bzip2=1.0.8
   - c-ares=1.28.1
-  - ca-certificates=2024.6.2
+  - ca-certificates=2024.7.4
+  - cached-property=1.5.2
+  - cached_property=1.5.2
+  - cffi=1.17.0
   - cfitsio=4.0.0
   - cmake=3.26.4
   - curl=8.7.1
+  - debugpy=1.8.5
+  - decorator=5.1.1
+  - defusedxml=0.7.1
+  - entrypoints=0.4
+  - exceptiongroup=1.2.2
+  - executing=2.0.1
   - expat=2.5.0
   - fftw=3.3.10
+  - fqdn=1.5.1
   - gcc_impl_linux-64=13.2.0
   - gcc_linux-64=13.2.0
   - gettext=0.22.5
@@ -27,8 +48,34 @@ dependencies:
   - gsl=2.7
   - gxx_impl_linux-64=13.2.0
   - gxx_linux-64=13.2.0
+  - h11=0.14.0
+  - h2=4.1.0
   - hdf5=1.14.0
+  - hpack=4.0.0
+  - httpcore=1.0.5
+  - httpx=0.27.0
+  - hyperframe=6.0.1
   - icu=72.1
+  - importlib_metadata=8.2.0
+  - importlib_resources=6.4.2
+  - ipykernel=6.14.0
+  - ipython=8.4.0
+  - isoduration=20.11.0
+  - jedi=0.19.1
+  - json5=0.9.25
+  - jsonpointer=3.0.0
+  - jsonschema=4.23.0
+  - jsonschema-specifications=2023.12.1
+  - jsonschema-with-format-nongpl=4.23.0
+  - jupyter-lsp=2.2.5
+  - jupyter_client=8.6.2
+  - jupyter_core=5.7.2
+  - jupyter_events=0.10.0
+  - jupyter_server=2.7.0
+  - jupyter_server_terminals=0.5.3
+  - jupyterlab=4.1.8
+  - jupyterlab_pygments=0.3.0
+  - jupyterlab_server=2.27.3
   - kernel-headers_linux-64=3.10.0
   - keyutils=1.6.1
   - krb5=1.21.2
@@ -59,6 +106,7 @@ dependencies:
   - libnsl=2.0.1
   - libopenblas=0.3.23
   - libsanitizer=13.2.0
+  - libsodium=1.0.18
   - libsqlite=3.45.3
   - libssh2=1.11.0
   - libstdcxx-devel_linux-64=13.2.0
@@ -68,130 +116,175 @@ dependencies:
   - libuv=1.48.0
   - libxcrypt=4.4.36
   - libzlib=1.2.13
+  - matplotlib-inline=0.1.7
+  - mistune=3.0.2
   - mpi=1.0
+  - nbclient=0.10.0
+  - nbconvert-core=7.16.4
+  - nbformat=5.10.4
   - ncurses=6.4.20240210
+  - nest-asyncio=1.6.0
+  - notebook-shim=0.2.4
   - openblas=0.3.23
   - openmpi=4.1.5
   - openssl=3.3.1
+  - overrides=7.7.0
+  - pandocfilters=1.5.0
+  - parso=0.8.4
   - pcre2=10.40
   - perl=5.32.1
+  - pexpect=4.9.0
+  - pickleshare=0.7.5
   - pip=24.0
+  - pkgutil-resolve-name=1.3.10
+  - prometheus_client=0.20.0
+  - prompt-toolkit=3.0.47
+  - psutil=6.0.0
+  - ptyprocess=0.7.0
+  - pure_eval=0.2.3
+  - pycparser=2.22
+  - pysocks=1.7.1
   - python=3.10.14
+  - python-fastjsonschema=2.20.0
+  - python-json-logger=2.0.7
+  - python_abi=3.10
+  - pyzmq=26.1.0
   - readline=8.2
+  - referencing=0.35.1
+  - rfc3339-validator=0.1.4
+  - rfc3986-validator=0.1.1
   - rhash=1.4.3
-  - wget=1.21.4
+  - rpds-py=0.20.0
+  - send2trash=1.8.0
+  - six=1.16.0
+  - sniffio=1.3.1
+  - soupsieve=2.5
+  - stack_data=0.6.2
   - superlu=5.2.2
   - sysroot_linux-64=2.17
+  - terminado=0.15.0
+  - tinycss2=1.3.0
   - tk=8.6.13
+  - tomli=2.0.1
+  - tornado=6.4.1
+  - traitlets=5.14.3
+  - types-python-dateutil=2.9.0.20240316
+  - typing_extensions=4.12.2
+  - typing_utils=0.1.0
+  - uri-template=1.3.0
+  - wcwidth=0.2.13
+  - webcolors=24.8.0
+  - webencodings=0.5.1
+  - websocket-client=1.8.0
+  - wget=1.21.4
   - xz=5.2.6
+  - yaml=0.2.5
+  - zeromq=4.3.5
   - zlib=1.2.13
   - zstd=1.5.5
   - pip:
-      - alabaster==0.7.13
-      - anytree==2.8.0
-      - appdirs==1.4.4
-      - astropy==5.2.2
-      - babel==2.12.1
-      - cachetools==5.3.1
-      - certifi==2023.5.7
-      - charset-normalizer==3.1.0
-      - configparser==5.3.0
-      - contourpy==1.1.0
-      - corner==2.2.1
-      - coverage==7.5.4
-      - cycler==0.11.0
-      - cython==3.0.10
-      - decorator==5.1.1
-      - deprecated==1.2.14
-      - dill==0.3.6
-      - distlib==0.3.8
-      - docutils==0.20.1
-      - filelock==3.13.4
-      - fonttools==4.40.0
-      - fuzzywuzzy==0.18.0
-      - getdist==1.4.8
-      - gpy==1.10.0
-      - h5py==3.8.0
-      - idna==3.4
-      - imageio==2.31.1
-      - imagesize==1.4.1
-      - iminuit==2.25.2
-      - importlib-metadata==6.6.0
-      - importlib-resources==5.12.0
-      - jax==0.4.12
-      - jinja2==3.1.2
-      - joblib==1.4.0
-      - johnnydep==1.20.2
-      - kiwisolver==1.4.4
-      - lazy-loader==0.2
-      - lenstronomy==1.11.2
-      - llvmlite==0.41.1
-      - markupsafe==2.1.3
-      - matplotlib==3.7.5
-      - ml-dtypes==0.2.0
-      - mpmath==1.3.0
-      - multiprocess==0.70.14
-      - networkx==3.1
-      - numba==0.58.1
-      - numpy==1.23.5
-      - numpydoc==1.5.0
-      - oauthlib==3.2.2
-      - opt-einsum==3.3.0
-      - oyaml==1.0
-      - packaging==23.1
-      - pandas==2.0.3
-      - paramz==0.9.5
-      - pgen==0.2.1
-      - pillow==9.5.0
-      - platformdirs==2.6.2
-      - portalocker==2.7.0
-      - protobuf==4.23.2
-      - py-bobyqa==1.4
-      - pybind11==2.12.0
-      - pydoe2==1.3.0
-      - pyerfa==2.0.0.3
-      - pyfftw==0.13.1
-      - pygments==2.17.2
-      - pyparsing==3.0.9
-      - python-dateutil==2.8.2
-      - pytz==2023.3
-      - pywavelets==1.4.1
-      - pyxdg==0.28
-      - PyYAML==6.0
-      - qp-prob==0.8.3
-      - requests==2.31.0
-      - sacc==0.8.1
-      - schwimmbad==0.3.2
-      - scikit-image==0.21.0
-      - scikit-learn==1.2.2
-      - scipy==1.10.1
-      - setuptools==67.7.2
-      - setuptools-scm==7.1.0
-      - six==1.16.0
-      - snowballstemmer==2.2.0
-      - sphinx==7.1.2
-      - sphinxcontrib-applehelp==1.0.4
-      - sphinxcontrib-devhelp==1.0.2
-      - sphinxcontrib-htmlhelp==2.0.1
-      - sphinxcontrib-jsmath==1.0.1
-      - sphinxcontrib-qthelp==1.0.3
-      - sphinxcontrib-serializinghtml==1.1.5
-      - structlog==23.1.0
-      - sympy==1.12
-      - tables-io==0.8.1
-      - tabulate==0.9.0
-      - threadpoolctl==3.1.0
-      - tifffile==2023.4.12
-      - tokenizers==0.13.3
-      - toml==0.10.2
-      - tomli==2.0.1
-      - tqdm==4.65.0
-      - typing-extensions==4.6.3
-      - tzdata==2023.3
-      - urllib3==1.26.16
-      - virtualenv==20.17.1
-      - wheel==0.40.0
-      - wimpy==0.6
-      - wrapt==1.14.1
-      - zipfile38==0.0.3
-      - zipp==3.15.0
+    - alabaster==0.7.13
+    - anytree==2.8.0
+    - appdirs==1.4.4
+    - astropy==5.2.2
+    - babel==2.12.1
+    - cachetools==5.3.1
+    - certifi==2023.5.7
+    - charset-normalizer==3.1.0
+    - configparser==5.3.0
+    - contourpy==1.1.0
+    - corner==2.2.1
+    - coverage==7.5.4
+    - cycler==0.11.0
+    - cython==3.0.10
+    - deprecated==1.2.14
+    - dill==0.3.6
+    - distlib==0.3.8
+    - docutils==0.20.1
+    - filelock==3.13.4
+    - fonttools==4.40.0
+    - fuzzywuzzy==0.18.0
+    - getdist==1.4.8
+    - gpy==1.10.0
+    - h5py==3.8.0
+    - idna==3.4
+    - imageio==2.31.1
+    - imagesize==1.4.1
+    - iminuit==2.25.2
+    - importlib-metadata==6.6.0
+    - importlib-resources==5.12.0
+    - jax==0.4.12
+    - jinja2==3.1.2
+    - joblib==1.4.0
+    - johnnydep==1.20.2
+    - kiwisolver==1.4.4
+    - lazy-loader==0.2
+    - lenstronomy==1.11.2
+    - llvmlite==0.41.1
+    - markupsafe==2.1.3
+    - matplotlib==3.7.5
+    - ml-dtypes==0.2.0
+    - mpmath==1.3.0
+    - multiprocess==0.70.14
+    - networkx==3.1
+    - numba==0.58.1
+    - numpy==1.23.5
+    - numpydoc==1.5.0
+    - oauthlib==3.2.2
+    - opt-einsum==3.3.0
+    - oyaml==1.0
+    - packaging==23.1
+    - pandas==2.0.3
+    - paramz==0.9.5
+    - pgen==0.2.1
+    - pillow==9.5.0
+    - platformdirs==3.9.1
+    - portalocker==2.7.0
+    - protobuf==4.23.2
+    - py-bobyqa==1.4
+    - pybind11==2.12.0
+    - pydoe2==1.3.0
+    - pyerfa==2.0.0.3
+    - pyfftw==0.13.1
+    - pygments==2.17.2
+    - pyparsing==3.0.9
+    - python-dateutil==2.8.2
+    - pytz==2023.3
+    - pywavelets==1.4.1
+    - pyxdg==0.28
+    - pyyaml==6.0
+    - qp-prob==0.8.3
+    - requests==2.31.0
+    - sacc==0.8.1
+    - schwimmbad==0.3.2
+    - scikit-image==0.21.0
+    - scikit-learn==1.2.2
+    - scipy==1.10.1
+    - setuptools==67.7.2
+    - setuptools-scm==7.1.0
+    - snowballstemmer==2.2.0
+    - sphinx==7.1.2
+    - sphinxcontrib-applehelp==1.0.4
+    - sphinxcontrib-devhelp==1.0.2
+    - sphinxcontrib-htmlhelp==2.0.1
+    - sphinxcontrib-jsmath==1.0.1
+    - sphinxcontrib-qthelp==1.0.3
+    - sphinxcontrib-serializinghtml==1.1.5
+    - structlog==23.1.0
+    - sympy==1.12
+    - tables-io==0.8.1
+    - tabulate==0.9.0
+    - threadpoolctl==3.1.0
+    - tifffile==2023.4.12
+    - tokenizers==0.13.3
+    - toml==0.10.2
+    - tqdm==4.65.0
+    - typing-extensions==4.6.3
+    - tzdata==2023.3
+    - urllib3==1.26.16
+    - virtualenv==20.26.0
+    - wheel==0.40.0
+    - wimpy==0.6
+    - wrapt==1.14.1
+    - zipfile38==0.0.3
+    - zipp==3.15.0

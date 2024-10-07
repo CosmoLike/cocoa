@@ -821,6 +821,7 @@ if [ -z "${IGNORE_CORE_INSTALLATION}" ]; then
         'mpmath==1.3.0' \
         'multiprocess==0.70.14' \
         'networkx==3.1' \
+        'notebook==7.1.0' \
         'numba==0.57.0' \
         'numpy==1.23.5'  \
         'numpydoc==1.5.0' \
@@ -895,6 +896,7 @@ if [ -z "${IGNORE_CORE_INSTALLATION}" ]; then
     # https://github.com/mpi4py/mpi4py/issues/335
     env MPICC=$MPI_CC_COMPILER ${PIP3:?} install \
         'mpi4py==3.1.4' \
+        'ipyparallel==8.8.0' \
       --no-cache-dir \
       --prefix="${ROOTDIR:?}/.local" \
       --force \
@@ -918,6 +920,8 @@ if [ -z "${IGNORE_CORE_INSTALLATION}" ]; then
     # https://github.com/mpi4py/mpi4py/issues/335
     env MPICC=$MPI_CC_COMPILER ${PIP3:?} install \
         'mpi4py==3.1.4' \
+        'notebook==7.1.1' \
+        'ipyparallel==8.8.0' \
       --no-cache-dir \
       --prefix="${ROOTDIR:?}/.local" \
       --force \
