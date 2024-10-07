@@ -216,7 +216,7 @@ export LSST_Y1_URL="https://github.com/CosmoLike/cocoa_lsst_y1.git"
 export LSST_Y1_NAME="lsst_y1"
 #export LSST_Y1_BRANCH="dev"
 #export LSST_Y1_COMMIT="6450df3392ae5645a68fcaa83a9374fb322189cf"
-export LSSTY1_TAG="v4.0-beta12"
+export LSST_Y1_TAG="v4.0-beta13"
 
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
