@@ -196,11 +196,7 @@ MCMC:
 >     [... NotebookApp] or http://127.0.0.1:8888/?token=XXX
 >     [... NotebookApp] Use Control-C to stop this server and shut down all kernels (twice to skip confirmation).
 >
-> Now go to the local internet browser and type `http://XX.YY.ZZ.123:8888/?token=XXX`, where XXX is the previously saved token displayed on the line
-> 
->     [... NotebookApp] http://XX.YY.ZZ.123:8888/?token=XXX
->
-
+> Now go to the local internet browser and type `http://XX.YY.ZZ.123:8888/?token=XXX`.
 
 > [!TIP]
 > If the user wants to download a project not provided by default or intends to clone existing projects in development mode, check the Appendix [FAQ: How do we download and run Cosmolike projects?](running_cosmolike_projects).
