@@ -154,7 +154,7 @@ MCMC:
 
 ### Examples involving Cosmolike
 
- **Step :three:**: The folder `projects/lsst-y1` contains a dozen examples involving different combinations of two-point correlation functions. So, run the `cobaya-run` on the first example following the commands below.
+ **Step :three:**: The folder `projects/lsst_y1` contains a dozen examples involving different combinations of two-point correlation functions. So, run the `cobaya-run` on the first example following the commands below.
 
 One model evaluation:
 
@@ -165,8 +165,46 @@ MCMC:
     mpirun -n 4 --oversubscribe --mca btl vader,tcp,self --bind-to core:overload-allowed --rank-by core --map-by numa:pe=${OMP_NUM_THREADS} cobaya-run ./projects/lsst_y1/EXAMPLE_MCMC1.yaml -f
 
 > [!TIP]
-> If the user wants to download a project not provided by default or intends to clone existing projects in development mode, check the Appendix [FAQ: How do we download and run Cosmolike projects?](running_cosmolike_projects).
+> To run Jupyter Notebook, assuming cocoa is installed on a local machine, type, after step 2️⃣, the command 
+> 
+>     jupyter notebook --no-browser --port=8888
+>
+> The terminal will show a message similar to the following template:
+>
+>     (...)
+>     [... NotebookApp] Jupyter Notebook 6.1.1 is running at:
+>     [... NotebookApp] http://f0a13949f6b5:8888/?token=XXX
+>     [... NotebookApp] or http://127.0.0.1:8888/?token=XXX
+>     [... NotebookApp] Use Control-C to stop this server and shut down all kernels (twice to skip confirmation).
+>
+> Now go to the local internet browser and type `http://127.0.0.1:8888/?token=XXX`, where XXX is the previously saved token displayed on the line
+> 
+>     [... NotebookApp] or http://127.0.0.1:8888/?token=XXX
+>
+> The project lsst-y1 contains jupyter notebook examples located at `projects/lsst_y1`.
 
+> [!TIP]
+> To run Jupyter Notebook, assuming cocoa is installed on a remote machine with open port 8888, type, after step 2️⃣, the command 
+> 
+>     jupyter notebook --no-browser --port=8888 --ip=XX.YY.ZZ.123
+>
+> where `XX.YY.ZZ.123` should be replaced by the server IP. The terminal will show a message similar to the following template:
+>
+>     (...)
+>     [... NotebookApp] Jupyter Notebook 6.1.1 is running at:
+>     [... NotebookApp] http://XX.YY.ZZ.123:8888/?token=XXX
+>     [... NotebookApp] or http://127.0.0.1:8888/?token=XXX
+>     [... NotebookApp] Use Control-C to stop this server and shut down all kernels (twice to skip confirmation).
+>
+> Now go to the local internet browser and type `http://XX.YY.ZZ.123:8888/?token=XXX`, where XXX is the previously saved token displayed on the line
+> 
+>     [... NotebookApp] http://XX.YY.ZZ.123:8888/?token=XXX
+>
+
+
+> [!TIP]
+> If the user wants to download a project not provided by default or intends to clone existing projects in development mode, check the Appendix [FAQ: How do we download and run Cosmolike projects?](running_cosmolike_projects).
+> 
 ## Appendix <a name="appendix"></a>
 
 ### Credits <a name="appendix_proper_credits"></a>
@@ -315,7 +353,7 @@ After fixing a particular issue, users should rerun the shell scripts `setup_coc
 
 ### :interrobang: FAQ: How do we compile the Boltzmann, CosmoLike, and Likelihood codes separately <a name="appendix_compile_separately"></a>
 
-To avoid excessive compilation or download times during development, users can use specialized scripts located at `Cocoa/installation_scripts/` that compile only a specific module or download only a particular dataset. A few examples of these scripts are: 
+To avoid excessive compilation or download times during development, users can use scripts located at `Cocoa/installation_scripts/` that compile only a specific module or download only a particular dataset. A few examples of these scripts are: 
 
      $(cocoa)(.local) cd "${ROOTDIR:?}"
      $(cocoa)(.local) source "${ROOTDIR:?}"/installation_scripts/compile_act_dr4.sh
@@ -452,7 +490,7 @@ Anaconda is not usually set by default on HPC environments but may be available 
 
     module load Anaconda3/2022.10
 
-If you are not sure about the name of the available Anaconda module, type the command.
+If you are not sure about the name of the available Anaconda module, type the command
 
     module avail An
 
@@ -466,19 +504,11 @@ There are various reasons why installing the Cocoa conda environment may take a 
 
 :one: *Never install conda environments using the login node*. 
 
-Instead, request an interactive job with a few cores. However, users must know that **some supercomputers do not provide internet access on computing nodes** (e.g., the Midway HPC at the University of Chicago). Ask the HPC staff for a **queue dedicated to installing and compiling code**; they should exist in a well-designed HPC environment. For example, the `build partition` on the Midway supercomputer provides nodes with internet access, which can be accessed with the command.
-
-    sinteractive --nodes=1 --ntasks=1 --cpus-per-task=5 --time=3:00:00 --account=pi-XXX --partition=build
-
-:two: *Set conda verbosity to DEBUG* in case the installation still takes too much time after step :one:.
-
-    conda config --set verbosity 2
-
-The DEBUG mode will ensure conda outputs many more intermediate installation steps, which helps the user check whether Conda is stuck on some intermediate step. Users can later reset the verbosity level with the command `conda config --set verbosity 0`.
+Instead, request an interactive job with a few cores. However, users must know that **some supercomputers do not provide internet access on computing nodes**. Ask the HPC staff for a **queue dedicated to installing and compiling code**; it should exist in a well-designed HPC environment.
 
 - :interrobang: **Conda installation is interrupted due to quota limitations**.
 
-Supercomputers usually enforce strict quota limits on home folders. These limits apply to the total file size and the number of files. By default, Anaconda modules install new environments at `$HOME/.conda/envs`. Anaconda also stores Gigabytes of downloaded packages in the `$HOME/.conda/pkgs` folder; `pkgs` is used by Anaconda as a package cache folder. Therefore, reasonable and widely applied quota limitations to the home folder significantly hinder the installation of new environments without the proposed changes below. 
+Supercomputers usually enforce strict quota limits on home folders. These limits apply to the total file size and the number of files. By default, Anaconda modules install new environments at `$HOME/.conda/envs`. Anaconda also stores Gigabytes of downloaded packages in the `$HOME/.conda/pkgs` folder; the `pkgs` folder is used by Anaconda as a package cache.
 
 :one: Create an Anaconda folder in a project folder outside `$HOME` with significantly more tolerant quota restrictions. For instance, we used the command below on the Midway supercomputer to create an Anaconda folder in the KICP projects partition.
 
