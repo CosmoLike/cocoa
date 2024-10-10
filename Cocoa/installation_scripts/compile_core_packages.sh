@@ -937,7 +937,7 @@ if [ -z "${IGNORE_CORE_INSTALLATION}" ]; then
   
   if [ -z "${IGNORE_EMULATOR_CPU_PIP_PACKAGES}" ]; then
   
-    if [ -n "${IGNORE_EMULATOR_GPU_PIP_PACKAGES}" ]; then
+    if [ -z "${IGNORE_EMULATOR_GPU_PIP_PACKAGES}" ]; then
       error "${EC28:?} (GPU AND CPU EMULATOR FLAGS)"; return 1;
     fi
 
@@ -945,7 +945,7 @@ if [ -z "${IGNORE_CORE_INSTALLATION}" ]; then
 
     env CXX="${CXX_COMPILER:?}" CC="${C_COMPILER:?}" ${PIP3:?} install \
         'tensorflow-cpu==2.12.0' \
-        'tensorflow_probability-0.21.0' \
+        'tensorflow_probability==0.21.0' \
         'keras==2.12.0' \
         'keras-preprocessing==1.1.2' \
         'torch==1.13.1+cpu' \
@@ -962,7 +962,7 @@ if [ -z "${IGNORE_CORE_INSTALLATION}" ]; then
 
   if [ -z "${IGNORE_EMULATOR_GPU_PIP_PACKAGES}" ]; then
   
-    if [ -n "${IGNORE_EMULATOR_CPU_PIP_PACKAGES}" ]; then
+    if [ -z "${IGNORE_EMULATOR_CPU_PIP_PACKAGES}" ]; then
       error "${EC28:?} (GPU AND CPU EMULATOR FLAGS)"; return 1;
     fi
 
@@ -970,7 +970,7 @@ if [ -z "${IGNORE_CORE_INSTALLATION}" ]; then
 
     env CXX="${CXX_COMPILER:?}" CC="${C_COMPILER:?}" ${PIP3:?} install \
         'tensorflow==2.12.0' \
-        'tensorflow_probability-0.21.0' \
+        'tensorflow_probability==0.21.0' \
         'keras==2.12.0' \
         'keras-preprocessing==1.1.2' \
         'torch==1.13.1+cu116' \
