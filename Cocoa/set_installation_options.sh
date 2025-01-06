@@ -214,9 +214,9 @@ export MGCAMB_NAME='MGCAMB'
 # --------------------------------------------------------------------
 export LSST_Y1_URL="https://github.com/CosmoLike/cocoa_lsst_y1.git"
 export LSST_Y1_NAME="lsst_y1"
-#export LSST_Y1_BRANCH="dev"
-#export LSST_Y1_COMMIT="6450df3392ae5645a68fcaa83a9374fb322189cf"
-export LSST_Y1_TAG="v4.0-beta13"
+#export LSST_Y1_BRANCH="main"
+#export LSST_Y1_COMMIT="0fd75b1c447d5576dc00f3c6bcde440cf9aa673f"
+export LSST_Y1_TAG="v4.0-beta14"
 
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
