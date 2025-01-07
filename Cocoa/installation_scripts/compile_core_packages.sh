@@ -821,7 +821,6 @@ if [ -z "${IGNORE_CORE_INSTALLATION}" ]; then
         'mpmath==1.3.0' \
         'multiprocess==0.70.14' \
         'networkx==3.1' \
-        'notebook==7.1.0' \
         'numba==0.57.0' \
         'numpy==1.23.5'  \
         'numpydoc==1.5.0' \
@@ -895,11 +894,14 @@ if [ -z "${IGNORE_CORE_INSTALLATION}" ]; then
     # (e.g., midway) no-cache-dir is important to fix this bug
     # https://github.com/mpi4py/mpi4py/issues/335
     env MPICC=$MPI_CC_COMPILER ${PIP3:?} install \
+        'numpy==1.23.5' \
         'mpi4py==3.1.4' \
+        'notebook==7.1.1' \
         'ipyparallel==8.8.0' \
+        'emcee==3.1.4' \
       --no-cache-dir \
       --prefix="${ROOTDIR:?}/.local" \
-      --force \
+      --force-reinstall \
       >${OUT1:?} 2>${OUT2:?} || { error "(PIP-CORE-PACKAGES) ${EC13:?}"; return 1; }
 
     pbottom "INSTALLING PYTHON CORE LIBRARIES VIA PIP" || return 1
@@ -909,22 +911,28 @@ if [ -z "${IGNORE_CORE_INSTALLATION}" ]; then
     ptop "INSTALLING PYTHON CORE LIBRARIES VIA PIP" || return 1
 
     #PS: --force-reinstall - this helps CARMA to see numpy files
-    env CXX="${CXX_COMPILER:?}" CC="${C_COMPILER:?}" ${PIP3:?} install \
-        'numpy==1.23.5' \
-      --prefix="${ROOTDIR:?}/.local" \
-      --force-reinstall \
-      >${OUT1:?} 2>${OUT2:?} || { error "(PIP-CORE-PACKAGES) ${EC13:?}"; return 1; }
+    #env CXX="${CXX_COMPILER:?}" CC="${C_COMPILER:?}" ${PIP3:?} install \
+    #    'numpy==1.23.5' \
+    #  --prefix="${ROOTDIR:?}/.local" \
+    # --force-reinstall \
+    #  >${OUT1:?} 2>${OUT2:?} || { error "(PIP-CORE-PACKAGES) ${EC13:?}"; return 1; }
+
+    #PS: --force-reinstall - this helps CARMA to see numpy files
+    #PS2: Need to include numpy in the same command to avoid numpy 2.0
 
     # mpi4py has a weird bug when installing from conda on a few machines 
     # (e.g., midway) no-cache-dir is important to fix this bug
     # https://github.com/mpi4py/mpi4py/issues/335
+    
     env MPICC=$MPI_CC_COMPILER ${PIP3:?} install \
+        'numpy==1.23.5' \
         'mpi4py==3.1.4' \
         'notebook==7.1.1' \
         'ipyparallel==8.8.0' \
+        'emcee==3.1.4' \
       --no-cache-dir \
       --prefix="${ROOTDIR:?}/.local" \
-      --force \
+      --force-reinstall \
       >${OUT1:?} 2>${OUT2:?} || { error "(PIP-CORE-PACKAGES) ${EC13:?}"; return 1; }
 
     pbottom "INSTALLING PYTHON CORE LIBRARIES VIA PIP" || return 1
