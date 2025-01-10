@@ -26,6 +26,18 @@
 
 #include "log.c/src/log.h"
 
+int fdiff(const double a, const double b)
+{
+  if (fabs(a - b) < 1.0e-13 * fabs(a + b) || fabs(a - b) < 2.0e-38)
+  {
+    return 0; 
+  }
+  else
+  {
+    return 1;
+  }
+}
+
 double fmin(const double a, const double b)
 {
   return a < b ? a : b;

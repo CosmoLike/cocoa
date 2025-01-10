@@ -2248,10 +2248,6 @@ double C_ss_tomo_limber(
 // ---------------------------------------------------------------------------
 // ---------------------------------------------------------------------------
 
-// -----------------------------------------------------------------------------
-// GS ANGULAR CORRELATION FUNCTION - TATT
-// -----------------------------------------------------------------------------
-
 double int_for_C_gs_TATT_tomo_limber(double a, void* params)
 {
   if (!(a>0) || !(a<1)) 
@@ -2301,10 +2297,6 @@ double int_for_C_gs_TATT_tomo_limber(double a, void* params)
   const double res = WK*(WMAG*bmag*PK + WGAL*(b1*PK + PK1loop)) + (WGAL*b1 + WMAG*bmag)*WS*GIE;
   return res*chidchi.dchida/(fK*fK);
 }
-
-// -----------------------------------------------------------------------------
-// GS ANGULAR CORRELATION FUNCTION - NON TATT
-// -----------------------------------------------------------------------------
 
 double int_for_C_gs_tomo_limber(double a, void* params)
 {
@@ -2603,7 +2595,12 @@ double C_gs_tomo_limber_nointerp(
   return res;
 }
 
-double C_gs_tomo_limber(double l, int ni, int nj, const int force_no_recompute)
+double C_gs_tomo_limber(
+    double l, 
+    int ni, 
+    int nj, 
+    const int force_no_recompute
+  )
 {
   static cosmopara C;
   static nuisancepara N;
@@ -2714,7 +2711,6 @@ double C_gs_tomo_limber(double l, int ni, int nj, const int force_no_recompute)
     return 0.0;
   }
 }
-
 
 // ---------------------------------------------------------------------------
 // ---------------------------------------------------------------------------
@@ -2977,7 +2973,12 @@ double C_gg_tomo_limber_nointerp(
   return res;
 }
 
-double C_gg_tomo_limber(double l, int ni, int nj, const int force_no_recompute)
+double C_gg_tomo_limber(
+    double l, 
+    int ni, 
+    int nj, 
+    const int force_no_recompute
+  )
 { // cross redshift bin not supported
   static cosmopara C;
   static nuisancepara N;
@@ -3326,7 +3327,11 @@ double C_gk_tomo_limber_nointerp(
   return res;
 }
 
-double C_gk_tomo_limber(double l, int ni, const int force_no_recompute)
+double C_gk_tomo_limber(
+    double l, 
+    int ni, 
+    const int force_no_recompute
+  )
 {
   static cosmopara C;
   static nuisancepara N;
@@ -3536,7 +3541,11 @@ double C_ks_tomo_limber_nointerp(
   return res;  
 }
 
-double C_ks_tomo_limber(double l, int ni, const int force_no_recompute)
+double C_ks_tomo_limber(
+    double l, 
+    int ni, 
+    const int force_no_recompute
+  )
 {
   static cosmopara C;
   static nuisancepara N;
@@ -4807,16 +4816,16 @@ void C_cl_tomo(int L, const int ni, const int nj, double *const Cl, double dev, 
   }
   
   {
-    const double zmin = tomo.clustering_zmin[ni];
-    const double zmax = tomo.clustering_zmax[ni];
+    const double zmin = redshift.clustering_zmin[ni];
+    const double zmax = redshift.clustering_zmax[ni];
     f_chi_for_Psi_cl(chi_ar, Nchi, f1_chi, ni, zmin, zmax);
     f_chi_for_Psi_cl_RSD(chi_ar, Nchi, f1_chi_RSD, ni, zmin, zmax);
     f_chi_for_Psi_cl_Mag(chi_ar, Nchi, f1_chi_Mag, ni, zmax);
   }
   if (ni != nj)
   { 
-    const double zmin = tomo.clustering_zmin[nj];
-    const double zmax = tomo.clustering_zmax[nj];
+    const double zmin = redshift.clustering_zmin[nj];
+    const double zmax = redshift.clustering_zmax[nj];
     f_chi_for_Psi_cl(chi_ar, Nchi, f2_chi, nj, zmin, zmax);
     f_chi_for_Psi_cl_RSD(chi_ar, Nchi, f2_chi_RSD, nj, zmin, zmax);
     f_chi_for_Psi_cl_Mag(chi_ar, Nchi, f2_chi_Mag, nj, zmax);
@@ -5049,15 +5058,15 @@ void C_gl_tomo(int L, int nl, int ns, double *const Cl, double dev, double toler
   }
 
   {
-    const double zmin = tomo.clustering_zmin[nl];
-    const double zmax = tomo.clustering_zmax[nl];
+    const double zmin = redshift.clustering_zmin[nl];
+    const double zmax = redshift.clustering_zmax[nl];
     f_chi_for_Psi_cl(chi_ar, Nchi, f1_chi, nl, zmin, zmax);
     f_chi_for_Psi_cl_RSD(chi_ar, Nchi, f1_chi_RSD, nl, zmin, zmax);
     f_chi_for_Psi_cl_Mag(chi_ar, Nchi, f1_chi_Mag, nl, zmax);
   }
   {
-    const double zmin = tomo.shear_zmin[ns];
-    const double zmax = tomo.shear_zmax[ns];
+    const double zmin = redshift.shear_zmin[ns];
+    const double zmax = redshift.shear_zmax[ns];
     f_chi_for_Psi_sh(chi_ar, Nchi, f2_chi, ns, zmax);
     f_chi_for_Psi_sh_IA(chi_ar, Nchi, f2_chi_IA_ar, ns, zmin, zmax);
   }

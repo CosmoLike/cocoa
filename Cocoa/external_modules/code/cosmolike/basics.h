@@ -11,6 +11,8 @@ extern "C" {
 #define NR_END 1
 #define FREE_ARG char *
 
+int fdiff(const double a, const double b);
+
 double fmin(const double a, const double b);
 
 double fmax(const double a, const double b);

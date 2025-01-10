@@ -405,22 +405,21 @@ void init_accuracy_boost(
 {
   static int N_a = 0;
   if (N_a == 0)
-  { // that saves the initial default value (imp on notebooks where users
-    // can change AccuracyBost back and forth)
+  { // (imp on notebooks where users can change sampling_boost interactively
     N_a = Ntable.N_a;
   }
   Ntable.N_a = static_cast<int>(ceil(N_a*sampling_boost));
   
   static int N_ell = 0;
   if (N_ell == 0)
-  { 
+  { // (imp on notebooks where users can change sampling_boost interactively
     N_ell = Ntable.N_ell;
   }
   Ntable.N_ell = static_cast<int>(ceil(N_ell*sampling_boost));
 
   static int N_ell_TATT = 0;
   if (N_ell_TATT == 0)
-  {
+  { // (imp on notebooks where users can change sampling_boost interactively
     N_ell_TATT = Ntable.N_ell_TATT;
   }
   Ntable.N_ell_TATT = static_cast<int>(ceil(N_ell_TATT*sampling_boost));
@@ -1639,8 +1638,6 @@ void init_lens_sample(
       "clustering_Nbin", 
       Ntomo
     );
-
-  survey.ggl_overlap_cut = 0.0;
   
   pf_photoz(0.1, 0);
 

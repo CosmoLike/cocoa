@@ -132,27 +132,19 @@ typedef struct
   int clustering_Nbin;    // number of lens galaxy bins
   int cluster_Nbin;       // number of lens cluster redshift bins
 
-  int shear_Npowerspectra; // number of shear-shear tomography power spectra
-  int ggl_Npowerspectra;   // number of galaxy-galaxy lensing tomography power spectra
+  int shear_Npowerspectra;       // number of shear-shear tomography power spectra
+  int ggl_Npowerspectra;         // number of galaxy-galaxy lensing tomography power spectra
   int clustering_Npowerspectra;  // number of galaxy-galaxy clustering tomography power spectra
-  
+    
+  /*
   int cgl_Npowerspectra;             // number of cluster-galaxy lensing tomography combinations
   int cg_clustering_Npowerspectra;   // number of cluster-galaxy clustering tomography combinations
-  int cc_clustering_Npowerspectra;   // number of cluster-cluster clustering tomography combinations
-
-  double shear_zmax[MAX_SIZE_ARRAYS];
-  double shear_zmin[MAX_SIZE_ARRAYS];
-  double n_source[MAX_SIZE_ARRAYS];
-
-  double clustering_zmax[MAX_SIZE_ARRAYS];
-  double clustering_zmin[MAX_SIZE_ARRAYS];
-  double n_lens[MAX_SIZE_ARRAYS];
-  
+  int cc_clustering_Npowerspectra;   // number of cluster-cluster clustering tomography combinations 
   double cluster_zmax[MAX_SIZE_ARRAYS];
   double cluster_zmin[MAX_SIZE_ARRAYS];
-
   // we assume cluster bin = galaxy bin (no cross)
   int external_selection_cg_clustering[MAX_SIZE_ARRAYS];
+  */
 } tomopara;
 
 typedef struct
@@ -160,17 +152,21 @@ typedef struct
   int shear_photoz;
   double shear_zdistrpar_zmin;
   double shear_zdistrpar_zmax;
-  int shear_histogram_zbins;
+  double shear_zmax[MAX_SIZE_ARRAYS];
+  double shear_zmin[MAX_SIZE_ARRAYS];
   char shear_REDSHIFT_FILE[CHAR_MAX_SIZE];
 
   int clustering_photoz;
   double clustering_zdistrpar_zmin;
   double clustering_zdistrpar_zmax;
-  int clustering_histogram_zbins;
+  double clustering_zmax[MAX_SIZE_ARRAYS];
+  double clustering_zmin[MAX_SIZE_ARRAYS];
   char clustering_REDSHIFT_FILE[CHAR_MAX_SIZE];
 
+  /*
   int clusters_photoz;
   char clusters_REDSHIFT_FILE[CHAR_MAX_SIZE];
+  */
 } redshiftpara;
 
 typedef struct
@@ -261,7 +257,6 @@ typedef struct
   double n_lens;                  // lens galaxy density per arcmin^2
   double m_lim;
   char name[CHAR_MAX_SIZE];
-  double ggl_overlap_cut;
 } sur;
 
 typedef struct
@@ -350,9 +345,9 @@ typedef struct
 typedef struct
 {
   char name[CHAR_MAX_SIZE];
-  double fwhm;        // beam fwhm in rad
-  double sensitivity; // white noise level in muK*rad
-  char pathLensRecNoise[CHAR_MAX_SIZE]; // path to precomputed noise on reconstructed kappa
+  double fwhm;                            // beam fwhm in rad
+  double sensitivity;                     // white noise level in muK*rad
+  char pathLensRecNoise[CHAR_MAX_SIZE];   // path to precomputed noise on reconstructed kappa
   char pathHealpixWinFunc[CHAR_MAX_SIZE]; // path to precomputed healpix window function
 } Cmb;
 

@@ -58,11 +58,13 @@ cosmopara cosmology =
   .is_cached = 0
 };
 
+
 tomopara tomo = 
 {
-  .n_source = {0},
-  .n_lens = {0},
-  .external_selection_cg_clustering = {0}
+  .shear_Nbin = 0,
+  .clustering_Nbin = 0,
+  .cluster_Nbin = 0
+  //.external_selection_cg_clustering = {0}
 };
 
 redshiftpara redshift =
@@ -70,11 +72,10 @@ redshiftpara redshift =
   .shear_photoz = 0,
   .shear_zdistrpar_zmin = 0.0,
   .shear_zdistrpar_zmax = 0.0,
-  .shear_histogram_zbins = 0,
+  
   .clustering_photoz = 0,
   .clustering_zdistrpar_zmin = 0.0,
-  .clustering_zdistrpar_zmax = 0.0,
-  .clustering_histogram_zbins = 0
+  .clustering_zdistrpar_zmax = 0.0
 };
 
 galpara gbias =
@@ -154,8 +155,7 @@ Cmb cmb =
 sur survey =
 {
   .area_conversion_factor  = 60.0 * 60.0 * 2.90888208665721580e-4 * 2.90888208665721580e-4,
-  .n_gal_conversion_factor = 1.0 / 2.90888208665721580e-4 / 2.90888208665721580e-4,
-  .ggl_overlap_cut = 1.
+  .n_gal_conversion_factor = 1.0 / 2.90888208665721580e-4 / 2.90888208665721580e-4
 };
 
 FPTpara FPT =
@@ -325,30 +325,19 @@ void reset_cosmology_struct()
 
 void reset_tomo_struct()
 {
-  for(int i=0; i<MAX_SIZE_ARRAYS; i++)
-  {
-    tomo.shear_zmax[i] = 0.0;
-    tomo.shear_zmin[i] = 0.0;
-    tomo.n_source[i] = 0.0;
-
-    tomo.clustering_zmax[i] = 0.0;
-    tomo.clustering_zmin[i] = 0.0;
-    tomo.n_lens[i] = 0.0;
-
-    tomo.cluster_zmax[i] = 0.0;
-    tomo.cluster_zmin[i] = 0.0;
-  }
-
   tomo.shear_Nbin = 0;
   tomo.clustering_Nbin = 0;
-  tomo.cluster_Nbin = 0;
 
   tomo.shear_Npowerspectra = 0;
   tomo.clustering_Npowerspectra = 0;
   tomo.ggl_Npowerspectra = 0;
+  
+/*
+  tomo.cluster_Nbin = 0;
   tomo.cg_clustering_Npowerspectra = 0;
   tomo.cc_clustering_Npowerspectra = 0;
   tomo.cgl_Npowerspectra = 0;
+*/
 }
 
 void reset_redshift_struct()
@@ -356,14 +345,26 @@ void reset_redshift_struct()
   redshift.shear_photoz = 0;
   redshift.shear_zdistrpar_zmin = 0.0;
   redshift.shear_zdistrpar_zmax = 0.0;
-  redshift.shear_histogram_zbins = 0;
   sprintf(redshift.shear_REDSHIFT_FILE, "%s", "");
 
   redshift.clustering_photoz = 0;
   redshift.clustering_zdistrpar_zmin = 0.0;
   redshift.clustering_zdistrpar_zmax = 0.0;
-  redshift.clustering_histogram_zbins = 0;
   sprintf(redshift.clustering_REDSHIFT_FILE, "%s", "");
+
+  for(int i=0; i<MAX_SIZE_ARRAYS; i++)
+  {
+    redshift.shear_zmax[i] = 0.0;
+    redshift.shear_zmin[i] = 0.0;
+
+    redshift.clustering_zmax[i] = 0.0;
+    redshift.clustering_zmin[i] = 0.0;
+
+/*
+    tomo.cluster_zmax[i] = 0.0;
+    tomo.cluster_zmin[i] = 0.0;
+*/
+  }
 }
 
 void reset_survey_struct()
@@ -378,7 +379,6 @@ void reset_survey_struct()
   survey.n_lens = 0.0;
   survey.m_lim = 0.0;
   sprintf(survey.name, "%s", "");
-  survey.ggl_overlap_cut = 1.0;
 }
 
 void reset_gbias_struct()
