@@ -214,16 +214,10 @@ double xi_pm_tomo(
       log_fatal("array allocation failed");
       exit(1);
     }
-
     for (int i=0; i<Ntable.Ntheta; i++)
     {
       Glplus[i]  = ((double*)(Glplus + Ntable.Ntheta) + limits.LMAX*i);
       Glminus[i] = ((double*)(Glminus + Ntable.Ntheta) + limits.LMAX*i);
-      for (int j=0; j<limits.LMAX; j++)
-      {
-        Glplus[i][j] = 0.0;
-        Glminus[i][j] = 0.0;
-      }
     }
     
     xi_vec_plus = (double*) calloc(NSIZE*Ntable.Ntheta, sizeof(double));
@@ -239,6 +233,41 @@ double xi_pm_tomo(
       log_fatal("array allocation failed");
       exit(1);
     }
+    
+    const int len = sizeof(double*)*Ntable.Ntheta + 
+                    sizeof(double)*Ntable.Ntheta*(limits.LMAX+1);
+
+    double** Pmin  = (double**) malloc(len);
+    if (Pmin == NULL)
+    {
+      log_fatal("array allocation failed");
+      exit(1);
+    }
+    double** Pmax  = (double**) malloc(len);
+    if (Pmax == NULL)
+    {
+      log_fatal("array allocation failed");
+      exit(1);
+    }
+    double** dPmin = (double**) malloc(len);
+    if (dPmin == NULL)
+    {
+      log_fatal("array allocation failed");
+      exit(1);
+    }
+    double** dPmax = (double**) malloc(len);
+    if (dPmax == NULL)
+    {
+      log_fatal("array allocation failed");
+      exit(1);
+    }
+    for (int i=0; i<Ntable.Ntheta; i++)
+    { // Legendre evals from l=0 to lmax (inclusive)
+      Pmin[i]  = ((double*)(Pmin+Ntable.Ntheta) + (limits.LMAX+1)*i);
+      Pmax[i]  = ((double*)(Pmax+Ntable.Ntheta) + (limits.LMAX+1)*i);
+      dPmin[i] = ((double*)(dPmin+Ntable.Ntheta) + (limits.LMAX+1)*i);
+      dPmax[i] = ((double*)(dPmax+Ntable.Ntheta) + (limits.LMAX+1)*i);
+    }
 
     double xmin[Ntable.Ntheta];
     double xmax[Ntable.Ntheta];
@@ -248,59 +277,11 @@ double xi_pm_tomo(
       xmin[i] = r.xmin;
       xmax[i] = r.xmax;
     }
-    
-    double** Pmin  = (double**) malloc(sizeof(double*)*Ntable.Ntheta + 
-                                       sizeof(double)*Ntable.Ntheta*(limits.LMAX+1));
-    if (Pmin == NULL)
-    {
-      log_fatal("array allocation failed");
-      exit(1);
-    }
-    
-    double** Pmax  = (double**) malloc(sizeof(double*)*Ntable.Ntheta + 
-                                       sizeof(double)*Ntable.Ntheta*(limits.LMAX+1));
-    if (Pmax == NULL)
-    {
-      log_fatal("array allocation failed");
-      exit(1);
-    }
-    
-    double** dPmin = (double**) malloc(sizeof(double*)*Ntable.Ntheta + 
-                                       sizeof(double)*Ntable.Ntheta*(limits.LMAX+1));
-    if (dPmin == NULL)
-    {
-      log_fatal("array allocation failed");
-      exit(1);
-    }
-    
-    double** dPmax = (double**) malloc(sizeof(double*)*Ntable.Ntheta + 
-                                       sizeof(double)*Ntable.Ntheta*(limits.LMAX+1));
-    if (dPmax == NULL)
-    {
-      log_fatal("array allocation failed");
-      exit(1);
-    }
-    
-    for (int i=0; i<Ntable.Ntheta; i++)
-    {
-      // you need these Legendre evals from l=0 to lmax (inclusive)
-      Pmin[i]  = ((double*)(Pmin+Ntable.Ntheta) + (limits.LMAX+1)*i);
-      Pmax[i]  = ((double*)(Pmax+Ntable.Ntheta) + (limits.LMAX+1)*i);
-      dPmin[i]  = ((double*)(dPmin+Ntable.Ntheta) + (limits.LMAX+1)*i);
-      dPmax[i]  = ((double*)(dPmax+Ntable.Ntheta) + (limits.LMAX+1)*i);
-      for (int j=0; j<(limits.LMAX + 1); j++)
-      {
-        Pmin[i][j]  = 0.0;
-        Pmax[i][j]  = 0.0;
-        dPmin[i][j] = 0.0;
-        dPmax[i][j] = 0.0;
-      }
-    }
-    
+
     #pragma omp parallel for collapse(2)
     for (int i=0; i<Ntable.Ntheta; i++)
     {
-      for (int l=0; l<limits.LMAX+1; l++)
+      for (int l=0; l<(limits.LMAX+1); l++)
       {
         bin_avg r   = set_bin_average(i, l);
         Pmin[i][l]  = r.Pmin;
@@ -310,10 +291,19 @@ double xi_pm_tomo(
       }
     }
 
+    const int lmin = 1;
+    for (int i=0; i<Ntable.Ntheta; i++)
+    {
+      for (int l=0; l<lmin; l++)
+      {
+        Glplus[i][l] = 0.0;
+        Glminus[i][l] = 0.0;
+      }
+    }
     #pragma omp parallel for collapse(2)
     for (int i=0; i<Ntable.Ntheta; i++)
     {
-      for (int l=1; l<limits.LMAX; l++)
+      for (int l=lmin; l<limits.LMAX; l++)
       {
         Glplus[i][l] = (2.*l+1)/(2.*M_PI*l*l*(l+1)*(l+1))*(
           -l*(l-1.)/2*(l+2./(2*l+1)) * (Pmin[i][l-1]-Pmax[i][l-1])
@@ -342,6 +332,7 @@ double xi_pm_tomo(
     free(dPmin);
     free(dPmax);
   }
+
   if (recompute_shear(C, N) || recompute_table(numtable))
   {
     if (limber == 1)
@@ -350,7 +341,8 @@ double xi_pm_tomo(
       {
         case IA_MODEL_TATT:
         { // TATT MODELING
-          const int len = sizeof(double*)*NSIZE + sizeof(double)*NSIZE*limits.LMAX;
+          const int len = sizeof(double*)*NSIZE + 
+                          sizeof(double)*NSIZE*limits.LMAX;
           double** Cl_EE = (double**) malloc(len);
           if (Cl_EE == NULL)
           {
@@ -363,11 +355,12 @@ double xi_pm_tomo(
             log_fatal("array allocation failed");
             exit(1);
           }
+          const int lmin = 1;
           for (int i=0; i<NSIZE; i++)
           {
             Cl_EE[i]  = ((double*)(Cl_EE + NSIZE) + limits.LMAX*i);
             Cl_BB[i]  = ((double*)(Cl_BB + NSIZE) + limits.LMAX*i);
-            for (int l=0; l<2; l++)
+            for (int l=0; l<lmin; l++)
             {
               Cl_EE[i][l] = 0.0;
               Cl_BB[i][l] = 0.0;
@@ -379,17 +372,27 @@ double xi_pm_tomo(
           #pragma GCC diagnostic push
           #pragma GCC diagnostic ignored "-Wunused-but-set-variable"
           { // init static variables inside the C_XY_limber function
+            int BM = 0;
+            for (int nz=0; nz<NSIZE; nz++)
+            {
+              const int Z1NZ = Z1(nz);
+              const int Z2NZ = Z2(nz);
+
+              if (nuisance.b_ta_z[0]    || nuisance.b_ta_z[Z1NZ] ||
+                  nuisance.b_ta_z[Z2NZ] || nuisance.A2_ia        ||
+                  nuisance.A2_z[Z1NZ]   || nuisance.A2_z[Z2NZ])
+              {
+                BM = 1;
+              }
+            }
             const int force_no_recompute = 0; // FALSE
             const int Z1NZ = Z1(0);
             const int Z2NZ = Z2(0);
-
-            const int BM = (nuisance.b_ta_z[0]    || nuisance.b_ta_z[Z1NZ] ||
-                            nuisance.b_ta_z[Z2NZ] || nuisance.A2_ia        ||
-                            nuisance.A2_z[Z1NZ]   || nuisance.A2_z[Z2NZ]) ? 1 : 0;
             const int l = limits.LMIN_tab + 1;
 
             double trash = C_ss_TATT_EE_tomo_limber((double) l, 
               Z1NZ, Z2NZ, force_no_recompute); 
+            
             trash = (BM == 1) ? C_ss_TATT_BB_tomo_limber((double) l, 
               Z1NZ, Z2NZ, 0) : 0.0;
           }
@@ -399,7 +402,7 @@ double xi_pm_tomo(
           #pragma omp parallel for collapse(2)
           for (int nz=0; nz<NSIZE; nz++) 
           {
-            for (int l=2; l<limits.LMIN_tab; l++)
+            for (int l=lmin; l<limits.LMIN_tab; l++)
             {
               const int init_static_vars_only = 0; // FALSE
               const int Z1NZ = Z1(nz);
@@ -409,8 +412,8 @@ double xi_pm_tomo(
                               nuisance.b_ta_z[Z2NZ] || nuisance.A2_ia        ||
                               nuisance.A2_z[Z1NZ]   || nuisance.A2_z[Z2NZ]) ? 1 : 0;
 
-              Cl_EE[nz][l] = C_ss_TATT_EE_tomo_limber_nointerp(
-                (double) l, Z1NZ, Z2NZ, init_static_vars_only);
+              Cl_EE[nz][l] = C_ss_TATT_EE_tomo_limber_nointerp((double) l, Z1NZ, 
+                Z2NZ, init_static_vars_only);
           
               Cl_BB[nz][l] = (BM == 1) ? C_ss_TATT_BB_tomo_limber_nointerp(
                 (double) l, Z1NZ, Z2NZ, init_static_vars_only) : 0.0;
@@ -430,10 +433,11 @@ double xi_pm_tomo(
                               nuisance.b_ta_z[Z2NZ] || nuisance.A2_ia        ||
                               nuisance.A2_z[Z1NZ]   || nuisance.A2_z[Z2NZ]) ? 1 : 0;
 
-              Cl_EE[nz][l] = C_ss_TATT_EE_tomo_limber((double) l, Z1NZ, Z2NZ, force_no_recompute);
+              Cl_EE[nz][l] = C_ss_TATT_EE_tomo_limber((double) l, Z1NZ, Z2NZ, 
+                force_no_recompute);
           
-              Cl_BB[nz][l] = (BM == 1) ? 
-                C_ss_TATT_BB_tomo_limber((double) l, Z1NZ, Z2NZ, force_no_recompute) : 0.0;
+              Cl_BB[nz][l] = (BM == 1) ?  C_ss_TATT_BB_tomo_limber((double) l, 
+                Z1NZ, Z2NZ, force_no_recompute) : 0.0;
             }
           }
 
@@ -445,9 +449,11 @@ double xi_pm_tomo(
               const int q = nz*Ntable.Ntheta + i;
               xi_vec_plus[q]  = 0;
               xi_vec_minus[q] = 0;
-              for (int l=2; l<limits.LMAX; l++)
+              
+              for (int l=lmin; l<limits.LMAX; l++)
               {
                 xi_vec_plus[q]  += Glplus[i][l] * (Cl_EE[nz][l] + Cl_BB[nz][l]);
+                
                 xi_vec_minus[q] += Glminus[i][l] * (Cl_EE[nz][l] - Cl_BB[nz][l]);
               }
             }
@@ -466,10 +472,11 @@ double xi_pm_tomo(
             log_fatal("array allocation failed");
             exit(1);
           }
+          const int lmin = 1;
           for (int i=0; i<NSIZE; i++)
           {
             Cl[i]  = ((double*)(Cl + NSIZE) + limits.LMAX*i);
-            for (int l=0; l<2; l++)
+            for (int l=0; l<lmin; l++)
             {
               Cl[i][l] = 0.0;
             }
@@ -482,14 +489,16 @@ double xi_pm_tomo(
             const int Z1NZ = Z1(0);
             const int Z2NZ = Z2(0);
             const int l = limits.LMIN_tab + 1;
-            double trash = C_ss_tomo_limber((double) l, Z1NZ, Z2NZ, force_no_recompute); 
+            
+            double trash = C_ss_tomo_limber((double) l, Z1NZ, Z2NZ, 
+              force_no_recompute); 
           }
           #pragma GCC diagnostic pop
           
           #pragma omp parallel for collapse(2)
           for (int nz=0; nz<NSIZE; nz++)
           {
-            for (int l=2; l<limits.LMIN_tab; l++)
+            for (int l=lmin; l<limits.LMIN_tab; l++)
             {
               const int init_static_vars_only = 0; // FALSE
               const int Z1NZ = Z1(nz);
@@ -508,7 +517,9 @@ double xi_pm_tomo(
               const int force_no_recompute = 1;    // TRUE
               const int Z1NZ = Z1(nz);
               const int Z2NZ = Z2(nz);
-              Cl[nz][l] = C_ss_tomo_limber((double) l, Z1NZ, Z2NZ, force_no_recompute);
+              
+              Cl[nz][l] = C_ss_tomo_limber((double) l, Z1NZ, Z2NZ, 
+                force_no_recompute);
             }
           }
 
@@ -520,9 +531,11 @@ double xi_pm_tomo(
               const int q = nz*Ntable.Ntheta + i;
               xi_vec_plus[q] = 0;
               xi_vec_minus[q] = 0;
-              for (int l=2; l<limits.LMAX; l++)
+              
+              for (int l=lmin; l<limits.LMAX; l++)
               {
                 xi_vec_plus[q]  += Glplus[i][l]*Cl[nz][l];
+                
                 xi_vec_minus[q] += Glminus[i][l]*Cl[nz][l];
               }
             }
@@ -562,7 +575,6 @@ double xi_pm_tomo(
 
   const int ntomo = N_shear(ni, nj);
   const int q = ntomo*Ntable.Ntheta + nt;
-  
   if (q < 0 || q > NSIZE*Ntable.Ntheta - 1)
   {
     log_fatal("internal logic error in selecting bin number");
@@ -574,94 +586,93 @@ double xi_pm_tomo(
 
 // ---------------------------------------------------------------------------
 
-double w_gammat_tomo(const int nt, const int ni, const int nj, const int limber)
+double w_gammat_tomo(
+    const int nt, 
+    const int ni, 
+    const int nj, 
+    const int limber
+  )
 {
+  static double** Pl = NULL;
+  static double* w_vec = NULL;
+  static cosmopara C;
+  static nuisancepara N;
+  static galpara G;
+  static Ntab numtable;
+
   if (Ntable.Ntheta == 0)
   {
     log_fatal("Ntable.Ntheta not initialized");
     exit(1);
   }
 
-  static double** Pl = 0;
-  static double* w_vec = 0;
-  static cosmopara C;
-  static nuisancepara N;
-  static galpara G;
-
-  const int nell = limits.LMAX;
-  const int ntheta = Ntable.Ntheta;
   const int NSIZE = tomo.ggl_Npowerspectra;
 
-  if (Pl == 0)
-  {    
+  if (Pl == NULL || w_vec == NULL || recompute_table(numtable))
+  { 
+    if (Pl != NULL) 
     {
-      const int len = sizeof(double*)*ntheta + sizeof(double)*ntheta*nell;
-      
-      Pl = (double**) malloc(len);
-      if (Pl == NULL)
-      {
-        log_fatal("array allocation failed");
-        exit(1);
-      }
-      
-      for (int i=0; i<ntheta; i++)
-      {
-        Pl[i]  = ((double*)(Pl + ntheta) + nell*i);
-        for (int j=0; j<nell; j++)
-        {
-          Pl[i][j] = 0.0;
-        }
-      }
+      free(Pl);
+      Pl = NULL;
+    }
+    if (w_vec != NULL) 
+    {
+      free(w_vec);
+      w_vec = NULL;
     }
 
-    w_vec = (double*) calloc(NSIZE*ntheta, sizeof(double)); 
+    Pl = (double**) malloc(sizeof(double*)*Ntable.Ntheta + 
+                           sizeof(double)*Ntable.Ntheta*limits.LMAX);
+    if (Pl == NULL)
+    {
+      log_fatal("array allocation failed");
+      exit(1);
+    }
+    for (int i=0; i<Ntable.Ntheta; i++)
+    {
+      Pl[i]  = ((double*)(Pl + Ntable.Ntheta) + limits.LMAX*i);
+    }
+    
+    w_vec = (double*) calloc(NSIZE*Ntable.Ntheta, sizeof(double)); 
     if (w_vec == NULL)
     {
       log_fatal("array allocation failed");
       exit(1);
     }
 
-    double xmin[ntheta];
-    double xmax[ntheta];
-    // Cocoa: dont thread (init of static variables inside set_bin_average)
-    for (int i=0; i<ntheta; i++)
-    {
-      bin_avg r = set_bin_average(i,0);
-      xmin[i] = r.xmin;
-      xmax[i] = r.xmax;
-    }
-
-    const int len = sizeof(double*)*ntheta + sizeof(double)*ntheta*(nell + 1);
-    
+    const int len = sizeof(double*)*Ntable.Ntheta + 
+                    sizeof(double)*Ntable.Ntheta*(limits.LMAX + 1);
     double** Pmin  = (double**) malloc(len);
     if (Pmin == NULL)
     {
       log_fatal("array allocation failed");
       exit(1);
     }
-    
     double** Pmax  = (double**) malloc(len);
     if (Pmax == NULL)
     {
       log_fatal("array allocation failed");
       exit(1);
     }
-    
-    for (int i=0; i<ntheta; i++)
+    for (int i=0; i<Ntable.Ntheta; i++)
     {
-      Pmin[i]  = ((double*)(Pmin + ntheta) + (nell + 1)*i);
-      Pmax[i]  = ((double*)(Pmax + ntheta) + (nell + 1)*i);
-      for (int j=0; j<(nell + 1); j++)
-      {
-        Pmin[i][j]  = 0.0;
-        Pmax[i][j]  = 0.0;
-      }
+      Pmin[i]  = ((double*)(Pmin + Ntable.Ntheta) + (limits.LMAX + 1)*i);
+      Pmax[i]  = ((double*)(Pmax + Ntable.Ntheta) + (limits.LMAX + 1)*i);
+    }
+
+    double xmin[Ntable.Ntheta];
+    double xmax[Ntable.Ntheta];
+    for (int i=0; i<Ntable.Ntheta; i++)
+    { // Cocoa: dont thread (init of static variables inside set_bin_average)
+      bin_avg r = set_bin_average(i,0);
+      xmin[i] = r.xmin;
+      xmax[i] = r.xmax;
     }
 
     #pragma omp parallel for collapse(2)
-    for (int i=0; i<ntheta; i ++)
+    for (int i=0; i<Ntable.Ntheta; i ++)
     {
-      for (int l=0; l<nell; l++)
+      for (int l=0; l<(limits.LMAX+1); l++)
       {
         bin_avg r = set_bin_average(i, l);
         Pmin[i][l] = r.Pmin;
@@ -669,10 +680,18 @@ double w_gammat_tomo(const int nt, const int ni, const int nj, const int limber)
       }
     }
 
-    #pragma omp parallel for collapse(2)
-    for (int i=0; i<ntheta; i++)
+    const int lmin = 1;
+    for (int i=0; i<Ntable.Ntheta; i++)
     {
-      for (int l=1; l<nell; l++)
+      for (int l=0; l<lmin; l++)
+      {
+        Pl[i][l] = 0.0;
+      }
+    }
+    #pragma omp parallel for collapse(2)
+    for (int i=0; i<Ntable.Ntheta; i++)
+    {
+      for (int l=lmin; l<limits.LMAX; l++)
       {
         Pl[i][l] = (2.*l+1)/(4.*M_PI*l*(l+1)*(xmin[i]-xmax[i]))
           *((l+2./(2*l+1.))*(Pmin[i][l-1]-Pmax[i][l-1])
@@ -685,21 +704,20 @@ double w_gammat_tomo(const int nt, const int ni, const int nj, const int limber)
     free(Pmax);
   }
 
-  if (recompute_gs(C, G, N))
-  {
-    const int len = sizeof(double*)*NSIZE + sizeof(double)*NSIZE*nell;
-    
-    double** Cl = (double**) malloc(len);
+  if (recompute_gs(C, G, N) || recompute_table(numtable))
+  {    
+    double** Cl = (double**) malloc(sizeof(double*)*NSIZE + 
+                                    sizeof(double)*NSIZE*limits.LMAX);
     if (Cl == NULL)
     {
       log_fatal("array allocation failed");
       exit(1);
-    }
-    
+    } 
+    const int lmin = 1;
     for (int i=0; i<NSIZE; i++)
     {
-      Cl[i]  = ((double*)(Cl + NSIZE) + nell*i);
-      for (int l=0; l<2; l++)
+      Cl[i]  = ((double*)(Cl + NSIZE) + limits.LMAX*i);
+      for (int l=0; l<lmin; l++)
       {
         Cl[i][l] = 0.0;
       }
@@ -713,7 +731,9 @@ double w_gammat_tomo(const int nt, const int ni, const int nj, const int limber)
       const int ZLNZ = ZL(nz);
       const int ZSNZ = ZS(nz);
       const int l = limits.LMIN_tab + 1;
-      double trash = C_gs_tomo_limber((double) l, ZLNZ, ZSNZ, force_no_recompute);
+      
+      double trash = C_gs_tomo_limber((double) l, ZLNZ, ZSNZ, 
+        force_no_recompute);
     }
     #pragma GCC diagnostic pop
 
@@ -722,7 +742,7 @@ double w_gammat_tomo(const int nt, const int ni, const int nj, const int limber)
       #pragma omp parallel for collapse(2)
       for (int nz=0; nz<NSIZE; nz++)
       {
-        for (int l=2; l<limits.LMIN_tab; l++)
+        for (int l=lmin; l<limits.LMIN_tab; l++)
         {
           const int init_static_vars_only = 0; // FALSE
           const int ZLNZ = ZL(nz);
@@ -736,39 +756,42 @@ double w_gammat_tomo(const int nt, const int ni, const int nj, const int limber)
       #pragma omp parallel for collapse(2)
       for (int nz=0; nz<NSIZE; nz++)
       {
-        for (int l=limits.LMIN_tab; l<nell; l++)
+        for (int l=limits.LMIN_tab; l<limits.LMAX; l++)
         {
           const int force_no_recompute = 1;    // TRUE
           const int ZLNZ = ZL(nz);
           const int ZSNZ = ZS(nz);
-
-          Cl[nz][l] = C_gs_tomo_limber((double) l, ZLNZ, ZSNZ, force_no_recompute);
+          
+          Cl[nz][l] = C_gs_tomo_limber((double) l, ZLNZ, ZSNZ, 
+            force_no_recompute);
         }
       }
     }
     else
     {
-      for (int nz=0; nz<NSIZE; nz++) // NONLIMBER
-      { 
-        const int L = 1;
+      for (int nz=0; nz<NSIZE; nz++) 
+      { // NONLIMBER
+        const int L = lmin;
         const double tolerance = 0.0075;    // required fractional accuracy in C(l)
         const double dev = 10. * tolerance; // will be diff exact vs Limber init to large
                                             // value in order to start while loop
         const int ZLNZ = ZL(nz);
         const int ZSNZ = ZS(nz);
+        
         C_gl_tomo(L, ZLNZ, ZSNZ, Cl[nz], dev, tolerance);
       }
       
       #pragma omp parallel for collapse(2)
       for (int nz=0; nz<NSIZE; nz++) // LIMBER PART
       {
-        for (int l=limits.LMAX_NOLIMBER+1; l<nell; l++)
+        for (int l=limits.LMAX_NOLIMBER+1; l<limits.LMAX; l++)
         {
           const int force_no_recompute = 1;    // TRUE
           const int ZLNZ = ZL(nz);
           const int ZSNZ = ZS(nz);
 
-          Cl[nz][l] = C_gs_tomo_limber((double) l, ZLNZ, ZSNZ, force_no_recompute);
+          Cl[nz][l] = C_gs_tomo_limber((double) l, ZLNZ, ZSNZ, 
+            force_no_recompute);
         }
       }
     }
@@ -776,11 +799,12 @@ double w_gammat_tomo(const int nt, const int ni, const int nj, const int limber)
     #pragma omp parallel for collapse(2)
     for (int nz=0; nz<NSIZE; nz++)
     {
-      for (int i=0; i<ntheta; i++)
+      for (int i=0; i<Ntable.Ntheta; i++)
       {
-        const int q = nz*ntheta+i;
+        const int q = nz*Ntable.Ntheta+i;
         w_vec[q] = 0;
-        for (int l=1; l<nell; l++)
+        
+        for (int l=lmin; l<limits.LMAX; l++)
         {
           w_vec[q] += Pl[i][l]*Cl[nz][l];
         }
@@ -792,6 +816,7 @@ double w_gammat_tomo(const int nt, const int ni, const int nj, const int limber)
     update_cosmopara(&C);
     update_galpara(&G);
     update_nuisance(&N);
+    update_table(&numtable);
   }
 
   if (nt < 0 || nt > Ntable.Ntheta - 1)
@@ -799,14 +824,17 @@ double w_gammat_tomo(const int nt, const int ni, const int nj, const int limber)
     log_fatal("error in selecting bin number nt = %d (max %d)", nt, Ntable.Ntheta);
     exit(1); 
   }
-  if (ni < -1 || ni > tomo.clustering_Nbin - 1 || nj < -1 || nj > tomo.shear_Nbin - 1)
+  if (ni < -1 || 
+      ni > tomo.clustering_Nbin - 1 || 
+      nj < -1 || 
+      nj > tomo.shear_Nbin - 1)
   {
     log_fatal("error in selecting bin number (ni, nj) = [%d,%d]", ni, nj);
     exit(1);
   }
   
-  const int q = N_ggl(ni, nj)*ntheta + nt;
-  if (q < 0 || q > NSIZE*ntheta - 1)
+  const int q = N_ggl(ni, nj)*Ntable.Ntheta + nt;
+  if (q < 0 || q > NSIZE*Ntable.Ntheta - 1)
   {
     log_fatal("internal logic error in selecting bin number");
     exit(1);
@@ -817,94 +845,93 @@ double w_gammat_tomo(const int nt, const int ni, const int nj, const int limber)
 
 // ---------------------------------------------------------------------------
 
-double w_gg_tomo(const int nt, const int ni, const int nj, const int limber)
+double w_gg_tomo(
+    const int nt, 
+    const int ni, 
+    const int nj, 
+    const int limber
+  )
 {
+  static double** Pl = NULL;
+  static double* w_vec = NULL;
+  static cosmopara C;
+  static nuisancepara N;
+  static galpara G;
+  static Ntab numtable;
+
   if (Ntable.Ntheta == 0)
   {
     log_fatal("Ntable.Ntheta not initialized");
     exit(1);
   }
 
-  static double** Pl = 0;
-  static double* w_vec = 0;
-  static cosmopara C;
-  static nuisancepara N;
-  static galpara G;
-
-  const int nell = limits.LMAX;
-  const int ntheta = Ntable.Ntheta;
   const int NSIZE = tomo.clustering_Npowerspectra;
 
-  if (Pl == 0)
+  if (Pl == NULL || w_vec == NULL || recompute_table(numtable))
   {
+    if (Pl != NULL) 
     {
-      const int len = sizeof(double*)*ntheta + sizeof(double)*ntheta*nell;
-      
-      Pl = (double**) malloc(len);
-      if (Pl == NULL)
-      {
-        log_fatal("array allocation failed");
-        exit(1);
-      }
-      
-      for (int i=0; i<ntheta; i++)
-      {
-        Pl[i]  = ((double*)(Pl + ntheta) + nell*i);
-        for (int j=0; j<nell; j++)
-        {
-          Pl[i][j] = 0.0;
-        }
-      }
+      free(Pl);
+      Pl = NULL;
+    }
+    if (w_vec != NULL) 
+    {
+      free(w_vec);
+      w_vec = NULL;
     }
 
-    w_vec = (double*) calloc(NSIZE*ntheta, sizeof(double));
+    Pl = (double**) malloc(sizeof(double*)*Ntable.Ntheta + 
+                           sizeof(double)*Ntable.Ntheta*limits.LMAX);
+    if (Pl == NULL)
+    {
+      log_fatal("array allocation failed");
+      exit(1);
+    }
+    for (int i=0; i<Ntable.Ntheta; i++)
+    {
+      Pl[i] = ((double*)(Pl + Ntable.Ntheta) + limits.LMAX*i);
+    }
+
+    w_vec = (double*) calloc(NSIZE*Ntable.Ntheta, sizeof(double));
     if (w_vec == NULL)
     {
       log_fatal("array allocation failed");
       exit(1);
     }
 
-    double xmin[ntheta];
-    double xmax[ntheta];
-    // Cocoa: dont thread (init of static variables inside set_bin_average)
-    for (int i=0; i<ntheta; i ++)
-    {
-      bin_avg r = set_bin_average(i,0);
-      xmin[i] = r.xmin;
-      xmax[i] = r.xmax;
-    }
-
-    const int len = sizeof(double*)*ntheta + sizeof(double)*ntheta*(nell + 1);
-    
-    double** Pmin  = (double**) malloc(len);
+    const int len = sizeof(double*)*Ntable.Ntheta + 
+                    sizeof(double)*Ntable.Ntheta*(limits.LMAX + 1);
+    double** Pmin = (double**) malloc(len);
     if (Pmin == NULL)
     {
       log_fatal("array allocation failed");
       exit(1);
     }
-    
-    double** Pmax  = (double**) malloc(len);
+    double** Pmax = (double**) malloc(len);
     if (Pmax == NULL)
     {
       log_fatal("array allocation failed");
       exit(1);
     }
-    
-    for (int i=0; i<ntheta; i++)
+    for (int i=0; i<Ntable.Ntheta; i++)
     {
-      Pmin[i]  = ((double*)(Pmin + ntheta) + (nell + 1)*i);
-      Pmax[i]  = ((double*)(Pmax + ntheta) + (nell + 1)*i);
-      for (int j=0; j<(nell + 1); j++)
-      {
-        Pmin[i][j]  = 0.0;
-        Pmax[i][j]  = 0.0;
-      }
+      Pmin[i] = ((double*)(Pmin + Ntable.Ntheta) + (limits.LMAX + 1)*i);
+      Pmax[i] = ((double*)(Pmax + Ntable.Ntheta) + (limits.LMAX + 1)*i);
     }
-  
+
+    double xmin[Ntable.Ntheta];
+    double xmax[Ntable.Ntheta];
+    for (int i=0; i<Ntable.Ntheta; i ++)
+    { // Cocoa: dont thread (init of static variables inside set_bin_average)
+      bin_avg r = set_bin_average(i,0);
+      xmin[i] = r.xmin;
+      xmax[i] = r.xmax;
+    }
+
     #pragma omp parallel for collapse(2)
-    for (int i=0; i<ntheta; i++)
+    for (int i=0; i<Ntable.Ntheta; i++)
     {
-      for (int l=0; l<nell; l++)
+      for (int l=0; l<(limits.LMAX+1); l++)
       {
         bin_avg r = set_bin_average(i,l);
         Pmin[i][l] = r.Pmin;
@@ -912,18 +939,22 @@ double w_gg_tomo(const int nt, const int ni, const int nj, const int limber)
       }
     }
 
-    for (int i=0; i<ntheta; i++)
-    { 
-      Pl[i][0] = 1.0;
-    }
-
-    #pragma omp parallel for collapse(2)
-    for (int i=0; i<ntheta; i++)
+    const int lmin = 1;
+    for (int i=0; i<Ntable.Ntheta; i++)
     {
-      for (int l=1; l<nell; l++)
+      for (int l=0; l<lmin; l++)
+      {
+        Pl[i][l] = 0.0;
+      }
+    }
+    #pragma omp parallel for collapse(2)
+    for (int i=0; i<Ntable.Ntheta; i++)
+    {
+      for (int l=lmin; l<limits.LMAX; l++)
       { 
         const double tmp = (1.0/(xmin[i] - xmax[i]))*(1. / (4.0 * M_PI));
-        Pl[i][l] = tmp*(Pmin[i][l + 1] - Pmax[i][l + 1] - Pmin[i][l - 1] + Pmax[i][l - 1]);
+        Pl[i][l] = tmp*(Pmin[i][l + 1] - Pmax[i][l + 1] 
+                        - Pmin[i][l - 1] + Pmax[i][l - 1]);
       }
     }
 
@@ -931,21 +962,20 @@ double w_gg_tomo(const int nt, const int ni, const int nj, const int limber)
     free(Pmax);
   }
 
-  if (recompute_gg(C, G, N))
-  {    
-    const int len = sizeof(double*)*NSIZE + sizeof(double)*NSIZE*nell;
-    
-    double** Cl = (double**) malloc(len);
+  if (recompute_gg(C, G, N) || recompute_table(numtable))
+  {        
+    double** Cl = (double**) malloc(sizeof(double*)*NSIZE + 
+                                    sizeof(double)*NSIZE*limits.LMAX);
     if (Cl == NULL)
     {
       log_fatal("array allocation failed");
       exit(1);
     }
-    
+    const int lmin = 1;
     for (int i=0; i<NSIZE; i++)
     {
-      Cl[i]  = ((double*)(Cl + NSIZE) + nell*i);
-      for (int l=0; l<2; l++)
+      Cl[i]  = ((double*)(Cl + NSIZE) + limits.LMAX*i);
+      for (int l=0; l<lmin; l++)
       {
         Cl[i][l] = 0.0;
       }
@@ -953,8 +983,13 @@ double w_gg_tomo(const int nt, const int ni, const int nj, const int limber)
 
     #pragma GCC diagnostic push
     #pragma GCC diagnostic ignored "-Wunused-variable"
-    {
-      double init_static_vars_only = C_gg_tomo_limber(limits.LMIN_tab, 0, 0, 0);
+    { // init static variables inside the C_XY_limber function
+      const int force_no_recompute = 0;    // FALSE
+      const int Z1 = 0;
+      const int Z2 = 0;
+      const int l = limits.LMIN_tab + 1;
+      
+      double trash = C_gg_tomo_limber((double) l, Z1, Z2, force_no_recompute);
     }
     #pragma GCC diagnostic pop
     
@@ -963,24 +998,29 @@ double w_gg_tomo(const int nt, const int ni, const int nj, const int limber)
       #pragma omp parallel for collapse(2)
       for (int nz=0; nz<NSIZE; nz++)
       {
-        for (int l=1; l<limits.LMIN_tab; l++)
+        for (int l=lmin; l<limits.LMIN_tab; l++)
         {
+          const int init_static_vars_only = 0; // FALSE
           const int q = nz;
           const int Z1 = nz; // cross redshift bin not supported so not using ZCL1(k)
           const int Z2 = nz; // cross redshift bin not supported so not using ZCL2(k)
-          Cl[q][l] = C_gg_tomo_limber_nointerp((double) l, Z1, Z2, use_linear_ps_limber, 0);
+          
+          Cl[q][l] = C_gg_tomo_limber_nointerp((double) l, Z1, Z2, 
+            use_linear_ps_limber, init_static_vars_only);
         }
       }
       
       #pragma omp parallel for collapse(2)
       for (int nz=0; nz<NSIZE; nz++)
       {
-        for (int l=limits.LMIN_tab; l<nell; l++)
+        for (int l=limits.LMIN_tab; l<limits.LMAX; l++)
         {
+          const int force_no_recompute = 1;    // TRUE
           const int q = nz;
           const int Z1 = nz; // cross redshift bin not supported so not using ZCL1(k)
           const int Z2 = nz; // cross redshift bin not supported so not using ZCL2(k)
-          Cl[q][l] = C_gg_tomo_limber((double) l, Z1, Z2, 1);
+          
+          Cl[q][l] = C_gg_tomo_limber((double) l, Z1, Z2, force_no_recompute);
         }
       }
     }
@@ -989,23 +1029,26 @@ double w_gg_tomo(const int nt, const int ni, const int nj, const int limber)
       for (int nz=0; nz<NSIZE; nz++) // NONLIMBER PART
       { 
         const int L = 1;
-        const double tolerance = 0.01;    // required fractional accuracy in C(l)
+        const double tolerance = 0.01;      // required fractional accuracy in C(l)
         const double dev = 10. * tolerance; // will be diff  exact vs Limber init to
                                             // large value in order to start while loop
         const int Z1 = nz; // cross redshift bin not supported so not using ZCL1(k)
         const int Z2 = nz; // cross redshift bin not supported so not using ZCL2(k)
+        
         C_cl_tomo(L, Z1, Z2, Cl[nz], dev, tolerance);
       }
       
       #pragma omp parallel for collapse(2)
       for (int nz=0; nz<NSIZE; nz++) // LIMBER PART
       {
-        for (int l=limits.LMAX_NOLIMBER+1; l<nell; l++)
+        for (int l=limits.LMAX_NOLIMBER+1; l<limits.LMAX; l++)
         {
+          const int force_no_recompute = 1;    // TRUE
           const int q = nz;
           const int Z1 = nz; // cross redshift bin not supported so not using ZCL1(k)
           const int Z2 = nz; // cross redshift bin not supported so not using ZCL2(k)
-          Cl[q][l] = C_gg_tomo_limber((double) l, Z1, Z2, 1);
+          
+          Cl[q][l] = C_gg_tomo_limber((double) l, Z1, Z2, force_no_recompute);
         }
       }
     }
@@ -1013,11 +1056,12 @@ double w_gg_tomo(const int nt, const int ni, const int nj, const int limber)
     #pragma omp parallel for collapse(2)
     for (int nz=0; nz<NSIZE; nz++)
     {
-      for (int i=0; i<ntheta; i++)
+      for (int i=0; i<Ntable.Ntheta; i++)
       {
-        const int q = nz*ntheta + i;
+        const int q = nz*Ntable.Ntheta + i;
         w_vec[q] = 0;
-        for (int l=1; l<nell; l++)
+        
+        for (int l=lmin; l<limits.LMAX; l++)
         {
           w_vec[q] += Pl[i][l]*Cl[nz][l];
         }
@@ -1029,6 +1073,7 @@ double w_gg_tomo(const int nt, const int ni, const int nj, const int limber)
     update_cosmopara(&C);
     update_galpara(&G);
     update_nuisance(&N);
+    update_table(&numtable);
   }
 
   if (nt < 0 || nt > Ntable.Ntheta - 1)
@@ -1036,21 +1081,22 @@ double w_gg_tomo(const int nt, const int ni, const int nj, const int limber)
     log_fatal("error in selecting bin number nt = %d (max %d)", nt, Ntable.Ntheta);
     exit(1); 
   }
-  
-  if (ni < -1 || ni > tomo.clustering_Nbin - 1 || nj < -1 || nj > tomo.clustering_Nbin - 1)
+  if (ni < -1 || 
+      ni > tomo.clustering_Nbin - 1 || 
+      nj < -1 || 
+      nj > tomo.clustering_Nbin - 1)
   {
     log_fatal("error in selecting bin number (ni, nj) = [%d,%d]", ni, nj);
     exit(1);
   }
-  
   if (ni != nj)
   {
     log_fatal("ni != nj tomography not supported");
     exit(1);
   }
   
-  const int q = ni * ntheta + nt;
-  if (q  < 0 || q > NSIZE*ntheta - 1)
+  const int q = ni * Ntable.Ntheta + nt;
+  if (q  < 0 || q > NSIZE*Ntable.Ntheta - 1)
   {
     log_fatal("internal logic error in selecting bin number");
     exit(1);
@@ -1063,92 +1109,86 @@ double w_gg_tomo(const int nt, const int ni, const int nj, const int limber)
 
 double w_gk_tomo(const int nt, const int ni, const int limber)
 {
+  static double** Pl = NULL;
+  static double* w_vec = NULL;
+  static cosmopara C;
+  static nuisancepara N;
+  static galpara G;
+  static Ntab numtable;
+
   if (Ntable.Ntheta == 0)
   {
     log_fatal("Ntable.Ntheta not initialized");
     exit(1);
   }
 
-  static double** Pl =0;
-  static double* w_vec = 0;
-  static cosmopara C;
-  static nuisancepara N;
-  static galpara G;
-  
-  const int nell = limits.LMAX;
-  const int ntheta = Ntable.Ntheta;
   const int NSIZE = tomo.clustering_Nbin;
   
-  if (Pl == 0)
+  if (Pl == NULL || w_vec == NULL || recompute_table(numtable))
   {
+    if (Pl != NULL) 
     {
-      const int len = sizeof(double*)*ntheta + sizeof(double)*ntheta*nell;
-      
-      Pl = (double**) malloc(len);
-      if (Pl == NULL)
-      {
-        log_fatal("array allocation failed");
-        exit(1);
-      }
-      
-      for (int i=0; i<ntheta; i++)
-      {
-        Pl[i]  = ((double*)(Pl + ntheta) + nell*i);
-        for (int j=0; j<nell; j++)
-        {
-          Pl[i][j] = 0.0;
-        }
-      }
+      free(Pl);
+      Pl = NULL;
+    }
+    if (w_vec != NULL) 
+    {
+      free(w_vec);
+      w_vec = NULL;
+    }
+ 
+    Pl = (double**) malloc(sizeof(double*)*Ntable.Ntheta + 
+                           sizeof(double)*Ntable.Ntheta*limits.LMAX);
+    if (Pl == NULL)
+    {
+      log_fatal("array allocation failed");
+      exit(1);
+    }
+    for (int i=0; i<Ntable.Ntheta; i++)
+    {
+      Pl[i]  = ((double*)(Pl + Ntable.Ntheta) + limits.LMAX*i);
     }
 
-    w_vec = (double*) calloc(NSIZE*ntheta, sizeof(double));
+    w_vec = (double*) calloc(NSIZE*Ntable.Ntheta, sizeof(double));
     if (w_vec == NULL)
     {
       log_fatal("array allocation failed");
       exit(1);
     }
 
-    double xmin[ntheta];
-    double xmax[ntheta];
-    // Cocoa: dont thread (init of static variables inside set_bin_average)
-    for (int i=0; i<ntheta; i++)
-    {
-      bin_avg r = set_bin_average(i,0);
-      xmin[i] = r.xmin;
-      xmax[i] = r.xmax;
-    }
-
-    const int len = sizeof(double*)*ntheta + sizeof(double)*ntheta*(nell + 1);
-    
+    const int len = sizeof(double*)*Ntable.Ntheta + 
+                    sizeof(double)*Ntable.Ntheta*(limits.LMAX + 1);
     double** Pmin  = (double**) malloc(len);
     if (Pmin == NULL)
     {
       log_fatal("array allocation failed");
       exit(1);
     }
-    
     double** Pmax  = (double**) malloc(len);
     if (Pmax == NULL)
     {
       log_fatal("array allocation failed");
       exit(1);
     }
-    
-    for (int i=0; i<ntheta; i++)
+    for (int i=0; i<Ntable.Ntheta; i++)
     {
-      Pmin[i]  = ((double*)(Pmin + ntheta) + (nell + 1)*i);
-      Pmax[i]  = ((double*)(Pmax + ntheta) + (nell + 1)*i);
-      for (int j=0; j<(nell + 1); j++)
-      {
-        Pmin[i][j]  = 0.0;
-        Pmax[i][j]  = 0.0;
-      }
+      Pmin[i]  = ((double*)(Pmin + Ntable.Ntheta) + (limits.LMAX + 1)*i);
+      Pmax[i]  = ((double*)(Pmax + Ntable.Ntheta) + (limits.LMAX + 1)*i);
+    }
+
+    double xmin[Ntable.Ntheta];
+    double xmax[Ntable.Ntheta];
+    for (int i=0; i<Ntable.Ntheta; i++)
+    { // Cocoa: dont thread (init of static variables inside set_bin_average)
+      bin_avg r = set_bin_average(i,0);
+      xmin[i] = r.xmin;
+      xmax[i] = r.xmax;
     }
 
     #pragma omp parallel for collapse(2)
-    for (int i=0; i<ntheta; i++)
+    for (int i=0; i<Ntable.Ntheta; i++)
     {
-      for (int l=0; l<nell; l++)
+      for (int l=0; l<limits.LMAX; l++)
       {
         bin_avg r = set_bin_average(i,l);
         Pmin[i][l] = r.Pmin;
@@ -1156,13 +1196,22 @@ double w_gk_tomo(const int nt, const int ni, const int limber)
       }
     }
 
-    #pragma omp parallel for collapse(2)
-    for (int i=0; i<ntheta; i++)
+    const int lmin = 1;
+    for (int i=0; i<Ntable.Ntheta; i++)
     {
-      for (int l=1; l<nell; l++)
+      for (int l=0; l<lmin; l++)
+      {
+        Pl[i][l] = 0.0;
+      }
+    }
+    #pragma omp parallel for collapse(2)
+    for (int i=0; i<Ntable.Ntheta; i++)
+    {
+      for (int l=lmin; l<limits.LMAX; l++)
       {
         const double tmp = (1.0/(xmin[i] - xmax[i]))*(1.0 / (4.0 * M_PI));
-        Pl[i][l] = tmp*(Pmin[i][l + 1] - Pmax[i][l + 1] - Pmin[i][l - 1] + Pmax[i][l - 1]);
+        Pl[i][l] = tmp*(Pmin[i][l + 1] - Pmax[i][l + 1] 
+                        - Pmin[i][l - 1] + Pmax[i][l - 1]);
       }
     }
 
@@ -1170,21 +1219,20 @@ double w_gk_tomo(const int nt, const int ni, const int limber)
     free(Pmax);
   }
 
-  if (recompute_gk(C, G, N))
-  {
-    const int len = sizeof(double*)*NSIZE + sizeof(double)*NSIZE*nell;
-    
-    double** Cl = (double**) malloc(len);
+  if (recompute_gk(C, G, N) || recompute_table(numtable))
+  { 
+    double** Cl = (double**) malloc(sizeof(double*)*NSIZE + 
+                                    sizeof(double)*NSIZE*limits.LMAX);
     if (Cl == NULL)
     {
       log_fatal("array allocation failed");
       exit(1);
     }
-    
+    const int lmin = 1;
     for (int i=0; i<NSIZE; i++)
     {
-      Cl[i]  = ((double*)(Cl + NSIZE) + nell*i);
-      for (int l=0; l<2; l++)
+      Cl[i]  = ((double*)(Cl + NSIZE) + limits.LMAX*i);
+      for (int l=0; l<lmin; l++)
       {
         Cl[i][l] = 0.0;
       }
@@ -1194,37 +1242,49 @@ double w_gk_tomo(const int nt, const int ni, const int limber)
     {
       #pragma GCC diagnostic push
       #pragma GCC diagnostic ignored "-Wunused-variable"
-      {
-        double init_static_vars_only = C_gk_tomo_limber_wrapper(limits.LMIN_tab + 1, 0, 0);
+      { // init static variables inside the C_XY_limber function
+        const int force_no_recompute = 0;    // FALSE
+        const int nz = 0;
+        const int l = limits.LMIN_tab + 1;
+        
+        double trash = C_gk_tomo_limber_wrapper((double) l, nz, 
+          force_no_recompute);
       }
       #pragma GCC diagnostic pop
       
       #pragma omp parallel for collapse(2)
       for (int nz=0; nz<NSIZE; nz++)
       {
-        for (int l=1; l<limits.LMIN_tab; l++)
+        for (int l=lmin; l<limits.LMIN_tab; l++)
         {
-          Cl[nz][l] = C_gk_tomo_limber_nointerp_wrapper((double) l, nz, use_linear_ps_limber, 0);
-        }
-      }
-      #pragma omp parallel for collapse(2)
-      for (int nz=0; nz<NSIZE; nz++)
-      {
-        for (int l=limits.LMIN_tab; l<nell; l++)
-        {
-          Cl[nz][l] = C_gk_tomo_limber_wrapper((double) l, nz, 1);
+          const int init_static_vars_only = 0; // FALSE
+
+          Cl[nz][l] = C_gk_tomo_limber_nointerp_wrapper((double) l, nz, 
+            use_linear_ps_limber, init_static_vars_only);
         }
       }
 
       #pragma omp parallel for collapse(2)
       for (int nz=0; nz<NSIZE; nz++)
       {
-        for (int i=0; i<ntheta; i++)
+        for (int l=limits.LMIN_tab; l<limits.LMAX; l++)
         {
-          w_vec[nz*ntheta+i] = 0;
-          for (int l=1; l<nell; l++)
+          const int force_no_recompute = 1;    // TRUE
+          
+          Cl[nz][l] = C_gk_tomo_limber_wrapper((double) l, nz, 
+            force_no_recompute);
+        }
+      }
+
+      #pragma omp parallel for collapse(2)
+      for (int nz=0; nz<NSIZE; nz++)
+      {
+        for (int i=0; i<Ntable.Ntheta; i++)
+        {
+          w_vec[nz*Ntable.Ntheta+i] = 0;
+          for (int l=lmin; l<limits.LMAX; l++)
           {
-            w_vec[nz*ntheta+i] += Pl[i][l]*Cl[nz][l];
+            w_vec[nz*Ntable.Ntheta+i] += Pl[i][l]*Cl[nz][l];
           }
         }
       }
@@ -1240,6 +1300,7 @@ double w_gk_tomo(const int nt, const int ni, const int limber)
     update_cosmopara(&C);
     update_galpara(&G);
     update_nuisance(&N);
+    update_table(&numtable);
   }
 
   if (ni < -1 || ni > tomo.clustering_Nbin - 1)
@@ -1247,15 +1308,14 @@ double w_gk_tomo(const int nt, const int ni, const int limber)
     log_fatal("error in selecting bin number ni = %d (max %d)", ni, tomo.clustering_Nbin);
     exit(1); 
   } 
-  
   if (nt < 0 || nt > Ntable.Ntheta - 1)
   {
     log_fatal("error in selecting bin number nt = %d (max %d)", nt, Ntable.Ntheta);
     exit(1); 
   } 
   
-  const int q = ni * ntheta + nt;
-  if (q < 0 || q > NSIZE*ntheta - 1)
+  const int q = ni * Ntable.Ntheta + nt;
+  if (q < 0 || q > NSIZE*Ntable.Ntheta - 1)
   {
     log_fatal("internal logic error in selecting bin number");
     exit(1);
@@ -1266,61 +1326,60 @@ double w_gk_tomo(const int nt, const int ni, const int limber)
 
 // ---------------------------------------------------------------------------
 
-double w_ks_tomo(const int nt, const int ni, const int limber)
+double w_ks_tomo(
+    const int nt, 
+    const int ni, 
+    const int limber
+  )
 {
-  if (Ntable.Ntheta ==0)
+  static double** Pl = NULL;
+  static double* w_vec = NULL;
+  static cosmopara C;
+  static nuisancepara N;
+  static Ntab numtable;
+  
+  if (Ntable.Ntheta == 0)
   {
     log_fatal("Ntable.Ntheta not initialized");
     exit(1);
   }
 
-  static double** Pl =0;
-  static double* w_vec =0;
-  static cosmopara C;
-  static nuisancepara N;
-  
-  const int nell = limits.LMAX;
-  const int ntheta = Ntable.Ntheta;
   const int NSIZE = tomo.shear_Nbin;
 
-  if (Pl == 0)
+  if (Pl == NULL || w_vec == NULL || recompute_table(numtable))
   {
+    if (Pl != NULL) 
     {
-      const int len = sizeof(double*)*ntheta + sizeof(double)*ntheta*nell;
-      Pl = (double**) malloc(len);
-      if (Pl == NULL)
-      {
-        log_fatal("array allocation failed");
-        exit(1);
-      }
-      for (int i=0; i<ntheta; i++)
-      {
-        Pl[i]  = ((double*)(Pl + ntheta) + nell*i);
-        for (int j=0; j<nell; j++)
-        {
-          Pl[i][j] = 0.0;
-        }
-      }
+      free(Pl);
+      Pl = NULL;
+    }
+    if (w_vec != NULL) 
+    {
+      free(w_vec);
+      w_vec = NULL;
     }
 
-    w_vec = (double*) calloc(NSIZE*ntheta, sizeof(double));
+    Pl = (double**) malloc(sizeof(double*)*Ntable.Ntheta + 
+                           sizeof(double)*Ntable.Ntheta*limits.LMAX);
+    if (Pl == NULL)
+    {
+      log_fatal("array allocation failed");
+      exit(1);
+    }
+    for (int i=0; i<Ntable.Ntheta; i++)
+    {
+      Pl[i]  = ((double*)(Pl + Ntable.Ntheta) + limits.LMAX*i);
+    }
+
+    w_vec = (double*) calloc(NSIZE*Ntable.Ntheta, sizeof(double));
     if (w_vec == NULL)
     {
       log_fatal("array allocation failed");
       exit(1);
     }
 
-    double xmin[ntheta];
-    double xmax[ntheta];
-    // Cocoa: dont thread (init of static variables inside set_bin_average)
-    for (int i=0; i<ntheta; i++)
-    {
-      bin_avg r = set_bin_average(i,0);
-      xmin[i] = r.xmin;
-      xmax[i] = r.xmax;
-    }
-
-    const int len = sizeof(double*)*ntheta + sizeof(double)*ntheta*(nell + 1);
+    const int len = sizeof(double*)*Ntable.Ntheta + 
+                    sizeof(double)*Ntable.Ntheta*(limits.LMAX + 1);
     
     double** Pmin  = (double**) malloc(len);
     if (Pmin == NULL)
@@ -1328,29 +1387,31 @@ double w_ks_tomo(const int nt, const int ni, const int limber)
       log_fatal("array allocation failed");
       exit(1);
     }
-    
     double** Pmax  = (double**) malloc(len);
     if (Pmax == NULL)
     {
       log_fatal("array allocation failed");
       exit(1);
     }
-    
-    for (int i=0; i<ntheta; i++)
+    for (int i=0; i<Ntable.Ntheta; i++)
     {
-      Pmin[i]  = ((double*)(Pmin + ntheta) + (nell + 1)*i);
-      Pmax[i]  = ((double*)(Pmax + ntheta) + (nell + 1)*i);
-      for (int j=0; j<(nell + 1); j++)
-      {
-        Pmin[i][j]  = 0.0;
-        Pmax[i][j]  = 0.0;
-      }
+      Pmin[i]  = ((double*)(Pmin + Ntable.Ntheta) + (limits.LMAX + 1)*i);
+      Pmax[i]  = ((double*)(Pmax + Ntable.Ntheta) + (limits.LMAX + 1)*i);
+    }
+
+    double xmin[Ntable.Ntheta];
+    double xmax[Ntable.Ntheta];
+    for (int i=0; i<Ntable.Ntheta; i++)
+    { // Cocoa: dont thread (init of static variables inside set_bin_average)
+      bin_avg r = set_bin_average(i,0);
+      xmin[i] = r.xmin;
+      xmax[i] = r.xmax;
     }
 
     #pragma omp parallel for collapse(2)
-    for (int i=0; i<ntheta; i++)
+    for (int i=0; i<Ntable.Ntheta; i++)
     {
-      for (int l=0; l<nell; l++)
+      for (int l=0; l<limits.LMAX; l++)
       {
         bin_avg r = set_bin_average(i,l);
         Pmin[i][l] = r.Pmin;
@@ -1358,10 +1419,18 @@ double w_ks_tomo(const int nt, const int ni, const int limber)
       }
     }
 
-    #pragma omp parallel for collapse(2)
-    for (int i=0; i<ntheta; i++)
+    const int lmin = 1;
+    for (int i=0; i<Ntable.Ntheta; i++)
     {
-      for (int l=1; l<nell; l++)
+      for (int l=0; l<lmin; l++)
+      {
+        Pl[i][0] = 0.0;
+      }
+    }
+    #pragma omp parallel for collapse(2)
+    for (int i=0; i<Ntable.Ntheta; i++)
+    {
+      for (int l=lmin; l<limits.LMAX; l++)
       {
         Pl[i][l] = (2.*l+1)/(4.*M_PI*l*(l+1)*(xmin[i]-xmax[i]))
           *((l+2./(2*l+1.))*(Pmin[i][l-1]-Pmax[i][l-1])
@@ -1374,21 +1443,20 @@ double w_ks_tomo(const int nt, const int ni, const int limber)
     free(Pmax);
   }
 
-  if (recompute_ks(C, N))
+  if (recompute_ks(C, N) || recompute_table(numtable))
   {
-    const int len = sizeof(double*)*NSIZE + sizeof(double)*NSIZE*nell;
-    
-    double** Cl = (double**) malloc(len);
+    double** Cl = (double**) malloc(sizeof(double*)*NSIZE + 
+                                    sizeof(double)*NSIZE*limits.LMAX);
     if (Cl == NULL)
     {
       log_fatal("array allocation failed");
       exit(1);
     }
-    
+    const int lmin = 1;
     for (int i=0; i<NSIZE; i++)
     {
-      Cl[i]  = ((double*)(Cl + NSIZE) + nell*i);
-      for (int l=0; l<2; l++)
+      Cl[i]  = ((double*)(Cl + NSIZE) + limits.LMAX*i);
+      for (int l=0; l<lmin; l++)
       {
         Cl[i][l] = 0.0;
       }
@@ -1398,31 +1466,49 @@ double w_ks_tomo(const int nt, const int ni, const int limber)
     {      
       #pragma GCC diagnostic push
       #pragma GCC diagnostic ignored "-Wunused-variable"
-      {
-        double init_static_vars_only = C_ks_tomo_limber_wrapper(limits.LMIN_tab + 1, 0, 0);
+      { // init static variables inside the C_XY_limber function
+        const int force_no_recompute = 0;    // FALSE
+        const int nz = 0;
+        const int l  = limits.LMIN_tab + 1;
+        
+        double trash = C_ks_tomo_limber_wrapper((double) l, nz, 
+          force_no_recompute);
       }
       #pragma GCC diagnostic pop
       
       #pragma omp parallel for collapse(2)
       for (int nz=0; nz<tomo.shear_Nbin; nz++)
       {
-        for (int l=1; l<nell; l++)
+        for (int l=lmin; l<limits.LMIN_tab; l++)
         {
-          Cl[nz][l] = (l > limits.LMIN_tab) ?
-            C_ks_tomo_limber_wrapper(l, nz, 1) :
-            C_ks_tomo_limber_nointerp_wrapper(l, nz, use_linear_ps_limber, 0);
+          const int init_static_vars_only = 0; // FALSE
+          
+          Cl[nz][l] = C_ks_tomo_limber_nointerp_wrapper((double) l, nz, 
+            use_linear_ps_limber, init_static_vars_only);
+        }
+      }
+
+      #pragma omp parallel for collapse(2)
+      for (int nz=0; nz<NSIZE; nz++)
+      {
+        for (int l=limits.LMIN_tab; l<limits.LMAX; l++)
+        {
+          const int force_no_recompute = 1;    // TRUE
+
+          Cl[nz][l] = C_ks_tomo_limber_wrapper((double) l, nz, 
+            force_no_recompute);
         }
       }
       
       #pragma omp parallel for collapse(2)
-      for (int nz=0; nz<tomo.shear_Nbin; nz++)
+      for (int nz=0; nz<NSIZE; nz++)
       {
-        for (int i=0; i<ntheta; i++)
+        for (int i=0; i<Ntable.Ntheta; i++)
         {
-          w_vec[nz*ntheta+i] = 0;
-          for (int l=2; l<nell; l++)
+          w_vec[nz*Ntable.Ntheta+i] = 0;
+          for (int l=lmin; l<limits.LMAX; l++)
           {
-            w_vec[nz*ntheta+i] += Pl[i][l]*Cl[nz][l];
+            w_vec[nz*Ntable.Ntheta+i] += Pl[i][l]*Cl[nz][l];
           }
         }
       }
@@ -1437,6 +1523,7 @@ double w_ks_tomo(const int nt, const int ni, const int limber)
 
     update_cosmopara(&C);
     update_nuisance(&N);
+    update_table(&numtable);
   }
 
   if (nt < 0 || nt > Ntable.Ntheta - 1)
@@ -1444,15 +1531,14 @@ double w_ks_tomo(const int nt, const int ni, const int limber)
     log_fatal("error in selecting bin number nt = %d (max %d)", nt, Ntable.Ntheta);
     exit(1); 
   }
-  
   if (ni < -1 || ni > tomo.shear_Nbin - 1)
   {
     log_fatal("error in selecting bin number ni = %d (max %d)", ni, tomo.shear_Nbin);
     exit(1);
   }
   
-  const int q = ni * ntheta + nt;
-  if (q  < 0 || q > NSIZE*ntheta - 1)
+  const int q = ni * Ntable.Ntheta + nt;
+  if (q  < 0 || q > NSIZE*Ntable.Ntheta - 1)
   {
     log_fatal("internal logic error in selecting bin number");
     exit(1);

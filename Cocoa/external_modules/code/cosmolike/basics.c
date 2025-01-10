@@ -99,6 +99,7 @@ bin_avg set_bin_average(
     }
 
     const int nell = limits.LMAX+1; // Legendre computes l=0,...,lmax (inclusive)
+    
     const int len  = sizeof(double*)*Ntable.Ntheta + 
                            sizeof(double)*Ntable.Ntheta*nell;
 
@@ -108,41 +109,30 @@ bin_avg set_bin_average(
       log_fatal("array allocation failed");
       exit(1);
     }
-
     Pmax  = (double**) malloc(len);
     if (Pmax == NULL)
     {
       log_fatal("array allocation failed");
       exit(1);
     }
-
     dPmin = (double**) malloc(len);
     if (dPmin == NULL)
     {
       log_fatal("array allocation failed");
       exit(1);
     }
-
     dPmax = (double**) malloc(len);
     if (dPmax == NULL)
     {
       log_fatal("array allocation failed");
       exit(1);
     }
-
     for (int i=0; i<Ntable.Ntheta; i++)
     {
       Pmin[i]  = ((double*)(Pmin + Ntable.Ntheta) + nell*i);
       Pmax[i]  = ((double*)(Pmax + Ntable.Ntheta) + nell*i);
       dPmin[i] = ((double*)(dPmin + Ntable.Ntheta) + nell*i);
       dPmax[i] = ((double*)(dPmax + Ntable.Ntheta) + nell*i);
-      for (int j=0; j<nell; j++)
-      {
-        Pmin[i][j]  = 0.0;
-        Pmax[i][j]  = 0.0;
-        dPmin[i][j] = 0.0;
-        dPmax[i][j] = 0.0;
-      }
     }
 
     xmin = (double*) calloc(Ntable.Ntheta, sizeof(double));
@@ -151,7 +141,6 @@ bin_avg set_bin_average(
       log_fatal("array allocation failed");
       exit(1);
     }
-
     xmax = (double*) calloc(Ntable.Ntheta, sizeof(double));
     if (xmax == NULL)
     {
