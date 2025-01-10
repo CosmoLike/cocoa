@@ -2084,7 +2084,7 @@ double C_ss_tomo_limber_nointerp(
   
   if (w == NULL || recompute_table(numtable))
   {
-    const size_t nsize_integration = 60 + 50 * (Ntable.high_def_integration);
+    const size_t nsize_integration = 90 + 50 * (Ntable.high_def_integration);
     
     if (w != NULL)
     {
@@ -2490,7 +2490,7 @@ double C_gs_tomo_limber_nointerp(
   
   if (w == NULL || recompute_table(numtable))
   {
-    const size_t nsize_integration = 120 + 50 * (Ntable.high_def_integration);
+    const size_t nsize_integration = 125 + 50 * (Ntable.high_def_integration);
     
     if (w != NULL)
     {
@@ -2901,7 +2901,7 @@ double C_gg_tomo_limber_nointerp(
   
   if (w == NULL || recompute_table(numtable))
   {
-    const size_t nsize_integration = 175 + 50 * (Ntable.high_def_integration);
+    const size_t nsize_integration = 200 + 50 * (Ntable.high_def_integration);
     
     if (w != NULL)
     {
