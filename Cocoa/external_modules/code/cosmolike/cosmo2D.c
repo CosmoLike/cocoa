@@ -2214,7 +2214,10 @@ double C_ss_tomo_limber(
     }
   }
 
-  if (ni < -1 || ni > tomo.shear_Nbin -1 || nj < -1 || nj > tomo.shear_Nbin -1)
+  if (ni < -1 || 
+      ni > tomo.shear_Nbin -1 || 
+      nj < -1 || 
+      nj > tomo.shear_Nbin -1)
   {
     log_fatal("invalid bin input (ni, nj) = (%d, %d)", ni, nj);
     exit(1);
@@ -2223,7 +2226,8 @@ double C_ss_tomo_limber(
   const double lnl = log(l);
   if (lnl < lnlmin || lnl > lnlmax)
   {
-    log_fatal("l = %e outside look-up table range [%e,%e]", l, exp(lnlmin), exp(lnlmax));
+    log_fatal("l = %e outside look-up table range [%e,%e]", l, 
+      exp(lnlmin), exp(lnlmax));
     exit(1);
   }
 
@@ -2310,13 +2314,18 @@ double int_for_C_gs_tomo_limber(double a, void* params)
     exit(1);
   }
   double* ar = (double*) params;
+  
   const int nl = (int) ar[0];
   const int ns = (int) ar[1];
-  if (nl < 0 || nl > tomo.clustering_Nbin - 1 || ns < 0 || ns > tomo.shear_Nbin - 1)
+  if (nl < 0 || 
+      nl > tomo.clustering_Nbin - 1 || 
+      ns < 0 || 
+      ns > tomo.shear_Nbin - 1)
   {
     log_fatal("error in selecting bin number (nl, ns) = [%d,%d]", nl, ns);
     exit(1);
   }
+  
   const double l = ar[2];
   const int use_linear_ps = (int) ar[3];
 
@@ -2391,13 +2400,18 @@ double int_for_C_gs_tomo_limber_withb2(double a, void* params)
     exit(1);
   }
   double* ar = (double*) params;
+
   const int nl = (int) ar[0];
   const int ns = (int) ar[1];
-  if (nl < 0 || nl > tomo.clustering_Nbin - 1 || ns < 0 || ns > tomo.shear_Nbin - 1)
+  if (nl < 0 || 
+      nl > tomo.clustering_Nbin - 1 || 
+      ns < 0 || 
+      ns > tomo.shear_Nbin - 1)
   {
     log_fatal("error in selecting bin number (nl, ns) = [%d,%d]", nl, ns);
     exit(1);
   }
+
   const double l = ar[2];
   //const int use_linear_ps = (int) ar[3];
 
@@ -2596,8 +2610,6 @@ double C_gs_tomo_limber(double l, int ni, int nj, const int force_no_recompute)
   static galpara G;
   static Ntab numtable;
   static double** table = NULL;
-  static double* sig = NULL;
-  static int osc[MAX_SIZE_ARRAYS*MAX_SIZE_ARRAYS];
   static int NSIZE;
   static int nell;
   static double lnlmin;
@@ -2606,10 +2618,10 @@ double C_gs_tomo_limber(double l, int ni, int nj, const int force_no_recompute)
 
   if (force_no_recompute == 0)
   { // Cocoa: nell = 10^5 on real funcs, so recompute funcs are expensive
-    if (table == NULL || sig == NULL || recompute_table(numtable)) 
+    if (table == NULL || recompute_table(numtable)) 
     {
       NSIZE  = tomo.ggl_Npowerspectra;
-      nell   = number_ell_fourier_2pt();
+      nell   = (int) number_ell_fourier_2pt();
       lnlmin = log(fmax(limits.LMIN_tab, 1.0));
       lnlmax = log(fmax(limits.LMAX, limits.LMAX_hankel) + 1);
       dlnl   = (lnlmax - lnlmin) / ((double) nell - 1.0);
@@ -2628,18 +2640,6 @@ double C_gs_tomo_limber(double l, int ni, int nj, const int force_no_recompute)
       for (int i=0; i<NSIZE; i++)
       {
         table[i] = ((double*)(table + NSIZE) + nell*i);
-      }
-
-      if (sig != NULL)
-      {
-        free(sig);
-        sig = NULL;
-      }
-      sig = (double*) malloc(sizeof(double)*NSIZE);
-      if (sig == NULL)
-      {
-        log_fatal("array allocation failed");
-        exit(1);
       }
     }
 
@@ -2680,41 +2680,6 @@ double C_gs_tomo_limber(double l, int ni, int nj, const int force_no_recompute)
         }
       }
 
-      #pragma omp parallel for
-      for (int k=0; k<NSIZE; k++)
-      {
-        const int init_static_vars_only = 0; // FALSE
-        const int ZLNZ = ZL(k);
-        const int ZSNZ = ZS(k);
-        sig[k] = 1.;
-        osc[k] = 0;
-
-        if (test_zoverlap(ZLNZ, ZSNZ))
-        {
-          const double tmp = C_gs_tomo_limber_nointerp(500., ZLNZ, ZSNZ, 
-            use_linear_ps_limber, init_static_vars_only);
-          
-          if (tmp < 0)
-          {
-            sig[k] = -1.;
-          }
-          for (int i=0; i<nell; i++)
-          {
-            if (table[k][i] * sig[k] < 0.)
-            {
-              osc[k] = 1;
-            }
-          }
-          if (osc[k] == 0)
-          {
-            for (int i=0; i<nell; i++)
-            {
-              table[k][i] = log(sig[k] * table[k][i]);
-            }
-          }
-        }
-      }
-
       update_cosmopara(&C);
       update_nuisance(&N);
       update_galpara(&G);
@@ -2741,23 +2706,7 @@ double C_gs_tomo_limber(double l, int ni, int nj, const int force_no_recompute)
       log_warn("l = %e > l_max = %e. Extrapolation adopted", l, exp(lnlmax));
     }
 
-    const double tmp = interpol(table[q], nell, lnlmin, lnlmax, dlnl, lnl, 0, 0);
-
-    double f1 = 0.;
-    if (osc[q] == 0)
-    {
-      f1 = sig[q] * exp(tmp);
-    }
-    else if (osc[q] == 1)
-    {
-      f1 = tmp;
-    }
-    else
-    {
-      log_fatal("internal logic error in selecting osc[ni]");
-      exit(1);
-    }
-    
+    const double f1 = interpol(table[q], nell, lnlmin, lnlmax, dlnl, lnl, 0, 0);
     return isnan(f1) ? 0.0 : f1;
   }
   else
@@ -3097,7 +3046,7 @@ double C_gg_tomo_limber(double l, int ni, int nj, const int force_no_recompute)
           const double res = C_gg_tomo_limber_nointerp(exp(lnl), ZCL1, ZCL2, 
             use_linear_ps_limber, init_static_vars_only);
           
-          table[k][p] = (res <= 0) ? -100 : log(res); // TODO: change this
+          table[k][p] = log(res); // TODO: change this
         }
       }
 
