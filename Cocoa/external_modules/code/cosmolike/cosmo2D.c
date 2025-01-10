@@ -176,29 +176,16 @@ double xi_pm_tomo(
 
   const int NSIZE = tomo.shear_Npowerspectra;
 
-  if (Glplus == NULL || recompute_table(numtable))
+  if (Glplus == NULL       || 
+      Glminus == NULL      || 
+      xi_vec_plus == NULL  ||
+      xi_vec_minus == NULL ||
+      recompute_table(numtable))
   {
     if (Glplus != NULL) 
     {
       free(Glplus);
-      Glplus = NULL;
-    }
-    if (Glminus != NULL) 
-    {
-      free(Glminus);
-      Glminus = NULL;
-    }
-    if (xi_vec_plus != NULL) 
-    {
-      free(xi_vec_plus);
-      xi_vec_plus = NULL;
-    }
-    if (xi_vec_minus != NULL) 
-    {
-      free(xi_vec_minus);
-      xi_vec_minus = NULL;
-    }
-      
+    } 
     Glplus = (double**) malloc(sizeof(double*)*Ntable.Ntheta + 
                                sizeof(double)*Ntable.Ntheta*limits.LMAX);
     if (Glplus == NULL)
@@ -206,7 +193,11 @@ double xi_pm_tomo(
       log_fatal("array allocation failed");
       exit(1);
     }
-    
+
+    if (Glminus != NULL) 
+    {
+      free(Glminus);
+    }
     Glminus = (double**) malloc(sizeof(double*)*Ntable.Ntheta + 
                                 sizeof(double)*Ntable.Ntheta*limits.LMAX);
     if (Glminus == NULL)
@@ -220,6 +211,10 @@ double xi_pm_tomo(
       Glminus[i] = ((double*)(Glminus + Ntable.Ntheta) + limits.LMAX*i);
     }
     
+    if (xi_vec_plus != NULL) 
+    {
+      free(xi_vec_plus);
+    }
     xi_vec_plus = (double*) calloc(NSIZE*Ntable.Ntheta, sizeof(double));
     if (xi_vec_plus == NULL)
     {
@@ -227,6 +222,10 @@ double xi_pm_tomo(
       exit(1);
     }
     
+    if (xi_vec_minus != NULL) 
+    {
+      free(xi_vec_minus);
+    }
     xi_vec_minus = (double*) calloc(NSIZE*Ntable.Ntheta, sizeof(double));
     if (xi_vec_minus == NULL)
     {
@@ -613,14 +612,7 @@ double w_gammat_tomo(
     if (Pl != NULL) 
     {
       free(Pl);
-      Pl = NULL;
     }
-    if (w_vec != NULL) 
-    {
-      free(w_vec);
-      w_vec = NULL;
-    }
-
     Pl = (double**) malloc(sizeof(double*)*Ntable.Ntheta + 
                            sizeof(double)*Ntable.Ntheta*limits.LMAX);
     if (Pl == NULL)
@@ -633,6 +625,10 @@ double w_gammat_tomo(
       Pl[i]  = ((double*)(Pl + Ntable.Ntheta) + limits.LMAX*i);
     }
     
+    if (w_vec != NULL) 
+    {
+      free(w_vec);
+    }
     w_vec = (double*) calloc(NSIZE*Ntable.Ntheta, sizeof(double)); 
     if (w_vec == NULL)
     {
@@ -872,14 +868,7 @@ double w_gg_tomo(
     if (Pl != NULL) 
     {
       free(Pl);
-      Pl = NULL;
     }
-    if (w_vec != NULL) 
-    {
-      free(w_vec);
-      w_vec = NULL;
-    }
-
     Pl = (double**) malloc(sizeof(double*)*Ntable.Ntheta + 
                            sizeof(double)*Ntable.Ntheta*limits.LMAX);
     if (Pl == NULL)
@@ -892,6 +881,10 @@ double w_gg_tomo(
       Pl[i] = ((double*)(Pl + Ntable.Ntheta) + limits.LMAX*i);
     }
 
+    if (w_vec != NULL) 
+    {
+      free(w_vec);
+    }
     w_vec = (double*) calloc(NSIZE*Ntable.Ntheta, sizeof(double));
     if (w_vec == NULL)
     {
@@ -1129,14 +1122,7 @@ double w_gk_tomo(const int nt, const int ni, const int limber)
     if (Pl != NULL) 
     {
       free(Pl);
-      Pl = NULL;
-    }
-    if (w_vec != NULL) 
-    {
-      free(w_vec);
-      w_vec = NULL;
-    }
- 
+    } 
     Pl = (double**) malloc(sizeof(double*)*Ntable.Ntheta + 
                            sizeof(double)*Ntable.Ntheta*limits.LMAX);
     if (Pl == NULL)
@@ -1149,6 +1135,10 @@ double w_gk_tomo(const int nt, const int ni, const int limber)
       Pl[i]  = ((double*)(Pl + Ntable.Ntheta) + limits.LMAX*i);
     }
 
+    if (w_vec != NULL) 
+    {
+      free(w_vec);
+    }
     w_vec = (double*) calloc(NSIZE*Ntable.Ntheta, sizeof(double));
     if (w_vec == NULL)
     {
@@ -1337,7 +1327,7 @@ double w_ks_tomo(
   static cosmopara C;
   static nuisancepara N;
   static Ntab numtable;
-  
+
   if (Ntable.Ntheta == 0)
   {
     log_fatal("Ntable.Ntheta not initialized");
@@ -1351,14 +1341,7 @@ double w_ks_tomo(
     if (Pl != NULL) 
     {
       free(Pl);
-      Pl = NULL;
     }
-    if (w_vec != NULL) 
-    {
-      free(w_vec);
-      w_vec = NULL;
-    }
-
     Pl = (double**) malloc(sizeof(double*)*Ntable.Ntheta + 
                            sizeof(double)*Ntable.Ntheta*limits.LMAX);
     if (Pl == NULL)
@@ -1371,6 +1354,10 @@ double w_ks_tomo(
       Pl[i]  = ((double*)(Pl + Ntable.Ntheta) + limits.LMAX*i);
     }
 
+    if (w_vec != NULL) 
+    {
+      free(w_vec);
+    }
     w_vec = (double*) calloc(NSIZE*Ntable.Ntheta, sizeof(double));
     if (w_vec == NULL)
     {
@@ -2084,17 +2071,39 @@ double int_for_C_ss_tomo_limber(double a, void* params)
   return res*PK*(chidchi.dchida/(fK*fK))*ell_prefactor;
 }
 
-double C_ss_tomo_limber_nointerp(double l, int ni, int nj, int use_linear_ps, 
-const int init_static_vars_only)
+double C_ss_tomo_limber_nointerp(
+    double l, 
+    int ni, 
+    int nj, 
+    int use_linear_ps, 
+    const int init_static_vars_only
+  )
 {
-  static gsl_integration_glfixed_table* w = 0;
-  if (w == 0)
+  static Ntab numtable;
+  static gsl_integration_glfixed_table* w = NULL;
+  
+  if (w == NULL || recompute_table(numtable))
   {
     const size_t nsize_integration = 60 + 50 * (Ntable.high_def_integration);
+    
+    if (w != NULL)
+    {
+      gsl_integration_glfixed_table_free(w);
+    }
     w = gsl_integration_glfixed_table_alloc(nsize_integration);
+    if (w == NULL)
+    {
+      log_fatal("array allocation failed");
+      exit(1);
+    }
+    
+    update_table(&numtable);
   }
 
-  if(ni < -1 || ni > tomo.shear_Nbin -1 || nj < -1 || nj > tomo.shear_Nbin -1)
+  if (ni < -1 || 
+      ni > tomo.shear_Nbin -1 || 
+      nj < -1 || 
+      nj > tomo.shear_Nbin -1)
   {
     log_fatal("invalid bin input (ni, nj) = (%d, %d)", ni, nj);
     exit(1);
@@ -2124,7 +2133,12 @@ const int init_static_vars_only)
   return res;     
 }
 
-double C_ss_tomo_limber(double l, int ni, int nj, const int force_no_recompute)
+double C_ss_tomo_limber(
+    double l, 
+    int ni, 
+    int nj, 
+    const int force_no_recompute
+  )
 {
   static cosmopara C;
   static nuisancepara N;
@@ -2136,19 +2150,17 @@ double C_ss_tomo_limber(double l, int ni, int nj, const int force_no_recompute)
   static double dlnl;
 
   if (force_no_recompute == 0)
-  { // nell = 100.000 on real funcs, recompute funcs become expensive
-
+  { // Cocoa: nell = 10^5 on real funcs, so recompute funcs are expensive
     if (table == NULL || recompute_table(numtable))
     {
-      NSIZE = tomo.shear_Npowerspectra;
+      NSIZE  = tomo.shear_Npowerspectra;
       lnlmin = log(fmax(limits.LMIN_tab - 1., 1.0));
       lnlmax = log(fmax(limits.LMAX, limits.LMAX_hankel) + 1);
-      dlnl = (lnlmax - lnlmin)/(Ntable.N_ell - 1.);
+      dlnl   = (lnlmax - lnlmin)/(Ntable.N_ell - 1.);
       
       if (table != NULL)
       {
         free(table);
-        table = NULL;
       }
       table = (double**) malloc(sizeof(double*)*NSIZE + 
                                 sizeof(double)*NSIZE*Ntable.N_ell);
@@ -2157,14 +2169,9 @@ double C_ss_tomo_limber(double l, int ni, int nj, const int force_no_recompute)
         log_fatal("array allocation failed");
         exit(1);
       }
-
       for (int i=0; i<NSIZE; i++)
       {
         table[i] = ((double*)(table + NSIZE) + Ntable.N_ell*i);
-        for (int j=0; j<Ntable.N_ell; j++)
-        {
-          table[i][j] = 0.0;
-        }
       }
     }
 
@@ -2172,13 +2179,16 @@ double C_ss_tomo_limber(double l, int ni, int nj, const int force_no_recompute)
     {
       #pragma GCC diagnostic push
       #pragma GCC diagnostic ignored "-Wunused-variable"
+      for (int k=0; k<NSIZE; k++)
       {
+        const int init_static_vars_only = 1; // TRUE
         const int k = 0;
-        const int Z1NZ = Z1(0);
-        const int Z2NZ = Z2(0);
+        const int Z1NZ = Z1(k);
+        const int Z2NZ = Z2(k);
         const double lmin = exp(lnlmin);
-        double init = 
-          C_ss_tomo_limber_nointerp(lmin, Z1NZ, Z2NZ, use_linear_ps_limber, 1);
+        
+        double trash = C_ss_tomo_limber_nointerp(lmin, Z1NZ, Z2NZ, 
+          use_linear_ps_limber, init_static_vars_only);
       }
       #pragma GCC diagnostic pop
       
@@ -2187,12 +2197,14 @@ double C_ss_tomo_limber(double l, int ni, int nj, const int force_no_recompute)
       {
         for (int i=0; i<Ntable.N_ell; i++)
         {
+          const int init_static_vars_only = 0; // FALSE
           const int Z1NZ = Z1(k);
           const int Z2NZ = Z2(k);
           const double lnl = lnlmin + i*dlnl;
           const double l = exp(lnl);
-          table[k][i]= log(
-            C_ss_tomo_limber_nointerp(l, Z1NZ, Z2NZ, use_linear_ps_limber, 0));
+          
+          table[k][i]= log(C_ss_tomo_limber_nointerp(l, Z1NZ, Z2NZ, 
+            use_linear_ps_limber, init_static_vars_only));
         }
       }
 
@@ -2202,7 +2214,7 @@ double C_ss_tomo_limber(double l, int ni, int nj, const int force_no_recompute)
     }
   }
 
-  if(ni < -1 || ni > tomo.shear_Nbin -1 || nj < -1 || nj > tomo.shear_Nbin -1)
+  if (ni < -1 || ni > tomo.shear_Nbin -1 || nj < -1 || nj > tomo.shear_Nbin -1)
   {
     log_fatal("invalid bin input (ni, nj) = (%d, %d)", ni, nj);
     exit(1);
@@ -2216,19 +2228,16 @@ double C_ss_tomo_limber(double l, int ni, int nj, const int force_no_recompute)
   }
 
   const int q = N_shear(ni, nj);
-  if(q > NSIZE - 1)
+  if (q > NSIZE - 1)
   {
     log_fatal("error in selecting bin number");
     exit(1);
   }
   
-  const double f1 = exp(
-    interpol_fitslope(table[q], Ntable.N_ell, lnlmin, lnlmax, dlnl, lnl, 1.));
-  if (isnan(f1)) 
-  {
-    return 0.0;
-  }
-  return f1;
+  const double f1 = exp(interpol_fitslope(table[q], Ntable.N_ell, lnlmin, 
+    lnlmax, dlnl, lnl, 1.));
+
+  return isnan(f1) ? 0.0 : f1;
 }
 
 // ---------------------------------------------------------------------------
@@ -2454,17 +2463,39 @@ double int_for_C_gs_tomo_limber_withb2(double a, void* params)
   return (linear_part + non_linear_part)*(chidchi.dchida/(fK*fK))*ell_prefactor2;
 }
 
-double C_gs_tomo_limber_nointerp(double l, int nl, int ns, int use_linear_ps,
-const int init_static_vars_only)
+double C_gs_tomo_limber_nointerp(
+    double l, 
+    int nl, 
+    int ns, 
+    int use_linear_ps,
+    const int init_static_vars_only
+  )
 {
-  static gsl_integration_glfixed_table* w = 0;
-  if (w == 0)
+  static Ntab numtable;
+  static gsl_integration_glfixed_table* w = NULL;
+  
+  if (w == NULL || recompute_table(numtable))
   {
     const size_t nsize_integration = 120 + 50 * (Ntable.high_def_integration);
+    
+    if (w != NULL)
+    {
+      gsl_integration_glfixed_table_free(w);
+    }
     w = gsl_integration_glfixed_table_alloc(nsize_integration);
+    if (w == NULL)
+    {
+      log_fatal("array allocation failed");
+      exit(1);
+    }
+
+    update_table(&numtable);
   }
 
-  if(nl < -1 || nl > tomo.clustering_Nbin -1 || ns < -1 || ns > tomo.shear_Nbin -1)
+  if (nl < -1 || 
+      nl > tomo.clustering_Nbin -1 || 
+      ns < -1 || 
+      ns > tomo.shear_Nbin -1)
   {
     log_fatal("invalid bin input (ni, nj) = (%d, %d)", nl, ns);
     exit(1);
@@ -2484,11 +2515,6 @@ const int init_static_vars_only)
   {
     log_fatal("amin < amax not true");
     exit(1);
-  }
-  if (w == 0)
-  {
-    const size_t nsize_integration = 120 + 50 * (Ntable.high_def_integration);
-    w = gsl_integration_glfixed_table_alloc(nsize_integration);
   }
 
   double res;
@@ -2568,55 +2594,67 @@ double C_gs_tomo_limber(double l, int ni, int nj, const int force_no_recompute)
   static cosmopara C;
   static nuisancepara N;
   static galpara G;
-  static double** table;
-  static double* sig;
-  static int osc[100];
+  static Ntab numtable;
+  static double** table = NULL;
+  static double* sig = NULL;
+  static int osc[MAX_SIZE_ARRAYS*MAX_SIZE_ARRAYS];
   static int NSIZE;
   static int nell;
   static double lnlmin;
   static double lnlmax;
   static double dlnl;
 
-  if (table == 0) 
-  {
-    NSIZE = tomo.ggl_Npowerspectra;
-    nell = number_ell_fourier_2pt();
-    lnlmin = log(fmax(limits.LMIN_tab, 1.0));
-    lnlmax = log(fmax(limits.LMAX, limits.LMAX_hankel) + 1);
-    dlnl = (lnlmax - lnlmin) / ((double) nell - 1.0);
+  if (force_no_recompute == 0)
+  { // Cocoa: nell = 10^5 on real funcs, so recompute funcs are expensive
+    if (table == NULL || sig == NULL || recompute_table(numtable)) 
+    {
+      NSIZE  = tomo.ggl_Npowerspectra;
+      nell   = number_ell_fourier_2pt();
+      lnlmin = log(fmax(limits.LMIN_tab, 1.0));
+      lnlmax = log(fmax(limits.LMAX, limits.LMAX_hankel) + 1);
+      dlnl   = (lnlmax - lnlmin) / ((double) nell - 1.0);
 
-    const int len = sizeof(double*)*NSIZE + sizeof(double)*NSIZE*nell;
-    table = (double**) malloc(len);
-    if (table == NULL)
-    {
-      log_fatal("array allocation failed");
-      exit(1);
-    }
-    for (int i=0; i<NSIZE; i++)
-    {
-      table[i] = ((double*)(table + NSIZE) + nell*i);
-      for (int j=0; j<nell; j++)
+      if (table != NULL)
       {
-        table[i][j] = 0.0;
+        free(table);
+      }      
+      table = (double**) malloc(sizeof(double*)*NSIZE + 
+                                sizeof(double)*NSIZE*nell);
+      if (table == NULL)
+      {
+        log_fatal("array allocation failed");
+        exit(1);
+      }
+      for (int i=0; i<NSIZE; i++)
+      {
+        table[i] = ((double*)(table + NSIZE) + nell*i);
+      }
+
+      if (sig != NULL)
+      {
+        free(sig);
+        sig = NULL;
+      }
+      sig = (double*) malloc(sizeof(double)*NSIZE);
+      if (sig == NULL)
+      {
+        log_fatal("array allocation failed");
+        exit(1);
       }
     }
 
-    sig = (double*) malloc(sizeof(double)*NSIZE);
-    if (sig == NULL)
-    {
-      log_fatal("array allocation failed");
-      exit(1);
-    }
-  }
-
-  if (force_no_recompute == 0)
-  { // it turns out - because (nell = 100.000) on real funcs, recompute funcs are quite expensive
-    if (recompute_gs(C, G, N))
+    if (recompute_gs(C, G, N) || recompute_table(numtable))
     {
       #pragma GCC diagnostic push
       #pragma GCC diagnostic ignored "-Wunused-variable"
-      {
-        double init = C_gs_tomo_limber_nointerp(exp(lnlmin), ZL(0), ZS(0), use_linear_ps_limber, 1);
+      for (int k=0; k<NSIZE; k++)
+      { // init static variables inside the C_XY_limber_nointerp function
+        const int init_static_vars_only = 1; // TRUE
+        const int ZLNZ = ZL(k);
+        const int ZSNZ = ZS(k);
+        
+        double trash = C_gs_tomo_limber_nointerp(exp(lnlmin), ZLNZ, ZSNZ, 
+          use_linear_ps_limber, init_static_vars_only);
       }
       #pragma GCC diagnostic pop
 
@@ -2625,37 +2663,54 @@ double C_gs_tomo_limber(double l, int ni, int nj, const int force_no_recompute)
       {
         for (int i=0; i<nell; i++)
         {
+          const int init_static_vars_only = 0; // FALSE
           const int ZLNZ = ZL(k);
           const int ZSNZ = ZS(k);
           const double lnl = lnlmin + i*dlnl;
-          const double ll = exp(lnl);
-          table[k][i] = C_gs_tomo_limber_nointerp(ll, ZLNZ, ZSNZ, use_linear_ps_limber, 0);
+          
+          if (test_zoverlap(ZLNZ, ZSNZ))
+          {
+            table[k][i] = C_gs_tomo_limber_nointerp(exp(lnl), ZLNZ, ZSNZ, 
+              use_linear_ps_limber, init_static_vars_only);
+          }
+          else
+          {
+            table[k][i] = 0.0;
+          }
         }
       }
 
       #pragma omp parallel for
       for (int k=0; k<NSIZE; k++)
       {
+        const int init_static_vars_only = 0; // FALSE
         const int ZLNZ = ZL(k);
         const int ZSNZ = ZS(k);
         sig[k] = 1.;
         osc[k] = 0;
-        if (C_gs_tomo_limber_nointerp(500., ZLNZ, ZSNZ, use_linear_ps_limber, 0) < 0)
+
+        if (test_zoverlap(ZLNZ, ZSNZ))
         {
-          sig[k] = -1.;
-        }
-        for (int i=0; i<nell; i++)
-        {
-          if (table[k][i] * sig[k] < 0.)
+          const double tmp = C_gs_tomo_limber_nointerp(500., ZLNZ, ZSNZ, 
+            use_linear_ps_limber, init_static_vars_only);
+          
+          if (tmp < 0)
           {
-            osc[k] = 1;
+            sig[k] = -1.;
           }
-        }
-        if (osc[k] == 0)
-        {
           for (int i=0; i<nell; i++)
           {
-            table[k][i] = log(sig[k] * table[k][i]);
+            if (table[k][i] * sig[k] < 0.)
+            {
+              osc[k] = 1;
+            }
+          }
+          if (osc[k] == 0)
+          {
+            for (int i=0; i<nell; i++)
+            {
+              table[k][i] = log(sig[k] * table[k][i]);
+            }
           }
         }
       }
@@ -2663,6 +2718,7 @@ double C_gs_tomo_limber(double l, int ni, int nj, const int force_no_recompute)
       update_cosmopara(&C);
       update_nuisance(&N);
       update_galpara(&G);
+      update_table(&numtable);
     }
   }
 
@@ -2673,40 +2729,41 @@ double C_gs_tomo_limber(double l, int ni, int nj, const int force_no_recompute)
     exit(1);
   }
 
-  const double lnl = log(l);
-  if (lnl < lnlmin)
+  if (test_zoverlap(ni, nj))
   {
-    log_warn("l = %e < l_min = %e. Extrapolation adopted", l, exp(lnlmin));
-  }
-  if (lnl > lnlmax)
-  {
-    log_warn("l = %e > l_max = %e. Extrapolation adopted", l, exp(lnlmax));
-  }
+    const double lnl = log(l);
+    if (lnl < lnlmin)
+    {
+      log_warn("l = %e < l_min = %e. Extrapolation adopted", l, exp(lnlmin));
+    }
+    if (lnl > lnlmax)
+    {
+      log_warn("l = %e > l_max = %e. Extrapolation adopted", l, exp(lnlmax));
+    }
 
-  const int overlap = test_zoverlap(ni, nj);
+    const double tmp = interpol(table[q], nell, lnlmin, lnlmax, dlnl, lnl, 0, 0);
 
-  double f1 = 0.;
-  if (overlap)
-  {
+    double f1 = 0.;
     if (osc[q] == 0)
     {
-      f1 = sig[q] * exp(interpol(table[q], nell, lnlmin, lnlmax, dlnl, lnl, 0, 0));
+      f1 = sig[q] * exp(tmp);
     }
-    else 
+    else if (osc[q] == 1)
     {
-      if (osc[q] == 1)
-      {
-        f1 = interpol(table[q], nell, lnlmin, lnlmax, dlnl, lnl, 0, 0);
-      }
-      else
-      {
-        log_fatal("internal logic error in selecting osc[ni]");
-        exit(1);
-      }
+      f1 = tmp;
     }
+    else
+    {
+      log_fatal("internal logic error in selecting osc[ni]");
+      exit(1);
+    }
+    
+    return isnan(f1) ? 0.0 : f1;
   }
-
-  return isnan(f1) ? 0.0 : f1;
+  else
+  {
+    return 0.0;
+  }
 }
 
 
@@ -2882,17 +2939,39 @@ double int_for_C_gg_tomo_limber_withb2(double a, void* params)
   return (linear_part + non_linear_part)*(chidchi.dchida/(fK*fK));
 }
 
-double C_gg_tomo_limber_nointerp(double l, int ni, int nj, int use_linear_ps,
-const int init_static_vars_only)
+double C_gg_tomo_limber_nointerp(
+    double l, 
+    int ni, 
+    int nj, 
+    int use_linear_ps,
+    const int init_static_vars_only
+  )
 {
-  static gsl_integration_glfixed_table* w = 0;
-  if (w == 0)
+  static Ntab numtable;
+  static gsl_integration_glfixed_table* w = NULL;
+  
+  if (w == NULL || recompute_table(numtable))
   {
     const size_t nsize_integration = 175 + 50 * (Ntable.high_def_integration);
+    
+    if (w != NULL)
+    {
+      gsl_integration_glfixed_table_free(w);
+    }
     w = gsl_integration_glfixed_table_alloc(nsize_integration);
+    if (w == NULL)
+    {
+      log_fatal("array allocation failed");
+      exit(1);
+    }
+
+    update_table(&numtable);
   }
 
-  if (ni < 0 || ni > tomo.clustering_Nbin - 1 || nj < 0 || nj > tomo.clustering_Nbin - 1)
+  if (ni < 0 || 
+      ni > tomo.clustering_Nbin - 1 || 
+      nj < 0 || 
+      nj > tomo.clustering_Nbin - 1)
   {
     log_fatal("error in selecting bin number (ni, nj) = [%d,%d]", ni, nj);
     exit(1);
@@ -2954,46 +3033,54 @@ double C_gg_tomo_limber(double l, int ni, int nj, const int force_no_recompute)
   static cosmopara C;
   static nuisancepara N;
   static galpara G;
-  static double** table;
+  static Ntab numtable;
+  static double** table = NULL;
   static int nell;
   static int NSIZE;
   static double lnlmin;
   static double lnlmax;
   static double dlnl;
   
-  if (table == 0)
-  {
-    nell = Ntable.N_ell;
-    NSIZE = tomo.clustering_Nbin;
-    lnlmin = log(fmax(limits.LMIN_tab, 1.0));
-    lnlmax = log(fmax(limits.LMAX, limits.LMAX_hankel) + 1);
-    dlnl = (lnlmax - lnlmin) / ((double) nell - 1.0);
-    
-    const int len = sizeof(double*)*NSIZE + sizeof(double)*NSIZE*nell;
-    table = (double**) malloc(len);
-    if (table == NULL)
+  if (force_no_recompute == 0)
+  { // Cocoa: nell = 10^5 on real funcs, so recompute funcs are expensive
+    if (table == NULL || recompute_table(numtable))
     {
-      log_fatal("array allocation failed");
-      exit(1);
-    }
-    for (int i=0; i<NSIZE; i++)
-    {
-      table[i] = ((double*)(table + NSIZE) + nell*i);
-      for (int j=0; j<nell; j++)
+      nell   = Ntable.N_ell;
+      NSIZE  = tomo.clustering_Nbin;
+      lnlmin = log(fmax(limits.LMIN_tab, 1.0));
+      lnlmax = log(fmax(limits.LMAX, limits.LMAX_hankel) + 1);
+      dlnl   = (lnlmax - lnlmin) / ((double) nell - 1.0);
+      
+      if (table != NULL) 
       {
-        table[i][j] = 0.0;
+        free(table);
+      }
+      table = (double**) malloc(sizeof(double*)*NSIZE + 
+                                sizeof(double)*NSIZE*nell);
+      
+      if (table == NULL)
+      {
+        log_fatal("array allocation failed");
+        exit(1);
+      }
+      for (int i=0; i<NSIZE; i++)
+      {
+        table[i] = ((double*)(table + NSIZE) + nell*i);
       }
     }
-  }
 
-  if (force_no_recompute == 0)
-  { // it turns out - because (nell = 100.000) on real funcs, recompute funcs are quite expensive
-    if (recompute_gg(C, G, N))
+    if (recompute_gg(C, G, N) || recompute_table(numtable))
     {
       #pragma GCC diagnostic push
       #pragma GCC diagnostic ignored "-Wunused-variable"
-      {
-        double init = C_gg_tomo_limber_nointerp(exp(lnlmin), 0, 0, use_linear_ps_limber, 1);
+      for (int k=0; k<NSIZE; k++) 
+      { // init static variables inside the C_XY_limber_nointerp function
+        const int init_static_vars_only = 1; // TRUE
+        const int ZCL1 = k;
+        const int ZCL2 = k;
+        
+        double trash = C_gg_tomo_limber_nointerp(exp(lnlmin), ZCL1, ZCL2, 
+          use_linear_ps_limber, init_static_vars_only);
       }
       #pragma GCC diagnostic pop
       
@@ -3002,21 +3089,29 @@ double C_gg_tomo_limber(double l, int ni, int nj, const int force_no_recompute)
       {
         for (int p=0; p<nell; p++)
         {
-          const int ZCL1 = k; // cross redshift bin not supported so not using ZCL1(k)
-          const int ZCL2 = k; // cross redshift bin not supported so not using ZCL2(k)
+          const int init_static_vars_only = 0; // FALSE
+          const int ZCL1 = k; // cross redshift bin not supported; not using ZCL1(k)
+          const int ZCL2 = k; // cross redshift bin not supported; not using ZCL2(k)
           const double lnl = lnlmin + p*dlnl;
-          const double res = C_gg_tomo_limber_nointerp(exp(lnl), ZCL1, ZCL2, use_linear_ps_limber, 0);
-          table[k][p] = (res <= 0) ? -100 : log(res);
+          
+          const double res = C_gg_tomo_limber_nointerp(exp(lnl), ZCL1, ZCL2, 
+            use_linear_ps_limber, init_static_vars_only);
+          
+          table[k][p] = (res <= 0) ? -100 : log(res); // TODO: change this
         }
       }
 
       update_cosmopara(&C);
       update_galpara(&G);
       update_nuisance(&N);
+      update_table(&numtable);
     }
   }
   
-  if (ni < 0 || ni > tomo.clustering_Nbin - 1 || nj < 0 || nj > tomo.clustering_Nbin - 1)
+  if (ni < 0 || 
+      ni > tomo.clustering_Nbin - 1 || 
+      nj < 0 || 
+      nj > tomo.clustering_Nbin - 1)
   {
     log_fatal("error in selecting bin number (ni, nj) = [%d,%d]", ni, nj);
     exit(1);
@@ -3038,14 +3133,15 @@ double C_gg_tomo_limber(double l, int ni, int nj, const int force_no_recompute)
     log_warn("l = %e > l_max = %e. Extrapolation adopted", l, exp(lnlmax));
   }
   
-  const int q = ni; // cross redshift bin not supported so not using N_CL(ni, nj) instead of ni
+  const int q = ni; // cross redshift bin not supported; not using N_CL(ni, nj)
   if (q < 0 || q > NSIZE - 1)
   {
     log_fatal("internal logic error in selecting bin number");
     exit(1);
   }
   
-  const double f1 = exp(interpol_fitslope(table[q], nell, lnlmin, lnlmax, dlnl, lnl, 1));
+  const double f1 = exp(interpol_fitslope(table[q], nell, lnlmin, lnlmax, 
+    dlnl, lnl, 1));
   
   return isnan(f1) ? 0.0 : f1;
 }
@@ -3201,14 +3297,32 @@ double int_for_C_gk_tomo_limber_withb2(double a, void* params)
   return (linear_part + non_linear_part)*(chidchi.dchida/(fK*fK))*ell_prefactor;
 }
 
-double C_gk_tomo_limber_nointerp(double l, int ni, int use_linear_ps, 
-const int init_static_vars_only)
+double C_gk_tomo_limber_nointerp(
+    double l, 
+    int ni, 
+    int use_linear_ps, 
+    const int init_static_vars_only
+  )
 {
-  static gsl_integration_glfixed_table* w = 0;
-  if (w == 0)
+  static Ntab numtable;
+  static gsl_integration_glfixed_table* w = NULL;
+  
+  if (w == NULL || recompute_table(numtable))
   {
     const size_t nsize_integration = 200 + 50 * (Ntable.high_def_integration);
+    
+    if (w != NULL)
+    {
+      gsl_integration_glfixed_table_free(w);
+    }
     w = gsl_integration_glfixed_table_alloc(nsize_integration);
+    if (w == NULL)
+    {
+      log_fatal("array allocation failed");
+      exit(1);
+    }
+
+    update_table(&numtable);
   }
 
   if (ni < 0 || ni > tomo.clustering_Nbin - 1)
@@ -3233,6 +3347,7 @@ const int init_static_vars_only)
   }
 
   double res = 0.0;
+  
   if (init_static_vars_only == 1)
   {
     if (has_b2_galaxies() && use_linear_ps == 0)
@@ -3258,6 +3373,7 @@ const int init_static_vars_only)
     }
     res =  gsl_integration_glfixed(&F, amin, amax, w);
   }
+
   return res;
 }
 
@@ -3266,48 +3382,53 @@ double C_gk_tomo_limber(double l, int ni, const int force_no_recompute)
   static cosmopara C;
   static nuisancepara N;
   static galpara G;
-  static double** table;
+  static Ntab numtable;
+  static double** table = NULL;
   static int NSIZE;
   static int nell;
   static double lnlmin;
   static double lnlmax;
   static double dlnl;
 
-  if (table == 0)
-  {
-    NSIZE = tomo.clustering_Nbin;
-    nell = Ntable.N_ell;
-    lnlmin = log(fmax(limits.LMIN_tab, 1.0));
-    lnlmax = log(fmax(limits.LMAX, limits.LMAX_hankel) + 1);
-    dlnl = (lnlmax - lnlmin)/((double) nell - 1.0);
+  if (force_no_recompute == 0)
+  { // Cocoa: nell = 10^5 on real funcs, so recompute funcs are expensive
+    if (table == NULL || recompute_table(numtable))
+    {
+      NSIZE  = tomo.clustering_Nbin;
+      nell   = Ntable.N_ell;
+      lnlmin = log(fmax(limits.LMIN_tab, 1.0));
+      lnlmax = log(fmax(limits.LMAX, limits.LMAX_hankel) + 1);
+      dlnl   = (lnlmax - lnlmin)/((double) nell - 1.0);
 
-    const int len = sizeof(double*)*NSIZE + sizeof(double)*NSIZE*nell;
-    table = (double**) malloc(len);
-    if (table == NULL)
-    {
-      log_fatal("array allocation failed");
-      exit(1);
-    }
-    for (int i=0; i<NSIZE; i++)
-    {
-      table[i] = ((double*)(table + NSIZE) + nell*i);
-      for (int j=0; j<nell; j++)
+      if (table != NULL) 
       {
-        table[i][j] = 0.0;
+        free(table);
+      }
+      table = (double**) malloc(sizeof(double*)*NSIZE + 
+                                sizeof(double)*NSIZE*nell);
+      if (table == NULL)
+      {
+        log_fatal("array allocation failed");
+        exit(1);
+      }
+      for (int i=0; i<NSIZE; i++)
+      {
+        table[i] = ((double*)(table + NSIZE) + nell*i);
       }
     }
-  }
-
-  if (force_no_recompute == 0)
-  { 
-    if (recompute_gk(C, G, N))
+  
+    if (recompute_gk(C, G, N) || recompute_table(numtable))
     {
       #pragma GCC diagnostic push
       #pragma GCC diagnostic ignored "-Wunused-variable"
-      {
-        const int k = 0;
+      for (int k=0; k<NSIZE; k++)
+      { // init static variables inside the C_XY_limber_nointerp function
+        const int init_static_vars_only = 1; // TRUE
+        const int ZLNZ = k;
         const double lnl = lnlmin;
-        double init = C_gk_tomo_limber_nointerp(exp(lnl), k, use_linear_ps_limber, 1);
+        
+        double trash = C_gk_tomo_limber_nointerp(exp(lnl), ZLNZ, 
+          use_linear_ps_limber, init_static_vars_only);
       }
       #pragma GCC diagnostic pop
       
@@ -3316,14 +3437,19 @@ double C_gk_tomo_limber(double l, int ni, const int force_no_recompute)
       {
         for (int i=0; i<nell; i++)
         {
+          const int init_static_vars_only = 0; // FALSE
+          const int ZLNZ = k;
           const double lnl = lnlmin + i*dlnl;
-          table[k][i]= log(C_gk_tomo_limber_nointerp(exp(lnl), k, use_linear_ps_limber, 0));
+          
+          table[k][i]= log(C_gk_tomo_limber_nointerp(exp(lnl), k, 
+            use_linear_ps_limber, init_static_vars_only));
         }
       }
       
       update_cosmopara(&C);
       update_nuisance(&N);
       update_galpara(&G);
+      update_table(&numtable);
     }
   }
 
@@ -3352,7 +3478,6 @@ double C_gk_tomo_limber(double l, int ni, const int force_no_recompute)
   }
 
   const double f1 = exp(interpol(table[q], nell, lnlmin, lnlmax, dlnl, lnl, 1, 1));
-  
   return isnan(f1) ? 0.0 : f1;
 }
 
@@ -3402,14 +3527,32 @@ double int_for_C_ks_tomo_limber(double a, void* params)
 }
 
 
-double C_ks_tomo_limber_nointerp(double l, int ni, int use_linear_ps,
-const int init_static_vars_only)
+double C_ks_tomo_limber_nointerp(
+    double l, 
+    int ni, 
+    int use_linear_ps,
+    const int init_static_vars_only
+  )
 {
-  static gsl_integration_glfixed_table* w = 0;
-  if (w == 0)
+  static Ntab numtable;
+  static gsl_integration_glfixed_table* w = NULL;
+  
+  if (w == NULL || recompute_table(numtable))
   {
     const size_t nsize_integration = 200 + 50 * (Ntable.high_def_integration);
+    
+    if (w != NULL)
+    {
+      gsl_integration_glfixed_table_free(w);
+    }
     w = gsl_integration_glfixed_table_alloc(nsize_integration);
+    if (w == NULL)
+    {
+      log_fatal("array allocation failed");
+      exit(1);
+    }
+
+    update_table(&numtable);
   }
 
   if (ni < -1 || ni > tomo.shear_Nbin - 1)
@@ -3428,6 +3571,7 @@ const int init_static_vars_only)
   }
  
   double res = 0.0;
+  
   if (init_static_vars_only == 1)
   {
     res = int_for_C_ks_tomo_limber(amin, (void*) ar);
@@ -3439,6 +3583,7 @@ const int init_static_vars_only)
     F.function = int_for_C_ks_tomo_limber;
     res = gsl_integration_glfixed(&F, amin, amax, w);
   }
+  
   return res;  
 }
 
@@ -3446,9 +3591,10 @@ double C_ks_tomo_limber(double l, int ni, const int force_no_recompute)
 {
   static cosmopara C;
   static nuisancepara N;
-  static double** table;
-  static double* sig;
-  static int osc[100];
+  static Ntab numtable;
+  static double** table = NULL;
+  static double* sig = NULL;
+  static int osc[MAX_SIZE_ARRAYS*MAX_SIZE_ARRAYS];
 
   const int NSIZE = tomo.shear_Nbin;
   const int nell = Ntable.N_ell;
@@ -3456,40 +3602,47 @@ double C_ks_tomo_limber(double l, int ni, const int force_no_recompute)
   const double lnlmax = log(fmax(limits.LMAX, limits.LMAX_hankel) + 1);
   const double dlnl = (lnlmax - lnlmin)/((double) nell - 1.0);
 
-  if (table == 0)
-  {
-    const int len = sizeof(double*)*NSIZE + sizeof(double)*NSIZE*nell;
-    table = (double**) malloc(len);
-    if (table == NULL)
+  if (force_no_recompute == 0)
+  { // Cocoa: nell = 10^5 on real funcs, so recompute funcs are expensive
+    
+    if (table == NULL || sig == NULL || recompute_table(numtable))
     {
-      log_fatal("array allocation failed");
-      exit(1);
-    }
-    for (int i=0; i<NSIZE; i++)
-    {
-      table[i] = ((double*)(table + NSIZE) + nell*i);
-      for (int j=0; j<nell; j++)
+      if (table != NULL) 
       {
-        table[i][j] = 0.0;
+        free(table);
+      }
+      table = (double**) malloc(sizeof(double*)*NSIZE + 
+                                sizeof(double)*NSIZE*nell);
+      if (table == NULL)
+      {
+        log_fatal("array allocation failed");
+        exit(1);
+      }
+      for (int i=0; i<NSIZE; i++)
+      {
+        table[i] = ((double*)(table + NSIZE) + nell*i);
+      }
+
+      sig = (double*) malloc(sizeof(double)*NSIZE);
+      if (sig == NULL)
+      {
+        log_fatal("array allocation failed");
+        exit(1);
       }
     }
 
-    sig = (double*) malloc(sizeof(double)*NSIZE);
-    if (sig == NULL)
-    {
-      log_fatal("array allocation failed");
-      exit(1);
-    }
-  }
-
-  if (force_no_recompute == 0)
-  { 
-    if (recompute_ks(C, N))
+    if (recompute_ks(C, N) || recompute_table(numtable))
     {
       #pragma GCC diagnostic push
       #pragma GCC diagnostic ignored "-Wunused-variable"
-      {
-        double init = C_ks_tomo_limber_nointerp(exp(lnlmin), 0, use_linear_ps_limber, 1);
+      for (int k=0; k<NSIZE; k++)
+      { // init static variables inside the C_XY_limber_nointerp function
+        const int init_static_vars_only = 1; // TRUE
+        const int ZSNZ = k;
+        const double lnl = lnlmin;
+        
+        double trash = C_ks_tomo_limber_nointerp(exp(lnl), ZSNZ, 
+          use_linear_ps_limber, init_static_vars_only);
       }
       #pragma GCC diagnostic pop
       
@@ -3498,10 +3651,15 @@ double C_ks_tomo_limber(double l, int ni, const int force_no_recompute)
       {
         for (int i=0; i<nell; i++)
         {
+          const int init_static_vars_only = 0; // FALSE
+          const int ZSNZ = k;
           const double lnl = lnlmin + i*dlnl;
-          table[k][i] = C_ks_tomo_limber_nointerp(exp(lnl), k, use_linear_ps_limber, 0);
+          
+          table[k][i] = C_ks_tomo_limber_nointerp(exp(lnl), ZSNZ, 
+            use_linear_ps_limber, init_static_vars_only);
         }
       }
+
       #pragma omp parallel for
       for (int k=0; k<NSIZE; k++)
       {
@@ -3526,8 +3684,10 @@ double C_ks_tomo_limber(double l, int ni, const int force_no_recompute)
           }
         }
       }
+
       update_cosmopara(&C);
       update_nuisance(&N);
+      update_table(&numtable);
     } 
   }
 
@@ -3603,13 +3763,31 @@ double int_for_C_kk_limber(double a, void* params)
   return WK*WK*PK*(chidchi.dchida/(fK*fK))*ell_prefactor*ell_prefactor;
 }
 
-double C_kk_limber_nointerp(double l, int use_linear_ps, const int init_static_vars_only)
+double C_kk_limber_nointerp(
+    double l, 
+    int use_linear_ps, 
+    const int init_static_vars_only
+  )
 {
-  static gsl_integration_glfixed_table* w = 0;
-  if (w == 0)
+  static Ntab numtable;
+  static gsl_integration_glfixed_table* w = NULL;
+  
+  if (w == NULL || recompute_table(numtable))
   {
     const size_t nsize_integration = 200 + 50 * (Ntable.high_def_integration);
+    
+    if (w != NULL)
+    {
+      gsl_integration_glfixed_table_free(w);
+    }
     w = gsl_integration_glfixed_table_alloc(nsize_integration);
+    if (w == NULL)
+    {
+      log_fatal("array allocation failed");
+      exit(1);
+    }
+
+    update_table(&numtable);
   }
 
   double ar[2] = {l, (double) use_linear_ps};
@@ -3617,6 +3795,7 @@ double C_kk_limber_nointerp(double l, int use_linear_ps, const int init_static_v
   const double amax = 0.99999;
   
   double res = 0.0;
+  
   if (init_static_vars_only == 1)
   {
     res = int_for_C_kk_limber(amin, (void*) ar);
@@ -3628,47 +3807,67 @@ double C_kk_limber_nointerp(double l, int use_linear_ps, const int init_static_v
     F.function = int_for_C_kk_limber;
     res = gsl_integration_glfixed(&F, amin, amax, w);
   }
+  
   return res;
 }
 
 double C_kk_limber(double l, const int force_no_recompute)
 {
   static cosmopara C;
-  static double* table;
-  
-  const int nell = Ntable.N_ell;
-  const double lnlmin = log(fmax(limits.LMIN_tab, 1.0));
-  const double lnlmax = log(fmax(limits.LMAX, limits.LMAX_hankel) + 1);
-  const double dlnl = (lnlmax - lnlmin)/((double) nell - 1.0);
-
-  if (table == 0)
-  {
-    table = (double*) malloc(sizeof(double)*nell);
-    if (table == NULL)
-    {
-      log_fatal("array allocation failed");
-      exit(1);
-    }
-  }
+  static Ntab numtable;
+  static double* table = NULL;
+  static int nell;
+  static double lnlmin;
+  static double lnlmax;
+  static double dlnl;
 
   if (force_no_recompute == 0)
-  {
-    if (recompute_cosmo3D(C))
+  { // Cocoa: nell = 10^5 on real funcs, so recompute funcs are expensive
+    
+    if (table == NULL || recompute_table(numtable))
+    {
+      nell = Ntable.N_ell;
+      lnlmin = log(fmax(limits.LMIN_tab, 1.0));
+      lnlmax = log(fmax(limits.LMAX, limits.LMAX_hankel) + 1);
+      dlnl = (lnlmax - lnlmin)/((double) nell - 1.0);
+
+      if (table != NULL) 
+      {
+        free(table);
+      }
+      table = (double*) malloc(sizeof(double)*nell);
+      if (table == NULL)
+      {
+        log_fatal("array allocation failed");
+        exit(1);
+      }
+    }
+
+    if (recompute_cosmo3D(C) || recompute_table(numtable))
     {
       #pragma GCC diagnostic push
       #pragma GCC diagnostic ignored "-Wunused-variable"
-      {
-        double init = C_kk_limber_nointerp(exp(lnlmin), use_linear_ps_limber, 1);
+      { // init static variables inside the C_XY_limber_nointerp function
+        const int init_static_vars_only = 1; // TRUE
+        const double lnl = lnlmin;
+
+        double trash = C_kk_limber_nointerp(exp(lnl), use_linear_ps_limber, 
+          init_static_vars_only);
       }
       #pragma GCC diagnostic pop
       
       #pragma omp parallel for
       for (int i=0; i<nell; i++)
       {
+        const int init_static_vars_only = 0; // FALSE
         const double lnl = lnlmin + i*dlnl;
-        table[i] = log(C_kk_limber_nointerp(exp(lnl), use_linear_ps_limber, 0));
+
+        table[i] = log(C_kk_limber_nointerp(exp(lnl), use_linear_ps_limber, 
+          init_static_vars_only));
       }
+
       update_cosmopara(&C);
+      update_table(&numtable);
     }
   }
 
@@ -3759,14 +3958,32 @@ double int_for_C_gy_tomo_limber(double a, void* params)
   return res*chidchi.dchida/(fK*fK);
 }
 
-double C_gy_tomo_limber_nointerp(double l, int ni, int use_linear_ps, 
-const int init_static_vars_only)
+double C_gy_tomo_limber_nointerp(
+    double l, 
+    int ni, 
+    int use_linear_ps, 
+    const int init_static_vars_only
+  )
 {
-  static gsl_integration_glfixed_table* w = 0;
-  if (w == 0)
+  static Ntab numtable;
+  static gsl_integration_glfixed_table* w = NULL;
+  
+  if (w == NULL || recompute_table(numtable))
   {
     const size_t nsize_integration = 200 + 50 * (Ntable.high_def_integration);
+    
+    if (w != NULL)
+    {
+      gsl_integration_glfixed_table_free(w);
+    }
     w = gsl_integration_glfixed_table_alloc(nsize_integration);
+    if (w == NULL)
+    {
+      log_fatal("array allocation failed");
+      exit(1);
+    }
+
+    update_table(&numtable);
   }
 
   double ar[3] = {(double)ni, l, (double) use_linear_ps};
@@ -3813,49 +4030,55 @@ double C_gy_tomo_limber(double l, int ni, const int force_no_recompute)
   static cosmopara C;
   static nuisancepara N;
   static ynuisancepara N2;
+  static Ntab numtable;
   static galpara G;
-  static double** table;
+  static double** table = NULL;
   static int NSIZE;
   static int nell;
   static double lnlmin;
   static double lnlmax;
   static double dlnl;
 
-  if (table == 0)
-  {
-    NSIZE = tomo.clustering_Nbin;
-    nell = Ntable.N_ell;
-    lnlmin = log(fmax(limits.LMIN_tab, 1.0));
-    lnlmax = log(fmax(limits.LMAX, limits.LMAX_hankel) + 1);
-    dlnl = (lnlmax - lnlmin)/((double) nell - 1.0);
+  if (force_no_recompute == 0)
+  { // Cocoa: nell = 10^5 on real funcs, so recompute funcs are expensive
+    
+    if (table == NULL || recompute_table(numtable))
+    {
+      NSIZE  = tomo.clustering_Nbin;
+      nell   = Ntable.N_ell;
+      lnlmin = log(fmax(limits.LMIN_tab, 1.0));
+      lnlmax = log(fmax(limits.LMAX, limits.LMAX_hankel) + 1);
+      dlnl   = (lnlmax - lnlmin)/((double) nell - 1.0);
 
-    const int len = sizeof(double*)*NSIZE + sizeof(double)*NSIZE*nell;
-    table = (double**) malloc(len);
-    if (table == NULL)
-    {
-      log_fatal("array allocation failed");
-      exit(1);
-    }
-    for (int i=0; i<NSIZE; i++)
-    {
-      table[i] = ((double*)(table + NSIZE) + nell*i);
-      for (int j=0; j<nell; j++)
+      if (table != NULL) 
       {
-        table[i][j] = 0.0;
+        free(table);
+      }
+      table = (double**) malloc(sizeof(double*)*NSIZE + 
+                                sizeof(double)*NSIZE*nell);
+      if (table == NULL)
+      {
+        log_fatal("array allocation failed");
+        exit(1);
+      }
+      for (int i=0; i<NSIZE; i++)
+      {
+        table[i] = ((double*)(table + NSIZE) + nell*i);
       }
     }
-  }
 
-  if (force_no_recompute == 0)
-  {
-    if (recompute_gy(C, G, N, N2))
+    if (recompute_gy(C, G, N, N2) || recompute_table(numtable))
     {
       #pragma GCC diagnostic push
       #pragma GCC diagnostic ignored "-Wunused-variable"
-      {
-        const int k = 0;
+      for (int k=0; k<NSIZE; k++)
+      { // init static variables inside the C_XY_limber_nointerp function
+        const int init_static_vars_only = 1; // TRUE
+        const int ZLNZ = k;
         const double lnl = lnlmin;
-        double init = C_gy_tomo_limber_nointerp(exp(lnl), k, use_linear_ps_limber, 1);
+
+        double trash = C_gy_tomo_limber_nointerp(exp(lnl), ZLNZ, 
+          use_linear_ps_limber, init_static_vars_only);
       }
       #pragma GCC diagnostic pop
       
@@ -3864,8 +4087,12 @@ double C_gy_tomo_limber(double l, int ni, const int force_no_recompute)
       {
         for (int i=0; i<nell; i++)
         {
+          const int init_static_vars_only = 0; // FALSE
+          const int ZLNZ = k;
           const double lnl = lnlmin + i*dlnl;
-          table[k][i]= log(C_gy_tomo_limber_nointerp(exp(lnl), k, use_linear_ps_limber, 0));
+          
+          table[k][i]= log(C_gy_tomo_limber_nointerp(exp(lnl), ZLNZ, 
+            use_linear_ps_limber, init_static_vars_only));
         }
       }
 
@@ -3873,6 +4100,7 @@ double C_gy_tomo_limber(double l, int ni, const int force_no_recompute)
       update_nuisance(&N);
       update_galpara(&G);
       update_ynuisance(&N2);
+      update_table(&numtable);
     }
   }
 
@@ -3944,14 +4172,32 @@ double int_for_C_ys_tomo_limber(double a, void* params)
   return res*PK*(chidchi.dchida/(fK*fK))*ell_prefactor2;
 }
 
-double C_ys_tomo_limber_nointerp(double l, int ni, int use_linear_ps, 
-const int init_static_vars_only)
+double C_ys_tomo_limber_nointerp(
+    double l, 
+    int ni, 
+    int use_linear_ps, 
+    const int init_static_vars_only
+  )
 {
-  static gsl_integration_glfixed_table* w = 0;
-  if (w == 0)
+  static Ntab numtable;
+  static gsl_integration_glfixed_table* w = NULL;
+  
+  if (w == NULL || recompute_table(numtable))
   {
     const size_t nsize_integration = 200 + 50 * (Ntable.high_def_integration);
+    
+    if (w != NULL)
+    {
+      gsl_integration_glfixed_table_free(w);
+    }
     w = gsl_integration_glfixed_table_alloc(nsize_integration);
+    if (w == NULL)
+    {
+      log_fatal("array allocation failed");
+      exit(1);
+    }
+
+    update_table(&numtable);
   }
 
   double ar[3] = {(double) ni, l, (double) use_linear_ps};
@@ -3959,6 +4205,7 @@ const int init_static_vars_only)
   const double amax = 0.99999;
 
   double res = 0.0;
+  
   if (init_static_vars_only == 1)
   {
     res = int_for_C_ys_tomo_limber(amin, (void*) ar);
@@ -3970,6 +4217,7 @@ const int init_static_vars_only)
     F.function = int_for_C_ys_tomo_limber;
     res =  gsl_integration_glfixed(&F, amin, amax, w);
   }
+  
   return res;
 }
 
@@ -3978,58 +4226,68 @@ double C_ys_tomo_limber(double l, int ni, const int force_no_recompute)
   static cosmopara C;
   static nuisancepara N;
   static ynuisancepara N2;
-  static double** table;
-  static double* sig;
-  static int osc[100];
+  static Ntab numtable;
+  static double** table = NULL;
+  static double* sig = NULL;
+  static int osc[MAX_SIZE_ARRAYS*MAX_SIZE_ARRAYS];
   static int NSIZE;
   static int nell;
   static double lnlmin;
   static double lnlmax;
   static double dlnl;
 
-  if (table == 0)
-  {
-    NSIZE = tomo.shear_Nbin;
-    nell = Ntable.N_ell;
-    lnlmin = log(fmax(limits.LMIN_tab, 1.0));
-    lnlmax = log(fmax(limits.LMAX, limits.LMAX_hankel) + 1);
-    dlnl = (lnlmax - lnlmin)/((double) nell - 1.0);
+  if (force_no_recompute == 0)
+  { // Cocoa: nell = 10^5 on real funcs, so recompute funcs are expensive
+    
+    if (table == NULL || sig == NULL || recompute_table(numtable))
+    {
+      NSIZE = tomo.shear_Nbin;
+      nell = Ntable.N_ell;
+      lnlmin = log(fmax(limits.LMIN_tab, 1.0));
+      lnlmax = log(fmax(limits.LMAX, limits.LMAX_hankel) + 1);
+      dlnl = (lnlmax - lnlmin)/((double) nell - 1.0);
 
-    const int len = sizeof(double*)*NSIZE + sizeof(double)*NSIZE*nell;
-    table = (double**) malloc(len);
-    if (table == NULL)
-    {
-      log_fatal("array allocation failed");
-      exit(1);
-    }
-    for (int i=0; i<NSIZE; i++)
-    {
-      table[i] = ((double*)(table + NSIZE) + nell*i);
-      for (int j=0; j<nell; j++)
+      if (table != NULL) 
       {
-        table[i][j] = 0.0;
+        free(table);
+      }
+      table = (double**) malloc(sizeof(double*)*NSIZE + 
+                                sizeof(double)*NSIZE*nell);
+      if (table == NULL)
+      {
+        log_fatal("array allocation failed");
+        exit(1);
+      }
+      for (int i=0; i<NSIZE; i++)
+      {
+        table[i] = ((double*)(table + NSIZE) + nell*i);
+      }
+
+      if (sig != NULL) 
+      {
+        free(sig);
+      }
+      sig = (double*) malloc(sizeof(double)*NSIZE);
+      if (sig == NULL)
+      {
+        log_fatal("array allocation failed");
+        exit(1);
       }
     }
 
-    sig = (double*) malloc(sizeof(double)*NSIZE);
-    if (sig == NULL)
-    {
-      log_fatal("array allocation failed");
-      exit(1);
-    }
-  }
-
-  if (force_no_recompute == 0)
-  {
-    if (recompute_ys(C, N, N2))
+    if (recompute_ys(C, N, N2) || recompute_table(numtable))
     {
       #pragma GCC diagnostic push
       #pragma GCC diagnostic ignored "-Wunused-variable"
-      {
+      { // init static variables inside the C_XY_limber_nointerp function
         for (int k=0; k<NSIZE; k++)
         {
-          double init = 
-            C_ys_tomo_limber_nointerp(exp(lnlmin), k, use_linear_ps_limber, 1);
+          const int init_static_vars_only = 1; // TRUE
+          const int ZSNZ = k;
+          const double lnl = lnlmin;
+
+          double trash = C_ys_tomo_limber_nointerp(exp(lnl), ZSNZ, 
+            use_linear_ps_limber, init_static_vars_only);
         }
       }
       #pragma GCC diagnostic pop
@@ -4039,7 +4297,12 @@ double C_ys_tomo_limber(double l, int ni, const int force_no_recompute)
       {
         for (int i=0; i<nell; i++)
         {
-          table[k][i] = C_ys_tomo_limber_nointerp(exp(lnlmin + i*dlnl), k, use_linear_ps_limber, 0);
+          const int init_static_vars_only = 0; // FALSE
+          const int ZSNZ = k;
+          const double lnl = lnlmin + i*dlnl;
+
+          table[k][i] = C_ys_tomo_limber_nointerp(exp(lnl), k, 
+            use_linear_ps_limber, init_static_vars_only);
         }
       }
       
@@ -4048,7 +4311,13 @@ double C_ys_tomo_limber(double l, int ni, const int force_no_recompute)
       {
         sig[k] = 1.;
         osc[k] = 0;
-        if (C_ys_tomo_limber_nointerp(500., k, use_linear_ps_limber, 0) < 0)
+
+        const int init_static_vars_only = 0; // FALSE
+        const int ZSNZ = k;
+        const double tmp = C_ys_tomo_limber_nointerp(500., ZSNZ, 
+          use_linear_ps_limber, init_static_vars_only);
+        
+        if (tmp < 0)
         {
           sig[k] = -1.;
         }
@@ -4071,6 +4340,7 @@ double C_ys_tomo_limber(double l, int ni, const int force_no_recompute)
       update_cosmopara(&C);
       update_nuisance(&N);
       update_ynuisance(&N2);
+      update_table(&numtable);
     }
   }
 
@@ -4150,13 +4420,31 @@ double int_for_C_ky_limber(double a, void* params)
   return (WK*WY*PK*chidchi.dchida/(fK*fK))*ell_prefactor;
 }
 
-double C_ky_limber_nointerp(double l, int use_linear_ps, const int init_static_vars_only)
+double C_ky_limber_nointerp(
+    double l, 
+    int use_linear_ps, 
+    const int init_static_vars_only
+  )
 {
-  static gsl_integration_glfixed_table* w = 0;
-  if (w == 0)
+  static Ntab numtable;
+  static gsl_integration_glfixed_table* w = NULL;
+  
+  if (w == NULL || recompute_table(numtable))
   {
     const size_t nsize_integration = 200 + 50 * (Ntable.high_def_integration);
+    
+    if (w != NULL)
+    {
+      gsl_integration_glfixed_table_free(w);
+    }
     w = gsl_integration_glfixed_table_alloc(nsize_integration);
+    if (w == NULL)
+    {
+      log_fatal("array allocation failed");
+      exit(1);
+    }
+
+    update_table(&numtable);
   }
 
   double ar[2] = {l, (double) use_linear_ps};
@@ -4164,6 +4452,7 @@ double C_ky_limber_nointerp(double l, int use_linear_ps, const int init_static_v
   const double amax = 1.0 - 1.e-5;
 
   double res = 0.0;
+  
   if (init_static_vars_only == 1)
   {
     res = int_for_C_ky_limber(amin, (void*) ar);
@@ -4175,6 +4464,7 @@ double C_ky_limber_nointerp(double l, int use_linear_ps, const int init_static_v
     F.function = int_for_C_ky_limber;
     res =  gsl_integration_glfixed(&F, amin, amax, w);
   }
+  
   return res;
 }
 
@@ -4182,40 +4472,61 @@ double C_ky_limber(double l, const int force_no_recompute)
 {
   static cosmopara C;
   static ynuisancepara N;
-  static double* table;
-  
-  const int nell = Ntable.N_ell;
-  const double lnlmin = log(fmax(limits.LMIN_tab, 1.0));
-  const double lnlmax = log(fmax(limits.LMAX, limits.LMAX_hankel) + 1);
-  const double dlnl = (lnlmax - lnlmin)/((double) nell - 1.0);
-
-  if (table == 0)
-  {
-    table = (double*) malloc(sizeof(double)*nell);
-    if (table == NULL)
-    {
-      log_fatal("array allocation failed");
-      exit(1);
-    }
-  }
+  static Ntab numtable;
+  static double* table = NULL;
+  static int nell;
+  static double lnlmin;
+  static double lnlmax;
+  static double dlnl;
 
   if (force_no_recompute == 0)
-  {
-    if (recompute_ky(C, N))
+  { // Cocoa: nell = 10^5 on real funcs, so recompute funcs are expensive
+    
+    if (table == NULL || recompute_table(numtable))
+    {
+      nell = Ntable.N_ell;
+      lnlmin = log(fmax(limits.LMIN_tab, 1.0));
+      lnlmax = log(fmax(limits.LMAX, limits.LMAX_hankel) + 1);
+      dlnl = (lnlmax - lnlmin)/((double) nell - 1.0);
+
+      if (table != NULL) 
+      {
+        free(table);
+      }
+      table = (double*) malloc(sizeof(double)*nell);
+      if (table == NULL)
+      {
+        log_fatal("array allocation failed");
+        exit(1);
+      }
+    }
+
+    if (recompute_ky(C, N) || recompute_table(numtable))
     {
       #pragma GCC diagnostic push
       #pragma GCC diagnostic ignored "-Wunused-variable"
-      {
-        double init = C_ky_limber_nointerp(exp(lnlmin), use_linear_ps_limber, 1);
+      { // init static variables inside the C_XY_limber_nointerp function
+        const int init_static_vars_only = 1; // TRUE
+        const double lnl = lnlmin;
+
+        double trash = C_ky_limber_nointerp(exp(lnl), use_linear_ps_limber, 
+          init_static_vars_only);
       }
       #pragma GCC diagnostic pop
+      
       #pragma omp parallel for
       for (int i=0; i<nell; i++)
       {
-        table[i] = log(C_ky_limber_nointerp(exp(lnlmin + i*dlnl), use_linear_ps_limber, 0));
+        const int init_static_vars_only = 0; // FALSE
+        const double lnl = lnlmin + i*dlnl;
+
+        table[i] = log(C_ky_limber_nointerp(exp(lnl), use_linear_ps_limber, 
+          init_static_vars_only));
       }
+
       update_ynuisance(&N);
       update_cosmopara(&C);
+      update_table(&numtable);
     }
   }
 
@@ -4263,13 +4574,27 @@ double int_for_C_yy_limber(double a, void *params)
   return WY*WY*PK*chidchi.dchida/(fK*fK);
 }
 
-double C_yy_limber_nointerp(double l, int use_linear_ps, const int init_static_vars_only)
+double C_yy_limber_nointerp(
+    double l, 
+    int use_linear_ps, 
+    const int init_static_vars_only
+  )
 {
-  static gsl_integration_glfixed_table* w = 0;
-  if (w == 0)
+  static Ntab numtable;
+  static gsl_integration_glfixed_table* w = NULL;
+  
+  if (w == NULL || recompute_table(numtable))
   {
     const size_t nsize_integration = 200 + 50 * (Ntable.high_def_integration);
+    
+    if (w != NULL)
+    {
+      gsl_integration_glfixed_table_free(w);
+      w = NULL;
+    }
     w = gsl_integration_glfixed_table_alloc(nsize_integration);
+
+    update_table(&numtable);
   }
 
   double ar[2] = {l, (double) use_linear_ps};
@@ -4277,6 +4602,7 @@ double C_yy_limber_nointerp(double l, int use_linear_ps, const int init_static_v
   const double amax = 1.0 - 1.e-5;
 
   double res = 0.0;
+  
   if (init_static_vars_only == 1)
   {
     res = int_for_C_yy_limber(amin, (void*) ar);
@@ -4288,6 +4614,7 @@ double C_yy_limber_nointerp(double l, int use_linear_ps, const int init_static_v
     F.function = int_for_C_yy_limber;
     res =  gsl_integration_glfixed(&F, amin, amax, w);
   }
+  
   return res;
 }
 
@@ -4295,42 +4622,61 @@ double C_yy_limber(double l, const int force_no_recompute)
 {
   static cosmopara C;
   static ynuisancepara N;
-  static double* table;
-  
-  const int nell = Ntable.N_ell;
-  const double lnlmin = log(fmax(limits.LMIN_tab, 1.0));
-  const double lnlmax = log(fmax(limits.LMAX, limits.LMAX_hankel) + 1.0);
-  const double dlnl = (lnlmax - lnlmin)/((double) nell - 1.0);
-
-  if (table == 0)
-  {
-    table = (double*) malloc(sizeof(double)*nell);
-    if (table == NULL)
-    {
-      log_fatal("array allocation failed");
-      exit(1);
-    }
-  }
+  static Ntab numtable;
+  static double* table = NULL;
+  static int nell;
+  static double lnlmin;
+  static double lnlmax;
+  static double dlnl;
 
   if (force_no_recompute == 0)
-  {
-    if (recompute_yy(C, N))
+  { // Cocoa: nell = 10^5 on real funcs, so recompute funcs are expensive
+    
+    if (table == NULL || recompute_table(numtable))
+    {
+      nell = Ntable.N_ell;
+      lnlmin = log(fmax(limits.LMIN_tab, 1.0));
+      lnlmax = log(fmax(limits.LMAX, limits.LMAX_hankel) + 1.0);
+      dlnl = (lnlmax - lnlmin)/((double) nell - 1.0);
+
+      if (table != NULL) 
+      {
+        free(table);
+      }
+      table = (double*) malloc(sizeof(double)*nell);
+      if (table == NULL)
+      {
+        log_fatal("array allocation failed");
+        exit(1);
+      }
+    }
+
+    if (recompute_yy(C, N) || recompute_table(numtable))
     {
       #pragma GCC diagnostic push
       #pragma GCC diagnostic ignored "-Wunused-variable"
-      {
-        double init = C_yy_limber_nointerp(exp(lnlmin), use_linear_ps_limber, 1);
+      { // init static variables inside the C_XY_limber_nointerp function
+        const int init_static_vars_only = 1; // TRUE
+        const double lnl = lnlmin;
+
+        double trash = C_yy_limber_nointerp(exp(lnl), use_linear_ps_limber, 
+          init_static_vars_only);
       }
       #pragma GCC diagnostic pop
       
       #pragma omp parallel for
       for (int i=0; i<nell; i++)
       {
-        table[i] = log(C_yy_limber_nointerp(exp(lnlmin + i*dlnl), use_linear_ps_limber, 0));
+        const int init_static_vars_only = 0; // FALSE
+        const double lnl = lnlmin + i*dlnl;
+
+        table[i] = log(C_yy_limber_nointerp(exp(lnl), use_linear_ps_limber, 
+          init_static_vars_only));
       }
       
       update_ynuisance(&N);
       update_cosmopara(&C);
+      update_table(&numtable);
     }
   }
 
@@ -4580,12 +4926,13 @@ void C_cl_tomo(int L, const int ni, const int nj, double *const Cl, double dev, 
     #pragma GCC diagnostic ignored "-Wunused-variable"
     #pragma GCC diagnostic push
     #pragma GCC diagnostic ignored "-Wunused-but-set-variable"
-    {
+    { // init static variables inside the C_XY_limber_nointerp function
       double init = p_lin(k1[0][0]*real_coverH0, 1.0);
       init = C_gg_tomo_limber_nointerp((double) ell_ar[0], ni, nj, 0, 1);
     }
     #pragma GCC diagnostic pop
     #pragma GCC diagnostic pop
+    
     #pragma omp parallel for
     for (int i=0; i<Nell_block; i++)
     {
@@ -4604,6 +4951,7 @@ void C_cl_tomo(int L, const int ni, const int nj, double *const Cl, double dev, 
         const double k1cH03 = k1cH0*k1cH0*k1cH0;
         cl_temp += (ni == nj) ? Fk1[i][j]*Fk1[i][j]*k1cH03*PK : Fk1[i][j]*Fk2[i][j]*k1cH03*PK;
       }
+      
       Cl[ell_ar[i]] = cl_temp * dlnk * 2. / M_PI + 
          C_gg_tomo_limber_nointerp((double) ell_ar[i], ni, nj, 0, 0)
         -C_gg_tomo_limber_nointerp((double) ell_ar[i], ni, nj, 1, 0);
@@ -4613,6 +4961,7 @@ void C_cl_tomo(int L, const int ni, const int nj, double *const Cl, double dev, 
   L++;
 
   Cl[limits.LMAX_NOLIMBER] = C_gg_tomo_limber((double) limits.LMAX_NOLIMBER, ni, nj, 0);
+  
   #pragma omp parallel for
   for (int l=L; l<limits.LMAX_NOLIMBER; l++)
   {
