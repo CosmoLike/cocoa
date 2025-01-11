@@ -768,7 +768,7 @@ double b_source(double a) // lookup table for b1 of source galaxies
   static double* table;
 
   const double amin = limits.a_min;
-  const double amax = 1.0 / (1.0 + redshift.shear_zdistrpar_zmin);
+  const double amax = 1.0 / (1.0 + redshift.shear_zdist_zmin_all);
   const double da = (amax - amin) / ((double) Ntable.N_a - 1.0);
 
   if (table == 0)
@@ -1388,8 +1388,8 @@ double ngal(const int ni, const double a)
   const int nbin = tomo.clustering_Nbin;
 
   const int na = Ntable.N_a;
-  const double amin = 1.0/(redshift.clustering_zdistrpar_zmax + 1.0);
-  const double amax = 1.0/(redshift.clustering_zdistrpar_zmin + 1.0);
+  const double amin = 1.0/(redshift.clustering_zdist_zmax_all + 1.0);
+  const double amax = 1.0/(redshift.clustering_zdist_zmin_all + 1.0);
   const double da = (amax - amin)/((double) na - 1.0);
 
   if (table == 0) 
@@ -1528,8 +1528,8 @@ double bgal(const int ni, const double a)
   const int nbin = tomo.clustering_Nbin;
 
   const int na = Ntable.N_a;
-  const double amin = 1.0/(redshift.clustering_zdistrpar_zmax + 1.0);
-  const double amax = 1.0/(redshift.clustering_zdistrpar_zmin + 1.0);
+  const double amin = 1.0/(redshift.clustering_zdist_zmax_all + 1.0);
+  const double amax = 1.0/(redshift.clustering_zdist_zmin_all + 1.0);
   const double da = (amax - amin)/((double) na - 1.0);
 
   if (table == 0) 

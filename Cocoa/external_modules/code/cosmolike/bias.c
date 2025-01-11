@@ -40,8 +40,8 @@ double b1_per_bin(double z __attribute__((unused)), int ni)
 double b1_per_bin_pass_evolv(double z, int ni) 
 {
   double z_evolv_passiv = growfac(1. / (z + 1.)) /
-                          growfac(1. / (1. + 0.5 * (redshift.clustering_zmin[ni] +
-                                                    redshift.clustering_zmax[ni])));
+      growfac(1. / (1. + 0.5 * (redshift.clustering_zdist_zmin[ni] +
+                                redshift.clustering_zdist_zmax[ni])));
   return (gbias.b[ni] - 1.) / z_evolv_passiv + 1.;
 }
 
@@ -91,8 +91,8 @@ double bgal_z(double z, int ni)
   { // old default: passive evolution
     double z_evolv_passiv =
         growfac(1. / (z + 1.)) /
-        growfac(1. / (1. + 0.5 * (redshift.clustering_zmin[ni] +
-                                  redshift.clustering_zmax[ni])));
+        growfac(1. / (1. + 0.5 * (redshift.clustering_zdist_zmin[ni] +
+                                  redshift.clustering_zdist_zmax[ni])));
     return (gbias.b[ni] - 1.) / z_evolv_passiv + 1.;
   }
 }

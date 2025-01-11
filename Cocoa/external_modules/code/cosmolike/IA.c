@@ -160,7 +160,7 @@ double A_LF(double mag, double a)
 // ---------------------------------------------------------------------------
 int check_LF(void)
 {
-  double a = 1./(1+redshift.shear_zdistrpar_zmax) + 0.005;
+  double a = 1./(1. + redshift.shear_zdist_zmax_all) + 0.005;
   while (a < 1.)
   {
     if (M_abs(survey.m_lim,a) < LF_coefficients[1][2] - (LF_coefficients[1][3]

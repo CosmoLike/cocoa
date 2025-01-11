@@ -60,7 +60,7 @@ int N_CL(int z1, int z2);
 
 // returns n(ztrue | j), works only with binned distributions; 
 // j =-1 -> no tomography; j>= 0 -> tomography bin j
-double zdistr_photoz(double z, int j); 
+double zdistr_photoz(double zz, const int nj); 
 
 // mean true redshift of source galaxies in tomography bin ni
 double zmean_source(int ni); 

@@ -150,17 +150,22 @@ typedef struct
 typedef struct
 {
   int shear_photoz;
-  double shear_zdistrpar_zmin;
-  double shear_zdistrpar_zmax;
-  double shear_zmax[MAX_SIZE_ARRAYS];
-  double shear_zmin[MAX_SIZE_ARRAYS];
+  int shear_nzbins;
+  double* shear_zdist_z_v;
+  double** shear_zdist_table;
+  double shear_zdist_zmin_all;
+  double shear_zdist_zmax_all;
+  double shear_zdist_zmin[MAX_SIZE_ARRAYS];
+  double shear_zdist_zmax[MAX_SIZE_ARRAYS];
   char shear_REDSHIFT_FILE[CHAR_MAX_SIZE];
 
   int clustering_photoz;
-  double clustering_zdistrpar_zmin;
-  double clustering_zdistrpar_zmax;
-  double clustering_zmax[MAX_SIZE_ARRAYS];
-  double clustering_zmin[MAX_SIZE_ARRAYS];
+  int clustering_nzbins;
+  double** clustering_zdist_table;
+  double clustering_zdist_zmin_all;
+  double clustering_zdist_zmax_all;
+  double clustering_zdist_zmin[MAX_SIZE_ARRAYS];
+  double clustering_zdist_zmax[MAX_SIZE_ARRAYS];
   char clustering_REDSHIFT_FILE[CHAR_MAX_SIZE];
 
   /*

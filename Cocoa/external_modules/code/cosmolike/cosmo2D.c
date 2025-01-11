@@ -4816,16 +4816,16 @@ void C_cl_tomo(int L, const int ni, const int nj, double *const Cl, double dev, 
   }
   
   {
-    const double zmin = redshift.clustering_zmin[ni];
-    const double zmax = redshift.clustering_zmax[ni];
+    const double zmin = redshift.clustering_zdist_zmin[ni];
+    const double zmax = redshift.clustering_zdist_zmax[ni];
     f_chi_for_Psi_cl(chi_ar, Nchi, f1_chi, ni, zmin, zmax);
     f_chi_for_Psi_cl_RSD(chi_ar, Nchi, f1_chi_RSD, ni, zmin, zmax);
     f_chi_for_Psi_cl_Mag(chi_ar, Nchi, f1_chi_Mag, ni, zmax);
   }
   if (ni != nj)
   { 
-    const double zmin = redshift.clustering_zmin[nj];
-    const double zmax = redshift.clustering_zmax[nj];
+    const double zmin = redshift.clustering_zdist_zmin[nj];
+    const double zmax = redshift.clustering_zdist_zmax[nj];
     f_chi_for_Psi_cl(chi_ar, Nchi, f2_chi, nj, zmin, zmax);
     f_chi_for_Psi_cl_RSD(chi_ar, Nchi, f2_chi_RSD, nj, zmin, zmax);
     f_chi_for_Psi_cl_Mag(chi_ar, Nchi, f2_chi_Mag, nj, zmax);
@@ -5058,15 +5058,15 @@ void C_gl_tomo(int L, int nl, int ns, double *const Cl, double dev, double toler
   }
 
   {
-    const double zmin = redshift.clustering_zmin[nl];
-    const double zmax = redshift.clustering_zmax[nl];
+    const double zmin = redshift.clustering_zdist_zmin[nl];
+    const double zmax = redshift.clustering_zdist_zmax[nl];
     f_chi_for_Psi_cl(chi_ar, Nchi, f1_chi, nl, zmin, zmax);
     f_chi_for_Psi_cl_RSD(chi_ar, Nchi, f1_chi_RSD, nl, zmin, zmax);
     f_chi_for_Psi_cl_Mag(chi_ar, Nchi, f1_chi_Mag, nl, zmax);
   }
   {
-    const double zmin = redshift.shear_zmin[ns];
-    const double zmax = redshift.shear_zmax[ns];
+    const double zmin = redshift.shear_zdist_zmin[ns];
+    const double zmax = redshift.shear_zdist_zmax[ns];
     f_chi_for_Psi_sh(chi_ar, Nchi, f2_chi, ns, zmax);
     f_chi_for_Psi_sh_IA(chi_ar, Nchi, f2_chi_IA_ar, ns, zmin, zmax);
   }

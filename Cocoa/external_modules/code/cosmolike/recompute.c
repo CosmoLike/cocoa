@@ -95,7 +95,7 @@ int recompute_galaxies(galpara G, int i)
     log_fatal("invalid bin input ni = %d", i);
     exit(1);
   }
-  return (fdiff(G.b[i], gbias.b[i])   || 
+  return (fdiff(G.b[i], gbias.b[i]) || 
           fdiff(G.b2[i], gbias.b2[i]) || 
           fdiff(G.bs2[i], gbias.bs2[i])) ? 1 : 0;
 }

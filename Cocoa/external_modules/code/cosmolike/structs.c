@@ -70,12 +70,20 @@ tomopara tomo =
 redshiftpara redshift =
 {
   .shear_photoz = 0,
-  .shear_zdistrpar_zmin = 0.0,
-  .shear_zdistrpar_zmax = 0.0,
+  .shear_nzbins = 0,
+  .shear_zdist_zmin_all = 0.0,
+  .shear_zdist_zmax_all = 0.0,
+  .shear_zdist_zmin = {0},
+  .shear_zdist_zmax = {0},
+  .shear_zdist_table = NULL,
   
   .clustering_photoz = 0,
-  .clustering_zdistrpar_zmin = 0.0,
-  .clustering_zdistrpar_zmax = 0.0
+  .clustering_nzbins = 0,
+  .clustering_zdist_zmin_all = 0.0,
+  .clustering_zdist_zmax_all = 0.0,
+  .clustering_zdist_zmin = {0},
+  .clustering_zdist_zmax = {0},
+  .clustering_zdist_table = NULL
 };
 
 galpara gbias =
@@ -343,27 +351,33 @@ void reset_tomo_struct()
 void reset_redshift_struct()
 {
   redshift.shear_photoz = 0;
-  redshift.shear_zdistrpar_zmin = 0.0;
-  redshift.shear_zdistrpar_zmax = 0.0;
+  if (redshift.shear_zdist_table != NULL)
+  {
+    free(redshift.shear_zdist_table);
+     redshift.shear_zdist_table = NULL;
+  }
+  redshift.shear_nzbins = 0;
+  redshift.shear_zdist_zmin_all = 0.0;
+  redshift.shear_zdist_zmax_all = 0.0;
   sprintf(redshift.shear_REDSHIFT_FILE, "%s", "");
 
+  if (redshift.clustering_zdist_table != NULL)
+  {
+    free(redshift.clustering_zdist_table);
+    redshift.clustering_zdist_table = NULL;
+  }
   redshift.clustering_photoz = 0;
-  redshift.clustering_zdistrpar_zmin = 0.0;
-  redshift.clustering_zdistrpar_zmax = 0.0;
+  redshift.clustering_nzbins = 0;
+  redshift.clustering_zdist_zmin_all = 0.0;
+  redshift.clustering_zdist_zmax_all = 0.0;
   sprintf(redshift.clustering_REDSHIFT_FILE, "%s", "");
 
   for(int i=0; i<MAX_SIZE_ARRAYS; i++)
   {
-    redshift.shear_zmax[i] = 0.0;
-    redshift.shear_zmin[i] = 0.0;
-
-    redshift.clustering_zmax[i] = 0.0;
-    redshift.clustering_zmin[i] = 0.0;
-
-/*
-    tomo.cluster_zmax[i] = 0.0;
-    tomo.cluster_zmin[i] = 0.0;
-*/
+    redshift.shear_zdist_zmin[i] = 0.0;
+    redshift.shear_zdist_zmax[i] = 0.0; 
+    redshift.clustering_zdist_zmin[i] = 0.0;
+    redshift.clustering_zdist_zmax[i] = 0.0;
   }
 }
 
