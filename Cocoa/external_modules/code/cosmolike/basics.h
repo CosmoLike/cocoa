@@ -1,4 +1,5 @@
 #include <fftw3.h>
+#include <gsl/gsl_integration.h>
 #include <gsl/gsl_matrix.h>
 #include "structs.h"
 
@@ -10,6 +11,11 @@ extern "C" {
 
 #define NR_END 1
 #define FREE_ARG char *
+
+gsl_integration_glfixed_table* malloc_gslint_glfixed(const int n);
+void* malloc1d(const int nx);
+void** malloc2d(const int nx, const int ny);
+void* calloc1d(const int nx);
 
 int fdiff(const double a, const double b);
 

@@ -485,18 +485,8 @@ double zdistr_photoz(double zz, const int nj)
     {
       free(table);
     }
-    table = (double**) malloc(sizeof(double*)*(ntomo+2) + 
-                              sizeof(double)*(ntomo+2)*nzbins);
-    if (table == NULL)
-    {
-      log_fatal("array allocation failed");
-      exit(1);
-    }
-    for (int i=0; i<(ntomo+2); i++)
-    {
-      table[i]  = ((double*)(table + (ntomo+2)) + nzbins*i);
-    }
-  
+    table = (double**) malloc2d(ntomo + 2, nzbins);
+    
     for (int i=0; i<ntomo+1; i++) 
     {
       if (Ntable.photoz_interpolation_type == 0)
@@ -604,7 +594,7 @@ double int_for_zmean_source(double z, void* params)
   double* ar = (double*) params;
   const int ni = (int) ar[0];
   
-  if (ni < -1 || ni > tomo.shear_Nbin - 1)
+  if (ni < 0 || ni > tomo.shear_Nbin - 1)
   {
     log_fatal("invalid bin input ni = %d", ni);
     exit(1);
@@ -623,19 +613,11 @@ double zmean_source(int ni)
 
   if (table == NULL || recompute_table(numtable))
   {
-    if (table == NULL) 
-    {
-      table = (double*) malloc(sizeof(double)*tomo.shear_Nbin);
-      if (table == NULL)
-      {
-        log_fatal("array allocation failed");
-        exit(1);
-      }
-    }
-
-    const size_t nsize_integration = 300 + 50 * (Ntable.high_def_integration);
-    gsl_integration_glfixed_table* gslw = 
-      gsl_integration_glfixed_table_alloc(nsize_integration);
+    if (table != NULL)  free(table);
+    table = (double*) malloc1d(tomo.shear_Nbin);
+   
+    const size_t szint = 300 + 50 * (Ntable.high_def_integration);
+    gsl_integration_glfixed_table* w = malloc_gslint_glfixed(szint);
 
     #pragma GCC diagnostic push
     #pragma GCC diagnostic ignored "-Wunused-variable"
@@ -656,10 +638,10 @@ double zmean_source(int ni)
       F.function = int_for_zmean_source;
       
       table[i] = gsl_integration_glfixed(&F, 
-        redshift.shear_zdist_zmin[i], redshift.shear_zdist_zmax[i], gslw);
+        redshift.shear_zdist_zmin[i], redshift.shear_zdist_zmax[i], w);
     }
 
-    gsl_integration_glfixed_table_free(gslw);
+    gsl_integration_glfixed_table_free(w);
   }
 
   if (ni < 0 || ni > tomo.shear_Nbin - 1)
@@ -725,23 +707,10 @@ double pf_photoz(double zz, int nj)
   {  
     const int ntomo  = tomo.clustering_Nbin;          // alias
     const int nzbins = redshift.clustering_nzbins;    // alias
+    
+    if (table != NULL) free(table);
+    table = (double**) malloc2d(ntomo + 2, nzbins);
 
-    if (table != NULL)
-    {
-      free(table);
-    }
-    table = (double**) malloc(sizeof(double*)*(ntomo+2) + 
-                              sizeof(double)*(ntomo+2)*nzbins);
-    if (table == NULL)
-    {
-      log_fatal("array allocation failed");
-      exit(1);
-    }
-    for (int i=0; i<(ntomo+2); i++)
-    {
-      table[i]  = ((double*)(table + (ntomo+2)) + nzbins*i);
-    }
-  
     for (int i=0; i<ntomo+1; i++) 
     {
       if (Ntable.photoz_interpolation_type == 0)
@@ -849,7 +818,7 @@ double int_for_zmean(double z, void* params)
   double* ar = (double*) params;
   const int ni = (int) ar[0];
   
-  if (ni < -1 || ni > tomo.clustering_Nbin - 1)
+  if (ni < 0 || ni > tomo.clustering_Nbin - 1)
   {
     log_fatal("invalid bin input ni = %d", ni);
     exit(1);
@@ -866,7 +835,7 @@ double norm_for_zmean(double z, void* params)
   double* ar = (double*) params;
   const int ni = (int) ar[0];
   
-  if (ni < -1 || ni > tomo.clustering_Nbin - 1)
+  if (ni < 0 || ni > tomo.clustering_Nbin - 1)
   {
     log_fatal("invalid bin input ni = %d", ni);
     exit(1);
@@ -885,29 +854,17 @@ double zmean(const int ni)
 
   if (table == NULL || recompute_table(numtable))
   {
-    if (table != NULL)
-    {
-      free(table);
-    }
-    table = (double*) malloc(sizeof(double)*(tomo.clustering_Nbin+1));
-    if (table == NULL)
-    {
-      log_fatal("array allocation failed");
-      exit(1);
-    }
+    if (table != NULL) free(table);
+    table = (double*) malloc1d(tomo.clustering_Nbin+1);
 
-    const size_t nsize_integration = 300 + 50 * (Ntable.high_def_integration);
-    gsl_integration_glfixed_table* gslw = 
-      gsl_integration_glfixed_table_alloc(nsize_integration);
+    const size_t szint = 300 + 50 * (Ntable.high_def_integration);
+    gsl_integration_glfixed_table* w = malloc_gslint_glfixed(szint);
 
     #pragma GCC diagnostic push
     #pragma GCC diagnostic ignored "-Wunused-variable"
-    #pragma GCC diagnostic push
-    #pragma GCC diagnostic ignored "-Wunused-but-set-variable"
     { // COCOA: init static variables.
       double init = pf_photoz(0., 0);
     }
-    #pragma GCC diagnostic pop
     #pragma GCC diagnostic pop
     
     #pragma omp parallel for
@@ -919,22 +876,20 @@ double zmean(const int ni)
       
       F.function = int_for_zmean;
       const double num = gsl_integration_glfixed(&F, 
-        redshift.clustering_zdist_zmin[i], redshift.clustering_zdist_zmax[i], 
-        gslw);
+        redshift.clustering_zdist_zmin[i], redshift.clustering_zdist_zmax[i], w);
       
       F.function = norm_for_zmean;
       const double den = gsl_integration_glfixed(&F, 
-        redshift.clustering_zdist_zmin[i], redshift.clustering_zdist_zmax[i], 
-        gslw);
+        redshift.clustering_zdist_zmin[i], redshift.clustering_zdist_zmax[i], w);
       
       table[i] = num/den;
     }
 
-    gsl_integration_glfixed_table_free(gslw);
+    gsl_integration_glfixed_table_free(w);
     update_table(&numtable);
   }
 
-  if (ni < -1 || ni > tomo.clustering_Nbin - 1)
+  if (ni < 0 || ni > tomo.clustering_Nbin - 1)
   {
     log_fatal("invalid bin input ni = %d", ni);
     exit(1);
@@ -945,9 +900,7 @@ double zmean(const int ni)
 
 // ------------------------------------------------------------------------
 // ------------------------------------------------------------------------
-// ------------------------------------------------------------------------
 // Bin-averaged lens efficiencies
-// ------------------------------------------------------------------------
 // ------------------------------------------------------------------------
 // ------------------------------------------------------------------------
 
@@ -962,7 +915,7 @@ double int_for_g_tomo(double aprime, void* params)
   
   const int ni = (int) ar[0];
   
-  if (ni < -1 || ni > tomo.shear_Nbin - 1)
+  if (ni < 0 || ni > tomo.shear_Nbin - 1)
   {
     log_fatal("invalid bin input ni = %d", ni);
     exit(1);
@@ -980,7 +933,6 @@ double g_tomo(double ainput, int ni) // for tomography bin ni
   static cosmopara C;
   static Ntab numtable;
   static double** table = NULL;
-  static gsl_integration_glfixed_table* gslw = NULL;
 
   const double amin = 1.0/(redshift.shear_zdist_zmax_all + 1.0);
   const double amax = 0.999999;
@@ -988,34 +940,8 @@ double g_tomo(double ainput, int ni) // for tomography bin ni
 
   if (table == NULL || recompute_table(numtable)) 
   {
-    if (table != NULL)
-    {
-      free(table);
-    }
-    table = (double**) malloc(sizeof(double*)*(tomo.shear_Nbin+1) + 
-                              sizeof(double)*(tomo.shear_Nbin+1)*Ntable.N_a);
-    if (table == NULL)
-    {
-      log_fatal("array allocation failed");
-      exit(1);
-    }
-    for (int i=0; i<(tomo.shear_Nbin+1); i++)
-    {
-      table[i] = ((double*)(table + (tomo.shear_Nbin+1)) + Ntable.N_a*i);
-    }
-
-    const size_t nsize_integration = 250 + 50 * (Ntable.high_def_integration);
-  
-    if (gslw != NULL)
-    {
-      gsl_integration_glfixed_table_free(gslw);    
-    }  
-    gslw = gsl_integration_glfixed_table_alloc(nsize_integration);
-    if (gslw == NULL)
-    {
-      log_fatal("array allocation failed");
-      exit(1);
-    }
+    if (table != NULL) free(table);
+    table = (double**) malloc2d(tomo.shear_Nbin, Ntable.N_a);
   }
 
   if (recompute_zphot_shear(N) || 
@@ -1024,29 +950,19 @@ double g_tomo(double ainput, int ni) // for tomography bin ni
   {
     #pragma GCC diagnostic push
     #pragma GCC diagnostic ignored "-Wunused-variable"
-    #pragma GCC diagnostic push
-    #pragma GCC diagnostic ignored "-Wunused-but-set-variable"
     { // COCOA: init static variables - allows the OpenMP on the next loop
       double ar[2];
+      ar[0] = (double) 0;
       ar[1] = chi(amin);
-      {
-        const int j = -1;
-        ar[0] = (double) j; 
-        double trash = int_for_g_tomo(amin, (void*) ar);
-      } 
-      if (tomo.shear_Nbin > 0) 
-      { 
-        const int j = 0;      
-        ar[0] = (double) j;
-        double trash = int_for_g_tomo(amin, (void*) ar);
-      }
-
+      double trash = int_for_g_tomo(amin, (void*) ar);
     }
     #pragma GCC diagnostic pop
-    #pragma GCC diagnostic pop
     
+    const size_t szint = 250 + 50 * (Ntable.high_def_integration);
+    gsl_integration_glfixed_table* w = malloc_gslint_glfixed(szint);
+
     #pragma omp parallel for collapse(2)
-    for (int j=-1; j<tomo.shear_Nbin; j++) 
+    for (int j=0; j<tomo.shear_Nbin; j++) 
     {
       for (int i=0; i<Ntable.N_a; i++) 
       {
@@ -1060,16 +976,17 @@ double g_tomo(double ainput, int ni) // for tomography bin ni
         F.params = ar;
         F.function = int_for_g_tomo;
         
-        table[j+1][i] = gsl_integration_glfixed(&F, amin, a, gslw);
+        table[j][i] = gsl_integration_glfixed(&F, amin, a, w);
       }
     }
 
+    gsl_integration_glfixed_table_free(w);
     update_cosmopara(&C);
     update_nuisance(&N);
     update_table(&numtable);
   }
 
-  if (ni < -1 || ni > tomo.shear_Nbin - 1)
+  if (ni < 0 || ni > tomo.shear_Nbin - 1)
   {
     log_fatal("invalid bin input ni = %d", ni);
     exit(1);
@@ -1082,7 +999,7 @@ double g_tomo(double ainput, int ni) // for tomography bin ni
   }
   else
   {
-    res = interpol(table[ni+1], Ntable.N_a, amin, amax, da, ainput, 1.0, 1.0); 
+    res = interpol(table[ni], Ntable.N_a, amin, amax, da, ainput, 1.0, 1.0); 
   }
   return res;
 }
@@ -1102,7 +1019,7 @@ double int_for_g2_tomo(double aprime, void* params)
   
   const int ni = (int) ar[0];
   
-  if (ni < -1 || ni > tomo.shear_Nbin - 1)
+  if (ni < 0 || ni > tomo.shear_Nbin - 1)
   {
     log_fatal("invalid bin input ni = %d", ni);
     exit(1);
@@ -1125,7 +1042,6 @@ double g2_tomo(double a, int ni)
   static cosmopara C;
   static Ntab numtable;
   static double** table = NULL;
-  static gsl_integration_glfixed_table* gslw = NULL;
 
   const double amin = 1.0/(redshift.shear_zdist_zmax_all + 1.0);
   const double amax = 0.999999;
@@ -1133,35 +1049,8 @@ double g2_tomo(double a, int ni)
 
   if (table == 0 || recompute_table(numtable)) 
   {
-    if (table != NULL)
-    {
-      free(table);
-    }
-    const int NSIZE=(tomo.shear_Nbin + 1);
-    table = (double**) malloc(sizeof(double*)*NSIZE + 
-                              sizeof(double)*NSIZE*Ntable.N_a);
-    if (table == NULL)
-    {
-      log_fatal("array allocation failed");
-      exit(1);
-    }
-    for (int i=0; i<NSIZE; i++)
-    {
-      table[i] = ((double*)(table + NSIZE) + Ntable.N_a*i);
-    }
-
-    const size_t nsize_integration = 250 + 50 * (Ntable.high_def_integration);
-
-    if (gslw != NULL)
-    {
-      gsl_integration_glfixed_table_free(gslw);    
-    }
-    gslw = gsl_integration_glfixed_table_alloc(nsize_integration);
-    if (gslw == NULL)
-    {
-      log_fatal("array allocation failed");
-      exit(1);
-    }
+    if (table != NULL) free(table);
+    table = (double**) malloc2d(tomo.shear_Nbin, Ntable.N_a);
   }
 
   if (recompute_zphot_shear(N) || 
@@ -1170,28 +1059,19 @@ double g2_tomo(double a, int ni)
   {
     #pragma GCC diagnostic push
     #pragma GCC diagnostic ignored "-Wunused-variable"
-    #pragma GCC diagnostic push
-    #pragma GCC diagnostic ignored "-Wunused-but-set-variable"
     { // init static variables
       double ar[2];
+      ar[0] = (double) 0;
       ar[1] = chi(amin);
-      {
-        const int j = -1;
-        ar[0] = (double) j; 
-        double trash = int_for_g2_tomo(amin, (void*) ar);
-      } 
-      if (tomo.shear_Nbin > 0) 
-      { 
-        const int j = 0;      
-        ar[0] = (double) j;
-        double trash = int_for_g2_tomo(amin, (void*) ar);
-      }
+      double trash = int_for_g2_tomo(amin, (void*) ar);
     }
     #pragma GCC diagnostic pop
-    #pragma GCC diagnostic pop
+
+    const size_t szint = 250 + 50 * (Ntable.high_def_integration);
+    gsl_integration_glfixed_table* w = malloc_gslint_glfixed(szint);
 
     #pragma omp parallel for collapse(2)
-    for (int j=-1; j<tomo.shear_Nbin; j++) 
+    for (int j=0; j<tomo.shear_Nbin; j++) 
     {
       for (int i=0; i<Ntable.N_a; i++) 
       {
@@ -1205,16 +1085,17 @@ double g2_tomo(double a, int ni)
         F.params = ar;
         F.function = int_for_g2_tomo;
 
-        table[j+1][i] = gsl_integration_glfixed(&F, amin, a, gslw);
-      }
+        table[j][i] = gsl_integration_glfixed(&F, amin, a, w);
+      } 
     }
 
+    gsl_integration_glfixed_table_free(w);   
     update_nuisance(&N);
     update_cosmopara(&C);
     update_table(&numtable);
   }
 
-  if (ni < -1 || ni > tomo.shear_Nbin - 1)
+  if (ni < 0 || ni > tomo.shear_Nbin - 1)
   {
     log_fatal("invalid bin input ni = %d", ni);
     exit(1);
@@ -1227,7 +1108,7 @@ double g2_tomo(double a, int ni)
   }
   else 
   {
-    res = interpol(table[ni+1], Ntable.N_a, amin, amax, da, a, 1.0, 1.0);
+    res = interpol(table[ni], Ntable.N_a, amin, amax, da, a, 1.0, 1.0);
   }  
   return res;
 }
@@ -1238,10 +1119,10 @@ double g2_tomo(double a, int ni)
 
 double int_for_g_lens(double aprime, void* params) 
 {
-  double *ar = (double*)params;
+  double *ar = (double*) params;
 
   const int ni = (int) ar[0];
-  if (ni < -1 || ni > tomo.clustering_Nbin - 1)
+  if (ni < 0 || ni > tomo.clustering_Nbin - 1)
   {
     log_fatal("invalid bin input ni = %d", ni);
     exit(1);
@@ -1264,7 +1145,6 @@ double g_lens(double a, int ni)
   static cosmopara C;
   static Ntab numtable;
   static double** table = NULL;
-  static gsl_integration_glfixed_table* gslw = NULL;
 
   const double amin = 1.0/(redshift.clustering_zdist_zmax_all + 1.0);
   const double amax = 0.999999;
@@ -1273,35 +1153,8 @@ double g_lens(double a, int ni)
 
   if (table == NULL || recompute_table(numtable)) 
   {
-    if (table != NULL)
-    {
-      free(table);
-    }
-    const int NSIZE = (tomo.clustering_Nbin + 1);
-    table = (double**) malloc(sizeof(double*)*NSIZE + 
-                              sizeof(double)*NSIZE*Ntable.N_a);
-    if (table == NULL)
-    {
-      log_fatal("array allocation failed");
-      exit(1);
-    }
-    for (int i=0; i<NSIZE; i++)
-    {
-      table[i] = ((double*)(table + NSIZE) + Ntable.N_a*i);
-    }
-
-    const size_t nsize_integration = 275 + 50 * (Ntable.high_def_integration);
-
-    if (gslw != NULL)
-    {
-      gsl_integration_glfixed_table_free(gslw);    
-    }
-    gslw = gsl_integration_glfixed_table_alloc(nsize_integration);
-    if (gslw == NULL)
-    {
-      log_fatal("array allocation failed");
-      exit(1);
-    }
+    if (table != NULL)  free(table);
+    table = (double**) malloc2d(tomo.clustering_Nbin , Ntable.N_a);
   }
 
   if (recompute_zphot_clustering(N) || 
@@ -1310,51 +1163,42 @@ double g_lens(double a, int ni)
   {
     #pragma GCC diagnostic push
     #pragma GCC diagnostic ignored "-Wunused-variable"
-    #pragma GCC diagnostic push
-    #pragma GCC diagnostic ignored "-Wunused-but-set-variable"
     { // COCOA: init static variables - allows the OpenMP on the next loop
       double ar[2];
+      ar[0] = (double) 0;
       ar[1] = chi(amin);
-      {
-        const int j = -1;
-        ar[0] = (double) j; // j = -1, no tomography is being done 
-        double trash = int_for_g_lens(amin_shear, (void*) ar);
-      }
-      if (tomo.clustering_Nbin > 0) 
-      {
-        const int j = 0;
-        ar[0] = (double) j;
-        double trash = int_for_g_lens(amin_shear, (void*) ar);
-      }
+      double trash = int_for_g_lens(amin_shear, (void*) ar);
     }
     #pragma GCC diagnostic pop 
-    #pragma GCC diagnostic pop
+
+    const size_t szint = 275 + 50 * (Ntable.high_def_integration);
+    gsl_integration_glfixed_table* w = malloc_gslint_glfixed(szint);
 
     #pragma omp parallel for collapse(2)
-    for (int j=-1; j<tomo.clustering_Nbin; j++) 
+    for (int j=0; j<tomo.clustering_Nbin; j++) 
     {
       for (int i=0; i<Ntable.N_a; i++) 
       {
-        double ar[2];
-        ar[0] = (double) j; // if j=-1, no tomography is being done
-
         const double a =  amin + i*da;
+        double ar[2];
+        ar[0] = (double) j;
         ar[1] = chi(a);
 
         gsl_function F;
         F.params = ar;
         F.function = int_for_g_lens;
 
-        table[j+1][i] = gsl_integration_glfixed(&F, amin_shear, a, gslw);
+        table[j][i] = gsl_integration_glfixed(&F, amin_shear, a, w);
       }
     }
 
+    gsl_integration_glfixed_table_free(w);
     update_table(&numtable);
     update_nuisance(&N);
     update_cosmopara(&C);
   }
 
-  if (ni < -1 || ni > tomo.clustering_Nbin - 1)
+  if (ni < 0 || ni > tomo.clustering_Nbin - 1)
   {
     log_fatal("invalid bin input ni = %d", ni);
     exit(1);
@@ -1367,7 +1211,7 @@ double g_lens(double a, int ni)
   }
   else 
   {
-    res = interpol(table[ni+1], Ntable.N_a, amin, amax, da, a, 1.0, 1.0); 
+    res = interpol(table[ni], Ntable.N_a, amin, amax, da, a, 1.0, 1.0); 
   }
   return res;
 }

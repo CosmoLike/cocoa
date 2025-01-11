@@ -26,6 +26,54 @@
 
 #include "log.c/src/log.h"
 
+gsl_integration_glfixed_table* malloc_gslint_glfixed(const int n)
+{
+  gsl_integration_glfixed_table* w = gsl_integration_glfixed_table_alloc(n);
+  if (w == NULL)
+  {
+    log_fatal("array allocation failed");
+    exit(1);
+  }
+  return w;
+}
+
+void** malloc2d(const int nx, const int ny)
+{
+  double** tab = (double**) malloc(sizeof(double*)*nx + sizeof(double)*nx*ny);
+  if (tab == NULL)
+  {
+    log_fatal("array allocation failed");
+    exit(1);
+  }
+  for (int i=0; i<nx; i++)
+  {
+    tab[i] = ((double*)(tab + nx) + ny*i);
+  }
+  return (void**) tab;
+}
+
+void* malloc1d(const int nx)
+{
+  double* vec = (double*) malloc(sizeof(double)*nx);
+  if (vec == NULL)
+  {
+    log_fatal("array allocation failed");
+    exit(1);
+  }
+  return (void*) vec;
+}
+
+void* calloc1d(const int nx)
+{
+  double* vec = (double*) calloc(nx, sizeof(double));
+  if (vec == NULL)
+  {
+    log_fatal("array allocation failed");
+    exit(1);
+  }
+  return (void*) vec;
+}
+
 int fdiff(const double a, const double b)
 {
   if (fabs(a - b) < 1.0e-13 * fabs(a + b) || fabs(a - b) < 2.0e-38)
