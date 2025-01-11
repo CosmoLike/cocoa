@@ -346,16 +346,63 @@ int recompute_table(Ntab N)
 // ---------------------------------------------------------------------------
 // ---------------------------------------------------------------------------
 
-/*
-int recompute_redshift(redshift N)
+int recompute_redshift(redshiftpara N)
 {
   int res = 0;
+  if ((N.shear_nzbins != redshift.shear_nzbins) ||
+      fdiff(N.shear_zdist_zmin_all, redshift.shear_zdist_zmin_all) ||
+      fdiff(N.shear_zdist_zmax_all, redshift.shear_zdist_zmax_all) ||
+      (N.clustering_nzbins != redshift.clustering_nzbins) ||
+      fdiff(N.clustering_zdist_zmin_all, redshift.clustering_zdist_zmin_all) ||
+      fdiff(N.clustering_zdist_zmax_all, redshift.clustering_zdist_zmax_all))
+  {
+    return 1;
+  }
+  for(int i=0; i<MAX_SIZE_ARRAYS; i++)
+  {
+    if (fdiff(N.shear_zdist_zmin[i], redshift.shear_zdist_zmin[i]) ||
+        fdiff(N.shear_zdist_zmax[i], redshift.shear_zdist_zmax[i]) ||
+        fdiff(N.clustering_zdist_zmin[i], redshift.clustering_zdist_zmin[i]) ||
+        fdiff(N.clustering_zdist_zmax[i], redshift.clustering_zdist_zmax[i]))
+    {
+      return 1;
+    }
 
-  if(N.shear_zdistrpar_zmin-redshift.shear_zdistrpar_zmin)
-
-  return res;
+  }
+  if ((N.clustering_zdist_table != redshift.clustering_zdist_table) ||
+      (N.shear_zdist_table != redshift.shear_zdist_table))
+  {
+    return 1;
+  }
+  if (redshift.clustering_zdist_table != NULL)
+  {
+    for (int k=0; k<redshift.clustering_nzbins; k++) 
+    { 
+      for (int i=0; i<tomo.clustering_Nbin+2; i++) 
+      {
+        if (fdiff(N.clustering_zdist_table[i][k], 
+                  redshift.clustering_zdist_table[i][k]))
+        {
+          return 1;
+        }
+      }
+    }
+  }
+  if (redshift.clustering_zdist_table != NULL)
+  {
+    for (int k=0; k<redshift.shear_nzbins; k++) 
+    { 
+      for (int i=0; i<tomo.shear_Nbin+2; i++) 
+      {
+        if (fdiff(N.shear_zdist_table[i][k], redshift.shear_zdist_table[i][k]))
+        {
+          return 1;
+        }
+      }
+    }
+  }
+  return 0;
 }
-*/
 
 // ---------------------------------------------------------------------------
 // ---------------------------------------------------------------------------

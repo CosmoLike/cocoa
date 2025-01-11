@@ -2140,9 +2140,5 @@ void set_HOD(int n)
   survey.n_lens = 2.0;
 
   log_debug("Using HOD model for lens population with n_lens = %.2f/arcmin^2", survey.n_lens);
-  
-  log_debug("Lens distribution from redshift file = %s", redshift.clustering_REDSHIFT_FILE);
-  
-  log_debug("Source distribution from redshift file =%s", redshift.shear_REDSHIFT_FILE);
 }
 

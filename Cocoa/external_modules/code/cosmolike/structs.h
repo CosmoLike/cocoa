@@ -157,7 +157,6 @@ typedef struct
   double shear_zdist_zmax_all;
   double shear_zdist_zmin[MAX_SIZE_ARRAYS];
   double shear_zdist_zmax[MAX_SIZE_ARRAYS];
-  char shear_REDSHIFT_FILE[CHAR_MAX_SIZE];
 
   int clustering_photoz;
   int clustering_nzbins;

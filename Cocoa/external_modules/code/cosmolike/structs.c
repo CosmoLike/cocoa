@@ -359,7 +359,6 @@ void reset_redshift_struct()
   redshift.shear_nzbins = 0;
   redshift.shear_zdist_zmin_all = 0.0;
   redshift.shear_zdist_zmax_all = 0.0;
-  sprintf(redshift.shear_REDSHIFT_FILE, "%s", "");
 
   if (redshift.clustering_zdist_table != NULL)
   {
