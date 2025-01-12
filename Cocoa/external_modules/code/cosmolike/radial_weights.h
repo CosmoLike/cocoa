@@ -5,7 +5,11 @@ extern "C" {
 #endif
 
 // complete lens efficiency weight
-double W_kappa(double a, double fK, int nz);
+double W_kappa(
+    const double a, 
+    const double fK, 
+    const int nz
+  );
 
 double W_mag(double a, double fK, int nz);
 

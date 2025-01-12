@@ -54,7 +54,7 @@ int recompute_cs(cosmopara C, galpara G, nuisancepara N);
 
 int recompute_table(Ntab N);
 
-int recompute_redshift(redshiftpara N);
+int recompute_redshift(redshiftparams N);
 
 #ifdef __cplusplus
 }

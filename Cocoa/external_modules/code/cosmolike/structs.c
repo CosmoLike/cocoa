@@ -56,7 +56,6 @@ cosmopara cosmology =
   //.w0 = -1,
   //.A_s =  2e-9,
   //.n_s = 0.96,
-  .is_cached = 0
 };
 
 
@@ -67,8 +66,10 @@ tomopara tomo =
   .clustering_Npowerspectra = 0
 };
 
-redshiftpara redshift =
+redshiftparams redshift =
 {
+  .random = 0.0,
+
   .shear_nbin = 0,
   .shear_photoz = 0,
   .shear_nzbins = 0,
@@ -212,6 +213,8 @@ lim limits =
 
 Ntab Ntable = 
 {
+  .random = 0.0,
+
   .N_a = 350,                         // N_a        (modified by COCOA from 100)
   .N_k_lin = 500,                     // N_k_lin
   .N_k_nlin = 500,                    // N_k_nlin
@@ -231,7 +234,6 @@ Ntab Ntable =
   .binned_p_cm_size_a_table = 30,
   .halo_uKS_nc = 20,
   .halo_uks_nx = 200,
-  .acc_boost_photoz_sampling = 1,
   .photoz_interpolation_type = 0,
   .high_def_integration = 0,
 };
@@ -324,8 +326,6 @@ void reset_cosmology_struct()
   cosmology.MGSigma = 0.0;
   cosmology.MGmu = 0.0;
 
-  cosmology.is_cached = 0;
-
   cosmology.Omega_b = 0.0;
   cosmology.Omega_m = 0.0;
   cosmology.Omega_v = 0.0;
@@ -349,6 +349,8 @@ void reset_tomo_struct()
 
 void reset_redshift_struct()
 {
+  redshift.random = 0.0;
+
   redshift.shear_nbin = 0;
   redshift.shear_photoz = 0;
   if (redshift.shear_zdist_table != NULL)
@@ -627,6 +629,8 @@ void update_ynuisance(ynuisancepara* N)
 
 void update_table(Ntab* N)
 {
+  N->random = Ntable.random;
+
   N->N_a = Ntable.N_a;
   N->N_ell = Ntable.N_ell;
   N->Ntheta = Ntable.Ntheta;
@@ -637,34 +641,23 @@ void update_table(Ntab* N)
 // ---------------------------------------------------------------------------
 // ---------------------------------------------------------------------------
 // ---------------------------------------------------------------------------
-void update_redshift(redshiftpara* N)
+void update_redshift(redshiftparams* N)
 {
-  N->shear_nbin = redshift.shear_nbin;
-  N->shear_nzbins = redshift.shear_nzbins;
-  N->shear_zdist_zmin_all = redshift.shear_zdist_zmin_all;
-  N->shear_zdist_zmax_all = redshift.shear_zdist_zmax_all;
-  
-  N->clustering_nbin = redshift.clustering_nbin;
-  N->clustering_nzbins = redshift.clustering_nzbins;
-  N->clustering_zdist_zmin_all = redshift.clustering_zdist_zmin_all;
-  N->clustering_zdist_zmax_all = redshift.clustering_zdist_zmax_all;
+  N->random = redshift.random;
 
-  for(int i=0; i<MAX_SIZE_ARRAYS; i++)
+  if (redshift.clustering_zdist_table != NULL)
   {
-    N->shear_zdist_zmin[i] = redshift.shear_zdist_zmin[i];
-    N->shear_zdist_zmax[i] = redshift.shear_zdist_zmax[i];
-    N->clustering_zdist_zmin[i] = redshift.clustering_zdist_zmin[i];
-    N->clustering_zdist_zmax[i] = redshift.clustering_zdist_zmax[i];
-  }
+    N->clustering_nbin = redshift.clustering_nbin;
+    N->clustering_nzbins = redshift.clustering_nzbins;
+    N->clustering_zdist_zmin_all = redshift.clustering_zdist_zmin_all;
+    N->clustering_zdist_zmax_all = redshift.clustering_zdist_zmax_all;
 
-  if (redshift.clustering_zdist_table == NULL || 
-      redshift.shear_zdist_table == NULL)
-  {
-    log_fatal("error: redshift struct not set");
-    exit(1);
-  }
+    for(int i=0; i<MAX_SIZE_ARRAYS; i++)
+    {
+      N->clustering_zdist_zmin[i] = redshift.clustering_zdist_zmin[i];
+      N->clustering_zdist_zmax[i] = redshift.clustering_zdist_zmax[i];
+    }
 
-  {
     const int ntomo  = redshift.clustering_nbin;
     const int nzbins = redshift.clustering_nzbins;
     
@@ -679,8 +672,20 @@ void update_redshift(redshiftpara* N)
       }
     }
   }
-/*
+
+  if (redshift.shear_zdist_table != NULL)
   {
+    N->shear_nbin = redshift.shear_nbin;
+    N->shear_nzbins = redshift.shear_nzbins;
+    N->shear_zdist_zmin_all = redshift.shear_zdist_zmin_all;
+    N->shear_zdist_zmax_all = redshift.shear_zdist_zmax_all;
+
+    for(int i=0; i<MAX_SIZE_ARRAYS; i++)
+    {
+      N->shear_zdist_zmin[i] = redshift.shear_zdist_zmin[i];
+      N->shear_zdist_zmax[i] = redshift.shear_zdist_zmax[i];
+    }
+
     const int nzbins = redshift.shear_nzbins;
     const int ntomo  = redshift.shear_nbin;
 
@@ -696,7 +701,6 @@ void update_redshift(redshiftpara* N)
       }
     }
   }
-*/
 }
 
 // ---------------------------------------------------------------------------

@@ -59,6 +59,10 @@ typedef struct
 
 typedef struct 
 {
+  double random; // COCOA: Random number. Optimization as the function 
+                 // COCOA: "recompute" can be too expensive if required to  
+                 // COCOA: check every element of the struct. Whenever 
+                 // COCOA: updating the struct, assign a new random number
   int N_a;          
   int N_k_lin;
   int N_k_nlin;
@@ -78,7 +82,6 @@ typedef struct
   int binned_p_cm_size_a_table;
   int halo_uKS_nc;                 // halo.c u_KS(double c, double k, double rv)
   int halo_uks_nx;                 // halo.c u_KS(double c, double k, double rv)
-  int acc_boost_photoz_sampling;
   int photoz_interpolation_type;
   int high_def_integration;
   double vtmax;
@@ -109,6 +112,11 @@ typedef struct
 
 typedef struct
 {
+  double random; // COCOA: Random number. Optimization as the function 
+                 // COCOA: "recompute" can be too expensive if required to  
+                 // COCOA: check every element of the struct. Whenever 
+                 // COCOA: updating the struct, assign a new random number
+
   double Omega_b;  // baryon density paramter
   double Omega_m;  // matter density parameter
   double Omega_v;  // cosmogical constant parameter
@@ -119,11 +127,6 @@ typedef struct
   double MGSigma;
   double MGmu;
   double sigma_8;
-  double random; // Random number between zero and 1 - see interface.cpp
-  //double w0;
-  //double A_s;
-  //double n_s;
-  int is_cached;
 } cosmopara;
 
 typedef struct 
@@ -135,6 +138,11 @@ typedef struct
 
 typedef struct
 {
+  double random; // COCOA: Random number. Optimization as the function 
+                 // COCOA: "recompute" can be too expensive if required to  
+                 // COCOA: check every element of the 2d arrays. Whenever 
+                 // COCOA: updating n(z) parameters, assign a new random number
+  
   int shear_nbin;         // number of source tomography bins
   int shear_photoz;
   int shear_nzbins;
@@ -167,7 +175,7 @@ typedef struct
   // we assume cluster bin = galaxy bin (no cross)
   int external_selection_cg_clustering[MAX_SIZE_ARRAYS];
   */
-} redshiftpara;
+} redshiftparams;
 
 typedef struct
 {
@@ -377,7 +385,7 @@ extern cosmopara cosmology;
 
 extern tomopara tomo;
 
-extern redshiftpara redshift;
+extern redshiftparams redshift;
 
 extern sur survey;
 
@@ -433,7 +441,7 @@ void update_ynuisance(ynuisancepara* N);
 
 void update_table(Ntab* N);
 
-void update_redshift(redshiftpara* N);
+void update_redshift(redshiftparams* N);
 
 #ifdef __cplusplus
 }

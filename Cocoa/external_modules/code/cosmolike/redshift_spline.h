@@ -87,15 +87,14 @@ double zmean(int ni);
 double g_cmb(double a); // lens efficiency for CMB lensing
 
 // lens efficiency of source galaxies in tomography bin ni
-double g_tomo(double a, int ni);
+double g_tomo(double a, const int ni);
 
 // lens efficiency of source galaxies in tomography bin ni
 double g2_tomo(double a, int ni);
 
 // lens efficiency of *lens* galaxies in tomography bin ni
 // used in magnification calculations
-double g_lens(double a, int ni);
-
+double g_lens(double a,  int ni);
 
 
 

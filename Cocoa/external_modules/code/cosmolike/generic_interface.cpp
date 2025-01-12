@@ -464,6 +464,8 @@ void init_accuracy_boost(
   precision.insane = insane/accuracy_boost; 
 
   Ntable.high_def_integration = integration_accuracy;
+
+  Ntable.random = RandomNumber::get_instance().get();
 }
 
 // ---------------------------------------------------------------------------
@@ -1846,20 +1848,15 @@ void init_lens_sample(std::string multihisto_file, const int Ntomo)
   }
   // READ THE N(Z) FILE ENDS ------------
 
-  pf_photoz(0.1, 0);
+  redshift.random = RandomNumber::get_instance().get();
 
-  int n = 0;
-  for (int i=0; i<Ntomo; i++)
+  //pf_photoz(0.1, 0); // init static variables
+
+  for (int k=0; k<Ntomo; k++)
   {
-    for (int j=0; j<redshift.shear_nbin; j++)
-    {
-      n += test_zoverlap(i, j);
-    }
-  }
-  tomo.ggl_Npowerspectra = n;
-
-  spdlog::debug("\x1b[90m{}\x1b[0m: tomo.ggl_Npowerspectra = {}",
-      "init_lens_sample", tomo.ggl_Npowerspectra);
+    spdlog::debug("\x1b[90m{}\x1b[0m: bin {} - {} = {}.", "init_lens_sample", 
+      k, "<z_s>", zmean(k));
+  } 
 
   spdlog::debug("\x1b[90m{}\x1b[0m: Ends", "init_lens_sample");
 }
@@ -1959,11 +1956,11 @@ void init_source_sample(std::string multihisto_file, const int Ntomo)
 
   for (int k=0; k<Ntomo; k++)
   {
-    spdlog::info("\x1b[90m{}\x1b[0m: bin {} - {} = {}.", "init_source_sample", 
+    spdlog::debug("\x1b[90m{}\x1b[0m: bin {} - {} = {}.", "init_source_sample", 
       k, "<z_s>", zmean_source(k));
-
-    nuisance.bias_zphot_shear[k] = 0.0;
   } 
+
+  redshift.random = RandomNumber::get_instance().get();
 
   spdlog::debug("\x1b[90m{}\x1b[0m: Ends", "init_source_sample");
 }
@@ -3251,8 +3248,6 @@ matrix compute_baryon_pcas_3x2pt_real(
       "\x1b[90m{}\x1b[0m: Computing DM only data vector begins", 
       "compute_baryon_pcas_3x2pt_real"
     );
-
-  cosmology.is_cached = 0;
   
   cosmology.random = RandomNumber::get_instance().get();
   
@@ -3364,8 +3359,6 @@ matrix compute_baryon_pcas_6x2pt(arma::Col<int>::fixed<6> order)
       "\x1b[90m{}\x1b[0m: Computing DM only data vector begins", 
       "compute_baryon_pcas_3x2pt"
     );
-
-  cosmology.is_cached = 0;
   
   cosmology.random = RandomNumber::get_instance().get();
   

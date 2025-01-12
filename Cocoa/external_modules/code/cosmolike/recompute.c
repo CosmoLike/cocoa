@@ -23,20 +23,17 @@
 
 int recompute_cosmo3D(cosmopara C)
 {
-  if (cosmology.is_cached == 1)
-  {
-    return 0;
-  } 
-  else
-  {
-    return (fdiff(C.Omega_m, cosmology.Omega_m) ||
-            fdiff(C.Omega_v, cosmology.Omega_v) ||
-            fdiff(C.Omega_nu, cosmology.Omega_nu) ||
-            fdiff(C.h0, cosmology.h0) ||
-            fdiff(C.random, cosmology.random) ||
-            fdiff(C.Omega_b, cosmology.Omega_b) ||
-            fdiff(C.sigma_8, cosmology.sigma_8)) ? 1 : 0;
-  }
+  // COCOA: Random number between (0,1). Optimization as the 
+  return fdiff(C.random, cosmology.random) ? 1 : 0;
+  /*
+  return (fdiff(C.Omega_m, cosmology.Omega_m) ||
+          fdiff(C.Omega_v, cosmology.Omega_v) ||
+          fdiff(C.Omega_nu, cosmology.Omega_nu) ||
+          fdiff(C.h0, cosmology.h0) ||
+          fdiff(C.random, cosmology.random) ||
+          fdiff(C.Omega_b, cosmology.Omega_b) ||
+          fdiff(C.sigma_8, cosmology.sigma_8)) ? 1 : 0;
+  */
 }
 
 int recompute_zphot_shear(nuisancepara N)
@@ -329,7 +326,11 @@ int recompute_cs(cosmopara C, galpara G, nuisancepara N)
 
 int recompute_table(Ntab N)
 {
-  int res = 0;
+ // COCOA: "recompute" can be too expensive if required to  
+ // COCOA: check every element of the struct. Whenever 
+ // COCOA: updating the struct, assign a new random number
+  return fdiff(N.random, Ntable.random) ? 1 : 0;
+  /*int res = 0;
   if ((N.N_a != Ntable.N_a) || 
       (N.N_ell != Ntable.N_ell) ||
       (N.Ntheta != Ntable.Ntheta) || 
@@ -340,14 +341,22 @@ int recompute_table(Ntab N)
     res = 1;
   }
   return res;
+  */
 }
 
 // ---------------------------------------------------------------------------
 // ---------------------------------------------------------------------------
 // ---------------------------------------------------------------------------
 
-int recompute_redshift(redshiftpara N)
+int recompute_redshift(redshiftparams N)
 {
+  // COCOA: Random number between (0,1). Optimization as the 
+  // COCOA: function "recompute_redshift" is too expensive
+  // COCOA: if required to check every element of the 2d arrays
+  // COCOA: Whenever updating n(z), just create a new random num
+  return fdiff(N.random, redshift.random) ? 1 : 0;
+
+  /*
   if (redshift.clustering_zdist_table == NULL || 
       redshift.shear_zdist_table == NULL)
   {
@@ -395,8 +404,7 @@ int recompute_redshift(redshiftpara N)
   else
   {
     return 1;
-  }
-/*  
+  } 
   if (N.shear_zdist_table != NULL)
   {
     for (int k=0; k<redshift.shear_nzbins; k++) 
@@ -414,9 +422,9 @@ int recompute_redshift(redshiftpara N)
   {
     return 1;
   }
-  */
   
   return 0;
+  */
 }
 
 // ---------------------------------------------------------------------------

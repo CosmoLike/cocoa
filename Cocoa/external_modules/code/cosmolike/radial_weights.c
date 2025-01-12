@@ -12,7 +12,11 @@
 #include "redshift_spline.h"
 #include "structs.h"
 
-double W_kappa(double a, double fK, int nz) 
+double W_kappa(
+    const double a, 
+    const double fK, 
+    const int nz
+  ) 
 {
   if (!(a>0) || !(a<1)) 
   {
