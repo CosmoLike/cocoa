@@ -639,10 +639,12 @@ void update_table(Ntab* N)
 // ---------------------------------------------------------------------------
 void update_redshift(redshiftpara* N)
 {
+  N->shear_nbin = redshift.shear_nbin;
   N->shear_nzbins = redshift.shear_nzbins;
   N->shear_zdist_zmin_all = redshift.shear_zdist_zmin_all;
   N->shear_zdist_zmax_all = redshift.shear_zdist_zmax_all;
   
+  N->clustering_nbin = redshift.clustering_nbin;
   N->clustering_nzbins = redshift.clustering_nzbins;
   N->clustering_zdist_zmin_all = redshift.clustering_zdist_zmin_all;
   N->clustering_zdist_zmax_all = redshift.clustering_zdist_zmax_all;
@@ -655,9 +657,38 @@ void update_redshift(redshiftpara* N)
     N->clustering_zdist_zmax[i] = redshift.clustering_zdist_zmax[i];
   }
 
-  //const int ntomo = 
-  //redshift.clustering_zdist_table = (double**) malloc2d(Ntomo + 1, nzbins);
+  {
+    const int nzbins = redshift.clustering_nzbins;
+    const int ntomo  = redshift.clustering_nbin;
 
+    if (N->clustering_zdist_table != NULL) free(N->clustering_zdist_table);
+    N->clustering_zdist_table = (double**) malloc2d(ntomo + 1, nzbins);
+
+    #pragma omp parallel for
+    for (int i=0; i<ntomo+1; i++)
+    {
+      for (int k=0; k<nzbins; k++) 
+      {
+        N->clustering_zdist_table[i,k] = redshift.clustering_zdist_table[i,k];
+      }
+    }
+  }
+  {
+    const int nzbins = redshift.shear_nzbins;
+    const int ntomo  = redshift.shear_nbin;
+
+    if (N->shear_zdist_table != NULL) free(N->shear_zdist_table);
+    N->shear_zdist_table = (double**) malloc2d(ntomo + 1, nzbins);
+
+    #pragma omp parallel for
+    for (int i=0; i<ntomo+1; i++)
+    {
+      for (int k=0; k<nzbins; k++) 
+      {
+        N->shear_zdist_table[i,k] = redshift.shear_zdist_table[i,k];
+      }
+    }
+  }
 }
 
 // ---------------------------------------------------------------------------

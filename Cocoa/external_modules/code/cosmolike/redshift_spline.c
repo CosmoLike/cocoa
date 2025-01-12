@@ -26,7 +26,7 @@
 
 double amin_source(int ni) 
 {
-  if (ni < -1 || ni > redshift.shear_nbin - 1)
+  if (ni < 0 || ni > redshift.shear_nbin - 1)
   {
     log_fatal("invalid bin input ni = %d", ni);
     exit(1);
@@ -39,13 +39,9 @@ double amax_source(int i __attribute__((unused)))
   return 1. / (1. + fmax(redshift.shear_zdist_zmin_all, 0.001));
 }
 
-// -----------------------------------------------------------------------------
-// -----------------------------------------------------------------------------
-// -----------------------------------------------------------------------------
-
 double amax_source_IA(int ni) 
 {
-  if (ni < -1 || ni > redshift.shear_nbin - 1)
+  if (ni < 0 || ni > redshift.shear_nbin - 1)
   {
     log_fatal("invalid bin input ni = %d", ni);
     exit(1);
@@ -53,34 +49,20 @@ double amax_source_IA(int ni)
   return 1. / (1. + fmax(redshift.shear_zdist_zmin_all, 0.001));
 }
 
-// -----------------------------------------------------------------------------
-// -----------------------------------------------------------------------------
-// -----------------------------------------------------------------------------
-
 double amin_lens(int ni) 
 {
-  if (ni < -1 || ni > redshift.clustering_nbin - 1)
+  if (ni < 0 || ni > redshift.clustering_nbin - 1)
   {
     log_fatal("invalid bin input ni = %d", ni);
     exit(1);
   }
-  
-  if (ni == -1) 
-  {
-    return 1. / (redshift.clustering_zdist_zmax_all + 1.);
-  }
-
   return 1. / (1 + redshift.clustering_zdist_zmax[ni] + 
                  2. * fabs(nuisance.bias_zphot_clustering[ni]));
 }
 
-// -----------------------------------------------------------------------------
-// -----------------------------------------------------------------------------
-// -----------------------------------------------------------------------------
-
 double amax_lens(int ni) 
 {
-  if (ni < -1 || ni > redshift.clustering_nbin - 1)
+  if (ni < 0 || ni > redshift.clustering_nbin - 1)
   {
     log_fatal("invalid bin input ni = %d", ni);
     exit(1);
@@ -90,12 +72,7 @@ double amax_lens(int ni)
   {
     return 1. / (1. + fmax(redshift.shear_zdist_zmin_all, 0.001));
   }
-  
-  if (ni == -1) 
-  {
-    return 1. / (1. + fmax(redshift.clustering_zdist_zmin_all, 0.001));
-  }
-  
+    
   return 1. / (1 + fmax(redshift.clustering_zdist_zmin[ni] -
       2. * fabs(nuisance.bias_zphot_clustering[ni]), 0.001));
 }
@@ -117,7 +94,7 @@ int test_kmax(double l, int ni) // return 1 if true, 0 otherwise
     }
   }
   
-  if (ni < -1 || ni > redshift.clustering_nbin - 1)
+  if (ni < 0 || ni > redshift.clustering_nbin - 1)
   {
     log_fatal("invalid bin input ni = %d", ni);
     exit(1);
@@ -204,7 +181,7 @@ int ZS(int nj)
       }
     }
   }
-  
+
   if (nj < 0 || nj > tomo.ggl_Npowerspectra - 1)
   {
     log_fatal("invalid bin input nj = %d (max %d)", nj, tomo.ggl_Npowerspectra);
@@ -467,10 +444,6 @@ double zdistr_histo_n(double z, const int ni)
   return res;
 }
 
-// -----------------------------------------------------------------------------
-// -----------------------------------------------------------------------------
-// -----------------------------------------------------------------------------
-
 double zdistr_photoz(double zz, const int nj) 
 {
   static double** table = NULL;
@@ -544,7 +517,7 @@ double zdistr_photoz(double zz, const int nj)
   const int ntomo  = redshift.shear_nbin;
   const int nzbins = redshift.shear_nzbins;
 
-  if (nj < -1 || nj > ntomo - 1) 
+  if (nj < 0 || nj > ntomo - 1) 
   {
     log_fatal("nj = %d bin outside range (max = %d)", nj, redshift.shear_nbin);
     exit(1);
@@ -585,10 +558,6 @@ double int_for_zmean_source(double z, void* params)
   } 
   return z * zdistr_photoz(z, ni);
 }
-
-// -----------------------------------------------------------------------------
-// -----------------------------------------------------------------------------
-// -----------------------------------------------------------------------------
 
 double zmean_source(int ni) 
 { // mean true redshift of source galaxies in tomography bin j
@@ -677,10 +646,6 @@ double pf_histo_n(double z, const int ni)
   }
   return res;
 }
-
-// -----------------------------------------------------------------------------
-// -----------------------------------------------------------------------------
-// -----------------------------------------------------------------------------
 
 double pf_photoz(double zz, int nj) 
 {
@@ -919,9 +884,7 @@ double g_tomo(double ainput, int ni) // for tomography bin ni
     #pragma GCC diagnostic push
     #pragma GCC diagnostic ignored "-Wunused-variable"
     { // COCOA: init static variables - allows the OpenMP on the next loop
-      double ar[2];
-      ar[0] = (double) 0;
-      ar[1] = chi(amin);
+      double ar[2] = {(double) 0, chi(amin)};
       double trash = int_for_g_tomo(amin, (void*) ar);
     }
     #pragma GCC diagnostic pop
@@ -934,11 +897,9 @@ double g_tomo(double ainput, int ni) // for tomography bin ni
     {
       for (int i=0; i<Ntable.N_a; i++) 
       {
-        const double a = amin + i*da;
-        
-        double ar[2];
-        ar[0] = (double) j;          
-        ar[1] = chi(a);
+        const double a = amin + i*da;       
+        double ar[2] = {(double) j, chi(a)};
+ 
 
         gsl_function F;
         F.params = ar;
@@ -986,7 +947,6 @@ double int_for_g2_tomo(double aprime, void* params)
   double *ar = (double*) params;
   
   const int ni = (int) ar[0];
-  
   if (ni < 0 || ni > redshift.shear_nbin - 1)
   {
     log_fatal("invalid bin input ni = %d", ni);
@@ -999,10 +959,6 @@ double int_for_g2_tomo(double aprime, void* params)
   return zdistr_photoz(1./aprime-1., ni) * f_K(chi_prime - chi1)/
     f_K(chi_prime - chi1)/(f_K(chi_prime)*f_K(chi_prime))/(aprime*aprime);
 }
-
-// -----------------------------------------------------------------------------
-// -----------------------------------------------------------------------------
-// -----------------------------------------------------------------------------
 
 double g2_tomo(double a, int ni) 
 { // for tomography bin ni
@@ -1028,9 +984,7 @@ double g2_tomo(double a, int ni)
     #pragma GCC diagnostic push
     #pragma GCC diagnostic ignored "-Wunused-variable"
     { // init static variables
-      double ar[2];
-      ar[0] = (double) 0;
-      ar[1] = chi(amin);
+      double ar[2] = {(double) 0, chi(amin)};
       double trash = int_for_g2_tomo(amin, (void*) ar);
     }
     #pragma GCC diagnostic pop
@@ -1043,12 +997,9 @@ double g2_tomo(double a, int ni)
     {
       for (int i=0; i<Ntable.N_a; i++) 
       {
-        const double a = amin + i*da;
-        
-        double ar[2];
-        ar[0] = (double) j;          
-        ar[1] = chi(a);
-
+        const double a = amin + i*da;    
+        double ar[2] = {(double) j, chi(a)};
+    
         gsl_function F;
         F.params = ar;
         F.function = int_for_g2_tomo;
@@ -1103,10 +1054,6 @@ double int_for_g_lens(double aprime, void* params)
         f_K(chi_prime) / (aprime * aprime);
 }
 
-// -----------------------------------------------------------------------------
-// -----------------------------------------------------------------------------
-// -----------------------------------------------------------------------------
-
 double g_lens(double a, int ni) 
 { // for *lens* tomography bin ni
   static nuisancepara N;
@@ -1132,9 +1079,7 @@ double g_lens(double a, int ni)
     #pragma GCC diagnostic push
     #pragma GCC diagnostic ignored "-Wunused-variable"
     { // COCOA: init static variables - allows the OpenMP on the next loop
-      double ar[2];
-      ar[0] = (double) 0;
-      ar[1] = chi(amin);
+      double ar[2] = {(double) 0, chi(amin)};
       double trash = int_for_g_lens(amin_shear, (void*) ar);
     }
     #pragma GCC diagnostic pop 
@@ -1148,10 +1093,8 @@ double g_lens(double a, int ni)
       for (int i=0; i<Ntable.N_a; i++) 
       {
         const double a =  amin + i*da;
-        double ar[2];
-        ar[0] = (double) j;
-        ar[1] = chi(a);
-
+        double ar[2] = {(double) j, chi(a)};
+  
         gsl_function F;
         F.params = ar;
         F.function = int_for_g_lens;
@@ -1202,7 +1145,9 @@ double g_cmb(double a)
   return f_K(chi_cmb - chi(a))/fchi_cmb;
 }
 
-
+// -----------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
 
 

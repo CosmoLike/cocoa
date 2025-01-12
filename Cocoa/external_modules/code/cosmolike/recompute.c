@@ -348,15 +348,18 @@ int recompute_table(Ntab N)
 
 int recompute_redshift(redshiftpara N)
 {
-  if ((N.shear_nzbins != redshift.shear_nzbins) ||
+  if ((N.shear_nbin != redshift.shear_nbin) ||
+      (N.shear_nzbins != redshift.shear_nzbins) ||
       fdiff(N.shear_zdist_zmin_all, redshift.shear_zdist_zmin_all) ||
       fdiff(N.shear_zdist_zmax_all, redshift.shear_zdist_zmax_all) ||
+      (N.clustering_nbin != redshift.clustering_nbin) ||
       (N.clustering_nzbins != redshift.clustering_nzbins) ||
       fdiff(N.clustering_zdist_zmin_all, redshift.clustering_zdist_zmin_all) ||
       fdiff(N.clustering_zdist_zmax_all, redshift.clustering_zdist_zmax_all))
   {
     return 1;
   }
+
   for(int i=0; i<MAX_SIZE_ARRAYS; i++)
   {
     if (fdiff(N.shear_zdist_zmin[i], redshift.shear_zdist_zmin[i]) ||
@@ -368,11 +371,13 @@ int recompute_redshift(redshiftpara N)
     }
 
   }
+
   if ((N.clustering_zdist_table != redshift.clustering_zdist_table) ||
       (N.shear_zdist_table != redshift.shear_zdist_table))
   {
     return 1;
   }
+
   if (redshift.clustering_zdist_table != NULL)
   {
     for (int k=0; k<redshift.clustering_nzbins; k++) 
@@ -387,6 +392,7 @@ int recompute_redshift(redshiftpara N)
       }
     }
   }
+  
   if (redshift.clustering_zdist_table != NULL)
   {
     for (int k=0; k<redshift.shear_nzbins; k++) 
