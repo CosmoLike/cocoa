@@ -36,13 +36,13 @@ int recompute_cosmo3D(cosmopara C)
   */
 }
 
-int recompute_zphot_shear(nuisancepara N)
+int recompute_zphot_shear(photozparams N)
 {
   int res = 0;
   for (int i=0; i<MAX_SIZE_ARRAYS; i++)
   {
-    if (fdiff(N.sigma_zphot_shear[i], nuisance.sigma_zphot_shear[i]) ||
-        fdiff(N.bias_zphot_shear[i], nuisance.bias_zphot_shear[i]))
+    if (fdiff(N.sigma_zphot_shear[i], photoz.sigma_zphot_shear[i]) ||
+        fdiff(N.bias_zphot_shear[i], photoz.bias_zphot_shear[i]))
     {
       res = 1;
     }
@@ -50,13 +50,13 @@ int recompute_zphot_shear(nuisancepara N)
   return res;
 }
 
-int recompute_zphot_clustering(nuisancepara N) 
+int recompute_zphot_clustering(photozparams N) 
 {
   int res = 0;
   for (int i=0; i<MAX_SIZE_ARRAYS; i++) 
   {
-    if (fdiff(N.sigma_zphot_clustering[i], nuisance.sigma_zphot_clustering[i]) ||
-        fdiff(N.bias_zphot_clustering[i], nuisance.bias_zphot_clustering[i])) 
+    if (fdiff(N.sigma_zphot_clustering[i], photoz.sigma_zphot_clustering[i]) ||
+        fdiff(N.bias_zphot_clustering[i], photoz.bias_zphot_clustering[i])) 
     {
       res = 1;
     }

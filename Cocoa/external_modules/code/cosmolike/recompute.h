@@ -16,9 +16,9 @@ extern "C" {
 
 int recompute_cosmo3D(cosmopara C);
 
-int recompute_zphot_shear(nuisancepara N);
+int recompute_zphot_shear(photozparams N);
 
-int recompute_zphot_clustering(nuisancepara N);
+int recompute_zphot_clustering(photozparams N);
 
 int recompute_yhalo(ynuisancepara N);
 

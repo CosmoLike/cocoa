@@ -2035,10 +2035,8 @@ void init_survey(
   if (surveyname.size() > CHAR_MAX_SIZE - 1)
   {
     spdlog::critical(
-        "\x1b[90m{}\x1b[0m: survey name too large for Cosmolike "
-        "(C char memory overflow)", 
-        "init_survey"
-      );
+      "\x1b[90m{}\x1b[0m: survey name too large for Cosmolike "
+      "(C char memory overflow)", "init_survey");
     exit(1);
   }
 
@@ -2094,22 +2092,16 @@ void set_nuisance_shear_calib(vector M)
 
   if (redshift.shear_nbin == 0)
   {
-    spdlog::critical(
-        "\x1b[90m{}\x1b[0m: {} = 0 is invalid", 
-        "set_nuisance_shear_calib",
-        "shear_Nbin"
-      );
+    spdlog::critical("\x1b[90m{}\x1b[0m: {} = 0 is invalid", 
+      "set_nuisance_shear_calib", "shear_Nbin");
     exit(1);
   }
 
   if (redshift.shear_nbin != static_cast<int>(M.n_elem))
   {
     spdlog::critical(
-        "\x1b[90m{}\x1b[0m: incompatible input w/ size = {} (!= {})",
-        "set_nuisance_shear_calib", 
-        M.n_elem, 
-        redshift.shear_nbin
-      );
+      "\x1b[90m{}\x1b[0m: incompatible input w/ size = {} (!= {})",
+      "set_nuisance_shear_calib", M.n_elem, redshift.shear_nbin);
     exit(1);
   }
 
@@ -2131,29 +2123,25 @@ void set_nuisance_shear_photoz(vector SP)
 
   if (redshift.shear_nbin == 0)
   {
-    spdlog::critical(
-        "\x1b[90m{}\x1b[0m: {} = 0 is invalid",
-        "set_nuisance_shear_photoz",
-        "shear_Nbin"
-      );
+    spdlog::critical("\x1b[90m{}\x1b[0m: {} = 0 is invalid",
+      "set_nuisance_shear_photoz", "shear_Nbin");
     exit(1);
   }
 
   if (redshift.shear_nbin != static_cast<int>(SP.n_elem))
   {
     spdlog::critical(
-        "\x1b[90m{}\x1b[0m: incompatible input w/ size = {} (!= {})",
-        "set_nuisance_shear_photoz",
-        SP.n_elem,
-        redshift.shear_nbin
-      );
+      "\x1b[90m{}\x1b[0m: incompatible input w/ size = {} (!= {})",
+      "set_nuisance_shear_photoz", SP.n_elem, redshift.shear_nbin);
     exit(1);
   }
 
   for (int i=0; i<redshift.shear_nbin; i++)
   {
-    nuisance.bias_zphot_shear[i] = SP(i);
+    photoz.bias_zphot_shear[i] = SP(i);
   }
+
+  photoz.random = RandomNumber::get_instance().get();
 
   spdlog::debug("\x1b[90m{}\x1b[0m: Ends", "set_nuisance_shear_photoz");
 }
@@ -2168,22 +2156,16 @@ void set_nuisance_clustering_photoz(vector CP)
 
   if (redshift.clustering_nbin == 0)
   {
-    spdlog::critical(
-        "\x1b[90m{}\x1b[0m: {} = 0 is invalid",
-        "set_nuisance_clustering_photoz",
-        "clustering_Nbin"
-      );
+    spdlog::critical("\x1b[90m{}\x1b[0m: {} = 0 is invalid",
+      "set_nuisance_clustering_photoz", "clustering_Nbin");
     exit(1);
   }
 
   if (redshift.clustering_nbin != static_cast<int>(CP.n_elem))
   {
     spdlog::critical(
-        "\x1b[90m{}\x1b[0m: incompatible input w/ size = {} (!= {})",
-        "set_nuisance_clustering_photoz",
-        CP.n_elem,
-        redshift.clustering_nbin
-      );
+      "\x1b[90m{}\x1b[0m: incompatible input w/ size = {} (!= {})",
+      "set_nuisance_clustering_photoz", CP.n_elem, redshift.clustering_nbin);
     exit(1);
   }
 
@@ -2191,6 +2173,8 @@ void set_nuisance_clustering_photoz(vector CP)
   {
     nuisance.bias_zphot_clustering[i] = CP(i);
   }
+
+  photoz.random = RandomNumber::get_instance().get();
 
   spdlog::debug("\x1b[90m{}\x1b[0m: Ends", "set_nuisance_clustering_photoz");
 }

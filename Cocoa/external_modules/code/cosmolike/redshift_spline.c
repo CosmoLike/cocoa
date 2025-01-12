@@ -57,7 +57,7 @@ double amin_lens(int ni)
     exit(1);
   }
   return 1. / (1 + redshift.clustering_zdist_zmax[ni] + 
-                 2. * fabs(nuisance.bias_zphot_clustering[ni]));
+                 2. * fabs(photoz.bias_zphot_clustering[ni]));
 }
 
 double amax_lens(int ni) 
@@ -74,7 +74,7 @@ double amax_lens(int ni)
   }
     
   return 1. / (1 + fmax(redshift.clustering_zdist_zmin[ni] -
-      2. * fabs(nuisance.bias_zphot_clustering[ni]), 0.001));
+      2. * fabs(photoz.bias_zphot_clustering[ni]), 0.001));
 }
 
 // -----------------------------------------------------------------------------
@@ -499,7 +499,7 @@ double zdistr_photoz(double zz, const int nj)
     exit(1);
   }
   
-  zz = zz - nuisance.bias_zphot_shear[nj];
+  zz = zz - photoz.bias_zphot_shear[nj];
   
   double res; 
   if (zz <= table[ntomo+1][0] || zz >= table[ntomo+1][nzbins - 1])
@@ -710,7 +710,7 @@ double pf_photoz(double zz, int nj)
     exit(1);
   }
   
-  zz = zz - nuisance.bias_zphot_clustering[nj];
+  zz = zz - photoz.bias_zphot_clustering[nj];
   
   double res; 
   if (zz <= table[ntomo+1][0] || zz >= table[ntomo+1][nzbins - 1])
@@ -840,8 +840,8 @@ double int_for_g_tomo(double aprime, void* params)
 
 double g_tomo(double ainput, const int ni) 
 {  
-  static nuisancepara N;
   static cosmopara C;
+  static double cache_photoz_params;
   static double cache_table_params;
   static double cache_redshift_params;
   static double** table = NULL;
@@ -857,8 +857,8 @@ double g_tomo(double ainput, const int ni)
     table = (double**) malloc2d(redshift.shear_nbin, Ntable.N_a);
   }
 
-  if (recompute_zphot_shear(N) || 
-      recompute_cosmo3D(C) ||
+  if (recompute_cosmo3D(C) ||
+      fdiff(cache_photoz_params, photoz.random) ||
       fdiff(cache_table_params, Ntable.random) ||
       fdiff(cache_redshift_params, redshift.random)) 
   {
@@ -891,7 +891,6 @@ double g_tomo(double ainput, const int ni)
 
     gsl_integration_glfixed_table_free(w);
     update_cosmopara(&C);
-    update_nuisance(&N);
     cache_table_params = Ntable.random;
     cache_redshift_params = redshift.random;
   }
@@ -940,8 +939,8 @@ double int_for_g2_tomo(double aprime, void* params)
 
 double g2_tomo(double a, int ni) 
 { // for tomography bin ni
-  static nuisancepara N;
   static cosmopara C;
+  static double cache_photoz_params;
   static double cache_table_params;
   static double cache_redshift_params;
   static double** table = NULL;
@@ -957,8 +956,8 @@ double g2_tomo(double a, int ni)
     table = (double**) malloc2d(redshift.shear_nbin, Ntable.N_a);
   }
 
-  if (recompute_zphot_shear(N) || 
-      recompute_cosmo3D(C) || 
+  if (recompute_cosmo3D(C) ||
+      fdiff(cache_photoz_params, photoz.random) || 
       fdiff(cache_table_params, Ntable.random) || 
       fdiff(cache_redshift_params, redshift.random)) 
   {
@@ -989,8 +988,7 @@ double g2_tomo(double a, int ni)
       } 
     }
 
-    gsl_integration_glfixed_table_free(w);   
-    update_nuisance(&N);
+    gsl_integration_glfixed_table_free(w);
     update_cosmopara(&C);
     cache_table_params = Ntable.random;
     cache_redshift_params = redshift.random;
@@ -1026,8 +1024,8 @@ double int_for_g_lens(double aprime, void* params)
 
 double g_lens(double a, int ni) 
 { // for *lens* tomography bin ni
-  static nuisancepara N;
   static cosmopara C;
+  static double cache_photoz_params;
   static double cache_table_params;
   static double cache_redshift_params;
   static double** table = NULL;
@@ -1044,8 +1042,8 @@ double g_lens(double a, int ni)
     table = (double**) malloc2d(redshift.clustering_nbin , Ntable.N_a);
   }
 
-  if (recompute_zphot_clustering(N) || 
-      recompute_cosmo3D(C) ||  
+  if (recompute_cosmo3D(C) ||  
+      fdiff(cache_photoz_params, photoz.random) ||
       fdiff(cache_table_params, Ntable.random) ||
       fdiff(cache_redshift_params, redshift.random)) 
   {
@@ -1077,7 +1075,6 @@ double g_lens(double a, int ni)
     }
 
     gsl_integration_glfixed_table_free(w);
-    update_nuisance(&N);
     update_cosmopara(&C);
     cache_table_params = Ntable.random;
     cache_redshift_params = redshift.random;

@@ -224,12 +224,6 @@ typedef struct
   double fred[MAX_SIZE_ARRAYS];
   
   double shear_calibration_m[MAX_SIZE_ARRAYS];
-
-  double sigma_zphot_shear[MAX_SIZE_ARRAYS];
-  double bias_zphot_shear[MAX_SIZE_ARRAYS];
-
-  double sigma_zphot_clustering[MAX_SIZE_ARRAYS];
-  double bias_zphot_clustering[MAX_SIZE_ARRAYS];
   
   // Variables for the 4x2pt+N (see: 2008.10757 & 2010.01138)
   double cluster_MOR[MAX_SIZE_ARRAYS];
@@ -238,6 +232,20 @@ typedef struct
   double frac_lowz;   // photo-z = 5 model (see: 2108.00658)
   double frac_highz;  // photo-z = 5 model (see: 2108.00658)
 } nuisancepara;
+
+typedef struct
+{
+  double random; // COCOA: Random number. Optimization as the function 
+                 // COCOA: "recompute" can be too expensive if required to  
+                 // COCOA: check every element of the struct. Whenever 
+                 // COCOA: updating the struct, assign a new random number
+  
+  double sigma_zphot_shear[MAX_SIZE_ARRAYS];
+  double bias_zphot_shear[MAX_SIZE_ARRAYS];
+  
+  double sigma_zphot_clustering[MAX_SIZE_ARRAYS];
+  double bias_zphot_clustering[MAX_SIZE_ARRAYS];
+} photozparams;
 
 typedef struct
 {
@@ -397,6 +405,8 @@ extern pdeltapara pdeltaparams;
 
 extern FPTpara FPT;
 
+extern photozparams photoz;
+
 extern nuisancepara nuisance;
 
 extern ynuisancepara ynuisance;
@@ -442,6 +452,8 @@ void update_ynuisance(ynuisancepara* N);
 void update_table(Ntab* N);
 
 void update_redshift(redshiftparams* N);
+
+void update_photoz_struct(photozparams* N);
 
 #ifdef __cplusplus
 }

@@ -126,11 +126,15 @@ nuisancepara nuisance =
   .A_z = {0},
   .A2_z = {0},
   .b_ta_z = {0},
-  .shear_calibration_m = {0},
+  .shear_calibration_m = {0}
+};
+
+photozparams photoz =
+{
   .sigma_zphot_shear = {0},
   .bias_zphot_shear = {0},
   .sigma_zphot_clustering = {0},
-  .bias_zphot_clustering = {0},
+  .bias_zphot_clustering = {0}
 };
 
 ynuisancepara ynuisance =
@@ -466,6 +470,21 @@ void reset_pdeltaparams_struct()
 // ---------------------------------------------------------------------------
 // ---------------------------------------------------------------------------
 
+void reset_photozparams_struct()
+{
+  for(int i=0; i<MAX_SIZE_ARRAYS; i++)
+  {
+    nuisance.sigma_zphot_shear[i] = 0.0;
+    nuisance.bias_zphot_shear[i] = 0.0;
+    nuisance.sigma_zphot_clustering[i] = 0.0;
+    nuisance.bias_zphot_clustering[i] = 0.0;
+  }
+}
+
+// ---------------------------------------------------------------------------
+// ---------------------------------------------------------------------------
+// ---------------------------------------------------------------------------
+
 void reset_nuisance_struct()
 {
   for(int i=0; i<MAX_SIZE_ARRAYS; i++)
@@ -477,11 +496,7 @@ void reset_nuisance_struct()
     
     nuisance.shear_calibration_m[i] = 0.0;
     
-    nuisance.sigma_zphot_shear[i] = 0.0;
-    nuisance.bias_zphot_shear[i] = 0.0;
-    
-    nuisance.sigma_zphot_clustering[i] = 0.0;
-    nuisance.bias_zphot_clustering[i] = 0.0;
+
     
     nuisance.cluster_MOR[i] = 0.0;
     nuisance.cluster_selection[i] = 0.0;
@@ -585,22 +600,28 @@ void update_nuisance(nuisancepara* N)
   N->eta_ia_tt     = nuisance.eta_ia_tt;
   
   for (int i=0; i<MAX_SIZE_ARRAYS; i++) 
-  {
-    N->sigma_zphot_clustering[i] = nuisance.sigma_zphot_clustering[i];
-    N->bias_zphot_clustering[i]  = nuisance.bias_zphot_clustering[i];
-  }
-  
-  for (int i=0; i<MAX_SIZE_ARRAYS; i++) 
-  {
-    N->sigma_zphot_shear[i] = nuisance.sigma_zphot_shear[i];
-    N->bias_zphot_shear[i]  = nuisance.bias_zphot_shear[i];
-    
+  {    
     N->A_z[i]    = nuisance.A_z[i];
     N->A2_z[i]   = nuisance.A2_z[i];
     N->b_ta_z[i] = nuisance.b_ta_z[i];
 
     N->cluster_MOR[i] = nuisance.cluster_MOR[i];
     N->cluster_selection[i] = nuisance.cluster_selection[i];
+  }
+}
+
+// ---------------------------------------------------------------------------
+// ---------------------------------------------------------------------------
+// ---------------------------------------------------------------------------
+
+void update_photoz_struct(photozparams* N)
+{  
+  for (int i=0; i<MAX_SIZE_ARRAYS; i++) 
+  {
+    N->sigma_zphot_clustering[i] = photoz.sigma_zphot_clustering[i];
+    N->bias_zphot_clustering[i] = photoz.bias_zphot_clustering[i];
+    N->sigma_zphot_shear[i] = photoz.sigma_zphot_shear[i];
+    N->bias_zphot_shear[i] = photoz.bias_zphot_shear[i];
   }
 }
 
@@ -641,6 +662,7 @@ void update_table(Ntab* N)
 // ---------------------------------------------------------------------------
 // ---------------------------------------------------------------------------
 // ---------------------------------------------------------------------------
+
 void update_redshift(redshiftparams* N)
 {
   N->random = redshift.random;
