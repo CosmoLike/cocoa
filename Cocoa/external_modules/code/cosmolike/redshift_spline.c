@@ -487,27 +487,6 @@ double zdistr_photoz(double zz, const int nj)
     }
     table = (double**) malloc2d(ntomo + 2, nzbins);
     
-    for (int i=0; i<ntomo+1; i++) 
-    {
-      if (Ntable.photoz_interpolation_type == 0)
-      {
-        photoz_splines[i] = gsl_spline_alloc(gsl_interp_cspline, nzbins);
-      }
-      else if (Ntable.photoz_interpolation_type == 1)
-      {
-        photoz_splines[i] = gsl_spline_alloc(gsl_interp_linear, nzbins);
-      }
-      else
-      {
-        photoz_splines[i] = gsl_spline_alloc(gsl_interp_steffen, nzbins);
-      }
-      if (photoz_splines[i] == NULL)
-      {
-        log_fatal("array allocation failed");
-        exit(1);
-      }
-    }
-
     const double zmin = redshift.shear_zdist_zmin_all;
     const double zmax = redshift.shear_zdist_zmax_all;
     const double dz_histo = (zmax - zmin) / ((double) nzbins);  
@@ -540,6 +519,11 @@ double zdistr_photoz(double zz, const int nj)
         table[i + 1][k] = zdistr_histo_n(z, i)/NORM[i];
         table[0][k] += table[i+1][k] * NORM[i] / norm;
       }
+    }
+
+    for (int i=0; i<ntomo+1; i++) 
+    {
+      photoz_splines[i] = malloc_gsl_spline(nzbins);
     }
 
     #pragma omp parallel for
@@ -711,27 +695,6 @@ double pf_photoz(double zz, int nj)
     if (table != NULL) free(table);
     table = (double**) malloc2d(ntomo + 2, nzbins);
 
-    for (int i=0; i<ntomo+1; i++) 
-    {
-      if (Ntable.photoz_interpolation_type == 0)
-      {
-        photoz_splines[i] = gsl_spline_alloc(gsl_interp_cspline, nzbins);
-      }
-      else if (Ntable.photoz_interpolation_type == 1)
-      {
-        photoz_splines[i] = gsl_spline_alloc(gsl_interp_linear, nzbins);
-      }
-      else
-      {
-        photoz_splines[i] = gsl_spline_alloc(gsl_interp_steffen, nzbins);
-      }
-      if (photoz_splines[i] == NULL)
-      {
-        log_fatal("array allocation failed");
-        exit(1);
-      }
-    }
-
     const double zmin = redshift.clustering_zdist_zmin_all;
     const double zmax = redshift.clustering_zdist_zmax_all;
     const double dz_histo = (zmax - zmin) / ((double) nzbins);  
@@ -764,6 +727,11 @@ double pf_photoz(double zz, int nj)
         table[i + 1][k] = pf_histo_n(z, i)/NORM[i];
         table[0][k] += table[i+1][k] * NORM[i] / norm;
       }
+    }
+
+    for (int i=0; i<ntomo+1; i++) 
+    {
+      photoz_splines[i] = malloc_gsl_spline(nzbins);
     }
 
     #pragma omp parallel for

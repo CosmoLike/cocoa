@@ -26,6 +26,29 @@
 
 #include "log.c/src/log.h"
 
+gsl_spline* malloc_gsl_spline(const int n)
+{
+  gsl_spline* result;
+  if (Ntable.photoz_interpolation_type == 0)
+  {
+    result = gsl_spline_alloc(gsl_interp_cspline, n);
+  }
+  else if (Ntable.photoz_interpolation_type == 1)
+  {
+    result = gsl_spline_alloc(gsl_interp_linear, n);
+  }
+  else
+  {
+    result = gsl_spline_alloc(gsl_interp_steffen, n);
+  }
+  if (result == NULL)
+  {
+    log_fatal("array allocation failed");
+    exit(1);
+  }
+  return result;
+}
+
 gsl_integration_glfixed_table* malloc_gslint_glfixed(const int n)
 {
   gsl_integration_glfixed_table* w = gsl_integration_glfixed_table_alloc(n);
