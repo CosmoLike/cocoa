@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include "basics.h"
 #include "structs.h"
 
 #include "log.c/src/log.h"
@@ -61,14 +62,14 @@ cosmopara cosmology =
 
 tomopara tomo = 
 {
-  .shear_Nbin = 0,
-  .clustering_Nbin = 0,
-  .cluster_Nbin = 0
-  //.external_selection_cg_clustering = {0}
+  .shear_Npowerspectra = 0,
+  .ggl_Npowerspectra = 0,
+  .clustering_Npowerspectra = 0
 };
 
 redshiftpara redshift =
 {
+  .shear_nbin = 0,
   .shear_photoz = 0,
   .shear_nzbins = 0,
   .shear_zdist_zmin_all = 0.0,
@@ -77,6 +78,7 @@ redshiftpara redshift =
   .shear_zdist_zmax = {0},
   .shear_zdist_table = NULL,
   
+  .clustering_nbin = 0,
   .clustering_photoz = 0,
   .clustering_nzbins = 0,
   .clustering_zdist_zmin_all = 0.0,
@@ -84,6 +86,8 @@ redshiftpara redshift =
   .clustering_zdist_zmin = {0},
   .clustering_zdist_zmax = {0},
   .clustering_zdist_table = NULL
+
+  //.cluster_Nbin = 0
 };
 
 galpara gbias =
@@ -333,15 +337,10 @@ void reset_cosmology_struct()
 
 void reset_tomo_struct()
 {
-  tomo.shear_Nbin = 0;
-  tomo.clustering_Nbin = 0;
-
   tomo.shear_Npowerspectra = 0;
   tomo.clustering_Npowerspectra = 0;
-  tomo.ggl_Npowerspectra = 0;
-  
+  tomo.ggl_Npowerspectra = 0; 
 /*
-  tomo.cluster_Nbin = 0;
   tomo.cg_clustering_Npowerspectra = 0;
   tomo.cc_clustering_Npowerspectra = 0;
   tomo.cgl_Npowerspectra = 0;
@@ -350,6 +349,7 @@ void reset_tomo_struct()
 
 void reset_redshift_struct()
 {
+  redshift.shear_nbin = 0;
   redshift.shear_photoz = 0;
   if (redshift.shear_zdist_table != NULL)
   {
@@ -360,16 +360,16 @@ void reset_redshift_struct()
   redshift.shear_zdist_zmin_all = 0.0;
   redshift.shear_zdist_zmax_all = 0.0;
 
+  redshift.clustering_nbin = 0;
+  redshift.clustering_nzbins = 0;
   if (redshift.clustering_zdist_table != NULL)
   {
     free(redshift.clustering_zdist_table);
     redshift.clustering_zdist_table = NULL;
   }
   redshift.clustering_photoz = 0;
-  redshift.clustering_nzbins = 0;
   redshift.clustering_zdist_zmin_all = 0.0;
   redshift.clustering_zdist_zmax_all = 0.0;
-  sprintf(redshift.clustering_REDSHIFT_FILE, "%s", "");
 
   for(int i=0; i<MAX_SIZE_ARRAYS; i++)
   {
@@ -556,31 +556,16 @@ void update_cosmopara(cosmopara *C)
 
 void update_galpara(galpara *G) 
 {
-  for (int i=0; i<tomo.clustering_Nbin; i++) 
+  for (int i=0; i<MAX_SIZE_ARRAYS; i++) 
   {
-    if (gbias.b[i] > 0.2 && gbias.b[i] < 20) 
+    G->b[i] = gbias.b[i];
+    G->b2[i] = gbias.b2[i];
+    G->bs2[i] = gbias.bs2[i];  
+    for(int j=0; j<MAX_SIZE_ARRAYS; j++)
     {
-      G->b[i] = gbias.b[i];
-      G->b2[i] = gbias.b2[i];
-      G->bs2[i] = gbias.bs2[i];
+      G->hod[i][j] = gbias.hod[i][j];
     }
-    else
-    {
-      // HOD ------------------------------------------------------------
-      if (gbias.hod[i][0] > 10 && gbias.hod[i][0] < 16) 
-      {
-        for(int j=0; j<MAX_SIZE_ARRAYS; j++)
-        {
-          G->hod[i][j] = gbias.hod[i][j];
-        }
-        G->cg[i]= gbias.cg[i];
-      }
-      else 
-      {
-        log_fatal("lens bin %d: neither linear bias or HOD are set", i);
-        exit(1);
-      }
-    } 
+    G->cg[i]= gbias.cg[i];
   }
 }
 
@@ -597,13 +582,13 @@ void update_nuisance(nuisancepara* N)
   N->A2_ia         = nuisance.A2_ia;
   N->eta_ia_tt     = nuisance.eta_ia_tt;
   
-  for (int i=0; i<tomo.clustering_Nbin; i++) 
+  for (int i=0; i<MAX_SIZE_ARRAYS; i++) 
   {
     N->sigma_zphot_clustering[i] = nuisance.sigma_zphot_clustering[i];
     N->bias_zphot_clustering[i]  = nuisance.bias_zphot_clustering[i];
   }
   
-  for (int i=0; i<tomo.shear_Nbin; i++) 
+  for (int i=0; i<MAX_SIZE_ARRAYS; i++) 
   {
     N->sigma_zphot_shear[i] = nuisance.sigma_zphot_shear[i];
     N->bias_zphot_shear[i]  = nuisance.bias_zphot_shear[i];
@@ -611,14 +596,8 @@ void update_nuisance(nuisancepara* N)
     N->A_z[i]    = nuisance.A_z[i];
     N->A2_z[i]   = nuisance.A2_z[i];
     N->b_ta_z[i] = nuisance.b_ta_z[i];
-  }
-  
-  for (int i=0; i<Cluster.N_MOR; ++i)
-  {
+
     N->cluster_MOR[i] = nuisance.cluster_MOR[i];
-  }
-  for (int i=0; i<Cluster.N_SF; ++i)
-  {
     N->cluster_selection[i] = nuisance.cluster_selection[i];
   }
 }
@@ -653,6 +632,32 @@ void update_table(Ntab* N)
   N->Ntheta = Ntable.Ntheta;
   N->N_ell_TATT = Ntable.N_ell_TATT;
   N->high_def_integration = Ntable.high_def_integration;
+}
+
+// ---------------------------------------------------------------------------
+// ---------------------------------------------------------------------------
+// ---------------------------------------------------------------------------
+void update_redshift(redshiftpara* N)
+{
+  N->shear_nzbins = redshift.shear_nzbins;
+  N->shear_zdist_zmin_all = redshift.shear_zdist_zmin_all;
+  N->shear_zdist_zmax_all = redshift.shear_zdist_zmax_all;
+  
+  N->clustering_nzbins = redshift.clustering_nzbins;
+  N->clustering_zdist_zmin_all = redshift.clustering_zdist_zmin_all;
+  N->clustering_zdist_zmax_all = redshift.clustering_zdist_zmax_all;
+
+  for(int i=0; i<MAX_SIZE_ARRAYS; i++)
+  {
+    N->shear_zdist_zmin[i] = redshift.shear_zdist_zmin[i];
+    N->shear_zdist_zmax[i] = redshift.shear_zdist_zmax[i];
+    N->clustering_zdist_zmin[i] = redshift.clustering_zdist_zmin[i];
+    N->clustering_zdist_zmax[i] = redshift.clustering_zdist_zmax[i];
+  }
+
+  //const int ntomo = 
+  //redshift.clustering_zdist_table = (double**) malloc2d(Ntomo + 1, nzbins);
+
 }
 
 // ---------------------------------------------------------------------------

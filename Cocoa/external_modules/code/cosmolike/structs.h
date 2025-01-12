@@ -128,14 +128,36 @@ typedef struct
 
 typedef struct 
 {
-  int shear_Nbin;         // number of source tomography bins
-  int clustering_Nbin;    // number of lens galaxy bins
-  int cluster_Nbin;       // number of lens cluster redshift bins
-
   int shear_Npowerspectra;       // number of shear-shear tomography power spectra
   int ggl_Npowerspectra;         // number of galaxy-galaxy lensing tomography power spectra
   int clustering_Npowerspectra;  // number of galaxy-galaxy clustering tomography power spectra
-    
+} tomopara;
+
+typedef struct
+{
+  int shear_nbin;         // number of source tomography bins
+  int shear_photoz;
+  int shear_nzbins;
+  double** shear_zdist_table;
+  double shear_zdist_zmin_all;
+  double shear_zdist_zmax_all;
+  double shear_zdist_zmin[MAX_SIZE_ARRAYS];
+  double shear_zdist_zmax[MAX_SIZE_ARRAYS];
+
+  int clustering_nbin;    // number of lens galaxy bins
+  int clustering_photoz;
+  int clustering_nzbins;
+  double** clustering_zdist_table;
+  double clustering_zdist_zmin_all;
+  double clustering_zdist_zmax_all;
+  double clustering_zdist_zmin[MAX_SIZE_ARRAYS];
+  double clustering_zdist_zmax[MAX_SIZE_ARRAYS];
+
+  /*
+  int cluster_Nbin;       // number of lens cluster redshift bins
+  int clusters_photoz;
+  char clusters_REDSHIFT_FILE[CHAR_MAX_SIZE];
+  */
   /*
   int cgl_Npowerspectra;             // number of cluster-galaxy lensing tomography combinations
   int cg_clustering_Npowerspectra;   // number of cluster-galaxy clustering tomography combinations
@@ -144,32 +166,6 @@ typedef struct
   double cluster_zmin[MAX_SIZE_ARRAYS];
   // we assume cluster bin = galaxy bin (no cross)
   int external_selection_cg_clustering[MAX_SIZE_ARRAYS];
-  */
-} tomopara;
-
-typedef struct
-{
-  int shear_photoz;
-  int shear_nzbins;
-  double* shear_zdist_z_v;
-  double** shear_zdist_table;
-  double shear_zdist_zmin_all;
-  double shear_zdist_zmax_all;
-  double shear_zdist_zmin[MAX_SIZE_ARRAYS];
-  double shear_zdist_zmax[MAX_SIZE_ARRAYS];
-
-  int clustering_photoz;
-  int clustering_nzbins;
-  double** clustering_zdist_table;
-  double clustering_zdist_zmin_all;
-  double clustering_zdist_zmax_all;
-  double clustering_zdist_zmin[MAX_SIZE_ARRAYS];
-  double clustering_zdist_zmax[MAX_SIZE_ARRAYS];
-  char clustering_REDSHIFT_FILE[CHAR_MAX_SIZE];
-
-  /*
-  int clusters_photoz;
-  char clusters_REDSHIFT_FILE[CHAR_MAX_SIZE];
   */
 } redshiftpara;
 

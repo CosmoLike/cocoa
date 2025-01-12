@@ -42,7 +42,7 @@ int recompute_cosmo3D(cosmopara C)
 int recompute_zphot_shear(nuisancepara N)
 {
   int res = 0;
-  for (int i=0; i<tomo.shear_Nbin; i++)
+  for (int i=0; i<MAX_SIZE_ARRAYS; i++)
   {
     if (fdiff(N.sigma_zphot_shear[i], nuisance.sigma_zphot_shear[i]) ||
         fdiff(N.bias_zphot_shear[i], nuisance.bias_zphot_shear[i]))
@@ -56,7 +56,7 @@ int recompute_zphot_shear(nuisancepara N)
 int recompute_zphot_clustering(nuisancepara N) 
 {
   int res = 0;
-  for (int i=0; i<tomo.clustering_Nbin; i++) 
+  for (int i=0; i<MAX_SIZE_ARRAYS; i++) 
   {
     if (fdiff(N.sigma_zphot_clustering[i], nuisance.sigma_zphot_clustering[i]) ||
         fdiff(N.bias_zphot_clustering[i], nuisance.bias_zphot_clustering[i])) 
@@ -76,7 +76,7 @@ int recompute_IA(nuisancepara N)
   {
     return 1;
   }
-  for (int i=0; i<tomo.shear_Nbin; i++)
+  for (int i=0; i<MAX_SIZE_ARRAYS; i++)
   {
     if (fdiff(N.A_z[i], nuisance.A_z[i]) ||
         fdiff(N.A2_z[i], nuisance.A2_z[i]) ||
@@ -90,7 +90,7 @@ int recompute_IA(nuisancepara N)
 
 int recompute_galaxies(galpara G, int i) 
 {
-  if (i < 0 || i > tomo.clustering_Nbin -1)
+  if (i < 0 || i > MAX_SIZE_ARRAYS -1)
   {
     log_fatal("invalid bin input ni = %d", i);
     exit(1);
@@ -102,7 +102,7 @@ int recompute_galaxies(galpara G, int i)
 
 int recompute_all_galaxies(galpara G) 
 {
-  for (int i=0; i<tomo.clustering_Nbin; i++) 
+  for (int i=0; i<MAX_SIZE_ARRAYS; i++) 
   {
     if (recompute_galaxies(G, i))
     {
@@ -174,7 +174,7 @@ int recompute_gs(cosmopara C, galpara G, nuisancepara N)
   {
     return 1;
   }
-  for (int i=0; i<tomo.clustering_Nbin; i++) 
+  for (int i=0; i<MAX_SIZE_ARRAYS; i++) 
   {
     if (recompute_galaxies(G, i))
     {
@@ -194,7 +194,7 @@ int recompute_gg(cosmopara C, galpara G, nuisancepara N)
   {
     return 1;
   }
-  for (int i=0; i<tomo.clustering_Nbin; i++) 
+  for (int i=0; i<MAX_SIZE_ARRAYS; i++) 
   {
     if (recompute_galaxies(G, i))
     {
@@ -223,7 +223,7 @@ int recompute_gk(cosmopara C, galpara G, nuisancepara N)
   {
     return 1;
   }
-  for (int i=0; i<tomo.clustering_Nbin; i++) 
+  for (int i=0; i<MAX_SIZE_ARRAYS; i++) 
   {
     if (recompute_galaxies(G, i))
     {
@@ -245,7 +245,7 @@ int recompute_gy(cosmopara C, galpara G, nuisancepara N, ynuisancepara N2)
   {
     return 1;
   }
-  for (int i=0; i<tomo.clustering_Nbin; i++) 
+  for (int i=0; i<MAX_SIZE_ARRAYS; i++) 
   {
     if (recompute_galaxies(G, i))
     {
@@ -297,7 +297,7 @@ int recompute_cg(cosmopara C, galpara G, nuisancepara N)
   {
     return 1;
   }
-  for (int i=0; i<tomo.clustering_Nbin; i++) 
+  for (int i=0; i<MAX_SIZE_ARRAYS; i++) 
   {
     if (recompute_galaxies(G, i))
     {
@@ -313,7 +313,7 @@ int recompute_cs(cosmopara C, galpara G, nuisancepara N)
   {
     return 1;
   }
-  for (int i=0; i<tomo.shear_Nbin; i++) 
+  for (int i=0; i<MAX_SIZE_ARRAYS; i++) 
   {
     if (recompute_galaxies(G, i))
     {
@@ -348,7 +348,6 @@ int recompute_table(Ntab N)
 
 int recompute_redshift(redshiftpara N)
 {
-  int res = 0;
   if ((N.shear_nzbins != redshift.shear_nzbins) ||
       fdiff(N.shear_zdist_zmin_all, redshift.shear_zdist_zmin_all) ||
       fdiff(N.shear_zdist_zmax_all, redshift.shear_zdist_zmax_all) ||
@@ -378,7 +377,7 @@ int recompute_redshift(redshiftpara N)
   {
     for (int k=0; k<redshift.clustering_nzbins; k++) 
     { 
-      for (int i=0; i<tomo.clustering_Nbin+2; i++) 
+      for (int i=0; i<redshift.clustering_nbin+2; i++) 
       {
         if (fdiff(N.clustering_zdist_table[i][k], 
                   redshift.clustering_zdist_table[i][k]))
@@ -392,7 +391,7 @@ int recompute_redshift(redshiftpara N)
   {
     for (int k=0; k<redshift.shear_nzbins; k++) 
     { 
-      for (int i=0; i<tomo.shear_Nbin+2; i++) 
+      for (int i=0; i<redshift.shear_nbin+2; i++) 
       {
         if (fdiff(N.shear_zdist_table[i][k], redshift.shear_zdist_table[i][k]))
         {

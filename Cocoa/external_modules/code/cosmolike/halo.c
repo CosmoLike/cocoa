@@ -1259,7 +1259,7 @@ double n_c(const double mh, const double a, const int ni)
     log_fatal("a>0 and a<1 not true");
     exit(1);
   }
-  if (ni < 0 || ni > tomo.clustering_Nbin - 1)
+  if (ni < 0 || ni > redshift.clustering_nbin - 1)
   { // avoid segfault for accessing wrong array index
     log_fatal("error in selecting bin number ni = %d", ni);
     exit(1);
@@ -1286,7 +1286,7 @@ double n_c(const double mh, const double a, const int ni)
 
 double n_s(const double mh, const double a, const int ni)
 {
-  if (ni < 0 || ni > tomo.clustering_Nbin - 1)
+  if (ni < 0 || ni > redshift.clustering_nbin - 1)
   { // avoid segfault for accessing wrong array index
     log_fatal("error in selecting bin number ni = %d", ni);
     exit(1);
@@ -1305,7 +1305,7 @@ double n_s(const double mh, const double a, const int ni)
 
 double f_c(const int ni)
 {
-  if (ni < 0 || ni > tomo.clustering_Nbin - 1)
+  if (ni < 0 || ni > redshift.clustering_nbin - 1)
   { // avoid segfault for accessing wrong array index
     log_fatal("error in selecting bin number ni = %d", ni);
     exit(1);
@@ -1320,7 +1320,7 @@ double f_c(const int ni)
 double u_g(const double k, const double m, const double a, const int ni)
 { // Fourier transformed normalized galaxy density profile, NFW with rescaled concentraion
   // analytic FT of NFW profile, from Cooray & Sheth 01
-  if (ni < 0 || ni > tomo.clustering_Nbin - 1)
+  if (ni < 0 || ni > redshift.clustering_nbin - 1)
   { // avoid segfault for accessing wrong array index
     log_fatal("error in selecting bin number ni = %d", ni);
     exit(1);
@@ -1348,7 +1348,7 @@ double int_ngal(double lnM, void *params)
     exit(1);
   }
   const int ni = (int) ar[1];
-  if (ni < 0 || ni > tomo.clustering_Nbin - 1)
+  if (ni < 0 || ni > redshift.clustering_nbin - 1)
   {
     log_fatal("error in selecting bin number ni = %d", ni);
     exit(1);
@@ -1361,7 +1361,7 @@ double int_ngal(double lnM, void *params)
 
 double ngal_nointerp(const int ni, const double a, const int init_static_vars_only)
 {
-  if (ni < 0 || ni > tomo.clustering_Nbin - 1)
+  if (ni < 0 || ni > redshift.clustering_nbin - 1)
   { // avoid segfault for accessing wrong array index
     log_fatal("error in selecting bin number ni = %d", ni);
     exit(1);
@@ -1385,7 +1385,7 @@ double ngal(const int ni, const double a)
   static galpara G;
   static double** table;
 
-  const int nbin = tomo.clustering_Nbin;
+  const int nbin = redshift.clustering_nbin;
 
   const int na = Ntable.N_a;
   const double amin = 1.0/(redshift.clustering_zdist_zmax_all + 1.0);
@@ -1441,7 +1441,7 @@ double int_m_mean(double lnM, void *params)
     exit(1);
   }
   const int ni = (int) ar[1];
-  if (ni < 0 || ni > tomo.clustering_Nbin - 1)
+  if (ni < 0 || ni > redshift.clustering_nbin - 1)
   {
     log_fatal("error in selecting bin number ni = %d", ni);
     exit(1);
@@ -1456,7 +1456,7 @@ double m_mean_nointerp(const int ni, const double a, const int init_static_vars_
 {
   double ar[2] = {a, (double) ni};
   
-  if (ni < 0 || ni > tomo.clustering_Nbin - 1)
+  if (ni < 0 || ni > redshift.clustering_nbin - 1)
   { // avoid segfault for accessing wrong array index
     log_fatal("error in selecting bin number ni = %d", ni);
     exit(1);
@@ -1488,7 +1488,7 @@ double int_bgal(double lnM, void *params)
     exit(1);
   }
   const int ni = (int) ar[1];
-  if (ni < 0 || ni > tomo.clustering_Nbin - 1)
+  if (ni < 0 || ni > redshift.clustering_nbin - 1)
   {
     log_fatal("error in selecting bin number ni = %d", ni);
     exit(1);
@@ -1501,7 +1501,7 @@ double int_bgal(double lnM, void *params)
 
 double bgal_nointerp(const int ni, const double a, const int init_static_vars_only)
 {
-  if (ni < 0 || ni > tomo.clustering_Nbin - 1)
+  if (ni < 0 || ni > redshift.clustering_nbin - 1)
   { // avoid segfault for accessing wrong array index
     log_fatal("error in selecting bin number ni = %d", ni);
     exit(1);
@@ -1525,7 +1525,7 @@ double bgal(const int ni, const double a)
   static galpara G;
   static double** table;
 
-  const int nbin = tomo.clustering_Nbin;
+  const int nbin = redshift.clustering_nbin;
 
   const int na = Ntable.N_a;
   const double amin = 1.0/(redshift.clustering_zdist_zmax_all + 1.0);
@@ -1581,7 +1581,7 @@ double int_fsat(double lnM, void *params)
     exit(1);
   }
   const int ni = (int) ar[1];
-  if (ni < 0 || ni > tomo.clustering_Nbin - 1)
+  if (ni < 0 || ni > redshift.clustering_nbin - 1)
   {
     log_fatal("error in selecting bin number ni = %d", ni);
     exit(1);
@@ -1594,7 +1594,7 @@ double int_fsat(double lnM, void *params)
 
 double fsat_nointerp(int ni, double a, const int init_static_vars_only)
 {
-  if (ni < 0 || ni > tomo.clustering_Nbin - 1)
+  if (ni < 0 || ni > redshift.clustering_nbin - 1)
   { // avoid segfault for accessing wrong array index
     log_fatal("error in selecting bin number ni = %d", ni);
     exit(1);
@@ -1629,7 +1629,7 @@ double int_for_G02(double logm, void* param)
     exit(1);
   }
   const int ni = (int) ar[2];
-  if (ni < 0 || ni > tomo.clustering_Nbin - 1)
+  if (ni < 0 || ni > redshift.clustering_nbin - 1)
   {
     log_fatal("error in selecting bin number ni = %d", ni);
     exit(1);
@@ -1671,7 +1671,7 @@ double int_GM02(double logm, void* params)
     exit(1);
   }
   const int ni = (int) ar[2];
-  if (ni < 0 || ni > tomo.clustering_Nbin - 1)
+  if (ni < 0 || ni > redshift.clustering_nbin - 1)
   {
     log_fatal("error in selecting bin number ni = %d", ni);
     exit(1);
@@ -1687,7 +1687,7 @@ double GM02_nointerp(double k, double a, int ni, const int init_static_vars_only
 { // needs to be divided by ngal
   double ar[3] = {k, a, (double) ni};
   
-  if (ni < 0 || ni > tomo.clustering_Nbin - 1)
+  if (ni < 0 || ni > redshift.clustering_nbin - 1)
   { // avoid segfault for accessing wrong array index
     log_fatal("error in selecting bin number ni = %d", ni);
     exit(1);
@@ -1718,7 +1718,7 @@ double int_G11(double logM, void* params)
     exit(1);
   }
   const int ni = (int) ar[2];
-  if (ni < 0 || ni > tomo.clustering_Nbin - 1)
+  if (ni < 0 || ni > redshift.clustering_nbin - 1)
   {
     log_fatal("error in selecting bin number ni = %d", ni);
     exit(1);
@@ -1734,7 +1734,7 @@ double G11_nointerp(double k, double a, int ni, const int init_static_vars_only)
 { // needs to be devided by ngal
   double ar[3]  ={k, a, (double) ni};
 
-  if (ni < 0 || ni > tomo.clustering_Nbin - 1)
+  if (ni < 0 || ni > redshift.clustering_nbin - 1)
   { // avoid segfault for accessing wrong array index
     log_fatal("error in selecting bin number ni = %d", ni);
     exit(1);
@@ -1791,7 +1791,7 @@ const int use_2h_and_linear_only)
     exit(1);
   }
 
-  const int nbin = tomo.clustering_Nbin;
+  const int nbin = redshift.clustering_nbin;
 
   const int nk = Ntable.N_k_nlin;
   const double lnkmin = log(limits.k_min_cH0);
@@ -1904,7 +1904,7 @@ double p_gm(const double k, const double a, const int ni, const int use_2h_and_l
   static double* amax = 0;
   static double* da = 0;
 
-  const int nbin = tomo.clustering_Nbin;
+  const int nbin = redshift.clustering_nbin;
 
   const int nk = Ntable.N_k_nlin;
   const double lnkmin = log(limits.k_min_cH0);

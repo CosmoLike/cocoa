@@ -323,8 +323,8 @@ void initial_setup()
   spdlog::debug("\x1b[90m{}\x1b[0m: Begins", "initial_setup");
 
   // restart variables to 0 so error check can flag bad initialization
-  tomo.shear_Nbin = 0;
-  tomo.clustering_Nbin = 0;
+  redshift.shear_nbin = 0;
+  redshift.clustering_nbin = 0;
 
   like.shear_shear = 0;
   like.shear_pos = 0;
@@ -833,8 +833,8 @@ void init_data_vector_size_real_space(
       Ntable.Ntheta*2*tomo.shear_Npowerspectra,
       Ntable.Ntheta*tomo.ggl_Npowerspectra,
       Ntable.Ntheta*tomo.clustering_Npowerspectra,
-      Ntable.Ntheta*tomo.shear_Nbin,
-      Ntable.Ntheta*tomo.clustering_Nbin,
+      Ntable.Ntheta*redshift.shear_nbin,
+      Ntable.Ntheta*redshift.clustering_nbin,
       0
     };
 
@@ -961,21 +961,21 @@ void init_data_vector_size_6x2pt_real_space()
       );
     exit(1);
   }
-  if (tomo.shear_Nbin == 0)
+  if (redshift.shear_nbin == 0)
   {
     spdlog::critical( 
         "\x1b[90m{}\x1b[0m: {} not set prior to this function call",
         "init_data_vector_size_6x2pt_real_space", 
-        "tomo.shear_Nbin"
+        "redshift.shear_nbin"
       );
     exit(1);
   }
-  if (tomo.clustering_Nbin == 0)
+  if (redshift.clustering_nbin == 0)
   {
     spdlog::critical(
         "\x1b[90m{}\x1b[0m: {} not set prior to this function call",
         "init_data_vector_size_6x2pt_real_space", 
-        "tomo.clustering_Nbin"
+        "redshift.clustering_nbin"
       );
     exit(1);
   }
@@ -1051,8 +1051,8 @@ void init_data_vector_size_fourier_space(
       like.Ncl*tomo.shear_Npowerspectra,
       like.Ncl*tomo.ggl_Npowerspectra,
       like.Ncl*tomo.clustering_Npowerspectra,
-      like.Ncl*tomo.shear_Nbin,
-      like.Ncl*tomo.clustering_Nbin,
+      like.Ncl*redshift.shear_nbin,
+      like.Ncl*redshift.clustering_nbin,
       0
     };
 
@@ -1179,21 +1179,21 @@ void init_data_vector_size_6x2pt_fourier_space()
       );
     exit(1);
   }
-  if (tomo.shear_Nbin == 0)
+  if (redshift.shear_nbin == 0)
   {
     spdlog::critical( 
         "\x1b[90m{}\x1b[0m: {} not set prior to this function call",
         "init_data_vector_size_6x2pt_fourier_space", 
-        "tomo.shear_Nbin"
+        "redshift.shear_nbin"
       );
     exit(1);
   }
-  if (tomo.clustering_Nbin == 0)
+  if (redshift.clustering_nbin == 0)
   {
     spdlog::critical(
         "\x1b[90m{}\x1b[0m: {} not set prior to this function call",
         "init_data_vector_size_6x2pt_fourier_space", 
-        "tomo.clustering_Nbin"
+        "redshift.clustering_nbin"
       );
     exit(1);
   }
@@ -1776,77 +1776,31 @@ void init_probes(
 // ---------------------------------------------------------------------------
 // ---------------------------------------------------------------------------
 
-void init_lens_sample(
-    std::string multihisto_file, 
-    const int Ntomo
-  )
+void init_lens_sample(std::string multihisto_file, const int Ntomo)
 {
   spdlog::debug("\x1b[90m{}\x1b[0m: Begins", "init_lens_sample");
 
-  if (tomo.shear_Nbin == 0)
-  {
-    spdlog::critical(
-        "\x1b[90m{}\x1b[0m: {} not set prior to this function call", 
-        "init_lens_sample", 
-        "tomo.shear_Nbin"
-      );
-    exit(1);
-  }
-  if (multihisto_file.size()>CHAR_MAX_SIZE-1)
-  {
-    spdlog::critical(
-        "\x1b[90m{}\x1b[0m: insufficient pre-allocated char memory (max = {}) "
-        "for the string: {}", 
-        "init_lens_sample", 
-        CHAR_MAX_SIZE-1, 
-        multihisto_file
-      );
-    exit(1);
-  }
   if (!(multihisto_file.size() > 0))
   {
-    spdlog::critical(
-        "\x1b[90m{}\x1b[0m: empty {} string not supported", 
-        "init_lens_sample", 
-        "multihisto_file"
-      );
+    spdlog::critical("\x1b[90m{}\x1b[0m: empty {} string not supported", 
+      "init_lens_sample", "multihisto_file");
     exit(1);
   }
   if (!(Ntomo > 0) || Ntomo > MAX_SIZE_ARRAYS)
   {
-    spdlog::critical(
-        "\x1b[90m{}\x1b[0m: {} = {} not supported (max = {})", 
-        "init_lens_sample", 
-        "Ntomo", 
-        Ntomo, 
-        MAX_SIZE_ARRAYS
-      );
+    spdlog::critical("\x1b[90m{}\x1b[0m: {} = {} not supported (max = {})", 
+      "init_lens_sample", "Ntomo", Ntomo, MAX_SIZE_ARRAYS);
     exit(1);
   }
 
-  memcpy(
-      redshift.clustering_REDSHIFT_FILE, 
-      multihisto_file.c_str(), 
-      multihisto_file.size()+1
-    );
-
   redshift.clustering_photoz = 4;
-  tomo.clustering_Nbin = Ntomo;
-  tomo.clustering_Npowerspectra = tomo.clustering_Nbin;
+  redshift.clustering_nbin = Ntomo;
+  
+  spdlog::debug("\x1b[90m{}\x1b[0m: {} = {} selected.", "init_lens_sample",
+    "clustering_REDSHIFT_FILE", multihisto_file);
 
-  spdlog::debug(
-      "\x1b[90m{}\x1b[0m: {} = {} selected.", 
-      "init_lens_sample",
-      "clustering_REDSHIFT_FILE", 
-      multihisto_file
-    );
-
-  spdlog::debug(
-      "\x1b[90m{}\x1b[0m: {} = {} selected.", 
-      "init_lens_sample",
-      "clustering_Nbin", 
-      Ntomo
-    );
+  spdlog::debug("\x1b[90m{}\x1b[0m: {} = {} selected.", "init_lens_sample",
+    "clustering_Nbin", Ntomo);
 
   // READ THE N(Z) FILE BEGINS ------------
   matrix input_table = read_table(multihisto_file);
@@ -1860,26 +1814,12 @@ void init_lens_sample(
   redshift.clustering_nzbins = input_table.n_rows;
   const int nzbins = redshift.clustering_nzbins;    // alias
 
-  if (redshift.clustering_zdist_table != NULL)
-  {
-    free(redshift.clustering_zdist_table);
-  }
-  redshift.clustering_zdist_table = (double**) malloc(sizeof(double*)*(Ntomo+1) + 
-                                                      sizeof(double)*(Ntomo+1)*nzbins);
-  if (redshift.clustering_zdist_table == NULL)
-  {
-    spdlog::critical("array allocation failed");
-    exit(1);
-  }
+  if (redshift.clustering_zdist_table != NULL) 
+      free(redshift.clustering_zdist_table);
+  redshift.clustering_zdist_table = (double**) malloc2d(Ntomo + 1, nzbins);
   
   double** tab = redshift.clustering_zdist_table;   // alias
-  for (int k=0; k<(Ntomo+1); k++)
-  {
-    tab[k] = nzbins*k + (double*)(tab + (Ntomo+1));
-  }
-
   double* z_v = redshift.clustering_zdist_table[Ntomo];  // alias
-
   for (int i=0; i<nzbins; i++) 
   {
     z_v[i] = input_table(i,0);
@@ -1911,7 +1851,7 @@ void init_lens_sample(
   int n = 0;
   for (int i=0; i<Ntomo; i++)
   {
-    for (int j=0; j<tomo.shear_Nbin; j++)
+    for (int j=0; j<redshift.shear_nbin; j++)
     {
       n += test_zoverlap(i, j);
     }
@@ -1947,8 +1887,7 @@ void init_source_sample(std::string multihisto_file, const int Ntomo)
   }
 
   redshift.shear_photoz = 4;
-  tomo.shear_Nbin = Ntomo;
-  tomo.shear_Npowerspectra = tomo.shear_Nbin * (tomo.shear_Nbin + 1) / 2;
+  redshift.shear_nbin = Ntomo;
   
   spdlog::debug("\x1b[90m{}\x1b[0m: tomo.shear_Npowerspectra = {}", 
       "init_source_sample", tomo.shear_Npowerspectra);
@@ -1970,27 +1909,11 @@ void init_source_sample(std::string multihisto_file, const int Ntomo)
   redshift.shear_nzbins = input_table.n_rows;
   const int nzbins = redshift.shear_nzbins; // alias
 
-  if (redshift.shear_zdist_table != NULL)
-  {
-    free(redshift.shear_zdist_table);
-  }
-  redshift.shear_zdist_table = (double**) malloc(sizeof(double*)*(Ntomo+1) + 
-                                                 sizeof(double)*(Ntomo+1)*nzbins);
-  if (redshift.shear_zdist_table == NULL)
-  {
-    spdlog::critical("array allocation failed");
-    exit(1);
-  }
+  if (redshift.shear_zdist_table != NULL) free(redshift.shear_zdist_table);
+  redshift.shear_zdist_table = (double**) malloc2d(Ntomo + 1, nzbins);
 
-  double** tab = redshift.shear_zdist_table;        // alias
-  
-  for (int k=0; k<(Ntomo+1); k++)
-  {
-    tab[k] = nzbins*k + (double*)(tab + (Ntomo+1));
-  }
-
+  double** tab = redshift.shear_zdist_table;        // alias  
   double* z_v = redshift.shear_zdist_table[Ntomo];  // alias
-
   for (int i=0; i<nzbins; i++) 
   {
     z_v[i] = input_table(i,0);
@@ -2025,7 +1948,7 @@ void init_source_sample(std::string multihisto_file, const int Ntomo)
                      redshift.shear_zdist_zmax_all);
     
     spdlog::critical("shear_zdist_zmin[0] = {},"
-                     " shear_zdist_zmax[tomo.shear_Nbin-1] = {}", 
+                     " shear_zdist_zmax[redshift.shear_nbin-1] = {}", 
                      redshift.shear_zdist_zmin[0], 
                      redshift.shear_zdist_zmax[Ntomo-1]);
     
@@ -2043,6 +1966,57 @@ void init_source_sample(std::string multihisto_file, const int Ntomo)
   } 
 
   spdlog::debug("\x1b[90m{}\x1b[0m: Ends", "init_source_sample");
+}
+
+// ---------------------------------------------------------------------------
+// ---------------------------------------------------------------------------
+// ---------------------------------------------------------------------------
+
+void init_ntomo_powerspectra()
+{
+  if (redshift.shear_nbin == 0)
+  {
+    spdlog::critical(
+      "\x1b[90m{}\x1b[0m: {} not set prior to this function call", 
+      "init_ntomo_powerspectra", "redshift.shear_nbin");
+    exit(1);
+  }
+  if (redshift.clustering_nbin == 0)
+  {
+    spdlog::critical(
+      "\x1b[90m{}\x1b[0m: {} not set prior to this function call", 
+      "init_ntomo_powerspectra", "redshift.clustering_nbin");
+    exit(1);
+  }
+
+  tomo.shear_Npowerspectra = redshift.shear_nbin * (redshift.shear_nbin + 1) / 2;
+
+  int n = 0;
+  for (int i=0; i<redshift.clustering_nbin; i++)
+  {
+    for (int j=0; j<redshift.shear_nbin; j++)
+    {
+      n += test_zoverlap(i, j);
+    }
+  }
+  tomo.ggl_Npowerspectra = n;
+
+  tomo.clustering_Npowerspectra = redshift.clustering_nbin;
+}
+
+// ---------------------------------------------------------------------------
+// ---------------------------------------------------------------------------
+// ---------------------------------------------------------------------------
+
+void init_redshift_distributions_from_files(
+  std::string lens_multihisto_file, const int lens_ntomo,
+  std::string source_multihisto_file, const int source_ntomo)
+{
+  init_lens_sample(lens_multihisto_file, lens_ntomo);
+  
+  init_source_sample(source_multihisto_file, source_ntomo);
+
+  init_ntomo_powerspectra();
 }
 
 // ---------------------------------------------------------------------------
@@ -2121,7 +2095,7 @@ void set_nuisance_shear_calib(vector M)
 {
   spdlog::debug("\x1b[90m{}\x1b[0m: Begins", "set_nuisance_shear_calib");
 
-  if (tomo.shear_Nbin == 0)
+  if (redshift.shear_nbin == 0)
   {
     spdlog::critical(
         "\x1b[90m{}\x1b[0m: {} = 0 is invalid", 
@@ -2131,18 +2105,18 @@ void set_nuisance_shear_calib(vector M)
     exit(1);
   }
 
-  if (tomo.shear_Nbin != static_cast<int>(M.n_elem))
+  if (redshift.shear_nbin != static_cast<int>(M.n_elem))
   {
     spdlog::critical(
         "\x1b[90m{}\x1b[0m: incompatible input w/ size = {} (!= {})",
         "set_nuisance_shear_calib", 
         M.n_elem, 
-        tomo.shear_Nbin
+        redshift.shear_nbin
       );
     exit(1);
   }
 
-  for (int i=0; i<tomo.shear_Nbin; i++)
+  for (int i=0; i<redshift.shear_nbin; i++)
   {
     nuisance.shear_calibration_m[i] = M(i);
   }
@@ -2158,7 +2132,7 @@ void set_nuisance_shear_photoz(vector SP)
 {
   spdlog::debug("\x1b[90m{}\x1b[0m: Begins", "set_nuisance_shear_photoz");
 
-  if (tomo.shear_Nbin == 0)
+  if (redshift.shear_nbin == 0)
   {
     spdlog::critical(
         "\x1b[90m{}\x1b[0m: {} = 0 is invalid",
@@ -2168,18 +2142,18 @@ void set_nuisance_shear_photoz(vector SP)
     exit(1);
   }
 
-  if (tomo.shear_Nbin != static_cast<int>(SP.n_elem))
+  if (redshift.shear_nbin != static_cast<int>(SP.n_elem))
   {
     spdlog::critical(
         "\x1b[90m{}\x1b[0m: incompatible input w/ size = {} (!= {})",
         "set_nuisance_shear_photoz",
         SP.n_elem,
-        tomo.shear_Nbin
+        redshift.shear_nbin
       );
     exit(1);
   }
 
-  for (int i=0; i<tomo.shear_Nbin; i++)
+  for (int i=0; i<redshift.shear_nbin; i++)
   {
     nuisance.bias_zphot_shear[i] = SP(i);
   }
@@ -2195,7 +2169,7 @@ void set_nuisance_clustering_photoz(vector CP)
 {
   spdlog::debug("\x1b[90m{}\x1b[0m: Begins", "set_nuisance_clustering_photoz");
 
-  if (tomo.clustering_Nbin == 0)
+  if (redshift.clustering_nbin == 0)
   {
     spdlog::critical(
         "\x1b[90m{}\x1b[0m: {} = 0 is invalid",
@@ -2205,18 +2179,18 @@ void set_nuisance_clustering_photoz(vector CP)
     exit(1);
   }
 
-  if (tomo.clustering_Nbin != static_cast<int>(CP.n_elem))
+  if (redshift.clustering_nbin != static_cast<int>(CP.n_elem))
   {
     spdlog::critical(
         "\x1b[90m{}\x1b[0m: incompatible input w/ size = {} (!= {})",
         "set_nuisance_clustering_photoz",
         CP.n_elem,
-        tomo.clustering_Nbin
+        redshift.clustering_nbin
       );
     exit(1);
   }
 
-  for (int i=0; i<tomo.clustering_Nbin; i++)
+  for (int i=0; i<redshift.clustering_nbin; i++)
   {
     nuisance.bias_zphot_clustering[i] = CP(i);
   }
@@ -2233,7 +2207,7 @@ void set_nuisance_clustering_photoz_stretch(vector CP)
 {
   spdlog::debug("\x1b[90m{}\x1b[0m: Begins", "set_nuisance_clustering_photoz_stretch");
 
-  if (tomo.clustering_Nbin == 0)
+  if (redshift.clustering_nbin == 0)
   {
     spdlog::critical(
       "\x1b[90m{}\x1b[0m: {} = 0 is invalid",
@@ -2243,18 +2217,18 @@ void set_nuisance_clustering_photoz_stretch(vector CP)
     exit(1);
   }
 
-  if (tomo.clustering_Nbin != static_cast<int>(CP.n_elem))
+  if (redshift.clustering_nbin != static_cast<int>(CP.n_elem))
   {
     spdlog::critical(
       "\x1b[90m{}\x1b[0m: incompatible input w/ size = {} (!= {})",
       "set_nuisance_clustering_photoz_stretch",
       CP.n_elem,
-      tomo.clustering_Nbin
+      redshift.clustering_nbin
     );
     exit(1);
   }
 
-  for (int i=0; i<tomo.clustering_Nbin; i++)
+  for (int i=0; i<redshift.clustering_nbin; i++)
   {
     nuisance.stretch_zphot_clustering[i] = CP(i);
   }
@@ -2271,7 +2245,7 @@ void set_nuisance_linear_bias(vector B1)
 {
   spdlog::debug("\x1b[90m{}\x1b[0m: Begins", "set_nuisance_linear_bias");
 
-  if (tomo.clustering_Nbin == 0)
+  if (redshift.clustering_nbin == 0)
   {
     spdlog::critical(
         "\x1b[90m{}\x1b[0m: {} = 0 is invalid",
@@ -2280,18 +2254,18 @@ void set_nuisance_linear_bias(vector B1)
     exit(1);
   }
 
-  if (tomo.clustering_Nbin != static_cast<int>(B1.n_elem))
+  if (redshift.clustering_nbin != static_cast<int>(B1.n_elem))
   {
     spdlog::critical(
         "\x1b[90m{}\x1b[0m: incompatible input w/ size = {} (!= {})",
         "set_nuisance_linear_bias", 
         B1.n_elem, 
-        tomo.clustering_Nbin
+        redshift.clustering_nbin
       );
     exit(1);
   }
 
-  for (int i=0; i<tomo.clustering_Nbin; i++)
+  for (int i=0; i<redshift.clustering_nbin; i++)
   {
     gbias.b[i] = B1(i);
   }
@@ -2307,7 +2281,7 @@ void set_nuisance_nonlinear_bias(vector B1, vector B2)
 {
   spdlog::debug("\x1b[90m{}\x1b[0m: Begins", "set_nuisance_nonlinear_bias");
 
-  if (tomo.clustering_Nbin == 0)
+  if (redshift.clustering_nbin == 0)
   {
     spdlog::critical(
         "\x1b[90m{}\x1b[0m: {} = 0 is invalid",
@@ -2317,22 +2291,22 @@ void set_nuisance_nonlinear_bias(vector B1, vector B2)
     exit(1);
   }
 
-  if ( tomo.clustering_Nbin != static_cast<int>(B1.n_elem) ||
-       tomo.clustering_Nbin != static_cast<int>(B2.n_elem))
+  if ( redshift.clustering_nbin != static_cast<int>(B1.n_elem) ||
+       redshift.clustering_nbin != static_cast<int>(B2.n_elem))
   {
     spdlog::critical(
         "\x1b[90m{}\x1b[0m: incompatible input w/ sizes = {} and {} (!= {})",
         "set_nuisance_nonlinear_bias", 
         B1.n_elem, 
         B2.n_elem, 
-        tomo.clustering_Nbin
+        redshift.clustering_nbin
       );
     exit(1);
   }
 
   constexpr double tmp = -4./7.;
   
-  for (int i=0; i<tomo.clustering_Nbin; i++)
+  for (int i=0; i<redshift.clustering_nbin; i++)
   {
     gbias.b2[i] = B2(i);
     gbias.bs2[i] = almost_equal(B2(i), 0.) ? 0 : tmp*(B1(i)-1.0);
@@ -2349,7 +2323,7 @@ void set_nuisance_magnification_bias(vector B_MAG)
 {
   spdlog::debug("\x1b[90m{}\x1b[0m: Begins", "set_nuisance_magnification_bias");
 
-  if (tomo.clustering_Nbin == 0)
+  if (redshift.clustering_nbin == 0)
   {
     spdlog::critical(
         "\x1b[90m{}\x1b[0m: {} = 0 is invalid",
@@ -2359,18 +2333,18 @@ void set_nuisance_magnification_bias(vector B_MAG)
     exit(1);
   }
 
-  if (tomo.clustering_Nbin != static_cast<int>(B_MAG.n_elem))
+  if (redshift.clustering_nbin != static_cast<int>(B_MAG.n_elem))
   {
     spdlog::critical(
         "\x1b[90m{}\x1b[0m: incompatible input w/ size = {} (!= {})",
         "set_nuisance_magnification_bias", 
         B_MAG.n_elem, 
-        tomo.clustering_Nbin
+        redshift.clustering_nbin
       );
     exit(1);
   }
 
-  for (int i=0; i<tomo.clustering_Nbin; i++)
+  for (int i=0; i<redshift.clustering_nbin; i++)
   {
     gbias.b_mag[i] = B_MAG(i);
   }
@@ -2403,7 +2377,7 @@ void set_nuisance_IA(
 {
   spdlog::debug("\x1b[90m{}\x1b[0m: Begins", "set_nuisance_IA");
 
-  if (tomo.shear_Nbin == 0)
+  if (redshift.shear_nbin == 0)
   {
     spdlog::critical(
         "\x1b[90m{}\x1b[0m: {} = 0 is invalid",
@@ -2413,9 +2387,9 @@ void set_nuisance_IA(
     exit(1);
   }
 
-  if (tomo.shear_Nbin != static_cast<int>(A1.n_elem) ||
-      tomo.shear_Nbin != static_cast<int>(A2.n_elem) ||
-      tomo.shear_Nbin != static_cast<int>(BTA.n_elem))
+  if (redshift.shear_nbin != static_cast<int>(A1.n_elem) ||
+      redshift.shear_nbin != static_cast<int>(A2.n_elem) ||
+      redshift.shear_nbin != static_cast<int>(BTA.n_elem))
   {
     spdlog::critical(
         "\x1b[90m{}\x1b[0m: incompatible input w/ sizes = {}, {} and {} (!= {})",
@@ -2423,7 +2397,7 @@ void set_nuisance_IA(
         A1.n_elem, 
         A2.n_elem, 
         BTA.n_elem, 
-        tomo.shear_Nbin
+        redshift.shear_nbin
       );
     exit(1);
   }
@@ -2432,7 +2406,7 @@ void set_nuisance_IA(
   
   if (like.IA == 2)
   {
-    for (int i=0; i<tomo.shear_Nbin; i++)
+    for (int i=0; i<redshift.shear_nbin; i++)
     {
       nuisance.A_z[i]     = A1(i);
       nuisance.A2_z[i]    = A2(i);
@@ -2449,7 +2423,7 @@ void set_nuisance_IA(
     nuisance.eta_ia_tt = A2[1];
     nuisance.b_ta_z[0] = BTA[0];
 
-    for (int i=2; i<tomo.shear_Nbin; i++)
+    for (int i=2; i<redshift.shear_nbin; i++)
     {
       if ( !(almost_equal(A1(i), 0.))    || 
            !(almost_equal(A2(i), 0.))    ||
@@ -2743,7 +2717,7 @@ void compute_gk_real_masked(vector& data_vector, const int start)
 {
   if (like.gk == 1)
   {
-    for (int nz=0; nz<tomo.clustering_Nbin; nz++)
+    for (int nz=0; nz<redshift.clustering_nbin; nz++)
     {
       for (int i=0; i<Ntable.Ntheta; i++) 
       {
@@ -2766,7 +2740,7 @@ void compute_ks_real_masked(vector& data_vector, const int start)
 {
   if (like.ks == 1) 
   {
-    for (int nz=0; nz<tomo.shear_Nbin; nz++)
+    for (int nz=0; nz<redshift.shear_nbin; nz++)
     {
       for (int i=0; i<Ntable.Ntheta; i++)
       {
@@ -2855,7 +2829,7 @@ vector compute_data_vector_6x2pt_real_masked_any_order(
       "compute_data_vector_6x2pt_real_masked_any_order")
     ;
 
-  if (tomo.shear_Nbin == 0)
+  if (redshift.shear_nbin == 0)
   {
     spdlog::critical(
         "\x1b[90m{}\x1b[0m: {} = 0 is invalid",
@@ -2993,8 +2967,8 @@ vector compute_data_vector_6x2pt_real_masked_any_order(
       2*Ntable.Ntheta*tomo.shear_Npowerspectra,
       Ntable.Ntheta*tomo.ggl_Npowerspectra,
       Ntable.Ntheta*tomo.clustering_Npowerspectra,
-      Ntable.Ntheta*tomo.clustering_Nbin,
-      Ntable.Ntheta*tomo.shear_Nbin,
+      Ntable.Ntheta*redshift.clustering_nbin,
+      Ntable.Ntheta*redshift.shear_nbin,
       like.is_cmb_bandpower  == 1 ? like.Nbp : like.Ncl 
     };
 
@@ -3043,7 +3017,7 @@ vector compute_data_vector_3x2pt_real_masked_any_order(
       "compute_data_vector_3x2pt_real_masked_any_order"
     );
 
-  if (tomo.shear_Nbin == 0)
+  if (redshift.shear_nbin == 0)
   {
     spdlog::critical(
         "\x1b[90m{}\x1b[0m: {} = 0 is invalid",
@@ -3126,7 +3100,7 @@ vector compute_data_vector_3x2pt_fourier_masked_any_order(
       "compute_data_vector_3x2pt_fourier_masked_any_order"
     );
 
-  if (tomo.shear_Nbin == 0)
+  if (redshift.shear_nbin == 0)
   {
     spdlog::critical(
         "\x1b[90m{}\x1b[0m: {} = 0 is invalid",
@@ -3777,8 +3751,8 @@ void IP::set_mask(std::string mask_filename, arma::Col<int>::fixed<6> order)
       2*Ntable.Ntheta*tomo.shear_Npowerspectra,
       Ntable.Ntheta*tomo.ggl_Npowerspectra,
       Ntable.Ntheta*tomo.clustering_Npowerspectra,
-      Ntable.Ntheta*tomo.clustering_Nbin,
-      Ntable.Ntheta*tomo.shear_Nbin,
+      Ntable.Ntheta*redshift.clustering_nbin,
+      Ntable.Ntheta*redshift.shear_nbin,
       like.is_cmb_bandpower  == 1 ? like.Nbp : like.Ncl 
     };
 

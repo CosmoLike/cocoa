@@ -500,11 +500,6 @@ void init_IA(
     const int IA_REDSHIFT_EVOL
   );
 
-void init_lens_sample(
-    std::string multihisto_file, 
-    const int Ntomo
-  );
-
 void init_linear_power_spectrum(
     arma::Col<double> io_log10k,
     arma::Col<double> io_z, 
@@ -524,9 +519,11 @@ void init_probes(
 void initial_setup(
   );
 
-void init_source_sample(
-    std::string multihisto_file, 
-    const int Ntomo
+void init_redshift_distributions_from_files(
+    std::string lens_multihisto_file, 
+    const int lens_ntomo,
+    std::string source_multihisto_file, 
+    const int source_ntomo
   );
 
 void init_survey(

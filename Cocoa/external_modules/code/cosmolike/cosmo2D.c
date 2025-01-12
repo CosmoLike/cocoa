@@ -110,7 +110,7 @@ double C_ks_tomo_limber_wrapper(double l, int ni, const int force_no_recompute)
 static int has_b2_galaxies()
 {
   int res = 0;
-  for (int i=0; i<tomo.clustering_Nbin; i++) 
+  for (int i=0; i<redshift.clustering_nbin; i++) 
   {
     if (gbias.b2[i])
     {
@@ -473,7 +473,7 @@ double xi_pm_tomo(
     exit(1); 
   }
   
-  if (ni < 0 || ni > tomo.shear_Nbin - 1 || nj < 0 || nj > tomo.shear_Nbin - 1)
+  if (ni < 0 || ni > redshift.shear_nbin - 1 || nj < 0 || nj > redshift.shear_nbin - 1)
   {
     log_fatal("error in selecting bin number (ni, nj) = [%d,%d]", ni, nj);
     exit(1);
@@ -686,9 +686,9 @@ double w_gammat_tomo(
     exit(1); 
   }
   if (ni < -1 || 
-      ni > tomo.clustering_Nbin - 1 || 
+      ni > redshift.clustering_nbin - 1 || 
       nj < -1 || 
-      nj > tomo.shear_Nbin - 1)
+      nj > redshift.shear_nbin - 1)
   {
     log_fatal("error in selecting bin number (ni, nj) = [%d,%d]", ni, nj);
     exit(1);
@@ -898,9 +898,9 @@ double w_gg_tomo(
     exit(1); 
   }
   if (ni < -1 || 
-      ni > tomo.clustering_Nbin - 1 || 
+      ni > redshift.clustering_nbin - 1 || 
       nj < -1 || 
-      nj > tomo.clustering_Nbin - 1)
+      nj > redshift.clustering_nbin - 1)
   {
     log_fatal("error in selecting bin number (ni, nj) = [%d,%d]", ni, nj);
     exit(1);
@@ -940,7 +940,7 @@ double w_gk_tomo(const int nt, const int ni, const int limber)
     exit(1);
   }
 
-  const int NSIZE = tomo.clustering_Nbin;
+  const int NSIZE = redshift.clustering_nbin;
   
   if (Pl == NULL || w_vec == NULL || recompute_table(numtable))
   {
@@ -1074,9 +1074,9 @@ double w_gk_tomo(const int nt, const int ni, const int limber)
     update_table(&numtable);
   }
 
-  if (ni < -1 || ni > tomo.clustering_Nbin - 1)
+  if (ni < -1 || ni > redshift.clustering_nbin - 1)
   {
-    log_fatal("error in selecting bin number ni = %d (max %d)", ni, tomo.clustering_Nbin);
+    log_fatal("error in selecting bin number ni = %d (max %d)", ni, redshift.clustering_nbin);
     exit(1); 
   } 
   if (nt < 0 || nt > Ntable.Ntheta - 1)
@@ -1117,7 +1117,7 @@ double w_ks_tomo(
     exit(1);
   }
 
-  const int NSIZE = tomo.shear_Nbin;
+  const int NSIZE = redshift.shear_nbin;
 
   if (Pl == NULL || w_vec == NULL || recompute_table(numtable))
   {
@@ -1202,7 +1202,7 @@ double w_ks_tomo(
       #pragma GCC diagnostic pop
       
       #pragma omp parallel for collapse(2)
-      for (int nz=0; nz<tomo.shear_Nbin; nz++)
+      for (int nz=0; nz<redshift.shear_nbin; nz++)
       {
         for (int l=lmin; l<limits.LMIN_tab; l++)
         {
@@ -1256,9 +1256,9 @@ double w_ks_tomo(
     log_fatal("error in selecting bin number nt = %d (max %d)", nt, Ntable.Ntheta);
     exit(1); 
   }
-  if (ni < -1 || ni > tomo.shear_Nbin - 1)
+  if (ni < -1 || ni > redshift.shear_nbin - 1)
   {
-    log_fatal("error in selecting bin number ni = %d (max %d)", ni, tomo.shear_Nbin);
+    log_fatal("error in selecting bin number ni = %d (max %d)", ni, redshift.shear_nbin);
     exit(1);
   }
   
@@ -1309,7 +1309,7 @@ double int_for_C_ss_TATT_EE_tomo_limber(double a, void* params)
   double* ar = (double*) params;
   const int n1 = (int) ar[0]; // first source bin
   const int n2 = (int) ar[1]; // second source bin
-  if (n1 < 0 || n1 > tomo.shear_Nbin - 1 || n2 < 0 || n2 > tomo.shear_Nbin - 1)
+  if (n1 < 0 || n1 > redshift.shear_nbin - 1 || n2 < 0 || n2 > redshift.shear_nbin - 1)
   {
     log_fatal("error in selecting bin number (ni, nj) = [%d,%d]", n1, n2);
     exit(1);
@@ -1358,7 +1358,7 @@ double int_for_C_ss_TATT_BB_tomo_limber(double a, void* params)
   double* ar = (double*) params;
   const int n1 = (int) ar[0]; // first source bin 
   const int n2 = (int) ar[1]; // second source bin
-  if (n1 < 0 || n1 > tomo.shear_Nbin - 1 || n2 < 0 || n2 > tomo.shear_Nbin - 1)
+  if (n1 < 0 || n1 > redshift.shear_nbin - 1 || n2 < 0 || n2 > redshift.shear_nbin - 1)
   {
     log_fatal("error in selecting bin number (ni, nj) = [%d,%d]", n1, n2);
     exit(1);
@@ -1396,7 +1396,7 @@ double C_ss_TATT_EE_tomo_limber_nointerp(
 {
   static gsl_integration_glfixed_table* w = 0;
 
-  if(ni < -1 || ni > tomo.shear_Nbin -1 || nj < -1 || nj > tomo.shear_Nbin -1)
+  if(ni < -1 || ni > redshift.shear_nbin -1 || nj < -1 || nj > redshift.shear_nbin -1)
   {
     log_fatal("invalid bin input (ni, nj) = (%d, %d)", ni, nj);
     exit(1);
@@ -1436,7 +1436,7 @@ double C_ss_TATT_BB_tomo_limber_nointerp(
 {
   static gsl_integration_glfixed_table* w = 0;
 
-  if(ni < -1 || ni > tomo.shear_Nbin -1 || nj < -1 || nj > tomo.shear_Nbin -1)
+  if(ni < -1 || ni > redshift.shear_nbin -1 || nj < -1 || nj > redshift.shear_nbin -1)
   {
     log_fatal("invalid bin input (ni, nj) = (%d, %d)", ni, nj);
     exit(1);
@@ -1586,7 +1586,7 @@ double C_ss_TATT_EE_tomo_limber(
     }
   }
 
-  if (ni < 0 || ni > tomo.shear_Nbin - 1 || nj < 0 || nj > tomo.shear_Nbin - 1)
+  if (ni < 0 || ni > redshift.shear_nbin - 1 || nj < 0 || nj > redshift.shear_nbin - 1)
   {
     log_fatal("error in selecting bin number (ni, nj) = [%d,%d]", ni, nj);
     exit(1);
@@ -1740,7 +1740,7 @@ const int force_no_recompute)
     }
   }
 
-  if (ni < 0 || ni > tomo.shear_Nbin - 1 || nj < 0 || nj > tomo.shear_Nbin - 1)
+  if (ni < 0 || ni > redshift.shear_nbin - 1 || nj < 0 || nj > redshift.shear_nbin - 1)
   {
     log_fatal("error in selecting bin number (ni, nj) = [%d,%d]", ni, nj);
     exit(1);
@@ -1799,7 +1799,7 @@ double int_for_C_ss_tomo_limber(double a, void* params)
 
   const int n1 = (int) ar[0]; // first source bin 
   const int n2 = (int) ar[1]; // second source bin 
-  if (n1 < 0 || n1 > tomo.shear_Nbin - 1 || n2 < 0 || n2 > tomo.shear_Nbin - 1)
+  if (n1 < 0 || n1 > redshift.shear_nbin - 1 || n2 < 0 || n2 > redshift.shear_nbin - 1)
   {
     log_fatal("error in selecting bin number (ni, nj) = [%d,%d]", n1, n2);
     exit(1);
@@ -1853,9 +1853,9 @@ double C_ss_tomo_limber_nointerp(
   }
 
   if (ni < -1 || 
-      ni > tomo.shear_Nbin -1 || 
+      ni > redshift.shear_nbin -1 || 
       nj < -1 || 
-      nj > tomo.shear_Nbin -1)
+      nj > redshift.shear_nbin -1)
   {
     log_fatal("invalid bin input (ni, nj) = (%d, %d)", ni, nj);
     exit(1);
@@ -1956,9 +1956,9 @@ double C_ss_tomo_limber(
   }
 
   if (ni < -1 || 
-      ni > tomo.shear_Nbin -1 || 
+      ni > redshift.shear_nbin -1 || 
       nj < -1 || 
-      nj > tomo.shear_Nbin -1)
+      nj > redshift.shear_nbin -1)
   {
     log_fatal("invalid bin input (ni, nj) = (%d, %d)", ni, nj);
     exit(1);
@@ -1999,7 +1999,7 @@ double int_for_C_gs_TATT_tomo_limber(double a, void* params)
   double* ar = (double*) params;
   const int nl = (int) ar[0];
   const int ns = (int) ar[1];
-  if (nl < 0 || nl > tomo.clustering_Nbin - 1 || ns < 0 || ns > tomo.shear_Nbin - 1)
+  if (nl < 0 || nl > redshift.clustering_nbin - 1 || ns < 0 || ns > redshift.shear_nbin - 1)
   {
     log_fatal("error in selecting bin number (nl, ns) = [%d,%d]", nl, ns);
     exit(1);
@@ -2051,9 +2051,9 @@ double int_for_C_gs_tomo_limber(double a, void* params)
   const int nl = (int) ar[0];
   const int ns = (int) ar[1];
   if (nl < 0 || 
-      nl > tomo.clustering_Nbin - 1 || 
+      nl > redshift.clustering_nbin - 1 || 
       ns < 0 || 
-      ns > tomo.shear_Nbin - 1)
+      ns > redshift.shear_nbin - 1)
   {
     log_fatal("error in selecting bin number (nl, ns) = [%d,%d]", nl, ns);
     exit(1);
@@ -2137,9 +2137,9 @@ double int_for_C_gs_tomo_limber_withb2(double a, void* params)
   const int nl = (int) ar[0];
   const int ns = (int) ar[1];
   if (nl < 0 || 
-      nl > tomo.clustering_Nbin - 1 || 
+      nl > redshift.clustering_nbin - 1 || 
       ns < 0 || 
-      ns > tomo.shear_Nbin - 1)
+      ns > redshift.shear_nbin - 1)
   {
     log_fatal("error in selecting bin number (nl, ns) = [%d,%d]", nl, ns);
     exit(1);
@@ -2232,9 +2232,9 @@ double C_gs_tomo_limber_nointerp(
   }
 
   if (nl < -1 || 
-      nl > tomo.clustering_Nbin -1 || 
+      nl > redshift.clustering_nbin -1 || 
       ns < -1 || 
-      ns > tomo.shear_Nbin -1)
+      ns > redshift.shear_nbin -1)
   {
     log_fatal("invalid bin input (ni, nj) = (%d, %d)", nl, ns);
     exit(1);
@@ -2327,8 +2327,6 @@ double C_gs_tomo_limber_nointerp(
 
   return res;
 }
-
-// ---------------------------------------------------------------------------
 
 double C_gs_tomo_limber(
     double l, 
@@ -2626,9 +2624,9 @@ double C_gg_tomo_limber_nointerp(
   }
 
   if (ni < 0 || 
-      ni > tomo.clustering_Nbin - 1 || 
+      ni > redshift.clustering_nbin - 1 || 
       nj < 0 || 
-      nj > tomo.clustering_Nbin - 1)
+      nj > redshift.clustering_nbin - 1)
   {
     log_fatal("error in selecting bin number (ni, nj) = [%d,%d]", ni, nj);
     exit(1);
@@ -2708,7 +2706,7 @@ double C_gg_tomo_limber(
     if (table == NULL || recompute_table(numtable))
     {
       nell   = Ntable.N_ell;
-      NSIZE  = tomo.clustering_Nbin;
+      NSIZE  = redshift.clustering_nbin;
       lnlmin = log(fmax(limits.LMIN_tab, 1.0));
       lnlmax = log(fmax(limits.LMAX, limits.LMAX_hankel) + 1);
       dlnl   = (lnlmax - lnlmin) / ((double) nell - 1.0);
@@ -2757,9 +2755,9 @@ double C_gg_tomo_limber(
   }
   
   if (ni < 0 || 
-      ni > tomo.clustering_Nbin - 1 || 
+      ni > redshift.clustering_nbin - 1 || 
       nj < 0 || 
-      nj > tomo.clustering_Nbin - 1)
+      nj > redshift.clustering_nbin - 1)
   {
     log_fatal("error in selecting bin number (ni, nj) = [%d,%d]", ni, nj);
     exit(1);
@@ -2808,7 +2806,7 @@ double int_for_C_gk_tomo_limber(double a, void* params)
   double* ar = (double*) params;
 
   const int nl = (int) ar[0];
-  if (nl < 0 || nl > tomo.clustering_Nbin - 1)
+  if (nl < 0 || nl > redshift.clustering_nbin - 1)
   {
     log_fatal("error in selecting bin number ni = %d", nl);
     exit(1);
@@ -2881,7 +2879,7 @@ double int_for_C_gk_tomo_limber_withb2(double a, void* params)
   double* ar = (double*) params;
 
   const int nl = (int) ar[0];
-  if (nl < 0 || nl > tomo.clustering_Nbin - 1)
+  if (nl < 0 || nl > redshift.clustering_nbin - 1)
   {
     log_fatal("error in selecting bin number ni = %d", nl);
     exit(1);
@@ -2963,7 +2961,7 @@ double C_gk_tomo_limber_nointerp(
     update_table(&numtable);
   }
 
-  if (ni < 0 || ni > tomo.clustering_Nbin - 1)
+  if (ni < 0 || ni > redshift.clustering_nbin - 1)
   {
     log_fatal("error in selecting bin number ni = %d", ni);
     exit(1);
@@ -3036,7 +3034,7 @@ double C_gk_tomo_limber(
   { // Cocoa: nell = 10^5 on real funcs, so recompute funcs are expensive
     if (table == NULL || recompute_table(numtable))
     {
-      NSIZE  = tomo.clustering_Nbin;
+      NSIZE  = redshift.clustering_nbin;
       nell   = Ntable.N_ell;
       lnlmin = log(fmax(limits.LMIN_tab, 1.0));
       lnlmax = log(fmax(limits.LMAX, limits.LMAX_hankel) + 1);
@@ -3082,7 +3080,7 @@ double C_gk_tomo_limber(
     }
   }
 
-  if (ni < -1 || ni > tomo.clustering_Nbin - 1)
+  if (ni < -1 || ni > redshift.clustering_nbin - 1)
   {
     log_fatal("error in selecting bin number ni = %d", ni);
     exit(1);
@@ -3124,7 +3122,7 @@ double int_for_C_ks_tomo_limber(double a, void* params)
 
   double* ar = (double*) params;
   const int ni = (int) ar[0];
-  if (ni < -1 || ni > tomo.shear_Nbin - 1)
+  if (ni < -1 || ni > redshift.shear_nbin - 1)
   {
     log_fatal("error in selecting bin number ni = %d", ni);
     exit(1);
@@ -3174,7 +3172,7 @@ double C_ks_tomo_limber_nointerp(
     update_table(&numtable);
   }
 
-  if (ni < -1 || ni > tomo.shear_Nbin - 1)
+  if (ni < -1 || ni > redshift.shear_nbin - 1)
   {
     log_fatal("error in selecting bin number ni = %d", ni);
     exit(1);
@@ -3219,7 +3217,7 @@ double C_ks_tomo_limber(
   static double* sig = NULL;
   static int osc[MAX_SIZE_ARRAYS*MAX_SIZE_ARRAYS];
 
-  const int NSIZE = tomo.shear_Nbin;
+  const int NSIZE = redshift.shear_nbin;
   const int nell = Ntable.N_ell;
   const double lnlmin = log(fmax(limits.LMIN_tab, 1.0));
   const double lnlmax = log(fmax(limits.LMAX, limits.LMAX_hankel) + 1);
@@ -3297,9 +3295,9 @@ double C_ks_tomo_limber(
     } 
   }
 
-  if (ni < 0 || ni > tomo.shear_Nbin - 1)
+  if (ni < 0 || ni > redshift.shear_nbin - 1)
   {
-    log_fatal("error in selecting bin number ni = %d (max %d)", ni, tomo.shear_Nbin);
+    log_fatal("error in selecting bin number ni = %d (max %d)", ni, redshift.shear_nbin);
     exit(1);
   }
 
@@ -3488,7 +3486,7 @@ double int_for_C_gy_tomo_limber(double a, void* params)
   
   double* ar = (double*) params;
   const int nl = (int) ar[0];
-  if (nl < 0 || nl > tomo.clustering_Nbin - 1)
+  if (nl < 0 || nl > redshift.clustering_nbin - 1)
   {
     log_fatal("error in selecting bin number ni = %d", nl);
     exit(1);
@@ -3622,7 +3620,7 @@ double C_gy_tomo_limber(double l, int ni, const int force_no_recompute)
     
     if (table == NULL || recompute_table(numtable))
     {
-      NSIZE  = tomo.clustering_Nbin;
+      NSIZE  = redshift.clustering_nbin;
       nell   = Ntable.N_ell;
       lnlmin = log(fmax(limits.LMIN_tab, 1.0));
       lnlmax = log(fmax(limits.LMAX, limits.LMAX_hankel) + 1);
@@ -3705,7 +3703,7 @@ double int_for_C_ys_tomo_limber(double a, void* params)
 
   double* ar = (double*) params;
   const int ni = (int) ar[0];
-  if (ni < 0 || ni > tomo.shear_Nbin - 1)
+  if (ni < 0 || ni > redshift.shear_nbin - 1)
   {
     log_fatal("error in selecting bin number ni = %d", ni);
     exit(1);
@@ -3796,7 +3794,7 @@ double C_ys_tomo_limber(double l, int ni, const int force_no_recompute)
     
     if (table == NULL || sig == NULL || recompute_table(numtable))
     {
-      NSIZE = tomo.shear_Nbin;
+      NSIZE = redshift.shear_nbin;
       nell = Ntable.N_ell;
       lnlmin = log(fmax(limits.LMIN_tab, 1.0));
       lnlmax = log(fmax(limits.LMAX, limits.LMAX_hankel) + 1);
@@ -3878,9 +3876,9 @@ double C_ys_tomo_limber(double l, int ni, const int force_no_recompute)
     }
   }
 
-  if (ni < 0 || ni > tomo.shear_Nbin - 1)
+  if (ni < 0 || ni > redshift.shear_nbin - 1)
   {
-    log_fatal("error in selecting bin number ni = %d (max %d)", ni, tomo.shear_Nbin);
+    log_fatal("error in selecting bin number ni = %d (max %d)", ni, redshift.shear_nbin);
     exit(1);
   }
 
@@ -4212,7 +4210,7 @@ double C_yy_limber(double l, const int force_no_recompute)
 void f_chi_for_Psi_cl(double *const chi, int Nchi, double *const f_chi, const int ni,
 const double zmin, const double zmax)
 { // Integrand for galaxy density
-  if (ni < -1 || ni > tomo.clustering_Nbin - 1)
+  if (ni < -1 || ni > redshift.clustering_nbin - 1)
   {
     log_fatal("error in selecting bin number ni = %d", ni);
     exit(1);
@@ -4235,7 +4233,7 @@ const double zmin, const double zmax)
 void f_chi_for_Psi_cl_RSD(double *const chi, int Nchi, double *const f_chi, const int ni,
 const double zmin, const double zmax)
 { // Integrand for galaxy density RSD
-  if (ni < -1 || ni > tomo.clustering_Nbin - 1)
+  if (ni < -1 || ni > redshift.clustering_nbin - 1)
   {
     log_fatal("error in selecting bin number ni = %d", ni);
     exit(1);
@@ -4261,7 +4259,7 @@ const double zmin, const double zmax)
 void f_chi_for_Psi_cl_Mag(double *const chi, int Nchi, double *const f_chi, const int ni,
 const double zmax)
 { // Integrand for lensing magnification of galaxy density
-  if (ni < -1 || ni > tomo.clustering_Nbin - 1)
+  if (ni < -1 || ni > redshift.clustering_nbin - 1)
   {
     log_fatal("error in selecting bin number ni = %d", ni);
     exit(1);
@@ -4286,7 +4284,7 @@ const double zmax)
 
 void C_cl_tomo(int L, const int ni, const int nj, double *const Cl, double dev, double tol)
 {
-  if (ni < -1 || ni > tomo.clustering_Nbin - 1 || nj < -1 || nj > tomo.clustering_Nbin - 1)
+  if (ni < -1 || ni > redshift.clustering_nbin - 1 || nj < -1 || nj > redshift.clustering_nbin - 1)
   {
     log_fatal("error in selecting bin number (ni, nj) = [%d,%d]", ni, nj);
     exit(1);
@@ -4480,7 +4478,7 @@ void C_cl_tomo(int L, const int ni, const int nj, double *const Cl, double dev, 
 void f_chi_for_Psi_sh(double *const chi, int Nchi, double *const fchi, const int nj,
 const double zmax)
 {
-  if (nj < -1 || nj > tomo.shear_Nbin - 1)
+  if (nj < -1 || nj > redshift.shear_nbin - 1)
   {
     log_fatal("error in selecting bin number nj = %d", nj);
     exit(1);
@@ -4503,7 +4501,7 @@ const double zmax)
 void f_chi_for_Psi_sh_IA(double *const chi, int Nchi, double *const fchi, const int nj,
 const double zmin, const double zmax)
 { // TODO: ADD ALL IA POSSIBILITIES
-  if (nj < -1 || nj > tomo.shear_Nbin - 1)
+  if (nj < -1 || nj > redshift.shear_nbin - 1)
   {
     log_fatal("error in selecting bin number nj = %d", nj);
     exit(1);
@@ -4533,7 +4531,7 @@ const double zmin, const double zmax)
 
 void C_gl_tomo(int L, int nl, int ns, double *const Cl, double dev, double tolerance)
 {
-  if (nl < -1 || nl > tomo.clustering_Nbin - 1 || ns < -1 || ns > tomo.clustering_Nbin - 1)
+  if (nl < -1 || nl > redshift.clustering_nbin - 1 || ns < -1 || ns > redshift.clustering_nbin - 1)
   {
     log_fatal("error in selecting bin number (ni, nj) = [%d,%d]", nl, ns);
     exit(1);

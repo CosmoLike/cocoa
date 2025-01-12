@@ -43,7 +43,7 @@ namespace cosmolike_interface
 static int has_b2_galaxies()
 {
   int res = 0;
-  for (int i=0; i<tomo.clustering_Nbin; i++) 
+  for (int i=0; i<redshift.clustering_nbin; i++) 
   {
     if (gbias.b2[i])
     {
@@ -104,7 +104,7 @@ vector get_binning_real_space()
 
 py::tuple xi_pm_tomo_cpp()
 {
-  if (tomo.shear_Nbin == 0)
+  if (redshift.shear_nbin == 0)
   {
     spdlog::critical(
         "\x1b[90m{}\x1b[0m: {} = 0 is invalid",
@@ -146,7 +146,7 @@ py::tuple xi_pm_tomo_cpp()
 
 vector w_gammat_tomo_cpp()
 {
-  if (tomo.shear_Nbin == 0)
+  if (redshift.shear_nbin == 0)
   {
     spdlog::critical(
         "\x1b[90m{}\x1b[0m: {} = 0 is invalid",
@@ -156,7 +156,7 @@ vector w_gammat_tomo_cpp()
     exit(1);
   }
 
-  if (tomo.clustering_Nbin == 0)
+  if (redshift.clustering_nbin == 0)
   {
     spdlog::critical(
         "\x1b[90m{}\x1b[0m: {} = 0 is invalid",
@@ -195,7 +195,7 @@ vector w_gammat_tomo_cpp()
 
 vector w_gg_tomo_cpp()
 {
-  if (tomo.clustering_Nbin == 0)
+  if (redshift.clustering_nbin == 0)
   {
     spdlog::critical(
         "\x1b[90m{}\x1b[0m: {} = 0 is invalid",
@@ -215,7 +215,7 @@ vector w_gg_tomo_cpp()
     exit(1);
   }
 
-  vector result(Ntable.Ntheta*tomo.clustering_Nbin, arma::fill::none);
+  vector result(Ntable.Ntheta*redshift.clustering_nbin, arma::fill::none);
 
   for (int nz=0; nz<tomo.clustering_Npowerspectra; nz++)
   {
@@ -234,7 +234,7 @@ vector w_gg_tomo_cpp()
 
 vector w_gk_tomo_cpp()
 {
-  if (tomo.clustering_Nbin == 0)
+  if (redshift.clustering_nbin == 0)
   {
     spdlog::critical(
         "\x1b[90m{}\x1b[0m: {} = 0 is invalid",
@@ -254,9 +254,9 @@ vector w_gk_tomo_cpp()
     exit(1);
   }
 
-  vector result(Ntable.Ntheta*tomo.clustering_Nbin, arma::fill::none);
+  vector result(Ntable.Ntheta*redshift.clustering_nbin, arma::fill::none);
 
-  for (int nz=0; nz<tomo.clustering_Nbin; nz++)
+  for (int nz=0; nz<redshift.clustering_nbin; nz++)
   {
     for (int i=0; i<Ntable.Ntheta; i++)
     {
@@ -273,7 +273,7 @@ vector w_gk_tomo_cpp()
 
 vector w_ks_tomo_cpp()
 {
-  if (tomo.shear_Nbin == 0)
+  if (redshift.shear_nbin == 0)
   {
     spdlog::critical(
         "\x1b[90m{}\x1b[0m: {} = 0 is invalid",
@@ -292,9 +292,9 @@ vector w_ks_tomo_cpp()
     exit(1);
   }
 
-  vector result(Ntable.Ntheta*tomo.shear_Nbin, arma::fill::none);
+  vector result(Ntable.Ntheta*redshift.shear_nbin, arma::fill::none);
 
-  for (int nz=0; nz<tomo.clustering_Nbin; nz++)
+  for (int nz=0; nz<redshift.clustering_nbin; nz++)
   {
     for (int i=0; i<Ntable.Ntheta; i++)
     {
@@ -507,18 +507,18 @@ matrix C_gg_tomo_limber_cpp(const vector l)
     exit(1);
   }
 
-  matrix result(l.n_elem, tomo.clustering_Nbin);
+  matrix result(l.n_elem, redshift.clustering_nbin);
 
   #pragma GCC diagnostic push
   #pragma GCC diagnostic ignored "-Wunused-variable"
-  for (int nz=0; nz<tomo.clustering_Nbin; nz++)
+  for (int nz=0; nz<redshift.clustering_nbin; nz++)
   { // init static variables
     double tmp = C_gg_tomo_limber_nointerp(l(0), nz, nz, 0, 1);
   }
   #pragma GCC diagnostic pop
 
   #pragma omp parallel for collapse(2)
-  for (int nz=0; nz<tomo.clustering_Nbin; nz++)
+  for (int nz=0; nz<redshift.clustering_nbin; nz++)
   {
     for (int i=0; i<static_cast<int>(l.n_elem); i++)
     {
@@ -539,7 +539,7 @@ matrix C_gg_tomo_cpp(const vector l)
 
   matrix result = C_gg_tomo_limber_cpp(l);
 
-  for (int nz=0; nz<tomo.clustering_Nbin; nz++)
+  for (int nz=0; nz<redshift.clustering_nbin; nz++)
   {
     arma::uvec idxs = arma::find(l < limits.LMAX_NOLIMBER);
 
@@ -580,18 +580,18 @@ matrix C_gk_tomo_limber_cpp(const vector l)
     exit(1);
   }
 
-  matrix result(l.n_elem, tomo.clustering_Nbin);
+  matrix result(l.n_elem, redshift.clustering_nbin);
 
   #pragma GCC diagnostic push
   #pragma GCC diagnostic ignored "-Wunused-variable"
-  for (int nz=0; nz<tomo.clustering_Nbin; nz++)
+  for (int nz=0; nz<redshift.clustering_nbin; nz++)
   { // init static variables
     double trash = C_gk_tomo_limber_nointerp(l(0), nz, 0, 1);
   }
   #pragma GCC diagnostic pop
 
   #pragma omp parallel for collapse(2)
-  for (int nz=0; nz<tomo.clustering_Nbin; nz++)
+  for (int nz=0; nz<redshift.clustering_nbin; nz++)
   {
     for (int i=0; i<static_cast<int>(l.n_elem); i++)
     {
@@ -619,18 +619,18 @@ matrix C_ks_tomo_limber_cpp(const vector l)
     exit(1);
   }
 
-  matrix result(l.n_elem, tomo.shear_Nbin);
+  matrix result(l.n_elem, redshift.shear_nbin);
 
   #pragma GCC diagnostic push
   #pragma GCC diagnostic ignored "-Wunused-variable"
-  for (int nz=0; nz<tomo.shear_Nbin; nz++)
+  for (int nz=0; nz<redshift.shear_nbin; nz++)
   { // init static variables
     double tmp = C_ks_tomo_limber_nointerp(l(0), nz, 0, 1);
   }
   #pragma GCC diagnostic pop
 
   #pragma omp parallel for collapse(2)
-  for (int nz=0; nz<tomo.shear_Nbin; nz++)
+  for (int nz=0; nz<redshift.shear_nbin; nz++)
   {
     for (int i=0; i<static_cast<int>(l.n_elem); i++)
     {
@@ -658,18 +658,18 @@ matrix C_gy_tomo_limber_cpp(const vector l)
     exit(1);
   }
 
-  matrix result(l.n_elem, tomo.clustering_Nbin);
+  matrix result(l.n_elem, redshift.clustering_nbin);
 
   #pragma GCC diagnostic push
   #pragma GCC diagnostic ignored "-Wunused-variable"
-  for (int nz=0; nz<tomo.clustering_Nbin; nz++)
+  for (int nz=0; nz<redshift.clustering_nbin; nz++)
   { // init static variables
     double tmp = C_gy_tomo_limber_nointerp(l(0), nz, 0, 1);
   }
   #pragma GCC diagnostic pop
 
   #pragma omp parallel for collapse(2)
-  for (int nz=0; nz<tomo.clustering_Nbin; nz++)
+  for (int nz=0; nz<redshift.clustering_nbin; nz++)
   {
     for (int i=0; i<static_cast<int>(l.n_elem); i++)
     {
@@ -698,18 +698,18 @@ matrix C_ys_tomo_limber_cpp(const vector l)
     exit(1);
   }
 
-  matrix result(l.n_elem, tomo.shear_Nbin);
+  matrix result(l.n_elem, redshift.shear_nbin);
 
   #pragma GCC diagnostic push
   #pragma GCC diagnostic ignored "-Wunused-variable"
-  for (int nz=0; nz<tomo.shear_Nbin; nz++)
+  for (int nz=0; nz<redshift.shear_nbin; nz++)
   { // init static variables
     double tmp = C_ys_tomo_limber_nointerp(l(0), nz, 0, 1);
   }
   #pragma GCC diagnostic pop
 
   #pragma omp parallel for collapse(2)
-  for (int nz=0; nz<tomo.shear_Nbin; nz++)
+  for (int nz=0; nz<redshift.shear_nbin; nz++)
   {
     for (int i=0; i<l.n_elem; i++)
     {
@@ -1149,7 +1149,7 @@ cube int_for_C_gg_tomo_limber_cpp(const vector a, const vector l)
     exit(1);
   }
 
-  const int NSIZE = tomo.clustering_Nbin;
+  const int NSIZE = redshift.clustering_nbin;
   cube result(a.n_elem, l.n_elem, NSIZE);
 
   #pragma GCC diagnostic push
@@ -1236,11 +1236,11 @@ cube int_for_C_gk_tomo_limber_cpp(
     exit(1);
   }
 
-  cube result(a.n_elem, l.n_elem, tomo.clustering_Nbin);
+  cube result(a.n_elem, l.n_elem, redshift.clustering_nbin);
 
   #pragma GCC diagnostic push
   #pragma GCC diagnostic ignored "-Wunused-variable"
-  for (int nz=0; nz<tomo.clustering_Nbin; nz++)
+  for (int nz=0; nz<redshift.clustering_nbin; nz++)
   { // init static variables
     double tmp = int_for_C_gk_tomo_limber_cpp(a(0), l(0), nz);
   }
@@ -1249,7 +1249,7 @@ cube int_for_C_gk_tomo_limber_cpp(
   if (has_b2_galaxies())
   {
     #pragma omp parallel for collapse(3)
-    for (int nz=0; nz<tomo.clustering_Nbin; nz++)
+    for (int nz=0; nz<redshift.clustering_nbin; nz++)
     {
       for (int i=0; i<l.n_elem; i++)
       {
@@ -1264,7 +1264,7 @@ cube int_for_C_gk_tomo_limber_cpp(
   else
   {
     #pragma omp parallel for collapse(3)
-    for (int nz=0; nz<tomo.clustering_Nbin; nz++)
+    for (int nz=0; nz<redshift.clustering_nbin; nz++)
     {
       for (int i=0; i<l.n_elem; i++)
       {
@@ -1319,11 +1319,11 @@ cube int_for_C_gy_tomo_limber_cpp(
     exit(1);
   }
 
-  cube result(a.n_elem, l.n_elem, tomo.clustering_Nbin);
+  cube result(a.n_elem, l.n_elem, redshift.clustering_nbin);
 
   #pragma GCC diagnostic push
   #pragma GCC diagnostic ignored "-Wunused-variable"
-  for (int nz=0; nz<tomo.clustering_Nbin; nz++)
+  for (int nz=0; nz<redshift.clustering_nbin; nz++)
   { // init static variables
     double tmp = int_for_C_gy_tomo_limber_cpp(a(0), l(0), nz);
   }
@@ -1337,7 +1337,7 @@ cube int_for_C_gy_tomo_limber_cpp(
   else
   {
     #pragma omp parallel for collapse(3)
-    for (int nz=0; nz<tomo.clustering_Nbin; nz++)
+    for (int nz=0; nz<redshift.clustering_nbin; nz++)
     {
       for (int i=0; i<l.n_elem; i++)
       {
@@ -1395,18 +1395,18 @@ cube int_for_C_ks_tomo_limber_cpp(
     exit(1);
   }
 
-  cube result(a.n_elem, l.n_elem, tomo.shear_Nbin);
+  cube result(a.n_elem, l.n_elem, redshift.shear_nbin);
 
   #pragma GCC diagnostic push
   #pragma GCC diagnostic ignored "-Wunused-variable"
-  for (int nz=0; nz<tomo.shear_Nbin; nz++)
+  for (int nz=0; nz<redshift.shear_nbin; nz++)
   { // init static variables
     double tmp = int_for_C_ks_tomo_limber_cpp(a(0), l(0), nz);
   }
   #pragma GCC diagnostic pop
 
   #pragma omp parallel for collapse(3)
-  for (int nz=0; nz<tomo.shear_Nbin; nz++)
+  for (int nz=0; nz<redshift.shear_nbin; nz++)
   {
     for (int i=0; i<l.n_elem; i++)
     {
@@ -1462,18 +1462,18 @@ cube int_for_C_ys_tomo_limber_cpp(
     exit(1);
   }
 
-  cube result(a.n_elem, l.n_elem, tomo.shear_Nbin);
+  cube result(a.n_elem, l.n_elem, redshift.shear_nbin);
 
   #pragma GCC diagnostic push
   #pragma GCC diagnostic ignored "-Wunused-variable"
-  for (int nz=0; nz<tomo.shear_Nbin; nz++)
+  for (int nz=0; nz<redshift.shear_nbin; nz++)
   { // init static variables
     double tmp = int_for_C_ys_tomo_limber_cpp(a(0), l(0), nz);
   }
   #pragma GCC diagnostic pop
 
   #pragma omp parallel for collapse(3)
-  for (int nz=0; nz<tomo.shear_Nbin; nz++)
+  for (int nz=0; nz<redshift.shear_nbin; nz++)
   {
     for (int i=0; i<l.n_elem; i++)
     {
