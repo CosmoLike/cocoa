@@ -657,14 +657,20 @@ void update_redshift(redshiftpara* N)
     N->clustering_zdist_zmax[i] = redshift.clustering_zdist_zmax[i];
   }
 
+  if (redshift.clustering_zdist_table == NULL || 
+      redshift.shear_zdist_table == NULL)
   {
-    const int nzbins = redshift.clustering_nzbins;
-    const int ntomo  = redshift.clustering_nbin;
+    log_fatal("error: redshift struct not set");
+    exit(1);
+  }
 
+  {
+    const int ntomo  = redshift.clustering_nbin;
+    const int nzbins = redshift.clustering_nzbins;
+    
     if (N->clustering_zdist_table != NULL) free(N->clustering_zdist_table);
     N->clustering_zdist_table = (double**) malloc2d(ntomo + 1, nzbins);
 
-    #pragma omp parallel for
     for (int i=0; i<ntomo+1; i++)
     {
       for (int k=0; k<nzbins; k++) 
@@ -673,6 +679,7 @@ void update_redshift(redshiftpara* N)
       }
     }
   }
+/*
   {
     const int nzbins = redshift.shear_nzbins;
     const int ntomo  = redshift.shear_nbin;
@@ -689,6 +696,7 @@ void update_redshift(redshiftpara* N)
       }
     }
   }
+*/
 }
 
 // ---------------------------------------------------------------------------

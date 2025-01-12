@@ -348,6 +348,13 @@ int recompute_table(Ntab N)
 
 int recompute_redshift(redshiftpara N)
 {
+  if (redshift.clustering_zdist_table == NULL || 
+      redshift.shear_zdist_table == NULL)
+  {
+    log_fatal("error: redshift struct not set");
+    exit(1);
+  }
+
   if ((N.shear_nbin != redshift.shear_nbin) ||
       (N.shear_nzbins != redshift.shear_nzbins) ||
       fdiff(N.shear_zdist_zmin_all, redshift.shear_zdist_zmin_all) ||
@@ -372,32 +379,29 @@ int recompute_redshift(redshiftpara N)
 
   }
 
-  if ((N.clustering_zdist_table != redshift.clustering_zdist_table) ||
-      (N.shear_zdist_table != redshift.shear_zdist_table))
-  {
-    return 1;
-  }
-
-  if (redshift.clustering_zdist_table != NULL)
+  if (N.clustering_zdist_table != NULL)
   {
     for (int k=0; k<redshift.clustering_nzbins; k++) 
     { 
-      for (int i=0; i<redshift.clustering_nbin+2; i++) 
+      for (int i=0; i<redshift.clustering_nbin+1; i++) 
       {
-        if (fdiff(N.clustering_zdist_table[i][k], 
-                  redshift.clustering_zdist_table[i][k]))
+        if (fdiff(N.clustering_zdist_table[i][k], redshift.clustering_zdist_table[i][k]))
         {
           return 1;
         }
       }
     }
   }
-  
-  if (redshift.clustering_zdist_table != NULL)
+  else
+  {
+    return 1;
+  }
+/*  
+  if (N.shear_zdist_table != NULL)
   {
     for (int k=0; k<redshift.shear_nzbins; k++) 
     { 
-      for (int i=0; i<redshift.shear_nbin+2; i++) 
+      for (int i=0; i<redshift.shear_nbin+1; i++) 
       {
         if (fdiff(N.shear_zdist_table[i][k], redshift.shear_zdist_table[i][k]))
         {
@@ -406,6 +410,12 @@ int recompute_redshift(redshiftpara N)
       }
     }
   }
+  else
+  {
+    return 1;
+  }
+  */
+  
   return 0;
 }
 

@@ -433,6 +433,8 @@ void update_ynuisance(ynuisancepara* N);
 
 void update_table(Ntab* N);
 
+void update_redshift(redshiftpara* N);
+
 #ifdef __cplusplus
 }
 #endif

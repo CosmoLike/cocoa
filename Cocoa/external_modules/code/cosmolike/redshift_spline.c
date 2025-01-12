@@ -626,7 +626,7 @@ double pf_histo_n(double z, const int ni)
       (z < redshift.clustering_zdist_zmax_all)) 
   {
     
-    const int ntomo = redshift.clustering_nbin;                 // alias
+    const int ntomo = redshift.clustering_nbin;             // alias
     const int nzbins = redshift.clustering_nzbins;          // alias
     double** tab = redshift.clustering_zdist_table;         // alias
     double* z_v = redshift.clustering_zdist_table[ntomo];   // alias
@@ -860,10 +860,13 @@ double int_for_g_tomo(double aprime, void* params)
     f_K(chi_prime) / (aprime * aprime);
 }
 
+// COCOA: g_tomo is called inside integrals (kernel)
+// COCOA: So the recompute functions are extremely expensive
 double g_tomo(double ainput, int ni) // for tomography bin ni 
 {  
   static nuisancepara N;
   static cosmopara C;
+  static redshiftpara P;
   static Ntab numtable;
   static double** table = NULL;
 
@@ -878,7 +881,9 @@ double g_tomo(double ainput, int ni) // for tomography bin ni
   }
 
   if (recompute_zphot_shear(N) || 
-      recompute_cosmo3D(C) || 
+      recompute_cosmo3D(C) ||
+      recompute_redshift(P) || // COCOA: extremely expensive, but it allows
+                               // COCOA: users to update to n(z) on Jupyter 
       recompute_table(numtable)) 
   {
     #pragma GCC diagnostic push
@@ -913,6 +918,7 @@ double g_tomo(double ainput, int ni) // for tomography bin ni
     update_cosmopara(&C);
     update_nuisance(&N);
     update_table(&numtable);
+    update_redshift(&P);
   }
 
   if (ni < 0 || ni > redshift.shear_nbin - 1)
