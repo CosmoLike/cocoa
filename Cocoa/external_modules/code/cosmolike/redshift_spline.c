@@ -924,10 +924,6 @@ double g_tomo(double ainput, const int ni)
     interpol(table[ni], Ntable.N_a, amin, amax, da, ainput, 1.0, 1.0);
 }
 
-// -----------------------------------------------------------------------------
-// -----------------------------------------------------------------------------
-// -----------------------------------------------------------------------------
-
 double int_for_g2_tomo(double aprime, void* params) 
 { // \int n(z') W(z,z')^2 routines for source clustering
   if (!(aprime>0) || !(aprime<1))
