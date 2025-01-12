@@ -414,16 +414,23 @@ double zdistr_histo_n(double z, const int ni)
 
 double zdistr_photoz(double zz, const int nj) 
 {
-  static redshiftparams P;
+  static double cache_redshift_params;
   static double** table = NULL;
   static gsl_spline* photoz_splines[MAX_SIZE_ARRAYS+1];
   
-  if (table == NULL || recompute_redshift(P)) 
-  {  
+  if (table == NULL || 
+      fdiff(cache_redshift_params, redshift.random))
+  { 
+    if (table == NULL)
+    {
+      for (int i=0; i<MAX_SIZE_ARRAYS+1; i++) 
+        photoz_splines[i] = NULL;
+    }
+
     const int ntomo  = redshift.shear_nbin;
     const int nzbins = redshift.shear_nzbins;
 
-    if (table != NULL) free(table);
+    if (table != NULL)  free(table);
     table = (double**) malloc2d(ntomo + 2, nzbins);
     
     const double zmin = redshift.shear_zdist_zmin_all;
@@ -462,6 +469,7 @@ double zdistr_photoz(double zz, const int nj)
 
     for (int i=0; i<ntomo+1; i++) 
     {
+      if (photoz_splines[i] != NULL) gsl_spline_free(photoz_splines[i]);
       photoz_splines[i] = malloc_gsl_spline(nzbins);
     }
 
@@ -479,7 +487,7 @@ double zdistr_photoz(double zz, const int nj)
       }
     }
 
-    update_redshift(&P);
+    cache_redshift_params = redshift.random;
   }
   
   const int ntomo = redshift.shear_nbin;
@@ -529,12 +537,14 @@ double int_for_zmean_source(double z, void* params)
 
 double zmean_source(int ni) 
 { // mean true redshift of source galaxies in tomography bin j
-  static Ntab numtable;
-  static redshiftparams P;
+  static double cache_table_params;
+  static double cache_redshift_params;
   static double* table = NULL;
 
-  if (table == NULL || recompute_table(numtable) || recompute_redshift(P))
-  {
+  if (table == NULL || 
+      fdiff(cache_table_params, Ntable.random) ||
+      fdiff(cache_redshift_params, redshift.random))
+  {    
     if (table != NULL)  free(table);
     table = (double*) malloc1d(redshift.shear_nbin);
    
@@ -561,8 +571,8 @@ double zmean_source(int ni)
     }
 
     gsl_integration_glfixed_table_free(w);
-    update_table(&numtable);
-    update_redshift(&P);
+    cache_redshift_params = redshift.random;
+    cache_table_params = Ntable.random;
   }
 
   if (ni < 0 || ni > redshift.shear_nbin - 1)
@@ -615,13 +625,20 @@ double pf_histo_n(double z, const int ni)
 
 double pf_photoz(double zz, int nj) 
 {
-  static redshiftparams P;
+  static double cache_redshift_params;
   static double** table = NULL;
   static gsl_spline* photoz_splines[MAX_SIZE_ARRAYS+1];
 
-  if (table == NULL || recompute_redshift(P)) 
+  if (table == NULL || 
+      fdiff(cache_redshift_params, redshift.random)) 
   {  
-    const int ntomo  = redshift.clustering_nbin;          // alias
+    if (table == NULL)
+    {
+      for (int i=0; i<MAX_SIZE_ARRAYS+1; i++) 
+        photoz_splines[i] = NULL;
+    }
+
+    const int ntomo  = redshift.clustering_nbin;      // alias
     const int nzbins = redshift.clustering_nzbins;    // alias
     
     if (table != NULL) free(table);
@@ -663,6 +680,7 @@ double pf_photoz(double zz, int nj)
 
     for (int i=0; i<ntomo+1; i++) 
     {
+      if (photoz_splines[i] != NULL) gsl_spline_free(photoz_splines[i]);
       photoz_splines[i] = malloc_gsl_spline(nzbins);
     }
 
@@ -680,7 +698,7 @@ double pf_photoz(double zz, int nj)
       }
     }
 
-    update_redshift(&P);
+    cache_redshift_params = redshift.random;
   }
   
   const int ntomo  = redshift.clustering_nbin;
@@ -739,11 +757,13 @@ double norm_for_zmean(double z, void* params)
 
 double zmean(const int ni)
 { // mean true redshift of galaxies in tomography bin j
-  static Ntab numtable;
-  static redshiftparams P;
+  static double cache_table_params;
+  static double cache_redshift_params;
   static double* table = NULL;
 
-  if (table == NULL || recompute_table(numtable) || recompute_redshift(P))
+  if (table == NULL || 
+      fdiff(cache_table_params, Ntable.random) ||
+      fdiff(cache_redshift_params, redshift.random))
   {
     if (table != NULL) free(table);
     table = (double*) malloc1d(redshift.clustering_nbin+1);
@@ -777,8 +797,8 @@ double zmean(const int ni)
     }
 
     gsl_integration_glfixed_table_free(w);
-    update_table(&numtable);
-    update_redshift(&P);
+    cache_table_params = Ntable.random;
+    cache_redshift_params = redshift.random;
   }
 
   if (ni < 0 || ni > redshift.clustering_nbin - 1)
@@ -822,22 +842,25 @@ double g_tomo(double ainput, const int ni)
 {  
   static nuisancepara N;
   static cosmopara C;
-  static Ntab numtable;
-  static redshiftparams P;
+  static double cache_table_params;
+  static double cache_redshift_params;
   static double** table = NULL;
 
   const double amin = 1.0/(redshift.shear_zdist_zmax_all + 1.0);
   const double amax = 0.999999;
   const double da = (amax - amin)/((double) Ntable.N_a - 1.0);
 
-  if (table == NULL || recompute_table(numtable)) 
+  if (table == NULL || 
+      fdiff(cache_table_params, Ntable.random)) 
   {
     if (table != NULL) free(table);
     table = (double**) malloc2d(redshift.shear_nbin, Ntable.N_a);
   }
 
-  if (recompute_zphot_shear(N) || recompute_cosmo3D(C) ||
-      recompute_table(numtable) || recompute_redshift(P)) 
+  if (recompute_zphot_shear(N) || 
+      recompute_cosmo3D(C) ||
+      fdiff(cache_table_params, Ntable.random) ||
+      fdiff(cache_redshift_params, redshift.random)) 
   {
     #pragma GCC diagnostic push
     #pragma GCC diagnostic ignored "-Wunused-variable"
@@ -869,8 +892,8 @@ double g_tomo(double ainput, const int ni)
     gsl_integration_glfixed_table_free(w);
     update_cosmopara(&C);
     update_nuisance(&N);
-    update_table(&numtable);
-    update_redshift(&P);
+    cache_table_params = Ntable.random;
+    cache_redshift_params = redshift.random;
   }
 
   if (ni < 0 || ni > redshift.shear_nbin - 1)
@@ -919,22 +942,25 @@ double g2_tomo(double a, int ni)
 { // for tomography bin ni
   static nuisancepara N;
   static cosmopara C;
-  static Ntab numtable;
-  static redshiftparams P;
+  static double cache_table_params;
+  static double cache_redshift_params;
   static double** table = NULL;
 
   const double amin = 1.0/(redshift.shear_zdist_zmax_all + 1.0);
   const double amax = 0.999999;
   const double da = (amax - amin)/((double) Ntable.N_a - 1.0);
 
-  if (table == 0 || recompute_table(numtable)) 
+  if (table == NULL || 
+      fdiff(cache_table_params, Ntable.random)) 
   {
     if (table != NULL) free(table);
     table = (double**) malloc2d(redshift.shear_nbin, Ntable.N_a);
   }
 
-  if (recompute_zphot_shear(N) || recompute_cosmo3D(C) || 
-      recompute_table(numtable) || recompute_redshift(P)) 
+  if (recompute_zphot_shear(N) || 
+      recompute_cosmo3D(C) || 
+      fdiff(cache_table_params, Ntable.random) || 
+      fdiff(cache_redshift_params, redshift.random)) 
   {
     #pragma GCC diagnostic push
     #pragma GCC diagnostic ignored "-Wunused-variable"
@@ -966,8 +992,8 @@ double g2_tomo(double a, int ni)
     gsl_integration_glfixed_table_free(w);   
     update_nuisance(&N);
     update_cosmopara(&C);
-    update_table(&numtable);
-    update_redshift(&P);
+    cache_table_params = Ntable.random;
+    cache_redshift_params = redshift.random;
   }
 
   if (ni < 0 || ni > redshift.shear_nbin - 1)
@@ -1002,8 +1028,8 @@ double g_lens(double a, int ni)
 { // for *lens* tomography bin ni
   static nuisancepara N;
   static cosmopara C;
-  static Ntab numtable;
-  static redshiftparams P;
+  static double cache_table_params;
+  static double cache_redshift_params;
   static double** table = NULL;
 
   const double amin = 1.0/(redshift.clustering_zdist_zmax_all + 1.0);
@@ -1011,14 +1037,17 @@ double g_lens(double a, int ni)
   const double da = (amax - amin)/((double) Ntable.N_a - 1.0);
   const double amin_shear = 1. / (redshift.shear_zdist_zmax_all + 1.);
 
-  if (table == NULL || recompute_table(numtable)) 
+  if (table == NULL || 
+      fdiff(cache_redshift_params, redshift.random)) 
   {
     if (table != NULL)  free(table);
     table = (double**) malloc2d(redshift.clustering_nbin , Ntable.N_a);
   }
 
-  if (recompute_zphot_clustering(N) || recompute_cosmo3D(C) || 
-      recompute_table(numtable) || recompute_redshift(P)) 
+  if (recompute_zphot_clustering(N) || 
+      recompute_cosmo3D(C) ||  
+      fdiff(cache_table_params, Ntable.random) ||
+      fdiff(cache_redshift_params, redshift.random)) 
   {
     #pragma GCC diagnostic push
     #pragma GCC diagnostic ignored "-Wunused-variable"
@@ -1048,10 +1077,10 @@ double g_lens(double a, int ni)
     }
 
     gsl_integration_glfixed_table_free(w);
-    update_table(&numtable);
     update_nuisance(&N);
     update_cosmopara(&C);
-    update_redshift(&P);
+    cache_table_params = Ntable.random;
+    cache_redshift_params = redshift.random;
   }
 
   if (ni < 0 || ni > redshift.clustering_nbin - 1)
