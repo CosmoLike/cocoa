@@ -200,7 +200,13 @@ double A_IA_Joachimi(const double a)
   }
 }
 
-void IA_A1_Z1Z2(const double a, const double growfac_a, const int n1, const int n2, double res[2])
+void IA_A1_Z1Z2(
+    const double a, 
+    const double growfac_a, 
+    const int n1, 
+    const int n2, 
+    double res[2]
+  )
 { 
   // COCOA (WARNING): THERE IS MINUS SIGN DIFFERENCE COMPARED TO C1_TA 
   // COCOA (WARNING): IN ORIGINAL COSMOLIKE (SEE: cosmo2D_fullsky_TATT.c)
@@ -265,8 +271,13 @@ double IA_A1_Z1(const double a, const double growfac_a, const int n1)
   return res[0];
 }
 
-void IA_A2_Z1Z2(const double a, const double growfac_a, 
-  const int n1, const int n2, double res[2])
+void IA_A2_Z1Z2(
+    const double a, 
+    const double growfac_a, 
+    const int n1, 
+    const int n2, 
+    double res[2]
+  )
 {
   // COCOA (WARNING): THERE IS factor x5 DIFFERENCE COMPARED TO C2_TT 
   // COCOA (WARNING): IN ORIGINAL COSMOLIKE (SEE: cosmo2D_fullsky_TATT.c)

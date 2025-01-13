@@ -138,11 +138,12 @@ typedef struct
 
 typedef struct
 {
-  double random; // COCOA: Random number. Optimization as the function 
-                 // COCOA: "recompute" can be too expensive if required to  
-                 // COCOA: check every element of the 2d arrays. Whenever 
-                 // COCOA: updating n(z) parameters, assign a new random number
-  
+  // COCOA: Random number. Optimization as the function "recompute" can be
+  // COCOA: too expensive if required to check every element of the 2d arrays.
+  // COCOA:  Whenever updating n(z) parameters, assign a new random number
+  double random_shear;
+  double random_clustering;
+
   int shear_nbin;         // number of source tomography bins
   int shear_photoz;
   int shear_nzbins;
@@ -201,7 +202,13 @@ typedef struct
 
 typedef struct
 {
-  // like.IA = 1 variables
+  // COCOA: Random number. Optimization as the function "recompute" can be
+  // COCOA: too expensive if required to check every element of the struct
+  // COCOA: Whenever updating the struct, assign a new random number
+  double random_photoz_shear;
+  double random_photoz_clustering;
+
+  // INTRINSIC ALIGMENT ------------------------------------------
   double LF_alpha;
   double LF_P;
   double LF_Q;
@@ -209,7 +216,6 @@ typedef struct
   double LF_red_P;
   double LF_red_Q;
   
-  // like.IA = 3; NLA; = 4; NLA, = 5; TATT (per bin);  = 6: TATT (power law)
   double A_z[MAX_SIZE_ARRAYS];    // NLA normalization per source redshift bin
   double A2_z[MAX_SIZE_ARRAYS];   // NLA normalization per source redshift bin
   double b_ta_z[MAX_SIZE_ARRAYS]; // b_ta, per bin (like.IA = 6), or use b_ta_z[0] with like.IA = 5
@@ -222,53 +228,17 @@ typedef struct
   double oneplusz0_ia;            // oneplusz0-ia MegaZ
   double c1rhocrit_ia;
   
+  // PHOTOZ ------------------------------------------
+  double bias_photoz_shear[MAX_SIZE_ARRAYS][MAX_SIZE_ARRAYS];      // bias, strech...
+  double bias_photoz_clustering[MAX_SIZE_ARRAYS][MAX_SIZE_ARRAYS]; // bias, strech...
+
+  // SHEAR CALIBRATION
   double shear_calibration_m[MAX_SIZE_ARRAYS];
   
   // Variables for the 4x2pt+N (see: 2008.10757 & 2010.01138)
   double cluster_MOR[MAX_SIZE_ARRAYS];
   double cluster_selection[MAX_SIZE_ARRAYS];
-} nuisancepara;
-
-typedef struct
-{
-  double random; // COCOA: Random number. Optimization as the function 
-                 // COCOA: "recompute" can be too expensive if required to  
-                 // COCOA: check every element of the struct. Whenever 
-                 // COCOA: updating the struct, assign a new random number
-
-  double sigma_zphot_shear[MAX_SIZE_ARRAYS];
-  double bias_zphot_shear[MAX_SIZE_ARRAYS];
-
-  double sigma_zphot_clustering[MAX_SIZE_ARRAYS];
-  double bias_zphot_clustering[MAX_SIZE_ARRAYS];
-} photoznuisanceparams;
-
-typedef struct
-{
-  double random; // COCOA: Random number. Optimization as the function 
-                 // COCOA: "recompute" can be too expensive if required to  
-                 // COCOA: check every element of the struct. Whenever 
-                 // COCOA: updating the struct, assign a new random number
-
-  double LF_alpha;
-  double LF_P;
-  double LF_Q;
-  double LF_red_alpha;
-  double LF_red_P;
-  double LF_red_Q;
-  
-  double A_z[MAX_SIZE_ARRAYS];    // NLA normalization per source redshift bin
-  double A2_z[MAX_SIZE_ARRAYS];   // NLA normalization per source redshift bin
-  double b_ta_z[MAX_SIZE_ARRAYS]; // b_ta per bin or use b_ta_z[0] redshift evol
-  double A_ia;                    // A IA see Joachimi2012
-  double A2_ia;                   // placeholder param for quadratic,etc IA
-  double beta_ia;                 // beta IA see Joachimi2012
-  double eta_ia;                  // eta_other IA see Joachimi2012
-  double eta_ia_tt;               // same as eta_ia, for TT
-  double eta_ia_highz;            // uncertainty in high z evolution
-  double oneplusz0_ia;            // oneplusz0-ia MegaZ
-  double c1rhocrit_ia;
-} ianuisanceparams;
+} nuisanceparams;
 
 typedef struct
 {
@@ -428,11 +398,7 @@ extern pdeltapara pdeltaparams;
 
 extern FPTpara FPT;
 
-extern ianuisanceparams ianuisance;
-
-extern photoznuisanceparams photoz;
-
-extern nuisancepara nuisance;
+extern nuisanceparams nuisance;
 
 extern ynuisancepara ynuisance;
 
@@ -470,15 +436,9 @@ void update_cosmopara(cosmopara* C);
 
 void update_galpara(galpara* G);
 
-void update_nuisance(nuisancepara* N);
+void update_nuisance(nuisanceparams* N);
 
 void update_ynuisance(ynuisancepara* N);
-
-void update_table(Ntab* N);
-
-void update_redshift(redshiftparams* N);
-
-void update_photoz_struct(photoznuisanceparams* N);
 
 #ifdef __cplusplus
 }

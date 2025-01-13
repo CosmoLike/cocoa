@@ -1813,50 +1813,74 @@ void init_lens_sample(std::string multihisto_file, const int Ntomo)
       exit(1);
   }
 
-  redshift.clustering_nzbins = input_table.n_rows;
-  const int nzbins = redshift.clustering_nzbins;    // alias
-
-  if (redshift.clustering_zdist_table != NULL) 
-      free(redshift.clustering_zdist_table);
-  redshift.clustering_zdist_table = (double**) malloc2d(Ntomo + 1, nzbins);
-  
-  double** tab = redshift.clustering_zdist_table;   // alias
-  double* z_v = redshift.clustering_zdist_table[Ntomo];  // alias
-  for (int i=0; i<nzbins; i++) 
+  int cache_update = 0;
+  if (redshift.clustering_nzbins != input_table.n_rows ||
+      redshift.clustering_zdist_table == NULL)
   {
-    z_v[i] = input_table(i,0);
-    for (int k=0; k<Ntomo; k++) 
+    cache_update = 1;
+  }
+  else
+  {
+    for (int i=0; i<redshift.clustering_nzbins; i++) 
     {
-      tab[k][i] = input_table(i,k+1);
+      double** tab = redshift.clustering_zdist_table;   // alias
+      double* z_v = redshift.clustering_zdist_table[Ntomo];  // alias
+
+      if (fdiff(z_v[i], input_table(i,0))) cache_update = 1;
+      
+      for (int k=0; k<Ntomo; k++) 
+        if (fdiff(tab[k][i], input_table(i,k+1)))  cache_update = 1;
     }
   }
-  
-  redshift.clustering_zdist_zmin_all = fmax(z_v[0], 1.e-5);
-  
-  redshift.clustering_zdist_zmax_all = z_v[nzbins-1] + 
-    (z_v[nzbins-1] - z_v[0]) / ((double) nzbins - 1.);
 
-  for (int k=0; k<Ntomo; k++) 
-  { // Set tomography bin boundaries
-    auto nofz = input_table.col(k+1).eval();
-    
-    arma::uvec idx = arma::find(nofz > 0.999e-8*nofz.max());
-    
-    redshift.clustering_zdist_zmin[k] = z_v[idx(0)];
-    
-    redshift.clustering_zdist_zmax[k] = z_v[idx(idx.n_elem-1)];
-  }
-  // READ THE N(Z) FILE ENDS ------------
-
-  redshift.random = RandomNumber::get_instance().get();
-
-  //pf_photoz(0.1, 0); // init static variables
-
-  for (int k=0; k<Ntomo; k++)
+  if(cache_update = 1)
   {
-    spdlog::debug("\x1b[90m{}\x1b[0m: bin {} - {} = {}.", "init_lens_sample", 
-      k, "<z_s>", zmean(k));
-  } 
+    redshift.clustering_nzbins = input_table.n_rows;
+    const int nzbins = redshift.clustering_nzbins;    // alias
+
+    if (redshift.clustering_zdist_table != NULL) 
+        free(redshift.clustering_zdist_table);
+    redshift.clustering_zdist_table = (double**) malloc2d(Ntomo + 1, nzbins);
+    
+    double** tab = redshift.clustering_zdist_table;   // alias
+    double* z_v = redshift.clustering_zdist_table[Ntomo];  // alias
+    
+    for (int i=0; i<nzbins; i++) 
+    {
+      z_v[i] = input_table(i,0);
+      for (int k=0; k<Ntomo; k++) 
+      {
+        tab[k][i] = input_table(i,k+1);
+      }
+    }
+    
+    redshift.clustering_zdist_zmin_all = fmax(z_v[0], 1.e-5);
+    
+    redshift.clustering_zdist_zmax_all = z_v[nzbins-1] + 
+      (z_v[nzbins-1] - z_v[0]) / ((double) nzbins - 1.);
+
+    for (int k=0; k<Ntomo; k++) 
+    { // Set tomography bin boundaries
+      auto nofz = input_table.col(k+1).eval();
+      
+      arma::uvec idx = arma::find(nofz > 0.999e-8*nofz.max());
+      
+      redshift.clustering_zdist_zmin[k] = z_v[idx(0)];
+      
+      redshift.clustering_zdist_zmax[k] = z_v[idx(idx.n_elem-1)];
+    }
+    // READ THE N(Z) FILE ENDS ------------
+
+    redshift.random_clustering = RandomNumber::get_instance().get();
+
+    pf_photoz(0.1, 0); // init static variables
+
+    for (int k=0; k<Ntomo; k++)
+    {
+      spdlog::debug("\x1b[90m{}\x1b[0m: bin {} - {} = {}.", "init_lens_sample", 
+        k, "<z_s>", zmean(k));
+    } 
+  }
 
   spdlog::debug("\x1b[90m{}\x1b[0m: Ends", "init_lens_sample");
 }
@@ -1903,64 +1927,87 @@ void init_source_sample(std::string multihisto_file, const int Ntomo)
     spdlog::critical("bad n(z) file (z vector not monotonic)");
     exit(1);
   }
-  redshift.shear_nzbins = input_table.n_rows;
-  const int nzbins = redshift.shear_nzbins; // alias
 
-  if (redshift.shear_zdist_table != NULL) free(redshift.shear_zdist_table);
-  redshift.shear_zdist_table = (double**) malloc2d(Ntomo + 1, nzbins);
-
-  double** tab = redshift.shear_zdist_table;        // alias  
-  double* z_v = redshift.shear_zdist_table[Ntomo];  // alias
-  for (int i=0; i<nzbins; i++) 
+  int cache_update = 0;
+  if (redshift.shear_nzbins != input_table.n_rows ||
+      redshift.shear_zdist_table == NULL)
   {
-    z_v[i] = input_table(i,0);
-    for (int k=0; k<Ntomo; k++) 
+    cache_update = 1;
+  }
+  else
+  {
+    double** tab = redshift.shear_zdist_table;        // alias  
+    double* z_v = redshift.shear_zdist_table[Ntomo];  // alias
+    for (int i=0; i<redshift.shear_nzbins; i++) 
     {
-      tab[k][i] = input_table(i,k+1);
+      if (fdiff(z_v[i], input_table(i,0))) cache_update = 1;
+
+      for (int k=0; k<Ntomo; k++) 
+        if (fdiff(tab[k][i], input_table(i,k+1))) cache_update = 1;
     }
   }
-  
-  redshift.shear_zdist_zmin_all = fmax(z_v[0], 1.e-5);
-  
-  redshift.shear_zdist_zmax_all = z_v[nzbins-1] + 
-    (z_v[nzbins-1] - z_v[0]) / ((double) nzbins - 1.);
 
-  for (int k=0; k<Ntomo; k++) 
-  { // Set tomography bin boundaries
-    auto nofz = input_table.col(k+1).eval();
+  if(cache_update = 1)
+  {
+    redshift.shear_nzbins = input_table.n_rows;
+    const int nzbins = redshift.shear_nzbins; // alias
+
+    if (redshift.shear_zdist_table == NULL) free(redshift.shear_zdist_table);
+    redshift.shear_zdist_table = (double**) malloc2d(Ntomo + 1, nzbins);
+
+    double** tab = redshift.shear_zdist_table;        // alias  
+    double* z_v = redshift.shear_zdist_table[Ntomo];  // alias
+    for (int i=0; i<nzbins; i++) 
+    {
+      z_v[i] = input_table(i,0);
+      for (int k=0; k<Ntomo; k++) 
+        tab[k][i] = input_table(i,k+1);
+    }
+  
+    redshift.shear_zdist_zmin_all = fmax(z_v[0], 1.e-5);
     
-    arma::uvec idx = arma::find(nofz > 0.999e-8*nofz.max());
-    
-    redshift.shear_zdist_zmin[k] = z_v[idx(0)];
-    
-    redshift.shear_zdist_zmax[k] = z_v[idx(idx.n_elem-1)];
+    redshift.shear_zdist_zmax_all = z_v[nzbins-1] + 
+      (z_v[nzbins-1] - z_v[0]) / ((double) nzbins - 1.);
+
+    for (int k=0; k<Ntomo; k++) 
+    { // Set tomography bin boundaries
+      auto nofz = input_table.col(k+1).eval();
+      
+      arma::uvec idx = arma::find(nofz > 0.999e-8*nofz.max());
+      
+      redshift.shear_zdist_zmin[k] = z_v[idx(0)];
+      
+      redshift.shear_zdist_zmax[k] = z_v[idx(idx.n_elem-1)];
+    }
+  
+    // READ THE N(Z) FILE ENDS ------------
+    if (redshift.shear_zdist_zmax_all < redshift.shear_zdist_zmax[Ntomo-1] || 
+        redshift.shear_zdist_zmin_all > redshift.shear_zdist_zmin[0]) 
+    {
+      spdlog::critical("zhisto_min = {},zhisto_max = {}", 
+                       redshift.shear_zdist_zmin_all, 
+                       redshift.shear_zdist_zmax_all);
+      
+      spdlog::critical("shear_zdist_zmin[0] = {},"
+                       " shear_zdist_zmax[redshift.shear_nbin-1] = {}", 
+                       redshift.shear_zdist_zmin[0], 
+                       redshift.shear_zdist_zmax[Ntomo-1]);
+      
+      spdlog::critical("%s n(z) file incompatible with tomo.shear bin choice", 
+                       multihisto_file);
+      exit(1);
+    } 
+
+    zdistr_photoz(0.1, 0); // init static variables
+
+    for (int k=0; k<Ntomo; k++)
+    {
+      spdlog::debug("\x1b[90m{}\x1b[0m: bin {} - {} = {}.", "init_source_sample", 
+        k, "<z_s>", zmean_source(k));
+    }
+
+    redshift.random_shear = RandomNumber::get_instance().get();
   }
-
-  // READ THE N(Z) FILE ENDS ------------
-  if (redshift.shear_zdist_zmax_all < redshift.shear_zdist_zmax[Ntomo-1] || 
-      redshift.shear_zdist_zmin_all > redshift.shear_zdist_zmin[0]) 
-  {
-    spdlog::critical("zhisto_min = {},zhisto_max = {}", 
-                     redshift.shear_zdist_zmin_all, 
-                     redshift.shear_zdist_zmax_all);
-    
-    spdlog::critical("shear_zdist_zmin[0] = {},"
-                     " shear_zdist_zmax[redshift.shear_nbin-1] = {}", 
-                     redshift.shear_zdist_zmin[0], 
-                     redshift.shear_zdist_zmax[Ntomo-1]);
-    
-    spdlog::critical("%s n(z) file incompatible with tomo.shear bin choice", 
-                     multihisto_file);
-    exit(1);
-  } 
-
-  for (int k=0; k<Ntomo; k++)
-  {
-    spdlog::debug("\x1b[90m{}\x1b[0m: bin {} - {} = {}.", "init_source_sample", 
-      k, "<z_s>", zmean_source(k));
-  } 
-
-  redshift.random = RandomNumber::get_instance().get();
 
   spdlog::debug("\x1b[90m{}\x1b[0m: Ends", "init_source_sample");
 }
@@ -2136,12 +2183,19 @@ void set_nuisance_shear_photoz(vector SP)
     exit(1);
   }
 
+  int cache_update = 0;
   for (int i=0; i<redshift.shear_nbin; i++)
   {
-    photoz.bias_zphot_shear[i] = SP(i);
+    if (fdiff(nuisance.bias_photoz_shear[0][i], SP(i)))
+    {
+      cache_update = 1;
+      nuisance.bias_photoz_shear[0][i] = SP(i);
+    }
+    
   }
 
-  photoz.random = RandomNumber::get_instance().get();
+  if (cache_update == 1)
+    nuisance.random_photoz_shear = RandomNumber::get_instance().get();
 
   spdlog::debug("\x1b[90m{}\x1b[0m: Ends", "set_nuisance_shear_photoz");
 }
@@ -2169,13 +2223,19 @@ void set_nuisance_clustering_photoz(vector CP)
     exit(1);
   }
 
+  int cache_update = 0;
   for (int i=0; i<redshift.clustering_nbin; i++)
   {
-    photoz.bias_zphot_clustering[i] = CP(i);
+    if (fdiff(nuisance.bias_photoz_clustering[0][i], CP(i)))
+    { 
+      cache_update = 1;
+      nuisance.bias_photoz_clustering[0][i] = CP(i);
+    }
   }
 
-  photoz.random = RandomNumber::get_instance().get();
-
+  if(cache_update == 1)
+    nuisance.random_photoz_clustering = RandomNumber::get_instance().get();
+  
   spdlog::debug("\x1b[90m{}\x1b[0m: Ends", "set_nuisance_clustering_photoz");
 }
 

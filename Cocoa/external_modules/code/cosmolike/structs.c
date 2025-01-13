@@ -68,7 +68,8 @@ tomopara tomo =
 
 redshiftparams redshift =
 {
-  .random = 0.0,
+  .random_shear = 0.0,
+  .random_clustering = 0.0,
 
   .shear_nbin = 0,
   .shear_photoz = 0,
@@ -120,37 +121,15 @@ pdeltapara pdeltaparams =
   .runmode = "Halofit"
 };
 
-nuisancepara nuisance =
+nuisanceparams nuisance =
 {
+  .random_photoz_shear = 0.0,
+  .random_photoz_clustering = 0.0,
   .c1rhocrit_ia = 0.01389,
   .A_z = {0},
   .A2_z = {0},
   .b_ta_z = {0},
   .shear_calibration_m = {0}
-};
-
-photoznuisanceparams photoz =
-{
-  .random = 0.0,
-  .sigma_zphot_shear = {0},
-  .bias_zphot_shear = {0},
-  .sigma_zphot_clustering = {0},
-  .bias_zphot_clustering = {0}
-};
-
-ianuisanceparams ianuisance =
-{
-  .random = 0.0,
-  .A_ia = 0.0,
-  .beta_ia = 0.0,
-  .eta_ia = 0.0,
-  .eta_ia_highz = 0.0,
-  .A2_ia = 0.0,
-  .eta_ia_tt = 0.0,
-  .c1rhocrit_ia = 0.01389,
-  .A_z = {0},
-  .A2_z = {0},
-  .b_ta_z = {0}
 };
 
 ynuisancepara ynuisance =
@@ -368,14 +347,15 @@ void reset_tomo_struct()
 
 void reset_redshift_struct()
 {
-  redshift.random = 0.0;
+  redshift.random_shear = 0.0;
+  redshift.random_clustering = 0.0;
 
   redshift.shear_nbin = 0;
   redshift.shear_photoz = 0;
   if (redshift.shear_zdist_table != NULL)
   {
     free(redshift.shear_zdist_table);
-     redshift.shear_zdist_table = NULL;
+    redshift.shear_zdist_table = NULL;
   }
   redshift.shear_nzbins = 0;
   redshift.shear_zdist_zmin_all = 0.0;
@@ -485,25 +465,19 @@ void reset_pdeltaparams_struct()
 // ---------------------------------------------------------------------------
 // ---------------------------------------------------------------------------
 
-void reset_photoznuisanceparams_struct()
-{
-  for(int i=0; i<MAX_SIZE_ARRAYS; i++)
-  {
-    photoz.sigma_zphot_shear[i] = 0.0;
-    photoz.bias_zphot_shear[i] = 0.0;
-    photoz.sigma_zphot_clustering[i] = 0.0;
-    photoz.bias_zphot_clustering[i] = 0.0;
-  }
-}
-
-// ---------------------------------------------------------------------------
-// ---------------------------------------------------------------------------
-// ---------------------------------------------------------------------------
-
 void reset_nuisance_struct()
 {
+  nuisance.random_photoz_shear = 0.0;
+  nuisance.random_photoz_clustering = 0.0;
+
   for(int i=0; i<MAX_SIZE_ARRAYS; i++)
   {
+    for(int j=0; j<MAX_SIZE_ARRAYS; j++)
+    {
+      nuisance.bias_photoz_shear[i][j] = 0.0;
+      nuisance.bias_photoz_clustering[i][j] = 0.0;
+    }
+
     nuisance.A_z[i] = 0.0;
     nuisance.A2_z[i] = 0.0;
     nuisance.b_ta_z[i] = 0.0;
@@ -523,10 +497,6 @@ void reset_nuisance_struct()
   nuisance.oneplusz0_ia = 0.0;
   nuisance.c1rhocrit_ia = 0.01389;
 }
-
-// ---------------------------------------------------------------------------
-// ---------------------------------------------------------------------------
-// ---------------------------------------------------------------------------
 
 void reset_ynuisance_struct()
 { // Compton-Y related variables  
@@ -549,24 +519,6 @@ void reset_cmb_struct()
   cmb.fwhm = 0.0;
   cmb.sensitivity = 0.0;
   sprintf(cmb.pathLensRecNoise, "%s", "");
-}
-
-void reset_ia_nuisance(ianuisanceparams* N)
-{
-  N->random = 0.0;
-  N->A_ia =  0.0;
-  N->beta_ia =  0.0;
-  N->eta_ia =  0.0;
-  N->eta_ia_highz  =  0.0;
-  N->A2_ia =  0.0;
-  N->eta_ia_tt =  0.0;
-
-  for (int i=0; i<MAX_SIZE_ARRAYS; i++) 
-  {    
-    N->A_z[i] =  0.0;
-    N->A2_z[i] =  0.0;
-    N->b_ta_z[i] =  0.0;
-  }
 }
 
 // --------------------------------------------------------------------
@@ -608,7 +560,7 @@ void update_galpara(galpara *G)
   }
 }
 
-void update_nuisance(nuisancepara* N)
+void update_nuisance(nuisanceparams* N)
 {
   N->A_ia          = nuisance.A_ia;
   N->beta_ia       = nuisance.beta_ia;
@@ -628,36 +580,6 @@ void update_nuisance(nuisancepara* N)
   }
 }
 
-void update_ia_nuisance(ianuisanceparams* N)
-{
-  N->random = ianuisance.random;
-  N->A_ia = ianuisance.A_ia;
-  N->beta_ia = ianuisance.beta_ia;
-  N->eta_ia = ianuisance.eta_ia;
-  N->eta_ia_highz  = ianuisance.eta_ia_highz;
-  N->A2_ia = ianuisance.A2_ia;
-  N->eta_ia_tt = ianuisance.eta_ia_tt;
-
-  for (int i=0; i<MAX_SIZE_ARRAYS; i++) 
-  {    
-    N->A_z[i] = ianuisance.A_z[i];
-    N->A2_z[i] = ianuisance.A2_z[i];
-    N->b_ta_z[i] = ianuisance.b_ta_z[i];
-  }
-}
-
-void update_photoz_struct(photoznuisanceparams* N)
-{  
-  N->random = photoz.random;
-  for (int i=0; i<MAX_SIZE_ARRAYS; i++) 
-  {
-    N->sigma_zphot_clustering[i] = photoz.sigma_zphot_clustering[i];
-    N->bias_zphot_clustering[i] = photoz.bias_zphot_clustering[i];
-    N->sigma_zphot_shear[i] = photoz.sigma_zphot_shear[i];
-    N->bias_zphot_shear[i] = photoz.bias_zphot_shear[i];
-  }
-}
-
 void update_ynuisance(ynuisancepara* N)
 { // Compton-Y related variables
   N->gas_Gamma_KS = ynuisance.gas_Gamma_KS;
@@ -671,79 +593,6 @@ void update_ynuisance(ynuisancepara* N)
   N->gas_sigma_star = ynuisance.gas_sigma_star;
   N->gas_lgT_w = ynuisance.gas_lgT_w;
   N->gas_f_H = ynuisance.gas_f_H;
-}
-
-void update_table(Ntab* N)
-{
-  N->random = Ntable.random;
-
-  N->N_a = Ntable.N_a;
-  N->N_ell = Ntable.N_ell;
-  N->Ntheta = Ntable.Ntheta;
-  N->N_ell_TATT = Ntable.N_ell_TATT;
-  N->high_def_integration = Ntable.high_def_integration;
-}
-
-void update_redshift(redshiftparams* N)
-{
-  N->random = redshift.random;
-
-  if (redshift.clustering_zdist_table != NULL)
-  {
-    N->clustering_nbin = redshift.clustering_nbin;
-    N->clustering_nzbins = redshift.clustering_nzbins;
-    N->clustering_zdist_zmin_all = redshift.clustering_zdist_zmin_all;
-    N->clustering_zdist_zmax_all = redshift.clustering_zdist_zmax_all;
-
-    for(int i=0; i<MAX_SIZE_ARRAYS; i++)
-    {
-      N->clustering_zdist_zmin[i] = redshift.clustering_zdist_zmin[i];
-      N->clustering_zdist_zmax[i] = redshift.clustering_zdist_zmax[i];
-    }
-
-    const int ntomo  = redshift.clustering_nbin;
-    const int nzbins = redshift.clustering_nzbins;
-    
-    if (N->clustering_zdist_table != NULL) free(N->clustering_zdist_table);
-    N->clustering_zdist_table = (double**) malloc2d(ntomo + 1, nzbins);
-
-    for (int i=0; i<ntomo+1; i++)
-    {
-      for (int k=0; k<nzbins; k++) 
-      {
-        N->clustering_zdist_table[i,k] = redshift.clustering_zdist_table[i,k];
-      }
-    }
-  }
-
-  if (redshift.shear_zdist_table != NULL)
-  {
-    N->shear_nbin = redshift.shear_nbin;
-    N->shear_nzbins = redshift.shear_nzbins;
-    N->shear_zdist_zmin_all = redshift.shear_zdist_zmin_all;
-    N->shear_zdist_zmax_all = redshift.shear_zdist_zmax_all;
-
-    for(int i=0; i<MAX_SIZE_ARRAYS; i++)
-    {
-      N->shear_zdist_zmin[i] = redshift.shear_zdist_zmin[i];
-      N->shear_zdist_zmax[i] = redshift.shear_zdist_zmax[i];
-    }
-
-    const int nzbins = redshift.shear_nzbins;
-    const int ntomo  = redshift.shear_nbin;
-
-    if (N->shear_zdist_table != NULL) free(N->shear_zdist_table);
-    N->shear_zdist_table = (double**) malloc2d(ntomo + 1, nzbins);
-
-    #pragma omp parallel for
-    for (int i=0; i<ntomo+1; i++)
-    {
-      for (int k=0; k<nzbins; k++) 
-      {
-        N->shear_zdist_table[i,k] = redshift.shear_zdist_table[i,k];
-      }
-    }
-  }
 }
 
 // ---------------------------------------------------------------------------
