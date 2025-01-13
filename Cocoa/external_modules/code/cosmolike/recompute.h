@@ -16,10 +16,6 @@ extern "C" {
 
 int recompute_cosmo3D(cosmopara C);
 
-int recompute_zphot_shear(photozparams N);
-
-int recompute_zphot_clustering(photozparams N);
-
 int recompute_yhalo(ynuisancepara N);
 
 int recompute_clusters(cosmopara C, nuisancepara N);
@@ -46,15 +42,13 @@ int recompute_yy(cosmopara C, ynuisancepara N);
 
 int recompute_ky(cosmopara C, ynuisancepara N);
 
+/*
 int recompute_cc(cosmopara C, nuisancepara N);
 
 int recompute_cg(cosmopara C, galpara G, nuisancepara N);
 
 int recompute_cs(cosmopara C, galpara G, nuisancepara N);
-
-int recompute_table(Ntab N);
-
-int recompute_redshift(redshiftparams N);
+*/
 
 #ifdef __cplusplus
 }

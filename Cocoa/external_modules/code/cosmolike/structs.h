@@ -238,12 +238,11 @@ typedef struct
 
   double sigma_zphot_shear[MAX_SIZE_ARRAYS];
   double bias_zphot_shear[MAX_SIZE_ARRAYS];
-  
+
   double sigma_zphot_clustering[MAX_SIZE_ARRAYS];
   double bias_zphot_clustering[MAX_SIZE_ARRAYS];
-} photozparams;
+} photoznuisanceparams;
 
-/*
 typedef struct
 {
   double random; // COCOA: Random number. Optimization as the function 
@@ -269,8 +268,7 @@ typedef struct
   double eta_ia_highz;            // uncertainty in high z evolution
   double oneplusz0_ia;            // oneplusz0-ia MegaZ
   double c1rhocrit_ia;
-} iaparams;
-*/
+} ianuisanceparams;
 
 typedef struct
 {
@@ -430,7 +428,9 @@ extern pdeltapara pdeltaparams;
 
 extern FPTpara FPT;
 
-extern photozparams photoz;
+extern ianuisanceparams ianuisance;
+
+extern photoznuisanceparams photoz;
 
 extern nuisancepara nuisance;
 
@@ -478,7 +478,7 @@ void update_table(Ntab* N);
 
 void update_redshift(redshiftparams* N);
 
-void update_photoz_struct(photozparams* N);
+void update_photoz_struct(photoznuisanceparams* N);
 
 #ifdef __cplusplus
 }

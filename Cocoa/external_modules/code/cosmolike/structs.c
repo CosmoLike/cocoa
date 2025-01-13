@@ -129,12 +129,28 @@ nuisancepara nuisance =
   .shear_calibration_m = {0}
 };
 
-photozparams photoz =
+photoznuisanceparams photoz =
 {
+  .random = 0.0,
   .sigma_zphot_shear = {0},
   .bias_zphot_shear = {0},
   .sigma_zphot_clustering = {0},
   .bias_zphot_clustering = {0}
+};
+
+ianuisanceparams ianuisance =
+{
+  .random = 0.0,
+  .A_ia = 0.0,
+  .beta_ia = 0.0,
+  .eta_ia = 0.0,
+  .eta_ia_highz = 0.0,
+  .A2_ia = 0.0,
+  .eta_ia_tt = 0.0,
+  .c1rhocrit_ia = 0.01389,
+  .A_z = {0},
+  .A2_z = {0},
+  .b_ta_z = {0}
 };
 
 ynuisancepara ynuisance =
@@ -329,7 +345,6 @@ void reset_cosmology_struct()
   cosmology.rho_crit = 7.4775e+21;
   cosmology.MGSigma = 0.0;
   cosmology.MGmu = 0.0;
-
   cosmology.Omega_b = 0.0;
   cosmology.Omega_m = 0.0;
   cosmology.Omega_v = 0.0;
@@ -470,7 +485,7 @@ void reset_pdeltaparams_struct()
 // ---------------------------------------------------------------------------
 // ---------------------------------------------------------------------------
 
-void reset_photozparams_struct()
+void reset_photoznuisanceparams_struct()
 {
   for(int i=0; i<MAX_SIZE_ARRAYS; i++)
   {
@@ -528,16 +543,30 @@ void reset_ynuisance_struct()
   ynuisance.gas_f_H = 0.0;
 }
 
-// ---------------------------------------------------------------------------
-// ---------------------------------------------------------------------------
-// ---------------------------------------------------------------------------
-
 void reset_cmb_struct()
 {
   sprintf(cmb.name, "%s", "");
   cmb.fwhm = 0.0;
   cmb.sensitivity = 0.0;
   sprintf(cmb.pathLensRecNoise, "%s", "");
+}
+
+void reset_ia_nuisance(ianuisanceparams* N)
+{
+  N->random = 0.0;
+  N->A_ia =  0.0;
+  N->beta_ia =  0.0;
+  N->eta_ia =  0.0;
+  N->eta_ia_highz  =  0.0;
+  N->A2_ia =  0.0;
+  N->eta_ia_tt =  0.0;
+
+  for (int i=0; i<MAX_SIZE_ARRAYS; i++) 
+  {    
+    N->A_z[i] =  0.0;
+    N->A2_z[i] =  0.0;
+    N->b_ta_z[i] =  0.0;
+  }
 }
 
 // --------------------------------------------------------------------
@@ -564,10 +593,6 @@ void update_cosmopara(cosmopara *C)
   C->random = cosmology.random;
 }
 
-// ---------------------------------------------------------------------------
-// ---------------------------------------------------------------------------
-// ---------------------------------------------------------------------------
-
 void update_galpara(galpara *G) 
 {
   for (int i=0; i<MAX_SIZE_ARRAYS; i++) 
@@ -582,10 +607,6 @@ void update_galpara(galpara *G)
     G->cg[i]= gbias.cg[i];
   }
 }
-
-// ---------------------------------------------------------------------------
-// ---------------------------------------------------------------------------
-// ---------------------------------------------------------------------------
 
 void update_nuisance(nuisancepara* N)
 {
@@ -607,12 +628,27 @@ void update_nuisance(nuisancepara* N)
   }
 }
 
-// ---------------------------------------------------------------------------
-// ---------------------------------------------------------------------------
-// ---------------------------------------------------------------------------
+void update_ia_nuisance(ianuisanceparams* N)
+{
+  N->random = ianuisance.random;
+  N->A_ia = ianuisance.A_ia;
+  N->beta_ia = ianuisance.beta_ia;
+  N->eta_ia = ianuisance.eta_ia;
+  N->eta_ia_highz  = ianuisance.eta_ia_highz;
+  N->A2_ia = ianuisance.A2_ia;
+  N->eta_ia_tt = ianuisance.eta_ia_tt;
 
-void update_photoz_struct(photozparams* N)
+  for (int i=0; i<MAX_SIZE_ARRAYS; i++) 
+  {    
+    N->A_z[i] = ianuisance.A_z[i];
+    N->A2_z[i] = ianuisance.A2_z[i];
+    N->b_ta_z[i] = ianuisance.b_ta_z[i];
+  }
+}
+
+void update_photoz_struct(photoznuisanceparams* N)
 {  
+  N->random = photoz.random;
   for (int i=0; i<MAX_SIZE_ARRAYS; i++) 
   {
     N->sigma_zphot_clustering[i] = photoz.sigma_zphot_clustering[i];
@@ -621,10 +657,6 @@ void update_photoz_struct(photozparams* N)
     N->bias_zphot_shear[i] = photoz.bias_zphot_shear[i];
   }
 }
-
-// ---------------------------------------------------------------------------
-// ---------------------------------------------------------------------------
-// ---------------------------------------------------------------------------
 
 void update_ynuisance(ynuisancepara* N)
 { // Compton-Y related variables
@@ -641,10 +673,6 @@ void update_ynuisance(ynuisancepara* N)
   N->gas_f_H = ynuisance.gas_f_H;
 }
 
-// ---------------------------------------------------------------------------
-// ---------------------------------------------------------------------------
-// ---------------------------------------------------------------------------
-
 void update_table(Ntab* N)
 {
   N->random = Ntable.random;
@@ -655,10 +683,6 @@ void update_table(Ntab* N)
   N->N_ell_TATT = Ntable.N_ell_TATT;
   N->high_def_integration = Ntable.high_def_integration;
 }
-
-// ---------------------------------------------------------------------------
-// ---------------------------------------------------------------------------
-// ---------------------------------------------------------------------------
 
 void update_redshift(redshiftparams* N)
 {

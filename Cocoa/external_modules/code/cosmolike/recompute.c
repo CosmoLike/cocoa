@@ -36,34 +36,6 @@ int recompute_cosmo3D(cosmopara C)
   */
 }
 
-int recompute_zphot_shear(photozparams N)
-{
-  int res = 0;
-  for (int i=0; i<MAX_SIZE_ARRAYS; i++)
-  {
-    if (fdiff(N.sigma_zphot_shear[i], photoz.sigma_zphot_shear[i]) ||
-        fdiff(N.bias_zphot_shear[i], photoz.bias_zphot_shear[i]))
-    {
-      res = 1;
-    }
-  }
-  return res;
-}
-
-int recompute_zphot_clustering(photozparams N) 
-{
-  int res = 0;
-  for (int i=0; i<MAX_SIZE_ARRAYS; i++) 
-  {
-    if (fdiff(N.sigma_zphot_clustering[i], photoz.sigma_zphot_clustering[i]) ||
-        fdiff(N.bias_zphot_clustering[i], photoz.bias_zphot_clustering[i])) 
-    {
-      res = 1;
-    }
-  }
-  return res;
-}
-
 int recompute_IA(nuisancepara N) 
 {
   if (fdiff(N.A_ia, nuisance.A_ia) || 
@@ -277,6 +249,7 @@ int recompute_ky(cosmopara C, ynuisancepara N)
   return recompute_cosmo3D(C) || recompute_yhalo(N);
 }
 
+/*
 // ---------------------------------------------------------------------------
 // ---------------------------------------------------------------------------
 // ---------------------------------------------------------------------------
@@ -317,114 +290,7 @@ int recompute_cs(cosmopara C, galpara G, nuisancepara N)
   }
   return 0;
 }
-
-// ---------------------------------------------------------------------------
-// ---------------------------------------------------------------------------
-// ---------------------------------------------------------------------------
-
-int recompute_table(Ntab N)
-{
- // COCOA: "recompute" can be too expensive if required to  
- // COCOA: check every element of the struct. Whenever 
- // COCOA: updating the struct, assign a new random number
-  return fdiff(N.random, Ntable.random) ? 1 : 0;
-  /*int res = 0;
-  if ((N.N_a != Ntable.N_a) || 
-      (N.N_ell != Ntable.N_ell) ||
-      (N.Ntheta != Ntable.Ntheta) || 
-      (N.N_ell_TATT != Ntable.N_ell_TATT) ||
-      (N.high_def_integration != Ntable.high_def_integration)
-     )
-  {
-    res = 1;
-  }
-  return res;
-  */
-}
-
-// ---------------------------------------------------------------------------
-// ---------------------------------------------------------------------------
-// ---------------------------------------------------------------------------
-
-int recompute_redshift(redshiftparams N)
-{
-  // COCOA: Random number between (0,1). Optimization as the 
-  // COCOA: function "recompute_redshift" is too expensive
-  // COCOA: if required to check every element of the 2d arrays
-  // COCOA: Whenever updating n(z), just create a new random num
-  return fdiff(N.random, redshift.random) ? 1 : 0;
-
-  /*
-  if (redshift.clustering_zdist_table == NULL || 
-      redshift.shear_zdist_table == NULL)
-  {
-    log_fatal("error: redshift struct not set");
-    exit(1);
-  }
-
-  if ((N.shear_nbin != redshift.shear_nbin) ||
-      (N.shear_nzbins != redshift.shear_nzbins) ||
-      fdiff(N.shear_zdist_zmin_all, redshift.shear_zdist_zmin_all) ||
-      fdiff(N.shear_zdist_zmax_all, redshift.shear_zdist_zmax_all) ||
-      (N.clustering_nbin != redshift.clustering_nbin) ||
-      (N.clustering_nzbins != redshift.clustering_nzbins) ||
-      fdiff(N.clustering_zdist_zmin_all, redshift.clustering_zdist_zmin_all) ||
-      fdiff(N.clustering_zdist_zmax_all, redshift.clustering_zdist_zmax_all))
-  {
-    return 1;
-  }
-
-  for(int i=0; i<MAX_SIZE_ARRAYS; i++)
-  {
-    if (fdiff(N.shear_zdist_zmin[i], redshift.shear_zdist_zmin[i]) ||
-        fdiff(N.shear_zdist_zmax[i], redshift.shear_zdist_zmax[i]) ||
-        fdiff(N.clustering_zdist_zmin[i], redshift.clustering_zdist_zmin[i]) ||
-        fdiff(N.clustering_zdist_zmax[i], redshift.clustering_zdist_zmax[i]))
-    {
-      return 1;
-    }
-
-  }
-
-  if (N.clustering_zdist_table != NULL)
-  {
-    for (int k=0; k<redshift.clustering_nzbins; k++) 
-    { 
-      for (int i=0; i<redshift.clustering_nbin+1; i++) 
-      {
-        if (fdiff(N.clustering_zdist_table[i][k], redshift.clustering_zdist_table[i][k]))
-        {
-          return 1;
-        }
-      }
-    }
-  }
-  else
-  {
-    return 1;
-  } 
-  if (N.shear_zdist_table != NULL)
-  {
-    for (int k=0; k<redshift.shear_nzbins; k++) 
-    { 
-      for (int i=0; i<redshift.shear_nbin+1; i++) 
-      {
-        if (fdiff(N.shear_zdist_table[i][k], redshift.shear_zdist_table[i][k]))
-        {
-          return 1;
-        }
-      }
-    }
-  }
-  else
-  {
-    return 1;
-  }
-  
-  return 0;
-  */
-}
-
+*/
 // ---------------------------------------------------------------------------
 // ---------------------------------------------------------------------------
 // ---------------------------------------------------------------------------
