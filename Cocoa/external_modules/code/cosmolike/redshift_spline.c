@@ -893,6 +893,7 @@ double g_tomo(double ainput, const int ni)
     update_cosmopara(&C);
     cache_table_params = Ntable.random;
     cache_redshift_params = redshift.random;
+    cache_photoz_params = photoz.random;
   }
 
   if (ni < 0 || ni > redshift.shear_nbin - 1)
@@ -992,6 +993,7 @@ double g2_tomo(double a, int ni)
     update_cosmopara(&C);
     cache_table_params = Ntable.random;
     cache_redshift_params = redshift.random;
+    cache_photoz_params = photoz.random;
   }
 
   if (ni < 0 || ni > redshift.shear_nbin - 1)
@@ -1078,6 +1080,7 @@ double g_lens(double a, int ni)
     update_cosmopara(&C);
     cache_table_params = Ntable.random;
     cache_redshift_params = redshift.random;
+    cache_photoz_params = photoz.random;
   }
 
   if (ni < 0 || ni > redshift.clustering_nbin - 1)

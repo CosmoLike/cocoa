@@ -474,10 +474,10 @@ void reset_photozparams_struct()
 {
   for(int i=0; i<MAX_SIZE_ARRAYS; i++)
   {
-    nuisance.sigma_zphot_shear[i] = 0.0;
-    nuisance.bias_zphot_shear[i] = 0.0;
-    nuisance.sigma_zphot_clustering[i] = 0.0;
-    nuisance.bias_zphot_clustering[i] = 0.0;
+    photoz.sigma_zphot_shear[i] = 0.0;
+    photoz.bias_zphot_shear[i] = 0.0;
+    photoz.sigma_zphot_clustering[i] = 0.0;
+    photoz.bias_zphot_clustering[i] = 0.0;
   }
 }
 

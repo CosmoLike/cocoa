@@ -2171,7 +2171,7 @@ void set_nuisance_clustering_photoz(vector CP)
 
   for (int i=0; i<redshift.clustering_nbin; i++)
   {
-    nuisance.bias_zphot_clustering[i] = CP(i);
+    photoz.bias_zphot_clustering[i] = CP(i);
   }
 
   photoz.random = RandomNumber::get_instance().get();

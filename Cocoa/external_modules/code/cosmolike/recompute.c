@@ -161,13 +161,12 @@ int recompute_clusters(cosmopara C, nuisancepara N)
 int recompute_shear(cosmopara C, nuisancepara N)
 {
   return (recompute_cosmo3D(C) || 
-          recompute_zphot_shear(N) || 
           recompute_IA(N)) ? 1 : 0;
 }
 
 int recompute_gs(cosmopara C, galpara G, nuisancepara N) 
 {
-  if (recompute_shear(C, N) || recompute_zphot_clustering(N))
+  if (recompute_shear(C, N))
   {
     return 1;
   }
@@ -187,7 +186,7 @@ int recompute_gs(cosmopara C, galpara G, nuisancepara N)
 
 int recompute_gg(cosmopara C, galpara G, nuisancepara N)
 {
-  if (recompute_cosmo3D(C) || recompute_zphot_clustering(N))
+  if (recompute_cosmo3D(C))
   {
     return 1;
   }
@@ -216,7 +215,7 @@ int recompute_ks(cosmopara C, nuisancepara N)
 
 int recompute_gk(cosmopara C, galpara G, nuisancepara N)
 {
-  if (recompute_cosmo3D(C) || recompute_zphot_clustering(N))
+  if (recompute_cosmo3D(C))
   {
     return 1;
   }
@@ -237,7 +236,6 @@ int recompute_gk(cosmopara C, galpara G, nuisancepara N)
 int recompute_gy(cosmopara C, galpara G, nuisancepara N, ynuisancepara N2) 
 {
   if (recompute_cosmo3D(C) || 
-      recompute_zphot_clustering(N) || 
       recompute_yhalo(N2))
   {
     return 1;
@@ -290,7 +288,7 @@ int recompute_cc(cosmopara C, nuisancepara N)
 
 int recompute_cg(cosmopara C, galpara G, nuisancepara N)
 {
-  if (recompute_clusters(C, N) || recompute_zphot_clustering(N))
+  if (recompute_clusters(C, N))
   {
     return 1;
   }
@@ -306,7 +304,7 @@ int recompute_cg(cosmopara C, galpara G, nuisancepara N)
 
 int recompute_cs(cosmopara C, galpara G, nuisancepara N)
 {
-  if (recompute_clusters(C, N) || recompute_zphot_shear(N) || recompute_IA(N))
+  if (recompute_clusters(C, N) || recompute_IA(N))
   {
     return 1;
   }
