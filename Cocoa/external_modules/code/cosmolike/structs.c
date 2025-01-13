@@ -492,12 +492,9 @@ void reset_nuisance_struct()
     nuisance.A_z[i] = 0.0;
     nuisance.A2_z[i] = 0.0;
     nuisance.b_ta_z[i] = 0.0;
-    nuisance.fred[i] = 0.0;
     
     nuisance.shear_calibration_m[i] = 0.0;
-    
-
-    
+        
     nuisance.cluster_MOR[i] = 0.0;
     nuisance.cluster_selection[i] = 0.0;
   }

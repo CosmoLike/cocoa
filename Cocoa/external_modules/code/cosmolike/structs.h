@@ -221,16 +221,12 @@ typedef struct
   double eta_ia_highz;            // uncertainty in high z evolution
   double oneplusz0_ia;            // oneplusz0-ia MegaZ
   double c1rhocrit_ia;
-  double fred[MAX_SIZE_ARRAYS];
   
   double shear_calibration_m[MAX_SIZE_ARRAYS];
   
   // Variables for the 4x2pt+N (see: 2008.10757 & 2010.01138)
   double cluster_MOR[MAX_SIZE_ARRAYS];
   double cluster_selection[MAX_SIZE_ARRAYS];
-
-  double frac_lowz;   // photo-z = 5 model (see: 2108.00658)
-  double frac_highz;  // photo-z = 5 model (see: 2108.00658)
 } nuisancepara;
 
 typedef struct
@@ -239,13 +235,42 @@ typedef struct
                  // COCOA: "recompute" can be too expensive if required to  
                  // COCOA: check every element of the struct. Whenever 
                  // COCOA: updating the struct, assign a new random number
-  
+
   double sigma_zphot_shear[MAX_SIZE_ARRAYS];
   double bias_zphot_shear[MAX_SIZE_ARRAYS];
   
   double sigma_zphot_clustering[MAX_SIZE_ARRAYS];
   double bias_zphot_clustering[MAX_SIZE_ARRAYS];
 } photozparams;
+
+/*
+typedef struct
+{
+  double random; // COCOA: Random number. Optimization as the function 
+                 // COCOA: "recompute" can be too expensive if required to  
+                 // COCOA: check every element of the struct. Whenever 
+                 // COCOA: updating the struct, assign a new random number
+
+  double LF_alpha;
+  double LF_P;
+  double LF_Q;
+  double LF_red_alpha;
+  double LF_red_P;
+  double LF_red_Q;
+  
+  double A_z[MAX_SIZE_ARRAYS];    // NLA normalization per source redshift bin
+  double A2_z[MAX_SIZE_ARRAYS];   // NLA normalization per source redshift bin
+  double b_ta_z[MAX_SIZE_ARRAYS]; // b_ta per bin or use b_ta_z[0] redshift evol
+  double A_ia;                    // A IA see Joachimi2012
+  double A2_ia;                   // placeholder param for quadratic,etc IA
+  double beta_ia;                 // beta IA see Joachimi2012
+  double eta_ia;                  // eta_other IA see Joachimi2012
+  double eta_ia_tt;               // same as eta_ia, for TT
+  double eta_ia_highz;            // uncertainty in high z evolution
+  double oneplusz0_ia;            // oneplusz0-ia MegaZ
+  double c1rhocrit_ia;
+} iaparams;
+*/
 
 typedef struct
 {

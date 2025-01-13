@@ -840,7 +840,7 @@ double int_for_g_tomo(double aprime, void* params)
 
 double g_tomo(double ainput, const int ni) 
 {  
-  static cosmopara C;
+  static double cache_cosmo_params;
   static double cache_photoz_params;
   static double cache_table_params;
   static double cache_redshift_params;
@@ -857,7 +857,7 @@ double g_tomo(double ainput, const int ni)
     table = (double**) malloc2d(redshift.shear_nbin, Ntable.N_a);
   }
 
-  if (recompute_cosmo3D(C) ||
+  if (fdiff(cache_cosmo_params, cosmology.random) ||
       fdiff(cache_photoz_params, photoz.random) ||
       fdiff(cache_table_params, Ntable.random) ||
       fdiff(cache_redshift_params, redshift.random)) 
@@ -890,7 +890,7 @@ double g_tomo(double ainput, const int ni)
     }
 
     gsl_integration_glfixed_table_free(w);
-    update_cosmopara(&C);
+    cache_cosmo_params = cosmology.random;
     cache_table_params = Ntable.random;
     cache_redshift_params = redshift.random;
     cache_photoz_params = photoz.random;
@@ -940,7 +940,7 @@ double int_for_g2_tomo(double aprime, void* params)
 
 double g2_tomo(double a, int ni) 
 { // for tomography bin ni
-  static cosmopara C;
+  static double cache_cosmo_params;
   static double cache_photoz_params;
   static double cache_table_params;
   static double cache_redshift_params;
@@ -957,7 +957,7 @@ double g2_tomo(double a, int ni)
     table = (double**) malloc2d(redshift.shear_nbin, Ntable.N_a);
   }
 
-  if (recompute_cosmo3D(C) ||
+  if (fdiff(cache_cosmo_params, cosmology.random) ||
       fdiff(cache_photoz_params, photoz.random) || 
       fdiff(cache_table_params, Ntable.random) || 
       fdiff(cache_redshift_params, redshift.random)) 
@@ -990,7 +990,7 @@ double g2_tomo(double a, int ni)
     }
 
     gsl_integration_glfixed_table_free(w);
-    update_cosmopara(&C);
+    cache_cosmo_params = cosmology.random;
     cache_table_params = Ntable.random;
     cache_redshift_params = redshift.random;
     cache_photoz_params = photoz.random;
@@ -1026,7 +1026,7 @@ double int_for_g_lens(double aprime, void* params)
 
 double g_lens(double a, int ni) 
 { // for *lens* tomography bin ni
-  static cosmopara C;
+  static double cache_cosmo_params;
   static double cache_photoz_params;
   static double cache_table_params;
   static double cache_redshift_params;
@@ -1044,7 +1044,7 @@ double g_lens(double a, int ni)
     table = (double**) malloc2d(redshift.clustering_nbin , Ntable.N_a);
   }
 
-  if (recompute_cosmo3D(C) ||  
+  if (fdiff(cache_cosmo_params, cosmology.random) ||  
       fdiff(cache_photoz_params, photoz.random) ||
       fdiff(cache_table_params, Ntable.random) ||
       fdiff(cache_redshift_params, redshift.random)) 
@@ -1077,7 +1077,7 @@ double g_lens(double a, int ni)
     }
 
     gsl_integration_glfixed_table_free(w);
-    update_cosmopara(&C);
+    cache_cosmo_params = cosmology.random;
     cache_table_params = Ntable.random;
     cache_redshift_params = redshift.random;
     cache_photoz_params = photoz.random;
@@ -1095,15 +1095,15 @@ double g_lens(double a, int ni)
 
 double g_cmb(double a) 
 {
-  static cosmopara C;
+  static double cache_cosmo_params;
   static double chi_cmb = 0.;
   static double fchi_cmb = 0.;
   
-  if (recompute_cosmo3D(C)) 
+  if (fdiff(cache_cosmo_params, cosmology.random)) 
   {
     chi_cmb = chi(1./1091.);
     fchi_cmb = f_K(chi_cmb);
-    update_cosmopara(&C);
+    cache_cosmo_params = cosmology.random;
   }
   
   return f_K(chi_cmb - chi(a))/fchi_cmb;
@@ -1482,7 +1482,7 @@ double dV_cluster(double z, void* params)
 
 double norm_z_cluster(const int nz)
 {
-  static cosmopara C;
+  static double cache_cosmo_params;
   static double* table;
   static gsl_integration_glfixed_table* w = 0;
 
@@ -1551,7 +1551,7 @@ double int_for_g_lens_cl(double aprime, void* params)
 
 double g_lens_cluster(const double a, const int nz, const int nl)
 { 
-  static cosmopara C;
+  static double cache_cosmo_params;
   static double** table = 0;
   static gsl_integration_glfixed_table* w = 0;
 
