@@ -167,6 +167,7 @@ double xi_pm_tomo(
   static double cache_table_params;
   static cosmopara C;
   static double cache_photoz_nuisance_params;
+  static double cache_redshift_nz_params;
   static nuisancepara N;
 
   if (Ntable.Ntheta == 0)
@@ -264,7 +265,8 @@ double xi_pm_tomo(
 
   if (recompute_shear(C, N) || 
       fdiff(cache_table_params, Ntable.random) ||
-      fdiff(cache_photoz_nuisance_params, photoz.random))
+      fdiff(cache_photoz_nuisance_params, photoz.random) ||
+      fdiff(cache_redshift_nz_params, redshift.random))
   {
     if (limber == 1)
     {
@@ -472,6 +474,7 @@ double xi_pm_tomo(
     update_nuisance(&N);
     cache_table_params = Ntable.random;
     cache_photoz_nuisance_params = photoz.random;
+    cache_redshift_nz_params = redshift.random;
   }
 
   if (nt < 0 || nt > Ntable.Ntheta - 1)
@@ -514,6 +517,7 @@ double w_gammat_tomo(
   static nuisancepara N;
   static galpara G;
   static double cache_photoz_nuisance_params;
+  static double cache_redshift_nz_params;
   static double cache_table_params;
 
   if (Ntable.Ntheta == 0)
@@ -583,7 +587,8 @@ double w_gammat_tomo(
 
   if (recompute_gs(C, G, N) || 
       fdiff(cache_table_params, Ntable.random) ||
-      fdiff(cache_photoz_nuisance_params, photoz.random))
+      fdiff(cache_photoz_nuisance_params, photoz.random) ||
+      fdiff(cache_redshift_nz_params, redshift.random))
   {    
     double** Cl = (double**) malloc2d(NSIZE, limits.LMAX);
 
@@ -691,6 +696,7 @@ double w_gammat_tomo(
     update_nuisance(&N);
     cache_table_params = Ntable.random;
     cache_photoz_nuisance_params = photoz.random;
+    cache_redshift_nz_params = redshift.random;
   }
 
   if (nt < 0 || nt > Ntable.Ntheta - 1)
@@ -732,6 +738,7 @@ double w_gg_tomo(
   static double* w_vec = NULL;
   static cosmopara C;
   static double cache_photoz_nuisance_params;
+  static double cache_redshift_nz_params;
   static nuisancepara N;
   static galpara G;
   static double cache_table_params;
@@ -802,7 +809,8 @@ double w_gg_tomo(
 
   if (recompute_gg(C, G, N) || 
       fdiff(cache_table_params, Ntable.random) ||
-      fdiff(cache_photoz_nuisance_params, photoz.random))
+      fdiff(cache_photoz_nuisance_params, photoz.random) ||
+      fdiff(cache_redshift_nz_params, redshift.random))
   {        
     double** Cl = (double**) malloc2d(NSIZE, limits.LMAX);
     
@@ -909,6 +917,7 @@ double w_gg_tomo(
     update_nuisance(&N);
     cache_table_params = Ntable.random;
     cache_photoz_nuisance_params = photoz.random;
+    cache_redshift_nz_params = redshift.random;
   }
 
   if (nt < 0 || nt > Ntable.Ntheta - 1)
@@ -950,6 +959,7 @@ double w_gk_tomo(const int nt, const int ni, const int limber)
   static double* w_vec = NULL;
   static cosmopara C;
   static double cache_photoz_nuisance_params;
+  static double cache_redshift_nz_params;
   static nuisancepara N;
   static galpara G;
   static double cache_table_params;
@@ -1020,7 +1030,8 @@ double w_gk_tomo(const int nt, const int ni, const int limber)
 
   if (recompute_gk(C, G, N) || 
       fdiff(cache_table_params, Ntable.random) ||
-      fdiff(cache_photoz_nuisance_params, photoz.random))
+      fdiff(cache_photoz_nuisance_params, photoz.random) ||
+      fdiff(cache_redshift_nz_params, redshift.random))
   { 
     double** Cl = (double**) malloc2d(NSIZE, limits.LMAX);
 
@@ -1097,6 +1108,7 @@ double w_gk_tomo(const int nt, const int ni, const int limber)
     update_nuisance(&N);
     cache_table_params = Ntable.random;
     cache_photoz_nuisance_params = photoz.random;
+    cache_redshift_nz_params = redshift.random;
   }
 
   if (ni < -1 || ni > redshift.clustering_nbin - 1)
@@ -1134,6 +1146,7 @@ double w_ks_tomo(
   static double* w_vec = NULL;
   static cosmopara C;
   static double cache_photoz_nuisance_params;
+  static double cache_redshift_nz_params;
   static nuisancepara N;
   static double cache_table_params;
 
@@ -1204,7 +1217,8 @@ double w_ks_tomo(
 
   if (recompute_ks(C, N) || 
       fdiff(cache_table_params, Ntable.random) ||
-      fdiff(cache_photoz_nuisance_params, photoz.random))
+      fdiff(cache_photoz_nuisance_params, photoz.random) ||
+      fdiff(cache_redshift_nz_params, redshift.random))
   {
     double** Cl = (double**) malloc2d(NSIZE, limits.LMAX);
 
@@ -1280,6 +1294,7 @@ double w_ks_tomo(
     update_nuisance(&N);
     cache_table_params = Ntable.random;
     cache_photoz_nuisance_params = photoz.random;
+    cache_redshift_nz_params = redshift.random;
   }
 
   if (nt < 0 || nt > Ntable.Ntheta - 1)
@@ -1515,6 +1530,7 @@ double C_ss_TATT_EE_tomo_limber(
 {
   static cosmopara C;
   static double cache_photoz_nuisance_params;
+  static double cache_redshift_nz_params;
   static nuisancepara N;
   static double** table;
   static double* sig;
@@ -1562,7 +1578,8 @@ double C_ss_TATT_EE_tomo_limber(
   if (force_no_recompute == 0)
   { // it turns out - because (nell = 100.000) on real funcs, recompute funcs are quite expensive
     if (recompute_shear(C, N) ||
-        fdiff(cache_photoz_nuisance_params, photoz.random))
+        fdiff(cache_photoz_nuisance_params, photoz.random) ||
+        fdiff(cache_redshift_nz_params, redshift.random))
     {
       #pragma GCC diagnostic push
       #pragma GCC diagnostic ignored "-Wunused-variable"
@@ -1617,6 +1634,7 @@ double C_ss_TATT_EE_tomo_limber(
       update_cosmopara(&C);
       update_nuisance(&N);
       cache_photoz_nuisance_params = photoz.random;
+      cache_redshift_nz_params = redshift.random;
     }
   }
 
@@ -1670,6 +1688,7 @@ double C_ss_TATT_BB_tomo_limber(const double l, const int ni, const int nj,
 const int force_no_recompute)
 {
   static double cache_photoz_nuisance_params;
+  static double cache_redshift_nz_params;
   static cosmopara C;
   static nuisancepara N;
   static double** table;
@@ -1718,7 +1737,8 @@ const int force_no_recompute)
   if (force_no_recompute == 0)
   { // it turns out - because (nell = 100.000) on real funcs, recompute funcs are quite expensive
     if (recompute_shear(C, N) ||
-        fdiff(cache_photoz_nuisance_params, photoz.random))
+        fdiff(cache_photoz_nuisance_params, photoz.random) ||
+        fdiff(cache_redshift_nz_params, redshift.random))
     {
       #pragma GCC diagnostic push
       #pragma GCC diagnostic ignored "-Wunused-variable"
@@ -1774,6 +1794,7 @@ const int force_no_recompute)
       update_cosmopara(&C);
       update_nuisance(&N);
       cache_photoz_nuisance_params = photoz.random;
+      cache_redshift_nz_params = redshift.random;
     }
   }
 
@@ -1931,6 +1952,7 @@ double C_ss_tomo_limber(
   )
 {
   static double cache_photoz_nuisance_params;
+  static double cache_redshift_nz_params;
   static cosmopara C;
   static nuisancepara N;
   static double** table = NULL;
@@ -1958,7 +1980,8 @@ double C_ss_tomo_limber(
 
     if (recompute_shear(C, N) || 
         fdiff(cache_table_params, Ntable.random) ||
-        fdiff(cache_photoz_nuisance_params, photoz.random))
+        fdiff(cache_photoz_nuisance_params, photoz.random) ||
+        fdiff(cache_redshift_nz_params, redshift.random))
     {
       #pragma GCC diagnostic push
       #pragma GCC diagnostic ignored "-Wunused-variable"
@@ -1995,6 +2018,7 @@ double C_ss_tomo_limber(
       update_nuisance(&N);
       cache_table_params = Ntable.random;
       cache_photoz_nuisance_params = photoz.random;
+      cache_redshift_nz_params = redshift.random;
     }
   }
 
@@ -2380,6 +2404,7 @@ double C_gs_tomo_limber(
   )
 {
   static double cache_photoz_nuisance_params;
+  static double cache_redshift_nz_params;
   static cosmopara C;
   static nuisancepara N;
   static galpara G;
@@ -2408,7 +2433,8 @@ double C_gs_tomo_limber(
 
     if (recompute_gs(C, G, N) || 
         fdiff(cache_table_params, Ntable.random) ||
-        fdiff(cache_photoz_nuisance_params, photoz.random))
+        fdiff(cache_photoz_nuisance_params, photoz.random) ||
+        fdiff(cache_redshift_nz_params, redshift.random))
     {
       #pragma GCC diagnostic push
       #pragma GCC diagnostic ignored "-Wunused-variable"
@@ -2450,6 +2476,7 @@ double C_gs_tomo_limber(
       update_galpara(&G);
       cache_table_params = Ntable.random;
       cache_photoz_nuisance_params = photoz.random;
+      cache_redshift_nz_params = redshift.random;
     }
   }
 
@@ -2741,6 +2768,7 @@ double C_gg_tomo_limber(
   )
 { // cross redshift bin not supported
   static double cache_photoz_nuisance_params;
+  static double cache_redshift_nz_params;
   static cosmopara C;
   static nuisancepara N;
   static galpara G;
@@ -2769,7 +2797,8 @@ double C_gg_tomo_limber(
 
     if (recompute_gg(C, G, N) || 
         fdiff(cache_table_params, Ntable.random) ||
-        fdiff(cache_photoz_nuisance_params, photoz.random))
+        fdiff(cache_photoz_nuisance_params, photoz.random) ||
+        fdiff(cache_redshift_nz_params, redshift.random))
     {
       #pragma GCC diagnostic push
       #pragma GCC diagnostic ignored "-Wunused-variable"
@@ -2806,6 +2835,7 @@ double C_gg_tomo_limber(
       update_nuisance(&N);
       cache_table_params = Ntable.random;
       cache_photoz_nuisance_params = photoz.random;
+      cache_redshift_nz_params = redshift.random;
     }
   }
   
@@ -3076,6 +3106,7 @@ double C_gk_tomo_limber(
   )
 {
   static double cache_photoz_nuisance_params;
+  static double cache_redshift_nz_params;
   static cosmopara C;
   static nuisancepara N;
   static galpara G;
@@ -3104,7 +3135,8 @@ double C_gk_tomo_limber(
   
     if (recompute_gk(C, G, N) || 
         fdiff(cache_table_params, Ntable.random) ||
-        fdiff(cache_photoz_nuisance_params, photoz.random))
+        fdiff(cache_photoz_nuisance_params, photoz.random) ||
+        fdiff(cache_redshift_nz_params, redshift.random))
     {
       #pragma GCC diagnostic push
       #pragma GCC diagnostic ignored "-Wunused-variable"
@@ -3138,6 +3170,7 @@ double C_gk_tomo_limber(
       update_galpara(&G);
       cache_table_params = Ntable.random;
       cache_photoz_nuisance_params = photoz.random;
+      cache_redshift_nz_params = redshift.random;
     }
   }
 
@@ -3273,6 +3306,7 @@ double C_ks_tomo_limber(
   )
 {
   static double cache_photoz_nuisance_params;
+  static double cache_redshift_nz_params;
   static cosmopara C;
   static nuisancepara N;
   static double cache_table_params;
@@ -3302,7 +3336,8 @@ double C_ks_tomo_limber(
 
     if (recompute_ks(C, N) || 
         fdiff(cache_table_params, Ntable.random) ||
-        fdiff(cache_photoz_nuisance_params, photoz.random))
+        fdiff(cache_photoz_nuisance_params, photoz.random) ||
+        fdiff(cache_redshift_nz_params, redshift.random))
     {
       #pragma GCC diagnostic push
       #pragma GCC diagnostic ignored "-Wunused-variable"
@@ -3360,6 +3395,7 @@ double C_ks_tomo_limber(
       update_nuisance(&N);
       cache_table_params = Ntable.random;
       cache_photoz_nuisance_params = photoz.random;
+      cache_redshift_nz_params = redshift.random;
     } 
   }
 
@@ -3676,6 +3712,7 @@ double C_gy_tomo_limber_nointerp(
 double C_gy_tomo_limber(double l, int ni, const int force_no_recompute)
 {
   static double cache_photoz_nuisance_params;
+  static double cache_redshift_nz_params;
   static cosmopara C;
   static nuisancepara N;
   static ynuisancepara N2;
@@ -3706,7 +3743,8 @@ double C_gy_tomo_limber(double l, int ni, const int force_no_recompute)
 
     if (recompute_gy(C, G, N, N2) || 
         fdiff(cache_table_params, Ntable.random) ||
-        fdiff(cache_photoz_nuisance_params, photoz.random))
+        fdiff(cache_photoz_nuisance_params, photoz.random) ||
+        fdiff(cache_redshift_nz_params, redshift.random))
     {
       #pragma GCC diagnostic push
       #pragma GCC diagnostic ignored "-Wunused-variable"
@@ -3741,6 +3779,7 @@ double C_gy_tomo_limber(double l, int ni, const int force_no_recompute)
       update_ynuisance(&N2);
       cache_table_params = Ntable.random;
       cache_photoz_nuisance_params = photoz.random;
+      cache_redshift_nz_params = redshift.random;
     }
   }
 
@@ -3855,6 +3894,7 @@ double C_ys_tomo_limber_nointerp(
 double C_ys_tomo_limber(double l, int ni, const int force_no_recompute)
 {
   static double cache_photoz_nuisance_params;
+  static double cache_redshift_nz_params;
   static cosmopara C;
   static nuisancepara N;
   static ynuisancepara N2;
@@ -3890,7 +3930,8 @@ double C_ys_tomo_limber(double l, int ni, const int force_no_recompute)
 
     if (recompute_ys(C, N, N2) || 
         fdiff(cache_table_params, Ntable.random) ||
-        fdiff(cache_photoz_nuisance_params, photoz.random))
+        fdiff(cache_photoz_nuisance_params, photoz.random) ||
+        fdiff(cache_redshift_nz_params, redshift.random))
     {
       #pragma GCC diagnostic push
       #pragma GCC diagnostic ignored "-Wunused-variable"
@@ -3957,6 +3998,7 @@ double C_ys_tomo_limber(double l, int ni, const int force_no_recompute)
       update_ynuisance(&N2);
       cache_table_params = Ntable.random;
       cache_photoz_nuisance_params = photoz.random;
+      cache_redshift_nz_params = redshift.random;
     }
   }
 
