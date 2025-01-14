@@ -123,7 +123,7 @@ static int has_b2_galaxies()
 int number_ell_fourier_2pt()
 {
   int res = 0;
-  switch(like.IA_MODEL)
+  switch((int) abs(like.IA_MODEL))
   {
     case IA_MODEL_TATT:
     { 
@@ -164,11 +164,13 @@ double xi_pm_tomo(
   static double** Glminus = NULL;
   static double* xi_vec_plus = NULL;
   static double* xi_vec_minus = NULL;
-  static double cache_table_params;
   static cosmopara C;
+  static nuisanceparams N;
+  static double cache_table_params;
   static double cache_photoz_nuisance_params_shear;
   static double cache_redshift_nz_params_shear;
-  static nuisanceparams N;
+  static double cache_intrinsic_aligment_params;
+  
 
   if (Ntable.Ntheta == 0)
   {
@@ -262,13 +264,14 @@ double xi_pm_tomo(
   }
 
   if (recompute_shear(C, N) || 
-      fdiff(cache_table_params, Ntable.random) ||
       fdiff(cache_photoz_nuisance_params_shear, nuisance.random_photoz_shear) ||
-      fdiff(cache_redshift_nz_params_shear, redshift.random_shear))
+      fdiff(cache_intrinsic_aligment_params, nuisance.random_ia) ||
+      fdiff(cache_redshift_nz_params_shear, redshift.random_shear) ||
+      fdiff(cache_table_params, Ntable.random))
   {
     if (limber == 1)
     {
-      switch(like.IA_MODEL)
+      switch((int) abs(like.IA_MODEL))
       {
         case IA_MODEL_TATT:
         { // TATT MODELING
@@ -472,6 +475,7 @@ double xi_pm_tomo(
     cache_table_params = Ntable.random;
     cache_photoz_nuisance_params_shear = nuisance.random_photoz_shear;
     cache_redshift_nz_params_shear = redshift.random_shear;
+    cache_intrinsic_aligment_params = nuisance.random_ia;
   }
 
   if (nt < 0 || nt > Ntable.Ntheta - 1)
@@ -480,7 +484,10 @@ double xi_pm_tomo(
     exit(1); 
   }
   
-  if (ni < 0 || ni > redshift.shear_nbin - 1 || nj < 0 || nj > redshift.shear_nbin - 1)
+  if (ni < 0 || 
+      ni > redshift.shear_nbin - 1 || 
+      nj < 0 || 
+      nj > redshift.shear_nbin - 1)
   {
     log_fatal("error in selecting bin number (ni, nj) = [%d,%d]", ni, nj);
     exit(1);
@@ -518,6 +525,7 @@ double w_gammat_tomo(
   static double cache_redshift_nz_params_shear;
   static double cache_redshift_nz_params_clustering;
   static double cache_table_params;
+  static double cache_intrinsic_aligment_params;
 
   if (Ntable.Ntheta == 0)
   {
@@ -562,12 +570,9 @@ double w_gammat_tomo(
 
     const int lmin = 1;
     for (int i=0; i<Ntable.Ntheta; i++)
-    {
       for (int l=0; l<lmin; l++)
-      {
         Pl[i][l] = 0.0;
-      }
-    }
+    
     #pragma omp parallel for collapse(2)
     for (int i=0; i<Ntable.Ntheta; i++)
     {
@@ -585,23 +590,20 @@ double w_gammat_tomo(
   }
 
   if (recompute_gs(C, G, N) ||
-      fdiff(cache_table_params, Ntable.random) ||
       fdiff(cache_photoz_nuisance_params_shear, nuisance.random_photoz_shear) ||
       fdiff(cache_photoz_nuisance_params_clustering, nuisance.random_photoz_clustering) ||
+      fdiff(cache_intrinsic_aligment_params, nuisance.random_ia) ||
       fdiff(cache_redshift_nz_params_shear, redshift.random_shear) ||
-      fdiff(cache_redshift_nz_params_clustering, redshift.random_clustering))
+      fdiff(cache_redshift_nz_params_clustering, redshift.random_clustering) ||
+      fdiff(cache_table_params, Ntable.random))
   {    
     double** Cl = (double**) malloc2d(NSIZE, limits.LMAX);
 
     const int lmin = 1;
     for (int i=0; i<NSIZE; i++)
-    {
       for (int l=0; l<lmin; l++)
-      {
         Cl[i][l] = 0.0;
-      }
-    }
-
+      
     #pragma GCC diagnostic push
     #pragma GCC diagnostic ignored "-Wunused-variable"
     { // init static variables inside the C_XY_limber function
@@ -701,6 +703,7 @@ double w_gammat_tomo(
     cache_photoz_nuisance_params_clustering = nuisance.random_photoz_clustering;
     cache_redshift_nz_params_shear = redshift.random_shear;
     cache_redshift_nz_params_clustering = redshift.random_clustering;
+    cache_intrinsic_aligment_params = nuisance.random_ia;
   }
 
   if (nt < 0 || nt > Ntable.Ntheta - 1)
@@ -812,9 +815,9 @@ double w_gg_tomo(
   }
 
   if (recompute_gg(C, G, N) || 
-      fdiff(cache_table_params, Ntable.random) ||
       fdiff(cache_photoz_nuisance_params_clustering, nuisance.random_photoz_clustering) ||
-      fdiff(cache_redshift_nz_params_clustering, redshift.random_clustering))
+      fdiff(cache_redshift_nz_params_clustering, redshift.random_clustering) ||
+      fdiff(cache_table_params, Ntable.random))
   {        
     double** Cl = (double**) malloc2d(NSIZE, limits.LMAX);
     
@@ -1033,9 +1036,9 @@ double w_gk_tomo(const int nt, const int ni, const int limber)
   }
 
   if (recompute_gk(C, G, N) || 
-      fdiff(cache_table_params, Ntable.random) ||
       fdiff(cache_photoz_nuisance_params_clustering, nuisance.random_photoz_clustering) ||
-      fdiff(cache_redshift_nz_params_clustering, redshift.random_clustering))
+      fdiff(cache_redshift_nz_params_clustering, redshift.random_clustering) ||
+      fdiff(cache_table_params, Ntable.random))
   { 
     double** Cl = (double**) malloc2d(NSIZE, limits.LMAX);
 
@@ -1149,11 +1152,12 @@ double w_ks_tomo(
   static double** Pl = NULL;
   static double* w_vec = NULL;
   static cosmopara C;
-  static double cache_photoz_nuisance_params_shear;
-  static double cache_redshift_nz_params_shear;
   static nuisanceparams N;
   static double cache_table_params;
-
+  static double cache_photoz_nuisance_params_shear;
+  static double cache_redshift_nz_params_shear;
+  static double cache_intrinsic_aligment_params;
+  
   if (Ntable.Ntheta == 0)
   {
     log_fatal("Ntable.Ntheta not initialized");
@@ -1197,12 +1201,9 @@ double w_ks_tomo(
 
     const int lmin = 1;
     for (int i=0; i<Ntable.Ntheta; i++)
-    {
       for (int l=0; l<lmin; l++)
-      {
         Pl[i][0] = 0.0;
-      }
-    }
+
     #pragma omp parallel for collapse(2)
     for (int i=0; i<Ntable.Ntheta; i++)
     {
@@ -1220,21 +1221,18 @@ double w_ks_tomo(
   }
 
   if (recompute_ks(C, N) || 
-      fdiff(cache_table_params, Ntable.random) ||
       fdiff(cache_photoz_nuisance_params_shear, nuisance.random_photoz_shear) ||
-      fdiff(cache_redshift_nz_params_shear, redshift.random_shear))
+      fdiff(cache_intrinsic_aligment_params, nuisance.random_ia) ||
+      fdiff(cache_redshift_nz_params_shear, redshift.random_shear) || 
+      fdiff(cache_table_params, Ntable.random))
   {
     double** Cl = (double**) malloc2d(NSIZE, limits.LMAX);
 
     const int lmin = 1;
     for (int i=0; i<NSIZE; i++)
-    {
       for (int l=0; l<lmin; l++)
-      {
         Cl[i][l] = 0.0;
-      }
-    }
-
+      
     if (limber == 1)
     {      
       #pragma GCC diagnostic push
@@ -1299,6 +1297,7 @@ double w_ks_tomo(
     cache_table_params = Ntable.random;
     cache_photoz_nuisance_params_shear = nuisance.random_photoz_shear;
     cache_redshift_nz_params_shear = redshift.random_shear;
+    cache_intrinsic_aligment_params = nuisance.random_ia;
   }
 
   if (nt < 0 || nt > Ntable.Ntheta - 1)
@@ -1478,8 +1477,6 @@ double C_ss_TATT_EE_tomo_limber_nointerp(
   return res;
 }
 
-// ---------------------------------------------------------------------------
-
 double C_ss_TATT_BB_tomo_limber_nointerp(
     double l, 
     int ni, 
@@ -1489,7 +1486,10 @@ double C_ss_TATT_BB_tomo_limber_nointerp(
 {
   static gsl_integration_glfixed_table* w = 0;
 
-  if(ni < -1 || ni > redshift.shear_nbin -1 || nj < -1 || nj > redshift.shear_nbin -1)
+  if (ni < -1 || 
+      ni > redshift.shear_nbin -1 || 
+      nj < -1 || 
+      nj > redshift.shear_nbin -1)
   {
     log_fatal("invalid bin input (ni, nj) = (%d, %d)", ni, nj);
     exit(1);
@@ -1536,9 +1536,10 @@ double C_ss_TATT_EE_tomo_limber(
   )
 {
   static cosmopara C;
+  static nuisanceparams N;
   static double cache_photoz_nuisance_params_shear;
   static double cache_redshift_nz_params_shear;
-  static nuisanceparams N;
+  static double cache_intrinsic_aligment_params;
   static double** table;
   static double* sig;
   static int osc[100];
@@ -1569,9 +1570,7 @@ double C_ss_TATT_EE_tomo_limber(
     {
       table[i] = ((double*)(table + NSIZE) + nell*i);
       for (int j=0; j<nell; j++)
-      {
         table[i][j] = 0.0;
-      }
     }
 
     sig = (double*) malloc(sizeof(double)*NSIZE);
@@ -1586,6 +1585,7 @@ double C_ss_TATT_EE_tomo_limber(
   { // it turns out - because (nell = 100.000) on real funcs, recompute funcs are quite expensive
     if (recompute_shear(C, N) ||
         fdiff(cache_photoz_nuisance_params_shear, nuisance.random_photoz_shear) ||
+        fdiff(cache_intrinsic_aligment_params, nuisance.random_ia) ||
         fdiff(cache_redshift_nz_params_shear, redshift.random_shear))
     {
       #pragma GCC diagnostic push
@@ -1642,6 +1642,7 @@ double C_ss_TATT_EE_tomo_limber(
       update_nuisance(&N);
       cache_photoz_nuisance_params_shear = nuisance.random_photoz_shear;
       cache_redshift_nz_params_shear = redshift.random_shear;
+      cache_intrinsic_aligment_params = nuisance.random_ia;
     }
   }
 
@@ -1653,13 +1654,9 @@ double C_ss_TATT_EE_tomo_limber(
   
   const double lnl = log(l);
   if (lnl < lnlmin)
-  {
     log_warn("l = %e < l_min = %e. Extrapolation adopted", l, exp(lnlmin));
-  }
   if (lnl > lnlmax)
-  {
     log_warn("l = %e > l_max = %e. Extrapolation adopted", l, exp(lnlmax));
-  }
   
   const int q = N_shear(ni, nj);
   if (q < 0 || q > NSIZE - 1)
@@ -1685,7 +1682,6 @@ double C_ss_TATT_EE_tomo_limber(
       exit(1);
     }
   }
-  
   return isnan(f1) ? 0.0 : f1;
 }
 
@@ -1696,6 +1692,7 @@ const int force_no_recompute)
 {
   static double cache_photoz_nuisance_params_shear;
   static double cache_redshift_nz_params_shear;
+  static double cache_intrinsic_aligment_params;
   static cosmopara C;
   static nuisanceparams N;
   static double** table;
@@ -1745,6 +1742,7 @@ const int force_no_recompute)
   { // it turns out - because (nell = 100.000) on real funcs, recompute funcs are quite expensive
     if (recompute_shear(C, N) ||
         fdiff(cache_photoz_nuisance_params_shear, nuisance.random_photoz_shear) ||
+        fdiff(cache_intrinsic_aligment_params, nuisance.random_ia) ||
         fdiff(cache_redshift_nz_params_shear, redshift.random_shear))
     {
       #pragma GCC diagnostic push
@@ -1802,10 +1800,14 @@ const int force_no_recompute)
       update_nuisance(&N);
       cache_photoz_nuisance_params_shear = nuisance.random_photoz_shear;
       cache_redshift_nz_params_shear = redshift.random_shear;
+      cache_intrinsic_aligment_params = nuisance.random_ia;
     }
   }
 
-  if (ni < 0 || ni > redshift.shear_nbin - 1 || nj < 0 || nj > redshift.shear_nbin - 1)
+  if (ni < 0 || 
+      ni > redshift.shear_nbin - 1 || 
+      nj < 0 || 
+      nj > redshift.shear_nbin - 1)
   {
     log_fatal("error in selecting bin number (ni, nj) = [%d,%d]", ni, nj);
     exit(1);
@@ -1813,13 +1815,10 @@ const int force_no_recompute)
   
   const double lnl = log(l);
   if (lnl < lnlmin)
-  {
     log_warn("l = %e < l_min = %e. Extrapolation adopted", l, exp(lnlmin));
-  }
   if (lnl > lnlmax)
-  {
     log_warn("l = %e > l_max = %e. Extrapolation adopted", l, exp(lnlmax));
-  }
+  
   
   const int q = N_shear(ni, nj);
   if (q < 0 || q > NSIZE - 1)
@@ -1830,22 +1829,17 @@ const int force_no_recompute)
   
   double f1;
   if (osc[q] == 0)
-  {
     f1 = sig[q] * exp(interpol(table[q], nell, lnlmin, lnlmax, dlnl, lnl, 1, 1));
-  }
   else
   {
     if (osc[q] == 1)
-    {
       f1 = interpol(table[q], nell, lnlmin, lnlmax, dlnl, lnl, 1, 1);
-    }
     else
     {
       log_fatal("internal logic error in selecting osc[ni]");
       exit(1);
     }
   }
-  
   return isnan(f1) ? 0.0 : f1;
 }
 
@@ -1864,7 +1858,10 @@ double int_for_C_ss_tomo_limber(double a, void* params)
 
   const int n1 = (int) ar[0]; // first source bin 
   const int n2 = (int) ar[1]; // second source bin 
-  if (n1 < 0 || n1 > redshift.shear_nbin - 1 || n2 < 0 || n2 > redshift.shear_nbin - 1)
+  if (n1 < 0 || 
+      n1 > redshift.shear_nbin - 1 || 
+      n2 < 0 || 
+      n2 > redshift.shear_nbin - 1)
   {
     log_fatal("error in selecting bin number (ni, nj) = [%d,%d]", n1, n2);
     exit(1);
@@ -1960,6 +1957,7 @@ double C_ss_tomo_limber(
 {
   static double cache_photoz_nuisance_params_shear;
   static double cache_redshift_nz_params_shear;
+  static double cache_intrinsic_aligment_params;
   static cosmopara C;
   static nuisanceparams N;
   static double** table = NULL;
@@ -1986,10 +1984,11 @@ double C_ss_tomo_limber(
     }
 
     if (recompute_shear(C, N) || 
-        fdiff(cache_table_params, Ntable.random) ||
         fdiff(cache_photoz_nuisance_params_shear, nuisance.random_photoz_shear) ||
-        fdiff(cache_redshift_nz_params_shear, redshift.random_shear))
-    {
+        fdiff(cache_intrinsic_aligment_params, nuisance.random_ia) ||
+        fdiff(cache_redshift_nz_params_shear, redshift.random_shear) ||
+        fdiff(cache_table_params, Ntable.random))
+    { 
       #pragma GCC diagnostic push
       #pragma GCC diagnostic ignored "-Wunused-variable"
       for (int k=0; k<NSIZE; k++)
@@ -2026,6 +2025,7 @@ double C_ss_tomo_limber(
       cache_table_params = Ntable.random;
       cache_photoz_nuisance_params_shear = nuisance.random_photoz_shear;
       cache_redshift_nz_params_shear = redshift.random_shear;
+      cache_intrinsic_aligment_params = nuisance.random_ia;
     }
   }
 
@@ -2073,7 +2073,10 @@ double int_for_C_gs_TATT_tomo_limber(double a, void* params)
   double* ar = (double*) params;
   const int nl = (int) ar[0];
   const int ns = (int) ar[1];
-  if (nl < 0 || nl > redshift.clustering_nbin - 1 || ns < 0 || ns > redshift.shear_nbin - 1)
+  if (nl < 0 || 
+      nl > redshift.clustering_nbin - 1 || 
+      ns < 0 || 
+      ns > redshift.shear_nbin - 1)
   {
     log_fatal("error in selecting bin number (nl, ns) = [%d,%d]", nl, ns);
     exit(1);
@@ -2245,7 +2248,6 @@ double int_for_C_gs_tomo_limber_withb2(double a, void* params)
   const double tmp = (l - 1.)*l*(l + 1.)*(l + 2.);         // correction (1812.05995 eqs 74-79)
   const double ell_prefactor2 = (tmp > 0) ? sqrt(tmp)/(ell*ell) : 0.0;
   
-  
   const double A_ZS = IA_A1_Z1(a, growfac_a, ns);
   const double WS   = W_source(a, ns, hoverh0) * A_ZS;
   
@@ -2414,6 +2416,7 @@ double C_gs_tomo_limber(
   static double cache_photoz_nuisance_params_clustering;
   static double cache_redshift_nz_params_shear;
   static double cache_redshift_nz_params_clustering;
+  static double cache_intrinsic_aligment_params;
   static cosmopara C;
   static nuisanceparams N;
   static galpara G;
@@ -2441,11 +2444,12 @@ double C_gs_tomo_limber(
     }
 
     if (recompute_gs(C, G, N) || 
-        fdiff(cache_table_params, Ntable.random) ||
         fdiff(cache_photoz_nuisance_params_shear, nuisance.random_photoz_shear) ||
         fdiff(cache_photoz_nuisance_params_clustering, nuisance.random_photoz_clustering) ||
+        fdiff(cache_intrinsic_aligment_params, nuisance.random_ia) ||
         fdiff(cache_redshift_nz_params_shear, redshift.random_shear) ||
-        fdiff(cache_redshift_nz_params_clustering, redshift.random_clustering))
+        fdiff(cache_redshift_nz_params_clustering, redshift.random_clustering) ||
+        fdiff(cache_table_params, Ntable.random))
     {
       #pragma GCC diagnostic push
       #pragma GCC diagnostic ignored "-Wunused-variable"
@@ -2486,12 +2490,11 @@ double C_gs_tomo_limber(
       update_nuisance(&N);
       update_galpara(&G);
       cache_table_params = Ntable.random;
-      
       cache_photoz_nuisance_params_shear = nuisance.random_photoz_shear;
       cache_photoz_nuisance_params_clustering = nuisance.random_photoz_clustering;
-      
       cache_redshift_nz_params_shear = redshift.random_shear;
       cache_redshift_nz_params_clustering = redshift.random_clustering;
+      cache_intrinsic_aligment_params = nuisance.random_ia;
     }
   }
 
@@ -2502,25 +2505,19 @@ double C_gs_tomo_limber(
     exit(1);
   }
 
+  double res = 0.0;
   if (test_zoverlap(ni, nj))
   {
     const double lnl = log(l);
     if (lnl < lnlmin)
-    {
       log_warn("l = %e < l_min = %e. Extrapolation adopted", l, exp(lnlmin));
-    }
     if (lnl > lnlmax)
-    {
       log_warn("l = %e > l_max = %e. Extrapolation adopted", l, exp(lnlmax));
-    }
-
+  
     const double f1 = interpol(table[q], nell, lnlmin, lnlmax, dlnl, lnl, 0, 0);
-    return isnan(f1) ? 0.0 : f1;
+    res = isnan(f1) ? 0.0 : f1;
   }
-  else
-  {
-    return 0.0;
-  }
+  return res;
 }
 
 // ---------------------------------------------------------------------------
@@ -2749,13 +2746,9 @@ double C_gg_tomo_limber_nointerp(
   if (init_static_vars_only == 1)
   {
     if (has_b2_galaxies() && use_linear_ps == 0)
-    {
       res = int_for_C_gg_tomo_limber_withb2(amin, (void*) ar);
-    }
     else
-    {
       res = int_for_C_gg_tomo_limber(amin, (void*) ar);
-    }
   }
   else
   {
@@ -2763,13 +2756,10 @@ double C_gg_tomo_limber_nointerp(
     F.params = (void*) ar;
     
     if (has_b2_galaxies() && use_linear_ps == 0)
-    {
       F.function = int_for_C_gg_tomo_limber_withb2;
-    }
     else
-    {
       F.function = int_for_C_gg_tomo_limber;
-    }
+    
     res = gsl_integration_glfixed(&F, amin, amax, w);
   }
   return res;
@@ -2811,9 +2801,9 @@ double C_gg_tomo_limber(
     }
 
     if (recompute_gg(C, G, N) || 
-        fdiff(cache_table_params, Ntable.random) ||
         fdiff(cache_photoz_nuisance_params_clustering, nuisance.random_photoz_clustering) ||
-        fdiff(cache_redshift_nz_params_clustering, redshift.random_clustering))
+        fdiff(cache_redshift_nz_params_clustering, redshift.random_clustering) ||
+        fdiff(cache_table_params, Ntable.random))
     {
       #pragma GCC diagnostic push
       #pragma GCC diagnostic ignored "-Wunused-variable"
@@ -2871,13 +2861,9 @@ double C_gg_tomo_limber(
   
   const double lnl = log(l);
   if (lnl < lnlmin)
-  {
     log_warn("l = %e < l_min = %e. Extrapolation adopted", l, exp(lnlmin));
-  }
   if (lnl > lnlmax)
-  {
     log_warn("l = %e > l_max = %e. Extrapolation adopted", l, exp(lnlmax));
-  }
   
   const int q = ni; // cross redshift bin not supported; not using N_CL(ni, nj)
   if (q < 0 || q > NSIZE - 1)
@@ -2979,7 +2965,8 @@ double int_for_C_gk_tomo_limber_withb2(double a, void* params)
   double* ar = (double*) params;
 
   const int nl = (int) ar[0];
-  if (nl < 0 || nl > redshift.clustering_nbin - 1)
+  if (nl < 0 || 
+      nl > redshift.clustering_nbin - 1)
   {
     log_fatal("error in selecting bin number ni = %d", nl);
     exit(1);
@@ -3062,7 +3049,8 @@ double C_gk_tomo_limber_nointerp(
     cache_table_params = Ntable.random;
   }
 
-  if (ni < 0 || ni > redshift.clustering_nbin - 1)
+  if (ni < 0 || 
+      ni > redshift.clustering_nbin - 1)
   {
     log_fatal("error in selecting bin number ni = %d", ni);
     exit(1);
@@ -3088,26 +3076,20 @@ double C_gk_tomo_limber_nointerp(
   if (init_static_vars_only == 1)
   {
     if (has_b2_galaxies() && use_linear_ps == 0)
-    {
       res = int_for_C_gk_tomo_limber_withb2(amin, (void*) ar);
-    }
     else
-    {
       res = int_for_C_gk_tomo_limber(amin, (void*) ar);
-    }
   }
   else
   {
     gsl_function F;
     F.params = (void*) ar;
+    
     if (has_b2_galaxies() && use_linear_ps == 0)
-    {
       F.function = int_for_C_gk_tomo_limber_withb2;
-    }
     else
-    {
       F.function = int_for_C_gk_tomo_limber;
-    }
+    
     res =  gsl_integration_glfixed(&F, amin, amax, w);
   }
 
@@ -3149,9 +3131,9 @@ double C_gk_tomo_limber(
     }
   
     if (recompute_gk(C, G, N) || 
-        fdiff(cache_table_params, Ntable.random) ||
         fdiff(cache_photoz_nuisance_params_clustering, nuisance.random_photoz_clustering) ||
-        fdiff(cache_redshift_nz_params_clustering, redshift.random_clustering))
+        fdiff(cache_redshift_nz_params_clustering, redshift.random_clustering) ||
+        fdiff(cache_table_params, Ntable.random))
     {
       #pragma GCC diagnostic push
       #pragma GCC diagnostic ignored "-Wunused-variable"
@@ -3197,15 +3179,10 @@ double C_gk_tomo_limber(
 
   const double lnl = log(l);
   if (lnl < lnlmin)
-  {
     log_warn("l = %e < l_min = %e. Extrapolation adopted", l, exp(lnlmin));
-  }
-
   if (lnl > lnlmax)
-  {
     log_warn("l = %e > l_max = %e. Extrapolation adopted", l, exp(lnlmax));
-  }
-
+  
   const int q =  ni; 
   if (q < 0 || q > NSIZE - 1)
   {
@@ -3262,7 +3239,6 @@ double int_for_C_ks_tomo_limber(double a, void* params)
   return (res*PK*chidchi.dchida/(fK*fK))*ell_prefactor1*ell_prefactor2;
 }
 
-
 double C_ks_tomo_limber_nointerp(
     double l, 
     int ni, 
@@ -3300,9 +3276,7 @@ double C_ks_tomo_limber_nointerp(
   double res = 0.0;
   
   if (init_static_vars_only == 1)
-  {
     res = int_for_C_ks_tomo_limber(amin, (void*) ar);
-  }
   else
   {
     gsl_function F;
@@ -3322,6 +3296,7 @@ double C_ks_tomo_limber(
 {
   static double cache_photoz_nuisance_params_shear;
   static double cache_redshift_nz_params_shear;
+  static double cache_intrinsic_aligment_params;
   static cosmopara C;
   static nuisanceparams N;
   static double cache_table_params;
@@ -3350,9 +3325,10 @@ double C_ks_tomo_limber(
     }
 
     if (recompute_ks(C, N) || 
-        fdiff(cache_table_params, Ntable.random) ||
         fdiff(cache_photoz_nuisance_params_shear, nuisance.random_photoz_shear) ||
-        fdiff(cache_redshift_nz_params_shear, redshift.random_shear))
+        fdiff(cache_intrinsic_aligment_params, nuisance.random_ia) ||
+        fdiff(cache_redshift_nz_params_shear, redshift.random_shear) ||
+        fdiff(cache_table_params, Ntable.random))
     {
       #pragma GCC diagnostic push
       #pragma GCC diagnostic ignored "-Wunused-variable"
@@ -3411,6 +3387,7 @@ double C_ks_tomo_limber(
       cache_table_params = Ntable.random;
       cache_photoz_nuisance_params_shear = nuisance.random_photoz_shear;
       cache_redshift_nz_params_shear = redshift.random_shear;
+      cache_intrinsic_aligment_params = nuisance.random_ia;
     } 
   }
 
@@ -3422,14 +3399,10 @@ double C_ks_tomo_limber(
 
   const double lnl = log(l);
   if (lnl < lnlmin)
-  {
     log_warn("l = %e < l_min = %e. Extrapolation adopted", l, exp(lnlmin));
-  }
   if (lnl > lnlmax)
-  {
     log_warn("l = %e > l_max = %e. Extrapolation adopted", l, exp(lnlmax));
-  }
-
+  
   const int q =  ni; 
   if (q < 0 || q > NSIZE - 1)
   {
@@ -3511,9 +3484,7 @@ double C_kk_limber_nointerp(
   double res = 0.0;
   
   if (init_static_vars_only == 1)
-  {
     res = int_for_C_kk_limber(amin, (void*) ar);
-  }
   else
   {
     gsl_function F;
@@ -3581,16 +3552,11 @@ double C_kk_limber(double l, const int force_no_recompute)
 
   const double lnl = log(l);
   if (lnl < lnlmin)
-  {
     log_warn("l = %e < l_min = %e. Extrapolation adopted", l, exp(lnlmin));
-  }
   if (lnl > lnlmax)
-  {
     log_warn("l = %e > l_max = %e. Extrapolation adopted", l, exp(lnlmax));
-  }
-
-  const double f1 = exp(interpol(table, nell, lnlmin, lnlmax, dlnl, lnl, 1, 1));
   
+  const double f1 = exp(interpol(table, nell, lnlmin, lnlmax, dlnl, lnl, 1, 1));
   return isnan(f1) ? 0.0 : f1;
 }
 
@@ -3698,9 +3664,7 @@ double C_gy_tomo_limber_nointerp(
       exit(1);
     }
     else
-    {
       res = int_for_C_gy_tomo_limber(amin, (void*) ar);
-    }
   }
   else
   {
@@ -3714,9 +3678,7 @@ double C_gy_tomo_limber_nointerp(
       return 0.0; // avoid gcc warning
     }
     else
-    {
       F.function = int_for_C_gy_tomo_limber;
-    }
     
     res =  gsl_integration_glfixed(&F, amin, amax, w);
   }
@@ -3757,9 +3719,9 @@ double C_gy_tomo_limber(double l, int ni, const int force_no_recompute)
     }
 
     if (recompute_gy(C, G, N, N2) || 
-        fdiff(cache_table_params, Ntable.random) ||
         fdiff(cache_photoz_nuisance_params_clustering, nuisance.random_photoz_clustering) ||
-        fdiff(cache_redshift_nz_params_clustering, redshift.random_clustering))
+        fdiff(cache_redshift_nz_params_clustering, redshift.random_clustering) ||
+        fdiff(cache_table_params, Ntable.random))
     {
       #pragma GCC diagnostic push
       #pragma GCC diagnostic ignored "-Wunused-variable"
@@ -3807,13 +3769,10 @@ double C_gy_tomo_limber(double l, int ni, const int force_no_recompute)
   
   const double lnl = log(l);
   if (lnl < lnlmin)
-  {
     log_warn("l = %e < l_min = %e. Extrapolation adopted", l, exp(lnlmin));
-  }
+  
   if (lnl > lnlmax)
-  {
     log_warn("l = %e > l_max = %e. Extrapolation adopted", l, exp(lnlmax));
-  }
   
   const double f1 = exp(interpol(table[q], nell, lnlmin, lnlmax, dlnl, lnl, 1, 1));
   
@@ -3892,9 +3851,7 @@ double C_ys_tomo_limber_nointerp(
   double res = 0.0;
   
   if (init_static_vars_only == 1)
-  {
     res = int_for_C_ys_tomo_limber(amin, (void*) ar);
-  }
   else
   {
     gsl_function F;
@@ -3910,6 +3867,7 @@ double C_ys_tomo_limber(double l, int ni, const int force_no_recompute)
 {
   static double cache_photoz_nuisance_params_shear;
   static double cache_redshift_nz_params_shear;
+  static double cache_intrinsic_aligment_params;
   static cosmopara C;
   static nuisanceparams N;
   static ynuisancepara N2;
@@ -3944,9 +3902,10 @@ double C_ys_tomo_limber(double l, int ni, const int force_no_recompute)
     }
 
     if (recompute_ys(C, N, N2) || 
-        fdiff(cache_table_params, Ntable.random) ||
         fdiff(cache_photoz_nuisance_params_shear, nuisance.random_photoz_shear) ||
-        fdiff(cache_redshift_nz_params_shear, redshift.random_shear))
+        fdiff(cache_intrinsic_aligment_params, nuisance.random_ia) ||
+        fdiff(cache_redshift_nz_params_shear, redshift.random_shear) ||
+        fdiff(cache_table_params, Ntable.random))
     {
       #pragma GCC diagnostic push
       #pragma GCC diagnostic ignored "-Wunused-variable"
@@ -3989,22 +3948,17 @@ double C_ys_tomo_limber(double l, int ni, const int force_no_recompute)
           use_linear_ps_limber, init_static_vars_only);
         
         if (tmp < 0)
-        {
           sig[k] = -1.;
-        }
+
         for (int i=0; i<nell; i++)
         {
           if (table[k][i]*sig[k] < 0.)
-          {
             osc[k] = 1;
-          }
         }
         if (osc[k] == 0)
         {
           for (int i=0; i<nell; i++)
-          {
             table[k][i] = log(sig[k]*table[k][i]);
-          }
         }
       }
       
@@ -4014,6 +3968,7 @@ double C_ys_tomo_limber(double l, int ni, const int force_no_recompute)
       cache_table_params = Ntable.random;
       cache_photoz_nuisance_params_shear = nuisance.random_photoz_shear;
       cache_redshift_nz_params_shear = redshift.random_shear;
+      cache_intrinsic_aligment_params = nuisance.random_ia;
     }
   }
 
@@ -4032,13 +3987,9 @@ double C_ys_tomo_limber(double l, int ni, const int force_no_recompute)
   
   const double lnl = log(l);
   if (lnl < lnlmin)
-  {
     log_warn("l = %e < l_min = %e. Extrapolation adopted", l, exp(lnlmin));
-  }
   if (lnl > lnlmax)
-  {
     log_warn("l = %e > l_max = %e. Extrapolation adopted", l, exp(lnlmax));
-  }
 
   double f1 = 0.0;
   if (osc[ni] == 0)
@@ -4118,9 +4069,7 @@ double C_ky_limber_nointerp(
   double res = 0.0;
   
   if (init_static_vars_only == 1)
-  {
     res = int_for_C_ky_limber(amin, (void*) ar);
-  }
   else
   {
     gsl_function F;
@@ -4190,13 +4139,9 @@ double C_ky_limber(double l, const int force_no_recompute)
 
   const double lnl = log(l);
   if (lnl < lnlmin)
-  {
     log_warn("l = %e < l_min = %e. Extrapolation adopted", l, exp(lnlmin));
-  }
   if (lnl > lnlmax)
-  {
     log_warn("l = %e > l_max = %e. Extrapolation adopted", l, exp(lnlmax));
-  }
   
   const double f1 = exp(interpol(table, nell, lnlmin, lnlmax, dlnl, lnl, 1, 1));
   
@@ -4257,9 +4202,7 @@ double C_yy_limber_nointerp(
   double res = 0.0;
   
   if (init_static_vars_only == 1)
-  {
     res = int_for_C_yy_limber(amin, (void*) ar);
-  }
   else
   {
     gsl_function F;
@@ -4329,13 +4272,9 @@ double C_yy_limber(double l, const int force_no_recompute)
 
   const double lnl = log(l);
   if (lnl < lnlmin)
-  {
     log_warn("l = %e < l_min = %e. Extrapolation adopted", l, exp(lnlmin));
-  }
   if (lnl > lnlmax)
-  {
     log_warn("l = %e > l_max = %e. Extrapolation adopted", l, exp(lnlmax));
-  }
   
   const double f1 = exp(interpol(table, nell, lnlmin, lnlmax, dlnl, lnl, 1, 1));
   

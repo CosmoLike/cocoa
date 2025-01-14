@@ -196,31 +196,32 @@ typedef struct
 { // When struct is updated, assign a new random number (critical for cache)
   double random_photoz_shear;
   double random_photoz_clustering;
+  double random_ia;
 
   // INTRINSIC ALIGMENT ------------------------------------------  
-  // if (IA_NLA_LF || IA_REDSHIFT_EVOLUTION)
-  // A_z[0] = A_ia          (IA_NLA_LF || IA_REDSHIFT_EVOLUTION)
-  // A_z[1] = eta_ia        (IA_NLA_LF || IA_REDSHIFT_EVOLUTION)
-  // A_z[2] = eta_ia_highz  (IA_NLA_LF, Joachimi2012)
-  // A_z[3] = beta_ia       (IA_NLA_LF, Joachimi2012)
-  // A_z[4] = LF_alpha      (IA_NLA_LF, Joachimi2012)
-  // A_z[5] = LF_P          (IA_NLA_LF, Joachimi2012)
-  // A_z[6] = LF_Q          (IA_NLA_LF, Joachimi2012)
-  // A_z[7] = LF_red_alpha  (IA_NLA_LF, Joachimi2012)
-  // A_z[8] = LF_red_P      (IA_NLA_LF, Joachimi2012)
-  // A_z[9] = LF_red_Q      (IA_NLA_LF, Joachimi2012)
-  // if IA_REDSHIFT_EVOLUTION
-  // A2_z[0] = A2_ia
-  // A2_z[1] = eta_ia_tt
-  double A_z[MAX_SIZE_ARRAYS];  // NLA normalization per source redshift bin
-  double A2_z[MAX_SIZE_ARRAYS]; // NLA normalization per source redshift bin
-  double b_ta_z[MAX_SIZE_ARRAYS]; // b_ta per bin or use b_ta_z[0] with IA_REDSHIFT_EVOLUTION
-  double oneplusz0_ia;          // oneplusz0-ia MegaZ
+  // A_z[0] = A_ia          if(IA_NLA_LF || IA_REDSHIFT_EVOLUTION)
+  // A_z[1] = eta_ia        if(IA_NLA_LF || IA_REDSHIFT_EVOLUTION)
+  // A_z[2] = eta_ia_highz  if(IA_NLA_LF, Joachimi2012)
+  // A_z[3] = beta_ia       if(IA_NLA_LF, Joachimi2012)
+  // A_z[4] = LF_alpha      if(IA_NLA_LF, Joachimi2012)
+  // A_z[5] = LF_P          if(IA_NLA_LF, Joachimi2012)
+  // A_z[6] = LF_Q          if(IA_NLA_LF, Joachimi2012)
+  // A_z[7] = LF_red_alpha  if(IA_NLA_LF, Joachimi2012)
+  // A_z[8] = LF_red_P      if(IA_NLA_LF, Joachimi2012)
+  // A_z[9] = LF_red_Q      if(IA_NLA_LF, Joachimi2012)
+  // A2_z[0] = A2_ia        if IA_REDSHIFT_EVOLUTION
+  // A2_z[1] = eta_ia_tt    if IA_REDSHIFT_EVOLUTION
+  double A_z[MAX_SIZE_ARRAYS];    // normalization per redshift bin
+  double A2_z[MAX_SIZE_ARRAYS];   // normalization per redshift bin
+  double b_ta_z[MAX_SIZE_ARRAYS]; // b_ta per redshift bin or 
+                                  // use b_ta_z[0] with IA_REDSHIFT_EVOLUTION
+  double oneplusz0_ia;
   double c1rhocrit_ia;
 
   // PHOTOZ ------------------------------------------
-  double bias_photoz_shear[MAX_SIZE_ARRAYS][MAX_SIZE_ARRAYS];      // bias, strech...
-  double bias_photoz_clustering[MAX_SIZE_ARRAYS][MAX_SIZE_ARRAYS]; // bias, strech...
+  // first index = bias, strech...
+  double bias_photoz_shear[MAX_SIZE_ARRAYS][MAX_SIZE_ARRAYS]; 
+  double bias_photoz_clustering[MAX_SIZE_ARRAYS][MAX_SIZE_ARRAYS];
 
   // SHEAR CALIBRATION ------------------------------------------
   double shear_calibration_m[MAX_SIZE_ARRAYS];
