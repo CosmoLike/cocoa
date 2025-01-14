@@ -813,11 +813,8 @@ void init_cosmo_runmode(
   
   memcpy(pdeltaparams.runmode, mode.c_str(), size + 1);
 
-  spdlog::debug(
-      "\x1b[90m{}\x1b[0m: {} = {} selected", 
-      "init_cosmo_runmode", 
-      "runmode", mode
-    );
+  spdlog::debug("\x1b[90m{}\x1b[0m: {} = {} selected", 
+    "init_cosmo_runmode", "runmode", mode);
   
   spdlog::debug("\x1b[90m{}\x1b[0m: Ends", "init_cosmo_runmode");
 }
@@ -1446,14 +1443,9 @@ void init_IA(const int IA_MODEL, const int IA_REDSHIFT_EVOL)
 {
   spdlog::debug("\x1b[90m{}\x1b[0m: Begins", "init_IA");
 
-  spdlog::debug(
-      "\x1b[90m{}\x1b[0m: {} = {} selected.", 
-      "init_IA", 
-      "IA MODEL", 
-      IA_MODEL, 
-      "IA REDSHIFT EVOLUTION", 
-      IA_REDSHIFT_EVOL
-    );
+  spdlog::debug("\x1b[90m{}\x1b[0m: {} = {} selected.", 
+    "init_IA", "IA MODEL", IA_MODEL, 
+    "IA REDSHIFT EVOLUTION", IA_REDSHIFT_EVOL);
 
   if (IA_MODEL == 0 || IA_MODEL == 1)
   {
@@ -1461,12 +1453,8 @@ void init_IA(const int IA_MODEL, const int IA_REDSHIFT_EVOL)
   }
   else
   {
-    spdlog::critical(
-        "{}: {} = {} not supported", 
-        "init_IA", 
-        "like.IA_MODEL", 
-        IA_MODEL
-      );
+    spdlog::critical("{}: {} = {} not supported", 
+      "init_IA", "like.IA_MODEL", IA_MODEL);
     exit(1);
   }
 
@@ -1479,12 +1467,8 @@ void init_IA(const int IA_MODEL, const int IA_REDSHIFT_EVOL)
   }
   else
   {
-    spdlog::critical(
-        "{}: {} = {} not supported", 
-        "init_IA", 
-        "like.IA", 
-        IA_REDSHIFT_EVOL
-      );
+    spdlog::critical("{}: {} = {} not supported", 
+      "init_IA", "like.IA", IA_REDSHIFT_EVOL);
     exit(1);
   }
 
@@ -1520,24 +1504,18 @@ void init_linear_power_spectrum(
   if (debug_fail)
   {
     spdlog::critical(
-        "\x1b[90m{}\x1b[0m: incompatible input w/ k.size = {}, z.size = {}, "
-        "and lnP.size = {}", "init_linear_power_spectrum", 
-        io_log10k.n_elem,
-        io_z.n_elem, 
-        io_lnP.n_elem
-      );
+      "\x1b[90m{}\x1b[0m: incompatible input w/ k.size = {}, z.size = {}, "
+      "and lnP.size = {}", "init_linear_power_spectrum", 
+      io_log10k.n_elem, io_z.n_elem, io_lnP.n_elem);
     exit(1);
   }
 
   if(io_z.n_elem < 5 || io_log10k.n_elem < 5)
   {
     spdlog::critical(
-        "\x1b[90m{}\x1b[0m: bad input w/ k.size = {}, z.size = {}, "
-        "and lnP.size = {}", "init_linear_power_spectrum", 
-        io_log10k.n_elem,
-        io_z.n_elem, 
-        io_lnP.n_elem
-      );
+      "\x1b[90m{}\x1b[0m: bad input w/ k.size = {}, z.size = {}, "
+      "and lnP.size = {}", "init_linear_power_spectrum", 
+      io_log10k.n_elem, io_z.n_elem, io_lnP.n_elem);
     exit(1);
   }
 
@@ -1591,26 +1569,18 @@ void init_non_linear_power_spectrum(
   if (debug_fail)
   {
     spdlog::critical(
-        "\x1b[90m{}\x1b[0m: incompatible input w/ k.size = {}, z.size = {}, "
-        "and lnP.size = {}", 
-        "init_non_linear_power_spectrum", 
-        io_log10k.n_elem,
-        io_z.n_elem, 
-        io_lnP.n_elem
-      );
+      "\x1b[90m{}\x1b[0m: incompatible input w/ k.size = {}, z.size = {}, "
+      "and lnP.size = {}", "init_non_linear_power_spectrum", 
+      io_log10k.n_elem, io_z.n_elem, io_lnP.n_elem);
     exit(1);
   }
 
   if (io_z.n_elem < 5 || io_log10k.n_elem < 5)
   {
     spdlog::critical(
-        "\x1b[90m{}\x1b[0m: bad input w/ k.size = {}, z.size = {}, "
-        "and lnP.size = {}", 
-        "init_non_linear_power_spectrum", 
-        io_log10k.n_elem,
-        io_z.n_elem, 
-        io_lnP.n_elem
-      );
+      "\x1b[90m{}\x1b[0m: bad input w/ k.size = {}, z.size = {}, "
+      "and lnP.size = {}", "init_non_linear_power_spectrum", 
+      io_log10k.n_elem, io_z.n_elem, io_lnP.n_elem);
     exit(1);
   }
 
@@ -1650,46 +1620,30 @@ void init_probes(
   {
     like.shear_shear = 1;
 
-    spdlog::debug(
-        "\x1b[90m{}\x1b[0m: {} = {} selected", 
-        "init_probes", 
-        "possible_probes", 
-        "xi"
-      );
+    spdlog::debug("\x1b[90m{}\x1b[0m: {} = {} selected", 
+      "init_probes", "possible_probes", "xi");
   }
   else if (possible_probes.compare("wtheta") == 0)
   {
     like.pos_pos = 1;
 
-    spdlog::debug(
-        "\x1b[90m{}\x1b[0m: {} = {} selected", 
-        "init_probes", 
-        "possible_probes", 
-        "wtheta"
-      );
+    spdlog::debug("\x1b[90m{}\x1b[0m: {} = {} selected", 
+      "init_probes", "possible_probes", "wtheta");
   }
   else if (possible_probes.compare("gammat") == 0)
   {
     like.shear_pos = 1;
 
-    spdlog::debug(
-        "\x1b[90m{}\x1b[0m: {} = {} selected", 
-        "init_probes", 
-        "possible_probes", 
-        "gammat"
-      );
+    spdlog::debug("\x1b[90m{}\x1b[0m: {} = {} selected", 
+      "init_probes", "possible_probes", "gammat");
   }
   else if (possible_probes.compare("2x2pt") == 0)
   {
     like.shear_pos = 1;
     like.pos_pos = 1;
 
-    spdlog::debug(
-        "\x1b[90m{}\x1b[0m: {} = {} selected", 
-        "init_probes", 
-        "possible_probes", 
-        "2x2pt"
-      );
+    spdlog::debug("\x1b[90m{}\x1b[0m: {} = {} selected", 
+      "init_probes", "possible_probes", "2x2pt");
   }
   else if (possible_probes.compare("3x2pt") == 0)
   {
@@ -1697,24 +1651,16 @@ void init_probes(
     like.shear_pos = 1;
     like.pos_pos = 1;
 
-    spdlog::debug(
-        "\x1b[90m{}\x1b[0m: {} = {} selected", 
-        "init_probes", 
-        "possible_probes", 
-        "3x2pt"
-      );
+    spdlog::debug("\x1b[90m{}\x1b[0m: {} = {} selected", 
+      "init_probes", "possible_probes", "3x2pt");
   }
   else if (possible_probes.compare("xi_ggl") == 0)
   {
     like.shear_shear = 1;
     like.shear_pos = 1;
 
-    spdlog::debug(
-        "\x1b[90m{}\x1b[0m: {} = {} selected", 
-        "init_probes", 
-        "possible_probes", 
-        "xi + ggl (2x2pt)"
-      );
+    spdlog::debug("\x1b[90m{}\x1b[0m: {} = {} selected", 
+      "init_probes", "possible_probes", "xi + ggl (2x2pt)");
   }
   else if (possible_probes.compare("5x2pt") == 0)
   {
@@ -1724,12 +1670,8 @@ void init_probes(
     like.gk = 1;
     like.ks = 1;
     
-    spdlog::debug(
-        "\x1b[90m{}\x1b[0m: {} = {} selected", 
-        "init_probes", 
-        "possible_probes", 
-        "5x2pt"
-      );
+    spdlog::debug("\x1b[90m{}\x1b[0m: {} = {} selected", 
+      "init_probes", "possible_probes", "5x2pt");
   }
   else if (possible_probes.compare("6x2pt") == 0)
   {
@@ -1740,12 +1682,8 @@ void init_probes(
     like.ks = 1;
     like.kk = 1;
     
-    spdlog::debug(
-        "\x1b[90m{}\x1b[0m: {} = {} selected", 
-        "init_probes", 
-        "possible_probes", 
-        "6x2pt"
-      );
+    spdlog::debug("\x1b[90m{}\x1b[0m: {} = {} selected", 
+      "init_probes", "possible_probes", "6x2pt");
   }
   else if (possible_probes.compare("c3x2pt") == 0)
   {
@@ -1753,21 +1691,13 @@ void init_probes(
     like.ks = 1;
     like.kk = 1;
     
-    spdlog::debug(
-        "\x1b[90m{}\x1b[0m: {} = {} selected", 
-        "init_probes", 
-        "possible_probes", 
-        "c3x2pt (gk + sk + kk)"
-      );
+    spdlog::debug("\x1b[90m{}\x1b[0m: {} = {} selected", 
+      "init_probes", "possible_probes", "c3x2pt (gk + sk + kk)");
   }
   else
   {
-    spdlog::critical(
-        "\x1b[90m{}\x1b[0m: {} = {} probe not supported",
-        "init_probes", 
-        "possible_probes", 
-        possible_probes
-      );
+    spdlog::critical("\x1b[90m{}\x1b[0m: {} = {} probe not supported",
+      "init_probes", "possible_probes", possible_probes);
     exit(1);
   }
 
@@ -2037,12 +1967,8 @@ void init_ntomo_powerspectra()
 
   int n = 0;
   for (int i=0; i<redshift.clustering_nbin; i++)
-  {
     for (int j=0; j<redshift.shear_nbin; j++)
-    {
       n += test_zoverlap(i, j);
-    }
-  }
   tomo.ggl_Npowerspectra = n;
 
   tomo.clustering_Npowerspectra = redshift.clustering_nbin;
@@ -2190,8 +2116,7 @@ void set_nuisance_shear_photoz(vector SP)
     {
       cache_update = 1;
       nuisance.bias_photoz_shear[0][i] = SP(i);
-    }
-    
+    } 
   }
 
   if (cache_update == 1)
@@ -2288,29 +2213,22 @@ void set_nuisance_linear_bias(vector B1)
 
   if (redshift.clustering_nbin == 0)
   {
-    spdlog::critical(
-        "\x1b[90m{}\x1b[0m: {} = 0 is invalid",
-        "set_nuisance_linear_bias", "clustering_Nbin"
-      );
+    spdlog::critical("\x1b[90m{}\x1b[0m: {} = 0 is invalid",
+      "set_nuisance_linear_bias", "clustering_Nbin");
     exit(1);
   }
 
   if (redshift.clustering_nbin != static_cast<int>(B1.n_elem))
   {
     spdlog::critical(
-        "\x1b[90m{}\x1b[0m: incompatible input w/ size = {} (!= {})",
-        "set_nuisance_linear_bias", 
-        B1.n_elem, 
-        redshift.clustering_nbin
-      );
+      "\x1b[90m{}\x1b[0m: incompatible input w/ size = {} (!= {})",
+      "set_nuisance_linear_bias", B1.n_elem, redshift.clustering_nbin);
     exit(1);
   }
 
   for (int i=0; i<redshift.clustering_nbin; i++)
-  {
     gbias.b[i] = B1(i);
-  }
-
+  
   spdlog::debug("\x1b[90m{}\x1b[0m: Ends", "set_nuisance_linear_bias");
 }
 
@@ -2324,24 +2242,18 @@ void set_nuisance_nonlinear_bias(vector B1, vector B2)
 
   if (redshift.clustering_nbin == 0)
   {
-    spdlog::critical(
-        "\x1b[90m{}\x1b[0m: {} = 0 is invalid",
-        "set_nuisance_nonlinear_bias", 
-        "clustering_Nbin"
-      );
+    spdlog::critical("\x1b[90m{}\x1b[0m: {} = 0 is invalid",
+      "set_nuisance_nonlinear_bias", "clustering_Nbin");
     exit(1);
   }
 
-  if ( redshift.clustering_nbin != static_cast<int>(B1.n_elem) ||
-       redshift.clustering_nbin != static_cast<int>(B2.n_elem))
+  if (redshift.clustering_nbin != static_cast<int>(B1.n_elem) ||
+      redshift.clustering_nbin != static_cast<int>(B2.n_elem))
   {
     spdlog::critical(
-        "\x1b[90m{}\x1b[0m: incompatible input w/ sizes = {} and {} (!= {})",
-        "set_nuisance_nonlinear_bias", 
-        B1.n_elem, 
-        B2.n_elem, 
-        redshift.clustering_nbin
-      );
+      "\x1b[90m{}\x1b[0m: incompatible input w/ sizes = {} and {} (!= {})",
+      "set_nuisance_nonlinear_bias", 
+      B1.n_elem, B2.n_elem, redshift.clustering_nbin);
     exit(1);
   }
 
@@ -2366,22 +2278,17 @@ void set_nuisance_magnification_bias(vector B_MAG)
 
   if (redshift.clustering_nbin == 0)
   {
-    spdlog::critical(
-        "\x1b[90m{}\x1b[0m: {} = 0 is invalid",
-        "set_nuisance_magnification_bias",
-        "clustering_Nbin"
-      );
+    spdlog::critical("\x1b[90m{}\x1b[0m: {} = 0 is invalid",
+      "set_nuisance_magnification_bias", "clustering_Nbin");
     exit(1);
   }
 
   if (redshift.clustering_nbin != static_cast<int>(B_MAG.n_elem))
   {
     spdlog::critical(
-        "\x1b[90m{}\x1b[0m: incompatible input w/ size = {} (!= {})",
-        "set_nuisance_magnification_bias", 
-        B_MAG.n_elem, 
-        redshift.clustering_nbin
-      );
+      "\x1b[90m{}\x1b[0m: incompatible input w/ size = {} (!= {})",
+      "set_nuisance_magnification_bias", 
+      B_MAG.n_elem, redshift.clustering_nbin);
     exit(1);
   }
 
@@ -2420,11 +2327,8 @@ void set_nuisance_IA(
 
   if (redshift.shear_nbin == 0)
   {
-    spdlog::critical(
-        "\x1b[90m{}\x1b[0m: {} = 0 is invalid",
-        "set_nuisance_IA", 
-        "shear_Nbin"
-      );
+    spdlog::critical("\x1b[90m{}\x1b[0m: {} = 0 is invalid",
+      "set_nuisance_IA", "shear_Nbin");
     exit(1);
   }
 
@@ -2433,55 +2337,42 @@ void set_nuisance_IA(
       redshift.shear_nbin != static_cast<int>(BTA.n_elem))
   {
     spdlog::critical(
-        "\x1b[90m{}\x1b[0m: incompatible input w/ sizes = {}, {} and {} (!= {})",
-        "set_nuisance_IA", 
-        A1.n_elem, 
-        A2.n_elem, 
-        BTA.n_elem, 
-        redshift.shear_nbin
-      );
+      "\x1b[90m{}\x1b[0m: incompatible input w/ sizes = {}, {} and {} (!= {})",
+      "set_nuisance_IA", A1.n_elem, A2.n_elem, 
+      BTA.n_elem, redshift.shear_nbin);
     exit(1);
   }
 
   nuisance.c1rhocrit_ia = 0.01389;
   
-  if (like.IA == 2)
+  if ((int) abs(like.IA) == 2)
   {
     for (int i=0; i<redshift.shear_nbin; i++)
     {
-      nuisance.A_z[i]     = A1(i);
-      nuisance.A2_z[i]    = A2(i);
-      nuisance.b_ta_z[i]  = BTA(i);
+      nuisance.A_z[i] = A1(i);
+      nuisance.A2_z[i] = A2(i);
+      nuisance.b_ta_z[i] = BTA(i);
     }
   }
-  else if (like.IA == 3)
+  else if ((int) abs(like.IA) == 3)
   {
-    nuisance.A_ia         = A1(0);
-    nuisance.eta_ia       = A1(1);
+    nuisance.A_z[0] = A1(0);
+    nuisance.A_z[1] = A1(1);
     nuisance.oneplusz0_ia = 1.62;
 
-    nuisance.A2_ia = A2[0];
-    nuisance.eta_ia_tt = A2[1];
+    nuisance.A2_z[0] = A2(0);
+    nuisance.A2_z[1] = A2(1);
     nuisance.b_ta_z[0] = BTA[0];
 
     for (int i=2; i<redshift.shear_nbin; i++)
     {
-      if ( !(almost_equal(A1(i), 0.))    || 
-           !(almost_equal(A2(i), 0.))    ||
-           !(almost_equal(BTA(i), 0.))
-          )
+      if (fdiff(A1(i), 0.) || fdiff(A2(i), 0.) || fdiff(BTA(i), 0.))
       {
         spdlog::critical(
-            "\x1b[90m{}\x1b[0m: one of nuisance.A_z[{}]={}, nuisance.A2_z[{}]="
-            "{}, nuisance.b_ta[{}]={} was specified w/ power-law evolution\n",
-            "set_nuisance_IA", 
-            i, 
-            nuisance.A_z[i], 
-            i, 
-            nuisance.A2_z[i], 
-            i, 
-            nuisance.b_ta_z[i]
-          );
+          "\x1b[90m{}\x1b[0m: one of nuisance.A_z[{}]={}, nuisance.A2_z[{}]="
+          "{}, nuisance.b_ta[{}]={} was specified w/ power-law evolution\n",
+          "set_nuisance_IA", i, nuisance.A_z[i], 
+          i, nuisance.A2_z[i], i, nuisance.b_ta_z[i]);
         exit(1);
       }
     }
@@ -2489,8 +2380,6 @@ void set_nuisance_IA(
 
   spdlog::debug("\x1b[90m{}\x1b[0m: Ends", "set_nuisance_ia");
 }
-
-
 
 // ---------------------------------------------------------------------------
 // ---------------------------------------------------------------------------

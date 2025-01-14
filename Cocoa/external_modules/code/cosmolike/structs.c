@@ -58,7 +58,6 @@ cosmopara cosmology =
   //.n_s = 0.96,
 };
 
-
 tomopara tomo = 
 {
   .shear_Npowerspectra = 0,
@@ -488,12 +487,6 @@ void reset_nuisance_struct()
     nuisance.cluster_selection[i] = 0.0;
   }
 
-  nuisance.A_ia = 0.0;
-  nuisance.A2_ia = 0.0;
-  nuisance.beta_ia = 0.0;
-  nuisance.eta_ia = 0.0;
-  nuisance.eta_ia_tt = 0.0;
-  nuisance.eta_ia_highz = 0.0;
   nuisance.oneplusz0_ia = 0.0;
   nuisance.c1rhocrit_ia = 0.01389;
 }
@@ -561,18 +554,11 @@ void update_galpara(galpara *G)
 }
 
 void update_nuisance(nuisanceparams* N)
-{
-  N->A_ia          = nuisance.A_ia;
-  N->beta_ia       = nuisance.beta_ia;
-  N->eta_ia        = nuisance.eta_ia;
-  N->eta_ia_highz  = nuisance.eta_ia_highz;
-  N->A2_ia         = nuisance.A2_ia;
-  N->eta_ia_tt     = nuisance.eta_ia_tt;
-  
+{  
   for (int i=0; i<MAX_SIZE_ARRAYS; i++) 
   {    
-    N->A_z[i]    = nuisance.A_z[i];
-    N->A2_z[i]   = nuisance.A2_z[i];
+    N->A_z[i] = nuisance.A_z[i];
+    N->A2_z[i] = nuisance.A2_z[i];
     N->b_ta_z[i] = nuisance.b_ta_z[i];
 
     N->cluster_MOR[i] = nuisance.cluster_MOR[i];

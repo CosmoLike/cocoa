@@ -58,11 +58,9 @@ typedef struct
 } pre;
 
 typedef struct 
-{
-  double random; // COCOA: Random number. Optimization as the function 
-                 // COCOA: "recompute" can be too expensive if required to  
-                 // COCOA: check every element of the struct. Whenever 
-                 // COCOA: updating the struct, assign a new random number
+{ // When struct is updated, assign a new random number (critical for cache)
+  double random; 
+
   int N_a;          
   int N_k_lin;
   int N_k_nlin;
@@ -111,11 +109,8 @@ typedef struct
 } FPTpara;
 
 typedef struct
-{
-  double random; // COCOA: Random number. Optimization as the function 
-                 // COCOA: "recompute" can be too expensive if required to  
-                 // COCOA: check every element of the struct. Whenever 
-                 // COCOA: updating the struct, assign a new random number
+{ // When struct is updated, assign a new random number (critical for cache)
+  double random;
 
   double Omega_b;  // baryon density paramter
   double Omega_m;  // matter density parameter
@@ -137,10 +132,7 @@ typedef struct
 } tomopara;
 
 typedef struct
-{
-  // COCOA: Random number. Optimization as the function "recompute" can be
-  // COCOA: too expensive if required to check every element of the 2d arrays.
-  // COCOA:  Whenever updating n(z) parameters, assign a new random number
+{ // When struct is updated, assign a new random number (critical for cache)
   double random_shear;
   double random_clustering;
 
@@ -201,38 +193,36 @@ typedef struct
 } clusterparams;
 
 typedef struct
-{
-  // COCOA: Random number. Optimization as the function "recompute" can be
-  // COCOA: too expensive if required to check every element of the struct
-  // COCOA: Whenever updating the struct, assign a new random number
+{ // When struct is updated, assign a new random number (critical for cache)
   double random_photoz_shear;
   double random_photoz_clustering;
 
-  // INTRINSIC ALIGMENT ------------------------------------------
-  double LF_alpha;
-  double LF_P;
-  double LF_Q;
-  double LF_red_alpha;
-  double LF_red_P;
-  double LF_red_Q;
-  
-  double A_z[MAX_SIZE_ARRAYS];    // NLA normalization per source redshift bin
-  double A2_z[MAX_SIZE_ARRAYS];   // NLA normalization per source redshift bin
-  double b_ta_z[MAX_SIZE_ARRAYS]; // b_ta, per bin (like.IA = 6), or use b_ta_z[0] with like.IA = 5
-  double A_ia;                    // A IA see Joachimi2012
-  double A2_ia;                   // placeholder param for quadratic,etc IA
-  double beta_ia;                 // beta IA see Joachimi2012
-  double eta_ia;                  // eta_other IA see Joachimi2012
-  double eta_ia_tt;               // same as eta_ia, for TT
-  double eta_ia_highz;            // uncertainty in high z evolution
-  double oneplusz0_ia;            // oneplusz0-ia MegaZ
+  // INTRINSIC ALIGMENT ------------------------------------------  
+  // if (IA_NLA_LF || IA_REDSHIFT_EVOLUTION)
+  // A_z[0] = A_ia          (IA_NLA_LF || IA_REDSHIFT_EVOLUTION)
+  // A_z[1] = eta_ia        (IA_NLA_LF || IA_REDSHIFT_EVOLUTION)
+  // A_z[2] = eta_ia_highz  (IA_NLA_LF, Joachimi2012)
+  // A_z[3] = beta_ia       (IA_NLA_LF, Joachimi2012)
+  // A_z[4] = LF_alpha      (IA_NLA_LF, Joachimi2012)
+  // A_z[5] = LF_P          (IA_NLA_LF, Joachimi2012)
+  // A_z[6] = LF_Q          (IA_NLA_LF, Joachimi2012)
+  // A_z[7] = LF_red_alpha  (IA_NLA_LF, Joachimi2012)
+  // A_z[8] = LF_red_P      (IA_NLA_LF, Joachimi2012)
+  // A_z[9] = LF_red_Q      (IA_NLA_LF, Joachimi2012)
+  // if IA_REDSHIFT_EVOLUTION
+  // A2_z[0] = A2_ia
+  // A2_z[1] = eta_ia_tt
+  double A_z[MAX_SIZE_ARRAYS];  // NLA normalization per source redshift bin
+  double A2_z[MAX_SIZE_ARRAYS]; // NLA normalization per source redshift bin
+  double b_ta_z[MAX_SIZE_ARRAYS]; // b_ta per bin or use b_ta_z[0] with IA_REDSHIFT_EVOLUTION
+  double oneplusz0_ia;          // oneplusz0-ia MegaZ
   double c1rhocrit_ia;
-  
+
   // PHOTOZ ------------------------------------------
   double bias_photoz_shear[MAX_SIZE_ARRAYS][MAX_SIZE_ARRAYS];      // bias, strech...
   double bias_photoz_clustering[MAX_SIZE_ARRAYS][MAX_SIZE_ARRAYS]; // bias, strech...
 
-  // SHEAR CALIBRATION
+  // SHEAR CALIBRATION ------------------------------------------
   double shear_calibration_m[MAX_SIZE_ARRAYS];
   
   // Variables for the 4x2pt+N (see: 2008.10757 & 2010.01138)

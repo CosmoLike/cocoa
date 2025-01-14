@@ -41,13 +41,6 @@ int recompute_IA(nuisanceparams N)
 {
   int res = 0;
 
-  if (fdiff(N.A_ia, nuisance.A_ia) || 
-      fdiff(N.eta_ia, nuisance.eta_ia) ||
-      fdiff(N.A2_ia, nuisance.A2_ia) || 
-      fdiff(N.eta_ia_tt, nuisance.eta_ia_tt))
-  {
-    res = 1;
-  }
   for (int i=0; i<MAX_SIZE_ARRAYS; i++)
   {
     if (fdiff(N.A_z[i], nuisance.A_z[i]) ||

@@ -178,10 +178,8 @@ double xi_pm_tomo(
 
   const int NSIZE = tomo.shear_Npowerspectra;
 
-  if (Glplus == NULL || 
-      Glminus == NULL || 
-      xi_vec_plus == NULL  || 
-      xi_vec_minus == NULL || 
+  if (Glplus == NULL || Glminus == NULL || 
+      xi_vec_plus == NULL  || xi_vec_minus == NULL || 
       fdiff(cache_table_params, Ntable.random))
   {
     if (Glplus != NULL) free(Glplus);
@@ -297,9 +295,8 @@ double xi_pm_tomo(
             {
               const int Z1NZ = Z1(nz);
               const int Z2NZ = Z2(nz);
-
               if (nuisance.b_ta_z[0]    || nuisance.b_ta_z[Z1NZ] ||
-                  nuisance.b_ta_z[Z2NZ] || nuisance.A2_ia        ||
+                  nuisance.b_ta_z[Z2NZ] || nuisance.A2_z[0]      ||
                   nuisance.A2_z[Z1NZ]   || nuisance.A2_z[Z2NZ])
               {
                 BM = 1;
@@ -328,9 +325,9 @@ double xi_pm_tomo(
               const int Z1NZ = Z1(nz);
               const int Z2NZ = Z2(nz);
 
-              const int BM = (nuisance.b_ta_z[0]    || nuisance.b_ta_z[Z1NZ] ||
-                              nuisance.b_ta_z[Z2NZ] || nuisance.A2_ia        ||
-                              nuisance.A2_z[Z1NZ]   || nuisance.A2_z[Z2NZ]) ? 1 : 0;
+              const int BM = (nuisance.b_ta_z[0] || nuisance.b_ta_z[Z1NZ] ||
+                            nuisance.b_ta_z[Z2NZ] || nuisance.A2_z[0] ||
+                            nuisance.A2_z[Z1NZ] || nuisance.A2_z[Z2NZ]) ? 1 : 0;
 
               Cl_EE[nz][l] = C_ss_TATT_EE_tomo_limber_nointerp((double) l, Z1NZ, 
                 Z2NZ, init_static_vars_only);
@@ -349,9 +346,9 @@ double xi_pm_tomo(
               const int Z1NZ = Z1(nz);
               const int Z2NZ = Z2(nz);
 
-              const int BM = (nuisance.b_ta_z[0]    || nuisance.b_ta_z[Z1NZ] ||
-                              nuisance.b_ta_z[Z2NZ] || nuisance.A2_ia        ||
-                              nuisance.A2_z[Z1NZ]   || nuisance.A2_z[Z2NZ]) ? 1 : 0;
+              const int BM = (nuisance.b_ta_z[0] || nuisance.b_ta_z[Z1NZ] ||
+                            nuisance.b_ta_z[Z2NZ] || nuisance.A2_z[0] ||
+                            nuisance.A2_z[Z1NZ] || nuisance.A2_z[Z2NZ]) ? 1 : 0;
 
               Cl_EE[nz][l] = C_ss_TATT_EE_tomo_limber((double) l, Z1NZ, Z2NZ, 
                 force_no_recompute);
@@ -4353,82 +4350,110 @@ double C_yy_limber(double l, const int force_no_recompute)
 // ----------------------------------------------------------------------------
 // ----------------------------------------------------------------------------
 
-// --------------------------------------------------------------------------------------
+// ----------------------------------------------------------------------------
 // Galaxy Clustering
-// --------------------------------------------------------------------------------------
+// ----------------------------------------------------------------------------
 
-void f_chi_for_Psi_cl(double *const chi, int Nchi, double *const f_chi, const int ni,
-const double zmin, const double zmax)
+void f_chi_for_Psi_cl(
+    double* const chi, 
+    const int nchi, 
+    double* const f_chi, 
+    const int ni
+  )
 { // Integrand for galaxy density
   if (ni < -1 || ni > redshift.clustering_nbin - 1)
   {
     log_fatal("error in selecting bin number ni = %d", ni);
     exit(1);
   }
+  
+  const double zmin = redshift.clustering_zdist_zmin[ni];
+  const double zmax = redshift.clustering_zdist_zmax[ni];
   const double real_coverH0 = cosmology.coverH0/cosmology.h0; // unit Mpc
-  for (int i=0; i<Nchi; i++)
+  
+  for (int i=0; i<nchi; i++)
   {
     const double a = a_chi(chi[i]/real_coverH0 /* convert unit to c/H0 */);
     const double z = 1.0/a - 1.;
-    const double tmp1 = pf_photoz(z, ni);
-    const double pf = (tmp1 < 0.) ? 0 : tmp1; // get rid of unphysical negatives
-    f_chi[i] = gbias.b1_function(z, ni)*chi[i]*pf*growfac(a)*hoverh0(a)/real_coverH0;
+
     if ((z < zmin) || (z > zmax))
     {
       f_chi[i] = 0.;
     }
+    else
+    {
+      const double tmp1 = pf_photoz(z, ni);
+      const double pf = (tmp1 < 0.) ? 0 : tmp1; // get rid of unphysical negatives
+      f_chi[i] = gbias.b1_function(z, ni)*chi[i]*pf*growfac(a)*hoverh0(a)/real_coverH0;
+    }
   }
 }
 
-void f_chi_for_Psi_cl_RSD(double *const chi, int Nchi, double *const f_chi, const int ni,
-const double zmin, const double zmax)
-{ // Integrand for galaxy density RSD
+void f_chi_for_Psi_cl_RSD(
+    double* const chi, 
+    const int nchi, 
+    double* const f_chi, 
+    const int ni
+  ) // Integrand for galaxy density RSD
+{ 
   if (ni < -1 || ni > redshift.clustering_nbin - 1)
   {
     log_fatal("error in selecting bin number ni = %d", ni);
     exit(1);
   }
   
+  const double zmin = redshift.clustering_zdist_zmin[ni];
+  const double zmax = redshift.clustering_zdist_zmax[ni];
   const double real_coverH0 = cosmology.coverH0 / cosmology.h0;
   
-  for (int i=0; i<Nchi; i++) 
+  for (int i=0; i<nchi; i++) 
   {
     const double a = a_chi(chi[i]/real_coverH0 /* convert unit to c/H0 */);
-    const double z = 1.0 / a - 1.0;
-    const double tmp1 = pf_photoz(z, ni);
-    const double pf = (tmp1 < 0.) ? 0 : tmp1; // get rid of unphysical negatives
-    struct growths tmp2 = growfac_all(a);
-    f_chi[i] = -chi[i]*pf*tmp2.D*tmp2.f*hoverh0(a)/real_coverH0;
+    const double z = 1.0 / a - 1.0; 
     if ((z < zmin) || (z > zmax))
     {
       f_chi[i] = 0.;
-    } 
+    }
+    else
+    {
+      const double tmp1 = pf_photoz(z, ni);
+      const double pf = (tmp1 < 0.) ? 0 : tmp1; // get rid of unphysical negatives
+      struct growths tmp2 = growfac_all(a);
+      f_chi[i] = -chi[i]*pf*tmp2.D*tmp2.f*hoverh0(a)/real_coverH0;
+    }
   }
 }
 
-void f_chi_for_Psi_cl_Mag(double *const chi, int Nchi, double *const f_chi, const int ni,
-const double zmax)
+void f_chi_for_Psi_cl_Mag(
+    double* const chi, 
+    const int nchi, 
+    double* const f_chi, 
+    const int ni
+  )
 { // Integrand for lensing magnification of galaxy density
   if (ni < -1 || ni > redshift.clustering_nbin - 1)
   {
     log_fatal("error in selecting bin number ni = %d", ni);
     exit(1);
   }
-  
+
+  const double zmax = redshift.clustering_zdist_zmax[ni]; 
   const double real_coverH0 = cosmology.coverH0 / cosmology.h0;
   
-  for (int i=0; i<Nchi; i++)
+  for (int i=0; i<nchi; i++)
   {
-    const double a = a_chi(chi[i]/real_coverH0 /* convert unit to c/H0 */);
+    const double a = a_chi(chi[i]/real_coverH0);
     const double z = 1. / a - 1.;
-    const double fK = f_K(chi[i]/real_coverH0 /* convert unit to c/H0 */);
-    const double wmag = W_mag(a, fK, ni);
-    const double window_M = wmag/fK/(real_coverH0*real_coverH0);
-    f_chi[i] = window_M * growfac(a); // unit [Mpc^-2]
-    if (z > zmax)
+    if (z > zmax) 
     {
       f_chi[i] = 0.;
-    } 
+    }
+    else
+    {
+      const double fK = f_K(chi[i]/real_coverH0); 
+      const double WM = W_mag(a, fK, ni);
+      f_chi[i] = (WM/fK/(real_coverH0*real_coverH0)) * growfac(a); // [Mpc^-2]
+    }
   }
 }
 
@@ -4507,20 +4532,14 @@ void C_cl_tomo(int L, const int ni, const int nj, double *const Cl, double dev, 
     }
   }
   
-  {
-    const double zmin = redshift.clustering_zdist_zmin[ni];
-    const double zmax = redshift.clustering_zdist_zmax[ni];
-    f_chi_for_Psi_cl(chi_ar, Nchi, f1_chi, ni, zmin, zmax);
-    f_chi_for_Psi_cl_RSD(chi_ar, Nchi, f1_chi_RSD, ni, zmin, zmax);
-    f_chi_for_Psi_cl_Mag(chi_ar, Nchi, f1_chi_Mag, ni, zmax);
-  }
+  f_chi_for_Psi_cl(chi_ar, Nchi, f1_chi, ni);
+  f_chi_for_Psi_cl_RSD(chi_ar, Nchi, f1_chi_RSD, ni);
+  f_chi_for_Psi_cl_Mag(chi_ar, Nchi, f1_chi_Mag, ni);
   if (ni != nj)
   { 
-    const double zmin = redshift.clustering_zdist_zmin[nj];
-    const double zmax = redshift.clustering_zdist_zmax[nj];
-    f_chi_for_Psi_cl(chi_ar, Nchi, f2_chi, nj, zmin, zmax);
-    f_chi_for_Psi_cl_RSD(chi_ar, Nchi, f2_chi_RSD, nj, zmin, zmax);
-    f_chi_for_Psi_cl_Mag(chi_ar, Nchi, f2_chi_Mag, nj, zmax);
+    f_chi_for_Psi_cl(chi_ar, Nchi, f2_chi, nj);
+    f_chi_for_Psi_cl_RSD(chi_ar, Nchi, f2_chi_RSD, nj);
+    f_chi_for_Psi_cl_Mag(chi_ar, Nchi, f2_chi_Mag, nj);
   }
 
   config cfg;
@@ -4620,68 +4639,102 @@ void C_cl_tomo(int L, const int ni, const int nj, double *const Cl, double dev, 
   }
 }
 
-// --------------------------------------------------------------------------------------
+// ----------------------------------------------------------------------------
 // Galaxy-Galaxylensing
-// --------------------------------------------------------------------------------------
+// ----------------------------------------------------------------------------
 
-
-void f_chi_for_Psi_sh(double *const chi, int Nchi, double *const fchi, const int nj,
-const double zmax)
+void f_chi_for_Psi_sh(
+    double* const chi, 
+    const int nchi, 
+    double* const fchi, 
+    const int ns
+  )
 {
-  if (nj < -1 || nj > redshift.shear_nbin - 1)
+  if (ns < -1 || ns > redshift.shear_nbin - 1)
   {
-    log_fatal("error in selecting bin number nj = %d", nj);
+    log_fatal("error in selecting bin number ns = %d", ns);
     exit(1);
   }
+  
+  const double zmax = redshift.shear_zdist_zmax[ns];
   const double real_coverH0 = cosmology.coverH0/cosmology.h0;
-  for (int i=0; i<Nchi; i++)
+  
+  for (int i=0; i<nchi; i++)
   {
-    const double a = a_chi(chi[i] / real_coverH0) ;
+    const double a = a_chi(chi[i]/real_coverH0) ;
     const double z = 1.0/a - 1.0;
-    const double fK = f_K(chi[i]/real_coverH0);
-    const double wkappa = W_kappa(a, fK, nj);
-    fchi[i] = (wkappa/fK/(real_coverH0*real_coverH0))*growfac(a); // unit [Mpc^-2]
-    if (z > zmax)
+    if (z > zmax) 
     {
-      fchi[i] = 0.;
+      fchi[i] = 0.0;
+    }
+    else
+    {
+      const double fK = f_K(chi[i]/real_coverH0);
+      const double WK = W_kappa(a, fK, ns);
+      fchi[i] = (WK/fK/(real_coverH0*real_coverH0))*growfac(a); // [Mpc^-2]
     }
   }
 }
 
-void f_chi_for_Psi_sh_IA(double *const chi, int Nchi, double *const fchi, const int nj,
-const double zmin, const double zmax)
-{ // TODO: ADD ALL IA POSSIBILITIES
-  if (nj < -1 || nj > redshift.shear_nbin - 1)
+void f_chi_for_Psi_sh_IA(
+    double* const chi, 
+    const int nchi, 
+    double* const fchi, 
+    const int ns
+  )
+{
+  if (ns < -1 || ns > redshift.shear_nbin - 1)
   {
-    log_fatal("error in selecting bin number nj = %d", nj);
+    log_fatal("error in selecting bin number nj = %d", ns);
     exit(1);
   }
-  
+  if ((int) abs(like.IA) != IA_REDSHIFT_EVOLUTION)
+  {
+    log_fatal("like.IA = %d not supported", like.IA);
+    exit(1);
+  }
+
+  const double zmin = redshift.shear_zdist_zmin[ns];
+  const double zmax = redshift.shear_zdist_zmax[ns];
   const double real_coverH0 = cosmology.coverH0 / cosmology.h0;
   
-  for (int i=0; i<Nchi; i++)
+  for (int i=0; i<nchi; i++)
   {
     // first convert unit of chi from Mpc to c/H0
     const double a = a_chi(chi[i] / real_coverH0) ;
     const double z = 1./a - 1.;
-    struct chis chidchi = chi_all(a);
-    const double hoverh0 = hoverh0v2(a, chidchi.dchida);
-    const double fK = f_K(chi[i]/real_coverH0);
-    const double norm = cosmology.Omega_m*nuisance.c1rhocrit_ia/growfac(a)*
-      nuisance.A_ia*pow(1./(a*nuisance.oneplusz0_ia),nuisance.eta_ia);
-    const double tmp1 = W_source(a, (double) nj, hoverh0);
-    const double wsource = (tmp1 > 0.) ? tmp1 : 0.;
-    fchi[i] = -wsource*norm/fK/(real_coverH0*real_coverH0)*growfac(a); // unit [Mpc^-2]
-    if ((z<zmin) || (z>zmax))
+    if ((z<zmin) || (z>zmax)) 
     {
       fchi[i] = 0.;
+    }
+    else
+    {
+      struct chis chidchi = chi_all(a);
+      const double hoverh0 = hoverh0v2(a, chidchi.dchida);
+      const double fK = f_K(chi[i]/real_coverH0);
+      const double growfac_a = growfac(a);
+
+      const double A_Z1 = IA_A1_Z1(a, growfac_a, ns);
+      const double WS   = W_source(a, ns, hoverh0) * A_Z1;
+      
+      fchi[i] = -WS/fK/(real_coverH0*real_coverH0)*growfac_a; // [Mpc^-2]      
     }
   }
 }
 
-void C_gl_tomo(int L, int nl, int ns, double *const Cl, double dev, double tolerance)
+void C_gl_tomo(
+    int L, 
+    int nl, 
+    int ns, 
+    double* const Cl, 
+    double dev, 
+    double tolerance
+  )
 {
-  if (nl < -1 || nl > redshift.clustering_nbin - 1 || ns < -1 || ns > redshift.clustering_nbin - 1)
+  if (nl < -1 || 
+      nl > redshift.clustering_nbin - 1 || 
+      ns < -1 || 
+      ns > redshift.clustering_nbin - 1)
   {
     log_fatal("error in selecting bin number (ni, nj) = [%d,%d]", nl, ns);
     exit(1);
@@ -4730,8 +4783,7 @@ void C_gl_tomo(int L, int nl, int ns, double *const Cl, double dev, double toler
   }
   
   for (int i=0; i<Nchi; i++)
-  {
-    // chi_min and chi_max may be cosmology dependent
+  { // chi_min and chi_max may be cosmology dependent
     chi_ar[i] = chi_min * exp(dlnchi * i);
   }
   
@@ -4749,20 +4801,12 @@ void C_gl_tomo(int L, int nl, int ns, double *const Cl, double dev, double toler
     }
   }
 
-  {
-    const double zmin = redshift.clustering_zdist_zmin[nl];
-    const double zmax = redshift.clustering_zdist_zmax[nl];
-    f_chi_for_Psi_cl(chi_ar, Nchi, f1_chi, nl, zmin, zmax);
-    f_chi_for_Psi_cl_RSD(chi_ar, Nchi, f1_chi_RSD, nl, zmin, zmax);
-    f_chi_for_Psi_cl_Mag(chi_ar, Nchi, f1_chi_Mag, nl, zmax);
-  }
-  {
-    const double zmin = redshift.shear_zdist_zmin[ns];
-    const double zmax = redshift.shear_zdist_zmax[ns];
-    f_chi_for_Psi_sh(chi_ar, Nchi, f2_chi, ns, zmax);
-    f_chi_for_Psi_sh_IA(chi_ar, Nchi, f2_chi_IA_ar, ns, zmin, zmax);
-  }
-
+  f_chi_for_Psi_cl(chi_ar, Nchi, f1_chi, nl);
+  f_chi_for_Psi_cl_RSD(chi_ar, Nchi, f1_chi_RSD, nl);
+  f_chi_for_Psi_cl_Mag(chi_ar, Nchi, f1_chi_Mag, nl);
+  f_chi_for_Psi_sh(chi_ar, Nchi, f2_chi, ns);
+  f_chi_for_Psi_sh_IA(chi_ar, Nchi, f2_chi_IA_ar, ns);
+  
   for (int j=0; j<Nchi; j++)
   {
     f2_chi[j] += f2_chi_IA_ar[j];
@@ -4862,7 +4906,6 @@ void C_gl_tomo(int L, int nl, int ns, double *const Cl, double dev, double toler
 
   Cl[limits.LMAX_NOLIMBER] = C_gs_tomo_limber((double) limits.LMAX_NOLIMBER, nl, ns, 0);
   
-
   #pragma omp parallel for
   for (int l=L; l<limits.LMAX_NOLIMBER; l++)
   {
