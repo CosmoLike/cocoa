@@ -167,6 +167,7 @@ double xi_pm_tomo(
   static cosmopara C;
   static nuisanceparams N;
   static double cache_table_params;
+  static double cache_cosmology_params;
   static double cache_photoz_nuisance_params_shear;
   static double cache_redshift_nz_params_shear;
   static double cache_intrinsic_aligment_params;
@@ -264,6 +265,7 @@ double xi_pm_tomo(
   }
 
   if (recompute_shear(C, N) || 
+      fdiff(cache_cosmology_params, cosmology.random) ||
       fdiff(cache_photoz_nuisance_params_shear, nuisance.random_photoz_shear) ||
       fdiff(cache_intrinsic_aligment_params, nuisance.random_ia) ||
       fdiff(cache_redshift_nz_params_shear, redshift.random_shear) ||
@@ -473,6 +475,7 @@ double xi_pm_tomo(
     update_cosmopara(&C);
     update_nuisance(&N);
     cache_table_params = Ntable.random;
+    cache_cosmology_params = cosmology.random;
     cache_photoz_nuisance_params_shear = nuisance.random_photoz_shear;
     cache_redshift_nz_params_shear = redshift.random_shear;
     cache_intrinsic_aligment_params = nuisance.random_ia;
@@ -520,6 +523,7 @@ double w_gammat_tomo(
   static cosmopara C;
   static nuisanceparams N;
   static galpara G;
+  static double cache_cosmology_params;
   static double cache_photoz_nuisance_params_shear;
   static double cache_photoz_nuisance_params_clustering;
   static double cache_redshift_nz_params_shear;
@@ -590,6 +594,7 @@ double w_gammat_tomo(
   }
 
   if (recompute_gs(C, G, N) ||
+      fdiff(cache_cosmology_params, cosmology.random) ||
       fdiff(cache_photoz_nuisance_params_shear, nuisance.random_photoz_shear) ||
       fdiff(cache_photoz_nuisance_params_clustering, nuisance.random_photoz_clustering) ||
       fdiff(cache_intrinsic_aligment_params, nuisance.random_ia) ||
@@ -699,6 +704,7 @@ double w_gammat_tomo(
     update_nuisance(&N);
     
     cache_table_params = Ntable.random;
+    cache_cosmology_params = cosmology.random;
     cache_photoz_nuisance_params_shear = nuisance.random_photoz_shear;
     cache_photoz_nuisance_params_clustering = nuisance.random_photoz_clustering;
     cache_redshift_nz_params_shear = redshift.random_shear;
@@ -744,6 +750,7 @@ double w_gg_tomo(
   static double** Pl = NULL;
   static double* w_vec = NULL;
   static cosmopara C;
+  static double cache_cosmology_params;
   static double cache_photoz_nuisance_params_clustering;
   static double cache_redshift_nz_params_clustering;
   static nuisanceparams N;
@@ -814,7 +821,8 @@ double w_gg_tomo(
     free(Pmax);
   }
 
-  if (recompute_gg(C, G, N) || 
+  if (recompute_gg(C, G, N) ||
+      fdiff(cache_cosmology_params, cosmology.random) || 
       fdiff(cache_photoz_nuisance_params_clustering, nuisance.random_photoz_clustering) ||
       fdiff(cache_redshift_nz_params_clustering, redshift.random_clustering) ||
       fdiff(cache_table_params, Ntable.random))
@@ -923,6 +931,7 @@ double w_gg_tomo(
     update_galpara(&G);
     update_nuisance(&N);
     cache_table_params = Ntable.random;
+    cache_cosmology_params = cosmology.random;
     cache_photoz_nuisance_params_clustering = nuisance.random_photoz_clustering;
     cache_redshift_nz_params_clustering = redshift.random_clustering;
   }
@@ -965,6 +974,7 @@ double w_gk_tomo(const int nt, const int ni, const int limber)
   static double** Pl = NULL;
   static double* w_vec = NULL;
   static cosmopara C;
+  static double cache_cosmology_params;
   static double cache_photoz_nuisance_params_clustering;
   static double cache_redshift_nz_params_clustering;
   static nuisanceparams N;
@@ -1036,6 +1046,7 @@ double w_gk_tomo(const int nt, const int ni, const int limber)
   }
 
   if (recompute_gk(C, G, N) || 
+      fdiff(cache_cosmology_params, cosmology.random) ||
       fdiff(cache_photoz_nuisance_params_clustering, nuisance.random_photoz_clustering) ||
       fdiff(cache_redshift_nz_params_clustering, redshift.random_clustering) ||
       fdiff(cache_table_params, Ntable.random))
@@ -1114,6 +1125,7 @@ double w_gk_tomo(const int nt, const int ni, const int limber)
     update_galpara(&G);
     update_nuisance(&N);
     cache_table_params = Ntable.random;
+    cache_cosmology_params = cosmology.random;
     cache_photoz_nuisance_params_clustering = nuisance.random_photoz_clustering;
     cache_redshift_nz_params_clustering = redshift.random_clustering;
   }
@@ -1154,6 +1166,7 @@ double w_ks_tomo(
   static cosmopara C;
   static nuisanceparams N;
   static double cache_table_params;
+  static double cache_cosmology_params;
   static double cache_photoz_nuisance_params_shear;
   static double cache_redshift_nz_params_shear;
   static double cache_intrinsic_aligment_params;
@@ -1221,6 +1234,7 @@ double w_ks_tomo(
   }
 
   if (recompute_ks(C, N) || 
+      fdiff(cache_cosmology_params, cosmology.random) ||
       fdiff(cache_photoz_nuisance_params_shear, nuisance.random_photoz_shear) ||
       fdiff(cache_intrinsic_aligment_params, nuisance.random_ia) ||
       fdiff(cache_redshift_nz_params_shear, redshift.random_shear) || 
@@ -1295,6 +1309,7 @@ double w_ks_tomo(
     update_cosmopara(&C);
     update_nuisance(&N);
     cache_table_params = Ntable.random;
+    cache_cosmology_params = cosmology.random;
     cache_photoz_nuisance_params_shear = nuisance.random_photoz_shear;
     cache_redshift_nz_params_shear = redshift.random_shear;
     cache_intrinsic_aligment_params = nuisance.random_ia;
@@ -1537,6 +1552,7 @@ double C_ss_TATT_EE_tomo_limber(
 {
   static cosmopara C;
   static nuisanceparams N;
+  static double cache_cosmology_params;
   static double cache_photoz_nuisance_params_shear;
   static double cache_redshift_nz_params_shear;
   static double cache_intrinsic_aligment_params;
@@ -1584,6 +1600,7 @@ double C_ss_TATT_EE_tomo_limber(
   if (force_no_recompute == 0)
   { // it turns out - because (nell = 100.000) on real funcs, recompute funcs are quite expensive
     if (recompute_shear(C, N) ||
+        fdiff(cache_cosmology_params, cosmology.random) ||
         fdiff(cache_photoz_nuisance_params_shear, nuisance.random_photoz_shear) ||
         fdiff(cache_intrinsic_aligment_params, nuisance.random_ia) ||
         fdiff(cache_redshift_nz_params_shear, redshift.random_shear))
@@ -1640,6 +1657,7 @@ double C_ss_TATT_EE_tomo_limber(
       
       update_cosmopara(&C);
       update_nuisance(&N);
+      cache_cosmology_params = cosmology.random;
       cache_photoz_nuisance_params_shear = nuisance.random_photoz_shear;
       cache_redshift_nz_params_shear = redshift.random_shear;
       cache_intrinsic_aligment_params = nuisance.random_ia;
@@ -1687,9 +1705,14 @@ double C_ss_TATT_EE_tomo_limber(
 
 // ---------------------------------------------------------------------------
 
-double C_ss_TATT_BB_tomo_limber(const double l, const int ni, const int nj, 
-const int force_no_recompute)
+double C_ss_TATT_BB_tomo_limber(
+    const double l, 
+    const int ni, 
+    const int nj, 
+    const int force_no_recompute
+  )
 {
+  static double cache_cosmology_params;
   static double cache_photoz_nuisance_params_shear;
   static double cache_redshift_nz_params_shear;
   static double cache_intrinsic_aligment_params;
@@ -1741,6 +1764,7 @@ const int force_no_recompute)
   if (force_no_recompute == 0)
   { // it turns out - because (nell = 100.000) on real funcs, recompute funcs are quite expensive
     if (recompute_shear(C, N) ||
+        fdiff(cache_cosmology_params, cosmology.random) ||
         fdiff(cache_photoz_nuisance_params_shear, nuisance.random_photoz_shear) ||
         fdiff(cache_intrinsic_aligment_params, nuisance.random_ia) ||
         fdiff(cache_redshift_nz_params_shear, redshift.random_shear))
@@ -1798,6 +1822,7 @@ const int force_no_recompute)
       
       update_cosmopara(&C);
       update_nuisance(&N);
+      cache_cosmology_params = cosmology.random;
       cache_photoz_nuisance_params_shear = nuisance.random_photoz_shear;
       cache_redshift_nz_params_shear = redshift.random_shear;
       cache_intrinsic_aligment_params = nuisance.random_ia;
@@ -1955,6 +1980,7 @@ double C_ss_tomo_limber(
     const int force_no_recompute
   )
 {
+  static double cache_cosmology_params;
   static double cache_photoz_nuisance_params_shear;
   static double cache_redshift_nz_params_shear;
   static double cache_intrinsic_aligment_params;
@@ -1983,7 +2009,8 @@ double C_ss_tomo_limber(
       table = (double**) malloc2d(NSIZE, nell);
     }
 
-    if (recompute_shear(C, N) || 
+    if (recompute_shear(C, N) ||
+        fdiff(cache_cosmology_params, cosmology.random) ||
         fdiff(cache_photoz_nuisance_params_shear, nuisance.random_photoz_shear) ||
         fdiff(cache_intrinsic_aligment_params, nuisance.random_ia) ||
         fdiff(cache_redshift_nz_params_shear, redshift.random_shear) ||
@@ -2023,6 +2050,7 @@ double C_ss_tomo_limber(
       update_cosmopara(&C);
       update_nuisance(&N);
       cache_table_params = Ntable.random;
+      cache_cosmology_params = cosmology.random;
       cache_photoz_nuisance_params_shear = nuisance.random_photoz_shear;
       cache_redshift_nz_params_shear = redshift.random_shear;
       cache_intrinsic_aligment_params = nuisance.random_ia;
@@ -2412,6 +2440,7 @@ double C_gs_tomo_limber(
     const int force_no_recompute
   )
 {
+  static double cache_cosmology_params;
   static double cache_photoz_nuisance_params_shear;
   static double cache_photoz_nuisance_params_clustering;
   static double cache_redshift_nz_params_shear;
@@ -2444,6 +2473,7 @@ double C_gs_tomo_limber(
     }
 
     if (recompute_gs(C, G, N) || 
+        fdiff(cache_cosmology_params, cosmology.random) ||
         fdiff(cache_photoz_nuisance_params_shear, nuisance.random_photoz_shear) ||
         fdiff(cache_photoz_nuisance_params_clustering, nuisance.random_photoz_clustering) ||
         fdiff(cache_intrinsic_aligment_params, nuisance.random_ia) ||
@@ -2490,6 +2520,7 @@ double C_gs_tomo_limber(
       update_nuisance(&N);
       update_galpara(&G);
       cache_table_params = Ntable.random;
+      cache_cosmology_params = cosmology.random;
       cache_photoz_nuisance_params_shear = nuisance.random_photoz_shear;
       cache_photoz_nuisance_params_clustering = nuisance.random_photoz_clustering;
       cache_redshift_nz_params_shear = redshift.random_shear;
@@ -2772,6 +2803,7 @@ double C_gg_tomo_limber(
     const int force_no_recompute
   )
 { // cross redshift bin not supported
+  static double cache_cosmology_params;
   static double cache_photoz_nuisance_params_clustering;
   static double cache_redshift_nz_params_clustering;
   static cosmopara C;
@@ -2801,6 +2833,7 @@ double C_gg_tomo_limber(
     }
 
     if (recompute_gg(C, G, N) || 
+        fdiff(cache_cosmology_params, cosmology.random) ||
         fdiff(cache_photoz_nuisance_params_clustering, nuisance.random_photoz_clustering) ||
         fdiff(cache_redshift_nz_params_clustering, redshift.random_clustering) ||
         fdiff(cache_table_params, Ntable.random))
@@ -2839,6 +2872,7 @@ double C_gg_tomo_limber(
       update_galpara(&G);
       update_nuisance(&N);
       cache_table_params = Ntable.random;
+      cache_cosmology_params = cosmology.random;
       cache_photoz_nuisance_params_clustering = nuisance.random_photoz_clustering;
       cache_redshift_nz_params_clustering = redshift.random_clustering;
     }
@@ -3102,6 +3136,7 @@ double C_gk_tomo_limber(
     const int force_no_recompute
   )
 {
+  static double cache_cosmology_params;
   static double cache_photoz_nuisance_params_clustering;
   static double cache_redshift_nz_params_clustering;
   static cosmopara C;
@@ -3130,7 +3165,8 @@ double C_gk_tomo_limber(
       table = (double**) malloc2d(NSIZE, nell);
     }
   
-    if (recompute_gk(C, G, N) || 
+    if (recompute_gk(C, G, N) ||
+        fdiff(cache_cosmology_params, cosmology.random) ||
         fdiff(cache_photoz_nuisance_params_clustering, nuisance.random_photoz_clustering) ||
         fdiff(cache_redshift_nz_params_clustering, redshift.random_clustering) ||
         fdiff(cache_table_params, Ntable.random))
@@ -3166,6 +3202,7 @@ double C_gk_tomo_limber(
       update_nuisance(&N);
       update_galpara(&G);
       cache_table_params = Ntable.random;
+      cache_cosmology_params = cosmology.random;
       cache_photoz_nuisance_params_clustering = nuisance.random_photoz_clustering;
       cache_redshift_nz_params_clustering = redshift.random_clustering;
     }
@@ -3294,6 +3331,7 @@ double C_ks_tomo_limber(
     const int force_no_recompute
   )
 {
+  static double cache_cosmology_params;
   static double cache_photoz_nuisance_params_shear;
   static double cache_redshift_nz_params_shear;
   static double cache_intrinsic_aligment_params;
@@ -3324,7 +3362,8 @@ double C_ks_tomo_limber(
       sig = (double*) malloc1d(NSIZE);
     }
 
-    if (recompute_ks(C, N) || 
+    if (recompute_ks(C, N) ||
+        fdiff(cache_cosmology_params, cosmology.random) ||
         fdiff(cache_photoz_nuisance_params_shear, nuisance.random_photoz_shear) ||
         fdiff(cache_intrinsic_aligment_params, nuisance.random_ia) ||
         fdiff(cache_redshift_nz_params_shear, redshift.random_shear) ||
@@ -3385,6 +3424,7 @@ double C_ks_tomo_limber(
       update_cosmopara(&C);
       update_nuisance(&N);
       cache_table_params = Ntable.random;
+      cache_cosmology_params = cosmology.random;
       cache_photoz_nuisance_params_shear = nuisance.random_photoz_shear;
       cache_redshift_nz_params_shear = redshift.random_shear;
       cache_intrinsic_aligment_params = nuisance.random_ia;
@@ -3500,6 +3540,7 @@ double C_kk_limber(double l, const int force_no_recompute)
 {
   static cosmopara C;
   static double cache_table_params;
+  static double cache_cosmology_params;
   static double* table = NULL;
   static int nell;
   static double lnlmin;
@@ -3522,6 +3563,7 @@ double C_kk_limber(double l, const int force_no_recompute)
     }
 
     if (recompute_cosmo3D(C) || 
+        fdiff(cache_cosmology_params, cosmology.random) ||
         fdiff(cache_table_params, Ntable.random))
     {
       #pragma GCC diagnostic push
@@ -3547,6 +3589,7 @@ double C_kk_limber(double l, const int force_no_recompute)
 
       update_cosmopara(&C);
       cache_table_params = Ntable.random;
+      cache_cosmology_params = cosmology.random;
     }
   }
 
@@ -3688,6 +3731,7 @@ double C_gy_tomo_limber_nointerp(
 
 double C_gy_tomo_limber(double l, int ni, const int force_no_recompute)
 {
+  static double cache_cosmology_params;
   static double cache_photoz_nuisance_params_clustering;
   static double cache_redshift_nz_params_clustering;
   static cosmopara C;
@@ -3718,7 +3762,8 @@ double C_gy_tomo_limber(double l, int ni, const int force_no_recompute)
       table = (double**) malloc2d(NSIZE, nell);
     }
 
-    if (recompute_gy(C, G, N, N2) || 
+    if (recompute_gy(C, G, N, N2) ||
+        fdiff(cache_cosmology_params, cosmology.random) || 
         fdiff(cache_photoz_nuisance_params_clustering, nuisance.random_photoz_clustering) ||
         fdiff(cache_redshift_nz_params_clustering, redshift.random_clustering) ||
         fdiff(cache_table_params, Ntable.random))
@@ -3755,6 +3800,7 @@ double C_gy_tomo_limber(double l, int ni, const int force_no_recompute)
       update_galpara(&G);
       update_ynuisance(&N2);
       cache_table_params = Ntable.random;
+      cache_cosmology_params = cosmology.random;
       cache_photoz_nuisance_params_clustering = nuisance.random_photoz_clustering;
       cache_redshift_nz_params_clustering = redshift.random_clustering;
     }
@@ -3865,6 +3911,7 @@ double C_ys_tomo_limber_nointerp(
 
 double C_ys_tomo_limber(double l, int ni, const int force_no_recompute)
 {
+  static double cache_cosmology_params;
   static double cache_photoz_nuisance_params_shear;
   static double cache_redshift_nz_params_shear;
   static double cache_intrinsic_aligment_params;
@@ -3902,6 +3949,7 @@ double C_ys_tomo_limber(double l, int ni, const int force_no_recompute)
     }
 
     if (recompute_ys(C, N, N2) || 
+        fdiff(cache_cosmology_params, cosmology.random) ||
         fdiff(cache_photoz_nuisance_params_shear, nuisance.random_photoz_shear) ||
         fdiff(cache_intrinsic_aligment_params, nuisance.random_ia) ||
         fdiff(cache_redshift_nz_params_shear, redshift.random_shear) ||
@@ -3966,6 +4014,7 @@ double C_ys_tomo_limber(double l, int ni, const int force_no_recompute)
       update_nuisance(&N);
       update_ynuisance(&N2);
       cache_table_params = Ntable.random;
+      cache_cosmology_params = cosmology.random;
       cache_photoz_nuisance_params_shear = nuisance.random_photoz_shear;
       cache_redshift_nz_params_shear = redshift.random_shear;
       cache_intrinsic_aligment_params = nuisance.random_ia;
@@ -4085,6 +4134,7 @@ double C_ky_limber(double l, const int force_no_recompute)
 {
   static cosmopara C;
   static ynuisancepara N;
+  static double cache_cosmology_params;
   static double cache_table_params;
   static double* table = NULL;
   static int nell;
@@ -4108,6 +4158,7 @@ double C_ky_limber(double l, const int force_no_recompute)
     }
 
     if (recompute_ky(C, N) || 
+        fdiff(cache_cosmology_params, cosmology.random) ||
         fdiff(cache_table_params, Ntable.random))
     {
       #pragma GCC diagnostic push
@@ -4134,6 +4185,7 @@ double C_ky_limber(double l, const int force_no_recompute)
       update_ynuisance(&N);
       update_cosmopara(&C);
       cache_table_params = Ntable.random;
+      cache_cosmology_params = cosmology.random;
     }
   }
 
@@ -4218,6 +4270,7 @@ double C_yy_limber(double l, const int force_no_recompute)
 {
   static cosmopara C;
   static ynuisancepara N;
+  static double cache_cosmology_params;
   static double cache_table_params;
   static double* table = NULL;
   static int nell;
@@ -4241,7 +4294,8 @@ double C_yy_limber(double l, const int force_no_recompute)
     }
 
     if (recompute_yy(C, N) || 
-        fdiff(cache_table_params, Ntable.random))
+        fdiff(cache_table_params, Ntable.random) ||
+        fdiff(cache_cosmology_params, cosmology.random))
     {
       #pragma GCC diagnostic push
       #pragma GCC diagnostic ignored "-Wunused-variable"
@@ -4267,6 +4321,7 @@ double C_yy_limber(double l, const int force_no_recompute)
       update_ynuisance(&N);
       update_cosmopara(&C);
       cache_table_params = Ntable.random;
+      cache_cosmology_params = cosmology.random;
     }
   }
 

@@ -2338,8 +2338,7 @@ void set_nuisance_IA(
   {
     spdlog::critical(
       "\x1b[90m{}\x1b[0m: incompatible input w/ sizes = {}, {} and {} (!= {})",
-      "set_nuisance_IA", A1.n_elem, A2.n_elem, 
-      BTA.n_elem, redshift.shear_nbin);
+      "set_nuisance_IA", A1.n_elem, A2.n_elem, BTA.n_elem, redshift.shear_nbin);
     exit(1);
   }
 
