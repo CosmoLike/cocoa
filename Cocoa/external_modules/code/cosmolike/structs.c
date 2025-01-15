@@ -86,15 +86,6 @@ redshiftparams redshift =
   //.cluster_Nbin = 0
 };
 
-galpara gbias =
-{
-  .b2 = {0},
-  .bs2 = {0},
-  .b1_function = &b1_per_bin,
-  .b_mag = {0},
-  .cg = {0},
-  .hod = {0}
-}; // default: point to old bgal_z routin
 
 clusterparams Cluster =
 {
@@ -120,10 +111,9 @@ nuisanceparams nuisance =
   .random_photoz_shear = 0.0,
   .random_photoz_clustering = 0.0,
   .c1rhocrit_ia = 0.01389,
-  .A_z = {0},
-  .A2_z = {0},
-  .b_ta_z = {0},
-  .shear_calibration_m = {0}
+  .ia = {0},
+  .shear_calibration_m = {0},
+  .gb = {0}
 };
 
 ynuisancepara ynuisance =
@@ -384,18 +374,6 @@ void reset_survey_struct()
   sprintf(survey.name, "%s", "");
 }
 
-void reset_gbias_struct()
-{
-  for(int i=0; i<10; i++)
-  {
-    gbias.b[i] = 0.0;
-    gbias.b2[i] = 0.0;
-    gbias.bs2[i] = 0.0;
-    gbias.b_mag[i] = 0.0;
-  }
-  gbias.b1_function = &b1_per_bin;
-}
-
 void reset_cluster_struct()
 {
   Cluster.N200_min = 0.0;
@@ -452,23 +430,34 @@ void reset_pdeltaparams_struct()
 
 void reset_nuisance_struct()
 {
+  nuisance.random_ia = 0.0;
   nuisance.random_photoz_shear = 0.0;
   nuisance.random_photoz_clustering = 0.0;
 
   for(int i=0; i<MAX_SIZE_ARRAYS; i++)
   {
-    for(int j=0; j<MAX_SIZE_ARRAYS; j++)
-      for(int k=0; k<MAX_SIZE_ARRAYS; k++)
-        nuisance.photoz[i][j][k] = 0.0;
-
-    nuisance.A_z[i] = 0.0;
-    nuisance.A2_z[i] = 0.0;
-    nuisance.b_ta_z[i] = 0.0;
-    
     nuisance.shear_calibration_m[i] = 0.0;
+    nuisance.gc[i] = 0.0;
+
+    for(int j=0; j<MAX_SIZE_ARRAYS; j++)
+    {
+      nuisance.ia[i][j] = 0.0;
+      nuisance.ia[i][j] = 0.0;
+      nuisance.ia[i][j] = 0.0;
+
+      nuisance.gb[i][j] = 0.0;
+      nuisance.hod[i][j] = 0.0;
+      
+      for(int k=0; k<MAX_SIZE_ARRAYS; k++)
+      {
+        nuisance.photoz[i][j][k] = 0.0;
+      }
+    }
         
+    /*
     nuisance.cluster_MOR[i] = 0.0;
     nuisance.cluster_selection[i] = 0.0;
+    */
   }
 
   nuisance.oneplusz0_ia = 0.0;
@@ -520,34 +509,6 @@ void update_cosmopara(cosmopara *C)
   //C->A_s = cosmology.A_s;  // cluster cosmology need that information
   //C->n_s = cosmology.n_s;  // cluster cosmology need that information
   C->random = cosmology.random;
-}
-
-void update_galpara(galpara *G) 
-{
-  for (int i=0; i<MAX_SIZE_ARRAYS; i++) 
-  {
-    G->b[i] = gbias.b[i];
-    G->b2[i] = gbias.b2[i];
-    G->bs2[i] = gbias.bs2[i];  
-    for(int j=0; j<MAX_SIZE_ARRAYS; j++)
-    {
-      G->hod[i][j] = gbias.hod[i][j];
-    }
-    G->cg[i]= gbias.cg[i];
-  }
-}
-
-void update_nuisance(nuisanceparams* N)
-{  
-  for (int i=0; i<MAX_SIZE_ARRAYS; i++) 
-  {    
-    N->A_z[i] = nuisance.A_z[i];
-    N->A2_z[i] = nuisance.A2_z[i];
-    N->b_ta_z[i] = nuisance.b_ta_z[i];
-
-    N->cluster_MOR[i] = nuisance.cluster_MOR[i];
-    N->cluster_selection[i] = nuisance.cluster_selection[i];
-  }
 }
 
 void update_ynuisance(ynuisancepara* N)

@@ -68,7 +68,7 @@ double amax_lens(int ni)
     exit(1);
   }
 
-  if (gbias.b_mag[ni] != 0) 
+  if (gbmag(0.0, ni) != 0) 
   {
     return 1. / (1. + fmax(redshift.shear_zdist_zmin_all, 0.001));
   }

@@ -37,47 +37,6 @@ int recompute_cosmo3D(cosmopara C)
 }
 
 
-int recompute_IA(nuisanceparams N) 
-{
-  int res = 0;
-
-  for (int i=0; i<MAX_SIZE_ARRAYS; i++)
-  {
-    if (fdiff(N.A_z[i], nuisance.A_z[i]) ||
-        fdiff(N.A2_z[i], nuisance.A2_z[i]) ||
-        fdiff(N.b_ta_z[i], nuisance.b_ta_z[i]))
-    {
-      res = 1;
-    }
-  }
-
-  return res;
-}
-
-int recompute_galaxies(galpara G, int i) 
-{
-  if (i < 0 || i > MAX_SIZE_ARRAYS -1)
-  {
-    log_fatal("invalid bin input ni = %d", i);
-    exit(1);
-  }
-  return (fdiff(G.b[i], gbias.b[i]) || 
-          fdiff(G.b2[i], gbias.b2[i]) || 
-          fdiff(G.bs2[i], gbias.bs2[i])) ? 1 : 0;
-}
-
-int recompute_all_galaxies(galpara G) 
-{
-  for (int i=0; i<MAX_SIZE_ARRAYS; i++) 
-  {
-    if (recompute_galaxies(G, i))
-    {
-      return 1;
-    }
-  }  
-  return 0;
-}
-
 int recompute_yhalo(ynuisancepara N)
 {
   if (fdiff(N.gas_beta, ynuisance.gas_beta) || 
@@ -100,6 +59,7 @@ int recompute_yhalo(ynuisancepara N)
   }
 }
 
+/*
 int recompute_clusters(cosmopara C, nuisanceparams N)
 {
   if (recompute_cosmo3D(C))
@@ -122,129 +82,7 @@ int recompute_clusters(cosmopara C, nuisanceparams N)
   }
   return 0;
 }
-
-// ---------------------------------------------------------------------------
-// ---------------------------------------------------------------------------
-// ---------------------------------------------------------------------------
-
-int recompute_shear(cosmopara C, nuisanceparams N)
-{
-  return (recompute_cosmo3D(C) || 
-          recompute_IA(N)) ? 1 : 0;
-}
-
-int recompute_gs(cosmopara C, galpara G, nuisanceparams N) 
-{
-  if (recompute_shear(C, N))
-  {
-    return 1;
-  }
-  for (int i=0; i<MAX_SIZE_ARRAYS; i++) 
-  {
-    if (recompute_galaxies(G, i))
-    {
-      return 1;
-    }
-  }
-  return 0;
-}
-
-// ---------------------------------------------------------------------------
-// ---------------------------------------------------------------------------
-// ---------------------------------------------------------------------------
-
-int recompute_gg(cosmopara C, galpara G, nuisanceparams N)
-{
-  if (recompute_cosmo3D(C))
-  {
-    return 1;
-  }
-  for (int i=0; i<MAX_SIZE_ARRAYS; i++) 
-  {
-    if (recompute_galaxies(G, i))
-    {
-      return 1;
-    }
-  }
-  return 0;
-}
-
-// ---------------------------------------------------------------------------
-// ---------------------------------------------------------------------------
-// ---------------------------------------------------------------------------
-
-int recompute_ks(cosmopara C, nuisanceparams N)
-{
-  return recompute_shear(C, N);
-}
-
-// ---------------------------------------------------------------------------
-// ---------------------------------------------------------------------------
-// ---------------------------------------------------------------------------
-
-int recompute_gk(cosmopara C, galpara G, nuisanceparams N)
-{
-  if (recompute_cosmo3D(C))
-  {
-    return 1;
-  }
-  for (int i=0; i<MAX_SIZE_ARRAYS; i++) 
-  {
-    if (recompute_galaxies(G, i))
-    {
-      return 1;
-    }
-  }
-  return 0;
-}
-
-// ---------------------------------------------------------------------------
-// ---------------------------------------------------------------------------
-// ---------------------------------------------------------------------------
-
-int recompute_gy(cosmopara C, galpara G, nuisanceparams N, ynuisancepara N2) 
-{
-  if (recompute_cosmo3D(C) || 
-      recompute_yhalo(N2))
-  {
-    return 1;
-  }
-  for (int i=0; i<MAX_SIZE_ARRAYS; i++) 
-  {
-    if (recompute_galaxies(G, i))
-    {
-      return 1;
-    }
-  }
-  return 0;
-}
-
-// ---------------------------------------------------------------------------
-// ---------------------------------------------------------------------------
-// ---------------------------------------------------------------------------
-
-int recompute_ys(cosmopara C, nuisanceparams N, ynuisancepara N2)
-{
-  return recompute_shear(C, N) || recompute_yhalo(N2);
-}
-
-// ---------------------------------------------------------------------------
-// ---------------------------------------------------------------------------
-// ---------------------------------------------------------------------------
-
-int recompute_yy(cosmopara C, ynuisancepara N)
-{
-  return recompute_cosmo3D(C) || recompute_yhalo(N);
-}
-
-// ---------------------------------------------------------------------------
-// ---------------------------------------------------------------------------
-// ---------------------------------------------------------------------------
-
-int recompute_ky(cosmopara C, ynuisancepara N)
-{
-  return recompute_cosmo3D(C) || recompute_yhalo(N);
-}
+*/
 
 /*
 // ---------------------------------------------------------------------------

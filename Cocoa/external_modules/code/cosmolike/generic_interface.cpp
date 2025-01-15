@@ -366,10 +366,11 @@ void initial_setup()
   // reset IA
   for (int i = 0; i < MAX_SIZE_ARRAYS; i++)
   {
-    nuisance.A_z[i] = 0.0;
-    nuisance.A2_z[i] = 0.0;
-    nuisance.b_ta_z[i] = 0.0;
+    nuisance.ia[0][i] = 0.0;
+    nuisance.ia[1][i] = 0.0;
+    nuisance.ia[2][i] = 0.0;
   }
+  reset_nuisance_struct();
 
   /*
   // reset clustering photo-z stretch parameters
@@ -2348,20 +2349,21 @@ void set_nuisance_IA(
   {
     for (int i=0; i<redshift.shear_nbin; i++)
     {
-      nuisance.A_z[i] = A1(i);
-      nuisance.A2_z[i] = A2(i);
-      nuisance.b_ta_z[i] = BTA(i);
+      nuisance.ia[0][i] = A1(i);
+      nuisance.ia[1][i] = A2(i);
+      nuisance.ia[2][i] = BTA(i);
     }
   }
   else if ((int) abs(like.IA) == 3)
   {
-    nuisance.A_z[0] = A1(0);
-    nuisance.A_z[1] = A1(1);
+    nuisance.ia[0][0] = A1(0);
+    nuisance.ia[0][1] = A1(1);
     nuisance.oneplusz0_ia = 1.62;
 
-    nuisance.A2_z[0] = A2(0);
-    nuisance.A2_z[1] = A2(1);
-    nuisance.b_ta_z[0] = BTA[0];
+    nuisance.ia[1][0] = A2(0);
+    nuisance.ia[1][1] = A2(1);
+    
+    nuisance.ia[2][0] = BTA[0];
 
     for (int i=2; i<redshift.shear_nbin; i++)
     {
@@ -2370,8 +2372,8 @@ void set_nuisance_IA(
         spdlog::critical(
           "\x1b[90m{}\x1b[0m: one of nuisance.A_z[{}]={}, nuisance.A2_z[{}]="
           "{}, nuisance.b_ta[{}]={} was specified w/ power-law evolution\n",
-          "set_nuisance_IA", i, nuisance.A_z[i], 
-          i, nuisance.A2_z[i], i, nuisance.b_ta_z[i]);
+          "set_nuisance_IA", i, nuisance.ia[0][i], 
+          i, nuisance.ia[1][i], i, nuisance.ia[2][i]);
         exit(1);
       }
     }

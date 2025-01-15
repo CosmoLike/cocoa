@@ -3,25 +3,26 @@
 #include <gsl/gsl_sf.h>
 
 #include "basics.h"
+#include "IA.h"
 #include "cosmo3D.h"
 #include "structs.h"
 
 #include "log.c/src/log.h"
 
 // if (IA_NLA_LF || IA_REDSHIFT_EVOLUTION)
-// A_z[0] = A_ia          (IA_NLA_LF || IA_REDSHIFT_EVOLUTION)
-// A_z[1] = eta_ia        (IA_NLA_LF || IA_REDSHIFT_EVOLUTION)
-// A_z[2] = eta_ia_highz  (IA_NLA_LF, Joachimi2012)
-// A_z[3] = beta_ia       (IA_NLA_LF, Joachimi2012)
-// A_z[4] = LF_alpha      (IA_NLA_LF, Joachimi2012)
-// A_z[5] = LF_P          (IA_NLA_LF, Joachimi2012)
-// A_z[6] = LF_Q          (IA_NLA_LF, Joachimi2012)
-// A_z[7] = LF_red_alpha  (IA_NLA_LF, Joachimi2012)
-// A_z[8] = LF_red_P      (IA_NLA_LF, Joachimi2012)
-// A_z[9] = LF_red_Q      (IA_NLA_LF, Joachimi2012)
+// ia[0][0] = A_ia          (IA_NLA_LF || IA_REDSHIFT_EVOLUTION)
+// ia[0][1] = eta_ia        (IA_NLA_LF || IA_REDSHIFT_EVOLUTION)
+// ia[0][2] = eta_ia_highz  (IA_NLA_LF, Joachimi2012)
+// ia[0][3] = beta_ia       (IA_NLA_LF, Joachimi2012)
+// ia[0][4] = LF_alpha      (IA_NLA_LF, Joachimi2012)
+// ia[0][5] = LF_P          (IA_NLA_LF, Joachimi2012)
+// ia[0][6] = LF_Q          (IA_NLA_LF, Joachimi2012)
+// ia[0][7] = LF_red_alpha  (IA_NLA_LF, Joachimi2012)
+// ia[0][8] = LF_red_P      (IA_NLA_LF, Joachimi2012)
+// ia[0][9] = LF_red_Q      (IA_NLA_LF, Joachimi2012)
 // if IA_REDSHIFT_EVOLUTION
-// A2_z[0] = A2_ia
-// A2_z[1] = eta_ia_tt
+// A2_z[1][0] = A2_ia
+// A2_z[1][1] = eta_ia_tt
 
 static double LF_coefficients[2][5] =
  { 
@@ -106,14 +107,12 @@ double f_red_LF(const double mag, const double a)
     exit(1);
   }
 
-  const double LF_alpha = nuisance.A_z[4];
-  const double LF_P = nuisance.A_z[5]; 
-  const double LF_Q = nuisance.A_z[6];
-  const double LF_red_alpha = nuisance.A_z[7];
-  const double LF_red_P = nuisance.A_z[8];   
-  const double LF_red_Q = nuisance.A_z[9]; 
-
-  double LF_all[3], LF_red[3];
+  const double LF_alpha = nuisance.ia[0][4];
+  const double LF_P = nuisance.ia[0][5]; 
+  const double LF_Q = nuisance.ia[0][6];
+  const double LF_red_alpha = nuisance.ia[0][7];
+  const double LF_red_P = nuisance.ia[0][8];   
+  const double LF_red_Q = nuisance.ia[0][9]; 
 
   // r-band LF parameters, Tab. 5 in http://arxiv.org/pdf/1111.0166v2.pdf
 
@@ -124,9 +123,10 @@ double f_red_LF(const double mag, const double a)
   const double P_red = LF_coefficients[0][4] + LF_red_P;
   const double Phistar_red = LF_coefficients[0][0];
 
+  double LF_red[3];
   LF_red[0] = Phistar_red*pow(10.0,0.4*P_red*(1./a-1));
   LF_red[1] = Mstar_red-Q_red*(1./a-1. -0.1);
-  LF_red[2]= alpha_red;
+  LF_red[2] = alpha_red;
 
   //all galaxies
   const double alpha = LF_coefficients[1][1] + LF_alpha;
@@ -135,6 +135,7 @@ double f_red_LF(const double mag, const double a)
   const double P = LF_coefficients[1][4] + LF_P;
   const double Phistar = LF_coefficients[1][0];
 
+  double LF_all[3];
   LF_all[0] = Phistar*pow(10.0,0.4*P*(1./a-1));
   LF_all[1] = Mstar -Q*(1./a-1. - 0.1);
   LF_all[2] = alpha;
@@ -154,9 +155,9 @@ double A_LF(double mag, double a)
     exit(1);
   }
 
-  const double beta_ia = nuisance.A_z[3];
-  const double LF_red_alpha = nuisance.A_z[7];
-  const double LF_red_Q = nuisance.A_z[9]; 
+  const double beta_ia = nuisance.ia[0][3];
+  const double LF_red_alpha = nuisance.ia[0][7];
+  const double LF_red_Q = nuisance.ia[0][9]; 
 
   // r-band LF parameters, Tab. 5 in http://arxiv.org/pdf/1111.0166v2.pdf
 
@@ -184,8 +185,8 @@ double A_LF(double mag, double a)
 // ---------------------------------------------------------------------------
 int check_LF(void)
 {
-  const double LF_Q = nuisance.A_z[6];
-  const double LF_red_Q = nuisance.A_z[9]; 
+  const double LF_Q = nuisance.ia[0][6];
+  const double LF_red_Q = nuisance.ia[0][9]; 
 
   double a = 1./(1. + redshift.shear_zdist_zmax_all) + 0.005;
   
@@ -216,9 +217,9 @@ double A_IA_Joachimi(const double a)
   const double highz = 0.75;
   const double z = 1.0/a - 1.0;
 
-  const double A_ia = nuisance.A_z[0];
-  const double eta_ia = nuisance.A_z[1];
-  const double eta_ia_highz = nuisance.A_z[2];
+  const double A_ia = nuisance.ia[0][0];
+  const double eta_ia = nuisance.ia[0][1];
+  const double eta_ia_highz = nuisance.ia[0][2];
 
   // A_0* < (L/L_0)^beta > *f_red
   const double A_red = A_ia*A_LF(survey.m_lim, a)*f_red_LF(survey.m_lim, a);
@@ -254,7 +255,7 @@ void IA_A1_Z1Z2(
   double A_Z1 = 0.0;
   double A_Z2 = 0.0;
   
-  switch((int) abs(like.IA))
+  switch(like.IA)
   {
     case NO_IA:
     {
@@ -270,14 +271,14 @@ void IA_A1_Z1Z2(
     }
     case IA_REDSHIFT_BINNING:
     { 
-      A_Z1 = nuisance.A_z[n1];
-      A_Z2 = nuisance.A_z[n2];
+      A_Z1 = nuisance.ia[0][n1];
+      A_Z2 = nuisance.ia[0][n2];
       break;
     }
     case IA_REDSHIFT_EVOLUTION:
     {
-      const double A_IA = nuisance.A_z[0];
-      const double eta  = nuisance.A_z[1];
+      const double A_IA = nuisance.ia[0][0];
+      const double eta  = nuisance.ia[0][1];
       A_Z1 = A_IA*pow((1.0/a)/nuisance.oneplusz0_ia, eta);
       A_Z2 = A_Z1;
       break;
@@ -319,7 +320,7 @@ void IA_A2_Z1Z2(
   double A2_Z1 = 0.0;
   double A2_Z2 = 0.0;
 
-  switch((int) abs(like.IA))
+  switch(like.IA)
   {
     case NO_IA:
     {
@@ -334,14 +335,14 @@ void IA_A2_Z1Z2(
     }
     case IA_REDSHIFT_BINNING:
     { 
-      A2_Z1 = nuisance.A2_z[n1];
-      A2_Z2 = nuisance.A2_z[n2];
+      A2_Z1 = nuisance.ia[1][n1];
+      A2_Z2 = nuisance.ia[1][n2];
       break;
     }
     case IA_REDSHIFT_EVOLUTION:
     {
-      const double A_IA = nuisance.A2_z[0];
-      const double eta  = nuisance.A2_z[1];
+      const double A_IA = nuisance.ia[1][0];
+      const double eta  = nuisance.ia[1][1];
       A2_Z1 = A_IA*pow((1.0/a)/nuisance.oneplusz0_ia, eta);
       A2_Z2 = A2_Z1;
       break;
@@ -374,7 +375,7 @@ void IA_BTA_Z1Z2(
   double BTA_Z1 = 0.0;
   double BTA_Z2 = 0.0;
 
-  switch((int) abs(like.IA))
+  switch(like.IA)
   {
     case NO_IA:
     {
@@ -389,13 +390,13 @@ void IA_BTA_Z1Z2(
     }
     case IA_REDSHIFT_BINNING:
     {
-      BTA_Z1 = nuisance.b_ta_z[n1];
-      BTA_Z2 = nuisance.b_ta_z[n2];
+      BTA_Z1 = nuisance.ia[2][n1];
+      BTA_Z2 = nuisance.ia[2][n2];
       break;
     }
     case IA_REDSHIFT_EVOLUTION:
     {
-      BTA_Z1 = nuisance.b_ta_z[0];
+      BTA_Z1 = nuisance.ia[2][0];
       BTA_Z2 = BTA_Z1;
       break;
     }

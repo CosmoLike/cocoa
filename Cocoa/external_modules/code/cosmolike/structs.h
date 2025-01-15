@@ -9,15 +9,6 @@ extern "C" {
 #define CHAR_MAX_SIZE 1024
 #define MAX_SIZE_ARRAYS 10
 
-#define NO_IA 0
-#define IA_NLA_LF 1
-#define IA_REDSHIFT_BINNING 2
-#define IA_REDSHIFT_EVOLUTION 3
-
-#define IA_MODEL_NLA 0
-#define IA_MODEL_TATT 1
-
-
 typedef struct 
 {
   double a_min;
@@ -48,14 +39,6 @@ typedef struct
   double halo_uKS_xmin; // halo.c u_KS(double c, double k, double rv)
   double halo_uKS_xmax; // halo.c u_KS(double c, double k, double rv)
 } lim;
-
-typedef struct 
-{
-  double low;
-  double medium;
-  double high;
-  double insane;
-} pre;
 
 typedef struct 
 { // When struct is updated, assign a new random number (critical for cache)
@@ -124,13 +107,6 @@ typedef struct
   double sigma_8;
 } cosmopara;
 
-typedef struct 
-{
-  int shear_Npowerspectra;       // number of shear-shear tomography power spectra
-  int ggl_Npowerspectra;         // number of galaxy-galaxy lensing tomography power spectra
-  int clustering_Npowerspectra;  // number of galaxy-galaxy clustering tomography power spectra
-} tomopara;
-
 typedef struct
 { // When struct is updated, assign a new random number (critical for cache)
   double random_shear;
@@ -170,6 +146,71 @@ typedef struct
   */
 } redshiftparams;
 
+typedef struct 
+{
+  int shear_Npowerspectra;       // number of shear-shear tomography power spectra
+  int ggl_Npowerspectra;         // number of galaxy-galaxy lensing tomography power spectra
+  int clustering_Npowerspectra;  // number of galaxy-galaxy clustering tomography power spectra
+} tomopara;
+
+typedef struct
+{ // When struct is updated, assign a new random number (critical for cache)
+  double random_photoz_shear;
+  double random_photoz_clustering;
+  double random_ia;
+  double random_galaxy_bias;
+  double random_yparams;
+
+  // INTRINSIC ALIGMENT ------------------------------------------  
+  // ia[0][0] = A_ia          if(IA_NLA_LF || IA_REDSHIFT_EVOLUTION)
+  // ia[0][1] = eta_ia        if(IA_NLA_LF || IA_REDSHIFT_EVOLUTION)
+  // ia[0][2] = eta_ia_highz  if(IA_NLA_LF, Joachimi2012)
+  // ia[0][3] = beta_ia       if(IA_NLA_LF, Joachimi2012)
+  // ia[0][4] = LF_alpha      if(IA_NLA_LF, Joachimi2012)
+  // ia[0][5] = LF_P          if(IA_NLA_LF, Joachimi2012)
+  // ia[0][6] = LF_Q          if(IA_NLA_LF, Joachimi2012)
+  // ia[0][7] = LF_red_alpha  if(IA_NLA_LF, Joachimi2012)
+  // ia[0][8] = LF_red_P      if(IA_NLA_LF, Joachimi2012)
+  // ia[0][9] = LF_red_Q      if(IA_NLA_LF, Joachimi2012)
+  // ------------------
+  // ia[1][0] = A2_ia        if IA_REDSHIFT_EVOLUTION
+  // ia[1][1] = eta_ia_tt    if IA_REDSHIFT_EVOLUTION
+  // ------------------
+  // ia[2][MAX_SIZE_ARRAYS] = b_ta_z[MAX_SIZE_ARRAYS]
+  // first index: ia[0][:] = A_z; ia[1][:] = A2_z; ia[2][:] = b_ta_z
+  double ia[MAX_SIZE_ARRAYS][MAX_SIZE_ARRAYS];
+  double oneplusz0_ia;
+  double c1rhocrit_ia;
+
+  // PHOTOZ ------------------------------------------
+  // 1st index: photoz[0][:][:] = SHEAR; photoz[1][:][:] = CLUSTERING
+  // 2nd index: photoz[:][0][:] = bias; photoz[:][1][:] = strech
+  double photoz[MAX_SIZE_ARRAYS][MAX_SIZE_ARRAYS][MAX_SIZE_ARRAYS]; 
+
+  // SHEAR CALIBRATION ------------------------------------------
+  double shear_calibration_m[MAX_SIZE_ARRAYS];
+  
+  // GALAXY BIAS ------------------------------------------
+  // 1st index: b[0][i] = linear galaxy bias in clustering bin i (b1)
+  //            b[1][i] = linear galaxy bias in clustering bin i (b2)
+  //            b[2][i] = leading order tidal bias in clustering bin i (b3)
+  //            b[3][i] = leading order tidal bias in clustering bin i
+  double gb[MAX_SIZE_ARRAYS][MAX_SIZE_ARRAYS]; // galaxy bias
+
+  // HOD[i] contains HOD parameters of galaxies in clustering bin i
+  // 5 parameter model of Zehavi et al. 2011 + modification of concentration
+  double hod[MAX_SIZE_ARRAYS][MAX_SIZE_ARRAYS]; 
+
+  double gc[MAX_SIZE_ARRAYS];  // galaxy concentration parameter
+
+  /*
+  // Variables for the 4x2pt+N (see: 2008.10757 & 2010.01138)
+  double cluster_MOR[MAX_SIZE_ARRAYS];
+  double cluster_selection[MAX_SIZE_ARRAYS];
+  */
+} nuisanceparams;
+
+
 typedef struct
 {
   int interpolate_survey_area;
@@ -192,48 +233,6 @@ typedef struct
   char model[CHAR_MAX_SIZE];
 } clusterparams;
 
-typedef struct
-{ // When struct is updated, assign a new random number (critical for cache)
-  double random_photoz_shear;
-  double random_photoz_clustering;
-  double random_ia;
-
-  // INTRINSIC ALIGMENT ------------------------------------------  
-  // ia[0][0] = A_ia          if(IA_NLA_LF || IA_REDSHIFT_EVOLUTION)
-  // ia[0][1] = eta_ia        if(IA_NLA_LF || IA_REDSHIFT_EVOLUTION)
-  // ia[0][2] = eta_ia_highz  if(IA_NLA_LF, Joachimi2012)
-  // ia[0][3] = beta_ia       if(IA_NLA_LF, Joachimi2012)
-  // ia[0][4] = LF_alpha      if(IA_NLA_LF, Joachimi2012)
-  // ia[0][5] = LF_P          if(IA_NLA_LF, Joachimi2012)
-  // ia[0][6] = LF_Q          if(IA_NLA_LF, Joachimi2012)
-  // ia[0][7] = LF_red_alpha  if(IA_NLA_LF, Joachimi2012)
-  // ia[0][8] = LF_red_P      if(IA_NLA_LF, Joachimi2012)
-  // ia[0][9] = LF_red_Q      if(IA_NLA_LF, Joachimi2012)
-  // ------------------
-  // ia[1][0] = A2_ia        if IA_REDSHIFT_EVOLUTION
-  // ia[1][1] = eta_ia_tt    if IA_REDSHIFT_EVOLUTION
-  // ------------------
-  // ia[2][MAX_SIZE_ARRAYS] = b_ta_z[MAX_SIZE_ARRAYS]
-
-  double A_z[MAX_SIZE_ARRAYS];    // normalization per redshift bin
-  double A2_z[MAX_SIZE_ARRAYS];   // normalization per redshift bin
-  double b_ta_z[MAX_SIZE_ARRAYS]; // b_ta per redshift bin or 
-                                  // use b_ta_z[0] with IA_REDSHIFT_EVOLUTION
-  double oneplusz0_ia;
-  double c1rhocrit_ia;
-
-  // PHOTOZ ------------------------------------------
-  // first index: bias_photoz[0] = SHEAR; bias_photoz[1] = CLUSTERING
-  // second index: bias, strech...
-  double photoz[MAX_SIZE_ARRAYS][MAX_SIZE_ARRAYS][MAX_SIZE_ARRAYS]; 
-
-  // SHEAR CALIBRATION ------------------------------------------
-  double shear_calibration_m[MAX_SIZE_ARRAYS];
-  
-  // Variables for the 4x2pt+N (see: 2008.10757 & 2010.01138)
-  double cluster_MOR[MAX_SIZE_ARRAYS];
-  double cluster_selection[MAX_SIZE_ARRAYS];
-} nuisanceparams;
 
 typedef struct
 {
@@ -262,6 +261,14 @@ typedef struct
   double m_lim;
   char name[CHAR_MAX_SIZE];
 } sur;
+
+typedef struct 
+{
+  double low;
+  double medium;
+  double high;
+  double insane;
+} pre;
 
 typedef struct
 {
@@ -305,24 +312,13 @@ typedef struct
   int adopt_limber_gg;
   int adopt_limber_gammat;
   int use_ggl_efficiency_zoverlap;
+
+  int galaxy_bias_model[MAX_SIZE_ARRAYS]; 
 } likepara;
 
-typedef double (*B1_model)(double z, int nz);
 
-typedef struct
-{
-  double b[MAX_SIZE_ARRAYS];      // linear galaxy bias paramter in clustering bin i
-  double b2[MAX_SIZE_ARRAYS];     // quadratic bias parameter for redshift bin i
-  double bs2[MAX_SIZE_ARRAYS];    // leading order tidal bias for redshift bin i
-  double b_mag[MAX_SIZE_ARRAYS];  // amplitude of magnification bias, b_mag[i] = 5*s[i]+beta[i]-2
-  
-  double hod[MAX_SIZE_ARRAYS][MAX_SIZE_ARRAYS]; // HOD[i] contains HOD parameters of galaxies in 
-                                                // clustering bin i, following 5 parameter model 
-                                                // of Zehavi et al. 2011 + modification of 
-                                                // concentration parameter
-  double cg[MAX_SIZE_ARRAYS];                   // galaxy concentration parameter
-  B1_model b1_function;
-} galpara;
+
+
 
 typedef struct
 {
@@ -380,8 +376,6 @@ extern redshiftparams redshift;
 
 extern sur survey;
 
-extern galpara gbias;
-
 extern clusterparams Cluster;
 
 extern pdeltapara pdeltaparams;
@@ -414,6 +408,8 @@ extern TinkerEmuParameters tinkerEmuParam;
 
 void reset_bary_struct();
 
+void reset_nuisance_struct();
+
 // --------------------------------------------------------------------
 // --------------------------------------------------------------------
 // --------------------------------------------------------------------
@@ -423,8 +419,6 @@ void reset_bary_struct();
 // --------------------------------------------------------------------
 
 void update_cosmopara(cosmopara* C);
-
-void update_galpara(galpara* G);
 
 void update_nuisance(nuisanceparams* N);
 
