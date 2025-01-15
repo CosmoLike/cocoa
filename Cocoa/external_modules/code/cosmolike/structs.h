@@ -199,18 +199,22 @@ typedef struct
   double random_ia;
 
   // INTRINSIC ALIGMENT ------------------------------------------  
-  // A_z[0] = A_ia          if(IA_NLA_LF || IA_REDSHIFT_EVOLUTION)
-  // A_z[1] = eta_ia        if(IA_NLA_LF || IA_REDSHIFT_EVOLUTION)
-  // A_z[2] = eta_ia_highz  if(IA_NLA_LF, Joachimi2012)
-  // A_z[3] = beta_ia       if(IA_NLA_LF, Joachimi2012)
-  // A_z[4] = LF_alpha      if(IA_NLA_LF, Joachimi2012)
-  // A_z[5] = LF_P          if(IA_NLA_LF, Joachimi2012)
-  // A_z[6] = LF_Q          if(IA_NLA_LF, Joachimi2012)
-  // A_z[7] = LF_red_alpha  if(IA_NLA_LF, Joachimi2012)
-  // A_z[8] = LF_red_P      if(IA_NLA_LF, Joachimi2012)
-  // A_z[9] = LF_red_Q      if(IA_NLA_LF, Joachimi2012)
-  // A2_z[0] = A2_ia        if IA_REDSHIFT_EVOLUTION
-  // A2_z[1] = eta_ia_tt    if IA_REDSHIFT_EVOLUTION
+  // ia[0][0] = A_ia          if(IA_NLA_LF || IA_REDSHIFT_EVOLUTION)
+  // ia[0][1] = eta_ia        if(IA_NLA_LF || IA_REDSHIFT_EVOLUTION)
+  // ia[0][2] = eta_ia_highz  if(IA_NLA_LF, Joachimi2012)
+  // ia[0][3] = beta_ia       if(IA_NLA_LF, Joachimi2012)
+  // ia[0][4] = LF_alpha      if(IA_NLA_LF, Joachimi2012)
+  // ia[0][5] = LF_P          if(IA_NLA_LF, Joachimi2012)
+  // ia[0][6] = LF_Q          if(IA_NLA_LF, Joachimi2012)
+  // ia[0][7] = LF_red_alpha  if(IA_NLA_LF, Joachimi2012)
+  // ia[0][8] = LF_red_P      if(IA_NLA_LF, Joachimi2012)
+  // ia[0][9] = LF_red_Q      if(IA_NLA_LF, Joachimi2012)
+  // ------------------
+  // ia[1][0] = A2_ia        if IA_REDSHIFT_EVOLUTION
+  // ia[1][1] = eta_ia_tt    if IA_REDSHIFT_EVOLUTION
+  // ------------------
+  // ia[2][MAX_SIZE_ARRAYS] = b_ta_z[MAX_SIZE_ARRAYS]
+
   double A_z[MAX_SIZE_ARRAYS];    // normalization per redshift bin
   double A2_z[MAX_SIZE_ARRAYS];   // normalization per redshift bin
   double b_ta_z[MAX_SIZE_ARRAYS]; // b_ta per redshift bin or 
