@@ -56,8 +56,8 @@ double amin_lens(int ni)
     log_fatal("invalid bin input ni = %d", ni);
     exit(1);
   }
-  return 1. / (1 + redshift.clustering_zdist_zmax[ni] + 
-                 2. * fabs(nuisance.bias_photoz_clustering[0][ni]));
+  return 1. / (1 + redshift.clustering_zdist_zmax[ni] 
+                 + 2.*fabs(nuisance.photoz[1][0][ni]));
 }
 
 double amax_lens(int ni) 
@@ -73,8 +73,8 @@ double amax_lens(int ni)
     return 1. / (1. + fmax(redshift.shear_zdist_zmin_all, 0.001));
   }
     
-  return 1. / (1 + fmax(redshift.clustering_zdist_zmin[ni] -
-      2. * fabs(nuisance.bias_photoz_clustering[0][ni]), 0.001));
+  return 1. / (1 + fmax(redshift.clustering_zdist_zmin[ni] 
+                 -2. * fabs(nuisance.photoz[1][0][ni]), 0.001));
 }
 
 // -----------------------------------------------------------------------------
@@ -501,7 +501,7 @@ double zdistr_photoz(double zz, const int nj)
     exit(1);
   }
   
-  zz = zz - nuisance.bias_photoz_shear[0][nj];
+  zz = zz - nuisance.photoz[0][0][nj];
   
   double res; 
   if (zz <= table[ntomo+1][0] || zz >= table[ntomo+1][nzbins - 1])
@@ -708,7 +708,7 @@ double pf_photoz(double zz, int nj)
     exit(1);
   }
   
-  zz = zz - nuisance.bias_photoz_clustering[0][nj];
+  zz = zz - nuisance.photoz[1][0][nj];
   
   double res; 
   if (zz <= table[ntomo+1][0] || zz >= table[ntomo+1][nzbins - 1])

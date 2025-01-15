@@ -60,18 +60,44 @@ gsl_integration_glfixed_table* malloc_gslint_glfixed(const int n)
   return w;
 }
 
-void** malloc2d(const int nx, const int ny)
+void*** malloc3d(const int nx, const int ny, const int nz)
 {
-  double** tab = (double**) malloc(sizeof(double*)*nx + sizeof(double)*nx*ny);
+  double*** tab = (double***) malloc(sizeof(double**)*nx +
+                                     sizeof(double*)*nx*ny + 
+                                     sizeof(double)*nx*ny*nz);
   if (tab == NULL)
   {
     log_fatal("array allocation failed");
     exit(1);
   }
+
+  #pragma omp parallel for collapse(2)
   for (int i=0; i<nx; i++)
   {
-    tab[i] = ((double*)(tab + nx) + ny*i);
+    for (int j=0; j<ny; j++)
+    {
+      tab[i] = (double**)(tab + nx) + ny*i;
+      tab[i][j] = (double*)((double**)(tab+nx) + nx*ny) + ny*nz*i + nz*j;
+    }
   }
+
+  return (void***) tab;
+}
+
+void** malloc2d(const int nx, const int ny)
+{
+  double** tab = (double**) malloc(sizeof(double*)*nx + 
+                                   sizeof(double)*nx*ny);
+  if (tab == NULL)
+  {
+    log_fatal("array allocation failed");
+    exit(1);
+  }
+
+  #pragma omp parallel for
+  for (int i=0; i<nx; i++)
+    tab[i] = (double*)(tab + nx) + ny*i;
+  
   return (void**) tab;
 }
 

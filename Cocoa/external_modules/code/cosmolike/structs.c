@@ -458,10 +458,8 @@ void reset_nuisance_struct()
   for(int i=0; i<MAX_SIZE_ARRAYS; i++)
   {
     for(int j=0; j<MAX_SIZE_ARRAYS; j++)
-    {
-      nuisance.bias_photoz_shear[i][j] = 0.0;
-      nuisance.bias_photoz_clustering[i][j] = 0.0;
-    }
+      for(int k=0; k<MAX_SIZE_ARRAYS; k++)
+        nuisance.photoz[i][j][k] = 0.0;
 
     nuisance.A_z[i] = 0.0;
     nuisance.A2_z[i] = 0.0;

@@ -160,10 +160,8 @@ double xi_pm_tomo(
     const int limber
   )
 {  
-  static double** Glplus = NULL;
-  static double** Glminus = NULL;
-  static double* xi_vec_plus = NULL;
-  static double* xi_vec_minus = NULL;
+  static double*** Glpm = NULL; //Glpm[0] = Gl+, Glpm[1] = Gl-
+  static double** xipm = NULL;  //xipm[0] = xi+, xipm[1] = xi-
   static double cache[MAX_SIZE_ARRAYS];
   
   if (Ntable.Ntheta == 0)
@@ -174,23 +172,17 @@ double xi_pm_tomo(
 
   const int NSIZE = tomo.shear_Npowerspectra;
 
-  if (Glplus == NULL || Glminus == NULL || xi_vec_plus == NULL  || 
-      xi_vec_minus == NULL || fdiff(cache[4], Ntable.random))
+  if (Glpm == NULL || xipm == NULL || fdiff(cache[4], Ntable.random))
   {
-    if (Glplus != NULL) free(Glplus);
-    Glplus = (double**) malloc2d(Ntable.Ntheta, limits.LMAX);
-    if (Glminus != NULL) free(Glminus);
-    Glminus = (double**) (double**) malloc2d(Ntable.Ntheta, limits.LMAX);
+    if (Glpm != NULL) free(Glpm);
+    Glpm = (double***) malloc3d(2, Ntable.Ntheta, limits.LMAX);
     
-    if (xi_vec_plus != NULL) free(xi_vec_plus);
-    xi_vec_plus = (double*) calloc1d(NSIZE*Ntable.Ntheta);
-    if (xi_vec_minus != NULL) free(xi_vec_minus);
-    xi_vec_minus = (double*) calloc1d(NSIZE*Ntable.Ntheta);
+    if (xipm != NULL) free(xipm);
+    xipm = (double**) malloc2d(2, NSIZE*Ntable.Ntheta);
     
-    double** Pmin  = (double**) malloc2d(Ntable.Ntheta, limits.LMAX + 1);
-    double** Pmax  = (double**) malloc2d(Ntable.Ntheta, limits.LMAX + 1);
-    double** dPmin = (double**) malloc2d(Ntable.Ntheta, limits.LMAX + 1);
-    double** dPmax = (double**) malloc2d(Ntable.Ntheta, limits.LMAX + 1);
+    double*** P = (double***) malloc3d(4, Ntable.Ntheta, limits.LMAX + 1);
+    double** Pmin  = P[0]; double** Pmax  = P[1];
+    double** dPmin = P[2]; double** dPmax = P[3];
 
     double xmin[Ntable.Ntheta];
     double xmax[Ntable.Ntheta];
@@ -219,16 +211,17 @@ double xi_pm_tomo(
     {
       for (int l=0; l<lmin; l++)
       {
-        Glplus[i][l] = 0.0;
-        Glminus[i][l] = 0.0;
+        Glpm[0][i][l] = 0.0;
+        Glpm[1][i][l] = 0.0;
       }
     }
+
     #pragma omp parallel for collapse(2)
     for (int i=0; i<Ntable.Ntheta; i++)
     {
       for (int l=lmin; l<limits.LMAX; l++)
       {
-        Glplus[i][l] = (2.*l+1)/(2.*M_PI*l*l*(l+1)*(l+1))*(
+        Glpm[0][i][l] = (2.*l+1)/(2.*M_PI*l*l*(l+1)*(l+1))*(
           -l*(l-1.)/2*(l+2./(2*l+1)) * (Pmin[i][l-1]-Pmax[i][l-1])
           -l*(l-1.)*(2.-l)/2 * (xmin[i]*Pmin[i][l]-xmax[i]*Pmax[i][l])
           +l*(l-1.)/(2.*l+1) * (Pmin[i][l+1]-Pmax[i][l+1])
@@ -238,7 +231,7 @@ double xi_pm_tomo(
           -2*(l+2)*(dPmin[i][l-1]-dPmax[i][l-1])
         )/(xmin[i]-xmax[i]);
 
-        Glminus[i][l] = (2.*l+1)/(2.*M_PI*l*l*(l+1)*(l+1))*(
+        Glpm[1][i][l] = (2.*l+1)/(2.*M_PI*l*l*(l+1)*(l+1))*(
           -l*(l-1.)/2*(l+2./(2*l+1)) * (Pmin[i][l-1]-Pmax[i][l-1])
           -l*(l-1.)*(2.-l)/2 * (xmin[i]*Pmin[i][l]-xmax[i]*Pmax[i][l])
           +l*(l-1.)/(2.*l+1)* (Pmin[i][l+1]-Pmax[i][l+1])
@@ -250,10 +243,7 @@ double xi_pm_tomo(
       }
     }
 
-    free(Pmin);
-    free(Pmax);
-    free(dPmin);
-    free(dPmax);
+    free(P);
   }
 
   if (fdiff(cache[0], cosmology.random) ||
@@ -268,16 +258,16 @@ double xi_pm_tomo(
       {
         case IA_MODEL_TATT:
         { // TATT MODELING
-          double** Cl_EE = (double**) malloc2d(NSIZE, limits.LMAX);
-          double** Cl_BB = (double**) malloc2d(NSIZE, limits.LMAX);
+          // Cl_EE = Cl[0], Cl_BB = Cl[1]
+          double*** Cl = (double***) malloc3d(2, NSIZE, limits.LMAX);
           
           const int lmin = 1;
           for (int i=0; i<NSIZE; i++)
           {
             for (int l=0; l<lmin; l++)
             {
-              Cl_EE[i][l] = 0.0;
-              Cl_BB[i][l] = 0.0;
+              Cl[0][i][l] = 0.0;
+              Cl[1][i][l] = 0.0;
             }
           }
 
@@ -323,10 +313,10 @@ double xi_pm_tomo(
                             nuisance.b_ta_z[Z2NZ] || nuisance.A2_z[0] ||
                             nuisance.A2_z[Z1NZ] || nuisance.A2_z[Z2NZ]) ? 1 : 0;
 
-              Cl_EE[nz][l] = C_ss_TATT_EE_tomo_limber_nointerp((double) l, Z1NZ, 
+              Cl[0][nz][l] = C_ss_TATT_EE_tomo_limber_nointerp((double) l, Z1NZ, 
                 Z2NZ, init_static_vars_only);
           
-              Cl_BB[nz][l] = (BM == 1) ? C_ss_TATT_BB_tomo_limber_nointerp(
+              Cl[1][nz][l] = (BM == 1) ? C_ss_TATT_BB_tomo_limber_nointerp(
                 (double) l, Z1NZ, Z2NZ, init_static_vars_only) : 0.0;
             }
           }          
@@ -343,9 +333,9 @@ double xi_pm_tomo(
                             nuisance.b_ta_z[Z2NZ] || nuisance.A2_z[0] ||
                             nuisance.A2_z[Z1NZ] || nuisance.A2_z[Z2NZ]) ? 1 : 0;
 
-              Cl_EE[nz][l] = C_ss_TATT_EE_tomo_limber((double) l, Z1NZ, Z2NZ);
+              Cl[0][nz][l] = C_ss_TATT_EE_tomo_limber((double) l, Z1NZ, Z2NZ);
           
-              Cl_BB[nz][l] = (BM == 1) ?  
+              Cl[1][nz][l] = (BM == 1) ?  
                 C_ss_TATT_BB_tomo_limber((double) l, Z1NZ, Z2NZ) : 0.0;
             }
           }
@@ -356,20 +346,18 @@ double xi_pm_tomo(
             for (int i=0; i<Ntable.Ntheta; i++)
             {
               const int q = nz*Ntable.Ntheta + i;
-              xi_vec_plus[q]  = 0;
-              xi_vec_minus[q] = 0;
+              xipm[0][q] = 0;
+              xipm[1][q] = 0;
               
               for (int l=lmin; l<limits.LMAX; l++)
               {
-                xi_vec_plus[q] += Glplus[i][l] * (Cl_EE[nz][l] + Cl_BB[nz][l]);       
-                
-                xi_vec_minus[q] += Glminus[i][l] * (Cl_EE[nz][l] - Cl_BB[nz][l]);
+                xipm[0][q] += Glpm[0][i][l] * (Cl[0][nz][l] + Cl[1][nz][l]);
+                xipm[1][q] += Glpm[1][i][l] * (Cl[0][nz][l] - Cl[1][nz][l]);
               }
             }
           }
 
-          free(Cl_EE);
-          free(Cl_BB);
+          free(Cl);
           break;
         }
         case IA_MODEL_NLA:
@@ -420,20 +408,18 @@ double xi_pm_tomo(
             }
           }
 
-          #pragma omp parallel for collapse(2)
+          //#pragma omp parallel for collapse(2)
           for (int nz=0; nz<NSIZE; nz++)
           {
             for (int i=0; i<Ntable.Ntheta; i++)
             {
               const int q = nz*Ntable.Ntheta + i;
-              xi_vec_plus[q] = 0;
-              xi_vec_minus[q] = 0;
-              
+              xipm[0][q] = 0;
+              xipm[1][q] = 0;
               for (int l=lmin; l<limits.LMAX; l++)
               {
-                xi_vec_plus[q]  += Glplus[i][l]*Cl[nz][l];
-                
-                xi_vec_minus[q] += Glminus[i][l]*Cl[nz][l];
+                xipm[0][q]  += Glpm[0][i][l]*Cl[nz][l];
+                xipm[1][q]  += Glpm[1][i][l]*Cl[nz][l];
               }
             }
           }
@@ -484,7 +470,7 @@ double xi_pm_tomo(
     exit(1);
   }
   
-  return (pm > 0) ? xi_vec_plus[q] : xi_vec_minus[q];
+  return (pm > 0) ? xipm[0][q] : xipm[1][q];
 }
 
 // ---------------------------------------------------------------------------
@@ -513,9 +499,7 @@ double w_gammat_tomo(
 
   const int NSIZE = tomo.ggl_Npowerspectra;
 
-  if (Pl == NULL || 
-      w_vec == NULL || 
-      fdiff(cache[6], Ntable.random))
+  if (Pl == NULL || w_vec == NULL || fdiff(cache[6], Ntable.random))
   {
     if (Pl != NULL) free(Pl);
     Pl = (double**) malloc2d(Ntable.Ntheta, limits.LMAX);;
@@ -523,8 +507,8 @@ double w_gammat_tomo(
     if (w_vec != NULL) free(w_vec);
     w_vec = (double*) calloc1d(NSIZE*Ntable.Ntheta);
 
-    double** Pmin  = (double**) malloc2d(Ntable.Ntheta, limits.LMAX + 1);
-    double** Pmax  = (double**) malloc2d(Ntable.Ntheta, limits.LMAX + 1);
+    double*** P = (double***) malloc3d(2, Ntable.Ntheta, limits.LMAX + 1);
+    double** Pmin  = P[0]; double** Pmax  = P[1];
 
     double xmin[Ntable.Ntheta];
     double xmax[Ntable.Ntheta];
@@ -563,8 +547,7 @@ double w_gammat_tomo(
       }
     }
 
-    free(Pmin);
-    free(Pmax);
+    free(P);
   }
 
   if (recompute_gs(C, G, N) ||
@@ -743,8 +726,8 @@ double w_gg_tomo(
     if (w_vec != NULL) free(w_vec);
     w_vec = (double*) calloc1d(NSIZE*Ntable.Ntheta);
 
-    double** Pmin = (double**) malloc2d(Ntable.Ntheta, limits.LMAX + 1);
-    double** Pmax = (double**) malloc2d(Ntable.Ntheta, limits.LMAX + 1);
+    double*** P = (double***) malloc3d(2, Ntable.Ntheta, limits.LMAX + 1);
+    double** Pmin  = P[0]; double** Pmax  = P[1];
 
     double xmin[Ntable.Ntheta];
     double xmax[Ntable.Ntheta];
@@ -785,8 +768,7 @@ double w_gg_tomo(
       }
     }
 
-    free(Pmin);
-    free(Pmax);
+    free(P);
   }
 
   if (recompute_gg(C, G, N) ||
@@ -955,8 +937,8 @@ double w_gk_tomo(const int nt, const int ni, const int limber)
     if (w_vec != NULL) free(w_vec);
     w_vec = calloc1d(NSIZE*Ntable.Ntheta);
 
-    double** Pmin  = (double**) malloc2d(Ntable.Ntheta, limits.LMAX + 1);
-    double** Pmax  = (double**) malloc2d(Ntable.Ntheta, limits.LMAX + 1);
+    double*** P = (double***) malloc3d(2, Ntable.Ntheta, limits.LMAX + 1);
+    double** Pmin  = P[0]; double** Pmax  = P[1];
 
     double xmin[Ntable.Ntheta];
     double xmax[Ntable.Ntheta];
@@ -994,8 +976,7 @@ double w_gk_tomo(const int nt, const int ni, const int limber)
       }
     }
 
-    free(Pmin);
-    free(Pmax);
+    free(P);
   }
 
   if (recompute_gk(C, G, N) || 
@@ -1135,8 +1116,8 @@ double w_ks_tomo(
     if (w_vec != NULL) free(w_vec);
     w_vec = calloc1d(NSIZE*Ntable.Ntheta);
     
-    double** Pmin  = (double**) malloc2d(Ntable.Ntheta, limits.LMAX + 1);
-    double** Pmax  = (double**) malloc2d(Ntable.Ntheta, limits.LMAX + 1);
+    double*** P = (double***) malloc3d(2, Ntable.Ntheta, limits.LMAX + 1);
+    double** Pmin  = P[0]; double** Pmax  = P[1];
 
     double xmin[Ntable.Ntheta];
     double xmax[Ntable.Ntheta];
@@ -1175,8 +1156,7 @@ double w_ks_tomo(
       }
     }
     
-    free(Pmin);
-    free(Pmax);
+    free(P);
   }
 
   if (fdiff(cache[0], cosmology.random) ||
@@ -2332,7 +2312,6 @@ double C_gs_tomo_limber(
   static cosmopara C;
   static nuisanceparams N;
   static galpara G;
-  static double cache_table_params;
   static double** table = NULL;
   static int NSIZE;
   static int nell;
@@ -2688,7 +2667,6 @@ double C_gg_tomo_limber(
   static cosmopara C;
   static nuisanceparams N;
   static galpara G;
-  static double cache_table_params;
   static double** table = NULL;
   static int nell;
   static int NSIZE;
@@ -3016,7 +2994,6 @@ double C_gk_tomo_limber(
   static cosmopara C;
   static nuisanceparams N;
   static galpara G;
-  static double cache_table_params;
   static double** table = NULL;
   static int NSIZE;
   static int nell;
@@ -3776,7 +3753,6 @@ double C_ys_tomo_limber(double l, int ni, const int force_no_recompute)
   static cosmopara C;
   static nuisanceparams N;
   static ynuisancepara N2;
-  static double cache_table_params;
   static double** table = NULL;
   static double* sig = NULL;
   static int osc[MAX_SIZE_ARRAYS*MAX_SIZE_ARRAYS];

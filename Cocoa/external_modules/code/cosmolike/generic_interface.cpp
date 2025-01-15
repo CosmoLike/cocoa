@@ -2112,10 +2112,10 @@ void set_nuisance_shear_photoz(vector SP)
   int cache_update = 0;
   for (int i=0; i<redshift.shear_nbin; i++)
   {
-    if (fdiff(nuisance.bias_photoz_shear[0][i], SP(i)))
+    if (fdiff(nuisance.photoz[0][0][i], SP(i)))
     {
       cache_update = 1;
-      nuisance.bias_photoz_shear[0][i] = SP(i);
+      nuisance.photoz[0][0][i] = SP(i);
     } 
   }
 
@@ -2151,10 +2151,10 @@ void set_nuisance_clustering_photoz(vector CP)
   int cache_update = 0;
   for (int i=0; i<redshift.clustering_nbin; i++)
   {
-    if (fdiff(nuisance.bias_photoz_clustering[0][i], CP(i)))
+    if (fdiff(nuisance.photoz[1][0][i], CP(i)))
     { 
       cache_update = 1;
-      nuisance.bias_photoz_clustering[0][i] = CP(i);
+      nuisance.photoz[1][0][i] = CP(i);
     }
   }
 

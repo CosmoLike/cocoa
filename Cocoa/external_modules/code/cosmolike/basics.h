@@ -21,6 +21,8 @@ void* malloc1d(const int nx);
 
 void** malloc2d(const int nx, const int ny);
 
+void*** malloc3d(const int nx, const int ny, const int nz);
+
 void* calloc1d(const int nx);
 
 int fdiff(const double a, const double b);

@@ -219,9 +219,9 @@ typedef struct
   double c1rhocrit_ia;
 
   // PHOTOZ ------------------------------------------
-  // first index = bias, strech...
-  double bias_photoz_shear[MAX_SIZE_ARRAYS][MAX_SIZE_ARRAYS]; 
-  double bias_photoz_clustering[MAX_SIZE_ARRAYS][MAX_SIZE_ARRAYS];
+  // first index: bias_photoz[0] = SHEAR; bias_photoz[1] = CLUSTERING
+  // second index: bias, strech...
+  double photoz[MAX_SIZE_ARRAYS][MAX_SIZE_ARRAYS][MAX_SIZE_ARRAYS]; 
 
   // SHEAR CALIBRATION ------------------------------------------
   double shear_calibration_m[MAX_SIZE_ARRAYS];
