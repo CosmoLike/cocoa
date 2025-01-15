@@ -118,8 +118,10 @@ int test_kmax(double l, int ni) // return 1 if true, 0 otherwise
 
 int test_zoverlap(int ni, int nj) // test whether source bin nj is behind lens bin ni
 { // Galaxy-Galaxy Lensing bins (redshift overlap tests)
-  if (ni < 0 || ni > redshift.clustering_nbin - 1 || 
-      nj < 0 || nj > redshift.shear_nbin - 1)
+  if (ni < 0 || 
+      ni > redshift.clustering_nbin - 1 || 
+      nj < 0 || 
+      nj > redshift.shear_nbin - 1)
   {
     log_fatal("invalid bin input (ni, nj) = (%d, %d)", ni, nj);
     exit(1);

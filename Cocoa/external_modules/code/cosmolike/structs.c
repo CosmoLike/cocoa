@@ -32,11 +32,6 @@ likepara like =
   .clusterWL = 0,
   .clusterCG = 0,
   .clusterCC = 0,
-  .use_full_sky_shear = 1,
-  .use_full_sky_ggl = 1,
-  .use_full_sky_clustering = 1,
-  .use_full_sky_gk = 1,
-  .use_full_sky_sk = 1,
   .adopt_limber_gg = 0,
   .adopt_limber_gammat = 1,
   .use_ggl_efficiency_zoverlap = 1
@@ -308,11 +303,6 @@ void reset_like_struct()
   like.sy = 0;
   like.ky = 0;
   like.yy = 0;
-  like.use_full_sky_shear = 1;
-  like.use_full_sky_ggl = 1;
-  like.use_full_sky_clustering = 1;
-  like.use_full_sky_gk = 1;
-  like.use_full_sky_sk = 1;
   like.adopt_limber_gg = 0;
 }
 
@@ -459,10 +449,6 @@ void reset_pdeltaparams_struct()
 {
   sprintf(pdeltaparams.runmode, "%s", "Halofit");
 }
-
-// ---------------------------------------------------------------------------
-// ---------------------------------------------------------------------------
-// ---------------------------------------------------------------------------
 
 void reset_nuisance_struct()
 {

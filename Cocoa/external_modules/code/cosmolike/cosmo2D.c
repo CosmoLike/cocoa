@@ -164,15 +164,8 @@ double xi_pm_tomo(
   static double** Glminus = NULL;
   static double* xi_vec_plus = NULL;
   static double* xi_vec_minus = NULL;
-  static cosmopara C;
-  static nuisanceparams N;
-  static double cache_table_params;
-  static double cache_cosmology_params;
-  static double cache_photoz_nuisance_params_shear;
-  static double cache_redshift_nz_params_shear;
-  static double cache_intrinsic_aligment_params;
+  static double cache[MAX_SIZE_ARRAYS];
   
-
   if (Ntable.Ntheta == 0)
   {
     log_fatal("Ntable.Ntheta not initialized");
@@ -181,9 +174,8 @@ double xi_pm_tomo(
 
   const int NSIZE = tomo.shear_Npowerspectra;
 
-  if (Glplus == NULL || Glminus == NULL || 
-      xi_vec_plus == NULL  || xi_vec_minus == NULL || 
-      fdiff(cache_table_params, Ntable.random))
+  if (Glplus == NULL || Glminus == NULL || xi_vec_plus == NULL  || 
+      xi_vec_minus == NULL || fdiff(cache[4], Ntable.random))
   {
     if (Glplus != NULL) free(Glplus);
     Glplus = (double**) malloc2d(Ntable.Ntheta, limits.LMAX);
@@ -264,12 +256,11 @@ double xi_pm_tomo(
     free(dPmax);
   }
 
-  if (recompute_shear(C, N) || 
-      fdiff(cache_cosmology_params, cosmology.random) ||
-      fdiff(cache_photoz_nuisance_params_shear, nuisance.random_photoz_shear) ||
-      fdiff(cache_intrinsic_aligment_params, nuisance.random_ia) ||
-      fdiff(cache_redshift_nz_params_shear, redshift.random_shear) ||
-      fdiff(cache_table_params, Ntable.random))
+  if (fdiff(cache[0], cosmology.random) ||
+      fdiff(cache[1], nuisance.random_photoz_shear) ||
+      fdiff(cache[2], nuisance.random_ia) ||
+      fdiff(cache[3], redshift.random_shear) ||
+      fdiff(cache[4], Ntable.random))
   {
     if (limber == 1)
     {
@@ -307,16 +298,14 @@ double xi_pm_tomo(
                 BM = 1;
               }
             }
-            const int force_no_recompute = 0; // FALSE
             const int Z1NZ = Z1(0);
             const int Z2NZ = Z2(0);
             const int l = limits.LMIN_tab + 1;
 
-            double trash = C_ss_TATT_EE_tomo_limber((double) l, 
-              Z1NZ, Z2NZ, force_no_recompute); 
+            double trash = C_ss_TATT_EE_tomo_limber((double) l, Z1NZ, Z2NZ); 
             
-            trash = (BM == 1) ? C_ss_TATT_BB_tomo_limber((double) l, 
-              Z1NZ, Z2NZ, 0) : 0.0;
+            trash = (BM == 1) ? 
+              C_ss_TATT_BB_tomo_limber((double) l, Z1NZ, Z2NZ) : 0.0;
           }
           #pragma GCC diagnostic pop
           #pragma GCC diagnostic pop
@@ -347,7 +336,6 @@ double xi_pm_tomo(
           {
             for (int l=limits.LMIN_tab; l<limits.LMAX; l++)
             {
-              const int force_no_recompute = 1;    // TRUE
               const int Z1NZ = Z1(nz);
               const int Z2NZ = Z2(nz);
 
@@ -355,11 +343,10 @@ double xi_pm_tomo(
                             nuisance.b_ta_z[Z2NZ] || nuisance.A2_z[0] ||
                             nuisance.A2_z[Z1NZ] || nuisance.A2_z[Z2NZ]) ? 1 : 0;
 
-              Cl_EE[nz][l] = C_ss_TATT_EE_tomo_limber((double) l, Z1NZ, Z2NZ, 
-                force_no_recompute);
+              Cl_EE[nz][l] = C_ss_TATT_EE_tomo_limber((double) l, Z1NZ, Z2NZ);
           
-              Cl_BB[nz][l] = (BM == 1) ?  C_ss_TATT_BB_tomo_limber((double) l, 
-                Z1NZ, Z2NZ, force_no_recompute) : 0.0;
+              Cl_BB[nz][l] = (BM == 1) ?  
+                C_ss_TATT_BB_tomo_limber((double) l, Z1NZ, Z2NZ) : 0.0;
             }
           }
 
@@ -374,7 +361,7 @@ double xi_pm_tomo(
               
               for (int l=lmin; l<limits.LMAX; l++)
               {
-                xi_vec_plus[q]  += Glplus[i][l] * (Cl_EE[nz][l] + Cl_BB[nz][l]);
+                xi_vec_plus[q] += Glplus[i][l] * (Cl_EE[nz][l] + Cl_BB[nz][l]);       
                 
                 xi_vec_minus[q] += Glminus[i][l] * (Cl_EE[nz][l] - Cl_BB[nz][l]);
               }
@@ -401,13 +388,10 @@ double xi_pm_tomo(
           #pragma GCC diagnostic push
           #pragma GCC diagnostic ignored "-Wunused-variable"
           { // init static variables inside the C_XY_limber function
-            const int force_no_recompute = 0; // FALSE
             const int Z1NZ = Z1(0);
             const int Z2NZ = Z2(0);
             const int l = limits.LMIN_tab + 1;
-            
-            double trash = C_ss_tomo_limber((double) l, Z1NZ, Z2NZ, 
-              force_no_recompute); 
+            double trash = C_ss_tomo_limber((double) l, Z1NZ, Z2NZ); 
           }
           #pragma GCC diagnostic pop
           
@@ -419,23 +403,20 @@ double xi_pm_tomo(
               const int init_static_vars_only = 0; // FALSE
               const int Z1NZ = Z1(nz);
               const int Z2NZ = Z2(nz);
-              
+
               Cl[nz][l] = C_ss_tomo_limber_nointerp((double) l, Z1NZ, Z2NZ, 
                 use_linear_ps_limber, init_static_vars_only);
             }
           }
-
           #pragma omp parallel for collapse(2)
           for (int nz=0; nz<NSIZE; nz++)
           {
             for (int l=limits.LMIN_tab; l<limits.LMAX; l++)
             {
-              const int force_no_recompute = 1;    // TRUE
               const int Z1NZ = Z1(nz);
-              const int Z2NZ = Z2(nz);
+              const int Z2NZ = Z2(nz); 
               
-              Cl[nz][l] = C_ss_tomo_limber((double) l, Z1NZ, Z2NZ, 
-                force_no_recompute);
+              Cl[nz][l] = C_ss_tomo_limber((double) l, Z1NZ, Z2NZ);
             }
           }
 
@@ -472,13 +453,12 @@ double xi_pm_tomo(
       log_fatal("NonLimber not implemented");
       exit(1);
     }
-    update_cosmopara(&C);
-    update_nuisance(&N);
-    cache_table_params = Ntable.random;
-    cache_cosmology_params = cosmology.random;
-    cache_photoz_nuisance_params_shear = nuisance.random_photoz_shear;
-    cache_redshift_nz_params_shear = redshift.random_shear;
-    cache_intrinsic_aligment_params = nuisance.random_ia;
+
+    cache[0] = cosmology.random;
+    cache[1] = nuisance.random_photoz_shear;
+    cache[2] = nuisance.random_ia;
+    cache[3] = redshift.random_shear;
+    cache[4] = Ntable.random;
   }
 
   if (nt < 0 || nt > Ntable.Ntheta - 1)
@@ -523,13 +503,7 @@ double w_gammat_tomo(
   static cosmopara C;
   static nuisanceparams N;
   static galpara G;
-  static double cache_cosmology_params;
-  static double cache_photoz_nuisance_params_shear;
-  static double cache_photoz_nuisance_params_clustering;
-  static double cache_redshift_nz_params_shear;
-  static double cache_redshift_nz_params_clustering;
-  static double cache_table_params;
-  static double cache_intrinsic_aligment_params;
+  static double cache[MAX_SIZE_ARRAYS];
 
   if (Ntable.Ntheta == 0)
   {
@@ -541,8 +515,8 @@ double w_gammat_tomo(
 
   if (Pl == NULL || 
       w_vec == NULL || 
-      fdiff(cache_table_params, Ntable.random))
-  { 
+      fdiff(cache[6], Ntable.random))
+  {
     if (Pl != NULL) free(Pl);
     Pl = (double**) malloc2d(Ntable.Ntheta, limits.LMAX);;
     
@@ -594,13 +568,13 @@ double w_gammat_tomo(
   }
 
   if (recompute_gs(C, G, N) ||
-      fdiff(cache_cosmology_params, cosmology.random) ||
-      fdiff(cache_photoz_nuisance_params_shear, nuisance.random_photoz_shear) ||
-      fdiff(cache_photoz_nuisance_params_clustering, nuisance.random_photoz_clustering) ||
-      fdiff(cache_intrinsic_aligment_params, nuisance.random_ia) ||
-      fdiff(cache_redshift_nz_params_shear, redshift.random_shear) ||
-      fdiff(cache_redshift_nz_params_clustering, redshift.random_clustering) ||
-      fdiff(cache_table_params, Ntable.random))
+      fdiff(cache[0], cosmology.random) ||
+      fdiff(cache[1], nuisance.random_photoz_shear) ||
+      fdiff(cache[2], nuisance.random_photoz_clustering) ||
+      fdiff(cache[3], nuisance.random_ia) ||
+      fdiff(cache[4], redshift.random_shear) ||
+      fdiff(cache[5], redshift.random_clustering) ||
+      fdiff(cache[6], Ntable.random))
   {    
     double** Cl = (double**) malloc2d(NSIZE, limits.LMAX);
 
@@ -689,11 +663,8 @@ double w_gammat_tomo(
       {
         const int q = nz*Ntable.Ntheta+i;
         w_vec[q] = 0;
-        
         for (int l=lmin; l<limits.LMAX; l++)
-        {
           w_vec[q] += Pl[i][l]*Cl[nz][l];
-        }
       }
     }
 
@@ -703,13 +674,13 @@ double w_gammat_tomo(
     update_galpara(&G);
     update_nuisance(&N);
     
-    cache_table_params = Ntable.random;
-    cache_cosmology_params = cosmology.random;
-    cache_photoz_nuisance_params_shear = nuisance.random_photoz_shear;
-    cache_photoz_nuisance_params_clustering = nuisance.random_photoz_clustering;
-    cache_redshift_nz_params_shear = redshift.random_shear;
-    cache_redshift_nz_params_clustering = redshift.random_clustering;
-    cache_intrinsic_aligment_params = nuisance.random_ia;
+    cache[0] = cosmology.random;
+    cache[1] = nuisance.random_photoz_shear;
+    cache[2] = nuisance.random_photoz_clustering;
+    cache[3] = nuisance.random_ia;
+    cache[4] = redshift.random_shear;
+    cache[5] = redshift.random_clustering;
+    cache[6] = Ntable.random;
   }
 
   if (nt < 0 || nt > Ntable.Ntheta - 1)
@@ -750,12 +721,9 @@ double w_gg_tomo(
   static double** Pl = NULL;
   static double* w_vec = NULL;
   static cosmopara C;
-  static double cache_cosmology_params;
-  static double cache_photoz_nuisance_params_clustering;
-  static double cache_redshift_nz_params_clustering;
   static nuisanceparams N;
   static galpara G;
-  static double cache_table_params;
+  static double cache[MAX_SIZE_ARRAYS];
 
   if (Ntable.Ntheta == 0)
   {
@@ -767,7 +735,7 @@ double w_gg_tomo(
 
   if (Pl == NULL || 
       w_vec == NULL || 
-      fdiff(cache_table_params, Ntable.random))
+      fdiff(cache[3], Ntable.random))
   {
     if (Pl != NULL) free(Pl);
     Pl = (double**) malloc2d(Ntable.Ntheta, limits.LMAX);;
@@ -822,22 +790,18 @@ double w_gg_tomo(
   }
 
   if (recompute_gg(C, G, N) ||
-      fdiff(cache_cosmology_params, cosmology.random) || 
-      fdiff(cache_photoz_nuisance_params_clustering, nuisance.random_photoz_clustering) ||
-      fdiff(cache_redshift_nz_params_clustering, redshift.random_clustering) ||
-      fdiff(cache_table_params, Ntable.random))
+      fdiff(cache[0], cosmology.random) || 
+      fdiff(cache[1], nuisance.random_photoz_clustering) ||
+      fdiff(cache[2], redshift.random_clustering) ||
+      fdiff(cache[3], Ntable.random))
   {        
     double** Cl = (double**) malloc2d(NSIZE, limits.LMAX);
     
     const int lmin = 1;
     for (int i=0; i<NSIZE; i++)
-    {
       for (int l=0; l<lmin; l++)
-      {
         Cl[i][l] = 0.0;
-      }
-    }
-
+    
     #pragma GCC diagnostic push
     #pragma GCC diagnostic ignored "-Wunused-variable"
     { // init static variables inside the C_XY_limber function
@@ -845,7 +809,6 @@ double w_gg_tomo(
       const int Z1 = 0;
       const int Z2 = 0;
       const int l = limits.LMIN_tab + 1;
-      
       double trash = C_gg_tomo_limber((double) l, Z1, Z2, force_no_recompute);
     }
     #pragma GCC diagnostic pop
@@ -919,9 +882,7 @@ double w_gg_tomo(
         w_vec[q] = 0;
         
         for (int l=lmin; l<limits.LMAX; l++)
-        {
           w_vec[q] += Pl[i][l]*Cl[nz][l];
-        }
       }
     }
 
@@ -930,10 +891,10 @@ double w_gg_tomo(
     update_cosmopara(&C);
     update_galpara(&G);
     update_nuisance(&N);
-    cache_table_params = Ntable.random;
-    cache_cosmology_params = cosmology.random;
-    cache_photoz_nuisance_params_clustering = nuisance.random_photoz_clustering;
-    cache_redshift_nz_params_clustering = redshift.random_clustering;
+    cache[0] = cosmology.random;
+    cache[1] = nuisance.random_photoz_clustering;
+    cache[2] = redshift.random_clustering;
+    cache[3] = Ntable.random;
   }
 
   if (nt < 0 || nt > Ntable.Ntheta - 1)
@@ -974,12 +935,9 @@ double w_gk_tomo(const int nt, const int ni, const int limber)
   static double** Pl = NULL;
   static double* w_vec = NULL;
   static cosmopara C;
-  static double cache_cosmology_params;
-  static double cache_photoz_nuisance_params_clustering;
-  static double cache_redshift_nz_params_clustering;
   static nuisanceparams N;
   static galpara G;
-  static double cache_table_params;
+  static double cache[MAX_SIZE_ARRAYS];
 
   if (Ntable.Ntheta == 0)
   {
@@ -989,9 +947,7 @@ double w_gk_tomo(const int nt, const int ni, const int limber)
 
   const int NSIZE = redshift.clustering_nbin;
   
-  if (Pl == NULL || 
-      w_vec == NULL || 
-      fdiff(cache_table_params, Ntable.random))
+  if (Pl == NULL || w_vec == NULL || fdiff(cache[3], Ntable.random))
   {
     if (Pl != NULL) free(Pl);
     Pl = (double**) malloc2d(Ntable.Ntheta, limits.LMAX);;
@@ -1024,12 +980,9 @@ double w_gk_tomo(const int nt, const int ni, const int limber)
 
     const int lmin = 1;
     for (int i=0; i<Ntable.Ntheta; i++)
-    {
       for (int l=0; l<lmin; l++)
-      {
         Pl[i][l] = 0.0;
-      }
-    }
+    
     #pragma omp parallel for collapse(2)
     for (int i=0; i<Ntable.Ntheta; i++)
     {
@@ -1046,10 +999,10 @@ double w_gk_tomo(const int nt, const int ni, const int limber)
   }
 
   if (recompute_gk(C, G, N) || 
-      fdiff(cache_cosmology_params, cosmology.random) ||
-      fdiff(cache_photoz_nuisance_params_clustering, nuisance.random_photoz_clustering) ||
-      fdiff(cache_redshift_nz_params_clustering, redshift.random_clustering) ||
-      fdiff(cache_table_params, Ntable.random))
+      fdiff(cache[0], cosmology.random) ||
+      fdiff(cache[1], nuisance.random_photoz_clustering) ||
+      fdiff(cache[2], redshift.random_clustering) ||
+      fdiff(cache[3], Ntable.random))
   { 
     double** Cl = (double**) malloc2d(NSIZE, limits.LMAX);
 
@@ -1124,10 +1077,11 @@ double w_gk_tomo(const int nt, const int ni, const int limber)
     update_cosmopara(&C);
     update_galpara(&G);
     update_nuisance(&N);
-    cache_table_params = Ntable.random;
-    cache_cosmology_params = cosmology.random;
-    cache_photoz_nuisance_params_clustering = nuisance.random_photoz_clustering;
-    cache_redshift_nz_params_clustering = redshift.random_clustering;
+
+    cache[0] = cosmology.random;
+    cache[1] = nuisance.random_photoz_clustering;
+    cache[2] = redshift.random_clustering;
+    cache[3] = Ntable.random;
   }
 
   if (ni < -1 || ni > redshift.clustering_nbin - 1)
@@ -1163,13 +1117,7 @@ double w_ks_tomo(
 {
   static double** Pl = NULL;
   static double* w_vec = NULL;
-  static cosmopara C;
-  static nuisanceparams N;
-  static double cache_table_params;
-  static double cache_cosmology_params;
-  static double cache_photoz_nuisance_params_shear;
-  static double cache_redshift_nz_params_shear;
-  static double cache_intrinsic_aligment_params;
+  static double cache[MAX_SIZE_ARRAYS];
   
   if (Ntable.Ntheta == 0)
   {
@@ -1179,9 +1127,7 @@ double w_ks_tomo(
 
   const int NSIZE = redshift.shear_nbin;
 
-  if (Pl == NULL || 
-      w_vec == NULL || 
-      fdiff(cache_table_params, Ntable.random))
+  if (Pl == NULL || w_vec == NULL || fdiff(cache[4], Ntable.random))
   {
     if (Pl != NULL) free(Pl);
     Pl = (double**) malloc2d(Ntable.Ntheta, limits.LMAX);;
@@ -1233,12 +1179,11 @@ double w_ks_tomo(
     free(Pmax);
   }
 
-  if (recompute_ks(C, N) || 
-      fdiff(cache_cosmology_params, cosmology.random) ||
-      fdiff(cache_photoz_nuisance_params_shear, nuisance.random_photoz_shear) ||
-      fdiff(cache_intrinsic_aligment_params, nuisance.random_ia) ||
-      fdiff(cache_redshift_nz_params_shear, redshift.random_shear) || 
-      fdiff(cache_table_params, Ntable.random))
+  if (fdiff(cache[0], cosmology.random) ||
+      fdiff(cache[1], nuisance.random_photoz_shear) ||
+      fdiff(cache[2], nuisance.random_ia) ||
+      fdiff(cache[3], redshift.random_shear) || 
+      fdiff(cache[4], Ntable.random))
   {
     double** Cl = (double**) malloc2d(NSIZE, limits.LMAX);
 
@@ -1292,9 +1237,7 @@ double w_ks_tomo(
         {
           w_vec[nz*Ntable.Ntheta+i] = 0;
           for (int l=lmin; l<limits.LMAX; l++)
-          {
             w_vec[nz*Ntable.Ntheta+i] += Pl[i][l]*Cl[nz][l];
-          }
         }
       }
     } 
@@ -1305,14 +1248,11 @@ double w_ks_tomo(
     }
 
     free(Cl);
-
-    update_cosmopara(&C);
-    update_nuisance(&N);
-    cache_table_params = Ntable.random;
-    cache_cosmology_params = cosmology.random;
-    cache_photoz_nuisance_params_shear = nuisance.random_photoz_shear;
-    cache_redshift_nz_params_shear = redshift.random_shear;
-    cache_intrinsic_aligment_params = nuisance.random_ia;
+    cache[0] = cosmology.random;
+    cache[1] = nuisance.random_photoz_shear;
+    cache[2] = nuisance.random_ia;
+    cache[3] = redshift.random_shear; 
+    cache[4] = Ntable.random;
   }
 
   if (nt < 0 || nt > Ntable.Ntheta - 1)
@@ -1425,7 +1365,10 @@ double int_for_C_ss_TATT_BB_tomo_limber(double a, void* params)
   double* ar = (double*) params;
   const int n1 = (int) ar[0]; // first source bin 
   const int n2 = (int) ar[1]; // second source bin
-  if (n1 < 0 || n1 > redshift.shear_nbin - 1 || n2 < 0 || n2 > redshift.shear_nbin - 1)
+  if (n1 < 0 || 
+      n1 > redshift.shear_nbin - 1 || 
+      n2 < 0 || 
+      n2 > redshift.shear_nbin - 1)
   {
     log_fatal("error in selecting bin number (ni, nj) = [%d,%d]", n1, n2);
     exit(1);
@@ -1461,27 +1404,34 @@ double C_ss_TATT_EE_tomo_limber_nointerp(
     const int init_static_vars_only
   )
 {
-  static gsl_integration_glfixed_table* w = 0;
+  static double cache[MAX_SIZE_ARRAYS];
+  static gsl_integration_glfixed_table* w = NULL;
 
-  if(ni < -1 || ni > redshift.shear_nbin -1 || nj < -1 || nj > redshift.shear_nbin -1)
+  if (ni < -1 || 
+      ni > redshift.shear_nbin -1 || 
+      nj < -1 || 
+      nj > redshift.shear_nbin -1)
   {
     log_fatal("invalid bin input (ni, nj) = (%d, %d)", ni, nj);
     exit(1);
   }
+
+  if (w == NULL || fdiff(cache[0], Ntable.random))
+  {
+    const size_t szint = 90 + 50 * (Ntable.high_def_integration);
+    if (w != NULL)  gsl_integration_glfixed_table_free(w);
+    w = malloc_gslint_glfixed(szint);
+    cache[0] = Ntable.random;
+  }
+
   double ar[3] = {(double) ni, (double) nj, l};
+  
   const double amin = fmax(amin_source(ni), amin_source(nj));
   const double amax = fmin(amax_source(ni), amax_source(nj));
 
   double res = 0.0;
   if (init_static_vars_only == 1)
-  {
-    if (w == 0)
-    {
-      const size_t szint = 60 + 50 * (Ntable.high_def_integration);
-      w = gsl_integration_glfixed_table_alloc(szint);
-    }
     res = int_for_C_ss_TATT_EE_tomo_limber(amin, (void*) ar);
-  } 
   else
   {
     gsl_function F;
@@ -1499,7 +1449,8 @@ double C_ss_TATT_BB_tomo_limber_nointerp(
     const int init_static_vars_only
   )
 {
-  static gsl_integration_glfixed_table* w = 0;
+  static double cache[MAX_SIZE_ARRAYS];
+  static gsl_integration_glfixed_table* w = NULL;
 
   if (ni < -1 || 
       ni > redshift.shear_nbin -1 || 
@@ -1510,7 +1461,16 @@ double C_ss_TATT_BB_tomo_limber_nointerp(
     exit(1);
   }
 
+  if (w == NULL || fdiff(cache[0], Ntable.random))
+  {
+    const size_t szint = 90 + 50 * (Ntable.high_def_integration);
+    if (w != NULL)  gsl_integration_glfixed_table_free(w);
+    w = malloc_gslint_glfixed(szint);
+    cache[0] = Ntable.random;
+  }
+
   double ar[3] = {(double) ni, (double) nj, l};
+  
   const double amin = fmax(amin_source(ni), amin_source(nj));
   const double amax = fmin(amax_source(ni), amax_source(nj));
   if (!(amin>0) || !(amin<1) || !(amax>0) || !(amax<1)) 
@@ -1521,14 +1481,7 @@ double C_ss_TATT_BB_tomo_limber_nointerp(
 
   double res = 0.0;
   if (init_static_vars_only == 1)
-  {
-    if (w == 0)
-    {
-      const size_t szint = 60 + 50 * (Ntable.high_def_integration);
-      w = gsl_integration_glfixed_table_alloc(szint);
-    }
     res = int_for_C_ss_TATT_BB_tomo_limber(amin, (void*) ar);
-  }
   else
   {
     gsl_function F;
@@ -1546,16 +1499,10 @@ double C_ss_TATT_BB_tomo_limber_nointerp(
 double C_ss_TATT_EE_tomo_limber(
     const double l, 
     const int ni, 
-    const int nj, 
-    const int force_no_recompute
+    const int nj
   )
 {
-  static cosmopara C;
-  static nuisanceparams N;
-  static double cache_cosmology_params;
-  static double cache_photoz_nuisance_params_shear;
-  static double cache_redshift_nz_params_shear;
-  static double cache_intrinsic_aligment_params;
+  static double cache[MAX_SIZE_ARRAYS];
   static double** table;
   static double* sig;
   static int osc[100];
@@ -1565,29 +1512,15 @@ double C_ss_TATT_EE_tomo_limber(
   static double lnlmax;
   static double dlnl;
 
-  if (table == 0)
+  if (table == NULL || fdiff(cache[4], Ntable.random))
   {
     NSIZE = tomo.shear_Npowerspectra;
     nell = Ntable.N_ell_TATT;
     lnlmin = log(fmax(limits.LMIN_tab - 1., 1.0));
     lnlmax = log(fmax(limits.LMAX, limits.LMAX_hankel) + 1);
     dlnl = (lnlmax - lnlmin) / ((double) nell - 1.);
-
-    const int len = sizeof(double*)*NSIZE + sizeof(double)*NSIZE*nell;
     
-    table = (double**) malloc(len);
-    if (table == NULL)
-    {
-      log_fatal("array allocation failed");
-      exit(1);
-    }
-    
-    for (int i=0; i<NSIZE; i++)
-    {
-      table[i] = ((double*)(table + NSIZE) + nell*i);
-      for (int j=0; j<nell; j++)
-        table[i][j] = 0.0;
-    }
+    table = (double**) malloc2d(NSIZE, nell);
 
     sig = (double*) malloc(sizeof(double)*NSIZE);
     if (sig == NULL)
@@ -1597,74 +1530,73 @@ double C_ss_TATT_EE_tomo_limber(
     }
   }
   
-  if (force_no_recompute == 0)
-  { // it turns out - because (nell = 100.000) on real funcs, recompute funcs are quite expensive
-    if (recompute_shear(C, N) ||
-        fdiff(cache_cosmology_params, cosmology.random) ||
-        fdiff(cache_photoz_nuisance_params_shear, nuisance.random_photoz_shear) ||
-        fdiff(cache_intrinsic_aligment_params, nuisance.random_ia) ||
-        fdiff(cache_redshift_nz_params_shear, redshift.random_shear))
+  if (fdiff(cache[0], cosmology.random) ||
+      fdiff(cache[1], nuisance.random_photoz_shear) ||
+      fdiff(cache[2], nuisance.random_ia) ||
+      fdiff(cache[3], redshift.random_shear) ||
+      fdiff(cache[4], Ntable.random))
+  {
+    #pragma GCC diagnostic push
+    #pragma GCC diagnostic ignored "-Wunused-variable"
     {
-      #pragma GCC diagnostic push
-      #pragma GCC diagnostic ignored "-Wunused-variable"
-      {
-        const int k = 0;
-        const int Z1NZ = Z1(k);
-        const int Z2NZ = Z2(k);
-        const double lnl = lnlmin;
-        double init = C_ss_TATT_EE_tomo_limber_nointerp(exp(lnl), Z1NZ, Z2NZ, 1);
-      }
-      #pragma GCC diagnostic pop
-      
-      #pragma omp parallel for collapse(2)
-      for (int k=0; k<NSIZE; k++)
-      {
-        for (int i=0; i<nell; i++)
-        {
-          const int Z1NZ = Z1(k);
-          const int Z2NZ = Z2(k);
-          const double lnl = lnlmin + i*dlnl;
-          table[k][i] = C_ss_TATT_EE_tomo_limber_nointerp(exp(lnl), Z1NZ, Z2NZ, 0);
-        }
-      }
-      
-      #pragma omp parallel for
-      for (int k=0; k<NSIZE; k++)
-      {
-        const int Z1NZ = Z1(k);
-        const int Z2NZ = Z2(k);
-        sig[k] = 1.;
-        osc[k] = 0;
-        if (C_ss_TATT_EE_tomo_limber_nointerp(500., Z1NZ, Z2NZ, 0) < 0)
-        {
-          sig[k] = -1.;
-        }
-        for (int i=0; i<nell; i++)
-        {
-          if (table[k][i] * sig[k] < 0.)
-          {
-            osc[k] = 1;
-          }
-        }
-        if (osc[k] == 0)
-        {
-          for (int i = 0; i<nell; i++)
-          {
-            table[k][i] = log(sig[k] * table[k][i]);
-          }
-        }
-      }
-      
-      update_cosmopara(&C);
-      update_nuisance(&N);
-      cache_cosmology_params = cosmology.random;
-      cache_photoz_nuisance_params_shear = nuisance.random_photoz_shear;
-      cache_redshift_nz_params_shear = redshift.random_shear;
-      cache_intrinsic_aligment_params = nuisance.random_ia;
+      const int k = 0;
+      const int Z1NZ = Z1(k);
+      const int Z2NZ = Z2(k);
+      const double lnl = lnlmin;
+      double init = C_ss_TATT_EE_tomo_limber_nointerp(exp(lnl), Z1NZ, Z2NZ, 1);
     }
-  }
+    #pragma GCC diagnostic pop
+    
+    #pragma omp parallel for collapse(2)
+    for (int k=0; k<NSIZE; k++)
+    {
+      for (int i=0; i<nell; i++)
+      {
+        const int Z1NZ = Z1(k);
+        const int Z2NZ = Z2(k);
+        const double lnl = lnlmin + i*dlnl;
+        table[k][i] = C_ss_TATT_EE_tomo_limber_nointerp(exp(lnl), Z1NZ, Z2NZ, 0);
+      }
+    }
+    
+    #pragma omp parallel for
+    for (int k=0; k<NSIZE; k++)
+    {
+      const int Z1NZ = Z1(k);
+      const int Z2NZ = Z2(k);
+      sig[k] = 1.;
+      osc[k] = 0;
+      if (C_ss_TATT_EE_tomo_limber_nointerp(500., Z1NZ, Z2NZ, 0) < 0)
+      {
+        sig[k] = -1.;
+      }
+      for (int i=0; i<nell; i++)
+      {
+        if (table[k][i] * sig[k] < 0.)
+        {
+          osc[k] = 1;
+        }
+      }
+      if (osc[k] == 0)
+      {
+        for (int i = 0; i<nell; i++)
+        {
+          table[k][i] = log(sig[k] * table[k][i]);
+        }
+      }
+    }
 
-  if (ni < 0 || ni > redshift.shear_nbin - 1 || nj < 0 || nj > redshift.shear_nbin - 1)
+    cache[0] = cosmology.random;
+    cache[1] = nuisance.random_photoz_shear;
+    cache[2] = nuisance.random_ia;
+    cache[3] = redshift.random_shear;
+    cache[4] = Ntable.random;
+  }
+  
+  if (ni < 0 || 
+      ni > redshift.shear_nbin - 1 || 
+      nj < 0 ||
+      nj > redshift.shear_nbin - 1)
   {
     log_fatal("error in selecting bin number (ni, nj) = [%d,%d]", ni, nj);
     exit(1);
@@ -1708,16 +1640,10 @@ double C_ss_TATT_EE_tomo_limber(
 double C_ss_TATT_BB_tomo_limber(
     const double l, 
     const int ni, 
-    const int nj, 
-    const int force_no_recompute
+    const int nj
   )
 {
-  static double cache_cosmology_params;
-  static double cache_photoz_nuisance_params_shear;
-  static double cache_redshift_nz_params_shear;
-  static double cache_intrinsic_aligment_params;
-  static cosmopara C;
-  static nuisanceparams N;
+  static double cache[MAX_SIZE_ARRAYS];
   static double** table;
   static double* sig;
   static int osc[100];
@@ -1734,24 +1660,8 @@ double C_ss_TATT_BB_tomo_limber(
     lnlmin = log(fmax(limits.LMIN_tab, 1.0));
     lnlmax = log(fmax(limits.LMAX, limits.LMAX_hankel) + 1);
     dlnl = (lnlmax - lnlmin) / ((double) nell - 1.0);
-
-    const int len = sizeof(double*)*NSIZE + sizeof(double)*NSIZE*nell;
     
-    table = (double**) malloc(len);
-    if (table == NULL)
-    {
-      log_fatal("array allocation failed");
-      exit(1);
-    }
-    
-    for (int i=0; i<NSIZE; i++)
-    {
-      table[i] = ((double*)(table + NSIZE) + nell*i);
-      for (int j=0; j<nell; j++)
-      {
-        table[i][j] = 0.0;
-      }
-    }
+    table = (double**) malloc2d(NSIZE, nell);
 
     sig = (double*) malloc(sizeof(double)*NSIZE);
     if (sig == NULL)
@@ -1761,72 +1671,68 @@ double C_ss_TATT_BB_tomo_limber(
     }
   }
 
-  if (force_no_recompute == 0)
-  { // it turns out - because (nell = 100.000) on real funcs, recompute funcs are quite expensive
-    if (recompute_shear(C, N) ||
-        fdiff(cache_cosmology_params, cosmology.random) ||
-        fdiff(cache_photoz_nuisance_params_shear, nuisance.random_photoz_shear) ||
-        fdiff(cache_intrinsic_aligment_params, nuisance.random_ia) ||
-        fdiff(cache_redshift_nz_params_shear, redshift.random_shear))
+  if (fdiff(cache[0], cosmology.random) ||
+      fdiff(cache[1], nuisance.random_photoz_shear) ||
+      fdiff(cache[2], nuisance.random_ia) ||
+      fdiff(cache[3], redshift.random_shear) ||
+      fdiff(cache[4], Ntable.random))
+  {
+    #pragma GCC diagnostic push
+    #pragma GCC diagnostic ignored "-Wunused-variable"
     {
-      #pragma GCC diagnostic push
-      #pragma GCC diagnostic ignored "-Wunused-variable"
-      {
-        const int k = 0;
-        const int Z1NZ = Z1(k);
-        const int Z2NZ = Z2(k);
-        const double lnl = lnlmin;
-        double init = C_ss_TATT_BB_tomo_limber_nointerp(exp(lnl), Z1NZ, Z2NZ, 1);
-      }
-      #pragma GCC diagnostic pop
-      
-      #pragma omp parallel for collapse(2)
-      for (int k=0; k<NSIZE; k++)
-      {
-        for (int i=0; i<nell; i++)
-        {
-          const int Z1NZ = Z1(k);
-          const int Z2NZ = Z2(k);
-          const double lnl = lnlmin + i*dlnl;
-          table[k][i] = C_ss_TATT_BB_tomo_limber_nointerp(exp(lnl), Z1NZ, Z2NZ, 0);
-        }
-      }
-      
-      #pragma omp parallel for
-      for (int k=0; k<NSIZE; k++)
-      {
-        const int Z1NZ = Z1(k);
-        const int Z2NZ = Z2(k);
-        sig[k] = 1.;
-        osc[k] = 0;
-        if (C_ss_TATT_BB_tomo_limber_nointerp(500., Z1NZ, Z2NZ, 0) < 0)
-        {
-          sig[k] = -1.;
-        }
-        for (int i=0; i<nell; i++)
-        {
-          if (table[k][i] * sig[k] < 0.)
-          {
-            osc[k] = 1;
-          }
-        }
-        if (osc[k] == 0)
-        {
-          #pragma omp parallel for
-          for (int i=0; i<nell; i++)
-          {
-            table[k][i] = log(sig[k] * table[k][i]);
-          }
-        }
-      }
-      
-      update_cosmopara(&C);
-      update_nuisance(&N);
-      cache_cosmology_params = cosmology.random;
-      cache_photoz_nuisance_params_shear = nuisance.random_photoz_shear;
-      cache_redshift_nz_params_shear = redshift.random_shear;
-      cache_intrinsic_aligment_params = nuisance.random_ia;
+      const int k = 0;
+      const int Z1NZ = Z1(k);
+      const int Z2NZ = Z2(k);
+      const double lnl = lnlmin;
+      double init = C_ss_TATT_BB_tomo_limber_nointerp(exp(lnl), Z1NZ, Z2NZ, 1);
     }
+    #pragma GCC diagnostic pop
+    
+    #pragma omp parallel for collapse(2)
+    for (int k=0; k<NSIZE; k++)
+    {
+      for (int i=0; i<nell; i++)
+      {
+        const int Z1NZ = Z1(k);
+        const int Z2NZ = Z2(k);
+        const double lnl = lnlmin + i*dlnl;
+        table[k][i] = C_ss_TATT_BB_tomo_limber_nointerp(exp(lnl), Z1NZ, Z2NZ, 0);
+      }
+    }
+    
+    #pragma omp parallel for
+    for (int k=0; k<NSIZE; k++)
+    {
+      const int Z1NZ = Z1(k);
+      const int Z2NZ = Z2(k);
+      sig[k] = 1.;
+      osc[k] = 0;
+      if (C_ss_TATT_BB_tomo_limber_nointerp(500., Z1NZ, Z2NZ, 0) < 0)
+      {
+        sig[k] = -1.;
+      }
+      for (int i=0; i<nell; i++)
+      {
+        if (table[k][i] * sig[k] < 0.)
+        {
+          osc[k] = 1;
+        }
+      }
+      if (osc[k] == 0)
+      {
+        #pragma omp parallel for
+        for (int i=0; i<nell; i++)
+        {
+          table[k][i] = log(sig[k] * table[k][i]);
+        }
+      }
+    }
+    
+    cache[0] = cosmology.random;
+    cache[1] = nuisance.random_photoz_shear;
+    cache[2] = nuisance.random_ia;
+    cache[3] = redshift.random_shear;
+    cache[4] = Ntable.random;
   }
 
   if (ni < 0 || 
@@ -1928,18 +1834,9 @@ double C_ss_tomo_limber_nointerp(
     const int init_static_vars_only
   )
 {
-  static double cache_table_params;
+  static double cache[MAX_SIZE_ARRAYS];
   static gsl_integration_glfixed_table* w = NULL;
   
-  if (w == NULL || 
-      fdiff(cache_table_params, Ntable.random))
-  {
-    const size_t szint = 90 + 50 * (Ntable.high_def_integration);
-    if (w != NULL)  gsl_integration_glfixed_table_free(w);
-    w = malloc_gslint_glfixed(szint);
-    cache_table_params = Ntable.random;
-  }
-
   if (ni < -1 || 
       ni > redshift.shear_nbin -1 || 
       nj < -1 || 
@@ -1947,6 +1844,14 @@ double C_ss_tomo_limber_nointerp(
   {
     log_fatal("invalid bin input (ni, nj) = (%d, %d)", ni, nj);
     exit(1);
+  }
+
+  if (w == NULL || fdiff(cache[0], Ntable.random))
+  {
+    const size_t szint = 90 + 50 * (Ntable.high_def_integration);
+    if (w != NULL)  gsl_integration_glfixed_table_free(w);
+    w = malloc_gslint_glfixed(szint);
+    cache[0] = Ntable.random;
   }
 
   double ar[4] = {(double) ni, (double) nj, l, (double) use_linear_ps};
@@ -1976,85 +1881,69 @@ double C_ss_tomo_limber_nointerp(
 double C_ss_tomo_limber(
     double l, 
     int ni, 
-    int nj, 
-    const int force_no_recompute
+    int nj
   )
 {
-  static double cache_cosmology_params;
-  static double cache_photoz_nuisance_params_shear;
-  static double cache_redshift_nz_params_shear;
-  static double cache_intrinsic_aligment_params;
-  static cosmopara C;
-  static nuisanceparams N;
+  static double cache[MAX_SIZE_ARRAYS];
   static double** table = NULL;
-  static double cache_table_params;
   static int NSIZE = 0;
   static int nell = 0;
   static double lnlmin;
   static double lnlmax;
   static double dlnl;
 
-  if (force_no_recompute == 0)
-  { // Cocoa: nell = 10^5 on real funcs, so recompute funcs are expensive
-    if (table == NULL || 
-        fdiff(cache_table_params, Ntable.random))
-    {
-      nell   = Ntable.N_ell;
-      NSIZE  = tomo.shear_Npowerspectra;
-      lnlmin = log(fmax(limits.LMIN_tab - 1., 1.0));
-      lnlmax = log(fmax(limits.LMAX, limits.LMAX_hankel) + 1);
-      dlnl   = (lnlmax - lnlmin)/(Ntable.N_ell - 1.);
-      
-      if (table != NULL) free(table);
-      table = (double**) malloc2d(NSIZE, nell);
-    }
+  if (table == NULL || fdiff(cache[4], Ntable.random))
+  {
+    nell   = Ntable.N_ell;
+    NSIZE  = tomo.shear_Npowerspectra;
+    lnlmin = log(fmax(limits.LMIN_tab - 1., 1.0));
+    lnlmax = log(fmax(limits.LMAX, limits.LMAX_hankel) + 1);
+    dlnl   = (lnlmax - lnlmin)/(Ntable.N_ell - 1.);
+    
+    if (table != NULL) free(table);
+    table = (double**) malloc2d(NSIZE, nell);
+  }
 
-    if (recompute_shear(C, N) ||
-        fdiff(cache_cosmology_params, cosmology.random) ||
-        fdiff(cache_photoz_nuisance_params_shear, nuisance.random_photoz_shear) ||
-        fdiff(cache_intrinsic_aligment_params, nuisance.random_ia) ||
-        fdiff(cache_redshift_nz_params_shear, redshift.random_shear) ||
-        fdiff(cache_table_params, Ntable.random))
-    { 
-      #pragma GCC diagnostic push
-      #pragma GCC diagnostic ignored "-Wunused-variable"
-      for (int k=0; k<NSIZE; k++)
+  if (fdiff(cache[0], cosmology.random) ||
+      fdiff(cache[1], nuisance.random_photoz_shear) ||
+      fdiff(cache[2], nuisance.random_ia) ||
+      fdiff(cache[3], redshift.random_shear) ||
+      fdiff(cache[4], Ntable.random))
+  { 
+    #pragma GCC diagnostic push
+    #pragma GCC diagnostic ignored "-Wunused-variable"
+    for (int k=0; k<NSIZE; k++)
+    {
+      const int init_static_vars_only = 1; // TRUE
+      const int k = 0;
+      const int Z1NZ = Z1(k);
+      const int Z2NZ = Z2(k);
+      const double lmin = exp(lnlmin);
+      double trash = C_ss_tomo_limber_nointerp(lmin, Z1NZ, Z2NZ, 
+        use_linear_ps_limber, init_static_vars_only);
+    }
+    #pragma GCC diagnostic pop
+    
+    #pragma omp parallel for collapse(2)
+    for (int k=0; k<NSIZE; k++)
+    {
+      for (int i=0; i<Ntable.N_ell; i++)
       {
-        const int init_static_vars_only = 1; // TRUE
-        const int k = 0;
+        const int init_static_vars_only = 0; // FALSE
         const int Z1NZ = Z1(k);
         const int Z2NZ = Z2(k);
-        const double lmin = exp(lnlmin);
+        const double l = exp(lnlmin + i*dlnl);
         
-        double trash = C_ss_tomo_limber_nointerp(lmin, Z1NZ, Z2NZ, 
-          use_linear_ps_limber, init_static_vars_only);
+        table[k][i]= log(C_ss_tomo_limber_nointerp(l, Z1NZ, Z2NZ, 
+          use_linear_ps_limber, init_static_vars_only));
       }
-      #pragma GCC diagnostic pop
-      
-      #pragma omp parallel for collapse(2)
-      for (int k=0; k<NSIZE; k++)
-      {
-        for (int i=0; i<Ntable.N_ell; i++)
-        {
-          const int init_static_vars_only = 0; // FALSE
-          const int Z1NZ = Z1(k);
-          const int Z2NZ = Z2(k);
-          const double lnl = lnlmin + i*dlnl;
-          const double l = exp(lnl);
-          
-          table[k][i]= log(C_ss_tomo_limber_nointerp(l, Z1NZ, Z2NZ, 
-            use_linear_ps_limber, init_static_vars_only));
-        }
-      }
-
-      update_cosmopara(&C);
-      update_nuisance(&N);
-      cache_table_params = Ntable.random;
-      cache_cosmology_params = cosmology.random;
-      cache_photoz_nuisance_params_shear = nuisance.random_photoz_shear;
-      cache_redshift_nz_params_shear = redshift.random_shear;
-      cache_intrinsic_aligment_params = nuisance.random_ia;
     }
+
+    cache[0] = cosmology.random;
+    cache[1] = nuisance.random_photoz_shear;
+    cache[2] = nuisance.random_ia;
+    cache[3] = redshift.random_shear;
+    cache[4] = Ntable.random;
   }
 
   if (ni < -1 || 
@@ -2324,18 +2213,9 @@ double C_gs_tomo_limber_nointerp(
     const int init_static_vars_only
   )
 {
-  static double cache_table_params;
+  static double cache[MAX_SIZE_ARRAYS];
   static gsl_integration_glfixed_table* w = NULL;
   
-  if (w == NULL || 
-      fdiff(cache_table_params, Ntable.random))
-  {
-    const size_t szint = 125 + 50 * (Ntable.high_def_integration);
-    if (w != NULL)  gsl_integration_glfixed_table_free(w);
-    w = malloc_gslint_glfixed(szint);
-    cache_table_params = Ntable.random;
-  }
-
   if (nl < -1 || 
       nl > redshift.clustering_nbin -1 || 
       ns < -1 || 
@@ -2343,6 +2223,14 @@ double C_gs_tomo_limber_nointerp(
   {
     log_fatal("invalid bin input (ni, nj) = (%d, %d)", nl, ns);
     exit(1);
+  }
+
+  if (w == NULL || fdiff(cache[0], Ntable.random))
+  {
+    const size_t szint = 125 + 50 * (Ntable.high_def_integration);
+    if (w != NULL)  gsl_integration_glfixed_table_free(w);
+    w = malloc_gslint_glfixed(szint);
+    cache[0] = Ntable.random;
   }
 
   double ar[4] = {(double) nl, (double) ns, l, use_linear_ps};
@@ -2440,12 +2328,7 @@ double C_gs_tomo_limber(
     const int force_no_recompute
   )
 {
-  static double cache_cosmology_params;
-  static double cache_photoz_nuisance_params_shear;
-  static double cache_photoz_nuisance_params_clustering;
-  static double cache_redshift_nz_params_shear;
-  static double cache_redshift_nz_params_clustering;
-  static double cache_intrinsic_aligment_params;
+  static double cache[MAX_SIZE_ARRAYS];
   static cosmopara C;
   static nuisanceparams N;
   static galpara G;
@@ -2459,8 +2342,7 @@ double C_gs_tomo_limber(
 
   if (force_no_recompute == 0)
   { // Cocoa: nell = 10^5 on real funcs, so recompute funcs are expensive
-    if (table == NULL || 
-        fdiff(cache_table_params, Ntable.random)) 
+    if (table == NULL || fdiff(cache[6], Ntable.random)) 
     {
       NSIZE  = tomo.ggl_Npowerspectra;
       nell   = (int) number_ell_fourier_2pt();
@@ -2473,13 +2355,13 @@ double C_gs_tomo_limber(
     }
 
     if (recompute_gs(C, G, N) || 
-        fdiff(cache_cosmology_params, cosmology.random) ||
-        fdiff(cache_photoz_nuisance_params_shear, nuisance.random_photoz_shear) ||
-        fdiff(cache_photoz_nuisance_params_clustering, nuisance.random_photoz_clustering) ||
-        fdiff(cache_intrinsic_aligment_params, nuisance.random_ia) ||
-        fdiff(cache_redshift_nz_params_shear, redshift.random_shear) ||
-        fdiff(cache_redshift_nz_params_clustering, redshift.random_clustering) ||
-        fdiff(cache_table_params, Ntable.random))
+        fdiff(cache[0], cosmology.random) ||
+        fdiff(cache[1], nuisance.random_photoz_shear) ||
+        fdiff(cache[2], nuisance.random_photoz_clustering) ||
+        fdiff(cache[3], nuisance.random_ia) ||
+        fdiff(cache[4], redshift.random_shear) ||
+        fdiff(cache[5], redshift.random_clustering) ||
+        fdiff(cache[6], Ntable.random))
     {
       #pragma GCC diagnostic push
       #pragma GCC diagnostic ignored "-Wunused-variable"
@@ -2519,13 +2401,13 @@ double C_gs_tomo_limber(
       update_cosmopara(&C);
       update_nuisance(&N);
       update_galpara(&G);
-      cache_table_params = Ntable.random;
-      cache_cosmology_params = cosmology.random;
-      cache_photoz_nuisance_params_shear = nuisance.random_photoz_shear;
-      cache_photoz_nuisance_params_clustering = nuisance.random_photoz_clustering;
-      cache_redshift_nz_params_shear = redshift.random_shear;
-      cache_redshift_nz_params_clustering = redshift.random_clustering;
-      cache_intrinsic_aligment_params = nuisance.random_ia;
+      cache[0] = cosmology.random;
+      cache[1] = nuisance.random_photoz_shear;
+      cache[2] = nuisance.random_photoz_clustering;
+      cache[3] = nuisance.random_ia;
+      cache[4] = redshift.random_shear;
+      cache[5] = redshift.random_clustering;
+      cache[6] = Ntable.random;
     }
   }
 
@@ -2731,18 +2613,9 @@ double C_gg_tomo_limber_nointerp(
     const int init_static_vars_only
   )
 {
-  static double cache_table_params;
+  static double cache[MAX_SIZE_ARRAYS];
   static gsl_integration_glfixed_table* w = NULL;
   
-  if (w == NULL || 
-      fdiff(cache_table_params, Ntable.random))
-  {
-    const size_t szint = 200 + 50 * (Ntable.high_def_integration);
-    if (w != NULL)  gsl_integration_glfixed_table_free(w);
-    w = malloc_gslint_glfixed(szint);
-    cache_table_params = Ntable.random;
-  }
-
   if (ni < 0 || 
       ni > redshift.clustering_nbin - 1 || 
       nj < 0 || 
@@ -2755,6 +2628,14 @@ double C_gg_tomo_limber_nointerp(
   {
     log_fatal("cross-tomography (ni,nj) = (%d,%d) bins not supported", ni, nj);
     exit(1);
+  }
+
+  if (w == NULL || fdiff(cache[0], Ntable.random))
+  {
+    const size_t szint = 200 + 50 * (Ntable.high_def_integration);
+    if (w != NULL)  gsl_integration_glfixed_table_free(w);
+    w = malloc_gslint_glfixed(szint);
+    cache[0] = Ntable.random;
   }
 
   double ar[4] = {(double) ni, (double) nj, l, (double) use_linear_ps};
@@ -2803,9 +2684,7 @@ double C_gg_tomo_limber(
     const int force_no_recompute
   )
 { // cross redshift bin not supported
-  static double cache_cosmology_params;
-  static double cache_photoz_nuisance_params_clustering;
-  static double cache_redshift_nz_params_clustering;
+  static double cache[MAX_SIZE_ARRAYS];
   static cosmopara C;
   static nuisanceparams N;
   static galpara G;
@@ -2819,8 +2698,7 @@ double C_gg_tomo_limber(
   
   if (force_no_recompute == 0)
   { // Cocoa: nell = 10^5 on real funcs, so recompute funcs are expensive
-    if (table == NULL || 
-        fdiff(cache_table_params, Ntable.random))
+    if (table == NULL || fdiff(cache[3], Ntable.random))
     {
       nell   = Ntable.N_ell;
       NSIZE  = redshift.clustering_nbin;
@@ -2833,10 +2711,10 @@ double C_gg_tomo_limber(
     }
 
     if (recompute_gg(C, G, N) || 
-        fdiff(cache_cosmology_params, cosmology.random) ||
-        fdiff(cache_photoz_nuisance_params_clustering, nuisance.random_photoz_clustering) ||
-        fdiff(cache_redshift_nz_params_clustering, redshift.random_clustering) ||
-        fdiff(cache_table_params, Ntable.random))
+        fdiff(cache[0], cosmology.random) ||
+        fdiff(cache[1], nuisance.random_photoz_clustering) ||
+        fdiff(cache[2], redshift.random_clustering) ||
+        fdiff(cache[3], Ntable.random))
     {
       #pragma GCC diagnostic push
       #pragma GCC diagnostic ignored "-Wunused-variable"
@@ -2871,10 +2749,10 @@ double C_gg_tomo_limber(
       update_cosmopara(&C);
       update_galpara(&G);
       update_nuisance(&N);
-      cache_table_params = Ntable.random;
-      cache_cosmology_params = cosmology.random;
-      cache_photoz_nuisance_params_clustering = nuisance.random_photoz_clustering;
-      cache_redshift_nz_params_clustering = redshift.random_clustering;
+      cache[0] = cosmology.random;
+      cache[1] = nuisance.random_photoz_clustering;
+      cache[2] = redshift.random_clustering;
+      cache[3] = Ntable.random;
     }
   }
   
@@ -3071,25 +2949,23 @@ double C_gk_tomo_limber_nointerp(
     const int init_static_vars_only
   )
 {
-  static double cache_table_params;
+  static double cache[MAX_SIZE_ARRAYS];
   static gsl_integration_glfixed_table* w = NULL;
   
-  if (w == NULL || 
-      fdiff(cache_table_params, Ntable.random))
-  {
-    const size_t szint = 200 + 50 * (Ntable.high_def_integration);
-    if (w != NULL)  gsl_integration_glfixed_table_free(w);
-    w = malloc_gslint_glfixed(szint);
-    cache_table_params = Ntable.random;
-  }
-
-  if (ni < 0 || 
-      ni > redshift.clustering_nbin - 1)
+  if (ni < 0 || ni > redshift.clustering_nbin - 1)
   {
     log_fatal("error in selecting bin number ni = %d", ni);
     exit(1);
   }
-  
+
+  if (w == NULL || fdiff(cache[0], Ntable.random))
+  {
+    const size_t szint = 200 + 50 * (Ntable.high_def_integration);
+    if (w != NULL)  gsl_integration_glfixed_table_free(w);
+    w = malloc_gslint_glfixed(szint);
+    cache[0] = Ntable.random;
+  }
+
   double ar[3] = {(double) ni, l, (double) use_linear_ps};
   
   const double amin = amin_lens(ni);
@@ -3136,9 +3012,7 @@ double C_gk_tomo_limber(
     const int force_no_recompute
   )
 {
-  static double cache_cosmology_params;
-  static double cache_photoz_nuisance_params_clustering;
-  static double cache_redshift_nz_params_clustering;
+  static double cache[MAX_SIZE_ARRAYS];
   static cosmopara C;
   static nuisanceparams N;
   static galpara G;
@@ -3152,8 +3026,7 @@ double C_gk_tomo_limber(
 
   if (force_no_recompute == 0)
   { // Cocoa: nell = 10^5 on real funcs, so recompute funcs are expensive
-    if (table == NULL || 
-        fdiff(cache_table_params, Ntable.random))
+    if (table == NULL || fdiff(cache[3], Ntable.random))
     {
       NSIZE  = redshift.clustering_nbin;
       nell   = Ntable.N_ell;
@@ -3166,10 +3039,10 @@ double C_gk_tomo_limber(
     }
   
     if (recompute_gk(C, G, N) ||
-        fdiff(cache_cosmology_params, cosmology.random) ||
-        fdiff(cache_photoz_nuisance_params_clustering, nuisance.random_photoz_clustering) ||
-        fdiff(cache_redshift_nz_params_clustering, redshift.random_clustering) ||
-        fdiff(cache_table_params, Ntable.random))
+        fdiff(cache[0], cosmology.random) ||
+        fdiff(cache[1], nuisance.random_photoz_clustering) ||
+        fdiff(cache[2], redshift.random_clustering) ||
+        fdiff(cache[3], Ntable.random))
     {
       #pragma GCC diagnostic push
       #pragma GCC diagnostic ignored "-Wunused-variable"
@@ -3201,10 +3074,10 @@ double C_gk_tomo_limber(
       update_cosmopara(&C);
       update_nuisance(&N);
       update_galpara(&G);
-      cache_table_params = Ntable.random;
-      cache_cosmology_params = cosmology.random;
-      cache_photoz_nuisance_params_clustering = nuisance.random_photoz_clustering;
-      cache_redshift_nz_params_clustering = redshift.random_clustering;
+      cache[0], cosmology.random;
+      cache[1], nuisance.random_photoz_clustering;
+      cache[2], redshift.random_clustering;
+      cache[3], Ntable.random;
     }
   }
 
@@ -3283,22 +3156,21 @@ double C_ks_tomo_limber_nointerp(
     const int init_static_vars_only
   )
 {
-  static double cache_table_params;
-  static gsl_integration_glfixed_table* w = NULL;
-  
-  if (w == NULL || 
-      fdiff(cache_table_params, Ntable.random))
+  static double cache[MAX_SIZE_ARRAYS];
+  static gsl_integration_glfixed_table* w = NULL;  
+
+  if (ni < 0 || ni > redshift.shear_nbin - 1)
+  {
+    log_fatal("error in selecting bin number ni = %d", ni);
+    exit(1);
+  }
+
+  if (w == NULL || fdiff(cache[0], Ntable.random))
   {
     const size_t szint = 200 + 50 * (Ntable.high_def_integration);
     if (w != NULL)  gsl_integration_glfixed_table_free(w);
     w = malloc_gslint_glfixed(szint);
-    cache_table_params = Ntable.random;
-  }
-
-  if (ni < -1 || ni > redshift.shear_nbin - 1)
-  {
-    log_fatal("error in selecting bin number ni = %d", ni);
-    exit(1);
+    cache[0] = Ntable.random;
   }
   
   double ar[3] = {(double) ni, l, (double) use_linear_ps};
@@ -3331,13 +3203,7 @@ double C_ks_tomo_limber(
     const int force_no_recompute
   )
 {
-  static double cache_cosmology_params;
-  static double cache_photoz_nuisance_params_shear;
-  static double cache_redshift_nz_params_shear;
-  static double cache_intrinsic_aligment_params;
-  static cosmopara C;
-  static nuisanceparams N;
-  static double cache_table_params;
+  static double cache[MAX_SIZE_ARRAYS];
   static double** table = NULL;
   static double* sig = NULL;
   static int osc[MAX_SIZE_ARRAYS*MAX_SIZE_ARRAYS];
@@ -3352,8 +3218,7 @@ double C_ks_tomo_limber(
   { // Cocoa: nell = 10^5 on real funcs, so recompute funcs are expensive
     
     if (table == NULL || 
-        sig == NULL || 
-        fdiff(cache_table_params, Ntable.random))
+        sig == NULL || fdiff(cache[4], Ntable.random))
     {
       if (table != NULL) free(table);
       table = (double**) malloc2d(NSIZE, nell);
@@ -3362,12 +3227,11 @@ double C_ks_tomo_limber(
       sig = (double*) malloc1d(NSIZE);
     }
 
-    if (recompute_ks(C, N) ||
-        fdiff(cache_cosmology_params, cosmology.random) ||
-        fdiff(cache_photoz_nuisance_params_shear, nuisance.random_photoz_shear) ||
-        fdiff(cache_intrinsic_aligment_params, nuisance.random_ia) ||
-        fdiff(cache_redshift_nz_params_shear, redshift.random_shear) ||
-        fdiff(cache_table_params, Ntable.random))
+    if (fdiff(cache[0], cosmology.random) ||
+        fdiff(cache[1], nuisance.random_photoz_shear) ||
+        fdiff(cache[2], nuisance.random_ia) ||
+        fdiff(cache[3], redshift.random_shear) ||
+        fdiff(cache[4], Ntable.random))
     {
       #pragma GCC diagnostic push
       #pragma GCC diagnostic ignored "-Wunused-variable"
@@ -3421,13 +3285,11 @@ double C_ks_tomo_limber(
         }
       }
 
-      update_cosmopara(&C);
-      update_nuisance(&N);
-      cache_table_params = Ntable.random;
-      cache_cosmology_params = cosmology.random;
-      cache_photoz_nuisance_params_shear = nuisance.random_photoz_shear;
-      cache_redshift_nz_params_shear = redshift.random_shear;
-      cache_intrinsic_aligment_params = nuisance.random_ia;
+      cache[0] = cosmology.random;
+      cache[1] = nuisance.random_photoz_shear;
+      cache[2] = nuisance.random_ia;
+      cache[3] = redshift.random_shear;
+      cache[4] = Ntable.random;
     } 
   }
 
@@ -3505,16 +3367,15 @@ double C_kk_limber_nointerp(
     const int init_static_vars_only
   )
 {
-  static double cache_table_params;
+  static double cache[MAX_SIZE_ARRAYS];
   static gsl_integration_glfixed_table* w = NULL;
   
-  if (w == NULL || 
-      fdiff(cache_table_params, Ntable.random))
+  if (w == NULL || fdiff(cache[0], Ntable.random))
   {
     const size_t szint = 200 + 50 * (Ntable.high_def_integration);
     if (w != NULL)  gsl_integration_glfixed_table_free(w);
     w = malloc_gslint_glfixed(szint);
-    cache_table_params = Ntable.random;
+    cache[0] = Ntable.random;
   }
 
   double ar[2] = {l, (double) use_linear_ps};
@@ -3538,9 +3399,7 @@ double C_kk_limber_nointerp(
 
 double C_kk_limber(double l, const int force_no_recompute)
 {
-  static cosmopara C;
-  static double cache_table_params;
-  static double cache_cosmology_params;
+  static double cache[MAX_SIZE_ARRAYS];
   static double* table = NULL;
   static int nell;
   static double lnlmin;
@@ -3550,8 +3409,7 @@ double C_kk_limber(double l, const int force_no_recompute)
   if (force_no_recompute == 0)
   { // Cocoa: nell = 10^5 on real funcs, so recompute funcs are expensive
     
-    if (table == NULL || 
-        fdiff(cache_table_params, Ntable.random))
+    if (table == NULL || fdiff(cache[1], Ntable.random))
     {
       nell = Ntable.N_ell;
       lnlmin = log(fmax(limits.LMIN_tab, 1.0));
@@ -3562,9 +3420,7 @@ double C_kk_limber(double l, const int force_no_recompute)
       table = (double*) malloc1d(nell);
     }
 
-    if (recompute_cosmo3D(C) || 
-        fdiff(cache_cosmology_params, cosmology.random) ||
-        fdiff(cache_table_params, Ntable.random))
+    if (fdiff(cache[0], cosmology.random) || fdiff(cache[1], Ntable.random))
     {
       #pragma GCC diagnostic push
       #pragma GCC diagnostic ignored "-Wunused-variable"
@@ -3587,9 +3443,8 @@ double C_kk_limber(double l, const int force_no_recompute)
           init_static_vars_only));
       }
 
-      update_cosmopara(&C);
-      cache_table_params = Ntable.random;
-      cache_cosmology_params = cosmology.random;
+      cache[0] = cosmology.random;
+      cache[1] = Ntable.random;
     }
   }
 
@@ -3682,16 +3537,21 @@ double C_gy_tomo_limber_nointerp(
     const int init_static_vars_only
   )
 {
-  static double cache_table_params;
+  static double cache[MAX_SIZE_ARRAYS];
   static gsl_integration_glfixed_table* w = NULL;
-  
-  if (w == NULL || 
-      fdiff(cache_table_params, Ntable.random))
+
+  if (ni < 0 || ni > redshift.clustering_nbin - 1)
+  {
+    log_fatal("error in selecting bin number ni = %d", ni);
+    exit(1);
+  }
+
+  if (w == NULL || fdiff(cache[0], Ntable.random))
   {
     const size_t szint = 200 + 50 * (Ntable.high_def_integration);
     if (w != NULL)  gsl_integration_glfixed_table_free(w);
     w = malloc_gslint_glfixed(szint);
-    cache_table_params = Ntable.random;
+    cache[0] = Ntable.random;
   }
 
   double ar[3] = {(double)ni, l, (double) use_linear_ps};
@@ -3731,13 +3591,10 @@ double C_gy_tomo_limber_nointerp(
 
 double C_gy_tomo_limber(double l, int ni, const int force_no_recompute)
 {
-  static double cache_cosmology_params;
-  static double cache_photoz_nuisance_params_clustering;
-  static double cache_redshift_nz_params_clustering;
+  static double cache[MAX_SIZE_ARRAYS];
   static cosmopara C;
   static nuisanceparams N;
   static ynuisancepara N2;
-  static double cache_table_params;
   static galpara G;
   static double** table = NULL;
   static int NSIZE;
@@ -3749,8 +3606,7 @@ double C_gy_tomo_limber(double l, int ni, const int force_no_recompute)
   if (force_no_recompute == 0)
   { // Cocoa: nell = 10^5 on real funcs, so recompute funcs are expensive
     
-    if (table == NULL || 
-        fdiff(cache_table_params, Ntable.random))
+    if (table == NULL || fdiff(cache[4], Ntable.random))
     {
       NSIZE  = redshift.clustering_nbin;
       nell   = Ntable.N_ell;
@@ -3763,10 +3619,10 @@ double C_gy_tomo_limber(double l, int ni, const int force_no_recompute)
     }
 
     if (recompute_gy(C, G, N, N2) ||
-        fdiff(cache_cosmology_params, cosmology.random) || 
-        fdiff(cache_photoz_nuisance_params_clustering, nuisance.random_photoz_clustering) ||
-        fdiff(cache_redshift_nz_params_clustering, redshift.random_clustering) ||
-        fdiff(cache_table_params, Ntable.random))
+        fdiff(cache[1], cosmology.random) || 
+        fdiff(cache[2], nuisance.random_photoz_clustering) ||
+        fdiff(cache[3], redshift.random_clustering) ||
+        fdiff(cache[4], Ntable.random))
     {
       #pragma GCC diagnostic push
       #pragma GCC diagnostic ignored "-Wunused-variable"
@@ -3799,10 +3655,10 @@ double C_gy_tomo_limber(double l, int ni, const int force_no_recompute)
       update_nuisance(&N);
       update_galpara(&G);
       update_ynuisance(&N2);
-      cache_table_params = Ntable.random;
-      cache_cosmology_params = cosmology.random;
-      cache_photoz_nuisance_params_clustering = nuisance.random_photoz_clustering;
-      cache_redshift_nz_params_clustering = redshift.random_clustering;
+      cache[1] = cosmology.random;
+      cache[2] = nuisance.random_photoz_clustering;
+      cache[3] = redshift.random_clustering;
+      cache[4] = Ntable.random;
     }
   }
 
@@ -3878,16 +3734,21 @@ double C_ys_tomo_limber_nointerp(
     const int init_static_vars_only
   )
 {
-  static double cache_table_params;
+  static double cache[MAX_SIZE_ARRAYS];
   static gsl_integration_glfixed_table* w = NULL;
-  
-  if (w == NULL || 
-      fdiff(cache_table_params, Ntable.random))
+
+  if (ni < 0 || ni > redshift.shear_nbin - 1)
+  {
+    log_fatal("error in selecting bin number ni = %d", ni);
+    exit(1);
+  } 
+
+  if (w == NULL || fdiff(cache[0], Ntable.random))
   {
     const size_t szint = 200 + 50 * (Ntable.high_def_integration);
     if (w != NULL)  gsl_integration_glfixed_table_free(w);
     w = malloc_gslint_glfixed(szint);
-    cache_table_params = Ntable.random;
+    cache[0] = Ntable.random;
   }
 
   double ar[3] = {(double) ni, l, (double) use_linear_ps};
@@ -3911,10 +3772,7 @@ double C_ys_tomo_limber_nointerp(
 
 double C_ys_tomo_limber(double l, int ni, const int force_no_recompute)
 {
-  static double cache_cosmology_params;
-  static double cache_photoz_nuisance_params_shear;
-  static double cache_redshift_nz_params_shear;
-  static double cache_intrinsic_aligment_params;
+  static double cache[MAX_SIZE_ARRAYS];
   static cosmopara C;
   static nuisanceparams N;
   static ynuisancepara N2;
@@ -3933,7 +3791,7 @@ double C_ys_tomo_limber(double l, int ni, const int force_no_recompute)
     
     if (table == NULL || 
         sig == NULL || 
-        fdiff(cache_table_params, Ntable.random))
+        fdiff(cache[4], Ntable.random))
     {
       NSIZE = redshift.shear_nbin;
       nell = Ntable.N_ell;
@@ -3949,11 +3807,11 @@ double C_ys_tomo_limber(double l, int ni, const int force_no_recompute)
     }
 
     if (recompute_ys(C, N, N2) || 
-        fdiff(cache_cosmology_params, cosmology.random) ||
-        fdiff(cache_photoz_nuisance_params_shear, nuisance.random_photoz_shear) ||
-        fdiff(cache_intrinsic_aligment_params, nuisance.random_ia) ||
-        fdiff(cache_redshift_nz_params_shear, redshift.random_shear) ||
-        fdiff(cache_table_params, Ntable.random))
+        fdiff(cache[0], cosmology.random) ||
+        fdiff(cache[1], nuisance.random_photoz_shear) ||
+        fdiff(cache[2], nuisance.random_ia) ||
+        fdiff(cache[3], redshift.random_shear) ||
+        fdiff(cache[4], Ntable.random))
     {
       #pragma GCC diagnostic push
       #pragma GCC diagnostic ignored "-Wunused-variable"
@@ -4013,11 +3871,11 @@ double C_ys_tomo_limber(double l, int ni, const int force_no_recompute)
       update_cosmopara(&C);
       update_nuisance(&N);
       update_ynuisance(&N2);
-      cache_table_params = Ntable.random;
-      cache_cosmology_params = cosmology.random;
-      cache_photoz_nuisance_params_shear = nuisance.random_photoz_shear;
-      cache_redshift_nz_params_shear = redshift.random_shear;
-      cache_intrinsic_aligment_params = nuisance.random_ia;
+      cache[0] = cosmology.random;
+      cache[1] = nuisance.random_photoz_shear;
+      cache[2] = nuisance.random_ia;
+      cache[3] = redshift.random_shear;
+      cache[4] = Ntable.random;
     }
   }
 
@@ -4099,16 +3957,15 @@ double C_ky_limber_nointerp(
     const int init_static_vars_only
   )
 {
-  static double cache_table_params;
+  static double cache[MAX_SIZE_ARRAYS];
   static gsl_integration_glfixed_table* w = NULL;
   
-  if (w == NULL || 
-      fdiff(cache_table_params, Ntable.random))
+  if (w == NULL || fdiff(cache[0], Ntable.random))
   {
     const size_t szint = 200 + 50 * (Ntable.high_def_integration);
     if (w != NULL)  gsl_integration_glfixed_table_free(w);
     w = malloc_gslint_glfixed(szint);
-    cache_table_params = Ntable.random;
+    cache[0] = Ntable.random;
   }
 
   double ar[2] = {l, (double) use_linear_ps};
@@ -4132,10 +3989,9 @@ double C_ky_limber_nointerp(
 
 double C_ky_limber(double l, const int force_no_recompute)
 {
+  static double cache[MAX_SIZE_ARRAYS];
   static cosmopara C;
   static ynuisancepara N;
-  static double cache_cosmology_params;
-  static double cache_table_params;
   static double* table = NULL;
   static int nell;
   static double lnlmin;
@@ -4145,8 +4001,7 @@ double C_ky_limber(double l, const int force_no_recompute)
   if (force_no_recompute == 0)
   { // Cocoa: nell = 10^5 on real funcs, so recompute funcs are expensive
     
-    if (table == NULL || 
-        fdiff(cache_table_params, Ntable.random))
+    if (table == NULL || fdiff(cache[1], Ntable.random))
     {
       nell = Ntable.N_ell;
       lnlmin = log(fmax(limits.LMIN_tab, 1.0));
@@ -4158,8 +4013,8 @@ double C_ky_limber(double l, const int force_no_recompute)
     }
 
     if (recompute_ky(C, N) || 
-        fdiff(cache_cosmology_params, cosmology.random) ||
-        fdiff(cache_table_params, Ntable.random))
+        fdiff(cache[0], cosmology.random) ||
+        fdiff(cache[1], Ntable.random))
     {
       #pragma GCC diagnostic push
       #pragma GCC diagnostic ignored "-Wunused-variable"
@@ -4184,8 +4039,8 @@ double C_ky_limber(double l, const int force_no_recompute)
 
       update_ynuisance(&N);
       update_cosmopara(&C);
-      cache_table_params = Ntable.random;
-      cache_cosmology_params = cosmology.random;
+      cache[0] = cosmology.random;
+      cache[1] = Ntable.random;
     }
   }
 
@@ -4235,16 +4090,15 @@ double C_yy_limber_nointerp(
     const int init_static_vars_only
   )
 {
-  static double cache_table_params;
+  static double cache[MAX_SIZE_ARRAYS];
   static gsl_integration_glfixed_table* w = NULL;
   
-  if (w == NULL || 
-      fdiff(cache_table_params, Ntable.random))
+  if (w == NULL || fdiff(cache[0], Ntable.random))
   {
     const size_t szint = 200 + 50 * (Ntable.high_def_integration);
     if (w != NULL)  gsl_integration_glfixed_table_free(w);
     w = malloc_gslint_glfixed(szint);
-    cache_table_params = Ntable.random;
+    cache[0] = Ntable.random;
   }
 
   double ar[2] = {l, (double) use_linear_ps};
@@ -4270,8 +4124,7 @@ double C_yy_limber(double l, const int force_no_recompute)
 {
   static cosmopara C;
   static ynuisancepara N;
-  static double cache_cosmology_params;
-  static double cache_table_params;
+  static double cache[MAX_SIZE_ARRAYS];
   static double* table = NULL;
   static int nell;
   static double lnlmin;
@@ -4281,8 +4134,7 @@ double C_yy_limber(double l, const int force_no_recompute)
   if (force_no_recompute == 0)
   { // Cocoa: nell = 10^5 on real funcs, so recompute funcs are expensive
     
-    if (table == NULL || 
-        fdiff(cache_table_params, Ntable.random))
+    if (table == NULL || fdiff(cache[1], Ntable.random))
     {
       nell = Ntable.N_ell;
       lnlmin = log(fmax(limits.LMIN_tab, 1.0));
@@ -4294,8 +4146,8 @@ double C_yy_limber(double l, const int force_no_recompute)
     }
 
     if (recompute_yy(C, N) || 
-        fdiff(cache_table_params, Ntable.random) ||
-        fdiff(cache_cosmology_params, cosmology.random))
+        fdiff(cache[0], cosmology.random) ||
+        fdiff(cache[1], Ntable.random))
     {
       #pragma GCC diagnostic push
       #pragma GCC diagnostic ignored "-Wunused-variable"
@@ -4320,8 +4172,8 @@ double C_yy_limber(double l, const int force_no_recompute)
       
       update_ynuisance(&N);
       update_cosmopara(&C);
-      cache_table_params = Ntable.random;
-      cache_cosmology_params = cosmology.random;
+      cache[0] = cosmology.random;
+      cache[1] = Ntable.random;
     }
   }
 
@@ -4371,9 +4223,7 @@ void f_chi_for_Psi_cl(
     const double z = 1.0/a - 1.;
 
     if ((z < zmin) || (z > zmax))
-    {
       f_chi[i] = 0.;
-    }
     else
     {
       const double tmp1 = pf_photoz(z, ni);
@@ -4404,10 +4254,9 @@ void f_chi_for_Psi_cl_RSD(
   {
     const double a = a_chi(chi[i]/real_coverH0 /* convert unit to c/H0 */);
     const double z = 1.0 / a - 1.0; 
+    
     if ((z < zmin) || (z > zmax))
-    {
       f_chi[i] = 0.;
-    }
     else
     {
       const double tmp1 = pf_photoz(z, ni);
@@ -4439,9 +4288,7 @@ void f_chi_for_Psi_cl_Mag(
     const double a = a_chi(chi[i]/real_coverH0);
     const double z = 1. / a - 1.;
     if (z > zmax) 
-    {
       f_chi[i] = 0.;
-    }
     else
     {
       const double fK = f_K(chi[i]/real_coverH0); 

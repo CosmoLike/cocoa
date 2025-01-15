@@ -297,11 +297,6 @@ typedef struct
   int clusterWL;
   int clusterCG;
   int clusterCC;
-  int use_full_sky_shear;
-  int use_full_sky_ggl;
-  int use_full_sky_clustering;
-  int use_full_sky_gk;
-  int use_full_sky_sk;
   int high_def_integration;
   int adopt_limber_gg;
   int adopt_limber_gammat;

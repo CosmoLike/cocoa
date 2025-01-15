@@ -2498,8 +2498,6 @@ void compute_ss_fourier_masked(vector& data_vector, const int start)
 {
   if (like.shear_shear == 1)
   {
-    constexpr int fnr = 0; // force_no_recompute
-
     for (int nz=0; nz<tomo.shear_Npowerspectra; nz++)
     {
       const int z1 = Z1(nz);
@@ -2511,7 +2509,7 @@ void compute_ss_fourier_masked(vector& data_vector, const int start)
         
         if (like.ell[i] < like.lmax_shear)
         {
-          data_vector(index) = C_ss_tomo_limber(like.ell[i], z1, z2, fnr)*
+          data_vector(index) = C_ss_tomo_limber(like.ell[i], z1, z2)*
             (1.0 + nuisance.shear_calibration_m[z1])*
             (1.0 + nuisance.shear_calibration_m[z2]);
         }

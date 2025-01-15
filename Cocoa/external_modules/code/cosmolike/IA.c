@@ -344,6 +344,7 @@ void IA_A2_Z1Z2(
       const double eta  = nuisance.A2_z[1];
       A2_Z1 = A_IA*pow((1.0/a)/nuisance.oneplusz0_ia, eta);
       A2_Z2 = A2_Z1;
+      break;
     } 
     default:
     {
@@ -392,10 +393,16 @@ void IA_BTA_Z1Z2(
       BTA_Z2 = nuisance.b_ta_z[n2];
       break;
     }
-    default:
+    case IA_REDSHIFT_EVOLUTION:
     {
       BTA_Z1 = nuisance.b_ta_z[0];
       BTA_Z2 = BTA_Z1;
+      break;
+    }
+    default:
+    {
+      log_fatal("like.IA = %d not supported", like.IA);
+      exit(1);  
     }
   }
 
