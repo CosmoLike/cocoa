@@ -4,6 +4,7 @@
 #include <gsl/gsl_interp2d.h>
 #include <gsl/gsl_odeiv.h>
 #include <gsl/gsl_spline.h>
+#include <gsl/gsl_sf.h>
 #include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -1333,4 +1334,83 @@ double PkRatio_baryons(double k_NL, double a)
 
 double MG_Sigma(double a __attribute__((unused))) {
   return 0.0;
+}
+
+
+double int_for_sigma2(double x, void* params) // inner integral
+{ // refactored FT of spherical top-hat that avoids numerical divergence of 1/x
+  double* ar = (double*) params;
+  const double k = x/ar[0];
+  const double PK = p_lin(k, 1.0);
+  
+  gsl_sf_result J1;
+  int status = gsl_sf_bessel_j1_e(x, &J1);
+  if (status) 
+  {
+    log_fatal(gsl_strerror(status));
+    exit(1);
+  }
+
+  const double tmp = 3.0*J1.val/ar[0];
+  return PK*tmp*tmp/(ar[0] * 2.0 * M_PI * M_PI);
+}
+
+double sigma2_nointerp(const double M, const int init_static_vars_only) 
+{
+  
+  const double radius = 
+    pow(0.75*M/(M_PI*cosmology.rho_crit*cosmology.Omega_m), 1.0/3.0)
+  
+  double ar[1] = {radius};
+  const double xmin = 0;
+  const double xmax = 14.1;
+
+  return (init_static_vars_only == 1) ? int_for_sigma2((xmin+xmax)/2.0, (void*) ar) :
+    Ntable.high_def_integration > 0 ?
+    int_gsl_integrate_high_precision(int_for_sigma2, (void*) ar, xmin, xmax, 
+      NULL, GSL_WORKSPACE_SIZE) :
+    int_gsl_integrate_medium_precision(int_for_sigma2, (void*) ar, xmin, xmax, 
+      NULL, GSL_WORKSPACE_SIZE);
+}
+
+double sigma2(const double M) 
+{
+  static cosmopara C;
+  static double* table;
+  
+  const int nlnM = Ntable.N_M;
+  const double lnMmin = log(limits.M_min);
+  const double lnMmax = log(limits.M_max);
+  const double dlnM = (lnMmax - lnMmin)/((double) nlnM - 1.0);
+  
+  if (table == 0) 
+  {
+    table = (double*) malloc(sizeof(double)*nlnM);
+  } 
+  if (recompute_cosmo3D(C)) 
+  {
+    #pragma GCC diagnostic push
+    #pragma GCC diagnostic ignored "-Wunused-variable"
+    {
+      double init = sigma2_nointerp(exp(lnMmin), 1);
+    }
+    #pragma GCC diagnostic pop
+    #pragma omp parallel for
+    for (int i=0; i<nlnM; i++) 
+    {
+      table[i] = log(sigma2_nointerp(exp(lnMmin + i*dlnM), 0));
+    }
+    update_cosmopara(&C);
+  }
+
+  const double lnM = log(M);
+  if (lnM < lnMmin)
+  {
+    log_warn("M = %e < l_min = %e. Extrapolation adopted", M, exp(lnMmin));
+  }
+  if (lnM > lnMmax)
+  {
+    log_warn("M = %e > l_max = %e. Extrapolation adopted", M, exp(lnMmax));
+  }
+  return exp(interpol(table, nlnM, lnMmin, lnMmax, dlnM, lnM, 1.0, 1.0));
 }

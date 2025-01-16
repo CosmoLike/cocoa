@@ -215,48 +215,4 @@ double gbmag(const double z, const int ni)
   return bmag;
 }
 
-// ----------------------------------------------------------------------------
-// ----------------------------------------------------------------------------
-// ----------------------------------------------------------------------------
-// Halo bias based on peak-background split
-// ----------------------------------------------------------------------------
-// ----------------------------------------------------------------------------
-// ----------------------------------------------------------------------------
 
-doube hb1nu(const double NU)
-{
-  int b1;
-  const double delta_c = 1.686;
-
-  switch(like.halo_bias_model[0])
-  {
-    case BHALO_TINKER_2010:
-    {
-      const double y = log10(200.0);
-      
-      const double ALPHA    = 1.0 + 0.24 * y * exp(-pow(4.0 / y, 4.0));
-      const double alpha    = 0.44 * y - 0.88;
-      const double nu_alpha = pow(NU, alpha);
-      
-      const double BETA = 0.183;
-      const double beta = 1.5;
-      const double nu_beta = pow(NU, beta);
-      
-      const double GAMMA = 0.019 + 0.107 * y + 0.19 * exp(-pow(4.0 / y, 4.0));
-      const double gamma = 2.4;
-      const double nu_gamma = pow(NU, gamma);
-      
-      b1 = 1.0 - ALPHA * nu_alpha / (nu_alpha + pow(delta_c, alpha)) 
-               + BETA * nu_beta + GAMMA * nu_gamma;
-      break;
-    }
-    default:
-    {
-      log_fatal("like.halo_bias_model[0] = %d not supported", 
-        like.halo_bias_model[0]);
-      exit(1);  
-    }
-  }
-
-  return b1;
-}
