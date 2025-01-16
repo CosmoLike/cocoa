@@ -504,7 +504,7 @@ double frac_ejc(double M)
 // ---------------------------------------------------------------------------
 // ---------------------------------------------------------------------------
 
-double int_ngal(double lnM, void *params)
+double int_pf(double lnM, void* params)
 {
   double* ar = (double*) params;
   
@@ -521,75 +521,44 @@ double int_ngal(double lnM, void *params)
     exit(1);
   }
 
-  const double m = exp(lnM);
-  const double pf = massfunc(m,a)*m*(f_c(ni)*n_c(m, a, ni) + n_s(ni, a, ni));
-  return pf;
+  const double m  = exp(lnM);
+  const double mf = massfunc(m,a);
+  const double nc = f_c(ni)*n_c(m, a, ni);
+  const double ns = n_s(ni, a, ni);
+
+  double res;
+  switch((int) ar[2])
+  {
+    case 0:
+    { // former int_ngal(double lnM, void *params)
+      res = mf*m*(nc + ns);
+      break;
+    }
+    case 1:
+    { // former int_m_mean(double lnM, void* params)
+      res = m*(mf*m*(nc + ns));
+      break;
+    }
+    case 2:
+    { // former int_fsat(double lnM, void *params)
+      res = mf*m*ns;
+      break;
+    }
+    case 3:
+    { // former int_bgal(double lnM, void* params)
+      res = B1(m,a)*(mf*m*(nc + ns));
+      break;
+    }
+    default:
+    {
+      log_fatal("option not supported");
+      exit(1);
+    }
+  }
+  return res;
 }
 
-double int_m_mean(double lnM, void* params)
-{
-  double* ar  = (double*) params;
-  
-  const double a = ar[0];
-  if (!(a>0) || !(a<1)) 
-  {
-    log_fatal("a>0 and a<1 not true");
-    exit(1);
-  }
-  const int ni = (int) ar[1];
-  if (ni < 0 || ni > redshift.clustering_nbin - 1)
-  {
-    log_fatal("error in selecting bin number ni = %d", ni);
-    exit(1);
-  }
-
-  const double m = exp(lnM);
-  return massfunc(m, a)*m*m*(f_c(ni)*n_c(m, a, ni) + n_s(m, a, ni));
-}
-
-double int_bgal(double lnM, void* params)
-{
-  double* ar  = (double*) params;
-  
-  const double a = ar[0];
-  if (!(a>0) || !(a<1)) 
-  {
-    log_fatal("a>0 and a<1 not true");
-    exit(1);
-  }
-  const int ni = (int) ar[1];
-  if (ni < 0 || ni > redshift.clustering_nbin - 1)
-  {
-    log_fatal("error in selecting bin number ni = %d", ni);
-    exit(1);
-  }
-
-  const double m = exp(lnM);
-  return massfunc(m, a)*m*B1(m,a)*(f_c(ni)*n_c(m, a, ni) + n_s(m, a, ni));
-}
-
-double int_fsat(double lnM, void *params)
-{
-  double* ar  = (double*) params;
-  
-  double a = ar[0];
-  if (!(a>0) || !(a<1)) 
-  {
-    log_fatal("a>0 and a<1 not true");
-    exit(1);
-  }
-  const int ni = (int) ar[1];
-  if (ni < 0 || ni > redshift.clustering_nbin - 1)
-  {
-    log_fatal("error in selecting bin number ni = %d", ni);
-    exit(1);
-  }
-
-  const double m = exp(lnM);
-  return massfunc(m,a)*m*n_s(m, a, ni);
-}
-
-double int_for_I02(double logm, void* params) 
+double int_for_I02_XY(double logm, void* params) 
 {
   double* ar = (double*) params;
   const double a = ar[0];
@@ -597,68 +566,64 @@ double int_for_I02(double logm, void* params)
   const double k2 = ar[2];
   const double m = exp(logm);
   const double c = conc(m, a);
-  const double u = u_nfw_c(c, k1, m, a)*u_nfw_c(c, k2, m, a);
-  
-  const double tmp = m/(cosmology.rho_crit * cosmology.Omega_m);
-  
-  return massfunc(m, a) * m * u * tmp * tmp;
-}
+  const double prefac = m/(cosmology.rho_crit * cosmology.Omega_m);
 
-double int_for_I02_my(double logm, void* params)
-{
-  double* ar = (double*) params;
-  const double a = ar[0];
-  const double k1 = ar[1];
-  const double k2 = ar[2];
-  const double m = exp(logm);
-  const double c = conc(m, a);
-  const double u = u_y_bnd(c, k1, m, a) * u_nfw_c(c, k2, m, a);
-  
-  const double tmp = m/(cosmology.rho_crit*cosmology.Omega_m);
-  
-  return massfunc(m, a) * m * u * tmp * tmp;
-}
+  double u;
+  switch((int) ar[3])
+  {
+    case 0:
+    { // former int_for_I02(double logm, void* params) 
+      u = u_nfw_c(c, k1, m, a)*u_nfw_c(c, k2, m, a);
+      break;
+    }
+    case 1:
+    { // former int_for_I02_my(double logm, void* params) 
+      u = u_y_bnd(c, k1, m, a) * u_nfw_c(c, k2, m, a);
+      break;
+    }
+    case 2:
+    { // former int_for_I02_yy(double logm, void* params) 
+      u = u_y_bnd(c, k1, m, a) * u_y_bnd(c, k2, m, a);
+      break;
+    }
+    default:
+    {
+      log_fatal("option not supported");
+      exit(1);
+    }
+  }
+  return massfunc(m, a) * m * u * prefac * prefac;
+}  
 
-double int_for_I02_yy(double logm, void* params)
-{
-  double* ar = (double*) params;
-  const double a = ar[0];
-  const double k1 = ar[1];
-  const double k2 = ar[2];
-  const double m = exp(logm);
-  const double c = conc(m,a); 
-  const double u = u_y_bnd(c, k1, m, a) * u_y_bnd(c, k2, m, a);
-  
-  const double tmp = m/(cosmology.rho_crit*cosmology.Omega_m);
-  
-  return massfunc(m, a) * m * u * tmp * tmp;
-}
-
-double int_for_I11_y(double logm, void* params) 
-{
-  const double* ar = (double*) params;  
-  const double a = ar[0];
-  const double k = ar[1];
-  const double m = exp(logm);
-  const double c = conc(m,a); 
-  const double u = u_y_bnd(c, k, m, a) + u_y_ejc(m);
-  
-  const double tmp = m/(cosmology.rho_crit*cosmology.Omega_m);
-  
-  return massfunc(m, a) * m * u * tmp * B1_normalized(m, a);
-}
-
-double int_for_I11(double logm, void* params) 
+double int_for_I11_XY(double logm, void* params) 
 {
   const double* ar = (double*) params;  
   const double a = ar[0];
   const double k = ar[1];
   const double m = exp(logm);
   const double c = conc(m, a);
-  const double u = u_nfw_c(c, k, m, a);
-  const double tmp = m/(cosmology.rho_crit*cosmology.Omega_m);
+  const double prefac = m/(cosmology.rho_crit * cosmology.Omega_m);
 
-  return massfunc(m, a) * m * u * tmp * B1_normalized(m, a);
+  double u;
+  switch((int) ar[2])
+  {
+    case 0:
+    { // double int_for_I11(double logm, void* params) 
+      const double u = u_nfw_c(c, k, m, a);
+      break;
+    }
+    case 1:
+    { // former int_for_I11_y(double logm, void* params) 
+      u = u_y_bnd(c, k, m, a) + u_y_ejc(m);
+      break;
+    }
+    default:
+    {
+      log_fatal("option not supported");
+      exit(1);
+    }
+  }
+  return massfunc(m, a) * m * u * prefac * B1_normalized(m, a);
 }
 
 double int_for_G02(double logm, void* param)
@@ -679,11 +644,13 @@ double int_for_G02(double logm, void* param)
     exit(1);
   }
 
-  const double m = exp(logm);
-  const double u = u_g(k, m, a, ni);
+  const double m  = exp(logm);
+  const double mf = massfunc(m, a);
+  const double u  = u_g(k, m, a, ni);
   const double ns = n_s(m, a, ni);
+  const double nc = n_c(m, a, ni);
   
-  return massfunc(m, a)*m*(u*u*ns*ns + 2.0*u*ns*n_c(m, a, ni)*f_c(ni));
+  return mf*m*(u*u*ns*ns + 2.0*u*ns*nc*f_c(ni));
 }
 
 double int_GM02(double logm, void* params)
@@ -705,24 +672,28 @@ double int_GM02(double logm, void* params)
   }
 
   const double m = exp(logm);
-  
-  return (massfunc(m,a)*m*m/(cosmology.rho_crit*cosmology.Omega_m))*
-          u_nfw_c(conc(m, a), k, m, a)*(u_g(k, m, a, ni)*n_s(m, a, ni) + 
-          n_c(m, a, ni)*f_c(ni));
+  const double c = conc(m, a);
+  const double mf = massfunc(m, a);
+  const double ns = n_s(m, a, ni);
+  const double nc = n_c(m, a, ni);
+  const double prefac = m/(cosmology.rho_crit * cosmology.Omega_m);
+
+  return mf*m*prefac*u_nfw_c(c,k,m,a)*(u_g(k,m,a,ni)*ns + nc*f_c(ni));
 }
 
 double int_F_KS(double x, void* params)
 {
   double* ar = (double*) params;
   const double y = ar[0];
-  return (x*sinl(y*x)/y)*pow(log(1.0 + x)/x, ynuisance.gas_Gamma_KS/(ynuisance.gas_Gamma_KS - 1.0));
+  
+  return (x*sinl(y*x)/y)*pow(log(1.0 + x)/x, 
+      ynuisance.gas_Gamma_KS/(ynuisance.gas_Gamma_KS - 1.0));
 }
 
 double int_F0_KS(double x, void* params __attribute__((unused)))
 {
   return x*x*pow(log(1.0 + x)/x, 1.0/(ynuisance.gas_Gamma_KS - 1.0));
 }
-
 
 double int_for_sigma2(double x, void* params) // inner integral
 { // refactored FT of spherical top-hat to avoid numerica divergence of 1/x
@@ -742,32 +713,27 @@ double int_for_sigma2(double x, void* params) // inner integral
   return PK*tmp*tmp/(ar[0] * 2.0 * M_PI * M_PI);
 }
 
-// norm for redshift evolution of < function (Eq.8 in Tinker 2010) + enforcing <M> to be unbiased
 double int_for_mass_norm(double x, void* params) 
-{ // inner integral
+{ // norm for z evolution of < function (Eq.8 Tinker2010) + enforcing <M> to be unbiased
   double* ar = (double*) params;
-  
   const double a = ar[0];
   if (!(a>0) || !(a<1)) 
   {
     log_fatal("a>0 and a<1 not true");
     exit(1);
   }
-  
   return f_tinker(x, a);
 }
 
 double int_for_bias_norm(double x, void* params) 
 { // correct bias for to halo mass cuts (so large-scale 2-h matches PT results at all zs)
   double* ar = (double*) params;
-  
   double a = ar[0];
   if (!(a>0) || !(a<1)) 
   {
     log_fatal("a>0 and a<1 not true");
     exit(1);
   }
-  
   return B1_nu(x, a) * f_tinker(x, a);
 }
 
@@ -791,11 +757,6 @@ double int_for_b_ngmatched(double logm, void* params)
   const double m = exp(logm);
   return massfunc(m, a) * m * B1(exp(logm), a);
 }
-
-
-
-
-
 
 /*
 double int_G11(double logM, void* params)
@@ -843,9 +804,10 @@ double int_G11(double logM, void* params)
 // ---------------------------------------------------------------------------
 // ---------------------------------------------------------------------------
 
-double ngal_nointerp(
+double pf_nointerp(
     const int ni, 
     const double a, 
+    const int func,
     const int init_static_vars_only
   )
 {
@@ -866,144 +828,25 @@ double ngal_nointerp(
     cache[0] = Ntable.random;
   }
 
-  double ar[2] = {a, (double) ni};
+  double ar[3] = {a, (double) ni, (double) func};
   const double lnMmin = log(10.0)*(nuisance.hod[ni][0] - 2.);
   const double lnMmax = log(limits.M_max);
 
   double res = 0.0;
   
   if (init_static_vars_only == 1)
-    res = int_ngal((lnMmin + lnMmax)/2.0, (void*) ar);
+    res = int_pf((lnMmin + lnMmax)/2.0, (void*) ar);
   else
   {
     gsl_function F;
     F.params = (void*) ar;
-    F.function = int_ngal;
+    F.function = int_pf;
     res = gsl_integration_glfixed(&F, lnMmin, lnMmax, w);
   }
   
-  return res;
-}
-
-double m_mean_nointerp(
-    const int ni, 
-    const double a, 
-    const int init_static_vars_only
-  )
-{
-  static double cache[MAX_SIZE_ARRAYS];
-  static gsl_integration_glfixed_table* w = NULL;
-  
-  if (ni < 0 || ni > redshift.clustering_nbin - 1)
-  {
-    log_fatal("error in selecting bin number ni = %d", ni);
-    exit(1);
-  }
-
-  if (w == NULL || fdiff(cache[0], Ntable.random))
-  {
-    const size_t szint = 1000 + 500 * (Ntable.high_def_integration);
-    if (w != NULL)  gsl_integration_glfixed_table_free(w);
-    w = malloc_gslint_glfixed(szint);
-    cache[0] = Ntable.random;
-  }
-
-  double ar[2] = {a, (double) ni};
-
-  const double lnMmin = log(10.0)*(nuisance.hod[ni][0] - 2.);
-  const double lnMmax = log(limits.M_max);
-  const double ngalaxies = ngal(ni, a);
-
-  double res = 0.0;
-  if (init_static_vars_only == 1)
-    res = int_m_mean((lnMmin + lnMmax)/2.0, (void*) ar);
-  else
-  {
-    gsl_function F;
-    F.params = (void*) ar;
-    F.function = int_m_mean;
-    res = gsl_integration_glfixed(&F, lnMmin, lnMmax, w)/ngalaxies;
-  }
-  return res;
-}
-
-double fsat_nointerp(
-    int ni, 
-    double a, 
-    const int init_static_vars_only
-  )
-{
-  static double cache[MAX_SIZE_ARRAYS];
-  static gsl_integration_glfixed_table* w = NULL;
-
-  if (ni < 0 || ni > redshift.clustering_nbin - 1)
-  { // avoid segfault for accessing wrong array index
-    log_fatal("error in selecting bin number ni = %d", ni);
-    exit(1);
-  }
-
-  if (w == NULL || fdiff(cache[0], Ntable.random))
-  {
-    const size_t szint = 1000 + 500 * (Ntable.high_def_integration);
-    if (w != NULL)  gsl_integration_glfixed_table_free(w);
-    w = malloc_gslint_glfixed(szint);
-    cache[0] = Ntable.random;
-  }
-
-  double ar[2] = {a, (double) ni};
-  const double lnMmin = log(10.0)*(nuisance.hod[ni][0] - 2.);
-  const double lnMmax = log(limits.M_max);
-  const double ngalaxies = ngal(ni, a);
-
-  double res = 0.0;
-  if (init_static_vars_only == 1)
-    res = int_fsat((lnMmin + lnMmax)/2.0, (void*) ar);
-  else
-  {
-    gsl_function F;
-    F.params = (void*) ar;
-    F.function = int_fsat;
-    res = gsl_integration_glfixed(&F, lnMmin, lnMmax, w)/ngalaxies;
-  }
-  return res;
-}
-
-double bgal_nointerp(
-    const int ni, 
-    const double a, 
-    const int init_static_vars_only
-  )
-{
-  static double cache[MAX_SIZE_ARRAYS];
-  static gsl_integration_glfixed_table* w = NULL;
-
-  if (ni < 0 || ni > redshift.clustering_nbin - 1)
-  { 
-    log_fatal("error in selecting bin number ni = %d", ni);
-    exit(1);
-  }
-
-  if (w == NULL || fdiff(cache[0], Ntable.random))
-  {
-    const size_t szint = 1000 + 500 * (Ntable.high_def_integration);
-    if (w != NULL)  gsl_integration_glfixed_table_free(w);
-    w = malloc_gslint_glfixed(szint);
-    cache[0] = Ntable.random;
-  }
-
-  double ar[2] = {a, (double) ni};
-  const double lnMmin = log(10.0)*(nuisance.hod[ni][0] - 2.0);
-  const double lnMmax = log(limits.M_max);
-
-  double res = 0.0;
-  if (init_static_vars_only == 1)
-    res = int_bgal((lnMmin + lnMmax)/2.0, (void*) ar);
-  else
-  {
-    gsl_function F;
-    F.params = (void*) ar;
-    F.function = int_bgal;
-    res = gsl_integration_glfixed(&F, lnMmin, lnMmax, w);
+  if (func == 1 || func == 2)
+  { // 1 = m_mean_nointerp; 2 = fsat_nointerp
+    res /= ngal(ni, a);
   }
   return res;
 }
