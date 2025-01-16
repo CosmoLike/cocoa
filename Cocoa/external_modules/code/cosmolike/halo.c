@@ -1090,7 +1090,6 @@ double int_for_I11_X(double lnM, void* params)
   return dNdlnM * u * (m/rhom) * hb1nu(nu, a)/bias_norm(a);
 }
 
-
 double I11_X_nointerp(
     const double k, 
     const double a,
@@ -1359,14 +1358,14 @@ double p_mm(
 
   if (table == NULL || fdiff(cache[1], Ntable.random))
   {
-    lim[1][2] = (lim[1][1] - lim[1][0]) / ((double) Ntable.N_k_nlin - 1.0);
     if (table != NULL) free(table);
-    table = (double**) malloc2d(Ntable.N_a, nk);
+    table = (double**) malloc2d(Ntable.N_a, Ntable.N_k_nlin);
     lim[0][0] = limits.a_min;
     lim[0][1] = 0.9999999;
     lim[0][2] = (lim[0][1] - lim[0][0]) / ((double) Ntable.N_a - 1.0);
     lim[1][0] = log(limits.k_min_cH0);
     lim[1][1] = log(limits.k_max_cH0);
+    lim[1][2] = (lim[1][1] - lim[1][0]) / ((double) Ntable.N_k_nlin - 1.0);
   }
 
   if (fdiff(cache[0], cosmology.random) || fdiff(cache[1], Ntable.random))
@@ -1374,9 +1373,7 @@ double p_mm(
     #pragma GCC diagnostic push
     #pragma GCC diagnostic ignored "-Wunused-variable"
     {
-      const int init_static_vars_only = 1; // TRUE
-      double trash = 
-        p_xy_nointerp(exp(lim[1][0]), lim[0][0], 0, init_static_vars_only);
+      double trash = p_xy_nointerp(exp(lim[1][0]), lim[0][0], 0, 1);
     }
     #pragma GCC diagnostic pop
     
@@ -1405,51 +1402,43 @@ double p_my(
 { 
   static double cache[MAX_SIZE_ARRAYS];
   static double** table = 0;
-  static double lim[3]
+  static double lim[2][3]; // lim[0][0] = amin, lim[0][1] = amax, lim[0][2] = da 
+                           // lim[1][0] = lnkmin, lim[1][1] = lnkmax, lim[1][2] = dlnk
 
-  const int na = Ntable.N_a;
-  const double amin = limits.a_min;
-  const double amax = 0.9999999;
-  const double da = (amax - amin) / ((double) na - 1.0);
-  
-  const int nk = Ntable.N_k_nlin;
-  const double lnkmin = log(limits.k_min_cH0);
-  const double lnkmax = log(limits.k_max_cH0);
-  const double dlnk = (lnkmax - lnkmin) / ((double) nk - 1.0);
-
-  if (table == 0)
+  if (table == NULL || fdiff(cache[1], Ntable.random))
   {
-    table = (double**) malloc(sizeof(double*)*na);
-    for(int i=0; i<na;i++)
-    {
-      table[i] = (double*) malloc(sizeof(double)*nk);
-    } 
+    if (table != NULL) free(table);
+    table = (double**) malloc2d(Ntable.N_a, Ntable.N_k_nlin); 
+    lim[0][0] = limits.a_min;
+    lim[0][1] = 0.9999999;
+    lim[0][2] = (lim[0][1] - lim[0][0]) / ((double) Ntable.N_a - 1.0);
+    lim[1][0] = log(limits.k_min_cH0);
+    lim[1][1] = log(limits.k_max_cH0);
+    lim[1][2] = (lim[1][1] - lim[1][0]) / ((double) Ntable.N_k_nlin - 1.0);
   }
   if (fdiff(cache[0], cosmology.random) || 
       fdiff(cache[1], Ntable.random) ||
-      fdiff(cache[2], Ntable.random_yparams))
+      fdiff(cache[2], Ntable.random_gas))
   {
     #pragma GCC diagnostic push
     #pragma GCC diagnostic ignored "-Wunused-variable"
     {
-      const int init_static_vars_only = 1; // TRUE
-      double init = 
-        p_xy_nointerp(exp(lnkmin), amin, 1, init_static_vars_only);
+      double init = p_xy_nointerp(exp(lim[1][0]), lim[0][0], 1, 1);
     }
     #pragma GCC diagnostic pop 
     
     #pragma omp parallel for collapse(2)
-    for (int i=0; i<na; i++) 
-      for (int j=0; j<nk; j++) 
-        table[i][j] = 
-          log(p_xy_nointerp(exp(lnkmin + j*dlnk), amin + i*da, 1, 0));
+    for (int i=1; i<Ntable.N_a; i++) 
+      for (int j=0; j<Ntable.N_k_nlin; j++) 
+        table[i][j] = log(p_xy_nointerp(exp(lim[1][0] + j*lim[1][2]), 
+                                            lim[0][0] + i*lim[0][2], 1, 0));
 
     cache[0] = cosmology.random;
     cache[1] = Ntable.random;
-    cache[2] = nuisance.random_yparams;
+    cache[2] = nuisance.random_gas;
   }
-  return exp(interpol2d(table, na, amin, amax, da, a, nk, lnkmin, 
-    lnkmax, dlnk, log(k), 1.0, 1.0));
+  return exp(interpol2d(table[ni], Ntable.N_a, lim[0][0], lim[0][1], lim[0][2], 
+    a, Ntable.N_k_nlin, lim[1][0], lim[1][1], lim[1][2], log(k), 0.0, 0.0));
 }
 
 double p_yy(
@@ -1459,6 +1448,8 @@ double p_yy(
 { 
   static double cache[MAX_SIZE_ARRAYS];
   static double** table = 0;
+  static double lim[2][3]; // lim[0][0] = amin, lim[0][1] = amax, lim[0][2] = da 
+                           // lim[1][0] = lnkmin, lim[1][1] = lnkmax, lim[1][2] = dlnk
 
   const int na = Ntable.N_a;
   const double amin = limits.a_min;
@@ -1474,33 +1465,37 @@ double p_yy(
   {
     if (table != NULL) free(table);
     table = (double**) malloc2d(na, nk);
+    lim[0][0] = limits.a_min;
+    lim[0][1] = 0.9999999;
+    lim[0][2] = (lim[0][1] - lim[0][0]) / ((double) Ntable.N_a - 1.0);
+    lim[1][0] = log(limits.k_min_cH0);
+    lim[1][1] = log(limits.k_max_cH0);
+    lim[1][2] = (lim[1][1] - lim[1][0]) / ((double) Ntable.N_k_nlin - 1.0);
   }
 
   if (fdiff(cache[0], cosmology.random) || 
       fdiff(cache[1], Ntable.random) ||
-      fdiff(cache[2], Ntable.random_yparams))
+      fdiff(cache[2], Ntable.random_gas))
   { 
     #pragma GCC diagnostic push
     #pragma GCC diagnostic ignored "-Wunused-variable"
     {
-      const int init_static_vars_only = 1; // TRUE
-      double init = 
-        p_xy_nointerp(exp(lnkmin), amin, 2, init_static_vars_only);
+      double init = p_xy_nointerp(exp(lim[1][0]), lim[0][0], 2, 1);
     }
     #pragma GCC diagnostic pop   
-    
+
     #pragma omp parallel for collapse(2)
-    for (int i=0; i<na; i++) 
-      for (int j=0; j<nk; j++) 
-        table[i][j] = 
-          log(p_xy_nointerp(exp(lnkmin + j*dlnk), amin + i*da, 2, 0));  
-    
+    for (int i=1; i<Ntable.N_a; i++) 
+      for (int j=0; j<Ntable.N_k_nlin; j++) 
+        table[i][j] = log(p_xy_nointerp(exp(lim[1][0] + j*lim[1][2]), 
+                                            lim[0][0] + i*lim[0][2], 2, 0));
+
     cache[0] = cosmology.random;
     cache[1] = Ntable.random;
-    cache[2] = nuisance.random_yparams;
+    cache[2] = nuisance.random_gas;
   }
-  return exp(interpol2d(table, na, amin, amax, da, a, nk, lnkmin, 
-    lnkmax, dlnk, log(k), 1.0, 1.0));
+  return exp(interpol2d(table[ni], Ntable.N_a, lim[0][0], lim[0][1], lim[0][2], 
+    a, Ntable.N_k_nlin, lim[1][0], lim[1][1], lim[1][2], log(k), 0.0, 0.0));
 }
 
 double p_gm_nointerp(
