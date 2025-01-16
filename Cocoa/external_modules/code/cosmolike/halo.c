@@ -1451,16 +1451,6 @@ double p_yy(
   static double lim[2][3]; // lim[0][0] = amin, lim[0][1] = amax, lim[0][2] = da 
                            // lim[1][0] = lnkmin, lim[1][1] = lnkmax, lim[1][2] = dlnk
 
-  const int na = Ntable.N_a;
-  const double amin = limits.a_min;
-  const double amax = 0.999999;
-  const double da = (amax - amin) / ((double) na - 1.0);
-  
-  const int nk = Ntable.N_k_nlin;
-  const double lnkmin = log(limits.k_min_cH0);
-  const double lnkmax = log(limits.k_max_cH0);
-  const double dlnk = (lnkmax - lnkmin) / ((double) nk - 1.0);
-
   if (table == NULL || fdiff(cache[1], Ntable.random))
   {
     if (table != NULL) free(table);

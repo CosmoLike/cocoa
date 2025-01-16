@@ -1355,7 +1355,7 @@ double int_for_sigma2(double x, void* params) // inner integral
   return PK*tmp*tmp/(ar[0] * 2.0 * M_PI * M_PI);
 }
 
-double sigma2_nointerp(const double M, const int init_static_vars_only) 
+double sigma2_nointerp(const double M, const double a, const int init_static_vars_only) 
 {
   
   const double radius = 

@@ -2432,8 +2432,7 @@ double int_for_C_gg_tomo_limber(double a, void* params)
     { 
       res *= WGALi*WGALj;
     }
-    const double PK = p_gg(k, a, ni, nj, use_linear_ps);
-    res *= PK;
+    res *= p_gg(k, a, ni, nj);
   }
   else
   {
@@ -2789,8 +2788,7 @@ double int_for_C_gk_tomo_limber(double a, void* params)
     { 
       res *= WGAL;
     }
-    const double PK = p_gm(k, a, nl, use_linear_ps);
-    res *= PK;
+    res *= p_gm(k, a, nl);
   }
   else
   {
@@ -4010,7 +4008,7 @@ double int_for_C_yy_limber(double a, void *params)
   const double fK = f_K(chidchi.chi);
   const double k  = ell/fK;
 
-  const double PK = p_yy(k, a, use_2h_only);
+  const double PK = p_yy(k, a);
   
   const double WY = W_y(a);
 
