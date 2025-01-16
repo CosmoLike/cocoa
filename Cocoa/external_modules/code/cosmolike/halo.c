@@ -592,7 +592,7 @@ double int_for_I02_XY(double lnM, void* params)
   return massfunc(m, a) * m * u * prefac * prefac;
 }  
 
-double int_for_I11_XY(double lnM, void* params) 
+double int_for_I11_X(double lnM, void* params) 
 {
   const double* ar = (double*) params;  
   const double a = ar[0];
@@ -883,7 +883,7 @@ double I02_XY_nointerp(
   return res;
 }
 
-double I11_XY_nointerp(
+double I11_X_nointerp(
     const double k, 
     const double a,
     const int func, 
@@ -913,32 +913,16 @@ double I11_XY_nointerp(
   
   double res;
   if (init_static_vars_only == 1)
-    res = int_for_I11((lnMmin + lnMmax)/2.0, (void*) ar);
+    res = int_for_I11_X((lnMmin + lnMmax)/2.0, (void*) ar);
   else
   {
     gsl_function F;
     F.params = (void*) ar;
-    F.function = int_for_I11;
+    F.function = int_for_I11_X;
     res = gsl_integration_glfixed(&F, lnMmin, lnMmax, w);
   }
   return res;
 }
-
-/*
-double I11_y_nointerp(const double k, const double a, const int init_static_vars_only) 
-{ 
-  double ar[2] = {a, k};
-  const double lnMmin = log(limits.M_min);
-  const double lnMmax = log(limits.M_max);
-  
-  return init_static_vars_only == 1 ? int_for_I11_y(lnMmin, (void*) ar): 
-    Ntable.high_def_integration > 0 ?
-    int_gsl_integrate_high_precision(int_for_I11_y, (void*) ar, lnMmin, lnMmax, 
-      NULL, GSL_WORKSPACE_SIZE) :
-    int_gsl_integrate_medium_precision(int_for_I11_y, (void*) ar, lnMmin, lnMmax, 
-      NULL, GSL_WORKSPACE_SIZE);
-}
-*/
 
 double G02_nointerp(
     double k, 
@@ -1058,7 +1042,7 @@ double p_xy_nointerp(
     case 0:
     { // PMM
       P1H  = I02 : 0.0;
-      I11X = I11(k, a, func, init_static_vars_only);
+      I11X = I11_X_nointerp(k, a, func, init_static_vars_only);
       I11Y = I11X;
       break;
     }
@@ -1069,8 +1053,8 @@ double p_xy_nointerp(
       const double x = ks*ks*ks*ks;
 
       P1H  = I02*(1.0/(x + 1.0)) : 0.0; // suppress lowk (Eq17;2009.01858)
-      I11X = I11(k, a, 0, init_static_vars_only);
-      I11Y = I11(k, a, 2, init_static_vars_only);
+      I11X = I11_X_nointerp(k, a, 0, init_static_vars_only);
+      I11Y = I11_X_nointerp(k, a, 2, init_static_vars_only);
       break;
     }
     case 2:
@@ -1080,7 +1064,7 @@ double p_xy_nointerp(
       const double x = ks*ks*ks*ks;
       
       P1H  = I02*(1.0/(x + 1.0)) : 0.0; // suppress lowk (Eq17;2009.01858)
-      I11X = I11(k, a, func, init_static_vars_only);
+      I11X = I11_X_nointerp(k, a, func, init_static_vars_only);
       I11Y = I11X;
       break;
     }
@@ -1561,68 +1545,6 @@ double bgal(const int ni, const double a)
   if ((a < amin) || (a > amax))
     return 0.0;
   return interpol(table[ni], na, amin, amax, da, a, 1.0, 1.0);
-}
-
-double I11(const double k, const double a) 
-{
-  static cosmopara C;
-  static double** table = 0;
-
-  const int na = Ntable.N_a;
-  const double amin = limits.a_min;
-  const double amax = 0.999999;
-  const double da = (amax - amin) / ((double) na - 1.0);
-
-  const int nk = Ntable.N_k_nlin;
-  const double lnkmin = log(limits.k_min_cH0);
-  const double lnkmax = log(limits.k_max_cH0);
-  const double dlnk = (lnkmax - lnkmin) / ((double) nk - 1.0);
-
-  if (table == 0)
-  {
-    table = (double**) malloc(sizeof(double*)*Ntable.N_a);
-    for(int i=0; i<Ntable.N_a;i++)
-    {
-      table[i] = (double*) malloc(sizeof(double)*Ntable.N_k_nlin);
-    }
-  }
-  if (recompute_cosmo3D(C)) 
-  {
-    #pragma GCC diagnostic push
-    #pragma GCC diagnostic ignored "-Wunused-variable"
-    {
-      double init = I11_nointerp(exp(lnkmin), amin, 1);
-    }
-    #pragma GCC diagnostic pop
-    #pragma omp parallel for collapse(2)
-    for (int i=0; i<na; i++)
-    {
-      for (int j=0; j<nk; j++)
-      {
-        table[i][j] = I11_nointerp(exp(lnkmin + j*dlnk), amin + i*da, 0);
-      }
-    }
-    update_cosmopara(&C);
-  }
-
-  const double lnk = log(k);
-  if (lnk < lnkmin)
-  {
-    log_warn("k = %e < k_min = %e. Extrapolation adopted", k, exp(lnkmin));
-  }
-  if (lnk > lnkmax)
-  {
-    log_warn("k = %e > k_max = %e. Extrapolation adopted", k, exp(lnkmax));
-  }
-  if (a < amin)
-  {
-    log_warn("a = %e < a_min = %e. Extrapolation adopted", a, amin);
-  }
-  if (a > amax)
-  {
-    log_warn("a = %e > a_max = %e. Extrapolation adopted", a, amax);
-  }
-  return exp(interpol2d(table, na, amin, amax, da, a, nk, lnkmin, lnkmax, dlnk, lnk, 1.0, 1.0));
 }
 
 double p_mm(
