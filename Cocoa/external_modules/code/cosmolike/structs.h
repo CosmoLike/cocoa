@@ -314,7 +314,10 @@ typedef struct
   int use_ggl_efficiency_zoverlap;
 
   int galaxy_bias_model[MAX_SIZE_ARRAYS]; 
-  int halo_bias_model[MAX_SIZE_ARRAYS];
+  int halo_model[MAX_SIZE_ARRAYS]; // [0] = HMF, 
+                                   // [1] = BIAS, 
+                                   // [2] = CONCENTRATION
+                                   // [3] = HALO PROFILE
 } likepara;
 
 
