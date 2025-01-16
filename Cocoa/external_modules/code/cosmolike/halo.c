@@ -33,121 +33,51 @@ static int GSL_WORKSPACE_SIZE = 250;
 // ---------------------------------------------------------------------------
 // ---------------------------------------------------------------------------
 
-double delta_c(double a __attribute__((unused))) 
-{ // set to 1.686 for consistency with Tinker mass & bias definition
-  return 1.686; 
-}
+#define delta_c 1.686
 
-double delta_Delta(double a __attribute__((unused))) 
-{ // using Tinker et al mass & bias functions with \Delta = 200 rho_{mean}
-  return 200.0;
-}
-
-double rho_Delta(const double a) // virial density in solar masses/h/(H0/c)^3 
-{ // using Tinker et al mass & bias functions with \Delta = 200 rho_{mean}
-  return (delta_Delta(a) * cosmology.rho_crit * cosmology.Omega_m);
-}
-
-double m_Delta(const double r, const double a) 
-{
-  return (4.0*M_PI /3.0)*r*r*r*rho_Delta(a);
-}
-
-double r_Delta(const double m, const double a) 
-{ // calculate r_Delta in c/H0 given m in (solar masses/h)
-  return pow(3./(4.0*M_PI)*(m/rho_Delta(a)), 1./3.);
-}
+#define Delta 200
 
 double r_s(const double m, const double a) 
 { 
-  return r_Delta(m, a) / conc(m, a); 
+  const double rho_delta = Delta * cosmology.rho_crit * cosmology.Omega_m;
+  const double r_delta   = pow(3./(4.0*M_PI)*(m/rho_delta), 1./3.);
+  return r_delta / conc(m, a); 
 }
 
-double radius(const double m) 
-{
-  return pow(3.0/4.0*m/(M_PI*cosmology.rho_crit*cosmology.Omega_m), 1.0/3.0);
-}
-
-double nu(const double M, const double a) 
-{
-  static int init = 1;
-  if ((cosmology.Omega_nu > 0) && init) 
-  {
-    log_fatal("halo.c does not support cosmologies with massive neutrinos");
-    exit(1);
-    init = 0;
-  }
-  return delta_c(a)/(sqrt(sigma2(M))*growfac(a));
-}
-
-double nuv2(const double M, const double a, const double growfac) 
-{
-  static int init = 1;
-  if ((cosmology.Omega_nu > 0) && init) 
-  {
-    log_fatal("halo.c does not support cosmologies with massive neutrinos");
-    exit(1);
-    init = 0;
-  }
-  return delta_c(a)/(sqrt(sigma2(M))*growfac);
-}
-
-double f_tinker(const double n, const double a_in) 
-{ 
-  // Eqs. (8-12) + Table 4 from Tinker et al. 2010
-  // aa = alpha, b = beta, c = gamma, f = phi, e = eta
-  double a = fmax(0.25, a_in); // limit fit range of mass function evolution to z <= 3, as
-                               // discussed after Eq. 12 of http://arxiv.org/pdf/1001.3162v2.pdf
-  const double aa = 0.368;
-  const double b = 0.589 * pow(a, -0.2);
-  const double c = 0.864 * pow(a, 0.01);
-  const double f = -0.729 * pow(a, .08);
-  const double e = -0.243 * pow(a, -0.27);
-  return aa * (1.0 + pow(b * n, -2.0 * f)) * pow(n, 2.0 * e) * exp(-c * n * n / 2.0);
-}
-
-double fnu_tinker(const double n, const double a) 
-{ 
-  return f_tinker(n, a) * n; 
-}
-
-double B1_nu(const double n, const double a) 
-{
-  // Eq (6) + Table 2 from Tinker et al. 2010
-  const double y = log10(200.0);
-  const double A = 1.0 + 0.24 * y * exp(-pow(4.0 / y, 4.0));
-  const double aa = 0.44 * y - 0.88;
-  const double B = 0.183;
-  const double b = 1.5;
-  const double C = 0.019 + 0.107 * y + 0.19 * exp(-pow(4.0 / y, 4.0));
-  const double c = 2.4;
-  return 1.0 - A * pow(n, aa) / (pow(n, aa) + pow(delta_c(a), aa)) +
-         B * pow(n, b) + C * pow(n, c);
+double f_tinker(const double n, double a) 
+{ // Eqs. (8-12) + Table 4 from Tinker et al. 2010
+  a = fmax(0.25, a); // limit fit range of mass function evolution to
+                     // z <= 3 (discussed after Eq. 12 of 1001.3162)
+  
+  const double alpha = 0.368;
+  const double beta = 0.589 * pow(a, -0.2);
+  const double gamma = 0.864 * pow(a, 0.01);
+  const double phi = -0.729 * pow(a, .08);
+  const double eta = -0.243 * pow(a, -0.27);
+  
+  return 
+    alpha * (1.0 + pow(beta*n, -2*phi)) * pow(n, 2*eta) * exp(-gamma*n*n/ 2.0);
 }
 
 double massfunc(const double m, const double a) 
 {
-  return fnu_tinker(nu(m, a), a) * cosmology.rho_crit * cosmology.Omega_m/m/m * dlognudlogm(m);
-}
-
-double B1(const double m, const double a) 
-{ // b(m,a) based on redshift evolution fits in Tinker et al. paper, no additional normalization
-  return B1_nu(nu(m, a), a); 
-}
-
-double B1_normalized(const double m, const double a) 
-{ // divide by bias norm only in matter spectra, not in HOD modeling/cluster analyses
-  return B1_nu(nu(m, a), a)/bias_norm(a);
+  const double nu  = delta_c/(sqrt(sigma2(m))*growfac(a));
+  const double gnu = f_tinker(nu, a) * nu;
+  return gnu * cosmology.rho_crit * cosmology.Omega_m/m/m * dlognudlogm(m);
 }
 
 double conc(const double m, const double a) 
 { // mass-concentration relation: Bhattacharya et al. 2013, Delta = 200 rho_{mean} (Table 2)
   const double g = growfac(a);
-  return 9.0*pow(nuv2(m, a, g), -0.29)*pow(g, 1.15); 
+  const double nu  = delta_c/(sqrt(sigma2(m))*g);
+  return 9.0*pow(nu, -0.29)*pow(g, 1.15); 
 }
 
 double u_nfw_c(const double c, const double k, const double m, const double a) 
 { // analytic FT of NFW profile, from Cooray & Sheth 01
+  
+  const double rho_delta = Delta * cosmology.rho_crit * cosmology.Omega_m;
+  const double r_delta   = pow(3./(4.0*M_PI)*(m/rho_delta), 1./3.);
   const double x = k * r_Delta(m, a) / c;
   const double xu = (1. + c) * x;
 
@@ -436,33 +366,38 @@ double int_pf(double lnM, void* params)
     log_fatal("error in selecting bin number ni = %d", ni);
     exit(1);
   }
+  const int func = (int) ar[2];
 
-  const double m  = exp(lnM);
-  const double mf = massfunc(m,a);
+  const double m = exp(lnM);
+  const double nu = delta_c/(sqrt(sigma2(m))*growfac(a));
+  
+  const double gnu  = f_tinker(nu, a) * nu; 
+  const double rhom = cosmology.rho_crit * cosmology.Omega_m;
+  const double dNdlnM = gnu * (rhom/m) * dlognudlogm(m); // mass function
   const double nc = f_c(ni)*n_c(m, a, ni);
   const double ns = n_s(ni, a, ni);
-
+  
   double res;
-  switch((int) ar[2])
+  switch(func)
   {
     case 0:
-    { // former int_ngal(double lnM, void *params)
-      res = mf*m*(nc + ns);
+    { // N_gal = \int dM n(M)*(nc + ns) = \int dlnM M n(M)*(nc + ns) 
+      res = dNdlnM*(nc + ns);
       break;
     }
     case 1:
-    { // former int_m_mean(double lnM, void* params)
-      res = m*(mf*m*(nc + ns));
+    { // <M> = \int dM M*n(M)*(nc + ns) = \int dlnM M^2 n(M)*(nc + ns) 
+      res = m*(dNdlnM*(nc + ns));
       break;
     }
     case 2:
-    { // former int_fsat(double lnM, void *params)
-      res = mf*m*ns;
+    {
+      res = dNdlnM*ns;
       break;
     }
     case 3:
-    { // former int_bgal(double lnM, void* params)
-      res = B1(m,a)*(mf*m*(nc + ns));
+    {
+      res = hb1nu(nu)*(dNdlnM*(nc + ns));
       break;
     }
     default:
@@ -531,12 +466,15 @@ double int_for_bias_norm(double x, void* params)
     exit(1);
   }
   
-  return B1_nu(x, a) * f_tinker(x, a);
+  return hb1nu(x) * f_tinker(x, a);
 }
 
 double int_for_dlognudlogm(double lnM, void* params __attribute__((unused))) 
 {
-  return log(nu(exp(lnM), 1.0));
+  // TODO: growfac should be parameter
+  const double a  = 1.0;
+  const double nu = delta_c/(sqrt(sigma2(exp(lnM)))*growfac(a));
+  return log(nu);
 }
 
 double int_for_ngmatched(double logm, void* params) 
@@ -552,7 +490,8 @@ double int_for_b_ngmatched(double logm, void* params)
   double* ar = (double*) params;
   const double a = ar[0];
   const double m = exp(logm);
-  return massfunc(m, a) * m * B1(exp(logm), a);
+  const double nu = delta_c/(sqrt(sigma2(m))*growfac(a));
+  return massfunc(m, a) * m * hb1nu(nu);
 }
 
 double int_for_I02_XY(double lnM, void* params) 
@@ -561,25 +500,29 @@ double int_for_I02_XY(double lnM, void* params)
   const double a = ar[0];
   const double k1 = ar[1];
   const double k2 = ar[2];
+
   const double m = exp(lnM);
   const double c = conc(m, a);
-  const double prefac = m/(cosmology.rho_crit * cosmology.Omega_m);
+
+  const double gnu  = f_tinker(nu, a) * nu; 
+  const double rhom = cosmology.rho_crit * cosmology.Omega_m;
+  const double dNdlnM = gnu * (rhom/m) * dlognudlogm(m); // mass function
 
   double u;
   switch((int) ar[3])
   {
     case 0:
-    { // former int_for_I02(double logm, void* params) 
-      u = u_nfw_c(c, k1, m, a)*u_nfw_c(c, k2, m, a);
+    { // matter-matter
+      u = u_nfw_c(c, k1, m, a) * u_nfw_c(c, k2, m, a);
       break;
     }
     case 1:
-    { // former int_for_I02_my(double logm, void* params) 
+    { // matter-y
       u = u_y_bnd(c, k1, m, a) * u_nfw_c(c, k2, m, a);
       break;
     }
     case 2:
-    { // former int_for_I02_yy(double logm, void* params) 
+    { // y-y 
       u = u_y_bnd(c, k1, m, a) * u_y_bnd(c, k2, m, a);
       break;
     }
@@ -589,7 +532,7 @@ double int_for_I02_XY(double lnM, void* params)
       exit(1);
     }
   }
-  return massfunc(m, a) * m * u * prefac * prefac;
+  return dNdlnM * u * (m/rhom) * (m/rhom);
 }  
 
 double int_for_I11_X(double lnM, void* params) 
@@ -597,20 +540,25 @@ double int_for_I11_X(double lnM, void* params)
   const double* ar = (double*) params;  
   const double a = ar[0];
   const double k = ar[1];
+  
   const double m = exp(lnM);
   const double c = conc(m, a);
-  const double prefac = m/(cosmology.rho_crit * cosmology.Omega_m);
+  const double nu = delta_c/(sqrt(sigma2(m))*growfac(a));
+  
+  const double gnu  = f_tinker(nu, a) * nu; 
+  const double rhom = cosmology.rho_crit * cosmology.Omega_m;
+  const double dNdlnM = gnu * (rhom/m) * dlognudlogm(m); // mass function
 
   double u;
   switch((int) ar[2])
   {
     case 0:
-    { // double int_for_I11(double logm, void* params) 
-      const double u = u_nfw_c(c, k, m, a);
+    { // matter
+      u = u_nfw_c(c, k, m, a);
       break;
     }
     case 1:
-    { // former int_for_I11_y(double logm, void* params) 
+    { // y
       u = u_y_bnd(c, k, m, a) + u_y_ejc(m);
       break;
     }
@@ -620,7 +568,7 @@ double int_for_I11_X(double lnM, void* params)
       exit(1);
     }
   }
-  return massfunc(m, a) * m * u * prefac * B1_normalized(m, a);
+  return dNdlnM * u * (m/rhom) * hb1nu(nu, a)/bias_norm(a);
 }
 
 double int_for_G02(double lnM, void* param)
@@ -699,8 +647,9 @@ double int_G11(double logM, void* params)
 
   const double m = exp(logM);
   const double u = u_g(k, m, a, ni);
-  
-  return m*massfunc(m,a)*(u*n_s(m, a, ni) + n_c(m, a, ni)*f_c(ni))*B1(m, a);
+  const double nu = delta_c/(sqrt(sigma2(m))*growfac(a));
+
+  return m*massfunc(m,a)*(u*n_s(m, a, ni) + n_c(m, a, ni)*f_c(ni))*hb1nu(nu);
 }
 */
 
@@ -795,7 +744,11 @@ double F_KS_nointerp(double c, double krs, const int init_static_vars_only)
 
 double sigma2_nointerp(const double M, const int init_static_vars_only) 
 {
-  double ar[1] = {radius(M)};
+  
+  const double radius = 
+    pow(0.75*M/(M_PI*cosmology.rho_crit*cosmology.Omega_m), 1.0/3.0)
+  
+  double ar[1] = {radius};
   const double xmin = 0;
   const double xmax = 14.1;
 
@@ -830,8 +783,10 @@ double bias_norm_nointerp(const double a, const int init_static_vars_only)
   }
 
   double ar[1] = {a};
-  const double numin = nu(limits.M_min, a);
-  const double numax = nu(limits.M_max, a);
+  
+  const double D = growfac(a);
+  const double numin = delta_c/(sqrt(sigma2(limits.M_min))*D);
+  const double numax = delta_c/(sqrt(sigma2(limits.M_max))*D);
 
   return (init_static_vars_only == 1) ? int_for_bias_norm((numin+numax)/2.0, (void*) ar) :
     Ntable.high_def_integration > 0 ?

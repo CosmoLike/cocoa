@@ -314,6 +314,7 @@ typedef struct
   int use_ggl_efficiency_zoverlap;
 
   int galaxy_bias_model[MAX_SIZE_ARRAYS]; 
+  int halo_bias_model[MAX_SIZE_ARRAYS];
 } likepara;
 
 
