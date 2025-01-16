@@ -1002,6 +1002,22 @@ double I11_nointerp(
   return res;
 }
 
+/*
+double I11_y_nointerp(const double k, const double a, const int init_static_vars_only) 
+{ 
+  double ar[2] = {a, k};
+  const double lnMmin = log(limits.M_min);
+  const double lnMmax = log(limits.M_max);
+  
+  return init_static_vars_only == 1 ? int_for_I11_y(lnMmin, (void*) ar): 
+    Ntable.high_def_integration > 0 ?
+    int_gsl_integrate_high_precision(int_for_I11_y, (void*) ar, lnMmin, lnMmax, 
+      NULL, GSL_WORKSPACE_SIZE) :
+    int_gsl_integrate_medium_precision(int_for_I11_y, (void*) ar, lnMmin, lnMmax, 
+      NULL, GSL_WORKSPACE_SIZE);
+}
+*/
+
 double G02_nointerp(
     double k, 
     double a, 
@@ -1104,19 +1120,6 @@ double G11_nointerp(double k, double a, int ni, const int init_static_vars_only)
 }
 */
 
-double I11_y_nointerp(const double k, const double a, const int init_static_vars_only) 
-{ 
-  double ar[2] = {a, k};
-  const double lnMmin = log(limits.M_min);
-  const double lnMmax = log(limits.M_max);
-  
-  return init_static_vars_only == 1 ? int_for_I11_y(lnMmin, (void*) ar): 
-    Ntable.high_def_integration > 0 ?
-    int_gsl_integrate_high_precision(int_for_I11_y, (void*) ar, lnMmin, lnMmax, 
-      NULL, GSL_WORKSPACE_SIZE) :
-    int_gsl_integrate_medium_precision(int_for_I11_y, (void*) ar, lnMmin, lnMmax, 
-      NULL, GSL_WORKSPACE_SIZE);
-}
 
 double I02_yy_nointerp(const double k1, const double k2, const double a, 
 const int init_static_vars_only) 
