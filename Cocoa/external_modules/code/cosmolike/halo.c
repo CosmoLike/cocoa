@@ -219,15 +219,13 @@ double bias_norm(const double a)
   return interpol(table, na, amin, amax, da, fmin(a, amax-da), 1.0, 1.0);
 }
 
-double lognu_gsl(double lnM, void* params) 
-{ // does not work w/ MG or m_nu >> 0.06ev
-  double* ar = (double*) params;
-  const double growfac_a = ar[0];
-  return log(delta_c/(sqrt(sigma2(exp(lnM)))*growfac_a)); 
+double lognu0_gsl(double lnM, void* params __attribute__((unused))) 
+{ 
+  return log(delta_c/sqrt(sigma2(exp(lnM)))); 
 }
 
 double dlognudlogm(const double m) 
-{
+{ // if sigma(z) \propto to D(z), then d\ln \nu/dlnM independent of z
   static double cache[MAX_SIZE_ARRAYS];
   static double* table;
   static double lim[3];
@@ -249,7 +247,7 @@ double dlognudlogm(const double m)
       double ar[1] = {1.0};
 
       gsl_function F;
-      F.function = &lognu_gsl;
+      F.function = &lognu0_gsl;
       F.params = (void*) ar;
 
       int status = gsl_deriv_central(&F, lim[0] + i*lim[2], 
@@ -269,7 +267,7 @@ double dlognudlogm(const double m)
       double ar[1] = {1.0};
 
       gsl_function F;
-      F.function = &lognu_gsl;
+      F.function = &lognu0_gsl;
       F.params = (void*) ar;
 
       int status = gsl_deriv_central(&F, lim[0] + i*lim[2], 
@@ -412,7 +410,7 @@ double u_g(
 }
 
 
-double n_c(const double m, const double a, const int ni)
+double HOD_nc(const double m, const double a, const int ni)
 {
   if (!(a>0) || !(a<1)) 
   {
@@ -445,7 +443,7 @@ double n_c(const double m, const double a, const int ni)
   return 0.5*(1.0 + ERF.val);
 }
 
-double n_s(
+double HOD_ns(
     const double m, 
     const double a, 
     const int ni
@@ -457,14 +455,12 @@ double n_s(
     exit(1);
   }
   
-  const double x = 
-    (m - pow(10.0,nuisance.hod[ni][3]))/pow(10.0, nuisance.hod[ni][2]);
-  const double ns = n_c(m, a, ni)*pow(x, nuisance.hod[ni][4]);
-
+  const double x = (m - pow(10.0,nuisance.hod[ni][3]))/pow(10.0, nuisance.hod[ni][2]);
+  const double ns = HOD_nc(m, a, ni)*pow(x, nuisance.hod[ni][4]);
   return (ns > 0) ? ns : 1.e-15;
 }
 
-double f_c(const int ni)
+double HOD_fc(const int ni)
 {
   if (ni < 0 || ni > redshift.clustering_nbin - 1)
   {
@@ -709,12 +705,14 @@ double int_hm_funcs(double lnM, void* params)
   const double growfac_a = (double) ar[3];
 
   const double m = exp(lnM);
+  
   const double nu = delta_c/(sqrt(sigma2(m))*growfac_a);
   const double gnu  = fnu(nu, a) * nu; 
   const double rhom = cosmology.rho_crit * cosmology.Omega_m;
-  const double dNdlnM = gnu * (rhom/m) * dlognudlogm(m); // mass function
-  const double nc = f_c(ni)*n_c(m, a, ni);
-  const double ns = n_s(ni, a, ni);
+  const double dNdlnM = gnu * (rhom/m) * dlognudlogm(m);
+  
+  const double nc = HOD_fc(ni)*HOD_nc(m, a, ni);
+  const double ns = HOD_ns(ni, a, ni);
   
   double res;
   switch(func)
@@ -1021,7 +1019,7 @@ double int_for_I11_X(double lnM, void* params)
   const double nu = delta_c/(sqrt(sigma2(m))*growfac_a);
   const double gnu = fnu(nu, a) * nu; 
   const double rhom = cosmology.rho_crit * cosmology.Omega_m;
-  const double dNdlnM = gnu * (rhom/m) * dlognudlogm(m); // mass function
+  const double dNdlnM = gnu * (rhom/m) * dlognudlogm(m);
 
   const double c = conc(m, growfac_a);
 
@@ -1112,14 +1110,15 @@ double int_for_G02(double lnM, void* param)
   const double nu = delta_c/(sqrt(sigma2(m))*growfac_a);
   const double gnu = fnu(nu, a) * nu; 
   const double rhom = cosmology.rho_crit * cosmology.Omega_m;
-  const double dNdlnM = gnu * (rhom/m) * dlognudlogm(m); // mass function
+  const double dNdlnM = gnu * (rhom/m) * dlognudlogm(m);
 
   const double c  = conc(m, growfac_a);
   const double u  = u_g(c, k, a, ni);
-  const double ns = n_s(m, a, ni);
-  const double nc = n_c(m, a, ni);
+  const double ns = HOD_ns(m, a, ni);
+  const double nc = HOD_nc(m, a, ni);
+  const double fc = HOD_fc(ni);
 
-  return dNdlnM*(u*u*ns*ns + 2.0*u*ns*nc*f_c(ni));
+  return dNdlnM*(u*u*ns*ns + 2.0*u*ns*nc*fc);
 }
 
 double G02_nointerp(
@@ -1187,13 +1186,14 @@ double int_GM02(double lnM, void* params)
   const double nu = delta_c/(sqrt(sigma2(m))*growfac_a);
   const double gnu  = fnu(nu, a) * nu; 
   const double rhom = cosmology.rho_crit * cosmology.Omega_m;
-  const double dNdlnM = gnu * (rhom/m) * dlognudlogm(m); // mass function
+  const double dNdlnM = gnu * (rhom/m) * dlognudlogm(m);
 
   const double c = conc(m, growfac_a);
-  const double ns = n_s(m, a, ni);
-  const double nc = n_c(m, a, ni);
+  const double ns = HOD_ns(m, a, ni);
+  const double nc = HOD_nc(m, a, ni);
+  const double fc = HOD_fc(ni);
 
-  return dNdlnM*(m/rhom)*u_c(c,k,m,a)*(u_g(c,k,a,ni)*ns + nc*f_c(ni));
+  return dNdlnM*(m/rhom)*u_c(c,k,m,a)*(u_g(c,k,a,ni)*ns + nc*fc);
 }
 
 double GM02_nointerp(
