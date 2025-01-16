@@ -16,25 +16,9 @@
 
 #include "log.c/src/log.h"
 
-static int GSL_WORKSPACE_SIZE = 250;
-
 #define DEFAULT_INT_PREC 1000
-
 #define delta_c 1.686
-
 #define Delta 200
-
-// HALO BIAS OPTIONS ---------------------------
-#define HALO_BIAS_TINKER_2010 0
-
-// HMF OPTIONS ---------------------------------
-#define HMF_TINKER_2010 0
-
-// CONCENTRATION OPTIONS -----------------------
-#define CONCENTRATION_BHATTACHARYA_2013 0
-
-// HALO PROFILE OPTIONS OPTIONS -----------------------
-#define HALO_PROFILE_NFW 0
 
 // ---------------------------------------------------------------------------
 // ---------------------------------------------------------------------------
@@ -63,18 +47,15 @@ doube hb1nu(const double nu, const double a)
       const double y = log10(200.0);
       
       const double ALPHA    = 1.0 + 0.24 * y * exp(-pow(4.0 / y, 4.0));
-      const double alpha    = 0.44 * y - 0.88;
-      const double nu_alpha = pow(nu, alpha);
+      const double nu_alpha = pow(nu, 0.44 * y - 0.88);
       
       const double BETA = 0.183;
-      const double beta = 1.5;
-      const double nu_beta = pow(nu, beta);
+      const double nu_beta = pow(nu, 1.5);
       
       const double GAMMA = 0.019 + 0.107 * y + 0.19 * exp(-pow(4.0 / y, 4.0));
-      const double gamma = 2.4;
-      const double nu_gamma = pow(nu, gamma);
+      const double nu_gamma = pow(nu, 2.4);
       
-      ans = 1.0 - ALPHA * nu_alpha / (nu_alpha + pow(delta_c, alpha)) 
+      ans = 1.0 - ALPHA * nu_alpha / (nu_alpha + pow(delta_c, 0.44 * y - 0.88)) 
                + BETA * nu_beta + GAMMA * nu_gamma;
       break;
     }
@@ -86,13 +67,6 @@ doube hb1nu(const double nu, const double a)
   }
 
   return ans;
-}
-
-double lognu(double lnM, const double a, const double growfac_a) 
-{  
-  const double m = exp(lnM);
-  const double nu = delta_c/(sqrt(sigma2(m, a))*growfac_a); 
-  return log(nu);
 }
 
 doube fnu(const double nu, const double a)
@@ -131,11 +105,7 @@ doube fnu(const double nu, const double a)
   return ans;
 }
 
-double conc(
-    const double m, 
-    const double a, 
-    const double growfac_a
-  ) 
+double conc(const double m, const double growfac_a) 
 {
   if (!(a>0) || !(a<1)) 
   {
@@ -149,7 +119,7 @@ double conc(
   {
     case CONCENTRATION_BHATTACHARYA_2013:
     { // Bhattacharya et al. 2013, Delta = 200 rho_{mean} (Table 2)
-      const double nu = delta_c/(sqrt(sigma2(m, a))*growfac_a);
+      const double nu = delta_c/(sqrt(sigma2(m))*growfac_a);
       ans =  9.0*pow(nu, -0.29)*pow(growfac_a, 1.15); 
       break;
     }
@@ -250,44 +220,40 @@ double bias_norm(const double a)
 }
 
 double lognu_gsl(double lnM, void* params) 
-{  
-  return logn(lnM, a, growfac_a);
+{ // does not work w/ MG or m_nu >> 0.06ev
+  double* ar = (double*) params;
+  const double growfac_a = ar[0];
+  return log(delta_c/(sqrt(sigma2(exp(lnM)))*growfac_a)); 
 }
 
-double dlognudlogm_a(
-    const double m, 
-    const double a, 
-    const double growfac_a
-  ) 
+double dlognudlogm(const double m) 
 {
   static double cache[MAX_SIZE_ARRAYS];
   static double* table;
-
-  const double lnMmin = log(limits.M_min);
-  const double lnMmax = log(limits.M_max);
-  const double dlnM = (lnMmax - lnMmin)/((double) Ntable.N_M - 1.0);
-
+  static double lim[3];
 
   if (table == 0 || fdiff(cache[1], Ntable.random))
   {
     if (table != NULL) free(table);
     table = (double*) malloc(sizeof(double) * Ntable.N_M);
+    lim[0] = log(limits.M_min);
+    lim[1] = log(limits.M_max);
+    lim[2] = (lim[1] - lim[0])/((double) Ntable.N_M - 1.0);
   }
 
-  if (fdiff(cache[0], cosmology.random) || 
-      fdiff(cache[1], Ntable.random))
+  if (fdiff(cache[0], cosmology.random) || fdiff(cache[1], Ntable.random))
   {
     {
       const int i = 0;
       double result, abserr;
-      double ar[2] = {a, growfac_a};
+      double ar[1] = {1.0};
 
       gsl_function F;
       F.function = &lognu_gsl;
       F.params = (void*) ar;
 
-      int status = gsl_deriv_central(&F, lnMmin + i*dlnM, 0.1*(lnMmin + i*dlnM), 
-        &result, &abserr);
+      int status = gsl_deriv_central(&F, lim[0] + i*lim[2], 
+        0.1*(lim[0] + i*lim[2]), &result, &abserr);
       if (status) 
       {
         log_fatal(gsl_strerror(status));
@@ -300,34 +266,26 @@ double dlognudlogm_a(
     for (int i=1; i <Ntable.N_M; i++) 
     {
       double result, abserr;
-      double ar[2] = {a, growfac_a};
+      double ar[1] = {1.0};
 
       gsl_function F;
       F.function = &lognu_gsl;
       F.params = (void*) ar;
 
-      int status = gsl_deriv_central(&F, lnMmin + i*dlnM, 0.1*(lnMmin + i*dlnM), 
-        &result, &abserr);
+      int status = gsl_deriv_central(&F, lim[0] + i*lim[2], 
+        0.1*(lim[0] + i*lim[2]), &result, &abserr);
       if (status) 
       {
         log_fatal(gsl_strerror(status));
         exit(1);
       }
-      
       table[i] = result;
     }
 
     cache[0] = cosmology.random;
     cache[1] = Ntable.random;
   }  
-  return interpol(table, Ntable.N_M, lnMmin, lnMmax, dlnM, log(m), 1.0, 1.0);
-}
-
-double dlognudlogm(const double m)
-{
-  const double a = 1.0;
-  const double growfac_a = growfac(1.0);
-  return dlognudlogm(m, a, growfac_a);
+  return interpol(table, Ntable.N_M, lim[0], lim[1], lim[2], log(m), 1.0, 1.0);
 }
 
 // ---------------------------------------------------------------------------
@@ -748,11 +706,11 @@ double int_hm_funcs(double lnM, void* params)
     exit(1);
   }
   const int func = (int) ar[2];
+  const double growfac_a = (double) ar[3];
 
   const double m = exp(lnM);
-  const double nu = delta_c/(sqrt(sigma2(m))*growfac(a));
-  
-  const double gnu  = f_tinker(nu, a) * nu; 
+  const double nu = delta_c/(sqrt(sigma2(m))*growfac_a);
+  const double gnu  = fnu(nu, a) * nu; 
   const double rhom = cosmology.rho_crit * cosmology.Omega_m;
   const double dNdlnM = gnu * (rhom/m) * dlognudlogm(m); // mass function
   const double nc = f_c(ni)*n_c(m, a, ni);
@@ -813,12 +771,11 @@ double ngal_nointerp(
     cache[0] = Ntable.random;
   }
 
-  double ar[2] = {a, (double) ni, (double) 0};
+  double ar[4] = {a, (double) ni, (double) 0, growfac(a)};
   const double lnMmin = log(10.0)*(nuisance.hod[ni][0] - 2.);
   const double lnMmax = log(limits.M_max);
 
   double res = 0.0;
-  
   if (init_static_vars_only == 1)
     res = int_hm_funcs((lnMmin + lnMmax)/2.0, (void*) ar);
   else
@@ -901,12 +858,11 @@ double pf_nointerp(
     cache[0] = Ntable.random;
   }
 
-  double ar[3] = {a, (double) ni, (double) func};
+  double ar[4] = {a, (double) ni, (double) func, growfac(a)}; 
   const double lnMmin = log(10.0)*(nuisance.hod[ni][0] - 2.);
   const double lnMmax = log(limits.M_max);
 
   double res = 0.0;
-  
   if (init_static_vars_only == 1)
     res = int_hm_funcs((lnMmin + lnMmax)/2.0, (void*) ar);
   else
@@ -916,12 +872,7 @@ double pf_nointerp(
     F.function = int_hm_funcs;
     res = gsl_integration_glfixed(&F, lnMmin, lnMmax, w);
   }
-  
-  if (func == 1 || func == 2)
-  { // 1 = m_mean_nointerp; 2 = fsat_nointerp
-    res /= ngal(ni, a);
-  }
-  return res;
+  return (func == 1 || func == 2) ? res/ngal(ni, a) : res;
 }
 
 double bgal(const int ni, const double a)
@@ -977,13 +928,16 @@ double int_for_I02_XY(double lnM, void* params)
   const double k1 = ar[1];
   const double k2 = ar[2];
   const int XY = (int) ar[3];
+  const double growfac_a = ar[4];
 
   const double m = exp(lnM);
-  const double c = conc(m, a);
-
-  const double gnu  = f_tinker(nu, a) * nu; 
+  
+  const double nu = delta_c/(sqrt(sigma2(m))*growfac_a);
+  const double gnu  = fnu(nu, a) * nu; 
   const double rhom = cosmology.rho_crit * cosmology.Omega_m;
   const double dNdlnM = gnu * (rhom/m) * dlognudlogm(m); // mass function
+
+  const double c = conc(m, growfac_a);
 
   double u;
   switch(XY)
@@ -1037,7 +991,7 @@ double I02_XY_nointerp(
     cache[0] = Ntable.random;
   }
 
-  double ar[4] = {a, k1, k2, func};
+  double ar[5] = {a, k1, k2, func, growfac(a)};
   const double lnMmin = log(limits.M_min);
   const double lnMmax = log(limits.M_max);
 
@@ -1059,17 +1013,20 @@ double int_for_I11_X(double lnM, void* params)
   const double* ar = (double*) params;  
   const double a = ar[0];
   const double k = ar[1];
-  
+  const int func = (int) ar[2];
+  const double growfac_a = ar[3];
+
   const double m = exp(lnM);
-  const double c = conc(m, a);
-  const double nu = delta_c/(sqrt(sigma2(m))*growfac(a));
   
-  const double gnu  = f_tinker(nu, a) * nu; 
+  const double nu = delta_c/(sqrt(sigma2(m))*growfac_a);
+  const double gnu = fnu(nu, a) * nu; 
   const double rhom = cosmology.rho_crit * cosmology.Omega_m;
   const double dNdlnM = gnu * (rhom/m) * dlognudlogm(m); // mass function
 
+  const double c = conc(m, growfac_a);
+
   double u;
-  switch((int) ar[2])
+  switch(func)
   {
     case 0:
     { // matter
@@ -1114,7 +1071,7 @@ double I11_X_nointerp(
     cache[0] = Ntable.random;
   }
 
-  double ar[3] = {a, k, func};
+  double ar[4] = {a, k, func, growfac(a)};
   const double lnMmin = log(limits.M_min);
   const double lnMmax = log(limits.M_max);
   
@@ -1148,16 +1105,19 @@ double int_for_G02(double lnM, void* param)
     log_fatal("error in selecting bin number ni = %d", ni);
     exit(1);
   }
+  const double growfac_a = ar[3];
 
   const double m  = exp(lnM);
-  const double c  = conc(m, a);
+
+  const double nu = delta_c/(sqrt(sigma2(m))*growfac_a);
+  const double gnu = fnu(nu, a) * nu; 
+  const double rhom = cosmology.rho_crit * cosmology.Omega_m;
+  const double dNdlnM = gnu * (rhom/m) * dlognudlogm(m); // mass function
+
+  const double c  = conc(m, growfac_a);
   const double u  = u_g(c, k, a, ni);
   const double ns = n_s(m, a, ni);
   const double nc = n_c(m, a, ni);
-  
-  const double gnu  = f_tinker(nu, a) * nu; 
-  const double rhom = cosmology.rho_crit * cosmology.Omega_m;
-  const double dNdlnM = gnu * (rhom/m) * dlognudlogm(m); // mass function
 
   return dNdlnM*(u*u*ns*ns + 2.0*u*ns*nc*f_c(ni));
 }
@@ -1186,7 +1146,7 @@ double G02_nointerp(
     cache[0] = Ntable.random;
   }
 
-  double ar[3] = {k, a, (double) ni};
+  double ar[4] = {k, a, (double) ni, growfac(a)};
   const double lnMmin = log(1.0e+8);
   const double lnMmax = log(limits.M_max);
 
@@ -1220,15 +1180,18 @@ double int_GM02(double lnM, void* params)
     log_fatal("error in selecting bin number ni = %d", ni);
     exit(1);
   }
+  const double growfac_a = ar[3];
 
   const double m = exp(lnM);
-  const double c = conc(m, a);
-  const double ns = n_s(m, a, ni);
-  const double nc = n_c(m, a, ni);
 
-  const double gnu  = f_tinker(nu, a) * nu; 
+  const double nu = delta_c/(sqrt(sigma2(m))*growfac_a);
+  const double gnu  = fnu(nu, a) * nu; 
   const double rhom = cosmology.rho_crit * cosmology.Omega_m;
   const double dNdlnM = gnu * (rhom/m) * dlognudlogm(m); // mass function
+
+  const double c = conc(m, growfac_a);
+  const double ns = n_s(m, a, ni);
+  const double nc = n_c(m, a, ni);
 
   return dNdlnM*(m/rhom)*u_c(c,k,m,a)*(u_g(c,k,a,ni)*ns + nc*f_c(ni));
 }
@@ -1257,7 +1220,7 @@ double GM02_nointerp(
     cache[0] = Ntable.random;
   }
 
-  double ar[3] = {k, a, (double) ni};
+  double ar[4] = {k, a, (double) ni, growfac(a)};
   const double lnMmin = log(10.)*(nuisance.hod[ni][0] - 1.0);
   const double lnMmax = log(limits.M_max);
 
