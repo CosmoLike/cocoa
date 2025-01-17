@@ -366,36 +366,9 @@ void init_accuracy_boost(
     static_cast<int>(ceil(Ntable.N_M*sampling_boost));
   */
 
-  static double low = 0;
-  if (low == 0)
-  {
-    low = precision.low;
-  }
-  precision.low = low/accuracy_boost;
-  
-  static double medium = 0;
-  if (medium == 0)
-  {
-    medium = precision.medium;
-  }
-  precision.medium = medium/accuracy_boost;
-  
-  static double high = 0;
-  if (high == 0)
-  {
-    high = precision.high;
-  }
-  precision.high = high/accuracy_boost;
-  
-  static double insane = 0;
-  if (insane == 0)
-  {
-    insane = precision.insane;
-  }
-  precision.insane = insane/accuracy_boost; 
-
   Ntable.high_def_integration = integration_accuracy;
 
+  // update cache
   Ntable.random = RandomNumber::get_instance().get();
 }
 

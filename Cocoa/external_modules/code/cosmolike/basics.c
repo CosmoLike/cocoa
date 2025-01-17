@@ -9,7 +9,6 @@
 #include <gsl/gsl_deriv.h>
 #include <gsl/gsl_eigen.h>
 #include <gsl/gsl_errno.h>
-#include <gsl/gsl_integration.h>
 #include <gsl/gsl_linalg.h>
 #include <gsl/gsl_matrix.h>
 #include <gsl/gsl_sf.h>
@@ -219,44 +218,6 @@ bin_avg set_bin_average(const int i_theta, const int j_L)
   r.dPmin = P[2][i_theta][j_L];
   r.dPmax = P[3][i_theta][j_L];
   return r;
-}
-
-double int_gsl_integrate_medium_precision(double (*func)(double, void*),
-void* arg, double a, double b, double* error, int niter)
-{
-  double res, err;
-  
-  // Hacked from GSL souce code (cquad.c) - stack (faster) vs heap allocation
-  size_t heap[niter];
-  gsl_integration_cquad_ival ival[niter];
-  gsl_integration_cquad_workspace w;
-  w.size = niter;
-  w.ivals = ival;
-  w.heap = heap;
-
-  gsl_function F;
-  F.function = func;
-  F.params = arg;
-  gsl_integration_cquad(&F, a, b, 0, precision.medium/2, &w, &res, &err, 0);
-  if (NULL != error) 
-  {
-    *error = err;
-  }
-  return res;
-}
-
-double int_gsl_integrate_low_precision(double (*func)(double, void*),
-void* arg, double a, double b, double* error __attribute__((unused)),
-int niter __attribute__((unused))) 
-{
-  gsl_set_error_handler_off();
-  double res, err;
-  gsl_function F;
-  F.function = func;
-  F.params = arg;
-  size_t neval;
-  gsl_integration_qng(&F, a, b, 0, precision.medium, &res, &err, &neval);
-  return res;
 }
 
 void error(char *s) 

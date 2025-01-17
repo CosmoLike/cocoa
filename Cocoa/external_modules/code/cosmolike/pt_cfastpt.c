@@ -408,11 +408,16 @@ void get_FPT_IA(void)
     }
 
     double k[FPT.N], Pin[FPT.N];
-    double IA_tt_EE[FPT.N], IA_tt_BB[FPT.N];
-    double IA_ta_dE1[FPT.N], IA_ta_dE2[FPT.N], IA_ta_0E0E[FPT.N],
-        IA_ta_0B0B[FPT.N];
-    double IA_mix_A[FPT.N], IA_mix_B[FPT.N], IA_mix_DEE[FPT.N],
-        IA_mix_DBB[FPT.N];
+    double IA_tt_EE[FPT.N]; 
+    double IA_tt_BB[FPT.N];
+    double IA_ta_dE1[FPT.N]; 
+    double IA_ta_dE2[FPT.N]; 
+    double IA_ta_0E0E[FPT.N];
+    double IA_ta_0B0B[FPT.N];
+    double IA_mix_A[FPT.N]; 
+    double IA_mix_B[FPT.N]; 
+    double IA_mix_DEE[FPT.N];
+    double IA_mix_DBB[FPT.N];
 
     FPT_input(k, Pin);
 

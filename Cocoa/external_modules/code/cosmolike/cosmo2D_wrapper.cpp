@@ -195,8 +195,8 @@ matrix C_ss_NLA_tomo_limber_cpp(const vector l)
 py::tuple C_ss_TATT_tomo_limber_cpp(const double l, const int ni, const int nj)
 {
   return py::make_tuple(
-    C_ss_TATT_EE_tomo_limber_nointerp(l, ni, nj, 0),
-    C_ss_TATT_BB_tomo_limber_nointerp(l, ni, nj, 0) 
+    C_ss_tomo_limber_nointerp(l, ni, nj, 1, 0),
+    C_ss_tomo_limber_nointerp(l, ni, nj, 0, 0) 
   );
 }
 
@@ -213,12 +213,11 @@ py::tuple C_ss_TATT_tomo_limber_cpp(const vector l)
 
   #pragma GCC diagnostic push
   #pragma GCC diagnostic ignored "-Wunused-variable"
-  for (int nz=0; nz<tomo.shear_Npowerspectra; nz++)
   { // init static variables
-    const int ni = Z1(nz);
-    const int nj = Z2(nz);
-    double trash = C_ss_TATT_EE_tomo_limber_nointerp(l(0), ni, nj, 1);
-    trash = C_ss_TATT_BB_tomo_limber_nointerp(l(0), ni, nj, 1);
+    const int ni = Z1(0);
+    const int nj = Z2(0);
+    double trash = C_ss_tomo_limber_nointerp(l(0), ni, nj, 1, 1);
+    trash = C_ss_tomo_limber_nointerp(l(0), ni, nj, 0, 1);
   }
   #pragma GCC diagnostic pop
 
@@ -229,8 +228,8 @@ py::tuple C_ss_TATT_tomo_limber_cpp(const vector l)
     {
       const int ni = Z1(nz);
       const int nj = Z2(nz);
-      EE(i, nz) = C_ss_TATT_EE_tomo_limber_nointerp(l(i), ni, nj, 0);
-      BB(i, nz) = C_ss_TATT_BB_tomo_limber_nointerp(l(i), ni, nj, 0);
+      EE(i, nz) = C_ss_tomo_limber_nointerp(l(i), ni, nj, 1, 0);
+      BB(i, nz) = C_ss_tomo_limber_nointerp(l(i), ni, nj, 1, 0);
     }
   }
 
@@ -619,6 +618,7 @@ vector C_yy_limber_nointerp_cpp(const vector l)
 // ---------------------------------------------------------------------------
 // ---------------------------------------------------------------------------
 
+/*
 double int_for_C_ss_NLA_tomo_limber_cpp(
     const double a, 
     const double l, 

@@ -1287,10 +1287,10 @@ double Pdelta(double io_kNL, double io_a) {
 double f_K(double chi) {
   double K, K_h, f;
   K = (cosmology.Omega_m + cosmology.Omega_v - 1.);
-  if (K > precision.medium) { // open
+  if (K > 1e-6) { // open
     K_h = sqrt(K); // K in units H0/c see BS eq. 2.30
     f = 1. / K_h * sin(K_h * chi);
-  } else if (K < -precision.medium) { // closed
+  } else if (K < -1e-6) { // closed
     K_h = sqrt(-K);
     f = 1. / K_h * sinh(K_h * chi);
   } else { // flat

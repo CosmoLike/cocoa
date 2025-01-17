@@ -22,6 +22,11 @@ typedef struct
   int LMAX;
   double LMIN_hankel;
   double LMAX_hankel;
+  
+
+  // ---------------------------------------------------
+  // CLUSTER ROUTINES (ALPHA STAGE)
+  // ---------------------------------------------------
   double cluster_util_log_M_min;
   double cluster_util_log_M_max;
   double binned_P_lambda_obs_given_M_zmin_table;
@@ -54,6 +59,13 @@ typedef struct
   int N_ell_TATT;                  // Cosmo2D
   int NL_Nell_block;               // Cosmo2D - NL = NonLimber
   int NL_Nchi;                     // Cosmo2D - NL = NonLimber
+  int photoz_interpolation_type;
+  int high_def_integration;
+  double vtmax;
+  double vtmin;
+  // ---------------------------------------------------
+  // CLUSTER ROUTINES (ALPHA STAGE)
+  // ---------------------------------------------------
   int N_a_halo_exclusion;          // N_a for binned_p_cc_incl_halo_exclusion (cluster_util.c)
   int N_k_halo_exclusion;          // N_k for binned_p_cc_incl_halo_exclusion (cluster_util.c)
   int N_k_hankel_halo_exclusion;   // N for 3D Hankel Transform (pk_to_xi and xi_to_pk)
@@ -63,10 +75,6 @@ typedef struct
   int binned_p_cm_size_a_table;
   int halo_uKS_nc;                 // halo.c u_KS(double c, double k, double rv)
   int halo_uks_nx;                 // halo.c u_KS(double c, double k, double rv)
-  int photoz_interpolation_type;
-  int high_def_integration;
-  double vtmax;
-  double vtmin;
 } Ntab;
 
 typedef struct 
@@ -262,14 +270,6 @@ typedef struct
   char name[CHAR_MAX_SIZE];
 } sur;
 
-typedef struct 
-{
-  double low;
-  double medium;
-  double high;
-  double insane;
-} pre;
-
 typedef struct
 {
   int is_cmb_bandpower;
@@ -354,21 +354,7 @@ typedef struct
   char pathHealpixWinFunc[CHAR_MAX_SIZE]; // path to precomputed healpix window function
 } Cmb;
 
-typedef struct 
-{
-  int tinker_bias_ncosmo;
-  int tinker_bias_nparam;
-  int tinker_bias_nsamp;
-  int tinker_bias_nparam_redshift;
-  int tinker_bias_extrapolation_cut_in;
-  int tinker_bias_extrapolation_cut_out;
-  int tinker_hmf_ncosmo;
-  int tinker_hmf_nparam;
-  int tinker_hmf_nsamp;
-  int tinker_hmf_nparam_redshift;
-  int tinker_hmf_extrapolation_cut_in;
-  int tinker_hmf_extrapolation_cut_out;
-} TinkerEmuParameters;
+
 
 double bgal_z(double z, int nz);
 
@@ -401,10 +387,6 @@ extern Cmb cmb;
 extern lim limits;
 
 extern Ntab Ntable;
-
-extern pre precision;
-
-extern TinkerEmuParameters tinkerEmuParam;
 
 // --------------------------------------------------------------------
 // --------------------------------------------------------------------

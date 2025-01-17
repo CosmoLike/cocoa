@@ -208,6 +208,12 @@ Ntab Ntable =
   .N_ell_TATT = 200,                  // N_ell_TATT (modified by COCOA from 60)
   .NL_Nell_block = 50,                // Cosmo2D - NL = NonLimber (NL_Nell_block)
   .NL_Nchi = 500,                     // Cosmo2D - NL = NonLimber (NL_Nchi)
+  .photoz_interpolation_type = 0,
+  .high_def_integration = 0,
+
+  // ---------------------------------------------------
+  // CLUSTER ROUTINES (ALPHA STAGE)
+  // ---------------------------------------------------
   .N_a_halo_exclusion = 100,          // N_a for binned_p_cc_incl_halo_exclusion (cluster_util.c)
   .N_k_halo_exclusion = 100,          // N_k for binned_p_cc_incl_halo_exclusion (cluster_util.c)
   .N_k_hankel_halo_exclusion = 3192,  // N for 3D Hankel Transform (pk_to_xi and xi_to_pk) 
@@ -217,31 +223,6 @@ Ntab Ntable =
   .binned_p_cm_size_a_table = 30,
   .halo_uKS_nc = 20,
   .halo_uks_nx = 200,
-  .photoz_interpolation_type = 0,
-  .high_def_integration = 0,
-};
-
-pre precision = 
-{
-  .medium = 5e-4, 
-  .high   = 1e-5, 
-  .insane = 1e-7    
-};
-
-TinkerEmuParameters tinkerEmuParam =
-{
-  .tinker_bias_ncosmo = 7,                // do not change
-  .tinker_bias_nparam = 4,                // do not change
-  .tinker_bias_nsamp = 40, 
-  .tinker_bias_nparam_redshift = 6,       // number of parameters of equation 7 in 1907.13167.;
-  .tinker_hmf_ncosmo = 7,                 // do not change
-  .tinker_hmf_nparam = 6,                 // do not change
-  .tinker_hmf_nsamp = 40, 
-  .tinker_hmf_nparam_redshift = 4,        // number of parameters of eq 2 in 1804.05866;
-  .tinker_bias_extrapolation_cut_in = 40,
-  .tinker_bias_extrapolation_cut_out = 45,
-  .tinker_hmf_extrapolation_cut_in = 40,
-  .tinker_hmf_extrapolation_cut_out = 45,
 };
 
 //  ----------------------------------------------------------------------------------
@@ -504,21 +485,6 @@ void update_cosmopara(cosmopara *C)
   //C->A_s = cosmology.A_s;  // cluster cosmology need that information
   //C->n_s = cosmology.n_s;  // cluster cosmology need that information
   C->random = cosmology.random;
-}
-
-void update_ynuisance(ynuisancepara* N)
-{ // Compton-Y related variables
-  N->gas_Gamma_KS = ynuisance.gas_Gamma_KS;
-  N->gas_beta = ynuisance.gas_beta;     
-  N->gas_lgM0 = ynuisance.gas_lgM0;     
-  N->gas_eps1 = ynuisance.gas_eps1;
-  N->gas_eps2 = ynuisance.gas_eps2;
-  N->gas_alpha = ynuisance.gas_alpha;
-  N->gas_A_star = ynuisance.gas_A_star;
-  N->gas_lgM_star = ynuisance.gas_lgM_star;
-  N->gas_sigma_star = ynuisance.gas_sigma_star;
-  N->gas_lgT_w = ynuisance.gas_lgT_w;
-  N->gas_f_H = ynuisance.gas_f_H;
 }
 
 // ---------------------------------------------------------------------------

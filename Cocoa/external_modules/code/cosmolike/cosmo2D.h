@@ -60,32 +60,23 @@ void C_cl_tomo(int L, int ni, int nj, double *Cl, double dev, double tolerance);
 // ----------------------------------------------------------------------------
 // ----------------------------------------------------------------------------
 
-double C_ss_TATT_EE_tomo_limber_nointerp(
-    double l, 
-    int ni, 
-    int nj, 
-    const int init_static_vars_only);
-
-double C_ss_TATT_EE_tomo_limber(double l, int ni, int nj);
-
-
-double C_ss_TATT_BB_tomo_limber_nointerp(double l, int ni, int nj, 
-  const int init_static_vars_only); // IA=(5||6)
-
-double C_ss_TATT_BB_tomo_limber(double l, int ni, int nj);
-
 double C_ss_tomo_limber_nointerp(
     double l, 
     int ni, 
     int nj, 
-    int use_linear_ps, 
+    int EE_or_use_linear_ps, 
     const int init_static_vars_only
   );
 
-double C_gs_tomo_limber_nointerp(double l, int ni, int nj, 
-  int use_linear_ps, const int init_static_vars_only);
+
+double C_ss_TATT_EE_tomo_limber(double l, int ni, int nj);
+
+double C_ss_TATT_BB_tomo_limber(double l, int ni, int nj);
 
 double C_ss_tomo_limber(const double l, const int ni, const int nj);
+
+double C_gs_tomo_limber_nointerp(double l, int ni, int nj, 
+  int use_linear_ps, const int init_static_vars_only);
 
 double C_gs_tomo_limber(const double l, const int ni, const int nj);
 

@@ -36,14 +36,6 @@ bin_avg set_bin_average(
     const int j_L
   );
 
-double int_gsl_integrate_high_precision(double (*func)(double, void *),
-  void *arg, double a, double b, double *error, int niter);
-
-double int_gsl_integrate_medium_precision(double (*func)(double, void *),
-  void *arg, double a, double b, double *error, int niter);
-
-double int_gsl_integrate_low_precision(double (*func)(double, void *),
-  void *arg, double a, double b, double *error, int niter);
 
 double interpol1d(
   const double* const f, 
