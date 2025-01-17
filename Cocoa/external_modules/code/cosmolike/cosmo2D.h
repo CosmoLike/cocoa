@@ -68,10 +68,12 @@ double C_ss_tomo_limber_nointerp(
     const int init_static_vars_only
   );
 
-
-double C_ss_TATT_EE_tomo_limber(double l, int ni, int nj);
-
-double C_ss_TATT_BB_tomo_limber(double l, int ni, int nj);
+double C_ss_TATT_tomo_limber(
+    const double l, 
+    const int ni, 
+    const int nj, 
+    const int EE
+  );
 
 double C_ss_tomo_limber(const double l, const int ni, const int nj);
 

@@ -220,48 +220,28 @@ double xi_pm_tomo(
   {
     if (limber == 1)
     {
+      // Cl_EE = Cl[0], Cl_BB = Cl[1]
+      double*** Cl = (double***) malloc3d(2, NSIZE, limits.LMAX);
+      
+      const int lmin = 1;
+      for (int i=0; i<NSIZE; i++)
+      {
+        for (int l=0; l<lmin; l++)
+        {
+          Cl[0][i][l] = 0.0;
+          Cl[1][i][l] = 0.0;
+        }
+      }
+
       switch(like.IA_MODEL)
       {
         case IA_MODEL_TATT:
         {
-          // Cl_EE = Cl[0], Cl_BB = Cl[1]
-          double*** Cl = (double***) malloc3d(2, NSIZE, limits.LMAX);
-          
-          const int lmin = 1;
-          for (int i=0; i<NSIZE; i++)
-          {
-            for (int l=0; l<lmin; l++)
-            {
-              Cl[0][i][l] = 0.0;
-              Cl[1][i][l] = 0.0;
-            }
-          }
-
           #pragma GCC diagnostic push
           #pragma GCC diagnostic ignored "-Wunused-variable"
-          #pragma GCC diagnostic push
-          #pragma GCC diagnostic ignored "-Wunused-but-set-variable"
           { // init static variables inside the C_XY_limber function
-            int BM = 0;
-            for (int nz=0; nz<NSIZE; nz++)
-            {
-              const int Z1NZ = Z1(nz);
-              const int Z2NZ = Z2(nz);
-              if (nuisance.ia[2][0]    || nuisance.ia[2][Z1NZ] ||
-                  nuisance.ia[2][Z2NZ] || nuisance.ia[1][0]    ||
-                  nuisance.ia[1][Z1NZ] || nuisance.ia[1][Z2NZ])
-              {
-                BM = 1;
-              }
-            }
-            const int Z1NZ = Z1(0);
-            const int Z2NZ = Z2(0);
-            const int l = limits.LMIN_tab + 1;
-
-            double ini = C_ss_TATT_EE_tomo_limber(l, Z1NZ, Z2NZ); 
-            ini = (BM == 1) ? C_ss_TATT_BB_tomo_limber(l, Z1NZ, Z2NZ) : 0.0;
+            double ini = C_ss_TATT_tomo_limber(limits.LMIN_tab+1,Z1(0),Z2(0),1);
           }
-          #pragma GCC diagnostic pop
           #pragma GCC diagnostic pop
 
           #pragma omp parallel for collapse(2)
@@ -269,91 +249,52 @@ double xi_pm_tomo(
           {
             for (int l=lmin; l<limits.LMIN_tab; l++)
             {
-              const int BM = (nuisance.ia[2][0]      || nuisance.ia[2][Z1(nz)] ||
-                              nuisance.ia[2][Z2(nz)] || nuisance.ia[1][0]    ||
-                              nuisance.ia[1][Z1(nz)] || nuisance.ia[1][Z2(nz)]) ? 1 : 0;
+              const int Z1NZ = Z1(nz);
+              const int Z2NZ = Z2(nz);
 
-              Cl[0][nz][l] = C_ss_tomo_limber_nointerp(l, Z1(nz), Z2(nz), 1, 0);
-              Cl[1][nz][l] = (BM == 1) ? C_ss_tomo_limber_nointerp(l, Z1(nz), Z2(nz), 0, 0) : 0.0;
-            }
-          }          
-          #pragma omp parallel for collapse(2)
-          for (int nz=0; nz<NSIZE; nz++) 
-          {
-            for (int l=limits.LMIN_tab; l<limits.LMAX; l++)
-            {
-              const int BM = (nuisance.ia[2][0]      || nuisance.ia[2][Z1(nz)] ||
-                              nuisance.ia[2][Z2(nz)] || nuisance.ia[1][0]    ||
-                              nuisance.ia[1][Z1(nz)] || nuisance.ia[1][Z2(nz)]) ? 1 : 0;
+              const int BM = (nuisance.ia[2][0]    || nuisance.ia[2][Z1NZ] ||
+                              nuisance.ia[2][Z2NZ] || nuisance.ia[1][0]    ||
+                              nuisance.ia[1][Z1NZ] || nuisance.ia[1][Z2NZ]) ? 1 : 0;
 
-              Cl[0][nz][l] = C_ss_TATT_EE_tomo_limber(l, Z1(nz), Z2(nz));
-              Cl[1][nz][l] = (BM == 1) ? C_ss_TATT_BB_tomo_limber(l, Z1(nz), Z2(nz)) : 0.0;
+              Cl[0][nz][l] = C_ss_tomo_limber_nointerp(l, Z1NZ, Z2NZ, 1, 0);
+              Cl[1][nz][l] = (BM == 1) ? C_ss_tomo_limber_nointerp(l, Z1NZ, Z2NZ, 0, 0) : 0;
             }
           }
-
-          #pragma omp parallel for collapse(2)
-          for (int nz=0; nz<NSIZE; nz++)
-          {
-            for (int i=0; i<Ntable.Ntheta; i++)
-            {
-              const int q = nz*Ntable.Ntheta + i;
-              xipm[0][q] = 0;
-              xipm[1][q] = 0;  
-              for (int l=lmin; l<limits.LMAX; l++)
-              {
-                xipm[0][q] += Glpm[0][i][l] * (Cl[0][nz][l] + Cl[1][nz][l]);
-                xipm[1][q] += Glpm[1][i][l] * (Cl[0][nz][l] - Cl[1][nz][l]);
-              }
-            }
-          }
-
-          free(Cl);
+          #pragma omp parallel for collapse(3)
+          for (int i=0; i<2; i++) 
+            for (int nz=0; nz<NSIZE; nz++) 
+              for (int l=limits.LMIN_tab; l<limits.LMAX; l++)
+                Cl[i][nz][l] = C_ss_TATT_tomo_limber(l, Z1(nz), Z2(nz), 1-i);
           break;
         }
         case IA_MODEL_NLA:
         { // OLD NLA INTERFACE (SIMPLER TO MOD IN EXTENSIONS TO WCDM)
-          double** Cl = (double**) malloc2d(NSIZE, limits.LMAX);
-          
-          const int lmin = 1;
-          for (int i=0; i<NSIZE; i++)
-            for (int l=0; l<lmin; l++)
-              Cl[i][l] = 0.0;
-
           #pragma GCC diagnostic push
           #pragma GCC diagnostic ignored "-Wunused-variable"
           for (int nz=0; nz<NSIZE; nz++)
           { // init static variables inside the C_XY_limber function
-            const int l = limits.LMIN_tab + 1;
-            double ini = C_ss_tomo_limber(l, Z1(nz), Z2(nz)); 
+            double ini = C_ss_tomo_limber(limits.LMIN_tab + 1, Z1(nz), Z2(nz)); 
           }
           #pragma GCC diagnostic pop
           
           #pragma omp parallel for collapse(2)
           for (int nz=0; nz<NSIZE; nz++)
+          { 
             for (int l=lmin; l<limits.LMIN_tab; l++)
-              Cl[nz][l] = C_ss_tomo_limber_nointerp(l, Z1(nz), Z2(nz), pslin_only, 0); 
-          #pragma omp parallel for collapse(2)
-          for (int nz=0; nz<NSIZE; nz++)
-            for (int l=limits.LMIN_tab; l<limits.LMAX; l++)        
-              Cl[nz][l] = C_ss_tomo_limber(l, Z1(nz), Z2(nz));
-
-          #pragma omp parallel for collapse(2)
-          for (int nz=0; nz<NSIZE; nz++)
-          {
-            for (int i=0; i<Ntable.Ntheta; i++)
             {
-              const int q = nz*Ntable.Ntheta + i;
-              xipm[0][q] = 0;
-              xipm[1][q] = 0;
-              for (int l=lmin; l<limits.LMAX; l++)
-              {
-                xipm[0][q]  += Glpm[0][i][l]*Cl[nz][l];
-                xipm[1][q]  += Glpm[1][i][l]*Cl[nz][l];
-              }
+              Cl[0][nz][l] = C_ss_tomo_limber_nointerp(l, Z1(nz), Z2(nz), pslin_only, 0); 
+              Cl[1][nz][l] = 0.0;
             }
           }
-
-          free(Cl);
+          #pragma omp parallel for collapse(2)
+          for (int nz=0; nz<NSIZE; nz++)
+          { 
+            for (int l=limits.LMIN_tab; l<limits.LMAX; l++)        
+            {  
+              Cl[0][nz][l] = C_ss_tomo_limber(l, Z1(nz), Z2(nz));
+              Cl[1][nz][l] = 0.0;
+            }
+          }
           break;
         }
         default:
@@ -362,6 +303,22 @@ double xi_pm_tomo(
           exit(1);
         }
       }
+      #pragma omp parallel for collapse(2)
+      for (int nz=0; nz<NSIZE; nz++)
+      {
+        for (int i=0; i<Ntable.Ntheta; i++)
+        {
+          const int q = nz*Ntable.Ntheta + i;
+          xipm[0][q] = 0;
+          xipm[1][q] = 0;  
+          for (int l=lmin; l<limits.LMAX; l++)
+          {
+            xipm[0][q] += Glpm[0][i][l] * (Cl[0][nz][l] + Cl[1][nz][l]);
+            xipm[1][q] += Glpm[1][i][l] * (Cl[0][nz][l] - Cl[1][nz][l]);
+          }
+        }
+      }
+      free(Cl);
     }
     else
     {
@@ -398,7 +355,6 @@ double xi_pm_tomo(
     log_fatal("internal logic error in selecting bin number");
     exit(1);
   }
-  
   return (pm > 0) ? xipm[0][q] : xipm[1][q];
 }
 
@@ -1084,7 +1040,7 @@ double int_for_C_ss_tomo_limber(double a, void* params)
 
   double ans;
 
-  switch(like.IA_MODEL)
+  switch(like.IA_MODEL) 
   {
     case IA_MODEL_TATT:
     {
@@ -1125,7 +1081,7 @@ double int_for_C_ss_tomo_limber(double a, void* params)
       break;
     }
     case IA_MODEL_NLA:
-    {
+    { // OLD NLA INTERFACE (SIMPLER TO MOD IN EXTENSIONS TO WCDM)
       const int use_linear_ps = (int) ar[3];
 
       const double WK1 = W_kappa(a, fK, n1);
@@ -1207,11 +1163,12 @@ double C_ss_tomo_limber_nointerp(
   return res;     
 }
 
-double C_ss_TATT_EE_tomo_limber(const double l, const int ni, const int nj)
+double C_ss_TATT_tomo_limber(const double l, const int ni, const int nj, const int EE)
 {
   static double cache[MAX_SIZE_ARRAYS];
-  static double** table;
+  static double*** table;
   static double lim[3];
+
 
   if (table == NULL || fdiff(cache[4], Ntable.random))
   {
@@ -1220,7 +1177,7 @@ double C_ss_TATT_EE_tomo_limber(const double l, const int ni, const int nj)
     lim[2] = (lim[1] - lim[0]) / ((double) Ntable.N_ell_TATT - 1.);
     
     if (table != NULL) free(table);
-    table = (double**) malloc2d(tomo.shear_Npowerspectra, Ntable.N_ell_TATT);
+    table = (double***) malloc3d(2, tomo.shear_Npowerspectra, Ntable.N_ell_TATT);
   }
   
   if (fdiff(cache[0], cosmology.random) ||
@@ -1231,17 +1188,31 @@ double C_ss_TATT_EE_tomo_limber(const double l, const int ni, const int nj)
   {
     #pragma GCC diagnostic push
     #pragma GCC diagnostic ignored "-Wunused-variable"
+    int BM = 0;
+    for (int k=0; k<tomo.shear_Npowerspectra; k++)
+    {  
+      BM = (nuisance.ia[2][0] || nuisance.ia[2][Z1(k)] ||
+            nuisance.ia[2][Z2(k)]   || nuisance.ia[1][0]    ||
+            nuisance.ia[1][Z1(k)]   || nuisance.ia[1][Z2(k)]) ? 1 : 0;
+    } 
     {
       double ini = C_ss_tomo_limber_nointerp(exp(lim[0]),Z1(0),Z2(0),1,1);
+      ini = (BM == 1) ? C_ss_tomo_limber_nointerp(exp(lim[0]),Z1(0),Z2(0),0,1) : 0.0;
     }
     #pragma GCC diagnostic pop
     
     #pragma omp parallel for collapse(2)
     for (int k=0; k<tomo.shear_Npowerspectra; k++)
+    {  
       for (int i=0; i<Ntable.N_ell_TATT; i++)
-        table[k][i] = C_ss_tomo_limber_nointerp(exp(lim[0] + i*lim[2]), 
-                                                    Z1(k), Z2(k), 1, 0);
-    
+      { 
+        const double l = exp(lim[0]+i*lim[2]);
+        const double Z1NZ = Z1(k);
+        const double Z2NZ = Z2(k);
+        table[0][k][i] = C_ss_tomo_limber_nointerp(l, Z1NZ, Z2NZ, 1, 0);
+        table[1][k][i] = (BM == 1) ? C_ss_tomo_limber_nointerp(l,Z1NZ,Z2NZ,0,0) : 0;
+      }
+    }
     cache[0] = cosmology.random;
     cache[1] = nuisance.random_photoz_shear;
     cache[2] = nuisance.random_ia;
@@ -1270,73 +1241,8 @@ double C_ss_TATT_EE_tomo_limber(const double l, const int ni, const int nj)
     log_fatal("internal logic error in selecting bin number");
     exit(1);
   }
-  return interpol1d(table[q], Ntable.N_ell_TATT, lim[0], lim[1], lim[2], lnl);
-}
-
-double C_ss_TATT_BB_tomo_limber(const double l, const int ni, const int nj)
-{
-  static double cache[MAX_SIZE_ARRAYS];
-  static double** table;
-  static double lim[3];
-
-  if (table == NULL || fdiff(cache[4], Ntable.random))
-  {
-    lim[0] = log(fmax(limits.LMIN_tab - 1., 1.0));
-    lim[1] = log(fmax(limits.LMAX, limits.LMAX_hankel) + 1);
-    lim[2] = (lim[1] - lim[0]) / ((double) Ntable.N_ell_TATT - 1.);
-    
-    if (table != NULL) free(table);
-    table = (double**) malloc2d(tomo.shear_Npowerspectra, Ntable.N_ell_TATT);
-  }
-
-  if (fdiff(cache[0], cosmology.random) ||
-      fdiff(cache[1], nuisance.random_photoz_shear) ||
-      fdiff(cache[2], nuisance.random_ia) ||
-      fdiff(cache[3], redshift.random_shear) ||
-      fdiff(cache[4], Ntable.random))
-  {
-    #pragma GCC diagnostic push
-    #pragma GCC diagnostic ignored "-Wunused-variable"
-    {
-      double ini = C_ss_tomo_limber_nointerp(exp(lim[0]),Z1(0),Z2(0),0,1);
-    }
-    #pragma GCC diagnostic pop
-    
-    #pragma omp parallel for collapse(2)
-    for (int k=0; k<tomo.shear_Npowerspectra; k++)
-      for (int i=0; i<Ntable.N_ell_TATT; i++)
-        table[k][i] = C_ss_tomo_limber_nointerp(exp(lim[0] + i*lim[2]), 
-                                                Z1(k), Z2(k), 0, 0);
-
-    cache[0] = cosmology.random;
-    cache[1] = nuisance.random_photoz_shear;
-    cache[2] = nuisance.random_ia;
-    cache[3] = redshift.random_shear;
-    cache[4] = Ntable.random;
-  }
-
-  if (ni < 0 || 
-      ni > redshift.shear_nbin - 1 || 
-      nj < 0 || 
-      nj > redshift.shear_nbin - 1)
-  {
-    log_fatal("error in selecting bin number (ni, nj) = [%d,%d]", ni, nj);
-    exit(1);
-  }
-  
-  const double lnl = log(l);
-  if (lnl < lim[0])
-    log_warn("l = %e < l_min = %e. Extrapolation adopted", l, exp(lim[0]));
-  if (lnl > lim[1])
-    log_warn("l = %e > l_max = %e. Extrapolation adopted", l, exp(lim[1]));
-  
-  const int q = N_shear(ni, nj);
-  if (q < 0 || q > tomo.shear_Npowerspectra - 1)
-  {
-    log_fatal("internal logic error in selecting bin number");
-    exit(1);
-  }
-  return interpol1d(table[q], Ntable.N_ell_TATT, lim[0], lim[1], lim[2], lnl);
+  return  interpol1d((EE == 1) ? table[0][q] : table[1][q], 
+                     Ntable.N_ell_TATT, lim[0], lim[1], lim[2], lnl);
 }
 
 double C_ss_tomo_limber(const double l, const int ni, const int nj)
