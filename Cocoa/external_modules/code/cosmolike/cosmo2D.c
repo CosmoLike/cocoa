@@ -2360,12 +2360,12 @@ double int_for_C_gg_tomo_limber(double a, void* params)
   const double k = ell / fK;
   const double z = 1.0/a - 1.0;
 
-  const double b1i = gb1(z, ni);
+  const double b1i   = gb1(z, ni);
   const double bmagi = gbmag(z, ni);
   const double WGALi = W_gal(a, ni, hoverh0);
   const double WMAGi = W_mag(a, fK, ni);
   
-  const double b1j = gb1(z, nj);
+  const double b1j   = gb1(z, nj);
   const double bmagj = gbmag(z, nj);
   const double WGALj = W_gal(a, nj, hoverh0);
   const double WMAGj = W_mag(a, fK, nj);
