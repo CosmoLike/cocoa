@@ -272,6 +272,29 @@ void error(char *s)
 // extrapolation. If no	extrapolation desired, set these to 0
 // ============================================================
 
+double interpol1d(
+  const double* const f, 
+  const int n, 
+  const double a, 
+  const double b, 
+  const double dx, 
+  const double x) 
+{
+  double ans;
+  if (x < a) 
+    ans = f[0] + (x - a);
+  else
+  {
+    const double r = (x - a) / dx;
+    const int i = (int) floor(r);
+    if (i + 1 >= n) 
+      ans = f[n - 1] + (x - b);
+    else 
+      ans = (r - i) * (f[i + 1] - f[i]) + f[i];
+  }
+  return ans;
+}
+
 double interpol(const double* const f, const int n, const double a, 
 const double b, const double dx, const double x, const double lower, 
 const double upper) 

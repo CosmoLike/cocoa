@@ -467,7 +467,7 @@ void init_bias(arma::Col<double> bias_z_evol_model)
   {
     like.galaxy_bias_model[i] = bias_z_evol_model(i);
     
-    spdlog::info("{}: {}[{}] = {} selected.", "init_bias", 
+    spdlog::debug("{}: {}[{}] = {} selected.", "init_bias", 
       "like.galaxy_bias_model", i, bias_z_evol_model(i));
   }
 
@@ -2413,8 +2413,6 @@ void compute_gs_fourier_masked(vector& data_vector, const int start)
 {
   if (like.shear_pos == 1)
   {
-    constexpr int fnr = 0; // force_no_recompute
-
     for (int nz=0; nz<tomo.shear_Npowerspectra; nz++)
     {
       const int zl = ZL(nz);
@@ -2426,7 +2424,7 @@ void compute_gs_fourier_masked(vector& data_vector, const int start)
         
         if (test_kmax(like.ell[i], zl))
         {
-          data_vector(index) = C_gs_tomo_limber(like.ell[i], zl, zs, fnr)*
+          data_vector(index) = C_gs_tomo_limber(like.ell[i], zl, zs)*
               (1.0 + nuisance.shear_calibration_m[zs]);
         }
         else
@@ -2469,8 +2467,6 @@ void compute_gg_fourier_masked(vector& data_vector, const int start)
 {
   if (like.pos_pos == 1)
   {
-    constexpr int fnr = 0; // force_no_recompute
-
     for (int nz=0; nz<tomo.clustering_Npowerspectra; nz++)
     {
       for (int i=0; i<like.Ncl; i++)
@@ -2478,13 +2474,9 @@ void compute_gg_fourier_masked(vector& data_vector, const int start)
         const int index = start + Ntable.Ntheta*nz + i;
 
         if (test_kmax(like.ell[i], nz))
-        {
-          data_vector(index) = C_gg_tomo_limber(like.ell[i], nz, nz, fnr);
-        }
+          data_vector(index) = C_gg_tomo_limber(like.ell[i], nz, nz);
         else
-        {
           data_vector(index) = 0.0;
-        }
       }
     }
   }
@@ -2554,10 +2546,8 @@ void compute_kk_fourier_masked(vector& data_vector, const int start)
         if (IP::get_instance().get_mask(index))
         {
           const double l = like.ell[i];
-          
           data_vector(index) = (l <= limits.LMIN_tab) ? 
-            C_kk_limber_nointerp(l, 0, 0) :
-            C_kk_limber(l, 0);
+            C_kk_limber_nointerp(l, 0, 0) : C_kk_limber(l);
         }
       }
     }
@@ -2566,8 +2556,7 @@ void compute_kk_fourier_masked(vector& data_vector, const int start)
       for (int L=like.lmin_bp; L<like.lmax_bp + 1; L++)
       {
         const double Ckk = (L <= limits.LMIN_tab) ? 
-          C_kk_limber_nointerp((double) L, 0, 0) : 
-          C_kk_limber((double) L, 0);
+          C_kk_limber_nointerp((double) L, 0, 0) : C_kk_limber((double) L);
 
         const int i = L - like.lmin_bp;
 

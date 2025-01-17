@@ -24,8 +24,9 @@
 
 #include "log.c/src/log.h"
 
-static int ps_lin_limber = 0; // 0 or 1 
+static int pslin_only = 0; // 0 or 1 
 static int include_HOD_GX = 0; // 0 or 1
+
 static int include_RSD_GS = 0; // 0 or 1 
 static int include_RSD_GG = 1; // 0 or 1 
 static int include_RSD_GK = 0; // 0 or 1
@@ -75,30 +76,6 @@ double w_pixel(const double ell)
   }
 
   return (lbins > 0) ? ((l < lbins) ? cl_pixel[l] : 0.0) : 1.0;
-}
-
-double C_gk_tomo_limber_nointerp_wrapper(double l, int ni, int use_linear_ps,
-const int init_static_vars_only)
-{
-  return 
-    C_gk_tomo_limber_nointerp(l, ni, use_linear_ps, init_static_vars_only)*beam_cmb(l)*w_pixel(l);
-}
-
-double C_gk_tomo_limber_wrapper(double l, int ni, const int force_no_recompute)
-{
-  return C_gk_tomo_limber(l, ni, force_no_recompute)*beam_cmb(l)*w_pixel(l);
-}
-
-double C_ks_tomo_limber_nointerp_wrapper(double l, int ni, int use_linear_ps, 
-const int init_static_vars_only)
-{
-  return 
-    C_ks_tomo_limber_nointerp(l, ni, use_linear_ps, init_static_vars_only)*beam_cmb(l)*w_pixel(l);
-}
-
-double C_ks_tomo_limber_wrapper(double l, int ni, const int force_no_recompute)
-{
-  return C_ks_tomo_limber(l, ni, force_no_recompute)*beam_cmb(l)*w_pixel(l);
 }
 
 static int has_b2_galaxies()
@@ -281,10 +258,8 @@ double xi_pm_tomo(
             const int Z2NZ = Z2(0);
             const int l = limits.LMIN_tab + 1;
 
-            double trash = C_ss_TATT_EE_tomo_limber((double) l, Z1NZ, Z2NZ); 
-            
-            trash = (BM == 1) ? 
-              C_ss_TATT_BB_tomo_limber((double) l, Z1NZ, Z2NZ) : 0.0;
+            double ini = C_ss_TATT_EE_tomo_limber(l, Z1NZ, Z2NZ); 
+            ini = (BM == 1) ? C_ss_TATT_BB_tomo_limber(l, Z1NZ, Z2NZ) : 0.0;
           }
           #pragma GCC diagnostic pop
           #pragma GCC diagnostic pop
@@ -294,7 +269,7 @@ double xi_pm_tomo(
           {
             for (int l=lmin; l<limits.LMIN_tab; l++)
             {
-              const int init_static_vars_only = 0; // FALSE
+              const int init = 0; // FALSE
               const int Z1NZ = Z1(nz);
               const int Z2NZ = Z2(nz);
 
@@ -302,11 +277,11 @@ double xi_pm_tomo(
                               nuisance.ia[2][Z2NZ] || nuisance.ia[1][0]    ||
                               nuisance.ia[1][Z1NZ] || nuisance.ia[1][Z2NZ]) ? 1 : 0;
 
-              Cl[0][nz][l] = C_ss_TATT_EE_tomo_limber_nointerp((double) l, Z1NZ, 
-                Z2NZ, init_static_vars_only);
+              Cl[0][nz][l] = C_ss_TATT_EE_tomo_limber_nointerp(l, Z1NZ, 
+                Z2NZ, init);
           
               Cl[1][nz][l] = (BM == 1) ? C_ss_TATT_BB_tomo_limber_nointerp(
-                (double) l, Z1NZ, Z2NZ, init_static_vars_only) : 0.0;
+                l, Z1NZ, Z2NZ, init) : 0.0;
             }
           }          
           #pragma omp parallel for collapse(2)
@@ -321,10 +296,10 @@ double xi_pm_tomo(
                               nuisance.ia[2][Z2NZ] || nuisance.ia[1][0]    ||
                               nuisance.ia[1][Z1NZ] || nuisance.ia[1][Z2NZ]) ? 1 : 0;
 
-              Cl[0][nz][l] = C_ss_TATT_EE_tomo_limber((double) l, Z1NZ, Z2NZ);
+              Cl[0][nz][l] = C_ss_TATT_EE_tomo_limber(l, Z1NZ, Z2NZ);
           
               Cl[1][nz][l] = (BM == 1) ?  
-                C_ss_TATT_BB_tomo_limber((double) l, Z1NZ, Z2NZ) : 0.0;
+                C_ss_TATT_BB_tomo_limber(l, Z1NZ, Z2NZ) : 0.0;
             }
           }
 
@@ -358,21 +333,21 @@ double xi_pm_tomo(
 
           #pragma GCC diagnostic push
           #pragma GCC diagnostic ignored "-Wunused-variable"
+          for (int nz=0; nz<NSIZE; nz++)
           { // init static variables inside the C_XY_limber function
             const int l = limits.LMIN_tab + 1;
-            double trash = C_ss_tomo_limber((double) l, Z1(0), Z2(0)); 
+            double ini = C_ss_tomo_limber(l, Z1(nz), Z2(nz)); 
           }
           #pragma GCC diagnostic pop
           
           #pragma omp parallel for collapse(2)
           for (int nz=0; nz<NSIZE; nz++)
             for (int l=lmin; l<limits.LMIN_tab; l++)
-              Cl[nz][l] = C_ss_tomo_limber_nointerp((double) l, Z1(nz), Z2(nz), 
-                                                    ps_lin_limber, 0);
+              Cl[nz][l] = C_ss_tomo_limber_nointerp(l, Z1(nz), Z2(nz), pslin_only, 0); 
           #pragma omp parallel for collapse(2)
           for (int nz=0; nz<NSIZE; nz++)
             for (int l=limits.LMIN_tab; l<limits.LMAX; l++)        
-              Cl[nz][l] = C_ss_tomo_limber((double) l, Z1(nz), Z2(nz));
+              Cl[nz][l] = C_ss_tomo_limber(l, Z1(nz), Z2(nz));
 
           #pragma omp parallel for collapse(2)
           for (int nz=0; nz<NSIZE; nz++)
@@ -443,12 +418,7 @@ double xi_pm_tomo(
 // ---------------------------------------------------------------------------
 // ---------------------------------------------------------------------------
 
-double w_gammat_tomo(
-    const int nt, 
-    const int ni, 
-    const int nj, 
-    const int limber
-  )
+double w_gammat_tomo(const int nt, const int ni, const int nj, const int limber)
 {
   static double** Pl = NULL;
   static double* w_vec = NULL;
@@ -536,7 +506,7 @@ double w_gammat_tomo(
       const int ZLNZ = ZL(nz);
       const int ZSNZ = ZS(nz);
       const int l = limits.LMIN_tab + 1; 
-      double trash = C_gs_tomo_limber((double) l, ZLNZ, ZSNZ, 0);
+      double ini = C_gs_tomo_limber(l, ZLNZ, ZSNZ);
     }
     #pragma GCC diagnostic pop
 
@@ -545,17 +515,12 @@ double w_gammat_tomo(
       #pragma omp parallel for collapse(2)
       for (int nz=0; nz<NSIZE; nz++)
         for (int l=lmin; l<limits.LMIN_tab; l++)
-          Cl[nz][l] = C_gs_tomo_limber_nointerp(l, ZL(nz), ZS(nz), ps_lin_limber, 0);
+          Cl[nz][l] = C_gs_tomo_limber_nointerp(l, ZL(nz), ZS(nz), pslin_only, 0);
       
       #pragma omp parallel for collapse(2)
       for (int nz=0; nz<NSIZE; nz++)
-      {
-        for (int l=limits.LMIN_tab; l<limits.LMAX; l++)
-        {
-          const int force_no_recompute = 1;    // TRUE          
-          Cl[nz][l] = C_gs_tomo_limber((double) l, ZL(nz), ZS(nz), force_no_recompute);
-        }
-      }
+        for (int l=limits.LMIN_tab; l<limits.LMAX; l++)      
+          Cl[nz][l] = C_gs_tomo_limber(l, ZL(nz), ZS(nz));
     }
     else
     {
@@ -573,17 +538,8 @@ double w_gammat_tomo(
       
       #pragma omp parallel for collapse(2)
       for (int nz=0; nz<NSIZE; nz++) // LIMBER PART
-      {
         for (int l=limits.LMAX_NOLIMBER+1; l<limits.LMAX; l++)
-        {
-          const int force_no_recompute = 1;    // TRUE
-          const int ZLNZ = ZL(nz);
-          const int ZSNZ = ZS(nz);
-
-          Cl[nz][l] = C_gs_tomo_limber((double) l, ZLNZ, ZSNZ, 
-            force_no_recompute);
-        }
-      }
+          Cl[nz][l] = C_gs_tomo_limber(l, ZL(nz), ZS(nz));
     }
 
     #pragma omp parallel for collapse(2)
@@ -638,12 +594,7 @@ double w_gammat_tomo(
 // ---------------------------------------------------------------------------
 // ---------------------------------------------------------------------------
 
-double w_gg_tomo(
-    const int nt, 
-    const int ni, 
-    const int nj, 
-    const int limber
-  )
+double w_gg_tomo(const int nt, const int ni, const int nj, const int limber)
 {
   static double** Pl = NULL;
   static double* w_vec = NULL;
@@ -725,11 +676,7 @@ double w_gg_tomo(
     #pragma GCC diagnostic push
     #pragma GCC diagnostic ignored "-Wunused-variable"
     { // init static variables inside the C_XY_limber function
-      const int force_no_recompute = 0;    // FALSE
-      const int Z1 = 0;
-      const int Z2 = 0;
-      const int l = limits.LMIN_tab + 1;
-      double trash = C_gg_tomo_limber((double) l, Z1, Z2, force_no_recompute);
+      double ini = C_gg_tomo_limber(limits.LMIN_tab + 1, 0, 0);
     }
     #pragma GCC diagnostic pop
     
@@ -737,32 +684,12 @@ double w_gg_tomo(
     {
       #pragma omp parallel for collapse(2)
       for (int nz=0; nz<NSIZE; nz++)
-      {
         for (int l=lmin; l<limits.LMIN_tab; l++)
-        {
-          const int init_static_vars_only = 0; // FALSE
-          const int q = nz;
-          const int Z1 = nz; // cross redshift bin not supported so not using ZCL1(k)
-          const int Z2 = nz; // cross redshift bin not supported so not using ZCL2(k)
-          
-          Cl[q][l] = C_gg_tomo_limber_nointerp((double) l, Z1, Z2, 
-            ps_lin_limber, init_static_vars_only);
-        }
-      }
-      
+          Cl[nz][l] = C_gg_tomo_limber_nointerp( l, nz, nz, pslin_only, 0);
       #pragma omp parallel for collapse(2)
       for (int nz=0; nz<NSIZE; nz++)
-      {
         for (int l=limits.LMIN_tab; l<limits.LMAX; l++)
-        {
-          const int force_no_recompute = 1;    // TRUE
-          const int q = nz;
-          const int Z1 = nz; // cross redshift bin not supported so not using ZCL1(k)
-          const int Z2 = nz; // cross redshift bin not supported so not using ZCL2(k)
-          
-          Cl[q][l] = C_gg_tomo_limber((double) l, Z1, Z2, force_no_recompute);
-        }
-      }
+          Cl[nz][l] = C_gg_tomo_limber( l, nz, nz);
     }
     else
     {
@@ -777,20 +704,10 @@ double w_gg_tomo(
         
         C_cl_tomo(L, Z1, Z2, Cl[nz], dev, tolerance);
       }
-      
       #pragma omp parallel for collapse(2)
       for (int nz=0; nz<NSIZE; nz++) // LIMBER PART
-      {
         for (int l=limits.LMAX_NOLIMBER+1; l<limits.LMAX; l++)
-        {
-          const int force_no_recompute = 1;    // TRUE
-          const int q = nz;
-          const int Z1 = nz; // cross redshift bin not supported so not using ZCL1(k)
-          const int Z2 = nz; // cross redshift bin not supported so not using ZCL2(k)
-          
-          Cl[q][l] = C_gg_tomo_limber((double) l, Z1, Z2, force_no_recompute);
-        }
-      }
+          Cl[nz][l] = C_gg_tomo_limber( l, nz, nz);
     }
 
     #pragma omp parallel for collapse(2)
@@ -929,38 +846,21 @@ double w_gk_tomo(const int nt, const int ni, const int limber)
       #pragma GCC diagnostic push
       #pragma GCC diagnostic ignored "-Wunused-variable"
       { // init static variables inside the C_XY_limber function
-        const int force_no_recompute = 0;    // FALSE
-        const int nz = 0;
-        const int l = limits.LMIN_tab + 1;
-        
-        double trash = C_gk_tomo_limber_wrapper((double) l, nz, 
-          force_no_recompute);
+        const double l = limits.LMIN_tab+1;      
+        double ini = C_gk_tomo_limber(l, 0)*beam_cmb(l)*w_pixel(l);
       }
       #pragma GCC diagnostic pop
       
       #pragma omp parallel for collapse(2)
       for (int nz=0; nz<NSIZE; nz++)
-      {
         for (int l=lmin; l<limits.LMIN_tab; l++)
-        {
-          const int init_static_vars_only = 0; // FALSE
-
-          Cl[nz][l] = C_gk_tomo_limber_nointerp_wrapper((double) l, nz, 
-            ps_lin_limber, init_static_vars_only);
-        }
-      }
+          Cl[nz][l] = 
+          C_gk_tomo_limber_nointerp(l, nz, pslin_only, 0)*beam_cmb(l)*w_pixel(l);
 
       #pragma omp parallel for collapse(2)
       for (int nz=0; nz<NSIZE; nz++)
-      {
         for (int l=limits.LMIN_tab; l<limits.LMAX; l++)
-        {
-          const int force_no_recompute = 1;    // TRUE
-          
-          Cl[nz][l] = C_gk_tomo_limber_wrapper((double) l, nz, 
-            force_no_recompute);
-        }
-      }
+          Cl[nz][l] = C_gk_tomo_limber(l, nz)*beam_cmb(l)*w_pixel(l);
 
       #pragma omp parallel for collapse(2)
       for (int nz=0; nz<NSIZE; nz++)
@@ -1007,7 +907,6 @@ double w_gk_tomo(const int nt, const int ni, const int limber)
     log_fatal("internal logic error in selecting bin number");
     exit(1);
   }  
-  
   return w_vec[q];
 }
 
@@ -1015,11 +914,7 @@ double w_gk_tomo(const int nt, const int ni, const int limber)
 // ---------------------------------------------------------------------------
 // ---------------------------------------------------------------------------
 
-double w_ks_tomo(
-    const int nt, 
-    const int ni, 
-    const int limber
-  )
+double w_ks_tomo(const int nt, const int ni, const int limber)
 {
   static double** Pl = NULL;
   static double* w_vec = NULL;
@@ -1101,40 +996,23 @@ double w_ks_tomo(
     {      
       #pragma GCC diagnostic push
       #pragma GCC diagnostic ignored "-Wunused-variable"
-      { // init static variables inside the C_XY_limber function
-        const int force_no_recompute = 0;    // FALSE
-        const int nz = 0;
-        const int l  = limits.LMIN_tab + 1;
-        
-        double trash = C_ks_tomo_limber_wrapper((double) l, nz, 
-          force_no_recompute);
+      { // init static variables inside the C_XY_limber function        
+        const double l = limits.LMIN_tab+1;
+        double ini = C_ks_tomo_limber(l, 0)*beam_cmb(l)*w_pixel(l);
       }
       #pragma GCC diagnostic pop
       
       #pragma omp parallel for collapse(2)
       for (int nz=0; nz<redshift.shear_nbin; nz++)
-      {
         for (int l=lmin; l<limits.LMIN_tab; l++)
-        {
-          const int init_static_vars_only = 0; // FALSE
-          
-          Cl[nz][l] = C_ks_tomo_limber_nointerp_wrapper((double) l, nz, 
-            ps_lin_limber, init_static_vars_only);
-        }
-      }
-
+          Cl[nz][l] = 
+            C_ks_tomo_limber_nointerp(l, nz, pslin_only, 0)*beam_cmb(l)*w_pixel(l);
+         
       #pragma omp parallel for collapse(2)
       for (int nz=0; nz<NSIZE; nz++)
-      {
-        for (int l=limits.LMIN_tab; l<limits.LMAX; l++)
-        {
-          const int force_no_recompute = 1;    // TRUE
-
-          Cl[nz][l] = C_ks_tomo_limber_wrapper((double) l, nz, 
-            force_no_recompute);
-        }
-      }
-      
+        for (int l=limits.LMIN_tab; l<limits.LMAX; l++)   
+          Cl[nz][l] = C_ks_tomo_limber(l, nz)*beam_cmb(l)*w_pixel(l);
+   
       #pragma omp parallel for collapse(2)
       for (int nz=0; nz<NSIZE; nz++)
       {
@@ -1306,7 +1184,7 @@ double C_ss_TATT_EE_tomo_limber_nointerp(
     double l, 
     int ni, 
     int nj, 
-    const int init_static_vars_only
+    const int init
   )
 {
   static double cache[MAX_SIZE_ARRAYS];
@@ -1335,7 +1213,7 @@ double C_ss_TATT_EE_tomo_limber_nointerp(
   const double amax = fmin(amax_source(ni), amax_source(nj));
 
   double res = 0.0;
-  if (init_static_vars_only == 1)
+  if (init == 1)
     res = int_for_C_ss_TATT_EE_tomo_limber(amin, (void*) ar);
   else
   {
@@ -1351,7 +1229,7 @@ double C_ss_TATT_BB_tomo_limber_nointerp(
     double l, 
     int ni, 
     int nj, 
-    const int init_static_vars_only
+    const int init
   )
 {
   static double cache[MAX_SIZE_ARRAYS];
@@ -1385,7 +1263,7 @@ double C_ss_TATT_BB_tomo_limber_nointerp(
   }
 
   double res = 0.0;
-  if (init_static_vars_only == 1)
+  if (init == 1)
     res = int_for_C_ss_TATT_BB_tomo_limber(amin, (void*) ar);
   else
   {
@@ -1444,25 +1322,15 @@ double C_ss_TATT_EE_tomo_limber(
     #pragma GCC diagnostic push
     #pragma GCC diagnostic ignored "-Wunused-variable"
     {
-      const int k = 0;
-      const int Z1NZ = Z1(k);
-      const int Z2NZ = Z2(k);
-      const double lnl = lnlmin;
-      double init = C_ss_TATT_EE_tomo_limber_nointerp(exp(lnl), Z1NZ, Z2NZ, 1);
+      double init = C_ss_TATT_EE_tomo_limber_nointerp(exp(lnlmin), Z1(0), Z2(0), 1);
     }
     #pragma GCC diagnostic pop
     
     #pragma omp parallel for collapse(2)
     for (int k=0; k<NSIZE; k++)
-    {
       for (int i=0; i<nell; i++)
-      {
-        const int Z1NZ = Z1(k);
-        const int Z2NZ = Z2(k);
-        const double lnl = lnlmin + i*dlnl;
-        table[k][i] = C_ss_TATT_EE_tomo_limber_nointerp(exp(lnl), Z1NZ, Z2NZ, 0);
-      }
-    }
+        table[k][i] = C_ss_TATT_EE_tomo_limber_nointerp(exp(lnlmin + i*dlnl), 
+                                                        Z1(k), Z2(k), 0);
     
     #pragma omp parallel for
     for (int k=0; k<NSIZE; k++)
@@ -1736,7 +1604,7 @@ double C_ss_tomo_limber_nointerp(
     int ni, 
     int nj, 
     int use_linear_ps, 
-    const int init_static_vars_only
+    const int init
   )
 {
   static double cache[MAX_SIZE_ARRAYS];
@@ -1769,10 +1637,8 @@ double C_ss_tomo_limber_nointerp(
   }
 
   double res = 0.0;
-  if (init_static_vars_only == 1)
-  {
+  if (init == 1)
     res = int_for_C_ss_tomo_limber(amin, (void*) ar);
-  }
   else
   {
     gsl_function F;
@@ -1783,30 +1649,20 @@ double C_ss_tomo_limber_nointerp(
   return res;     
 }
 
-double C_ss_tomo_limber(
-    double l, 
-    int ni, 
-    int nj
-  )
+double C_ss_tomo_limber(const double l, const int ni, const int nj)
 {
   static double cache[MAX_SIZE_ARRAYS];
   static double** table = NULL;
-  static int NSIZE = 0;
-  static int nell = 0;
-  static double lnlmin;
-  static double lnlmax;
-  static double dlnl;
+  static double lim[3];
 
   if (table == NULL || fdiff(cache[4], Ntable.random))
   {
-    nell   = Ntable.N_ell;
-    NSIZE  = tomo.shear_Npowerspectra;
-    lnlmin = log(fmax(limits.LMIN_tab - 1., 1.0));
-    lnlmax = log(fmax(limits.LMAX, limits.LMAX_hankel) + 1);
-    dlnl   = (lnlmax - lnlmin)/(Ntable.N_ell - 1.);
+    lim[0] = log(fmax(limits.LMIN_tab - 1., 1.0));
+    lim[1] = log(fmax(limits.LMAX, limits.LMAX_hankel) + 1);
+    lim[2]   = (lim[1] - lim[0])/(Ntable.N_ell - 1.);
     
     if (table != NULL) free(table);
-    table = (double**) malloc2d(NSIZE, nell);
+    table = (double**) malloc2d(tomo.shear_Npowerspectra, Ntable.N_ell);
   }
 
   if (fdiff(cache[0], cosmology.random) ||
@@ -1817,32 +1673,17 @@ double C_ss_tomo_limber(
   { 
     #pragma GCC diagnostic push
     #pragma GCC diagnostic ignored "-Wunused-variable"
-    for (int k=0; k<NSIZE; k++)
     {
-      const int init_static_vars_only = 1; // TRUE
-      const int k = 0;
-      const int Z1NZ = Z1(k);
-      const int Z2NZ = Z2(k);
-      const double lmin = exp(lnlmin);
-      double trash = C_ss_tomo_limber_nointerp(lmin, Z1NZ, Z2NZ, 
-        ps_lin_limber, init_static_vars_only);
+      const double lmin = exp(lim[0]);
+      double ini = C_ss_tomo_limber_nointerp(lmin, Z1(0), Z2(0), pslin_only, 1);
     }
     #pragma GCC diagnostic pop
     
     #pragma omp parallel for collapse(2)
-    for (int k=0; k<NSIZE; k++)
-    {
+    for (int k=0; k<tomo.shear_Npowerspectra; k++)
       for (int i=0; i<Ntable.N_ell; i++)
-      {
-        const int init_static_vars_only = 0; // FALSE
-        const int Z1NZ = Z1(k);
-        const int Z2NZ = Z2(k);
-        const double l = exp(lnlmin + i*dlnl);
-        
-        table[k][i]= log(C_ss_tomo_limber_nointerp(l, Z1NZ, Z2NZ, 
-          ps_lin_limber, init_static_vars_only));
-      }
-    }
+        table[k][i] = 
+        C_ss_tomo_limber_nointerp(exp(lim[0]+i*lim[2]), Z1(k), Z2(k), pslin_only, 0);
 
     cache[0] = cosmology.random;
     cache[1] = nuisance.random_photoz_shear;
@@ -1861,24 +1702,18 @@ double C_ss_tomo_limber(
   }
 
   const double lnl = log(l);
-  if (lnl < lnlmin || lnl > lnlmax)
+  if (lnl < lim[0] || lnl > lim[1])
   {
-    log_fatal("l = %e outside look-up table range [%e,%e]", l, 
-      exp(lnlmin), exp(lnlmax));
+    log_fatal("l = %e outside range [%e,%e]", l, exp(lim[0]), exp(lim[1]));
     exit(1);
   }
-
   const int q = N_shear(ni, nj);
-  if (q > NSIZE - 1)
+  if (q > tomo.shear_Npowerspectra - 1)
   {
     log_fatal("error in selecting bin number");
     exit(1);
   }
-  
-  const double f1 = exp(interpol_fitslope(table[q], Ntable.N_ell, lnlmin, 
-    lnlmax, dlnl, lnl, 1.));
-
-  return isnan(f1) ? 0.0 : f1;
+  return interpol1d(table[q], Ntable.N_ell, lim[0], lim[1], lim[2], lnl);
 }
 
 // ---------------------------------------------------------------------------
@@ -2118,7 +1953,7 @@ double C_gs_tomo_limber_nointerp(
     int nl, 
     int ns, 
     int use_linear_ps,
-    const int init_static_vars_only
+    const int init
   )
 {
   static double cache[MAX_SIZE_ARRAYS];
@@ -2159,7 +1994,7 @@ double C_gs_tomo_limber_nointerp(
 
   double res;
   
-  if (init_static_vars_only == 1)
+  if (init == 1)
   {
     switch(like.IA_MODEL)
     {
@@ -2229,92 +2064,63 @@ double C_gs_tomo_limber_nointerp(
   return res;
 }
 
-double C_gs_tomo_limber(
-    double l, 
-    int ni, 
-    int nj, 
-    const int force_no_recompute
-  )
+double C_gs_tomo_limber(const double l, const int ni, const int nj)
 {
   static double cache[MAX_SIZE_ARRAYS];
   static double** table = NULL;
-  static int NSIZE;
   static int nell;
-  static double lnlmin;
-  static double lnlmax;
-  static double dlnl;
+  static double lim[3];
 
-  if (force_no_recompute == 0)
-  { // Cocoa: nell = 10^5 on real funcs, so recompute funcs are expensive
-    if (table == NULL || fdiff(cache[6], Ntable.random)) 
-    {
-      NSIZE  = tomo.ggl_Npowerspectra;
-      nell   = (int) number_ell_fourier_2pt();
-      lnlmin = log(fmax(limits.LMIN_tab, 1.0));
-      lnlmax = log(fmax(limits.LMAX, limits.LMAX_hankel) + 1);
-      dlnl   = (lnlmax - lnlmin) / ((double) nell - 1.0);
+  if (table == NULL || fdiff(cache[6], Ntable.random)) 
+  {
+    nell   = (int) number_ell_fourier_2pt();
+    lim[0] = log(fmax(limits.LMIN_tab, 1.0));
+    lim[1] = log(fmax(limits.LMAX, limits.LMAX_hankel) + 1);
+    lim[2] = (lim[1] - lim[0]) / ((double) nell - 1.0);
 
-      if (table != NULL) free(table);
-      table = (double**) malloc2d(NSIZE, nell);
-    }
-
-    if (fdiff(cache[0], cosmology.random) ||
-        fdiff(cache[1], nuisance.random_photoz_shear) ||
-        fdiff(cache[2], nuisance.random_photoz_clustering) ||
-        fdiff(cache[3], nuisance.random_ia) ||
-        fdiff(cache[4], redshift.random_shear) ||
-        fdiff(cache[5], redshift.random_clustering) ||
-        fdiff(cache[6], Ntable.random) ||
-        fdiff(cache[7], nuisance.random_galaxy_bias))
-    {
-      #pragma GCC diagnostic push
-      #pragma GCC diagnostic ignored "-Wunused-variable"
-      for (int k=0; k<NSIZE; k++)
-      { // init static variables inside the C_XY_limber_nointerp function
-        const int init_static_vars_only = 1; // TRUE
-        const int ZLNZ = ZL(k);
-        const int ZSNZ = ZS(k);
-        
-        double trash = C_gs_tomo_limber_nointerp(exp(lnlmin), ZLNZ, ZSNZ, 
-          ps_lin_limber, init_static_vars_only);
-      }
-      #pragma GCC diagnostic pop
-
-      #pragma omp parallel for collapse(2)
-      for (int k=0; k<NSIZE; k++)
-      {
-        for (int i=0; i<nell; i++)
-        {
-          const int init_static_vars_only = 0; // FALSE
-          const int ZLNZ = ZL(k);
-          const int ZSNZ = ZS(k);
-          const double lnl = lnlmin + i*dlnl;
-          
-          if (test_zoverlap(ZLNZ, ZSNZ))
-          {
-            table[k][i] = C_gs_tomo_limber_nointerp(exp(lnl), ZLNZ, ZSNZ, 
-              ps_lin_limber, init_static_vars_only);
-          }
-          else
-          {
-            table[k][i] = 0.0;
-          }
-        }
-      }
-
-      cache[0] = cosmology.random;
-      cache[1] = nuisance.random_photoz_shear;
-      cache[2] = nuisance.random_photoz_clustering;
-      cache[3] = nuisance.random_ia;
-      cache[4] = redshift.random_shear;
-      cache[5] = redshift.random_clustering;
-      cache[6] = Ntable.random;
-      cache[7] = nuisance.random_galaxy_bias;
-    }
+    if (table != NULL) free(table);
+    table = (double**) malloc2d(tomo.ggl_Npowerspectra, nell);
   }
 
+  if (fdiff(cache[0], cosmology.random) ||
+      fdiff(cache[1], nuisance.random_photoz_shear) ||
+      fdiff(cache[2], nuisance.random_photoz_clustering) ||
+      fdiff(cache[3], nuisance.random_ia) ||
+      fdiff(cache[4], redshift.random_shear) ||
+      fdiff(cache[5], redshift.random_clustering) ||
+      fdiff(cache[6], Ntable.random) ||
+      fdiff(cache[7], nuisance.random_galaxy_bias))
+  {
+    #pragma GCC diagnostic push
+    #pragma GCC diagnostic ignored "-Wunused-variable"
+    for (int k=0; k<tomo.ggl_Npowerspectra; k++)
+    { // init static variables inside the C_XY_limber_nointerp function     
+      double ini = 
+        C_gs_tomo_limber_nointerp(exp(lim[0]), ZL(k), ZS(k), pslin_only, 1);
+    }
+    #pragma GCC diagnostic pop
+
+    #pragma omp parallel for collapse(2)
+    for (int k=0; k<tomo.ggl_Npowerspectra; k++)
+      for (int i=0; i<nell; i++)      
+        if (test_zoverlap(ZL(k), ZS(k)))
+          table[k][i] = C_gs_tomo_limber_nointerp(exp(lim[0] + i*lim[2]), 
+            ZL(k), ZS(k), pslin_only, 0);
+        else
+          table[k][i] = 0.0;
+
+    cache[0] = cosmology.random;
+    cache[1] = nuisance.random_photoz_shear;
+    cache[2] = nuisance.random_photoz_clustering;
+    cache[3] = nuisance.random_ia;
+    cache[4] = redshift.random_shear;
+    cache[5] = redshift.random_clustering;
+    cache[6] = Ntable.random;
+    cache[7] = nuisance.random_galaxy_bias;
+  }
+  
   const int q = N_ggl(ni, nj);
-  if (q < 0 || q > NSIZE - 1)
+  if (q < 0 || q > tomo.ggl_Npowerspectra - 1)
   {
     log_fatal("internal logic error in selecting bin number");
     exit(1);
@@ -2324,13 +2130,11 @@ double C_gs_tomo_limber(
   if (test_zoverlap(ni, nj))
   {
     const double lnl = log(l);
-    if (lnl < lnlmin)
-      log_warn("l = %e < l_min = %e. Extrapolation adopted", l, exp(lnlmin));
-    if (lnl > lnlmax)
-      log_warn("l = %e > l_max = %e. Extrapolation adopted", l, exp(lnlmax));
-  
-    const double f1 = interpol(table[q], nell, lnlmin, lnlmax, dlnl, lnl, 0, 0);
-    res = isnan(f1) ? 0.0 : f1;
+    if (lnl < lim[0])
+      log_warn("l = %e < l_min = %e. Extrapolation adopted", l, exp(lim[0]));
+    if (lnl > lim[1])
+      log_warn("l = %e > l_max = %e. Extrapolation adopted", l, exp(lim[1]));
+    res = interpol1d(table[q], nell, lim[0], lim[1], lim[2], lnl);
   }
   return res;
 }
@@ -2515,7 +2319,7 @@ double C_gg_tomo_limber_nointerp(
     int ni, 
     int nj, 
     int use_linear_ps,
-    const int init_static_vars_only
+    const int init
   )
 {
   static double cache[MAX_SIZE_ARRAYS];
@@ -2560,7 +2364,7 @@ double C_gg_tomo_limber_nointerp(
   }
 
   double res = 0.0;
-  if (init_static_vars_only == 1)
+  if (init == 1)
   {
     if (has_b2_galaxies() && use_linear_ps == 0)
       res = int_for_C_gg_tomo_limber_withb2(amin, (void*) ar);
@@ -2582,12 +2386,7 @@ double C_gg_tomo_limber_nointerp(
   return res;
 }
 
-double C_gg_tomo_limber(
-    double l, 
-    int ni, 
-    int nj, 
-    const int force_no_recompute
-  )
+double C_gg_tomo_limber(const double l, const int ni, const int nj)
 { // cross redshift bin not supported
   static double cache[MAX_SIZE_ARRAYS];
   static double** table = NULL;
@@ -2597,62 +2396,44 @@ double C_gg_tomo_limber(
   static double lnlmax;
   static double dlnl;
   
-  if (force_no_recompute == 0)
-  { // Cocoa: nell = 10^5 on real funcs, so recompute funcs are expensive
-    if (table == NULL || fdiff(cache[3], Ntable.random))
-    {
-      nell   = Ntable.N_ell;
-      NSIZE  = redshift.clustering_nbin;
-      lnlmin = log(fmax(limits.LMIN_tab, 1.0));
-      lnlmax = log(fmax(limits.LMAX, limits.LMAX_hankel) + 1);
-      dlnl   = (lnlmax - lnlmin) / ((double) nell - 1.0);
-  
-      if (table != NULL) free(table);
-      table = (double**) malloc2d(NSIZE, nell);
-    }
+  if (table == NULL || fdiff(cache[3], Ntable.random))
+  {
+    nell   = Ntable.N_ell;
+    NSIZE  = redshift.clustering_nbin;
+    lnlmin = log(fmax(limits.LMIN_tab, 1.0));
+    lnlmax = log(fmax(limits.LMAX, limits.LMAX_hankel) + 1);
+    dlnl   = (lnlmax - lnlmin) / ((double) nell - 1.0);
 
-    if (fdiff(cache[0], cosmology.random) ||
-        fdiff(cache[1], nuisance.random_photoz_clustering) ||
-        fdiff(cache[2], redshift.random_clustering) ||
-        fdiff(cache[3], Ntable.random) ||
-        fdiff(cache[4], nuisance.random_galaxy_bias))
-    {
-      #pragma GCC diagnostic push
-      #pragma GCC diagnostic ignored "-Wunused-variable"
-      for (int k=0; k<NSIZE; k++) 
-      { // init static variables inside the C_XY_limber_nointerp function
-        const int init_static_vars_only = 1; // TRUE
-        const int ZCL1 = k;
-        const int ZCL2 = k;
-        
-        double trash = C_gg_tomo_limber_nointerp(exp(lnlmin), ZCL1, ZCL2, 
-          ps_lin_limber, init_static_vars_only);
-      }
-      #pragma GCC diagnostic pop
-      
-      #pragma omp parallel for collapse(2)
-      for (int k=0; k<NSIZE; k++)  
-      {
-        for (int p=0; p<nell; p++)
-        {
-          const int init_static_vars_only = 0; // FALSE
-          const int ZCL1 = k; // cross redshift bin not supported; not using ZCL1(k)
-          const int ZCL2 = k; // cross redshift bin not supported; not using ZCL2(k)
-          const double lnl = lnlmin + p*dlnl;
-          
-          const double res = C_gg_tomo_limber_nointerp(exp(lnl), ZCL1, ZCL2, 
-            ps_lin_limber, init_static_vars_only);
-          
-          table[k][p] = log(res); // TODO: change this
-        }
-      }
+    if (table != NULL) free(table);
+    table = (double**) malloc2d(NSIZE, nell);
+  }
 
-      cache[0] = cosmology.random;
-      cache[1] = nuisance.random_photoz_clustering;
-      cache[2] = redshift.random_clustering;
-      cache[3] = Ntable.random;
-      cache[4] = nuisance.random_galaxy_bias;
+  if (fdiff(cache[0], cosmology.random) ||
+      fdiff(cache[1], nuisance.random_photoz_clustering) ||
+      fdiff(cache[2], redshift.random_clustering) ||
+      fdiff(cache[3], Ntable.random) ||
+      fdiff(cache[4], nuisance.random_galaxy_bias))
+  {
+    #pragma GCC diagnostic push
+    #pragma GCC diagnostic ignored "-Wunused-variable"
+    for (int k=0; k<NSIZE; k++) 
+    { // init static variables inside the C_XY_limber_nointerp function
+      const int init = 1; // TRUE
+      double ini = C_gg_tomo_limber_nointerp(exp(lnlmin), k, k, pslin_only, 1);
     }
+    #pragma GCC diagnostic pop
+    
+    #pragma omp parallel for collapse(2)
+    for (int k=0; k<NSIZE; k++)  
+      for (int p=0; p<nell; p++)
+        table[k][p] = 
+          C_gg_tomo_limber_nointerp(exp(lnlmin+p*dlnl), k, k, pslin_only, 0);
+
+    cache[0] = cosmology.random;
+    cache[1] = nuisance.random_photoz_clustering;
+    cache[2] = redshift.random_clustering;
+    cache[3] = Ntable.random;
+    cache[4] = nuisance.random_galaxy_bias;
   }
   
   if (ni < 0 || 
@@ -2681,12 +2462,8 @@ double C_gg_tomo_limber(
   {
     log_fatal("internal logic error in selecting bin number");
     exit(1);
-  }
-  
-  const double f1 = exp(interpol_fitslope(table[q], nell, lnlmin, lnlmax, 
-    dlnl, lnl, 1));
-  
-  return isnan(f1) ? 0.0 : f1;
+  }  
+  return interpol1d(table[q], nell, lnlmin, lnlmax, dlnl, lnl);
 }
 
 // ---------------------------------------------------------------------------
@@ -2845,7 +2622,7 @@ double C_gk_tomo_limber_nointerp(
     double l, 
     int ni, 
     int use_linear_ps, 
-    const int init_static_vars_only
+    const int init
   )
 {
   static double cache[MAX_SIZE_ARRAYS];
@@ -2882,7 +2659,7 @@ double C_gk_tomo_limber_nointerp(
 
   double res = 0.0;
   
-  if (init_static_vars_only == 1)
+  if (init == 1)
   {
     if (has_b2_galaxies() && use_linear_ps == 0)
       res = int_for_C_gk_tomo_limber_withb2(amin, (void*) ar);
@@ -2905,75 +2682,48 @@ double C_gk_tomo_limber_nointerp(
   return res;
 }
 
-double C_gk_tomo_limber(
-    double l, 
-    int ni, 
-    const int force_no_recompute
-  )
+double C_gk_tomo_limber(const double l, const int ni)
 {
   static double cache[MAX_SIZE_ARRAYS];
   static double** table = NULL;
-  static int NSIZE;
-  static int nell;
-  static double lnlmin;
-  static double lnlmax;
-  static double dlnl;
+  static double lim[3];
 
-  if (force_no_recompute == 0)
-  { // Cocoa: nell = 10^5 on real funcs, so recompute funcs are expensive
-    if (table == NULL || fdiff(cache[3], Ntable.random))
-    {
-      NSIZE  = redshift.clustering_nbin;
-      nell   = Ntable.N_ell;
-      lnlmin = log(fmax(limits.LMIN_tab, 1.0));
-      lnlmax = log(fmax(limits.LMAX, limits.LMAX_hankel) + 1);
-      dlnl   = (lnlmax - lnlmin)/((double) nell - 1.0);
+  if (table == NULL || fdiff(cache[3], Ntable.random))
+  {
+    lim[0] = log(fmax(limits.LMIN_tab, 1.0));
+    lim[1] = log(fmax(limits.LMAX, limits.LMAX_hankel) + 1);
+    lim[2] = (lim[1] - lim[0])/((double) Ntable.N_ell - 1.0);
 
-      if (table != NULL) free(table);
-      table = (double**) malloc2d(NSIZE, nell);
-    }
-  
-    if (fdiff(cache[0], cosmology.random) ||
-        fdiff(cache[1], nuisance.random_photoz_clustering) ||
-        fdiff(cache[2], redshift.random_clustering) ||
-        fdiff(cache[3], Ntable.random) ||
-        fdiff(cache[4], nuisance.random_galaxy_bias))
-    {
-      #pragma GCC diagnostic push
-      #pragma GCC diagnostic ignored "-Wunused-variable"
-      for (int k=0; k<NSIZE; k++)
-      { // init static variables inside the C_XY_limber_nointerp function
-        const int init_static_vars_only = 1; // TRUE
-        const int ZLNZ = k;
-        const double lnl = lnlmin;
-        
-        double trash = C_gk_tomo_limber_nointerp(exp(lnl), ZLNZ, 
-          ps_lin_limber, init_static_vars_only);
-      }
-      #pragma GCC diagnostic pop
-      
-      #pragma omp parallel for collapse(2)
-      for (int k=0; k<NSIZE; k++)
-      {
-        for (int i=0; i<nell; i++)
-        {
-          const int init_static_vars_only = 0; // FALSE
-          const int ZLNZ = k;
-          const double lnl = lnlmin + i*dlnl;
-          
-          table[k][i]= log(C_gk_tomo_limber_nointerp(exp(lnl), k, 
-            ps_lin_limber, init_static_vars_only));
-        }
-      }
-      
-      cache[0] = cosmology.random;
-      cache[1] = nuisance.random_photoz_clustering;
-      cache[2] = redshift.random_clustering;
-      cache[3] = Ntable.random;
-      cache[4] = nuisance.random_galaxy_bias;
-    }
+    if (table != NULL) free(table);
+    table = (double**) malloc2d(redshift.clustering_nbin, Ntable.N_ell);
   }
 
+  if (fdiff(cache[0], cosmology.random) ||
+      fdiff(cache[1], nuisance.random_photoz_clustering) ||
+      fdiff(cache[2], redshift.random_clustering) ||
+      fdiff(cache[3], Ntable.random) ||
+      fdiff(cache[4], nuisance.random_galaxy_bias))
+  {
+    #pragma GCC diagnostic push
+    #pragma GCC diagnostic ignored "-Wunused-variable"
+    { // init static variables inside the C_XY_limber_nointerp function      
+      double ini = C_gk_tomo_limber_nointerp(exp(lim[0]), 0, pslin_only, 1);
+    }
+    #pragma GCC diagnostic pop
+    
+    #pragma omp parallel for collapse(2)
+    for (int k=0; k<redshift.clustering_nbin; k++)
+      for (int i=0; i<Ntable.N_ell; i++)  
+        table[k][i] = 
+          C_gk_tomo_limber_nointerp(exp(lim[0] + i*lim[2]), k, pslin_only, 0);
+    
+    cache[0] = cosmology.random;
+    cache[1] = nuisance.random_photoz_clustering;
+    cache[2] = redshift.random_clustering;
+    cache[3] = Ntable.random;
+    cache[4] = nuisance.random_galaxy_bias;
+  }
+  
   if (ni < -1 || ni > redshift.clustering_nbin - 1)
   {
     log_fatal("error in selecting bin number ni = %d", ni);
@@ -2981,20 +2731,18 @@ double C_gk_tomo_limber(
   }
 
   const double lnl = log(l);
-  if (lnl < lnlmin)
-    log_warn("l = %e < l_min = %e. Extrapolation adopted", l, exp(lnlmin));
-  if (lnl > lnlmax)
-    log_warn("l = %e > l_max = %e. Extrapolation adopted", l, exp(lnlmax));
+  if (lnl < lim[0])
+    log_warn("l = %e < l_min = %e. Extrapolation adopted", l, exp(lim[0]));
+  if (lnl > lim[1])
+    log_warn("l = %e > l_max = %e. Extrapolation adopted", l, exp(lim[1]));
   
   const int q =  ni; 
-  if (q < 0 || q > NSIZE - 1)
+  if (q < 0 || q > redshift.clustering_nbin - 1)
   {
     log_fatal("internal logic error in selecting bin number");
     exit(1);
   }
-
-  const double f1 = exp(interpol(table[q], nell, lnlmin, lnlmax, dlnl, lnl, 1, 1));
-  return isnan(f1) ? 0.0 : f1;
+  return interpol1d(table[q], Ntable.N_ell, lim[0], lim[1], lim[2], lnl);
 }
 
 // ---------------------------------------------------------------------------
@@ -3046,7 +2794,7 @@ double C_ks_tomo_limber_nointerp(
     double l, 
     int ni, 
     int use_linear_ps,
-    const int init_static_vars_only
+    const int init
   )
 {
   static double cache[MAX_SIZE_ARRAYS];
@@ -3077,7 +2825,7 @@ double C_ks_tomo_limber_nointerp(
  
   double res = 0.0;
   
-  if (init_static_vars_only == 1)
+  if (init == 1)
     res = int_for_C_ks_tomo_limber(amin, (void*) ar);
   else
   {
@@ -3092,8 +2840,7 @@ double C_ks_tomo_limber_nointerp(
 
 double C_ks_tomo_limber(
     double l, 
-    int ni, 
-    const int force_no_recompute
+    int ni
   )
 {
   static double cache[MAX_SIZE_ARRAYS];
@@ -3107,85 +2854,81 @@ double C_ks_tomo_limber(
   const double lnlmax = log(fmax(limits.LMAX, limits.LMAX_hankel) + 1);
   const double dlnl = (lnlmax - lnlmin)/((double) nell - 1.0);
 
-  if (force_no_recompute == 0)
-  { // Cocoa: nell = 10^5 on real funcs, so recompute funcs are expensive
-    
-    if (table == NULL || 
-        sig == NULL || fdiff(cache[4], Ntable.random))
-    {
-      if (table != NULL) free(table);
-      table = (double**) malloc2d(NSIZE, nell);
+  if (table == NULL || 
+      sig == NULL || fdiff(cache[4], Ntable.random))
+  {
+    if (table != NULL) free(table);
+    table = (double**) malloc2d(NSIZE, nell);
 
-      if (sig != NULL) free(sig);
-      sig = (double*) malloc1d(NSIZE);
-    }
-
-    if (fdiff(cache[0], cosmology.random) ||
-        fdiff(cache[1], nuisance.random_photoz_shear) ||
-        fdiff(cache[2], nuisance.random_ia) ||
-        fdiff(cache[3], redshift.random_shear) ||
-        fdiff(cache[4], Ntable.random))
-    {
-      #pragma GCC diagnostic push
-      #pragma GCC diagnostic ignored "-Wunused-variable"
-      for (int k=0; k<NSIZE; k++)
-      { // init static variables inside the C_XY_limber_nointerp function
-        const int init_static_vars_only = 1; // TRUE
-        const int ZSNZ = k;
-        const double lnl = lnlmin;
-        
-        double trash = C_ks_tomo_limber_nointerp(exp(lnl), ZSNZ, 
-          ps_lin_limber, init_static_vars_only);
-      }
-      #pragma GCC diagnostic pop
-      
-      #pragma omp parallel for collapse(2)
-      for (int k=0; k<NSIZE; k++)
-      {
-        for (int i=0; i<nell; i++)
-        {
-          const int init_static_vars_only = 0; // FALSE
-          const int ZSNZ = k;
-          const double lnl = lnlmin + i*dlnl;
-          
-          table[k][i] = C_ks_tomo_limber_nointerp(exp(lnl), ZSNZ, 
-            ps_lin_limber, init_static_vars_only);
-        }
-      }
-
-      #pragma omp parallel for
-      for (int k=0; k<NSIZE; k++)
-      {
-        sig[k] = 1.;
-        osc[k] = 0;
-        if (C_ks_tomo_limber_nointerp(500., k, ps_lin_limber, 0) < 0)
-        {
-          sig[k] = -1.;
-        }
-        for (int i=0; i<nell; i++)
-        {
-          if (table[k][i]*sig[k] < 0.)
-          {
-            osc[k] = 1;
-          }
-        }
-        if (osc[k] == 0)
-        {
-          for (int i=0; i<nell; i++)
-          {
-            table[k][i] = log(sig[k]*table[k][i]);
-          }
-        }
-      }
-
-      cache[0] = cosmology.random;
-      cache[1] = nuisance.random_photoz_shear;
-      cache[2] = nuisance.random_ia;
-      cache[3] = redshift.random_shear;
-      cache[4] = Ntable.random;
-    } 
+    if (sig != NULL) free(sig);
+    sig = (double*) malloc1d(NSIZE);
   }
 
+  if (fdiff(cache[0], cosmology.random) ||
+      fdiff(cache[1], nuisance.random_photoz_shear) ||
+      fdiff(cache[2], nuisance.random_ia) ||
+      fdiff(cache[3], redshift.random_shear) ||
+      fdiff(cache[4], Ntable.random))
+  {
+    #pragma GCC diagnostic push
+    #pragma GCC diagnostic ignored "-Wunused-variable"
+    for (int k=0; k<NSIZE; k++)
+    { // init static variables inside the C_XY_limber_nointerp function
+      const int init = 1; // TRUE
+      const int ZSNZ = k;
+      const double lnl = lnlmin;
+      
+      double ini = C_ks_tomo_limber_nointerp(exp(lnl), ZSNZ, 
+        pslin_only, init);
+    }
+    #pragma GCC diagnostic pop
+    
+    #pragma omp parallel for collapse(2)
+    for (int k=0; k<NSIZE; k++)
+    {
+      for (int i=0; i<nell; i++)
+      {
+        const int init = 0; // FALSE
+        const int ZSNZ = k;
+        const double lnl = lnlmin + i*dlnl;
+        
+        table[k][i] = C_ks_tomo_limber_nointerp(exp(lnl), ZSNZ, 
+          pslin_only, init);
+      }
+    }
+
+    #pragma omp parallel for
+    for (int k=0; k<NSIZE; k++)
+    {
+      sig[k] = 1.;
+      osc[k] = 0;
+      if (C_ks_tomo_limber_nointerp(500., k, pslin_only, 0) < 0)
+      {
+        sig[k] = -1.;
+      }
+      for (int i=0; i<nell; i++)
+      {
+        if (table[k][i]*sig[k] < 0.)
+        {
+          osc[k] = 1;
+        }
+      }
+      if (osc[k] == 0)
+      {
+        for (int i=0; i<nell; i++)
+        {
+          table[k][i] = log(sig[k]*table[k][i]);
+        }
+      }
+    }
+
+    cache[0] = cosmology.random;
+    cache[1] = nuisance.random_photoz_shear;
+    cache[2] = nuisance.random_ia;
+    cache[3] = redshift.random_shear;
+    cache[4] = Ntable.random;
+  } 
+  
   if (ni < 0 || ni > redshift.shear_nbin - 1)
   {
     log_fatal("error in selecting bin number ni = %d (max %d)", ni, redshift.shear_nbin);
@@ -3257,7 +3000,7 @@ double int_for_C_kk_limber(double a, void* params)
 double C_kk_limber_nointerp(
     double l, 
     int use_linear_ps, 
-    const int init_static_vars_only
+    const int init
   )
 {
   static double cache[MAX_SIZE_ARRAYS];
@@ -3277,7 +3020,7 @@ double C_kk_limber_nointerp(
   
   double res = 0.0;
   
-  if (init_static_vars_only == 1)
+  if (init == 1)
     res = int_for_C_kk_limber(amin, (void*) ar);
   else
   {
@@ -3290,65 +3033,46 @@ double C_kk_limber_nointerp(
   return res;
 }
 
-double C_kk_limber(double l, const int force_no_recompute)
+double C_kk_limber(const double l)
 {
   static double cache[MAX_SIZE_ARRAYS];
   static double* table = NULL;
-  static int nell;
-  static double lnlmin;
-  static double lnlmax;
-  static double dlnl;
+  static double lim[3];
 
-  if (force_no_recompute == 0)
-  { // Cocoa: nell = 10^5 on real funcs, so recompute funcs are expensive
+  if (table == NULL || fdiff(cache[1], Ntable.random))
+  {
+    lim[0] = log(fmax(limits.LMIN_tab, 1.0));
+    lim[1] = log(fmax(limits.LMAX, limits.LMAX_hankel) + 1);
+    lim[2] = (lim[1] - lim[0])/((double) Ntable.N_ell - 1.0);
+
+    if (table != NULL) free(table);
+    table = (double*) malloc1d(Ntable.N_ell);
+  }
+
+  if (fdiff(cache[0], cosmology.random) || fdiff(cache[1], Ntable.random))
+  {
+    #pragma GCC diagnostic push
+    #pragma GCC diagnostic ignored "-Wunused-variable"
+    { // init static variables inside the C_XY_limber_nointerp function
+      double ini = C_kk_limber_nointerp(exp(lim[0]), pslin_only, 1);
+    }
+    #pragma GCC diagnostic pop
     
-    if (table == NULL || fdiff(cache[1], Ntable.random))
-    {
-      nell = Ntable.N_ell;
-      lnlmin = log(fmax(limits.LMIN_tab, 1.0));
-      lnlmax = log(fmax(limits.LMAX, limits.LMAX_hankel) + 1);
-      dlnl = (lnlmax - lnlmin)/((double) nell - 1.0);
-
-      if (table != NULL) free(table);
-      table = (double*) malloc1d(nell);
-    }
-
-    if (fdiff(cache[0], cosmology.random) || fdiff(cache[1], Ntable.random))
-    {
-      #pragma GCC diagnostic push
-      #pragma GCC diagnostic ignored "-Wunused-variable"
-      { // init static variables inside the C_XY_limber_nointerp function
-        const int init_static_vars_only = 1; // TRUE
-        const double lnl = lnlmin;
-
-        double trash = C_kk_limber_nointerp(exp(lnl), ps_lin_limber, 
-          init_static_vars_only);
-      }
-      #pragma GCC diagnostic pop
-      
-      #pragma omp parallel for
-      for (int i=0; i<nell; i++)
-      {
-        const int init_static_vars_only = 0; // FALSE
-        const double lnl = lnlmin + i*dlnl;
-
-        table[i] = log(C_kk_limber_nointerp(exp(lnl), ps_lin_limber, 
-          init_static_vars_only));
-      }
-
-      cache[0] = cosmology.random;
-      cache[1] = Ntable.random;
-    }
+    #pragma omp parallel for
+    for (int i=0; i<Ntable.N_ell; i++)
+      table[i] = C_kk_limber_nointerp(exp(lim[0] + i*lim[2]), pslin_only, 0);
+  
+    cache[0] = cosmology.random;
+    cache[1] = Ntable.random;
   }
 
   const double lnl = log(l);
-  if (lnl < lnlmin)
-    log_warn("l = %e < l_min = %e. Extrapolation adopted", l, exp(lnlmin));
-  if (lnl > lnlmax)
-    log_warn("l = %e > l_max = %e. Extrapolation adopted", l, exp(lnlmax));
+  if (lnl < lim[0])
+    log_warn("l = %e < l_min = %e. Extrapolation adopted", l, exp(lim[0]));
+  if (lnl > lim[1])
+    log_warn("l = %e > l_max = %e. Extrapolation adopted", l, exp(lim[1]));
   
-  const double f1 = exp(interpol(table, nell, lnlmin, lnlmax, dlnl, lnl, 1, 1));
-  return isnan(f1) ? 0.0 : f1;
+  return interpol1d(table, Ntable.N_ell, lim[0], lim[1], lim[2], lnl);
 }
 
 // ---------------------------------------------------------------------------
@@ -3427,7 +3151,7 @@ double C_gy_tomo_limber_nointerp(
     double l, 
     int ni, 
     int use_linear_ps, 
-    const int init_static_vars_only
+    const int init
   )
 {
   static double cache[MAX_SIZE_ARRAYS];
@@ -3452,7 +3176,7 @@ double C_gy_tomo_limber_nointerp(
   const double amax = 0.99999;
 
   double res = 0.0;
-  if (init_static_vars_only == 1)
+  if (init == 1)
   {
     if (has_b2_galaxies() && use_linear_ps == 0)
     {
@@ -3482,7 +3206,7 @@ double C_gy_tomo_limber_nointerp(
   return res;
 }
 
-double C_gy_tomo_limber(double l, int ni, const int force_no_recompute)
+double C_gy_tomo_limber(double l, int ni)
 {
   static double cache[MAX_SIZE_ARRAYS];
   static double** table = NULL;
@@ -3517,12 +3241,12 @@ double C_gy_tomo_limber(double l, int ni, const int force_no_recompute)
       #pragma GCC diagnostic ignored "-Wunused-variable"
       for (int k=0; k<NSIZE; k++)
       { // init static variables inside the C_XY_limber_nointerp function
-        const int init_static_vars_only = 1; // TRUE
+        const int init = 1; // TRUE
         const int ZLNZ = k;
         const double lnl = lnlmin;
 
-        double trash = C_gy_tomo_limber_nointerp(exp(lnl), ZLNZ, 
-          ps_lin_limber, init_static_vars_only);
+        double ini = C_gy_tomo_limber_nointerp(exp(lnl), ZLNZ, 
+          pslin_only, init);
       }
       #pragma GCC diagnostic pop
       
@@ -3531,12 +3255,12 @@ double C_gy_tomo_limber(double l, int ni, const int force_no_recompute)
       {
         for (int i=0; i<nell; i++)
         {
-          const int init_static_vars_only = 0; // FALSE
+          const int init = 0; // FALSE
           const int ZLNZ = k;
           const double lnl = lnlmin + i*dlnl;
           
           table[k][i]= log(C_gy_tomo_limber_nointerp(exp(lnl), ZLNZ, 
-            ps_lin_limber, init_static_vars_only));
+            pslin_only, init));
         }
       }
 
@@ -3617,7 +3341,7 @@ double C_ys_tomo_limber_nointerp(
     double l, 
     int ni, 
     int use_linear_ps, 
-    const int init_static_vars_only
+    const int init
   )
 {
   static double cache[MAX_SIZE_ARRAYS];
@@ -3643,7 +3367,7 @@ double C_ys_tomo_limber_nointerp(
 
   double res = 0.0;
   
-  if (init_static_vars_only == 1)
+  if (init == 1)
     res = int_for_C_ys_tomo_limber(amin, (void*) ar);
   else
   {
@@ -3656,7 +3380,7 @@ double C_ys_tomo_limber_nointerp(
   return res;
 }
 
-double C_ys_tomo_limber(double l, int ni, const int force_no_recompute)
+double C_ys_tomo_limber(double l, int ni)
 {
   static double cache[MAX_SIZE_ARRAYS];
   static cosmopara C;
@@ -3702,12 +3426,12 @@ double C_ys_tomo_limber(double l, int ni, const int force_no_recompute)
       { // init static variables inside the C_XY_limber_nointerp function
         for (int k=0; k<NSIZE; k++)
         {
-          const int init_static_vars_only = 1; // TRUE
+          const int init = 1; // TRUE
           const int ZSNZ = k;
           const double lnl = lnlmin;
 
-          double trash = C_ys_tomo_limber_nointerp(exp(lnl), ZSNZ, 
-            ps_lin_limber, init_static_vars_only);
+          double ini = C_ys_tomo_limber_nointerp(exp(lnl), ZSNZ, 
+            pslin_only, init);
         }
       }
       #pragma GCC diagnostic pop
@@ -3717,12 +3441,12 @@ double C_ys_tomo_limber(double l, int ni, const int force_no_recompute)
       {
         for (int i=0; i<nell; i++)
         {
-          const int init_static_vars_only = 0; // FALSE
+          const int init = 0; // FALSE
           const int ZSNZ = k;
           const double lnl = lnlmin + i*dlnl;
 
           table[k][i] = C_ys_tomo_limber_nointerp(exp(lnl), k, 
-            ps_lin_limber, init_static_vars_only);
+            pslin_only, init);
         }
       }
       
@@ -3732,10 +3456,10 @@ double C_ys_tomo_limber(double l, int ni, const int force_no_recompute)
         sig[k] = 1.;
         osc[k] = 0;
 
-        const int init_static_vars_only = 0; // FALSE
+        const int init = 0; // FALSE
         const int ZSNZ = k;
         const double tmp = C_ys_tomo_limber_nointerp(500., ZSNZ, 
-          ps_lin_limber, init_static_vars_only);
+          pslin_only, init);
         
         if (tmp < 0)
           sig[k] = -1.;
@@ -3838,7 +3562,7 @@ double int_for_C_ky_limber(double a, void* params)
 double C_ky_limber_nointerp(
     double l, 
     int use_linear_ps, 
-    const int init_static_vars_only
+    const int init
   )
 {
   static double cache[MAX_SIZE_ARRAYS];
@@ -3858,7 +3582,7 @@ double C_ky_limber_nointerp(
 
   double res = 0.0;
   
-  if (init_static_vars_only == 1)
+  if (init == 1)
     res = int_for_C_ky_limber(amin, (void*) ar);
   else
   {
@@ -3871,7 +3595,7 @@ double C_ky_limber_nointerp(
   return res;
 }
 
-double C_ky_limber(double l, const int force_no_recompute)
+double C_ky_limber(double l)
 {
   static double cache[MAX_SIZE_ARRAYS];
   static cosmopara C;
@@ -3902,22 +3626,22 @@ double C_ky_limber(double l, const int force_no_recompute)
       #pragma GCC diagnostic push
       #pragma GCC diagnostic ignored "-Wunused-variable"
       { // init static variables inside the C_XY_limber_nointerp function
-        const int init_static_vars_only = 1; // TRUE
+        const int init = 1; // TRUE
         const double lnl = lnlmin;
 
-        double trash = C_ky_limber_nointerp(exp(lnl), ps_lin_limber, 
-          init_static_vars_only);
+        double ini = C_ky_limber_nointerp(exp(lnl), pslin_only, 
+          init);
       }
       #pragma GCC diagnostic pop
       
       #pragma omp parallel for
       for (int i=0; i<nell; i++)
       {
-        const int init_static_vars_only = 0; // FALSE
+        const int init = 0; // FALSE
         const double lnl = lnlmin + i*dlnl;
 
-        table[i] = log(C_ky_limber_nointerp(exp(lnl), ps_lin_limber, 
-          init_static_vars_only));
+        table[i] = log(C_ky_limber_nointerp(exp(lnl), pslin_only, 
+          init));
       }
 
       update_ynuisance(&N);
@@ -3970,7 +3694,7 @@ double int_for_C_yy_limber(double a, void *params)
 double C_yy_limber_nointerp(
     double l, 
     int use_linear_ps, 
-    const int init_static_vars_only
+    const int init
   )
 {
   static double cache[MAX_SIZE_ARRAYS];
@@ -3990,7 +3714,7 @@ double C_yy_limber_nointerp(
 
   double res = 0.0;
   
-  if (init_static_vars_only == 1)
+  if (init == 1)
     res = int_for_C_yy_limber(amin, (void*) ar);
   else
   {
@@ -4003,7 +3727,7 @@ double C_yy_limber_nointerp(
   return res;
 }
 
-double C_yy_limber(double l, const int force_no_recompute)
+double C_yy_limber(double l)
 {
   static cosmopara C;
   static ynuisancepara N;
@@ -4034,22 +3758,22 @@ double C_yy_limber(double l, const int force_no_recompute)
       #pragma GCC diagnostic push
       #pragma GCC diagnostic ignored "-Wunused-variable"
       { // init static variables inside the C_XY_limber_nointerp function
-        const int init_static_vars_only = 1; // TRUE
+        const int init = 1; // TRUE
         const double lnl = lnlmin;
 
-        double trash = C_yy_limber_nointerp(exp(lnl), ps_lin_limber, 
-          init_static_vars_only);
+        double ini = C_yy_limber_nointerp(exp(lnl), pslin_only, 
+          init);
       }
       #pragma GCC diagnostic pop
       
       #pragma omp parallel for
       for (int i=0; i<nell; i++)
       {
-        const int init_static_vars_only = 0; // FALSE
+        const int init = 0; // FALSE
         const double lnl = lnlmin + i*dlnl;
 
-        table[i] = log(C_yy_limber_nointerp(exp(lnl), ps_lin_limber, 
-          init_static_vars_only));
+        table[i] = log(C_yy_limber_nointerp(exp(lnl), pslin_only, 
+          init));
       }
       
       update_ynuisance(&N);
@@ -4350,17 +4074,17 @@ void C_cl_tomo(int L, const int ni, const int nj, double *const Cl, double dev, 
          C_gg_tomo_limber_nointerp((double) ell_ar[i], ni, nj, 0, 0)
         -C_gg_tomo_limber_nointerp((double) ell_ar[i], ni, nj, 1, 0);
     }
-    dev = Cl[L]/C_gg_tomo_limber_nointerp((double) L, ni, nj, 0, 0) - 1;
+    dev = Cl[L]/C_gg_tomo_limber_nointerp(L, ni, nj, 0, 0) - 1;
   }
   L++;
 
-  Cl[limits.LMAX_NOLIMBER] = C_gg_tomo_limber((double) limits.LMAX_NOLIMBER, ni, nj, 0);
+  Cl[limits.LMAX_NOLIMBER] = C_gg_tomo_limber(limits.LMAX_NOLIMBER, ni, nj);
   
   #pragma omp parallel for
   for (int l=L; l<limits.LMAX_NOLIMBER; l++)
   {
-    Cl[l] = (l > limits.LMIN_tab) ? C_gg_tomo_limber((double) l, ni, nj, 1) :
-      C_gg_tomo_limber_nointerp((double) l, ni, nj, ps_lin_limber, 0);
+    Cl[l] = (l > limits.LMIN_tab) ? C_gg_tomo_limber(l, ni, nj) :
+      C_gg_tomo_limber_nointerp(l, ni, nj, pslin_only, 0);
   }
 }
 
@@ -4625,16 +4349,16 @@ void C_gl_tomo(
         C_gs_tomo_limber_nointerp((double) ell_ar[i], nl, ns, 0, 0)
        -C_gs_tomo_limber_nointerp((double) ell_ar[i], nl, ns, 1, 0);
     }
-    dev = Cl[L]/C_gs_tomo_limber_nointerp((double) L, nl, ns, 0, 0) - 1;
+    dev = Cl[L]/C_gs_tomo_limber_nointerp(L, nl, ns, 0, 0) - 1;
   }
   L++;
 
-  Cl[limits.LMAX_NOLIMBER] = C_gs_tomo_limber((double) limits.LMAX_NOLIMBER, nl, ns, 0);
+  Cl[limits.LMAX_NOLIMBER] = C_gs_tomo_limber(limits.LMAX_NOLIMBER, nl, ns);
   
   #pragma omp parallel for
   for (int l=L; l<limits.LMAX_NOLIMBER; l++)
   {
-    Cl[l] = (l > limits.LMIN_tab) ? C_gs_tomo_limber((double) l, nl, ns, 1) :
-      C_gs_tomo_limber_nointerp((double) l, nl, ns, ps_lin_limber, 0);
+    Cl[l] = (l > limits.LMIN_tab) ? C_gs_tomo_limber(l, nl, ns) :
+      C_gs_tomo_limber_nointerp(l, nl, ns, pslin_only, 0);
   }      
 }

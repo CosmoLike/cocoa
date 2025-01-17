@@ -30,13 +30,13 @@ double xi_pm_tomo(
   );
 
 // gs in real space has a special name
-double w_gammat_tomo(int nt, int ni, int nj, int limber);
+double w_gammat_tomo(const int nt, const int ni, const int nj, const int limber);
 
-double w_gg_tomo(int nt, int ni, int nj, int limber);
+double w_gg_tomo(const int nt, const int ni, const int nj, const int limber);
 
-double w_gk_tomo(int nt, int ni, int limber);
+double w_gk_tomo(const int nt, const int ni, const int limber);
 
-double w_ks_tomo(int nt, int ni, int limber);
+double w_ks_tomo(const int nt, const int ni, const int limber);
 
 // ----------------------------------------------------------------------------
 // ----------------------------------------------------------------------------
@@ -82,39 +82,30 @@ double C_ss_tomo_limber_nointerp(
     const int init_static_vars_only
   );
 
-double C_ss_tomo_limber(double l, int ni, int nj); // IA=(0||3||4)
-
-// works with IA=(0||3||4||5||6)
 double C_gs_tomo_limber_nointerp(double l, int ni, int nj, 
   int use_linear_ps, const int init_static_vars_only);
 
-double C_gs_tomo_limber(double l, int ni, int nj, 
-  const int force_no_recompute);
+double C_ss_tomo_limber(const double l, const int ni, const int nj);
+
+double C_gs_tomo_limber(const double l, const int ni, const int nj);
+
+double C_gg_tomo_limber(const double l, const int ni, const int nj);
+
+double C_ks_tomo_limber(const double l, const int ni);
+
+double C_gk_tomo_limber(const double l, const int ni);
+
+double C_kk_limber(const double l);
+
+double C_gy_tomo_limber(double l, int ni);
+
+double C_ys_tomo_limber(double l, int ni);
+
+double C_ky_limber(double l);
+
+double C_yy_limber(double l);
 
 
-// ----------------------------------------------------------------------------
-// All functions below can run w/ like.IA=0 || like.IA=3 || like.IA=4
-// ----------------------------------------------------------------------------
-
-// ----------------------------------------------------------------------------
-// Interpolated Version (On first call, Func will create an interpolation table)
-// ----------------------------------------------------------------------------
-
-double C_gg_tomo_limber(double l, int ni, int nj, const int force_no_recompute);
-
-double C_ks_tomo_limber(double l, int ni, const int force_no_recompute);
-
-double C_kk_limber(double l, const int force_no_recompute);
-
-double C_gy_tomo_limber(double l, int ni, const int force_no_recompute);
-
-double C_ys_tomo_limber(double l, int ni, const int force_no_recompute);
-
-double C_ky_limber(double l, const int force_no_recompute);
-
-double C_yy_limber(double l, const int force_no_recompute);
-
-double C_gk_tomo_limber(double l, int ni, const int force_no_recompute);
 
 // ----------------------------------------------------------------------------
 // Non-Interpolated Version (Will compute the Integral at every call)

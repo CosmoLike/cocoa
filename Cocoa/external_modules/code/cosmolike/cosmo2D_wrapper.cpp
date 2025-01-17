@@ -87,12 +87,8 @@ static int nell()
 vector get_binning_real_space()
 {  
   vector result(Ntable.Ntheta, arma::fill::none);
-
   for (int i = 0; i < Ntable.Ntheta; i++)
-  {    
     result(i) = like.theta[i] / 2.90888208665721580e-4; 
-  }
-
   return result;
 }
 
@@ -101,26 +97,7 @@ vector get_binning_real_space()
 // ---------------------------------------------------------------------------
 
 py::tuple xi_pm_tomo_cpp()
-{
-  if (redshift.shear_nbin == 0)
-  {
-    spdlog::critical(
-        "\x1b[90m{}\x1b[0m: {} = 0 is invalid",
-        "compute_data_vector_masked", 
-        "shear_Nbin"
-      );
-    exit(1);
-  }
-  if (Ntable.Ntheta == 0)
-  {
-    spdlog::critical(
-        "\x1b[90m{}\x1b[0m: {} = 0 is invalid",
-        "compute_data_vector_masked", 
-        "Ntheta"
-      );
-    exit(1);
-  }
- 
+{ 
   matrix xp(Ntable.Ntheta, tomo.shear_Npowerspectra, arma::fill::none);
   matrix xm(Ntable.Ntheta, tomo.shear_Npowerspectra, arma::fill::none);
 
@@ -134,46 +111,17 @@ py::tuple xi_pm_tomo_cpp()
       xm(i,nz) = xi_pm_tomo(-1, i, z1, z2, 1);
     }
   }
-
   return py::make_tuple(carma::mat_to_arr(xp), carma::mat_to_arr(xm));
 }
 
-// ---------------------------------------------------------------------------
-// ---------------------------------------------------------------------------
-// ---------------------------------------------------------------------------
-
 vector w_gammat_tomo_cpp()
-{
-  if (redshift.shear_nbin == 0)
-  {
-    spdlog::critical("\x1b[90m{}\x1b[0m: {} = 0 is invalid",
-      "compute_data_vector_masked", "shear_Nbin");
-    exit(1);
-  }
-  if (redshift.clustering_nbin == 0)
-  {
-    spdlog::critical("\x1b[90m{}\x1b[0m: {} = 0 is invalid",
-      "compute_data_vector_masked", "clustering_Nbin");
-    exit(1);
-  }
-  if (Ntable.Ntheta == 0)
-  {
-    spdlog::critical("\x1b[90m{}\x1b[0m: {} = 0 is invalid",
-      "compute_data_vector_masked", "Ntheta");
-    exit(1);
-  }
-  
+{  
   vector result(Ntable.Ntheta*tomo.ggl_Npowerspectra, arma::fill::none);
-
   for (int nz=0; nz<tomo.ggl_Npowerspectra; nz++)
     for (int i=0; i<Ntable.Ntheta; i++)
       result(Ntable.Ntheta*nz+i) = w_gammat_tomo(i, ZL(nz), ZS(nz), 1);
   return result;
 }
-
-// ---------------------------------------------------------------------------
-// ---------------------------------------------------------------------------
-// ---------------------------------------------------------------------------
 
 vector w_gg_tomo_cpp()
 {
@@ -364,7 +312,6 @@ matrix C_gs_tomo_limber_cpp(const vector l)
   for (int nz=0; nz<tomo.ggl_Npowerspectra; nz++)
     for (int i=0; i<static_cast<int>(l.n_elem); i++)
       result(i, nz) = C_gs_tomo_limber_nointerp(l(i), ZL(nz), ZS(nz), 0, 0);
-
   return result;
 }
 
@@ -397,7 +344,6 @@ matrix C_gg_tomo_limber_cpp(const vector l)
   for (int nz=0; nz<redshift.clustering_nbin; nz++)
     for (int i=0; i<static_cast<int>(l.n_elem); i++)
       result(i, nz) = C_gg_tomo_limber_nointerp(l(i), nz, nz, 0, 0);
-
   return result;
 }
 
@@ -430,7 +376,6 @@ matrix C_gg_tomo_cpp(const vector l)
       }
     }
   }
-
   return result;
 }
 
@@ -464,7 +409,6 @@ matrix C_gk_tomo_limber_cpp(const vector l)
   for (int nz=0; nz<redshift.clustering_nbin; nz++)
     for (int i=0; i<static_cast<int>(l.n_elem); i++)
       result(i, nz) = C_gk_tomo_limber_nointerp(l(i), nz, 0, 0);
- 
   return result;
 }
 
@@ -499,7 +443,6 @@ matrix C_ks_tomo_limber_cpp(const vector l)
   for (int nz=0; nz<redshift.shear_nbin; nz++)
     for (int i=0; i<static_cast<int>(l.n_elem); i++)
       result(i, nz) = C_ks_tomo_limber_nointerp(l(i), nz, 0, 0);
-
   return result;
 }
 
@@ -535,7 +478,6 @@ matrix C_gy_tomo_limber_cpp(const vector l)
   for (int nz=0; nz<redshift.clustering_nbin; nz++)
     for (int i=0; i<static_cast<int>(l.n_elem); i++)
       result(i, nz) = C_gy_tomo_limber_nointerp(l(i), nz, 0, 0);
-
   return result;
 }
 
@@ -569,7 +511,6 @@ matrix C_ys_tomo_limber_cpp(const vector l)
   for (int nz=0; nz<redshift.shear_nbin; nz++)
     for (int i=0; i<l.n_elem; i++)
       result(i, nz) = C_ys_tomo_limber_nointerp(l(i), nz, 0, 0);
-
   return result;
 }
 */
@@ -602,7 +543,6 @@ vector C_kk_limber_cpp(const vector l)
   #pragma omp parallel for
   for (int i=0; i<l.n_elem; i++)
     result(i) = C_kk_limber_nointerp(l(i), 0, 0);
-
   return result;
 }
 
@@ -635,7 +575,6 @@ vector C_ky_limber_nointerp_cpp(const vector l)
   #pragma omp parallel for
   for (int i=0; i<l.n_elem; i++)
     result(i) = C_ky_limber_nointerp(l(i), 0, 0);
-
   return result;
 }
 
@@ -668,7 +607,6 @@ vector C_yy_limber_nointerp_cpp(const vector l)
   #pragma omp parallel for
   for (int i=0; i<l.n_elem; i++)
     result(i) = C_yy_limber_nointerp(l(i), 0, 0);
-
   return result;
 }
 */
@@ -715,8 +653,7 @@ cube int_for_C_ss_NLA_tomo_limber_cpp(vector a, vector l)
   for (int nz=0; nz<tomo.shear_Npowerspectra; nz++)
     for (int i=0; i<l.n_elem; i++)
       for (int j=0; j<a.n_elem; j++)
-        result(j, i, nz) = int_for_C_ss_NLA_tomo_limber_cpp(a(j),l(i),Z1(nz),Z2(nz));
-
+        result(j,i,nz) = int_for_C_ss_NLA_tomo_limber_cpp(a(j),l(i),Z1(nz),Z2(nz));
   return result;
 }
 
@@ -773,7 +710,6 @@ py::tuple int_for_C_ss_TATT_tomo_limber_cpp(const vector a, const vector l)
       }
     }
   }
-
   return py::make_tuple(carma::cube_to_arr(EE), carma::cube_to_arr(BB));
 }
 
@@ -854,13 +790,9 @@ double int_for_C_gs_tomo_limber_cpp(
     case IA_MODEL_NLA:
     {
       if (has_b2_galaxies())
-      {
         res = int_for_C_gs_tomo_limber_withb2(a, (void*) ar);
-      }
       else 
-      {
         res = int_for_C_gs_tomo_limber(a, (void*) ar);
-      }
       break;
     }
     default:
@@ -970,14 +902,9 @@ double int_for_C_gg_tomo_limber_cpp(
   double res = 0.0;
   
   if (has_b2_galaxies())
-  {
     res = int_for_C_gg_tomo_limber_withb2(a, (void*) ar);
-  }
   else
-  {
     res = int_for_C_gg_tomo_limber(a, (void*) ar);
-  }
-
   return res;
 }
 
@@ -1052,15 +979,11 @@ double int_for_C_gk_tomo_limber_cpp(
   double ar[3] = {(double) nz, l, (double) 0.0};
 
   double res = 0.0;
-  
+
   if (has_b2_galaxies())
-  {
     res = int_for_C_gk_tomo_limber_withb2(a, (void*) ar);
-  }
   else
-  {
     res = int_for_C_gk_tomo_limber(a, (void*) ar);
-  }
 
   return res;
 }

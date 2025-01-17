@@ -47,7 +47,7 @@ double gb1(const double z, const int ni)
     }
     case B1_GROWTH_SCALING:
     {
-      ans = nuisance.gb[0][0] / (growfac(1. / (z + 1.)) / growfac(1.));
+      ans = nuisance.gb[0][0] / growfac(1. / (z + 1.));
       break;
     }
     case B1_POWER_LAW:

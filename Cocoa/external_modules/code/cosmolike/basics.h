@@ -45,6 +45,14 @@ double int_gsl_integrate_medium_precision(double (*func)(double, void *),
 double int_gsl_integrate_low_precision(double (*func)(double, void *),
   void *arg, double a, double b, double *error, int niter);
 
+double interpol1d(
+  const double* const f, 
+  const int n, 
+  const double a, 
+  const double b, 
+  const double dx, 
+  const double x); 
+
 double interpol2d(double **f, int nx, double ax, double bx, double dx, double x,
   int ny, double ay, double by, double dy, double y, double lower, double upper);
 
