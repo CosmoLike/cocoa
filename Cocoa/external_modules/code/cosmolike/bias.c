@@ -62,7 +62,6 @@ double gb1(const double z, const int ni)
       exit(1);  
     }
   }
-
   return ans;
 }
 
@@ -97,8 +96,6 @@ double gb2(const double z, const int ni)
       exit(1);  
     }
   }
-  printf("%e\n ", ans);
-  exit(1);
   return ans;
 }
 
@@ -131,8 +128,6 @@ double gbs2(const double z, const int ni)
       exit(1);  
     }
   }
-  printf("%e\n ", ans);
-  exit(1);
   return ans;
 }
 
@@ -165,8 +160,6 @@ double gb3(const double z, const int ni)
       exit(1);  
     }
   }
-  printf("%e\n ", ans);
-  exit(1);
   return ans;
 }
 
