@@ -161,7 +161,7 @@ vector w_ks_tomo_cpp()
 
 double C_ss_NLA_tomo_limber_cpp(const double l, const int ni, const int nj)
 {
-  return C_ss_tomo_limber_nointerp(l, ni, nj, 0, 0);
+  return C_ss_tomo_limber_nointerp(l, ni, nj, 1, 0);
 }
 
 matrix C_ss_NLA_tomo_limber_cpp(const vector l)
@@ -177,14 +177,14 @@ matrix C_ss_NLA_tomo_limber_cpp(const vector l)
   #pragma GCC diagnostic push
   #pragma GCC diagnostic ignored "-Wunused-variable"
   { // init static variables
-    double trash = C_ss_tomo_limber_nointerp(l(0), Z1(0), Z2(0), 0, 1);
+    double trash = C_ss_tomo_limber_nointerp(l(0), Z1(0), Z2(0), 1, 1);
   }
   #pragma GCC diagnostic pop
 
   #pragma omp parallel for collapse(2)
   for (int nz=0; nz<tomo.shear_Npowerspectra; nz++)
     for (int i=0; i<static_cast<int>(l.n_elem); i++)
-      result(i, nz) = C_ss_tomo_limber_nointerp(l(i), Z1(nz), Z2(nz), 0, 0);
+      result(i, nz) = C_ss_tomo_limber_nointerp(l(i), Z1(nz), Z2(nz), 1, 0);
   
   return result;
 }
@@ -229,7 +229,7 @@ py::tuple C_ss_TATT_tomo_limber_cpp(const vector l)
       const int ni = Z1(nz);
       const int nj = Z2(nz);
       EE(i, nz) = C_ss_tomo_limber_nointerp(l(i), ni, nj, 1, 0);
-      BB(i, nz) = C_ss_tomo_limber_nointerp(l(i), ni, nj, 1, 0);
+      BB(i, nz) = C_ss_tomo_limber_nointerp(l(i), ni, nj, 0, 0);
     }
   }
 
@@ -287,7 +287,7 @@ py::tuple C_ss_tomo_limber_cpp(vector l)
 
 double C_gs_tomo_limber_cpp(const double l, const int ni, const int nj)
 {
-  return C_gs_tomo_limber_nointerp(l, ni, nj, 0, 0);
+  return C_gs_tomo_limber_nointerp(l, ni, nj, 0);
 }
 
 matrix C_gs_tomo_limber_cpp(const vector l)
@@ -303,14 +303,14 @@ matrix C_gs_tomo_limber_cpp(const vector l)
   #pragma GCC diagnostic push
   #pragma GCC diagnostic ignored "-Wunused-variable"
   { // init static variables
-    double tmp = C_gs_tomo_limber_nointerp(l(0), ZL(0), ZS(0), 0, 1);
+    double tmp = C_gs_tomo_limber_nointerp(l(0), ZL(0), ZS(0), 1);
   }
   #pragma GCC diagnostic pop
 
   #pragma omp parallel for collapse(2)
   for (int nz=0; nz<tomo.ggl_Npowerspectra; nz++)
     for (int i=0; i<static_cast<int>(l.n_elem); i++)
-      result(i, nz) = C_gs_tomo_limber_nointerp(l(i), ZL(nz), ZS(nz), 0, 0);
+      result(i, nz) = C_gs_tomo_limber_nointerp(l(i), ZL(nz), ZS(nz), 0);
   return result;
 }
 
@@ -319,7 +319,7 @@ matrix C_gs_tomo_limber_cpp(const vector l)
 
 double C_gg_tomo_limber_cpp(const double l, const int nz)
 {
-  return C_gg_tomo_limber_nointerp(l, nz, nz, 0, 0);
+  return C_gg_tomo_limber_nointerp(l, nz, nz, 0);
 }
 
 matrix C_gg_tomo_limber_cpp(const vector l)
@@ -335,14 +335,14 @@ matrix C_gg_tomo_limber_cpp(const vector l)
   #pragma GCC diagnostic push
   #pragma GCC diagnostic ignored "-Wunused-variable"
   { // init static variables
-    double tmp = C_gg_tomo_limber_nointerp(l(0), 0, 0, 0, 1);
+    double tmp = C_gg_tomo_limber_nointerp(l(0), 0, 0, 1);
   }
   #pragma GCC diagnostic pop
 
   #pragma omp parallel for collapse(2)
   for (int nz=0; nz<redshift.clustering_nbin; nz++)
     for (int i=0; i<static_cast<int>(l.n_elem); i++)
-      result(i, nz) = C_gg_tomo_limber_nointerp(l(i), nz, nz, 0, 0);
+      result(i, nz) = C_gg_tomo_limber_nointerp(l(i), nz, nz, 0);
   return result;
 }
 
@@ -383,7 +383,7 @@ matrix C_gg_tomo_cpp(const vector l)
 
 double C_gk_tomo_limber_cpp(const double l, const int ni)
 {
-  return C_gk_tomo_limber_nointerp(l, ni, 0, 0);
+  return C_gk_tomo_limber_nointerp(l, ni, 0);
 }
 
 matrix C_gk_tomo_limber_cpp(const vector l)
@@ -400,14 +400,14 @@ matrix C_gk_tomo_limber_cpp(const vector l)
   #pragma GCC diagnostic ignored "-Wunused-variable"
   for (int nz=0; nz<redshift.clustering_nbin; nz++)
   { // init static variables
-    double trash = C_gk_tomo_limber_nointerp(l(0), nz, 0, 1);
+    double trash = C_gk_tomo_limber_nointerp(l(0), nz, 1);
   }
   #pragma GCC diagnostic pop
 
   #pragma omp parallel for collapse(2)
   for (int nz=0; nz<redshift.clustering_nbin; nz++)
     for (int i=0; i<static_cast<int>(l.n_elem); i++)
-      result(i, nz) = C_gk_tomo_limber_nointerp(l(i), nz, 0, 0);
+      result(i, nz) = C_gk_tomo_limber_nointerp(l(i), nz, 0);
   return result;
 }
 
@@ -417,7 +417,7 @@ matrix C_gk_tomo_limber_cpp(const vector l)
 
 double C_ks_tomo_limber_cpp(const double l, const int ni)
 {
-  return C_ks_tomo_limber_nointerp(l, ni, 0, 0);
+  return C_ks_tomo_limber_nointerp(l, ni, 0);
 }
 
 matrix C_ks_tomo_limber_cpp(const vector l)
@@ -434,14 +434,14 @@ matrix C_ks_tomo_limber_cpp(const vector l)
   #pragma GCC diagnostic ignored "-Wunused-variable"
   for (int nz=0; nz<redshift.shear_nbin; nz++)
   { // init static variables
-    double tmp = C_ks_tomo_limber_nointerp(l(0), nz, 0, 1);
+    double tmp = C_ks_tomo_limber_nointerp(l(0), nz, 1);
   }
   #pragma GCC diagnostic pop
 
   #pragma omp parallel for collapse(2)
   for (int nz=0; nz<redshift.shear_nbin; nz++)
     for (int i=0; i<static_cast<int>(l.n_elem); i++)
-      result(i, nz) = C_ks_tomo_limber_nointerp(l(i), nz, 0, 0);
+      result(i, nz) = C_ks_tomo_limber_nointerp(l(i), nz, 0);
   return result;
 }
 
@@ -519,7 +519,7 @@ matrix C_ys_tomo_limber_cpp(const vector l)
 
 double C_kk_limber_cpp(const double l)
 {
-  return C_kk_limber_nointerp(l, 0, 0);
+  return C_kk_limber_nointerp(l, 0);
 }
 
 vector C_kk_limber_cpp(const vector l)
@@ -535,13 +535,13 @@ vector C_kk_limber_cpp(const vector l)
   #pragma GCC diagnostic push
   #pragma GCC diagnostic ignored "-Wunused-variable"
   { // init static variables
-    double tmp = C_kk_limber_nointerp(l(0), 0, 1);
+    double tmp = C_kk_limber_nointerp(l(0), 1);
   }
   #pragma GCC diagnostic pop
 
   #pragma omp parallel for
   for (int i=0; i<l.n_elem; i++)
-    result(i) = C_kk_limber_nointerp(l(i), 0, 0);
+    result(i) = C_kk_limber_nointerp(l(i), 0);
   return result;
 }
 

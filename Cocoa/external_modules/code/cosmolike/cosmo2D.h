@@ -46,9 +46,6 @@ double w_ks_tomo(const int nt, const int ni, const int limber);
 // ----------------------------------------------------------------------------
 // ----------------------------------------------------------------------------
 
-// Mixture of non-Limber and Limber of C_cl (G-G lensing)
-void C_gl_tomo(int L, int nl, int ns, double *Cl, double dev, double tolerance);
-
 // Mixture of non-Limber and Limber of C_cl (galaxy clustering)
 void C_cl_tomo(int L, int ni, int nj, double *Cl, double dev, double tolerance);
 
@@ -60,25 +57,12 @@ void C_cl_tomo(int L, int ni, int nj, double *Cl, double dev, double tolerance);
 // ----------------------------------------------------------------------------
 // ----------------------------------------------------------------------------
 
-double C_ss_tomo_limber_nointerp(
-    double l, 
-    int ni, 
-    int nj, 
-    int EE_or_use_linear_ps, 
-    const int init_static_vars_only
-  );
-
-double C_ss_TATT_tomo_limber(
+double C_ss_tomo_limber(
     const double l, 
     const int ni, 
     const int nj, 
     const int EE
   );
-
-double C_ss_tomo_limber(const double l, const int ni, const int nj);
-
-double C_gs_tomo_limber_nointerp(double l, int ni, int nj, 
-  int use_linear_ps, const int init_static_vars_only);
 
 double C_gs_tomo_limber(const double l, const int ni, const int nj);
 
@@ -98,36 +82,32 @@ double C_ky_limber(double l);
 
 double C_yy_limber(double l);
 
-
-
 // ----------------------------------------------------------------------------
 // Non-Interpolated Version (Will compute the Integral at every call)
 // ----------------------------------------------------------------------------
 
+double C_ss_tomo_limber_nointerp(double l, int ni, int nj, int EE, const int init);
+
+double C_gs_tomo_limber_nointerp(double l, int ni, int nj, const int init_static_vars_only);
+
+double C_gg_tomo_limber_nointerp(double l, int ni, int nj, const int init);
+
 // WARNING: C_gg beyond linear bias for cross-tomography bins not yet supported
-double C_gg_tomo_limber_nointerp(double l, int ni, int nj, 
-  int use_linear_ps, const int init_static_vars_only);
+double C_gg_tomo_limber_nointerp(double l, int ni, int nj, const int init);
 
-double C_gk_tomo_limber_nointerp(double l, int nl, 
-  int use_linear_ps, const int init_static_vars_only);
+double C_gk_tomo_limber_nointerp(double l, int nl, const int init);
 
-double C_ks_tomo_limber_nointerp(double l, int ns, 
-  int use_linear_ps, const int init_static_vars_only);
+double C_ks_tomo_limber_nointerp(double l, int ns, const int init);
 
-double C_kk_limber_nointerp(double l, int use_linear_ps, 
-  const int init_static_vars_only);
+double C_kk_limber_nointerp(double l, const int init);
 
-double C_gy_tomo_limber_nointerp(double l, int ni, 
-  int use_linear_ps,  const int init_static_vars_only);
+double C_gy_tomo_limber_nointerp(double l, int ni, const int init);
 
-double C_ys_tomo_limber_nointerp(double l, int ni, 
-  int use_linear_ps, const int init_static_vars_only);
+double C_ys_tomo_limber_nointerp(double l, int ni, const int init);
 
-double C_ky_limber_nointerp(double l, 
-  int use_linear_ps, const int init_static_vars_only);
+double C_ky_limber_nointerp(double l, const int init);
 
-double C_yy_limber_nointerp(double l, 
-  int use_linear_ps, const int init_static_vars_only);
+double C_yy_limber_nointerp(double l, const int init);
 
 // ----------------------------------------------------------------------------
 // ----------------------------------------------------------------------------

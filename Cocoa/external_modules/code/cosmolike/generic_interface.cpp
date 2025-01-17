@@ -2322,7 +2322,7 @@ void compute_ss_real_masked(vector& data_vector, const int start)
 // ---------------------------------------------------------------------------
 
 void compute_ss_fourier_masked(vector& data_vector, const int start)
-{
+{ // HERE WE ASSUME NLA EE TODO CHANGE NAMES
   if (like.shear_shear == 1)
   {
     for (int nz=0; nz<tomo.shear_Npowerspectra; nz++)
@@ -2336,7 +2336,7 @@ void compute_ss_fourier_masked(vector& data_vector, const int start)
         
         if (like.ell[i] < like.lmax_shear)
         {
-          data_vector(index) = C_ss_tomo_limber(like.ell[i], z1, z2)*
+          data_vector(index) = C_ss_tomo_limber(like.ell[i], z1, z2, 1)*
             (1.0 + nuisance.shear_calibration_m[z1])*
             (1.0 + nuisance.shear_calibration_m[z2]);
         }
@@ -2520,7 +2520,7 @@ void compute_kk_fourier_masked(vector& data_vector, const int start)
         {
           const double l = like.ell[i];
           data_vector(index) = (l <= limits.LMIN_tab) ? 
-            C_kk_limber_nointerp(l, 0, 0) : C_kk_limber(l);
+            C_kk_limber_nointerp(l, 0) : C_kk_limber(l);
         }
       }
     }
@@ -2529,7 +2529,7 @@ void compute_kk_fourier_masked(vector& data_vector, const int start)
       for (int L=like.lmin_bp; L<like.lmax_bp + 1; L++)
       {
         const double Ckk = (L <= limits.LMIN_tab) ? 
-          C_kk_limber_nointerp((double) L, 0, 0) : C_kk_limber((double) L);
+          C_kk_limber_nointerp((double) L, 0) : C_kk_limber((double) L);
 
         const int i = L - like.lmin_bp;
 
