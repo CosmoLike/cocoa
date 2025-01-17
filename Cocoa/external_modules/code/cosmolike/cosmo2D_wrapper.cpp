@@ -29,6 +29,8 @@
 namespace py = pybind11;
 
 // cosmolike
+#include "cosmolike/bias.h"
+#include "cosmolike/IA.h"
 #include "cosmolike/cosmo2D.h"
 #include "cosmolike/redshift_spline.h"
 #include "cosmolike/structs.h"
@@ -43,13 +45,9 @@ namespace cosmolike_interface
 static int has_b2_galaxies()
 {
   int res = 0;
-  for (int i=0; i<redshift.clustering_nbin; i++) 
-  {
-    if (gbias.b2[i])
-    {
+  for (int i=0; i<redshift.clustering_nbin; i++)
+    if (nuisance.gb[1][i])
       res = 1;
-    }
-  }
   return res;
 }
 
@@ -327,29 +325,20 @@ matrix C_ss_NLA_tomo_limber_cpp(const vector l)
     exit(1);
   }
 
-  matrix result(l.n_elem, tomo.shear_Npowerspectra,arma::fill::zeros);
+  matrix result(l.n_elem, tomo.shear_Npowerspectra, arma::fill::none);
 
   #pragma GCC diagnostic push
   #pragma GCC diagnostic ignored "-Wunused-variable"
-  for (int nz=0; nz<tomo.shear_Npowerspectra; nz++)
   { // init static variables
-    const int ni = Z1(nz);
-    const int nj = Z2(nz);
-    double trash = C_ss_tomo_limber_nointerp(l(0), ni, nj, 0, 1);
+    double trash = C_ss_tomo_limber_nointerp(l(0), Z1(0), Z2(0), 0, 1);
   }
   #pragma GCC diagnostic pop
 
   #pragma omp parallel for collapse(2)
   for (int nz=0; nz<tomo.shear_Npowerspectra; nz++)
-  {
     for (int i=0; i<static_cast<int>(l.n_elem); i++)
-    {
-      const int ni = Z1(nz);
-      const int nj = Z2(nz);
-      result(i, nz) = C_ss_tomo_limber_nointerp(l(i), ni, nj, 0, 0);
-    }
-  }
-
+      result(i, nz) = C_ss_tomo_limber_nointerp(l(i), Z1(nz), Z2(nz), 0, 0);
+  
   return result;
 }
 
@@ -1284,6 +1273,7 @@ cube int_for_C_gk_tomo_limber_cpp(
 // ---------------------------------------------------------------------------
 // ---------------------------------------------------------------------------
 
+/*
 double int_for_C_gy_tomo_limber_cpp(
     const double a, 
     const double l,
@@ -1353,6 +1343,9 @@ cube int_for_C_gy_tomo_limber_cpp(
   return result;
 }
 
+*/
+
+
 // ---------------------------------------------------------------------------
 // ---------------------------------------------------------------------------
 // ---------------------------------------------------------------------------
@@ -1420,6 +1413,7 @@ cube int_for_C_ks_tomo_limber_cpp(
   return result;
 }
 
+/*
 // ---------------------------------------------------------------------------
 // ---------------------------------------------------------------------------
 // ---------------------------------------------------------------------------
@@ -1486,6 +1480,7 @@ cube int_for_C_ys_tomo_limber_cpp(
 
   return result;
 }
+*/
 
 // ---------------------------------------------------------------------------
 // ---------------------------------------------------------------------------
@@ -1531,6 +1526,7 @@ matrix int_for_C_kk_limber_cpp(const vector a, const vector l)
 // ---------------------------------------------------------------------------
 // ---------------------------------------------------------------------------
 
+/*
 double int_for_C_ky_limber_cpp(const double a, const double l)
 {
   double ar[2] = {l, (double) 0.0}; 
@@ -1606,6 +1602,8 @@ matrix int_for_C_yy_limber_cpp(const vector a, const vector l)
 
   return result;
 }
+
+*/
 
 // ---------------------------------------------------------------------------
 // ---------------------------------------------------------------------------

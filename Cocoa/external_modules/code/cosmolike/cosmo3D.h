@@ -63,6 +63,8 @@ double MG_Sigma(double a);
 
 double PkRatio_baryons(double k_NL, double a);
 
+double sigma2(const double M);
+
 #ifdef __cplusplus
 }
 #endif

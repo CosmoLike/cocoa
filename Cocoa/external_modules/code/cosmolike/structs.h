@@ -159,7 +159,7 @@ typedef struct
   double random_photoz_clustering;
   double random_ia;
   double random_galaxy_bias;
-  double random_yparams;
+  double random_gas;
 
   // INTRINSIC ALIGMENT ------------------------------------------  
   // ia[0][0] = A_ia          if(IA_NLA_LF || IA_REDSHIFT_EVOLUTION)
@@ -177,7 +177,6 @@ typedef struct
   // ia[1][1] = eta_ia_tt    if IA_REDSHIFT_EVOLUTION
   // ------------------
   // ia[2][MAX_SIZE_ARRAYS] = b_ta_z[MAX_SIZE_ARRAYS]
-  // first index: ia[0][:] = A_z; ia[1][:] = A2_z; ia[2][:] = b_ta_z
   double ia[MAX_SIZE_ARRAYS][MAX_SIZE_ARRAYS];
   double oneplusz0_ia;
   double c1rhocrit_ia;
@@ -191,10 +190,11 @@ typedef struct
   double shear_calibration_m[MAX_SIZE_ARRAYS];
   
   // GALAXY BIAS ------------------------------------------
-  // 1st index: b[0][i] = linear galaxy bias in clustering bin i (b1)
-  //            b[1][i] = linear galaxy bias in clustering bin i (b2)
-  //            b[2][i] = leading order tidal bias in clustering bin i (b3)
-  //            b[3][i] = leading order tidal bias in clustering bin i
+  // 1st index: b[0][i]: linear galaxy bias in clustering bin i
+  //            b[1][i]: nonlinear b2 galaxy bias in clustering bin i
+  //            b[2][i]: leading order tidal bs2 galaxy bias in clustering bin i
+  //            b[3][i]: nonlinear b3 galaxy bias in clustering bin i 
+  //            b[4][i]: amplitude of magnification bias in clustering bin i 
   double gb[MAX_SIZE_ARRAYS][MAX_SIZE_ARRAYS]; // galaxy bias
 
   // HOD[i] contains HOD parameters of galaxies in clustering bin i
@@ -413,6 +413,8 @@ extern TinkerEmuParameters tinkerEmuParam;
 void reset_bary_struct();
 
 void reset_nuisance_struct();
+
+void reset_redshift_struct();
 
 // --------------------------------------------------------------------
 // --------------------------------------------------------------------

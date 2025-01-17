@@ -38,6 +38,7 @@ namespace py = pybind11;
 #include "cosmolike/baryons.h"
 #include "cosmolike/cosmo2D.h"
 #include "cosmolike/cosmo3D.h"
+#include "cosmolike/IA.h"
 #include "cosmolike/halo.h"
 #include "cosmolike/radial_weights.h"
 #include "cosmolike/recompute.h"
@@ -346,30 +347,14 @@ void initial_setup()
   like.kk = 0;
   like.ks = 0;
   
-  // bias
-  gbias.b1_function = &b1_per_bin;
-
-  // no priors
+    // no priors
   like.clusterN = 0;
   like.clusterWL = 0;
   like.clusterCG = 0;
   like.clusterCC = 0;
 
   // reset bias
-  for (int i = 0; i < MAX_SIZE_ARRAYS; i++)
-  {
-    gbias.b[i] = 0.0;
-    gbias.b2[i] = 0.0;
-    gbias.b_mag[i] = 0.0;
-  }
-
-  // reset IA
-  for (int i = 0; i < MAX_SIZE_ARRAYS; i++)
-  {
-    nuisance.ia[0][i] = 0.0;
-    nuisance.ia[1][i] = 0.0;
-    nuisance.ia[2][i] = 0.0;
-  }
+  reset_redshift_struct();
   reset_nuisance_struct();
 
   /*
@@ -2227,9 +2212,24 @@ void set_nuisance_linear_bias(vector B1)
     exit(1);
   }
 
+  // GALAXY BIAS ------------------------------------------
+  // 1st index: b[0][i] = linear galaxy bias in clustering bin i (b1)
+  //            b[1][i] = linear galaxy bias in clustering bin i (b2)
+  //            b[2][i] = leading order tidal bias in clustering bin i (b3)
+  //            b[3][i] = leading order tidal bias in clustering bin i
+  int cache_update = 0;
   for (int i=0; i<redshift.clustering_nbin; i++)
-    gbias.b[i] = B1(i);
-  
+  {
+    if(fdiff(nuisance.gb[0][i], B1(i)))
+    {
+      cache_update = 1;
+      nuisance.gb[0][i] = B1(i);
+    } 
+  }
+
+  if(cache_update == 1)
+    nuisance.random_galaxy_bias = RandomNumber::get_instance().get();
+
   spdlog::debug("\x1b[90m{}\x1b[0m: Ends", "set_nuisance_linear_bias");
 }
 
@@ -2258,13 +2258,24 @@ void set_nuisance_nonlinear_bias(vector B1, vector B2)
     exit(1);
   }
 
-  constexpr double tmp = -4./7.;
-  
+  // GALAXY BIAS ------------------------------------------
+  // 1st index: b[0][i]: linear galaxy bias in clustering bin i
+  //            b[1][i]: nonlinear b2 galaxy bias in clustering bin i
+  //            b[2][i]: leading order tidal bs2 galaxy bias in clustering bin i
+  //            b[3][i]: nonlinear b3 galaxy bias  in clustering bin i 
+  //            b[4][i]: amplitude of magnification bias in clustering bin i 
+  int cache_update = 0;
   for (int i=0; i<redshift.clustering_nbin; i++)
   {
-    gbias.b2[i] = B2(i);
-    gbias.bs2[i] = almost_equal(B2(i), 0.) ? 0 : tmp*(B1(i)-1.0);
+    if(fdiff(nuisance.gb[1][i], B2(i)))
+    {
+      cache_update = 1;
+      nuisance.gb[1][i] = B2(i);
+      nuisance.gb[2][i] = almost_equal(B2(i), 0.) ? 0 : (-4./7.)*(B1(i)-1.0);
+    }
   }
+  if(cache_update == 1)
+    nuisance.random_galaxy_bias = RandomNumber::get_instance().get();
 
   spdlog::debug("\x1b[90m{}\x1b[0m: Ends", "set_nuisance_nonlinear_bias");
 }
@@ -2293,10 +2304,23 @@ void set_nuisance_magnification_bias(vector B_MAG)
     exit(1);
   }
 
+  // GALAXY BIAS ------------------------------------------
+  // 1st index: b[0][i]: linear galaxy bias in clustering bin i
+  //            b[1][i]: nonlinear b2 galaxy bias in clustering bin i
+  //            b[2][i]: leading order tidal bs2 galaxy bias in clustering bin i
+  //            b[3][i]: nonlinear b3 galaxy bias  in clustering bin i 
+  //            b[4][i]: amplitude of magnification bias in clustering bin i
+  int cache_update = 0;
   for (int i=0; i<redshift.clustering_nbin; i++)
   {
-    gbias.b_mag[i] = B_MAG(i);
+    if(fdiff(nuisance.gb[4][i], B_MAG(i)))
+    {
+      cache_update = 1;
+      nuisance.gb[4][i] = B_MAG(i);
+    }
   }
+  if(cache_update == 1)
+    nuisance.random_galaxy_bias = RandomNumber::get_instance().get();
 
   spdlog::debug("\x1b[90m{}\x1b[0m: Ends", "set_nuisance_magnification_bias");
 }
@@ -2332,10 +2356,9 @@ void set_nuisance_IA(
       "set_nuisance_IA", "shear_Nbin");
     exit(1);
   }
-
-  if (redshift.shear_nbin != static_cast<int>(A1.n_elem) ||
-      redshift.shear_nbin != static_cast<int>(A2.n_elem) ||
-      redshift.shear_nbin != static_cast<int>(BTA.n_elem))
+  if (redshift.shear_nbin > static_cast<int>(A1.n_elem) ||
+      redshift.shear_nbin > static_cast<int>(A2.n_elem) ||
+      redshift.shear_nbin > static_cast<int>(BTA.n_elem))
   {
     spdlog::critical(
       "\x1b[90m{}\x1b[0m: incompatible input w/ sizes = {}, {} and {} (!= {})",
@@ -2343,41 +2366,60 @@ void set_nuisance_IA(
     exit(1);
   }
 
+  // INTRINSIC ALIGMENT ------------------------------------------  
+  // ia[0][0] = A_ia          if(IA_NLA_LF || IA_REDSHIFT_EVOLUTION)
+  // ia[0][1] = eta_ia        if(IA_NLA_LF || IA_REDSHIFT_EVOLUTION)
+  // ia[0][2] = eta_ia_highz  if(IA_NLA_LF, Joachimi2012)
+  // ia[0][3] = beta_ia       if(IA_NLA_LF, Joachimi2012)
+  // ia[0][4] = LF_alpha      if(IA_NLA_LF, Joachimi2012)
+  // ia[0][5] = LF_P          if(IA_NLA_LF, Joachimi2012)
+  // ia[0][6] = LF_Q          if(IA_NLA_LF, Joachimi2012)
+  // ia[0][7] = LF_red_alpha  if(IA_NLA_LF, Joachimi2012)
+  // ia[0][8] = LF_red_P      if(IA_NLA_LF, Joachimi2012)
+  // ia[0][9] = LF_red_Q      if(IA_NLA_LF, Joachimi2012)
+  // ------------------
+  // ia[1][0] = A2_ia        if IA_REDSHIFT_EVOLUTION
+  // ia[1][1] = eta_ia_tt    if IA_REDSHIFT_EVOLUTION
+  // ------------------
+  // ia[2][MAX_SIZE_ARRAYS] = b_ta_z[MAX_SIZE_ARRAYS]
+
+  int cache_update = 0;
   nuisance.c1rhocrit_ia = 0.01389;
   
-  if ((int) abs(like.IA) == 2)
+  if (like.IA == IA_REDSHIFT_BINNING)
   {
     for (int i=0; i<redshift.shear_nbin; i++)
     {
-      nuisance.ia[0][i] = A1(i);
-      nuisance.ia[1][i] = A2(i);
-      nuisance.ia[2][i] = BTA(i);
-    }
-  }
-  else if ((int) abs(like.IA) == 3)
-  {
-    nuisance.ia[0][0] = A1(0);
-    nuisance.ia[0][1] = A1(1);
-    nuisance.oneplusz0_ia = 1.62;
-
-    nuisance.ia[1][0] = A2(0);
-    nuisance.ia[1][1] = A2(1);
-    
-    nuisance.ia[2][0] = BTA[0];
-
-    for (int i=2; i<redshift.shear_nbin; i++)
-    {
-      if (fdiff(A1(i), 0.) || fdiff(A2(i), 0.) || fdiff(BTA(i), 0.))
+      if (fdiff(nuisance.ia[0][i],A1(i)) ||
+          fdiff(nuisance.ia[1][i],A2(i)) ||
+          fdiff(nuisance.ia[2][i],A2(i)))
       {
-        spdlog::critical(
-          "\x1b[90m{}\x1b[0m: one of nuisance.A_z[{}]={}, nuisance.A2_z[{}]="
-          "{}, nuisance.b_ta[{}]={} was specified w/ power-law evolution\n",
-          "set_nuisance_IA", i, nuisance.ia[0][i], 
-          i, nuisance.ia[1][i], i, nuisance.ia[2][i]);
-        exit(1);
+        nuisance.ia[0][i] = A1(i);
+        nuisance.ia[1][i] = A2(i);
+        nuisance.ia[2][i] = BTA(i);
+        cache_update = 1;
       }
     }
   }
+  else if (like.IA == IA_REDSHIFT_EVOLUTION)
+  {
+    nuisance.oneplusz0_ia = 1.62;
+    if (fdiff(nuisance.ia[0][0],A1(0)) ||
+        fdiff(nuisance.ia[0][1],A1(1)) ||
+        fdiff(nuisance.ia[1][0],A2(0)) ||
+        fdiff(nuisance.ia[1][1],A2(1)) ||
+        fdiff(nuisance.ia[2][0],BTA(0)))
+    {
+      nuisance.ia[0][0] = A1(0);
+      nuisance.ia[0][1] = A1(1);
+      nuisance.ia[1][0] = A2(0);
+      nuisance.ia[1][1] = A2(1);
+      nuisance.ia[2][0] = BTA(0);
+      cache_update = 1;
+    }
+  }
+  if(cache_update == 1)
+    nuisance.random_ia = RandomNumber::get_instance().get();
 
   spdlog::debug("\x1b[90m{}\x1b[0m: Ends", "set_nuisance_ia");
 }

@@ -9,6 +9,7 @@
 #include <string.h>
 
 #include "basics.h"
+#include "bias.h"
 #include "cosmo3D.h"
 #include "recompute.h"
 #include "redshift_spline.h"

@@ -110,12 +110,8 @@ static int has_b2_galaxies()
 {
   int res = 0;
   for (int i=0; i<redshift.clustering_nbin; i++) 
-  {
     if (nuisance.gb[1][i])
-    {
       res = 1;
-    }
-  }
   return res;
 }
 
@@ -2048,7 +2044,7 @@ double int_for_C_gs_tomo_limber(double a, void* params)
       res *= WGAL;
     }
 
-    const double PK = p_gm(k, a, nl, use_linear_ps);
+    const double PK = p_gm(k, a, nl);
     res *= PK;
   }
   else
@@ -2357,7 +2353,7 @@ double C_gs_tomo_limber(
       cache[4] = redshift.random_shear;
       cache[5] = redshift.random_clustering;
       cache[6] = Ntable.random;
-      cache[7] = nuisance.random_galaxy_bias
+      cache[7] = nuisance.random_galaxy_bias;
     }
   }
 

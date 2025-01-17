@@ -4,12 +4,6 @@
 extern "C" {
 #endif
 
-#define DEFAULT_INT_PREC 1000
-
-#define delta_c 1.686
-
-#define Delta 200
-
 // HALO BIAS OPTIONS ---------------------------
 #define HALO_BIAS_TINKER_2010 0
 

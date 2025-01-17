@@ -419,10 +419,6 @@ void reset_bary_struct()
   }
 }
 
-// ---------------------------------------------------------------------------
-// ---------------------------------------------------------------------------
-// ---------------------------------------------------------------------------
-
 void reset_pdeltaparams_struct()
 {
   sprintf(pdeltaparams.runmode, "%s", "Halofit");
@@ -459,7 +455,6 @@ void reset_nuisance_struct()
     nuisance.cluster_selection[i] = 0.0;
     */
   }
-
   nuisance.oneplusz0_ia = 0.0;
   nuisance.c1rhocrit_ia = 0.01389;
 }

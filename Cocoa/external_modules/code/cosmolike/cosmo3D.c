@@ -1338,10 +1338,11 @@ double MG_Sigma(double a __attribute__((unused))) {
 
 
 double int_for_sigma2(double x, void* params) // inner integral
-{ // refactored FT of spherical top-hat that avoids numerical divergence of 1/x
+{
   double* ar = (double*) params;
-  const double k = x/ar[0];
-  const double PK = p_lin(k, 1.0);
+  const double R = ar[0];
+  const double a = ar[1];
+  const double PK = p_lin(x/R, a);
   
   gsl_sf_result J1;
   int status = gsl_sf_bessel_j1_e(x, &J1);
@@ -1350,67 +1351,75 @@ double int_for_sigma2(double x, void* params) // inner integral
     log_fatal(gsl_strerror(status));
     exit(1);
   }
-
   const double tmp = 3.0*J1.val/ar[0];
   return PK*tmp*tmp/(ar[0] * 2.0 * M_PI * M_PI);
 }
 
-double sigma2_nointerp(const double M, const double a, const int init_static_vars_only) 
+double sigma2_nointerp(
+    const double M, 
+    const double a, 
+    const int init_static_vars_only
+  ) 
 {
+  static double cache[MAX_SIZE_ARRAYS];
+  static gsl_integration_glfixed_table* w = NULL;
+
+  if (w == NULL || fdiff(cache[0], Ntable.random))
+  {
+    const size_t szint = 500 + 500 * (Ntable.high_def_integration);
+    if (w != NULL)  gsl_integration_glfixed_table_free(w);
+    w = malloc_gslint_glfixed(szint);
+    cache[0] = Ntable.random;
+  }
   
-  const double radius = 
-    pow(0.75*M/(M_PI*cosmology.rho_crit*cosmology.Omega_m), 1.0/3.0)
-  
-  double ar[1] = {radius};
+  double ar[1] = {pow(0.75*M/(M_PI*cosmology.rho_crit*cosmology.Omega_m),1./3.)};
   const double xmin = 0;
   const double xmax = 14.1;
 
-  return (init_static_vars_only == 1) ? int_for_sigma2((xmin+xmax)/2.0, (void*) ar) :
-    Ntable.high_def_integration > 0 ?
-    int_gsl_integrate_high_precision(int_for_sigma2, (void*) ar, xmin, xmax, 
-      NULL, GSL_WORKSPACE_SIZE) :
-    int_gsl_integrate_medium_precision(int_for_sigma2, (void*) ar, xmin, xmax, 
-      NULL, GSL_WORKSPACE_SIZE);
+  double res;
+  if (init_static_vars_only == 1)
+    res = int_for_sigma2((xmin+xmax)/2.0, (void*) ar);
+  else
+  {
+    gsl_function F;
+    F.params = (void*) ar;
+    F.function = int_for_sigma2;
+    res = gsl_integration_glfixed(&F, xmin, xmax, w);
+  }
+  return res;
 }
 
 double sigma2(const double M) 
 {
-  static cosmopara C;
+  static double cache[MAX_SIZE_ARRAYS];
   static double* table;
-  
-  const int nlnM = Ntable.N_M;
-  const double lnMmin = log(limits.M_min);
-  const double lnMmax = log(limits.M_max);
-  const double dlnM = (lnMmax - lnMmin)/((double) nlnM - 1.0);
-  
-  if (table == 0) 
+  static double lim[3];
+
+  if (table == NULL || fdiff(cache[1], Ntable.random))
   {
-    table = (double*) malloc(sizeof(double)*nlnM);
+    if (table != NULL) free(table);
+    table = (double*) malloc(sizeof(double)*Ntable.N_M);
+    lim[0] = log(limits.M_min);
+    lim[1] = log(limits.M_max);
+    lim[2] = (lim[1] - lim[0])/((double) Ntable.N_M - 1.0);
   } 
-  if (recompute_cosmo3D(C)) 
+  if (fdiff(cache[0], cosmology.random) || fdiff(cache[1], Ntable.random))
   {
     #pragma GCC diagnostic push
     #pragma GCC diagnostic ignored "-Wunused-variable"
-    {
-      double init = sigma2_nointerp(exp(lnMmin), 1);
+    { // sigma2_nointerp(M, a, init_static_vars_only) 
+      double init = sigma2_nointerp(exp(lim[0]), 1.0, 1);
     }
     #pragma GCC diagnostic pop
+    
     #pragma omp parallel for
-    for (int i=0; i<nlnM; i++) 
-    {
-      table[i] = log(sigma2_nointerp(exp(lnMmin + i*dlnM), 0));
-    }
-    update_cosmopara(&C);
+    for (int i=0; i<Ntable.N_M; i++) 
+      table[i] = log(sigma2_nointerp(exp(lim[0] + i*lim[2]), 1.0, 0));
+    
+    cache[0] = cosmology.random;
+    cache[1] = Ntable.random;
   }
-
-  const double lnM = log(M);
-  if (lnM < lnMmin)
-  {
-    log_warn("M = %e < l_min = %e. Extrapolation adopted", M, exp(lnMmin));
-  }
-  if (lnM > lnMmax)
-  {
-    log_warn("M = %e > l_max = %e. Extrapolation adopted", M, exp(lnMmax));
-  }
-  return exp(interpol(table, nlnM, lnMmin, lnMmax, dlnM, lnM, 1.0, 1.0));
+  return exp(interpol(table, Ntable.N_M, lim[0], lim[1], lim[2], log(M), 1., 1.));
 }
+
+
