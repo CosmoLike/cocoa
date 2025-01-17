@@ -1194,62 +1194,6 @@ double C_ss_tomo_limber(const double l, const int ni, const int nj, const int EE
 // ---------------------------------------------------------------------------
 // ---------------------------------------------------------------------------
 
-double int_for_C_gs_TATT_tomo_limber(double a, void* params)
-{
-  if (!(a>0) || !(a<1)) 
-  {
-    log_fatal("a>0 and a<1 not true");
-    exit(1);
-  }
-  double* ar = (double*) params;
-  const int nl = (int) ar[0];
-  const int ns = (int) ar[1];
-  if (nl < 0 || 
-      nl > redshift.clustering_nbin - 1 || 
-      ns < 0 || 
-      ns > redshift.shear_nbin - 1)
-  {
-    log_fatal("error in selecting bin number (nl, ns) = [%d,%d]", nl, ns);
-    exit(1);
-  }
-  const double l = ar[2];
-
-  const double growfac_a = growfac(a);
-  struct chis chidchi = chi_all(a);
-  const double hoverh0 = hoverh0v2(a, chidchi.dchida);
-  const double g4 = growfac_a*growfac_a*growfac_a*growfac_a;
-  const double ell = l + 0.5;
-  const double fK = f_K(chidchi.chi);
-  const double k = ell / fK;
-  const double z = 1. / a - 1.;
-
-  const double WGAL = W_gal(a, nl, hoverh0);
-  const double WMAG = W_mag(a, fK, nl); 
-  const double WS = W_source(a, ns, hoverh0);
-  const double WK = W_kappa(a, fK, ns);
-  
-  const double b1 = gb1(z, nl);
-  const double bmag = gbmag(z, nl);
-  const double b2 = gb2(z, nl);
-  const double bs2 = gbs2(z, nl);
-  const double b3 = gb3(z, nl);
-
-  const double PK = Pdelta(k, a);
-  const double tmp1 = 0.5*g4*(b2 * PT_d1d2(k) + bs2 * PT_d1s2(k) + b3 * PT_d1d3(k));
-  const double PK1loop = (WGAL*b2 != 0) ? tmp1 : 0.0; 
-
-  const double C1_ZS   = -IA_A1_Z1(a, growfac_a, ns);
-  const double b_ta_zs = IA_BTA_Z1(a, growfac_a, ns);
-  const double C2_ZS   = 5.*IA_A2_Z1(a, growfac_a, ns);
-  const double GIE  = TATT_GI_E(k, a, C1_ZS, C2_ZS, b_ta_zs, growfac_a, PK);
-
-  const double res = WK*(WMAG*bmag*PK + 
-                     WGAL*(b1*PK + PK1loop)) + 
-                     (WGAL*b1 + WMAG*bmag)*WS*GIE;
-  
-  return res*chidchi.dchida/(fK*fK);
-}
-
 double int_for_C_gs_tomo_limber(double a, void* params)
 {
   if (!(a>0) || !(a<1)) 
@@ -1258,7 +1202,6 @@ double int_for_C_gs_tomo_limber(double a, void* params)
     exit(1);
   }
   double* ar = (double*) params;
-  
   const int nl = (int) ar[0];
   const int ns = (int) ar[1];
   if (nl < 0 || 
@@ -1269,94 +1212,9 @@ double int_for_C_gs_tomo_limber(double a, void* params)
     log_fatal("error in selecting bin number (nl, ns) = [%d,%d]", nl, ns);
     exit(1);
   }
-  
   const double l = ar[2];
-
-  const double ell = l + 0.5;
-  const double growfac_a = growfac(a);
-  struct chis chidchi = chi_all(a);
-  const double hoverh0 = hoverh0v2(a, chidchi.dchida);
-  const double fK = f_K(chidchi.chi);
-  const double k = ell/fK;
-  const double z = 1.0/a - 1.0;
-
-  const double b1   = gb1(z, nl);
-  const double bmag = gbmag(z, nl);
-
-  const double WK = W_kappa(a, fK, ns);
-  const double WGAL = W_gal(a, nl, hoverh0);
-  const double WMAG = W_mag(a, fK, nl);
-
-  const double ell_prefactor = l*(l + 1.)/(ell*ell);          // correction (1812.05995 eqs 74-79)
-  const double tmp = (l - 1.)*l*(l + 1.)*(l + 2.);            // correction (1812.05995 eqs 74-79)
-  const double ell_prefactor2 = (tmp > 0) ? sqrt(tmp)/(ell*ell) : 0.0;
-
-  const double A_ZS = IA_A1_Z1(a, growfac_a, ns);
-  const double WS   = W_source(a, ns, hoverh0)*A_ZS;
+  const int nonlinear_bias = ar[3];
   
-  double res = WK - WS;
-
-  if (include_HOD_GX == 1)
-  {
-    if (include_RSD_GS == 1)
-    {
-      log_fatal("RSD not implemented with (HOD = TRUE)");
-      exit(1);
-    }
-    else
-    {
-      res *= WGAL;
-    }
-
-    const double PK = p_gm(k, a, nl);
-    res *= PK;
-  }
-  else
-  {
-    if (include_RSD_GS == 1)
-    {
-      const double chi_0 = f_K(ell/k);
-      const double chi_1 = f_K((ell+1.)/k);
-      const double a_0 = a_chi(chi_0);
-      const double a_1 = a_chi(chi_1);
-      const double WRSD = W_RSD(ell, a_0, a_1, nl);
-
-      res *= (WGAL*b1 + WMAG*ell_prefactor*bmag) + WRSD;
-    }
-    else
-    {
-      res *= (WGAL*b1 + WMAG*ell_prefactor*bmag);
-    }
-
-    const double PK = Pdelta(k,a);
-    res *= PK;
-  }
-  
-  return res*(chidchi.dchida/(fK*fK))*ell_prefactor2;
-}
-
-double int_for_C_gs_tomo_limber_withb2(double a, void* params)
-{
-  if(!(a>0) || !(a<1)) 
-  {
-    log_fatal("a>0 and a<1 not true");
-    exit(1);
-  }
-  double* ar = (double*) params;
-
-  const int nl = (int) ar[0];
-  const int ns = (int) ar[1];
-  if (nl < 0 || 
-      nl > redshift.clustering_nbin - 1 || 
-      ns < 0 || 
-      ns > redshift.shear_nbin - 1)
-  {
-    log_fatal("error in selecting bin number (nl, ns) = [%d,%d]", nl, ns);
-    exit(1);
-  }
-
-  const double l = ar[2];
-
   const double growfac_a = growfac(a);
   struct chis chidchi = chi_all(a);
   const double hoverh0 = hoverh0v2(a, chidchi.dchida);
@@ -1365,60 +1223,108 @@ double int_for_C_gs_tomo_limber_withb2(double a, void* params)
   const double fK = f_K(chidchi.chi);
   const double k = ell/fK;
   const double z = 1.0/a - 1.0;
+  const double PK = Pdelta(k,a);
 
   const double b1 = gb1(z, nl);
   const double bmag = gbmag(z, nl);
-  const double b2 = gb2(z, nl);
-  const double bs2 = gbs2(z, nl);
-  const double b3 = gb3(z, nl);
 
   const double WK = W_kappa(a, fK, ns);
   const double WGAL = W_gal(a, nl, hoverh0);
   const double WMAG = W_mag(a, fK, nl);
 
-  const double ell_prefactor = l*(l + 1.)/(ell*ell);       // correction (1812.05995 eqs 74-79)
-  const double tmp = (l - 1.)*l*(l + 1.)*(l + 2.);         // correction (1812.05995 eqs 74-79)
+  const double ell_prefactor = l*(l + 1.)/(ell*ell); // correction (1812.05995 eqs 74-79)
+  const double tmp = (l - 1.)*l*(l + 1.)*(l + 2.);   // correction (1812.05995 eqs 74-79)
   const double ell_prefactor2 = (tmp > 0) ? sqrt(tmp)/(ell*ell) : 0.0;
-  
-  const double A_ZS = IA_A1_Z1(a, growfac_a, ns);
-  const double WS   = W_source(a, ns, hoverh0) * A_ZS;
-  
-  double linear_part = WK - WS;
-  double non_linear_part = linear_part;
-  
-  if(include_RSD_GS == 1)
+
+  double ans;
+
+  switch(like.IA_MODEL)
   {
-    static double chi_a_min = 0;
-    if (chi_a_min == 0)
+    case IA_MODEL_TATT:
     {
-      chi_a_min = chi(limits.a_min);
+      const double WS = W_source(a, ns, hoverh0);
+
+      const double b2 = gb2(z, nl);
+      const double bs2 = gbs2(z, nl);
+      const double b3 = gb3(z, nl);
+
+      const double C1_ZS   = -IA_A1_Z1(a, growfac_a, ns);
+      const double b_ta_zs = IA_BTA_Z1(a, growfac_a, ns);
+      const double C2_ZS   = 5.*IA_A2_Z1(a, growfac_a, ns);
+      const double GIE = TATT_GI_E(k, a, C1_ZS, C2_ZS, b_ta_zs, growfac_a, PK);
+
+      double oneloop = 0.0;
+      if (nonlinear_bias == 1)
+      {
+        oneloop = 0.5*g4*(b2 * PT_d1d2(k) + bs2 * PT_d1s2(k) + b3 * PT_d1d3(k));
+      }
+      
+      const double tmp1 = 0.5*g4*(b2 * PT_d1d2(k) + bs2 * PT_d1s2(k) + b3 * PT_d1d3(k));
+      const double PK1loop = (WGAL*b2 != 0) ? tmp1 : 0.0; 
+
+
+      ans  = WK*(WMAG*bmag*PK + WGAL*(b1*PK + PK1loop)) + (WGAL*b1 + WMAG*bmag)*WS*GIE;
+      ans *= chidchi.dchida/(fK*fK) * ell_prefactor2;
+      break;
     }
-    const double chi_0 = f_K(ell/k);
-    const double chi_1 = f_K((ell + 1.0)/k);
-    if (chi_1 > chi_a_min)
+    case IA_MODEL_NLA:
     {
-      return 0;
+      const double A_ZS = IA_A1_Z1(a, growfac_a, ns);
+      const double WS   = W_source(a, ns, hoverh0)*A_ZS;
+
+      double b1pk = WK - WS;
+
+      if (include_HOD_GX == 1)
+      {
+        if (include_RSD_GS == 1)
+        {
+          log_fatal("RSD not implemented with (HOD = TRUE)");
+          exit(1);
+        }
+        else
+        {  
+          b1pk *= WGAL;
+        }
+        b1pk *= p_gm(k, a, nl);
+      }
+      else
+      {
+        if (include_RSD_GS == 1)
+        {
+          const double chi_0 = f_K(ell/k);
+          const double chi_1 = f_K((ell+1.)/k);
+          const double a_0 = a_chi(chi_0);
+          const double a_1 = a_chi(chi_1);
+          const double WRSD = W_RSD(ell, a_0, a_1, nl);
+          b1pk *= (WGAL*b1 + WMAG*ell_prefactor*bmag) + WRSD;
+        }
+        else
+          b1pk *= (WGAL*b1 + WMAG*ell_prefactor*bmag);
+        b1pk *= PK;
+      }
+
+      double oneloop = 0.0;
+      if (nonlinear_bias == 1)
+      {
+        const double bmag = gbmag(z, nl);
+        const double b2   = gb2(z, nl);
+        const double bs2  = gbs2(z, nl);
+        const double b3   = gb3(z, nl);
+        oneloop  = (WK - WS) * WGAL;
+        oneloop *= g4*0.5*(b2*PT_d1d2(k) + bs2*PT_d1s2(k) + b3*PT_d1d3(k));
+      }
+
+      ans = (b1pk + oneloop)*(chidchi.dchida/(fK*fK))*ell_prefactor2;
+      break;
     }
-    const double a_0 = a_chi(chi_0);
-    const double a_1 = a_chi(chi_1);
-    const double WRSD = W_RSD(ell, a_0, a_1, nl);
-
-    linear_part     *= (WGAL*b1 + WMAG*ell_prefactor*bmag) + WRSD;
-    non_linear_part *= WGAL;
+    default:
+    {
+      log_fatal("like.IA_MODEL = %d not supported", like.IA_MODEL);
+      exit(1);
+    }
   }
-  else
-  {
-    linear_part     *= (WGAL*b1 + WMAG*ell_prefactor*bmag);
-    non_linear_part *= WGAL;
-  }
-
-  linear_part *= Pdelta(k,a);
-  non_linear_part *= g4*0.5*(b2*PT_d1d2(k) + bs2*PT_d1s2(k) + b3*PT_d1d3(k));
-
-  return (linear_part + non_linear_part)*(chidchi.dchida/(fK*fK))*ell_prefactor2;
+  return ans;
 }
-
-// ---------------------------------------------------------------------------
 
 double C_gs_tomo_limber_nointerp(
     double l, 
@@ -1447,7 +1353,7 @@ double C_gs_tomo_limber_nointerp(
     cache[0] = Ntable.random;
   }
 
-  double ar[3] = {(double) nl, (double) ns, l};
+  double ar[4] = {(double) nl, (double) ns, l, has_b2_galaxies()};
   
   const double amin = amin_lens(nl);
   const double amax = amax_lens(nl);
@@ -1464,66 +1370,13 @@ double C_gs_tomo_limber_nointerp(
   }
 
   double res;
-  
   if (init == 1)
-  {
-    switch(like.IA_MODEL)
-    {
-      case IA_MODEL_TATT:
-      {
-        res = int_for_C_gs_TATT_tomo_limber(amin, (void*) ar);
-        break;
-      }
-      case IA_MODEL_NLA:
-      {
-        if (has_b2_galaxies())
-        {
-          res = int_for_C_gs_tomo_limber_withb2(amin, (void*) ar);
-        }
-        else 
-        {
-          res = int_for_C_gs_tomo_limber(amin, (void*) ar);
-        }
-        break;
-      }
-      default:
-      {
-        log_fatal("like.IA_MODEL = %d not supported", like.IA_MODEL);
-        exit(1);
-      }
-    }
-  }
+    res = int_for_C_gs_tomo_limber(amin, (void*) ar);
   else
   {    
     gsl_function F;
     F.params = (void*) ar;
-    
-    switch(like.IA_MODEL)
-    {
-      case IA_MODEL_NLA:
-      {
-        if (has_b2_galaxies())
-        {    
-          F.function = int_for_C_gs_tomo_limber_withb2;
-        }
-        else 
-        {
-          F.function = int_for_C_gs_tomo_limber;
-        }
-        break;
-      }
-      case IA_MODEL_TATT:
-      {
-        F.function = int_for_C_gs_TATT_tomo_limber;
-        break;
-      }
-      default:
-      {
-        log_fatal("like.IA_MODEL = %d not supported", like.IA_MODEL);
-        exit(1);
-      }
-    }
-
+    F.function = int_for_C_gs_tomo_limber;
     res = gsl_integration_glfixed(&F, amin, amax, w);
   }
 
