@@ -1941,11 +1941,7 @@ double int_for_C_gk_tomo_limber_withb2(double a, void* params)
   return (linear_part + non_linear_part)*(chidchi.dchida/(fK*fK))*ell_prefactor;
 }
 
-double C_gk_tomo_limber_nointerp(
-    double l, 
-    int ni,
-    const int init
-  )
+double C_gk_tomo_limber_nointerp(double l, int ni, const int init)
 {
   static double cache[MAX_SIZE_ARRAYS];
   static gsl_integration_glfixed_table* w = NULL;
@@ -2109,11 +2105,7 @@ double int_for_C_ks_tomo_limber(double a, void* params)
   return (res*PK*chidchi.dchida/(fK*fK))*ell_prefactor1*ell_prefactor2;
 }
 
-double C_ks_tomo_limber_nointerp(
-    double l, 
-    int ni,
-    const int init
-  )
+double C_ks_tomo_limber_nointerp(double l, int ni, const int init)
 {
   static double cache[MAX_SIZE_ARRAYS];
   static gsl_integration_glfixed_table* w = NULL;  
@@ -2310,10 +2302,7 @@ double int_for_C_kk_limber(double a, void* params)
   return WK*WK*PK*(chidchi.dchida/(fK*fK))*ell_prefactor*ell_prefactor;
 }
 
-double C_kk_limber_nointerp(
-    double l,
-    const int init
-  )
+double C_kk_limber_nointerp(double l, const int init)
 {
   static double cache[MAX_SIZE_ARRAYS];
   static gsl_integration_glfixed_table* w = NULL;
@@ -3112,111 +3101,17 @@ double C_yy_limber(double l)
 // ----------------------------------------------------------------------------
 // ----------------------------------------------------------------------------
 
-// ----------------------------------------------------------------------------
-// Galaxy Clustering
-// ----------------------------------------------------------------------------
-
-void f_chi_for_Psi_cl(
-    double* const chi, 
-    const int nchi, 
-    double* const f_chi, 
-    const int ni
+void C_cl_tomo(
+    int L, 
+    const int ni, 
+    const int nj, 
+    double *const Cl, 
+    double dev, 
+    double tol
   )
-{ // Integrand for galaxy density
-  if (ni < -1 || ni > redshift.clustering_nbin - 1)
-  {
-    log_fatal("error in selecting bin number ni = %d", ni);
-    exit(1);
-  }
-  
-  const double zmin = redshift.clustering_zdist_zmin[ni];
-  const double zmax = redshift.clustering_zdist_zmax[ni];
-  const double real_coverH0 = cosmology.coverH0/cosmology.h0; // unit Mpc
-  
-  for (int i=0; i<nchi; i++)
-  {
-    const double a = a_chi(chi[i]/real_coverH0 /* convert unit to c/H0 */);
-    const double z = 1.0/a - 1.;
-
-    if ((z < zmin) || (z > zmax))
-      f_chi[i] = 0.;
-    else
-    {
-      const double tmp1 = pf_photoz(z, ni);
-      const double pf = (tmp1 < 0.) ? 0 : tmp1; // get rid of unphysical negatives
-      f_chi[i] = gb1(z, ni)*chi[i]*pf*growfac(a)*hoverh0(a)/real_coverH0;
-    }
-  }
-}
-
-void f_chi_for_Psi_cl_RSD(
-    double* const chi, 
-    const int nchi, 
-    double* const f_chi, 
-    const int ni
-  ) // Integrand for galaxy density RSD
-{ 
-  if (ni < -1 || ni > redshift.clustering_nbin - 1)
-  {
-    log_fatal("error in selecting bin number ni = %d", ni);
-    exit(1);
-  }
-  
-  const double zmin = redshift.clustering_zdist_zmin[ni];
-  const double zmax = redshift.clustering_zdist_zmax[ni];
-  const double real_coverH0 = cosmology.coverH0 / cosmology.h0;
-  
-  for (int i=0; i<nchi; i++) 
-  {
-    const double a = a_chi(chi[i]/real_coverH0 /* convert unit to c/H0 */);
-    const double z = 1.0 / a - 1.0; 
-    
-    if ((z < zmin) || (z > zmax))
-      f_chi[i] = 0.;
-    else
-    {
-      const double tmp1 = pf_photoz(z, ni);
-      const double pf = (tmp1 < 0.) ? 0 : tmp1; // get rid of unphysical negatives
-      struct growths tmp2 = growfac_all(a);
-      f_chi[i] = -chi[i]*pf*tmp2.D*tmp2.f*hoverh0(a)/real_coverH0;
-    }
-  }
-}
-
-void f_chi_for_Psi_cl_Mag(
-    double* const chi, 
-    const int nchi, 
-    double* const f_chi, 
-    const int ni
-  )
-{ // Integrand for lensing magnification of galaxy density
-  if (ni < -1 || ni > redshift.clustering_nbin - 1)
-  {
-    log_fatal("error in selecting bin number ni = %d", ni);
-    exit(1);
-  }
-
-  const double zmax = redshift.clustering_zdist_zmax[ni]; 
-  const double real_coverH0 = cosmology.coverH0 / cosmology.h0;
-  
-  for (int i=0; i<nchi; i++)
-  {
-    const double a = a_chi(chi[i]/real_coverH0);
-    const double z = 1. / a - 1.;
-    if (z > zmax) 
-      f_chi[i] = 0.;
-    else
-    {
-      const double fK = f_K(chi[i]/real_coverH0); 
-      const double WM = W_mag(a, fK, ni);
-      f_chi[i] = (WM/fK/(real_coverH0*real_coverH0)) * growfac(a); // [Mpc^-2]
-    }
-  }
-}
-
-void C_cl_tomo(int L, const int ni, const int nj, double *const Cl, double dev, double tol)
 {
-  if (ni < -1 || ni > redshift.clustering_nbin - 1 || nj < -1 || nj > redshift.clustering_nbin - 1)
+  if (ni < -1 || ni > redshift.clustering_nbin - 1 || 
+      nj < -1 || nj > redshift.clustering_nbin - 1)
   {
     log_fatal("error in selecting bin number (ni, nj) = [%d,%d]", ni, nj);
     exit(1);
@@ -3226,77 +3121,51 @@ void C_cl_tomo(int L, const int ni, const int nj, double *const Cl, double dev, 
     log_fatal("Cocoa disabled cross-spectrum w_gg");
     exit(1);
   }
-
-  static double** k1;
-  static double** k2;
-  static double** Fk1;
-  static double** Fk2;
-  static double** Fk1_Mag;
-  static double** Fk2_Mag;
-  static double* chi_ar;
-
-  const int Nell_block = Ntable.NL_Nell_block;
-  const int Nchi = Ntable.NL_Nchi;  
-  int ell_ar[Nell_block];
-  double f1_chi[Nchi];
-  double f2_chi[Nchi];
-  double f1_chi_RSD[Nchi];
-  double f2_chi_RSD[Nchi];
-  double f1_chi_Mag[Nchi];
-  double f2_chi_Mag[Nchi];
+    
   const double real_coverH0 = cosmology.coverH0/cosmology.h0;
   const double chi_min = chi(1./(1.0 + 0.002))*real_coverH0; // DIMENSIONELESS
   const double chi_max = chi(1./(1.0 + 4.0))*real_coverH0;   // DIMENSIONELESS
-  const double dlnchi = log(chi_max/chi_min) / ((double) Nchi - 1.0);
+  const double dlnchi = log(chi_max/chi_min) / ((double) Ntable.NL_Nchi - 1.0);
   const double dlnk = dlnchi;
 
-  if (k1 == 0) 
+  int* ell_ar = (int*) malloc(sizeof(int)*Ntable.NL_Nell_block);
+  
+  double*** Fk1 = (double***) 
+    malloc3d(3, Ntable.NL_Nell_block, Ntable.NL_Nchi); // (Fk1, Fk1_Mag, k1)    
+  
+  double** f1_chi = (double**) 
+    malloc2d(4, Ntable.NL_Nchi); // (f1, f1_RSD, f1_MAG, chi)
+
+  #pragma omp parallel for
+  for (int i=0; i<Ntable.NL_Nchi; i++)
   {
-    k1 = (double**) malloc(Nell_block * sizeof(double*));
-    k2 = (double**) malloc(Nell_block * sizeof(double*));
-    Fk1 = (double**) malloc(Nell_block * sizeof(double*));
-    Fk2 = (double**) malloc(Nell_block * sizeof(double*));
-    Fk1_Mag = (double**) malloc(Nell_block * sizeof(double*));
-    Fk2_Mag = (double**) malloc(Nell_block * sizeof(double*));
-    for (int i = 0; i < Nell_block; i++) 
-    {
-      k1[i] = (double*) malloc(Nchi * sizeof(double));
-      k2[i] = (double*) malloc(Nchi * sizeof(double));
-      Fk1[i] = (double*) malloc(Nchi * sizeof(double));
-      Fk2[i] = (double*) malloc(Nchi * sizeof(double));
-      Fk1_Mag[i] = (double*) malloc(Nchi * sizeof(double));
-      Fk2_Mag[i] = (double*) malloc(Nchi * sizeof(double));
+    f1_chi[3][i] = chi_min * exp(dlnchi * i); 
+    const double a = a_chi(f1_chi[3][i]/real_coverH0);
+    const double z = 1. / a - 1.;
+    
+    if (z < redshift.clustering_zdist_zmin[ni] || 
+        z > redshift.clustering_zdist_zmax[ni])
+    { 
+      f1_chi[0][i] = 0.;
+      f1_chi[1][i] = 0.;
+      f1_chi[2][i] = 0.;
     }
-    chi_ar = (double*) malloc(Nchi * sizeof(double));
-  }
-  
-  for (int i=0; i < Nchi; i++)
-  { // chi_min and chi_max are cosmology dependent
-    chi_ar[i] = chi_min * exp(dlnchi * i); 
-  }
-  
-  #pragma omp parallel for collapse(2)
-  for (int i=0; i<Nell_block; i++)
-  {
-    for (int j=0; j<Nchi; j++)
+    else
     {
-      k1[i][j] = 0.0;
-      k2[i][j] = 0.0;
-      Fk1[i][j] = 0.0;
-      Fk2[i][j] = 0.0;
-      Fk1_Mag[i][j] = 0.0;
-      Fk2_Mag[i][j] = 0.0;
+      const double pf = pf_photoz(z,ni);
+      const double hoverh0_a = hoverh0(a);
+      const double fK = f_K(f1_chi[3][i]/real_coverH0); 
+      const double WM = W_mag(a, fK, ni);
+      struct growths growfac_a = growfac_all(a);
+      const double D = growfac_a.D;
+      const double f = growfac_a.f;
+
+      f1_chi[0][i] = gb1(z, ni)*f1_chi[3][i]*pf*D*hoverh0_a/real_coverH0;
+      
+      f1_chi[1][i] = -f1_chi[3][i]*pf*D*f*hoverh0_a/real_coverH0;
+
+      f1_chi[2][i] = (WM/fK/(real_coverH0*real_coverH0)) * D; // [Mpc^-2] 
     }
-  }
-  
-  f_chi_for_Psi_cl(chi_ar, Nchi, f1_chi, ni);
-  f_chi_for_Psi_cl_RSD(chi_ar, Nchi, f1_chi_RSD, ni);
-  f_chi_for_Psi_cl_Mag(chi_ar, Nchi, f1_chi_Mag, ni);
-  if (ni != nj)
-  { 
-    f_chi_for_Psi_cl(chi_ar, Nchi, f2_chi, nj);
-    f_chi_for_Psi_cl_RSD(chi_ar, Nchi, f2_chi_RSD, nj);
-    f_chi_for_Psi_cl_Mag(chi_ar, Nchi, f2_chi_Mag, nj);
   }
 
   config cfg;
@@ -3327,56 +3196,49 @@ void C_cl_tomo(int L, const int ni, const int nj, double *const Cl, double dev, 
 
   while ((fabs(dev) > tol) && (L < limits.LMAX_NOLIMBER))
   {
-    for (int i=0; i<Nell_block; i++)
-    {
-      ell_ar[i] = i + i_block * Nell_block; 
-    }
+    for (int i=0; i<Ntable.NL_Nell_block; i++)
+      ell_ar[i] = i + i_block * Ntable.NL_Nell_block; 
+
     i_block++;
-    if (L >= limits.LMAX_NOLIMBER - Nell_block)
-    { //Xiao: break before memory leak in next iteration
-      break;
-    }
-    L = i_block * Nell_block - 1;
+  
+    if (L >= limits.LMAX_NOLIMBER - Ntable.NL_Nell_block) break; //Xiao: break before memory leak in next iteration
+  
+    L = i_block * Ntable.NL_Nell_block - 1;
 
-    cfftlog_ells(chi_ar, f1_chi, Nchi, &cfg, ell_ar, Nell_block, k1, Fk1);
-    cfftlog_ells_increment(chi_ar, f1_chi_RSD, Nchi, &cfg_RSD, ell_ar, Nell_block, k1, Fk1);   
-    cfftlog_ells(chi_ar, f1_chi_Mag, Nchi, &cfg_Mag, ell_ar, Nell_block, k1, Fk1_Mag);    
-    if (ni != nj)
-    {
-      cfftlog_ells(chi_ar, f2_chi, Nchi, &cfg, ell_ar, Nell_block, k2, Fk2);
-      cfftlog_ells_increment(chi_ar, f2_chi_RSD, Nchi, &cfg_RSD, ell_ar, Nell_block, k2, Fk2);
-      cfftlog_ells(chi_ar, f2_chi_Mag, Nchi, &cfg_Mag, ell_ar, Nell_block, k2, Fk2_Mag);
-    }
-
+    cfftlog_ells(f1_chi[3], f1_chi[0], Ntable.NL_Nchi, &cfg, ell_ar, 
+      Ntable.NL_Nell_block, Fk1[2], Fk1[0]);
+    
+    cfftlog_ells_increment(f1_chi[3], f1_chi[1], Ntable.NL_Nchi, &cfg_RSD, 
+      ell_ar, Ntable.NL_Nell_block, Fk1[2], Fk1[0]);   
+    
+    cfftlog_ells(f1_chi[3], f1_chi[2], Ntable.NL_Nchi, &cfg_Mag, ell_ar, 
+      Ntable.NL_Nell_block, Fk1[2], Fk1[1]);    
+    
     #pragma GCC diagnostic push
     #pragma GCC diagnostic ignored "-Wunused-variable"
     #pragma GCC diagnostic push
     #pragma GCC diagnostic ignored "-Wunused-but-set-variable"
     { // init static variables inside the C_XY_limber_nointerp function
-      double ini = p_lin(k1[0][0]*real_coverH0, 1.0);
-      ini = C_gg_tomo_limber_nointerp((double) ell_ar[0], ni, nj, 1);
+      double ini = p_lin(Fk1[2][0][0]*real_coverH0, 1.0);
+      ini = C_gg_tomo_limber_nointerp((double) 100, 0, 0, 1);
     }
     #pragma GCC diagnostic pop
     #pragma GCC diagnostic pop
-    
-    #pragma omp parallel for
-    for (int i=0; i<Nell_block; i++)
-    {
-      double cl_temp = 0.;
-      for (int j=0; j<Nchi; j++)
-      {
-        const double ell_prefactor = ell_ar[i] * (ell_ar[i] + 1.);
-        Fk1[i][j] += gbmag(0.0, ni)*ell_prefactor*Fk1_Mag[i][j]/(k1[i][j]*k1[i][j]);
-        if (ni != nj)
-        {
-          Fk2[i][j] += gbmag(0.0, nj)*ell_prefactor*Fk2_Mag[i][j]/(k2[i][j]*k2[i][j]);
-        }
 
-        // ------------------------------------------------------------------------------------
-        const double k1cH0 = k1[i][j] * real_coverH0;
-        const double PK = p_lin(k1cH0, 1.0);
-        const double k1cH03 = k1cH0*k1cH0*k1cH0;
-        cl_temp += (ni == nj) ? Fk1[i][j]*Fk1[i][j]*k1cH03*PK : Fk1[i][j]*Fk2[i][j]*k1cH03*PK;
+    #pragma omp parallel for
+    for (int i=0; i<Ntable.NL_Nell_block; i++)
+    {
+      const double ell_prefactor = ell_ar[i] * (ell_ar[i] + 1.);
+
+      double cl_temp = 0.;
+      for (int j=0; j<Ntable.NL_Nchi; j++)
+      {
+        Fk1[0][i][j] += 
+          gbmag(0.0, ni)*ell_prefactor*Fk1[1][i][j]/(Fk1[2][i][j]*Fk1[2][i][j]);
+        
+        const double k1cH0 = Fk1[2][i][j] * real_coverH0;
+        
+        cl_temp += Fk1[0][i][j]*Fk1[0][i][j]*(k1cH0*k1cH0*k1cH0)*p_lin(k1cH0,1);
       }
       
       Cl[ell_ar[i]] = cl_temp * dlnk * 2. / M_PI + 
@@ -3393,4 +3255,7 @@ void C_cl_tomo(int L, const int ni, const int nj, double *const Cl, double dev, 
   for (int l=L; l<limits.LMAX_NOLIMBER; l++)
     Cl[l] = (l > limits.LMIN_tab) ? C_gg_tomo_limber(l, ni, nj) :
                                     C_gg_tomo_limber_nointerp(l, ni, nj, 0);
+  free(Fk1);
+  free(f1_chi);
+  free(ell_ar);
 }

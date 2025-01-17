@@ -20,16 +20,11 @@ extern "C" {
 // ----------------------------------------------------------------------------
 // ----------------------------------------------------------------------------
 
-// ss in real space has a special name
+// ss in real space
 double xi_pm_tomo(
-    const int pm, 
-    const int nt, 
-    const int ni, 
-    const int nj, 
-    const int limber
-  );
+    const int pm, const int nt, const int ni, const int nj, const int limber);
 
-// gs in real space has a special name
+// gs in real space
 double w_gammat_tomo(const int nt, const int ni, const int nj, const int limber);
 
 double w_gg_tomo(const int nt, const int ni, const int nj, const int limber);
@@ -41,28 +36,12 @@ double w_ks_tomo(const int nt, const int ni, const int limber);
 // ----------------------------------------------------------------------------
 // ----------------------------------------------------------------------------
 // ----------------------------------------------------------------------------
-// Non Limber (Angular Power Spectrum)
-// ----------------------------------------------------------------------------
-// ----------------------------------------------------------------------------
-// ----------------------------------------------------------------------------
-
-// Mixture of non-Limber and Limber of C_cl (galaxy clustering)
-void C_cl_tomo(int L, int ni, int nj, double *Cl, double dev, double tolerance);
-
-// ----------------------------------------------------------------------------
-// ----------------------------------------------------------------------------
-// ----------------------------------------------------------------------------
 // Limber Approximation (Angular Power Spectrum)
 // ----------------------------------------------------------------------------
 // ----------------------------------------------------------------------------
 // ----------------------------------------------------------------------------
 
-double C_ss_tomo_limber(
-    const double l, 
-    const int ni, 
-    const int nj, 
-    const int EE
-  );
+double C_ss_tomo_limber(const double l, const int ni, const int nj, const int EE);
 
 double C_gs_tomo_limber(const double l, const int ni, const int nj);
 
@@ -92,7 +71,7 @@ double C_gs_tomo_limber_nointerp(double l, int ni, int nj, const int init_static
 
 double C_gg_tomo_limber_nointerp(double l, int ni, int nj, const int init);
 
-// WARNING: C_gg beyond linear bias for cross-tomography bins not yet supported
+// WARNING: C_gg for cross-tomography bins not yet supported
 double C_gg_tomo_limber_nointerp(double l, int ni, int nj, const int init);
 
 double C_gk_tomo_limber_nointerp(double l, int nl, const int init);
@@ -110,32 +89,16 @@ double C_ky_limber_nointerp(double l, const int init);
 double C_yy_limber_nointerp(double l, const int init);
 
 // ----------------------------------------------------------------------------
+// Integrands 
 // ----------------------------------------------------------------------------
-// ----------------------------------------------------------------------------
-// Integrand for Angular Power Spectrum - Limber Approximation 
-// ----------------------------------------------------------------------------
-// ----------------------------------------------------------------------------
-// ----------------------------------------------------------------------------
-
-double int_for_C_ss_TATT_EE_tomo_limber(double a, void* params);
-
-double int_for_C_ss_TATT_BB_tomo_limber(double a, void* params);
 
 double int_for_C_ss_tomo_limber(double a, void* params);
 
-double int_for_C_gs_TATT_tomo_limber(double a, void* params);
-
 double int_for_C_gs_tomo_limber(double a, void* params);
-
-double int_for_C_gs_tomo_limber_withb2(double a, void* params);
 
 double int_for_C_gg_tomo_limber(double a, void* params);
 
-double int_for_C_gg_tomo_limber_withb2(double a, void* params);
-
 double int_for_C_gk_tomo_limber(double a, void* params);
-
-double int_for_C_gk_tomo_limber_withb2(double a, void* params);
 
 double int_for_C_ks_tomo_limber(double a, void* params);
 
@@ -148,6 +111,16 @@ double int_for_C_ys_tomo_limber(double a, void* params);
 double int_for_C_ky_limber(double a, void* params);
 
 double int_for_C_yy_limber(double a, void *params);
+
+// ----------------------------------------------------------------------------
+// ----------------------------------------------------------------------------
+// ----------------------------------------------------------------------------
+// Non Limber (Angular Power Spectrum)
+// ----------------------------------------------------------------------------
+// ----------------------------------------------------------------------------
+// ----------------------------------------------------------------------------
+
+void C_cl_tomo(int L, int ni, int nj, double *Cl, double dev, double tolerance);
 
 #ifdef __cplusplus
 }
