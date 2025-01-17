@@ -29,18 +29,14 @@
 gsl_spline* malloc_gsl_spline(const int n)
 {
   gsl_spline* result;
+
   if (Ntable.photoz_interpolation_type == 0)
-  {
     result = gsl_spline_alloc(gsl_interp_cspline, n);
-  }
   else if (Ntable.photoz_interpolation_type == 1)
-  {
     result = gsl_spline_alloc(gsl_interp_linear, n);
-  }
   else
-  {
     result = gsl_spline_alloc(gsl_interp_steffen, n);
-  }
+
   if (result == NULL)
   {
     log_fatal("array allocation failed");
@@ -125,14 +121,7 @@ void* calloc1d(const int nx)
 
 int fdiff(const double a, const double b)
 {
-  if (fabs(a - b) < 1.0e-13 * fabs(a + b) || fabs(a - b) < 2.0e-38)
-  {
-    return 0; 
-  }
-  else
-  {
-    return 1;
-  }
+  return (fabs(a-b) < 1.0e-13 * fabs(a+b) || fabs(a-b) < 2.0e-38) ? 0 : 1;
 }
 
 double fmin(const double a, const double b)
@@ -145,17 +134,10 @@ double fmax(const double a, const double b)
   return a > b ? a : b;
 }
 
-bin_avg set_bin_average(
-    const int i_theta, 
-    const int j_L
-  )
+bin_avg set_bin_average(const int i_theta, const int j_L)
 {
-  static double** Pmin  = NULL;
-  static double** Pmax  = NULL;
-  static double** dPmin = NULL;
-  static double** dPmax = NULL;
-  static double* xmin = NULL;
-  static double* xmax = NULL;
+  static double*** P  = NULL;
+  static double** xminmax = NULL;
   static int ntheta = 0;
   
   if (Ntable.Ntheta == 0)
@@ -174,134 +156,51 @@ bin_avg set_bin_average(
     exit(1);
   }
 
-  if (Pmin == NULL || (ntheta != Ntable.Ntheta))
+  if (P == NULL || (ntheta != Ntable.Ntheta))
   {
-    if (Pmin != NULL)
-    {
-      free(Pmin);
-      Pmin = NULL;
-    }
-    if (Pmax != NULL)
-    {
-      free(Pmax);
-      Pmax = NULL;
-    }
-    if (dPmin != NULL)
-    {
-      free(dPmin);
-      dPmin = NULL;
-    }
-    if (dPmax != NULL)
-    {
-      free(dPmax);
-      dPmax = NULL;
-    }
-    if (xmin != NULL)
-    {
-      free(xmin);
-      xmin = NULL;
-    }
-    if (xmax != NULL)
-    {
-      free(xmax);
-      xmax = NULL;
-    }
+    if (P != NULL) free(P);
+    if (xminmax != NULL) free(xminmax);
 
-    const int nell = limits.LMAX+1; // Legendre computes l=0,...,lmax (inclusive)
-    
-    const int len  = sizeof(double*)*Ntable.Ntheta + 
-                           sizeof(double)*Ntable.Ntheta*nell;
+    // Legendre computes l=0,...,lmax (inclusive)
+    P  = (double***) malloc3d(4, Ntable.Ntheta, limits.LMAX+1);
+    double** Pmin  = P[0]; double** Pmax  = P[1];
+    double** dPmin = P[2]; double** dPmax = P[3];
 
-    Pmin  = (double**) malloc(len);
-    if (Pmin == NULL)
-    {
-      log_fatal("array allocation failed");
-      exit(1);
-    }
-    Pmax  = (double**) malloc(len);
-    if (Pmax == NULL)
-    {
-      log_fatal("array allocation failed");
-      exit(1);
-    }
-    dPmin = (double**) malloc(len);
-    if (dPmin == NULL)
-    {
-      log_fatal("array allocation failed");
-      exit(1);
-    }
-    dPmax = (double**) malloc(len);
-    if (dPmax == NULL)
-    {
-      log_fatal("array allocation failed");
-      exit(1);
-    }
-    for (int i=0; i<Ntable.Ntheta; i++)
-    {
-      Pmin[i]  = ((double*)(Pmin + Ntable.Ntheta) + nell*i);
-      Pmax[i]  = ((double*)(Pmax + Ntable.Ntheta) + nell*i);
-      dPmin[i] = ((double*)(dPmin + Ntable.Ntheta) + nell*i);
-      dPmax[i] = ((double*)(dPmax + Ntable.Ntheta) + nell*i);
-    }
-
-    xmin = (double*) calloc(Ntable.Ntheta, sizeof(double));
-    if (xmin == NULL)
-    {
-      log_fatal("array allocation failed");
-      exit(1);
-    }
-    xmax = (double*) calloc(Ntable.Ntheta, sizeof(double));
-    if (xmax == NULL)
-    {
-      log_fatal("array allocation failed");
-      exit(1);
-    }
+    xminmax = (double**) malloc2d(2, Ntable.Ntheta);
 
     const double logdt = 
       (log(Ntable.vtmax)-log(Ntable.vtmin))/ (double) Ntable.Ntheta;
     
     for(int i=0; i<Ntable.Ntheta ; i++)
     {
-      xmin[i] = cos(exp(log(Ntable.vtmin) + (i + 0.0)*logdt));
-      xmax[i] = cos(exp(log(Ntable.vtmin) + (i + 1.0)*logdt));
+      xminmax[0][i] = cos(exp(log(Ntable.vtmin) + (i + 0.0)*logdt));
+      xminmax[1][i] = cos(exp(log(Ntable.vtmin) + (i + 1.0)*logdt));
     }
 
     #pragma omp parallel for
     for (int i=0; i<Ntable.Ntheta; i++)
     {
-      if (abs(xmin[i]) > 1)
+      if (abs(xminmax[0][i]) > 1)
       {
-        log_fatal(
-          "logical error: bad Legendre argument xmin = %.3e (> 1)", xmin[i]
-        );
+        log_fatal("logical error: Legendre argument xmin = %.3e>1", xminmax[0][i]);
         exit(1);
       }
-      if (abs(xmax[i]) > 1)
+      if (abs(xminmax[1][i]) > 1)
       {
-        log_fatal(
-          "logical error: bad Legendre argument xmas = %.3e (> 1)", xmin[i]
-        );
+        log_fatal("logical error: Legendre argument xmax = %.3e>1", xminmax[1][i]);
         exit(1);
       }
       
-      int status = gsl_sf_legendre_Pl_deriv_array(
-          limits.LMAX, 
-          xmin[i], 
-          Pmin[i], 
-          dPmin[i]
-        );
+      int status = 
+      gsl_sf_legendre_Pl_deriv_array(limits.LMAX, xminmax[0][i], Pmin[i], dPmin[i]);
       if (status) 
       {
         log_fatal(gsl_strerror(status));
         exit(1);
       }
 
-      status = gsl_sf_legendre_Pl_deriv_array(
-          limits.LMAX, 
-          xmax[i], 
-          Pmax[i], 
-          dPmax[i]
-        );
+      status = 
+      gsl_sf_legendre_Pl_deriv_array(limits.LMAX, xminmax[1][i], Pmax[i], dPmax[i]);
       if (status) 
       {
         log_fatal(gsl_strerror(status));
@@ -313,71 +212,13 @@ bin_avg set_bin_average(
   }
 
   bin_avg r;
-  r.xmin = xmin[i_theta];
-  r.xmax = xmax[i_theta];
-  r.Pmin = Pmin[i_theta][j_L];
-  r.Pmax = Pmax[i_theta][j_L];
-  r.dPmin = dPmin[i_theta][j_L];
-  r.dPmax = dPmax[i_theta][j_L];
+  r.xmin = xminmax[0][i_theta];
+  r.xmax = xminmax[1][i_theta];
+  r.Pmin = P[0][i_theta][j_L];
+  r.Pmax = P[1][i_theta][j_L];
+  r.dPmin = P[2][i_theta][j_L];
+  r.dPmax = P[3][i_theta][j_L];
   return r;
-}
-
-/*
-double int_gsl_integrate_high_precision(double (*func)(double, void*),
-void* arg, double a, double b, double* error, int niter)
-{
-  double res, err;
-  gsl_integration_cquad_workspace *w = gsl_integration_cquad_workspace_alloc(niter);
-  gsl_function F;
-  F.function = func;
-  F.params = arg;
-  gsl_integration_cquad(&F, a, b, 0, precision.high, w, &res, &err, 0);
-  if (NULL != error)
-    *error = err;
-  gsl_integration_cquad_workspace_free(w);
-  return res;
-}
-
-double int_gsl_integrate_medium_precision(double (*func)(double, void*),
-void* arg, double a, double b, double* error, int niter)
-{
-  double res, err;
-  
-  gsl_integration_cquad_workspace *w = gsl_integration_cquad_workspace_alloc(niter);
-  gsl_function F;
-  F.function = func;
-  F.params = arg;
-  gsl_integration_cquad(&F, a, b, 0, precision.medium/2, w, &res, &err, 0);
-  if (NULL != error) 
-  {
-    *error = err;
-  }
-  return res;
-}
-*/
-
-double int_gsl_integrate_high_precision(double (*func)(double, void*),
-void* arg, double a, double b, double* error, int niter)
-{
-  double res, err;
-  
-  // Hacked from GSL souce code (cquad.c) - stack (faster) vs heap allocation
-  size_t heap[niter];
-  gsl_integration_cquad_ival ival[niter];
-  gsl_integration_cquad_workspace w;
-  w.size = niter;
-  w.ivals = ival;
-  w.heap = heap;  
-
-  gsl_function F;
-  F.function = func;
-  F.params = arg;
-  gsl_integration_cquad(&F, a, b, 0, precision.high, &w, &res, &err, 0);
-  if (NULL != error) 
-  {
-    *error = err;
-  }
-  return res;
 }
 
 double int_gsl_integrate_medium_precision(double (*func)(double, void*),
@@ -576,47 +417,58 @@ int ny, double ay, double by, double dy, double y, double lower, double upper)
          dt * (1. - ds) * f[i + 1][j] + dt * ds * f[i + 1][j + 1];
 }
 
-double interpol2d_fitslope(double **f, int nx, double ax, double bx, double dx,
-double x, int ny, double ay, double by, double dy, double y, double lower) 
-{
-  double t, dt, s, ds, upper;
-  int i, j, fitrange;
-  if (x < ax) {
+double interpol2d_fitslope(
+    double **f, 
+    int nx, 
+    double ax, 
+    double bx, 
+    double dx,
+    double x, 
+    int ny, 
+    double ay, 
+    double by, 
+    double dy, 
+    double y, 
+    double lower
+  ) 
+{  
+  if (x < ax || x > bx)
     return 0.;
-  }
-
-  if (x > bx) {
-    return 0.;
-  }
-  t = (x - ax) / dx;
-  i = (int)(floor(t));
-  dt = t - i;
-  if (y < ay) {
+  
+  const double t = (x - ax) / dx;
+  int i = (int)(floor(t));
+  const double dt = (x - ax) / dx - i;
+  
+  if (y < ay) 
     return ((1. - dt) * f[i][0] + dt * f[i + 1][0]) + (y - ay) * lower;
-  } else if (y > by) {
-    if (ny > 25) {
+  else if (y > by) 
+  {
+    int fitrange;
+
+    if (ny > 25) 
       fitrange = 5;
-    } else {
-      fitrange = (int)floor(ny / 5);
-    }
-    upper = ((1. - dt) * (f[i][ny - 1] - f[i][ny - 1 - fitrange]) +
-             dt * (f[i + 1][ny - 1] - f[i + 1][ny - 1 - fitrange])) /
-            (dy * fitrange);
-    return ((1. - dt) * f[i][ny - 1] + dt * f[i + 1][ny - 1]) +
-           (y - by) * upper;
+    else 
+      fitrange = (int) floor(ny / 5);
+
+    const double upper = ((1. - dt) * (f[i][ny - 1] - f[i][ny - 1 - fitrange]) + 
+      dt * (f[i + 1][ny - 1] - f[i + 1][ny - 1 - fitrange])) /(dy * fitrange);
+    
+    return ((1. - dt) * f[i][ny - 1] + dt * f[i + 1][ny - 1]) + (y - by) * upper;
   }
-  s = (y - ay) / dy;
-  j = (int)(floor(s));
-  ds = s - j;
-  if ((i + 1 == nx) && (j + 1 == ny)) {
+  
+  const double s = (y - ay) / dy;
+  const int j = (int)(floor(s));
+  const double ds = s - j;
+  
+  if ((i + 1 == nx) && (j + 1 == ny)) 
     return (1. - dt) * (1. - ds) * f[i][j];
-  }
-  if (i + 1 == nx) {
+  
+  if (i + 1 == nx) 
     return (1. - dt) * (1. - ds) * f[i][j] + (1. - dt) * ds * f[i][j + 1];
-  }
-  if (j + 1 == ny) {
+
+  if (j + 1 == ny)
     return (1. - dt) * (1. - ds) * f[i][j] + dt * (1. - ds) * f[i + 1][j];
-  }
+  
   return (1. - dt) * (1. - ds) * f[i][j] + (1. - dt) * ds * f[i][j + 1] +
          dt * (1. - ds) * f[i + 1][j] + dt * ds * f[i + 1][j + 1];
 }

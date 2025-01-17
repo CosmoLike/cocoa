@@ -313,7 +313,11 @@ typedef struct
   int adopt_limber_gammat;
   int use_ggl_efficiency_zoverlap;
 
-  int galaxy_bias_model[MAX_SIZE_ARRAYS]; 
+  int galaxy_bias_model[MAX_SIZE_ARRAYS]; // [0] = b1, 
+                                          // [1] = b2, 
+                                          // [2] = bs2, 
+                                          // [3] = b3, 
+                                          // [4] = bmag 
   int halo_model[MAX_SIZE_ARRAYS]; // [0] = HMF, 
                                    // [1] = BIAS, 
                                    // [2] = CONCENTRATION

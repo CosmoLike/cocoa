@@ -24,7 +24,7 @@
 
 #include "log.c/src/log.h"
 
-static int use_linear_ps_limber = 0; // 0 or 1 
+static int ps_lin_limber = 0; // 0 or 1 
 static int include_HOD_GX = 0; // 0 or 1
 static int include_RSD_GS = 0; // 0 or 1 
 static int include_RSD_GG = 1; // 0 or 1 
@@ -34,13 +34,8 @@ static int include_RSD_GY = 0; // 0 or 1
 double beam_cmb(const double l)
 {
   const double sigma = cmb.fwhm/sqrt(16.0*log(2.0));
-  
   double norm = 1.0;
-  if(l < like.lmin_kappacmb || l > like.lmax_kappacmb)
-  {
-    norm = 0.0;
-  }
-  
+  if(l < like.lmin_kappacmb || l > like.lmax_kappacmb)  norm = 0.0;
   return exp(-l*(l+1.0)*sigma*sigma)*norm;
 }
 
@@ -171,7 +166,6 @@ double xi_pm_tomo(
   {
     if (Glpm != NULL) free(Glpm);
     Glpm = (double***) malloc3d(2, Ntable.Ntheta, limits.LMAX);
-    
     if (xipm != NULL) free(xipm);
     xipm = (double**) malloc2d(2, NSIZE*Ntable.Ntheta);
     
@@ -341,8 +335,7 @@ double xi_pm_tomo(
             {
               const int q = nz*Ntable.Ntheta + i;
               xipm[0][q] = 0;
-              xipm[1][q] = 0;
-              
+              xipm[1][q] = 0;  
               for (int l=lmin; l<limits.LMAX; l++)
               {
                 xipm[0][q] += Glpm[0][i][l] * (Cl[0][nz][l] + Cl[1][nz][l]);
@@ -360,49 +353,28 @@ double xi_pm_tomo(
           
           const int lmin = 1;
           for (int i=0; i<NSIZE; i++)
-          {
             for (int l=0; l<lmin; l++)
-            {
               Cl[i][l] = 0.0;
-            }
-          }
 
           #pragma GCC diagnostic push
           #pragma GCC diagnostic ignored "-Wunused-variable"
           { // init static variables inside the C_XY_limber function
-            const int Z1NZ = Z1(0);
-            const int Z2NZ = Z2(0);
             const int l = limits.LMIN_tab + 1;
-            double trash = C_ss_tomo_limber((double) l, Z1NZ, Z2NZ); 
+            double trash = C_ss_tomo_limber((double) l, Z1(0), Z2(0)); 
           }
           #pragma GCC diagnostic pop
           
           #pragma omp parallel for collapse(2)
           for (int nz=0; nz<NSIZE; nz++)
-          {
             for (int l=lmin; l<limits.LMIN_tab; l++)
-            {
-              const int init_static_vars_only = 0; // FALSE
-              const int Z1NZ = Z1(nz);
-              const int Z2NZ = Z2(nz);
-
-              Cl[nz][l] = C_ss_tomo_limber_nointerp((double) l, Z1NZ, Z2NZ, 
-                use_linear_ps_limber, init_static_vars_only);
-            }
-          }
+              Cl[nz][l] = C_ss_tomo_limber_nointerp((double) l, Z1(nz), Z2(nz), 
+                                                    ps_lin_limber, 0);
           #pragma omp parallel for collapse(2)
           for (int nz=0; nz<NSIZE; nz++)
-          {
-            for (int l=limits.LMIN_tab; l<limits.LMAX; l++)
-            {
-              const int Z1NZ = Z1(nz);
-              const int Z2NZ = Z2(nz); 
-              
-              Cl[nz][l] = C_ss_tomo_limber((double) l, Z1NZ, Z2NZ);
-            }
-          }
+            for (int l=limits.LMIN_tab; l<limits.LMAX; l++)        
+              Cl[nz][l] = C_ss_tomo_limber((double) l, Z1(nz), Z2(nz));
 
-          //#pragma omp parallel for collapse(2)
+          #pragma omp parallel for collapse(2)
           for (int nz=0; nz<NSIZE; nz++)
           {
             for (int i=0; i<Ntable.Ntheta; i++)
@@ -560,14 +532,11 @@ double w_gammat_tomo(
     #pragma GCC diagnostic push
     #pragma GCC diagnostic ignored "-Wunused-variable"
     { // init static variables inside the C_XY_limber function
-      const int force_no_recompute = 0;    // FALSE
       const int nz = 0;
       const int ZLNZ = ZL(nz);
       const int ZSNZ = ZS(nz);
-      const int l = limits.LMIN_tab + 1;
-      
-      double trash = C_gs_tomo_limber((double) l, ZLNZ, ZSNZ, 
-        force_no_recompute);
+      const int l = limits.LMIN_tab + 1; 
+      double trash = C_gs_tomo_limber((double) l, ZLNZ, ZSNZ, 0);
     }
     #pragma GCC diagnostic pop
 
@@ -575,29 +544,16 @@ double w_gammat_tomo(
     {
       #pragma omp parallel for collapse(2)
       for (int nz=0; nz<NSIZE; nz++)
-      {
         for (int l=lmin; l<limits.LMIN_tab; l++)
-        {
-          const int init_static_vars_only = 0; // FALSE
-          const int ZLNZ = ZL(nz);
-          const int ZSNZ = ZS(nz);
-          
-          Cl[nz][l] = C_gs_tomo_limber_nointerp((double) l, ZLNZ, ZSNZ, 
-            use_linear_ps_limber, init_static_vars_only);
-        }
-      }
+          Cl[nz][l] = C_gs_tomo_limber_nointerp(l, ZL(nz), ZS(nz), ps_lin_limber, 0);
       
       #pragma omp parallel for collapse(2)
       for (int nz=0; nz<NSIZE; nz++)
       {
         for (int l=limits.LMIN_tab; l<limits.LMAX; l++)
         {
-          const int force_no_recompute = 1;    // TRUE
-          const int ZLNZ = ZL(nz);
-          const int ZSNZ = ZS(nz);
-          
-          Cl[nz][l] = C_gs_tomo_limber((double) l, ZLNZ, ZSNZ, 
-            force_no_recompute);
+          const int force_no_recompute = 1;    // TRUE          
+          Cl[nz][l] = C_gs_tomo_limber((double) l, ZL(nz), ZS(nz), force_no_recompute);
         }
       }
     }
@@ -790,7 +746,7 @@ double w_gg_tomo(
           const int Z2 = nz; // cross redshift bin not supported so not using ZCL2(k)
           
           Cl[q][l] = C_gg_tomo_limber_nointerp((double) l, Z1, Z2, 
-            use_linear_ps_limber, init_static_vars_only);
+            ps_lin_limber, init_static_vars_only);
         }
       }
       
@@ -990,7 +946,7 @@ double w_gk_tomo(const int nt, const int ni, const int limber)
           const int init_static_vars_only = 0; // FALSE
 
           Cl[nz][l] = C_gk_tomo_limber_nointerp_wrapper((double) l, nz, 
-            use_linear_ps_limber, init_static_vars_only);
+            ps_lin_limber, init_static_vars_only);
         }
       }
 
@@ -1163,7 +1119,7 @@ double w_ks_tomo(
           const int init_static_vars_only = 0; // FALSE
           
           Cl[nz][l] = C_ks_tomo_limber_nointerp_wrapper((double) l, nz, 
-            use_linear_ps_limber, init_static_vars_only);
+            ps_lin_limber, init_static_vars_only);
         }
       }
 
@@ -1869,7 +1825,7 @@ double C_ss_tomo_limber(
       const int Z2NZ = Z2(k);
       const double lmin = exp(lnlmin);
       double trash = C_ss_tomo_limber_nointerp(lmin, Z1NZ, Z2NZ, 
-        use_linear_ps_limber, init_static_vars_only);
+        ps_lin_limber, init_static_vars_only);
     }
     #pragma GCC diagnostic pop
     
@@ -1884,7 +1840,7 @@ double C_ss_tomo_limber(
         const double l = exp(lnlmin + i*dlnl);
         
         table[k][i]= log(C_ss_tomo_limber_nointerp(l, Z1NZ, Z2NZ, 
-          use_linear_ps_limber, init_static_vars_only));
+          ps_lin_limber, init_static_vars_only));
       }
     }
 
@@ -2320,7 +2276,7 @@ double C_gs_tomo_limber(
         const int ZSNZ = ZS(k);
         
         double trash = C_gs_tomo_limber_nointerp(exp(lnlmin), ZLNZ, ZSNZ, 
-          use_linear_ps_limber, init_static_vars_only);
+          ps_lin_limber, init_static_vars_only);
       }
       #pragma GCC diagnostic pop
 
@@ -2337,7 +2293,7 @@ double C_gs_tomo_limber(
           if (test_zoverlap(ZLNZ, ZSNZ))
           {
             table[k][i] = C_gs_tomo_limber_nointerp(exp(lnl), ZLNZ, ZSNZ, 
-              use_linear_ps_limber, init_static_vars_only);
+              ps_lin_limber, init_static_vars_only);
           }
           else
           {
@@ -2670,7 +2626,7 @@ double C_gg_tomo_limber(
         const int ZCL2 = k;
         
         double trash = C_gg_tomo_limber_nointerp(exp(lnlmin), ZCL1, ZCL2, 
-          use_linear_ps_limber, init_static_vars_only);
+          ps_lin_limber, init_static_vars_only);
       }
       #pragma GCC diagnostic pop
       
@@ -2685,7 +2641,7 @@ double C_gg_tomo_limber(
           const double lnl = lnlmin + p*dlnl;
           
           const double res = C_gg_tomo_limber_nointerp(exp(lnl), ZCL1, ZCL2, 
-            use_linear_ps_limber, init_static_vars_only);
+            ps_lin_limber, init_static_vars_only);
           
           table[k][p] = log(res); // TODO: change this
         }
@@ -2992,7 +2948,7 @@ double C_gk_tomo_limber(
         const double lnl = lnlmin;
         
         double trash = C_gk_tomo_limber_nointerp(exp(lnl), ZLNZ, 
-          use_linear_ps_limber, init_static_vars_only);
+          ps_lin_limber, init_static_vars_only);
       }
       #pragma GCC diagnostic pop
       
@@ -3006,7 +2962,7 @@ double C_gk_tomo_limber(
           const double lnl = lnlmin + i*dlnl;
           
           table[k][i]= log(C_gk_tomo_limber_nointerp(exp(lnl), k, 
-            use_linear_ps_limber, init_static_vars_only));
+            ps_lin_limber, init_static_vars_only));
         }
       }
       
@@ -3179,7 +3135,7 @@ double C_ks_tomo_limber(
         const double lnl = lnlmin;
         
         double trash = C_ks_tomo_limber_nointerp(exp(lnl), ZSNZ, 
-          use_linear_ps_limber, init_static_vars_only);
+          ps_lin_limber, init_static_vars_only);
       }
       #pragma GCC diagnostic pop
       
@@ -3193,7 +3149,7 @@ double C_ks_tomo_limber(
           const double lnl = lnlmin + i*dlnl;
           
           table[k][i] = C_ks_tomo_limber_nointerp(exp(lnl), ZSNZ, 
-            use_linear_ps_limber, init_static_vars_only);
+            ps_lin_limber, init_static_vars_only);
         }
       }
 
@@ -3202,7 +3158,7 @@ double C_ks_tomo_limber(
       {
         sig[k] = 1.;
         osc[k] = 0;
-        if (C_ks_tomo_limber_nointerp(500., k, use_linear_ps_limber, 0) < 0)
+        if (C_ks_tomo_limber_nointerp(500., k, ps_lin_limber, 0) < 0)
         {
           sig[k] = -1.;
         }
@@ -3365,7 +3321,7 @@ double C_kk_limber(double l, const int force_no_recompute)
         const int init_static_vars_only = 1; // TRUE
         const double lnl = lnlmin;
 
-        double trash = C_kk_limber_nointerp(exp(lnl), use_linear_ps_limber, 
+        double trash = C_kk_limber_nointerp(exp(lnl), ps_lin_limber, 
           init_static_vars_only);
       }
       #pragma GCC diagnostic pop
@@ -3376,7 +3332,7 @@ double C_kk_limber(double l, const int force_no_recompute)
         const int init_static_vars_only = 0; // FALSE
         const double lnl = lnlmin + i*dlnl;
 
-        table[i] = log(C_kk_limber_nointerp(exp(lnl), use_linear_ps_limber, 
+        table[i] = log(C_kk_limber_nointerp(exp(lnl), ps_lin_limber, 
           init_static_vars_only));
       }
 
@@ -3566,7 +3522,7 @@ double C_gy_tomo_limber(double l, int ni, const int force_no_recompute)
         const double lnl = lnlmin;
 
         double trash = C_gy_tomo_limber_nointerp(exp(lnl), ZLNZ, 
-          use_linear_ps_limber, init_static_vars_only);
+          ps_lin_limber, init_static_vars_only);
       }
       #pragma GCC diagnostic pop
       
@@ -3580,7 +3536,7 @@ double C_gy_tomo_limber(double l, int ni, const int force_no_recompute)
           const double lnl = lnlmin + i*dlnl;
           
           table[k][i]= log(C_gy_tomo_limber_nointerp(exp(lnl), ZLNZ, 
-            use_linear_ps_limber, init_static_vars_only));
+            ps_lin_limber, init_static_vars_only));
         }
       }
 
@@ -3751,7 +3707,7 @@ double C_ys_tomo_limber(double l, int ni, const int force_no_recompute)
           const double lnl = lnlmin;
 
           double trash = C_ys_tomo_limber_nointerp(exp(lnl), ZSNZ, 
-            use_linear_ps_limber, init_static_vars_only);
+            ps_lin_limber, init_static_vars_only);
         }
       }
       #pragma GCC diagnostic pop
@@ -3766,7 +3722,7 @@ double C_ys_tomo_limber(double l, int ni, const int force_no_recompute)
           const double lnl = lnlmin + i*dlnl;
 
           table[k][i] = C_ys_tomo_limber_nointerp(exp(lnl), k, 
-            use_linear_ps_limber, init_static_vars_only);
+            ps_lin_limber, init_static_vars_only);
         }
       }
       
@@ -3779,7 +3735,7 @@ double C_ys_tomo_limber(double l, int ni, const int force_no_recompute)
         const int init_static_vars_only = 0; // FALSE
         const int ZSNZ = k;
         const double tmp = C_ys_tomo_limber_nointerp(500., ZSNZ, 
-          use_linear_ps_limber, init_static_vars_only);
+          ps_lin_limber, init_static_vars_only);
         
         if (tmp < 0)
           sig[k] = -1.;
@@ -3949,7 +3905,7 @@ double C_ky_limber(double l, const int force_no_recompute)
         const int init_static_vars_only = 1; // TRUE
         const double lnl = lnlmin;
 
-        double trash = C_ky_limber_nointerp(exp(lnl), use_linear_ps_limber, 
+        double trash = C_ky_limber_nointerp(exp(lnl), ps_lin_limber, 
           init_static_vars_only);
       }
       #pragma GCC diagnostic pop
@@ -3960,7 +3916,7 @@ double C_ky_limber(double l, const int force_no_recompute)
         const int init_static_vars_only = 0; // FALSE
         const double lnl = lnlmin + i*dlnl;
 
-        table[i] = log(C_ky_limber_nointerp(exp(lnl), use_linear_ps_limber, 
+        table[i] = log(C_ky_limber_nointerp(exp(lnl), ps_lin_limber, 
           init_static_vars_only));
       }
 
@@ -4081,7 +4037,7 @@ double C_yy_limber(double l, const int force_no_recompute)
         const int init_static_vars_only = 1; // TRUE
         const double lnl = lnlmin;
 
-        double trash = C_yy_limber_nointerp(exp(lnl), use_linear_ps_limber, 
+        double trash = C_yy_limber_nointerp(exp(lnl), ps_lin_limber, 
           init_static_vars_only);
       }
       #pragma GCC diagnostic pop
@@ -4092,7 +4048,7 @@ double C_yy_limber(double l, const int force_no_recompute)
         const int init_static_vars_only = 0; // FALSE
         const double lnl = lnlmin + i*dlnl;
 
-        table[i] = log(C_yy_limber_nointerp(exp(lnl), use_linear_ps_limber, 
+        table[i] = log(C_yy_limber_nointerp(exp(lnl), ps_lin_limber, 
           init_static_vars_only));
       }
       
@@ -4404,7 +4360,7 @@ void C_cl_tomo(int L, const int ni, const int nj, double *const Cl, double dev, 
   for (int l=L; l<limits.LMAX_NOLIMBER; l++)
   {
     Cl[l] = (l > limits.LMIN_tab) ? C_gg_tomo_limber((double) l, ni, nj, 1) :
-      C_gg_tomo_limber_nointerp((double) l, ni, nj, use_linear_ps_limber, 0);
+      C_gg_tomo_limber_nointerp((double) l, ni, nj, ps_lin_limber, 0);
   }
 }
 
@@ -4679,6 +4635,6 @@ void C_gl_tomo(
   for (int l=L; l<limits.LMAX_NOLIMBER; l++)
   {
     Cl[l] = (l > limits.LMIN_tab) ? C_gs_tomo_limber((double) l, nl, ns, 1) :
-      C_gs_tomo_limber_nointerp((double) l, nl, ns, use_linear_ps_limber, 0);
+      C_gs_tomo_limber_nointerp((double) l, nl, ns, ps_lin_limber, 0);
   }      
 }

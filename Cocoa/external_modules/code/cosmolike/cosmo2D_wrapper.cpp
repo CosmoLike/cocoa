@@ -146,44 +146,28 @@ vector w_gammat_tomo_cpp()
 {
   if (redshift.shear_nbin == 0)
   {
-    spdlog::critical(
-        "\x1b[90m{}\x1b[0m: {} = 0 is invalid",
-        "compute_data_vector_masked", 
-        "shear_Nbin"
-      );
+    spdlog::critical("\x1b[90m{}\x1b[0m: {} = 0 is invalid",
+      "compute_data_vector_masked", "shear_Nbin");
     exit(1);
   }
-
   if (redshift.clustering_nbin == 0)
   {
-    spdlog::critical(
-        "\x1b[90m{}\x1b[0m: {} = 0 is invalid",
-        "compute_data_vector_masked", 
-        "clustering_Nbin"
-      );
+    spdlog::critical("\x1b[90m{}\x1b[0m: {} = 0 is invalid",
+      "compute_data_vector_masked", "clustering_Nbin");
     exit(1);
   }
-
   if (Ntable.Ntheta == 0)
   {
-    spdlog::critical(
-        "\x1b[90m{}\x1b[0m: {} = 0 is invalid",
-        "compute_data_vector_masked", 
-        "Ntheta"
-      );
+    spdlog::critical("\x1b[90m{}\x1b[0m: {} = 0 is invalid",
+      "compute_data_vector_masked", "Ntheta");
     exit(1);
   }
   
   vector result(Ntable.Ntheta*tomo.ggl_Npowerspectra, arma::fill::none);
 
   for (int nz=0; nz<tomo.ggl_Npowerspectra; nz++)
-  {
     for (int i=0; i<Ntable.Ntheta; i++)
-    {
       result(Ntable.Ntheta*nz+i) = w_gammat_tomo(i, ZL(nz), ZS(nz), 1);
-    }
-  }
-
   return result;
 }
 
@@ -193,113 +177,28 @@ vector w_gammat_tomo_cpp()
 
 vector w_gg_tomo_cpp()
 {
-  if (redshift.clustering_nbin == 0)
-  {
-    spdlog::critical(
-        "\x1b[90m{}\x1b[0m: {} = 0 is invalid",
-        "compute_data_vector_masked", 
-        "clustering_Nbin"
-      );
-    exit(1);
-  }
-
-  if (Ntable.Ntheta == 0)
-  {
-    spdlog::critical(
-        "\x1b[90m{}\x1b[0m: {} = 0 is invalid",
-        "compute_data_vector_masked", 
-        "Ntheta"
-      );
-    exit(1);
-  }
-
   vector result(Ntable.Ntheta*redshift.clustering_nbin, arma::fill::none);
-
   for (int nz=0; nz<tomo.clustering_Npowerspectra; nz++)
-  {
     for (int i=0; i<Ntable.Ntheta; i++)
-    {
       result(Ntable.Ntheta*nz + i) = w_gg_tomo(i, nz, nz, 0);
-    }
-  }
-
   return result;
 }
-
-// ---------------------------------------------------------------------------
-// ---------------------------------------------------------------------------
-// ---------------------------------------------------------------------------
 
 vector w_gk_tomo_cpp()
 {
-  if (redshift.clustering_nbin == 0)
-  {
-    spdlog::critical(
-        "\x1b[90m{}\x1b[0m: {} = 0 is invalid",
-        "compute_data_vector_masked", 
-        "clustering_Nbin"
-      );
-    exit(1);
-  }
-
-  if (Ntable.Ntheta == 0)
-  {
-    spdlog::critical(
-        "\x1b[90m{}\x1b[0m: {} = 0 is invalid",
-        "compute_data_vector_masked", 
-        "Ntheta"
-      );
-    exit(1);
-  }
-
   vector result(Ntable.Ntheta*redshift.clustering_nbin, arma::fill::none);
-
   for (int nz=0; nz<redshift.clustering_nbin; nz++)
-  {
     for (int i=0; i<Ntable.Ntheta; i++)
-    {
       result(Ntable.Ntheta*nz + i) = w_gk_tomo(i, nz, 1);
-    }
-  }
-
   return result;
 }
 
-// ---------------------------------------------------------------------------
-// ---------------------------------------------------------------------------
-// ---------------------------------------------------------------------------
-
 vector w_ks_tomo_cpp()
 {
-  if (redshift.shear_nbin == 0)
-  {
-    spdlog::critical(
-        "\x1b[90m{}\x1b[0m: {} = 0 is invalid",
-        "compute_data_vector_masked", 
-        "clustering_Nbin"
-      );
-    exit(1);
-  }
-  if (Ntable.Ntheta == 0)
-  {
-    spdlog::critical(
-        "\x1b[90m{}\x1b[0m: {} = 0 is invalid",
-        "compute_data_vector_masked", 
-        "Ntheta"
-      );
-    exit(1);
-  }
-
   vector result(Ntable.Ntheta*redshift.shear_nbin, arma::fill::none);
-
   for (int nz=0; nz<redshift.clustering_nbin; nz++)
-  {
     for (int i=0; i<Ntable.Ntheta; i++)
-    {
       result(Ntable.Ntheta*nz + i) = w_ks_tomo(i, nz, 1);
-    }
-  }
-
   return result;
 }
 
@@ -341,8 +240,6 @@ matrix C_ss_NLA_tomo_limber_cpp(const vector l)
   
   return result;
 }
-
-
 
 // ---------------------------------------------------------------------------
 // ---------------------------------------------------------------------------
@@ -440,8 +337,6 @@ py::tuple C_ss_tomo_limber_cpp(vector l)
 
 // ---------------------------------------------------------------------------
 // ---------------------------------------------------------------------------
-// ---------------------------------------------------------------------------
-// ---------------------------------------------------------------------------
 
 double C_gs_tomo_limber_cpp(const double l, const int ni, const int nj)
 {
@@ -460,26 +355,19 @@ matrix C_gs_tomo_limber_cpp(const vector l)
 
   #pragma GCC diagnostic push
   #pragma GCC diagnostic ignored "-Wunused-variable"
-  for (int nz=0; nz<tomo.ggl_Npowerspectra; nz++)
   { // init static variables
-    double tmp = C_gs_tomo_limber_nointerp(l(0), ZL(nz), ZS(nz), 0, 1);
+    double tmp = C_gs_tomo_limber_nointerp(l(0), ZL(0), ZS(0), 0, 1);
   }
   #pragma GCC diagnostic pop
 
   #pragma omp parallel for collapse(2)
   for (int nz=0; nz<tomo.ggl_Npowerspectra; nz++)
-  {
     for (int i=0; i<static_cast<int>(l.n_elem); i++)
-    {
       result(i, nz) = C_gs_tomo_limber_nointerp(l(i), ZL(nz), ZS(nz), 0, 0);
-    }
-  }
 
   return result;
 }
 
-// ---------------------------------------------------------------------------
-// ---------------------------------------------------------------------------
 // ---------------------------------------------------------------------------
 // ---------------------------------------------------------------------------
 
@@ -500,20 +388,15 @@ matrix C_gg_tomo_limber_cpp(const vector l)
 
   #pragma GCC diagnostic push
   #pragma GCC diagnostic ignored "-Wunused-variable"
-  for (int nz=0; nz<redshift.clustering_nbin; nz++)
   { // init static variables
-    double tmp = C_gg_tomo_limber_nointerp(l(0), nz, nz, 0, 1);
+    double tmp = C_gg_tomo_limber_nointerp(l(0), 0, 0, 0, 1);
   }
   #pragma GCC diagnostic pop
 
   #pragma omp parallel for collapse(2)
   for (int nz=0; nz<redshift.clustering_nbin; nz++)
-  {
     for (int i=0; i<static_cast<int>(l.n_elem); i++)
-    {
       result(i, nz) = C_gg_tomo_limber_nointerp(l(i), nz, nz, 0, 0);
-    }
-  }
 
   return result;
 }
@@ -553,8 +436,6 @@ matrix C_gg_tomo_cpp(const vector l)
 
 // ---------------------------------------------------------------------------
 // ---------------------------------------------------------------------------
-// ---------------------------------------------------------------------------
-// ---------------------------------------------------------------------------
 
 double C_gk_tomo_limber_cpp(const double l, const int ni)
 {
@@ -581,13 +462,9 @@ matrix C_gk_tomo_limber_cpp(const vector l)
 
   #pragma omp parallel for collapse(2)
   for (int nz=0; nz<redshift.clustering_nbin; nz++)
-  {
     for (int i=0; i<static_cast<int>(l.n_elem); i++)
-    {
       result(i, nz) = C_gk_tomo_limber_nointerp(l(i), nz, 0, 0);
-    }
-  }
-
+ 
   return result;
 }
 
@@ -620,12 +497,8 @@ matrix C_ks_tomo_limber_cpp(const vector l)
 
   #pragma omp parallel for collapse(2)
   for (int nz=0; nz<redshift.shear_nbin; nz++)
-  {
     for (int i=0; i<static_cast<int>(l.n_elem); i++)
-    {
       result(i, nz) = C_ks_tomo_limber_nointerp(l(i), nz, 0, 0);
-    }
-  }
 
   return result;
 }
@@ -634,6 +507,7 @@ matrix C_ks_tomo_limber_cpp(const vector l)
 // ---------------------------------------------------------------------------
 // ---------------------------------------------------------------------------
 
+/*
 double C_gy_tomo_limber_cpp(const double l, const int ni)
 {
   return C_gy_tomo_limber_nointerp(l, ni, 0, 0);
@@ -659,18 +533,12 @@ matrix C_gy_tomo_limber_cpp(const vector l)
 
   #pragma omp parallel for collapse(2)
   for (int nz=0; nz<redshift.clustering_nbin; nz++)
-  {
     for (int i=0; i<static_cast<int>(l.n_elem); i++)
-    {
-      const int ni = nz;
       result(i, nz) = C_gy_tomo_limber_nointerp(l(i), nz, 0, 0);
-    }
-  }
 
   return result;
 }
 
-// ---------------------------------------------------------------------------
 // ---------------------------------------------------------------------------
 // ---------------------------------------------------------------------------
 
@@ -699,17 +567,13 @@ matrix C_ys_tomo_limber_cpp(const vector l)
 
   #pragma omp parallel for collapse(2)
   for (int nz=0; nz<redshift.shear_nbin; nz++)
-  {
     for (int i=0; i<l.n_elem; i++)
-    {
       result(i, nz) = C_ys_tomo_limber_nointerp(l(i), nz, 0, 0);
-    }
-  }
 
   return result;
 }
+*/
 
-// ---------------------------------------------------------------------------
 // ---------------------------------------------------------------------------
 // ---------------------------------------------------------------------------
 
@@ -737,17 +601,15 @@ vector C_kk_limber_cpp(const vector l)
 
   #pragma omp parallel for
   for (int i=0; i<l.n_elem; i++)
-  {
     result(i) = C_kk_limber_nointerp(l(i), 0, 0);
-  }
 
   return result;
 }
 
 // ---------------------------------------------------------------------------
 // ---------------------------------------------------------------------------
-// ---------------------------------------------------------------------------
 
+/*
 double C_ky_limber_cpp(const double l)
 {
   return C_ky_limber_nointerp(l, 0, 0);
@@ -772,9 +634,7 @@ vector C_ky_limber_nointerp_cpp(const vector l)
 
   #pragma omp parallel for
   for (int i=0; i<l.n_elem; i++)
-  {
     result(i) = C_ky_limber_nointerp(l(i), 0, 0);
-  }
 
   return result;
 }
@@ -807,13 +667,11 @@ vector C_yy_limber_nointerp_cpp(const vector l)
 
   #pragma omp parallel for
   for (int i=0; i<l.n_elem; i++)
-  {
     result(i) = C_yy_limber_nointerp(l(i), 0, 0);
-  }
 
   return result;
 }
-
+*/
 // ---------------------------------------------------------------------------
 // ---------------------------------------------------------------------------
 // ---------------------------------------------------------------------------
@@ -855,15 +713,9 @@ cube int_for_C_ss_NLA_tomo_limber_cpp(vector a, vector l)
 
   #pragma omp parallel for collapse(3)
   for (int nz=0; nz<tomo.shear_Npowerspectra; nz++)
-  {
     for (int i=0; i<l.n_elem; i++)
-    {
       for (int j=0; j<a.n_elem; j++)
-      {
-        result(j, i, nz) = int_for_C_ss_NLA_tomo_limber_cpp(a(j), l(i), Z1(nz), Z2(nz));
-      }
-    }
-  }
+        result(j, i, nz) = int_for_C_ss_NLA_tomo_limber_cpp(a(j),l(i),Z1(nz),Z2(nz));
 
   return result;
 }

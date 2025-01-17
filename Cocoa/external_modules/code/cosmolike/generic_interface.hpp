@@ -412,15 +412,11 @@ void init_baryons_contamination(
   ); // NEW API
 #endif
 
-void init_baryons_contamination(
-    std::string sim
-  ); // OLD API
+void init_baryons_contamination(std::string sim); // OLD API
 
-void init_binning_fourier(
-    const int Ncl, 
-    const int lmin, 
-    const int lmax
-  );
+void init_bias(arma::Col<double> bias_z_evol_model);
+
+void init_binning_fourier(const int Ncl, const int lmin, const int lmax);
 
 void init_binning_real_space(
     const int Ntheta, 
@@ -434,9 +430,7 @@ void init_binning_cmb_bandpower(
     const int lmax
   );
 
-void init_cosmo_runmode(
-    const bool is_linear
-  );
+void init_cosmo_runmode(const bool is_linear);
 
 void init_cmb(
     const double lmin_kappa_cmb, 
@@ -465,25 +459,17 @@ void init_data_6x2pt_real_space(
     arma::Col<int>::fixed<6> order
   );
 
-void init_data_vector_size(
-    arma::Col<int>::fixed<6> exclude
-  );
+void init_data_vector_size(arma::Col<int>::fixed<6> exclude);
 
-void init_data_vector_size_real_space(
-    arma::Col<int>::fixed<6> exclude
-  );
+void init_data_vector_size_real_space(arma::Col<int>::fixed<6> exclude);
 
-void init_data_vector_size_3x2pt_real_space(
-  );
+void init_data_vector_size_3x2pt_real_space();
 
-void init_data_vector_size_6x2pt_real_space(
-  );
+void init_data_vector_size_6x2pt_real_space();
 
-void init_data_vector_size_3x2pt_fourier_space(
-  );
+void init_data_vector_size_3x2pt_fourier_space();
 
-void init_data_vector_size_6x2pt_fourier_space(
-  );
+void init_data_vector_size_6x2pt_fourier_space();
 
 void init_distances(
     arma::Col<double> io_z, 
@@ -516,8 +502,7 @@ void init_probes(
     std::string possible_probes
   );
 
-void initial_setup(
-  );
+void initial_setup();
 
 void init_redshift_distributions_from_files(
     std::string lens_multihisto_file, 
