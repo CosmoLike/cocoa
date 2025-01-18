@@ -86,7 +86,6 @@ redshiftparams redshift =
   //.cluster_Nbin = 0
 };
 
-
 clusterparams Cluster =
 {
   .interpolate_survey_area = 1,
@@ -113,22 +112,10 @@ nuisanceparams nuisance =
   .c1rhocrit_ia = 0.01389,
   .ia = {0},
   .shear_calibration_m = {0},
-  .gb = {0}
-};
-
-ynuisancepara ynuisance =
-{
-  .gas_Gamma_KS = 0,
-  .gas_beta = 0,
-  .gas_lgM0 = 0, 
-  .gas_eps1 = 0,
-  .gas_eps2 = 0,
-  .gas_alpha = 0,
-  .gas_A_star = 0,
-  .gas_lgM_star = 0,
-  .gas_sigma_star = 0,
-  .gas_lgT_w = 0,
-  .gas_f_H = 0
+  .gb = {0},
+  .gas = {0},
+  .gc = {0},
+  .hod = {0}
 };
 
 barypara bary =
@@ -415,7 +402,8 @@ void reset_nuisance_struct()
   {
     nuisance.shear_calibration_m[i] = 0.0;
     nuisance.gc[i] = 0.0;
-
+    nuisance.gas[i] = 0.0;
+    
     for(int j=0; j<MAX_SIZE_ARRAYS; j++)
     {
       nuisance.ia[i][j] = 0.0;
@@ -438,21 +426,6 @@ void reset_nuisance_struct()
   }
   nuisance.oneplusz0_ia = 0.0;
   nuisance.c1rhocrit_ia = 0.01389;
-}
-
-void reset_ynuisance_struct()
-{ // Compton-Y related variables  
-  ynuisance.gas_Gamma_KS =  0.0;
-  ynuisance.gas_beta = 0.0;     
-  ynuisance.gas_lgM0 = 0.0;     
-  ynuisance.gas_eps1 = 0.0;
-  ynuisance.gas_eps2 = 0.0;
-  ynuisance.gas_alpha = 0.0;
-  ynuisance.gas_A_star = 0.0;
-  ynuisance.gas_lgM_star = 0.0;
-  ynuisance.gas_sigma_star = 0.0;
-  ynuisance.gas_lgT_w = 0.0;
-  ynuisance.gas_f_H = 0.0;
 }
 
 void reset_cmb_struct()

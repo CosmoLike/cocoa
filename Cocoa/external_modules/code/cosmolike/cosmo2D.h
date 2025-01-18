@@ -53,13 +53,13 @@ double C_gk_tomo_limber(const double l, const int ni);
 
 double C_kk_limber(const double l);
 
-double C_gy_tomo_limber(double l, int ni);
+double C_gy_tomo_limber(const double l, const int ni);
 
-double C_ys_tomo_limber(double l, int ni);
+double C_ys_tomo_limber(const double l, const int ni);
 
-double C_ky_limber(double l);
+double C_ky_limber(const double l);
 
-double C_yy_limber(double l);
+double C_yy_limber(const double l);
 
 // ----------------------------------------------------------------------------
 // Non-Interpolated Version (Will compute the Integral at every call)
@@ -67,11 +67,10 @@ double C_yy_limber(double l);
 
 double C_ss_tomo_limber_nointerp(double l, int ni, int nj, int EE, const int init);
 
-double C_gs_tomo_limber_nointerp(double l, int ni, int nj, const int init_static_vars_only);
+double C_gs_tomo_limber_nointerp(const double l, const int ni, const int nj, const int init);
 
 double C_gg_tomo_limber_nointerp(double l, int ni, int nj, const int init);
 
-// WARNING: C_gg for cross-tomography bins not yet supported
 double C_gg_tomo_limber_nointerp(double l, int ni, int nj, const int init);
 
 double C_gk_tomo_limber_nointerp(double l, int nl, const int init);
@@ -84,9 +83,9 @@ double C_gy_tomo_limber_nointerp(double l, int ni, const int init);
 
 double C_ys_tomo_limber_nointerp(double l, int ni, const int init);
 
-double C_ky_limber_nointerp(double l, const int init);
+double C_ky_limber_nointerp(const double l, const int init);
 
-double C_yy_limber_nointerp(double l, const int init);
+double C_yy_limber_nointerp(const double l, const int init);
 
 // ----------------------------------------------------------------------------
 // Integrands 

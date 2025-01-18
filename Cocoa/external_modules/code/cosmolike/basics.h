@@ -13,6 +13,16 @@ extern "C" {
 #define NR_END 1
 #define FREE_ARG char *
 
+typedef struct 
+{
+  double xmin;
+  double xmax;
+  double Pmin;
+  double Pmax;
+  double dPmin;
+  double dPmax;
+} bin_avg;
+
 gsl_spline* malloc_gsl_spline(const int n);
 
 gsl_integration_glfixed_table* malloc_gslint_glfixed(const int n);
@@ -31,11 +41,7 @@ double fmin(const double a, const double b);
 
 double fmax(const double a, const double b);
 
-bin_avg set_bin_average(
-    const int i_theta, 
-    const int j_L
-  );
-
+bin_avg set_bin_average(const int i_theta, const int j_L);
 
 double interpol1d(
   const double* const f, 

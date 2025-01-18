@@ -37,28 +37,6 @@ int recompute_cosmo3D(cosmopara C)
 }
 
 
-int recompute_yhalo(ynuisancepara N)
-{
-  if (fdiff(N.gas_beta, ynuisance.gas_beta) || 
-      fdiff(N.gas_lgM0, ynuisance.gas_lgM0) ||
-      fdiff(N.gas_eps1, ynuisance.gas_eps1) || 
-      fdiff(N.gas_eps2, ynuisance.gas_eps2) || 
-      fdiff(N.gas_alpha, ynuisance.gas_alpha) || 
-      fdiff(N.gas_A_star, ynuisance.gas_A_star) || 
-      fdiff(N.gas_lgM_star, ynuisance.gas_lgM_star) || 
-      fdiff(N.gas_sigma_star, ynuisance.gas_sigma_star) || 
-      fdiff(N.gas_lgT_w, ynuisance.gas_lgT_w) || 
-      fdiff(N.gas_f_H, ynuisance.gas_f_H) || 
-      fdiff(N.gas_Gamma_KS, ynuisance.gas_Gamma_KS)) 
-  {
-    return 1;
-  }
-  else
-  {
-    return 0;
-  }
-}
-
 /*
 int recompute_clusters(cosmopara C, nuisanceparams N)
 {
@@ -76,49 +54,6 @@ int recompute_clusters(cosmopara C, nuisanceparams N)
   for (int i=0; i<Cluster.N_SF; i++)
   {
     if (fdiff(N.cluster_selection[i], nuisance.cluster_selection[i]))
-    {
-      return 1;
-    }
-  }
-  return 0;
-}
-*/
-
-/*
-// ---------------------------------------------------------------------------
-// ---------------------------------------------------------------------------
-// ---------------------------------------------------------------------------
-
-int recompute_cc(cosmopara C, nuisancepara N)
-{
-  return recompute_clusters(C, N);
-}
-
-int recompute_cg(cosmopara C, galpara G, nuisancepara N)
-{
-  if (recompute_clusters(C, N))
-  {
-    return 1;
-  }
-  for (int i=0; i<MAX_SIZE_ARRAYS; i++) 
-  {
-    if (recompute_galaxies(G, i))
-    {
-      return 1;
-    }
-  }
-  return 0;
-}
-
-int recompute_cs(cosmopara C, galpara G, nuisancepara N)
-{
-  if (recompute_clusters(C, N) || recompute_IA(N))
-  {
-    return 1;
-  }
-  for (int i=0; i<MAX_SIZE_ARRAYS; i++) 
-  {
-    if (recompute_galaxies(G, i))
     {
       return 1;
     }

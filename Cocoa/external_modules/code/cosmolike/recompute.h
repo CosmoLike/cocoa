@@ -16,8 +16,6 @@ extern "C" {
 
 int recompute_cosmo3D(cosmopara C);
 
-int recompute_yhalo(ynuisancepara N);
-
 /*
 
 int recompute_clusters(cosmopara C, nuisancepara N);

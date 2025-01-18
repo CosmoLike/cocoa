@@ -451,7 +451,7 @@ double HOD_fc(const int ni)
 
 double int_F0_KS(double x, void* params __attribute__((unused)))
 {
-  return x*x*pow(log(1.0 + x)/x, 1.0/(ynuisance.gas_Gamma_KS - 1.0));
+  return x*x*pow(log(1.0 + x)/x, 1.0/(nuisance.gas[0] - 1.0));
 }
 
 double F0_KS_nointerp(double c, const int init_static_vars_only)
@@ -492,7 +492,7 @@ double int_F_KS(double x, void* params)
   const double y = ar[0];
   
   return (x*sinl(y*x)/y)*pow(log(1.0 + x)/x, 
-      ynuisance.gas_Gamma_KS/(ynuisance.gas_Gamma_KS - 1.0));
+      nuisance.gas[0]/(nuisance.gas[0] - 1.0));
 }
 
 double F_KS_nointerp(double c, double krs, const int init_static_vars_only) 
@@ -551,8 +551,7 @@ double u_KS(double c, double k, const double rv)
     lim[1][2] = (lim[1][1] - lim[1][0])/((double) Ntable.halo_uks_nx - 1.0); 
   }
 
-  if (fdiff(cache[0], nuisance.random_gas) || 
-      fdiff(cache[1], Ntable.random))
+  if (fdiff(cache[0], nuisance.random_gas) || fdiff(cache[1], Ntable.random))
   { 
     #pragma GCC diagnostic push
     #pragma GCC diagnostic ignored "-Wunused-variable"
@@ -581,36 +580,33 @@ double u_KS(double c, double k, const double rv)
 
 double frac_bnd(double M)
 {
-  const double M0 = pow(10.0, ynuisance.gas_lgM0);
-  return cosmology.Omega_b/(cosmology.Omega_m*(1.0+ pow(M0/M, ynuisance.gas_beta)));
+  const double M0 = pow(10.0, nuisance.gas[2]);
+  return cosmology.Omega_b/(cosmology.Omega_m*(1.0+ pow(M0/M, nuisance.gas[1])));
 }
 
 double frac_ejc(double M)
 {
   const double logM = log10(M);
-  const double delta = (logM - ynuisance.gas_lgM_star)/ynuisance.gas_sigma_star;
-  const double tmp = ynuisance.gas_A_star * exp(-0.5*delta*delta);  
-  const double frac_star = ((logM > ynuisance.gas_lgM0) && (tmp < ynuisance.gas_A_star/3.0)) ?
-    ynuisance.gas_A_star/3.0 : tmp; 
+  const double delta = (logM - nuisance.gas[7])/nuisance.gas[8];
+  
+  const double tmp = nuisance.gas[6] * exp(-0.5*delta*delta);  
+  const double frac_star = ((logM > nuisance.gas[2]) && 
+                           (tmp < nuisance.gas[6]/3.0)) ? nuisance.gas[6]/3.0 : tmp; 
+  
   return frac_bnd(M) - frac_star;
 }
 
-double u_y_bnd(
-    double c, 
-    double k, 
-    double m, 
-    double a
-  )
+double u_y_bnd(double c, double k, double m, double a)
 { //unit: [G(M_solar/h)^2 / (c/H0)]
   
   const double rho_delta = Delta * cosmology.rho_crit * cosmology.Omega_m;
   const double r_delta = pow(3./(4.0*M_PI)*(m/rho_delta), 1./3.);
   const double rv = r_delta;
 
-  const double mu_p = 4.0/(3.0 + 5*ynuisance.gas_f_H);
-  const double mu_e = 2.0/(1.0 + ynuisance.gas_f_H);
+  const double mu_p = 4.0/(3.0 + 5*nuisance.gas[10]);
+  const double mu_e = 2.0/(1.0 + nuisance.gas[10]);
   
-  return (2.0*ynuisance.gas_alpha/(3.0*a))*(mu_p/mu_e)*frac_bnd(m)*m*(m/rv)*u_KS(c, k, rv);
+  return (2.0*nuisance.gas[5]/(3.0*a))*(mu_p/mu_e)*frac_bnd(m)*m*(m/rv)*u_KS(c, k, rv);
 }
 
 double u_y_ejc(double m)
@@ -618,8 +614,8 @@ double u_y_ejc(double m)
   const double num_p = 1.1892e57; // proton number in 1 solar mass, unit [1/Msun]
   
   // convert ejected gas T (K) to E (eV) then to [G (Msun/h)^2 / (c/H0) * h]
-  const double E_w = pow(10,ynuisance.gas_lgT_w) * 8.6173e-5 * 5.616e-44;
-  const double mu_e = 2./(1.+ynuisance.gas_f_H);
+  const double E_w = pow(10,nuisance.gas[9]) * 8.6173e-5 * 5.616e-44;
+  const double mu_e = 2./(1.+nuisance.gas[10]);
   
   return (num_p * m * frac_ejc(m) / mu_e) * E_w; // final unit in [G(Msun/h)^2 / (c/H0)]
 }

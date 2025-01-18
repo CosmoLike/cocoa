@@ -7,7 +7,7 @@ extern "C" {
 #endif
 
 #define CHAR_MAX_SIZE 1024
-#define MAX_SIZE_ARRAYS 10
+#define MAX_SIZE_ARRAYS 20
 
 typedef struct 
 {
@@ -22,8 +22,6 @@ typedef struct
   int LMAX;
   double LMIN_hankel;
   double LMAX_hankel;
-  
-
   // ---------------------------------------------------
   // CLUSTER ROUTINES (ALPHA STAGE)
   // ---------------------------------------------------
@@ -76,16 +74,6 @@ typedef struct
   int halo_uKS_nc;                 // halo.c u_KS(double c, double k, double rv)
   int halo_uks_nx;                 // halo.c u_KS(double c, double k, double rv)
 } Ntab;
-
-typedef struct 
-{
-  double xmin;
-  double xmax;
-  double Pmin;
-  double Pmax;
-  double dPmin;
-  double dPmax;
-} bin_avg;
 
 typedef struct
 { // parameters for power spectrum passed to FASTPT
@@ -211,13 +199,26 @@ typedef struct
 
   double gc[MAX_SIZE_ARRAYS];  // galaxy concentration parameter
 
+  // GAS ------------------------------------------
+  //gas[0] = gas_Gamma_KS; // Gamma in K-S profile
+  //gas[1] = gas_beta;     // beta: mass scaling index in bound gas fraction
+  //gas[2] = gas_lgM0;     // critical halo mass, below which gas ejection is significant
+  //gas[3] = gas_eps1;
+  //gas[4] = gas_eps2;
+  //gas[5] = gas_alpha;
+  //gas[6] = gas_A_star;
+  //gas[7] = gas_lgM_star;
+  //gas[8] = gas_sigma_star;
+  //gas[9] = gas_lgT_w;
+  //gas[10] = gas_f_H;
+  double gas[MAX_SIZE_ARRAYS]; // Compton-Y related variables
+
   /*
   // Variables for the 4x2pt+N (see: 2008.10757 & 2010.01138)
   double cluster_MOR[MAX_SIZE_ARRAYS];
   double cluster_selection[MAX_SIZE_ARRAYS];
   */
 } nuisanceparams;
-
 
 typedef struct
 {
@@ -240,23 +241,6 @@ typedef struct
   
   char model[CHAR_MAX_SIZE];
 } clusterparams;
-
-
-typedef struct
-{
-  // Compton-Y related variables
-  double gas_Gamma_KS; // Gamma in K-S profile
-  double gas_beta;     // beta: mass scaling index in bound gas fraction
-  double gas_lgM0;     // critical halo mass, below which gas ejection is significant
-  double gas_eps1;
-  double gas_eps2;
-  double gas_alpha;
-  double gas_A_star;
-  double gas_lgM_star;
-  double gas_sigma_star;
-  double gas_lgT_w;
-  double gas_f_H;
-} ynuisancepara;
 
 typedef struct
 {
@@ -325,9 +309,6 @@ typedef struct
 } likepara;
 
 
-
-
-
 typedef struct
 {
   char runmode[CHAR_MAX_SIZE];
@@ -355,7 +336,6 @@ typedef struct
 } Cmb;
 
 
-
 double bgal_z(double z, int nz);
 
 double b1_per_bin(double z, int nz);
@@ -377,8 +357,6 @@ extern pdeltapara pdeltaparams;
 extern FPTpara FPT;
 
 extern nuisanceparams nuisance;
-
-extern ynuisancepara ynuisance;
 
 extern barypara bary;
 
@@ -413,8 +391,6 @@ void reset_redshift_struct();
 void update_cosmopara(cosmopara* C);
 
 void update_nuisance(nuisanceparams* N);
-
-void update_ynuisance(ynuisancepara* N);
 
 #ifdef __cplusplus
 }
