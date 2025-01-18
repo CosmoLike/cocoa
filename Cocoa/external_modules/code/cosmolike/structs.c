@@ -118,17 +118,6 @@ nuisanceparams nuisance =
   .hod = {0}
 };
 
-barypara bary =
-{
-  .is_Pk_bary = 0,
-  .Na_bins = 0,
-  .Nk_bins = 0,
-  .a_bins = NULL,
-  .logk_bins = NULL,
-  .log_PkR = NULL,
-  .interp2d = NULL,
-};
-
 Cmb cmb =
 {
   .fwhm = 0.0,
@@ -139,16 +128,6 @@ sur survey =
 {
   .area_conversion_factor  = 60.0 * 60.0 * 2.90888208665721580e-4 * 2.90888208665721580e-4,
   .n_gal_conversion_factor = 1.0 / 2.90888208665721580e-4 / 2.90888208665721580e-4
-};
-
-FPTpara FPT =
-{
-  .k_min = 1.e-5,
-  .k_max = 1.e+3,
-  .N = 800,
-  .N_per_dec = 100,
-  .N_AB = 7,
-  .N_IA = 10
 };
 
 lim limits = 
@@ -190,7 +169,6 @@ Ntab Ntable =
   .N_k_nlin = 500,                    // N_k_nlin
   .N_ell  = 325,                      // N_ell      (modified by COCOA from 200)
   .Ntheta = 250,                      // N_theta    (modified by COCOA from 200)
-  .N_thetaH = 2048,                   // N_theta for Hankel
   .N_M  = 1000,                       // N_M, M = mass (Halo Model)
   .N_ell_TATT = 200,                  // N_ell_TATT (modified by COCOA from 60)
   .NL_Nell_block = 50,                // Cosmo2D - NL = NonLimber (NL_Nell_block)
@@ -355,38 +333,6 @@ void reset_cluster_struct()
   sprintf(Cluster.model, "%s", "default");
 }
 
-void reset_bary_struct()
-{
-  bary.is_Pk_bary = 0;
-  bary.T = NULL;
-  bary.Na_bins = 0;
-  bary.Nk_bins = 0;
-
-  if((bary.a_bins != NULL))
-  {
-    free(bary.a_bins);
-    bary.a_bins = NULL;
-  }
-
-  if((bary.logk_bins != NULL))
-  {
-    free(bary.logk_bins);
-    bary.logk_bins = NULL;
-  }
-  
-  if((bary.log_PkR != NULL))
-  {
-    free(bary.log_PkR);
-    bary.log_PkR = NULL;
-  }
-  
-  if((bary.interp2d != NULL))
-  {
-    gsl_interp2d_free(bary.interp2d);
-    bary.interp2d = NULL;
-  }
-}
-
 void reset_pdeltaparams_struct()
 {
   sprintf(pdeltaparams.runmode, "%s", "Halofit");
@@ -403,7 +349,7 @@ void reset_nuisance_struct()
     nuisance.shear_calibration_m[i] = 0.0;
     nuisance.gc[i] = 0.0;
     nuisance.gas[i] = 0.0;
-    
+
     for(int j=0; j<MAX_SIZE_ARRAYS; j++)
     {
       nuisance.ia[i][j] = 0.0;

@@ -901,17 +901,8 @@ double g_tomo(double ainput, const int ni)
     exit(1);
   } 
 
-  double res;
-  if (ainput <= amin || ainput > 1.0 - da) 
-  {
-    res = 0.0;
-  }
-  else
-  {
-    res = interpol(table[ni], Ntable.N_a, amin, amax, da, ainput, 1.0, 1.0); 
-  }
   return (ainput <= amin || ainput > 1.0 - da) ? 0.0 :
-    interpol(table[ni], Ntable.N_a, amin, amax, da, ainput, 1.0, 1.0);
+    interpol1d(table[ni], Ntable.N_a, amin, amax, da, ainput);
 }
 
 double int_for_g2_tomo(double aprime, void* params) 
@@ -1002,7 +993,7 @@ double g2_tomo(double a, int ni)
   } 
  
   return (a <= amin || a > 1.0 - da) ? 0.0 : 
-    interpol(table[ni], Ntable.N_a, amin, amax, da, a, 1.0, 1.0);
+    interpol1d(table[ni], Ntable.N_a, amin, amax, da, a);
 }
 
 double int_for_g_lens(double aprime, void* params) 
@@ -1089,7 +1080,7 @@ double g_lens(double a, int ni)
   }
 
   return (a < amin || a > 1.0 - da) ? 0.0 :
-    interpol(table[ni], Ntable.N_a, amin, amax, da, a, 1.0, 1.0);
+    interpol1d(table[ni], Ntable.N_a, amin, amax, da, a);
 }
 
 double g_cmb(double a) 

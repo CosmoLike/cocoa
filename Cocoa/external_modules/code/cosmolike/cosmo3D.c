@@ -10,7 +10,9 @@
 #include <stdlib.h>
 #include <string.h>
 #include "log.c/src/log.h"
+
 #include "basics.h"
+#include "baryons.h"
 #include "cosmo3D.h"
 #include "recompute.h"
 #include "structs.h"
@@ -1419,7 +1421,7 @@ double sigma2(const double M)
     cache[0] = cosmology.random;
     cache[1] = Ntable.random;
   }
-  return exp(interpol(table, Ntable.N_M, lim[0], lim[1], lim[2], log(M), 1., 1.));
+  return exp(interpol1d(table, Ntable.N_M, lim[0], lim[1], lim[2], log(M)));
 }
 
 

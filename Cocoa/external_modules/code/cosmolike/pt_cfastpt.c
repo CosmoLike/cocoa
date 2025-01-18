@@ -13,6 +13,18 @@
 
 #include "log.c/src/log.h"
 
+extern FPTpara FPT;
+
+FPTpara FPT =
+{
+  .k_min = 1.e-5,
+  .k_max = 1.e+3,
+  .N = 800,
+  .N_per_dec = 100,
+  .N_AB = 7,
+  .N_IA = 10
+};
+
 static double tab_d1d3[800] = {
  3.910971e-18,  4.182876e-18,  4.466778e-18,  4.789119e-18,
  5.133766e-18,  5.508468e-18,  5.890354e-18,  6.301033e-18,  6.736776e-18,  7.223413e-18,
@@ -264,7 +276,7 @@ double PT_d1d2(double k_coverH0)
     return 0.;
   }
 
-  return interpol(FPT.tab_AB[0], FPT.N, logkmin, logkmax, dlgk, lgk, 0., 0.);
+  return interpol1d(FPT.tab_AB[0], FPT.N, logkmin, logkmax, dlgk, lgk);
 }
 
 double PT_d1d3(double k_coverH0) { // interpolate FPT.tab_AB[0] - Pd1d3
@@ -285,7 +297,7 @@ double PT_d1d3(double k_coverH0) { // interpolate FPT.tab_AB[0] - Pd1d3
   {
     return 0.;
   }
-  return interpol(tab_d1d3, FPT.N, logkmin, logkmax, dlgk,lgk, 0.,0.);
+  return interpol1d(tab_d1d3, FPT.N, logkmin, logkmax, dlgk,lgk);
 }
 
 double PT_d2d2(double k_coverH0) 
@@ -303,7 +315,7 @@ double PT_d2d2(double k_coverH0)
   }
   
   double lgk = log(k_coverH0);
-  return interpol(FPT.tab_AB[1], FPT.N, logkmin, logkmax, dlgk, lgk, 0., 0.);
+  return interpol1d(FPT.tab_AB[1], FPT.N, logkmin, logkmax, dlgk, lgk);
 }
 
 double PT_d1s2(double k_coverH0) 
@@ -325,7 +337,7 @@ double PT_d1s2(double k_coverH0)
   {
     return 0.;
   }
-  return interpol(FPT.tab_AB[2], FPT.N, logkmin, logkmax, dlgk, lgk, 0., 0.);
+  return interpol1d(FPT.tab_AB[2], FPT.N, logkmin, logkmax, dlgk, lgk);
 }
 
 double PT_d2s2(double k_coverH0) 
@@ -347,7 +359,7 @@ double PT_d2s2(double k_coverH0)
   {
     return 0.;
   }
-  return interpol(FPT.tab_AB[3], FPT.N, logkmin, logkmax, dlgk, lgk, 0., 0.);
+  return interpol1d(FPT.tab_AB[3], FPT.N, logkmin, logkmax, dlgk, lgk);
 }
 
 double PT_s2s2(double k_coverH0) 
@@ -369,7 +381,7 @@ double PT_s2s2(double k_coverH0)
   {
     return 0.;
   }
-  return interpol(FPT.tab_AB[4], FPT.N, logkmin, logkmax, dlgk, lgk, 0., 0.);
+  return interpol1d(FPT.tab_AB[4], FPT.N, logkmin, logkmax, dlgk, lgk);
 }
 
 double PT_sigma4(double k_coverH0 __attribute__((unused))) 
@@ -473,30 +485,24 @@ double growfac_a, double pdelta_ak)
     }
     double g4 = growfac_a*growfac_a*growfac_a*growfac_a;
 
-    const double P_ta_EE = g4 * interpol(FPT.tab_IA[4], FPT.N, logkmin, logkmax, dlgk, lgk,
-                            0., 0.);
-    const double P_ta_dE1 = g4 * interpol(FPT.tab_IA[2], FPT.N, logkmin, logkmax, dlgk, lgk,
-                             0., 0.);
-    const double P_ta_dE2 = g4 * interpol(FPT.tab_IA[3], FPT.N, logkmin, logkmax, dlgk, lgk,
-                             0., 0.);
+    const double P_ta_EE = g4*interpol1d(FPT.tab_IA[4], FPT.N, logkmin, logkmax, dlgk, lgk);
+    const double P_ta_dE1 = g4*interpol1d(FPT.tab_IA[2], FPT.N, logkmin, logkmax, dlgk, lgk);
+    const double P_ta_dE2 = g4*interpol1d(FPT.tab_IA[3], FPT.N, logkmin, logkmax, dlgk, lgk);
 
     ta_EE = C1 * C1_2 *
             (b_ta * b_ta_2 * P_ta_EE + (b_ta + b_ta_2) * (P_ta_dE1 + P_ta_dE2));
 
     if (C2) 
     {
-      const double P_mix_EE = g4 * interpol(FPT.tab_IA[8], FPT.N, logkmin, logkmax, dlgk,
-                               lgk, 0., 0.);
-      const double P_mix_A = g4 * interpol(FPT.tab_IA[6], FPT.N, logkmin, logkmax, dlgk, lgk,
-                              0., 0.);
-      const double P_mix_B = g4 * interpol(FPT.tab_IA[7], FPT.N, logkmin, logkmax, dlgk, lgk,
-                              0., 0.);
+      const double P_mix_EE = g4*interpol1d(FPT.tab_IA[8], FPT.N, logkmin, logkmax, dlgk, lgk);
+      const double P_mix_A = g4*interpol1d(FPT.tab_IA[6], FPT.N, logkmin, logkmax, dlgk, lgk);
+      const double P_mix_B = g4*interpol1d(FPT.tab_IA[7], FPT.N, logkmin, logkmax, dlgk, lgk);
 
       mix_EE = (C1 * C2_2 + C1_2 * C2) * (P_mix_A + P_mix_B) +
                (C1 * b_ta * C2_2 + C1_2 * b_ta_2 * C2) * P_mix_EE;
 
       tt_EE = C2 * C2_2 * g4 *
-          interpol(FPT.tab_IA[0], FPT.N, logkmin, logkmax, dlgk, lgk, 0., 0.);
+          interpol1d(FPT.tab_IA[0], FPT.N, logkmin, logkmax, dlgk, lgk);
     }
   }
 
@@ -530,14 +536,14 @@ double C2, double b_ta, double C1_2, double C2_2, double b_ta_2, double growfac_
     const double g4 = growfac_a*growfac_a*growfac_a*growfac_a;
 
     ta_BB = C1 * C1_2 * b_ta * b_ta_2 * g4 *
-            interpol(FPT.tab_IA[5], FPT.N, logkmin, logkmax, dlgk, lgk, 0., 0.);
+            interpol1d(FPT.tab_IA[5], FPT.N, logkmin, logkmax, dlgk, lgk);
 
     if (C2) {
       mix_BB = (C1 * b_ta * C2_2 + C1_2 * b_ta_2 * C2) * g4 *
-          interpol(FPT.tab_IA[9], FPT.N, logkmin, logkmax, dlgk, lgk, 0., 0.);
+          interpol1d(FPT.tab_IA[9], FPT.N, logkmin, logkmax, dlgk, lgk);
 
       tt_BB = C2 * C2_2 * g4 *
-          interpol(FPT.tab_IA[1], FPT.N, logkmin, logkmax, dlgk, lgk, 0., 0.);
+          interpol1d(FPT.tab_IA[1], FPT.N, logkmin, logkmax, dlgk, lgk);
     }
   }
 
@@ -573,20 +579,16 @@ double C2, double b_ta, double growfac_a, double pdelta_ak)
     const double g4 = growfac_a*growfac_a*growfac_a*growfac_a;
 
     double P_ta_dE1, P_ta_dE2;
-    P_ta_dE1 = g4 * interpol(FPT.tab_IA[2], FPT.N, logkmin, logkmax, dlgk, lgk,
-                             0., 0.);
-    P_ta_dE2 = g4 * interpol(FPT.tab_IA[3], FPT.N, logkmin, logkmax, dlgk, lgk,
-                             0., 0.);
+    P_ta_dE1 = g4 * interpol1d(FPT.tab_IA[2], FPT.N, logkmin, logkmax, dlgk, lgk);
+    P_ta_dE2 = g4 * interpol1d(FPT.tab_IA[3], FPT.N, logkmin, logkmax, dlgk, lgk);
 
     ta_GI = C1 * b_ta * (P_ta_dE1 + P_ta_dE2);
 
     if (C2) 
     {
       double P_mix_A, P_mix_B;
-      P_mix_A = g4 * interpol(FPT.tab_IA[6], FPT.N, logkmin, logkmax, dlgk, lgk,
-                              0., 0.);
-      P_mix_B = g4 * interpol(FPT.tab_IA[7], FPT.N, logkmin, logkmax, dlgk, lgk,
-                              0., 0.);
+      P_mix_A = g4 * interpol1d(FPT.tab_IA[6], FPT.N, logkmin, logkmax, dlgk, lgk);
+      P_mix_B = g4 * interpol1d(FPT.tab_IA[7], FPT.N, logkmin, logkmax, dlgk, lgk);
 
       tt_GI = C2 * (P_mix_A + P_mix_B);
     }

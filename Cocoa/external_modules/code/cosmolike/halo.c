@@ -195,8 +195,7 @@ double bias_norm(const double a)
     cache[0] = cosmology.random;
     cache[1] = Ntable.random;
   }
-  return interpol(table, Ntable.N_a, lim[0], lim[1], lim[2], 
-    fmin(a,lim[1]-lim[2]), 1., 1.);
+  return interpol1d(table, Ntable.N_a, lim[0], lim[1], lim[2], fmin(a,lim[1]-lim[2]));
 }
 
 double lognu0_gsl(double lnM, void* params __attribute__((unused))) 
@@ -263,7 +262,7 @@ double dlognudlogm(const double m)
     cache[0] = cosmology.random;
     cache[1] = Ntable.random;
   }  
-  return interpol(table, Ntable.N_M, lim[0], lim[1], lim[2], log(m), 1.0, 1.0);
+  return interpol1d(table, Ntable.N_M, lim[0], lim[1], lim[2], log(m));
 }
 
 // ---------------------------------------------------------------------------
@@ -574,8 +573,9 @@ double u_KS(double c, double k, const double rv)
     cache[0] = nuisance.random_gas; 
     cache[1] = Ntable.random;
   }
-  return interpol2d(table, Ntable.halo_uKS_nc, lim[0][0], lim[0][1], lim[0][2], 
-    c, Ntable.halo_uks_nx, lim[1][0], lim[1][1], lim[1][2], log(k * rv/c), 0, 0);
+  return interpol2d(table, 
+    Ntable.halo_uKS_nc, lim[0][0], lim[0][1], lim[0][2], c, 
+    Ntable.halo_uks_nx, lim[1][0], lim[1][1], lim[1][2], log(k * rv/c));
 }
 
 double frac_bnd(double M)
@@ -781,7 +781,7 @@ double ngal(const int ni, const double a)
 
   if ((a < lim[0]) || (a > lim[1]))
     return 0.0;
-  return interpol(table[ni], Ntable.N_a, lim[0], lim[1], lim[2], a, 1.0, 1.0);
+  return interpol1d(table[ni], Ntable.N_a, lim[0], lim[1], lim[2], a);
 }
 
 double hm_funcs_nointerp(
@@ -891,8 +891,8 @@ double bgal(const int ni, const double a)
     cache[2] = nuisance.random_galaxy_bias;
     cache[3] = redshift.random_clustering;
   }  
-  return (a < lim[0]) || (a > lim[1]) ? 0.0 : interpol(table[ni], Ntable.N_a, 
-    lim[0], lim[1], lim[2], a, 1.0, 1.0);
+  return (a < lim[0]) || (a > lim[1]) ? 0.0 : 
+    interpol1d(table[ni], Ntable.N_a, lim[0], lim[1], lim[2], a);
 }
 
 double int_for_I02_XY(double lnM, void* params) 
@@ -1310,8 +1310,9 @@ double p_mm(
 if (a < limits.a_min_hm){return Pdelta_halo(k,limits.a_min_hm)*pow(growfac(a)/growfac(limits.a_min_hm),2);}
   if (a > 0.999){return Pdelta_halo(k,0.999)*pow(growfac(a)/growfac(0.999),2);}
 */
-  return exp(interpol2d(table, Ntable.N_a, lim[0][0], lim[0][1], lim[0][2], 
-    a, Ntable.N_k_nlin, lim[1][0], lim[1][1], lim[1][2], log(k), 0.0, 0.0));
+  return exp(interpol2d(table, 
+    Ntable.N_a, lim[0][0], lim[0][1], lim[0][2], a, 
+    Ntable.N_k_nlin, lim[1][0], lim[1][1], lim[1][2], log(k)));
 }
 
 double p_my(
@@ -1357,8 +1358,9 @@ double p_my(
     cache[1] = Ntable.random;
     cache[2] = nuisance.random_gas;
   }
-  return exp(interpol2d(table, Ntable.N_a, lim[0][0], lim[0][1], lim[0][2], 
-    a, Ntable.N_k_nlin, lim[1][0], lim[1][1], lim[1][2], log(k), 0.0, 0.0));
+  return exp(interpol2d(table, 
+    Ntable.N_a, lim[0][0], lim[0][1], lim[0][2], a, 
+    Ntable.N_k_nlin, lim[1][0], lim[1][1], lim[1][2], log(k)));
 }
 
 double p_yy(
@@ -1405,8 +1407,9 @@ double p_yy(
     cache[1] = Ntable.random;
     cache[2] = nuisance.random_gas;
   }
-  return exp(interpol2d(table, Ntable.N_a, lim[0][0], lim[0][1], lim[0][2], 
-    a, Ntable.N_k_nlin, lim[1][0], lim[1][1], lim[1][2], log(k), 0.0, 0.0));
+  return exp(interpol2d(table, 
+    Ntable.N_a, lim[0][0], lim[0][1], lim[0][2], a, 
+    Ntable.N_k_nlin, lim[1][0], lim[1][1], lim[1][2], log(k)));
 }
 
 double p_gm_nointerp(
@@ -1485,8 +1488,8 @@ double p_gm(
     exit(1);
   }
   return (a < lim[ni][0] || a > lim[ni][1]) ? 0.0 : exp(interpol2d(table[ni], 
-      na, lim[ni][0], lim[ni][1], lim[ni][2], a, Ntable.N_k_nlin, 
-      lim[nbin][0], lim[nbin][1], lim[nbin][2], log(k), 0,0));
+    na, lim[ni][0], lim[ni][1], lim[ni][2], a, 
+    Ntable.N_k_nlin, lim[nbin][0], lim[nbin][1], lim[nbin][2], log(k)));
 }
 
 double p_gg_nointerp(
@@ -1579,8 +1582,8 @@ double p_gg(
     exit(1);
   }  
   return (a < lim[ni][0] || a > lim[ni][1]) ? 0.0 : exp(interpol2d(table[ni], 
-      na, lim[ni][0], lim[ni][1], lim[ni][2], a, Ntable.N_k_nlin, 
-      lim[nbin][0], lim[nbin][1], lim[nbin][2], log(k), 0,0));
+      na, lim[ni][0], lim[ni][1], lim[ni][2], a, 
+      Ntable.N_k_nlin, lim[nbin][0], lim[nbin][1], lim[nbin][2], log(k)));
 }
 
 // ---------------------------------------------------------------------------

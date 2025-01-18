@@ -92,7 +92,7 @@ double M_abs(const double mag, const double a)
 
   // no acceptable k-korrection exists for k>3, also no meaningful IA model
   const double z = 1./a - 1.0 >= 3.0 ? 2.99 : 1./a - 1.0;
-  const double ke = interpol(table, 31, 0., 3.0, 0.1, z, 1.0, 1.0);
+  const double ke = interpol1d(table, 31, 0., 3.0, 0.1, z);
   struct chis chidchi = chi_all(a);
   const double fK = f_K(chidchi.chi);
 

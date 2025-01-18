@@ -4,6 +4,18 @@
 extern "C" {
 #endif
 
+typedef struct
+{ // parameters for power spectrum passed to FASTPT
+  double k_min;
+  double k_max;
+  int N;
+  int N_per_dec;
+  double** tab_AB; // parameters for table of bias terms
+  int N_AB;        // parameters for table of bias terms
+  double** tab_IA; // parameters for table of IA terms
+  int N_IA;        // parameters for table of IA terms
+} FPTpara;
+
 double PT_d1d2(double k_coverH0);
 
 double PT_d1d3(double k_coverH0);

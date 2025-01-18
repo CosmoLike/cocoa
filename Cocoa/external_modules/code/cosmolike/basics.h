@@ -52,21 +52,9 @@ double interpol1d(
   const double x); 
 
 double interpol2d(double **f, int nx, double ax, double bx, double dx, double x,
-  int ny, double ay, double by, double dy, double y, double lower, double upper);
-
-double interpol2d_fitslope(double **f, int nx, double ax, double bx, double dx,
-  double x, int ny, double ay, double by, double dy, double y, double lower);
-
-double interpol(const double* const f, const int n, const double a, 
-const double b, const double dx, const double x, const double lower, 
-const double upper);
-
-double interpol_fitslope(double *f, int n, double a, double b, double dx,
-  double x, double lower);
+  int ny, double ay, double by, double dy, double y);
 
 int line_count(char *filename);
-
-void error(char *s);
 
 void hankel_kernel_FT(double x, fftw_complex *res, double *arg,
 int argc __attribute__((unused)));

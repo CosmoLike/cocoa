@@ -220,19 +220,6 @@ bin_avg set_bin_average(const int i_theta, const int j_L)
   return r;
 }
 
-void error(char *s) 
-{
-  printf("error:%s\n ", s);
-  exit(1);
-}
-
-// ============================================================
-// Interpolates f at the value x, where f is a double[n] array,
-// representing a function between a and b, stepwidth dx.
-// 'lower' and 'upper' are powers of a logarithmic power law
-// extrapolation. If no	extrapolation desired, set these to 0
-// ============================================================
-
 double interpol1d(
   const double* const f, 
   const int n, 
@@ -255,47 +242,6 @@ double interpol1d(
   }
   return ans;
 }
-
-double interpol(const double* const f, const int n, const double a, 
-const double b, const double dx, const double x, const double lower, 
-const double upper) 
-{
-  if (x < a) 
-  {
-    if (lower == 0.) 
-    {
-      return 0.0;
-    }
-    return f[0] + lower * (x - a);
-  }
-
-  const double r = (x - a) / dx;
-  const int i = (int) floor(r);
-  
-  if (i + 1 >= n) 
-  {
-    if (upper == 0.0) 
-    {
-      if (i + 1 == n) 
-      {
-        return f[i]; // constant extrapolation
-      } 
-      else 
-      {
-        return 0.0;
-      }
-    } 
-    else 
-    {
-      return f[n - 1] + upper * (x - b); // linear extrapolation
-    }
-  } 
-  else 
-  {
-    return (r - i) * (f[i + 1] - f[i]) + f[i]; // interpolation
-  }
-}
-
 
 int line_count(char* filename) 
 {  
@@ -333,125 +279,45 @@ int line_count(char* filename)
   return nlines;
 }
 
-double interpol_fitslope(double *f, int n, double a, double b, double dx,
-                         double x, double lower) 
-{
-  double r;
-  int i, fitrange;
-  if (x < a) {
-    if (lower == 0.) {
-      return 0.0;
-    }
-    return f[0] + lower * (x - a);
-  }
-  r = (x - a) / dx;
-  i = (int)(floor(r));
-  if (i + 1 >= n) {
-    if (n > 50) {
-      fitrange = 5;
-    } else {
-      fitrange = (int)floor(n / 10);
-    }
-    double upper = (f[n - 1] - f[n - 1 - fitrange]) / (dx * fitrange);
-    return f[n - 1] + upper * (x - b); /* linear extrapolation */
-
-  } else {
-    return (r - i) * (f[i + 1] - f[i]) + f[i]; /* interpolation */
-  }
-}
-
-/* ============================================================ *
- * like interpol, but f beeing a 2d-function			*
- * 'lower' and 'upper' are the powers of a power law extra-	*
- * polation in the second argument				*
- * ============================================================ */
 double interpol2d(double **f, int nx, double ax, double bx, double dx, double x,
-int ny, double ay, double by, double dy, double y, double lower, double upper) 
+int ny, double ay, double by, double dy, double y) 
 {
   double t, dt, s, ds;
   int i, j;
-  if (x < ax) {
+  
+  if (x < ax) 
     return 0.;
-  }
-  if (x > bx) {
+  if (x > bx) 
     return 0.;
-  }
+
   t = (x - ax) / dx;
   i = (int)(floor(t));
   dt = t - i;
-  if (y < ay) {
-    return ((1. - dt) * f[i][0] + dt * f[i + 1][0]) + (y - ay) * lower;
-  } else if (y > by) {
-    return ((1. - dt) * f[i][ny - 1] + dt * f[i + 1][ny - 1]) +
-           (y - by) * upper;
+  
+  if (y < ay) 
+  {
+    return ((1. - dt) * f[i][0] + dt * f[i + 1][0]) + (y - ay);
+  } 
+  else if (y > by) 
+  {
+    return ((1. - dt) * f[i][ny - 1] + dt * f[i + 1][ny - 1]) + (y - by);
   }
   s = (y - ay) / dy;
   j = (int)(floor(s));
   ds = s - j;
-  if ((i + 1 == nx) && (j + 1 == ny)) {
-    return (1. - dt) * (1. - ds) * f[i][j];
-  }
-  if (i + 1 == nx) {
-    return (1. - dt) * (1. - ds) * f[i][j] + (1. - dt) * ds * f[i][j + 1];
-  }
-  if (j + 1 == ny) {
-    return (1. - dt) * (1. - ds) * f[i][j] + dt * (1. - ds) * f[i + 1][j];
-  }
-  return (1. - dt) * (1. - ds) * f[i][j] + (1. - dt) * ds * f[i][j + 1] +
-         dt * (1. - ds) * f[i + 1][j] + dt * ds * f[i + 1][j + 1];
-}
-
-double interpol2d_fitslope(
-    double **f, 
-    int nx, 
-    double ax, 
-    double bx, 
-    double dx,
-    double x, 
-    int ny, 
-    double ay, 
-    double by, 
-    double dy, 
-    double y, 
-    double lower
-  ) 
-{  
-  if (x < ax || x > bx)
-    return 0.;
-  
-  const double t = (x - ax) / dx;
-  int i = (int)(floor(t));
-  const double dt = (x - ax) / dx - i;
-  
-  if (y < ay) 
-    return ((1. - dt) * f[i][0] + dt * f[i + 1][0]) + (y - ay) * lower;
-  else if (y > by) 
-  {
-    int fitrange;
-
-    if (ny > 25) 
-      fitrange = 5;
-    else 
-      fitrange = (int) floor(ny / 5);
-
-    const double upper = ((1. - dt) * (f[i][ny - 1] - f[i][ny - 1 - fitrange]) + 
-      dt * (f[i + 1][ny - 1] - f[i + 1][ny - 1 - fitrange])) /(dy * fitrange);
-    
-    return ((1. - dt) * f[i][ny - 1] + dt * f[i + 1][ny - 1]) + (y - by) * upper;
-  }
-  
-  const double s = (y - ay) / dy;
-  const int j = (int)(floor(s));
-  const double ds = s - j;
   
   if ((i + 1 == nx) && (j + 1 == ny)) 
+  {
     return (1. - dt) * (1. - ds) * f[i][j];
-  
+  }
   if (i + 1 == nx) 
+  {
     return (1. - dt) * (1. - ds) * f[i][j] + (1. - dt) * ds * f[i][j + 1];
-
-  if (j + 1 == ny)
+  }
+  if (j + 1 == ny) 
+  {
     return (1. - dt) * (1. - ds) * f[i][j] + dt * (1. - ds) * f[i + 1][j];
+  }
   
   return (1. - dt) * (1. - ds) * f[i][j] + (1. - dt) * ds * f[i][j + 1] +
          dt * (1. - ds) * f[i + 1][j] + dt * ds * f[i + 1][j + 1];

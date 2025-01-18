@@ -406,11 +406,7 @@ double w_gammat_tomo(const int nt, const int ni, const int nj, const int limber)
     #pragma GCC diagnostic push
     #pragma GCC diagnostic ignored "-Wunused-variable"
     { // init static variables inside the C_XY_limber function
-      const int nz = 0;
-      const int ZLNZ = ZL(nz);
-      const int ZSNZ = ZS(nz);
-      const int l = limits.LMIN_tab + 1; 
-      double ini = C_gs_tomo_limber(l, ZLNZ, ZSNZ);
+      double ini = C_gs_tomo_limber(limits.LMIN_tab + 1, ZL(0), ZS(0));
     }
     #pragma GCC diagnostic pop
 
