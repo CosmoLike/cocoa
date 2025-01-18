@@ -13,6 +13,8 @@ namespace cosmolike_interface
 {
 
 // ---------------------------------------------------------------------------
+// ---------------------------------------------------------------------------
+// ---------------------------------------------------------------------------
 
 arma::Col<double> get_binning_real_space();
 
@@ -27,77 +29,57 @@ arma::Col<double> w_gk_tomo_cpp();
 arma::Col<double> w_ks_tomo_cpp();
 
 // ---------------------------------------------------------------------------
+// ---------------------------------------------------------------------------
+// ---------------------------------------------------------------------------
 
-double C_ss_NLA_tomo_limber_cpp(
+py::tuple C_ss_TATT_tomo_limber_cpp(
     const double l, 
     const int ni, 
     const int nj
   );
 
-arma::Mat<double> C_ss_NLA_tomo_limber_cpp(
+py::tuple C_ss_TATT_tomo_limber_cpp(
     const arma::Col<double> l
   );
 
-double int_for_C_ss_NLA_tomo_limber_cpp(
+py::tuple int_for_C_ss_tomo_limber_cpp(
     const double a, 
     const double l, 
     const int ni, 
     const int nj
   );
 
-arma::Cube<double> int_for_C_ss_NLA_tomo_limber_cpp(
+py::tuple int_for_C_ss_tomo_limber_cpp(
+    const arma::Col<double> a, 
+    const arma::Col<double> l
+  );
+
+double int_for_C_ss_EE_tomo_limber_cpp(
+    const double a, 
+    const double l, 
+    const int ni, 
+    const int nj
+  );
+
+arma::Cube<double> int_for_C_ss_EE_tomo_limber_cpp(
+    arma::Col<double> a, 
+    arma::Col<double> l
+  );
+
+double int_for_C_ss_BB_tomo_limber_cpp(
+    const double a, 
+    const double l, 
+    const int ni, 
+    const int nj
+  );
+
+arma::Cube<double> int_for_C_ss_BB_tomo_limber_cpp(
     arma::Col<double> a, 
     arma::Col<double> l
   );
 
 // ---------------------------------------------------------------------------
-
-py::tuple C_ss_TATT_tomo_limber_cpp(
-    const double l, 
-    const int ni, 
-    const int nj
-  );
-
-py::tuple C_ss_TATT_tomo_limber_cpp(
-    const arma::Col<double> l
-  );
-
-py::tuple int_for_C_ss_TATT_tomo_limber_cpp(
-    const double a, 
-    const double l, 
-    const int ni, 
-    const int nj
-  );
-
-py::tuple int_for_C_ss_TATT_tomo_limber_cpp(
-    const arma::Col<double> a, 
-    const arma::Col<double> l
-  );
-
 // ---------------------------------------------------------------------------
-
-py::tuple C_ss_tomo_limber_cpp(
-    const double l, 
-    const int ni, 
-    const int nj
-  );
-
-py::tuple C_ss_tomo_limber_cpp(
-    arma::Col<double> l
-  );
-
-py::tuple int_for_C_ss_tomo_limber_cpp(
-    const double a, 
-    const double l, 
-    const int ni, 
-    const int nj
-  );
-
-py::tuple int_for_C_ss_tomo_limber_cpp(
-    const arma::Col<double> a, 
-    const arma::Col<double> l
-  );
-
 // ---------------------------------------------------------------------------
 
 double C_gs_tomo_limber_cpp(

@@ -1051,10 +1051,10 @@ double int_for_C_ss_tomo_limber(double a, void* params)
 }
 
 double C_ss_tomo_limber_nointerp(
-    double l, 
-    int ni, 
-    int nj, 
-    int EE, 
+    const double l, 
+    const int ni, 
+    const int nj, 
+    const int EE, 
     const int init
   )
 {
@@ -1607,9 +1607,9 @@ double C_gg_tomo_limber_linpsopt_nointerp(
 }
 
 double C_gg_tomo_limber_nointerp(
-    double l, 
-    int ni, 
-    int nj,
+    const double l, 
+    const int ni, 
+    const int nj,
     const int init
   )
 {
@@ -1845,7 +1845,7 @@ double int_for_C_gk_tomo_limber_withb2(double a, void* params)
   return (linear_part + non_linear_part)*(chidchi.dchida/(fK*fK))*ell_prefactor;
 }
 
-double C_gk_tomo_limber_nointerp(double l, int ni, const int init)
+double C_gk_tomo_limber_nointerp(const double l, const int ni, const int init)
 {
   static double cache[MAX_SIZE_ARRAYS];
   static gsl_integration_glfixed_table* w = NULL;
@@ -2009,7 +2009,7 @@ double int_for_C_ks_tomo_limber(double a, void* params)
   return (res*PK*chidchi.dchida/(fK*fK))*ell_prefactor1*ell_prefactor2;
 }
 
-double C_ks_tomo_limber_nointerp(double l, int ni, const int init)
+double C_ks_tomo_limber_nointerp(const double l, const int ni, const int init)
 {
   static double cache[MAX_SIZE_ARRAYS];
   static gsl_integration_glfixed_table* w = NULL;  
@@ -2139,7 +2139,7 @@ double int_for_C_kk_limber(double a, void* params)
   return WK*WK*PK*(chidchi.dchida/(fK*fK))*ell_prefactor*ell_prefactor;
 }
 
-double C_kk_limber_nointerp(double l, const int init)
+double C_kk_limber_nointerp(const double l, const int init)
 {
   static double cache[MAX_SIZE_ARRAYS];
   static gsl_integration_glfixed_table* w = NULL;

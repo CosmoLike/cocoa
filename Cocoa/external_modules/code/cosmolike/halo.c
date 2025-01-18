@@ -124,7 +124,7 @@ double int_for_bias_norm(double nu, void* params)
 
 double bias_norm_nointerp(
     const double a, 
-    const int init_static_vars_only
+    const int init
   )
 {
   static double cache[MAX_SIZE_ARRAYS];
@@ -151,7 +151,7 @@ double bias_norm_nointerp(
   double ar[2] = {a, growfac_a};
 
   double res;
-  if (init_static_vars_only == 1)
+  if (init == 1)
     res = int_for_bias_norm((nu_min+nu_max)/2.0, (void*) ar);
   else
   {
@@ -453,7 +453,7 @@ double int_F0_KS(double x, void* params __attribute__((unused)))
   return x*x*pow(log(1.0 + x)/x, 1.0/(nuisance.gas[0] - 1.0));
 }
 
-double F0_KS_nointerp(double c, const int init_static_vars_only)
+double F0_KS_nointerp(double c, const int init)
 {
   static double cache[MAX_SIZE_ARRAYS];
   static gsl_integration_glfixed_table* w = NULL;
@@ -472,7 +472,7 @@ double F0_KS_nointerp(double c, const int init_static_vars_only)
   
   double res = 0.0;
   
-  if (init_static_vars_only == 1)
+  if (init == 1)
     res = int_F0_KS((xmin + xmax)/2.0, (void*) ar);
   else
   {
@@ -494,7 +494,7 @@ double int_F_KS(double x, void* params)
       nuisance.gas[0]/(nuisance.gas[0] - 1.0));
 }
 
-double F_KS_nointerp(double c, double krs, const int init_static_vars_only) 
+double F_KS_nointerp(double c, double krs, const int init) 
 {
   static double cache[MAX_SIZE_ARRAYS];
   static gsl_integration_glfixed_table* w = NULL;
@@ -513,7 +513,7 @@ double F_KS_nointerp(double c, double krs, const int init_static_vars_only)
 
   double res = 0.0;
   
-  if (init_static_vars_only == 1)
+  if (init == 1)
     res = int_F_KS((cmin + cmax)/2.0, (void*) ar);
   else
   {
@@ -622,7 +622,7 @@ double u_y_ejc(double m)
 
 double n_s_cmv(double a) 
 { 
-  double dV_dz = pow(f_K(chi(a)), 2.0) / hoverh0(a); // comoving dV/dz(z = 1./a-1) per radian^2
+  double dV_dz = pow(f_K(chi(a)), 2.0) / hoverh0(a); // comoving dV/dz per radian^2
   return zdistr_photoz(1.0/a - 1., -1) * survey.n_gal * 
     survey.n_gal_conversion_factor / dV_dz; // dN/dz/radian^2/(dV/dz/radian^2)
 }
@@ -701,7 +701,7 @@ double int_hm_funcs(double lnM, void* params)
 double ngal_nointerp(
     const int ni, 
     const double a, 
-    const int init_static_vars_only
+    const int init
   )
 {
   static double cache[MAX_SIZE_ARRAYS];
@@ -726,7 +726,7 @@ double ngal_nointerp(
   const double lnMmax = log(limits.M_max);
 
   double res = 0.0;
-  if (init_static_vars_only == 1)
+  if (init == 1)
     res = int_hm_funcs((lnMmin + lnMmax)/2.0, (void*) ar);
   else
   {
@@ -788,7 +788,7 @@ double hm_funcs_nointerp(
     const int ni, 
     const double a, 
     const int func,
-    const int init_static_vars_only
+    const int init
   )
 {
   static double cache[MAX_SIZE_ARRAYS];
@@ -813,7 +813,7 @@ double hm_funcs_nointerp(
   const double lnMmax = log(limits.M_max);
 
   double res = 0.0;
-  if (init_static_vars_only == 1)
+  if (init == 1)
     res = int_hm_funcs((lnMmin + lnMmax)/2.0, (void*) ar);
   else
   {
@@ -828,28 +828,28 @@ double hm_funcs_nointerp(
 double mmean_nointerp(
     const int ni, 
     const double a, 
-    const int init_static_vars_only
+    const int init
   )
 {
-  return hm_funcs_nointerp(ni, a, 1, init_static_vars_only);
+  return hm_funcs_nointerp(ni, a, 1, init);
 }
 
 double fsat_nointerp(
     const int ni, 
     const double a, 
-    const int init_static_vars_only
+    const int init
   )
 {
-  return hm_funcs_nointerp(ni, a, 2, init_static_vars_only);
+  return hm_funcs_nointerp(ni, a, 2, init);
 } 
 
 double bgal_nointerp(
     const int ni, 
     const double a, 
-    const int init_static_vars_only
+    const int init
   )
 {
-  return hm_funcs_nointerp(ni, a, 3, init_static_vars_only);
+  return hm_funcs_nointerp(ni, a, 3, init);
 }
 
 double bgal(const int ni, const double a)
@@ -945,7 +945,7 @@ double I02_XY_nointerp(
     const double k2, 
     const double a,
     const int func, // 1 = MM, 2 = MY, 3 = YY
-    const int init_static_vars_only
+    const int init
   ) 
 {
   static double cache[MAX_SIZE_ARRAYS];
@@ -964,7 +964,7 @@ double I02_XY_nointerp(
   const double lnMmax = log(limits.M_max);
 
   double res;
-  if (init_static_vars_only == 1)
+  if (init == 1)
     res = int_for_I02_XY((lnMmin + lnMmax)/2.0, (void*) ar);
   else
   {
@@ -1019,7 +1019,7 @@ double I11_X_nointerp(
     const double k, 
     const double a,
     const int func, 
-    const int init_static_vars_only
+    const int init
   ) 
 { 
   static double cache[MAX_SIZE_ARRAYS];
@@ -1038,7 +1038,7 @@ double I11_X_nointerp(
   const double lnMmax = log(limits.M_max);
   
   double res;
-  if (init_static_vars_only == 1)
+  if (init == 1)
     res = int_for_I11_X((lnMmin + lnMmax)/2.0, (void*) ar);
   else
   {
@@ -1091,7 +1091,7 @@ double G02_nointerp(
     double k, 
     double a, 
     int ni, 
-    const int init_static_vars_only
+    const int init
   )
 { //needs to be divided by ngal^2
   static double cache[MAX_SIZE_ARRAYS];
@@ -1116,7 +1116,7 @@ double G02_nointerp(
   const double lnMmax = log(limits.M_max);
 
   double res;
-  if (init_static_vars_only == 1)
+  if (init == 1)
     res = int_for_G02((lnMmin + lnMmax)/2.0, (void*) ar);
   else
   {
@@ -1166,7 +1166,7 @@ double GM02_nointerp(
     double k, 
     double a, 
     int ni, 
-    const int init_static_vars_only
+    const int init
   )
 { // needs to be divided by ngal
   static double cache[MAX_SIZE_ARRAYS];
@@ -1191,7 +1191,7 @@ double GM02_nointerp(
   const double lnMmax = log(limits.M_max);
 
   double res;
-  if (init_static_vars_only == 1)
+  if (init == 1)
     res = int_GM02((lnMmin + lnMmax)/2.0, (void*) ar);
   else
   {
@@ -1217,10 +1217,10 @@ double p_xy_nointerp(
     const double k, 
     const double a,
     const int func,
-    const int init_static_vars_only
+    const int init
   ) 
 {
-  const double I02 = I02_XY_nointerp(k, k, a, func, init_static_vars_only);
+  const double I02 = I02_XY_nointerp(k, k, a, func, init);
 
   double P1H, I11X, I11Y;
 
@@ -1229,7 +1229,7 @@ double p_xy_nointerp(
     case 0:
     { // PMM
       P1H  = I02;
-      I11X = I11_X_nointerp(k, a, func, init_static_vars_only);
+      I11X = I11_X_nointerp(k, a, func, init);
       I11Y = I11X;
       break;
     }
@@ -1240,8 +1240,8 @@ double p_xy_nointerp(
       const double x = ks*ks*ks*ks;
 
       P1H  = I02*(1.0/(x + 1.0)); // suppress lowk (Eq17;2009.01858)
-      I11X = I11_X_nointerp(k, a, 0, init_static_vars_only);
-      I11Y = I11_X_nointerp(k, a, 2, init_static_vars_only);
+      I11X = I11_X_nointerp(k, a, 0, init);
+      I11Y = I11_X_nointerp(k, a, 2, init);
       break;
     }
     case 2:
@@ -1251,7 +1251,7 @@ double p_xy_nointerp(
       const double x = ks*ks*ks*ks;
       
       P1H  = I02*(1.0/(x + 1.0)); // suppress lowk (Eq17;2009.01858)
-      I11X = I11_X_nointerp(k, a, func, init_static_vars_only);
+      I11X = I11_X_nointerp(k, a, func, init);
       I11Y = I11X;
       break;
     }
@@ -1292,7 +1292,7 @@ double p_mm(
   {
     #pragma GCC diagnostic push
     #pragma GCC diagnostic ignored "-Wunused-variable"
-    { // p_xy_nointerp(k, a, func, init_static_vars_only)
+    { // p_xy_nointerp(k, a, func, init)
       double init = p_xy_nointerp(exp(lim[1][0]), lim[0][0], 0, 1);
     }
     #pragma GCC diagnostic pop
@@ -1416,11 +1416,11 @@ double p_gm_nointerp(
     const double k, 
     const double a, 
     const int ni,
-    const int init_static_vars_only
+    const int init
   )
 {
   return Pdelta(k, a)*bgal(ni, a) + 
-            GM02_nointerp(k, a, ni, init_static_vars_only)/ngal(ni, a);
+            GM02_nointerp(k, a, ni, init)/ngal(ni, a);
 }
 
 double p_gm(
@@ -1497,7 +1497,7 @@ double p_gg_nointerp(
     const double a, 
     const int ni, 
     const int nj,
-    const int init_static_vars_only
+    const int init
   )
 {
   if (ni != nj)
@@ -1508,7 +1508,7 @@ double p_gg_nointerp(
   const double bg = bgal(ni, a);
   const double ng = ngal(ni, a);
   return Pdelta(k, a)*bg*bg + 
-    G02_nointerp(k, a, ni, init_static_vars_only)/(ng*ng);
+    G02_nointerp(k, a, ni, init)/(ng*ng);
 }
 
 double p_gg(

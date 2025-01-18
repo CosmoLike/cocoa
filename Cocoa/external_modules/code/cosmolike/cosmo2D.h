@@ -65,23 +65,24 @@ double C_yy_limber(const double l);
 // Non-Interpolated Version (Will compute the Integral at every call)
 // ----------------------------------------------------------------------------
 
-double C_ss_tomo_limber_nointerp(double l, int ni, int nj, int EE, const int init);
+double C_ss_tomo_limber_nointerp(const double l, const int ni, const int nj, 
+  const int EE, const int init);
 
-double C_gs_tomo_limber_nointerp(const double l, const int ni, const int nj, const int init);
+double C_gs_tomo_limber_nointerp(const double l, const int ni, 
+  const int nj, const int init);
 
-double C_gg_tomo_limber_nointerp(double l, int ni, int nj, const int init);
+double C_gg_tomo_limber_nointerp(const double l, const int ni, const int nj, 
+  const int init);
 
-double C_gg_tomo_limber_nointerp(double l, int ni, int nj, const int init);
+double C_gk_tomo_limber_nointerp(const double l, const int nl, const int init);
 
-double C_gk_tomo_limber_nointerp(double l, int nl, const int init);
+double C_ks_tomo_limber_nointerp(const double l, const int ns, const int init);
 
-double C_ks_tomo_limber_nointerp(double l, int ns, const int init);
+double C_kk_limber_nointerp(const double l, const int init);
 
-double C_kk_limber_nointerp(double l, const int init);
+double C_gy_tomo_limber_nointerp(const double l, const int ni, const int init);
 
-double C_gy_tomo_limber_nointerp(double l, int ni, const int init);
-
-double C_ys_tomo_limber_nointerp(double l, int ni, const int init);
+double C_ys_tomo_limber_nointerp(const double l, const int ni, const int init);
 
 double C_ky_limber_nointerp(const double l, const int init);
 
