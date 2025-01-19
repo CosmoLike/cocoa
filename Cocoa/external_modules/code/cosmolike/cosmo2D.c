@@ -1125,16 +1125,6 @@ double C_ss_tomo_limber(const double l, const int ni, const int nj, const int EE
       fdiff(cache[3], redshift.random_shear) ||
       fdiff(cache[4], Ntable.random))
   {
-    int BM = 0;
-    if (like.IA == IA_MODEL_TATT)
-    {
-      for (int k=0; k<tomo.shear_Npowerspectra; k++)
-      {  
-        BM = (nuisance.ia[2][0] || nuisance.ia[2][Z1(k)] ||
-              nuisance.ia[2][Z2(k)]   || nuisance.ia[1][0]    ||
-              nuisance.ia[1][Z1(k)]   || nuisance.ia[1][Z2(k)]) ? 1 : 0;
-      }
-    }
     #pragma GCC diagnostic push
     #pragma GCC diagnostic ignored "-Wunused-variable" 
     {
