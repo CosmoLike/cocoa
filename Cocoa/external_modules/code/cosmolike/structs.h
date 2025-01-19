@@ -9,6 +9,18 @@ extern "C" {
 #define CHAR_MAX_SIZE 1024
 #define MAX_SIZE_ARRAYS 20
 
+typedef struct
+{ // parameters for power spectrum passed to FASTPT
+  double k_min;
+  double k_max;
+  int N;
+  int N_per_dec;
+  double** tab_AB; // parameters for table of bias terms
+  int N_AB;        // parameters for table of bias terms
+  double** tab_IA; // parameters for table of IA terms
+  int N_IA;        // parameters for table of IA terms
+} FPTpara;
+
 typedef struct 
 {
   double a_min;
@@ -112,6 +124,9 @@ typedef struct
   double clustering_zdist_zmin[MAX_SIZE_ARRAYS];
   double clustering_zdist_zmax[MAX_SIZE_ARRAYS];
 
+  // ---------------------------------------------------
+  // CLUSTER ROUTINES (ALPHA STAGE)
+  // ---------------------------------------------------
   /*
   int cluster_Nbin;       // number of lens cluster redshift bins
   int clusters_photoz;
@@ -199,6 +214,10 @@ typedef struct
   //gas[10] = gas_f_H;
   double gas[MAX_SIZE_ARRAYS]; // Compton-Y related variables
 
+
+  // ---------------------------------------------------
+  // CLUSTER ROUTINES (ALPHA STAGE)
+  // ---------------------------------------------------
   /*
   // Variables for the 4x2pt+N (see: 2008.10757 & 2010.01138)
   double cluster_MOR[MAX_SIZE_ARRAYS];
@@ -264,28 +283,6 @@ typedef struct
 
 typedef struct
 {
-  int interpolate_survey_area;
-  int bias_model;                 // Bias model
-  int hmf_model;                  // HMF model 
-  int nonlinear_bias;             // Do we include nonlinear bias in cluster analysis?
-
-  int N_MOR;                      // Mass observable relation (number of nuisance params)
-  int N_SF;                       // selection function (number of nuisance params)
-
-  int halo_exclusion_model;
-  double delta_exclusion;  // delta for exclusion radius (halo_exclusion) according to Baldauf 2013
-
-  int N200_Nbin;                  // number of cluster bins in lambda_obs (observed richness)
-  double N200_min;                // global lambda_obs_min (observed richness)
-  double N200_max;                // global lambda_obs_max (observed richness)
-  double N_min[MAX_SIZE_ARRAYS];  // lambda_obs_min in each bin in lambda_obs (observed richness)
-  double N_max[MAX_SIZE_ARRAYS];  // lambda_obs_max in each bin in lambda_obs (observed richness)
-  
-  char model[CHAR_MAX_SIZE];
-} clusterparams;
-
-typedef struct
-{
   double area;                    // survey_area in deg^2.
   double n_gal;                   // galaxy density per arcmin^2
   double sigma_e;                 // rms inrinsic ellipticity noise
@@ -311,21 +308,31 @@ typedef struct
   char pathHealpixWinFunc[CHAR_MAX_SIZE]; // path to precomputed healpix window function
 } Cmb;
 
+
+// ---------------------------------------------------
+// CLUSTER ROUTINES (ALPHA STAGE)
+// ---------------------------------------------------
 typedef struct
-{ // parameters for power spectrum passed to FASTPT
-  double k_min;
-  double k_max;
-  int N;
-  int N_per_dec;
-  double** tab_AB; // parameters for table of bias terms
-  int N_AB;        // parameters for table of bias terms
-  double** tab_IA; // parameters for table of IA terms
-  int N_IA;        // parameters for table of IA terms
-} FPTpara;
+{
+  int interpolate_survey_area;
+  int bias_model;                 // Bias model
+  int hmf_model;                  // HMF model 
+  int nonlinear_bias;             // Do we include nonlinear bias in cluster analysis?
 
-double bgal_z(double z, int nz);
+  int N_MOR;                      // Mass observable relation (number of nuisance params)
+  int N_SF;                       // selection function (number of nuisance params)
 
-double b1_per_bin(double z, int nz);
+  int halo_exclusion_model;
+  double delta_exclusion;  // delta for exclusion radius (halo_exclusion) according to Baldauf 2013
+
+  int N200_Nbin;                  // number of cluster bins in lambda_obs (observed richness)
+  double N200_min;                // global lambda_obs_min (observed richness)
+  double N200_max;                // global lambda_obs_max (observed richness)
+  double N_min[MAX_SIZE_ARRAYS];  // lambda_obs_min in each bin in lambda_obs (observed richness)
+  double N_max[MAX_SIZE_ARRAYS];  // lambda_obs_max in each bin in lambda_obs (observed richness)
+  
+  char model[CHAR_MAX_SIZE];
+} clusterparams;
 
 extern likepara like;
 
