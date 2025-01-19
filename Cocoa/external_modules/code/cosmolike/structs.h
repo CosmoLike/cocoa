@@ -32,8 +32,6 @@ typedef struct
   int LMIN_tab;
   int LMAX_NOLIMBER;
   int LMAX;
-  double LMIN_hankel;
-  double LMAX_hankel;
   // ---------------------------------------------------
   // CLUSTER ROUTINES (ALPHA STAGE)
   // ---------------------------------------------------

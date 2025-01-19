@@ -1112,7 +1112,7 @@ double C_ss_tomo_limber(const double l, const int ni, const int nj, const int EE
   {
     nell   = Ntable.N_ell;
     lim[0] = log(fmax(limits.LMIN_tab - 1., 1.0));
-    lim[1] = log(fmax(limits.LMAX, limits.LMAX_hankel) + 1);
+    lim[1] = log(limits.LMAX + 1);
     lim[2] = (lim[1] - lim[0]) / ((double) nell - 1.);
 
     if (table != NULL) free(table);
@@ -1396,7 +1396,7 @@ double C_gs_tomo_limber(const double l, const int ni, const int nj)
   {
     nell   = Ntable.N_ell;
     lim[0] = log(fmax(limits.LMIN_tab, 1.0));
-    lim[1] = log(fmax(limits.LMAX, limits.LMAX_hankel) + 1);
+    lim[1] = log(limits.LMAX + 1);
     lim[2] = (lim[1] - lim[0]) / ((double) nell - 1.0);
 
     if (table != NULL) free(table);
@@ -1639,7 +1639,7 @@ double C_gg_tomo_limber(const double l, const int ni, const int nj)
     nell   = Ntable.N_ell;
     NSIZE  = redshift.clustering_nbin;
     lnlmin = log(fmax(limits.LMIN_tab, 1.0));
-    lnlmax = log(fmax(limits.LMAX, limits.LMAX_hankel) + 1);
+    lnlmax = log(limits.LMAX + 1);
     dlnl   = (lnlmax - lnlmin) / ((double) nell - 1.0);
 
     if (table != NULL) free(table);
@@ -1846,7 +1846,7 @@ double C_gk_tomo_limber(const double l, const int ni)
   if (table == NULL || fdiff(cache[3], Ntable.random))
   {
     lim[0] = log(fmax(limits.LMIN_tab, 1.0));
-    lim[1] = log(fmax(limits.LMAX, limits.LMAX_hankel) + 1);
+    lim[1] = log(limits.LMAX + 1);
     lim[2] = (lim[1] - lim[0])/((double) Ntable.N_ell - 1.0);
 
     if (table != NULL) free(table);
@@ -1995,7 +1995,7 @@ double C_ks_tomo_limber(double l, int ni)
     table = (double**) malloc2d(redshift.shear_nbin, Ntable.N_ell);
 
     lim[0] = log(fmax(limits.LMIN_tab, 1.0));
-    lim[1] = log(fmax(limits.LMAX, limits.LMAX_hankel) + 1);
+    lim[1] = log(limits.LMAX + 1);
     lim[2] = (lim[1] - lim[0])/((double) Ntable.N_ell - 1.0);
   }
 
@@ -2111,7 +2111,7 @@ double C_kk_limber(const double l)
   if (table == NULL || fdiff(cache[1], Ntable.random))
   {
     lim[0] = log(fmax(limits.LMIN_tab, 1.0));
-    lim[1] = log(fmax(limits.LMAX, limits.LMAX_hankel) + 1);
+    lim[1] = log(limits.LMAX + 1);
     lim[2] = (lim[1] - lim[0])/((double) Ntable.N_ell - 1.0);
 
     if (table != NULL) free(table);
@@ -2256,7 +2256,7 @@ double C_gy_tomo_limber(double l, int ni)
   if (table == NULL || fdiff(cache[4], Ntable.random))
   {
     lim[0] = log(fmax(limits.LMIN_tab, 1.0));
-    lim[1] = log(fmax(limits.LMAX, limits.LMAX_hankel) + 1);
+    lim[1] = log(limits.LMAX + 1);
     lim[2]   = (lim[1] - lim[0])/((double) Ntable.N_ell - 1.0);
 
     if (table != NULL) free(table);
@@ -2396,7 +2396,7 @@ double C_ys_tomo_limber(double l, int ni)
     table = (double**) malloc2d(redshift.shear_nbin, Ntable.N_ell);
 
     lim[0] = log(fmax(limits.LMIN_tab, 1.0));
-    lim[1] = log(fmax(limits.LMAX, limits.LMAX_hankel) + 1);
+    lim[1] = log(limits.LMAX + 1);
     lim[2] = (lim[1] - lim[0])/((double) Ntable.N_ell - 1.0);
   }
 
@@ -2519,7 +2519,7 @@ double C_ky_limber(double l)
     table = (double*) malloc1d(Ntable.N_ell);
 
     lim[0] = log(fmax(limits.LMIN_tab, 1.0));
-    lim[1] = log(fmax(limits.LMAX, limits.LMAX_hankel) + 1);
+    lim[1] = log(limits.LMAX + 1);
     lim[2] = (lim[1] - lim[0])/((double) Ntable.N_ell - 1.0);
   }
 
@@ -2614,7 +2614,7 @@ double C_yy_limber(double l)
   if (table == NULL || fdiff(cache[1], Ntable.random))
   {
     lim[0] = log(fmax(limits.LMIN_tab, 1.0));
-    lim[1] = log(fmax(limits.LMAX, limits.LMAX_hankel) + 1.0);
+    lim[1] = log(limits.LMAX + 1.0);
     lim[2] = (lim[1] - lim[0])/((double) Ntable.N_ell - 1.0);
 
     if (table != NULL) free(table);
