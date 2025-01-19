@@ -224,13 +224,8 @@ double xi_pm_tomo(
           const int Z1NZ = Z1(nz);
           const int Z2NZ = Z2(nz);
 
-          const double BM = (like.IA == IA_MODEL_TATT) &&
-                            (nuisance.ia[2][0]    || nuisance.ia[2][Z1NZ] ||
-                             nuisance.ia[2][Z2NZ] || nuisance.ia[1][0]    ||
-                             nuisance.ia[1][Z1NZ] || nuisance.ia[1][Z2NZ]) ? 1 : 0;
-
           Cl[0][nz][l] = C_ss_tomo_limber_nointerp(l, Z1NZ, Z2NZ, 1, 0);
-          Cl[1][nz][l] = (BM == 1) ? C_ss_tomo_limber_nointerp(l, Z1NZ, Z2NZ, 0, 0) : 0;
+          Cl[1][nz][l] = C_ss_tomo_limber_nointerp(l, Z1NZ, Z2NZ, 0, 0);
         }
       }
       
