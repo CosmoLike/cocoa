@@ -51,30 +51,6 @@ static int has_b2_galaxies()
   return res;
 }
 
-static int nell()
-{
-  int res = 0;
-  switch(like.IA_MODEL)
-  {
-    case IA_MODEL_TATT:
-    { 
-      res = Ntable.N_ell_TATT;
-      break;
-    }
-    case IA_MODEL_NLA:
-    {
-      res = Ntable.N_ell;
-      break;
-    }
-    default:
-    {
-      spdlog::critical("like.IA_MODEL = {} not supported", like.IA_MODEL);
-      exit(1);
-    }
-  }
-  return res;
-}
-
 // ---------------------------------------------------------------------------
 // ---------------------------------------------------------------------------
 // ---------------------------------------------------------------------------
@@ -895,7 +871,7 @@ cube int_for_C_gg_tomo_limber_cpp(const vector a, const vector l)
   #pragma GCC diagnostic push
   #pragma GCC diagnostic ignored "-Wunused-variable"
   for (int nz=0; nz<redshift.clustering_nbin; nz++)
-  { // init static variables
+  { // init static variablesf
     double tmp = int_for_C_gg_tomo_limber_cpp(a(0), l(0), nz, nz);
   }
   #pragma GCC diagnostic pop

@@ -344,16 +344,12 @@ void init_accuracy_boost(
    // (imp on notebooks where users can change sampling_boost interactively
   static int N_a = 0;
   static int N_ell = 0;
-  static int N_ell_TATT = 0;
 
   if (N_a == 0) N_a = Ntable.N_a;
   Ntable.N_a = static_cast<int>(ceil(N_a*sampling_boost));
   
   if (N_ell == 0) N_ell = Ntable.N_ell;
   Ntable.N_ell = static_cast<int>(ceil(N_ell*sampling_boost));
-
-  if (N_ell_TATT == 0)  N_ell_TATT = Ntable.N_ell_TATT;
-  Ntable.N_ell_TATT = static_cast<int>(ceil(N_ell_TATT*sampling_boost));
 
   /*  
   Ntable.N_k_lin = 

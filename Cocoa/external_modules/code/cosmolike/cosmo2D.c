@@ -13,6 +13,7 @@
 
 #include "bias.h"
 #include "basics.h"
+#include "cfastpt/cfastpt.h"
 #include "cosmo3D.h"
 #include "cosmo2D.h"
 #include "halo.h"
@@ -83,30 +84,6 @@ static int has_b2_galaxies()
   for (int i=0; i<redshift.clustering_nbin; i++) 
     if (nuisance.gb[1][i])
       res = 1;
-  return res;
-}
-
-int number_ell_fourier_2pt()
-{
-  int res = 0;
-  switch(like.IA_MODEL)
-  {
-    case IA_MODEL_TATT:
-    { 
-      res = Ntable.N_ell_TATT;
-      break;
-    }
-    case IA_MODEL_NLA:
-    {
-      res = Ntable.N_ell;
-      break;
-    }
-    default:
-    {
-      log_fatal("like.IA_MODEL = %d not supported", like.IA_MODEL);
-      exit(1);
-    }
-  }
   return res;
 }
 
@@ -972,72 +949,96 @@ double int_for_C_ss_tomo_limber(double a, void* params)
   const int EE = (int) ar[3];
 
   const double ell = l + 0.5;
-  const double growfac_a = growfac(a);
   struct chis chidchi = chi_all(a);
+  const double growfac_a = growfac(a);
   const double hoverh0 = hoverh0v2(a, chidchi.dchida);
   const double fK = f_K(chidchi.chi);
   const double k = ell/fK;
   
+  const double WK1 = W_kappa(a, fK, n1);
+  const double WK2 = W_kappa(a, fK, n2);
+  const double WS1 = W_source(a, n1, hoverh0);
+  const double WS2 = W_source(a, n2, hoverh0);
+  const double PK  = Pdelta(k,a);
+
+  const double ell4 = ell*ell*ell*ell; // correction (1812.05995 eqs 74-79)
+  const double ell_prefactor = l*(l - 1.)*(l + 1.)*(l + 2.)/ell4; 
+
   double ans;
 
   switch(like.IA_MODEL) 
   {
     case IA_MODEL_TATT:
-    {
-      const double ws1 = W_source(a, n1, hoverh0);
-      const double ws2 = W_source(a, n2, hoverh0); 
+    { 
+      get_FPT_IA();
+
+      const double lnk = log(k);
+      const double g4 = growfac_a*growfac_a*growfac_a*growfac_a;
       
-      const double C11 = -IA_A1_Z1(a, growfac_a, n1);
-      const double bta1 = IA_BTA_Z1(a, growfac_a, n1);         
-      const double C21 = 5.*IA_A2_Z1(a, growfac_a, n1);
+      double IA_AX[2];
+      IA_A1_Z1Z2(a, growfac_a, n1, n2, IA_AX);
+      const double C11 = IA_AX[0];
+      const double C12 = IA_AX[1];
+      IA_A2_Z1Z2(a, growfac_a, n1, n2, IA_AX);
+      const double C21 = IA_AX[0];
+      const double C22 = IA_AX[1];
+      IA_BTA_Z1Z2(a, growfac_a, n1, n2, IA_AX);
+      const double bta1 = IA_AX[0];
+      const double bta2 = IA_AX[1];
       
-      const double C12 = -IA_A1_Z1(a, growfac_a, n2);    
-      const double bta2 = IA_BTA_Z1(a, growfac_a, n2);          
-      const double C22 = 5.*IA_A2_Z1(a, growfac_a, n2); 
+      double lim[3];
+      lim[0] = log(FPT.k_min);
+      lim[1] = log(FPT.k_max);
+      lim[2] = log(10.) / (double) FPT.N_per_dec;
 
       if (EE == 1)
-      {  
-        const double PK  =  Pdelta(k,a);
-        const double wk1 = W_kappa(a, fK, n1); 
-        const double wk2 = W_kappa(a, fK, n2); 
-  
-        double t1 = TATT_II_EE(k, a, C11, C21, bta1, C12, C22, bta2, growfac_a, PK);
-        double t2 = TATT_GI_E(k, a, C11, C21, bta1, growfac_a, PK);
-        double t3 = TATT_GI_E(k, a, C12, C22, bta2, growfac_a, PK);
+      {     
+        double tt = g4*interpol1d(FPT.tab_IA[0],FPT.N,lim[0],lim[1],lim[2],lnk);
+        double ta_dE1 = g4*interpol1d(FPT.tab_IA[2],FPT.N,lim[0],lim[1],lim[2],lnk);
+        double ta_dE2 = g4*interpol1d(FPT.tab_IA[3],FPT.N,lim[0],lim[1],lim[2],lnk);
+        double ta = g4*interpol1d(FPT.tab_IA[4],FPT.N,lim[0],lim[1],lim[2],lnk);
+        double mixA = g4*interpol1d(FPT.tab_IA[6],FPT.N,lim[0],lim[1],lim[2],lnk);
+        double mixB = g4*interpol1d(FPT.tab_IA[7],FPT.N,lim[0],lim[1],lim[2],lnk);
+        double mixEE = g4*interpol1d(FPT.tab_IA[8],FPT.N,lim[0],lim[1],lim[2],lnk);
         
-        ans = wk1 * wk2 * PK   + 
-              ws1 * ws2 * t1 + 
-              ws1 * wk2 * t2 + 
-              ws2 * wk1 * t3;
-
-        ans *= chidchi.dchida / (fK * fK);
+        ans = WK1*WK2*PK 
+              - WS1*WK2*(C11*PK + C11*bta1*(ta_dE1+ta_dE2) - 5*C21*(mixA+mixB))
+              - WS2*WK1*(C12*PK + C12*bta2*(ta_dE1+ta_dE2) - 5*C22*(mixA+mixB))
+              + WS1*WS2*(C11*C12*PK 
+                         + C11*C12*(bta1*bta2*ta + (bta1 + bta2)*(ta_dE1+ta_dE2))
+                         - 5*(C11*C22 + C12*C21)*(mixA+mixB)
+                         - 5*(C11*bta1*C22 + C12*bta2*C21)*mixEE
+                         + 25*C21*C22*tt);
       }
-      else
-      {
-        double t1 = TATT_II_BB(k, a, C11, C21, bta1, C12, C22, bta2, growfac_a);   
-        ans = (ws1 * ws2 * t1) * chidchi.dchida / (fK * fK);
+      else  
+      {        
+        double tt = g4*interpol1d(FPT.tab_IA[1],FPT.N,lim[0],lim[1],lim[2],lnk);
+        double ta = g4*interpol1d(FPT.tab_IA[5],FPT.N,lim[0],lim[1],lim[2],lnk);
+        double mix = g4*interpol1d(FPT.tab_IA[9],FPT.N,lim[0],lim[1],lim[2],lnk);
+        
+        ans = WS1*WS2*(C11*C12*bta1*bta2*ta 
+                       - 5*(C11*bta1*C22+C12*bta2*C21)*mix 
+                       + 25*C21*C22*tt);
       }
       break;
     }
     case IA_MODEL_NLA:
-    { // OLD NLA INTERFACE (SIMPLER TO MOD IN EXTENSIONS TO WCDM)
-      const double WK1 = W_kappa(a, fK, n1);
-      const double WK2 = W_kappa(a, fK, n2);
-      const double PK  = Pdelta(k,a);
-      
-      const double ell4 = ell*ell*ell*ell; // correction (1812.05995 eqs 74-79)
-      const double ell_prefactor = l*(l - 1.)*(l + 1.)*(l + 2.)/ell4; 
-
-      double IA_A1[2];
-      IA_A1_Z1Z2(a, growfac_a, n1, n2, IA_A1);
-      const double A_Z1 = IA_A1[0];
-      const double A_Z2 = IA_A1[1];
-      const double WS1  = W_source(a, n1, hoverh0) * A_Z1;
-      const double WS2  = W_source(a, n2, hoverh0) * A_Z2; 
-
-      ans = (WK1 - WS1) * (WK2 - WS2);
-      ans *= PK*(chidchi.dchida/(fK*fK))*ell_prefactor;
-
+    {
+      if (EE == 1)
+      { 
+        double IA_A1[2];
+        IA_A1_Z1Z2(a, growfac_a, n1, n2, IA_A1);
+        const double C11 = IA_A1[0];
+        const double C12 = IA_A1[1];
+        ans =   WK1*WK2*PK 
+              - WS1*WK2*C11*PK 
+              - WS2*WK1*C12*PK
+              + WS1*WS2*C11*C12*PK;
+      }
+      else
+      {
+        ans = 0.0;
+      }
       break;
     }
     default:
@@ -1047,7 +1048,7 @@ double int_for_C_ss_tomo_limber(double a, void* params)
     }
   }
 
-  return ans;
+  return ans*(chidchi.dchida/(fK*fK))*ell_prefactor;
 }
 
 double C_ss_tomo_limber_nointerp(
@@ -1109,7 +1110,7 @@ double C_ss_tomo_limber(const double l, const int ni, const int nj, const int EE
   
   if (table == NULL || fdiff(cache[4], Ntable.random))
   {
-    nell   = number_ell_fourier_2pt();
+    nell   = Ntable.N_ell;
     lim[0] = log(fmax(limits.LMIN_tab - 1., 1.0));
     lim[1] = log(fmax(limits.LMAX, limits.LMAX_hankel) + 1);
     lim[2] = (lim[1] - lim[0]) / ((double) nell - 1.);
@@ -1138,7 +1139,7 @@ double C_ss_tomo_limber(const double l, const int ni, const int nj, const int EE
     #pragma GCC diagnostic ignored "-Wunused-variable" 
     {
       double ini = C_ss_tomo_limber_nointerp(exp(lim[0]),Z1(0),Z2(0),1,1);
-      ini = (BM == 1) ? C_ss_tomo_limber_nointerp(exp(lim[0]),Z1(0),Z2(0),0,1) : 0;
+      ini = C_ss_tomo_limber_nointerp(exp(lim[0]),Z1(0),Z2(0),0,1);
     }
     #pragma GCC diagnostic pop
     
@@ -1151,7 +1152,7 @@ double C_ss_tomo_limber(const double l, const int ni, const int nj, const int EE
         const double Z1NZ = Z1(k);
         const double Z2NZ = Z2(k);
         table[0][k][i] = C_ss_tomo_limber_nointerp(l,Z1NZ,Z2NZ,1,0);
-        table[1][k][i] = (BM == 1) ? C_ss_tomo_limber_nointerp(l,Z1NZ,Z2NZ,0,0) : 0;
+        table[1][k][i] = C_ss_tomo_limber_nointerp(l,Z1NZ,Z2NZ,0,0);
       }
     }
     cache[0] = cosmology.random;
@@ -1227,6 +1228,7 @@ double int_for_C_gs_tomo_limber(double a, void* params)
   const double WK = W_kappa(a, fK, ns);
   const double WGAL = W_gal(a, nl, hoverh0);
   const double WMAG = W_mag(a, fK, nl);
+  const double WS   = W_source(a, ns, hoverh0);
 
   const double ell_prefactor = l*(l + 1.)/(ell*ell); // correction (1812.05995 eqs 74-79)
   const double tmp = (l - 1.)*l*(l + 1.)*(l + 2.);   // correction (1812.05995 eqs 74-79)
@@ -1238,65 +1240,69 @@ double int_for_C_gs_tomo_limber(double a, void* params)
   {
     case IA_MODEL_TATT:
     {
-      const double WS = W_source(a, ns, hoverh0);
+      if (include_HOD_GX == 1)
+      {
+        log_fatal("HOD NOT IMPLEMENTED");
+        exit(1);
+      }
 
-      const double b2 = gb2(z, nl);
-      const double bs2 = gbs2(z, nl);
-      const double b3 = gb3(z, nl);
+      get_FPT_IA();
 
-      const double C1_ZS   = -IA_A1_Z1(a, growfac_a, ns);
-      const double b_ta_zs = IA_BTA_Z1(a, growfac_a, ns);
-      const double C2_ZS   = 5.*IA_A2_Z1(a, growfac_a, ns);
-      const double GIE = TATT_GI_E(k, a, C1_ZS, C2_ZS, b_ta_zs, growfac_a, PK);
+      const double lnk = log(k);
+      double lim[3];
+      lim[0] = log(FPT.k_min);
+      lim[1] = log(FPT.k_max);
+      lim[2] = log(10.) / (double) FPT.N_per_dec;
+
+      double mixA = g4*interpol1d(FPT.tab_IA[6],FPT.N,lim[0],lim[1],lim[2],lnk);
+      double mixB = g4*interpol1d(FPT.tab_IA[7],FPT.N,lim[0],lim[1],lim[2],lnk);
+      double ta_dE1 = g4*interpol1d(FPT.tab_IA[2],FPT.N,lim[0],lim[1],lim[2],lnk);
+      double ta_dE2 = g4*interpol1d(FPT.tab_IA[3],FPT.N,lim[0],lim[1],lim[2],lnk);
+
+      double WRSD = 0.0;
+      if (include_RSD_GS == 1)
+      {
+        const double chi_0 = f_K(ell/k);
+        const double chi_1 = f_K((ell+1.)/k);
+        const double a_0 = a_chi(chi_0);
+        const double a_1 = a_chi(chi_1);
+        WRSD = W_RSD(ell, a_0, a_1, nl);
+      }
 
       double oneloop = 0.0;
       if (nonlinear_bias == 1)
-      {
+      { 
+        const double b2 = gb2(z, nl);
+        const double bs2 = gbs2(z, nl);
+        const double b3 = gb3(z, nl);
         oneloop = 0.5*g4*(b2 * PT_d1d2(k) + bs2 * PT_d1s2(k) + b3 * PT_d1d3(k));
       }
-      
-      const double tmp1 = 0.5*g4*(b2 * PT_d1d2(k) + bs2 * PT_d1s2(k) + b3 * PT_d1d3(k));
-      const double PK1loop = (WGAL*b2 != 0) ? tmp1 : 0.0; 
 
+      const double C1ZS  = IA_A1_Z1(a, growfac_a, ns);
+      const double btazs = IA_BTA_Z1(a, growfac_a, ns);
+      const double C2ZS  = IA_A2_Z1(a, growfac_a, ns);
 
-      ans  = WK*(WMAG*bmag*PK + WGAL*(b1*PK + PK1loop)) + (WGAL*b1 + WMAG*bmag)*WS*GIE;
-      ans *= chidchi.dchida/(fK*fK) * ell_prefactor2;
+      ans = (WK-WS*C1ZS)*((WGAL*b1+WMAG*ell_prefactor*bmag+WRSD)*PK+WGAL*oneloop) 
+            - WS*(WGAL*b1 + WMAG*ell_prefactor*bmag)*(C1ZS*btazs*(ta_dE1+ta_dE2) 
+                                                      - 5*C2ZS*(mixA+mixB));
       break;
     }
     case IA_MODEL_NLA:
     {
-      const double A_ZS = IA_A1_Z1(a, growfac_a, ns);
-      const double WS   = W_source(a, ns, hoverh0)*A_ZS;
-
-      double b1pk = WK - WS;
-
       if (include_HOD_GX == 1)
       {
-        if (include_RSD_GS == 1)
-        {
-          log_fatal("RSD not implemented with (HOD = TRUE)");
-          exit(1);
-        }
-        else
-        {  
-          b1pk *= WGAL;
-        }
-        b1pk *= p_gm(k, a, nl);
+        log_fatal("HOD NOT IMPLEMENTED");
+        exit(1);
       }
-      else
+
+      double WRSD = 0.0;
+      if (include_RSD_GS == 1)
       {
-        if (include_RSD_GS == 1)
-        {
-          const double chi_0 = f_K(ell/k);
-          const double chi_1 = f_K((ell+1.)/k);
-          const double a_0 = a_chi(chi_0);
-          const double a_1 = a_chi(chi_1);
-          const double WRSD = W_RSD(ell, a_0, a_1, nl);
-          b1pk *= (WGAL*b1 + WMAG*ell_prefactor*bmag) + WRSD;
-        }
-        else
-          b1pk *= (WGAL*b1 + WMAG*ell_prefactor*bmag);
-        b1pk *= PK;
+        const double chi_0 = f_K(ell/k);
+        const double chi_1 = f_K((ell+1.)/k);
+        const double a_0 = a_chi(chi_0);
+        const double a_1 = a_chi(chi_1);
+        WRSD = W_RSD(ell, a_0, a_1, nl);
       }
 
       double oneloop = 0.0;
@@ -1306,10 +1312,12 @@ double int_for_C_gs_tomo_limber(double a, void* params)
         const double b2   = gb2(z, nl);
         const double bs2  = gbs2(z, nl);
         const double b3   = gb3(z, nl);
-        oneloop  = (WK - WS) * WGAL;
-        oneloop *= g4*0.5*(b2*PT_d1d2(k) + bs2*PT_d1s2(k) + b3*PT_d1d3(k));
+        oneloop = g4*0.5*(b2*PT_d1d2(k) + bs2*PT_d1s2(k) + b3*PT_d1d3(k));
       }
-      ans = (b1pk + oneloop)*(chidchi.dchida/(fK*fK))*ell_prefactor2;
+      
+      const double C1ZS = IA_A1_Z1(a, growfac_a, ns);
+
+      ans = (WK-WS*C1ZS)*((WGAL*b1+WMAG*ell_prefactor*bmag+WRSD)*PK+WGAL*oneloop);
       break;
     }
     default:
@@ -1318,7 +1326,7 @@ double int_for_C_gs_tomo_limber(double a, void* params)
       exit(1);
     }
   }
-  return ans;
+  return ans*(chidchi.dchida/(fK*fK))*ell_prefactor2;
 }
 
 double C_gs_tomo_limber_nointerp(
@@ -1386,7 +1394,7 @@ double C_gs_tomo_limber(const double l, const int ni, const int nj)
 
   if (table == NULL || fdiff(cache[6], Ntable.random)) 
   {
-    nell   = (int) number_ell_fourier_2pt();
+    nell   = Ntable.N_ell;
     lim[0] = log(fmax(limits.LMIN_tab, 1.0));
     lim[1] = log(fmax(limits.LMAX, limits.LMAX_hankel) + 1);
     lim[2] = (lim[1] - lim[0]) / ((double) nell - 1.0);
@@ -1715,6 +1723,7 @@ double int_for_C_gk_tomo_limber(double a, void* params)
     exit(1);
   }
   const double l = ar[1];
+  const int nonlinear_bias = ar[2];
 
   const double ell = l + 0.5;
   struct chis chidchi = chi_all(a);
@@ -1767,82 +1776,18 @@ double int_for_C_gk_tomo_limber(double a, void* params)
     res *= PK;
   }
 
-  return (res*chidchi.dchida/(fK*fK))*ell_prefactor;
-}
-
-double int_for_C_gk_tomo_limber_withb2(double a, void* params)
-{
-  if(!(a>0) || !(a<1)) 
+  double oneloop = WK;
+  if (nonlinear_bias == 1)
   {
-    log_fatal("a>0 and a<1 not true");
-    exit(1);
+    const double growfac_a = growfac(a);
+    const double g4 = growfac_a*growfac_a*growfac_a*growfac_a;
+    const double bmag = gbmag(z, nl);
+    const double b2 = gb2(z, nl);
+    const double bs2 = gbs2(z, nl);
+    oneloop *= WGAL;
+    oneloop *= g4*(0.5*b2*PT_d1d2(k) + 0.5*bs2*PT_d1s2(k));
   }
-  double* ar = (double*) params;
-
-  const int nl = (int) ar[0];
-  if (nl < 0 || 
-      nl > redshift.clustering_nbin - 1)
-  {
-    log_fatal("error in selecting bin number ni = %d", nl);
-    exit(1);
-  }
-  const double l = ar[1];
-  
-  const double growfac_a = growfac(a);
-  const double g4 = growfac_a*growfac_a*growfac_a*growfac_a;
-  struct chis chidchi = chi_all(a);
-  const double hoverh0 = hoverh0v2(a, chidchi.dchida);
-  const double ell = l + 0.5;
-  const double fK = f_K(chidchi.chi);
-  const double k = ell/fK; 
-  const double z = 1./a - 1.;
-  
-  const double b1 = gb1(z, nl);
-  const double bmag = gbmag(z, nl);
-  const double b2 = gb2(z, nl);
-  const double bs2 = gbs2(z, nl);
-  const double b3 = gb3(z, nl);
-
-  const double WK = W_k(a, fK);
-  const double WGAL = W_gal(a, nl, hoverh0);
-  const double WMAG = W_mag(a, fK, nl);
-  
-  const double ell_prefactor = l*(l + 1.)/(ell*ell); // prefactor correction (1812.05995 eqs 74-79)
-
-  double linear_part = WK; 
-  double non_linear_part = WK; 
-
-  if(include_RSD_GK == 1)
-  {
-    static double chi_a_min = 0;
-    if (chi_a_min == 0)
-    {
-      chi_a_min = chi(limits.a_min);
-    }
-    const double chi_0 = f_K(ell/k);
-    const double chi_1 = f_K((ell + 1.0)/k);
-    if (chi_1 > chi_a_min)
-    {
-      return 0;
-    }
-    const double a_0 = a_chi(chi_0);
-    const double a_1 = a_chi(chi_1);
-    const double WRSD = W_RSD(ell, a_0, a_1, nl);
-
-    linear_part *= (WGAL*b1 + WMAG*ell_prefactor*bmag) + WRSD;
-    non_linear_part *= WGAL;
-  }
-  else
-  {
-    linear_part *= (WGAL*b1 + WMAG*ell_prefactor*bmag);
-    non_linear_part *= WGAL;
-  }
-
-  linear_part *= Pdelta(k,a);
-
-  non_linear_part *= g4*(0.5*b2*PT_d1d2(k) + 0.5*bs2*PT_d1s2(k));
-
-  return (linear_part + non_linear_part)*(chidchi.dchida/(fK*fK))*ell_prefactor;
+  return ((res + oneloop)*chidchi.dchida/(fK*fK))*ell_prefactor;
 }
 
 double C_gk_tomo_limber_nointerp(const double l, const int ni, const int init)
@@ -1864,7 +1809,7 @@ double C_gk_tomo_limber_nointerp(const double l, const int ni, const int init)
     cache[0] = Ntable.random;
   }
 
-  double ar[2] = {(double) ni, l};
+  double ar[3] = {(double) ni, l, has_b2_galaxies()};
   
   const double amin = amin_lens(ni);
   const double amax = amax_lens(ni);
@@ -1880,27 +1825,15 @@ double C_gk_tomo_limber_nointerp(const double l, const int ni, const int init)
   }
 
   double res = 0.0;
-  
   if (init == 1)
-  {
-    if (has_b2_galaxies())
-      res = int_for_C_gk_tomo_limber_withb2(amin, (void*) ar);
-    else
-      res = int_for_C_gk_tomo_limber(amin, (void*) ar);
-  }
+    res = int_for_C_gk_tomo_limber(amin, (void*) ar);
   else
   {
     gsl_function F;
     F.params = (void*) ar;
-    
-    if (has_b2_galaxies())
-      F.function = int_for_C_gk_tomo_limber_withb2;
-    else
-      F.function = int_for_C_gk_tomo_limber;
-    
-    res =  gsl_integration_glfixed(&F, amin, amax, w);
+    F.function = int_for_C_gk_tomo_limber;
+    res = gsl_integration_glfixed(&F, amin, amax, w);
   }
-
   return res;
 }
 

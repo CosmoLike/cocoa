@@ -12,6 +12,16 @@
 //  ----------------------------------------------------------------------------------
 //  ----------------------------------------------------------------------------------
 
+FPTpara FPT =
+{
+  .k_min = 1.e-5,
+  .k_max = 1.e+3,
+  .N = 800,
+  .N_per_dec = 100,
+  .N_AB = 7,
+  .N_IA = 10
+};
+
 likepara like =
 {
   .IA = 0.,
@@ -170,7 +180,6 @@ Ntab Ntable =
   .N_ell  = 325,                      // N_ell      (modified by COCOA from 200)
   .Ntheta = 250,                      // N_theta    (modified by COCOA from 200)
   .N_M  = 1000,                       // N_M, M = mass (Halo Model)
-  .N_ell_TATT = 200,                  // N_ell_TATT (modified by COCOA from 60)
   .NL_Nell_block = 50,                // Cosmo2D - NL = NonLimber (NL_Nell_block)
   .NL_Nchi = 500,                     // Cosmo2D - NL = NonLimber (NL_Nchi)
   .photoz_interpolation_type = 0,

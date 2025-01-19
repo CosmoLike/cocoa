@@ -53,7 +53,6 @@ typedef struct
   int N_ell;
   int Ntheta;
   int N_M;
-  int N_ell_TATT;                  // Cosmo2D
   int NL_Nell_block;               // Cosmo2D - NL = NonLimber
   int NL_Nchi;                     // Cosmo2D - NL = NonLimber
   int photoz_interpolation_type;
@@ -312,6 +311,18 @@ typedef struct
   char pathHealpixWinFunc[CHAR_MAX_SIZE]; // path to precomputed healpix window function
 } Cmb;
 
+typedef struct
+{ // parameters for power spectrum passed to FASTPT
+  double k_min;
+  double k_max;
+  int N;
+  int N_per_dec;
+  double** tab_AB; // parameters for table of bias terms
+  int N_AB;        // parameters for table of bias terms
+  double** tab_IA; // parameters for table of IA terms
+  int N_IA;        // parameters for table of IA terms
+} FPTpara;
+
 double bgal_z(double z, int nz);
 
 double b1_per_bin(double z, int nz);
@@ -337,6 +348,8 @@ extern Cmb cmb;
 extern lim limits;
 
 extern Ntab Ntable;
+
+extern FPTpara FPT;
 
 // --------------------------------------------------------------------
 // --------------------------------------------------------------------

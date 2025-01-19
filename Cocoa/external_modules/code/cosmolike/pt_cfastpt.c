@@ -13,18 +13,6 @@
 
 #include "log.c/src/log.h"
 
-extern FPTpara FPT;
-
-FPTpara FPT =
-{
-  .k_min = 1.e-5,
-  .k_max = 1.e+3,
-  .N = 800,
-  .N_per_dec = 100,
-  .N_AB = 7,
-  .N_IA = 10
-};
-
 static double tab_d1d3[800] = {
  3.910971e-18,  4.182876e-18,  4.466778e-18,  4.789119e-18,
  5.133766e-18,  5.508468e-18,  5.890354e-18,  6.301033e-18,  6.736776e-18,  7.223413e-18,
@@ -399,200 +387,44 @@ double PT_sigma4(double k_coverH0 __attribute__((unused)))
 
 void get_FPT_IA(void) 
 {
-  static cosmopara C;
-  if (recompute_cosmo3D(C)) 
+  static double cache[MAX_SIZE_ARRAYS];
+  
+  if (fdiff(cache[0], cosmology.random) || fdiff(cache[1], Ntable.random))
   {
-    update_cosmopara(&C);
-
-    if (FPT.tab_IA == 0) 
-    { // if table doesn't exit yet, create it
-      FPT.tab_IA = (double**) malloc(sizeof(double*)*FPT.N_IA);
-      for(int i=0; i<FPT.N_IA; i++)
-      {
-        FPT.tab_IA[i] = (double*) malloc(sizeof(double)*FPT.N);
-      }
-
-      if (FPT.k_min < limits.k_min_cH0) 
-      {
-        FPT.k_min = K_CH0(FPT.k_min);
-        FPT.k_max = K_CH0(FPT.k_max);
-      }
+    if ((int) log10(FPT.k_max / FPT.k_min) * FPT.N_per_dec != FPT.N) 
+    {
+      log_fatal("inconsistent k-range and number of bins for FPT");
+      log_fatal("inconsistent k-range and number of bins for FPT: "
+          "kmin=%e, kmax=%e, N_per_dec=%d, N=%d", FPT.k_min, 
+          FPT.k_max, FPT.N_per_dec, FPT.N);
+      exit(1);
     }
 
-    double k[FPT.N], Pin[FPT.N];
-    double IA_tt_EE[FPT.N]; 
-    double IA_tt_BB[FPT.N];
-    double IA_ta_dE1[FPT.N]; 
-    double IA_ta_dE2[FPT.N]; 
-    double IA_ta_0E0E[FPT.N];
-    double IA_ta_0B0B[FPT.N];
-    double IA_mix_A[FPT.N]; 
-    double IA_mix_B[FPT.N]; 
-    double IA_mix_DEE[FPT.N];
-    double IA_mix_DBB[FPT.N];
-
-    FPT_input(k, Pin);
-
-    IA_tt(k, Pin, FPT.N, IA_tt_EE, IA_tt_BB);
-
-    IA_ta(k, Pin, FPT.N, IA_ta_dE1, IA_ta_dE2, IA_ta_0E0E, IA_ta_0B0B);
-
-    IA_mix(k, Pin, FPT.N, IA_mix_A, IA_mix_B, IA_mix_DEE, IA_mix_DBB);
+    if (FPT.tab_IA != NULL) free(FPT.tab_IA);
+    FPT.tab_IA = (double**) malloc2d(12, FPT.N);
+    FPT.k_min = 1.e-5*cosmology.coverH0;
+    FPT.k_max = 1.e+3*cosmology.coverH0;
 
     #pragma omp parallel for
-    for (int i = 0; i < FPT.N; i++) 
+    for (int i=0; i<FPT.N; i++) 
     {
-      FPT.tab_IA[0][i] = IA_tt_EE[i]; // tt_EE
-      FPT.tab_IA[1][i] = IA_tt_BB[i]; // tt_BB
-      FPT.tab_IA[2][i] = IA_ta_dE1[i];  // ta_dE1
-      FPT.tab_IA[3][i] = IA_ta_dE2[i];  // ta_dE2
-      FPT.tab_IA[4][i] = IA_ta_0E0E[i]; // ta_EE
-      FPT.tab_IA[5][i] = IA_ta_0B0B[i]; // ta_BB
-      FPT.tab_IA[6][i] = IA_mix_A[i];      // mix_A
-      FPT.tab_IA[7][i] = IA_mix_B[i] * 4.; // mix_B
-      FPT.tab_IA[8][i] = IA_mix_DEE[i];    // mix_D_EE
-      FPT.tab_IA[9][i] = IA_mix_DBB[i];    // mix_D_BB
+      FPT.tab_IA[10][i] = exp(log(FPT.k_min) + i*(log(10.)/FPT.N_per_dec));
+      FPT.tab_IA[11][i] = p_lin(FPT.tab_IA[10][i], 1.0);
     }
-  }
-}
 
-double TATT_II_EE(double k_coverH0, double a __attribute__((unused)), double C1,
-double C2, double b_ta, double C1_2, double C2_2, double b_ta_2,
-double growfac_a, double pdelta_ak) 
-{
-  double ta_EE = 0., tt_EE = 0., mix_EE = 0.;
-  const double nla_EE = C1 * C1_2 * pdelta_ak;
-  
-  static cosmopara C;
-  static double logkmin = 0., logkmax = 0., dlgk = 0.;
-
-  // if TATT is specified, i.e. C2 !=0 (TT), or b_ta != 0 (TA)
-  if (C2 != 0 || b_ta != 0)
-  {
-    // only call FASTPT if cosmology changed since last call
-    if (recompute_cosmo3D(C))
-    {
-      get_FPT_IA();
-      update_cosmopara(&C);
-      logkmin = log(FPT.k_min);
-      logkmax = log(FPT.k_max);
-      dlgk = log(10.) / (double)FPT.N_per_dec;
-    }
-    double lgk = log(k_coverH0);
-    // outside FASTPT interpolation range; return NLA contribution only
-    if (lgk <= logkmin || lgk >= logkmax) {
-      return nla_EE;
-    }
-    double g4 = growfac_a*growfac_a*growfac_a*growfac_a;
-
-    const double P_ta_EE = g4*interpol1d(FPT.tab_IA[4], FPT.N, logkmin, logkmax, dlgk, lgk);
-    const double P_ta_dE1 = g4*interpol1d(FPT.tab_IA[2], FPT.N, logkmin, logkmax, dlgk, lgk);
-    const double P_ta_dE2 = g4*interpol1d(FPT.tab_IA[3], FPT.N, logkmin, logkmax, dlgk, lgk);
-
-    ta_EE = C1 * C1_2 *
-            (b_ta * b_ta_2 * P_ta_EE + (b_ta + b_ta_2) * (P_ta_dE1 + P_ta_dE2));
-
-    if (C2) 
-    {
-      const double P_mix_EE = g4*interpol1d(FPT.tab_IA[8], FPT.N, logkmin, logkmax, dlgk, lgk);
-      const double P_mix_A = g4*interpol1d(FPT.tab_IA[6], FPT.N, logkmin, logkmax, dlgk, lgk);
-      const double P_mix_B = g4*interpol1d(FPT.tab_IA[7], FPT.N, logkmin, logkmax, dlgk, lgk);
-
-      mix_EE = (C1 * C2_2 + C1_2 * C2) * (P_mix_A + P_mix_B) +
-               (C1 * b_ta * C2_2 + C1_2 * b_ta_2 * C2) * P_mix_EE;
-
-      tt_EE = C2 * C2_2 * g4 *
-          interpol1d(FPT.tab_IA[0], FPT.N, logkmin, logkmax, dlgk, lgk);
-    }
-  }
-
-  return nla_EE + ta_EE + mix_EE + tt_EE;
-}
-
-double TATT_II_BB(double k_coverH0, double a __attribute__((unused)), double C1,
-double C2, double b_ta, double C1_2, double C2_2, double b_ta_2, double growfac_a) 
-{
-  double ta_BB = 0., tt_BB = 0., mix_BB = 0.;
-  static cosmopara C;
-  static double logkmin = 0., logkmax = 0., dlgk = 0.;
-  
-  if (C2 != 0 || b_ta != 0) 
-  {
-    if (recompute_cosmo3D(C)) 
-    {
-      get_FPT_IA(); // only call FASTPT if cosmology changed since last call
-      update_cosmopara(&C);
-      logkmin = log(FPT.k_min);
-      logkmax = log(FPT.k_max);
-      dlgk = log(10.) / (double)FPT.N_per_dec;
-    }
+    IA_tt(FPT.tab_IA[10], FPT.tab_IA[11], FPT.N, FPT.tab_IA[0], FPT.tab_IA[1]);
     
-    double lgk = log(k_coverH0);
-    if (lgk < logkmin || lgk >= logkmax) 
-    {
-      return 0.0;
-    }
-
-    const double g4 = growfac_a*growfac_a*growfac_a*growfac_a;
-
-    ta_BB = C1 * C1_2 * b_ta * b_ta_2 * g4 *
-            interpol1d(FPT.tab_IA[5], FPT.N, logkmin, logkmax, dlgk, lgk);
-
-    if (C2) {
-      mix_BB = (C1 * b_ta * C2_2 + C1_2 * b_ta_2 * C2) * g4 *
-          interpol1d(FPT.tab_IA[9], FPT.N, logkmin, logkmax, dlgk, lgk);
-
-      tt_BB = C2 * C2_2 * g4 *
-          interpol1d(FPT.tab_IA[1], FPT.N, logkmin, logkmax, dlgk, lgk);
-    }
-  }
-
-  return ta_BB + mix_BB + tt_BB;
-}
-
-double TATT_GI_E(double k_coverH0, double a __attribute__((unused)), double C1,
-double C2, double b_ta, double growfac_a, double pdelta_ak) 
-{
-  double nla_GI = 0., ta_GI = 0., tt_GI = 0.;
-  nla_GI = C1 * pdelta_ak;
-  
-  static cosmopara C;
-  static double logkmin = 0., logkmax = 0., dlgk = 0.;
-  
-  if (C2 != 0 || b_ta != 0) 
-  { // if TATT is specified, i.e. C2 !=0 (TT), or b_ta != 0 (TA)
-    if (recompute_cosmo3D(C)) 
-    {
-      get_FPT_IA();
-      update_cosmopara(&C); // only call FASTPT if cosmology changed since last call
-      logkmin = log(FPT.k_min);
-      logkmax = log(FPT.k_max);
-      dlgk = log(10.) / (double)FPT.N_per_dec;
-    }
+    IA_ta(FPT.tab_IA[10], FPT.tab_IA[11], FPT.N, FPT.tab_IA[2], 
+      FPT.tab_IA[3], FPT.tab_IA[4], FPT.tab_IA[5]);
     
-    double lgk = log(k_coverH0);
-    if (lgk < logkmin || lgk >= logkmax) 
-    {
-      return nla_GI;
-    }
+    IA_mix(FPT.tab_IA[10], FPT.tab_IA[11], FPT.N,FPT.tab_IA[6], 
+      FPT.tab_IA[7], FPT.tab_IA[8], FPT.tab_IA[9]);
     
-    const double g4 = growfac_a*growfac_a*growfac_a*growfac_a;
-
-    double P_ta_dE1, P_ta_dE2;
-    P_ta_dE1 = g4 * interpol1d(FPT.tab_IA[2], FPT.N, logkmin, logkmax, dlgk, lgk);
-    P_ta_dE2 = g4 * interpol1d(FPT.tab_IA[3], FPT.N, logkmin, logkmax, dlgk, lgk);
-
-    ta_GI = C1 * b_ta * (P_ta_dE1 + P_ta_dE2);
-
-    if (C2) 
-    {
-      double P_mix_A, P_mix_B;
-      P_mix_A = g4 * interpol1d(FPT.tab_IA[6], FPT.N, logkmin, logkmax, dlgk, lgk);
-      P_mix_B = g4 * interpol1d(FPT.tab_IA[7], FPT.N, logkmin, logkmax, dlgk, lgk);
-
-      tt_GI = C2 * (P_mix_A + P_mix_B);
-    }
+    #pragma omp parallel for
+    for (int i=0; i<FPT.N; i++) 
+      FPT.tab_IA[7][i] *= 4.;
+    
+    cache[0] = cosmology.random;
+    cache[1] = Ntable.random;
   }
-
-  return nla_GI + ta_GI + tt_GI;
 }
