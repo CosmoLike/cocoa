@@ -466,10 +466,8 @@ void init_binning_cmb_bandpower(
   spdlog::debug("{}: {} = {} selected.", 
     "init_binning_cmb_bandpower", "Number of Band Powers (Nbandpower)", 
     Nbandpower);
-  
   spdlog::debug("{}: {} = {} selected.", 
     "init_binning_cmb_bandpower", "l_min", lmin);
-
   spdlog::debug("{}: {} = {} selected.", 
     "init_binning_cmb_bandpower", "l_max", lmax);
 
@@ -540,35 +538,17 @@ void init_binning_real_space(
 
   if (!(Ntheta > 0))
   {
-    spdlog::critical(
-        "{}: {} = {} not supported", 
-        "init_binning_real_space",
-        "NthetaNtheta", 
-        Ntheta
-      );
+    spdlog::critical("{}: {} = {} not supported", "init_binning_real_space",
+      "NthetaNtheta", Ntheta);
     exit(1);
   }
 
-  spdlog::debug(
-      "{}: {} = {} selected.", 
-      "init_binning_real_space", 
-      "Ntheta", 
-      Ntheta
-    );
-
-  spdlog::debug(
-      "{}: {} = {} selected.", 
-      "init_binning_real_space", 
-      "theta_min_arcmin", 
-      theta_min_arcmin
-    );
-
-  spdlog::debug(
-      "{}: {} = {} selected.", 
-      "init_binning_real_space", 
-      "theta_max_arcmin", 
-      theta_max_arcmin
-    );
+  spdlog::debug("{}: {} = {} selected.", "init_binning_real_space", 
+    "Ntheta", Ntheta);
+  spdlog::debug("{}: {} = {} selected.", "init_binning_real_space", 
+    "theta_min_arcmin", theta_min_arcmin);
+  spdlog::debug("{}: {} = {} selected.", "init_binning_real_space", 
+    "theta_max_arcmin", theta_max_arcmin);
 
   Ntable.Ntheta = Ntheta;
   
@@ -1068,134 +1048,6 @@ void init_data_6x2pt_real_space(
 // ---------------------------------------------------------------------------
 // ---------------------------------------------------------------------------
 
-void init_distances(vector io_z, vector io_chi)
-{
-  spdlog::debug("{}: Begins", "init_distances");
-
-  bool debug_fail = false;
-  
-  if (io_z.n_elem != io_chi.n_elem)
-  {
-    debug_fail = true;
-  }
-  else
-  {
-    if (io_z.n_elem == 0)
-    {
-      debug_fail = true;
-    }
-  }
-  
-  if (debug_fail)
-  {
-    spdlog::critical(
-      "{}: incompatible input w/ z.size = {} and G.size = {}",
-      "init_distances",
-      io_z.n_elem,
-      io_chi.n_elem
-    );
-    exit(1);
-  }
-
-  if(io_z.n_elem < 5)
-  {
-    spdlog::critical(
-        "{}: bad input w/ z.size = {} and chi.size = {}"
-        "init_distances", 
-        io_z.n_elem, 
-        io_chi.n_elem
-      );
-    exit(1);
-  }
-
-  int nz = static_cast<int>(io_z.n_elem);
-  
-  double* vz = io_z.memptr();
-  double* vchi = io_chi.memptr();
-  
-  setup_chi(&nz, &vz, &vchi, 1);
-
-  // force initialization - imp to avoid seg fault when openmp is on
-  const double io_a = 1.0;
-  chi(io_a);
-
-  spdlog::debug("{}: Ends", "init_distances");
-
-  return;
-}
-
-// ---------------------------------------------------------------------------
-// ---------------------------------------------------------------------------
-// ---------------------------------------------------------------------------
-
-// Growth: D = G * a
-void init_growth(vector io_z, vector io_G)
-{
-  spdlog::debug("{}: Begins", "init_growth");
-
-
-  bool debug_fail = false;
-  
-  if (io_z.n_elem != io_G.n_elem)
-  {
-    debug_fail = true;
-  }
-  else
-  {
-    if (io_z.n_elem == 0)
-    {
-      debug_fail = true;
-    }
-  }
-  
-  if (debug_fail)
-  {
-    spdlog::critical(
-        "{}: incompatible input w/ z.size = {} and G.size = {}",
-        "init_growth", 
-        io_z.n_elem, 
-        io_G.n_elem
-      );
-    exit(1);
-  }
-
-  if(io_z.n_elem < 5)
-  {
-    spdlog::critical(
-        "{}: bad input w/ z.size = {} and G.size = {}"
-        "init_growth", 
-        io_z.n_elem, 
-        io_G.n_elem
-      );
-    exit(1);
-  }
-
-  int nz = static_cast<int>(io_z.n_elem);
-  
-  double* z = io_z.memptr();
-  double* G = io_G.memptr();
-  
-  setup_growth(&nz, &z, &G, 1);
-
-  // force initialization - imp to avoid seg fault when openmp is on
-  const double io_a = 1.0;
-  const double zz = 0.0;
-  
-  f_growth(zz);
-  
-  growfac_all(io_a);
-  
-  growfac(io_a);
-
-  spdlog::debug("{}: Ends", "init_growth");
-
-  return;
-}
-
-// ---------------------------------------------------------------------------
-// ---------------------------------------------------------------------------
-// ---------------------------------------------------------------------------
-
 void init_IA(const int IA_MODEL, const int IA_REDSHIFT_EVOL)
 {
   spdlog::debug("{}: Begins", "init_IA");
@@ -1230,134 +1082,6 @@ void init_IA(const int IA_MODEL, const int IA_REDSHIFT_EVOL)
   }
 
   spdlog::debug("{}: Ends", "init_IA");
-}
-
-// ---------------------------------------------------------------------------
-// ---------------------------------------------------------------------------
-// ---------------------------------------------------------------------------
-
-void init_linear_power_spectrum(
-    vector io_log10k,
-    vector io_z, 
-    vector io_lnP
-  )
-{
-  spdlog::debug("{}: Begins", "init_linear_power_spectrum");
-
-  bool debug_fail = false;
-  
-  if (io_z.n_elem*io_log10k.n_elem != io_lnP.n_elem)
-  {
-    debug_fail = true;
-  }
-  else
-  {
-    if (io_z.n_elem == 0 || io_log10k.n_elem == 0)
-    {
-      debug_fail = true;
-    }
-  }
-  
-  if (debug_fail)
-  {
-    spdlog::critical(
-      "{}: incompatible input w/ k.size = {}, z.size = {}, "
-      "and lnP.size = {}", "init_linear_power_spectrum", 
-      io_log10k.n_elem, io_z.n_elem, io_lnP.n_elem);
-    exit(1);
-  }
-
-  if(io_z.n_elem < 5 || io_log10k.n_elem < 5)
-  {
-    spdlog::critical(
-      "{}: bad input w/ k.size = {}, z.size = {}, "
-      "and lnP.size = {}", "init_linear_power_spectrum", 
-      io_log10k.n_elem, io_z.n_elem, io_lnP.n_elem);
-    exit(1);
-  }
-
-  int nlog10k = static_cast<int>(io_log10k.n_elem);
-  int nz = static_cast<int>(io_z.n_elem);
-  
-  double* log10k = io_log10k.memptr();
-  double* z = io_z.memptr();
-  double* lnP = io_lnP.memptr();
-  
-  setup_p_lin(&nlog10k, &nz, &log10k, &z, &lnP, 1);
-
-  // force initialization - imp to avoid seg fault when openmp is on
-  const double io_a = 1.0;
-  const double io_k = 0.1*cosmology.coverH0;
-  p_lin(io_k, io_a);
-
-  spdlog::debug("{}: Ends", "init_linear_power_spectrum");
-
-  return;
-}
-
-
-
-// ---------------------------------------------------------------------------
-// ---------------------------------------------------------------------------
-// ---------------------------------------------------------------------------
-
-void init_non_linear_power_spectrum(
-    vector io_log10k,
-    vector io_z, 
-    vector io_lnP
-  )
-{
-  spdlog::debug("{}: Begins", "init_non_linear_power_spectrum");
-
-  bool debug_fail = false;
-  
-  if (io_z.n_elem*io_log10k.n_elem != io_lnP.n_elem)
-  {
-    debug_fail = true;
-  }
-  else
-  {
-    if (io_z.n_elem == 0)
-    {
-      debug_fail = true;
-    }
-  }
-
-  if (debug_fail)
-  {
-    spdlog::critical(
-      "{}: incompatible input w/ k.size = {}, z.size = {}, "
-      "and lnP.size = {}", "init_non_linear_power_spectrum", 
-      io_log10k.n_elem, io_z.n_elem, io_lnP.n_elem);
-    exit(1);
-  }
-
-  if (io_z.n_elem < 5 || io_log10k.n_elem < 5)
-  {
-    spdlog::critical(
-      "{}: bad input w/ k.size = {}, z.size = {}, "
-      "and lnP.size = {}", "init_non_linear_power_spectrum", 
-      io_log10k.n_elem, io_z.n_elem, io_lnP.n_elem);
-    exit(1);
-  }
-
-  int nlog10k = static_cast<int>(io_log10k.n_elem);
-  int nz = static_cast<int>(io_z.n_elem);
-  
-  double* log10k = io_log10k.memptr();
-  double* z = io_z.memptr();
-  double* lnP = io_lnP.memptr();
-  
-  setup_p_nonlin(&nlog10k, &nz, &log10k, &z, &lnP, 1);
-
-  // force initialization - imp to avoid seg fault when openmp is on
-  const double io_a = 1.0;
-  const double io_k = 0.1*cosmology.coverH0;
-  p_nonlin(io_k, io_a);
-
-  spdlog::debug("{}: Ends", "init_non_linear_power_spectrum");
-
-  return;
 }
 
 // ---------------------------------------------------------------------------
@@ -1521,12 +1245,23 @@ void init_lens_sample(std::string multihisto_file, const int Ntomo)
       double** tab = redshift.clustering_zdist_table;   // alias
       double* z_v = redshift.clustering_zdist_table[Ntomo];  // alias
 
-      if (fdiff(z_v[i], input_table(i,0))) cache_update = 1;
-      
+      if (fdiff(z_v[i], input_table(i,0))) 
+      {
+        cache_update = 1;
+        break;
+      }
       for (int k=0; k<Ntomo; k++) 
-        if (fdiff(tab[k][i], input_table(i,k+1)))  cache_update = 1;
+      {  
+        if (fdiff(tab[k][i], input_table(i,k+1))) 
+        {
+          cache_update = 1;
+          goto jump;
+        }
+      }
     }
   }
+
+  jump:
 
   if(cache_update = 1)
   {
@@ -1635,12 +1370,23 @@ void init_source_sample(std::string multihisto_file, const int Ntomo)
     double* z_v = redshift.shear_zdist_table[Ntomo];  // alias
     for (int i=0; i<redshift.shear_nzbins; i++) 
     {
-      if (fdiff(z_v[i], input_table(i,0))) cache_update = 1;
-
+      if (fdiff(z_v[i], input_table(i,0))) 
+      {
+        cache_update = 1;
+        break;
+      }
       for (int k=0; k<Ntomo; k++) 
-        if (fdiff(tab[k][i], input_table(i,k+1))) cache_update = 1;
+      {
+        if (fdiff(tab[k][i], input_table(i,k+1))) 
+        {
+          cache_update = 1;
+          goto jump;
+        }
+      }
     }
   }
+
+  jump:
 
   if(cache_update = 1)
   {
@@ -1669,9 +1415,7 @@ void init_source_sample(std::string multihisto_file, const int Ntomo)
       auto nofz = input_table.col(k+1).eval();
       
       arma::uvec idx = arma::find(nofz > 0.999e-8*nofz.max());
-      
       redshift.shear_zdist_zmin[k] = z_v[idx(0)];
-      
       redshift.shear_zdist_zmax[k] = z_v[idx(idx.n_elem-1)];
     }
   
@@ -1824,6 +1568,329 @@ void init_survey(
 // ---------------------------------------------------------------------------
 // ---------------------------------------------------------------------------
 
+// ---------------------------------------------------------------------------
+// ---------------------------------------------------------------------------
+// ---------------------------------------------------------------------------
+
+void init_distances(vector io_z, vector io_chi)
+{
+  spdlog::debug("{}: Begins", "init_distances");
+
+  bool debug_fail = false;
+  if (io_z.n_elem != io_chi.n_elem)
+    debug_fail = true;
+  else
+    if (io_z.n_elem == 0)
+      debug_fail = true;
+  
+  if (debug_fail)
+  {
+    spdlog::critical("{}: incompatible input w/ z.size = {} and G.size = {}",
+      "init_distances", io_z.n_elem, io_chi.n_elem);
+    exit(1);
+  }
+  if(io_z.n_elem < 5)
+  {
+    spdlog::critical("{}: bad input w/ z.size = {} and chi.size = {}"
+      "init_distances", io_z.n_elem, io_chi.n_elem);
+    exit(1);
+  }
+
+  int nz = static_cast<int>(io_z.n_elem);
+  
+  double* vz = io_z.memptr();
+  double* vchi = io_chi.memptr();
+  
+  setup_chi(&nz, &vz, &vchi, 1);
+
+  // force initialization - imp to avoid seg fault when openmp is on
+  const double io_a = 1.0;
+  chi(io_a);
+
+  // new implementation ------------------------------------------------
+  int cache_update = 0;
+  if (cosmology.chi_nz != static_cast<int>(io_z.n_elem) || cosmology.chi  == NULL)
+    cache_update = 1;
+  else
+  {
+    for (int i=0; i<cosmology.chi_nz; i++) 
+    {
+      if (fdiff(cosmology.chi[0][i], io_z(i)) ||
+          fdiff(cosmology.chi[1][i], io_chi(i))) 
+      {
+        cache_update = 1; 
+        break; 
+      }    
+    }
+  }
+
+  if(cache_update = 1)
+  {
+    cosmology.chi_nz = static_cast<int>(io_z.n_elem);
+
+    if (cosmology.chi != NULL) free(cosmology.chi);
+    cosmology.chi = (double**) malloc2d(2, cosmology.chi_nz);
+
+    #pragma omp parallel for
+    for (int i=0; i<cosmology.chi_nz; i++)
+    {
+      cosmology.chi[0][i] = io_z(i);
+      cosmology.chi[1][i] = io_chi(i);
+    }
+  }
+
+  spdlog::debug("{}: Ends", "init_distances");
+  return;
+}
+
+// ---------------------------------------------------------------------------
+// ---------------------------------------------------------------------------
+// ---------------------------------------------------------------------------
+
+// Growth: D = G * a
+void init_growth(vector io_z, vector io_G)
+{
+  spdlog::debug("{}: Begins", "init_growth");
+
+  bool debug_fail = false;
+  if (io_z.n_elem != io_G.n_elem)
+    debug_fail = true;
+  else
+    if (io_z.n_elem == 0)
+      debug_fail = true;
+  
+  if (debug_fail)
+  {
+    spdlog::critical("{}: incompatible input w/ z.size = {} and G.size = {}",
+      "init_growth", io_z.n_elem, io_G.n_elem);
+    exit(1);
+  }
+  if(io_z.n_elem < 5)
+  {
+    spdlog::critical("{}: bad input w/ z.size = {} and G.size = {}"
+      "init_growth", io_z.n_elem, io_G.n_elem);
+    exit(1);
+  }
+
+  int nz = static_cast<int>(io_z.n_elem);
+  
+  double* z = io_z.memptr();
+  double* G = io_G.memptr();
+  
+  setup_growth(&nz, &z, &G, 1);
+
+  // force initialization - imp to avoid seg fault when openmp is on
+  const double io_a = 1.0;
+  const double zz = 0.0;
+  
+  f_growth(zz);
+  
+  growfac_all(io_a);
+  
+  growfac(io_a);
+
+  // new implementation ------------------------------------------------------
+  int cache_update = 0;
+  if (cosmology.G_nz != static_cast<int>(io_z.n_elem) || cosmology.G  == NULL)
+    cache_update = 1;
+  else
+  {
+    for (int i=0; i<cosmology.chi_nz; i++) 
+    {
+      if (fdiff(cosmology.G[0][i], io_z(i)) ||
+          fdiff(cosmology.G[1][i], io_G(i))) 
+      {
+        cache_update = 1; 
+        break;
+      }    
+    }
+  }
+
+  if(cache_update = 1)
+  {
+    cosmology.G_nz = static_cast<int>(io_z.n_elem);
+
+    if (cosmology.G != NULL) free(cosmology.G);
+    cosmology.G = (double**) malloc2d(2, cosmology.G_nz);
+
+    #pragma omp parallel for
+    for (int i=0; i<cosmology.G_nz; i++)
+    {
+      cosmology.G[0][i] = io_z(i);
+      cosmology.G[1][i] = io_G(i);
+    }
+  }
+
+  spdlog::debug("{}: Ends", "init_growth");
+  return;
+}
+
+// ---------------------------------------------------------------------------
+// ---------------------------------------------------------------------------
+// ---------------------------------------------------------------------------
+
+void init_linear_power_spectrum(vector io_log10k, vector io_z, vector io_lnP)
+{
+  spdlog::debug("{}: Begins", "init_linear_power_spectrum");
+
+  bool debug_fail = false;
+  if (io_z.n_elem*io_log10k.n_elem != io_lnP.n_elem)
+    debug_fail = true;
+  else
+    if (io_z.n_elem == 0 || io_log10k.n_elem == 0)
+      debug_fail = true;
+  
+  if (debug_fail)
+  {
+    spdlog::critical("{}: incompatible input w/ k.size = {}, z.size = {}, "
+      "and lnP.size = {}", "init_linear_power_spectrum", 
+      io_log10k.n_elem, io_z.n_elem, io_lnP.n_elem);
+    exit(1);
+  }
+  if(io_z.n_elem < 5 || io_log10k.n_elem < 5)
+  {
+    spdlog::critical("{}: bad input w/ k.size = {}, z.size = {}, "
+      "and lnP.size = {}", "init_linear_power_spectrum", 
+      io_log10k.n_elem, io_z.n_elem, io_lnP.n_elem);
+    exit(1);
+  }
+
+  int nlog10k = static_cast<int>(io_log10k.n_elem);
+  int nz = static_cast<int>(io_z.n_elem);
+  
+  double* log10k = io_log10k.memptr();
+  double* z = io_z.memptr();
+  double* lnP = io_lnP.memptr();
+  
+  setup_p_lin(&nlog10k, &nz, &log10k, &z, &lnP, 1);
+
+  // force initialization - imp to avoid seg fault when openmp is on
+  const double io_a = 1.0;
+  const double io_k = 0.1*cosmology.coverH0;
+  p_lin(io_k, io_a);
+
+
+  spdlog::debug("{}: Ends", "init_linear_power_spectrum");
+
+  return;
+}
+
+// ---------------------------------------------------------------------------
+// ---------------------------------------------------------------------------
+// ---------------------------------------------------------------------------
+
+void init_non_linear_power_spectrum(vector io_log10k, vector io_z, vector io_lnP)
+{
+  spdlog::debug("{}: Begins", "init_non_linear_power_spectrum");
+
+  bool debug_fail = false;
+  
+  if (io_z.n_elem*io_log10k.n_elem != io_lnP.n_elem)
+    debug_fail = true;
+  else
+    if (io_z.n_elem == 0)
+      debug_fail = true;
+
+  if (debug_fail)
+  {
+    spdlog::critical("{}: incompatible input w/ k.size = {}, z.size = {}, "
+      "and lnP.size = {}", "init_non_linear_power_spectrum", 
+      io_log10k.n_elem, io_z.n_elem, io_lnP.n_elem);
+    exit(1);
+  }
+
+  if (io_z.n_elem < 5 || io_log10k.n_elem < 5)
+  {
+    spdlog::critical("{}: bad input w/ k.size = {}, z.size = {}, "
+      "and lnP.size = {}", "init_non_linear_power_spectrum", 
+      io_log10k.n_elem, io_z.n_elem, io_lnP.n_elem);
+    exit(1);
+  }
+
+  int nlog10k = static_cast<int>(io_log10k.n_elem);
+  int nz = static_cast<int>(io_z.n_elem);
+  
+  double* log10k = io_log10k.memptr();
+  double* z = io_z.memptr();
+  double* lnP = io_lnP.memptr();
+  
+  setup_p_nonlin(&nlog10k, &nz, &log10k, &z, &lnP, 1);
+
+  // force initialization - imp to avoid seg fault when openmp is on
+  const double io_a = 1.0;
+  const double io_k = 0.1*cosmology.coverH0;
+  p_nonlin(io_k, io_a);
+
+  // new implementation ------------------------------------------------------
+  int cache_update = 0;
+  if (cosmology.lnP_nk != static_cast<int>(io_log10k.n_elem) ||
+      cosmology.lnP_nz != static_cast<int>(io_z.n_elem) || 
+      cosmology.lnP  == NULL)
+    cache_update = 1;
+  else
+  {
+    for (int i=0; i<cosmology.lnP_nk; i++)
+    {
+      for (int j=0; j<cosmology.lnP_nz; j++)
+      {
+        if (fdiff(cosmology.lnP[i][j], io_lnP(i*cosmology.lnP_nz+j))) 
+        {
+          cache_update = 1; 
+          goto jump;
+        }
+      }
+    }
+    for (int i=0; i<cosmology.lnP_nk; i++)
+    {
+      if (fdiff(cosmology.lnP[i][cosmology.lnP_nz], io_log10k(i))) 
+      {
+        cache_update = 1; 
+        break;
+      }
+    }
+    for (int j=0; j<cosmology.lnP_nz; j++)
+    {
+      if (fdiff(cosmology.lnP[cosmology.lnP_nk][j], io_z(j))) 
+      {
+        cache_update = 1; 
+        break;
+      }
+    }
+  }
+
+  jump:
+
+  if(cache_update = 1)
+  {
+    cosmology.lnP_nk = static_cast<int>(io_log10k.n_elem);
+    cosmology.lnP_nz = static_cast<int>(io_z.n_elem);
+
+    if (cosmology.lnP != NULL) free(cosmology.lnP);
+    cosmology.lnP = (double**) malloc2d(cosmology.lnP_nk+1,cosmology.lnP_nz+1);
+
+    #pragma omp parallel for
+    for (int i=0; i<cosmology.lnP_nk; i++)
+      cosmology.lnP[i][cosmology.lnP_nz] = io_log10k(i);
+
+    #pragma omp parallel for
+    for (int j=0; j<cosmology.lnP_nz; j++)
+      cosmology.lnP[cosmology.lnP_nk][j] = io_z(j);
+
+    #pragma omp parallel for collapse(2)
+    for (int i=0; i<cosmology.lnP_nk; i++)
+      for (int j=0; j<cosmology.lnP_nz; j++)
+        cosmology.lnP[i][j] = io_lnP(i*cosmology.lnP_nz+j);
+  }
+
+  spdlog::debug("{}: Ends", "init_non_linear_power_spectrum");
+
+  return;
+}
+
+// ---------------------------------------------------------------------------
+// ---------------------------------------------------------------------------
+// ---------------------------------------------------------------------------
+
 void set_nuisance_shear_calib(vector M)
 {
   spdlog::debug("{}: Begins", "set_nuisance_shear_calib");
@@ -1834,7 +1901,6 @@ void set_nuisance_shear_calib(vector M)
       "set_nuisance_shear_calib", "shear_Nbin");
     exit(1);
   }
-
   if (redshift.shear_nbin != static_cast<int>(M.n_elem))
   {
     spdlog::critical(
@@ -1844,10 +1910,8 @@ void set_nuisance_shear_calib(vector M)
   }
 
   for (int i=0; i<redshift.shear_nbin; i++)
-  {
     nuisance.shear_calibration_m[i] = M(i);
-  }
-
+  
    spdlog::debug("{}: Ends", "set_nuisance_shear_calib");
 }
 
@@ -1865,7 +1929,6 @@ void set_nuisance_shear_photoz(vector SP)
       "set_nuisance_shear_photoz", "shear_Nbin");
     exit(1);
   }
-
   if (redshift.shear_nbin != static_cast<int>(SP.n_elem))
   {
     spdlog::critical(
@@ -1904,7 +1967,6 @@ void set_nuisance_clustering_photoz(vector CP)
       "set_nuisance_clustering_photoz", "clustering_Nbin");
     exit(1);
   }
-
   if (redshift.clustering_nbin != static_cast<int>(CP.n_elem))
   {
     spdlog::critical(
@@ -1982,7 +2044,6 @@ void set_nuisance_linear_bias(vector B1)
       "set_nuisance_linear_bias", "clustering_Nbin");
     exit(1);
   }
-
   if (redshift.clustering_nbin != static_cast<int>(B1.n_elem))
   {
     spdlog::critical(
@@ -2026,7 +2087,6 @@ void set_nuisance_nonlinear_bias(vector B1, vector B2)
       "set_nuisance_nonlinear_bias", "clustering_Nbin");
     exit(1);
   }
-
   if (redshift.clustering_nbin != static_cast<int>(B1.n_elem) ||
       redshift.clustering_nbin != static_cast<int>(B2.n_elem))
   {
@@ -2073,7 +2133,6 @@ void set_nuisance_magnification_bias(vector B_MAG)
       "set_nuisance_magnification_bias", "clustering_Nbin");
     exit(1);
   }
-
   if (redshift.clustering_nbin != static_cast<int>(B_MAG.n_elem))
   {
     spdlog::critical(

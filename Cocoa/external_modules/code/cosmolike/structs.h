@@ -97,6 +97,20 @@ typedef struct
   double MGSigma;
   double MGmu;
   double sigma_8;
+
+  int lnP_nk;
+  int lnP_nz;
+  double** lnP;
+
+  int lnPL_nk;
+  int lnPL_nz;
+  double** lnPL;
+
+  int chi_nz;
+  double** chi;
+
+  int G_nz;
+  double** G;
 } cosmopara;
 
 typedef struct
