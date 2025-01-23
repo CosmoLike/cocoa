@@ -1567,9 +1567,46 @@ void init_survey(
 // ---------------------------------------------------------------------------
 // ---------------------------------------------------------------------------
 
-void init_distances(vector io_z, vector io_chi)
+void set_cosmological_parameters(
+    const double omega_matter,
+    const double hubble
+  )
 {
-  spdlog::debug("{}: Begins", "init_distances");
+  spdlog::debug("\x1b[90m{}\x1b[0m: Begins", "set_cosmological_parameters");
+
+  // Cosmolike should not need parameters from inflation or dark energy.
+  // Cobaya provides P(k,z), H(z), D(z), Chi(z)...
+  // It may require H0 to set scales and \Omega_M to set the halo model
+
+  int cache_update = 0;
+  if (fdiff(cosmology.Omega_m, omega_matter) ||
+      fdiff(cosmology.h0, hubble/100.0)) // assuming H0 in km/s/Mpc
+  {
+    cache_update = 1;
+  }
+  if(cache_update = 1)
+  {
+    cosmology.Omega_m = omega_matter;
+    cosmology.Omega_v = 1.0-omega_matter;
+    // Cosmolike only needs to know that there are massive neutrinos (>0)
+    cosmology.Omega_nu = 0.1;
+    cosmology.h0 = hubble/100.0; 
+    cosmology.MGSigma = 0.0;
+    cosmology.MGmu = 0.0;
+    
+    cosmology.random = cosmolike_interface::RandomNumber::get_instance().get();
+  }
+
+  spdlog::debug("\x1b[90m{}\x1b[0m: Ends", "set_cosmological_parameters");
+}
+
+// ---------------------------------------------------------------------------
+// ---------------------------------------------------------------------------
+// ---------------------------------------------------------------------------
+
+void set_distances(vector io_z, vector io_chi)
+{
+  spdlog::debug("{}: Begins", "set_distances");
 
   bool debug_fail = false;
   if (io_z.n_elem != io_chi.n_elem)
@@ -1581,13 +1618,13 @@ void init_distances(vector io_z, vector io_chi)
   if (debug_fail)
   {
     spdlog::critical("{}: incompatible input w/ z.size = {} and G.size = {}",
-      "init_distances", io_z.n_elem, io_chi.n_elem);
+      "set_distances", io_z.n_elem, io_chi.n_elem);
     exit(1);
   }
   if(io_z.n_elem < 5)
   {
     spdlog::critical("{}: bad input w/ z.size = {} and chi.size = {}"
-      "init_distances", io_z.n_elem, io_chi.n_elem);
+      "set_distances", io_z.n_elem, io_chi.n_elem);
     exit(1);
   }
 
@@ -1624,7 +1661,7 @@ void init_distances(vector io_z, vector io_chi)
     cosmology.random = RandomNumber::get_instance().get();
   }
 
-  spdlog::debug("{}: Ends", "init_distances");
+  spdlog::debug("{}: Ends", "set_distances");
   return;
 }
 
@@ -1633,9 +1670,9 @@ void init_distances(vector io_z, vector io_chi)
 // ---------------------------------------------------------------------------
 
 // Growth: D = G * a
-void init_growth(vector io_z, vector io_G)
+void set_growth(vector io_z, vector io_G)
 {
-  spdlog::debug("{}: Begins", "init_growth");
+  spdlog::debug("{}: Begins", "set_growth");
 
   bool debug_fail = false;
   if (io_z.n_elem != io_G.n_elem)
@@ -1647,13 +1684,13 @@ void init_growth(vector io_z, vector io_G)
   if (debug_fail)
   {
     spdlog::critical("{}: incompatible input w/ z.size = {} and G.size = {}",
-      "init_growth", io_z.n_elem, io_G.n_elem);
+      "set_growth", io_z.n_elem, io_G.n_elem);
     exit(1);
   }
   if(io_z.n_elem < 5)
   {
     spdlog::critical("{}: bad input w/ z.size = {} and G.size = {}"
-      "init_growth", io_z.n_elem, io_G.n_elem);
+      "set_growth", io_z.n_elem, io_G.n_elem);
     exit(1);
   }
 
@@ -1690,7 +1727,7 @@ void init_growth(vector io_z, vector io_G)
     cosmology.random = RandomNumber::get_instance().get();
   }
 
-  spdlog::debug("{}: Ends", "init_growth");
+  spdlog::debug("{}: Ends", "set_growth");
   return;
 }
 
@@ -1698,9 +1735,9 @@ void init_growth(vector io_z, vector io_G)
 // ---------------------------------------------------------------------------
 // ---------------------------------------------------------------------------
 
-void init_linear_power_spectrum(vector io_log10k, vector io_z, vector io_lnP)
+void set_linear_power_spectrum(vector io_log10k, vector io_z, vector io_lnP)
 {
-  spdlog::debug("{}: Begins", "init_linear_power_spectrum");
+  spdlog::debug("{}: Begins", "set_linear_power_spectrum");
 
   bool debug_fail = false;
   if (io_z.n_elem*io_log10k.n_elem != io_lnP.n_elem)
@@ -1712,14 +1749,14 @@ void init_linear_power_spectrum(vector io_log10k, vector io_z, vector io_lnP)
   if (debug_fail)
   {
     spdlog::critical("{}: incompatible input w/ k.size = {}, z.size = {}, "
-      "and lnP.size = {}", "init_linear_power_spectrum", 
+      "and lnP.size = {}", "set_linear_power_spectrum", 
       io_log10k.n_elem, io_z.n_elem, io_lnP.n_elem);
     exit(1);
   }
   if(io_z.n_elem < 5 || io_log10k.n_elem < 5)
   {
     spdlog::critical("{}: bad input w/ k.size = {}, z.size = {}, "
-      "and lnP.size = {}", "init_linear_power_spectrum", 
+      "and lnP.size = {}", "set_linear_power_spectrum", 
       io_log10k.n_elem, io_z.n_elem, io_lnP.n_elem);
     exit(1);
   }
@@ -1786,7 +1823,7 @@ void init_linear_power_spectrum(vector io_log10k, vector io_z, vector io_lnP)
     cosmology.random = RandomNumber::get_instance().get();
   }
 
-  spdlog::debug("{}: Ends", "init_linear_power_spectrum");
+  spdlog::debug("{}: Ends", "set_linear_power_spectrum");
   return;
 }
 
@@ -1794,9 +1831,9 @@ void init_linear_power_spectrum(vector io_log10k, vector io_z, vector io_lnP)
 // ---------------------------------------------------------------------------
 // ---------------------------------------------------------------------------
 
-void init_non_linear_power_spectrum(vector io_log10k, vector io_z, vector io_lnP)
+void set_non_linear_power_spectrum(vector io_log10k, vector io_z, vector io_lnP)
 {
-  spdlog::debug("{}: Begins", "init_non_linear_power_spectrum");
+  spdlog::debug("{}: Begins", "set_non_linear_power_spectrum");
 
   bool debug_fail = false;
   
@@ -1809,7 +1846,7 @@ void init_non_linear_power_spectrum(vector io_log10k, vector io_z, vector io_lnP
   if (debug_fail)
   {
     spdlog::critical("{}: incompatible input w/ k.size = {}, z.size = {}, "
-      "and lnP.size = {}", "init_non_linear_power_spectrum", 
+      "and lnP.size = {}", "set_non_linear_power_spectrum", 
       io_log10k.n_elem, io_z.n_elem, io_lnP.n_elem);
     exit(1);
   }
@@ -1817,7 +1854,7 @@ void init_non_linear_power_spectrum(vector io_log10k, vector io_z, vector io_lnP
   if (io_z.n_elem < 5 || io_log10k.n_elem < 5)
   {
     spdlog::critical("{}: bad input w/ k.size = {}, z.size = {}, "
-      "and lnP.size = {}", "init_non_linear_power_spectrum", 
+      "and lnP.size = {}", "set_non_linear_power_spectrum", 
       io_log10k.n_elem, io_z.n_elem, io_lnP.n_elem);
     exit(1);
   }
@@ -1884,7 +1921,7 @@ void init_non_linear_power_spectrum(vector io_log10k, vector io_z, vector io_lnP
     cosmology.random = RandomNumber::get_instance().get();
   }
 
-  spdlog::debug("{}: Ends", "init_non_linear_power_spectrum");
+  spdlog::debug("{}: Ends", "set_non_linear_power_spectrum");
   return;
 }
 

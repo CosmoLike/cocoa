@@ -471,31 +471,11 @@ void init_data_vector_size_3x2pt_fourier_space();
 
 void init_data_vector_size_6x2pt_fourier_space();
 
-void init_distances(
-    arma::Col<double> io_z, 
-    arma::Col<double> io_chi
-  );
 
-void init_growth(
-    arma::Col<double> io_z, 
-    arma::Col<double> io_G
-  );
 
 void init_IA(
     const int IA_MODEL, 
     const int IA_REDSHIFT_EVOL
-  );
-
-void init_linear_power_spectrum(
-    arma::Col<double> io_log10k,
-    arma::Col<double> io_z, 
-    arma::Col<double> io_lnP
-  );
-
-void init_non_linear_power_spectrum(
-    arma::Col<double> io_log10k,
-    arma::Col<double> io_z, 
-    arma::Col<double> io_lnP
   );
 
 void init_probes(
@@ -532,6 +512,33 @@ void init_survey(
 // ---------------------------------------------------------------------------
 // ---------------------------------------------------------------------------
 // ---------------------------------------------------------------------------
+
+void set_cosmological_parameters(
+    const double omega_matter,
+    const double hubble
+  );
+
+void set_distances(
+    arma::Col<double> io_z, 
+    arma::Col<double> io_chi
+  );
+
+void set_growth(
+    arma::Col<double> io_z, 
+    arma::Col<double> io_G
+  );
+
+void set_linear_power_spectrum(
+    arma::Col<double> io_log10k,
+    arma::Col<double> io_z, 
+    arma::Col<double> io_lnP
+  );
+
+void set_non_linear_power_spectrum(
+    arma::Col<double> io_log10k,
+    arma::Col<double> io_z, 
+    arma::Col<double> io_lnP
+  );
 
 void set_nuisance_bias(
     arma::Col<double> B1, 
