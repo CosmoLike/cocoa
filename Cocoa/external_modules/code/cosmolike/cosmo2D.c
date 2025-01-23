@@ -1239,10 +1239,14 @@ double int_for_C_gs_tomo_limber(double a, void* params)
       lim[1] = log(FPT.k_max);
       lim[2] = log(10.) / (double) FPT.N_per_dec;
 
-      double mixA = g4*interpol1d(FPT.tab_IA[6],FPT.N,lim[0],lim[1],lim[2],lnk);
-      double mixB = g4*interpol1d(FPT.tab_IA[7],FPT.N,lim[0],lim[1],lim[2],lnk);
-      double ta_dE1 = g4*interpol1d(FPT.tab_IA[2],FPT.N,lim[0],lim[1],lim[2],lnk);
-      double ta_dE2 = g4*interpol1d(FPT.tab_IA[3],FPT.N,lim[0],lim[1],lim[2],lnk);
+      double mixA = (lnk<lim[0] || lnk>lim[1]) ? 0.0 : 
+        g4*interpol1d(FPT.tab_IA[6],FPT.N,lim[0],lim[1],lim[2],lnk);
+      double mixB = (lnk<lim[0] || lnk>lim[1]) ? 0.0 :
+        g4*interpol1d(FPT.tab_IA[7],FPT.N,lim[0],lim[1],lim[2],lnk);
+      double ta_dE1 = (lnk<lim[0] || lnk>lim[1]) ? 0.0 :
+        g4*interpol1d(FPT.tab_IA[2],FPT.N,lim[0],lim[1],lim[2],lnk);
+      double ta_dE2 = (lnk<lim[0] || lnk>lim[1]) ? 0.0 :
+        g4*interpol1d(FPT.tab_IA[3],FPT.N,lim[0],lim[1],lim[2],lnk);
 
       double WRSD = 0.0;
       if (include_RSD_GS == 1)
@@ -1257,10 +1261,18 @@ double int_for_C_gs_tomo_limber(double a, void* params)
       double oneloop = 0.0;
       if (nonlinear_bias == 1)
       { 
+        const double d1d2 = (lnk<lim[0] || lnk>lim[1]) ? 0.0 :
+          interpol1d(FPT.tab_AB[0],FPT.N,lim[0],lim[1],lim[2],lnk);
+        const double d1s2 = (lnk<lim[0] || lnk>lim[1]) ? 0.0 :
+          interpol1d(FPT.tab_AB[2],FPT.N,lim[0],lim[1],lim[2],lnk);
+        const double d1d3 = (lnk<lim[0] || lnk>lim[1]) ? 0.0 :
+          interpol1d(tab_d1d3,FPT.N,lim[0],lim[1],lim[2],lnk);
+
         const double b2 = gb2(z, nl);
         const double bs2 = gbs2(z, nl);
         const double b3 = gb3(z, nl);
-        oneloop = 0.5*g4*(b2 * PT_d1d2(k) + bs2 * PT_d1s2(k) + b3 * PT_d1d3(k));
+
+        oneloop = 0.5*g4*(b2 * d1d2 + bs2 * d1s2 + b3 * d1d3);
       }
 
       const double C1ZS  = IA_A1_Z1(a, growfac_a, ns);
@@ -1293,11 +1305,24 @@ double int_for_C_gs_tomo_limber(double a, void* params)
       double oneloop = 0.0;
       if (nonlinear_bias == 1)
       {
-        const double bmag = gbmag(z, nl);
-        const double b2   = gb2(z, nl);
-        const double bs2  = gbs2(z, nl);
-        const double b3   = gb3(z, nl);
-        oneloop = g4*0.5*(b2*PT_d1d2(k) + bs2*PT_d1s2(k) + b3*PT_d1d3(k));
+        const double lnk = log(k);
+        double lim[3];
+        lim[0] = log(FPT.k_min);
+        lim[1] = log(FPT.k_max);
+        lim[2] = log(10.) / (double) FPT.N_per_dec;
+
+        const double d1d2 = (lnk<lim[0] || lnk>lim[1]) ? 0.0 :
+          interpol1d(FPT.tab_AB[0],FPT.N,lim[0],lim[1],lim[2],lnk);
+        const double d1s2 = (lnk<lim[0] || lnk>lim[1]) ? 0.0 :
+          interpol1d(FPT.tab_AB[2],FPT.N,lim[0],lim[1],lim[2],lnk);
+        const double d1d3 = (lnk<lim[0] || lnk>lim[1]) ? 0.0 :
+          interpol1d(tab_d1d3,FPT.N,lim[0],lim[1],lim[2],lnk);
+
+        const double b2 = gb2(z, nl);
+        const double bs2 = gbs2(z, nl);
+        const double b3 = gb3(z, nl);
+
+        oneloop = 0.5*g4*(b2*d1d2 + bs2*d1s2 + b3*d1d3);
       }
       
       const double C1ZS = IA_A1_Z1(a, growfac_a, ns);
@@ -1522,17 +1547,36 @@ double int_for_C_gg_tomo_limber(double a, void* params)
   double oneloop = 0.0;
   if (nonlinear_bias == 1 && use_linear_ps == 0)
   {
+    const double lnk = log(k);
+    double lim[3];
+    lim[0] = log(FPT.k_min);
+    lim[1] = log(FPT.k_max);
+    lim[2] = log(10.) / (double) FPT.N_per_dec;
+
+    const double d1d2 = (lnk<lim[0] || lnk>lim[1]) ? 0.0 :
+      interpol1d(FPT.tab_AB[0],FPT.N,lim[0],lim[1],lim[2],lnk);
+    const double d2d2 = (lnk<lim[0] || lnk>lim[1]) ? 0.0 :
+      interpol1d(FPT.tab_AB[1],FPT.N,lim[0],lim[1],lim[2],lnk);
+    const double d1s2 = (lnk<lim[0] || lnk>lim[1]) ? 0.0 :
+      interpol1d(FPT.tab_AB[2],FPT.N,lim[0],lim[1],lim[2],lnk);
+    const double d2s2 = (lnk<lim[0] || lnk>lim[1]) ? 0.0 :
+      interpol1d(FPT.tab_AB[3],FPT.N,lim[0],lim[1],lim[2],lnk);
+    const double s2s2 = (lnk<lim[0] || lnk>lim[1]) ? 0.0 :
+      interpol1d(FPT.tab_AB[4],FPT.N,lim[0],lim[1],lim[2],lnk);
+    const double d1d3 = (lnk<lim[0] || lnk>lim[1]) ? 0.0 :
+      interpol1d(tab_d1d3,FPT.N,lim[0],lim[1],lim[2],lnk);
+    const double s4 = 0.; // PT_sigma4(k);
+
     const double growfac_a = growfac(a);
     const double g4 = growfac_a*growfac_a*growfac_a*growfac_a;
     const double b2 = gb2(z, ni);
     const double bs2 = gbs2(z, ni);
     const double b3 = gb3(z, ni);
-    const double s4 = 0.; // PT_sigma4(k);
-
+    
     oneloop *= WGALi*WGALi;
-    oneloop *= g4*(b1i * b2 * PT_d1d2(k) + 0.25 * b2 * b2 * (PT_d2d2(k) - 2. * s4) +
-      b1i * bs2 * PT_d1s2(k) + 0.5 * b2 * bs2 * (PT_d2s2(k) - 4. / 3. * s4) +
-      0.25 * bs2 * bs2 * (PT_s2s2(k) - 8. / 9. * s4) + b1i * b3 * PT_d1d3(k));
+    oneloop *= g4*(b1i*b2*d1d2 + 0.25*b2*b2 * (d2d2 - 2.*s4) +
+      b1i*bs2*d1s2 + 0.5*b2*bs2 * (d2s2 - 4. / 3.*s4) +
+      0.25*bs2*bs2* (s2s2 - 8. / 9. * s4) + b1i*b3*d1d3);
   }
   return (res +  oneloop)*chidchi.dchida/(fK*fK);
 }
@@ -1766,11 +1810,23 @@ double int_for_C_gk_tomo_limber(double a, void* params)
   {
     const double growfac_a = growfac(a);
     const double g4 = growfac_a*growfac_a*growfac_a*growfac_a;
-    const double bmag = gbmag(z, nl);
+
+    const double lnk = log(k);
+    double lim[3];
+    lim[0] = log(FPT.k_min);
+    lim[1] = log(FPT.k_max);
+    lim[2] = log(10.) / (double) FPT.N_per_dec;
+
+    const double d1d2 = (lnk<lim[0] || lnk>lim[1]) ? 0.0 :
+      interpol1d(FPT.tab_AB[0],FPT.N,lim[0],lim[1],lim[2],lnk);
+    const double d1s2 = (lnk<lim[0] || lnk>lim[1]) ? 0.0 :
+      interpol1d(FPT.tab_AB[0],FPT.N,lim[0],lim[1],lim[2],lnk);
+
     const double b2 = gb2(z, nl);
     const double bs2 = gbs2(z, nl);
+    
     oneloop *= WGAL;
-    oneloop *= g4*(0.5*b2*PT_d1d2(k) + 0.5*bs2*PT_d1s2(k));
+    oneloop *= g4*(0.5*b2*d1d2 + 0.5*bs2*d1s2);
   }
   return ((res + oneloop)*chidchi.dchida/(fK*fK))*ell_prefactor;
 }

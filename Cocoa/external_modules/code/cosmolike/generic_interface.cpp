@@ -1568,10 +1568,6 @@ void init_survey(
 // ---------------------------------------------------------------------------
 // ---------------------------------------------------------------------------
 
-// ---------------------------------------------------------------------------
-// ---------------------------------------------------------------------------
-// ---------------------------------------------------------------------------
-
 void init_distances(vector io_z, vector io_chi)
 {
   spdlog::debug("{}: Begins", "init_distances");
@@ -1596,18 +1592,6 @@ void init_distances(vector io_z, vector io_chi)
     exit(1);
   }
 
-  int nz = static_cast<int>(io_z.n_elem);
-  
-  double* vz = io_z.memptr();
-  double* vchi = io_chi.memptr();
-  
-  setup_chi(&nz, &vz, &vchi, 1);
-
-  // force initialization - imp to avoid seg fault when openmp is on
-  const double io_a = 1.0;
-  chi(io_a);
-
-  // new implementation ------------------------------------------------
   int cache_update = 0;
   if (cosmology.chi_nz != static_cast<int>(io_z.n_elem) || cosmology.chi  == NULL)
     cache_update = 1;
@@ -1637,6 +1621,8 @@ void init_distances(vector io_z, vector io_chi)
       cosmology.chi[0][i] = io_z(i);
       cosmology.chi[1][i] = io_chi(i);
     }
+
+    //cosmology.random = RandomNumber::get_instance().get();
   }
 
   spdlog::debug("{}: Ends", "init_distances");
@@ -1672,24 +1658,6 @@ void init_growth(vector io_z, vector io_G)
     exit(1);
   }
 
-  int nz = static_cast<int>(io_z.n_elem);
-  
-  double* z = io_z.memptr();
-  double* G = io_G.memptr();
-  
-  setup_growth(&nz, &z, &G, 1);
-
-  // force initialization - imp to avoid seg fault when openmp is on
-  const double io_a = 1.0;
-  const double zz = 0.0;
-  
-  f_growth(zz);
-  
-  growfac_all(io_a);
-  
-  growfac(io_a);
-
-  // new implementation ------------------------------------------------------
   int cache_update = 0;
   if (cosmology.G_nz != static_cast<int>(io_z.n_elem) || cosmology.G  == NULL)
     cache_update = 1;
@@ -1719,7 +1687,19 @@ void init_growth(vector io_z, vector io_G)
       cosmology.G[0][i] = io_z(i);
       cosmology.G[1][i] = io_G(i);
     }
+
+    //cosmology.random = RandomNumber::get_instance().get();
   }
+
+  // force initialization - imp to avoid seg fault when openmp is on
+  const double io_a = 1.0;
+  const double zz = 0.0;
+  
+  f_growth(zz);
+  
+  growfac_all(io_a);
+  
+  growfac(io_a);
 
   spdlog::debug("{}: Ends", "init_growth");
   return;
@@ -1755,23 +1735,69 @@ void init_linear_power_spectrum(vector io_log10k, vector io_z, vector io_lnP)
     exit(1);
   }
 
-  int nlog10k = static_cast<int>(io_log10k.n_elem);
-  int nz = static_cast<int>(io_z.n_elem);
-  
-  double* log10k = io_log10k.memptr();
-  double* z = io_z.memptr();
-  double* lnP = io_lnP.memptr();
-  
-  setup_p_lin(&nlog10k, &nz, &log10k, &z, &lnP, 1);
+  int cache_update = 0;
+  if (cosmology.lnPL_nk != static_cast<int>(io_log10k.n_elem) ||
+      cosmology.lnPL_nz != static_cast<int>(io_z.n_elem) || 
+      cosmology.lnPL  == NULL)
+    cache_update = 1;
+  else
+  {
+    for (int i=0; i<cosmology.lnPL_nk; i++)
+    {
+      for (int j=0; j<cosmology.lnPL_nz; j++)
+      {
+        if (fdiff(cosmology.lnPL[i][j], io_lnP(i*cosmology.lnPL_nz+j))) 
+        {
+          cache_update = 1; 
+          goto jump;
+        }
+      }
+    }
+    for (int i=0; i<cosmology.lnPL_nk; i++)
+    {
+      if (fdiff(cosmology.lnPL[i][cosmology.lnPL_nz], io_log10k(i))) 
+      {
+        cache_update = 1; 
+        break;
+      }
+    }
+    for (int j=0; j<cosmology.lnPL_nz; j++)
+    {
+      if (fdiff(cosmology.lnPL[cosmology.lnPL_nk][j], io_z(j))) 
+      {
+        cache_update = 1; 
+        break;
+      }
+    }
+  }
 
-  // force initialization - imp to avoid seg fault when openmp is on
-  const double io_a = 1.0;
-  const double io_k = 0.1*cosmology.coverH0;
-  p_lin(io_k, io_a);
+  jump:
 
+  if(cache_update = 1)
+  {
+    cosmology.lnPL_nk = static_cast<int>(io_log10k.n_elem);
+    cosmology.lnPL_nz = static_cast<int>(io_z.n_elem);
+
+    if (cosmology.lnPL != NULL) free(cosmology.lnPL);
+    cosmology.lnPL = (double**) malloc2d(cosmology.lnPL_nk+1,cosmology.lnPL_nz+1);
+
+    #pragma omp parallel for
+    for (int i=0; i<cosmology.lnPL_nk; i++)
+      cosmology.lnPL[i][cosmology.lnPL_nz] = io_log10k(i);
+
+    #pragma omp parallel for
+    for (int j=0; j<cosmology.lnPL_nz; j++)
+      cosmology.lnPL[cosmology.lnPL_nk][j] = io_z(j);
+
+    #pragma omp parallel for collapse(2)
+    for (int i=0; i<cosmology.lnPL_nk; i++)
+      for (int j=0; j<cosmology.lnPL_nz; j++)
+        cosmology.lnPL[i][j] = io_lnP(i*cosmology.lnPL_nz+j);
+
+    //cosmology.random = RandomNumber::get_instance().get();
+  }
 
   spdlog::debug("{}: Ends", "init_linear_power_spectrum");
-
   return;
 }
 
@@ -1807,21 +1833,6 @@ void init_non_linear_power_spectrum(vector io_log10k, vector io_z, vector io_lnP
     exit(1);
   }
 
-  int nlog10k = static_cast<int>(io_log10k.n_elem);
-  int nz = static_cast<int>(io_z.n_elem);
-  
-  double* log10k = io_log10k.memptr();
-  double* z = io_z.memptr();
-  double* lnP = io_lnP.memptr();
-  
-  setup_p_nonlin(&nlog10k, &nz, &log10k, &z, &lnP, 1);
-
-  // force initialization - imp to avoid seg fault when openmp is on
-  const double io_a = 1.0;
-  const double io_k = 0.1*cosmology.coverH0;
-  p_nonlin(io_k, io_a);
-
-  // new implementation ------------------------------------------------------
   int cache_update = 0;
   if (cosmology.lnP_nk != static_cast<int>(io_log10k.n_elem) ||
       cosmology.lnP_nz != static_cast<int>(io_z.n_elem) || 
@@ -1880,10 +1891,11 @@ void init_non_linear_power_spectrum(vector io_log10k, vector io_z, vector io_lnP
     for (int i=0; i<cosmology.lnP_nk; i++)
       for (int j=0; j<cosmology.lnP_nz; j++)
         cosmology.lnP[i][j] = io_lnP(i*cosmology.lnP_nz+j);
+
+    //cosmology.random = RandomNumber::get_instance().get();
   }
 
   spdlog::debug("{}: Ends", "init_non_linear_power_spectrum");
-
   return;
 }
 
