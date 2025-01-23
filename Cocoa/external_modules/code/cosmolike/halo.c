@@ -12,7 +12,6 @@
 #include "cosmo3D.h"
 #include "redshift_spline.h"
 #include "structs.h"
-#include "recompute.h"
 
 #include "log.c/src/log.h"
 

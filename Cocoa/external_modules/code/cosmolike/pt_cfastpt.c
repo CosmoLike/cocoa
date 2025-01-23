@@ -8,7 +8,6 @@
 #include "basics.h"
 #include "cosmo3D.h"
 #include "pt_cfastpt.h"
-#include "recompute.h"
 #include "structs.h"
 
 #include "log.c/src/log.h"

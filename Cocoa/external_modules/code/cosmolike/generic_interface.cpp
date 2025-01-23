@@ -41,7 +41,6 @@ namespace py = pybind11;
 #include "cosmolike/IA.h"
 #include "cosmolike/halo.h"
 #include "cosmolike/radial_weights.h"
-#include "cosmolike/recompute.h"
 #include "cosmolike/pt_cfastpt.h"
 #include "cosmolike/redshift_spline.h"
 #include "cosmolike/structs.h"
@@ -1622,7 +1621,7 @@ void init_distances(vector io_z, vector io_chi)
       cosmology.chi[1][i] = io_chi(i);
     }
 
-    //cosmology.random = RandomNumber::get_instance().get();
+    cosmology.random = RandomNumber::get_instance().get();
   }
 
   spdlog::debug("{}: Ends", "init_distances");
@@ -1688,18 +1687,8 @@ void init_growth(vector io_z, vector io_G)
       cosmology.G[1][i] = io_G(i);
     }
 
-    //cosmology.random = RandomNumber::get_instance().get();
+    cosmology.random = RandomNumber::get_instance().get();
   }
-
-  // force initialization - imp to avoid seg fault when openmp is on
-  const double io_a = 1.0;
-  const double zz = 0.0;
-  
-  f_growth(zz);
-  
-  growfac_all(io_a);
-  
-  growfac(io_a);
 
   spdlog::debug("{}: Ends", "init_growth");
   return;
@@ -1794,7 +1783,7 @@ void init_linear_power_spectrum(vector io_log10k, vector io_z, vector io_lnP)
       for (int j=0; j<cosmology.lnPL_nz; j++)
         cosmology.lnPL[i][j] = io_lnP(i*cosmology.lnPL_nz+j);
 
-    //cosmology.random = RandomNumber::get_instance().get();
+    cosmology.random = RandomNumber::get_instance().get();
   }
 
   spdlog::debug("{}: Ends", "init_linear_power_spectrum");
@@ -1892,7 +1881,7 @@ void init_non_linear_power_spectrum(vector io_log10k, vector io_z, vector io_lnP
       for (int j=0; j<cosmology.lnP_nz; j++)
         cosmology.lnP[i][j] = io_lnP(i*cosmology.lnP_nz+j);
 
-    //cosmology.random = RandomNumber::get_instance().get();
+    cosmology.random = RandomNumber::get_instance().get();
   }
 
   spdlog::debug("{}: Ends", "init_non_linear_power_spectrum");

@@ -14,7 +14,6 @@
 #include "basics.h"
 #include "baryons.h"
 #include "cosmo3D.h"
-#include "recompute.h"
 #include "structs.h"
 
 // ----------------------------------------------------------------------------
