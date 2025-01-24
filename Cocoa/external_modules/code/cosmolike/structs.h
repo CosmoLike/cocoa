@@ -92,15 +92,15 @@ typedef struct
   // CLUSTER ROUTINES (ALPHA STAGE)
   // ---------------------------------------------------
   // ---------------------------------------------------
-  int N_a_halo_exclusion;          // N_a for binned_p_cc_incl_halo_exclusion (cluster_util.c)
-  int N_k_halo_exclusion;          // N_k for binned_p_cc_incl_halo_exclusion (cluster_util.c)
-  int N_k_hankel_halo_exclusion;   // N for 3D Hankel Transform (pk_to_xi and xi_to_pk)
+  int N_a_halo_exclusion;        // N_a for binned_p_cc_incl_halo_exclusion (cluster_util.c)
+  int N_k_halo_exclusion;        // N_k for binned_p_cc_incl_halo_exclusion (cluster_util.c)
+  int N_k_hankel_halo_exclusion; // N for 3D Hankel Transform (pk_to_xi and xi_to_pk)
   int N_R_halo_exclusion;
   int binned_P_lambda_obs_given_M_size_z_table;
   int binned_P_lambda_obs_given_M_size_M_table;
   int binned_p_cm_size_a_table;
-  int halo_uKS_nc;                 // halo.c u_KS(double c, double k, double rv)
-  int halo_uks_nx;                 // halo.c u_KS(double c, double k, double rv)
+  int halo_uKS_nc;               // halo.c u_KS(double c, double k, double rv)
+  int halo_uks_nx;               // halo.c u_KS(double c, double k, double rv)
 } Ntab;
 
 typedef struct
@@ -281,7 +281,6 @@ typedef struct
   double lmin;
   double lmax;
   double* ell;
-  double* theta;
   double cosmax;
   double Rmin_bias;
   double Rmin_shear;
@@ -307,11 +306,13 @@ typedef struct
   int clusterWL;
   int clusterCG;
   int clusterCC;
-  int high_def_integration;
   int adopt_limber_gg;
-  int adopt_limber_gammat;
   int use_ggl_efficiency_zoverlap;
-
+  // ---------------------------------------------------
+  // ---------------------------------------------------
+  // HALO MODEL CHOICES
+  // ---------------------------------------------------
+  // ---------------------------------------------------
   int galaxy_bias_model[MAX_SIZE_ARRAYS]; // [0] = b1, 
                                           // [1] = b2, 
                                           // [2] = bs2, 
@@ -414,6 +415,7 @@ typedef struct
   */
 } redshiftparams;
 
+/*
 // ---------------------------------------------------
 // CLUSTER ROUTINES (ALPHA STAGE)
 // ---------------------------------------------------
@@ -438,6 +440,15 @@ typedef struct
   
   char model[CHAR_MAX_SIZE];
 } clusterparams;
+*/
+
+// --------------------------------------------------------------------
+// --------------------------------------------------------------------
+// --------------------------------------------------------------------
+//  EXTERN STRUCTS 
+// --------------------------------------------------------------------
+// --------------------------------------------------------------------
+// --------------------------------------------------------------------
 
 extern likepara like;
 
@@ -448,8 +459,6 @@ extern tomopara tomo;
 extern redshiftparams redshift;
 
 extern sur survey;
-
-extern clusterparams Cluster;
 
 extern pdeltapara pdeltaparams;
 
@@ -465,6 +474,8 @@ extern FPT FPTbias;
 
 extern FPT FPTIA;
 
+//extern clusterparams Cluster;
+
 // --------------------------------------------------------------------
 // --------------------------------------------------------------------
 // --------------------------------------------------------------------
@@ -473,23 +484,13 @@ extern FPT FPTIA;
 // --------------------------------------------------------------------
 // --------------------------------------------------------------------
 
+void reset_like_struct();
 void reset_bary_struct();
-
 void reset_nuisance_struct();
-
 void reset_redshift_struct();
-
-// --------------------------------------------------------------------
-// --------------------------------------------------------------------
-// --------------------------------------------------------------------
-// UPDATE
-// --------------------------------------------------------------------
-// --------------------------------------------------------------------
-// --------------------------------------------------------------------
-
-void update_cosmopara(cosmopara* C);
-
-void update_nuisance(nuisanceparams* N);
+void reset_cosmology_struct();
+void reset_tomo_struct();
+void reset_Ntable_struct();
 
 #ifdef __cplusplus
 }

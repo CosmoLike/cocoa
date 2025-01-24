@@ -167,13 +167,11 @@ bin_avg set_bin_average(const int i_theta, const int j_L)
 
     xminmax = (double**) malloc2d(2, Ntable.Ntheta);
 
-    const double logdt = 
-      (log(Ntable.vtmax)-log(Ntable.vtmin))/ (double) Ntable.Ntheta;
-    
+    const double logdt = (log(Ntable.vtmax)-log(Ntable.vtmin))/ Ntable.Ntheta;
     for(int i=0; i<Ntable.Ntheta ; i++)
     {
-      xminmax[0][i] = cos(exp(log(Ntable.vtmin) + (i + 0.0)*logdt));
-      xminmax[1][i] = cos(exp(log(Ntable.vtmin) + (i + 1.0)*logdt));
+      xminmax[0][i] = cos(exp(log(Ntable.vtmin) + (i + 0.)*logdt));
+      xminmax[1][i] = cos(exp(log(Ntable.vtmin) + (i + 1.)*logdt));
     }
 
     #pragma omp parallel for

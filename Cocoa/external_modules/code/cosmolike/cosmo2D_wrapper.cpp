@@ -63,8 +63,16 @@ static int has_b2_galaxies()
 vector get_binning_real_space()
 {  
   vector result(Ntable.Ntheta, arma::fill::none);
+  
+  const double logdt=(std::log(Ntable.vtmax)-std::log(Ntable.vtmin))/Ntable.Ntheta;
   for (int i = 0; i < Ntable.Ntheta; i++)
-    result(i) = like.theta[i] / 2.90888208665721580e-4; 
+  {  
+    const double thetamin = std::exp(log(Ntable.vtmin) + (i + 0.0) * logdt);
+    const double thetamax = std::exp(log(Ntable.vtmin) + (i + 1.0) * logdt);
+    const double theta = (2./ 3.) * (std::pow(thetamax,3) - std::pow(thetamin,3)) /
+                                    (thetamax*thetamax    - thetamin*thetamin);
+    result(i) = theta / 2.90888208665721580e-4; 
+  }
   return result;
 }
 

@@ -388,7 +388,6 @@ double w_gammat_tomo(const int nt, const int ni, const int nj, const int limber)
       for (int nz=0; nz<NSIZE; nz++)
         for (int l=lmin; l<limits.LMIN_tab; l++)
           Cl[nz][l] = C_gs_tomo_limber_nointerp(l, ZL(nz), ZS(nz), 0);
-      
       #pragma omp parallel for collapse(2)
       for (int nz=0; nz<NSIZE; nz++)
         for (int l=limits.LMIN_tab; l<limits.LMAX; l++)      

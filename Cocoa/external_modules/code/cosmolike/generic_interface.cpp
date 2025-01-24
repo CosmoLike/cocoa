@@ -210,10 +210,8 @@ std::tuple<std::string,int> get_baryon_sim_name_and_tag(std::string sim)
     if (count > 1)
     {
       spdlog::critical(
-          "{}: Scenario {} not supported (too many dashes)", 
-          "get_baryon_sim_name_and_tag",
-          sim
-        );
+        "{}: Scenario {} not supported (too many dashes)", 
+        "get_baryon_sim_name_and_tag", sim);
       exit(1);
     }
   }
@@ -277,10 +275,6 @@ void initial_setup()
   
   spdlog::debug("{}: Begins", "initial_setup");
 
-  // restart variables to 0 so error check can flag bad initialization
-  redshift.shear_nbin = 0;
-  redshift.clustering_nbin = 0;
-
   like.shear_shear = 0;
   like.shear_pos = 0;
   like.pos_pos = 0;
@@ -310,14 +304,12 @@ void initial_setup()
   // reset bias
   reset_redshift_struct();
   reset_nuisance_struct();
+  reset_cosmology_struct();
+  reset_tomo_struct();
+  reset_Ntable_struct();
+  reset_like_struct();
 
-  // nonlimber ?
-  // nonLimber: 0; Limber: 1;
-  // Doesn't support IA=6 AND nonLimber together
   like.adopt_limber_gg = 0;
-  like.adopt_limber_gammat = 1;
-
-  Ntable.high_def_integration = 1;
 
   std::string mode = "Halofit";
   memcpy(pdeltaparams.runmode, mode.c_str(), mode.size() + 1);
@@ -545,29 +537,22 @@ void init_binning_real_space(
     "theta_max_arcmin", theta_max_arcmin);
 
   Ntable.Ntheta = Ntheta;
+  Ntable.vtmin  = theta_min_arcmin * 2.90888208665721580e-4; // arcmin to rad conv
+  Ntable.vtmax  = theta_max_arcmin * 2.90888208665721580e-4; // arcmin to rad conv
   
-  Ntable.vtmin = theta_min_arcmin * 2.90888208665721580e-4; // arcmin to rad conv
+  const double logdt=(std::log(Ntable.vtmax)-std::log(Ntable.vtmin))/Ntable.Ntheta;
   
-  Ntable.vtmax = theta_max_arcmin * 2.90888208665721580e-4; // arcmin to rad conv
-  
-  const double logdt = 
-    (std::log(Ntable.vtmax) - std::log(Ntable.vtmin))/ (double) Ntable.Ntheta;
-  
-  like.theta = (double*) calloc(Ntable.Ntheta, sizeof(double));
-
-  constexpr double x = 2./ 3.;
-
   for (int i=0; i<Ntable.Ntheta; i++)
   {
-    const double thetamin = std::exp(log(Ntable.vtmin) + (i + 0.0) * logdt);
-    const double thetamax = std::exp(log(Ntable.vtmin) + (i + 1.0) * logdt);
+    const double thetamin = std::exp(log(Ntable.vtmin) + (i + 0.) * logdt);
+    const double thetamax = std::exp(log(Ntable.vtmin) + (i + 1.) * logdt);
     
-    like.theta[i] = x * (std::pow(thetamax, 3) - std::pow(thetamin, 3)) /
-      (thetamax*thetamax - thetamin*thetamin);
+    const double theta = (2./3.) * (std::pow(thetamax,3) - std::pow(thetamin,3)) /
+                                   (thetamax*thetamax    - thetamin*thetamin);
 
     spdlog::debug("{}: Bin {:d} - {} = {:.4e}, {} = {:.4e} and {} = {:.4e}",
       "init_binning_real_space", i, "theta_min [rad]", thetamin, "theta [rad]", 
-      like.theta[i], "theta_max [rad]", thetamax);
+      theta, "theta_max [rad]", thetamax);
   }
 
   spdlog::debug("{}: Ends", "init_binning_real_space");
@@ -2448,13 +2433,15 @@ void compute_gs_real_masked(vector& data_vector, const int start)
       for (int i=0; i<Ntable.Ntheta; i++)
       {
         const int index = start + Ntable.Ntheta*nz + i;
-        
         if (IP::get_instance().get_mask(index))
         {
-          data_vector(index) = 
-            ( w_gammat_tomo(i, zl, zs, like.adopt_limber_gammat) + 
-              compute_pm(zl, zs, like.theta[i])
-            )*(1.0+nuisance.shear_calibration_m[zs]);
+          const double logdt=(std::log(Ntable.vtmax)-std::log(Ntable.vtmin))/Ntable.Ntheta;
+          const double thetamin = std::exp(log(Ntable.vtmin) + (i+0.) * logdt);
+          const double thetamax = std::exp(log(Ntable.vtmin) + (i+1.) * logdt);
+          const double theta = (2./3.) * (std::pow(thetamax,3) - std::pow(thetamin,3)) /
+                                         (thetamax*thetamax    - thetamin*thetamin);
+          data_vector(index) = (w_gammat_tomo(i,zl,zs,1)+
+            compute_pm(zl,zs,theta))*(1.0+nuisance.shear_calibration_m[zs]);
         }
       }
     }
