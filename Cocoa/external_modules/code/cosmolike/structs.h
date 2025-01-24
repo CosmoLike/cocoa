@@ -16,9 +16,7 @@ typedef struct
   int N;
   int N_per_dec;
   double** tab_AB; // parameters for table of bias terms
-  int N_AB;        // parameters for table of bias terms
   double** tab_IA; // parameters for table of IA terms
-  int N_IA;        // parameters for table of IA terms
 } FPTpara;
 
 typedef struct 

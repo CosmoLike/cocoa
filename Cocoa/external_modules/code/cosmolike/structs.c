@@ -18,8 +18,6 @@ FPTpara FPT =
   .k_max = 1.e+3,
   .N = 800,
   .N_per_dec = 100,
-  .N_AB = 7,
-  .N_IA = 10
 };
 
 likepara like =
