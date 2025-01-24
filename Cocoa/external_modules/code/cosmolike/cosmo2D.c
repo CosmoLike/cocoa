@@ -982,19 +982,32 @@ double int_for_C_ss_tomo_limber(double a, void* params)
       const double bta2 = IA_AX[1];
       
       double lim[3];
-      lim[0] = log(FPT.k_min);
-      lim[1] = log(FPT.k_max);
-      lim[2] = log(10.) / (double) FPT.N_per_dec;
+      lim[0] = log(FPTIA.k_min);
+      lim[1] = log(FPTIA.k_max);
+      lim[2] = (lim[1] - lim[0])/FPTIA.N;
 
       if (EE == 1)
       {     
-        double tt = g4*interpol1d(FPT.tab_IA[0],FPT.N,lim[0],lim[1],lim[2],lnk);
-        double ta_dE1 = g4*interpol1d(FPT.tab_IA[2],FPT.N,lim[0],lim[1],lim[2],lnk);
-        double ta_dE2 = g4*interpol1d(FPT.tab_IA[3],FPT.N,lim[0],lim[1],lim[2],lnk);
-        double ta = g4*interpol1d(FPT.tab_IA[4],FPT.N,lim[0],lim[1],lim[2],lnk);
-        double mixA = g4*interpol1d(FPT.tab_IA[6],FPT.N,lim[0],lim[1],lim[2],lnk);
-        double mixB = g4*interpol1d(FPT.tab_IA[7],FPT.N,lim[0],lim[1],lim[2],lnk);
-        double mixEE = g4*interpol1d(FPT.tab_IA[8],FPT.N,lim[0],lim[1],lim[2],lnk);
+        const double tt = (lnk<lim[0] || lnk>lim[1]) ? 0.0 : 
+          g4*interpol1d(FPTIA.tab[0], FPTIA.N, lim[0], lim[1], lim[2], lnk);
+        
+        const double ta_dE1 = (lnk<lim[0] || lnk>lim[1]) ? 0.0 : 
+          g4*interpol1d(FPTIA.tab[2], FPTIA.N, lim[0], lim[1], lim[2], lnk);
+        
+        const double ta_dE2 = (lnk<lim[0] || lnk>lim[1]) ? 0.0 : 
+          g4*interpol1d(FPTIA.tab[3], FPTIA.N, lim[0], lim[1], lim[2], lnk);
+        
+        const double ta = (lnk<lim[0] || lnk>lim[1]) ? 0.0 : 
+          g4*interpol1d(FPTIA.tab[4], FPTIA.N, lim[0], lim[1], lim[2], lnk);
+        
+        const double mixA = (lnk<lim[0] || lnk>lim[1]) ? 0.0 : 
+          g4*interpol1d (FPTIA.tab[6], FPTIA.N, lim[0], lim[1], lim[2], lnk);
+        
+        const double mixB = (lnk<lim[0] || lnk>lim[1]) ? 0.0 : 
+          g4*interpol1d(FPTIA.tab[7], FPTIA.N, lim[0], lim[1], lim[2], lnk);
+        
+        const double mixEE = (lnk<lim[0] || lnk>lim[1]) ? 0.0 : 
+          g4*interpol1d(FPTIA.tab[8], FPTIA.N, lim[0], lim[1], lim[2], lnk);
         
         ans = WK1*WK2*PK 
               - WS1*WK2*(C11*PK + C11*bta1*(ta_dE1+ta_dE2) - 5*C21*(mixA+mixB))
@@ -1007,9 +1020,14 @@ double int_for_C_ss_tomo_limber(double a, void* params)
       }
       else  
       {        
-        double tt = g4*interpol1d(FPT.tab_IA[1],FPT.N,lim[0],lim[1],lim[2],lnk);
-        double ta = g4*interpol1d(FPT.tab_IA[5],FPT.N,lim[0],lim[1],lim[2],lnk);
-        double mix = g4*interpol1d(FPT.tab_IA[9],FPT.N,lim[0],lim[1],lim[2],lnk);
+        const double tt = (lnk<lim[0] || lnk>lim[1]) ? 0.0 : 
+          g4*interpol1d(FPTIA.tab[1],FPTIA.N, lim[0], lim[1], lim[2], lnk);
+        
+        const double ta = (lnk<lim[0] || lnk>lim[1]) ? 0.0 : 
+          g4*interpol1d(FPTIA.tab[5],FPTIA.N, lim[0], lim[1], lim[2], lnk);
+        
+        const double mix = (lnk<lim[0] || lnk>lim[1]) ? 0.0 : 
+          g4*interpol1d(FPTIA.tab[9],FPTIA.N, lim[0], lim[1], lim[2], lnk);
         
         ans = WS1*WS2*(C11*C12*bta1*bta2*ta 
                        - 5*(C11*bta1*C22+C12*bta2*C21)*mix 
@@ -1232,21 +1250,23 @@ double int_for_C_gs_tomo_limber(double a, void* params)
       }
 
       get_FPT_IA();
-
       const double lnk = log(k);
       double lim[3];
-      lim[0] = log(FPT.k_min);
-      lim[1] = log(FPT.k_max);
-      lim[2] = log(10.) / (double) FPT.N_per_dec;
+      lim[0] = log(FPTIA.k_min);
+      lim[1] = log(FPTIA.k_max);
+      lim[2] = (lim[1] - lim[0])/FPTIA.N;
 
-      double mixA = (lnk<lim[0] || lnk>lim[1]) ? 0.0 : 
-        g4*interpol1d(FPT.tab_IA[6],FPT.N,lim[0],lim[1],lim[2],lnk);
-      double mixB = (lnk<lim[0] || lnk>lim[1]) ? 0.0 :
-        g4*interpol1d(FPT.tab_IA[7],FPT.N,lim[0],lim[1],lim[2],lnk);
-      double ta_dE1 = (lnk<lim[0] || lnk>lim[1]) ? 0.0 :
-        g4*interpol1d(FPT.tab_IA[2],FPT.N,lim[0],lim[1],lim[2],lnk);
-      double ta_dE2 = (lnk<lim[0] || lnk>lim[1]) ? 0.0 :
-        g4*interpol1d(FPT.tab_IA[3],FPT.N,lim[0],lim[1],lim[2],lnk);
+      const double mixA = (lnk<lim[0] || lnk>lim[1]) ? 0.0 : 
+        g4*interpol1d(FPTIA.tab[6], FPTIA.N, lim[0], lim[1], lim[2], lnk);
+      
+      const double mixB = (lnk<lim[0] || lnk>lim[1]) ? 0.0 :
+        g4*interpol1d(FPTIA.tab[7], FPTIA.N, lim[0], lim[1], lim[2], lnk);
+      
+      const double ta_dE1 = (lnk<lim[0] || lnk>lim[1]) ? 0.0 :
+        g4*interpol1d(FPTIA.tab[2], FPTIA.N, lim[0], lim[1], lim[2], lnk);
+      
+      const double ta_dE2 = (lnk<lim[0] || lnk>lim[1]) ? 0.0 :
+        g4*interpol1d(FPTIA.tab[3], FPTIA.N, lim[0], lim[1], lim[2], lnk);
 
       double WRSD = 0.0;
       if (include_RSD_GS == 1)
@@ -1259,14 +1279,21 @@ double int_for_C_gs_tomo_limber(double a, void* params)
       }
 
       double oneloop = 0.0;
-      if (nonlinear_bias == 1)
+      if (1 == nonlinear_bias)
       { 
+        get_FPT_bias();
+        lim[0] = log(FPTbias.k_min);
+        lim[1] = log(FPTbias.k_max);
+        lim[2] = (lim[1] - lim[0])/FPTbias.N;
+
         const double d1d2 = (lnk<lim[0] || lnk>lim[1]) ? 0.0 :
-          interpol1d(FPT.tab_AB[0],FPT.N,lim[0],lim[1],lim[2],lnk);
+          interpol1d(FPTbias.tab[0], FPTbias.N, lim[0], lim[1], lim[2], lnk);
+        
         const double d1s2 = (lnk<lim[0] || lnk>lim[1]) ? 0.0 :
-          interpol1d(FPT.tab_AB[2],FPT.N,lim[0],lim[1],lim[2],lnk);
+          interpol1d(FPTbias.tab[2], FPTbias.N, lim[0], lim[1], lim[2], lnk);
+        
         const double d1d3 = (lnk<lim[0] || lnk>lim[1]) ? 0.0 :
-          interpol1d(tab_d1d3,FPT.N,lim[0],lim[1],lim[2],lnk);
+          interpol1d(tab_d1d3, FPTbias.N, lim[0], lim[1], lim[2], lnk);
 
         const double b2 = gb2(z, nl);
         const double bs2 = gbs2(z, nl);
@@ -1303,20 +1330,23 @@ double int_for_C_gs_tomo_limber(double a, void* params)
       }
 
       double oneloop = 0.0;
-      if (nonlinear_bias == 1)
+      if (1 == nonlinear_bias)
       {
+        get_FPT_bias();
         const double lnk = log(k);
         double lim[3];
-        lim[0] = log(FPT.k_min);
-        lim[1] = log(FPT.k_max);
-        lim[2] = log(10.) / (double) FPT.N_per_dec;
+        lim[0] = log(FPTbias.k_min);
+        lim[1] = log(FPTbias.k_max);
+        lim[2] = (lim[1] - lim[0])/FPTbias.N;
 
         const double d1d2 = (lnk<lim[0] || lnk>lim[1]) ? 0.0 :
-          interpol1d(FPT.tab_AB[0],FPT.N,lim[0],lim[1],lim[2],lnk);
+          interpol1d(FPTbias.tab[0], FPTbias.N, lim[0], lim[1], lim[2], lnk);
+        
         const double d1s2 = (lnk<lim[0] || lnk>lim[1]) ? 0.0 :
-          interpol1d(FPT.tab_AB[2],FPT.N,lim[0],lim[1],lim[2],lnk);
+          interpol1d(FPTbias.tab[2], FPTbias.N, lim[0], lim[1], lim[2], lnk);
+        
         const double d1d3 = (lnk<lim[0] || lnk>lim[1]) ? 0.0 :
-          interpol1d(tab_d1d3,FPT.N,lim[0],lim[1],lim[2],lnk);
+          interpol1d(tab_d1d3, FPTbias.N, lim[0], lim[1], lim[2], lnk);
 
         const double b2 = gb2(z, nl);
         const double bs2 = gbs2(z, nl);
@@ -1545,26 +1575,33 @@ double int_for_C_gg_tomo_limber(double a, void* params)
   }
 
   double oneloop = 0.0;
-  if (nonlinear_bias == 1 && use_linear_ps == 0)
+  if (1 == nonlinear_bias && 0 == use_linear_ps)
   {
+    get_FPT_bias();
     const double lnk = log(k);
     double lim[3];
-    lim[0] = log(FPT.k_min);
-    lim[1] = log(FPT.k_max);
-    lim[2] = log(10.) / (double) FPT.N_per_dec;
+    lim[0] = log(FPTbias.k_min);
+    lim[1] = log(FPTbias.k_max);
+    lim[2] = (lim[1] - lim[0])/FPTbias.N;
 
     const double d1d2 = (lnk<lim[0] || lnk>lim[1]) ? 0.0 :
-      interpol1d(FPT.tab_AB[0],FPT.N,lim[0],lim[1],lim[2],lnk);
+      interpol1d(FPTbias.tab[0], FPTbias.N, lim[0], lim[1], lim[2], lnk);
+    
     const double d2d2 = (lnk<lim[0] || lnk>lim[1]) ? 0.0 :
-      interpol1d(FPT.tab_AB[1],FPT.N,lim[0],lim[1],lim[2],lnk);
+      interpol1d(FPTbias.tab[1], FPTbias.N, lim[0], lim[1], lim[2], lnk);
+    
     const double d1s2 = (lnk<lim[0] || lnk>lim[1]) ? 0.0 :
-      interpol1d(FPT.tab_AB[2],FPT.N,lim[0],lim[1],lim[2],lnk);
+      interpol1d(FPTbias.tab[2], FPTbias.N, lim[0], lim[1], lim[2], lnk);
+    
     const double d2s2 = (lnk<lim[0] || lnk>lim[1]) ? 0.0 :
-      interpol1d(FPT.tab_AB[3],FPT.N,lim[0],lim[1],lim[2],lnk);
+      interpol1d(FPTbias.tab[3], FPTbias.N, lim[0], lim[1], lim[2], lnk);
+    
     const double s2s2 = (lnk<lim[0] || lnk>lim[1]) ? 0.0 :
-      interpol1d(FPT.tab_AB[4],FPT.N,lim[0],lim[1],lim[2],lnk);
+      interpol1d(FPTbias.tab[4], FPTbias.N, lim[0], lim[1], lim[2], lnk);
+    
     const double d1d3 = (lnk<lim[0] || lnk>lim[1]) ? 0.0 :
-      interpol1d(tab_d1d3,FPT.N,lim[0],lim[1],lim[2],lnk);
+      interpol1d(tab_d1d3, FPTbias.N, lim[0], lim[1], lim[2], lnk);
+    
     const double s4 = 0.; // PT_sigma4(k);
 
     const double growfac_a = growfac(a);
@@ -1752,7 +1789,7 @@ double int_for_C_gk_tomo_limber(double a, void* params)
     exit(1);
   }
   const double l = ar[1];
-  const int nonlinear_bias = ar[2];
+  const int nonlinear = ar[2];
 
   const double ell = l + 0.5;
   struct chis chidchi = chi_all(a);
@@ -1806,21 +1843,23 @@ double int_for_C_gk_tomo_limber(double a, void* params)
   }
 
   double oneloop = WK;
-  if (nonlinear_bias == 1)
+  if (1 == nonlinear)
   {
+    get_FPT_bias();
     const double growfac_a = growfac(a);
     const double g4 = growfac_a*growfac_a*growfac_a*growfac_a;
 
     const double lnk = log(k);
     double lim[3];
-    lim[0] = log(FPT.k_min);
-    lim[1] = log(FPT.k_max);
-    lim[2] = log(10.) / (double) FPT.N_per_dec;
+    lim[0] = log(FPTbias.k_min);
+    lim[1] = log(FPTbias.k_max);
+    lim[2] = (lim[1] - lim[0])/FPTbias.N;
 
     const double d1d2 = (lnk<lim[0] || lnk>lim[1]) ? 0.0 :
-      interpol1d(FPT.tab_AB[0],FPT.N,lim[0],lim[1],lim[2],lnk);
+      interpol1d(FPTbias.tab[0], FPTbias.N, lim[0], lim[1], lim[2], lnk);
+    
     const double d1s2 = (lnk<lim[0] || lnk>lim[1]) ? 0.0 :
-      interpol1d(FPT.tab_AB[0],FPT.N,lim[0],lim[1],lim[2],lnk);
+      interpol1d(FPTbias.tab[0], FPTbias.N, lim[0], lim[1], lim[2], lnk);
 
     const double b2 = gb2(z, nl);
     const double bs2 = gbs2(z, nl);

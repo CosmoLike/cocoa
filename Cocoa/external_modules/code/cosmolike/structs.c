@@ -4,20 +4,20 @@
 
 #include "log.c/src/log.h"
 
-//  ----------------------------------------------------------------------------------
-//  ----------------------------------------------------------------------------------
-//  ----------------------------------------------------------------------------------
-//  STRUCT INITIALIZATION  
-//  ----------------------------------------------------------------------------------
-//  ----------------------------------------------------------------------------------
-//  ----------------------------------------------------------------------------------
-
-FPTpara FPT =
+FPT FPTIA =
 {
   .k_min = 1.e-5,
   .k_max = 1.e+3,
   .N = 800,
-  .N_per_dec = 100,
+  .tab = NULL
+};
+
+FPT FPTbias =
+{
+  .k_min = 1.e-5,
+  .k_max = 1.e+3,
+  .N = 800,
+  .tab = NULL
 };
 
 likepara like =
@@ -47,6 +47,7 @@ likepara like =
 
 cosmopara cosmology =
 {
+  .random = 0.0,
   .Omega_nu = 0.,
   .coverH0 = 2997.92458,
   .rho_crit = 7.4775e+21,
@@ -56,9 +57,16 @@ cosmopara cosmology =
   .Omega_b = 0.0,
   .Omega_v = 0.0,
   .h0 = 0.0,
-  //.w0 = -1,
-  //.A_s =  2e-9,
-  //.n_s = 0.96,
+  .lnP_nk = 0,
+  .lnP_nz = 0,
+  .lnP = NULL,
+  .lnPL_nk = 0,
+  .lnPL_nz = 0,
+  .lnPL = NULL,
+  .chi_nz = 0,
+  .chi = NULL,
+  .G_nz = 0,
+  .G = NULL
 };
 
 tomopara tomo = 
@@ -72,7 +80,6 @@ redshiftparams redshift =
 {
   .random_shear = 0.0,
   .random_clustering = 0.0,
-
   .shear_nbin = 0,
   .shear_photoz = 0,
   .shear_nzbins = 0,
@@ -81,7 +88,6 @@ redshiftparams redshift =
   .shear_zdist_zmin = {0},
   .shear_zdist_zmax = {0},
   .shear_zdist_table = NULL,
-  
   .clustering_nbin = 0,
   .clustering_photoz = 0,
   .clustering_nzbins = 0,
@@ -90,8 +96,6 @@ redshiftparams redshift =
   .clustering_zdist_zmin = {0},
   .clustering_zdist_zmax = {0},
   .clustering_zdist_table = NULL
-
-  //.cluster_Nbin = 0
 };
 
 clusterparams Cluster =
@@ -169,7 +173,6 @@ lim limits =
 Ntab Ntable = 
 {
   .random = 0.0,
-
   .N_a = 350,                         // N_a        (modified by COCOA from 100)
   .N_k_lin = 500,                     // N_k_lin
   .N_k_nlin = 500,                    // N_k_nlin
@@ -180,7 +183,7 @@ Ntab Ntable =
   .NL_Nchi = 500,                     // Cosmo2D - NL = NonLimber (NL_Nchi)
   .photoz_interpolation_type = 0,
   .high_def_integration = 0,
-
+  .FPTboost=0,
   // ---------------------------------------------------
   // CLUSTER ROUTINES (ALPHA STAGE)
   // ---------------------------------------------------

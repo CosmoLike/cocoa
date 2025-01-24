@@ -61,16 +61,11 @@ namespace cosmolike_interface
 // ---------------------------------------------------------------------------
 // ---------------------------------------------------------------------------
 // ---------------------------------------------------------------------------
-// ---------------------------------------------------------------------------
-// ---------------------------------------------------------------------------
 // AUX FUNCTIONS
 // ---------------------------------------------------------------------------
 // ---------------------------------------------------------------------------
 // ---------------------------------------------------------------------------
-// ---------------------------------------------------------------------------
-// ---------------------------------------------------------------------------
-// ---------------------------------------------------------------------------
-// ---------------------------------------------------------------------------
+
 
 matrix read_table(const std::string file_name)
 {
@@ -3079,24 +3074,17 @@ matrix compute_baryon_pcas_3x2pt_real(arma::Col<int>::fixed<3> order)
 
   // weight the diff matrix by inv_L; then SVD ----------------------------  
   matrix U, V;
-  
   vector s;
-  
   arma::svd(U, s, V, inv_L * D);
 
   // compute PCs ----------------------------------------------------------
-
   matrix PC = L * U; 
 
   // Expand the number of dims --------------------------------------------
-
   matrix R = matrix(ndata, nscenarios); 
 
   for (int i=0; i<nscenarios; i++)
-  {
-    R.col(i) = 
-      IP::get_instance().expand_theory_data_vector_from_sqzd(PC.col(i));
-  }
+    R.col(i) = IP::get_instance().expand_theory_data_vector_from_sqzd(PC.col(i));
 
   return R;
 }
@@ -3115,29 +3103,22 @@ matrix compute_baryon_pcas_6x2pt(arma::Col<int>::fixed<6> order)
 
   // Compute Cholesky Decomposition of the Covariance Matrix --------------
   
-  spdlog::debug(
-      "{}: Computing Cholesky Decomposition of"
-      " the Covariance Matrix begins", 
-      "compute_baryon_pcas_3x2pt"
-    );
+  spdlog::debug("{}: Computing Cholesky Decomposition of"
+    " the Covariance Matrix begins",  "compute_baryon_pcas_3x2pt");
 
   matrix L = arma::chol(IP::get_instance().get_cov_masked_sqzd(), "lower");
 
   matrix inv_L = arma::inv(L);
 
-  spdlog::debug(
-      "{}: Computing Cholesky Decomposition of"
-      " the Covariance Matrix ends", 
-      "compute_baryon_pcas_3x2pt"
-    );
+  spdlog::debug("{}: Computing Cholesky Decomposition of"
+    " the Covariance Matrix ends", "compute_baryon_pcas_3x2pt");
 
   // Compute Dark Matter data vector --------------------------------------
   
-  spdlog::debug(
-      "{}: Computing DM only data vector begins", 
-      "compute_baryon_pcas_3x2pt"
-    );
+  spdlog::debug("{}: Computing DM only data vector begins", 
+    "compute_baryon_pcas_3x2pt");
   
+  // line below to force clear cosmolike cosmology cache
   cosmology.random = RandomNumber::get_instance().get();
   
   reset_bary_struct(); // make sure there is no baryon contamination
@@ -3146,10 +3127,8 @@ matrix compute_baryon_pcas_6x2pt(arma::Col<int>::fixed<6> order)
       compute_data_vector_6x2pt_real_masked_any_order(order)
     );
 
-  spdlog::debug(
-      "{}: Computing DM only data vector ends", 
-      "compute_baryon_pcas_3x2pt"
-    );
+  spdlog::debug("{}: Computing DM only data vector ends", 
+    "compute_baryon_pcas_3x2pt");
 
   // Compute data vector for all Baryon scenarios -------------------------
   
@@ -3157,12 +3136,9 @@ matrix compute_baryon_pcas_6x2pt(arma::Col<int>::fixed<6> order)
 
   for (int i=0; i<nscenarios; i++)
   {
-    spdlog::debug(
-        "{}: Computing contaminated data vector"
-        " with baryon scenario {} begins", 
-        "compute_baryon_pcas_3x2pt",
-        BaryonScenario::get_instance().get_scenario(i)
-      );
+    spdlog::debug("{}: Computing contaminated data vector"
+      " with baryon scenario {} begins", "compute_baryon_pcas_3x2pt",
+      BaryonScenario::get_instance().get_scenario(i));
 
     // line below to force clear cosmolike cosmology cache
     cosmology.random = RandomNumber::get_instance().get();
@@ -3185,29 +3161,20 @@ matrix compute_baryon_pcas_6x2pt(arma::Col<int>::fixed<6> order)
 
   reset_bary_struct();
   
-  // line below to force clear cosmolike cosmology cache
+  // line below to force clear cosmolike cosmology cache ------------------
   cosmology.random = RandomNumber::get_instance().get();
-
+  
   // weight the diff matrix by inv_L; then SVD ----------------------------  
   matrix U, V;
-  
   vector s;
-  
   arma::svd(U, s, V, inv_L * D);
-
   // compute PCs ----------------------------------------------------------
-
   matrix PC = L * U; 
-
   // Expand the number of dims --------------------------------------------
-
   matrix R = matrix(ndata, nscenarios); 
 
   for (int i=0; i<nscenarios; i++)
-  {
-    R.col(i) = 
-      IP::get_instance().expand_theory_data_vector_from_sqzd(PC.col(i));
-  }
+    R.col(i) = IP::get_instance().expand_theory_data_vector_from_sqzd(PC.col(i));
 
   return R;
 }

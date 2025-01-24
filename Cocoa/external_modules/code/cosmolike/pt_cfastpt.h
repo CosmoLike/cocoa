@@ -142,7 +142,7 @@ static double tab_d1d3[800] = {
 
 void get_FPT_IA(void);
 
-void FPT_input(double k[], double P[]);
+void get_FPT_bias(void);
 
 #ifdef __cplusplus
 }
