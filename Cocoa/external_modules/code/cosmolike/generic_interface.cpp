@@ -1262,7 +1262,7 @@ void init_lens_sample(std::string multihisto_file, const int Ntomo)
 
   jump:
 
-  if(cache_update = 1)
+  if (1 == cache_update)
   {
     redshift.clustering_nzbins = input_table.n_rows;
     const int nzbins = redshift.clustering_nzbins;    // alias
@@ -1387,7 +1387,7 @@ void init_source_sample(std::string multihisto_file, const int Ntomo)
 
   jump:
 
-  if(cache_update = 1)
+  if (1 == cache_update)
   {
     redshift.shear_nzbins = input_table.n_rows;
     const int nzbins = redshift.shear_nzbins; // alias
@@ -1584,7 +1584,7 @@ void set_cosmological_parameters(
   {
     cache_update = 1;
   }
-  if(cache_update = 1)
+  if (1 == cache_update)
   {
     cosmology.Omega_m = omega_matter;
     cosmology.Omega_v = 1.0-omega_matter;
@@ -1593,7 +1593,6 @@ void set_cosmological_parameters(
     cosmology.h0 = hubble/100.0; 
     cosmology.MGSigma = 0.0;
     cosmology.MGmu = 0.0;
-    
     cosmology.random = cosmolike_interface::RandomNumber::get_instance().get();
   }
 
@@ -1644,7 +1643,7 @@ void set_distances(vector io_z, vector io_chi)
     }
   }
 
-  if(cache_update = 1)
+  if (1 == cache_update)
   {
     cosmology.chi_nz = static_cast<int>(io_z.n_elem);
 
@@ -1662,7 +1661,6 @@ void set_distances(vector io_z, vector io_chi)
   }
 
   spdlog::debug("{}: Ends", "set_distances");
-  return;
 }
 
 // ---------------------------------------------------------------------------
@@ -1699,7 +1697,7 @@ void set_growth(vector io_z, vector io_G)
     cache_update = 1;
   else
   {
-    for (int i=0; i<cosmology.chi_nz; i++) 
+    for (int i=0; i<cosmology.G_nz; i++) 
     {
       if (fdiff(cosmology.G[0][i], io_z(i)) ||
           fdiff(cosmology.G[1][i], io_G(i))) 
@@ -1710,7 +1708,7 @@ void set_growth(vector io_z, vector io_G)
     }
   }
 
-  if(cache_update = 1)
+  if (1 == cache_update)
   {
     cosmology.G_nz = static_cast<int>(io_z.n_elem);
 
@@ -1728,7 +1726,6 @@ void set_growth(vector io_z, vector io_G)
   }
 
   spdlog::debug("{}: Ends", "set_growth");
-  return;
 }
 
 // ---------------------------------------------------------------------------
@@ -1799,7 +1796,7 @@ void set_linear_power_spectrum(vector io_log10k, vector io_z, vector io_lnP)
 
   jump:
 
-  if(cache_update = 1)
+  if (1 == cache_update)
   {
     cosmology.lnPL_nk = static_cast<int>(io_log10k.n_elem);
     cosmology.lnPL_nz = static_cast<int>(io_z.n_elem);
@@ -1824,7 +1821,6 @@ void set_linear_power_spectrum(vector io_log10k, vector io_z, vector io_lnP)
   }
 
   spdlog::debug("{}: Ends", "set_linear_power_spectrum");
-  return;
 }
 
 // ---------------------------------------------------------------------------
@@ -1897,7 +1893,7 @@ void set_non_linear_power_spectrum(vector io_log10k, vector io_z, vector io_lnP)
 
   jump:
 
-  if(cache_update = 1)
+  if (1 == cache_update)
   {
     cosmology.lnP_nk = static_cast<int>(io_log10k.n_elem);
     cosmology.lnP_nz = static_cast<int>(io_z.n_elem);
@@ -1922,7 +1918,6 @@ void set_non_linear_power_spectrum(vector io_log10k, vector io_z, vector io_lnP)
   }
 
   spdlog::debug("{}: Ends", "set_non_linear_power_spectrum");
-  return;
 }
 
 // ---------------------------------------------------------------------------
@@ -1985,7 +1980,7 @@ void set_nuisance_shear_photoz(vector SP)
     } 
   }
 
-  if (cache_update == 1)
+  if (1 == cache_update)
     nuisance.random_photoz_shear = RandomNumber::get_instance().get();
 
   spdlog::debug("{}: Ends", "set_nuisance_shear_photoz");
@@ -2023,7 +2018,7 @@ void set_nuisance_clustering_photoz(vector CP)
     }
   }
 
-  if(cache_update == 1)
+  if(1 == cache_update)
     nuisance.random_photoz_clustering = RandomNumber::get_instance().get();
   
   spdlog::debug("{}: Ends", "set_nuisance_clustering_photoz");
@@ -2105,7 +2100,7 @@ void set_nuisance_linear_bias(vector B1)
     } 
   }
 
-  if(cache_update == 1)
+  if(1 == cache_update)
     nuisance.random_galaxy_bias = RandomNumber::get_instance().get();
 
   spdlog::debug("{}: Ends", "set_nuisance_linear_bias");
@@ -2151,7 +2146,7 @@ void set_nuisance_nonlinear_bias(vector B1, vector B2)
       nuisance.gb[2][i] = almost_equal(B2(i), 0.) ? 0 : (-4./7.)*(B1(i)-1.0);
     }
   }
-  if(cache_update == 1)
+  if(1 == cache_update)
     nuisance.random_galaxy_bias = RandomNumber::get_instance().get();
 
   spdlog::debug("{}: Ends", "set_nuisance_nonlinear_bias");
@@ -2195,7 +2190,7 @@ void set_nuisance_magnification_bias(vector B_MAG)
       nuisance.gb[4][i] = B_MAG(i);
     }
   }
-  if(cache_update == 1)
+  if(1 == cache_update)
     nuisance.random_galaxy_bias = RandomNumber::get_instance().get();
 
   spdlog::debug("{}: Ends", "set_nuisance_magnification_bias");
@@ -2294,7 +2289,7 @@ void set_nuisance_IA(
       cache_update = 1;
     }
   }
-  if(cache_update == 1)
+  if(1 == cache_update)
     nuisance.random_ia = RandomNumber::get_instance().get();
 
   spdlog::debug("{}: Ends", "set_nuisance_ia");
