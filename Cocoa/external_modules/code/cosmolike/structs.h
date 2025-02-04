@@ -324,7 +324,6 @@ typedef struct
                                    // [3] = HALO PROFILE
 } likepara;
 
-
 typedef struct
 {
   double area;                    // survey_area in deg^2.

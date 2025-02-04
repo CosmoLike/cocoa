@@ -35,9 +35,7 @@ static int include_RSD_GY = 0; // 0 or 1
 double beam_cmb(const double l)
 {
   const double sigma = cmb.fwhm/sqrt(16.0*log(2.0));
-  double norm = 1.0;
-  if(l < like.lmin_kappacmb || l > like.lmax_kappacmb)  norm = 0.0;
-  return exp(-l*(l+1.0)*sigma*sigma)*norm;
+  return exp(-l*(l+1.0)*sigma*sigma);
 }
 
 double w_pixel(const double ell)
@@ -223,7 +221,6 @@ double xi_pm_tomo(
         {
           const int Z1NZ = Z1(nz);
           const int Z2NZ = Z2(nz);
-
           Cl[0][nz][l] = C_ss_tomo_limber_nointerp(l, Z1NZ, Z2NZ, 1, 0);
           Cl[1][nz][l] = C_ss_tomo_limber_nointerp(l, Z1NZ, Z2NZ, 0, 0);
         }

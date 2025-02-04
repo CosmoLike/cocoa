@@ -24,22 +24,22 @@
 // ----------------------------------------------------------------------------
 // ----------------------------------------------------------------------------
 
-double chi(double io_a)
+double chi(const double a)
 {
-  struct chis r = chi_all(io_a);
+  struct chis r = chi_all(a);
   return r.chi;
 }
 
-double dchi_da(double io_a)
+double dchi_da(const double a)
 {
-  struct chis r = chi_all(io_a);
+  struct chis r = chi_all(a);
   return r.dchida;
 }
 
-struct chis chi_all(double io_a)
+struct chis chi_all(const double a)
 {
-  double out_dchi[4];
-  const double redshift = 1.0/io_a - 1.0;
+  double out[2];
+  const double z = 1.0/a - 1.0;
 
   int j = 0;
   {
@@ -48,7 +48,7 @@ struct chis chi_all(double io_a)
     while (ihi > ilo + 1)
     {
       size_t ll = (ihi + ilo)/2;
-      if (cosmology.chi[0][ll] > redshift)
+      if (cosmology.chi[0][ll] > z)
         ihi = ll;
       else
         ilo = ll;
@@ -56,9 +56,9 @@ struct chis chi_all(double io_a)
     j = ilo;
   }
 
-  double dy = (redshift              - cosmology.chi[0][j])/
-              (cosmology.chi[0][j+1] - cosmology.chi[0][j]);
-  out_dchi[0] = cosmology.chi[1][j] + dy*(cosmology.chi[1][j+1] - cosmology.chi[1][j]);
+  const double dy = (z                     - cosmology.chi[0][j])/
+                    (cosmology.chi[0][j+1] - cosmology.chi[0][j]);
+  out[0] = cosmology.chi[1][j] + dy*(cosmology.chi[1][j+1]-cosmology.chi[1][j]);
 
   if (j>0)
   {
@@ -67,7 +67,7 @@ struct chis chi_all(double io_a)
     
     const double down = (cosmology.chi[1][j+1] - cosmology.chi[1][j-1])/
                         (cosmology.chi[0][j+1] - cosmology.chi[0][j-1]);
-    out_dchi[1] = down + dy*(up-down);
+    out[1] = down + dy*(up-down);
   }
   else 
   {
@@ -76,39 +76,39 @@ struct chis chi_all(double io_a)
     
     const double down = (cosmology.chi[1][j+1] - cosmology.chi[1][j])/
                         (cosmology.chi[0][j+1] - cosmology.chi[0][j]);
-    out_dchi[1] = down + dy*(up-down);
+    out[1] = down + dy*(up-down);
   }
 
   // convert from (Mpc/h) to (Mpc/h)/(c/H0=100)^3 (dimensioneless)
-  out_dchi[1] = (out_dchi[1]/cosmology.coverH0);
+  out[1] = (out[1]/cosmology.coverH0);
   // convert from d\chi/dz to d\chi/da
-  out_dchi[1] = out_dchi[1]/(io_a*io_a);
+  out[1] = out[1]/(a*a);
 
   struct chis result;
-  result.chi = out_dchi[0]/cosmology.coverH0;
-  result.dchida = out_dchi[1];
+  result.chi = out[0]/cosmology.coverH0;
+  result.dchida = out[1];
   return result;
 }
 
-double dchi_dz(double io_a)
+double dchi_dz(const double a)
 {
-  return (io_a*io_a)*dchi_da(io_a);
+  return (a*a)*dchi_da(a);
 }
 
-double hoverh0(double io_a)
+double hoverh0(const double a)
 {
-  return 1.0/dchi_dz(io_a);
+  return 1.0/dchi_dz(a);
 }
 
-double hoverh0v2(double io_a, double dchida)
+double hoverh0v2(const double a, const double dchida)
 {
-  return 1.0/((io_a*io_a)*dchida);
+  return 1.0/((a*a)*dchida);
 }
 
-double a_chi(double io_chi)
+double a_chi(const double io_chi)
 {
   // convert from (Mpc/h)/(c/H0=100)^3 (dimensioneless) to (Mpc/h)
-  io_chi *= cosmology.coverH0;
+  const double chi = io_chi*cosmology.coverH0;
 
   int j = 0;
   {
@@ -117,7 +117,7 @@ double a_chi(double io_chi)
     while (ihi > ilo + 1)
     {
       size_t ll = (ihi + ilo)/2;
-      if (cosmology.chi[1][ll] > io_chi)
+      if (cosmology.chi[1][ll] > chi)
         ihi = ll;
       else
         ilo = ll;
@@ -125,9 +125,9 @@ double a_chi(double io_chi)
     j = ilo;
   }
 
-  double dy = (io_chi                - cosmology.chi[1][j])/
-              (cosmology.chi[1][j+1] - cosmology.chi[1][j]);
-  double z  = cosmology.chi[0][j] + dy*(cosmology.chi[0][j+1] - cosmology.chi[0][j]);
+  const double dy = (chi                   - cosmology.chi[1][j])/
+                    (cosmology.chi[1][j+1] - cosmology.chi[1][j]);
+  double z  = cosmology.chi[0][j] + dy*(cosmology.chi[0][j+1]-cosmology.chi[0][j]);
 
   return 1.0/(1.0+z);
 }
@@ -140,9 +140,9 @@ double a_chi(double io_chi)
 // ----------------------------------------------------------------------------
 // ----------------------------------------------------------------------------
 
-double growfac(double io_a)
+double growfac(const double a)
 {
-  return norm_growfac(io_a, true);
+  return norm_growfac(a, true);
 }
 
 double norm_growfac(const double a, const bool normalize_z0)
@@ -290,9 +290,9 @@ struct growths norm_growfac_all(const double a, const bool normalize_z0)
   return Gf;
 }
 
-struct growths growfac_all(double io_a)
+struct growths growfac_all(const double a)
 {
-  return norm_growfac_all(io_a, true);
+  return norm_growfac_all(a, true);
 }
 
 // ----------------------------------------------------------------------------

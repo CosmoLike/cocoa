@@ -16,31 +16,33 @@ struct growths {
   double f;
 };
 
-struct growths growfac_all(double io_a);
+struct growths growfac_all(const double a);
 
 // return chi and dchi_da in a single spline call (faster)
-struct chis chi_all(double io_a);
+struct chis chi_all(const double a);
 
 double norm_growfac(const double a, const bool normalize_z0);
 
 double f_growth(const double z);
 
-double growfac(double a);
+double growfac(const double a);
 
 // ----------------------------------------------------------------------
 // ----------------------------------------------------------------------
 
 double f_K(double chi);
 
-double chi(double a);
+double chi(const double a);
 
-double dchi_da(double a);
+double dchi_dz(const double a);
 
-double hoverh0(double a);
+double dchi_da(const double a);
 
-double hoverh0v2(double io_a, double dchida);
+double hoverh0(const double a);
 
-double a_chi(double chi1);
+double hoverh0v2(const double a, const double dchida);
+
+double a_chi(const double io_chi);
 
 // ----------------------------------------------------------------------
 // ----------------------------------------------------------------------
