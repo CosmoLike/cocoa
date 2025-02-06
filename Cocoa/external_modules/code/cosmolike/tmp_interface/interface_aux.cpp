@@ -47,7 +47,8 @@ arma::Mat<double> read_table(const std::string file_name)
 
   if (!input_file.is_open())
   {
-    spdlog::critical("{}: file {} cannot be opened", "read_table", file_name);
+    const std::string etmp = "read_table";
+    spdlog::critical("{}: file {} cannot be opened", etmp, file_name);
     exit(1);
   }
 
@@ -116,8 +117,8 @@ arma::Mat<double> read_table(const std::string file_name)
     
     if (words.size() != ncols)
     {
-      spdlog::critical("{}: file {} is not well formatted"
-        " (regular table required)", "read_table", file_name);
+      const std::string etmp = "read_table";
+      spdlog::critical("{}: file {} is not well formatted", etmp, file_name);
       exit(1);
     }
     

@@ -396,18 +396,19 @@ double p_nonlin(const double k, const double a)
     j = ilo;
   }
 
-  double dx = (log10k                                 - cosmology.lnP[i][cosmology.lnP_nz])/
+  double dx = (log10k                               - cosmology.lnP[i][cosmology.lnP_nz])/
               (cosmology.lnP[i+1][cosmology.lnP_nz] - cosmology.lnP[i][cosmology.lnP_nz]);
 
-  double dy = (z                                     - cosmology.lnP[cosmology.lnP_nk][j])/
+
+  double dy = (z                                   - cosmology.lnP[cosmology.lnP_nk][j])/
               (cosmology.lnP[cosmology.lnP_nk][j+1]- cosmology.lnP[cosmology.lnP_nk][j]);
+
 
   const double out_lnP =    (1-dx)*(1-dy)*cosmology.lnP[i][j]
                           + (1-dx)*dy*cosmology.lnP[i][j+1]
                           + dx*(1-dy)*cosmology.lnP[i+1][j]
                           + dx*dy*cosmology.lnP[i+1][j+1];
 
-  // convert from (Mpc/h)^3 to (Mpc/h)^3/(c/H0=100)^3 (dimensioneless)
   return exp(out_lnP)/(cosmology.coverH0*cosmology.coverH0*cosmology.coverH0);
 }
 

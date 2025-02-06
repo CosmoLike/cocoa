@@ -70,9 +70,9 @@ std::tuple<std::string,int> get_baryon_sim_name_and_tag(std::string sim)
 
     if (count > 1)
     {
-      spdlog::critical(
-        "{}: Scenario {} not supported (too many dashes)", 
-        "get_baryon_sim_name_and_tag", sim);
+      const std::string etmp = "get_baryon_sim_name_and_tag";
+      const std::string emsg = "{}: Scenario {} not supported (too many dashes)";
+      spdlog::critical(emsg, etmp, sim);
       exit(1);
     }
   }

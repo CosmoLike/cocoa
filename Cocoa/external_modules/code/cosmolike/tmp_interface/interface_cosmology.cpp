@@ -86,6 +86,7 @@ void set_distances(arma::Col<double> io_z, arma::Col<double> io_chi)
   else
     if (io_z.n_elem == 0)
       debug_fail = true;
+  
   if (debug_fail)
   {
     spdlog::critical("{}: incompatible input w/ z.size = {} and G.size = {}",
@@ -148,6 +149,7 @@ void set_growth(arma::Col<double> io_z, arma::Col<double> io_G)
   else
     if (io_z.n_elem == 0)
       debug_fail = true;
+  
   if (debug_fail)
   {
     spdlog::critical("{}: incompatible input w/ z.size = {} and G.size = {}",
@@ -211,6 +213,7 @@ void set_linear_power_spectrum(arma::Col<double> io_log10k,
   else
     if (io_z.n_elem == 0 || io_log10k.n_elem == 0)
       debug_fail = true;
+  
   if (debug_fail)
   {
     spdlog::critical("{}: incompatible input w/ k.size = {}, z.size = {}, "
@@ -305,6 +308,7 @@ void set_non_linear_power_spectrum(arma::Col<double> io_log10k,
   else
     if (io_z.n_elem == 0)
       debug_fail = true;
+  
   if (debug_fail)
   {
     spdlog::critical("{}: incompatible input w/ k.size = {}, z.size = {}, "

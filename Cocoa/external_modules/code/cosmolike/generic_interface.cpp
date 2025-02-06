@@ -95,11 +95,7 @@ matrix read_table(const std::string file_name)
   
   if(tmp.empty())
   {
-    spdlog::critical(
-        "{}: file {} is empty",
-        "read_table",
-        file_name
-      );
+    spdlog::critical("{}: file {} is empty", "read_table", file_name);
     exit(1);
   }
   
@@ -134,6 +130,9 @@ matrix read_table(const std::string file_name)
     std::vector<std::string> words;
     words.reserve(100);
     
+    boost::trim_left(lines[0]);
+    boost::trim_right(lines[0]);
+
     boost::split(
       words,lines[0], 
       boost::is_any_of(" \t"),
@@ -141,13 +140,11 @@ matrix read_table(const std::string file_name)
     );
     
     ncols = words.size();
-    
+
     result.set_size(lines.size(), ncols);
     
     for (size_t j=0; j<ncols; j++)
-    {
       result(0,j) = std::stod(words[j]);
-    }
   }
 
   #pragma omp parallel for
@@ -155,6 +152,9 @@ matrix read_table(const std::string file_name)
   {
     std::vector<std::string> words;
     
+    boost::trim_left(lines[i]);
+    boost::trim_right(lines[i]);
+
     boost::split(
       words, 
       lines[i], 
@@ -164,19 +164,13 @@ matrix read_table(const std::string file_name)
     
     if (words.size() != ncols)
     {
-      spdlog::critical(
-          "{}: file {} is not well formatted"
-          " (regular table required)", 
-          "read_table", 
-          file_name
-        );
+      spdlog::critical("{}: file {} is not well formatted"
+        " (regular table required)", "read_table", file_name);
       exit(1);
     }
     
     for (size_t j=0; j<ncols; j++)
-    {
       result(i,j) = std::stod(words[j]);
-    }
   };
   
   return result;
@@ -1385,7 +1379,6 @@ void init_source_sample(std::string multihisto_file, const int Ntomo)
     }
   
     redshift.shear_zdist_zmin_all = fmax(z_v[0], 1.e-5);
-    
     redshift.shear_zdist_zmax_all = z_v[nzbins-1] + 
       (z_v[nzbins-1] - z_v[0]) / ((double) nzbins - 1.);
 
@@ -1394,7 +1387,7 @@ void init_source_sample(std::string multihisto_file, const int Ntomo)
       auto nofz = input_table.col(k+1).eval();
       
       arma::uvec idx = arma::find(nofz > 0.999e-8*nofz.max());
-      redshift.shear_zdist_zmin[k] = z_v[idx(0)];
+      redshift.shear_zdist_zmin[k] = fmax(z_v[idx(0)], 1.001e-5);
       redshift.shear_zdist_zmax[k] = z_v[idx(idx.n_elem-1)];
     }
   

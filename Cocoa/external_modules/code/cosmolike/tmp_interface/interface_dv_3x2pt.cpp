@@ -57,30 +57,30 @@ void init_data_vector_size_3x2pt_real_space()
 
   if (tomo.shear_Npowerspectra == 0)
   {
-    spdlog::critical(
-      "{}: {} not set prior to this function call",
-      "init_data_vector_size_3x2pt_real_space", "tomo.shear_Npowerspectra");
+    const std::string emsg = "{}: {} not set prior to this function call";
+    const std::string etmp = "init_data_vector_size_3x2pt_real_space";
+    spdlog::critical(emsg, etmp, "tomo.shear_Npowerspectra");
     exit(1);
   }
   if (tomo.ggl_Npowerspectra == 0)
   {
-    spdlog::critical(
-      "{}: {} not set prior to this function call",
-      "init_data_vector_size_3x2pt_real_space", "tomo.ggl_Npowerspectra");
+    const std::string emsg = "{}: {} not set prior to this function call";
+    const std::string etmp = "init_data_vector_size_3x2pt_real_space";
+    spdlog::critical(emsg, etmp, "tomo.ggl_Npowerspectra");
     exit(1);
   }
   if (tomo.clustering_Npowerspectra == 0)
   {
-    spdlog::critical(
-      "{}: {} not set prior to this function call",
-      "init_data_vector_size_3x2pt_real_space", "tomo.clustering_Npowerspectra");
+    const std::string emsg = "{}: {} not set prior to this function call";
+    const std::string etmp = "init_data_vector_size_3x2pt_real_space";
+    spdlog::critical(emsg, etm, "tomo.clustering_Npowerspectra");
     exit(1);
   }
   if (Ntable.Ntheta == 0) 
   {
-    spdlog::critical(
-      "{}: {} not set prior to this function call",
-      "init_data_vector_size_3x2pt_real_space", "Ntable.Ntheta");
+    const std::string emsg = "{}: {} not set prior to this function call";
+    const std::string etmp = "init_data_vector_size_3x2pt_real_space";
+    spdlog::critical(emsg, etmp, "Ntable.Ntheta");
     exit(1);
   }
 
@@ -104,28 +104,30 @@ void init_data_vector_size_3x2pt_fourier_space()
 
   if (tomo.shear_Npowerspectra == 0)
   {
-    spdlog::critical("{}: {} not set prior to this function call",
-      "init_data_vector_size_3x2pt_fourier_space", "tomo.shear_Npowerspectra");
+    const std::string emsg = "{}: {} not set prior to this function call";
+    const std::string etmp = "init_data_vector_size_3x2pt_fourier_space";
+    spdlog::critical(emsg, etmp, "tomo.shear_Npowerspectra");
     exit(1);
   }
   if (tomo.ggl_Npowerspectra == 0)
   {
-    spdlog::critical("{}: {} not set prior to this function call",
-      "init_data_vector_size_3x2pt_fourier_space", "tomo.ggl_Npowerspectra");
+    const std::string emsg = "{}: {} not set prior to this function call";
+    const std::string etmp = "init_data_vector_size_3x2pt_fourier_space";
+    spdlog::critical(emsg, etmp, "tomo.ggl_Npowerspectra");
     exit(1);
   }
   if (tomo.clustering_Npowerspectra == 0)
   {
-    spdlog::critical("{}: {} not set prior to this function call",
-      "init_data_vector_size_3x2pt_fourier_space", 
-      "tomo.clustering_Npowerspectra");
+    const std::string emsg = "{}: {} not set prior to this function call";
+    const std::string etmp = "init_data_vector_size_3x2pt_fourier_space";
+    spdlog::critical(emsg, etmp, "tomo.clustering_Npowerspectra");
     exit(1);
   }
   if (like.Ncl == 0) 
   {
-    spdlog::critical("{}: {} not set prior to this function call",
-      "init_data_vector_size_3x2pt_fourier_space", 
-      "like.Ncl");
+    const std::string emsg = "{}: {} not set prior to this function call";
+    const std::string etmp = "init_data_vector_size_3x2pt_fourier_space";
+    spdlog::critical(emsg, etmp, "like.Ncl");
     exit(1);
   }
 
@@ -134,9 +136,8 @@ void init_data_vector_size_3x2pt_fourier_space()
                 + like.Ncl*tomo.clustering_Npowerspectra;
   
   spdlog::debug("{}: {} = {} selected.", 
-    "init_data_vector_size_3x2pt_fourier_space", 
-    "Ndata", like.Ndata);
-  
+    "init_data_vector_size_3x2pt_fourier_space", "Ndata", like.Ndata);
+
   spdlog::debug("{}: Ends", "init_data_vector_size_3x2pt_fourier_space");
 }
 
@@ -247,20 +248,23 @@ vector compute_data_vector_3x2pt_real_masked_any_order(arma::Col<int>::fixed<3> 
 
   if (redshift.shear_nbin == 0)
   {
-    spdlog::critical("{}: {} = 0 is invalid",
-      "compute_data_vector_3x2pt_real_masked_any_order", "shear_Nbin");
+    const std::string emsg = "{}: {} = 0 is invalid";
+    const std::string etmp = "compute_data_vector_3x2pt_real_masked_any_order";
+    spdlog::critical(emsg, etmp, "shear_Nbin");
     exit(1);
   }
   if (Ntable.Ntheta == 0)
   {
-    spdlog::critical("{}: {} = 0 is invalid",
-      "compute_data_vector_3x2pt_real_masked_any_order", "Ntheta");
+    const std::string emsg = "{}: {} = 0 is invalid";
+    const std::string etmp = "compute_data_vector_3x2pt_real_masked_any_order";
+    spdlog::critical(emsg, etmp, "Ntheta");
     exit(1);
   }
   if (!IP::get_instance().is_mask_set())
   {
-    spdlog::critical("{}: {} not set prior to this function call",
-      "compute_data_vector_3x2pt_real_masked_any_order", "mask");
+    const std::string emsg = "{}: {} not set prior to this function call";
+    const std::string etmp = "compute_data_vector_3x2pt_real_masked_any_order";
+    spdlog::critical(emsg, etmp, "IP::is_mask_set");
     exit(1);
   }
 
@@ -306,14 +310,16 @@ arma::Col<double> compute_data_vector_3x2pt_real_masked_any_order(
 {
   if (!BaryonScenario::get_instance().is_pcs_set())
   {
-    spdlog::critical("{}: {} not set prior to this function call",
-      "compute_data_vector_3x2pt_real_masked_any_order", "baryon PCs");
+    const std::string emsg = "{}: {} not set prior to this function call";
+    const std::string etmp = "compute_data_vector_3x2pt_real_masked_any_order";
+    spdlog::critical(emsg, etmp, "BaryonScenario::is_pcs_set()");
     exit(1);
   }
   if (BaryonScenario::get_instance().get_pcs().row(0).n_elem < Q.n_elem)
   {
-    spdlog::critical("{}: {} invalid PC amplitude vector or PC eigenvectors",
-      "compute_data_vector_3x2pt_real_masked_any_order");
+    const std::string emsg = "{}: {} invalid PC amplitude vector or PC eigenvectors";
+    const std::string etmp = "compute_data_vector_3x2pt_real_masked_any_order";
+    spdlog::critical(emsg, etmp);
     exit(1);
   }
 
@@ -321,8 +327,9 @@ arma::Col<double> compute_data_vector_3x2pt_real_masked_any_order(
   
   if (BaryonScenario::get_instance().get_pcs().col(0).n_elem != dv.n_elem)
   {
-    spdlog::critical("{}: {} invalid datavector or PC eigenvectors",
-      "compute_data_vector_3x2pt_real_masked_any_order");
+    const std::string emsg = "{}: {} invalid datavector or PC eigenvectors";
+    const std::string etmp = "compute_data_vector_3x2pt_real_masked_any_order";
+    spdlog::critical(emsg, etmp);
     exit(1);
   }
 
@@ -331,6 +338,7 @@ arma::Col<double> compute_data_vector_3x2pt_real_masked_any_order(
     for (int i=0; i<Q.n_elem; i++)
       if (IP::get_instance().get_mask(j))
         dv(j) += Q(i) * BaryonScenario::get_instance().get_pcs(j, i);
+  
   return dv;
 }
 
@@ -424,24 +432,28 @@ void compute_gg_fourier_masked(arma::Col<double>& data_vector, const int start)
 // ---------------------------------------------------------------------------
 // ---------------------------------------------------------------------------
 
-vector compute_data_vector_3x2pt_fourier_masked_any_order(arma::Col<int>::fixed<3> order)
+vector compute_data_vector_3x2pt_fourier_masked_any_order(
+    arma::Col<int>::fixed<3> order
+  )
 { // order = (1,2,3) => Cosmic Shear, ggl, gg
   spdlog::debug("{}: Begins","compute_data_vector_3x2pt_fourier_masked_any_order");
 
   if (redshift.shear_nbin == 0)
   {
-    spdlog::critical("{}: {} = 0 is invalid",
-      "compute_data_vector_3x2pt_fourier_masked_any_order", "shear_Nbin");
+    const std::string emsg = "{}: {} = 0 is invalid";
+    const std::string etmp = "compute_data_vector_3x2pt_fourier_masked_any_order";
+    spdlog::critical(emsg, etmp, "shear_Nbin");
     exit(1);
   }
   if (like.Ncl == 0)
   {
-    spdlog::critical("{}: {} = 0 is invalid",
-      "compute_data_vector_3x2pt_fourier_masked_any_order", "Ncl");
+    const std::string emsg = "{}: {} = 0 is invalid";
+    const std::string etmp = "compute_data_vector_3x2pt_fourier_masked_any_order";
+    spdlog::critical(emsg, etmp, "Ncl");
     exit(1);
   }
 
-  // check if there are not equal elements
+  // TODO: check if there are not equal elements
   constexpr int sz = 3;
 
   auto indices = arma::conv_to<arma::Col<int>>::from(
@@ -458,12 +470,8 @@ vector compute_data_vector_3x2pt_fourier_masked_any_order(arma::Col<int>::fixed<
   arma::Col<int>::fixed<sz> start = {0,0,0};
 
   for(int i=0; i<sz; i++)
-  {
     for(int j=0; j<indices(i); j++)
-    {
       start(i) += sizes(indices(j));
-    }
-  }
   
   vector data_vector(like.Ndata, arma::fill::zeros);
   
