@@ -1031,12 +1031,12 @@ void init_IA(const int IA_MODEL, const int IA_REDSHIFT_EVOL)
 
   if (IA_MODEL == 0 || IA_MODEL == 1)
   {
-    like.IA_MODEL = IA_MODEL;
+    nuisance.IA_MODEL = IA_MODEL;
   }
   else
   {
     spdlog::critical("{}: {} = {} not supported", 
-      "init_IA", "like.IA_MODEL", IA_MODEL);
+      "init_IA", "nuisance.IA_MODEL", IA_MODEL);
     exit(1);
   }
 
@@ -1045,12 +1045,12 @@ void init_IA(const int IA_MODEL, const int IA_REDSHIFT_EVOL)
       IA_REDSHIFT_EVOL == IA_REDSHIFT_BINNING     || 
       IA_REDSHIFT_EVOL == IA_REDSHIFT_EVOLUTION)
   {
-    like.IA = IA_REDSHIFT_EVOL;
+    nuisance.IA = IA_REDSHIFT_EVOL;
   }
   else
   {
     spdlog::critical("{}: {} = {} not supported", 
-      "init_IA", "like.IA", IA_REDSHIFT_EVOL);
+      "init_IA", "nuisance.IA", IA_REDSHIFT_EVOL);
     exit(1);
   }
 
@@ -2230,7 +2230,7 @@ void set_nuisance_IA(
   int cache_update = 0;
   nuisance.c1rhocrit_ia = 0.01389;
   
-  if (like.IA == IA_REDSHIFT_BINNING)
+  if (nuisance.IA == IA_REDSHIFT_BINNING)
   {
     for (int i=0; i<redshift.shear_nbin; i++)
     {
@@ -2245,7 +2245,7 @@ void set_nuisance_IA(
       }
     }
   }
-  else if (like.IA == IA_REDSHIFT_EVOLUTION)
+  else if (nuisance.IA == IA_REDSHIFT_EVOLUTION)
   {
     nuisance.oneplusz0_ia = 1.62;
     if (fdiff(nuisance.ia[0][0],A1(0)) ||

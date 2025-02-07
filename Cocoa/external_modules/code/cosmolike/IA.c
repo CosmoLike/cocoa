@@ -255,7 +255,7 @@ void IA_A1_Z1Z2(
   double A_Z1 = 0.0;
   double A_Z2 = 0.0;
   
-  switch(like.IA)
+  switch(nuisance.IA)
   {
     case NO_IA:
     {
@@ -285,7 +285,7 @@ void IA_A1_Z1Z2(
     }
     default:
     {
-      log_fatal("like.IA = %d not supported", like.IA);
+      log_fatal("nuisance.IA = %d not supported", nuisance.IA);
       exit(1);
     }
   }
@@ -320,7 +320,7 @@ void IA_A2_Z1Z2(
   double A2_Z1 = 0.0;
   double A2_Z2 = 0.0;
 
-  switch(like.IA)
+  switch(nuisance.IA)
   {
     case NO_IA:
     {
@@ -343,13 +343,14 @@ void IA_A2_Z1Z2(
     {
       const double A_IA = nuisance.ia[1][0];
       const double eta  = nuisance.ia[1][1];
-      A2_Z1 = A_IA*pow((1.0/a)/nuisance.oneplusz0_ia, eta);
+      A2_Z1 = A_IA*pow(1.0/(a*nuisance.oneplusz0_ia), eta);
       A2_Z2 = A2_Z1;
       break;
     } 
+
     default:
     {
-      log_fatal("like.IA = %d not supported", like.IA);
+      log_fatal("nuissance.IA = %d not supported", nuisance.IA);
       exit(1);  
     }
   }
@@ -375,7 +376,7 @@ void IA_BTA_Z1Z2(
   double BTA_Z1 = 0.0;
   double BTA_Z2 = 0.0;
 
-  switch(like.IA)
+  switch(nuisance.IA)
   {
     case NO_IA:
     {
@@ -402,7 +403,7 @@ void IA_BTA_Z1Z2(
     }
     default:
     {
-      log_fatal("like.IA = %d not supported", like.IA);
+      log_fatal("nuisance.IA = %d not supported", nuisance.IA);
       exit(1);  
     }
   }

@@ -18,9 +18,9 @@ void get_FPT_bias(void)
 
   if (fdiff(cache[1], Ntable.random))
   {
-    FPTbias.k_min     = 1.e-6*cosmology.coverH0;
-    FPTbias.k_max     = 1.e+4*cosmology.coverH0;
-    FPTbias.N         = 1000 + 200 * Ntable.FPTboost;
+    FPTIA.k_min     = 1.e-5;
+    FPTIA.k_max     = 1.e+5;
+    FPTbias.N       = 1300 + 200 * Ntable.FPTboost;
     if (FPTbias.tab != NULL) free(FPTbias.tab);
     FPTbias.tab = (double**) malloc2d(7, FPTbias.N);
   }
@@ -62,21 +62,24 @@ void get_FPT_IA(void)
 
   if (fdiff(cache[1], Ntable.random))
   {
-    FPTIA.k_min     = 1.e-6*cosmology.coverH0;
-    FPTIA.k_max     = 1.e+4*cosmology.coverH0;
-    FPTIA.N         = 1000 + 200 * Ntable.FPTboost;
+    FPTIA.k_min     = 5.e-4;
+    FPTIA.k_max     = 1.e+6;
+    FPTIA.N         = 1200 + 200 * Ntable.FPTboost;
     
     if (FPTIA.tab != NULL) free(FPTIA.tab);
     FPTIA.tab = (double**) malloc2d(12, FPTIA.N);
   }
   if (fdiff(cache[0], cosmology.random) || fdiff(cache[1], Ntable.random))
   {
-    const double dlogk = (log(FPTIA.k_max)-log(FPTIA.k_min))/FPTIA.N;
+    double lim[3];
+    lim[0] = log(FPTIA.k_min);
+    lim[1] = log(FPTIA.k_max);
+    lim[2] = (lim[1] - lim[0])/FPTIA.N;
     
     #pragma omp parallel for
     for (int i=0; i<FPTIA.N; i++) 
     {
-      FPTIA.tab[10][i] = exp(log(FPTIA.k_min) + i*dlogk);
+      FPTIA.tab[10][i] = exp(lim[0] + i*lim[2]);
       FPTIA.tab[11][i] = p_lin(FPTIA.tab[10][i], 1.0);
     }
 
@@ -85,7 +88,7 @@ void get_FPT_IA(void)
     IA_ta(FPTIA.tab[10], FPTIA.tab[11], FPTIA.N, FPTIA.tab[2], 
       FPTIA.tab[3], FPTIA.tab[4], FPTIA.tab[5]);
     
-    IA_mix(FPTIA.tab[10], FPTIA.tab[11], FPTIA.N,FPTIA.tab[6], 
+    IA_mix(FPTIA.tab[10], FPTIA.tab[11], FPTIA.N, FPTIA.tab[6], 
       FPTIA.tab[7], FPTIA.tab[8], FPTIA.tab[9]);
     
     #pragma omp parallel for

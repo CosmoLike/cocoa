@@ -208,6 +208,9 @@ typedef struct
   // ia[1][1] = eta_ia_tt    if IA_REDSHIFT_EVOLUTION
   // ------------------
   // ia[2][MAX_SIZE_ARRAYS] = b_ta_z[MAX_SIZE_ARRAYS]
+  
+  int IA;
+  int IA_MODEL;
   double ia[MAX_SIZE_ARRAYS][MAX_SIZE_ARRAYS];
   double oneplusz0_ia;
   double c1rhocrit_ia;
@@ -289,8 +292,6 @@ typedef struct
   double lmax_bp;      // Note: for dv, only need binmat with corr
   double lmin_kappacmb;
   double lmax_kappacmb;
-  int IA;
-  int IA_MODEL;
   int bias;
   int shear_shear;
   int shear_pos;

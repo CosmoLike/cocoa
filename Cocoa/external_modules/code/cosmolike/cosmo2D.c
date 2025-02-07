@@ -957,7 +957,7 @@ double int_for_C_ss_tomo_limber(double a, void* params)
 
   double ans;
 
-  switch(like.IA_MODEL) 
+  switch(nuisance.IA_MODEL) 
   {
     case IA_MODEL_TATT:
     { 
@@ -997,7 +997,7 @@ double int_for_C_ss_tomo_limber(double a, void* params)
           g4*interpol1d(FPTIA.tab[4], FPTIA.N, lim[0], lim[1], lim[2], lnk);
         
         const double mixA = (lnk<lim[0] || lnk>lim[1]) ? 0.0 : 
-          g4*interpol1d (FPTIA.tab[6], FPTIA.N, lim[0], lim[1], lim[2], lnk);
+          g4*interpol1d(FPTIA.tab[6], FPTIA.N, lim[0], lim[1], lim[2], lnk);
         
         const double mixB = (lnk<lim[0] || lnk>lim[1]) ? 0.0 : 
           g4*interpol1d(FPTIA.tab[7], FPTIA.N, lim[0], lim[1], lim[2], lnk);
@@ -1009,10 +1009,18 @@ double int_for_C_ss_tomo_limber(double a, void* params)
               - WS1*WK2*(C11*PK + C11*bta1*(ta_dE1+ta_dE2) - 5*C21*(mixA+mixB))
               - WS2*WK1*(C12*PK + C12*bta2*(ta_dE1+ta_dE2) - 5*C22*(mixA+mixB))
               + WS1*WS2*(C11*C12*PK 
-                         + C11*C12*(bta1*bta2*ta + (bta1 + bta2)*(ta_dE1+ta_dE2))
-                         - 5*(C11*C22 + C12*C21)*(mixA+mixB)
-                         - 5*(C11*bta1*C22 + C12*bta2*C21)*mixEE
-                         + 25*C21*C22*tt);
+                         + C11*C12*(bta1*bta2*ta + (bta1+bta2)*(ta_dE1+ta_dE2))
+                         - 5.*(C11*C22 + C12*C21)*(mixA+mixB)
+                         - 5.*(C11*bta1*C22+C12*bta2*C21)*mixEE
+                         + 25.*C21*C22*tt);
+
+        double ans2 =   WK1*WK2*PK 
+              - WS1*WK2*C11*PK 
+              - WS2*WK1*C12*PK
+              + WS1*WS2*C11*C12*PK;
+
+        //if (fabs(ans) > 0 && fabs(ans/ans2 > 1.1))
+        //  printf("%.6e %.6e %.6e\n", ans, ans2, ans/ans2);
       }
       else  
       {        
@@ -1026,8 +1034,8 @@ double int_for_C_ss_tomo_limber(double a, void* params)
           g4*interpol1d(FPTIA.tab[9],FPTIA.N, lim[0], lim[1], lim[2], lnk);
         
         ans = WS1*WS2*(C11*C12*bta1*bta2*ta 
-                       - 5*(C11*bta1*C22+C12*bta2*C21)*mix 
-                       + 25*C21*C22*tt);
+                       - 5.*(C11*bta1*C22+C12*bta2*C21)*mix 
+                       + 25.*C21*C22*tt);
       }
       break;
     }
@@ -1052,7 +1060,7 @@ double int_for_C_ss_tomo_limber(double a, void* params)
     }
     default:
     {
-      log_fatal("like.IA_MODEL = %d not supported", like.IA_MODEL);
+      log_fatal("nuisance.IA_MODEL = %d not supported", nuisance.IA_MODEL);
       exit(1);
     }
   }
@@ -1182,8 +1190,7 @@ double C_ss_tomo_limber(const double l, const int ni, const int nj, const int EE
     log_fatal("internal logic error in selecting bin number");
     exit(1);
   }
-  return  interpol1d((EE == 1) ? table[0][q] : table[1][q], 
-                     nell, lim[0], lim[1], lim[2], lnl);
+  return  interpol1d((1==EE)?table[0][q]:table[1][q],nell,lim[0],lim[1],lim[2],lnl);
 }
 
 // ---------------------------------------------------------------------------
@@ -1235,7 +1242,7 @@ double int_for_C_gs_tomo_limber(double a, void* params)
 
   double ans;
 
-  switch(like.IA_MODEL)
+  switch(nuisance.IA_MODEL)
   {
     case IA_MODEL_TATT:
     {
@@ -1302,9 +1309,11 @@ double int_for_C_gs_tomo_limber(double a, void* params)
       const double btazs = IA_BTA_Z1(a, growfac_a, ns);
       const double C2ZS  = IA_A2_Z1(a, growfac_a, ns);
 
-      ans = (WK-WS*C1ZS)*((WGAL*b1+WMAG*ell_prefactor*bmag+WRSD)*PK+WGAL*oneloop) 
-            - WS*(WGAL*b1 + WMAG*ell_prefactor*bmag)*(C1ZS*btazs*(ta_dE1+ta_dE2) 
-                                                      - 5*C2ZS*(mixA+mixB));
+      // TODO: IS THIS CONSISTENT (WRSD, ONELOOP AND IA CROSS TERMS)?
+      ans =  WK*((WGAL*b1+WMAG*ell_prefactor*bmag+WRSD)*PK+WGAL*oneloop) 
+            -WS*(WGAL*b1+WMAG*ell_prefactor*bmag)*( C1ZS*PK
+                                                    + C1ZS*btazs*(ta_dE1+ta_dE2) 
+                                                    - 5*C2ZS*(mixA+mixB));
       break;
     }
     case IA_MODEL_NLA:
@@ -1358,7 +1367,7 @@ double int_for_C_gs_tomo_limber(double a, void* params)
     }
     default:
     {
-      log_fatal("like.IA_MODEL = %d not supported", like.IA_MODEL);
+      log_fatal("nuisance.IA_MODEL = %d not supported", nuisance.IA_MODEL);
       exit(1);
     }
   }

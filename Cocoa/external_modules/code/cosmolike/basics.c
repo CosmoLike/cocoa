@@ -228,13 +228,17 @@ double interpol1d(
 {
   double ans;
   if (x < a) 
-    ans = f[0] + (x - a);
+  {  
+    ans = f[0]; // constant extrapolation
+  }
   else
   {
     const double r = (x - a) / dx;
     const int i = (int) floor(r);
-    if (i + 1 >= n) 
-      ans = f[n - 1] + (x - b);
+    if (i + 1 >= n)
+    {
+      ans = f[n-1]; // constant extrapolation
+    }
     else 
       ans = (r - i) * (f[i + 1] - f[i]) + f[i];
   }

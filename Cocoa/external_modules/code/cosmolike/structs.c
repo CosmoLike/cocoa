@@ -64,7 +64,6 @@ lim limits =
 
 void reset_like_struct()
 {
-  like.IA = 0.;
   like.bias = 0;
   like.Ncl = 0;
   like.Ncos = 0;
@@ -82,7 +81,7 @@ void reset_like_struct()
   like.lmax_shear = 0;
   like.lmin_kappacmb = 0;
   like.lmax_kappacmb = 0;
-  like.IA = 0;
+  
   like.bias = 0;
   like.clusterN = 0;
   like.clusterWL = 0;
@@ -216,6 +215,9 @@ void reset_nuisance_struct()
   }
   nuisance.oneplusz0_ia = 0.0;
   nuisance.c1rhocrit_ia = 0.01389;
+
+  nuisance.IA = 0;
+  nuisance.IA_MODEL = 0;
 }
 
 void reset_cmb_struct()

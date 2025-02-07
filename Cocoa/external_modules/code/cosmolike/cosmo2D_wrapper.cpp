@@ -225,7 +225,7 @@ py::tuple C_ss_TATT_tomo_limber_cpp(const vector l)
 
 py::tuple C_ss_tomo_limber_cpp(const double l, const int ni, const int nj)
 {
-  switch(like.IA_MODEL)
+  switch(nuisance.IA_MODEL)
   {
     case IA_MODEL_TATT:
     {
@@ -237,7 +237,7 @@ py::tuple C_ss_tomo_limber_cpp(const double l, const int ni, const int nj)
     }
     default:
     {
-      spdlog::critical("like.IA_MODEL = {} not supported", like.IA_MODEL);
+      spdlog::critical("nuisance.IA_MODEL = {} not supported", nuisance.IA_MODEL);
       exit(1);
     }
   }
@@ -245,7 +245,7 @@ py::tuple C_ss_tomo_limber_cpp(const double l, const int ni, const int nj)
 
 py::tuple C_ss_tomo_limber_cpp(vector l)
 {
-  switch(like.IA_MODEL)
+  switch(nuisance.IA_MODEL)
   {
     case IA_MODEL_TATT:
     {
@@ -260,7 +260,7 @@ py::tuple C_ss_tomo_limber_cpp(vector l)
     }
     default:
     {
-      spdlog::critical("like.IA_MODEL = {} not supported", like.IA_MODEL);
+      spdlog::critical("nuisance.IA_MODEL = {} not supported", nuisance.IA_MODEL);
       exit(1);
     }
   }
@@ -742,7 +742,7 @@ double int_for_C_gs_tomo_limber_cpp(
 
   double res;
 
-  switch(like.IA_MODEL)
+  switch(nuisance.IA_MODEL)
   {
     case IA_MODEL_TATT:
     {
@@ -759,7 +759,7 @@ double int_for_C_gs_tomo_limber_cpp(
     }
     default:
     {
-      spdlog::critical("like.IA_MODEL = {} not supported", like.IA_MODEL);
+      spdlog::critical("nuisance.IA_MODEL = {} not supported", nuisance.IA_MODEL);
       exit(1);
     }
   }
@@ -786,7 +786,7 @@ cube int_for_C_gs_tomo_limber_cpp(const vector a, const vector l)
   }
   #pragma GCC diagnostic pop
 
-  switch(like.IA_MODEL)
+  switch(nuisance.IA_MODEL)
   {
     case IA_MODEL_TATT:
     {
@@ -840,7 +840,7 @@ cube int_for_C_gs_tomo_limber_cpp(const vector a, const vector l)
     }
     default:
     {
-      spdlog::critical("like.IA_MODEL = {} not supported", like.IA_MODEL);
+      spdlog::critical("nuisance.IA_MODEL = {} not supported", nuisance.IA_MODEL);
       exit(1);
     }
   }
@@ -1064,7 +1064,7 @@ double int_for_C_ks_tomo_limber_cpp(
 
   double res = 0.0;
 
-  switch(like.IA_MODEL)
+  switch(nuisance.IA_MODEL)
   {
     case IA_MODEL_NLA:
     {
@@ -1072,7 +1072,7 @@ double int_for_C_ks_tomo_limber_cpp(
     }
     default:
     {
-      spdlog::critical("like.IA_MODEL = {} not supported", like.IA_MODEL);
+      spdlog::critical("nuisance.IA_MODEL = {} not supported", nuisance.IA_MODEL);
       exit(1);
     }
   }
@@ -1132,7 +1132,7 @@ double int_for_C_ys_tomo_limber_cpp(
 
   double res = 0.0;
 
-  switch(like.IA_MODEL)
+  switch(nuisance.IA_MODEL)
   {
     case IA_MODEL_NLA:
     {
@@ -1140,7 +1140,7 @@ double int_for_C_ys_tomo_limber_cpp(
     }
     default:
     {
-      spdlog::critical("like.IA_MODEL = {} not supported", like.IA_MODEL);
+      spdlog::critical("nuisance.IA_MODEL = {} not supported", nuisance.IA_MODEL);
       exit(1);
     }
   }
