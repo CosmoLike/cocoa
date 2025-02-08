@@ -479,9 +479,9 @@ void init_binning_fourier(
     exit(1);
   }
 
-  spdlog::debug("{}: {} = {} selected.", "init_binning_fourier", "Nells", Nells);
-  spdlog::debug("{}: {} = {} selected.", "init_binning_fourier", "l_min", lmin);
-  spdlog::debug("{}: {} = {} selected.", "init_binning_fourier", "l_max", lmax);
+  spdlog::debug("{}: {} = {} selected.","init_binning_fourier","Nells",Nells);
+  spdlog::debug("{}: {} = {} selected.","init_binning_fourier","l_min",lmin);
+  spdlog::debug("{}: {} = {} selected.","init_binning_fourier","l_max",lmax);
 
   like.Ncl = Nells;
   
@@ -1252,9 +1252,7 @@ void init_lens_sample(std::string multihisto_file, const int Ntomo)
     {
       z_v[i] = input_table(i,0);
       for (int k=0; k<Ntomo; k++) 
-      {
         tab[k][i] = input_table(i,k+1);
-      }
     }
     
     redshift.clustering_zdist_zmin_all = fmax(z_v[0], 1.e-5);
@@ -1279,10 +1277,7 @@ void init_lens_sample(std::string multihisto_file, const int Ntomo)
     pf_photoz(0.1, 0); // init static variables
 
     for (int k=0; k<Ntomo; k++)
-    {
-      spdlog::debug("{}: bin {} - {} = {}.", "init_lens_sample", 
-        k, "<z_s>", zmean(k));
-    } 
+      spdlog::debug("{}: bin {} - {} = {}.","init_lens_sample",k,"<z_s>",zmean(k));
   }
 
   spdlog::debug("{}: Ends", "init_lens_sample");
@@ -1412,11 +1407,8 @@ void init_source_sample(std::string multihisto_file, const int Ntomo)
     zdistr_photoz(0.1, 0); // init static variables
 
     for (int k=0; k<Ntomo; k++)
-    {
-      spdlog::debug("{}: bin {} - {} = {}.", "init_source_sample", 
-        k, "<z_s>", zmean_source(k));
-    }
-
+      spdlog::debug("{}: bin {} - {} = {}.","init_source_sample",k,"<z_s>",zmean_source(k));
+  
     redshift.random_shear = RandomNumber::get_instance().get();
   }
 

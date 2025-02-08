@@ -32,13 +32,13 @@ arma::Col<double> w_ks_tomo_cpp();
 // ---------------------------------------------------------------------------
 // ---------------------------------------------------------------------------
 
-py::tuple C_ss_TATT_tomo_limber_cpp(
+py::tuple C_ss_tomo_limber_cpp(
     const double l, 
     const int ni, 
     const int nj
   );
 
-py::tuple C_ss_TATT_tomo_limber_cpp(
+py::tuple C_ss_tomo_limber_cpp(
     const arma::Col<double> l
   );
 
@@ -54,33 +54,11 @@ py::tuple int_for_C_ss_tomo_limber_cpp(
     const arma::Col<double> l
   );
 
-double int_for_C_ss_EE_tomo_limber_cpp(
-    const double a, 
-    const double l, 
-    const int ni, 
-    const int nj
-  );
-
-arma::Cube<double> int_for_C_ss_EE_tomo_limber_cpp(
-    arma::Col<double> a, 
-    arma::Col<double> l
-  );
-
-double int_for_C_ss_BB_tomo_limber_cpp(
-    const double a, 
-    const double l, 
-    const int ni, 
-    const int nj
-  );
-
-arma::Cube<double> int_for_C_ss_BB_tomo_limber_cpp(
-    arma::Col<double> a, 
-    arma::Col<double> l
-  );
-
 // ---------------------------------------------------------------------------
 // ---------------------------------------------------------------------------
 // ---------------------------------------------------------------------------
+
+arma::Mat<double> gs_bins();
 
 double C_gs_tomo_limber_cpp(
     const double l, 
@@ -104,28 +82,7 @@ arma::Cube<double> int_for_C_gs_tomo_limber_cpp(
     const arma::Col<double> l
   );
 
-// ---------------------------------------------------------------------------
 
-double C_gg_tomo_limber_cpp(
-    const double l, 
-    const int nz
-  );
-
-arma::Mat<double> C_gg_tomo_limber_cpp(
-    const arma::Col<double> l
-  );
-
-double int_for_C_gg_tomo_limber_cpp(
-    const double a, 
-    const double l, 
-    const int ni, 
-    const int nj
-  );
-
-arma::Cube<double> int_for_C_gg_tomo_limber_cpp(
-    const arma::Col<double> a, 
-    const arma::Col<double> l
-  );
 
 // ---------------------------------------------------------------------------
 
