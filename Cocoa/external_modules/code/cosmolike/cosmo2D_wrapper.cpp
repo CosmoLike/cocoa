@@ -98,13 +98,16 @@ py::tuple xi_pm_tomo_cpp()
   return py::make_tuple(carma::mat_to_arr(xp), carma::mat_to_arr(xm));
 }
 
-/* need to convert this to a matrix */
-arma::Col<double> w_gammat_tomo_cpp()
+arma::Cube<double> w_gammat_tomo_cpp()
 {  
-  arma::Col<double> result(Ntable.Ntheta*tomo.ggl_Npowerspectra,arma::fill::none);
+  arma::Cube<double> result(Ntable.Ntheta,
+                            redshift.clustering_nbin, 
+                            redshift.shear_nbin,
+                            arma::fill::zeros);
+  
   for (int nz=0; nz<tomo.ggl_Npowerspectra; nz++)
     for (int i=0; i<Ntable.Ntheta; i++)
-      result(Ntable.Ntheta*nz+i) = w_gammat_tomo(i, ZL(nz), ZS(nz), 1);
+      result(i,ZL(nz),ZS(nz)) = w_gammat_tomo(i, ZL(nz), ZS(nz), 1);
   return result;
 }
 
@@ -117,6 +120,7 @@ arma::Col<double> w_gg_tomo_cpp()
   return result;
 }
 
+/*
 arma::Col<double> w_gk_tomo_cpp()
 {
   arma::Col<double> result(Ntable.Ntheta*redshift.clustering_nbin,arma::fill::none);
@@ -134,6 +138,7 @@ arma::Col<double> w_ks_tomo_cpp()
       result(Ntable.Ntheta*nz+i) = w_ks_tomo(i, nz, 1);
   return result;
 }
+*/
 
 // ---------------------------------------------------------------------------
 // ---------------------------------------------------------------------------
