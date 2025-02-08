@@ -66,7 +66,7 @@ double C_gs_tomo_limber_cpp(
     const int nj
   );
 
-arma::Mat<double> C_gs_tomo_limber_cpp(
+arma::Cube<double> C_gs_tomo_limber_cpp(
     const arma::Col<double> l
   );
 

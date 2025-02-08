@@ -160,8 +160,8 @@ py::tuple C_ss_tomo_limber_cpp(const arma::Col<double> l)
     exit(1);
   }
   
-  arma::Mat<double> EE(l.n_elem, tomo.shear_Npowerspectra);
-  arma::Mat<double> BB(l.n_elem, tomo.shear_Npowerspectra);
+  arma::Mat<double> EE(l.n_elem,tomo.shear_Npowerspectra,arma::fill::zeros);
+  arma::Mat<double> BB(l.n_elem,tomo.shear_Npowerspectra,arma::fill::zeros);
 
   #pragma GCC diagnostic push
   #pragma GCC diagnostic ignored "-Wunused-variable"
@@ -206,7 +206,7 @@ double C_gs_tomo_limber_cpp(const double l, const int ni, const int nj)
   return C_gs_tomo_limber_nointerp(l, ni, nj, 0);
 }
 
-arma::Mat<double> C_gs_tomo_limber_cpp(const arma::Col<double> l)
+arma::Cube<double> C_gs_tomo_limber_cpp(const arma::Col<double> l)
 {
   if (!(l.n_elem > 0))
   {
@@ -214,7 +214,10 @@ arma::Mat<double> C_gs_tomo_limber_cpp(const arma::Col<double> l)
     exit(1);
   }
 
-  arma::Mat<double> result(l.n_elem, tomo.ggl_Npowerspectra);
+  arma::Cube<double> result(l.n_elem,
+                            redshift.clustering_nbin, 
+                            redshift.shear_nbin,
+                            arma::fill::zeros);
 
   #pragma GCC diagnostic push
   #pragma GCC diagnostic ignored "-Wunused-variable"
@@ -227,7 +230,7 @@ arma::Mat<double> C_gs_tomo_limber_cpp(const arma::Col<double> l)
   #pragma omp parallel for collapse(2)
   for (int nz=0; nz<tomo.ggl_Npowerspectra; nz++)
     for (int i=0; i<static_cast<int>(l.n_elem); i++)
-      result(i, nz) = C_gs_tomo_limber_nointerp(l(i),ZL(nz),ZS(nz),0);
+      result(i,ZL(nz),ZS(nz))=C_gs_tomo_limber_nointerp(l(i),ZL(nz),ZS(nz),0);
   return result;
 }
 
