@@ -550,7 +550,7 @@ double w_gg_tomo(const int nt, const int ni, const int nj, const int limber)
       for (int nz=0; nz<NSIZE; nz++) // NONLIMBER PART
       { 
         const int L = 1;
-        const double tolerance = 0.0075;     // required fractional accuracy in C(l)
+        const double tolerance = 0.01;     // required fractional accuracy in C(l)
         const double dev = 10. * tolerance; // will be diff  exact vs Limber init to
                                             // large value in order to start while loop
         const int Z1 = nz; // cross redshift bin not supported so not using ZCL1(k)

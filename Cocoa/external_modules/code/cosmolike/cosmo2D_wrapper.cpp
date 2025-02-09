@@ -125,15 +125,6 @@ arma::Cube<double> w_gg_tomo_cpp()
 }
 
 /*
-arma::Col<double> w_gg_tomo_cpp()
-{
-  arma::Col<double> result(Ntable.Ntheta*redshift.clustering_nbin,arma::fill::none);
-  for (int nz=0; nz<tomo.clustering_Npowerspectra; nz++)
-    for (int i=0; i<Ntable.Ntheta; i++)
-      result(Ntable.Ntheta*nz+i) = w_gg_tomo(i, nz, nz, 0);
-  return result;
-}
-
 
 arma::Col<double> w_gk_tomo_cpp()
 {
@@ -306,7 +297,7 @@ arma::Cube<double> C_gg_tomo_cpp(const arma::Col<double> l)
     if (idxs.n_elem > 0)
     {
       const int L = 1;
-      const double tolerance = 0.0075;     // required fractional accuracy in C(l)
+      const double tolerance = 0.01;     // required fractional accuracy in C(l)
       const double dev = 10. * tolerance; // will be diff  exact vs Limber init to
 
       arma::Col<double> Cl(limits.LMAX_NOLIMBER+1);
