@@ -34,7 +34,7 @@ lim limits =
   .M_min = 1.0e+6,              // M_min
   .M_max = 1.0e+17,             // M_max
   .LMIN_tab = 20,               // LMIN_tab
-  .LMAX_NOLIMBER = 250,         // LMAX_NOLIMBER
+  .LMAX_NOLIMBER = 150,         // LMAX_NOLIMBER
   .LMAX = 100000,
   .cluster_util_log_M_min = 12.0,
   .cluster_util_log_M_max = 15.9,
@@ -237,7 +237,6 @@ void reset_Ntable_struct()
   Ntable.N_ell  = 350;                  // N_ell      
   Ntable.Ntheta = 250;                  // N_theta  
   Ntable.N_M  = 1000;                   // N_M, M = mass (Halo Model)
-  Ntable.NL_Nell_block = 50;            // Cosmo2D - NL = NonLimber (NL_Nell_block)
   Ntable.NL_Nchi = 500;                 // Cosmo2D - NL = NonLimber (NL_Nchi)
   Ntable.photoz_interpolation_type = 0;
   Ntable.high_def_integration = 0;

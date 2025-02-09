@@ -111,6 +111,20 @@ arma::Cube<double> w_gammat_tomo_cpp()
   return result;
 }
 
+arma::Cube<double> w_gg_tomo_cpp()
+{
+  arma::Cube<double> result(Ntable.Ntheta,
+                            redshift.clustering_nbin,
+                            redshift.clustering_nbin,
+                            arma::fill::zeros);
+
+  for (int nz=0; nz<tomo.clustering_Npowerspectra; nz++)
+    for (int i=0; i<Ntable.Ntheta; i++)
+      result(i, nz, nz) = w_gg_tomo(i, nz, nz, 0);
+  return result;
+}
+
+/*
 arma::Col<double> w_gg_tomo_cpp()
 {
   arma::Col<double> result(Ntable.Ntheta*redshift.clustering_nbin,arma::fill::none);
@@ -120,7 +134,7 @@ arma::Col<double> w_gg_tomo_cpp()
   return result;
 }
 
-/*
+
 arma::Col<double> w_gk_tomo_cpp()
 {
   arma::Col<double> result(Ntable.Ntheta*redshift.clustering_nbin,arma::fill::none);
@@ -247,7 +261,7 @@ double C_gg_tomo_limber_cpp(const double l, const int nz)
   return C_gg_tomo_limber_nointerp(l, nz, nz, 0);
 }
 
-arma::Mat<double> C_gg_tomo_limber_cpp(const arma::Col<double> l)
+arma::Cube<double> C_gg_tomo_limber_cpp(const arma::Col<double> l)
 {
   if (!(l.n_elem > 0))
   {
@@ -255,7 +269,10 @@ arma::Mat<double> C_gg_tomo_limber_cpp(const arma::Col<double> l)
     exit(1);
   }
 
-  arma::Mat<double> result(l.n_elem, redshift.clustering_nbin);
+  arma::Cube<double> result(l.n_elem, 
+                            redshift.clustering_nbin,
+                            redshift.clustering_nbin,
+                            arma::fill::zeros);
 
   #pragma GCC diagnostic push
   #pragma GCC diagnostic ignored "-Wunused-variable"
@@ -268,11 +285,11 @@ arma::Mat<double> C_gg_tomo_limber_cpp(const arma::Col<double> l)
   #pragma omp parallel for collapse(2)
   for (int nz=0; nz<redshift.clustering_nbin; nz++)
     for (int i=0; i<static_cast<int>(l.n_elem); i++)
-      result(i, nz) = C_gg_tomo_limber_nointerp(l(i), nz, nz, 0);
+      result(i, nz, nz) = C_gg_tomo_limber_nointerp(l(i), nz, nz, 0);
   return result;
 }
 
-arma::Mat<double> C_gg_tomo_cpp(const arma::Col<double> l)
+arma::Cube<double> C_gg_tomo_cpp(const arma::Col<double> l)
 {
   if (!(l.n_elem > 0))
   {
@@ -280,7 +297,7 @@ arma::Mat<double> C_gg_tomo_cpp(const arma::Col<double> l)
     exit(1);
   }
 
-  arma::Mat<double> result = C_gg_tomo_limber_cpp(l);
+  arma::Cube<double> result = C_gg_tomo_limber_cpp(l);
 
   for (int nz=0; nz<redshift.clustering_nbin; nz++)
   {
@@ -289,14 +306,14 @@ arma::Mat<double> C_gg_tomo_cpp(const arma::Col<double> l)
     if (idxs.n_elem > 0)
     {
       const int L = 1;
-      const double tolerance = 0.01;      // required fractional accuracy in C(l)
+      const double tolerance = 0.0075;     // required fractional accuracy in C(l)
       const double dev = 10. * tolerance; // will be diff  exact vs Limber init to
 
       arma::Col<double> Cl(limits.LMAX_NOLIMBER+1);
       C_cl_tomo(L, nz, nz, Cl.memptr(), dev, tolerance);
       
       for (int i=0; i<static_cast<int>(idxs.n_elem); i++)
-        result(idxs(i), nz) = Cl(static_cast<int>(l(idxs(i))+1e-13));
+        result(idxs(i), nz, nz) = Cl(static_cast<int>(l(idxs(i))+1e-13));
     }
   }
   return result;

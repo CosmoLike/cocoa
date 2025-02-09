@@ -550,7 +550,7 @@ double w_gg_tomo(const int nt, const int ni, const int nj, const int limber)
       for (int nz=0; nz<NSIZE; nz++) // NONLIMBER PART
       { 
         const int L = 1;
-        const double tolerance = 0.01;      // required fractional accuracy in C(l)
+        const double tolerance = 0.0075;     // required fractional accuracy in C(l)
         const double dev = 10. * tolerance; // will be diff  exact vs Limber init to
                                             // large value in order to start while loop
         const int Z1 = nz; // cross redshift bin not supported so not using ZCL1(k)
@@ -2767,6 +2767,10 @@ void C_cl_tomo(
   const double dlnchi = log(chi_max/chi_min) / ((double) Ntable.NL_Nchi - 1.0);
   const double dlnk = dlnchi;
 
+  Ntable.NL_Nell_block = 4;  // COCOA: IMP TO MAINTAIN THIS NUMBER=1 WHY?
+                             // THERE IS A ~1-2% offset between NL and L and large ell
+                             // TODO: INVESTIGATE THE SOURCE OF THIS PROBLEM
+
   int* ell_ar = (int*) malloc(sizeof(int)*Ntable.NL_Nell_block);
   double*** Fk1 = (double***) malloc3d(3, Ntable.NL_Nell_block, Ntable.NL_Nchi); // (Fk1, Fk1_Mag, k1)    
   double** f1_chi = (double**) malloc2d(4, Ntable.NL_Nchi); // (f1, f1_RSD, f1_MAG, chi)
@@ -2828,6 +2832,9 @@ void C_cl_tomo(
   cfg_Mag.N_extrap_high = 0;
 
   int i_block = 0;
+
+
+
 
   while ((fabs(dev) > tol) && (L < limits.LMAX_NOLIMBER))
   {
