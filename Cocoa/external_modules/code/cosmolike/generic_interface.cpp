@@ -3787,7 +3787,6 @@ double IP::get_dv_masked(const int ci) const
       );
     exit(1);
   }
-
   return this->data_masked_(ci);
 }
 
@@ -3804,7 +3803,6 @@ double IP::get_dv_masked_sqzd(const int ci) const
       );
     exit(1);
   }
-
   return this->data_masked_sqzd_(ci);
 }
 
@@ -3836,7 +3834,6 @@ double IP::get_inv_cov_masked(
       );
     exit(1);
   }
-
   return this->inv_cov_masked_(ci, cj);
 }
 
@@ -3868,7 +3865,6 @@ double IP::get_inv_cov_masked_sqzd(
       );
     exit(1);
   }
-
   return this->inv_cov_masked_sqzd_(ci, cj);
 }
 
@@ -3920,21 +3916,18 @@ double IP::get_chi2(arma::Col<double> datavector) const
       "IP::get_chi2", "data_vector");
     exit(1);
   }
-  
   if (!(this->is_mask_set_))
   {
     spdlog::critical("{}: {} not set prior to this function call",
       "IP::get_chi2", "mask");
     exit(1);
   }
-  
   if (!(this->is_inv_cov_set_))
   {
     spdlog::critical("{}: {} not set prior to this function call",
       "IP::get_chi2", "inv_cov");
     exit(1);
   }
-
   if (datavector.n_elem != like.Ndata)
   {
     spdlog::critical("{}: "
@@ -3996,7 +3989,6 @@ vector IP::expand_theory_data_vector_from_sqzd(vector input) const
           "IP::expand_theory_data_vector_from_sqzd");
         exit(1);
       }
-
       result(i) = input(this->get_index_sqzd(i));
     }
   }
@@ -4016,12 +4008,8 @@ vector IP::sqzd_theory_data_vector(vector input) const
   vector result(this->ndata_sqzd_, arma::fill::zeros);
   
   for (int i=0; i<this->ndata_; i++)
-  {
     if (this->get_mask(i) > 0.99)
-    {
       result(this->get_index_sqzd(i)) = input(i);
-    }
-  }
 
   return result;
 }

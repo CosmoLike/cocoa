@@ -82,8 +82,15 @@ arma::Col<double> get_binning_real_space()
 
 py::tuple xi_pm_tomo_cpp()
 { 
-  arma::Mat<double> xp(Ntable.Ntheta,tomo.shear_Npowerspectra,arma::fill::none);
-  arma::Mat<double> xm(Ntable.Ntheta,tomo.shear_Npowerspectra,arma::fill::none);
+  arma::Cube<double> xp(Ntable.Ntheta,
+                        redshift.shear_nbin,
+                        redshift.shear_nbin,
+                        arma::fill::zeros);
+  
+  arma::Cube<double> xm(Ntable.Ntheta,
+                        redshift.shear_nbin,
+                        redshift.shear_nbin,
+                        arma::fill::zeros);
 
   for (int nz=0; nz<tomo.shear_Npowerspectra; nz++)
   {    
@@ -91,11 +98,14 @@ py::tuple xi_pm_tomo_cpp()
     {
       const int z1 = Z1(nz);
       const int z2 = Z2(nz);
-      xp(i,nz) = xi_pm_tomo(1, i, z1, z2, 1);
-      xm(i,nz) = xi_pm_tomo(-1, i, z1, z2, 1);
+      xp(i,z1,z2) = xi_pm_tomo(1, i, z1, z2, 1);
+      xm(i,z1,z2) = xi_pm_tomo(-1, i, z1, z2, 1);
+
+      xp(i,z2,z1) = xp(i,z1,z2);
+      xm(i,z2,z1) = xm(i,z1,z2);
     }
   }
-  return py::make_tuple(carma::mat_to_arr(xp), carma::mat_to_arr(xm));
+  return py::make_tuple(carma::cube_to_arr(xp), carma::cube_to_arr(xm));
 }
 
 arma::Cube<double> w_gammat_tomo_cpp()
@@ -170,8 +180,14 @@ py::tuple C_ss_tomo_limber_cpp(const arma::Col<double> l)
     exit(1);
   }
   
-  arma::Mat<double> EE(l.n_elem,tomo.shear_Npowerspectra,arma::fill::zeros);
-  arma::Mat<double> BB(l.n_elem,tomo.shear_Npowerspectra,arma::fill::zeros);
+  arma::Cube<double> EE(l.n_elem,
+                        redshift.shear_nbin,
+                        redshift.shear_nbin,
+                        arma::fill::zeros);
+  arma::Cube<double> BB(l.n_elem,
+                        redshift.shear_nbin,
+                        redshift.shear_nbin,
+                        arma::fill::zeros);
 
   #pragma GCC diagnostic push
   #pragma GCC diagnostic ignored "-Wunused-variable"
@@ -190,11 +206,11 @@ py::tuple C_ss_tomo_limber_cpp(const arma::Col<double> l)
     {
       const int ni = Z1(nz);
       const int nj = Z2(nz);
-      EE(i, nz) = C_ss_tomo_limber_nointerp(l(i), ni, nj, 1, 0);
-      BB(i, nz) = C_ss_tomo_limber_nointerp(l(i), ni, nj, 0, 0);
+      EE(i, ni, nj) = C_ss_tomo_limber_nointerp(l(i), ni, nj, 1, 0);
+      BB(i, ni, nj) = C_ss_tomo_limber_nointerp(l(i), ni, nj, 0, 0);
     }
   }
-  return py::make_tuple(carma::mat_to_arr(EE), carma::mat_to_arr(BB));
+  return py::make_tuple(carma::cube_to_arr(EE),carma::cube_to_arr(BB));
 }
 
 // ---------------------------------------------------------------------------
