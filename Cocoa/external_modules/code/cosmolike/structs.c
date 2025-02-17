@@ -180,7 +180,7 @@ FPTpara FPT =
 
 lim limits = 
 {
-  .a_min = 1.0/(1.0 + 10.0),    // a_min (z = 10, needed for CMB lensing)
+  .a_min = 1.0/(1.0 + 30.0),    // a_min (z = 10, needed for CMB lensing)
   .k_min_cH0 = 2.e-2,           // k_min_cH0
   .k_max_cH0 = 3.e+6,           // k_max_cH0
   .M_min = 1.0e+6,              // M_min

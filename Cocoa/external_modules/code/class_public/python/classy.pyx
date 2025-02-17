@@ -1686,6 +1686,12 @@ cdef class Class:
                 value = self.ba.Omega0_m
             elif name == 'omega_m':
                 value = self.ba.Omega0_m*self.ba.h**2
+            ### JX: register omega_b/Omega_b as derived parameters
+            elif name == 'Omega_b':
+                value = self.ba.Omega0_b
+            elif name == 'omega_b':
+                value = self.ba.Omega0_b*self.ba.h**2
+            ### JX: register end
             elif name == 'xi_idr':
                 value = self.ba.T_idr/self.ba.T_cmb
             elif name == 'N_dg':
