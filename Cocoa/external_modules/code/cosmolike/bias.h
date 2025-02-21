@@ -4,35 +4,38 @@
 extern "C" {
 #endif
 
+#define B1_PER_BIN 0
+#define B1_PER_BIN_EVOLV 1
+#define B1_PER_BIN_PASS_EVOLV 2
+#define B1_GROWTH_SCALING 3
+#define B1_POWER_LAW 4
+
+#define B2_PER_BIN 0
+#define B2_FROM_B1 1
+
+#define BS2_PER_BIN 0
+#define BS2_FROM_B1 1
+
+#define B3_PER_BIN 0
+#define B3_FROM_B1 1
+
+#define BMAG_PER_BIN 0
+
 // ----------------------------------------------------------------------
 // ----------------------------------------------------------------------
-// bias evolution with redshift
+// galaxy bias evolution with redshift
 // ----------------------------------------------------------------------
 // ----------------------------------------------------------------------
 
-// model b1 using one non-evoling parameter per redshift bin
-double b1_per_bin(double z, int ni);
+double gb1(const double z, const int ni); // g = galaxy, b1 = linear galaxy bias
 
-// model b1 using one parameter per redshift
-// bin, power-law evolution within each bin
-double b1_per_bin_evolv(double z, int ni);
+double gb2(const double z, const int ni);
 
+double gbs2(const double z, const int ni);
 
-// model b1 using one parameter per redshift bin + passive evolution
-double b1_per_bin_pass_evolv(double z, int ni);
+double gb3(const double z, const int ni);
 
-// model b1 assuming b1(z) = b_{1,0}*G(z)
-double b1_growth_scaling(double z, int ni);
-
-// bias evolution within redshift bin, used by
-// clustering/G-G-lensing routines without HOD modeling
-double bgal_z(double z, int ni);
-
-double b2_from_b1(double b1); // fitting function for b_2(b_1)
-
-double bs2_from_b1(double b1); // theory prediction for b_s2(b_1)
-
-double b3nl_from_b1(double b1); // theory prediction b3nl(b1) = b1-1
+double gbmag(const double z, const int ni);
 
 #ifdef __cplusplus
 }

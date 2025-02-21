@@ -192,6 +192,29 @@ fi
 # -------------------------------- DES_Y3 ------------------------------------
 # ----------------------------------------------------------------------------
 
+if [ -z "${IGNORE_COSMOLIKE_DES_Y3_CODE}" ]; then 
+  
+  # Name to be printed on this shell script messages
+  PRINTNAME="DES_Y3"
+
+  ptop "GETTING ${PRINTNAME:?}" || return 1
+
+  FOLDER="${DES_Y3_NAME:-"des_y3"}"
+
+  URL="${DES_Y3_URL:-"https://github.com/CosmoLike/cocoa_des_y3.git"}"
+
+  if [ -n "${DES_Y3_COMMIT}" ]; then
+    gitact2 "${FOLDER:?}" "${URL:?}" "${DES_Y3_COMMIT:?}"  || return 1
+  elif [ -n "${DES_Y3_BRANCH}" ]; then 
+    gitact1 "${FOLDER:?}" "${URL:?}" "${DES_Y3_BRANCH:?}" || return 1
+  elif [ -n "${DES_Y3_TAG}" ]; then 
+    gitact3 "${FOLDER:?}" "${URL:?}" "${DES_Y3_TAG:?}" || return 1
+  fi
+
+  pbottom "GETTING ${PRINTNAME:?}" || return 1
+
+fi
+
 # ----------------------------------------------------------------------------
 # ----------------------------- DES_Y1 x Planck ------------------------------
 # ----------------------------------------------------------------------------

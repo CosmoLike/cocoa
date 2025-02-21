@@ -215,8 +215,14 @@ export MGCAMB_NAME='MGCAMB'
 export LSST_Y1_URL="https://github.com/CosmoLike/cocoa_lsst_y1.git"
 export LSST_Y1_NAME="lsst_y1"
 #export LSST_Y1_BRANCH="main"
-#export LSST_Y1_COMMIT="0fd75b1c447d5576dc00f3c6bcde440cf9aa673f"
-export LSST_Y1_TAG="v4.0-beta14"
+#export LSST_Y1_COMMIT="8f7f0c40784fcae718006b6c6715c58fb0b085b0"
+export LSST_Y1_TAG="v4.0-beta17"
+
+export DES_Y3_URL="https://github.com/CosmoLike/cocoa_des_y3.git"
+export DES_Y3_NAME="des_y3"
+#export DES_Y3_BRANCH="main"
+#export DES_Y3_COMMIT="2d7e05944bf9c4724dcb5407e7cb76c992993807"
+export DES_Y3_TAG="v4.0-beta17"
 
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------

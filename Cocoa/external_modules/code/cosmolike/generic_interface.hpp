@@ -412,15 +412,11 @@ void init_baryons_contamination(
   ); // NEW API
 #endif
 
-void init_baryons_contamination(
-    std::string sim
-  ); // OLD API
+void init_baryons_contamination(std::string sim); // OLD API
 
-void init_binning_fourier(
-    const int Ncl, 
-    const int lmin, 
-    const int lmax
-  );
+void init_bias(arma::Col<double> bias_z_evol_model);
+
+void init_binning_fourier(const int Ncl, const int lmin, const int lmax);
 
 void init_binning_real_space(
     const int Ntheta, 
@@ -434,9 +430,7 @@ void init_binning_cmb_bandpower(
     const int lmax
   );
 
-void init_cosmo_runmode(
-    const bool is_linear
-  );
+void init_cosmo_runmode(const bool is_linear);
 
 void init_cmb(
     const double lmin_kappa_cmb, 
@@ -465,68 +459,36 @@ void init_data_6x2pt_real_space(
     arma::Col<int>::fixed<6> order
   );
 
-void init_data_vector_size(
-    arma::Col<int>::fixed<6> exclude
-  );
+void init_data_vector_size(arma::Col<int>::fixed<6> exclude);
 
-void init_data_vector_size_real_space(
-    arma::Col<int>::fixed<6> exclude
-  );
+void init_data_vector_size_real_space(arma::Col<int>::fixed<6> exclude);
 
-void init_data_vector_size_3x2pt_real_space(
-  );
+void init_data_vector_size_3x2pt_real_space();
 
-void init_data_vector_size_6x2pt_real_space(
-  );
+void init_data_vector_size_6x2pt_real_space();
 
-void init_data_vector_size_3x2pt_fourier_space(
-  );
+void init_data_vector_size_3x2pt_fourier_space();
 
-void init_data_vector_size_6x2pt_fourier_space(
-  );
+void init_data_vector_size_6x2pt_fourier_space();
 
-void init_distances(
-    arma::Col<double> io_z, 
-    arma::Col<double> io_chi
-  );
 
-void init_growth(
-    arma::Col<double> io_z, 
-    arma::Col<double> io_G
-  );
 
 void init_IA(
     const int IA_MODEL, 
     const int IA_REDSHIFT_EVOL
   );
 
-void init_lens_sample(
-    std::string multihisto_file, 
-    const int Ntomo
-  );
-
-void init_linear_power_spectrum(
-    arma::Col<double> io_log10k,
-    arma::Col<double> io_z, 
-    arma::Col<double> io_lnP
-  );
-
-void init_non_linear_power_spectrum(
-    arma::Col<double> io_log10k,
-    arma::Col<double> io_z, 
-    arma::Col<double> io_lnP
-  );
-
 void init_probes(
     std::string possible_probes
   );
 
-void initial_setup(
-  );
+void initial_setup();
 
-void init_source_sample(
-    std::string multihisto_file, 
-    const int Ntomo
+void init_redshift_distributions_from_files(
+    std::string lens_multihisto_file, 
+    const int lens_ntomo,
+    std::string source_multihisto_file, 
+    const int source_ntomo
   );
 
 void init_survey(
@@ -550,6 +512,33 @@ void init_survey(
 // ---------------------------------------------------------------------------
 // ---------------------------------------------------------------------------
 // ---------------------------------------------------------------------------
+
+void set_cosmological_parameters(
+    const double omega_matter,
+    const double hubble
+  );
+
+void set_distances(
+    arma::Col<double> io_z, 
+    arma::Col<double> io_chi
+  );
+
+void set_growth(
+    arma::Col<double> io_z, 
+    arma::Col<double> io_G
+  );
+
+void set_linear_power_spectrum(
+    arma::Col<double> io_log10k,
+    arma::Col<double> io_z, 
+    arma::Col<double> io_lnP
+  );
+
+void set_non_linear_power_spectrum(
+    arma::Col<double> io_log10k,
+    arma::Col<double> io_z, 
+    arma::Col<double> io_lnP
+  );
 
 void set_nuisance_bias(
     arma::Col<double> B1, 

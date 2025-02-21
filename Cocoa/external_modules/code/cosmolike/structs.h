@@ -7,16 +7,7 @@ extern "C" {
 #endif
 
 #define CHAR_MAX_SIZE 1024
-#define MAX_SIZE_ARRAYS 10
-
-#define NO_IA 0
-#define IA_NLA_LF 1
-#define IA_REDSHIFT_BINNING 2
-#define IA_REDSHIFT_EVOLUTION 3
-
-#define IA_MODEL_NLA 0
-#define IA_MODEL_TATT 1
-
+#define MAX_SIZE_ARRAYS 20
 
 typedef struct 
 {
@@ -29,8 +20,9 @@ typedef struct
   int LMIN_tab;
   int LMAX_NOLIMBER;
   int LMAX;
-  double LMIN_hankel;
-  double LMAX_hankel;
+  // ---------------------------------------------------
+  // CLUSTER ROUTINES (ALPHA STAGE)
+  // ---------------------------------------------------
   double cluster_util_log_M_min;
   double cluster_util_log_M_max;
   double binned_P_lambda_obs_given_M_zmin_table;
@@ -51,64 +43,79 @@ typedef struct
 
 typedef struct 
 {
-  double low;
-  double medium;
-  double high;
-  double insane;
-} pre;
-
-typedef struct 
-{
+  // ---------------------------------------------------
+  // ---------------------------------------------------
+  // CACHE VARIABLES
+  // ---------------------------------------------------
+  // ---------------------------------------------------
+  double random; 
+  // ---------------------------------------------------
+  // ---------------------------------------------------
+  // CONTROL NUM POINTS ON COSMOLIKE TABLES
+  // ---------------------------------------------------
+  // ---------------------------------------------------
   int N_a;          
   int N_k_lin;
   int N_k_nlin;
   int N_ell;
   int Ntheta;
-  int N_thetaH;
   int N_M;
-  int N_ell_TATT;                  // Cosmo2D
   int NL_Nell_block;               // Cosmo2D - NL = NonLimber
   int NL_Nchi;                     // Cosmo2D - NL = NonLimber
-  int N_a_halo_exclusion;          // N_a for binned_p_cc_incl_halo_exclusion (cluster_util.c)
-  int N_k_halo_exclusion;          // N_k for binned_p_cc_incl_halo_exclusion (cluster_util.c)
-  int N_k_hankel_halo_exclusion;   // N for 3D Hankel Transform (pk_to_xi and xi_to_pk)
+  // ---------------------------------------------------
+  // ---------------------------------------------------
+  // INTERPOL TYPE ON SOURCE/LENS n(z) INTERPOLATION
+  // ---------------------------------------------------
+  // ---------------------------------------------------
+  int photoz_interpolation_type;
+  // ---------------------------------------------------
+  // ---------------------------------------------------
+  // THETA RANGE ON REAL SPACE CORRELATION FUNCTIONS
+  // ---------------------------------------------------
+  // ---------------------------------------------------
+  double vtmax;
+  double vtmin;
+  // ---------------------------------------------------
+  // ---------------------------------------------------
+  // CONTROL NUM POINTS EVALUATED ON COSMOLIKE INTEGRALS
+  // ---------------------------------------------------
+  // ---------------------------------------------------
+  int high_def_integration;
+  // ---------------------------------------------------
+  // ---------------------------------------------------
+  // CONTROL NUM POINTS EVALUATED BY FASPT
+  // ---------------------------------------------------
+  // ---------------------------------------------------
+  int FPTboost;
+  // ---------------------------------------------------
+  // ---------------------------------------------------
+  // CLUSTER ROUTINES (ALPHA STAGE)
+  // ---------------------------------------------------
+  // ---------------------------------------------------
+  int N_a_halo_exclusion;        // N_a for binned_p_cc_incl_halo_exclusion (cluster_util.c)
+  int N_k_halo_exclusion;        // N_k for binned_p_cc_incl_halo_exclusion (cluster_util.c)
+  int N_k_hankel_halo_exclusion; // N for 3D Hankel Transform (pk_to_xi and xi_to_pk)
   int N_R_halo_exclusion;
   int binned_P_lambda_obs_given_M_size_z_table;
   int binned_P_lambda_obs_given_M_size_M_table;
   int binned_p_cm_size_a_table;
-  int halo_uKS_nc;                 // halo.c u_KS(double c, double k, double rv)
-  int halo_uks_nx;                 // halo.c u_KS(double c, double k, double rv)
-  int acc_boost_photoz_sampling;
-  int photoz_interpolation_type;
-  int high_def_integration;
-  double vtmax;
-  double vtmin;
+  int halo_uKS_nc;               // halo.c u_KS(double c, double k, double rv)
+  int halo_uks_nx;               // halo.c u_KS(double c, double k, double rv)
 } Ntab;
 
-typedef struct 
-{
-  double xmin;
-  double xmax;
-  double Pmin;
-  double Pmax;
-  double dPmin;
-  double dPmax;
-} bin_avg;
-
-typedef struct
-{ // parameters for power spectrum passed to FASTPT
-  double k_min;
-  double k_max;
-  int N;
-  int N_per_dec;
-  double** tab_AB; // parameters for table of bias terms
-  int N_AB;        // parameters for table of bias terms
-  double** tab_IA; // parameters for table of IA terms
-  int N_IA;        // parameters for table of IA terms
-} FPTpara;
-
 typedef struct
 {
+  // ---------------------------------------------------
+  // ---------------------------------------------------
+  // CACHE VARIABLES
+  // ---------------------------------------------------
+  // ---------------------------------------------------
+  double random;
+  // ---------------------------------------------------
+  // ---------------------------------------------------
+  // COSMO PARAMETERS
+  // ---------------------------------------------------
+  // ---------------------------------------------------
   double Omega_b;  // baryon density paramter
   double Omega_m;  // matter density parameter
   double Omega_v;  // cosmogical constant parameter
@@ -119,60 +126,299 @@ typedef struct
   double MGSigma;
   double MGmu;
   double sigma_8;
-  double random; // Random number between zero and 1 - see interface.cpp
-  //double w0;
-  //double A_s;
-  //double n_s;
-  int is_cached;
+  // ---------------------------------------------------
+  // ---------------------------------------------------
+  // MATTER POWER SPECTRUM
+  // size = (lnP_nk+1,lnP_nz+1)
+  // z = lnP[lnP_nk,j<lnP_nz]
+  // k = lnP[i<lnP_nk,lnP_nz]
+  // ---------------------------------------------------
+  // ---------------------------------------------------
+  int lnP_nk;
+  int lnP_nz;
+  double** lnP;
+  // ---------------------------------------------------
+  // ---------------------------------------------------
+  // LINEAR MATTER POWER SPECTRUM
+  // size = (lnP_nk+1,lnP_nz+1)
+  // z = lnPL[lnP_nk,j<lnP_nz]
+  // k = lnPL[i<lnP_nk,lnP_nz]
+  // ---------------------------------------------------
+  // ---------------------------------------------------
+  int lnPL_nk;
+  int lnPL_nz;
+  double** lnPL;
+  // ---------------------------------------------------
+  // ---------------------------------------------------
+  // DISTANCE
+  // ---------------------------------------------------
+  // ---------------------------------------------------
+  // z   = chi[0,j<chi_nz]
+  // chi = chi[1,j<chi_nz]
+  int chi_nz;
+  double** chi;
+  // ---------------------------------------------------
+  // ---------------------------------------------------
+  // GROWTH FACTOR
+  // ---------------------------------------------------
+  // ---------------------------------------------------
+  // z   = G[0,j<chi_nz]
+  // chi = G[1,j<chi_nz]
+  int G_nz;
+  double** G;
 } cosmopara;
+
+typedef struct
+{ // parameters for power spectrum passed to FASTPT
+  int N;
+  double k_min;
+  double k_max;
+  double** tab; 
+} FPT;
+
+typedef struct
+{
+  // ---------------------------------------------------
+  // ---------------------------------------------------
+  // CACHE VARIABLES
+  // ---------------------------------------------------
+  // ---------------------------------------------------
+  double random_photoz_shear;
+  double random_photoz_clustering;
+  double random_ia;
+  double random_galaxy_bias;
+  double random_gas;
+  // ---------------------------------------------------
+  // ---------------------------------------------------
+  // INTRINSIC ALIGMENT --------------------------------
+  // ---------------------------------------------------
+  // --------------------------------------------------- 
+  // ia[0][0] = A_ia          if(IA_NLA_LF || IA_REDSHIFT_EVOLUTION)
+  // ia[0][1] = eta_ia        if(IA_NLA_LF || IA_REDSHIFT_EVOLUTION)
+  // ia[0][2] = eta_ia_highz  if(IA_NLA_LF, Joachimi2012)
+  // ia[0][3] = beta_ia       if(IA_NLA_LF, Joachimi2012)
+  // ia[0][4] = LF_alpha      if(IA_NLA_LF, Joachimi2012)
+  // ia[0][5] = LF_P          if(IA_NLA_LF, Joachimi2012)
+  // ia[0][6] = LF_Q          if(IA_NLA_LF, Joachimi2012)
+  // ia[0][7] = LF_red_alpha  if(IA_NLA_LF, Joachimi2012)
+  // ia[0][8] = LF_red_P      if(IA_NLA_LF, Joachimi2012)
+  // ia[0][9] = LF_red_Q      if(IA_NLA_LF, Joachimi2012)
+  // ------------------
+  // ia[1][0] = A2_ia        if IA_REDSHIFT_EVOLUTION
+  // ia[1][1] = eta_ia_tt    if IA_REDSHIFT_EVOLUTION
+  // ------------------
+  // ia[2][MAX_SIZE_ARRAYS] = b_ta_z[MAX_SIZE_ARRAYS]
+  
+  int IA;
+  int IA_MODEL;
+  double ia[MAX_SIZE_ARRAYS][MAX_SIZE_ARRAYS];
+  double oneplusz0_ia;
+  double c1rhocrit_ia;
+  // ---------------------------------------------------
+  // ---------------------------------------------------
+  // PHOTOZ --------------------------------------------
+  // ---------------------------------------------------
+  // ---------------------------------------------------
+  // 1st index: photoz[0][:][:] = SHEAR; photoz[1][:][:] = CLUSTERING
+  // 2nd index: photoz[:][0][:] = bias; photoz[:][1][:] = strech
+  double photoz[MAX_SIZE_ARRAYS][MAX_SIZE_ARRAYS][MAX_SIZE_ARRAYS]; 
+  // ---------------------------------------------------
+  // ---------------------------------------------------
+  // SHEAR CALIBRATION ---------------------------------
+  // ---------------------------------------------------
+  // ---------------------------------------------------
+  double shear_calibration_m[MAX_SIZE_ARRAYS];
+  // ---------------------------------------------------
+  // ---------------------------------------------------
+  // GALAXY BIAS ---------------------------------------
+  // ---------------------------------------------------
+  // ---------------------------------------------------
+  // 1st index: b[0][i]: linear galaxy bias in clustering bin i
+  //            b[1][i]: nonlinear b2 galaxy bias in clustering bin i
+  //            b[2][i]: leading order tidal bs2 galaxy bias in clustering bin i
+  //            b[3][i]: nonlinear b3 galaxy bias in clustering bin i 
+  //            b[4][i]: amplitude of magnification bias in clustering bin i 
+  double gb[MAX_SIZE_ARRAYS][MAX_SIZE_ARRAYS]; // galaxy bias
+  // HOD[i] contains HOD parameters of galaxies in clustering bin i
+  // 5 parameter model of Zehavi et al. 2011 + modification of concentration
+  double hod[MAX_SIZE_ARRAYS][MAX_SIZE_ARRAYS]; 
+  double gc[MAX_SIZE_ARRAYS];  // galaxy concentration parameter
+  // ---------------------------------------------------
+  // ---------------------------------------------------
+  // GAS -----------------------------------------------
+  // ---------------------------------------------------
+  // ---------------------------------------------------
+  //gas[0] = gas_Gamma_KS; // Gamma in K-S profile
+  //gas[1] = gas_beta;     // beta: mass scaling index in bound gas fraction
+  //gas[2] = gas_lgM0;     // critical halo mass, below which gas ejection is significant
+  //gas[3] = gas_eps1;
+  //gas[4] = gas_eps2;
+  //gas[5] = gas_alpha;
+  //gas[6] = gas_A_star;
+  //gas[7] = gas_lgM_star;
+  //gas[8] = gas_sigma_star;
+  //gas[9] = gas_lgT_w;
+  //gas[10] = gas_f_H;
+  double gas[MAX_SIZE_ARRAYS]; // Compton-Y related variables
+  // ---------------------------------------------------
+  // ---------------------------------------------------
+  // CLUSTER ROUTINES (ALPHA STAGE)
+  // ---------------------------------------------------
+  // ---------------------------------------------------
+  /*
+  // Variables for the 4x2pt+N (see: 2008.10757 & 2010.01138)
+  double cluster_MOR[MAX_SIZE_ARRAYS];
+  double cluster_selection[MAX_SIZE_ARRAYS];
+  */
+} nuisanceparams;
+
+typedef struct
+{
+  int is_cmb_bandpower;
+  int is_cmb_kkkk_cov_from_sim;// if kkkk covmat is from sim, apply Hartlap factor
+  double alpha_Hartlap_kkkk;
+  int Ncl;
+  int Ncos;
+  int Ndata;
+  int Nbp; // number of band-power bins for CMB lensing
+  double lmin;
+  double lmax;
+  double* ell;
+  double cosmax;
+  double Rmin_bias;
+  double Rmin_shear;
+  double lmax_shear;
+  double lmin_bp;      // minimum l mode of CMB band power binning matrix (w/ corr)
+  double lmax_bp;      // Note: for dv, only need binmat with corr
+  double lmin_kappacmb;
+  double lmax_kappacmb;
+  int bias;
+  int shear_shear;
+  int shear_pos;
+  int pos_pos;
+  int gk;
+  int kk;
+  int ks;
+  int gy;
+  int sy;
+  int ky;
+  int yy;
+  int clusterN;
+  int clusterWL;
+  int clusterCG;
+  int clusterCC;
+  int adopt_limber_gg;
+  int use_ggl_efficiency_zoverlap;
+  // ---------------------------------------------------
+  // ---------------------------------------------------
+  // HALO MODEL CHOICES
+  // ---------------------------------------------------
+  // ---------------------------------------------------
+  int galaxy_bias_model[MAX_SIZE_ARRAYS]; // [0] = b1, 
+                                          // [1] = b2, 
+                                          // [2] = bs2, 
+                                          // [3] = b3, 
+                                          // [4] = bmag 
+  int halo_model[MAX_SIZE_ARRAYS]; // [0] = HMF, 
+                                   // [1] = BIAS, 
+                                   // [2] = CONCENTRATION
+                                   // [3] = HALO PROFILE
+} likepara;
+
+typedef struct
+{
+  double area;                    // survey_area in deg^2.
+  double n_gal;                   // galaxy density per arcmin^2
+  double sigma_e;                 // rms inrinsic ellipticity noise
+  double area_conversion_factor;  // factor from deg^2 to radian^2:
+  double n_gal_conversion_factor; // factor from n_gal/arcmin^2 to n_gal/radian^2:
+  double n_lens;                  // lens galaxy density per arcmin^2
+  double m_lim;
+  char name[CHAR_MAX_SIZE];
+} sur;
+
+
+typedef struct
+{
+  char runmode[CHAR_MAX_SIZE];
+} pdeltapara;
+
+typedef struct
+{
+  char name[CHAR_MAX_SIZE];
+  double fwhm;                            // beam fwhm in rad
+  double sensitivity;                     // white noise level in muK*rad
+  char pathLensRecNoise[CHAR_MAX_SIZE];   // path to precomputed noise on reconstructed kappa
+  char pathHealpixWinFunc[CHAR_MAX_SIZE]; // path to precomputed healpix window function
+} Cmb;
 
 typedef struct 
 {
-  int shear_Nbin;         // number of source tomography bins
-  int clustering_Nbin;    // number of lens galaxy bins
-  int cluster_Nbin;       // number of lens cluster redshift bins
-
-  int shear_Npowerspectra; // number of shear-shear tomography power spectra
-  int ggl_Npowerspectra;   // number of galaxy-galaxy lensing tomography power spectra
+  int shear_Npowerspectra;       // number of shear-shear tomography power spectra
+  int ggl_Npowerspectra;         // number of galaxy-galaxy lensing tomography power spectra
   int clustering_Npowerspectra;  // number of galaxy-galaxy clustering tomography power spectra
-  
-  int cgl_Npowerspectra;             // number of cluster-galaxy lensing tomography combinations
-  int cg_clustering_Npowerspectra;   // number of cluster-galaxy clustering tomography combinations
-  int cc_clustering_Npowerspectra;   // number of cluster-cluster clustering tomography combinations
-
-  double shear_zmax[MAX_SIZE_ARRAYS];
-  double shear_zmin[MAX_SIZE_ARRAYS];
-  double n_source[MAX_SIZE_ARRAYS];
-
-  double clustering_zmax[MAX_SIZE_ARRAYS];
-  double clustering_zmin[MAX_SIZE_ARRAYS];
-  double n_lens[MAX_SIZE_ARRAYS];
-  
-  double cluster_zmax[MAX_SIZE_ARRAYS];
-  double cluster_zmin[MAX_SIZE_ARRAYS];
-
-  // we assume cluster bin = galaxy bin (no cross)
-  int external_selection_cg_clustering[MAX_SIZE_ARRAYS];
 } tomopara;
 
 typedef struct
 {
+  // ---------------------------------------------------
+  // ---------------------------------------------------
+  // CACHE VARIABLES
+  // ---------------------------------------------------
+  // ---------------------------------------------------
+  double random_shear;
+  double random_clustering;
+  // ---------------------------------------------------
+  // ---------------------------------------------------
+  // SOURCE n(Z)
+  // ---------------------------------------------------
+  // ---------------------------------------------------
+  int shear_nbin;         // number of source tomography bins
   int shear_photoz;
-  double shear_zdistrpar_zmin;
-  double shear_zdistrpar_zmax;
-  int shear_histogram_zbins;
-  char shear_REDSHIFT_FILE[CHAR_MAX_SIZE];
-
+  int shear_nzbins;
+  double** shear_zdist_table;
+  double shear_zdist_zmin_all;
+  double shear_zdist_zmax_all;
+  double shear_zdist_zmin[MAX_SIZE_ARRAYS];
+  double shear_zdist_zmax[MAX_SIZE_ARRAYS];
+  // ---------------------------------------------------
+  // ---------------------------------------------------
+  // CLUSTERING n(z)
+  // ---------------------------------------------------
+  // ---------------------------------------------------
+  int clustering_nbin;    // number of lens galaxy bins
   int clustering_photoz;
-  double clustering_zdistrpar_zmin;
-  double clustering_zdistrpar_zmax;
-  int clustering_histogram_zbins;
-  char clustering_REDSHIFT_FILE[CHAR_MAX_SIZE];
-
+  int clustering_nzbins;
+  double** clustering_zdist_table;
+  double clustering_zdist_zmin_all;
+  double clustering_zdist_zmax_all;
+  double clustering_zdist_zmin[MAX_SIZE_ARRAYS];
+  double clustering_zdist_zmax[MAX_SIZE_ARRAYS];
+  // ---------------------------------------------------
+  // ---------------------------------------------------
+  // CLUSTER ROUTINES (ALPHA STAGE)
+  // ---------------------------------------------------
+  // ---------------------------------------------------
+  /*
+  int cluster_Nbin;       // number of lens cluster redshift bins
   int clusters_photoz;
   char clusters_REDSHIFT_FILE[CHAR_MAX_SIZE];
-} redshiftpara;
+  */
+  /*
+  int cgl_Npowerspectra;             // number of cluster-galaxy lensing tomography combinations
+  int cg_clustering_Npowerspectra;   // number of cluster-galaxy clustering tomography combinations
+  int cc_clustering_Npowerspectra;   // number of cluster-cluster clustering tomography combinations 
+  double cluster_zmax[MAX_SIZE_ARRAYS];
+  double cluster_zmin[MAX_SIZE_ARRAYS];
+  // we assume cluster bin = galaxy bin (no cross)
+  int external_selection_cg_clustering[MAX_SIZE_ARRAYS];
+  */
+} redshiftparams;
 
+/*
+// ---------------------------------------------------
+// CLUSTER ROUTINES (ALPHA STAGE)
+// ---------------------------------------------------
 typedef struct
 {
   int interpolate_survey_area;
@@ -194,187 +440,15 @@ typedef struct
   
   char model[CHAR_MAX_SIZE];
 } clusterparams;
+*/
 
-typedef struct
-{
-  // like.IA = 1 variables
-  double LF_alpha;
-  double LF_P;
-  double LF_Q;
-  double LF_red_alpha;
-  double LF_red_P;
-  double LF_red_Q;
-  
-  // like.IA = 3; NLA; = 4; NLA, = 5; TATT (per bin);  = 6: TATT (power law)
-  double A_z[MAX_SIZE_ARRAYS];    // NLA normalization per source redshift bin
-  double A2_z[MAX_SIZE_ARRAYS];   // NLA normalization per source redshift bin
-  double b_ta_z[MAX_SIZE_ARRAYS]; // b_ta, per bin (like.IA = 6), or use b_ta_z[0] with like.IA = 5
-  double A_ia;                    // A IA see Joachimi2012
-  double A2_ia;                   // placeholder param for quadratic,etc IA
-  double beta_ia;                 // beta IA see Joachimi2012
-  double eta_ia;                  // eta_other IA see Joachimi2012
-  double eta_ia_tt;               // same as eta_ia, for TT
-  double eta_ia_highz;            // uncertainty in high z evolution
-  double oneplusz0_ia;            // oneplusz0-ia MegaZ
-  double c1rhocrit_ia;
-  double fred[MAX_SIZE_ARRAYS];
-  
-  double shear_calibration_m[MAX_SIZE_ARRAYS];
-
-  double sigma_zphot_shear[MAX_SIZE_ARRAYS];
-  double bias_zphot_shear[MAX_SIZE_ARRAYS];
-
-  double sigma_zphot_clustering[MAX_SIZE_ARRAYS];
-  double bias_zphot_clustering[MAX_SIZE_ARRAYS];
-  
-  // Variables for the 4x2pt+N (see: 2008.10757 & 2010.01138)
-  double cluster_MOR[MAX_SIZE_ARRAYS];
-  double cluster_selection[MAX_SIZE_ARRAYS];
-
-  double frac_lowz;   // photo-z = 5 model (see: 2108.00658)
-  double frac_highz;  // photo-z = 5 model (see: 2108.00658)
-} nuisancepara;
-
-typedef struct
-{
-  // Compton-Y related variables
-  double gas_Gamma_KS; // Gamma in K-S profile
-  double gas_beta;     // beta: mass scaling index in bound gas fraction
-  double gas_lgM0;     // critical halo mass, below which gas ejection is significant
-  double gas_eps1;
-  double gas_eps2;
-  double gas_alpha;
-  double gas_A_star;
-  double gas_lgM_star;
-  double gas_sigma_star;
-  double gas_lgT_w;
-  double gas_f_H;
-} ynuisancepara;
-
-typedef struct
-{
-  double area;                    // survey_area in deg^2.
-  double n_gal;                   // galaxy density per arcmin^2
-  double sigma_e;                 // rms inrinsic ellipticity noise
-  double area_conversion_factor;  // factor from deg^2 to radian^2:
-  double n_gal_conversion_factor; // factor from n_gal/arcmin^2 to n_gal/radian^2:
-  double n_lens;                  // lens galaxy density per arcmin^2
-  double m_lim;
-  char name[CHAR_MAX_SIZE];
-  double ggl_overlap_cut;
-} sur;
-
-typedef struct
-{
-  int is_cmb_bandpower;
-  int is_cmb_kkkk_cov_from_sim;// if kkkk covmat is from sim, apply Hartlap factor
-  double alpha_Hartlap_kkkk;
-  int Ncl;
-  int Ncos;
-  int Ndata;
-  int Nbp; // number of band-power bins for CMB lensing
-  double lmin;
-  double lmax;
-  double* ell;
-  double* theta;
-  double cosmax;
-  double Rmin_bias;
-  double Rmin_shear;
-  double lmax_shear;
-  double lmin_bp;      // minimum l mode of CMB band power binning matrix (w/ corr)
-  double lmax_bp;      // Note: for dv, only need binmat with corr
-  double lmin_kappacmb;
-  double lmax_kappacmb;
-  int IA;
-  int IA_MODEL;
-  int bias;
-  int shear_shear;
-  int shear_pos;
-  int pos_pos;
-  int gk;
-  int kk;
-  int ks;
-  int gy;
-  int sy;
-  int ky;
-  int yy;
-  int clusterN;
-  int clusterWL;
-  int clusterCG;
-  int clusterCC;
-  int use_full_sky_shear;
-  int use_full_sky_ggl;
-  int use_full_sky_clustering;
-  int use_full_sky_gk;
-  int use_full_sky_sk;
-  int high_def_integration;
-  int adopt_limber_gg;
-  int adopt_limber_gammat;
-  int use_ggl_efficiency_zoverlap;
-} likepara;
-
-typedef double (*B1_model)(double z, int nz);
-
-typedef struct
-{
-  double b[MAX_SIZE_ARRAYS];      // linear galaxy bias paramter in clustering bin i
-  double b2[MAX_SIZE_ARRAYS];     // quadratic bias parameter for redshift bin i
-  double bs2[MAX_SIZE_ARRAYS];    // leading order tidal bias for redshift bin i
-  double b_mag[MAX_SIZE_ARRAYS];  // amplitude of magnification bias, b_mag[i] = 5*s[i]+beta[i]-2
-  
-  double hod[MAX_SIZE_ARRAYS][MAX_SIZE_ARRAYS]; // HOD[i] contains HOD parameters of galaxies in 
-                                                // clustering bin i, following 5 parameter model 
-                                                // of Zehavi et al. 2011 + modification of 
-                                                // concentration parameter
-  double cg[MAX_SIZE_ARRAYS];                   // galaxy concentration parameter
-  B1_model b1_function;
-} galpara;
-
-typedef struct
-{
-  char runmode[CHAR_MAX_SIZE];
-} pdeltapara;
-
-typedef struct
-{
-  int is_Pk_bary;
-  int Na_bins;
-  int Nk_bins;
-  double* a_bins;
-  double* logk_bins;
-  double* log_PkR;
-  gsl_interp2d_type* T;
-  gsl_interp2d* interp2d;
-} barypara;
-
-typedef struct
-{
-  char name[CHAR_MAX_SIZE];
-  double fwhm;        // beam fwhm in rad
-  double sensitivity; // white noise level in muK*rad
-  char pathLensRecNoise[CHAR_MAX_SIZE]; // path to precomputed noise on reconstructed kappa
-  char pathHealpixWinFunc[CHAR_MAX_SIZE]; // path to precomputed healpix window function
-} Cmb;
-
-typedef struct 
-{
-  int tinker_bias_ncosmo;
-  int tinker_bias_nparam;
-  int tinker_bias_nsamp;
-  int tinker_bias_nparam_redshift;
-  int tinker_bias_extrapolation_cut_in;
-  int tinker_bias_extrapolation_cut_out;
-  int tinker_hmf_ncosmo;
-  int tinker_hmf_nparam;
-  int tinker_hmf_nsamp;
-  int tinker_hmf_nparam_redshift;
-  int tinker_hmf_extrapolation_cut_in;
-  int tinker_hmf_extrapolation_cut_out;
-} TinkerEmuParameters;
-
-double bgal_z(double z, int nz);
-
-double b1_per_bin(double z, int nz);
+// --------------------------------------------------------------------
+// --------------------------------------------------------------------
+// --------------------------------------------------------------------
+//  EXTERN STRUCTS 
+// --------------------------------------------------------------------
+// --------------------------------------------------------------------
+// --------------------------------------------------------------------
 
 extern likepara like;
 
@@ -382,23 +456,13 @@ extern cosmopara cosmology;
 
 extern tomopara tomo;
 
-extern redshiftpara redshift;
+extern redshiftparams redshift;
 
 extern sur survey;
 
-extern galpara gbias;
-
-extern clusterparams Cluster;
-
 extern pdeltapara pdeltaparams;
 
-extern FPTpara FPT;
-
-extern nuisancepara nuisance;
-
-extern ynuisancepara ynuisance;
-
-extern barypara bary;
+extern nuisanceparams nuisance;
 
 extern Cmb cmb;
 
@@ -406,9 +470,11 @@ extern lim limits;
 
 extern Ntab Ntable;
 
-extern pre precision;
+extern FPT FPTbias;
 
-extern TinkerEmuParameters tinkerEmuParam;
+extern FPT FPTIA;
+
+//extern clusterparams Cluster;
 
 // --------------------------------------------------------------------
 // --------------------------------------------------------------------
@@ -418,25 +484,13 @@ extern TinkerEmuParameters tinkerEmuParam;
 // --------------------------------------------------------------------
 // --------------------------------------------------------------------
 
+void reset_like_struct();
 void reset_bary_struct();
-
-// --------------------------------------------------------------------
-// --------------------------------------------------------------------
-// --------------------------------------------------------------------
-// UPDATE
-// --------------------------------------------------------------------
-// --------------------------------------------------------------------
-// --------------------------------------------------------------------
-
-void update_cosmopara(cosmopara* C);
-
-void update_galpara(galpara* G);
-
-void update_nuisance(nuisancepara* N);
-
-void update_ynuisance(ynuisancepara* N);
-
-void update_table(Ntab* N);
+void reset_nuisance_struct();
+void reset_redshift_struct();
+void reset_cosmology_struct();
+void reset_tomo_struct();
+void reset_Ntable_struct();
 
 #ifdef __cplusplus
 }

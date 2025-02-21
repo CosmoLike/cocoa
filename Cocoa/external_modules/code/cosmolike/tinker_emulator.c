@@ -324,6 +324,22 @@ static double emu_tinker_inv_covariance_cosmosample[6][6] = {
 {-14738.80308857765,4295.670961238588,335.6020489343278,38.917173912872784,-57.15969177525089,12.183540589219549},
 };
 
+TinkerEmuParameters tinkerEmuParam =
+{
+  .tinker_bias_ncosmo = 7,                // do not change
+  .tinker_bias_nparam = 4,                // do not change
+  .tinker_bias_nsamp = 40, 
+  .tinker_bias_nparam_redshift = 6,       // number of parameters of equation 7 in 1907.13167.;
+  .tinker_hmf_ncosmo = 7,                 // do not change
+  .tinker_hmf_nparam = 6,                 // do not change
+  .tinker_hmf_nsamp = 40, 
+  .tinker_hmf_nparam_redshift = 4,        // number of parameters of eq 2 in 1804.05866;
+  .tinker_bias_extrapolation_cut_in = 40,
+  .tinker_bias_extrapolation_cut_out = 45,
+  .tinker_hmf_extrapolation_cut_in = 40,
+  .tinker_hmf_extrapolation_cut_out = 45,
+};
+
 double kernel(const double *const x1, const double *const x2, const double *const loglambdas, 
 const int ndim)
 { // Squared exponential kernel function

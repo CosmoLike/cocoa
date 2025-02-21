@@ -172,14 +172,14 @@ const int limber)
     log_fatal("error in selecting bin number nl = %d (max %d)", nl, nlsize);
     exit(1); 
   } 
-  if (ni < 0 || ni > tomo.cluster_Nbin - 1)
+  if (ni < 0 || ni > redshift.clustering_nbin - 1)
   {
-    log_fatal("error in selecting bin number ni = %d (max %d)", ni, tomo.cluster_Nbin);
+    log_fatal("error in selecting bin number ni = %d (max %d)", ni, redshift.clustering_nbin);
     exit(1); 
   } 
-  if (nj < 0 || nj > tomo.shear_Nbin - 1)
+  if (nj < 0 || nj > redshift.shear_nbin - 1)
   {
-    log_fatal("error in selecting bin number nj = %d (max %d)", nj, tomo.shear_Nbin);
+    log_fatal("error in selecting bin number nj = %d (max %d)", nj, redshift.shear_nbin);
     exit(1); 
   }
   const int ntomo = N_cgl(ni, nj);
@@ -213,7 +213,7 @@ const int limber)
   static double* w_vec = 0;
 
   const int nlsize = Cluster.N200_Nbin;
-  const int nccl_size = tomo.cluster_Nbin; // cross redshift bin not supported so not using
+  const int nccl_size = redshift.clustering_nbin; // cross redshift bin not supported so not using
                                            // tomo.cc_clustering_Npowerspectra
 
   const int nell = limits.LMAX;
@@ -412,14 +412,14 @@ const int limber)
     log_fatal("error in selecting bin number nl2 = %d (max %d)", nl2, nlsize);
     exit(1); 
   } 
-  if (ni < 0 || ni > tomo.cluster_Nbin - 1)
+  if (ni < 0 || ni > redshift.clustering_nbin - 1)
   {
-    log_fatal("error in selecting bin number ni = %d (max %d)", ni, tomo.cluster_Nbin);
+    log_fatal("error in selecting bin number ni = %d (max %d)", ni, redshift.clustering_nbin);
     exit(1); 
   } 
-  if (nj < 0 || nj > tomo.cluster_Nbin - 1)
+  if (nj < 0 || nj > redshift.clustering_nbin - 1)
   {
-    log_fatal("error in selecting bin number nj = %d (max %d)", nj, tomo.cluster_Nbin);
+    log_fatal("error in selecting bin number nj = %d (max %d)", nj, redshift.clustering_nbin);
     exit(1); 
   }
   const int q = (nl1*nlsize*nccl_size + nl2*nccl_size + ni)*ntheta + nt; // cross redshift bin not 
@@ -577,9 +577,9 @@ double w_cg_tomo(const int nt, const int nl, const int ni, const int nj, const i
     log_fatal("error in selecting bin number nl = %d (max %d)", nl, nlsize);
     exit(1); 
   } 
-  if (ni < 0 || ni > tomo.cluster_Nbin - 1)
+  if (ni < 0 || ni > redshift.clustering_nbin - 1)
   {
-    log_fatal("error in selecting bin number ni = %d (max %d)", ni, tomo.cluster_Nbin);
+    log_fatal("error in selecting bin number ni = %d (max %d)", ni, redshift.clustering_nbin);
     exit(1); 
   } 
   if (nj < 0 || nj > tomo.clustering_Nbin - 1)
@@ -791,14 +791,14 @@ const int limber)
     log_fatal("error in selecting bin number nl = %d (max %d)", nl, nlsize);
     exit(1); 
   } 
-  if (ni < 0 || ni > tomo.cluster_Nbin - 1)
+  if (ni < 0 || ni > redshift.clustering_nbin - 1)
   {
-    log_fatal("error in selecting bin number ni = %d (max %d)", ni, tomo.cluster_Nbin);
+    log_fatal("error in selecting bin number ni = %d (max %d)", ni, redshift.clustering_nbin);
     exit(1); 
   } 
-  if (nj < 0 || nj > tomo.shear_Nbin - 1)
+  if (nj < 0 || nj > redshift.shear_nbin - 1)
   {
-    log_fatal("error in selecting bin number nj = %d (max %d)", nj, tomo.shear_Nbin);
+    log_fatal("error in selecting bin number nj = %d (max %d)", nj, redshift.shear_nbin);
     exit(1); 
   }
   const double lntheta = log(theta);
@@ -835,7 +835,7 @@ const int nj, const int limber)
   static double** table;
 
   const int nlsize = Cluster.N200_Nbin;
-  const int nccl_size = tomo.cluster_Nbin; // cross redshift bin not supported so not using
+  const int nccl_size = redshift.clustering_nbin; // cross redshift bin not supported so not using
                                            // tomo.cc_clustering_Npowerspectra
   const int NSIZE = nlsize*nlsize*nccl_size;
   const int ntheta = Ntable.N_thetaH;
@@ -1100,14 +1100,14 @@ const int nj, const int limber)
     log_fatal("error in selecting bin number nl2 = %d (max %d)", nl2, nlsize);
     exit(1); 
   } 
-  if (ni < 0 || ni > tomo.cluster_Nbin - 1)
+  if (ni < 0 || ni > redshift.clustering_nbin - 1)
   {
-    log_fatal("error in selecting bin number ni = %d (max %d)", ni, tomo.cluster_Nbin);
+    log_fatal("error in selecting bin number ni = %d (max %d)", ni, redshift.clustering_nbin);
     exit(1); 
   } 
-  if (nj < 0 || nj > tomo.cluster_Nbin - 1)
+  if (nj < 0 || nj > redshift.clustering_nbin - 1)
   {
-    log_fatal("error in selecting bin number nj = %d (max %d)", nj, tomo.cluster_Nbin);
+    log_fatal("error in selecting bin number nj = %d (max %d)", nj, redshift.clustering_nbin);
     exit(1); 
   }
   const double lntheta = log(theta);
@@ -1300,9 +1300,9 @@ double w_cg_tomo_flatsky(double theta, int nl, int ni, int nj, int limber)
     log_fatal("error in selecting bin number nl = %d (max %d)", nl, nlsize);
     exit(1); 
   } 
-  if (ni < 0 || ni > tomo.cluster_Nbin - 1)
+  if (ni < 0 || ni > redshift.clustering_nbin - 1)
   {
-    log_fatal("error in selecting bin number ni = %d (max %d)", ni, tomo.cluster_Nbin);
+    log_fatal("error in selecting bin number ni = %d (max %d)", ni, redshift.clustering_nbin);
     exit(1); 
   } 
   if (nj < 0 || nj > tomo.clustering_Nbin - 1)
@@ -1385,14 +1385,14 @@ const int use_linear_ps, const int init_static_vars_only)
     log_fatal("error in selecting bin number nl = %d (max %d)", nl, Cluster.N200_Nbin);
     exit(1); 
   } 
-  if (ni < 0 || ni > tomo.cluster_Nbin - 1)
+  if (ni < 0 || ni > redshift.clustering_nbin - 1)
   {
-    log_fatal("error in selecting bin number ni = %d (max %d)", ni, tomo.cluster_Nbin);
+    log_fatal("error in selecting bin number ni = %d (max %d)", ni, redshift.clustering_nbin);
     exit(1); 
   } 
-  if (nj < 0 || nj > tomo.shear_Nbin - 1)
+  if (nj < 0 || nj > redshift.shear_nbin - 1)
   {
-    log_fatal("error in selecting bin number nj = %d (max %d)", nj, tomo.shear_Nbin);
+    log_fatal("error in selecting bin number nj = %d (max %d)", nj, redshift.shear_nbin);
     exit(1); 
   }
   double ar[5] = {(double) nl, (double) ni, (double) nj, l, (double) use_linear_ps};
@@ -1469,14 +1469,14 @@ double C_cs_tomo_limber(const double l, const int nl, const int ni, const int nj
     log_fatal("error in selecting bin number nl = %d (max %d)", nl, nlsize);
     exit(1); 
   } 
-  if (ni < 0 || ni > tomo.cluster_Nbin - 1)
+  if (ni < 0 || ni > redshift.clustering_nbin - 1)
   {
-    log_fatal("error in selecting bin number ni = %d (max %d)", ni, tomo.cluster_Nbin);
+    log_fatal("error in selecting bin number ni = %d (max %d)", ni, redshift.clustering_nbin);
     exit(1); 
   } 
-  if (nj < 0 || nj > tomo.shear_Nbin - 1)
+  if (nj < 0 || nj > redshift.shear_nbin - 1)
   {
-    log_fatal("error in selecting bin number nj = %d (max %d)", nj, tomo.shear_Nbin);
+    log_fatal("error in selecting bin number nj = %d (max %d)", nj, redshift.shear_nbin);
     exit(1); 
   }
   const double lnl = log(l);
@@ -1545,14 +1545,14 @@ const int nj, const int use_linear_ps, const int init_static_vars_only)
     log_fatal("error in selecting bin number nl2 = %d (max %d)", nl2, Cluster.N200_Nbin);
     exit(1); 
   } 
-  if (ni < 0 || ni > tomo.cluster_Nbin - 1)
+  if (ni < 0 || ni > redshift.clustering_nbin - 1)
   {
-    log_fatal("error in selecting bin number ni = %d (max %d)", ni, tomo.cluster_Nbin);
+    log_fatal("error in selecting bin number ni = %d (max %d)", ni, redshift.clustering_nbin);
     exit(1); 
   } 
-  if (nj < 0 || nj > tomo.cluster_Nbin - 1)
+  if (nj < 0 || nj > redshift.clustering_nbin - 1)
   {
-    log_fatal("error in selecting bin number nj = %d (max %d)", nj, tomo.cluster_Nbin);
+    log_fatal("error in selecting bin number nj = %d (max %d)", nj, redshift.clustering_nbin);
     exit(1); 
   } 
   double ar[6] = {(double) nl1, (double) nl2, (double) ni, (double) nj, l, (double) use_linear_ps};  
@@ -1644,14 +1644,14 @@ const int nj)
     log_fatal("error in selecting bin number nl2 = %d (max %d)", nl2, nlsize);
     exit(1); 
   } 
-  if (ni < 0 || ni > tomo.cluster_Nbin - 1)
+  if (ni < 0 || ni > redshift.clustering_nbin - 1)
   {
-    log_fatal("error in selecting bin number ni = %d (max %d)", ni, tomo.cluster_Nbin);
+    log_fatal("error in selecting bin number ni = %d (max %d)", ni, redshift.clustering_nbin);
     exit(1); 
   } 
-  if (nj < 0 || nj > tomo.cluster_Nbin - 1)
+  if (nj < 0 || nj > redshift.clustering_nbin - 1)
   {
-    log_fatal("error in selecting bin number nj = %d (max %d)", nj, tomo.cluster_Nbin);
+    log_fatal("error in selecting bin number nj = %d (max %d)", nj, redshift.clustering_nbin);
     exit(1); 
   } 
   const double lnl = log(l);
@@ -1707,9 +1707,9 @@ const int use_linear_ps, const int init_static_vars_only)
     log_fatal("error in selecting bin number nl = %d (max %d)", nl, Cluster.N200_Nbin);
     exit(1); 
   } 
-  if (ni < 0 || ni > tomo.cluster_Nbin - 1)
+  if (ni < 0 || ni > redshift.clustering_nbin - 1)
   {
-    log_fatal("error in selecting bin number ni = %d (max %d)", ni, tomo.cluster_Nbin);
+    log_fatal("error in selecting bin number ni = %d (max %d)", ni, redshift.clustering_nbin);
     exit(1); 
   } 
   if (nj < 0 || nj > tomo.clustering_Nbin - 1)
@@ -1800,9 +1800,9 @@ double C_cg_tomo_limber(const double l, const int nl, const int ni, const int nj
     log_fatal("error in selecting bin number nl = %d (max %d)", nl, nlsize);
     exit(1); 
   } 
-  if (ni < 0 || ni > tomo.cluster_Nbin - 1)
+  if (ni < 0 || ni > redshift.clustering_nbin - 1)
   {
-    log_fatal("error in selecting bin number ni = %d (max %d)", ni, tomo.cluster_Nbin);
+    log_fatal("error in selecting bin number ni = %d (max %d)", ni, redshift.clustering_nbin);
     exit(1); 
   } 
   if (nj < 0 || nj > tomo.clustering_Nbin - 1)
@@ -2359,7 +2359,7 @@ double binned_N(const int nl, const int nz)
   static double** table;
 
   const int N_l = Cluster.N200_Nbin;
-  const int N_z = tomo.cluster_Nbin;
+  const int N_z = redshift.clustering_nbin;
 
   if (table == 0)
   {

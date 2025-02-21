@@ -21,6 +21,46 @@
 #include "baryons.h"
 #include "structs.h"
 
+barypara bary =
+{
+  .is_Pk_bary = 0,
+  .Na_bins = 0,
+  .Nk_bins = 0,
+  .a_bins = NULL,
+  .logk_bins = NULL,
+  .log_PkR = NULL,
+  .interp2d = NULL,
+};
+
+void reset_bary_struct()
+{
+  bary.is_Pk_bary = 0;
+  bary.T = NULL;
+  bary.Na_bins = 0;
+  bary.Nk_bins = 0;
+
+  if((bary.a_bins != NULL))
+  {
+    free(bary.a_bins);
+    bary.a_bins = NULL;
+  }
+  if((bary.logk_bins != NULL))
+  {
+    free(bary.logk_bins);
+    bary.logk_bins = NULL;
+  }
+  if((bary.log_PkR != NULL))
+  {
+    free(bary.log_PkR);
+    bary.log_PkR = NULL;
+  }
+  if((bary.interp2d != NULL))
+  {
+    gsl_interp2d_free(bary.interp2d);
+    bary.interp2d = NULL;
+  }
+}
+
 static double zBins_TNG100[13] = {3.71,3.49,3.28,2.90,2.44,2.1,1.74,1.41,1.04,0.7,0.35,0.18,0.0};
 static double zBins_HzAGN[11] = {4.9285,4.249,3.7384,3.33445,3.00295,1.96615,1.02715,0.519195,0.22878,0.017865,0.0};
 static double zBins_mb2[21] = {3.5,3.25,2.8,2.45,2.1,2.0,1.8,1.7,1.6,1.4,1.2,1.1,1.0,0.8,0.7,0.6,0.4,0.35,0.2,0.0625,0.0};
