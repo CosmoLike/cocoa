@@ -38,6 +38,14 @@ export IGNORE_CAMSPEC_CMB_DATA=1
 export IGNORE_LIPOP_CMB_DATA=1
 
 # ------------------------------------------------------------------------------
+# We download core packages from servers that block our download 
+# if we run source_cocoa multiple times. So if you need to rerun setup_cocoa,
+# these flags can be useful
+# ------------------------------------------------------------------------------
+#export IGNORE_CORE_INSTALLATION=1
+#export IGNORE_PIP_CORE_INSTALLATION=1
+
+# ------------------------------------------------------------------------------
 # The keys below control which packages will be installed and compiled 
 # ------------------------------------------------------------------------------
 #export IGNORE_COBAYA_CODE=1

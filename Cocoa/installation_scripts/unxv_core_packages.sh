@@ -2,7 +2,7 @@
 # ----------------------------------------------------------------------------
 # ----------------------------------------------------------------------------
 # ----------------------------------------------------------------------------
-if [ -z "${SKIP_DECOMM_CORE_PACKAGES}" ]; then
+if [[ -z "${SKIP_DECOMM_CORE_PACKAGES}" && -z "${IGNORE_CORE_INSTALLATION}" ]]; then
 
   if [ -z "${ROOTDIR}" ]; then
     source start_cocoa.sh || { pfail 'ROOTDIR'; return 1; }
@@ -132,7 +132,7 @@ if [ -z "${SKIP_DECOMM_CORE_PACKAGES}" ]; then
 
       tar xf "${TFILES[$i]}.xz" >${OUT1:?} 2>${OUT2:?} || 
         { error "${EC25:?} (${TFILES[$i]}.xz)"; return 1; }
-    
+
       unset -v FOLDER
 
     fi
