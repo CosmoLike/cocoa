@@ -16,7 +16,7 @@ fi
 # ------------------------------------------------------------------------------
 # VERBOSE AS DEBUG TOOL --------------------------------------------------------
 # ------------------------------------------------------------------------------
-#export COCOA_OUTPUT_VERBOSE=1
+export COCOA_OUTPUT_VERBOSE=1
 
 # ------------------------------------------------------------------------------
 # If set, COSMOLIKE will compile with DEBUG flags ------------------------------
@@ -38,9 +38,8 @@ export IGNORE_CAMSPEC_CMB_DATA=1
 export IGNORE_LIPOP_CMB_DATA=1
 
 # ------------------------------------------------------------------------------
-# We download core packages from servers that block our download 
-# if we run source_cocoa multiple times. So if you need to rerun setup_cocoa,
-# these flags can be useful
+# We download packages from servers that slowdown transfer after many runs. So, 
+# if rerun setup_cocoa to download some non-core lib, these flags may be handy
 # ------------------------------------------------------------------------------
 #export IGNORE_CORE_INSTALLATION=1
 #export IGNORE_PIP_CORE_INSTALLATION=1

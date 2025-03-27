@@ -60,7 +60,7 @@ if [ -z "${IGNORE_PIP_CORE_INSTALLATION}" ]; then
  
   if [ -z "${IGNORE_PIP_CORE_PACKAGES}" ]; then
 
-    ptop "INSTALLING PYTHON CORE LIBRARIES VIA PIP" || return 1
+    ptop "INSTALLING ALL PYTHON CORE LIBRARIES VIA PIP" || return 1
 
     env CXX="${CXX_COMPILER:?}" CC="${C_COMPILER:?}" ${PIP3:?} install \
         'alabaster==0.7.13' \
@@ -191,11 +191,12 @@ if [ -z "${IGNORE_PIP_CORE_INSTALLATION}" ]; then
       --force-reinstall \
       >${OUT1:?} 2>${OUT2:?} || { error "(PIP-CORE-PACKAGES) ${EC13:?}"; return 1; }
 
+
     pbottom "INSTALLING PYTHON CORE LIBRARIES VIA PIP" || return 1
 
   else
     
-    ptop "INSTALLING PYTHON CORE LIBRARIES VIA PIP" || return 1
+    ptop "INSTALLING A FEW PYTHON CORE LIBRARIES VIA PIP" || return 1
 
     #PS: --force-reinstall - this helps CARMA to see numpy files
     #env CXX="${CXX_COMPILER:?}" CC="${C_COMPILER:?}" ${PIP3:?} install \
@@ -221,6 +222,10 @@ if [ -z "${IGNORE_PIP_CORE_INSTALLATION}" ]; then
       --prefix="${ROOTDIR:?}/.local" \
       --force-reinstall \
       >${OUT1:?} 2>${OUT2:?} || { error "(PIP-CORE-PACKAGES) ${EC13:?}"; return 1; }
+
+    env CXX="${CXX_COMPILER:?}" CC="${C_COMPILER:?}" ${PIP3:?} install \
+    --upgrade setuptools --no-cache-dir >${OUT1:?} 2>${OUT2:?} \
+    || { error "(PIP-CORE-PACKAGES) ${EC13:?}"; return 1; }
 
     pbottom "INSTALLING PYTHON CORE LIBRARIES VIA PIP" || return 1
   

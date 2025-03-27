@@ -72,8 +72,22 @@ if [ -z "${IGNORE_EUCLID_EMULATOR_V2_CODE}" ]; then
   
   # ---------------------------------------------------------------------------  
  
+  #WE NEED TO PREVENT ALL COMPILE COMMANDS FROM USING THE INTERNET
+  #FROM: https://github.com/pypa/pip/issues/12050
+  #So, you're installing setuptools in your current environment. 
+  #Then you're installing the current project with --no-index. 
+  #But the current project needs setuptools (and wheel) installed. 
+  #Since pip 23.1 we don't use setup.py install for legacy projects, 
+  #we do a build using an isolated environment. It's that build 
+  #(which is a subprocess) that needs setuptools and can't get it 
+  #because of the --no-index.
+  #You can avoid this by using --no-build-isolation, or you can make 
+  #setuptools and wheel available (via --find-links or similar) 
+  #for the isolated enviornment creation.
+
   env CXX="${CXX_COMPILER:?}" CC="${C_COMPILER:?}" ${PIP3:?} install \
-      ${PACKDIR:?} --no-dependencies --prefix="${ROOTDIR:?}/.local" \
+    ${PACKDIR:?} --no-dependencies --prefix="${ROOTDIR:?}/.local" \
+    --no-index --no-deps --no-build-isolation \
     >${OUT1:?} 2>${OUT2:?} || { error "${EC3:?}"; return 1; }
 
   pbottom "COMPILING ${PRINTNAME:?}" || return 1
