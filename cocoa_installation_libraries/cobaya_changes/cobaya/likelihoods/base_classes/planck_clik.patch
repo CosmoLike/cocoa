@@ -1,0 +1,41 @@
+--- planck_clik2.py	2025-03-28 15:28:23.960001837 -0400
++++ planck_clik.py	2025-03-28 15:25:17.529086211 -0400
+@@ -278,22 +278,22 @@
+     :class:`tools.VersionCheckError` if the installed version is too old.
+     """
+     clik_src_path = get_clik_source_folder(path)
+-    #version_file = os.path.join(clik_src_path, 'readme.md')
+-    #if os.path.exists(version_file):
+-    #    with open(version_file, 'r') as f:
+-    #        if version_match := re.search(r'(clik|plc) (\d+\.\d+)', f.read()):
+-    #            installed_version = version_match.group(2)
+-    #        else:
+-    #            installed_version = "16.0"
+-    #else:
+-    #    installed_version = clik_src_path.rstrip(os.sep).split("-")[-1]
+-    #installed_version = version.parse(installed_version)
+-    #if installed_version < version.parse(min_version):
+-    #    raise VersionCheckError(
+-    #        f"Installed version of the Planck likelihood code 'clik' ({installed_version})"
+-    #        f" older than minimum required one ({last_version_clik}).")
+-    #elif installed_version > version.parse(last_version_clik):
+-    #    raise ValueError("This should not happen: min version needs update.")
++    version_file = os.path.join(clik_src_path, 'readme.md')
++    if os.path.exists(version_file):
++        with open(version_file, 'r') as f:
++            if version_match := re.search(r'(clik|plc) (\d+\.\d+)', f.read()):
++                installed_version = version_match.group(2)
++            else:
++                installed_version = "16.0"
++    else:
++        installed_version = clik_src_path.rstrip(os.sep).split("-")[-1]
++    installed_version = version.parse(installed_version)
++    if installed_version < version.parse(min_version):
++        raise VersionCheckError(
++            f"Installed version of the Planck likelihood code 'clik' ({installed_version})"
++            f" older than minimum required one ({last_version_clik}).")
++    elif installed_version > version.parse(last_version_clik):
++        raise ValueError("This should not happen: min version needs update.")
+     return os.path.join(clik_src_path, 'lib/python/site-packages')
+ 
+ 

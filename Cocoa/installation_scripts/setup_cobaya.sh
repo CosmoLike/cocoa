@@ -123,6 +123,27 @@ if [ -z "${IGNORE_COBAYA_CODE}" ]; then
   # parenthesis = run in a subshell
   ( sh change_python_files.sh ) || { error "${EC22:?} (CPF)"; return 1; }
 
+  # --------------------------------------------------------------------------
+  # PATCH FILE --------------------------------------------- -----------------
+  # --------------------------------------------------------------------------  
+  declare -a TFOLDER=("cobaya/likelihoods/base_classes/") # Must include  
+  declare -a TFILE=("planck_clik.py")
+  declare -a TFILEP=("planck_clik.patch")
+  AL=${#TFOLDER[@]}
+  echo ${AL}
+
+  for (( i=0; i<${AL}; i++ ));
+  do
+    cdfolder "${COB:?}/${TFOLDER[$i]}" || return 1;
+
+    echo "${CCCOB:?}/${TFOLDER[$i]}"
+
+    cpfolder "${CCCOB:?}/${TFOLDER[$i]}${TFILEP[$i]:?}" . 2>${OUT2:?} || return 1;
+
+    patch -R -u "${TFILE[$i]:?}" -i "${TFILEP[$i]:?}" >${OUT1:?} \
+      2>${OUT2:?} || { error "${EC17:?} (${TFILE[$i]:?})"; return 1; }
+  done
+
   cdfolder "${ROOTDIR:?}" || return 1;
 
   unset -v TFILE
