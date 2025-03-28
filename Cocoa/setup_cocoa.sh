@@ -84,18 +84,8 @@ fi
 
 declare -i ERRORCODE=0
 
-declare -a SCRIPTS=("setup_core_packages.sh" 
-                     "unxv_core_packages.sh" 
-                     "unxv_sn.sh"
-                     "unxv_bao.sh"
-                     "unxv_h0licow.sh" 
-                     "unxv_act_dr6.sh"
-                     "unxv_simons_observatory.sh"
-                     "unxv_bicep.sh"
-                     "unxv_spt.sh"
-                     "unxv_planck2018_basic.sh"
-                     "unxv_camspec.sh"
-                     "unxv_lipop.sh"
+declare -a SCRIPTS=( "setup_core_packages.sh" 
+                     "setup_pip_core_packages.sh"
                      "setup_cobaya.sh"
                      "setup_simons_observatory.sh"
                      "setup_camspec.sh"
@@ -109,7 +99,18 @@ declare -a SCRIPTS=("setup_core_packages.sh"
                      "setup_class.sh"
                      "setup_velocileptors.sh"
                      "setup_ee2.sh"
-                     "setup_cosmolike_projects.sh")
+                     "setup_cosmolike_projects.sh"
+                     "unxv_core_packages.sh"  
+                     "unxv_sn.sh"
+                     "unxv_bao.sh"
+                     "unxv_h0licow.sh" 
+                     "unxv_act_dr6.sh"
+                     "unxv_simons_observatory.sh"
+                     "unxv_bicep.sh"
+                     "unxv_spt.sh"
+                     "unxv_planck2018_basic.sh"
+                     "unxv_camspec.sh"
+                     "unxv_lipop.sh")
 
 for (( i=0; i<${#SCRIPTS[@]}; i++ ));
 do
