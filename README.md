@@ -151,7 +151,7 @@ We assume that you are still in the Conda cocoa environment from the previous `c
     export OMP_PROC_BIND=close; export OMP_NUM_THREADS=8
 
 > [!NOTE]
-> The environmental variable `OMP_PROC_BIND`, when set to `close`, places the OpenMP cores as closely as possible. This setting is important as current architectures (e.g., AMD Ryzen and EPYC) scatter physical cores inside a single socket in multiple chiplets, limiting the bandwidth between chiplets.
+> `OMP_PROC_BIND=close` bound OpenMP threads to physically close cores. This is an important optimization when running cocoa in current chiplet-based architectures, as they scatter physical cores in multiple chiplets but provide limit communication bandwidth between chiplets. Threads running across different chiplets may suffer from (1) Higher latency when accessing shared data, (2) Lower memory bandwidth, and (3) Reduced cache efficiency due to lack of shared caches between chiplets.
 
 ### Examples not involving Cosmolike
 
