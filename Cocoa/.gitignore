@@ -1,5 +1,8 @@
 Cocoa/cobaya
 cobaya2/
+cobaya3/
+cobaya4/
+.ipynb_checkpoints/
 ./cobaya
 cobaya/
 chains/
@@ -33,8 +36,6 @@ external_modules/data/spt_3g
 external_modules/data/act
 external_modules/code/PolyChordLite/
 
-
-
 projects/desxplanck
 projects/lsst_fourier
 projects/des_y3
@@ -60,12 +61,14 @@ external_modules/data/kids
 external_modules/data/kids*
 external_modules/data/cocoa_*
 external_modules/data/ede*
-external_modules/code/roman_real
-external_modules/code/roman_real*
-external_modules/code/roman_fourier
-external_modules/code/roman_fourier*
-external_modules/code/roman*
-external_modules/code/ROMAN*
+external_modules/data/roman_real
+external_modules/data/roman_real*
+external_modules/data/roman_fourier
+external_modules/data/roman_fourier*
+external_modules/data/roman*
+external_modules/data/ROMAN*
+external_modules/data/act_dr6_cmbonly
+external_modules/data/act_dr*
 
 external_modules/code/planck/code/spt_clik/.lock-waf_*
 external_modules/code/planck/code/spt_clik/.waf*
@@ -119,6 +122,14 @@ external_modules/code/TMPSO
 external_modules/code/TMP*
 external_modules/code/SOSYSLIB
 external_modules/code/SO*
+external_modules/code/act_dr6_cmbonly
+external_modules/code/act_dr*
+external_modules/code/roman_real
+external_modules/code/roman_real*
+external_modules/code/roman_fourier
+external_modules/code/roman_fourier*
+external_modules/code/roman*
+external_modules/code/ROMAN*
 
 cobaya/cobaya/likelihoods/XXX
 cobaya/cobaya/likelihoods/des_y1

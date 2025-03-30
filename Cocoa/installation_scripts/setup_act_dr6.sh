@@ -2,7 +2,7 @@
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
-if [ -z "${IGNORE_ACTDR4_CODE}" ]; then
+if [ -z "${IGNORE_ACTDR6_CODE}" ]; then
 
   if [ -z "${ROOTDIR}" ]; then
     source start_cocoa.sh || { pfail 'ROOTDIR'; return 1; }
@@ -13,6 +13,7 @@ if [ -z "${IGNORE_ACTDR4_CODE}" ]; then
 
   unset_env_vars () {
     unset -v URL CCIL ECODEF FOLDER PACKDIR CHANGES TFOLDER TFILE TFILEP AL
+    unset -v EDATAF COB COBLIKE
     cdroot || return 1;
   }
 
@@ -51,31 +52,39 @@ if [ -z "${IGNORE_ACTDR4_CODE}" ]; then
 
   CCIL="${ROOTDIR:?}/../cocoa_installation_libraries"
 
-  # ---------------------------------------------------------------------------
-  
-  ptop 'SETUP ACTDR4' || return 1;
-
-  URL="${ACTDR4_URL:-"https://github.com/ACTCollaboration/pyactlike"}"
-
-  CHANGES="${CCIL:?}/pyactlike_changes"
-
   # E = EXTERNAL, CODE, F=FODLER
   ECODEF="${ROOTDIR:?}/external_modules/code"
 
-  FOLDER=${ACTDR4_NAME:-"pyactlike"}
+  COB="${ROOTDIR:?}/cobaya"        # COB = Cobaya
+
+  COBLIKE="cobaya/likelihoods"      # COB = Cobaya, LIKE = likelihoods
+
+  # ---------------------------------------------------------------------------
+  
+  ptop 'SETUP ACTDR6' || return 1;
+
+  URL="${ACTDR6CMBONLY_URL:-"https://github.com/ACTCollaboration/DR6-ACT-lite.git"}"
+
+  CHANGES="${CCIL:?}/act_dr6_cmbonly_changes"
+
+  FOLDER=${ACTDR6CMBONLY_NAME:-"act_dr6_cmbonly"}
 
   PACKDIR="${ECODEF:?}/${FOLDER:?}"
 
   # ---------------------------------------------------------------------------
   # In case this script is called twice ---------------------------------------
   # ---------------------------------------------------------------------------
-  if [ -n "${OVERWRITE_EXISTING_ACTDR4_CMB_CODE}" ]; then
+  if [[ -n "${OVERWRITE_EXISTING_ACTDR6_CMB_CODE}" ]]; then
 
     rm -rf "${PACKDIR:?}"
 
   fi
 
-  if [ ! -d "${PACKDIR:?}" ]; then
+  rm -rf "${PACKDIR:?}"
+
+  if [[ ! -d "${PACKDIR:?}" ]]; then
+
+    # CODE 1: ACTDR6 LITE
 
     # --------------------------------------------------------------------------
     # Clone from original repo -------------------------------------------------
@@ -88,10 +97,10 @@ if [ -z "${IGNORE_ACTDR4_CODE}" ]; then
     "${GIT:?}" clone "${URL:?}" "${FOLDER:?}" \
       >${OUT1:?} 2>${OUT2:?} || { error "${EC15:?}"; return 1; }
     
-    cdfolder "${PACKDIR}" || { cdroot; return 1; }
+    cdfolder "${PACKDIR:?}" || { cdroot; return 1; }
 
-    if [ -n "${ACTDR4_GIT_COMMIT}" ]; then
-      "${GIT:?}" checkout "${ACTDR4_GIT_COMMIT:?}" \
+    if [ -n "${ACTDR6CMBONLY_GIT_COMMIT}" ]; then
+      "${GIT:?}" checkout "${ACTDR6CMBONLY_GIT_COMMIT:?}" \
         >${OUT1:?} 2>${OUT2:?} || { error "${EC16:?}"; return 1; }
     fi
 
@@ -99,21 +108,20 @@ if [ -z "${IGNORE_ACTDR4_CODE}" ]; then
     # Patch code to be compatible w/ COCOA environment -------------------------
     # --------------------------------------------------------------------------
     # T = TMP
-    declare -a TFOLDER=("pyactlike/" 
-                       ) # If nonblank, path must include /
+    declare -a TFOLDER=("act_dr6_cmbonly/") # If nonblank, path must include /
     
     # T = TMP
-    declare -a TFILE=("like.py" 
-                     )
+    declare -a TFILE=("act_dr6_cmbonly.py")
 
     #T = TMP, P = PATCH
-    declare -a TFILEP=("like.patch" 
-                      )
+    declare -a TFILEP=("act_dr6_cmbonly.patch")
+    
     # AL = Array Length
     AL=${#TFOLDER[@]}
 
     for (( i=0; i<${AL}; i++ ));
     do
+    
       cdfolder "${PACKDIR:?}/${TFOLDER[$i]}" || return 1
 
       cpfolder "${CHANGES:?}/${TFOLDER[$i]}${TFILEP[$i]:?}" . \
@@ -121,16 +129,38 @@ if [ -z "${IGNORE_ACTDR4_CODE}" ]; then
 
       patch -u "${TFILE[$i]:?}" -i "${TFILEP[$i]:?}" >${OUT1:?} \
         2>${OUT2:?} || { error "${EC17:?} (${TFILE[$i]:?})"; return 1; }
+    
     done
+
+    # need to create symlinks for this likelihood to work w/ COBAYA.
+    # we copied the code below to start_cocoa.sh shell script as well
+    # we added corresponding code to stop_cocoa.sh that delete these symlinks
+    if [[ -d "${PACKDIR:?}/act_dr6_cmbonly" ]]; then
+      
+      if [[ -L "${COB:?}/${COBLIKE:?}/act_dr6_cmbonly" ]]; then
+      
+        rm "${COB:?}/${COBLIKE:?}/act_dr6_cmbonly"
+      
+      fi
+      
+      ln -s "${PACKDIR:?}/act_dr6_cmbonly" "${COB:?}/${COBLIKE:?}" \
+        >${OUT1:?} 2>${OUT2:?} || { error "${EC34:?}"; return 1; }
+
+      # it seems this is synthetic data (we will download real data from lambda)
+      if [[ -d "${PACKDIR:?}/act_dr6_cmbonly/data" ]]; then
+      
+        rm -rf "${PACKDIR:?}/act_dr6_cmbonly/data"
+      
+      fi
+    
+    fi
 
   fi
   
   cdfolder "${ROOTDIR}" || return 1;
   
-  pbottom 'SETUP ACTDR4' || return 1
+  pbottom 'SETUP ACTDR6' || return 1
   
-  # ---------------------------------------------------------------------------
-
   unset_all || return 1
   
 fi

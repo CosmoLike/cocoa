@@ -1,16 +1,13 @@
 stop_at_error: false
 debug: false
-timing: false
+timing: true
 
 likelihood:
-  planck_2020_hillipop.TTTEEE:
-    data_folder: planck/hillipop
-  planck_2018_lowl.TT:
-    path: ./external_modules
-  planck_2020_lollipop.lowlB:
-    data_folder: planck/lollipop
-  planck_2020_lollipop.lowlEB:
-    data_folder: planck/lollipop
+  act_dr6_cmbonly: null
+  act_dr6_lenslike.ACTDR6LensLike:
+     lens_only: False
+     lmax: 4000
+     variant: act_baseline
 
 params:
   logA:
@@ -189,23 +186,31 @@ theory:
     path: ./external_modules/code/CAMB
     use_renames: True
     extra_args:
-      AccuracyBoost: 1.10
-      lens_potential_accuracy: 2
       num_massive_neutrinos: 1
       nnu: 3.046
       dark_energy_model: ppf
+      kmax: 10
+      k_per_logint: 30
+      nonlinear: true
+      lens_potential_accuracy: 8
+      lens_margin: 2050
+      AccuracyBoost: 1.3
+      lAccuracyBoost: 1.3
+      min_l_logl_sampling: 6000
+      DoLateRadTruncation: false
 
 sampler:
   evaluate:
     override:
-      logA: 3.0448
-      ns: 0.96605
-      theta_MC_100: 1.04088
-      omegabh2: 0.022383
-      omegach2: 0.12011
-      tau: 0.0543
-      w0pwa: -0.968859
-      w: -0.909098
-      A_planck: 1.00133
+      logA: 3.054029209
+      ns: 0.9674033551 
+      theta_MC_100: 1.040548130
+      omegabh2: 0.02259704353
+      omegach2: 0.1239697476
+      tau: 5.671529467e-02 
+      w0pwa: -0.99999
+      w: -0.99999
+      A_act: 1.0
+      P_act: 1.0
 
-output: ./projects/example/chains/EXAMPLE_EVALUATE11
+output: ./projects/example/chains/EXAMPLE_EVALUATE12
