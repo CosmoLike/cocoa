@@ -130,7 +130,7 @@ Users can now proceed to **step :two:**.
 This script compiles external modules selected for installation on the `set_installation_options.sh` shell script (e.g., CAMB and Class). 
 
 > [!NOTE]
-> In some HPC environments, the compute nodes cannot access the web. So, by design, the script `compile_cocoa.sh` does not require internet access to run successfully. Code compilation is a CPU-intensive operation, so running  `compile_cocoa.sh` on a cluster login node can be against the policy of many HPC systems. Our design allows users to run `setup_cocoa.sh` in a login node and `compile_cocoa.sh` in a compute node.
+> In some HPC environments, the compute nodes cannot access the web. So, by design, the script `compile_cocoa.sh` does not require internet access to run successfully. Code compilation is a CPU-intensive operation, so running  `compile_cocoa.sh` on a cluster login node can be against the HPC policy. Users should run `setup_cocoa.sh` in a login node and `compile_cocoa.sh` in a compute node.
 
 > [!Tip]
 > Cocoa does not install many external modules by default, but users may find them helpful in a particular project. In this case, check the many available options on the `set_installation_options.sh` shell script. Then, rerun steps :two: and :three:. 
