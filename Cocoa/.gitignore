@@ -69,6 +69,7 @@ external_modules/data/roman*
 external_modules/data/ROMAN*
 external_modules/data/act_dr6_cmbonly
 external_modules/data/act_dr*
+external_modules/data/act_dr6_mflike
 
 external_modules/code/planck/code/spt_clik/.lock-waf_*
 external_modules/code/planck/code/spt_clik/.waf*
@@ -124,6 +125,7 @@ external_modules/code/SOSYSLIB
 external_modules/code/SO*
 external_modules/code/act_dr6_cmbonly
 external_modules/code/act_dr*
+external_modules/data/act_dr6_mflike
 external_modules/code/roman_real
 external_modules/code/roman_real*
 external_modules/code/roman_fourier
