@@ -102,7 +102,7 @@ Users can now proceed to **step :two:**.
 > [!TIP]
 > If users want to clone the latest commit (not advisable), then clone the repository with the following command 
 >
-> (ssh privilege)
+> (SSH)
 > 
 >     "${CONDA_PREFIX}"/bin/git clone git@github.com:CosmoLike/cocoa.git cocoa
 > 
