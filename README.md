@@ -111,16 +111,22 @@ Users can now proceed to **step :two:**.
     source setup_cocoa.sh
 
 > [!NOTE]
-> This script downloads and decompresses external modules set on the `set_installation_options.sh` script (e.g., CAMB and Class).
+> This script downloads and decompresses external modules set on the `set_installation_options.sh` script (e.g., CAMB and Class), requiring internet access to run successfully.
+
+> [!Tip]
+> If you run `setup_cocoa.sh` more than once, Cocoa will not download previously installed packages and remake the Python private environment. To overwrite this default behavior, users must set the key `OVERWRITE_EXISTING_ALL_PACKAGES` on the `set_installation_options.sh` shell script. This optimization prevents Cocoa from downloading several gigabytes repeatedly. 
 
 **Step :three:**: Run the script `compile_cocoa.sh` by typing 
 
     source compile_cocoa.sh
     
-This script compiles external modules set on the `set_installation_options.sh` script (e.g., CAMB and Class). 
+This script compiles external modules selected for installation on the `set_installation_options.sh` shell script (e.g., CAMB and Class). 
+
+> [!NOTE]
+> In some HPC environments, the compute nodes cannot access the web. So, by design, the script `compile_cocoa.sh` does not require internet access to run successfully. Code compilation is a CPU-intensive operation, so running  `compile_cocoa.sh` on a cluster login node can be against the policy of many HPC systems. Our design allows the user to run `setup_cocoa.sh` in a login node and `compile_cocoa.sh` in a compute node.
 
 > [!Tip]
-> Cocoa does not install many external modules by default, but users may find them helpful in a particular project. Check the many available options on the `set_installation_options.sh` shell script in this case. Then, rerun steps :two: and :three:. 
+> Cocoa does not install many external modules by default, but users may find them helpful in a particular project. In this case, check the many available options on the `set_installation_options.sh` shell script. Then, rerun steps :two: and :three:. 
 
 ## Running Examples  <a name="cobaya_base_code_examples"></a>
 
@@ -355,7 +361,7 @@ Steps to debug Cocoa
 
       (....)
 
-- The second step consists of rerunning the particular script that failed with the verbose output set. The scripts `setup_cocoa.sh` and `compile_cocoa.sh` run many shell scripts. Users may find it advantageous to run only the routine that failed. For further information on how to do that, see the appendix [FAQ: How do we compile the Boltzmann, CosmoLike, and Likelihood codes separately](#appendix_compile_separately).
+- The second step consists of rerunning the failed script with the verbose output set. The scripts `setup_cocoa.sh` and `compile_cocoa.sh` run many shell scripts. Users may find it advantageous to run only the routine that failed. For further information on how to do that, see the appendix [FAQ: How do we compile the Boltzmann, CosmoLike, and Likelihood codes separately](#appendix_compile_separately).
 
 After fixing a particular issue, users should rerun the shell scripts `setup_cocoa.sh` and `compile_cocoa.sh` to ensure all packages are installed and compiled correctly.
 
@@ -419,13 +425,13 @@ To ensure these scripts can download these datasets, users must be sure that the
 
 We provide the docker image [whovian-cocoa](https://hub.docker.com/r/vivianmiranda/whovian-cocoa) to facilitate the installation of Cocoa on Windows and MacOS. This appendix assumes the users already have the docker engine installed on their local PC. For instructions on installing the docker engine in specific operating systems, please refer to [Docker's official documentation](https://docs.docker.com/engine/install/). 
 
- **Step :one:**: Create a folder and go to the location on the host computer that you want to provide access to the Docker container, as shown below. 
+ **Step :one:**: Create a folder and go to the location on the host computer where you want to provide access to the Docker container, as shown below. 
 
      mkdir -p cocoa_docker
      cd ./cocoa_docker
 
 > [!NOTE]
-> The flag `-v $(pwd):/home/whovian/host/` in the `docker run` command ensures that files on the host computer have been mounted to the directory `/home/whovian/host/`. Files within the folder where the Docker  container was initialized are accessible at `/home/Whovian/host/`. Users should work inside this directory to avoid losing work if the docker image needs to be deleted.
+> The flag `-v $(pwd):/home/whovian/host/` in the `docker run` command ensures that files on the host computer have been mounted to the directory `/home/whovian/host/`. Files within the folder where the Docker container was initialized are accessible at `/home/Whovian/host/`. Users should work inside this directory to avoid losing work if the docker image needs to be deleted.
 
 > [!WARNING]
 >  Do not run the Docker container on a general folder (like the host's home directory); this would provide too much access to the Docker container. Accidents happen, especially when dealing with dangerous bash commands such as `rm` (deletion).
