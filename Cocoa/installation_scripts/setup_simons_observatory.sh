@@ -68,12 +68,6 @@ if [ -z "${IGNORE_SIMONS_OBSERVATORY_LIKELIHOOD_CODE}" ]; then
   
   COBLIKE="cobaya/likelihoods"      # COB = Cobaya, LIKE = likelihoods
   
-  cppatch() {
-    cp "${CCCOB:?}/${1:?}/${2:?}" "${COB:?}/${1:?}" \
-      2>"/dev/null" || 
-      { error "CP FILE ${CCCOB:?}/${1:?}/${2:?} on ${COB:?}/${1:?}"; return 1; }
-  }
-
   # ----------------------------------------------------------------------------
   # ----------------------------------------------------------------------------
   # ----------------------------------------------------------------------------
@@ -95,17 +89,17 @@ if [ -z "${IGNORE_SIMONS_OBSERVATORY_LIKELIHOOD_CODE}" ]; then
   # ---------------------------------------------------------------------------
   # in case this script is called twice
   # ---------------------------------------------------------------------------
-  if [ -n "${OVERWRITE_EXISTING_SIMONS_OBSERVATORY_CODE}" ]; then
+  if [[ -n "${OVERWRITE_EXISTING_SIMONS_OBSERVATORY_CODE}" ]]; then
 
     rm -rf "${PACKDIR:?}"
 
   fi
 
-  if [ ! -d "${PACKDIR:?}" ]; then
+  if [[ ! -d "${PACKDIR:?}" ]]; then
     
-    # ---------------------------------------------------------------------------
+    # --------------------------------------------------------------------------
     # clone from original repo
-    # ---------------------------------------------------------------------------
+    # --------------------------------------------------------------------------
     cdfolder "${ECODEF}" || return 1;
 
     "${CURL:?}" -fsS "${URL:?}" \
@@ -134,7 +128,7 @@ if [ -z "${IGNORE_SIMONS_OBSERVATORY_LIKELIHOOD_CODE}" ]; then
 
   URL="${SO_MFLIKE_URL:-"https://github.com/simonsobs/LAT_MFLike.git"}"
   
-  FOLDER="SOMKFLIKE"
+  FOLDER="mflike"
 
   PACKDIR="${ECODEF:?}/${FOLDER:?}"
 
@@ -146,52 +140,66 @@ if [ -z "${IGNORE_SIMONS_OBSERVATORY_LIKELIHOOD_CODE}" ]; then
   # ---------------------------------------------------------------------------
   # in case this script is called twice
   # ---------------------------------------------------------------------------
-  rm -rf "${PACKDIR:?}"
-  rm -rf "${COB:?}/${COBLIKE}/mflike"
+  if [[ -n "${OVERWRITE_EXISTING_SIMONS_OBSERVATORY_CODE}" ]]; then
+    
+    rm -rf "${PACKDIR:?}"
 
-  # ---------------------------------------------------------------------------
-  # clone from original repo
-  # ---------------------------------------------------------------------------
-  cdfolder "${ECODEF}" || return 1;
-
-  "${CURL:?}" -fsS "${URL:?}" \
-    >${OUT1:?} 2>${OUT2:?} || { error "${EC27:?} (URL=${URL:?})"; return 1; }
-
-  "${GIT:?}" clone "${URL:?}" --recursive "${FOLDER:?}" \
-    >${OUT1:?} 2>${OUT2:?} || { error "${EC15:?}"; return 1; }
-
-  cdfolder "${PACKDIR}" || return 1;
-
-  if [ -n "${SO_MFLIKE_GIT_COMMIT}" ]; then
-    "${GIT:?}" checkout "${SO_MFLIKE_GIT_COMMIT:?}" \
-      >${OUT1:?} 2>${OUT2:?} || { error "${EC16:?}"; return 1; }
   fi
 
-  # ---------------------------------------------------------------------------
-  # move likelihood to cobaya
-  
-  mv "${PACKDIR}/mflike" "${COB:?}/${COBLIKE}"
+  if [[ ! -d "${PACKDIR:?}" ]]; then
+    # --------------------------------------------------------------------------
+    # clone from original repo
+    # --------------------------------------------------------------------------
+    cdfolder "${ECODEF}" || return 1;
 
-  # ---------------------------------------------------------------------------
-  # ERASE TMP FOLDER
-  rm -rf "${PACKDIR:?}"
+    "${CURL:?}" -fsS "${URL:?}" \
+      >${OUT1:?} 2>${OUT2:?} || { error "${EC27:?} (URL=${URL:?})"; return 1; }
 
-  # ---------------------------------------------------------------------------
-  # PATCH MKFLIKE
-  
-  cppatch "${COBLIKE:?}/mflike" "mflike.patch" || return 1
+    "${GIT:?}" clone "${URL:?}" --recursive "${FOLDER:?}" \
+      >${OUT1:?} 2>${OUT2:?} || { error "${EC15:?}"; return 1; }
 
-  cdfolder "${COB:?}/${COBLIKE:?}/mflike"|| return 1;
+    cdfolder "${PACKDIR}" || return 1;
 
-  patch -u "mflike.py" -i "mflike.patch" >${OUT1:?} \
-      2>${OUT2:?} || { error "${EC17:?} (mflike.patch)"; return 1; }
+    if [ -n "${SO_MFLIKE_GIT_COMMIT}" ]; then
+      "${GIT:?}" checkout "${SO_MFLIKE_GIT_COMMIT:?}" \
+        >${OUT1:?} 2>${OUT2:?} || { error "${EC16:?}"; return 1; }
+    fi
 
-  cdfolder "${ROOTDIR}" || return 1
+    # --------------------------------------------------------------------------
+    # PATCH MKFLIKE
+    cdfolder "${PACKDIR:?}/mflike"|| return 1;
+
+    cp "${CCCOB:?}/${COBLIKE:?}/mflike/mflike.patch" "${PACKDIR:?}/mflike" \
+      2>"/dev/null" || 
+      { error "CP FILE ${CCCOB:?}/${COBLIKE:?}/mflike/mflike.patch on ${PACKDIR:?}/mflike"; return 1; }
+
+    patch -u "mflike.py" -i "mflike.patch" >${OUT1:?} \
+        2>${OUT2:?} || { error "${EC17:?} (mflike.patch)"; return 1; }
+
+    # --------------------------------------------------------------------------
+    # need to create symlinks for this likelihood to work w/ COBAYA.
+    # we copied the code below to start_cocoa.sh shell script as well
+    # we added corresponding code to stop_cocoa.sh that delete these symlinks
+    # --------------------------------------------------------------------------
+    if [[ -d "${PACKDIR:?}/mflike" ]]; then
+      
+      if [[ -L "${COB:?}/${COBLIKE:?}/mflike" ]]; then
+        rm -f "${COB:?}/${COBLIKE:?}/mflike"
+      fi
+
+      ln -s "${PACKDIR:?}/mflike" "${COB:?}/${COBLIKE:?}" \
+        >${OUT1:?} 2>${OUT2:?} || { error "${EC34:?}"; return 1; }
+    
+    fi
+
+  fi
 
   pbottom "SETUP ${PRINTNAME:?}" || return 1;
 
   #-----------------------------------------------------------------------------
   
+  cdfolder "${ROOTDIR}" || return 1
+
   unset_all || return 1;
   
 fi

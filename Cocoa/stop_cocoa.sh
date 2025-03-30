@@ -79,6 +79,14 @@ if [ -z "${IGNORE_ACTDR6_CODE}" ]; then
   fi
 fi
 
+# ----------------------------------------------------------------------------
+# ------------------------------- SO LIKELIHOOD ------------------------------
+# ----------------------------------------------------------------------------
+if [[ -z "${IGNORE_SIMONS_OBSERVATORY_LIKELIHOOD_CODE}" ]]; then
+  if [[ -L "${ROOTDIR:?}/cobaya/cobaya/likelihoods/mflike" ]]; then
+    rm -f "${ROOTDIR:?}/cobaya/cobaya/likelihoods/mflike"
+  fi
+fi
 
 # ----------------------------------------------------------------------------
 # ------------------------ STOP EXTERNAL PROJECTS ---------------------------

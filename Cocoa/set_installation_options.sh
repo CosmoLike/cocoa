@@ -32,7 +32,7 @@ export IGNORE_BICEP_CMB_DATA=1
 # export IGNORE_HOLICOW_STRONG_LENSING_DATA=1
 # export IGNORE_SN_DATA=1
 # export IGNORE_SPT_CMB_DATA=1
-export IGNORE_SIMONS_OBSERVATORY_CMB_DATA=1
+#export IGNORE_SIMONS_OBSERVATORY_CMB_DATA=1
 # export IGNORE_PLANCK_CMB_DATA=1
 export IGNORE_CAMSPEC_CMB_DATA=1
 export IGNORE_LIPOP_CMB_DATA=1
@@ -60,10 +60,10 @@ export IGNORE_CLASS_CODE=1
 #export IGNORE_POLYCHORD_SAMPLER_CODE=1
 #export IGNORE_PLANCK_LIKELIHOOD_CODE=1
 #export IGNORE_ACTDR4_CODE=1
-export IGNORE_ACTDR6_CODE=1
+#export IGNORE_ACTDR6_CODE=1
 export IGNORE_CPP_CUBA_INSTALLATION=1
 export IGNORE_VELOCILEPTORS_CODE=1
-export IGNORE_SIMONS_OBSERVATORY_LIKELIHOOD_CODE=1
+#export IGNORE_SIMONS_OBSERVATORY_LIKELIHOOD_CODE=1
 export IGNORE_CAMSPEC_LIKELIHOOD_CODE=1
 export IGNORE_LIPOP_LIKELIHOOD_CODE=1
 export IGNORE_HYREC_CODE=1
@@ -73,13 +73,6 @@ export IGNORE_MGCAMB_CODE=1
 #Many cosmolike projects (including LSST-Y1) require euclid emulator
 #export IGNORE_EUCLID_EMULATOR_V2_CODE=1
 #export IGNORE_COSMOLIKE_LSSTY1_CODE=1
-
-# ------------------------------------------------------------------------------
-#COMPATIBILITY: ACTDR6 IS BASED ON SO LIKELIHOOD (LAT_MFLike) ------------------
-if [ -z "${IGNORE_ACTDR6_CODE}" ]; then
-  unset -v IGNORE_SIMONS_OBSERVATORY_LIKELIHOOD_CODE
-fi
-# ------------------------------------------------------------------------------
 
 # ------------------------------------------------------------------------------
 # If OVERWRITE_EXISTING_XXX_CODE=1, the setup_cocoa overwrites existing PACKAGES
@@ -144,6 +137,13 @@ fi
 # We decided to install C++ Armadillo library locally 
 # to link it against lapack & OpenBlas & arpack
 unset IGNORE_CPP_ARMA_INSTALLATION
+
+# ------------------------------------------------------------------------------
+#COMPATIBILITY: ACTDR6 IS BASED ON SIMONS_OBSERVATORY LAT_MFLike LIKELIHOOD ----
+if [ -z "${IGNORE_ACTDR6_CODE}" ]; then
+  unset -v IGNORE_SIMONS_OBSERVATORY_LIKELIHOOD_CODE
+fi
+# ------------------------------------------------------------------------------
 
 # ------------------------------------------------------------------------------
 # If OVERWRITE_EXISTING_XXX_CODE=1, the setup_cocoa overwrites existing PACKAGES
@@ -256,7 +256,7 @@ export VELOCILEPTORS_GIT_COMMIT="889a0c98895831eb23b250a26162cfb8a93237bd"
 export VELOCILEPTORS_NAME="velocileptors"
 
 export FGSPECTRA_URL="https://github.com/simonsobs/fgspectra.git"
-export FGSPECTRA_GIT_COMMIT="87206ac7f919bcf82b08dee180f0821d038d24d2"
+export FGSPECTRA_GIT_COMMIT="cd78a3a72274dac2b9e05bef1943370807c46146"
 export FGSPECTRA_NAME="fgspectra"
 
 export SO_MFLIKE_URL="https://github.com/simonsobs/LAT_MFLike.git"

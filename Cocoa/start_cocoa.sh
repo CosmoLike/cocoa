@@ -88,7 +88,7 @@ fi
 # ----------------------------------------------------------------------------
 # ------------------------------- ACT LIKELIHOOD -----------------------------
 # ----------------------------------------------------------------------------
-if [ -z "${IGNORE_ACTDR6_CODE}" ]; then
+if [[ -z "${IGNORE_ACTDR6_CODE}" ]]; then
 
   if [[ ! -L "${ROOTDIR:?}/cobaya/cobaya/likelihoods/act_dr6_cmbonly" ]]; then
     ln -s "${ROOTDIR:?}/external_modules/code/act_dr6_cmbonly/act_dr6_cmbonly" \
@@ -102,6 +102,17 @@ if [ -z "${IGNORE_ACTDR6_CODE}" ]; then
       >${OUT1:?} 2>${OUT2:?} || { error "${EC34:?}"; return 1; }
   fi
 
+fi
+
+# ----------------------------------------------------------------------------
+# ------------------------------- SO LIKELIHOOD ------------------------------
+# ----------------------------------------------------------------------------
+if [[ -z "${IGNORE_SIMONS_OBSERVATORY_LIKELIHOOD_CODE}" ]]; then
+  if [[ ! -L "${ROOTDIR:?}/cobaya/cobaya/likelihoods/mflike" ]]; then
+    ln -s "${ROOTDIR:?}/external_modules/code/mflike/mflike" \
+          "${ROOTDIR:?}/cobaya/cobaya/likelihoods" \
+      >${OUT1:?} 2>${OUT2:?} || { error "${EC34:?}"; return 1; }
+  fi
 fi
 
 # ----------------------------------------------------------------------------

@@ -208,14 +208,16 @@ if [ -z "${IGNORE_ACTDR6_CODE}" ]; then
         >${OUT1:?} 2>${OUT2:?} || { error "${EC16:?}"; return 1; }
     fi
 
+    # --------------------------------------------------------------------------
     # need to create symlinks for this likelihood to work w/ COBAYA.
     # we copied the code below to start_cocoa.sh shell script as well
     # we added corresponding code to stop_cocoa.sh that delete these symlinks
+    # --------------------------------------------------------------------------
     if [[ -d "${PACKDIR:?}/act_dr6_mflike" ]]; then
       
       if [[ -L "${COB:?}/${COBLIKE:?}/act_dr6_mflike" ]]; then
       
-        rm "${COB:?}/${COBLIKE:?}/act_dr6_mflike"
+        rm -f "${COB:?}/${COBLIKE:?}/act_dr6_mflike"
       
       fi
       

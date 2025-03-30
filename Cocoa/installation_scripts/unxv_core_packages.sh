@@ -128,13 +128,14 @@ if [[ -z "${SKIP_DECOMM_CORE_PACKAGES}" && -z "${IGNORE_CORE_INSTALLATION}" ]]; 
         error "${EC25:?} (${TFILES[$i]}.xz)"; return 1;
       fi
 
+
       if [ -n "${OVERWRITE_EXISTING_CORE_PACKAGES}" ]; then
         
         rm -rf ${FOLDER:?}
 
       fi
 
-      if [ -z ${FOLDER:?} ]; then
+      if [[ ! -d ${FOLDER:?} ]]; then
 
         tar xf "${TFILES[$i]}.xz" >${OUT1:?} 2>${OUT2:?} || 
           { error "${EC25:?} (${TFILES[$i]}.xz)"; return 1; }
