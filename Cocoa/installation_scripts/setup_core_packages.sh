@@ -231,6 +231,7 @@ if [ -z "${IGNORE_CORE_INSTALLATION}" ]; then
   # ----------------------------------------------------------------------------
 
   if [ -z "${IGNORE_XZ_INSTALLATION}" ]; then
+  
     ptop "GETTING AND COMPILING XZ LIBRARY (CORE LIBS)" || return 1;
 
     cdfolder "${CCIL:?}" || return 1;
@@ -254,6 +255,7 @@ if [ -z "${IGNORE_CORE_INSTALLATION}" ]; then
     cdfolder "${ROOTDIR}" || return 1;
 
     pbottom "GETTING AND COMPILING XZ LIBRARY (CORE LIBS)" || return 1;
+  
   fi
 
   # ----------------------------------------------------------------------------
