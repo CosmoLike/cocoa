@@ -16,7 +16,7 @@ fi
 # ------------------------------------------------------------------------------
 # VERBOSE AS DEBUG TOOL --------------------------------------------------------
 # ------------------------------------------------------------------------------
-#export COCOA_OUTPUT_VERBOSE=1
+export COCOA_OUTPUT_VERBOSE=1
 
 # ------------------------------------------------------------------------------
 # If set, COSMOLIKE will compile with DEBUG flags ------------------------------
@@ -45,19 +45,22 @@ export IGNORE_LIPOP_CMB_DATA=1
 #export IGNORE_PIP_CORE_INSTALLATION=1
 
 # ------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # The keys below control which packages will be installed and compiled 
+# ------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
 #export IGNORE_COBAYA_CODE=1
 #export IGNORE_CAMB_CODE=1
-
-# Default we just use CAMB (it reduces compile_cocoa time)
+# Default we just use CAMB (it reduces compile_cocoa.sh execution time)
 export IGNORE_CLASS_CODE=1
 
 #export IGNORE_COSMOLIKE_CODE=1
 #export IGNORE_POLYCHORD_SAMPLER_CODE=1
 #export IGNORE_PLANCK_LIKELIHOOD_CODE=1
 #export IGNORE_ACTDR4_CODE=1
-#export IGNORE_ACTDR6_CODE=1
+export IGNORE_ACTDR6_CODE=1
 export IGNORE_CPP_CUBA_INSTALLATION=1
 export IGNORE_VELOCILEPTORS_CODE=1
 export IGNORE_SIMONS_OBSERVATORY_LIKELIHOOD_CODE=1
@@ -83,7 +86,7 @@ fi
 # overwrite means: delete existing PACKAGE folder and install it again ---------
 # these keys are only relevant if you run setup_cocoa multiple times -----------
 # ------------------------------------------------------------------------------
-#export OVERWRITE_EXISTING_ALL_PACKAGES=1
+export OVERWRITE_EXISTING_ALL_PACKAGES=1
 
 # ------------------------------------------------------------------------------
 # If set, compile_planck.sh uses click like code from github.com/benabed/clik

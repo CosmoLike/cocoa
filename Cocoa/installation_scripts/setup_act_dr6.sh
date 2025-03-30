@@ -72,7 +72,7 @@ if [ -z "${IGNORE_ACTDR6_CODE}" ]; then
 
   CHANGES="${CCIL:?}/act_dr6_cmbonly_changes"
 
-  FOLDER=${ACTDR6_CMBONLY_NAME:-"act_dr6_cmbonly"}
+  FOLDER="act_dr6_cmbonly"
 
   PACKDIR="${ECODEF:?}/${FOLDER:?}"
 
@@ -140,7 +140,7 @@ if [ -z "${IGNORE_ACTDR6_CODE}" ]; then
       
       if [[ -L "${COB:?}/${COBLIKE:?}/act_dr6_cmbonly" ]]; then
       
-        rm "${COB:?}/${COBLIKE:?}/act_dr6_cmbonly"
+        rm -f "${COB:?}/${COBLIKE:?}/act_dr6_cmbonly"
       
       fi
       
@@ -175,7 +175,7 @@ if [ -z "${IGNORE_ACTDR6_CODE}" ]; then
 
   CHANGES="${CCIL:?}/act_dr6_mflike_changes"
 
-  FOLDER=${ACTDR6_MFLIKE_NAME:-"act_dr6_mflike"}
+  FOLDER="act_dr6_mflike"
 
   PACKDIR="${ECODEF:?}/${FOLDER:?}"
 
@@ -206,6 +206,22 @@ if [ -z "${IGNORE_ACTDR6_CODE}" ]; then
     if [ -n "${ACTDR6_MFLIKE_GIT_COMMIT}" ]; then
       "${GIT:?}" checkout "${ACTDR6_MFLIKE_GIT_COMMIT:?}" \
         >${OUT1:?} 2>${OUT2:?} || { error "${EC16:?}"; return 1; }
+    fi
+
+    # need to create symlinks for this likelihood to work w/ COBAYA.
+    # we copied the code below to start_cocoa.sh shell script as well
+    # we added corresponding code to stop_cocoa.sh that delete these symlinks
+    if [[ -d "${PACKDIR:?}/act_dr6_mflike" ]]; then
+      
+      if [[ -L "${COB:?}/${COBLIKE:?}/act_dr6_mflike" ]]; then
+      
+        rm "${COB:?}/${COBLIKE:?}/act_dr6_mflike"
+      
+      fi
+      
+      ln -s "${PACKDIR:?}/act_dr6_mflike" "${COB:?}/${COBLIKE:?}" \
+        >${OUT1:?} 2>${OUT2:?} || { error "${EC34:?}"; return 1; }
+    
     fi
 
   fi

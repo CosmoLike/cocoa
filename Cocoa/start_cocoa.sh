@@ -86,6 +86,25 @@ if [ -z "${IGNORE_PLANCK_COMPILATION}" ]; then
 fi
 
 # ----------------------------------------------------------------------------
+# ------------------------------- ACT LIKELIHOOD -----------------------------
+# ----------------------------------------------------------------------------
+if [ -z "${IGNORE_ACTDR6_CODE}" ]; then
+
+  if [[ ! -L "${ROOTDIR:?}/cobaya/cobaya/likelihoods/act_dr6_cmbonly" ]]; then
+    ln -s "${ROOTDIR:?}/external_modules/code/act_dr6_cmbonly/act_dr6_cmbonly" \
+          "${ROOTDIR:?}/cobaya/cobaya/likelihoods" \
+      >${OUT1:?} 2>${OUT2:?} || { error "${EC34:?}"; return 1; }
+  fi
+
+  if [[ ! -L "${ROOTDIR:?}/cobaya/cobaya/likelihoods/act_dr6_mflike" ]]; then
+    ln -s "${ROOTDIR:?}/external_modules/code/act_dr6_mflike/act_dr6_mflike" \
+          "${ROOTDIR:?}/cobaya/cobaya/likelihoods" \
+      >${OUT1:?} 2>${OUT2:?} || { error "${EC34:?}"; return 1; }
+  fi
+
+fi
+
+# ----------------------------------------------------------------------------
 # ------------------------ START EXTERNAL PROJECTS ---------------------------
 # ----------------------------------------------------------------------------
 

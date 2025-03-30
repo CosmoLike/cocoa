@@ -67,6 +67,20 @@ if [ -z "${IGNORE_PLANCK_COMPILATION}" ]; then
 fi
 
 # ----------------------------------------------------------------------------
+# ------------------------------- ACT LIKELIHOOD -----------------------------
+# ----------------------------------------------------------------------------
+if [ -z "${IGNORE_ACTDR6_CODE}" ]; then
+  if [[ -L "${ROOTDIR:?}/cobaya/cobaya/likelihoods/act_dr6_cmbonly" ]]; then
+    rm -f "${ROOTDIR:?}/cobaya/cobaya/likelihoods/act_dr6_cmbonly"
+  fi
+
+  if [[ -L "${ROOTDIR:?}/cobaya/cobaya/likelihoods/act_dr6_mflike" ]]; then
+    rm -f "${ROOTDIR:?}/cobaya/cobaya/likelihoods/act_dr6_mflike"
+  fi
+fi
+
+
+# ----------------------------------------------------------------------------
 # ------------------------ STOP EXTERNAL PROJECTS ---------------------------
 # ----------------------------------------------------------------------------
 
