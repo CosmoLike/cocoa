@@ -78,35 +78,6 @@ export IGNORE_MGCAMB_CODE=1
 # ------------------------------------------------------------------------------
 #export OVERWRITE_EXISTING_ALL_PACKAGES=1
 
-if [ -n "${OVERWRITE_EXISTING_ALL_PACKAGES}" ]; then
-
-  export OVERWRITE_EXISTING_COCOA_PRIVATE_PYTHON_ENV=1
-  export OVERWRITE_EXISTING_CORE_PACKAGES=1
-  export OVERWRITE_EXISTING_COSMOLIKE_CODE=1
-  export OVERWRITE_EXISTING_COBAYA_CODE=1
-  export OVERWRITE_EXISTING_CAMB_CODE=1
-  export OVERWRITE_EXISTING_MGCAMB_CODE=1
-  export OVERWRITE_EXISTING_CLASS_CODE=1
-  export OVERWRITE_EXISTING_HYREC_CODE=1
-  export OVERWRITE_EXISTING_COSMOREC_CODE=1
-  export OVERWRITE_EXISTING_POLYCHORD_CODE=1
-  export OVERWRITE_EXISTING_VELOCILEPTORS_CODE=1
-  export OVERWRITE_EXISTING_EE2_CODE=1
-  export OVERWRITE_EXISTING_BAO_DATA=1
-  export OVERWRITE_EXISTING_ACTDR4_CMB_DATA=1
-  export OVERWRITE_EXISTING_SIMONS_OBSERVATORY_CODE=1
-  export OVERWRITE_EXISTING_FGSPECTRA_DATA=1
-  export OVERWRITE_EXISTING_LIPOP_CMB_DATA=1
-  export OVERWRITE_EXISTING_ACTDR6_CMB_DATA=1
-  export OVERWRITE_EXISTING_BICEP_CMB_DATA=1
-  export OVERWRITE_EXISTING_CAMPSPEC_CMB_DATA=1
-  export OVERWRITE_EXISTING_SPT3G_CMB_DATA=1
-  export OVERWRITE_EXISTING_PLANCK_CMB_DATA=1
-  export OVERWRITE_EXISTING_SIMONS_OBSERVATORY_CMB_DATA=1
-  export OVERWRITE_EXISTING_SN_DATA=1
-  export OVERWRITE_EXISTING_HOLICOW_DATA=1
-
-fi
 # ------------------------------------------------------------------------------
 # If set, compile_planck.sh uses click like code from github.com/benabed/clik
 # ------------------------------------------------------------------------------
@@ -163,6 +134,41 @@ fi
 # We decided to install C++ Armadillo library locally 
 # to link it against lapack & OpenBlas & arpack
 unset IGNORE_CPP_ARMA_INSTALLATION
+
+# ------------------------------------------------------------------------------
+# If OVERWRITE_EXISTING_XXX_CODE=1, the setup_cocoa overwrites existing PACKAGES
+# overwrite means: delete existing PACKAGE folder and install it again ---------
+# these keys are only relevant if you run setup_cocoa multiple times -----------
+# ------------------------------------------------------------------------------
+if [ -n "${OVERWRITE_EXISTING_ALL_PACKAGES}" ]; then
+
+  export OVERWRITE_EXISTING_COCOA_PRIVATE_PYTHON_ENV=1
+  export OVERWRITE_EXISTING_CORE_PACKAGES=1
+  export OVERWRITE_EXISTING_COSMOLIKE_CODE=1
+  export OVERWRITE_EXISTING_COBAYA_CODE=1
+  export OVERWRITE_EXISTING_CAMB_CODE=1
+  export OVERWRITE_EXISTING_MGCAMB_CODE=1
+  export OVERWRITE_EXISTING_CLASS_CODE=1
+  export OVERWRITE_EXISTING_HYREC_CODE=1
+  export OVERWRITE_EXISTING_COSMOREC_CODE=1
+  export OVERWRITE_EXISTING_POLYCHORD_CODE=1
+  export OVERWRITE_EXISTING_VELOCILEPTORS_CODE=1
+  export OVERWRITE_EXISTING_EE2_CODE=1
+  export OVERWRITE_EXISTING_BAO_DATA=1
+  export OVERWRITE_EXISTING_ACTDR4_CMB_DATA=1
+  export OVERWRITE_EXISTING_SIMONS_OBSERVATORY_CODE=1
+  export OVERWRITE_EXISTING_FGSPECTRA_DATA=1
+  export OVERWRITE_EXISTING_LIPOP_CMB_DATA=1
+  export OVERWRITE_EXISTING_ACTDR6_CMB_DATA=1
+  export OVERWRITE_EXISTING_BICEP_CMB_DATA=1
+  export OVERWRITE_EXISTING_CAMPSPEC_CMB_DATA=1
+  export OVERWRITE_EXISTING_SPT3G_CMB_DATA=1
+  export OVERWRITE_EXISTING_PLANCK_CMB_DATA=1
+  export OVERWRITE_EXISTING_SIMONS_OBSERVATORY_CMB_DATA=1
+  export OVERWRITE_EXISTING_SN_DATA=1
+  export OVERWRITE_EXISTING_HOLICOW_DATA=1
+
+fi
 
 # ------------------------------------------------------------------------------
 # PACKAGE URL AND VERSIONS. CHANGES IN THE COMMIT ID MAY BREAK COCOA -----------
