@@ -110,36 +110,43 @@ if [[ -z "${SKIP_DECOMM_CORE_PACKAGES}" && -z "${IGNORE_CORE_INSTALLATION}" ]]; 
       # ------------------------------------------------------------------------
       # check if file exists
       if [ ! -f "${TFILES[$i]}.xz" ]; then
+      
         error "${EC36:?} (${TFILES[$i]}.xz)"; return 1;
+      
       fi
       
       # ------------------------------------------------------------------------
       # delete existing folder w/ same name as the folder inside the xz file 
       
       # check if the command that defines FOLDER fails
-      tar tf "${TFILES[$i]}.xz" | cut -f1 -d"/" | sort | uniq \
-        >${OUT1:?} 2>${OUT2:?} || 
-        { error "${EC25:?} (${TFILES[$i]}.xz)"; return 1; }
+      #tar tf "${TFILES[$i]}.xz" | cut -f1 -d"/" | sort | uniq \
+      #  >${OUT1:?} 2>${OUT2:?} || 
+      #  { error "${EC25:?} (${TFILES[$i]}.xz)"; return 1; }
 
       FOLDER=$(tar tf "${TFILES[$i]}.xz" | cut -f1 -d"/" | sort | uniq)
       if [ -z ${FOLDER:?} ]; then
         error "${EC25:?} (${TFILES[$i]}.xz)"; return 1;
       fi
 
-      rm -rf ${FOLDER:?}
+      if [ -n "${OVERWRITE_EXISTING_CORE_PACKAGES}" ]; then
+        
+        rm -rf ${FOLDER:?}
 
-      # ------------------------------------------------------------------------
+      fi
 
-      tar xf "${TFILES[$i]}.xz" >${OUT1:?} 2>${OUT2:?} || 
-        { error "${EC25:?} (${TFILES[$i]}.xz)"; return 1; }
+      if [ -z ${FOLDER:?} ]; then
 
+        tar xf "${TFILES[$i]}.xz" >${OUT1:?} 2>${OUT2:?} || 
+          { error "${EC25:?} (${TFILES[$i]}.xz)"; return 1; }
+
+      fi
       unset -v FOLDER
 
     fi
   
   done
 
-  # ----------------------------------------------------------------------------
+  cdfolder "${ROOTDIR}" || return 1;
 
   unset_all || return 1;
 

@@ -80,32 +80,40 @@ if [ -z "${IGNORE_LIPOP_LIKELIHOOD_CODE}" ]; then
     local URL="${2:?}"
 
     # in case you run this script more than once
-    rm -rf "${COB:?}/${TFOLDER:?}"
-    rm -rf "${COB:?}/${COBLIKE:?}/tmp"
+    if [ -n "${OVERWRITE_EXISTING_LIPOP_CMB_DATA}" ]; then
 
-    cdfolder "${COB:?}/${COBLIKE:?}" || return 1;
+      rm -rf "${COB:?}/${TFOLDER:?}"
+      rm -rf "${COB:?}/${COBLIKE:?}/tmp"
 
-    "${CURL:?}" -fsS "${URL:?}" >${OUT1:?} \
-      2>${OUT2:?} || { error "${EC27:?} (URL=${URL:?})"; return 1; }
+    fi
 
-    "${GIT:?}" clone --depth ${GIT_CLONE_MAXIMUM_DEPTH:?} "${URL:?}" "tmp" \
-      >${OUT1:?} 2>${OUT2:?} || { error "${EC15:?}"; return 1; }
-  
-    cdfolder "${COB:?}/${COBLIKE}/tmp" || return 1;
+    if [ ! -d "${COB:?}/${TFOLDER:?}" ]; then
 
-    "${GIT:?}" reset --hard "${3:?}" \
-      >${OUT1:?} 2>${OUT2:?} || { error "${EC23:?}"; return 1; }
+      cdfolder "${COB:?}/${COBLIKE:?}" || return 1;
 
-    cpfolder ${1:?}/ "${COB:?}/${COBLIKE:?}" || return 1;
+      "${CURL:?}" -fsS "${URL:?}" >${OUT1:?} \
+        2>${OUT2:?} || { error "${EC27:?} (URL=${URL:?})"; return 1; }
+
+      "${GIT:?}" clone --depth ${GIT_CLONE_MAXIMUM_DEPTH:?} "${URL:?}" "tmp" \
+        >${OUT1:?} 2>${OUT2:?} || { error "${EC15:?}"; return 1; }
     
-    cdfolder "${COB:?}/${TFOLDER:?}" || return 1;
-    
-    rm -rf "${COB:?}/${COBLIKE:?}/tmp"
+      cdfolder "${COB:?}/${COBLIKE}/tmp" || return 1;
 
-    cppatch "${TFOLDER:?}" "init.patch" || return 1
+      "${GIT:?}" reset --hard "${3:?}" \
+        >${OUT1:?} 2>${OUT2:?} || { error "${EC23:?}"; return 1; }
 
-    patch -u '__init__.py' -i 'init.patch' >${OUT1:?} 2>${OUT2:?} || 
-      { error "${EC17:?}"; return 1; }
+      cpfolder ${1:?}/ "${COB:?}/${COBLIKE:?}" || return 1;
+      
+      cdfolder "${COB:?}/${TFOLDER:?}" || return 1;
+      
+      rm -rf "${COB:?}/${COBLIKE:?}/tmp"
+
+      cppatch "${TFOLDER:?}" "init.patch" || return 1
+
+      patch -u '__init__.py' -i 'init.patch' >${OUT1:?} 2>${OUT2:?} || 
+        { error "${EC17:?}"; return 1; }
+
+    fi
 
     cdfolder "${ROOTDIR:?}" || return 1; 
   }

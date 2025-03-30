@@ -1,6 +1,6 @@
-timing: True
+stop_at_error: False
 debug: false
-stop_at_error: True
+timing: true
 
 likelihood:
   planck_2018_highl_plik.TTTEEE:

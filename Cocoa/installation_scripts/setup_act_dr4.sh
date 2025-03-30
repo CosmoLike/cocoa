@@ -69,57 +69,65 @@ if [ -z "${IGNORE_ACTDR4_CODE}" ]; then
   # ---------------------------------------------------------------------------
   # In case this script is called twice ---------------------------------------
   # ---------------------------------------------------------------------------
-  rm -rf "${PACKDIR:?}"
+  if [ -n "${OVERWRITE_EXISTING_ACTDR4_CMB_DATA}" ]; then
 
-  # ---------------------------------------------------------------------------
-  # Clone from original repo --------------------------------------------------
-  # ---------------------------------------------------------------------------
-  cdfolder "${ECODEF:?}" || { cdroot; return 1; }
+    rm -rf "${PACKDIR:?}"
 
-  "${CURL:?}" -fsS "${URL:?}" \
-    >${OUT1:?} 2>${OUT2:?} || { error "${EC27:?} (URL=${URL:?})"; return 1; }
-
-  "${GIT:?}" clone "${URL:?}" "${FOLDER:?}" \
-    >${OUT1:?} 2>${OUT2:?} || { error "${EC15:?}"; return 1; }
-  
-  cdfolder "${PACKDIR}" || { cdroot; return 1; }
-
-  if [ -n "${ACTDR4_GIT_COMMIT}" ]; then
-    "${GIT:?}" checkout "${ACTDR4_GIT_COMMIT:?}" \
-      >${OUT1:?} 2>${OUT2:?} || { error "${EC16:?}"; return 1; }
   fi
 
-  # need to apply patch
-    # ---------------------------------------------------------------------------
-  # Patch CAMB to be compatible w/ COCOA environment --------------------------
-  # We patch the files below so they use the right compilers ------------------
-  # ---------------------------------------------------------------------------
-  # T = TMP
-  declare -a TFOLDER=("pyactlike/" 
-                     ) # If nonblank, path must include /
+  if [ ! -d "${PACKDIR:?}" ]; then
+
+    # --------------------------------------------------------------------------
+    # Clone from original repo -------------------------------------------------
+    # --------------------------------------------------------------------------
+    cdfolder "${ECODEF:?}" || { cdroot; return 1; }
+
+    "${CURL:?}" -fsS "${URL:?}" \
+      >${OUT1:?} 2>${OUT2:?} || { error "${EC27:?} (URL=${URL:?})"; return 1; }
+
+    "${GIT:?}" clone "${URL:?}" "${FOLDER:?}" \
+      >${OUT1:?} 2>${OUT2:?} || { error "${EC15:?}"; return 1; }
+    
+    cdfolder "${PACKDIR}" || { cdroot; return 1; }
+
+    if [ -n "${ACTDR4_GIT_COMMIT}" ]; then
+      "${GIT:?}" checkout "${ACTDR4_GIT_COMMIT:?}" \
+        >${OUT1:?} 2>${OUT2:?} || { error "${EC16:?}"; return 1; }
+    fi
+
+    # need to apply patch
+    # --------------------------------------------------------------------------
+    # Patch CAMB to be compatible w/ COCOA environment -------------------------
+    # We patch the files below so they use the right compilers -----------------
+    # --------------------------------------------------------------------------
+    # T = TMP
+    declare -a TFOLDER=("pyactlike/" 
+                       ) # If nonblank, path must include /
+    
+    # T = TMP
+    declare -a TFILE=("like.py" 
+                     )
+
+    #T = TMP, P = PATCH
+    declare -a TFILEP=("like.patch" 
+                      )
+    # AL = Array Length
+    AL=${#TFOLDER[@]}
+
+    for (( i=0; i<${AL}; i++ ));
+    do
+      cdfolder "${PACKDIR:?}/${TFOLDER[$i]}" || return 1
+
+      cpfolder "${CHANGES:?}/${TFOLDER[$i]}${TFILEP[$i]:?}" . \
+        2>${OUT2:?} || return 1;
+
+      patch -u "${TFILE[$i]:?}" -i "${TFILEP[$i]:?}" >${OUT1:?} \
+        2>${OUT2:?} || { error "${EC17:?} (${TFILE[$i]:?})"; return 1; }
+    done
+
+  fi
   
-  # T = TMP
-  declare -a TFILE=("like.py" 
-                   )
-
-  #T = TMP, P = PATCH
-  declare -a TFILEP=("like.patch" 
-                    )
-  # AL = Array Length
-  AL=${#TFOLDER[@]}
-
-  for (( i=0; i<${AL}; i++ ));
-  do
-    cdfolder "${PACKDIR:?}/${TFOLDER[$i]}" || return 1
-
-    cpfolder "${CHANGES:?}/${TFOLDER[$i]}${TFILEP[$i]:?}" . \
-      2>${OUT2:?} || return 1;
-
-    patch -u "${TFILE[$i]:?}" -i "${TFILEP[$i]:?}" >${OUT1:?} \
-      2>${OUT2:?} || { error "${EC17:?} (${TFILE[$i]:?})"; return 1; }
-  done
-  
-  cdfolder "${ROOTDIR}" || return 1
+  cdfolder "${ROOTDIR}" || return 1;
   
   pbottom 'SETUP ACTDR4' || return 1
   

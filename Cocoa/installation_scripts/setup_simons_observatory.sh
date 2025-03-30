@@ -95,25 +95,33 @@ if [ -z "${IGNORE_SIMONS_OBSERVATORY_LIKELIHOOD_CODE}" ]; then
   # ---------------------------------------------------------------------------
   # in case this script is called twice
   # ---------------------------------------------------------------------------
-  rm -rf "${PACKDIR:?}"
+  if [ -n "${OVERWRITE_EXISTING_SIMONS_OBSERVATORY_CODE}" ]; then
 
-  # ---------------------------------------------------------------------------
-  # clone from original repo
-  # ---------------------------------------------------------------------------
-  cdfolder "${ECODEF}" || return 1;
+    rm -rf "${PACKDIR:?}"
 
-  "${CURL:?}" -fsS "${URL:?}" \
-    >${OUT1:?} 2>${OUT2:?} || { error "${EC27:?} (URL=${URL:?})"; return 1; }
+  fi
 
-  "${GIT:?}" clone "${URL:?}" --depth ${GIT_CLONE_MAXIMUM_DEPTH:?} \
-    --recursive "${FOLDER:?}" \
-    >${OUT1:?} 2>${OUT2:?} || { error "${EC15:?}"; return 1; }
+  if [ ! -d "${PACKDIR:?}" ]; then
+    
+    # ---------------------------------------------------------------------------
+    # clone from original repo
+    # ---------------------------------------------------------------------------
+    cdfolder "${ECODEF}" || return 1;
 
-  cdfolder "${PACKDIR}" || return 1;
+    "${CURL:?}" -fsS "${URL:?}" \
+      >${OUT1:?} 2>${OUT2:?} || { error "${EC27:?} (URL=${URL:?})"; return 1; }
 
-  if [ -n "${SO_SYSLIB_GIT_COMMIT}" ]; then
-    "${GIT:?}" checkout "${SO_SYSLIB_GIT_COMMIT:?}" \
-      >${OUT1:?} 2>${OUT2:?} || { error "${EC16:?}"; return 1; }
+    "${GIT:?}" clone "${URL:?}" --depth ${GIT_CLONE_MAXIMUM_DEPTH:?} \
+      --recursive "${FOLDER:?}" \
+      >${OUT1:?} 2>${OUT2:?} || { error "${EC15:?}"; return 1; }
+
+    cdfolder "${PACKDIR}" || return 1;
+
+    if [ -n "${SO_SYSLIB_GIT_COMMIT}" ]; then
+      "${GIT:?}" checkout "${SO_SYSLIB_GIT_COMMIT:?}" \
+        >${OUT1:?} 2>${OUT2:?} || { error "${EC16:?}"; return 1; }
+    fi
+
   fi
 
   cdfolder "${ROOTDIR}" || return 1

@@ -48,9 +48,11 @@ export IGNORE_LIPOP_CMB_DATA=1
 # The keys below control which packages will be installed and compiled 
 # ------------------------------------------------------------------------------
 #export IGNORE_COBAYA_CODE=1
-
 #export IGNORE_CAMB_CODE=1
-#export IGNORE_CLASS_CODE=1
+
+# Default we just use CAMB (it reduces compile_cocoa time)
+export IGNORE_CLASS_CODE=1
+
 #export IGNORE_COSMOLIKE_CODE=1
 #export IGNORE_POLYCHORD_SAMPLER_CODE=1
 #export IGNORE_PLANCK_LIKELIHOOD_CODE=1
@@ -70,16 +72,40 @@ export IGNORE_MGCAMB_CODE=1
 #export IGNORE_COSMOLIKE_LSSTY1_CODE=1
 
 # ------------------------------------------------------------------------------
-# If OVERWRITE_EXISTING_XXX_CODE is set, setup_XXX overwrites existing PACKAGES
-# overwrite = delete existing PACKAGE folder and install it again --------------
+# If OVERWRITE_EXISTING_XXX_CODE=1, the setup_cocoa overwrites existing PACKAGES
+# overwrite means: delete existing PACKAGE folder and install it again ---------
+# these keys are only relevant if you run setup_cocoa multiple times -----------
 # ------------------------------------------------------------------------------
-#export OVERWRITE_EXISTING_COSMOLIKE_CODE=1
-export OVERWRITE_EXISTING_CAMB_CODE=1
-export OVERWRITE_EXISTING_MGCAMB_CODE=1
-export OVERWRITE_EXISTING_CLASS_CODE=1
-export OVERWRITE_EXISTING_HYREC_CODE=1
-export OVERWRITE_EXISTING_COSMOREC_CODE=1
+#export OVERWRITE_EXISTING_ALL=1
 
+if [ -n "${OVERWRITE_EXISTING_COCOA_PRIVATE_PYTHON_ENV}" ]; then
+
+  export OVERWRITE_EXISTING_COCOA_PRIVATE_PYTHON_ENV=1
+  export OVERWRITE_EXISTING_CORE_PACKAGES=1
+  export OVERWRITE_EXISTING_COSMOLIKE_CODE=1
+  export OVERWRITE_EXISTING_COBAYA_CODE=1
+  export OVERWRITE_EXISTING_CAMB_CODE=1
+  export OVERWRITE_EXISTING_MGCAMB_CODE=1
+  export OVERWRITE_EXISTING_CLASS_CODE=1
+  export OVERWRITE_EXISTING_HYREC_CODE=1
+  export OVERWRITE_EXISTING_COSMOREC_CODE=1
+  export OVERWRITE_EXISTING_POLYCHORD_CODE=1
+  export OVERWRITE_EXISTING_VELOCILEPTORS_CODE=1
+  export OVERWRITE_EXISTING_BAO_DATA=1
+  export OVERWRITE_EXISTING_ACTDR4_CMB_DATA=1
+  export OVERWRITE_EXISTING_SIMONS_OBSERVATORY_CODE=1
+  export OVERWRITE_EXISTING_FGSPECTRA_DATA=1
+  export OVERWRITE_EXISTING_LIPOP_CMB_DATA=1
+  export OVERWRITE_EXISTING_ACTDR6_CMB_DATA=1
+  export OVERWRITE_EXISTING_BICEP_CMB_DATA=1
+  export OVERWRITE_EXISTING_CAMPSPEC_CMB_DATA=1
+  export OVERWRITE_EXISTING_SPT3G_CMB_DATA=1
+  export OVERWRITE_EXISTING_PLANCK_CMB_DATA=1
+  export OVERWRITE_EXISTING_SIMONS_OBSERVATORY_CMB_DATA=1
+  export OVERWRITE_EXISTING_SN_DATA=1
+  export OVERWRITE_EXISTING_HOLICOW_DATA=1
+
+fi
 # ------------------------------------------------------------------------------
 # If set, compile_planck.sh uses click like code from github.com/benabed/clik
 # ------------------------------------------------------------------------------
@@ -108,8 +134,13 @@ export MINICONDA_INSTALLATION=1
 #export MANUAL_INSTALLATION=1
 
 # ------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # DERIVED & RARELY CHANGED FLAGS (DO NOT CHANGE) -------------------------------
 # ------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
+
 if [ -n "${MANUAL_INSTALLATION}" ]; then      
   source "${ROOTDIR:?}/installation_scripts/flags_manual_installation.sh" 
   if [ $? -ne 0 ]; then
@@ -166,11 +197,13 @@ export POLYCHORD_GIT_COMMIT="daba49d1385d065122db76a2b384050f9e95d278"
 export POLY_NAME="PolyChordLite"
 
 export CAMB_URL="https://github.com/cmbant/CAMB"
-export CAMB_GIT_COMMIT="45d1c3d27e7480c0f9a82c98522c17ed422dd408"
+#export CAMB_GIT_COMMIT="45d1c3d27e7480c0f9a82c98522c17ed422dd408"
+export CAMB_GIT_COMMIT="886b17cbc23137737b7ef4318d165aa7bdbbbbed"
 export CAMB_NAME='CAMB'
 
 export CLASS_URL="https://github.com/lesgourg/class_public.git"
-export CLASS_GIT_COMMIT="8df566c1ff2d0b3e40e106567c435575aea337be"
+#export CLASS_GIT_COMMIT="8df566c1ff2d0b3e40e106567c435575aea337be"
+export CLASS_GIT_COMMIT="0ceb7a9a4c1e444ef5d5d56a8328a0640be91b18"
 export CLASS_NAME="class_public"
 
 export ACTDR4_URL="https://github.com/ACTCollaboration/pyactlike"

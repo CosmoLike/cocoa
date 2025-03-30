@@ -67,26 +67,31 @@ if [ -z "${IGNORE_ACTDR6_DATA}" ]; then
 
   # ---------------------------------------------------------------------------
   # note: in case script run >1x w/ previous run stoped prematurely b/c error
-  
-  rm -rf "${PACKDIR:?}"
-
-  # ---------------------------------------------------------------------------
-
-  mkdir -p "${PACKDIR:?}" \
-    >${OUT1:?} 2>${OUT2:?}  || { error "${EC20:?}"; return 1; }
-  
-  mkdir -p "${PACKDIR:?}/lensing" \
-    >${OUT1:?} 2>${OUT2:?} || { error "${EC20:?}"; return 1; }
+  if [ -n "${OVERWRITE_EXISTING_ACTDR6_CMB_DATA}" ]; then
     
-  cdfolder "${PACKDIR:?}/lensing" || return 1
+    rm -rf "${PACKDIR:?}"
 
-  "${WGET:?}" "${URL:?}" -q --show-progress --progress=bar:force || 
-    { error "${EC24:?}"; return 1; }
+  fi
 
-  tar -zxvf "${FILE:?}" \
-    >${OUT1:?} 2>${OUT2:?} || { error "${EC25:?}"; return 1; }
+  if [ ! -d "${PACKDIR:?}" ]; then
 
-  # ---------------------------------------------------------------------------
+    mkdir -p "${PACKDIR:?}" \
+      >${OUT1:?} 2>${OUT2:?}  || { error "${EC20:?}"; return 1; }
+    
+    mkdir -p "${PACKDIR:?}/lensing" \
+      >${OUT1:?} 2>${OUT2:?} || { error "${EC20:?}"; return 1; }
+      
+    cdfolder "${PACKDIR:?}/lensing" || return 1
+
+    "${WGET:?}" "${URL:?}" -q --show-progress --progress=bar:force || 
+      { error "${EC24:?}"; return 1; }
+
+    tar -zxvf "${FILE:?}" \
+      >${OUT1:?} 2>${OUT2:?} || { error "${EC25:?}"; return 1; }
+
+  fi
+
+  cdfolder "${ROOTDIR}" || return 1;
   
   pbottom "SETUP/UNXV ${PRINTNAME:?} DATA" || return 1
 

@@ -67,22 +67,27 @@ if [ -z "${IGNORE_CAMSPEC_CMB_DATA}" ]; then
 
   # ---------------------------------------------------------------------------
   # note: in case script run >1x w/ previous run stoped prematurely b/c error
+  if [ -n "${OVERWRITE_EXISTING_CAMPSPEC_CMB_DATA}" ]; then
   
-  rm -rf "${PACKDIR:?}"
+    rm -rf "${PACKDIR:?}"
 
-  rm -rf "${EDATAF:?}/${FILE:?}"
+    rm -rf "${EDATAF:?}/${FILE:?}"
+
+  fi
   
-  # ---------------------------------------------------------------------------
+  if [ ! -d "${PACKDIR:?}" ]; then
 
-  cdfolder "${EDATAF:?}" || return 1
+    cdfolder "${EDATAF:?}" || return 1
 
-  "${WGET:?}" "${URL:?}" -q --show-progress \
-    --progress=bar:force:noscroll || { error "${EC24:?}"; return 1; }
-  
-  unzip "${FILE:?}" >${OUT1:?} 2>${OUT2:?} || { error "${EC26:?}"; return 1; }
+    "${WGET:?}" "${URL:?}" -q --show-progress \
+      --progress=bar:force:noscroll || { error "${EC24:?}"; return 1; }
+    
+    unzip "${FILE:?}" >${OUT1:?} 2>${OUT2:?} || { error "${EC26:?}"; return 1; }
 
-  # ---------------------------------------------------------------------------
-  
+  fi
+
+  cdfolder "${ROOTDIR}" || return 1;
+    
   pbottom "SETUP/UNXV ${PRINTNAME:?} DATA" || return 1
 
   unset_all || return 1

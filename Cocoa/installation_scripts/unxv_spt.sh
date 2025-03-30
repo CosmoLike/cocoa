@@ -63,30 +63,35 @@ if [ -z "${IGNORE_SPT_CMB_DATA}" ]; then
   
   # ---------------------------------------------------------------------------
   # note: in case this script is run twice
-  
-  rm -rf "${PACKDIR:?}"
-  
-  # ---------------------------------------------------------------------------
+  if [ -n "${OVERWRITE_EXISTING_SPT3G_CMB_DATA}" ]; then
 
-  cdfolder "${EDATAF:?}" || return 1
+    rm -rf "${PACKDIR:?}"
 
-  # check if the link exists
-  "${CURL:?}" -fsS "${URL:?}" \
-    >${OUT1:?} 2>${OUT2:?} || { error "${EC27:?} (URL=${URL:?})"; return 1; }
+  fi
+  
+  if [ ! -d "${PACKDIR:?}" ]; then
+
+    cdfolder "${EDATAF:?}" || return 1
+
+    # check if the link exists
+    "${CURL:?}" -fsS "${URL:?}" \
+      >${OUT1:?} 2>${OUT2:?} || { error "${EC27:?} (URL=${URL:?})"; return 1; }
+      
+    ${GIT:?} clone "${URL:?}" "${FOLDER:?}" \
+      >${OUT1:?} 2>${OUT2:?} || { error "${EC15:?}"; return 1; }
+
+    if [ -n "${SPT3G_DATA_GIT_COMMIT}" ]; then
+      
+      cdfolder "${PACKDIR:?}"
+
+      ${GIT:?} checkout "${SPT3G_DATA_GIT_COMMIT:?}" \
+        >${OUT1:?} 2>${OUT2:?} || { error "${EC16:?}"; return 1; }
     
-  ${GIT:?} clone "${URL:?}" "${FOLDER:?}" \
-    >${OUT1:?} 2>${OUT2:?} || { error "${EC15:?}"; return 1; }
+    fi
 
-  if [ -n "${SPT3G_DATA_GIT_COMMIT}" ]; then
-    
-    cdfolder "${PACKDIR:?}"
-
-    ${GIT:?} checkout "${SPT3G_DATA_GIT_COMMIT:?}" \
-      >${OUT1:?} 2>${OUT2:?} || { error "${EC16:?}"; return 1; }
-  
   fi
 
-  # ---------------------------------------------------------------------------
+  cdfolder "${ROOTDIR}" || return 1;
 
   pbottom "SETUP/UNXV ${PRINTNAME:?} DATA" || return 1
 

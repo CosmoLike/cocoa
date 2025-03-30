@@ -67,25 +67,33 @@ if [ -z "${IGNORE_VELOCILEPTORS_CODE}" ]; then
   # ---------------------------------------------------------------------------
   # In case this script is called twice ---------------------------------------
   # ---------------------------------------------------------------------------
-  rm -rf "${PACKDIR:?}"
+  if [ -n "${OVERWRITE_EXISTING_VELOCILEPTORS_CODE}" ]; then
 
-  # ---------------------------------------------------------------------------
-  # Clone from original repo --------------------------------------------------
-  # ---------------------------------------------------------------------------
-  cdfolder "${ECODEF:?}" || { cdroot; return 1; }
+    rm -rf "${PACKDIR:?}"
 
-  "${CURL:?}" -fsS "${URL:?}" \
-    >${OUT1:?} 2>${OUT2:?} || { error "${EC27:?} (URL=${URL:?})"; return 1; }
+  fi
 
-  "${GIT:?}" clone "${URL:?}" --depth ${GIT_CLONE_MAXIMUM_DEPTH:?} \
-    --recursive "${FOLDER:?}" \
-    >${OUT1:?} 2>${OUT2:?} || { error "${EC15:?}"; return 1; }
-  
-  cdfolder "${PACKDIR}" || { cdroot; return 1; }
+  if [ ! -d "${PACKDIR:?}" ]; then
+    
+    # ---------------------------------------------------------------------------
+    # Clone from original repo --------------------------------------------------
+    # ---------------------------------------------------------------------------
+    cdfolder "${ECODEF:?}" || { cdroot; return 1; }
 
-  if [ -n "${VELOCILEPTORS_GIT_COMMIT}" ]; then
-    "${GIT:?}" checkout "${VELOCILEPTORS_GIT_COMMIT:?}" \
-      >${OUT1:?} 2>${OUT2:?} || { error "${EC16:?}"; return 1; }
+    "${CURL:?}" -fsS "${URL:?}" \
+      >${OUT1:?} 2>${OUT2:?} || { error "${EC27:?} (URL=${URL:?})"; return 1; }
+
+    "${GIT:?}" clone "${URL:?}" --depth ${GIT_CLONE_MAXIMUM_DEPTH:?} \
+      --recursive "${FOLDER:?}" \
+      >${OUT1:?} 2>${OUT2:?} || { error "${EC15:?}"; return 1; }
+    
+    cdfolder "${PACKDIR}" || { cdroot; return 1; }
+
+    if [ -n "${VELOCILEPTORS_GIT_COMMIT}" ]; then
+      "${GIT:?}" checkout "${VELOCILEPTORS_GIT_COMMIT:?}" \
+        >${OUT1:?} 2>${OUT2:?} || { error "${EC16:?}"; return 1; }
+    fi
+
   fi
     
   cdfolder "${ROOTDIR}" || return 1

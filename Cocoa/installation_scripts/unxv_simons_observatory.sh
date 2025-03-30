@@ -65,33 +65,38 @@ if [ -z "${IGNORE_SIMONS_OBSERVATORY_CMB_DATA}" ]; then
 
   # --------------------------------------------------------------------------
   # note: in case script run >1x w/ previous run stoped prematurely b/c error
+  if [ -n "${OVERWRITE_EXISTING_SIMONS_OBSERVATORY_CMB_DATA}" ]; then
+
+    rm -rf "${PACKDIR:?}"
+
+  fi
   
-  rm -rf "${PACKDIR:?}"
+  if [ ! -d "${PACKDIR:?}" ]; then
+    
+    mkdir -p "${PACKDIR:?}" \
+      >${OUT1:?} 2>${OUT2:?} || { error "${EC20:?}"; return 1; }
+    
+    cdfolder "${PACKDIR:?}" || return 1
+
+    # note: users can download multiple versions (reproduce existing work)
+    # note: For example, SO_DATA_VERSION="v0.7.1 v0.8"
+    # note: This is only possible because each ver is saved on a separated folder
+    for x in $(echo "${VER:?}")
+    do
+      FILE="${x}.tar.gz"
+
+      "${WGET:?}" "${URL}/${FILE:?}" -q --show-progress --progress=bar:force \
+        || { error "${EC24:?}"; return 1; }
+
+      tar -zxvf "${FILE:?}" \
+        >${OUT1:?} 2>${OUT2:?} || { error "${EC25:?}"; return 1; }
+    
+    done
+
+  fi
+
+  cdfolder "${ROOTDIR}" || return 1;
   
-  # ---------------------------------------------------------------------------
-
-  mkdir -p "${PACKDIR:?}" \
-    >${OUT1:?} 2>${OUT2:?} || { error "${EC20:?}"; return 1; }
-  
-  cdfolder "${PACKDIR:?}" || return 1
-
-  # note: users can download multiple versions (reproduce existing work)
-  # note: For example, SO_DATA_VERSION="v0.7.1 v0.8"
-  # note: This is only possible because each ver is saved on a separated folder
-  for x in $(echo "${VER:?}")
-  do
-    FILE="${x}.tar.gz"
-
-    "${WGET:?}" "${URL}/${FILE:?}" -q --show-progress --progress=bar:force \
-      || { error "${EC24:?}"; return 1; }
-
-    tar -zxvf "${FILE:?}" \
-      >${OUT1:?} 2>${OUT2:?} || { error "${EC25:?}"; return 1; }
-  
-  done
-
-  # ---------------------------------------------------------------------------
-
   pbottom "SETUP/UNXV ${PRINTNAME:?} DATA" || return 1
 
   unset_all || return 1
