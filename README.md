@@ -85,7 +85,7 @@ Users can now proceed to **step :two:**.
     git-lfs install
 
 > [!WARNING]
-> In the next section, we assume users have loaded the Cocoa conda environment via the `conda activate cocoa` command.
+> In the next section, we assume users have activated the Cocoa conda environment
 
 ## Installation and Compilation of external modules <a name="cobaya_base_code"></a>
 
