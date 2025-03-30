@@ -103,9 +103,12 @@ Users can now proceed to **step :two:**.
 > If users want to clone the latest commit (not advisable), then clone the repository with the following command 
 >
 > (ssh privilege)
+> 
 >     "${CONDA_PREFIX}"/bin/git clone git@github.com:CosmoLike/cocoa.git cocoa
+> 
 > (HTTP)
->.    "${CONDA_PREFIX}"/bin/git clone https://github.com/CosmoLike/cocoa.git cocoa
+> 
+>     "${CONDA_PREFIX}"/bin/git clone https://github.com/CosmoLike/cocoa.git cocoa
 
 > [!TIP]
 > If the developers want to start coding a new feature or fix a bug from the git clone of a release version (e.g., `--branch v4.0-beta17`), check the appendix [FAQ: How do we push changes to the Cocoa main branch? A few git hacks](#push_main) subsection *How to develop starting from a git tag?*
