@@ -223,8 +223,13 @@ export ACTDR4_URL="https://github.com/ACTCollaboration/pyactlike"
 export ACTDR4_GIT_COMMIT="1cac8c5d047bc2cad991890f2ebf1d8e3fb483b3"
 export ACTDR4_NAME="pyactlike"
 
+export ACTDR6CMBONLY_URL="https://github.com/ACTCollaboration/DR6-ACT-lite.git"
+export ACTDR6CMBONLY_GIT_COMMIT="627aeafb88ae5ad1aa66b406bea2d65cfa66a27d"
+export ACTDR6CMBONLY_NAME='act_dr6_cmbonly'
+
 export ACTDR6_LENSING_DATA_URL="https://lambda.gsfc.nasa.gov/data/suborbital/ACT/ACT_dr6/likelihood/data"
 export ACTDR6_LENSING_DATA_FILE="ACT_dr6_likelihood_v1.2.tgz"
+
 export ACTDR6_CMBONLY_DATA_URL="https://lambda.gsfc.nasa.gov/data/act/pspipe/sacc_files/"
 export ACTDR6_CMBONLY_DATA_FILE="dr6_data_cmbonly.tar.gz"
 
@@ -263,9 +268,7 @@ export MGCAMB_URL="https://github.com/sfu-cosmo/MGCobaya.git"
 export MGCAMB_GIT_COMMIT="443c4a733db687ac18e918b8ed09b45003a8c4ca"
 export MGCAMB_NAME='MGCAMB'
 
-export ACTDR6CMBONLY_URL="https://github.com/ACTCollaboration/DR6-ACT-lite.git"
-export ACTDR6CMBONLY_GIT_COMMIT="627aeafb88ae5ad1aa66b406bea2d65cfa66a27d"
-export ACTDR6CMBONLY_NAME='act_dr6_cmbonly'
+
 # --------------------------------------------------------------------
 # --------------------------------------------------------------------
 # Cosmolike projects below
