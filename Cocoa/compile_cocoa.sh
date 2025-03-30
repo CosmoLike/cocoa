@@ -42,6 +42,7 @@ declare -a SCRIPTS=("compile_core_packages.sh"
                      "compile_polychord.sh"
                      "compile_velocileptors.sh"
                      "compile_ee2.sh"
+                     "compile_fgspectra.sh"
                      "compile_simons_observatory.sh"
                      ) # T = TMP
 

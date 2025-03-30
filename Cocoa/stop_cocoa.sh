@@ -86,6 +86,9 @@ if [[ -z "${IGNORE_SIMONS_OBSERVATORY_LIKELIHOOD_CODE}" ]]; then
   if [[ -L "${ROOTDIR:?}/cobaya/cobaya/likelihoods/mflike" ]]; then
     rm -f "${ROOTDIR:?}/cobaya/cobaya/likelihoods/mflike"
   fi
+  if [[ -L "${ROOTDIR:?}/cobaya/cobaya/theories/mflike" ]]; then
+    rm -f "${ROOTDIR:?}/cobaya/cobaya/theories/mflike"
+  fi
 fi
 
 # ----------------------------------------------------------------------------

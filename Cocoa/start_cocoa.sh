@@ -113,6 +113,11 @@ if [[ -z "${IGNORE_SIMONS_OBSERVATORY_LIKELIHOOD_CODE}" ]]; then
           "${ROOTDIR:?}/cobaya/cobaya/likelihoods" \
       >${OUT1:?} 2>${OUT2:?} || { error "${EC34:?}"; return 1; }
   fi
+  if [[ ! -L "${ROOTDIR:?}/cobaya/cobaya/theories/mflike" ]]; then
+    ln -s "${ROOTDIR:?}/external_modules/code/mflike/mflike" \
+          "${ROOTDIR:?}/cobaya/cobaya/theories" \
+      >${OUT1:?} 2>${OUT2:?} || { error "${EC34:?}"; return 1; }
+  fi
 fi
 
 # ----------------------------------------------------------------------------

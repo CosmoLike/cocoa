@@ -139,9 +139,15 @@ fi
 unset IGNORE_CPP_ARMA_INSTALLATION
 
 # ------------------------------------------------------------------------------
-#COMPATIBILITY: ACTDR6 IS BASED ON SIMONS_OBSERVATORY LAT_MFLike LIKELIHOOD ----
+# -------------------- COMPATIBILITY/DEPENDENCIES ------------------------------
+# ------------------------------------------------------------------------------
 if [ -z "${IGNORE_ACTDR6_CODE}" ]; then
+  unset -v IGNORE_FGSPECTRA_CODE
   unset -v IGNORE_SIMONS_OBSERVATORY_LIKELIHOOD_CODE
+fi
+
+if [ -z "${IGNORE_SIMONS_OBSERVATORY_LIKELIHOOD_CODE}" ]; then
+  unset -v IGNORE_FGSPECTRA_CODE
 fi
 # ------------------------------------------------------------------------------
 

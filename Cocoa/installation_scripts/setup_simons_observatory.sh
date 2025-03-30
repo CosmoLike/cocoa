@@ -12,7 +12,8 @@ if [ -z "${IGNORE_SIMONS_OBSERVATORY_LIKELIHOOD_CODE}" ]; then
   ( source "${ROOTDIR:?}/installation_scripts/flags_check.sh" ) || return 1;
 
   unset_env_vars () {
-    unset -v COB CCCOB COBLIKE URL FOLDER PACKDIR PRINTNAME ECODEF URL
+    unset -v COB CCCOB COBLIKE URL FOLDER PACKDIR PRINTNAME ECODEF URL 
+    unset -v COBTH
     cdroot || return 1;
   }
 
@@ -51,12 +52,6 @@ if [ -z "${IGNORE_SIMONS_OBSERVATORY_LIKELIHOOD_CODE}" ]; then
   # ----------------------------------------------------------------------------
   # ----------------------------------------------------------------------------
   # ----------------------------------------------------------------------------
-  unset -v IGNORE_FGSPECTRA_CODE
-  ( source "${ROOTDIR:?}/installation_scripts/setup_fgspectra.sh" ) || return 1;
-
-  # ----------------------------------------------------------------------------
-  # ----------------------------------------------------------------------------
-  # ----------------------------------------------------------------------------
   
   unset_env_vars || return 1
 
@@ -64,9 +59,11 @@ if [ -z "${IGNORE_SIMONS_OBSERVATORY_LIKELIHOOD_CODE}" ]; then
 
   COB="${ROOTDIR:?}/cobaya"        # COB = Cobaya
 
-  CCCOB="${CCIL:?}/cobaya_changes"  # CC = CoCoA, COB = Cobaya (Cocoa Cobaya)
+  CCCOB="${CCIL:?}/cobaya_changes" # CC = CoCoA, COB = Cobaya (Cocoa Cobaya)
   
-  COBLIKE="cobaya/likelihoods"      # COB = Cobaya, LIKE = likelihoods
+  COBLIKE="cobaya/likelihoods"     # COB = Cobaya, LIKE = likelihoods
+  
+  COBTH="cobaya/theories"          # COB = Cobaya, TH = theories
   
   # ----------------------------------------------------------------------------
   # ----------------------------------------------------------------------------
@@ -189,7 +186,14 @@ if [ -z "${IGNORE_SIMONS_OBSERVATORY_LIKELIHOOD_CODE}" ]; then
 
       ln -s "${PACKDIR:?}/mflike" "${COB:?}/${COBLIKE:?}" \
         >${OUT1:?} 2>${OUT2:?} || { error "${EC34:?}"; return 1; }
-    
+
+      if [[ -L "${COB:?}/${COBTH:?}/mflike" ]]; then
+        rm -f "${COB:?}/${COBTH:?}/mflike"
+      fi
+
+      ln -s "${PACKDIR:?}/mflike" "${COB:?}/${COBTH:?}" \
+        >${OUT1:?} 2>${OUT2:?} || { error "${EC34:?}"; return 1; }
+
     fi
 
   fi
