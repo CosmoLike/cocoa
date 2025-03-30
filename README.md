@@ -100,7 +100,7 @@ and
 Users can now proceed to **step :two:**.
 
 > [!TIP]
-> If users want to clone the repository in development mode, type the following command to clone the repository from the latest main commit.
+> If users want to work in development mode from the latest commit, then clone the repository with the following command
 >
 >     "${CONDA_PREFIX}"/bin/git clone git@github.com:CosmoLike/cocoa.git cocoa
 
