@@ -38,7 +38,7 @@ This readme file presents basic and advanced instructions for installing all [Co
 
 ## Installation of core packages via Conda <a name="required_packages_conda"></a>
 
-Core packages include compilers and numerical libraries (e.g., GSL and FFTW) that we need but will never develop or modify in any research project. We install most of these core packages via Conda, as shown below.
+Core packages include compilers and numerical libraries (e.g., GSL and FFTW) that we will never modify in any research project. We install most of these core packages via Conda, as shown below.
 
 **Step :one:**: Download the file `cocoapy39.yml` yml file
 
