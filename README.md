@@ -104,7 +104,7 @@ Users can now proceed to **step :two:**.
 >
 > (ssh privilege)
 >     "${CONDA_PREFIX}"/bin/git clone git@github.com:CosmoLike/cocoa.git cocoa
-> (http)
+> (HTTP)
 >.    "${CONDA_PREFIX}"/bin/git clone https://github.com/CosmoLike/cocoa.git cocoa
 
 > [!TIP]
