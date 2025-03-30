@@ -275,7 +275,7 @@ Following best practices, Cocoa scripts download most external modules from thei
 > If users want to compile only a subset of these packages, refer to the appendix [Compiling Boltzmann, CosmoLike, and Likelihood codes separately](#appendix_compile_separately).
           
 > [!NOTE]
->  Our scripts never install packages on `$HOME/.local` as that would make them global to the user. All requirements for Cocoa are installed at
+>  Our scripts never install packages on `$HOME/.local` as that would make them global to the user. Instead, they are installed at
 >
 >      Cocoa/.local/bin
 >      Cocoa/.local/include
