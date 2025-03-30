@@ -209,19 +209,19 @@ sampler:
       tau: 0.0544
       w0pwa: -0.999
       w: -0.999
-      #a_tSZ: 3.30
-      #a_kSZ: 1.6
-      #a_p: 6.90
-      #beta_p: 2.08
-      #a_c: 4.90
-      #beta_c: 2.20
-      #a_s: 3.10
-      #a_gtt: 2.81
-      #a_gte: 0.10
-      #a_gee: 0.10
-      #a_psee: 0.0
-      #a_pste: 0.0
-      #xi: 0.2
+      a_tSZ: 3.30
+      a_kSZ: 1.6
+      a_p: 6.90
+      beta_p: 2.08
+      a_c: 4.90
+      beta_c: 2.20
+      a_s: 3.10
+      a_gtt: 2.81
+      a_gte: 0.10
+      a_gee: 0.10
+      a_psee: 0.0
+      a_pste: 0.0
+      xi: 0.2
       T_d: 9.60
 
 output: ./projects/example/chains/EXAMPLE_EVALUATE6
