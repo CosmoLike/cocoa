@@ -118,10 +118,10 @@ Users can now proceed to **step :two:**.
     source setup_cocoa.sh
 
 > [!NOTE]
-> This script downloads and decompresses external modules set on the `set_installation_options.sh` script (e.g., CAMB and Class), requiring internet access to run successfully.
+> This script downloads and decompresses external modules, requiring internet access to run successfully.
 
 > [!Tip]
-> If you run `setup_cocoa.sh` more than once, Cocoa will not download previously installed packages and remake the Python private environment. To overwrite this default behavior, users must set the key `OVERWRITE_EXISTING_ALL_PACKAGES` on the `set_installation_options.sh` shell script. This optimization prevents Cocoa from downloading several gigabytes repeatedly. 
+> If users run `setup_cocoa.sh` more than once, Cocoa will not download previously installed packages or remake the Cocoa private Python environment. To overwrite this behavior, users must set the key `OVERWRITE_EXISTING_ALL_PACKAGES` on the `set_installation_options.sh` shell script. This optimization prevents Cocoa from downloading several gigabytes repeatedly. 
 
 **Step :three:**: Run the script `compile_cocoa.sh` by typing 
 
