@@ -64,10 +64,10 @@ and create symbolic links that will give better names for the GNU compilers
 Users can now proceed to **step :two:**. 
 
 > [!TIP]
-> To install the Cocoa environment on a supercomputer, users may take advantage of the fact that many HPC environments provide the [Anaconda installer](https://www.anaconda.com) as an external module. Check the Appendix [FAQ: How do we use an available Anaconda module on HPC?](#overview_anaconda).
+> To install the Cocoa environment on a supercomputer, users may take advantage of the fact that many HPC environments provide the [Anaconda installer](https://www.anaconda.com) as an external module. Check the appendix [FAQ: How do we use an available Anaconda module on HPC?](#overview_anaconda).
 
 > [!TIP]
-> Users not working on an HPC environment that offers Anaconda or [Miniconda](https://docs.anaconda.com/miniconda/) may want to check the Appendix [FAQ: What if there is no Conda? Miniconda installation](#overview_miniconda).
+> Users not working on an HPC environment that offers Anaconda or [Miniconda](https://docs.anaconda.com/miniconda/) may want to check the appendix [FAQ: What if there is no Conda? Miniconda installation](#overview_miniconda).
 
 > [!TIP]
 > We provide the YML file `cocoapy310.yml` so users can work on Python 3.10. In this setup, users must also modify the following flag `PYTHON_VERSION` on the shell script `set_installation_options.sh` before proceeding further with the Cocoa installation.
@@ -91,7 +91,7 @@ Users can now proceed to **step :two:**.
 
 **Step :one:**: Download Cocoa's latest release and go to the `cocoa` main folder,
 
-    "${CONDA_PREFIX}"/bin/git clone --depth 1 https://github.com/CosmoLike/cocoa.git --branch v4.0-beta17 cocoa
+    "${CONDA_PREFIX}"/bin/git clone --depth 1 https://github.com/CosmoLike/cocoa.git --branch v4.0-beta19 cocoa
 
 and
 
@@ -102,13 +102,16 @@ Users can now proceed to **step :two:**.
 > [!TIP]
 > If users want to clone the latest commit (not advisable), then clone the repository with the following command 
 >
-> (ssh privilege)
+> (SSH)
+> 
 >     "${CONDA_PREFIX}"/bin/git clone git@github.com:CosmoLike/cocoa.git cocoa
+> 
 > (HTTP)
->.    "${CONDA_PREFIX}"/bin/git clone https://github.com/CosmoLike/cocoa.git cocoa
+> 
+>     "${CONDA_PREFIX}"/bin/git clone https://github.com/CosmoLike/cocoa.git cocoa
 
 > [!TIP]
-> If the developers want to start coding a new feature or fix a bug from the git clone of a release version (e.g., `--branch v4.0-beta17`), check the appendix [FAQ: How do we push changes to the Cocoa main branch? A few git hacks](#push_main) subsection *How to develop starting from a git tag?*
+> If the developers want to start coding a new feature or fix a bug from the git clone of a release version (e.g., `v4.0-beta17`), check the appendix [FAQ: How do we push changes to the Cocoa main branch? A few git hacks](#push_main)
 
 **Step :two:**: Run the script `setup_cocoa.sh` via
         
@@ -221,7 +224,7 @@ and
 > Now go to the local internet browser and type `http://XX.YY.ZZ.123:8888/?token=XXX`.
 
 > [!TIP]
-> If users want to download a project not provided by default or intend to clone existing projects in development mode, check the Appendix [FAQ: How do we download and run Cosmolike projects?](running_cosmolike_projects).
+> If users want to download a project not provided by default or intend to clone existing projects in development mode, check the appendix [FAQ: How do we download and run Cosmolike projects?](running_cosmolike_projects).
 > 
 ## Appendix <a name="appendix"></a>
 
@@ -258,13 +261,13 @@ Following best practices, Cocoa scripts download most external modules from thei
 - *Installation of core packages via Conda* 
  
 > [!TIP]
-> For those working on projects that utilize machine-learning-based emulators, the Appendix [Setting-up conda environment for Machine Learning emulators](#ml_emulators) provides additional commands for installing the necessary packages.
+> For those working on projects that utilize machine-learning-based emulators, the appendix [Setting-up conda environment for Machine Learning emulators](#ml_emulators) provides additional commands for installing the necessary packages.
 
 > [!TIP]
-> We provide a docker image named *whovian-cocoa* that facilitates cocoa installation on Windows and MacOS. For further instructions, refer to the Appendix [FAQ: How do you run cocoa on your laptop? The docker container is named *whovian-cocoa*](#appendix_jupyter_whovian).
+> We provide a docker image named *whovian-cocoa* that facilitates cocoa installation on Windows and MacOS. For further instructions, refer to the appendix [FAQ: How do you run cocoa on your laptop? The docker container is named *whovian-cocoa*](#appendix_jupyter_whovian).
 
 > [!NOTE]
-> The conda installation method should be chosen in most cases. In the rare instances in which users cannot work with Conda, refer to the Appendix [Installation of Cocoa's core packages without Conda](#required_packages_cache), as it contains instructions for a much slower (and prone to errors) but conda-independent installation method.
+> The conda installation method should be chosen in most cases. In the rare instances in which users cannot work with Conda, refer to the appendix [Installation of Cocoa's core packages without Conda](#required_packages_cache), as it contains instructions for a much slower (and prone to errors) but conda-independent installation method.
 
 - *Installation and Compilation of external modules* 
 
