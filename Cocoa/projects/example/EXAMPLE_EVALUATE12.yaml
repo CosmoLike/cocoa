@@ -8,6 +8,7 @@ likelihood:
      lens_only: False
      lmax: 4000
      variant: act_baseline
+  planck_2018_lowl.EE_sroll2: null
 
 params:
   logA:

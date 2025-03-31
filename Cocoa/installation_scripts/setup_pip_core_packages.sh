@@ -136,7 +136,7 @@ if [ -z "${IGNORE_PIP_CORE_INSTALLATION}" ]; then
         'PyYAML==6.0' \
         'qp-prob==0.8.3' \
         'requests==2.31.0' \
-        'sacc==0.8.1' \
+        'sacc==0.10' \
         'schwimmbad==0.3.2' \
         'scikit-image==0.21.0' \
         'scikit-learn==1.2.2' \
@@ -209,6 +209,7 @@ if [ -z "${IGNORE_PIP_CORE_INSTALLATION}" ]; then
     # (e.g., midway) no-cache-dir is important to fix this bug
     # https://github.com/mpi4py/mpi4py/issues/335
     env MPICC=$MPI_CC_COMPILER ${PIP3:?} install \
+        'pip==25.0.1' \
         'numpy==1.23.5' \
         'mpi4py==3.1.4' \
       --no-cache-dir \
@@ -222,7 +223,9 @@ if [ -z "${IGNORE_PIP_CORE_INSTALLATION}" ]; then
         'notebook==7.1.1' \
         'ipyparallel==8.8.0' \
         'emcee==3.1.4' \
-      --no-cache-dir \
+        'sacc==0.10' \
+        'setuptools_scm==8.2.0' \
+      --no-cache-dir --use-pep517 \
       --prefix="${ROOTDIR:?}/.local" \
       >${OUT1:?} 2>${OUT2:?} || { error "(PIP-CORE-PACKAGES) ${EC13:?}"; return 1; }
 

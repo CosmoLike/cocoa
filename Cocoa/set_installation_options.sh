@@ -26,7 +26,7 @@ export COCOA_OUTPUT_VERBOSE=1
 # ------------------------------------------------------------------------------
 # The flags below allow users to skip downloading specific datasets ------------
 # ------------------------------------------------------------------------------
-#export IGNORE_ACTDR6_DATA=1
+export IGNORE_ACTDR6_DATA=1
 # export IGNORE_BAO_DATA=1
 export IGNORE_BICEP_CMB_DATA=1
 # export IGNORE_HOLICOW_STRONG_LENSING_DATA=1
@@ -55,7 +55,6 @@ export IGNORE_LIPOP_CMB_DATA=1
 #export IGNORE_CAMB_CODE=1
 # Default we just use CAMB (it reduces compile_cocoa.sh execution time)
 export IGNORE_CLASS_CODE=1
-
 #export IGNORE_COSMOLIKE_CODE=1
 #export IGNORE_POLYCHORD_SAMPLER_CODE=1
 #export IGNORE_PLANCK_LIKELIHOOD_CODE=1
@@ -266,8 +265,7 @@ export SO_MFLIKE_URL="https://github.com/simonsobs/LAT_MFLike.git"
 export SO_MFLIKE_GIT_COMMIT="531267e8f046f72ddc5fe4ff88432871ad8c9cfd"
 
 export SO_SYSLIB_URL="https://github.com/simonsobs/syslibrary.git"
-export SO_SYSLIB_GIT_COMMIT="c4a112dc2324647395b6c91d4747e3ab19754413"
-export SO_SYSLIB_NAME="SOSYSLIB"
+export SO_SYSLIB_GIT_COMMIT="2471df981053a7526a441d2547eb8dde10d92f70"
 
 export EE2_URL="https://github.com/miknab/EuclidEmulator2.git"
 export EE2_GIT_COMMIT="ff59f6683069417f6b4d2fb5d59197044d424445"
@@ -285,6 +283,9 @@ export COSMOREC_NAME="cosmorec"
 export MGCAMB_URL="https://github.com/sfu-cosmo/MGCobaya.git"
 export MGCAMB_GIT_COMMIT="443c4a733db687ac18e918b8ed09b45003a8c4ca"
 export MGCAMB_NAME='MGCAMB'
+
+export PLANCK2018_SROLL2_URL="https://web.fe.infn.it/~pagano/low_ell_datasets/sroll2/"
+export PLANCK2018_SROLL2_FILE="simall_100x143_sroll2_v3_EE_Aplanck.tgz"
 
 # --------------------------------------------------------------------
 # --------------------------------------------------------------------

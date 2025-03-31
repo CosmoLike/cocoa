@@ -209,7 +209,7 @@ if [ -z "${IGNORE_COBAYA_CODE}" ]; then
     rm -f "${COB:?}/${TFOLDER:?}/EE_clik.py"
     rm -f "${COB:?}/${TFOLDER:?}/EE_clik.yaml"
     rm -f "${COB:?}/${TFOLDER:?}/EE_sroll2.py"
-    rm -f "${COB:?}/${TFOLDER:?}/EE_sroll2.bibtex"
+    #rm -f "${COB:?}/${TFOLDER:?}/EE_sroll2.bibtex"
 
     cppatch "${TFOLDER:?}" "EE.py" || return 1
 
@@ -218,6 +218,8 @@ if [ -z "${IGNORE_COBAYA_CODE}" ]; then
     cppatch "${TFOLDER:?}" "TT.py" || return 1
 
     cppatch "${TFOLDER:?}" "TT.yaml" || return 1
+
+    cppatch "${TFOLDER:?}" "EE_sroll2.py" || return 1
 
     unset -v TFOLDER
     
