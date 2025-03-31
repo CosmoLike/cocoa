@@ -38,13 +38,6 @@ export IGNORE_CAMSPEC_CMB_DATA=1
 export IGNORE_LIPOP_CMB_DATA=1
 
 # ------------------------------------------------------------------------------
-# We download packages from servers that slowdown transfer after many runs. So, 
-# if rerun setup_cocoa to download some non-core lib, these flags may be handy
-# ------------------------------------------------------------------------------
-#export IGNORE_CORE_INSTALLATION=1
-#export IGNORE_PIP_CORE_INSTALLATION=1
-
-# ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
 # The keys below control which packages will be installed and compiled 
@@ -53,8 +46,7 @@ export IGNORE_LIPOP_CMB_DATA=1
 # ------------------------------------------------------------------------------
 #export IGNORE_COBAYA_CODE=1
 #export IGNORE_CAMB_CODE=1
-# Default we just use CAMB (it reduces compile_cocoa.sh execution time)
-export IGNORE_CLASS_CODE=1
+export IGNORE_CLASS_CODE=1 # Default: we just use CAMB (reduces compilation time)
 #export IGNORE_COSMOLIKE_CODE=1
 #export IGNORE_POLYCHORD_SAMPLER_CODE=1
 #export IGNORE_PLANCK_LIKELIHOOD_CODE=1
