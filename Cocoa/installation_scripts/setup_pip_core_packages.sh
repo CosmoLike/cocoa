@@ -142,7 +142,7 @@ if [ -z "${IGNORE_PIP_CORE_INSTALLATION}" ]; then
         'scikit-learn==1.2.2' \
         'scipy==1.10.1' \
         'setuptools==67.7.2' \
-        'setuptools-scm==7.1.0' \
+        'setuptools_scm==8.2.0' \
         'six==1.16.0' \
         'snowballstemmer==2.2.0' \
         'sphinx==7.1.2' \

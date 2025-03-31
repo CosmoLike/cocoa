@@ -37,31 +37,29 @@ if [ -z "${IGNORE_SIMONS_OBSERVATORY_LIKELIHOOD_CODE}" ]; then
     cd "${1:?}" 2>"/dev/null" || { error "CD FOLDER ${1}"; return 1; }
   }
 
-  # ---------------------------------------------------------------------------
-  # ---------------------------------------------------------------------------  
-  # ---------------------------------------------------------------------------  
+  # ----------------------------------------------------------------------------
+  # ----------------------------------------------------------------------------  
+  # ----------------------------------------------------------------------------  
   
   unset_env_vars || return 1
 
-  # ---------------------------------------------------------------------------
-
   # E = EXTERNAL, CODE, F=FODLER
   ECODEF="${ROOTDIR:?}/external_modules/code"
+
+  # ----------------------------------------------------------------------------  
+  # ----------------------------------------------------------------------------
+  
+  PRINTNAME="SIMONS OBSERVATORY SYSLIBRARY"
+  ptop "COMPILING ${PRINTNAME:?}" || return 1
 
   FOLDER="${SO_SYSLIB_NAME:-"SOSYSLIB"}"
 
   PACKDIR="${ECODEF:?}/${FOLDER:?}"
 
-  # Name to be printed on this shell script messages
-  PRINTNAME="SIMONS OBSERVATORY SYSLIBRARY"
-
-  ptop "COMPILING ${PRINTNAME:?}" || return 1
-
   cdfolder "${PACKDIR}" || return 1
 
-  # ---------------------------------------------------------------------------
+  # ---------------------------------------------------------------------------- 
   # cleaning any previous compilation
-
   rm -rf "${PACKDIR:?}/build/"
   rm -rf "${PACKDIR:?}/syslibrary.egg-info/"
   
@@ -72,16 +70,49 @@ if [ -z "${IGNORE_SIMONS_OBSERVATORY_LIKELIHOOD_CODE}" ]; then
 
   rm -rf  "${PLIB:?}"/syslibrary
   rm -rf  "${PLIB:?}"/syslibrary-*
-  
-  # ---------------------------------------------------------------------------  
- 
+  # ----------------------------------------------------------------------------
+
   env CXX="${CXX_COMPILER:?}" CC="${C_COMPILER:?}" ${PIP3:?} install . \
-    --prefix="${ROOTDIR:?}/.local" \
+    --prefix="${ROOTDIR:?}/.local" --no-index --no-deps --no-build-isolation \
     >${OUT1:?} 2>${OUT2:?} || { error "${EC13:?}"; return 1; }
+    
+
+  cdfolder "${ROOTDIR}" || return 1
 
   pbottom "COMPILING ${PRINTNAME:?}" || return 1
 
+  # ----------------------------------------------------------------------------  
+  # ----------------------------------------------------------------------------
+
+  # Name to be printed on this shell script messages
+  PRINTNAME="SIMONS OBSERVATORY MKLIKE"
+  ptop "COMPILING ${PRINTNAME:?}" || return 1
+
+  FOLDER="mflike"
+
+  PACKDIR="${ECODEF:?}/${FOLDER:?}"
+
+  cdfolder "${PACKDIR}" || return 1
+
+  # ----------------------------------------------------------------------------
+  # cleaning any previous compilation
+  rm -rf "${PACKDIR:?}/build/"
+  rm -rf "${PACKDIR:?}/syslibrary.egg-info/"
+
+  # ----------------------------------------------------------------------------
+
+  env CXX="${CXX_COMPILER:?}" CC="${C_COMPILER:?}" ${PIP3:?} install ${PACKDIR:?} \
+    --prefix="${ROOTDIR:?}/.local" --no-index --no-dependencies --no-build-isolation \
+    >${OUT1:?} 2>${OUT2:?} || { error "${EC13:?}"; return 1; }
+
+  cdfolder "${ROOTDIR}" || return 1
+
+  pbottom "COMPILING ${PRINTNAME:?}" || return 1
+
+  # ---------------------------------------------------------------------------  
   # ---------------------------------------------------------------------------
+
+  cdfolder "${ROOTDIR}" || return 1
 
   unset_all || return 1
   

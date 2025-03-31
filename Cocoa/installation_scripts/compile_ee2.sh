@@ -87,7 +87,7 @@ if [ -z "${IGNORE_EUCLID_EMULATOR_V2_CODE}" ]; then
 
   env CXX="${CXX_COMPILER:?}" CC="${C_COMPILER:?}" ${PIP3:?} install \
     ${PACKDIR:?} --no-dependencies --prefix="${ROOTDIR:?}/.local" \
-    --no-index --no-deps --no-build-isolation \
+    --no-index --no-build-isolation \
     >${OUT1:?} 2>${OUT2:?} || { error "${EC3:?}"; return 1; }
 
   pbottom "COMPILING ${PRINTNAME:?}" || return 1

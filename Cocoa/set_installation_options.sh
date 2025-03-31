@@ -202,7 +202,6 @@ fi
 export GIT_CLONE_MAXIMUM_DEPTH=40
 
 export COBAYA_URL="https://github.com/CobayaSampler/cobaya.git"
-#export COBAYA_GIT_COMMIT="2636ea9ed399c35c5d276de1acb15aaafbcab10c"
 export COBAYA_GIT_COMMIT="86943d81d48d2edb2961b17077461df9e799f4d1"
 
 export HILLIPOP_URL="https://github.com/planck-npipe/hillipop.git"
@@ -226,12 +225,10 @@ export POLYCHORD_GIT_COMMIT="daba49d1385d065122db76a2b384050f9e95d278"
 export POLY_NAME="PolyChordLite"
 
 export CAMB_URL="https://github.com/cmbant/CAMB"
-#export CAMB_GIT_COMMIT="45d1c3d27e7480c0f9a82c98522c17ed422dd408"
 export CAMB_GIT_COMMIT="886b17cbc23137737b7ef4318d165aa7bdbbbbed"
 export CAMB_NAME='CAMB'
 
 export CLASS_URL="https://github.com/lesgourg/class_public.git"
-#export CLASS_GIT_COMMIT="8df566c1ff2d0b3e40e106567c435575aea337be"
 export CLASS_GIT_COMMIT="0ceb7a9a4c1e444ef5d5d56a8328a0640be91b18"
 export CLASS_NAME="class_public"
 
@@ -251,8 +248,8 @@ export ACTDR6_LENSING_DATA_FILE="ACT_dr6_likelihood_v1.2.tgz"
 export ACTDR6_CMBONLY_DATA_URL="https://lambda.gsfc.nasa.gov/data/act/pspipe/sacc_files/"
 export ACTDR6_CMBONLY_DATA_FILE="dr6_data_cmbonly.tar.gz"
 
-#export ACTDR6_MFLIKE_DATA_URL=
-#export ACTDR6_MFLIKE_DATA_FILE=
+export ACTDR6_MFLIKE_DATA_URL=https://lambda.gsfc.nasa.gov/data/act/pspipe/sacc_files/
+export ACTDR6_MFLIKE_DATA_FILE=dr6_data.tar.gz
 
 export SO_DATA_URL="https://portal.nersc.gov/cfs/sobs/users/MFLike_data"
 export SO_DATA_VERSION="v0.8"
@@ -288,7 +285,6 @@ export COSMOREC_NAME="cosmorec"
 export MGCAMB_URL="https://github.com/sfu-cosmo/MGCobaya.git"
 export MGCAMB_GIT_COMMIT="443c4a733db687ac18e918b8ed09b45003a8c4ca"
 export MGCAMB_NAME='MGCAMB'
-
 
 # --------------------------------------------------------------------
 # --------------------------------------------------------------------
