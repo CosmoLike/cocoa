@@ -4,7 +4,9 @@ timing: true
 
 likelihood:
   act_dr6_mflike.act_dr6_mflike:
+    data_folder: act_dr6_mflike/v1.0
     input_file: dr6_data.fits
+    lmax_theory: 4000
   act_dr6_lenslike.ACTDR6LensLike:
      lens_only: False
      lmax: 4000
@@ -335,7 +337,7 @@ theory:
     extra_args:
       num_massive_neutrinos: 1
       nnu: 3.046
-      dark_energy_model: ppf
+      #dark_energy_model: ppf
       kmax: 10
       k_per_logint: 30
       nonlinear: true
@@ -345,7 +347,9 @@ theory:
       lAccuracyBoost: 1.3
       min_l_logl_sampling: 6000
       DoLateRadTruncation: false
-  
+      recombination_model: CosmoRec
+      halofit_version: mead2020
+
   mflike.BandpowerForeground:
     top_hat_band:
 
@@ -383,20 +387,15 @@ theory:
 sampler:
   evaluate:
     override:
+      #ACT PROVIDED NUMBER: chi-sq    = 5881.056
       logA: 3.054029209
       ns: 0.9674033551 
       theta_MC_100: 1.040548130
-      omegabh2: 0.02259704353
-      omegach2: 0.1239697476
-      tau: 5.671529467e-02 
-      w0pwa: -0.99999
-      w: -0.99999
-      xi: 6.858509947e-02
-      a_gtt: 7.970993437
-      a_gte: 4.186537040e-01
-      a_gee: 1.672634046e-01 
-      a_psee: 3.828045568e-03
-      a_pste: -2.453029221e-02 
+      omegabh2: 2.259704353e-02 
+      omegach2: 1.239697476e-01
+      tau: 5.671529467e-02
+      w0pwa: -0.999
+      w: -0.999
       a_tSZ: 3.489236433
       alpha_tSZ: -4.546365922e-01
       a_kSZ: 1.061365288e+00
@@ -405,5 +404,26 @@ sampler:
       a_c: 3.784241034e+00
       a_s: 2.845033763e+00
       beta_s: -2.779685125e+00 
-      
+      a_gtt: 7.970993437
+      a_gte: 4.186537040e-01
+      a_gee: 1.672634046e-01 
+      a_psee: 3.828045568e-03
+      a_pste: -2.453029221e-02 
+      xi: 6.858509947e-02
+      calG_all: 1.000050478
+      cal_dr6_pa4_f220: 9.812613896e-01
+      cal_dr6_pa5_f090: 1.000168951
+      cal_dr6_pa5_f150: 9.992407463e-01
+      cal_dr6_pa6_f090: 9.998818650e-01
+      cal_dr6_pa6_f150: 1.001491175
+      calE_dr6_pa5_f090: 9.873920950e-01  
+      calE_dr6_pa5_f150: 9.974938525e-01 
+      calE_dr6_pa6_f090: 9.974483244e-01
+      calE_dr6_pa6_f150: 9.967553054e-01
+      bandint_shift_dr6_pa4_f220: 6.635359341
+      bandint_shift_dr6_pa5_f090: -5.145090313e-02
+      bandint_shift_dr6_pa5_f150: -9.974598944e-01
+      bandint_shift_dr6_pa6_f090: 5.530410872e-01
+      bandint_shift_dr6_pa6_f150: -3.459811085e-01 
+
 output: ./projects/example/chains/EXAMPLE_EVALUATE13

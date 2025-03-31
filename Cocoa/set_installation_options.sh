@@ -67,7 +67,7 @@ export IGNORE_VELOCILEPTORS_CODE=1
 export IGNORE_CAMSPEC_LIKELIHOOD_CODE=1
 export IGNORE_LIPOP_LIKELIHOOD_CODE=1
 export IGNORE_HYREC_CODE=1
-export IGNORE_COSMOREC_CODE=1
+#export IGNORE_COSMOREC_CODE=1
 export IGNORE_MGCAMB_CODE=1
 
 #Many cosmolike projects (including LSST-Y1) require euclid emulator
