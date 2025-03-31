@@ -387,7 +387,7 @@ theory:
 sampler:
   evaluate:
     override:
-      #ACT PROVIDED NUMBER: chi-sq    = 5881.056
+      #ACT PROVIDED NUMBER: chi-sq    = 5881.056 (\delta chi2 if recfast is off~ 0.45)
       logA: 3.054029209
       ns: 0.9674033551 
       theta_MC_100: 1.040548130
