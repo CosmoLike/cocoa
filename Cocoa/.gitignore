@@ -136,6 +136,8 @@ external_modules/code/roman*
 external_modules/code/ROMAN*
 external_modules/code/mflike*/
 external_modules/code/mf*/
+external_modules/code/syslibrary/
+external_modules/code/sys*
 
 cobaya/cobaya/likelihoods/XXX
 cobaya/cobaya/likelihoods/des_y1
