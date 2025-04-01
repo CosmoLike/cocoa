@@ -138,7 +138,7 @@ external_modules/code/mflike*/
 external_modules/code/mf*/
 external_modules/code/syslibrary/
 external_modules/code/sys*
-external_modules/code/planck_2020*
+#external_modules/code/planck_2020*
 
 cobaya/cobaya/likelihoods/XXX
 cobaya/cobaya/likelihoods/des_y1
