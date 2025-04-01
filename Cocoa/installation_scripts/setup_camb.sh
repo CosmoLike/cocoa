@@ -50,9 +50,11 @@ if [ -z "${IGNORE_CAMB_CODE}" ]; then
 
   unset_env_vars || return 1
 
-  CCIL="${ROOTDIR:?}/../cocoa_installation_libraries"
-
   # ---------------------------------------------------------------------------
+
+  ptop "SETUP CAMB" || return 1;
+
+  CCIL="${ROOTDIR:?}/../cocoa_installation_libraries"
 
   URL="${CAMB_URL:-"https://github.com/cmbant/CAMB"}"
 
@@ -65,23 +67,10 @@ if [ -z "${IGNORE_CAMB_CODE}" ]; then
 
   PACKDIR="${ECODEF:?}/${FOLDER:?}"
 
-  # Name to be printed on this shell script messages
-  PRINTNAME="CAMB"
-
-  ptop "SETUP ${PRINTNAME:?}" || return 1;
-
-  # ----------------------------------------------------------------------------
-  # In case this script is called twice ----------------------------------------
-  # ----------------------------------------------------------------------------
   if [ -n "${OVERWRITE_EXISTING_CAMB_CODE}" ]; then
-    
     rm -rf "${PACKDIR:?}"
-  
   fi
 
-  # ----------------------------------------------------------------------------
-  # Clone from original repo ---------------------------------------------------
-  # ----------------------------------------------------------------------------
   if [ ! -d "${PACKDIR:?}" ]; then
     
     cdfolder "${ECODEF:?}" || { cdroot; return 1; }
@@ -137,11 +126,9 @@ if [ -z "${IGNORE_CAMB_CODE}" ]; then
 
   fi
 
+  pbottom "SETUP CAMB" || return 1
+  
   cdfolder "${ROOTDIR}" || return 1
-  
-  pbottom "SETUP ${PRINTNAME:?}" || return 1
-  
-  # ----------------------------------------------------------------------------
 
   unset_all || return 1
   

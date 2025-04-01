@@ -17,7 +17,7 @@ if [ -z "${IGNORE_LIPOP_LIKELIHOOD_CODE}" ]; then
   }
 
   unset_env_funcs () {
-    unset -f cdfolder cpfolder error cpfile flipop cppatch cppatchfolder
+    unset -f cdfolder cpfolder error cpfile flipop cppatch
     unset -f unset_env_funcs
     cdroot || return 1;
   }
@@ -53,6 +53,9 @@ if [ -z "${IGNORE_LIPOP_LIKELIHOOD_CODE}" ]; then
   # ----------------------------------------------------------------------------
   
   unset_env_vars || return 1
+  
+  # E = EXTERNAL, CODE, F=FODLER
+  ECODEF="${ROOTDIR:?}/external_modules/code"
 
   CCIL="${ROOTDIR:?}/../cocoa_installation_libraries" # IL = installation lib
 
@@ -68,14 +71,48 @@ if [ -z "${IGNORE_LIPOP_LIKELIHOOD_CODE}" ]; then
       { error "CP FILE ${CCCOB:?}/${1:?}/${2:?} on ${COB:?}/${1:?}"; return 1; }
   }
 
-  cppatchfolder() {
-    cp -r "${CCCOB:?}/${1:?}/${2:?}" "${COB:?}/${1:?}" \
-      2>"/dev/null" || 
-      { error "CP FOLDER ${CCCOB:?}/${1:?}/${2:?} on ${COB:?}/${1:?}"; \
-      return 1; }
+  flipop() {
+
+    if [ -n "${OVERWRITE_EXISTING_LIPOP_CMB_DATA}" ]; then
+      rm -rf "${ECODEF:?}/${1:?}"
+    fi
+
+    if [ ! -d "${ECODEF:?}/${1:?}" ]; then
+
+      cdfolder "${ECODEF:?}" || return 1;
+
+      "${GIT:?}" clone --depth ${GIT_CLONE_MAXIMUM_DEPTH:?} "${2:?}" \
+        --recursive ${1:?} >${OUT1:?} 2>${OUT2:?} || { error "${EC15:?}"; return 1; }
+    
+      cdfolder "${ECODEF:?}/${1:?}" || return 1;
+
+      "${GIT:?}" reset --hard "${3:?}" \
+        >${OUT1:?} 2>${OUT2:?} || { error "${EC23:?}"; return 1; }
+
+      # ------------------------------------------------------------------------
+      # Symlinks for likelihood to work w/ COBAYA.(also @start/stop_cocoa.sh)
+      # ------------------------------------------------------------------------
+      if [[ -d "${ECODEF:?}/${1:?}/${1:?}" ]]; then
+        if [[ -L "${COB:?}/${COBLIKE:?}/${1:?}" ]]; then
+          rm -f "${COB:?}/${COBLIKE:?}/${1:?}"
+        fi
+        ln -s "${ECODEF:?}/${1:?}/${1:?}" "${COB:?}/${COBLIKE:?}" \
+          >${OUT1:?} 2>${OUT2:?} || { error "${EC34:?}"; return 1; }
+      fi
+      
+      cp "${CCIL:?}/${1:?}_changes/init.patch" "${ECODEF:?}/${1:?}/${1:?}" 2>"/dev/null" || 
+      { error "CP FILE ${CCCOB:?}/${1:?}/init.patch on ${ECODEF:?}/${1:?}/${1:?}"; return 1; }
+
+      cdfolder "${ECODEF:?}/${1:?}/${1:?}" || return 1;
+      
+      patch -u '__init__.py' -i 'init.patch' >${OUT1:?} 2>${OUT2:?} || 
+        { error "${EC17:?}"; return 1; }
+    fi
+
+    cdfolder "${ROOTDIR:?}" || return 1; 
   }
 
-  flipop() {
+  flipop2() {
     local TFOLDER="${COBLIKE:?}/${1:?}"
     local URL="${2:?}"
 
@@ -106,7 +143,7 @@ if [ -z "${IGNORE_LIPOP_LIKELIHOOD_CODE}" ]; then
       
       cdfolder "${COB:?}/${TFOLDER:?}" || return 1;
       
-      rm -rf "${COB:?}/${COBLIKE:?}/tmp"
+      #rm -rf "${COB:?}/${COBLIKE:?}/tmp"
 
       cppatch "${TFOLDER:?}" "init.patch" || return 1
 

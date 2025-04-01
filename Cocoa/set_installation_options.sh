@@ -16,7 +16,7 @@ fi
 # ------------------------------------------------------------------------------
 # VERBOSE AS DEBUG TOOL --------------------------------------------------------
 # ------------------------------------------------------------------------------
-#export COCOA_OUTPUT_VERBOSE=1
+export COCOA_OUTPUT_VERBOSE=1
 
 # ------------------------------------------------------------------------------
 # If set, COSMOLIKE will compile with DEBUG flags ------------------------------
@@ -56,7 +56,7 @@ export IGNORE_CPP_CUBA_INSTALLATION=1
 export IGNORE_VELOCILEPTORS_CODE=1
 export IGNORE_SIMONS_OBSERVATORY_LIKELIHOOD_CODE=1
 export IGNORE_CAMSPEC_LIKELIHOOD_CODE=1
-export IGNORE_LIPOP_LIKELIHOOD_CODE=1
+#export IGNORE_LIPOP_LIKELIHOOD_CODE=1
 export IGNORE_HYREC_CODE=1
 export IGNORE_COSMOREC_CODE=1
 export IGNORE_MGCAMB_CODE=1
@@ -69,7 +69,7 @@ export IGNORE_MGCAMB_CODE=1
 # overwrite means: delete existing PACKAGE folder and install it again ---------
 # these keys are only relevant if you run setup_cocoa multiple times -----------
 # ------------------------------------------------------------------------------
-#export OVERWRITE_EXISTING_ALL_PACKAGES=1
+export OVERWRITE_EXISTING_ALL_PACKAGES=1
 
 # ------------------------------------------------------------------------------
 # If set, compile_planck.sh uses click like code from github.com/benabed/clik

@@ -81,7 +81,8 @@ if [ -z "${IGNORE_ACTDR6_CODE}" ]; then
 
     cdfolder "${ECODEF:?}" || { cdroot; return 1; }
 
-    "${GIT:?}" clone "${URL:?}" "${FOLDER:?}" \
+    "${GIT:?}" clone --depth ${GIT_CLONE_MAXIMUM_DEPTH:?} "${URL:?}" \
+      --recursive "${FOLDER:?}" \
       >${OUT1:?} 2>${OUT2:?} || { error "${EC15:?}"; return 1; }
     
     cdfolder "${PACKDIR:?}" || { cdroot; return 1; }
@@ -129,8 +130,9 @@ if [ -z "${IGNORE_ACTDR6_CODE}" ]; then
     fi
   fi
 
-  cdfolder "${ROOTDIR}" || return 1;
   pbottom 'SETUP ACTDR6 (CMBONLY)' || return 1
+
+  cdfolder "${ROOTDIR}" || return 1;
 
   # ----------------------------------------------------------------------------
   # ----------------------------------------------------------------------------
@@ -154,7 +156,8 @@ if [ -z "${IGNORE_ACTDR6_CODE}" ]; then
     
     cdfolder "${ECODEF:?}" || { cdroot; return 1; }
 
-    "${GIT:?}" clone "${URL:?}" "${FOLDER:?}" \
+    "${GIT:?}" clone --depth ${GIT_CLONE_MAXIMUM_DEPTH:?} "${URL:?}" \
+      --recursive "${FOLDER:?}" \ \
       >${OUT1:?} 2>${OUT2:?} || { error "${EC15:?}"; return 1; }
     
     cdfolder "${PACKDIR:?}" || { cdroot; return 1; }
@@ -165,26 +168,19 @@ if [ -z "${IGNORE_ACTDR6_CODE}" ]; then
     fi
 
     # --------------------------------------------------------------------------
-    # need to create symlinks for this likelihood to work w/ COBAYA.
-    # we copied the code below to start_cocoa.sh shell script as well
-    # we added corresponding code to stop_cocoa.sh that delete these symlinks
+    # Symlinks for likelihood to work w/ COBAYA.(also @start/stop_cocoa.sh)
     # --------------------------------------------------------------------------
     if [[ -d "${PACKDIR:?}/act_dr6_mflike" ]]; then
       if [[ -L "${COB:?}/${COBLIKE:?}/act_dr6_mflike" ]]; then
         rm -f "${COB:?}/${COBLIKE:?}/act_dr6_mflike"
       fi
-      
       ln -s "${PACKDIR:?}/act_dr6_mflike" "${COB:?}/${COBLIKE:?}" \
         >${OUT1:?} 2>${OUT2:?} || { error "${EC34:?}"; return 1; }
-    
     fi
 
   fi
 
-  cdfolder "${ROOTDIR}" || return 1;
   pbottom 'SETUP ACTDR6 (MFLIKE)' || return 1
-
-  # ----------------------------------------------------------------------------
 
   cdfolder "${ROOTDIR}" || return 1;
   
