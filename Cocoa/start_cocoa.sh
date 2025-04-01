@@ -97,7 +97,7 @@ if [[ -z "${IGNORE_ACTDR6_CODE}" ]]; then
   fi
 
   if [[ ! -L "${ROOTDIR:?}/cobaya/cobaya/likelihoods/act_dr6_mflike" ]]; then
-    ln -s "${ROOTDIR:?}/external_modules/code/act_dr6_mflike/act_dr6_mflike" \
+    ln -s "${ROOTDIR:?}/external_modules/code/${ACTDR6_MFLIKE_NAME:-"act_dr6_mflike"}/act_dr6_mflike" \
           "${ROOTDIR:?}/cobaya/cobaya/likelihoods" \
       >${OUT1:?} 2>${OUT2:?} || { error "${EC34:?}"; return 1; }
   fi

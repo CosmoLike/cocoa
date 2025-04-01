@@ -46,59 +46,46 @@ if [ -z "${IGNORE_SIMONS_OBSERVATORY_LIKELIHOOD_CODE}" ]; then
   # E = EXTERNAL, CODE, F=FODLER
   ECODEF="${ROOTDIR:?}/external_modules/code"
 
+  PLIB="${ROOTDIR:?}/.local/lib/python${PYTHON_VERSION:?}/site-packages"
+  
   # ----------------------------------------------------------------------------  
   # ----------------------------------------------------------------------------
   
-  PRINTNAME="SIMONS OBSERVATORY SYSLIBRARY"
-  ptop "COMPILING ${PRINTNAME:?}" || return 1
+  ptop "COMPILING SIMONS OBSERVATORY SYSLIBRARY" || return 1
 
-  FOLDER="${SO_SYSLIB_NAME:-"SOSYSLIB"}"
-
-  PACKDIR="${ECODEF:?}/${FOLDER:?}"
+  PACKDIR="${ECODEF:?}/${SO_SYSLIB_NAME:-"syslibrary"}"
 
   cdfolder "${PACKDIR}" || return 1
 
   # ---------------------------------------------------------------------------- 
   # cleaning any previous compilation
   rm -rf "${PACKDIR:?}/build/"
-  rm -rf "${PACKDIR:?}/syslibrary.egg-info/"
-  
-  "${PYTHON3:?}" setup.py clean \
-    >${OUT1:?} 2>${OUT2:?} || { error "${EC1:?}"; return 1; }
-
-  PLIB="${ROOTDIR:?}/.local/lib/python${PYTHON_VERSION:?}/site-packages"
-
-  rm -rf  "${PLIB:?}"/syslibrary
-  rm -rf  "${PLIB:?}"/syslibrary-*
+  rm -rf "${PACKDIR:?}/syslibrary.egg-info/"  
+  rm -rf  "${PLIB:?}/syslibrary"
+  rm -rf  "${PLIB:?}/syslibrary"-*
   # ----------------------------------------------------------------------------
 
   env CXX="${CXX_COMPILER:?}" CC="${C_COMPILER:?}" ${PIP3:?} install . \
     --prefix="${ROOTDIR:?}/.local" --no-index --no-deps --no-build-isolation \
     >${OUT1:?} 2>${OUT2:?} || { error "${EC13:?}"; return 1; }
     
-
   cdfolder "${ROOTDIR}" || return 1
 
-  pbottom "COMPILING ${PRINTNAME:?}" || return 1
+  pbottom "COMPILING SIMONS OBSERVATORY SYSLIBRARY" || return 1
 
   # ----------------------------------------------------------------------------  
   # ----------------------------------------------------------------------------
 
-  # Name to be printed on this shell script messages
-  PRINTNAME="SIMONS OBSERVATORY MKLIKE"
-  ptop "COMPILING ${PRINTNAME:?}" || return 1
+  ptop "COMPILING SIMONS OBSERVATORY MKLIKE" || return 1
 
-  FOLDER="mflike"
-
-  PACKDIR="${ECODEF:?}/${FOLDER:?}"
-
-  cdfolder "${PACKDIR}" || return 1
+  PACKDIR="${ECODEF:?}/mflike"
 
   # ----------------------------------------------------------------------------
   # cleaning any previous compilation
   rm -rf "${PACKDIR:?}/build/"
   rm -rf "${PACKDIR:?}/syslibrary.egg-info/"
-
+  rm -rf  "${PLIB:?}/mflike"
+  rm -rf  "${PLIB:?}/mflike"-*
   # ----------------------------------------------------------------------------
 
   env CXX="${CXX_COMPILER:?}" CC="${C_COMPILER:?}" ${PIP3:?} install ${PACKDIR:?} \
@@ -107,9 +94,8 @@ if [ -z "${IGNORE_SIMONS_OBSERVATORY_LIKELIHOOD_CODE}" ]; then
 
   cdfolder "${ROOTDIR}" || return 1
 
-  pbottom "COMPILING ${PRINTNAME:?}" || return 1
+  pbottom "COMPILING SIMONS OBSERVATORY MKLIKE" || return 1
 
-  #
   # ---------------------------------------------------------------------------  
   # ---------------------------------------------------------------------------
 

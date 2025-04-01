@@ -55,6 +55,9 @@ if [ -z "${IGNORE_SIMONS_OBSERVATORY_LIKELIHOOD_CODE}" ]; then
   
   unset_env_vars || return 1
 
+  # E = EXTERNAL, CODE, F=FODLER
+  ECODEF="${ROOTDIR:?}/external_modules/code"
+
   CCIL="${ROOTDIR:?}/../cocoa_installation_libraries" # IL = installation lib
 
   COB="${ROOTDIR:?}/cobaya"        # COB = Cobaya
@@ -67,40 +70,21 @@ if [ -z "${IGNORE_SIMONS_OBSERVATORY_LIKELIHOOD_CODE}" ]; then
   
   # ----------------------------------------------------------------------------
   # ----------------------------------------------------------------------------
-  # ----------------------------------------------------------------------------
+  
+  ptop "SETUP SIMONS OBSERVATORY SYSLIBRARY" || return 1;
 
   URL="${SO_SYSLIB_URL:-"https://github.com/simonsobs/syslibrary.git"}"
     
-  # E = EXTERNAL, CODE, F=FODLER
-  ECODEF="${ROOTDIR:?}/external_modules/code"
-
-  FOLDER="${SO_SYSLIB_NAME:-"SOSYSLIB"}"
+  FOLDER="${SO_SYSLIB_NAME:-"syslibrary"}"
 
   PACKDIR="${ECODEF:?}/${FOLDER:?}"
 
-  # Name to be printed on this shell script messages
-  PRINTNAME="SIMONS OBSERVATORY SYSLIBRARY"
-
-  ptop "SETUP ${PRINTNAME:?}" || return 1;
-
-  # ---------------------------------------------------------------------------
-  # in case this script is called twice
-  # ---------------------------------------------------------------------------
   if [[ -n "${OVERWRITE_EXISTING_SIMONS_OBSERVATORY_CODE}" ]]; then
-
     rm -rf "${PACKDIR:?}"
-
   fi
 
   if [[ ! -d "${PACKDIR:?}" ]]; then
-    
-    # --------------------------------------------------------------------------
-    # clone from original repo
-    # --------------------------------------------------------------------------
     cdfolder "${ECODEF}" || return 1;
-
-    "${CURL:?}" -fsS "${URL:?}" \
-      >${OUT1:?} 2>${OUT2:?} || { error "${EC27:?} (URL=${URL:?})"; return 1; }
 
     "${GIT:?}" clone "${URL:?}" --depth ${GIT_CLONE_MAXIMUM_DEPTH:?} \
       --recursive "${FOLDER:?}" \
@@ -112,16 +96,17 @@ if [ -z "${IGNORE_SIMONS_OBSERVATORY_LIKELIHOOD_CODE}" ]; then
       "${GIT:?}" checkout "${SO_SYSLIB_GIT_COMMIT:?}" \
         >${OUT1:?} 2>${OUT2:?} || { error "${EC16:?}"; return 1; }
     fi
-
   fi
 
   cdfolder "${ROOTDIR}" || return 1
 
-  pbottom "SETUP ${PRINTNAME:?}" || return 1;
+  pbottom "SETUP SIMONS OBSERVATORY SYSLIBRARY" || return 1;
   
   # ----------------------------------------------------------------------------
   # ----------------------------------------------------------------------------
   # ----------------------------------------------------------------------------
+
+  ptop "SETUP SIMONS OBSERVATORY MFLIKE" || return 1;
 
   URL="${SO_MFLIKE_URL:-"https://github.com/simonsobs/LAT_MFLike.git"}"
   
@@ -129,28 +114,12 @@ if [ -z "${IGNORE_SIMONS_OBSERVATORY_LIKELIHOOD_CODE}" ]; then
 
   PACKDIR="${ECODEF:?}/${FOLDER:?}"
 
-  # Name to be printed on this shell script messages
-  PRINTNAME="SIMONS OBSERVATORY MFLIKE"
-
-  ptop "SETUP ${PRINTNAME:?}" || return 1;
-
-  # ---------------------------------------------------------------------------
-  # in case this script is called twice
-  # ---------------------------------------------------------------------------
-  if [[ -n "${OVERWRITE_EXISTING_SIMONS_OBSERVATORY_CODE}" ]]; then
-    
+  if [[ -n "${OVERWRITE_EXISTING_SIMONS_OBSERVATORY_CODE}" ]]; then    
     rm -rf "${PACKDIR:?}"
-
   fi
 
   if [[ ! -d "${PACKDIR:?}" ]]; then
-    # --------------------------------------------------------------------------
-    # clone from original repo
-    # --------------------------------------------------------------------------
     cdfolder "${ECODEF}" || return 1;
-
-    "${CURL:?}" -fsS "${URL:?}" \
-      >${OUT1:?} 2>${OUT2:?} || { error "${EC27:?} (URL=${URL:?})"; return 1; }
 
     "${GIT:?}" clone "${URL:?}" --recursive "${FOLDER:?}" \
       >${OUT1:?} 2>${OUT2:?} || { error "${EC15:?}"; return 1; }
@@ -162,7 +131,6 @@ if [ -z "${IGNORE_SIMONS_OBSERVATORY_LIKELIHOOD_CODE}" ]; then
         >${OUT1:?} 2>${OUT2:?} || { error "${EC16:?}"; return 1; }
     fi
 
-    # --------------------------------------------------------------------------
     # PATCH MKFLIKE
     cdfolder "${PACKDIR:?}/mflike"|| return 1;
 
@@ -179,29 +147,27 @@ if [ -z "${IGNORE_SIMONS_OBSERVATORY_LIKELIHOOD_CODE}" ]; then
     # we added corresponding code to stop_cocoa.sh that delete these symlinks
     # --------------------------------------------------------------------------
     if [[ -d "${PACKDIR:?}/mflike" ]]; then
-      
       if [[ -L "${COB:?}/${COBLIKE:?}/mflike" ]]; then
         rm -f "${COB:?}/${COBLIKE:?}/mflike"
       fi
-
       ln -s "${PACKDIR:?}/mflike" "${COB:?}/${COBLIKE:?}" \
         >${OUT1:?} 2>${OUT2:?} || { error "${EC34:?}"; return 1; }
 
       if [[ -L "${COB:?}/${COBTH:?}/mflike" ]]; then
         rm -f "${COB:?}/${COBTH:?}/mflike"
       fi
-
       ln -s "${PACKDIR:?}/mflike" "${COB:?}/${COBTH:?}" \
         >${OUT1:?} 2>${OUT2:?} || { error "${EC34:?}"; return 1; }
-
     fi
-
   fi
+  
+  cdfolder "${ROOTDIR}" || return 1
 
-  pbottom "SETUP ${PRINTNAME:?}" || return 1;
+  pbottom "SETUP SIMONS OBSERVATORY MFLIKE" || return 1;
 
   #-----------------------------------------------------------------------------
-  
+  #-----------------------------------------------------------------------------
+
   cdfolder "${ROOTDIR}" || return 1
 
   unset_all || return 1;
