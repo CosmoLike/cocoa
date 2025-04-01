@@ -12,7 +12,7 @@ if [ -z "${IGNORE_ACTDR6_DATA}" ]; then
   ( source "${ROOTDIR:?}/installation_scripts/flags_check.sh" ) || return 1;
 
   unset_env_vars () {
-    unset -v EDATAF FOLDER PACKDIR FILE URL_BASE URL PRINTNAME
+    unset -v EDATAF FOLDER PACKDIR FILE URL_BASE URL PRINTNAME TMP
     cdroot || return 1;
   }
 
@@ -38,26 +38,15 @@ if [ -z "${IGNORE_ACTDR6_DATA}" ]; then
     cd "${1:?}" 2>"/dev/null" || { error "CD FOLDER: ${1}"; return 1; }
   }
 
-  # --------------------------------------------------------------------------- 
-  # --------------------------------------------------------------------------- 
-  # ---------------------------------------------------------------------------
-
   unset_env_vars || return 1
 
   # E = EXTERNAL, DATA, F=FODLER
   EDATAF="${ROOTDIR:?}/external_modules/data"
-  
-    # Name to be printed on this shell script messages
-  PRINTNAME="ACT-DR6 DATA"
 
-  # ----------------------------------------------------------------------------
-  # ----------------------------------------------------------------------------
-  # ----------------------------------------------------------------------------
-  # ----------------------------------------------------------------------------
-  # ----------------------------------------------------------------------------
-  # ----------------------------------------------------------------------------
+  # --------------------------------------------------------------------------- 
+  # ---------------------------------------------------------------------------
 
-  ptop "SETUP/UNXV ${PRINTNAME:?} (LENSING)" || return 1
+  ptop "SETUP/UNXV ACT-DR6 DATA (LENSING)" || return 1
 
   FOLDER="act"
 
@@ -70,44 +59,37 @@ if [ -z "${IGNORE_ACTDR6_DATA}" ]; then
 
   URL="${ACTDR6_LENSING_DATA_URL:-"${URL_BASE:?}"}/${FILE:?}"
 
-  # ---------------------------------------------------------------------------
-  # note: in case script run >1x w/ previous run stoped prematurely b/c error
   if [ -n "${OVERWRITE_EXISTING_ACTDR6_CMB_DATA}" ]; then
-    
     rm -rf "${PACKDIR:?}"
+    if [ -n "${REDOWNLOAD_EXISTING_ACTDR6_CMB_DATA}" ]; then
+      rm -f "${EDATAF:?}/${FILE:?}"
+    fi
+  fi 
 
-  fi
-
-  if [ ! -d "${PACKDIR:?}" ]; then
-
-    mkdir -p "${PACKDIR:?}" \
-      >${OUT1:?} 2>${OUT2:?}  || { error "${EC20:?}"; return 1; }
+  if [[ ! -d "${PACKDIR:?}" || ! -d "${PACKDIR:?}/lensing" ]]; then
+    mkdir -p "${PACKDIR:?}" >${OUT1:?} 2>${OUT2:?} || { error "${EC20:?}"; return 1; }
+    mkdir -p "${PACKDIR:?}/lensing" >${OUT1:?} 2>${OUT2:?} || { error "${EC20:?}"; return 1; }
     
-    mkdir -p "${PACKDIR:?}/lensing" \
-      >${OUT1:?} 2>${OUT2:?} || { error "${EC20:?}"; return 1; }
-      
-    cdfolder "${PACKDIR:?}/lensing" || return 1
+    cdfolder "${EDATAF:?}" || return 1
 
-    "${WGET:?}" "${URL:?}" -q --show-progress --progress=bar:force || 
-      { error "${EC24:?}"; return 1; }
+    if [ ! -e "${FILE:?}" ]; then
+      "${WGET:?}" "${URL:?}" -q --show-progress --progress=bar:force || 
+        { error "${EC24:?}"; return 1; }
+    fi
 
-    tar -zxvf "${FILE:?}" \
-      >${OUT1:?} 2>${OUT2:?} || { error "${EC25:?}"; return 1; }
-
+    TMP=$(tar -tf "${FILE:?}" | head -1 | cut -f1 -d"/")
+    tar -zxvf "${FILE:?}" >${OUT1:?} 2>${OUT2:?} || { error "${EC25:?}"; return 1; }
+    mv "${TMP:?}" "${PACKDIR:?}/lensing"
   fi
 
   cdfolder "${ROOTDIR}" || return 1;
   
-  pbottom "SETUP/UNXV ${PRINTNAME:?} (LENSING)" || return 1
+  pbottom "SETUP/UNXV ACT-DR6 DATA (LENSING)" || return 1
 
   # ----------------------------------------------------------------------------
   # ----------------------------------------------------------------------------
-  # ----------------------------------------------------------------------------
-  # ----------------------------------------------------------------------------
-  # ----------------------------------------------------------------------------
-  # ----------------------------------------------------------------------------
 
-  ptop "SETUP/UNXV ${PRINTNAME:?} (CMBONLY)" || return 1
+  ptop "SETUP/UNXV ACT-DR6 DATA (CMBONLY)" || return 1
 
   FOLDER="act_dr6_cmbonly"
 
@@ -120,45 +102,39 @@ if [ -z "${IGNORE_ACTDR6_DATA}" ]; then
 
   URL="${ACTDR6_CMBONLY_DATA_URL:-"${URL_BASE:?}"}/${FILE:?}"
 
-  # ---------------------------------------------------------------------------
-  # note: in case script run >1x w/ previous run stoped prematurely b/c error
-  if [ -n "${OVERWRITE_EXISTING_ACTDR6_CMB_DATA}" ]; then
-    
+  if [ -n "${OVERWRITE_EXISTING_ACTDR6_CMB_DATA}" ]; then    
     rm -rf "${PACKDIR:?}"
-
+    if [ -n "${REDOWNLOAD_EXISTING_ACTDR6_CMB_DATA}" ]; then
+      rm -f "${EDATAF:?}/${FILE:?}"
+    fi
   fi
 
   if [ ! -d "${PACKDIR:?}" ]; then
-
-    mkdir -p "${PACKDIR:?}" \
-      >${OUT1:?} 2>${OUT2:?}  || { error "${EC20:?}"; return 1; }
+    mkdir -p "${PACKDIR:?}" >${OUT1:?} 2>${OUT2:?} || { error "${EC20:?}"; return 1; }
           
-    cdfolder "${PACKDIR:?}" || return 1
+    cdfolder "${EDATAF:?}" || return 1
 
-    "${WGET:?}" "${URL:?}" -q --show-progress --progress=bar:force || 
-      { error "${EC24:?}"; return 1; }
+    if [ ! -e "${FILE:?}" ]; then
+      "${WGET:?}" "${URL:?}" -q --show-progress --progress=bar:force || 
+        { error "${EC24:?}"; return 1; }
+    fi
 
-    tar -zxvf "${FILE:?}" \
-      >${OUT1:?} 2>${OUT2:?} || { error "${EC25:?}"; return 1; }
-
+    TMP=$(tar -tf "${FILE:?}" | head -1 | cut -f1 -d"/")
+    tar -zxvf "${FILE:?}" >${OUT1:?} 2>${OUT2:?} || { error "${EC25:?}"; return 1; }
+    mv "${TMP:?}" "${PACKDIR:?}"
   fi
 
   cdfolder "${ROOTDIR}" || return 1;
 
-  pbottom "SETUP/UNXV ${PRINTNAME:?} (CMBONLY)" || return 1
+  pbottom "SETUP/UNXV ACT-DR6 DATA (CMBONLY)" || return 1
 
   # ----------------------------------------------------------------------------
   # ----------------------------------------------------------------------------
-  # ----------------------------------------------------------------------------
-  # ----------------------------------------------------------------------------
-  # ----------------------------------------------------------------------------
-  # ----------------------------------------------------------------------------
 
-  ptop "SETUP/UNXV ${PRINTNAME:?} (MFLIKE)" || return 1
+  ptop "SETUP/UNXV ACT-DR6 DATA (MFLIKE)" || return 1
 
   FOLDER="act_dr6_mflike"
 
-  # PACK = PACKAGE, DIR = DIRECTORY
   PACKDIR="${EDATAF:?}/${FOLDER:?}"
 
   FILE="${ACTDR6_MFLIKE_DATA_FILE:-"dr6_data.tar.gz"}"
@@ -167,35 +143,29 @@ if [ -z "${IGNORE_ACTDR6_DATA}" ]; then
 
   URL="${ACTDR6_MFLIKE_DATA_URL:-"${URL_BASE:?}"}/${FILE:?}"
 
-  if [ -n "${OVERWRITE_EXISTING_ACTDR6_CMB_DATA}" ]; then
-    
+  if [ -n "${OVERWRITE_EXISTING_ACTDR6_CMB_DATA}" ]; then 
     rm -rf "${PACKDIR:?}"
-
+    if [ -n "${REDOWNLOAD_EXISTING_ACTDR6_CMB_DATA}" ]; then
+      rm -f "${EDATAF:?}/${FILE:?}"
+    fi
   fi
 
   if [ ! -d "${PACKDIR:?}" ]; then
-
-    mkdir -p "${PACKDIR:?}" \
-      >${OUT1:?} 2>${OUT2:?}  || { error "${EC20:?}"; return 1; }
+    mkdir -p "${PACKDIR:?}" >${OUT1:?} 2>${OUT2:?} || { error "${EC20:?}"; return 1; }
           
-    cdfolder "${PACKDIR:?}" || return 1
+    cdfolder "${EDATAF:?}" || return 1
 
-    "${WGET:?}" "${URL:?}" -q --show-progress --progress=bar:force || 
-      { error "${EC24:?}"; return 1; }
+    if [ ! -e "${FILE:?}" ]; then
+      "${WGET:?}" "${URL:?}" -q --show-progress \
+        --progress=bar:force:noscroll || { error "${EC24:?}"; return 1; }
+    fi
 
-    tar -zxvf "${FILE:?}" \
-      >${OUT1:?} 2>${OUT2:?} || { error "${EC25:?}"; return 1; }
-
+    TMP=$(tar -tf "${FILE:?}" | head -1 | cut -f1 -d"/")
+    tar -zxvf "${FILE:?}" >${OUT1:?} 2>${OUT2:?} || { error "${EC25:?}"; return 1; }
+    mv "${TMP:?}" "${PACKDIR:?}"
   fi
 
-  pbottom "SETUP/UNXV ${PRINTNAME:?} (MFLIKE)" || return 1
-
-  # ----------------------------------------------------------------------------
-  # ----------------------------------------------------------------------------
-  # ----------------------------------------------------------------------------
-  # ----------------------------------------------------------------------------
-  # ----------------------------------------------------------------------------
-  # ----------------------------------------------------------------------------
+  pbottom "SETUP/UNXV ACT-DR6 DATA (MFLIKE)" || return 1
 
   cdfolder "${ROOTDIR}" || return 1;
 

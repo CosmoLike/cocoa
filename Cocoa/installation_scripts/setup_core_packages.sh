@@ -59,46 +59,34 @@ if [ -z "${IGNORE_CORE_INSTALLATION}" ]; then
 
     # In case this script runs twice -------------------------------------------
     if [ -n "${OVERWRITE_EXISTING_CORE_PACKAGES}" ]; then
-
       rm -rf "${CCIL:?}/${4:?}"
       rm -rf "${CCIL:?}/${1:?}"
-      rm -f  "${CCIL:?}/${FILE:?}"
-    
+      if [ -n "${REDOWNLOAD_EXISTING_CORE_PACKAGES}" ]; then
+        rm -f  "${CCIL:?}/${FILE:?}"
+      fi 
     fi
 
-    if [[ ! -d "${CCIL:?}/${4:?}" && \
-          ! -d "${CCIL:?}/${1:?}" && \
-          ! -e "${CCIL:?}/${FILE:?}" ]]; then
+    if [[ ! -d "${CCIL:?}/${4:?}" && ! -d "${CCIL:?}/${1:?}" ]]; then
 
-      wget "${3:?}" --retry-connrefused --waitretry=1 --tries=3 --read-timeout=20 \
-        --timeout=15 --waitretry=0 --show-progress --progress=bar:force \
-        >${OUT1:?} 2>${OUT2:?} || { error "${EC24:?}"; return 1; }
-
-      if [ "${2:?}" == "tar.gz" ]; then
-        
-        tar zxvf "${FILE}" \
-          >${OUT1:?} 2>${OUT2:?} || { error "${EC25:?} (gz)"; return 1; }
-      
-      elif [ "${2:?}" == "tar.xz" ]; then
-      
-        tar xf "${FILE}" \
-          >${OUT1:?} 2>${OUT2:?} || { error "${EC25:?} (xz)"; return 1; }
-      
-      else
-
-        error "UNKNOWN FILE EXTENSION"; return 1;
-      
+      if [[ ! -e "${CCIL:?}/${FILE:?}" ]]; then
+        wget "${3:?}" --retry-connrefused --waitretry=1 --tries=3 --read-timeout=20 \
+          --timeout=15 --waitretry=0 --show-progress --progress=bar:force \
+          >${OUT1:?} 2>${OUT2:?} || { error "${EC24:?}"; return 1; }
       fi
 
-      if [ "${1:?}/" != "${4:?}" ] && [ "${1:?}" != "${4:?}" ] \
-        && [ "${1:?}" != "${4:?}/" ] ; then
+      if [ "${2:?}" == "tar.gz" ]; then
+        tar zxvf "${FILE}" >${OUT1:?} 2>${OUT2:?} || { error "${EC25:?} (gz)"; return 1; }
+      elif [ "${2:?}" == "tar.xz" ]; then
+        tar xf "${FILE}" >${OUT1:?} 2>${OUT2:?} || { error "${EC25:?} (xz)"; return 1; }
+      else
+        error "UNKNOWN FILE EXTENSION"; return 1;
+      fi
 
+      if [[ "${1:?}/" != "${4:?}" && "${1:?}" != "${4:?}" && "${1:?}" != "${4:?}/" ]]; then
         # In case this script runs twice (after being killed by CTRL-D)
         rm -rf "${CCIL:?}/${4:?}"
         mv "${1:?}/" "${4:?}" 2>${OUT2:?} || { error "MV FOLDER"; return 1; }
-      
       fi
-
     fi
 
     cdfolder "${ROOTDIR}" || return 1;

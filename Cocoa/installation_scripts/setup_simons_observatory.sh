@@ -12,13 +12,12 @@ if [ -z "${IGNORE_SIMONS_OBSERVATORY_LIKELIHOOD_CODE}" ]; then
   ( source "${ROOTDIR:?}/installation_scripts/flags_check.sh" ) || return 1;
 
   unset_env_vars () {
-    unset -v COB CCCOB COBLIKE URL FOLDER PACKDIR PRINTNAME ECODEF URL 
-    unset -v COBTH
+    unset -v COB CCCOB COBLIKE URL FOLDER PACKDIR PRINTNAME ECODEF URL COBTH
     cdroot || return 1;
   }
 
   unset_env_funcs () {
-    unset -f cdfolder cpfolder error cpfile cppatch cppatchfolder
+    unset -f cdfolder error
     unset -f unset_env_funcs
     cdroot || return 1;
   }
@@ -38,20 +37,6 @@ if [ -z "${IGNORE_SIMONS_OBSERVATORY_LIKELIHOOD_CODE}" ]; then
   cdfolder() {
     cd "${1:?}" 2>"/dev/null" || { error "CD FOLDER: ${1}"; return 1; }
   }
-
-  cpfolder() {
-    cp -r "${1:?}" "${2:?}"  \
-      2>"/dev/null" || { error "CP FOLDER ${1} on ${2}"; return 1; }
-  }
-
-  cpfile() {
-    cp "${1:?}" "${2:?}" \
-      2>"/dev/null" || { error "CP FILE ${1} on ${2}"; return 1; }
-  }
-
-  # ----------------------------------------------------------------------------
-  # ----------------------------------------------------------------------------
-  # ----------------------------------------------------------------------------
   
   unset_env_vars || return 1
 
@@ -100,9 +85,6 @@ if [ -z "${IGNORE_SIMONS_OBSERVATORY_LIKELIHOOD_CODE}" ]; then
 
   pbottom "SETUP SIMONS OBSERVATORY SYSLIBRARY" || return 1;
 
-  cdfolder "${ROOTDIR}" || return 1
-
-  # ----------------------------------------------------------------------------
   # ----------------------------------------------------------------------------
   # ----------------------------------------------------------------------------
 

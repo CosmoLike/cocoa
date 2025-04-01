@@ -16,7 +16,7 @@ fi
 # ------------------------------------------------------------------------------
 # VERBOSE AS DEBUG TOOL --------------------------------------------------------
 # ------------------------------------------------------------------------------
-export COCOA_OUTPUT_VERBOSE=1
+#export COCOA_OUTPUT_VERBOSE=1
 
 # ------------------------------------------------------------------------------
 # If set, COSMOLIKE will compile with DEBUG flags ------------------------------
@@ -26,14 +26,14 @@ export COCOA_OUTPUT_VERBOSE=1
 # ------------------------------------------------------------------------------
 # The flags below allow users to skip downloading specific datasets ------------
 # ------------------------------------------------------------------------------
-#export IGNORE_ACTDR6_DATA=1
+export IGNORE_ACTDR6_DATA=1
 # export IGNORE_BAO_DATA=1
 export IGNORE_BICEP_CMB_DATA=1
 # export IGNORE_HOLICOW_STRONG_LENSING_DATA=1
 # export IGNORE_SN_DATA=1
-# export IGNORE_SPT_CMB_DATA=1
-#export IGNORE_SIMONS_OBSERVATORY_CMB_DATA=1
-# export IGNORE_PLANCK_CMB_DATA=1
+export IGNORE_SPT_CMB_DATA=1
+export IGNORE_SIMONS_OBSERVATORY_CMB_DATA=1
+#export IGNORE_PLANCK_CMB_DATA=1
 export IGNORE_CAMSPEC_CMB_DATA=1
 export IGNORE_LIPOP_CMB_DATA=1
 
@@ -50,15 +50,15 @@ export IGNORE_CLASS_CODE=1 # Default: we just use CAMB (reduces compilation time
 #export IGNORE_COSMOLIKE_CODE=1
 #export IGNORE_POLYCHORD_SAMPLER_CODE=1
 #export IGNORE_PLANCK_LIKELIHOOD_CODE=1
-#export IGNORE_ACTDR4_CODE=1
-#export IGNORE_ACTDR6_CODE=1
+export IGNORE_ACTDR4_CODE=1
+export IGNORE_ACTDR6_CODE=1
 export IGNORE_CPP_CUBA_INSTALLATION=1
 export IGNORE_VELOCILEPTORS_CODE=1
-#export IGNORE_SIMONS_OBSERVATORY_LIKELIHOOD_CODE=1
+export IGNORE_SIMONS_OBSERVATORY_LIKELIHOOD_CODE=1
 export IGNORE_CAMSPEC_LIKELIHOOD_CODE=1
-#export IGNORE_LIPOP_LIKELIHOOD_CODE=1
+export IGNORE_LIPOP_LIKELIHOOD_CODE=1
 export IGNORE_HYREC_CODE=1
-#export IGNORE_COSMOREC_CODE=1
+export IGNORE_COSMOREC_CODE=1
 export IGNORE_MGCAMB_CODE=1
 #Many cosmolike projects (including LSST-Y1) require euclid emulator
 #export IGNORE_EUCLID_EMULATOR_V2_CODE=1
@@ -67,10 +67,11 @@ export IGNORE_MGCAMB_CODE=1
 # ------------------------------------------------------------------------------
 # If OVERWRITE_EXISTING_XXX_CODE=1, the setup_cocoa overwrites existing PACKAGES
 # overwrite means: delete existing PACKAGE folder and install it again ---------
+# redownload: delete the compressed file and download data again
 # these keys are only relevant if you run setup_cocoa multiple times -----------
 # ------------------------------------------------------------------------------
 export OVERWRITE_EXISTING_ALL_PACKAGES=1
-
+#export REDOWNLOAD_EXISTING_ALL_DATA=1
 # ------------------------------------------------------------------------------
 # If set, compile_planck.sh uses click like code from github.com/benabed/clik
 # ------------------------------------------------------------------------------
@@ -148,7 +149,6 @@ fi
 # these keys are only relevant if you run setup_cocoa multiple times -----------
 # ------------------------------------------------------------------------------
 if [ -n "${OVERWRITE_EXISTING_ALL_PACKAGES}" ]; then
-
   export OVERWRITE_EXISTING_COCOA_PRIVATE_PYTHON_ENV=1
   export OVERWRITE_EXISTING_CORE_PACKAGES=1
   export OVERWRITE_EXISTING_COSMOLIKE_CODE=1
@@ -164,6 +164,7 @@ if [ -n "${OVERWRITE_EXISTING_ALL_PACKAGES}" ]; then
   export OVERWRITE_EXISTING_BAO_DATA=1
   export OVERWRITE_EXISTING_SIMONS_OBSERVATORY_CODE=1
   export OVERWRITE_EXISTING_FGSPECTRA_DATA=1
+  export OVERWRITE_EXISTING_LIPOP_CMB_CODE=1
   export OVERWRITE_EXISTING_LIPOP_CMB_DATA=1
   export OVERWRITE_EXISTING_ACTDR4_CMB_CODE=1
   export OVERWRITE_EXISTING_ACTDR4_CMB_DATA=1
@@ -176,9 +177,15 @@ if [ -n "${OVERWRITE_EXISTING_ALL_PACKAGES}" ]; then
   export OVERWRITE_EXISTING_SIMONS_OBSERVATORY_CMB_DATA=1
   export OVERWRITE_EXISTING_SN_DATA=1
   export OVERWRITE_EXISTING_HOLICOW_DATA=1
-
 fi
 
+if [ -n "${REDOWNLOAD_EXISTING_ALL_DATA}" ]; then
+  export REDOWNLOAD_EXISTING_CORE_PACKAGES=1
+  export REDOWNLOAD_EXISTING_ACTDR6_CMB_DATA=1
+  export REDOWNLOAD_EXISTING_LIPOP_CMB_DATA=1
+  export REDOWNLOAD_EXISTING_SIMONS_OBSERVATORY_CMB_DATA=1
+  export REDOWNLOAD_EXISTING_CAMPSPEC_CMB_DATA=1
+fi
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
