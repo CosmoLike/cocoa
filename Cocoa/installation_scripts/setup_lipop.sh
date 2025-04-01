@@ -12,12 +12,12 @@ if [ -z "${IGNORE_LIPOP_LIKELIHOOD_CODE}" ]; then
   ( source "${ROOTDIR:?}/installation_scripts/flags_check.sh" ) || return 1;
 
   unset_env_vars () {
-    unset -v COB CCCOB COBLIKE URL TFILE TFOLDER
+    unset -v COB CCCOB COBLIKE URL TFILE TFOLDER ECODEF CCIL
     cdroot || return 1;
   }
 
   unset_env_funcs () {
-    unset -f cdfolder cpfolder error cpfile flipop cppatch
+    unset -f cdfolder error flipop
     unset -f unset_env_funcs
     cdroot || return 1;
   }
@@ -37,20 +37,6 @@ if [ -z "${IGNORE_LIPOP_LIKELIHOOD_CODE}" ]; then
   cdfolder() {
     cd "${1:?}" 2>"/dev/null" || { error "CD FOLDER: ${1}"; return 1; }
   }
-
-  cpfolder() {
-    cp -r "${1:?}" "${2:?}"  \
-      2>"/dev/null" || { error "CP FOLDER ${1} on ${2}"; return 1; }
-  }
-
-  cpfile() {
-    cp "${1:?}" "${2:?}" \
-      2>"/dev/null" || { error "CP FILE ${1} on ${2}"; return 1; }
-  }
-
-  # ----------------------------------------------------------------------------
-  # ----------------------------------------------------------------------------
-  # ----------------------------------------------------------------------------
   
   unset_env_vars || return 1
   
@@ -59,136 +45,82 @@ if [ -z "${IGNORE_LIPOP_LIKELIHOOD_CODE}" ]; then
 
   CCIL="${ROOTDIR:?}/../cocoa_installation_libraries" # IL = installation lib
 
-  COB="${ROOTDIR:?}/cobaya"        # COB = Cobaya
-
-  CCCOB="${CCIL:?}/cobaya_changes"  # CC = CoCoA, COB = Cobaya (Cocoa Cobaya)
+  COBLIKE="${ROOTDIR:?}/cobaya/cobaya/likelihoods" # COB = Cobaya, LIKE = likelihoods
   
-  COBLIKE="cobaya/likelihoods"      # COB = Cobaya, LIKE = likelihoods
-  
-  cppatch() {
-    cp "${CCCOB:?}/${1:?}/${2:?}" "${COB:?}/${1:?}" \
-      2>"/dev/null" || 
-      { error "CP FILE ${CCCOB:?}/${1:?}/${2:?} on ${COB:?}/${1:?}"; return 1; }
-  }
-
   flipop() {
-
+    local TF="${ECODEF:?}/${1:?}"
+    
     if [ -n "${OVERWRITE_EXISTING_LIPOP_CMB_DATA}" ]; then
-      rm -rf "${ECODEF:?}/${1:?}"
+      rm -rf "${TF:?}"
     fi
 
-    if [ ! -d "${ECODEF:?}/${1:?}" ]; then
+    if [ ! -d "${TF:?}" ]; then
 
       cdfolder "${ECODEF:?}" || return 1;
 
-      "${GIT:?}" clone --depth ${GIT_CLONE_MAXIMUM_DEPTH:?} "${2:?}" \
-        --recursive ${1:?} >${OUT1:?} 2>${OUT2:?} || { error "${EC15:?}"; return 1; }
+      "${GIT:?}" clone --depth ${GIT_CLONE_MAXIMUM_DEPTH:?} "${3:?}" --recursive \
+        ${1:?} >${OUT1:?} 2>${OUT2:?} || { error "${EC15:?}"; return 1; }
     
-      cdfolder "${ECODEF:?}/${1:?}" || return 1;
+      cdfolder "${TF:?}" || return 1;
 
-      "${GIT:?}" reset --hard "${3:?}" \
+      "${GIT:?}" reset --hard "${4:?}" \
         >${OUT1:?} 2>${OUT2:?} || { error "${EC23:?}"; return 1; }
+
+      cp "${CCIL:?}/${2:?}_changes/init.patch" "${TF:?}/${2:?}" 2>"/dev/null" \
+        || { error "CP FILE init.patch on ${TF:?}/${2:?}"; return 1; }
+
+      cdfolder "${TF:?}/${2:?}" || return 1;
+
+      patch -u '__init__.py' -i 'init.patch' >${OUT1:?} 2>${OUT2:?} || 
+        { error "${EC17:?}"; return 1; }
 
       # ------------------------------------------------------------------------
       # Symlinks for likelihood to work w/ COBAYA.(also @start/stop_cocoa.sh)
       # ------------------------------------------------------------------------
-      if [[ -d "${ECODEF:?}/${1:?}/${1:?}" ]]; then
-        if [[ -L "${COB:?}/${COBLIKE:?}/${1:?}" ]]; then
-          rm -f "${COB:?}/${COBLIKE:?}/${1:?}"
+      if [[ -d "${TF:?}/${2:?}" ]]; then
+        if [[ -L "${COBLIKE:?}/${2:?}" ]]; then
+          rm -f "${COBLIKE:?}/${2:?}"
         fi
-        ln -s "${ECODEF:?}/${1:?}/${1:?}" "${COB:?}/${COBLIKE:?}" \
+        ln -s "${TF:?}/${2:?}" "${COBLIKE:?}" \
           >${OUT1:?} 2>${OUT2:?} || { error "${EC34:?}"; return 1; }
       fi
-      
-      cp "${CCIL:?}/${1:?}_changes/init.patch" "${ECODEF:?}/${1:?}/${1:?}" 2>"/dev/null" || 
-      { error "CP FILE ${CCCOB:?}/${1:?}/init.patch on ${ECODEF:?}/${1:?}/${1:?}"; return 1; }
-
-      cdfolder "${ECODEF:?}/${1:?}/${1:?}" || return 1;
-      
-      patch -u '__init__.py' -i 'init.patch' >${OUT1:?} 2>${OUT2:?} || 
-        { error "${EC17:?}"; return 1; }
-    fi
-
-    cdfolder "${ROOTDIR:?}" || return 1; 
-  }
-
-  flipop2() {
-    local TFOLDER="${COBLIKE:?}/${1:?}"
-    local URL="${2:?}"
-
-    # in case you run this script more than once
-    if [ -n "${OVERWRITE_EXISTING_LIPOP_CMB_DATA}" ]; then
-
-      rm -rf "${COB:?}/${TFOLDER:?}"
-      rm -rf "${COB:?}/${COBLIKE:?}/tmp"
-
-    fi
-
-    if [ ! -d "${COB:?}/${TFOLDER:?}" ]; then
-
-      cdfolder "${COB:?}/${COBLIKE:?}" || return 1;
-
-      "${CURL:?}" -fsS "${URL:?}" >${OUT1:?} \
-        2>${OUT2:?} || { error "${EC27:?} (URL=${URL:?})"; return 1; }
-
-      "${GIT:?}" clone --depth ${GIT_CLONE_MAXIMUM_DEPTH:?} "${URL:?}" "tmp" \
-        >${OUT1:?} 2>${OUT2:?} || { error "${EC15:?}"; return 1; }
-    
-      cdfolder "${COB:?}/${COBLIKE}/tmp" || return 1;
-
-      "${GIT:?}" reset --hard "${3:?}" \
-        >${OUT1:?} 2>${OUT2:?} || { error "${EC23:?}"; return 1; }
-
-      cpfolder ${1:?}/ "${COB:?}/${COBLIKE:?}" || return 1;
-      
-      cdfolder "${COB:?}/${TFOLDER:?}" || return 1;
-      
-      #rm -rf "${COB:?}/${COBLIKE:?}/tmp"
-
-      cppatch "${TFOLDER:?}" "init.patch" || return 1
-
-      patch -u '__init__.py' -i 'init.patch' >${OUT1:?} 2>${OUT2:?} || 
-        { error "${EC17:?}"; return 1; }
-
     fi
 
     cdfolder "${ROOTDIR:?}" || return 1; 
   }
   
   #-----------------------------------------------------------------------------
-  # HILLIPOP_URL LIKELIHOOD ----------------------------------------------------
   #-----------------------------------------------------------------------------
 
   ptop "SETUP HILLIPOP LIKELIHOOD" || return 1
 
-  TFOLDER="planck_2020_hillipop"
+  TFOLDER="${PL2020_HILLIPOP_NAME:-"planck_2020_hillipop"}"
   
   URL="${HILLIPOP_URL:-"https://github.com/planck-npipe/hillipop.git"}"
   
-  flipop "${TFOLDER:?}" "${URL:?}" "${HILLIPOP_GIT_COMMIT:-"HEAD~"}" || return 1;
+  flipop "${TFOLDER:?}" "planck_2020_hillipop" "${URL:?}" \
+    "${HILLIPOP_GIT_COMMIT:-"HEAD~"}" || return 1;
   
-  unset -v TFOLDER URL
-
   pbottom "SETUP HILLIPOP LIKELIHOOD" || return 1
 
   #-----------------------------------------------------------------------------
-  # LOLLIPOP LIKELIHOOD --------------------------------------------------------
   #-----------------------------------------------------------------------------
 
   ptop "SETUP LOLLIPOP LIKELIHOOD" || return 1
 
-  TFOLDER="planck_2020_lollipop"
+  TFOLDER="${PL2020_LOLLIPOP_NAME:-"planck_2020_lollipop"}"
   
   URL="${LOLLIPOP_URL:-"https://github.com/planck-npipe/lollipop.git"}"
   
-  flipop "${TFOLDER:?}" "${URL:?}" "${LOLLIPOP_GIT_COMMIT:-"HEAD~"}" || return 1;
+  flipop "${TFOLDER:?}" "planck_2020_lollipop" "${URL:?}" \
+    "${LOLLIPOP_GIT_COMMIT:-"HEAD~"}" || return 1;
   
-  unset -v TFOLDER URL
-
   pbottom "SETUP LOLLIPOP LIKELIHOOD" || return 1
 
   #-----------------------------------------------------------------------------
   
+  cdfolder "${ROOTDIR:?}" || return 1;
+
   unset_all || return 1;
   
 fi

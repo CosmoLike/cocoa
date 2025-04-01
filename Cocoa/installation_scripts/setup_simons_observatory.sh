@@ -98,10 +98,10 @@ if [ -z "${IGNORE_SIMONS_OBSERVATORY_LIKELIHOOD_CODE}" ]; then
     fi
   fi
 
+  pbottom "SETUP SIMONS OBSERVATORY SYSLIBRARY" || return 1;
+
   cdfolder "${ROOTDIR}" || return 1
 
-  pbottom "SETUP SIMONS OBSERVATORY SYSLIBRARY" || return 1;
-  
   # ----------------------------------------------------------------------------
   # ----------------------------------------------------------------------------
   # ----------------------------------------------------------------------------
@@ -110,7 +110,7 @@ if [ -z "${IGNORE_SIMONS_OBSERVATORY_LIKELIHOOD_CODE}" ]; then
 
   URL="${SO_MFLIKE_URL:-"https://github.com/simonsobs/LAT_MFLike.git"}"
   
-  FOLDER="mflike"
+  FOLDER=${SO_MFLIKE_NAME:-"mflike"}
 
   PACKDIR="${ECODEF:?}/${FOLDER:?}"
 
@@ -160,13 +160,8 @@ if [ -z "${IGNORE_SIMONS_OBSERVATORY_LIKELIHOOD_CODE}" ]; then
         >${OUT1:?} 2>${OUT2:?} || { error "${EC34:?}"; return 1; }
     fi
   fi
-  
-  cdfolder "${ROOTDIR}" || return 1
 
   pbottom "SETUP SIMONS OBSERVATORY MFLIKE" || return 1;
-
-  #-----------------------------------------------------------------------------
-  #-----------------------------------------------------------------------------
 
   cdfolder "${ROOTDIR}" || return 1
 

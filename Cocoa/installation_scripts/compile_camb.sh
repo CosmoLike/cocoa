@@ -12,7 +12,7 @@ if [ -z "${IGNORE_CAMB_CODE}" ]; then
   ( source "${ROOTDIR:?}/installation_scripts/flags_check.sh" ) || return 1;
 
   unset_env_vars () {
-    unset -v ECODEF FOLDER PACKDIR PRINTNAME
+    unset -v ECODEF FOLDER PACKDIR PRINTNAME PLIB
     cdroot || return 1;
   }
 
@@ -38,10 +38,6 @@ if [ -z "${IGNORE_CAMB_CODE}" ]; then
     cd "${1:?}" 2>"/dev/null" || { error "CD FOLDER ${1}"; return 1; }
   }
   
-  # ---------------------------------------------------------------------------
-  # ---------------------------------------------------------------------------
-  # ---------------------------------------------------------------------------
-
   unset_env_vars || return 1
 
   # ---------------------------------------------------------------------------

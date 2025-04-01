@@ -50,22 +50,22 @@ if [ -z "${IGNORE_EUCLID_EMULATOR_V2_CODE}" ]; then
 
   PACKDIR="${ECODEF:?}/${FOLDER:?}"
 
-  ptop "COMPILING EUCLID EMULATOR V2" || return 1
+  PLIB="${ROOTDIR:?}/.local/lib/python${PYTHON_VERSION:?}/site-packages"
 
-  cdfolder "${PACKDIR}" || return 1
+  ptop "COMPILING EUCLID EMULATOR V2" || return 1
 
   # ---------------------------------------------------------------------------
   rm -rf "${PACKDIR:?}/build/"
   rm -rf "${PACKDIR:?}/euclidemu2.egg-info/"
-  PLIB="${ROOTDIR:?}/.local/lib/python${PYTHON_VERSION:?}/site-packages"
   rm -rf  "${PLIB:?}"/euclidemu2
   rm -rf  "${PLIB:?}"/euclidemu2-*
   # ---------------------------------------------------------------------------  
  
+  cdfolder "${PACKDIR}" || return 1
+
   #prevent all compile_XXX.sh from using the internet (run @compute nodes)
   #FROM: https://github.com/pypa/pip/issues/12050
   #That is why we use --no-dependencies --no-index --no-build-isolation
-
   env CXX="${CXX_COMPILER:?}" CC="${C_COMPILER:?}" ${PIP3:?} install \
     ${PACKDIR:?} --no-dependencies --prefix="${ROOTDIR:?}/.local" \
     --no-index --no-build-isolation \
