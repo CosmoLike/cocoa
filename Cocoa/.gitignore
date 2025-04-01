@@ -19,6 +19,9 @@ core.*
 *.egg
 *.vfproj
 *.sln
+*.tar.gz
+*.tgz
+*.tar
 
 cobaya/cobaya/likelihoods/.gitignore
 external_modules/code/.gitignore
