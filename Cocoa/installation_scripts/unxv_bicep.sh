@@ -63,17 +63,22 @@ if [ -z "${IGNORE_BICEP_CMB_DATA}" ]; then
 
   # ---------------------------------------------------------------------------
   # note: in case script run >1x w/ previous run stoped prematurely b/c error
-  
-  rm -rf "${PACKDIR:?}"
-  
-  # ---------------------------------------------------------------------------
+  if [ -n "${OVERWRITE_EXISTING_BICEP_CMB_DATA}" ]; then
 
-  cdfolder "${EDATAF:?}" || return 1
-
-  tar xf "${FILE:?}" >${OUT1:?} 2>${OUT2:?} || { error "${EC25:?}"; return 1; }
-
-  # ---------------------------------------------------------------------------
+    rm -rf "${PACKDIR:?}"
   
+  fi
+  
+  if [ ! -d "${PACKDIR:?}" ]; then
+
+    cdfolder "${EDATAF:?}" || return 1
+
+    tar xf "${FILE:?}" >${OUT1:?} 2>${OUT2:?} || { error "${EC25:?}"; return 1; }
+
+  fi 
+
+  cdfolder "${ROOTDIR}" || return 1;
+
   pbottom "SETUP/UNXV ${PRINTNAME:?} DATA" || return 1
 
   unset_all || return 1

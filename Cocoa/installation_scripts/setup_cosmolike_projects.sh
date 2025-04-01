@@ -57,26 +57,25 @@ gitact1() {
   # In case this script runs twice --------------------------------------------
   # ---------------------------------------------------------------------------
   if [ -n "${OVERWRITE_EXISTING_COSMOLIKE_CODE}" ]; then
-    
     rm -rf "${PACKDIR:?}"
-  
   fi
 
   # ---------------------------------------------------------------------------
   # clone from original repo --------------------------------------------------
   # ---------------------------------------------------------------------------
   if [ ! -d "${PACKDIR:?}" ]; then
-
-    "${CURL:?}" -fsS "${2:?}" \
-      >${OUT1:?} 2>${OUT2:?} || { error "${EC27:?} (URL=${2:?})"; return 1; }
-
     "${GIT:?}" clone "${2:?}" "${1:?}" \
       >${OUT1:?} 2>${OUT2:?} || { error "${EC15:?}"; return 1; }
 
     cdfolder "${1}" || return 1;
 
-    "${GIT:?}" checkout -b ${3} origin/${3} \
-      >${OUT1:?} 2>${OUT2:?} || { error "${EC16:?}"; return 1; }
+    if git show-ref --quiet refs/heads/${3}; then
+      # do nothing
+      echo "git branch exists" >${OUT1:?} 2>${OUT2:?} || { return 1; }
+    else
+      "${GIT:?}" checkout -b ${3} origin/${3} \
+        >${OUT1:?} 2>${OUT2:?} || { error "${EC16:?}"; return 1; }
+    fi
   fi
     
   cdfolder "${ROOTDIR}" || return 1;
@@ -100,10 +99,6 @@ gitact2() {
   # clone from original repo --------------------------------------------------
   # ---------------------------------------------------------------------------
   if [ ! -d "${PACKDIR:?}" ]; then
-
-    "${CURL:?}" -fsS "${2:?}" \
-      >${OUT1:?} 2>${OUT2:?} || { error "${EC27:?} (URL=${2:?})"; return 1; }
-
     "${GIT:?}" clone "${2:?}" "${1:?}" \
       >${OUT1:?} 2>${OUT2:?} || { error "${EC15:?}"; return 1; }
 
@@ -111,7 +106,6 @@ gitact2() {
 
     "${GIT:?}" checkout ${3} \
       >${OUT1:?} 2>${OUT2:?} || { error "${EC16:?}"; return 1; }
-
   fi
     
   cdfolder "${ROOTDIR}" || return 1;
@@ -135,10 +129,6 @@ gitact3() {
   # clone from original repo --------------------------------------------------
   # ---------------------------------------------------------------------------
   if [ ! -d "${PACKDIR:?}" ]; then
-
-    "${CURL:?}" -fsS "${2:?}" \
-      >${OUT1:?} 2>${OUT2:?} || { error "${EC27:?} (URL=${2:?})"; return 1; }
-
     "${GIT:?}" clone "${2:?}" "${1:?}" \
       >${OUT1:?} 2>${OUT2:?} || { error "${EC15:?}"; return 1; }
 

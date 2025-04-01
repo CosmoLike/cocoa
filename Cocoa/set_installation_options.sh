@@ -31,30 +31,26 @@ export IGNORE_ACTDR6_DATA=1
 export IGNORE_BICEP_CMB_DATA=1
 # export IGNORE_HOLICOW_STRONG_LENSING_DATA=1
 # export IGNORE_SN_DATA=1
-# export IGNORE_SPT_CMB_DATA=1
+export IGNORE_SPT_CMB_DATA=1
 export IGNORE_SIMONS_OBSERVATORY_CMB_DATA=1
-# export IGNORE_PLANCK_CMB_DATA=1
+#export IGNORE_PLANCK_CMB_DATA=1
 export IGNORE_CAMSPEC_CMB_DATA=1
 export IGNORE_LIPOP_CMB_DATA=1
 
 # ------------------------------------------------------------------------------
-# We download packages from servers that slowdown transfer after many runs. So, 
-# if rerun setup_cocoa to download some non-core lib, these flags may be handy
 # ------------------------------------------------------------------------------
-#export IGNORE_CORE_INSTALLATION=1
-#export IGNORE_PIP_CORE_INSTALLATION=1
-
 # ------------------------------------------------------------------------------
 # The keys below control which packages will be installed and compiled 
 # ------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 #export IGNORE_COBAYA_CODE=1
-
 #export IGNORE_CAMB_CODE=1
-#export IGNORE_CLASS_CODE=1
+export IGNORE_CLASS_CODE=1 # Default: we just use CAMB (reduces compilation time)
 #export IGNORE_COSMOLIKE_CODE=1
 #export IGNORE_POLYCHORD_SAMPLER_CODE=1
 #export IGNORE_PLANCK_LIKELIHOOD_CODE=1
-#export IGNORE_ACTDR4_CODE=1
+export IGNORE_ACTDR4_CODE=1
 export IGNORE_ACTDR6_CODE=1
 export IGNORE_CPP_CUBA_INSTALLATION=1
 export IGNORE_VELOCILEPTORS_CODE=1
@@ -64,22 +60,18 @@ export IGNORE_LIPOP_LIKELIHOOD_CODE=1
 export IGNORE_HYREC_CODE=1
 export IGNORE_COSMOREC_CODE=1
 export IGNORE_MGCAMB_CODE=1
-
 #Many cosmolike projects (including LSST-Y1) require euclid emulator
 #export IGNORE_EUCLID_EMULATOR_V2_CODE=1
 #export IGNORE_COSMOLIKE_LSSTY1_CODE=1
 
 # ------------------------------------------------------------------------------
-# If OVERWRITE_EXISTING_XXX_CODE is set, setup_XXX overwrites existing PACKAGES
-# overwrite = delete existing PACKAGE folder and install it again --------------
+# If OVERWRITE_EXISTING_XXX_CODE=1, the setup_cocoa overwrites existing PACKAGES
+# overwrite means: delete existing PACKAGE folder and install it again ---------
+# redownload: delete the compressed file and download data again
+# these keys are only relevant if you run setup_cocoa multiple times -----------
 # ------------------------------------------------------------------------------
-#export OVERWRITE_EXISTING_COSMOLIKE_CODE=1
-export OVERWRITE_EXISTING_CAMB_CODE=1
-export OVERWRITE_EXISTING_MGCAMB_CODE=1
-export OVERWRITE_EXISTING_CLASS_CODE=1
-export OVERWRITE_EXISTING_HYREC_CODE=1
-export OVERWRITE_EXISTING_COSMOREC_CODE=1
-
+export OVERWRITE_EXISTING_ALL_PACKAGES=1
+#export REDOWNLOAD_EXISTING_ALL_DATA=1
 # ------------------------------------------------------------------------------
 # If set, compile_planck.sh uses click like code from github.com/benabed/clik
 # ------------------------------------------------------------------------------
@@ -108,8 +100,13 @@ export MINICONDA_INSTALLATION=1
 #export MANUAL_INSTALLATION=1
 
 # ------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # DERIVED & RARELY CHANGED FLAGS (DO NOT CHANGE) -------------------------------
 # ------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
+
 if [ -n "${MANUAL_INSTALLATION}" ]; then      
   source "${ROOTDIR:?}/installation_scripts/flags_manual_installation.sh" 
   if [ $? -ne 0 ]; then
@@ -133,7 +130,68 @@ fi
 unset IGNORE_CPP_ARMA_INSTALLATION
 
 # ------------------------------------------------------------------------------
+# -------------------- COMPATIBILITY/DEPENDENCIES ------------------------------
+# ------------------------------------------------------------------------------
+if [ -z "${IGNORE_ACTDR6_CODE}" ]; then
+  unset -v IGNORE_FGSPECTRA_CODE
+  unset -v IGNORE_SIMONS_OBSERVATORY_LIKELIHOOD_CODE
+  unset -v IGNORE_COSMOREC_CODE
+fi
+
+if [ -z "${IGNORE_SIMONS_OBSERVATORY_LIKELIHOOD_CODE}" ]; then
+  unset -v IGNORE_FGSPECTRA_CODE
+fi
+# ------------------------------------------------------------------------------
+
+# ------------------------------------------------------------------------------
+# If OVERWRITE_EXISTING_XXX_CODE=1, the setup_cocoa overwrites existing PACKAGES
+# overwrite means: delete existing PACKAGE folder and install it again ---------
+# these keys are only relevant if you run setup_cocoa multiple times -----------
+# ------------------------------------------------------------------------------
+if [ -n "${OVERWRITE_EXISTING_ALL_PACKAGES}" ]; then
+  export OVERWRITE_EXISTING_COCOA_PRIVATE_PYTHON_ENV=1
+  export OVERWRITE_EXISTING_CORE_PACKAGES=1
+  export OVERWRITE_EXISTING_COSMOLIKE_CODE=1
+  export OVERWRITE_EXISTING_COBAYA_CODE=1
+  export OVERWRITE_EXISTING_CAMB_CODE=1
+  export OVERWRITE_EXISTING_MGCAMB_CODE=1
+  export OVERWRITE_EXISTING_CLASS_CODE=1
+  export OVERWRITE_EXISTING_HYREC_CODE=1
+  export OVERWRITE_EXISTING_COSMOREC_CODE=1
+  export OVERWRITE_EXISTING_POLYCHORD_CODE=1
+  export OVERWRITE_EXISTING_VELOCILEPTORS_CODE=1
+  export OVERWRITE_EXISTING_EE2_CODE=1
+  export OVERWRITE_EXISTING_BAO_DATA=1
+  export OVERWRITE_EXISTING_SIMONS_OBSERVATORY_CODE=1
+  export OVERWRITE_EXISTING_FGSPECTRA_DATA=1
+  export OVERWRITE_EXISTING_LIPOP_CMB_CODE=1
+  export OVERWRITE_EXISTING_LIPOP_CMB_DATA=1
+  export OVERWRITE_EXISTING_ACTDR4_CMB_CODE=1
+  export OVERWRITE_EXISTING_ACTDR4_CMB_DATA=1
+  export OVERWRITE_EXISTING_ACTDR6_CMB_CODE=1
+  export OVERWRITE_EXISTING_ACTDR6_CMB_DATA=1
+  export OVERWRITE_EXISTING_BICEP_CMB_DATA=1
+  export OVERWRITE_EXISTING_CAMPSPEC_CMB_DATA=1
+  export OVERWRITE_EXISTING_SPT3G_CMB_DATA=1
+  export OVERWRITE_EXISTING_PLANCK_CMB_DATA=1
+  export OVERWRITE_EXISTING_SIMONS_OBSERVATORY_CMB_DATA=1
+  export OVERWRITE_EXISTING_SN_DATA=1
+  export OVERWRITE_EXISTING_HOLICOW_DATA=1
+fi
+
+if [ -n "${REDOWNLOAD_EXISTING_ALL_DATA}" ]; then
+  export REDOWNLOAD_EXISTING_CORE_PACKAGES=1
+  export REDOWNLOAD_EXISTING_ACTDR6_CMB_DATA=1
+  export REDOWNLOAD_EXISTING_LIPOP_CMB_DATA=1
+  export REDOWNLOAD_EXISTING_SIMONS_OBSERVATORY_CMB_DATA=1
+  export REDOWNLOAD_EXISTING_CAMPSPEC_CMB_DATA=1
+fi
+# ------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # PACKAGE URL AND VERSIONS. CHANGES IN THE COMMIT ID MAY BREAK COCOA -----------
+# ------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
 
 # This flag saves a lot of time when running setup_cocoa.py 
@@ -142,7 +200,7 @@ unset IGNORE_CPP_ARMA_INSTALLATION
 export GIT_CLONE_MAXIMUM_DEPTH=40
 
 export COBAYA_URL="https://github.com/CobayaSampler/cobaya.git"
-export COBAYA_GIT_COMMIT="2636ea9ed399c35c5d276de1acb15aaafbcab10c"
+export COBAYA_GIT_COMMIT="86943d81d48d2edb2961b17077461df9e799f4d1"
 
 export HILLIPOP_URL="https://github.com/planck-npipe/hillipop.git"
 export HILLIPOP_GIT_COMMIT="cc9cbe31991d4662522241543a46d44d2cdec251"
@@ -165,19 +223,31 @@ export POLYCHORD_GIT_COMMIT="daba49d1385d065122db76a2b384050f9e95d278"
 export POLY_NAME="PolyChordLite"
 
 export CAMB_URL="https://github.com/cmbant/CAMB"
-export CAMB_GIT_COMMIT="45d1c3d27e7480c0f9a82c98522c17ed422dd408"
+export CAMB_GIT_COMMIT="886b17cbc23137737b7ef4318d165aa7bdbbbbed"
 export CAMB_NAME='CAMB'
 
 export CLASS_URL="https://github.com/lesgourg/class_public.git"
-export CLASS_GIT_COMMIT="8df566c1ff2d0b3e40e106567c435575aea337be"
+export CLASS_GIT_COMMIT="0ceb7a9a4c1e444ef5d5d56a8328a0640be91b18"
 export CLASS_NAME="class_public"
 
 export ACTDR4_URL="https://github.com/ACTCollaboration/pyactlike"
 export ACTDR4_GIT_COMMIT="1cac8c5d047bc2cad991890f2ebf1d8e3fb483b3"
 export ACTDR4_NAME="pyactlike"
 
-export ACT_DR6_DATA_URL="https://lambda.gsfc.nasa.gov/data/suborbital/ACT/ACT_dr6/likelihood/data"
-export ACT_DR6_DATA_FILE="ACT_dr6_likelihood_v1.2.tgz"
+export ACTDR6_CMBONLY_URL="https://github.com/ACTCollaboration/DR6-ACT-lite.git"
+export ACTDR6_CMBONLY_GIT_COMMIT="627aeafb88ae5ad1aa66b406bea2d65cfa66a27d"
+
+export ACTDR6_MFLIKE_URL="https://github.com/ACTCollaboration/act_dr6_mflike.git"
+export ACTDR6_MFLIKE_GIT_COMMIT=4249ff9e2d92f01d6a38d4adbe78ad34f83a33f7
+
+export ACTDR6_LENSING_DATA_URL="https://lambda.gsfc.nasa.gov/data/suborbital/ACT/ACT_dr6/likelihood/data"
+export ACTDR6_LENSING_DATA_FILE="ACT_dr6_likelihood_v1.2.tgz"
+
+export ACTDR6_CMBONLY_DATA_URL="https://lambda.gsfc.nasa.gov/data/act/pspipe/sacc_files/"
+export ACTDR6_CMBONLY_DATA_FILE="dr6_data_cmbonly.tar.gz"
+
+export ACTDR6_MFLIKE_DATA_URL=https://lambda.gsfc.nasa.gov/data/act/pspipe/sacc_files/
+export ACTDR6_MFLIKE_DATA_FILE=dr6_data.tar.gz
 
 export SO_DATA_URL="https://portal.nersc.gov/cfs/sobs/users/MFLike_data"
 export SO_DATA_VERSION="v0.8"
@@ -187,15 +257,14 @@ export VELOCILEPTORS_GIT_COMMIT="889a0c98895831eb23b250a26162cfb8a93237bd"
 export VELOCILEPTORS_NAME="velocileptors"
 
 export FGSPECTRA_URL="https://github.com/simonsobs/fgspectra.git"
-export FGSPECTRA_GIT_COMMIT="87206ac7f919bcf82b08dee180f0821d038d24d2"
+export FGSPECTRA_GIT_COMMIT="cd78a3a72274dac2b9e05bef1943370807c46146"
 export FGSPECTRA_NAME="fgspectra"
 
 export SO_MFLIKE_URL="https://github.com/simonsobs/LAT_MFLike.git"
-export SO_MFLIKE_GIT_COMMIT="660e0fa06e1c68335b7def416c256dfd316564d4"
+export SO_MFLIKE_GIT_COMMIT="531267e8f046f72ddc5fe4ff88432871ad8c9cfd"
 
 export SO_SYSLIB_URL="https://github.com/simonsobs/syslibrary.git"
-export SO_SYSLIB_GIT_COMMIT="c4a112dc2324647395b6c91d4747e3ab19754413"
-export SO_SYSLIB_NAME="SOSYSLIB"
+export SO_SYSLIB_GIT_COMMIT="2471df981053a7526a441d2547eb8dde10d92f70"
 
 export EE2_URL="https://github.com/miknab/EuclidEmulator2.git"
 export EE2_GIT_COMMIT="ff59f6683069417f6b4d2fb5d59197044d424445"
@@ -213,6 +282,9 @@ export COSMOREC_NAME="cosmorec"
 export MGCAMB_URL="https://github.com/sfu-cosmo/MGCobaya.git"
 export MGCAMB_GIT_COMMIT="443c4a733db687ac18e918b8ed09b45003a8c4ca"
 export MGCAMB_NAME='MGCAMB'
+
+export PLANCK2018_SROLL2_URL="https://web.fe.infn.it/~pagano/low_ell_datasets/sroll2/"
+export PLANCK2018_SROLL2_FILE="simall_100x143_sroll2_v3_EE_Aplanck.tgz"
 
 # --------------------------------------------------------------------
 # --------------------------------------------------------------------

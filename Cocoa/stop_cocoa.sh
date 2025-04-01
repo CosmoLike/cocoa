@@ -31,8 +31,6 @@ if [ $? -ne 0 ]; then
   return 1;
 fi
 
-
-
 # ----------------------------------------------------------------------------
 # ----------------------------- PLANCK LIKELIHOOD ----------------------------
 # ----------------------------------------------------------------------------
@@ -64,6 +62,62 @@ if [ -z "${IGNORE_PLANCK_COMPILATION}" ]; then
     fi
     unset OLD_CLIK_PLUGIN
   fi
+fi
+
+# ----------------------------------------------------------------------------
+# ------------------------------- ACT LIKELIHOOD -----------------------------
+# ----------------------------------------------------------------------------
+if [ -z "${IGNORE_ACTDR6_CODE}" ]; then
+  COBLIKE="${ROOTDIR:?}/cobaya/cobaya/likelihoods"
+
+  TMP="act_dr6_cmbonly"
+  if [[ -L "${COBLIKE:?}/${TMP:?}" ]]; then
+    rm -f "${COBLIKE:?}/${TMP:?}"
+  fi
+
+  TMP="act_dr6_mflike"
+  if [[ -L "${COBLIKE:?}/${TMP:?}" ]]; then
+    rm -f "${COBLIKE:?}/${TMP:?}"
+  fi
+
+  unset -v COBLIKE TMP
+fi
+
+# ----------------------------------------------------------------------------
+# ------------------------------- SO LIKELIHOOD ------------------------------
+# ----------------------------------------------------------------------------
+if [[ -z "${IGNORE_SIMONS_OBSERVATORY_LIKELIHOOD_CODE}" ]]; then
+  COBLIKE="${ROOTDIR:?}/cobaya/cobaya/likelihoods"
+  COBTH="${ROOTDIR:?}/cobaya/cobaya/theories"
+  TMP="mflike"
+  
+  if [[ -L "${COBLIKE:?}/${TMP:?}" ]]; then
+    rm -f "${COBLIKE:?}/${TMP:?}"
+  fi
+  if [[ -L "${COBTH:?}/${TMP:?}" ]]; then
+    rm -f "${COBTH:?}/${TMP:?}"
+  fi
+
+  unset -v COBLIKE COBTH TMP
+fi
+
+# ----------------------------------------------------------------------------
+# ----------------------------- LIPOP LIKELIHOOD -----------------------------
+# ----------------------------------------------------------------------------
+if [ -z "${IGNORE_ACTDR6_CODE}" ]; then
+  COBLIKE="${ROOTDIR:?}/cobaya/cobaya/likelihoods"
+
+  TMP="planck_2020_hillipop"
+  if [[ -L "${COBLIKE:?}/${TMP:?}" ]]; then
+    rm -f "${COBLIKE:?}/${TMP:?}"
+  fi
+
+  TMP="planck_2020_lollipop"
+  if [[ -L "${COBLIKE:?}/${TMP:?}" ]]; then
+    rm -f "${COBLIKE:?}/${TMP:?}"
+  fi
+
+  unset -v COBLIKE TMP
 fi
 
 # ----------------------------------------------------------------------------

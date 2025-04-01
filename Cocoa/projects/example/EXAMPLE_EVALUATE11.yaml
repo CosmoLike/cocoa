@@ -1,15 +1,13 @@
 stop_at_error: false
 debug: false
-timing: false
+timing: true
 
 likelihood:
   planck_2020_hillipop.TTTEEE:
     data_folder: planck/hillipop
   planck_2018_lowl.TT:
     path: ./external_modules
-  planck_2020_lollipop.lowlB:
-    data_folder: planck/lollipop
-  planck_2020_lollipop.lowlEB:
+  planck_2020_lollipop.lowlE:
     data_folder: planck/lollipop
 
 params:
@@ -208,4 +206,4 @@ sampler:
       w: -0.909098
       A_planck: 1.00133
 
-output: ./projects/example/chains/EXAMPLE_EVALUATE10
+output: ./projects/example/chains/EXAMPLE_EVALUATE11

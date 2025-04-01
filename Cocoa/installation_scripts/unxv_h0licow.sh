@@ -53,46 +53,35 @@ if [ -z "${IGNORE_HOLICOW_STRONG_LENSING_DATA}" ]; then
   
   URL="${HOLICOW_DATA_URL:-"https://github.com/shsuyu/H0LiCOW-public.git"}"
 
-  # Name to be printed on this shell script messages
-  PRINTNAME="H0LICOW"
+  ptop "SETUP/UNXV H0LICOW DATA" || return 1
 
-  # ---------------------------------------------------------------------------
-
-  ptop "SETUP/UNXV ${PRINTNAME:?} DATA" || return 1
-
-  # ---------------------------------------------------------------------------
-  # in case this script is called twice
+  if [ -n "${OVERWRITE_EXISTING_HOLICOW_DATA}" ]; then
+    rm -rf "${EDATAF:?}/${TMP:?}"
+    rm -rf "${EDATAF:?}/${FOLDER:?}"
+  fi
   
-  rm -rf "${EDATAF:?}/${TMP:?}"
+  if [ ! -d "${EDATAF:?}/${FOLDER:?}" ]; then
 
-  rm -rf "${EDATAF:?}/${FOLDER:?}"
-  
-  # ---------------------------------------------------------------------------
+    cdfolder "${EDATAF:?}" || return 1
+      
+    ${GIT:?} clone "${URL:?}" "${TMP:?}" \
+      >${OUT1:?} 2>${OUT2:?} || { error "${EC15:?}"; return 1; }
 
-  cdfolder "${EDATAF:?}" || return 1
+    cdfolder "${EDATAF:?}/${TMP:?}" || return 1
 
-  # check if the link exists
-  "${CURL:?}" -fsS "${URL:?}" \
-    >${OUT1:?} 2>${OUT2:?} || { error "${EC27:?} (URL=${URL:?})"; return 1; }
-    
-  ${GIT:?} clone "${URL:?}" "${TMP:?}" \
-    >${OUT1:?} 2>${OUT2:?} || { error "${EC15:?}"; return 1; }
+    if [ -n "${HOLICOW_DATA_GIT_COMMIT}" ]; then
+      ${GIT:?} checkout "${HOLICOW_DATA_GIT_COMMIT:?}" \
+        >${OUT1:?} 2>${OUT2:?} || { error "${EC16:?}"; return 1; }
+    fi
 
-  cdfolder "${EDATAF:?}/${TMP:?}" || return 1
-
-  if [ -n "${HOLICOW_DATA_GIT_COMMIT}" ]; then
-    ${GIT:?} checkout "${HOLICOW_DATA_GIT_COMMIT:?}" \
-      >${OUT1:?} 2>${OUT2:?} || { error "${EC16:?}"; return 1; }
+    mv "${FOLDER:?}" "${EDATAF:?}"
+    rm -rf "${EDATAF:?}/${TMP:?}"
   fi
 
-  mv "${FOLDER:?}" "${EDATAF:?}"
+  pbottom "SETUP/UNXV H0LICOW DATA" || return 1
 
-  rm -rf "${EDATAF:?}/${TMP:?}"
-
-  # ---------------------------------------------------------------------------
+  cdfolder "${ROOTDIR}" || return 1;
   
-  pbottom "SETUP/UNXV ${PRINTNAME:?} DATA" || return 1
-
   unset_all || return 1
 
 fi

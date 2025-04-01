@@ -136,13 +136,13 @@ if [ -z "${IGNORE_PIP_CORE_INSTALLATION}" ]; then
         'PyYAML==6.0' \
         'qp-prob==0.8.3' \
         'requests==2.31.0' \
-        'sacc==0.8.1' \
+        'sacc==0.10' \
         'schwimmbad==0.3.2' \
         'scikit-image==0.21.0' \
         'scikit-learn==1.2.2' \
         'scipy==1.10.1' \
         'setuptools==67.7.2' \
-        'setuptools-scm==7.1.0' \
+        'setuptools_scm==8.2.0' \
         'six==1.16.0' \
         'snowballstemmer==2.2.0' \
         'sphinx==7.1.2' \
@@ -183,14 +183,18 @@ if [ -z "${IGNORE_PIP_CORE_INSTALLATION}" ]; then
     env MPICC=$MPI_CC_COMPILER ${PIP3:?} install \
         'numpy==1.23.5' \
         'mpi4py==3.1.4' \
-        'notebook==7.1.1' \
-        'ipyparallel==8.8.0' \
-        'emcee==3.1.4' \
       --no-cache-dir \
       --prefix="${ROOTDIR:?}/.local" \
       --force-reinstall \
       >${OUT1:?} 2>${OUT2:?} || { error "(PIP-CORE-PACKAGES) ${EC13:?}"; return 1; }
 
+    env MPICC=$MPI_CC_COMPILER ${PIP3:?} install \
+        'notebook==7.1.1' \
+        'ipyparallel==8.8.0' \
+        'emcee==3.1.4' \
+      --no-cache-dir \
+      --prefix="${ROOTDIR:?}/.local" \
+      >${OUT1:?} 2>${OUT2:?} || { error "(PIP-CORE-PACKAGES) ${EC13:?}"; return 1; }
 
     pbottom "INSTALLING PYTHON CORE LIBRARIES VIA PIP" || return 1
 
@@ -199,28 +203,30 @@ if [ -z "${IGNORE_PIP_CORE_INSTALLATION}" ]; then
     ptop "INSTALLING A FEW PYTHON CORE LIBRARIES VIA PIP" || return 1
 
     #PS: --force-reinstall - this helps CARMA to see numpy files
-    #env CXX="${CXX_COMPILER:?}" CC="${C_COMPILER:?}" ${PIP3:?} install \
-    #    'numpy==1.23.5' \
-    #  --prefix="${ROOTDIR:?}/.local" \
-    # --force-reinstall \
-    #  >${OUT1:?} 2>${OUT2:?} || { error "(PIP-CORE-PACKAGES) ${EC13:?}"; return 1; }
-
-    #PS: --force-reinstall - this helps CARMA to see numpy files
     #PS2: Need to include numpy in the same command to avoid numpy 2.0
-
+    
     # mpi4py has a weird bug when installing from conda on a few machines 
     # (e.g., midway) no-cache-dir is important to fix this bug
     # https://github.com/mpi4py/mpi4py/issues/335
-    
+    env MPICC=$MPI_CC_COMPILER ${PIP3:?} install \
+        'pip==25.0.1' \
+        'numpy==1.23.5' \
+        'mpi4py==3.1.4' \
+      --no-cache-dir \
+      --prefix="${ROOTDIR:?}/.local" \
+      --force-reinstall \
+      >${OUT1:?} 2>${OUT2:?} || { error "(PIP-CORE-PACKAGES) ${EC13:?}"; return 1; }
+
     env MPICC=$MPI_CC_COMPILER ${PIP3:?} install \
         'numpy==1.23.5' \
         'mpi4py==3.1.4' \
         'notebook==7.1.1' \
         'ipyparallel==8.8.0' \
         'emcee==3.1.4' \
-      --no-cache-dir \
+        'sacc==0.10' \
+        'setuptools_scm==8.2.0' \
+      --no-cache-dir --use-pep517 \
       --prefix="${ROOTDIR:?}/.local" \
-      --force-reinstall \
       >${OUT1:?} 2>${OUT2:?} || { error "(PIP-CORE-PACKAGES) ${EC13:?}"; return 1; }
 
     env CXX="${CXX_COMPILER:?}" CC="${C_COMPILER:?}" ${PIP3:?} install \

@@ -38,10 +38,6 @@ if [ -z "${IGNORE_CAMSPEC_CMB_DATA}" ]; then
     cd "${1:?}" 2>"/dev/null" || { error "CD FOLDER: ${1}"; return 1; }
   }
 
-  # --------------------------------------------------------------------------- 
-  # --------------------------------------------------------------------------- 
-  # ---------------------------------------------------------------------------
-
   unset_env_vars || return 1
 
   # E = EXTERNAL, DATA, F=FODLER
@@ -54,36 +50,33 @@ if [ -z "${IGNORE_CAMSPEC_CMB_DATA}" ]; then
 
   FILE="CamSpec2021.zip"
 
-  URL_BASE="https://github.com/CobayaSampler/planck_native_data/"
+  URL_BASE="https://github.com/CobayaSampler/planck_native_data"
 
   URL="${URL_BASE:?}/releases/download/v1/${FILE:?}"
   
-  # Name to be printed on this shell script messages
-  PRINTNAME="CAMSPEC-2021"
+  ptop "SETUP/UNXV CAMSPEC-2021 DATA"  || return 1
 
-  # ---------------------------------------------------------------------------
+  if [ -n "${OVERWRITE_EXISTING_CAMPSPEC_CMB_DATA}" ]; then  
+    rm -rf "${PACKDIR:?}"
+    if [ -n "${REDOWNLOAD_EXISTING_CAMPSPEC_CMB_DATA}" ]; then  
+      rm -rf "${EDATAF:?}/${FILE:?}"
+    fi
+  fi
   
-  ptop "SETUP/UNXV ${PRINTNAME:?} DATA"  || return 1
+  if [ ! -d "${PACKDIR:?}" ]; then
+    cdfolder "${EDATAF:?}" || return 1
 
-  # ---------------------------------------------------------------------------
-  # note: in case script run >1x w/ previous run stoped prematurely b/c error
+    if [ ! -e "${FILE:?}" ]; then
+      "${WGET:?}" "${URL:?}" -q --show-progress \
+        --progress=bar:force:noscroll || { error "${EC24:?}"; return 1; }
+    fi
+
+    unzip "${FILE:?}" >${OUT1:?} 2>${OUT2:?} || { error "${EC26:?}"; return 1; }
+  fi
   
-  rm -rf "${PACKDIR:?}"
+  pbottom "SETUP/UNXV CAMSPEC-2021 DATA" || return 1
 
-  rm -rf "${EDATAF:?}/${FILE:?}"
-  
-  # ---------------------------------------------------------------------------
-
-  cdfolder "${EDATAF:?}" || return 1
-
-  "${WGET:?}" "${URL:?}" -q --show-progress \
-    --progress=bar:force:noscroll || { error "${EC24:?}"; return 1; }
-  
-  unzip "${FILE:?}" >${OUT1:?} 2>${OUT2:?} || { error "${EC26:?}"; return 1; }
-
-  # ---------------------------------------------------------------------------
-  
-  pbottom "SETUP/UNXV ${PRINTNAME:?} DATA" || return 1
+  cdfolder "${ROOTDIR}" || return 1;
 
   unset_all || return 1
 

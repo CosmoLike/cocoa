@@ -1,25 +1,33 @@
---- mflike.py	2024-07-11 20:47:37.909715210 -0400
-+++ mflike2.py	2024-07-11 20:50:22.611406000 -0400
-@@ -24,14 +24,20 @@
- 
- import numpy as np
+--- mflike2.py	2025-03-30 18:09:12.415845935 -0400
++++ mflike.py	2025-03-30 18:07:37.536557070 -0400
+@@ -45,10 +45,17 @@
+ from numbers import Real
+ import sacc
  from cobaya.conventions import data_path, packages_path_input
 -from cobaya.likelihoods.base_classes import InstallableLikelihood
 +#VM BEGINS
 +#from cobaya.likelihoods.base_classes import InstallableLikelihood
 +from cobaya.likelihood import Likelihood
++from cobaya.functions import chi_squared
 +#VM ENDS
  from cobaya.log import LoggedError
- from cobaya.tools import are_different_params_lists
  
- from .theoryforge import TheoryForge
- 
- 
--class MFLike(InstallableLikelihood):
+-class _MFLike(InstallableLikelihood):
 +#VM BEGINS
-+#class MFLike(InstallableLikelihood):
-+class MFLike(Likelihood):
++#class _MFLike(InstallableLikelihood):
++class _MFLike(Likelihood):
 +#VM ENDS
      _url = "https://portal.nersc.gov/cfs/sobs/users/MFLike_data"
      _release = "v0.8"
-     install_options = {"download_url": f"{_url}/{_release}.tar.gz"}
+     install_options = {
+@@ -67,6 +74,10 @@
+     lmax_theory: Optional[int]
+     requested_cls: list[str]
+ 
++    #VM BEGINS
++    _fast_chi_squared = staticmethod(chi_squared)
++    #VM ENDS
++    
+     def initialize(self):
+         # Set default values to data member not initialized via yaml file
+         self.l_bpws = None

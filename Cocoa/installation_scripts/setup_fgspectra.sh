@@ -75,24 +75,32 @@ if [ -z "${IGNORE_FGSPECTRA_CODE}" ]; then
   # ---------------------------------------------------------------------------
   # in case this script is called twice
   # ---------------------------------------------------------------------------
-  rm -rf "${PACKDIR:?}"
+  if [ -n "${OVERWRITE_EXISTING_FGSPECTRA_DATA}" ]; then
 
-  # ---------------------------------------------------------------------------
-  # clone from original repo
-  # ---------------------------------------------------------------------------
-  cdfolder "${ECODEF}" || return 1;
+    rm -rf "${PACKDIR:?}"
 
-  "${CURL:?}" -fsS "${URL:?}" \
-    >${OUT1:?} 2>${OUT2:?} || { error "${EC27:?} (URL=${URL:?})"; return 1; }
+  fi
 
-  "${GIT:?}" clone "${URL:?}" --recursive "${FOLDER:?}" \
-    >${OUT1:?} 2>${OUT2:?} || { error "${EC15:?}"; return 1; }
-  
-  cdfolder "${PACKDIR}" || return 1;
+  if [ ! -d "${PACKDIR:?}" ]; then
+    
+    # ---------------------------------------------------------------------------
+    # clone from original repo
+    # ---------------------------------------------------------------------------
+    cdfolder "${ECODEF}" || return 1;
 
-  if [ -n "${FGSPECTRA_GIT_COMMIT}" ]; then
-    "${GIT:?}" checkout "${FGSPECTRA_GIT_COMMIT:?}" \
-      >${OUT1:?} 2>${OUT2:?} || { error "${EC16:?}"; return 1; }
+    "${CURL:?}" -fsS "${URL:?}" \
+      >${OUT1:?} 2>${OUT2:?} || { error "${EC27:?} (URL=${URL:?})"; return 1; }
+
+    "${GIT:?}" clone "${URL:?}" --recursive "${FOLDER:?}" \
+      >${OUT1:?} 2>${OUT2:?} || { error "${EC15:?}"; return 1; }
+    
+    cdfolder "${PACKDIR}" || return 1;
+
+    if [ -n "${FGSPECTRA_GIT_COMMIT}" ]; then
+      "${GIT:?}" checkout "${FGSPECTRA_GIT_COMMIT:?}" \
+        >${OUT1:?} 2>${OUT2:?} || { error "${EC16:?}"; return 1; }
+    fi
+
   fi
   
   cdfolder "${ROOTDIR}" || return 1;

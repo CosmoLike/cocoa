@@ -38,10 +38,6 @@ if [ -z "${IGNORE_SIMONS_OBSERVATORY_CMB_DATA}" ]; then
     cd "${1:?}" 2>"/dev/null" || { error "CD FOLDER: ${1}"; return 1; }
   }
 
-  # --------------------------------------------------------------------------- 
-  # --------------------------------------------------------------------------- 
-  # ---------------------------------------------------------------------------
-
   unset_env_vars || return 1
 
   # E = EXTERNAL, DATA, F=FODLER
@@ -56,43 +52,45 @@ if [ -z "${IGNORE_SIMONS_OBSERVATORY_CMB_DATA}" ]; then
   # PACK = PACKAGE, DIR = DIRECTORY
   PACKDIR="${EDATAF:?}/${FOLDER:?}"
 
-  # Name to be printed on this shell script messages
-  PRINTNAME="SIMONS OBSERVATORY"
+  ptop "SETUP/UNXV SIMONS OBSERVATORY DATA" || return 1
 
-  # --------------------------------------------------------------------------
-
-  ptop "SETUP/UNXV ${PRINTNAME:?} DATA" || return 1
-
-  # --------------------------------------------------------------------------
-  # note: in case script run >1x w/ previous run stoped prematurely b/c error
+  if [ -n "${OVERWRITE_EXISTING_SIMONS_OBSERVATORY_CMB_DATA}" ]; then
+    rm -rf "${PACKDIR:?}"
+    if [ -n "${REDOWNLOAD_EXISTING_SIMONS_OBSERVATORY_CMB_DATA}" ]; then
+      for x in $(echo "${VER:?}")
+      do
+        FILE="${x}.tar.gz"
+        rm -f "${EDATAF:?}/${FILE:?}"
+      done
+    fi
+  fi
   
-  rm -rf "${PACKDIR:?}"
+  if [ ! -d "${PACKDIR:?}" ]; then
+    
+    mkdir -p "${PACKDIR:?}" >${OUT1:?} 2>${OUT2:?} || { error "${EC20:?}"; return 1; }
+    
+    cdfolder "${EDATAF:?}" || return 1
   
-  # ---------------------------------------------------------------------------
+    # note: users can download multiple versions (reproduce existing work)
+    # note: For example, SO_DATA_VERSION="v0.7.1 v0.8"
+    for x in $(echo "${VER:?}")
+    do
+      FILE="${x}.tar.gz"
 
-  mkdir -p "${PACKDIR:?}" \
-    >${OUT1:?} 2>${OUT2:?} || { error "${EC20:?}"; return 1; }
+      if [ ! -e "${FILE:?}" ]; then
+        "${WGET:?}" "${URL}/${FILE:?}" -q --show-progress --progress=bar:force \
+          || { error "${EC24:?}"; return 1; }
+      fi
+
+      TMP=$(tar -tf "${FILE:?}" | head -1 | cut -f1 -d"/")
+      tar -zxvf "${FILE:?}" >${OUT1:?} 2>${OUT2:?} || { error "${EC25:?}"; return 1; }
+      mv "${TMP:?}" "${PACKDIR:?}"
+    done
+  fi
+
+  pbottom "SETUP/UNXV SIMONS OBSERVATORY DATA" || return 1
   
-  cdfolder "${PACKDIR:?}" || return 1
-
-  # note: users can download multiple versions (reproduce existing work)
-  # note: For example, SO_DATA_VERSION="v0.7.1 v0.8"
-  # note: This is only possible because each ver is saved on a separated folder
-  for x in $(echo "${VER:?}")
-  do
-    FILE="${x}.tar.gz"
-
-    "${WGET:?}" "${URL}/${FILE:?}" -q --show-progress --progress=bar:force \
-      || { error "${EC24:?}"; return 1; }
-
-    tar -zxvf "${FILE:?}" \
-      >${OUT1:?} 2>${OUT2:?} || { error "${EC25:?}"; return 1; }
-  
-  done
-
-  # ---------------------------------------------------------------------------
-
-  pbottom "SETUP/UNXV ${PRINTNAME:?} DATA" || return 1
+  cdfolder "${ROOTDIR}" || return 1;
 
   unset_all || return 1
   

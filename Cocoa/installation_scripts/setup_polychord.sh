@@ -74,57 +74,65 @@ if [ -z "${IGNORE_POLYCHORD_SAMPLER_CODE}" ]; then
   # ---------------------------------------------------------------------------
   # in case this script is called twice
   # ---------------------------------------------------------------------------
-  rm -rf "${PACKDIR:?}"
+  if [ -n "${OVERWRITE_EXISTING_POLYCHORD_CODE}" ]; then
+
+    rm -rf "${PACKDIR:?}"
+
+  fi
 
   # ---------------------------------------------------------------------------
   # clone from original repo
   # ---------------------------------------------------------------------------
-  cdfolder "${ECODEF}" || return 1;
+  if [ ! -d "${PACKDIR:?}" ]; then
 
-  "${CURL:?}" -fsS "${URL:?}" \
-    >${OUT1:?} 2>${OUT2:?} || { error "${EC27:?} (URL=${URL:?})"; return 1; }
+    cdfolder "${ECODEF}" || return 1;
 
-  "${GIT:?}" clone --depth ${GIT_CLONE_MAXIMUM_DEPTH:?} "${URL:?}" \
-    --recursive "${FOLDER:?}" \
-    >${OUT1:?} 2>${OUT2:?} || { error "${EC15:?}"; return 1; }
-  
-  cdfolder "${PACKDIR}" || return 1;
+    "${CURL:?}" -fsS "${URL:?}" \
+      >${OUT1:?} 2>${OUT2:?} || { error "${EC27:?} (URL=${URL:?})"; return 1; }
 
-  if [ -n "${POLYCHORD_GIT_COMMIT}" ]; then
-    "${GIT:?}" checkout "${POLYCHORD_GIT_COMMIT:?}" \
-      >${OUT1:?} 2>${OUT2:?} || { error "${EC16:?}"; return 1; }
+    "${GIT:?}" clone --depth ${GIT_CLONE_MAXIMUM_DEPTH:?} "${URL:?}" \
+      --recursive "${FOLDER:?}" \
+      >${OUT1:?} 2>${OUT2:?} || { error "${EC15:?}"; return 1; }
+    
+    cdfolder "${PACKDIR}" || return 1;
+
+    if [ -n "${POLYCHORD_GIT_COMMIT}" ]; then
+      "${GIT:?}" checkout "${POLYCHORD_GIT_COMMIT:?}" \
+        >${OUT1:?} 2>${OUT2:?} || { error "${EC16:?}"; return 1; }
+    fi
+    
+    # ---------------------------------------------------------------------------
+    # We patch the files below so they use the right compilers ------------------
+    # ---------------------------------------------------------------------------
+    declare -a TFOLDER=("" 
+                        ""
+                        "" ) # If nonblank, path must include /
+    
+    # T = TMP
+    declare -a TFILE=("Makefile" 
+                      "setup.py"
+                      "Makefile_gnu")
+
+    #T = TMP, P = PATCH
+    declare -a TFILEP=("Makefile.patch" 
+                       "setup.patch"
+                       "Makefile_gnu.patch")
+
+    # AL = Array Length
+    AL=${#TFOLDER[@]}
+
+    for (( i=0; i<${AL}; i++ ));
+    do
+      cdfolder "${PACKDIR:?}/${TFOLDER[$i]}" || return 1
+
+      cpfolder "${CHANGES:?}/${TFOLDER[$i]}${TFILEP[$i]:?}" . \
+        2>${OUT2:?} || return 1;
+
+      patch -u "${TFILE[$i]:?}" -i "${TFILEP[$i]:?}" >${OUT1:?} \
+        2>${OUT2:?} || { error "${EC17:?} (${TFILE[$i]:?})"; return 1; }
+    done
+
   fi
-  
-  # ---------------------------------------------------------------------------
-  # We patch the files below so they use the right compilers ------------------
-  # ---------------------------------------------------------------------------
-  declare -a TFOLDER=("" 
-                      ""
-                      "" ) # If nonblank, path must include /
-  
-  # T = TMP
-  declare -a TFILE=("Makefile" 
-                    "setup.py"
-                    "Makefile_gnu")
-
-  #T = TMP, P = PATCH
-  declare -a TFILEP=("Makefile.patch" 
-                     "setup.patch"
-                     "Makefile_gnu.patch")
-
-  # AL = Array Length
-  AL=${#TFOLDER[@]}
-
-  for (( i=0; i<${AL}; i++ ));
-  do
-    cdfolder "${PACKDIR:?}/${TFOLDER[$i]}" || return 1
-
-    cpfolder "${CHANGES:?}/${TFOLDER[$i]}${TFILEP[$i]:?}" . \
-      2>${OUT2:?} || return 1;
-
-    patch -u "${TFILE[$i]:?}" -i "${TFILEP[$i]:?}" >${OUT1:?} \
-      2>${OUT2:?} || { error "${EC17:?} (${TFILE[$i]:?})"; return 1; }
-  done
 
   cdfolder "${ROOTDIR}" || return 1;
   

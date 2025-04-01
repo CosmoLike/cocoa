@@ -1,5 +1,8 @@
 Cocoa/cobaya
 cobaya2/
+cobaya3/
+cobaya4/
+.ipynb_checkpoints/
 ./cobaya
 cobaya/
 chains/
@@ -16,6 +19,9 @@ core.*
 *.egg
 *.vfproj
 *.sln
+*.tar.gz
+*.tgz
+*.tar
 
 cobaya/cobaya/likelihoods/.gitignore
 external_modules/code/.gitignore
@@ -32,8 +38,6 @@ external_modules/data/spt_hiell_2020
 external_modules/data/spt_3g
 external_modules/data/act
 external_modules/code/PolyChordLite/
-
-
 
 projects/desxplanck
 projects/lsst_fourier
@@ -60,12 +64,17 @@ external_modules/data/kids
 external_modules/data/kids*
 external_modules/data/cocoa_*
 external_modules/data/ede*
-external_modules/code/roman_real
-external_modules/code/roman_real*
-external_modules/code/roman_fourier
-external_modules/code/roman_fourier*
-external_modules/code/roman*
-external_modules/code/ROMAN*
+external_modules/data/roman_real
+external_modules/data/roman_real*
+external_modules/data/roman_fourier
+external_modules/data/roman_fourier*
+external_modules/data/roman*
+external_modules/data/ROMAN*
+external_modules/data/act_dr6_cmbonly
+external_modules/data/act_dr*
+external_modules/data/act_dr6_mflike
+external_modules/data/mflike*/
+external_modules/data/mf*/
 
 external_modules/code/planck/code/spt_clik/.lock-waf_*
 external_modules/code/planck/code/spt_clik/.waf*
@@ -119,6 +128,20 @@ external_modules/code/TMPSO
 external_modules/code/TMP*
 external_modules/code/SOSYSLIB
 external_modules/code/SO*
+external_modules/code/act_dr6_cmbonly
+external_modules/code/act_dr*
+external_modules/data/act_dr6_mflike
+external_modules/code/roman_real
+external_modules/code/roman_real*
+external_modules/code/roman_fourier
+external_modules/code/roman_fourier*
+external_modules/code/roman*
+external_modules/code/ROMAN*
+external_modules/code/mflike*/
+external_modules/code/mf*/
+external_modules/code/syslibrary/
+external_modules/code/sys*
+external_modules/code/planck_2020*
 
 cobaya/cobaya/likelihoods/XXX
 cobaya/cobaya/likelihoods/des_y1
@@ -134,6 +157,10 @@ cobaya/cobaya/likelihoods/kids
 cobaya/cobaya/likelihoods/kids*
 cobaya/cobaya/likelihoods/cocoa_*
 cobaya/cobaya/likelihoods/ede*
+cobaya/cobaya/likelihoods/mflike*/
+cobaya/cobaya/likelihoods/mf*/
+cobaya/cobaya/likelihoods/act*/
+
 
 projects/lsst_y1/
 projects/lsst*/

@@ -12,7 +12,7 @@ if [ -z "${IGNORE_CAMB_CODE}" ]; then
   ( source "${ROOTDIR:?}/installation_scripts/flags_check.sh" ) || return 1;
 
   unset_env_vars () {
-    unset -v ECODEF FOLDER PACKDIR PRINTNAME
+    unset -v ECODEF FOLDER PACKDIR PRINTNAME PLIB
     cdroot || return 1;
   }
 
@@ -38,14 +38,9 @@ if [ -z "${IGNORE_CAMB_CODE}" ]; then
     cd "${1:?}" 2>"/dev/null" || { error "CD FOLDER ${1}"; return 1; }
   }
   
-  # ---------------------------------------------------------------------------
-  # ---------------------------------------------------------------------------
-  # ---------------------------------------------------------------------------
-
   unset_env_vars || return 1
 
   # ---------------------------------------------------------------------------
-
   # E = EXTERNAL, CODE, F=FODLER
   ECODEF="${ROOTDIR:?}/external_modules/code"
 
@@ -53,24 +48,18 @@ if [ -z "${IGNORE_CAMB_CODE}" ]; then
 
   PACKDIR="${ECODEF:?}/${FOLDER:?}"
 
-  # Name to be printed on this shell script messages
-  PRINTNAME="CAMB"
-
-  ptop "COMPILING ${PRINTNAME:?}" || return 1
+  ptop "COMPILING CAMB" || return 1
 
   cdfolder "${PACKDIR:?}" || return 1
 
-  # ---------------------------------------------------------------------------
-  # cleaning any previous compilation
-  
+  # ---------------------------------------------------------------------------  
   rm -rf "${PACKDIR:?}/build/"
   rm -rf "${PACKDIR:?}/camb/__pycache__/"
   rm -f  "${PACKDIR:?}/camb/camblib.so"
   rm -rf "${PACKDIR:?}/forutils/Releaselib/"
-  
-  "${PYTHON3:?}" setup.py clean \
-    >${OUT1:?} 2>${OUT2:?} || { error "${EC1:?}"; return 1; }
-  
+  PLIB="${ROOTDIR:?}/.local/lib/python${PYTHON_VERSION:?}/site-packages"
+  rm -rf  "${PLIB:?}/camb"
+  rm -rf  "${PLIB:?}/camb"-*
   # ---------------------------------------------------------------------------
   
   if [ -z "${IGNORE_COSMOREC_CODE}" ] && [ -n "${IGNORE_HYREC_CODE}" ]; then
@@ -100,10 +89,18 @@ if [ -z "${IGNORE_CAMB_CODE}" ]; then
 
   fi
 
-  pbottom "COMPILING ${PRINTNAME:?}" || return 1
+  #prevent all compile_XXX.sh from using the internet (run @compute nodes)
+  #FROM: https://github.com/pypa/pip/issues/12050
+  #That is why we use --no-dependencies --no-index --no-build-isolation
+  env CXX="${CXX_COMPILER:?}" CC="${C_COMPILER:?}" ${PIP3:?} install \
+    ${PACKDIR:?} --no-dependencies --prefix="${ROOTDIR:?}/.local" \
+    --no-index --no-build-isolation \
+    >${OUT1:?} 2>${OUT2:?} || { error "${EC3:?}"; return 1; }
 
-  # ---------------------------------------------------------------------------
+  pbottom "COMPILING CAMB" || return 1
 
+  cdfolder "${ROOTDIR}" || return 1;
+  
   unset_all || return 1
 
 fi

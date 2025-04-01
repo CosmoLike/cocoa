@@ -54,23 +54,32 @@ ptop2 'SETUP COCOA INSTALLATION PACKAGES'
 # ------------------------------------------------------------------------------
 # ---------------------- Activate Virtual Environment --------------------------
 # ------------------------------------------------------------------------------
+if [ -n "${OVERWRITE_EXISTING_COCOA_PRIVATE_PYTHON_ENV}" ]; then
 
-cd ${ROOTDIR:?}/../
+  rm -rf ${ROOTDIR:?}/.local/
 
-if [ -n "${DONT_USE_SYSTEM_PIP_PACKAGES}" ]; then
-  ${GLOBALPYTHON3:?} -m venv "${ROOTDIR:?}/.local/"
-else
-  ${GLOBALPYTHON3:?} -m venv "${ROOTDIR:?}/.local/" --system-site-packages
 fi
 
-ptop 'SETUP COCOA PRIVATE PYTHON ENV'
+if [ ! -d "${ROOTDIR:?}/.local/" ]; then
+
+  ptop 'SETUP COCOA PRIVATE PYTHON ENV'
+
+  cd ${ROOTDIR:?}/../
+
+  if [ -n "${DONT_USE_SYSTEM_PIP_PACKAGES}" ]; then
+    ${GLOBALPYTHON3:?} -m venv "${ROOTDIR:?}/.local/"
+  else
+    ${GLOBALPYTHON3:?} -m venv "${ROOTDIR:?}/.local/" --system-site-packages
+  fi
+
+  pbottom 'SETUP COCOA PRIVATE PYTHON ENV'
+
+fi
 
 source "${ROOTDIR:?}/.local/bin/activate"
 if [ $? -ne 0 ]; then
   error_cip "cocoa private python environment activation"; return 1;
 fi
-
-pbottom 'SETUP COCOA PRIVATE PYTHON ENV'
 
 source "${ROOTDIR:?}/installation_scripts/flags_set_new.sh"
 if [ $? -ne 0 ]; then
@@ -87,10 +96,11 @@ declare -i ERRORCODE=0
 declare -a SCRIPTS=( "setup_core_packages.sh" 
                      "setup_pip_core_packages.sh"
                      "setup_cobaya.sh"
+                     "setup_fgspectra.sh"
                      "setup_simons_observatory.sh"
-                     "setup_camspec.sh"
                      "setup_lipop.sh"
                      "setup_act_dr4.sh"
+                     "setup_act_dr6.sh"
                      "setup_polychord.sh"
                      "setup_hyrec2.sh"
                      "setup_cosmorec.sh"
