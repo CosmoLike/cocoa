@@ -1,0 +1,11 @@
+--- lollipop2.py	2025-04-01 16:02:25.568009168 -0400
++++ lollipop.py	2025-04-01 16:02:58.551823772 -0400
+@@ -212,7 +212,7 @@
+                 cls.get_install_options() and os.path.exists(path) and len(os.listdir(path)) > 0
+             ):
+                 return False
+-            if not os.path.exists(os.path.join(path, "planck_2020/lollipop")):
++            if not os.path.exists(os.path.join(path, "planck/lollipop")):
+                 return False
+         return True
+ 
