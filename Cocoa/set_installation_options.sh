@@ -16,7 +16,7 @@ fi
 # ------------------------------------------------------------------------------
 # VERBOSE AS DEBUG TOOL --------------------------------------------------------
 # ------------------------------------------------------------------------------
-export COCOA_OUTPUT_VERBOSE=1
+#export COCOA_OUTPUT_VERBOSE=1
 
 # ------------------------------------------------------------------------------
 # If set, COSMOLIKE will compile with DEBUG flags ------------------------------
@@ -26,7 +26,7 @@ export COCOA_OUTPUT_VERBOSE=1
 # ------------------------------------------------------------------------------
 # The flags below allow users to skip downloading specific datasets ------------
 # ------------------------------------------------------------------------------
-#export IGNORE_ACTDR6_DATA=1
+export IGNORE_ACTDR6_DATA=1
 # export IGNORE_BAO_DATA=1
 export IGNORE_BICEP_CMB_DATA=1
 # export IGNORE_HOLICOW_STRONG_LENSING_DATA=1
@@ -50,11 +50,11 @@ export IGNORE_CLASS_CODE=1 # Default: we just use CAMB (reduces compilation time
 #export IGNORE_COSMOLIKE_CODE=1
 #export IGNORE_POLYCHORD_SAMPLER_CODE=1
 #export IGNORE_PLANCK_LIKELIHOOD_CODE=1
-#export IGNORE_ACTDR4_CODE=1
-#export IGNORE_ACTDR6_CODE=1
+export IGNORE_ACTDR4_CODE=1
+export IGNORE_ACTDR6_CODE=1
 export IGNORE_CPP_CUBA_INSTALLATION=1
 export IGNORE_VELOCILEPTORS_CODE=1
-#export IGNORE_SIMONS_OBSERVATORY_LIKELIHOOD_CODE=1
+export IGNORE_SIMONS_OBSERVATORY_LIKELIHOOD_CODE=1
 export IGNORE_CAMSPEC_LIKELIHOOD_CODE=1
 export IGNORE_LIPOP_LIKELIHOOD_CODE=1
 export IGNORE_HYREC_CODE=1
@@ -69,7 +69,7 @@ export IGNORE_MGCAMB_CODE=1
 # overwrite means: delete existing PACKAGE folder and install it again ---------
 # these keys are only relevant if you run setup_cocoa multiple times -----------
 # ------------------------------------------------------------------------------
-export OVERWRITE_EXISTING_ALL_PACKAGES=1
+#export OVERWRITE_EXISTING_ALL_PACKAGES=1
 
 # ------------------------------------------------------------------------------
 # If set, compile_planck.sh uses click like code from github.com/benabed/clik

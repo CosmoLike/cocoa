@@ -38,12 +38,13 @@ declare -a SCRIPTS=("compile_core_packages.sh"
                      "compile_mgcamb.sh"
                      "compile_class.sh" 
                      "compile_planck.sh" 
-                     "compile_act_dr4.sh"
                      "compile_polychord.sh"
                      "compile_velocileptors.sh"
                      "compile_ee2.sh"
                      "compile_fgspectra.sh"
                      "compile_simons_observatory.sh"
+                     "compile_act_dr4.sh"
+                     "compile_act_dr6.sh"
                      ) # T = TMP
 
 for (( i=0; i<${#SCRIPTS[@]}; i++ ));
