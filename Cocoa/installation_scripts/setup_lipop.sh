@@ -67,23 +67,13 @@ if [ -z "${IGNORE_LIPOP_LIKELIHOOD_CODE}" ]; then
         >${OUT1:?} 2>${OUT2:?} || { error "${EC23:?}"; return 1; }
 
       cp "${CCIL:?}/${2:?}_changes/init.patch" "${TF:?}/${2:?}" 2>"/dev/null" \
-        || { error "CP FILE init.patch on ${TF:?}/${2:?}"; return 1; }
+        || { error "CP FILE init.patch"; return 1; }
 
       cdfolder "${TF:?}/${2:?}" || return 1;
 
       patch -u '__init__.py' -i 'init.patch' >${OUT1:?} 2>${OUT2:?} || 
         { error "${EC17:?}"; return 1; }
-
-      # ------------------------------------------------------------------------
-      # Symlinks for likelihood to work w/ COBAYA.(also @start/stop_cocoa.sh)
-      # ------------------------------------------------------------------------
-      if [[ -d "${TF:?}/${2:?}" ]]; then
-        if [[ -L "${COBLIKE:?}/${2:?}" ]]; then
-          rm -f "${COBLIKE:?}/${2:?}"
-        fi
-        ln -s "${TF:?}/${2:?}" "${COBLIKE:?}" \
-          >${OUT1:?} 2>${OUT2:?} || { error "${EC34:?}"; return 1; }
-      fi
+  
     fi
 
     cdfolder "${ROOTDIR:?}" || return 1; 

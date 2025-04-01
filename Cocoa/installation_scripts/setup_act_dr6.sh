@@ -111,23 +111,6 @@ if [ -z "${IGNORE_ACTDR6_CODE}" ]; then
       patch -u "${TFILE[$i]:?}" -i "${TFILEP[$i]:?}" >${OUT1:?} \
         2>${OUT2:?} || { error "${EC17:?} (${TFILE[$i]:?})"; return 1; }
     done
-
-    # need to create symlinks for this likelihood to work w/ COBAYA.
-    # we copied the code below to start_cocoa.sh shell script as well
-    # we added corresponding code to stop_cocoa.sh that delete these symlinks
-    if [[ -d "${PACKDIR:?}/act_dr6_cmbonly" ]]; then
-      if [[ -L "${COB:?}/${COBLIKE:?}/act_dr6_cmbonly" ]]; then
-        rm -f "${COB:?}/${COBLIKE:?}/act_dr6_cmbonly"
-      fi
-      
-      ln -s "${PACKDIR:?}/act_dr6_cmbonly" "${COB:?}/${COBLIKE:?}" \
-        >${OUT1:?} 2>${OUT2:?} || { error "${EC34:?}"; return 1; }
-
-      # it seems this is synthetic data (we will download real data from lambda)
-      if [[ -d "${PACKDIR:?}/act_dr6_cmbonly/data" ]]; then
-        rm -rf "${PACKDIR:?}/act_dr6_cmbonly/data"
-      fi
-    fi
   fi
 
   pbottom 'SETUP ACTDR6 (CMBONLY)' || return 1
@@ -157,7 +140,7 @@ if [ -z "${IGNORE_ACTDR6_CODE}" ]; then
     cdfolder "${ECODEF:?}" || { cdroot; return 1; }
 
     "${GIT:?}" clone --depth ${GIT_CLONE_MAXIMUM_DEPTH:?} "${URL:?}" \
-      --recursive "${FOLDER:?}" \ \
+      --recursive "${FOLDER:?}" \
       >${OUT1:?} 2>${OUT2:?} || { error "${EC15:?}"; return 1; }
     
     cdfolder "${PACKDIR:?}" || { cdroot; return 1; }
@@ -166,18 +149,6 @@ if [ -z "${IGNORE_ACTDR6_CODE}" ]; then
       "${GIT:?}" checkout "${ACTDR6_MFLIKE_GIT_COMMIT:?}" \
         >${OUT1:?} 2>${OUT2:?} || { error "${EC16:?}"; return 1; }
     fi
-
-    # --------------------------------------------------------------------------
-    # Symlinks for likelihood to work w/ COBAYA.(also @start/stop_cocoa.sh)
-    # --------------------------------------------------------------------------
-    if [[ -d "${PACKDIR:?}/act_dr6_mflike" ]]; then
-      if [[ -L "${COB:?}/${COBLIKE:?}/act_dr6_mflike" ]]; then
-        rm -f "${COB:?}/${COBLIKE:?}/act_dr6_mflike"
-      fi
-      ln -s "${PACKDIR:?}/act_dr6_mflike" "${COB:?}/${COBLIKE:?}" \
-        >${OUT1:?} 2>${OUT2:?} || { error "${EC34:?}"; return 1; }
-    fi
-
   fi
 
   pbottom 'SETUP ACTDR6 (MFLIKE)' || return 1

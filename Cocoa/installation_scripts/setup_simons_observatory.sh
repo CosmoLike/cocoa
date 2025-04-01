@@ -135,30 +135,10 @@ if [ -z "${IGNORE_SIMONS_OBSERVATORY_LIKELIHOOD_CODE}" ]; then
     cdfolder "${PACKDIR:?}/mflike"|| return 1;
 
     cp "${CCCOB:?}/${COBLIKE:?}/mflike/mflike.patch" "${PACKDIR:?}/mflike" \
-      2>"/dev/null" || 
-      { error "CP FILE ${CCCOB:?}/${COBLIKE:?}/mflike/mflike.patch on ${PACKDIR:?}/mflike"; return 1; }
+      2>"/dev/null" || { error "CP FILE mflike.patch"; return 1; }
 
     patch -u "mflike.py" -i "mflike.patch" >${OUT1:?} \
         2>${OUT2:?} || { error "${EC17:?} (mflike.patch)"; return 1; }
-
-    # --------------------------------------------------------------------------
-    # need to create symlinks for this likelihood to work w/ COBAYA.
-    # we copied the code below to start_cocoa.sh shell script as well
-    # we added corresponding code to stop_cocoa.sh that delete these symlinks
-    # --------------------------------------------------------------------------
-    if [[ -d "${PACKDIR:?}/mflike" ]]; then
-      if [[ -L "${COB:?}/${COBLIKE:?}/mflike" ]]; then
-        rm -f "${COB:?}/${COBLIKE:?}/mflike"
-      fi
-      ln -s "${PACKDIR:?}/mflike" "${COB:?}/${COBLIKE:?}" \
-        >${OUT1:?} 2>${OUT2:?} || { error "${EC34:?}"; return 1; }
-
-      if [[ -L "${COB:?}/${COBTH:?}/mflike" ]]; then
-        rm -f "${COB:?}/${COBTH:?}/mflike"
-      fi
-      ln -s "${PACKDIR:?}/mflike" "${COB:?}/${COBTH:?}" \
-        >${OUT1:?} 2>${OUT2:?} || { error "${EC34:?}"; return 1; }
-    fi
   fi
 
   pbottom "SETUP SIMONS OBSERVATORY MFLIKE" || return 1;
