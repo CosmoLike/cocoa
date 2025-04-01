@@ -320,13 +320,14 @@ Following best practices, Cocoa scripts download most external modules from thei
       # ------------------------------------------------------------------------------
       # The flags below allow users to skip downloading specific datasets ------------
       # ------------------------------------------------------------------------------
-      # export IGNORE_BICEP_CMB_DATA=1
+      export IGNORE_ACTDR6_DATA=1
+      # export IGNORE_BAO_DATA=1
+      export IGNORE_BICEP_CMB_DATA=1
       # export IGNORE_HOLICOW_STRONG_LENSING_DATA=1
       # export IGNORE_SN_DATA=1
-      # export IGNORE_BAO_DATA=1
-      # export IGNORE_SPT_CMB_DATA=1
+      export IGNORE_SPT_CMB_DATA=1
       export IGNORE_SIMONS_OBSERVATORY_CMB_DATA=1
-      # export IGNORE_PLANCK_CMB_DATA=1
+      #export IGNORE_PLANCK_CMB_DATA=1
       export IGNORE_CAMSPEC_CMB_DATA=1
       export IGNORE_LIPOP_CMB_DATA=1
 
@@ -347,8 +348,22 @@ Following best practices, Cocoa scripts download most external modules from thei
       #export IGNORE_SIMONS_OBSERVATORY_LIKELIHOOD_CODE=1
       #export IGNORE_CAMSPEC_LIKELIHOOD_CODE=1
       #export IGNORE_LIPOP_LIKELIHOOD_CODE=1
+      export IGNORE_HYREC_CODE=1
+      export IGNORE_COSMOREC_CODE=1
+      #export IGNORE_EUCLID_EMULATOR_V2_CODE=1
+      #export IGNORE_COSMOLIKE_LSSTY1_CODE=1
 
       (...)
+
+      # ------------------------------------------------------------------------------
+      # If OVERWRITE_EXISTING_XXX_CODE=1, the setup_cocoa overwrites existing PACKAGES
+      # overwrite means: delete existing PACKAGE folder and install it again ---------
+      # redownload: delete the compressed file and download data again
+      # these keys are only relevant if you run setup_cocoa multiple times -----------
+      # ------------------------------------------------------------------------------
+      export OVERWRITE_EXISTING_ALL_PACKAGES=1
+      #export REDOWNLOAD_EXISTING_ALL_DATA=1
+
  
 Steps to debug Cocoa
 
