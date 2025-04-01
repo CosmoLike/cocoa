@@ -136,13 +136,10 @@ if [ -z "${IGNORE_COBAYA_CODE}" ]; then
     declare -a TFILE=("planck_clik.py")
     declare -a TFILEP=("planck_clik.patch")
     AL=${#TFOLDER[@]}
-    echo ${AL}
 
     for (( i=0; i<${AL}; i++ ));
     do
       cdfolder "${COB:?}/${TFOLDER[$i]}" || return 1;
-
-      echo "${CCCOB:?}/${TFOLDER[$i]}"
 
       cpfolder "${CCCOB:?}/${TFOLDER[$i]}${TFILEP[$i]:?}" . 2>${OUT2:?} || return 1;
 
