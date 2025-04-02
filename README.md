@@ -121,7 +121,7 @@ Users can now proceed to **step :two:**.
 > This script downloads and decompresses external modules, requiring internet access to run successfully.
 
 > [!Tip]
-> If users run `setup_cocoa.sh` more than once, Cocoa will not download (git clone) previously installed packages or remake the Cocoa private Python environment. To overwrite this behavior, users must set the key `OVERWRITE_EXISTING_ALL_PACKAGES` on the `set_installation_options.sh` shell script. Even with this key activated, Cocoa will not download large datasets again (e.g., ACT-DR6). Users must also set the key `REDOWNLOAD_EXISTING_ALL_DATA` to overwrite this additional behavior. These two optimizations prevent Cocoa from downloading several gigabytes repeatedly. 
+> If users run `setup_cocoa.sh` more than once, Cocoa will not download (git clone) previously installed packages or remake the Cocoa private Python environment. To overwrite this behavior, users must set the key `OVERWRITE_EXISTING_ALL_PACKAGES` on the `set_installation_options.sh` shell script. Even with this key activated, Cocoa will not download large datasets again (e.g., ACT-DR6). Users must also set the key `REDOWNLOAD_EXISTING_ALL_DATA` to enable this additional behavior. These two optimizations prevent Cocoa from downloading several gigabytes repeatedly. 
 
 **Step :three:**: Run the script `compile_cocoa.sh` by typing 
 
