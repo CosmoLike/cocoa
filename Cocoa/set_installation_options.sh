@@ -70,7 +70,7 @@ export IGNORE_MGCAMB_CODE=1
 # redownload: delete the compressed file and download data again
 # these keys are only relevant if you run setup_cocoa multiple times -----------
 # ------------------------------------------------------------------------------
-export OVERWRITE_EXISTING_ALL_PACKAGES=1
+#export OVERWRITE_EXISTING_ALL_PACKAGES=1
 #export REDOWNLOAD_EXISTING_ALL_DATA=1
 # ------------------------------------------------------------------------------
 # If set, compile_planck.sh uses click like code from github.com/benabed/clik
