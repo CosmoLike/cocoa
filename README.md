@@ -91,7 +91,11 @@ Users can now proceed to **step :two:**.
 
 **Step :one:**: Download Cocoa's latest release and go to the `cocoa` main folder,
 
+<<<<<<< HEAD
     "${CONDA_PREFIX}"/bin/git clone --depth 1 https://github.com/CosmoLike/cocoa.git --branch v4.0-beta19 cocoa
+=======
+    "${CONDA_PREFIX}"/bin/git clone --depth 1 https://github.com/CosmoLike/cocoa.git --branch v4.0-beta20 cocoa
+>>>>>>> 9ca5a4cb42d9d30e4f12915f16a938d7dbf022f2
 
 and
 
@@ -121,7 +125,11 @@ Users can now proceed to **step :two:**.
 > This script downloads and decompresses external modules, requiring internet access to run successfully.
 
 > [!Tip]
+<<<<<<< HEAD
 > If users run `setup_cocoa.sh` more than once, Cocoa will not download previously installed packages or remake the Cocoa private Python environment. To overwrite this behavior, users must set the key `OVERWRITE_EXISTING_ALL_PACKAGES` on the `set_installation_options.sh` shell script. This optimization prevents Cocoa from downloading several gigabytes repeatedly. 
+=======
+> If users run `setup_cocoa.sh` more than once, Cocoa will not download (git clone) previously installed packages or remake the Cocoa private Python environment. To overwrite this behavior, users must set the key `OVERWRITE_EXISTING_ALL_PACKAGES` on the `set_installation_options.sh` shell script. Even with this key activated, Cocoa will not download large datasets again (e.g., ACT-DR6). Users must also set the key `REDOWNLOAD_EXISTING_ALL_DATA` to enable this additional behavior. These two optimizations prevent Cocoa from downloading several gigabytes repeatedly. 
+>>>>>>> 9ca5a4cb42d9d30e4f12915f16a938d7dbf022f2
 
 **Step :three:**: Run the script `compile_cocoa.sh` by typing 
 
@@ -130,7 +138,11 @@ Users can now proceed to **step :two:**.
 This script compiles external modules selected for installation on the `set_installation_options.sh` shell script (e.g., CAMB and Class). 
 
 > [!NOTE]
+<<<<<<< HEAD
 > In some HPC environments, the compute nodes cannot access the web. So, by design, the script `compile_cocoa.sh` does not require internet access to run successfully. Code compilation is a CPU-intensive operation, so running  `compile_cocoa.sh` on a cluster login node can be against the HPC policy. Users should run `setup_cocoa.sh` in a login node and `compile_cocoa.sh` in a compute node.
+=======
+> In some HPC environments, the compute nodes cannot access the web. So, by design, the script `compile_cocoa.sh` does not require internet access to run successfully. Code compilation is a CPU-intensive operation, so running  `compile_cocoa.sh` on a cluster login node can be against HPC policy. Users should then run `setup_cocoa.sh` in a login node and `compile_cocoa.sh` in a compute node.
+>>>>>>> 9ca5a4cb42d9d30e4f12915f16a938d7dbf022f2
 
 > [!Tip]
 > Cocoa does not install many external modules by default, but users may find them helpful in a particular project. In this case, check the many available options on the `set_installation_options.sh` shell script. Then, rerun steps :two: and :three:. 
@@ -175,7 +187,7 @@ One model evaluation:
         
 MCMC:
 
-   mpirun -n 4 --oversubscribe --mca btl vader,tcp,self --bind-to core:overload-allowed --rank-by core --map-by numa:pe=${OMP_NUM_THREADS} cobaya-run ./projects/lsst_y1/EXAMPLE_MCMC1.yaml -f
+    mpirun -n 4 --oversubscribe --mca btl vader,tcp,self --bind-to core:overload-allowed --rank-by core --map-by numa:pe=${OMP_NUM_THREADS} cobaya-run ./projects/lsst_y1/EXAMPLE_MCMC1.yaml -f
 
 Profile:
 
@@ -320,13 +332,14 @@ Following best practices, Cocoa scripts download most external modules from thei
       # ------------------------------------------------------------------------------
       # The flags below allow users to skip downloading specific datasets ------------
       # ------------------------------------------------------------------------------
-      # export IGNORE_BICEP_CMB_DATA=1
+      export IGNORE_ACTDR6_DATA=1
+      # export IGNORE_BAO_DATA=1
+      export IGNORE_BICEP_CMB_DATA=1
       # export IGNORE_HOLICOW_STRONG_LENSING_DATA=1
       # export IGNORE_SN_DATA=1
-      # export IGNORE_BAO_DATA=1
-      # export IGNORE_SPT_CMB_DATA=1
+      export IGNORE_SPT_CMB_DATA=1
       export IGNORE_SIMONS_OBSERVATORY_CMB_DATA=1
-      # export IGNORE_PLANCK_CMB_DATA=1
+      #export IGNORE_PLANCK_CMB_DATA=1
       export IGNORE_CAMSPEC_CMB_DATA=1
       export IGNORE_LIPOP_CMB_DATA=1
 
@@ -347,8 +360,22 @@ Following best practices, Cocoa scripts download most external modules from thei
       #export IGNORE_SIMONS_OBSERVATORY_LIKELIHOOD_CODE=1
       #export IGNORE_CAMSPEC_LIKELIHOOD_CODE=1
       #export IGNORE_LIPOP_LIKELIHOOD_CODE=1
+      export IGNORE_HYREC_CODE=1
+      export IGNORE_COSMOREC_CODE=1
+      #export IGNORE_EUCLID_EMULATOR_V2_CODE=1
+      #export IGNORE_COSMOLIKE_LSSTY1_CODE=1
 
       (...)
+
+      # ------------------------------------------------------------------------------
+      # If OVERWRITE_EXISTING_XXX_CODE=1, the setup_cocoa overwrites existing PACKAGES
+      # overwrite means: delete existing PACKAGE folder and install it again ---------
+      # redownload: delete the compressed file and download data again
+      # these keys are only relevant if you run setup_cocoa multiple times -----------
+      # ------------------------------------------------------------------------------
+      export OVERWRITE_EXISTING_ALL_PACKAGES=1
+      #export REDOWNLOAD_EXISTING_ALL_DATA=1
+
  
 Steps to debug Cocoa
 
