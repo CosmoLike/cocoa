@@ -459,6 +459,20 @@ void init_data_6x2pt_real_space(
     arma::Col<int>::fixed<6> order
   );
 
+void init_data_3x2pt_fourier_space(
+    std::string cov, 
+    std::string mask, 
+    std::string data,
+    arma::Col<int>::fixed<3> order
+  );
+
+void init_data_6x2pt_fourier_space(
+    std::string cov, 
+    std::string mask, 
+    std::string data,
+    arma::Col<int>::fixed<6> order
+  );
+
 void init_data_vector_size(arma::Col<int>::fixed<6> exclude);
 
 void init_data_vector_size_real_space(arma::Col<int>::fixed<6> exclude);
@@ -593,6 +607,10 @@ arma::Mat<double> compute_baryon_pcas_3x2pt_real(
     arma::Col<int>::fixed<3> order
   );
 
+arma::Mat<double> compute_baryon_pcas_3x2pt_fourier(
+    arma::Col<int>::fixed<3> order
+  );
+
 arma::Mat<double> compute_baryon_pcas_6x2pt(
     arma::Col<int>::fixed<6> order
   );
@@ -606,6 +624,15 @@ arma::Col<double> compute_data_vector_3x2pt_real_masked_any_order(
   );
 
 arma::Col<double> compute_data_vector_3x2pt_real_masked_any_order(
+    arma::Col<double> Q,                // PC amplitudes
+    arma::Col<int>::fixed<3> order
+  );
+
+arma::Col<double> compute_data_vector_3x2pt_fourier_masked_any_order(
+    arma::Col<int>::fixed<3> order
+  );
+
+arma::Col<double> compute_data_vector_3x2pt_fourier_masked_any_order(
     arma::Col<double> Q,                // PC amplitudes
     arma::Col<int>::fixed<3> order
   );

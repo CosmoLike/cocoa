@@ -519,7 +519,7 @@ void init_binning_real_space(
   if (!(Ntheta > 0))
   {
     spdlog::critical("{}: {} = {} not supported", "init_binning_real_space",
-      "NthetaNtheta", Ntheta);
+      "Ntheta", Ntheta);
     exit(1);
   }
 
@@ -995,6 +995,32 @@ void init_data_3x2pt_real_space(
 // ---------------------------------------------------------------------------
 // ---------------------------------------------------------------------------
 
+void init_data_3x2pt_fourier_space(
+    std::string cov, 
+    std::string mask, 
+    std::string data, 
+    arma::Col<int>::fixed<3> order
+  )
+{
+  spdlog::debug("{}: Begins", "init_data_3x2pt_fourier_space");
+
+  init_data_vector_size_3x2pt_fourier_space();
+  
+  IP::get_instance().set_mask(mask, order);   // set_mask must be called first
+  
+  IP::get_instance().set_data(data);
+  
+  IP::get_instance().set_inv_cov(cov);
+
+  spdlog::debug("{}: Ends", "init_data_3x2pt_fourier_space");
+
+  return;
+}
+
+// ---------------------------------------------------------------------------
+// ---------------------------------------------------------------------------
+// ---------------------------------------------------------------------------
+
 void init_data_6x2pt_real_space(
     std::string cov, 
     std::string mask, 
@@ -1004,7 +1030,7 @@ void init_data_6x2pt_real_space(
 {
   spdlog::debug("{}: Begins", "init_data_6x2pt_real_space");
 
-  init_data_vector_size_6x2pt_fourier_space();
+  init_data_vector_size_6x2pt_real_space();
   
   IP::get_instance().set_mask(mask, order);   // set_mask must be called first
   
@@ -1013,6 +1039,32 @@ void init_data_6x2pt_real_space(
   IP::get_instance().set_inv_cov(cov);
 
   spdlog::debug("{}: Ends", "init_data_6x2pt_real_space");
+
+  return;
+}
+
+// ---------------------------------------------------------------------------
+// ---------------------------------------------------------------------------
+// ---------------------------------------------------------------------------
+
+void init_data_6x2pt_fourier_space(
+    std::string cov, 
+    std::string mask, 
+    std::string data,
+    arma::Col<int>::fixed<6> order
+  )
+{
+  spdlog::debug("{}: Begins", "init_data_6x2pt_fourier_space");
+
+  init_data_vector_size_6x2pt_fourier_space();
+  
+  IP::get_instance().set_mask(mask, order);   // set_mask must be called first
+  
+  IP::get_instance().set_data(data);
+  
+  IP::get_instance().set_inv_cov(cov);
+
+  spdlog::debug("{}: Ends", "init_data_6x2pt_fourier_space");
 
   return;
 }
@@ -2971,6 +3023,45 @@ arma::Col<double> compute_data_vector_3x2pt_real_masked_any_order(
 // ---------------------------------------------------------------------------
 // ---------------------------------------------------------------------------
 
+arma::Col<double> compute_data_vector_3x2pt_fourier_masked_any_order(
+    arma::Col<double> Q,                // PC amplitudes
+    arma::Col<int>::fixed<3> order
+  )
+{
+  if (!BaryonScenario::get_instance().is_pcs_set())
+  {
+    spdlog::critical("{}: {} not set prior to this function call",
+      "compute_data_vector_3x2pt_fourier_masked_any_order", "baryon PCs");
+    exit(1);
+  }
+  if (BaryonScenario::get_instance().get_pcs().row(0).n_elem < Q.n_elem)
+  {
+    spdlog::critical("{}: {} invalid PC amplitude vector or PC eigenvectors",
+      "compute_data_vector_3x2pt_fourier_masked_any_order");
+    exit(1);
+  }
+
+  arma::Col<double> dv = compute_data_vector_3x2pt_fourier_masked_any_order(order);
+  
+  if (BaryonScenario::get_instance().get_pcs().col(0).n_elem != dv.n_elem)
+  {
+    spdlog::critical("{}: {} invalid datavector or PC eigenvectors",
+      "compute_data_vector_3x2pt_fourier_masked_any_order");
+    exit(1);
+  }
+
+  for (int j=0; j<dv.n_elem; j++)
+    for (int i=0; i<Q.n_elem; i++)
+      if (IP::get_instance().get_mask(j))
+        dv(j) += Q(i) * BaryonScenario::get_instance().get_pcs(j, i);
+ 
+  return dv;
+}
+
+// ---------------------------------------------------------------------------
+// ---------------------------------------------------------------------------
+// ---------------------------------------------------------------------------
+
 matrix compute_baryon_pcas_3x2pt_real(arma::Col<int>::fixed<3> order)
 {
   const int ndata = IP::get_instance().get_ndata();
@@ -3035,6 +3126,100 @@ matrix compute_baryon_pcas_3x2pt_real(arma::Col<int>::fixed<3> order)
         "{}: Computing contaminated data vector"
         " with baryon scenario {} ends", 
         "compute_baryon_pcas_3x2pt_real",
+        BaryonScenario::get_instance().get_scenario(i)
+      );
+  }
+
+  reset_bary_struct();
+  
+  // line below to force clear cosmolike cosmology cache
+  cosmology.random = RandomNumber::get_instance().get();
+
+  // weight the diff matrix by inv_L; then SVD ----------------------------  
+  matrix U, V;
+  vector s;
+  arma::svd(U, s, V, inv_L * D);
+
+  // compute PCs ----------------------------------------------------------
+  matrix PC = L * U; 
+
+  // Expand the number of dims --------------------------------------------
+  matrix R = matrix(ndata, nscenarios); 
+
+  for (int i=0; i<nscenarios; i++)
+    R.col(i) = IP::get_instance().expand_theory_data_vector_from_sqzd(PC.col(i));
+
+  return R;
+}
+
+// ---------------------------------------------------------------------------
+// ---------------------------------------------------------------------------
+// ---------------------------------------------------------------------------
+
+matrix compute_baryon_pcas_3x2pt_fourier(arma::Col<int>::fixed<3> order)
+{
+  const int ndata = IP::get_instance().get_ndata();
+
+  const int ndata_sqzd = IP::get_instance().get_ndata_sqzd();
+  
+  const int nscenarios = BaryonScenario::get_instance().nscenarios();
+
+  // Compute Cholesky Decomposition of the Covariance Matrix --------------
+  
+  spdlog::debug("{}: Computing Cholesky Decomposition of"
+    " the Covariance Matrix begins", "compute_baryon_pcas_3x2pt_fourier");
+
+  matrix L = arma::chol(IP::get_instance().get_cov_masked_sqzd(), "lower");
+
+  matrix inv_L = arma::inv(L);
+
+  spdlog::debug("{}: Computing Cholesky Decomposition of"
+    " the Covariance Matrix ends", "compute_baryon_pcas_3x2pt_fourier");
+
+  // Compute Dark Matter data vector --------------------------------------
+  
+  spdlog::debug("{}: Computing DM only data vector begins", 
+    "compute_baryon_pcas_3x2pt_fourier");
+  
+  cosmology.random = RandomNumber::get_instance().get();
+  
+  reset_bary_struct(); // make sure there is no baryon contamination
+
+  vector dv_dm = IP::get_instance().sqzd_theory_data_vector(
+      compute_data_vector_3x2pt_fourier_masked_any_order(order)
+    );
+
+  spdlog::debug("{}: Computing DM only data vector ends", 
+    "compute_baryon_pcas_3x2pt_fourier");
+
+  // Compute data vector for all Baryon scenarios -------------------------
+  
+  matrix D = matrix(ndata_sqzd, nscenarios);
+
+  for (int i=0; i<nscenarios; i++)
+  {
+    spdlog::debug(
+        "{}: Computing contaminated data vector"
+        " with baryon scenario {} begins", 
+        "compute_baryon_pcas_3x2pt_fourier",
+        BaryonScenario::get_instance().get_scenario(i)
+      );
+
+    // line below to force clear cosmolike cosmology cache
+    cosmology.random = RandomNumber::get_instance().get();
+
+    init_baryons_contamination(BaryonScenario::get_instance().get_scenario(i));
+
+    vector dv = IP::get_instance().sqzd_theory_data_vector(
+        compute_data_vector_3x2pt_fourier_masked_any_order(order)
+      );
+
+    D.col(i) = dv - dv_dm;
+
+    spdlog::debug(
+        "{}: Computing contaminated data vector"
+        " with baryon scenario {} ends", 
+        "compute_baryon_pcas_3x2pt_fourier",
         BaryonScenario::get_instance().get_scenario(i)
       );
   }
