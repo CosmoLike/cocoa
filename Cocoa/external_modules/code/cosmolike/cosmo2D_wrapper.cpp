@@ -80,6 +80,22 @@ arma::Col<double> get_binning_real_space()
 // ---------------------------------------------------------------------------
 // ---------------------------------------------------------------------------
 
+arma::Col<double> get_binning_fourier_space()
+{  
+  arma::Col<double> result(like.Ncl, arma::fill::none);
+  
+  const double logdl = (std::log(like.lmax) - std::log(like.lmin))/like.Ncl;
+  for (int i = 0; i < like.Ncl; i++)
+  {  
+    result(i) = std::exp(std::log(like.lmin) + (i + 0.5)*logdl);
+  }
+  return result;
+}
+
+// ---------------------------------------------------------------------------
+// ---------------------------------------------------------------------------
+// ---------------------------------------------------------------------------
+
 py::tuple xi_pm_tomo_cpp()
 { 
   arma::Cube<double> xp(Ntable.Ntheta,
