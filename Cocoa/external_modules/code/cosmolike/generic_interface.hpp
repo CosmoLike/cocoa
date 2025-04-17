@@ -94,10 +94,10 @@ class IP
     void set_data(std::string datavector_filename);
 
     // 3x2pt
-    void set_mask(std::string mask_filename, arma::Col<int>::fixed<3> order);
+    void set_mask(std::string mask_filename, arma::Col<int>::fixed<3> order, const int real_space);
 
     // 6x2pt
-    void set_mask(std::string mask_filename, arma::Col<int>::fixed<6> order);
+    void set_mask(std::string mask_filename, arma::Col<int>::fixed<6> order, const int real_space);
 
     void set_inv_cov(std::string covariance_filename);
 

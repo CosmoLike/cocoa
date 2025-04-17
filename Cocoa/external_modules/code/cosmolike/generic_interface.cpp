@@ -981,7 +981,7 @@ void init_data_3x2pt_real_space(
 
   init_data_vector_size_3x2pt_real_space();
   
-  IP::get_instance().set_mask(mask, order);   // set_mask must be called first
+  IP::get_instance().set_mask(mask, order, 1);  // set_mask must be called first
   
   IP::get_instance().set_data(data);
   
@@ -1007,7 +1007,7 @@ void init_data_3x2pt_fourier_space(
 
   init_data_vector_size_3x2pt_fourier_space();
   
-  IP::get_instance().set_mask(mask, order);   // set_mask must be called first
+  IP::get_instance().set_mask(mask, order, 0);  // set_mask must be called first
   
   IP::get_instance().set_data(data);
   
@@ -1033,7 +1033,7 @@ void init_data_6x2pt_real_space(
 
   init_data_vector_size_6x2pt_real_space();
   
-  IP::get_instance().set_mask(mask, order);   // set_mask must be called first
+  IP::get_instance().set_mask(mask, order, 1);  // set_mask must be called first
   
   IP::get_instance().set_data(data);
   
@@ -1059,7 +1059,7 @@ void init_data_6x2pt_fourier_space(
 
   init_data_vector_size_6x2pt_fourier_space();
   
-  IP::get_instance().set_mask(mask, order);   // set_mask must be called first
+  IP::get_instance().set_mask(mask, order, 0);  // set_mask must be called first
   
   IP::get_instance().set_data(data);
   
@@ -3466,7 +3466,7 @@ void IP::set_data(std::string datavector_filename)
   this->is_data_set_ = true;
 }
 
-void IP::set_mask(std::string mask_filename, arma::Col<int>::fixed<3> order)
+void IP::set_mask(std::string mask_filename, arma::Col<int>::fixed<3> order, const int real_space)
 {
   if (!(like.Ndata>0))
   {
@@ -3509,12 +3509,24 @@ void IP::set_mask(std::string mask_filename, arma::Col<int>::fixed<3> order)
       arma::stable_sort_index(order, "ascend")
     );
 
-  arma::Col<int>::fixed<sz> sizes =
-    {
-      2*Ntable.Ntheta*tomo.shear_Npowerspectra,
-      Ntable.Ntheta*tomo.ggl_Npowerspectra,
-      Ntable.Ntheta*tomo.clustering_Npowerspectra,
-    };
+  if(real_space==1)
+  {
+    arma::Col<int>::fixed<sz> sizes =
+      {
+        2*Ntable.Ntheta*tomo.shear_Npowerspectra,
+        Ntable.Ntheta*tomo.ggl_Npowerspectra,
+        Ntable.Ntheta*tomo.clustering_Npowerspectra,
+      };
+  }
+  else
+  {
+    arma::Col<int>::fixed<sz> sizes =
+      {
+        like.Ncl*tomo.shear_Npowerspectra,
+        like.Ncl*tomo.ggl_Npowerspectra,
+        like.Ncl*tomo.clustering_Npowerspectra,
+      };
+  }
 
   arma::Col<int>::fixed<sz> start = {0,0,0};
 
@@ -3598,7 +3610,7 @@ void IP::set_mask(std::string mask_filename, arma::Col<int>::fixed<3> order)
   this->is_mask_set_ = true;
 }
 
-void IP::set_mask(std::string mask_filename, arma::Col<int>::fixed<6> order)
+void IP::set_mask(std::string mask_filename, arma::Col<int>::fixed<6> order, const int real_space)
 {
   if (!(like.Ndata>0))
   {
@@ -3647,15 +3659,30 @@ void IP::set_mask(std::string mask_filename, arma::Col<int>::fixed<6> order)
       arma::stable_sort_index(order, "ascend")
     );
 
-  arma::Col<int>::fixed<sz> sizes =
-    {
-      2*Ntable.Ntheta*tomo.shear_Npowerspectra,
-      Ntable.Ntheta*tomo.ggl_Npowerspectra,
-      Ntable.Ntheta*tomo.clustering_Npowerspectra,
-      Ntable.Ntheta*redshift.clustering_nbin,
-      Ntable.Ntheta*redshift.shear_nbin,
-      like.is_cmb_bandpower  == 1 ? like.Nbp : like.Ncl 
-    };
+  if(real_space==1)
+  {
+    arma::Col<int>::fixed<sz> sizes =
+      {
+        2*Ntable.Ntheta*tomo.shear_Npowerspectra,
+        Ntable.Ntheta*tomo.ggl_Npowerspectra,
+        Ntable.Ntheta*tomo.clustering_Npowerspectra,
+        Ntable.Ntheta*redshift.clustering_nbin,
+        Ntable.Ntheta*redshift.shear_nbin,
+        like.is_cmb_bandpower  == 1 ? like.Nbp : like.Ncl 
+      };
+  }
+  else
+  {
+    arma::Col<int>::fixed<sz> sizes =
+      {
+        like.Ncl*tomo.shear_Npowerspectra,
+        like.Ncl*tomo.ggl_Npowerspectra,
+        like.Ncl*tomo.clustering_Npowerspectra,
+        like.Ncl*redshift.clustering_nbin,
+        like.Ncl*redshift.shear_nbin,
+        like.is_cmb_bandpower  == 1 ? like.Nbp : like.Ncl 
+      };
+  }
 
   arma::Col<int>::fixed<sz> start = {0,0,0,0,0,0};
 
