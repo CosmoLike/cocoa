@@ -466,8 +466,8 @@ void init_binning_cmb_bandpower(
 
 void init_binning_fourier(
     const int Nells, 
-    const int lmin, 
-    const int lmax
+    const double lmin, 
+    const double lmax
   )
 {
   spdlog::debug("{}: Begins", "init_binning_fourier");
