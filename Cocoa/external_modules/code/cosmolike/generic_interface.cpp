@@ -468,7 +468,8 @@ void init_binning_cmb_bandpower(
 void init_binning_fourier(
     const int Nells, 
     const double lmin, 
-    const double lmax
+    const double lmax,
+    const double lmax_shear,
   )
 {
   spdlog::debug("{}: Begins", "init_binning_fourier");
@@ -483,12 +484,15 @@ void init_binning_fourier(
   spdlog::info("{}: {} = {:d} selected.","init_binning_fourier","Nells",Nells);
   spdlog::info("{}: {} = {:.0f} selected.","init_binning_fourier","l_min",lmin);
   spdlog::info("{}: {} = {:.0f} selected.","init_binning_fourier","l_max",lmax);
+  spdlog::info("{}: {} = {:.0f} selected.","init_binning_fourier","l_max_shear",lmax_shear);
 
   like.Ncl = Nells;
   
   like.lmin = lmin;
   
   like.lmax = lmax;
+
+  like.lmax_shear = lmax_shear;
   
   const double logdl = (std::log(like.lmax) - std::log(like.lmin))/like.Ncl;
   
@@ -2463,7 +2467,7 @@ void compute_ss_fourier_masked(vector& data_vector, const int start)
       {
         const int index = start + like.Ncl*nz + i;
         
-        if (like.ell[i] < like.lmax_shear)
+        if (IP::get_instance().get_mask(index)&&(like.ell[i]<like.lmax_shear))
         {
           data_vector(index) = C_ss_tomo_limber(like.ell[i], z1, z2, 1)*
             (1.0 + nuisance.shear_calibration_m[z1])*
@@ -2525,8 +2529,7 @@ void compute_gs_fourier_masked(vector& data_vector, const int start)
       for (int i=0; i<like.Ncl; i++)
       {
         const int index = start + like.Ncl*nz + i;
-        
-        if (test_kmax(like.ell[i], zl))
+        if (IP::get_instance().get_mask(index))
         {
           data_vector(index) = C_gs_tomo_limber(like.ell[i], zl, zs)*
               (1.0 + nuisance.shear_calibration_m[zs]);
@@ -2577,7 +2580,7 @@ void compute_gg_fourier_masked(vector& data_vector, const int start)
       {
         const int index = start + like.Ncl*nz + i;
 
-        if (test_kmax(like.ell[i], nz))
+        if (IP::get_instance().get_mask(index))
           data_vector(index) = C_gg_tomo_limber(like.ell[i], nz, nz);
         else
           data_vector(index) = 0.0;

@@ -416,7 +416,7 @@ void init_baryons_contamination(std::string sim); // OLD API
 
 void init_bias(arma::Col<double> bias_z_evol_model);
 
-void init_binning_fourier(const int Ncl, const double lmin, const double lmax);
+void init_binning_fourier(const int Ncl, const double lmin, const double lmax, const double lmax_shear);
 
 void init_binning_real_space(
     const int Ntheta, 
