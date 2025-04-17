@@ -2943,19 +2943,20 @@ vector compute_data_vector_3x2pt_fourier_masked_any_order(
 
   constexpr int sz = 3;
 
+  // probe type indices, 0,1,2,... 
   auto indices = arma::conv_to<arma::Col<int>>::from(
       arma::stable_sort_index(order, "ascend")
     );
-
+  // size of each probe type
   arma::Col<int>::fixed<sz> sizes =
     {
       like.Ncl*tomo.shear_Npowerspectra,
       like.Ncl*tomo.ggl_Npowerspectra,
       like.Ncl*tomo.clustering_Npowerspectra
     };
-
+  // the starting index of each probe
   arma::Col<int>::fixed<sz> start = {0,0,0};
-
+  // for each probe
   for(int i=0; i<sz; i++)
   {
     for(int j=0; j<indices(i); j++)
@@ -2963,6 +2964,10 @@ vector compute_data_vector_3x2pt_fourier_masked_any_order(
       start(i) += sizes(indices(j));
     }
   }
+
+  spdlog::info("{}: start from {} - {} - {}",
+    "compute_data_vector_3x2pt_fourier_masked_any_order", 
+    start(0), start(1), start(2));
   
   vector data_vector(like.Ndata, arma::fill::zeros);
   
