@@ -2996,10 +2996,13 @@ vector compute_data_vector_3x2pt_fourier_masked_any_order(
   vector data_vector(like.Ndata, arma::fill::zeros);
   
   compute_ss_fourier_masked(data_vector, start(0));
+  spdlog::info("compute_ss_fourier_masked done");
 
   compute_gs_fourier_masked(data_vector, start(1));
+  spdlog::info("compute_gs_fourier_masked done");
 
   compute_gg_fourier_masked(data_vector, start(2));
+  spdlog::info("compute_gg_fourier_masked done");
 
   spdlog::debug(
       "{}: Ends", 
