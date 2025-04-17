@@ -469,7 +469,7 @@ void init_binning_fourier(
     const int Nells, 
     const double lmin, 
     const double lmax,
-    const double lmax_shear,
+    const double lmax_shear
   )
 {
   spdlog::debug("{}: Begins", "init_binning_fourier");
@@ -2521,7 +2521,7 @@ void compute_gs_fourier_masked(vector& data_vector, const int start)
 {
   if (like.shear_pos == 1)
   {
-    for (int nz=0; nz<tomo.shear_Npowerspectra; nz++)
+    for (int nz=0; nz<tomo.ggl_Npowerspectra; nz++)
     {
       const int zl = ZL(nz);
       const int zs = ZS(nz);
