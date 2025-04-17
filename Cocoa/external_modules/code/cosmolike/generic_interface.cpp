@@ -13,6 +13,7 @@
 #include <cmath> 
 
 // SPDLOG
+#define SPDLOG_ACTIVE_LEVEL SPDLOG_LEVEL_DEBUG
 #include <spdlog/spdlog.h>
 #include <spdlog/sinks/basic_file_sink.h>
 #include <spdlog/cfg/env.h>
@@ -479,9 +480,9 @@ void init_binning_fourier(
     exit(1);
   }
 
-  spdlog::debug("{}: {} = {} selected.","init_binning_fourier","Nells",Nells);
-  spdlog::debug("{}: {} = {} selected.","init_binning_fourier","l_min",lmin);
-  spdlog::debug("{}: {} = {} selected.","init_binning_fourier","l_max",lmax);
+  spdlog::info("{}: {} = {:d} selected.","init_binning_fourier","Nells",Nells);
+  spdlog::info("{}: {} = {:.0f} selected.","init_binning_fourier","l_min",lmin);
+  spdlog::info("{}: {} = {:.0f} selected.","init_binning_fourier","l_max",lmax);
 
   like.Ncl = Nells;
   
@@ -497,11 +498,11 @@ void init_binning_fourier(
   {
     like.ell[i] = std::exp(std::log(like.lmin) + (i + 0.5)*logdl);
   
-    spdlog::debug("{}: Bin {:d} - {} = {:.4e}, {} = {:.4e} and {} = {:.4e}",
+    spdlog::info("{}: Bin {:d} - {} = {:.0f}, {} = {:.0f} and {} = {:.0f}",
       "init_binning_fourier", i, "lmin", lmin, "ell", like.ell[i], "lmax", lmax);
   }
 
-  spdlog::debug("{}: Ends", "init_binning_fourier");
+  spdlog::info("{}: Ends", "init_binning_fourier");
 }
 
 // ---------------------------------------------------------------------------
@@ -1492,11 +1493,34 @@ void init_ntomo_powerspectra()
 
   int n = 0;
   for (int i=0; i<redshift.clustering_nbin; i++)
+  {
     for (int j=0; j<redshift.shear_nbin; j++)
+    {
       n += test_zoverlap(i, j);
+      if(test_zoverlap(i, j)==0)
+      {
+        spdlog::info("{}: GGL pair L{:d}-S{:d} is excluded",
+          "init_ntomo_powerspectra", i, j);
+      }
+    }
+  }
   tomo.ggl_Npowerspectra = n;
 
   tomo.clustering_Npowerspectra = redshift.clustering_nbin;
+
+  spdlog::info(
+    "{}: tomo.shear_Npowerspectra = {}",
+    "init_ntomo_powerspectra", tomo.shear_Npowerspectra
+  );
+  spdlog::info(
+    "{}: tomo.ggl_Npowerspectra = {}",
+    "init_ntomo_powerspectra", tomo.ggl_Npowerspectra
+  );
+  spdlog::info(
+    "{}: tomo.clustering_Npowerspectra = {}",
+    "init_ntomo_powerspectra", tomo.clustering_Npowerspectra
+  );
+
 }
 
 // ---------------------------------------------------------------------------
