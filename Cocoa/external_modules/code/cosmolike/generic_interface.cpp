@@ -2575,7 +2575,7 @@ void compute_gg_fourier_masked(vector& data_vector, const int start)
     {
       for (int i=0; i<like.Ncl; i++)
       {
-        const int index = start + Ntable.Ntheta*nz + i;
+        const int index = start + like.Ncl*nz + i;
 
         if (test_kmax(like.ell[i], nz))
           data_vector(index) = C_gg_tomo_limber(like.ell[i], nz, nz);
