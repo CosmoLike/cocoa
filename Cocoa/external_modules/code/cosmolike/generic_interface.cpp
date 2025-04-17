@@ -872,7 +872,7 @@ void init_data_vector_size_3x2pt_fourier_space()
 
   init_data_vector_size_fourier_space(exclude);
   
-  spdlog::debug(
+  spdlog::info(
       "{}: {} = {} selected.", 
       "init_data_vector_size_3x2pt_fourier_space", 
       "Ndata", 
