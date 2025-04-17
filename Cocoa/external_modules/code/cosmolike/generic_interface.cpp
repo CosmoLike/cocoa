@@ -649,8 +649,8 @@ void init_data_vector_size_real_space(arma::Col<int>::fixed<6> exclude)
       Ntable.Ntheta*2*tomo.shear_Npowerspectra,
       Ntable.Ntheta*tomo.ggl_Npowerspectra,
       Ntable.Ntheta*tomo.clustering_Npowerspectra,
-      Ntable.Ntheta*redshift.shear_nbin,
       Ntable.Ntheta*redshift.clustering_nbin,
+      Ntable.Ntheta*redshift.shear_nbin,
       0
     };
 
@@ -804,8 +804,8 @@ void init_data_vector_size_fourier_space(
       like.Ncl*tomo.shear_Npowerspectra,
       like.Ncl*tomo.ggl_Npowerspectra,
       like.Ncl*tomo.clustering_Npowerspectra,
-      like.Ncl*redshift.shear_nbin,
       like.Ncl*redshift.clustering_nbin,
+      like.Ncl*redshift.shear_nbin,
       0
     };
 
@@ -3509,23 +3509,18 @@ void IP::set_mask(std::string mask_filename, arma::Col<int>::fixed<3> order, con
       arma::stable_sort_index(order, "ascend")
     );
 
+  arma::Col<int>::fixed<sz> sizes = {0,0,0}; 
   if(real_space==1)
   {
-    arma::Col<int>::fixed<sz> sizes =
-      {
-        2*Ntable.Ntheta*tomo.shear_Npowerspectra,
-        Ntable.Ntheta*tomo.ggl_Npowerspectra,
-        Ntable.Ntheta*tomo.clustering_Npowerspectra,
-      };
+    sizes(0) = 2*Ntable.Ntheta*tomo.shear_Npowerspectra;
+    sizes(1) = Ntable.Ntheta*tomo.ggl_Npowerspectra;
+    sizes(2) = Ntable.Ntheta*tomo.clustering_Npowerspectra;
   }
   else
   {
-    arma::Col<int>::fixed<sz> sizes =
-      {
-        like.Ncl*tomo.shear_Npowerspectra,
-        like.Ncl*tomo.ggl_Npowerspectra,
-        like.Ncl*tomo.clustering_Npowerspectra,
-      };
+    sizes(0) = like.Ncl*tomo.shear_Npowerspectra;
+    sizes(1) = like.Ncl*tomo.ggl_Npowerspectra;
+    sizes(2) = like.Ncl*tomo.clustering_Npowerspectra;
   }
 
   arma::Col<int>::fixed<sz> start = {0,0,0};
@@ -3659,29 +3654,24 @@ void IP::set_mask(std::string mask_filename, arma::Col<int>::fixed<6> order, con
       arma::stable_sort_index(order, "ascend")
     );
 
+  arma::Col<int>::fixed<sz> sizes = {0,0,0,0,0,0};
   if(real_space==1)
   {
-    arma::Col<int>::fixed<sz> sizes =
-      {
-        2*Ntable.Ntheta*tomo.shear_Npowerspectra,
-        Ntable.Ntheta*tomo.ggl_Npowerspectra,
-        Ntable.Ntheta*tomo.clustering_Npowerspectra,
-        Ntable.Ntheta*redshift.clustering_nbin,
-        Ntable.Ntheta*redshift.shear_nbin,
-        like.is_cmb_bandpower  == 1 ? like.Nbp : like.Ncl 
-      };
+    sizes(0) = 2*Ntable.Ntheta*tomo.shear_Npowerspectra;
+    sizes(1) = Ntable.Ntheta*tomo.ggl_Npowerspectra;
+    sizes(2) = Ntable.Ntheta*tomo.clustering_Npowerspectra;
+    sizes(3) = Ntable.Ntheta*redshift.clustering_nbin;
+    sizes(4) = Ntable.Ntheta*redshift.shear_nbin;
+    sizes(5) = like.is_cmb_bandpower  == 1 ? like.Nbp : like.Ncl;
   }
   else
   {
-    arma::Col<int>::fixed<sz> sizes =
-      {
-        like.Ncl*tomo.shear_Npowerspectra,
-        like.Ncl*tomo.ggl_Npowerspectra,
-        like.Ncl*tomo.clustering_Npowerspectra,
-        like.Ncl*redshift.clustering_nbin,
-        like.Ncl*redshift.shear_nbin,
-        like.is_cmb_bandpower  == 1 ? like.Nbp : like.Ncl 
-      };
+    sizes(0) = like.Ncl*tomo.shear_Npowerspectra;
+    sizes(1) = like.Ncl*tomo.ggl_Npowerspectra;
+    sizes(2) = like.Ncl*tomo.clustering_Npowerspectra;
+    sizes(3) = like.Ncl*redshift.clustering_nbin;
+    sizes(4) = like.Ncl*redshift.shear_nbin;
+    sizes(5) = like.is_cmb_bandpower  == 1 ? like.Nbp : like.Ncl;
   }
 
   arma::Col<int>::fixed<sz> start = {0,0,0,0,0,0};
