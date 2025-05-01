@@ -75,8 +75,18 @@ params:
       scale: 0.03
     proposal: 0.03
     latex: \Omega_\mathrm{c} h^2
+  mnu1:
+    value: 0.0
+    drop: True
+  mnu2:
+    value: 'lambda: np.sqrt(7.5e-5)'
+    drop: True
+  mnu3:
+    value: 'lambda: np.sqrt(2.5e-3)'
+    drop: True
   mnu:
-    value: 0.06
+    value: 'lambda mnu1, mnu2 ,mnu3: mnu1 + mnu2 + mnu3'
+    latex: \sum m_\nu
   tau:
     prior:
       dist: norm
@@ -88,31 +98,6 @@ params:
       scale: 0.006
     proposal: 0.003
     latex: \tau_\mathrm{reio}
-  w0pwa:
-    prior:
-      min: -5 
-      max: -0.01
-    ref:
-      dist: norm
-      loc: -0.99
-      scale: 0.05
-    proposal: 0.05
-    latex: w_{0,\mathrm{DE}}+w_{a,\mathrm{DE}}
-    drop: true
-  w:
-    prior:
-      min: -3
-      max: -0.01
-    ref:
-      dist: norm
-      loc: -0.99
-      scale: 0.05
-    proposal: 0.05
-    latex: w_{0,\mathrm{DE}}
-  wa:
-    value: 'lambda w0pwa, w: w0pwa - w'
-    derived: false
-    latex: w_{a,\mathrm{DE}}
   omegal:
     latex: \Omega_\Lambda
   omegam:
@@ -178,16 +163,7 @@ params:
     latex: 10^5 \mathrm{D}/\mathrm{H}
   zrei:
     latex: z_\mathrm{re}
-  nrun:
-    value: 0.0
-    latex: n_\mathrm{run}
-  nrunrun:
-    value: 0.0
-    latex: n_\mathrm{run,run}
-  omegak:
-    value: 0.0
-    latex: \Omega_k
-    
+
 theory:
   camb:
     path: ./external_modules/code/CAMB
@@ -195,9 +171,14 @@ theory:
     extra_args:
       AccuracyBoost: 1.10
       lens_potential_accuracy: 2
-      num_massive_neutrinos: 1
-      nnu: 3.046
-      dark_energy_model: ppf
+      num_nu_massless: 1.044
+      num_nu_massive: 2
+      nu_mass_eigenstates: 2
+      # We use the minimal normal ordering case: massless lightest state, m2 and m3
+      # computed according to oscilation measurements.
+      nu_mass_fractions: [0.14763410387308012,0.8523658961269198]
+      nu_mass_numbers: [1,1]
+      share_delta_neff: True
 
 sampler:
   evaluate:
@@ -208,8 +189,6 @@ sampler:
       omegabh2: 0.022383
       omegach2: 0.12011
       tau: 0.0543
-      w0pwa: -0.99999
-      w: -0.99999
       A_planck: 1.00138
       calib_100T: 1.00136
       calib_217T: 0.997534
@@ -226,4 +205,4 @@ sampler:
       ps_A_143_217: 30.2718
       ps_A_217_217: 109.975
     
-output: ./projects/example/chains/EXAMPLE_EVALUATE2
+output: ./projects/example/chains/EXAMPLE_EVALUATE15

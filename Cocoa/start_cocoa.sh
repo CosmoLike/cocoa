@@ -92,14 +92,14 @@ if [[ -z "${IGNORE_ACTDR6_CODE}" ]]; then
   ECODEF="${ROOTDIR:?}/external_modules/code"
   COBLIKE="${ROOTDIR:?}/cobaya/cobaya/likelihoods"
 
-  TMP=${ACTDR6_CMBONLY_NAME:-"act_dr6_cmbonly"}
+  TMP="${ACTDR6_CMBONLY_NAME:-"act_dr6_cmbonly"}"
   TMP2="act_dr6_cmbonly"
   if [[ ! -L "${COBLIKE:?}/${TMP2}" ]]; then
     ln -s "${ECODEF:?}/${TMP}/${TMP2}" "${COBLIKE:?}" \
       >${OUT1:?} 2>${OUT2:?} || { error "${EC34:?}"; return 1; }
   fi
 
-  TMP=${ACTDR6_MFLIKE_NAME:-"act_dr6_mflike"}
+  TMP="${ACTDR6_MFLIKE_NAME:-"act_dr6_mflike"}"
   TMP2="act_dr6_mflike"
   if [[ ! -L "${COBLIKE:?}/${TMP2}" ]]; then
     ln -s "${ECODEF:?}/${TMP}/${TMP2}" "${COBLIKE:?}" \
@@ -117,7 +117,7 @@ if [[ -z "${IGNORE_SIMONS_OBSERVATORY_LIKELIHOOD_CODE}" ]]; then
   COBLIKE="${ROOTDIR:?}/cobaya/cobaya/likelihoods"
   COBTH="${ROOTDIR:?}/cobaya/cobaya/theories"
 
-  TMP=${SO_MFLIKE_NAME:-"mflike"}
+  TMP="${SO_MFLIKE_NAME:-"mflike"}"
   TMP2="mflike"
   
   if [[ ! -L "${COBLIKE:?}/${TMP2}" ]]; then
@@ -139,14 +139,14 @@ if [[ -z "${IGNORE_LIPOP_LIKELIHOOD_CODE}" ]]; then
   ECODEF="${ROOTDIR:?}/external_modules/code"
   COBLIKE="${ROOTDIR:?}/cobaya/cobaya/likelihoods"
 
-  TMP=${PL2020_HILLIPOP_NAME:-"planck_2020_hillipop"}
+  TMP="${PL2020_HILLIPOP_NAME:-"planck_2020_hillipop"}"
   TMP2="planck_2020_hillipop"
   if [[ ! -L "${COBLIKE:?}/${TMP2}" ]]; then
     ln -s "${ECODEF:?}/${TMP}/${TMP2}" "${COBLIKE:?}" \
       >${OUT1:?} 2>${OUT2:?} || { error "${EC34:?}"; return 1; }
   fi
 
-  TMP=${PL2020_LOLLIPOP_NAME:-"planck_2020_lollipop"}
+  TMP="${PL2020_LOLLIPOP_NAME:-"planck_2020_lollipop"}"
   TMP2="planck_2020_lollipop"
   if [[ ! -L "${COBLIKE:?}/${TMP2}" ]]; then
     ln -s "${ECODEF:?}/${TMP}/${TMP2}" "${COBLIKE:?}" \
@@ -154,6 +154,24 @@ if [[ -z "${IGNORE_LIPOP_LIKELIHOOD_CODE}" ]]; then
   fi
 
   unset -v ECODEF COBLIKE TMP TMP2
+fi
+
+# ----------------------------------------------------------------------------
+# ----------------------------- COSMOPOWER LIKELIHOOD ------------------------
+# ----------------------------------------------------------------------------
+if [[ -z "${IGNORE_COSMOPOWER_CODE}" ]]; then
+  ECODEF="${ROOTDIR:?}/external_modules/code"
+  COBTH="${ROOTDIR:?}/cobaya/cobaya/theories"
+
+  TMP="${COSMOPOWER_SOLIKET_NAME:-"soliket"}"
+  TMP2="soliket/cosmopower"
+
+  if [[ ! -L "${COBTH:?}/${TMP2}" ]]; then
+    ln -s "${ECODEF:?}/emulators/${TMP}/${TMP2}" "${COBTH:?}" \
+      >${OUT1:?} 2>${OUT2:?} || { error "${EC34:?}"; return 1; }
+  fi
+
+  unset -v ECODEF COBTH TMP TMP2
 fi
 
 # ----------------------------------------------------------------------------

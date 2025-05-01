@@ -250,14 +250,14 @@ if [ -z "${IGNORE_PIP_CORE_INSTALLATION}" ]; then
     ptop "PIP INSTALL MACHINE LEARNING CPU-ONLY PACKAGES" || return 1
 
     env CXX="${CXX_COMPILER:?}" CC="${C_COMPILER:?}" ${PIP3:?} install \
-        'tensorflow-cpu==2.15.0' \
-        'tensorflow_probability==0.23.0' \
-        'keras==2.15.0' \
+        'tensorflow-cpu==2.13.1' \
+        'tensorflow_probability==0.21' \
+        'keras==2.13.1' \
         'keras-preprocessing==1.1.2' \
         'torch==1.13.1+cpu' \
         'torchvision==0.14.1+cpu' \
         'torchaudio==0.13.1' \
-        'tensiometer==1.0.2' \
+        'tensiometer==0.1.2' \
         'regex==2024.11.6' \
         'mkdocs-material==9.5.15' \
         'mkdocs==1.5.3' \
@@ -267,6 +267,7 @@ if [ -z "${IGNORE_PIP_CORE_INSTALLATION}" ]; then
         'gdown==5.2.0' \
         'tqdm==4.66.4' \
         'scikit-learn==1.5.0' \
+        'jupyter==1.0.0' \
       --extra-index-url "https://download.pytorch.org/whl/cpu" \
       --prefix="${ROOTDIR:?}/.local" \
       >${OUT1:?} 2>${OUT2:?} || { error "${EC13:?}"; return 1; }
@@ -284,14 +285,14 @@ if [ -z "${IGNORE_PIP_CORE_INSTALLATION}" ]; then
     ptop "PIP INSTALL MACHINE LEARNING GPU PACKAGES"
 
     env CXX="${CXX_COMPILER:?}" CC="${C_COMPILER:?}" ${PIP3:?} install \
-        'tensorflow==2.15.0' \
-        'tensorflow_probability==0.23.0' \
-        'keras==2.15.0' \
+        'tensorflow==2.13.1' \
+        'tensorflow_probability==0.21' \
+        'keras==2.13.1' \
         'keras-preprocessing==1.1.2' \
         'torch==1.13.1+cu116' \
         'torchvision==0.14.1+cu116' \
         'torchaudio==0.13.1' \
-        'tensiometer==1.0.2' \
+        'tensiometer==0.1.2' \
         'regex==2024.11.6' \
         'mkdocs-material==9.5.15' \
         'mkdocs==1.5.3' \
@@ -301,8 +302,9 @@ if [ -z "${IGNORE_PIP_CORE_INSTALLATION}" ]; then
         'gdown==5.2.0' \
         'tqdm==4.66.4' \
         'scikit-learn==1.5.0' \
+        'jupyter==1.0.0' \
       --extra-index-url "https://download.pytorch.org/whl/cu116" \
-      --prefix="${ROOTDIR:?}/.local" \
+      --prefix="${ROOTDIR:?}/.local" --use-deprecated=legacy-resolver \
       >${OUT1:?} 2>${OUT2:?} || { error "${EC13:?}"; return 1; } 
 
     pbottom "PIP INSTALL MACHINE LEARNING GPU PACKAGES" || return 1
