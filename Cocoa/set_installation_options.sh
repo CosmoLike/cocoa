@@ -32,7 +32,7 @@ export IGNORE_BICEP_CMB_DATA=1
 # export IGNORE_HOLICOW_STRONG_LENSING_DATA=1
 # export IGNORE_SN_DATA=1
 export IGNORE_SPT_CMB_DATA=1
-export IGNORE_SIMONS_OBSERVATORY_CMB_DATA=1
+#export IGNORE_SIMONS_OBSERVATORY_CMB_DATA=1
 #export IGNORE_PLANCK_CMB_DATA=1
 export IGNORE_CAMSPEC_CMB_DATA=1
 export IGNORE_LIPOP_CMB_DATA=1
@@ -54,15 +54,18 @@ export IGNORE_CLASS_CODE=1 # Default: we just use CAMB (reduces compilation time
 #export IGNORE_ACTDR6_CODE=1
 export IGNORE_CPP_CUBA_INSTALLATION=1
 export IGNORE_VELOCILEPTORS_CODE=1
-#export IGNORE_SIMONS_OBSERVATORY_LIKELIHOOD_CODE=1
+export IGNORE_SIMONS_OBSERVATORY_LIKELIHOOD_CODE=1
 export IGNORE_CAMSPEC_LIKELIHOOD_CODE=1
 export IGNORE_LIPOP_LIKELIHOOD_CODE=1
 export IGNORE_HYREC_CODE=1
 #export IGNORE_COSMOREC_CODE=1
 export IGNORE_MGCAMB_CODE=1
+#export IGNORE_COSMOPOWER_CODE=1
 #Many cosmolike projects (including LSST-Y1) require euclid emulator
 #export IGNORE_EUCLID_EMULATOR_V2_CODE=1
 #export IGNORE_COSMOLIKE_LSSTY1_CODE=1
+
+
 
 # ------------------------------------------------------------------------------
 # If OVERWRITE_EXISTING_XXX_CODE=1, the setup_cocoa overwrites existing PACKAGES
@@ -86,7 +89,7 @@ export MAKE_NUM_THREADS=4
 # If not set, pip_core_packages.sh will install several ML packages ------------
 # ------------------------------------------------------------------------------
 export IGNORE_EMULATOR_CPU_PIP_PACKAGES=1
-export IGNORE_EMULATOR_GPU_PIP_PACKAGES=1
+#export IGNORE_EMULATOR_GPU_PIP_PACKAGES=1
 
 # ------------------------------------------------------------------------------
 # Adopted Python version -------------------------------------------------------
@@ -177,6 +180,7 @@ if [ -n "${OVERWRITE_EXISTING_ALL_PACKAGES}" ]; then
   export OVERWRITE_EXISTING_SIMONS_OBSERVATORY_CMB_DATA=1
   export OVERWRITE_EXISTING_SN_DATA=1
   export OVERWRITE_EXISTING_HOLICOW_DATA=1
+  export OVERWRITE_EXISTING_COSMOPOWER_CODE=1
 fi
 
 if [ -n "${REDOWNLOAD_EXISTING_ALL_DATA}" ]; then
@@ -285,6 +289,15 @@ export MGCAMB_NAME='MGCAMB'
 
 export PLANCK2018_SROLL2_URL="https://web.fe.infn.it/~pagano/low_ell_datasets/sroll2/"
 export PLANCK2018_SROLL2_FILE="simall_100x143_sroll2_v3_EE_Aplanck.tgz"
+
+export COSMOPOWER_SOLIKET_URL="https://github.com/simonsobs/SOLikeT.git"
+export COSMOPOWER_SOLIKET_GIT_COMMIT="1d8333ea0007c88e7c2de192de39301884093cd8"
+
+export COSMOPOWER_URL="https://github.com/alessiospuriomancini/cosmopower.git"
+export COSMOPOWER_GIT_COMMIT="7cac5e71c975c06257b2f95f0dcea5dd09b0f45f"
+
+export TRF_EMUL_DATA_URL="https://github.com/CosmoLike/emulators_data.git"
+export TRF_EMUL_DATA_GIT_COMMIT="b4583e06dc5f84a4508663bac1e163f664eda39f"
 
 # --------------------------------------------------------------------
 # --------------------------------------------------------------------
