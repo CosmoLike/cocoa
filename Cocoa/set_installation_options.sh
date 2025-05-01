@@ -16,7 +16,7 @@ fi
 # ------------------------------------------------------------------------------
 # VERBOSE AS DEBUG TOOL --------------------------------------------------------
 # ------------------------------------------------------------------------------
-export COCOA_OUTPUT_VERBOSE=1
+#export COCOA_OUTPUT_VERBOSE=1
 
 # ------------------------------------------------------------------------------
 # If set, COSMOLIKE will compile with DEBUG flags ------------------------------
@@ -60,7 +60,7 @@ export IGNORE_LIPOP_LIKELIHOOD_CODE=1
 export IGNORE_HYREC_CODE=1
 #export IGNORE_COSMOREC_CODE=1
 export IGNORE_MGCAMB_CODE=1
-#export IGNORE_COSMOPOWER_CODE=1
+export IGNORE_COSMOPOWER_CODE=1
 #Many cosmolike projects (including LSST-Y1) require euclid emulator
 #export IGNORE_EUCLID_EMULATOR_V2_CODE=1
 #export IGNORE_COSMOLIKE_LSSTY1_CODE=1
