@@ -157,7 +157,7 @@ if [[ -z "${IGNORE_LIPOP_LIKELIHOOD_CODE}" ]]; then
 fi
 
 # ----------------------------------------------------------------------------
-# ----------------------------- COSMOPOWER LIKELIHOOD ------------------------
+# ----------------------------- COSMOPOWER THEORY ----------------------------
 # ----------------------------------------------------------------------------
 if [[ -z "${IGNORE_COSMOPOWER_CODE}" ]]; then
   ECODEF="${ROOTDIR:?}/external_modules/code"
@@ -165,6 +165,24 @@ if [[ -z "${IGNORE_COSMOPOWER_CODE}" ]]; then
 
   TMP="${COSMOPOWER_SOLIKET_NAME:-"soliket"}"
   TMP2="soliket/cosmopower"
+
+  if [[ ! -L "${COBTH:?}/${TMP2}" ]]; then
+    ln -s "${ECODEF:?}/emulators/${TMP}/${TMP2}" "${COBTH:?}" \
+      >${OUT1:?} 2>${OUT2:?} || { error "${EC34:?}"; return 1; }
+  fi
+
+  unset -v ECODEF COBTH TMP TMP2
+fi
+
+# ----------------------------------------------------------------------------
+# ----------------------------- CMB TRF THERY --------------------------------
+# ----------------------------------------------------------------------------
+if [[ -z "${IGNORE_EMULTRF_CODE}" ]]; then
+  ECODEF="${ROOTDIR:?}/external_modules/code"
+  COBTH="${ROOTDIR:?}/cobaya/cobaya/theories"
+
+  TMP="${EMULTRF_NAME:-"emultrf"}"
+  TMP2="emulcmbtrf"
 
   if [[ ! -L "${COBTH:?}/${TMP2}" ]]; then
     ln -s "${ECODEF:?}/emulators/${TMP}/${TMP2}" "${COBTH:?}" \

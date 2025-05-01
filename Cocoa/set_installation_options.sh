@@ -16,7 +16,7 @@ fi
 # ------------------------------------------------------------------------------
 # VERBOSE AS DEBUG TOOL --------------------------------------------------------
 # ------------------------------------------------------------------------------
-#export COCOA_OUTPUT_VERBOSE=1
+export COCOA_OUTPUT_VERBOSE=1
 
 # ------------------------------------------------------------------------------
 # If set, COSMOLIKE will compile with DEBUG flags ------------------------------
@@ -59,8 +59,10 @@ export IGNORE_CAMSPEC_LIKELIHOOD_CODE=1
 export IGNORE_LIPOP_LIKELIHOOD_CODE=1
 export IGNORE_HYREC_CODE=1
 #export IGNORE_COSMOREC_CODE=1
+#export IGNORE_EMULTRF_CODE=1
+
 export IGNORE_MGCAMB_CODE=1
-export IGNORE_COSMOPOWER_CODE=1
+#export IGNORE_COSMOPOWER_CODE=1
 #Many cosmolike projects (including LSST-Y1) require euclid emulator
 #export IGNORE_EUCLID_EMULATOR_V2_CODE=1
 #export IGNORE_COSMOLIKE_LSSTY1_CODE=1
@@ -181,6 +183,7 @@ if [ -n "${OVERWRITE_EXISTING_ALL_PACKAGES}" ]; then
   export OVERWRITE_EXISTING_SN_DATA=1
   export OVERWRITE_EXISTING_HOLICOW_DATA=1
   export OVERWRITE_EXISTING_COSMOPOWER_CODE=1
+  export OVERWRITE_EXISTING_EMULTRF_CODE=1
 fi
 
 if [ -n "${REDOWNLOAD_EXISTING_ALL_DATA}" ]; then
@@ -295,6 +298,9 @@ export COSMOPOWER_SOLIKET_GIT_COMMIT="1d8333ea0007c88e7c2de192de39301884093cd8"
 
 export COSMOPOWER_URL="https://github.com/alessiospuriomancini/cosmopower.git"
 export COSMOPOWER_GIT_COMMIT="7cac5e71c975c06257b2f95f0dcea5dd09b0f45f"
+
+export EMULTRF_URL="https://github.com/CosmoLike/emulators_code.git"
+export EMULTRF_GIT_COMMIT="42d76584ee0f76ff5be485ed272748ed2a52726c"
 
 export TRF_EMUL_DATA_URL="https://github.com/CosmoLike/emulators_data.git"
 export TRF_EMUL_DATA_GIT_COMMIT="b4583e06dc5f84a4508663bac1e163f664eda39f"
