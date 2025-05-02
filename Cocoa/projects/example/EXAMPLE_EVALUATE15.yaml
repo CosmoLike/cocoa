@@ -3,9 +3,9 @@ debug: False
 timing: true
 
 likelihood:
-  planck_2018_highl_plik.TT:
+  planck_2018_highl_plik.TT_lite:
     path: ./external_modules/
-    clik_file: plc_3.0/hi_l/plik/plik_rd12_HM_v22_TT.clik
+    clik_file: plc_3.0/hi_l/plik_lite/plik_lite_v22_TT.clik
   planck_2018_lowl.TT:
     path: ./external_modules
   planck_2018_lowl.EE:
@@ -36,25 +36,16 @@ params:
       scale: 0.005
     proposal: 0.005
     latex: n_\mathrm{s}
-  theta_MC_100:
+  H0:
     prior:
-      min: 0.5
-      max: 10
+      min: 60
+      max: 90
     ref:
       dist: norm
-      loc: 1.04109
-      scale: 0.001
-    proposal: 0.001
-    latex: 100\theta_\mathrm{MC}
-    drop: true
-    renames: theta
-  cosmomc_theta:
-    value: 'lambda theta_MC_100: 1.e-2*theta_MC_100'
-    derived: false
-  H0:
+      loc: 75
+      scale: 2
+    proposal: 0.2
     latex: H_0
-    min: 20
-    max: 100
   omegabh2:
     prior:
       min: 0.01
@@ -75,18 +66,8 @@ params:
       scale: 0.03
     proposal: 0.03
     latex: \Omega_\mathrm{c} h^2
-  mnu1:
-    value: 0.0
-    drop: True
-  mnu2:
-    value: 'lambda: np.sqrt(7.5e-5)'
-    drop: True
-  mnu3:
-    value: 'lambda: np.sqrt(2.5e-3)'
-    drop: True
   mnu:
-    value: 'lambda mnu1, mnu2 ,mnu3: mnu1 + mnu2 + mnu3'
-    latex: \sum m_\nu
+    value: 0.06
   tau:
     prior:
       dist: norm
@@ -169,40 +150,19 @@ theory:
     path: ./external_modules/code/CAMB
     use_renames: True
     extra_args:
-      AccuracyBoost: 1.10
-      lens_potential_accuracy: 2
-      num_nu_massless: 1.044
-      num_nu_massive: 2
-      nu_mass_eigenstates: 2
-      # We use the minimal normal ordering case: massless lightest state, m2 and m3
-      # computed according to oscilation measurements.
-      nu_mass_fractions: [0.14763410387308012,0.8523658961269198]
-      nu_mass_numbers: [1,1]
-      share_delta_neff: True
+      AccuracyBoost: 1.1
+      dark_energy_model: ppf
+      num_nu_massive: 1
 
 sampler:
   evaluate:
     override:
       logA: 3.0448
       ns: 0.96605
-      theta_MC_100: 1.04088
+      H0: 67.319
       omegabh2: 0.022383
       omegach2: 0.12011
       tau: 0.0543
       A_planck: 1.00138
-      calib_100T: 1.00136
-      calib_217T: 0.997534
-      A_cib_217: 74.4119
-      xi_sz_cib: 0.127483
-      A_sz: 5.954
-      ksz_norm: 2.93033
-      gal545_A_100: 7.06323
-      gal545_A_143: 8.49817
-      gal545_A_143_217: 23.3975
-      gal545_A_217: 78.1438
-      ps_A_100_100: 222.559
-      ps_A_143_143: 60.2773
-      ps_A_143_217: 30.2718
-      ps_A_217_217: 109.975
-    
+
 output: ./projects/example/chains/EXAMPLE_EVALUATE15

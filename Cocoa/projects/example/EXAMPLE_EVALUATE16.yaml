@@ -3,9 +3,9 @@ debug: False
 timing: true
 
 likelihood:
-  planck_2018_highl_plik.TT:
+  planck_2018_highl_plik.TT_lite:
     path: ./external_modules/
-    clik_file: plc_3.0/hi_l/plik/plik_rd12_HM_v22_TT.clik
+    clik_file: plc_3.0/hi_l/plik_lite/plik_lite_v22_TT.clik
   planck_2018_lowl.TT:
     path: ./external_modules
   planck_2018_lowl.EE:
@@ -125,19 +125,5 @@ sampler:
       omegach2: 0.12011
       tau: 0.0543
       A_planck: 1.00138
-      calib_100T: 1.00136
-      calib_217T: 0.997534
-      A_cib_217: 74.4119
-      xi_sz_cib: 0.127483
-      A_sz: 5.954
-      ksz_norm: 2.93033
-      gal545_A_100: 7.06323
-      gal545_A_143: 8.49817
-      gal545_A_143_217: 23.3975
-      gal545_A_217: 78.1438
-      ps_A_100_100: 222.559
-      ps_A_143_143: 60.2773
-      ps_A_143_217: 30.2718
-      ps_A_217_217: 109.975
     
 output: ./projects/example/chains/EXAMPLE_EVALUATE15
