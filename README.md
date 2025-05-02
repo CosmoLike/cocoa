@@ -91,7 +91,8 @@ Users can now proceed to **step :two:**.
 
 **Step :one:**: Download Cocoa's latest release and go to the `cocoa` main folder,
 
-    "${CONDA_PREFIX}"/bin/git clone --depth 1 https://github.com/CosmoLike/cocoa.git --branch v4.0-beta20 cocoa
+    "${CONDA_PREFIX}"/bin/git clone --depth 1 https://github.com/CosmoLike/cocoa.git --branch v4.0-beta21 cocoa
+
 
 and
 
@@ -122,6 +123,7 @@ Users can now proceed to **step :two:**.
 
 > [!Tip]
 > If users run `setup_cocoa.sh` more than once, Cocoa will not download (git clone) previously installed packages or remake the Cocoa private Python environment. To overwrite this behavior, users must set the key `OVERWRITE_EXISTING_ALL_PACKAGES` on the `set_installation_options.sh` shell script. Even with this key activated, Cocoa will not download large datasets again (e.g., ACT-DR6). Users must also set the key `REDOWNLOAD_EXISTING_ALL_DATA` to enable this additional behavior. These two optimizations prevent Cocoa from downloading several gigabytes repeatedly. 
+
 
 **Step :three:**: Run the script `compile_cocoa.sh` by typing 
 

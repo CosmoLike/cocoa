@@ -37,7 +37,8 @@ external_modules/data/h0licow_distance_chains/
 external_modules/data/spt_hiell_2020
 external_modules/data/spt_3g
 external_modules/data/act
-external_modules/code/PolyChordLite/
+external_modules/data/emultrf
+external_modules/data/emul*
 
 projects/desxplanck
 projects/lsst_fourier
@@ -142,6 +143,10 @@ external_modules/code/mf*/
 external_modules/code/syslibrary/
 external_modules/code/sys*
 external_modules/code/planck_2020*
+external_modules/code/PolyChordLite/
+external_modules/code/emulators/*
+external_modules/code/emul*/
+external_modules/code/emulators/soliket
 
 cobaya/cobaya/likelihoods/XXX
 cobaya/cobaya/likelihoods/des_y1

@@ -3,11 +3,12 @@ debug: false
 timing: true
 
 likelihood:
-  act_dr6_cmbonly: null
+  act_dr6_cmbonly:
+    lmax_theory: 4000
   act_dr6_lenslike.ACTDR6LensLike:
-     lens_only: False
-     lmax: 4000
-     variant: act_baseline
+    lens_only: False
+    lmax: 4000
+    variant: act_baseline
   planck_2018_lowl.EE_sroll2: null
 
 params:
@@ -74,8 +75,20 @@ params:
       scale: 0.03
     proposal: 0.03
     latex: \Omega_\mathrm{c} h^2
+  #mnu:
+  #  value: 0.06
+  mnu1:
+    value: 0.0
+    drop: True
+  mnu2:
+    value: 'lambda: np.sqrt(7.5e-5)'
+    drop: True
+  mnu3:
+    value: 'lambda: np.sqrt(2.5e-3)'
+    drop: True
   mnu:
-    value: 0.06
+    value: 'lambda mnu1, mnu2 ,mnu3: mnu1 + mnu2 + mnu3'
+    latex: \sum m_\nu
   tau:
     prior:
       dist: norm
@@ -195,12 +208,21 @@ theory:
       nonlinear: true
       lens_potential_accuracy: 8
       lens_margin: 2050
-      AccuracyBoost: 1.3
-      lAccuracyBoost: 1.3
+      AccuracyBoost: 1.5
+      lAccuracyBoost: 1.5
       min_l_logl_sampling: 6000
       DoLateRadTruncation: false
       recombination_model: CosmoRec
       halofit_version: mead2020
+      # from https://github.com/simonsobs/SOLikeT/blob/master/examples/example_1.yaml
+      num_nu_massless: 1.044
+      num_nu_massive: 2
+      nu_mass_eigenstates: 2
+      # We use the minimal normal ordering case: massless lightest state, m2 and m3
+      # computed according to oscilation measurements.
+      nu_mass_fractions: [0.14763410387308012,0.8523658961269198]
+      nu_mass_numbers: [1,1]
+      share_delta_neff: True
 
 sampler:
   evaluate:

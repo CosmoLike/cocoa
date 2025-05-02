@@ -1,15 +1,14 @@
-stop_at_error: False
-debug: False
+stop_at_error: false
+debug: false
 timing: true
 
 likelihood:
-  planck_2018_highl_plik.TT:
-    path: ./external_modules/
-    clik_file: plc_3.0/hi_l/plik/plik_rd12_HM_v22_TT.clik
+  planck_2020_hillipop.TTTEEE:
+    data_folder: planck/hillipop
   planck_2018_lowl.TT:
     path: ./external_modules
-  planck_2018_lowl.EE:
-    path: ./external_modules
+  planck_2020_lollipop.lowlE:
+    data_folder: planck/lollipop
 
 params:
   logA:
@@ -146,11 +145,6 @@ params:
     latex: r_\mathrm{drag}
   yheused:
     latex: Y_P^\mathrm{BBN}
-  omegan2:
-    latex: \Omega_\mathrm{\\nu} h^2
-  omegan:
-    derived: 'lambda omegan2, H0: omegan2/((H0/100)**2)'
-    latex: \Omega_\mathrm{\\nu}
   zstar:
     latex: z_*
   rstar:
@@ -187,7 +181,7 @@ params:
   omegak:
     value: 0.0
     latex: \Omega_k
-    
+
 theory:
   camb:
     path: ./external_modules/code/CAMB
@@ -208,22 +202,8 @@ sampler:
       omegabh2: 0.022383
       omegach2: 0.12011
       tau: 0.0543
-      w0pwa: -0.99999
-      w: -0.99999
-      A_planck: 1.00138
-      calib_100T: 1.00136
-      calib_217T: 0.997534
-      A_cib_217: 74.4119
-      xi_sz_cib: 0.127483
-      A_sz: 5.954
-      ksz_norm: 2.93033
-      gal545_A_100: 7.06323
-      gal545_A_143: 8.49817
-      gal545_A_143_217: 23.3975
-      gal545_A_217: 78.1438
-      ps_A_100_100: 222.559
-      ps_A_143_143: 60.2773
-      ps_A_143_217: 30.2718
-      ps_A_217_217: 109.975
-    
-output: ./projects/example/chains/EXAMPLE_EVALUATE2
+      w0pwa: -0.968859
+      w: -0.909098
+      A_planck: 1.00133
+
+output: ./projects/example/chains/EXAMPLE_EVALUATE11

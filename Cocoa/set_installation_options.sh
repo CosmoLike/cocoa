@@ -36,6 +36,7 @@ export IGNORE_SIMONS_OBSERVATORY_CMB_DATA=1
 #export IGNORE_PLANCK_CMB_DATA=1
 export IGNORE_CAMSPEC_CMB_DATA=1
 export IGNORE_LIPOP_CMB_DATA=1
+export IGNORE_EMULTRF_DATA=1 #SaraivanovZhongZhu transformer-based emulator
 
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
@@ -59,7 +60,11 @@ export IGNORE_CAMSPEC_LIKELIHOOD_CODE=1
 export IGNORE_LIPOP_LIKELIHOOD_CODE=1
 export IGNORE_HYREC_CODE=1
 export IGNORE_COSMOREC_CODE=1
+export IGNORE_EMULTRF_CODE=1 #SaraivanovZhongZhu transformer-based emulator
+
 export IGNORE_MGCAMB_CODE=1
+export IGNORE_COSMOPOWER_CODE=1
+
 #Many cosmolike projects (including LSST-Y1) require euclid emulator
 #export IGNORE_EUCLID_EMULATOR_V2_CODE=1
 #export IGNORE_COSMOLIKE_LSSTY1_CODE=1
@@ -70,7 +75,7 @@ export IGNORE_MGCAMB_CODE=1
 # redownload: delete the compressed file and download data again
 # these keys are only relevant if you run setup_cocoa multiple times -----------
 # ------------------------------------------------------------------------------
-#export OVERWRITE_EXISTING_ALL_PACKAGES=1
+export OVERWRITE_EXISTING_ALL_PACKAGES=1
 #export REDOWNLOAD_EXISTING_ALL_DATA=1
 # ------------------------------------------------------------------------------
 # If set, compile_planck.sh uses click like code from github.com/benabed/clik
@@ -141,6 +146,10 @@ fi
 if [ -z "${IGNORE_SIMONS_OBSERVATORY_LIKELIHOOD_CODE}" ]; then
   unset -v IGNORE_FGSPECTRA_CODE
 fi
+
+if [[ -z "${IGNORE_COSMOPOWER_CODE}" || -z "${IGNORE_EMULTRF_CODE}" ]]; then
+  unset -v IGNORE_EMULATOR_GPU_PIP_PACKAGES
+fi
 # ------------------------------------------------------------------------------
 
 # ------------------------------------------------------------------------------
@@ -177,6 +186,8 @@ if [ -n "${OVERWRITE_EXISTING_ALL_PACKAGES}" ]; then
   export OVERWRITE_EXISTING_SIMONS_OBSERVATORY_CMB_DATA=1
   export OVERWRITE_EXISTING_SN_DATA=1
   export OVERWRITE_EXISTING_HOLICOW_DATA=1
+  export OVERWRITE_EXISTING_COSMOPOWER_CODE=1
+  export OVERWRITE_EXISTING_EMULTRF_CODE=1
 fi
 
 if [ -n "${REDOWNLOAD_EXISTING_ALL_DATA}" ]; then
@@ -185,6 +196,7 @@ if [ -n "${REDOWNLOAD_EXISTING_ALL_DATA}" ]; then
   export REDOWNLOAD_EXISTING_LIPOP_CMB_DATA=1
   export REDOWNLOAD_EXISTING_SIMONS_OBSERVATORY_CMB_DATA=1
   export REDOWNLOAD_EXISTING_CAMPSPEC_CMB_DATA=1
+  export OVERWRITE_EXISTING_EMULTRF_DATA=1
 fi
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
@@ -285,6 +297,18 @@ export MGCAMB_NAME='MGCAMB'
 
 export PLANCK2018_SROLL2_URL="https://web.fe.infn.it/~pagano/low_ell_datasets/sroll2/"
 export PLANCK2018_SROLL2_FILE="simall_100x143_sroll2_v3_EE_Aplanck.tgz"
+
+export COSMOPOWER_SOLIKET_URL="https://github.com/simonsobs/SOLikeT.git"
+export COSMOPOWER_SOLIKET_GIT_COMMIT="1d8333ea0007c88e7c2de192de39301884093cd8"
+
+export COSMOPOWER_URL="https://github.com/alessiospuriomancini/cosmopower.git"
+export COSMOPOWER_GIT_COMMIT="7cac5e71c975c06257b2f95f0dcea5dd09b0f45f"
+
+export EMULTRF_URL="https://github.com/CosmoLike/emulators_code.git"
+export EMULTRF_GIT_COMMIT="42d76584ee0f76ff5be485ed272748ed2a52726c"
+
+export EMULTRF_DATA_URL="https://github.com/CosmoLike/emulators_data.git"
+export EMULTRF_DATA_GIT_COMMIT="d84aa6bcae5c115a07c4c4e6f5f302399ca4286a"
 
 # --------------------------------------------------------------------
 # --------------------------------------------------------------------

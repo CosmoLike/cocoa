@@ -3,9 +3,9 @@ debug: False
 timing: true
 
 likelihood:
-  planck_2018_highl_plik.TT:
+  planck_2018_highl_plik.TT_lite:
     path: ./external_modules/
-    clik_file: plc_3.0/hi_l/plik/plik_rd12_HM_v22_TT.clik
+    clik_file: plc_3.0/hi_l/plik_lite/plik_lite_v22_TT.clik
   planck_2018_lowl.TT:
     path: ./external_modules
   planck_2018_lowl.EE:
@@ -36,25 +36,16 @@ params:
       scale: 0.005
     proposal: 0.005
     latex: n_\mathrm{s}
-  theta_MC_100:
+  H0:
     prior:
-      min: 0.5
-      max: 10
+      min: 60
+      max: 90
     ref:
       dist: norm
-      loc: 1.04109
-      scale: 0.001
-    proposal: 0.001
-    latex: 100\theta_\mathrm{MC}
-    drop: true
-    renames: theta
-  cosmomc_theta:
-    value: 'lambda theta_MC_100: 1.e-2*theta_MC_100'
-    derived: false
-  H0:
+      loc: 75
+      scale: 2
+    proposal: 0.2
     latex: H_0
-    min: 20
-    max: 100
   omegabh2:
     prior:
       min: 0.01
@@ -88,31 +79,6 @@ params:
       scale: 0.006
     proposal: 0.003
     latex: \tau_\mathrm{reio}
-  w0pwa:
-    prior:
-      min: -5 
-      max: -0.01
-    ref:
-      dist: norm
-      loc: -0.99
-      scale: 0.05
-    proposal: 0.05
-    latex: w_{0,\mathrm{DE}}+w_{a,\mathrm{DE}}
-    drop: true
-  w:
-    prior:
-      min: -3
-      max: -0.01
-    ref:
-      dist: norm
-      loc: -0.99
-      scale: 0.05
-    proposal: 0.05
-    latex: w_{0,\mathrm{DE}}
-  wa:
-    value: 'lambda w0pwa, w: w0pwa - w'
-    derived: false
-    latex: w_{a,\mathrm{DE}}
   omegal:
     latex: \Omega_\Lambda
   omegam:
@@ -178,52 +144,25 @@ params:
     latex: 10^5 \mathrm{D}/\mathrm{H}
   zrei:
     latex: z_\mathrm{re}
-  nrun:
-    value: 0.0
-    latex: n_\mathrm{run}
-  nrunrun:
-    value: 0.0
-    latex: n_\mathrm{run,run}
-  omegak:
-    value: 0.0
-    latex: \Omega_k
-    
+
 theory:
   camb:
     path: ./external_modules/code/CAMB
     use_renames: True
     extra_args:
-      AccuracyBoost: 1.10
-      lens_potential_accuracy: 2
-      num_massive_neutrinos: 1
-      nnu: 3.046
+      AccuracyBoost: 1.1
       dark_energy_model: ppf
+      num_nu_massive: 1
 
 sampler:
   evaluate:
     override:
       logA: 3.0448
       ns: 0.96605
-      theta_MC_100: 1.04088
+      H0: 67.319
       omegabh2: 0.022383
       omegach2: 0.12011
       tau: 0.0543
-      w0pwa: -0.99999
-      w: -0.99999
       A_planck: 1.00138
-      calib_100T: 1.00136
-      calib_217T: 0.997534
-      A_cib_217: 74.4119
-      xi_sz_cib: 0.127483
-      A_sz: 5.954
-      ksz_norm: 2.93033
-      gal545_A_100: 7.06323
-      gal545_A_143: 8.49817
-      gal545_A_143_217: 23.3975
-      gal545_A_217: 78.1438
-      ps_A_100_100: 222.559
-      ps_A_143_143: 60.2773
-      ps_A_143_217: 30.2718
-      ps_A_217_217: 109.975
-    
-output: ./projects/example/chains/EXAMPLE_EVALUATE2
+
+output: ./projects/example/chains/EXAMPLE_EVALUATE15
