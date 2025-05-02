@@ -37,7 +37,8 @@ external_modules/data/h0licow_distance_chains/
 external_modules/data/spt_hiell_2020
 external_modules/data/spt_3g
 external_modules/data/act
-
+external_modules/data/emultrf
+external_modules/data/emul*
 
 projects/desxplanck
 projects/lsst_fourier
