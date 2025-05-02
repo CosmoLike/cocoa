@@ -268,13 +268,21 @@ if [ -z "${IGNORE_PIP_CORE_INSTALLATION}" ]; then
         'tqdm==4.66.4' \
         'scikit-learn==1.5.0' \
         'jupyter==1.0.0' \
-        'notebook==7.1.3' \
-        'ipyparallel==8.8.0' \
-        'typing-extensions==4.5.0' --force-reinstall \
+      --no-cache-dir \
       --extra-index-url "https://download.pytorch.org/whl/cpu" \
       --prefix="${ROOTDIR:?}/.local" \
       >${OUT1:?} 2>${OUT2:?} || { error "${EC13:?}"; return 1; }
   
+    # Without this code, jupyter breaks notebook
+    env CXX="${CXX_COMPILER:?}" CC="${C_COMPILER:?}" ${PIP3:?} install \
+        'notebook==7.1.3' \
+        'ipyparallel==8.8.0' \
+        'typing-extensions==4.5.0' \
+      --no-cache-dir\
+      --force-reinstall \
+      --prefix="${ROOTDIR:?}/.local" \
+      >${OUT1:?} 2>${OUT2:?} || { error "${EC13:?}"; return 1; }
+
     pbottom "PIP INSTALL MACHINE LEARNING CPU-ONLY PACKAGES"
   
   fi
@@ -306,12 +314,20 @@ if [ -z "${IGNORE_PIP_CORE_INSTALLATION}" ]; then
         'tqdm==4.66.4' \
         'scikit-learn==1.5.0' \
         'jupyter==1.0.0' \
-        'notebook==7.1.3' \
-        'ipyparallel==8.8.0' \
-        'typing-extensions==4.5.0' --force-reinstall \
+      --no-cache-dir \
       --extra-index-url "https://download.pytorch.org/whl/cu116" \
       --prefix="${ROOTDIR:?}/.local" --use-deprecated=legacy-resolver \
       >${OUT1:?} 2>${OUT2:?} || { error "${EC13:?}"; return 1; } 
+
+    # Without this code, jupyter breaks notebook
+    env CXX="${CXX_COMPILER:?}" CC="${C_COMPILER:?}" ${PIP3:?} install \
+        'notebook==7.1.3' \
+        'ipyparallel==8.8.0' \
+        'typing-extensions==4.5.0' \
+      --no-cache-dir \
+      --force-reinstall \
+      --prefix="${ROOTDIR:?}/.local" \
+      >${OUT1:?} 2>${OUT2:?} || { error "${EC13:?}"; return 1; }
 
     pbottom "PIP INSTALL MACHINE LEARNING GPU PACKAGES" || return 1
   
