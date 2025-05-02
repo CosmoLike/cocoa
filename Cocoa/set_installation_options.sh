@@ -36,9 +36,7 @@ export IGNORE_SIMONS_OBSERVATORY_CMB_DATA=1
 #export IGNORE_PLANCK_CMB_DATA=1
 export IGNORE_CAMSPEC_CMB_DATA=1
 export IGNORE_LIPOP_CMB_DATA=1
-
-# Zhu&Saraivanov TRF EMULATOR
-export IGNORE_EMULTRF_DATA=1
+export IGNORE_EMULTRF_DATA=1 #SaraivanovZhongZhu transformer-based emulator
 
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
@@ -62,9 +60,7 @@ export IGNORE_CAMSPEC_LIKELIHOOD_CODE=1
 export IGNORE_LIPOP_LIKELIHOOD_CODE=1
 export IGNORE_HYREC_CODE=1
 export IGNORE_COSMOREC_CODE=1
-
-# Zhu&Saraivanov TRF EMULATOR
-export IGNORE_EMULTRF_CODE=1
+export IGNORE_EMULTRF_CODE=1 #SaraivanovZhongZhu transformer-based emulator
 
 export IGNORE_MGCAMB_CODE=1
 export IGNORE_COSMOPOWER_CODE=1
