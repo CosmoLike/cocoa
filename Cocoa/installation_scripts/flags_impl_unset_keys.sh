@@ -47,7 +47,7 @@ unset -v GIT SPTURL HOLIURL PL2020_URL ARPACK_LIBRARY_LOC
 unset -v PLK_DIR LPVS CAMSPEC_URL ACTDR6_LL PL_LWL BASECL PL2020 CBURL
 unset -v POLY_NAME CAMB_NAME CAMB_GIT_COMMIT cocoa_HDF5_build
 unset -v OUT1 OUT2 MNT URL CHANGES CLASS_NAME fail_sdf PACKDIR
-unset -f pfail fail_comp_act fail_clact error_start_cocoa error_stop_cocoa 
+unset -f pfail fail_comp_act fail_clact error_stop_cocoa 
 unset -v INT_LIB INT_INCL INT_INCL_PY INT_INCL_PY_SP 
 unset -f ptop ptop2 ptop3 pbottom pbottom3 pbottom2
 unset -v URL CHANGES ECODEF CLNAME PACKDIR TFOLDER TFILE TFILEP AL
