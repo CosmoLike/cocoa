@@ -278,8 +278,8 @@ if [ -z "${IGNORE_PIP_CORE_INSTALLATION}" ]; then
         'notebook==7.1.3' \
         'ipyparallel==8.8.0' \
         'typing-extensions==4.5.0' \
+        'httpx==0.27.2' \
       --no-cache-dir\
-      --force-reinstall \
       --prefix="${ROOTDIR:?}/.local" \
       >${OUT1:?} 2>${OUT2:?} || { error "${EC13:?}"; return 1; }
 
@@ -324,8 +324,8 @@ if [ -z "${IGNORE_PIP_CORE_INSTALLATION}" ]; then
         'notebook==7.1.3' \
         'ipyparallel==8.8.0' \
         'typing-extensions==4.5.0' \
+        'httpx==0.27.2' \
       --no-cache-dir \
-      --force-reinstall \
       --prefix="${ROOTDIR:?}/.local" \
       >${OUT1:?} 2>${OUT2:?} || { error "${EC13:?}"; return 1; }
 
