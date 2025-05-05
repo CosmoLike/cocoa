@@ -78,79 +78,34 @@ params:
       scale: 0.006
     proposal: 0.003
     latex: \tau_\mathrm{reio}
-  omegal:
-    latex: \Omega_\Lambda
-  omegam:
-    latex: \Omega_\mathrm{m}
-  omegamh2:
-    derived: 'lambda omegam, H0: omegam*(H0/100)**2'
-    latex: \Omega_\mathrm{m} h^2
   omegab:
     derived: 'lambda omegabh2, H0: omegabh2/((H0/100)**2)'
     latex: \Omega_\mathrm{b}
   omegac:
     derived: 'lambda omegach2, H0: omegach2/((H0/100)**2)'
     latex: \Omega_\mathrm{c}
-  sigma8:
-    latex: \sigma_8
-  s8h5:
-    derived: 'lambda sigma8, H0: sigma8*(H0*1e-2)**(-0.5)'
-    latex: \sigma_8/h^{0.5}
-  s8omegamp5:
-    derived: 'lambda sigma8, omegam: sigma8*omegam**0.5'
-    latex: \sigma_8 \Omega_\mathrm{m}^{0.5}
-  s8omegamp25:
-    derived: 'lambda sigma8, omegam: sigma8*omegam**0.25'
-    latex: \sigma_8 \Omega_\mathrm{m}^{0.25}
   A:
     derived: 'lambda As: 1e9*As'
     latex: 10^9 A_\mathrm{s}
-  age:
-    latex: '{\rm{Age}}/\mathrm{Gyr}'
-  rdrag:
-    latex: r_\mathrm{drag}
-  yheused:
-    latex: Y_P^\mathrm{BBN}
-  zstar:
-    latex: z_*
-  rstar:
-    latex: r_*
-  thetastar:
-    latex: 100\theta_*
-  DAstar:
-    latex: D_\mathrm{A}/\mathrm{Gpc}
-  zdrag:
-    latex: z_\mathrm{drag}
-  kd:
-    latex: k_\mathrm{D}
-  thetad:
-    latex: 100\theta_\mathrm{D}
-  zeq:
-    latex: z_\mathrm{eq}
-  keq:
-    latex: k_\mathrm{eq}
-  thetaeq:
-    latex: 100\theta_\mathrm{eq}
-  thetarseq:
-    latex: 100\theta_\mathrm{s,eq}
-  DHBBN:
-    derived: "lambda DH: 10**5*DH"
-    latex: 10^5 \mathrm{D}/\mathrm{H}
-  zrei:
-    latex: z_\mathrm{re}
 
 theory:
   camb:
     path: ./external_modules/code/CAMB
     use_renames: True
     extra_args:
-      lens_potential_accuracy: 8
-      AccuracyBoost: 1.5
-      lSampleBoost: 10
-      lAccuracyBoost: 3 
-      #num_massive_neutrinos: 1
-      #nnu: 3.046
+      halofit_version: mead2020
       dark_energy_model: ppf
+      lmax: 6000
+      lens_potential_accuracy: 30
+      AccuracyBoost:  1.5
+      lSampleBoost: 10
+      lAccuracyBoost: 3
+      lens_margin: 2050
+      min_l_logl_sampling: 6000
+      num_massive_neutrinos: 1
+      nnu: 3.046
+      accurate_massive_neutrino_transfers: false
+      DoLateRadTruncation: false
 
 sampler:
   evaluate:

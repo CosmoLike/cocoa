@@ -121,12 +121,13 @@ theory:
   camb:
     path: ./external_modules/code/CAMB
     extra_args:
-      halofit_version: takahashi
+      halofit_version: mead2020
       dark_energy_model: ppf
-      lmax: 5000
-      lens_potential_accuracy: 8
-      AccuracyBoost:  2.0
-      lAccuracyBoost: 1.3
+      lmax: 6000
+      lens_potential_accuracy: 30
+      AccuracyBoost:  1.5
+      lSampleBoost: 10
+      lAccuracyBoost: 3
       lens_margin: 2050
       min_l_logl_sampling: 6000
       num_massive_neutrinos: 1
@@ -138,25 +139,25 @@ theory:
 sampler:
   evaluate:
     override:
-      logA: 3.045
-      ns: 0.9649
-      H0: 63.9385
-      omegabh2: 0.02236
-      omegach2: 0.1302
-      tau: 0.0544
-      a_tSZ: 3.30
-      a_kSZ: 1.6
-      a_p: 6.90
-      beta_p: 2.08
-      a_c: 4.90
-      beta_c: 2.20
-      a_s: 3.10
-      a_gtt: 2.81
+      logA: 3.045845885
+      ns: 9.652308970e-01
+      H0: 6.748819246e+01
+      omegabh2: 2.246801442e-02
+      omegach2: 1.198257361e-01 
+      tau: 5.433339482e-02
+      a_tSZ: 3.299661491
+      a_kSZ: 1.603283271
+      a_p: 6.909072608
+      beta_p: 2.081592320
+      a_c: 4.903593522
+      beta_c: 2.201183246
+      a_s: 3.100233500
+      a_gtt: 2.843185734
       a_gte: 0.10
-      a_gee: 0.10
+      a_gee: 9.891127676e-02
       a_psee: 0.0
-      a_pste: 0.0
-      xi: 0.2
-      T_d: 9.60
+      a_pste: 5.316779467e-04
+      xi: 1.910150877e-01 
+      T_d: 1.028875217e+01
 
 output: ./projects/example/chains/EXAMPLE_EVALUATE21
