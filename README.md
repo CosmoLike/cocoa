@@ -6,8 +6,9 @@
 2. [Installation of core packages via Conda](#required_packages_conda)
 3. [Installation and Compilation of external modules](#cobaya_base_code)
 4. [Running Examples](#cobaya_base_code_examples)
-5. [Creating Cosmolike projects (external readme)](Cocoa/projects/)
-6. [Appendix](#appendix)
+5. [Running Examples based on Machine Learning emulators](#cobaya_base_code_examples_emul)
+6. [Creating Cosmolike projects (external readme)](Cocoa/projects/)
+7. [Appendix](#appendix)
     1. [Credits](#appendix_proper_credits)
     2. [Additional Installation Notes](#additional_notes)
     3. [FAQ: What if installation or compilation goes wrong?](#running_wrong)
@@ -38,7 +39,7 @@ This readme file presents basic and advanced instructions for installing all [Co
 
 ## Installation of core packages via Conda <a name="required_packages_conda"></a>
 
-Core packages include compilers and numerical libraries (e.g., GSL and FFTW) that we will never modify in any research project. We install most of these core packages via Conda, as shown below.
+Core packages include compilers and numerical libraries (e.g., GSL and FFTW) that users typically never modify. We install most of these core packages via Conda, as shown below.
 
 **Step :one:**: Download the file `cocoapy39.yml` yml file
 
@@ -99,7 +100,7 @@ and
 Users can now proceed to **step :two:**.
 
 > [!TIP]
-> If you want to clone the latest commit, then clone the repository with the following command 
+> If you want to work from the latest commit, then clone the repository with the following command 
 >
 > (SSH)
 > 
@@ -150,7 +151,7 @@ We assume that you are still in the Conda cocoa environment from the previous `c
     export OMP_PROC_BIND=close; export OMP_NUM_THREADS=8
 
 > [!NOTE]
-> `OMP_PROC_BIND=close` bound OpenMP threads to physically close cores. This is an important optimization when running cocoa in current chiplet-based architectures, as they scatter physical cores in multiple chiplets but provide limit communication bandwidth between chiplets. Threads running across different chiplets may suffer from (1) Higher latency when accessing shared data, (2) Lower memory bandwidth, and (3) Reduced cache efficiency due to lack of shared caches between chiplets.
+> `OMP_PROC_BIND=close` bound OpenMP threads to physically close cores (within the same chiplet on chiplet-based architectures). Threads running across different chiplets may suffer from (1) Higher latency when accessing shared data, (2) Lower memory bandwidth, and (3) Reduced cache efficiency.
 
 ### Examples not involving Cosmolike
 
@@ -160,7 +161,7 @@ One model evaluation:
 
     mpirun -n 1 --oversubscribe --mca btl vader,tcp,self --bind-to core:overload-allowed --rank-by core --map-by numa:pe=${OMP_NUM_THREADS} cobaya-run  ./projects/example/EXAMPLE_EVALUATE1.yaml -f
         
-MCMC (we run with 32 cores):
+MCMC (we run MCMCs with 32 cores):
 
     mpirun -n 4 --oversubscribe --mca btl vader,tcp,self --bind-to core:overload-allowed --rank-by core --map-by numa:pe=${OMP_NUM_THREADS} cobaya-run ./projects/example/EXAMPLE_MCMC1.yaml -f
 
@@ -171,8 +172,8 @@ MCMC (we run with 32 cores):
 One model evaluation:
 
     mpirun -n 1 --oversubscribe --mca btl vader,tcp,self --bind-to core:overload-allowed --rank-by core --map-by numa:pe=${OMP_NUM_THREADS} cobaya-run ./projects/lsst_y1/EXAMPLE_EVALUATE1.yaml -f
-        
-MCMC (we run with 32 cores):
+
+MCMC (we run MCMCs with 32 cores):
 
     mpirun -n 4 --oversubscribe --mca btl vader,tcp,self --bind-to core:overload-allowed --rank-by core --map-by numa:pe=${OMP_NUM_THREADS} cobaya-run ./projects/lsst_y1/EXAMPLE_MCMC1.yaml -f
 
@@ -226,39 +227,34 @@ and
 > If users want to download a project not provided by default or intend to clone existing projects in development mode, check the appendix [FAQ: How do we download and run Cosmolike projects?](running_cosmolike_projects).
 > 
 
-## Examples with Machine Learning Emulator (not involving Cosmolike)
+## Running Examples based on Machine Learning emulators <a name="cobaya_base_code_examples_emul"></a>
 
-We have been introducing Machine Learning based emulators capable of simulating CMB and background data into CoCoa. To run them, we assume you have commented out the following lines (i.e, prevent these environmental keys from being set) on `set_installation_options.sh` before running the scripts `setup_cocoa.sh` and `compile_cocoa.sh`
+Cocoa contains a few transformer-based neural network emulators capable of simulating CMB, cosmolike, matter power spectrum and distances. We provide a few scripts that exemplify their API (they are implemented as a cobaya theory block replacing Class/CAMB). To run them, we assume you have commented out the following lines on `set_installation_options.sh` before running the scripts `setup_cocoa.sh` and `compile_cocoa.sh`
 
       [Adapted from Cocoa/set_installation_options.sh shell script] 
-     
-      # inset # symbol in the lines below (i.e., unset these keys)
-      #export IGNORE_EMULTRF_CODE=1 #SaraivanovZhongZhu (SZZ) transformer-based emul
+      # inset # symbol in the lines below (i.e., unset these environmental keys)
+      #export IGNORE_EMULTRF_CODE=1  #SaraivanovZhongZhu (SZZ) transformer-based emul
       #export IGNORE_EMULTRF_DATA=1  #SaraivanovZhongZhu (SZZ) transformer-based emul
-
-We also assume that you are still in the Conda cocoa environment from the previous `conda activate cocoa` command and that you are in the cocoa main folder `cocoa/Cocoa`, 
 
  **Step :one:**: Activate the private Python environment by sourcing the script `start_cocoa.sh`
 
     source start_cocoa.sh
 
- **Step :two:**: Select the number of OpenMP cores (our emulator greatly benefits from OpenMP threading up to approximately three cores).
+ **Step :two:**: Select the number of OpenMP cores (our emulator benefits from OpenMP threading up to approximately three cores).
     
     export OMP_PROC_BIND=close; export OMP_NUM_THREADS=3
 
- **Step :three:** The folder `projects/example` contains a few examples involving our transformed-based CMB emulator implemented as a cobaya theory block (replacing Class/CAMB). So, run the `cobaya-run` on the first emulator example following the commands below.
+ **Step :three:** So, run `cobaya-run` on the first emulator example following the commands below.
 
 One model evaluation:
 
     mpirun -n 1 --oversubscribe --mca btl vader,tcp,self --bind-to core:overload-allowed --rank-by core --map-by numa:pe=${OMP_NUM_THREADS} cobaya-run ./projects/lsst_y1/EXAMPLE_EVALUATE22.yaml -f
-
-We offer a direct comparison against CAMB at the same cosmology on `EXAMPLE_EVALUATE21.yaml`
         
-MCMC (we run with 16 cores):
+MCMC (we run MCMCs with 12 cores):
 
     mpirun -n 4 --oversubscribe --mca btl vader,tcp,self --bind-to core:overload-allowed --rank-by core --map-by numa:pe=${OMP_NUM_THREADS} cobaya-run ./projects/example/EXAMPLE_MCMC22.yaml -f
 
-PolyChord (we run with 32 cores):
+PolyChord (we run Nested Sampling with 24 cores):
 
     mpirun -n 8 --oversubscribe --mca btl vader,tcp,self --bind-to core:overload-allowed --rank-by core --map-by numa:pe=${OMP_NUM_THREADS} cobaya-run ./projects/example/EXAMPLE_POLY22.yaml -f
     
