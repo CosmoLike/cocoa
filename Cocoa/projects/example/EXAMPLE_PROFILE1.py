@@ -1,374 +1,228 @@
 import sys, platform, os
-sys.path.insert(0, os.environ['ROOTDIR'] + 
-                   '/external_modules/code/CAMB/build/lib.linux-x86_64-'
-                   +os.environ['PYTHON_VERSION'])
+from cobaya.theories.emulcmbtrf.emuprofile import EmulProfile
 import functools
 import numpy as np
 import ipyparallel
 import sys, platform, os
 import math
-import euclidemu2
 import scipy
 from getdist import IniFile
 import itertools
 import iminuit
-import camb
-import cosmolike_lsst_y1_interface as ci
 import copy
 import argparse
 import random
 import emcee
 import itertools
-
-# ------------------------------------------------------------------------------
-# ------------------------------------------------------------------------------
-# ------------------------------------------------------------------------------
-
-CLprobe="xi"
-path= os.environ['ROOTDIR'] + "/external_modules/data/lsst_y1"
-data_file="lsst_y1_M1_GGL0.05.dataset"
-
-IA_model = 0
-IA_redshift_evolution = 3
-
-# Init Cosmolike & Read LSST-Y1 data file
-ini = IniFile(os.path.normpath(os.path.join(path, data_file)))
-data_vector_file = ini.relativeFileName('data_file')
-cov_file = ini.relativeFileName('cov_file')
-mask_file = ini.relativeFileName('mask_file')
-ntheta = ini.int("n_theta")
-theta_min_arcmin = ini.float("theta_min_arcmin")
-theta_max_arcmin = ini.float("theta_max_arcmin")
-
-lens_file = ini.relativeFileName('nz_lens_file')
-
-source_file = ini.relativeFileName('nz_source_file')
-
-lens_ntomo = ini.int("lens_ntomo")
-
-source_ntomo = ini.int("source_ntomo")
-
-ci.initial_setup()
-
-ci.init_cosmo_runmode(is_linear=False)
-
-ci.init_source_sample(filename=source_file, ntomo_bins=int(source_ntomo))
-
-ci.init_lens_sample(filename=lens_file, ntomo_bins=int(lens_ntomo))
-
-ci.init_IA(ia_model=int(IA_model), ia_redshift_evolution=int(IA_redshift_evolution))
-
-# Init Cosmolike
-ci.init_probes(possible_probes=CLprobe)
-ci.init_binning(int(ntheta), theta_min_arcmin, theta_max_arcmin)
-ci.init_data_real(cov_file, mask_file, data_vector_file)
-
-# ------------------------------------------------------------------------------
-# ------------------------------------------------------------------------------
-# ------------------------------------------------------------------------------
-
-def get_camb_cosmology(omegam, omegab, H0, ns, As_1e9 , w, w0pwa, mnu,
-                       AccuracyBoost=1.0, kmax=10, k_per_logint=20, 
-                       CAMBAccuracyBoost=1.1, non_linear_emul=2):
-    As = lambda As_1e9: 1e-9 * As_1e9
-    wa = lambda w0pwa, w: w0pwa - w
-    omegabh2 = lambda omegab, H0: omegab*(H0/100)**2
-    omegach2 = lambda omegam, omegab, mnu, H0: (omegam-omegab)*(H0/100)**2-(mnu*(3.046/3)**0.75)/94.0708
-    omegamh2 = lambda omegam, H0: omegam*(H0/100)**2
-
-    CAMBAccuracyBoost = CAMBAccuracyBoost*AccuracyBoost
-    
-    kmax = max(kmax/2.0, kmax*(1.0 + 3*(AccuracyBoost-1)))
-    
-    k_per_logint = max(k_per_logint/2.0, int(k_per_logint) + int(3*(AccuracyBoost-1)))
-    
-    extrap_kmax = max(max(2.5e2, 3*kmax), max(2.5e2, 3*kmax) * AccuracyBoost)
-
-    z_interp_1D = np.concatenate( (np.concatenate((np.linspace(0,2.0,1000),
-                                                   np.linspace(2.0,10.1,200)),
-                                                   axis=0),
-                                   np.linspace(1080,2000,20)),
-                                   axis=0)
-    
-    z_interp_2D = np.concatenate(( np.linspace(0, 2.0, 95), 
-                                   np.linspace(2.25, 10, 5)),  
-                                 axis=0)
-
-    log10k_interp_2D = np.linspace(-4.2, 2.0, 1200)
-
-    pars = camb.set_params(H0=H0, 
-                           ombh2=omegabh2(omegab, H0), 
-                           omch2=omegach2(omegam, omegab, mnu, H0), 
-                           mnu=mnu, 
-                           omk=0, 
-                           tau=0.06,  
-                           As=As(As_1e9), 
-                           ns=ns, 
-                           halofit_version='takahashi', 
-                           lmax=10,
-                           AccuracyBoost=CAMBAccuracyBoost,
-                           lens_potential_accuracy=1.0,
-                           num_massive_neutrinos=1,
-                           nnu=3.046,
-                           accurate_massive_neutrino_transfers=False,
-                           k_per_logint=k_per_logint,
-                           kmax=kmax);
-    
-    pars.set_dark_energy(w=w, wa=wa(w0pwa, w), dark_energy_model='ppf');    
-    
-    pars.NonLinear = camb.model.NonLinear_both
-    
-    pars.set_matter_power(redshifts = z_interp_2D, kmax = kmax, silent = True);
-    
-    results = camb.get_results(pars)
-    
-    PKL  = results.get_matter_power_interpolator(var1="delta_tot", 
-                                                 var2="delta_tot", 
-                                                 nonlinear=False, 
-                                                 extrap_kmax=extrap_kmax, 
-                                                 hubble_units=False, 
-                                                 k_hunit=False);
-    
-    PKNL = results.get_matter_power_interpolator(var1="delta_tot", 
-                                                 var2="delta_tot",  
-                                                 nonlinear=True, 
-                                                 extrap_kmax=extrap_kmax, 
-                                                 hubble_units=False, 
-                                                 k_hunit=False);
-    
-    lnPL = np.empty(len(log10k_interp_2D)*len(z_interp_2D))
-    for i in range(len(z_interp_2D)):
-        lnPL[i::len(z_interp_2D)] = np.log(PKL.P(z_interp_2D[i], 
-                                                 np.power(10.0,log10k_interp_2D)))
-    lnPL  += np.log(((H0/100.)**3)) 
-    
-    lnPNL  = np.empty(len(log10k_interp_2D)*len(z_interp_2D))
-    if non_linear_emul == 1:
-        params = { 'Omm'  : omegam, 
-                   'As'   : As(As_1e9), 
-                   'Omb'  : omegab,
-                   'ns'   : ns, 
-                   'h'    : H0/100., 
-                   'mnu'  : mnu,  
-                   'w'    : w, 
-                   'wa'   : wa(w0pwa, w)
-                 }
-        kbt, bt = euclidemu2.get_boost(params, 
-                                       z_interp_2D, 
-                                       np.power(10.0, 
-                                                np.linspace(-2.0589, 
-                                                            0.973, 
-                                                            len(log10k_interp_2D)))
-                                      )
-        log10k_interp_2D = log10k_interp_2D - np.log10(H0/100.)
-        
-        for i in range(len(z_interp_2D)):    
-            lnbt = scipy.interpolate.interp1d(np.log10(kbt), 
-                                              np.log(bt[i]), 
-                                              kind = 'linear', 
-                                              fill_value = 'extrapolate', 
-                                              assume_sorted = True)(log10k_interp_2D)
-            lnbt[np.power(10,log10k_interp_2D) < 8.73e-3] = 0.0
-            lnPNL[i::len(z_interp_2D)] = lnPL[i::len(z_interp_2D)] + lnbt
-    elif non_linear_emul == 2:
-        for i in range(len(z_interp_2D)):
-            lnPNL[i::len(z_interp_2D)] = np.log(PKNL.P(z_interp_2D[i], 
-                                                       np.power(10.0,log10k_interp_2D)))            
-        log10k_interp_2D = log10k_interp_2D - np.log10(H0/100.)
-        lnPNL += np.log(((H0/100.)**3))
-
-    G_growth = np.sqrt(PKL.P(z_interp_2D,0.0005)/PKL.P(0,0.0005))
-    G_growth = G_growth*(1 + z_interp_2D)/G_growth[len(G_growth)-1]
-
-    chi = results.comoving_radial_distance(z_interp_1D, tol=1e-4) * (H0/100.)
-
-    return (log10k_interp_2D, z_interp_2D, lnPL, lnPNL, G_growth, z_interp_1D, chi)
-
-# ------------------------------------------------------------------------------
-# ------------------------------------------------------------------------------
-# ------------------------------------------------------------------------------
-
-def chi2(params, AccuracyBoost=1.0, non_linear_emul=2):
-
-    As_1e9 = params[0]
-    ns     = params[1]
-    H0     = params[2]
-    omegab = params[3]
-    omegam = params[4]
-    
-    DZ_S1  = params[5]
-    DZ_S2  = params[6]
-    DZ_S3  = params[7]
-    DZ_S4  = params[8]
-    DZ_S5  = params[9]    
-    
-    A1_1   = params[10] 
-    A1_2   = params[11]
-    
-    M1     = params[12]
-    M2     = params[13]
-    M3     = params[14]
-    M4     = params[15]
-    M5     = params[16]
-
-    w      = -0.9 
-    w0pwa  = -0.9
-    mnu    =  0.06
-
-    (log10k_interp_2D, z_interp_2D, lnPL, lnPNL, 
-        G_growth, z_interp_1D, chi) = get_camb_cosmology(omegam=omegam, 
-                                                         omegab=omegab, 
-                                                         H0=H0, 
-                                                         ns=ns, 
-                                                         As_1e9=As_1e9,
-                                                         w=w, 
-                                                         w0pwa=w0pwa, 
-                                                         mnu=mnu,
-                                                         AccuracyBoost=AccuracyBoost,
-                                                         non_linear_emul=non_linear_emul)
-    
-    ci.init_accuracy_boost(AccuracyBoost, 
-                           AccuracyBoost, 
-                           int(1+5*(AccuracyBoost-1)))
-    
-    ci.set_cosmology(omegam=omegam,
-                     H0=H0, 
-                     log10k_2D=log10k_interp_2D, 
-                     z_2D=z_interp_2D, 
-                     lnP_linear=lnPL,
-                     lnP_nonlinear=lnPNL,
-                     G=G_growth,
-                     z_1D=z_interp_1D,
-                     chi=chi)
-    
-    ci.set_nuisance_shear_calib(M=[M1, M2, M3, M4, M5])
-    
-    ci.set_nuisance_shear_photoz(bias=[DZ_S1, DZ_S2, DZ_S3, DZ_S4, DZ_S5])
-    
-    ci.set_nuisance_ia(A1   = [A1_1, A1_2, 0, 0, 0], 
-                       A2   = [0, 0, 0, 0, 0], 
-                       B_TA = [0, 0, 0, 0, 0])
-
-    datavector = np.array(ci.compute_data_vector_masked())
-    return ci.compute_chi2(datavector)
+from mflike import TTTEEE, BandpowerForeground
 
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
 
 x = np.array([
-                2.1,          # As
+                3.04,         # logA
                 0.96,         # ns
                 67.0,         # H0
-                0.04,         # omegab
-                0.30,         # omegam
-                0.04,         # S1
-                0.0016,       # S2
-                0.03,         # S3
-                -0.08,        # S4
-                -8.67127e-05, # S5
-                0.7,          # A11
-                -1.5,         # A12
-                0.001,        # M1
-                0.002,        # M2
-                0.003,        # M3
-                0.004,        # M4
-                0.001         # M5
+                0.02,         # omegabh2
+                .12,          # omegach2
+                0.05,         # tau
+                3.29,         # a_tSZ
+                1.60,         # a_kSZ
+                6.90,         # a_p
+                2.08,         # beta_p
+                4.90,         # a_c
+                2.20,         # beta_c
+                3.10,         # a_s
+                2.84,         # a_gtt
+                1.9e-01,      # xi
+                10.2,         # T_d
+                0.10,         # a_gte
+                5.31e-04,     # a_pste
+                9.8e-02,      # a_gee
+                0.0,          # a_psee
               ], dtype='float64')
 
 bounds = np.array([
-                    [1.95, 2.4],   # As
-                    [0.89, 1.05],  # ns 
-                    [55.0, 87.0],  # H0
-                    [0.027, 0.065], # omegab
-                    [0.22, 0.38],   # omegam
-                    [-0.12, 0.12], # S1
-                    [-0.12, 0.12], # S2
-                    [-0.12, 0.12], # S3
-                    [-0.12, 0.12], # S4
-                    [-0.12, 0.12], # S5
-                    [-4.5, 4.5],   # A11
-                    [-4.5, 4.5],   # A12
-                    [-0.12, 0.12], # M1
-                    [-0.12, 0.12], # M2
-                    [-0.12, 0.12], # M3
-                    [-0.12, 0.12], # M4
-                    [-0.12, 0.12]  # M5
+                    [1.61, 3.91],   # logAs
+                    [0.92, 1.05],   # ns 
+                    [60.0, 90.0],   # H0
+                    [0.01, 0.04],   # omegabh2
+                    [0.06, 0.20],   # omegach2
+                    [0.02, 0.09],   # tau
+                    [3.0, 3.6],     # a_tSZ
+                    [1.4, 1.8],     # a_kSZ
+                    [6.2, 7.6],     # a_p
+                    [1.8, 2.2],     # beta_p
+                    [4.4, 5.4],     # a_c
+                    [2.0, 2.4],     # beta_c
+                    [2.8, 3.4],     # a_s
+                    [1.5, 4.0],     # a_gtt
+                    [0.0, 0.2],     # xi
+                    [8.60, 10.60],  # T_d
+                    [0.20, 0.50],   # a_gte
+                    [-1.00, 1.00],  # a_pste
+                    [-0.05, 0.30],  # a_gee
+                    [0.00, 0.5],    # a_psee
                   ], dtype='float64')
 
 start = np.array([ 
-                    1.96,         # As
-                    0.90,         # ns 
-                    61.0,         # H0
-                    0.028,        # omegab
-                    0.25,         # omegam
-                    -0.20,        # S1
-                    -0.20,        # S2
-                    -0.20,        # S3
-                    -0.20,        # S4
-                    -0.20,        # S5                   
-                    -3.00,        # A11
-                    -3.00,        # A12
-                    -0.20,        # M1
-                    -0.20,        # M2
-                    -0.20,        # M3
-                    -0.20,        # M4
-                    -0.20         # M5
+                     2.974,      # logAs
+                     0.9439,     # ns 
+                     64.66,      # H0
+                     0.0216,     # omegabh2
+                     0.114,      # omegach2
+                     0.0252,     # tau
+                     3.0,        # a_tSZ
+                     1.4,        # a_kSZ
+                     6.2,        # a_p
+                     1.8,        # beta_p                  
+                     4.4,        # a_c
+                     2.0,        # beta_c
+                     2.8,        # a_s
+                     0.54,       # a_gtt
+                     0.0,        # xi
+                     8.60,       # T_d
+                     0.16,       # a_gte
+                    -0.5,        # a_pste
+                    -0.0,        # a_gee
+                    -0.20        # a_psee
                 ], dtype='float64')
 
 stop  = np.array([ 
-                    2.3,         # As
-                    1.04,         # ns
-                    78.0,         # H0
-                    0.05,         # omegab
-                    0.35,         # omegam
-                    0.20,         # S1
-                    0.20,         # S2
-                    0.20,         # S3
-                    0.20,         # S4                    
-                    0.20,         # S5                    
-                    3.00,         # A11
-                    3.00,         # A12
-                    0.20,         # M1
-                    0.20,         # M2
-                    0.20,         # M3
-                    0.20,         # M4
-                    0.20          # M5
+                    3.114,      # logAs
+                    0.9859,     # ns
+                    70.06,      # H0
+                    0.02312,    # omegabh2
+                    0.126,      # omegach2
+                    0.0836,     # tau
+                    3.6,        # a_tSZ
+                    1.8,        # a_kSZ
+                    7.6,        # a_p
+                    2.2,        # beta_p                  
+                    5.4,        # a_c
+                    2.4,        # beta_c
+                    3.4,        # a_s
+                    5.04,       # a_gtt
+                    0.2,        # xi
+                    10.60,      # T_d
+                    0.56,       # a_gte
+                    -0.5,       # a_pste
+                    0.3,        # a_gee
+                    0.20        # a_psee
                  ], dtype='float64')
 
 name  = [ 
-            "As",       # As
-            "ns",       # ns
-            "H0",       # H0
-            "omegab",   # omegab
-            "omm",      # omegam
-            "S1",       # S1
-            "S2",       # S2
-            "S3",       # S3
-            "S4",       # S4
-            "S5",       # S5          
-            "A11",      # A11
-            "A12",      # A12
-            "M1",       # M1
-            "M2",       # M2
-            "M3",       # M3
-            "M4",       # M4
-            "M5"        # M5
+            "logAs",     # As
+            "ns",        # ns
+            "H0",        # H0
+            "omegabh2",  # omegabh2
+            "omegach2",  # omegach2
+            "tau",       # tau
+            "a_tSZ",     # a_tSZ
+            "a_kSZ",     # a_kSZ
+            "a_p",       # a_p
+            "beta_p",    # beta_p          
+            "a_c",       # a_c
+            "beta_c",    # beta_c
+            "a_s",       # a_s
+            "a_gtt",     # a_gtt
+            "xi"         # xi
+            "T_d"        # T_d
+            "a_gte",     # a_gte
+            "a_pste"     # a_pste
+            "a_gee",     # a_gee
+            "a_psee"     # a_psee
         ]
+# ------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
+
+MKL = TTTEEE(
+    {
+        "data_folder": "simons_observatory/v0.8",
+        #"packages_path": packages_path,
+        "input_file": "LAT_simu_sacc_00044.fits",
+        "cov_Bbl_file": "data_sacc_w_covar_and_Bbl.fits",
+        "defaults": {
+            "polarizations": ['TT', 'TE', 'ET', 'EE'],
+            "scales": {
+                "TT": [50, 3002],
+                "TE": [50, 3002],
+                "ET": [50, 3002],
+                "EE": [50, 3002],
+            },
+            "symmetrize": False,
+        },
+        "lmax_theory": 5000
+    }
+)
+fg  = BandpowerForeground(MKL.get_fg_requirements())
+
+tmp='external_modules/data/emultrf/CMB_TRF/'
+emu=EmulProfile(ROOTDIR=os.environ.get("ROOTDIR") , 
+                ttfilename=tmp+'/chiTTAstautrf1dot2milnewlhcevansqrtrescalec16', 
+                tefilename=tmp+'/chiTEAstautrf1dot2milnewlhcevansqrtrescalec16', 
+                eefilename=tmp+'/chiEEAstautrf1dot2milnewlhcevansqrtrescalec16', 
+                ttextraname=tmp+'/extrainfo_lhs_tt_96.npy', 
+                teextraname=tmp+'/extrainfo_lhs_te_96.npy', 
+                eeextraname=tmp+'/extrainfo_lhs_ee_96.npy')
+
+def chi2(p):
+    NP = {
+        "T_effd": 19.6,
+        "beta_d": 1.5,
+        "beta_s": -2.5,
+        "alpha_s": 1,
+        "bandint_shift_LAT_93": 0,
+        "bandint_shift_LAT_145": 0,
+        "bandint_shift_LAT_225": 0,
+        "cal_LAT_93": 1,
+        "cal_LAT_145": 1,
+        "cal_LAT_225": 1,
+        "calG_all": 1,
+        "alpha_LAT_93": 0,
+        "alpha_LAT_145": 0,
+        "alpha_LAT_225": 0,
+    } | {
+        "a_tSZ": p[6],
+        "a_kSZ": p[7],
+        "a_p": p[8],
+        "beta_p": p[9],
+        "a_c": p[10],
+        "beta_c": p[11],
+        "a_s": p[12],
+        "T_d": p[15],
+        "a_gtt": p[13],
+        "xi": p[14],
+        "alpha_dT": -0.6,
+        "alpha_p": 1,
+        "alpha_tSZ": 0.,
+        "calT_LAT_93": 1,
+        "calT_LAT_145": 1,
+        "calT_LAT_225": 1,
+    } | {
+        "a_gte": p[16],
+        "a_pste": p[17],
+        "alpha_dE": -0.4
+    } | {
+        "a_gee": p[18],
+        "a_psee": p[19],
+        "alpha_dE": -0.4,
+        "calE_LAT_93": 1,
+        "calE_LAT_145": 1,
+        "calE_LAT_225": 1
+    }
+    #[ombh2, omch2, H0, tau, ns, logAs]
+    return -2 * (MKL.loglike(emu.get_Cl(
+        cmb_params=[p[3],p[4],p[2],p[5],p[1],p[0]]),
+        fg.get_foreground_model_totals(**NP),**NP)-MKL.logp_const)
 
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
 
 parser = argparse.ArgumentParser(prog='EXAMPLE_PROFILE1')
-
-parser.add_argument("--AB",
-                    dest="AccuracyBoost",
-                    help="Accuracy Boost of CAMB/Cosmolike calculation",
-                    type=float,
-                    nargs='?',
-                    const=1,
-                    default=1.1)
 
 parser.add_argument("--tol",
                     dest="tolerance",
@@ -384,7 +238,7 @@ parser.add_argument("--maxfeval",
                     type=int,
                     nargs='?',
                     const=1,
-                    default=50000)
+                    default=75000)
 
 parser.add_argument("--maxiter",
                     dest="maxiter",
@@ -400,20 +254,29 @@ parser.add_argument("--minmethod",
                     type=int,
                     nargs='?',
                     const=1,
-                    default=1)
+                    default=5)
+
+parser.add_argument("--root",
+                    dest="root",
+                    help="Name of the Output File",
+                    nargs='?',
+                    const=1,
+                    default="./projects/example/")
 
 parser.add_argument("--outroot",
                     dest="outroot",
                     help="Name of the Output File",
                     nargs='?',
-                    const=1)
+                    const=1,
+                    default="test.dat")
 
 parser.add_argument("--profile",
                     dest="profile",
                     help="Which Parameter to Profile",
                     type=int,
                     nargs='?',
-                    const=1)
+                    const=1,
+                    default=1)
 
 parser.add_argument("--mpi",
                     dest="mpi",
@@ -425,37 +288,37 @@ parser.add_argument("--mpi",
 # need to use parse_known_args because of mpifuture 
 args, unknown = parser.parse_known_args()
 
-non_linear_emul = 2
-AccuracyBoost   = args.AccuracyBoost
 tol             = args.tolerance
 maxfeval        = args.maxfeval
 maxiter         = args.maxiter
 min_method      = args.minmethod
-oroot           = "chains/" + args.outroot
+oroot           = args.root + "chains/" + args.outroot
 index           = args.profile
 nummpi          = args.mpi
 
-cov_file = 'EXAMPLE_MCMC1.covmat'
+cov_file = args.root + 'EXAMPLE_EVALUATE20.covmat'
 cov      = np.loadtxt(cov_file)
-# need to delete the w line
-cov = np.delete(cov, (5), axis=0)
-cov = np.delete(cov, (5), axis=1)
-cov = np.array(cov, dtype='float64')
+
+print(cov.shape)
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
 
-def min_chi2(x0, bounds, min_method, fixed=-1, AccuracyBoost=1.0, 
-             tol=0.01, maxfeval=3000, non_linear_emul=2, maxiter=10, cov=cov):
+def min_chi2(x0, 
+             bounds, 
+             min_method, 
+             fixed=-1, 
+             tol=0.01, 
+             maxfeval=3000, 
+             maxiter=10, 
+             cov=cov):
 
     def mychi2(params, *args):
         z, fixed, T = args
         params = np.array(params)
         if fixed > -1:
             params = np.insert(params, fixed, z)
-        res = chi2(params=params, 
-                   AccuracyBoost=AccuracyBoost, 
-                   non_linear_emul=non_linear_emul)/T
+        res = chi2(params=params)/T
         return res
 
     if fixed > -1:
@@ -490,10 +353,11 @@ def min_chi2(x0, bounds, min_method, fixed=-1, AccuracyBoost=1.0,
        def __init__(self, stepsize=0.2):
            self.cov = stepsize*cov
        def __call__(self, x):
+           print(self.cov.shape)
+           print(x.shape) 
            return np.random.multivariate_normal(x, self.cov, size=1)
 
     if min_method == 1:
-    
         x = copy.deepcopy(x0)
         tmp = iminuit.minimize(fun=mychi2, 
                                x0=x, 
@@ -523,7 +387,6 @@ def min_chi2(x0, bounds, min_method, fixed=-1, AccuracyBoost=1.0,
                                                                         'fatol'    : tol, 
                                                                         'maxfev'   : maxfeval,
                                                                         'maxiter'  : maxiter}})
-        
         x = copy.deepcopy(tmp.x)  
         tmp = iminuit.minimize(fun=mychi2, 
                                x0=x, 
@@ -536,7 +399,6 @@ def min_chi2(x0, bounds, min_method, fixed=-1, AccuracyBoost=1.0,
         result = [tmp.x, tmp.fun]
     
     elif min_method == 2:
-        
         x = copy.deepcopy(x0)
         tmp = iminuit.minimize(fun=mychi2, 
                                x0=x, 
@@ -559,9 +421,7 @@ def min_chi2(x0, bounds, min_method, fixed=-1, AccuracyBoost=1.0,
                                             visit=1.01, 
                                             accept=1, 
                                             initial_temp=5230.0, 
-                                            restart_temp_ratio=0.0002) 
-        
-        
+                                            restart_temp_ratio=0.0002)
         x = copy.deepcopy(tmp.x)  
         tmp = iminuit.minimize(fun=mychi2, 
                                x0=x, 
@@ -571,11 +431,9 @@ def min_chi2(x0, bounds, min_method, fixed=-1, AccuracyBoost=1.0,
                                tol=tol,
                                options = {'stra'  : 2, 
                                           'maxfun': int(maxfeval/3.0)})
-
         result = [tmp.x, tmp.fun]
-
+    
     elif min_method == 3:
-        
         tmp = scipy.optimize.shgo(func=mychi2, 
                                   args=args, 
                                   bounds=bounds,
@@ -593,9 +451,7 @@ def min_chi2(x0, bounds, min_method, fixed=-1, AccuracyBoost=1.0,
                                                                           'maxfev'   : maxfeval,
                                                                           'maxiter'  : maxiter}})
         result = [tmp.x, tmp.fun]
-    
     elif min_method == 4:
-    
         x = copy.deepcopy(x0)
         partial_samples = [x]
         partial = [mychi2(x, *args)]
@@ -610,12 +466,9 @@ def min_chi2(x0, bounds, min_method, fixed=-1, AccuracyBoost=1.0,
                                               'maxfun': maxfeval})
             partial_samples.append(tmp.x)
             partial.append(tmp.fun)
-            
             j = np.argmin(np.array(partial))
             x = GaussianStep(stepsize=0.005)(partial_samples[j])[0,:]
-            
             print(f"MN: i = {i}, chi2 = {partial[j]}, param = {args[0]}")
-        
         j = np.argmin(np.array(partial))
         result = [partial_samples[j], partial[j]]   
     
@@ -631,10 +484,12 @@ def min_chi2(x0, bounds, min_method, fixed=-1, AccuracyBoost=1.0,
         partial = []
 
         for i in range(5):
+            print(f"emcee: i = {i} begins")
+
             x = [] # Initial point
             for j in range(nwalkers):
                 x.append(GaussianStep(stepsize=stepsz[i])(x0)[0,:])
-            x = np.array(x, dtype='float64')
+            x = np.array(x,dtype='float64')
 
             GScov  = copy.deepcopy(cov)
             GScov *= temperature[i]*stepsz[i] 
@@ -686,10 +541,8 @@ def prf(x0, index, min_method, maxiter, maxfeval):
                     bounds=np.array(bounds, dtype='float64'), 
                     min_method=min_method, 
                     fixed=index, 
-                    AccuracyBoost=AccuracyBoost, 
                     tol=tol, 
                     maxfeval=maxfeval, 
-                    non_linear_emul=non_linear_emul, 
                     maxiter=maxiter)
     return res
 
@@ -704,10 +557,9 @@ if __name__ == '__main__':
     
     print(f"min_method={min_method}, maxiter={maxiter}, maxfeval={maxfeval}, tol={tol}, param={index}")
 
-    executor = MPIPoolExecutor()
-
-    param = np.linspace(start=start[index], stop=stop[index], num=nummpi)
+#    executor = MPIPoolExecutor()
     
+    param = np.linspace(start=start[index], stop=stop[index], num=nummpi)
     print(f"profile param values = {param}")
 
     x0 = []
@@ -717,7 +569,8 @@ if __name__ == '__main__':
         x0.append(tmp)
     x0 = np.array(x0, dtype=object)
 
-    res = np.array(list(executor.map(functools.partial(prf,
+#    res = np.array(list(executor.map(functools.partial(prf,
+    res = np.array(list(map(functools.partial(prf,
                                                        index=index, 
                                                        min_method=min_method,
                                                        maxiter=maxiter,
@@ -734,17 +587,23 @@ if __name__ == '__main__':
         for i in range(nummpi):
             x0.append(np.insert(res[i,0], index, param[i]))
         x0 = np.array(x0, dtype=object)
-
         res = np.array(list(executor.map(functools.partial(prf,
                                                            index=index, 
                                                            min_method=4,
                                                            maxiter=maxiter,
                                                            maxfeval=int(2500)),
                                          x0)))
-
         rnd = random.randint(0,1000)
         out = oroot + "_" + str(rnd) + "_method_" + str(4) + "_" + name[index] + ".txt"
         print("Output file = ", out)
         np.savetxt(out, np.c_[param, res[:,1]])
-    
-    executor.shutdown()
+
+#    executor.shutdown()
+
+
+#mpirun -n 10 python -m mpi4py.futures ./projects/example/EXAMPLE_PROFILE1.py --tol 0.02 --profile 1 --maxiter 5 --maxfeval 100 --mpi 10 --outroot "test1" --minmethod 5 
+
+#mpirun -n ${SLURM_NTASKS} --oversubscribe --mca btl vader,tcp,self \
+#  --bind-to core:overload-allowed --map-by numa:pe=${OMP_NUM_THREADS} \
+#  python -m mpi4py.futures EXAMPLE_PROFILE1.py --AB 1.0 --tol 0.02 --profile 1 \
+#  --maxiter 5 --maxfeval 10000 --mpi ${tmp} --outroot "monday" --minmethod 1
