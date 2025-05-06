@@ -219,7 +219,7 @@ and
 
 ## Running Examples based on Machine Learning emulators <a name="cobaya_base_code_examples_emul"></a>
 
-Cocoa contains a few transformer-based neural network emulators capable of simulating CMB, cosmolike, matter power spectrum and distances. We provide a few scripts that exemplify their API (they are implemented as a cobaya theory block replacing Class/CAMB). To run them, we assume you have commented out the following lines on `set_installation_options.sh` before running the scripts `setup_cocoa.sh` and `compile_cocoa.sh`
+Cocoa contains a few transformer-based neural network emulators capable of simulating CMB, cosmolike, matter power spectrum and distances. We provide a few scripts that exemplify their API. To run them, we assume users have commented out the following lines on `set_installation_options.sh` prior to running the `setup_cocoa.sh` and `compile_cocoa.sh` installation scripts.
 
       [Adapted from Cocoa/set_installation_options.sh shell script] 
       # inset # symbol in the lines below (i.e., unset these environmental keys)
