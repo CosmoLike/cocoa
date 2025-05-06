@@ -70,16 +70,6 @@ Users can now proceed to **step :two:**.
 > [!TIP]
 > Users not working on an HPC environment that offers Anaconda or [Miniconda](https://docs.anaconda.com/miniconda/) may want to check the appendix [FAQ: What if there is no Conda? Miniconda installation](#overview_miniconda).
 
-> [!TIP]
-> We provide the YML file `cocoapy310.yml` so users can work on Python 3.10. In this setup, users must also modify the following flag `PYTHON_VERSION` on the shell script `set_installation_options.sh` before proceeding further with the Cocoa installation.
->
->     [Adapted from Cocoa/set_installation_options.sh shell script] 
->     # ------------------------------------------------------------------------------
->     # Adopted Python version -------------------------------------------------------
->     # ------------------------------------------------------------------------------
->     export PYTHON_VERSION=3.9
-
-
 **Step :two:**: Install `git-lfs` when loading the Conda cocoa environment for the first time.
 
     git-lfs install
