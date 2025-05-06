@@ -92,7 +92,6 @@ Users can now proceed to **step :two:**.
 
     "${CONDA_PREFIX}"/bin/git clone --depth 1 https://github.com/CosmoLike/cocoa.git --branch v4.0-beta21 cocoa
 
-
 and
 
     cd ./cocoa/Cocoa
@@ -100,7 +99,7 @@ and
 Users can now proceed to **step :two:**.
 
 > [!TIP]
-> If users want to clone the latest commit (not advisable), then clone the repository with the following command 
+> If you want to clone the latest commit, then clone the repository with the following command 
 >
 > (SSH)
 > 
@@ -111,7 +110,7 @@ Users can now proceed to **step :two:**.
 >     "${CONDA_PREFIX}"/bin/git clone https://github.com/CosmoLike/cocoa.git cocoa
 
 > [!TIP]
-> If users want to develop Cocoa from a release version (e.g., `v4.0-beta17`), check the appendix [FAQ: How do we push changes to the Cocoa main branch? A few git hacks](#push_main)
+> If you want to develop Cocoa from a release version (e.g., `v4.0-beta20`), then check the appendix [FAQ: How do we push changes to the Cocoa main branch? A few git hacks](#push_main)
 
 **Step :two:**: Run the script `setup_cocoa.sh` via
         
@@ -120,15 +119,14 @@ Users can now proceed to **step :two:**.
 > [!NOTE]
 > This script downloads and decompresses external modules, requiring internet access to run successfully.
 
-> [!Tip]
-> If users run `setup_cocoa.sh` more than once, Cocoa will not download (git clone) previously installed packages or remake the Cocoa private Python environment. To overwrite this behavior, users must set the key `OVERWRITE_EXISTING_ALL_PACKAGES` on the `set_installation_options.sh` shell script. Even with this key activated, Cocoa will not download large datasets again (e.g., ACT-DR6). Users must also set the key `REDOWNLOAD_EXISTING_ALL_DATA` to enable this additional behavior. These two optimizations prevent Cocoa from downloading several gigabytes repeatedly. 
-
+> [!NOTE]
+> If you run `setup_cocoa.sh` more than once, Cocoa will not download (git clone) previously installed packages or recreate the Cocoa private Python environment. To overwrite this behavior, you must set the key `OVERWRITE_EXISTING_ALL_PACKAGES` on `set_installation_options.sh`. Even with this optimization disabled, Cocoa will not download large datasets repeatedly unless the key `REDOWNLOAD_EXISTING_ALL_DATA` is also exported.
 
 **Step :three:**: Run the script `compile_cocoa.sh` by typing 
 
     source compile_cocoa.sh
     
-This script compiles external modules selected for installation on the `set_installation_options.sh` shell script (e.g., CAMB and Class). 
+This script compiles external modules selected for installation on `set_installation_options.sh` (e.g., CAMB and Class). 
 
 > [!NOTE]
 > In some HPC environments, the compute nodes cannot access the web. So, by design, the script `compile_cocoa.sh` does not require internet access to run successfully. Code compilation is a CPU-intensive operation, so running  `compile_cocoa.sh` on a cluster login node can be against HPC policy. Users should then run `setup_cocoa.sh` in a login node and `compile_cocoa.sh` in a compute node.
