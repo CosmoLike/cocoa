@@ -79,7 +79,6 @@ Users can now proceed to **step :two:**.
 >     export PYTHON_VERSION=3.9
 
 
-
 **Step :two:**: Install `git-lfs` when loading the Conda cocoa environment for the first time.
 
     git-lfs install
@@ -163,7 +162,7 @@ One model evaluation:
 
     mpirun -n 1 --oversubscribe --mca btl vader,tcp,self --bind-to core:overload-allowed --rank-by core --map-by numa:pe=${OMP_NUM_THREADS} cobaya-run  ./projects/example/EXAMPLE_EVALUATE1.yaml -f
         
-MCMC:
+MCMC (we run with 32 cores):
 
     mpirun -n 4 --oversubscribe --mca btl vader,tcp,self --bind-to core:overload-allowed --rank-by core --map-by numa:pe=${OMP_NUM_THREADS} cobaya-run ./projects/example/EXAMPLE_MCMC1.yaml -f
 
@@ -175,7 +174,7 @@ One model evaluation:
 
     mpirun -n 1 --oversubscribe --mca btl vader,tcp,self --bind-to core:overload-allowed --rank-by core --map-by numa:pe=${OMP_NUM_THREADS} cobaya-run ./projects/lsst_y1/EXAMPLE_EVALUATE1.yaml -f
         
-MCMC:
+MCMC (we run with 32 cores):
 
     mpirun -n 4 --oversubscribe --mca btl vader,tcp,self --bind-to core:overload-allowed --rank-by core --map-by numa:pe=${OMP_NUM_THREADS} cobaya-run ./projects/lsst_y1/EXAMPLE_MCMC1.yaml -f
 
@@ -190,7 +189,7 @@ and
 and
 
     mpirun -n ${NMPI} --oversubscribe --mca btl vader,tcp,self --bind-to core:overload-allowed --rank-by core --map-by numa:pe=${OMP_NUM_THREADS} python -m mpi4py.futures EXAMPLE_PROFILE1.py --mpi $((${NMPI}-1)) --profile 1 --tol 0.05 --AB 1.0 --outroot 'profile' --minmethod 5 --maxiter 1 --maxfeval 250 
-      
+ 
 > [!TIP]
 > To run Jupyter Notebook, assuming cocoa is installed on a local machine, type, after step 2️⃣, the command 
 > 
@@ -228,6 +227,43 @@ and
 > [!TIP]
 > If users want to download a project not provided by default or intend to clone existing projects in development mode, check the appendix [FAQ: How do we download and run Cosmolike projects?](running_cosmolike_projects).
 > 
+
+## Examples with Machine Learning Emulator (not involving Cosmolike)
+
+We have been introducing Machine Learning based emulators capable of simulating CMB and background data into CoCoa. To run them, we assume you have commented out the following lines (i.e, prevent these environmental keys from being set) on `set_installation_options.sh` before running the scripts `setup_cocoa.sh` and `compile_cocoa.sh`
+
+      [Adapted from Cocoa/set_installation_options.sh shell script] 
+     
+      # inset # symbol in the lines below (i.e., unset these keys)
+      #export IGNORE_EMULTRF_CODE=1 #SaraivanovZhongZhu (SZZ) transformer-based emul
+      #export IGNORE_EMULTRF_DATA=1  #SaraivanovZhongZhu (SZZ) transformer-based emul
+
+We also assume that you are still in the Conda cocoa environment from the previous `conda activate cocoa` command and that you are in the cocoa main folder `cocoa/Cocoa`, 
+
+ **Step :one:**: Activate the private Python environment by sourcing the script `start_cocoa.sh`
+
+    source start_cocoa.sh
+
+ **Step :two:**: Select the number of OpenMP cores (our emulator greatly benefits from OpenMP threading up to approximately three cores).
+    
+    export OMP_PROC_BIND=close; export OMP_NUM_THREADS=3
+
+ **Step :three:** The folder `projects/example` contains a few examples involving our transformed-based CMB emulator implemented as a cobaya theory block (replacing Class/CAMB). So, run the `cobaya-run` on the first emulator example following the commands below.
+
+One model evaluation:
+
+    mpirun -n 1 --oversubscribe --mca btl vader,tcp,self --bind-to core:overload-allowed --rank-by core --map-by numa:pe=${OMP_NUM_THREADS} cobaya-run ./projects/lsst_y1/EXAMPLE_EVALUATE22.yaml -f
+
+We offer a direct comparison against CAMB at the same cosmology on `EXAMPLE_EVALUATE21.yaml`
+        
+MCMC (we run with 16 cores):
+
+    mpirun -n 4 --oversubscribe --mca btl vader,tcp,self --bind-to core:overload-allowed --rank-by core --map-by numa:pe=${OMP_NUM_THREADS} cobaya-run ./projects/example/EXAMPLE_MCMC22.yaml -f
+
+PolyChord (we run with 32 cores):
+
+    mpirun -n 8 --oversubscribe --mca btl vader,tcp,self --bind-to core:overload-allowed --rank-by core --map-by numa:pe=${OMP_NUM_THREADS} cobaya-run ./projects/example/EXAMPLE_POLY22.yaml -f
+    
 ## Appendix <a name="appendix"></a>
 
 ### Credits <a name="appendix_proper_credits"></a>
