@@ -121,7 +121,7 @@ Users can now proceed to **step :two:**.
 > This script downloads and decompresses external modules, requiring internet access to run successfully.
 
 > [!NOTE]
-> If you run `setup_cocoa.sh` more than once, Cocoa will not download (git clone) previously installed packages or recreate the Cocoa private Python environment. To overwrite this behavior, you must set the key `OVERWRITE_EXISTING_ALL_PACKAGES` on `set_installation_options.sh`. Even with this optimization disabled, Cocoa will not download large datasets repeatedly unless the key `REDOWNLOAD_EXISTING_ALL_DATA` is also exported.
+> If you run `setup_cocoa.sh` more than once, Cocoa will not download previously installed packages. To overwrite this behavior, export the key `OVERWRITE_EXISTING_ALL_PACKAGES` on `set_installation_options.sh`. Even with this optimization disabled, Cocoa will not download large datasets repeatedly unless the key `REDOWNLOAD_EXISTING_ALL_DATA` is also set.
 
 **Step :three:**: Run the script `compile_cocoa.sh` by typing 
 
@@ -151,7 +151,7 @@ We assume that you are still in the Conda cocoa environment from the previous `c
     export OMP_PROC_BIND=close; export OMP_NUM_THREADS=8
 
 > [!NOTE]
-> `OMP_PROC_BIND=close` bound OpenMP threads to physically close cores (within the same chiplet on chiplet-based architectures). Threads running across different chiplets may suffer from (1) Higher latency when accessing shared data, (2) Lower memory bandwidth, and (3) Reduced cache efficiency.
+> `OMP_PROC_BIND=close` bound OpenMP threads to physically close cores (within the same chiplet on chiplet-based architectures).
 
 ### Examples not involving Cosmolike
 
