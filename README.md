@@ -65,7 +65,7 @@ and create symbolic links that will give better names for the GNU compilers
 Users can now proceed to **step :two:**. 
 
 > [!TIP]
-> To install the Cocoa environment on a supercomputer, users may take advantage of the fact that many HPC environments provide the [Anaconda installer](https://www.anaconda.com) as an external module. Check the appendix [FAQ: How do we use an available Anaconda module on HPC?](#overview_anaconda).
+> To install the cocoa conda environment on a supercomputer, users may take advantage of the fact that many HPC environments provide the [Anaconda installer](https://www.anaconda.com) as an external module. Check the appendix [FAQ: How do we use an available Anaconda module on HPC?](#overview_anaconda).
 
 > [!TIP]
 > Users not working on an HPC environment that offers Anaconda or [Miniconda](https://docs.anaconda.com/miniconda/) may want to check the appendix [FAQ: What if there is no Conda? Miniconda installation](#overview_miniconda).
@@ -79,7 +79,7 @@ Users can now proceed to **step :two:**.
 
 ## Installation and Compilation of external modules <a name="cobaya_base_code"></a>
 
-**Step :one:**: Download Cocoa's latest release and go to the `cocoa` main folder,
+**Step :one:**: Download cocoa's latest release and go to the `cocoa` main folder,
 
     "${CONDA_PREFIX}"/bin/git clone --depth 1 https://github.com/CosmoLike/cocoa.git --branch v4.0-beta21 cocoa
 
@@ -101,7 +101,7 @@ Users can now proceed to **step :two:**.
 >     "${CONDA_PREFIX}"/bin/git clone https://github.com/CosmoLike/cocoa.git cocoa
 
 > [!TIP]
-> If you want to develop Cocoa from a release version (e.g., `v4.0-beta20`), then check the appendix [FAQ: How do we push changes to the Cocoa main branch? A few git hacks](#push_main)
+> If you want to develop from a release version (e.g., `v4.0-beta20`), check the appendix [FAQ: How do we push changes to the Cocoa main branch? A few git hacks](#push_main)
 
 **Step :two:**: Run the script `setup_cocoa.sh` via
         
@@ -111,7 +111,7 @@ Users can now proceed to **step :two:**.
 > This script downloads and decompresses external modules, requiring internet access to run successfully.
 
 > [!NOTE]
-> If you run `setup_cocoa.sh` more than once, Cocoa will not download previously installed packages. To overwrite this behavior, export the key `OVERWRITE_EXISTING_ALL_PACKAGES` on `set_installation_options.sh`. Even with this optimization disabled, Cocoa will not download large datasets repeatedly unless the key `REDOWNLOAD_EXISTING_ALL_DATA` is also set.
+> If you run `setup_cocoa.sh` multiple times, Cocoa will not download previously installed packages. To overwrite this behavior, export the key `OVERWRITE_EXISTING_ALL_PACKAGES` on `set_installation_options.sh`. Even with this optimization disabled, cocoa will not download large datasets repeatedly unless the key `REDOWNLOAD_EXISTING_ALL_DATA` is also set.
 
 **Step :three:**: Run the script `compile_cocoa.sh` by typing 
 
