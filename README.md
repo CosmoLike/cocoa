@@ -230,7 +230,7 @@ Cocoa contains a few transformer-based neural network emulators capable of simul
 
     source start_cocoa.sh
 
- **Step :two:**: Select the number of OpenMP cores (our emulator benefits from OpenMP threading up to approximately three cores).
+ **Step :two:**: Select the number of OpenMP cores (emulators also benefit from OpenMP threading).
     
     export OMP_PROC_BIND=close; export OMP_NUM_THREADS=3
 
