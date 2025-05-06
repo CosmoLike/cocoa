@@ -304,7 +304,7 @@ export COSMOPOWER_URL="https://github.com/alessiospuriomancini/cosmopower.git"
 export COSMOPOWER_GIT_COMMIT="7cac5e71c975c06257b2f95f0dcea5dd09b0f45f"
 
 export EMULTRF_URL="https://github.com/CosmoLike/emulators_code.git"
-export EMULTRF_GIT_COMMIT="42d76584ee0f76ff5be485ed272748ed2a52726c"
+export EMULTRF_GIT_COMMIT="d327aa0de477f68933d2e43ffec2eff19ff66709"
 
 export EMULTRF_DATA_URL="https://github.com/CosmoLike/emulators_data.git"
 export EMULTRF_DATA_GIT_COMMIT="d84aa6bcae5c115a07c4c4e6f5f302399ca4286a"
