@@ -3,8 +3,8 @@
 #SBATCH --job-name=EP1
 #SBATCH --output=EP1-%A_%a.out
 #SBATCH --nodes=1
-#SBATCH --ntasks=90
-#SBATCH --ntasks-per-node=90
+#SBATCH --ntasks=91
+#SBATCH --ntasks-per-node=91
 #SBATCH --cpus-per-task=1
 #SBATCH --time=60:00:00
 #SBATCH --partition=standard
