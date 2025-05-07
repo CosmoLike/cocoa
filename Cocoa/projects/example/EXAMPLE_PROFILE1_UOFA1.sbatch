@@ -2,11 +2,11 @@
 
 #SBATCH --job-name=EP1
 #SBATCH --output=EP1-%A_%a.out
-#SBATCH --nodes=1
-#SBATCH --ntasks=40
-#SBATCH --ntasks-per-node=25
-#SBATCH --cpus-per-task=2
-#SBATCH --time=120:00:00
+#SBATCH --nodes=3
+#SBATCH --ntasks=90
+#SBATCH --ntasks-per-node=30
+#SBATCH --cpus-per-task=3
+#SBATCH --time=60:00:00
 #SBATCH --partition=standard
 #SBATCH --account=cosmolike
 #SBATCH --exclusive
@@ -39,7 +39,7 @@ export tmp=$((${SLURM_NTASKS}-1))
 cd $SLURM_SUBMIT_DIR
 
 mpirun -n ${SLURM_NTASKS} --oversubscribe --mca btl vader,tcp,self \
-  --bind-to core:overload-allowed --map-by numa:pe=${OMP_NUM_THREADS} \
+  --bind-to core:overload-allowed --map-by core:pe=${OMP_NUM_THREADS} \
   python -m mpi4py.futures$SLURM_SUBMIT_DIR/projects/example/EXAMPLE_PROFILE1.py \
   --tol 0.05 --profile 1 --maxiter 5 --maxfeval 10000 --mpi tmp \
   --outroot "testpr1" --minmethod 1 --factor 4

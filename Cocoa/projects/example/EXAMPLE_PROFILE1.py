@@ -513,7 +513,6 @@ if __name__ == '__main__':
     x0 = np.array(x0, dtype=object)
 
     res = np.array(list(executor.map(functools.partial(prf,
-#    res = np.array(list(map(functools.partial(prf,
                                                        index=index, 
                                                        min_method=min_method,
                                                        maxiter=maxiter,
@@ -541,13 +540,3 @@ if __name__ == '__main__':
         print("Output file = ", out)
         np.savetxt(out, np.c_[param, res[:,1]])
     executor.shutdown()
-
-
-#mpirun -n 10 python -m mpi4py.futures ./projects/example/EXAMPLE_PROFILE1.py \
-#--tol 0.02 --profile 1 --maxiter 5 --maxfeval 20000 --mpi 10 \
-#--outroot "test1" --minmethod 5 
-
-#mpirun -n ${SLURM_NTASKS} --oversubscribe --mca btl vader,tcp,self \
-#  --bind-to core:overload-allowed --map-by numa:pe=${OMP_NUM_THREADS} \
-#  python -m mpi4py.futures EXAMPLE_PROFILE1.py --AB 1.0 --tol 0.02 --profile 1 \
-#  --maxiter 5 --maxfeval 10000 --mpi ${tmp} --outroot "monday" --minmethod 1 --factor 2
