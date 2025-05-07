@@ -41,13 +41,13 @@ This readme file presents basic and advanced instructions for installing all [Co
 
 Core packages include compilers and numerical libraries (e.g., GSL and FFTW) that users typically never modify. We install most of these core packages via Conda, as shown below.
 
-**Step :one:**: Download the file `cocoapy39.yml` yml file
+**Step :one:**: Download the file `cocoapy310.yml` yml file
 
-    wget https://raw.githubusercontent.com/CosmoLike/cocoa/dev/cocoapy10.yml
+    wget https://raw.githubusercontent.com/CosmoLike/cocoa/dev/cocoapy310.yml
 
 create the cocoa environment,
 
-    conda env create --name cocoa --file=cocoapy10.yml
+    conda env create --name cocoa --file=cocoapy310.yml
 
 activate it
 
@@ -239,7 +239,7 @@ Cocoa contains a few transformer-based neural network emulators capable of simul
 
 One model evaluation:
 
-    mpirun -n 1 --oversubscribe --mca pml ^ucx --mca btl vader,tcp,self --bind-to core:overload-allowed --rank-by slot --map-by numa:pe=${OMP_NUM_THREADS} cobaya-run ./projects/lsst_y1/EXAMPLE_EVALUATE22.yaml -f
+    mpirun -n 1 --oversubscribe --mca pml ^ucx --mca btl vader,tcp,self --bind-to core:overload-allowed --rank-by slot --map-by numa:pe=${OMP_NUM_THREADS} cobaya-run ./projects/example/EXAMPLE_EVALUATE22.yaml -f
         
 MCMC (we run MCMCs with 12 cores):
 
