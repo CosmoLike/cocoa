@@ -231,9 +231,9 @@ Cocoa contains a few transformer-based neural network emulators capable of simul
 
     source start_cocoa.sh
 
- **Step :two:**: Select the number of OpenMP cores (emulators also benefit from OpenMP threading).
+ **Step :two:**: Select the number of OpenMP cores (no need to thread via OpenMP).
     
-    export OMP_PROC_BIND=close; export OMP_NUM_THREADS=3
+    export OMP_PROC_BIND=close; export OMP_NUM_THREADS=1
 
  **Step :three:** So, run `cobaya-run` on the first emulator example following the commands below.
 

@@ -40,7 +40,7 @@ cd $SLURM_SUBMIT_DIR
 
 mpirun -n ${SLURM_NTASKS} --oversubscribe --mca btl vader,tcp,self \
   --bind-to core:overload-allowed --map-by core:pe=${OMP_NUM_THREADS} \
-  python -m mpi4py.futures$SLURM_SUBMIT_DIR/projects/example/EXAMPLE_PROFILE1.py \
+  python -m mpi4py.futures $SLURM_SUBMIT_DIR/projects/example/EXAMPLE_PROFILE1.py \
   --tol 0.05 --profile 1 --maxiter 5 --maxfeval 10000 --mpi tmp \
   --outroot "testpr1" --minmethod 1 --factor 4
 
