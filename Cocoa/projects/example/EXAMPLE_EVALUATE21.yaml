@@ -116,7 +116,9 @@ params:
   A:
     derived: 'lambda As: 1e9*As'
     latex: 10^9 A_\mathrm{s}
-
+  thetastar:
+    latex: 100\theta_*
+    
 theory:
   camb:
     path: ./external_modules/code/CAMB
