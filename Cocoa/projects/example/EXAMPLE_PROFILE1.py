@@ -25,7 +25,7 @@ x = np.array([
                 0.96,         # ns
                 67.0,         # H0
                 0.02,         # omegabh2
-                .12,          # omegach2
+                0.12,         # omegach2
                 0.05,         # tau
                 3.29,         # a_tSZ
                 1.60,         # a_kSZ
@@ -153,8 +153,6 @@ def chi2(p):
     result= -2 * (MKL.loglike(emu.get_Cl(
         cmb_params=[p[3],p[4],p[2],p[5],p[1],p[0]]),
         fg.get_foreground_model_totals(**NP),**NP)-MKL.logp_const)
-
-    #print(p[0], p[1], p[2], p[3], p[4], p[5], result)
     return result
 
 # ------------------------------------------------------------------------------
