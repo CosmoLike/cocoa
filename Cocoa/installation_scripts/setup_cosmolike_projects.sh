@@ -207,7 +207,7 @@ fi
 # -------------------------- ROMAN_FOURIER ------------------------------------
 # ----------------------------------------------------------------------------
 
-if [ -z "${IGNORE_COSMOLIKE_DES_Y3_CODE}" ]; then 
+if [ -z "${IGNORE_COSMOLIKE_ROMAN_FOURIER_CODE}" ]; then 
   
   # Name to be printed on this shell script messages
   PRINTNAME="ROMAN_FOURIER"
@@ -224,6 +224,33 @@ if [ -z "${IGNORE_COSMOLIKE_DES_Y3_CODE}" ]; then
     gitact1 "${FOLDER:?}" "${URL:?}" "${ROMAN_FOURIER_BRANCH:?}" || return 1
   elif [ -n "${ROMAN_FOURIER_TAG}" ]; then 
     gitact3 "${FOLDER:?}" "${URL:?}" "${ROMAN_FOURIER_TAG:?}" || return 1
+  fi
+
+  pbottom "GETTING ${PRINTNAME:?}" || return 1
+
+fi
+
+# ----------------------------------------------------------------------------
+# ---------------------------- ROMAN_REAL ------------------------------------
+# ----------------------------------------------------------------------------
+
+if [ -z "${IGNORE_COSMOLIKE_ROMAN_REAL_CODE}" ]; then 
+  
+  # Name to be printed on this shell script messages
+  PRINTNAME="ROMAN_REAL"
+
+  ptop "GETTING ${PRINTNAME:?}" || return 1
+
+  FOLDER="${ROMAN_REAL_NAME:-"roman_fourier"}"
+
+  URL="${ROMAN_REAL_URL:-"git@github.com:CosmoLike/cocoa_roman_fourier.git"}"
+
+  if [ -n "${ROMAN_REAL_COMMIT}" ]; then
+    gitact2 "${FOLDER:?}" "${URL:?}" "${ROMAN_REAL_COMMIT:?}"  || return 1
+  elif [ -n "${ROMAN_REAL_BRANCH}" ]; then 
+    gitact1 "${FOLDER:?}" "${URL:?}" "${ROMAN_REAL_BRANCH:?}" || return 1
+  elif [ -n "${ROMAN_REAL_TAG}" ]; then 
+    gitact3 "${FOLDER:?}" "${URL:?}" "${ROMAN_REAL_TAG:?}" || return 1
   fi
 
   pbottom "GETTING ${PRINTNAME:?}" || return 1

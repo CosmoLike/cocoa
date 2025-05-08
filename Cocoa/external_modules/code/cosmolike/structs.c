@@ -130,7 +130,13 @@ void reset_tomo_struct()
 {
   tomo.shear_Npowerspectra = 0;
   tomo.clustering_Npowerspectra = 0;
-  tomo.ggl_Npowerspectra = 0; 
+  tomo.ggl_Npowerspectra = 0;
+  if (tomo.ggl_exclude != NULL)
+  {
+    free(tomo.ggl_exclude);
+    tomo.ggl_exclude = NULL;
+  }
+  tomo.N_ggl_exclude = 0;
 }
 
 void reset_redshift_struct()

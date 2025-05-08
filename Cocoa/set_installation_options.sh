@@ -64,9 +64,11 @@ export IGNORE_MGCAMB_CODE=1
 #export IGNORE_EMULTRF_CODE=1 #SaraivanovZhongZhu (SZZ) transformer-based emul
 export IGNORE_COSMOPOWER_CODE=1
 #export IGNORE_EUCLID_EMULATOR_V2_CODE=1
+
 #export IGNORE_COSMOLIKE_LSSTY1_CODE=1
-export IGNORE_COSMOLIKE_DES_Y3_CODE=1
+#export IGNORE_COSMOLIKE_DES_Y3_CODE=1
 #export IGNORE_COSMOLIKE_ROMAN_FOURIER_CODE=1
+export IGNORE_COSMOLIKE_ROMAN_REAL_CODE=1
 
 # ------------------------------------------------------------------------------
 # If OVERWRITE_EXISTING_XXX_CODE=1, the setup_cocoa overwrites existing PACKAGES
@@ -327,9 +329,11 @@ export DES_Y3_TAG="v4.0-beta17"
 
 export ROMAN_FOURIER_URL="git@github.com:CosmoLike/cocoa_roman_fourier.git"
 export ROMAN_FOURIER_NAME="roman_fourier"
-export ROMAN_FOURIER_BRANCH="vivian"
-#export ROMAN_FOURIER_COMMIT="ac5ad1dfe05193e3334d9da76bdb32d73fecad63"
-#export ROMAN_FOURIER_TAG="v4.0-beta17"
+export ROMAN_FOURIER_COMMIT="fedf918298d3c2c700b12dbe98a956de508a48f8"
+
+export ROMAN_REAL_URL="git@github.com:CosmoLike/cocoa_roman_real.git"
+export ROMAN_REAL_NAME="roman_real"
+export ROMAN_REAL_COMMIT="2bfb0c28f1d4f4f22f8750b5d85789ff13633b2a"
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------

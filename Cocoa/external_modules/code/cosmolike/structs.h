@@ -357,6 +357,8 @@ typedef struct
   int shear_Npowerspectra;       // number of shear-shear tomography power spectra
   int ggl_Npowerspectra;         // number of galaxy-galaxy lensing tomography power spectra
   int clustering_Npowerspectra;  // number of galaxy-galaxy clustering tomography power spectra
+  int* ggl_exclude;              // l-s pairs that are excluded in ggl
+  int N_ggl_exclude;             // number of l-s ggl pairs excluded
 } tomopara;
 
 typedef struct
