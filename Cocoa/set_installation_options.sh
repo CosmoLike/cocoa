@@ -33,9 +33,9 @@ export IGNORE_BICEP_CMB_DATA=1
 #export IGNORE_SN_DATA=1
 #export IGNORE_SPT_CMB_DATA=1
 #export IGNORE_SIMONS_OBSERVATORY_CMB_DATA=1
-export IGNORE_PLANCK_CMB_DATA=1
+#export IGNORE_PLANCK_CMB_DATA=1
 export IGNORE_CAMSPEC_CMB_DATA=1
-export IGNORE_LIPOP_CMB_DATA=1
+#export IGNORE_LIPOP_CMB_DATA=1
 #export IGNORE_EMULTRF_DATA=1 #SaraivanovZhongZhu (SZZ) transformer-based emul
 
 # ------------------------------------------------------------------------------
@@ -51,22 +51,22 @@ export IGNORE_CLASS_CODE=1 # Default: we just use CAMB (reduces compilation time
 #export IGNORE_COSMOLIKE_CODE=1
 #export IGNORE_POLYCHORD_SAMPLER_CODE=1
 #export IGNORE_PLANCK_LIKELIHOOD_CODE=1
-export IGNORE_ACTDR4_CODE=1
-export IGNORE_ACTDR6_CODE=1
+#export IGNORE_ACTDR4_CODE=1
+#export IGNORE_ACTDR6_CODE=1
 export IGNORE_CPP_CUBA_INSTALLATION=1
 export IGNORE_VELOCILEPTORS_CODE=1
 #export IGNORE_SIMONS_OBSERVATORY_LIKELIHOOD_CODE=1
-export IGNORE_CAMSPEC_LIKELIHOOD_CODE=1
-export IGNORE_LIPOP_LIKELIHOOD_CODE=1
+#export IGNORE_CAMSPEC_LIKELIHOOD_CODE=1
+#export IGNORE_LIPOP_LIKELIHOOD_CODE=1
 export IGNORE_HYREC_CODE=1
-export IGNORE_COSMOREC_CODE=1
+#export IGNORE_COSMOREC_CODE=1
 export IGNORE_MGCAMB_CODE=1
 #export IGNORE_EMULTRF_CODE=1 #SaraivanovZhongZhu (SZZ) transformer-based emul
 #export IGNORE_COSMOPOWER_CODE=1
-
-#Many cosmolike projects (including LSST-Y1) require euclid emulator
 #export IGNORE_EUCLID_EMULATOR_V2_CODE=1
 #export IGNORE_COSMOLIKE_LSSTY1_CODE=1
+#export IGNORE_COSMOLIKE_DES_Y3_CODE=1
+#export IGNORE_COSMOLIKE_ROMAN_FOURIER_CODE=1
 
 # ------------------------------------------------------------------------------
 # If OVERWRITE_EXISTING_XXX_CODE=1, the setup_cocoa overwrites existing PACKAGES
@@ -325,6 +325,11 @@ export DES_Y3_NAME="des_y3"
 #export DES_Y3_COMMIT="2d7e05944bf9c4724dcb5407e7cb76c992993807"
 export DES_Y3_TAG="v4.0-beta17"
 
+export ROMAN_FOURIER_URL="git@github.com:CosmoLike/cocoa_roman_fourier.git"
+export ROMAN_FOURIER_NAME="roman_fourier"
+export ROMAN_FOURIER_BRANCH="vivian"
+#export ROMAN_FOURIER_COMMIT="ac5ad1dfe05193e3334d9da76bdb32d73fecad63"
+#export ROMAN_FOURIER_TAG="v4.0-beta17"
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------

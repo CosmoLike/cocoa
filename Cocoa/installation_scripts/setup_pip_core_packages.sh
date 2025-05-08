@@ -68,7 +68,7 @@ if [ -z "${IGNORE_PIP_CORE_INSTALLATION}" ]; then
   env MPICC=$MPI_CC_COMPILER ${PIP3:?} install \
       'numpy==1.23.5' \
       'mpi4py==4.0.3' \
-    --no-cache-dir \
+    --no-cache-dir --prefer-binary \
     --prefix="${ROOTDIR:?}/.local" \
     --force-reinstall \
     >${OUT1:?} 2>${OUT2:?} || { error "(PIP-CORE-PACKAGES) ${EC13:?}"; return 1; }
@@ -80,7 +80,7 @@ if [ -z "${IGNORE_PIP_CORE_INSTALLATION}" ]; then
       'ipyparallel==9.0.1' \
       'emcee== 3.1.6' \
       'sacc==1.0.2' \
-    --no-cache-dir --use-pep517 \
+    --no-cache-dir --prefer-binary --use-pep517 \
     --prefix="${ROOTDIR:?}/.local" \
     >${OUT1:?} 2>${OUT2:?} || { error "(PIP-CORE-PACKAGES) ${EC13:?}"; return 1; }
 
@@ -109,7 +109,7 @@ if [ -z "${IGNORE_PIP_CORE_INSTALLATION}" ]; then
         'scikit-learn==1.6.1' \
         'jupyter==1.0.0' \
         'typing-extensions==4.13.2' \
-      --no-cache-dir \
+      --no-cache-dir --prefer-binary \
       --extra-index-url "https://download.pytorch.org/whl/cu118" \
       --prefix="${ROOTDIR:?}/.local" \
       >${OUT1:?} 2>${OUT2:?} || { error "${EC13:?}"; return 1; } 
@@ -118,7 +118,7 @@ if [ -z "${IGNORE_PIP_CORE_INSTALLATION}" ]; then
     env CXX="${CXX_COMPILER:?}" CC="${C_COMPILER:?}" ${PIP3:?} install \
         'notebook==7.4.2' \
         'ipyparallel==9.0.1' \
-      --no-cache-dir \
+      --no-cache-dir --prefer-binary \
       --prefix="${ROOTDIR:?}/.local" \
       >${OUT1:?} 2>${OUT2:?} || { error "${EC13:?}"; return 1; }
 
