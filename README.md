@@ -716,41 +716,8 @@ Commenting out the environmental flags shown below, located at *set_installation
     # ------------------------------------------------------------------------------
     # If not set, Cocoa/installation_scripts/setup_pip_core_packages.sh will install several ML packages
     # ------------------------------------------------------------------------------
-    #export IGNORE_EMULATOR_CPU_PIP_PACKAGES=1
     #export IGNORE_EMULATOR_GPU_PIP_PACKAGES=1
-        
-We recommend using the GPU versions to train the emulator while using the CPU versions to run the MCMCs. This can be achieved by creating two separate environments, i.e., two independent CoCoA copies. Alternatively, users can manually incorporate the pip ML installation commands located on the shell script `Cocoa/installation_scripts/setup_pip_core_packages.sh` in their conda environments (two conda environments, one for the GPU and one for the CPU runs).
-
-    [Adapted from Cocoa/installation_scripts/setup_pip_core_packages.sh script - the command may not be entirely up to date] 
-     
-    #CPU VERSION
-    env CXX="${CXX_COMPILER:?}" CC="${C_COMPILER:?}" ${PIP3:?} install \
-        'tensorflow-cpu==2.12.0' \
-        'tensorflow_probability-0.21.0' \
-        'keras==2.12.0' \
-        'keras-preprocessing==1.1.2' \
-        'torch==1.13.1+cpu' \
-        'torchvision==0.14.1+cpu' \
-        'torchaudio==0.13.1' \
-        'tensiometer==0.1.2' \
-      --extra-index-url "https://download.pytorch.org/whl/cpu" \
-      --prefix="${ROOTDIR:?}/.local" 
-
-    (...)
-
-    #GPU VERSION
-    env CXX="${CXX_COMPILER:?}" CC="${C_COMPILER:?}" ${PIP3:?} install \
-        'tensorflow==2.12.0' \
-        'tensorflow_probability-0.21.0' \
-        'keras==2.12.0' \
-        'keras-preprocessing==1.1.2' \
-        'torch==1.13.1+cu116' \
-        'torchvision==0.14.1+cu116' \
-        'torchaudio==0.13.1' \
-        'tensiometer==0.1.2' \
-      --extra-index-url "https://download.pytorch.org/whl/cu116" \
-      --prefix="${ROOTDIR:?}/.local"
-      
+              
 ### :interrobang: FAQ: How can users improve their Bash/C/C++ knowledge to develop Cocoa/Cosmolike? :book::book: <a name="lectnotes"></a>
 
 A working knowledge of Python is required to understand the Cobaya framework at the developer level. Users must also know the Bash language to understand Cocoa's scripts. Proficiency in C and C++ is also needed to manipulate Cosmolike and the C++ Cobaya-Cosmolike C++ interface. Finally, users need to understand the Fortran-2003 language to modify CAMB.
