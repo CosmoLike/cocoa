@@ -485,8 +485,6 @@ void init_data_vector_size_3x2pt_fourier_space();
 
 void init_data_vector_size_6x2pt_fourier_space();
 
-
-
 void init_IA(
     const int IA_MODEL, 
     const int IA_REDSHIFT_EVOL
@@ -510,6 +508,8 @@ void init_survey(
     double area, 
     double sigma_e
   );
+
+void init_ggl_exclude(arma::Col<int> ggl_exclude);
 
 // ---------------------------------------------------------------------------
 // ---------------------------------------------------------------------------
