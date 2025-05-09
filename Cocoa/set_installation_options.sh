@@ -16,7 +16,7 @@ fi
 # ------------------------------------------------------------------------------
 # VERBOSE AS DEBUG TOOL --------------------------------------------------------
 # ------------------------------------------------------------------------------
-export COCOA_OUTPUT_VERBOSE=1
+#export COCOA_OUTPUT_VERBOSE=1
 
 # ------------------------------------------------------------------------------
 # If set, COSMOLIKE will compile with DEBUG flags ------------------------------
@@ -31,12 +31,12 @@ export IGNORE_ACTDR6_DATA=1
 export IGNORE_BICEP_CMB_DATA=1
 # export IGNORE_HOLICOW_STRONG_LENSING_DATA=1
 #export IGNORE_SN_DATA=1
-#export IGNORE_SPT_CMB_DATA=1
-#export IGNORE_SIMONS_OBSERVATORY_CMB_DATA=1
+export IGNORE_SPT_CMB_DATA=1
+export IGNORE_SIMONS_OBSERVATORY_CMB_DATA=1
 #export IGNORE_PLANCK_CMB_DATA=1
 export IGNORE_CAMSPEC_CMB_DATA=1
 export IGNORE_LIPOP_CMB_DATA=1
-#export IGNORE_EMULTRF_DATA=1 #SaraivanovZhongZhu (SZZ) transformer-based emul
+export IGNORE_EMULTRF_DATA=1 #SaraivanovZhongZhu (SZZ) transformer-based emul
 
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
@@ -55,19 +55,18 @@ export IGNORE_ACTDR4_CODE=1
 export IGNORE_ACTDR6_CODE=1
 export IGNORE_CPP_CUBA_INSTALLATION=1
 export IGNORE_VELOCILEPTORS_CODE=1
-#export IGNORE_SIMONS_OBSERVATORY_LIKELIHOOD_CODE=1
+export IGNORE_SIMONS_OBSERVATORY_LIKELIHOOD_CODE=1
 export IGNORE_CAMSPEC_LIKELIHOOD_CODE=1
 export IGNORE_LIPOP_LIKELIHOOD_CODE=1
 export IGNORE_HYREC_CODE=1
 export IGNORE_COSMOREC_CODE=1
 export IGNORE_MGCAMB_CODE=1
-#export IGNORE_EMULTRF_CODE=1 #SaraivanovZhongZhu (SZZ) transformer-based emul
+export IGNORE_EMULTRF_CODE=1 #SaraivanovZhongZhu (SZZ) transformer-based emul
 export IGNORE_COSMOPOWER_CODE=1
 #export IGNORE_EUCLID_EMULATOR_V2_CODE=1
-
 #export IGNORE_COSMOLIKE_LSSTY1_CODE=1
-#export IGNORE_COSMOLIKE_DES_Y3_CODE=1
-#export IGNORE_COSMOLIKE_ROMAN_FOURIER_CODE=1
+export IGNORE_COSMOLIKE_DES_Y3_CODE=1
+export IGNORE_COSMOLIKE_ROMAN_FOURIER_CODE=1
 export IGNORE_COSMOLIKE_ROMAN_REAL_CODE=1
 
 # ------------------------------------------------------------------------------
@@ -329,11 +328,11 @@ export DES_Y3_TAG="v4.0-beta17"
 
 export ROMAN_FOURIER_URL="git@github.com:CosmoLike/cocoa_roman_fourier.git"
 export ROMAN_FOURIER_NAME="roman_fourier"
-export ROMAN_FOURIER_COMMIT="fedf918298d3c2c700b12dbe98a956de508a48f8"
+export ROMAN_FOURIER_COMMIT="6e5d261cf762e0a083b832245acc1d21d8a389ae"
 
 export ROMAN_REAL_URL="git@github.com:CosmoLike/cocoa_roman_real.git"
 export ROMAN_REAL_NAME="roman_real"
-export ROMAN_REAL_COMMIT="2bfb0c28f1d4f4f22f8750b5d85789ff13633b2a"
+export ROMAN_REAL_COMMIT="71dfa5d0d63f1835686842a9d0fc48f58c2c387d"
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
