@@ -184,8 +184,19 @@ and
 >     export IGNORE_COSMOLIKE_ROMAN_FOURIER_CODE=1
 >     export IGNORE_COSMOLIKE_ROMAN_REAL_CODE=1
 >
-> If users want to download a project not provided by default or intend to clone existing projects in development mode, check the appendix [FAQ: How do we download and run Cosmolike projects?](#running_cosmolike_projects).
- 
+> If users comment these lines (unsetting the corresponding IGNORE keys) after running `setup_cocoa.sh` and `compile_cocoa.sh`, there is no need to rerun these general scripts, which would reinstall many packages (slow). Instead, run the following three commands:
+>
+>      source start_cocoa.sh
+>
+> and
+> 
+>      source ./installation_scripts/setup_cosmolike_projects.sh
+>
+> and
+> 
+>       source ./installation_scripts/compile_all_projects.sh
+
+  
 > [!TIP]
 > To run Jupyter Notebook, assuming cocoa is installed on a local machine, type, after step 2️⃣, the command 
 > 
