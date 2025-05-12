@@ -71,7 +71,7 @@ Users can now proceed to **step :two:**.
 > [!TIP]
 > Users not working on an HPC environment that offers Anaconda or [Miniconda](https://docs.anaconda.com/miniconda/) may want to check the appendix [FAQ: What if there is no Conda? Miniconda installation](#overview_miniconda).
 
-**Step :two:**: Install `git-lfs` when loading the Conda cocoa environment for the first time.
+**Step :two:**: Install `git-lfs` when loading the conda cocoa environment for the first time.
 
     git-lfs install
 
@@ -82,7 +82,7 @@ Users can now proceed to **step :two:**.
 
 **Step :one:**: Download cocoa's latest release and go to the `cocoa` main folder,
 
-    "${CONDA_PREFIX}"/bin/git clone --depth 1 https://github.com/CosmoLike/cocoa.git --branch v4.0-beta22 cocoa
+    "${CONDA_PREFIX}"/bin/git clone --depth 1 https://github.com/CosmoLike/cocoa.git --branch v4.0-beta23 cocoa
 
 and
 
@@ -102,7 +102,7 @@ Users can now proceed to **step :two:**.
 >     "${CONDA_PREFIX}"/bin/git clone https://github.com/CosmoLike/cocoa.git cocoa
 
 > [!TIP]
-> If you want to develop from a release version (e.g., `v4.0-beta20`), check the appendix [FAQ: How do we push changes to the Cocoa main branch? A few git hacks](#push_main)
+> If you want to develop from a release version (e.g., `v4.0-beta20`), check the appendix [FAQ: How do we push changes to the cocoa main branch? A few git hacks](#push_main)
 
 **Step :two:**: Run the script `setup_cocoa.sh` via
         
@@ -112,7 +112,7 @@ Users can now proceed to **step :two:**.
 > This script downloads and decompresses external modules, requiring internet access to run successfully.
 
 > [!NOTE]
-> If you run `setup_cocoa.sh` multiple times, Cocoa will not download previously installed packages. To overwrite this behavior, export the key `OVERWRITE_EXISTING_ALL_PACKAGES` on `set_installation_options.sh`. Even with this optimization disabled, cocoa will not download large datasets repeatedly unless the key `REDOWNLOAD_EXISTING_ALL_DATA` is also set.
+> If you run `setup_cocoa.sh` multiple times, cocoa will not download previously installed packages. To overwrite this behavior, export the key `OVERWRITE_EXISTING_ALL_PACKAGES` on `set_installation_options.sh`. Even with this optimization disabled, cocoa will not download large datasets repeatedly unless the key `REDOWNLOAD_EXISTING_ALL_DATA` is also set.
 
 **Step :three:**: Run the script `compile_cocoa.sh` by typing 
 
@@ -179,6 +179,19 @@ and
 and
 
     mpirun -n ${NMPI} --oversubscribe --mca pml ^ucx --mca btl vader,tcp,self --bind-to core:overload-allowed --rank-by slot --map-by numa:pe=${OMP_NUM_THREADS} python -m mpi4py.futures EXAMPLE_PROFILE1.py --mpi $((${NMPI}-1)) --profile 1 --tol 0.05 --AB 1.0 --outroot 'profile' --minmethod 5 --maxiter 1 --maxfeval 250 
+
+> [!TIP]
+> We provide several cosmolike projects that can be loaded and compiled using `setup_cocoa.sh` and `compile_cocoa.sh` scripts. To activate them, comment the following lines on `set_installation_options.sh` 
+> 
+>     [Adapted from Cocoa/set_installation_options.sh shell script] 
+>     # The keys below control which cosmolike projects will be installed and compiled 
+>     # inset # symbol in the lines below (i.e., unset these environmental keys)
+>     #export IGNORE_COSMOLIKE_LSSTY1_CODE=1
+>     export IGNORE_COSMOLIKE_DES_Y3_CODE=1
+>     export IGNORE_COSMOLIKE_ROMAN_FOURIER_CODE=1
+>     export IGNORE_COSMOLIKE_ROMAN_REAL_CODE=1
+>
+> If users want to download a project not provided by default or intend to clone existing projects in development mode, check the appendix [FAQ: How do we download and run Cosmolike projects?](running_cosmolike_projects).
  
 > [!TIP]
 > To run Jupyter Notebook, assuming cocoa is installed on a local machine, type, after step 2️⃣, the command 
@@ -213,10 +226,6 @@ and
 >     [... NotebookApp] Use Control-C to stop this server and shut down all kernels (twice to skip confirmation).
 >
 > Now go to the local internet browser and type `http://XX.YY.ZZ.123:8888/?token=XXX`.
-
-> [!TIP]
-> If users want to download a project not provided by default or intend to clone existing projects in development mode, check the appendix [FAQ: How do we download and run Cosmolike projects?](running_cosmolike_projects).
-> 
 
 ## Running Examples based on Machine Learning emulators <a name="cobaya_base_code_examples_emul"></a>
 
