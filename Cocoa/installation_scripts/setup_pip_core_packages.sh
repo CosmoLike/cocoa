@@ -101,7 +101,7 @@ if [ -z "${IGNORE_PIP_CORE_INSTALLATION}" ]; then
   # ----------------------------------------------------------------------------
   
   if [ -z "${IGNORE_EMULATOR_GPU_PIP_PACKAGES}" ]; then
-    ptop "PIP INSTALL MACHINE LEARNING GPU PACKAGES"
+    ptop "PIP INSTALL MACHINE LEARNING GPU PACKAGES (takes a while O(5-10min)...)"
 
     env CXX="${CXX_COMPILER:?}" CC="${C_COMPILER:?}" ${PIP3:?} install \
         'tensorflow==2.17.0' \
