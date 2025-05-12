@@ -82,7 +82,7 @@ Users can now proceed to **step :two:**.
 
 **Step :one:**: Download cocoa's latest release and go to the `cocoa` main folder,
 
-    "${CONDA_PREFIX}"/bin/git clone --depth 1 https://github.com/CosmoLike/cocoa.git --branch v4.0-beta21 cocoa
+    "${CONDA_PREFIX}"/bin/git clone --depth 1 https://github.com/CosmoLike/cocoa.git --branch v4.0-beta22 cocoa
 
 and
 
