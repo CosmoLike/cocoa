@@ -75,9 +75,9 @@ Users can now proceed to **step :two:**.
 ## Installation and Compilation of external modules <a name="cobaya_base_code"></a>
 
 > [!WARNING]
-> In this section, we assume users have previously activated the Cocoa conda environment
+> In this fork, we assume users are all developers with edit access via ssh keys to all SBU-COSMOLIKE repositories. Cocoa scripts will fail if you don't have such privileges.
 >
-> 
+
 **Step :one:**: Download cocoa's latest commit and go to the `cocoa` main folder,
 
     "${CONDA_PREFIX}"/bin/git clone git@github.com:SBU-COSMOLIKE/cocoa.git cocoa
