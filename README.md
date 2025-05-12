@@ -80,7 +80,7 @@ Users can now proceed to **step :two:**.
 > 
 **Step :one:**: Download cocoa's latest commit and go to the `cocoa` main folder,
 
-    "${CONDA_PREFIX}"/bin/git clone git@github.com:CosmoLike/cocoa.git cocoa
+    "${CONDA_PREFIX}"/bin/git clone git@github.com:SBU-COSMOLIKE/cocoa.git cocoa
 
 and
 
