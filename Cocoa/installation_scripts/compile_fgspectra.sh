@@ -61,29 +61,26 @@ if [ -z "${IGNORE_FGSPECTRA_CODE}" ]; then
 
   # ---------------------------------------------------------------------------
   # cleaning any previous compilation
-
   rm -rf "${PACKDIR:?}/build/"
   rm -rf "${PACKDIR:?}/fgspectra.egg-info/"
   
-  "${PYTHON3:?}" setup.py clean \
-    >${OUT1:?} 2>${OUT2:?} || { error "${EC1:?}"; return 1; }
+  "${PYTHON3:?}" setup.py clean >${OUT1:?} 2>${OUT2:?} || { error "${EC1:?}"; return 1; }
 
   PLIB="${ROOTDIR:?}/.local/lib/python${PYTHON_VERSION:?}/site-packages"
-
   rm -rf  "${PLIB:?}"/fgspectra
-  rm -rf  "${PLIB:?}"/fgspectra-*
-  
+  rm -rf  "${PLIB:?}"/fgspectra-*  
   # ---------------------------------------------------------------------------  
  
-  ${PIP3:?} install . --prefix="${ROOTDIR:?}/.local" \
-    >${OUT1:?} 2>${OUT2:?} || { error "${EC3:?}"; return 1; }
+  (export LD_LIBRARY_PATH=${CONDA_PREFIX:?}/lib:$LD_LIBRARY_PATH && \
+   export LD_LIBRARY_PATH=${ROOTDIR:?}/.local/lib:$LD_LIBRARY_PATH && \
+   ${PIP3:?} install . --prefix="${ROOTDIR:?}/.local" \
+   >${OUT1:?} 2>${OUT2:?} || { error "${EC3:?}"; return 1; })
 
   pbottom "COMPILING ${PRINTNAME:?}" || return 1
 
   # ---------------------------------------------------------------------------
 
   unset_all || return 1
-  
 fi
 
 # ------------------------------------------------------------------------------

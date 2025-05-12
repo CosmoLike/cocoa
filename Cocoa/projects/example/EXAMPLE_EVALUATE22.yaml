@@ -1,18 +1,46 @@
-stop_at_error: False
-debug: False
+stop_at_error: false
 timing: true
+debug: false
 
 likelihood:
-  #planck_2018_highl_plik.TT_lite:
-  #  path: ./external_modules/
-  #  clik_file: plc_3.0/hi_l/plik_lite/plik_lite_v22_TT.clik
-  planck_2018_highl_plik.TTTEEE_lite:
-    path: ./external_modules/
-    clik_file: plc_3.0/hi_l/plik_lite/plik_lite_v22_TTTEEE.clik
-  planck_2018_lowl.TT:
-    path: ./external_modules
-  planck_2018_lowl.EE:
-    path: ./external_modules
+  mflike.TTTEEE:
+    data_folder: simons_observatory/v0.8
+    input_file: LAT_simu_sacc_00044.fits
+    cov_Bbl_file: data_sacc_w_covar_and_Bbl.fits
+    defaults:
+      # Which spectra?
+      polarizations: ['TT', 'TE', 'ET', 'EE']
+      # Scale cuts (in ell) for each spectrum
+      scales:
+        TT: [50, 3002]
+        TE: [50, 3002]
+        ET: [50, 3002]
+        EE: [50, 3002]
+      symmetrize: False
+
+    data:
+      # List the names and frequencies of all the
+      # relevant experiments.
+      experiments:
+        - LAT_93
+        - LAT_145
+        - LAT_225
+        # - PlanckHFI_545:
+
+      spectra:
+        # Here, list all the different cross-correlations
+        # between experiments and bands you want to
+        # analyse.
+        # For each of them, you can specify which spectra
+        # and scale cuts you'd like to use. If you don't
+        # specify anything, the defaults will be used.
+        - experiments: [LAT_93, LAT_93]
+        - experiments: [LAT_93, LAT_145]
+        - experiments: [LAT_93, LAT_225]
+        - experiments: [LAT_145, LAT_145]
+        - experiments: [LAT_145, LAT_225]
+        - experiments: [LAT_225, LAT_225]
+      lmax_theory: 5000
 
 params:
   logA:
@@ -88,8 +116,7 @@ params:
   A:
     derived: 'lambda As: 1e9*As'
     latex: 10^9 A_\mathrm{s}
-
-
+    
 theory:
   emulcmbtrf:
     path: ./cobaya/cobaya/theories/
@@ -102,16 +129,30 @@ theory:
       teextraname: 'external_modules/data/emultrf/CMB_TRF/extrainfo_lhs_te_96.npy'
       eefilename: 'external_modules/data/emultrf/CMB_TRF/chiEEAstautrf1dot2milnewlhcevansqrtrescalec16'
       eeextraname: 'external_modules/data/emultrf/CMB_TRF/extrainfo_lhs_ee_96.npy'
+  mflike.BandpowerForeground:
 
 sampler:
   evaluate:
     override:
-      logA: 3.0448
-      ns: 0.96605
-      H0: 67.319
-      omegabh2: 0.022383
-      omegach2: 0.12011
-      tau: 0.0543
-      A_planck: 1.00138
+      logA: 3.045845885
+      ns: 9.652308970e-01
+      H0: 6.748819246e+01
+      omegabh2: 2.246801442e-02
+      omegach2: 1.198257361e-01 
+      tau: 5.433339482e-02
+      a_tSZ: 3.299661491
+      a_kSZ: 1.603283271
+      a_p: 6.909072608
+      beta_p: 2.081592320
+      a_c: 4.903593522
+      beta_c: 2.201183246
+      a_s: 3.100233500
+      a_gtt: 2.843185734
+      a_gte: 0.10
+      a_gee: 9.891127676e-02
+      a_psee: 0.0
+      a_pste: 5.316779467e-04
+      xi: 1.910150877e-01 
+      T_d: 1.028875217e+01
 
-output: ./projects/example/chains/EXAMPLE_EVALUATE17
+output: ./projects/example/chains/EXAMPLE_EVALUATE22

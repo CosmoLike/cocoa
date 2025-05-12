@@ -30,13 +30,13 @@ export IGNORE_ACTDR6_DATA=1
 # export IGNORE_BAO_DATA=1
 export IGNORE_BICEP_CMB_DATA=1
 # export IGNORE_HOLICOW_STRONG_LENSING_DATA=1
-# export IGNORE_SN_DATA=1
+#export IGNORE_SN_DATA=1
 export IGNORE_SPT_CMB_DATA=1
 export IGNORE_SIMONS_OBSERVATORY_CMB_DATA=1
 #export IGNORE_PLANCK_CMB_DATA=1
 export IGNORE_CAMSPEC_CMB_DATA=1
 export IGNORE_LIPOP_CMB_DATA=1
-export IGNORE_EMULTRF_DATA=1 #SaraivanovZhongZhu transformer-based emulator
+export IGNORE_EMULTRF_DATA=1 #SaraivanovZhongZhu (SZZ) transformer-based emul
 
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
@@ -60,14 +60,22 @@ export IGNORE_CAMSPEC_LIKELIHOOD_CODE=1
 export IGNORE_LIPOP_LIKELIHOOD_CODE=1
 export IGNORE_HYREC_CODE=1
 export IGNORE_COSMOREC_CODE=1
-export IGNORE_EMULTRF_CODE=1 #SaraivanovZhongZhu transformer-based emulator
-
 export IGNORE_MGCAMB_CODE=1
+export IGNORE_EMULTRF_CODE=1 #SaraivanovZhongZhu (SZZ) transformer-based emul
 export IGNORE_COSMOPOWER_CODE=1
-
-#Many cosmolike projects (including LSST-Y1) require euclid emulator
 #export IGNORE_EUCLID_EMULATOR_V2_CODE=1
+
+# ------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
+# The keys below control which cosmolike projects will be installed and compiled 
+# ------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 #export IGNORE_COSMOLIKE_LSSTY1_CODE=1
+export IGNORE_COSMOLIKE_DES_Y3_CODE=1
+export IGNORE_COSMOLIKE_ROMAN_FOURIER_CODE=1
+export IGNORE_COSMOLIKE_ROMAN_REAL_CODE=1
 
 # ------------------------------------------------------------------------------
 # If OVERWRITE_EXISTING_XXX_CODE=1, the setup_cocoa overwrites existing PACKAGES
@@ -76,6 +84,7 @@ export IGNORE_COSMOPOWER_CODE=1
 # these keys are only relevant if you run setup_cocoa multiple times -----------
 # ------------------------------------------------------------------------------
 export OVERWRITE_EXISTING_ALL_PACKAGES=1
+#export OVERWRITE_EXISTING_COSMOLIKE_CODE=1
 #export REDOWNLOAD_EXISTING_ALL_DATA=1
 # ------------------------------------------------------------------------------
 # If set, compile_planck.sh uses click like code from github.com/benabed/clik
@@ -90,13 +99,12 @@ export MAKE_NUM_THREADS=4
 # ------------------------------------------------------------------------------
 # If not set, pip_core_packages.sh will install several ML packages ------------
 # ------------------------------------------------------------------------------
-export IGNORE_EMULATOR_CPU_PIP_PACKAGES=1
 export IGNORE_EMULATOR_GPU_PIP_PACKAGES=1
 
 # ------------------------------------------------------------------------------
 # Adopted Python version -------------------------------------------------------
 # ------------------------------------------------------------------------------
-export PYTHON_VERSION=3.9
+export PYTHON_VERSION=3.10
 
 # ------------------------------------------------------------------------------
 # HOW COCOA CORE PACKAGES SHOULD BE INSTALLED? ---------------------------------
@@ -160,7 +168,6 @@ fi
 if [ -n "${OVERWRITE_EXISTING_ALL_PACKAGES}" ]; then
   export OVERWRITE_EXISTING_COCOA_PRIVATE_PYTHON_ENV=1
   export OVERWRITE_EXISTING_CORE_PACKAGES=1
-  export OVERWRITE_EXISTING_COSMOLIKE_CODE=1
   export OVERWRITE_EXISTING_COBAYA_CODE=1
   export OVERWRITE_EXISTING_CAMB_CODE=1
   export OVERWRITE_EXISTING_MGCAMB_CODE=1
@@ -305,10 +312,10 @@ export COSMOPOWER_URL="https://github.com/alessiospuriomancini/cosmopower.git"
 export COSMOPOWER_GIT_COMMIT="7cac5e71c975c06257b2f95f0dcea5dd09b0f45f"
 
 export EMULTRF_URL="https://github.com/CosmoLike/emulators_code.git"
-export EMULTRF_GIT_COMMIT="42d76584ee0f76ff5be485ed272748ed2a52726c"
+export EMULTRF_GIT_COMMIT="5c80e0b7877901ec3edd3028a73f7434b1fa6f35"
 
 export EMULTRF_DATA_URL="https://github.com/CosmoLike/emulators_data.git"
-export EMULTRF_DATA_GIT_COMMIT="d84aa6bcae5c115a07c4c4e6f5f302399ca4286a"
+export EMULTRF_DATA_GIT_COMMIT="dca7bf6bb40ae8c6428837c2d48a7b63de36ae3a"
 
 # --------------------------------------------------------------------
 # --------------------------------------------------------------------
@@ -318,8 +325,8 @@ export EMULTRF_DATA_GIT_COMMIT="d84aa6bcae5c115a07c4c4e6f5f302399ca4286a"
 export LSST_Y1_URL="https://github.com/CosmoLike/cocoa_lsst_y1.git"
 export LSST_Y1_NAME="lsst_y1"
 #export LSST_Y1_BRANCH="main"
-#export LSST_Y1_COMMIT="8f7f0c40784fcae718006b6c6715c58fb0b085b0"
-export LSST_Y1_TAG="v4.0-beta17"
+#export LSST_Y1_COMMIT="c97e8bb4b861131737c3b472631d4ed82afdce89"
+export LSST_Y1_TAG="v4.0-beta18"
 
 export DES_Y3_URL="https://github.com/CosmoLike/cocoa_des_y3.git"
 export DES_Y3_NAME="des_y3"
@@ -327,6 +334,13 @@ export DES_Y3_NAME="des_y3"
 #export DES_Y3_COMMIT="2d7e05944bf9c4724dcb5407e7cb76c992993807"
 export DES_Y3_TAG="v4.0-beta17"
 
+export ROMAN_FOURIER_URL="git@github.com:CosmoLike/cocoa_roman_fourier.git"
+export ROMAN_FOURIER_NAME="roman_fourier"
+export ROMAN_FOURIER_COMMIT="e79d3e5754484ccc3353e7fb12073264cd9137b4"
+
+export ROMAN_REAL_URL="git@github.com:CosmoLike/cocoa_roman_real.git"
+export ROMAN_REAL_NAME="roman_real"
+export ROMAN_REAL_COMMIT="d9dcdda435f64d11f24649c33e7d8b9bf0da0dfb"
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------

@@ -73,19 +73,24 @@ if [ -z "${IGNORE_POLYCHORD_SAMPLER_CODE}" ]; then
   
   # ---------------------------------------------------------------------------
 
-  make >${OUT1:?} 2>${OUT2:?} || { error "${EC7:?}"; return 1; }
+  (export LD_LIBRARY_PATH=${CONDA_PREFIX:?}/lib:$LD_LIBRARY_PATH && \
+   export LD_LIBRARY_PATH=${ROOTDIR:?}/.local/lib:$LD_LIBRARY_PATH && \
+   make >${OUT1:?} 2>${OUT2:?} || { error "${EC7:?}"; return 1; })
 
-  make -j $MNT all \
-    >${OUT1:?} 2>${OUT2:?} || { error "${EC7:?}"; return 1; }
+  (export LD_LIBRARY_PATH=${CONDA_PREFIX:?}/lib:$LD_LIBRARY_PATH && \
+   export LD_LIBRARY_PATH=${ROOTDIR:?}/.local/lib:$LD_LIBRARY_PATH && \
+   make -j $MNT all >${OUT1:?} 2>${OUT2:?} || { error "${EC7:?}"; return 1; })
 
-  make -j $MNT pypolychord \
-    >${OUT1:?} 2>${OUT2:?} || { error "${EC8:?}"; return 1; }
+  (export LD_LIBRARY_PATH=${CONDA_PREFIX:?}/lib:$LD_LIBRARY_PATH && \
+   export LD_LIBRARY_PATH=${ROOTDIR:?}/.local/lib:$LD_LIBRARY_PATH && \
+   make -j $MNT pypolychord >${OUT1:?} 2>${OUT2:?} || { error "${EC8:?}"; return 1; })
 
-  CC="${MPI_CC_COMPILER:?}" CXX="${MPI_CXX_COMPILER:?}" \
-    "${PYTHON3:?}" setup.py install --prefix "${ROOTDIR:?}/.local" \
-    >${OUT1:?} 2> ${OUT2:?} || { error "${EC9:?}"; return 1; }
+  (export LD_LIBRARY_PATH=${CONDA_PREFIX:?}/lib:$LD_LIBRARY_PATH && \
+   export LD_LIBRARY_PATH=${ROOTDIR:?}/.local/lib:$LD_LIBRARY_PATH && \
+   CC="${MPI_CC_COMPILER:?}" CXX="${MPI_CXX_COMPILER:?}" \
+   "${PYTHON3:?}" setup.py install --prefix "${ROOTDIR:?}/.local" \
+   >${OUT1:?} 2> ${OUT2:?} || { error "${EC9:?}"; return 1; })
 
- 
   pbottom 'COMPILING POLYCHORD' || return 1
 
   # ----------------------------------------------------------------------------

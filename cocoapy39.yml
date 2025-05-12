@@ -184,6 +184,7 @@ dependencies:
   - zeromq=4.3.5
   - zlib=1.2.13
   - zstd=1.5.5
+  - ucx=1.14.0
   - pip:
     - alabaster==0.7.13
     - anytree==2.8.0

@@ -60,23 +60,18 @@ if [ -z "${IGNORE_COSMOREC_CODE}" ]; then
 
   # ---------------------------------------------------------------------------
   # cleaning any previous compilation
-  
-  #rm -f  "${ROOTDIR:?}/.local/lib/libhyrec.a"
   rm -f "${PACKDIR:?}/libCosmoRec.a"
   rm -f "${PACKDIR:?}/CosmoRec"
   rm -f "${ROOTDIR:?}/.local/libCosmoRec.a"
-
-  # ---------------------------------------------------------------------------
-  
   cdfolder "${PACKDIR}" || return 1
-  
-  # ---------------------------------------------------------------------------
-  
-  make cleanall \
-    >${OUT1:?} 2>${OUT2:?} || { error "${EC2:?}"; return 1; }
+  make cleanall >${OUT1:?} 2>${OUT2:?} || { error "${EC2:?}"; return 1; }
 
-  CC="${CXX_COMPILER:?}"  make all \
-    >${OUT1:?} 2>${OUT2:?} || { error "${EC7:?}"; return 1; }
+  # ---------------------------------------------------------------------------
+  cdfolder "${PACKDIR}" || return 1
+
+  (export LD_LIBRARY_PATH=${CONDA_PREFIX:?}/lib:$LD_LIBRARY_PATH && \
+   export LD_LIBRARY_PATH=${ROOTDIR:?}/.local/lib:$LD_LIBRARY_PATH && \
+   CC="${CXX_COMPILER:?}" make all >${OUT1:?} 2>${OUT2:?} || { error "${EC7:?}"; return 1; })
   
   mv "${PACKDIR:?}/libCosmoRec.a" "${ROOTDIR:?}/.local/lib" \
     >${OUT1:?} 2>${OUT2:?} || { error "${EC30:?}"; return 1; }

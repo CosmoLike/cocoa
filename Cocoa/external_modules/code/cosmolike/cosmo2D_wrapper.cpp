@@ -13,6 +13,7 @@
 #include <cmath> 
 
 // SPDLOG
+#define SPDLOG_ACTIVE_LEVEL SPDLOG_LEVEL_DEBUG
 #include <spdlog/spdlog.h>
 #include <spdlog/sinks/basic_file_sink.h>
 #include <spdlog/cfg/env.h>
@@ -72,6 +73,22 @@ arma::Col<double> get_binning_real_space()
     const double theta = (2./ 3.) * (std::pow(thetamax,3) - std::pow(thetamin,3)) /
                                     (thetamax*thetamax    - thetamin*thetamin);
     result(i) = theta / 2.90888208665721580e-4; 
+  }
+  return result;
+}
+
+// ---------------------------------------------------------------------------
+// ---------------------------------------------------------------------------
+// ---------------------------------------------------------------------------
+
+arma::Col<double> get_binning_fourier_space()
+{  
+  arma::Col<double> result(like.Ncl, arma::fill::none);
+  
+  const double logdl = (std::log(like.lmax) - std::log(like.lmin))/like.Ncl;
+  for (int i = 0; i < like.Ncl; i++)
+  {  
+    result(i) = std::exp(std::log(like.lmin) + (i + 0.5)*logdl);
   }
   return result;
 }

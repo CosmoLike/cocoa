@@ -1,18 +1,46 @@
-stop_at_error: False
-debug: False
-timing: true
+stop_at_error: false
+timing: false
+debug: false
 
 likelihood:
-  #planck_2018_highl_plik.TT_lite:
-  #  path: ./external_modules/
-  #  clik_file: plc_3.0/hi_l/plik_lite/plik_lite_v22_TT.clik
-  planck_2018_highl_plik.TTTEEE_lite:
-    path: ./external_modules/
-    clik_file: plc_3.0/hi_l/plik_lite/plik_lite_v22_TTTEEE.clik
-  planck_2018_lowl.TT:
-    path: ./external_modules
-  planck_2018_lowl.EE:
-    path: ./external_modules
+  mflike.TTTEEE:
+    data_folder: simons_observatory/v0.8
+    input_file: LAT_simu_sacc_00044.fits
+    cov_Bbl_file: data_sacc_w_covar_and_Bbl.fits
+    defaults:
+      # Which spectra?
+      polarizations: ['TT', 'TE', 'ET', 'EE']
+      # Scale cuts (in ell) for each spectrum
+      scales:
+        TT: [50, 3002]
+        TE: [50, 3002]
+        ET: [50, 3002]
+        EE: [50, 3002]
+      symmetrize: False
+
+    data:
+      # List the names and frequencies of all the
+      # relevant experiments.
+      experiments:
+        - LAT_93
+        - LAT_145
+        - LAT_225
+        # - PlanckHFI_545:
+
+      spectra:
+        # Here, list all the different cross-correlations
+        # between experiments and bands you want to
+        # analyse.
+        # For each of them, you can specify which spectra
+        # and scale cuts you'd like to use. If you don't
+        # specify anything, the defaults will be used.
+        - experiments: [LAT_93, LAT_93]
+        - experiments: [LAT_93, LAT_145]
+        - experiments: [LAT_93, LAT_225]
+        - experiments: [LAT_145, LAT_145]
+        - experiments: [LAT_145, LAT_225]
+        - experiments: [LAT_225, LAT_225]
+      lmax_theory: 5000
 
 params:
   logA:
@@ -88,12 +116,11 @@ params:
   A:
     derived: 'lambda As: 1e9*As'
     latex: 10^9 A_\mathrm{s}
-
-
+    
 theory:
   emulcmbtrf:
     path: ./cobaya/cobaya/theories/
-    stop_at_error: True
+    stop_at_error: False
     extra_args:
       # This version of the emul was not trained with CosmoRec
       ttfilename: 'external_modules/data/emultrf/CMB_TRF/chiTTAstautrf1dot2milnewlhcevansqrtrescalec16'
@@ -102,16 +129,16 @@ theory:
       teextraname: 'external_modules/data/emultrf/CMB_TRF/extrainfo_lhs_te_96.npy'
       eefilename: 'external_modules/data/emultrf/CMB_TRF/chiEEAstautrf1dot2milnewlhcevansqrtrescalec16'
       eeextraname: 'external_modules/data/emultrf/CMB_TRF/extrainfo_lhs_ee_96.npy'
+  mflike.BandpowerForeground:
 
 sampler:
-  evaluate:
-    override:
-      logA: 3.0448
-      ns: 0.96605
-      H0: 67.319
-      omegabh2: 0.022383
-      omegach2: 0.12011
-      tau: 0.0543
-      A_planck: 1.00138
+  polychord:
+    path: null
+    nlive: 128
+    num_repeats: 2d
+    do_clustering: false
+    precision_criterion: 0.05
+    boost_posterior: 5
+    feedback: 2
 
-output: ./projects/example/chains/EXAMPLE_EVALUATE17
+output: ./projects/example/chains/EXAMPLE_POLY22

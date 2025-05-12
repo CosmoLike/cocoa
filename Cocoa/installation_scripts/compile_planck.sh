@@ -80,7 +80,6 @@ if [ -z "${IGNORE_PLANCK_LIKELIHOOD_CODE}" ]; then
 
   # ---------------------------------------------------------------------------
   # cleaning any previous compilation
-  
   rm -f  "${ROOTDIR:?}/.local"/bin/clik*
   rm -f  "${ROOTDIR:?}/.local"/lib/libclik_f90.so
   rm -f  "${ROOTDIR:?}/.local"/lib/libclik.so
@@ -89,23 +88,20 @@ if [ -z "${IGNORE_PLANCK_LIKELIHOOD_CODE}" ]; then
   rm -f  "${ROOTDIR:?}/.local"/include/clik*
   rm -f  "${PACKDIR:?}/".lock-waf_*
 
-  "${PYTHON3:?}" waf distclean \
-    >${OUT1:?} 2>${OUT2:?} || { error "${EC18:?}"; return 1; }
+  "${PYTHON3:?}" waf distclean >${OUT1:?} 2>${OUT2:?} || { error "${EC18:?}"; return 1; }
 
   # ---------------------------------------------------------------------------
   
-  FC="${FORTRAN_COMPILER:?}" CC="${C_COMPILER:?}" CXX="${CXX_COMPILER:?}" \
-    "${PYTHON3:?}" waf configure \
-    --gcc --gfortran --cfitsio_islocal \
-    --prefix "${ROOTDIR:?}/.local" \
-    --lapack_prefix="${CLIK_LAPACK_LIBS:?}" \
-    --cfitsio_lib="${CLIK_CFITSIO_LIBS:?}" \
-    --python="${PYTHON3:?}" \
-    >${OUT1:?} 2>${OUT2:?} || { error "${EC5:?}"; return 1; }
+  (export LD_LIBRARY_PATH=${CONDA_PREFIX:?}/lib:$LD_LIBRARY_PATH && \
+   export LD_LIBRARY_PATH=${ROOTDIR:?}/.local/lib:$LD_LIBRARY_PATH && \
+   FC="${FORTRAN_COMPILER:?}" CC="${C_COMPILER:?}" CXX="${CXX_COMPILER:?}" \
+   "${PYTHON3:?}" waf configure --gcc --gfortran --cfitsio_islocal --prefix "${ROOTDIR:?}/.local" \
+   --lapack_prefix="${CLIK_LAPACK_LIBS:?}" --cfitsio_lib="${CLIK_CFITSIO_LIBS:?}" \
+   --python="${PYTHON3:?}" >${OUT1:?} 2>${OUT2:?} || { error "${EC5:?}"; return 1; })
   
-  "${PYTHON3:?}" waf install -v \
-    >${OUT1:?} 2>${OUT2:?} || { error "${EC6:?}"; return 1; }
-
+  (export LD_LIBRARY_PATH=${CONDA_PREFIX:?}/lib:$LD_LIBRARY_PATH && \
+   export LD_LIBRARY_PATH=${ROOTDIR:?}/.local/lib:$LD_LIBRARY_PATH && \
+   "${PYTHON3:?}" waf install -v >${OUT1:?} 2>${OUT2:?} || { error "${EC6:?}"; return 1; })
   
   pbottom "COMPILING ${PRINTNAME:?}" || return 1
 

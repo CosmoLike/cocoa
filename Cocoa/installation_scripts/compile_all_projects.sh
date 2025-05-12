@@ -64,7 +64,9 @@ for TMP in $(find "${ROOTDIR:?}/projects/" -mindepth 1 -maxdepth 1 -type d ! -na
     FILE="${FOLDER:?}/compile_${TMP2:?}.sh"
 
     if [ -f "${FILE:?}" ]; then
-      ( source "${FILE:?}" ) || { error "${EC31:?} (${FILE:?})"; return 1; }
+      ( export LD_LIBRARY_PATH=${CONDA_PREFIX:?}/lib:$LD_LIBRARY_PATH && \
+        export LD_LIBRARY_PATH=${ROOTDIR:?}/.local/lib:$LD_LIBRARY_PATH && \
+        source "${FILE:?}" ) || { error "${EC31:?} (${FILE:?})"; return 1; }
     fi
 
   fi

@@ -6,8 +6,9 @@
 2. [Installation of core packages via Conda](#required_packages_conda)
 3. [Installation and Compilation of external modules](#cobaya_base_code)
 4. [Running Examples](#cobaya_base_code_examples)
-5. [Creating Cosmolike projects (external readme)](Cocoa/projects/)
-6. [Appendix](#appendix)
+5. [Running Examples based on Machine Learning emulators](#cobaya_base_code_examples_emul)
+6. [Creating Cosmolike projects (external readme)](Cocoa/projects/)
+7. [Appendix](#appendix)
     1. [Credits](#appendix_proper_credits)
     2. [Additional Installation Notes](#additional_notes)
     3. [FAQ: What if installation or compilation goes wrong?](#running_wrong)
@@ -38,15 +39,15 @@ This readme file presents basic and advanced instructions for installing all [Co
 
 ## Installation of core packages via Conda <a name="required_packages_conda"></a>
 
-Core packages include compilers and numerical libraries (e.g., GSL and FFTW) that we will never modify in any research project. We install most of these core packages via Conda, as shown below.
+Core packages include compilers and numerical libraries (e.g., GSL and FFTW) that users typically never modify. We install most of these core packages via Conda, as shown below.
 
-**Step :one:**: Download the file `cocoapy39.yml` yml file
+**Step :one:**: Download the file `cocoapy310.yml` yml file
 
-    wget https://raw.githubusercontent.com/CosmoLike/cocoa/dev/cocoapy39.yml
+    wget https://raw.githubusercontent.com/CosmoLike/cocoa/dev/cocoapy310.yml
 
 create the cocoa environment,
 
-    conda env create --name cocoa --file=cocoapy39.yml
+    conda env create --name cocoa --file=cocoapy310.yml
 
 activate it
 
@@ -60,25 +61,15 @@ and create symbolic links that will give better names for the GNU compilers
     ln -s "${CONDA_PREFIX}"/bin/x86_64-conda-linux-gnu-gcc-ar "${CONDA_PREFIX}"/bin/gcc-ar
     ln -s "${CONDA_PREFIX}"/bin/x86_64-conda-linux-gnu-gcc-ranlib "${CONDA_PREFIX}"/bin/gcc-ranlib
     ln -s "${CONDA_PREFIX}"/bin/x86_64-conda-linux-gnu-ld "${CONDA_PREFIX}"/bin/ld
+    ln -s "${CONDA_PREFIX}"/lib/libopenblas.so.0 "${CONDA_PREFIX}"/lib/libopenblas.so
 
 Users can now proceed to **step :two:**. 
 
 > [!TIP]
-> To install the Cocoa environment on a supercomputer, users may take advantage of the fact that many HPC environments provide the [Anaconda installer](https://www.anaconda.com) as an external module. Check the appendix [FAQ: How do we use an available Anaconda module on HPC?](#overview_anaconda).
+> To install the cocoa conda environment on a supercomputer, users may take advantage of the fact that many HPC environments provide the [Anaconda installer](https://www.anaconda.com) as an external module. Check the appendix [FAQ: How do we use an available Anaconda module on HPC?](#overview_anaconda).
 
 > [!TIP]
 > Users not working on an HPC environment that offers Anaconda or [Miniconda](https://docs.anaconda.com/miniconda/) may want to check the appendix [FAQ: What if there is no Conda? Miniconda installation](#overview_miniconda).
-
-> [!TIP]
-> We provide the YML file `cocoapy310.yml` so users can work on Python 3.10. In this setup, users must also modify the following flag `PYTHON_VERSION` on the shell script `set_installation_options.sh` before proceeding further with the Cocoa installation.
->
->     [Adapted from Cocoa/set_installation_options.sh shell script] 
->     # ------------------------------------------------------------------------------
->     # Adopted Python version -------------------------------------------------------
->     # ------------------------------------------------------------------------------
->     export PYTHON_VERSION=3.9
-
-
 
 **Step :two:**: Install `git-lfs` when loading the Conda cocoa environment for the first time.
 
@@ -89,10 +80,9 @@ Users can now proceed to **step :two:**.
 
 ## Installation and Compilation of external modules <a name="cobaya_base_code"></a>
 
-**Step :one:**: Download Cocoa's latest release and go to the `cocoa` main folder,
+**Step :one:**: Download cocoa's latest release and go to the `cocoa` main folder,
 
-    "${CONDA_PREFIX}"/bin/git clone --depth 1 https://github.com/CosmoLike/cocoa.git --branch v4.0-beta21 cocoa
-
+    "${CONDA_PREFIX}"/bin/git clone --depth 1 https://github.com/CosmoLike/cocoa.git --branch v4.0-beta22 cocoa
 
 and
 
@@ -101,7 +91,7 @@ and
 Users can now proceed to **step :two:**.
 
 > [!TIP]
-> If users want to clone the latest commit (not advisable), then clone the repository with the following command 
+> If you want to work from the latest commit, then clone the repository with the following command 
 >
 > (SSH)
 > 
@@ -112,7 +102,7 @@ Users can now proceed to **step :two:**.
 >     "${CONDA_PREFIX}"/bin/git clone https://github.com/CosmoLike/cocoa.git cocoa
 
 > [!TIP]
-> If users want to develop Cocoa from a release version (e.g., `v4.0-beta17`), check the appendix [FAQ: How do we push changes to the Cocoa main branch? A few git hacks](#push_main)
+> If you want to develop from a release version (e.g., `v4.0-beta20`), check the appendix [FAQ: How do we push changes to the Cocoa main branch? A few git hacks](#push_main)
 
 **Step :two:**: Run the script `setup_cocoa.sh` via
         
@@ -121,15 +111,14 @@ Users can now proceed to **step :two:**.
 > [!NOTE]
 > This script downloads and decompresses external modules, requiring internet access to run successfully.
 
-> [!Tip]
-> If users run `setup_cocoa.sh` more than once, Cocoa will not download (git clone) previously installed packages or remake the Cocoa private Python environment. To overwrite this behavior, users must set the key `OVERWRITE_EXISTING_ALL_PACKAGES` on the `set_installation_options.sh` shell script. Even with this key activated, Cocoa will not download large datasets again (e.g., ACT-DR6). Users must also set the key `REDOWNLOAD_EXISTING_ALL_DATA` to enable this additional behavior. These two optimizations prevent Cocoa from downloading several gigabytes repeatedly. 
-
+> [!NOTE]
+> If you run `setup_cocoa.sh` multiple times, Cocoa will not download previously installed packages. To overwrite this behavior, export the key `OVERWRITE_EXISTING_ALL_PACKAGES` on `set_installation_options.sh`. Even with this optimization disabled, cocoa will not download large datasets repeatedly unless the key `REDOWNLOAD_EXISTING_ALL_DATA` is also set.
 
 **Step :three:**: Run the script `compile_cocoa.sh` by typing 
 
     source compile_cocoa.sh
     
-This script compiles external modules selected for installation on the `set_installation_options.sh` shell script (e.g., CAMB and Class). 
+This script compiles external modules selected for installation on `set_installation_options.sh` (e.g., CAMB and Class). 
 
 > [!NOTE]
 > In some HPC environments, the compute nodes cannot access the web. So, by design, the script `compile_cocoa.sh` does not require internet access to run successfully. Code compilation is a CPU-intensive operation, so running  `compile_cocoa.sh` on a cluster login node can be against HPC policy. Users should then run `setup_cocoa.sh` in a login node and `compile_cocoa.sh` in a compute node.
@@ -153,7 +142,7 @@ We assume that you are still in the Conda cocoa environment from the previous `c
     export OMP_PROC_BIND=close; export OMP_NUM_THREADS=8
 
 > [!NOTE]
-> `OMP_PROC_BIND=close` bound OpenMP threads to physically close cores. This is an important optimization when running cocoa in current chiplet-based architectures, as they scatter physical cores in multiple chiplets but provide limit communication bandwidth between chiplets. Threads running across different chiplets may suffer from (1) Higher latency when accessing shared data, (2) Lower memory bandwidth, and (3) Reduced cache efficiency due to lack of shared caches between chiplets.
+> `OMP_PROC_BIND=close` bound OpenMP threads to physically close cores (within the same chiplet on chiplet-based architectures).
 
 ### Examples not involving Cosmolike
 
@@ -161,11 +150,11 @@ We assume that you are still in the Conda cocoa environment from the previous `c
 
 One model evaluation:
 
-    mpirun -n 1 --oversubscribe --mca btl vader,tcp,self --bind-to core:overload-allowed --rank-by core --map-by numa:pe=${OMP_NUM_THREADS} cobaya-run  ./projects/example/EXAMPLE_EVALUATE1.yaml -f
+    mpirun -n 1 --oversubscribe --mca pml ^ucx --mca btl vader,tcp,self --bind-to core:overload-allowed --rank-by slot --map-by numa:pe=${OMP_NUM_THREADS} cobaya-run  ./projects/example/EXAMPLE_EVALUATE1.yaml -f
         
-MCMC:
+MCMC (we run MCMCs with 32 cores):
 
-    mpirun -n 4 --oversubscribe --mca btl vader,tcp,self --bind-to core:overload-allowed --rank-by core --map-by numa:pe=${OMP_NUM_THREADS} cobaya-run ./projects/example/EXAMPLE_MCMC1.yaml -f
+    mpirun -n 4 --oversubscribe --mca pml ^ucx --mca btl vader,tcp,self --bind-to core:overload-allowed --rank-by slot --map-by numa:pe=${OMP_NUM_THREADS} cobaya-run ./projects/example/EXAMPLE_MCMC1.yaml -f
 
 ### Examples involving Cosmolike
 
@@ -173,11 +162,11 @@ MCMC:
 
 One model evaluation:
 
-    mpirun -n 1 --oversubscribe --mca btl vader,tcp,self --bind-to core:overload-allowed --rank-by core --map-by numa:pe=${OMP_NUM_THREADS} cobaya-run ./projects/lsst_y1/EXAMPLE_EVALUATE1.yaml -f
-        
-MCMC:
+    mpirun -n 1 --oversubscribe --mca pml ^ucx --mca btl vader,tcp,self --bind-to core:overload-allowed --rank-by slot --map-by numa:pe=${OMP_NUM_THREADS} cobaya-run ./projects/lsst_y1/EXAMPLE_EVALUATE1.yaml -f
 
-    mpirun -n 4 --oversubscribe --mca btl vader,tcp,self --bind-to core:overload-allowed --rank-by core --map-by numa:pe=${OMP_NUM_THREADS} cobaya-run ./projects/lsst_y1/EXAMPLE_MCMC1.yaml -f
+MCMC (we run MCMCs with 32 cores):
+
+    mpirun -n 4 --oversubscribe --mca pml ^ucx --mca btl vader,tcp,self --bind-to core:overload-allowed --rank-by slot --map-by numa:pe=${OMP_NUM_THREADS} cobaya-run ./projects/lsst_y1/EXAMPLE_MCMC1.yaml -f
 
 Profile:
 
@@ -189,8 +178,8 @@ and
 
 and
 
-    mpirun -n ${NMPI} --oversubscribe --mca btl vader,tcp,self --bind-to core:overload-allowed --rank-by core --map-by numa:pe=${OMP_NUM_THREADS} python -m mpi4py.futures EXAMPLE_PROFILE1.py --mpi $((${NMPI}-1)) --profile 1 --tol 0.05 --AB 1.0 --outroot 'profile' --minmethod 5 --maxiter 1 --maxfeval 250 
-      
+    mpirun -n ${NMPI} --oversubscribe --mca pml ^ucx --mca btl vader,tcp,self --bind-to core:overload-allowed --rank-by slot --map-by numa:pe=${OMP_NUM_THREADS} python -m mpi4py.futures EXAMPLE_PROFILE1.py --mpi $((${NMPI}-1)) --profile 1 --tol 0.05 --AB 1.0 --outroot 'profile' --minmethod 5 --maxiter 1 --maxfeval 250 
+ 
 > [!TIP]
 > To run Jupyter Notebook, assuming cocoa is installed on a local machine, type, after step 2️⃣, the command 
 > 
@@ -228,6 +217,38 @@ and
 > [!TIP]
 > If users want to download a project not provided by default or intend to clone existing projects in development mode, check the appendix [FAQ: How do we download and run Cosmolike projects?](running_cosmolike_projects).
 > 
+
+## Running Examples based on Machine Learning emulators <a name="cobaya_base_code_examples_emul"></a>
+
+Cocoa contains a few transformer-based neural network emulators capable of simulating CMB, cosmolike, matter power spectrum and distances. We provide a few scripts that exemplify their API. To run them, we assume users have commented out the following lines on `set_installation_options.sh` prior to running the `setup_cocoa.sh` and `compile_cocoa.sh` installation scripts.
+
+      [Adapted from Cocoa/set_installation_options.sh shell script] 
+      # inset # symbol in the lines below (i.e., unset these environmental keys)
+      #export IGNORE_EMULTRF_CODE=1  #SaraivanovZhongZhu (SZZ) transformer-based emul
+      #export IGNORE_EMULTRF_DATA=1  #SaraivanovZhongZhu (SZZ) transformer-based emul
+
+ **Step :one:**: Activate the private Python environment by sourcing the script `start_cocoa.sh`
+
+    source start_cocoa.sh
+
+ **Step :two:**: Select the number of OpenMP cores (no need to thread via OpenMP).
+    
+    export OMP_PROC_BIND=close; export OMP_NUM_THREADS=1
+
+ **Step :three:** So, run `cobaya-run` on the first emulator example following the commands below.
+
+One model evaluation:
+
+    mpirun -n 1 --oversubscribe --mca pml ^ucx --mca btl vader,tcp,self --bind-to core:overload-allowed --rank-by slot --map-by numa:pe=${OMP_NUM_THREADS} cobaya-run ./projects/example/EXAMPLE_EVALUATE22.yaml -f
+        
+MCMC (we run MCMCs with 12 cores):
+
+    mpirun -n 4 --oversubscribe --mca btl vader,tcp,self --bind-to core:overload-allowed --rank-by slot --map-by numa:pe=${OMP_NUM_THREADS} cobaya-run ./projects/example/EXAMPLE_MCMC22.yaml -f
+
+PolyChord (we run Nested Sampling with 24 cores):
+
+    mpirun -n 8 --oversubscribe --mca pml ^ucx --mca btl vader,tcp,self --bind-to core:overload-allowed --rank-by slot --map-by numa:pe=${OMP_NUM_THREADS} cobaya-run ./projects/example/EXAMPLE_POLY22.yaml -f
+    
 ## Appendix <a name="appendix"></a>
 
 ### Credits <a name="appendix_proper_credits"></a>
@@ -287,12 +308,6 @@ Following best practices, Cocoa scripts download most external modules from thei
 > This behavior enables users to work on multiple instances of Cocoa simultaneously, similar to what was possible with [CosmoMC](https://github.com/cmbant/CosmoMC).
 
 - *Running Examples*
-
-> [!TIP]
-> We offer the flag `COCOA_RUN_EVALUATE` as an alias (syntax-sugar) for `mpirun -n 1 --oversubscribe --mca btl vader,tcp,self --bind-to core:overload-allowed --rank-by core --map-by numa:pe=4 cobaya-run`.
-
-> [!TIP]
-> We offer the flag `COCOA_RUN_MCMC` as an alias (syntax-sugar) for `mpirun -n 4 --oversubscribe --mca btl vader,tcp,self --bind-to core:overload-allowed --rank-by core --map-by numa:pe=4 cobaya-run`. 
 
 > [!NOTE]
 > Additional explanations about our `mpirun` flags: Why the `--mca btl vader,tcp,self` flag? Conda-forge developers don't [compile OpenMPI with Infiniband compatibility](https://github.com/conda-forge/openmpi-feedstock/issues/38).
@@ -701,41 +716,8 @@ Commenting out the environmental flags shown below, located at *set_installation
     # ------------------------------------------------------------------------------
     # If not set, Cocoa/installation_scripts/setup_pip_core_packages.sh will install several ML packages
     # ------------------------------------------------------------------------------
-    #export IGNORE_EMULATOR_CPU_PIP_PACKAGES=1
     #export IGNORE_EMULATOR_GPU_PIP_PACKAGES=1
-        
-We recommend using the GPU versions to train the emulator while using the CPU versions to run the MCMCs. This can be achieved by creating two separate environments, i.e., two independent CoCoA copies. Alternatively, users can manually incorporate the pip ML installation commands located on the shell script `Cocoa/installation_scripts/setup_pip_core_packages.sh` in their conda environments (two conda environments, one for the GPU and one for the CPU runs).
-
-    [Adapted from Cocoa/installation_scripts/setup_pip_core_packages.sh script - the command may not be entirely up to date] 
-     
-    #CPU VERSION
-    env CXX="${CXX_COMPILER:?}" CC="${C_COMPILER:?}" ${PIP3:?} install \
-        'tensorflow-cpu==2.12.0' \
-        'tensorflow_probability-0.21.0' \
-        'keras==2.12.0' \
-        'keras-preprocessing==1.1.2' \
-        'torch==1.13.1+cpu' \
-        'torchvision==0.14.1+cpu' \
-        'torchaudio==0.13.1' \
-        'tensiometer==0.1.2' \
-      --extra-index-url "https://download.pytorch.org/whl/cpu" \
-      --prefix="${ROOTDIR:?}/.local" 
-
-    (...)
-
-    #GPU VERSION
-    env CXX="${CXX_COMPILER:?}" CC="${C_COMPILER:?}" ${PIP3:?} install \
-        'tensorflow==2.12.0' \
-        'tensorflow_probability-0.21.0' \
-        'keras==2.12.0' \
-        'keras-preprocessing==1.1.2' \
-        'torch==1.13.1+cu116' \
-        'torchvision==0.14.1+cu116' \
-        'torchaudio==0.13.1' \
-        'tensiometer==0.1.2' \
-      --extra-index-url "https://download.pytorch.org/whl/cu116" \
-      --prefix="${ROOTDIR:?}/.local"
-      
+              
 ### :interrobang: FAQ: How can users improve their Bash/C/C++ knowledge to develop Cocoa/Cosmolike? :book::book: <a name="lectnotes"></a>
 
 A working knowledge of Python is required to understand the Cobaya framework at the developer level. Users must also know the Bash language to understand Cocoa's scripts. Proficiency in C and C++ is also needed to manipulate Cosmolike and the C++ Cobaya-Cosmolike C++ interface. Finally, users need to understand the Fortran-2003 language to modify CAMB.

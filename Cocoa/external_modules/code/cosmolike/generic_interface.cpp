@@ -13,6 +13,7 @@
 #include <cmath> 
 
 // SPDLOG
+#define SPDLOG_ACTIVE_LEVEL SPDLOG_LEVEL_DEBUG
 #include <spdlog/spdlog.h>
 #include <spdlog/sinks/basic_file_sink.h>
 #include <spdlog/cfg/env.h>
@@ -466,8 +467,9 @@ void init_binning_cmb_bandpower(
 
 void init_binning_fourier(
     const int Nells, 
-    const int lmin, 
-    const int lmax
+    const double lmin, 
+    const double lmax,
+    const double lmax_shear
   )
 {
   spdlog::debug("{}: Begins", "init_binning_fourier");
@@ -479,15 +481,18 @@ void init_binning_fourier(
     exit(1);
   }
 
-  spdlog::debug("{}: {} = {} selected.","init_binning_fourier","Nells",Nells);
-  spdlog::debug("{}: {} = {} selected.","init_binning_fourier","l_min",lmin);
-  spdlog::debug("{}: {} = {} selected.","init_binning_fourier","l_max",lmax);
+  spdlog::info("{}: {} = {:d} selected.","init_binning_fourier","Nells",Nells);
+  spdlog::info("{}: {} = {:.0f} selected.","init_binning_fourier","l_min",lmin);
+  spdlog::info("{}: {} = {:.0f} selected.","init_binning_fourier","l_max",lmax);
+  spdlog::info("{}: {} = {:.0f} selected.","init_binning_fourier","l_max_shear",lmax_shear);
 
   like.Ncl = Nells;
   
   like.lmin = lmin;
   
   like.lmax = lmax;
+
+  like.lmax_shear = lmax_shear;
   
   const double logdl = (std::log(like.lmax) - std::log(like.lmin))/like.Ncl;
   
@@ -497,11 +502,11 @@ void init_binning_fourier(
   {
     like.ell[i] = std::exp(std::log(like.lmin) + (i + 0.5)*logdl);
   
-    spdlog::debug("{}: Bin {:d} - {} = {:.4e}, {} = {:.4e} and {} = {:.4e}",
+    spdlog::info("{}: Bin {:d} - {} = {:.0f}, {} = {:.0f} and {} = {:.0f}",
       "init_binning_fourier", i, "lmin", lmin, "ell", like.ell[i], "lmax", lmax);
   }
 
-  spdlog::debug("{}: Ends", "init_binning_fourier");
+  spdlog::info("{}: Ends", "init_binning_fourier");
 }
 
 // ---------------------------------------------------------------------------
@@ -519,7 +524,7 @@ void init_binning_real_space(
   if (!(Ntheta > 0))
   {
     spdlog::critical("{}: {} = {} not supported", "init_binning_real_space",
-      "NthetaNtheta", Ntheta);
+      "Ntheta", Ntheta);
     exit(1);
   }
 
@@ -648,8 +653,8 @@ void init_data_vector_size_real_space(arma::Col<int>::fixed<6> exclude)
       Ntable.Ntheta*2*tomo.shear_Npowerspectra,
       Ntable.Ntheta*tomo.ggl_Npowerspectra,
       Ntable.Ntheta*tomo.clustering_Npowerspectra,
-      Ntable.Ntheta*redshift.shear_nbin,
       Ntable.Ntheta*redshift.clustering_nbin,
+      Ntable.Ntheta*redshift.shear_nbin,
       0
     };
 
@@ -803,8 +808,8 @@ void init_data_vector_size_fourier_space(
       like.Ncl*tomo.shear_Npowerspectra,
       like.Ncl*tomo.ggl_Npowerspectra,
       like.Ncl*tomo.clustering_Npowerspectra,
-      like.Ncl*redshift.shear_nbin,
       like.Ncl*redshift.clustering_nbin,
+      like.Ncl*redshift.shear_nbin,
       0
     };
 
@@ -872,7 +877,7 @@ void init_data_vector_size_3x2pt_fourier_space()
 
   init_data_vector_size_fourier_space(exclude);
   
-  spdlog::debug(
+  spdlog::info(
       "{}: {} = {} selected.", 
       "init_data_vector_size_3x2pt_fourier_space", 
       "Ndata", 
@@ -980,13 +985,39 @@ void init_data_3x2pt_real_space(
 
   init_data_vector_size_3x2pt_real_space();
   
-  IP::get_instance().set_mask(mask, order);   // set_mask must be called first
+  IP::get_instance().set_mask(mask, order, 1);  // set_mask must be called first
   
   IP::get_instance().set_data(data);
   
   IP::get_instance().set_inv_cov(cov);
 
   spdlog::debug("{}: Ends", "init_data_3x2pt_real_space");
+
+  return;
+}
+
+// ---------------------------------------------------------------------------
+// ---------------------------------------------------------------------------
+// ---------------------------------------------------------------------------
+
+void init_data_3x2pt_fourier_space(
+    std::string cov, 
+    std::string mask, 
+    std::string data, 
+    arma::Col<int>::fixed<3> order
+  )
+{
+  spdlog::debug("{}: Begins", "init_data_3x2pt_fourier_space");
+
+  init_data_vector_size_3x2pt_fourier_space();
+  
+  IP::get_instance().set_mask(mask, order, 0);  // set_mask must be called first
+  
+  IP::get_instance().set_data(data);
+  
+  IP::get_instance().set_inv_cov(cov);
+
+  spdlog::debug("{}: Ends", "init_data_3x2pt_fourier_space");
 
   return;
 }
@@ -1004,15 +1035,41 @@ void init_data_6x2pt_real_space(
 {
   spdlog::debug("{}: Begins", "init_data_6x2pt_real_space");
 
-  init_data_vector_size_6x2pt_fourier_space();
+  init_data_vector_size_6x2pt_real_space();
   
-  IP::get_instance().set_mask(mask, order);   // set_mask must be called first
+  IP::get_instance().set_mask(mask, order, 1);  // set_mask must be called first
   
   IP::get_instance().set_data(data);
   
   IP::get_instance().set_inv_cov(cov);
 
   spdlog::debug("{}: Ends", "init_data_6x2pt_real_space");
+
+  return;
+}
+
+// ---------------------------------------------------------------------------
+// ---------------------------------------------------------------------------
+// ---------------------------------------------------------------------------
+
+void init_data_6x2pt_fourier_space(
+    std::string cov, 
+    std::string mask, 
+    std::string data,
+    arma::Col<int>::fixed<6> order
+  )
+{
+  spdlog::debug("{}: Begins", "init_data_6x2pt_fourier_space");
+
+  init_data_vector_size_6x2pt_fourier_space();
+  
+  IP::get_instance().set_mask(mask, order, 0);  // set_mask must be called first
+  
+  IP::get_instance().set_data(data);
+  
+  IP::get_instance().set_inv_cov(cov);
+
+  spdlog::debug("{}: Ends", "init_data_6x2pt_fourier_space");
 
   return;
 }
@@ -1440,11 +1497,34 @@ void init_ntomo_powerspectra()
 
   int n = 0;
   for (int i=0; i<redshift.clustering_nbin; i++)
+  {
     for (int j=0; j<redshift.shear_nbin; j++)
+    {
       n += test_zoverlap(i, j);
+      if(test_zoverlap(i, j)==0)
+      {
+        spdlog::info("{}: GGL pair L{:d}-S{:d} is excluded",
+          "init_ntomo_powerspectra", i, j);
+      }
+    }
+  }
   tomo.ggl_Npowerspectra = n;
 
   tomo.clustering_Npowerspectra = redshift.clustering_nbin;
+
+  spdlog::info(
+    "{}: tomo.shear_Npowerspectra = {}",
+    "init_ntomo_powerspectra", tomo.shear_Npowerspectra
+  );
+  spdlog::info(
+    "{}: tomo.ggl_Npowerspectra = {}",
+    "init_ntomo_powerspectra", tomo.ggl_Npowerspectra
+  );
+  spdlog::info(
+    "{}: tomo.clustering_Npowerspectra = {}",
+    "init_ntomo_powerspectra", tomo.clustering_Npowerspectra
+  );
+
 }
 
 // ---------------------------------------------------------------------------
@@ -1499,6 +1579,27 @@ void init_survey(
   survey.sigma_e = sigma_e;
 
   spdlog::debug("{}: Ends", "init_survey");
+}
+
+// ---------------------------------------------------------------------------
+// ---------------------------------------------------------------------------
+// ---------------------------------------------------------------------------
+
+void init_ggl_exclude(arma::Col<int> ggl_exclude)
+{
+  arma::Col<int> _ggl_excl_ = arma::conv_to<arma::Col<int>>::from(ggl_exclude);
+  
+  if (tomo.ggl_exclude != NULL) {
+    free(tomo.ggl_exclude);
+  }
+  tomo.ggl_exclude   = (int*) malloc(sizeof(int)*ggl_exclude.n_elem);
+  tomo.N_ggl_exclude = int(ggl_exclude.n_elem/2);
+  
+  spdlog::info("init_ggl_exclude: {} ggl pairs excluded", tomo.N_ggl_exclude);
+  
+  for(int i=0; i<ggl_exclude.n_elem; i++) {
+    tomo.ggl_exclude[i] = ggl_exclude(i);
+  }
 }
 
 // ---------------------------------------------------------------------------
@@ -1563,6 +1664,7 @@ void set_cosmological_parameters(
 
   spdlog::debug("\x1b[90m{}\x1b[0m: Ends", "set_cosmological_parameters");
 }
+
 
 // ---------------------------------------------------------------------------
 // ---------------------------------------------------------------------------
@@ -2387,7 +2489,7 @@ void compute_ss_fourier_masked(vector& data_vector, const int start)
       {
         const int index = start + like.Ncl*nz + i;
         
-        if (like.ell[i] < like.lmax_shear)
+        if (IP::get_instance().get_mask(index)&&(like.ell[i]<like.lmax_shear))
         {
           data_vector(index) = C_ss_tomo_limber(like.ell[i], z1, z2, 1)*
             (1.0 + nuisance.shear_calibration_m[z1])*
@@ -2441,7 +2543,7 @@ void compute_gs_fourier_masked(vector& data_vector, const int start)
 {
   if (like.shear_pos == 1)
   {
-    for (int nz=0; nz<tomo.shear_Npowerspectra; nz++)
+    for (int nz=0; nz<tomo.ggl_Npowerspectra; nz++)
     {
       const int zl = ZL(nz);
       const int zs = ZS(nz);
@@ -2449,8 +2551,7 @@ void compute_gs_fourier_masked(vector& data_vector, const int start)
       for (int i=0; i<like.Ncl; i++)
       {
         const int index = start + like.Ncl*nz + i;
-        
-        if (test_kmax(like.ell[i], zl))
+        if (IP::get_instance().get_mask(index))
         {
           data_vector(index) = C_gs_tomo_limber(like.ell[i], zl, zs)*
               (1.0 + nuisance.shear_calibration_m[zs]);
@@ -2499,9 +2600,9 @@ void compute_gg_fourier_masked(vector& data_vector, const int start)
     {
       for (int i=0; i<like.Ncl; i++)
       {
-        const int index = start + Ntable.Ntheta*nz + i;
+        const int index = start + like.Ncl*nz + i;
 
-        if (test_kmax(like.ell[i], nz))
+        if (IP::get_instance().get_mask(index))
           data_vector(index) = C_gg_tomo_limber(like.ell[i], nz, nz);
         else
           data_vector(index) = 0.0;
@@ -2891,19 +2992,20 @@ vector compute_data_vector_3x2pt_fourier_masked_any_order(
 
   constexpr int sz = 3;
 
+  // probe type indices, 0,1,2,... 
   auto indices = arma::conv_to<arma::Col<int>>::from(
       arma::stable_sort_index(order, "ascend")
     );
-
+  // size of each probe type
   arma::Col<int>::fixed<sz> sizes =
     {
       like.Ncl*tomo.shear_Npowerspectra,
       like.Ncl*tomo.ggl_Npowerspectra,
       like.Ncl*tomo.clustering_Npowerspectra
     };
-
+  // the starting index of each probe
   arma::Col<int>::fixed<sz> start = {0,0,0};
-
+  // for each probe
   for(int i=0; i<sz; i++)
   {
     for(int j=0; j<indices(i); j++)
@@ -2911,14 +3013,21 @@ vector compute_data_vector_3x2pt_fourier_masked_any_order(
       start(i) += sizes(indices(j));
     }
   }
+
+  spdlog::debug("{}: start from {} - {} - {}",
+    "compute_data_vector_3x2pt_fourier_masked_any_order", 
+    start(0), start(1), start(2));
   
   vector data_vector(like.Ndata, arma::fill::zeros);
   
   compute_ss_fourier_masked(data_vector, start(0));
+  spdlog::debug("compute_ss_fourier_masked done");
 
   compute_gs_fourier_masked(data_vector, start(1));
+  spdlog::debug("compute_gs_fourier_masked done");
 
   compute_gg_fourier_masked(data_vector, start(2));
+  spdlog::debug("compute_gg_fourier_masked done");
 
   spdlog::debug(
       "{}: Ends", 
@@ -2956,6 +3065,45 @@ arma::Col<double> compute_data_vector_3x2pt_real_masked_any_order(
   {
     spdlog::critical("{}: {} invalid datavector or PC eigenvectors",
       "compute_data_vector_3x2pt_real_masked_any_order");
+    exit(1);
+  }
+
+  for (int j=0; j<dv.n_elem; j++)
+    for (int i=0; i<Q.n_elem; i++)
+      if (IP::get_instance().get_mask(j))
+        dv(j) += Q(i) * BaryonScenario::get_instance().get_pcs(j, i);
+ 
+  return dv;
+}
+
+// ---------------------------------------------------------------------------
+// ---------------------------------------------------------------------------
+// ---------------------------------------------------------------------------
+
+arma::Col<double> compute_data_vector_3x2pt_fourier_masked_any_order(
+    arma::Col<double> Q,                // PC amplitudes
+    arma::Col<int>::fixed<3> order
+  )
+{
+  if (!BaryonScenario::get_instance().is_pcs_set())
+  {
+    spdlog::critical("{}: {} not set prior to this function call",
+      "compute_data_vector_3x2pt_fourier_masked_any_order", "baryon PCs");
+    exit(1);
+  }
+  if (BaryonScenario::get_instance().get_pcs().row(0).n_elem < Q.n_elem)
+  {
+    spdlog::critical("{}: {} invalid PC amplitude vector or PC eigenvectors",
+      "compute_data_vector_3x2pt_fourier_masked_any_order");
+    exit(1);
+  }
+
+  arma::Col<double> dv = compute_data_vector_3x2pt_fourier_masked_any_order(order);
+  
+  if (BaryonScenario::get_instance().get_pcs().col(0).n_elem != dv.n_elem)
+  {
+    spdlog::critical("{}: {} invalid datavector or PC eigenvectors",
+      "compute_data_vector_3x2pt_fourier_masked_any_order");
     exit(1);
   }
 
@@ -3035,6 +3183,100 @@ matrix compute_baryon_pcas_3x2pt_real(arma::Col<int>::fixed<3> order)
         "{}: Computing contaminated data vector"
         " with baryon scenario {} ends", 
         "compute_baryon_pcas_3x2pt_real",
+        BaryonScenario::get_instance().get_scenario(i)
+      );
+  }
+
+  reset_bary_struct();
+  
+  // line below to force clear cosmolike cosmology cache
+  cosmology.random = RandomNumber::get_instance().get();
+
+  // weight the diff matrix by inv_L; then SVD ----------------------------  
+  matrix U, V;
+  vector s;
+  arma::svd(U, s, V, inv_L * D);
+
+  // compute PCs ----------------------------------------------------------
+  matrix PC = L * U; 
+
+  // Expand the number of dims --------------------------------------------
+  matrix R = matrix(ndata, nscenarios); 
+
+  for (int i=0; i<nscenarios; i++)
+    R.col(i) = IP::get_instance().expand_theory_data_vector_from_sqzd(PC.col(i));
+
+  return R;
+}
+
+// ---------------------------------------------------------------------------
+// ---------------------------------------------------------------------------
+// ---------------------------------------------------------------------------
+
+matrix compute_baryon_pcas_3x2pt_fourier(arma::Col<int>::fixed<3> order)
+{
+  const int ndata = IP::get_instance().get_ndata();
+
+  const int ndata_sqzd = IP::get_instance().get_ndata_sqzd();
+  
+  const int nscenarios = BaryonScenario::get_instance().nscenarios();
+
+  // Compute Cholesky Decomposition of the Covariance Matrix --------------
+  
+  spdlog::debug("{}: Computing Cholesky Decomposition of"
+    " the Covariance Matrix begins", "compute_baryon_pcas_3x2pt_fourier");
+
+  matrix L = arma::chol(IP::get_instance().get_cov_masked_sqzd(), "lower");
+
+  matrix inv_L = arma::inv(L);
+
+  spdlog::debug("{}: Computing Cholesky Decomposition of"
+    " the Covariance Matrix ends", "compute_baryon_pcas_3x2pt_fourier");
+
+  // Compute Dark Matter data vector --------------------------------------
+  
+  spdlog::debug("{}: Computing DM only data vector begins", 
+    "compute_baryon_pcas_3x2pt_fourier");
+  
+  cosmology.random = RandomNumber::get_instance().get();
+  
+  reset_bary_struct(); // make sure there is no baryon contamination
+
+  vector dv_dm = IP::get_instance().sqzd_theory_data_vector(
+      compute_data_vector_3x2pt_fourier_masked_any_order(order)
+    );
+
+  spdlog::debug("{}: Computing DM only data vector ends", 
+    "compute_baryon_pcas_3x2pt_fourier");
+
+  // Compute data vector for all Baryon scenarios -------------------------
+  
+  matrix D = matrix(ndata_sqzd, nscenarios);
+
+  for (int i=0; i<nscenarios; i++)
+  {
+    spdlog::debug(
+        "{}: Computing contaminated data vector"
+        " with baryon scenario {} begins", 
+        "compute_baryon_pcas_3x2pt_fourier",
+        BaryonScenario::get_instance().get_scenario(i)
+      );
+
+    // line below to force clear cosmolike cosmology cache
+    cosmology.random = RandomNumber::get_instance().get();
+
+    init_baryons_contamination(BaryonScenario::get_instance().get_scenario(i));
+
+    vector dv = IP::get_instance().sqzd_theory_data_vector(
+        compute_data_vector_3x2pt_fourier_masked_any_order(order)
+      );
+
+    D.col(i) = dv - dv_dm;
+
+    spdlog::debug(
+        "{}: Computing contaminated data vector"
+        " with baryon scenario {} ends", 
+        "compute_baryon_pcas_3x2pt_fourier",
         BaryonScenario::get_instance().get_scenario(i)
       );
   }
@@ -3249,7 +3491,7 @@ void IP::set_data(std::string datavector_filename)
   this->is_data_set_ = true;
 }
 
-void IP::set_mask(std::string mask_filename, arma::Col<int>::fixed<3> order)
+void IP::set_mask(std::string mask_filename, arma::Col<int>::fixed<3> order, const int real_space)
 {
   if (!(like.Ndata>0))
   {
@@ -3292,12 +3534,19 @@ void IP::set_mask(std::string mask_filename, arma::Col<int>::fixed<3> order)
       arma::stable_sort_index(order, "ascend")
     );
 
-  arma::Col<int>::fixed<sz> sizes =
-    {
-      2*Ntable.Ntheta*tomo.shear_Npowerspectra,
-      Ntable.Ntheta*tomo.ggl_Npowerspectra,
-      Ntable.Ntheta*tomo.clustering_Npowerspectra,
-    };
+  arma::Col<int>::fixed<sz> sizes = {0,0,0}; 
+  if(real_space==1)
+  {
+    sizes(0) = 2*Ntable.Ntheta*tomo.shear_Npowerspectra;
+    sizes(1) = Ntable.Ntheta*tomo.ggl_Npowerspectra;
+    sizes(2) = Ntable.Ntheta*tomo.clustering_Npowerspectra;
+  }
+  else
+  {
+    sizes(0) = like.Ncl*tomo.shear_Npowerspectra;
+    sizes(1) = like.Ncl*tomo.ggl_Npowerspectra;
+    sizes(2) = like.Ncl*tomo.clustering_Npowerspectra;
+  }
 
   arma::Col<int>::fixed<sz> start = {0,0,0};
 
@@ -3381,7 +3630,7 @@ void IP::set_mask(std::string mask_filename, arma::Col<int>::fixed<3> order)
   this->is_mask_set_ = true;
 }
 
-void IP::set_mask(std::string mask_filename, arma::Col<int>::fixed<6> order)
+void IP::set_mask(std::string mask_filename, arma::Col<int>::fixed<6> order, const int real_space)
 {
   if (!(like.Ndata>0))
   {
@@ -3430,15 +3679,25 @@ void IP::set_mask(std::string mask_filename, arma::Col<int>::fixed<6> order)
       arma::stable_sort_index(order, "ascend")
     );
 
-  arma::Col<int>::fixed<sz> sizes =
-    {
-      2*Ntable.Ntheta*tomo.shear_Npowerspectra,
-      Ntable.Ntheta*tomo.ggl_Npowerspectra,
-      Ntable.Ntheta*tomo.clustering_Npowerspectra,
-      Ntable.Ntheta*redshift.clustering_nbin,
-      Ntable.Ntheta*redshift.shear_nbin,
-      like.is_cmb_bandpower  == 1 ? like.Nbp : like.Ncl 
-    };
+  arma::Col<int>::fixed<sz> sizes = {0,0,0,0,0,0};
+  if(real_space==1)
+  {
+    sizes(0) = 2*Ntable.Ntheta*tomo.shear_Npowerspectra;
+    sizes(1) = Ntable.Ntheta*tomo.ggl_Npowerspectra;
+    sizes(2) = Ntable.Ntheta*tomo.clustering_Npowerspectra;
+    sizes(3) = Ntable.Ntheta*redshift.clustering_nbin;
+    sizes(4) = Ntable.Ntheta*redshift.shear_nbin;
+    sizes(5) = like.is_cmb_bandpower  == 1 ? like.Nbp : like.Ncl;
+  }
+  else
+  {
+    sizes(0) = like.Ncl*tomo.shear_Npowerspectra;
+    sizes(1) = like.Ncl*tomo.ggl_Npowerspectra;
+    sizes(2) = like.Ncl*tomo.clustering_Npowerspectra;
+    sizes(3) = like.Ncl*redshift.clustering_nbin;
+    sizes(4) = like.Ncl*redshift.shear_nbin;
+    sizes(5) = like.is_cmb_bandpower  == 1 ? like.Nbp : like.Ncl;
+  }
 
   arma::Col<int>::fixed<sz> start = {0,0,0,0,0,0};
 

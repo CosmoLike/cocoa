@@ -126,8 +126,24 @@ int test_zoverlap(int ni, int nj) // test whether source bin nj is behind lens b
     log_fatal("invalid bin input (ni, nj) = (%d, %d)", ni, nj);
     exit(1);
   }
+  int res = 1;
+  // check if explicitly excluded (return False)
+  if(tomo.ggl_exclude != NULL)
+  {
+    for(int k=0; k<tomo.N_ggl_exclude; k++)
+    {
+      int i = k*2+0;
+      int j = k*2+1;
+      if((ni==tomo.ggl_exclude[i]) && (nj==tomo.ggl_exclude[j]))
+      {
+        res = 0;
+        break;
+      }
+    }
+  }
+  // otherwise, return True
 
-  return 1;
+  return res;
 }
 
 // -----------------------------------------------------------------------------

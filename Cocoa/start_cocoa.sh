@@ -12,9 +12,9 @@ error_start_cocoa () {
   local MSG="\033[0;31m (${FILE}) we cannot run "
   local MSG2="\033[0m"
   echo -e "${MSG}${1:?}${MSG2}" 2>"/dev/null"
-  unset -f error_cip
+  unset -f error_start_cocoa
   cd $(pwd -P) 2>"/dev/null"
-  source stop_cocoa 2>"/dev/null"
+  source stop_cocoa.sh 2>"/dev/null"
   return 1
 }
 
@@ -96,14 +96,14 @@ if [[ -z "${IGNORE_ACTDR6_CODE}" ]]; then
   TMP2="act_dr6_cmbonly"
   if [[ ! -L "${COBLIKE:?}/${TMP2}" ]]; then
     ln -s "${ECODEF:?}/${TMP}/${TMP2}" "${COBLIKE:?}" \
-      >${OUT1:?} 2>${OUT2:?} || { error "${EC34:?}"; return 1; }
+      >${OUT1:?} 2>${OUT2:?} || { error_start_cocoa "${EC34:?}"; return 1; }
   fi
 
   TMP="${ACTDR6_MFLIKE_NAME:-"act_dr6_mflike"}"
   TMP2="act_dr6_mflike"
   if [[ ! -L "${COBLIKE:?}/${TMP2}" ]]; then
     ln -s "${ECODEF:?}/${TMP}/${TMP2}" "${COBLIKE:?}" \
-      >${OUT1:?} 2>${OUT2:?} || { error "${EC34:?}"; return 1; }
+      >${OUT1:?} 2>${OUT2:?} || { error_start_cocoa "${EC34:?}"; return 1; }
   fi
 
   unset -v ECODEF COBLIKE TMP TMP2
@@ -122,11 +122,11 @@ if [[ -z "${IGNORE_SIMONS_OBSERVATORY_LIKELIHOOD_CODE}" ]]; then
   
   if [[ ! -L "${COBLIKE:?}/${TMP2}" ]]; then
     ln -s "${ECODEF:?}/${TMP}/${TMP2}" "${COBLIKE:?}" \
-      >${OUT1:?} 2>${OUT2:?} || { error "${EC34:?}"; return 1; }
+      >${OUT1:?} 2>${OUT2:?} || { error_start_cocoa "${EC34:?}"; return 1; }
   fi
   if [[ ! -L "${COBTH:?}/${TMP2}" ]]; then
     ln -s "${ECODEF:?}/${TMP}/${TMP2}" "${COBTH:?}" \
-      >${OUT1:?} 2>${OUT2:?} || { error "${EC34:?}"; return 1; }
+      >${OUT1:?} 2>${OUT2:?} || { error_start_cocoa "${EC34:?}"; return 1; }
   fi
 
   unset -v ECODEF COBLIKE TMP TMP2 COBTH
@@ -143,14 +143,14 @@ if [[ -z "${IGNORE_LIPOP_LIKELIHOOD_CODE}" ]]; then
   TMP2="planck_2020_hillipop"
   if [[ ! -L "${COBLIKE:?}/${TMP2}" ]]; then
     ln -s "${ECODEF:?}/${TMP}/${TMP2}" "${COBLIKE:?}" \
-      >${OUT1:?} 2>${OUT2:?} || { error "${EC34:?}"; return 1; }
+      >${OUT1:?} 2>${OUT2:?} || { error_start_cocoa "${EC34:?}"; return 1; }
   fi
 
   TMP="${PL2020_LOLLIPOP_NAME:-"planck_2020_lollipop"}"
   TMP2="planck_2020_lollipop"
   if [[ ! -L "${COBLIKE:?}/${TMP2}" ]]; then
     ln -s "${ECODEF:?}/${TMP}/${TMP2}" "${COBLIKE:?}" \
-      >${OUT1:?} 2>${OUT2:?} || { error "${EC34:?}"; return 1; }
+      >${OUT1:?} 2>${OUT2:?} || { error_start_cocoa "${EC34:?}"; return 1; }
   fi
 
   unset -v ECODEF COBLIKE TMP TMP2
@@ -165,17 +165,18 @@ if [[ -z "${IGNORE_COSMOPOWER_CODE}" ]]; then
 
   TMP="${COSMOPOWER_SOLIKET_NAME:-"soliket"}"
   TMP2="soliket/cosmopower"
+  TMP3="cosmopower"
 
-  if [[ ! -L "${COBTH:?}/${TMP2}" ]]; then
+  if [[ ! -L "${COBTH:?}/${TMP3:?}" ]]; then
     ln -s "${ECODEF:?}/emulators/${TMP}/${TMP2}" "${COBTH:?}" \
-      >${OUT1:?} 2>${OUT2:?} || { error "${EC34:?}"; return 1; }
+      >${OUT1:?} 2>${OUT2:?} || { error_start_cocoa "${EC34:?}"; return 1; }
   fi
 
-  unset -v ECODEF COBTH TMP TMP2
+  unset -v ECODEF COBTH TMP TMP2 TMP3
 fi
 
 # ----------------------------------------------------------------------------
-# ----------------------------- CMB TRF THERY --------------------------------
+# ----------------------------- CMB TRF THEORY -------------------------------
 # ----------------------------------------------------------------------------
 if [[ -z "${IGNORE_EMULTRF_CODE}" ]]; then
   ECODEF="${ROOTDIR:?}/external_modules/code"
@@ -186,23 +187,23 @@ if [[ -z "${IGNORE_EMULTRF_CODE}" ]]; then
 
   if [[ ! -L "${COBTH:?}/${TMP2}" ]]; then
     ln -s "${ECODEF:?}/emulators/${TMP}/${TMP2}" "${COBTH:?}" \
-      >${OUT1:?} 2>${OUT2:?} || { error "${EC34:?}"; return 1; }
+      >${OUT1:?} 2>${OUT2:?} || { error_start_cocoa "${EC34:?}"; return 1; }
   fi
 
   unset -v ECODEF COBTH TMP TMP2
 fi
 
 # ----------------------------------------------------------------------------
-# ------------------------ START EXTERNAL PROJECTS ---------------------------
-# ----------------------------------------------------------------------------
-
-source "${ROOTDIR:?}/installation_scripts/start_all_projects.sh"
-
-# ----------------------------------------------------------------------------
 # ----------------------------------------------------------------------------
 # ----------------------------------------------------------------------------
 
 unset -f error_start_cocoa 
+
+# ----------------------------------------------------------------------------
+# ------------------------ START EXTERNAL PROJECTS ---------------------------
+# ----------------------------------------------------------------------------
+
+source "${ROOTDIR:?}/installation_scripts/start_all_projects.sh"
 
 # ----------------------------------------------------------------------------
 # ----------------------------------------------------------------------------

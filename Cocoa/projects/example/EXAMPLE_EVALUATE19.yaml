@@ -1,18 +1,14 @@
-stop_at_error: False
-debug: False
+stop_at_error: false
+debug: false
 timing: true
 
 likelihood:
-  #planck_2018_highl_plik.TT_lite:
-  #  path: ./external_modules/
-  #  clik_file: plc_3.0/hi_l/plik_lite/plik_lite_v22_TT.clik
-  planck_2018_highl_plik.TTTEEE_lite:
-    path: ./external_modules/
-    clik_file: plc_3.0/hi_l/plik_lite/plik_lite_v22_TTTEEE.clik
+  planck_2020_hillipop.TTTEEE:
+    data_folder: planck/hillipop
   planck_2018_lowl.TT:
     path: ./external_modules
-  planck_2018_lowl.EE:
-    path: ./external_modules
+  planck_2020_lollipop.lowlE:
+    data_folder: planck/lollipop
 
 params:
   logA:
@@ -45,6 +41,10 @@ params:
       scale: 2
     proposal: 0.2
     latex: H_0
+    drop: true
+  h:
+    value: 'lambda H0: H0/100.0'
+    latex: h
   omegabh2:
     prior:
       min: 0.01
@@ -89,29 +89,55 @@ params:
     derived: 'lambda As: 1e9*As'
     latex: 10^9 A_\mathrm{s}
 
-
 theory:
-  emulcmbtrf:
-    path: ./cobaya/cobaya/theories/
+  cosmopower:
     stop_at_error: True
-    extra_args:
-      # This version of the emul was not trained with CosmoRec
-      ttfilename: 'external_modules/data/emultrf/CMB_TRF/chiTTAstautrf1dot2milnewlhcevansqrtrescalec16'
-      ttextraname: 'external_modules/data/emultrf/CMB_TRF/extrainfo_lhs_tt_96.npy'
-      tefilename: 'external_modules/data/emultrf/CMB_TRF/chiTEAstautrf1dot2milnewlhcevansqrtrescalec16'
-      teextraname: 'external_modules/data/emultrf/CMB_TRF/extrainfo_lhs_te_96.npy'
-      eefilename: 'external_modules/data/emultrf/CMB_TRF/chiEEAstautrf1dot2milnewlhcevansqrtrescalec16'
-      eeextraname: 'external_modules/data/emultrf/CMB_TRF/extrainfo_lhs_ee_96.npy'
+    network_path: ./cobaya/cobaya/theories/cosmopower/data/CP_paper
+    network_settings:
+      tt:
+        type: "NN"
+        log: True
+        filename: "cmb_TT_NN"
+      ee: 
+        type: "NN"
+        log: True
+        filename: "cmb_EE_NN"
+      te:
+        type: "PCAplusNN"
+        log: False
+        filename: "cmb_TE_PCAplusNN"
+    renames: 
+      omegabh2: omega_b
+      omegach2: omega_cdm
+      ns: n_s
+      logA: ln10^{10}A_s
+      tau: tau_reio
 
 sampler:
   evaluate:
     override:
-      logA: 3.0448
-      ns: 0.96605
-      H0: 67.319
-      omegabh2: 0.022383
-      omegach2: 0.12011
-      tau: 0.0543
-      A_planck: 1.00138
+      logA: 3.047535895
+      ns: 9.801549869e-01
+      H0: 7.182062346e+01
+      omegabh2: 2.306354920e-02 
+      omegach2: 1.105074681e-01
+      tau: 6.432003074e-02
+      A_planck: 1.002616795e+00
+      cal100A: 1.003485828
+      cal100B: 1.001379564
+      cal143B: 1.001823229
+      cal217A: 9.980824511e-01
+      cal217B: 1.000376039e+00
+      Aradio: 6.061092792e+01
+      Adusty: 5.530087241e+00
+      AdustT: 9.915862356e-01
+      beta_dustT: 1.506792162e+00
+      Acib: 2.785328233
+      beta_cib: 1.72985635
+      Atsz: 4.088125418
+      Aksz: 1.027432090
+      xi: 8.505610435e-02
+      AdustP: 1.029969523
+      beta_dustP: 1.584808304e+00
 
-output: ./projects/example/chains/EXAMPLE_EVALUATE17
+output: ./projects/example/chains/EXAMPLE_EVALUATE19
