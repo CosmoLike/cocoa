@@ -324,9 +324,7 @@ export EMULTRF_DATA_GIT_COMMIT="dca7bf6bb40ae8c6428837c2d48a7b63de36ae3a"
 # --------------------------------------------------------------------
 export LSST_Y1_URL="https://github.com/CosmoLike/cocoa_lsst_y1.git"
 export LSST_Y1_NAME="lsst_y1"
-#export LSST_Y1_BRANCH="main"
-#export LSST_Y1_COMMIT="c97e8bb4b861131737c3b472631d4ed82afdce89"
-export LSST_Y1_TAG="v4.0-beta18"
+export LSST_Y1_COMMIT="c97e8bb4b861131737c3b472631d4ed82afdce89"
 
 export DES_Y3_URL="https://github.com/CosmoLike/cocoa_des_y3.git"
 export DES_Y3_NAME="des_y3"
@@ -334,11 +332,11 @@ export DES_Y3_NAME="des_y3"
 #export DES_Y3_COMMIT="2d7e05944bf9c4724dcb5407e7cb76c992993807"
 export DES_Y3_TAG="v4.0-beta17"
 
-export ROMAN_FOURIER_URL="git@github.com:CosmoLike/cocoa_roman_fourier.git"
+export ROMAN_FOURIER_URL="https://github.com/CosmoLike/cocoa_roman_fourier.git"
 export ROMAN_FOURIER_NAME="roman_fourier"
 export ROMAN_FOURIER_COMMIT="e79d3e5754484ccc3353e7fb12073264cd9137b4"
 
-export ROMAN_REAL_URL="git@github.com:CosmoLike/cocoa_roman_real.git"
+export ROMAN_REAL_URL="https://github.com/CosmoLike/cocoa_roman_real.git"
 export ROMAN_REAL_NAME="roman_real"
 export ROMAN_REAL_COMMIT="d9dcdda435f64d11f24649c33e7d8b9bf0da0dfb"
 # ------------------------------------------------------------------------------
