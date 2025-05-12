@@ -88,6 +88,33 @@ params:
   A:
     derived: 'lambda As: 1e9*As'
     latex: 10^9 A_\mathrm{s}
+  mnu:
+    value: 0.06
+  w0pwa:
+    prior:
+      min: -5 
+      max: -0.01
+    ref:
+      dist: norm
+      loc: -0.99
+      scale: 0.05
+    proposal: 0.05
+    latex: w_{0,\mathrm{DE}}+w_{a,\mathrm{DE}}
+    drop: true
+  w:
+    prior:
+      min: -3
+      max: -0.01
+    ref:
+      dist: norm
+      loc: -0.99
+      scale: 0.05
+    proposal: 0.05
+    latex: w_{0,\mathrm{DE}}
+  wa:
+    value: 'lambda w0pwa, w: w0pwa - w'
+    derived: false
+    latex: w_{a,\mathrm{DE}}
 
 
 theory:
@@ -102,6 +129,7 @@ theory:
       teextraname: 'external_modules/data/emultrf/CMB_TRF/extrainfo_lhs_te_96.npy'
       eefilename: 'external_modules/data/emultrf/CMB_TRF/chiEEAstautrf1dot2milnewlhcevansqrtrescalec16'
       eeextraname: 'external_modules/data/emultrf/CMB_TRF/extrainfo_lhs_ee_96.npy'
+      ordering: ['omegabh2','omegach2','H0','tau','ns','logA','mnu','w','wa']
 
 sampler:
   evaluate:
@@ -112,6 +140,8 @@ sampler:
       omegabh2: 0.022383
       omegach2: 0.12011
       tau: 0.0543
+      w0pwa: -1
+      w: -1
       A_planck: 1.00138
 
 output: ./projects/example/chains/EXAMPLE_EVALUATE17
