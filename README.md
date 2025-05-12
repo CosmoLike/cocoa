@@ -78,29 +78,15 @@ Users can now proceed to **step :two:**.
 > In this section, we assume users have previously activated the Cocoa conda environment
 >
 > 
-**Step :one:**: Download cocoa's latest release and go to the `cocoa` main folder,
+**Step :one:**: Download cocoa's latest commit and go to the `cocoa` main folder,
 
-    "${CONDA_PREFIX}"/bin/git clone --depth 1 https://github.com/CosmoLike/cocoa.git --branch v4.0-beta23 cocoa
+    "${CONDA_PREFIX}"/bin/git clone git@github.com:CosmoLike/cocoa.git cocoa
 
 and
 
     cd ./cocoa/Cocoa
 
 Users can now proceed to **step :two:**.
-
-> [!TIP]
-> If you want to work from the latest commit, then clone the repository with the following command 
->
-> (SSH)
-> 
->     "${CONDA_PREFIX}"/bin/git clone git@github.com:CosmoLike/cocoa.git cocoa
-> 
-> (HTTP)
-> 
->     "${CONDA_PREFIX}"/bin/git clone https://github.com/CosmoLike/cocoa.git cocoa
->
->
-> On the other hand. users who want to develop from a release version (e.g., `v4.0-beta20`) may want to read the appendix [FAQ: How do we push changes to the cocoa main branch? A few git hacks](#push_main)
 
 **Step :two:**: Run the script `setup_cocoa.sh` via
         
