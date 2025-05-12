@@ -73,7 +73,6 @@ if [ -z "${IGNORE_CLASS_CODE}" ]; then
 
   PLIB="${ROOTDIR:?}/.local/lib/python${PYTHON_VERSION:?}/site-packages"
   rm -rf "${PLIB:?}"/classy*
-
   rm -rf "${PACKDIR:?}/python/build/"
   rm -rf "${PACKDIR:?}/python/classy.egg-info"  
   rm -rf "${PACKDIR:?}/build/"
@@ -93,14 +92,15 @@ if [ -z "${IGNORE_CLASS_CODE}" ]; then
   
   cpfolder "${PACKDIR:?}/include2" "${PACKDIR:?}/include" || return 1;
 
-  CC="${C_COMPILER:?}" PYTHON=${PYTHON3:?} make all \
-    >${OUT1:?} 2>${OUT2:?} || { error "${EC7:?}"; return 1; }
+  (export LD_LIBRARY_PATH=${CONDA_PREFIX:?}/lib:$LD_LIBRARY_PATH && \
+   CC="${C_COMPILER:?}" PYTHON=${PYTHON3:?} make all \
+   >${OUT1:?} 2>${OUT2:?} || { error "${EC7:?}"; return 1; })
    
   cdfolder "${PACKDIR}/python" || return 1
 
-  CC="${C_COMPILER:?}" ${PYTHON3:?} setup.py build \
-    >${OUT1:?} 2>${OUT2:?} || { error "${EC4:?}"; return 1; }
-
+  (export LD_LIBRARY_PATH=${CONDA_PREFIX:?}/lib:$LD_LIBRARY_PATH && \
+   CC="${C_COMPILER:?}" ${PYTHON3:?} setup.py build \
+   >${OUT1:?} 2>${OUT2:?} || { error "${EC4:?}"; return 1; })
 
   pbottom "COMPILING ${PRINTNAME:?}" || return 1
 

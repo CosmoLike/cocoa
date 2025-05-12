@@ -72,11 +72,12 @@ if [ -z "${IGNORE_HYREC_CODE}" ]; then
   # ---------------------------------------------------------------------------
   # create .local/include/hyrec2 where headers will be located
   
-  mkdir "${ROOTDIR:?}/.local/include/hyrec2"  \
+  mkdir "${ROOTDIR:?}/.local/include/hyrec2" \
     >${OUT1:?} 2>${OUT2:?}  || { error "${EC20:?}"; return 1; }
 
-  CC="${C_COMPILER:?}" make install \
-    >${OUT1:?} 2>${OUT2:?} || { error "${EC10:?}"; return 1; }
+  (export LD_LIBRARY_PATH=${CONDA_PREFIX:?}/lib:$LD_LIBRARY_PATH && \
+   CC="${C_COMPILER:?}" make install \
+   >${OUT1:?} 2>${OUT2:?} || { error "${EC10:?}"; return 1; })
   
   pbottom "COMPILING ${PRINTNAME:?}" || return 1
 

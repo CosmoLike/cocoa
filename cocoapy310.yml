@@ -1,3 +1,4 @@
+#PS: COCOA WILL OVERWRITE NUMPY VERSION
 channels:
   - conda-forge
 dependencies:

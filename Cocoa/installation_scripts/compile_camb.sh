@@ -64,38 +64,42 @@ if [ -z "${IGNORE_CAMB_CODE}" ]; then
   
   if [ -z "${IGNORE_COSMOREC_CODE}" ] && [ -n "${IGNORE_HYREC_CODE}" ]; then
 
-    RECOMBINATION_FILES="recfast cosmorec" COMPILER="${FORTRAN_COMPILER:?}" \
+    (export LD_LIBRARY_PATH=${CONDA_PREFIX:?}/lib:$LD_LIBRARY_PATH && \
+      RECOMBINATION_FILES="recfast cosmorec" COMPILER="${FORTRAN_COMPILER:?}" \
       F90C="${FORTRAN_COMPILER:?}" "${PYTHON3:?}" setup.py build \
-      >${OUT1:?} 2>${OUT2:?} || { error "${EC4:?}"; return 1; }
+      >${OUT1:?} 2>${OUT2:?} || { error "${EC4:?}"; return 1; })
   
   elif [ -n "${IGNORE_COSMOREC_CODE}" ] && [ -z "${IGNORE_HYREC_CODE}" ]; then
 
-    RECOMBINATION_FILES="recfast hyrec" COMPILER="${FORTRAN_COMPILER:?}" \
+    (export LD_LIBRARY_PATH=${CONDA_PREFIX:?}/lib:$LD_LIBRARY_PATH && \
+      RECOMBINATION_FILES="recfast hyrec" COMPILER="${FORTRAN_COMPILER:?}" \
       F90C="${FORTRAN_COMPILER:?}" "${PYTHON3:?}" setup.py build \
-      >${OUT1:?} 2>${OUT2:?} || { error "${EC4:?}"; return 1; }
+      >${OUT1:?} 2>${OUT2:?} || { error "${EC4:?}"; return 1; })
   
   elif [ -z "${IGNORE_COSMOREC_CODE}" ] && [ -z "${IGNORE_HYREC_CODE}" ]; then
 
-    RECOMBINATION_FILES="recfast cosmorec hyrec" \
+    (export LD_LIBRARY_PATH=${CONDA_PREFIX:?}/lib:$LD_LIBRARY_PATH && \
+      RECOMBINATION_FILES="recfast cosmorec hyrec" \
       COMPILER="${FORTRAN_COMPILER:?}" F90C="${FORTRAN_COMPILER:?}" \
       "${PYTHON3:?}" setup.py build \
-      >${OUT1:?} 2>${OUT2:?} || { error "${EC4:?}"; return 1; }
+      >${OUT1:?} 2>${OUT2:?} || { error "${EC4:?}"; return 1; })
 
   else
 
-    COMPILER="${FORTRAN_COMPILER:?}" F90C="${FORTRAN_COMPILER:?}" \
+    (export LD_LIBRARY_PATH=${CONDA_PREFIX:?}/lib:$LD_LIBRARY_PATH && \
+      COMPILER="${FORTRAN_COMPILER:?}" F90C="${FORTRAN_COMPILER:?}" \
       "${PYTHON3:?}" setup.py build \
-      >${OUT1:?} 2>${OUT2:?} || { error "${EC4:?}"; return 1; }
+      >${OUT1:?} 2>${OUT2:?} || { error "${EC4:?}"; return 1; })
 
   fi
 
   #prevent all compile_XXX.sh from using the internet (run @compute nodes)
   #FROM: https://github.com/pypa/pip/issues/12050
   #That is why we use --no-dependencies --no-index --no-build-isolation
-  env CXX="${CXX_COMPILER:?}" CC="${C_COMPILER:?}" ${PIP3:?} install \
-    ${PACKDIR:?} --no-dependencies --prefix="${ROOTDIR:?}/.local" \
-    --no-index --no-build-isolation \
-    >${OUT1:?} 2>${OUT2:?} || { error "${EC3:?}"; return 1; }
+  (export LD_LIBRARY_PATH=${CONDA_PREFIX:?}/lib:$LD_LIBRARY_PATH && \
+   env CXX="${CXX_COMPILER:?}" CC="${C_COMPILER:?}" ${PIP3:?} install \
+   ${PACKDIR:?} --no-dependencies --prefix="${ROOTDIR:?}/.local" --no-index \
+   --no-build-isolation >${OUT1:?} 2>${OUT2:?} || { error "${EC3:?}"; return 1; })
 
   pbottom "COMPILING CAMB" || return 1
 

@@ -56,8 +56,7 @@ if [ -z "${IGNORE_PIP_CORE_INSTALLATION}" ]; then
 
   # ----------------------------------------------------------------------------
   # --------------------------- PIP CORE PACKAGES ------------------------------
-  # ----------------------------------------------------------------------------
-    
+  # ----------------------------------------------------------------------------  
   ptop "INSTALLING A FEW PYTHON CORE LIBRARIES VIA PIP" || return 1
 
   #PS: --force-reinstall - this helps CARMA to see numpy files
@@ -65,8 +64,15 @@ if [ -z "${IGNORE_PIP_CORE_INSTALLATION}" ]; then
   # mpi4py has a weird bug when installing from conda on a few machines 
   # (e.g., midway) no-cache-dir is important to fix this bug
   # https://github.com/mpi4py/mpi4py/issues/335
+  if [ -n "${COCOA_FORCE_NUMPY_1_23}" ]; then
+    # ISSUE: https://github.com/numpy/numpy/issues/24903
+    COCOA_NUMPY_VERSION='1.23.5'
+  else
+    COCOA_NUMPY_VERSION='1.26.3'
+  fi
+  
   env MPICC=$MPI_CC_COMPILER ${PIP3:?} install \
-      'numpy==1.23.5' \
+      "numpy==${COCOA_NUMPY_VERSION:?}" \
       'mpi4py==4.0.3' \
     --no-cache-dir --prefer-binary \
     --prefix="${ROOTDIR:?}/.local" \
@@ -74,7 +80,7 @@ if [ -z "${IGNORE_PIP_CORE_INSTALLATION}" ]; then
     >${OUT1:?} 2>${OUT2:?} || { error "(PIP-CORE-PACKAGES) ${EC13:?}"; return 1; }
 
   env MPICC=$MPI_CC_COMPILER ${PIP3:?} install \
-      'numpy==1.23.5' \
+      "numpy==${COCOA_NUMPY_VERSION:?}" \
       'mpi4py==4.0.3' \
       'notebook==7.4.2' \
       'ipyparallel==9.0.1' \
@@ -94,7 +100,7 @@ if [ -z "${IGNORE_PIP_CORE_INSTALLATION}" ]; then
   # ----------------------------- PIP ML PACKAGES ------------------------------
   # ----------------------------------------------------------------------------
   
-  if [ -z "${IGNORE_EMULATOR_GPU_PIP_PACKAGES}" ]; then\
+  if [ -z "${IGNORE_EMULATOR_GPU_PIP_PACKAGES}" ]; then
     ptop "PIP INSTALL MACHINE LEARNING GPU PACKAGES"
 
     env CXX="${CXX_COMPILER:?}" CC="${C_COMPILER:?}" ${PIP3:?} install \
