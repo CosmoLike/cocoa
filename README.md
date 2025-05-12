@@ -66,20 +66,18 @@ and create symbolic links that will give better names for the GNU compilers
 Users can now proceed to **step :two:**. 
 
 > [!TIP]
-> To install the cocoa conda environment on a supercomputer, users may take advantage of the fact that many HPC environments provide the [Anaconda installer](https://www.anaconda.com) as an external module. Check the appendix [FAQ: How do we use an available Anaconda module on HPC?](#overview_anaconda).
-
-> [!TIP]
-> Users not working on an HPC environment that offers Anaconda or [Miniconda](https://docs.anaconda.com/miniconda/) may want to check the appendix [FAQ: What if there is no Conda? Miniconda installation](#overview_miniconda).
+> To install the cocoa conda environment on a supercomputer, users may take advantage of the fact that many HPC environments provide the [Anaconda installer](https://www.anaconda.com) as an external module. Check the appendix [FAQ: How do we use an available Anaconda module on HPC?](#overview_anaconda). Conversely, users working on an HPC environment that does not offer Anaconda or Miniconda may want to check the appendix [FAQ: What if there is no Conda? Miniconda installation](#overview_miniconda).
 
 **Step :two:**: Install `git-lfs` when loading the conda cocoa environment for the first time.
 
     git-lfs install
 
-> [!WARNING]
-> In the next section, we assume users have previously activated the Cocoa conda environment
-
 ## Installation and Compilation of external modules <a name="cobaya_base_code"></a>
 
+> [!WARNING]
+> In this section, we assume users have previously activated the Cocoa conda environment
+>
+> 
 **Step :one:**: Download cocoa's latest release and go to the `cocoa` main folder,
 
     "${CONDA_PREFIX}"/bin/git clone --depth 1 https://github.com/CosmoLike/cocoa.git --branch v4.0-beta23 cocoa
@@ -100,16 +98,15 @@ Users can now proceed to **step :two:**.
 > (HTTP)
 > 
 >     "${CONDA_PREFIX}"/bin/git clone https://github.com/CosmoLike/cocoa.git cocoa
-
-> [!TIP]
-> If you want to develop from a release version (e.g., `v4.0-beta20`), check the appendix [FAQ: How do we push changes to the cocoa main branch? A few git hacks](#push_main)
+>
+>
+> On the other hand. users who want to develop from a release version (e.g., `v4.0-beta20`) may want to read the appendix [FAQ: How do we push changes to the cocoa main branch? A few git hacks](#push_main)
 
 **Step :two:**: Run the script `setup_cocoa.sh` via
         
     source setup_cocoa.sh
 
-> [!NOTE]
-> This script downloads and decompresses external modules, requiring internet access to run successfully.
+This script downloads and decompresses external modules, requiring internet access to run successfully.
 
 > [!NOTE]
 > If you run `setup_cocoa.sh` multiple times, cocoa will not download previously installed packages. To overwrite this behavior, export the key `OVERWRITE_EXISTING_ALL_PACKAGES` on `set_installation_options.sh`. Even with this optimization disabled, cocoa will not download large datasets repeatedly unless the key `REDOWNLOAD_EXISTING_ALL_DATA` is also set.
@@ -118,13 +115,10 @@ Users can now proceed to **step :two:**.
 
     source compile_cocoa.sh
     
-This script compiles external modules selected for installation on `set_installation_options.sh` (e.g., CAMB and Class). 
+This script compiles external modules selected for installation on `set_installation_options.sh` (e.g., CAMB and Class). Cocoa does not install many external modules by default, but users may find them helpful in a particular project. In this case, check the many available options on the `set_installation_options.sh` shell script. Then, rerun steps :two: and :three:. 
 
 > [!NOTE]
 > In some HPC environments, the compute nodes cannot access the web. So, by design, the script `compile_cocoa.sh` does not require internet access to run successfully. Code compilation is a CPU-intensive operation, so running  `compile_cocoa.sh` on a cluster login node can be against HPC policy. Users should then run `setup_cocoa.sh` in a login node and `compile_cocoa.sh` in a compute node.
-
-> [!Tip]
-> Cocoa does not install many external modules by default, but users may find them helpful in a particular project. In this case, check the many available options on the `set_installation_options.sh` shell script. Then, rerun steps :two: and :three:. 
 
 ## Running Examples  <a name="cobaya_base_code_examples"></a>
 
@@ -134,15 +128,11 @@ We assume that you are still in the Conda cocoa environment from the previous `c
 
     source start_cocoa.sh
 
-> [!NOTE]
-> Users will see a terminal like this: `$(cocoa)(.local)`. *This is a feature, not a bug*! 
+Users will see a terminal like this: `$(cocoa)(.local)`. *This is a feature, not a bug*! 
 
  **Step :two:**: Select the number of OpenMP cores (below, we set it to 8).
     
     export OMP_PROC_BIND=close; export OMP_NUM_THREADS=8
-
-> [!NOTE]
-> `OMP_PROC_BIND=close` bound OpenMP threads to physically close cores (within the same chiplet on chiplet-based architectures).
 
 ### Examples not involving Cosmolike
 
@@ -152,6 +142,7 @@ One model evaluation:
 
     mpirun -n 1 --oversubscribe --mca pml ^ucx --mca btl vader,tcp,self --bind-to core:overload-allowed --rank-by slot --map-by numa:pe=${OMP_NUM_THREADS} cobaya-run  ./projects/example/EXAMPLE_EVALUATE1.yaml -f
         
+
 MCMC (we run MCMCs with 32 cores):
 
     mpirun -n 4 --oversubscribe --mca pml ^ucx --mca btl vader,tcp,self --bind-to core:overload-allowed --rank-by slot --map-by numa:pe=${OMP_NUM_THREADS} cobaya-run ./projects/example/EXAMPLE_MCMC1.yaml -f
@@ -164,9 +155,11 @@ One model evaluation:
 
     mpirun -n 1 --oversubscribe --mca pml ^ucx --mca btl vader,tcp,self --bind-to core:overload-allowed --rank-by slot --map-by numa:pe=${OMP_NUM_THREADS} cobaya-run ./projects/lsst_y1/EXAMPLE_EVALUATE1.yaml -f
 
+
 MCMC (we run MCMCs with 32 cores):
 
     mpirun -n 4 --oversubscribe --mca pml ^ucx --mca btl vader,tcp,self --bind-to core:overload-allowed --rank-by slot --map-by numa:pe=${OMP_NUM_THREADS} cobaya-run ./projects/lsst_y1/EXAMPLE_MCMC1.yaml -f
+
 
 Profile:
 
@@ -180,7 +173,7 @@ and
 
     mpirun -n ${NMPI} --oversubscribe --mca pml ^ucx --mca btl vader,tcp,self --bind-to core:overload-allowed --rank-by slot --map-by numa:pe=${OMP_NUM_THREADS} python -m mpi4py.futures EXAMPLE_PROFILE1.py --mpi $((${NMPI}-1)) --profile 1 --tol 0.05 --AB 1.0 --outroot 'profile' --minmethod 5 --maxiter 1 --maxfeval 250 
 
-> [!TIP]
+> [!Note]
 > We provide several cosmolike projects that can be loaded and compiled using `setup_cocoa.sh` and `compile_cocoa.sh` scripts. To activate them, comment the following lines on `set_installation_options.sh` 
 > 
 >     [Adapted from Cocoa/set_installation_options.sh shell script] 
@@ -212,21 +205,6 @@ and
 >
 > The project lsst-y1 contains jupyter notebook examples located at `projects/lsst_y1`.
 
-> [!TIP]
-> To run Jupyter Notebook, assuming cocoa is installed on a remote machine with open port 8888, type, after step 2️⃣, the command 
-> 
->     jupyter notebook --no-browser --port=8888 --ip=XX.YY.ZZ.123
->
-> where `XX.YY.ZZ.123` should be replaced by the server IP. The terminal will show a message similar to the following template:
->
->     (...)
->     [... NotebookApp] Jupyter Notebook 6.1.1 is running at:
->     [... NotebookApp] http://XX.YY.ZZ.123:8888/?token=XXX
->     [... NotebookApp] or http://127.0.0.1:8888/?token=XXX
->     [... NotebookApp] Use Control-C to stop this server and shut down all kernels (twice to skip confirmation).
->
-> Now go to the local internet browser and type `http://XX.YY.ZZ.123:8888/?token=XXX`.
-
 ## Running Examples based on Machine Learning emulators <a name="cobaya_base_code_examples_emul"></a>
 
 Cocoa contains a few transformer-based neural network emulators capable of simulating CMB, cosmolike, matter power spectrum and distances. We provide a few scripts that exemplify their API. To run them, we assume users have commented out the following lines on `set_installation_options.sh` prior to running the `setup_cocoa.sh` and `compile_cocoa.sh` installation scripts.
@@ -250,9 +228,11 @@ One model evaluation:
 
     mpirun -n 1 --oversubscribe --mca pml ^ucx --mca btl vader,tcp,self --bind-to core:overload-allowed --rank-by slot --map-by numa:pe=${OMP_NUM_THREADS} cobaya-run ./projects/example/EXAMPLE_EVALUATE22.yaml -f
         
+
 MCMC (we run MCMCs with 12 cores):
 
     mpirun -n 4 --oversubscribe --mca btl vader,tcp,self --bind-to core:overload-allowed --rank-by slot --map-by numa:pe=${OMP_NUM_THREADS} cobaya-run ./projects/example/EXAMPLE_MCMC22.yaml -f
+
 
 PolyChord (we run Nested Sampling with 24 cores):
 
@@ -307,6 +287,9 @@ Following best practices, Cocoa scripts download most external modules from thei
 > If users want to compile only a subset of these packages, refer to the appendix [Compiling Boltzmann, CosmoLike, and Likelihood codes separately](#appendix_compile_separately).
           
 - *Running Examples*
+
+> [!NOTE]
+> `OMP_PROC_BIND=close` bound OpenMP threads to physically close cores (within the same chiplet on chiplet-based architectures).
 
 > [!NOTE]
 > Additional explanations about our `mpirun` flags: Why the `--bind-to core:overload-allowed --map-by numa:pe=${OMP_NUM_THREADS}` flag? This flag enables efficient hybrid MPI + OpenMP runs on NUMA architecture.
