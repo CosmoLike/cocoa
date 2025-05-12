@@ -68,7 +68,7 @@ export IGNORE_COSMOPOWER_CODE=1
 #export IGNORE_COSMOLIKE_LSSTY1_CODE=1
 #export IGNORE_COSMOLIKE_DES_Y3_CODE=1
 #export IGNORE_COSMOLIKE_ROMAN_FOURIER_CODE=1
-export IGNORE_COSMOLIKE_ROMAN_REAL_CODE=1
+#export IGNORE_COSMOLIKE_ROMAN_REAL_CODE=1
 
 # ------------------------------------------------------------------------------
 # If OVERWRITE_EXISTING_XXX_CODE=1, the setup_cocoa overwrites existing PACKAGES
@@ -77,6 +77,7 @@ export IGNORE_COSMOLIKE_ROMAN_REAL_CODE=1
 # these keys are only relevant if you run setup_cocoa multiple times -----------
 # ------------------------------------------------------------------------------
 export OVERWRITE_EXISTING_ALL_PACKAGES=1
+#export OVERWRITE_EXISTING_COSMOLIKE_CODE=1
 #export REDOWNLOAD_EXISTING_ALL_DATA=1
 # ------------------------------------------------------------------------------
 # If set, compile_planck.sh uses click like code from github.com/benabed/clik
@@ -160,7 +161,6 @@ fi
 if [ -n "${OVERWRITE_EXISTING_ALL_PACKAGES}" ]; then
   export OVERWRITE_EXISTING_COCOA_PRIVATE_PYTHON_ENV=1
   export OVERWRITE_EXISTING_CORE_PACKAGES=1
-  export OVERWRITE_EXISTING_COSMOLIKE_CODE=1
   export OVERWRITE_EXISTING_COBAYA_CODE=1
   export OVERWRITE_EXISTING_CAMB_CODE=1
   export OVERWRITE_EXISTING_MGCAMB_CODE=1
@@ -318,8 +318,8 @@ export EMULTRF_DATA_GIT_COMMIT="dca7bf6bb40ae8c6428837c2d48a7b63de36ae3a"
 export LSST_Y1_URL="https://github.com/CosmoLike/cocoa_lsst_y1.git"
 export LSST_Y1_NAME="lsst_y1"
 #export LSST_Y1_BRANCH="main"
-#export LSST_Y1_COMMIT="8f7f0c40784fcae718006b6c6715c58fb0b085b0"
-export LSST_Y1_TAG="v4.0-beta17"
+#export LSST_Y1_COMMIT="c97e8bb4b861131737c3b472631d4ed82afdce89"
+export LSST_Y1_TAG="v4.0-beta18"
 
 export DES_Y3_URL="https://github.com/CosmoLike/cocoa_des_y3.git"
 export DES_Y3_NAME="des_y3"
@@ -329,7 +329,7 @@ export DES_Y3_TAG="v4.0-beta17"
 
 export ROMAN_FOURIER_URL="git@github.com:CosmoLike/cocoa_roman_fourier.git"
 export ROMAN_FOURIER_NAME="roman_fourier"
-export ROMAN_FOURIER_COMMIT="6e5d261cf762e0a083b832245acc1d21d8a389ae"
+export ROMAN_FOURIER_COMMIT="e79d3e5754484ccc3353e7fb12073264cd9137b4"
 
 export ROMAN_REAL_URL="git@github.com:CosmoLike/cocoa_roman_real.git"
 export ROMAN_REAL_NAME="roman_real"
