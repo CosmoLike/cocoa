@@ -191,7 +191,7 @@ and
 >     export IGNORE_COSMOLIKE_ROMAN_FOURIER_CODE=1
 >     export IGNORE_COSMOLIKE_ROMAN_REAL_CODE=1
 >
-> If users want to download a project not provided by default or intend to clone existing projects in development mode, check the appendix [FAQ: How do we download and run Cosmolike projects?](running_cosmolike_projects).
+> If users want to download a project not provided by default or intend to clone existing projects in development mode, check the appendix [FAQ: How do we download and run Cosmolike projects?](#running_cosmolike_projects).
  
 > [!TIP]
 > To run Jupyter Notebook, assuming cocoa is installed on a local machine, type, after step 2️⃣, the command 
@@ -306,8 +306,13 @@ Following best practices, Cocoa scripts download most external modules from thei
 > [!TIP]
 > If users want to compile only a subset of these packages, refer to the appendix [Compiling Boltzmann, CosmoLike, and Likelihood codes separately](#appendix_compile_separately).
           
+- *Running Examples*
+
 > [!NOTE]
->  Our scripts never install packages on `$HOME/.local` as that would make them global to the user. Instead, they are installed at
+> Additional explanations about our `mpirun` flags: Why the `--bind-to core:overload-allowed --map-by numa:pe=${OMP_NUM_THREADS}` flag? This flag enables efficient hybrid MPI + OpenMP runs on NUMA architecture.
+
+> [!NOTE]
+> Additional explanations about the functioning `start_cocoa.sh`/`stop_cocoa.sh` scripts: why two separate shell environments, `(cocoa)` and `(.local)`? Users should be able to manipulate multiple Cocoa instances seamlessly, which is particularly useful when running chains in one instance while experimenting with code development in another. Consistency of the environment across all Cocoa instances is crucial, and the `start_cocoa.sh`/`stop_cocoa.sh` scripts handle the loading and unloading of environmental path variables. Our scripts never install packages on `$HOME/.local` as that would make them global to the user. Instead, on each instance they are installed at
 >
 >      Cocoa/.local/bin
 >      Cocoa/.local/include
@@ -315,17 +320,6 @@ Following best practices, Cocoa scripts download most external modules from thei
 >      Cocoa/.local/share
 >
 > This behavior enables users to work on multiple instances of Cocoa simultaneously, similar to what was possible with [CosmoMC](https://github.com/cmbant/CosmoMC).
-
-- *Running Examples*
-
-> [!NOTE]
-> Additional explanations about our `mpirun` flags: Why the `--mca btl vader,tcp,self` flag? Conda-forge developers don't [compile OpenMPI with Infiniband compatibility](https://github.com/conda-forge/openmpi-feedstock/issues/38).
-
-> [!NOTE]
-> Additional explanations about our `mpirun` flags: Why the `--bind-to core:overload-allowed --map-by numa:pe=${OMP_NUM_THREADS}` flag? This flag enables efficient hybrid MPI + OpenMP runs on NUMA architecture.
-
-> [!NOTE]
-> Additional explanations about the functioning `start_cocoa.sh`/`stop_cocoa.sh` scripts: why two separate shell environments, `(cocoa)` and `(.local)`? Users should be able to manipulate multiple Cocoa instances seamlessly, which is particularly useful when running chains in one instance while experimenting with code development in another. Consistency of the environment across all Cocoa instances is crucial, and the `start_cocoa.sh`/`stop_cocoa.sh` scripts handle the loading and unloading of environmental path variables.
 
 ### :interrobang: FAQ: What if installation or compilation goes wrong? <a name="running_wrong"></a>
 
