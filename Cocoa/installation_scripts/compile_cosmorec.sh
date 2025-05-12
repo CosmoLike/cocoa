@@ -70,6 +70,7 @@ if [ -z "${IGNORE_COSMOREC_CODE}" ]; then
   cdfolder "${PACKDIR}" || return 1
 
   (export LD_LIBRARY_PATH=${CONDA_PREFIX:?}/lib:$LD_LIBRARY_PATH && \
+   export LD_LIBRARY_PATH=${ROOTDIR:?}/.local/lib:$LD_LIBRARY_PATH && \
    CC="${CXX_COMPILER:?}" make all >${OUT1:?} 2>${OUT2:?} || { error "${EC7:?}"; return 1; })
   
   mv "${PACKDIR:?}/libCosmoRec.a" "${ROOTDIR:?}/.local/lib" \

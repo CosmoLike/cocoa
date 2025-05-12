@@ -60,24 +60,20 @@ if [ -z "${IGNORE_HYREC_CODE}" ]; then
 
   # ---------------------------------------------------------------------------
   # cleaning any previous compilation
-  
   rm -f  "${ROOTDIR:?}/.local/lib/libhyrec.a"
   rm -f  "${ROOTDIR:?}/.local/lib/libhyrec.so"
   rm -rf "${ROOTDIR:?}/.local/include/hyrec2"
   
-  # ---------------------------------------------------------------------------
-  
+  # ---------------------------------------------------------------------------  
   cdfolder "${PACKDIR}" || return 1
   
-  # ---------------------------------------------------------------------------
   # create .local/include/hyrec2 where headers will be located
-  
   mkdir "${ROOTDIR:?}/.local/include/hyrec2" \
     >${OUT1:?} 2>${OUT2:?}  || { error "${EC20:?}"; return 1; }
 
   (export LD_LIBRARY_PATH=${CONDA_PREFIX:?}/lib:$LD_LIBRARY_PATH && \
-   CC="${C_COMPILER:?}" make install \
-   >${OUT1:?} 2>${OUT2:?} || { error "${EC10:?}"; return 1; })
+   export LD_LIBRARY_PATH=${ROOTDIR:?}/.local/lib:$LD_LIBRARY_PATH && \
+   CC="${C_COMPILER:?}" make install >${OUT1:?} 2>${OUT2:?} || { error "${EC10:?}"; return 1; })
   
   pbottom "COMPILING ${PRINTNAME:?}" || return 1
 

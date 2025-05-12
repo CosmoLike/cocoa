@@ -73,6 +73,7 @@ if [ -z "${IGNORE_MGCAMB_CODE}" ]; then
   # ---------------------------------------------------------------------------
   
   (export LD_LIBRARY_PATH=${CONDA_PREFIX:?}/lib:$LD_LIBRARY_PATH && \
+   export LD_LIBRARY_PATH=${ROOTDIR:?}/.local/lib:$LD_LIBRARY_PATH && \
    COMPILER="${FORTRAN_COMPILER:?}" F90C="${FORTRAN_COMPILER:?}" \
    "${PYTHON3:?}" setup.py build >${OUT1:?} 2>${OUT2:?} || { error "${EC4:?}"; return 1; })
   

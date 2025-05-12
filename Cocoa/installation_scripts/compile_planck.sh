@@ -93,12 +93,14 @@ if [ -z "${IGNORE_PLANCK_LIKELIHOOD_CODE}" ]; then
   # ---------------------------------------------------------------------------
   
   (export LD_LIBRARY_PATH=${CONDA_PREFIX:?}/lib:$LD_LIBRARY_PATH && \
+   export LD_LIBRARY_PATH=${ROOTDIR:?}/.local/lib:$LD_LIBRARY_PATH && \
    FC="${FORTRAN_COMPILER:?}" CC="${C_COMPILER:?}" CXX="${CXX_COMPILER:?}" \
    "${PYTHON3:?}" waf configure --gcc --gfortran --cfitsio_islocal --prefix "${ROOTDIR:?}/.local" \
    --lapack_prefix="${CLIK_LAPACK_LIBS:?}" --cfitsio_lib="${CLIK_CFITSIO_LIBS:?}" \
    --python="${PYTHON3:?}" >${OUT1:?} 2>${OUT2:?} || { error "${EC5:?}"; return 1; })
   
   (export LD_LIBRARY_PATH=${CONDA_PREFIX:?}/lib:$LD_LIBRARY_PATH && \
+   export LD_LIBRARY_PATH=${ROOTDIR:?}/.local/lib:$LD_LIBRARY_PATH && \
    "${PYTHON3:?}" waf install -v >${OUT1:?} 2>${OUT2:?} || { error "${EC6:?}"; return 1; })
   
   pbottom "COMPILING ${PRINTNAME:?}" || return 1

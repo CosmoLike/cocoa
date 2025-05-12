@@ -62,9 +62,11 @@ if [ -z "${IGNORE_SIMONS_OBSERVATORY_LIKELIHOOD_CODE}" ]; then
   rm -rf  "${PLIB:?}/${ACTDR6_CMBONLY_NAME:-"act_dr6_cmbonly"}"-*
   # ----------------------------------------------------------------------------
 
-  env CXX="${CXX_COMPILER:?}" CC="${C_COMPILER:?}" ${PIP3:?} install "${PACKDIR:?}" \
-    --prefix="${ROOTDIR:?}/.local" --no-index --no-deps --no-build-isolation \
-    >${OUT1:?} 2>${OUT2:?} || { error "${EC13:?}"; return 1; }
+  (export LD_LIBRARY_PATH=${CONDA_PREFIX:?}/lib:$LD_LIBRARY_PATH && \
+   export LD_LIBRARY_PATH=${ROOTDIR:?}/.local/lib:$LD_LIBRARY_PATH && \
+   env CXX="${CXX_COMPILER:?}" CC="${C_COMPILER:?}" ${PIP3:?} install "${PACKDIR:?}" \
+   --prefix="${ROOTDIR:?}/.local" --no-index --no-deps --no-build-isolation \
+   >${OUT1:?} 2>${OUT2:?} || { error "${EC13:?}"; return 1; })
     
   cdfolder "${ROOTDIR}" || return 1
 
@@ -86,9 +88,11 @@ if [ -z "${IGNORE_SIMONS_OBSERVATORY_LIKELIHOOD_CODE}" ]; then
   rm -rf  "${PLIB:?}/${ACTDR6_MFLIKE_NAME:-"act_dr6_mflike"}"-*
   # ----------------------------------------------------------------------------
 
-  env CXX="${CXX_COMPILER:?}" CC="${C_COMPILER:?}" ${PIP3:?} install "${PACKDIR:?}" \
-    --prefix="${ROOTDIR:?}/.local" --no-index --no-deps --no-build-isolation \
-    >${OUT1:?} 2>${OUT2:?} || { error "${EC13:?}"; return 1; }
+  (export LD_LIBRARY_PATH=${CONDA_PREFIX:?}/lib:$LD_LIBRARY_PATH && \
+   export LD_LIBRARY_PATH=${ROOTDIR:?}/.local/lib:$LD_LIBRARY_PATH && \
+   env CXX="${CXX_COMPILER:?}" CC="${C_COMPILER:?}" ${PIP3:?} install "${PACKDIR:?}" \
+   --prefix="${ROOTDIR:?}/.local" --no-index --no-deps --no-build-isolation \
+   >${OUT1:?} 2>${OUT2:?} || { error "${EC13:?}"; return 1; })
     
   cdfolder "${ROOTDIR}" || return 1
   

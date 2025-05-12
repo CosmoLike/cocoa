@@ -63,9 +63,11 @@ if [ -z "${IGNORE_ACTDR4_CODE}" ]; then
   rm -rf  "${PLIB:?}/${ACTDR4_NAME:-"pyactlike"}"-*  
   # ---------------------------------------------------------------------------  
  
-  env CXX="${CXX_COMPILER:?}" CC="${C_COMPILER:?}"  ${PIP3:?} install "${PACKDIR:?}" \
+  ( export LD_LIBRARY_PATH=${CONDA_PREFIX:?}/lib:$LD_LIBRARY_PATH && \
+    export LD_LIBRARY_PATH=${ROOTDIR:?}/.local/lib:$LD_LIBRARY_PATH && \
+    env CXX="${CXX_COMPILER:?}" CC="${C_COMPILER:?}" ${PIP3:?} install "${PACKDIR:?}" \
     --prefix="${ROOTDIR:?}/.local" --no-index --no-deps --no-build-isolation \
-    >${OUT1:?} 2>${OUT2:?} || { error "${EC3:?}"; return 1; }
+    >${OUT1:?} 2>${OUT2:?} || { error "${EC3:?}"; return 1; })
   
   pbottom "COMPILING ACT-DR4" || return 1
 

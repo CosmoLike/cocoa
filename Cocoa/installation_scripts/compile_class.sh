@@ -78,7 +78,6 @@ if [ -z "${IGNORE_CLASS_CODE}" ]; then
   rm -rf "${PACKDIR:?}/build/"
   rm -f "${PACKDIR:?}/class"
   rm -f "${PACKDIR:?}/libclass.a"
-  
   # ---------------------------------------------------------------------------
   # note: historical motivation when class was inside Cocoa git repo
   # (motivation): Cocoa has /include entry on .gitignore. Why? Class compilation
@@ -93,12 +92,14 @@ if [ -z "${IGNORE_CLASS_CODE}" ]; then
   cpfolder "${PACKDIR:?}/include2" "${PACKDIR:?}/include" || return 1;
 
   (export LD_LIBRARY_PATH=${CONDA_PREFIX:?}/lib:$LD_LIBRARY_PATH && \
+   export LD_LIBRARY_PATH=${ROOTDIR:?}/.local/lib:$LD_LIBRARY_PATH && \
    CC="${C_COMPILER:?}" PYTHON=${PYTHON3:?} make all \
    >${OUT1:?} 2>${OUT2:?} || { error "${EC7:?}"; return 1; })
    
   cdfolder "${PACKDIR}/python" || return 1
 
   (export LD_LIBRARY_PATH=${CONDA_PREFIX:?}/lib:$LD_LIBRARY_PATH && \
+   export LD_LIBRARY_PATH=${ROOTDIR:?}/.local/lib:$LD_LIBRARY_PATH && \
    CC="${C_COMPILER:?}" ${PYTHON3:?} setup.py build \
    >${OUT1:?} 2>${OUT2:?} || { error "${EC4:?}"; return 1; })
 
