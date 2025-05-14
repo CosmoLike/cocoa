@@ -1311,6 +1311,7 @@ void init_lens_sample(std::string multihisto_file, const int Ntomo)
       for (int k=0; k<Ntomo; k++) 
         tab[k][i] = input_table(i,k+1);
     }
+    double dz = (z_v[nzbins-1]-z_v[0]) / (nzbins-1.0);
     
     redshift.clustering_zdist_zmin_all = fmax(z_v[0], 1.e-5);
     
@@ -1326,6 +1327,17 @@ void init_lens_sample(std::string multihisto_file, const int Ntomo)
       redshift.clustering_zdist_zmin[k] = z_v[idx(0)];
       
       redshift.clustering_zdist_zmax[k] = z_v[idx(idx.n_elem-1)];
+
+      // Set tomography bin mean redshift
+      double _zmean = 0.0;
+      double _norm = 0.0;
+      for (int i_idx=0; i_idx<idx.n_elem; i_idx++)
+      {
+        int i = idx(i_idx);
+        _zmean += (z_v[i] + 0.5*dz)*tab[k][i];
+        _norm += tab[k][i];
+      }
+      redshift.clustering_zdist_zmean[k] = _zmean / _norm; 
     }
     // READ THE N(Z) FILE ENDS ------------
 
@@ -2073,40 +2085,43 @@ void set_nuisance_clustering_photoz(vector CP)
 // ---------------------------------------------------------------------------
 // ---------------------------------------------------------------------------
 
-/*
-void set_nuisance_clustering_photoz_stretch(vector CP)
+void set_nuisance_clustering_photoz_stretch(vector CPS)
 {
   spdlog::debug("{}: Begins", "set_nuisance_clustering_photoz_stretch");
 
   if (redshift.clustering_nbin == 0)
   {
-    spdlog::critical(
-      "{}: {} = 0 is invalid",
-      "set_nuisance_clustering_photoz_stretch",
-      "clustering_Nbin"
+    spdlog::critical("{}: {} = 0 is invalid",
+      "set_nuisance_clustering_photoz_stretch", "clustering_Nbin"
     );
     exit(1);
   }
-
-  if (redshift.clustering_nbin != static_cast<int>(CP.n_elem))
+  if (redshift.clustering_nbin != static_cast<int>(CPS.n_elem))
   {
     spdlog::critical(
       "{}: incompatible input w/ size = {} (!= {})",
       "set_nuisance_clustering_photoz_stretch",
-      CP.n_elem,
+      CPS.n_elem,
       redshift.clustering_nbin
     );
     exit(1);
   }
 
+  int cache_update = 0;
   for (int i=0; i<redshift.clustering_nbin; i++)
   {
-    nuisance.stretch_zphot_clustering[i] = CP(i);
+    if (fdiff(nuisance.photoz[1][1][i], CPS(i)))
+    {
+      cache_update = 1;
+      nuisance.photoz[1][1][i] = CPS(i);
+    }
   }
+
+  if(1 == cache_update)
+    nuisance.random_photoz_clustering = RandomNumber::get_instance().get();
 
   spdlog::debug("{}: Ends", "set_nuisance_clustering_photoz_stretch");
 }
-*/
 
 // ---------------------------------------------------------------------------
 // ---------------------------------------------------------------------------

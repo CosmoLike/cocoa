@@ -56,8 +56,13 @@ double amin_lens(int ni)
     log_fatal("invalid bin input ni = %d", ni);
     exit(1);
   }
-  return 1. / (1 + redshift.clustering_zdist_zmax[ni] 
-                 + 2.*fabs(nuisance.photoz[1][0][ni]));
+
+  // zmax that includes the photo-z stretch
+  double zmax = (redshift.clustering_zdist_zmax[ni] - \
+                 redshift.clustering_zdist_zmean[ni])\
+                *nuisance.photoz[1][1][ni] + \
+                redshift.clustering_zdist_zmean[ni];
+  return 1. / (1 + zmax + 2.*fabs(nuisance.photoz[1][0][ni]));
 }
 
 double amax_lens(int ni) 
@@ -68,13 +73,18 @@ double amax_lens(int ni)
     exit(1);
   }
 
+  // zmin that includes the photo-z stretch
+  double zmin = (redshift.clustering_zdist_zmin[ni] - \
+                 redshift.clustering_zdist_zmean[ni])\
+                *nuisance.photoz[1][1][ni] + \
+                redshift.clustering_zdist_zmean[ni];
+
   if (gbmag(0.0, ni) != 0) 
   {
     return 1. / (1. + fmax(redshift.shear_zdist_zmin_all, 0.001));
   }
     
-  return 1. / (1 + fmax(redshift.clustering_zdist_zmin[ni] 
-                 -2. * fabs(nuisance.photoz[1][0][ni]), 0.001));
+  return 1. / (1 + fmax(zmin - 2. * fabs(nuisance.photoz[1][0][ni]), 0.001));
 }
 
 // -----------------------------------------------------------------------------
@@ -724,7 +734,8 @@ double pf_photoz(double zz, int nj)
     exit(1);
   }
   
-  zz = zz - nuisance.photoz[1][0][nj];
+  zz = (zz - nuisance.photoz[1][0][nj] - redshift.clustering_zdist_zmean[nj])/\
+       nuisance.photoz[1][1][nj] + redshift.clustering_zdist_zmean[nj];
   
   double res; 
   if (zz <= table[ntomo+1][0] || zz >= table[ntomo+1][nzbins - 1])
@@ -739,6 +750,7 @@ double pf_photoz(double zz, int nj)
       log_fatal(gsl_strerror(status));
       exit(1);
     }
+    res = res / nuisance.photoz[1][1][nj];
   }
   return res;
 }

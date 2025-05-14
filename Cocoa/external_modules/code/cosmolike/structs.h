@@ -220,7 +220,7 @@ typedef struct
   // ---------------------------------------------------
   // ---------------------------------------------------
   // 1st index: photoz[0][:][:] = SHEAR; photoz[1][:][:] = CLUSTERING
-  // 2nd index: photoz[:][0][:] = bias; photoz[:][1][:] = strech
+  // 2nd index: photoz[:][0][:] = bias; photoz[:][1][:] = stretch
   double photoz[MAX_SIZE_ARRAYS][MAX_SIZE_ARRAYS][MAX_SIZE_ARRAYS]; 
   // ---------------------------------------------------
   // ---------------------------------------------------
@@ -396,6 +396,7 @@ typedef struct
   double clustering_zdist_zmax_all;
   double clustering_zdist_zmin[MAX_SIZE_ARRAYS];
   double clustering_zdist_zmax[MAX_SIZE_ARRAYS];
+  double clustering_zdist_zmean[MAX_SIZE_ARRAYS];
   // ---------------------------------------------------
   // ---------------------------------------------------
   // CLUSTER ROUTINES (ALPHA STAGE)

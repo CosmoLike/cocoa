@@ -172,6 +172,7 @@ void reset_redshift_struct()
     redshift.shear_zdist_zmax[i] = 0.0; 
     redshift.clustering_zdist_zmin[i] = 0.0;
     redshift.clustering_zdist_zmax[i] = 0.0;
+    redshift.clustering_zdist_zmean[i] = 0.0;
   }
 }
 
@@ -216,7 +217,10 @@ void reset_nuisance_struct()
       nuisance.hod[i][j] = 0.0;
       
       for(int k=0; k<MAX_SIZE_ARRAYS; k++)
-        nuisance.photoz[i][j][k] = 0.0;
+      {
+        if(j==1){nuisance.photoz[i][j][k] = 1.0;} // photo-z stretch params
+        else{nuisance.photoz[i][j][k] = 0.0;}
+      }
     }
   }
   nuisance.oneplusz0_ia = 0.0;

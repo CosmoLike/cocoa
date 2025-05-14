@@ -564,6 +564,10 @@ void set_nuisance_clustering_photoz(
     arma::Col<double> CP
   );
 
+void set_nuisance_clustering_photoz_stretch(
+    arma::Col<double> CPS
+  );
+
 void set_nuisance_IA(
     arma::Col<double> A1, 
     arma::Col<double> A2,
