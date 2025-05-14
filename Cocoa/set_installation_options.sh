@@ -16,7 +16,7 @@ fi
 # ------------------------------------------------------------------------------
 # VERBOSE AS DEBUG TOOL --------------------------------------------------------
 # ------------------------------------------------------------------------------
-#export COCOA_OUTPUT_VERBOSE=1
+export COCOA_OUTPUT_VERBOSE=1
 
 # ------------------------------------------------------------------------------
 # If set, COSMOLIKE will compile with DEBUG flags ------------------------------
@@ -26,17 +26,18 @@ fi
 # ------------------------------------------------------------------------------
 # The flags below allow users to skip downloading specific datasets ------------
 # ------------------------------------------------------------------------------
-export IGNORE_ACTDR6_DATA=1
+#export IGNORE_ACTDR6_DATA=1
 # export IGNORE_BAO_DATA=1
 export IGNORE_BICEP_CMB_DATA=1
 # export IGNORE_HOLICOW_STRONG_LENSING_DATA=1
 #export IGNORE_SN_DATA=1
 export IGNORE_SPT_CMB_DATA=1
-export IGNORE_SIMONS_OBSERVATORY_CMB_DATA=1
+#export IGNORE_SIMONS_OBSERVATORY_CMB_DATA=1
 #export IGNORE_PLANCK_CMB_DATA=1
-export IGNORE_CAMSPEC_CMB_DATA=1
-export IGNORE_LIPOP_CMB_DATA=1
-export IGNORE_EMULTRF_DATA=1 #SaraivanovZhongZhu (SZZ) transformer-based emul
+#export IGNORE_CAMSPEC_CMB_DATA=1
+#export IGNORE_LIPOP_CMB_DATA=1
+#export IGNORE_COSMOPOWER_DATA=1
+#export IGNORE_EMULTRF_DATA=1 #SaraivanovZhongZhu (SZZ) transformer-based emul
 
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
@@ -51,18 +52,18 @@ export IGNORE_CLASS_CODE=1 # Default: we just use CAMB (reduces compilation time
 #export IGNORE_COSMOLIKE_CODE=1
 #export IGNORE_POLYCHORD_SAMPLER_CODE=1
 #export IGNORE_PLANCK_LIKELIHOOD_CODE=1
-export IGNORE_ACTDR4_CODE=1
-export IGNORE_ACTDR6_CODE=1
+#export IGNORE_ACTDR4_CODE=1
+#export IGNORE_ACTDR6_CODE=1
 export IGNORE_CPP_CUBA_INSTALLATION=1
 export IGNORE_VELOCILEPTORS_CODE=1
-export IGNORE_SIMONS_OBSERVATORY_LIKELIHOOD_CODE=1
-export IGNORE_CAMSPEC_LIKELIHOOD_CODE=1
-export IGNORE_LIPOP_LIKELIHOOD_CODE=1
+#export IGNORE_SIMONS_OBSERVATORY_LIKELIHOOD_CODE=1
+#export IGNORE_CAMSPEC_LIKELIHOOD_CODE=1
+#export IGNORE_LIPOP_LIKELIHOOD_CODE=1
 export IGNORE_HYREC_CODE=1
 export IGNORE_COSMOREC_CODE=1
 export IGNORE_MGCAMB_CODE=1
-export IGNORE_EMULTRF_CODE=1 #SaraivanovZhongZhu (SZZ) transformer-based emul
-export IGNORE_COSMOPOWER_CODE=1
+#export IGNORE_EMULTRF_CODE=1 #SaraivanovZhongZhu (SZZ) transformer-based emul
+#export IGNORE_COSMOPOWER_CODE=1
 #export IGNORE_EUCLID_EMULATOR_V2_CODE=1
 
 # ------------------------------------------------------------------------------
@@ -74,8 +75,8 @@ export IGNORE_COSMOPOWER_CODE=1
 # ------------------------------------------------------------------------------
 #export IGNORE_COSMOLIKE_LSSTY1_CODE=1
 export IGNORE_COSMOLIKE_DES_Y3_CODE=1
-export IGNORE_COSMOLIKE_ROMAN_FOURIER_CODE=1
-export IGNORE_COSMOLIKE_ROMAN_REAL_CODE=1
+#export IGNORE_COSMOLIKE_ROMAN_FOURIER_CODE=1
+#export IGNORE_COSMOLIKE_ROMAN_REAL_CODE=1
 
 # ------------------------------------------------------------------------------
 # If OVERWRITE_EXISTING_XXX_CODE=1, the setup_cocoa overwrites existing PACKAGES
@@ -83,9 +84,11 @@ export IGNORE_COSMOLIKE_ROMAN_REAL_CODE=1
 # redownload: delete the compressed file and download data again
 # these keys are only relevant if you run setup_cocoa multiple times -----------
 # ------------------------------------------------------------------------------
-export OVERWRITE_EXISTING_ALL_PACKAGES=1
+#export OVERWRITE_EXISTING_ALL_PACKAGES=1
 #export OVERWRITE_EXISTING_COSMOLIKE_CODE=1
 #export REDOWNLOAD_EXISTING_ALL_DATA=1
+export OVERWRITE_EXISTING_EMULTRF_CODE=1
+export OVERWRITE_EXISTING_EMULTRF_DATA=1
 # ------------------------------------------------------------------------------
 # If set, compile_planck.sh uses click like code from github.com/benabed/clik
 # ------------------------------------------------------------------------------
@@ -204,6 +207,7 @@ if [ -n "${REDOWNLOAD_EXISTING_ALL_DATA}" ]; then
   export REDOWNLOAD_EXISTING_SIMONS_OBSERVATORY_CMB_DATA=1
   export REDOWNLOAD_EXISTING_CAMPSPEC_CMB_DATA=1
   export OVERWRITE_EXISTING_EMULTRF_DATA=1
+  export OVERWRITE_EXISTING_COSMOPOWER_DATA=1
 fi
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
@@ -311,11 +315,14 @@ export COSMOPOWER_SOLIKET_GIT_COMMIT="1d8333ea0007c88e7c2de192de39301884093cd8"
 export COSMOPOWER_URL="https://github.com/alessiospuriomancini/cosmopower.git"
 export COSMOPOWER_GIT_COMMIT="7cac5e71c975c06257b2f95f0dcea5dd09b0f45f"
 
+export COSMOPOWER_URL_DATA="https://github.com/cosmopower-organization/jense_2024_emulators.git"
+export COSMOPOWER_URL_DATA_COMMIT="4317635eed70289ee1ec6b3df828027173071e36"
+
 export EMULTRF_URL="https://github.com/CosmoLike/emulators_code.git"
-export EMULTRF_GIT_COMMIT="5c80e0b7877901ec3edd3028a73f7434b1fa6f35"
+export EMULTRF_GIT_COMMIT="c2ba750d04a584376bce3c65d048e9a7180e134c"
 
 export EMULTRF_DATA_URL="https://github.com/CosmoLike/emulators_data.git"
-export EMULTRF_DATA_GIT_COMMIT="dca7bf6bb40ae8c6428837c2d48a7b63de36ae3a"
+export EMULTRF_DATA_GIT_COMMIT="7d7085241486809b8b765bf58e6e2b437bc2e406"
 
 # --------------------------------------------------------------------
 # --------------------------------------------------------------------

@@ -105,7 +105,7 @@ if [ -z "${IGNORE_PIP_CORE_INSTALLATION}" ]; then
 
     env CXX="${CXX_COMPILER:?}" CC="${C_COMPILER:?}" ${PIP3:?} install \
         'tensorflow==2.17.0' \
-        'tensorflow_probability==0.25.0' \
+        'tensorflow_probability==0.24.0' \
         'keras==3.9.2' \
         'keras-preprocessing==1.1.2' \
         'torch==2.6.0' \
@@ -115,6 +115,10 @@ if [ -z "${IGNORE_PIP_CORE_INSTALLATION}" ]; then
         'scikit-learn==1.6.1' \
         'jupyter==1.0.0' \
         'typing-extensions==4.13.2' \
+        'mkdocs_material==9.6.13' \
+        'mkdocstrings==0.29.1' \
+        'pytest==8.3.5' \
+        'tf-keras==2.17.0' \
       --no-cache-dir --prefer-binary \
       --extra-index-url "https://download.pytorch.org/whl/cu118" \
       --prefix="${ROOTDIR:?}/.local" \

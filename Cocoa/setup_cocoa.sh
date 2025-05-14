@@ -26,7 +26,6 @@ error_cip () {
 # ------------------------------------------------------------------------------
 # ------------------------------ Basic Settings --------------------------------
 # ------------------------------------------------------------------------------
-
 source $(pwd -P)/installation_scripts/flags_save_old.sh
 if [ $? -ne 0 ]; then
   error_cip 'script flags_save_old.sh' 
@@ -45,23 +44,16 @@ if [ -n "${MINICONDA_INSTALLATION}" ]; then
   fi
 fi
 
-# ------------------------------------------------------------------------------
-
 ptop2 'SETUP COCOA INSTALLATION PACKAGES'
-
-# ------------------------------------------------------------------------------
 
 # ------------------------------------------------------------------------------
 # ---------------------- Activate Virtual Environment --------------------------
 # ------------------------------------------------------------------------------
 if [ -n "${OVERWRITE_EXISTING_COCOA_PRIVATE_PYTHON_ENV}" ]; then
-
   rm -rf ${ROOTDIR:?}/.local/
-
 fi
 
 if [ ! -d "${ROOTDIR:?}/.local/" ]; then
-
   ptop 'SETUP COCOA PRIVATE PYTHON ENV'
 
   cd ${ROOTDIR:?}/../
@@ -73,7 +65,6 @@ if [ ! -d "${ROOTDIR:?}/.local/" ]; then
   fi
 
   pbottom 'SETUP COCOA PRIVATE PYTHON ENV'
-
 fi
 
 source "${ROOTDIR:?}/.local/bin/activate"
@@ -90,7 +81,6 @@ fi
 # ------------------------------------------------------------------------------
 # ------------------------------ INSTALL PACKAGES ------------------------------
 # ------------------------------------------------------------------------------
-
 declare -i ERRORCODE=0
 
 declare -a SCRIPTS=( "setup_core_packages.sh" 
@@ -123,29 +113,23 @@ declare -a SCRIPTS=( "setup_core_packages.sh"
                      "unxv_planck2018_basic.sh"
                      "unxv_camspec.sh"
                      "unxv_lipop.sh"
-                     "unxv_emultrf.sh")
+                     "unxv_emultrf.sh"
+                     "unxv_cosmopower.sh")
 
 for (( i=0; i<${#SCRIPTS[@]}; i++ ));
 do
-
   cdroot; 
-
   ( source "${ROOTDIR:?}/installation_scripts/${SCRIPTS[$i]}" )
   if [ $? -ne 0 ]; then
     if [ -n "${COCOA_OUTPUT_VERBOSE}" ]; then
-      error_cip "script ${SCRIPTS[$i]}"
-      return 1
+      error_cip_msg "script ${SCRIPTS[$i]}"
+      ERRORCODE=1
     else
       error_cip_msg "script ${SCRIPTS[$i]}"
       ERRORCODE=1
     fi
   fi
-
 done
-
-# ----------------------------------------------------------------------------
-# ----------------------------------------------------------------------------
-# ----------------------------------------------------------------------------
 
 if [ ${ERRORCODE:?} -ne 0 ]; then
   error_cip "setup_cocoa.py"; return 1
@@ -158,9 +142,7 @@ fi
 
 unset -v ERRORCODE SCRIPTS
 unset -f error_cip error_cip_msg
-
 pbottom2 'SETUP COCOA INSTALLATION PACKAGES'
-
 source stop_cocoa.sh || return 1;
 
 # ------------------------------------------------------------------------------
