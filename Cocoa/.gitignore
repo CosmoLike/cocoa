@@ -42,6 +42,7 @@ external_modules/data/emul*
 external_modules/data/cosmopower/
 external_modules/data/cosmo*
 
+
 projects/desxplanck
 projects/lsst_fourier
 projects/des_y3
@@ -149,6 +150,7 @@ external_modules/code/PolyChordLite/
 external_modules/code/emulators/*
 external_modules/code/emul*/
 external_modules/code/emulators/soliket
+external_modules/code/emulators/so*
 
 cobaya/cobaya/likelihoods/XXX
 cobaya/cobaya/likelihoods/des_y1
