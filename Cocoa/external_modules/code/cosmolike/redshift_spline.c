@@ -62,6 +62,7 @@ double amin_lens(int ni)
                  redshift.clustering_zdist_zmean[ni])\
                 *nuisance.photoz[1][1][ni] + \
                 redshift.clustering_zdist_zmean[ni];
+  //double zmax = redshift.clustering_zdist_zmax[ni];
   return 1. / (1 + zmax + 2.*fabs(nuisance.photoz[1][0][ni]));
 }
 
@@ -78,7 +79,7 @@ double amax_lens(int ni)
                  redshift.clustering_zdist_zmean[ni])\
                 *nuisance.photoz[1][1][ni] + \
                 redshift.clustering_zdist_zmean[ni];
-
+  //double zmin = redshift.clustering_zdist_zmin[ni];
   if (gbmag(0.0, ni) != 0) 
   {
     return 1. / (1. + fmax(redshift.shear_zdist_zmin_all, 0.001));
