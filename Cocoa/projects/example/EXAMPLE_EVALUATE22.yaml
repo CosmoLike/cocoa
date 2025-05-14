@@ -156,9 +156,7 @@ theory:
       teextraname: 'external_modules/data/emultrf/CMB_TRF/extrainfo_lhs_te_96.npy'
       eefilename: 'external_modules/data/emultrf/CMB_TRF/chiEEAstautrf1dot2milnewlhcevansqrtrescalec16'
       eeextraname: 'external_modules/data/emultrf/CMB_TRF/extrainfo_lhs_ee_96.npy'
-      dlfilename: 'external_modules/data/emultrf/CMB_TRF/chisquaredllog'
-      dlextraname: 'external_modules/data/emultrf/CMB_TRF/extrainfodl.npy'
-      dltransmat: 'external_modules/data/emultrf/CMB_TRF/PCAdl.npy'
+      sn_likelihood: False
       ordering: ['omegabh2','omegach2','H0','tau','ns','logA','mnu','w','wa']
   mflike.BandpowerForeground:
 
