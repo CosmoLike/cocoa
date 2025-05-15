@@ -116,7 +116,34 @@ params:
   A:
     derived: 'lambda As: 1e9*As'
     latex: 10^9 A_\mathrm{s}
-    
+  mnu:
+    value: 0.06
+  w0pwa:
+    prior:
+      min: -5 
+      max: -0.01
+    ref:
+      dist: norm
+      loc: -0.99
+      scale: 0.05
+    proposal: 0.05
+    latex: w_{0,\mathrm{DE}}+w_{a,\mathrm{DE}}
+    drop: true
+  w:
+    prior:
+      min: -3
+      max: -0.01
+    ref:
+      dist: norm
+      loc: -0.99
+      scale: 0.05
+    proposal: 0.05
+    latex: w_{0,\mathrm{DE}}
+  wa:
+    value: 'lambda w0pwa, w: w0pwa - w'
+    derived: false
+    latex: w_{a,\mathrm{DE}}
+
 theory:
   emulcmbtrf:
     path: ./cobaya/cobaya/theories/
@@ -129,6 +156,12 @@ theory:
       teextraname: 'external_modules/data/emultrf/CMB_TRF/extrainfo_lhs_te_96.npy'
       eefilename: 'external_modules/data/emultrf/CMB_TRF/chiEEAstautrf1dot2milnewlhcevansqrtrescalec16'
       eeextraname: 'external_modules/data/emultrf/CMB_TRF/extrainfo_lhs_ee_96.npy'
+      dlfilename: 'external_modules/data/emultrf/CMB_TRF/chisquaredllog'
+      dlextraname: 'external_modules/data/emultrf/CMB_TRF/extrainfodl.npy'
+      dltransmat: 'external_modules/data/emultrf/CMB_TRF/PCAdl.npy'
+      GPfilename:  'external_modules/data/emultrf/CMB_TRF/thetaH0GP.joblib'
+      GPextraname: 'external_modules/data/emultrf/CMB_TRF/extrainfotheta.npy'
+      ordering: ['omegabh2','omegach2','H0','tau','ns','logA','mnu','w','wa']
   mflike.BandpowerForeground:
 
 sampler:
@@ -140,6 +173,8 @@ sampler:
       omegabh2: 2.246801442e-02
       omegach2: 1.198257361e-01 
       tau: 5.433339482e-02
+      w0pwa: -1
+      w: -1
       a_tSZ: 3.299661491
       a_kSZ: 1.603283271
       a_p: 6.909072608
