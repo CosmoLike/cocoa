@@ -20,8 +20,10 @@ void get_FPT_bias(void)
   {
     FPTIA.k_min     = 1.e-5;
     FPTIA.k_max     = 1.e+5;
-    FPTbias.N       = 1300 + 200 * Ntable.FPTboost;
-    if (FPTbias.tab != NULL) free(FPTbias.tab);
+    FPTbias.N       = 800 + 200 * Ntable.FPTboost;
+    if (FPTbias.tab != NULL) {
+      free(FPTbias.tab);
+    }
     FPTbias.tab = (double**) malloc2d(7, FPTbias.N);
   }
   if (fdiff(cache[0], cosmology.random) || fdiff(cache[1], Ntable.random))
@@ -64,9 +66,12 @@ void get_FPT_IA(void)
   {
     FPTIA.k_min     = 5.e-4;
     FPTIA.k_max     = 1.e+6;
-    FPTIA.N         = 1200 + 200 * Ntable.FPTboost;
-    
-    if (FPTIA.tab != NULL) free(FPTIA.tab);
+    //FPTIA.N       = 1200 + 200 * Ntable.FPTboost;
+    FPTIA.N         = 400 + 200 * Ntable.FPTboost;
+
+    if (FPTIA.tab != NULL) {
+      free(FPTIA.tab);
+    }
     FPTIA.tab = (double**) malloc2d(12, FPTIA.N);
   }
   if (fdiff(cache[0], cosmology.random) || fdiff(cache[1], Ntable.random))

@@ -220,7 +220,7 @@ typedef struct
   // ---------------------------------------------------
   // ---------------------------------------------------
   // 1st index: photoz[0][:][:] = SHEAR; photoz[1][:][:] = CLUSTERING
-  // 2nd index: photoz[:][0][:] = bias; photoz[:][1][:]  = stretch
+  // 2nd index: photoz[:][0][:] = bias; photoz[:][1][:] = stretch
   double photoz[MAX_SIZE_ARRAYS][MAX_SIZE_ARRAYS][MAX_SIZE_ARRAYS]; 
   // ---------------------------------------------------
   // ---------------------------------------------------

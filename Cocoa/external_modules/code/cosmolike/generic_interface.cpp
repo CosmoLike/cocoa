@@ -296,7 +296,7 @@ void initial_setup()
   like.clusterCG = 0;
   like.clusterCC = 0;
 
-  // reset bias
+  // reset bias - pretty important to setup variables to zero or 1 via reset
   reset_redshift_struct();
   reset_nuisance_struct();
   reset_cosmology_struct();
@@ -388,8 +388,8 @@ void init_baryons_contamination(
        
   spdlog::debug(
       "{}: Baryon simulation w/ Name = {} & Tag = {} selected",
-      "init_baryons_contamination", 
-      name, 
+      "init_baryons_contamination",
+      name,
       tag
     );
 
@@ -427,8 +427,8 @@ void init_bias(arma::Col<double> bias_z_evol_model)
     
     spdlog::debug(
         "{}: {}[{}] = {} selected.", "init_bias", 
-        "like.galaxy_bias_model", 
-        i, 
+        "like.galaxy_bias_model",
+        i,
         bias_z_evol_model(i)
       );
   }
@@ -451,7 +451,7 @@ void init_binning_cmb_bandpower(
   if (!(Nbandpower > 0)) {
     spdlog::critical(
       "{}: {} = {} not supported", 
-      "init_binning_cmb_bandpower", 
+      "init_binning_cmb_bandpower",
       "Number of Band Powers (Nbandpower)", 
       Nbandpower
     );
@@ -459,19 +459,19 @@ void init_binning_cmb_bandpower(
   }
   spdlog::debug(
       "{}: {} = {} selected.", 
-      "init_binning_cmb_bandpower", 
+      "init_binning_cmb_bandpower",
       "Number of Band Powers (Nbandpower)", 
       Nbandpower
     );
   spdlog::debug(
       "{}: {} = {} selected.", 
-      "init_binning_cmb_bandpower", 
+      "init_binning_cmb_bandpower",
       "l_min", 
       lmin
     );
   spdlog::debug(
       "{}: {} = {} selected.", 
-      "init_binning_cmb_bandpower", 
+      "init_binning_cmb_bandpower",
       "l_max", 
       lmax
     );
@@ -500,7 +500,8 @@ void init_binning_fourier(
 
   if (!(Nells > 0)) {
     spdlog::critical(
-        "{}: {} = {} not supported", "init_binning_fourier", 
+        "{}: {} = {:d} not supported",
+        "init_binning_fourier", 
         "Number of l modes (Nells)", 
         Nells
       );
@@ -539,26 +540,24 @@ void init_binning_fourier(
 
   like.lmax_shear = lmax_shear;
   
-  const double logdl = (std::log(lmax) - std::log(lmin))/ (double) Nells;
+  const double logdl = (std::log(lmax) - std::log(lmin))/ (double) like.Ncl;
   
   if (like.ell != NULL) {
     free(like.ell);
   }
-  like.ell = (double*) malloc(sizeof(double)*Nells);
+  like.ell = (double*) malloc(sizeof(double)*like.Ncl);
   
-  for (int i=0; i<like.Ncl; i++)
-  {
+  for (int i=0; i<like.Ncl; i++) {
     like.ell[i] = std::exp(std::log(like.lmin) + (i + 0.5)*logdl);
-  
     spdlog::debug(
         "{}: Bin {:d} - {} = {:d}, {} = {:d} and {} = {:d}",
-        "init_binning_fourier", 
-        i, 
-        "lmin", 
-        lmin, 
-        "ell", 
-        like.ell[i], 
-        "lmax", 
+        "init_binning_fourier",
+        i,
+        "lmin",
+        lmin,
+        "ell",
+        like.ell[i],
+        "lmax",
         lmax
       );
   }
@@ -577,10 +576,9 @@ void init_binning_real_space(
 {
   spdlog::debug("{}: Begins", "init_binning_real_space");
 
-  if (!(Ntheta > 0))
-  {
+  if (!(Ntheta > 0)) {
     spdlog::critical(
-        "{}: {} = {} not supported", "init_binning_real_space",
+        "{}: {} = {:d} not supported", "init_binning_real_space",
         "Ntheta", 
         Ntheta
       );
@@ -588,7 +586,7 @@ void init_binning_real_space(
   }
 
   spdlog::debug(
-      "{}: {} = {} selected.", "init_binning_real_space", 
+      "{}: {} = {:d} selected.", "init_binning_real_space", 
       "Ntheta", 
       Ntheta
     );
@@ -612,8 +610,7 @@ void init_binning_real_space(
   
   constexpr double fac = (2./3.);
 
-  for (int i=0; i<Ntable.Ntheta; i++)
-  {
+  for (int i=0; i<Ntable.Ntheta; i++) {
     const double thetamin = std::exp(log(Ntable.vtmin) + (i + 0.) * logdt);
     const double thetamax = std::exp(log(Ntable.vtmin) + (i + 1.) * logdt);
     
@@ -1445,18 +1442,18 @@ void init_lens_sample(std::string multihisto_file, const int Ntomo)
       redshift.clustering_zdist_zmax[k] = z_v[idx(idx.n_elem-1)];
     }
     // READ THE N(Z) FILE ENDS ------------
-
     redshift.random_clustering = RandomNumber::get_instance().get();
 
     pf_photoz(0.1, 0); // init static variables
 
     for (int k=0; k<Ntomo; k++) {
+      redshift.clustering_zdist_zmean[k] = zmean(k);
       spdlog::debug(
           "{}: bin {} - {} = {}.",
           "init_lens_sample",
           k,
           "<z_s>",
-          zmean(k)
+          redshift.clustering_zdist_zmean[k]
         );
     }
   }
@@ -1805,7 +1802,6 @@ void set_cosmological_parameters(
 
   spdlog::debug("\x1b[90m{}\x1b[0m: Ends", "set_cosmological_parameters");
 }
-
 
 // ---------------------------------------------------------------------------
 // ---------------------------------------------------------------------------
@@ -2249,13 +2245,11 @@ void set_nuisance_clustering_photoz(vector CP)
 // ---------------------------------------------------------------------------
 // ---------------------------------------------------------------------------
 
-/*
-void set_nuisance_clustering_photoz_stretch(vector CP)
+void set_nuisance_clustering_photoz_stretch(vector CPS)
 {
   spdlog::debug("{}: Begins", "set_nuisance_clustering_photoz_stretch");
 
-  if (redshift.clustering_nbin == 0)
-  {
+  if (redshift.clustering_nbin == 0) {
     spdlog::critical(
       "{}: {} = 0 is invalid",
       "set_nuisance_clustering_photoz_stretch",
@@ -2263,26 +2257,29 @@ void set_nuisance_clustering_photoz_stretch(vector CP)
     );
     exit(1);
   }
-
-  if (redshift.clustering_nbin != static_cast<int>(CP.n_elem))
-  {
+  if (redshift.clustering_nbin != static_cast<int>(CPS.n_elem)) {
     spdlog::critical(
       "{}: incompatible input w/ size = {} (!= {})",
       "set_nuisance_clustering_photoz_stretch",
-      CP.n_elem,
+      CPS.n_elem,
       redshift.clustering_nbin
     );
     exit(1);
   }
 
-  for (int i=0; i<redshift.clustering_nbin; i++)
-  {
-    nuisance.stretch_zphot_clustering[i] = CP(i);
+  int cache_update = 0;
+  for (int i=0; i<redshift.clustering_nbin; i++) {
+    if (fdiff(nuisance.photoz[1][1][i], CPS(i))) {
+      cache_update = 1;
+      nuisance.photoz[1][1][i] = CPS(i);
+    }
   }
 
+  if(1 == cache_update) {
+    nuisance.random_photoz_clustering = RandomNumber::get_instance().get();
+  }
   spdlog::debug("{}: Ends", "set_nuisance_clustering_photoz_stretch");
 }
-*/
 
 // ---------------------------------------------------------------------------
 // ---------------------------------------------------------------------------
@@ -3152,7 +3149,6 @@ vector compute_data_vector_3x2pt_fourier_masked_any_order(
   auto indices = arma::conv_to<arma::Col<int>>::from(
       arma::stable_sort_index(order, "ascend")
     );
-  
   // size of each probe type
   arma::Col<int>::fixed<sz> sizes =
     {
@@ -3160,10 +3156,8 @@ vector compute_data_vector_3x2pt_fourier_masked_any_order(
       like.Ncl*tomo.ggl_Npowerspectra,
       like.Ncl*tomo.clustering_Npowerspectra
     };
-  
   // the starting index of each probe
   arma::Col<int>::fixed<sz> start = {0,0,0};
-  
   // for each probe
   for(int i=0; i<sz; i++) {
     for(int j=0; j<indices(i); j++) {
@@ -3174,8 +3168,8 @@ vector compute_data_vector_3x2pt_fourier_masked_any_order(
   spdlog::debug(
       "{}: start from {:d} - {:d} - {:d}",
       "compute_data_vector_3x2pt_fourier_masked_any_order", 
-      start(0), 
-      start(1), 
+      start(0),
+      start(1),
       start(2)
     );
   
@@ -3374,8 +3368,7 @@ matrix compute_baryon_pcas_3x2pt_real(arma::Col<int>::fixed<3> order)
   matrix R = matrix(ndata, nscenarios); 
 
   for (int i=0; i<nscenarios; i++) {
-    R.col(i) = 
-      IP::get_instance().expand_theory_data_vector_from_sqzd(PC.col(i));
+    R.col(i) = IP::get_instance().expand_theory_data_vector_from_sqzd(PC.col(i));
   }
 
   return R;
@@ -3499,8 +3492,11 @@ matrix compute_baryon_pcas_6x2pt(arma::Col<int>::fixed<6> order)
 
   // Compute Cholesky Decomposition of the Covariance Matrix --------------
   
-  spdlog::debug("{}: Computing Cholesky Decomposition of"
-    " the Covariance Matrix begins",  "compute_baryon_pcas_3x2pt");
+  spdlog::debug(
+      "{}: Computing Cholesky Decomposition of"
+      " the Covariance Matrix begins",
+      "compute_baryon_pcas_3x2pt"
+    );
 
   matrix L = arma::chol(IP::get_instance().get_cov_masked_sqzd(), "lower");
 
@@ -3533,8 +3529,10 @@ matrix compute_baryon_pcas_6x2pt(arma::Col<int>::fixed<6> order)
   for (int i=0; i<nscenarios; i++)
   {
     spdlog::debug("{}: Computing contaminated data vector"
-      " with baryon scenario {} begins", "compute_baryon_pcas_3x2pt",
-      BaryonScenario::get_instance().get_scenario(i));
+        " with baryon scenario {} begins",
+        "compute_baryon_pcas_3x2pt",
+        BaryonScenario::get_instance().get_scenario(i)
+      );
 
     // line below to force clear cosmolike cosmology cache
     cosmology.random = RandomNumber::get_instance().get();
@@ -3621,8 +3619,7 @@ bool IP::is_data_set() const
 
 void IP::set_data(std::string datavector_filename)
 {
-  if (!(this->is_mask_set_))
-  {
+  if (!(this->is_mask_set_)) {
     spdlog::critical(
         "{}: {} not set prior to this function call", 
         "set_data",
@@ -3639,8 +3636,7 @@ void IP::set_data(std::string datavector_filename)
 
   matrix table = read_table(datavector_filename);
   
-  if (table.n_rows != this->ndata_)
-  {
+  if (table.n_rows != this->ndata_) {
     spdlog::critical(
         "{}: inconsistent data vector", 
         "IP::set_data"
@@ -3675,10 +3671,12 @@ void IP::set_data(std::string datavector_filename)
 
 void IP::set_mask(std::string mask_filename, arma::Col<int>::fixed<3> order, const int real_space)
 {
-  if (!(like.Ndata>0))
-  {
-    spdlog::critical("{}: {} not set prior to this function call",
-      "IP::set_mask", "like.Ndata");
+  if (!(like.Ndata>0)) {
+    spdlog::critical(
+        "{}: {} not set prior to this function call",
+        "IP::set_mask",
+        "like.Ndata"
+      );
     exit(1);
   }
 
@@ -3698,12 +3696,9 @@ void IP::set_mask(std::string mask_filename, arma::Col<int>::fixed<3> order, con
     exit(1);
   }
   
-  for (int i=0; i<this->ndata_; i++)
-  {
+  for (int i=0; i<this->ndata_; i++) {
     this->mask_(i) = static_cast<int>(table(i,1) + 1e-13);
-    
-    if (!(this->mask_(i) == 0 || this->mask_(i) == 1))
-    {
+    if (!(this->mask_(i) == 0 || this->mask_(i) == 1)) {
       spdlog::critical(
           "{}: inconsistent mask", 
           "IP::set_mask"
@@ -3762,15 +3757,15 @@ void IP::set_mask(std::string mask_filename, arma::Col<int>::fixed<3> order, con
   if (!(this->ndata_sqzd_>0)) {
     spdlog::critical(
         "{}: mask file {} left no data points after masking",
-        "IP::set_mask", 
+        "IP::set_mask",
         mask_filename
       );
     exit(1);
   }
   spdlog::debug(
       "{}: mask file {} left {} non-masked elements after masking",
-      "IP::set_mask", 
-      mask_filename, 
+      "IP::set_mask",
+      mask_filename,
       this->ndata_sqzd_
     );
 
@@ -3799,8 +3794,8 @@ void IP::set_mask(std::string mask_filename, arma::Col<int>::fixed<3> order, con
 }
 
 void IP::set_mask(
-    std::string mask_filename, 
-    arma::Col<int>::fixed<6> order, 
+    std::string mask_filename,
+    arma::Col<int>::fixed<6> order,
     const int real_space
   )
 {

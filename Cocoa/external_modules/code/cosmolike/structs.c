@@ -163,8 +163,7 @@ void reset_redshift_struct()
   redshift.clustering_zdist_zmin_all = 0.0;
   redshift.clustering_zdist_zmax_all = 0.0;
 
-  for (int i=0; i<MAX_SIZE_ARRAYS; i++)
-  {
+  for (int i=0; i<MAX_SIZE_ARRAYS; i++) {
     redshift.shear_zdist_zmin[i] = 0.0;
     redshift.shear_zdist_zmax[i] = 0.0; 
     redshift.clustering_zdist_zmin[i] = 0.0;
@@ -198,23 +197,17 @@ void reset_nuisance_struct()
   nuisance.random_photoz_shear = 0.0;
   nuisance.random_photoz_clustering = 0.0;
 
-  for (int i=0; i<MAX_SIZE_ARRAYS; i++)
-  {
+  for (int i=0; i<MAX_SIZE_ARRAYS; i++) {
     nuisance.shear_calibration_m[i] = 0.0;
     nuisance.gc[i] = 0.0;
     nuisance.gas[i] = 0.0;
-
-    for (int j=0; j<MAX_SIZE_ARRAYS; j++)
-    {
+    for (int j=0; j<MAX_SIZE_ARRAYS; j++) {
       nuisance.ia[i][j] = 0.0;
       nuisance.ia[i][j] = 0.0;
       nuisance.ia[i][j] = 0.0;
-
       nuisance.gb[i][j] = 0.0;
       nuisance.hod[i][j] = 0.0;
-      
-      for (int k=0; k<MAX_SIZE_ARRAYS; k++) 
-      {
+      for (int k=0; k<MAX_SIZE_ARRAYS; k++) {
         if (j==1) {
           nuisance.photoz[i][j][k] = 1.0;
         } // photo-z stretch params
@@ -226,7 +219,6 @@ void reset_nuisance_struct()
   }
   nuisance.oneplusz0_ia = 0.0;
   nuisance.c1rhocrit_ia = 0.01389;
-
   nuisance.IA = 0;
   nuisance.IA_MODEL = 0;
 }

@@ -56,7 +56,7 @@ double amin_lens(int ni)
   }
   const double zmax = 
     (redshift.clustering_zdist_zmax[ni] 
-      - redshift.clustering_zdist_zmean[ni])/nuisance.photoz[1][1][ni] 
+      - redshift.clustering_zdist_zmean[ni])*nuisance.photoz[1][1][ni]
       + redshift.clustering_zdist_zmean[ni];
   return 1. / (1 + zmax + 2.*fabs(nuisance.photoz[1][0][ni]));
 }
@@ -70,7 +70,7 @@ double amax_lens(int ni)
 
   const double zmin = 
     (redshift.clustering_zdist_zmin[ni] 
-      - redshift.clustering_zdist_zmean[ni])/nuisance.photoz[1][1][ni] 
+      - redshift.clustering_zdist_zmean[ni])*nuisance.photoz[1][1][ni]
       + redshift.clustering_zdist_zmean[ni];
 
   if (gbmag(0.0, ni) != 0) {
@@ -145,15 +145,11 @@ int test_zoverlap(int ni, int nj) // test whether source bin nj is behind lens b
 int ZL(int ni) 
 {
   static int N[MAX_SIZE_ARRAYS*MAX_SIZE_ARRAYS] = {-42};
-  if (N[0] < -1) 
-  {
+  if (N[0] < -1) {
     int n = 0;
-    for (int i=0; i<redshift.clustering_nbin; i++) 
-    {
-      for (int j=0; j<redshift.shear_nbin; j++) 
-      {
-        if (test_zoverlap(i, j)) 
-        {
+    for (int i=0; i<redshift.clustering_nbin; i++) {
+      for (int j=0; j<redshift.shear_nbin; j++) {
+        if (test_zoverlap(i, j)) {
           N[n] = i;
           n++;
         }
@@ -172,15 +168,11 @@ int ZL(int ni)
 int ZS(int nj) 
 {
   static int N[MAX_SIZE_ARRAYS*MAX_SIZE_ARRAYS] = {-42};
-  if (N[0] < -1) 
-  {
+  if (N[0] < -1) {
     int n = 0;
-    for (int i = 0; i < redshift.clustering_nbin; i++) 
-    {
-      for (int j = 0; j < redshift.shear_nbin; j++) 
-      {
-        if (test_zoverlap(i, j)) 
-        {
+    for (int i = 0; i < redshift.clustering_nbin; i++) {
+      for (int j = 0; j < redshift.shear_nbin; j++) {
+        if (test_zoverlap(i, j)) {
           N[n] = j;
           n++;
         }
@@ -199,20 +191,15 @@ int ZS(int nj)
 int N_ggl(int ni, int nj) 
 { // ni = redshift bin of the lens, nj = redshift bin of the source
   static int N[MAX_SIZE_ARRAYS][MAX_SIZE_ARRAYS] = {{-42}};
-  if (N[0][0] < 0) 
-  {
+  if (N[0][0] < 0) {
     int n = 0;
-    for (int i=0; i<redshift.clustering_nbin; i++) 
-    {
-      for (int j=0; j<redshift.shear_nbin; j++) 
-      {
-        if (test_zoverlap(i, j)) 
-        {
+    for (int i=0; i<redshift.clustering_nbin; i++) {
+      for (int j=0; j<redshift.shear_nbin; j++) {
+        if (test_zoverlap(i, j)) {
           N[i][j] = n;
           n++;
         } 
-        else 
-        {
+        else {
           N[i][j] = -1;
         }
       }
@@ -717,9 +704,10 @@ double pf_photoz(double zz, int nj)
   }
   
   zz  = (zz - nuisance.photoz[1][0][nj]
-            - redshift.clustering_zdist_zmean[nj])/nuisance.photoz[1][1][nj];
-  zz += redshift.clustering_zdist_zmean[nj];
+            - redshift.clustering_zdist_zmean[nj])/nuisance.photoz[1][1][nj] + redshift.clustering_zdist_zmean[nj];
 
+  //zz  = zz - nuisance.photoz[1][0][nj];
+  
   double res; 
   if (zz <= table[ntomo+1][0] || zz >= table[ntomo+1][nzbins - 1])
   { // z_v = table[ntomo+1]
@@ -733,6 +721,7 @@ double pf_photoz(double zz, int nj)
       log_fatal(gsl_strerror(status));
       exit(1);
     }
+    res = res / nuisance.photoz[1][1][nj];
   }
   return res;
 }

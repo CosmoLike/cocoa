@@ -519,7 +519,9 @@ void init_survey(
     double sigma_e
   );
 
-void init_ggl_exclude(arma::Col<int> ggl_exclude);
+void init_ggl_exclude(
+	arma::Col<int> ggl_exclude
+  );
 
 // ---------------------------------------------------------------------------
 // ---------------------------------------------------------------------------

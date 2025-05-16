@@ -345,7 +345,7 @@ export ROMAN_FOURIER_COMMIT="e79d3e5754484ccc3353e7fb12073264cd9137b4"
 
 export ROMAN_REAL_URL="https://github.com/CosmoLike/cocoa_roman_real.git"
 export ROMAN_REAL_NAME="roman_real"
-export ROMAN_REAL_COMMIT="d12df004856bf8465880c315b16c78fbf3c8aef5"
+export ROMAN_REAL_COMMIT="adc9f082f3a39f7449b1f47c26d5fee96666327c"
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
