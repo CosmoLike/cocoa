@@ -58,9 +58,9 @@ double amin_lens(int ni)
   }
 
   // zmax that includes the photo-z stretch
-  double zmax = (redshift.clustering_zdist_zmax[ni] - \
-                 redshift.clustering_zdist_zmean[ni])\
-                *nuisance.photoz[1][1][ni] + \
+  double zmax = (redshift.clustering_zdist_zmax[ni] - 
+                 redshift.clustering_zdist_zmean[ni])
+                *nuisance.photoz[1][1][ni] + 
                 redshift.clustering_zdist_zmean[ni];
   //double zmax = redshift.clustering_zdist_zmax[ni];
   return 1. / (1 + zmax + 2.*fabs(nuisance.photoz[1][0][ni]));
@@ -75,9 +75,9 @@ double amax_lens(int ni)
   }
 
   // zmin that includes the photo-z stretch
-  double zmin = (redshift.clustering_zdist_zmin[ni] - \
-                 redshift.clustering_zdist_zmean[ni])\
-                *nuisance.photoz[1][1][ni] + \
+  double zmin = (redshift.clustering_zdist_zmin[ni] - 
+                 redshift.clustering_zdist_zmean[ni])
+                *nuisance.photoz[1][1][ni] + 
                 redshift.clustering_zdist_zmean[ni];
   //double zmin = redshift.clustering_zdist_zmin[ni];
   if (gbmag(0.0, ni) != 0) 
@@ -735,7 +735,7 @@ double pf_photoz(double zz, int nj)
     exit(1);
   }
   
-  zz = (zz - nuisance.photoz[1][0][nj] - redshift.clustering_zdist_zmean[nj])/\
+  zz = (zz - nuisance.photoz[1][0][nj] - redshift.clustering_zdist_zmean[nj])/
        nuisance.photoz[1][1][nj] + redshift.clustering_zdist_zmean[nj];
   
   double res; 
