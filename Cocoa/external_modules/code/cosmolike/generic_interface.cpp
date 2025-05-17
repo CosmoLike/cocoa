@@ -332,6 +332,8 @@ void init_accuracy_boost(
   if (N_ell == 0) N_ell = Ntable.N_ell;
   Ntable.N_ell = static_cast<int>(ceil(N_ell*sampling_boost));
 
+  Ntable.FPTboost = static_cast<int>(std::max(accuracy_boost-1.0, 0.0));
+  
   /*  
   Ntable.N_k_lin = 
     static_cast<int>(ceil(Ntable.N_k_lin*sampling_boost));
@@ -3635,25 +3637,16 @@ void IP::set_data(std::string datavector_filename)
   this->data_filename_ = datavector_filename;
 
   matrix table = read_table(datavector_filename);
-  
   if (table.n_rows != this->ndata_) {
-    spdlog::critical(
-        "{}: inconsistent data vector", 
-        "IP::set_data"
-      );
+    spdlog::critical("{}: inconsistent data vector", "IP::set_data");
     exit(1);
   }
 
-  for(int i=0; i<like.Ndata; i++)
-  {
+  for(int i=0; i<like.Ndata; i++) {
     this->data_masked_(i) = table(i,1);
-    
     this->data_masked_(i) *= this->get_mask(i);
-
-    if(this->get_mask(i) == 1)
-    {
-      if(this->get_index_sqzd(i) < 0)
-      {
+    if(this->get_mask(i) == 1) {
+      if(this->get_index_sqzd(i) < 0) {
         spdlog::critical(
             "{}: logical error, internal"
             " inconsistent mask operation", 
@@ -3661,15 +3654,17 @@ void IP::set_data(std::string datavector_filename)
           );
         exit(1);
       }
-
       this->data_masked_sqzd_(this->get_index_sqzd(i)) = this->data_masked_(i);
     }
   }
-
   this->is_data_set_ = true;
 }
 
-void IP::set_mask(std::string mask_filename, arma::Col<int>::fixed<3> order, const int real_space)
+void IP::set_mask(
+    std::string mask_filename, 
+    arma::Col<int>::fixed<3> order, 
+    const int real_space
+  )
 {
   if (!(like.Ndata>0)) {
     spdlog::critical(
@@ -3682,16 +3677,14 @@ void IP::set_mask(std::string mask_filename, arma::Col<int>::fixed<3> order, con
 
   constexpr int sz = 3;
 
-  this->ndata_ = like.Ndata;
+  this->ndata_ = like.Ndata;  
   
   this->mask_.set_size(this->ndata_);
-
+  
   this->mask_filename_ = mask_filename;
 
   matrix table = read_table(mask_filename);
-
-  if (table.n_rows != this->ndata_)
-  {
+  if (table.n_rows != this->ndata_) {
     spdlog::critical("{}: inconsistent mask", "IP::set_mask");
     exit(1);
   }
@@ -3699,10 +3692,7 @@ void IP::set_mask(std::string mask_filename, arma::Col<int>::fixed<3> order, con
   for (int i=0; i<this->ndata_; i++) {
     this->mask_(i) = static_cast<int>(table(i,1) + 1e-13);
     if (!(this->mask_(i) == 0 || this->mask_(i) == 1)) {
-      spdlog::critical(
-          "{}: inconsistent mask", 
-          "IP::set_mask"
-        );
+      spdlog::critical("{}: inconsistent mask", "IP::set_mask");
       exit(1);
     }
   }
@@ -3817,24 +3807,15 @@ void IP::set_mask(
   this->mask_filename_ = mask_filename;
 
   matrix table = read_table(mask_filename);
-  
   if (table.n_rows != this->ndata_) {
-    spdlog::critical(
-        "{}: inconsistent mask", 
-        "IP::set_mask"
-      );
+    spdlog::critical("{}: inconsistent mask", "IP::set_mask");
     exit(1);
   }
 
-  for (int i=0; i<this->ndata_; i++)
-  {
+  for (int i=0; i<this->ndata_; i++) {
     this->mask_(i) = static_cast<int>(table(i,1)+1e-13);
-    
     if (!(this->mask_(i) == 0 || this->mask_(i) == 1)) {
-      spdlog::critical(
-          "{}: inconsistent mask", 
-          "IP::set_mask"
-        );
+      spdlog::critical("{}: inconsistent mask", "IP::set_mask");
       exit(1);
     }
   }
@@ -3958,8 +3939,7 @@ void IP::set_mask(
 
 void IP::set_inv_cov(std::string covariance_filename)
 {
-  if (!(this->is_mask_set_))
-  {
+  if (!(this->is_mask_set_)) {
     spdlog::critical(
         "{}: {} not set prior to this function call",
         "IP::set_inv_cov",
@@ -3969,29 +3949,26 @@ void IP::set_inv_cov(std::string covariance_filename)
   }
 
   this->cov_filename_ = covariance_filename;
-
   matrix table = read_table(covariance_filename); 
   
   this->cov_masked_.set_size(this->ndata_, this->ndata_);
   this->cov_masked_.zeros();
+  this->cov_masked_sqzd_.set_size(this->ndata_sqzd_, this->ndata_sqzd_);
+  this->inv_cov_masked_sqzd_.set_size(this->ndata_sqzd_, this->ndata_sqzd_);
 
   switch (table.n_cols)
   {
     case 3:
     {
-      for (int i=0; i<static_cast<int>(table.n_rows); i++)
-      {
+      #pragma omp parallel for
+      for (int i=0; i<static_cast<int>(table.n_rows); i++) {
         const int j = static_cast<int>(table(i,0));
         const int k = static_cast<int>(table(i,1));
-
         this->cov_masked_(j,k) = table(i,2);
-
-        if (j!=k)
-        {
+        if (j!=k) {
           // apply mask to off-diagonal covariance elements
           this->cov_masked_(j,k) *= this->get_mask(j);
           this->cov_masked_(j,k) *= this->get_mask(k);
-
           // m(i,j) = m(j,i)
           this->cov_masked_(k,j) = this->cov_masked_(j,k);
         }
@@ -4000,19 +3977,16 @@ void IP::set_inv_cov(std::string covariance_filename)
     }
     case 4:
     {
-      for (int i=0; i<static_cast<int>(table.n_rows); i++)
-      {
+      #pragma omp parallel for
+      for (int i=0; i<static_cast<int>(table.n_rows); i++) {
         const int j = static_cast<int>(table(i,0));
         const int k = static_cast<int>(table(i,1));
-
         this->cov_masked_(j,k) = table(i,2) + table(i,3);
 
-        if (j!=k)
-        {
+        if (j!=k) {
           // apply mask to off-diagonal covariance elements
           this->cov_masked_(j,k) *= this->get_mask(j);
           this->cov_masked_(j,k) *= this->get_mask(k);
-
           // m(i,j) = m(j,i)
           this->cov_masked_(k,j) = this->cov_masked_(j,k);
         }
@@ -4021,19 +3995,15 @@ void IP::set_inv_cov(std::string covariance_filename)
     }
     case 10:
     {
-      for (int i=0; i<static_cast<int>(table.n_rows); i++)
-      {
+      #pragma omp parallel for
+      for (int i=0; i<static_cast<int>(table.n_rows); i++) {
         const int j = static_cast<int>(table(i,0));
         const int k = static_cast<int>(table(i,1));
-
         this->cov_masked_(j,k) = table(i,8) + table(i,9);
-
-        if (j!=k)
-        {
+        if (j!=k) {
           // apply mask to off-diagonal covariance elements
           this->cov_masked_(j,k) *= this->get_mask(j);
           this->cov_masked_(j,k) *= this->get_mask(k);
-
           // m(i,j) = m(j,i)
           this->cov_masked_(k,j) = this->cov_masked_(j,k);
         }
@@ -4055,25 +4025,28 @@ void IP::set_inv_cov(std::string covariance_filename)
   // after inversion and use block-wise inversion to the whole matrix
   if ((like.is_cmb_bandpower == 1) && (like.is_cmb_kkkk_cov_from_sim == 1))
   {
-    int N5x2pt = this->ndata_ - like.Nbp;
-    for (int i=N5x2pt; i<this->ndata_; i++)
-    {
-      for (int j=N5x2pt; j<this->ndata_; j++)
-      {
-        this->cov_masked_(i,j)     /= like.alpha_Hartlap_kkkk;
+    const int N5x2pt = this->ndata_ - like.Nbp;
+    if (!(N5x2pt>0)) {
+      spdlog::critical(
+          "{}, {}: inconsistent dv size and number of binning in (kappa-kappa)",
+          "IP::set_inv_cov", 
+          this->ndata_,
+          like.Nbp
+        );
+      exit(1);
+    }
+    #pragma omp parallel for
+    for (int i=N5x2pt; i<this->ndata_; i++) {
+      for (int j=N5x2pt; j<this->ndata_; j++) {
+        this->cov_masked_(i,j) /= like.alpha_Hartlap_kkkk;
       }
     }
   }
 
   vector eigvals = arma::eig_sym(this->cov_masked_);
-  for(int i=0; i<this->ndata_; i++)
-  {
-    if(eigvals(i) < 0)
-    {
-      spdlog::critical(
-          "{}: covmat (masked) not positive definite!", 
-          "IP::set_inv_cov"
-        );
+  for(int i=0; i<this->ndata_; i++) {
+    if(eigvals(i) < 0) {
+      spdlog::critical("{}: masked cov not positive definite", "IP::set_inv_cov");
       exit(-1);
     }
   }
@@ -4083,61 +4056,48 @@ void IP::set_inv_cov(std::string covariance_filename)
   // apply mask again to make sure numerical errors in matrix inversion don't 
   // cause problems. Also, set diagonal elements corresponding to datavector
   // elements outside mask to 0, so that they don't contribute to chi2
-  for (int i=0; i<this->ndata_; i++)
-  {
+  #pragma omp parallel for
+  for (int i=0; i<this->ndata_; i++) {
     this->inv_cov_masked_(i,i) *= this->get_mask(i)*this->get_mask(i);
-    for (int j=0; j<i; j++)
-    {
+    for (int j=0; j<i; j++) {
       this->inv_cov_masked_(i,j) *= this->get_mask(i)*this->get_mask(j);
       this->inv_cov_masked_(j,i) = this->inv_cov_masked_(i,j);
     }
   };
   
-  this->cov_masked_sqzd_.set_size(this->ndata_sqzd_, this->ndata_sqzd_);
-
-  this->inv_cov_masked_sqzd_.set_size(this->ndata_sqzd_, this->ndata_sqzd_);
-
+  #pragma omp parallel for collapse(2)
   for(int i=0; i<this->ndata_; i++)
   {
     for(int j=0; j<this->ndata_; j++)
     {
-      if((this->mask_(i)>0.99) && (this->mask_(j)>0.99))
-      {
-        if(this->get_index_sqzd(i) < 0)
-        {
+      if((this->mask_(i)>0.99) && (this->mask_(j)>0.99)) {
+        if(this->get_index_sqzd(i) < 0) {
           spdlog::critical(
-              "{}: logical error, internal"
-              " inconsistent mask operation", 
+              "{}: logical error, internal inconsistent mask operation", 
               "IP::set_inv_cov"
             );
           exit(1);
         }
-        if(this->get_index_sqzd(j) < 0)
-        {
+        if(this->get_index_sqzd(j) < 0) {
           spdlog::critical(
-              "{}: logical error, internal"
-              " inconsistent mask operation", 
+              "{}: logical error, internal inconsistent mask operation", 
               "IP::set_inv_cov"
             );
           exit(1);
         }
-
-        this->cov_masked_sqzd_(this->get_index_sqzd(i),
-            this->get_index_sqzd(j)) = this->cov_masked_(i,j);
-
-        this->inv_cov_masked_sqzd_(this->get_index_sqzd(i),
-            this->get_index_sqzd(j)) = this->inv_cov_masked_(i,j);
+        const int idxa = this->get_index_sqzd(i);
+        const int idxb = this->get_index_sqzd(j);
+        this->cov_masked_sqzd_(idxa,idxb) = this->cov_masked_(i,j);
+        this->inv_cov_masked_sqzd_(idxa,idxb) = this->inv_cov_masked_(i,j);
       }
     }
   }
-
   this->is_inv_cov_set_ = true;
 }
 
 int IP::get_mask(const int ci) const
 {
-  if (ci > like.Ndata || ci < 0)
-  {
+  if (ci > like.Ndata || ci < 0) {
     spdlog::critical(
         "{}: index i = {} is not valid (min = {}, max = {})",
         "IP::get_mask", 
@@ -4147,14 +4107,12 @@ int IP::get_mask(const int ci) const
       );
     exit(1);
   }
-
   return this->mask_(ci);
 }
 
 int IP::get_index_sqzd(const int ci) const
 {
-  if (ci > like.Ndata || ci < 0)
-  {
+  if (ci > like.Ndata || ci < 0) {
     spdlog::critical(
         "{}: index i = {} is not valid (min = {}, max = {})", 
         "IP::get_index_sqzd", 
@@ -4164,14 +4122,12 @@ int IP::get_index_sqzd(const int ci) const
       );
     exit(1);
   }
-
   return this->index_sqzd_(ci);
 }
 
 double IP::get_dv_masked(const int ci) const
 {
-  if (ci > like.Ndata || ci < 0)
-  {
+  if (ci > like.Ndata || ci < 0) {
     spdlog::critical(
         "{}: index i = {} is not valid (min = {}, max = {})",
         "IP::get_dv_masked", 
@@ -4186,8 +4142,7 @@ double IP::get_dv_masked(const int ci) const
 
 double IP::get_dv_masked_sqzd(const int ci) const
 {
-  if (ci > like.Ndata || ci < 0)
-  {
+  if (ci > like.Ndata || ci < 0) {
     spdlog::critical(
         "{}: index i = {} is not valid (min = {}, max = {})",
         "IP::get_dv_masked_sqzd", 
@@ -4205,8 +4160,7 @@ double IP::get_inv_cov_masked(
     const int cj
   ) const
 {
-  if (ci > like.Ndata || ci < 0)
-  {
+  if (ci > like.Ndata || ci < 0) {
     spdlog::critical(
         "{}: index i = {} is not valid (min = {}, max = {})",
         "IP::get_inv_cov_masked", 
@@ -4216,9 +4170,7 @@ double IP::get_inv_cov_masked(
       );
     exit(1);
   }
-
-  if (cj > like.Ndata || cj < 0)
-  {
+  if (cj > like.Ndata || cj < 0) {
     spdlog::critical(
         "{}: index j = {} is not valid (min = {}, max = {})",
         "IP::get_inv_cov_masked", 
@@ -4236,8 +4188,7 @@ double IP::get_inv_cov_masked_sqzd(
     const int cj
   ) const
 {
-  if (ci > like.Ndata || ci < 0)
-  {
+  if (ci > like.Ndata || ci < 0) {
     spdlog::critical(
         "{}: index i = {} is not valid (min = {}, max = {})",
         "IP::get_inv_cov_masked_sqzd", 
@@ -4247,9 +4198,7 @@ double IP::get_inv_cov_masked_sqzd(
       );
     exit(1);
   }
-  
-  if (cj > like.Ndata || cj < 0)
-  {
+  if (cj > like.Ndata || cj < 0) {
     spdlog::critical(
         "{}: index j = {} is not valid (min = {}, max = {})",
         "IP::get_inv_cov_masked_sqzd", 
