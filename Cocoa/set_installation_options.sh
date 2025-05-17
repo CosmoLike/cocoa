@@ -331,7 +331,7 @@ export EMULTRF_DATA_GIT_COMMIT="7d7085241486809b8b765bf58e6e2b437bc2e406"
 # --------------------------------------------------------------------
 export LSST_Y1_URL="https://github.com/CosmoLike/cocoa_lsst_y1.git"
 export LSST_Y1_NAME="lsst_y1"
-export LSST_Y1_COMMIT="a8e1a085b4fde0374a5a65c98d6e085b826ae1d3"
+export LSST_Y1_COMMIT="e597b2d42070cf2e72d3d3293e200c32bf7f11fd"
 
 export DES_Y3_URL="https://github.com/CosmoLike/cocoa_des_y3.git"
 export DES_Y3_NAME="des_y3"
