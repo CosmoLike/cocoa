@@ -1071,7 +1071,7 @@ This will ensure that `stop_cocoa.sh` unsets them before exiting Cocoa
      fi
 
 > [!NOTE]
-> The *projects* folder was designed to include all Cosmolike projects, and Cocoa contains the two following scripts:
+> *projects* was designed to include all Cosmolike projects, and Cocoa contains two scripts
 >
 >      "${ROOTDIR:?}"/installation_scripts/setup_cosmolike_projects.sh
 >      "${ROOTDIR:?}"/installation_scripts/compile_all_projects.sh
