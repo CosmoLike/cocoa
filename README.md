@@ -220,6 +220,7 @@ and
 Cocoa contains a few transformer-based neural network emulators capable of simulating CMB, cosmolike, matter power spectrum and distances. We provide a few scripts that exemplify their API. To run them, we assume users have commented out the following lines on `set_installation_options.sh` prior to running the `setup_cocoa.sh` and `compile_cocoa.sh` installation scripts.
 
       [Adapted from Cocoa/set_installation_options.sh shell script] 
+      
       # inset # symbol in the lines below (i.e., unset these environmental keys)
       #export IGNORE_EMULTRF_CODE=1  #SaraivanovZhongZhu (SZZ) transformer-based emul
       #export IGNORE_EMULTRF_DATA=1  #SaraivanovZhongZhu (SZZ) transformer-based emul
@@ -993,7 +994,7 @@ In the instructions below, we assume that you are still in the Conda cocoa envir
 
 **Step :one:**: Go to the project folder (`./cocoa/Cocoa/projects`) and clone a Cosmolike project with the fictitious name `XXX`:
     
-    cd ./cocoa/Cocoa/projects
+    cd ./projects
 
 and 
 
