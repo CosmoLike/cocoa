@@ -329,6 +329,9 @@ export EMULTRF_GIT_COMMIT="29f9265cd5493d480998d3bcf4c55fbb9a0da914"
 export EMULTRF_DATA_URL="https://github.com/CosmoLike/emulators_data.git"
 export EMULTRF_DATA_GIT_COMMIT="7d7085241486809b8b765bf58e6e2b437bc2e406"
 
+export DARKEMULATOR_URL="https://github.com/DarkQuestCosmology/dark_emulator_public.git"
+export DARKEMULATOR_GIT_COMMIT="46df5972509624e2eeadc2bf3ac528b02333a7e2"
+
 # --------------------------------------------------------------------
 # --------------------------------------------------------------------
 # Cosmolike projects below

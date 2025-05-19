@@ -47,6 +47,7 @@ declare -a SCRIPTS=("compile_core_packages.sh"
                      "compile_simons_observatory.sh"
                      "compile_act_dr4.sh"
                      "compile_act_dr6.sh"
+                     "compile_darkemulator.sh"
                      ) # T = TMP
 
 for (( i=0; i<${#SCRIPTS[@]}; i++ ));
