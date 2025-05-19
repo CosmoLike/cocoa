@@ -99,6 +99,8 @@ void reset_like_struct()
   like.ky = 0;
   like.yy = 0;
   like.adopt_limber_gg = 0;
+  like.is_cmb_bandpower=0;
+  like.use_halo_model=0;
 }
 
 void reset_cosmology_struct()

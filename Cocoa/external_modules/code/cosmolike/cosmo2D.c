@@ -1246,123 +1246,135 @@ double int_for_C_gs_tomo_limber(double a, void* params)
   {
     case IA_MODEL_TATT:
     {
-      if (include_HOD_GX == 1)
+      if (like.use_halo_model == 0)
       {
-        log_fatal("HOD NOT IMPLEMENTED");
+        get_FPT_IA();
+        const double lnk = log(k);
+        double lim[3];
+        lim[0] = log(FPTIA.k_min);
+        lim[1] = log(FPTIA.k_max);
+        lim[2] = (lim[1] - lim[0])/FPTIA.N;
+
+        const double mixA = (lnk<lim[0] || lnk>lim[1]) ? 0.0 : 
+          g4*interpol1d(FPTIA.tab[6], FPTIA.N, lim[0], lim[1], lim[2], lnk);
+        
+        const double mixB = (lnk<lim[0] || lnk>lim[1]) ? 0.0 :
+          g4*interpol1d(FPTIA.tab[7], FPTIA.N, lim[0], lim[1], lim[2], lnk);
+        
+        const double ta_dE1 = (lnk<lim[0] || lnk>lim[1]) ? 0.0 :
+          g4*interpol1d(FPTIA.tab[2], FPTIA.N, lim[0], lim[1], lim[2], lnk);
+        
+        const double ta_dE2 = (lnk<lim[0] || lnk>lim[1]) ? 0.0 :
+          g4*interpol1d(FPTIA.tab[3], FPTIA.N, lim[0], lim[1], lim[2], lnk);
+
+        double WRSD = 0.0;
+        if (include_RSD_GS == 1)
+        {
+          const double chi_0 = f_K(ell/k);
+          const double chi_1 = f_K((ell+1.)/k);
+          const double a_0 = a_chi(chi_0);
+          const double a_1 = a_chi(chi_1);
+          WRSD = W_RSD(ell, a_0, a_1, nl);
+        }
+
+        double oneloop = 0.0;
+        if (1 == nonlinear_bias)
+        { 
+          get_FPT_bias();
+          lim[0] = log(FPTbias.k_min);
+          lim[1] = log(FPTbias.k_max);
+          lim[2] = (lim[1] - lim[0])/FPTbias.N;
+
+          const double d1d2 = (lnk<lim[0] || lnk>lim[1]) ? 0.0 :
+            interpol1d(FPTbias.tab[0], FPTbias.N, lim[0], lim[1], lim[2], lnk);
+          
+          const double d1s2 = (lnk<lim[0] || lnk>lim[1]) ? 0.0 :
+            interpol1d(FPTbias.tab[2], FPTbias.N, lim[0], lim[1], lim[2], lnk);
+          
+          const double d1d3 = (lnk<lim[0] || lnk>lim[1]) ? 0.0 :
+            interpol1d(tab_d1d3, FPTbias.N, lim[0], lim[1], lim[2], lnk);
+
+          const double b2 = gb2(z, nl);
+          const double bs2 = gbs2(z, nl);
+          const double b3 = gb3(z, nl);
+
+          oneloop = 0.5*g4*(b2 * d1d2 + bs2 * d1s2 + b3 * d1d3);
+        }
+
+        const double C1ZS  = IA_A1_Z1(a, growfac_a, ns);
+        const double btazs = IA_BTA_Z1(a, growfac_a, ns);
+        const double C2ZS  = IA_A2_Z1(a, growfac_a, ns);
+
+        // TODO: IS THIS CONSISTENT (WRSD, ONELOOP AND IA CROSS TERMS)?
+        ans =  WK*((WGAL*b1+WMAG*ell_prefactor*bmag+WRSD)*PK+WGAL*oneloop) 
+              -WS*(WGAL*b1+WMAG*ell_prefactor*bmag)*( C1ZS*PK
+                                                      + C1ZS*btazs*(ta_dE1+ta_dE2) 
+                                                      - 5*C2ZS*(mixA+mixB));
+      }
+      else
+      {
+        log_fatal("inconsistent halo model option = %d", like.use_halo_model);
         exit(1);
       }
-
-      get_FPT_IA();
-      const double lnk = log(k);
-      double lim[3];
-      lim[0] = log(FPTIA.k_min);
-      lim[1] = log(FPTIA.k_max);
-      lim[2] = (lim[1] - lim[0])/FPTIA.N;
-
-      const double mixA = (lnk<lim[0] || lnk>lim[1]) ? 0.0 : 
-        g4*interpol1d(FPTIA.tab[6], FPTIA.N, lim[0], lim[1], lim[2], lnk);
-      
-      const double mixB = (lnk<lim[0] || lnk>lim[1]) ? 0.0 :
-        g4*interpol1d(FPTIA.tab[7], FPTIA.N, lim[0], lim[1], lim[2], lnk);
-      
-      const double ta_dE1 = (lnk<lim[0] || lnk>lim[1]) ? 0.0 :
-        g4*interpol1d(FPTIA.tab[2], FPTIA.N, lim[0], lim[1], lim[2], lnk);
-      
-      const double ta_dE2 = (lnk<lim[0] || lnk>lim[1]) ? 0.0 :
-        g4*interpol1d(FPTIA.tab[3], FPTIA.N, lim[0], lim[1], lim[2], lnk);
-
-      double WRSD = 0.0;
-      if (include_RSD_GS == 1)
-      {
-        const double chi_0 = f_K(ell/k);
-        const double chi_1 = f_K((ell+1.)/k);
-        const double a_0 = a_chi(chi_0);
-        const double a_1 = a_chi(chi_1);
-        WRSD = W_RSD(ell, a_0, a_1, nl);
-      }
-
-      double oneloop = 0.0;
-      if (1 == nonlinear_bias)
-      { 
-        get_FPT_bias();
-        lim[0] = log(FPTbias.k_min);
-        lim[1] = log(FPTbias.k_max);
-        lim[2] = (lim[1] - lim[0])/FPTbias.N;
-
-        const double d1d2 = (lnk<lim[0] || lnk>lim[1]) ? 0.0 :
-          interpol1d(FPTbias.tab[0], FPTbias.N, lim[0], lim[1], lim[2], lnk);
-        
-        const double d1s2 = (lnk<lim[0] || lnk>lim[1]) ? 0.0 :
-          interpol1d(FPTbias.tab[2], FPTbias.N, lim[0], lim[1], lim[2], lnk);
-        
-        const double d1d3 = (lnk<lim[0] || lnk>lim[1]) ? 0.0 :
-          interpol1d(tab_d1d3, FPTbias.N, lim[0], lim[1], lim[2], lnk);
-
-        const double b2 = gb2(z, nl);
-        const double bs2 = gbs2(z, nl);
-        const double b3 = gb3(z, nl);
-
-        oneloop = 0.5*g4*(b2 * d1d2 + bs2 * d1s2 + b3 * d1d3);
-      }
-
-      const double C1ZS  = IA_A1_Z1(a, growfac_a, ns);
-      const double btazs = IA_BTA_Z1(a, growfac_a, ns);
-      const double C2ZS  = IA_A2_Z1(a, growfac_a, ns);
-
-      // TODO: IS THIS CONSISTENT (WRSD, ONELOOP AND IA CROSS TERMS)?
-      ans =  WK*((WGAL*b1+WMAG*ell_prefactor*bmag+WRSD)*PK+WGAL*oneloop) 
-            -WS*(WGAL*b1+WMAG*ell_prefactor*bmag)*( C1ZS*PK
-                                                    + C1ZS*btazs*(ta_dE1+ta_dE2) 
-                                                    - 5*C2ZS*(mixA+mixB));
       break;
     }
     case IA_MODEL_NLA:
     {
-      if (include_HOD_GX == 1)
+      const double C1ZS = IA_A1_Z1(a, growfac_a, ns);
+
+      if (like.use_halo_model == 0)
+      {
+        double WRSD = 0.0;
+        if (include_RSD_GS == 1)
+        {
+          const double chi_0 = f_K(ell/k);
+          const double chi_1 = f_K((ell+1.)/k);
+          const double a_0 = a_chi(chi_0);
+          const double a_1 = a_chi(chi_1);
+          WRSD = W_RSD(ell, a_0, a_1, nl);
+        }
+
+        double oneloop = 0.0;
+        if (1 == nonlinear_bias)
+        {
+          get_FPT_bias();
+          const double lnk = log(k);
+          double lim[3];
+          lim[0] = log(FPTbias.k_min);
+          lim[1] = log(FPTbias.k_max);
+          lim[2] = (lim[1] - lim[0])/FPTbias.N;
+
+          const double d1d2 = (lnk<lim[0] || lnk>lim[1]) ? 0.0 :
+            interpol1d(FPTbias.tab[0], FPTbias.N, lim[0], lim[1], lim[2], lnk);
+          
+          const double d1s2 = (lnk<lim[0] || lnk>lim[1]) ? 0.0 :
+            interpol1d(FPTbias.tab[2], FPTbias.N, lim[0], lim[1], lim[2], lnk);
+          
+          const double d1d3 = (lnk<lim[0] || lnk>lim[1]) ? 0.0 :
+            interpol1d(tab_d1d3, FPTbias.N, lim[0], lim[1], lim[2], lnk);
+
+          const double b2 = gb2(z, nl);
+          const double bs2 = gbs2(z, nl);
+          const double b3 = gb3(z, nl);
+
+          oneloop = 0.5*g4*(b2*d1d2 + bs2*d1s2 + b3*d1d3);
+        }
+        ans = (WK-WS*C1ZS)*((WGAL*b1+WMAG*ell_prefactor*bmag+WRSD)*PK+WGAL*oneloop);
+      }
+      else if (like.use_halo_model == 1)
       {
         log_fatal("HOD NOT IMPLEMENTED");
         exit(1);
       }
-
-      double WRSD = 0.0;
-      if (include_RSD_GS == 1)
-      {
-        const double chi_0 = f_K(ell/k);
-        const double chi_1 = f_K((ell+1.)/k);
-        const double a_0 = a_chi(chi_0);
-        const double a_1 = a_chi(chi_1);
-        WRSD = W_RSD(ell, a_0, a_1, nl);
+      else if (like.use_halo_model == 2)
+      { // Use external halo model emulator
+        ans = (WK-WS*C1ZS)*WGAL*external_p_gm(k, a);
       }
-
-      double oneloop = 0.0;
-      if (1 == nonlinear_bias)
+      else
       {
-        get_FPT_bias();
-        const double lnk = log(k);
-        double lim[3];
-        lim[0] = log(FPTbias.k_min);
-        lim[1] = log(FPTbias.k_max);
-        lim[2] = (lim[1] - lim[0])/FPTbias.N;
-
-        const double d1d2 = (lnk<lim[0] || lnk>lim[1]) ? 0.0 :
-          interpol1d(FPTbias.tab[0], FPTbias.N, lim[0], lim[1], lim[2], lnk);
-        
-        const double d1s2 = (lnk<lim[0] || lnk>lim[1]) ? 0.0 :
-          interpol1d(FPTbias.tab[2], FPTbias.N, lim[0], lim[1], lim[2], lnk);
-        
-        const double d1d3 = (lnk<lim[0] || lnk>lim[1]) ? 0.0 :
-          interpol1d(tab_d1d3, FPTbias.N, lim[0], lim[1], lim[2], lnk);
-
-        const double b2 = gb2(z, nl);
-        const double bs2 = gbs2(z, nl);
-        const double b3 = gb3(z, nl);
-
-        oneloop = 0.5*g4*(b2*d1d2 + bs2*d1s2 + b3*d1d3);
+        log_fatal("inconsistent halo model option = %d", like.use_halo_model);
+        exit(1);
       }
-      
-      const double C1ZS = IA_A1_Z1(a, growfac_a, ns);
-
-      ans = (WK-WS*C1ZS)*((WGAL*b1+WMAG*ell_prefactor*bmag+WRSD)*PK+WGAL*oneloop);
       break;
     }
     default:
@@ -1371,6 +1383,7 @@ double int_for_C_gs_tomo_limber(double a, void* params)
       exit(1);
     }
   }
+
   return ans*(chidchi.dchida/(fK*fK))*ell_prefactor2;
 }
 
@@ -1444,7 +1457,9 @@ double C_gs_tomo_limber(const double l, const int ni, const int nj)
     lim[1] = log(limits.LMAX + 1);
     lim[2] = (lim[1] - lim[0]) / ((double) nell - 1.0);
 
-    if (table != NULL) free(table);
+    if (table != NULL) {
+      free(table);
+    }
     table = (double**) malloc2d(tomo.ggl_Npowerspectra, nell);
   }
 
@@ -1544,18 +1559,7 @@ double int_for_C_gg_tomo_limber(double a, void* params)
   
   double res = 1.0;
   
-  if (include_HOD_GX == 1)
-  {
-    if (include_RSD_GG == 1)
-    {
-      log_fatal("RSD not implemented with (HOD = TRUE)");
-      exit(1);
-    }
-    else
-      res *= WGALi*WGALj;
-    res *= p_gg(k, a, ni, nj);
-  }
-  else
+  if (like.use_halo_model == 0)
   {
     if(include_RSD_GG == 1)
     {
@@ -1577,50 +1581,73 @@ double int_for_C_gg_tomo_limber(double a, void* params)
       res *= (WGALi*b1i + WMAGi*ell_prefactor*bmagi);
     }
     res *= (use_linear_ps ? p_lin(k,a) : Pdelta(k,a));
-  }
 
-  double oneloop = 0.0;
-  if (1 == nonlinear_bias && 0 == use_linear_ps)
+    double oneloop = 0.0;
+    if (1 == nonlinear_bias && 0 == use_linear_ps)
+    {
+      get_FPT_bias();
+      const double lnk = log(k);
+      double lim[3];
+      lim[0] = log(FPTbias.k_min);
+      lim[1] = log(FPTbias.k_max);
+      lim[2] = (lim[1] - lim[0])/FPTbias.N;
+
+      const double d1d2 = (lnk<lim[0] || lnk>lim[1]) ? 0.0 :
+        interpol1d(FPTbias.tab[0], FPTbias.N, lim[0], lim[1], lim[2], lnk);
+      
+      const double d2d2 = (lnk<lim[0] || lnk>lim[1]) ? 0.0 :
+        interpol1d(FPTbias.tab[1], FPTbias.N, lim[0], lim[1], lim[2], lnk);
+      
+      const double d1s2 = (lnk<lim[0] || lnk>lim[1]) ? 0.0 :
+        interpol1d(FPTbias.tab[2], FPTbias.N, lim[0], lim[1], lim[2], lnk);
+      
+      const double d2s2 = (lnk<lim[0] || lnk>lim[1]) ? 0.0 :
+        interpol1d(FPTbias.tab[3], FPTbias.N, lim[0], lim[1], lim[2], lnk);
+      
+      const double s2s2 = (lnk<lim[0] || lnk>lim[1]) ? 0.0 :
+        interpol1d(FPTbias.tab[4], FPTbias.N, lim[0], lim[1], lim[2], lnk);
+      
+      const double d1d3 = (lnk<lim[0] || lnk>lim[1]) ? 0.0 :
+        interpol1d(tab_d1d3, FPTbias.N, lim[0], lim[1], lim[2], lnk);
+      
+      const double s4 = 0.; // PT_sigma4(k);
+
+      const double growfac_a = growfac(a);
+      const double g4 = growfac_a*growfac_a*growfac_a*growfac_a;
+      const double b2 = gb2(z, ni);
+      const double bs2 = gbs2(z, ni);
+      const double b3 = gb3(z, ni);
+      
+      oneloop *= WGALi*WGALi;
+      oneloop *= g4*(b1i*b2*d1d2 + 0.25*b2*b2 * (d2d2 - 2.*s4) +
+        b1i*bs2*d1s2 + 0.5*b2*bs2 * (d2s2 - 4. / 3.*s4) +
+        0.25*bs2*bs2* (s2s2 - 8. / 9. * s4) + b1i*b3*d1d3);
+    }
+
+    res += oneloop;
+  }
+  else if (like.use_halo_model == 1)
+  { // Use Halo Model from Halo.c
+    if (include_RSD_GG == 1)
+    {
+      log_fatal("RSD not implemented with (HOD = TRUE)");
+      exit(1);
+    }
+    else
+      res *= WGALi*WGALj;
+    res *= p_gg(k, a, ni, nj);
+  }
+  else if (like.use_halo_model == 2)
+  { // Use external halo model emulator
+    res *= WGALi*WGALj;
+    res *= external_p_gg(k, a);
+  }
+  else
   {
-    get_FPT_bias();
-    const double lnk = log(k);
-    double lim[3];
-    lim[0] = log(FPTbias.k_min);
-    lim[1] = log(FPTbias.k_max);
-    lim[2] = (lim[1] - lim[0])/FPTbias.N;
-
-    const double d1d2 = (lnk<lim[0] || lnk>lim[1]) ? 0.0 :
-      interpol1d(FPTbias.tab[0], FPTbias.N, lim[0], lim[1], lim[2], lnk);
-    
-    const double d2d2 = (lnk<lim[0] || lnk>lim[1]) ? 0.0 :
-      interpol1d(FPTbias.tab[1], FPTbias.N, lim[0], lim[1], lim[2], lnk);
-    
-    const double d1s2 = (lnk<lim[0] || lnk>lim[1]) ? 0.0 :
-      interpol1d(FPTbias.tab[2], FPTbias.N, lim[0], lim[1], lim[2], lnk);
-    
-    const double d2s2 = (lnk<lim[0] || lnk>lim[1]) ? 0.0 :
-      interpol1d(FPTbias.tab[3], FPTbias.N, lim[0], lim[1], lim[2], lnk);
-    
-    const double s2s2 = (lnk<lim[0] || lnk>lim[1]) ? 0.0 :
-      interpol1d(FPTbias.tab[4], FPTbias.N, lim[0], lim[1], lim[2], lnk);
-    
-    const double d1d3 = (lnk<lim[0] || lnk>lim[1]) ? 0.0 :
-      interpol1d(tab_d1d3, FPTbias.N, lim[0], lim[1], lim[2], lnk);
-    
-    const double s4 = 0.; // PT_sigma4(k);
-
-    const double growfac_a = growfac(a);
-    const double g4 = growfac_a*growfac_a*growfac_a*growfac_a;
-    const double b2 = gb2(z, ni);
-    const double bs2 = gbs2(z, ni);
-    const double b3 = gb3(z, ni);
-    
-    oneloop *= WGALi*WGALi;
-    oneloop *= g4*(b1i*b2*d1d2 + 0.25*b2*b2 * (d2d2 - 2.*s4) +
-      b1i*bs2*d1s2 + 0.5*b2*bs2 * (d2s2 - 4. / 3.*s4) +
-      0.25*bs2*bs2* (s2s2 - 8. / 9. * s4) + b1i*b3*d1d3);
+    log_fatal("inconsistent halo model option = %d", like.use_halo_model);
+    exit(1);
   }
-  return (res +  oneloop)*chidchi.dchida/(fK*fK);
+  return res*chidchi.dchida/(fK*fK);
 }
 
 double C_gg_tomo_limber_linpsopt_nointerp(

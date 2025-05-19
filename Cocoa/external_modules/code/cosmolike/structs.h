@@ -323,6 +323,10 @@ typedef struct
                                    // [1] = BIAS, 
                                    // [2] = CONCENTRATION
                                    // [3] = HALO PROFILE
+
+  int use_halo_model; // 0 - No Halo Model
+                      // 1 - Use Halo model from Halo.c
+                      // 2 - Use external Halo model (emulator)
 } likepara;
 
 typedef struct

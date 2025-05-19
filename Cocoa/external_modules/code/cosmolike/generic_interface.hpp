@@ -500,6 +500,10 @@ void init_IA(
     const int IA_REDSHIFT_EVOL
   );
 
+void init_galaxy_power_spectrum(
+    const int USE_HALO_MODEL
+  );
+
 void init_probes(
     std::string possible_probes
   );

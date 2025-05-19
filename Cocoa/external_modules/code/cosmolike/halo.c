@@ -1506,8 +1506,7 @@ double p_gg_nointerp(
   }
   const double bg = bgal(ni, a);
   const double ng = ngal(ni, a);
-  return Pdelta(k, a)*bg*bg + 
-    G02_nointerp(k, a, ni, init)/(ng*ng);
+  return Pdelta(k, a)*bg*bg + G02_nointerp(k, a, ni, init)/(ng*ng);
 }
 
 double p_gg(
@@ -1676,4 +1675,116 @@ void set_HOD(const int ni)
   log_debug("HOD: bin %d; <z> %.2f; f_sat %.3f", ni, z, fsat_nointerp(ni,a,0));
   
   log_debug("HOD: bin %d; <z> %.2f; <b_g> %.2f", ni, z, nuisance.gb[0][ni]);
+}
+
+
+
+// ----------------------------------------------------------------------------
+// ----------------------------------------------------------------------------
+// ----------------------------------------------------------------------------
+// External Power Spectrum
+// ----------------------------------------------------------------------------
+// ----------------------------------------------------------------------------
+// ----------------------------------------------------------------------------
+
+double external_p_gm(const double k, const double a)
+{
+  // convert from (x/Mpc/h - dimensioneless) to h/Mpc with x = c/H0 (Mpc)
+  const double log10k = log10(k/cosmology.coverH0);
+  const double z = 1.0/a-1.0;
+  
+  int i = 0;
+  {
+    size_t ilo = 0;
+    size_t ihi = hmemu.lnPGM_nk-1;
+    while (ihi>ilo+1) 
+    {
+      size_t ll = (ihi+ilo)/2;
+      if(hmemu.lnPGM[ll][hmemu.lnPGM_nz] > log10k)
+        ihi = ll;
+      else
+        ilo = ll;
+    }
+    i = ilo;
+  }
+
+  int j = 0;
+  {
+    size_t ilo = 0;
+    size_t ihi = hmemu.lnPGM_nz-1;
+    while (ihi>ilo+1) 
+    {
+      size_t ll = (ihi+ilo)/2;
+      if(hmemu.lnPGM[hmemu.lnPGM_nk][ll] > z)
+        ihi = ll;
+      else
+        ilo = ll;
+    }
+    j = ilo;
+  }
+
+  double dx = (log10k                           - hmemu.lnPGM[i][hmemu.lnPGM_nz])/
+              (hmemu.lnPGM[i+1][hmemu.lnPGM_nz] - hmemu.lnPGM[i][hmemu.lnPGM_nz]);
+
+  double dy = (z                                - hmemu.lnPGM[hmemu.lnPGM_nk][j])/
+              (hmemu.lnPGM[hmemu.lnPGM_nk][j+1] - hmemu.lnPGM[hmemu.lnPGM_nk][j]);
+
+  const double out_lnP =    (1-dx)*(1-dy)*hmemu.lnPGM[i][j]
+                          + (1-dx)*dy*hmemu.lnPGM[i][j+1]
+                          + dx*(1-dy)*hmemu.lnPGM[i+1][j]
+                          + dx*dy*hmemu.lnPGM[i+1][j+1];
+
+  // convert from (Mpc/h)^3 to (Mpc/h)^3/(c/H0=100)^3 (dimensioneless)
+  return exp(out_lnP)/(cosmology.coverH0*cosmology.coverH0*cosmology.coverH0);
+}
+
+double external_p_gg(const double k, const double a)
+{
+  // convert from (x/Mpc/h - dimensioneless) to h/Mpc with x = c/H0 (Mpc)
+  const double log10k = log10(k/cosmology.coverH0);
+  const double z = 1.0/a-1.0;
+  
+  int i = 0;
+  {
+    size_t ilo = 0;
+    size_t ihi = hmemu.lnPGG_nk-1;
+    while (ihi>ilo+1) 
+    {
+      size_t ll = (ihi+ilo)/2;
+      if(hmemu.lnPGG[ll][hmemu.lnPGG_nz] > log10k)
+        ihi = ll;
+      else
+        ilo = ll;
+    }
+    i = ilo;
+  }
+
+  int j = 0;
+  {
+    size_t ilo = 0;
+    size_t ihi = hmemu.lnPGG_nz-1;
+    while (ihi>ilo+1) 
+    {
+      size_t ll = (ihi+ilo)/2;
+      if(hmemu.lnPGG[hmemu.lnPGG_nk][ll] > z)
+        ihi = ll;
+      else
+        ilo = ll;
+    }
+    j = ilo;
+  }
+
+  double dx = (log10k                           - hmemu.lnPGG[i][hmemu.lnPGG_nz])/
+              (hmemu.lnPGG[i+1][hmemu.lnPGG_nz] - hmemu.lnPGG[i][hmemu.lnPGG_nz]);
+
+  double dy = (z                                - hmemu.lnPGG[hmemu.lnPGG_nk][j])/
+              (hmemu.lnPGG[hmemu.lnPGG_nk][j+1] - hmemu.lnPGG[hmemu.lnPGG_nk][j]);
+
+  const double out_lnP =    (1-dx)*(1-dy)*hmemu.lnPGG[i][j]
+                          + (1-dx)*dy*hmemu.lnPGG[i][j+1]
+                          + dx*(1-dy)*hmemu.lnPGG[i+1][j]
+                          + dx*dy*hmemu.lnPGG[i+1][j+1];
+
+  // convert from (Mpc/h)^3 to (Mpc/h)^3/(c/H0=100)^3 (dimensioneless)
+  return exp(out_lnP)/(cosmology.coverH0*cosmology.coverH0*cosmology.coverH0);
 }

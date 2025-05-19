@@ -26,6 +26,10 @@ double p_my(const double k, const double a);
 
 double p_yy(const double k, const double a);
 
+double external_p_gg(const double k, const double a);
+
+double external_p_gm(const double k, const double a);
+
 #ifdef __cplusplus
 }
 #endif

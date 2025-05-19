@@ -1181,6 +1181,19 @@ void init_data_6x2pt_fourier_space(
 // ---------------------------------------------------------------------------
 // ---------------------------------------------------------------------------
 
+void init_galaxy_power_spectrum(const int USE_HALO_MODEL)
+{
+  spdlog::debug("{}: Begins", "init_galaxy_power_spectrum");
+
+  like.use_halo_model = USE_HALO_MODEL;
+
+  spdlog::debug("{}: Ends", "init_galaxy_power_spectrum");
+}
+
+// ---------------------------------------------------------------------------
+// ---------------------------------------------------------------------------
+// ---------------------------------------------------------------------------
+
 void init_IA(const int IA_MODEL, const int IA_REDSHIFT_EVOL)
 {
   spdlog::debug("{}: Begins", "init_IA");
