@@ -1029,9 +1029,6 @@ and
 
     mpirun -n 1 --oversubscribe --mca pml ^ucx --mca btl vader,tcp,self --bind-to core:overload-allowed --rank-by slot --map-by numa:pe=${OMP_NUM_THREADS} cobaya-run ./projects/XXX/EXAMPLE_EVALUATE1.yaml -f
 
-> [!Warning]
-> Never delete a folder from `projects` without first running `stop_cocoa.sh`; otherwise, Cocoa will have ill-defined links.
-
 If users want to make a particular cosmolike project widely available in cocoa, implement the following steps:
 
 **Step :one:**: Add the following env keys on `set_installation_options.sh`
@@ -1077,3 +1074,6 @@ This will ensure that `stop_cocoa.sh` unsets them before exiting Cocoa
 >      "${ROOTDIR:?}"/installation_scripts/compile_all_projects.sh
 > 
 > that `setup` and `compile` all projects defined there. As a standard, we defined the project name `XXX` to be stored on a GitHub repository with the name `cocoa_XXX`. The prefix `cocoa_` helps developers on Cosmolike organization differentiate legacy Cosmolike projects from matching ones designed for Cocoa. 
+
+> [!Warning]
+> Never delete a folder from `projects` without first running `stop_cocoa.sh`; otherwise, Cocoa will have ill-defined links.
