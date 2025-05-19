@@ -992,7 +992,7 @@ If this does not create any merge conflicts, type
 
 In the instructions below, we assume that you are still in the Conda cocoa environment from the previous `conda activate cocoa` command and that you are in the cocoa main folder `cocoa/Cocoa`, 
 
-**Step :one:**: Go to the project folder (`./cocoa/Cocoa/projects`) and clone a Cosmolike project with the fictitious name `XXX`:
+**Step :one:**: Go to the projects folder (`./projects`) and clone a Cosmolike project with the fictitious name `XXX`:
     
     cd ./projects
 
