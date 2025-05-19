@@ -1031,17 +1031,11 @@ and
 > [!Warning]
 > Never delete your project folder from `$ROOTDIR/project` without first running the `stop_cocoa.sh` bash script; otherwise, Cocoa will have ill-defined soft links located at `Cocoa/cobaya/cobaya/likelihoods/`, `Cocoa/external_modules/code/` and `Cocoa/external_modules/data/`. The env variables `LD_LIBRARY_PATH` and `PYTHONPATH`  will also contain ill-defined paths for these projects.  Why this behavior? The script `start_cocoa.sh` creates symbolic links so cobaya can see the likelihood and data files. It also adds the *Cobaya-Cosmolike interface* of all projects to `LD_LIBRARY_PATH` and `PYTHONPATH` paths.
 
-> [!NOTE]
-> The *projects* folder was designed to include all Cosmolike projects, and Cocoa contains the two following scripts:
->
->      "${ROOTDIR:?}"/installation_scripts/setup_cosmolike_projects.sh
->      "${ROOTDIR:?}"/installation_scripts/compile_all_projects.sh
-> 
-> that `setup` and `compile` all projects defined there. As a standard, we defined the project name `XXX` to be stored on a GitHub repository with the name `cocoa_XXX`. The prefix `cocoa_` helps developers on Cosmolike organization differentiate legacy Cosmolike projects from matching ones designed for Cocoa. 
 
-If users want to make the cosmolike project named `XXX`default in cocoa (assuming the project resides the a GitHub repository `https://github.com/.../cocoa_lsst_XXX.git`), follow the following steps:
 
-**Step :one:**: Create the following links on `set_installation_options.sh`
+If users want to make a particular cosmolike project widely available in cocoa (named `XXX` as an example), implement the following steps:
+
+**Step :one:**: Add the following env keys on `set_installation_options.sh`
 
     [adapted from ${ROOTDIR:?}/set_installation_options.sh script]
     
@@ -1055,12 +1049,15 @@ If users want to make the cosmolike project named `XXX`default in cocoa (assumin
     #Key XXX_COMMIT is optional, but we strongly recommend its inclusion 
     export XXX_COMMIT="a5cf62ffcec7b862dda5b1234f6bb19124bb5d0"
 
-**Step :two:**: Add the keys `XXX_URL`, `XXX_NAME`, and `XXX_COMMIT` to `${ROOTDIR:?}/installation_scripts/flags_impl_unset_keys.sh` so `stop_cocoa.sh` unset them
+**Step :two:**: Adapt and add the keys below to `flags_impl_unset_keys.sh` 
 
     [adapted from ${ROOTDIR:?}/installation_scripts/flags_impl_unset_keys.sh]
+
     unset -v XXX_URL XXX_NAME XXX_COMMIT IGNORE_COSMOLIKE_XXX_CODE
-   
-**Step :three:** Add and adapt the following block to `${ROOTDIR:?}/installation_scripts/setup_cosmolike_projects`
+
+This will ensure that `stop_cocoa.sh` unsets them before exiting Cocoa
+
+**Step :three:** Add and adapt the following block to `setup_cosmolike_projects.sh`.
 
      [adapted from ${ROOTDIR:?}/installation_scripts/setup_cosmolike_projects.sh script]
      
@@ -1074,4 +1071,10 @@ If users want to make the cosmolike project named `XXX`default in cocoa (assumin
        pbottom "GETTING XXX" || return 1
      fi
 
-    
+> [!NOTE]
+> The *projects* folder was designed to include all Cosmolike projects, and Cocoa contains the two following scripts:
+>
+>      "${ROOTDIR:?}"/installation_scripts/setup_cosmolike_projects.sh
+>      "${ROOTDIR:?}"/installation_scripts/compile_all_projects.sh
+> 
+> that `setup` and `compile` all projects defined there. As a standard, we defined the project name `XXX` to be stored on a GitHub repository with the name `cocoa_XXX`. The prefix `cocoa_` helps developers on Cosmolike organization differentiate legacy Cosmolike projects from matching ones designed for Cocoa. 
