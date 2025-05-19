@@ -418,6 +418,45 @@ typedef struct
   */
 } redshiftparams;
 
+// ---------------------------------------------------
+// ---------------------------------------------------
+// PGM and PGG from HALO MODEL - USE W/ DARK EMULATOR
+// ---------------------------------------------------
+// ---------------------------------------------------
+typedef struct
+{
+  // ---------------------------------------------------
+  // ---------------------------------------------------
+  // CACHE VARIABLES
+  // ---------------------------------------------------
+  // ---------------------------------------------------
+  double random;
+
+  // ---------------------------------------------------
+  // ---------------------------------------------------
+  // PGM POWER SPECTRUM (matter-galaxy)
+  // size = (lnP_nk+1,lnP_nz+1)
+  // z = lnP[lnP_nk,j<lnP_nz]
+  // k = lnP[i<lnP_nk,lnP_nz]
+  // ---------------------------------------------------
+  // ---------------------------------------------------
+  int lnPGM_nk;
+  int lnPGM_nz;
+  double** lnPGM;
+  
+  // ---------------------------------------------------
+  // ---------------------------------------------------
+  // PGM POWER SPECTRUM (matter-galaxy)
+  // size = (lnP_nk+1,lnP_nz+1)
+  // z = lnP[lnP_nk,j<lnP_nz]
+  // k = lnP[i<lnP_nk,lnP_nz]
+  // ---------------------------------------------------
+  // ---------------------------------------------------
+  int lnPGG_nk;
+  int lnPGG_nz;
+  double** lnPGG;
+} halomodel;
+
 /*
 // ---------------------------------------------------
 // CLUSTER ROUTINES (ALPHA STAGE)
@@ -477,6 +516,8 @@ extern FPT FPTbias;
 
 extern FPT FPTIA;
 
+extern halomodel hmemu; // halo model emulator
+
 //extern clusterparams Cluster;
 
 // --------------------------------------------------------------------
@@ -494,6 +535,7 @@ void reset_redshift_struct();
 void reset_cosmology_struct();
 void reset_tomo_struct();
 void reset_Ntable_struct();
+void reset_halomodel_struct();
 
 #ifdef __cplusplus
 }

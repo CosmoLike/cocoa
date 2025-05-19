@@ -2143,6 +2143,194 @@ void set_non_linear_power_spectrum(vector io_log10k, vector io_z, vector io_lnP)
 // ---------------------------------------------------------------------------
 // ---------------------------------------------------------------------------
 
+void set_pgm_power_spectrum(vector io_log10k, vector io_z, vector io_lnP)
+{
+  spdlog::debug("{}: Begins", "set_pgm_power_spectrum");
+
+  bool debug_fail = false;
+  if (io_z.n_elem*io_log10k.n_elem != io_lnP.n_elem) {
+    debug_fail = true;
+  }
+  else {
+    if (io_z.n_elem == 0 || io_log10k.n_elem == 0)
+      debug_fail = true;
+  }
+  if (debug_fail)
+  {
+    spdlog::critical("{}: incompatible input w/ k.size = {}, z.size = {}, "
+      "and lnP.size = {}", "set_pgm_power_spectrum", 
+      io_log10k.n_elem, io_z.n_elem, io_lnP.n_elem);
+    exit(1);
+  }
+  if(io_z.n_elem < 5 || io_log10k.n_elem < 5)
+  {
+    spdlog::critical("{}: bad input w/ k.size = {}, z.size = {}, "
+      "and lnP.size = {}", "set_pgm_power_spectrum", 
+      io_log10k.n_elem, io_z.n_elem, io_lnP.n_elem);
+    exit(1);
+  }
+
+  int cache_update = 0;
+  if (hmemu.lnPGM_nk != static_cast<int>(io_log10k.n_elem) ||
+      hmemu.lnPGM_nz != static_cast<int>(io_z.n_elem) || 
+      hmemu.lnPGM  == NULL) 
+  {
+    cache_update = 1;
+  }
+  else
+  {
+    for (int i=0; i<hmemu.lnPGM_nk; i++) {
+      for (int j=0; j<hmemu.lnPGM_nz; j++) {
+        if (fdiff(hmemu.lnPGM[i][j], io_lnP(i*hmemu.lnPGM_nz+j))) {
+          cache_update = 1; 
+          goto jump;
+        }
+      }
+    }
+    for (int i=0; i<hmemu.lnPGM_nk; i++) {
+      if (fdiff(hmemu.lnPGM[i][hmemu.lnPGM_nz], io_log10k(i))) {
+        cache_update = 1; 
+        break;
+      }
+    }
+    for (int j=0; j<hmemu.lnPGM_nz; j++) {
+      if (fdiff(hmemu.lnPGM[hmemu.lnPGM_nk][j], io_z(j))) {
+        cache_update = 1; 
+        break;
+      }
+    }
+  }
+
+  jump:
+
+  if (1 == cache_update)
+  {
+    hmemu.lnPGM_nk = static_cast<int>(io_log10k.n_elem);
+    hmemu.lnPGM_nz = static_cast<int>(io_z.n_elem);
+
+    if (hmemu.lnPGM != NULL) {
+      free(hmemu.lnPGM);
+    }
+    hmemu.lnPGM = (double**) malloc2d(hmemu.lnPGM_nk+1,hmemu.lnPGM_nz+1);
+
+    #pragma omp parallel for
+    for (int i=0; i<hmemu.lnPGM_nk; i++) {
+      hmemu.lnPGM[i][hmemu.lnPGM_nz] = io_log10k(i);
+    }
+
+    #pragma omp parallel for
+    for (int j=0; j<hmemu.lnPGM_nz; j++)
+      hmemu.lnPGM[hmemu.lnPGM_nk][j] = io_z(j);
+
+    #pragma omp parallel for collapse(2)
+    for (int i=0; i<hmemu.lnPGM_nk; i++)
+      for (int j=0; j<hmemu.lnPGM_nz; j++)
+        hmemu.lnPGM[i][j] = io_lnP(i*hmemu.lnPGM_nz+j);
+
+    hmemu.random = RandomNumber::get_instance().get();
+  }
+
+  spdlog::debug("{}: Ends", "set_pgm_power_spectrum");
+}
+
+// ---------------------------------------------------------------------------
+// ---------------------------------------------------------------------------
+// ---------------------------------------------------------------------------
+
+void set_pgg_power_spectrum(vector io_log10k, vector io_z, vector io_lnP)
+{
+  spdlog::debug("{}: Begins", "set_pgg_power_spectrum");
+
+  bool debug_fail = false;
+  if (io_z.n_elem*io_log10k.n_elem != io_lnP.n_elem) {
+    debug_fail = true;
+  }
+  else {
+    if (io_z.n_elem == 0 || io_log10k.n_elem == 0)
+      debug_fail = true;
+  }
+  if (debug_fail)
+  {
+    spdlog::critical("{}: incompatible input w/ k.size = {}, z.size = {}, "
+      "and lnP.size = {}", "set_pgg_power_spectrum", 
+      io_log10k.n_elem, io_z.n_elem, io_lnP.n_elem);
+    exit(1);
+  }
+  if(io_z.n_elem < 5 || io_log10k.n_elem < 5)
+  {
+    spdlog::critical("{}: bad input w/ k.size = {}, z.size = {}, "
+      "and lnP.size = {}", "set_pgg_power_spectrum", 
+      io_log10k.n_elem, io_z.n_elem, io_lnP.n_elem);
+    exit(1);
+  }
+
+  int cache_update = 0;
+  if (hmemu.lnPGG_nk != static_cast<int>(io_log10k.n_elem) ||
+      hmemu.lnPGG_nz != static_cast<int>(io_z.n_elem) || 
+      hmemu.lnPGG  == NULL) 
+  {
+    cache_update = 1;
+  }
+  else
+  {
+    for (int i=0; i<hmemu.lnPGG_nk; i++) {
+      for (int j=0; j<hmemu.lnPGG_nz; j++) {
+        if (fdiff(hmemu.lnPGG[i][j], io_lnP(i*hmemu.lnPGG_nz+j))) {
+          cache_update = 1; 
+          goto jump;
+        }
+      }
+    }
+    for (int i=0; i<hmemu.lnPGG_nk; i++) {
+      if (fdiff(hmemu.lnPGG[i][hmemu.lnPGG_nz], io_log10k(i))) {
+        cache_update = 1; 
+        break;
+      }
+    }
+    for (int j=0; j<hmemu.lnPGG_nz; j++) {
+      if (fdiff(hmemu.lnPGG[hmemu.lnPGG_nk][j], io_z(j))) {
+        cache_update = 1; 
+        break;
+      }
+    }
+  }
+
+  jump:
+
+  if (1 == cache_update)
+  {
+    hmemu.lnPGG_nk = static_cast<int>(io_log10k.n_elem);
+    hmemu.lnPGG_nz = static_cast<int>(io_z.n_elem);
+
+    if (hmemu.lnPGG != NULL) {
+      free(hmemu.lnPGG);
+    }
+    hmemu.lnPGG = (double**) malloc2d(hmemu.lnPGG_nk+1,hmemu.lnPGG_nz+1);
+
+    #pragma omp parallel for
+    for (int i=0; i<hmemu.lnPGG_nk; i++) {
+      hmemu.lnPGG[i][hmemu.lnPGG_nz] = io_log10k(i);
+    }
+
+    #pragma omp parallel for
+    for (int j=0; j<hmemu.lnPGG_nz; j++)
+      hmemu.lnPGG[hmemu.lnPGG_nk][j] = io_z(j);
+
+    #pragma omp parallel for collapse(2)
+    for (int i=0; i<hmemu.lnPGG_nk; i++)
+      for (int j=0; j<hmemu.lnPGG_nz; j++)
+        hmemu.lnPGG[i][j] = io_lnP(i*hmemu.lnPGG_nz+j);
+
+    hmemu.random = RandomNumber::get_instance().get();
+  }
+
+  spdlog::debug("{}: Ends", "set_pgg_power_spectrum");
+}
+
+// ---------------------------------------------------------------------------
+// ---------------------------------------------------------------------------
+// ---------------------------------------------------------------------------
+
 void set_nuisance_shear_calib(vector M)
 {
   spdlog::debug("{}: Begins", "set_nuisance_shear_calib");

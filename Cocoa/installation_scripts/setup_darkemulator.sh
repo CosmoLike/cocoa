@@ -58,7 +58,7 @@ if [ -z "${IGNORE_DARK_EMULATOR_CODE}" ]; then
   # E = EXTERNAL, CODE, F=FODLER
   ECODEF="${ROOTDIR:?}/external_modules/code"
 
-  FOLDER="${DARK_EMULATOR_NAME:-"dark_emulator"}"
+  FOLDER="${DARKEMULATOR_NAME:-"dark_emulator"}"
 
   PACKDIR="${ECODEF:?}/${FOLDER:?}"
 

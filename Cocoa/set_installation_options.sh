@@ -16,7 +16,7 @@ fi
 # ------------------------------------------------------------------------------
 # VERBOSE AS DEBUG TOOL --------------------------------------------------------
 # ------------------------------------------------------------------------------
-#export COCOA_OUTPUT_VERBOSE=1
+export COCOA_OUTPUT_VERBOSE=1
 
 # ------------------------------------------------------------------------------
 # If set, COSMOLIKE will compile with DEBUG flags ------------------------------
@@ -331,6 +331,7 @@ export EMULTRF_DATA_GIT_COMMIT="7d7085241486809b8b765bf58e6e2b437bc2e406"
 
 export DARKEMULATOR_URL="https://github.com/DarkQuestCosmology/dark_emulator_public.git"
 export DARKEMULATOR_GIT_COMMIT="46df5972509624e2eeadc2bf3ac528b02333a7e2"
+export DARKEMULATOR_NAME="dark_emulator"
 
 # --------------------------------------------------------------------
 # --------------------------------------------------------------------

@@ -96,6 +96,7 @@ if [ -z "${IGNORE_PIP_CORE_INSTALLATION}" ]; then
       'ipyparallel==9.0.1' \
       'emcee== 3.1.6' \
       'sacc==1.0.2' \
+      'george==0.4.4' \
     --no-cache-dir --prefer-binary --use-pep517 \
     --prefix="${ROOTDIR:?}/.local" \
     >${OUT1:?} 2>${OUT2:?} || { error "(PIP-CORE-PACKAGES) ${EC13:?}"; return 1; }

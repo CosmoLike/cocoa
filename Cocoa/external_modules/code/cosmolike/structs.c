@@ -13,6 +13,7 @@ Ntab Ntable;
 nuisanceparams nuisance;
 likepara like;
 sur survey;
+halomodel hmemu;
 //clusterparams Cluster;
 
 pdeltapara pdeltaparams =
@@ -244,6 +245,16 @@ void reset_Ntable_struct()
   Ntable.photoz_interpolation_type = 0;
   Ntable.high_def_integration = 0;
   Ntable.FPTboost=0;
+}
+
+void reset_halomodel_struct()
+{
+  hmemu.lnPGM_nk = 0;
+  hmemu.lnPGM_nz = 0;
+  hmemu.lnPGM = NULL;
+  hmemu.lnPGG_nk = 0;
+  hmemu.lnPGG_nz = 0;
+  hmemu.lnPGG = NULL;
 }
 
 /*

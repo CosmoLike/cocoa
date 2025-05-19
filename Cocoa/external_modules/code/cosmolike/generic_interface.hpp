@@ -603,6 +603,18 @@ void set_nuisance_shear_photoz(
     arma::Col<double> SP
   );
 
+void set_pgg_power_spectrum(
+    arma::Col<double> io_log10k, 
+    arma::Col<double> io_z, 
+    arma::Col<double> io_lnP
+  );
+
+void set_pgm_power_spectrum(
+    arma::Col<double> io_log10k, 
+    arma::Col<double> io_z, 
+    arma::Col<double> io_lnP
+  );
+
 // ---------------------------------------------------------------------------
 // ---------------------------------------------------------------------------
 // ---------------------------------------------------------------------------
