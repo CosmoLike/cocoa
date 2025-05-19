@@ -65,19 +65,29 @@ if [ -z "${IGNORE_PIP_CORE_INSTALLATION}" ]; then
   # (e.g., midway) no-cache-dir is important to fix this bug
   # https://github.com/mpi4py/mpi4py/issues/335
   if [ -n "${COCOA_FORCE_NUMPY_1_23}" ]; then
-    # ISSUE: https://github.com/numpy/numpy/issues/24903
     COCOA_NUMPY_VERSION='1.23.5'
+
+    env MPICC=$MPI_CC_COMPILER ${PIP3:?} install \
+        "numpy==${COCOA_NUMPY_VERSION:?}" \
+        'mpi4py==4.0.3' \
+        'pyfftw==0.13.1' \
+        'setuptools==80.3.1' \
+      --no-cache-dir --prefer-binary \
+      --prefix="${ROOTDIR:?}/.local" \
+      --force-reinstall \
+      >${OUT1:?} 2>${OUT2:?} || { error "(PIP-CORE-PACKAGES) ${EC13:?}"; return 1; }
   else
     COCOA_NUMPY_VERSION='1.26.3'
+
+    env MPICC=$MPI_CC_COMPILER ${PIP3:?} install \
+        "numpy==${COCOA_NUMPY_VERSION:?}" \
+        'mpi4py==4.0.3' \
+        'setuptools==80.3.1' \
+      --no-cache-dir --prefer-binary \
+      --prefix="${ROOTDIR:?}/.local" \
+      --force-reinstall \
+      >${OUT1:?} 2>${OUT2:?} || { error "(PIP-CORE-PACKAGES) ${EC13:?}"; return 1; }
   fi
-  
-  env MPICC=$MPI_CC_COMPILER ${PIP3:?} install \
-      "numpy==${COCOA_NUMPY_VERSION:?}" \
-      'mpi4py==4.0.3' \
-    --no-cache-dir --prefer-binary \
-    --prefix="${ROOTDIR:?}/.local" \
-    --force-reinstall \
-    >${OUT1:?} 2>${OUT2:?} || { error "(PIP-CORE-PACKAGES) ${EC13:?}"; return 1; }
 
   env MPICC=$MPI_CC_COMPILER ${PIP3:?} install \
       "numpy==${COCOA_NUMPY_VERSION:?}" \
@@ -90,9 +100,9 @@ if [ -z "${IGNORE_PIP_CORE_INSTALLATION}" ]; then
     --prefix="${ROOTDIR:?}/.local" \
     >${OUT1:?} 2>${OUT2:?} || { error "(PIP-CORE-PACKAGES) ${EC13:?}"; return 1; }
 
-  env CXX="${CXX_COMPILER:?}" CC="${C_COMPILER:?}" ${PIP3:?} install \
-  --upgrade setuptools --no-cache-dir >${OUT1:?} 2>${OUT2:?} \
-  || { error "(PIP-CORE-PACKAGES) ${EC13:?}"; return 1; }
+  #env CXX="${CXX_COMPILER:?}" CC="${C_COMPILER:?}" ${PIP3:?} install \
+  #--upgrade setuptools --no-cache-dir >${OUT1:?} 2>${OUT2:?} \
+  #|| { error "(PIP-CORE-PACKAGES) ${EC13:?}"; return 1; }
 
   pbottom "INSTALLING PYTHON CORE LIBRARIES VIA PIP" || return 1
   

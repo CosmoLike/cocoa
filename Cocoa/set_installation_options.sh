@@ -48,7 +48,7 @@ export IGNORE_EMULTRF_DATA=1 #SaraivanovZhongZhu (SZZ) transformer-based emul
 # ------------------------------------------------------------------------------
 #export IGNORE_COBAYA_CODE=1
 #export IGNORE_CAMB_CODE=1
-export IGNORE_CLASS_CODE=1 # Default: we just use CAMB (reduces compilation time)
+#export IGNORE_CLASS_CODE=1 # Default: we just use CAMB (reduces compilation time)
 #export IGNORE_COSMOLIKE_CODE=1
 #export IGNORE_POLYCHORD_SAMPLER_CODE=1
 #export IGNORE_PLANCK_LIKELIHOOD_CODE=1
@@ -73,10 +73,10 @@ export IGNORE_COSMOPOWER_CODE=1
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
-export IGNORE_COSMOLIKE_LSSTY1_CODE=1
-#export IGNORE_COSMOLIKE_DES_Y3_CODE=1
-export IGNORE_COSMOLIKE_ROMAN_FOURIER_CODE=1
-export IGNORE_COSMOLIKE_ROMAN_REAL_CODE=1
+#export IGNORE_COSMOLIKE_LSSTY1_CODE=1
+export IGNORE_COSMOLIKE_DES_Y3_CODE=1
+#export IGNORE_COSMOLIKE_ROMAN_FOURIER_CODE=1
+#export IGNORE_COSMOLIKE_ROMAN_REAL_CODE=1
 
 # ------------------------------------------------------------------------------
 # If OVERWRITE_EXISTING_XXX_CODE=1, the setup_cocoa overwrites existing PACKAGES
@@ -161,6 +161,11 @@ fi
 if [[ -z "${IGNORE_COSMOPOWER_CODE}" || -z "${IGNORE_EMULTRF_CODE}" ]]; then
   unset -v IGNORE_EMULATOR_GPU_PIP_PACKAGES
 fi
+
+#if [ -z "${IGNORE_EUCLID_EMULATOR_V2_CODE}" ]; then
+#  unset -v IGNORE_CLASS_CODE
+#fi
+
 # ------------------------------------------------------------------------------
 
 # ------------------------------------------------------------------------------
@@ -331,7 +336,7 @@ export EMULTRF_DATA_GIT_COMMIT="7d7085241486809b8b765bf58e6e2b437bc2e406"
 # --------------------------------------------------------------------
 export LSST_Y1_URL="https://github.com/CosmoLike/cocoa_lsst_y1.git"
 export LSST_Y1_NAME="lsst_y1"
-export LSST_Y1_COMMIT="e597b2d42070cf2e72d3d3293e200c32bf7f11fd"
+export LSST_Y1_COMMIT="1abe548281296196dabee7b19e31c56f324eda38"
 
 export DES_Y3_URL="https://github.com/CosmoLike/cocoa_des_y3.git"
 export DES_Y3_NAME="des_y3"
