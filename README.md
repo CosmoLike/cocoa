@@ -1032,9 +1032,7 @@ and
 > [!Warning]
 > Never delete your project folder from `$ROOTDIR/project` without first running the `stop_cocoa.sh` bash script; otherwise, Cocoa will have ill-defined soft links located at `Cocoa/cobaya/cobaya/likelihoods/`, `Cocoa/external_modules/code/` and `Cocoa/external_modules/data/`. The env variables `LD_LIBRARY_PATH` and `PYTHONPATH`  will also contain ill-defined paths for these projects.  Why this behavior? The script `start_cocoa.sh` creates symbolic links so cobaya can see the likelihood and data files. It also adds the *Cobaya-Cosmolike interface* of all projects to `LD_LIBRARY_PATH` and `PYTHONPATH` paths.
 
-
-
-If users want to make a particular cosmolike project widely available in cocoa (named `XXX` as an example), implement the following steps:
+If users want to make a particular cosmolike project widely available in cocoa, implement the following steps:
 
 **Step :one:**: Add the following env keys on `set_installation_options.sh`
 
