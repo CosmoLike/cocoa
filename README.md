@@ -989,29 +989,89 @@ If this does not create any merge conflicts, type
 
 ### :interrobang: FAQ: How do we download and run Cosmolike projects? <a name="running_cosmolike_projects"></a> 
 
-The *projects* folder was designed to include Cosmolike projects. We assume that you are still in the Conda cocoa environment from the previous `conda activate cocoa` command and that you are in the cocoa main folder `cocoa/Cocoa`, 
+In the instructions below, we assume that you are still in the Conda cocoa environment from the previous `conda activate cocoa` command and that you are in the cocoa main folder `cocoa/Cocoa`, 
 
 **Step :one:**: Go to the project folder (`./cocoa/Cocoa/projects`) and clone a Cosmolike project with the fictitious name `XXX`:
     
     cd ./cocoa/Cocoa/projects
-    "${CONDA_PREFIX}/bin/git" clone git@github.com:CosmoLike/cocoa_XXX.git XXX
+
+and 
+
+    "${CONDA_PREFIX}/bin/git" clone https://github.com/CosmoLike/cocoa_lsst_XXX.git XXX
 
 By convention, the Cosmolike Organization hosts a Cobaya-Cosmolike project named XXX at `CosmoLike/cocoa_XXX`. The `cocoa_` prefix must be dropped when cloning the repository.
  
 **Step :two:**: Go back to the Cocoa main folder and activate the private Python environment
     
     cd ../
+
+and
+
     source start_cocoa.sh
  
 :warning: The `start_cocoa.sh` script must be run after cloning the project repository. 
 
-**Step :three:**: Compile the project, as shown below
+**Step :three:**: Compile the project, as shown below (two possibilities)
  
     source "${ROOTDIR:?}"/projects/XXX/scripts/compile_XXX
-  
+
+or
+
+    # this will compile all cosmolike courses
+    source "${ROOTDIR:?}"/installation_scripts/compile_all_projects.sh
+ 
 **Step :four:**: Select the number of OpenMP cores and run a template YAML file
     
-    export OMP_PROC_BIND=close; export OMP_NUM_THREADS=4
-    mpirun -n 1 --oversubscribe --mca btl vader,tcp,self --bind-to core --rank-by core --map-by numa:pe=${OMP_NUM_THREADS} cobaya-run ./projects/XXX/EXAMPLE_EVALUATE1.yaml -f
+    export OMP_PROC_BIND=close; export OMP_NUM_THREADS=8
 
-⚠️ Never delete the `lsst_y1` folder from the project folder without running `stop_cocoa` first; otherwise, Cocoa will have ill-defined soft links. Where the ill-defined soft links will be located? They will be at `Cocoa/cobaya/cobaya/likelihoods/`, `Cocoa/external_modules/code/` and `Cocoa/external_modules/data/`. The script `stop_cocoa` deletes them. Why this behavior exists? The script `start_cocoa` creates symbolic links so cobaya can see the likelihood and data files. It also adds the *Cobaya-Cosmolike interface* of all projects to `LD_LIBRARY_PATH` and `PYTHONPATH` paths.
+and 
+
+    mpirun -n 1 --oversubscribe --mca pml ^ucx --mca btl vader,tcp,self --bind-to core:overload-allowed --rank-by slot --map-by numa:pe=${OMP_NUM_THREADS} cobaya-run ./projects/XXX/EXAMPLE_EVALUATE1.yaml -f
+
+> [!Warning]
+> Never delete your project folder from `$ROOTDIR/project` without first running the `stop_cocoa.sh` bash script; otherwise, Cocoa will have ill-defined soft links located at `Cocoa/cobaya/cobaya/likelihoods/`, `Cocoa/external_modules/code/` and `Cocoa/external_modules/data/`. The env variables `LD_LIBRARY_PATH` and `PYTHONPATH`  will also contain ill-defined paths for these projects.  Why this behavior? The script `start_cocoa.sh` creates symbolic links so cobaya can see the likelihood and data files. It also adds the *Cobaya-Cosmolike interface* of all projects to `LD_LIBRARY_PATH` and `PYTHONPATH` paths.
+
+> [!NOTE]
+> The *projects* folder was designed to include all Cosmolike projects, and Cocoa contains the two following scripts:
+>
+>      "${ROOTDIR:?}"/installation_scripts/setup_cosmolike_projects.sh
+>      "${ROOTDIR:?}"/installation_scripts/compile_all_projects.sh
+> 
+> that `setup` and `compile` all projects defined there. As a standard, we defined the project name `XXX` to be stored on a GitHub repository with the name `cocoa_XXX`. The prefix `cocoa_` helps developers on Cosmolike organization differentiate legacy Cosmolike projects from matching ones designed for Cocoa. 
+
+If users want to make the cosmolike project named `XXX`default in cocoa (assuming the project resides the a GitHub repository `https://github.com/.../cocoa_lsst_XXX.git`), follow the following steps:
+
+**Step :one:**: Create the following links on `set_installation_options.sh`
+
+    [adapted from ${ROOTDIR:?}/set_installation_options.sh script]
+    
+    #the flag below allows users to skip the downloading project XXX
+    #export IGNORE_COSMOLIKE_XXX_CODE=1
+
+    (...)
+   
+    export XXX_URL="https://github.com/.../cocoa_lsst_XXX.git"
+    export XXX_NAME="XXX"
+    #Key XXX_COMMIT is optional, but we strongly recommend its inclusion 
+    export XXX_COMMIT="a5cf62ffcec7b862dda5b1234f6bb19124bb5d0"
+
+**Step :two:**: Add the keys `XXX_URL`, `XXX_NAME`, and `XXX_COMMIT` to `${ROOTDIR:?}/installation_scripts/flags_impl_unset_keys.sh` so `stop_cocoa.sh` unset them
+
+    [adapted from ${ROOTDIR:?}/installation_scripts/flags_impl_unset_keys.sh]
+    unset -v XXX_URL XXX_NAME XXX_COMMIT IGNORE_COSMOLIKE_XXX_CODE
+   
+**Step :three:** Add and adapt the following block to `${ROOTDIR:?}/installation_scripts/setup_cosmolike_projects`
+
+     [adapted from ${ROOTDIR:?}/installation_scripts/setup_cosmolike_projects.sh script]
+     
+     if [ -z "${IGNORE_COSMOLIKE_XXX_CODE}" ]; then 
+       ptop "GETTING XXX" || return 1
+
+       if [ -n "${XXX_COMMIT}" ]; then
+         gitact2 "${XXX_NAME:?}" "${XXX_URL:?}" "${XXX_COMMIT:?}"  || return 1
+       fi
+
+       pbottom "GETTING XXX" || return 1
+     fi
+
+    
