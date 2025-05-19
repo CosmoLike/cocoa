@@ -611,9 +611,11 @@ to make sure it resembles the one below.
     
     mkdir "${CONDA_DIR:?}"
     
-    wget https://repo.continuum.io/miniconda/Miniconda3-py38_23.9.0-0-Linux-x86_64.sh
+    wget https://repo.anaconda.com/miniconda/Miniconda3-py39_25.3.1-1-Linux-x86_64.sh
     
-    /bin/bash Miniconda3-py38_23.9.0-0-Linux-x86_64.sh -f -b -p "${CONDA_DIR:?}"
+    /bin/bash Miniconda3-py39_25.3.1-1-Linux-x86_64.sh -f -b -p "${CONDA_DIR:?}"
+
+    /bin/bash 
 
 Please don't forget to adapt the path assigned to `CONDA_DIR` in the command above:
 
