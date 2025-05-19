@@ -43,7 +43,7 @@ Core packages include compilers and numerical libraries (e.g., GSL and FFTW) tha
 
 **Step :one:**: Download the file `cocoapy310.yml` yml file
 
-    wget https://raw.githubusercontent.com/CosmoLike/cocoa/refs/heads/main/cocoapy310.yml
+    wget https://raw.githubusercontent.com/CosmoLike/cocoa/refs/heads/dev/cocoapy310.yml
 
 create the cocoa environment,
 
@@ -61,7 +61,6 @@ and create symbolic links that will give better names for the GNU compilers
     ln -s "${CONDA_PREFIX}"/bin/x86_64-conda-linux-gnu-gcc-ar "${CONDA_PREFIX}"/bin/gcc-ar
     ln -s "${CONDA_PREFIX}"/bin/x86_64-conda-linux-gnu-gcc-ranlib "${CONDA_PREFIX}"/bin/gcc-ranlib
     ln -s "${CONDA_PREFIX}"/bin/x86_64-conda-linux-gnu-ld "${CONDA_PREFIX}"/bin/ld
-    ln -s "${CONDA_PREFIX}"/lib/libopenblas.so.0 "${CONDA_PREFIX}"/lib/libopenblas.so
 
 Users can now proceed to **step :two:**. 
 
@@ -80,7 +79,7 @@ Users can now proceed to **step :two:**.
 > 
 **Step :one:**: Download cocoa's latest release and go to the `cocoa` main folder,
 
-    "${CONDA_PREFIX}"/bin/git clone --depth 1 https://github.com/CosmoLike/cocoa.git --branch v4.0-beta23 cocoa
+    "${CONDA_PREFIX}"/bin/git clone --depth 1 https://github.com/CosmoLike/cocoa.git --branch v4.0-beta25 cocoa
 
 and
 

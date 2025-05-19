@@ -220,7 +220,7 @@ typedef struct
   // ---------------------------------------------------
   // ---------------------------------------------------
   // 1st index: photoz[0][:][:] = SHEAR; photoz[1][:][:] = CLUSTERING
-  // 2nd index: photoz[:][0][:] = bias; photoz[:][1][:] = strech
+  // 2nd index: photoz[:][0][:] = bias; photoz[:][1][:] = stretch
   double photoz[MAX_SIZE_ARRAYS][MAX_SIZE_ARRAYS][MAX_SIZE_ARRAYS]; 
   // ---------------------------------------------------
   // ---------------------------------------------------
@@ -281,17 +281,17 @@ typedef struct
   int Ncos;
   int Ndata;
   int Nbp; // number of band-power bins for CMB lensing
-  double lmin;
-  double lmax;
+  int lmin;
+  int lmax;
   double* ell;
   double cosmax;
   double Rmin_bias;
   double Rmin_shear;
-  double lmax_shear;
-  double lmin_bp;      // minimum l mode of CMB band power binning matrix (w/ corr)
-  double lmax_bp;      // Note: for dv, only need binmat with corr
-  double lmin_kappacmb;
-  double lmax_kappacmb;
+  int lmax_shear;
+  int lmin_bp;      // minimum l mode of CMB band power binning matrix (w/ corr)
+  int lmax_bp;      // Note: for dv, only need binmat with corr
+  int lmin_kappacmb;
+  int lmax_kappacmb;
   int bias;
   int shear_shear;
   int shear_pos;
@@ -396,6 +396,7 @@ typedef struct
   double clustering_zdist_zmax_all;
   double clustering_zdist_zmin[MAX_SIZE_ARRAYS];
   double clustering_zdist_zmax[MAX_SIZE_ARRAYS];
+  double clustering_zdist_zmean[MAX_SIZE_ARRAYS];
   // ---------------------------------------------------
   // ---------------------------------------------------
   // CLUSTER ROUTINES (ALPHA STAGE)

@@ -16,7 +16,7 @@ fi
 # ------------------------------------------------------------------------------
 # VERBOSE AS DEBUG TOOL --------------------------------------------------------
 # ------------------------------------------------------------------------------
-export COCOA_OUTPUT_VERBOSE=1
+#export COCOA_OUTPUT_VERBOSE=1
 
 # ------------------------------------------------------------------------------
 # If set, COSMOLIKE will compile with DEBUG flags ------------------------------
@@ -32,12 +32,12 @@ export IGNORE_BICEP_CMB_DATA=1
 # export IGNORE_HOLICOW_STRONG_LENSING_DATA=1
 #export IGNORE_SN_DATA=1
 export IGNORE_SPT_CMB_DATA=1
-#export IGNORE_SIMONS_OBSERVATORY_CMB_DATA=1
+export IGNORE_SIMONS_OBSERVATORY_CMB_DATA=1
 #export IGNORE_PLANCK_CMB_DATA=1
 export IGNORE_CAMSPEC_CMB_DATA=1
-#export IGNORE_LIPOP_CMB_DATA=1
+export IGNORE_LIPOP_CMB_DATA=1
 export IGNORE_COSMOPOWER_DATA=1
-#export IGNORE_EMULTRF_DATA=1 #SaraivanovZhongZhu (SZZ) transformer-based emul
+export IGNORE_EMULTRF_DATA=1 #SaraivanovZhongZhu (SZZ) transformer-based emul
 
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
@@ -56,13 +56,13 @@ export IGNORE_ACTDR4_CODE=1
 export IGNORE_ACTDR6_CODE=1
 export IGNORE_CPP_CUBA_INSTALLATION=1
 export IGNORE_VELOCILEPTORS_CODE=1
-#export IGNORE_SIMONS_OBSERVATORY_LIKELIHOOD_CODE=1
+export IGNORE_SIMONS_OBSERVATORY_LIKELIHOOD_CODE=1
 export IGNORE_CAMSPEC_LIKELIHOOD_CODE=1
-#export IGNORE_LIPOP_LIKELIHOOD_CODE=1
+export IGNORE_LIPOP_LIKELIHOOD_CODE=1
 export IGNORE_HYREC_CODE=1
 export IGNORE_COSMOREC_CODE=1
 export IGNORE_MGCAMB_CODE=1
-#export IGNORE_EMULTRF_CODE=1 #SaraivanovZhongZhu (SZZ) transformer-based emul
+export IGNORE_EMULTRF_CODE=1 #SaraivanovZhongZhu (SZZ) transformer-based emul
 export IGNORE_COSMOPOWER_CODE=1
 #export IGNORE_EUCLID_EMULATOR_V2_CODE=1
 
@@ -161,6 +161,11 @@ fi
 if [[ -z "${IGNORE_COSMOPOWER_CODE}" || -z "${IGNORE_EMULTRF_CODE}" ]]; then
   unset -v IGNORE_EMULATOR_GPU_PIP_PACKAGES
 fi
+
+#if [ -z "${IGNORE_EUCLID_EMULATOR_V2_CODE}" ]; then
+#  unset -v IGNORE_CLASS_CODE
+#fi
+
 # ------------------------------------------------------------------------------
 
 # ------------------------------------------------------------------------------
@@ -331,7 +336,7 @@ export EMULTRF_DATA_GIT_COMMIT="7d7085241486809b8b765bf58e6e2b437bc2e406"
 # --------------------------------------------------------------------
 export LSST_Y1_URL="https://github.com/CosmoLike/cocoa_lsst_y1.git"
 export LSST_Y1_NAME="lsst_y1"
-export LSST_Y1_COMMIT="c97e8bb4b861131737c3b472631d4ed82afdce89"
+export LSST_Y1_COMMIT="1abe548281296196dabee7b19e31c56f324eda38"
 
 export DES_Y3_URL="https://github.com/CosmoLike/cocoa_des_y3.git"
 export DES_Y3_NAME="des_y3"
@@ -341,11 +346,11 @@ export DES_Y3_TAG="v4.0-beta17"
 
 export ROMAN_FOURIER_URL="https://github.com/CosmoLike/cocoa_roman_fourier.git"
 export ROMAN_FOURIER_NAME="roman_fourier"
-export ROMAN_FOURIER_COMMIT="e79d3e5754484ccc3353e7fb12073264cd9137b4"
+export ROMAN_FOURIER_COMMIT="282e1d222a1827e02d7c04faa94939a4520640ac"
 
 export ROMAN_REAL_URL="https://github.com/CosmoLike/cocoa_roman_real.git"
 export ROMAN_REAL_NAME="roman_real"
-export ROMAN_REAL_COMMIT="d9dcdda435f64d11f24649c33e7d8b9bf0da0dfb"
+export ROMAN_REAL_COMMIT="a5cf62ffcec7b862dda5bf343bf6bb19124bb5d0"
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------

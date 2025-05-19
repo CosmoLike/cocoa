@@ -41,8 +41,7 @@ double amax_source(int i __attribute__((unused)))
 
 double amax_source_IA(int ni) 
 {
-  if (ni < 0 || ni > redshift.shear_nbin - 1)
-  {
+  if (ni < 0 || ni > redshift.shear_nbin - 1) {
     log_fatal("invalid bin input ni = %d", ni);
     exit(1);
   }
@@ -51,30 +50,33 @@ double amax_source_IA(int ni)
 
 double amin_lens(int ni) 
 {
-  if (ni < 0 || ni > redshift.clustering_nbin - 1)
-  {
+  if (ni < 0 || ni > redshift.clustering_nbin - 1) {
     log_fatal("invalid bin input ni = %d", ni);
     exit(1);
   }
-  return 1. / (1 + redshift.clustering_zdist_zmax[ni] 
-                 + 2.*fabs(nuisance.photoz[1][0][ni]));
+  const double zmax = 
+    (redshift.clustering_zdist_zmax[ni] 
+      - redshift.clustering_zdist_zmean[ni])*nuisance.photoz[1][1][ni]
+      + redshift.clustering_zdist_zmean[ni];
+  return 1. / (1 + zmax + 2.*fabs(nuisance.photoz[1][0][ni]));
 }
 
 double amax_lens(int ni) 
 {
-  if (ni < 0 || ni > redshift.clustering_nbin - 1)
-  {
+  if (ni < 0 || ni > redshift.clustering_nbin - 1) {
     log_fatal("invalid bin input ni = %d", ni);
     exit(1);
   }
 
-  if (gbmag(0.0, ni) != 0) 
-  {
+  const double zmin = 
+    (redshift.clustering_zdist_zmin[ni] 
+      - redshift.clustering_zdist_zmean[ni])*nuisance.photoz[1][1][ni]
+      + redshift.clustering_zdist_zmean[ni];
+
+  if (gbmag(0.0, ni) != 0) {
     return 1. / (1. + fmax(redshift.shear_zdist_zmin_all, 0.001));
   }
-    
-  return 1. / (1 + fmax(redshift.clustering_zdist_zmin[ni] 
-                 -2. * fabs(nuisance.photoz[1][0][ni]), 0.001));
+  return 1. / (1 + fmax(zmin -2.*fabs(nuisance.photoz[1][0][ni]), 0.001));
 }
 
 // -----------------------------------------------------------------------------
@@ -85,17 +87,14 @@ int test_kmax(double l, int ni) // return 1 if true, 0 otherwise
 { // test whether the (l, ni) bin is in the linear clustering regime
   static double chiref[10] = {-1.};
     
-  if (chiref[0] < 0)
-  {
-    for (int i=0; i<redshift.clustering_nbin; i++)
-    {
+  if (chiref[0] < 0) {
+    for (int i=0; i<redshift.clustering_nbin; i++) {
       chiref[i] = chi(1.0/(1. + 0.5 * (redshift.clustering_zdist_zmin[i] + 
                                        redshift.clustering_zdist_zmax[i])));
     }
   }
-  
-  if (ni < 0 || ni > redshift.clustering_nbin - 1)
-  {
+
+  if (ni < 0 || ni > redshift.clustering_nbin - 1) {
     log_fatal("invalid bin input ni = %d", ni);
     exit(1);
   }
@@ -105,8 +104,7 @@ int test_kmax(double l, int ni) // return 1 if true, 0 otherwise
   const double kmax = 2.0*M_PI / R_min * cosmology.coverH0;
   
   int res = 0.0;
-  if ((l + 0.5) / chiref[ni] < kmax)
-  {
+  if ((l + 0.5) / chiref[ni] < kmax) {
     res = 1;
   }
   return res;
@@ -127,22 +125,16 @@ int test_zoverlap(int ni, int nj) // test whether source bin nj is behind lens b
     exit(1);
   }
   int res = 1;
-  // check if explicitly excluded (return False)
-  if(tomo.ggl_exclude != NULL)
-  {
-    for(int k=0; k<tomo.N_ggl_exclude; k++)
-    {
-      int i = k*2+0;
-      int j = k*2+1;
-      if((ni==tomo.ggl_exclude[i]) && (nj==tomo.ggl_exclude[j]))
-      {
+  if (tomo.ggl_exclude != NULL) {
+    for (int k=0; k<tomo.N_ggl_exclude; k++) {
+      const int i = k*2+0;
+      const int j = k*2+1;
+      if ((ni == tomo.ggl_exclude[i]) && (nj == tomo.ggl_exclude[j])) {
         res = 0;
         break;
       }
     }
   }
-  // otherwise, return True
-
   return res;
 }
 
@@ -153,15 +145,11 @@ int test_zoverlap(int ni, int nj) // test whether source bin nj is behind lens b
 int ZL(int ni) 
 {
   static int N[MAX_SIZE_ARRAYS*MAX_SIZE_ARRAYS] = {-42};
-  if (N[0] < -1) 
-  {
+  if (N[0] < -1) {
     int n = 0;
-    for (int i=0; i<redshift.clustering_nbin; i++) 
-    {
-      for (int j=0; j<redshift.shear_nbin; j++) 
-      {
-        if (test_zoverlap(i, j)) 
-        {
+    for (int i=0; i<redshift.clustering_nbin; i++) {
+      for (int j=0; j<redshift.shear_nbin; j++) {
+        if (test_zoverlap(i, j)) {
           N[n] = i;
           n++;
         }
@@ -180,15 +168,11 @@ int ZL(int ni)
 int ZS(int nj) 
 {
   static int N[MAX_SIZE_ARRAYS*MAX_SIZE_ARRAYS] = {-42};
-  if (N[0] < -1) 
-  {
+  if (N[0] < -1) {
     int n = 0;
-    for (int i = 0; i < redshift.clustering_nbin; i++) 
-    {
-      for (int j = 0; j < redshift.shear_nbin; j++) 
-      {
-        if (test_zoverlap(i, j)) 
-        {
+    for (int i = 0; i < redshift.clustering_nbin; i++) {
+      for (int j = 0; j < redshift.shear_nbin; j++) {
+        if (test_zoverlap(i, j)) {
           N[n] = j;
           n++;
         }
@@ -207,20 +191,15 @@ int ZS(int nj)
 int N_ggl(int ni, int nj) 
 { // ni = redshift bin of the lens, nj = redshift bin of the source
   static int N[MAX_SIZE_ARRAYS][MAX_SIZE_ARRAYS] = {{-42}};
-  if (N[0][0] < 0) 
-  {
+  if (N[0][0] < 0) {
     int n = 0;
-    for (int i=0; i<redshift.clustering_nbin; i++) 
-    {
-      for (int j=0; j<redshift.shear_nbin; j++) 
-      {
-        if (test_zoverlap(i, j)) 
-        {
+    for (int i=0; i<redshift.clustering_nbin; i++) {
+      for (int j=0; j<redshift.shear_nbin; j++) {
+        if (test_zoverlap(i, j)) {
           N[i][j] = n;
           n++;
         } 
-        else 
-        {
+        else {
           N[i][j] = -1;
         }
       }
@@ -724,7 +703,10 @@ double pf_photoz(double zz, int nj)
     exit(1);
   }
   
-  zz = zz - nuisance.photoz[1][0][nj];
+  zz  = (zz - nuisance.photoz[1][0][nj]
+            - redshift.clustering_zdist_zmean[nj])/nuisance.photoz[1][1][nj] + redshift.clustering_zdist_zmean[nj];
+
+  //zz  = zz - nuisance.photoz[1][0][nj];
   
   double res; 
   if (zz <= table[ntomo+1][0] || zz >= table[ntomo+1][nzbins - 1])
@@ -739,6 +721,7 @@ double pf_photoz(double zz, int nj)
       log_fatal(gsl_strerror(status));
       exit(1);
     }
+    res = res / nuisance.photoz[1][1][nj];
   }
   return res;
 }
@@ -779,7 +762,9 @@ double zmean(const int ni)
       fdiff(cache_table_params, Ntable.random) ||
       fdiff(cache_redshift_nz_params_clustering, redshift.random_clustering))
   {
-    if (table != NULL) free(table);
+    if (table != NULL) {
+      free(table);
+    }
     table = (double*) malloc1d(redshift.clustering_nbin+1);
 
     const size_t szint = 300 + 50 * (Ntable.high_def_integration);
@@ -867,7 +852,9 @@ double g_tomo(double ainput, const int ni)
   if (table == NULL || 
       fdiff(cache_table_params, Ntable.random)) 
   {
-    if (table != NULL) free(table);
+    if (table != NULL) {
+      free(table);
+    }
     table = (double**) malloc2d(redshift.shear_nbin, Ntable.N_a);
   }
 
@@ -958,7 +945,9 @@ double g2_tomo(double a, int ni)
   if (table == NULL || 
       fdiff(cache_table_params, Ntable.random)) 
   {
-    if (table != NULL) free(table);
+    if (table != NULL) {
+      free(table);
+    }
     table = (double**) malloc2d(redshift.shear_nbin, Ntable.N_a);
   }
 
@@ -1045,7 +1034,9 @@ double g_lens(double a, int ni)
   if (table == NULL || 
       fdiff(cache_table_params, Ntable.random)) 
   {
-    if (table != NULL) free(table);
+    if (table != NULL) {
+      free(table);
+    }
     table = (double**) malloc2d(redshift.clustering_nbin , Ntable.N_a);
   }
 

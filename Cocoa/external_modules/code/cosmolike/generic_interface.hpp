@@ -78,7 +78,6 @@ class IP
       static IP instance;
       return instance;
     }
-
     ~IP() = default;
 
     // ----------------------------------------------
@@ -94,10 +93,14 @@ class IP
     void set_data(std::string datavector_filename);
 
     // 3x2pt
-    void set_mask(std::string mask_filename, arma::Col<int>::fixed<3> order, const int real_space);
+    void set_mask(std::string mask_filename, 
+                  arma::Col<int>::fixed<3> order, 
+                  const int real_space);
 
     // 6x2pt
-    void set_mask(std::string mask_filename, arma::Col<int>::fixed<6> order, const int real_space);
+    void set_mask(std::string mask_filename, 
+                  arma::Col<int>::fixed<6> order, 
+                  const int real_space);
 
     void set_inv_cov(std::string covariance_filename);
 
@@ -416,7 +419,12 @@ void init_baryons_contamination(std::string sim); // OLD API
 
 void init_bias(arma::Col<double> bias_z_evol_model);
 
-void init_binning_fourier(const int Ncl, const double lmin, const double lmax, const double lmax_shear);
+void init_binning_fourier(
+    const int Ncl, 
+    const int lmin, 
+    const int lmax, 
+    const int lmax_shear
+  );
 
 void init_binning_real_space(
     const int Ntheta, 
@@ -430,7 +438,9 @@ void init_binning_cmb_bandpower(
     const int lmax
   );
 
-void init_cosmo_runmode(const bool is_linear);
+void init_cosmo_runmode(
+    const bool is_linear
+  );
 
 void init_cmb(
     const double lmin_kappa_cmb, 
@@ -509,7 +519,9 @@ void init_survey(
     double sigma_e
   );
 
-void init_ggl_exclude(arma::Col<int> ggl_exclude);
+void init_ggl_exclude(
+	arma::Col<int> ggl_exclude
+  );
 
 // ---------------------------------------------------------------------------
 // ---------------------------------------------------------------------------
@@ -562,6 +574,10 @@ void set_nuisance_bias(
 
 void set_nuisance_clustering_photoz(
     arma::Col<double> CP
+  );
+
+void set_nuisance_clustering_photoz_stretch(
+    arma::Col<double> CPS
   );
 
 void set_nuisance_IA(
