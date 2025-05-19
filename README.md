@@ -43,7 +43,7 @@ Core packages include compilers and numerical libraries (e.g., GSL and FFTW) tha
 
 **Step :one:**: Download the file `cocoapy310.yml` yml file
 
-    wget https://raw.githubusercontent.com/CosmoLike/cocoa/refs/heads/main/cocoapy310.yml
+    wget https://raw.githubusercontent.com/CosmoLike/cocoa/refs/heads/dev/cocoapy310.yml
 
 create the cocoa environment,
 
