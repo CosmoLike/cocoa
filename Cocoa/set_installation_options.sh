@@ -48,7 +48,7 @@ export IGNORE_EMULTRF_DATA=1 #SaraivanovZhongZhu (SZZ) transformer-based emul
 # ------------------------------------------------------------------------------
 #export IGNORE_COBAYA_CODE=1
 #export IGNORE_CAMB_CODE=1
-#export IGNORE_CLASS_CODE=1 # Default: we just use CAMB (reduces compilation time)
+export IGNORE_CLASS_CODE=1 # Default: we just use CAMB (reduces compilation time)
 #export IGNORE_COSMOLIKE_CODE=1
 #export IGNORE_POLYCHORD_SAMPLER_CODE=1
 #export IGNORE_PLANCK_LIKELIHOOD_CODE=1
