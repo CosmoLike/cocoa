@@ -180,8 +180,8 @@ and
 >     # inset # symbol in the lines below (i.e., unset these environmental keys)
 >     #export IGNORE_COSMOLIKE_LSSTY1_CODE=1
 >     export IGNORE_COSMOLIKE_DES_Y3_CODE=1
->     export IGNORE_COSMOLIKE_ROMAN_FOURIER_CODE=1
->     export IGNORE_COSMOLIKE_ROMAN_REAL_CODE=1
+>     #export IGNORE_COSMOLIKE_ROMAN_FOURIER_CODE=1
+>     #export IGNORE_COSMOLIKE_ROMAN_REAL_CODE=1
 >
 > If users comment these lines (unsetting the corresponding IGNORE keys) after running `setup_cocoa.sh` and `compile_cocoa.sh`, there is no need to rerun these general scripts, which would reinstall many packages (slow). Instead, run the following three commands:
 >
