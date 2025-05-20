@@ -65,6 +65,7 @@ export IGNORE_MGCAMB_CODE=1
 export IGNORE_EMULTRF_CODE=1 #SaraivanovZhongZhu (SZZ) transformer-based emul
 export IGNORE_COSMOPOWER_CODE=1
 #export IGNORE_EUCLID_EMULATOR_V2_CODE=1
+export IGNORE_DARK_EMULATOR_CODE=1
 
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
@@ -167,9 +168,7 @@ fi
 # ------------------------------------------------------------------------------
 
 # ------------------------------------------------------------------------------
-# If OVERWRITE_EXISTING_XXX_CODE=1, the setup_cocoa overwrites existing PACKAGES
-# overwrite means: delete existing PACKAGE folder and install it again ---------
-# these keys are only relevant if you run setup_cocoa multiple times -----------
+# These keys are only relevant if you run setup_cocoa multiple times -----------
 # ------------------------------------------------------------------------------
 if [ -n "${OVERWRITE_EXISTING_ALL_PACKAGES}" ]; then
   export OVERWRITE_EXISTING_COCOA_PRIVATE_PYTHON_ENV=1
@@ -201,6 +200,7 @@ if [ -n "${OVERWRITE_EXISTING_ALL_PACKAGES}" ]; then
   export OVERWRITE_EXISTING_HOLICOW_DATA=1
   export OVERWRITE_EXISTING_COSMOPOWER_CODE=1
   export OVERWRITE_EXISTING_EMULTRF_CODE=1
+  export OVERWRITE_EXISTING_DARK_EMULATOR_CODE=1
 fi
 
 if [ -n "${REDOWNLOAD_EXISTING_ALL_DATA}" ]; then

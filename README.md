@@ -1082,12 +1082,33 @@ This will ensure that `stop_cocoa.sh` unsets them before exiting Cocoa.
 
 Cocoa provides a verbose but methodical method for adding packages to its environment. Science packages still being developed by the authors should be cloned in development mode with commit flags specified. This includes pure Python packages typically installed using the generic pip command. Every package should have a `setup` and a `compile` script; the' compile' script should never depend on an internet connection. As an example, we list below the steps we implemented to add the Dark Emulator package to Cocoa. 
 
-**Step :one:**: Add the env keys below on `set_installation_options.sh` that point to the git repository and commit of the package
+**Step :one:**: Add the *five* env keys below on `set_installation_options.sh` that point to the git repository and commit of the package
 
      [adapted from ${ROOTDIR:?}/set_installation_options.sh script]
-     (...) 
      
-     export DARKEMULATOR_URL="https://github.com/DarkQuestCosmology/dark_emulator_public.git"
-     export DARKEMULATOR_GIT_COMMIT="46df5972509624e2eeadc2bf3ac528b02333a7e2"
+     # ------------------------------------------------------------------------------
+     # The keys below control which packages will be installed and compiled  
+     # ------------------------------------------------------------------------------
+     (...)
+     export IGNORE_DARK_EMULATOR_CODE=1  # key number one
+     
+     (...)
+     
+     # ------------------------------------------------------------------------------
+     # These keys are only relevant if you run setup_cocoa multiple times -----------
+     # ------------------------------------------------------------------------------
+     if [ -n "${OVERWRITE_EXISTING_ALL_PACKAGES}" ]; then
+          (...)
+	  export OVERWRITE_EXISTING_DARK_EMULATOR_CODE=1 # key number two
+     fi
+     
+     (...)
+     
+     # ------------------------------------------------------------------------------
+     # PACKAGE URL AND VERSIONS. CHANGES IN THE COMMIT ID MAY BREAK COCOA -----------
+     # ------------------------------------------------------------------------------
+     export DARKEMULATOR_URL="https://github.com/DarkQuestCosmology/dark_emulator_public.git" # key number three
+     export DARKEMULATOR_GIT_COMMIT="46df5972509624e2eeadc2bf3ac528b02333a7e2".            # key number four
+     export DARKEMULATOR_NAME="dark_emulator"                                                                                # key number five
 
      
