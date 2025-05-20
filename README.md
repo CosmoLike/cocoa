@@ -13,7 +13,7 @@
     2. [Additional Installation Notes](#additional_notes)
     3. [FAQ: What if installation or compilation goes wrong?](#running_wrong)
     4. [FAQ: How do we compile the Boltzmann, CosmoLike, and Likelihood codes separately](#appendix_compile_separately)
-    5. [FAQ: How do we run cocoa on a laptop? The docker image named *whovian-cocoa*](#appendix_jupyter_whovian)
+    5. [FAQ: How do we run Cocoa on a laptop? The docker image named *whovian-cocoa*](#appendix_jupyter_whovian)
     6. [FAQ: How do we use an available Anaconda module on HPC?](#overview_anaconda)
     7. [FAQ: What if there is no Conda? Miniconda installation](#overview_miniconda)
     8. [FAQ: How do we make the Slow/Fast decomposition on MCMC chains with Cosmolike? Manual Blocking](#manual_blocking_cosmolike)
@@ -26,12 +26,14 @@
     15. [FAQ: How do we push changes to the Cocoa main branch? A few git hacks](#push_main)
     16. [FAQ: How do we develop from a git tag? A few more git hacks](#dev_from_tag)
     17. [FAQ: How do we download and run Cosmolike projects?](#running_cosmolike_projects)
-
+    18. [FAQ: How do we add a new package to Cocoa? The Dark Emulator Example](#add_package_v1)
+    19. [FAQ: How do we add a new package to Cocoa? The MGCAMB Example](#add_package_v2)
+    
 ## Overview of the [Cobaya](https://github.com/CobayaSampler)-[CosmoLike](https://github.com/CosmoLike) Joint Architecture (Cocoa) <a name="overview"></a>
 
 Cocoa allows users to run [CosmoLike](https://github.com/CosmoLike) routines inside the [Cobaya](https://github.com/CobayaSampler) framework. [CosmoLike](https://github.com/CosmoLike) can analyze data primarily from the [Dark Energy Survey](https://www.darkenergysurvey.org) and simulate future multi-probe analyses for LSST and Roman Space Telescope. 
 
-Besides integrating [Cobaya](https://github.com/CobayaSampler) and [CosmoLike](https://github.com/CosmoLike), Cocoa introduces shell scripts that allow users to containerize [Cobaya](https://github.com/CobayaSampler), the Boltzmann codes and multiple likelihoods. The container structure ensures that users can adopt consistent versions for the Fortran/C/C++ compilers and libraries across multiple machines; this greatly simplifies debugging. 
+Besides integrating [Cobaya](https://github.com/CobayaSampler) and [CosmoLike](https://github.com/CosmoLike), Cocoa introduces shell scripts that allow users to containerize [Cobaya](https://github.com/CobayaSampler), the Boltzmann codes, and multiple likelihoods. The container structure of Cocoa ensures that users can adopt consistent versions for the Fortran/C/C++ compilers and libraries across multiple machines. Such a systematic approach greatly simplifies the debugging process. 
 
 Our scripts never install packages and Python modules on `$HOME/.local`, where `$HOME` is a shell environment variable that points to the user's home folder, as that would make them global to the user. Such behavior would interfere with all previously installed packages, potentially creating dependency incompatibilities between different projects the user works on. This behavior enables users to work on multiple instances of Cocoa simultaneously, similar to what was possible with [CosmoMC](https://github.com/cmbant/CosmoMC). 
 
@@ -39,7 +41,7 @@ This readme file presents basic and advanced instructions for installing all [Co
 
 ## Installation of core packages via Conda <a name="required_packages_conda"></a>
 
-Core packages include compilers and numerical libraries (e.g., GSL and FFTW) that users typically never modify. We install most of these core packages via Conda, as shown below.
+Core packages include compilers and numerical libraries (e.g., GSL and FFTW), which users typically do not modify. We install most of these core packages via Conda, as shown below.
 
 **Step :one:**: Download the file `cocoapy310.yml` yml file
 
@@ -65,7 +67,7 @@ and create symbolic links that will give better names for the GNU compilers
 Users can now proceed to **step :two:**. 
 
 > [!TIP]
-> To install the cocoa conda environment on a supercomputer, users may take advantage of the fact that many HPC environments provide the [Anaconda installer](https://www.anaconda.com) as an external module. Check the appendix [FAQ: How do we use an available Anaconda module on HPC?](#overview_anaconda). Conversely, users working on an HPC environment that does not offer Anaconda or Miniconda may want to check the appendix [FAQ: What if there is no Conda? Miniconda installation](#overview_miniconda).
+> To install the `cocoa` conda environment on a supercomputer, users may take advantage of the fact that many HPC environments provide the [Anaconda installer](https://www.anaconda.com) as an external module. Check the appendix [FAQ: How do we use an available Anaconda module on HPC?](#overview_anaconda). Conversely, users working on an HPC environment that does not offer Anaconda or Miniconda may want to check the appendix [FAQ: What if there is no Conda? Miniconda installation](#overview_miniconda).
 
 **Step :two:**: Install `git-lfs` when loading the conda cocoa environment for the first time.
 
@@ -77,7 +79,7 @@ Users can now proceed to **step :two:**.
 > In this section, we assume users have previously activated the Cocoa conda environment
 >
 > 
-**Step :one:**: Download cocoa's latest release and go to the `cocoa` main folder,
+**Step :one:**: Download Cocoa's latest release and go to its main folder (`cocoa/Cocoa`),
 
     "${CONDA_PREFIX}"/bin/git clone --depth 1 https://github.com/CosmoLike/cocoa.git --branch v4.0-beta25 cocoa
 
@@ -99,7 +101,7 @@ Users can now proceed to **step :two:**.
 >     "${CONDA_PREFIX}"/bin/git clone https://github.com/CosmoLike/cocoa.git cocoa
 >
 >
-> On the other hand. users who want to develop from a release version (e.g., `v4.0-beta20`) may want to read the appendix [FAQ: How do we push changes to the cocoa main branch? A few git hacks](#push_main)
+> Users who want to develop from a release version (e.g., `v4.0-beta20`) may want to read the appendix [FAQ: How do we push changes to the cocoa main branch? A few git hacks](#push_main)
 
 **Step :two:**: Run the script `setup_cocoa.sh` via
         
@@ -108,7 +110,7 @@ Users can now proceed to **step :two:**.
 This script downloads and decompresses external modules, requiring internet access to run successfully.
 
 > [!NOTE]
-> If you run `setup_cocoa.sh` multiple times, cocoa will not download previously installed packages. To overwrite this behavior, export the key `OVERWRITE_EXISTING_ALL_PACKAGES` on `set_installation_options.sh`. Even with this optimization disabled, cocoa will not download large datasets repeatedly unless the key `REDOWNLOAD_EXISTING_ALL_DATA` is also set.
+> If you run `setup_cocoa.sh` multiple times, Cocoa will not download previously installed packages. To overwrite this behavior, export the key `OVERWRITE_EXISTING_ALL_PACKAGES` on `set_installation_options.sh`. Even with this optimization disabled, Cocoa will not download large datasets repeatedly unless the key `REDOWNLOAD_EXISTING_ALL_DATA` is also set.
 
 **Step :three:**: Run the script `compile_cocoa.sh` by typing 
 
@@ -197,7 +199,7 @@ and
 
   
 > [!TIP]
-> To run Jupyter Notebook, assuming cocoa is installed on a local machine, type, after step 2️⃣, the command 
+> To run Jupyter Notebook, assuming Cocoa is installed on a local machine, type, after step 2️⃣, the command 
 > 
 >     jupyter notebook --no-browser --port=8888
 >
@@ -217,7 +219,7 @@ and
 
 ## Running Examples based on Machine Learning emulators <a name="cobaya_base_code_examples_emul"></a>
 
-Cocoa contains a few transformer-based neural network emulators capable of simulating CMB, cosmolike, matter power spectrum and distances. We provide a few scripts that exemplify their API. To run them, we assume users have commented out the following lines on `set_installation_options.sh` prior to running the `setup_cocoa.sh` and `compile_cocoa.sh` installation scripts.
+Cocoa contains a few transformer-based neural network emulators capable of simulating CMB, cosmolike, matter power spectrum, and distances. We provide a few scripts that exemplify their API. To run them, we assume users have commented out the following lines on `set_installation_options.sh` prior to running the `setup_cocoa.sh` and `compile_cocoa.sh` installation scripts.
 
       [Adapted from Cocoa/set_installation_options.sh shell script] 
       
@@ -287,10 +289,10 @@ Following best practices, Cocoa scripts download most external modules from thei
 > For those working on projects that utilize machine-learning-based emulators, the appendix [Setting-up conda environment for Machine Learning emulators](#ml_emulators) provides additional commands for installing the necessary packages.
 
 > [!TIP]
-> We provide a docker image named *whovian-cocoa* that facilitates cocoa installation on Windows and MacOS. For further instructions, refer to the appendix [FAQ: How do you run cocoa on your laptop? The docker container is named *whovian-cocoa*](#appendix_jupyter_whovian).
+> We provide a Docker image named *whovian-cocoa* that facilitates cocoa installation on Windows and MacOS. For further instructions, refer to the appendix [FAQ: How do you run Cocoa on your laptop? The Docker container is named *whovian-cocoa*](#appendix_jupyter_whovian).
 
 > [!NOTE]
-> The conda installation method should be chosen in most cases. In the rare instances in which users cannot work with Conda, refer to the appendix [Installation of Cocoa's core packages without Conda](#required_packages_cache), as it contains instructions for a much slower (and prone to errors) but conda-independent installation method.
+> The conda installation method should be chosen in most cases. In the rare instances in which users cannot work with Conda, refer to the appendix [Installation of Cocoa's core packages without Conda](#required_packages_cache), as it contains instructions for a much slower (and prone to errors) but Conda-independent installation method.
 
 - *Installation and Compilation of external modules* 
 
@@ -303,10 +305,10 @@ Following best practices, Cocoa scripts download most external modules from thei
 > `OMP_PROC_BIND=close` bound OpenMP threads to physically close cores (within the same chiplet on chiplet-based architectures).
 
 > [!NOTE]
-> Additional explanations about our `mpirun` flags: Why the `--bind-to core:overload-allowed --map-by numa:pe=${OMP_NUM_THREADS}` flag? This flag enables efficient hybrid MPI + OpenMP runs on NUMA architecture.
+> Additional explanations about our `mpirun` flags: Why the `--bind-to core:overload-allowed --map-by numa:pe=${OMP_NUM_THREADS}` flag? This flag enables efficient hybrid MPI+OpenMP runs on NUMA architecture.
 
 > [!NOTE]
-> Additional explanations about the functioning `start_cocoa.sh`/`stop_cocoa.sh` scripts: why two separate shell environments, `(cocoa)` and `(.local)`? Users should be able to manipulate multiple Cocoa instances seamlessly, which is particularly useful when running chains in one instance while experimenting with code development in another. Consistency of the environment across all Cocoa instances is crucial, and the `start_cocoa.sh`/`stop_cocoa.sh` scripts handle the loading and unloading of environmental path variables. Our scripts never install packages on `$HOME/.local` as that would make them global to the user. Instead, on each instance they are installed at
+> Additional explanations about the functioning `start_cocoa.sh`/`stop_cocoa.sh` scripts: why two separate shell environments, `(cocoa)` and `(.local)`? Users should be able to manipulate multiple Cocoa instances seamlessly, which is particularly useful when running chains in one instance while experimenting with code development in another. Consistency of the environment across all Cocoa instances is crucial, and the `start_cocoa.sh`/`stop_cocoa.sh` scripts handle the loading and unloading of environmental path variables. Our scripts never install packages on `$HOME/.local` as that would make them global to the user. Instead, on each instance, they are installed at
 >
 >      Cocoa/.local/bin
 >      Cocoa/.local/include
@@ -370,18 +372,18 @@ Following best practices, Cocoa scripts download most external modules from thei
       (...)
 
       # ------------------------------------------------------------------------------
-      # If OVERWRITE_EXISTING_XXX_CODE=1, the setup_cocoa overwrites existing PACKAGES
-      # overwrite means: delete existing PACKAGE folder and install it again ---------
-      # redownload: delete the compressed file and download data again
-      # these keys are only relevant if you run setup_cocoa multiple times -----------
+      # OVERWRITE_EXISTING_XXX_CODE=1 -> setup_cocoa overwrites existing PACKAGES ----
+      # overwrite means: delete the existing PACKAGE folder and install it again -----------
+      # redownload: delete the compressed file and download the data again ---------------
+      # These keys are only relevant if you run setup_cocoa multiple times -----------
       # ------------------------------------------------------------------------------
-      export OVERWRITE_EXISTING_ALL_PACKAGES=1
-      #export REDOWNLOAD_EXISTING_ALL_DATA=1
+       export OVERWRITE_EXISTING_ALL_PACKAGES=1 # except cosmolike projects
+       #export OVERWRITE_EXISTING_COSMOLIKE_CODE=1
+       #export REDOWNLOAD_EXISTING_ALL_DATA=1
 
- 
 Steps to debug Cocoa
 
-- The first step is to define the `COCOA_OUTPUT_VERBOSE` and `COSMOLIKE_DEBUG_MODE` flags to obtain a more detailed output. To accomplish that, we advise users to uncomment the lines below that are part of the `set_installation_options.sh` script and then restart the cocoa private environment by running `source stop_cocoa.sh; source start_cocoa.sh`
+- The first step is to define the `COCOA_OUTPUT_VERBOSE` and `COSMOLIKE_DEBUG_MODE` flags to obtain a more detailed output. To accomplish that, we advise users to uncomment the lines below that are part of the `set_installation_options.sh` script and then restart the Cocoa private environment by running `source stop_cocoa.sh; source start_cocoa.sh`
 
       [Adapted from Cocoa/set_installation_options.sh shell script] 
 
@@ -397,7 +399,7 @@ Steps to debug Cocoa
 
       (....)
 
-- The second step consists of rerunning the failed script with the verbose output set. The scripts `setup_cocoa.sh` and `compile_cocoa.sh` run many shell scripts. Users may find it advantageous to run only the routine that failed. For further information on how to do that, see the appendix [FAQ: How do we compile the Boltzmann, CosmoLike, and Likelihood codes separately](#appendix_compile_separately).
+- The second step involves rerunning the failed script with the verbose output set. The scripts `setup_cocoa.sh` and `compile_cocoa.sh` run many shell scripts, so users may find it advantageous to run only the routine that failed. For further information on how to do that, see the appendix [FAQ: How do we compile the Boltzmann, CosmoLike, and Likelihood codes separately](#appendix_compile_separately).
 
 After fixing a particular issue, users should rerun the shell scripts `setup_cocoa.sh` and `compile_cocoa.sh` to ensure all packages are installed and compiled correctly.
 
@@ -421,7 +423,7 @@ Above and below, the `$(cocoa)(.local)` emphasizes they should run after activat
      $(cocoa)(.local) source "${ROOTDIR:?}"/installation_scripts/setup_polychord.sh
      $(cocoa)(.local) source "${ROOTDIR:?}"/installation_scripts/setup_cobaya.sh
 
-To ensure these scripts can download and install these packages, users must be sure that the environment keys below are *NOT* set. These keys are shown on `set_installation_options.sh`. The command `unset -v` unset them. 
+To ensure these scripts can download and install these packages, users must be sure that the environment keys below are *NOT* set. These keys are shown on `set_installation_options.sh`. The command `unset -v` unsets them. 
       
      unset -v IGNORE_CAMB_CODE
      unset -v IGNORE_CLASS_CODE
@@ -459,7 +461,7 @@ To ensure these scripts can download these datasets, users must be sure that the
 
 ### :interrobang: FAQ: How do we run cocoa on a laptop? The docker image named *whovian-cocoa* <a name="appendix_jupyter_whovian"></a>
 
-We provide the docker image [whovian-cocoa](https://hub.docker.com/r/vivianmiranda/whovian-cocoa) to facilitate the installation of Cocoa on Windows and MacOS. This appendix assumes users already have the docker engine installed on their local PC. For instructions on installing the docker engine in specific operating systems, please refer to [Docker's official documentation](https://docs.docker.com/engine/install/). 
+We provide the Docker image [whovian-cocoa](https://hub.docker.com/r/vivianmiranda/whovian-cocoa) to facilitate the installation of Cocoa on Windows and macOS. This appendix assumes that users already have the Docker Engine installed on their local PC. For instructions on installing the Docker engine on specific operating systems, please refer to [Docker's official documentation](https://docs.docker.com/engine/install/). 
 
  **Step :one:**: Create a folder and go to the location on the host computer where you want to provide access to the Docker container, as shown below. 
 
@@ -467,7 +469,7 @@ We provide the docker image [whovian-cocoa](https://hub.docker.com/r/vivianmiran
      cd ./cocoa_docker
 
 > [!NOTE]
-> The flag `-v $(pwd):/home/whovian/host/` in the `docker run` command ensures that files on the host computer have been mounted to the directory `/home/whovian/host/`. Files within the folder where the Docker container was initialized are accessible at `/home/Whovian/host/`. Users should work inside this directory to avoid losing work if the docker image needs to be deleted.
+> The flag `-v $(pwd):/home/whovian/host/` in the `docker run` command ensures that files on the host computer have been mounted to the directory `/home/whovian/host/`. Files within the folder where the Docker container was initialized are accessible at `/home/Whovian/host/`. Users should work inside this directory to avoid losing work if the Docker image needs to be deleted.
 
 > [!WARNING]
 >  Do not run the Docker container on a general folder (like the host's home directory); this would provide too much access to the Docker container. Accidents happen, especially when dealing with dangerous bash commands such as `rm` (deletion).
@@ -493,7 +495,7 @@ Following the command above, users should see the following text on the screen t
 
 Now proceed with the standard cocoa installation in section [Installation and Compilation of external modules](#cobaya_base_code)
  
-Once installation is complete, the user must learn how to **start**, use, and **exit** the container. Below, we answer a few common questions about using/managing Docker containers.  
+Once installation is complete, the user must learn how to **start**, use, and **exit** the container. Below, we address a few common questions about using and managing Docker containers.  
 
 > [!TIP]
 > Assuming the user maintained the container name `cocoa2023` via the flag `--name cocoa2023` on the `docker run` command, type:
@@ -536,7 +538,7 @@ Below, we list users' most common issues when installing Cocoa conda environment
 
 - :interrobang: **Conda command not found**.
   
-Anaconda is not usually set by default on HPC environments but may be available as a module. For example, on the Midway HPC cluster, it can be loaded using the command below.
+Anaconda is not usually set by default on HPC environments, but may be available as a module. For example, on the Midway HPC cluster, it can be loaded using the command below.
 
     module load Anaconda3/2022.10
 
@@ -550,11 +552,11 @@ to show all modules with names that start with `An`. The output should resemble 
 
 - :interrobang: **Installation seems to take forever**.
 
-There are various reasons why installing the Cocoa conda environment may take a long time. Here is a checklist of good practices to overcome this problem.
+There are various reasons why installing the Cocoa conda environment may take a long time. Here is a checklist of best practices to troubleshoot installation.
 
 :one: *Never install conda environments using the login node*. 
 
-Instead, request an interactive job with a few cores. However, users must know that **some supercomputers do not provide internet access on computing nodes**. Ask the HPC staff for a **queue dedicated to installing and compiling code**; it should exist in a well-designed HPC environment.
+Instead, request an interactive job with a few cores. However, users should be aware that **some supercomputers do not provide internet access on computing nodes**. Ask the HPC staff for a **queue dedicated to installing and compiling code**; it should exist in a well-designed HPC environment.
 
 - :interrobang: **Conda installation is interrupted due to quota limitations**.
 
@@ -1029,7 +1031,7 @@ and
 
     mpirun -n 1 --oversubscribe --mca pml ^ucx --mca btl vader,tcp,self --bind-to core:overload-allowed --rank-by slot --map-by numa:pe=${OMP_NUM_THREADS} cobaya-run ./projects/XXX/EXAMPLE_EVALUATE1.yaml -f
 
-If users want to make a particular cosmolike project widely available in cocoa, implement the following steps:
+If users want to make a particular cosmolike project widely available in Cocoa, implement the following steps:
 
 **Step :one:**: Add the following env keys on `set_installation_options.sh`
 
@@ -1051,7 +1053,7 @@ If users want to make a particular cosmolike project widely available in cocoa, 
 
     unset -v XXX_URL XXX_NAME XXX_COMMIT IGNORE_COSMOLIKE_XXX_CODE
 
-This will ensure that `stop_cocoa.sh` unsets them before exiting Cocoa
+This will ensure that `stop_cocoa.sh` unsets them before exiting Cocoa.
 
 **Step :three:** Add and adapt the following block to `setup_cosmolike_projects.sh`.
 
@@ -1073,7 +1075,13 @@ This will ensure that `stop_cocoa.sh` unsets them before exiting Cocoa
 >      "${ROOTDIR:?}"/installation_scripts/setup_cosmolike_projects.sh
 >      "${ROOTDIR:?}"/installation_scripts/compile_all_projects.sh
 > 
-> that `setup` and `compile` all projects defined there. As a standard, we defined the project name `XXX` to be stored on a GitHub repository with the name `cocoa_XXX`. The prefix `cocoa_` helps developers on Cosmolike organization differentiate legacy Cosmolike projects from matching ones designed for Cocoa. 
+> that `setup` and `compile` all projects defined there. As a standard, we defined the project name `XXX` to be stored on a GitHub repository with the name `cocoa_XXX`. The prefix `cocoa_` helps developers in the Cosmolike organization differentiate legacy Cosmolike projects from matching ones designed for Cocoa. 
 
 > [!Warning]
 > Never delete a folder from `projects` without first running `stop_cocoa.sh`; otherwise, Cocoa will have ill-defined links.
+
+### :interrobang: FAQ: How do we add a new package to Cocoa? The Dark Emulator Example <a name="add_package_v1"></a> 
+
+
+
+

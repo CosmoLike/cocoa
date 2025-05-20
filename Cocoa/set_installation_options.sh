@@ -79,16 +79,14 @@ export IGNORE_COSMOLIKE_DES_Y3_CODE=1
 #export IGNORE_COSMOLIKE_ROMAN_REAL_CODE=1
 
 # ------------------------------------------------------------------------------
-# If OVERWRITE_EXISTING_XXX_CODE=1, the setup_cocoa overwrites existing PACKAGES
-# overwrite means: delete existing PACKAGE folder and install it again ---------
-# redownload: delete the compressed file and download data again
-# these keys are only relevant if you run setup_cocoa multiple times -----------
+# OVERWRITE_EXISTING_XXX_CODE=1 -> setup_cocoa overwrites existing PACKAGES ----
+# overwrite: delete the existing PACKAGE folder and install it again -----------
+# redownload: delete the compressed file and download data again ---------------
+# These keys are only relevant if you run setup_cocoa multiple times -----------
 # ------------------------------------------------------------------------------
-export OVERWRITE_EXISTING_ALL_PACKAGES=1
+export OVERWRITE_EXISTING_ALL_PACKAGES=1 # except cosmolike projects
 #export OVERWRITE_EXISTING_COSMOLIKE_CODE=1
 #export REDOWNLOAD_EXISTING_ALL_DATA=1
-export OVERWRITE_EXISTING_EMULTRF_CODE=1
-#export OVERWRITE_EXISTING_EMULTRF_DATA=1
 # ------------------------------------------------------------------------------
 # If set, compile_planck.sh uses click like code from github.com/benabed/clik
 # ------------------------------------------------------------------------------
