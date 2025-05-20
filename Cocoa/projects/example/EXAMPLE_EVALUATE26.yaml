@@ -1,0 +1,109 @@
+stop_at_error: false
+debug: false
+timing: true
+
+likelihood:
+  sn.pantheon:
+    path: ./external_modules/data/sn_data
+  sn.roman_c:
+    path: ./external_modules/data/sn_data
+  sn.roman_o:
+    path: ./external_modules/data/sn_data
+  bao.sixdf_2011_bao:
+    path: ./external_modules/data/
+  bao.sdss_dr7_mgs:
+    path: ./external_modules/data/
+  bao.sdss_dr12_consensus_bao:
+    path: ./external_modules/data/
+
+
+
+params:
+  logA:
+    prior:
+      min: 1.61
+      max: 3.91
+    ref:
+      dist: norm
+      loc: 3.0448
+      scale: 0.05
+    proposal: 0.05
+    latex: \log(10^{10} A_\mathrm{s})
+    drop: true
+  As:
+    value: 'lambda logA: 1e-10*np.exp(logA)'
+    latex: A_\mathrm{s}
+  ns:
+    prior:
+      min: 0.92
+      max: 1.05
+    ref:
+      dist: norm
+      loc: 0.96605
+      scale: 0.005
+    proposal: 0.005
+    latex: n_\mathrm{s}
+  H0:
+    prior:
+      min: 55
+      max: 90
+    ref:
+      dist: norm
+      loc: 67
+      scale: 2
+    proposal: 0.001
+    latex: H_0
+  omegabh2:
+    prior:
+      min: 0.01
+      max: 0.04
+    ref:
+      dist: norm
+      loc: 0.022383
+      scale: 0.005
+    proposal: 0.005
+    latex: \Omega_\mathrm{b} h^2
+  omegach2:
+    prior:
+      min: 0.06
+      max: 0.2
+    ref:
+      dist: norm
+      loc: 0.12011
+      scale: 0.03
+    proposal: 0.03
+    latex: \Omega_\mathrm{c} h^2
+  mnu:
+    value: 0.06
+
+  rdrag:
+    latex: r_\mathrm{drag}
+
+theory:
+  emulbaores:
+    path: ./cobaya/cobaya/theories/
+    stop_at_error: True
+    extra_args:
+      # This version of the emul was not trained with CosmoRec
+      dlfilename: 'external_modules/data/emultrf/BAO_RES/chisquaredllog'
+      dlextraname: 'external_modules/data/emultrf/BAO_RES/extrainfodl.npy'
+      dltransmat: 'external_modules/data/emultrf/BAO_RES/PCAdl.npy'
+      Hfilename: 'external_modules/data/emultrf/BAO_RES/chisquareH'
+      Hextraname: 'external_modules/data/emultrf/BAO_RES/extrainfoH.npy'
+      Htransmat: 'external_modules/data/emultrf/BAO_RES/PCAH.npy'
+      rdragfilename: 'external_modules/data/emultrf/BAO_RES/rdragGP.joblib'
+      rdragextraname: 'external_modules/data/emultrf/BAO_RES/extrainfordrag.npy'
+      ordering: ['omegabh2','omegach2','H0']
+
+
+sampler:
+  evaluate:
+    override:
+      logA: 3.0448
+      ns: 0.96605
+      H0: 68
+      omegabh2: 0.022383
+      omegach2: 0.12011
+      
+
+output: ./projects/example/chains/EXAMPLE_EVALUATE1
