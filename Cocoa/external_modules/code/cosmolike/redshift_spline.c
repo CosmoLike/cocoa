@@ -418,31 +418,31 @@ double zdistr_photoz(double zz, const int nj)
   if (table == NULL || 
       fdiff(cache_redshift_nz_params_shear, redshift.random_shear))
   { 
-    if (table == NULL)
-    {
-      for (int i=0; i<MAX_SIZE_ARRAYS+1; i++) 
+    if (table == NULL) {
+      for (int i=0; i<MAX_SIZE_ARRAYS+1; i++) {
         photoz_splines[i] = NULL;
+      }
     }
 
     const int ntomo  = redshift.shear_nbin;
     const int nzbins = redshift.shear_nzbins;
 
-    if (table != NULL)  free(table);
+    if (table != NULL) {
+      free(table);
+    }
     table = (double**) malloc2d(ntomo + 2, nzbins);
     
     const double zmin = redshift.shear_zdist_zmin_all;
     const double zmax = redshift.shear_zdist_zmax_all;
     const double dz_histo = (zmax - zmin) / ((double) nzbins);  
-    for (int k=0; k<nzbins; k++) 
-    { // redshift stored at zv = table[ntomo+1]
+    for (int k=0; k<nzbins; k++) { // redshift stored at zv = table[ntomo+1]
       table[ntomo+1][k] = zmin + (k + 0.5) * dz_histo;
     }
     
     double NORM[MAX_SIZE_ARRAYS];    
     double norm = 0; 
     #pragma omp parallel for reduction( + : norm )
-    for (int i=0; i<ntomo; i++) 
-    {
+    for (int i=0; i<ntomo; i++) {
       NORM[i] = 0.0;
       for (int k=0; k<nzbins; k++) 
       {    
@@ -453,32 +453,29 @@ double zdistr_photoz(double zz, const int nj)
     }
         
     #pragma omp parallel for
-    for (int k=0; k<nzbins; k++) 
-    { 
+    for (int k=0; k<nzbins; k++) { 
       table[0][k] = 0; // store normalization in table[0][:]
-      for (int i=0; i<ntomo; i++) 
-      {
+      for (int i=0; i<ntomo; i++) {
         const double z = table[ntomo+1][k];
         table[i + 1][k] = zdistr_histo_n(z, i)/NORM[i];
         table[0][k] += table[i+1][k] * NORM[i] / norm;
       }
     }
 
-    for (int i=0; i<ntomo+1; i++) 
-    {
-      if (photoz_splines[i] != NULL) gsl_spline_free(photoz_splines[i]);
+    for (int i=0; i<ntomo+1; i++) {
+      if (photoz_splines[i] != NULL) {
+        gsl_spline_free(photoz_splines[i]);
+      }
       photoz_splines[i] = malloc_gsl_spline(nzbins);
     }
 
     #pragma omp parallel for
-    for (int i=0; i<ntomo+1; i++) 
-    {
+    for (int i=0; i<ntomo+1; i++) {
       int status = gsl_spline_init(photoz_splines[i], 
                                    table[ntomo+1], // z_v = table[ntomo+1]
                                    table[i], 
                                    nzbins);
-      if (status) 
-      {
+      if (status) {
         log_fatal(gsl_strerror(status));
         exit(1);
       }
@@ -487,27 +484,23 @@ double zdistr_photoz(double zz, const int nj)
     cache_redshift_nz_params_shear = redshift.random_shear;
   }
   
-  const int ntomo = redshift.shear_nbin;
+  const int ntomo  = redshift.shear_nbin;
   const int nzbins = redshift.shear_nzbins;
 
-  if (nj < 0 || nj > ntomo - 1) 
-  {
+  if (nj < 0 || nj > ntomo - 1) {
     log_fatal("nj = %d bin outside range (max = %d)", nj, redshift.shear_nbin);
     exit(1);
   }
-  
+
   zz = zz - nuisance.photoz[0][0][nj];
   
   double res; 
-  if (zz <= table[ntomo+1][0] || zz >= table[ntomo+1][nzbins - 1])
-  { // z_v = table[ntomo+1]
+  if (zz <= table[ntomo+1][0] || zz >= table[ntomo+1][nzbins - 1]) { // z_v = table[ntomo+1]
     res = 0.0;
   }
-  else
-  {
+  else {
     int status = gsl_spline_eval_e(photoz_splines[nj+1], zz, NULL, &res);
-    if (status) 
-    {
+    if (status) {
       log_fatal(gsl_strerror(status));
       exit(1);
     }
@@ -606,8 +599,7 @@ double pf_histo_n(double z, const int ni)
 
     const int nj = (int) floor((z - zhisto_min) / dz_histo);
     
-    if (ni < 0 || ni > ntomo - 1 || nj < 0 || nj > nzbins - 1)
-    {
+    if (ni < 0 || ni > ntomo - 1 || nj < 0 || nj > nzbins - 1) {
       log_fatal("invalid bin input (zbin = ni, bin = nj) = (%d, %d)", ni, nj);
       exit(1);
     } 

@@ -16,7 +16,7 @@ fi
 # ------------------------------------------------------------------------------
 # VERBOSE AS DEBUG TOOL --------------------------------------------------------
 # ------------------------------------------------------------------------------
-#export COCOA_OUTPUT_VERBOSE=1
+export COCOA_OUTPUT_VERBOSE=1
 
 # ------------------------------------------------------------------------------
 # If set, COSMOLIKE will compile with DEBUG flags ------------------------------
@@ -75,8 +75,8 @@ export IGNORE_COSMOPOWER_CODE=1
 # ------------------------------------------------------------------------------
 #export IGNORE_COSMOLIKE_LSSTY1_CODE=1
 export IGNORE_COSMOLIKE_DES_Y3_CODE=1
-#export IGNORE_COSMOLIKE_ROMAN_FOURIER_CODE=1
-#export IGNORE_COSMOLIKE_ROMAN_REAL_CODE=1
+export IGNORE_COSMOLIKE_ROMAN_FOURIER_CODE=1
+export IGNORE_COSMOLIKE_ROMAN_REAL_CODE=1
 
 # ------------------------------------------------------------------------------
 # OVERWRITE_EXISTING_XXX_CODE=1 -> setup_cocoa overwrites existing PACKAGES ----
@@ -337,6 +337,7 @@ export DARKEMULATOR_GIT_COMMIT="46df5972509624e2eeadc2bf3ac528b02333a7e2"
 # --------------------------------------------------------------------
 export LSST_Y1_URL="https://github.com/CosmoLike/cocoa_lsst_y1.git"
 export LSST_Y1_NAME="lsst_y1"
+#export LSST_Y1_BRANCH="dev"
 export LSST_Y1_COMMIT="1abe548281296196dabee7b19e31c56f324eda38"
 
 export DES_Y3_URL="https://github.com/CosmoLike/cocoa_des_y3.git"

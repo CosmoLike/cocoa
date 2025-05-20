@@ -68,7 +68,7 @@ namespace cosmolike_interface
 // ---------------------------------------------------------------------------
 
 
-matrix read_table(const std::string file_name)
+arma::Mat<double> read_table(const std::string file_name)
 {
   std::ifstream input_file(file_name);
 
@@ -124,7 +124,7 @@ matrix read_table(const std::string file_name)
   // Third: Split line into words
   // --------------------------------------------------------
 
-  matrix result;
+  arma::Mat<double> result;
   size_t ncols = 0;
   
   { // first line
@@ -1330,14 +1330,14 @@ void init_probes(
 // ---------------------------------------------------------------------------
 // ---------------------------------------------------------------------------
 
-void init_lens_sample(std::string multihisto_file, const int Ntomo)
+arma::Mat<double> read_nz_sample(std::string multihisto_file, const int Ntomo)
 {
-  spdlog::debug("{}: Begins", "init_lens_sample");
+  spdlog::debug("{}: Begins", "read_nz_sample");
 
   if (!(multihisto_file.size() > 0)) {
     spdlog::critical(
         "{}: empty {} string not supported", 
-        "init_lens_sample", 
+        "read_nz_sample", 
         "multihisto_file"
       );
     exit(1);
@@ -1345,7 +1345,72 @@ void init_lens_sample(std::string multihisto_file, const int Ntomo)
   if (!(Ntomo > 0) || Ntomo > MAX_SIZE_ARRAYS) {
     spdlog::critical(
         "{}: {} = {} not supported (max = {})", 
-        "init_lens_sample", 
+        "read_nz_sample", 
+        "Ntomo", 
+        Ntomo, 
+        MAX_SIZE_ARRAYS
+      );
+    exit(1);
+  }  
+  spdlog::debug(
+      "{}: {} = {} selected.", 
+      "read_nz_sample",
+      "redshift file:", 
+      multihisto_file
+    );
+  spdlog::debug(
+      "{}: {} = {} selected.", 
+      "redshift",
+      "nbin", 
+      Ntomo
+    );
+
+  // READ THE N(Z) FILE BEGINS ------------
+  arma::Mat<double> input_table = read_table(multihisto_file);
+
+  if (!input_table.col(0).eval().is_sorted("ascend")) {
+    spdlog::critical("bad n(z) file (z vector not monotonic)");
+    exit(1);
+  }
+
+  spdlog::debug("{}: Ends", "read_nz_sample");
+
+  return input_table;
+}
+
+// ---------------------------------------------------------------------------
+// ---------------------------------------------------------------------------
+// ---------------------------------------------------------------------------
+
+void set_lens_sample_size(const int Ntomo)
+{
+  if (!(Ntomo > 0) || Ntomo > MAX_SIZE_ARRAYS) {
+    spdlog::critical(
+        "{}: {} = {} not supported (max = {})", 
+        "set_lens_sample_size", 
+        "Ntomo", 
+        Ntomo, 
+        MAX_SIZE_ARRAYS
+      );
+    exit(1);
+  }
+  redshift.clustering_photoz = 4;
+  redshift.clustering_nbin = Ntomo;
+}
+
+// ---------------------------------------------------------------------------
+// ---------------------------------------------------------------------------
+// ---------------------------------------------------------------------------
+
+void set_lens_sample(arma::Mat<double> input_table)
+{
+  spdlog::debug("{}: Begins", "set_lens_sample");
+
+  const int Ntomo = redshift.clustering_nbin;
+  if (!(Ntomo > 0) || Ntomo > MAX_SIZE_ARRAYS) {
+    spdlog::critical(
+        "{}: {} = {} not supported (max = {})", 
+        "set_lens_sample_size", 
         "Ntomo", 
         Ntomo, 
         MAX_SIZE_ARRAYS
@@ -1353,34 +1418,9 @@ void init_lens_sample(std::string multihisto_file, const int Ntomo)
     exit(1);
   }
 
-  redshift.clustering_photoz = 4;
-  redshift.clustering_nbin = Ntomo;
-  
-  spdlog::debug(
-      "{}: {} = {} selected.", 
-      "init_lens_sample",
-      "clustering_REDSHIFT_FILE", 
-      multihisto_file
-    );
-  spdlog::debug(
-      "{}: {} = {} selected.", 
-      "init_lens_sample",
-      "clustering_Nbin", 
-      Ntomo
-    );
-
-  // READ THE N(Z) FILE BEGINS ------------
-  matrix input_table = read_table(multihisto_file);
-
-  if (!input_table.col(0).eval().is_sorted("ascend")) {
-    spdlog::critical("bad n(z) file (z vector not monotonic)");
-    exit(1);
-  }
-
   int cache_update = 0;
   if (redshift.clustering_nzbins != input_table.n_rows ||
-      redshift.clustering_zdist_table == NULL)
-  {
+      redshift.clustering_zdist_table == NULL) {
     cache_update = 1;
   }
   else
@@ -1390,15 +1430,12 @@ void init_lens_sample(std::string multihisto_file, const int Ntomo)
       double** tab = redshift.clustering_zdist_table;        // alias
       double* z_v = redshift.clustering_zdist_table[Ntomo];  // alias
 
-      if (fdiff(z_v[i], input_table(i,0))) 
-      {
+      if (fdiff(z_v[i], input_table(i,0))) {
         cache_update = 1;
         break;
       }
-      for (int k=0; k<Ntomo; k++) 
-      {  
-        if (fdiff(tab[k][i], input_table(i,k+1))) 
-        {
+      for (int k=0; k<Ntomo; k++) {  
+        if (fdiff(tab[k][i], input_table(i,k+1))) {
           cache_update = 1;
           goto jump;
         }
@@ -1418,14 +1455,14 @@ void init_lens_sample(std::string multihisto_file, const int Ntomo)
     }
     redshift.clustering_zdist_table = (double**) malloc2d(Ntomo + 1, nzbins);
     
-    double** tab = redshift.clustering_zdist_table;   // alias
+    double** tab = redshift.clustering_zdist_table;        // alias
     double* z_v = redshift.clustering_zdist_table[Ntomo];  // alias
     
-    for (int i=0; i<nzbins; i++) 
-    {
+    for (int i=0; i<nzbins; i++) {
       z_v[i] = input_table(i,0);
-      for (int k=0; k<Ntomo; k++) 
+      for (int k=0; k<Ntomo; k++) {
         tab[k][i] = input_table(i,k+1);
+      }
     }
     
     redshift.clustering_zdist_zmin_all = fmax(z_v[0], 1.e-5);
@@ -1433,8 +1470,7 @@ void init_lens_sample(std::string multihisto_file, const int Ntomo)
     redshift.clustering_zdist_zmax_all = z_v[nzbins-1] + 
       (z_v[nzbins-1] - z_v[0]) / ((double) nzbins - 1.);
 
-    for (int k=0; k<Ntomo; k++) 
-    { // Set tomography bin boundaries
+    for (int k=0; k<Ntomo; k++) { // Set tomography bin boundaries
       auto nofz = input_table.col(k+1).eval();
       
       arma::uvec idx = arma::find(nofz > 0.999e-8*nofz.max());
@@ -1452,7 +1488,7 @@ void init_lens_sample(std::string multihisto_file, const int Ntomo)
       redshift.clustering_zdist_zmean[k] = zmean(k);
       spdlog::debug(
           "{}: bin {} - {} = {}.",
-          "init_lens_sample",
+          "set_lens_sample",
           k,
           "<z_s>",
           redshift.clustering_zdist_zmean[k]
@@ -1460,73 +1496,82 @@ void init_lens_sample(std::string multihisto_file, const int Ntomo)
     }
   }
 
-  spdlog::debug("{}: Ends", "init_lens_sample");
+  spdlog::debug("{}: Ends", "set_lens_sample");
 }
 
 // ---------------------------------------------------------------------------
 // ---------------------------------------------------------------------------
 // ---------------------------------------------------------------------------
 
-void init_source_sample(std::string multihisto_file, const int Ntomo)
+void init_lens_sample(std::string multihisto_file, const int Ntomo)
 {
-  spdlog::debug("{}: Begins", "init_source_sample");
+  spdlog::debug("{}: Begins", "init_lens_sample v2.0");
 
-  if (!(multihisto_file.size() > 0))
-  {
-    spdlog::critical("{}: empty {} string not supported",
-        "init_source_sample", "multihisto_file");
+  arma::Mat<double> input_table = read_nz_sample(multihisto_file, Ntomo);
+
+  set_lens_sample_size(Ntomo);
+
+  set_lens_sample(input_table);
+
+  spdlog::debug("{}: Ends", "init_lens_sample v2.0");
+}
+
+// ---------------------------------------------------------------------------
+// ---------------------------------------------------------------------------
+// ---------------------------------------------------------------------------
+
+void set_source_sample_size(const int Ntomo)
+{
+  if (!(Ntomo > 0) || Ntomo > MAX_SIZE_ARRAYS) {
+    spdlog::critical(
+        "{}: {} = {} not supported (max = {})", 
+        "set_source_sample_size", 
+        "Ntomo", 
+        Ntomo, 
+        MAX_SIZE_ARRAYS
+      );
     exit(1);
-  }
-
-  if (!(Ntomo > 0) || Ntomo > MAX_SIZE_ARRAYS)
-  {
-    spdlog::critical("{}: {} = {} not supported (max = {})",
-        "init_source_sample", "Ntomo", Ntomo, MAX_SIZE_ARRAYS);
-    exit(1);
-  }
-
+  } 
   redshift.shear_photoz = 4;
   redshift.shear_nbin = Ntomo;
-  
-  spdlog::debug("{}: tomo.shear_Npowerspectra = {}", 
-      "init_source_sample", tomo.shear_Npowerspectra);
+}
 
-  spdlog::debug("{}: {} = {} selected.", 
-      "init_source_sample", "shear_REDSHIFT_FILE", multihisto_file);
+// ---------------------------------------------------------------------------
+// ---------------------------------------------------------------------------
+// ---------------------------------------------------------------------------
 
-  spdlog::debug("{}: {} = {} selected.", 
-      "init_source_sample", "shear_Nbin", Ntomo);
+void set_source_sample(arma::Mat<double> input_table)
+{
+  spdlog::debug("{}: Begins", "set_source_sample");
 
-  // READ THE N(Z) FILE BEGINS ------------
-  matrix input_table = read_table(multihisto_file);
-  
-  if (!input_table.col(0).eval().is_sorted("ascend"))
-  {
-    spdlog::critical("bad n(z) file (z vector not monotonic)");
+  const int Ntomo = redshift.shear_nbin;
+  if (!(Ntomo > 0) || Ntomo > MAX_SIZE_ARRAYS) {
+    spdlog::critical(
+        "{}: {} = {} not supported (max = {})", 
+        "set_source_sample", 
+        "Ntomo", 
+        Ntomo, 
+        MAX_SIZE_ARRAYS
+      );
     exit(1);
-  }
+  } 
 
   int cache_update = 0;
   if (redshift.shear_nzbins != input_table.n_rows ||
-      redshift.shear_zdist_table == NULL)
-  {
+      redshift.shear_zdist_table == NULL) {
     cache_update = 1;
   }
   else
   {
     double** tab = redshift.shear_zdist_table;        // alias  
-    double* z_v = redshift.shear_zdist_table[Ntomo];  // alias
-    for (int i=0; i<redshift.shear_nzbins; i++) 
-    {
-      if (fdiff(z_v[i], input_table(i,0))) 
-      {
+    double* z_v  = redshift.shear_zdist_table[Ntomo];  // alias
+    for (int i=0; i<redshift.shear_nzbins; i++)  {
+      if (fdiff(z_v[i], input_table(i,0))) {
         cache_update = 1;
-        break;
+        goto jump;
       }
-      for (int k=0; k<Ntomo; k++) 
-      {
-        if (fdiff(tab[k][i], input_table(i,k+1))) 
-        {
+      for (int k=0; k<Ntomo; k++) {
+        if (fdiff(tab[k][i], input_table(i,k+1))) {
           cache_update = 1;
           goto jump;
         }
@@ -1541,15 +1586,14 @@ void init_source_sample(std::string multihisto_file, const int Ntomo)
     redshift.shear_nzbins = input_table.n_rows;
     const int nzbins = redshift.shear_nzbins; // alias
 
-    if (redshift.shear_zdist_table == NULL) {
+    if (redshift.shear_zdist_table != NULL) {
       free(redshift.shear_zdist_table);
     }
     redshift.shear_zdist_table = (double**) malloc2d(Ntomo + 1, nzbins);
 
     double** tab = redshift.shear_zdist_table;        // alias  
     double* z_v = redshift.shear_zdist_table[Ntomo];  // alias
-    for (int i=0; i<nzbins; i++) 
-    {
+    for (int i=0; i<nzbins; i++) {
       z_v[i] = input_table(i,0);
       for (int k=0; k<Ntomo; k++) {
         tab[k][i] = input_table(i,k+1);
@@ -1584,10 +1628,6 @@ void init_source_sample(std::string multihisto_file, const int Ntomo)
           redshift.shear_zdist_zmin[0], 
           redshift.shear_zdist_zmax[Ntomo-1]
         );
-      spdlog::critical(
-          "%s n(z) file incompatible with tomo.shear bin choice", 
-          multihisto_file
-        );
       exit(1);
     } 
 
@@ -1596,7 +1636,7 @@ void init_source_sample(std::string multihisto_file, const int Ntomo)
     for (int k=0; k<Ntomo; k++) {
       spdlog::debug(
           "{}: bin {} - {} = {}.",
-          "init_source_sample",
+          "set_source_sample",
           k,
           "<z_s>",
           zmean_source(k)
@@ -1604,6 +1644,23 @@ void init_source_sample(std::string multihisto_file, const int Ntomo)
     }
     redshift.random_shear = RandomNumber::get_instance().get();
   }
+
+  spdlog::debug("{}: Ends", "set_source_sample");
+}
+
+// ---------------------------------------------------------------------------
+// ---------------------------------------------------------------------------
+// ---------------------------------------------------------------------------
+
+void init_source_sample(std::string multihisto_file, const int Ntomo)
+{
+  spdlog::debug("{}: Begins", "init_source_sample");
+
+  arma::Mat<double> input_table = read_nz_sample(multihisto_file, Ntomo);
+
+  set_source_sample_size(Ntomo);
+
+  set_source_sample(input_table);
 
   spdlog::debug("{}: Ends", "init_source_sample");
 }
@@ -1667,6 +1724,25 @@ void init_ntomo_powerspectra()
       tomo.clustering_Npowerspectra
     );
 }
+
+// ---------------------------------------------------------------------------
+// ---------------------------------------------------------------------------
+// ---------------------------------------------------------------------------
+
+py::tuple read_redshift_distributions_from_files(
+  std::string lens_multihisto_file, const int lens_ntomo,
+  std::string source_multihisto_file, const int source_ntomo)
+{
+  arma::Mat<double> input_lens_table = 
+    read_nz_sample(lens_multihisto_file, lens_ntomo);
+
+  arma::Mat<double> input_source_table = 
+    read_nz_sample(source_multihisto_file, source_ntomo);
+
+  return py::make_tuple(carma::mat_to_arr(input_lens_table), 
+                        carma::mat_to_arr(input_source_table));
+}
+
 
 // ---------------------------------------------------------------------------
 // ---------------------------------------------------------------------------
