@@ -1095,6 +1095,18 @@ Cocoa provides a verbose but methodical method for adding packages to its enviro
      (...)
      
      # ------------------------------------------------------------------------------
+     # OVERWRITE_EXISTING_XXX_CODE=1 -> setup_cocoa overwrites existing PACKAGES ----
+     # overwrite: delete the existing PACKAGE folder and install it again -----------
+     # redownload: delete the compressed file and download data again ---------------
+     # These keys are only relevant if you run setup_cocoa multiple times -----------
+     # ------------------------------------------------------------------------------
+     export OVERWRITE_EXISTING_ALL_PACKAGES=1 # except cosmolike projects
+     #export OVERWRITE_EXISTING_COSMOLIKE_CODE=1
+     #export REDOWNLOAD_EXISTING_ALL_DATA=1
+
+     (...)
+      
+     # ------------------------------------------------------------------------------
      # These keys are only relevant if you run setup_cocoa multiple times -----------
      # ------------------------------------------------------------------------------
      if [ -n "${OVERWRITE_EXISTING_ALL_PACKAGES}" ]; then
