@@ -902,11 +902,9 @@ Finally, set the following environmental keys:
 
 ### :interrobang: FAQ: How do we push changes to the Cocoa main branch? A few git hacks <a name="push_main"></a>
 
-Until recently, Cocoa development was unstructured, and developers could push directly to the `main` branch. Small commits were not discouraged,  and such flexible development rules will soon change. Shortly, we will protect the `main` branch by requiring every push to be reviewed by Cocoa's leading developers. We also want to reduce the number of commits from now on.
+Until recently, Cocoa development was unstructured, and developers could push directly to the `main` branch. Small commits were not discouraged, but such flexible development rules will soon change. We will protect the `main` branch by requiring every push to be reviewed by Cocoa's leading developers. We aim to reduce the number of commits in the future. Our new philosophy establishes that **a commit in the main branch should contain an atomic change that takes code from one working state to another working state with meaningful and well-tested improvements.** So, developers should propose changes to the `main` branch in larger chunks (*via squash commits*), as shown below.
 
-Our new philosophy establishes that **a commit in the main branch should contain an atomic change that takes code from a working state to another working state with meaningful and well-tested improvements.** So, developers should propose changes to the `main` branch in larger chunks (*via squash commits*), as shown below.
-
-Important note: we **strongly** advise developers to use the up-to-date `git` given by Cocoa conda environment. 
+Important note: We strongly advise developers to use the up-to-date `git` provided by the Cocoa conda environment. 
 
 - :interrobang: **How to apply squash commits?**
   
@@ -1082,6 +1080,5 @@ This will ensure that `stop_cocoa.sh` unsets them before exiting Cocoa.
 
 ### :interrobang: FAQ: How do we add a new package to Cocoa? The Dark Emulator Example <a name="add_package_v1"></a> 
 
-
-
+Cocoa provides a verbose but methodical method for adding packages to its environment. Science packages that are still in development by the authors should be cloned in development mode with commit flags clearly delimited. This includes pure Python packages, which are typically installed using the pip command. Every package should have a `setup` and a `compile` script, and the' compile' script should never depend on an internet connection. As an example, we list below the steps we implemented to add the Dark Emulator package to Cocoa. 
 
