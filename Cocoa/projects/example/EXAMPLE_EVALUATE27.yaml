@@ -15,6 +15,7 @@ likelihood:
     path: ./external_modules/data/
   bao.sdss_dr12_consensus_bao:
     path: ./external_modules/data/
+  h0licow.h0licowlike: null
 
 
 
