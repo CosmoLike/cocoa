@@ -1080,5 +1080,14 @@ This will ensure that `stop_cocoa.sh` unsets them before exiting Cocoa.
 
 ### :interrobang: FAQ: How do we add a new package to Cocoa? The Dark Emulator Example <a name="add_package_v1"></a> 
 
-Cocoa provides a verbose but methodical method for adding packages to its environment. Science packages that are still in development by the authors should be cloned in development mode with commit flags clearly delimited. This includes pure Python packages, which are typically installed using the pip command. Every package should have a `setup` and a `compile` script, and the' compile' script should never depend on an internet connection. As an example, we list below the steps we implemented to add the Dark Emulator package to Cocoa. 
+Cocoa provides a verbose but methodical method for adding packages to its environment. Science packages still being developed by the authors should be cloned in development mode with commit flags specified. This includes pure Python packages typically installed using the generic pip command. Every package should have a `setup` and a `compile` script; the' compile' script should never depend on an internet connection. As an example, we list below the steps we implemented to add the Dark Emulator package to Cocoa. 
 
+**Step :one:**: Add the env keys below on `set_installation_options.sh` that point to the git repository and commit of the package
+
+     [adapted from ${ROOTDIR:?}/set_installation_options.sh script]
+     (...) 
+     
+     export DARKEMULATOR_URL="https://github.com/DarkQuestCosmology/dark_emulator_public.git"
+     export DARKEMULATOR_GIT_COMMIT="46df5972509624e2eeadc2bf3ac528b02333a7e2"
+
+     
