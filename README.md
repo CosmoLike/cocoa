@@ -1090,7 +1090,7 @@ Cocoa provides a verbose but methodical method for adding packages to its enviro
      # The keys below control which packages will be installed and compiled  
      # ------------------------------------------------------------------------------
      (...)
-     export IGNORE_DARK_EMULATOR_CODE=1  # key number one
+     export IGNORE_DARK_EMULATOR_CODE=1                       # key number one
      
      (...)
      
@@ -1098,8 +1098,8 @@ Cocoa provides a verbose but methodical method for adding packages to its enviro
      # These keys are only relevant if you run setup_cocoa multiple times -----------
      # ------------------------------------------------------------------------------
      if [ -n "${OVERWRITE_EXISTING_ALL_PACKAGES}" ]; then
-          (...)
-	  export OVERWRITE_EXISTING_DARK_EMULATOR_CODE=1 # key number two
+         (...)
+         export OVERWRITE_EXISTING_DARK_EMULATOR_CODE=1      # key number two
      fi
      
      (...)
@@ -1107,8 +1107,9 @@ Cocoa provides a verbose but methodical method for adding packages to its enviro
      # ------------------------------------------------------------------------------
      # PACKAGE URL AND VERSIONS. CHANGES IN THE COMMIT ID MAY BREAK COCOA -----------
      # ------------------------------------------------------------------------------
+     (...)
      export DARKEMULATOR_URL="https://github.com/DarkQuestCosmology/dark_emulator_public.git" # key number three
-     export DARKEMULATOR_GIT_COMMIT="46df5972509624e2eeadc2bf3ac528b02333a7e2".            # key number four
-     export DARKEMULATOR_NAME="dark_emulator"                                                                                # key number five
+     export DARKEMULATOR_GIT_COMMIT="46df5972509624e2eeadc2bf3ac528b02333a7e2".               # key number four
+     export DARKEMULATOR_NAME="dark_emulator"                                                 # key number five
 
      
