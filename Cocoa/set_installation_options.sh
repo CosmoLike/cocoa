@@ -86,6 +86,8 @@ export IGNORE_COSMOLIKE_ROMAN_REAL_CODE=1
 # ------------------------------------------------------------------------------
 export OVERWRITE_EXISTING_ALL_PACKAGES=1    # except cosmolike projects
 #export OVERWRITE_EXISTING_COSMOLIKE_CODE=1 # dangerous (possible lost of uncommit work)
+                                            # if unset, users must manually delete
+                                            # project if wants setup_cocoa to reclone it
 #export REDOWNLOAD_EXISTING_ALL_DATA=1      # warning: some data are many GB
 
 # ------------------------------------------------------------------------------
@@ -338,22 +340,39 @@ export DARKEMULATOR_GIT_COMMIT="46df5972509624e2eeadc2bf3ac528b02333a7e2"
 # --------------------------------------------------------------------
 export LSST_Y1_URL="https://github.com/CosmoLike/cocoa_lsst_y1.git"
 export LSST_Y1_NAME="lsst_y1"
+#BRANCH: if unset, load the latest commit on the specified branch
 #export LSST_Y1_BRANCH="dev"
+#COMMIT: if unset, load the specified commit
 export LSST_Y1_COMMIT="1abe548281296196dabee7b19e31c56f324eda38"
+#BRANCH: if unset, load the specified TAG
+#export LSST_Y1_TAG="v4.0-beta17"
 
 export DES_Y3_URL="https://github.com/CosmoLike/cocoa_des_y3.git"
 export DES_Y3_NAME="des_y3"
+#BRANCH: if unset, load the latest commit on the specified branch
 #export DES_Y3_BRANCH="main"
+#COMMIT: if unset, load the specified commit
 #export DES_Y3_COMMIT="2d7e05944bf9c4724dcb5407e7cb76c992993807"
+#BRANCH: if unset, load the specified TAG
 export DES_Y3_TAG="v4.0-beta17"
 
 export ROMAN_FOURIER_URL="https://github.com/CosmoLike/cocoa_roman_fourier.git"
 export ROMAN_FOURIER_NAME="roman_fourier"
+#BRANCH: if unset, load the latest commit on the specified branch
+#export ROMAN_FOURIER_BRANCH="main"
+#COMMIT: if unset, load the specified commit
 export ROMAN_FOURIER_COMMIT="282e1d222a1827e02d7c04faa94939a4520640ac"
+#BRANCH: if unset, load the specified TAG
+#export ROMAN_FOURIER_TAG="v4.0-beta17"
 
 export ROMAN_REAL_URL="https://github.com/CosmoLike/cocoa_roman_real.git"
 export ROMAN_REAL_NAME="roman_real"
+#BRANCH: if unset, load the latest commit on the specified branch
+#export ROMAN_REAL_BRANCH="main"
+#COMMIT: if unset, load the specified commit
 export ROMAN_REAL_COMMIT="a5cf62ffcec7b862dda5bf343bf6bb19124bb5d0"
+#BRANCH: if unset, load the specified TAG
+#export ROMAN_REAL_TAG="v4.0-beta17"
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
