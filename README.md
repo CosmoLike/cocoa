@@ -227,7 +227,10 @@ and
 > and
 > 
 >       source ./installation_scripts/compile_all_projects.sh
-
+>
+> or in case users just want to compile a single project (let's say the `roman_real` project)
+>
+>       source ./projects/roman_real/scripts/compile_roman_real.sh
   
 > [!TIP]
 > To run Jupyter Notebook, assuming Cocoa is installed on a local machine, type, after step 2️⃣, the command 
