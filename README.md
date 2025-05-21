@@ -213,7 +213,7 @@ and
 >     #export ROMAN_REAL_BRANCH="dev"
 >     #COMMIT: if unset, load the specified commit
 >     export ROMAN_REAL_COMMIT="a5cf62ffcec7b862dda5bf343bf6bb19124bb5d0"
->     #BRANCH: if unset, load the specified TAG
+>     #TAG: if unset, load the specified TAG
 >     #export ROMAN_REAL_TAG="v4.0-beta17"
 > 
 > If users comment these lines (unsetting the corresponding IGNORE keys) after running `setup_cocoa.sh` and `compile_cocoa.sh`, there is no need to rerun these general scripts, which would reinstall many packages (slow). Instead, run the following three commands:
