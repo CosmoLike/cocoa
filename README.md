@@ -377,9 +377,9 @@ Following best practices, Cocoa scripts download most external modules from thei
       # redownload: delete the compressed file and download the data again ---------------
       # These keys are only relevant if you run setup_cocoa multiple times -----------
       # ------------------------------------------------------------------------------
-       export OVERWRITE_EXISTING_ALL_PACKAGES=1 # except cosmolike projects
-       #export OVERWRITE_EXISTING_COSMOLIKE_CODE=1
-       #export REDOWNLOAD_EXISTING_ALL_DATA=1
+       export OVERWRITE_EXISTING_ALL_PACKAGES=1      # except cosmolike projects
+       #export OVERWRITE_EXISTING_COSMOLIKE_CODE=1   # dangerous (possible lost of uncommit work)
+       #export REDOWNLOAD_EXISTING_ALL_DATA=1        # warning: some data are many GB
 
 Steps to debug Cocoa
 
