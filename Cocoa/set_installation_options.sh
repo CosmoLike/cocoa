@@ -84,9 +84,10 @@ export IGNORE_COSMOLIKE_ROMAN_REAL_CODE=1
 # redownload: delete the compressed file and download data again ---------------
 # These keys are only relevant if you run setup_cocoa multiple times -----------
 # ------------------------------------------------------------------------------
-export OVERWRITE_EXISTING_ALL_PACKAGES=1 # except cosmolike projects
-#export OVERWRITE_EXISTING_COSMOLIKE_CODE=1
-#export REDOWNLOAD_EXISTING_ALL_DATA=1
+export OVERWRITE_EXISTING_ALL_PACKAGES=1    # except cosmolike projects
+#export OVERWRITE_EXISTING_COSMOLIKE_CODE=1 # dangerous (possible lost of uncommit work)
+#export REDOWNLOAD_EXISTING_ALL_DATA=1      # warning: some data are many GB
+
 # ------------------------------------------------------------------------------
 # If set, compile_planck.sh uses click like code from github.com/benabed/clik
 # ------------------------------------------------------------------------------
