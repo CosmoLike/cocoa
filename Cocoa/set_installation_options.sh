@@ -295,8 +295,10 @@ export SO_MFLIKE_GIT_COMMIT="531267e8f046f72ddc5fe4ff88432871ad8c9cfd"
 export SO_SYSLIB_URL="https://github.com/simonsobs/syslibrary.git"
 export SO_SYSLIB_GIT_COMMIT="2471df981053a7526a441d2547eb8dde10d92f70"
 
-export EE2_URL="https://github.com/miknab/EuclidEmulator2.git"
-export EE2_GIT_COMMIT="ff59f6683069417f6b4d2fb5d59197044d424445"
+export EE2_URL="https://github.com/vivianmiranda/EuclidEmulator2.git"
+export EE2_GIT_COMMIT="ec75557b7cfa3ca96b26e5e39b1881ae70826a0a"
+# THIS GIT IS FOR THE ORIGNIAL EE2 BEFORE VM MODS
+#export EE2_GIT_COMMIT="ff59f6683069417f6b4d2fb5d59197044d424445"
 export EE2_NAME="euclidemu2"
 
 export HYREC_URL="https://github.com/nanoomlee/HYREC-2.git"
@@ -335,7 +337,7 @@ export DARKEMULATOR_GIT_COMMIT="46df5972509624e2eeadc2bf3ac528b02333a7e2"
 
 # --------------------------------------------------------------------
 # --------------------------------------------------------------------
-# Cosmolike projects below
+# Cosmolike projects below -------------------------------------------
 # --------------------------------------------------------------------
 # --------------------------------------------------------------------
 export LSST_Y1_URL="https://github.com/CosmoLike/cocoa_lsst_y1.git"

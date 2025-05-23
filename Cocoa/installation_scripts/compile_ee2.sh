@@ -57,8 +57,9 @@ if [ -z "${IGNORE_EUCLID_EMULATOR_V2_CODE}" ]; then
   # ---------------------------------------------------------------------------
   rm -rf "${PACKDIR:?}/build/"
   rm -rf "${PACKDIR:?}/euclidemu2.egg-info/"
-  rm -rf  "${PLIB:?}"/euclidemu2
-  rm -rf  "${PLIB:?}"/euclidemu2-*
+  rm -rf "${PLIB:?}"/euclidemu2
+  rm -rf "${PLIB:?}"/euclidemu2-*
+  rm -rf "${PLIB:?}"/euclidemu2.cpython*
   # ---------------------------------------------------------------------------  
  
   cdfolder "${PACKDIR}" || return 1
