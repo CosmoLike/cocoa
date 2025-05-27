@@ -191,7 +191,7 @@ if [[ -z "${IGNORE_EMULTRF_CODE}" ]]; then
   fi
 
   TMP="${EMULTRF_NAME:-"emultrf"}"
-  TMP2="emulbaores"
+  TMP2="emulbaosnres"
 
   if [[ ! -L "${COBTH:?}/${TMP2}" ]]; then
     ln -s "${ECODEF:?}/emulators/${TMP}/${TMP2}" "${COBTH:?}" \

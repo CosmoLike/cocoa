@@ -145,7 +145,7 @@ if [[ -z "${IGNORE_EMULTRF_CODE}" ]]; then
     rm -f "${COBTH:?}/${TMP:?}"
   fi
 
-  TMP="emulbaores"
+  TMP="emulbaosnres"
   if [[ -L "${COBTH:?}/${TMP:?}" ]]; then
     rm -f "${COBTH:?}/${TMP:?}"
   fi

@@ -32,7 +32,7 @@ export IGNORE_BICEP_CMB_DATA=1
 # export IGNORE_HOLICOW_STRONG_LENSING_DATA=1
 #export IGNORE_SN_DATA=1
 export IGNORE_SPT_CMB_DATA=1
-export IGNORE_SIMONS_OBSERVATORY_CMB_DATA=1
+#export IGNORE_SIMONS_OBSERVATORY_CMB_DATA=1
 #export IGNORE_PLANCK_CMB_DATA=1
 export IGNORE_CAMSPEC_CMB_DATA=1
 export IGNORE_LIPOP_CMB_DATA=1
@@ -56,7 +56,7 @@ export IGNORE_ACTDR4_CODE=1
 export IGNORE_ACTDR6_CODE=1
 export IGNORE_CPP_CUBA_INSTALLATION=1
 export IGNORE_VELOCILEPTORS_CODE=1
-export IGNORE_SIMONS_OBSERVATORY_LIKELIHOOD_CODE=1
+#export IGNORE_SIMONS_OBSERVATORY_LIKELIHOOD_CODE=1
 export IGNORE_CAMSPEC_LIKELIHOOD_CODE=1
 export IGNORE_LIPOP_LIKELIHOOD_CODE=1
 export IGNORE_HYREC_CODE=1
@@ -65,6 +65,7 @@ export IGNORE_MGCAMB_CODE=1
 #export IGNORE_EMULTRF_CODE=1 #SaraivanovZhongZhu (SZZ) transformer-based emul
 export IGNORE_COSMOPOWER_CODE=1
 #export IGNORE_EUCLID_EMULATOR_V2_CODE=1
+export IGNORE_DARK_EMULATOR_CODE=1
 
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
@@ -204,6 +205,7 @@ if [ -n "${OVERWRITE_EXISTING_ALL_PACKAGES}" ]; then
   export OVERWRITE_EXISTING_HOLICOW_DATA=1
   export OVERWRITE_EXISTING_COSMOPOWER_CODE=1
   export OVERWRITE_EXISTING_EMULTRF_CODE=1
+  export OVERWRITE_EXISTING_DARK_EMULATOR_CODE=1
 fi
 
 if [ -n "${REDOWNLOAD_EXISTING_ALL_DATA}" ]; then
@@ -327,10 +329,10 @@ export COSMOPOWER_URL_DATA="https://github.com/cosmopower-organization/jense_202
 export COSMOPOWER_URL_DATA_COMMIT="4317635eed70289ee1ec6b3df828027173071e36"
 
 export EMULTRF_URL="https://github.com/CosmoLike/emulators_code.git"
-export EMULTRF_GIT_COMMIT="af76aff58cf88569845d33a0ae11bdf5cd33eeb6"
+export EMULTRF_GIT_COMMIT="d560e3780e4548994478077a377b4c109600a18d"
 
 export EMULTRF_DATA_URL="https://github.com/CosmoLike/emulators_data.git"
-export EMULTRF_DATA_GIT_COMMIT="d7bf378a811fafb698f41083a40ac327eb7da003"
+export EMULTRF_DATA_GIT_COMMIT="f5241924c587cf683c73972034847f4f1cff34c3"
 
 export DARKEMULATOR_URL="https://github.com/DarkQuestCosmology/dark_emulator_public.git"
 export DARKEMULATOR_GIT_COMMIT="46df5972509624e2eeadc2bf3ac528b02333a7e2"
