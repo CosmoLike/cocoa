@@ -37,7 +37,7 @@ export IGNORE_SIMONS_OBSERVATORY_CMB_DATA=1
 export IGNORE_CAMSPEC_CMB_DATA=1
 export IGNORE_LIPOP_CMB_DATA=1
 export IGNORE_COSMOPOWER_DATA=1
-export IGNORE_EMULTRF_DATA=1 #SaraivanovZhongZhu (SZZ) transformer-based emul
+#export IGNORE_EMULTRF_DATA=1 #SaraivanovZhongZhu (SZZ) transformer-based emul
 
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
@@ -62,7 +62,7 @@ export IGNORE_LIPOP_LIKELIHOOD_CODE=1
 export IGNORE_HYREC_CODE=1
 export IGNORE_COSMOREC_CODE=1
 export IGNORE_MGCAMB_CODE=1
-export IGNORE_EMULTRF_CODE=1 #SaraivanovZhongZhu (SZZ) transformer-based emul
+#export IGNORE_EMULTRF_CODE=1 #SaraivanovZhongZhu (SZZ) transformer-based emul
 export IGNORE_COSMOPOWER_CODE=1
 #export IGNORE_EUCLID_EMULATOR_V2_CODE=1
 
@@ -296,7 +296,7 @@ export SO_SYSLIB_URL="https://github.com/simonsobs/syslibrary.git"
 export SO_SYSLIB_GIT_COMMIT="2471df981053a7526a441d2547eb8dde10d92f70"
 
 export EE2_URL="https://github.com/vivianmiranda/EuclidEmulator2.git"
-export EE2_GIT_COMMIT="ec75557b7cfa3ca96b26e5e39b1881ae70826a0a"
+export EE2_GIT_COMMIT="8ab43c83beb1cf574d48f87be3ac5d6d39755666"
 # THIS GIT IS FOR THE ORIGNIAL EE2 BEFORE VM MODS
 #export EE2_GIT_COMMIT="ff59f6683069417f6b4d2fb5d59197044d424445"
 export EE2_NAME="euclidemu2"
@@ -327,10 +327,10 @@ export COSMOPOWER_URL_DATA="https://github.com/cosmopower-organization/jense_202
 export COSMOPOWER_URL_DATA_COMMIT="4317635eed70289ee1ec6b3df828027173071e36"
 
 export EMULTRF_URL="https://github.com/CosmoLike/emulators_code.git"
-export EMULTRF_GIT_COMMIT="29f9265cd5493d480998d3bcf4c55fbb9a0da914"
+export EMULTRF_GIT_COMMIT="af76aff58cf88569845d33a0ae11bdf5cd33eeb6"
 
 export EMULTRF_DATA_URL="https://github.com/CosmoLike/emulators_data.git"
-export EMULTRF_DATA_GIT_COMMIT="7d7085241486809b8b765bf58e6e2b437bc2e406"
+export EMULTRF_DATA_GIT_COMMIT="d7bf378a811fafb698f41083a40ac327eb7da003"
 
 export DARKEMULATOR_URL="https://github.com/DarkQuestCosmology/dark_emulator_public.git"
 export DARKEMULATOR_GIT_COMMIT="46df5972509624e2eeadc2bf3ac528b02333a7e2"

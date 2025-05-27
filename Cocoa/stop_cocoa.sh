@@ -145,6 +145,16 @@ if [[ -z "${IGNORE_EMULTRF_CODE}" ]]; then
     rm -f "${COBTH:?}/${TMP:?}"
   fi
 
+  TMP="emulbaores"
+  if [[ -L "${COBTH:?}/${TMP:?}" ]]; then
+    rm -f "${COBTH:?}/${TMP:?}"
+  fi
+
+  TMP="emulsnres"
+  if [[ -L "${COBTH:?}/${TMP:?}" ]]; then
+    rm -f "${COBTH:?}/${TMP:?}"
+  fi
+  
   unset -v COBTH TMP
 fi
 
