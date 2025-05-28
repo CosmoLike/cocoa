@@ -1,0 +1,24 @@
+--- model.py	2025-05-27 20:38:20.678271937 -0400
++++ model2.py	2025-05-27 20:38:51.318644877 -0400
+@@ -1011,10 +1011,17 @@
+             # Check that there is only one non-knowledgeable element, and assign
+             # unused params
+             if len(agnostic_likes) > 1 and not all(assign.values()):
+-                raise LoggedError(
+-                    self.log, "More than one parameter-agnostic likelihood/theory "
+-                              "with respect to %s: %r. Cannot decide "
+-                              "parameter assignments.", option, agnostic_likes)
++                #VM BEGINS (ALLOW MULTIPLE EMULATORS AS THEORY)
++                #raise LoggedError(
++                #    self.log, "More than one parameter-agnostic likelihood/theory "
++                #              "with respect to %s: %r. Cannot decide "
++                #              "parameter assignments.", option, agnostic_likes)
++                for i in range(len(agnostic_likes)):
++                    component = agnostic_likes[i]
++                    for p, assigned in assign.items():
++                        #if not assigned:
++                        assign[p] += [component]
++                #VM ENDS
+             elif agnostic_likes:  # if there is only one
+                 component = agnostic_likes[0]
+                 for p, assigned in assign.items():
