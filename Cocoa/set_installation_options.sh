@@ -329,7 +329,7 @@ export COSMOPOWER_URL_DATA="https://github.com/cosmopower-organization/jense_202
 export COSMOPOWER_URL_DATA_COMMIT="4317635eed70289ee1ec6b3df828027173071e36"
 
 export EMULTRF_URL="https://github.com/CosmoLike/emulators_code.git"
-export EMULTRF_GIT_COMMIT="d560e3780e4548994478077a377b4c109600a18d"
+export EMULTRF_GIT_COMMIT="6023e5624ec21e1b3c9cda48075bcf4296a2d871"
 
 export EMULTRF_DATA_URL="https://github.com/CosmoLike/emulators_data.git"
 export EMULTRF_DATA_GIT_COMMIT="f5241924c587cf683c73972034847f4f1cff34c3"
