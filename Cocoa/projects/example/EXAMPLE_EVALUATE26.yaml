@@ -142,7 +142,6 @@ params:
     value: 'lambda w0pwa, w: w0pwa - w'
     derived: false
     latex: w_{a,\mathrm{DE}}
-  
     
 theory:
   emulcmbtrf:
