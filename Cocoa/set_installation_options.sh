@@ -374,7 +374,7 @@ export ROMAN_REAL_NAME="roman_real"
 #BRANCH: if unset, load the latest commit on the specified branch
 #export ROMAN_REAL_BRANCH="main"
 #COMMIT: if unset, load the specified commit
-export ROMAN_REAL_COMMIT="a5cf62ffcec7b862dda5bf343bf6bb19124bb5d0"
+export ROMAN_REAL_COMMIT="a627af5b1a403b270de3d6825643a8c95b48a2a5"
 #BRANCH: if unset, load the specified TAG
 #export ROMAN_REAL_TAG="v4.0-beta17"
 # ------------------------------------------------------------------------------
