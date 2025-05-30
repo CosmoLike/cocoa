@@ -119,7 +119,7 @@ This script downloads and decompresses external modules, requiring internet acce
 This script compiles external modules selected for installation on `set_installation_options.sh` (e.g., CAMB and Class). Cocoa does not install many external modules by default, but users may find them helpful in a particular project. In this case, check the many available options on the `set_installation_options.sh` shell script. Then, rerun steps :two: and :three:. 
 
 > [!NOTE]
-> In some HPC environments, the compute nodes cannot access the web. So, by design, the script `compile_cocoa.sh` does not require internet access to run successfully. Code compilation is a CPU-intensive operation, so running  `compile_cocoa.sh` on a cluster login node can be against HPC policy. Users should then run `setup_cocoa.sh` in a login node and `compile_cocoa.sh` in a compute node.
+> In some HPC environments, the compute nodes cannot access the web. So, by design, the script `compile_cocoa.sh` does not require internet access to run successfully. Code compilation is a CPU-intensive operation; therefore, running  `compile_cocoa.sh` on a cluster login node can be against HPC policy. Users should then run `setup_cocoa.sh` in a login node and `compile_cocoa.sh` in a compute node.
 
 ## Running Examples  <a name="cobaya_base_code_examples"></a>
 
@@ -259,13 +259,36 @@ Cocoa contains a few transformer-based neural network emulators capable of simul
       
       # inset # symbol in the lines below (i.e., unset these environmental keys)
       #export IGNORE_EMULTRF_CODE=1  #SaraivanovZhongZhu (SZZ) transformer-based emul
-      #export IGNORE_EMULTRF_DATA=1  #SaraivanovZhongZhu (SZZ) transformer-based emul
+      #export IGNORE_EMULTRF_DATA=1   #SaraivanovZhongZhu (SZZ) transformer-based emul
+      
+      #export IGNORE_SIMONS_OBSERVATORY_LIKELIHOOD_CODE=1    # to run EXAMPLE_EVALUATE26.yaml
+      #export IGNORE_SIMONS_OBSERVATORY_CMB_DATA=1.                  # to run EXAMPLE_EVALUATE26.yaml
+
+> [!NOTE]
+> What if users forget to unset these keys prior to running `setup_cocoa.sh` and `compile_cocoa.sh` installation scripts?
+> Running `setup_cocoa.sh` and `compile_cocoa.sh` again can take a long time. Instead, run the following commands
+>
+>      source start_cocoa.sh      # even if (.local) is already active, users must run start_cocoa.sh again to update key values
+> 
+> and
+>
+>      source ./installation_scripts/setup_pip_core_packages.sh     # install pip packages required by ML emulators
+>      source ./installation_scripts/setup_emultrf.sh	                        # download emulator codes
+>      source ./installation_scripts/unxv_emultrf.sh			                # download pre-trained emulators
+>
+> and
+>
+>      source ./installation_scripts/setup_simons_observatory.sh       # download Simons Observatory Likelihood code (to run EXAMPLE_EVALUATE26.yaml)
+>      source ./installation_scripts/unxv_simons_observatory.sh        # download Simons Observatory Likelihood data  (to run EXAMPLE_EVALUATE26.yaml)
+>      source ./installation_scripts/compile_simons_observatory.sh   # compile Simons Observatory Lkelihood code     (to run EXAMPLE_EVALUATE26.yaml)
+ 
+Now follow all the steps below, including step :one: (users will neeed to run `start_cocoa.sh` once more so Cocoa can create appropriate symlinks).
 
  **Step :one:**: Activate the private Python environment by sourcing the script `start_cocoa.sh`
 
     source start_cocoa.sh
 
- **Step :two:**: Select the number of OpenMP cores (no need to thread via OpenMP).
+ **Step :two:**: Select the number of OpenMP cores (no need to thread via OpenMP; however, `OMP_NUM_THREADS=3` reduces emulator runtime ~x2).
     
     export OMP_PROC_BIND=close; export OMP_NUM_THREADS=1
 
