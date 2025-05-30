@@ -2,6 +2,10 @@
 #include <armadillo>
 #include <map>
 
+// Python Binding
+#include <pybind11/pybind11.h>
+#include <pybind11/pytypes.h>
+
 #ifndef __COSMOLIKE_GENERIC_INTERFACE_HPP
 #define __COSMOLIKE_GENERIC_INTERFACE_HPP
 
@@ -506,6 +510,13 @@ void init_probes(
 
 void initial_setup();
 
+py::tuple read_redshift_distributions_from_files(
+    std::string lens_multihisto_file, 
+    const int lens_ntomo,
+    std::string source_multihisto_file, 
+    const int source_ntomo
+  );
+
 void init_redshift_distributions_from_files(
     std::string lens_multihisto_file, 
     const int lens_ntomo,
@@ -522,6 +533,8 @@ void init_survey(
 void init_ggl_exclude(
 	arma::Col<int> ggl_exclude
   );
+
+
 
 // ---------------------------------------------------------------------------
 // ---------------------------------------------------------------------------
@@ -602,6 +615,16 @@ void set_nuisance_shear_calib(
 void set_nuisance_shear_photoz(
     arma::Col<double> SP
   );
+
+void set_lens_sample_size(const int Ntomo);
+
+void set_lens_sample(arma::Mat<double> input_table);
+
+void set_source_sample_size(const int Ntomo);
+
+void set_source_sample(arma::Mat<double> input_table);
+
+void init_ntomo_powerspectra();
 
 // ---------------------------------------------------------------------------
 // ---------------------------------------------------------------------------

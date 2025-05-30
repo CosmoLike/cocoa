@@ -2,7 +2,7 @@
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
-if [ -z "${IGNORE_EUCLID_EMULATOR_V2_CODE}" ]; then
+if [ -z "${IGNORE_DARK_EMULATOR_CODE}" ]; then
   
   if [ -z "${ROOTDIR}" ]; then
     source start_cocoa.sh || { pfail 'ROOTDIR'; return 1; }
@@ -46,20 +46,19 @@ if [ -z "${IGNORE_EUCLID_EMULATOR_V2_CODE}" ]; then
   # E = EXTERNAL, CODE, F=FODLER
   ECODEF="${ROOTDIR:?}/external_modules/code"
 
-  FOLDER="${EE2_NAME:-"euclidemu2"}"
+  FOLDER="${DARK_EMULATOR_NAME:-"dark_emulator"}"
 
   PACKDIR="${ECODEF:?}/${FOLDER:?}"
 
   PLIB="${ROOTDIR:?}/.local/lib/python${PYTHON_VERSION:?}/site-packages"
 
-  ptop "COMPILING EUCLID EMULATOR V2" || return 1
+  ptop "COMPILING DARK EMULATOR" || return 1
 
   # ---------------------------------------------------------------------------
   rm -rf "${PACKDIR:?}/build/"
-  rm -rf "${PACKDIR:?}/euclidemu2.egg-info/"
-  rm -rf "${PLIB:?}"/euclidemu2
-  rm -rf "${PLIB:?}"/euclidemu2-*
-  rm -rf "${PLIB:?}"/euclidemu2.cpython*
+  rm -rf "${PACKDIR:?}/dark_emulator.egg-info/"
+  rm -rf  "${PLIB:?}"/dark_emulator
+  rm -rf  "${PLIB:?}"/dark_emulator-*
   # ---------------------------------------------------------------------------  
  
   cdfolder "${PACKDIR}" || return 1
@@ -73,7 +72,7 @@ if [ -z "${IGNORE_EUCLID_EMULATOR_V2_CODE}" ]; then
     ${PACKDIR:?} --no-dependencies --prefix="${ROOTDIR:?}/.local" --no-index \
     --no-build-isolation >${OUT1:?} 2>${OUT2:?} || { error "${EC3:?}"; return 1; })
 
-  pbottom "COMPILING EUCLID EMULATOR V2" || return 1
+  pbottom "COMPILING DARK EMULATOR" || return 1
 
   cdfolder "${ROOTDIR}" || return 1;
 

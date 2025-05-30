@@ -123,6 +123,9 @@ dependencies:
   - zipp=3.21.0
   - zlib=1.3.1
   - zstd=1.5.7
+  - numpy==1.26.3
+  - pyfftw=0.15.0
+  - cython==3.0.12
   - pip:
     - alabaster==1.0.0
     - anytree==2.13.0
@@ -139,7 +142,6 @@ dependencies:
     - corner==2.2.3
     - coverage==7.8.0
     - cycler==0.12.1
-    - cython==3.0.12
     - decorator==5.2.1
     - deprecated==1.2.18
     - dill==0.4.0
@@ -178,7 +180,6 @@ dependencies:
     - network==0.1
     - networkx==3.4.2
     - numba==0.60.0
-    - numpy==1.23.5
     - numpydoc==1.8.0
     - oauthlib==3.2.2
     - opt-einsum==3.4.0
@@ -194,7 +195,6 @@ dependencies:
     - pybind11==2.13.6
     - pydoe2==1.3.0
     - pyerfa==2.0.1.5
-    - pyfftw==0.15.0
     - pygments==2.19.1
     - pyparsing==3.2.3
     - pytz==2025.2
