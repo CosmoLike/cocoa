@@ -32,12 +32,12 @@ export IGNORE_BICEP_CMB_DATA=1
 # export IGNORE_HOLICOW_STRONG_LENSING_DATA=1
 #export IGNORE_SN_DATA=1
 export IGNORE_SPT_CMB_DATA=1
-#export IGNORE_SIMONS_OBSERVATORY_CMB_DATA=1
+export IGNORE_SIMONS_OBSERVATORY_CMB_DATA=1
 #export IGNORE_PLANCK_CMB_DATA=1
 export IGNORE_CAMSPEC_CMB_DATA=1
 export IGNORE_LIPOP_CMB_DATA=1
 export IGNORE_COSMOPOWER_DATA=1
-#export IGNORE_EMULTRF_DATA=1 #SaraivanovZhongZhu (SZZ) transformer-based emul
+export IGNORE_EMULTRF_DATA=1 #SaraivanovZhongZhu (SZZ) transformer-based emul
 
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
@@ -56,13 +56,13 @@ export IGNORE_ACTDR4_CODE=1
 export IGNORE_ACTDR6_CODE=1
 export IGNORE_CPP_CUBA_INSTALLATION=1
 export IGNORE_VELOCILEPTORS_CODE=1
-#export IGNORE_SIMONS_OBSERVATORY_LIKELIHOOD_CODE=1
+export IGNORE_SIMONS_OBSERVATORY_LIKELIHOOD_CODE=1
 export IGNORE_CAMSPEC_LIKELIHOOD_CODE=1
 export IGNORE_LIPOP_LIKELIHOOD_CODE=1
 export IGNORE_HYREC_CODE=1
 export IGNORE_COSMOREC_CODE=1
 export IGNORE_MGCAMB_CODE=1
-#export IGNORE_EMULTRF_CODE=1 #SaraivanovZhongZhu (SZZ) transformer-based emul
+export IGNORE_EMULTRF_CODE=1 #SaraivanovZhongZhu (SZZ) transformer-based emul
 export IGNORE_COSMOPOWER_CODE=1
 #export IGNORE_EUCLID_EMULATOR_V2_CODE=1
 export IGNORE_DARK_EMULATOR_CODE=1
@@ -74,7 +74,7 @@ export IGNORE_DARK_EMULATOR_CODE=1
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
-#export IGNORE_COSMOLIKE_LSSTY1_CODE=1
+export IGNORE_COSMOLIKE_LSSTY1_CODE=1
 export IGNORE_COSMOLIKE_DES_Y3_CODE=1
 #export IGNORE_COSMOLIKE_ROMAN_FOURIER_CODE=1
 #export IGNORE_COSMOLIKE_ROMAN_REAL_CODE=1
@@ -298,7 +298,7 @@ export SO_SYSLIB_URL="https://github.com/simonsobs/syslibrary.git"
 export SO_SYSLIB_GIT_COMMIT="2471df981053a7526a441d2547eb8dde10d92f70"
 
 export EE2_URL="https://github.com/vivianmiranda/EuclidEmulator2.git"
-export EE2_GIT_COMMIT="f6bcf241c15dd77a0da4845f3a3f4087afd29d27"
+export EE2_GIT_COMMIT="df250250e31fcd15841b622b42142cb12f9fd68b"
 # THIS GIT IS FOR THE ORIGNIAL EE2 BEFORE VM MODS
 #export EE2_GIT_COMMIT="ff59f6683069417f6b4d2fb5d59197044d424445"
 export EE2_NAME="euclidemu2"
@@ -347,7 +347,7 @@ export LSST_Y1_NAME="lsst_y1"
 #BRANCH: if unset, load the latest commit on the specified branch
 #export LSST_Y1_BRANCH="dev"
 #COMMIT: if unset, load the specified commit
-export LSST_Y1_COMMIT="1abe548281296196dabee7b19e31c56f324eda38"
+export LSST_Y1_COMMIT="2d2a9cde8c38090e5088287ec969d9486522ce17"
 #BRANCH: if unset, load the specified TAG
 #export LSST_Y1_TAG="v4.0-beta17"
 
@@ -365,7 +365,7 @@ export ROMAN_FOURIER_NAME="roman_fourier"
 #BRANCH: if unset, load the latest commit on the specified branch
 #export ROMAN_FOURIER_BRANCH="main"
 #COMMIT: if unset, load the specified commit
-export ROMAN_FOURIER_COMMIT="282e1d222a1827e02d7c04faa94939a4520640ac"
+export ROMAN_FOURIER_COMMIT="d990ace46033b074c88934657f5abbf9f91acbad"
 #BRANCH: if unset, load the specified TAG
 #export ROMAN_FOURIER_TAG="v4.0-beta17"
 
@@ -374,7 +374,7 @@ export ROMAN_REAL_NAME="roman_real"
 #BRANCH: if unset, load the latest commit on the specified branch
 #export ROMAN_REAL_BRANCH="main"
 #COMMIT: if unset, load the specified commit
-export ROMAN_REAL_COMMIT="a627af5b1a403b270de3d6825643a8c95b48a2a5"
+export ROMAN_REAL_COMMIT="3a5fd28ec7f0c60e093990177bf3f70d58649517"
 #BRANCH: if unset, load the specified TAG
 #export ROMAN_REAL_TAG="v4.0-beta17"
 # ------------------------------------------------------------------------------
