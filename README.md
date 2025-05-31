@@ -259,10 +259,10 @@ Cocoa contains a few transformer-based neural network emulators capable of simul
       
       # inset # symbol in the lines below (i.e., unset these environmental keys)
       #export IGNORE_EMULTRF_CODE=1  #SaraivanovZhongZhu (SZZ) transformer-based emul
-      #export IGNORE_EMULTRF_DATA=1   #SaraivanovZhongZhu (SZZ) transformer-based emul
+      #export IGNORE_EMULTRF_DATA=1  #SaraivanovZhongZhu (SZZ) transformer-based emul
       
       #export IGNORE_SIMONS_OBSERVATORY_LIKELIHOOD_CODE=1    # to run EXAMPLE_EVALUATE26.yaml
-      #export IGNORE_SIMONS_OBSERVATORY_CMB_DATA=1.                  # to run EXAMPLE_EVALUATE26.yaml
+      #export IGNORE_SIMONS_OBSERVATORY_CMB_DATA=1           # to run EXAMPLE_EVALUATE26.yaml
 
 > [!NOTE]
 > What users should do if they don't unset these keys prior to running `setup_cocoa.sh` and `compile_cocoa.sh`?
@@ -273,14 +273,14 @@ Cocoa contains a few transformer-based neural network emulators capable of simul
 > and
 >
 >      source ./installation_scripts/setup_pip_core_packages.sh     # install pip packages required by ML emulators
->      source ./installation_scripts/setup_emultrf.sh	                        # download emulator codes
->      source ./installation_scripts/unxv_emultrf.sh			                # download pre-trained emulators
+>      source ./installation_scripts/setup_emultrf.sh               # download emulator codes
+>      source ./installation_scripts/unxv_emultrf.sh                # download pre-trained emulators
 >
 > and
 >
 >      source ./installation_scripts/setup_simons_observatory.sh       # download Simons Observatory Likelihood code (to run EXAMPLE_EVALUATE26.yaml)
 >      source ./installation_scripts/unxv_simons_observatory.sh        # download Simons Observatory Likelihood data  (to run EXAMPLE_EVALUATE26.yaml)
->      source ./installation_scripts/compile_simons_observatory.sh   # compile Simons Observatory Lkelihood code     (to run EXAMPLE_EVALUATE26.yaml)
+>      source ./installation_scripts/compile_simons_observatory.sh     # compile Simons Observatory Lkelihood code     (to run EXAMPLE_EVALUATE26.yaml)
  
 Now follow all the steps below, including step :one: (users will neeed to run `start_cocoa.sh` once more so Cocoa can create appropriate symlinks).
 
