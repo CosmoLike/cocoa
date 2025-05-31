@@ -16,7 +16,7 @@ fi
 # ------------------------------------------------------------------------------
 # VERBOSE AS DEBUG TOOL --------------------------------------------------------
 # ------------------------------------------------------------------------------
-#export COCOA_OUTPUT_VERBOSE=1
+export COCOA_OUTPUT_VERBOSE=1
 
 # ------------------------------------------------------------------------------
 # If set, COSMOLIKE will compile with DEBUG flags ------------------------------
@@ -347,9 +347,9 @@ export DARKEMULATOR_GIT_COMMIT="46df5972509624e2eeadc2bf3ac528b02333a7e2"
 export LSST_Y1_URL="git@github.com:SBU-COSMOLIKE/cocoa_lsst_y1.git"
 export LSST_Y1_NAME="lsst_y1"
 #BRANCH: if unset, load the latest commit on the specified branch
-#export LSST_Y1_BRANCH="dev"
+export LSST_Y1_BRANCH="main"
 #COMMIT: if unset, load the specified commit
-export LSST_Y1_COMMIT="2d2a9cde8c38090e5088287ec969d9486522ce17"
+#export LSST_Y1_COMMIT="2d2a9cde8c38090e5088287ec969d9486522ce17"
 #BRANCH: if unset, load the specified TAG
 #export LSST_Y1_TAG="v4.0-beta17"
 
@@ -365,18 +365,18 @@ export DES_Y3_TAG="v4.0-beta17"
 export ROMAN_FOURIER_URL="git@github.com:SBU-COSMOLIKE/cocoa_roman_fourier.git"
 export ROMAN_FOURIER_NAME="roman_fourier"
 #BRANCH: if unset, load the latest commit on the specified branch
-#export ROMAN_FOURIER_BRANCH="main"
+export ROMAN_FOURIER_BRANCH="main"
 #COMMIT: if unset, load the specified commit
-export ROMAN_FOURIER_COMMIT="d990ace46033b074c88934657f5abbf9f91acbad"
+#export ROMAN_FOURIER_COMMIT="d990ace46033b074c88934657f5abbf9f91acbad"
 #BRANCH: if unset, load the specified TAG
 #export ROMAN_FOURIER_TAG="v4.0-beta17"
 
 export ROMAN_REAL_URL="git@github.com:SBU-COSMOLIKE/cocoa_roman_real.git"
 export ROMAN_REAL_NAME="roman_real"
 #BRANCH: if unset, load the latest commit on the specified branch
-#export ROMAN_REAL_BRANCH="main"
+export ROMAN_REAL_BRANCH="main"
 #COMMIT: if unset, load the specified commit
-export ROMAN_REAL_COMMIT="3a5fd28ec7f0c60e093990177bf3f70d58649517"
+#export ROMAN_REAL_COMMIT="3a5fd28ec7f0c60e093990177bf3f70d58649517"
 #BRANCH: if unset, load the specified TAG
 #export ROMAN_REAL_TAG="v4.0-beta17"
 # ------------------------------------------------------------------------------
