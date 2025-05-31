@@ -265,8 +265,8 @@ Cocoa contains a few transformer-based neural network emulators capable of simul
       #export IGNORE_SIMONS_OBSERVATORY_CMB_DATA=1.                  # to run EXAMPLE_EVALUATE26.yaml
 
 > [!NOTE]
-> What if users forget to unset these keys prior to running `setup_cocoa.sh` and `compile_cocoa.sh` installation scripts?
-> Running `setup_cocoa.sh` and `compile_cocoa.sh` again can take a long time. Instead, run the following commands
+> What users should do if they don't unset these keys prior to running `setup_cocoa.sh` and `compile_cocoa.sh`?
+> These global scripts again can take a long time. Instead, run the following commands
 >
 >      source start_cocoa.sh      # even if (.local) is already active, users must run start_cocoa.sh again to update key values
 > 
