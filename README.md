@@ -78,17 +78,10 @@ Users can now proceed to **step :two:**.
 > [!WARNING]
 > **In this fork**, we assume **all users are developers with edit access via ssh keys to all SBU-COSMOLIKE repositories**. *Cocoa scripts will fail if you don't have such privileges*.
 >
-<<<<<<< HEAD
 
 **Step :one:**: Download cocoa's latest commit and go to the `cocoa` main folder,
 
     "${CONDA_PREFIX}"/bin/git clone git@github.com:SBU-COSMOLIKE/cocoa.git cocoa
-=======
-> 
-**Step :one:**: Download Cocoa's latest release and go to its main folder (`cocoa/Cocoa`),
-
-    "${CONDA_PREFIX}"/bin/git clone https://github.com/CosmoLike/cocoa.git --branch v4.0-beta26 cocoa
->>>>>>> upstream/main
 
 and
 
@@ -96,23 +89,6 @@ and
 
 Users can now proceed to **step :two:**.
 
-<<<<<<< HEAD
-=======
-> [!TIP]
-> If you want to work from the latest commit, then clone the repository with the following command 
->
-> (SSH)
-> 
->     "${CONDA_PREFIX}"/bin/git clone git@github.com:CosmoLike/cocoa.git cocoa
-> 
-> (HTTP)
-> 
->     "${CONDA_PREFIX}"/bin/git clone https://github.com/CosmoLike/cocoa.git cocoa
->
->
-> Users who want to develop from a release version (e.g., `v4.0-beta20`) may want to read the appendix [FAQ: How do we push changes to the cocoa main branch? A few git hacks](#push_main)
-
->>>>>>> upstream/main
 **Step :two:**: Run the script `setup_cocoa.sh` via
         
     source setup_cocoa.sh
@@ -190,8 +166,6 @@ and
 >     [Adapted from Cocoa/set_installation_options.sh shell script]
 >     (...)
 >
-<<<<<<< HEAD
-=======
 >     # ------------------------------------------------------------------------------
 >     # The keys below control which cosmolike projects will be installed and compiled
 >     # ------------------------------------------------------------------------------
@@ -228,7 +202,6 @@ and
 >     #TAG: if unset, load the specified TAG
 >     #export ROMAN_REAL_TAG="v4.0-beta17"
 > 
->>>>>>> upstream/main
 > If users comment these lines (unsetting the corresponding IGNORE keys) after running `setup_cocoa.sh` and `compile_cocoa.sh`, there is no need to rerun these general scripts, which would reinstall many packages (slow). Instead, run the following three commands:
 >
 >      source start_cocoa.sh
@@ -240,15 +213,11 @@ and
 > and
 > 
 >       source ./installation_scripts/compile_all_projects.sh
-<<<<<<< HEAD
- 
-=======
 >
 > or in case users just want to compile a single project (let's say the `roman_real` project)
 >
 >       source ./projects/roman_real/scripts/compile_roman_real.sh
   
->>>>>>> upstream/main
 > [!TIP]
 > To run Jupyter Notebook, assuming Cocoa is installed on a local machine, type, after step 2️⃣, the command 
 > 
