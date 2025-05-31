@@ -69,7 +69,7 @@ if [ -z "${IGNORE_COSMOPOWER_CODE}" ]; then
   (export LD_LIBRARY_PATH=${CONDA_PREFIX:?}/lib:$LD_LIBRARY_PATH && \
    export LD_LIBRARY_PATH=${ROOTDIR:?}/.local/lib:$LD_LIBRARY_PATH && \
    env CXX="${CXX_COMPILER:?}" CC="${C_COMPILER:?}" ${PIP3:?} install \
-   ${PACKDIR:?} --no-dependencies --prefix="${ROOTDIR:?}/.local" --no-index \
+   ${PACKDIR:?} --prefix="${ROOTDIR:?}/.local" --no-index \
    --no-build-isolation >${OUT1:?} 2>${OUT2:?} || { error "${EC3:?}"; return 1; })
 
   pbottom "COMPILING COSMOPOWER" || return 1

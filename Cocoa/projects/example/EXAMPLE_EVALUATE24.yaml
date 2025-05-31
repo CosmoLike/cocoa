@@ -3,9 +3,44 @@ debug: false
 timing: true
 
 likelihood:
-  sn.pantheon:
+  sn.union3: 
     path: ./external_modules/data/sn_data
-
+  sn.pantheon: 
+    path: ./external_modules/data/sn_data
+  sn.pantheonplus: 
+    path: ./external_modules/data/sn_data
+  sn.roman_c:
+    path: ./external_modules/data/sn_data
+  sn.roman_o:
+    path: ./external_modules/data/sn_data
+  bao.sixdf_2011_bao:
+    path: ./external_modules/data/
+  bao.sdss_dr7_mgs:
+    path: ./external_modules/data/
+  bao.sdss_dr12_consensus_bao:
+    path: ./external_modules/data/
+  bao.desi_2024_bao_all:
+    path: ./external_modules/data/
+  bao.desi_2024_bao_bgs_z1:
+    path: ./external_modules/data/
+  bao.desi_2024_bao_elg_z2:
+    path: ./external_modules/data/
+  bao.desi_2024_bao_lrg_z1:
+    path: ./external_modules/data/
+  bao.desi_2024_bao_lrg_z2:
+    path: ./external_modules/data/
+  bao.desi_2024_bao_lrgpluselg_z1:
+    path: ./external_modules/data/
+  bao.desi_2024_bao_lya:
+    path: ./external_modules/data/
+  bao.desi_2024_bao_qso_z1:
+    path: ./external_modules/data/
+  bao.desi_dr2.desi_bao_all:
+    path: ./external_modules/data/
+  bao.desi_dr2.desi_bao_lrg1:
+    path: ./external_modules/data/
+  bao.desi_dr2.desi_bao_lrg2:
+    path: ./external_modules/data/
 
 params:
   logA:
@@ -100,7 +135,8 @@ params:
     value: 'lambda w0pwa, w: w0pwa - w'
     derived: false
     latex: w_{a,\mathrm{DE}}
-
+  rdrag:
+    latex: r_\mathrm{drag}
 
 
 
@@ -126,6 +162,5 @@ theory:
       num_massive_neutrinos: 1
       nnu: 3.046
       dark_energy_model: ppf
-
 
 output: ./projects/example/chains/EXAMPLE_EVALUATE24

@@ -1,38 +1,11 @@
---- ./class_public/Makefile	2024-06-17 15:12:09.433082000 -0400
-+++ ./class_public2/Makefile	2024-06-11 18:29:16.499454000 -0400
-@@ -18,9 +18,14 @@
- ########################################################
- 
- # your C compiler:
--CC       = gcc
-+#VM BEGINS
-+#COCOA BEGINS
-+#CC       = gcc
-+CC       ?= $(C_COMPILER)
- #CC       = icc
- #CC       = pgcc
-+#COCOA ENDS
-+#VM ENDS
- 
- # your tool for creating static libraries:
- AR        = ar rv
-@@ -30,7 +35,9 @@
- # substitute python3 to python in the line below, or you can simply
- # add a compilation option on the terminal command line:
- # "PYTHON=python3 make all" (Thanks to Marius Millea for python3 compatibility)
--PYTHON ?= python
-+# VM BEGINS
-+PYTHON ?= $(CONDA_DIR)/bin/python
-+#VM ENDS
- 
- # your optimization flag
- OPTFLAG = -O3
-@@ -195,7 +202,7 @@
- else
- 	grep -v "lgomp" python/setup.py > python/autosetup.py
- endif
--	cd python; export CC=$(CC); $(PYTHON) autosetup.py install || $(PYTHON) autosetup.py install --user
-+	cd python; export CC=$(CC); $(PYTHON) autosetup.py install || CC=$(CC) $(PYTHON) autosetup.py install --user
- 	rm python/autosetup.py
+--- Makefile	2025-05-19 08:20:28.101080686 -0400
++++ Makefile2	2025-05-19 08:22:54.879019123 -0400
+@@ -213,7 +213,7 @@
+         site_packages=$$($(PYTHON) -c "import distutils.sysconfig; print(distutils.sysconfig.get_python_lib())" || $(PYTHON) -c "import site; print(site.getsitepackages()[0])") && \
+         echo "Cleaning up previous installation in: $$site_packages" && \
+         rm -rf $$site_packages/classy* && \
+-        $(PYTHON) -m pip install .; \
++        CC=$(CC) $(PYTHON) -m pip install . --user; \
+     fi
  
  clean: .base

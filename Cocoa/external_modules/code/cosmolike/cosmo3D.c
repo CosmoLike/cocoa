@@ -357,10 +357,13 @@ double p_lin(const double k, const double a)
   return exp(out_lnP)/(cosmology.coverH0*cosmology.coverH0*cosmology.coverH0);
 }
 
+
+
 double p_nonlin(const double k, const double a)
 {
+  const double coverH0 = cosmology.coverH0;
   // convert from (x/Mpc/h - dimensioneless) to h/Mpc with x = c/H0 (Mpc)
-  const double log10k = log10(k/cosmology.coverH0);
+  const double log10k = log10(k/coverH0);
   const double z = 1.0/a-1.0;
 
   // logk = cosmology.lnP[0:nk,cosmology.lnP_nz]
@@ -403,13 +406,13 @@ double p_nonlin(const double k, const double a)
   double dy = (z                                   - cosmology.lnP[cosmology.lnP_nk][j])/
               (cosmology.lnP[cosmology.lnP_nk][j+1]- cosmology.lnP[cosmology.lnP_nk][j]);
 
-  const double out_lnP =    (1-dx)*(1-dy)*cosmology.lnP[i][j]
+  const double out_lnP =  (1-dx)*(1-dy)*cosmology.lnP[i][j]
                           + (1-dx)*dy*cosmology.lnP[i][j+1]
                           + dx*(1-dy)*cosmology.lnP[i+1][j]
                           + dx*dy*cosmology.lnP[i+1][j+1];
-
-  double ans = 
-    exp(out_lnP)/(cosmology.coverH0*cosmology.coverH0*cosmology.coverH0);
+  
+  const double ans = exp(out_lnP)/(coverH0*coverH0*coverH0);
+  
   return (bary.is_Pk_bary==1) ? ans*PkRatio_baryons(k,a) : ans;
  } 
 

@@ -2,7 +2,7 @@
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
-if [ -z "${IGNORE_EMULTRF_DATA}" ]; then
+if [ -z "${IGNORE_COSMOPOWER_DATA}" ]; then
 
   if [ -z "${ROOTDIR}" ]; then
     source start_cocoa.sh || { pfail 'ROOTDIR'; return 1; }
@@ -47,9 +47,9 @@ if [ -z "${IGNORE_EMULTRF_DATA}" ]; then
   # E = EXTERNAL, DATA, F=FODLER
   EDATAF="${ROOTDIR:?}/external_modules/data/"
 
-  URL="${EMULTRF_DATA_URL:-"https://github.com/CosmoLike/emulators_data.git"}"
+  URL="${COSMOPOWER_URL_DATA:-"https://github.com/cosmopower-organization/jense_2024_emulators.git"}"
 
-  FOLDER="emultrf"
+  FOLDER="cosmopower"
   
   # PACK = PACKAGE, DIR = DIRECTORY
   PACKDIR="${EDATAF:?}/${FOLDER:?}"
@@ -59,7 +59,7 @@ if [ -z "${IGNORE_EMULTRF_DATA}" ]; then
 
   # ---------------------------------------------------------------------------
   # in case this script is called twice
-  if [ -n "${OVERWRITE_EXISTING_EMULTRF_DATA}" ]; then
+  if [ -n "${OVERWRITE_EXISTING_COSMOPOWER_DATA}" ]; then
     rm -rf "${PACKDIR:?}"
   fi
   # ---------------------------------------------------------------------------
@@ -69,7 +69,7 @@ if [ -z "${IGNORE_EMULTRF_DATA}" ]; then
     ${GIT:?} clone "${URL:?}" "${FOLDER:?}" \
       >${OUT1:?} 2>${OUT2:?} || { error "${EC15:?}"; return 1; }
 
-    if [ -n "${EMULTRF_DATA_GIT_COMMIT}" ]; then
+    if [ -n "${COSMOPOWER_URL_DATA_COMMIT}" ]; then
       cdfolder "${PACKDIR:?}" || return 1
 
       ${GIT:?} checkout "${EMULTRF_DATA_GIT_COMMIT:?}" \

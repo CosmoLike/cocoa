@@ -16,6 +16,12 @@ else
   export OLD_OMP_NUM_THREADS="x"
 fi
 
+if [ -n "${OMP_PROC_BIND}" ]; then
+  export OLD_OMP_PROC_BIND=$OMP_PROC_BIND
+else
+  export OLD_OMP_PROC_BIND="x"
+fi
+
 if [ -n "${LD_LIBRARY_PATH}" ]; then
   export OLD_LD_LIBRARY_PATH=$LD_LIBRARY_PATH
 else

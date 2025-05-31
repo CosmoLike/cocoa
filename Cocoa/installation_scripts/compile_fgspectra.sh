@@ -73,8 +73,8 @@ if [ -z "${IGNORE_FGSPECTRA_CODE}" ]; then
  
   (export LD_LIBRARY_PATH=${CONDA_PREFIX:?}/lib:$LD_LIBRARY_PATH && \
    export LD_LIBRARY_PATH=${ROOTDIR:?}/.local/lib:$LD_LIBRARY_PATH && \
-   ${PIP3:?} install . --prefix="${ROOTDIR:?}/.local" \
-   >${OUT1:?} 2>${OUT2:?} || { error "${EC3:?}"; return 1; })
+   ${PIP3:?} install . --no-dependencies --prefix="${ROOTDIR:?}/.local" \
+   --no-index --no-build-isolation >${OUT1:?} 2>${OUT2:?} || { error "${EC3:?}"; return 1; })
 
   pbottom "COMPILING ${PRINTNAME:?}" || return 1
 

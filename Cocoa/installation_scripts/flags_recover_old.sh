@@ -9,6 +9,13 @@ if [ -n "${OLD_OMP_NUM_THREADS}" ]; then
   unset OLD_OMP_NUM_THREADS
 fi
 
+if [ -n "${OLD_OMP_PROC_BIND}" ]; then
+  if [ "${OLD_OMP_PROC_BIND}" != "x" ]; then
+    export OMP_PROC_BIND=$OLD_OMP_PROC_BIND
+  fi
+  unset OLD_OMP_PROC_BIND
+fi
+
 if [ -n "${OLD_LD_LIBRARY_PATH}" ]; then
   if [ "${OLD_LD_LIBRARY_PATH}" != "x" ]; then
     export LD_LIBRARY_PATH=$OLD_LD_LIBRARY_PATH

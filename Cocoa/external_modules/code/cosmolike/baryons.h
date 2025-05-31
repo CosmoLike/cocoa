@@ -1,3 +1,6 @@
+// gsl lib
+#include <gsl/gsl_interp2d.h>
+
 #ifndef __COSMOLIKE_PARAMETERS_BARYONS_H
 #define __COSMOLIKE_PARAMETERS_BARYONS_H
 #ifdef __cplusplus

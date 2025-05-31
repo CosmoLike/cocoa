@@ -2,6 +2,10 @@
 #include <armadillo>
 #include <map>
 
+// Python Binding
+#include <pybind11/pybind11.h>
+#include <pybind11/pytypes.h>
+
 #ifndef __COSMOLIKE_GENERIC_INTERFACE_HPP
 #define __COSMOLIKE_GENERIC_INTERFACE_HPP
 
@@ -78,7 +82,6 @@ class IP
       static IP instance;
       return instance;
     }
-
     ~IP() = default;
 
     // ----------------------------------------------
@@ -94,10 +97,14 @@ class IP
     void set_data(std::string datavector_filename);
 
     // 3x2pt
-    void set_mask(std::string mask_filename, arma::Col<int>::fixed<3> order, const int real_space);
+    void set_mask(std::string mask_filename, 
+                  arma::Col<int>::fixed<3> order, 
+                  const int real_space);
 
     // 6x2pt
-    void set_mask(std::string mask_filename, arma::Col<int>::fixed<6> order, const int real_space);
+    void set_mask(std::string mask_filename, 
+                  arma::Col<int>::fixed<6> order, 
+                  const int real_space);
 
     void set_inv_cov(std::string covariance_filename);
 
@@ -416,7 +423,12 @@ void init_baryons_contamination(std::string sim); // OLD API
 
 void init_bias(arma::Col<double> bias_z_evol_model);
 
-void init_binning_fourier(const int Ncl, const double lmin, const double lmax, const double lmax_shear);
+void init_binning_fourier(
+    const int Ncl, 
+    const int lmin, 
+    const int lmax, 
+    const int lmax_shear
+  );
 
 void init_binning_real_space(
     const int Ntheta, 
@@ -430,7 +442,9 @@ void init_binning_cmb_bandpower(
     const int lmax
   );
 
-void init_cosmo_runmode(const bool is_linear);
+void init_cosmo_runmode(
+    const bool is_linear
+  );
 
 void init_cmb(
     const double lmin_kappa_cmb, 
@@ -496,6 +510,13 @@ void init_probes(
 
 void initial_setup();
 
+py::tuple read_redshift_distributions_from_files(
+    std::string lens_multihisto_file, 
+    const int lens_ntomo,
+    std::string source_multihisto_file, 
+    const int source_ntomo
+  );
+
 void init_redshift_distributions_from_files(
     std::string lens_multihisto_file, 
     const int lens_ntomo,
@@ -509,7 +530,11 @@ void init_survey(
     double sigma_e
   );
 
-void init_ggl_exclude(arma::Col<int> ggl_exclude);
+void init_ggl_exclude(
+	arma::Col<int> ggl_exclude
+  );
+
+
 
 // ---------------------------------------------------------------------------
 // ---------------------------------------------------------------------------
@@ -564,6 +589,10 @@ void set_nuisance_clustering_photoz(
     arma::Col<double> CP
   );
 
+void set_nuisance_clustering_photoz_stretch(
+    arma::Col<double> CPS
+  );
+
 void set_nuisance_IA(
     arma::Col<double> A1, 
     arma::Col<double> A2,
@@ -586,6 +615,16 @@ void set_nuisance_shear_calib(
 void set_nuisance_shear_photoz(
     arma::Col<double> SP
   );
+
+void set_lens_sample_size(const int Ntomo);
+
+void set_lens_sample(arma::Mat<double> input_table);
+
+void set_source_sample_size(const int Ntomo);
+
+void set_source_sample(arma::Mat<double> input_table);
+
+void init_ntomo_powerspectra();
 
 // ---------------------------------------------------------------------------
 // ---------------------------------------------------------------------------

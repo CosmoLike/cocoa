@@ -131,8 +131,7 @@ void reset_tomo_struct()
   tomo.shear_Npowerspectra = 0;
   tomo.clustering_Npowerspectra = 0;
   tomo.ggl_Npowerspectra = 0;
-  if (tomo.ggl_exclude != NULL)
-  {
+  if (tomo.ggl_exclude != NULL) {
     free(tomo.ggl_exclude);
     tomo.ggl_exclude = NULL;
   }
@@ -146,8 +145,7 @@ void reset_redshift_struct()
 
   redshift.shear_nbin = 0;
   redshift.shear_photoz = 0;
-  if (redshift.shear_zdist_table != NULL)
-  {
+  if (redshift.shear_zdist_table != NULL) {
     free(redshift.shear_zdist_table);
     redshift.shear_zdist_table = NULL;
   }
@@ -157,8 +155,7 @@ void reset_redshift_struct()
 
   redshift.clustering_nbin = 0;
   redshift.clustering_nzbins = 0;
-  if (redshift.clustering_zdist_table != NULL)
-  {
+  if (redshift.clustering_zdist_table != NULL) {
     free(redshift.clustering_zdist_table);
     redshift.clustering_zdist_table = NULL;
   }
@@ -166,12 +163,12 @@ void reset_redshift_struct()
   redshift.clustering_zdist_zmin_all = 0.0;
   redshift.clustering_zdist_zmax_all = 0.0;
 
-  for(int i=0; i<MAX_SIZE_ARRAYS; i++)
-  {
+  for (int i=0; i<MAX_SIZE_ARRAYS; i++) {
     redshift.shear_zdist_zmin[i] = 0.0;
     redshift.shear_zdist_zmax[i] = 0.0; 
     redshift.clustering_zdist_zmin[i] = 0.0;
     redshift.clustering_zdist_zmax[i] = 0.0;
+    redshift.clustering_zdist_zmean[i] = 0.0;
   }
 }
 
@@ -200,28 +197,28 @@ void reset_nuisance_struct()
   nuisance.random_photoz_shear = 0.0;
   nuisance.random_photoz_clustering = 0.0;
 
-  for(int i=0; i<MAX_SIZE_ARRAYS; i++)
-  {
+  for (int i=0; i<MAX_SIZE_ARRAYS; i++) {
     nuisance.shear_calibration_m[i] = 0.0;
     nuisance.gc[i] = 0.0;
     nuisance.gas[i] = 0.0;
-
-    for(int j=0; j<MAX_SIZE_ARRAYS; j++)
-    {
+    for (int j=0; j<MAX_SIZE_ARRAYS; j++) {
       nuisance.ia[i][j] = 0.0;
       nuisance.ia[i][j] = 0.0;
       nuisance.ia[i][j] = 0.0;
-
       nuisance.gb[i][j] = 0.0;
       nuisance.hod[i][j] = 0.0;
-      
-      for(int k=0; k<MAX_SIZE_ARRAYS; k++)
-        nuisance.photoz[i][j][k] = 0.0;
+      for (int k=0; k<MAX_SIZE_ARRAYS; k++) {
+        if (j==1) {
+          nuisance.photoz[i][j][k] = 1.0;
+        } // photo-z stretch params
+        else {
+          nuisance.photoz[i][j][k] = 0.0;
+        }
+      }
     }
   }
   nuisance.oneplusz0_ia = 0.0;
   nuisance.c1rhocrit_ia = 0.01389;
-
   nuisance.IA = 0;
   nuisance.IA_MODEL = 0;
 }

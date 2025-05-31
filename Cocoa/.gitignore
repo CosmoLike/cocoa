@@ -39,6 +39,9 @@ external_modules/data/spt_3g
 external_modules/data/act
 external_modules/data/emultrf
 external_modules/data/emul*
+external_modules/data/cosmopower/
+external_modules/data/cosmo*
+
 
 projects/desxplanck
 projects/lsst_fourier
@@ -147,6 +150,9 @@ external_modules/code/PolyChordLite/
 external_modules/code/emulators/*
 external_modules/code/emul*/
 external_modules/code/emulators/soliket
+external_modules/code/emulators/so*
+external_modules/code/dark_emu*
+external_modules/code/cosmolike2
 
 cobaya/cobaya/likelihoods/XXX
 cobaya/cobaya/likelihoods/des_y1
@@ -170,3 +176,6 @@ cobaya/cobaya/likelihoods/act*/
 projects/lsst_y1/
 projects/lsst*/
 projects/des*/
+projects/roman*
+projects/roman_fourier/
+projects/roman_real/

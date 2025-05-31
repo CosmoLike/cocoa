@@ -92,26 +92,23 @@ params:
 theory:
   cosmopower:
     stop_at_error: True
-    network_path: ./cobaya/cobaya/theories/cosmopower/data/CP_paper
+    network_path: ./external_modules/data/cosmopower/jense_2023_camb_lcdm/networks
     network_settings:
       tt:
         type: "NN"
         log: True
-        filename: "cmb_TT_NN"
+        filename: "jense_2023_camb_lcdm_Cl_tt"
       ee: 
         type: "NN"
         log: True
-        filename: "cmb_EE_NN"
+        filename: "jense_2023_camb_lcdm_Cl_ee"
       te:
         type: "PCAplusNN"
         log: False
-        filename: "cmb_TE_PCAplusNN"
+        filename: "jense_2023_camb_lcdm_Cl_te"
     renames: 
-      omegabh2: omega_b
-      omegach2: omega_cdm
-      ns: n_s
-      logA: ln10^{10}A_s
-      tau: tau_reio
+      omegabh2: ombh2
+      omegach2: omch2
 
 sampler:
   evaluate:

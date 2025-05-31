@@ -34,9 +34,11 @@ export IGNORE_BICEP_CMB_DATA=1
 export IGNORE_SPT_CMB_DATA=1
 #export IGNORE_SIMONS_OBSERVATORY_CMB_DATA=1
 #export IGNORE_PLANCK_CMB_DATA=1
-#export IGNORE_CAMSPEC_CMB_DATA=1
-#export IGNORE_LIPOP_CMB_DATA=1
-#export IGNORE_EMULTRF_DATA=1 #SaraivanovZhongZhu (SZZ) transformer-based emul
+export IGNORE_CAMSPEC_CMB_DATA=1
+export IGNORE_LIPOP_CMB_DATA=1
+export IGNORE_COSMOPOWER_DATA=1
+export IGNORE_EMULTRF_DATA=1 #SaraivanovZhongZhu (SZZ) transformer-based emul
+
 
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
@@ -54,6 +56,7 @@ export IGNORE_SPT_CMB_DATA=1
 #export IGNORE_ACTDR4_CODE=1
 #export IGNORE_ACTDR6_CODE=1
 export IGNORE_CPP_CUBA_INSTALLATION=1
+export IGNORE_FGSPECTRA_CODE=1
 export IGNORE_VELOCILEPTORS_CODE=1
 #export IGNORE_SIMONS_OBSERVATORY_LIKELIHOOD_CODE=1
 #export IGNORE_CAMSPEC_LIKELIHOOD_CODE=1
@@ -64,6 +67,7 @@ export IGNORE_MGCAMB_CODE=1
 #export IGNORE_EMULTRF_CODE=1 #SaraivanovZhongZhu (SZZ) transformer-based emul
 #export IGNORE_COSMOPOWER_CODE=1
 #export IGNORE_EUCLID_EMULATOR_V2_CODE=1
+export IGNORE_DARK_EMULATOR_CODE=1
 
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
@@ -72,20 +76,23 @@ export IGNORE_MGCAMB_CODE=1
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
-#export IGNORE_COSMOLIKE_LSSTY1_CODE=1
+#export IGNORE_COSMOLIKE_LSST_Y1_CODE=1
 export IGNORE_COSMOLIKE_DES_Y3_CODE=1
 #export IGNORE_COSMOLIKE_ROMAN_FOURIER_CODE=1
 #export IGNORE_COSMOLIKE_ROMAN_REAL_CODE=1
 
 # ------------------------------------------------------------------------------
-# If OVERWRITE_EXISTING_XXX_CODE=1, the setup_cocoa overwrites existing PACKAGES
-# overwrite means: delete existing PACKAGE folder and install it again ---------
-# redownload: delete the compressed file and download data again
-# these keys are only relevant if you run setup_cocoa multiple times -----------
+# OVERWRITE_EXISTING_XXX_CODE=1 -> setup_cocoa overwrites existing PACKAGES ----
+# overwrite: delete the existing PACKAGE folder and install it again -----------
+# redownload: delete the compressed file and download data again ---------------
+# These keys are only relevant if you run setup_cocoa multiple times -----------
 # ------------------------------------------------------------------------------
-#export OVERWRITE_EXISTING_ALL_PACKAGES=1
-#export OVERWRITE_EXISTING_COSMOLIKE_CODE=1
-#export REDOWNLOAD_EXISTING_ALL_DATA=1
+export OVERWRITE_EXISTING_ALL_PACKAGES=1    # except cosmolike projects
+#export OVERWRITE_EXISTING_COSMOLIKE_CODE=1 # dangerous (possible lost of uncommit work)
+                                            # if unset, users must manually delete
+                                            # project if wants setup_cocoa to reclone it
+#export REDOWNLOAD_EXISTING_ALL_DATA=1      # warning: some data are many GB
+
 # ------------------------------------------------------------------------------
 # If set, compile_planck.sh uses click like code from github.com/benabed/clik
 # ------------------------------------------------------------------------------
@@ -158,6 +165,11 @@ fi
 if [[ -z "${IGNORE_COSMOPOWER_CODE}" || -z "${IGNORE_EMULTRF_CODE}" ]]; then
   unset -v IGNORE_EMULATOR_GPU_PIP_PACKAGES
 fi
+
+#if [ -z "${IGNORE_EUCLID_EMULATOR_V2_CODE}" ]; then
+#  unset -v IGNORE_CLASS_CODE
+#fi
+
 # ------------------------------------------------------------------------------
 
 # ------------------------------------------------------------------------------
@@ -195,6 +207,7 @@ if [ -n "${OVERWRITE_EXISTING_ALL_PACKAGES}" ]; then
   export OVERWRITE_EXISTING_HOLICOW_DATA=1
   export OVERWRITE_EXISTING_COSMOPOWER_CODE=1
   export OVERWRITE_EXISTING_EMULTRF_CODE=1
+  export OVERWRITE_EXISTING_DARK_EMULATOR_CODE=1
 fi
 
 if [ -n "${REDOWNLOAD_EXISTING_ALL_DATA}" ]; then
@@ -204,6 +217,7 @@ if [ -n "${REDOWNLOAD_EXISTING_ALL_DATA}" ]; then
   export REDOWNLOAD_EXISTING_SIMONS_OBSERVATORY_CMB_DATA=1
   export REDOWNLOAD_EXISTING_CAMPSPEC_CMB_DATA=1
   export OVERWRITE_EXISTING_EMULTRF_DATA=1
+  export OVERWRITE_EXISTING_COSMOPOWER_DATA=1
 fi
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
@@ -285,8 +299,10 @@ export SO_MFLIKE_GIT_COMMIT="531267e8f046f72ddc5fe4ff88432871ad8c9cfd"
 export SO_SYSLIB_URL="https://github.com/simonsobs/syslibrary.git"
 export SO_SYSLIB_GIT_COMMIT="2471df981053a7526a441d2547eb8dde10d92f70"
 
-export EE2_URL="https://github.com/miknab/EuclidEmulator2.git"
-export EE2_GIT_COMMIT="ff59f6683069417f6b4d2fb5d59197044d424445"
+export EE2_URL="https://github.com/vivianmiranda/EuclidEmulator2.git"
+export EE2_GIT_COMMIT="df250250e31fcd15841b622b42142cb12f9fd68b"
+# THIS GIT IS FOR THE ORIGNIAL EE2 BEFORE VM MODS
+#export EE2_GIT_COMMIT="ff59f6683069417f6b4d2fb5d59197044d424445"
 export EE2_NAME="euclidemu2"
 
 export HYREC_URL="https://github.com/nanoomlee/HYREC-2.git"
@@ -311,32 +327,58 @@ export COSMOPOWER_SOLIKET_GIT_COMMIT="1d8333ea0007c88e7c2de192de39301884093cd8"
 export COSMOPOWER_URL="https://github.com/alessiospuriomancini/cosmopower.git"
 export COSMOPOWER_GIT_COMMIT="7cac5e71c975c06257b2f95f0dcea5dd09b0f45f"
 
-export EMULTRF_URL="git@github.com:SBU-COSMOLIKE/emulators_code.git"
-export EMULTRF_GIT_COMMIT="5c80e0b7877901ec3edd3028a73f7434b1fa6f35"
+export COSMOPOWER_URL_DATA="https://github.com/cosmopower-organization/jense_2024_emulators.git"
+export COSMOPOWER_URL_DATA_COMMIT="4317635eed70289ee1ec6b3df828027173071e36"
 
-export EMULTRF_DATA_URL="git@github.com:SBU-COSMOLIKE/emulators_data.git"
-export EMULTRF_DATA_GIT_COMMIT="dca7bf6bb40ae8c6428837c2d48a7b63de36ae3a"
+export EMULTRF_URL="https://github.com/CosmoLike/emulators_code.git"
+export EMULTRF_GIT_COMMIT="6023e5624ec21e1b3c9cda48075bcf4296a2d871"
+
+export EMULTRF_DATA_URL="https://github.com/CosmoLike/emulators_data.git"
+export EMULTRF_DATA_GIT_COMMIT="b2abc2149f4b3b56836f05ddb135667d79b742a4"
+
+export DARKEMULATOR_URL="https://github.com/DarkQuestCosmology/dark_emulator_public.git"
+export DARKEMULATOR_GIT_COMMIT="46df5972509624e2eeadc2bf3ac528b02333a7e2"
 
 # --------------------------------------------------------------------
 # --------------------------------------------------------------------
-# Cosmolike projects below
+# Cosmolike projects below -------------------------------------------
 # --------------------------------------------------------------------
 # --------------------------------------------------------------------
 export LSST_Y1_URL="git@github.com:SBU-COSMOLIKE/cocoa_lsst_y1.git"
 export LSST_Y1_NAME="lsst_y1"
-export LSST_Y1_COMMIT="c97e8bb4b861131737c3b472631d4ed82afdce89"
+#BRANCH: if unset, load the latest commit on the specified branch
+#export LSST_Y1_BRANCH="dev"
+#COMMIT: if unset, load the specified commit
+export LSST_Y1_COMMIT="2d2a9cde8c38090e5088287ec969d9486522ce17"
+#BRANCH: if unset, load the specified TAG
+#export LSST_Y1_TAG="v4.0-beta17"
 
 export DES_Y3_URL="git@github.com:SBU-COSMOLIKE/cocoa_des_y3.git"
 export DES_Y3_NAME="des_y3"
-export DES_Y3_COMMIT="2d7e05944bf9c4724dcb5407e7cb76c992993807"
+#BRANCH: if unset, load the latest commit on the specified branch
+#export DES_Y3_BRANCH="main"
+#COMMIT: if unset, load the specified commit
+#export DES_Y3_COMMIT="2d7e05944bf9c4724dcb5407e7cb76c992993807"
+#BRANCH: if unset, load the specified TAG
+export DES_Y3_TAG="v4.0-beta17"
 
 export ROMAN_FOURIER_URL="git@github.com:SBU-COSMOLIKE/cocoa_roman_fourier.git"
 export ROMAN_FOURIER_NAME="roman_fourier"
-export ROMAN_FOURIER_COMMIT="e79d3e5754484ccc3353e7fb12073264cd9137b4"
+#BRANCH: if unset, load the latest commit on the specified branch
+#export ROMAN_FOURIER_BRANCH="main"
+#COMMIT: if unset, load the specified commit
+export ROMAN_FOURIER_COMMIT="d990ace46033b074c88934657f5abbf9f91acbad"
+#BRANCH: if unset, load the specified TAG
+#export ROMAN_FOURIER_TAG="v4.0-beta17"
 
 export ROMAN_REAL_URL="git@github.com:SBU-COSMOLIKE/cocoa_roman_real.git"
 export ROMAN_REAL_NAME="roman_real"
-export ROMAN_REAL_COMMIT="d9dcdda435f64d11f24649c33e7d8b9bf0da0dfb"
+#BRANCH: if unset, load the latest commit on the specified branch
+#export ROMAN_REAL_BRANCH="main"
+#COMMIT: if unset, load the specified commit
+export ROMAN_REAL_COMMIT="3a5fd28ec7f0c60e093990177bf3f70d58649517"
+#BRANCH: if unset, load the specified TAG
+#export ROMAN_REAL_TAG="v4.0-beta17"
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------

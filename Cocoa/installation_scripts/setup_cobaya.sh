@@ -135,15 +135,32 @@ if [ -z "${IGNORE_COBAYA_CODE}" ]; then
     declare -a TFOLDER=("cobaya/likelihoods/base_classes/") # Must include  
     declare -a TFILE=("planck_clik.py")
     declare -a TFILEP=("planck_clik.patch")
-    AL=${#TFOLDER[@]}
 
-    for (( i=0; i<${AL}; i++ ));
+    for (( i=0; i<${#TFOLDER[@]}; i++ ));
     do
       cdfolder "${COB:?}/${TFOLDER[$i]}" || return 1;
 
       cpfolder "${CCCOB:?}/${TFOLDER[$i]}${TFILEP[$i]:?}" . 2>${OUT2:?} || return 1;
 
-      patch -R -u "${TFILE[$i]:?}" -i "${TFILEP[$i]:?}" >${OUT1:?} \
+      patch -u -R "${TFILE[$i]:?}" -i "${TFILEP[$i]:?}" >${OUT1:?} \
+        2>${OUT2:?} || { error "${EC17:?} (${TFILE[$i]:?})"; return 1; }
+    done
+
+    # --------------------------------------------------------------------------
+    # PATCH FILE2 --------------------------------------------- -----------------
+    # --------------------------------------------------------------------------  
+    declare -a TFOLDER=("cobaya/") # Must include  
+    declare -a TFILE=("model.py")
+    declare -a TFILEP=("model.patch")
+
+    for (( i=0; i<${#TFOLDER[@]}; i++ ));
+    do
+      cdfolder "${COB:?}/${TFOLDER[$i]}" || return 1;
+
+      cpfolder "${CCCOB:?}/${TFOLDER[$i]}${TFILEP[$i]:?}" . 2>${OUT2:?} || return 1;
+
+      # HERE I CAN't USE THE -R
+      patch -u "${TFILE[$i]:?}" -i "${TFILEP[$i]:?}" >${OUT1:?} \
         2>${OUT2:?} || { error "${EC17:?} (${TFILE[$i]:?})"; return 1; }
     done
 
