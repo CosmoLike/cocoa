@@ -64,8 +64,8 @@ export IGNORE_VELOCILEPTORS_CODE=1
 export IGNORE_HYREC_CODE=1
 export IGNORE_COSMOREC_CODE=1
 export IGNORE_MGCAMB_CODE=1
-#export IGNORE_EMULTRF_CODE=1 #SaraivanovZhongZhu (SZZ) transformer-based emul
-#export IGNORE_COSMOPOWER_CODE=1
+export IGNORE_EMULTRF_CODE=1 #SaraivanovZhongZhu (SZZ) transformer-based emul
+export IGNORE_COSMOPOWER_CODE=1
 #export IGNORE_EUCLID_EMULATOR_V2_CODE=1
 export IGNORE_DARK_EMULATOR_CODE=1
 
@@ -106,7 +106,7 @@ export MAKE_NUM_THREADS=4
 # ------------------------------------------------------------------------------
 # If not set, pip_core_packages.sh will install several ML packages ------------
 # ------------------------------------------------------------------------------
-#export IGNORE_EMULATOR_GPU_PIP_PACKAGES=1
+export IGNORE_EMULATOR_GPU_PIP_PACKAGES=1
 
 # ------------------------------------------------------------------------------
 # Adopted Python version -------------------------------------------------------
@@ -330,11 +330,11 @@ export COSMOPOWER_GIT_COMMIT="7cac5e71c975c06257b2f95f0dcea5dd09b0f45f"
 export COSMOPOWER_URL_DATA="https://github.com/cosmopower-organization/jense_2024_emulators.git"
 export COSMOPOWER_URL_DATA_COMMIT="4317635eed70289ee1ec6b3df828027173071e36"
 
-export EMULTRF_URL="https://github.com/CosmoLike/emulators_code.git"
+export EMULTRF_URL="git@github.com:SBU-COSMOLIKE/emulators_code.git"
 export EMULTRF_GIT_COMMIT="6023e5624ec21e1b3c9cda48075bcf4296a2d871"
 
-export EMULTRF_DATA_URL="https://github.com/CosmoLike/emulators_data.git"
-export EMULTRF_DATA_GIT_COMMIT="b2abc2149f4b3b56836f05ddb135667d79b742a4"
+export EMULTRF_DATA_URL="git@github.com:SBU-COSMOLIKE/emulators_data.git"
+export EMULTRF_DATA_GIT_COMMIT="d90d888d6a51cd12408abf206465311c3978bb2f"
 
 export DARKEMULATOR_URL="https://github.com/DarkQuestCosmology/dark_emulator_public.git"
 export DARKEMULATOR_GIT_COMMIT="46df5972509624e2eeadc2bf3ac528b02333a7e2"
