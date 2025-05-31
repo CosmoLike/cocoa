@@ -1067,8 +1067,9 @@ and
 
     source start_cocoa.sh
  
-> [!Warning] Users must run `start_cocoa.sh` after cloning the project repository, so Cocoa can create appropriate soft-links.
->
+> [!Warning]
+> Users must run `start_cocoa.sh` after cloning the project repository, so Cocoa can create appropriate soft-links.
+
 **Step :three:**: Compile the project, as shown below (two possibilities)
  
     source "${ROOTDIR:?}"/projects/XXX/scripts/compile_XXX
