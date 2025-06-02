@@ -75,11 +75,7 @@ export IGNORE_DARK_EMULATOR_CODE=1
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
-<<<<<<< HEAD
-export IGNORE_COSMOLIKE_LSSTY1_CODE=1
-=======
 #export IGNORE_COSMOLIKE_LSST_Y1_CODE=1
->>>>>>> main
 export IGNORE_COSMOLIKE_DES_Y3_CODE=1
 #export IGNORE_COSMOLIKE_ROMAN_FOURIER_CODE=1
 #export IGNORE_COSMOLIKE_ROMAN_REAL_CODE=1
@@ -341,6 +337,9 @@ export EMULTRF_DATA_GIT_COMMIT="b2abc2149f4b3b56836f05ddb135667d79b742a4"
 
 export DARKEMULATOR_URL="https://github.com/DarkQuestCosmology/dark_emulator_public.git"
 export DARKEMULATOR_GIT_COMMIT="46df5972509624e2eeadc2bf3ac528b02333a7e2"
+
+export FASTPT_URL="https://github.com/jablazek/FAST-PT.git"
+export FASTPT_GIT_COMMIT="5e65ad23becaaae5b18aedcaacab99411df92b0f"
 
 # --------------------------------------------------------------------
 # --------------------------------------------------------------------
