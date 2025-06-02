@@ -525,12 +525,6 @@ We provide the Docker image [whovian-cocoa](https://hub.docker.com/r/vivianmiran
      mkdir -p cocoa_docker
      cd ./cocoa_docker
 
-> [!NOTE]
-> The flag `-v $(pwd):/home/whovian/host/` in the `docker run` command ensures that files on the host computer have been mounted to the directory `/home/whovian/host/`. Files within the folder where the Docker container was initialized are accessible at `/home/Whovian/host/`. Users should work inside this directory to avoid losing work if the Docker image needs to be deleted.
-
-> [!WARNING]
->  Do not run the Docker container on a general folder (like the host's home directory); this would provide too much access to the Docker container. Accidents happen, especially when dealing with dangerous bash commands such as `rm` (deletion).
-
  **Step :two:**: Download the docker image *whovian-cocoa*, name the associated container `cocoa2023`, and run the container for the first time, type:
 
     docker run --platform linux/amd64 --hostname cocoa --name cocoa2023 -it -p 8888:8888 -v $(pwd):/home/whovian/host/ -v ~/.ssh:/home/whovian/.ssh:ro vivianmiranda/whovian-cocoa
@@ -577,6 +571,9 @@ This is a large image with a size of approximately 16GB, as it **already contain
 > before typing `http://127.0.0.1:8888/?token=XXX` on the local desktop/laptop. This will bind the server port `8888` to the local port `8888`.
 > 
 >     [... NotebookApp] or http://127.0.0.1:8888/?token=XXX  
+
+> [!WARNING]
+> The flag `-v $(pwd):/home/whovian/host/` in the `docker run` command ensures that files on the host computer have been mounted to the directory `/home/whovian/host/`. Files within the folder where the Docker container was initialized are accessible at `/home/Whovian/host/`. Users should work inside this directory to avoid losing work if the Docker image needs to be deleted. Do not run the Docker container on a general folder (like the host's home directory); this would provide too much access to the Docker container. Accidents happen, especially when dealing with dangerous bash commands such as `rm` (deletion).
 
 ### :interrobang: FAQ: How do we use an available Anaconda module on HPC? <a name="overview_anaconda"></a>
 
