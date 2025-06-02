@@ -527,18 +527,18 @@ We provide the Docker image [whovian-cocoa](https://hub.docker.com/r/vivianmiran
 
  **Step :two:**: Download the docker image *whovian-cocoa*, name the associated container `cocoa2023`, and run the container for the first time, type:
 
-    docker run --platform linux/amd64 --hostname cocoa --name cocoa2023 -it -p 8888:8888 -v $(pwd):/home/whovian/host/ -v ~/.ssh:/home/whovian/.ssh:ro vivianmiranda/whovian-cocoa
+    docker run --platform linux/amd64 --hostname cocoa --name cocoa2025 -it -p 8888:8888 -v $(pwd):/home/whovian/host/ -v ~/.ssh:/home/whovian/.ssh:ro vivianmiranda/whovian-cocoa
 
 This is a large image with a size of approximately 16GB, as it already contains the cocoa `v4.0beta26` installed and pre-compiled. 
 
  **Step :three:**: As shown in the picture below, users can follow the instructions provided in Section [Running Examples](#cobaya_base_code_examples) to run basic non-cosmolike-based examples, as well as examples within `LSST-Y1`, `ROMAN_REAL`, and `ROMAN_FOURIER` projects. 
 
-<img width="1590" alt="Screenshot 2025-06-02 at 6 57 13 PM" src="https://github.com/user-attachments/assets/f1d97078-9d7f-45f1-bd1a-4226d543b1fc" />
+![screenshot_2025-06-02_at_7 23 48_pm](https://github.com/user-attachments/assets/2b15ce75-3d43-4a65-ab7b-e70077492b32)
 
 > [!TIP]
 > Once installation is complete, the user must learn how to **start**, use, and **exit** the container. Assuming the user maintained the container name `cocoa2023` via the flag `--name cocoa2023` on the `docker run` command, type:
 >    
->      docker start -ai cocoa2023
+>      docker start -ai cocoa2025
 >
 >  to restart the container after the first exit.
 
@@ -569,6 +569,12 @@ This is a large image with a size of approximately 16GB, as it already contains 
 > before typing `http://127.0.0.1:8888/?token=XXX` on the local desktop/laptop. This will bind the server port `8888` to the local port `8888`.
 > 
 >     [... NotebookApp] or http://127.0.0.1:8888/?token=XXX  
+
+> [!TIP]
+> To delete a particular container, type
+>
+>      docker rm -f cocoa2025
+>
 
 > [!WARNING]
 > The flag `-v $(pwd):/home/whovian/host/` in the `docker run` command ensures that files on the host computer have been mounted to the directory `/home/whovian/host/`. Files within the folder where the Docker container was initialized are accessible at `/home/Whovian/host/`. Users should work inside this directory to avoid losing work if the Docker image needs to be deleted. Do not run the Docker container on a general folder (like the host's home directory); this would provide too much access to the Docker container. Accidents happen, especially when dealing with dangerous bash commands such as `rm` (deletion).
