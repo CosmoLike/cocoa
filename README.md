@@ -541,7 +541,7 @@ Following the command above, users should see the following text on the screen t
 
 This is a large image with a size of approximately 16GB, as it **already contains the cocoa version `v4.0beta26` installed and compiled**. As shown in the picture below, Users now follow the instructions in Section [Running Examples](#cobaya_base_code_examples) to run basic non-cosmolike-based examples, as well as examples provided by the `LSST-Y1`, `ROMAN_REAL', and `ROMAN_FOURIER` projects. 
 
-<img width="2382" alt="Screenshot 2025-06-02 at 6 52 23 PM" src="https://github.com/user-attachments/assets/f33b9c5b-8849-4311-9bbe-4b5c5257673b" />
+<img width="1590" alt="Screenshot 2025-06-02 at 6 57 13 PM" src="https://github.com/user-attachments/assets/f1d97078-9d7f-45f1-bd1a-4226d543b1fc" />
 
 > [!TIP]
 > Once installation is complete, the user must learn how to **start**, use, and **exit** the container. Assuming the user maintained the container name `cocoa2023` via the flag `--name cocoa2023` on the `docker run` command, type:
