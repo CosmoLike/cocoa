@@ -116,7 +116,10 @@ This script downloads and decompresses external modules, requiring internet acce
 
     source compile_cocoa.sh
     
-This script compiles external modules selected for installation on `set_installation_options.sh` (e.g., CAMB and Class). Cocoa does not install many external modules by default, but users may require them in a particular project. In this case, check the  available options on the `set_installation_options.sh` shell script. Then, rerun steps :two: and :three:. 
+This script compiles external modules selected for installation on `set_installation_options.sh` (e.g., CAMB and Class). 
+
+> [!TIP]
+> Cocoa does not install many external modules by default, but users may require them in a particular project. In this case, check the  available options on the `set_installation_options.sh` shell script. Then, rerun steps :two: and :three:. 
 
 > [!NOTE]
 > In some HPC environments, the compute nodes cannot access the web. So, by design, the script `compile_cocoa.sh` does not require internet access to run successfully. Code compilation is a CPU-intensive operation; therefore, running  `compile_cocoa.sh` on a cluster login node can be against HPC policy. Users should then run `setup_cocoa.sh` in a login node and `compile_cocoa.sh` in a compute node.
