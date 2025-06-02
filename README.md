@@ -529,11 +529,9 @@ We provide the Docker image [whovian-cocoa](https://hub.docker.com/r/vivianmiran
 
     docker run --platform linux/amd64 --hostname cocoa --name cocoa2023 -it -p 8888:8888 -v $(pwd):/home/whovian/host/ -v ~/.ssh:/home/whovian/.ssh:ro vivianmiranda/whovian-cocoa
 
-Following the command above, users should see the following text on the screen terminal:
+This is a large image with a size of approximately 16GB, as it **already contains the cocoa version `v4.0beta26` installed and compiled**. 
 
-<img width="872" alt="Screenshot 2023-12-19 at 1 26 50 PM" src="https://github.com/CosmoLike/cocoa/assets/3210728/eb1fe7ec-e463-48a6-90d2-2d84e5b61aa1">
-
-This is a large image with a size of approximately 16GB, as it **already contains the cocoa version `v4.0beta26` installed and compiled**. As shown in the picture below, Users now follow the instructions in Section [Running Examples](#cobaya_base_code_examples) to run basic non-cosmolike-based examples, as well as examples provided by the `LSST-Y1`, `ROMAN_REAL', and `ROMAN_FOURIER` projects. 
+ **Step :three:**: As shown in the picture below, users can follow the instructions provided in Section [Running Examples](#cobaya_base_code_examples) to run basic non-cosmolike-based examples, as well as examples within `LSST-Y1`, `ROMAN_REAL', and `ROMAN_FOURIER` projects. 
 
 <img width="1590" alt="Screenshot 2025-06-02 at 6 57 13 PM" src="https://github.com/user-attachments/assets/f1d97078-9d7f-45f1-bd1a-4226d543b1fc" />
 
