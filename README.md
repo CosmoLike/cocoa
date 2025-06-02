@@ -539,23 +539,12 @@ Following the command above, users should see the following text on the screen t
 
 <img width="872" alt="Screenshot 2023-12-19 at 1 26 50 PM" src="https://github.com/CosmoLike/cocoa/assets/3210728/eb1fe7ec-e463-48a6-90d2-2d84e5b61aa1">
 
- **Step :three:**: Init Conda when running the container the first time, as shown below.
+This is a large image with a size of approximately 16GB, as it **already contains the cocoa version `v4.0beta26` installed and compiled**. As shown in the picture below, Users now follow the instructions in Section [Running Examples](#cobaya_base_code_examples) to run basic non-cosmolike-based examples, as well as examples provided by the `LSST-Y1`, `ROMAN_REAL', and `ROMAN_FOURIER` projects. 
 
-    conda init bash
-    source ~/.bashrc
-    conda activate cocoa
-    git-lfs install
-
- **Step :four:**: Access the host computer on `/home/whovian/host/`
- 
-    cd ~/host/
-
-Now proceed with the standard cocoa installation in section [Installation and Compilation of external modules](#cobaya_base_code)
- 
-Once installation is complete, the user must learn how to **start**, use, and **exit** the container. Below, we address a few common questions about using and managing Docker containers.  
+<img width="2382" alt="Screenshot 2025-06-02 at 6 52 23 PM" src="https://github.com/user-attachments/assets/f33b9c5b-8849-4311-9bbe-4b5c5257673b" />
 
 > [!TIP]
-> Assuming the user maintained the container name `cocoa2023` via the flag `--name cocoa2023` on the `docker run` command, type:
+> Once installation is complete, the user must learn how to **start**, use, and **exit** the container. Assuming the user maintained the container name `cocoa2023` via the flag `--name cocoa2023` on the `docker run` command, type:
 >    
 >      docker start -ai cocoa2023
 >
