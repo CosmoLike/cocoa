@@ -55,7 +55,13 @@ activate it
 
     conda activate cocoa
 
-and create symbolic links that will give better names for the GNU compilers
+> [!TIP]
+> To install the `cocoa` conda environment on a supercomputer, users may take advantage of the fact that several HPC environments provide the [Anaconda installer](https://www.anaconda.com) as an external module. If this applies to you, then check the appendix [FAQ: How do we use an available Anaconda module on HPC?](#overview_anaconda).
+
+> [!TIP]
+> Users working on an HPC environment that does not offer Anaconda or Miniconda may want to check the appendix [FAQ: What if there is no Conda? Miniconda installation](#overview_miniconda).
+
+**Step :two:**: When and only when loading the conda cocoa environment for the first time, create symbolic links that will give better names for the GNU compilers
 
     ln -s "${CONDA_PREFIX}"/bin/x86_64-conda_cos6-linux-gnu-gcc "${CONDA_PREFIX}"/bin/gcc
     ln -s "${CONDA_PREFIX}"/bin/x86_64-conda_cos6-linux-gnu-g++ "${CONDA_PREFIX}"/bin/g++
@@ -64,24 +70,14 @@ and create symbolic links that will give better names for the GNU compilers
     ln -s "${CONDA_PREFIX}"/bin/x86_64-conda-linux-gnu-gcc-ranlib "${CONDA_PREFIX}"/bin/gcc-ranlib
     ln -s "${CONDA_PREFIX}"/bin/x86_64-conda-linux-gnu-ld "${CONDA_PREFIX}"/bin/ld
 
-Users can now proceed to **step :two:**. 
-
-> [!TIP]
-> To install the `cocoa` conda environment on a supercomputer, users may take advantage of the fact that several HPC environments provide the [Anaconda installer](https://www.anaconda.com) as an external module. If this applies to you, then check the appendix [FAQ: How do we use an available Anaconda module on HPC?](#overview_anaconda).
-
-> [!TIP]
-> Users working on an HPC environment that does not offer Anaconda or Miniconda may want to check the appendix [FAQ: What if there is no Conda? Miniconda installation](#overview_miniconda).
-
-**Step :two:**: Install `git-lfs` when loading the conda cocoa environment for the first time.
+and Install `git-lfs`
 
     git-lfs install
 
 ## Installation and Compilation of external modules <a name="cobaya_base_code"></a>
 
-> [!WARNING]
-> In this section, we assume users have previously activated the Cocoa conda environment
->
-> 
+In this section, we assume users have previously activated the Cocoa conda environment.
+
 **Step :one:**: Download Cocoa's latest release and go to its main folder (`cocoa/Cocoa`),
 
     "${CONDA_PREFIX}"/bin/git clone https://github.com/CosmoLike/cocoa.git --branch v4.0-beta26 cocoa
