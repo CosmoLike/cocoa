@@ -239,7 +239,7 @@ Now, users must follow all the steps below.
     
     export OMP_PROC_BIND=close; export OMP_NUM_THREADS=1
 
- **Step :three:** So, run `cobaya-run` on the first emulator example following the commands below.
+ **Step :three:** Run `cobaya-run` on the first emulator example following the commands below.
 
 One model evaluation:
 
