@@ -1,6 +1,6 @@
 # Table of contents
 1. [The Projects Folder](#appendix_projects_folder)
-2. [FAQ: How do we download and run Cosmolike projects?](/#running_cosmolike_projects)
+2. [FAQ: How do we download and run Cosmolike projects?](#running_cosmolike_projects)
 3. [FAQ: How do we set Weak Lensing YAML files in Cobaya? A warning](#appendix_example_runs)
 4. [FAQ: How do we set Slow/Fast decomposition with Cosmolike?](#manual_blocking_cosmolike)
 5. [FAQ: How do we create a new cosmolike project?](#appendix_lsst_y1_new)
@@ -72,12 +72,11 @@ and
 
 **Step :three:**: Compile the project, as shown below (two possibilities)
  
-    source "${ROOTDIR:?}"/projects/XXX/scripts/compile_XXX
+    source ./projects/XXX/scripts/compile_XXX
 
 or
 
-    # This will compile all cosmolike courses
-    source "${ROOTDIR:?}"/installation_scripts/compile_all_projects.sh
+    source ./installation_scripts/compile_all_projects.sh # compile all cosmolike projects
  
 **Step :four:**: Select the number of OpenMP cores and run a template YAML file
     
@@ -87,11 +86,11 @@ and
 
     mpirun -n 1 --oversubscribe --mca pml ^ucx --mca btl vader,tcp,self --bind-to core:overload-allowed --rank-by slot --map-by numa:pe=${OMP_NUM_THREADS} cobaya-run ./projects/XXX/EXAMPLE_EVALUATE1.yaml -f
 
-If users want to make a particular cosmolike project widely available in Cocoa, implement the following steps:
+If users want to make a particular Cosmolike project widely available in Cocoa, implement the following steps:
 
 **Step :one:**: Add the following env keys on `set_installation_options.sh`
 
-    [adapted from ${ROOTDIR:?}/set_installation_options.sh script]
+    [adapted from Cocoa/set_installation_options.sh script]
     
     #the flag below allows users to skip the downloading project XXX
     #export IGNORE_COSMOLIKE_XXX_CODE=1
@@ -101,11 +100,11 @@ If users want to make a particular cosmolike project widely available in Cocoa, 
     export XXX_URL="https://github.com/.../cocoa_lsst_XXX.git"
     export XXX_NAME="XXX"
     #Key XXX_COMMIT is optional, but we strongly recommend its inclusion 
-    export XXX_COMMIT="a5cf62ffcec7b862dda5b1234f6bb19124bb5d0"
+    export XXX_COMMIT="abc123"
 
 **Step :two:**: Adapt and add the keys below to `flags_impl_unset_keys.sh` 
 
-    [adapted from ${ROOTDIR:?}/installation_scripts/flags_impl_unset_keys.sh]
+    [adapted from Cocoa/installation_scripts/flags_impl_unset_keys.sh]
 
     unset -v XXX_URL XXX_NAME XXX_COMMIT IGNORE_COSMOLIKE_XXX_CODE
 
@@ -113,7 +112,7 @@ This will ensure that `stop_cocoa.sh` unsets them before exiting Cocoa.
 
 **Step :three:** Add and adapt the following block to `setup_cosmolike_projects.sh`.
 
-     [adapted from ${ROOTDIR:?}/installation_scripts/setup_cosmolike_projects.sh script]
+     [adapted from Cocoa/installation_scripts/setup_cosmolike_projects.sh script]
      
      if [ -z "${IGNORE_COSMOLIKE_XXX_CODE}" ]; then 
        ptop "GETTING XXX" || return 1
@@ -126,12 +125,12 @@ This will ensure that `stop_cocoa.sh` unsets them before exiting Cocoa.
      fi
 
 > [!NOTE]
-> *projects* was designed to include all Cosmolike projects, and Cocoa contains two scripts
+> Cocoa contains the scripts
 >
->      "${ROOTDIR:?}"/installation_scripts/setup_cosmolike_projects.sh
->      "${ROOTDIR:?}"/installation_scripts/compile_all_projects.sh
+>      Cocoa/installation_scripts/setup_cosmolike_projects.sh
+>      Cocoa/installation_scripts/compile_all_projects.sh
 > 
-> that `setup` and `compile` all projects defined there. As a standard, we defined the project name `XXX` to be stored on a GitHub repository with the name `cocoa_XXX`. The prefix `cocoa_` helps developers in the Cosmolike organization differentiate legacy Cosmolike projects from matching ones designed for Cocoa. 
+> designed to download and compile all Cosmolike projects defined in the `Cocoa/projects` folder.
 
 > [!Warning]
 > Never delete a folder from `projects` without first running `stop_cocoa.sh`; otherwise, Cocoa will have ill-defined links.
