@@ -221,7 +221,7 @@ The CosmoLike pipeline requires $\Omega_m$ and $\Omega_b$ to be provided, but th
 
 ### :interrobang: FAQ: How do we set Slow/Fast decomposition with Cosmolike?  <a name="manual_blocking_cosmolike"></a>
 
-Cosmolike can't cache the intermediate products associated with two models, which are necessary to exploit Cobaya optimizations associated with dragging (`drag: True`). Still, it can cache one model, thereby enabling the user to take advantage of the slow/fast decomposition of parameters in Cobaya's main Markov Chain Monte Carlo (MCMC) sampler. For example, Cosmolike execution time is reduced by approximately 50% when fixing the cosmological parameters. On variations limited to the multiplicative shear calibration, Cosmolike execution time is reduced by many orders of magnitude compared to a full run. 
+Cosmolike can't cache the intermediate products associated with the previous two evaluations, which are necessary to exploit Cobaya optimizations associated with dragging (`drag: True`). Still, it can cache the last evaluation, allowing the user to take advantage of a slow/fast decomposition of parameters in Cobaya's main Markov Chain Monte Carlo (MCMC) sampler. 
 
 Cobaya cannot automatically handle parameters with different speed hierarchies associated with the same likelihood. Luckily, we can manually impose a speed hierarchy in Cobaya using the `blocking:` option in the YAML file. The main limitation of this method is that parameters of all adopted likelihoods, not only the ones required by Cosmolike, must be manually specified.
 
