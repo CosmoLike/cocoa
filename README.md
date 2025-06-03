@@ -136,7 +136,7 @@ This script downloads and decompresses external modules, requiring internet acce
 
     source compile_cocoa.sh
     
-This script compiles external modules selected for installation on `set_installation_options.sh` (e.g., CAMB and Class). Users can now proceed to the next section. Users can now proceed to the next section.
+This script compiles external modules selected for installation on `set_installation_options.sh` (e.g., CAMB and Class). Users can now proceed to **the next section**.
 
 > [!TIP]
 > Cocoa does not install many external modules by default, but users may require them in a particular project. In this case, check the  available options on the `set_installation_options.sh` shell script. Then, rerun steps :two: and :three:. 
@@ -152,11 +152,13 @@ We assume that you are still in the Conda cocoa environment from the previous `c
 
     source start_cocoa.sh
 
-Users will see a terminal like this: `$(cocoa)(.local)`. *This is a feature, not a bug*! 
+Users will see a terminal like this: `$(cocoa)(.local)`. *This is a feature, not a bug*! Users can now proceed to **step :two:**.
 
  **Step :two:**: Select the number of OpenMP cores (below, we set it to 8).
     
     export OMP_PROC_BIND=close; export OMP_NUM_THREADS=8
+
+Users can now proceed to **step :three:**.
 
 ### Examples not involving Cosmolike
 
@@ -166,7 +168,6 @@ One model evaluation:
 
     mpirun -n 1 --oversubscribe --mca pml ^ucx --mca btl vader,tcp,self --bind-to core:overload-allowed --rank-by slot --map-by numa:pe=${OMP_NUM_THREADS} cobaya-run  ./projects/example/EXAMPLE_EVALUATE1.yaml -f
         
-
 MCMC (we run MCMCs with 32 cores):
 
     mpirun -n 4 --oversubscribe --mca pml ^ucx --mca btl vader,tcp,self --bind-to core:overload-allowed --rank-by slot --map-by numa:pe=${OMP_NUM_THREADS} cobaya-run ./projects/example/EXAMPLE_MCMC1.yaml -f
@@ -183,7 +184,6 @@ One model evaluation:
 MCMC (we run MCMCs with 32 cores):
 
     mpirun -n 4 --oversubscribe --mca pml ^ucx --mca btl vader,tcp,self --bind-to core:overload-allowed --rank-by slot --map-by numa:pe=${OMP_NUM_THREADS} cobaya-run ./projects/lsst_y1/EXAMPLE_MCMC1.yaml -f
-
 
 Profile:
 
