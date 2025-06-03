@@ -234,13 +234,13 @@ Cocoa contains a few transformer-based neural network emulators capable of simul
       #export IGNORE_SIMONS_OBSERVATORY_LIKELIHOOD_CODE=1    # to run EXAMPLE_EVALUATE26.yaml
       #export IGNORE_SIMONS_OBSERVATORY_CMB_DATA=1           # to run EXAMPLE_EVALUATE26.yaml
  
-Now follow all the steps below, including step :one: (users will neeed to run `start_cocoa.sh` once more so Cocoa can create appropriate symlinks).
+Now follow all the steps below, including step :one:.
 
  **Step :one:**: Activate the private Python environment by sourcing the script `start_cocoa.sh`
 
     source start_cocoa.sh
 
- **Step :two:**: Select the number of OpenMP cores (no need to thread via OpenMP; however, `OMP_NUM_THREADS=3` reduces emulator runtime ~x2).
+ **Step :two:**: Select the number of OpenMP cores (no need to thread via OpenMP; however, `OMP_NUM_THREADS=3` did reduce the TRF emulator runtime by a factor of two on our test machine).
     
     export OMP_PROC_BIND=close; export OMP_NUM_THREADS=1
 
@@ -327,7 +327,7 @@ Here are a few steps to debug Cocoa
 
       (....)
 
-**Step :two:**: restart the Cocoa private environment by rerunning `source start_cocoa.sh`, and compile the failed package separately by following the instructions in the appendix [FAQ: How do we compile the Boltzmann, CosmoLike, and Likelihood codes separately](#appendix_compile_separately).
+**Step :two:**: restart the Cocoa private environment by rerunning `source start_cocoa.sh` (everytime users edit `set_installation_options.sh`, they need to reload `(.local)` by rerunning `start_cocoa.sh`), and compile the failed package separately by following the instructions in the appendix [FAQ: How do we compile the Boltzmann, CosmoLike, and Likelihood codes separately](#appendix_compile_separately).
 
 **Step :three:**: rerun `setup_cocoa.sh` and `compile_cocoa.sh` to ensure all packages are installed and compiled correctly.
 
@@ -353,7 +353,7 @@ To avoid excessive compilation or download times during development, users can u
      (...)
      #export IGNORE_ACTDR6_CODE=1                            # ACT-DR6 likelihood code
 
-Then, users should run the commands below
+Everytime users edit `set_installation_options.sh`, they need to reload `(.local)` by rerunning `start_cocoa.sh`. Then, users should run the commands below
 
      cd ./cocoa/Cocoa
      source start_cocoa.sh      # even if (.local) is already active, users must run start_cocoa.sh again to update key values
@@ -408,7 +408,7 @@ Finally, cocoa also provide several cosmolike projects. To activate them, manipu
      #TAG: if unset, load the specified TAG
      #export ROMAN_REAL_TAG="v4.0-beta17"
  
-Then, run the following commands:
+Everytime users edit `set_installation_options.sh`, they need to reload `(.local)` by rerunning `start_cocoa.sh`. Then, run the following commands:
 
       cd ./cocoa/Cocoa
       source start_cocoa.sh # even if (.local) is already active, users must run start_cocoa.sh again to update key values
