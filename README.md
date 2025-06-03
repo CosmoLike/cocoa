@@ -9,7 +9,7 @@
 5. [Running ML emulators](#cobaya_base_code_examples_emul)
 6. [Creating Cosmolike projects (external readme)](Cocoa/projects/)
 7. [Appendix](#appendix)
-    1. [FAQ: Suggested steps to debug Cocoa](#running_wrong)
+    1. [FAQ: How do we debug Cocoa? Suggested steps](#running_wrong)
     2. [FAQ: How do we compile external modules?](#appendix_compile_separately)
     3. [FAQ: How do we run Cocoa with Docker?](#appendix_jupyter_whovian)
     4. [FAQ: How do we use an available Anaconda module on HPC?](#overview_anaconda)
@@ -274,7 +274,7 @@ PolyChord:
 
 # Appendix <a name="appendix"></a>
 
-## :interrobang: FAQ: Suggested steps to debug Cocoa <a name="running_wrong"></a>
+## :interrobang: FAQ: How do we debug Cocoa? Suggested steps <a name="running_wrong"></a>
 
 **Step :one:**: define the `COCOA_OUTPUT_VERBOSE` and `COSMOLIKE_DEBUG_MODE` flags on `set_installation_options.sh` to obtain a more detailed output, as shown below
   
