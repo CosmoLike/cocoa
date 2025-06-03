@@ -11,7 +11,7 @@
 7. [Appendix](#appendix)
     1. [Credits](#appendix_proper_credits)
     2. [FAQ: What if installation or compilation goes wrong?](#running_wrong)
-    3. [FAQ: How do we compile the Boltzmann, CosmoLike, and Likelihood codes separately](#appendix_compile_separately)
+    3. [FAQ: How do we compile individual modules?](#appendix_compile_ly)
     4. [FAQ: How do we run Cocoa on a laptop? The docker image named *whovian-cocoa*](#appendix_jupyter_whovian)
     5. [FAQ: How do we use an available Anaconda module on HPC?](#overview_anaconda)
     6. [FAQ: What if there is no Conda? Miniconda installation](#overview_miniconda)
@@ -118,7 +118,7 @@ Users can now proceed to **the next section**.
 > Users who want to develop from a release version (e.g., `v4.0-beta20`) should read the appendix [FAQ: How do we push changes to the cocoa main branch? A few git hacks](#push_main)
 
 > [!TIP]
-> Cocoa does not install all the available external modules by default. If the user requires additional packages, refer to the appendix [Compiling Boltzmann, CosmoLike, and Likelihood codes separately](#appendix_compile_separately).
+> Cocoa does not install all the available external modules by default. If the user requires additional packages, refer to the appendix [FAQ: How do we compile individual modules?](#appendix_compile_separately).
 
 > [!NOTE]
 > In case users need to run `setup_cocoa.sh` more than once, Cocoa will not download previously installed packages, cosmolike projects, or large datasets, unless the following keys are set on `set_installation_options.sh`
@@ -191,7 +191,7 @@ and
 **End of basic instructions**.
 
 > [!Tip]
-> Cocoa provides several cosmolike projects, not all of which are installed by default. To activate them, refer to the appendix [Compiling Boltzmann, CosmoLike, and Likelihood codes separately](#appendix_compile_separately).
+> Cocoa provides several cosmolike projects, not all of which are installed by default. To activate them, refer to the appendix [FAQ: How do we compile individual modules?](#appendix_compile_ly).
 
 > [!TIP]
 > Assuming Cocoa is installed on a local (not remote!) machine, type the command below after step 2️⃣ to run Jupyter Notebooks.
@@ -213,7 +213,7 @@ and
 > The project lsst-y1 contains jupyter notebook examples located at `projects/lsst_y1`.
 
 > [!NOTE]
-> Why did we choose to work with two separate shell environments, `(cocoa)` and `(.local)`? Our scripts enable users to work on multiple Cocoa instances, similar to what was possible with [CosmoMC](https://github.com/cmbant/CosmoMC). On each instance, our scripts install packages at
+> Why did we choose to work with two distinct shell environments, `(cocoa)` and `(.local)`? Our scripts enable users to work on multiple Cocoa instances, similar to what was possible with [CosmoMC](https://github.com/cmbant/CosmoMC). On each instance, our scripts install packages at
 >
 >      Cocoa/.local/bin
 >      Cocoa/.local/include
@@ -328,13 +328,13 @@ Below, we present a few suggested steps to debug Cocoa.
 
 **Step :two:**: restart the Cocoa private environment by rerunning `source start_cocoa.sh` (every time users edit `set_installation_options.sh`, they must reload the `(.local)` environment by rerunning `start_cocoa.sh`).
 
-**Step :three:**: compile the failed package by following the instructions in the appendix [FAQ: How do we compile the Boltzmann, CosmoLike, and Likelihood codes separately](#appendix_compile_separately).
+**Step :three:**: compile the failed package by following the instructions in the appendix [FAQ: How do we compile individual modules?](#appendix_compile_separately).
 
 **Step 4️⃣**: rerun `setup_cocoa.sh` and `compile_cocoa.sh` to ensure all packages are installed and compiled correctly.
 
-### :interrobang: FAQ: How do we compile the Boltzmann, CosmoLike, and Likelihood codes separately <a name="appendix_compile_separately"></a>
+### :interrobang: FAQ: How do we compile individual modules? <a name="appendix_compile_separately"></a>
 
-To avoid excessive compilation or download times during development, users can use scripts located at `Cocoa/installation_scripts/` to download and compile only specific modules (or datasets). To take full advantage of them, users must first unset the appropriate keys on `set_installation_options.sh`, as exemplified below 
+To avoid excessive compilation or download times during development, users can use scripts located at `Cocoa/installation_scripts/` to download and compile only specific modules (or datasets). To take full advantage of them, users must first unset the appropriate keys on `set_installation_options.sh`, as exemplified below.
 
      [Adapted from Cocoa/set_installation_options.sh shell script]
 
