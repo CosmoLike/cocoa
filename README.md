@@ -154,7 +154,7 @@ Users will see a terminal like this: `$(cocoa)(.local)`. *This is a feature, not
 
 ### Examples not involving Cosmolike
 
- **Step :three:**: The folder `projects/example` contains a dozen examples involving different likelihoods. So, run the `cobaya-run` on the first example following the commands below.
+ **Step :three:**: The folder `projects/example` contains a few examples involving different likelihoods. So, run the `cobaya-run` on the first example following the commands below.
 
 One model evaluation:
 
