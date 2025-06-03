@@ -10,11 +10,11 @@
 6. [Creating Cosmolike projects (external readme)](Cocoa/projects/)
 7. [Appendix](#appendix)
     1. [Credits](#appendix_proper_credits)
-    2. [FAQ: Suggested steps to debug Cocoa?](#running_wrong)
+    2. [FAQ: Suggested steps to debug Cocoa](#running_wrong)
     3. [FAQ: How do we compile individual modules?](#appendix_compile_separately)
     4. [FAQ: How do we run Cocoa with Docker?](#appendix_jupyter_whovian)
     5. [FAQ: How do we use an available Anaconda module on HPC?](#overview_anaconda)
-    6. [FAQ: What if there is no Conda? Miniconda installation](#overview_miniconda)
+    6. [FAQ: How do we install Conda?](#overview_)
     7. [FAQ: How do we make the Slow/Fast decomposition on MCMC chains with Cosmolike? Manual Blocking](#manual_blocking_cosmolike)
     8. [FAQ: How do we switch Cocoa's adopted CAMB/CLASS/Polychord? (external readme)](Cocoa/external_modules/code)
     9. [FAQ: How do we download modern CMB data? (external readme)](Cocoa/external_modules/data)
@@ -72,7 +72,7 @@ Users can now proceed to the **next section**.
 > To install the `cocoa` conda environment on a supercomputer, users may take advantage of the fact that several HPC environments provide the [Anaconda installer](https://www.anaconda.com) as an external module. If this applies to you, then check the appendix [FAQ: How do we use an available Anaconda module on HPC?](#overview_anaconda).
 
 > [!TIP]
-> Users working on an HPC environment that does not offer Anaconda or Miniconda may want to check the appendix [FAQ: What if there is no Conda? Miniconda installation](#overview_miniconda).
+> Users working on an HPC environment that does not offer Anaconda or  may want to check the appendix [FAQ: How do we install Conda?](#overview_).
 
 > [!TIP]
 > We provide a Docker image named *whovian-cocoa* with Cocoa pre-installed and pre-compiled. For further instructions, refer to the appendix [FAQ: How do we run Cocoa with Docker?](#appendix_jupyter_whovian).
@@ -306,7 +306,7 @@ The following is not an exhaustive list of the codes we use/download/adopt
   
 Following best practices, Cocoa scripts download most external modules from their original repositories, including Cobaya, CAMB, Class, Polychord, ACT-DR6, HiLLiPoP, and Lollipop. Although our repository includes a few likelihoods in compressed [xz file format](https://tukaani.org/xz/format.html), we do not want to discourage users from cloning their code/data from their original repositories.  The work of those authors is extraordinary, and users **must cite them** appropriately.
 
-### :interrobang: FAQ: Suggested steps to debug Cocoa? <a name="running_wrong"></a>
+### :interrobang: FAQ: Suggested steps to debug Cocoa <a name="running_wrong"></a>
 
 **Step :one:**: define the `COCOA_OUTPUT_VERBOSE` and `COSMOLIKE_DEBUG_MODE` flags on `set_installation_options.sh` to obtain a more detailed output, as shown below
   
@@ -561,21 +561,19 @@ to make sure it resembles the one below.
     envs_dirs:
       - /project2/kicp/XXX/anaconda/envs/
 
-### :interrobang: FAQ: What if there is no Conda? Miniconda installation <a name="overview_miniconda"></a>
+### :interrobang: FAQ: How do we install Conda? <a name="overview_miniconda"></a>
 
 **Step :one:**: Download and run the Miniconda installation script. 
 
-    export CONDA_DIR="/gpfs/home/XXX/miniconda"
+    export CONDA_DIR="/gpfs/home/XXX/miniconda" # replace this string!
     
     mkdir "${CONDA_DIR:?}"
     
-    wget https://repo.anaconda.com/miniconda/Miniconda3-py39_25.3.1-1-Linux-x86_64.sh
+    wget https://repo.anaconda.com/miniconda/Miniconda3-py310_25.3.1-1-Linux-x86_64.sh
     
-    /bin/bash Miniconda3-py39_25.3.1-1-Linux-x86_64.sh -f -b -p "${CONDA_DIR:?}"
+    /bin/bash Miniconda3-py310_25.3.1-1-Linux-x86_64.sh -f -b -p "${CONDA_DIR:?}"
 
     /bin/bash 
-
-Please don't forget to adapt the path assigned to `CONDA_DIR` in the command above:
 
 **Step :two:**: After installation, users must source the conda configuration file, as shown below:
 
