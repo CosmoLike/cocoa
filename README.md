@@ -76,7 +76,7 @@ Users can now proceed to the **next section**.
 > Users working on an HPC environment that does not offer Anaconda or Miniconda may want to check the appendix [FAQ: What if there is no Conda? Miniconda installation](#overview_miniconda).
 
 > [!TIP]
-> We provide a Docker image named *whovian-cocoa* that provides cocoa pre-installed and pre-compiled. For further instructions, refer to the appendix [FAQ: How do you run Cocoa on your laptop? The Docker container is named *whovian-cocoa*](#appendix_jupyter_whovian).
+> We provide a Docker image named *whovian-cocoa* that provides cocoa pre-installed and pre-compiled. For further instructions, refer to the appendix [FAQ: How do you run Cocoa on your laptop? The Docker container named *whovian-cocoa*](#appendix_jupyter_whovian).
 
 ## Installation and Compilation of external modules <a name="cobaya_base_code"></a>
 
@@ -94,13 +94,13 @@ and
         
     source setup_cocoa.sh
 
-This script downloads and decompresses external modules, requiring internet access to run successfully.
+This script downloads and decompresses external modules, requiring internet access, which is relevant on HPC environments where only the login node can access the web.
 
 **Step :three:**: Run the script `compile_cocoa.sh` by typing 
 
     source compile_cocoa.sh
     
-This script compiles external modules selected for installation on `set_installation_options.sh` (e.g., CAMB). 
+This script compiles external modules selected for installation on `set_installation_options.sh` (e.g., CAMB), and does not require internet access. 
 
 Users can now proceed to **the next section**.
 
@@ -122,7 +122,7 @@ Users can now proceed to **the next section**.
 > Cocoa does not install many external modules by default, but users may require them in a particular project. In this case, check the  available options on the `set_installation_options.sh` shell script. Then, rerun steps :two: and :three: or refer to the appendix [Compiling Boltzmann, CosmoLike, and Likelihood codes separately](#appendix_compile_separately).
 
 > [!NOTE]
-> In some HPC environments, the compute nodes cannot access the web. So, by design, the script `compile_cocoa.sh` does not require internet access to run successfully. Code compilation is a CPU-intensive operation; therefore, running  `compile_cocoa.sh` on a cluster login node can be against HPC policy. Users should then run `setup_cocoa.sh` in a login node and `compile_cocoa.sh` in a compute node.
+> In some HPC environments, the compute nodes cannot access the internet. So, by design, the script `compile_cocoa.sh` does not require internet access to run successfully. Code compilation is a CPU-intensive operation; therefore, running  `compile_cocoa.sh` on a cluster login node can be against HPC policy. Users should then run `setup_cocoa.sh` in a login node and `compile_cocoa.sh` in a compute node.
 
 > [!NOTE]
 > When running `setup_cocoa.sh` repeatedly, Cocoa will not download previously installed packages, cosmolike projects or large datasets, unless the following keys are set on `set_installation_options.sh`
@@ -363,13 +363,13 @@ The following is not an exhaustive list of the codes we use/download/adopt
 
 - [Lollipop CMB likelihood](https://github.com/planck-npipe/lollipop.git) is a Planck low-l polarization likelihood.
   
-Following best practices, Cocoa scripts download most external modules from their original repositories, including Cobaya, CAMB, Class, Polychord, ACT-DR6, HiLLiPoP, and Lollipop. We do not want to discourage people from cloning code from their original repositories. Our repository has included a few likelihoods as compressed [xz file format](https://tukaani.org/xz/format.html). The work of those authors is extraordinary, and users **must cite them** appropriately.
+Following best practices, Cocoa scripts download most external modules from their original repositories, including Cobaya, CAMB, Class, Polychord, ACT-DR6, HiLLiPoP, and Lollipop. Although our repository includes a few likelihoods in compressed [xz file format](https://tukaani.org/xz/format.html), we do not want to discourage users from cloning their code/data from their original repositories.  The work of those authors is extraordinary, and users **must cite them** appropriately.
 
 ### :interrobang: FAQ: What if installation or compilation goes wrong? <a name="running_wrong"></a>
 
 The script *set_installation_options script* contains all flags that manage package installation. Given that, here are a few steps to debug Cocoa
 
-**Step :one:**: define the `COCOA_OUTPUT_VERBOSE` and `COSMOLIKE_DEBUG_MODE` flags to obtain a more detailed output, as shown below
+**Step :one:**: define the `COCOA_OUTPUT_VERBOSE` and `COSMOLIKE_DEBUG_MODE` flags on `set_installation_options.sh` to obtain a more detailed output, as shown below
   
       [Adapted from Cocoa/set_installation_options.sh shell script] 
 
@@ -385,67 +385,49 @@ The script *set_installation_options script* contains all flags that manage pack
 
       (....)
 
-**Step :three:**: restart the Cocoa private environment by running `source stop_cocoa.sh` and `source start_cocoa.sh`.
+**Step :two:**: restart the Cocoa private environment by rerunning `source start_cocoa.sh`, and compile the failed package separately by following the instructions in the appendix [FAQ: How do we compile the Boltzmann, CosmoLike, and Likelihood codes separately](#appendix_compile_separately).
 
-> [!TIP]
-> The second step involves rerunning the all scripts with the verbose output set. The master programs `setup_cocoa.sh` and `compile_cocoa.sh` run many shell scripts, so users may find it advantageous to run only the routine that failed when dubbuging. See the appendix [FAQ: How do we compile the Boltzmann, CosmoLike, and Likelihood codes separately](#appendix_compile_separately). After fixing a particular issue, users should rerun `setup_cocoa.sh` and `compile_cocoa.sh` to ensure all packages are installed and compiled correctly.
+**Step :three:**: rerun `setup_cocoa.sh` and `compile_cocoa.sh` to ensure all packages are installed and compiled correctly.
 
 ### :interrobang: FAQ: How do we compile the Boltzmann, CosmoLike, and Likelihood codes separately <a name="appendix_compile_separately"></a>
 
-To avoid excessive compilation or download times during development, users can use scripts located at `Cocoa/installation_scripts/` that compile only a specific module or download only a particular dataset. A few examples of these scripts are: 
+To avoid excessive compilation or download times during development, users can use scripts located at `Cocoa/installation_scripts/` that either downloads (`setup_XXX.sh`) or compile (`compile_XXX.sh`) only a specific module. A few examples of these scripts are: 
 
      $(cocoa)(.local) cd "${ROOTDIR:?}"
-     $(cocoa)(.local) source "${ROOTDIR:?}"/installation_scripts/compile_act_dr4.sh
-     $(cocoa)(.local) source "${ROOTDIR:?}"/installation_scripts/compile_camb.sh
-     $(cocoa)(.local) source "${ROOTDIR:?}"/installation_scripts/compile_class.sh
-     $(cocoa)(.local) source "${ROOTDIR:?}"/installation_scripts/compile_planck.sh
-     $(cocoa)(.local) source "${ROOTDIR:?}"/installation_scripts/compile_polychord.sh
+     
+     $(cocoa)(.local) source "${ROOTDIR:?}"/installation_scripts/setup_act_dr6.sh
+     $(cocoa)(.local) source "${ROOTDIR:?}"/installation_scripts/setup_simons_observatory.sh
 
-Above and below, the `$(cocoa)(.local)` emphasizes they should run after activating the cocoa environments. The shell subroutines that download external modules from their original Git repositories are shown below.
+     $(cocoa)(.local) source "${ROOTDIR:?}"/installation_scripts/compile_act_dr6.sh
+     $(cocoa)(.local) source "${ROOTDIR:?}"/installation_scripts/compile_simons_observatory.sh
+     
+Similarly, we show below a few examples of shell scripts that download and unpack data from multiple experiments. 
 
-     $(cocoa)(.local) cd "${ROOTDIR:?}"
-     $(cocoa)(.local) source "${ROOTDIR:?}"/installation_scripts/setup_act_dr4.sh
-     $(cocoa)(.local) source "${ROOTDIR:?}"/installation_scripts/setup_camb.sh
-     $(cocoa)(.local) source "${ROOTDIR:?}"/installation_scripts/setup_class.sh
-     $(cocoa)(.local) source "${ROOTDIR:?}"/installation_scripts/setup_polychord.sh
-     $(cocoa)(.local) source "${ROOTDIR:?}"/installation_scripts/setup_cobaya.sh
+     $(cocoa)(.local) source "${ROOTDIR:?}"/installation_scripts/unxv_act_dr6.sh
+     $(cocoa)(.local) source "${ROOTDIR:?}"/installation_scripts/unxv_simons_observatory.sh
 
-To ensure these scripts can download and install these packages, users must ensure that the environment keys that prevent their installation are *NOT* set on `set_installation_options.sh` as shown below. If they were set, users must comment the lines below and reload the cocoa environment by rerunning `start_cocoa.sh`
+The `$(cocoa)(.local)` prefix emphasizes users should run these scripts after activating cocoa environments. 
+
+To ensure these scripts can download and install these packages, users must comment the lines below on `set_installation_options.sh` and reload the `(.local)` environment by rerunning `start_cocoa.sh`
 
      [Adapted from Cocoa/set_installation_options.sh shell script]
-     
+
+     # ------------------------------------------------------------------------------
+     # The flags below allow users to skip downloading specific datasets ------------
+     # ------------------------------------------------------------------------------
+     #export IGNORE_ACTDR6_DATA=1  # ACT-DR6 likelihood data
+     (...)
+     #export IGNORE_SIMONS_OBSERVATORY_CMB_DATA=1  # SO likelihood data
+
+     (...)
+
      # ------------------------------------------------------------------------------
      # The keys below control which packages will be installed and compiled 
      # ------------------------------------------------------------------------------
-     #export IGNORE_COBAYA_CODE=1
-     #export IGNORE_CAMB_CODE=1
-     #export IGNORE_CLASS_CODE=1 # Default: we just use CAMB (reduces compilation time)
+     #export IGNORE_SIMONS_OBSERVATORY_LIKELIHOOD_CODE=1 
      (...)
-     #export IGNORE_POLYCHORD_SAMPLER_CODE=1
-     (...)
-     #export IGNORE_ACTDR4_CODE=1
-
-Below, we show the shell subroutines that download and unpack data from multiple experiments. 
-
-     $(cocoa)(.local) cd "${ROOTDIR:?}"
-     $(cocoa)(.local) source "${ROOTDIR:?}"/installation_scripts/unxv_act_dr6.sh
-     $(cocoa)(.local) source "${ROOTDIR:?}"/installation_scripts/unxv_h0licow.sh
-     $(cocoa)(.local) source "${ROOTDIR:?}"/installation_scripts/unxv_lipop.sh
-     $(cocoa)(.local) source "${ROOTDIR:?}"/installation_scripts/unxv_simons_observatory.sh
-
-To ensure these scripts can download these datasets, users must be sure that the environment keys below are *NOT* set. These keys are shown on `set_installation_options.sh`. The command `unset -v` unset them. 
-
-     unset -v IGNORE_ACTDR6_DATA
-     unset -v IGNORE_BAO_DATA
-     unset -v IGNORE_BICEP_CMB_DATA
-     unset -v IGNORE_CAMSPEC_CMB_DATA
-     unset -v IGNORE_HOLICOW_STRONG_LENSING_DATA
-     unset -v IGNORE_LIPOP_CMB_DATA
-     unset -v IGNORE_PLANCK_CMB_DATA
-     unset -v IGNORE_SIMONS_OBSERVATORY_CMB_DATA
-     unset -v IGNORE_SN_DATA
-     unset -v IGNORE_SPT_CMB_DATA
-
+     #export IGNORE_ACTDR6_CODE=1  # ACT-DR6 likelihood code
+     
 ### :interrobang: FAQ: How do we run cocoa on a laptop? The docker image named *whovian-cocoa* <a name="appendix_jupyter_whovian"></a>
 
 We provide the Docker image [whovian-cocoa](https://hub.docker.com/r/vivianmiranda/whovian-cocoa) to facilitate the installation of Cocoa on Windows and macOS. This appendix assumes that users already have the Docker Engine installed on their local PC. For instructions on installing the Docker engine on specific operating systems, please refer to [Docker's official documentation](https://docs.docker.com/engine/install/). 
