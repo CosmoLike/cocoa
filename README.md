@@ -35,13 +35,13 @@ Cocoa allows users to run [CosmoLike](https://github.com/CosmoLike) routines ins
 
 Besides integrating [Cobaya](https://github.com/CobayaSampler) and [CosmoLike](https://github.com/CosmoLike), Cocoa introduces shell scripts that allow users to containerize [Cobaya](https://github.com/CobayaSampler), the Boltzmann codes, and multiple likelihoods. The container structure of Cocoa ensures that users can adopt consistent versions for the Fortran/C/C++ compilers and libraries across multiple machines. Such a systematic approach greatly simplifies the debugging process. 
 
-Our scripts never install packages and Python modules on `$HOME/.local`, where `$HOME` is a shell environment variable that points to the user's home folder, as that would make them global to the user. Such behavior would interfere with all previously installed packages, potentially creating dependency incompatibilities between different projects the user works on. This behavior enables users to work on multiple instances of Cocoa simultaneously, similar to what was possible with [CosmoMC](https://github.com/cmbant/CosmoMC). 
+Our scripts never install packages or Python modules on globlal folder `$HOME/.local`, where `$HOME` is a shell environment variable that points to the user's home folder. Doing so would force cocoa packages to be global to the user, possibly breaking environments. Our scripts enables users to work on multiple Cocoa instances simultaneously, similar to what was possible with [CosmoMC](https://github.com/cmbant/CosmoMC). 
 
 This readme file presents basic and advanced instructions for installing all [Cobaya](https://github.com/CobayaSampler) and [CosmoLike](https://github.com/CosmoLike) components.
 
 ## Installation of core packages via Conda <a name="required_packages_conda"></a>
 
-Core packages include compilers and numerical libraries (e.g., GSL and FFTW), which users typically do not modify. We install most of these core packages via Conda, as shown below.
+Core packages include compilers and numerical libraries (e.g., GSL and FFTW), which users typically never modify. We install most of these core packages via Conda, as shown below.
 
 **Step :one:**: Download the file `cocoapy310.yml` yml file
 
@@ -104,7 +104,7 @@ Users can now proceed to **step :two:**.
 >     "${CONDA_PREFIX}"/bin/git clone https://github.com/CosmoLike/cocoa.git cocoa
 >
 >
-> Users who want to develop from a release version (e.g., `v4.0-beta20`) may want to read the appendix [FAQ: How do we push changes to the cocoa main branch? A few git hacks](#push_main)
+> Users who want to develop from a release version (e.g., `v4.0-beta20`) should read the appendix [FAQ: How do we push changes to the cocoa main branch? A few git hacks](#push_main) 
 
 **Step :two:**: Run the script `setup_cocoa.sh` via
         
@@ -113,7 +113,25 @@ Users can now proceed to **step :two:**.
 This script downloads and decompresses external modules, requiring internet access to run successfully.
 
 > [!NOTE]
-> If you run `setup_cocoa.sh` multiple times, Cocoa will not download previously installed packages. To overwrite this behavior, export the key `OVERWRITE_EXISTING_ALL_PACKAGES` on `set_installation_options.sh`. Even with this optimization disabled, Cocoa will not download large datasets repeatedly unless the key `REDOWNLOAD_EXISTING_ALL_DATA` is also set.
+> When running `setup_cocoa.sh` repeatedly, Cocoa will not download previously installed packages, cosmolike projects or large datasets, unless the following keys are set on `set_installation_options.sh`
+>
+>     [Adapted from Cocoa/set_installation_options.sh shell script]
+>     (...)
+>     (...)
+>
+>     # ------------------------------------------------------------------------------
+>     # OVERWRITE_EXISTING_XXX_CODE=1 -> setup_cocoa overwrites existing PACKAGES ----
+>     # overwrite: delete the existing PACKAGE folder and install it again -----------
+>     # redownload: delete the compressed file and download data again ---------------
+>     # These keys are only relevant if you run setup_cocoa multiple times -----------
+>     # ------------------------------------------------------------------------------
+>     (...)
+>     export OVERWRITE_EXISTING_ALL_PACKAGES=1    # except cosmolike projects
+>     #export OVERWRITE_EXISTING_COSMOLIKE_CODE=1 # dangerous (possible lost of uncommit work)
+>                                                 # if unset, users must manually delete cosmolike projects
+>     #export REDOWNLOAD_EXISTING_ALL_DATA=1      # warning: some data are many GB
+>
+> To overwrite this behavior, export the key `OVERWRITE_EXISTING_ALL_PACKAGES` on `set_installation_options.sh`. Even with this optimization disabled, Cocoa will not download large datasets repeatedly unless the key `REDOWNLOAD_EXISTING_ALL_DATA` is also set.
 
 **Step :three:**: Run the script `compile_cocoa.sh` by typing 
 
@@ -204,8 +222,7 @@ and
 >     # ------------------------------------------------------------------------------
 >     (...)
 >     export OVERWRITE_EXISTING_COSMOLIKE_CODE=1 # dangerous (possible lost of uncommit work)
->                                                # if unset, users must manually delete
->                                                # project if wants setup_cocoa to reclone it
+>                                                # if unset, users must manually delete cosmolike projects
 >
 >     (...)
 > 
