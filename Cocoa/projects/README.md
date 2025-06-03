@@ -12,7 +12,7 @@
 
 The `projects` folder includes all the projects linked to Cosmolike; they can also help organize general investigations, even if they don't use Cosmolike directly. 
 
-Projects should be hosted on independent GitHub repositories; our convention is to name the repository cocoa_XXX, where XXX is the intended project name. Projects that utilize Cosmolike need to have more or less the following structure, taken from a [LSST_Y1 project](https://github.com/CosmoLike/cocoa_lsst_y1)
+Projects should be hosted on independent GitHub repositories; our convention is to name the repository cocoa_XXX, where XXX is the intended project name. Projects that utilize Cosmolike need to have more or less the following structure, taken from the [LSST_Y1 project](https://github.com/CosmoLike/cocoa_lsst_y1)
 
     +-- cocoa_lsst_y1
     |    +-- likelihood
