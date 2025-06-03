@@ -48,18 +48,18 @@ Projects should be hosted on independent GitHub repositories; our convention is 
 
 ### :interrobang: FAQ: How do we download and run Cosmolike projects? <a name="running_cosmolike_projects"></a> 
 
-**Step :one:**: Activate conda environment and go to the projects folder (`./projects`) and clone a Cosmolike project with the fictitious name `XXX`:
+**Step :one:**: Activate conda environment and go to the projects folder (`./projects`)
     
     conda activate cocoa
     cd ./cocoa/Cocoa/projects
 
-and 
+**Step :two:**  Clone a Cosmolike project (assumed here to have with the fictitious name `XXX`):
 
     git clone https://github.com/CosmoLike/cocoa_lsst_XXX.git XXX
 
 By convention, the *Cosmolike Organization* adds the prefix `cocoa_` to all Cobaya-Cosmolike projects. For example, a fictitious project named XXX would be hosted at `CosmoLike/cocoa_XXX`. However, the `cocoa_` prefix must be dropped when cloning the repository.
  
-**Step :two:**: Go back to the Cocoa main folder and activate the private Python environment
+**Step :three:**: Go back to the Cocoa main folder and activate the private Python environment
     
     cd ../
 
@@ -70,7 +70,7 @@ and
 > [!Warning]
 > Users must run the script `start_cocoa.sh` after cloning the project repository so that Cocoa can reload `(.local)` environment and create appropriate soft links.
 
-**Step :three:**: Compile the project, as shown below (two possibilities)
+**Step :four:**: Compile the project, as shown below (two possibilities)
  
     source ./projects/XXX/scripts/compile_XXX
 
@@ -78,7 +78,7 @@ or
 
     source ./installation_scripts/compile_all_projects.sh # compile all cosmolike projects
  
-**Step :four:**: Select the number of OpenMP cores and run a template YAML file
+**Step :five:**: Select the number of OpenMP cores and run a template YAML file
     
     export OMP_PROC_BIND=close; export OMP_NUM_THREADS=8
 
@@ -92,21 +92,24 @@ If users want to make a particular Cosmolike project widely available in Cocoa, 
 
     [adapted from Cocoa/set_installation_options.sh script]
     
-    #the flag below allows users to skip the downloading project XXX
     #export IGNORE_COSMOLIKE_XXX_CODE=1
 
     (...)
    
     export XXX_URL="https://github.com/.../cocoa_lsst_XXX.git"
     export XXX_NAME="XXX"
-    #Key XXX_COMMIT is optional, but we strongly recommend its inclusion 
+    #BRANCH: if unset, load the latest commit on the specified branch
+    #export XXX_BRANCH="dev"
+    #COMMIT: if unset, load the specified commit
     export XXX_COMMIT="abc123"
+    #TAG: if unset, load the specified TAG
+    #export XXX_TAG="v4.0-beta17"
 
-**Step :two:**: Adapt and add the keys below to `flags_impl_unset_keys.sh` 
+**Step :two:**: Adapt and add the new defined keys to `flags_impl_unset_keys.sh` 
 
     [adapted from Cocoa/installation_scripts/flags_impl_unset_keys.sh]
 
-    unset -v XXX_URL XXX_NAME XXX_COMMIT IGNORE_COSMOLIKE_XXX_CODE
+    unset -v XXX_URL XXX_NAME XXX_COMMIT IGNORE_COSMOLIKE_XXX_CODE XXX_TAG XXX_BRANCH
 
 This will ensure that `stop_cocoa.sh` unsets them before exiting Cocoa.
 
