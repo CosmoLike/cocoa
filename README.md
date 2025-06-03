@@ -11,7 +11,7 @@
 7. [Appendix](#appendix)
     1. [Credits](#appendix_proper_credits)
     2. [FAQ: Suggested steps to debug Cocoa](#running_wrong)
-    3. [FAQ: How do we compile individual modules?](#appendix_compile_separately)
+    3. [FAQ: How do we compile external modules?](#appendix_compile_separately)
     4. [FAQ: How do we run Cocoa with Docker?](#appendix_jupyter_whovian)
     5. [FAQ: How do we use an available Anaconda module on HPC?](#overview_anaconda)
     6. [FAQ: How do we install Conda?](#overview_)
@@ -118,7 +118,7 @@ Users can now proceed to **the next section**.
 > Users who want to develop from a release version (e.g., `v4.0-beta20`) should read the appendix [FAQ: How do we push changes to the cocoa main branch? A few git hacks](#push_main)
 
 > [!TIP]
-> Cocoa does not install all the available external modules by default. If the user requires additional packages, refer to the appendix [FAQ: How do we compile individual modules?](#appendix_compile_).
+> Cocoa does not install all the available external modules by default. If the user requires additional packages, refer to the appendix [FAQ: How do we compile external modules?](#appendix_compile_).
 
 > [!NOTE]
 > In case users need to run `setup_cocoa.sh` more than once, Cocoa will not download previously installed packages, cosmolike projects, or large datasets, unless the following keys are set on `set_installation_options.sh`
@@ -191,7 +191,7 @@ and
 **End of basic instructions**.
 
 > [!Tip]
-> Cocoa provides several cosmolike projects, not all of which are installed by default. To activate them, refer to the appendix [FAQ: How do we compile individual modules?](#appendix_compile_ly).
+> Cocoa provides several cosmolike projects, not all of which are installed by default. To activate them, refer to the appendix [FAQ: How do we compile external modules?](#appendix_compile_ly).
 
 > [!TIP]
 > Assuming Cocoa is installed on a local (not remote!) machine, type the command below after step 2️⃣ to run Jupyter Notebooks.
@@ -326,11 +326,11 @@ Following best practices, Cocoa scripts download most external modules from thei
 
 **Step :two:**: restart the Cocoa private environment by rerunning `source start_cocoa.sh` (every time users edit `set_installation_options.sh`, they must reload the `(.local)` environment by rerunning `start_cocoa.sh`).
 
-**Step :three:**: compile the failed package by following the instructions in the appendix [FAQ: How do we compile individual modules?](#appendix_compile_separately).
+**Step :three:**: compile the failed package by following the instructions in the appendix [FAQ: How do we compile external modules?](#appendix_compile_separately).
 
 **Step 4️⃣**: rerun `setup_cocoa.sh` and `compile_cocoa.sh` to ensure all packages are installed and compiled correctly.
 
-### :interrobang: FAQ: How do we compile individual modules? <a name="appendix_compile_separately"></a>
+### :interrobang: FAQ: How do we compile external modules? <a name="appendix_compile_separately"></a>
 
 To avoid excessive compilation or download times during development, users can use scripts located at `Cocoa/installation_scripts/` to download and compile only specific modules (or datasets). To take full advantage of them, users must first unset the appropriate keys on `set_installation_options.sh`, as exemplified below.
 
