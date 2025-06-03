@@ -10,7 +10,7 @@
 6. [Creating Cosmolike projects (external readme)](Cocoa/projects/)
 7. [Appendix](#appendix)
     1. [Credits](#appendix_proper_credits)
-    2. [FAQ: What if installation or compilation goes wrong?](#running_wrong)
+    2. [FAQ: Suggested steps to debug Cocoa?](#running_wrong)
     3. [FAQ: How do we compile individual modules?](#appendix_compile_separately)
     4. [FAQ: How do we run Cocoa on a laptop? The docker image named *whovian-cocoa*](#appendix_jupyter_whovian)
     5. [FAQ: How do we use an available Anaconda module on HPC?](#overview_anaconda)
@@ -306,9 +306,7 @@ The following is not an exhaustive list of the codes we use/download/adopt
   
 Following best practices, Cocoa scripts download most external modules from their original repositories, including Cobaya, CAMB, Class, Polychord, ACT-DR6, HiLLiPoP, and Lollipop. Although our repository includes a few likelihoods in compressed [xz file format](https://tukaani.org/xz/format.html), we do not want to discourage users from cloning their code/data from their original repositories.  The work of those authors is extraordinary, and users **must cite them** appropriately.
 
-### :interrobang: FAQ: What if installation or compilation goes wrong? <a name="running_wrong"></a>
-
-Below, we present a few suggested steps to debug Cocoa.
+### :interrobang: FAQ: Suggested steps to debug Cocoa? <a name="running_wrong"></a>
 
 **Step :one:**: define the `COCOA_OUTPUT_VERBOSE` and `COSMOLIKE_DEBUG_MODE` flags on `set_installation_options.sh` to obtain a more detailed output, as shown below
   
