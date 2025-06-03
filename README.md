@@ -119,7 +119,7 @@ Users can now proceed to **the next section**.
 > Users who want to develop from a release version (e.g., `v4.0-beta20`) should read the appendix [FAQ: How do we push changes to the cocoa main branch? A few git hacks](#push_main)
 
 > [!TIP]
-> Cocoa does not install many external modules by default, but users may require them in a particular project. In this case, check the  available options on the `set_installation_options.sh` shell script. Then, rerun steps :two: and :three: or refer to the appendix [Compiling Boltzmann, CosmoLike, and Likelihood codes separately](#appendix_compile_separately).
+> Cocoa does not install all the available external modules by default. If the user requires additional packages, refer to the appendix [Compiling Boltzmann, CosmoLike, and Likelihood codes separately](#appendix_compile_separately).
 
 > [!NOTE]
 > When running `setup_cocoa.sh` repeatedly, Cocoa will not download previously installed packages, cosmolike projects or large datasets, unless the following keys are set on `set_installation_options.sh`
