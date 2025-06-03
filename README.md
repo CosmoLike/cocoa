@@ -100,7 +100,7 @@ This script downloads and decompresses external modules, requiring internet acce
 
     source compile_cocoa.sh
     
-This script compiles external modules selected for installation on `s.sh` (e.g., CAMB), and does not require internet access. 
+This script compiles external modules selected for installation on `set_installation_options.sh` (e.g., CAMB), and does not require internet access. 
 
 Users can now proceed to **the next section**.
 
