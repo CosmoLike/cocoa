@@ -307,8 +307,7 @@ PolyChord:
     mpirun -n 8 --oversubscribe --mca pml ^ucx --mca btl vader,tcp,self --bind-to core:overload-allowed --rank-by slot --map-by numa:pe=${OMP_NUM_THREADS} cobaya-run ./projects/example/EXAMPLE_POLY22.yaml -f
 
 > [!NOTE]
-> What users should do if they don't unset these keys prior to running `setup_cocoa.sh` and `compile_cocoa.sh`?
-> These global scripts again can take a long time. Instead, run the following commands
+> What users should do if they don't unset ML-related environment keys prior to running `setup_cocoa.sh` and `compile_cocoa.sh`, as rerunning these scripts can require a long time? Instead, run the following commands
 >
 >      source start_cocoa.sh      # even if (.local) is already active, users must run start_cocoa.sh again to update key values
 > 
@@ -324,7 +323,7 @@ PolyChord:
 >      source ./installation_scripts/unxv_simons_observatory.sh        # download Simons Observatory Likelihood data  (to run EXAMPLE_EVALUATE26.yaml)
 >      source ./installation_scripts/compile_simons_observatory.sh     # compile Simons Observatory Lkelihood code     (to run EXAMPLE_EVALUATE26.yaml)
 > 
-> Finally, follow all the steps in this section, including step :one:. Users will indeed neeed to run `start_cocoa.sh` once more so Cocoa can create appropriate symlinks.
+> Finally, rerun all the steps presented this section, including step :one:. Users will indeed neeed to rerun `start_cocoa.sh` so Cocoa can create appropriate symlinks that expose the emulators to Cobaya.
 
 ## Appendix <a name="appendix"></a>
 
