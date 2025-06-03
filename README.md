@@ -94,13 +94,13 @@ and
         
     source setup_cocoa.sh
 
-This script downloads and decompresses external modules, requiring internet access. Therefore, users cannot run this script on compute nodes in HPC environments where only the login node can access the web.
+This script downloads and decompresses external modules, requiring internet access. Therefore, users cannot run this script on compute nodes in a HPC environment where only the cluster login node can access the web.
 
 **Step :three:**: Run the script `compile_cocoa.sh` by typing 
 
     source compile_cocoa.sh
     
-This script compiles external modules selected for installation on `set_installation_options.sh` (e.g., CAMB), and does not require internet access. 
+This script compiles external modules selected for installation on `set_installation_options.sh` (e.g., CAMB), and does not require internet access. Code compilation is a CPU-intensive operation; therefore, running  `compile_cocoa.sh` on a cluster login node can be against HPC policy. Users should then run `setup_cocoa.sh` in a login node and `compile_cocoa.sh` in a compute node.
 
 Users can now proceed to **the next section**.
 
@@ -119,10 +119,7 @@ Users can now proceed to **the next section**.
 > Users who want to develop from a release version (e.g., `v4.0-beta20`) should read the appendix [FAQ: How do we push changes to the cocoa main branch? A few git hacks](#push_main)
 
 > [!TIP]
-> Cocoa does not install many external modules by default, but users may require them in a particular project. In this case, check the  available options on the `s.sh` shell script. Then, rerun steps :two: and :three: or refer to the appendix [Compiling Boltzmann, CosmoLike, and Likelihood codes separately](#appendix_compile_separately).
-
-> [!NOTE]
-> In some HPC environments, the compute nodes cannot access the internet. So, by design, the script `compile_cocoa.sh` does not require internet access to run successfully. Code compilation is a CPU-intensive operation; therefore, running  `compile_cocoa.sh` on a cluster login node can be against HPC policy. Users should then run `setup_cocoa.sh` in a login node and `compile_cocoa.sh` in a compute node.
+> Cocoa does not install many external modules by default, but users may require them in a particular project. In this case, check the  available options on the `set_installation_options.sh` shell script. Then, rerun steps :two: and :three: or refer to the appendix [Compiling Boltzmann, CosmoLike, and Likelihood codes separately](#appendix_compile_separately).
 
 > [!NOTE]
 > When running `setup_cocoa.sh` repeatedly, Cocoa will not download previously installed packages, cosmolike projects or large datasets, unless the following keys are set on `set_installation_options.sh`
