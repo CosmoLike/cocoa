@@ -3,7 +3,7 @@
 2. [FAQ: How do we download and run Cosmolike projects?](#running_cosmolike_projects)
 3. [FAQ: How do we set Weak Lensing YAML files in Cobaya?](#appendix_example_runs)
 4. [FAQ: How do we set Slow/Fast decomposition with Cosmolike?](#manual_blocking_cosmolike)
-5. [FAQ: How do we create a new cosmolike project?](#appendix_lsst_y1_new)
+5. [FAQ: How do we create a new Cosmolike project?](#appendix_lsst_y1_new)
    1. [Minor changes: the easy way](#appendix_lsst_y1_new_small)
    2. [Minor changes: the hard way](#appendix_lsst_y1_new_small2)
    3. [Major changes](#appendix_lsst_y1_new_major)
@@ -286,7 +286,7 @@ Below, we provide an example YAML configuration for an MCMC chain with DES 3x2pt
                 Rminus1_single_split: 4
 
 
-# Adapting the COCOA_LSST_Y1 repository to a new project <a name="appendix_lsst_y1_new"></a> 
+## :interrobang: FAQ: How do we create a new Cosmolike project <a name="appendix_lsst_y1_new"></a> 
 
 Adapting the LSST_Y1 folder to construct a new project involves many small core changes and a few major ones. They are tedious but straightforward. The easier way to apply the minor core changes to the code is via the bash script *transfer_project.sh*.
 
