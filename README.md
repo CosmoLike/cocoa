@@ -594,8 +594,8 @@ Until recently, Cocoa development was a bit unstructured. Developers could push 
   
 **Step :one:**: create a development branch. Do not call the development branch `dev`, as `dev` is reserved for work done by the leading Cocoa developers. For concreteness, let's name the new branch `xyzdev`
 
-    # Developers must input the command below on the main branch.
-    git switch -c xyzdev
+   
+    git switch -c xyzdev                # run on the main branch
 
 > [!TIP]
 > The use of developers' initials followed by `dev` helps make the branch easily identifiable.
@@ -605,17 +605,17 @@ Until recently, Cocoa development was a bit unstructured. Developers could push 
 
 **Step :two:**: develop the proposed changes. We advise developers to commit frequently. In your branch, a commit does not need to be atomic, changing the code from one working state to another well-tested, meaningful working state. Developers can push to the server via the command.
 
-    git push -u origin xyzdev   # run on the xyzdev branch
+    git push -u origin xyzdev        # run on the xyzdev branch
 
 **Step :three:**: Once the developers created an atomic, meaningful, and well-tested improvement to Cocoa, the developer needs to merge any subsequent changes made in `main`.
 
-    git merge main              # run on the xyzdev branch
+    git merge main                      # run on the xyzdev branch
 
 This step may create conflicts that must be addressed before step four. 
 
 **Step :four:**: Once the developers have merged recent changes made on the `main` branch, they must push to the main branch the modifications made on the `xyzdev` branch by first **squashing all your changes into a single commit**, as shown below
 
-    git switch main             # run on the xyzdev branch
+    git switch main                     # run on the xyzdev branch
 
 and
 
@@ -627,7 +627,7 @@ and
 
 and
 
-    git push origin main # run on the main branch
+    git push origin main              # run on the main branch
 
 ## :interrobang: FAQ: How do we develop from a git tag? A few more git hacks <a name="dev_from_tag"></a>
 
