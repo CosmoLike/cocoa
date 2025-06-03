@@ -13,7 +13,7 @@
     2. [FAQ: How do we compile external modules?](#appendix_compile_separately)
     3. [FAQ: How do we run Cocoa with Docker?](#appendix_jupyter_whovian)
     4. [FAQ: How do we use an available Anaconda module on HPC?](#overview_anaconda)
-    5. [FAQ: How do we install Conda?](#overview_conda)
+    5. [FAQ: How do we install Conda?](#overview_miniconda)
     6. [FAQ: How do we set the environment for Machine Learning projects?](#ml_emulators)
     7. [FAQ: How can users improve their Bash/C/C++ knowledge to develop Cocoa/Cosmolike?](#lectnotes)
     8. [FAQ: How do we push changes to the Cocoa main branch? A few git hacks](#push_main)
