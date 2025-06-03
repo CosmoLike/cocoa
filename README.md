@@ -6,7 +6,7 @@
 2. [Installation of core packages via Conda](#required_packages_conda)
 3. [Installation and Compilation of external modules](#cobaya_base_code)
 4. [Running Examples](#cobaya_base_code_examples)
-5. [Running Examples based on Machine Learning emulators](#cobaya_base_code_examples_emul)
+5. [Running ML emulators](#cobaya_base_code_examples_emul)
 6. [Creating Cosmolike projects (external readme)](Cocoa/projects/)
 7. [Appendix](#appendix)
     1. [Credits](#appendix_proper_credits)
@@ -220,7 +220,7 @@ and
 >      Cocoa/.local/lib
 >      Cocoa/.local/share
 
-## Running Examples based on Machine Learning emulators <a name="cobaya_base_code_examples_emul"></a>
+## Running ML emulators <a name="cobaya_base_code_examples_emul"></a>
 
 Cocoa contains a few transformer-based neural network emulators capable of simulating CMB, cosmolike, matter power spectrum, and distances. We provide a few scripts that exemplify their API. To run them, we assume users have commented out the following lines on `set_installation_options.sh` prior to running the `setup_cocoa.sh` and `compile_cocoa.sh` installation scripts.
 
