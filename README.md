@@ -9,19 +9,19 @@
 5. [Running ML emulators](#cobaya_base_code_examples_emul)
 6. [Creating Cosmolike projects (external readme)](Cocoa/projects/)
 7. [Appendix](#appendix)
-    1. [Credits](#appendix_proper_credits)
-    2. [FAQ: Suggested steps to debug Cocoa](#running_wrong)
-    3. [FAQ: How do we compile external modules?](#appendix_compile_separately)
-    4. [FAQ: How do we run Cocoa with Docker?](#appendix_jupyter_whovian)
-    5. [FAQ: How do we use an available Anaconda module on HPC?](#overview_anaconda)
-    6. [FAQ: How do we install Conda?](#overview_conda)
-    7. [FAQ: How do we set the environment for Machine Learning projects?](#ml_emulators)
-    8. [FAQ: How can users improve their Bash/C/C++ knowledge to develop Cocoa/Cosmolike?](#lectnotes)
-    9. [FAQ: How do we push changes to the Cocoa main branch? A few git hacks](#push_main)
-   10. [FAQ: How do we develop from a Git tag? A few more Git hacks](#dev_from_tag)
-   11. [FAQ: How do we download modern CMB data? (external readme)](Cocoa/external_modules/data)
-   12. [FAQ: How do we switch Cocoa's adopted CAMB/CLASS/Polychord? (external readme)](Cocoa/external_modules/code)
-   13. [FAQ: Where do we find common FAQs about Cosmolike? (external readme)](Cocoa/projects/)
+    1. [FAQ: Suggested steps to debug Cocoa](#running_wrong)
+    2. [FAQ: How do we compile external modules?](#appendix_compile_separately)
+    3. [FAQ: How do we run Cocoa with Docker?](#appendix_jupyter_whovian)
+    4. [FAQ: How do we use an available Anaconda module on HPC?](#overview_anaconda)
+    5. [FAQ: How do we install Conda?](#overview_conda)
+    6. [FAQ: How do we set the environment for Machine Learning projects?](#ml_emulators)
+    7. [FAQ: How can users improve their Bash/C/C++ knowledge to develop Cocoa/Cosmolike?](#lectnotes)
+    8. [FAQ: How do we push changes to the Cocoa main branch? A few git hacks](#push_main)
+    9. [FAQ: How do we develop from a Git tag? A few more Git hacks](#dev_from_tag)
+   10. [FAQ: How do we download modern CMB data? (external readme)](Cocoa/external_modules/data)
+   11. [FAQ: How do we switch Cocoa's adopted CAMB/CLASS/Polychord? (external readme)](Cocoa/external_modules/code)
+   12. [FAQ: Where do we find common FAQs about Cosmolike? (external readme)](Cocoa/projects/)
+   13. [Credits](#appendix_proper_credits)
 
 # Overview of the [Cobaya](https://github.com/CobayaSampler)-[CosmoLike](https://github.com/CosmoLike) Joint Architecture (Cocoa) <a name="overview"></a>
 
@@ -273,34 +273,6 @@ PolyChord:
 > Finally, rerun all the steps presented in this section, including step one. Users must reload the `(.local)` environment by rerunning `start_cocoa.sh` so Cocoa can create appropriate symlinks that expose the emulators to Cobaya.
 
 # Appendix <a name="appendix"></a>
-
-## Credits <a name="appendix_proper_credits"></a>
-
-The following is not an exhaustive list of the codes we use/download/adopt
-
-- [Cobaya](https://github.com/CobayaSampler) is a framework developed by Dr. Jesus Torrado and Prof. Anthony Lewis
-
-- [Cosmolike](https://github.com/CosmoLike) is a framework developed by Prof. Elisabeth Krause and Prof. Tim Eifler
-
-- [CAMB](https://github.com/cmbant/CAMB) is a Boltzmann code developed by Prof. Anthony Lewis
-
-- [CLASS](https://github.com/lesgourg/class_public) is a Boltzmann code developed by Prof. Julien Lesgourgues and Dr. Thomas Tram
-
-- [Polychord](https://github.com/PolyChord/PolyChordLite) is a sampler code developed by Dr. Will Handley, Prof. Lasenby, and Prof. M. Hobson
-
-- [CLIK](https://github.com/benabed/clik) is the likelihood code used to analyze Planck and SPT data, maintained by Prof. Karim Benabed
-
-- [SPT](https://github.com/SouthPoleTelescope/spt3g_y1_dist) is the official likelihood of the South Pole Telescope 3G Year 1
-
-- [MFLike](https://github.com/simonsobs/LAT_MFLike) is the official likelihood of the Simons Observatory
-
-- [ACTLensing](https://github.com/ACTCollaboration/act_dr6_lenslike) is the official lensing likelihood of the ACT collaboration developed by Prof. Mathew Madhavacheril
-
-- [HiLLiPoP CMB likelihood](https://github.com/planck-npipe/hillipop.git) is a multifrequency CMB likelihood for Planck data.
-
-- [Lollipop CMB likelihood](https://github.com/planck-npipe/lollipop.git) is a Planck low-l polarization likelihood.
-  
-Following best practices, Cocoa scripts download most external modules from their original repositories, including Cobaya, CAMB, Class, Polychord, ACT-DR6, HiLLiPoP, and Lollipop. Although our repository includes a few likelihoods in compressed [xz file format](https://tukaani.org/xz/format.html), we do not want to discourage users from cloning their code/data from their original repositories.  The work of those authors is extraordinary, and users **must cite them** appropriately.
 
 ## :interrobang: FAQ: Suggested steps to debug Cocoa <a name="running_wrong"></a>
 
@@ -679,3 +651,31 @@ Finally, the developer needs to merge the changes made on `xyzlocdev`.
 If this merge does not create any merge conflicts, type
 
     git push origin xyzdev        # run on the xyzdev branch
+
+## Credits <a name="appendix_proper_credits"></a>
+
+The following is not an exhaustive list of the codes we use/download/adopt
+
+- [Cobaya](https://github.com/CobayaSampler) is a framework developed by Dr. Jesus Torrado and Prof. Anthony Lewis
+
+- [Cosmolike](https://github.com/CosmoLike) is a framework developed by Prof. Elisabeth Krause and Prof. Tim Eifler
+
+- [CAMB](https://github.com/cmbant/CAMB) is a Boltzmann code developed by Prof. Anthony Lewis
+
+- [CLASS](https://github.com/lesgourg/class_public) is a Boltzmann code developed by Prof. Julien Lesgourgues and Dr. Thomas Tram
+
+- [Polychord](https://github.com/PolyChord/PolyChordLite) is a sampler code developed by Dr. Will Handley, Prof. Lasenby, and Prof. M. Hobson
+
+- [CLIK](https://github.com/benabed/clik) is the likelihood code used to analyze Planck and SPT data, maintained by Prof. Karim Benabed
+
+- [SPT](https://github.com/SouthPoleTelescope/spt3g_y1_dist) is the official likelihood of the South Pole Telescope 3G Year 1
+
+- [MFLike](https://github.com/simonsobs/LAT_MFLike) is the official likelihood of the Simons Observatory
+
+- [ACTLensing](https://github.com/ACTCollaboration/act_dr6_lenslike) is the official lensing likelihood of the ACT collaboration developed by Prof. Mathew Madhavacheril
+
+- [HiLLiPoP CMB likelihood](https://github.com/planck-npipe/hillipop.git) is a multifrequency CMB likelihood for Planck data.
+
+- [Lollipop CMB likelihood](https://github.com/planck-npipe/lollipop.git) is a Planck low-l polarization likelihood.
+  
+Following best practices, Cocoa scripts download most external modules from their original repositories, including Cobaya, CAMB, Class, Polychord, ACT-DR6, HiLLiPoP, and Lollipop. Although our repository includes a few likelihoods in compressed [xz file format](https://tukaani.org/xz/format.html), we do not want to discourage users from cloning their code/data from their original repositories.  The work of those authors is extraordinary, and users **must cite them** appropriately.
