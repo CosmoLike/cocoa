@@ -256,7 +256,7 @@ PolyChord:
 > [!NOTE]
 > What should users do if they don't unset ML-related environment keys before running `setup_cocoa.sh` and `compile_cocoa.sh`, as rerunning these scripts can require a long time? Instead, run the following commands.
 >
->      source start_cocoa.sh      # even if (.local) is already active, users must run start_cocoa.sh again to update bash environmental values
+>      source start_cocoa.sh     # even if (.local) is already active, users must run start_cocoa.sh again to update bash environment values
 > 
 > and
 >
@@ -323,7 +323,7 @@ To avoid excessive compilation or download times during development, users can u
 Everytime users edit `set_installation_options.sh`, they need to reload `(.local)` by rerunning `start_cocoa.sh`. Then, users should run the commands below
 
      cd ./cocoa/Cocoa
-     source start_cocoa.sh      # even if (.local) is already active, users must run start_cocoa.sh again to update key values
+     source start_cocoa.sh      # even if (.local) is already active, users must run start_cocoa.sh again to update bash environment values
 
  and
  
@@ -378,12 +378,12 @@ Finally, cocoa also provide several cosmolike projects. To activate them, manipu
 Everytime users edit `set_installation_options.sh`, they need to reload `(.local)` by rerunning `start_cocoa.sh`. Then, run the following commands:
 
       cd ./cocoa/Cocoa
-      source start_cocoa.sh # even if (.local) is already active, users must run start_cocoa.sh again to update key values
-
+      source start_cocoa.sh       # even if (.local) is already active, users must run start_cocoa.sh again to update bash environment values
+      
  and
  
       source ./installation_scripts/setup_cosmolike_projects.sh   # download all cosmolike projects  
-      source ./installation_scripts/compile_all_projects.sh       # compile  all cosmolike project
+      source ./installation_scripts/compile_all_projects.sh           # compile  all cosmolike project
 
 In case users only want to compile a single cosmolike project (let's say the `roman_real` project)
 
@@ -574,7 +574,7 @@ Commenting out the environmental flags below *before running* `setup_cocoa.sh` w
 
 In case users have already run `setup_cocoa.sh`, then run the command.
 
-    source start_cocoa.sh  # even if (.local) is already active, users must run start_cocoa.sh again to update key values
+    source start_cocoa.sh  # even if (.local) is already active, users must run start_cocoa.sh again to update bash environment values
    
 and
 
