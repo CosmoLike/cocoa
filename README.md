@@ -94,7 +94,7 @@ and
         
     source setup_cocoa.sh
 
-This script downloads and decompresses external modules, requiring internet access, which is relevant on HPC environments where only the login node can access the web.
+This script downloads and decompresses external modules, requiring internet access. Therefore, users cannot run this script on compute nodes in HPC environments where only the login node can access the web.
 
 **Step :three:**: Run the script `compile_cocoa.sh` by typing 
 
