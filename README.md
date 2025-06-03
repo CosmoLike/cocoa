@@ -235,8 +235,9 @@ Now, users must follow all the steps below.
 
     source start_cocoa.sh
 
- **Step :two:**: Select the number of OpenMP cores (no need to thread via OpenMP; however, `OMP_NUM_THREADS=3` did reduce the TRF emulator runtime by a factor of two on our test machine).
+ **Step :two:**: Select the number of OpenMP cores.
     
+    # No need to thread via OpenMP. However, 2-3 threads may reduce the TRF emulator runtime
     export OMP_PROC_BIND=close; export OMP_NUM_THREADS=1
 
  **Step :three:** Run `cobaya-run` on the first emulator example following the commands below.
