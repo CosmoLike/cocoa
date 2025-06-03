@@ -333,29 +333,14 @@ Here are a few steps to debug Cocoa
 
 ### :interrobang: FAQ: How do we compile the Boltzmann, CosmoLike, and Likelihood codes separately <a name="appendix_compile_separately"></a>
 
-To avoid excessive compilation or download times during development, users can use scripts located at `Cocoa/installation_scripts/` that either downloads (`setup_XXX.sh`) or compile (`compile_XXX.sh`) only specific modules. A few examples of these scripts are: 
-
-     cd ./cocoa/Cocoa
-     
-     source ./installation_scripts/setup_act_dr6.sh
-     source ./installation_scripts/setup_simons_observatory.sh
-
-     source ./installation_scripts/compile_act_dr6.sh
-     source ./installation_scripts/compile_simons_observatory.sh
-     
-Similarly, we show below a shell scripts that download and unpack data from multiple experiments. 
-
-     $(cocoa)(.local) source "${ROOTDIR:?}"/installation_scripts/unxv_act_dr6.sh
-     $(cocoa)(.local) source "${ROOTDIR:?}"/installation_scripts/unxv_simons_observatory.sh
-
-To ensure these scripts can download and install these packages, users must comment the lines below on `set_installation_options.sh` and reload the `(.local)` environment by rerunning `start_cocoa.sh`
+To avoid excessive compilation or download times during development, users can use scripts located at `Cocoa/installation_scripts/` to download and compile only specific modules (or datasets). To take full advantage of them, users must first unset the appropriate keys on `set_installation_options.sh`, as exemplified below 
 
      [Adapted from Cocoa/set_installation_options.sh shell script]
 
      # ------------------------------------------------------------------------------
      # The flags below allow users to skip downloading specific datasets ------------
      # ------------------------------------------------------------------------------
-     #export IGNORE_ACTDR6_DATA=1  # ACT-DR6 likelihood data
+     #export IGNORE_ACTDR6_DATA=1                  # ACT-DR6 likelihood data
      (...)
      #export IGNORE_SIMONS_OBSERVATORY_CMB_DATA=1  # SO likelihood data
 
@@ -364,11 +349,27 @@ To ensure these scripts can download and install these packages, users must comm
      # ------------------------------------------------------------------------------
      # The keys below control which packages will be installed and compiled 
      # ------------------------------------------------------------------------------
-     #export IGNORE_SIMONS_OBSERVATORY_LIKELIHOOD_CODE=1 
+     #export IGNORE_SIMONS_OBSERVATORY_LIKELIHOOD_CODE=1     # SO likelihood code
      (...)
-     #export IGNORE_ACTDR6_CODE=1  # ACT-DR6 likelihood code
+     #export IGNORE_ACTDR6_CODE=1                            # ACT-DR6 likelihood code
 
-Finally, cocoa provide several cosmolike projects. To activate them, comment the following lines on `set_installation_options.sh` 
+Then, users should run the commands below
+
+     cd ./cocoa/Cocoa
+     source start_cocoa.sh      # even if (.local) is already active, users must run start_cocoa.sh again to update key values
+
+ and
+ 
+     source ./installation_scripts/setup_act_dr6.sh                # download likelihood code
+     source ./installation_scripts/setup_simons_observatory.sh     # download likelihood code
+
+     source ./installation_scripts/compile_act_dr6.sh              # compile likelihood code
+     source ./installation_scripts/compile_simons_observatory.sh   # compile likelihood code
+     
+     source ./installation_scripts/unxv_act_dr6.sh                 # download and unpack likelihood data
+     source ./installation_scripts/unxv_simons_observatory.sh      # download and unpack likelihood data
+
+Finally, cocoa also provide several cosmolike projects. To activate them, manipulate the following lines on `set_installation_options.sh` 
 
      [Adapted from Cocoa/set_installation_options.sh shell script]
 
@@ -407,21 +408,19 @@ Finally, cocoa provide several cosmolike projects. To activate them, comment the
      #TAG: if unset, load the specified TAG
      #export ROMAN_REAL_TAG="v4.0-beta17"
  
-If users comment these lines after running `setup_cocoa.sh` and `compile_cocoa.sh`, there is no need to rerun these general scripts. Instead, run the following three commands:
+Then, run the following commands:
 
-      source start_cocoa.sh
+      cd ./cocoa/Cocoa
+      source start_cocoa.sh # even if (.local) is already active, users must run start_cocoa.sh again to update key values
 
  and
  
-      source ./installation_scripts/setup_cosmolike_projects.sh
+      source ./installation_scripts/setup_cosmolike_projects.sh   # download all cosmolike projects  
+      source ./installation_scripts/compile_all_projects.sh       # compile  all cosmolike project
 
-and
- 
-       source ./installation_scripts/compile_all_projects.sh
+In case users just want to compile a single cosmolike project (let's say the `roman_real` project)
 
-or in case users just want to compile a single project (let's say the `roman_real` project)
-
-       source ./projects/roman_real/scripts/compile_roman_real.sh
+      source ./projects/roman_real/scripts/compile_roman_real.sh
      
 ### :interrobang: FAQ: How do we run cocoa on a laptop? The docker image named *whovian-cocoa* <a name="appendix_jupyter_whovian"></a>
 
