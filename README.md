@@ -234,7 +234,7 @@ Cocoa contains a few transformer-based neural network emulators capable of simul
       #export IGNORE_SIMONS_OBSERVATORY_LIKELIHOOD_CODE=1    # to run EXAMPLE_EVALUATE26.yaml
       #export IGNORE_SIMONS_OBSERVATORY_CMB_DATA=1           # to run EXAMPLE_EVALUATE26.yaml
  
-Now follow all the steps below, including step :one:.
+Now follow all the steps below.
 
  **Step :one:**: Activate the private Python environment by sourcing the script `start_cocoa.sh`
 
@@ -273,9 +273,9 @@ PolyChord:
 >
 >      source ./installation_scripts/setup_simons_observatory.sh       # download Simons Observatory Likelihood code (to run EXAMPLE_EVALUATE26.yaml)
 >      source ./installation_scripts/unxv_simons_observatory.sh        # download Simons Observatory Likelihood data  (to run EXAMPLE_EVALUATE26.yaml)
->      source ./installation_scripts/compile_simons_observatory.sh     # compile Simons Observatory Lkelihood code     (to run EXAMPLE_EVALUATE26.yaml)
+>      source ./installation_scripts/compile_simons_observatory.sh     # compile Simons Observatory Likelihood code     (to run EXAMPLE_EVALUATE26.yaml)
 > 
-> Finally, rerun all the steps presented this section, including step :one:. Users will indeed neeed to rerun `start_cocoa.sh` so Cocoa can create appropriate symlinks that expose the emulators to Cobaya.
+> Finally, rerun all the steps presented in this section, including step one. Users must reload the `(.local)` environment by rerunning `start_cocoa.sh` so Cocoa can create appropriate symlinks that expose the emulators to Cobaya.
 
 ## Appendix <a name="appendix"></a>
 
@@ -327,9 +327,11 @@ Here are a few steps to debug Cocoa
 
       (....)
 
-**Step :two:**: restart the Cocoa private environment by rerunning `source start_cocoa.sh` (everytime users edit `set_installation_options.sh`, they need to reload `(.local)` by rerunning `start_cocoa.sh`), and compile the failed package separately by following the instructions in the appendix [FAQ: How do we compile the Boltzmann, CosmoLike, and Likelihood codes separately](#appendix_compile_separately).
+**Step :two:**: restart the Cocoa private environment by rerunning `source start_cocoa.sh` (every time users edit `set_installation_options.sh`, they must reload the `(.local)` environment by rerunning `start_cocoa.sh`).
 
-**Step :three:**: rerun `setup_cocoa.sh` and `compile_cocoa.sh` to ensure all packages are installed and compiled correctly.
+**Step :three:**: compile the failed package by following the instructions in the appendix [FAQ: How do we compile the Boltzmann, CosmoLike, and Likelihood codes separately](#appendix_compile_separately).
+
+**Step 4️⃣**: rerun `setup_cocoa.sh` and `compile_cocoa.sh` to ensure all packages are installed and compiled correctly.
 
 ### :interrobang: FAQ: How do we compile the Boltzmann, CosmoLike, and Likelihood codes separately <a name="appendix_compile_separately"></a>
 
@@ -437,16 +439,16 @@ We provide the Docker image [whovian-cocoa](https://hub.docker.com/r/vivianmiran
 
 This is a large image with a size of approximately 16GB, as it already contains the cocoa `v4.0beta26` installed and pre-compiled. 
 
- **Step :three:**: As shown in the picture below, users can follow the instructions provided in Section [Running Examples](#cobaya_base_code_examples) to run basic non-cosmolike-based examples, as well as examples within `LSST-Y1`, `ROMAN_REAL`, and `ROMAN_FOURIER` projects. 
+ **Step :three:**: As shown in the picture below, users can follow the instructions provided in Section [Running Examples](#cobaya_base_code_examples) to run a few non-cosmolike-based examples, as well as examples within `LSST-Y1`, `ROMAN_REAL`, and `ROMAN_FOURIER` projects. 
 
 ![screenshot_2025-06-02_at_7 23 48_pm](https://github.com/user-attachments/assets/2b15ce75-3d43-4a65-ab7b-e70077492b32)
 
 > [!TIP]
-> Once installation is complete, the user must learn how to **start**, use, and **exit** the container. Assuming the user maintained the container name `cocoa2023` via the flag `--name cocoa2023` on the `docker run` command, type:
+> Once installation is complete, the user must learn how to **start** and **exit** the Docker container. Assuming the user maintained the container name `cocoa2025` set on the flag `--name cocoa2025`, type:
 >    
 >      docker start -ai cocoa2025
 >
->  to restart the container after the first exit.
+>  to restart the container.
 
 > [!TIP]
 > To run Jupyter Notebooks within the *whovian-cocoa* docker container installed on a local machine, type the following command:
@@ -477,7 +479,7 @@ This is a large image with a size of approximately 16GB, as it already contains 
 >     [... NotebookApp] or http://127.0.0.1:8888/?token=XXX  
 
 > [!TIP]
-> To delete a particular container, type
+> To delete a particular container, assuming the container name `cocoa2025`, type
 >
 >      docker rm -f cocoa2025
 >
@@ -491,7 +493,7 @@ Below, we list users' most common issues when installing Cocoa conda environment
 
 - :interrobang: **Conda command not found**.
   
-Anaconda is not usually set by default on HPC environments, but may be available as a module. For example, on the Midway HPC cluster, it can be loaded using the command below.
+Anaconda is not usually set by default on HPC environments but may be available as a module. For example, on the Midway HPC cluster, it can be loaded using the command below.
 
     module load Anaconda3/2022.10
 
@@ -509,13 +511,13 @@ There are various reasons why installing the Cocoa conda environment may take a 
 
 :one: *Never install conda environments using the login node*. 
 
-Instead, request an interactive job with a few cores. However, users should be aware that **some supercomputers do not provide internet access on computing nodes**. Ask the HPC staff for a **queue dedicated to installing and compiling code**; it should exist in a well-designed HPC environment.
+Instead, request an interactive job with a few cores. However, users should know that **some supercomputers do not provide internet access on computing nodes**. Ask the HPC staff for a **queue dedicated to installing and compiling code**; it should exist in a well-designed HPC environment.
 
 - :interrobang: **Conda installation is interrupted due to quota limitations**.
 
 Supercomputers usually enforce strict quota limits on home folders. These limits apply to the total file size and the number of files. By default, Anaconda modules install new environments at `$HOME/.conda/envs`. Anaconda also stores Gigabytes of downloaded packages in the `$HOME/.conda/pkgs` folder; the `pkgs` folder is used by Anaconda as a package cache.
 
-:one: Create an Anaconda folder in a project folder outside `$HOME` with significantly more tolerant quota restrictions. For instance, we used the command below on the Midway supercomputer to create an Anaconda folder in the KICP projects partition.
+:one: Create an Anaconda folder in a partition containing a more tolerant quota restriction than `$HOME`. For instance, we used the command below on the Midway supercomputer to create the Anaconda folder in the KICP projects partition.
 
     mkdir /project2/kicp/XXX/anaconda/
 
