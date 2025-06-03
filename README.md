@@ -55,6 +55,8 @@ activate it
 
     conda activate cocoa
 
+Users can now proceed to **step :two:**.
+
 > [!TIP]
 > To install the `cocoa` conda environment on a supercomputer, users may take advantage of the fact that several HPC environments provide the [Anaconda installer](https://www.anaconda.com) as an external module. If this applies to you, then check the appendix [FAQ: How do we use an available Anaconda module on HPC?](#overview_anaconda).
 
@@ -73,6 +75,8 @@ activate it
 and install `git-lfs`
 
     git-lfs install
+
+Users can now proceed to the next section.
 
 ## Installation and Compilation of external modules <a name="cobaya_base_code"></a>
 
@@ -106,13 +110,12 @@ Users can now proceed to **step :two:**.
         
     source setup_cocoa.sh
 
-This script downloads and decompresses external modules, requiring internet access to run successfully.
+This script downloads and decompresses external modules, requiring internet access to run successfully. Users can now proceed to **step :three:**.
 
 > [!NOTE]
 > When running `setup_cocoa.sh` repeatedly, Cocoa will not download previously installed packages, cosmolike projects or large datasets, unless the following keys are set on `set_installation_options.sh`
 >
 >     [Adapted from Cocoa/set_installation_options.sh shell script]
->     (...)
 >     (...)
 >
 >     # ------------------------------------------------------------------------------
@@ -133,7 +136,7 @@ This script downloads and decompresses external modules, requiring internet acce
 
     source compile_cocoa.sh
     
-This script compiles external modules selected for installation on `set_installation_options.sh` (e.g., CAMB and Class). 
+This script compiles external modules selected for installation on `set_installation_options.sh` (e.g., CAMB and Class). Users can now proceed to the next section. Users can now proceed to the next section.
 
 > [!TIP]
 > Cocoa does not install many external modules by default, but users may require them in a particular project. In this case, check the  available options on the `set_installation_options.sh` shell script. Then, rerun steps :two: and :three:. 
