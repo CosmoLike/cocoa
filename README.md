@@ -256,7 +256,7 @@ PolyChord:
 > [!NOTE]
 > What should users do if they don't unset ML-related environment keys before running `setup_cocoa.sh` and `compile_cocoa.sh`, as rerunning these scripts can require a long time? Instead, run the following commands.
 >
->      source start_cocoa.sh     # even if (.local) is already active, users must run start_cocoa.sh again to update bash environment values
+>      source start_cocoa.sh  # even if (.local) is already active, users must run start_cocoa.sh again to update bash environment values
 > 
 > and
 >
@@ -323,7 +323,7 @@ To avoid excessive compilation or download times during development, users can u
 Everytime users edit `set_installation_options.sh`, they need to reload `(.local)` by rerunning `start_cocoa.sh`. Then, users should run the commands below
 
      cd ./cocoa/Cocoa
-     source start_cocoa.sh      # even if (.local) is already active, users must run start_cocoa.sh again to update bash environment values
+     source start_cocoa.sh   # even if (.local) is already active, users must run start_cocoa.sh again to update bash environment values
 
  and
  
@@ -378,7 +378,7 @@ Finally, cocoa also provide several cosmolike projects. To activate them, manipu
 Everytime users edit `set_installation_options.sh`, they need to reload `(.local)` by rerunning `start_cocoa.sh`. Then, run the following commands:
 
       cd ./cocoa/Cocoa
-      source start_cocoa.sh       # even if (.local) is already active, users must run start_cocoa.sh again to update bash environment values
+      source start_cocoa.sh   # even if (.local) is already active, users must run start_cocoa.sh again to update bash environment values
       
  and
  
@@ -595,7 +595,7 @@ Until recently, Cocoa development was a bit unstructured. Developers could push 
 **Step :one:**: create a development branch. Do not call the development branch `dev`, as `dev` is reserved for work done by the leading Cocoa developers. For concreteness, let's name the new branch `xyzdev`
 
    
-    git switch -c xyzdev                # run on the main branch
+    git switch -c xyzdev  # run on the main branch
 
 > [!TIP]
 > The use of developers' initials followed by `dev` helps make the branch easily identifiable.
@@ -605,17 +605,17 @@ Until recently, Cocoa development was a bit unstructured. Developers could push 
 
 **Step :two:**: develop the proposed changes. We advise developers to commit frequently. In your branch, a commit does not need to be atomic, changing the code from one working state to another well-tested, meaningful working state. Developers can push to the server via the command.
 
-    git push -u origin xyzdev        # run on the xyzdev branch
+    git push -u origin xyzdev   # run on the xyzdev branch
 
 **Step :three:**: Once the developers created an atomic, meaningful, and well-tested improvement to Cocoa, the developer needs to merge any subsequent changes made in `main`.
 
-    git merge main                      # run on the xyzdev branch
+    git merge main   # run on the xyzdev branch
 
 This step may create conflicts that must be addressed before step four. 
 
 **Step :four:**: Once the developers have merged recent changes made on the `main` branch, they must push to the main branch the modifications made on the `xyzdev` branch by first **squashing all your changes into a single commit**, as shown below
 
-    git switch main                     # run on the xyzdev branch
+    git switch main  # run on the xyzdev branch
 
 and
 
@@ -627,7 +627,7 @@ and
 
 and
 
-    git push origin main              # run on the main branch
+    git push origin main  # run on the main branch
 
 ## :interrobang: FAQ: How do we develop from a git tag? A few more git hacks <a name="dev_from_tag"></a>
 
@@ -648,7 +648,7 @@ Now, all commits will be associated with this local branch.
 
 **Step :three:** The developer has two options at the end of development. They can **either** create a new remote branch
 
-    git push origin xyzlocdev     # run on the xyzlocdev branch
+    git push origin xyzlocdev    # run on the xyzlocdev branch
 
 **or** they can fetch and download the remote `xyzdev` branch, which will later absorb the changes made on `xyzlocdev`
 
@@ -660,7 +660,7 @@ Finally, the developer needs to merge the changes made on `xyzlocdev`.
 
 If this merge does not create any merge conflicts, type
 
-    git push origin xyzdev        # run on the xyzdev branch
+    git push origin xyzdev    # run on the xyzdev branch
 
 ## Credits <a name="appendix_proper_credits"></a>
 
