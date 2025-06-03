@@ -136,7 +136,7 @@ This script downloads and decompresses external modules, requiring internet acce
 
     source compile_cocoa.sh
     
-This script compiles external modules selected for installation on `set_installation_options.sh` (e.g., CAMB and Class). Users can now proceed to **the next section**.
+This script compiles external modules selected for installation on `set_installation_options.sh` (e.g., CAMB). Users can now proceed to **the next section**.
 
 > [!TIP]
 > Cocoa does not install many external modules by default, but users may require them in a particular project. In this case, check the  available options on the `set_installation_options.sh` shell script. Then, rerun steps :two: and :three:. 
