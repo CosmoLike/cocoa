@@ -333,22 +333,20 @@ Here are a few steps to debug Cocoa
 
 ### :interrobang: FAQ: How do we compile the Boltzmann, CosmoLike, and Likelihood codes separately <a name="appendix_compile_separately"></a>
 
-To avoid excessive compilation or download times during development, users can use scripts located at `Cocoa/installation_scripts/` that either downloads (`setup_XXX.sh`) or compile (`compile_XXX.sh`) only a specific module. A few examples of these scripts are: 
+To avoid excessive compilation or download times during development, users can use scripts located at `Cocoa/installation_scripts/` that either downloads (`setup_XXX.sh`) or compile (`compile_XXX.sh`) only specific modules. A few examples of these scripts are: 
 
-     $(cocoa)(.local) cd "${ROOTDIR:?}"
+     cd ./cocoa/Cocoa
      
-     $(cocoa)(.local) source "${ROOTDIR:?}"/installation_scripts/setup_act_dr6.sh
-     $(cocoa)(.local) source "${ROOTDIR:?}"/installation_scripts/setup_simons_observatory.sh
+     source ./installation_scripts/setup_act_dr6.sh
+     source ./installation_scripts/setup_simons_observatory.sh
 
-     $(cocoa)(.local) source "${ROOTDIR:?}"/installation_scripts/compile_act_dr6.sh
-     $(cocoa)(.local) source "${ROOTDIR:?}"/installation_scripts/compile_simons_observatory.sh
+     source ./installation_scripts/compile_act_dr6.sh
+     source ./installation_scripts/compile_simons_observatory.sh
      
-Similarly, we show below a few examples of shell scripts that download and unpack data from multiple experiments. 
+Similarly, we show below a shell scripts that download and unpack data from multiple experiments. 
 
      $(cocoa)(.local) source "${ROOTDIR:?}"/installation_scripts/unxv_act_dr6.sh
      $(cocoa)(.local) source "${ROOTDIR:?}"/installation_scripts/unxv_simons_observatory.sh
-
-The `$(cocoa)(.local)` prefix emphasizes users should run these scripts after activating cocoa environments. 
 
 To ensure these scripts can download and install these packages, users must comment the lines below on `set_installation_options.sh` and reload the `(.local)` environment by rerunning `start_cocoa.sh`
 
