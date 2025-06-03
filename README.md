@@ -11,7 +11,7 @@
 7. [Appendix](#appendix)
     1. [Credits](#appendix_proper_credits)
     2. [FAQ: What if installation or compilation goes wrong?](#running_wrong)
-    3. [FAQ: How do we compile individual modules?](#appendix_compile_ly)
+    3. [FAQ: How do we compile individual modules?](#appendix_compile_separately)
     4. [FAQ: How do we run Cocoa on a laptop? The docker image named *whovian-cocoa*](#appendix_jupyter_whovian)
     5. [FAQ: How do we use an available Anaconda module on HPC?](#overview_anaconda)
     6. [FAQ: What if there is no Conda? Miniconda installation](#overview_miniconda)
@@ -118,7 +118,7 @@ Users can now proceed to **the next section**.
 > Users who want to develop from a release version (e.g., `v4.0-beta20`) should read the appendix [FAQ: How do we push changes to the cocoa main branch? A few git hacks](#push_main)
 
 > [!TIP]
-> Cocoa does not install all the available external modules by default. If the user requires additional packages, refer to the appendix [FAQ: How do we compile individual modules?](#appendix_compile_separately).
+> Cocoa does not install all the available external modules by default. If the user requires additional packages, refer to the appendix [FAQ: How do we compile individual modules?](#appendix_compile_).
 
 > [!NOTE]
 > In case users need to run `setup_cocoa.sh` more than once, Cocoa will not download previously installed packages, cosmolike projects, or large datasets, unless the following keys are set on `set_installation_options.sh`
