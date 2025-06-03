@@ -1,7 +1,7 @@
 # Table of contents
 1. [The Projects Folder](#appendix_projects_folder)
 2. [FAQ: How do we download and run Cosmolike projects?](#running_cosmolike_projects)
-3. [FAQ: How do we set Weak Lensing YAML files in Cobaya? A warning](#appendix_example_runs)
+3. [FAQ: How do we set Weak Lensing YAML files in Cobaya?](#appendix_example_runs)
 4. [FAQ: How do we set Slow/Fast decomposition with Cosmolike?](#manual_blocking_cosmolike)
 5. [FAQ: How do we create a new cosmolike project?](#appendix_lsst_y1_new)
    1. [Minor changes: the easy way](#appendix_lsst_y1_new_small)
@@ -138,7 +138,7 @@ This will ensure that `stop_cocoa.sh` unsets them before exiting Cocoa.
 > [!Warning]
 > Never delete a folder from `projects` without first running `stop_cocoa.sh`; otherwise, Cocoa will have ill-defined links.
 
-### :interrobang: FAQ: How do we set Weak Lensing YAML files in Cobaya? A warning <a name="appendix_example_runs"></a>
+### :interrobang: FAQ: How do we set Weak Lensing YAML files in Cobaya? <a name="appendix_example_runs"></a>
 
 The CosmoLike pipeline requires $\Omega_m$ and $\Omega_b$ to be provided, but the CAMB Boltzmann code only accepts $\Omega_c h^2$ and $\Omega_b h^2$ in Cobaya. Given that, there are two ways of creating YAML compatible with CAMB and Cosmolike: 
 
@@ -181,7 +181,7 @@ The CosmoLike pipeline requires $\Omega_m$ and $\Omega_b$ to be provided, but th
 
 2. Weak Lensing parameterization: $\big(\Omega_m,\Omega_b\big)$ as primary MCMC parameters and $\big(\Omega_c h^2, \Omega_b h^2\big)$ as derived quantities.
 
-Adopting $\big(\Omega_m,\Omega_b\big)$ as main MCMC parameters can create a silent bug in Cobaya; *we are unsure if this problem persists in newer Cobaya versions, so this report should be a warning*. The problem occurs when the option `drop: true` is absent in $\big(\Omega_m,\Omega_b\big)$ parameters, and there are no expressions that define the derived $\big(\Omega_c h^2, \Omega_b h^2\big)$ quantities. *The bug is silent* because the MCMC runs without any warnings, but the CAMB Boltzmann code does not update the cosmological parameters at every MCMC iteration. As a result, the posteriors are flawed, but they may seem reasonable to those unfamiliar with the issue. Please be aware of this bug to avoid any potential inaccuracies in the results. 
+Adopting $\big(\Omega_m,\Omega_b\big)$ as main MCMC parameters can create a silent bug in Cobaya; **we are unsure if this problem persists in newer Cobaya versions, so users must follow our instructions**. The problem occurs when the option `drop: true` is absent in $\big(\Omega_m,\Omega_b\big)$ parameters, and there are no expressions that define the derived $\big(\Omega_c h^2, \Omega_b h^2\big)$ quantities. **The bug is silent** because the MCMC runs without any warnings, but the CAMB Boltzmann code does not update the cosmological parameters at every MCMC iteration. As a result, the posteriors are flawed, but they may seem reasonable to those unfamiliar with the issue. Please be aware of this bug to avoid any potential inaccuracies in the results. 
 
 The correct way to create YAML files with $\big(\Omega_m,\Omega_b\big)$ as primary MCMC parameters is exemplified below
 
@@ -222,11 +222,9 @@ The correct way to create YAML files with $\big(\Omega_m,\Omega_b\big)$ as prima
 
 ### :interrobang: FAQ: How do we set Slow/Fast decomposition with Cosmolike?  <a name="manual_blocking_cosmolike"></a>
 
-The Cosmolike Weak Lensing pipelines contain parameters with different speed hierarchies. For example, Cosmolike execution time is reduced by approximately 50% when fixing the cosmological parameters. On variations limited to the multiplicative shear calibration, Cosmolike execution time is reduced by many orders of magnitude compared to a full run. 
+Cosmolike can't cache the intermediate products associated with two models, which are necessary to exploit Cobaya optimizations associated with dragging (`drag: True`). Still, it can cache one model, thereby enabling the user to take advantage of the slow/fast decomposition of parameters in Cobaya's main Markov Chain Monte Carlo (MCMC) sampler. For example, Cosmolike execution time is reduced by approximately 50% when fixing the cosmological parameters. On variations limited to the multiplicative shear calibration, Cosmolike execution time is reduced by many orders of magnitude compared to a full run. 
 
 Cobaya cannot automatically handle parameters with different speed hierarchies associated with the same likelihood. Luckily, we can manually impose a speed hierarchy in Cobaya using the `blocking:` option in the YAML file. The main limitation of this method is that parameters of all adopted likelihoods, not only the ones required by Cosmolike, must be manually specified.
-
-Cosmolike can't cache the intermediate products associated with two models, which are necessary to exploit Cobaya optimizations associated with dragging (`drag: True`). Still, it can cache one model, thereby enabling the user to take advantage of the slow/fast decomposition of parameters in Cobaya's main Markov Chain Monte Carlo (MCMC) sampler. 
 
 Below, we provide an example YAML configuration for an MCMC chain with DES 3x2pt likelihood.
 
@@ -261,9 +259,7 @@ Below, we provide an example YAML configuration for an MCMC chain with DES 3x2pt
                 # ---------------------------------------------------------------------
                 # Exploiting Cosmolike speed hierarchy
                 # ---------------------------------------------------------------------
-                measure_speeds: False # We provide the approximate speeds in the blocking
-                # drag = false. The drag sampler requires the intermediate products of the last
-                # two evaluations to be cached. Cosmolike can only cache the last evaluation.
+                measure_speeds: False 
                 drag: False
                 oversample_power: 0.2
                 oversample_thin: True
