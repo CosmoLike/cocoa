@@ -181,8 +181,6 @@ The CosmoLike pipeline requires $\Omega_m$ and $\Omega_b$ to be provided, but th
 
 2. Weak Lensing parameterization: $\big(\Omega_m,\Omega_b\big)$ as primary MCMC parameters and $\big(\Omega_c h^2, \Omega_b h^2\big)$ as derived quantities.
 
-The correct way to create YAML files with $\big(\Omega_m,\Omega_b\big)$ as primary MCMC parameters is exemplified below
-
         omegab:
             prior:
                 min: 0.03
