@@ -15,12 +15,12 @@
     4. [FAQ: How do we use an available Anaconda module on HPC?](#overview_anaconda)
     5. [FAQ: How do we install Conda?](#overview_miniconda)
     6. [FAQ: How do we set the environment for Machine Learning projects?](#ml_emulators)
-    7. [FAQ: How can users improve their Bash/C/C++ knowledge to develop Cocoa/Cosmolike?](#lectnotes)
-    8. [FAQ: How do we push changes to the Cocoa main branch? A few git hacks](#push_main)
-    9. [FAQ: How do we develop from a Git tag? A few more Git hacks](#dev_from_tag)
-   10. [FAQ: How do we download modern CMB data? (external readme)](Cocoa/external_modules/data)
-   11. [FAQ: How do we switch Cocoa's adopted CAMB/CLASS/Polychord? (external readme)](Cocoa/external_modules/code)
-   12. [FAQ: Where do we find common FAQs about Cosmolike? (external readme)](Cocoa/projects/)
+    7. [FAQ: How do we push changes to the Cocoa main branch? A few git hacks](#push_main)
+    8. [FAQ: How do we develop from a Git tag? A few more Git hacks](#dev_from_tag)
+    9. [FAQ: How do we download modern CMB data? (external readme)](Cocoa/external_modules/data)
+   10. [FAQ: How do we switch Cocoa's adopted CAMB/CLASS/Polychord? (external readme)](Cocoa/external_modules/code)
+   11. [FAQ: Where do we find common FAQs about Cosmolike? (external readme)](Cocoa/projects/)
+   12. [FAQ: How can users improve their Bash/C/C++ knowledge to develop Cocoa/Cosmolike?](#lectnotes)
    13. [Credits](#appendix_proper_credits)
 
 # Overview of the [Cobaya](https://github.com/CobayaSampler)-[CosmoLike](https://github.com/CosmoLike) Joint Architecture (Cocoa) <a name="overview"></a>
@@ -581,12 +581,6 @@ and
 
     source ./installation_scripts/setup_pip_core_packages.sh
               
-## :interrobang: FAQ: How can users improve their Bash/C/C++ knowledge to develop Cocoa/Cosmolike? :book::book: <a name="lectnotes"></a>
-
-A working knowledge of Python is required to understand the Cobaya framework at the developer level. Users must also be familiar with the Bash language to understand Cocoa's scripts. Proficiency in C and C++ is also needed to manipulate Cosmolike and the C++ Cobaya-Cosmolike C++ interface. Finally, users need to understand the Fortran-2003 language to modify CAMB.
-
-Learning all these languages can be overwhelming, so to enable new users to do research that demands modifications on the inner workings of these codes, we include [here](cocoa_installation_libraries/LectNotes.pdf) a link to approximately 600 slides that provide an overview of Bash (slides ~1-137), C (slides ~138-371), and C++ (slides ~372-599). In the future, we aim to add lectures about Python and Fortran. 
-
 ## :interrobang: FAQ: How do we push changes to the Cocoa main branch? A few git hacks <a name="push_main"></a>
 
 Until recently, Cocoa development was a bit unstructured. Developers could push directly to the `main` branch, and small commits were not discouraged. Such flexible development rules will soon change when `v4.0` leaves the beta phase. We will protect the `main` branch by requiring every push to be reviewed by Cocoa's leading developers. Our new philosophy establishes that *a commit in the main branch should contain an atomic change that takes code from one working state to another working state with meaningful and well-tested improvements*. Therefore, developers should propose changes to the `main` branch in larger chunks (*via squash commits*), as shown below.
@@ -662,6 +656,12 @@ Finally, the developer needs to merge the changes made on `xyzlocdev`.
 If this merge does not create any merge conflicts, type
 
     git push origin xyzdev    # run on the xyzdev branch
+
+## :interrobang: FAQ: How can users improve their Bash/C/C++ knowledge to develop Cocoa/Cosmolike? :book::book: <a name="lectnotes"></a>
+
+A working knowledge of Python is required to understand the Cobaya framework at the developer level. Users must also be familiar with the Bash language to understand Cocoa's scripts. Proficiency in C and C++ is also needed to manipulate Cosmolike and the C++ Cobaya-Cosmolike C++ interface. Finally, users need to understand the Fortran-2003 language to modify CAMB.
+
+Learning all these languages can be overwhelming, so to enable new users to do research that demands modifications on the inner workings of these codes, we include [here](cocoa_installation_libraries/LectNotes.pdf) a link to approximately 600 slides that provide an overview of Bash (slides ~1-137), C (slides ~138-371), and C++ (slides ~372-599). In the future, we aim to add lectures about Python and Fortran. 
 
 ## Credits <a name="appendix_proper_credits"></a>
 
