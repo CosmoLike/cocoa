@@ -76,7 +76,7 @@ and install `git-lfs`
 
     git-lfs install
 
-Users can now proceed to the next section.
+Users can now proceed to the **next section**.
 
 ## Installation and Compilation of external modules <a name="cobaya_base_code"></a>
 
@@ -129,8 +129,6 @@ This script downloads and decompresses external modules, requiring internet acce
 >     #export OVERWRITE_EXISTING_COSMOLIKE_CODE=1 # dangerous (possible lost of uncommit work)
 >                                                 # if unset, users must manually delete cosmolike projects
 >     #export REDOWNLOAD_EXISTING_ALL_DATA=1      # warning: some data are many GB
->
-> To overwrite this behavior, export the key `OVERWRITE_EXISTING_ALL_PACKAGES` on `set_installation_options.sh`. Even with this optimization disabled, Cocoa will not download large datasets repeatedly unless the key `REDOWNLOAD_EXISTING_ALL_DATA` is also set.
 
 **Step :three:**: Run the script `compile_cocoa.sh` by typing 
 
