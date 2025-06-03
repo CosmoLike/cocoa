@@ -253,11 +253,11 @@ and
 >       source ./projects/roman_real/scripts/compile_roman_real.sh
   
 > [!TIP]
-> To run Jupyter Notebook, assuming Cocoa is installed on a local machine, type, after step 2️⃣, the command 
-> 
+> Assuming Cocoa is installed on a local (not remote!) machine, type the command below after step 2️⃣ to run Jupyter Notebooks.
+>
 >     jupyter notebook --no-browser --port=8888
 >
-> The terminal will show a message similar to the following template:
+> The terminal will then show a message similar to the following template:
 >
 >     (...)
 >     [... NotebookApp] Jupyter Notebook 6.1.1 is running at:
