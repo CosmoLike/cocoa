@@ -15,16 +15,14 @@
     4. [FAQ: How do we run Cocoa with Docker?](#appendix_jupyter_whovian)
     5. [FAQ: How do we use an available Anaconda module on HPC?](#overview_anaconda)
     6. [FAQ: How do we install Conda?](#overview_conda)
-    7. [FAQ: How do we make the Slow/Fast decomposition on MCMC chains with Cosmolike? Manual Blocking](#manual_blocking_cosmolike)
-    8. [FAQ: How do we switch Cocoa's adopted CAMB/CLASS/Polychord? (external readme)](Cocoa/external_modules/code)
-    9. [FAQ: How do we download modern CMB data? (external readme)](Cocoa/external_modules/data)
-    10. [FAQ: How do we set the environment for Machine Learning projects?](#ml_emulators)
-    11. [FAQ: How can users improve their Bash/C/C++ knowledge to develop Cocoa/Cosmolike?](#lectnotes)
-    12. [Warning about Weak Lensing YAML files in Cobaya](#appendix_example_runs)
-    13. [FAQ: How do we push changes to the Cocoa main branch? A few git hacks](#push_main)
-    14. [FAQ: How do we develop from a Git tag? A few more Git hacks](#dev_from_tag)
-    15. [FAQ: How do we download and run Cosmolike projects? (external readme)](Cocoa/projects/#running_cosmolike_projects)
-    
+    7. [FAQ: How do we set the environment for Machine Learning projects?](#ml_emulators)
+    8. [FAQ: How can users improve their Bash/C/C++ knowledge to develop Cocoa/Cosmolike?](#lectnotes)
+    9. [FAQ: How do we push changes to the Cocoa main branch? A few git hacks](#push_main)
+   10. [FAQ: How do we develop from a Git tag? A few more Git hacks](#dev_from_tag)
+   11. [FAQ: How do we download modern CMB data? (external readme)](Cocoa/external_modules/data)
+   12. [FAQ: How do we switch Cocoa's adopted CAMB/CLASS/Polychord? (external readme)](Cocoa/external_modules/code)
+   13. [FAQ: Where do we find common FAQs about Cosmolike? (external readme)](Cocoa/projects/)
+
 ## Overview of the [Cobaya](https://github.com/CobayaSampler)-[CosmoLike](https://github.com/CosmoLike) Joint Architecture (Cocoa) <a name="overview"></a>
 
 Cocoa allows users to run [CosmoLike](https://github.com/CosmoLike) routines inside the [Cobaya](https://github.com/CobayaSampler) framework. [CosmoLike](https://github.com/CosmoLike) can analyze data primarily from the [Dark Energy Survey](https://www.darkenergysurvey.org) and simulate future multi-probe analyses for LSST and Roman Space Telescope. 
@@ -589,76 +587,6 @@ to make sure it resembles the one below.
 
 After that, the `conda` command will be available.
 
-### :interrobang: FAQ: How do we set the Slow/Fast decomposition on MCMC chains with Cosmolike? Manual Blocking <a name="manual_blocking_cosmolike"></a>
-
-The Cosmolike Weak Lensing pipelines contain parameters with different speed hierarchies. For example, Cosmolike execution time is reduced by approximately 50% when fixing the cosmological parameters. When varying only the multiplicative shear calibration, Cosmolike execution time is reduced by two orders of magnitude. 
-
-Cobaya cannot automatically handle parameters associated with the same likelihood with different speed hierarchies. Luckily, we can manually impose the speed hierarchy in Cobaya using the `blocking:` option. The only drawback of this method is that parameters of all adopted likelihoods, not only the ones required by Cosmolike, must be manually specified.
-
-In addition to that, Cosmolike can't cache the intermediate products of the last two evaluations, which is necessary to exploit optimizations associated with dragging (`drag: True`). However, Cosmolike caches the intermediate products of the previous evaluation, thereby enabling the user to take advantage of the slow/fast decomposition of parameters in Cobaya's main MCMC sampler. 
-
-Below, we provide an example YAML configuration for an MCMC chain with DES 3x2pt likelihood.
-
-        likelihood: 
-            des_y3.des_3x2pt:
-            path: ./external_modules/data/des_y3
-            data_file: DES_Y1.dataset
-         
-         (...)
-         
-        sampler:
-            mcmc:
-                covmat: "./projects/des_y3/EXAMPLE_MCMC22.covmat"
-                covmat_params:
-                # ---------------------------------------------------------------------
-                # Proposal covariance matrix learning
-                # ---------------------------------------------------------------------
-                learn_proposal: True
-                learn_proposal_Rminus1_min: 0.03
-                learn_proposal_Rminus1_max: 100.
-                learn_proposal_Rminus1_max_early: 200.
-                # ---------------------------------------------------------------------
-                # Convergence criteria
-                # ---------------------------------------------------------------------
-                # Maximum number of posterior evaluations
-                max_samples: .inf
-                # Gelman-Rubin R-1 on means
-                Rminus1_stop: 0.015
-                # Gelman-Rubin R-1 on std deviations
-                Rminus1_cl_stop: 0.17
-                Rminus1_cl_level: 0.95
-                # ---------------------------------------------------------------------
-                # Exploiting Cosmolike speed hierarchy
-                # ---------------------------------------------------------------------
-                measure_speeds: False # We provide the approximate speeds in the blocking
-                # drag = false. The drag sampler requires the intermediate products of the last
-                # two evaluations to be cached. Cosmolike can only cache the last evaluation.
-                drag: False
-                oversample_power: 0.2
-                oversample_thin: True
-                blocking:
-                - [1,
-                    [
-                        As_1e9, H0, omegab, omegam, ns
-                    ]
-                  ]
-                - [4,
-                    [
-                        DES_DZ_S1, DES_DZ_S2, DES_DZ_S3, DES_DZ_S4, DES_A1_1, DES_A1_2,
-                        DES_B1_1, DES_B1_2, DES_B1_3, DES_B1_4, DES_B1_5,
-                        DES_DZ_L1, DES_DZ_L2, DES_DZ_L3, DES_DZ_L4, DES_DZ_L5
-                    ]
-                  ]
-                - [25,
-                    [
-                        DES_M1, DES_M2, DES_M3, DES_M4, DES_PM1, DES_PM2, DES_PM3, DES_PM4, DES_PM5
-                    ]
-                  ]
-                # ---------------------------------------------------------------------
-                max_tries: 100000
-                burn_in: 0
-                Rminus1_single_split: 4
-
 ### :interrobang: FAQ: How do users set the environment for Machine Learning projects? <a name="ml_emulators"></a>
 
 Commenting out the environmental flags shown below, located at *set_installation_options* script, will enable the installation of machine-learning-related libraries via pip.  
@@ -675,88 +603,6 @@ Commenting out the environmental flags shown below, located at *set_installation
 A working knowledge of Python is required to understand the Cobaya framework at the developer level. Users must also know the Bash language to understand Cocoa's scripts. Proficiency in C and C++ is also needed to manipulate Cosmolike and the C++ Cobaya-Cosmolike C++ interface. Finally, users need to understand the Fortran-2003 language to modify CAMB.
 
 Learning all these languages can be overwhelming, so to enable new users to do research that demands modifications on the inner workings of these codes, we include [here](cocoa_installation_libraries/LectNotes.pdf) a link to approximately 600 slides that provide an overview of Bash (slides ~1-137), C (slides ~138-371), and C++ (slides ~372-599). In the future, we aim to add lectures about Python and Fortran. 
-
-### :warning::warning: Warning about Weak Lensing YAML files in Cobaya <a name="appendix_example_runs"></a>
-
-The CosmoLike pipeline takes $\Omega_m$ and $\Omega_b$, but the CAMB Boltzmann code only accepts $\Omega_c h^2$ and $\Omega_b h^2$ in Cobaya. Therefore, there are two ways of creating YAML compatible with CAMB and Cosmolike: 
-
-1. CMB parameterization: $\big(\Omega_c h^2,\Omega_b h^2\big)$ as primary MCMC parameters and $\big(\Omega_m,\Omega_b\big)$ as derived quantities.
-
-        omegabh2:
-            prior:
-                min: 0.01
-                max: 0.04
-            ref:
-                dist: norm
-                loc: 0.022383
-                scale: 0.005
-            proposal: 0.005
-            latex: \Omega_\mathrm{b} h^2
-        omegach2:
-            prior:
-                min: 0.06
-                max: 0.2
-            ref:
-                dist: norm
-                loc: 0.12011
-                scale: 0.03
-            proposal: 0.03
-            latex: \Omega_\mathrm{c} h^2
-        mnu:
-            value: 0.06
-            latex: m_\\nu
-        omegam:
-            latex: \Omega_\mathrm{m}
-        omegamh2:
-            derived: 'lambda omegam, H0: omegam*(H0/100)**2'
-            latex: \Omega_\mathrm{m} h^2
-        omegab:
-            derived: 'lambda omegabh2, H0: omegabh2/((H0/100)**2)'
-            latex: \Omega_\mathrm{b}
-        omegac:
-            derived: 'lambda omegach2, H0: omegach2/((H0/100)**2)'
-            latex: \Omega_\mathrm{c}
-
-2. Weak Lensing parameterization: $\big(\Omega_m,\Omega_b\big)$ as primary MCMC parameters and $\big(\Omega_c h^2, \Omega_b h^2\big)$ as derived quantities.
-
-Adopting $\big(\Omega_m,\Omega_b\big)$ as main MCMC parameters can create a silent bug in Cobaya; *we are unsure if this problem persists in newer Cobaya versions, so this report should be a warning*. The problem occurs when the option `drop: true` is absent in $\big(\Omega_m,\Omega_b\big)$ parameters, and there are no expressions that define the derived $\big(\Omega_c h^2, \Omega_b h^2\big)$ quantities. *The bug is silent* because the MCMC runs without any warnings, but the CAMB Boltzmann code does not update the cosmological parameters at every MCMC iteration. As a result, the resulting posteriors are flawed, but they may seem reasonable to those unfamiliar with the issue. Please be aware of this bug to avoid any potential inaccuracies in the results. 
-
-The correct way to create YAML files with $\big(\Omega_m,\Omega_b\big)$ as primary MCMC parameters is exemplified below
-
-        omegab:
-            prior:
-                min: 0.03
-                max: 0.07
-            ref:
-                dist: norm
-                loc: 0.0495
-                scale: 0.004
-            proposal: 0.004
-            latex: \Omega_\mathrm{b}
-            drop: true
-        omegam:
-            prior:
-                min: 0.1
-                max: 0.9
-            ref:
-                dist: norm
-                loc: 0.316
-                scale: 0.02
-            proposal: 0.02
-            latex: \Omega_\mathrm{m}
-            drop: true
-        mnu:
-            value: 0.06
-            latex: m_\\nu
-        omegabh2:
-            value: 'lambda omegab, H0: omegab*(H0/100)**2'
-            latex: \Omega_\mathrm{b} h^2
-        omegach2:
-            value: 'lambda omegam, omegab, mnu, H0: (omegam-omegab)*(H0/100)**2-(mnu*(3.046/3)**0.75)/94.0708'
-            latex: \Omega_\mathrm{c} h^2
-        omegamh2:
-            derived: 'lambda omegam, H0: omegam*(H0/100)**2'
-            latex: \Omega_\mathrm{m} h^2
 
 ### :interrobang: FAQ: How do we push changes to the Cocoa main branch? A few git hacks <a name="push_main"></a>
 

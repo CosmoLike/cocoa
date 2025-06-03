@@ -1,11 +1,14 @@
 # Table of contents
 1. [The Projects Folder](#appendix_projects_folder)
-2. [Adapting the COCOA_LSST_Y1 repository to a new project](#appendix_lsst_y1_new)
+2. [FAQ: How do we download and run Cosmolike projects?](/#running_cosmolike_projects)
+3. [FAQ: How do we set Weak Lensing YAML files in Cobaya? A warning](#appendix_example_runs)
+4. [FAQ: How do we set Slow/Fast decomposition with Cosmolike?](#manual_blocking_cosmolike)
+5. [FAQ: How do we create a new cosmolike project?](#appendix_lsst_y1_new)
    1. [Minor changes: the easy way](#appendix_lsst_y1_new_small)
    2. [Minor changes: the hard way](#appendix_lsst_y1_new_small2)
    3. [Major changes](#appendix_lsst_y1_new_major)
  
-# The Projects Folder <a name="appendix_projects_folder"></a> 
+### The Projects Folder <a name="appendix_projects_folder"></a> 
 
 The `projects` folder includes all the projects linked to Cosmolike; they can also help organize general investigations, even if they don't use Cosmolike directly. 
 
@@ -133,6 +136,159 @@ This will ensure that `stop_cocoa.sh` unsets them before exiting Cocoa.
 
 > [!Warning]
 > Never delete a folder from `projects` without first running `stop_cocoa.sh`; otherwise, Cocoa will have ill-defined links.
+
+### :interrobang: FAQ: How do we set Weak Lensing YAML files in Cobaya? A warning <a name="appendix_example_runs"></a>
+
+The CosmoLike pipeline takes $\Omega_m$ and $\Omega_b$, but the CAMB Boltzmann code only accepts $\Omega_c h^2$ and $\Omega_b h^2$ in Cobaya. Therefore, there are two ways of creating YAML compatible with CAMB and Cosmolike: 
+
+1. CMB parameterization: $\big(\Omega_c h^2,\Omega_b h^2\big)$ as primary MCMC parameters and $\big(\Omega_m,\Omega_b\big)$ as derived quantities.
+
+        omegabh2:
+            prior:
+                min: 0.01
+                max: 0.04
+            ref:
+                dist: norm
+                loc: 0.022383
+                scale: 0.005
+            proposal: 0.005
+            latex: \Omega_\mathrm{b} h^2
+        omegach2:
+            prior:
+                min: 0.06
+                max: 0.2
+            ref:
+                dist: norm
+                loc: 0.12011
+                scale: 0.03
+            proposal: 0.03
+            latex: \Omega_\mathrm{c} h^2
+        mnu:
+            value: 0.06
+            latex: m_\\nu
+        omegam:
+            latex: \Omega_\mathrm{m}
+        omegamh2:
+            derived: 'lambda omegam, H0: omegam*(H0/100)**2'
+            latex: \Omega_\mathrm{m} h^2
+        omegab:
+            derived: 'lambda omegabh2, H0: omegabh2/((H0/100)**2)'
+            latex: \Omega_\mathrm{b}
+        omegac:
+            derived: 'lambda omegach2, H0: omegach2/((H0/100)**2)'
+            latex: \Omega_\mathrm{c}
+
+2. Weak Lensing parameterization: $\big(\Omega_m,\Omega_b\big)$ as primary MCMC parameters and $\big(\Omega_c h^2, \Omega_b h^2\big)$ as derived quantities.
+
+Adopting $\big(\Omega_m,\Omega_b\big)$ as main MCMC parameters can create a silent bug in Cobaya; *we are unsure if this problem persists in newer Cobaya versions, so this report should be a warning*. The problem occurs when the option `drop: true` is absent in $\big(\Omega_m,\Omega_b\big)$ parameters, and there are no expressions that define the derived $\big(\Omega_c h^2, \Omega_b h^2\big)$ quantities. *The bug is silent* because the MCMC runs without any warnings, but the CAMB Boltzmann code does not update the cosmological parameters at every MCMC iteration. As a result, the posteriors are flawed, but they may seem reasonable to those unfamiliar with the issue. Please be aware of this bug to avoid any potential inaccuracies in the results. 
+
+The correct way to create YAML files with $\big(\Omega_m,\Omega_b\big)$ as primary MCMC parameters is exemplified below
+
+        omegab:
+            prior:
+                min: 0.03
+                max: 0.07
+            ref:
+                dist: norm
+                loc: 0.0495
+                scale: 0.004
+            proposal: 0.004
+            latex: \Omega_\mathrm{b}
+            drop: true
+        omegam:
+            prior:
+                min: 0.1
+                max: 0.9
+            ref:
+                dist: norm
+                loc: 0.316
+                scale: 0.02
+            proposal: 0.02
+            latex: \Omega_\mathrm{m}
+            drop: true
+        mnu:
+            value: 0.06
+            latex: m_\\nu
+        omegabh2:
+            value: 'lambda omegab, H0: omegab*(H0/100)**2'
+            latex: \Omega_\mathrm{b} h^2
+        omegach2:
+            value: 'lambda omegam, omegab, mnu, H0: (omegam-omegab)*(H0/100)**2-(mnu*(3.046/3)**0.75)/94.0708'
+            latex: \Omega_\mathrm{c} h^2
+        omegamh2:
+            derived: 'lambda omegam, H0: omegam*(H0/100)**2'
+            latex: \Omega_\mathrm{m} h^2
+
+### :interrobang: FAQ: How do we set Slow/Fast decomposition with Cosmolike?  <a name="manual_blocking_cosmolike"></a>
+
+The Cosmolike Weak Lensing pipelines contain parameters with different speed hierarchies. For example, Cosmolike execution time is reduced by approximately 50% when fixing the cosmological parameters. When varying only the multiplicative shear calibration, Cosmolike execution time is reduced by two orders of magnitude. 
+
+Cobaya cannot automatically handle parameters associated with the same likelihood with different speed hierarchies. Luckily, we can manually impose the speed hierarchy in Cobaya using the `blocking:` option. The only drawback of this method is that parameters of all adopted likelihoods, not only the ones required by Cosmolike, must be manually specified.
+
+In addition to that, Cosmolike can't cache the intermediate products of the last two evaluations, which is necessary to exploit optimizations associated with dragging (`drag: True`). However, Cosmolike caches the intermediate products of the previous evaluations, thereby enabling the user to take advantage of the slow/fast decomposition of parameters in Cobaya's main Markov Chain Monte Carlo (MCMC) sampler. 
+
+Below, we provide an example YAML configuration for an MCMC chain with DES 3x2pt likelihood.
+
+        likelihood: 
+            des_y3.des_3x2pt:
+            path: ./external_modules/data/des_y3
+            data_file: DES_Y1.dataset
+         
+         (...)
+         
+        sampler:
+            mcmc:
+                covmat: "./projects/des_y3/EXAMPLE_MCMC22.covmat"
+                covmat_params:
+                # ---------------------------------------------------------------------
+                # Proposal covariance matrix learning
+                # ---------------------------------------------------------------------
+                learn_proposal: True
+                learn_proposal_Rminus1_min: 0.03
+                learn_proposal_Rminus1_max: 100.
+                learn_proposal_Rminus1_max_early: 200.
+                # ---------------------------------------------------------------------
+                # Convergence criteria
+                # ---------------------------------------------------------------------
+                # Maximum number of posterior evaluations
+                max_samples: .inf
+                # Gelman-Rubin R-1 on means
+                Rminus1_stop: 0.015
+                # Gelman-Rubin R-1 on std deviations
+                Rminus1_cl_stop: 0.17
+                Rminus1_cl_level: 0.95
+                # ---------------------------------------------------------------------
+                # Exploiting Cosmolike speed hierarchy
+                # ---------------------------------------------------------------------
+                measure_speeds: False # We provide the approximate speeds in the blocking
+                # drag = false. The drag sampler requires the intermediate products of the last
+                # two evaluations to be cached. Cosmolike can only cache the last evaluation.
+                drag: False
+                oversample_power: 0.2
+                oversample_thin: True
+                blocking:
+                - [1,
+                    [
+                        As_1e9, H0, omegab, omegam, ns
+                    ]
+                  ]
+                - [4,
+                    [
+                        DES_DZ_S1, DES_DZ_S2, DES_DZ_S3, DES_DZ_S4, DES_A1_1, DES_A1_2,
+                        DES_B1_1, DES_B1_2, DES_B1_3, DES_B1_4, DES_B1_5,
+                        DES_DZ_L1, DES_DZ_L2, DES_DZ_L3, DES_DZ_L4, DES_DZ_L5
+                    ]
+                  ]
+                - [25,
+                    [
+                        DES_M1, DES_M2, DES_M3, DES_M4, DES_PM1, DES_PM2, DES_PM3, DES_PM4, DES_PM5
+                    ]
+                  ]
+                # ---------------------------------------------------------------------
+                max_tries: 100000
+                burn_in: 0
+                Rminus1_single_split: 4
+
 
 # Adapting the COCOA_LSST_Y1 repository to a new project <a name="appendix_lsst_y1_new"></a> 
 
