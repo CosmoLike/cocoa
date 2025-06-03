@@ -10,23 +10,22 @@
 6. [Creating Cosmolike projects (external readme)](Cocoa/projects/)
 7. [Appendix](#appendix)
     1. [Credits](#appendix_proper_credits)
-    2. [Additional Installation Notes](#additional_notes)
-    3. [FAQ: What if installation or compilation goes wrong?](#running_wrong)
-    4. [FAQ: How do we compile the Boltzmann, CosmoLike, and Likelihood codes separately](#appendix_compile_separately)
-    5. [FAQ: How do we run Cocoa on a laptop? The docker image named *whovian-cocoa*](#appendix_jupyter_whovian)
-    6. [FAQ: How do we use an available Anaconda module on HPC?](#overview_anaconda)
-    7. [FAQ: What if there is no Conda? Miniconda installation](#overview_miniconda)
-    8. [FAQ: How do we make the Slow/Fast decomposition on MCMC chains with Cosmolike? Manual Blocking](#manual_blocking_cosmolike)
-    9. [FAQ: How do we switch Cocoa's adopted CAMB/CLASS/Polychord? (external readme)](Cocoa/external_modules/code)
-    10. [FAQ: How do we download modern CMB data? (external readme)](Cocoa/external_modules/data)
-    11. [FAQ: How do we set the environment for Machine Learning projects?](#ml_emulators)
-    12. [FAQ: How can users improve their Bash/C/C++ knowledge to develop Cocoa/Cosmolike?](#lectnotes)
-    13. [Warning about Weak Lensing YAML files in Cobaya](#appendix_example_runs)
-    14. [FAQ: How do we install Cocoa without conda?](#required_packages_cache)
-    15. [FAQ: How do we push changes to the Cocoa main branch? A few git hacks](#push_main)
-    16. [FAQ: How do we develop from a git tag? A few more git hacks](#dev_from_tag)
-    17. [FAQ: How do we download and run Cosmolike projects?](#running_cosmolike_projects)
-    18. [FAQ: How do we add a new package to Cocoa? The Dark Emulator Example](#add_package_v1)
+    2. [FAQ: What if installation or compilation goes wrong?](#running_wrong)
+    3. [FAQ: How do we compile the Boltzmann, CosmoLike, and Likelihood codes separately](#appendix_compile_separately)
+    4. [FAQ: How do we run Cocoa on a laptop? The docker image named *whovian-cocoa*](#appendix_jupyter_whovian)
+    5. [FAQ: How do we use an available Anaconda module on HPC?](#overview_anaconda)
+    6. [FAQ: What if there is no Conda? Miniconda installation](#overview_miniconda)
+    7. [FAQ: How do we make the Slow/Fast decomposition on MCMC chains with Cosmolike? Manual Blocking](#manual_blocking_cosmolike)
+    8. [FAQ: How do we switch Cocoa's adopted CAMB/CLASS/Polychord? (external readme)](Cocoa/external_modules/code)
+    9. [FAQ: How do we download modern CMB data? (external readme)](Cocoa/external_modules/data)
+    10. [FAQ: How do we set the environment for Machine Learning projects?](#ml_emulators)
+    11. [FAQ: How can users improve their Bash/C/C++ knowledge to develop Cocoa/Cosmolike?](#lectnotes)
+    12. [Warning about Weak Lensing YAML files in Cobaya](#appendix_example_runs)
+    13. [FAQ: How do we install Cocoa without conda?](#required_packages_cache)
+    14. [FAQ: How do we push changes to the Cocoa main branch? A few git hacks](#push_main)
+    15. [FAQ: How do we develop from a git tag? A few more git hacks](#dev_from_tag)
+    16. [FAQ: How do we download and run Cosmolike projects?](#running_cosmolike_projects)
+    17. [FAQ: How do we add a new package to Cocoa? The Dark Emulator Example](#add_package_v1)
     19. [FAQ: How do we add a new package to Cocoa? The MGCAMB Example](#add_package_v2)
     
 ## Overview of the [Cobaya](https://github.com/CobayaSampler)-[CosmoLike](https://github.com/CosmoLike) Joint Architecture (Cocoa) <a name="overview"></a>
@@ -76,6 +75,9 @@ Users can now proceed to the **next section**.
 > [!TIP]
 > Users working on an HPC environment that does not offer Anaconda or Miniconda may want to check the appendix [FAQ: What if there is no Conda? Miniconda installation](#overview_miniconda).
 
+> [!TIP]
+> We provide a Docker image named *whovian-cocoa* that provides cocoa pre-installed and pre-compiled. For further instructions, refer to the appendix [FAQ: How do you run Cocoa on your laptop? The Docker container is named *whovian-cocoa*](#appendix_jupyter_whovian).
+
 ## Installation and Compilation of external modules <a name="cobaya_base_code"></a>
 
 In this section, we assume users have previously activated the Cocoa conda environment.
@@ -117,7 +119,7 @@ Users can now proceed to **the next section**.
 > Users who want to develop from a release version (e.g., `v4.0-beta20`) should read the appendix [FAQ: How do we push changes to the cocoa main branch? A few git hacks](#push_main)
 
 > [!TIP]
-> Cocoa does not install many external modules by default, but users may require them in a particular project. In this case, check the  available options on the `set_installation_options.sh` shell script. Then, rerun steps :two: and :three:. 
+> Cocoa does not install many external modules by default, but users may require them in a particular project. In this case, check the  available options on the `set_installation_options.sh` shell script. Then, rerun steps :two: and :three: or refer to the appendix [Compiling Boltzmann, CosmoLike, and Likelihood codes separately](#appendix_compile_separately).
 
 > [!NOTE]
 > In some HPC environments, the compute nodes cannot access the web. So, by design, the script `compile_cocoa.sh` does not require internet access to run successfully. Code compilation is a CPU-intensive operation; therefore, running  `compile_cocoa.sh` on a cluster login node can be against HPC policy. Users should then run `setup_cocoa.sh` in a login node and `compile_cocoa.sh` in a compute node.
@@ -269,6 +271,16 @@ and
 >
 > The project lsst-y1 contains jupyter notebook examples located at `projects/lsst_y1`.
 
+> [!NOTE]
+> Why did we choose to work with two separate shell environments, `(cocoa)` and `(.local)`? Users should be able to manipulate multiple Cocoa instances seamlessly, which is particularly useful when running chains in one instance while experimenting with code development in another. Consistency of the environment across all Cocoa instances is crucial, and the `start_cocoa.sh`/`stop_cocoa.sh` scripts handle the loading and unloading of environmental path variables. Our scripts never install packages on `$HOME/.local` as that would make them global to the user. Instead, on each instance, they are installed at
+>
+>      Cocoa/.local/bin
+>      Cocoa/.local/include
+>      Cocoa/.local/lib
+>      Cocoa/.local/share
+>
+> This behavior enables users to work on multiple instances of Cocoa, similar to what was possible with [CosmoMC](https://github.com/cmbant/CosmoMC).
+
 ## Running Examples based on Machine Learning emulators <a name="cobaya_base_code_examples_emul"></a>
 
 Cocoa contains a few transformer-based neural network emulators capable of simulating CMB, cosmolike, matter power spectrum, and distances. We provide a few scripts that exemplify their API. To run them, we assume users have commented out the following lines on `set_installation_options.sh` prior to running the `setup_cocoa.sh` and `compile_cocoa.sh` installation scripts.
@@ -354,42 +366,6 @@ The following is not an exhaustive list of the codes we use/download/adopt
 - [Lollipop CMB likelihood](https://github.com/planck-npipe/lollipop.git) is a Planck low-l polarization likelihood.
   
 Following best practices, Cocoa scripts download most external modules from their original repositories, including Cobaya, CAMB, Class, Polychord, ACT-DR6, HiLLiPoP, and Lollipop. We do not want to discourage people from cloning code from their original repositories. Our repository has included a few likelihoods as compressed [xz file format](https://tukaani.org/xz/format.html). The work of those authors is extraordinary, and users **must cite them** appropriately.
-
-### Additional Installation Notes <a name="additional_notes"></a>
-
-- *Installation of core packages via Conda* 
- 
-> [!TIP]
-> For those working on projects that utilize machine-learning-based emulators, the appendix [Setting-up conda environment for Machine Learning emulators](#ml_emulators) provides additional commands for installing the necessary packages.
-
-> [!TIP]
-> We provide a Docker image named *whovian-cocoa* that facilitates cocoa installation on Windows and MacOS. For further instructions, refer to the appendix [FAQ: How do you run Cocoa on your laptop? The Docker container is named *whovian-cocoa*](#appendix_jupyter_whovian).
-
-> [!NOTE]
-> The conda installation method should be chosen in most cases. In the rare instances in which users cannot work with Conda, refer to the appendix [Installation of Cocoa's core packages without Conda](#required_packages_cache), as it contains instructions for a much slower (and prone to errors) but Conda-independent installation method.
-
-- *Installation and Compilation of external modules* 
-
-> [!TIP]
-> If users want to compile only a subset of these packages, refer to the appendix [Compiling Boltzmann, CosmoLike, and Likelihood codes separately](#appendix_compile_separately).
-          
-- *Running Examples*
-
-> [!NOTE]
-> `OMP_PROC_BIND=close` bound OpenMP threads to physically close cores (within the same chiplet on chiplet-based architectures).
-
-> [!NOTE]
-> Additional explanations about our `mpirun` flags: Why the `--bind-to core:overload-allowed --map-by numa:pe=${OMP_NUM_THREADS}` flag? This flag enables efficient hybrid MPI+OpenMP runs on NUMA architecture.
-
-> [!NOTE]
-> Additional explanations about the functioning `start_cocoa.sh`/`stop_cocoa.sh` scripts: why two separate shell environments, `(cocoa)` and `(.local)`? Users should be able to manipulate multiple Cocoa instances seamlessly, which is particularly useful when running chains in one instance while experimenting with code development in another. Consistency of the environment across all Cocoa instances is crucial, and the `start_cocoa.sh`/`stop_cocoa.sh` scripts handle the loading and unloading of environmental path variables. Our scripts never install packages on `$HOME/.local` as that would make them global to the user. Instead, on each instance, they are installed at
->
->      Cocoa/.local/bin
->      Cocoa/.local/include
->      Cocoa/.local/lib
->      Cocoa/.local/share
->
-> This behavior enables users to work on multiple instances of Cocoa simultaneously, similar to what was possible with [CosmoMC](https://github.com/cmbant/CosmoMC).
 
 ### :interrobang: FAQ: What if installation or compilation goes wrong? <a name="running_wrong"></a>
 
