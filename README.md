@@ -12,7 +12,7 @@
     1. [Credits](#appendix_proper_credits)
     2. [FAQ: Suggested steps to debug Cocoa?](#running_wrong)
     3. [FAQ: How do we compile individual modules?](#appendix_compile_separately)
-    4. [FAQ: How do we run Cocoa on a laptop? The docker image named *whovian-cocoa*](#appendix_jupyter_whovian)
+    4. [FAQ: How do we run Cocoa with Docker?](#appendix_jupyter_whovian)
     5. [FAQ: How do we use an available Anaconda module on HPC?](#overview_anaconda)
     6. [FAQ: What if there is no Conda? Miniconda installation](#overview_miniconda)
     7. [FAQ: How do we make the Slow/Fast decomposition on MCMC chains with Cosmolike? Manual Blocking](#manual_blocking_cosmolike)
@@ -75,7 +75,7 @@ Users can now proceed to the **next section**.
 > Users working on an HPC environment that does not offer Anaconda or Miniconda may want to check the appendix [FAQ: What if there is no Conda? Miniconda installation](#overview_miniconda).
 
 > [!TIP]
-> We provide a Docker image named *whovian-cocoa* that provides cocoa pre-installed and pre-compiled. For further instructions, refer to the appendix [FAQ: How do you run Cocoa on your laptop? The Docker container named *whovian-cocoa*](#appendix_jupyter_whovian).
+> We provide a Docker image named *whovian-cocoa* with Cocoa pre-installed and pre-compiled. For further instructions, refer to the appendix [FAQ: How do we run Cocoa with Docker?](#appendix_jupyter_whovian).
 
 ## Installation and Compilation of external modules <a name="cobaya_base_code"></a>
 
@@ -421,7 +421,7 @@ In case users only want to compile a single cosmolike project (let's say the `ro
 
       source ./projects/roman_real/scripts/compile_roman_real.sh
      
-### :interrobang: FAQ: How do we run cocoa on a laptop? The docker image named *whovian-cocoa* <a name="appendix_jupyter_whovian"></a>
+### :interrobang: FAQ: How do we run Cocoa with Docker? <a name="appendix_jupyter_whovian"></a>
 
 We provide the Docker image [whovian-cocoa](https://hub.docker.com/r/vivianmiranda/whovian-cocoa) to facilitate the installation of Cocoa on Windows and macOS. This appendix assumes that users have already installed the Docker Engine on their local PC. For instructions on installing the Docker engine on specific operating systems, refer to [Docker's official documentation](https://docs.docker.com/engine/install/). 
 
@@ -467,7 +467,7 @@ This is a large image with a size of approximately 16GB, as it already contains 
 >     [... NotebookApp] or http://127.0.0.1:8888/?token=XXX  
       
 > [!TIP]
-> To run the Jupyter Notebook on the *whovian-cocoa* docker container installed in a remote server, adjust the command below
+> To run the Jupyter Notebook on the *whovian-cocoa* docker container installed on a remote server, adjust the command below
 >
 >     ssh your_username@your_sever.com -L 8888:localhost:8888
 >
