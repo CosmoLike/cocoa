@@ -128,7 +128,6 @@ Users can now proceed to **the next section**.
 > When running `setup_cocoa.sh` repeatedly, Cocoa will not download previously installed packages, cosmolike projects or large datasets, unless the following keys are set on `set_installation_options.sh`
 >
 >     [Adapted from Cocoa/set_installation_options.sh shell script]
->     (...)
 >
 >     # ------------------------------------------------------------------------------
 >     # OVERWRITE_EXISTING_XXX_CODE=1 -> setup_cocoa overwrites existing PACKAGES ----
@@ -199,7 +198,6 @@ and
 > We provide several cosmolike projects that can be loaded and compiled using `setup_cocoa.sh` and `compile_cocoa.sh` scripts. To activate them, comment the following lines on `set_installation_options.sh` 
 > 
 >     [Adapted from Cocoa/set_installation_options.sh shell script]
->     (...)
 >
 >     # ------------------------------------------------------------------------------
 >     # The keys below control which cosmolike projects will be installed and compiled
@@ -369,72 +367,10 @@ Following best practices, Cocoa scripts download most external modules from thei
 
 ### :interrobang: FAQ: What if installation or compilation goes wrong? <a name="running_wrong"></a>
 
-- The script *set_installation_options script* contains a few additional flags that may be useful. Some of these flags are shown below:
+The script *set_installation_options script* contains all flags that manage package installation. Given that, here are a few steps to debug Cocoa
 
-      [Adapted from Cocoa/set_installation_options.sh shell script] 
-      
-      # ------------------------------------------------------------------------------
-      # VERBOSE AS DEBUG TOOL --------------------------------------------------------
-      # ------------------------------------------------------------------------------
-      #export COCOA_OUTPUT_VERBOSE=1
-
-      # ------------------------------------------------------------------------------
-      # If set, COSMOLIKE will compile with DEBUG flags ------------------------------
-      # ------------------------------------------------------------------------------
-      #export COSMOLIKE_DEBUG_MODE=1
+**Step :one:**: define the `COCOA_OUTPUT_VERBOSE` and `COSMOLIKE_DEBUG_MODE` flags to obtain a more detailed output, as shown below
   
-      # ------------------------------------------------------------------------------
-      # The flags below allow users to skip downloading specific datasets ------------
-      # ------------------------------------------------------------------------------
-      export IGNORE_ACTDR6_DATA=1
-      # export IGNORE_BAO_DATA=1
-      export IGNORE_BICEP_CMB_DATA=1
-      # export IGNORE_HOLICOW_STRONG_LENSING_DATA=1
-      # export IGNORE_SN_DATA=1
-      export IGNORE_SPT_CMB_DATA=1
-      export IGNORE_SIMONS_OBSERVATORY_CMB_DATA=1
-      #export IGNORE_PLANCK_CMB_DATA=1
-      export IGNORE_CAMSPEC_CMB_DATA=1
-      export IGNORE_LIPOP_CMB_DATA=1
-
-      (...)
-
-      # ------------------------------------------------------------------------------
-      # The keys below control which packages will be installed and compiled 
-      # ------------------------------------------------------------------------------
-      #export IGNORE_CAMB_CODE=1
-      #export IGNORE_CLASS_CODE=1
-      #export IGNORE_COSMOLIKE_CODE=1
-      #export IGNORE_POLYCHORD_SAMPLER_CODE=1
-      #export IGNORE_PLANCK_LIKELIHOOD_CODE=1
-      #export IGNORE_ACTDR4_CODE=1
-      #export IGNORE_ACTDR6_CODE=1
-      #export IGNORE_CPP_CUBA_INSTALLATION=1
-      #export IGNORE_VELOCILEPTORS_CODE=1
-      #export IGNORE_SIMONS_OBSERVATORY_LIKELIHOOD_CODE=1
-      #export IGNORE_CAMSPEC_LIKELIHOOD_CODE=1
-      #export IGNORE_LIPOP_LIKELIHOOD_CODE=1
-      export IGNORE_HYREC_CODE=1
-      export IGNORE_COSMOREC_CODE=1
-      #export IGNORE_EUCLID_EMULATOR_V2_CODE=1
-      #export IGNORE_COSMOLIKE_LSSTY1_CODE=1
-
-      (...)
-
-      # ------------------------------------------------------------------------------
-      # OVERWRITE_EXISTING_XXX_CODE=1 -> setup_cocoa overwrites existing PACKAGES ----
-      # overwrite means: delete the existing PACKAGE folder and install it again -----------
-      # redownload: delete the compressed file and download the data again ---------------
-      # These keys are only relevant if you run setup_cocoa multiple times -----------
-      # ------------------------------------------------------------------------------
-       export OVERWRITE_EXISTING_ALL_PACKAGES=1      # except cosmolike projects
-       #export OVERWRITE_EXISTING_COSMOLIKE_CODE=1   # dangerous (possible lost of uncommit work)
-       #export REDOWNLOAD_EXISTING_ALL_DATA=1        # warning: some data are many GB
-
-Steps to debug Cocoa
-
-- The first step is to define the `COCOA_OUTPUT_VERBOSE` and `COSMOLIKE_DEBUG_MODE` flags to obtain a more detailed output. To accomplish that, we advise users to uncomment the lines below that are part of the `set_installation_options.sh` script and then restart the Cocoa private environment by running `source stop_cocoa.sh; source start_cocoa.sh`
-
       [Adapted from Cocoa/set_installation_options.sh shell script] 
 
       # ------------------------------------------------------------------------------
@@ -449,9 +385,10 @@ Steps to debug Cocoa
 
       (....)
 
-- The second step involves rerunning the failed script with the verbose output set. The scripts `setup_cocoa.sh` and `compile_cocoa.sh` run many shell scripts, so users may find it advantageous to run only the routine that failed. For further information on how to do that, see the appendix [FAQ: How do we compile the Boltzmann, CosmoLike, and Likelihood codes separately](#appendix_compile_separately).
+**Step :three:**: restart the Cocoa private environment by running `source stop_cocoa.sh` and `source start_cocoa.sh`.
 
-After fixing a particular issue, users should rerun the shell scripts `setup_cocoa.sh` and `compile_cocoa.sh` to ensure all packages are installed and compiled correctly.
+> [!TIP]
+> The second step involves rerunning the all scripts with the verbose output set. The master programs `setup_cocoa.sh` and `compile_cocoa.sh` run many shell scripts, so users may find it advantageous to run only the routine that failed when dubbuging. See the appendix [FAQ: How do we compile the Boltzmann, CosmoLike, and Likelihood codes separately](#appendix_compile_separately). After fixing a particular issue, users should rerun `setup_cocoa.sh` and `compile_cocoa.sh` to ensure all packages are installed and compiled correctly.
 
 ### :interrobang: FAQ: How do we compile the Boltzmann, CosmoLike, and Likelihood codes separately <a name="appendix_compile_separately"></a>
 
@@ -473,28 +410,28 @@ Above and below, the `$(cocoa)(.local)` emphasizes they should run after activat
      $(cocoa)(.local) source "${ROOTDIR:?}"/installation_scripts/setup_polychord.sh
      $(cocoa)(.local) source "${ROOTDIR:?}"/installation_scripts/setup_cobaya.sh
 
-To ensure these scripts can download and install these packages, users must be sure that the environment keys below are *NOT* set. These keys are shown on `set_installation_options.sh`. The command `unset -v` unsets them. 
-      
-     unset -v IGNORE_CAMB_CODE
-     unset -v IGNORE_CLASS_CODE
-     unset -v IGNORE_POLYCHORD_SAMPLER_CODE
-     unset -v IGNORE_PLANCK_LIKELIHOOD_CODE
-     unset -v IGNORE_ACTDR4_CODE
-     unset -v IGNORE_COBAYA_CODE
+To ensure these scripts can download and install these packages, users must ensure that the environment keys that prevent their installation are *NOT* set on `set_installation_options.sh` as shown below. If they were set, users must comment the lines below and reload the cocoa environment by rerunning `start_cocoa.sh`
+
+     [Adapted from Cocoa/set_installation_options.sh shell script]
+     
+     # ------------------------------------------------------------------------------
+     # The keys below control which packages will be installed and compiled 
+     # ------------------------------------------------------------------------------
+     #export IGNORE_COBAYA_CODE=1
+     #export IGNORE_CAMB_CODE=1
+     #export IGNORE_CLASS_CODE=1 # Default: we just use CAMB (reduces compilation time)
+     (...)
+     #export IGNORE_POLYCHORD_SAMPLER_CODE=1
+     (...)
+     #export IGNORE_ACTDR4_CODE=1
 
 Below, we show the shell subroutines that download and unpack data from multiple experiments. 
 
      $(cocoa)(.local) cd "${ROOTDIR:?}"
      $(cocoa)(.local) source "${ROOTDIR:?}"/installation_scripts/unxv_act_dr6.sh
-     $(cocoa)(.local) source "${ROOTDIR:?}"/installation_scripts/unxv_bao.sh
-     $(cocoa)(.local) source "${ROOTDIR:?}"/installation_scripts/unxv_bicep.sh
-     $(cocoa)(.local) source "${ROOTDIR:?}"/installation_scripts/unxv_camspec.sh
      $(cocoa)(.local) source "${ROOTDIR:?}"/installation_scripts/unxv_h0licow.sh
      $(cocoa)(.local) source "${ROOTDIR:?}"/installation_scripts/unxv_lipop.sh
-     $(cocoa)(.local) source "${ROOTDIR:?}"/installation_scripts/unxv_planck2018_basic.sh
      $(cocoa)(.local) source "${ROOTDIR:?}"/installation_scripts/unxv_simons_observatory.sh
-     $(cocoa)(.local) source "${ROOTDIR:?}"/installation_scripts/unxv_sn.sh
-     $(cocoa)(.local) source "${ROOTDIR:?}"/installation_scripts/unxv_spt.sh
 
 To ensure these scripts can download these datasets, users must be sure that the environment keys below are *NOT* set. These keys are shown on `set_installation_options.sh`. The command `unset -v` unset them. 
 
