@@ -57,7 +57,7 @@ Projects should be hosted on independent GitHub repositories; our convention is 
 
     git clone https://github.com/CosmoLike/cocoa_lsst_XXX.git XXX
 
-By convention, the *Cosmolike Organization* adds the prefix `cocoa_` to all Cobaya-Cosmolike projects. For example, a fictitious project named XXX would be hosted at `CosmoLike/cocoa_XXX`. However, the `cocoa_` prefix must be dropped when cloning the repository.
+By convention, the *Cosmolike Organization* adds the prefix `cocoa_` to all Cobaya-Cosmolike projects, which must be removed when cloning the repository.
  
 **Step :three:**: Go back to the Cocoa main folder and activate the private Python environment
     
