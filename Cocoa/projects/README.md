@@ -48,17 +48,16 @@ Projects should be hosted on independent GitHub repositories; our convention is 
 
 ### :interrobang: FAQ: How do we download and run Cosmolike projects? <a name="running_cosmolike_projects"></a> 
 
-In the instructions below, we assume that you are still in the Conda cocoa environment from the previous `conda activate cocoa` command and that you are in the cocoa main folder `cocoa/Cocoa`, 
-
-**Step :one:**: Go to the projects folder (`./projects`) and clone a Cosmolike project with the fictitious name `XXX`:
+**Step :one:**: Activate conda environment and go to the projects folder (`./projects`) and clone a Cosmolike project with the fictitious name `XXX`:
     
-    cd ./projects
+    conda activate cocoa
+    cd ./cocoa/Cocoa/projects
 
 and 
 
-    "${CONDA_PREFIX}/bin/git" clone https://github.com/CosmoLike/cocoa_lsst_XXX.git XXX
+    git clone https://github.com/CosmoLike/cocoa_lsst_XXX.git XXX
 
-By convention, the Cosmolike Organization hosts a Cobaya-Cosmolike project named XXX at `CosmoLike/cocoa_XXX`. The `cocoa_` prefix must be dropped when cloning the repository.
+By convention, the *Cosmolike Organization* adds the prefix `cocoa_` to all Cobaya-Cosmolike projects. For example, a fictitious project named XXX would be hosted at `CosmoLike/cocoa_XXX`. However, the `cocoa_` prefix must be dropped when cloning the repository.
  
 **Step :two:**: Go back to the Cocoa main folder and activate the private Python environment
     
@@ -69,7 +68,7 @@ and
     source start_cocoa.sh
  
 > [!Warning]
-> Users must run `start_cocoa.sh` after cloning the project repository, so Cocoa can create appropriate soft-links.
+> Users must run the script `start_cocoa.sh` after cloning the project repository so that Cocoa can reload `(.local)` environment and create appropriate soft links.
 
 **Step :three:**: Compile the project, as shown below (two possibilities)
  
@@ -77,7 +76,7 @@ and
 
 or
 
-    # this will compile all cosmolike courses
+    # This will compile all cosmolike courses
     source "${ROOTDIR:?}"/installation_scripts/compile_all_projects.sh
  
 **Step :four:**: Select the number of OpenMP cores and run a template YAML file
