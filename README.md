@@ -256,7 +256,7 @@ PolyChord:
 > [!NOTE]
 > What should users do if they don't unset ML-related environment keys before running `setup_cocoa.sh` and `compile_cocoa.sh`, as rerunning these scripts can require a long time? Instead, run the following commands.
 >
->      source start_cocoa.sh      # even if (.local) is already active, users must run start_cocoa.sh again to update key values
+>      source start_cocoa.sh      # even if (.local) is already active, users must run start_cocoa.sh again to update bash environmental values
 > 
 > and
 >
@@ -561,18 +561,28 @@ After that, the `conda` command will be available.
 
 ## :interrobang: FAQ: How do users set the environment for Machine Learning projects? <a name="ml_emulators"></a>
 
-Commenting out the environmental flags shown below, located at *set_installation_options* script, will enable the installation of machine-learning-related libraries via pip.  
+Commenting out the environmental flags below *before running* `setup_cocoa.sh` will enable the installation of machine-learning-related libraries via pip.  
 
     [Adapted from Cocoa/set_installation_options.sh shell script] 
      
     # ------------------------------------------------------------------------------
-    # If not set, Cocoa/installation_scripts/setup_pip_core_packages.sh will install several ML packages
+    # If not set, pip_core_packages.sh will install several ML package
     # ------------------------------------------------------------------------------
     #export IGNORE_EMULATOR_GPU_PIP_PACKAGES=1
+    
+    (...)
+
+In case users have already run `setup_cocoa.sh`, then run the command.
+
+    source start_cocoa.sh  # even if (.local) is already active, users must run start_cocoa.sh again to update key values
+   
+and
+
+    source ./installation_scripts/setup_pip_core_packages.sh
               
 ## :interrobang: FAQ: How can users improve their Bash/C/C++ knowledge to develop Cocoa/Cosmolike? :book::book: <a name="lectnotes"></a>
 
-A working knowledge of Python is required to understand the Cobaya framework at the developer level. Users must also know the Bash language to understand Cocoa's scripts. Proficiency in C and C++ is also needed to manipulate Cosmolike and the C++ Cobaya-Cosmolike C++ interface. Finally, users need to understand the Fortran-2003 language to modify CAMB.
+A working knowledge of Python is required to understand the Cobaya framework at the developer level. Users must also be familiar with the Bash language to understand Cocoa's scripts. Proficiency in C and C++ is also needed to manipulate Cosmolike and the C++ Cobaya-Cosmolike C++ interface. Finally, users need to understand the Fortran-2003 language to modify CAMB.
 
 Learning all these languages can be overwhelming, so to enable new users to do research that demands modifications on the inner workings of these codes, we include [here](cocoa_installation_libraries/LectNotes.pdf) a link to approximately 600 slides that provide an overview of Bash (slides ~1-137), C (slides ~138-371), and C++ (slides ~372-599). In the future, we aim to add lectures about Python and Fortran. 
 
