@@ -15,7 +15,7 @@
     4. [FAQ: How do we use an available Anaconda module on HPC?](#overview_anaconda)
     5. [FAQ: How do we install Conda?](#overview_miniconda)
     6. [FAQ: How do we set the environment for Machine Learning projects?](#ml_emulators)
-    7. [FAQ: How do we push changes to the Cocoa main branch? A few git hacks](#push_main)
+    7. [FAQ: How do we push changes to the Cocoa main branch?](#push_main)
     8. [FAQ: How do we develop from a Git tag? A few more Git hacks](#dev_from_tag)
     9. [FAQ: How do we download additional likelihood data? (external readme)](Cocoa/external_modules/data)
    10. [FAQ: Where do we find common FAQs about external modules? (external readme)](Cocoa/external_modules/code)
@@ -567,7 +567,7 @@ and
 
     source ./installation_scripts/setup_pip_core_packages.sh
               
-## :interrobang: FAQ: How do we push changes to the Cocoa main branch? A few git hacks <a name="push_main"></a>
+## :interrobang: FAQ: How do we push changes to the Cocoa main branch? <a name="push_main"></a>
 
 Until recently, Cocoa development was a bit unstructured. Developers could push directly to the `main` branch, and small commits were not discouraged. Such flexible development rules will soon change when `v4.0` leaves the beta phase. We will protect the `main` branch by requiring every push to be reviewed by Cocoa's leading developers. Our new philosophy establishes that *a commit in the main branch should contain an atomic change that takes code from one working state to another working state with meaningful and well-tested improvements*. Therefore, developers should propose changes to the `main` branch in larger chunks (*via squash commits*), as shown below.
 
