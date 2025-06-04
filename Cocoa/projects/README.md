@@ -62,9 +62,7 @@ Cocoa's `set_installation_options.sh` shell script includes instructions to inst
      export IGNORE_COSMOLIKE_DES_Y3_CODE=1
      #export IGNORE_COSMOLIKE_ROMAN_FOURIER_CODE=1
      #export IGNORE_COSMOLIKE_ROMAN_REAL_CODE=1
-
      (...)
-
      # ------------------------------------------------------------------------------
      # OVERWRITE_EXISTING_XXX_CODE=1 -> setup_cocoa overwrites existing PACKAGES ----
      # overwrite: delete the existing PACKAGE folder and install it again -----------
@@ -74,9 +72,7 @@ Cocoa's `set_installation_options.sh` shell script includes instructions to inst
      (...)
      export OVERWRITE_EXISTING_COSMOLIKE_CODE=1 # dangerous (possible loss of uncommitted work)
                                                 # If unset, users must manually delete cosmolike projects
-
      (...)
- 
      # ------------------------------------------------------------------------------
      # Cosmolike projects below -----------------------------------------------------
      # ------------------------------------------------------------------------------
@@ -155,9 +151,7 @@ If users want to make a particular Cosmolike project widely available in Cocoa, 
     # ------------------------------------------------------------------------------
     (...)
     #export IGNORE_COSMOLIKE_XXX_CODE=1
-
     (...)
-   
     # ------------------------------------------------------------------------------
     # Cosmolike projects below -------------------------------------------
     # ------------------------------------------------------------------------------
@@ -304,9 +298,7 @@ Below, we provide an example YAML configuration for an MCMC chain with DES 3x2pt
             des_y3.des_3x2pt:
             path: ./external_modules/data/des_y3
             data_file: DES_Y1.dataset
-         
          (...)
-         
         sampler:
             mcmc:
                 covmat: "./projects/des_y3/EXAMPLE_MCMC22.covmat"
@@ -476,12 +468,9 @@ and remove any previously compiled dynamic library
     if [ -z "${IGNORE_COSMOLIKE_LSSTY1_CODE}" ]; then # delete this line
     if [ -z "${IGNORE_COSMOLIKE_XXX_CODE}" ]; then    # add this line
         (...)
-	
 	FOLDER="${LSST_Y1_NAME:-"lsst_y1"}" # delete this line
         FOLDER="${XXX_NAME:-"xxx"}"         # add this line
-
         (...)
-    
         PRINTNAME="LSST_Y1"  # delete this line
         PRINTNAME="XXX"      # add this line
      
@@ -491,7 +480,6 @@ and remove any previously compiled dynamic library
     if [ -z "${IGNORE_COSMOLIKE_LSSTY1_CODE}" ]; then # delete this line
     if [ -z "${IGNORE_COSMOLIKE_XXX_CODE}" ]; then    # add this line
         (...)
-	
 	FOLDER="${LSST_Y1_NAME:-"lsst_y1"}" # delete this line
         FOLDER="${XXX_NAME:-"xxx"}"         # add this line
 
@@ -507,24 +495,30 @@ and remove any previously compiled dynamic library
     survey = "xxx"   # add this line
 
 > [!Tip]
-> If the project name `xxx` contains more than the experiment name, we suggest replacing the `survey` word name with just the experiment name. For example, if `XXX = DES_Y3`, then adopt `survey = "xxx"`.
+> If the project name `xxx` contains more than the experiment name (e.g., the release year), we suggest assigned `survey` to just the experiment name. For example, if `XXX = DES_Y3`, then assigned `survey = "DES"`.
 
-**Step 2:** Change the file `lsst_3x2pt.py` following the instructions below
+**Step 2:** Change the file `combo_3x2pt.py` following the instructions below
 
-    [adapted from Cocoa/projects/lsst_y1/likelihood/lsst_3x2pt.py line ~19;21]
-    // change lsst_y1 to XXX in the line below
-    from cobaya.likelihoods.lsst_y1._cosmolike_prototype_base import _cosmolike_prototype_base
-    // change cosmolike_lsst_y1_interface to cosmolike_XXX_interface in the line below
-    import cosmolike_lsst_y1_interface as ci
+    [adapted from Cocoa/projects/lsst_y1/likelihood/combo_3x2pt.py line ~1-10;]
+    from cobaya.likelihoods.lsst_y1._cosmolike_prototype_base import _cosmolike_prototype_base, survey # delete this line
+    from cobaya.likelihoods.xxx._cosmolike_prototype_base import _cosmolike_prototype_base, survey     # add this line
     
-**Step 3:** Change the file `$ROOTDIR/projects/XXX/likelihood/lsst_3x2pt.yaml` following the instructions below
+    import cosmolike_lsst_y1_interface as ci # delete this line
+    import cosmolike_xxx_interface as ci     # add this line
+
+Users should perform similar changes to `combo_2x2pt.py`, `combo_xi_gg.py`, `combo_xi_ggl.py`, and `cosmic_shear.py`.
+    
+**Step 3:** Change the file `combo_3x2pt.yaml` following the instructions below
    
+    [adapted from Cocoa/projects/lsst_y1/likelihood/combo_3x2pt.py lines ~2;30;31]
+    data_file: lsst_y1_M1_GGL0.05.dataset #delete this line
+    data_file: xxx_yyy.dataset            #add and adapt this line; yyy = the adopted scale cuts
     (...)
-    // change LSST_Y1.dataset to XXX.dataset in the line below (adopted convention: .dataset file name = project name all in CAPS)
-    data_file: LSST_Y1.dataset
+    filename_baryon_pca: "./projects/lsst_y1/data/pca.txt" #delete this line
+    filename_baryon_pca: "./projects/xxx/data/pca.txt"     #add this line; users will need to recompute pca.txt if they want to use PCA for baryons
     (...)
-    // change params_lsst_3x2pt to params_XXX_3x2pt in the line below
-    params: !defaults [params_lsst_3x2pt]
+    print_datavector_file: "./projects/lsst_y1/chains/lsst_y1_theory.modelvector" #delete this line
+    print_datavector_file: "./projects/xxx/chains/xxx_theory.modelvector"         #add this line
 
 **Step 4:** Rename the file `params_lsst_3x2pt.yaml` to `params_XXX_3x2pt.yaml`. Also, rename the associated parameter names, 
 replacing the `LSST_` prefix as shown below. 
