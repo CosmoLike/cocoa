@@ -174,7 +174,6 @@ If users want to make a particular Cosmolike project widely available in Cocoa, 
 **Step :two:**: Add all new defined environment keys to `flags_impl_unset_keys.sh` 
     
     [adapted from Cocoa/installation_scripts/flags_impl_unset_keys.sh]
-
     unset -v XXX_URL XXX_NAME XXX_COMMIT IGNORE_COSMOLIKE_XXX_CODE XXX_TAG XXX_BRANCH
 
 This will ensure the bash script `stop_cocoa.sh` unsets these keys before unloading Cocoa's `(.local)` environment. Failing to do so will pollute your bash environment.
@@ -182,25 +181,23 @@ This will ensure the bash script `stop_cocoa.sh` unsets these keys before unload
 **Step :three:** Add and adapt the following block of code to the shell script `Cocoa/installation_scripts/setup_cosmolike_projects.sh`.
 
      [adapted from Cocoa/installation_scripts/setup_cosmolike_projects.sh shell script]
-     
      if [ -z "${IGNORE_COSMOLIKE_XXX_CODE}" ]; then 
+         PRINTNAME="XXX"
        
-       PRINTNAME="XXX"
-       
-       ptop "GETTING ${PRINTNAME:?}" || return 1
+         ptop "GETTING ${PRINTNAME:?}" || return 1
 
-       FOLDER="${XXX_NAME}"
-       URL="${XXX_URL}"
+         FOLDER="${XXX_NAME}"
+         URL="${XXX_URL}"
 
-       if [ -n "${XXX_COMMIT}" ]; then
-         gitact2 "${FOLDER:?}" "${URL:?}" "${XXX_COMMIT:?}"  || return 1
-       elif [ -n "${XXX_BRANCH}" ]; then 
-         gitact1 "${FOLDER:?}" "${URL:?}" "${XXX_BRANCH:?}" || return 1
-      elif [ -n "${XXX_TAG}" ]; then 
-       gitact3 "${FOLDER:?}" "${URL:?}" "${XXX_TAG:?}" || return 1
-      fi
+         if [ -n "${XXX_COMMIT}" ]; then
+             gitact2 "${FOLDER:?}" "${URL:?}" "${XXX_COMMIT:?}"  || return 1
+         elif [ -n "${XXX_BRANCH}" ]; then 
+             gitact1 "${FOLDER:?}" "${URL:?}" "${XXX_BRANCH:?}" || return 1
+        elif [ -n "${XXX_TAG}" ]; then 
+           gitact3 "${FOLDER:?}" "${URL:?}" "${XXX_TAG:?}" || return 1
+        fi
       
-      pbottom "GETTING ${PRINTNAME:?}" || return 1
+        pbottom "GETTING ${PRINTNAME:?}" || return 1
     fi
 
 > [!NOTE]
@@ -396,11 +393,11 @@ and
 
 and
 	
-	conda activate cocoa
+    conda activate cocoa
 
 and
 
-	source start_cocoa.sh
+    source start_cocoa.sh
 
 **Step 2:** Choose a project name (e.g., project `xxx`), and copy the `LSST_Y1` project using the command below
     
@@ -433,7 +430,7 @@ and
         @rm -rf cosmolike_lsst_y1_interface.so cosmolike_lsst_y1_interface.so.dSYM  *.o # delete this line
         @rm -rf cosmolike_xxx_interface.so cosmolike_xxx_interface.so.dSYM  *.o         # add this line
 
-**Step 2:** Change the name of the File `cosmolike_lsst_y1_interface.py` using the command below
+**Step 2:** Change the name of the file `cosmolike_lsst_y1_interface.py` using the command below
        
     mv "${ROOTDIR:?}"/projects/xxx/interface/cosmolike_lsst_y1_interface.py "${ROOTDIR:?}"/projects/xxx/interface/cosmolike_xxx_interface.py
 
@@ -453,7 +450,7 @@ and remove any previously compiled dynamic library
     
     [adapted from Cocoa/projects/lsst_y1/interface/interface.cpp line ~43]
     PYBIND11_MODULE(cosmolike_lsst_y1_interface, m) # delete this line
-    PYBIND11_MODULE(cosmolike_xxx_interface, m) # add this line
+    PYBIND11_MODULE(cosmolike_xxx_interface, m)     # add this line
     {
         m.doc() = "CosmoLike Interface for LSST_Y1 3x2pt Module"; # delete this line
         m.doc() = "CosmoLike Interface for XXX 3x2pt Module";     # add this line   
@@ -473,127 +470,48 @@ and remove any previously compiled dynamic library
     
     mv "${ROOTDIR:?}"/projects/xxx/scripts/stop_lsst_y1.sh "${ROOTDIR:?}"/projects/xxx/scripts/stop_xxx.sh
 
-**Step 4:** Change the file `$ROOTDIR/projects/XXX/scripts/compile_lsst_y1` following the instructions below
+**Step 4:** Change the file `compile_xxx.sh` following the instructions below
 
-    (...)
+    [adapted from Cocoa/projects/lsst_y1/scripts/compile_lsst_y1.sh line ~4;43;65]
+    if [ -z "${IGNORE_COSMOLIKE_LSSTY1_CODE}" ]; then # delete this line
+    if [ -z "${IGNORE_COSMOLIKE_XXX_CODE}" ]; then    # add this line
+        (...)
+	
+	FOLDER="${LSST_Y1_NAME:-"lsst_y1"}" # delete this line
+        FOLDER="${XXX_NAME:-"xxx"}"         # add this line
 
-    // change $ROOTDIR/projects/lsst_y1/interface to $ROOTDIR/projects/XXX/interface in the line below 
-    cd $ROOTDIR/projects/lsst_y1/interface
+        (...)
     
-**Step 5:** Change the file `$ROOTDIR/projects/XXX/scripts/start_lsst_y1` following the instructions below
-
-    (...)
-
-    // change $ROOTDIR/projects/lsst_y1/interface to $ROOTDIR/projects/XXX/interface in the line below 
-    addvar LD_LIBRARY_PATH $ROOTDIR/projects/lsst_y1/interface
-    
-    // change $ROOTDIR/projects/lsst_y1/interface to $ROOTDIR/projects/XXX/interface in the line below 
-    addvar PYTHONPATH $ROOTDIR/projects/lsst_y1/interface
-
-### Changes in the likelihood folder
-
-**Step 1:** Change the file `$ROOTDIR/projects/XXX/likelihood/_cosmolike_prototype_base.py` following the instructions below
-
-    (...) 
-    
-    // change cosmolike_lsst_y1_interface to cosmolike_XXX_interface in the line below 
-    import cosmolike_lsst_y1_interface as ci
-    
-    (...)
+        PRINTNAME="LSST_Y1"  # delete this line
+        PRINTNAME="XXX"      # add this line
      
-    def set_source_related(self, **params_values):
-        ci.set_nuisance_shear_calib(
-          M = [
-            params_values.get(p, None) for p in [
-              // change LSST_ to the name of the survey associated w/ XXX)
-              "LSST_M"+str(i+1) for i in range(self.source_ntomo)
-            ]
-          ]
-        )
+**Step 5:** Change the file `start_xxx.sh` following the instructions below
 
-        ci.set_nuisance_shear_photoz(
-          bias = [
-            params_values.get(p, None) for p in [
-              // change LSST_ to the name of the survey associated w/ XXX)
-              "LSST_DZ_S"+str(i+1) for i in range(self.source_ntomo)
-            ]
-          ]
-        )
+    [adapted from Cocoa/projects/lsst_y1/scripts/start_lsst_y1.sh line ~4;13]
+    if [ -z "${IGNORE_COSMOLIKE_LSSTY1_CODE}" ]; then # delete this line
+    if [ -z "${IGNORE_COSMOLIKE_XXX_CODE}" ]; then    # add this line
+        (...)
+	
+	FOLDER="${LSST_Y1_NAME:-"lsst_y1"}" # delete this line
+        FOLDER="${XXX_NAME:-"xxx"}"         # add this line
 
-        ci.set_nuisance_ia(
-          A1 = [
-            params_values.get(p, None) for p in [
-              // change LSST_ to the name of the survey associated w/ XXX)
-              "LSST_A1_"+str(i+1) for i in range(self.source_ntomo)
-            ]
-          ],
-          A2 = [
-            params_values.get(p, None) for p in [
-              // change LSST_ to the name of the survey associated w/ XXX)
-              "LSST_A2_"+str(i+1) for i in range(self.source_ntomo)
-            ]
-          ],
-          B_TA = [
-            params_values.get(p, None) for p in [
-              // change LSST_ to the name of the survey associated w/ XXX)
-              "LSST_BTA_"+str(i+1) for i in range(self.source_ntomo)
-            ]
-          ],
-        )
-     
-    (...)
-     
-    def set_lens_related(self, **params_values):
-        ci.set_nuisance_bias(
-            B1 = [
-                params_values.get(p, None) for p in [
-                  // change DES_ to the name of the survey associated w/ XXX)
-                  "LSST_B1_"+str(i+1) for i in range(self.lens_ntomo)
-                ]
-            ], 
-            B2 = [
-                  params_values.get(p, None) for p in [
-                  // change DES_ to the name of the survey associated w/ XXX)
-                  "LSST_B2_"+str(i+1) for i in range(self.lens_ntomo)
-                ]
-            ],
-            B_MAG = [
-                params_values.get(p, None) for p in [
-                  // change DES_ to the name of the survey associated w/ XXX)
-                  "LSST_BMAG_"+str(i+1) for i in range(self.lens_ntomo)
-                ]
-            ]
-        )
-        ci.set_nuisance_clustering_photoz(
-            bias = [
-                params_values.get(p, None) for p in [
-                  // change DES_ to the name of the survey associated w/ XXX)
-                  "LSST_DZ_L"+str(i+1) for i in range(self.lens_ntomo)
-                ]
-            ]
-        )
-        ci.set_point_mass(
-            PMV = [
-                params_values.get(p, None) for p in [
-                  // change DES_ to the name of the survey associated w/ XXX)
-                  "LSST_PM"+str(i+1) for i in range(self.lens_ntomo)
-                ]
-            ]
-        )
-     
-    (...)
-     
-    def set_baryon_related(self, **params_values):
-        // change LSST_ to the name of the survey associated w/ XXX)
-        self.baryon_pcs_qs[0] = params_values.get("LSST_BARYON_Q1", None)
-        self.baryon_pcs_qs[1] = params_values.get("LSST_BARYON_Q2", None)
-        self.baryon_pcs_qs[2] = params_values.get("LSST_BARYON_Q3", None)
-        self.baryon_pcs_qs[3] = params_values.get("LSST_BARYON_Q4", None)
+### Changes in the `Cocoa/projects/xxx/likelihood` folder
 
-If the project name `XXX` contains more than the experiment name, we suggest replacing `LSST_` with just the experiment name. For example, if `XXX = DES_Y3`, then adopt `DES_DZ_L1` for the name of the redshift shift on lens bin 1. The convention adopted must be followed when changing the files `params_des_cosmic_shear.yaml` and `params_des_3x2pt.yaml`. 
+**Step 1:** Change the file `_cosmolike_prototype_base.py` following the instructions below
 
-**Step 2:** Change the file `$ROOTDIR/projects/XXX/likelihood/lsst_3x2pt.py` following the instructions below
-    
+    [adapted from Cocoa/projects/lsst_y1/likelihood/_cosmolike_prototype_base.sh line ~19;21]
+    import cosmolike_lsst_y1_interface as ci #delete this line
+    import cosmolike_xxx_interface as ci     #add this line
+
+    survey = "LSST"  #delete this line
+    survey = "xxx"   # add this line
+
+> [!Tip]
+> If the project name `xxx` contains more than the experiment name, we suggest replacing the `survey` word name with just the experiment name. For example, if `XXX = DES_Y3`, then adopt `survey = "xxx"`.
+
+**Step 2:** Change the file `lsst_3x2pt.py` following the instructions below
+
+    [adapted from Cocoa/projects/lsst_y1/likelihood/lsst_3x2pt.py line ~19;21]
     // change lsst_y1 to XXX in the line below
     from cobaya.likelihoods.lsst_y1._cosmolike_prototype_base import _cosmolike_prototype_base
     // change cosmolike_lsst_y1_interface to cosmolike_XXX_interface in the line below
