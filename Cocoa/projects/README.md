@@ -118,7 +118,7 @@ Below, we provide instructions on how to download and install cosmolike projects
     git clone https://github.com/CosmoLike/cocoa_lsst_XXX.git XXX # users can clone their fork instead
 
 > [!Note]
-> By convention, the *Cosmolike Organization* adds the prefix `cocoa_` to all Cobaya-Cosmolike projects, which must be removed when cloning the repository.
+> By convention, the *Cosmolike Organization* adds the prefix `cocoa_` to all Cobaya-Cosmolike projects, which must be removed when cloning the repository. Why? The cocoa script `compile_all_projects.sh`, which finds and compiles all Cosmolike projects, requires the prefix to be removed.
  
 **Step :three:**: Go back to the Cocoa main folder and activate the private Python environment
     
@@ -206,8 +206,8 @@ This will ensure the bash script `stop_cocoa.sh` unsets these keys before unload
 > [!NOTE]
 > Cocoa contains the scripts
 >
->      Cocoa/installation_scripts/setup_cosmolike_projects.sh
->      Cocoa/installation_scripts/compile_all_projects.sh
+>      Cocoa/installation_scripts/setup_cosmolike_projects.sh.  # download cosmolike projects set on set_installation_options.sh
+>      Cocoa/installation_scripts/compile_all_projects.sh            # finds and compiles all cosmolike projects located on Cocoa/projects
 > 
 > designed to download and compile all Cosmolike projects defined in the `Cocoa/projects` folder.
 
@@ -293,7 +293,7 @@ The CosmoLike pipeline requires $\Omega_m$ and $\Omega_b$ to be provided, but th
             latex: \Omega_\mathrm{m} h^2
 
 > [!Warning]
->Adopting $\big(\Omega_m,\Omega_b\big)$ as main MCMC parameters can create a silent bug in Cobaya. We are unsure if this problem persists in newer Cobaya versions; therefore, users must follow our instructions. The problem occurs when the option `drop: true` is absent in $\big(\Omega_m,\Omega_b\big)$ parameters, and there are no expressions that define the derived $\big(\Omega_c h^2, \Omega_b h^2\big)$ quantities. The bug is silent because the MCMC runs without any warnings, but the CAMB Boltzmann code does not update the cosmological parameters at every MCMC iteration. As a result, the posteriors are flawed, but they may seem reasonable to those unfamiliar with the issue. 
+>Adopting $\big(\Omega_m,\Omega_b\big)$ as main MCMC parameters can create a silent bug in Cobaya. We are unsure if this problem persists in newer Cobaya versions; therefore, users are advised to follow our instructions. The problem occurs when the option `drop: true` is absent in $\big(\Omega_m,\Omega_b\big)$ parameters, and there are no expressions that define the derived $\big(\Omega_c h^2, \Omega_b h^2\big)$ quantities. The bug is silent because the MCMC runs without any warnings, but the CAMB Boltzmann code does not update the cosmological parameters at every MCMC iteration. As a result, the posteriors are flawed, but they may seem reasonable to those unfamiliar with the issue. 
 
 ### :interrobang: FAQ: How do we set Slow/Fast decomposition with Cosmolike?  <a name="manual_blocking_cosmolike"></a>
 
