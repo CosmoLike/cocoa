@@ -2,7 +2,7 @@
 <img width="780" alt="Screenshot 2024-09-16 at 10 55 14 PM" src="https://github.com/user-attachments/assets/f327e3bf-22c7-46e4-9bb5-14c8e7afc4c1">
 
 # Table of contents
-1. [Overview of the Cobaya-CosmoLike Joint Architecture (Cocoa)](#overview) 
+1. [Overview](#overview) 
 2. [Installation of core packages via Conda](#required_packages_conda)
 3. [Installation and Compilation of external modules](#cobaya_base_code)
 4. [Running Examples](#cobaya_base_code_examples)
@@ -23,7 +23,7 @@
    12. [FAQ: How can we improve our Bash/C/C++ knowledge?](#lectnotes)
    13. [Credits](#appendix_proper_credits)
 
-# Overview of the [Cobaya](https://github.com/CobayaSampler)-[CosmoLike](https://github.com/CosmoLike) Joint Architecture (Cocoa) <a name="overview"></a>
+# Overview <a name="overview"></a>
 
 Cocoa allows users to run [CosmoLike](https://github.com/CosmoLike) routines inside the [Cobaya](https://github.com/CobayaSampler) framework. [CosmoLike](https://github.com/CosmoLike) can analyze data primarily from the [Dark Energy Survey](https://www.darkenergysurvey.org) and simulate future multi-probe analyses for LSST and Roman Space Telescope. 
 
