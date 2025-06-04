@@ -405,7 +405,7 @@ We provide the Docker image [whovian-cocoa](https://hub.docker.com/r/vivianmiran
 
     docker run --platform linux/amd64 --hostname cocoa --name cocoa2025 -it -p 8888:8888 -v $(pwd):/home/whovian/host/ -v ~/.ssh:/home/whovian/.ssh:ro vivianmiranda/whovian-cocoa
 
-This is a large image with a size of approximately 16GB, as it already contains the cocoa `v4.0beta26` installed and pre-compiled. 
+This is a large image with a size of approximately 16GB, as it already contains the Cocoa version `v4.0beta26` installed and pre-compiled. 
 
  **Step :three:**: As shown in the picture below, users can follow the instructions provided in Section [Running Examples](#cobaya_base_code_examples) to run a few non-cosmolike-based examples, as well as examples within `LSST-Y1`, `ROMAN_REAL`, and `ROMAN_FOURIER` projects. 
 
@@ -513,9 +513,9 @@ Supercomputers usually enforce strict quota limits on home folders. These limits
 
     source ~/.bashrc
 
-:six: After completing steps :one:-:five:, check the `$HOME/.condarc` file with the command
+:six: After completing steps :one:-:five:, check the internals of the `$HOME/.condarc` file with the command
 
-    more $HOME/.condarc
+    more "${HOME:?}"/.condarc
 
 to make sure it resembles the one below.
 
@@ -528,9 +528,9 @@ to make sure it resembles the one below.
     channel_priority: strict
     verbosity: 0
     pkgs_dirs:
-      - /project2/kicp/XXX/anaconda/pkgs
+      - /project2/kicp/XXX/anaconda/pkgs  # adjust this directory path
     envs_dirs:
-      - /project2/kicp/XXX/anaconda/envs/
+      - /project2/kicp/XXX/anaconda/envs/ # adjust this directory path
 
 ## :interrobang: FAQ: How do we install Conda? <a name="overview_miniconda"></a>
 
@@ -630,9 +630,9 @@ and
 
 A useful git hack is related to developing Cocoa from a git tag. We reserve Git tags to set milestones in our development, so they serve as good starting points for coding localized new features (e.g., changes to a file that other developers have not recently modified) or bug fixes.
 
-**Step :one: (optional)** If the developer has cloned the repository using the `https` URL address, we change the URL to the SSH-key-based address
+**Step :one: (optional)** If the developer has cloned the repository using the `https` URL address, then change the URL to the SSH-key-based address (if the developer has previously uploaded a public key to their GitHub account)
 
-    git remote set-url origin git@github.com:CosmoLike/cocoa.git
+    git remote set-url origin git@github.com:CosmoLike/cocoa.git # that would allow users to push without typing a password
 
 **Step :two:** Move the detached state to a new local branch via the command
 
@@ -645,19 +645,19 @@ Now, all commits will be associated with this local branch.
 
 **Step :three:** The developer has two options at the end of development. They can **either** create a new remote branch
 
-    git push origin xyzlocdev    # run on the xyzlocdev branch
+    git push origin xyzlocdev # run on the xyzlocdev branch
 
 **or** they can fetch and download the remote `xyzdev` branch, which will later absorb the changes made on `xyzlocdev`
 
-    git switch -c xyzdev origin/xyzdev  # run on the xyzlocdev branch
+    git switch -c xyzdev origin/xyzdev # run on the xyzlocdev branch
 
 Finally, the developer needs to merge the changes made on `xyzlocdev`.
 
-    git merge --squash xyzlocdev  # run on the xyzdev branch
+    git merge --squash xyzlocdev # run on the xyzdev branch
 
 If this merge does not create any merge conflicts, type
 
-    git push origin xyzdev    # run on the xyzdev branch
+    git push origin xyzdev # run on the xyzdev branch
 
 ## :interrobang: FAQ: How can we improve our Bash/C/C++ knowledge? <a name="lectnotes"></a>
 
