@@ -4,9 +4,8 @@
 3. [FAQ: How do we set Weak Lensing YAML files in Cobaya?](#appendix_example_runs)
 4. [FAQ: How do we set Slow/Fast decomposition with Cosmolike?](#manual_blocking_cosmolike)
 5. [FAQ: How do we create a new Cosmolike project?](#appendix_lsst_y1_new)
-   1. [Minor changes: the easy way](#appendix_lsst_y1_new_small)
-   2. [Minor changes: the hard way](#appendix_lsst_y1_new_small2)
-   3. [Major changes](#appendix_lsst_y1_new_major)
+   1. [The easy way](#appendix_lsst_y1_new_small)
+   2. [The hard way](#appendix_lsst_y1_new_small2)
  
 ## The Projects Folder <a name="appendix_projects_folder"></a> 
 
@@ -355,7 +354,7 @@ Below, we provide an example YAML configuration for an MCMC chain with DES 3x2pt
 
 Adapting the LSST_Y1 folder to construct a new project involves many small core changes and a few major ones. They are tedious but straightforward. The easier way to apply the minor core changes to the code is via the bash script *transfer_project.sh*.
 
-## Minor changes: the easy way <a name="appendix_lsst_y1_new_small"></a> 
+## The easy way <a name="appendix_lsst_y1_new_small"></a> 
 
  To properly use the bash script *transfer_project.sh*., users must set the following variables at the beginning of the file:
 
@@ -375,7 +374,7 @@ and
 
     bash transfer_project.sh
 
-## Minor changes: the hard way <a name="appendix_lsst_y1_new_small2"></a> 
+## The hard way <a name="appendix_lsst_y1_new_small2"></a> 
 
 ### Create the new project
 
@@ -520,49 +519,53 @@ Users should perform similar changes to `combo_2x2pt.py`, `combo_xi_gg.py`, `com
     print_datavector_file: "./projects/lsst_y1/chains/lsst_y1_theory.modelvector" #delete this line
     print_datavector_file: "./projects/xxx/chains/xxx_theory.modelvector"         #add this line
 
-**Step 4:** Rename the file `params_lsst_3x2pt.yaml` to `params_XXX_3x2pt.yaml`. Also, rename the associated parameter names, 
-replacing the `LSST_` prefix as shown below. 
+Users should perform similar changes to `combo_2x2pt.yaml`, `combo_xi_gg.yaml`, `combo_xi_ggl.yaml`, and `cosmic_shear.yaml`.
 
-      XXX_DZ_S1:
-         prior:
+**Step 4:** Rename the prefix `LSST_` of all lens and source-related parameters, located on `params_lens.yaml` and `params_source.yaml`, as shown below. 
+
+    [adapted from Cocoa/projects/lsst_y1/likelihood/params_lens.yaml lines ~2-12]
+    LSST_DZ_L1:  # delete this line
+    XX_DZ_L1:    # add this line
+        prior:
             dist: norm
             loc: 0.0
             scale: 0.005
-         ref:
+        ref:
             dist: norm
             loc: 0.0
             scale: 0.005
-            proposal: 0.005
-         latex: \Delta z_\mathrm{s, XXX}^1
-         
-Similar changes must be made in `params_XXX_cosmic_shear.yaml`. Note that changes either in the number of lenses or source bins will demand the introduction of new parameters in 
-`params_XXX_cosmic_shear.yaml` and `params_XXX_3x2pt.yaml`
-
-### Changes in the data folder
-
-**Step 1:** Rename the `.dataset` file. Our adopted convention is: `.dataset` file name = project name capitalized
-
-     $(cocoa)(.local) cp $ROOTDIR/projects/LSST_Y1/data/LSST_Y1.dataset $ROOTDIR/projects/XXX/data/XXX.dataset
+        proposal: 0.005
+        latex: \Delta z_\mathrm{l,LSST}^1 # delete this line
+	latex: \Delta z_\mathrm{l,XXX}^1 # delete this line
      
-**Step 2:** Update `XXX.dataset` file with the names of the new data vector, covariance, n(z), binning, mask...
+     (...) # Don't forget to rename ALL parameters
+         
+### Changes in the `Cocoa/projects/xxx/data` folder
 
-      data_file = XXX_nonlim
-      cov_file = cov_XXX
-      mask_file = 3x2pt_baseline.mask
-      nz_lens_file = lens_XXX.nz
-      nz_source_file = source_XXX.nz
-      lensing_overlap_cut = 0.0
-      lens_ntomo = 5
-      source_ntomo = 5
-      n_theta = 26
-      IA_model = 4
-      theta_min_arcmin = 2.5
-      theta_max_arcmin = 900.
-      #baryon_pca_file = pca.txt
+**Step 1:** Rename the `.dataset` file by adapting the command below 
 
-## Major changes: <a name="appendix_lsst_y1_new_major"></a>  
+    # yyy = the adopted scale cuts on xxx_yyy.dataset
+    mv "${ROOTDIR:?}"/projects/xxx/data/lsst_y1_M1_GGL0.05.dataset $ROOTDIR/projects/xxx/data/xxx_yyy.dataset
 
-* Computation of a new covariance matrix using either [CosmoCov](https://github.com/CosmoLike/CosmoCov) or [CosmoCovFourier](https://github.com/CosmoLike/CosmoCov_Fourier)
-* Simulation of new `n(z)` for lenses and sources
-* Updates to the Cosmolike C++ interface so the appropriate routines can be called from the Python likelihood
-* Updates to the Cosmolike Python likelihoods and their associated Yaml files. These include, for example, `/likelihood/lsst_3x2pt.py` and `/likelihood/lsst_3x2pt.yaml`
+> [!Tip]
+> There are many datasets and masks associated with different scale cuts in the `lsst_y1/data` folder. Some of them are listed below.
+>
+>    lsst_y1_M[2-6]_GGL0.05.dataset
+>    lsst_y1_M[2-6]_GGLOLAP0.05.mask
+>
+> We recommend that users delete these files, as they will not be applicable in the new projects. The same goes for data vectors, covariances, and n(z) files.
+
+**Step 2:** Update `xxx_yyy.dataset` file with the names of the new data vector, covariance, n(z), binning, mask...
+
+    [adapted from Cocoa/projects/lsst_y1/likelihood/params_lens.yaml lines ~2-12]
+    data_file = XXX_nonlim
+    cov_file = cov_XXX
+    mask_file = 3x2pt_baseline.mask
+    nz_lens_file = lens_XXX.nz
+    nz_source_file = source_XXX.nz
+    lens_ntomo = 5
+    source_ntomo = 5
+    n_theta = 26
+    theta_min_arcmin = 2.5
+    theta_max_arcmin = 900.
+    baryon_pca_file = pca.txt
