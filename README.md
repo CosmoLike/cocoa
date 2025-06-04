@@ -20,7 +20,7 @@
     9. [FAQ: How do we download modern CMB data? (external readme)](Cocoa/external_modules/data)
    10. [FAQ: How do we switch Cocoa's adopted CAMB/CLASS/Polychord? (external readme)](Cocoa/external_modules/code)
    11. [FAQ: Where do we find common FAQs about Cosmolike? (external readme)](Cocoa/projects/)
-   12. [FAQ: How can users improve their Bash/C/C++ knowledge to develop Cocoa/Cosmolike?](#lectnotes)
+   12. [FAQ: How can we improve our Bash/C/C++ knowledge?](#lectnotes)
    13. [Credits](#appendix_proper_credits)
 
 # Overview of the [Cobaya](https://github.com/CobayaSampler)-[CosmoLike](https://github.com/CosmoLike) Joint Architecture (Cocoa) <a name="overview"></a>
@@ -657,7 +657,7 @@ If this merge does not create any merge conflicts, type
 
     git push origin xyzdev    # run on the xyzdev branch
 
-## :interrobang: FAQ: How can users improve their Bash/C/C++ knowledge to develop Cocoa/Cosmolike? :book::book: <a name="lectnotes"></a>
+## :interrobang: FAQ: How can we improve our Bash/C/C++ knowledge? <a name="lectnotes"></a>
 
 A working knowledge of Python is required to understand the Cobaya framework at the developer level. Users must also be familiar with the Bash language to understand Cocoa's scripts. Proficiency in C and C++ is also needed to manipulate Cosmolike and the C++ Cobaya-Cosmolike C++ interface. Finally, users need to understand the Fortran-2003 language to modify CAMB.
 
