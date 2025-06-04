@@ -51,7 +51,7 @@ The `projects` folder includes all the projects linked to Cosmolike; they can al
 
 ### Part I: The semi-automatic way 
 
-Cocoa's `set_installation_options.sh` shell script includes instructions to install several Cosmo-like projects. To activate them, manipulate the following lines on `set_installation_options.sh` 
+Cocoa's `set_installation_options.sh` shell script includes instructions to install several Cosmolike projects. To activate them, manipulate the following lines on `set_installation_options.sh` 
 
      [Adapted from Cocoa/set_installation_options.sh shell script]
 
@@ -78,7 +78,7 @@ Cocoa's `set_installation_options.sh` shell script includes instructions to inst
      (...)
  
      # ------------------------------------------------------------------------------
-     # Cosmolike projects below -------------------------------------------
+     # Cosmolike projects below -----------------------------------------------------
      # ------------------------------------------------------------------------------
      (...)
      export ROMAN_REAL_URL="https://github.com/CosmoLike/cocoa_roman_real.git"
@@ -90,7 +90,7 @@ Cocoa's `set_installation_options.sh` shell script includes instructions to inst
      #TAG: if unset, load the specified TAG
      #export ROMAN_REAL_TAG="v4.0-beta17"
  
-Everytime users edit `set_installation_options.sh`, they need to reload `(.local)` by rerunning `start_cocoa.sh`. Then, run the following commands:
+Every time `set_installation_options.sh` is edited, they need to reload `(.local)` by rerunning `start_cocoa.sh`. Then, run the following commands:
 
       cd ./cocoa/Cocoa
       source start_cocoa.sh # even if (.local) is already active, users must run start_cocoa.sh again to update bash environment values
