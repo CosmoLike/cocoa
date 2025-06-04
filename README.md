@@ -29,7 +29,7 @@ Cocoa allows users to run [CosmoLike](https://github.com/CosmoLike) routines ins
 
 Besides integrating [Cobaya](https://github.com/CobayaSampler) and [CosmoLike](https://github.com/CosmoLike), Cocoa introduces shell scripts that allow users to containerize [Cobaya](https://github.com/CobayaSampler), the Boltzmann codes, and multiple likelihoods. The container structure of Cocoa ensures that users can adopt consistent versions for the Fortran/C/C++ compilers and libraries across multiple machines. Such a systematic approach greatly simplifies the debugging process. 
 
-Our scripts never install packages or Python modules on a globlal folder such as `$HOME/.local`. Here, `$HOME` denotes a shell environment variable that points to the user's home folder. Doing so would force cocoa packages to be global to the user, possibly breaking environments. Our scripts enables users to work on multiple Cocoa instances simultaneously, similar to what was possible with [CosmoMC](https://github.com/cmbant/CosmoMC). 
+Our scripts never install packages or Python modules in a global folder such as `$HOME/.local`. Here, `$HOME` denotes a shell environment variable that points to the user's home folder. Doing so would force cocoa packages to be global to the user, possibly breaking environments. Our scripts enable users to work on multiple Cocoa instances simultaneously, similar to what was possible with [CosmoMC](https://github.com/cmbant/CosmoMC). 
 
 This readme file presents basic and advanced instructions for installing all [Cobaya](https://github.com/CobayaSampler) and [CosmoLike](https://github.com/CosmoLike) components.
 
@@ -68,7 +68,7 @@ Users can now proceed to the **next section**.
 > To install the `cocoa` conda environment on a supercomputer, users may take advantage of the fact that several HPC environments provide the [Anaconda installer](https://www.anaconda.com) as an external module. If this applies to you, then check the appendix [FAQ: How do we use an available Anaconda module on HPC?](#overview_anaconda).
 
 > [!TIP]
-> Users working on an HPC environment that does not offer Anaconda or  may want to check the appendix [FAQ: How do we install Conda?](#overview_conda).
+> Users working in an HPC environment that does not offer Anaconda or  may want to check the appendix [FAQ: How do we install Conda?](#overview_conda).
 
 > [!TIP]
 > We provide a Docker image named *whovian-cocoa* with Cocoa pre-installed and pre-compiled. For further instructions, refer to the appendix [FAQ: How do we run Cocoa with Docker?](#appendix_jupyter_whovian).
@@ -215,6 +215,8 @@ and
 >      Cocoa/.local/include
 >      Cocoa/.local/lib
 >      Cocoa/.local/share
+>
+> Another reason 
 
 # Running ML emulators <a name="cobaya_base_code_examples_emul"></a>
 
@@ -237,7 +239,7 @@ Now, users must follow all the steps below.
 
  **Step :two:**: Select the number of OpenMP cores.
     
-    # No need to thread via OpenMP. However, 2-3 threads may reduce the TRF emulator runtime
+    # No need to thread via OpenMP. However, 2-3 threads can reduce the TRF emulator runtime from ~0.2s to 0.1s.
     export OMP_PROC_BIND=close; export OMP_NUM_THREADS=1
 
  **Step :three:** Run `cobaya-run` on the first emulator example following the commands below.
@@ -255,7 +257,7 @@ PolyChord:
     mpirun -n 8 --oversubscribe --mca pml ^ucx --mca btl vader,tcp,self --bind-to core:overload-allowed --rank-by slot --map-by numa:pe=${OMP_NUM_THREADS} cobaya-run ./projects/example/EXAMPLE_POLY22.yaml -f
 
 > [!NOTE]
-> What should users do if they don't unset ML-related environment keys before running `setup_cocoa.sh` and `compile_cocoa.sh`, as rerunning these scripts can require a long time? Instead, run the following commands.
+> What should users do if they have not configured ML-related keys before running `setup_cocoa.sh` and `compile_cocoa.sh`, as rerunning these scripts can require a long time? Instead, run the following commands.
 >
 >      source start_cocoa.sh # even if (.local) is already active, users must run start_cocoa.sh again to update bash environment values
 > 

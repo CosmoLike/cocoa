@@ -90,12 +90,12 @@ Cocoa's `set_installation_options.sh` shell script includes instructions to inst
      #TAG: if unset, load the specified TAG
      #export ROMAN_REAL_TAG="v4.0-beta17"
  
-Every time `set_installation_options.sh` is edited, they need to reload `(.local)` by rerunning `start_cocoa.sh`. Then, run the following commands:
+Every time `set_installation_options.sh` is edited, users need to reload `(.local)` by rerunning `start_cocoa.sh`. Therefore, to download and compile cosmolike projects users must first run the following commands:
 
       cd ./cocoa/Cocoa
       source start_cocoa.sh # even if (.local) is already active, users must run start_cocoa.sh again to update bash environment values
       
- and
+ and then
  
       source ./installation_scripts/setup_cosmolike_projects.sh   # download all cosmolike projects  
       source ./installation_scripts/compile_all_projects.sh           # compile  all cosmolike project
@@ -390,88 +390,90 @@ and
 
 ### Create the new project
 
-**Step 1:** Choose a project name (e.g., project XXX), and copy the `LSST_Y1` project using the command below
+**Step 1:** Initialize cocoa environments.
+
+    cd ./cocoa/Cocoa
+
+and
+	
+	conda activate cocoa
+
+and
+
+	source start_cocoa.sh
+
+**Step 2:** Choose a project name (e.g., project `xxx`), and copy the `LSST_Y1` project using the command below
     
-    cp "${ROOTDIR:?}"/projects/lsst_y1/ "${ROOTDIR:?}"/projects/xxx
+    cp -r "${ROOTDIR:?}"/projects/lsst_y1/ "${ROOTDIR:?}"/projects/xxx
 
-**Step 2:** Remove the git repository associated with LSST_Y1 project
+**Step 3:** Remove the git repository associated with LSST_Y1 project
 
-    rm -rf "${ROOTDIR:?}"/projects/$NEW_PROJECT/.git/
+    rm -rf "${ROOTDIR:?}"/projects/xxx/.git/
 
-### Changes in the interface folder 
+### Changes in the `Cocoa/projects/xxx/interface` folder 
 
-**Step 1:** Change the file `Cocoa/projects/XXX/interface/MakefileCosmolike` following the instructions below
+**Step 1:** Change the file `Cocoa/projects/xxx/interface/MakefileCosmolike` following the instructions below (replace all instances of `lsst_y1` with `xxx`
 
-    (...)
+    [adapted from Cocoa/projects/lsst_y1/interface/MakefileCosmolike line ~118]
      
-    CSOURCES += \
-        (...)
-        ${ROOTDIR}/external_modules/code/cosmolike/pt_cfastpt.c \
-        // add additional files from /external_modules/code/cosmolike that is needed
-    
-    (...)
-    
-    OBJECTC += \
-        (...)
-        ./pt_cfastpt.o \
-        // add additional files from /external_modules/code/cosmolike that is needed
-    
-    (...)
-    
     all:  shared
-    // change cosmolike_lsst_y1_interface.so to cosmolike_XXX_interface.so in the line below
-    shared: cosmolike_lsst_y1_interface.so
-    
-    (...)
-    
-    // change cosmolike_lsst_y1_interface.so to cosmolike_XXX_interface.so in the line below
-    cosmolike_lsst_y1_interface.so: $(OBJECTC) $(CSOURCES) interface.cpp
+    shared: cosmolike_lsst_y1_interface.so # delete this line
+    shared: cosmolike_xxx_interface.so       # add this line
+
+and
+
+    [adapted from Cocoa/projects/lsst_y1/interface/MakefileCosmolike line ~172]
+    cosmolike_lsst_y1_interface.so: $(OBJECTC) $(CSOURCES) interface.cpp # delete this line
+    cosmolike_xxx_interface.so: $(OBJECTC) $(CSOURCES) interface.cpp       # add this line
         $(CXX) $(CXXFLAGS) -DCOBAYA_SAMPLER -shared -fPIC -o $@ $(OBJECTC) interface.cpp $(LDFLAGS)
         @rm *.o
     
-    (...)
+and
     
-    // change cosmolike_lsst_y1_interface.so to cosmolike_XXX_interface.so in the line below 
-    clean:
-        @rm -rf cosmolike_lsst_y1_interface.so cosmolike_lsst_y1_interface.so.dSYM  *.o
+     [adapted from Cocoa/projects/lsst_y1/interface/MakefileCosmolike line ~176]
+     clean:
+        @rm -rf cosmolike_lsst_y1_interface.so cosmolike_lsst_y1_interface.so.dSYM  *.o # delete this line
+        @rm -rf cosmolike_xxx_interface.so cosmolike_xxx_interface.so.dSYM  *.o # add this line
 
 **Step 2:** Change the name of the File `Cocoa/projects/XXX/interface/cosmolike_lsst_y1_interface.py` using the command below
        
-    mv ${ROOTDIR:?}/projects/XXX/interface/cosmolike_lsst_y1_interface.py ${ROOTDIR:?}/projects/XXX/interface/cosmolike_XXX_interface.py
+    mv "${ROOTDIR:?}"/projects/xxx/interface/cosmolike_lsst_y1_interface.py "${ROOTDIR:?}"/projects/xxx/interface/cosmolike_xxx_interface.py
 
-**Step 3** Changes in the newly created file `$ROOTDIR/projects/XXX/interface/cosmolike_XXX_interface.py` 
+and remove any previously compiled dynamic library 
 
+    rm -f  "${ROOTDIR:?}"/projects/xxx/interface/cosmolike_lsst_y1_interface.so
+    
+**Step 3** Change the newly created file `Cocoa/projects/xxx/interface/cosmolike_xxx_interface.py` following the instructions below
+
+	[adapted from Cocoa/projects/lsst_y1/interface/cosmolike_xxx_interface.py]
     def __bootstrap__():
         (...)
-        // change cosmolike_lsst_y1_interface.so to cosmolike_XXX_interface.so in the line below 
-        __file__ = pkg_resources.resource_filename(__name__,'cosmolike_lsst_y1_interface.so')
+        __file__ = pkg_resources.resource_filename(__name__,'cosmolike_lsst_y1_interface.so') # delete this line
+        __file__ = pkg_resources.resource_filename(__name__,'cosmolike_xxx_interface.so') # add this line
         
 **Step 4** Change the file `Cocoa/projects/XXX/interface/interface.cpp` following the instructions below
     
-    (...)
-    
-    // change cosmolike_lsst_y1_interface to cosmolike_XXX_interface in the line below
-    PYBIND11_MODULE(cosmolike_lsst_y1_interface, m)
+    [adapted from Cocoa/projects/lsst_y1/interface/interface.cpp line ~43]
+    PYBIND11_MODULE(cosmolike_lsst_y1_interface, m) # delete this line
+    PYBIND11_MODULE(cosmolike_xxx_interface, m) # add this line
     {
-        // change the description below
-        m.doc() = "CosmoLike Interface for LSST_Y1 3x2pt Module";
-        
+        m.doc() = "CosmoLike Interface for LSST_Y1 3x2pt Module"; # delete this line
+        m.doc() = "CosmoLike Interface for XXX 3x2pt Module"; # add this line   
        (...)
-    }
     
 ### Changes in the script folder
 
-**Step 1:** Change the name of the file `$ROOTDIR/projects/XXX/scripts/compile_lsst_y1` using the command below 
+**Step 1:** Change the name of the file `Cocoa/projects/xx/scripts/compile_lsst_y1.sh` using the command below 
     
-    $(cocoa)(.local) mv $ROOTDIR/projects/XXX/scripts/compile_lsst_y1 $ROOTDIR/projects/XXX/scripts/compile_XXX
+    mv "${ROOTDIR:?}"/projects/xxx/scripts/compile_lsst_y1.sh "${ROOTDIR:?}"/projects/xxx/scripts/compile_xxx.sh
     
-**Step 2:** Change the name of the file `$ROOTDIR/projects/XXX/scripts/start_lsst_y1` using the command below 
+**Step 2:** Change the name of the file `$ROOTDIR/projects/xx/scripts/start_lsst_y1.sh` using the command below 
     
-    $(cocoa)(.local) mv $ROOTDIR/projects/XXX/scripts/start_lsst_y1 $ROOTDIR/projects/XXX/scripts/start_XXX
+    mv "${ROOTDIR:?}"/projects/xxx/scripts/start_lsst_y1.sh "${ROOTDIR:?}"/projects/xxx/scripts/start_xxx.sh
     
-**Step 3:** Change the name of the file `$ROOTDIR/projects/XXX/scripts/stop_lsst_y1` using the command below 
+**Step 3:** Change the name of the file `Cocoa/projects/xxx/scripts/stop_lsst_y1.sh` using the command below 
     
-    $(cocoa)(.local) mv $ROOTDIR/projects/XXX/scripts/stop_lsst_y1 $ROOTDIR/projects/XXX/scripts/stop_XXX
+    mv "${ROOTDIR:?}"/projects/xxx/scripts/stop_lsst_y1.sh "${ROOTDIR:?}"/projects/xxx/scripts/stop_xxx.sh
 
 **Step 4:** Change the file `$ROOTDIR/projects/XXX/scripts/compile_lsst_y1` following the instructions below
 
