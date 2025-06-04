@@ -8,11 +8,9 @@
    2. [Minor changes: the hard way](#appendix_lsst_y1_new_small2)
    3. [Major changes](#appendix_lsst_y1_new_major)
  
-### The Projects Folder <a name="appendix_projects_folder"></a> 
+## The Projects Folder <a name="appendix_projects_folder"></a> 
 
-The `projects` folder includes all the projects linked to Cosmolike; they can also help organize general investigations, even if they don't use Cosmolike directly. 
-
-Projects should be hosted on independent GitHub repositories; our convention is to name the repository cocoa_XXX, where XXX is the intended project name. Projects that utilize Cosmolike need to have more or less the following structure, taken from the [LSST_Y1 project](https://github.com/CosmoLike/cocoa_lsst_y1)
+The `projects` folder includes all the projects linked to Cosmolike; they can also help organize general investigations, even if they don't use Cosmolike directly. Projects that utilize Cosmolike need to have more or less the following structure, taken from the [LSST_Y1 project](https://github.com/CosmoLike/cocoa_lsst_y1)
 
     +-- cocoa_lsst_y1
     |    +-- likelihood
@@ -46,31 +44,91 @@ Projects should be hosted on independent GitHub repositories; our convention is 
     |    +-- EXAMPLE_EVALUATE_1.YAML
     |    +-- EXAMPLE_MCMC_1.YAML
 
-### :interrobang: FAQ: How do we download and run Cosmolike projects? <a name="running_cosmolike_projects"></a> 
+> [!Note]
+> Projects should be hosted on independent GitHub repositories. By convention, the Cosmolike Organization adds the prefix `cocoa_` to all Cobaya-Cosmolike projects. For instance, the repository `cocoa_XXX` targets project `XXX`. 
 
-**Step :one:**: Activate conda environment and go to the projects folder (`./projects`)
+## :interrobang: FAQ: How do we download and run Cosmolike projects? <a name="running_cosmolike_projects"></a> 
+
+### Part I: The semi-automatic way 
+
+Cocoa's `set_installation_options.sh` shell script includes instructions to install several Cosmo-like projects. To activate them, manipulate the following lines on `set_installation_options.sh` 
+
+     [Adapted from Cocoa/set_installation_options.sh shell script]
+
+     # ------------------------------------------------------------------------------
+     # The keys below control which cosmolike projects will be installed and compiled
+     # ------------------------------------------------------------------------------
+     export IGNORE_COSMOLIKE_LSSTY1_CODE=1
+     export IGNORE_COSMOLIKE_DES_Y3_CODE=1
+     #export IGNORE_COSMOLIKE_ROMAN_FOURIER_CODE=1
+     #export IGNORE_COSMOLIKE_ROMAN_REAL_CODE=1
+
+     (...)
+
+     # ------------------------------------------------------------------------------
+     # OVERWRITE_EXISTING_XXX_CODE=1 -> setup_cocoa overwrites existing PACKAGES ----
+     # overwrite: delete the existing PACKAGE folder and install it again -----------
+     # redownload: delete the compressed file and download data again ---------------
+     # These keys are only relevant if you run setup_cocoa multiple times -----------
+     # ------------------------------------------------------------------------------
+     (...)
+     export OVERWRITE_EXISTING_COSMOLIKE_CODE=1 # dangerous (possible loss of uncommitted work)
+                                                # If unset, users must manually delete cosmolike projects
+
+     (...)
+ 
+     # ------------------------------------------------------------------------------
+     # Cosmolike projects below -------------------------------------------
+     # ------------------------------------------------------------------------------
+     (...)
+     export ROMAN_REAL_URL="https://github.com/CosmoLike/cocoa_roman_real.git"
+     export ROMAN_REAL_NAME="roman_real"
+     #BRANCH: if unset, load the latest commit on the specified branch
+     #export ROMAN_REAL_BRANCH="dev"
+     #COMMIT: if unset, load the specified commit
+     export ROMAN_REAL_COMMIT="a5cf62ffcec7b862dda5bf343bf6bb19124bb5d0"
+     #TAG: if unset, load the specified TAG
+     #export ROMAN_REAL_TAG="v4.0-beta17"
+ 
+Everytime users edit `set_installation_options.sh`, they need to reload `(.local)` by rerunning `start_cocoa.sh`. Then, run the following commands:
+
+      cd ./cocoa/Cocoa
+      source start_cocoa.sh # even if (.local) is already active, users must run start_cocoa.sh again to update bash environment values
+      
+ and
+ 
+      source ./installation_scripts/setup_cosmolike_projects.sh   # download all cosmolike projects  
+      source ./installation_scripts/compile_all_projects.sh           # compile  all cosmolike project
+
+In case users only want to compile a single cosmolike project (let's say the `roman_real` project)
+
+      source ./projects/roman_real/scripts/compile_roman_real.sh
+
+### Part II: New Projects 
+
+Below, we provide instructions on how to download and install cosmolike projects that have not been previously configured on `set_installation_options.sh` shell script.
+
+**Step :one:**: Activate conda environment and go to the projects folder (`Cocoa/projects`)
     
     conda activate cocoa
-    cd ./cocoa/Cocoa/projects
+    cd ./projects  # here we assume users are located in the Cocoa's main folder that contains the `start_cocoa.sh` script
 
-**Step :two:**  Clone a Cosmolike project (assumed here to have with the fictitious name `XXX`):
+**Step :two:**  Clone the desired Cosmolike project (assumed here to have with the fictitious name `XXX`):
 
-    git clone https://github.com/CosmoLike/cocoa_lsst_XXX.git XXX
+    git clone https://github.com/CosmoLike/cocoa_lsst_XXX.git XXX # users can clone their fork instead
 
-By convention, the *Cosmolike Organization* adds the prefix `cocoa_` to all Cobaya-Cosmolike projects, which must be removed when cloning the repository.
+> [!Note]
+> By convention, the *Cosmolike Organization* adds the prefix `cocoa_` to all Cobaya-Cosmolike projects, which must be removed when cloning the repository.
  
 **Step :three:**: Go back to the Cocoa main folder and activate the private Python environment
     
     cd ../
-
-and
-
-    source start_cocoa.sh
+    source start_cocoa.sh # even if (.local) is loaded, users need to rerun start_cocoa after cloning the project repository
  
 > [!Warning]
-> Users must run the script `start_cocoa.sh` after cloning the project repository so that Cocoa can reload `(.local)` environment and create appropriate soft links.
+> Users must run the script `start_cocoa.sh` after cloning the project repository so that Cocoa can reload `(.local)` environment and create appropriate soft links to cobaya.
 
-**Step :four:**: Compile the project, as shown below (two possibilities)
+**Step :four:**: Compile the project (two possibilities)
  
     source ./projects/XXX/scripts/compile_XXX
 
@@ -86,16 +144,24 @@ and
 
     mpirun -n 1 --oversubscribe --mca pml ^ucx --mca btl vader,tcp,self --bind-to core:overload-allowed --rank-by slot --map-by numa:pe=${OMP_NUM_THREADS} cobaya-run ./projects/XXX/EXAMPLE_EVALUATE1.yaml -f
 
-If users want to make a particular Cosmolike project widely available in Cocoa, implement the following steps:
+If users want to make a particular Cosmolike project widely available in Cocoa, implement the following changes to Cocoa's configuration scripts:
 
 **Step :one:**: Add the following env keys on `set_installation_options.sh`
 
-    [adapted from Cocoa/set_installation_options.sh script]
+    [adapted from Cocoa/set_installation_options.sh shell script]
     
+    # ------------------------------------------------------------------------------
+    # The keys below control which cosmolike projects will be installed and compiled
+    # ------------------------------------------------------------------------------
+    (...)
     #export IGNORE_COSMOLIKE_XXX_CODE=1
 
     (...)
    
+    # ------------------------------------------------------------------------------
+    # Cosmolike projects below -------------------------------------------
+    # ------------------------------------------------------------------------------
+    (...)
     export XXX_URL="https://github.com/.../cocoa_lsst_XXX.git"
     export XXX_NAME="XXX"
     #BRANCH: if unset, load the latest commit on the specified branch
@@ -105,27 +171,37 @@ If users want to make a particular Cosmolike project widely available in Cocoa, 
     #TAG: if unset, load the specified TAG
     #export XXX_TAG="v4.0-beta17"
 
-**Step :two:**: Adapt and add the new defined keys to `flags_impl_unset_keys.sh` 
-
+**Step :two:**: Add all new defined environment keys to `flags_impl_unset_keys.sh` 
+    
     [adapted from Cocoa/installation_scripts/flags_impl_unset_keys.sh]
 
     unset -v XXX_URL XXX_NAME XXX_COMMIT IGNORE_COSMOLIKE_XXX_CODE XXX_TAG XXX_BRANCH
 
-This will ensure that `stop_cocoa.sh` unsets them before exiting Cocoa.
+This will ensure the bash script `stop_cocoa.sh` unsets these keys before unloading Cocoa's `(.local)` environment. Failing to do so will pollute your bash environment.
 
-**Step :three:** Add and adapt the following block to `setup_cosmolike_projects.sh`.
+**Step :three:** Add and adapt the following block of code to the shell script `Cocoa/installation_scripts/setup_cosmolike_projects.sh`.
 
-     [adapted from Cocoa/installation_scripts/setup_cosmolike_projects.sh script]
+     [adapted from Cocoa/installation_scripts/setup_cosmolike_projects.sh shell script]
      
      if [ -z "${IGNORE_COSMOLIKE_XXX_CODE}" ]; then 
-       ptop "GETTING XXX" || return 1
+       
+       PRINTNAME="XXX"
+       
+       ptop "GETTING ${PRINTNAME:?}" || return 1
+
+       FOLDER="${XXX_NAME}"
+       URL="${XXX_URL}"
 
        if [ -n "${XXX_COMMIT}" ]; then
-         gitact2 "${XXX_NAME:?}" "${XXX_URL:?}" "${XXX_COMMIT:?}"  || return 1
-       fi
-
-       pbottom "GETTING XXX" || return 1
-     fi
+         gitact2 "${FOLDER:?}" "${URL:?}" "${XXX_COMMIT:?}"  || return 1
+       elif [ -n "${XXX_BRANCH}" ]; then 
+         gitact1 "${FOLDER:?}" "${URL:?}" "${XXX_BRANCH:?}" || return 1
+      elif [ -n "${XXX_TAG}" ]; then 
+       gitact3 "${FOLDER:?}" "${URL:?}" "${XXX_TAG:?}" || return 1
+      fi
+      
+      pbottom "GETTING ${PRINTNAME:?}" || return 1
+    fi
 
 > [!NOTE]
 > Cocoa contains the scripts
@@ -136,7 +212,7 @@ This will ensure that `stop_cocoa.sh` unsets them before exiting Cocoa.
 > designed to download and compile all Cosmolike projects defined in the `Cocoa/projects` folder.
 
 > [!Warning]
-> Never delete a folder from `projects` without first running `stop_cocoa.sh`; otherwise, Cocoa will have ill-defined links.
+> Never delete a folder from `projects` without first running `stop_cocoa.sh`; otherwise, Cocoa will have ill-defined links to these projects.
 
 ### :interrobang: FAQ: How do we set Weak Lensing YAML files in Cobaya? <a name="appendix_example_runs"></a>
 
@@ -300,9 +376,15 @@ Adapting the LSST_Y1 folder to construct a new project involves many small core 
      NEW_PROJECT="des_y3"
      NEW_SURVEY="DES"
 
-After that, just type
+After that, type
 
-     $(cocoa)(.local) bash transfer_project.sh
+    conda activate cocoa
+    source start_cocoa.sh
+    cd ./projects
+
+and
+
+    bash transfer_project.sh
 
 ## Minor changes: the hard way <a name="appendix_lsst_y1_new_small2"></a> 
 
@@ -310,15 +392,15 @@ After that, just type
 
 **Step 1:** Choose a project name (e.g., project XXX), and copy the `LSST_Y1` project using the command below
     
-    $(cocoa)(.local) cp $ROOTDIR/projects/lsst_y1/ $ROOTDIR/projects/xxx
+    cp "${ROOTDIR:?}"/projects/lsst_y1/ "${ROOTDIR:?}"/projects/xxx
 
 **Step 2:** Remove the git repository associated with LSST_Y1 project
 
-    $(cocoa)(.local) rm -rf $ROOTDIR/projects/$NEW_PROJECT/.git/
+    rm -rf "${ROOTDIR:?}"/projects/$NEW_PROJECT/.git/
 
 ### Changes in the interface folder 
 
-**Step 1:** Change the file `$ROOTDIR/projects/XXX/interface/MakefileCosmolike` following the instructions below
+**Step 1:** Change the file `Cocoa/projects/XXX/interface/MakefileCosmolike` following the instructions below
 
     (...)
      
@@ -353,9 +435,9 @@ After that, just type
     clean:
         @rm -rf cosmolike_lsst_y1_interface.so cosmolike_lsst_y1_interface.so.dSYM  *.o
 
-**Step 2:** Change the name of the File `$ROOTDIR/projects/XXX/interface/cosmolike_lsst_y1_interface.py` using the command below
-    
-    $(cocoa)(.local) mv $ROOTDIR/projects/XXX/interface/cosmolike_lsst_y1_interface.py $ROOTDIR/projects/XXX/interface/cosmolike_XXX_interface.py
+**Step 2:** Change the name of the File `Cocoa/projects/XXX/interface/cosmolike_lsst_y1_interface.py` using the command below
+       
+    mv ${ROOTDIR:?}/projects/XXX/interface/cosmolike_lsst_y1_interface.py ${ROOTDIR:?}/projects/XXX/interface/cosmolike_XXX_interface.py
 
 **Step 3** Changes in the newly created file `$ROOTDIR/projects/XXX/interface/cosmolike_XXX_interface.py` 
 
@@ -364,7 +446,7 @@ After that, just type
         // change cosmolike_lsst_y1_interface.so to cosmolike_XXX_interface.so in the line below 
         __file__ = pkg_resources.resource_filename(__name__,'cosmolike_lsst_y1_interface.so')
         
-**Step 4** Change the file `$ROOTDIR/projects/XXX/interface/interface.cpp` following the instructions below
+**Step 4** Change the file `Cocoa/projects/XXX/interface/interface.cpp` following the instructions below
     
     (...)
     

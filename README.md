@@ -257,7 +257,7 @@ PolyChord:
 > [!NOTE]
 > What should users do if they don't unset ML-related environment keys before running `setup_cocoa.sh` and `compile_cocoa.sh`, as rerunning these scripts can require a long time? Instead, run the following commands.
 >
->      source start_cocoa.sh  # even if (.local) is already active, users must run start_cocoa.sh again to update bash environment values
+>      source start_cocoa.sh # even if (.local) is already active, users must run start_cocoa.sh again to update bash environment values
 > 
 > and
 >
@@ -324,7 +324,7 @@ To avoid excessive compilation or download times during development, users can u
 Everytime users edit `set_installation_options.sh`, they need to reload `(.local)` by rerunning `start_cocoa.sh`. Then, users should run the commands below
 
      cd ./cocoa/Cocoa
-     source start_cocoa.sh   # even if (.local) is already active, users must run start_cocoa.sh again to update bash environment values
+     source start_cocoa.sh # even if (.local) is already active, users must run start_cocoa.sh again to update bash environment values
 
  and
  
@@ -337,7 +337,7 @@ Everytime users edit `set_installation_options.sh`, they need to reload `(.local
      source ./installation_scripts/unxv_act_dr6.sh                 # download and unpack likelihood data
      source ./installation_scripts/unxv_simons_observatory.sh      # download and unpack likelihood data
 
-Finally, cocoa also provide several cosmolike projects. To activate them, manipulate the following lines on `set_installation_options.sh` 
+Finally, cocoa's `set_installation_options.sh` master script includes instructions to install several cosmolike projects. To activate them, manipulate the following lines on `set_installation_options.sh` 
 
      [Adapted from Cocoa/set_installation_options.sh shell script]
 
@@ -358,8 +358,8 @@ Finally, cocoa also provide several cosmolike projects. To activate them, manipu
      # These keys are only relevant if you run setup_cocoa multiple times -----------
      # ------------------------------------------------------------------------------
      (...)
-     export OVERWRITE_EXISTING_COSMOLIKE_CODE=1 # dangerous (possible lost of uncommit work)
-                                                # if unset, users must manually delete cosmolike projects
+     export OVERWRITE_EXISTING_COSMOLIKE_CODE=1 # dangerous (possible loss of uncommitted work)
+                                                # If unset, users must manually delete cosmolike projects
 
      (...)
  
@@ -379,7 +379,7 @@ Finally, cocoa also provide several cosmolike projects. To activate them, manipu
 Everytime users edit `set_installation_options.sh`, they need to reload `(.local)` by rerunning `start_cocoa.sh`. Then, run the following commands:
 
       cd ./cocoa/Cocoa
-      source start_cocoa.sh   # even if (.local) is already active, users must run start_cocoa.sh again to update bash environment values
+      source start_cocoa.sh # even if (.local) is already active, users must run start_cocoa.sh again to update bash environment values
       
  and
  
@@ -575,7 +575,7 @@ Commenting out the environmental flags below *before running* `setup_cocoa.sh` w
 
 In case users have already run `setup_cocoa.sh`, then run the command.
 
-    source start_cocoa.sh  # even if (.local) is already active, users must run start_cocoa.sh again to update bash environment values
+    source start_cocoa.sh # even if (.local) is already active, users must run start_cocoa.sh again to update bash environment values
    
 and
 
