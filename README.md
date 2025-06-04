@@ -120,7 +120,6 @@ Users can now proceed to **the next section**.
 > In case users need to run `setup_cocoa.sh` more than once, Cocoa will not download previously installed packages, cosmolike projects, or large datasets, unless the following keys are set on `set_installation_options.sh`
 >
 >     [Adapted from Cocoa/set_installation_options.sh shell script]
->
 >     # ------------------------------------------------------------------------------
 >     # OVERWRITE_EXISTING_XXX_CODE=1 -> setup_cocoa overwrites existing PACKAGES ----
 >     # overwrite: delete the existing PACKAGE folder and install it again -----------
@@ -282,18 +281,15 @@ PolyChord:
 **Step :one:**: define the `COCOA_OUTPUT_VERBOSE` and `COSMOLIKE_DEBUG_MODE` flags on `set_installation_options.sh` to obtain a more detailed output, as shown below
   
       [Adapted from Cocoa/set_installation_options.sh shell script] 
-
       # ------------------------------------------------------------------------------
       # VERBOSE AS DEBUG TOOL --------------------------------------------------------
       # ------------------------------------------------------------------------------
       export COCOA_OUTPUT_VERBOSE=1
-
       # ------------------------------------------------------------------------------
       # If set, COSMOLIKE will compile with DEBUG flags ------------------------------
       # ------------------------------------------------------------------------------
       export COSMOLIKE_DEBUG_MODE=1
-
-      (....)
+      (...)
 
 **Step :two:**: restart the Cocoa private environment by rerunning `source start_cocoa.sh` (every time users edit `set_installation_options.sh`, they must reload the `(.local)` environment by rerunning `start_cocoa.sh`).
 
@@ -306,16 +302,13 @@ PolyChord:
 To avoid excessive compilation or download times during development, users can use scripts located at `Cocoa/installation_scripts/` to download and compile only specific modules (or datasets). To take full advantage of them, users must first unset the appropriate keys on `set_installation_options.sh`, as exemplified below.
 
      [Adapted from Cocoa/set_installation_options.sh shell script]
-
      # ------------------------------------------------------------------------------
      # The flags below allow users to skip downloading specific datasets ------------
      # ------------------------------------------------------------------------------
      #export IGNORE_ACTDR6_DATA=1                  # ACT-DR6 likelihood data
      (...)
      #export IGNORE_SIMONS_OBSERVATORY_CMB_DATA=1  # SO likelihood data
-
      (...)
-
      # ------------------------------------------------------------------------------
      # The keys below control which packages will be installed and compiled 
      # ------------------------------------------------------------------------------
@@ -332,17 +325,14 @@ Everytime users edit `set_installation_options.sh`, they need to reload `(.local
  
      source ./installation_scripts/setup_act_dr6.sh                # download likelihood code
      source ./installation_scripts/setup_simons_observatory.sh     # download likelihood code
-
      source ./installation_scripts/compile_act_dr6.sh              # compile likelihood code
      source ./installation_scripts/compile_simons_observatory.sh   # compile likelihood code
-     
      source ./installation_scripts/unxv_act_dr6.sh                 # download and unpack likelihood data
      source ./installation_scripts/unxv_simons_observatory.sh      # download and unpack likelihood data
 
 Finally, cocoa's `set_installation_options.sh` master script includes instructions to install several cosmolike projects. To activate them, manipulate the following lines on `set_installation_options.sh` 
 
      [Adapted from Cocoa/set_installation_options.sh shell script]
-
      # ------------------------------------------------------------------------------
      # The keys below control which cosmolike projects will be installed and compiled
      # ------------------------------------------------------------------------------
@@ -350,9 +340,7 @@ Finally, cocoa's `set_installation_options.sh` master script includes instructio
      export IGNORE_COSMOLIKE_DES_Y3_CODE=1
      #export IGNORE_COSMOLIKE_ROMAN_FOURIER_CODE=1
      #export IGNORE_COSMOLIKE_ROMAN_REAL_CODE=1
-
      (...)
-
      # ------------------------------------------------------------------------------
      # OVERWRITE_EXISTING_XXX_CODE=1 -> setup_cocoa overwrites existing PACKAGES ----
      # overwrite: delete the existing PACKAGE folder and install it again -----------
@@ -362,9 +350,7 @@ Finally, cocoa's `set_installation_options.sh` master script includes instructio
      (...)
      export OVERWRITE_EXISTING_COSMOLIKE_CODE=1 # dangerous (possible loss of uncommitted work)
                                                 # If unset, users must manually delete cosmolike projects
-
      (...)
- 
      # ------------------------------------------------------------------------------
      # Cosmolike projects below -------------------------------------------
      # ------------------------------------------------------------------------------
@@ -567,12 +553,10 @@ After that, the `conda` command will be available.
 Commenting out the environmental flags below *before running* `setup_cocoa.sh` will enable the installation of machine-learning-related libraries via pip.  
 
     [Adapted from Cocoa/set_installation_options.sh shell script] 
-     
     # ------------------------------------------------------------------------------
     # If not set, pip_core_packages.sh will install several ML package
     # ------------------------------------------------------------------------------
     #export IGNORE_EMULATOR_GPU_PIP_PACKAGES=1
-    
     (...)
 
 In case users have already run `setup_cocoa.sh`, then run the command.
