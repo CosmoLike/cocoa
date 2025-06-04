@@ -3,7 +3,7 @@
 
 # Table of contents
 1. [Overview](#overview) 
-2. [Installation of core packages via Conda](#required_packages_conda)
+2. [Installation of core packages](#required_packages_conda)
 3. [Installation and Compilation of external modules](#cobaya_base_code)
 4. [Running Examples](#cobaya_base_code_examples)
 5. [Running ML emulators](#cobaya_base_code_examples_emul)
@@ -33,7 +33,7 @@ Our scripts never install packages or Python modules in a global folder such as 
 
 This readme file presents basic and advanced instructions for installing all [Cobaya](https://github.com/CobayaSampler) and [CosmoLike](https://github.com/CosmoLike) components.
 
-# Installation of core packages via Conda <a name="required_packages_conda"></a>
+# Installation of core packages <a name="required_packages_conda"></a>
 
 Core packages include compilers and numerical libraries that users never modify. We install most of these core packages via Conda, as shown below.
 
