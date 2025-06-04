@@ -435,7 +435,7 @@ and
         @rm -rf cosmolike_lsst_y1_interface.so cosmolike_lsst_y1_interface.so.dSYM  *.o # delete this line
         @rm -rf cosmolike_xxx_interface.so cosmolike_xxx_interface.so.dSYM  *.o # add this line
 
-**Step 2:** Change the name of the File `Cocoa/projects/XXX/interface/cosmolike_lsst_y1_interface.py` using the command below
+**Step 2:** Change the name of the File `cosmolike_lsst_y1_interface.py` using the command below
        
     mv "${ROOTDIR:?}"/projects/xxx/interface/cosmolike_lsst_y1_interface.py "${ROOTDIR:?}"/projects/xxx/interface/cosmolike_xxx_interface.py
 
@@ -443,7 +443,7 @@ and remove any previously compiled dynamic library
 
     rm -f  "${ROOTDIR:?}"/projects/xxx/interface/cosmolike_lsst_y1_interface.so
     
-**Step 3** Change the newly created file `Cocoa/projects/xxx/interface/cosmolike_xxx_interface.py` following the instructions below
+**Step 3** Change the newly created file `cosmolike_xxx_interface.py` following the instructions below
 
 	[adapted from Cocoa/projects/lsst_y1/interface/cosmolike_xxx_interface.py]
     def __bootstrap__():
@@ -461,17 +461,17 @@ and remove any previously compiled dynamic library
         m.doc() = "CosmoLike Interface for XXX 3x2pt Module"; # add this line   
        (...)
     
-### Changes in the script folder
+### Changes in the `Cocoa/projects/xxx/scripts` folder
 
-**Step 1:** Change the name of the file `Cocoa/projects/xx/scripts/compile_lsst_y1.sh` using the command below 
+**Step 1:** Change the name of the file `compile_lsst_y1.sh` using the command below 
     
     mv "${ROOTDIR:?}"/projects/xxx/scripts/compile_lsst_y1.sh "${ROOTDIR:?}"/projects/xxx/scripts/compile_xxx.sh
     
-**Step 2:** Change the name of the file `$ROOTDIR/projects/xx/scripts/start_lsst_y1.sh` using the command below 
+**Step 2:** Change the name of the file `start_lsst_y1.sh` using the command below 
     
     mv "${ROOTDIR:?}"/projects/xxx/scripts/start_lsst_y1.sh "${ROOTDIR:?}"/projects/xxx/scripts/start_xxx.sh
     
-**Step 3:** Change the name of the file `Cocoa/projects/xxx/scripts/stop_lsst_y1.sh` using the command below 
+**Step 3:** Change the name of the file `stop_lsst_y1.sh` using the command below 
     
     mv "${ROOTDIR:?}"/projects/xxx/scripts/stop_lsst_y1.sh "${ROOTDIR:?}"/projects/xxx/scripts/stop_xxx.sh
 
