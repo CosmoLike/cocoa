@@ -98,7 +98,7 @@ Every time `set_installation_options.sh` is edited, users need to reload `(.loca
  and then
  
       source ./installation_scripts/setup_cosmolike_projects.sh   # download all cosmolike projects  
-      source ./installation_scripts/compile_all_projects.sh           # compile  all cosmolike project
+      source ./installation_scripts/compile_all_projects.sh       # compile  all cosmolike project
 
 In case users only want to compile a single cosmolike project (let's say the `roman_real` project)
 
@@ -415,16 +415,14 @@ and
 **Step 1:** Change the file `Cocoa/projects/xxx/interface/MakefileCosmolike` following the instructions below (replace all instances of `lsst_y1` with `xxx`
 
     [adapted from Cocoa/projects/lsst_y1/interface/MakefileCosmolike line ~118]
-     
-    all:  shared
     shared: cosmolike_lsst_y1_interface.so # delete this line
-    shared: cosmolike_xxx_interface.so       # add this line
+    shared: cosmolike_xxx_interface.so     # add this line
 
 and
 
     [adapted from Cocoa/projects/lsst_y1/interface/MakefileCosmolike line ~172]
     cosmolike_lsst_y1_interface.so: $(OBJECTC) $(CSOURCES) interface.cpp # delete this line
-    cosmolike_xxx_interface.so: $(OBJECTC) $(CSOURCES) interface.cpp       # add this line
+    cosmolike_xxx_interface.so: $(OBJECTC) $(CSOURCES) interface.cpp     # add this line
         $(CXX) $(CXXFLAGS) -DCOBAYA_SAMPLER -shared -fPIC -o $@ $(OBJECTC) interface.cpp $(LDFLAGS)
         @rm *.o
     
@@ -433,7 +431,7 @@ and
      [adapted from Cocoa/projects/lsst_y1/interface/MakefileCosmolike line ~176]
      clean:
         @rm -rf cosmolike_lsst_y1_interface.so cosmolike_lsst_y1_interface.so.dSYM  *.o # delete this line
-        @rm -rf cosmolike_xxx_interface.so cosmolike_xxx_interface.so.dSYM  *.o # add this line
+        @rm -rf cosmolike_xxx_interface.so cosmolike_xxx_interface.so.dSYM  *.o         # add this line
 
 **Step 2:** Change the name of the File `cosmolike_lsst_y1_interface.py` using the command below
        
@@ -449,7 +447,7 @@ and remove any previously compiled dynamic library
     def __bootstrap__():
         (...)
         __file__ = pkg_resources.resource_filename(__name__,'cosmolike_lsst_y1_interface.so') # delete this line
-        __file__ = pkg_resources.resource_filename(__name__,'cosmolike_xxx_interface.so') # add this line
+        __file__ = pkg_resources.resource_filename(__name__,'cosmolike_xxx_interface.so')     # add this line
         
 **Step 4** Change the file `Cocoa/projects/XXX/interface/interface.cpp` following the instructions below
     
@@ -458,7 +456,7 @@ and remove any previously compiled dynamic library
     PYBIND11_MODULE(cosmolike_xxx_interface, m) # add this line
     {
         m.doc() = "CosmoLike Interface for LSST_Y1 3x2pt Module"; # delete this line
-        m.doc() = "CosmoLike Interface for XXX 3x2pt Module"; # add this line   
+        m.doc() = "CosmoLike Interface for XXX 3x2pt Module";     # add this line   
        (...)
     
 ### Changes in the `Cocoa/projects/xxx/scripts` folder
