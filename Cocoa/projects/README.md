@@ -462,7 +462,7 @@ Users can also use the following command to perform the required substitutions.
 
     cd "${ROOTDIR:?}"/projects/xxx/interface/
     sed --in-place --regexp-extended "s@lsst_y1@xxx@g" interface.cpp
-    sed --in-place --regexp-extended "s@LSST_Y1@XXX@g" interface.cpp
+    sed --in-place --regexp-extended "s@LSST-Y1@XXX@g" interface.cpp
     
 ### Changes in the `Cocoa/projects/xxx/scripts` folder
 
