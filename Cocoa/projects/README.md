@@ -421,6 +421,11 @@ and
         @rm -rf cosmolike_lsst_y1_interface.so cosmolike_lsst_y1_interface.so.dSYM  *.o # delete this line
         @rm -rf cosmolike_xxx_interface.so cosmolike_xxx_interface.so.dSYM  *.o         # add this line
 
+Users can also use the following command to perform the required substitutions.
+
+    cd "${ROOTDIR:?}"/projects/xxx/interface/
+    sed --in-place --regexp-extended "s@lsst_y1@xxx@g" MakefileCosmolike
+    
 **Step 2:** Change the name of the file `cosmolike_lsst_y1_interface.py` using the command below
        
     mv "${ROOTDIR:?}"/projects/xxx/interface/cosmolike_lsst_y1_interface.py "${ROOTDIR:?}"/projects/xxx/interface/cosmolike_xxx_interface.py
@@ -436,7 +441,13 @@ and remove any previously compiled dynamic library
         (...)
         __file__ = pkg_resources.resource_filename(__name__,'cosmolike_lsst_y1_interface.so') # delete this line
         __file__ = pkg_resources.resource_filename(__name__,'cosmolike_xxx_interface.so')     # add this line
-        
+
+
+Users can also use the following command to perform the required substitutions.
+
+    cd "${ROOTDIR:?}"/projects/xxx/interface/
+    sed --in-place --regexp-extended "s@lsst_y1@xxx@g" cosmolike_xxx_interface.py
+    
 **Step 4** Change the file `Cocoa/projects/XXX/interface/interface.cpp` following the instructions below
     
     [adapted from Cocoa/projects/lsst_y1/interface/interface.cpp line ~43]
@@ -446,6 +457,12 @@ and remove any previously compiled dynamic library
         m.doc() = "CosmoLike Interface for LSST_Y1 3x2pt Module"; # delete this line
         m.doc() = "CosmoLike Interface for XXX 3x2pt Module";     # add this line   
        (...)
+       
+Users can also use the following command to perform the required substitutions.
+
+    cd "${ROOTDIR:?}"/projects/xxx/interface/
+    sed --in-place --regexp-extended "s@lsst_y1@xxx@g" interface.cpp
+    sed --in-place --regexp-extended "s@LSST_Y1@XXX@g" interface.cpp
     
 ### Changes in the `Cocoa/projects/xxx/scripts` folder
 
@@ -464,25 +481,31 @@ and remove any previously compiled dynamic library
 **Step 4:** Change the file `compile_xxx.sh` following the instructions below
 
     [adapted from Cocoa/projects/lsst_y1/scripts/compile_lsst_y1.sh line ~4;43;65]
-    if [ -z "${IGNORE_COSMOLIKE_LSSTY1_CODE}" ]; then # delete this line
-    if [ -z "${IGNORE_COSMOLIKE_XXX_CODE}" ]; then    # add this line
+    if [ -z "${IGNORE_COSMOLIKE_LSST_Y1_CODE}" ]; then # delete this line
+    if [ -z "${IGNORE_COSMOLIKE_XXX_CODE}" ]; then     # add this line
         (...)
 	FOLDER="${LSST_Y1_NAME:-"lsst_y1"}" # delete this line
         FOLDER="${XXX_NAME:-"xxx"}"         # add this line
         (...)
         PRINTNAME="LSST_Y1"  # delete this line
         PRINTNAME="XXX"      # add this line
-     
+
+Users can also use the following command to perform the required substitutions.
+
+    cd "${ROOTDIR:?}"/projects/xxx/scripts/
+    sed --in-place --regexp-extended "s@LSST_Y1@XXX@g" compile_xxx.sh
+    sed --in-place --regexp-extended "s@lsst_y1@xxx@g" compile_xxx.sh
+    
 **Step 5:** Change the file `start_xxx.sh` following the instructions below
 
     [adapted from Cocoa/projects/lsst_y1/scripts/start_lsst_y1.sh line ~4;13]
     if [ -z "${IGNORE_COSMOLIKE_LSST_Y1_CODE}" ]; then # delete this line
-    if [ -z "${IGNORE_COSMOLIKE_XXX_CODE}" ]; then    # add this line
+    if [ -z "${IGNORE_COSMOLIKE_XXX_CODE}" ]; then     # add this line
         (...)
 	FOLDER="${LSST_Y1_NAME:-"lsst_y1"}" # delete this line
         FOLDER="${XXX_NAME:-"xxx"}"         # add this line
 
-Users can also use the following command to perform the substitution
+Users can also use the following command to perform the required substitutions.
 
     cd "${ROOTDIR:?}"/projects/xxx/scripts/
     sed --in-place --regexp-extended "s@LSST_Y1@XXX@g" start_xxx.sh
@@ -503,7 +526,7 @@ Users can also use the following command to perform the substitution
 > If the project name `xxx` contains more than the experiment name (e.g., the release year), we suggest assigned `survey` to just the experiment name. For example, if `XXX = DES_Y3`, then assigned `survey = "DES"`.
 >
 
-Users can perform most of the replacements listed above by running the following commands.
+Users can perform the required replacements by running the following commands.
  
     cd "${ROOTDIR:?}"/projects/xxx/likelihood/
     sed --in-place --regexp-extended "s@lsst_y1@xxx@g" _cosmolike_prototype_base.sh
@@ -520,7 +543,7 @@ Users can perform most of the replacements listed above by running the following
 
 Users should perform similar changes to `combo_2x2pt.py`, `combo_xi_gg.py`, `combo_xi_ggl.py`, and `cosmic_shear.py`.
 
-Finally, users can perform the replacements listed above by running the following commands.
+Finally, users can perform the required replacements by running the following commands.
  
     cd "${ROOTDIR:?}"/projects/xxx/likelihood/
     sed --in-place --regexp-extended "s@lsst_y1@xxx@g" combo_3x2pt.py
@@ -543,7 +566,7 @@ Finally, users can perform the replacements listed above by running the followin
 
 Users should perform similar changes to `combo_2x2pt.yaml`, `combo_xi_gg.yaml`, `combo_xi_ggl.yaml`, and `cosmic_shear.yaml`.
 
-Finally, users can perform most of the replacements listed above by running the following commands.
+Finally, users can perform most of the required replacements by running the following commands.
  
     cd "${ROOTDIR:?}"/projects/xxx/likelihood/
     sed --in-place --regexp-extended "s@lsst_y1@xxx@g" combo_3x2pt.yaml
@@ -571,7 +594,7 @@ Finally, users can perform most of the replacements listed above by running the 
      
      (...) # Don't forget to rename ALL parameters
 
-Finally, users can perform the replacements listed above by running the following commands.
+Finally, users can perform the required replacements by running the following commands.
 
     cd "${ROOTDIR:?}"/projects/xxx/likelihood/
     sed --in-place --regexp-extended "s@LSST@XXX@g" params_lens.yaml
@@ -606,3 +629,63 @@ Finally, users can perform the replacements listed above by running the followin
     theta_min_arcmin = 2.5
     theta_max_arcmin = 900.
     baryon_pca_file = pca.txt
+
+### Changes in the `Cocoa/projects/` main folder
+
+**Step 1:** Change the file `EXAMPLE_EVALUATE1.yaml` following the instructions below
+
+    [adapted from Cocoa/projects/lsst_y1/EXAMPLE_EVALUATE1.yaml line ~5-15]
+    likelihood:
+        lsst_y1.cosmic_shear:
+            path: ./external_modules/data/lsst_y1
+            data_file: lsst_y1_M1_GGL0.05.dataset   # 705 non-masked elements  (EE2 delta chi^2 ~ 11.8) # delete this line
+	    data_file: xxx_M1_GGL0.05.dataset   # 705 non-masked elements  (EE2 delta chi^2 ~ 11.8) # delete this line
+ 	    (...)
+    	    print_datavector_file: "./projects/lsst_y1/chains/example1_lsst_y1_theory.modelvector"  # delete this line
+	    print_datavector_file: "./projects/xxx/chains/example1_lsst_y1_theory.modelvector"  # add this line
+    	    (...)
+    (...)
+    params:
+        LSST_A2_1: # delete this line
+	XXX_A2_1:  # add this line
+	    (...)
+            latex: A_\mathrm{2-IA,LSST}^1  # delete this line
+	    latex: A_\mathrm{2-IA,XXX}^1   # add this line
+        (...) # Change similar parameters that follow this one
+    (...)
+    sampler:
+        evaluate:
+            N: 1
+            override:
+                As_1e9: 2.1
+                (...)
+                LSST_DZ_S1: 0.0414632  # delete this line
+		XXX_DZ_S1: 0.0414632  # add this line
+                (...) # Change similar parameters that follow this one
+
+    output: ./projects/lsst_y1/chains/EXAMPLE_EVALUATE1 # delete this line
+    output: ./projects/xxx/chains/EXAMPLE_EVALUATE1     # add this line
+
+Users should perform similar changes to `EXAMPLE_EVALUATE[2-5].yaml`, and EXAMPLE_MCMC[1-4].yaml`
+
+Finally, users can perform the required replacements by running the following commands.
+
+    cd "${ROOTDIR:?}"/projects/xxx/
+    sed --in-place --regexp-extended "s@lsst_y1@xxx@g" EXAMPLE_EVALUATE1.yaml
+    sed --in-place --regexp-extended "s@LSST@XXX@g" EXAMPLE_EVALUATE1.yaml
+    sed --in-place --regexp-extended "s@lsst_y1@xxx@g" EXAMPLE_EVALUATE2.yaml
+    sed --in-place --regexp-extended "s@LSST@XXX@g" EXAMPLE_EVALUATE2.yaml
+    sed --in-place --regexp-extended "s@lsst_y1@xxx@g" EXAMPLE_EVALUATE3.yaml
+    sed --in-place --regexp-extended "s@LSST@XXX@g" EXAMPLE_EVALUATE3.yaml
+    sed --in-place --regexp-extended "s@lsst_y1@xxx@g" EXAMPLE_EVALUATE4.yaml
+    sed --in-place --regexp-extended "s@LSST@XXX@g" EXAMPLE_EVALUATE4.yaml
+    sed --in-place --regexp-extended "s@lsst_y1@xxx@g" EXAMPLE_EVALUATE5.yaml
+    sed --in-place --regexp-extended "s@LSST@XXX@g" EXAMPLE_EVALUATE5.yaml
+    sed --in-place --regexp-extended "s@lsst_y1@xxx@g" EXAMPLE_MCMC1.yaml
+    sed --in-place --regexp-extended "s@LSST@XXX@g" EXAMPLE_MCMC1.yaml
+    sed --in-place --regexp-extended "s@lsst_y1@xxx@g" EXAMPLE_MCMC2.yaml
+    sed --in-place --regexp-extended "s@LSST@XXX@g" EXAMPLE_MCMC2.yaml
+    sed --in-place --regexp-extended "s@lsst_y1@xxx@g" EXAMPLE_MCMC3.yaml
+    sed --in-place --regexp-extended "s@LSST@XXX@g" EXAMPLE_MCMC3.yaml
+    sed --in-place --regexp-extended "s@lsst_y1@xxx@g" EXAMPLE_MCMC4.yaml
+    sed --in-place --regexp-extended "s@LSST@XXX@g" EXAMPLE_MCMC4.yaml
