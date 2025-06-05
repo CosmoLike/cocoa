@@ -520,7 +520,7 @@ Users can also use the following command to perform the required substitutions.
     import cosmolike_xxx_interface as ci     #add this line
 
     survey = "LSST"  #delete this line
-    survey = "xxx"   # add this line
+    survey = "XXX"   #add this line - not here XXX is capitalized
 
 > [!Tip]
 > If the project name `xxx` contains more than the experiment name (e.g., the release year), we suggest assigned `survey` to just the experiment name. For example, if `XXX = DES_Y3`, then assigned `survey = "DES"`.
@@ -530,7 +530,7 @@ Users can perform the required replacements by running the following commands.
  
     cd "${ROOTDIR:?}"/projects/xxx/likelihood/
     sed --in-place --regexp-extended "s@lsst_y1@xxx@g" _cosmolike_prototype_base.sh
-    sed --in-place --regexp-extended "s@LSST@xxx@g" _cosmolike_prototype_base.sh
+    sed --in-place --regexp-extended "s@LSST@XXX@g" _cosmolike_prototype_base.sh
 
 **Step 2:** Change the file `combo_3x2pt.py` following the instructions below
 
@@ -579,7 +579,7 @@ Finally, users can perform most of the required replacements by running the foll
 
     [adapted from Cocoa/projects/lsst_y1/likelihood/params_lens.yaml lines ~2-12]
     LSST_DZ_L1:  # delete this line
-    XX_DZ_L1:    # add this line
+    XXX_DZ_L1:   # add this line - note here XXX is capitalized
         prior:
             dist: norm
             loc: 0.0
