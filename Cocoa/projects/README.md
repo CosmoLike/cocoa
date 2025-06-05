@@ -476,11 +476,17 @@ and remove any previously compiled dynamic library
 **Step 5:** Change the file `start_xxx.sh` following the instructions below
 
     [adapted from Cocoa/projects/lsst_y1/scripts/start_lsst_y1.sh line ~4;13]
-    if [ -z "${IGNORE_COSMOLIKE_LSSTY1_CODE}" ]; then # delete this line
+    if [ -z "${IGNORE_COSMOLIKE_LSST_Y1_CODE}" ]; then # delete this line
     if [ -z "${IGNORE_COSMOLIKE_XXX_CODE}" ]; then    # add this line
         (...)
 	FOLDER="${LSST_Y1_NAME:-"lsst_y1"}" # delete this line
         FOLDER="${XXX_NAME:-"xxx"}"         # add this line
+
+Users can also use the following command to perform the substitution
+
+    cd "${ROOTDIR:?}"/projects/xxx/scripts/
+    sed --in-place --regexp-extended "s@LSST_Y1@XXX@g" start_xxx.sh
+    sed --in-place --regexp-extended "s@lsst_y1@xxx@g" start_xxx.sh
 
 ### Changes in the `Cocoa/projects/xxx/likelihood` folder
 
@@ -495,6 +501,13 @@ and remove any previously compiled dynamic library
 
 > [!Tip]
 > If the project name `xxx` contains more than the experiment name (e.g., the release year), we suggest assigned `survey` to just the experiment name. For example, if `XXX = DES_Y3`, then assigned `survey = "DES"`.
+>
+
+Users can perform most of the replacements listed above by running the following commands.
+ 
+    cd "${ROOTDIR:?}"/projects/xxx/likelihood/
+    sed --in-place --regexp-extended "s@lsst_y1@xxx@g" _cosmolike_prototype_base.sh
+    sed --in-place --regexp-extended "s@LSST@xxx@g" _cosmolike_prototype_base.sh
 
 **Step 2:** Change the file `combo_3x2pt.py` following the instructions below
 
@@ -506,10 +519,19 @@ and remove any previously compiled dynamic library
     import cosmolike_xxx_interface as ci     # add this line
 
 Users should perform similar changes to `combo_2x2pt.py`, `combo_xi_gg.py`, `combo_xi_ggl.py`, and `cosmic_shear.py`.
+
+Finally, users can perform the replacements listed above by running the following commands.
+ 
+    cd "${ROOTDIR:?}"/projects/xxx/likelihood/
+    sed --in-place --regexp-extended "s@lsst_y1@xxx@g" combo_3x2pt.py
+    sed --in-place --regexp-extended "s@lsst_y1@xxx@g" combo_2x2pt.py
+    sed --in-place --regexp-extended "s@lsst_y1@xxx@g" combo_xi_gg.py
+    sed --in-place --regexp-extended "s@lsst_y1@xxx@g" combo_xi_ggl.py
+    sed --in-place --regexp-extended "s@lsst_y1@xxx@g" cosmic_shear.py
     
 **Step 3:** Change the file `combo_3x2pt.yaml` following the instructions below
    
-    [adapted from Cocoa/projects/lsst_y1/likelihood/combo_3x2pt.py lines ~2;30;31]
+    [adapted from Cocoa/projects/lsst_y1/likelihood/combo_3x2pt.yaml lines ~2;30;31]
     data_file: lsst_y1_M1_GGL0.05.dataset #delete this line
     data_file: xxx_yyy.dataset            #add and adapt this line; yyy = the adopted scale cuts
     (...)
@@ -521,7 +543,16 @@ Users should perform similar changes to `combo_2x2pt.py`, `combo_xi_gg.py`, `com
 
 Users should perform similar changes to `combo_2x2pt.yaml`, `combo_xi_gg.yaml`, `combo_xi_ggl.yaml`, and `cosmic_shear.yaml`.
 
-**Step 4:** Rename the prefix `LSST_` of all lens and source-related parameters, located on `params_lens.yaml` and `params_source.yaml`, as shown below. 
+Finally, users can perform most of the replacements listed above by running the following commands.
+ 
+    cd "${ROOTDIR:?}"/projects/xxx/likelihood/
+    sed --in-place --regexp-extended "s@lsst_y1@xxx@g" combo_3x2pt.yaml
+    sed --in-place --regexp-extended "s@lsst_y1@xxx@g" combo_2x2pt.yaml
+    sed --in-place --regexp-extended "s@lsst_y1@xxx@g" combo_xi_gg.yaml
+    sed --in-place --regexp-extended "s@lsst_y1@xxx@g" combo_xi_ggl.yaml
+    sed --in-place --regexp-extended "s@lsst_y1@xxx@g" cosmic_shear.yaml
+    
+**Step 4:** Rename the prefix `LSST_` of all lens and source-related parameters by running the commands below. 
 
     [adapted from Cocoa/projects/lsst_y1/likelihood/params_lens.yaml lines ~2-12]
     LSST_DZ_L1:  # delete this line
@@ -539,6 +570,12 @@ Users should perform similar changes to `combo_2x2pt.yaml`, `combo_xi_gg.yaml`, 
 	latex: \Delta z_\mathrm{l,XXX}^1 # delete this line
      
      (...) # Don't forget to rename ALL parameters
+
+Finally, users can perform the replacements listed above by running the following commands.
+
+    cd "${ROOTDIR:?}"/projects/xxx/likelihood/
+    sed --in-place --regexp-extended "s@LSST@XXX@g" params_lens.yaml
+    sed --in-place --regexp-extended "s@LSST@XXX@g" params_source.yaml
          
 ### Changes in the `Cocoa/projects/xxx/data` folder
 
