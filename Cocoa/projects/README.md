@@ -197,7 +197,7 @@ This will ensure the bash script `stop_cocoa.sh` unsets these keys before unload
 > Cocoa contains the scripts
 >
 >      Cocoa/installation_scripts/setup_cosmolike_projects.sh.  # download cosmolike projects set on set_installation_options.sh
->      Cocoa/installation_scripts/compile_all_projects.sh            # finds and compiles all cosmolike projects located on Cocoa/projects
+>      Cocoa/installation_scripts/compile_all_projects.sh       # finds and compiles all cosmolike projects located on Cocoa/projects
 > 
 > designed to download and compile all Cosmolike projects defined in the `Cocoa/projects` folder.
 
@@ -434,8 +434,8 @@ and
 and
 
     [adapted from Cocoa/projects/lsst_y1/interface/MakefileCosmolike line ~172]
-    cosmolike_lsst_y1_interface.so: $(OBJECTC) $(CSOURCES) interface.cpp # delete this line
-    cosmolike_xxx_interface.so: $(OBJECTC) $(CSOURCES) interface.cpp     # add this line
+    cosmolike_lsst_y1_interface.so: $(OBJECTC) $(CSOURCES) interface.cpp  # delete this line
+    cosmolike_xxx_interface.so: $(OBJECTC) $(CSOURCES) interface.cpp      # add this line
         $(CXX) $(CXXFLAGS) -DCOBAYA_SAMPLER -shared -fPIC -o $@ $(OBJECTC) interface.cpp $(LDFLAGS)
         @rm *.o
     
