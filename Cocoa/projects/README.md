@@ -354,26 +354,51 @@ Below, we provide an example YAML configuration for an MCMC chain with DES 3x2pt
 
 Adapting the LSST_Y1 folder to construct a new project involves many small core changes and a few major ones. They are tedious but straightforward. The easier way to apply the minor core changes to the code is via the bash script *transfer_project.sh*.
 
+And, of course, it goes without saying that the bash script *transfer_project.sh* only renames the prefix of variables and files; it does not modify the data vectors, covariance matrices, masking, or redshift distributions associated with a new survey.
+
 ## The easy way <a name="appendix_lsst_y1_new_small"></a> 
 
- To properly use the bash script *transfer_project.sh*., users must set the following variables at the beginning of the file:
+**Step 1:** Initialize cocoa environments.
 
-     OLD_PROJECT="lsst_y1"
-     OLD_SURVEY="LSST"
+    cd ./cocoa/Cocoa
 
-     NEW_PROJECT="des_y3"
-     NEW_SURVEY="DES"
-
-After that, type
-
+and
+	
     conda activate cocoa
-    source start_cocoa.sh
-    cd ./projects
 
 and
 
-    bash transfer_project.sh
+    source start_cocoa.sh
 
+ **Step 2:** Edit the file *copy_and_rename_project.sh*, following the instructions below
+
+    [adapted from Cocoa/projects/copy_and_rename_project.sh line ~7-11]
+    OLD_PROJECT="lsst_y1"
+    OLD_SURVEY="LSST"
+
+    NEW_PROJECT="xxx"  # edit this line
+    NEW_SURVEY="XXX"   # edit this line (Survey name should be capitalized)
+
+ **Step 3:** Run the bash script *copy_and_rename_project.sh*
+
+    bash ./projects/copy_and_rename_project.sh
+
+ **Step 4:** Reload the cocoa environment `(.local)`
+
+     source start_cocoa.sh # even if (.local) is already active, users must run start_cocoa.sh again to update bash environment values
+
+**Step 5:** Compile the new `xxx` project to test the change of variables
+
+    source ./projects/xxx/scripts/compile_xxx.sh
+
+**Step 6:** Run an example evaluation to test the change of variable names
+
+    source ./projects/xxx/scripts/compile_xxx.sh
+
+and
+    
+    mpirun -n 1 --oversubscribe --mca pml ^ucx --mca btl vader,tcp,self --bind-to core:overload-allowed --rank-by slot --map-by numa:pe=${OMP_NUM_THREADS} cobaya-run ./projects/xxx/EXAMPLE_EVALUATE1.yaml -f
+    
 ## The hard way <a name="appendix_lsst_y1_new_small2"></a> 
 
 ### Create the new project
