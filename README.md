@@ -2,8 +2,8 @@
 <img width="780" alt="Screenshot 2024-09-16 at 10 55 14 PM" src="https://github.com/user-attachments/assets/f327e3bf-22c7-46e4-9bb5-14c8e7afc4c1">
 
 # Table of contents
-1. [Overview of the Cobaya-CosmoLike Joint Architecture (Cocoa)](#overview) 
-2. [Installation of core packages via Conda](#required_packages_conda)
+1. [Overview](#overview) 
+2. [Installation of core packages](#required_packages_conda)
 3. [Installation and Compilation of external modules](#cobaya_base_code)
 4. [Running Examples](#cobaya_base_code_examples)
 5. [Running ML emulators](#cobaya_base_code_examples_emul)
@@ -15,15 +15,15 @@
     4. [FAQ: How do we use an available Anaconda module on HPC?](#overview_anaconda)
     5. [FAQ: How do we install Conda?](#overview_miniconda)
     6. [FAQ: How do we set the environment for Machine Learning projects?](#ml_emulators)
-    7. [FAQ: How do we push changes to the Cocoa main branch? A few git hacks](#push_main)
+    7. [FAQ: How do we push changes to the Cocoa main branch?](#push_main)
     8. [FAQ: How do we develop from a Git tag? A few more Git hacks](#dev_from_tag)
-    9. [FAQ: How do we download modern CMB data? (external readme)](Cocoa/external_modules/data)
-   10. [FAQ: How do we switch Cocoa's adopted CAMB/CLASS/Polychord? (external readme)](Cocoa/external_modules/code)
+    9. [FAQ: How do we download additional likelihood data? (external readme)](Cocoa/external_modules/data)
+   10. [FAQ: Where do we find common FAQs about external modules? (external readme)](Cocoa/external_modules/code)
    11. [FAQ: Where do we find common FAQs about Cosmolike? (external readme)](Cocoa/projects/)
    12. [FAQ: How can we improve our Bash/C/C++ knowledge?](#lectnotes)
    13. [Credits](#appendix_proper_credits)
 
-# Overview of the [Cobaya](https://github.com/CobayaSampler)-[CosmoLike](https://github.com/CosmoLike) Joint Architecture (Cocoa) <a name="overview"></a>
+# Overview <a name="overview"></a>
 
 Cocoa allows users to run [CosmoLike](https://github.com/CosmoLike) routines inside the [Cobaya](https://github.com/CobayaSampler) framework. [CosmoLike](https://github.com/CosmoLike) can analyze data primarily from the [Dark Energy Survey](https://www.darkenergysurvey.org) and simulate future multi-probe analyses for LSST and Roman Space Telescope. 
 
@@ -33,7 +33,7 @@ Our scripts never install packages or Python modules in a global folder such as 
 
 This readme file presents basic and advanced instructions for installing all [Cobaya](https://github.com/CobayaSampler) and [CosmoLike](https://github.com/CosmoLike) components.
 
-# Installation of core packages via Conda <a name="required_packages_conda"></a>
+# Installation of core packages <a name="required_packages_conda"></a>
 
 Core packages include compilers and numerical libraries that users never modify. We install most of these core packages via Conda, as shown below.
 
@@ -120,7 +120,6 @@ Users can now proceed to **the next section**.
 > In case users need to run `setup_cocoa.sh` more than once, Cocoa will not download previously installed packages, cosmolike projects, or large datasets, unless the following keys are set on `set_installation_options.sh`
 >
 >     [Adapted from Cocoa/set_installation_options.sh shell script]
->
 >     # ------------------------------------------------------------------------------
 >     # OVERWRITE_EXISTING_XXX_CODE=1 -> setup_cocoa overwrites existing PACKAGES ----
 >     # overwrite: delete the existing PACKAGE folder and install it again -----------
@@ -282,18 +281,15 @@ PolyChord:
 **Step :one:**: define the `COCOA_OUTPUT_VERBOSE` and `COSMOLIKE_DEBUG_MODE` flags on `set_installation_options.sh` to obtain a more detailed output, as shown below
   
       [Adapted from Cocoa/set_installation_options.sh shell script] 
-
       # ------------------------------------------------------------------------------
       # VERBOSE AS DEBUG TOOL --------------------------------------------------------
       # ------------------------------------------------------------------------------
       export COCOA_OUTPUT_VERBOSE=1
-
       # ------------------------------------------------------------------------------
       # If set, COSMOLIKE will compile with DEBUG flags ------------------------------
       # ------------------------------------------------------------------------------
       export COSMOLIKE_DEBUG_MODE=1
-
-      (....)
+      (...)
 
 **Step :two:**: restart the Cocoa private environment by rerunning `source start_cocoa.sh` (every time users edit `set_installation_options.sh`, they must reload the `(.local)` environment by rerunning `start_cocoa.sh`).
 
@@ -306,16 +302,13 @@ PolyChord:
 To avoid excessive compilation or download times during development, users can use scripts located at `Cocoa/installation_scripts/` to download and compile only specific modules (or datasets). To take full advantage of them, users must first unset the appropriate keys on `set_installation_options.sh`, as exemplified below.
 
      [Adapted from Cocoa/set_installation_options.sh shell script]
-
      # ------------------------------------------------------------------------------
      # The flags below allow users to skip downloading specific datasets ------------
      # ------------------------------------------------------------------------------
      #export IGNORE_ACTDR6_DATA=1                  # ACT-DR6 likelihood data
      (...)
      #export IGNORE_SIMONS_OBSERVATORY_CMB_DATA=1  # SO likelihood data
-
      (...)
-
      # ------------------------------------------------------------------------------
      # The keys below control which packages will be installed and compiled 
      # ------------------------------------------------------------------------------
@@ -332,17 +325,14 @@ Everytime users edit `set_installation_options.sh`, they need to reload `(.local
  
      source ./installation_scripts/setup_act_dr6.sh                # download likelihood code
      source ./installation_scripts/setup_simons_observatory.sh     # download likelihood code
-
      source ./installation_scripts/compile_act_dr6.sh              # compile likelihood code
      source ./installation_scripts/compile_simons_observatory.sh   # compile likelihood code
-     
      source ./installation_scripts/unxv_act_dr6.sh                 # download and unpack likelihood data
      source ./installation_scripts/unxv_simons_observatory.sh      # download and unpack likelihood data
 
 Finally, cocoa's `set_installation_options.sh` master script includes instructions to install several cosmolike projects. To activate them, manipulate the following lines on `set_installation_options.sh` 
 
      [Adapted from Cocoa/set_installation_options.sh shell script]
-
      # ------------------------------------------------------------------------------
      # The keys below control which cosmolike projects will be installed and compiled
      # ------------------------------------------------------------------------------
@@ -350,9 +340,7 @@ Finally, cocoa's `set_installation_options.sh` master script includes instructio
      export IGNORE_COSMOLIKE_DES_Y3_CODE=1
      #export IGNORE_COSMOLIKE_ROMAN_FOURIER_CODE=1
      #export IGNORE_COSMOLIKE_ROMAN_REAL_CODE=1
-
      (...)
-
      # ------------------------------------------------------------------------------
      # OVERWRITE_EXISTING_XXX_CODE=1 -> setup_cocoa overwrites existing PACKAGES ----
      # overwrite: delete the existing PACKAGE folder and install it again -----------
@@ -362,9 +350,7 @@ Finally, cocoa's `set_installation_options.sh` master script includes instructio
      (...)
      export OVERWRITE_EXISTING_COSMOLIKE_CODE=1 # dangerous (possible loss of uncommitted work)
                                                 # If unset, users must manually delete cosmolike projects
-
      (...)
- 
      # ------------------------------------------------------------------------------
      # Cosmolike projects below -------------------------------------------
      # ------------------------------------------------------------------------------
@@ -405,7 +391,7 @@ We provide the Docker image [whovian-cocoa](https://hub.docker.com/r/vivianmiran
 
     docker run --platform linux/amd64 --hostname cocoa --name cocoa2025 -it -p 8888:8888 -v $(pwd):/home/whovian/host/ -v ~/.ssh:/home/whovian/.ssh:ro vivianmiranda/whovian-cocoa
 
-This is a large image with a size of approximately 16GB, as it already contains the cocoa `v4.0beta26` installed and pre-compiled. 
+This is a large image with a size of approximately 16GB, as it already contains the Cocoa version `v4.0beta26` installed and pre-compiled. 
 
  **Step :three:**: As shown in the picture below, users can follow the instructions provided in Section [Running Examples](#cobaya_base_code_examples) to run a few non-cosmolike-based examples, as well as examples within `LSST-Y1`, `ROMAN_REAL`, and `ROMAN_FOURIER` projects. 
 
@@ -513,9 +499,9 @@ Supercomputers usually enforce strict quota limits on home folders. These limits
 
     source ~/.bashrc
 
-:six: After completing steps :one:-:five:, check the `$HOME/.condarc` file with the command
+:six: After completing steps :one:-:five:, check the internals of the `$HOME/.condarc` file with the command
 
-    more $HOME/.condarc
+    more "${HOME:?}"/.condarc
 
 to make sure it resembles the one below.
 
@@ -528,9 +514,9 @@ to make sure it resembles the one below.
     channel_priority: strict
     verbosity: 0
     pkgs_dirs:
-      - /project2/kicp/XXX/anaconda/pkgs
+      - /project2/kicp/XXX/anaconda/pkgs  # adjust this directory path
     envs_dirs:
-      - /project2/kicp/XXX/anaconda/envs/
+      - /project2/kicp/XXX/anaconda/envs/ # adjust this directory path
 
 ## :interrobang: FAQ: How do we install Conda? <a name="overview_miniconda"></a>
 
@@ -567,12 +553,10 @@ After that, the `conda` command will be available.
 Commenting out the environmental flags below *before running* `setup_cocoa.sh` will enable the installation of machine-learning-related libraries via pip.  
 
     [Adapted from Cocoa/set_installation_options.sh shell script] 
-     
     # ------------------------------------------------------------------------------
     # If not set, pip_core_packages.sh will install several ML package
     # ------------------------------------------------------------------------------
     #export IGNORE_EMULATOR_GPU_PIP_PACKAGES=1
-    
     (...)
 
 In case users have already run `setup_cocoa.sh`, then run the command.
@@ -583,7 +567,7 @@ and
 
     source ./installation_scripts/setup_pip_core_packages.sh
               
-## :interrobang: FAQ: How do we push changes to the Cocoa main branch? A few git hacks <a name="push_main"></a>
+## :interrobang: FAQ: How do we push changes to the Cocoa main branch? <a name="push_main"></a>
 
 Until recently, Cocoa development was a bit unstructured. Developers could push directly to the `main` branch, and small commits were not discouraged. Such flexible development rules will soon change when `v4.0` leaves the beta phase. We will protect the `main` branch by requiring every push to be reviewed by Cocoa's leading developers. Our new philosophy establishes that *a commit in the main branch should contain an atomic change that takes code from one working state to another working state with meaningful and well-tested improvements*. Therefore, developers should propose changes to the `main` branch in larger chunks (*via squash commits*), as shown below.
 
@@ -630,9 +614,9 @@ and
 
 A useful git hack is related to developing Cocoa from a git tag. We reserve Git tags to set milestones in our development, so they serve as good starting points for coding localized new features (e.g., changes to a file that other developers have not recently modified) or bug fixes.
 
-**Step :one: (optional)** If the developer has cloned the repository using the `https` URL address, we change the URL to the SSH-key-based address
+**Step :one: (optional)** If the developer has cloned the repository using the `https` URL address, then change the URL to the SSH-key-based address (if the developer has previously uploaded a public key to their GitHub account)
 
-    git remote set-url origin git@github.com:CosmoLike/cocoa.git
+    git remote set-url origin git@github.com:CosmoLike/cocoa.git # that would allow users to push without typing a password
 
 **Step :two:** Move the detached state to a new local branch via the command
 
@@ -645,19 +629,19 @@ Now, all commits will be associated with this local branch.
 
 **Step :three:** The developer has two options at the end of development. They can **either** create a new remote branch
 
-    git push origin xyzlocdev    # run on the xyzlocdev branch
+    git push origin xyzlocdev # run on the xyzlocdev branch
 
 **or** they can fetch and download the remote `xyzdev` branch, which will later absorb the changes made on `xyzlocdev`
 
-    git switch -c xyzdev origin/xyzdev  # run on the xyzlocdev branch
+    git switch -c xyzdev origin/xyzdev # run on the xyzlocdev branch
 
 Finally, the developer needs to merge the changes made on `xyzlocdev`.
 
-    git merge --squash xyzlocdev  # run on the xyzdev branch
+    git merge --squash xyzlocdev # run on the xyzdev branch
 
 If this merge does not create any merge conflicts, type
 
-    git push origin xyzdev    # run on the xyzdev branch
+    git push origin xyzdev # run on the xyzdev branch
 
 ## :interrobang: FAQ: How can we improve our Bash/C/C++ knowledge? <a name="lectnotes"></a>
 

@@ -4,9 +4,8 @@
 3. [FAQ: How do we set Weak Lensing YAML files in Cobaya?](#appendix_example_runs)
 4. [FAQ: How do we set Slow/Fast decomposition with Cosmolike?](#manual_blocking_cosmolike)
 5. [FAQ: How do we create a new Cosmolike project?](#appendix_lsst_y1_new)
-   1. [Minor changes: the easy way](#appendix_lsst_y1_new_small)
-   2. [Minor changes: the hard way](#appendix_lsst_y1_new_small2)
-   3. [Major changes](#appendix_lsst_y1_new_major)
+   1. [The easy way](#appendix_lsst_y1_new_small)
+   2. [The hard way](#appendix_lsst_y1_new_small2)
  
 ## The Projects Folder <a name="appendix_projects_folder"></a> 
 
@@ -62,9 +61,7 @@ Cocoa's `set_installation_options.sh` shell script includes instructions to inst
      export IGNORE_COSMOLIKE_DES_Y3_CODE=1
      #export IGNORE_COSMOLIKE_ROMAN_FOURIER_CODE=1
      #export IGNORE_COSMOLIKE_ROMAN_REAL_CODE=1
-
      (...)
-
      # ------------------------------------------------------------------------------
      # OVERWRITE_EXISTING_XXX_CODE=1 -> setup_cocoa overwrites existing PACKAGES ----
      # overwrite: delete the existing PACKAGE folder and install it again -----------
@@ -74,9 +71,7 @@ Cocoa's `set_installation_options.sh` shell script includes instructions to inst
      (...)
      export OVERWRITE_EXISTING_COSMOLIKE_CODE=1 # dangerous (possible loss of uncommitted work)
                                                 # If unset, users must manually delete cosmolike projects
-
      (...)
- 
      # ------------------------------------------------------------------------------
      # Cosmolike projects below -----------------------------------------------------
      # ------------------------------------------------------------------------------
@@ -155,9 +150,7 @@ If users want to make a particular Cosmolike project widely available in Cocoa, 
     # ------------------------------------------------------------------------------
     (...)
     #export IGNORE_COSMOLIKE_XXX_CODE=1
-
     (...)
-   
     # ------------------------------------------------------------------------------
     # Cosmolike projects below -------------------------------------------
     # ------------------------------------------------------------------------------
@@ -174,7 +167,6 @@ If users want to make a particular Cosmolike project widely available in Cocoa, 
 **Step :two:**: Add all new defined environment keys to `flags_impl_unset_keys.sh` 
     
     [adapted from Cocoa/installation_scripts/flags_impl_unset_keys.sh]
-
     unset -v XXX_URL XXX_NAME XXX_COMMIT IGNORE_COSMOLIKE_XXX_CODE XXX_TAG XXX_BRANCH
 
 This will ensure the bash script `stop_cocoa.sh` unsets these keys before unloading Cocoa's `(.local)` environment. Failing to do so will pollute your bash environment.
@@ -182,25 +174,23 @@ This will ensure the bash script `stop_cocoa.sh` unsets these keys before unload
 **Step :three:** Add and adapt the following block of code to the shell script `Cocoa/installation_scripts/setup_cosmolike_projects.sh`.
 
      [adapted from Cocoa/installation_scripts/setup_cosmolike_projects.sh shell script]
-     
      if [ -z "${IGNORE_COSMOLIKE_XXX_CODE}" ]; then 
+         PRINTNAME="XXX"
        
-       PRINTNAME="XXX"
-       
-       ptop "GETTING ${PRINTNAME:?}" || return 1
+         ptop "GETTING ${PRINTNAME:?}" || return 1
 
-       FOLDER="${XXX_NAME}"
-       URL="${XXX_URL}"
+         FOLDER="${XXX_NAME}"
+         URL="${XXX_URL}"
 
-       if [ -n "${XXX_COMMIT}" ]; then
-         gitact2 "${FOLDER:?}" "${URL:?}" "${XXX_COMMIT:?}"  || return 1
-       elif [ -n "${XXX_BRANCH}" ]; then 
-         gitact1 "${FOLDER:?}" "${URL:?}" "${XXX_BRANCH:?}" || return 1
-      elif [ -n "${XXX_TAG}" ]; then 
-       gitact3 "${FOLDER:?}" "${URL:?}" "${XXX_TAG:?}" || return 1
-      fi
+         if [ -n "${XXX_COMMIT}" ]; then
+             gitact2 "${FOLDER:?}" "${URL:?}" "${XXX_COMMIT:?}"  || return 1
+         elif [ -n "${XXX_BRANCH}" ]; then 
+             gitact1 "${FOLDER:?}" "${URL:?}" "${XXX_BRANCH:?}" || return 1
+        elif [ -n "${XXX_TAG}" ]; then 
+           gitact3 "${FOLDER:?}" "${URL:?}" "${XXX_TAG:?}" || return 1
+        fi
       
-      pbottom "GETTING ${PRINTNAME:?}" || return 1
+        pbottom "GETTING ${PRINTNAME:?}" || return 1
     fi
 
 > [!NOTE]
@@ -307,9 +297,7 @@ Below, we provide an example YAML configuration for an MCMC chain with DES 3x2pt
             des_y3.des_3x2pt:
             path: ./external_modules/data/des_y3
             data_file: DES_Y1.dataset
-         
          (...)
-         
         sampler:
             mcmc:
                 covmat: "./projects/des_y3/EXAMPLE_MCMC22.covmat"
@@ -366,27 +354,52 @@ Below, we provide an example YAML configuration for an MCMC chain with DES 3x2pt
 
 Adapting the LSST_Y1 folder to construct a new project involves many small core changes and a few major ones. They are tedious but straightforward. The easier way to apply the minor core changes to the code is via the bash script *transfer_project.sh*.
 
-## Minor changes: the easy way <a name="appendix_lsst_y1_new_small"></a> 
+And, of course, it goes without saying that the bash script *transfer_project.sh* only renames the prefix of variables and files; it does not modify the data vectors, covariance matrices, masking, or redshift distributions associated with a new survey.
 
- To properly use the bash script *transfer_project.sh*., users must set the following variables at the beginning of the file:
+## The easy way <a name="appendix_lsst_y1_new_small"></a> 
 
-     OLD_PROJECT="lsst_y1"
-     OLD_SURVEY="LSST"
+**Step 1:** Initialize cocoa environments.
 
-     NEW_PROJECT="des_y3"
-     NEW_SURVEY="DES"
+    cd ./cocoa/Cocoa
 
-After that, type
-
+and
+	
     conda activate cocoa
-    source start_cocoa.sh
-    cd ./projects
 
 and
 
-    bash transfer_project.sh
+    source start_cocoa.sh
 
-## Minor changes: the hard way <a name="appendix_lsst_y1_new_small2"></a> 
+ **Step 2:** Edit the file *copy_and_rename_project.sh*, following the instructions below
+
+    [adapted from Cocoa/projects/copy_and_rename_project.sh line ~7-11]
+    OLD_PROJECT="lsst_y1"
+    OLD_SURVEY="LSST"
+
+    NEW_PROJECT="xxx"  # edit this line
+    NEW_SURVEY="XXX"   # edit this line (Survey name should be capitalized)
+
+ **Step 3:** Run the bash script *copy_and_rename_project.sh*
+
+    bash ./projects/copy_and_rename_project.sh
+
+ **Step 4:** Reload the cocoa environment `(.local)`
+
+     source start_cocoa.sh # even if (.local) is already active, users must run start_cocoa.sh again to update bash environment values
+
+**Step 5:** Compile the new `xxx` project to test the change of variables
+
+    source ./projects/xxx/scripts/compile_xxx.sh
+
+**Step 6:** Run an example evaluation to test the change of variable names
+
+    source ./projects/xxx/scripts/compile_xxx.sh
+
+and
+    
+    mpirun -n 1 --oversubscribe --mca pml ^ucx --mca btl vader,tcp,self --bind-to core:overload-allowed --rank-by slot --map-by numa:pe=${OMP_NUM_THREADS} cobaya-run ./projects/xxx/EXAMPLE_EVALUATE1.yaml -f
+    
+## The hard way <a name="appendix_lsst_y1_new_small2"></a> 
 
 ### Create the new project
 
@@ -396,11 +409,11 @@ and
 
 and
 	
-	conda activate cocoa
+    conda activate cocoa
 
 and
 
-	source start_cocoa.sh
+    source start_cocoa.sh
 
 **Step 2:** Choose a project name (e.g., project `xxx`), and copy the `LSST_Y1` project using the command below
     
@@ -433,7 +446,12 @@ and
         @rm -rf cosmolike_lsst_y1_interface.so cosmolike_lsst_y1_interface.so.dSYM  *.o # delete this line
         @rm -rf cosmolike_xxx_interface.so cosmolike_xxx_interface.so.dSYM  *.o         # add this line
 
-**Step 2:** Change the name of the File `cosmolike_lsst_y1_interface.py` using the command below
+Users can also use the following command to perform the required substitutions.
+
+    cd "${ROOTDIR:?}"/projects/xxx/interface/
+    sed --in-place --regexp-extended "s@lsst_y1@xxx@g" MakefileCosmolike
+    
+**Step 2:** Change the name of the file `cosmolike_lsst_y1_interface.py` using the command below
        
     mv "${ROOTDIR:?}"/projects/xxx/interface/cosmolike_lsst_y1_interface.py "${ROOTDIR:?}"/projects/xxx/interface/cosmolike_xxx_interface.py
 
@@ -448,16 +466,28 @@ and remove any previously compiled dynamic library
         (...)
         __file__ = pkg_resources.resource_filename(__name__,'cosmolike_lsst_y1_interface.so') # delete this line
         __file__ = pkg_resources.resource_filename(__name__,'cosmolike_xxx_interface.so')     # add this line
-        
+
+
+Users can also use the following command to perform the required substitutions.
+
+    cd "${ROOTDIR:?}"/projects/xxx/interface/
+    sed --in-place --regexp-extended "s@lsst_y1@xxx@g" cosmolike_xxx_interface.py
+    
 **Step 4** Change the file `Cocoa/projects/XXX/interface/interface.cpp` following the instructions below
     
     [adapted from Cocoa/projects/lsst_y1/interface/interface.cpp line ~43]
     PYBIND11_MODULE(cosmolike_lsst_y1_interface, m) # delete this line
-    PYBIND11_MODULE(cosmolike_xxx_interface, m) # add this line
+    PYBIND11_MODULE(cosmolike_xxx_interface, m)     # add this line
     {
         m.doc() = "CosmoLike Interface for LSST_Y1 3x2pt Module"; # delete this line
         m.doc() = "CosmoLike Interface for XXX 3x2pt Module";     # add this line   
        (...)
+       
+Users can also use the following command to perform the required substitutions.
+
+    cd "${ROOTDIR:?}"/projects/xxx/interface/
+    sed --in-place --regexp-extended "s@lsst_y1@xxx@g" interface.cpp
+    sed --in-place --regexp-extended "s@LSST-Y1@XXX@g" interface.cpp
     
 ### Changes in the `Cocoa/projects/xxx/scripts` folder
 
@@ -473,184 +503,214 @@ and remove any previously compiled dynamic library
     
     mv "${ROOTDIR:?}"/projects/xxx/scripts/stop_lsst_y1.sh "${ROOTDIR:?}"/projects/xxx/scripts/stop_xxx.sh
 
-**Step 4:** Change the file `$ROOTDIR/projects/XXX/scripts/compile_lsst_y1` following the instructions below
+**Step 4:** Change the file `compile_xxx.sh` following the instructions below
 
-    (...)
+    [adapted from Cocoa/projects/lsst_y1/scripts/compile_lsst_y1.sh line ~4;43;65]
+    if [ -z "${IGNORE_COSMOLIKE_LSST_Y1_CODE}" ]; then # delete this line
+    if [ -z "${IGNORE_COSMOLIKE_XXX_CODE}" ]; then     # add this line
+        (...)
+	FOLDER="${LSST_Y1_NAME:-"lsst_y1"}" # delete this line
+        FOLDER="${XXX_NAME:-"xxx"}"         # add this line
+        (...)
+        PRINTNAME="LSST_Y1"  # delete this line
+        PRINTNAME="XXX"      # add this line
 
-    // change $ROOTDIR/projects/lsst_y1/interface to $ROOTDIR/projects/XXX/interface in the line below 
-    cd $ROOTDIR/projects/lsst_y1/interface
+Users can also use the following command to perform the required substitutions.
+
+    cd "${ROOTDIR:?}"/projects/xxx/scripts/
+    sed --in-place --regexp-extended "s@LSST_Y1@XXX@g" compile_xxx.sh
+    sed --in-place --regexp-extended "s@lsst_y1@xxx@g" compile_xxx.sh
     
-**Step 5:** Change the file `$ROOTDIR/projects/XXX/scripts/start_lsst_y1` following the instructions below
+**Step 5:** Change the file `start_xxx.sh` following the instructions below
 
-    (...)
+    [adapted from Cocoa/projects/lsst_y1/scripts/start_lsst_y1.sh line ~4;13]
+    if [ -z "${IGNORE_COSMOLIKE_LSST_Y1_CODE}" ]; then # delete this line
+    if [ -z "${IGNORE_COSMOLIKE_XXX_CODE}" ]; then     # add this line
+        (...)
+	FOLDER="${LSST_Y1_NAME:-"lsst_y1"}" # delete this line
+        FOLDER="${XXX_NAME:-"xxx"}"         # add this line
 
-    // change $ROOTDIR/projects/lsst_y1/interface to $ROOTDIR/projects/XXX/interface in the line below 
-    addvar LD_LIBRARY_PATH $ROOTDIR/projects/lsst_y1/interface
+Users can also use the following command to perform the required substitutions.
+
+    cd "${ROOTDIR:?}"/projects/xxx/scripts/
+    sed --in-place --regexp-extended "s@LSST_Y1@XXX@g" start_xxx.sh
+    sed --in-place --regexp-extended "s@lsst_y1@xxx@g" start_xxx.sh
+
+### Changes in the `Cocoa/projects/xxx/likelihood` folder
+
+**Step 1:** Change the file `_cosmolike_prototype_base.py` following the instructions below
+
+    [adapted from Cocoa/projects/lsst_y1/likelihood/_cosmolike_prototype_base.sh line ~19;21]
+    import cosmolike_lsst_y1_interface as ci #delete this line
+    import cosmolike_xxx_interface as ci     #add this line
+
+    survey = "LSST"  #delete this line
+    survey = "XXX"   #add this line - not here XXX is capitalized
+
+> [!Tip]
+> If the project name `xxx` contains more than the experiment name (e.g., the release year), we suggest assigned `survey` to just the experiment name. For example, if `XXX = DES_Y3`, then assigned `survey = "DES"`.
+>
+
+Users can perform the required replacements by running the following commands.
+ 
+    cd "${ROOTDIR:?}"/projects/xxx/likelihood/
+    sed --in-place --regexp-extended "s@lsst_y1@xxx@g" _cosmolike_prototype_base.sh
+    sed --in-place --regexp-extended "s@LSST@XXX@g" _cosmolike_prototype_base.sh
+
+**Step 2:** Change the file `combo_3x2pt.py` following the instructions below
+
+    [adapted from Cocoa/projects/lsst_y1/likelihood/combo_3x2pt.py line ~1-10;]
+    from cobaya.likelihoods.lsst_y1._cosmolike_prototype_base import _cosmolike_prototype_base, survey # delete this line
+    from cobaya.likelihoods.xxx._cosmolike_prototype_base import _cosmolike_prototype_base, survey     # add this line
     
-    // change $ROOTDIR/projects/lsst_y1/interface to $ROOTDIR/projects/XXX/interface in the line below 
-    addvar PYTHONPATH $ROOTDIR/projects/lsst_y1/interface
+    import cosmolike_lsst_y1_interface as ci # delete this line
+    import cosmolike_xxx_interface as ci     # add this line
 
-### Changes in the likelihood folder
+Users should perform similar changes to `combo_2x2pt.py`, `combo_xi_gg.py`, `combo_xi_ggl.py`, and `cosmic_shear.py`.
 
-**Step 1:** Change the file `$ROOTDIR/projects/XXX/likelihood/_cosmolike_prototype_base.py` following the instructions below
-
-    (...) 
+Finally, users can perform the required replacements by running the following commands.
+ 
+    cd "${ROOTDIR:?}"/projects/xxx/likelihood/
+    sed --in-place --regexp-extended "s@lsst_y1@xxx@g" combo_3x2pt.py
+    sed --in-place --regexp-extended "s@lsst_y1@xxx@g" combo_2x2pt.py
+    sed --in-place --regexp-extended "s@lsst_y1@xxx@g" combo_xi_gg.py
+    sed --in-place --regexp-extended "s@lsst_y1@xxx@g" combo_xi_ggl.py
+    sed --in-place --regexp-extended "s@lsst_y1@xxx@g" cosmic_shear.py
     
-    // change cosmolike_lsst_y1_interface to cosmolike_XXX_interface in the line below 
-    import cosmolike_lsst_y1_interface as ci
-    
-    (...)
-     
-    def set_source_related(self, **params_values):
-        ci.set_nuisance_shear_calib(
-          M = [
-            params_values.get(p, None) for p in [
-              // change LSST_ to the name of the survey associated w/ XXX)
-              "LSST_M"+str(i+1) for i in range(self.source_ntomo)
-            ]
-          ]
-        )
-
-        ci.set_nuisance_shear_photoz(
-          bias = [
-            params_values.get(p, None) for p in [
-              // change LSST_ to the name of the survey associated w/ XXX)
-              "LSST_DZ_S"+str(i+1) for i in range(self.source_ntomo)
-            ]
-          ]
-        )
-
-        ci.set_nuisance_ia(
-          A1 = [
-            params_values.get(p, None) for p in [
-              // change LSST_ to the name of the survey associated w/ XXX)
-              "LSST_A1_"+str(i+1) for i in range(self.source_ntomo)
-            ]
-          ],
-          A2 = [
-            params_values.get(p, None) for p in [
-              // change LSST_ to the name of the survey associated w/ XXX)
-              "LSST_A2_"+str(i+1) for i in range(self.source_ntomo)
-            ]
-          ],
-          B_TA = [
-            params_values.get(p, None) for p in [
-              // change LSST_ to the name of the survey associated w/ XXX)
-              "LSST_BTA_"+str(i+1) for i in range(self.source_ntomo)
-            ]
-          ],
-        )
-     
-    (...)
-     
-    def set_lens_related(self, **params_values):
-        ci.set_nuisance_bias(
-            B1 = [
-                params_values.get(p, None) for p in [
-                  // change DES_ to the name of the survey associated w/ XXX)
-                  "LSST_B1_"+str(i+1) for i in range(self.lens_ntomo)
-                ]
-            ], 
-            B2 = [
-                  params_values.get(p, None) for p in [
-                  // change DES_ to the name of the survey associated w/ XXX)
-                  "LSST_B2_"+str(i+1) for i in range(self.lens_ntomo)
-                ]
-            ],
-            B_MAG = [
-                params_values.get(p, None) for p in [
-                  // change DES_ to the name of the survey associated w/ XXX)
-                  "LSST_BMAG_"+str(i+1) for i in range(self.lens_ntomo)
-                ]
-            ]
-        )
-        ci.set_nuisance_clustering_photoz(
-            bias = [
-                params_values.get(p, None) for p in [
-                  // change DES_ to the name of the survey associated w/ XXX)
-                  "LSST_DZ_L"+str(i+1) for i in range(self.lens_ntomo)
-                ]
-            ]
-        )
-        ci.set_point_mass(
-            PMV = [
-                params_values.get(p, None) for p in [
-                  // change DES_ to the name of the survey associated w/ XXX)
-                  "LSST_PM"+str(i+1) for i in range(self.lens_ntomo)
-                ]
-            ]
-        )
-     
-    (...)
-     
-    def set_baryon_related(self, **params_values):
-        // change LSST_ to the name of the survey associated w/ XXX)
-        self.baryon_pcs_qs[0] = params_values.get("LSST_BARYON_Q1", None)
-        self.baryon_pcs_qs[1] = params_values.get("LSST_BARYON_Q2", None)
-        self.baryon_pcs_qs[2] = params_values.get("LSST_BARYON_Q3", None)
-        self.baryon_pcs_qs[3] = params_values.get("LSST_BARYON_Q4", None)
-
-If the project name `XXX` contains more than the experiment name, we suggest replacing `LSST_` with just the experiment name. For example, if `XXX = DES_Y3`, then adopt `DES_DZ_L1` for the name of the redshift shift on lens bin 1. The convention adopted must be followed when changing the files `params_des_cosmic_shear.yaml` and `params_des_3x2pt.yaml`. 
-
-**Step 2:** Change the file `$ROOTDIR/projects/XXX/likelihood/lsst_3x2pt.py` following the instructions below
-    
-    // change lsst_y1 to XXX in the line below
-    from cobaya.likelihoods.lsst_y1._cosmolike_prototype_base import _cosmolike_prototype_base
-    // change cosmolike_lsst_y1_interface to cosmolike_XXX_interface in the line below
-    import cosmolike_lsst_y1_interface as ci
-    
-**Step 3:** Change the file `$ROOTDIR/projects/XXX/likelihood/lsst_3x2pt.yaml` following the instructions below
+**Step 3:** Change the file `combo_3x2pt.yaml` following the instructions below
    
+    [adapted from Cocoa/projects/lsst_y1/likelihood/combo_3x2pt.yaml lines ~2;30;31]
+    data_file: lsst_y1_M1_GGL0.05.dataset #delete this line
+    data_file: xxx_yyy.dataset            #add and adapt this line; yyy = the adopted scale cuts
     (...)
-    // change LSST_Y1.dataset to XXX.dataset in the line below (adopted convention: .dataset file name = project name all in CAPS)
-    data_file: LSST_Y1.dataset
+    filename_baryon_pca: "./projects/lsst_y1/data/pca.txt" #delete this line
+    filename_baryon_pca: "./projects/xxx/data/pca.txt"     #add this line; users will need to recompute pca.txt if they want to use PCA for baryons
     (...)
-    // change params_lsst_3x2pt to params_XXX_3x2pt in the line below
-    params: !defaults [params_lsst_3x2pt]
+    print_datavector_file: "./projects/lsst_y1/chains/lsst_y1_theory.modelvector" #delete this line
+    print_datavector_file: "./projects/xxx/chains/xxx_theory.modelvector"         #add this line
 
-**Step 4:** Rename the file `params_lsst_3x2pt.yaml` to `params_XXX_3x2pt.yaml`. Also, rename the associated parameter names, 
-replacing the `LSST_` prefix as shown below. 
+Users should perform similar changes to `combo_2x2pt.yaml`, `combo_xi_gg.yaml`, `combo_xi_ggl.yaml`, and `cosmic_shear.yaml`.
 
-      XXX_DZ_S1:
-         prior:
+Finally, users can perform most of the required replacements by running the following commands.
+ 
+    cd "${ROOTDIR:?}"/projects/xxx/likelihood/
+    sed --in-place --regexp-extended "s@lsst_y1@xxx@g" combo_3x2pt.yaml
+    sed --in-place --regexp-extended "s@lsst_y1@xxx@g" combo_2x2pt.yaml
+    sed --in-place --regexp-extended "s@lsst_y1@xxx@g" combo_xi_gg.yaml
+    sed --in-place --regexp-extended "s@lsst_y1@xxx@g" combo_xi_ggl.yaml
+    sed --in-place --regexp-extended "s@lsst_y1@xxx@g" cosmic_shear.yaml
+    
+**Step 4:** Rename the prefix `LSST_` of all lens and source-related parameters by running the commands below. 
+
+    [adapted from Cocoa/projects/lsst_y1/likelihood/params_lens.yaml lines ~2-12]
+    LSST_DZ_L1:  # delete this line
+    XXX_DZ_L1:   # add this line - note here XXX is capitalized
+        prior:
             dist: norm
             loc: 0.0
             scale: 0.005
-         ref:
+        ref:
             dist: norm
             loc: 0.0
             scale: 0.005
-            proposal: 0.005
-         latex: \Delta z_\mathrm{s, XXX}^1
-         
-Similar changes must be made in `params_XXX_cosmic_shear.yaml`. Note that changes either in the number of lenses or source bins will demand the introduction of new parameters in 
-`params_XXX_cosmic_shear.yaml` and `params_XXX_3x2pt.yaml`
-
-### Changes in the data folder
-
-**Step 1:** Rename the `.dataset` file. Our adopted convention is: `.dataset` file name = project name capitalized
-
-     $(cocoa)(.local) cp $ROOTDIR/projects/LSST_Y1/data/LSST_Y1.dataset $ROOTDIR/projects/XXX/data/XXX.dataset
+        proposal: 0.005
+        latex: \Delta z_\mathrm{l,LSST}^1 # delete this line
+	latex: \Delta z_\mathrm{l,XXX}^1 # delete this line
      
-**Step 2:** Update `XXX.dataset` file with the names of the new data vector, covariance, n(z), binning, mask...
+     (...) # Don't forget to rename ALL parameters
 
-      data_file = XXX_nonlim
-      cov_file = cov_XXX
-      mask_file = 3x2pt_baseline.mask
-      nz_lens_file = lens_XXX.nz
-      nz_source_file = source_XXX.nz
-      lensing_overlap_cut = 0.0
-      lens_ntomo = 5
-      source_ntomo = 5
-      n_theta = 26
-      IA_model = 4
-      theta_min_arcmin = 2.5
-      theta_max_arcmin = 900.
-      #baryon_pca_file = pca.txt
+Finally, users can perform the required replacements by running the following commands.
 
-## Major changes: <a name="appendix_lsst_y1_new_major"></a>  
+    cd "${ROOTDIR:?}"/projects/xxx/likelihood/
+    sed --in-place --regexp-extended "s@LSST@XXX@g" params_lens.yaml
+    sed --in-place --regexp-extended "s@LSST@XXX@g" params_source.yaml
+         
+### Changes in the `Cocoa/projects/xxx/data` folder
 
-* Computation of a new covariance matrix using either [CosmoCov](https://github.com/CosmoLike/CosmoCov) or [CosmoCovFourier](https://github.com/CosmoLike/CosmoCov_Fourier)
-* Simulation of new `n(z)` for lenses and sources
-* Updates to the Cosmolike C++ interface so the appropriate routines can be called from the Python likelihood
-* Updates to the Cosmolike Python likelihoods and their associated Yaml files. These include, for example, `/likelihood/lsst_3x2pt.py` and `/likelihood/lsst_3x2pt.yaml`
+**Step 1:** Rename the `.dataset` file by adapting the command below 
+
+    # yyy = the adopted scale cuts on xxx_yyy.dataset
+    mv "${ROOTDIR:?}"/projects/xxx/data/lsst_y1_M1_GGL0.05.dataset $ROOTDIR/projects/xxx/data/xxx_yyy.dataset
+
+> [!Tip]
+> There are many datasets and masks associated with different scale cuts in the `lsst_y1/data` folder. Some of them are listed below.
+>
+>    lsst_y1_M[2-6]_GGL0.05.dataset
+>    lsst_y1_M[2-6]_GGLOLAP0.05.mask
+>
+> We recommend that users delete these files, as they will not be applicable in the new projects. The same goes for data vectors, covariances, and n(z) files.
+
+**Step 2:** Update `xxx_yyy.dataset` file with the names of the new data vector, covariance, n(z), binning, mask...
+
+    [adapted from Cocoa/projects/lsst_y1/likelihood/params_lens.yaml lines ~2-12]
+    data_file = XXX_nonlim
+    cov_file = cov_XXX
+    mask_file = 3x2pt_baseline.mask
+    nz_lens_file = lens_XXX.nz
+    nz_source_file = source_XXX.nz
+    lens_ntomo = 5
+    source_ntomo = 5
+    n_theta = 26
+    theta_min_arcmin = 2.5
+    theta_max_arcmin = 900.
+    baryon_pca_file = pca.txt
+
+### Changes in the `Cocoa/projects/` main folder
+
+**Step 1:** Change the file `EXAMPLE_EVALUATE1.yaml` following the instructions below
+
+    [adapted from Cocoa/projects/lsst_y1/EXAMPLE_EVALUATE1.yaml line ~5-15]
+    likelihood:
+        lsst_y1.cosmic_shear:
+            path: ./external_modules/data/lsst_y1
+            data_file: lsst_y1_M1_GGL0.05.dataset   # 705 non-masked elements  (EE2 delta chi^2 ~ 11.8) # delete this line
+	    data_file: xxx_M1_GGL0.05.dataset   # 705 non-masked elements  (EE2 delta chi^2 ~ 11.8) # delete this line
+ 	    (...)
+    	    print_datavector_file: "./projects/lsst_y1/chains/example1_lsst_y1_theory.modelvector"  # delete this line
+	    print_datavector_file: "./projects/xxx/chains/example1_lsst_y1_theory.modelvector"  # add this line
+    	    (...)
+    (...)
+    params:
+        LSST_A2_1: # delete this line
+	XXX_A2_1:  # add this line
+	    (...)
+            latex: A_\mathrm{2-IA,LSST}^1  # delete this line
+	    latex: A_\mathrm{2-IA,XXX}^1   # add this line
+        (...) # Change similar parameters that follow this one
+    (...)
+    sampler:
+        evaluate:
+            N: 1
+            override:
+                As_1e9: 2.1
+                (...)
+                LSST_DZ_S1: 0.0414632  # delete this line
+		XXX_DZ_S1: 0.0414632  # add this line
+                (...) # Change similar parameters that follow this one
+
+    output: ./projects/lsst_y1/chains/EXAMPLE_EVALUATE1 # delete this line
+    output: ./projects/xxx/chains/EXAMPLE_EVALUATE1     # add this line
+
+Users should perform similar changes to `EXAMPLE_EVALUATE[2-5].yaml`, and EXAMPLE_MCMC[1-4].yaml`
+
+Finally, users can perform the required replacements by running the following commands.
+
+    cd "${ROOTDIR:?}"/projects/xxx/
+    sed --in-place --regexp-extended "s@lsst_y1@xxx@g" EXAMPLE_EVALUATE1.yaml
+    sed --in-place --regexp-extended "s@LSST@XXX@g" EXAMPLE_EVALUATE1.yaml
+    sed --in-place --regexp-extended "s@lsst_y1@xxx@g" EXAMPLE_EVALUATE2.yaml
+    sed --in-place --regexp-extended "s@LSST@XXX@g" EXAMPLE_EVALUATE2.yaml
+    sed --in-place --regexp-extended "s@lsst_y1@xxx@g" EXAMPLE_EVALUATE3.yaml
+    sed --in-place --regexp-extended "s@LSST@XXX@g" EXAMPLE_EVALUATE3.yaml
+    sed --in-place --regexp-extended "s@lsst_y1@xxx@g" EXAMPLE_EVALUATE4.yaml
+    sed --in-place --regexp-extended "s@LSST@XXX@g" EXAMPLE_EVALUATE4.yaml
+    sed --in-place --regexp-extended "s@lsst_y1@xxx@g" EXAMPLE_EVALUATE5.yaml
+    sed --in-place --regexp-extended "s@LSST@XXX@g" EXAMPLE_EVALUATE5.yaml
+    sed --in-place --regexp-extended "s@lsst_y1@xxx@g" EXAMPLE_MCMC1.yaml
+    sed --in-place --regexp-extended "s@LSST@XXX@g" EXAMPLE_MCMC1.yaml
+    sed --in-place --regexp-extended "s@lsst_y1@xxx@g" EXAMPLE_MCMC2.yaml
+    sed --in-place --regexp-extended "s@LSST@XXX@g" EXAMPLE_MCMC2.yaml
+    sed --in-place --regexp-extended "s@lsst_y1@xxx@g" EXAMPLE_MCMC3.yaml
+    sed --in-place --regexp-extended "s@LSST@XXX@g" EXAMPLE_MCMC3.yaml
+    sed --in-place --regexp-extended "s@lsst_y1@xxx@g" EXAMPLE_MCMC4.yaml
+    sed --in-place --regexp-extended "s@LSST@XXX@g" EXAMPLE_MCMC4.yaml
