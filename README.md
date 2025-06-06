@@ -183,8 +183,6 @@ and
 
     mpirun -n ${NMPI} --oversubscribe --mca pml ^ucx --mca btl vader,tcp,self --bind-to core:overload-allowed --rank-by slot --map-by numa:pe=${OMP_NUM_THREADS} python -m mpi4py.futures EXAMPLE_PROFILE1.py --mpi $((${NMPI}-1)) --profile 1 --tol 0.05 --AB 1.0 --outroot 'profile' --minmethod 5 --maxiter 1 --maxfeval 250 
 
-**End of basic instructions**.
-
 > [!Tip]
 > Cocoa provides several cosmolike projects, not all of which are installed by default. To activate them, refer to the appendix [FAQ: How do we compile external modules?](#appendix_compile_ly).
 
