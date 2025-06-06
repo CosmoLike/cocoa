@@ -114,7 +114,7 @@ params:
 
 
 theory:
-  emulcmbtrf:
+  emulcmb:
     path: ./cobaya/cobaya/theories/
     stop_at_error: True
     extra_args:
@@ -126,6 +126,10 @@ theory:
       eefilename:  'external_modules/data/emultrf/CMB_TRF/chiEEAstautrf1dot2milnewlhcevansqrtrescalec16'
       eeextraname: 'external_modules/data/emultrf/CMB_TRF/extrainfo_lhs_ee_96.npy'
       ordering: ['omegabh2','omegach2','H0','tau','ns','logA','mnu','w','wa']
+      thetaordering: ['omegabh2','omegach2','thetastar']
+      modeltype: 'TRF'
+      ellmax: 5000
+
 
 sampler:
   evaluate:
