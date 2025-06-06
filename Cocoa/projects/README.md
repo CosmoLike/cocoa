@@ -1,11 +1,13 @@
 # Table of contents
 1. [The Projects Folder](#appendix_projects_folder)
-2. [FAQ: How do we download and run Cosmolike projects?](#running_cosmolike_projects)
-3. [FAQ: How do we set Weak Lensing YAML files in Cobaya?](#appendix_example_runs)
-4. [FAQ: How do we set Slow/Fast decomposition with Cosmolike?](#manual_blocking_cosmolike)
-5. [FAQ: How do we create a new Cosmolike project?](#appendix_lsst_y1_new)
-   1. [The easy way](#appendix_lsst_y1_new_small)
-   2. [The hard way](#appendix_lsst_y1_new_small2)
+2. [FAQ: How do we download and run Cosmolike projects?](#appendix_projects_download_run_cosmolike)
+      1. [Projects already set in the config file](#appendix_projects_download_setconfig)
+      2. [New Projects ](#appendix_projects_download_new)
+4. [FAQ: How do we set Weak Lensing YAML files in Cobaya?](#appendix_projects_setyaml)
+5. [FAQ: How do we set Slow/Fast decomposition with Cosmolike?](#manual_blocking_cosmolike)
+6. [FAQ: How do we create a new Cosmolike project?](#appendix_projects_new)
+   1. [The easy way](#appendix_projects_new_easy)
+   2. [The hard way](#appendix_projects_new_hard)
  
 ## The Projects Folder <a name="appendix_projects_folder"></a> 
 
@@ -46,9 +48,9 @@ The `projects` folder includes all the projects linked to Cosmolike; they can al
 > [!Note]
 > Projects should be hosted on independent GitHub repositories. By convention, the Cosmolike Organization adds the prefix `cocoa_` to all Cobaya-Cosmolike projects. For instance, the repository `cocoa_XXX` targets project `XXX`. 
 
-## :interrobang: FAQ: How do we download and run Cosmolike projects? <a name="running_cosmolike_projects"></a> 
+## :interrobang: FAQ: How do we download and run Cosmolike projects? <a name="appendix_projects_download_run_cosmolike"></a> 
 
-### Part I: The semi-automatic way 
+### Part I: Projects already set in the config file <a name="appendix_projects_download_setconfig"></a> 
 
 Cocoa's `set_installation_options.sh` shell script includes instructions to install several Cosmolike projects. To activate them, manipulate the following lines on `set_installation_options.sh` 
 
@@ -99,7 +101,7 @@ In case users only want to compile a single cosmolike project (let's say the `ro
 
       source ./projects/roman_real/scripts/compile_roman_real.sh
 
-### Part II: New Projects 
+### Part II: New Projects <a name="appendix_projects_download_new"></a> 
 
 Below, we provide instructions on how to download and install cosmolike projects that have not been previously configured on `set_installation_options.sh` shell script.
 
@@ -204,7 +206,7 @@ This will ensure the bash script `stop_cocoa.sh` unsets these keys before unload
 > [!Warning]
 > Never delete a folder from `projects` without first running `stop_cocoa.sh`; otherwise, Cocoa will have ill-defined links to these projects.
 
-### :interrobang: FAQ: How do we set Weak Lensing YAML files in Cobaya? <a name="appendix_example_runs"></a>
+### :interrobang: FAQ: How do we set Weak Lensing YAML files in Cobaya? <a name="appendix_projects_setyaml"></a>
 
 The CosmoLike pipeline requires $\Omega_m$ and $\Omega_b$ to be provided, but the CAMB Boltzmann code only accepts $\Omega_c h^2$ and $\Omega_b h^2$ in Cobaya. Given that, there are two ways of creating YAML compatible with CAMB and Cosmolike: 
 
@@ -350,13 +352,13 @@ Below, we provide an example YAML configuration for an MCMC chain with DES 3x2pt
                 Rminus1_single_split: 4
 
 
-## :interrobang: FAQ: How do we create a new Cosmolike project <a name="appendix_lsst_y1_new"></a> 
+## :interrobang: FAQ: How do we create a new Cosmolike project <a name="appendix_projects_new"></a> 
 
 Adapting the LSST_Y1 folder to construct a new project involves many small core changes and a few major ones. They are tedious but straightforward. The easier way to apply the minor core changes to the code is via the bash script *transfer_project.sh*.
 
 And, of course, it goes without saying that the bash script *transfer_project.sh* only renames the prefix of variables and files; it does not modify the data vectors, covariance matrices, masking, or redshift distributions associated with a new survey.
 
-## The easy way <a name="appendix_lsst_y1_new_small"></a> 
+## The easy way <a name="appendix_projects_new_easy"></a> 
 
 **Step 1:** Initialize cocoa environments.
 
@@ -399,7 +401,7 @@ and
     
     mpirun -n 1 --oversubscribe --mca pml ^ucx --mca btl vader,tcp,self --bind-to core:overload-allowed --rank-by slot --map-by numa:pe=${OMP_NUM_THREADS} cobaya-run ./projects/xxx/EXAMPLE_EVALUATE1.yaml -f
     
-## The hard way <a name="appendix_lsst_y1_new_small2"></a> 
+## The hard way <a name="appendix_projects_new_hard"></a> 
 
 ### Create the new project
 
