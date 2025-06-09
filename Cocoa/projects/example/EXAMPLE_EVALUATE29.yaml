@@ -1,0 +1,95 @@
+stop_at_error: false
+debug: false
+timing: true
+
+likelihood:
+  sn.pantheon:
+    path: ./external_modules/data/sn_data
+
+
+params:
+  H0:
+    prior:
+      min: 55
+      max: 90
+    ref:
+      dist: norm
+      loc: 67
+      scale: 2
+    proposal: 0.001
+    latex: H_0
+  omegabh2:
+    prior:
+      min: 0.01
+      max: 0.04
+    ref:
+      dist: norm
+      loc: 0.022383
+      scale: 0.005
+    proposal: 0.005
+    latex: \Omega_\mathrm{b} h^2
+  omegach2:
+    prior:
+      min: 0.06
+      max: 0.2
+    ref:
+      dist: norm
+      loc: 0.12011
+      scale: 0.03
+    proposal: 0.03
+    latex: \Omega_\mathrm{c} h^2
+  omegaaxh2:
+    prior:
+      min: 0.02
+      max: 0.4
+    ref:
+      dist: norm
+      loc: 0.2
+      scale: 0.03
+    proposal: 0.21
+    latex: \Omega_\mathrm{ax} h^2
+
+  logmx:
+    prior:
+      min: -34
+      max: -31.5
+    ref:
+      dist: norm
+      loc: -33
+      scale: 1
+    proposal: -33.1
+    latex: \log{m_{\rm ax}}
+
+
+
+
+sampler:
+  evaluate:
+    override:
+      omegabh2: 0.022383
+      omegach2: 0.12011
+      H0: 67
+      omegaaxh2: 0.2
+      logmx: -33
+
+theory:
+  emulbaosn:
+    path: ./cobaya/cobaya/theories/
+    stop_at_error: True
+    extra_args:
+      # This version of the emul was not trained with CosmoRec
+      dlfilename: 'external_modules/data/emultrf/BAO_SN_RES/chisquaredlreallog'
+      dlextraname: 'external_modules/data/emultrf/BAO_SN_RES/extrainforealdl.npy'
+      dltransmat: 'external_modules/data/emultrf/BAO_SN_RES/PCArealdl.npy'
+      Hfilename: 'external_modules/data/emultrf/BAO_SN_RES/chisquareHreallog'
+      Hextraname: 'external_modules/data/emultrf/BAO_SN_RES/extrainforealH.npy'
+      Htransmat: 'external_modules/data/emultrf/BAO_SN_RES/PCArealH.npy'
+      rdragfilename: 'external_modules/data/emultrf/BAO_SN_RES/axrdrag.joblib'
+      rdragextraname: 'external_modules/data/emultrf/BAO_SN_RES/extrainfoaxrdrag.npy'
+      ordering: ['omm','H0','omegaaxh2','logmx']
+      rdragordering: ['omegabh2','omegach2','H0','omegaaxh2','logmx']
+      zlindl: 'external_modules/data/emultrf/BAO_SN_RES/zaxdl.npy'
+      zlinH: 'external_modules/data/emultrf/BAO_SN_RES/zaxH.npy'
+      extradllevel: 0
+
+output: ./projects/example/chains/EXAMPLE_EVALUATE25

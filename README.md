@@ -77,10 +77,14 @@ Users can now proceed to the **next section**.
 
 In this section, we assume users have previously activated the Cocoa conda environment.
 
-**Step :one:**: Download Cocoa's latest release and go to its main folder (`cocoa/Cocoa`),
+> [!WARNING]
+> **In this fork**, we assume **all users are developers with edit access via ssh keys to all SBU-COSMOLIKE repositories**. *Cocoa scripts will fail if you don't have such privileges*.
+>
 
-    git clone https://github.com/CosmoLike/cocoa.git --branch v4.0-beta26 cocoa
+**Step :one:**: Download cocoa's latest commit and go to the `cocoa` main folder,
 
+    "${CONDA_PREFIX}"/bin/git clone git@github.com:SBU-COSMOLIKE/cocoa.git cocoa
+ 
 and
 
     cd ./cocoa/Cocoa
@@ -98,20 +102,6 @@ This script downloads and decompresses external modules, requiring internet acce
 This script compiles external modules selected for installation on `set_installation_options.sh` (e.g., CAMB) and does not require internet access. Code compilation is a CPU-intensive operation; therefore, running  `compile_cocoa.sh` on a cluster login node can be against HPC policy. Users should then run `setup_cocoa.sh` in a login node and `compile_cocoa.sh` on an interactive compute node.
 
 Users can now proceed to **the next section**.
-
-> [!TIP]
-> If you want to work from the latest commit, then clone the repository with the following command 
->
-> (SSH)
-> 
->     git clone git@github.com:CosmoLike/cocoa.git cocoa
-> 
-> (HTTP)
-> 
->     git clone https://github.com/CosmoLike/cocoa.git cocoa
->
->
-> Users who want to develop from a release version (e.g., `v4.0-beta20`) should read the appendix [FAQ: How do we push changes to the cocoa main branch? A few git hacks](#push_main)
 
 > [!TIP]
 > Cocoa does not install all the available external modules by default. If the user requires additional packages, refer to the appendix [FAQ: How do we compile external modules?](#appendix_compile_).
