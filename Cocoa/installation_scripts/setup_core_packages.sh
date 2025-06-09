@@ -551,13 +551,13 @@ if [ -z "${IGNORE_CORE_INSTALLATION}" ]; then
 
     ptop "GETTING SPDLOG LIBRARY (CORE LIBS)" || return 1;
 
-    PACKAGE_VERSION="${SPDLOG_VERSION:-"1.14.1"}" 
+    PACKAGE_VERSION="${SPDLOG_VERSION:-"v1.14.1"}"  
 
     URL='https://github.com/gabime/spdlog.git'
 
     FOLDER='spdlog'
 
-    VER="v${PACKAGE_VERSION:?}"
+    VER="${PACKAGE_VERSION:?}"
 
     # note: Do not change XFZ filename. 
     # note: Otherwise the script unxv_core_packages.sh will stop working
