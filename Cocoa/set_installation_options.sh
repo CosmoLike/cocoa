@@ -326,10 +326,10 @@ export COSMOPOWER_GIT_COMMIT="7cac5e71c975c06257b2f95f0dcea5dd09b0f45f"
 export COSMOPOWER_URL_DATA="https://github.com/cosmopower-organization/jense_2024_emulators.git"
 export COSMOPOWER_URL_DATA_COMMIT="4317635eed70289ee1ec6b3df828027173071e36"
 
-export EMULTRF_URL="git@github.com:SBU-COSMOLIKE/emulators_code.git"
+export EMULTRF_URL="https://github.com/CosmoLike/emulators_code.git"
 export EMULTRF_GIT_COMMIT="6023e5624ec21e1b3c9cda48075bcf4296a2d871"
 
-export EMULTRF_DATA_URL="git@github.com:SBU-COSMOLIKE/emulators_data.git"
+export EMULTRF_DATA_URL="https://github.com/CosmoLike/emulators_data.git"
 export EMULTRF_DATA_GIT_COMMIT="d90d888d6a51cd12408abf206465311c3978bb2f"
 
 export DARKEMULATOR_URL="https://github.com/DarkQuestCosmology/dark_emulator_public.git"
@@ -340,7 +340,7 @@ export DARKEMULATOR_GIT_COMMIT="46df5972509624e2eeadc2bf3ac528b02333a7e2"
 # Cosmolike projects below -------------------------------------------
 # --------------------------------------------------------------------
 # --------------------------------------------------------------------
-export LSST_Y1_URL="git@github.com:SBU-COSMOLIKE/cocoa_lsst_y1.git"
+export LSST_Y1_URL="https://github.com/CosmoLike/cocoa_lsst_y1.git"
 export LSST_Y1_NAME="lsst_y1"
 #BRANCH: if unset, load the latest commit on the specified branch
 export LSST_Y1_BRANCH="main"
@@ -349,7 +349,7 @@ export LSST_Y1_BRANCH="main"
 #BRANCH: if unset, load the specified TAG
 #export LSST_Y1_TAG="v4.0-beta17"
 
-export DES_Y3_URL="git@github.com:SBU-COSMOLIKE/cocoa_des_y3.git"
+export DES_Y3_URL="https://github.com/CosmoLike/cocoa_des_y3.git"
 export DES_Y3_NAME="des_y3"
 #BRANCH: if unset, load the latest commit on the specified branch
 #export DES_Y3_BRANCH="main"
@@ -358,7 +358,7 @@ export DES_Y3_NAME="des_y3"
 #BRANCH: if unset, load the specified TAG
 export DES_Y3_TAG="v4.0-beta17"
 
-export ROMAN_FOURIER_URL="git@github.com:SBU-COSMOLIKE/cocoa_roman_fourier.git"
+export ROMAN_FOURIER_URL="https://github.com/CosmoLike/cocoa_roman_fourier.git"
 export ROMAN_FOURIER_NAME="roman_fourier"
 #BRANCH: if unset, load the latest commit on the specified branch
 export ROMAN_FOURIER_BRANCH="main"
@@ -367,7 +367,7 @@ export ROMAN_FOURIER_BRANCH="main"
 #BRANCH: if unset, load the specified TAG
 #export ROMAN_FOURIER_TAG="v4.0-beta17"
 
-export ROMAN_REAL_URL="git@github.com:SBU-COSMOLIKE/cocoa_roman_real.git"
+export ROMAN_REAL_URL="https://github.com/CosmoLike/cocoa_roman_real.git"
 export ROMAN_REAL_NAME="roman_real"
 #BRANCH: if unset, load the latest commit on the specified branch
 export ROMAN_REAL_BRANCH="main"
