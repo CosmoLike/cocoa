@@ -163,5 +163,4 @@ theory:
       nnu: 3.046
       dark_energy_model: ppf
 
-
 output: ./projects/example/chains/EXAMPLE_EVALUATE24
