@@ -126,6 +126,7 @@ dependencies:
   - numpy==1.26.3
   - pyfftw=0.15.0
   - cython==3.0.12
+  - util-linux==2.40.4
   - pip:
     - alabaster==1.0.0
     - anytree==2.13.0

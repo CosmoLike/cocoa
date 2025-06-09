@@ -71,9 +71,7 @@ namespace cosmolike_interface
 arma::Mat<double> read_table(const std::string file_name)
 {
   std::ifstream input_file(file_name);
-
-  if (!input_file.is_open())
-  {
+  if (!input_file.is_open()) {
     spdlog::critical("{}: file {} cannot be opened", "read_table", file_name);
     exit(1);
   }
@@ -409,10 +407,14 @@ void init_bias(arma::Col<double> bias_z_evol_model)
 {
   spdlog::debug("{}: Begins", "init_bias");
   
-  if (MAX_SIZE_ARRAYS < static_cast<int>(bias_z_evol_model.n_elem))
-  {
-    spdlog::critical("{}: incompatible input {} size = {} (> {})", "init_bias", 
-      "bias_z_evol_model", bias_z_evol_model.n_elem, MAX_SIZE_ARRAYS);
+  if (MAX_SIZE_ARRAYS < static_cast<int>(bias_z_evol_model.n_elem)) {
+    spdlog::critical(
+        "{}: incompatible input {} size = {} (> {})", 
+        "init_bias", 
+        "bias_z_evol_model", 
+        bias_z_evol_model.n_elem, 
+        MAX_SIZE_ARRAYS
+      );
     exit(1);
   }
 
@@ -423,8 +425,18 @@ void init_bias(arma::Col<double> bias_z_evol_model)
                                           // [3] = b3, 
                                           // [4] = bmag 
   */
-  for(int i=0; i<bias_z_evol_model.n_elem; i++)
-  {
+  for(int i=0; i<bias_z_evol_model.n_elem; i++) {
+    if (std::isnan(bias_z_evol_model(i))) {
+      // can't compile cosmolike with -O3 or -fast-math
+      // see: https://stackoverflow.com/a/47703550/2472169
+      spdlog::critical(
+        "{}: NaN found on index {}.", 
+        "init_bias",
+        i
+      );
+      exit(1);
+    }
+
     like.galaxy_bias_model[i] = bias_z_evol_model(i);
     
     spdlog::debug(
@@ -1382,9 +1394,1187 @@ arma::Mat<double> read_nz_sample(std::string multihisto_file, const int Ntomo)
 // ---------------------------------------------------------------------------
 // ---------------------------------------------------------------------------
 
+void init_lens_sample(std::string multihisto_file, const int Ntomo)
+{
+  spdlog::debug("{}: Begins", "init_lens_sample v2.0");
+
+  arma::Mat<double> input_table = read_nz_sample(multihisto_file, Ntomo);
+
+  set_lens_sample_size(Ntomo);
+
+  set_lens_sample(input_table);
+
+  spdlog::debug("{}: Ends", "init_lens_sample v2.0");
+}
+
+// ---------------------------------------------------------------------------
+// ---------------------------------------------------------------------------
+// ---------------------------------------------------------------------------
+
+void init_source_sample(std::string multihisto_file, const int Ntomo)
+{
+  spdlog::debug("{}: Begins", "init_source_sample");
+
+  arma::Mat<double> input_table = read_nz_sample(multihisto_file, Ntomo);
+
+  set_source_sample_size(Ntomo);
+
+  set_source_sample(input_table);
+
+  spdlog::debug("{}: Ends", "init_source_sample");
+}
+
+// ---------------------------------------------------------------------------
+// ---------------------------------------------------------------------------
+// ---------------------------------------------------------------------------
+
+void init_ntomo_powerspectra()
+{
+  if (redshift.shear_nbin == 0) {
+    spdlog::critical(
+        "{}: {} not set prior to this function call", 
+        "init_ntomo_powerspectra", 
+        "redshift.shear_nbin"
+      );
+    exit(1);
+  }
+  if (redshift.clustering_nbin == 0) {
+    spdlog::critical(
+        "{}: {} not set prior to this function call", 
+        "init_ntomo_powerspectra", 
+        "redshift.clustering_nbin"
+      );
+    exit(1);
+  }
+
+  tomo.shear_Npowerspectra = redshift.shear_nbin * (redshift.shear_nbin + 1) / 2;
+
+  int n = 0;
+  for (int i=0; i<redshift.clustering_nbin; i++) {
+    for (int j=0; j<redshift.shear_nbin; j++) {
+      n += test_zoverlap(i, j);
+      if(test_zoverlap(i, j) == 0) {
+        spdlog::info(
+            "{}: GGL pair L{:d}-S{:d} is excluded",
+            "init_ntomo_powerspectra", 
+            i, 
+            j
+          );
+      }
+    }
+  }
+  tomo.ggl_Npowerspectra = n;
+
+  tomo.clustering_Npowerspectra = redshift.clustering_nbin;
+
+  spdlog::debug(
+      "{}: tomo.shear_Npowerspectra = {}",
+      "init_ntomo_powerspectra", 
+      tomo.shear_Npowerspectra
+    );
+  spdlog::debug(
+      "{}: tomo.ggl_Npowerspectra = {}",
+      "init_ntomo_powerspectra", 
+      tomo.ggl_Npowerspectra
+    );
+  spdlog::debug(
+      "{}: tomo.clustering_Npowerspectra = {}",
+      "init_ntomo_powerspectra", 
+      tomo.clustering_Npowerspectra
+    );
+}
+
+// ---------------------------------------------------------------------------
+// ---------------------------------------------------------------------------
+// ---------------------------------------------------------------------------
+
+
+py::tuple read_redshift_distributions_from_files(
+  std::string lens_multihisto_file, const int lens_ntomo,
+  std::string source_multihisto_file, const int source_ntomo)
+{
+  arma::Mat<double> input_lens_table = 
+    read_nz_sample(lens_multihisto_file, lens_ntomo);
+
+  arma::Mat<double> input_source_table = 
+    read_nz_sample(source_multihisto_file, source_ntomo);
+
+  return py::make_tuple(carma::mat_to_arr(input_lens_table), 
+                        carma::mat_to_arr(input_source_table));
+}
+
+// ---------------------------------------------------------------------------
+// ---------------------------------------------------------------------------
+// ---------------------------------------------------------------------------
+
+void init_redshift_distributions_from_files(
+  std::string lens_multihisto_file, const int lens_ntomo,
+  std::string source_multihisto_file, const int source_ntomo)
+{
+  init_lens_sample(lens_multihisto_file, lens_ntomo);
+  
+  init_source_sample(source_multihisto_file, source_ntomo);
+
+  init_ntomo_powerspectra();
+}
+
+// ---------------------------------------------------------------------------
+// ---------------------------------------------------------------------------
+// ---------------------------------------------------------------------------
+
+void init_survey(
+    std::string surveyname, 
+    double area, 
+    double sigma_e
+  )
+{
+  spdlog::debug("{}: Begins", "init_survey");
+
+  boost::trim_if(surveyname, boost::is_any_of("\t "));
+  
+  surveyname = boost::algorithm::to_lower_copy(surveyname);
+    
+  if (surveyname.size() > CHAR_MAX_SIZE - 1) {
+    spdlog::critical(
+        "{}: survey name too large for Cosmolike "
+        "(C char memory overflow)", "init_survey"
+      );
+    exit(1);
+  }
+  if (!(surveyname.size()>0)) {
+    spdlog::critical("{}: incompatible input", "init_survey");
+    exit(1);
+  }
+
+  memcpy(survey.name, surveyname.c_str(), surveyname.size() + 1);
+  
+  survey.area = area;
+  
+  survey.sigma_e = sigma_e;
+
+  spdlog::debug("{}: Ends", "init_survey");
+}
+
+// ---------------------------------------------------------------------------
+// ---------------------------------------------------------------------------
+// ---------------------------------------------------------------------------
+
+void init_ggl_exclude(arma::Col<int> ggl_exclude)
+{
+  spdlog::debug("{}: Begins", "init_ggl_exclude");
+
+  arma::Col<int> _ggl_excl_ = arma::conv_to<arma::Col<int>>::from(ggl_exclude);
+  
+  if (tomo.ggl_exclude != NULL) {
+    free(tomo.ggl_exclude);
+  }
+  tomo.ggl_exclude = (int*) malloc(sizeof(int)*ggl_exclude.n_elem);
+  if (tomo.ggl_exclude == NULL) {
+    spdlog::critical("array allocation failed");
+    exit(1);
+  }
+
+  tomo.N_ggl_exclude = int(ggl_exclude.n_elem/2);
+  
+  spdlog::debug("init_ggl_exclude: {} ggl pairs excluded", tomo.N_ggl_exclude);
+  
+  #pragma omp parallel for
+  for(int i=0; i<ggl_exclude.n_elem; i++) {
+    if (std::isnan(ggl_exclude(i))) {
+      // can't compile cosmolike with -O3 or -fast-math
+      // see: https://stackoverflow.com/a/47703550/2472169
+      spdlog::critical(
+        "{}: NaN found on index {}.", 
+        "init_ggl_exclude",
+        i
+      );
+      exit(1);
+    }
+    tomo.ggl_exclude[i] = ggl_exclude(i);
+  }
+
+  spdlog::debug("{}: Ends", "init_ggl_exclude");
+}
+
+// ---------------------------------------------------------------------------
+// ---------------------------------------------------------------------------
+// ---------------------------------------------------------------------------
+// ---------------------------------------------------------------------------
+// ---------------------------------------------------------------------------
+// ---------------------------------------------------------------------------
+// ---------------------------------------------------------------------------
+// ---------------------------------------------------------------------------
+// ---------------------------------------------------------------------------
+// ---------------------------------------------------------------------------
+// ---------------------------------------------------------------------------
+// ---------------------------------------------------------------------------
+// ---------------------------------------------------------------------------
+// ---------------------------------------------------------------------------
+// SET FUNCTIONS
+// ---------------------------------------------------------------------------
+// ---------------------------------------------------------------------------
+// ---------------------------------------------------------------------------
+// ---------------------------------------------------------------------------
+// ---------------------------------------------------------------------------
+// ---------------------------------------------------------------------------
+// ---------------------------------------------------------------------------
+// ---------------------------------------------------------------------------
+// ---------------------------------------------------------------------------
+// ---------------------------------------------------------------------------
+// ---------------------------------------------------------------------------
+// ---------------------------------------------------------------------------
+// ---------------------------------------------------------------------------
+// ---------------------------------------------------------------------------
+// ---------------------------------------------------------------------------
+
+void set_cosmological_parameters(
+    const double omega_matter,
+    const double hubble
+  )
+{
+  spdlog::debug("{}: Begins", "set_cosmological_parameters");
+
+  // Cosmolike should not need parameters from inflation or dark energy.
+  // Cobaya provides P(k,z), H(z), D(z), Chi(z)...
+  // It may require H0 to set scales and \Omega_M to set the halo model
+
+  int cache_update = 0;
+  if (fdiff(cosmology.Omega_m, omega_matter) ||
+      fdiff(cosmology.h0, hubble/100.0)) // assuming H0 in km/s/Mpc 
+  {
+    cache_update = 1;
+  }
+  if (1 == cache_update) {
+    cosmology.Omega_m = omega_matter;
+    cosmology.Omega_v = 1.0-omega_matter;
+    // Cosmolike only needs to know that there are massive neutrinos (>0)
+    cosmology.Omega_nu = 0.1;
+    cosmology.h0 = hubble/100.0; 
+    cosmology.MGSigma = 0.0;
+    cosmology.MGmu = 0.0;
+    cosmology.random = cosmolike_interface::RandomNumber::get_instance().get();
+  }
+
+  spdlog::debug("{}: Ends", "set_cosmological_parameters");
+}
+
+// ---------------------------------------------------------------------------
+// ---------------------------------------------------------------------------
+// ---------------------------------------------------------------------------
+
+void set_distances(arma::Col<double> io_z, arma::Col<double> io_chi)
+{
+  spdlog::debug("{}: Begins", "set_distances");
+
+  bool debug_fail = false;
+  if (io_z.n_elem != io_chi.n_elem) {
+    debug_fail = true;
+  }
+  else {
+    if (io_z.n_elem == 0) {
+      debug_fail = true;
+    }
+  }
+  
+  if (debug_fail) {
+    spdlog::critical(
+        "{}: incompatible input w/ z.size = {} and G.size = {}",
+        "set_distances", 
+        io_z.n_elem, 
+        io_chi.n_elem
+      );
+    exit(1);
+  }
+  if(io_z.n_elem < 5) {
+    spdlog::critical(
+        "{}: bad input w/ z.size = {} and chi.size = {}"
+        "set_distances", 
+        io_z.n_elem, 
+        io_chi.n_elem
+      );
+    exit(1);
+  }
+
+  int cache_update = 0;
+  if (cosmology.chi_nz != static_cast<int>(io_z.n_elem) || 
+      NULL == cosmology.chi) {
+    cache_update = 1;
+  }
+  else
+  {
+    for (int i=0; i<cosmology.chi_nz; i++) {
+      if (fdiff(cosmology.chi[0][i], io_z(i)) ||
+          fdiff(cosmology.chi[1][i], io_chi(i))) {
+        cache_update = 1; 
+        break; 
+      }    
+    }
+  }
+
+  if (1 == cache_update)
+  {
+    cosmology.chi_nz = static_cast<int>(io_z.n_elem);
+
+    if (cosmology.chi != NULL) {
+      free(cosmology.chi);
+    }
+    cosmology.chi = (double**) malloc2d(2, cosmology.chi_nz);
+
+    #pragma omp parallel for
+    for (int i=0; i<cosmology.chi_nz; i++) {
+      if (std::isnan(io_z(i)) || std::isnan(io_chi(i))) {
+        // can't compile cosmolike with -O3 or -fast-math
+        // see: https://stackoverflow.com/a/47703550/2472169
+        spdlog::critical(
+          "{}: NaN found on interpolation table.", 
+          "set_distances"
+        );
+        exit(1);
+      }
+      cosmology.chi[0][i] = io_z(i);
+      cosmology.chi[1][i] = io_chi(i);
+    }
+
+    cosmology.random = RandomNumber::get_instance().get();
+  }
+
+  spdlog::debug("{}: Ends", "set_distances");
+}
+
+// ---------------------------------------------------------------------------
+// ---------------------------------------------------------------------------
+// ---------------------------------------------------------------------------
+
+// Growth: D = G * a
+void set_growth(arma::Col<double> io_z, arma::Col<double> io_G)
+{
+  spdlog::debug("{}: Begins", "set_growth");
+
+  bool debug_fail = false;
+  if (io_z.n_elem != io_G.n_elem) {
+    debug_fail = true;
+  }
+  else {
+    if (io_z.n_elem == 0) {
+      debug_fail = true;
+    }
+  }
+  if (debug_fail) {
+    spdlog::critical(
+        "{}: incompatible input w/ z.size = {} and G.size = {}",
+        "set_growth", 
+        io_z.n_elem, io_G.n_elem
+      );
+    exit(1);
+  }
+  if(io_z.n_elem < 5) {
+    spdlog::critical(
+        "{}: bad input w/ z.size = {} and G.size = {}"
+        "set_growth", 
+        io_z.n_elem, io_G.n_elem
+      );
+    exit(1);
+  }
+
+  int cache_update = 0;
+  if (cosmology.G_nz != static_cast<int>(io_z.n_elem) || NULL == cosmology.G) {
+    cache_update = 1;
+  }
+  else
+  {
+    for (int i=0; i<cosmology.G_nz; i++) {
+      if (fdiff(cosmology.G[0][i], io_z(i)) ||
+          fdiff(cosmology.G[1][i], io_G(i))) {
+        cache_update = 1; 
+        break;
+      }    
+    }
+  }
+
+  if (1 == cache_update)
+  {
+    cosmology.G_nz = static_cast<int>(io_z.n_elem);
+
+    if (cosmology.G != NULL) {
+      free(cosmology.G);
+    }
+    cosmology.G = (double**) malloc2d(2, cosmology.G_nz);
+
+    #pragma omp parallel for
+    for (int i=0; i<cosmology.G_nz; i++) {
+      if (std::isnan(io_z(i)) || std::isnan(io_G(i))) {
+        // can't compile cosmolike with -O3 or -fast-math
+        // see: https://stackoverflow.com/a/47703550/2472169
+        spdlog::critical(
+          "{}: NaN found on interpolation table.", 
+          "set_growth"
+        );
+        exit(1);
+      }
+      cosmology.G[0][i] = io_z(i);
+      cosmology.G[1][i] = io_G(i);
+    }
+
+    cosmology.random = RandomNumber::get_instance().get();
+  }
+
+  spdlog::debug("{}: Ends", "set_growth");
+}
+
+// ---------------------------------------------------------------------------
+// ---------------------------------------------------------------------------
+// ---------------------------------------------------------------------------
+
+void set_linear_power_spectrum(
+    arma::Col<double> io_log10k, 
+    arma::Col<double> io_z, 
+    arma::Col<double> io_lnP
+  )
+{
+  spdlog::debug("{}: Begins", "set_linear_power_spectrum");
+
+  bool debug_fail = false;
+  if (io_z.n_elem*io_log10k.n_elem != io_lnP.n_elem) {
+    debug_fail = true;
+  }
+  else {
+    if (io_z.n_elem == 0 || io_log10k.n_elem == 0) {
+      debug_fail = true;
+    }
+  }
+  if (debug_fail)
+  {
+    spdlog::critical(
+        "{}: incompatible input w/ k.size = {}, z.size = {}, "
+        "and lnP.size = {}", "set_linear_power_spectrum", 
+        io_log10k.n_elem, io_z.n_elem, io_lnP.n_elem
+      );
+    exit(1);
+  }
+  if(io_z.n_elem < 5 || io_log10k.n_elem < 5) {
+    spdlog::critical(
+        "{}: bad input w/ k.size = {}, z.size = {}, "
+        "and lnP.size = {}", "set_linear_power_spectrum", 
+        io_log10k.n_elem, io_z.n_elem, io_lnP.n_elem
+      );
+    exit(1);
+  }
+
+  int cache_update = 0;
+  if (cosmology.lnPL_nk != static_cast<int>(io_log10k.n_elem) ||
+      cosmology.lnPL_nz != static_cast<int>(io_z.n_elem) || 
+      NULL == cosmology.lnPL) {
+    cache_update = 1;
+  }
+  else
+  {
+    for (int i=0; i<cosmology.lnPL_nk; i++) {
+      for (int j=0; j<cosmology.lnPL_nz; j++) {
+        if (fdiff(cosmology.lnPL[i][j], io_lnP(i*cosmology.lnPL_nz+j))) {
+          cache_update = 1; 
+          goto jump;
+        }
+      }
+    }
+    for (int i=0; i<cosmology.lnPL_nk; i++) {
+      if (fdiff(cosmology.lnPL[i][cosmology.lnPL_nz], io_log10k(i))) {
+        cache_update = 1; 
+        break;
+      }
+    }
+    for (int j=0; j<cosmology.lnPL_nz; j++) {
+      if (fdiff(cosmology.lnPL[cosmology.lnPL_nk][j], io_z(j))) {
+        cache_update = 1; 
+        break;
+      }
+    }
+  }
+
+  jump:
+
+  if (1 == cache_update)
+  {
+    cosmology.lnPL_nk = static_cast<int>(io_log10k.n_elem);
+    cosmology.lnPL_nz = static_cast<int>(io_z.n_elem);
+
+    if (cosmology.lnPL != NULL) {
+      free(cosmology.lnPL);
+    }
+    cosmology.lnPL = (double**) malloc2d(cosmology.lnPL_nk+1,cosmology.lnPL_nz+1);
+
+    #pragma omp parallel for
+    for (int i=0; i<cosmology.lnPL_nk; i++) {
+      if (std::isnan(io_log10k(i))) {
+        // can't compile cosmolike with -O3 or -fast-math
+        // see: https://stackoverflow.com/a/47703550/2472169
+        spdlog::critical(
+          "{}: NaN found on interpolation table.", 
+          "set_linear_power_spectrum"
+        );
+        exit(1);
+      }
+      cosmology.lnPL[i][cosmology.lnPL_nz] = io_log10k(i);
+    }
+
+    #pragma omp parallel for
+    for (int j=0; j<cosmology.lnPL_nz; j++) {
+      if (std::isnan(io_z(j))) {
+        // can't compile cosmolike with -O3 or -fast-math
+        // see: https://stackoverflow.com/a/47703550/2472169
+        spdlog::critical(
+          "{}: NaN found on interpolation table.", 
+          "set_linear_power_spectrum"
+        );
+        exit(1);
+      }
+      cosmology.lnPL[cosmology.lnPL_nk][j] = io_z(j);
+    }
+
+    #pragma omp parallel for collapse(2)
+    for (int i=0; i<cosmology.lnPL_nk; i++)
+      for (int j=0; j<cosmology.lnPL_nz; j++) {
+        if (std::isnan(io_lnP(i*cosmology.lnP_nz+j))) {
+          // can't compile cosmolike with -O3 or -fast-math
+          // see: https://stackoverflow.com/a/47703550/2472169
+          spdlog::critical(
+            "{}: NaN found on interpolation table.", 
+            "set_linear_power_spectrum"
+          );
+          exit(1);
+        }
+        cosmology.lnPL[i][j] = io_lnP(i*cosmology.lnPL_nz+j);
+      }
+
+    cosmology.random = RandomNumber::get_instance().get();
+  }
+
+  spdlog::debug("{}: Ends", "set_linear_power_spectrum");
+}
+
+// ---------------------------------------------------------------------------
+// ---------------------------------------------------------------------------
+// ---------------------------------------------------------------------------
+
+void set_non_linear_power_spectrum(
+    arma::Col<double> io_log10k, 
+    arma::Col<double> io_z, 
+    arma::Col<double> io_lnP
+  )
+{
+  spdlog::debug("{}: Begins", "set_non_linear_power_spectrum");
+
+  bool debug_fail = false;
+  if (io_z.n_elem*io_log10k.n_elem != io_lnP.n_elem) {
+    debug_fail = true;
+  }
+  else {
+    if (io_z.n_elem == 0) {
+      debug_fail = true;
+    }
+  }
+  if (debug_fail) {
+    spdlog::critical(
+        "{}: incompatible input w/ k.size = {}, z.size = {}, "
+        "and lnP.size = {}", "set_non_linear_power_spectrum", 
+        io_log10k.n_elem, io_z.n_elem, io_lnP.n_elem
+      );
+    exit(1);
+  }
+  if (io_z.n_elem < 5 || io_log10k.n_elem < 5) {
+    spdlog::critical(
+        "{}: bad input w/ k.size = {}, z.size = {}, "
+        "and lnP.size = {}", "set_non_linear_power_spectrum", 
+        io_log10k.n_elem, io_z.n_elem, io_lnP.n_elem
+      );
+    exit(1);
+  }
+
+  int cache_update = 0;
+  if (cosmology.lnP_nk != static_cast<int>(io_log10k.n_elem) ||
+      cosmology.lnP_nz != static_cast<int>(io_z.n_elem) || 
+      NULL == cosmology.lnP) {
+    cache_update = 1;
+  }
+  else
+  {
+    for (int i=0; i<cosmology.lnP_nk; i++) {
+      for (int j=0; j<cosmology.lnP_nz; j++) {
+        if (fdiff(cosmology.lnP[i][j], io_lnP(i*cosmology.lnP_nz+j))) {
+          cache_update = 1; 
+          goto jump;
+        }
+      }
+    }
+    for (int i=0; i<cosmology.lnP_nk; i++) {
+      if (fdiff(cosmology.lnP[i][cosmology.lnP_nz], io_log10k(i))) {
+        cache_update = 1; 
+        break;
+      }
+    }
+    for (int j=0; j<cosmology.lnP_nz; j++) {
+      if (fdiff(cosmology.lnP[cosmology.lnP_nk][j], io_z(j))) {
+        cache_update = 1; 
+        break;
+      }
+    }
+  }
+
+  jump:
+
+  if (1 == cache_update)
+  {
+    cosmology.lnP_nk = static_cast<int>(io_log10k.n_elem);
+    cosmology.lnP_nz = static_cast<int>(io_z.n_elem);
+
+    if (cosmology.lnP != NULL) {
+      free(cosmology.lnP);
+    }
+    cosmology.lnP = (double**) malloc2d(cosmology.lnP_nk+1,cosmology.lnP_nz+1);
+
+    #pragma omp parallel for
+    for (int i=0; i<cosmology.lnP_nk; i++) {
+      if (std::isnan(io_log10k(i))) {
+        // can't compile cosmolike with -O3 or -fast-math
+        // see: https://stackoverflow.com/a/47703550/2472169
+        spdlog::critical(
+          "{}: NaN found on interpolation table.", 
+          "set_non_linear_power_spectrum"
+        );
+        exit(1);
+      }
+      cosmology.lnP[i][cosmology.lnP_nz] = io_log10k(i);
+    }
+    #pragma omp parallel for
+    for (int j=0; j<cosmology.lnP_nz; j++) {
+      if (std::isnan(io_z(j))) {
+        // can't compile cosmolike with -O3 or -fast-math
+        // see: https://stackoverflow.com/a/47703550/2472169
+        spdlog::critical(
+          "{}: NaN found on interpolation table.", 
+          "set_non_linear_power_spectrum"
+        );
+        exit(1);
+      }
+      cosmology.lnP[cosmology.lnP_nk][j] = io_z(j);
+    }
+    #pragma omp parallel for collapse(2)
+    for (int i=0; i<cosmology.lnP_nk; i++)
+      for (int j=0; j<cosmology.lnP_nz; j++) {
+        if (std::isnan(io_lnP(i*cosmology.lnP_nz+j))) {
+          // can't compile cosmolike with -O3 or -fast-math
+          // see: https://stackoverflow.com/a/47703550/2472169
+          spdlog::critical(
+            "{}: NaN found on interpolation table.", 
+            "set_non_linear_power_spectrum"
+          );
+          exit(1);
+        }
+        cosmology.lnP[i][j] = io_lnP(i*cosmology.lnP_nz+j);
+      }
+
+    cosmology.random = RandomNumber::get_instance().get();
+  }
+
+  spdlog::debug("{}: Ends", "set_non_linear_power_spectrum");
+}
+
+// ---------------------------------------------------------------------------
+// ---------------------------------------------------------------------------
+// ---------------------------------------------------------------------------
+
+void set_nuisance_shear_calib(arma::Col<double> M)
+{
+  spdlog::debug("{}: Begins", "set_nuisance_shear_calib");
+
+  if (redshift.shear_nbin == 0) {
+    spdlog::critical(
+        "{}: {} = 0 is invalid", 
+        "set_nuisance_shear_calib", 
+        "shear_Nbin"
+      );
+    exit(1);
+  }
+  if (redshift.shear_nbin != static_cast<int>(M.n_elem)) {
+    spdlog::critical(
+        "{}: incompatible input w/ size = {} (!= {})",
+        "set_nuisance_shear_calib", 
+        M.n_elem, 
+        redshift.shear_nbin
+      );
+    exit(1);
+  }
+
+  for (int i=0; i<redshift.shear_nbin; i++) {
+    if (std::isnan(M(i))) {
+      // can't compile cosmolike with -O3 or -fast-math
+      // see: https://stackoverflow.com/a/47703550/2472169
+      spdlog::critical(
+        "{}: NaN found on index {} ({}).", 
+        "set_nuisance_shear_calib", 
+        i,
+        "common error if `params_values.get(p, None)` return None"
+      );
+      exit(1);
+    }
+    nuisance.shear_calibration_m[i] = M(i);
+  }
+  
+  spdlog::debug("{}: Ends", "set_nuisance_shear_calib");
+}
+
+// ---------------------------------------------------------------------------
+// ---------------------------------------------------------------------------
+// ---------------------------------------------------------------------------
+
+void set_nuisance_shear_photoz(arma::Col<double> SP)
+{
+  spdlog::debug("{}: Begins", "set_nuisance_shear_photoz");
+
+  if (redshift.shear_nbin == 0) {
+    spdlog::critical(
+        "{}: {} = 0 is invalid",
+        "set_nuisance_shear_photoz", 
+        "shear_Nbin"
+      );
+    exit(1);
+  }
+  if (redshift.shear_nbin != static_cast<int>(SP.n_elem)) {
+    spdlog::critical(
+        "{}: incompatible input w/ size = {} (!= {})",
+        "set_nuisance_shear_photoz", 
+        SP.n_elem, 
+        redshift.shear_nbin
+      );
+    exit(1);
+  }
+
+  int cache_update = 0;
+  for (int i=0; i<redshift.shear_nbin; i++) {
+    if (std::isnan(SP(i))) {
+      // can't compile cosmolike with -O3 or -fast-math
+      // see: https://stackoverflow.com/a/47703550/2472169
+      spdlog::critical(
+        "{}: NaN found on index {} ({}).", 
+        "set_nuisance_shear_photoz", 
+        i,
+        "common error if `params_values.get(p, None)` return None"
+      );
+      exit(1);
+    }
+    if (fdiff(nuisance.photoz[0][0][i], SP(i)))
+    {
+      cache_update = 1;
+      nuisance.photoz[0][0][i] = SP(i);
+    } 
+  }
+
+  if (1 == cache_update) {
+    nuisance.random_photoz_shear = RandomNumber::get_instance().get();
+  }
+
+  spdlog::debug("{}: Ends", "set_nuisance_shear_photoz");
+}
+
+// ---------------------------------------------------------------------------
+// ---------------------------------------------------------------------------
+// ---------------------------------------------------------------------------
+
+void set_nuisance_clustering_photoz(arma::Col<double> CP)
+{
+  spdlog::debug("{}: Begins", "set_nuisance_clustering_photoz");
+
+  if (redshift.clustering_nbin == 0) {
+    spdlog::critical(
+        "{}: {} = 0 is invalid",
+        "set_nuisance_clustering_photoz", 
+        "clustering_Nbin"
+      );
+    exit(1);
+  }
+  if (redshift.clustering_nbin != static_cast<int>(CP.n_elem)) {
+    spdlog::critical(
+        "{}: incompatible input w/ size = {} (!= {})",
+        "set_nuisance_clustering_photoz", 
+        CP.n_elem, 
+        redshift.clustering_nbin
+      );
+    exit(1);
+  }
+
+  int cache_update = 0;
+  for (int i=0; i<redshift.clustering_nbin; i++)
+  {
+    if (std::isnan(CP(i))) {
+      // can't compile cosmolike with -O3 or -fast-math
+      // see: https://stackoverflow.com/a/47703550/2472169
+      spdlog::critical(
+        "{}: NaN found on index {} ({}).", 
+        "set_nuisance_clustering_photoz", 
+        i,
+        "common error if `params_values.get(p, None)` return None"
+      );
+      exit(1);
+    }
+    if (fdiff(nuisance.photoz[1][0][i], CP(i)))
+    { 
+      cache_update = 1;
+      nuisance.photoz[1][0][i] = CP(i);
+    }
+  }
+
+  if(1 == cache_update) {
+    nuisance.random_photoz_clustering = RandomNumber::get_instance().get();
+  }
+  
+  spdlog::debug("{}: Ends", "set_nuisance_clustering_photoz");
+}
+
+// ---------------------------------------------------------------------------
+// ---------------------------------------------------------------------------
+// ---------------------------------------------------------------------------
+
+void set_nuisance_clustering_photoz_stretch(arma::Col<double> CPS)
+{
+  spdlog::debug("{}: Begins", "set_nuisance_clustering_photoz_stretch");
+
+  if (redshift.clustering_nbin == 0) {
+    spdlog::critical(
+        "{}: {} = 0 is invalid",
+        "set_nuisance_clustering_photoz_stretch",
+        "clustering_Nbin"
+      );
+    exit(1);
+  }
+  if (redshift.clustering_nbin != static_cast<int>(CPS.n_elem)) {
+    spdlog::critical(
+        "{}: incompatible input w/ size = {} (!= {})",
+        "set_nuisance_clustering_photoz_stretch",
+        CPS.n_elem,
+        redshift.clustering_nbin
+      );
+    exit(1);
+  }
+
+  int cache_update = 0;
+  for (int i=0; i<redshift.clustering_nbin; i++) {
+    if (std::isnan(CPS(i))) {
+      // can't compile cosmolike with -O3 or -fast-math
+      // see: https://stackoverflow.com/a/47703550/2472169
+      spdlog::critical(
+        "{}: NaN found on index {} ({}).", 
+        "set_nuisance_clustering_photoz_stretch", 
+        i,
+        "common error if `params_values.get(p, None)` return None"
+      );
+      exit(1);
+    }
+    if (fdiff(nuisance.photoz[1][1][i], CPS(i))) {
+      cache_update = 1;
+      nuisance.photoz[1][1][i] = CPS(i);
+    }
+  }
+
+  if(1 == cache_update) {
+    nuisance.random_photoz_clustering = RandomNumber::get_instance().get();
+  }
+  spdlog::debug("{}: Ends", "set_nuisance_clustering_photoz_stretch");
+}
+
+// ---------------------------------------------------------------------------
+// ---------------------------------------------------------------------------
+// ---------------------------------------------------------------------------
+
+void set_nuisance_linear_bias(arma::Col<double> B1)
+{
+  spdlog::debug("{}: Begins", "set_nuisance_linear_bias");
+
+  if (redshift.clustering_nbin == 0) {
+    spdlog::critical(
+        "{}: {} = 0 is invalid",
+        "set_nuisance_linear_bias", "clustering_Nbin"
+      );
+    exit(1);
+  }
+  if (redshift.clustering_nbin != static_cast<int>(B1.n_elem)) {
+    spdlog::critical(
+        "{}: incompatible input w/ size = {} (!= {})",
+        "set_nuisance_linear_bias", 
+        B1.n_elem, 
+        redshift.clustering_nbin
+      );
+    exit(1);
+  }
+
+  // GALAXY BIAS ------------------------------------------
+  // 1st index: b[0][i] = linear galaxy bias in clustering bin i (b1)
+  //            b[1][i] = linear galaxy bias in clustering bin i (b2)
+  //            b[2][i] = leading order tidal bias in clustering bin i (b3)
+  //            b[3][i] = leading order tidal bias in clustering bin i
+  int cache_update = 0;
+  for (int i=0; i<redshift.clustering_nbin; i++) {
+    if (std::isnan(B1(i))) {
+      // can't compile cosmolike with -O3 or -fast-math
+      // see: https://stackoverflow.com/a/47703550/2472169
+      spdlog::critical(
+        "{}: NaN found on index {} ({}).", 
+        "set_nuisance_linear_bias", 
+        i,
+        "common error if `params_values.get(p, None)` return None"
+      );
+      exit(1);
+    }
+    if(fdiff(nuisance.gb[0][i], B1(i)))
+    {
+      cache_update = 1;
+      nuisance.gb[0][i] = B1(i);
+    } 
+  }
+
+  if(1 == cache_update) {
+    nuisance.random_galaxy_bias = RandomNumber::get_instance().get();
+  }
+
+  spdlog::debug("{}: Ends", "set_nuisance_linear_bias");
+}
+
+// ---------------------------------------------------------------------------
+// ---------------------------------------------------------------------------
+// ---------------------------------------------------------------------------
+
+void set_nuisance_nonlinear_bias(arma::Col<double> B1, arma::Col<double> B2)
+{
+  spdlog::debug("{}: Begins", "set_nuisance_nonlinear_bias");
+
+  if (redshift.clustering_nbin == 0)
+  {
+    spdlog::critical("{}: {} = 0 is invalid",
+      "set_nuisance_nonlinear_bias", "clustering_Nbin");
+    exit(1);
+  }
+  if (redshift.clustering_nbin != static_cast<int>(B1.n_elem) ||
+      redshift.clustering_nbin != static_cast<int>(B2.n_elem))
+  {
+    spdlog::critical(
+      "{}: incompatible input w/ sizes = {} and {} (!= {})",
+      "set_nuisance_nonlinear_bias", 
+      B1.n_elem, B2.n_elem, redshift.clustering_nbin);
+    exit(1);
+  }
+
+  // GALAXY BIAS ------------------------------------------
+  // 1st index: b[0][i]: linear galaxy bias in clustering bin i
+  //            b[1][i]: nonlinear b2 galaxy bias in clustering bin i
+  //            b[2][i]: leading order tidal bs2 galaxy bias in clustering bin i
+  //            b[3][i]: nonlinear b3 galaxy bias  in clustering bin i 
+  //            b[4][i]: amplitude of magnification bias in clustering bin i 
+  int cache_update = 0;
+  for (int i=0; i<redshift.clustering_nbin; i++)
+  {
+    if (std::isnan(B1(i)) || std::isnan(B2(i))) {
+      // can't compile cosmolike with -O3 or -fast-math
+      // see: https://stackoverflow.com/a/47703550/2472169
+      spdlog::critical(
+        "{}: NaN found on index {} ({}).", 
+        "set_nuisance_nonlinear_bias", 
+        i,
+        "common error if `params_values.get(p, None)` return None"
+      );
+      exit(1);
+    }
+    if(fdiff(nuisance.gb[1][i], B2(i))) {
+      cache_update = 1;
+      nuisance.gb[1][i] = B2(i);
+      nuisance.gb[2][i] = almost_equal(B2(i), 0.) ? 0 : (-4./7.)*(B1(i)-1.0);
+    }
+  }
+
+  if(1 == cache_update) {
+    nuisance.random_galaxy_bias = RandomNumber::get_instance().get();
+  }
+
+  spdlog::debug("{}: Ends", "set_nuisance_nonlinear_bias");
+}
+
+// ---------------------------------------------------------------------------
+// ---------------------------------------------------------------------------
+// ---------------------------------------------------------------------------
+
+void set_nuisance_magnification_bias(arma::Col<double> B_MAG)
+{
+  spdlog::debug("{}: Begins", "set_nuisance_magnification_bias");
+
+  if (redshift.clustering_nbin == 0) {
+    spdlog::critical(
+        "{}: {} = 0 is invalid",
+        "set_nuisance_magnification_bias", 
+        "clustering_Nbin"
+      );
+    exit(1);
+  }
+  if (redshift.clustering_nbin != static_cast<int>(B_MAG.n_elem)) {
+    spdlog::critical(
+        "{}: incompatible input w/ size = {} (!= {})",
+        "set_nuisance_magnification_bias", 
+        B_MAG.n_elem, redshift.clustering_nbin
+      );
+    exit(1);
+  }
+
+  // GALAXY BIAS ------------------------------------------
+  // 1st index: b[0][i]: linear galaxy bias in clustering bin i
+  //            b[1][i]: nonlinear b2 galaxy bias in clustering bin i
+  //            b[2][i]: leading order tidal bs2 galaxy bias in clustering bin i
+  //            b[3][i]: nonlinear b3 galaxy bias  in clustering bin i 
+  //            b[4][i]: amplitude of magnification bias in clustering bin i
+  int cache_update = 0;
+  for (int i=0; i<redshift.clustering_nbin; i++)
+  {
+    if (std::isnan(B_MAG(i))) {
+      // can't compile cosmolike with -O3 or -fast-math
+      // see: https://stackoverflow.com/a/47703550/2472169
+      spdlog::critical(
+        "{}: NaN found on index {} ({}).", 
+        "set_nuisance_magnification_bias", 
+        i,
+        "common error if `params_values.get(p, None)` return None"
+      );
+      exit(1);
+    }
+    if(fdiff(nuisance.gb[4][i], B_MAG(i))) {
+      cache_update = 1;
+      nuisance.gb[4][i] = B_MAG(i);
+    }
+  }
+
+  if(1 == cache_update) {
+    nuisance.random_galaxy_bias = RandomNumber::get_instance().get();
+  }
+
+  spdlog::debug("{}: Ends", "set_nuisance_magnification_bias");
+}
+
+// ---------------------------------------------------------------------------
+// ---------------------------------------------------------------------------
+// ---------------------------------------------------------------------------
+
+void set_nuisance_bias(
+    arma::Col<double> B1, 
+    arma::Col<double> B2, 
+    arma::Col<double> B_MAG
+  )
+{
+  set_nuisance_linear_bias(B1);
+  
+  set_nuisance_nonlinear_bias(B1, B2);
+  
+  set_nuisance_magnification_bias(B_MAG);
+}
+
+// ---------------------------------------------------------------------------
+// ---------------------------------------------------------------------------
+// ---------------------------------------------------------------------------
+
+void set_nuisance_IA(
+    arma::Col<double> A1, 
+    arma::Col<double> A2,
+    arma::Col<double> BTA
+  )
+{
+  spdlog::debug("{}: Begins", "set_nuisance_IA");
+
+  if (redshift.shear_nbin == 0)
+  {
+    spdlog::critical("{}: {} = 0 is invalid",
+      "set_nuisance_IA", "shear_Nbin");
+    exit(1);
+  }
+  if (redshift.shear_nbin > static_cast<int>(A1.n_elem) ||
+      redshift.shear_nbin > static_cast<int>(A2.n_elem) ||
+      redshift.shear_nbin > static_cast<int>(BTA.n_elem))
+  {
+    spdlog::critical(
+      "{}: incompatible input w/ sizes = {}, {} and {} (!= {})",
+      "set_nuisance_IA", A1.n_elem, A2.n_elem, BTA.n_elem, redshift.shear_nbin);
+    exit(1);
+  }
+
+  // INTRINSIC ALIGMENT ------------------------------------------  
+  // ia[0][0] = A_ia          if(IA_NLA_LF || IA_REDSHIFT_EVOLUTION)
+  // ia[0][1] = eta_ia        if(IA_NLA_LF || IA_REDSHIFT_EVOLUTION)
+  // ia[0][2] = eta_ia_highz  if(IA_NLA_LF, Joachimi2012)
+  // ia[0][3] = beta_ia       if(IA_NLA_LF, Joachimi2012)
+  // ia[0][4] = LF_alpha      if(IA_NLA_LF, Joachimi2012)
+  // ia[0][5] = LF_P          if(IA_NLA_LF, Joachimi2012)
+  // ia[0][6] = LF_Q          if(IA_NLA_LF, Joachimi2012)
+  // ia[0][7] = LF_red_alpha  if(IA_NLA_LF, Joachimi2012)
+  // ia[0][8] = LF_red_P      if(IA_NLA_LF, Joachimi2012)
+  // ia[0][9] = LF_red_Q      if(IA_NLA_LF, Joachimi2012)
+  // ------------------
+  // ia[1][0] = A2_ia        if IA_REDSHIFT_EVOLUTION
+  // ia[1][1] = eta_ia_tt    if IA_REDSHIFT_EVOLUTION
+  // ------------------
+  // ia[2][MAX_SIZE_ARRAYS] = b_ta_z[MAX_SIZE_ARRAYS]
+
+  int cache_update = 0;
+  nuisance.c1rhocrit_ia = 0.01389;
+  
+  if (nuisance.IA == IA_REDSHIFT_BINNING)
+  {
+    for (int i=0; i<redshift.shear_nbin; i++)
+    {
+      if (std::isnan(A1(i)) || std::isnan(A2(i)) || std::isnan(BTA(i))) {
+        // can't compile cosmolike with -O3 or -fast-math
+        // see: https://stackoverflow.com/a/47703550/2472169
+        spdlog::critical(
+          "{}: NaN found on index {} ({}).", 
+          "set_nuisance_ia", 
+          i,
+          "common error if `params_values.get(p, None)` return None"
+        );
+        exit(1);
+      }
+      if (fdiff(nuisance.ia[0][i],A1(i)) ||
+          fdiff(nuisance.ia[1][i],A2(i)) ||
+          fdiff(nuisance.ia[2][i],A2(i)))
+      {
+        nuisance.ia[0][i] = A1(i);
+        nuisance.ia[1][i] = A2(i);
+        nuisance.ia[2][i] = BTA(i);
+        cache_update = 1;
+      }
+    }
+  }
+  else if (nuisance.IA == IA_REDSHIFT_EVOLUTION)
+  {
+    nuisance.oneplusz0_ia = 1.62;
+    if (fdiff(nuisance.ia[0][0],A1(0)) ||
+        fdiff(nuisance.ia[0][1],A1(1)) ||
+        fdiff(nuisance.ia[1][0],A2(0)) ||
+        fdiff(nuisance.ia[1][1],A2(1)) ||
+        fdiff(nuisance.ia[2][0],BTA(0)))
+    {
+      nuisance.ia[0][0] = A1(0);
+      nuisance.ia[0][1] = A1(1);
+      nuisance.ia[1][0] = A2(0);
+      nuisance.ia[1][1] = A2(1);
+      nuisance.ia[2][0] = BTA(0);
+      cache_update = 1;
+    }
+  }
+  if(1 == cache_update) {
+    nuisance.random_ia = RandomNumber::get_instance().get();
+  }
+
+  spdlog::debug("{}: Ends", "set_nuisance_ia");
+}
+
+// ---------------------------------------------------------------------------
+// ---------------------------------------------------------------------------
+// ---------------------------------------------------------------------------
+
 void set_lens_sample_size(const int Ntomo)
 {
-  if (!(Ntomo > 0) || Ntomo > MAX_SIZE_ARRAYS) {
+  if (std::isnan(Ntomo) || !(Ntomo > 0) || Ntomo > MAX_SIZE_ARRAYS) {
     spdlog::critical(
         "{}: {} = {} not supported (max = {})", 
         "set_lens_sample_size", 
@@ -1407,7 +2597,7 @@ void set_lens_sample(arma::Mat<double> input_table)
   spdlog::debug("{}: Begins", "set_lens_sample");
 
   const int Ntomo = redshift.clustering_nbin;
-  if (!(Ntomo > 0) || Ntomo > MAX_SIZE_ARRAYS) {
+  if (std::isnan(Ntomo) || !(Ntomo > 0) || Ntomo > MAX_SIZE_ARRAYS) {
     spdlog::critical(
         "{}: {} = {} not supported (max = {})", 
         "set_lens_sample_size", 
@@ -1420,13 +2610,12 @@ void set_lens_sample(arma::Mat<double> input_table)
 
   int cache_update = 0;
   if (redshift.clustering_nzbins != input_table.n_rows ||
-      redshift.clustering_zdist_table == NULL) {
+      NULL == redshift.clustering_zdist_table) {
     cache_update = 1;
   }
   else
   {
-    for (int i=0; i<redshift.clustering_nzbins; i++) 
-    {
+    for (int i=0; i<redshift.clustering_nzbins; i++) {
       double** tab = redshift.clustering_zdist_table;        // alias
       double* z_v = redshift.clustering_zdist_table[Ntomo];  // alias
 
@@ -1503,26 +2692,9 @@ void set_lens_sample(arma::Mat<double> input_table)
 // ---------------------------------------------------------------------------
 // ---------------------------------------------------------------------------
 
-void init_lens_sample(std::string multihisto_file, const int Ntomo)
-{
-  spdlog::debug("{}: Begins", "init_lens_sample v2.0");
-
-  arma::Mat<double> input_table = read_nz_sample(multihisto_file, Ntomo);
-
-  set_lens_sample_size(Ntomo);
-
-  set_lens_sample(input_table);
-
-  spdlog::debug("{}: Ends", "init_lens_sample v2.0");
-}
-
-// ---------------------------------------------------------------------------
-// ---------------------------------------------------------------------------
-// ---------------------------------------------------------------------------
-
 void set_source_sample_size(const int Ntomo)
 {
-  if (!(Ntomo > 0) || Ntomo > MAX_SIZE_ARRAYS) {
+  if (std::isnan(Ntomo) || !(Ntomo > 0) || Ntomo > MAX_SIZE_ARRAYS) {
     spdlog::critical(
         "{}: {} = {} not supported (max = {})", 
         "set_source_sample_size", 
@@ -1545,7 +2717,7 @@ void set_source_sample(arma::Mat<double> input_table)
   spdlog::debug("{}: Begins", "set_source_sample");
 
   const int Ntomo = redshift.shear_nbin;
-  if (!(Ntomo > 0) || Ntomo > MAX_SIZE_ARRAYS) {
+  if (std::isnan(Ntomo) ||  !(Ntomo > 0) || Ntomo > MAX_SIZE_ARRAYS) {
     spdlog::critical(
         "{}: {} = {} not supported (max = {})", 
         "set_source_sample", 
@@ -1558,7 +2730,7 @@ void set_source_sample(arma::Mat<double> input_table)
 
   int cache_update = 0;
   if (redshift.shear_nzbins != input_table.n_rows ||
-      redshift.shear_zdist_table == NULL) {
+      NULL == redshift.shear_zdist_table) {
     cache_update = 1;
   }
   else
@@ -1651,949 +2823,6 @@ void set_source_sample(arma::Mat<double> input_table)
 // ---------------------------------------------------------------------------
 // ---------------------------------------------------------------------------
 // ---------------------------------------------------------------------------
-
-void init_source_sample(std::string multihisto_file, const int Ntomo)
-{
-  spdlog::debug("{}: Begins", "init_source_sample");
-
-  arma::Mat<double> input_table = read_nz_sample(multihisto_file, Ntomo);
-
-  set_source_sample_size(Ntomo);
-
-  set_source_sample(input_table);
-
-  spdlog::debug("{}: Ends", "init_source_sample");
-}
-
-// ---------------------------------------------------------------------------
-// ---------------------------------------------------------------------------
-// ---------------------------------------------------------------------------
-
-void init_ntomo_powerspectra()
-{
-  if (redshift.shear_nbin == 0) {
-    spdlog::critical(
-        "{}: {} not set prior to this function call", 
-        "init_ntomo_powerspectra", 
-        "redshift.shear_nbin"
-      );
-    exit(1);
-  }
-  if (redshift.clustering_nbin == 0) {
-    spdlog::critical(
-        "{}: {} not set prior to this function call", 
-        "init_ntomo_powerspectra", 
-        "redshift.clustering_nbin"
-      );
-    exit(1);
-  }
-
-  tomo.shear_Npowerspectra = redshift.shear_nbin * (redshift.shear_nbin + 1) / 2;
-
-  int n = 0;
-  for (int i=0; i<redshift.clustering_nbin; i++) {
-    for (int j=0; j<redshift.shear_nbin; j++) {
-      n += test_zoverlap(i, j);
-      if(test_zoverlap(i, j) == 0) {
-        spdlog::info(
-            "{}: GGL pair L{:d}-S{:d} is excluded",
-            "init_ntomo_powerspectra", 
-            i, 
-            j
-          );
-      }
-    }
-  }
-  tomo.ggl_Npowerspectra = n;
-
-  tomo.clustering_Npowerspectra = redshift.clustering_nbin;
-
-  spdlog::debug(
-      "{}: tomo.shear_Npowerspectra = {}",
-      "init_ntomo_powerspectra", 
-      tomo.shear_Npowerspectra
-    );
-  spdlog::debug(
-      "{}: tomo.ggl_Npowerspectra = {}",
-      "init_ntomo_powerspectra", 
-      tomo.ggl_Npowerspectra
-    );
-  spdlog::debug(
-      "{}: tomo.clustering_Npowerspectra = {}",
-      "init_ntomo_powerspectra", 
-      tomo.clustering_Npowerspectra
-    );
-}
-
-// ---------------------------------------------------------------------------
-// ---------------------------------------------------------------------------
-// ---------------------------------------------------------------------------
-
-py::tuple read_redshift_distributions_from_files(
-  std::string lens_multihisto_file, const int lens_ntomo,
-  std::string source_multihisto_file, const int source_ntomo)
-{
-  arma::Mat<double> input_lens_table = 
-    read_nz_sample(lens_multihisto_file, lens_ntomo);
-
-  arma::Mat<double> input_source_table = 
-    read_nz_sample(source_multihisto_file, source_ntomo);
-
-  return py::make_tuple(carma::mat_to_arr(input_lens_table), 
-                        carma::mat_to_arr(input_source_table));
-}
-
-
-// ---------------------------------------------------------------------------
-// ---------------------------------------------------------------------------
-// ---------------------------------------------------------------------------
-
-void init_redshift_distributions_from_files(
-  std::string lens_multihisto_file, const int lens_ntomo,
-  std::string source_multihisto_file, const int source_ntomo)
-{
-  init_lens_sample(lens_multihisto_file, lens_ntomo);
-  
-  init_source_sample(source_multihisto_file, source_ntomo);
-
-  init_ntomo_powerspectra();
-}
-
-// ---------------------------------------------------------------------------
-// ---------------------------------------------------------------------------
-// ---------------------------------------------------------------------------
-
-void init_survey(
-    std::string surveyname, 
-    double area, 
-    double sigma_e
-  )
-{
-  spdlog::debug("{}: Begins", "init_survey");
-
-  boost::trim_if(surveyname, boost::is_any_of("\t "));
-  
-  surveyname = boost::algorithm::to_lower_copy(surveyname);
-    
-  if (surveyname.size() > CHAR_MAX_SIZE - 1) {
-    spdlog::critical(
-        "{}: survey name too large for Cosmolike "
-        "(C char memory overflow)", "init_survey"
-      );
-    exit(1);
-  }
-  if (!(surveyname.size()>0)) {
-    spdlog::critical("{}: incompatible input", "init_survey");
-    exit(1);
-  }
-
-  memcpy(survey.name, surveyname.c_str(), surveyname.size() + 1);
-  
-  survey.area = area;
-  
-  survey.sigma_e = sigma_e;
-
-  spdlog::debug("{}: Ends", "init_survey");
-}
-
-// ---------------------------------------------------------------------------
-// ---------------------------------------------------------------------------
-// ---------------------------------------------------------------------------
-
-void init_ggl_exclude(arma::Col<int> ggl_exclude)
-{
-  arma::Col<int> _ggl_excl_ = arma::conv_to<arma::Col<int>>::from(ggl_exclude);
-  
-  if (tomo.ggl_exclude != NULL) {
-    free(tomo.ggl_exclude);
-  }
-  tomo.ggl_exclude   = (int*) malloc(sizeof(int)*ggl_exclude.n_elem);
-  
-  tomo.N_ggl_exclude = int(ggl_exclude.n_elem/2);
-  
-  spdlog::debug("init_ggl_exclude: {} ggl pairs excluded", tomo.N_ggl_exclude);
-  
-  for(int i=0; i<ggl_exclude.n_elem; i++) {
-    tomo.ggl_exclude[i] = ggl_exclude(i);
-  }
-}
-
-// ---------------------------------------------------------------------------
-// ---------------------------------------------------------------------------
-// ---------------------------------------------------------------------------
-// ---------------------------------------------------------------------------
-// ---------------------------------------------------------------------------
-// ---------------------------------------------------------------------------
-// ---------------------------------------------------------------------------
-// ---------------------------------------------------------------------------
-// ---------------------------------------------------------------------------
-// ---------------------------------------------------------------------------
-// ---------------------------------------------------------------------------
-// ---------------------------------------------------------------------------
-// ---------------------------------------------------------------------------
-// ---------------------------------------------------------------------------
-// SET FUNCTIONS
-// ---------------------------------------------------------------------------
-// ---------------------------------------------------------------------------
-// ---------------------------------------------------------------------------
-// ---------------------------------------------------------------------------
-// ---------------------------------------------------------------------------
-// ---------------------------------------------------------------------------
-// ---------------------------------------------------------------------------
-// ---------------------------------------------------------------------------
-// ---------------------------------------------------------------------------
-// ---------------------------------------------------------------------------
-// ---------------------------------------------------------------------------
-// ---------------------------------------------------------------------------
-// ---------------------------------------------------------------------------
-// ---------------------------------------------------------------------------
-// ---------------------------------------------------------------------------
-
-void set_cosmological_parameters(
-    const double omega_matter,
-    const double hubble
-  )
-{
-  spdlog::debug("\x1b[90m{}\x1b[0m: Begins", "set_cosmological_parameters");
-
-  // Cosmolike should not need parameters from inflation or dark energy.
-  // Cobaya provides P(k,z), H(z), D(z), Chi(z)...
-  // It may require H0 to set scales and \Omega_M to set the halo model
-
-  int cache_update = 0;
-  if (fdiff(cosmology.Omega_m, omega_matter) ||
-      fdiff(cosmology.h0, hubble/100.0)) // assuming H0 in km/s/Mpc
-  {
-    cache_update = 1;
-  }
-  if (1 == cache_update)
-  {
-    cosmology.Omega_m = omega_matter;
-    cosmology.Omega_v = 1.0-omega_matter;
-    // Cosmolike only needs to know that there are massive neutrinos (>0)
-    cosmology.Omega_nu = 0.1;
-    cosmology.h0 = hubble/100.0; 
-    cosmology.MGSigma = 0.0;
-    cosmology.MGmu = 0.0;
-    cosmology.random = cosmolike_interface::RandomNumber::get_instance().get();
-  }
-
-  spdlog::debug("\x1b[90m{}\x1b[0m: Ends", "set_cosmological_parameters");
-}
-
-// ---------------------------------------------------------------------------
-// ---------------------------------------------------------------------------
-// ---------------------------------------------------------------------------
-
-void set_distances(vector io_z, vector io_chi)
-{
-  spdlog::debug("{}: Begins", "set_distances");
-
-  bool debug_fail = false;
-  if (io_z.n_elem != io_chi.n_elem)
-    debug_fail = true;
-  else
-    if (io_z.n_elem == 0)
-      debug_fail = true;
-  
-  if (debug_fail) {
-    spdlog::critical(
-        "{}: incompatible input w/ z.size = {} and G.size = {}",
-        "set_distances", 
-        io_z.n_elem, 
-        io_chi.n_elem
-      );
-    exit(1);
-  }
-  if(io_z.n_elem < 5) {
-    spdlog::critical(
-        "{}: bad input w/ z.size = {} and chi.size = {}"
-        "set_distances", 
-        io_z.n_elem, 
-        io_chi.n_elem
-      );
-    exit(1);
-  }
-
-  int cache_update = 0;
-  if (cosmology.chi_nz != static_cast<int>(io_z.n_elem) || 
-      cosmology.chi  == NULL) 
-  {
-    cache_update = 1;
-  }
-  else
-  {
-    for (int i=0; i<cosmology.chi_nz; i++) 
-    {
-      if (fdiff(cosmology.chi[0][i], io_z(i)) ||
-          fdiff(cosmology.chi[1][i], io_chi(i))) 
-      {
-        cache_update = 1; 
-        break; 
-      }    
-    }
-  }
-
-  if (1 == cache_update)
-  {
-    cosmology.chi_nz = static_cast<int>(io_z.n_elem);
-
-    if (cosmology.chi != NULL) {
-      free(cosmology.chi);
-    }
-    cosmology.chi = (double**) malloc2d(2, cosmology.chi_nz);
-
-    #pragma omp parallel for
-    for (int i=0; i<cosmology.chi_nz; i++)
-    {
-      cosmology.chi[0][i] = io_z(i);
-      cosmology.chi[1][i] = io_chi(i);
-    }
-
-    cosmology.random = RandomNumber::get_instance().get();
-  }
-
-  spdlog::debug("{}: Ends", "set_distances");
-}
-
-// ---------------------------------------------------------------------------
-// ---------------------------------------------------------------------------
-// ---------------------------------------------------------------------------
-
-// Growth: D = G * a
-void set_growth(vector io_z, vector io_G)
-{
-  spdlog::debug("{}: Begins", "set_growth");
-
-  bool debug_fail = false;
-  if (io_z.n_elem != io_G.n_elem)
-    debug_fail = true;
-  else
-    if (io_z.n_elem == 0)
-      debug_fail = true;
-  
-  if (debug_fail)
-  {
-    spdlog::critical("{}: incompatible input w/ z.size = {} and G.size = {}",
-      "set_growth", io_z.n_elem, io_G.n_elem);
-    exit(1);
-  }
-  if(io_z.n_elem < 5)
-  {
-    spdlog::critical("{}: bad input w/ z.size = {} and G.size = {}"
-      "set_growth", io_z.n_elem, io_G.n_elem);
-    exit(1);
-  }
-
-  int cache_update = 0;
-  if (cosmology.G_nz != static_cast<int>(io_z.n_elem) || cosmology.G  == NULL)
-    cache_update = 1;
-  else
-  {
-    for (int i=0; i<cosmology.G_nz; i++) 
-    {
-      if (fdiff(cosmology.G[0][i], io_z(i)) ||
-          fdiff(cosmology.G[1][i], io_G(i))) 
-      {
-        cache_update = 1; 
-        break;
-      }    
-    }
-  }
-
-  if (1 == cache_update)
-  {
-    cosmology.G_nz = static_cast<int>(io_z.n_elem);
-
-    if (cosmology.G != NULL) {
-      free(cosmology.G);
-    }
-    cosmology.G = (double**) malloc2d(2, cosmology.G_nz);
-
-    #pragma omp parallel for
-    for (int i=0; i<cosmology.G_nz; i++)
-    {
-      cosmology.G[0][i] = io_z(i);
-      cosmology.G[1][i] = io_G(i);
-    }
-
-    cosmology.random = RandomNumber::get_instance().get();
-  }
-
-  spdlog::debug("{}: Ends", "set_growth");
-}
-
-// ---------------------------------------------------------------------------
-// ---------------------------------------------------------------------------
-// ---------------------------------------------------------------------------
-
-void set_linear_power_spectrum(vector io_log10k, vector io_z, vector io_lnP)
-{
-  spdlog::debug("{}: Begins", "set_linear_power_spectrum");
-
-  bool debug_fail = false;
-  if (io_z.n_elem*io_log10k.n_elem != io_lnP.n_elem)
-    debug_fail = true;
-  else
-    if (io_z.n_elem == 0 || io_log10k.n_elem == 0)
-      debug_fail = true;
-  
-  if (debug_fail)
-  {
-    spdlog::critical("{}: incompatible input w/ k.size = {}, z.size = {}, "
-      "and lnP.size = {}", "set_linear_power_spectrum", 
-      io_log10k.n_elem, io_z.n_elem, io_lnP.n_elem);
-    exit(1);
-  }
-  if(io_z.n_elem < 5 || io_log10k.n_elem < 5)
-  {
-    spdlog::critical("{}: bad input w/ k.size = {}, z.size = {}, "
-      "and lnP.size = {}", "set_linear_power_spectrum", 
-      io_log10k.n_elem, io_z.n_elem, io_lnP.n_elem);
-    exit(1);
-  }
-
-  int cache_update = 0;
-  if (cosmology.lnPL_nk != static_cast<int>(io_log10k.n_elem) ||
-      cosmology.lnPL_nz != static_cast<int>(io_z.n_elem) || 
-      cosmology.lnPL  == NULL)
-    cache_update = 1;
-  else
-  {
-    for (int i=0; i<cosmology.lnPL_nk; i++)
-    {
-      for (int j=0; j<cosmology.lnPL_nz; j++)
-      {
-        if (fdiff(cosmology.lnPL[i][j], io_lnP(i*cosmology.lnPL_nz+j))) 
-        {
-          cache_update = 1; 
-          goto jump;
-        }
-      }
-    }
-    for (int i=0; i<cosmology.lnPL_nk; i++)
-    {
-      if (fdiff(cosmology.lnPL[i][cosmology.lnPL_nz], io_log10k(i))) 
-      {
-        cache_update = 1; 
-        break;
-      }
-    }
-    for (int j=0; j<cosmology.lnPL_nz; j++)
-    {
-      if (fdiff(cosmology.lnPL[cosmology.lnPL_nk][j], io_z(j))) 
-      {
-        cache_update = 1; 
-        break;
-      }
-    }
-  }
-
-  jump:
-
-  if (1 == cache_update)
-  {
-    cosmology.lnPL_nk = static_cast<int>(io_log10k.n_elem);
-    cosmology.lnPL_nz = static_cast<int>(io_z.n_elem);
-
-    if (cosmology.lnPL != NULL) free(cosmology.lnPL);
-    cosmology.lnPL = (double**) malloc2d(cosmology.lnPL_nk+1,cosmology.lnPL_nz+1);
-
-    #pragma omp parallel for
-    for (int i=0; i<cosmology.lnPL_nk; i++)
-      cosmology.lnPL[i][cosmology.lnPL_nz] = io_log10k(i);
-
-    #pragma omp parallel for
-    for (int j=0; j<cosmology.lnPL_nz; j++)
-      cosmology.lnPL[cosmology.lnPL_nk][j] = io_z(j);
-
-    #pragma omp parallel for collapse(2)
-    for (int i=0; i<cosmology.lnPL_nk; i++)
-      for (int j=0; j<cosmology.lnPL_nz; j++)
-        cosmology.lnPL[i][j] = io_lnP(i*cosmology.lnPL_nz+j);
-
-    cosmology.random = RandomNumber::get_instance().get();
-  }
-
-  spdlog::debug("{}: Ends", "set_linear_power_spectrum");
-}
-
-// ---------------------------------------------------------------------------
-// ---------------------------------------------------------------------------
-// ---------------------------------------------------------------------------
-
-void set_non_linear_power_spectrum(vector io_log10k, vector io_z, vector io_lnP)
-{
-  spdlog::debug("{}: Begins", "set_non_linear_power_spectrum");
-
-  bool debug_fail = false;
-  
-  if (io_z.n_elem*io_log10k.n_elem != io_lnP.n_elem)
-    debug_fail = true;
-  else
-    if (io_z.n_elem == 0)
-      debug_fail = true;
-
-  if (debug_fail)
-  {
-    spdlog::critical("{}: incompatible input w/ k.size = {}, z.size = {}, "
-      "and lnP.size = {}", "set_non_linear_power_spectrum", 
-      io_log10k.n_elem, io_z.n_elem, io_lnP.n_elem);
-    exit(1);
-  }
-
-  if (io_z.n_elem < 5 || io_log10k.n_elem < 5)
-  {
-    spdlog::critical("{}: bad input w/ k.size = {}, z.size = {}, "
-      "and lnP.size = {}", "set_non_linear_power_spectrum", 
-      io_log10k.n_elem, io_z.n_elem, io_lnP.n_elem);
-    exit(1);
-  }
-
-  int cache_update = 0;
-  if (cosmology.lnP_nk != static_cast<int>(io_log10k.n_elem) ||
-      cosmology.lnP_nz != static_cast<int>(io_z.n_elem) || 
-      cosmology.lnP  == NULL)
-    cache_update = 1;
-  else
-  {
-    for (int i=0; i<cosmology.lnP_nk; i++)
-    {
-      for (int j=0; j<cosmology.lnP_nz; j++)
-      {
-        if (fdiff(cosmology.lnP[i][j], io_lnP(i*cosmology.lnP_nz+j))) 
-        {
-          cache_update = 1; 
-          goto jump;
-        }
-      }
-    }
-    for (int i=0; i<cosmology.lnP_nk; i++)
-    {
-      if (fdiff(cosmology.lnP[i][cosmology.lnP_nz], io_log10k(i))) 
-      {
-        cache_update = 1; 
-        break;
-      }
-    }
-    for (int j=0; j<cosmology.lnP_nz; j++)
-    {
-      if (fdiff(cosmology.lnP[cosmology.lnP_nk][j], io_z(j))) 
-      {
-        cache_update = 1; 
-        break;
-      }
-    }
-  }
-
-  jump:
-
-  if (1 == cache_update)
-  {
-    cosmology.lnP_nk = static_cast<int>(io_log10k.n_elem);
-    cosmology.lnP_nz = static_cast<int>(io_z.n_elem);
-
-    if (cosmology.lnP != NULL) free(cosmology.lnP);
-    cosmology.lnP = (double**) malloc2d(cosmology.lnP_nk+1,cosmology.lnP_nz+1);
-
-    #pragma omp parallel for
-    for (int i=0; i<cosmology.lnP_nk; i++)
-      cosmology.lnP[i][cosmology.lnP_nz] = io_log10k(i);
-
-    #pragma omp parallel for
-    for (int j=0; j<cosmology.lnP_nz; j++)
-      cosmology.lnP[cosmology.lnP_nk][j] = io_z(j);
-
-    #pragma omp parallel for collapse(2)
-    for (int i=0; i<cosmology.lnP_nk; i++)
-      for (int j=0; j<cosmology.lnP_nz; j++)
-        cosmology.lnP[i][j] = io_lnP(i*cosmology.lnP_nz+j);
-
-    cosmology.random = RandomNumber::get_instance().get();
-  }
-
-  spdlog::debug("{}: Ends", "set_non_linear_power_spectrum");
-}
-
-// ---------------------------------------------------------------------------
-// ---------------------------------------------------------------------------
-// ---------------------------------------------------------------------------
-
-void set_nuisance_shear_calib(vector M)
-{
-  spdlog::debug("{}: Begins", "set_nuisance_shear_calib");
-
-  if (redshift.shear_nbin == 0)
-  {
-    spdlog::critical("{}: {} = 0 is invalid", 
-      "set_nuisance_shear_calib", "shear_Nbin");
-    exit(1);
-  }
-  if (redshift.shear_nbin != static_cast<int>(M.n_elem))
-  {
-    spdlog::critical(
-      "{}: incompatible input w/ size = {} (!= {})",
-      "set_nuisance_shear_calib", M.n_elem, redshift.shear_nbin);
-    exit(1);
-  }
-
-  for (int i=0; i<redshift.shear_nbin; i++)
-    nuisance.shear_calibration_m[i] = M(i);
-  
-   spdlog::debug("{}: Ends", "set_nuisance_shear_calib");
-}
-
-// ---------------------------------------------------------------------------
-// ---------------------------------------------------------------------------
-// ---------------------------------------------------------------------------
-
-void set_nuisance_shear_photoz(vector SP)
-{
-  spdlog::debug("{}: Begins", "set_nuisance_shear_photoz");
-
-  if (redshift.shear_nbin == 0)
-  {
-    spdlog::critical("{}: {} = 0 is invalid",
-      "set_nuisance_shear_photoz", "shear_Nbin");
-    exit(1);
-  }
-  if (redshift.shear_nbin != static_cast<int>(SP.n_elem))
-  {
-    spdlog::critical(
-      "{}: incompatible input w/ size = {} (!= {})",
-      "set_nuisance_shear_photoz", SP.n_elem, redshift.shear_nbin);
-    exit(1);
-  }
-
-  int cache_update = 0;
-  for (int i=0; i<redshift.shear_nbin; i++)
-  {
-    if (fdiff(nuisance.photoz[0][0][i], SP(i)))
-    {
-      cache_update = 1;
-      nuisance.photoz[0][0][i] = SP(i);
-    } 
-  }
-
-  if (1 == cache_update)
-    nuisance.random_photoz_shear = RandomNumber::get_instance().get();
-
-  spdlog::debug("{}: Ends", "set_nuisance_shear_photoz");
-}
-
-// ---------------------------------------------------------------------------
-// ---------------------------------------------------------------------------
-// ---------------------------------------------------------------------------
-
-void set_nuisance_clustering_photoz(vector CP)
-{
-  spdlog::debug("{}: Begins", "set_nuisance_clustering_photoz");
-
-  if (redshift.clustering_nbin == 0)
-  {
-    spdlog::critical("{}: {} = 0 is invalid",
-      "set_nuisance_clustering_photoz", "clustering_Nbin");
-    exit(1);
-  }
-  if (redshift.clustering_nbin != static_cast<int>(CP.n_elem))
-  {
-    spdlog::critical(
-      "{}: incompatible input w/ size = {} (!= {})",
-      "set_nuisance_clustering_photoz", CP.n_elem, redshift.clustering_nbin);
-    exit(1);
-  }
-
-  int cache_update = 0;
-  for (int i=0; i<redshift.clustering_nbin; i++)
-  {
-    if (fdiff(nuisance.photoz[1][0][i], CP(i)))
-    { 
-      cache_update = 1;
-      nuisance.photoz[1][0][i] = CP(i);
-    }
-  }
-
-  if(1 == cache_update)
-    nuisance.random_photoz_clustering = RandomNumber::get_instance().get();
-  
-  spdlog::debug("{}: Ends", "set_nuisance_clustering_photoz");
-}
-
-// ---------------------------------------------------------------------------
-// ---------------------------------------------------------------------------
-// ---------------------------------------------------------------------------
-
-void set_nuisance_clustering_photoz_stretch(vector CPS)
-{
-  spdlog::debug("{}: Begins", "set_nuisance_clustering_photoz_stretch");
-
-  if (redshift.clustering_nbin == 0) {
-    spdlog::critical(
-      "{}: {} = 0 is invalid",
-      "set_nuisance_clustering_photoz_stretch",
-      "clustering_Nbin"
-    );
-    exit(1);
-  }
-  if (redshift.clustering_nbin != static_cast<int>(CPS.n_elem)) {
-    spdlog::critical(
-      "{}: incompatible input w/ size = {} (!= {})",
-      "set_nuisance_clustering_photoz_stretch",
-      CPS.n_elem,
-      redshift.clustering_nbin
-    );
-    exit(1);
-  }
-
-  int cache_update = 0;
-  for (int i=0; i<redshift.clustering_nbin; i++) {
-    if (fdiff(nuisance.photoz[1][1][i], CPS(i))) {
-      cache_update = 1;
-      nuisance.photoz[1][1][i] = CPS(i);
-    }
-  }
-
-  if(1 == cache_update) {
-    nuisance.random_photoz_clustering = RandomNumber::get_instance().get();
-  }
-  spdlog::debug("{}: Ends", "set_nuisance_clustering_photoz_stretch");
-}
-
-// ---------------------------------------------------------------------------
-// ---------------------------------------------------------------------------
-// ---------------------------------------------------------------------------
-
-void set_nuisance_linear_bias(vector B1)
-{
-  spdlog::debug("{}: Begins", "set_nuisance_linear_bias");
-
-  if (redshift.clustering_nbin == 0)
-  {
-    spdlog::critical("{}: {} = 0 is invalid",
-      "set_nuisance_linear_bias", "clustering_Nbin");
-    exit(1);
-  }
-  if (redshift.clustering_nbin != static_cast<int>(B1.n_elem))
-  {
-    spdlog::critical(
-      "{}: incompatible input w/ size = {} (!= {})",
-      "set_nuisance_linear_bias", B1.n_elem, redshift.clustering_nbin);
-    exit(1);
-  }
-
-  // GALAXY BIAS ------------------------------------------
-  // 1st index: b[0][i] = linear galaxy bias in clustering bin i (b1)
-  //            b[1][i] = linear galaxy bias in clustering bin i (b2)
-  //            b[2][i] = leading order tidal bias in clustering bin i (b3)
-  //            b[3][i] = leading order tidal bias in clustering bin i
-  int cache_update = 0;
-  for (int i=0; i<redshift.clustering_nbin; i++)
-  {
-    if(fdiff(nuisance.gb[0][i], B1(i)))
-    {
-      cache_update = 1;
-      nuisance.gb[0][i] = B1(i);
-    } 
-  }
-
-  if(1 == cache_update)
-    nuisance.random_galaxy_bias = RandomNumber::get_instance().get();
-
-  spdlog::debug("{}: Ends", "set_nuisance_linear_bias");
-}
-
-// ---------------------------------------------------------------------------
-// ---------------------------------------------------------------------------
-// ---------------------------------------------------------------------------
-
-void set_nuisance_nonlinear_bias(vector B1, vector B2)
-{
-  spdlog::debug("{}: Begins", "set_nuisance_nonlinear_bias");
-
-  if (redshift.clustering_nbin == 0)
-  {
-    spdlog::critical("{}: {} = 0 is invalid",
-      "set_nuisance_nonlinear_bias", "clustering_Nbin");
-    exit(1);
-  }
-  if (redshift.clustering_nbin != static_cast<int>(B1.n_elem) ||
-      redshift.clustering_nbin != static_cast<int>(B2.n_elem))
-  {
-    spdlog::critical(
-      "{}: incompatible input w/ sizes = {} and {} (!= {})",
-      "set_nuisance_nonlinear_bias", 
-      B1.n_elem, B2.n_elem, redshift.clustering_nbin);
-    exit(1);
-  }
-
-  // GALAXY BIAS ------------------------------------------
-  // 1st index: b[0][i]: linear galaxy bias in clustering bin i
-  //            b[1][i]: nonlinear b2 galaxy bias in clustering bin i
-  //            b[2][i]: leading order tidal bs2 galaxy bias in clustering bin i
-  //            b[3][i]: nonlinear b3 galaxy bias  in clustering bin i 
-  //            b[4][i]: amplitude of magnification bias in clustering bin i 
-  int cache_update = 0;
-  for (int i=0; i<redshift.clustering_nbin; i++)
-  {
-    if(fdiff(nuisance.gb[1][i], B2(i)))
-    {
-      cache_update = 1;
-      nuisance.gb[1][i] = B2(i);
-      nuisance.gb[2][i] = almost_equal(B2(i), 0.) ? 0 : (-4./7.)*(B1(i)-1.0);
-    }
-  }
-  if(1 == cache_update)
-    nuisance.random_galaxy_bias = RandomNumber::get_instance().get();
-
-  spdlog::debug("{}: Ends", "set_nuisance_nonlinear_bias");
-}
-
-// ---------------------------------------------------------------------------
-// ---------------------------------------------------------------------------
-// ---------------------------------------------------------------------------
-
-void set_nuisance_magnification_bias(vector B_MAG)
-{
-  spdlog::debug("{}: Begins", "set_nuisance_magnification_bias");
-
-  if (redshift.clustering_nbin == 0)
-  {
-    spdlog::critical("{}: {} = 0 is invalid",
-      "set_nuisance_magnification_bias", "clustering_Nbin");
-    exit(1);
-  }
-  if (redshift.clustering_nbin != static_cast<int>(B_MAG.n_elem))
-  {
-    spdlog::critical(
-      "{}: incompatible input w/ size = {} (!= {})",
-      "set_nuisance_magnification_bias", 
-      B_MAG.n_elem, redshift.clustering_nbin);
-    exit(1);
-  }
-
-  // GALAXY BIAS ------------------------------------------
-  // 1st index: b[0][i]: linear galaxy bias in clustering bin i
-  //            b[1][i]: nonlinear b2 galaxy bias in clustering bin i
-  //            b[2][i]: leading order tidal bs2 galaxy bias in clustering bin i
-  //            b[3][i]: nonlinear b3 galaxy bias  in clustering bin i 
-  //            b[4][i]: amplitude of magnification bias in clustering bin i
-  int cache_update = 0;
-  for (int i=0; i<redshift.clustering_nbin; i++)
-  {
-    if(fdiff(nuisance.gb[4][i], B_MAG(i)))
-    {
-      cache_update = 1;
-      nuisance.gb[4][i] = B_MAG(i);
-    }
-  }
-  if(1 == cache_update)
-    nuisance.random_galaxy_bias = RandomNumber::get_instance().get();
-
-  spdlog::debug("{}: Ends", "set_nuisance_magnification_bias");
-}
-
-// ---------------------------------------------------------------------------
-// ---------------------------------------------------------------------------
-// ---------------------------------------------------------------------------
-
-void set_nuisance_bias(vector B1, vector B2, vector B_MAG)
-{
-  set_nuisance_linear_bias(B1);
-  
-  set_nuisance_nonlinear_bias(B1, B2);
-  
-  set_nuisance_magnification_bias(B_MAG);
-}
-
-// ---------------------------------------------------------------------------
-// ---------------------------------------------------------------------------
-// ---------------------------------------------------------------------------
-
-void set_nuisance_IA(
-    arma::Col<double> A1, 
-    arma::Col<double> A2,
-    arma::Col<double> BTA
-  )
-{
-  spdlog::debug("{}: Begins", "set_nuisance_IA");
-
-  if (redshift.shear_nbin == 0)
-  {
-    spdlog::critical("{}: {} = 0 is invalid",
-      "set_nuisance_IA", "shear_Nbin");
-    exit(1);
-  }
-  if (redshift.shear_nbin > static_cast<int>(A1.n_elem) ||
-      redshift.shear_nbin > static_cast<int>(A2.n_elem) ||
-      redshift.shear_nbin > static_cast<int>(BTA.n_elem))
-  {
-    spdlog::critical(
-      "{}: incompatible input w/ sizes = {}, {} and {} (!= {})",
-      "set_nuisance_IA", A1.n_elem, A2.n_elem, BTA.n_elem, redshift.shear_nbin);
-    exit(1);
-  }
-
-  // INTRINSIC ALIGMENT ------------------------------------------  
-  // ia[0][0] = A_ia          if(IA_NLA_LF || IA_REDSHIFT_EVOLUTION)
-  // ia[0][1] = eta_ia        if(IA_NLA_LF || IA_REDSHIFT_EVOLUTION)
-  // ia[0][2] = eta_ia_highz  if(IA_NLA_LF, Joachimi2012)
-  // ia[0][3] = beta_ia       if(IA_NLA_LF, Joachimi2012)
-  // ia[0][4] = LF_alpha      if(IA_NLA_LF, Joachimi2012)
-  // ia[0][5] = LF_P          if(IA_NLA_LF, Joachimi2012)
-  // ia[0][6] = LF_Q          if(IA_NLA_LF, Joachimi2012)
-  // ia[0][7] = LF_red_alpha  if(IA_NLA_LF, Joachimi2012)
-  // ia[0][8] = LF_red_P      if(IA_NLA_LF, Joachimi2012)
-  // ia[0][9] = LF_red_Q      if(IA_NLA_LF, Joachimi2012)
-  // ------------------
-  // ia[1][0] = A2_ia        if IA_REDSHIFT_EVOLUTION
-  // ia[1][1] = eta_ia_tt    if IA_REDSHIFT_EVOLUTION
-  // ------------------
-  // ia[2][MAX_SIZE_ARRAYS] = b_ta_z[MAX_SIZE_ARRAYS]
-
-  int cache_update = 0;
-  nuisance.c1rhocrit_ia = 0.01389;
-  
-  if (nuisance.IA == IA_REDSHIFT_BINNING)
-  {
-    for (int i=0; i<redshift.shear_nbin; i++)
-    {
-      if (fdiff(nuisance.ia[0][i],A1(i)) ||
-          fdiff(nuisance.ia[1][i],A2(i)) ||
-          fdiff(nuisance.ia[2][i],A2(i)))
-      {
-        nuisance.ia[0][i] = A1(i);
-        nuisance.ia[1][i] = A2(i);
-        nuisance.ia[2][i] = BTA(i);
-        cache_update = 1;
-      }
-    }
-  }
-  else if (nuisance.IA == IA_REDSHIFT_EVOLUTION)
-  {
-    nuisance.oneplusz0_ia = 1.62;
-    if (fdiff(nuisance.ia[0][0],A1(0)) ||
-        fdiff(nuisance.ia[0][1],A1(1)) ||
-        fdiff(nuisance.ia[1][0],A2(0)) ||
-        fdiff(nuisance.ia[1][1],A2(1)) ||
-        fdiff(nuisance.ia[2][0],BTA(0)))
-    {
-      nuisance.ia[0][0] = A1(0);
-      nuisance.ia[0][1] = A1(1);
-      nuisance.ia[1][0] = A2(0);
-      nuisance.ia[1][1] = A2(1);
-      nuisance.ia[2][0] = BTA(0);
-      cache_update = 1;
-    }
-  }
-  if(1 == cache_update)
-    nuisance.random_ia = RandomNumber::get_instance().get();
-
-  spdlog::debug("{}: Ends", "set_nuisance_ia");
-}
-
-// ---------------------------------------------------------------------------
-// ---------------------------------------------------------------------------
-// ---------------------------------------------------------------------------
 // ---------------------------------------------------------------------------
 // ---------------------------------------------------------------------------
 // ---------------------------------------------------------------------------
@@ -2668,7 +2897,7 @@ double compute_pm(const int zl, const int zs, const double theta)
 // ---------------------------------------------------------------------------
 // ---------------------------------------------------------------------------
 
-void compute_ss_real_masked(vector& data_vector, const int start)
+void compute_ss_real_masked(arma::Col<double>& data_vector, const int start)
 {
   if (like.shear_shear == 1)
   {
@@ -2701,11 +2930,8 @@ void compute_ss_real_masked(vector& data_vector, const int start)
   }
 }
 
-// ---------------------------------------------------------------------------
-// ---------------------------------------------------------------------------
-// ---------------------------------------------------------------------------
 
-void compute_ss_fourier_masked(vector& data_vector, const int start)
+void compute_ss_fourier_masked(arma::Col<double>& data_vector, const int start)
 { // HERE WE ASSUME NLA EE TODO CHANGE NAMES
   if (like.shear_shear == 1)
   {
@@ -2737,7 +2963,7 @@ void compute_ss_fourier_masked(vector& data_vector, const int start)
 // ---------------------------------------------------------------------------
 // ---------------------------------------------------------------------------
 
-void compute_gs_real_masked(vector& data_vector, const int start)
+void compute_gs_real_masked(arma::Col<double>& data_vector, const int start)
 {
   if (like.shear_pos == 1)
   {
@@ -2768,7 +2994,7 @@ void compute_gs_real_masked(vector& data_vector, const int start)
 // ---------------------------------------------------------------------------
 // ---------------------------------------------------------------------------
 
-void compute_gs_fourier_masked(vector& data_vector, const int start)
+void compute_gs_fourier_masked(arma::Col<double>& data_vector, const int start)
 {
   if (like.shear_pos == 1)
   {
@@ -2798,7 +3024,7 @@ void compute_gs_fourier_masked(vector& data_vector, const int start)
 // ---------------------------------------------------------------------------
 // ---------------------------------------------------------------------------
 
-void compute_gg_real_masked(vector& data_vector, const int start)
+void compute_gg_real_masked(arma::Col<double>& data_vector, const int start)
 {
   if (like.pos_pos == 1)
   {
@@ -2821,7 +3047,7 @@ void compute_gg_real_masked(vector& data_vector, const int start)
 // ---------------------------------------------------------------------------
 // ---------------------------------------------------------------------------
 
-void compute_gg_fourier_masked(vector& data_vector, const int start)
+void compute_gg_fourier_masked(arma::Col<double>& data_vector, const int start)
 {
   if (like.pos_pos == 1)
   {
@@ -2844,7 +3070,7 @@ void compute_gg_fourier_masked(vector& data_vector, const int start)
 // ---------------------------------------------------------------------------
 // ---------------------------------------------------------------------------
 
-void compute_gk_real_masked(vector& data_vector, const int start)
+void compute_gk_real_masked(arma::Col<double>& data_vector, const int start)
 {
   if (like.gk == 1)
   {
@@ -2867,7 +3093,7 @@ void compute_gk_real_masked(vector& data_vector, const int start)
 // ---------------------------------------------------------------------------
 // ---------------------------------------------------------------------------
 
-void compute_ks_real_masked(vector& data_vector, const int start)
+void compute_ks_real_masked(arma::Col<double>& data_vector, const int start)
 {
   if (like.ks == 1) 
   {
@@ -2891,7 +3117,7 @@ void compute_ks_real_masked(vector& data_vector, const int start)
 // ---------------------------------------------------------------------------
 // ---------------------------------------------------------------------------
 
-void compute_kk_fourier_masked(vector& data_vector, const int start)
+void compute_kk_fourier_masked(arma::Col<double>& data_vector, const int start)
 {
   if (like.kk == 1)
   {
@@ -2942,7 +3168,6 @@ void compute_kk_fourier_masked(vector& data_vector, const int start)
     }
   }
 }
-
 
 // ---------------------------------------------------------------------------
 // ---------------------------------------------------------------------------
@@ -4302,12 +4527,12 @@ arma::Col<int> IP::get_mask() const
   return this->mask_;
 }
 
-vector IP::get_dv_masked() const
+arma::Col<double> IP::get_dv_masked() const
 {
   return this->data_masked_;
 }
 
-vector IP::get_dv_masked_sqzd() const
+arma::Col<double> IP::get_dv_masked_sqzd() const
 {
   return this->data_masked_sqzd_;
 }
@@ -4387,7 +4612,7 @@ matrix IP::get_cov_masked_sqzd() const
   return this->cov_masked_sqzd_;
 }
 
-vector IP::expand_theory_data_vector_from_sqzd(vector input) const
+arma::Col<double> IP::expand_theory_data_vector_from_sqzd(arma::Col<double> input) const
 {
   if (this->ndata_sqzd_ != static_cast<int>(input.n_elem))
   {
@@ -4396,7 +4621,7 @@ vector IP::expand_theory_data_vector_from_sqzd(vector input) const
     exit(1);
   }
 
-  vector result(this->ndata_, arma::fill::zeros);
+  arma::Col<double> result(this->ndata_, arma::fill::zeros);
 
   for(int i=0; i<this->ndata_; i++)
   {
@@ -4415,7 +4640,7 @@ vector IP::expand_theory_data_vector_from_sqzd(vector input) const
   return result;
 }
 
-vector IP::sqzd_theory_data_vector(vector input) const
+arma::Col<double> IP::sqzd_theory_data_vector(arma::Col<double> input) const
 {
   if (this->ndata_ != static_cast<int>(input.n_elem))
   {
@@ -4424,7 +4649,7 @@ vector IP::sqzd_theory_data_vector(vector input) const
     exit(1);
   }
 
-  vector result(this->ndata_sqzd_, arma::fill::zeros);
+  arma::Col<double> result(this->ndata_sqzd_, arma::fill::zeros);
   
   for (int i=0; i<this->ndata_; i++)
     if (this->get_mask(i) > 0.99)

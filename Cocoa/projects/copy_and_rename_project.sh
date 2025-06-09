@@ -7,10 +7,10 @@
 OLD_PROJECT="lsst_y1"
 OLD_SURVEY="LSST"
 
-NEW_PROJECT="roman_real_y1"
-NEW_SURVEY="ROMAN" 
+NEW_PROJECT="xxx"
+NEW_SURVEY="XXX" 
 
-PRJ="${ROOTDIR:?}/projects/${NEW_PROJECT}"
+PRJ="${ROOTDIR:?}/projects/${NEW_PROJECT:?}"
 
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
@@ -49,19 +49,13 @@ declare -a TMP=(
 
 for (( i=0; i<${#TMP[@]}; i++ ));
 do
-  sed --in-place --regexp-extended "s@${OLD_PROJECT}@${NEW_PROJECT,,}@g" \
-    "${PRJ:?}/${TMP[$i]}" 2>/dev/null
-  sed --in-place --regexp-extended "s@${OLD_PROJECT^^}@${NEW_PROJECT,,}@g" \
-    "${PRJ:?}/${TMP[$i]}" 2>/dev/null
-  sed --in-place --regexp-extended "s@${OLD_PROJECT,,}@${NEW_PROJECT,,}@g" \
-    "${PRJ:?}/${TMP[$i]}" 2>/dev/null
+  sed --in-place --regexp-extended "s@${OLD_PROJECT}@${NEW_PROJECT,,}@g"   "${PRJ:?}/${TMP[$i]}" 2>/dev/null
+  sed --in-place --regexp-extended "s@${OLD_PROJECT^^}@${NEW_PROJECT,,}@g" "${PRJ:?}/${TMP[$i]}" 2>/dev/null
+  sed --in-place --regexp-extended "s@${OLD_PROJECT,,}@${NEW_PROJECT,,}@g" "${PRJ:?}/${TMP[$i]}" 2>/dev/null
 
-  sed --in-place --regexp-extended  "s@"${OLD_SURVEY}"@"${NEW_SURVEY,,}"@g" \
-    "${PRJ:?}/${TMP[$i]}" 2>/dev/null
-  sed --in-place --regexp-extended  "s@"${OLD_SURVEY^^}"@"${NEW_SURVEY,,}"@g" \
-    "${PRJ:?}/${TMP[$i]}" 2>/dev/null
-  sed --in-place --regexp-extended  "s@"${OLD_SURVEY,,}"@"${NEW_SURVEY,,}"@g" \
-    "${PRJ:?}/${TMP[$i]}" 2>/dev/null
+  sed --in-place --regexp-extended  "s@"${OLD_SURVEY}"@"${NEW_SURVEY^^}"@g"   "${PRJ:?}/${TMP[$i]}" 2>/dev/null
+  sed --in-place --regexp-extended  "s@"${OLD_SURVEY^^}"@"${NEW_SURVEY^^}"@g" "${PRJ:?}/${TMP[$i]}" 2>/dev/null
+  sed --in-place --regexp-extended  "s@"${OLD_SURVEY,,}"@"${NEW_SURVEY^^}"@g" "${PRJ:?}/${TMP[$i]}" 2>/dev/null
 done
 
 
@@ -72,9 +66,9 @@ for f in ${PRJ}/{,likelihood/,interface/,data/,scripts/}*.{sh,py,cpp,dataset,yam
   sed --in-place --regexp-extended "s@${OLD_PROJECT^^}@${NEW_PROJECT,,}@g" "${f}" 2>/dev/null
   sed --in-place --regexp-extended "s@${OLD_PROJECT,,}@${NEW_PROJECT,,}@g" "${f}" 2>/dev/null
 
-  sed --in-place --regexp-extended  "s@"${OLD_SURVEY}"@"${NEW_SURVEY,,}"@g" "${f}" 2>/dev/null
-  sed --in-place --regexp-extended  "s@"${OLD_SURVEY^^}"@"${NEW_SURVEY,,}"@g" "${f}" 2>/dev/null
-  sed --in-place --regexp-extended  "s@"${OLD_SURVEY,,}"@"${NEW_SURVEY,,}"@g" "${f}" 2>/dev/null
+  sed --in-place --regexp-extended  "s@"${OLD_SURVEY}"@"${NEW_SURVEY^^}"@g" "${f}" 2>/dev/null
+  sed --in-place --regexp-extended  "s@"${OLD_SURVEY^^}"@"${NEW_SURVEY^^}"@g" "${f}" 2>/dev/null
+  sed --in-place --regexp-extended  "s@"${OLD_SURVEY,,}"@"${NEW_SURVEY^^}"@g" "${f}" 2>/dev/null
 done
 
 # ------------------------------------------------------------------------------------
@@ -110,5 +104,7 @@ rm -rf "${PRJ:?}"/.git/                  2>/dev/null
 rm -rf "${PRJ:?}"/interface/__pycache__  2>/dev/null
 rm -rf "${PRJ:?}"/likelihood/__pycache__ 2>/dev/null
 rm -rf "${PRJ:?}"/scripts/random_scripts_used_by_dev 2>/dev/null
+
+unset -v PRJ OLD_PROJECT OLD_SURVEY NEW_PROJECT NEW_SURVEY
 
 # ------------------------------------------------------------------------------------
