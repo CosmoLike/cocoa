@@ -243,7 +243,7 @@ if [ -z "${IGNORE_COSMOLIKE_ROMAN_REAL_CODE}" ]; then
 
   FOLDER="${ROMAN_REAL_NAME:-"roman_fourier"}"
 
-  URL="${ROMAN_REAL_URL:-"git@github.com:CosmoLike/cocoa_roman_fourier.git"}"
+  URL="${ROMAN_REAL_URL:-"git@github.com:CosmoLike/cocoa_roman_real.git"}"
 
   if [ -n "${ROMAN_REAL_COMMIT}" ]; then
     gitact2 "${FOLDER:?}" "${URL:?}" "${ROMAN_REAL_COMMIT:?}"  || return 1
