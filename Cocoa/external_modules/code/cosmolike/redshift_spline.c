@@ -119,13 +119,31 @@ int test_zoverlap(int ni, int nj) // test whether source bin nj is behind lens b
   if (ni < 0 || 
       ni > redshift.clustering_nbin - 1 || 
       nj < 0 || 
-      nj > redshift.shear_nbin - 1)
-  {
+      nj > redshift.shear_nbin - 1) {
     log_fatal("invalid bin input (ni, nj) = (%d, %d)", ni, nj);
     exit(1);
   }
-  int res = 1;
   if (tomo.ggl_exclude != NULL) {
+    static int N[MAX_SIZE_ARRAYS][MAX_SIZE_ARRAYS] = {{-42}};
+    if (N[0][0] < -1) {
+      for (int i=0; i<redshift.clustering_nbin; i++) {
+        for (int j=0; j<redshift.shear_nbin; j++) {
+          N[i][j] = 1;
+          for (int k=0; k<tomo.N_ggl_exclude; k++) {
+            const int p = k*2+0;
+            const int q = k*2+1;
+            if ((i == tomo.ggl_exclude[p]) && 
+                (j == tomo.ggl_exclude[q])) {
+              N[i][j] = 0;
+              break;
+            }
+          }
+        }
+      } 
+    }
+    return  N[ni][nj];
+    /*
+    int res = 1;
     for (int k=0; k<tomo.N_ggl_exclude; k++) {
       const int i = k*2+0;
       const int j = k*2+1;
@@ -134,8 +152,12 @@ int test_zoverlap(int ni, int nj) // test whether source bin nj is behind lens b
         break;
       }
     }
+    //printf("testing %d %d \n", N[ni][nj], res);
+    return res;*/
   }
-  return res;
+  else {
+    return 1;
+  }
 }
 
 // -----------------------------------------------------------------------------

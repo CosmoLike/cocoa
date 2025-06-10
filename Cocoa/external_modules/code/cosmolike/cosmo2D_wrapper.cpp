@@ -191,9 +191,10 @@ py::tuple C_ss_tomo_limber_cpp(const double l, const int ni, const int nj)
 
 py::tuple C_ss_tomo_limber_cpp(const arma::Col<double> l)
 {
-  if (!(l.n_elem > 0))
-  {
-    spdlog::critical("\x1b[90m{}\x1b[0m: l array size = {}", l.n_elem);
+  if (!(l.n_elem > 0)) {
+    spdlog::critical("{}: l array size = {}", 
+                     "C_ss_tomo_limber_cpp", 
+                     l.n_elem);
     exit(1);
   }
   
@@ -251,9 +252,10 @@ double C_gs_tomo_limber_cpp(const double l, const int ni, const int nj)
 
 arma::Cube<double> C_gs_tomo_limber_cpp(const arma::Col<double> l)
 {
-  if (!(l.n_elem > 0))
-  {
-    spdlog::critical("\x1b[90m{}\x1b[0m: l array size = {}", l.n_elem);
+  if (!(l.n_elem > 0)) {
+    spdlog::critical("{}: l array size = {}", 
+                     "C_gs_tomo_limber_cpp", 
+                     l.n_elem);
     exit(1);
   }
 
@@ -287,9 +289,10 @@ double C_gg_tomo_limber_cpp(const double l, const int nz)
 
 arma::Cube<double> C_gg_tomo_limber_cpp(const arma::Col<double> l)
 {
-  if (!(l.n_elem > 0))
-  {
-    spdlog::critical("\x1b[90m{}\x1b[0m: l array size = {}", l.n_elem);
+  if (!(l.n_elem > 0)) {
+    spdlog::critical("{}: l array size = {}", 
+                     "C_gg_tomo_limber_cpp", 
+                     l.n_elem);
     exit(1);
   }
 
@@ -315,9 +318,10 @@ arma::Cube<double> C_gg_tomo_limber_cpp(const arma::Col<double> l)
 
 arma::Cube<double> C_gg_tomo_cpp(const arma::Col<double> l)
 {
-  if (!(l.n_elem > 0))
-  {
-    spdlog::critical("\x1b[90m{}\x1b[0m: l array size = {}", l.n_elem);
+  if (!(l.n_elem > 0)) {
+    spdlog::critical("{}: l array size = {}", 
+                     "C_gg_tomo_cpp", 
+                     l.n_elem);
     exit(1);
   }
 
@@ -353,9 +357,10 @@ double C_gk_tomo_limber_cpp(const double l, const int ni)
 
 arma::Mat<double> C_gk_tomo_limber_cpp(const arma::Col<double> l)
 {
-  if (!(l.n_elem > 0))
-  {
-    spdlog::critical("\x1b[90m{}\x1b[0m: l array size = {}", l.n_elem);
+  if (!(l.n_elem > 0)) {
+    spdlog::critical("{}: l array size = {}", 
+                     "C_gk_tomo_limber_cpp", 
+                     l.n_elem);
     exit(1);
   }
 
@@ -387,9 +392,10 @@ double C_ks_tomo_limber_cpp(const double l, const int ni)
 
 arma::Mat<double> C_ks_tomo_limber_cpp(const arma::Col<double> l)
 {
-  if (!(l.n_elem > 0))
-  {
-    spdlog::critical("\x1b[90m{}\x1b[0m: l array size = {}", l.n_elem);
+  if (!(l.n_elem > 0)) {
+    spdlog::critical("{}: l array size = {}", 
+                     "C_ks_tomo_limber_cpp", 
+                     l.n_elem);
     exit(1);
   }
 
@@ -424,7 +430,9 @@ arma::Mat<double> C_gy_tomo_limber_cpp(const arma::Col<double> l)
 {
   if (!(l.n_elem > 0))
   {
-    spdlog::critical("\x1b[90m{}\x1b[0m: l array size = {}", l.n_elem);
+    spdlog::critical("{}: l array size = {}", 
+                     "C_gy_tomo_limber_cpp", 
+                     l.n_elem);
     exit(1);
   }
 
@@ -457,7 +465,9 @@ arma::Mat<double> C_ys_tomo_limber_cpp(const arma::Col<double> l)
 {
   if (!(l.n_elem > 0))
   {
-    spdlog::critical("\x1b[90m{}\x1b[0m: l array size = {}", l.n_elem);
+    spdlog::critical("{}: l array size = {}", 
+                     "C_ys_tomo_limber_cpp", 
+                     l.n_elem);
     exit(1);
   }
 
@@ -489,9 +499,10 @@ double C_kk_limber_cpp(const double l)
 
 arma::Col<double> C_kk_limber_cpp(const arma::Col<double> l)
 {
-  if (!(l.n_elem > 0))
-  {
-    spdlog::critical("\x1b[90m{}\x1b[0m: l array size = {}", l.n_elem);
+  if (!(l.n_elem > 0)) {
+    spdlog::critical("{}: l array size = {}", 
+                     "C_kk_limber_cpp", 
+                     l.n_elem);
     exit(1);
   }
 
@@ -521,9 +532,10 @@ double C_ky_limber_cpp(const double l)
 
 arma::Col<double> C_ky_limber_nointerp_cpp(const arma::Col<double> l)
 {
-  if (!(l.n_elem > 0))
-  {
-    spdlog::critical("\x1b[90m{}\x1b[0m: l array size = {}", l.n_elem);
+  if (!(l.n_elem > 0)) {
+    spdlog::critical("{}: l array size = {}", 
+                     "C_ky_limber_nointerp_cpp", 
+                     l.n_elem);
     exit(1);
   }
 
@@ -553,9 +565,10 @@ double C_yy_limber_cpp(double l)
 
 arma::Col<double> C_yy_limber_nointerp_cpp(const arma::Col<double> l)
 {
-  if (!(l.n_elem > 0))
-  {
-    spdlog::critical("\x1b[90m{}\x1b[0m: l array size = {}", l.n_elem);
+  if (!(l.n_elem > 0)) {
+    spdlog::critical("{}: l array size = {}", 
+                     "C_yy_limber_nointerp_cpp", 
+                     l.n_elem);
     exit(1);
   }
 
@@ -599,10 +612,11 @@ arma::Cube<double> int_for_C_ss_EE_tomo_limber_cpp(
     arma::Col<double> l
   )
 {
-  if (!(l.n_elem > 0 && a.n_elem > 0))
-  {
-    spdlog::critical("\x1b[90m{}\x1b[0m: l array size = {}", l.n_elem);
-    spdlog::critical("\x1b[90m{}\x1b[0m: a array size = {}", a.n_elem);
+  if (!(l.n_elem > 0 && a.n_elem > 0)) {
+    spdlog::critical("{}: l array size = {} and scale factor array size = {}", 
+                      "int_for_C_ss_EE_tomo_limber_cpp", 
+                      l.n_elem,
+                      a.n_elem);
     exit(1);
   }
 
@@ -640,10 +654,11 @@ arma::Cube<double> int_for_C_ss_BB_tomo_limber_cpp(
     arma::Col<double> l
   )
 {
-  if (!(l.n_elem > 0 && a.n_elem > 0))
-  {
-    spdlog::critical("\x1b[90m{}\x1b[0m: l array size = {}", l.n_elem);
-    spdlog::critical("\x1b[90m{}\x1b[0m: a array size = {}", a.n_elem);
+  if (!(l.n_elem > 0 && a.n_elem > 0)) {
+    spdlog::critical("{}: l array size = {} and scale factor array size = {}", 
+                      "int_for_C_ss_BB_tomo_limber_cpp", 
+                      l.n_elem,
+                      a.n_elem);
     exit(1);
   }
 
@@ -681,10 +696,11 @@ py::tuple int_for_C_ss_tomo_limber_cpp(
 py::tuple int_for_C_ss_tomo_limber_cpp(
   const arma::Col<double> a, const arma::Col<double> l)
 {
-  if (!(l.n_elem > 0 && a.n_elem > 0))
-  {
-    spdlog::critical("\x1b[90m{}\x1b[0m: l array size = {}", l.n_elem);
-    spdlog::critical("\x1b[90m{}\x1b[0m: a array size = {}", a.n_elem);
+  if (!(l.n_elem > 0 && a.n_elem > 0)) {
+    spdlog::critical("{}: l array size = {} and scale factor array size = {}", 
+                      "int_for_C_ss_tomo_limber_cpp", 
+                      l.n_elem,
+                      a.n_elem);
     exit(1);
   }
 
@@ -734,10 +750,11 @@ arma::Cube<double> int_for_C_gs_tomo_limber_cpp(
     const arma::Col<double> l
   )
 {
-  if (!(l.n_elem > 0 && a.n_elem > 0))
-  {
-    spdlog::critical("\x1b[90m{}\x1b[0m: l array size = {}", l.n_elem);
-    spdlog::critical("\x1b[90m{}\x1b[0m: a array size = {}", a.n_elem);
+  if (!(l.n_elem > 0 && a.n_elem > 0)) {
+    spdlog::critical("{}: l array size = {} and scale factor array size = {}", 
+                      "int_for_C_gs_tomo_limber_cpp", 
+                      l.n_elem,
+                      a.n_elem);
     exit(1);
   }
 
@@ -779,10 +796,11 @@ arma::Cube<double> int_for_C_gg_tomo_limber_cpp(
     const arma::Col<double> l
   )
 {
-  if (!(l.n_elem > 0 && a.n_elem > 0))
-  {
-    spdlog::critical("\x1b[90m{}\x1b[0m: l array size = {}", l.n_elem);
-    spdlog::critical("\x1b[90m{}\x1b[0m: a array size = {}", a.n_elem);
+  if (!(l.n_elem > 0 && a.n_elem > 0)) {
+    spdlog::critical("{}: l array size = {} and scale factor array size = {}", 
+                      "int_for_C_gg_tomo_limber_cpp", 
+                      l.n_elem,
+                      a.n_elem);
     exit(1);
   }
 
@@ -833,10 +851,11 @@ arma::Cube<double> int_for_C_gk_tomo_limber_cpp(
     const arma::Col<double> l
   )
 {
-  if (!(l.n_elem > 0 && a.n_elem > 0))
-  {
-    spdlog::critical("\x1b[90m{}\x1b[0m: l array size = {}", l.n_elem);
-    spdlog::critical("\x1b[90m{}\x1b[0m: a array size = {}", a.n_elem);
+  if (!(l.n_elem > 0 && a.n_elem > 0)) {
+    spdlog::critical("{}: l array size = {} and scale factor array size = {}", 
+                      "int_for_C_gk_tomo_limber_cpp", 
+                      l.n_elem,
+                      a.n_elem);
     exit(1);
   }
 
@@ -919,8 +938,10 @@ arma::Cube<double> int_for_C_gy_tomo_limber_cpp(
 {
   if (!(l.n_elem > 0 && a.n_elem > 0))
   {
-    spdlog::critical("\x1b[90m{}\x1b[0m: l array size = {}", l.n_elem);
-    spdlog::critical("\x1b[90m{}\x1b[0m: a array size = {}", a.n_elem);
+    spdlog::critical("{}: l array size = {} and scale factor array size = {}", 
+                      "int_for_C_gy_tomo_limber_cpp", 
+                      l.n_elem,
+                      a.n_elem);
     exit(1);
   }
 
@@ -993,10 +1014,11 @@ arma::Cube<double> int_for_C_ks_tomo_limber_cpp(
     const arma::Col<double> l
   )
 {
-  if (!(l.n_elem > 0 && a.n_elem > 0))
-  {
-    spdlog::critical("\x1b[90m{}\x1b[0m: l array size = {}", l.n_elem);
-    spdlog::critical("\x1b[90m{}\x1b[0m: a array size = {}", a.n_elem);
+  if (!(l.n_elem > 0 && a.n_elem > 0)) {
+    spdlog::critical("{}: l array size = {} and scale factor array size = {}", 
+                      "int_for_C_ks_tomo_limber_cpp", 
+                      l.n_elem,
+                      a.n_elem);
     exit(1);
   }
 
@@ -1061,10 +1083,11 @@ arma::Cube<double> int_for_C_ys_tomo_limber_cpp(
     const arma::Col<double> l
   )
 {
-  if (!(l.n_elem > 0 && a.n_elem > 0))
-  {
-    spdlog::critical("\x1b[90m{}\x1b[0m: l array size = {}", l.n_elem);
-    spdlog::critical("\x1b[90m{}\x1b[0m: a array size = {}", a.n_elem);
+  if (!(l.n_elem > 0 && a.n_elem > 0)) {
+    spdlog::critical("{}: l array size = {} and scale factor array size = {}", 
+                      "int_for_C_ys_tomo_limber_cpp", 
+                      l.n_elem,
+                      a.n_elem);
     exit(1);
   }
 
@@ -1109,10 +1132,11 @@ arma::Mat<double> int_for_C_kk_limber_cpp(
     const arma::Col<double> l
   )
 {
-  if (!(l.n_elem > 0 && a.n_elem > 0))
-  {
-    spdlog::critical("\x1b[90m{}\x1b[0m: l array size = {}", l.n_elem);
-    spdlog::critical("\x1b[90m{}\x1b[0m: a array size = {}", a.n_elem);
+  if (!(l.n_elem > 0 && a.n_elem > 0)) {
+    spdlog::critical("{}: l array size = {} and scale factor array size = {}", 
+                      "int_for_C_kk_limber_cpp", 
+                      l.n_elem,
+                      a.n_elem);
     exit(1);
   }
 
@@ -1148,10 +1172,11 @@ arma::Mat<double> int_for_C_ky_limber_cpp(
     const arma::Col<double> l
   )
 {
-  if (!(l.n_elem > 0 && a.n_elem > 0))
-  {
-    spdlog::critical("\x1b[90m{}\x1b[0m: l array size = {}", l.n_elem);
-    spdlog::critical("\x1b[90m{}\x1b[0m: a array size = {}", a.n_elem);
+  if (!(l.n_elem > 0 && a.n_elem > 0)) {
+    spdlog::critical("{}: l array size = {} and scale factor array size = {}", 
+                      "int_for_C_ky_limber_cpp", 
+                      l.n_elem,
+                      a.n_elem);
     exit(1);
   }
 
@@ -1191,10 +1216,11 @@ arma::Mat<double> int_for_C_yy_limber_cpp(
     const arma::Col<double> l
   )
 {
-  if (!(l.n_elem > 0 && a.n_elem > 0))
-  {
-    spdlog::critical("\x1b[90m{}\x1b[0m: l array size = {}", l.n_elem);
-    spdlog::critical("\x1b[90m{}\x1b[0m: a array size = {}", a.n_elem);
+  if (!(l.n_elem > 0 && a.n_elem > 0)) {
+    spdlog::critical("{}: l array size = {} and scale factor array size = {}", 
+                      "int_for_C_yy_limber_cpp", 
+                      l.n_elem,
+                      a.n_elem);
     exit(1);
   }
 
