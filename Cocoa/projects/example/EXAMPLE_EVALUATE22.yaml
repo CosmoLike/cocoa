@@ -143,18 +143,12 @@ params:
     value: 'lambda w0pwa, w: w0pwa - w'
     derived: false
     latex: w_{a,\mathrm{DE}}
-  omegamh2:
-    value: 'lambda omegach2, omegabh2, mnu: omegach2+omegabh2+(mnu*(3.046/3)**0.75)/94.0708'
-    latex: \Omega_\mathrm{m} h^2
-  omegam:
-    value: 'lambda omegamh2, H0: omegamh2/(H0/100)**2'
-    latex: \Omega_\mathrm{m}
 
 theory:
   emulcmb:
     path: ./cobaya/cobaya/theories/
     stop_at_error: True
-    #provides: ['rdrag']
+    provides: ['rdrag']
     extra_args:
       # This version of the emul was not trained with CosmoRec
       eval: [True, True, True, False, False, False] #TT,TE,EE,PHIPHI,RD,THETA

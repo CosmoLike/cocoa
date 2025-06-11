@@ -45,17 +45,16 @@ sampler:
       omegam: 0.31383
 
 theory:
-  emulsn:
+  emulbaosn:
     path: ./cobaya/cobaya/theories/
     stop_at_error: True
     extra_args:
-      ordering: ['omegam', 'H0']
-      dlfilename:  'external_modules/data/emultrf/BAO_SN_RES/chisquaredllog'
-      dlextraname: 'external_modules/data/emultrf/BAO_SN_RES/extrainfodl.npy'
-      dltransmat:  'external_modules/data/emultrf/BAO_SN_RES/PCAdl.npy'
-      # Users can train on different redshift grids. The code needs to 
-      # know what was the z-grid used on luminosity distance training
-      zlindl: 'external_modules/data/emultrf/BAO_SN_RES/zlinlcdm.npy'
-      extradllevel: 4400
+      eval: [True, False] # dL(z), H(z),
+      file:  ['external_modules/data/emultrf/BAO_SN_RES/chisquaredllog.pt', None]
+      extra: ['external_modules/data/emultrf/BAO_SN_RES/extrainfodl.npy', None]
+      tmat:  ['external_modules/data/emultrf/BAO_SN_RES/PCAdl.npy', None]
+      zlin:  ['external_modules/data/emultrf/BAO_SN_RES/zlinlcdm.npy', None]       
+      ord: [['omegam','H0'], None]
+      extrapar: [{'offset' : 4400.0, 'INTDIM' : 4, 'NLAYER' : 4}, None]
 
 output: ./projects/example/chains/EXAMPLE_EVALUATE25
