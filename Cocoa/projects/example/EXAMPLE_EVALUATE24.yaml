@@ -154,6 +154,9 @@ params:
     latex: w_{a,\mathrm{DE}}
   H0:
     latex: H_0
+  omegamh2:
+    value: 'lambda omegach2, omegabh2, mnu: omegach2+omegabh2+(mnu*(3.046/3)**0.75)/94.0708'
+    latex: \Omega_\mathrm{m} h^2
   omegam:
     latex: \Omega_\mathrm{m}
   rdrag:
@@ -163,7 +166,7 @@ theory:
   emultheta:
     path: ./cobaya/cobaya/theories/
     stop_at_error: True
-    provides: ['H0', 'omegam'] # necessary flag when using theta* + calling BAO emul theory
+    provides: ['H0', 'omegam']
     extra_args:
       file: ['external_modules/data/emultrf/CMB_TRF/thetaH0GP.joblib']  #THETA
       extra: ['external_modules/data/emultrf/CMB_TRF/extrainfotheta.npy']    #THETA
@@ -171,7 +174,7 @@ theory:
   emulrdrag:
     path: ./cobaya/cobaya/theories/
     stop_at_error: True
-    provides: ['rdrag'] # necessary flag
+    provides: ['rdrag']
     extra_args:
       file: ['external_modules/data/emultrf/BAO_SN_RES/rdragGP.joblib'] 
       extra: ['external_modules/data/emultrf/BAO_SN_RES/extrainfordrag.npy'] 
