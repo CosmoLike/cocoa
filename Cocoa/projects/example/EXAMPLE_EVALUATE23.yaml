@@ -43,18 +43,18 @@ likelihood:
       lmax_theory: 5000
   sn.union3: 
     path: ./external_modules/data/sn_data
-  sn.pantheon: 
-    path: ./external_modules/data/sn_data
-  sn.pantheonplus: 
-    path: ./external_modules/data/sn_data
-  sn.roman_c:
-    path: ./external_modules/data/sn_data
-  sn.roman_o:
-    path: ./external_modules/data/sn_data
-  sn.desy5: 
-    path: ./external_modules/data/sn_data
-  bao.desi_2024_bao_all:
-    path: ./external_modules/data/
+#  sn.pantheon: 
+#    path: ./external_modules/data/sn_data
+#  sn.pantheonplus: 
+#    path: ./external_modules/data/sn_data
+#  sn.roman_c:
+#    path: ./external_modules/data/sn_data
+#  sn.roman_o:
+#    path: ./external_modules/data/sn_data
+#  sn.desy5: 
+#    path: ./external_modules/data/sn_data
+#  bao.desi_2024_bao_all:
+#    path: ./external_modules/data/
 
 params:
   logA:
@@ -170,7 +170,7 @@ theory:
   emulcmb:
     path: ./cobaya/cobaya/theories/
     stop_at_error: True
-    provides: ['rdrag']
+    provides: ['rdrag'] # necessary flag so cobaya knows this is the theory that computes rdrag
     extra_args:
       # This version of the emul was not trained with CosmoRec
       eval: [True, True, True, False, True, False] #TT,TE,EE,PHIPHI,RD,THETA
@@ -179,23 +179,20 @@ theory:
              'external_modules/data/emultrf/CMB_TRF/chiEEAstautrf1dot2milnewlhcevansqrtrescalec16.pt',
              None,  #PHIPHI
              'external_modules/data/emultrf/BAO_SN_RES/rdragGP.joblib', #RD
-             'external_modules/data/emultrf/CMB_TRF/thetaH0GP.joblib'   #THETA
-             ]
+             'external_modules/data/emultrf/CMB_TRF/thetaH0GP.joblib']  #THETA
       extra: ['external_modules/data/emultrf/CMB_TRF/extrainfo_lhs_tt_96.npy',
               'external_modules/data/emultrf/CMB_TRF/extrainfo_lhs_te_96.npy',
               'external_modules/data/emultrf/CMB_TRF/extrainfo_lhs_ee_96.npy',
               None, #PHIPHI
               'external_modules/data/emultrf/BAO_SN_RES/extrainfordrag.npy', #RD
-              'external_modules/data/emultrf/CMB_TRF/extrainfotheta.npy'     #THETA
-             ]
+              'external_modules/data/emultrf/CMB_TRF/extrainfotheta.npy']    #THETA
       ord: [['omegabh2','omegach2','H0','tau','ns','logA','mnu','w','wa'],
             ['omegabh2','omegach2','H0','tau','ns','logA','mnu','w','wa'],
             ['omegabh2','omegach2','H0','tau','ns','logA','mnu','w','wa'],
             None,
             ['omegabh2','omegach2','H0'],
-            ['omegam','H0'],
-           ]
-      extrapar: [{'ellmax' : 5000, 'MLA': 'TRF', 'NCTRF': 16,  'INTDIM': 4, 'INTTRF': 5120},
+            ['omegam','H0']]
+      extrapar: [{'ellmax' : 5000, 'MLA': 'TRF', 'NCTRF': 16, 'INTDIM': 4, 'INTTRF': 5120},
                  {'ellmax' : 5000, 'MLA': 'TRF', 'NCTRF': 16, 'INTDIM': 4, 'INTTRF': 5120},
                  {'ellmax' : 5000, 'MLA': 'TRF', 'NCTRF': 16, 'INTDIM': 4, 'INTTRF': 5120},
                  None,
@@ -206,19 +203,19 @@ theory:
     path: ./cobaya/cobaya/theories/
     stop_at_error: True
     extra_args:
-      # ordering for distance and H(z) emulators
-      ordering: ['omegam','H0']
-      # Distance emulator
-      dlfilename: 'external_modules/data/emultrf/BAO_SN_RES/chisquaredllog'
-      dlextraname: 'external_modules/data/emultrf/BAO_SN_RES/extrainfodl.npy'
-      dltransmat: 'external_modules/data/emultrf/BAO_SN_RES/PCAdl.npy'
-      extradllevel: 4400 # dl was trained with this constant shift
-      zlindl: 'external_modules/data/emultrf/BAO_SN_RES/zlinlcdm.npy'
-      # H(z) emulator
-      Hfilename: 'external_modules/data/emultrf/BAO_SN_RES/chisquareH'
-      Hextraname: 'external_modules/data/emultrf/BAO_SN_RES/extrainfoH.npy'
-      Htransmat: 'external_modules/data/emultrf/BAO_SN_RES/PCAH.npy'
-      zlinH: 'external_modules/data/emultrf/BAO_SN_RES/zlinlcdm.npy'
+      eval: [True, True] # dL(z), H(z),
+      file:  ['external_modules/data/emultrf/BAO_SN_RES/chisquaredllog.pt',
+              'external_modules/data/emultrf/BAO_SN_RES/chisquareH.pt']
+      extra: ['external_modules/data/emultrf/BAO_SN_RES/extrainfodl.npy',
+              'external_modules/data/emultrf/BAO_SN_RES/extrainfoH.npy']
+      tmat:  ['external_modules/data/emultrf/BAO_SN_RES/PCAdl.npy',
+              'external_modules/data/emultrf/BAO_SN_RES/PCAH.npy']
+      zlin:  ['external_modules/data/emultrf/BAO_SN_RES/zlinlcdm.npy',
+              'external_modules/data/emultrf/BAO_SN_RES/zlinlcdm.npy']       
+      ord: [['omegam','H0'],
+            ['omegam','H0']]
+      extrapar: [{'offset' : 4400.0, 'INTDIM' : 4, 'NLAYER' : 4},
+                 {'offset' : 0.0000, 'INTDIM' : 1, 'NLAYER' : 1}]
   
 sampler:
   evaluate:

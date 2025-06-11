@@ -163,23 +163,20 @@ theory:
              'external_modules/data/emultrf/CMB_TRF/chiEEAstautrf1dot2milnewlhcevansqrtrescalec16.pt',
              None,  #PHIPHI
              'external_modules/data/emultrf/BAO_SN_RES/rdragGP.joblib', #RD
-             'external_modules/data/emultrf/CMB_TRF/thetaH0GP.joblib'   #THETA
-             ]
+             'external_modules/data/emultrf/CMB_TRF/thetaH0GP.joblib']  #THETA
       extra: ['external_modules/data/emultrf/CMB_TRF/extrainfo_lhs_tt_96.npy',
               'external_modules/data/emultrf/CMB_TRF/extrainfo_lhs_te_96.npy',
               'external_modules/data/emultrf/CMB_TRF/extrainfo_lhs_ee_96.npy',
               None, #PHIPHI
               'external_modules/data/emultrf/BAO_SN_RES/extrainfordrag.npy', #RD
-              'external_modules/data/emultrf/CMB_TRF/extrainfotheta.npy'     #THETA
-             ]
+              'external_modules/data/emultrf/CMB_TRF/extrainfotheta.npy']    #THETA
       ord: [['omegabh2','omegach2','H0','tau','ns','logA','mnu','w','wa'],
             ['omegabh2','omegach2','H0','tau','ns','logA','mnu','w','wa'],
             ['omegabh2','omegach2','H0','tau','ns','logA','mnu','w','wa'],
             None,
             ['omegabh2','omegach2','H0'],
-            ['omegam','H0'],
-           ]
-      extrapar: [{'ellmax' : 5000, 'MLA': 'TRF', 'NCTRF': 16,  'INTDIM': 4, 'INTTRF': 5120},
+            ['omegam','H0']]
+      extrapar: [{'ellmax' : 5000, 'MLA': 'TRF', 'NCTRF': 16, 'INTDIM': 4, 'INTTRF': 5120},
                  {'ellmax' : 5000, 'MLA': 'TRF', 'NCTRF': 16, 'INTDIM': 4, 'INTTRF': 5120},
                  {'ellmax' : 5000, 'MLA': 'TRF', 'NCTRF': 16, 'INTDIM': 4, 'INTTRF': 5120},
                  None,
