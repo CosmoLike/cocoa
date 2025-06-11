@@ -348,7 +348,7 @@ export LSST_Y1_NAME="lsst_y1"
 #BRANCH: if unset, load the latest commit on the specified branch
 #export LSST_Y1_BRANCH="dev"
 #COMMIT: if unset, load the specified commit
-export LSST_Y1_COMMIT="2d2a9cde8c38090e5088287ec969d9486522ce17"
+export LSST_Y1_COMMIT="df96af9558c97b07d355df4bfc56f1677e71b201"
 #BRANCH: if unset, load the specified TAG
 #export LSST_Y1_TAG="v4.0-beta17"
 
@@ -366,7 +366,7 @@ export ROMAN_FOURIER_NAME="roman_fourier"
 #BRANCH: if unset, load the latest commit on the specified branch
 #export ROMAN_FOURIER_BRANCH="main"
 #COMMIT: if unset, load the specified commit
-export ROMAN_FOURIER_COMMIT="d990ace46033b074c88934657f5abbf9f91acbad"
+export ROMAN_FOURIER_COMMIT="dff77ff96e121438a2c96c97fddc0141b41fe345"
 #BRANCH: if unset, load the specified TAG
 #export ROMAN_FOURIER_TAG="v4.0-beta17"
 
@@ -375,7 +375,7 @@ export ROMAN_REAL_NAME="roman_real"
 #BRANCH: if unset, load the latest commit on the specified branch
 #export ROMAN_REAL_BRANCH="main"
 #COMMIT: if unset, load the specified commit
-export ROMAN_REAL_COMMIT="3a5fd28ec7f0c60e093990177bf3f70d58649517"
+export ROMAN_REAL_COMMIT="06b7f8fe633a3e4949cc9947be3e4d56a956f433"
 #BRANCH: if unset, load the specified TAG
 #export ROMAN_REAL_TAG="v4.0-beta17"
 # ------------------------------------------------------------------------------
