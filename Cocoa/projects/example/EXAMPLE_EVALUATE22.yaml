@@ -143,30 +143,50 @@ params:
     value: 'lambda w0pwa, w: w0pwa - w'
     derived: false
     latex: w_{a,\mathrm{DE}}
+  omegamh2:
+    value: 'lambda omegach2, omegabh2, mnu: omegach2+omegabh2+(mnu*(3.046/3)**0.75)/94.0708'
+    latex: \Omega_\mathrm{m} h^2
+  omegam:
+    value: 'lambda omegamh2, H0: omegamh2/(H0/100)**2'
+    latex: \Omega_\mathrm{m} h^2
 
 theory:
   emulcmb:
     path: ./cobaya/cobaya/theories/
     stop_at_error: True
+    #provides: ['rdrag']
     extra_args:
       # This version of the emul was not trained with CosmoRec
-      ttfilename: 'external_modules/data/emultrf/CMB_TRF/chiTTAstautrf1dot2milnewlhcevansqrtrescalec16'
-      ttextraname: 'external_modules/data/emultrf/CMB_TRF/extrainfo_lhs_tt_96.npy'
-      tefilename: 'external_modules/data/emultrf/CMB_TRF/chiTEAstautrf1dot2milnewlhcevansqrtrescalec16'
-      teextraname: 'external_modules/data/emultrf/CMB_TRF/extrainfo_lhs_te_96.npy'
-      eefilename: 'external_modules/data/emultrf/CMB_TRF/chiEEAstautrf1dot2milnewlhcevansqrtrescalec16'
-      eeextraname: 'external_modules/data/emultrf/CMB_TRF/extrainfo_lhs_ee_96.npy'
-#      dlfilename: 'external_modules/data/emultrf/CMB_TRF/chisquaredllog'
-#      dlextraname: 'external_modules/data/emultrf/CMB_TRF/extrainfodl.npy'
-#      dltransmat: 'external_modules/data/emultrf/CMB_TRF/PCAdl.npy'
-      GPfilename:  'external_modules/data/emultrf/CMB_TRF/thetaH0GP.joblib'
-      GPextraname: 'external_modules/data/emultrf/CMB_TRF/extrainfotheta.npy'
-      ordering: ['omegabh2','omegach2','H0','tau','ns','logA','mnu','w','wa']
-      modeltype: 'TRF'
-      ellmax: 5000
-
+      eval: [True, True, True, False, False, False] #TT,TE,EE,PHIPHI,RD,THETA
+      file: ['external_modules/data/emultrf/CMB_TRF/chiTTAstautrf1dot2milnewlhcevansqrtrescalec16.pt',
+             'external_modules/data/emultrf/CMB_TRF/chiTEAstautrf1dot2milnewlhcevansqrtrescalec16.pt',
+             'external_modules/data/emultrf/CMB_TRF/chiEEAstautrf1dot2milnewlhcevansqrtrescalec16.pt',
+             None,  #PHIPHI
+             'external_modules/data/emultrf/BAO_SN_RES/rdragGP.joblib', #RD
+             'external_modules/data/emultrf/CMB_TRF/thetaH0GP.joblib'   #THETA
+             ]
+      extra: ['external_modules/data/emultrf/CMB_TRF/extrainfo_lhs_tt_96.npy',
+              'external_modules/data/emultrf/CMB_TRF/extrainfo_lhs_te_96.npy',
+              'external_modules/data/emultrf/CMB_TRF/extrainfo_lhs_ee_96.npy',
+              None, #PHIPHI
+              'external_modules/data/emultrf/BAO_SN_RES/extrainfordrag.npy', #RD
+              'external_modules/data/emultrf/CMB_TRF/extrainfotheta.npy'     #THETA
+             ]
+      ord: [['omegabh2','omegach2','H0','tau','ns','logA','mnu','w','wa'],
+            ['omegabh2','omegach2','H0','tau','ns','logA','mnu','w','wa'],
+            ['omegabh2','omegach2','H0','tau','ns','logA','mnu','w','wa'],
+            None,
+            ['omegabh2','omegach2','H0'],
+            ['omegam','H0'],
+           ]
+      extrapar: [{'ellmax' : 5000, 'MLA': 'TRF', 'NCTRF': 16,  'INTDIM': 4, 'INTTRF': 5120},
+                 {'ellmax' : 5000, 'MLA': 'TRF', 'NCTRF': 16, 'INTDIM': 4, 'INTTRF': 5120},
+                 {'ellmax' : 5000, 'MLA': 'TRF', 'NCTRF': 16, 'INTDIM': 4, 'INTTRF': 5120},
+                 None,
+                 None,
+                 None]
   mflike.BandpowerForeground:
-
+    
 sampler:
   evaluate:
     override:

@@ -163,26 +163,30 @@ theory:
       ellmax: 5000
 
   mflike.BandpowerForeground:
+  
   emulbaosn:
     path: ./cobaya/cobaya/theories/
     stop_at_error: True
     extra_args:
+      # main emulator
+      ordering:      ['omm','H0']
       dlfilename: 'external_modules/data/emultrf/BAO_SN_RES/chisquaredllog'
       dlextraname: 'external_modules/data/emultrf/BAO_SN_RES/extrainfodl.npy'
       dltransmat: 'external_modules/data/emultrf/BAO_SN_RES/PCAdl.npy'
       Hfilename: 'external_modules/data/emultrf/BAO_SN_RES/chisquareH'
       Hextraname: 'external_modules/data/emultrf/BAO_SN_RES/extrainfoH.npy'
       Htransmat: 'external_modules/data/emultrf/BAO_SN_RES/PCAH.npy'
-      rdragfilename: 'external_modules/data/emultrf/BAO_SN_RES/rdragGP.joblib'
-      rdragextraname: 'external_modules/data/emultrf/BAO_SN_RES/extrainfordrag.npy'
+      # theta_star emulator
+      thetaordering: ['omegabh2','omegach2','thetastar']
       GPfilename:  'external_modules/data/emultrf/CMB_TRF/thetaH0GP.joblib'
       GPextraname: 'external_modules/data/emultrf/CMB_TRF/extrainfotheta.npy'
-      ordering: ['omm','H0']
+      # rdrag emulator (required for BAO)
+      rdragfilename: 'external_modules/data/emultrf/BAO_SN_RES/rdragGP.joblib'
+      rdragextraname: 'external_modules/data/emultrf/BAO_SN_RES/extrainfordrag.npy'
       rdragordering: ['omegabh2','omegach2','H0']
       zlindl: 'external_modules/data/emultrf/BAO_SN_RES/zlinlcdm.npy'
       zlinH: 'external_modules/data/emultrf/BAO_SN_RES/zlinlcdm.npy'
       extradllevel: 4400
-
 
 sampler:
   evaluate:

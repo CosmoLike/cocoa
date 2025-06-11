@@ -921,8 +921,7 @@ double w_ks_tomo(const int nt, const int ni, const int limber)
 
 double int_for_C_ss_tomo_limber(double a, void* params)
 {
-  if (!(a>0) || !(a<1)) 
-  {
+  if (!(a>0) || !(a<1)) {
     log_fatal("a>0 and a<1 not true");
     exit(1);
   }

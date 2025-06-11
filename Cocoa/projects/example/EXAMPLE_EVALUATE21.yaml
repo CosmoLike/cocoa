@@ -40,7 +40,21 @@ likelihood:
         - experiments: [LAT_145, LAT_145]
         - experiments: [LAT_145, LAT_225]
         - experiments: [LAT_225, LAT_225]
-            
+  sn.union3: 
+    path: ./external_modules/data/sn_data
+  sn.pantheon: 
+    path: ./external_modules/data/sn_data
+  sn.pantheonplus: 
+    path: ./external_modules/data/sn_data
+  sn.roman_c:
+    path: ./external_modules/data/sn_data
+  sn.roman_o:
+    path: ./external_modules/data/sn_data
+  sn.desy5: 
+    path: ./external_modules/data/sn_data
+  bao.desi_2024_bao_all:
+    path: ./external_modules/data/
+
 params:
   logA:
     prior:
@@ -118,7 +132,12 @@ params:
     latex: 10^9 A_\mathrm{s}
   thetastar:
     latex: 100\theta_*
-    
+  omegam:
+    latex: \Omega_\mathrm{m}
+  omegamh2:
+    derived: 'lambda omegam, H0: omegam*(H0/100)**2'
+    latex: \Omega_\mathrm{m} h^2
+
 theory:
   camb:
     path: ./external_modules/code/CAMB

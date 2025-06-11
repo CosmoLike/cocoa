@@ -183,7 +183,7 @@ if [[ -z "${IGNORE_EMULTRF_CODE}" ]]; then
   COBTH="${ROOTDIR:?}/cobaya/cobaya/theories"
 
   TMP="${EMULTRF_NAME:-"emultrf"}"
-  TMP2="emulcmbtrf"
+  TMP2="emulcmb"
 
   if [[ ! -L "${COBTH:?}/${TMP2}" ]]; then
     ln -s "${ECODEF:?}/emulators/${TMP}/${TMP2}" "${COBTH:?}" \
@@ -191,7 +191,7 @@ if [[ -z "${IGNORE_EMULTRF_CODE}" ]]; then
   fi
 
   TMP="${EMULTRF_NAME:-"emultrf"}"
-  TMP2="emulbaosnres"
+  TMP2="emulbaosn"
 
   if [[ ! -L "${COBTH:?}/${TMP2}" ]]; then
     ln -s "${ECODEF:?}/emulators/${TMP}/${TMP2}" "${COBTH:?}" \
@@ -199,7 +199,7 @@ if [[ -z "${IGNORE_EMULTRF_CODE}" ]]; then
   fi
 
   TMP="${EMULTRF_NAME:-"emultrf"}"
-  TMP2="emulsnres"
+  TMP2="emulsn"
 
   if [[ ! -L "${COBTH:?}/${TMP2}" ]]; then
     ln -s "${ECODEF:?}/emulators/${TMP}/${TMP2}" "${COBTH:?}" \

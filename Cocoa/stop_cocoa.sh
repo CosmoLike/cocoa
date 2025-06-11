@@ -140,12 +140,12 @@ fi
 if [[ -z "${IGNORE_EMULTRF_CODE}" ]]; then
   COBTH="${ROOTDIR:?}/cobaya/cobaya/theories"
 
-  TMP="emulcmbtrf"
+  TMP="emulcmb"
   if [[ -L "${COBTH:?}/${TMP:?}" ]]; then
     rm -f "${COBTH:?}/${TMP:?}"
   fi
 
-  TMP="emulbaosnres"
+  TMP="emulbaosn"
   if [[ -L "${COBTH:?}/${TMP:?}" ]]; then
     rm -f "${COBTH:?}/${TMP:?}"
   fi
