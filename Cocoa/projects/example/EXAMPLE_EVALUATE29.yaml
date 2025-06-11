@@ -74,15 +74,6 @@ params:
     value: 'lambda omegamh2, H0: omegamh2/(H0/100)**2'
     latex: \Omega_\mathrm{m}
 
-sampler:
-  evaluate:
-    override:
-      omegabh2: 0.022383
-      omegach2: 0.12011
-      H0: 67
-      omegaaxh2: 0.2
-      logmx: -33
-
 theory:
   emulrdrag:
     path: ./cobaya/cobaya/theories/
@@ -110,4 +101,13 @@ theory:
       extrapar: [{'offset' : 0.0, 'INTDIM' : 4, 'NLAYER' : 4}, 
                  {'offset' : 0.0, 'INTDIM' : 1, 'NLAYER' : 1}]
 
+sampler:
+  evaluate:
+    override:
+      omegabh2: 0.022383
+      omegach2: 0.12011
+      H0: 67
+      omegaaxh2: 0.2
+      logmx: -33
+      
 output: ./projects/example/chains/EXAMPLE_EVALUATE28
