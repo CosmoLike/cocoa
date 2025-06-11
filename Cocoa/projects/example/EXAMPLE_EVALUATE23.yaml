@@ -188,7 +188,7 @@ theory:
       extra: ['external_modules/data/emultrf/CMB_TRF/extrainfo_lhs_tt_96.npy',
               'external_modules/data/emultrf/CMB_TRF/extrainfo_lhs_te_96.npy',
               'external_modules/data/emultrf/CMB_TRF/extrainfo_lhs_ee_96.npy',
-              None]    #THETA
+              None]
       ord: [['omegabh2','omegach2','H0','tau','ns','logA','mnu','w','wa'],
             ['omegabh2','omegach2','H0','tau','ns','logA','mnu','w','wa'],
             ['omegabh2','omegach2','H0','tau','ns','logA','mnu','w','wa'],

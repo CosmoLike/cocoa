@@ -168,8 +168,8 @@ theory:
     stop_at_error: True
     provides: ['H0', 'omegam']
     extra_args:
-      file: ['external_modules/data/emultrf/CMB_TRF/thetaH0GP.joblib']  #THETA
-      extra: ['external_modules/data/emultrf/CMB_TRF/extrainfotheta.npy']    #THETA
+      file: ['external_modules/data/emultrf/CMB_TRF/thetaH0GP.joblib']
+      extra: ['external_modules/data/emultrf/CMB_TRF/extrainfotheta.npy']
       ord: [['omegabh2','omegach2','thetastar']]
   emulrdrag:
     path: ./cobaya/cobaya/theories/
@@ -192,7 +192,7 @@ theory:
       extra: ['external_modules/data/emultrf/CMB_TRF/extrainfo_lhs_tt_96.npy',
               'external_modules/data/emultrf/CMB_TRF/extrainfo_lhs_te_96.npy',
               'external_modules/data/emultrf/CMB_TRF/extrainfo_lhs_ee_96.npy',
-              None]    #THETA
+              None]
       ord: [['omegabh2','omegach2','H0','tau','ns','logA','mnu','w','wa'],
             ['omegabh2','omegach2','H0','tau','ns','logA','mnu','w','wa'],
             ['omegabh2','omegach2','H0','tau','ns','logA','mnu','w','wa'],
