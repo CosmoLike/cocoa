@@ -148,7 +148,7 @@ params:
     latex: \Omega_\mathrm{m} h^2
   omegam:
     value: 'lambda omegamh2, H0: omegamh2/(H0/100)**2'
-    latex: \Omega_\mathrm{m} h^2
+    latex: \Omega_\mathrm{m}
 
 theory:
   emulcmb:
@@ -175,7 +175,7 @@ theory:
             ['omegabh2','omegach2','H0','tau','ns','logA','mnu','w','wa'],
             None,
             ['omegabh2','omegach2','H0'],
-            ['omegam','H0']]
+            ['omegabh2','omegach2','thetastar']]
       extrapar: [{'ellmax' : 5000, 'MLA': 'TRF', 'NCTRF': 16, 'INTDIM': 4, 'INTTRF': 5120},
                  {'ellmax' : 5000, 'MLA': 'TRF', 'NCTRF': 16, 'INTDIM': 4, 'INTTRF': 5120},
                  {'ellmax' : 5000, 'MLA': 'TRF', 'NCTRF': 16, 'INTDIM': 4, 'INTTRF': 5120},

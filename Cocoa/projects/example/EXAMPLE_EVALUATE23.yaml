@@ -43,18 +43,18 @@ likelihood:
       lmax_theory: 5000
   sn.union3: 
     path: ./external_modules/data/sn_data
-#  sn.pantheon: 
-#    path: ./external_modules/data/sn_data
-#  sn.pantheonplus: 
-#    path: ./external_modules/data/sn_data
-#  sn.roman_c:
-#    path: ./external_modules/data/sn_data
-#  sn.roman_o:
-#    path: ./external_modules/data/sn_data
-#  sn.desy5: 
-#    path: ./external_modules/data/sn_data
-#  bao.desi_2024_bao_all:
-#    path: ./external_modules/data/
+  sn.pantheon: 
+    path: ./external_modules/data/sn_data
+  sn.pantheonplus: 
+    path: ./external_modules/data/sn_data
+  sn.roman_c:
+    path: ./external_modules/data/sn_data
+  sn.roman_o:
+    path: ./external_modules/data/sn_data
+  sn.desy5: 
+    path: ./external_modules/data/sn_data
+  bao.desi_2024_bao_all:
+    path: ./external_modules/data/
 
 params:
   logA:
@@ -162,7 +162,7 @@ params:
     latex: \Omega_\mathrm{m} h^2
   omegam:
     value: 'lambda omegamh2, H0: omegamh2/(H0/100)**2'
-    latex: \Omega_\mathrm{m} h^2
+    latex: \Omega_\mathrm{m}
   rdrag:
     latex: r_\mathrm{drag}
 
@@ -170,7 +170,7 @@ theory:
   emulcmb:
     path: ./cobaya/cobaya/theories/
     stop_at_error: True
-    provides: ['rdrag'] # necessary flag so cobaya knows this is the theory that computes rdrag
+    provides: ['rdrag'] # necessary flag when + calling BAO emul theory
     extra_args:
       # This version of the emul was not trained with CosmoRec
       eval: [True, True, True, False, True, False] #TT,TE,EE,PHIPHI,RD,THETA
@@ -191,7 +191,7 @@ theory:
             ['omegabh2','omegach2','H0','tau','ns','logA','mnu','w','wa'],
             None,
             ['omegabh2','omegach2','H0'],
-            ['omegam','H0']]
+            ['omegabh2','omegach2','thetastar']]
       extrapar: [{'ellmax' : 5000, 'MLA': 'TRF', 'NCTRF': 16, 'INTDIM': 4, 'INTTRF': 5120},
                  {'ellmax' : 5000, 'MLA': 'TRF', 'NCTRF': 16, 'INTDIM': 4, 'INTTRF': 5120},
                  {'ellmax' : 5000, 'MLA': 'TRF', 'NCTRF': 16, 'INTDIM': 4, 'INTTRF': 5120},
