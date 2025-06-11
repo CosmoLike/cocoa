@@ -105,6 +105,8 @@ params:
       scale: 0.0004
     proposal: 0.0002
     latex: 100\theta_\mathrm{*}
+  H0:
+    latex: H_0
   omegamh2:
     value: 'lambda omegach2, omegabh2, mnu: omegach2+omegabh2+(mnu*(3.046/3)**0.75)/94.0708'
     latex: \Omega_\mathrm{m} h^2
@@ -130,9 +132,9 @@ theory:
       extra: ['external_modules/data/emultrf/CMB_CNN/extrainfoaxTT.npy',
               'external_modules/data/emultrf/CMB_CNN/extrainfoaxTE.npy',
               'external_modules/data/emultrf/CMB_CNN/extrainfoaxEE.npy', None]
-      ord: [['omegabh2','omegach2','thetastar','omegaaxh2','logmx'],
-            ['omegabh2','omegach2','thetastar','omegaaxh2','logmx'],
-            ['omegabh2','omegach2','thetastar','omegaaxh2','logmx'], None]
+      ord: [ ['omegabh2','omegach2','H0','logA','ns','tau','omegaaxh2','logmx'],
+             ['omegabh2','omegach2','H0','logA','ns','tau','omegaaxh2','logmx'],
+             ['omegabh2','omegach2','H0','logA','ns','tau','omegaaxh2','logmx'], None]
       extrapar: [{'ellmax' : 2601, 'MLA': 'CNN', 'INTDIM': 4, 'INTCNN': 3200},
                  {'ellmax' : 2601, 'MLA': 'CNN', 'INTDIM': 4, 'INTCNN': 3200},
                  {'ellmax' : 2601, 'MLA': 'CNN', 'INTDIM': 4, 'INTCNN': 3200}, None]
@@ -148,8 +150,6 @@ sampler:
       tau: 0.0543
       omegaaxh2: 0.2
       logmx: -33
-      w0pwa: -1
-      w: -1
       A_planck: 1.00138
 
 output: ./projects/example/chains/EXAMPLE_EVALUATE28

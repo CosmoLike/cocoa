@@ -331,7 +331,7 @@ export EMULTRF_GIT_COMMIT="4ba5ff58e15ddf300b307a346b9e34527703cab3"
 #export EMULTRF_GIT_COMMIT="6023e5624ec21e1b3c9cda48075bcf4296a2d871"
 
 export EMULTRF_DATA_URL="https://github.com/CosmoLike/emulators_data.git"
-export EMULTRF_DATA_GIT_COMMIT="240a16b2df8667bd1773710a72cdbd711e2a5e37"
+export EMULTRF_DATA_GIT_COMMIT="cc2eb8f04a982dc69ee03112373770b714e2d6d3"
 #export EMULTRF_DATA_GIT_COMMIT="b2abc2149f4b3b56836f05ddb135667d79b742a4"
 
 export DARKEMULATOR_URL="https://github.com/DarkQuestCosmology/dark_emulator_public.git"
