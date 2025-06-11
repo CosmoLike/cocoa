@@ -327,12 +327,10 @@ export COSMOPOWER_URL_DATA="https://github.com/cosmopower-organization/jense_202
 export COSMOPOWER_URL_DATA_COMMIT="4317635eed70289ee1ec6b3df828027173071e36"
 
 export EMULTRF_URL="https://github.com/CosmoLike/emulators_code.git"
-export EMULTRF_GIT_COMMIT="4ba5ff58e15ddf300b307a346b9e34527703cab3"
-#export EMULTRF_GIT_COMMIT="6023e5624ec21e1b3c9cda48075bcf4296a2d871"
+export EMULTRF_GIT_COMMIT="0a0cba998643670ca90316eada46fecac1a92e85"
 
 export EMULTRF_DATA_URL="https://github.com/CosmoLike/emulators_data.git"
 export EMULTRF_DATA_GIT_COMMIT="cc2eb8f04a982dc69ee03112373770b714e2d6d3"
-#export EMULTRF_DATA_GIT_COMMIT="b2abc2149f4b3b56836f05ddb135667d79b742a4"
 
 export DARKEMULATOR_URL="https://github.com/DarkQuestCosmology/dark_emulator_public.git"
 export DARKEMULATOR_GIT_COMMIT="46df5972509624e2eeadc2bf3ac528b02333a7e2"

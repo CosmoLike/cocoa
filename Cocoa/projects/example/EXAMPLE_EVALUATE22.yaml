@@ -168,7 +168,18 @@ theory:
                  {'ellmax' : 5000, 'MLA': 'TRF', 'NCTRF': 16, 'INTDIM': 4, 'INTTRF': 5120},
                  None]
   mflike.BandpowerForeground:
-    
+
+#CAMB
+#[evaluate]    chi2_mflike.TTTEEE = 2964.92
+#[evaluate]    chi2_sn.union3 = 26.5423
+#[evaluate]    chi2_sn.pantheon = 1035.19
+#[evaluate]    chi2_sn.pantheonplus = 1403.88
+#[evaluate]    chi2_sn.roman_c = 70.8908
+#[evaluate]    chi2_sn.roman_o = 83.008
+#[evaluate]    chi2_sn.desy5 = 1645.46
+#[evaluate]    chi2_bao.desi_2024_bao_all = 20.4756
+#[evaluate]    chi2_bao.desi_dr2.desi_bao_all = 28.1885
+
 sampler:
   evaluate:
     override:
