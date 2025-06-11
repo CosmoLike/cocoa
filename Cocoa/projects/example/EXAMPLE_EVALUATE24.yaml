@@ -160,36 +160,43 @@ params:
     latex: r_\mathrm{drag}
 
 theory:
+  emultheta:
+    path: ./cobaya/cobaya/theories/
+    stop_at_error: True
+    provides: ['H0', 'omegam'] # necessary flag when using theta* + calling BAO emul theory
+    extra_args:
+      file: ['external_modules/data/emultrf/CMB_TRF/thetaH0GP.joblib']  #THETA
+      extra: ['external_modules/data/emultrf/CMB_TRF/extrainfotheta.npy']    #THETA
+      ord: [['omegabh2','omegach2','thetastar']]
+  emulrdrag:
+    path: ./cobaya/cobaya/theories/
+    stop_at_error: True
+    provides: ['rdrag'] # necessary flag
+    extra_args:
+      file: ['external_modules/data/emultrf/BAO_SN_RES/rdragGP.joblib'] 
+      extra: ['external_modules/data/emultrf/BAO_SN_RES/extrainfordrag.npy'] 
+      ord: [['omegabh2','omegach2','H0']]
   emulcmb:
     path: ./cobaya/cobaya/theories/
     stop_at_error: True
-    provides: ['rdrag', 'H0', 'omegam'] # necessary flag when using theta* + calling BAO emul theory
     extra_args:
       # This version of the emul was not trained with CosmoRec
-      eval: [True, True, True, False, True, True] #TT,TE,EE,PHIPHI,RD,THETA
+      eval: [True, True, True, False] #TT,TE,EE,PHIPHI
       file: ['external_modules/data/emultrf/CMB_TRF/chiTTAstautrf1dot2milnewlhcevansqrtrescalec16.pt',
              'external_modules/data/emultrf/CMB_TRF/chiTEAstautrf1dot2milnewlhcevansqrtrescalec16.pt',
              'external_modules/data/emultrf/CMB_TRF/chiEEAstautrf1dot2milnewlhcevansqrtrescalec16.pt',
-             None,  #PHIPHI
-             'external_modules/data/emultrf/BAO_SN_RES/rdragGP.joblib', #RD
-             'external_modules/data/emultrf/CMB_TRF/thetaH0GP.joblib']  #THETA
+             None] 
       extra: ['external_modules/data/emultrf/CMB_TRF/extrainfo_lhs_tt_96.npy',
               'external_modules/data/emultrf/CMB_TRF/extrainfo_lhs_te_96.npy',
               'external_modules/data/emultrf/CMB_TRF/extrainfo_lhs_ee_96.npy',
-              None, #PHIPHI
-              'external_modules/data/emultrf/BAO_SN_RES/extrainfordrag.npy', #RD
-              'external_modules/data/emultrf/CMB_TRF/extrainfotheta.npy']    #THETA
+              None]    #THETA
       ord: [['omegabh2','omegach2','H0','tau','ns','logA','mnu','w','wa'],
             ['omegabh2','omegach2','H0','tau','ns','logA','mnu','w','wa'],
             ['omegabh2','omegach2','H0','tau','ns','logA','mnu','w','wa'],
-            None,
-            ['omegabh2','omegach2','H0'],
-            ['omegabh2','omegach2','thetastar']]
+            None]
       extrapar: [{'ellmax' : 5000, 'MLA': 'TRF', 'NCTRF': 16, 'INTDIM': 4, 'INTTRF': 5120},
                  {'ellmax' : 5000, 'MLA': 'TRF', 'NCTRF': 16, 'INTDIM': 4, 'INTTRF': 5120},
                  {'ellmax' : 5000, 'MLA': 'TRF', 'NCTRF': 16, 'INTDIM': 4, 'INTTRF': 5120},
-                 None,
-                 None,
                  None]
   mflike.BandpowerForeground:
   emulbaosn:

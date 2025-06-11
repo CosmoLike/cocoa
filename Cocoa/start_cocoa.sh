@@ -205,7 +205,23 @@ if [[ -z "${IGNORE_EMULTRF_CODE}" ]]; then
     ln -s "${ECODEF:?}/emulators/${TMP}/${TMP2}" "${COBTH:?}" \
       >${OUT1:?} 2>${OUT2:?} || { error_start_cocoa "${EC34:?}"; return 1; }
   fi
-  
+
+  TMP="${EMULTRF_NAME:-"emultrf"}"
+  TMP2="emultheta"
+
+  if [[ ! -L "${COBTH:?}/${TMP2}" ]]; then
+    ln -s "${ECODEF:?}/emulators/${TMP}/${TMP2}" "${COBTH:?}" \
+      >${OUT1:?} 2>${OUT2:?} || { error_start_cocoa "${EC34:?}"; return 1; }
+  fi
+
+  TMP="${EMULTRF_NAME:-"emultrf"}"
+  TMP2="emulrdrag"
+
+  if [[ ! -L "${COBTH:?}/${TMP2}" ]]; then
+    ln -s "${ECODEF:?}/emulators/${TMP}/${TMP2}" "${COBTH:?}" \
+      >${OUT1:?} 2>${OUT2:?} || { error_start_cocoa "${EC34:?}"; return 1; }
+  fi
+
   unset -v ECODEF COBTH TMP TMP2
 fi
 
