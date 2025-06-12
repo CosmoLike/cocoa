@@ -366,7 +366,7 @@ export ROMAN_FOURIER_NAME="roman_fourier"
 #BRANCH: if unset, load the latest commit on the specified branch
 #export ROMAN_FOURIER_BRANCH="main"
 #COMMIT: if unset, load the specified commit
-export ROMAN_FOURIER_COMMIT="dff77ff96e121438a2c96c97fddc0141b41fe345"
+export ROMAN_FOURIER_COMMIT="407a35a15b2a1d96d96cb5f0276cf772c2c60e6d"
 #BRANCH: if unset, load the specified TAG
 #export ROMAN_FOURIER_TAG="v4.0-beta17"
 
@@ -375,7 +375,7 @@ export ROMAN_REAL_NAME="roman_real"
 #BRANCH: if unset, load the latest commit on the specified branch
 #export ROMAN_REAL_BRANCH="main"
 #COMMIT: if unset, load the specified commit
-export ROMAN_REAL_COMMIT="63b7ae975ec55738ce263e62134f9c58e8e99523"
+export ROMAN_REAL_COMMIT="8a13be52849fc7965b99f41bd173b7dda05fba67"
 #BRANCH: if unset, load the specified TAG
 #export ROMAN_REAL_TAG="v4.0-beta17"
 # ------------------------------------------------------------------------------
