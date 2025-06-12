@@ -330,7 +330,7 @@ export EMULTRF_URL="https://github.com/CosmoLike/emulators_code.git"
 export EMULTRF_GIT_COMMIT="0a0cba998643670ca90316eada46fecac1a92e85"
 
 export EMULTRF_DATA_URL="https://github.com/CosmoLike/emulators_data.git"
-export EMULTRF_DATA_GIT_COMMIT="cc2eb8f04a982dc69ee03112373770b714e2d6d3"
+export EMULTRF_DATA_GIT_COMMIT="208fc465a2beb219fabf92e0802c2815d7556588"
 
 export DARKEMULATOR_URL="https://github.com/DarkQuestCosmology/dark_emulator_public.git"
 export DARKEMULATOR_GIT_COMMIT="46df5972509624e2eeadc2bf3ac528b02333a7e2"
@@ -357,9 +357,9 @@ export DES_Y3_NAME="des_y3"
 #BRANCH: if unset, load the latest commit on the specified branch
 #export DES_Y3_BRANCH="main"
 #COMMIT: if unset, load the specified commit
-#export DES_Y3_COMMIT="2d7e05944bf9c4724dcb5407e7cb76c992993807"
+export DES_Y3_COMMIT="1a46582b5539c177bd68f8863c054f79a15f8538"
 #BRANCH: if unset, load the specified TAG
-export DES_Y3_TAG="v4.0-beta17"
+#export DES_Y3_TAG="v4.0-beta17"
 
 export ROMAN_FOURIER_URL="https://github.com/CosmoLike/cocoa_roman_fourier.git"
 export ROMAN_FOURIER_NAME="roman_fourier"
