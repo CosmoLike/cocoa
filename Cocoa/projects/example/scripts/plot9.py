@@ -27,8 +27,9 @@ matplotlib.rcParams['legend.labelspacing'] = 0.77
 matplotlib.rcParams['savefig.bbox'] = 'tight'
 matplotlib.rcParams['savefig.format'] = 'pdf'
 
-parameter = [u'logA', u'ns', u'H0', u'omegabh2',  u'omegach2', u'omegaaxh2', u'logmx', u'tau', u'thetastar', u'chi2__BAO', u'chi2__CMB', u'chi2__SN']
-chaindir=os.getcwd()
+parameter = [u'logA', u'ns', u'omegabh2',  u'omegach2', u'omegaaxh2', 
+             u'logmx', u'tau', u'thetastar', u'chi2__BAO', u'chi2__CMB', u'chi2__SN']
+chaindir=os.getenv('ROOTDIR')
 
 analysissettings={'smooth_scale_1D':0.35,'smooth_scale_2D':0.35,
 'ignore_rows': u'0.4','range_confidence' : u'0.005'}
@@ -38,35 +39,41 @@ analysissettings2={'smooth_scale_1D':0.35,'smooth_scale_2D':0.35,
 
 
 root_chains = (
-  '$ROOTDIR/projects/example/EXAMPLE_MCMC30'
+  '/projects/example/chains/EXAMPLE_MCMC26',
+  '/projects/example/chains/EXAMPLE_MCMC30'
 )
 
 # --------------------------------------------------------------------------------
 samples=loadMCSamples(chaindir + root_chains[0],settings=analysissettings)
 p = samples.getParams()
-samples.saveAsText('.VM_plot9_TMP1')
+samples.saveAsText(chaindir + '/projects/example/scripts/.VM_plot9_TMP1')
+# --------------------------------------------------------------------------------
+samples=loadMCSamples(chaindir + root_chains[1],settings=analysissettings)
+p = samples.getParams()
+samples.saveAsText(chaindir + '/projects/example/scripts/.VM_plot9_TMP2')
 # --------------------------------------------------------------------------------
 
 #GET DIST PLOT SETUP
 g = gplot.getSubplotPlotter(
   chain_dir=chaindir,
   analysis_settings=analysissettings2,
-  width_inch=5.0
+  width_inch=13.0
 )
-#g.settings.axis_tick_x_rotation=65
+g.settings.axis_tick_x_rotation=65
 g.settings.lw_contour = 1.2
 g.settings.legend_rect_border = False
 g.settings.figure_legend_frame = False
-g.settings.axes_fontsize = 13.5
-g.settings.legend_fontsize = 13.0
+g.settings.axes_fontsize = 13.0
+g.settings.legend_fontsize = 18.0
 g.settings.alpha_filled_add = 0.7
-g.settings.lab_fontsize=15
+g.settings.lab_fontsize=12.5
 g.legend_labels=False
 
 param_3d = None
 g.triangle_plot(
   [
-   chaindir + '/.VM_plot9_TMP1',
+   chaindir + '/projects/example/scripts/.VM_plot9_TMP2',
+   chaindir + '/projects/example/scripts/.VM_plot9_TMP1',
   ],
 parameter,
 plot_3d_with_param=param_3d,line_args=[
@@ -76,14 +83,15 @@ plot_3d_with_param=param_3d,line_args=[
   {'lw': 1.6,'ls': 'dotted', 'color':'black'},
   {'lw': 1.0,'ls': 'dashdot', 'color':'purple'}
 ],
-filled=[True,True,False,False,False],
+filled=[True,False,False,False,False],
 contour_colors=['royalblue','lightcoral','grey','black', 'purple'],
 contour_ls=['solid', 'dashed', '-.', 'dotted','dashdot'],
 contour_lws=[1.0, 1.2, 1.4, 1.6, 1.0],
 legend_labels=[
-  'EXAMPLE MCMC 30', 
+  'Axion Emulator', 
+  'LCDM Emulator', 
 ],
-legend_loc=(0.425,0.725),
+legend_loc=(0.6,0.725),
 imax_shaded=0)
 
 
