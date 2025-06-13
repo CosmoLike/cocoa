@@ -23,6 +23,8 @@ likelihood:
     path: ./external_modules/data/sn_data
   bao.desi_2024_bao_all:
     path: ./external_modules/data/
+  bao.desi_dr2.desi_bao_all:
+    path: ./external_modules/data/ 
 
 params:
   logA:
@@ -158,12 +160,12 @@ theory:
     stop_at_error: True
     extra_args:
       eval: [True, True] # dL(z), H(z),
-      file:  ['external_modules/data/emultrf/BAO_SN_RES/chisquaredlreallog.pt', 
-              'external_modules/data/emultrf/BAO_SN_RES/chisquareHreallog.pt']
-      extra: ['external_modules/data/emultrf/BAO_SN_RES/extrainforealdl.npy', 
-              'external_modules/data/emultrf/BAO_SN_RES/extrainforealH.npy']
-      tmat:  ['external_modules/data/emultrf/BAO_SN_RES/PCArealdl.npy', 
-              'external_modules/data/emultrf/BAO_SN_RES/PCArealH.npy']
+      file:  ['external_modules/data/emultrf/BAO_SN_RES/chisquaredlreallogax.pt', 
+              'external_modules/data/emultrf/BAO_SN_RES/chisquareHreallogax.pt']
+      extra: ['external_modules/data/emultrf/BAO_SN_RES/extrainforealdlax.npy', 
+              'external_modules/data/emultrf/BAO_SN_RES/extrainforealHax.npy']
+      tmat:  ['external_modules/data/emultrf/BAO_SN_RES/PCArealdlax.npy', 
+              'external_modules/data/emultrf/BAO_SN_RES/PCArealHax.npy']
       zlin:  ['external_modules/data/emultrf/BAO_SN_RES/zaxdl.npy',
               'external_modules/data/emultrf/BAO_SN_RES/zaxH.npy']       
       ord: [['omegam','H0','omegaaxh2','logmx'], 
