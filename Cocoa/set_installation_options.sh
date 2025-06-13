@@ -83,7 +83,7 @@ export IGNORE_COSMOLIKE_ROMAN_REAL_CODE=1
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
-export INSTALL_PRIVATE_AXIONS_PROJECT=1
+#export INSTALL_PRIVATE_AXIONS_PROJECT=1
 
 # ------------------------------------------------------------------------------
 # OVERWRITE_EXISTING_XXX_CODE=1 -> setup_cocoa overwrites existing PACKAGES ----
