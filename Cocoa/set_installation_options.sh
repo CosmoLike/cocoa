@@ -32,12 +32,12 @@ export IGNORE_BICEP_CMB_DATA=1
 # export IGNORE_HOLICOW_STRONG_LENSING_DATA=1
 #export IGNORE_SN_DATA=1
 export IGNORE_SPT_CMB_DATA=1
-export IGNORE_SIMONS_OBSERVATORY_CMB_DATA=1
+#export IGNORE_SIMONS_OBSERVATORY_CMB_DATA=1
 #export IGNORE_PLANCK_CMB_DATA=1
 export IGNORE_CAMSPEC_CMB_DATA=1
 export IGNORE_LIPOP_CMB_DATA=1
 export IGNORE_COSMOPOWER_DATA=1
-export IGNORE_EMULTRF_DATA=1 #SaraivanovZhongZhu (SZZ) transformer-based emul
+#export IGNORE_EMULTRF_DATA=1 #SaraivanovZhongZhu (SZZ) transformer-based emul
 
 # ------------------------------------------------------------------------------
 # The keys below control which packages will be installed and compiled 
@@ -51,15 +51,15 @@ export IGNORE_CLASS_CODE=1 # Default: we just use CAMB (reduces compilation time
 export IGNORE_ACTDR4_CODE=1
 export IGNORE_ACTDR6_CODE=1
 export IGNORE_CPP_CUBA_INSTALLATION=1
-export IGNORE_FGSPECTRA_CODE=1
+#export IGNORE_FGSPECTRA_CODE=1
 export IGNORE_VELOCILEPTORS_CODE=1
-export IGNORE_SIMONS_OBSERVATORY_LIKELIHOOD_CODE=1
+#export IGNORE_SIMONS_OBSERVATORY_LIKELIHOOD_CODE=1
 export IGNORE_CAMSPEC_LIKELIHOOD_CODE=1
 export IGNORE_LIPOP_LIKELIHOOD_CODE=1
 export IGNORE_HYREC_CODE=1
 export IGNORE_COSMOREC_CODE=1
 export IGNORE_MGCAMB_CODE=1
-export IGNORE_EMULTRF_CODE=1 #SaraivanovZhongZhu (SZZ) transformer-based emul
+#export IGNORE_EMULTRF_CODE=1 #SaraivanovZhongZhu (SZZ) transformer-based emul
 export IGNORE_COSMOPOWER_CODE=1
 #export IGNORE_EUCLID_EMULATOR_V2_CODE=1
 export IGNORE_DARK_EMULATOR_CODE=1
@@ -71,10 +71,10 @@ export IGNORE_DARK_EMULATOR_CODE=1
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
-#export IGNORE_COSMOLIKE_LSST_Y1_CODE=1
+export IGNORE_COSMOLIKE_LSST_Y1_CODE=1
 export IGNORE_COSMOLIKE_DES_Y3_CODE=1
-#export IGNORE_COSMOLIKE_ROMAN_FOURIER_CODE=1
-#export IGNORE_COSMOLIKE_ROMAN_REAL_CODE=1
+export IGNORE_COSMOLIKE_ROMAN_FOURIER_CODE=1
+export IGNORE_COSMOLIKE_ROMAN_REAL_CODE=1
 
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
@@ -336,10 +336,10 @@ export COSMOPOWER_URL_DATA="https://github.com/cosmopower-organization/jense_202
 export COSMOPOWER_URL_DATA_COMMIT="4317635eed70289ee1ec6b3df828027173071e36"
 
 export EMULTRF_URL="git@github.com:SBU-COSMOLIKE/emulators_code.git"
-export EMULTRF_GIT_COMMIT="0a0cba998643670ca90316eada46fecac1a92e85"
+#export EMULTRF_GIT_COMMIT="0a0cba998643670ca90316eada46fecac1a92e85"
 
-export EMULTRF_DATA_URL="git@github.com:SBU-COSMOLIKE/emulators_data.git"
-export EMULTRF_DATA_GIT_COMMIT="208fc465a2beb219fabf92e0802c2815d7556588"
+export EMULTRF_DATA_URL="git@github.com:SBU-COSMOLIKE/emulators_data_lcdm.git"
+#export EMULTRF_DATA_GIT_COMMIT="208fc465a2beb219fabf92e0802c2815d7556588"
 
 export DARKEMULATOR_URL="https://github.com/DarkQuestCosmology/dark_emulator_public.git"
 export DARKEMULATOR_GIT_COMMIT="46df5972509624e2eeadc2bf3ac528b02333a7e2"
@@ -393,5 +393,6 @@ export ROMAN_REAL_COMMIT="8a13be52849fc7965b99f41bd173b7dda05fba67"
 # private projects below ---------------------------------------------
 # --------------------------------------------------------------------
 # --------------------------------------------------------------------
-export AXIONS_URL="git@github.com:SBU-COSMOLIKE/cocoa_axions.git"
-#export AXIONS_COMMIT="df96af9558c97b07d355df4bfc56f1677e71b201"
+export AXIONS_PROJECT_URL="git@github.com:SBU-COSMOLIKE/cocoa_axions.git"
+export AXIONS_PROJECT_NAME="axions"
+#export AXIONS_PROJECT_COMMIT="df96af9558c97b07d355df4bfc56f1677e71b201"
