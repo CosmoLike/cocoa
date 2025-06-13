@@ -84,7 +84,7 @@ plot_3d_with_param=param_3d,line_args=[
   {'lw': 1.6,'ls': 'dotted', 'color':'black'},
   {'lw': 1.0,'ls': 'dashdot', 'color':'purple'}
 ],
-filled=[True,False,False,False,False],
+filled=[True,True,False,False,False],
 contour_colors=['royalblue','lightcoral','grey','black', 'purple'],
 contour_ls=['solid', 'dashed', '-.', 'dotted','dashdot'],
 contour_lws=[1.0, 1.2, 1.4, 1.6, 1.0],
@@ -92,7 +92,7 @@ legend_labels=[
   'Axion Emulator (NO CMB, Sampled on H0)', 
   'LCDM Emulator (NO CMB, Sampled on H0)', 
 ],
-legend_loc=(0.6,0.725),
+legend_loc=(0.4,0.8),
 imax_shaded=0)
 
 

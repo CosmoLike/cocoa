@@ -29,7 +29,7 @@ matplotlib.rcParams['savefig.format'] = 'pdf'
 
 #parameter = [u'logA', u'ns', u'omegabh2',  u'omegach2', u'omegaaxh2', 
 #             u'logmx', u'tau', u'thetastar', u'chi2__BAO', u'chi2__CMB', u'chi2__SN']
-parameter = [u'logA', u'ns', u'omegach2', u'omegaaxh2', u'logmx', u'chi2__BAO', u'chi2__CMB', u'chi2__SN']
+parameter = [u'logA', u'ns', u'H0', u'omegach2', u'omegaaxh2', u'logmx', u'chi2__BAO', u'chi2__CMB', u'chi2__SN']
 chaindir=os.getenv('ROOTDIR')
 
 analysissettings={'smooth_scale_1D':0.35,'smooth_scale_2D':0.35,
@@ -84,7 +84,7 @@ plot_3d_with_param=param_3d,line_args=[
   {'lw': 1.6,'ls': 'dotted', 'color':'black'},
   {'lw': 1.0,'ls': 'dashdot', 'color':'purple'}
 ],
-filled=[True,False,False,False,False],
+filled=[True,True,False,False,False],
 contour_colors=['royalblue','lightcoral','grey','black', 'purple'],
 contour_ls=['solid', 'dashed', '-.', 'dotted','dashdot'],
 contour_lws=[1.0, 1.2, 1.4, 1.6, 1.0],
