@@ -1,23 +1,19 @@
-stop_at_error: false
-debug: false
+
+stop_at_error: False
+debug: False
 timing: true
 
 likelihood:
-  sn.pantheon:
-    path: ./external_modules/data/sn_data
-  sn.roman_c:
-    path: ./external_modules/data/sn_data
-  sn.roman_o:
-    path: ./external_modules/data/sn_data
-  bao.sixdf_2011_bao:
-    path: ./external_modules/data/
-  bao.sdss_dr7_mgs:
-    path: ./external_modules/data/
-  bao.sdss_dr12_consensus_bao:
-    path: ./external_modules/data/
-  h0licow.h0licowlike: null
-
-
+  #planck_2018_highl_plik.TT_lite:
+  #  path: ./external_modules/
+  #  clik_file: plc_3.0/hi_l/plik_lite/plik_lite_v22_TT.clik
+  planck_2018_highl_plik.TTTEEE_lite:
+    path: ./external_modules/
+    clik_file: plc_3.0/hi_l/plik_lite/plik_lite_v22_TTTEEE.clik
+  planck_2018_lowl.TT:
+    path: ./external_modules
+  planck_2018_lowl.EE:
+    path: ./external_modules
 
 params:
   logA:
@@ -30,10 +26,6 @@ params:
       scale: 0.05
     proposal: 0.05
     latex: \log(10^{10} A_\mathrm{s})
-    drop: true
-  As:
-    value: 'lambda logA: 1e-10*np.exp(logA)'
-    latex: A_\mathrm{s}
   ns:
     prior:
       min: 0.92
@@ -46,13 +38,13 @@ params:
     latex: n_\mathrm{s}
   H0:
     prior:
-      min: 55
+      min: 60
       max: 90
     ref:
       dist: norm
-      loc: 67
+      loc: 75
       scale: 2
-    proposal: 0.001
+    proposal: 0.2
     latex: H_0
   omegabh2:
     prior:
@@ -74,33 +66,93 @@ params:
       scale: 0.03
     proposal: 0.03
     latex: \Omega_\mathrm{c} h^2
+  tau:
+    prior:
+      dist: norm
+      loc: 0.0544
+      scale: 0.0073
+    ref:
+      dist: norm
+      loc: 0.055
+      scale: 0.006
+    proposal: 0.003
+    latex: \tau_\mathrm{reio}
+  omegab:
+    derived: 'lambda omegabh2, H0: omegabh2/((H0/100)**2)'
+    latex: \Omega_\mathrm{b}
+  omegac:
+    derived: 'lambda omegach2, H0: omegach2/((H0/100)**2)'
+    latex: \Omega_\mathrm{c}
+  As:
+    derived: 'lambda logA: 1e-10*np.exp(logA)'
+    latex: A_\mathrm{s}
+  A:
+    derived: 'lambda As: 1e9*As'
+    latex: 10^9 A_\mathrm{s}
   mnu:
     value: 0.06
+  w0pwa:
+    prior:
+      min: -5 
+      max: -0.01
+    ref:
+      dist: norm
+      loc: -0.99
+      scale: 0.05
+    proposal: 0.05
+    latex: w_{0,\mathrm{DE}}+w_{a,\mathrm{DE}}
+    drop: true
+  w:
+    prior:
+      min: -3
+      max: -0.01
+    ref:
+      dist: norm
+      loc: -0.99
+      scale: 0.05
+    proposal: 0.05
+    latex: w_{0,\mathrm{DE}}
+  wa:
+    value: 'lambda w0pwa, w: w0pwa - w'
+    derived: false
+    latex: w_{a,\mathrm{DE}}
 
-  rdrag:
-    latex: r_\mathrm{drag}
 
 theory:
-  camb:
-    path: ./external_modules/code/CAMB
-    use_renames: True
+  emulcmb:
+    path: ./cobaya/cobaya/theories/
+    stop_at_error: True
     extra_args:
-      AccuracyBoost: 1.10
-      lens_potential_accuracy: 2
-      num_massive_neutrinos: 1
-      nnu: 3.046
-      dark_energy_model: ppf
-
-
+      # This version of the emul was not trained with CosmoRec
+      eval: [True, True, True, False] #TT,TE,EE,PHIPHI
+      file: ['external_modules/data/emultrf/CMB_TRF/chiTTAstautrf1dot2milnewlhcevansqrtrescalec16.pt',
+             'external_modules/data/emultrf/CMB_TRF/chiTEAstautrf1dot2milnewlhcevansqrtrescalec16.pt',
+             'external_modules/data/emultrf/CMB_TRF/chiEEAstautrf1dot2milnewlhcevansqrtrescalec16.pt',
+             None] 
+      extra: ['external_modules/data/emultrf/CMB_TRF/extrainfo_lhs_tt_96.npy',
+              'external_modules/data/emultrf/CMB_TRF/extrainfo_lhs_te_96.npy',
+              'external_modules/data/emultrf/CMB_TRF/extrainfo_lhs_ee_96.npy',
+              None]
+      ord: [['omegabh2','omegach2','H0','tau','ns','logA','mnu','w','wa'],
+            ['omegabh2','omegach2','H0','tau','ns','logA','mnu','w','wa'],
+            ['omegabh2','omegach2','H0','tau','ns','logA','mnu','w','wa'],
+            None]
+      extrapar: [{'ellmax' : 5000, 'MLA': 'TRF', 'NCTRF': 16, 'INTDIM': 4, 'INTTRF': 5120},
+                 {'ellmax' : 5000, 'MLA': 'TRF', 'NCTRF': 16, 'INTDIM': 4, 'INTTRF': 5120},
+                 {'ellmax' : 5000, 'MLA': 'TRF', 'NCTRF': 16, 'INTDIM': 4, 'INTTRF': 5120},
+                 None]
 
 sampler:
   evaluate:
     override:
       logA: 3.0448
       ns: 0.96605
-      H0: 68
+      H0: 67.319
       omegabh2: 0.022383
       omegach2: 0.12011
-      
+      tau: 0.0543
+      w0pwa: -1
+      w: -1
+      A_planck: 1.00138
 
-output: ./projects/example/chains/EXAMPLE_EVALUATE1
+output: ./projects/example/chains/EXAMPLE_EVALUATE27

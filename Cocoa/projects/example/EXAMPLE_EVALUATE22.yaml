@@ -150,22 +150,35 @@ theory:
     stop_at_error: True
     extra_args:
       # This version of the emul was not trained with CosmoRec
-      ttfilename: 'external_modules/data/emultrf/CMB_TRF/chiTTAstautrf1dot2milnewlhcevansqrtrescalec16'
-      ttextraname: 'external_modules/data/emultrf/CMB_TRF/extrainfo_lhs_tt_96.npy'
-      tefilename: 'external_modules/data/emultrf/CMB_TRF/chiTEAstautrf1dot2milnewlhcevansqrtrescalec16'
-      teextraname: 'external_modules/data/emultrf/CMB_TRF/extrainfo_lhs_te_96.npy'
-      eefilename: 'external_modules/data/emultrf/CMB_TRF/chiEEAstautrf1dot2milnewlhcevansqrtrescalec16'
-      eeextraname: 'external_modules/data/emultrf/CMB_TRF/extrainfo_lhs_ee_96.npy'
-#      dlfilename: 'external_modules/data/emultrf/CMB_TRF/chisquaredllog'
-#      dlextraname: 'external_modules/data/emultrf/CMB_TRF/extrainfodl.npy'
-#      dltransmat: 'external_modules/data/emultrf/CMB_TRF/PCAdl.npy'
-      GPfilename:  'external_modules/data/emultrf/CMB_TRF/thetaH0GP.joblib'
-      GPextraname: 'external_modules/data/emultrf/CMB_TRF/extrainfotheta.npy'
-      ordering: ['omegabh2','omegach2','H0','tau','ns','logA','mnu','w','wa']
-      modeltype: 'TRF'
-      ellmax: 5000
-
+      eval: [True, True, True, False] #TT,TE,EE,PHIPHI
+      file: ['external_modules/data/emultrf/CMB_TRF/chiTTAstautrf1dot2milnewlhcevansqrtrescalec16.pt',
+             'external_modules/data/emultrf/CMB_TRF/chiTEAstautrf1dot2milnewlhcevansqrtrescalec16.pt',
+             'external_modules/data/emultrf/CMB_TRF/chiEEAstautrf1dot2milnewlhcevansqrtrescalec16.pt',
+             None] 
+      extra: ['external_modules/data/emultrf/CMB_TRF/extrainfo_lhs_tt_96.npy',
+              'external_modules/data/emultrf/CMB_TRF/extrainfo_lhs_te_96.npy',
+              'external_modules/data/emultrf/CMB_TRF/extrainfo_lhs_ee_96.npy',
+              None]
+      ord: [['omegabh2','omegach2','H0','tau','ns','logA','mnu','w','wa'],
+            ['omegabh2','omegach2','H0','tau','ns','logA','mnu','w','wa'],
+            ['omegabh2','omegach2','H0','tau','ns','logA','mnu','w','wa'],
+            None]
+      extrapar: [{'ellmax' : 5000, 'MLA': 'TRF', 'NCTRF': 16, 'INTDIM': 4, 'INTTRF': 5120},
+                 {'ellmax' : 5000, 'MLA': 'TRF', 'NCTRF': 16, 'INTDIM': 4, 'INTTRF': 5120},
+                 {'ellmax' : 5000, 'MLA': 'TRF', 'NCTRF': 16, 'INTDIM': 4, 'INTTRF': 5120},
+                 None]
   mflike.BandpowerForeground:
+
+#CAMB
+#[evaluate]    chi2_mflike.TTTEEE = 2964.92
+#[evaluate]    chi2_sn.union3 = 26.5423
+#[evaluate]    chi2_sn.pantheon = 1035.19
+#[evaluate]    chi2_sn.pantheonplus = 1403.88
+#[evaluate]    chi2_sn.roman_c = 70.8908
+#[evaluate]    chi2_sn.roman_o = 83.008
+#[evaluate]    chi2_sn.desy5 = 1645.46
+#[evaluate]    chi2_bao.desi_2024_bao_all = 20.4756
+#[evaluate]    chi2_bao.desi_dr2.desi_bao_all = 28.1885
 
 sampler:
   evaluate:

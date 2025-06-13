@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <stdlib.h> 
 #if !defined(__APPLE__)
 #include <malloc.h>
 #endif
@@ -55,6 +56,7 @@ gsl_integration_glfixed_table* malloc_gslint_glfixed(const int n)
   return w;
 }
 
+/*
 void*** malloc3d(const int nx, const int ny, const int nz)
 {
   double*** tab = (double***) malloc(sizeof(double**)*nx +
@@ -78,7 +80,34 @@ void*** malloc3d(const int nx, const int ny, const int nz)
 
   return (void***) tab;
 }
+*/
 
+void*** malloc3d(const int nx, const int ny, const int nz)
+{ // Got help from ChatGPT to do the align version of my previous malloc func
+  void* raw_block = NULL;
+  if (posix_memalign(&raw_block, 64, nx * sizeof(double**) + 
+                                     nx * ny * sizeof(double*) + 
+                                     nx * ny * nz * sizeof(double)) != 0) {
+    log_fatal("posix_memalign failed in malloc3d_aligned64");
+    exit(EXIT_FAILURE);
+  }
+
+  double*** tab = (double***) raw_block;
+
+  #pragma omp parallel for collapse(2)
+  for (int i = 0; i < nx; ++i) {
+    for (int j = 0; j < ny; ++j) {
+      tab[i]    = (double**) ((char*) raw_block + nx*sizeof(double**)) + ny*i;
+      tab[i][j] = (double*)  ((char*) raw_block + 
+                              nx*sizeof(double**) + 
+                              nx*ny*sizeof(double*)) + nz*(ny*i + j);
+    }
+  }
+
+  return (void***) tab;
+}
+
+/*
 void** malloc2d(const int nx, const int ny)
 {
   double** tab = (double**) malloc(sizeof(double*)*nx + 
@@ -90,12 +119,38 @@ void** malloc2d(const int nx, const int ny)
   }
 
   #pragma omp parallel for
-  for (int i=0; i<nx; i++)
+  for (int i=0; i<nx; i++) {
     tab[i] = (double*)(tab + nx) + ny*i;
+  }
   
   return (void**) tab;
 }
+*/
 
+void** malloc2d(const int nx, const int ny)
+{ // Got help from ChatGPT to do the align version of my previous malloc func
+  const size_t pointer_bytes = nx * sizeof(double*);
+  const size_t data_bytes    = nx * ny * sizeof(double);
+  const size_t total_bytes   = pointer_bytes + data_bytes;
+
+  void* raw_block = NULL;
+  if (posix_memalign(&raw_block, 
+                     64, 
+                     sizeof(double*)*nx+sizeof(double)*nx*ny) != 0) {
+    log_fatal("posix_memalign failed for malloc2d");
+    exit(1);
+  }
+
+  double** tab = (double**) raw_block;
+
+  #pragma omp parallel for
+  for (int i = 0; i < nx; ++i) {
+    tab[i] = (double*) ((char*) raw_block + nx * sizeof(double*)) + i * ny;
+  }
+  return (void**) tab;
+}
+
+/*
 void* malloc1d(const int nx)
 {
   double* vec = (double*) malloc(sizeof(double)*nx);
@@ -105,6 +160,17 @@ void* malloc1d(const int nx)
     exit(1);
   }
   return (void*) vec;
+}
+*/
+
+void* malloc1d(const int nx)
+{ // Got help from ChatGPT to do the align version of my previous malloc func
+  void* vec = NULL;
+  if (posix_memalign(&vec, 64, sizeof(double) * nx) != 0) {
+    log_fatal("array allocation failed (malloc1d)");
+    exit(1); 
+  }
+  return vec;
 }
 
 void* calloc1d(const int nx)

@@ -233,14 +233,14 @@ void reset_cmb_struct()
 
 void reset_Ntable_struct()
 {
-  Ntable.random = 0.0;
-  Ntable.N_a = 350;                     // N_a       
-  Ntable.N_k_lin = 500;                 // N_k_lin
-  Ntable.N_k_nlin = 500;                // N_k_nlin
-  Ntable.N_ell  = 350;                  // N_ell      
-  Ntable.Ntheta = 250;                  // N_theta  
-  Ntable.N_M  = 1000;                   // N_M, M = mass (Halo Model)
-  Ntable.NL_Nchi = 500;                 // Cosmo2D - NL = NonLimber (NL_Nchi)
+  Ntable.random   = 0.0;
+  Ntable.N_a      = 300;                   // N_a       
+  Ntable.N_k_lin  = 500;                   // N_k_lin
+  Ntable.N_k_nlin = 500;                   // N_k_nlin
+  Ntable.N_ell    = 350;                   // N_ell      
+  Ntable.Ntheta   = 250;                   // N_theta  
+  Ntable.N_M      = 1000;                  // N_M, M = mass (Halo Model)
+  Ntable.NL_Nchi  = 500;                   // Cosmo2D - NL = NonLimber (NL_Nchi)
   Ntable.photoz_interpolation_type = 0;
   Ntable.high_def_integration = 0;
   Ntable.FPTboost=0;

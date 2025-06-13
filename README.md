@@ -35,11 +35,11 @@ This readme file presents basic and advanced instructions for installing all [Co
 
 # Installation of core packages <a name="required_packages_conda"></a>
 
-Core packages include compilers and numerical libraries that users never modify. We install most of these core packages via Conda, as shown below.
+Core packages include compilers and numerical libraries that users typically do not modify. We install most of these core packages via Conda, as shown below.
 
 **Step :one:**: Download the file `cocoapy310.yml` yml file
 
-    wget https://raw.githubusercontent.com/CosmoLike/cocoa/refs/heads/main/cocoapy310.yml
+    wget https://raw.githubusercontent.com/SBU-COSMOLIKE/cocoa/refs/heads/main/cocoapy310.yml
 
 create the cocoa environment,
 
@@ -78,9 +78,9 @@ Users can now proceed to the **next section**.
 In this section, we assume users have previously activated the Cocoa conda environment.
 
 **Step :one:**: Download Cocoa's latest release and go to its main folder (`cocoa/Cocoa`),
-
-    git clone https://github.com/CosmoLike/cocoa.git --branch v4.0-beta26 cocoa
  
+    git clone git@github.com:SBU-COSMOLIKE/cocoa.git cocoa
+
 and
 
     cd ./cocoa/Cocoa
@@ -100,21 +100,10 @@ This script compiles external modules selected for installation on `set_installa
 Users can now proceed to **the next section**.
 
 > [!TIP]
-> If you want to work from the latest commit, then clone the repository with the following command 
->
-> (SSH)
-> 
->     git clone git@github.com:CosmoLike/cocoa.git cocoa
-> 
-> (HTTP)
-> 
->     git clone https://github.com/CosmoLike/cocoa.git cocoa
->
->
 > Users who want to develop from a release version (e.g., `v4.0-beta20`) should read the appendix [FAQ: How do we push changes to the cocoa main branch? A few git hacks](#push_main)
 
 > [!TIP]
-> Cocoa does not install all the available external modules by default. If the user requires additional packages, refer to the appendix [FAQ: How do we compile external modules?](#appendix_compile_).
+> Cocoa does not install all the available external modules by default. If the user requires additional packages, refer to the appendix [FAQ: How do we compile external modules?](#appendix_compile_separately).
 
 > [!NOTE]
 > In case users need to run `setup_cocoa.sh` more than once, Cocoa will not download previously installed packages, cosmolike projects, or large datasets, unless the following keys are set on `set_installation_options.sh`
@@ -184,7 +173,7 @@ and
     mpirun -n ${NMPI} --oversubscribe --mca pml ^ucx --mca btl vader,tcp,self --bind-to core:overload-allowed --rank-by slot --map-by numa:pe=${OMP_NUM_THREADS} python -m mpi4py.futures EXAMPLE_PROFILE1.py --mpi $((${NMPI}-1)) --profile 1 --tol 0.05 --AB 1.0 --outroot 'profile' --minmethod 5 --maxiter 1 --maxfeval 250 
 
 > [!Tip]
-> Cocoa provides several cosmolike projects, not all of which are installed by default. To activate them, refer to the appendix [FAQ: How do we compile external modules?](#appendix_compile_ly).
+> Cocoa provides several cosmolike projects, not all of which are installed by default. To activate them, refer to the appendix [FAQ: How do we compile external modules?](#appendix_compile_separately).
 
 > [!TIP]
 > Assuming Cocoa is installed on a local (not remote!) machine, type the command below after step 2️⃣ to run Jupyter Notebooks.
@@ -224,7 +213,9 @@ Cocoa contains a few transformer-based neural network emulators capable of simul
       # inset # symbol in the lines below (i.e., unset these environmental keys)
       #export IGNORE_EMULTRF_CODE=1  #SaraivanovZhongZhu (SZZ) transformer-based emul
       #export IGNORE_EMULTRF_DATA=1  #SaraivanovZhongZhu (SZZ) transformer-based emul
+
       
+      #export IGNORE_FGSPECTRA_CODE=1                        # to run EXAMPLE_EVALUATE26.yaml
       #export IGNORE_SIMONS_OBSERVATORY_LIKELIHOOD_CODE=1    # to run EXAMPLE_EVALUATE26.yaml
       #export IGNORE_SIMONS_OBSERVATORY_CMB_DATA=1           # to run EXAMPLE_EVALUATE26.yaml
  
@@ -266,6 +257,8 @@ PolyChord:
 >
 > and
 >
+>      source  ./installation_scripts/setup_fgspectra.sh               # download Simons Observatory foreground library
+>      source  ./installation_scripts/compile_fgspectra.sh             # download Simons Observatory foreground library
 >      source ./installation_scripts/setup_simons_observatory.sh       # download Simons Observatory Likelihood code (to run EXAMPLE_EVALUATE26.yaml)
 >      source ./installation_scripts/unxv_simons_observatory.sh        # download Simons Observatory Likelihood data  (to run EXAMPLE_EVALUATE26.yaml)
 >      source ./installation_scripts/compile_simons_observatory.sh     # compile Simons Observatory Likelihood code     (to run EXAMPLE_EVALUATE26.yaml)
