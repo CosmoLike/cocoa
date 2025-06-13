@@ -202,7 +202,7 @@ and
 >      Cocoa/.local/lib
 >      Cocoa/.local/share
 >
-> Another reason 
+> Consistency of the environment across all Cocoa instances is crucial, and the start_cocoa.sh/stop_cocoa.sh scripts handle the loading and unloading of environmental path variables. 
 
 # Running ML emulators <a name="cobaya_base_code_examples_emul"></a>
 
