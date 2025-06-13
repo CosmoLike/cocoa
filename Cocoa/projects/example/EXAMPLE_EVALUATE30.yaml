@@ -1,0 +1,186 @@
+stop_at_error: false
+debug: false
+timing: true
+
+likelihood:
+  #planck_2018_highl_plik.TT_lite:
+  #  path: ./external_modules/
+  #  clik_file: plc_3.0/hi_l/plik_lite/plik_lite_v22_TT.clik
+  planck_2018_highl_plik.TTTEEE_lite:
+    path: ./external_modules/
+    clik_file: plc_3.0/hi_l/plik_lite/plik_lite_v22_TTTEEE.clik
+  planck_2018_lowl.TT:
+    path: ./external_modules
+  planck_2018_lowl.EE:
+    path: ./external_modules
+  sn.union3: 
+    path: ./external_modules/data/sn_data
+  sn.pantheon: 
+    path: ./external_modules/data/sn_data
+  sn.pantheonplus: 
+    path: ./external_modules/data/sn_data
+  sn.desy5: 
+    path: ./external_modules/data/sn_data
+  bao.desi_2024_bao_all:
+    path: ./external_modules/data/
+
+params:
+  logA:
+    prior:
+      min: 1.61
+      max: 3.91
+    ref:
+      dist: norm
+      loc: 3.0448
+      scale: 0.05
+    proposal: 0.05
+    latex: \log(10^{10} A_\mathrm{s})
+  ns:
+    prior:
+      min: 0.92
+      max: 1.05
+    ref:
+      dist: norm
+      loc: 0.96605
+      scale: 0.005
+    proposal: 0.005
+    latex: n_\mathrm{s}
+  omegabh2:
+    prior:
+      min: 0.01
+      max: 0.04
+    ref:
+      dist: norm
+      loc: 0.022383
+      scale: 0.005
+    proposal: 0.005
+    latex: \Omega_\mathrm{b} h^2
+  omegach2:
+    prior:
+      min: 0.06
+      max: 0.2
+    ref:
+      dist: norm
+      loc: 0.12011
+      scale: 0.03
+    proposal: 0.03
+    latex: \Omega_\mathrm{c} h^2
+  omegaaxh2:
+    prior:
+      min: 0.02
+      max: 0.4
+    ref:
+      dist: norm
+      loc: 0.2
+      scale: 0.03
+    proposal: 0.21
+    latex: \Omega_\mathrm{ax} h^2
+  logmx:
+    prior:
+      min: -34
+      max: -31.5
+    ref:
+      dist: norm
+      loc: -33
+      scale: 1
+    proposal: -33.1
+    latex: \log{m_{\rm ax}}
+  tau:
+    prior:
+      dist: norm
+      loc: 0.0544
+      scale: 0.0073
+    ref:
+      dist: norm
+      loc: 0.055
+      scale: 0.006
+    proposal: 0.003
+    latex: \tau_\mathrm{reio}
+  mnu:
+    value: 0.06
+  thetastar:
+    prior:
+      min: 0.5
+      max: 10
+    ref:
+      dist: norm
+      loc: 1.04109
+      scale: 0.0004
+    proposal: 0.0002
+    latex: 100\theta_\mathrm{*}
+  H0:
+    latex: H_0
+  omegamh2:
+    value: 'lambda omegach2, omegabh2, mnu: omegach2+omegabh2+(mnu*(3.046/3)**0.75)/94.0708'
+    latex: \Omega_\mathrm{m} h^2
+  omegam:
+    latex: \Omega_\mathrm{m}
+  rdrag:
+    latex: r_\mathrm{drag}
+
+theory:
+  emultheta:
+    path: ./cobaya/cobaya/theories/
+    stop_at_error: True
+    provides: ['H0', 'omegam']
+    extra_args:
+      file:  ['external_modules/data/emultrf/CMB_CNN/axH0theta.joblib']
+      extra: ['external_modules/data/emultrf/CMB_CNN/extrainfoaxH0.npy']
+      ord:   [['omegabh2','omegach2','thetastar','omegaaxh2','logmx']]
+  emulrdrag:
+    path: ./cobaya/cobaya/theories/
+    stop_at_error: True
+    provides: ['rdrag']
+    extra_args:
+      file: ['external_modules/data/emultrf/BAO_SN_RES/axrdrag.joblib'] 
+      extra: ['external_modules/data/emultrf/BAO_SN_RES/extrainfoaxrdrag.npy'] 
+      ord: [['omegabh2','omegach2','H0','omegaaxh2','logmx']]
+  emulcmb:
+    path: ./cobaya/cobaya/theories/
+    stop_at_error: True
+    extra_args:
+      # This version of the emul was not trained with CosmoRec
+      eval: [True, True, True, False] #TT,TE,EE,PHIPHI
+      file: ['external_modules/data/emultrf/CMB_CNN/chiTTaxionCNN1200k.pt',
+             'external_modules/data/emultrf/CMB_CNN/chiTEaxionCNN1200k.pt',
+             'external_modules/data/emultrf/CMB_CNN/chiEEaxionCNN1200k.pt', None]
+      extra: ['external_modules/data/emultrf/CMB_CNN/extrainfoaxTT.npy',
+              'external_modules/data/emultrf/CMB_CNN/extrainfoaxTE.npy',
+              'external_modules/data/emultrf/CMB_CNN/extrainfoaxEE.npy', None]
+      ord: [ ['omegabh2','omegach2','H0','logA','ns','tau','omegaaxh2','logmx'],
+             ['omegabh2','omegach2','H0','logA','ns','tau','omegaaxh2','logmx'],
+             ['omegabh2','omegach2','H0','logA','ns','tau','omegaaxh2','logmx'], None]
+      extrapar: [{'ellmax' : 2601, 'MLA': 'CNN', 'INTDIM': 4, 'INTCNN': 3200},
+                 {'ellmax' : 2601, 'MLA': 'CNN', 'INTDIM': 4, 'INTCNN': 3200},
+                 {'ellmax' : 2601, 'MLA': 'CNN', 'INTDIM': 4, 'INTCNN': 3200}, None]
+  emulbaosn:
+    path: ./cobaya/cobaya/theories/
+    stop_at_error: True
+    extra_args:
+      eval: [True, True] # dL(z), H(z),
+      file:  ['external_modules/data/emultrf/BAO_SN_RES/chisquaredlreallog.pt', 
+              'external_modules/data/emultrf/BAO_SN_RES/chisquareHreallog.pt']
+      extra: ['external_modules/data/emultrf/BAO_SN_RES/extrainforealdl.npy', 
+              'external_modules/data/emultrf/BAO_SN_RES/extrainforealH.npy']
+      tmat:  ['external_modules/data/emultrf/BAO_SN_RES/PCArealdl.npy', 
+              'external_modules/data/emultrf/BAO_SN_RES/PCArealH.npy']
+      zlin:  ['external_modules/data/emultrf/BAO_SN_RES/zaxdl.npy',
+              'external_modules/data/emultrf/BAO_SN_RES/zaxH.npy']       
+      ord: [['omegam','H0','omegaaxh2','logmx'], 
+            ['omegam','H0','omegaaxh2','logmx']]
+      extrapar: [{'offset' : 0.0, 'INTDIM' : 4, 'NLAYER' : 4}, 
+                 {'offset' : 0.0, 'INTDIM' : 1, 'NLAYER' : 1}]
+
+sampler:
+  evaluate:
+    override:
+      logA: 3.0448
+      ns: 0.96605
+      omegabh2: 0.022383
+      omegach2: 0.12011
+      thetastar: 1.0410562
+      tau: 0.0543
+      omegaaxh2: 0.2
+      logmx: -33
+
+output: ./projects/example/chains/EXAMPLE_EVALUATE30

@@ -1,50 +1,18 @@
-stop_at_error: false
+stop_at_error: False
+debug: False
 timing: true
-debug: false
 
 likelihood:
-  mflike.TTTEEE:
-    data_folder: simons_observatory/v0.8
-    input_file: LAT_simu_sacc_00044.fits
-    cov_Bbl_file: data_sacc_w_covar_and_Bbl.fits
-    defaults:
-      # Which spectra?
-      polarizations: ['TT', 'TE', 'ET', 'EE']
-      # Scale cuts (in ell) for each spectrum
-      scales:
-        TT: [50, 3002]
-        TE: [50, 3002]
-        ET: [50, 3002]
-        EE: [50, 3002]
-      symmetrize: False
-
-    data:
-      # List the names and frequencies of all the
-      # relevant experiments.
-      experiments:
-        - LAT_93
-        - LAT_145
-        - LAT_225
-        # - PlanckHFI_545:
-
-      spectra:
-        # Here, list all the different cross-correlations
-        # between experiments and bands you want to
-        # analyse.
-        # For each of them, you can specify which spectra
-        # and scale cuts you'd like to use. If you don't
-        # specify anything, the defaults will be used.
-        - experiments: [LAT_93, LAT_93]
-        - experiments: [LAT_93, LAT_145]
-        - experiments: [LAT_93, LAT_225]
-        - experiments: [LAT_145, LAT_145]
-        - experiments: [LAT_145, LAT_225]
-        - experiments: [LAT_225, LAT_225]
-      lmax_theory: 5000
-  sn.pantheonplus: 
-    path: ./external_modules/data/sn_data
-  bao.desi_2024_bao_all:
-    path: ./external_modules/data/
+  #planck_2018_highl_plik.TT_lite:
+  #  path: ./external_modules/
+  #  clik_file: plc_3.0/hi_l/plik_lite/plik_lite_v22_TT.clik
+  planck_2018_highl_plik.TTTEEE_lite:
+    path: ./external_modules/
+    clik_file: plc_3.0/hi_l/plik_lite/plik_lite_v22_TTTEEE.clik
+  planck_2018_lowl.TT:
+    path: ./external_modules
+  planck_2018_lowl.EE:
+    path: ./external_modules
 
 params:
   logA:
@@ -57,6 +25,10 @@ params:
       scale: 0.05
     proposal: 0.05
     latex: \log(10^{10} A_\mathrm{s})
+    drop: true
+  As:
+    value: 'lambda logA: 1e-10*np.exp(logA)'
+    latex: A_\mathrm{s}
   ns:
     prior:
       min: 0.92
@@ -67,17 +39,16 @@ params:
       scale: 0.005
     proposal: 0.005
     latex: n_\mathrm{s}
-  thetastar:
+  H0:
     prior:
-      min: 0.5
-      max: 10
+      min: 60
+      max: 90
     ref:
       dist: norm
-      loc: 1.04109
-      scale: 0.0004
-    proposal: 0.0002
-    latex: 100\theta_\mathrm{*}
-    renames: theta
+      loc: 75
+      scale: 2
+    proposal: 0.2
+    latex: H_0
   omegabh2:
     prior:
       min: 0.01
@@ -98,6 +69,8 @@ params:
       scale: 0.03
     proposal: 0.03
     latex: \Omega_\mathrm{c} h^2
+  mnu:
+    value: 0.06
   tau:
     prior:
       dist: norm
@@ -109,105 +82,90 @@ params:
       scale: 0.006
     proposal: 0.003
     latex: \tau_\mathrm{reio}
-  As:
-    derived: 'lambda logA: 1e-10*np.exp(logA)'
-    latex: A_\mathrm{s}
+  omegal:
+    latex: \Omega_\Lambda
+  omegam:
+    latex: \Omega_\mathrm{m}
+  omegamh2:
+    derived: 'lambda omegam, H0: omegam*(H0/100)**2'
+    latex: \Omega_\mathrm{m} h^2
+  omegab:
+    derived: 'lambda omegabh2, H0: omegabh2/((H0/100)**2)'
+    latex: \Omega_\mathrm{b}
+  omegac:
+    derived: 'lambda omegach2, H0: omegach2/((H0/100)**2)'
+    latex: \Omega_\mathrm{c}
+  sigma8:
+    latex: \sigma_8
+  s8h5:
+    derived: 'lambda sigma8, H0: sigma8*(H0*1e-2)**(-0.5)'
+    latex: \sigma_8/h^{0.5}
+  s8omegamp5:
+    derived: 'lambda sigma8, omegam: sigma8*omegam**0.5'
+    latex: \sigma_8 \Omega_\mathrm{m}^{0.5}
+  s8omegamp25:
+    derived: 'lambda sigma8, omegam: sigma8*omegam**0.25'
+    latex: \sigma_8 \Omega_\mathrm{m}^{0.25}
   A:
     derived: 'lambda As: 1e9*As'
     latex: 10^9 A_\mathrm{s}
-  mnu:
-    value: 0.06
-  w0pwa:
-    prior:
-      min: -5 
-      max: -0.01
-    ref:
-      dist: norm
-      loc: -0.99
-      scale: 0.05
-    proposal: 0.05
-    latex: w_{0,\mathrm{DE}}+w_{a,\mathrm{DE}}
-    drop: true
-  w:
-    prior:
-      min: -3
-      max: -0.01
-    ref:
-      dist: norm
-      loc: -0.99
-      scale: 0.05
-    proposal: 0.05
-    latex: w_{0,\mathrm{DE}}
-  wa:
-    value: 'lambda w0pwa, w: w0pwa - w'
-    derived: false
-    latex: w_{a,\mathrm{DE}}
-    
+  age:
+    latex: '{\rm{Age}}/\mathrm{Gyr}'
+  rdrag:
+    latex: r_\mathrm{drag}
+  yheused:
+    latex: Y_P^\mathrm{BBN}
+  omegan2:
+    latex: \Omega_\mathrm{\\nu} h^2
+  omegan:
+    derived: 'lambda omegan2, H0: omegan2/((H0/100)**2)'
+    latex: \Omega_\mathrm{\\nu}
+  zstar:
+    latex: z_*
+  rstar:
+    latex: r_*
+  thetastar:
+    latex: 100\theta_*
+  DAstar:
+    latex: D_\mathrm{A}/\mathrm{Gpc}
+  zdrag:
+    latex: z_\mathrm{drag}
+  kd:
+    latex: k_\mathrm{D}
+  thetad:
+    latex: 100\theta_\mathrm{D}
+  zeq:
+    latex: z_\mathrm{eq}
+  keq:
+    latex: k_\mathrm{eq}
+  thetaeq:
+    latex: 100\theta_\mathrm{eq}
+  thetarseq:
+    latex: 100\theta_\mathrm{s,eq}
+  DHBBN:
+    derived: "lambda DH: 10**5*DH"
+    latex: 10^5 \mathrm{D}/\mathrm{H}
+  zrei:
+    latex: z_\mathrm{re}
+
 theory:
-  emulcmb:
-    path: ./cobaya/cobaya/theories/
-    stop_at_error: True
+  camb:
+    path: ./external_modules/code/CAMB
+    use_renames: True
     extra_args:
-      # This version of the emul was not trained with CosmoRec
-      ttfilename:  'external_modules/data/emultrf/CMB_TRF/chiTTAstautrf1dot2milnewlhcevansqrtrescalec16'
-      ttextraname: 'external_modules/data/emultrf/CMB_TRF/extrainfo_lhs_tt_96.npy'
-      tefilename:  'external_modules/data/emultrf/CMB_TRF/chiTEAstautrf1dot2milnewlhcevansqrtrescalec16'
-      teextraname: 'external_modules/data/emultrf/CMB_TRF/extrainfo_lhs_te_96.npy'
-      eefilename:  'external_modules/data/emultrf/CMB_TRF/chiEEAstautrf1dot2milnewlhcevansqrtrescalec16'
-      eeextraname: 'external_modules/data/emultrf/CMB_TRF/extrainfo_lhs_ee_96.npy'
-      GPfilename:  'external_modules/data/emultrf/CMB_TRF/thetaH0GP.joblib'
-      GPextraname: 'external_modules/data/emultrf/CMB_TRF/extrainfotheta.npy'
-      ordering: ['omegabh2','omegach2','H0','tau','ns','logA','mnu','w','wa']
-      thetaordering: ['omegabh2','omegach2','thetastar']
-      modeltype: 'TRF'
-      ellmax: 5000
-
-  mflike.BandpowerForeground:
-  emulbaosn:
-    path: ./cobaya/cobaya/theories/
-    stop_at_error: True
-    extra_args:
-      dlfilename: 'external_modules/data/emultrf/BAO_SN_RES/chisquaredllog'
-      dlextraname: 'external_modules/data/emultrf/BAO_SN_RES/extrainfodl.npy'
-      dltransmat: 'external_modules/data/emultrf/BAO_SN_RES/PCAdl.npy'
-      Hfilename: 'external_modules/data/emultrf/BAO_SN_RES/chisquareH'
-      Hextraname: 'external_modules/data/emultrf/BAO_SN_RES/extrainfoH.npy'
-      Htransmat: 'external_modules/data/emultrf/BAO_SN_RES/PCAH.npy'
-      rdragfilename: 'external_modules/data/emultrf/BAO_SN_RES/rdragGP.joblib'
-      rdragextraname: 'external_modules/data/emultrf/BAO_SN_RES/extrainfordrag.npy'
-      GPfilename:  'external_modules/data/emultrf/CMB_TRF/thetaH0GP.joblib'
-      GPextraname: 'external_modules/data/emultrf/CMB_TRF/extrainfotheta.npy'
-      ordering: ['omm','H0']
-      rdragordering: ['omegabh2','omegach2','H0']
-      zlindl: 'external_modules/data/emultrf/BAO_SN_RES/zlinlcdm.npy'
-      zlinH: 'external_modules/data/emultrf/BAO_SN_RES/zlinlcdm.npy'
-      extradllevel: 4400
-
+      AccuracyBoost: 1.1
+      dark_energy_model: ppf
+      num_nu_massive: 1
 
 sampler:
   evaluate:
     override:
-      logA: 3.045845885
-      ns: 9.652308970e-01
-      thetastar: 1.0410562
-      omegabh2: 2.246801442e-02
-      omegach2: 1.198257361e-01 
-      tau: 5.433339482e-02
-      w0pwa: -1
-      w: -1
-      a_tSZ: 3.299661491
-      a_kSZ: 1.603283271
-      a_p: 6.909072608
-      beta_p: 2.081592320
-      a_c: 4.903593522
-      beta_c: 2.201183246
-      a_s: 3.100233500
-      a_gtt: 2.843185734
-      a_gte: 0.10
-      a_gee: 9.891127676e-02
-      a_psee: 0.0
-      a_pste: 5.316779467e-04
-      xi: 1.910150877e-01 
-      T_d: 1.028875217e+01
+      logA: 3.0448
+      ns: 0.96605
+      H0: 67.319
+      omegabh2: 0.022383
+      omegach2: 0.12011
+      tau: 0.0543
+      A_planck: 1.00138
 
 output: ./projects/example/chains/EXAMPLE_EVALUATE26

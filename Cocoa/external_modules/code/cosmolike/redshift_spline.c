@@ -119,13 +119,31 @@ int test_zoverlap(int ni, int nj) // test whether source bin nj is behind lens b
   if (ni < 0 || 
       ni > redshift.clustering_nbin - 1 || 
       nj < 0 || 
-      nj > redshift.shear_nbin - 1)
-  {
+      nj > redshift.shear_nbin - 1) {
     log_fatal("invalid bin input (ni, nj) = (%d, %d)", ni, nj);
     exit(1);
   }
-  int res = 1;
   if (tomo.ggl_exclude != NULL) {
+    static int N[MAX_SIZE_ARRAYS][MAX_SIZE_ARRAYS] = {{-42}};
+    if (N[0][0] < -1) {
+      for (int i=0; i<redshift.clustering_nbin; i++) {
+        for (int j=0; j<redshift.shear_nbin; j++) {
+          N[i][j] = 1;
+          for (int k=0; k<tomo.N_ggl_exclude; k++) {
+            const int p = k*2+0;
+            const int q = k*2+1;
+            if ((i == tomo.ggl_exclude[p]) && 
+                (j == tomo.ggl_exclude[q])) {
+              N[i][j] = 0;
+              break;
+            }
+          }
+        }
+      } 
+    }
+    return  N[ni][nj];
+    /*
+    int res = 1;
     for (int k=0; k<tomo.N_ggl_exclude; k++) {
       const int i = k*2+0;
       const int j = k*2+1;
@@ -134,8 +152,12 @@ int test_zoverlap(int ni, int nj) // test whether source bin nj is behind lens b
         break;
       }
     }
+    //printf("testing %d %d \n", N[ni][nj], res);
+    return res;*/
   }
-  return res;
+  else {
+    return 1;
+  }
 }
 
 // -----------------------------------------------------------------------------
@@ -808,17 +830,14 @@ double zmean(const int ni)
 
 double int_for_g_tomo(double aprime, void* params) 
 {
-  if (!(aprime>0) || !(aprime<1))
-  {
+  if (!(aprime>0) || !(aprime<1)) {
     log_fatal("a>0 and a<1 not true");
     exit(1);
   }
   double *ar = (double*)params;
   
   const int ni = (int) ar[0];
-  
-  if (ni < 0 || ni > redshift.shear_nbin - 1)
-  {
+  if (ni < 0 || ni > redshift.shear_nbin - 1) {
     log_fatal("invalid bin input ni = %d", ni);
     exit(1);
   } 
@@ -841,7 +860,7 @@ double g_tomo(double ainput, const int ni)
   const double amax = 0.999999;
   const double da = (amax - amin)/((double) Ntable.N_a - 1.0);
 
-  if (table == NULL || 
+  if (NULL == table || 
       fdiff(cache_table_params, Ntable.random)) 
   {
     if (table != NULL) {
@@ -867,17 +886,14 @@ double g_tomo(double ainput, const int ni)
     gsl_integration_glfixed_table* w = malloc_gslint_glfixed(szint);
 
     #pragma omp parallel for collapse(2)
-    for (int j=0; j<redshift.shear_nbin; j++) 
-    {
-      for (int i=0; i<Ntable.N_a; i++) 
-      {
+    for (int j=0; j<redshift.shear_nbin; j++) {
+      for (int i=0; i<Ntable.N_a; i++) {
         const double a = amin + i*da;       
         double ar[2] = {(double) j, chi(a)};
  
         gsl_function F;
         F.params = ar;
-        F.function = int_for_g_tomo;
-        
+        F.function = int_for_g_tomo;       
         table[j][i] = gsl_integration_glfixed(&F, amin, a, w);
       }
     }
@@ -889,12 +905,10 @@ double g_tomo(double ainput, const int ni)
     cache_photoz_nuisance_params_shear = nuisance.random_photoz_shear;
   }
 
-  if (ni < 0 || ni > redshift.shear_nbin - 1)
-  {
+  if (ni < 0 || ni > redshift.shear_nbin - 1) {
     log_fatal("invalid bin input ni = %d", ni);
     exit(1);
   } 
-
   return (ainput <= amin || ainput > 1.0 - da) ? 0.0 :
     interpol1d(table[ni], Ntable.N_a, amin, amax, da, ainput);
 }
@@ -1049,17 +1063,14 @@ double g_lens(double a, int ni)
     gsl_integration_glfixed_table* w = malloc_gslint_glfixed(szint);
 
     #pragma omp parallel for collapse(2)
-    for (int j=0; j<redshift.clustering_nbin; j++) 
-    {
-      for (int i=0; i<Ntable.N_a; i++) 
-      {
+    for (int j=0; j<redshift.clustering_nbin; j++) {
+      for (int i=0; i<Ntable.N_a; i++) {
         const double a =  amin + i*da;
         double ar[2] = {(double) j, chi(a)};
   
         gsl_function F;
         F.params = ar;
         F.function = int_for_g_lens;
-
         table[j][i] = gsl_integration_glfixed(&F, amin_shear, a, w);
       }
     }

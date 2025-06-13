@@ -35,7 +35,7 @@ This readme file presents basic and advanced instructions for installing all [Co
 
 # Installation of core packages <a name="required_packages_conda"></a>
 
-Core packages include compilers and numerical libraries that users never modify. We install most of these core packages via Conda, as shown below.
+Core packages include compilers and numerical libraries that users typically do not modify. We install most of these core packages via Conda, as shown below.
 
 **Step :one:**: Download the file `cocoapy310.yml` yml file
 
@@ -114,7 +114,7 @@ Users can now proceed to **the next section**.
 > Users who want to develop from a release version (e.g., `v4.0-beta20`) should read the appendix [FAQ: How do we push changes to the cocoa main branch? A few git hacks](#push_main)
 
 > [!TIP]
-> Cocoa does not install all the available external modules by default. If the user requires additional packages, refer to the appendix [FAQ: How do we compile external modules?](#appendix_compile_).
+> Cocoa does not install all the available external modules by default. If the user requires additional packages, refer to the appendix [FAQ: How do we compile external modules?](#appendix_compile_separately).
 
 > [!NOTE]
 > In case users need to run `setup_cocoa.sh` more than once, Cocoa will not download previously installed packages, cosmolike projects, or large datasets, unless the following keys are set on `set_installation_options.sh`
@@ -184,7 +184,7 @@ and
     mpirun -n ${NMPI} --oversubscribe --mca pml ^ucx --mca btl vader,tcp,self --bind-to core:overload-allowed --rank-by slot --map-by numa:pe=${OMP_NUM_THREADS} python -m mpi4py.futures EXAMPLE_PROFILE1.py --mpi $((${NMPI}-1)) --profile 1 --tol 0.05 --AB 1.0 --outroot 'profile' --minmethod 5 --maxiter 1 --maxfeval 250 
 
 > [!Tip]
-> Cocoa provides several cosmolike projects, not all of which are installed by default. To activate them, refer to the appendix [FAQ: How do we compile external modules?](#appendix_compile_ly).
+> Cocoa provides several cosmolike projects, not all of which are installed by default. To activate them, refer to the appendix [FAQ: How do we compile external modules?](#appendix_compile_separately).
 
 > [!TIP]
 > Assuming Cocoa is installed on a local (not remote!) machine, type the command below after step 2️⃣ to run Jupyter Notebooks.

@@ -3,69 +3,58 @@ debug: false
 timing: true
 
 likelihood:
-  sn.pantheon:
+  sn.union3: 
     path: ./external_modules/data/sn_data
-
+  sn.pantheon: 
+    path: ./external_modules/data/sn_data
+  sn.pantheonplus: 
+    path: ./external_modules/data/sn_data
+  sn.roman_c:
+    path: ./external_modules/data/sn_data
+  sn.roman_o:
+    path: ./external_modules/data/sn_data
+  sn.desy5: 
+    path: ./external_modules/data/sn_data
 
 params:
   H0:
+    value: 67
+  omegam:
     prior:
-      min: 55
-      max: 90
+      min: 0.2
+      max: 0.4
     ref:
       dist: norm
-      loc: 67
-      scale: 2
-    proposal: 0.001
-    latex: H_0
-  omegabh2:
-    prior:
-      min: 0.01
-      max: 0.04
-    ref:
-      dist: norm
-      loc: 0.022383
-      scale: 0.005
-    proposal: 0.005
+      loc: 0.3
+      scale: 0.1
+    proposal: 0.1
     latex: \Omega_\mathrm{b} h^2
-  omegach2:
-    prior:
-      min: 0.06
-      max: 0.2
-    ref:
-      dist: norm
-      loc: 0.12011
-      scale: 0.03
-    proposal: 0.03
-    latex: \Omega_\mathrm{c} h^2
 
-
-
+# FROM CAMB
+# omegam = 0.31383
+#[evaluate]  chi2_sn.union3 = 26.5423
+#[evaluate]  chi2_sn.pantheon = 1035.19
+#[evaluate]  chi2_sn.pantheonplus = 1403.88
+#[evaluate]  chi2_sn.roman_c = 70.8908
+#[evaluate]  chi2_sn.roman_o = 83.008
+#[evaluate]  chi2_sn.desy5 = 1645.46
 
 sampler:
   evaluate:
     override:
-      omegabh2: 0.022383
-      omegach2: 0.12011
-      H0: 67
+      omegam: 0.31383
 
 theory:
   emulbaosn:
     path: ./cobaya/cobaya/theories/
     stop_at_error: True
     extra_args:
-      # This version of the emul was not trained with CosmoRec
-      dlfilename: 'external_modules/data/emultrf/BAO_SN_RES/chisquaredllog'
-      dlextraname: 'external_modules/data/emultrf/BAO_SN_RES/extrainfodl.npy'
-      dltransmat: 'external_modules/data/emultrf/BAO_SN_RES/PCAdl.npy'
-      Hfilename: 'external_modules/data/emultrf/BAO_SN_RES/chisquareH'
-      Hextraname: 'external_modules/data/emultrf/BAO_SN_RES/extrainfoH.npy'
-      Htransmat: 'external_modules/data/emultrf/BAO_SN_RES/PCAH.npy'
-      rdragfilename: 'external_modules/data/emultrf/BAO_SN_RES/rdragGP.joblib'
-      rdragextraname: 'external_modules/data/emultrf/BAO_SN_RES/extrainfordrag.npy'
-      ordering: ['omm','H0']
-      rdragordering: ['omegabh2','omegach2','H0']
-      zlindl: 'external_modules/data/emultrf/BAO_SN_RES/zlinlcdm.npy'
-      zlinH: 'external_modules/data/emultrf/BAO_SN_RES/zlinlcdm.npy'
-      extradllevel: 4400
+      eval: [True, False] # dL(z), H(z),
+      file:  ['external_modules/data/emultrf/BAO_SN_RES/chisquaredllog.pt', None]
+      extra: ['external_modules/data/emultrf/BAO_SN_RES/extrainfodl.npy', None]
+      tmat:  ['external_modules/data/emultrf/BAO_SN_RES/PCAdl.npy', None]
+      zlin:  ['external_modules/data/emultrf/BAO_SN_RES/zlinlcdm.npy', None]       
+      ord: [['omegam','H0'], None]
+      extrapar: [{'offset' : 4400.0, 'INTDIM' : 4, 'NLAYER' : 4}, None]
+
 output: ./projects/example/chains/EXAMPLE_EVALUATE25

@@ -36,7 +36,6 @@ params:
       scale: 0.005
     proposal: 0.005
     latex: n_\mathrm{s}
-
   omegabh2:
     prior:
       min: 0.01
@@ -57,7 +56,6 @@ params:
       scale: 0.03
     proposal: 0.03
     latex: \Omega_\mathrm{c} h^2
-
   omegaaxh2:
     prior:
       min: 0.02
@@ -68,7 +66,6 @@ params:
       scale: 0.03
     proposal: 0.21
     latex: \Omega_\mathrm{ax} h^2
-
   logmx:
     prior:
       min: -34
@@ -79,9 +76,6 @@ params:
       scale: 1
     proposal: -33.1
     latex: \log{m_{\rm ax}}
-
-
-
   tau:
     prior:
       dist: norm
@@ -93,7 +87,6 @@ params:
       scale: 0.006
     proposal: 0.003
     latex: \tau_\mathrm{reio}
-
   As:
     derived: 'lambda logA: 1e-10*np.exp(logA)'
     latex: A_\mathrm{s}
@@ -102,31 +95,6 @@ params:
     latex: 10^9 A_\mathrm{s}
   mnu:
     value: 0.06
-  w0pwa:
-    prior:
-      min: -5 
-      max: -0.01
-    ref:
-      dist: norm
-      loc: -0.99
-      scale: 0.05
-    proposal: 0.05
-    latex: w_{0,\mathrm{DE}}+w_{a,\mathrm{DE}}
-    drop: true
-  w:
-    prior:
-      min: -3
-      max: -0.01
-    ref:
-      dist: norm
-      loc: -0.99
-      scale: 0.05
-    proposal: 0.05
-    latex: w_{0,\mathrm{DE}}
-  wa:
-    value: 'lambda w0pwa, w: w0pwa - w'
-    derived: false
-    latex: w_{a,\mathrm{DE}}
   thetastar:
     prior:
       min: 0.5
@@ -137,29 +105,39 @@ params:
       scale: 0.0004
     proposal: 0.0002
     latex: 100\theta_\mathrm{*}
-
-
+  H0:
+    latex: H_0
+  omegamh2:
+    value: 'lambda omegach2, omegabh2, mnu: omegach2+omegabh2+(mnu*(3.046/3)**0.75)/94.0708'
+    latex: \Omega_\mathrm{m} h^2
 
 theory:
+  emultheta:
+    path: ./cobaya/cobaya/theories/
+    stop_at_error: True
+    provides: ['H0', 'omegam']
+    extra_args:
+      file:  ['external_modules/data/emultrf/CMB_CNN/axH0theta.joblib']
+      extra: ['external_modules/data/emultrf/CMB_CNN/extrainfoaxH0.npy']
+      ord:   [['omegabh2','omegach2','thetastar','omegaaxh2','logmx']]
   emulcmb:
     path: ./cobaya/cobaya/theories/
     stop_at_error: True
     extra_args:
       # This version of the emul was not trained with CosmoRec
-      ttfilename: 'external_modules/data/emultrf/CMB_CNN/chiTTaxionCNN1200k'
-      ttextraname: 'external_modules/data/emultrf/CMB_CNN/extrainfoaxTT.npy'
-      tefilename: 'external_modules/data/emultrf/CMB_CNN/chiTEaxionCNN1200k'
-      teextraname: 'external_modules/data/emultrf/CMB_CNN/extrainfoaxTE.npy'
-      eefilename: 'external_modules/data/emultrf/CMB_CNN/chiEEaxionCNN1200k'
-      eeextraname: 'external_modules/data/emultrf/CMB_CNN/extrainfoaxEE.npy'
-      GPfilename: 'external_modules/data/emultrf/CMB_CNN/axH0theta.joblib'
-      GPextraname: 'external_modules/data/emultrf/CMB_CNN/extrainfoaxH0.npy'
-      ordering: ['omegabh2','omegach2','H0','logA','ns','tau','omegaaxh2','logmx']
-      thetaordering: ['omegabh2','omegach2','thetastar','omegaaxh2','logmx']
-      modeltype: 'CNN'
-      ellmax: 2601
-
-      
+      eval: [True, True, True, False] #TT,TE,EE,PHIPHI
+      file: ['external_modules/data/emultrf/CMB_CNN/chiTTaxionCNN1200k.pt',
+             'external_modules/data/emultrf/CMB_CNN/chiTEaxionCNN1200k.pt',
+             'external_modules/data/emultrf/CMB_CNN/chiEEaxionCNN1200k.pt', None]
+      extra: ['external_modules/data/emultrf/CMB_CNN/extrainfoaxTT.npy',
+              'external_modules/data/emultrf/CMB_CNN/extrainfoaxTE.npy',
+              'external_modules/data/emultrf/CMB_CNN/extrainfoaxEE.npy', None]
+      ord: [ ['omegabh2','omegach2','H0','logA','ns','tau','omegaaxh2','logmx'],
+             ['omegabh2','omegach2','H0','logA','ns','tau','omegaaxh2','logmx'],
+             ['omegabh2','omegach2','H0','logA','ns','tau','omegaaxh2','logmx'], None]
+      extrapar: [{'ellmax' : 2601, 'MLA': 'CNN', 'INTDIM': 4, 'INTCNN': 3200},
+                 {'ellmax' : 2601, 'MLA': 'CNN', 'INTDIM': 4, 'INTCNN': 3200},
+                 {'ellmax' : 2601, 'MLA': 'CNN', 'INTDIM': 4, 'INTCNN': 3200}, None]
 
 sampler:
   evaluate:
@@ -172,8 +150,6 @@ sampler:
       tau: 0.0543
       omegaaxh2: 0.2
       logmx: -33
-      w0pwa: -1
-      w: -1
       A_planck: 1.00138
 
-output: ./projects/example/chains/EXAMPLE_EVALUATE17
+output: ./projects/example/chains/EXAMPLE_EVALUATE28
