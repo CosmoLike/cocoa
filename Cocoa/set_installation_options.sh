@@ -16,7 +16,7 @@ fi
 # ------------------------------------------------------------------------------
 # VERBOSE AS DEBUG TOOL --------------------------------------------------------
 # ------------------------------------------------------------------------------
-#export COCOA_OUTPUT_VERBOSE=1
+export COCOA_OUTPUT_VERBOSE=1
 
 # ------------------------------------------------------------------------------
 # If set, COSMOLIKE will compile with DEBUG flags ------------------------------
@@ -97,6 +97,9 @@ export OVERWRITE_EXISTING_ALL_PACKAGES=1    # except cosmolike projects
                                             # project if wants setup_cocoa to reclone it
 #export REDOWNLOAD_EXISTING_ALL_DATA=1      # warning: some data are many GB
 
+#export OVERWRITE_EXISTING_PRIVATE_CODE=1   # dangerous (possible lost of uncommit work)
+                                            # if unset, users must manually delete
+                                            # project if wants setup_cocoa to reclone it
 # ------------------------------------------------------------------------------
 # If set, compile_planck.sh uses click like code from github.com/benabed/clik
 # ------------------------------------------------------------------------------

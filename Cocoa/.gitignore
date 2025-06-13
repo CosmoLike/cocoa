@@ -28,6 +28,8 @@ external_modules/code/.gitignore
 external_modules/data/.gitignore
 projects/.gitignore
 
+external_modules/data/ax*
+external_modules/data/axions/
 external_modules/data/bao_data/
 external_modules/data/bicep_keck_2015/
 external_modules/data/des_data/

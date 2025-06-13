@@ -46,7 +46,7 @@ cpfile() {
     2>"/dev/null" || { error "CP FILE ${1} on ${2}"; return 1; }
 }
 
-gitact1() {  
+gitact() {  
   local PROJECT="${ROOTDIR}/projects"
 
   local PACKDIR="${PROJECT:?}/${1:?}"
@@ -56,7 +56,7 @@ gitact1() {
   # ---------------------------------------------------------------------------
   # In case this script runs twice --------------------------------------------
   # ---------------------------------------------------------------------------
-  if [ -n "${OVERWRITE_EXISTING_COSMOLIKE_CODE}" ]; then
+  if [ -n "${OVERWRITE_EXISTING_PRIVATE_CODE}" ]; then
     rm -rf "${PACKDIR:?}"
   fi
 
@@ -69,13 +69,8 @@ gitact1() {
 
     cdfolder "${1}" || return 1;
 
-    if git show-ref --quiet refs/heads/${3}; then
-      # do nothing
-      echo "git branch exists" >${OUT1:?} 2>${OUT2:?} || { return 1; }
-    else
-      "${GIT:?}" checkout -b ${3} origin/${3} \
+    "${GIT:?}" checkout ${3} \
         >${OUT1:?} 2>${OUT2:?} || { error "${EC16:?}"; return 1; }
-    fi
   fi
     
   cdfolder "${ROOTDIR}" || return 1;
@@ -91,7 +86,7 @@ gitact2() {
   # ---------------------------------------------------------------------------
   # In case this script runs twice --------------------------------------------
   # ---------------------------------------------------------------------------
-  if [ -n "${OVERWRITE_EXISTING_COSMOLIKE_CODE}" ]; then
+  if [ -n "${OVERWRITE_EXISTING_PRIVATE_CODE}" ]; then
     rm -rf "${PACKDIR:?}"
   fi
 
@@ -101,47 +96,11 @@ gitact2() {
   if [ ! -d "${PACKDIR:?}" ]; then
     "${GIT:?}" clone "${2:?}" "${1:?}" \
       >${OUT1:?} 2>${OUT2:?} || { error "${EC15:?}"; return 1; }
-
-    cdfolder "${1}" || return 1;
-
-    "${GIT:?}" checkout ${3} \
-      >${OUT1:?} 2>${OUT2:?} || { error "${EC16:?}"; return 1; }
   fi
     
   cdfolder "${ROOTDIR}" || return 1;
 }
 
-gitact3() {  
-  local PROJECT="${ROOTDIR}/projects"
-
-  local PACKDIR="${PROJECT:?}/${1:?}"
-
-  cdfolder "${PROJECT:?}" || return 1;
-
-  # ---------------------------------------------------------------------------
-  # In case this script runs twice --------------------------------------------
-  # ---------------------------------------------------------------------------
-  if [ -n "${OVERWRITE_EXISTING_COSMOLIKE_CODE}" ]; then
-    rm -rf "${PACKDIR:?}"
-  fi
-
-  # ---------------------------------------------------------------------------
-  # clone from original repo --------------------------------------------------
-  # ---------------------------------------------------------------------------
-  if [ ! -d "${PACKDIR:?}" ]; then
-    "${GIT:?}" clone "${2:?}" "${1:?}" \
-      >${OUT1:?} 2>${OUT2:?} || { error "${EC15:?}"; return 1; }
-
-    cdfolder "${1}" || return 1;
-
-    "${GIT:?}" fetch --all --tags --prune
-
-    "${GIT:?}" checkout tags/${3} -b ${3} \
-      >${OUT1:?} 2>${OUT2:?} || { error "${EC16:?}"; return 1; }
-  fi
-    
-  cdfolder "${ROOTDIR}" || return 1;
-}
 
 # ---------------------------------------------------------------------------
 # ---------------------------------------------------------------------------
@@ -155,6 +114,8 @@ unset_env_vars || return 1
 
 if [ -n "${INSTALL_PRIVATE_AXIONS_PROJECT}" ]; then 
   
+  echo "what?"
+
   # Name to be printed on this shell script messages
   PRINTNAME="AXIONS PROJECT"
 
@@ -165,7 +126,9 @@ if [ -n "${INSTALL_PRIVATE_AXIONS_PROJECT}" ]; then
   URL="${AXIONS_PROJECT_URL:?}"
 
   if [ -n "${AXIONS_PROJECT_COMMIT}" ]; then
-    gitact2 "${FOLDER:?}" "${URL:?}" "${AXIONS_PROJECT_COMMIT:?}"  || return 1
+    gitact "${FOLDER:?}" "${URL:?}" "${AXIONS_PROJECT_COMMIT:?}"  || return 1
+  else
+    gitact2 "${FOLDER:?}" "${URL:?}"  || return 1
   fi
 
   pbottom "GETTING ${PRINTNAME:?}" || return 1
