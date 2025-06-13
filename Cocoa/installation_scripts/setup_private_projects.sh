@@ -114,8 +114,6 @@ unset_env_vars || return 1
 
 if [ -n "${INSTALL_PRIVATE_AXIONS_PROJECT}" ]; then 
   
-  echo "what?"
-
   # Name to be printed on this shell script messages
   PRINTNAME="AXIONS PROJECT"
 
