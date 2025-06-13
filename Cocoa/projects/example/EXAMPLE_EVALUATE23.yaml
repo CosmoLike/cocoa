@@ -160,12 +160,15 @@ params:
     derived: false
     latex: w_{a,\mathrm{DE}}
   omegamh2:
+    derived: True
     value: 'lambda omegach2, omegabh2, mnu: omegach2+omegabh2+(mnu*(3.046/3)**0.75)/94.0708'
     latex: \Omega_\mathrm{m} h^2
   omegam:
+    derived: True
     value: 'lambda omegamh2, H0: omegamh2/(H0/100)**2'
     latex: \Omega_\mathrm{m}
   rdrag:
+    derived: True
     latex: r_\mathrm{drag}
 
 theory:

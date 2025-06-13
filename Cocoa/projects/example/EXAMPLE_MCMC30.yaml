@@ -1,5 +1,5 @@
 stop_at_error: false
-debug: false
+debug: False
 timing: False
 
 likelihood:
@@ -62,9 +62,9 @@ params:
       max: 0.4
     ref:
       dist: norm
-      loc: 0.2
+      loc: 0.1
       scale: 0.03
-    proposal: 0.21
+    proposal: 0.03
     latex: \Omega_\mathrm{ax} h^2
   logmx:
     prior:
@@ -74,7 +74,7 @@ params:
       dist: norm
       loc: -33
       scale: 1
-    proposal: -33.1
+    proposal: 1
     latex: \log{m_{\rm ax}}
   tau:
     prior:

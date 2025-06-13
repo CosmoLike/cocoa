@@ -27,8 +27,9 @@ matplotlib.rcParams['legend.labelspacing'] = 0.77
 matplotlib.rcParams['savefig.bbox'] = 'tight'
 matplotlib.rcParams['savefig.format'] = 'pdf'
 
-parameter = [u'logA', u'ns', u'omegabh2',  u'omegach2', u'omegaaxh2', 
-             u'logmx', u'tau', u'thetastar', u'chi2__BAO', u'chi2__CMB', u'chi2__SN']
+#parameter = [u'logA', u'ns', u'omegabh2',  u'omegach2', u'omegaaxh2', 
+#             u'logmx', u'tau', u'thetastar', u'chi2__BAO', u'chi2__CMB', u'chi2__SN']
+parameter = [u'logA', u'ns', u'omegach2', u'omegaaxh2', u'logmx', u'chi2__BAO', u'chi2__CMB', u'chi2__SN']
 chaindir=os.getenv('ROOTDIR')
 
 analysissettings={'smooth_scale_1D':0.35,'smooth_scale_2D':0.35,
@@ -57,16 +58,16 @@ samples.saveAsText(chaindir + '/projects/example/scripts/.VM_plot9_TMP2')
 g = gplot.getSubplotPlotter(
   chain_dir=chaindir,
   analysis_settings=analysissettings2,
-  width_inch=13.0
+  width_inch=10.0
 )
 g.settings.axis_tick_x_rotation=65
 g.settings.lw_contour = 1.2
 g.settings.legend_rect_border = False
 g.settings.figure_legend_frame = False
-g.settings.axes_fontsize = 13.0
+g.settings.axes_fontsize = 14.0
 g.settings.legend_fontsize = 18.0
 g.settings.alpha_filled_add = 0.7
-g.settings.lab_fontsize=12.5
+g.settings.lab_fontsize=13.5
 g.legend_labels=False
 
 param_3d = None
