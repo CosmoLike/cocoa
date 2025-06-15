@@ -184,7 +184,7 @@ theory:
     extra_args:
       file: ['external_modules/data/emultrf/BAO_SN_RES/rdragGP.joblib'] 
       extra: ['external_modules/data/emultrf/BAO_SN_RES/extrainfordrag.npy'] 
-      ord: [['omegabh2','omegach2','H0']]
+      ord: [['omegabh2','omegach2']]
   emulcmb:
     path: ./cobaya/cobaya/theories/
     stop_at_error: True
