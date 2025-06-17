@@ -77,6 +77,15 @@ export IGNORE_COSMOLIKE_DES_Y3_CODE=1
 #export IGNORE_COSMOLIKE_ROMAN_REAL_CODE=1
 
 # ------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
+# The keys below control which private projects (not public repo)
+# ------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
+#export INSTALL_PRIVATE_AXIONS_PROJECT=1
+
+# ------------------------------------------------------------------------------
 # OVERWRITE_EXISTING_XXX_CODE=1 -> setup_cocoa overwrites existing PACKAGES ----
 # overwrite: delete the existing PACKAGE folder and install it again -----------
 # redownload: delete the compressed file and download data again ---------------
@@ -88,6 +97,9 @@ export OVERWRITE_EXISTING_ALL_PACKAGES=1    # except cosmolike projects
                                             # project if wants setup_cocoa to reclone it
 #export REDOWNLOAD_EXISTING_ALL_DATA=1      # warning: some data are many GB
 
+#export OVERWRITE_EXISTING_PRIVATE_CODE=1   # dangerous (possible lost of uncommit work)
+                                            # if unset, users must manually delete
+                                            # project if wants setup_cocoa to reclone it
 # ------------------------------------------------------------------------------
 # If set, compile_planck.sh uses click like code from github.com/benabed/clik
 # ------------------------------------------------------------------------------
@@ -378,6 +390,12 @@ export ROMAN_REAL_NAME="roman_real"
 export ROMAN_REAL_COMMIT="8a13be52849fc7965b99f41bd173b7dda05fba67"
 #BRANCH: if unset, load the specified TAG
 #export ROMAN_REAL_TAG="v4.0-beta17"
-# ------------------------------------------------------------------------------
-# ------------------------------------------------------------------------------
-# ------------------------------------------------------------------------------
+
+# --------------------------------------------------------------------
+# --------------------------------------------------------------------
+# private projects below ---------------------------------------------
+# --------------------------------------------------------------------
+# --------------------------------------------------------------------
+export AXIONS_PROJECT_URL="git@github.com:SBU-COSMOLIKE/cocoa_axions.git"
+export AXIONS_PROJECT_NAME="axions"
+#export AXIONS_PROJECT_COMMIT="df96af9558c97b07d355df4bfc56f1677e71b201"
