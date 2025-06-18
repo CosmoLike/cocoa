@@ -150,11 +150,6 @@ if [[ -z "${IGNORE_EMULTRF_CODE}" ]]; then
     rm -f "${COBTH:?}/${TMP:?}"
   fi
 
-  TMP="emulsn"
-  if [[ -L "${COBTH:?}/${TMP:?}" ]]; then
-    rm -f "${COBTH:?}/${TMP:?}"
-  fi
-
   TMP="emultheta"
   if [[ -L "${COBTH:?}/${TMP:?}" ]]; then
     rm -f "${COBTH:?}/${TMP:?}"
