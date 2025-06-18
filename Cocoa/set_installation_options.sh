@@ -341,8 +341,8 @@ export COSMOPOWER_URL_DATA_COMMIT="4317635eed70289ee1ec6b3df828027173071e36"
 export EMULTRF_URL="https://github.com/CosmoLike/emulators_code.git"
 export EMULTRF_GIT_COMMIT="0a0cba998643670ca90316eada46fecac1a92e85"
 
-#export EMULTRF_DATA_URL="https://github.com/CosmoLike/emulators_data.git"
 export EMULTRF_DATA_URL="https://github.com/SBU-COSMOLIKE/emulators_data_lcdm.git"
+#export EMULTRF_DATA_URL="https://github.com/CosmoLike/emulators_data.git"
 #export EMULTRF_DATA_GIT_COMMIT="208fc465a2beb219fabf92e0802c2815d7556588"
 
 export DARKEMULATOR_URL="https://github.com/DarkQuestCosmology/dark_emulator_public.git"

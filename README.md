@@ -68,7 +68,7 @@ Users can now proceed to the **next section**.
 > To install the `cocoa` conda environment on a supercomputer, users may take advantage of the fact that several HPC environments provide the [Anaconda installer](https://www.anaconda.com) as an external module. If this applies to you, then check the appendix [FAQ: How do we use an available Anaconda module on HPC?](#overview_anaconda).
 
 > [!TIP]
-> Users working in an HPC environment that does not offer Anaconda or  may want to check the appendix [FAQ: How do we install Conda?](#overview_conda).
+> Users working in an HPC environment that does not offer Anaconda may want to check the appendix [FAQ: How do we install Conda?](#overview_conda).
 
 > [!TIP]
 > We provide a Docker image named *whovian-cocoa* with Cocoa pre-installed and pre-compiled. For further instructions, refer to the appendix [FAQ: How do we run Cocoa with Docker?](#appendix_jupyter_whovian).
