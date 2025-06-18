@@ -81,8 +81,8 @@ params:
     latex: n_\mathrm{s}
   thetastar:
     prior:
-      min: 0.5
-      max: 10
+      min: 1
+      max: 1.2
     ref:
       dist: norm
       loc: 1.04109
@@ -155,13 +155,17 @@ params:
     derived: false
     latex: w_{a,\mathrm{DE}}
   H0:
+    derived: true
     latex: H_0
   omegamh2:
+    derived: true
     value: 'lambda omegach2, omegabh2, mnu: omegach2+omegabh2+(mnu*(3.046/3)**0.75)/94.0708'
     latex: \Omega_\mathrm{m} h^2
   omegam:
+    derived: true
     latex: \Omega_\mathrm{m}
   rdrag:
+    derived: true
     latex: r_\mathrm{drag}
 
 theory:
@@ -179,8 +183,8 @@ theory:
     provides: ['rdrag']
     extra_args:
       file: ['external_modules/data/emultrf/BAO_SN_RES/rdragGP.joblib'] 
-      extra: ['external_modules/data/emultrf/BAO_SN_RES/extrainfordrag.npy'] 
-      ord: [['omegabh2','omegach2','H0']]
+      extra: ['external_modules/data/emultrf/BAO_SN_RES/extrainfordrag.npy']
+      ord: [['omegabh2','omegach2']]
   emulcmb:
     path: ./cobaya/cobaya/theories/
     stop_at_error: True

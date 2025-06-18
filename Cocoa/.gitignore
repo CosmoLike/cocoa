@@ -1,3 +1,4 @@
+.DS_Store
 Cocoa/cobaya
 cobaya2/
 cobaya3/
@@ -27,7 +28,13 @@ cobaya/cobaya/likelihoods/.gitignore
 external_modules/code/.gitignore
 external_modules/data/.gitignore
 projects/.gitignore
+projects/.DS_Store
+projects/example/.DS_Store
 
+external_modules/data/.DS_Store
+external_modules/code/.DS_Store
+external_modules/data/ax*
+external_modules/data/axions/
 external_modules/data/bao_data/
 external_modules/data/bicep_keck_2015/
 external_modules/data/des_data/
