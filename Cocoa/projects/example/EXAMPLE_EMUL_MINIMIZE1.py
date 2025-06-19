@@ -304,8 +304,7 @@ def min_chi2(x0,
         ndim        = int(x0.shape[0])
         nwalkers    = int(2*x0.shape[0])
         nsteps      = maxfeval
-        #temperature = np.array([1.0, 0.25, 0.1, 0.005, 0.001], dtype='float64')
-        temperature = np.array([1.0, 0.25], dtype='float64')
+        temperature = np.array([1.0, 0.25, 0.1, 0.005, 0.001], dtype='float64')
         stepsz      = temperature/4.0
         
         start_time = time.time()
