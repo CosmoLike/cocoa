@@ -1,3 +1,11 @@
+import warnings
+from sklearn.exceptions import InconsistentVersionWarning
+warnings.filterwarnings("ignore", category=InconsistentVersionWarning)
+warnings.filterwarnings(
+    "ignore",
+    message=".*column is deprecated.*",
+    module=r"sacc\.sacc"
+)
 import functools, ipyparallel, scipy, iminuit, copy, argparse, random
 import emcee, itertools
 import numpy as np
@@ -292,10 +300,24 @@ def min_chi2(x0,
         nsteps      = maxfeval
         temperature = np.array([1.0, 0.25, 0.1, 0.005, 0.001], dtype='float64')
         stepsz      = temperature/4.0
+        
+        start_time = time.time()
+        mychi2(x0, *args)
+        end_time = time.time()
+        elapsed_time = end_time - start_time
+ 
+        print(f"Emcee: nwalkers = {nwalkers}, "
+              f"nTemp = {len(temperature)}, "
+              f"feval (per walker) = {maxfeval}, "
+              f"feval (per Temp) = {nwalkers*maxfeval}, "
+              f"feval = {nwalkers*maxfeval*len(temperature)}")
+        print(f"Emcee: Like Eval Time: {elapsed_time:.2f} secs, "
+              f"Eval Time = {elapsed_time*nwalkers*maxfeval*len(temperature)/3600.:.2f} hours.")
+
         partial_samples = []
         partial = []
 
-        for i in range(5):
+        for i in range(len(temperature)):
             x = [] # Initial point
             for j in range(nwalkers):
                 x.append(GaussianStep(stepsize=stepsz[i])(x0)[0,:])
@@ -314,18 +336,21 @@ def min_chi2(x0,
             samples = sampler.get_chain(flat=True, thin=1, discard=0)
 
             j = np.argmin(-1.0*np.array(sampler.get_log_prob(flat=True)))
-            
             partial_samples.append(samples[j])
-            partial.append(mychi2(samples[j], *args))
-            j = np.argmin(np.array(partial))
-            x0 = copy.deepcopy(partial_samples[j])
+            tchi2 = mychi2(samples[j], *args)
+            partial.append(tchi2)
+
+            x0 = copy.deepcopy(samples[j])
             sampler.reset()
-            print(f"emcee: i = {i}, chi2 = {partial[j]}, params = {partial_samples[j]}")
+            print(f"emcee: i = {i}, chi2 = {tchi2}, param = {args[0]}")
         
+        # min chi2 from the entire emcee runs
         j = np.argmin(np.array(partial))
         result = [partial_samples[j], partial[j]]
-        print(f"All (emcee): chi2 = {partial[j]}, params = {partial_samples[j]}")
     
+    else:
+        raise RuntimeError("Unknown Mimimizer Type")
+
     return result
 
 # ------------------------------------------------------------------------------
@@ -373,17 +398,12 @@ if __name__ == '__main__':
     print(res[j,0])
     np.savetxt(out + ".txt", np.c_[res[j,1], res[j,0]]) # + here = concatenate
 
-    if ref > 0:
+    if ref > 0 and min_method != 1:
         for i in range(numpts):
             print(res[i,0])
-            x0[i,:] = GaussianStep(stepsize=1.0)(res[i,0])[0,:]
-
-        res = np.array(list(executor.map(functools.partial(prf,
-                                                           index=index, 
-                                                           min_method=1,
-                                                           maxiter=maxiter,
-                                                           maxfeval=maxfeval/10),
-                                         x0)))
+            x0[i,:] = GaussianStep(stepsize=0.05)(res[i,0])[0,:]
+        res = np.array(list(executor.map(functools.partial(prf,index=index, min_method=1,
+            maxiter=maxiter,maxfeval=max(10*maxfeval,250)),x0)), dtype="object")
         print("Output file = ", out + "_ref" + ".txt")
         np.savetxt(out + "_ref" + ".txt", np.c_[res[j,1], res[j,0]])
     executor.shutdown()

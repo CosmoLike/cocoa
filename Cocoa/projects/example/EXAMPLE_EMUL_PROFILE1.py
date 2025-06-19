@@ -1,4 +1,12 @@
-import functools, ipyparallel, scipy, iminuit, copy, argparse, random 
+import warnings
+from sklearn.exceptions import InconsistentVersionWarning
+warnings.filterwarnings("ignore", category=InconsistentVersionWarning)
+warnings.filterwarnings(
+    "ignore",
+    message=".*column is deprecated.*",
+    module=r"sacc\.sacc"
+)
+import functools, ipyparallel, scipy, iminuit, copy, argparse, random, time 
 import emcee, itertools
 import numpy as np
 from cobaya.theories.emulcmb.emulcmb2 import emulcmb
@@ -159,11 +167,15 @@ def chi2(p):
              'wa': 0.0,
              'omegamh2': p[4]+p[3]+(0.06*(3.046/3)**0.75)/94.0708
              }
-    param = param | etheta.get_params(param)
+    param = param | etheta.calculate(param)
     cl    = ecmb.get_Cl(params=param, ell_factor=True)
     fmt   = fg.get_foreground_model_totals(**NP)
     return -2*MKL.loglike(cl, fmt, **NP)
 
+# ------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
+# Code below does not require changes ------------------------------------------
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
@@ -248,6 +260,12 @@ parser.add_argument("--ref",
                     const=1,
                     default=1) # zero or one
 
+parser.add_argument("--cov",
+                    dest="cov",
+                    help="Chain Covariance Matrix",
+                    nargs='?',
+                    const=1) # zero or one
+
 # need to use parse_known_args because of mpifuture 
 args, unknown = parser.parse_known_args()
 
@@ -260,9 +278,9 @@ index       = args.profile
 numpts      = args.numpts
 ref         = args.ref
 
-cov_file = args.root + 'EXAMPLE_EMUL_MCMC1.covmat'
-cov      = np.loadtxt(cov_file)[0:20,0:20]
-for i in range(19):
+cov_file = args.root + args.cov
+cov      = np.loadtxt(cov_file)[0:len(x),0:len(x)]
+for i in range(len(x)):
     start[i]     = x[i] -args.factor*np.sqrt(cov[i,i])
     stop[i]      = x[i] +args.factor*np.sqrt(cov[i,i])
     bounds[i][0] = x[i] -100.0*args.factor*np.sqrt(cov[i,i])  
@@ -336,7 +354,7 @@ def min_chi2(x0,
             x = GaussianStep(stepsize=0.005)(partial_samples[j])[0,:]
             print(f"MN: i = {i}, chi2 = {partial[j]}, param = {args[0]}")
         j = np.argmin(np.array(partial))
-        result = [partial_samples[j], partial[j]]   
+        result = [partial_samples[j], partial[j]] 
     
     elif min_method == 2: # adapted from PROCOLI       
     
@@ -346,12 +364,23 @@ def min_chi2(x0,
         temperature = np.array([1.0, 0.25, 0.1, 0.005, 0.001], dtype='float64')
         stepsz      = temperature/4.0
 
+        start_time = time.time()
+        mychi2(x0, *args)
+        end_time = time.time()
+        elapsed_time = end_time - start_time
+ 
+        print(f"Emcee: nwalkers = {nwalkers}, "
+              f"nTemp = {len(temperature)}, "
+              f"feval (per walker) = {maxfeval}, "
+              f"feval (per Temp) = {nwalkers*maxfeval}, "
+              f"feval = {nwalkers*maxfeval*len(temperature)}")
+        print(f"Emcee: Like Eval Time: {elapsed_time:.2f} secs, "
+              f"Eval Time = {elapsed_time*nwalkers*maxfeval*len(temperature)/3600.:.2f} hours.")
+
         partial_samples = []
         partial = []
 
-        for i in range(5):
-            print(f"emcee: i = {i} begins")
-
+        for i in range(len(temperature)):
             x = [] # Initial point
             for j in range(nwalkers):
                 x.append(GaussianStep(stepsize=stepsz[i])(x0)[0,:])
@@ -370,18 +399,20 @@ def min_chi2(x0,
             samples = sampler.get_chain(flat=True, thin=1, discard=0)
 
             j = np.argmin(-1.0*np.array(sampler.get_log_prob(flat=True)))
-            
             partial_samples.append(samples[j])
-            partial.append(mychi2(samples[j], *args))
-            j = np.argmin(np.array(partial))
-            x0 = copy.deepcopy(partial_samples[j])
+            tchi2 = mychi2(samples[j], *args)
+            partial.append(tchi2)
+
+            x0 = copy.deepcopy(samples[j])
             sampler.reset()
-            print(f"emcee: i = {i}, chi2 = {partial[j]}, param = {args[0]}")
+            print(f"emcee: i = {i}, chi2 = {tchi2}, param = {args[0]}")
         
         # min chi2 from the entire emcee runs
         j = np.argmin(np.array(partial))
         result = [partial_samples[j], partial[j]]
-        print(f"All: chi2 = {partial[j]}, param = {args[0]}")
+    
+    else:
+        raise RuntimeError("Unknown Mimimizer Type")
     
     return result
 
@@ -421,29 +452,21 @@ if __name__ == '__main__':
         x0.append(tmp)
     x0 = np.array(x0, dtype=object)
 
-    res = np.array(list(executor.map(functools.partial(prf,
-                                                       index=index, 
-                                                       min_method=min_method,
-                                                       maxiter=maxiter,
-                                                       maxfeval=maxfeval),
-                                     x0)))
+    res = np.asarray(list(executor.map(functools.partial(prf, index=index, 
+        min_method=min_method, maxiter=maxiter, maxfeval=maxfeval), x0)), dtype="object")
 
     rnd = random.randint(0,1000)
     out = oroot + "_" + str(rnd) + "_method_" + str(min_method) + "_" + name[index] 
     print("Output file = ", out + ".txt")
     np.savetxt(out + ".txt", np.c_[param, res[:,1]])
 
-    if ref > 0:
+    if ref > 0 and min_method != 1:
         x0 = []
-        for i in range(numpts):
+        for i in range(numpts): 
             x0.append(np.insert(res[i,0], index, param[i]))
         x0 = np.array(x0, dtype=object)
-        res = np.array(list(executor.map(functools.partial(prf,
-                                                           index=index, 
-                                                           min_method=1,
-                                                           maxiter=maxiter,
-                                                           maxfeval=maxfeval/10),
-                                         x0)))
+        res = np.array(list(executor.map(functools.partial(prf, index=index, min_method=1, 
+            maxiter=maxiter, maxfeval=max(10*maxfeval,250)), x0)), dtype="object")
         print("Output file = ", out + "_ref" + ".txt")
         np.savetxt(out + "_ref" + ".txt", np.c_[param, res[:,1]])
     executor.shutdown()
@@ -454,4 +477,5 @@ if __name__ == '__main__':
 #  --rank-by slot --map-by numa:pe=${OMP_NUM_THREADS}  \
 #  python -m mpi4py.futures ./projects/example/EXAMPLE_EMUL_PROFILE1.py  \
 #  --tol 0.05 --profile 1 --maxiter 2 --maxfeval 10000 --numpts 20  \
-#  --outroot "example_emul_profile1" --minmethod 1 --factor 3 --ref 1
+#  --outroot "example_emul_profile1" --minmethod 1 --factor 3 --ref 1 \
+#  --cov 'EXAMPLE_EMUL_MCMC1.covmat'
