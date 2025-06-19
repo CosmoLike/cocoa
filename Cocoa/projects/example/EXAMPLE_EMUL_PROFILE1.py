@@ -280,11 +280,16 @@ ref         = args.ref
 
 cov_file = args.root + args.cov
 cov      = np.loadtxt(cov_file)[0:len(x),0:len(x)]
-for i in range(len(x)):
-    start[i]     = x[i] -args.factor*np.sqrt(cov[i,i])
-    stop[i]      = x[i] +args.factor*np.sqrt(cov[i,i])
-    bounds[i][0] = x[i] -100.0*args.factor*np.sqrt(cov[i,i])  
-    bounds[i][1] = x[i] +100.0*args.factor*np.sqrt(cov[i,i])
+sigma    = np.sqrt(np.diag(cov))
+start    = x - args.factor*sigma
+stop     = x + args.factor*sigma
+bounds   = np.c_[x - 100.0*args.factor*sigma, x + 100.0*args.factor*sigma]
+
+#for i in range(len(x)):
+#    start[i]     = x[i] -args.factor*np.sqrt(cov[i,i])
+#    stop[i]      = x[i] +args.factor*np.sqrt(cov[i,i])
+#    bounds[i][0] = x[i] -100.0*args.factor*np.sqrt(cov[i,i])  
+#    bounds[i][1] = x[i] +100.0*args.factor*np.sqrt(cov[i,i])
 
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
@@ -402,7 +407,6 @@ def min_chi2(x0,
             partial_samples.append(samples[j])
             tchi2 = mychi2(samples[j], *args)
             partial.append(tchi2)
-
             x0 = copy.deepcopy(samples[j])
             sampler.reset()
             print(f"emcee: i = {i}, chi2 = {tchi2}, param = {args[0]}")
@@ -412,8 +416,7 @@ def min_chi2(x0,
         result = [partial_samples[j], partial[j]]
     
     else:
-        raise RuntimeError("Unknown Mimimizer Type")
-    
+        raise RuntimeError("Unknown Mimimizer Type") 
     return result
 
 # ------------------------------------------------------------------------------
@@ -450,7 +453,7 @@ if __name__ == '__main__':
         tmp = copy.deepcopy(x)
         tmp[index] = param[i]
         x0.append(tmp)
-    x0 = np.array(x0, dtype=object)
+    x0 = np.array(x0, dtype='float64')
 
     res = np.asarray(list(executor.map(functools.partial(prf, index=index, 
         min_method=min_method, maxiter=maxiter, maxfeval=maxfeval), x0)), dtype="object")
@@ -465,8 +468,10 @@ if __name__ == '__main__':
         for i in range(numpts): 
             x0.append(np.insert(res[i,0], index, param[i]))
         x0 = np.array(x0, dtype=object)
-        res = np.array(list(executor.map(functools.partial(prf, index=index, min_method=1, 
-            maxiter=maxiter, maxfeval=max(10*maxfeval,250)), x0)), dtype="object")
+        
+        res = np.array(list(executor.map(functools.partial(prf, index=index, 
+            min_method=1, maxiter=maxiter, maxfeval=max(10*maxfeval,250)), x0)), dtype="object")
+        
         print("Output file = ", out + "_ref" + ".txt")
         np.savetxt(out + "_ref" + ".txt", np.c_[param, res[:,1]])
     executor.shutdown()

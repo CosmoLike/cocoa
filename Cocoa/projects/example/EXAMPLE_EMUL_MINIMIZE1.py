@@ -6,7 +6,7 @@ warnings.filterwarnings(
     message=".*column is deprecated.*",
     module=r"sacc\.sacc"
 )
-import functools, ipyparallel, scipy, iminuit, copy, argparse, random
+import functools, ipyparallel, scipy, iminuit, copy, argparse, random, time
 import emcee, itertools
 import numpy as np
 from cobaya.theories.emulcmb.emulcmb2 import emulcmb
@@ -141,11 +141,15 @@ def chi2(p):
              'wa': 0.0,
              'omegamh2': p[4]+p[3]+(0.06*(3.046/3)**0.75)/94.0708
              }
-    param = param | etheta.get_params(param)
+    param = param | etheta.calculate(param)
     cl    = ecmb.get_Cl(params=param, ell_factor=True)
     fmt   = fg.get_foreground_model_totals(**NP)
     return -2*MKL.loglike(cl, fmt, **NP)
 
+# ------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
+# Code below does not require changes ------------------------------------------
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
@@ -222,6 +226,12 @@ parser.add_argument("--ref",
                     const=1,
                     default=1) # zero or one
 
+parser.add_argument("--cov",
+                    dest="cov",
+                    help="Chain Covariance Matrix",
+                    nargs='?',
+                    const=1) # zero or one
+
 # need to use parse_known_args because of mpifuture 
 args, unknown = parser.parse_known_args()
 tol         = args.tolerance
@@ -232,7 +242,7 @@ oroot       = args.root + "chains/" + args.outroot
 numpts      = args.numpts
 ref         = args.ref
 
-cov_file = args.root + 'EXAMPLE_EMUL_MCMC1.covmat'
+cov_file = args.root + args.cov
 cov      = np.loadtxt(cov_file)[0:len(x),0:len(x)]
 sigma    = np.sqrt(np.diag(cov))
 bounds   = np.c_[x - args.factor*sigma, x + args.factor*sigma]
@@ -241,7 +251,6 @@ class GaussianStep:
     def __init__(self, stepsize=0.2):
        self.cov = stepsize*cov
     def __call__(self, x):
-        print(len(x), len(self.cov))
         return np.random.multivariate_normal(x, self.cov, size=1)
 
 def min_chi2(x0, 
@@ -253,10 +262,10 @@ def min_chi2(x0,
              cov=cov):
 
     def mychi2(params, *args):
-        T = args
+        T = args[0]
         return chi2(p=params)/T
 
-    args = (1.0)
+    args = [1.0]
 
     def log_prior(params):
         return 1.0
@@ -273,7 +282,6 @@ def min_chi2(x0,
         x = copy.deepcopy(x0)
         partial_samples = [x]
         partial = [mychi2(x, *args)]
-        
         for i in range(maxiter):
             tmp = iminuit.minimize(fun=mychi2, 
                                    x0=x, 
@@ -287,18 +295,17 @@ def min_chi2(x0,
             partial.append(tmp.fun)
             j = np.argmin(np.array(partial))
             x = GaussianStep(stepsize=0.005)(partial_samples[j])[0,:]
-            print(f"MN: i = {i}, chi2 = {partial[j]}, params = {partial_samples[j]}")
-        
+            print(f"MN: i = {i}, chi2 = {partial[j]}")
         j = np.argmin(np.array(partial))
         result = [partial_samples[j], partial[j]]
-        print(f"All (MN): chi2 = {partial[j]}, params = {partial_samples[j]}")
 
     elif min_method == 2: # adapted from PROCOLI       
     
         ndim        = int(x0.shape[0])
         nwalkers    = int(2*x0.shape[0])
         nsteps      = maxfeval
-        temperature = np.array([1.0, 0.25, 0.1, 0.005, 0.001], dtype='float64')
+        #temperature = np.array([1.0, 0.25, 0.1, 0.005, 0.001], dtype='float64')
+        temperature = np.array([1.0, 0.25], dtype='float64')
         stepsz      = temperature/4.0
         
         start_time = time.time()
@@ -329,7 +336,7 @@ def min_chi2(x0,
             sampler = emcee.EnsembleSampler(nwalkers, 
                                             ndim, 
                                             logprob, 
-                                            args=(args[0], args[1], temperature[i]),
+                                            args=[temperature[i]],
                                             moves=[(emcee.moves.GaussianMove(cov=GScov),1.)])
             
             sampler.run_mcmc(x, nsteps, skip_initial_state_check=False)
@@ -339,28 +346,26 @@ def min_chi2(x0,
             partial_samples.append(samples[j])
             tchi2 = mychi2(samples[j], *args)
             partial.append(tchi2)
-
             x0 = copy.deepcopy(samples[j])
             sampler.reset()
-            print(f"emcee: i = {i}, chi2 = {tchi2}, param = {args[0]}")
+            print(f"emcee: i = {i}, chi2 = {tchi2}")
         
         # min chi2 from the entire emcee runs
         j = np.argmin(np.array(partial))
         result = [partial_samples[j], partial[j]]
-    
+
     else:
         raise RuntimeError("Unknown Mimimizer Type")
-
     return result
 
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
 
-def minimizer(x0, index, min_method, maxiter, maxfeval):
-    res =  min_chi2(x0=np.array(x0[index,:], dtype='float64'), 
+def prf(x0, min_method, maxiter, maxfeval):
+    res =  min_chi2(x0=np.array(x0, dtype='float64'), 
                     bounds=np.array(bounds, dtype='float64'), 
-                    min_method=min_method,
+                    min_method=min_method, 
                     tol=tol, 
                     maxfeval=maxfeval, 
                     maxiter=maxiter)
@@ -378,32 +383,42 @@ if __name__ == '__main__':
 
     executor = MPIPoolExecutor()
     
-    x0 = np.zeros((numpts,len(x)), dtype='float64')
+    x0 = []
     for i in range(numpts):
-        x0[i,:] = GaussianStep(stepsize=1.0)(x0[:,i])[0,:]
+        x0.append(GaussianStep(stepsize=1.0)(copy.deepcopy(x))[0,:])
+    x0 = np.array(x0, dtype='float64')
     
-    res = np.array(list(executor.map(functools.partial(prf,
-                                                       index=index, 
-                                                       min_method=min_method,
-                                                       maxiter=maxiter,
-                                                       maxfeval=maxfeval),
-                                     x0)))
-
-    j = np.argmin(np.array(res[:,1]))
+    res = np.array(list(executor.map(functools.partial(prf, min_method=min_method, 
+        maxiter=maxiter, maxfeval=maxfeval), x0)), dtype="object")
 
     rnd = random.randint(0,1000)
     out = oroot + "_" + str(rnd) + "_method_" + str(min_method)
+    
     print("Output file = ", out +".txt")
-    print(res[j,1])
-    print(res[j,0])
-    np.savetxt(out + ".txt", np.c_[res[j,1], res[j,0]]) # + here = concatenate
+    j = np.argmin(np.array(res[:,1]))
+    np.savetxt(out + ".txt", np.concatenate([np.array([res[j,1]],dtype='float64'), 
+                                             np.array(res[j,0],dtype='float64')]))
 
     if ref > 0 and min_method != 1:
         for i in range(numpts):
-            print(res[i,0])
-            x0[i,:] = GaussianStep(stepsize=0.05)(res[i,0])[0,:]
-        res = np.array(list(executor.map(functools.partial(prf,index=index, min_method=1,
+            x0[i,:] = GaussianStep(stepsize=0.025)(res[i,0])[0,:]
+        
+        res2 = np.array(list(executor.map(functools.partial(prf, min_method=1,
             maxiter=maxiter,maxfeval=max(10*maxfeval,250)),x0)), dtype="object")
+        
+        res3 = np.concatenate([res, res2])
+
         print("Output file = ", out + "_ref" + ".txt")
-        np.savetxt(out + "_ref" + ".txt", np.c_[res[j,1], res[j,0]])
+        j = np.argmin(np.array(res3[:,1]))
+        np.savetxt(out + "_ref" + ".txt", np.concatenate([np.array([res3[j,1]],dtype='float64'), 
+                                                          np.array(res3[j,0],dtype='float64')]))
     executor.shutdown()
+
+#HOW TO CALL THIS SCRIPT
+#mpirun -n 5 --oversubscribe --mca pml ^ucx  \
+#  --mca btl vader,tcp,self --bind-to core:overload-allowed  \
+#  --rank-by slot --map-by numa:pe=${OMP_NUM_THREADS}  \
+#  python -m mpi4py.futures ./projects/example/EXAMPLE_EMUL_MINIMIZE1.py \
+#  --tol 0.05 --profile 1 --maxiter 1 --maxfeval 5 --numpts 4 \
+#  --outroot "example_emul_minimize1" --minmethod 2 --factor 3 --ref 1 \
+#  --cov 'EXAMPLE_EMUL_MCMC1.covmat
