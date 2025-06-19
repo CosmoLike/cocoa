@@ -271,4 +271,4 @@ sampler:
       xi: 1.910150877e-01 
       T_d: 1.028875217e+01
 
-output: ./projects/example/chains/EXAMPLE_EVALUATE24
+output: ./projects/example/chains/EXAMPLE_EMUL_EVALUATE4

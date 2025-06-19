@@ -50,8 +50,8 @@ params:
     ref:
       dist: norm
       loc: 3.0448
-      scale: 0.05
-    proposal: 0.05
+      scale: 0.025
+    proposal: 0.025
     latex: \log(10^{10} A_\mathrm{s})
   ns:
     prior:
@@ -63,16 +63,17 @@ params:
       scale: 0.005
     proposal: 0.005
     latex: n_\mathrm{s}
-  H0:
+  thetastar:
     prior:
-      min: 60
-      max: 90
+      min: 1
+      max: 1.2
     ref:
       dist: norm
-      loc: 75
-      scale: 2
-    proposal: 0.2
-    latex: H_0
+      loc: 1.04109
+      scale: 0.0004
+    proposal: 0.0002
+    latex: 100\theta_\mathrm{*}
+    renames: theta
   omegabh2:
     prior:
       min: 0.01
@@ -90,8 +91,8 @@ params:
     ref:
       dist: norm
       loc: 0.12011
-      scale: 0.03
-    proposal: 0.03
+      scale: 0.015
+    proposal: 0.01
     latex: \Omega_\mathrm{c} h^2
   tau:
     prior:
@@ -104,6 +105,8 @@ params:
       scale: 0.006
     proposal: 0.003
     latex: \tau_\mathrm{reio}
+  mnu:
+    value: 0.06
   omegab:
     derived: 'lambda omegabh2, H0: omegabh2/((H0/100)**2)'
     latex: \Omega_\mathrm{b}
@@ -116,19 +119,54 @@ params:
   A:
     derived: 'lambda As: 1e9*As'
     latex: 10^9 A_\mathrm{s}
-    
+  w:
+    value: -1
+    latex: w_{0,\mathrm{DE}}
+  wa:
+    value: 0.0
+    latex: w_{a,\mathrm{DE}}
+  H0:
+    derived: true
+    latex: H_0
+  omegamh2:
+    derived: true
+    value: 'lambda omegach2, omegabh2, mnu: omegach2+omegabh2+(mnu*(3.046/3)**0.75)/94.0708'
+    latex: \Omega_\mathrm{m} h^2
+  omegam:
+    derived: true
+    latex: \Omega_\mathrm{m}
+
 theory:
-  emulcmbtrf:
+  emultheta:
+    path: ./cobaya/cobaya/theories/
+    stop_at_error: True
+    provides: ['H0', 'omegam']
+    extra_args:
+      file: ['external_modules/data/emultrf/CMB_TRF/thetaH0GP.joblib']
+      extra: ['external_modules/data/emultrf/CMB_TRF/extrainfotheta.npy']
+      ord: [['omegabh2','omegach2','thetastar']]
+  emulcmb:
     path: ./cobaya/cobaya/theories/
     stop_at_error: True
     extra_args:
       # This version of the emul was not trained with CosmoRec
-      ttfilename: 'external_modules/data/emultrf/CMB_TRF/chiTTAstautrf1dot2milnewlhcevansqrtrescalec16'
-      ttextraname: 'external_modules/data/emultrf/CMB_TRF/extrainfo_lhs_tt_96.npy'
-      tefilename: 'external_modules/data/emultrf/CMB_TRF/chiTEAstautrf1dot2milnewlhcevansqrtrescalec16'
-      teextraname: 'external_modules/data/emultrf/CMB_TRF/extrainfo_lhs_te_96.npy'
-      eefilename: 'external_modules/data/emultrf/CMB_TRF/chiEEAstautrf1dot2milnewlhcevansqrtrescalec16'
-      eeextraname: 'external_modules/data/emultrf/CMB_TRF/extrainfo_lhs_ee_96.npy'
+      eval: [True, True, True, False] #TT,TE,EE,PHIPHI
+      file: ['external_modules/data/emultrf/CMB_TRF/chiTTAstautrf1dot2milnewlhcevansqrtrescalec16.pt',
+             'external_modules/data/emultrf/CMB_TRF/chiTEAstautrf1dot2milnewlhcevansqrtrescalec16.pt',
+             'external_modules/data/emultrf/CMB_TRF/chiEEAstautrf1dot2milnewlhcevansqrtrescalec16.pt',
+             None] 
+      extra: ['external_modules/data/emultrf/CMB_TRF/extrainfo_lhs_tt_96.npy',
+              'external_modules/data/emultrf/CMB_TRF/extrainfo_lhs_te_96.npy',
+              'external_modules/data/emultrf/CMB_TRF/extrainfo_lhs_ee_96.npy',
+              None]
+      ord: [['omegabh2','omegach2','H0','tau','ns','logA','mnu','w','wa'],
+            ['omegabh2','omegach2','H0','tau','ns','logA','mnu','w','wa'],
+            ['omegabh2','omegach2','H0','tau','ns','logA','mnu','w','wa'],
+            None]
+      extrapar: [{'ellmax' : 5000, 'MLA': 'TRF', 'NCTRF': 16, 'INTDIM': 4, 'INTTRF': 5120},
+                 {'ellmax' : 5000, 'MLA': 'TRF', 'NCTRF': 16, 'INTDIM': 4, 'INTTRF': 5120},
+                 {'ellmax' : 5000, 'MLA': 'TRF', 'NCTRF': 16, 'INTDIM': 4, 'INTTRF': 5120},
+                 None]
   mflike.BandpowerForeground:
 
 sampler:
@@ -137,7 +175,7 @@ sampler:
     # File (w/ path) or matrix defining a covariance matrix for the proposal:
     # - null (default): will be generated from params info (prior and proposal)
     # - matrix: remember to set `covmat_params` to the parameters in the matrix
-    covmat: "./projects/example/EXAMPLE_POLY22.covmat"
+    covmat: 'projects/example/EXAMPLE_EMUL_MCMC1.covmat'
     covmat_params:
     # --------------------------------------
     # --------------------------------------
@@ -158,31 +196,17 @@ sampler:
     # --------------------------------------
     # Maximum number of posterior evaluations
     max_samples: .inf
-    # Gelman-Rubin R-1 on means
-    Rminus1_stop: 0.005
-    # Gelman-Rubin R-1 on std deviations
-    Rminus1_cl_stop: 0.15
+    Rminus1_stop: 0.01
+    Rminus1_cl_stop: 0.1
     Rminus1_cl_level: 0.95
-    # --------------------------------------
-    # --------------------------------------
+    # ---------------------------------------------------------------------
+    # ---------------------------------------------------------------------
     # Exploiting speed hierarchy
-    # --------------------------------------
-    # --------------------------------------
-    measure_speeds: False
+    # ---------------------------------------------------------------------
+    # ---------------------------------------------------------------------
+    measure_speeds: True
     drag: False
-    blocking:
-      - [5,
-          [
-            logA, ns, H0, omegabh2, omegach2, tau 
-          ]
-        ]
-      - [30,
-          [
-            a_tSZ, a_kSZ, a_p, beta_p, a_c, beta_c, 
-            a_s, a_gtt, xi, T_d, a_gte, a_pste, a_gee, a_psee
-          ]
-        ]
-    oversample_power: 0.3
+    oversample_power: 0.2
     oversample_thin: True
     # --------------------------------------
     # --------------------------------------
@@ -198,4 +222,4 @@ sampler:
     # ---------------------------------------------------------------------
     Rminus1_single_split: 4
 
-output: ./projects/example/chains/EXAMPLE_MCMC22
+output: ./projects/example/chains/EXAMPLE_EMUL_MCMC1

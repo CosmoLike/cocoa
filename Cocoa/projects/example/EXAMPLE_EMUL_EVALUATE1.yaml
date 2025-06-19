@@ -1,6 +1,6 @@
-stop_at_error: false
-timing: true
-debug: false
+stop_at_error: False
+timing: True
+debug: False
 
 likelihood:
   mflike.TTTEEE:
@@ -40,7 +40,22 @@ likelihood:
         - experiments: [LAT_145, LAT_145]
         - experiments: [LAT_145, LAT_225]
         - experiments: [LAT_225, LAT_225]
-      lmax_theory: 5000
+  sn.union3: 
+    path: ./external_modules/data/sn_data
+  sn.pantheon: 
+    path: ./external_modules/data/sn_data
+  sn.pantheonplus: 
+    path: ./external_modules/data/sn_data
+  sn.roman_c:
+    path: ./external_modules/data/sn_data
+  sn.roman_o:
+    path: ./external_modules/data/sn_data
+  sn.desy5: 
+    path: ./external_modules/data/sn_data
+  bao.desi_2024_bao_all:
+    path: ./external_modules/data/
+  bao.desi_dr2.desi_bao_all:
+    path: ./external_modules/data/
 
 params:
   logA:
@@ -53,15 +68,19 @@ params:
       scale: 0.05
     proposal: 0.05
     latex: \log(10^{10} A_\mathrm{s})
+    drop: true
+  As:
+    value: 'lambda logA: 1e-10*np.exp(logA)'
+    latex: A_\mathrm{s}
   ns:
     prior:
-      min: 0.92
-      max: 1.05
+      min: 0.8
+      max: 1.2
     ref:
       dist: norm
-      loc: 0.96605
-      scale: 0.005
-    proposal: 0.005
+      loc: 0.965
+      scale: 0.004
+    proposal: 0.002
     latex: n_\mathrm{s}
   H0:
     prior:
@@ -75,23 +94,23 @@ params:
     latex: H_0
   omegabh2:
     prior:
-      min: 0.01
-      max: 0.04
+      min: 0.005
+      max: 0.1
     ref:
       dist: norm
-      loc: 0.022383
-      scale: 0.005
-    proposal: 0.005
+      loc: 0.0224
+      scale: 0.0001
+    proposal: 0.0001
     latex: \Omega_\mathrm{b} h^2
   omegach2:
     prior:
-      min: 0.06
-      max: 0.2
+      min: 0.001
+      max: 0.99
     ref:
       dist: norm
-      loc: 0.12011
-      scale: 0.03
-    proposal: 0.03
+      loc: 0.12
+      scale: 0.001
+    proposal: 0.0005
     latex: \Omega_\mathrm{c} h^2
   tau:
     prior:
@@ -110,66 +129,38 @@ params:
   omegac:
     derived: 'lambda omegach2, H0: omegach2/((H0/100)**2)'
     latex: \Omega_\mathrm{c}
-  As:
-    derived: 'lambda logA: 1e-10*np.exp(logA)'
-    latex: A_\mathrm{s}
   A:
     derived: 'lambda As: 1e9*As'
     latex: 10^9 A_\mathrm{s}
-  mnu:
-    value: 0.06
-  w0pwa:
-    prior:
-      min: -5 
-      max: -0.01
-    ref:
-      dist: norm
-      loc: -0.99
-      scale: 0.05
-    proposal: 0.05
-    latex: w_{0,\mathrm{DE}}+w_{a,\mathrm{DE}}
-    drop: true
-  w:
-    prior:
-      min: -3
-      max: -0.01
-    ref:
-      dist: norm
-      loc: -0.99
-      scale: 0.05
-    proposal: 0.05
-    latex: w_{0,\mathrm{DE}}
-  wa:
-    value: 'lambda w0pwa, w: w0pwa - w'
-    derived: false
-    latex: w_{a,\mathrm{DE}}
-
+  thetastar:
+    latex: 100\theta_*
+  omegam:
+    latex: \Omega_\mathrm{m}
+  omegamh2:
+    derived: 'lambda omegam, H0: omegam*(H0/100)**2'
+    latex: \Omega_\mathrm{m} h^2
+  rdrag:
+    latex: r_\mathrm{drag}
+    
 theory:
-  emulcmb:
-    path: ./cobaya/cobaya/theories/
-    stop_at_error: True
+  camb:
+    path: ./external_modules/code/CAMB
     extra_args:
-      # This version of the emul was not trained with CosmoRec
-      eval: [True, True, True, False] #TT,TE,EE,PHIPHI
-      file: ['external_modules/data/emultrf/CMB_TRF/chiTTAstautrf1dot2milnewlhcevansqrtrescalec16.pt',
-             'external_modules/data/emultrf/CMB_TRF/chiTEAstautrf1dot2milnewlhcevansqrtrescalec16.pt',
-             'external_modules/data/emultrf/CMB_TRF/chiEEAstautrf1dot2milnewlhcevansqrtrescalec16.pt',
-             None] 
-      extra: ['external_modules/data/emultrf/CMB_TRF/extrainfo_lhs_tt_96.npy',
-              'external_modules/data/emultrf/CMB_TRF/extrainfo_lhs_te_96.npy',
-              'external_modules/data/emultrf/CMB_TRF/extrainfo_lhs_ee_96.npy',
-              None]
-      ord: [['omegabh2','omegach2','H0','tau','ns','logA','mnu','w','wa'],
-            ['omegabh2','omegach2','H0','tau','ns','logA','mnu','w','wa'],
-            ['omegabh2','omegach2','H0','tau','ns','logA','mnu','w','wa'],
-            None]
-      extrapar: [{'ellmax' : 5000, 'MLA': 'TRF', 'NCTRF': 16, 'INTDIM': 4, 'INTTRF': 5120},
-                 {'ellmax' : 5000, 'MLA': 'TRF', 'NCTRF': 16, 'INTDIM': 4, 'INTTRF': 5120},
-                 {'ellmax' : 5000, 'MLA': 'TRF', 'NCTRF': 16, 'INTDIM': 4, 'INTTRF': 5120},
-                 None]
+      halofit_version: mead2020
+      dark_energy_model: ppf
+      lmax: 6000
+      lens_potential_accuracy: 30
+      AccuracyBoost:  1.5
+      lSampleBoost: 10
+      lAccuracyBoost: 3
+      lens_margin: 2050
+      min_l_logl_sampling: 6000
+      num_massive_neutrinos: 1
+      nnu: 3.046
+      accurate_massive_neutrino_transfers: false
+      DoLateRadTruncation: false
   mflike.BandpowerForeground:
 
-#CAMB
 #[evaluate]    chi2_mflike.TTTEEE = 2964.92
 #[evaluate]    chi2_sn.union3 = 26.5423
 #[evaluate]    chi2_sn.pantheon = 1035.19
@@ -189,8 +180,6 @@ sampler:
       omegabh2: 2.246801442e-02
       omegach2: 1.198257361e-01 
       tau: 5.433339482e-02
-      w0pwa: -1
-      w: -1
       a_tSZ: 3.299661491
       a_kSZ: 1.603283271
       a_p: 6.909072608
@@ -206,4 +195,4 @@ sampler:
       xi: 1.910150877e-01 
       T_d: 1.028875217e+01
 
-output: ./projects/example/chains/EXAMPLE_EVALUATE22
+output: ./projects/example/chains/EXAMPLE_EMUL_EVALUATE1

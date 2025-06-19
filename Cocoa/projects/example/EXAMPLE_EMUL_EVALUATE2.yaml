@@ -1,5 +1,5 @@
 stop_at_error: false
-timing: false
+timing: true
 debug: false
 
 likelihood:
@@ -116,29 +116,94 @@ params:
   A:
     derived: 'lambda As: 1e9*As'
     latex: 10^9 A_\mathrm{s}
-    
+  mnu:
+    value: 0.06
+  w0pwa:
+    prior:
+      min: -5 
+      max: -0.01
+    ref:
+      dist: norm
+      loc: -0.99
+      scale: 0.05
+    proposal: 0.05
+    latex: w_{0,\mathrm{DE}}+w_{a,\mathrm{DE}}
+    drop: true
+  w:
+    prior:
+      min: -3
+      max: -0.01
+    ref:
+      dist: norm
+      loc: -0.99
+      scale: 0.05
+    proposal: 0.05
+    latex: w_{0,\mathrm{DE}}
+  wa:
+    value: 'lambda w0pwa, w: w0pwa - w'
+    derived: false
+    latex: w_{a,\mathrm{DE}}
+
 theory:
-  emulcmbtrf:
+  emulcmb:
     path: ./cobaya/cobaya/theories/
-    stop_at_error: False
+    stop_at_error: True
     extra_args:
       # This version of the emul was not trained with CosmoRec
-      ttfilename: 'external_modules/data/emultrf/CMB_TRF/chiTTAstautrf1dot2milnewlhcevansqrtrescalec16'
-      ttextraname: 'external_modules/data/emultrf/CMB_TRF/extrainfo_lhs_tt_96.npy'
-      tefilename: 'external_modules/data/emultrf/CMB_TRF/chiTEAstautrf1dot2milnewlhcevansqrtrescalec16'
-      teextraname: 'external_modules/data/emultrf/CMB_TRF/extrainfo_lhs_te_96.npy'
-      eefilename: 'external_modules/data/emultrf/CMB_TRF/chiEEAstautrf1dot2milnewlhcevansqrtrescalec16'
-      eeextraname: 'external_modules/data/emultrf/CMB_TRF/extrainfo_lhs_ee_96.npy'
+      eval: [True, True, True, False] #TT,TE,EE,PHIPHI
+      file: ['external_modules/data/emultrf/CMB_TRF/chiTTAstautrf1dot2milnewlhcevansqrtrescalec16.pt',
+             'external_modules/data/emultrf/CMB_TRF/chiTEAstautrf1dot2milnewlhcevansqrtrescalec16.pt',
+             'external_modules/data/emultrf/CMB_TRF/chiEEAstautrf1dot2milnewlhcevansqrtrescalec16.pt',
+             None] 
+      extra: ['external_modules/data/emultrf/CMB_TRF/extrainfo_lhs_tt_96.npy',
+              'external_modules/data/emultrf/CMB_TRF/extrainfo_lhs_te_96.npy',
+              'external_modules/data/emultrf/CMB_TRF/extrainfo_lhs_ee_96.npy',
+              None]
+      ord: [['omegabh2','omegach2','H0','tau','ns','logA','mnu','w','wa'],
+            ['omegabh2','omegach2','H0','tau','ns','logA','mnu','w','wa'],
+            ['omegabh2','omegach2','H0','tau','ns','logA','mnu','w','wa'],
+            None]
+      extrapar: [{'ellmax' : 5000, 'MLA': 'TRF', 'NCTRF': 16, 'INTDIM': 4, 'INTTRF': 5120},
+                 {'ellmax' : 5000, 'MLA': 'TRF', 'NCTRF': 16, 'INTDIM': 4, 'INTTRF': 5120},
+                 {'ellmax' : 5000, 'MLA': 'TRF', 'NCTRF': 16, 'INTDIM': 4, 'INTTRF': 5120},
+                 None]
   mflike.BandpowerForeground:
 
-sampler:
-  polychord:
-    path: null
-    nlive: 128
-    num_repeats: 2d
-    do_clustering: false
-    precision_criterion: 0.05
-    boost_posterior: 5
-    feedback: 2
+#CAMB
+#[evaluate]    chi2_mflike.TTTEEE = 2964.92
+#[evaluate]    chi2_sn.union3 = 26.5423
+#[evaluate]    chi2_sn.pantheon = 1035.19
+#[evaluate]    chi2_sn.pantheonplus = 1403.88
+#[evaluate]    chi2_sn.roman_c = 70.8908
+#[evaluate]    chi2_sn.roman_o = 83.008
+#[evaluate]    chi2_sn.desy5 = 1645.46
+#[evaluate]    chi2_bao.desi_2024_bao_all = 20.4756
+#[evaluate]    chi2_bao.desi_dr2.desi_bao_all = 28.1885
 
-output: ./projects/example/chains/EXAMPLE_POLY22
+sampler:
+  evaluate:
+    override:
+      logA: 3.045845885
+      ns: 9.652308970e-01
+      H0: 6.748819246e+01
+      omegabh2: 2.246801442e-02
+      omegach2: 1.198257361e-01 
+      tau: 5.433339482e-02
+      w0pwa: -1
+      w: -1
+      a_tSZ: 3.299661491
+      a_kSZ: 1.603283271
+      a_p: 6.909072608
+      beta_p: 2.081592320
+      a_c: 4.903593522
+      beta_c: 2.201183246
+      a_s: 3.100233500
+      a_gtt: 2.843185734
+      a_gte: 0.10
+      a_gee: 9.891127676e-02
+      a_psee: 0.0
+      a_pste: 5.316779467e-04
+      xi: 1.910150877e-01 
+      T_d: 1.028875217e+01
+
+output: ./projects/example/chains/EXAMPLE_EMUL_EVALUATE2

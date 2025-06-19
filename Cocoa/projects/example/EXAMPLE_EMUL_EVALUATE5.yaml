@@ -57,4 +57,4 @@ theory:
       ord: [['omegam','H0'], None]
       extrapar: [{'offset' : 4400.0, 'INTDIM' : 4, 'NLAYER' : 4}, None]
 
-output: ./projects/example/chains/EXAMPLE_EVALUATE25
+output: ./projects/example/chains/EXAMPLE_EMUL_EVALUATE5
