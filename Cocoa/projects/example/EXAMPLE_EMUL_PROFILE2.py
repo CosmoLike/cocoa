@@ -9,10 +9,148 @@ warnings.filterwarnings(
 import functools, iminuit, copy, argparse, random, time 
 import emcee, itertools
 import numpy as np
-from cobaya.theories.emulcmb.emulcmb2 import emulcmb
-from cobaya.theories.emultheta.emultheta2 import emultheta
+from cobaya.yaml import yaml_load
+from cobaya.model import get_model
 from getdist import IniFile
-from mflike import TTTEEE, BandpowerForeground
+# ------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
+info_txt = r"""
+likelihood:
+  planck_2018_highl_plik.TTTEEE_lite: 
+    path: ./external_modules/
+    clik_file: plc_3.0/hi_l/plik_lite/plik_lite_v22_TTTEEE.clik
+  planck_2018_lowl.TT: 
+    path: ./external_modules
+  planck_2018_lowl.EE:
+    path: ./external_modules
+
+params:
+  logA:
+    prior:
+      min: 1.61
+      max: 3.91
+    ref:
+      dist: norm
+      loc: 3.0448
+      scale: 0.05
+    proposal: 0.05
+    latex: \log(10^{10} A_\mathrm{s})
+  ns:
+    prior:
+      min: 0.92
+      max: 1.05
+    ref:
+      dist: norm
+      loc: 0.96605
+      scale: 0.005
+    proposal: 0.005
+    latex: n_\mathrm{s}
+  thetastar:
+    prior:
+      min: 1
+      max: 1.2
+    ref:
+      dist: norm
+      loc: 1.04109
+      scale: 0.0004
+    proposal: 0.0002
+    latex: 100\theta_\mathrm{*}
+    renames: theta
+  omegabh2:
+    prior:
+      min: 0.01
+      max: 0.04
+    ref:
+      dist: norm
+      loc: 0.022383
+      scale: 0.005
+    proposal: 0.005
+    latex: \Omega_\mathrm{b} h^2
+  omegach2:
+    prior:
+      min: 0.06
+      max: 0.2
+    ref:
+      dist: norm
+      loc: 0.12011
+      scale: 0.03
+    proposal: 0.03
+    latex: \Omega_\mathrm{c} h^2
+  tau:
+    prior:
+      dist: norm
+      loc: 0.0544
+      scale: 0.0073
+    ref:
+      dist: norm
+      loc: 0.055
+      scale: 0.006
+    proposal: 0.003
+    latex: \tau_\mathrm{reio}
+  As:
+    derived: 'lambda logA: 1e-10*np.exp(logA)'
+    latex: A_\mathrm{s}
+  A:
+    derived: 'lambda As: 1e9*As'
+    latex: 10^9 A_\mathrm{s}
+  mnu:
+    value: 0.06
+  w0pwa:
+    value: -1.0
+    latex: w_{0,\mathrm{DE}}+w_{a,\mathrm{DE}}
+    drop: true
+  w:
+    value: -1.0
+    latex: w_{0,\mathrm{DE}}
+  wa:
+    value: 'lambda w0pwa, w: w0pwa - w'
+    derived: false
+    latex: w_{a,\mathrm{DE}}
+  H0:
+    derived: true
+    latex: H_0
+  omegamh2:
+    derived: true
+    value: 'lambda omegach2, omegabh2, mnu: omegach2+omegabh2+(mnu*(3.046/3)**0.75)/94.0708'
+    latex: \Omega_\mathrm{m} h^2
+  omegam:
+    derived: true
+    latex: \Omega_\mathrm{m}
+
+theory:
+  emultheta:
+    path: ./cobaya/cobaya/theories/
+    stop_at_error: True
+    provides: ['H0', 'omegam']
+    extra_args:
+      file: ['external_modules/data/emultrf/CMB_TRF/thetaH0GP.joblib']
+      extra: ['external_modules/data/emultrf/CMB_TRF/extrainfotheta.npy']
+      ord: [['omegabh2','omegach2','thetastar']]
+  emulcmb:
+    path: ./cobaya/cobaya/theories/
+    stop_at_error: True
+    extra_args:
+      # This version of the emul was not trained with CosmoRec
+      eval: [True, True, True, False] #TT,TE,EE,PHIPHI
+      device: "cuda"
+      file: ['external_modules/data/emultrf/CMB_TRF/chiTTAstautrf1dot2milnewlhcevansqrtrescalec16.pt',
+             'external_modules/data/emultrf/CMB_TRF/chiTEAstautrf1dot2milnewlhcevansqrtrescalec16.pt',
+             'external_modules/data/emultrf/CMB_TRF/chiEEAstautrf1dot2milnewlhcevansqrtrescalec16.pt',
+             None] 
+      extra: ['external_modules/data/emultrf/CMB_TRF/extrainfo_lhs_tt_96.npy',
+              'external_modules/data/emultrf/CMB_TRF/extrainfo_lhs_te_96.npy',
+              'external_modules/data/emultrf/CMB_TRF/extrainfo_lhs_ee_96.npy',
+              None]
+      ord: [['omegabh2','omegach2','H0','tau','ns','logA','mnu','w','wa'],
+            ['omegabh2','omegach2','H0','tau','ns','logA','mnu','w','wa'],
+            ['omegabh2','omegach2','H0','tau','ns','logA','mnu','w','wa'],
+            None]
+      extrapar: [{'ellmax' : 5000, 'MLA': 'TRF', 'NCTRF': 16, 'INTDIM': 4, 'INTTRF': 5120},
+                 {'ellmax' : 5000, 'MLA': 'TRF', 'NCTRF': 16, 'INTDIM': 4, 'INTTRF': 5120},
+                 {'ellmax' : 5000, 'MLA': 'TRF', 'NCTRF': 16, 'INTDIM': 4, 'INTTRF': 5120},
+                 None]
+"""
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
@@ -23,20 +161,7 @@ x = np.array([
     2.246801442e-02,     # omegabh2
     1.198257361e-01 ,    # omegach2
     5.433339482e-02,     # tau
-    3.299661491,         # a_tSZ
-    1.603283271,         # a_kSZ
-    6.909072608,         # a_p
-    2.081592320,         # beta_p
-    4.903593522,         # a_c
-    2.201183246,         # beta_c
-    3.100233500,         # a_s
-    2.843185734,         # a_gtt
-    1.910150877e-01 ,    # xi
-    1.028875217e+01,     # T_d
-    0.10,                # a_gte
-    5.316779467e-04,     # a_pste
-    9.891127676e-02,     # a_gee
-    0.0,          # a_psee
+    1.00138
 ], dtype='float64')
 
 name  = [ 
@@ -46,20 +171,7 @@ name  = [
     "omegabh2",  # omegabh2
     "omegach2",  # omegach2
     "tau",       # tau
-    "a_tSZ",     # a_tSZ
-    "a_kSZ",     # a_kSZ
-    "a_p",       # a_p
-    "beta_p",    # beta_p          
-    "a_c",       # a_c
-    "beta_c",    # beta_c
-    "a_s",       # a_s
-    "a_gtt",     # a_gtt
-    "xi"         # xi
-    "T_d"        # T_d
-    "a_gte",     # a_gte
-    "a_pste"     # a_pste
-    "a_gee",     # a_gee
-    "a_psee"     # a_psee
+    "A_planck",  # A_planck
 ]
 
 bounds = np.zeros((len(x),2), dtype='float64')
@@ -70,109 +182,27 @@ stop   = np.zeros(len(x), dtype='float64')
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
 
-MKL = TTTEEE(
-    {
-        "data_folder": "simons_observatory/v0.8",
-        "input_file": "LAT_simu_sacc_00044.fits",
-        "cov_Bbl_file": "data_sacc_w_covar_and_Bbl.fits",
-        "defaults": {
-            "polarizations": ['TT', 'TE', 'ET', 'EE'],
-            "scales": {
-                "TT": [50, 3002],
-                "TE": [50, 3002],
-                "ET": [50, 3002],
-                "EE": [50, 3002],
-            },
-            "symmetrize": False,
-        },
-        "lmax_theory": 5000
-    }
-)
-fg  = BandpowerForeground(MKL.get_fg_requirements())
-
-ecmb = emulcmb(extra_args={  
-    'eval': [True, True, True, False],
-    'device': "cuda",
-    'file': ['external_modules/data/emultrf/CMB_TRF/chiTTAstautrf1dot2milnewlhcevansqrtrescalec16.pt',
-             'external_modules/data/emultrf/CMB_TRF/chiTEAstautrf1dot2milnewlhcevansqrtrescalec16.pt',
-             'external_modules/data/emultrf/CMB_TRF/chiEEAstautrf1dot2milnewlhcevansqrtrescalec16.pt',
-             None],
-    'extra': ['external_modules/data/emultrf/CMB_TRF/extrainfo_lhs_tt_96.npy',
-              'external_modules/data/emultrf/CMB_TRF/extrainfo_lhs_te_96.npy',
-              'external_modules/data/emultrf/CMB_TRF/extrainfo_lhs_ee_96.npy',
-              None],
-    'ord': [['omegabh2','omegach2','H0','tau','ns','logA','mnu','w','wa'],
-            ['omegabh2','omegach2','H0','tau','ns','logA','mnu','w','wa'],
-            ['omegabh2','omegach2','H0','tau','ns','logA','mnu','w','wa'], 
-            None],
-    'extrapar': [{'ellmax' : 5000, 'MLA': 'TRF', 'NCTRF': 16, 'INTDIM': 4, 'INTTRF': 5120},
-                 {'ellmax' : 5000, 'MLA': 'TRF', 'NCTRF': 16, 'INTDIM': 4, 'INTTRF': 5120},
-                 {'ellmax' : 5000, 'MLA': 'TRF', 'NCTRF': 16, 'INTDIM': 4, 'INTTRF': 5120},
-                 None]})
-
-etheta = emultheta(extra_args={ 
-    'file': ['external_modules/data/emultrf/CMB_TRF/thetaH0GP.joblib'],
-    'extra':['external_modules/data/emultrf/CMB_TRF/extrainfotheta.npy'],
-    'ord':  [['omegabh2','omegach2','thetastar']]})
+info  = yaml_load(info_txt)
+model = get_model(info)
 
 def chi2(p):
-    NP = {
-        "T_effd": 19.6,
-        "beta_d": 1.5,
-        "beta_s": -2.5,
-        "alpha_s": 1,
-        "bandint_shift_LAT_93": 0,
-        "bandint_shift_LAT_145": 0,
-        "bandint_shift_LAT_225": 0,
-        "cal_LAT_93": 1,
-        "cal_LAT_145": 1,
-        "cal_LAT_225": 1,
-        "calG_all": 1,
-        "alpha_LAT_93": 0,
-        "alpha_LAT_145": 0,
-        "alpha_LAT_225": 0,
-        "a_tSZ": p[6],
-        "a_kSZ": p[7],
-        "a_p": p[8],
-        "beta_p": p[9],
-        "a_c": p[10],
-        "beta_c": p[11],
-        "a_s": p[12],
-        "T_d": p[15],
-        "a_gtt": p[13],
-        "xi": p[14],
-        "alpha_dT": -0.6,
-        "alpha_p": 1.0,
-        "alpha_tSZ": 0.0,
-        "calT_LAT_93": 1.0,
-        "calT_LAT_145": 1.0,
-        "calT_LAT_225": 1.0,
-        "a_gte": p[16],
-        "a_pste": p[17],
-        "alpha_dE": -0.4,
-        "a_gee": p[18],
-        "a_psee": p[19],
-        "alpha_dE": -0.4,
-        "calE_LAT_93": 1,
-        "calE_LAT_145": 1,
-        "calE_LAT_225": 1
-    }
-    param = {'logA': p[0],
-             'ns': p[1],
-             'thetastar': p[2],
-             'omegabh2': p[3],
-             'omegach2': p[4],
-             'tau': p[5],
-             'mnu': 0.06,
-             'w': -1.0,
-             'wa': 0.0,
-             'omegamh2': p[4]+p[3]+(0.06*(3.046/3)**0.75)/94.0708
-             }
-    param = param | etheta.calculate(param)
-    cl    = ecmb.get_Cl(params=param, ell_factor=True)
-    fmt   = fg.get_foreground_model_totals(**NP)
-    result = -2*MKL.loglike(cl, fmt, **NP)
-    return result
+    point = dict(zip(model.parameterization.sampled_params(),
+                 model.prior.sample(ignore_external=True)[0]))
+
+    point.update({'logA': p[0], 
+                  'ns':  p[1],
+                  'thetastar': p[2], 
+                  'omegabh2': p[3], 
+                  'omegach2': p[4], 
+                  'tau': p[5],
+                  'A_planck': p[6]})
+    logposterior = model.logposterior(point, as_dict=True)
+
+    res1 = logposterior["loglikes"]["planck_2018_highl_plik.TTTEEE_lite"]
+    res2 = logposterior["loglikes"]["planck_2018_lowl.TT"]
+    res3 = logposterior["loglikes"]["planck_2018_lowl.EE"]
+    res  = -2.0*(res1 + res2 + res3)
+    return res
 
 
 # ------------------------------------------------------------------------------
