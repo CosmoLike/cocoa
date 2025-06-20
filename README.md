@@ -244,7 +244,6 @@ Now, users must follow all the steps below.
 
  **Step :two:**: Select the number of OpenMP cores ().
     
-    # No need to thread via OpenMP. However, 2-3 threads can reduce the TRF emulator runtime from ~0.2s to 0.1s.
     export OMP_PROC_BIND=close; export OMP_NUM_THREADS=1
 
 > [!NOTE]
@@ -259,6 +258,16 @@ One model evaluation:
 MCMC:
 
     mpirun -n 4 --oversubscribe --mca btl vader,tcp,self --bind-to core:overload-allowed --rank-by slot --map-by numa:pe=${OMP_NUM_THREADS} cobaya-run ./projects/example/EXAMPLE_EMUL_MCMC1.yaml -f
+
+PROFILE (simplified parameters to speed-up convergence):
+
+    mpirun -n 5 --oversubscribe --mca pml ^ucx  \
+      --mca btl vader,tcp,self --bind-to core:overload-allowed \
+      --rank-by slot --map-by numa:pe=${OMP_NUM_THREADS}  \
+      python -m mpi4py.futures ./projects/example/EXAMPLE_EMUL_PROFILE3.py \
+      --tol 0.05 --profile 1 --maxiter 2 --maxfeval 150 --numpts 10 \
+      --outroot "example_emul_profile3" --minmethod 2 --factor 4 --ref 1 \
+      --cov 'EXAMPLE_EMUL_MCMC2.covmat'
 
 > [!NOTE]
 > What should users do if they have not configured ML-related keys before running `setup_cocoa.sh` and `compile_cocoa.sh`, as rerunning these scripts can require a long time? Instead, run the following commands.
