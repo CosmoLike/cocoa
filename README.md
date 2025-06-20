@@ -146,6 +146,9 @@ Users will see a terminal like this: `$(cocoa)(.local)`. *This is a feature, not
     
     export OMP_PROC_BIND=close; export OMP_NUM_THREADS=8
 
+> [!NOTE]
+> This step is mandatory steps even if the number of threads is one. Failing to set `OMP_NUM_THREADS` would incour in the `Floating point exception (core dumped)` error message when running the proposed examples.
+
 ## Examples not involving Cosmolike
 
  **Step :three:**: The folder `projects/example` contains a few examples involving different likelihoods. So, run the `cobaya-run` on the first example following the commands below.
@@ -232,28 +235,30 @@ Cocoa contains a few transformer-based neural network emulators capable of simul
  
 Now, users must follow all the steps below.
 
+> [!NOTE]
+> Having a GPU speeds up transformers-based emulators by a factor ~7 (tested on the simple NVIDIA RTX3060). 
+
  **Step :one:**: Activate the private Python environment by sourcing the script `start_cocoa.sh`
 
     source start_cocoa.sh
 
- **Step :two:**: Select the number of OpenMP cores.
+ **Step :two:**: Select the number of OpenMP cores ().
     
     # No need to thread via OpenMP. However, 2-3 threads can reduce the TRF emulator runtime from ~0.2s to 0.1s.
     export OMP_PROC_BIND=close; export OMP_NUM_THREADS=1
+
+> [!NOTE]
+> This step is mandatory steps even if the number of threads is one. Failing to set `OMP_NUM_THREADS` would incour in the `Floating point exception (core dumped)` error message when running the proposed examples
 
  **Step :three:** Run `cobaya-run` on the first emulator example following the commands below.
 
 One model evaluation:
 
-    mpirun -n 1 --oversubscribe --mca pml ^ucx --mca btl vader,tcp,self --bind-to core:overload-allowed --rank-by slot --map-by numa:pe=${OMP_NUM_THREADS} cobaya-run ./projects/example/EXAMPLE_EVALUATE22.yaml -f
+    mpirun -n 1 --oversubscribe --mca pml ^ucx --mca btl vader,tcp,self --bind-to core:overload-allowed --rank-by slot --map-by numa:pe=${OMP_NUM_THREADS} cobaya-run ./projects/example/EXAMPLE_EMUL_EVALUATE1.yaml -f
         
 MCMC:
 
-    mpirun -n 4 --oversubscribe --mca btl vader,tcp,self --bind-to core:overload-allowed --rank-by slot --map-by numa:pe=${OMP_NUM_THREADS} cobaya-run ./projects/example/EXAMPLE_MCMC22.yaml -f
-
-PolyChord:
-
-    mpirun -n 8 --oversubscribe --mca pml ^ucx --mca btl vader,tcp,self --bind-to core:overload-allowed --rank-by slot --map-by numa:pe=${OMP_NUM_THREADS} cobaya-run ./projects/example/EXAMPLE_POLY22.yaml -f
+    mpirun -n 4 --oversubscribe --mca btl vader,tcp,self --bind-to core:overload-allowed --rank-by slot --map-by numa:pe=${OMP_NUM_THREADS} cobaya-run ./projects/example/EXAMPLE_EMUL_MCMC1.yaml -f
 
 > [!NOTE]
 > What should users do if they have not configured ML-related keys before running `setup_cocoa.sh` and `compile_cocoa.sh`, as rerunning these scripts can require a long time? Instead, run the following commands.
