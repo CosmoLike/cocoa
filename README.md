@@ -265,6 +265,7 @@ PROFILE (simplified parameters to speed-up convergence):
       --mca btl vader,tcp,self --bind-to core:overload-allowed \
       --rank-by slot --map-by numa:pe=${OMP_NUM_THREADS}  \
       python -m mpi4py.futures ./projects/example/EXAMPLE_EMUL_PROFILE3.py \
+      --root ./projects/example/ \
       --tol 0.05 --profile 1 --maxiter 2 --maxfeval 150 --numpts 10 \
       --outroot "example_emul_profile3" --minmethod 2 --factor 4 --ref 1 \
       --cov 'EXAMPLE_EMUL_MCMC2.covmat'
