@@ -49,7 +49,8 @@ theory:
     path: ./cobaya/cobaya/theories/
     stop_at_error: True
     extra_args:
-      eval: [True, False] # dL(z), H(z),
+      eval: [True, False] # dL(z), H(z)
+      device: "cuda"
       file:  ['external_modules/data/emultrf/BAO_SN_RES/chisquaredllog.pt', None]
       extra: ['external_modules/data/emultrf/BAO_SN_RES/extrainfodl.npy', None]
       tmat:  ['external_modules/data/emultrf/BAO_SN_RES/PCAdl.npy', None]
@@ -57,4 +58,4 @@ theory:
       ord: [['omegam','H0'], None]
       extrapar: [{'offset' : 4400.0, 'INTDIM' : 4, 'NLAYER' : 4}, None]
 
-output: ./projects/example/chains/EXAMPLE_EMUL_EVALUATE5
+output: ./projects/example/chains/EXAMPLE_EMUL_EVALUATE4

@@ -310,7 +310,7 @@ def min_chi2(x0,
         
         mychi2(x0, *args) # first call takes a lot longer (when running on cuda)
         start_time = time.time()
-        mychi2(x0, *args)
+        mychi2(GaussianStep(stepsize=0.1)(x0)[0,:], *args)
         end_time = time.time()
         elapsed_time = end_time - start_time
  

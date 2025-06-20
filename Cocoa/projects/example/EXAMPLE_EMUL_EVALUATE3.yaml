@@ -213,7 +213,8 @@ theory:
     path: ./cobaya/cobaya/theories/
     stop_at_error: True
     extra_args:
-      eval: [True, True] # dL(z), H(z),
+      eval: [True, True] # dL(z), H(z)
+      device: "cuda"
       file:  ['external_modules/data/emultrf/BAO_SN_RES/chisquaredllog.pt',
               'external_modules/data/emultrf/BAO_SN_RES/chisquareH.pt']
       extra: ['external_modules/data/emultrf/BAO_SN_RES/extrainfodl.npy',
@@ -248,8 +249,9 @@ theory:
 
 sampler:
   evaluate:
+    N: 2
     override:
-      logA: 3.045845885
+      #logA: 3.045845885
       ns: 9.652308970e-01
       thetastar: 1.0410562
       omegabh2: 2.246801442e-02
@@ -272,4 +274,4 @@ sampler:
       xi: 1.910150877e-01 
       T_d: 1.028875217e+01
 
-output: ./projects/example/chains/EXAMPLE_EMUL_EVALUATE4
+output: ./projects/example/chains/EXAMPLE_EMUL_EVALUATE3

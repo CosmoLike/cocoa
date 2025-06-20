@@ -187,7 +187,7 @@ model = get_model(info)
 
 def chi2(p):
     point = dict(zip(model.parameterization.sampled_params(),
-                 model.prior.sample(ignore_external=True)[0]))
+                     model.prior.sample(ignore_external=True)[0]))
 
     point.update({'logA': p[0], 
                   'ns':  p[1],
@@ -198,9 +198,9 @@ def chi2(p):
                   'A_planck': p[6]})
     logposterior = model.logposterior(point, as_dict=True)
 
-    res1 = logposterior["loglikes"]["planck_2018_highl_plik.TTTEEE_lite"]
-    res2 = logposterior["loglikes"]["planck_2018_lowl.TT"]
-    res3 = logposterior["loglikes"]["planck_2018_lowl.EE"]
+    res1 = logposterior["loglikes"].get("planck_2018_highl_plik.TTTEEE_lite",-1e200)
+    res2 = logposterior["loglikes"].get("planck_2018_lowl.TT",-1e200)
+    res3 = logposterior["loglikes"].get("planck_2018_lowl.EE",-1e200)
     res  = -2.0*(res1 + res2 + res3)
     return res
 
@@ -374,6 +374,14 @@ def min_chi2(x0,
     if min_method == 1:    
     
         x = copy.deepcopy(x0)
+
+        mychi2(x, *args) # first call takes a lot longer (when running on cuda)
+        start_time = time.time()
+        mychi2(GaussianStep(stepsize=0.1)(x)[0,:], *args)
+        elapsed_time = time.time() - start_time
+        print(f"MN: Like Eval Time: {elapsed_time:.4f} secs, "
+              f"Eval Time = {elapsed_time*maxiter*maxfeval/3600.:.4f} hours.")
+
         partial_samples = [x]
         partial = [mychi2(x, *args)]
         for i in range(maxiter):
@@ -389,7 +397,7 @@ def min_chi2(x0,
             partial.append(tmp.fun)
             j = np.argmin(np.array(partial))
             x = GaussianStep(stepsize=0.005)(partial_samples[j])[0,:]
-            print(f"MN: i = {i}, chi2 = {partial[j]}, param = {args[0]}")
+            #print(f"MN: i = {i}, chi2 = {partial[j]}, param = {args[0]}")
         j = np.argmin(np.array(partial))
         result = [partial_samples[j], partial[j]] 
     
@@ -403,7 +411,7 @@ def min_chi2(x0,
 
         mychi2(x0, *args) # first call takes a lot longer (when running on cuda)
         start_time = time.time()
-        mychi2(x0, *args)
+        mychi2(GaussianStep(stepsize=0.1)(x0)[0,:], *args)
         elapsed_time = time.time() - start_time
     
         print(f"Emcee: nwalkers = {nwalkers}, "
@@ -411,8 +419,8 @@ def min_chi2(x0,
               f"feval (per walker) = {maxfeval}, "
               f"feval (per Temp) = {nwalkers*maxfeval}, "
               f"feval = {nwalkers*maxfeval*len(temperature)}")
-        print(f"Emcee: Like Eval Time: {elapsed_time:.2f} secs, "
-              f"Eval Time = {elapsed_time*nwalkers*maxfeval*len(temperature)/3600.:.2f} hours.")
+        print(f"Emcee: Like Eval Time: {elapsed_time:.4f} secs, "
+              f"Eval Time = {elapsed_time*nwalkers*maxfeval*len(temperature)/3600.:.4f} hours.")
 
         partial_samples = []
         partial = []
@@ -441,7 +449,7 @@ def min_chi2(x0,
             partial.append(tchi2)
             x0 = copy.deepcopy(samples[j])
             sampler.reset()
-            print(f"emcee: i = {i}, chi2 = {tchi2}, param = {args[0]}")
+            #print(f"emcee: i = {i}, chi2 = {tchi2}, param = {args[0]}")
         
         # min chi2 from the entire emcee runs
         j = np.argmin(np.array(partial))
@@ -512,7 +520,7 @@ if __name__ == '__main__':
 #mpirun -n 5 --oversubscribe --mca pml ^ucx  \
 #  --mca btl vader,tcp,self --bind-to core:overload-allowed  \
 #  --rank-by slot --map-by numa:pe=${OMP_NUM_THREADS}  \
-#  python -m mpi4py.futures ./projects/example/EXAMPLE_EMUL_PROFILE1.py  \
-#  --tol 0.05 --profile 1 --maxiter 2 --maxfeval 50 --numpts 4  \
-#  --outroot "example_emul_profile1" --minmethod 1 --factor 3 --ref 1 \
-#  --cov 'EXAMPLE_EMUL_MCMC1.covmat'
+#  python -m mpi4py.futures ./projects/example/EXAMPLE_EMUL_PROFILE2.py  \
+#  --tol 0.05 --profile 1 --maxiter 1 --maxfeval 5 --numpts 4  \
+#  --outroot "example_emul_profile2" --minmethod 2 --factor 5 --ref 1 \
+#  --cov 'EXAMPLE_EMUL_MCMC2.covmat'
