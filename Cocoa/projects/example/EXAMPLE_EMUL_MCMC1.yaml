@@ -151,6 +151,7 @@ theory:
     extra_args:
       # This version of the emul was not trained with CosmoRec
       eval: [True, True, True, False] #TT,TE,EE,PHIPHI
+      device: "cuda"
       file: ['external_modules/data/emultrf/CMB_TRF/chiTTAstautrf1dot2milnewlhcevansqrtrescalec16.pt',
              'external_modules/data/emultrf/CMB_TRF/chiTEAstautrf1dot2milnewlhcevansqrtrescalec16.pt',
              'external_modules/data/emultrf/CMB_TRF/chiEEAstautrf1dot2milnewlhcevansqrtrescalec16.pt',

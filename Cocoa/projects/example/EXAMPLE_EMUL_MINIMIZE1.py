@@ -400,7 +400,7 @@ if __name__ == '__main__':
 
     if ref > 0 and min_method != 1:
         for i in range(numpts):
-            x0[i,:] = GaussianStep(stepsize=0.025)(res[i,0])[0,:]
+            x0[i,:] = GaussianStep(stepsize=0.0005*i)(res[i,0])[0,:]
         
         res2 = np.array(list(executor.map(functools.partial(prf, min_method=1,
             maxiter=maxiter,maxfeval=max(10*maxfeval,250)),x0)), dtype="object")
@@ -418,6 +418,6 @@ if __name__ == '__main__':
 #  --mca btl vader,tcp,self --bind-to core:overload-allowed  \
 #  --rank-by slot --map-by numa:pe=${OMP_NUM_THREADS}  \
 #  python -m mpi4py.futures ./projects/example/EXAMPLE_EMUL_MINIMIZE1.py \
-#  --tol 0.05 --profile 1 --maxiter 1 --maxfeval 5 --numpts 4 \
+#  --tol 0.05 --profile 1 --maxiter 1 --maxfeval 50 --numpts 4 \
 #  --outroot "example_emul_minimize1" --minmethod 2 --factor 3 --ref 1 \
 #  --cov 'EXAMPLE_EMUL_MCMC1.covmat

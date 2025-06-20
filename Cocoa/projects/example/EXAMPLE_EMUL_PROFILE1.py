@@ -92,6 +92,7 @@ fg  = BandpowerForeground(MKL.get_fg_requirements())
 
 ecmb = emulcmb(extra_args={  
     'eval': [True, True, True, False],
+    'device': "cuda",
     'file': ['external_modules/data/emultrf/CMB_TRF/chiTTAstautrf1dot2milnewlhcevansqrtrescalec16.pt',
              'external_modules/data/emultrf/CMB_TRF/chiTEAstautrf1dot2milnewlhcevansqrtrescalec16.pt',
              'external_modules/data/emultrf/CMB_TRF/chiEEAstautrf1dot2milnewlhcevansqrtrescalec16.pt',
@@ -170,7 +171,9 @@ def chi2(p):
     param = param | etheta.calculate(param)
     cl    = ecmb.get_Cl(params=param, ell_factor=True)
     fmt   = fg.get_foreground_model_totals(**NP)
-    return -2*MKL.loglike(cl, fmt, **NP)
+    result = -2*MKL.loglike(cl, fmt, **NP)
+    return result
+
 
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
@@ -306,11 +309,10 @@ def min_chi2(x0,
 
     def mychi2(params, *args):
         z, fixed, T = args
-        params = np.array(params)
+        params = np.array(params, dtype='float64')
         if fixed > -1:
             params = np.insert(params, fixed, z)
-        res = chi2(p=params)/T
-        return res
+        return chi2(p=params)/T
 
     if fixed > -1:
         z      = x0[fixed]
@@ -369,11 +371,11 @@ def min_chi2(x0,
         temperature = np.array([1.0, 0.25, 0.1, 0.005, 0.001], dtype='float64')
         stepsz      = temperature/4.0
 
+        mychi2(x0, *args) # first call takes a lot longer (when running on cuda)
         start_time = time.time()
         mychi2(x0, *args)
-        end_time = time.time()
-        elapsed_time = end_time - start_time
- 
+        elapsed_time = time.time() - start_time
+    
         print(f"Emcee: nwalkers = {nwalkers}, "
               f"nTemp = {len(temperature)}, "
               f"feval (per walker) = {maxfeval}, "
@@ -481,6 +483,6 @@ if __name__ == '__main__':
 #  --mca btl vader,tcp,self --bind-to core:overload-allowed  \
 #  --rank-by slot --map-by numa:pe=${OMP_NUM_THREADS}  \
 #  python -m mpi4py.futures ./projects/example/EXAMPLE_EMUL_PROFILE1.py  \
-#  --tol 0.05 --profile 1 --maxiter 2 --maxfeval 10000 --numpts 20  \
+#  --tol 0.05 --profile 1 --maxiter 2 --maxfeval 50 --numpts 4  \
 #  --outroot "example_emul_profile1" --minmethod 1 --factor 3 --ref 1 \
 #  --cov 'EXAMPLE_EMUL_MCMC1.covmat'
