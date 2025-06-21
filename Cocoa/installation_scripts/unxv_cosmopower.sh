@@ -72,7 +72,7 @@ if [ -z "${IGNORE_COSMOPOWER_DATA}" ]; then
     if [ -n "${COSMOPOWER_URL_DATA_COMMIT}" ]; then
       cdfolder "${PACKDIR:?}" || return 1
 
-      ${GIT:?} checkout "${EMULTRF_DATA_GIT_COMMIT:?}" \
+      ${GIT:?} checkout "${COSMOPOWER_URL_DATA_COMMIT:?}" \
         >${OUT1:?} 2>${OUT2:?} || { error "${EC16:?}"; return 1; }
     fi
   fi
