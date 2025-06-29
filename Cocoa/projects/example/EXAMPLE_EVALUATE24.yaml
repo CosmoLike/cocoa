@@ -214,6 +214,7 @@ theory:
     stop_at_error: True
     extra_args:
       eval: [True, True] # dL(z), H(z),
+      method: ["NN", "NN"]
       file:  ['external_modules/data/emultrf/BAO_SN_RES/chisquaredllog.pt',
               'external_modules/data/emultrf/BAO_SN_RES/chisquareH.pt']
       extra: ['external_modules/data/emultrf/BAO_SN_RES/extrainfodl.npy',

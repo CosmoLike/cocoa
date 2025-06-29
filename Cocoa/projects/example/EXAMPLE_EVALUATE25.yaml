@@ -213,7 +213,8 @@ theory:
     path: ./cobaya/cobaya/theories/
     stop_at_error: True
     extra_args:
-      eval: [False, True] # dL(z), H(z),
+      eval: [True, True] # dL(z), H(z),
+      method: ["INT", "NN"]
       file:  [None,
               'external_modules/data/emultrf/BAO_SN_RES/chisquareH.pt']
       extra: [None,
@@ -224,7 +225,7 @@ theory:
               'external_modules/data/emultrf/BAO_SN_RES/zlinlcdm.npy']       
       ord: [['omegam','H0'],
             ['omegam','H0']]
-      extrapar: [{'offset' : 4400.0, 'INTDIM' : 4, 'NLAYER' : 4},
+      extrapar: [None,
                  {'offset' : 0.0000, 'INTDIM' : 1, 'NLAYER' : 1}]
 
 # CAMB FROM EXAMPLE_EVALUATE21.YAML
