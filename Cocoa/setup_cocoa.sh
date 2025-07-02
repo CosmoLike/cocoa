@@ -134,10 +134,7 @@ do
 done
 
 if [ ${ERRORCODE:?} -ne 0 ]; then
-  error_cip "setup_cocoa.py"
-  unset -v ERRORCODE SCRIPTS
-  unset -f error_cip error_cip_msg
-  source stop_cocoa.sh || return 1;
+  error_cip "setup_cocoa.py"; return 1
   return 1
 fi
 

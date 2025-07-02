@@ -68,7 +68,7 @@ Users can now proceed to the **next section**.
 > To install the `cocoa` conda environment on a supercomputer, users may take advantage of the fact that several HPC environments provide the [Anaconda installer](https://www.anaconda.com) as an external module. If this applies to you, then check the appendix [FAQ: How do we use an available Anaconda module on HPC?](#overview_anaconda).
 
 > [!TIP]
-> Users working in an HPC environment that does not offer Anaconda or  may want to check the appendix [FAQ: How do we install Conda?](#overview_conda).
+> Users working in an HPC environment that does not offer Anaconda may want to check the appendix [FAQ: How do we install Conda?](#overview_conda).
 
 > [!TIP]
 > We provide a Docker image named *whovian-cocoa* with Cocoa pre-installed and pre-compiled. For further instructions, refer to the appendix [FAQ: How do we run Cocoa with Docker?](#appendix_jupyter_whovian).
@@ -134,6 +134,9 @@ Users will see a terminal like this: `$(cocoa)(.local)`. *This is a feature, not
  **Step :two:**: Select the number of OpenMP cores (below, we set it to 8).
     
     export OMP_PROC_BIND=close; export OMP_NUM_THREADS=8
+
+> [!NOTE]
+> This step is mandatory steps even if the number of threads is one. Failing to set `OMP_NUM_THREADS` would incour in the `Floating point exception (core dumped)` error message when running the proposed examples.
 
 ## Examples not involving Cosmolike
 
@@ -221,6 +224,9 @@ Cocoa contains a few transformer-based neural network emulators capable of simul
  
 Now, users must follow all the steps below.
 
+> [!NOTE]
+> Having a GPU speeds up transformers-based emulators by a factor ~7 (tested on the simple NVIDIA RTX3060). 
+
  **Step :one:**: Activate the private Python environment by sourcing the script `start_cocoa.sh`
 
     source start_cocoa.sh
@@ -229,19 +235,29 @@ Now, users must follow all the steps below.
 
     export OMP_PROC_BIND=close; export OMP_NUM_THREADS=1
 
+> [!NOTE]
+> This step is mandatory steps even if the number of threads is one. Failing to set `OMP_NUM_THREADS` would incour in the `Floating point exception (core dumped)` error message when running the proposed examples
+
  **Step :three:** Run `cobaya-run` on the first emulator example following the commands below.
 
 One model evaluation:
 
-    mpirun -n 1 --oversubscribe --mca pml ^ucx --mca btl vader,tcp,self --bind-to core:overload-allowed --rank-by slot --map-by numa:pe=${OMP_NUM_THREADS} cobaya-run ./projects/example/EXAMPLE_EVALUATE22.yaml -f
+    mpirun -n 1 --oversubscribe --mca pml ^ucx --mca btl vader,tcp,self --bind-to core:overload-allowed --rank-by slot --map-by numa:pe=${OMP_NUM_THREADS} cobaya-run ./projects/example/EXAMPLE_EMUL_EVALUATE1.yaml -f
         
 MCMC:
 
-    mpirun -n 4 --oversubscribe --mca btl vader,tcp,self --bind-to core:overload-allowed --rank-by slot --map-by numa:pe=${OMP_NUM_THREADS} cobaya-run ./projects/example/EXAMPLE_MCMC22.yaml -f
+    mpirun -n 4 --oversubscribe --mca btl vader,tcp,self --bind-to core:overload-allowed --rank-by slot --map-by numa:pe=${OMP_NUM_THREADS} cobaya-run ./projects/example/EXAMPLE_EMUL_MCMC1.yaml -f
 
-PolyChord:
+PROFILE (simplified parameters to speed-up convergence):
 
-    mpirun -n 8 --oversubscribe --mca pml ^ucx --mca btl vader,tcp,self --bind-to core:overload-allowed --rank-by slot --map-by numa:pe=${OMP_NUM_THREADS} cobaya-run ./projects/example/EXAMPLE_POLY22.yaml -f
+    mpirun -n 5 --oversubscribe --mca pml ^ucx  \
+      --mca btl vader,tcp,self --bind-to core:overload-allowed \
+      --rank-by slot --map-by numa:pe=${OMP_NUM_THREADS}  \
+      python -m mpi4py.futures ./projects/example/EXAMPLE_EMUL_PROFILE3.py \
+      --root ./projects/example/ \
+      --tol 0.05 --profile 1 --maxiter 2 --maxfeval 150 --numpts 10 \
+      --outroot "example_emul_profile3" --minmethod 2 --factor 4 --ref 1 \
+      --cov 'EXAMPLE_EMUL_MCMC2.covmat'
 
 > [!NOTE]
 > What should users do if they have not configured ML-related keys before running `setup_cocoa.sh` and `compile_cocoa.sh`, as rerunning these scripts can require a long time? Instead, run the following commands.
