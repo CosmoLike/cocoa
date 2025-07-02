@@ -216,7 +216,7 @@ and
 >      Cocoa/.local/lib
 >      Cocoa/.local/share
 >
-> Another reason 
+> Consistency of the environment across all Cocoa instances is crucial, and the `start_cocoa.sh`/`stop_cocoa.sh` scripts handle the loading and unloading of environmental path variables. 
 
 # Running ML emulators <a name="cobaya_base_code_examples_emul"></a>
 
@@ -242,8 +242,8 @@ Now, users must follow all the steps below.
 
     source start_cocoa.sh
 
- **Step :two:**: Select the number of OpenMP cores ().
-    
+ **Step :two:**: Select the number of OpenMP cores.
+
     export OMP_PROC_BIND=close; export OMP_NUM_THREADS=1
 
 > [!NOTE]

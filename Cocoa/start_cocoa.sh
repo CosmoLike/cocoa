@@ -11,10 +11,10 @@ error_start_cocoa () {
   local FILE="$(basename ${BASH_SOURCE[0]})"
   local MSG="\033[0;31m (${FILE}) we cannot run "
   local MSG2="\033[0m"
-  echo -e "${MSG}${1:?}${MSG2}" 2>"/dev/null"
+  echo -e "${MSG}${1:?}${MSG2}"
   unset -f error_start_cocoa
-  cd $(pwd -P) 2>"/dev/null"
-  source stop_cocoa.sh 2>"/dev/null"
+  cd $(pwd -P) 
+  source stop_cocoa.sh
   return 1
 }
 
