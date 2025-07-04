@@ -113,6 +113,7 @@ theory:
       file: ['external_modules/data/emultrf/CMB_TRF/thetaH0GP.joblib']
       extra: ['external_modules/data/emultrf/CMB_TRF/extrainfotheta.npy']
       ord: [['omegabh2','omegach2','thetastar']]
+      extrapar: [{'MLA' : "GP"}]
   emulcmb:
     path: ./cobaya/cobaya/theories/
     stop_at_error: True
