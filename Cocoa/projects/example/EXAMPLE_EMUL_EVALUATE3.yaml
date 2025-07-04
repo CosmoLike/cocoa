@@ -177,13 +177,14 @@ theory:
       file: ['external_modules/data/emultrf/CMB_TRF/thetaH0GP.joblib']
       extra: ['external_modules/data/emultrf/CMB_TRF/extrainfotheta.npy']
       ord: [['omegabh2','omegach2','thetastar']]
+      extrapar: [{'MLA' : "GP"}]
   emulrdrag:
     path: ./cobaya/cobaya/theories/
     stop_at_error: True
     provides: ['rdrag']
     extra_args:
       file: ['external_modules/data/emultrf/BAO_SN_RES/rdragGP.joblib'] 
-      extra: ['external_modules/data/emultrf/BAO_SN_RES/extrainfordrag.npy']
+      extra: ['external_modules/data/emultrf/BAO_SN_RES/extrainfordrag.npy'] 
       ord: [['omegabh2','omegach2']]
   emulcmb:
     path: ./cobaya/cobaya/theories/
@@ -215,17 +216,26 @@ theory:
     extra_args:
       eval: [True, True] # dL(z), H(z)
       device: "cuda"
-      file:  ['external_modules/data/emultrf/BAO_SN_RES/chisquaredllog.pt',
-              'external_modules/data/emultrf/BAO_SN_RES/chisquareH.pt']
-      extra: ['external_modules/data/emultrf/BAO_SN_RES/extrainfodl.npy',
-              'external_modules/data/emultrf/BAO_SN_RES/extrainfoH.npy']
-      tmat:  ['external_modules/data/emultrf/BAO_SN_RES/PCAdl.npy',
-              'external_modules/data/emultrf/BAO_SN_RES/PCAH.npy']
-      zlin:  ['external_modules/data/emultrf/BAO_SN_RES/zlinlcdm.npy',
-              'external_modules/data/emultrf/BAO_SN_RES/zlinlcdm.npy']       
-      ord: [['omegam','H0'],
-            ['omegam','H0']]
-      extrapar: [{'offset' : 4400.0, 'INTDIM' : 4, 'NLAYER' : 4},
+      #method: ["NN", "NN"]
+      #file:  ['external_modules/data/emultrf/BAO_SN_RES/chisquaredllog.pt',
+      #        'external_modules/data/emultrf/BAO_SN_RES/chisquareH.pt']
+      #extra: ['external_modules/data/emultrf/BAO_SN_RES/extrainfodl.npy',
+      #        'external_modules/data/emultrf/BAO_SN_RES/extrainfoH.npy']
+      #tmat:  ['external_modules/data/emultrf/BAO_SN_RES/PCAdl.npy',
+      #        'external_modules/data/emultrf/BAO_SN_RES/PCAH.npy']
+      #zlin:  ['external_modules/data/emultrf/BAO_SN_RES/zlinlcdm.npy',
+      #        'external_modules/data/emultrf/BAO_SN_RES/zlinlcdm.npy']       
+      #ord: [['omegam','H0'],
+      #      ['omegam','H0']]
+      #extrapar: [{'offset' : 4400.0, 'INTDIM' : 4, 'NLAYER' : 4},
+      #           {'offset' : 0.0000, 'INTDIM' : 1, 'NLAYER' : 1}]
+      method: ["INT", "NN"] # with INT, we will integrate H(z)
+      file:  [None,'external_modules/data/emultrf/BAO_SN_RES/chisquareH.pt']
+      extra: [None,'external_modules/data/emultrf/BAO_SN_RES/extrainfoH.npy']
+      tmat:  [None,'external_modules/data/emultrf/BAO_SN_RES/PCAH.npy']
+      zlin:  [None,'external_modules/data/emultrf/BAO_SN_RES/zlinlcdm.npy']       
+      ord: [None, ['omegam','H0']]
+      extrapar: [{'ZMIN' : 0.0001, 'ZMAX' : 3, 'NZ' : 1200},
                  {'offset' : 0.0000, 'INTDIM' : 1, 'NLAYER' : 1}]
 
 # CAMB FROM EXAMPLE_EVALUATE21.YAML
@@ -249,9 +259,9 @@ theory:
 
 sampler:
   evaluate:
-    N: 2
+    N: 1
     override:
-      #logA: 3.045845885
+      logA: 3.045845885
       ns: 9.652308970e-01
       thetastar: 1.0410562
       omegabh2: 2.246801442e-02
