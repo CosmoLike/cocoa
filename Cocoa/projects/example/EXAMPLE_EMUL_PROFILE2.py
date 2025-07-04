@@ -525,9 +525,9 @@ if __name__ == '__main__':
 
 #HOW TO CALL THIS SCRIPT
 #mpirun -n 5 --oversubscribe --mca pml ^ucx  \
-#  --mca btl vader,tcp,self --bind-to core:overload-allowed  \
+#  --mca btl vader,tcp,self --bind-to core:overload-allowed \
 #  --rank-by slot --map-by core:pe=${OMP_NUM_THREADS}  \
-#  python -m mpi4py.futures ./projects/example/EXAMPLE_EMUL_PROFILE2.py  \
+#  python -m mpi4py.futures ./projects/example/EXAMPLE_EMUL_PROFILE2.py \
 #  --nwalkers 5 --profile 1 --maxfeval 15 --numpts 4  \
 #  --outroot "example_emul_profile2" --factor 5 \
 #  --cov 'EXAMPLE_EMUL_MCMC2.covmat'

@@ -503,6 +503,15 @@ etheta = emultheta(extra_args={
     'ord':  [['omegabh2','omegach2','thetastar']],
     'extrapar': [{'MLA' : "GP"}]})
 
+# want to add rd information
+from cobaya.theories.emulrdrag.emulrdrag2 import emulrdrag
+
+# LCDM emulator. On this mass range, DE does not influence rd
+erd = emulrdrag(extra_args={ 
+    'file': ['external_modules/data/emultrf/BAO_SN_RES/rdragGP.joblib'] ,
+    'extra': ['external_modules/data/emultrf/BAO_SN_RES/extrainfordrag.npy'],
+    'ord':  [['omegabh2','omegach2']]})
+
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
@@ -528,7 +537,42 @@ if __name__ == '__main__':
                                                        nwalkers=nwalkers),x0)),dtype="object")
 
     x0 = np.array([np.insert(row,index,p) for row, p in zip(res[:,0],param)],dtype='float64')
-    
+
+    # Append H0 and omegam (begins) --------------------
+    tmp = [
+        etheta.calculate({
+            'thetastar': row[2],
+            'omegabh2':  row[3],
+            'omegach2':  row[4],
+            'omegamh2':  row[3] + row[4] + (0.06*(3.046/3)**0.75)/94.0708
+        })
+        for row in x0
+      ]
+    h  = np.array([d['H0']     for d in tmp], dtype='float64')
+    om = np.array([d['omegam'] for d in tmp], dtype='float64')
+    x0 = np.column_stack((x0, h, om))
+    # Append H0 and omegam (ends) --------------------
+
+    # Append rd (begins) --------------------
+    tmp = [
+        erd.calculate({
+            'thetastar': row[2],
+            'omegabh2':  row[3],
+            'omegach2':  row[4],
+            'omegamh2':  row[3] + row[4] + (0.06*(3.046/3)**0.75)/94.0708,
+            'H0':        row[-2]
+        })
+        for row in x0
+      ]
+    rdrag = np.array([d['rdrag'] for d in tmp], dtype='float64')
+    x0 = np.column_stack((x0, rdrag))
+    # Append rd (ends) --------------------
+
+    # Append individual chi2 (begins) --------------------
+    tmp = np.array([chi2v2(d) for d in x0], dtype='float64')
+    x0 = np.column_stack((x0,tmp[:,0],tmp[:,1],tmp[:,2],tmp[:,3],tmp[:,4]))
+    # Append individual chi2 (ends) --------------------
+
     rnd = random.randint(0,9999)
     out = oroot + "_" + str(rnd) + "_" + name[index] 
     print("Output file = ", out + ".txt")
@@ -539,10 +583,10 @@ if __name__ == '__main__':
     executor.shutdown()
 
 #HOW TO CALL THIS SCRIPT
-#  mpirun -n 5 --oversubscribe --mca pml ^ucx  \
-#    --mca btl vader,tcp,self --bind-to core:overload-allowed \
-#    --rank-by slot --map-by numa:pe=${OMP_NUM_THREADS}  \
-#    python -m mpi4py.futures ./projects/example/EXAMPLE_EMUL_PROFILE3.py \
-#    --tol 0.05 --profile 1 --maxiter 2 --maxfeval 50 --numpts 4 \
-#    --outroot "example_emul_profile3" --minmethod 2 --factor 5 --ref 1 \
-#    --cov 'EXAMPLE_EMUL_MCMC2.covmat'
+#mpirun -n 5 --oversubscribe --mca pml ^ucx  \
+#  --mca btl vader,tcp,self --bind-to core:overload-allowed \
+#  --rank-by slot --map-by core:pe=${OMP_NUM_THREADS}  \
+#  python -m mpi4py.futures ./projects/example/EXAMPLE_EMUL_PROFILE3.py \
+#  --nwalkers 5 --profile 1 --maxfeval 15 --numpts 4  \
+#  --outroot "example_emul_profile3" --factor 5 \
+#  --cov 'EXAMPLE_EMUL_MCMC2.covmat'
