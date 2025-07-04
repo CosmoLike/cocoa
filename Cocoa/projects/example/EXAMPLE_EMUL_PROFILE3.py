@@ -375,7 +375,6 @@ for i in range(len(x)):
 # ------------------------------------------------------------------------------
 
 def min_chi2(x0, 
-             bounds, 
              fixed=-1, 
              maxfeval=3000, 
              cov=cov,
@@ -391,7 +390,6 @@ def min_chi2(x0,
     if fixed > -1:
         z      = x0[fixed]
         x0     = np.delete(x0, (fixed))
-        bounds = np.delete(bounds, (fixed), axis=0)
         args = (z, fixed, 1.0)
     else:
         args = (0.0, -2.0, 1.0)
@@ -416,7 +414,7 @@ def min_chi2(x0,
            return np.random.multivariate_normal(x, self.cov, size=1)
     
     ndim        = int(x0.shape[0])
-    nwalkers    = int(2*x0.shape[0])
+    nwalkers    = int(nwalkers)
     nsteps      = maxfeval
     temperature = np.array([1.0, 0.25, 0.1, 0.005, 0.001], dtype='float64')
     stepsz      = temperature/4.0
@@ -470,22 +468,9 @@ def min_chi2(x0,
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
 
-def prf(x0, index, maxfeval, bounds, nwalkers=5):
+def prf(x0, index, maxfeval, nwalkers=5):
     t0 = np.array(x0, dtype='float64')
-    t1 = np.array(bounds, dtype="float64") # np.array do a deep copy. Deep copy necessary 
-                                           # line to avoid weird bug that changes on bounds
-                                           # propagate from different iterations (same MPI core)
-    t1[:,0] += t0
-    t1[:,1] += t0
-
-    for i in range(len(x)):
-        if (t1[i][0] < bounds0[i][0]):
-          t1[i][0] = bounds0[i][0]
-        if (t1[i][1] > bounds0[i][1]):
-          t1[i][1] = bounds0[i][1]
-
     res =  min_chi2(x0=t0, 
-                    bounds=t1, 
                     fixed=index, 
                     maxfeval=maxfeval, 
                     nwalkers=nwalkers)
@@ -528,12 +513,10 @@ if __name__ == '__main__':
     print(f"profile param values = {param}")
     x0 = np.tile(x, (param.size, 1))
     x0[:,index] = param
-    bounds = np.c_[- 25.0*args.factor*sigma,+ 25.0*args.factor*sigma]
 
     res = np.array(list(executor.map(functools.partial(prf, 
                                                        index=index,
                                                        maxfeval=maxfeval, 
-                                                       bounds=bounds, 
                                                        nwalkers=nwalkers),x0)),dtype="object")
 
     x0 = np.array([np.insert(row,index,p) for row, p in zip(res[:,0],param)],dtype='float64')
