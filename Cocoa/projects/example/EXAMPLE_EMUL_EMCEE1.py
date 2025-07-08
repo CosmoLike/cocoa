@@ -182,16 +182,14 @@ theory:
     path: ./cobaya/cobaya/theories/
     stop_at_error: True
     extra_args:
-      eval: [True, True] # dL(z), H(z)
       device: "cuda"
-      method: ["INT", "NN"] # with INT, we will integrate H(z)
-      file:  [None,'external_modules/data/emultrf/BAO_SN_RES/chisquareH.pt']
-      extra: [None,'external_modules/data/emultrf/BAO_SN_RES/extrainfoH.npy']
-      tmat:  [None,'external_modules/data/emultrf/BAO_SN_RES/PCAH.npy']
-      zlin:  [None,'external_modules/data/emultrf/BAO_SN_RES/zlinlcdm.npy']       
+      file:  [None, 'external_modules/data/emultrf/BAO_SN_RES/chisquareH.pt']
+      extra: [None, 'external_modules/data/emultrf/BAO_SN_RES/extrainfoH.npy']    
       ord: [None, ['omegam','H0']]
-      extrapar: [{'ZMIN' : 0.0001, 'ZMAX' : 3, 'NZ' : 1200},
-                 {'offset' : 0.0000, 'INTDIM' : 1, 'NLAYER' : 1}]
+      extrapar: [{'MLA': 'INT', 'ZMIN' : 0.0001, 'ZMAX' : 3, 'NZ' : 600},
+                 {'MLA': 'ResMLP', 'offset' : 0.0, 'INTDIM' : 1, 'NLAYER' : 1,
+                  'TMAT': 'external_modules/data/emultrf/BAO_SN_RES/PCAH.npy',
+                  'ZLIN': 'external_modules/data/emultrf/BAO_SN_RES/zlinlcdm.npy'}]
 """
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------

@@ -214,29 +214,14 @@ theory:
     path: ./cobaya/cobaya/theories/
     stop_at_error: True
     extra_args:
-      eval: [True, True] # dL(z), H(z)
       device: "cuda"
-      #method: ["NN", "NN"]
-      #file:  ['external_modules/data/emultrf/BAO_SN_RES/chisquaredllog.pt',
-      #        'external_modules/data/emultrf/BAO_SN_RES/chisquareH.pt']
-      #extra: ['external_modules/data/emultrf/BAO_SN_RES/extrainfodl.npy',
-      #        'external_modules/data/emultrf/BAO_SN_RES/extrainfoH.npy']
-      #tmat:  ['external_modules/data/emultrf/BAO_SN_RES/PCAdl.npy',
-      #        'external_modules/data/emultrf/BAO_SN_RES/PCAH.npy']
-      #zlin:  ['external_modules/data/emultrf/BAO_SN_RES/zlinlcdm.npy',
-      #        'external_modules/data/emultrf/BAO_SN_RES/zlinlcdm.npy']       
-      #ord: [['omegam','H0'],
-      #      ['omegam','H0']]
-      #extrapar: [{'offset' : 4400.0, 'INTDIM' : 4, 'NLAYER' : 4},
-      #           {'offset' : 0.0000, 'INTDIM' : 1, 'NLAYER' : 1}]
-      method: ["INT", "NN"] # with INT, we will integrate H(z)
-      file:  [None,'external_modules/data/emultrf/BAO_SN_RES/chisquareH.pt']
-      extra: [None,'external_modules/data/emultrf/BAO_SN_RES/extrainfoH.npy']
-      tmat:  [None,'external_modules/data/emultrf/BAO_SN_RES/PCAH.npy']
-      zlin:  [None,'external_modules/data/emultrf/BAO_SN_RES/zlinlcdm.npy']       
+      file:  [None, 'external_modules/data/emultrf/BAO_SN_RES/chisquareH.pt']
+      extra: [None, 'external_modules/data/emultrf/BAO_SN_RES/extrainfoH.npy']    
       ord: [None, ['omegam','H0']]
-      extrapar: [{'ZMIN' : 0.0001, 'ZMAX' : 3, 'NZ' : 1200},
-                 {'offset' : 0.0000, 'INTDIM' : 1, 'NLAYER' : 1}]
+      extrapar: [{'MLA': 'INT', 'ZMIN' : 0.0001, 'ZMAX' : 3, 'NZ' : 600},
+                 {'MLA': 'ResMLP', 'offset' : 0.0, 'INTDIM' : 1, 'NLAYER' : 1,
+                  'TMAT': 'external_modules/data/emultrf/BAO_SN_RES/PCAH.npy',
+                  'ZLIN': 'external_modules/data/emultrf/BAO_SN_RES/zlinlcdm.npy'}]
 
 # CAMB FROM EXAMPLE_EVALUATE21.YAML
 #[evaluate]    chi2_mflike.TTTEEE = 2964.92
@@ -256,6 +241,13 @@ theory:
 #[evaluate]    omegam = 0.31383
 #[evaluate]    omegamh2 = 0.142939
 #[evaluate]    rdrag = 147.028
+
+#{'MLA': 'INT', 'ZMIN' : 0.0001, 'ZMAX' : 3, 'NZ' : 600}
+#[evaluate]    chi2_sn.roman_c = 70.9567
+#[evaluate]    chi2_sn.roman_o = 83.1507
+#[evaluate]    chi2_sn.desy5 = 1645.43
+#[evaluate]    chi2_bao.desi_2024_bao_all = 20.486
+#[evaluate]    chi2_bao.desi_dr2.desi_bao_all = 28.2202
 
 sampler:
   evaluate:
