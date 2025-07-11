@@ -62,12 +62,12 @@ theory:
     stop_at_error: True
     extra_args:
       device: "cuda"
-      file:  [None, 'external_modules/data/emultrf/BAO_SN_RES/chisquareH.pt']
-      extra: [None, 'external_modules/data/emultrf/BAO_SN_RES/extrainfoH.npy']    
+      file:  [None, 'external_modules/data/emultrf/BAO_SN_RES/emul_lcdm_H.pt']
+      extra: [None, 'external_modules/data/emultrf/BAO_SN_RES/extra_lcdm_H.npy']    
       ord: [None, ['omegam','H0']]
       extrapar: [{'MLA': 'INT', 'ZMIN' : 0.0001, 'ZMAX' : 3, 'NZ' : 600},
                  {'MLA': 'ResMLP', 'offset' : 0.0, 'INTDIM' : 1, 'NLAYER' : 1,
-                  'TMAT': 'external_modules/data/emultrf/BAO_SN_RES/PCAH.npy',
-                  'ZLIN': 'external_modules/data/emultrf/BAO_SN_RES/zlinlcdm.npy'}]
+                  'TMAT': 'external_modules/data/emultrf/BAO_SN_RES/PCA_lcdm_H.npy',
+                  'ZLIN': 'external_modules/data/emultrf/BAO_SN_RES/z_lin_lcdm.npy'}]
 
 output: ./projects/example/chains/EXAMPLE_EMUL_EVALUATE4

@@ -139,35 +139,32 @@ params:
 theory:
   emultheta:
     path: ./cobaya/cobaya/theories/
-    stop_at_error: True
     provides: ['H0', 'omegam']
     extra_args:
-      file: ['external_modules/data/emultrf/CMB_TRF/thetaH0GP.joblib']
-      extra: ['external_modules/data/emultrf/CMB_TRF/extrainfotheta.npy']
+      file: ['external_modules/data/emultrf/CMB_TRF/emul_lcdm_thetaH0_GP.joblib']
+      extra: ['external_modules/data/emultrf/CMB_TRF/extra_lcdm_thetaH0.npy']
       ord: [['omegabh2','omegach2','thetastar']]
       extrapar: [{'MLA' : "GP"}]
   emulrdrag:
     path: ./cobaya/cobaya/theories/
-    stop_at_error: True
     provides: ['rdrag']
     extra_args:
-      file: ['external_modules/data/emultrf/BAO_SN_RES/rdragGP.joblib'] 
-      extra: ['external_modules/data/emultrf/BAO_SN_RES/extrainfordrag.npy'] 
+      file: ['external_modules/data/emultrf/BAO_SN_RES/emul_lcdm_rdrag_GP.joblib'] 
+      extra: ['external_modules/data/emultrf/BAO_SN_RES/extra_lcdm_rdrag.npy'] 
       ord: [['omegabh2','omegach2']]
   emulcmb:
     path: ./cobaya/cobaya/theories/
-    stop_at_error: True
     extra_args:
       # This version of the emul was not trained with CosmoRec
       eval: [True, True, True, False] #TT,TE,EE,PHIPHI
       device: "cuda"
-      file: ['external_modules/data/emultrf/CMB_TRF/chiTTAstautrf1dot2milnewlhcevansqrtrescalec16.pt',
-             'external_modules/data/emultrf/CMB_TRF/chiTEAstautrf1dot2milnewlhcevansqrtrescalec16.pt',
-             'external_modules/data/emultrf/CMB_TRF/chiEEAstautrf1dot2milnewlhcevansqrtrescalec16.pt',
+      file: ['external_modules/data/emultrf/CMB_TRF/emul_lcdm_CMBTT_TRF.pt',
+             'external_modules/data/emultrf/CMB_TRF/emul_lcdm_CMBTE_TRF.pt',
+             'external_modules/data/emultrf/CMB_TRF/emul_lcdm_CMBEE_TRF.pt',
              None] 
-      extra: ['external_modules/data/emultrf/CMB_TRF/extrainfo_lhs_tt_96.npy',
-              'external_modules/data/emultrf/CMB_TRF/extrainfo_lhs_te_96.npy',
-              'external_modules/data/emultrf/CMB_TRF/extrainfo_lhs_ee_96.npy',
+      extra: ['external_modules/data/emultrf/CMB_TRF/extra_lcdm_CMBTT_TRF.npy',
+              'external_modules/data/emultrf/CMB_TRF/extra_lcdm_CMBTE_TRF.npy',
+              'external_modules/data/emultrf/CMB_TRF/extra_lcdm_CMBEE_TRF.npy',
               None]
       ord: [['omegabh2','omegach2','H0','tau','ns','logA','mnu','w','wa'],
             ['omegabh2','omegach2','H0','tau','ns','logA','mnu','w','wa'],
@@ -181,16 +178,14 @@ theory:
     path: ./cobaya/cobaya/theories/
     stop_at_error: True
     extra_args:
-      eval: [True, True] # dL(z), H(z)
       device: "cuda"
-      method: ["INT", "NN"] # with INT, we will integrate H(z)
-      file:  [None,'external_modules/data/emultrf/BAO_SN_RES/chisquareH.pt']
-      extra: [None,'external_modules/data/emultrf/BAO_SN_RES/extrainfoH.npy']
-      tmat:  [None,'external_modules/data/emultrf/BAO_SN_RES/PCAH.npy']
-      zlin:  [None,'external_modules/data/emultrf/BAO_SN_RES/zlinlcdm.npy']       
+      file:  [None, 'external_modules/data/emultrf/BAO_SN_RES/emul_lcdm_H.pt']
+      extra: [None, 'external_modules/data/emultrf/BAO_SN_RES/extra_lcdm_H.npy']    
       ord: [None, ['omegam','H0']]
-      extrapar: [{'ZMIN' : 0.0001, 'ZMAX' : 3, 'NZ' : 1200},
-                 {'offset' : 0.0000, 'INTDIM' : 1, 'NLAYER' : 1}]
+      extrapar: [{'MLA': 'INT', 'ZMIN' : 0.0001, 'ZMAX' : 3, 'NZ' : 600},
+                 {'MLA': 'ResMLP', 'offset' : 0.0, 'INTDIM' : 1, 'NLAYER' : 1,
+                  'TMAT': 'external_modules/data/emultrf/BAO_SN_RES/PCA_lcdm_H.npy',
+                  'ZLIN': 'external_modules/data/emultrf/BAO_SN_RES/z_lin_lcdm.npy'}]
 """
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
@@ -252,7 +247,8 @@ def chi2(p):
       res3 = logposterior["loglikes"].get("planck_2018_lowl.EE",-1e200)
       res4 = logposterior["loglikes"].get("sn.desy5",-1e200)
       res5 = logposterior["loglikes"].get("bao.desi_dr2.desi_bao_all",-1e200)
-      res  = -2.0*(res1 + res2 + res3 + res4 + res5)
+      res6 = logposterior["logpriors"].get("0",-1e20)
+      res  = -2.0*(res1 + res2 + res3 + res4 + res5 + res6)
     else:
       res = -2.0*(1e20)
     return res
@@ -274,13 +270,19 @@ def chi2v2(p):
       res3 = logposterior["loglikes"].get("planck_2018_lowl.EE",-1e20)
       res4 = logposterior["loglikes"].get("sn.desy5",-1e20)
       res5 = logposterior["loglikes"].get("bao.desi_dr2.desi_bao_all",-1e20)
-      return [-2.0*res1, 
-              -2.0*res2, 
-              -2.0*res3,
-              -2.0*res4,
-              -2.0*res5]
+      res6 = logposterior["logpriors"].get("0",-1e20)
+      return np.array([-2.0*res1, 
+                       -2.0*res2, 
+                       -2.0*res3,
+                       -2.0*res4,
+                       -2.0*res5,
+                       -2.0*res6], dtype='float64')
     else:
-      res [-2.0*(1e20), -2.0*(1e20), -2.0*(1e20), -2.0*(1e20), -2.0*(1e20)]
+      return np.array([-2.0*(1e20), 
+                       -2.0*(1e20), 
+                       -2.0*(1e20), 
+                       -2.0*(1e20), 
+                       -2.0*(1e20)], dtype='float64')
 
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
@@ -483,8 +485,8 @@ from cobaya.theories.emultheta.emultheta2 import emultheta
 
 etheta = emultheta(extra_args={ 
     'device': "cuda",
-    'file': ['external_modules/data/emultrf/CMB_TRF/thetaH0GP.joblib'],
-    'extra':['external_modules/data/emultrf/CMB_TRF/extrainfotheta.npy'],
+    'file': ['external_modules/data/emultrf/CMB_TRF/emul_lcdm_thetaH0_GP.joblib'],
+    'extra':['external_modules/data/emultrf/CMB_TRF/extra_lcdm_thetaH0.npy'],
     'ord':  [['omegabh2','omegach2','thetastar']],
     'extrapar': [{'MLA' : "GP"}]})
 
@@ -493,8 +495,8 @@ from cobaya.theories.emulrdrag.emulrdrag2 import emulrdrag
 
 # LCDM emulator. On this mass range, DE does not influence rd
 erd = emulrdrag(extra_args={ 
-    'file': ['external_modules/data/emultrf/BAO_SN_RES/rdragGP.joblib'] ,
-    'extra': ['external_modules/data/emultrf/BAO_SN_RES/extrainfordrag.npy'],
+    'file': ['external_modules/data/emultrf/BAO_SN_RES/emul_lcdm_rdrag_GP.joblib'] ,
+    'extra': ['external_modules/data/emultrf/BAO_SN_RES/extra_lcdm_rdrag.npy'],
     'ord':  [['omegabh2','omegach2']]})
 
 # ------------------------------------------------------------------------------

@@ -132,27 +132,25 @@ params:
 theory:
   emultheta:
     path: ./cobaya/cobaya/theories/
-    stop_at_error: True
     provides: ['H0', 'omegam']
     extra_args:
-      file: ['external_modules/data/emultrf/CMB_TRF/thetaH0GP.joblib']
-      extra: ['external_modules/data/emultrf/CMB_TRF/extrainfotheta.npy']
+      file: ['external_modules/data/emultrf/CMB_TRF/emul_lcdm_thetaH0_GP.joblib']
+      extra: ['external_modules/data/emultrf/CMB_TRF/extra_lcdm_thetaH0.npy']
       ord: [['omegabh2','omegach2','thetastar']]
       extrapar: [{'MLA' : "GP"}]
   emulcmb:
     path: ./cobaya/cobaya/theories/
-    stop_at_error: True
     extra_args:
       # This version of the emul was not trained with CosmoRec
       eval: [True, True, True, False] #TT,TE,EE,PHIPHI
       device: "cuda"
-      file: ['external_modules/data/emultrf/CMB_TRF/chiTTAstautrf1dot2milnewlhcevansqrtrescalec16.pt',
-             'external_modules/data/emultrf/CMB_TRF/chiTEAstautrf1dot2milnewlhcevansqrtrescalec16.pt',
-             'external_modules/data/emultrf/CMB_TRF/chiEEAstautrf1dot2milnewlhcevansqrtrescalec16.pt',
+      file: ['external_modules/data/emultrf/CMB_TRF/emul_lcdm_CMBTT_TRF.pt',
+             'external_modules/data/emultrf/CMB_TRF/emul_lcdm_CMBTE_TRF.pt',
+             'external_modules/data/emultrf/CMB_TRF/emul_lcdm_CMBEE_TRF.pt',
              None] 
-      extra: ['external_modules/data/emultrf/CMB_TRF/extrainfo_lhs_tt_96.npy',
-              'external_modules/data/emultrf/CMB_TRF/extrainfo_lhs_te_96.npy',
-              'external_modules/data/emultrf/CMB_TRF/extrainfo_lhs_ee_96.npy',
+      extra: ['external_modules/data/emultrf/CMB_TRF/extra_lcdm_CMBTT_TRF.npy',
+              'external_modules/data/emultrf/CMB_TRF/extra_lcdm_CMBTE_TRF.npy',
+              'external_modules/data/emultrf/CMB_TRF/extra_lcdm_CMBEE_TRF.npy',
               None]
       ord: [['omegabh2','omegach2','H0','tau','ns','logA','mnu','w','wa'],
             ['omegabh2','omegach2','H0','tau','ns','logA','mnu','w','wa'],
@@ -221,7 +219,8 @@ def chi2(p):
       res1 = logposterior["loglikes"].get("planck_2018_highl_plik.TTTEEE_lite",-1e200)
       res2 = logposterior["loglikes"].get("planck_2018_lowl.TT",-1e200)
       res3 = logposterior["loglikes"].get("planck_2018_lowl.EE",-1e200)
-      res  = -2.0*(res1 + res2 + res3)
+      res4 = logposterior["logpriors"].get("0",-1e20) 
+      res  = -2.0*(res1 + res2 + res3 + res4)
     else:
       res = -2.0*(1e20)
     return res
@@ -241,11 +240,16 @@ def chi2v2(p):
       res1 = logposterior["loglikes"].get("planck_2018_highl_plik.TTTEEE_lite",-1e20)
       res2 = logposterior["loglikes"].get("planck_2018_lowl.TT",-1e20)
       res3 = logposterior["loglikes"].get("planck_2018_lowl.EE",-1e20)
-      return [-2.0*res1, 
-              -2.0*res2, 
-              -2.0*res3]
+      res4 = logposterior["logpriors"].get("0",-1e20) 
+      return np.array([-2.0*res1, 
+                       -2.0*res2, 
+                       -2.0*res3,
+                       -2.0*res4], dtype='float64')
     else:
-      res [-2.0*(1e20), -2.0*(1e20), -2.0*(1e20)]
+      return np.array([-2.0*(1e20), 
+                       -2.0*(1e20), 
+                       -2.0*(1e20), 
+                       -2.0*(1e20)], dtype='float64')
 
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
@@ -448,8 +452,8 @@ from cobaya.theories.emultheta.emultheta2 import emultheta
 
 etheta = emultheta(extra_args={ 
     'device': "cuda",
-    'file': ['external_modules/data/emultrf/CMB_TRF/thetaH0GP.joblib'],
-    'extra':['external_modules/data/emultrf/CMB_TRF/extrainfotheta.npy'],
+    'file': ['external_modules/data/emultrf/CMB_TRF/emul_lcdm_thetaH0_GP.joblib'],
+    'extra':['external_modules/data/emultrf/CMB_TRF/extra_lcdm_thetaH0.npy'],
     'ord':  [['omegabh2','omegach2','thetastar']],
     'extrapar': [{'MLA' : "GP"}]})
 
@@ -506,11 +510,11 @@ if __name__ == '__main__':
                comments="# ")
     executor.shutdown()
 
-#HOW TO CALL THIS SCRIPT
-#mpirun -n 5 --oversubscribe --mca pml ^ucx  \
+#HOW TO CALL THIS SCRIPT (EXAMPLE)
+#mpirun -n 6 --oversubscribe --mca pml ^ucx  \
 #  --mca btl vader,tcp,self --bind-to core:overload-allowed \
 #  --rank-by slot --map-by core:pe=${OMP_NUM_THREADS}  \
 #  python -m mpi4py.futures ./projects/example/EXAMPLE_EMUL_PROFILE2.py \
-#  --nwalkers 5 --profile 1 --maxfeval 15 --numpts 4  \
+#  --nwalkers 5 --profile 1 --maxfeval 15000 --numpts 5  \
 #  --outroot "example_emul_profile2" --factor 5 \
 #  --cov 'EXAMPLE_EMUL_MCMC2.covmat'

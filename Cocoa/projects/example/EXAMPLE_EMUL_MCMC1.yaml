@@ -139,27 +139,25 @@ params:
 theory:
   emultheta:
     path: ./cobaya/cobaya/theories/
-    stop_at_error: True
     provides: ['H0', 'omegam']
     extra_args:
-      file: ['external_modules/data/emultrf/CMB_TRF/thetaH0GP.joblib']
-      extra: ['external_modules/data/emultrf/CMB_TRF/extrainfotheta.npy']
+      file: ['external_modules/data/emultrf/CMB_TRF/emul_lcdm_thetaH0_GP.joblib']
+      extra: ['external_modules/data/emultrf/CMB_TRF/extra_lcdm_thetaH0.npy']
       ord: [['omegabh2','omegach2','thetastar']]
       extrapar: [{'MLA' : "GP"}]
   emulcmb:
     path: ./cobaya/cobaya/theories/
-    stop_at_error: True
     extra_args:
       # This version of the emul was not trained with CosmoRec
       eval: [True, True, True, False] #TT,TE,EE,PHIPHI
       device: "cuda"
-      file: ['external_modules/data/emultrf/CMB_TRF/chiTTAstautrf1dot2milnewlhcevansqrtrescalec16.pt',
-             'external_modules/data/emultrf/CMB_TRF/chiTEAstautrf1dot2milnewlhcevansqrtrescalec16.pt',
-             'external_modules/data/emultrf/CMB_TRF/chiEEAstautrf1dot2milnewlhcevansqrtrescalec16.pt',
+      file: ['external_modules/data/emultrf/CMB_TRF/emul_lcdm_CMBTT_TRF.pt',
+             'external_modules/data/emultrf/CMB_TRF/emul_lcdm_CMBTE_TRF.pt',
+             'external_modules/data/emultrf/CMB_TRF/emul_lcdm_CMBEE_TRF.pt',
              None] 
-      extra: ['external_modules/data/emultrf/CMB_TRF/extrainfo_lhs_tt_96.npy',
-              'external_modules/data/emultrf/CMB_TRF/extrainfo_lhs_te_96.npy',
-              'external_modules/data/emultrf/CMB_TRF/extrainfo_lhs_ee_96.npy',
+      extra: ['external_modules/data/emultrf/CMB_TRF/extra_lcdm_CMBTT_TRF.npy',
+              'external_modules/data/emultrf/CMB_TRF/extra_lcdm_CMBTE_TRF.npy',
+              'external_modules/data/emultrf/CMB_TRF/extra_lcdm_CMBEE_TRF.npy',
               None]
       ord: [['omegabh2','omegach2','H0','tau','ns','logA','mnu','w','wa'],
             ['omegabh2','omegach2','H0','tau','ns','logA','mnu','w','wa'],

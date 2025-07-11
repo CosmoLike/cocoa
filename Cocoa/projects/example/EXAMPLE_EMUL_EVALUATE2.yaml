@@ -173,26 +173,24 @@ params:
 theory:
   emulrdrag:
     path: ./cobaya/cobaya/theories/
-    stop_at_error: True
     provides: ['rdrag']
     extra_args:
-      file: ['external_modules/data/emultrf/BAO_SN_RES/rdragGP.joblib'] 
-      extra: ['external_modules/data/emultrf/BAO_SN_RES/extrainfordrag.npy'] 
+      file: ['external_modules/data/emultrf/BAO_SN_RES/emul_lcdm_rdrag_GP.joblib'] 
+      extra: ['external_modules/data/emultrf/BAO_SN_RES/extra_lcdm_rdrag.npy'] 
       ord: [['omegabh2','omegach2']]
   emulcmb:
     path: ./cobaya/cobaya/theories/
-    stop_at_error: True
     extra_args:
       # This version of the emul was not trained with CosmoRec
       eval: [True, True, True, False] #TT,TE,EE,PHIPHI
       device: "cuda"
-      file: ['external_modules/data/emultrf/CMB_TRF/chiTTAstautrf1dot2milnewlhcevansqrtrescalec16.pt',
-             'external_modules/data/emultrf/CMB_TRF/chiTEAstautrf1dot2milnewlhcevansqrtrescalec16.pt',
-             'external_modules/data/emultrf/CMB_TRF/chiEEAstautrf1dot2milnewlhcevansqrtrescalec16.pt',
+      file: ['external_modules/data/emultrf/CMB_TRF/emul_lcdm_CMBTT_TRF.pt',
+             'external_modules/data/emultrf/CMB_TRF/emul_lcdm_CMBTE_TRF.pt',
+             'external_modules/data/emultrf/CMB_TRF/emul_lcdm_CMBEE_TRF.pt',
              None] 
-      extra: ['external_modules/data/emultrf/CMB_TRF/extrainfo_lhs_tt_96.npy',
-              'external_modules/data/emultrf/CMB_TRF/extrainfo_lhs_te_96.npy',
-              'external_modules/data/emultrf/CMB_TRF/extrainfo_lhs_ee_96.npy',
+      extra: ['external_modules/data/emultrf/CMB_TRF/extra_lcdm_CMBTT_TRF.npy',
+              'external_modules/data/emultrf/CMB_TRF/extra_lcdm_CMBTE_TRF.npy',
+              'external_modules/data/emultrf/CMB_TRF/extra_lcdm_CMBEE_TRF.npy',
               None]
       ord: [['omegabh2','omegach2','H0','tau','ns','logA','mnu','w','wa'],
             ['omegabh2','omegach2','H0','tau','ns','logA','mnu','w','wa'],
@@ -208,13 +206,13 @@ theory:
     stop_at_error: True
     extra_args:
       device: "cuda"
-      file:  [None, 'external_modules/data/emultrf/BAO_SN_RES/chisquareH.pt']
-      extra: [None, 'external_modules/data/emultrf/BAO_SN_RES/extrainfoH.npy']    
+      file:  [None, 'external_modules/data/emultrf/BAO_SN_RES/emul_lcdm_H.pt']
+      extra: [None, 'external_modules/data/emultrf/BAO_SN_RES/extra_lcdm_H.npy']    
       ord: [None, ['omegam','H0']]
       extrapar: [{'MLA': 'INT', 'ZMIN' : 0.0001, 'ZMAX' : 3, 'NZ' : 600},
                  {'MLA': 'ResMLP', 'offset' : 0.0, 'INTDIM' : 1, 'NLAYER' : 1,
-                  'TMAT': 'external_modules/data/emultrf/BAO_SN_RES/PCAH.npy',
-                  'ZLIN': 'external_modules/data/emultrf/BAO_SN_RES/zlinlcdm.npy'}]
+                  'TMAT': 'external_modules/data/emultrf/BAO_SN_RES/PCA_lcdm_H.npy',
+                  'ZLIN': 'external_modules/data/emultrf/BAO_SN_RES/z_lin_lcdm.npy'}]
 
 # CAMB FROM EXAMPLE_EVALUATE21.YAML
 #[evaluate]    chi2_mflike.TTTEEE = 2964.92
