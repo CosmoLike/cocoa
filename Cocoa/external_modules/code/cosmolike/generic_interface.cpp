@@ -3440,13 +3440,12 @@ vector compute_data_vector_3x2pt_fourier_masked_any_order(
 // ---------------------------------------------------------------------------
 // ---------------------------------------------------------------------------
 
-arma::Col<double> compute_data_vector_3x2pt_real_masked_any_order(
+arma::Col<double> compute_add_baryons_pcs_to_dark_matter_data_vector_3x2pt(
     arma::Col<double> Q,                // PC amplitudes
-    arma::Col<int>::fixed<3> order
+    arma::Col<double> dm_only_datavector
   )
 {
-  if (!BaryonScenario::get_instance().is_pcs_set())
-  {
+  if (!BaryonScenario::get_instance().is_pcs_set()) {
     spdlog::critical(
         "{}: {} not set prior to this function call",
         "compute_data_vector_3x2pt_real_masked_any_order", 
@@ -3454,8 +3453,7 @@ arma::Col<double> compute_data_vector_3x2pt_real_masked_any_order(
       );
     exit(1);
   }
-  if (BaryonScenario::get_instance().get_pcs().row(0).n_elem < Q.n_elem)
-  {
+  if (BaryonScenario::get_instance().get_pcs().row(0).n_elem < Q.n_elem) {
     spdlog::critical(
         "{}: invalid PC amplitude vector or PC eigenvectors",
         "compute_data_vector_3x2pt_real_masked_any_order"
@@ -3463,10 +3461,9 @@ arma::Col<double> compute_data_vector_3x2pt_real_masked_any_order(
     exit(1);
   }
 
-  arma::Col<double> dv = compute_data_vector_3x2pt_real_masked_any_order(order);
+  arma::Col<double>& dv = dm_only_datavector; // alias
   
-  if (BaryonScenario::get_instance().get_pcs().col(0).n_elem != dv.n_elem)
-  {
+  if (BaryonScenario::get_instance().get_pcs().col(0).n_elem != dv.n_elem) {
     spdlog::critical(
         "{}: invalid datavector or PC eigenvectors",
         "compute_data_vector_3x2pt_real_masked_any_order"
@@ -3478,8 +3475,20 @@ arma::Col<double> compute_data_vector_3x2pt_real_masked_any_order(
     for (int i=0; i<Q.n_elem; i++)
       if (IP::get_instance().get_mask(j))
         dv(j) += Q(i) * BaryonScenario::get_instance().get_pcs(j, i);
- 
   return dv;
+}
+
+// ---------------------------------------------------------------------------
+// ---------------------------------------------------------------------------
+// ---------------------------------------------------------------------------
+
+arma::Col<double> compute_data_vector_3x2pt_real_masked_any_order(
+    arma::Col<double> Q,                // PC amplitudes
+    arma::Col<int>::fixed<3> order
+  )
+{
+  arma::Col<double> dv = compute_data_vector_3x2pt_real_masked_any_order(order);
+  return compute_add_baryons_pcs_to_dark_matter_data_vector_3x2pt(Q, dv);
 }
 
 // ---------------------------------------------------------------------------
