@@ -2882,8 +2882,14 @@ double compute_pm(const int zl, const int zs, const double theta)
 // ---------------------------------------------------------------------------
 // ---------------------------------------------------------------------------
 // ---------------------------------------------------------------------------
+// ---------------------------------------------------------------------------
+// ---------------------------------------------------------------------------
+// ---------------------------------------------------------------------------
 
-void compute_ss_real_calib_masked(arma::Col<double>& data_vector, const int start)
+void compute_ss_real_add_shear_calib_and_mask(
+    arma::Col<double>& data_vector, 
+    const int start
+  )
 { // do not thread this function
   if (1 == like.shear_shear) {
     for (int nz=0; nz<tomo.shear_Npowerspectra; nz++) {
@@ -2895,17 +2901,26 @@ void compute_ss_real_calib_masked(arma::Col<double>& data_vector, const int star
           data_vector(index) *= (1.0 + nuisance.shear_calibration_m[z1])*
                                 (1.0 + nuisance.shear_calibration_m[z2]);
         }
+        else {
+          data_vector(index) = 0.0;
+        }
         index += Ntable.Ntheta*tomo.shear_Npowerspectra;
         if (IP::get_instance().get_mask(index)) {
           data_vector(index) *= (1.0 + nuisance.shear_calibration_m[z1])*
                                 (1.0 + nuisance.shear_calibration_m[z2]);
+        }
+        else {
+          data_vector(index) = 0.0;
         }
       }
     }
   }
 }
 
-void compute_ss_real_masked(arma::Col<double>& data_vector, const int start)
+void compute_ss_real_masked(
+    arma::Col<double>& data_vector, 
+    const int start
+  )
 { // do not thread this function
   if (1 == like.shear_shear) {
     for (int nz=0; nz<tomo.shear_Npowerspectra; nz++) {
@@ -2922,11 +2937,16 @@ void compute_ss_real_masked(arma::Col<double>& data_vector, const int start)
         }
       }
     }
-    compute_ss_real_calib_masked(data_vector, start);
+    compute_ss_real_add_shear_calib_and_mask(data_vector, start);
   }
 }
 
-void compute_ss_fourier_calib_masked(arma::Col<double>& data_vector, const int start)
+// ---------------------------------------------------------------------------
+
+void compute_ss_fourier_add_shear_calib_and_mask(
+    arma::Col<double>& data_vector, 
+    const int start
+  )
 { // do not thread this function
   if (1 == like.shear_shear) {
     for (int nz=0; nz<tomo.shear_Npowerspectra; nz++) {
@@ -2938,12 +2958,18 @@ void compute_ss_fourier_calib_masked(arma::Col<double>& data_vector, const int s
           data_vector(index) *= (1.0 + nuisance.shear_calibration_m[z1])*
                                 (1.0 + nuisance.shear_calibration_m[z2]);
         }
+        else {
+          data_vector(index) = 0.0;
+        }
       }
     }
   }
 }
 
-void compute_ss_fourier_masked(arma::Col<double>& data_vector, const int start)
+void compute_ss_fourier_masked(
+    arma::Col<double>& data_vector, 
+    const int start
+  )
 { // do not thread this function
   if (1 == like.shear_shear) {
     for (int nz=0; nz<tomo.shear_Npowerspectra; nz++) {
@@ -2956,15 +2982,16 @@ void compute_ss_fourier_masked(arma::Col<double>& data_vector, const int start)
         }
       }
     }
-    compute_ss_fourier_calib_masked(data_vector, start);
+    compute_ss_fourier_add_shear_calib_and_mask(data_vector, start);
   }
 }
 
 // ---------------------------------------------------------------------------
-// ---------------------------------------------------------------------------
-// ---------------------------------------------------------------------------
 
-void compute_gs_real_calib_masked(arma::Col<double>& data_vector, const int start)
+void compute_gs_real_add_shear_calib_and_mask(
+    arma::Col<double>& data_vector, 
+    const int start
+  )
 { // do not thread this function
   if (1 == like.shear_pos) {
     for (int nz=0; nz<tomo.ggl_Npowerspectra; nz++) {
@@ -2973,6 +3000,9 @@ void compute_gs_real_calib_masked(arma::Col<double>& data_vector, const int star
         const int index = start + Ntable.Ntheta*nz + i;
         if (IP::get_instance().get_mask(index)) {
           data_vector(index) *= (1.0+nuisance.shear_calibration_m[zs]);
+        }
+        else {
+          data_vector(index) = 0.0;
         }
       }
     }
@@ -2997,11 +3027,14 @@ void compute_gs_real_masked(arma::Col<double>& data_vector, const int start)
         }
       }
     }
-    compute_gs_real_calib_masked(data_vector, start);
+    compute_gs_real_add_shear_calib_and_mask(data_vector, start);
   }
 }  
 
-void compute_gs_fourier_calib_masked(arma::Col<double>& data_vector, const int start)
+void compute_gs_fourier_add_shear_calib_and_mask(
+    arma::Col<double>& data_vector, 
+    const int start
+  )
 { // do not thread this function
   if (1 == like.shear_pos) {
     for (int nz=0; nz<tomo.ggl_Npowerspectra; nz++) {
@@ -3010,6 +3043,9 @@ void compute_gs_fourier_calib_masked(arma::Col<double>& data_vector, const int s
         const int index = start + like.Ncl*nz + i;
         if (IP::get_instance().get_mask(index)) {
           data_vector(index) *= (1.0 + nuisance.shear_calibration_m[zs]);
+        }
+        else {
+          data_vector(index) = 0.0;
         }
       }
     }
@@ -3029,13 +3065,26 @@ void compute_gs_fourier_masked(arma::Col<double>& data_vector, const int start)
         }
       }
     }
-    compute_gs_fourier_calib_masked(data_vector, start);
+    compute_gs_fourier_add_shear_calib_and_mask(data_vector, start);
   }
 }
 
 // ---------------------------------------------------------------------------
-// ---------------------------------------------------------------------------
-// ---------------------------------------------------------------------------
+
+void compute_gg_real_add_mask(arma::Col<double>& data_vector, const int start)
+{ // do not thread this function
+  if (1 == like.pos_pos)
+  {
+    for (int nz=0; nz<tomo.clustering_Npowerspectra; nz++) {
+      for (int i=0; i<Ntable.Ntheta; i++) {
+        const int index = start + Ntable.Ntheta*nz + i;
+        if (!IP::get_instance().get_mask(index)) {
+          data_vector(index) = 0.0;
+        }
+      }
+    }
+  }
+}
 
 void compute_gg_real_masked(arma::Col<double>& data_vector, const int start)
 { // do not thread this function
@@ -3052,6 +3101,21 @@ void compute_gg_real_masked(arma::Col<double>& data_vector, const int start)
   }
 }
 
+void compute_gg_fourier_add_mask(arma::Col<double>& data_vector, const int start)
+{ // do not thread this function
+  if (1 == like.pos_pos)
+  {
+    for (int nz=0; nz<tomo.clustering_Npowerspectra; nz++) {
+      for (int i=0; i<like.Ncl; i++) {
+        const int index = start + like.Ncl*nz + i;
+        if (!IP::get_instance().get_mask(index)) {
+          data_vector(index) = 0.0;
+        }
+      }
+    }
+  }
+}
+
 void compute_gg_fourier_masked(arma::Col<double>& data_vector, const int start)
 { // do not thread this function
   if (1 == like.pos_pos)
@@ -3062,16 +3126,11 @@ void compute_gg_fourier_masked(arma::Col<double>& data_vector, const int start)
         if (IP::get_instance().get_mask(index)) {
           data_vector(index) = C_gg_tomo_limber(like.ell[i], nz, nz);
         }
-        else {
-          data_vector(index) = 0.0;
-        }
       }
     }
   }
 }
 
-// ---------------------------------------------------------------------------
-// ---------------------------------------------------------------------------
 // ---------------------------------------------------------------------------
 
 void compute_gk_real_masked(arma::Col<double>& data_vector, const int start)
@@ -3090,8 +3149,6 @@ void compute_gk_real_masked(arma::Col<double>& data_vector, const int start)
 }
 
 // ---------------------------------------------------------------------------
-// ---------------------------------------------------------------------------
-// ---------------------------------------------------------------------------
 
 void compute_ks_real_masked(arma::Col<double>& data_vector, const int start)
 { // do not thread this function
@@ -3109,8 +3166,6 @@ void compute_ks_real_masked(arma::Col<double>& data_vector, const int start)
   }
 }
 
-// ---------------------------------------------------------------------------
-// ---------------------------------------------------------------------------
 // ---------------------------------------------------------------------------
 
 void compute_kk_fourier_masked(arma::Col<double>& data_vector, const int start)
@@ -3316,37 +3371,42 @@ vector compute_data_vector_6x2pt_real_masked_any_order(
 // ---------------------------------------------------------------------------
 // ---------------------------------------------------------------------------
 // ---------------------------------------------------------------------------
-arma::Col<int>::fixed<3> compute_3x2pt_data_vector_sizes()
+// ---------------------------------------------------------------------------
+// ---------------------------------------------------------------------------
+// ---------------------------------------------------------------------------
+
+arma::Col<int>::fixed<3> compute_data_vector_3x2pt_real_sizes()
 {
-  spdlog::debug("{}: Begins", "get_3x2pt_data_vector_sizes");
+  spdlog::debug("{}: Begins", "compute_data_vector_3x2pt_real_sizes");
 
   if (0 == redshift.shear_nbin) [[unlikely]] {
     spdlog::critical("{}: {} = 0 is invalid",
-      "compute_data_vector_3x2pt_real_masked_any_order", "shear_Nbin");
+      "compute_data_vector_3x2pt_real_sizes", "shear_Nbin");
     exit(1);
   }
   if (0 == redshift.clustering_nbin) [[unlikely]] {
     spdlog::critical("{}: {} = 0 is invalid",
-        "compute_data_vector_3x2pt_real_masked_any_order", "clustering_Nbin");
+        "compute_data_vector_3x2pt_real_sizes", "clustering_Nbin");
     exit(1);
   }
   if (0 == Ntable.Ntheta) [[unlikely]] {
     spdlog::critical("{}: {} = 0 is invalid",
-      "compute_data_vector_3x2pt_real_masked_any_order", "Ntheta");
+      "compute_data_vector_3x2pt_real_sizes", "Ntheta");
     exit(1);
   }
   return arma::Col<int>::fixed<3>{2*Ntable.Ntheta*tomo.shear_Npowerspectra,
                                   Ntable.Ntheta*tomo.ggl_Npowerspectra,
                                   Ntable.Ntheta*tomo.clustering_Npowerspectra};
-  spdlog::debug("{}: Ends", "get_3x2pt_data_vector_sizes");
+  spdlog::debug("{}: Ends", "compute_data_vector_3x2pt_real_sizes");
 }
 
-
-arma::Col<int>::fixed<3> compute_3x2pt_data_vector_starts(arma::Col<int>::fixed<3> order)
+arma::Col<int>::fixed<3> compute_data_vector_3x2pt_real_starts(
+    arma::Col<int>::fixed<3> order
+  )
 {
-  spdlog::debug("{}: Begins", "get_3x2pt_data_vector_sizes");
+  spdlog::debug("{}: Begins", "compute_data_vector_3x2pt_real_starts");
   using namespace arma;
-  Col<int>::fixed<3> sizes = compute_3x2pt_data_vector_sizes();
+  Col<int>::fixed<3> sizes = compute_data_vector_3x2pt_real_sizes();
   auto indices = conv_to<Col<int>>::from(stable_sort_index(order, "ascend"));
   Col<int>::fixed<3> start = {0,0,0};
   for(int i=0; i<3; i++) {
@@ -3354,25 +3414,26 @@ arma::Col<int>::fixed<3> compute_3x2pt_data_vector_starts(arma::Col<int>::fixed<
       start(i) += sizes(indices(j));
     }
   } 
-  spdlog::debug("{}: Ends", "get_3x2pt_data_vector_sizes");
+  spdlog::debug("{}: Ends", "compute_data_vector_3x2pt_real_starts");
   return start;
 }
 
 // machine learning emulators do not compute fast parameters
-arma::Col<double> compute_add_shear_calib_3x2pt_real_masked_any_order(
+arma::Col<double> compute_add_shear_calib_and_mask_3x2pt_real_any_order(
     arma::Col<double> data_vector,
     arma::Col<int>::fixed<3> order) // order = (1,2,3): Cosmic Shear, ggl, gg
 { 
-  spdlog::debug("{}: Begins", "compute_add_shear_calib_3x2pt_real_masked_any_order");
+  spdlog::debug("{}: Begins","compute_add_shear_calib_and_mask_3x2pt_real_any_order");
   if (!IP::get_instance().is_mask_set()) [[unlikely]] {
     spdlog::critical("{}: {} not set prior to this function call",
-      "compute_data_vector_3x2pt_real_masked_any_order", "mask");
+      "compute_add_shear_calib_and_mask_3x2pt_real_any_order", "mask");
     exit(1);
   }
-  arma::Col<int>::fixed<3> start = compute_3x2pt_data_vector_starts(order);
-  compute_ss_real_calib_masked(data_vector, start(0));
-  compute_gs_real_calib_masked(data_vector, start(1));
-  spdlog::debug("{}: Ends", "compute_data_vector_3x2pt_real_masked_any_order");
+  arma::Col<int>::fixed<3> start = compute_data_vector_3x2pt_real_starts(order);
+  compute_ss_real_add_shear_calib_and_mask(data_vector, start(0));
+  compute_gs_fourier_add_shear_calib_and_mask(data_vector, start(1));
+  compute_gg_real_add_mask(data_vector, start(2));
+  spdlog::debug("{}: Ends","compute_add_shear_calib_and_mask_3x2pt_real_any_order");
   return data_vector;
 }
 
@@ -3385,7 +3446,7 @@ arma::Col<double> compute_data_vector_3x2pt_real_masked_any_order(
       "compute_data_vector_3x2pt_real_masked_any_order", "mask");
     exit(1);
   }
-  arma::Col<int>::fixed<3> start = compute_3x2pt_data_vector_starts(order);
+  arma::Col<int>::fixed<3> start = compute_data_vector_3x2pt_real_starts(order);
   arma::Col<double> data_vector(like.Ndata, arma::fill::zeros);
   compute_ss_real_masked(data_vector, start(0));
   compute_gs_real_masked(data_vector, start(1));
@@ -3394,112 +3455,150 @@ arma::Col<double> compute_data_vector_3x2pt_real_masked_any_order(
   return data_vector;
 }
 
-// ---------------------------------------------------------------------------
-// ---------------------------------------------------------------------------
-
-arma::Col<double> compute_data_vector_3x2pt_fourier_masked_any_order(
-    arma::Col<int>::fixed<3> order
-  )
-{ // order = (1,2,3) => Cosmic Shear, ggl, gg
-  spdlog::debug("{}: Begins", "compute_data_vector_3x2pt_fourier_masked_any_order");
-
-  if (0 == redshift.shear_nbin) [[unlikely]] {
+arma::Col<double> compute_add_baryons_pcs_to_dark_matter_data_vector_3x2pt_real(
+    arma::Col<double> Q,                // PC amplitudes
+    arma::Col<double> dm_only_datavector)
+{
+  spdlog::debug("{}: Begins", 
+                "compute_add_baryons_pcs_to_dark_matter_data_vector_3x2pt_real");
+  if (!BaryonScenario::get_instance().is_pcs_set()) [[unlikely]] {
     spdlog::critical(
-        "{}: {} = 0 is invalid",
-        "compute_data_vector_3x2pt_fourier_masked_any_order", 
-        "shear_Nbin"
+        "{}: {} not set prior to this function call",
+        "compute_add_baryons_pcs_to_dark_matter_data_vector_3x2pt_real", 
+        "baryon PCs"
       );
     exit(1);
   }
-  if (0 == like.Ncl) [[unlikely]] {
+  if (BaryonScenario::get_instance().get_pcs().row(0).n_elem < Q.n_elem) [[unlikely]] {
     spdlog::critical(
-        "{}: {} = 0 is invalid",
-        "compute_data_vector_3x2pt_fourier_masked_any_order", 
-        "Ncl"
+        "{}: invalid PC amplitude vector or PC eigenvectors",
+        "compute_add_baryons_pcs_to_dark_matter_data_vector_3x2pt_real"
       );
     exit(1);
   }
-
-  // check if there are not equal elements
-  constexpr int sz = 3;
-
-  // probe type indices, 0,1,2,... 
-  auto indices = arma::conv_to<arma::Col<int>>::from(
-      arma::stable_sort_index(order, "ascend")
-    );
-  // size of each probe type
-  arma::Col<int>::fixed<sz> sizes =
-    {
-      like.Ncl*tomo.shear_Npowerspectra,
-      like.Ncl*tomo.ggl_Npowerspectra,
-      like.Ncl*tomo.clustering_Npowerspectra
-    };
-  // the starting index of each probe
-  arma::Col<int>::fixed<sz> start = {0,0,0};
-  // for each probe
-  for(int i=0; i<sz; i++) {
-    for(int j=0; j<indices(i); j++) {
-      start(i) += sizes(indices(j));
+  arma::Col<double>& dv = dm_only_datavector; // alias
+  if (BaryonScenario::get_instance().get_pcs().col(0).n_elem != dv.n_elem) [[unlikely]] {
+    spdlog::critical(
+        "{}: invalid datavector or PC eigenvectors",
+        "compute_add_baryons_pcs_to_dark_matter_data_vector_3x2pt_real"
+      );
+    exit(1);
+  }
+  for (int j=0; j<dv.n_elem; j++) {
+    for (int i=0; i<Q.n_elem; i++) {
+      if (IP::get_instance().get_mask(j)) {
+        dv(j) += Q(i) * BaryonScenario::get_instance().get_pcs(j, i);
+      }
     }
   }
+  spdlog::debug("{}: Ends", 
+                "compute_add_baryons_pcs_to_dark_matter_data_vector_3x2pt_real");
+  return dv;
+}
 
-  spdlog::debug(
-      "{}: start from {:d} - {:d} - {:d}",
-      "compute_data_vector_3x2pt_fourier_masked_any_order", 
-      start(0),
-      start(1),
-      start(2)
-    );
-  
-  arma::Col<double> data_vector(like.Ndata, arma::fill::zeros);
-  
-  compute_ss_fourier_masked(data_vector, start(0));
-  spdlog::debug("compute_ss_fourier_masked done");
-
-  compute_gs_fourier_masked(data_vector, start(1));
-  spdlog::debug("compute_gs_fourier_masked done");
-
-  compute_gg_fourier_masked(data_vector, start(2));
-  spdlog::debug("compute_gg_fourier_masked done");
-
-  spdlog::debug(
-      "{}: Ends", 
-      "compute_data_vector_3x2pt_fourier_masked_any_order"
-    );
-  return data_vector;
+arma::Col<double> compute_data_vector_3x2pt_real_masked_any_order(
+    arma::Col<double> Q,                // PC amplitudes
+    arma::Col<int>::fixed<3> order)
+{
+  arma::Col<double> dv = compute_data_vector_3x2pt_real_masked_any_order(order);
+  return compute_add_baryons_pcs_to_dark_matter_data_vector_3x2pt_real(Q, dv);
 }
 
 // ---------------------------------------------------------------------------
 // ---------------------------------------------------------------------------
 // ---------------------------------------------------------------------------
+// ---------------------------------------------------------------------------
+// ---------------------------------------------------------------------------
+// ---------------------------------------------------------------------------
 
-arma::Col<double> compute_add_baryons_pcs_to_dark_matter_data_vector_3x2pt(
+arma::Col<int>::fixed<3> compute_data_vector_3x2pt_fourier_sizes()
+{
+  spdlog::debug("{}: Begins", "compute_data_vector_3x2pt_fourier_sizes");
+
+  if (0 == redshift.shear_nbin) [[unlikely]] {
+    spdlog::critical("{}: {} = 0 is invalid",
+      "compute_data_vector_3x2pt_fourier_sizes", "shear_Nbin");
+    exit(1);
+  }
+  if (0 == redshift.clustering_nbin) [[unlikely]] {
+    spdlog::critical("{}: {} = 0 is invalid",
+        "compute_data_vector_3x2pt_fourier_sizes", "clustering_Nbin");
+    exit(1);
+  }
+  if (0 == like.Ncl) [[unlikely]] {
+    spdlog::critical("{}: {} = 0 is invalid",
+        "compute_data_vector_3x2pt_fourier_sizes", "Ncl");
+    exit(1);
+  }
+  return arma::Col<int>::fixed<3>{2*like.Ncl*tomo.shear_Npowerspectra,
+                                  like.Ncl*tomo.ggl_Npowerspectra,
+                                  like.Ncl*tomo.clustering_Npowerspectra};
+  spdlog::debug("{}: Ends", "compute_data_vector_3x2pt_fourier_sizes");
+}
+
+arma::Col<int>::fixed<3> compute_data_vector_3x2pt_fourier_starts(
+    arma::Col<int>::fixed<3> order
+  )
+{
+  spdlog::debug("{}: Begins", "compute_data_vector_3x2pt_fourier_starts");
+  using namespace arma;
+  Col<int>::fixed<3> sizes = compute_data_vector_3x2pt_fourier_sizes();
+  auto indices = conv_to<Col<int>>::from(stable_sort_index(order, "ascend"));
+  Col<int>::fixed<3> start = {0,0,0};
+  for(int i=0; i<3; i++) {
+    for(int j=0; j<indices(i); j++) {
+      start(i) += sizes(indices(j));
+    }
+  } 
+  spdlog::debug("{}: Ends", "compute_data_vector_3x2pt_fourier_starts");
+  return start;
+}
+
+arma::Col<double> compute_data_vector_3x2pt_fourier_masked_any_order(
+    arma::Col<int>::fixed<3> order) // order = (1,2,3) => Cosmic Shear, ggl, gg
+{ 
+  spdlog::debug("{}: Begins", "compute_data_vector_3x2pt_fourier_masked_any_order");
+  if (!IP::get_instance().is_mask_set()) [[unlikely]] {
+    spdlog::critical("{}: {} not set prior to this function call",
+      "compute_data_vector_3x2pt_fourier_masked_any_order", "mask");
+    exit(1);
+  }
+  arma::Col<int>::fixed<3> start = compute_data_vector_3x2pt_fourier_starts(order);
+  arma::Col<double> data_vector(like.Ndata, arma::fill::zeros);
+  compute_ss_fourier_masked(data_vector, start(0));
+  compute_gs_fourier_masked(data_vector, start(1));
+  compute_gg_fourier_masked(data_vector, start(2));
+  spdlog::debug("{}: Ends", "compute_data_vector_3x2pt_fourier_masked_any_order");
+  return data_vector;
+}
+
+arma::Col<double> compute_add_baryons_pcs_to_dark_matter_data_vector_3x2pt_fourier(
     arma::Col<double> Q,                // PC amplitudes
     arma::Col<double> dm_only_datavector
   )
 {
-  if (!BaryonScenario::get_instance().is_pcs_set()) {
+  spdlog::debug("{}: Begins", 
+                "compute_add_baryons_pcs_to_dark_matter_data_vector_3x2pt_fourier");
+  if (!BaryonScenario::get_instance().is_pcs_set()) [[unlikely]] {
     spdlog::critical(
         "{}: {} not set prior to this function call",
-        "compute_data_vector_3x2pt_real_masked_any_order", 
+        "compute_add_baryons_pcs_to_dark_matter_data_vector_3x2pt_fourier", 
         "baryon PCs"
       );
     exit(1);
   }
-  if (BaryonScenario::get_instance().get_pcs().row(0).n_elem < Q.n_elem) {
+  if (BaryonScenario::get_instance().get_pcs().row(0).n_elem < Q.n_elem) [[unlikely]] {
     spdlog::critical(
         "{}: invalid PC amplitude vector or PC eigenvectors",
-        "compute_data_vector_3x2pt_real_masked_any_order"
+        "compute_add_baryons_pcs_to_dark_matter_data_vector_3x2pt_fourier"
       );
     exit(1);
   }
-
   arma::Col<double>& dv = dm_only_datavector; // alias
-  
-  if (BaryonScenario::get_instance().get_pcs().col(0).n_elem != dv.n_elem) {
+  if (BaryonScenario::get_instance().get_pcs().col(0).n_elem != dv.n_elem) [[unlikely]] {
     spdlog::critical(
         "{}: invalid datavector or PC eigenvectors",
-        "compute_data_vector_3x2pt_real_masked_any_order"
+        "compute_add_baryons_pcs_to_dark_matter_data_vector_3x2pt_fourier"
       );
     exit(1);
   }
@@ -3510,67 +3609,27 @@ arma::Col<double> compute_add_baryons_pcs_to_dark_matter_data_vector_3x2pt(
       }
     }
   }
+  spdlog::debug("{}: Ends", 
+                "compute_add_baryons_pcs_to_dark_matter_data_vector_3x2pt_fourier");
   return dv;
 }
-
-// ---------------------------------------------------------------------------
-// ---------------------------------------------------------------------------
-// ---------------------------------------------------------------------------
-
-arma::Col<double> compute_data_vector_3x2pt_real_masked_any_order(
-    arma::Col<double> Q,                // PC amplitudes
-    arma::Col<int>::fixed<3> order
-  )
-{
-  arma::Col<double> dv = compute_data_vector_3x2pt_real_masked_any_order(order);
-  return compute_add_baryons_pcs_to_dark_matter_data_vector_3x2pt(Q, dv);
-}
-
-// ---------------------------------------------------------------------------
-// ---------------------------------------------------------------------------
-// ---------------------------------------------------------------------------
 
 arma::Col<double> compute_data_vector_3x2pt_fourier_masked_any_order(
     arma::Col<double> Q,                // PC amplitudes
-    arma::Col<int>::fixed<3> order
-  )
+    arma::Col<int>::fixed<3> order)
 {
-  if (!BaryonScenario::get_instance().is_pcs_set()) {
-    spdlog::critical(
-        "{}: {} not set prior to this function call",
-        "compute_data_vector_3x2pt_fourier_masked_any_order", 
-        "baryon PCs"
-      );
-    exit(1);
-  }
-  if (BaryonScenario::get_instance().get_pcs().row(0).n_elem < Q.n_elem) {
-    spdlog::critical(
-        "{}: invalid PC amplitude vector or PC eigenvectors",
-        "compute_data_vector_3x2pt_fourier_masked_any_order"
-      );
-    exit(1);
-  }
-
   arma::Col<double> dv = compute_data_vector_3x2pt_fourier_masked_any_order(order);
-  
-  if (BaryonScenario::get_instance().get_pcs().col(0).n_elem != dv.n_elem) {
-    spdlog::critical(
-        "{}: invalid datavector or PC eigenvectors",
-        "compute_data_vector_3x2pt_fourier_masked_any_order"
-      );
-    exit(1);
-  }
-
-  for (int j=0; j<dv.n_elem; j++) {
-    for (int i=0; i<Q.n_elem; i++) {
-      if (IP::get_instance().get_mask(j)) {
-        dv(j) += Q(i) * BaryonScenario::get_instance().get_pcs(j, i);
-      }
-    }
-  }
- 
-  return dv;
+  return compute_add_baryons_pcs_to_dark_matter_data_vector_3x2pt_fourier(Q, dv);
 }
+
+// ---------------------------------------------------------------------------
+// ---------------------------------------------------------------------------
+// ---------------------------------------------------------------------------
+// ---------------------------------------------------------------------------
+// ---------------------------------------------------------------------------
+// ---------------------------------------------------------------------------
+
+
 
 // ---------------------------------------------------------------------------
 // ---------------------------------------------------------------------------

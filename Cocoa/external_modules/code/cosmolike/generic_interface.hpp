@@ -660,11 +660,6 @@ arma::Col<double> compute_data_vector_3x2pt_real_masked_any_order(
     arma::Col<int>::fixed<3> order
   );
 
-arma::Col<double> compute_add_baryons_pcs_to_dark_matter_data_vector_3x2pt(
-    arma::Col<double> Q,                // PC amplitudes
-    arma::Col<double> dm_only_datavector
-  );
-
 arma::Col<double> compute_data_vector_3x2pt_real_masked_any_order(
     arma::Col<double> Q,                // PC amplitudes
     arma::Col<int>::fixed<3> order
@@ -683,15 +678,23 @@ arma::Col<double> compute_data_vector_3x2pt_fourier_masked_any_order(
 // Functions relevant for machine learning emulators
 // ------------------------------------------------------------------
 
-// machine learning emulators do not compute fast parameters
-arma::Col<double> compute_add_shear_calib_3x2pt_real_masked_any_order(
-    arma::Col<double> data_vector,
-    arma::Col<int>::fixed<3> order
+arma::Col<double> compute_add_baryons_pcs_to_dark_matter_data_vector_3x2pt_real(
+    arma::Col<double> Q,                // PC amplitudes
+    arma::Col<double> dm_only_datavector
   );
 
-// we need to complete the data vector with zeros in case we ask
-//  only for cosmic shear (or ggl or gg)
-arma::Col<int>::fixed<3> compute_3x2pt_data_vector_sizes();
+arma::Col<double> compute_add_baryons_pcs_to_dark_matter_data_vector_3x2pt_fourier(
+    arma::Col<double> Q,                // PC amplitudes
+    arma::Col<double> dm_only_datavector
+  );
+
+arma::Col<double> compute_add_shear_calib_and_mask_3x2pt_real_any_order(
+    arma::Col<double> data_vector,
+    arma::Col<int>::fixed<3> order
+  ); // ML emulators do not compute fast parameters
+
+arma::Col<int>::fixed<3> compute_data_vector_3x2pt_real_sizes();
+arma::Col<int>::fixed<3> compute_data_vector_3x2pt_fourier_sizes();
 
 }  // namespace cosmolike_interface
 #endif // HEADER GUARD
