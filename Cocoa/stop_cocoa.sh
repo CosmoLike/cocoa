@@ -160,6 +160,10 @@ if [[ -z "${IGNORE_EMULTRF_CODE}" ]]; then
     rm -f "${COBTH:?}/${TMP:?}"
   fi
 
+  TMP="emul_cosmic_shear"
+  if [[ -L "${COBTH:?}/${TMP:?}" ]]; then
+    rm -f "${COBTH:?}/${TMP:?}"
+  fi
   unset -v COBTH TMP
 fi
 

@@ -1249,9 +1249,7 @@ void init_IA(const int IA_MODEL, const int IA_REDSHIFT_EVOL)
 // ---------------------------------------------------------------------------
 // ---------------------------------------------------------------------------
 
-void init_probes(
-    std::string possible_probes
-  )
+void init_probes(std::string possible_probes)
 {
   boost::trim_if(possible_probes, boost::is_any_of("\t "));
   possible_probes = boost::algorithm::to_lower_copy(possible_probes);
@@ -1582,11 +1580,7 @@ void init_ggl_exclude(arma::Col<int> ggl_exclude)
     if (std::isnan(ggl_exclude(i))) {
       // can't compile cosmolike with -O3 or -fast-math
       // see: https://stackoverflow.com/a/47703550/2472169
-      spdlog::critical(
-        "{}: NaN found on index {}.", 
-        "init_ggl_exclude",
-        i
-      );
+      spdlog::critical("{}: NaN found on index {}.", "init_ggl_exclude", i);
       exit(1);
     }
     tomo.ggl_exclude[i] = ggl_exclude(i);
@@ -1721,10 +1715,7 @@ void set_distances(arma::Col<double> io_z, arma::Col<double> io_chi)
       if (std::isnan(io_z(i)) || std::isnan(io_chi(i))) [[unlikely]] {
         // can't compile cosmolike with -O3 or -fast-math
         // see: https://stackoverflow.com/a/47703550/2472169
-        spdlog::critical(
-          "{}: NaN found on interpolation table.", 
-          "set_distances"
-        );
+        spdlog::critical("{}: NaN found on interpolation table.", "set_distances");
         exit(1);
       }
       cosmology.chi[0][i] = io_z(i);
@@ -1801,10 +1792,7 @@ void set_growth(arma::Col<double> io_z, arma::Col<double> io_G)
       if (std::isnan(io_z(i)) || std::isnan(io_G(i))) [[unlikely]] {
         // can't compile cosmolike with -O3 or -fast-math
         // see: https://stackoverflow.com/a/47703550/2472169
-        spdlog::critical(
-          "{}: NaN found on interpolation table.", 
-          "set_growth"
-        );
+        spdlog::critical("{}: NaN found on interpolation table.", "set_growth");
         exit(1);
       }
       cosmology.G[0][i] = io_z(i);
@@ -1902,10 +1890,7 @@ void set_linear_power_spectrum(
       if (std::isnan(io_log10k(i))) [[unlikely]] {
         // can't compile cosmolike with -O3 or -fast-math
         // see: https://stackoverflow.com/a/47703550/2472169
-        spdlog::critical(
-          "{}: NaN found on interpolation table.", 
-          "set_linear_power_spectrum"
-        );
+        spdlog::critical("{}: NaN found on interpolation table.", "set_linear_power_spectrum");
         exit(1);
       }
       cosmology.lnPL[i][cosmology.lnPL_nz] = io_log10k(i);
@@ -1916,10 +1901,7 @@ void set_linear_power_spectrum(
       if (std::isnan(io_z(j))) [[unlikely]] {
         // can't compile cosmolike with -O3 or -fast-math
         // see: https://stackoverflow.com/a/47703550/2472169
-        spdlog::critical(
-          "{}: NaN found on interpolation table.", 
-          "set_linear_power_spectrum"
-        );
+        spdlog::critical("{}: NaN found on interpolation table.", "set_linear_power_spectrum");
         exit(1);
       }
       cosmology.lnPL[cosmology.lnPL_nk][j] = io_z(j);
@@ -1931,10 +1913,7 @@ void set_linear_power_spectrum(
         if (std::isnan(io_lnP(i*cosmology.lnP_nz+j))) [[unlikely]] {
           // can't compile cosmolike with -O3 or -fast-math
           // see: https://stackoverflow.com/a/47703550/2472169
-          spdlog::critical(
-            "{}: NaN found on interpolation table.", 
-            "set_linear_power_spectrum"
-          );
+          spdlog::critical("{}: NaN found on interpolation table.", "set_linear_power_spectrum");
           exit(1);
         }
         cosmology.lnPL[i][j] = io_lnP(i*cosmology.lnPL_nz+j);
@@ -2165,7 +2144,6 @@ void set_nuisance_shear_photoz(arma::Col<double> SP)
   if (1 == cache_update || 1 == force_cache_update_test) {
     nuisance.random_photoz_shear = RandomNumber::get_instance().get();
   }
-
   spdlog::debug("{}: Ends", "set_nuisance_shear_photoz");
 }
 
@@ -2905,57 +2883,80 @@ double compute_pm(const int zl, const int zs, const double theta)
 // ---------------------------------------------------------------------------
 // ---------------------------------------------------------------------------
 
-void compute_ss_real_masked(arma::Col<double>& data_vector, const int start)
+void compute_ss_real_calib_masked(arma::Col<double>& data_vector, const int start)
 { // do not thread this function
-  if (1 == like.shear_shear)
-  {
-    for (int nz=0; nz<tomo.shear_Npowerspectra; nz++)
-    {
+  if (1 == like.shear_shear) {
+    for (int nz=0; nz<tomo.shear_Npowerspectra; nz++) {
       const int z1 = Z1(nz);
       const int z2 = Z2(nz);
-
-      for (int i=0; i<Ntable.Ntheta; i++)
-      {
+      for (int i=0; i<Ntable.Ntheta; i++) {
         int index = start + Ntable.Ntheta*nz + i;
-        
         if (IP::get_instance().get_mask(index)) {
-          data_vector(index) = xi_pm_tomo(1, i, z1, z2, 1)*
-            (1.0 + nuisance.shear_calibration_m[z1])*
-            (1.0 + nuisance.shear_calibration_m[z2]);
+          data_vector(index) *= (1.0 + nuisance.shear_calibration_m[z1])*
+                                (1.0 + nuisance.shear_calibration_m[z2]);
         }
-        
         index += Ntable.Ntheta*tomo.shear_Npowerspectra;
-        
         if (IP::get_instance().get_mask(index)) {
-          data_vector(index) = xi_pm_tomo(-1, i, z1, z2, 1)*
-            (1.0 + nuisance.shear_calibration_m[z1])*
-            (1.0 + nuisance.shear_calibration_m[z2]);
+          data_vector(index) *= (1.0 + nuisance.shear_calibration_m[z1])*
+                                (1.0 + nuisance.shear_calibration_m[z2]);
         }
       }
     }
   }
 }
 
-
-void compute_ss_fourier_masked(arma::Col<double>& data_vector, const int start)
+void compute_ss_real_masked(arma::Col<double>& data_vector, const int start)
 { // do not thread this function
-  if (1 == like.shear_shear)
-  {
+  if (1 == like.shear_shear) {
+    for (int nz=0; nz<tomo.shear_Npowerspectra; nz++) {
+      const int z1 = Z1(nz);
+      const int z2 = Z2(nz);
+      for (int i=0; i<Ntable.Ntheta; i++) {
+        int index = start + Ntable.Ntheta*nz + i;
+        if (IP::get_instance().get_mask(index)) {
+          data_vector(index) = xi_pm_tomo(1, i, z1, z2, 1);
+        }  
+        index += Ntable.Ntheta*tomo.shear_Npowerspectra;
+        if (IP::get_instance().get_mask(index)) {
+          data_vector(index) = xi_pm_tomo(-1, i, z1, z2, 1);
+        }
+      }
+    }
+    compute_ss_real_calib_masked(data_vector, start);
+  }
+}
+
+void compute_ss_fourier_calib_masked(arma::Col<double>& data_vector, const int start)
+{ // do not thread this function
+  if (1 == like.shear_shear) {
     for (int nz=0; nz<tomo.shear_Npowerspectra; nz++) {
       const int z1 = Z1(nz);
       const int z2 = Z2(nz);
       for (int i=0; i<like.Ncl; i++) {
         const int index = start + like.Ncl*nz + i;
-        if (IP::get_instance().get_mask(index)&&(like.ell[i]<like.lmax_shear)) {
-          data_vector(index) = C_ss_tomo_limber(like.ell[i], z1, z2, 1)*
-            (1.0 + nuisance.shear_calibration_m[z1])*
-            (1.0 + nuisance.shear_calibration_m[z2]);
-        }
-        else {
-          data_vector(index) = 0.0;
+        if (IP::get_instance().get_mask(index) && (like.ell[i]<like.lmax_shear)) {
+          data_vector(index) *= (1.0 + nuisance.shear_calibration_m[z1])*
+                                (1.0 + nuisance.shear_calibration_m[z2]);
         }
       }
     }
+  }
+}
+
+void compute_ss_fourier_masked(arma::Col<double>& data_vector, const int start)
+{ // do not thread this function
+  if (1 == like.shear_shear) {
+    for (int nz=0; nz<tomo.shear_Npowerspectra; nz++) {
+      const int z1 = Z1(nz);
+      const int z2 = Z2(nz);
+      for (int i=0; i<like.Ncl; i++) {
+        const int index = start + like.Ncl*nz + i;
+        if (IP::get_instance().get_mask(index) && (like.ell[i]<like.lmax_shear)) {
+          data_vector(index) = C_ss_tomo_limber(like.ell[i], z1, z2, 1);
+        }
+      }
+    }
+    compute_ss_fourier_calib_masked(data_vector, start);
   }
 }
 
@@ -2963,52 +2964,72 @@ void compute_ss_fourier_masked(arma::Col<double>& data_vector, const int start)
 // ---------------------------------------------------------------------------
 // ---------------------------------------------------------------------------
 
+void compute_gs_real_calib_masked(arma::Col<double>& data_vector, const int start)
+{ // do not thread this function
+  if (1 == like.shear_pos) {
+    for (int nz=0; nz<tomo.ggl_Npowerspectra; nz++) {
+      const int zs = ZS(nz);
+      for (int i=0; i<Ntable.Ntheta; i++) {
+        const int index = start + Ntable.Ntheta*nz + i;
+        if (IP::get_instance().get_mask(index)) {
+          data_vector(index) *= (1.0+nuisance.shear_calibration_m[zs]);
+        }
+      }
+    }
+  }
+}
+
 void compute_gs_real_masked(arma::Col<double>& data_vector, const int start)
 { // do not thread this function
-  if (1 == like.shear_pos)
-  {
+  if (1 == like.shear_pos) {
     for (int nz=0; nz<tomo.ggl_Npowerspectra; nz++) {
       const int zl = ZL(nz);
       const int zs = ZS(nz);
       for (int i=0; i<Ntable.Ntheta; i++) {
         const int index = start + Ntable.Ntheta*nz + i;
-        
         if (IP::get_instance().get_mask(index)) {
           const double logdt=(std::log(Ntable.vtmax)-std::log(Ntable.vtmin))/Ntable.Ntheta;
           const double thetamin = std::exp(log(Ntable.vtmin) + (i+0.) * logdt);
           const double thetamax = std::exp(log(Ntable.vtmin) + (i+1.) * logdt);
           const double theta = (2./3.) * (std::pow(thetamax,3) - std::pow(thetamin,3)) /
                                          (thetamax*thetamax    - thetamin*thetamin);
-          data_vector(index) = (w_gammat_tomo(i,zl,zs,1)+
-            compute_pm(zl,zs,theta))*(1.0+nuisance.shear_calibration_m[zs]);
+          data_vector(index) = (w_gammat_tomo(i,zl,zs,1)+compute_pm(zl,zs,theta));
+        }
+      }
+    }
+    compute_gs_real_calib_masked(data_vector, start);
+  }
+}  
+
+void compute_gs_fourier_calib_masked(arma::Col<double>& data_vector, const int start)
+{ // do not thread this function
+  if (1 == like.shear_pos) {
+    for (int nz=0; nz<tomo.ggl_Npowerspectra; nz++) {
+      const int zs = ZS(nz);
+      for (int i=0; i<like.Ncl; i++) {
+        const int index = start + like.Ncl*nz + i;
+        if (IP::get_instance().get_mask(index)) {
+          data_vector(index) *= (1.0 + nuisance.shear_calibration_m[zs]);
         }
       }
     }
   }
 }
 
-// ---------------------------------------------------------------------------
-// ---------------------------------------------------------------------------
-// ---------------------------------------------------------------------------
-
 void compute_gs_fourier_masked(arma::Col<double>& data_vector, const int start)
 { // do not thread this function
-  if (1 == like.shear_pos)
-  {
+  if (1 == like.shear_pos) {
     for (int nz=0; nz<tomo.ggl_Npowerspectra; nz++) {
       const int zl = ZL(nz);
       const int zs = ZS(nz);
       for (int i=0; i<like.Ncl; i++) {
         const int index = start + like.Ncl*nz + i;
         if (IP::get_instance().get_mask(index)) {
-          data_vector(index) = C_gs_tomo_limber(like.ell[i], zl, zs)*
-              (1.0 + nuisance.shear_calibration_m[zs]);
-        }
-        else {
-          data_vector(index) = 0.0;
+          data_vector(index) = C_gs_tomo_limber(like.ell[i], zl, zs);
         }
       }
     }
+    compute_gs_fourier_calib_masked(data_vector, start);
   }
 }
 
@@ -3030,10 +3051,6 @@ void compute_gg_real_masked(arma::Col<double>& data_vector, const int start)
     }
   }
 }
-
-// ---------------------------------------------------------------------------
-// ---------------------------------------------------------------------------
-// ---------------------------------------------------------------------------
 
 void compute_gg_fourier_masked(arma::Col<double>& data_vector, const int start)
 { // do not thread this function
@@ -3145,11 +3162,8 @@ vector compute_data_vector_6x2pt_real_masked_any_order(
     arma::Col<int>::fixed<6> order
   )
 { // order = (1,2,3,4,5,6) => Cosmic Shear, ggl, gg, gk, sk, kk
-  spdlog::debug(
-      "{}: Begins", 
-      "compute_data_vector_6x2pt_real_masked_any_order"
-    );
-
+  spdlog::debug("{}: Begins", "compute_data_vector_6x2pt_real_masked_any_order");
+  
   if (0 == redshift.shear_nbin) [[unlikely]] {
     spdlog::critical(
         "{}: {} = 0 is invalid",
@@ -3166,8 +3180,7 @@ vector compute_data_vector_6x2pt_real_masked_any_order(
       );
     exit(1);
   }
-  if (1 == like.is_cmb_bandpower)
-  {
+  if (1 == like.is_cmb_bandpower) {
     if (!(like.Nbp > 0)) [[unlikely]]{
       spdlog::critical(
           "{}: {} not set prior to this function call",
@@ -3203,8 +3216,7 @@ vector compute_data_vector_6x2pt_real_masked_any_order(
       exit(1);
     }
   }
-  else
-  {
+  else {
     if (!(like.Ncl > 0)) [[unlikely]] {
       spdlog::critical(
           "{}: {} not set prior to this function call",
@@ -3304,16 +3316,18 @@ vector compute_data_vector_6x2pt_real_masked_any_order(
 // ---------------------------------------------------------------------------
 // ---------------------------------------------------------------------------
 // ---------------------------------------------------------------------------
-
-vector compute_data_vector_3x2pt_real_masked_any_order(
-    arma::Col<int>::fixed<3> order
-  )
-{ // order = (1,2,3) => Cosmic Shear, ggl, gg
-  spdlog::debug("{}: Begins", "compute_data_vector_3x2pt_real_masked_any_order");
+arma::Col<int>::fixed<3> compute_3x2pt_data_vector_sizes()
+{
+  spdlog::debug("{}: Begins", "get_3x2pt_data_vector_sizes");
 
   if (0 == redshift.shear_nbin) [[unlikely]] {
     spdlog::critical("{}: {} = 0 is invalid",
       "compute_data_vector_3x2pt_real_masked_any_order", "shear_Nbin");
+    exit(1);
+  }
+  if (0 == redshift.clustering_nbin) [[unlikely]] {
+    spdlog::critical("{}: {} = 0 is invalid",
+        "compute_data_vector_3x2pt_real_masked_any_order", "clustering_Nbin");
     exit(1);
   }
   if (0 == Ntable.Ntheta) [[unlikely]] {
@@ -3321,50 +3335,69 @@ vector compute_data_vector_3x2pt_real_masked_any_order(
       "compute_data_vector_3x2pt_real_masked_any_order", "Ntheta");
     exit(1);
   }
+  return arma::Col<int>::fixed<3>{2*Ntable.Ntheta*tomo.shear_Npowerspectra,
+                                  Ntable.Ntheta*tomo.ggl_Npowerspectra,
+                                  Ntable.Ntheta*tomo.clustering_Npowerspectra};
+  spdlog::debug("{}: Ends", "get_3x2pt_data_vector_sizes");
+}
+
+
+arma::Col<int>::fixed<3> compute_3x2pt_data_vector_starts(arma::Col<int>::fixed<3> order)
+{
+  spdlog::debug("{}: Begins", "get_3x2pt_data_vector_sizes");
+  using namespace arma;
+  Col<int>::fixed<3> sizes = compute_3x2pt_data_vector_sizes();
+  auto indices = conv_to<Col<int>>::from(stable_sort_index(order, "ascend"));
+  Col<int>::fixed<3> start = {0,0,0};
+  for(int i=0; i<3; i++) {
+    for(int j=0; j<indices(i); j++) {
+      start(i) += sizes(indices(j));
+    }
+  } 
+  spdlog::debug("{}: Ends", "get_3x2pt_data_vector_sizes");
+  return start;
+}
+
+// machine learning emulators do not compute fast parameters
+arma::Col<double> compute_add_shear_calib_3x2pt_real_masked_any_order(
+    arma::Col<double> data_vector,
+    arma::Col<int>::fixed<3> order) // order = (1,2,3): Cosmic Shear, ggl, gg
+{ 
+  spdlog::debug("{}: Begins", "compute_add_shear_calib_3x2pt_real_masked_any_order");
   if (!IP::get_instance().is_mask_set()) [[unlikely]] {
     spdlog::critical("{}: {} not set prior to this function call",
       "compute_data_vector_3x2pt_real_masked_any_order", "mask");
     exit(1);
   }
-
-  // check if there are not equal elements
-
-  constexpr int sz = 3;
-
-  auto indices = arma::conv_to<arma::Col<int>>::from(
-      arma::stable_sort_index(order, "ascend")
-    );
-
-  arma::Col<int>::fixed<sz> sizes =
-    {
-      2*Ntable.Ntheta*tomo.shear_Npowerspectra,
-      Ntable.Ntheta*tomo.ggl_Npowerspectra,
-      Ntable.Ntheta*tomo.clustering_Npowerspectra
-    };
-
-  arma::Col<int>::fixed<sz> start = {0,0,0};
-
-  for(int i=0; i<sz; i++)
-    for(int j=0; j<indices(i); j++)
-      start(i) += sizes(indices(j));
-  
-  vector data_vector(like.Ndata, arma::fill::zeros);
-  
-  compute_ss_real_masked(data_vector, start(0));
-
-  compute_gs_real_masked(data_vector, start(1));
-
-  compute_gg_real_masked(data_vector, start(2));
-
+  arma::Col<int>::fixed<3> start = compute_3x2pt_data_vector_starts(order);
+  compute_ss_real_calib_masked(data_vector, start(0));
+  compute_gs_real_calib_masked(data_vector, start(1));
   spdlog::debug("{}: Ends", "compute_data_vector_3x2pt_real_masked_any_order");
+  return data_vector;
+}
 
+arma::Col<double> compute_data_vector_3x2pt_real_masked_any_order(
+    arma::Col<int>::fixed<3> order) // order = (1,2,3): Cosmic Shear, ggl, gg
+{ 
+  spdlog::debug("{}: Begins", "compute_data_vector_3x2pt_real_masked_any_order");
+  if (!IP::get_instance().is_mask_set()) [[unlikely]] {
+    spdlog::critical("{}: {} not set prior to this function call",
+      "compute_data_vector_3x2pt_real_masked_any_order", "mask");
+    exit(1);
+  }
+  arma::Col<int>::fixed<3> start = compute_3x2pt_data_vector_starts(order);
+  arma::Col<double> data_vector(like.Ndata, arma::fill::zeros);
+  compute_ss_real_masked(data_vector, start(0));
+  compute_gs_real_masked(data_vector, start(1));
+  compute_gg_real_masked(data_vector, start(2));
+  spdlog::debug("{}: Ends", "compute_data_vector_3x2pt_real_masked_any_order");
   return data_vector;
 }
 
 // ---------------------------------------------------------------------------
 // ---------------------------------------------------------------------------
 
-vector compute_data_vector_3x2pt_fourier_masked_any_order(
+arma::Col<double> compute_data_vector_3x2pt_fourier_masked_any_order(
     arma::Col<int>::fixed<3> order
   )
 { // order = (1,2,3) => Cosmic Shear, ggl, gg
@@ -3418,7 +3451,7 @@ vector compute_data_vector_3x2pt_fourier_masked_any_order(
       start(2)
     );
   
-  vector data_vector(like.Ndata, arma::fill::zeros);
+  arma::Col<double> data_vector(like.Ndata, arma::fill::zeros);
   
   compute_ss_fourier_masked(data_vector, start(0));
   spdlog::debug("compute_ss_fourier_masked done");
@@ -3470,11 +3503,13 @@ arma::Col<double> compute_add_baryons_pcs_to_dark_matter_data_vector_3x2pt(
       );
     exit(1);
   }
-
-  for (int j=0; j<dv.n_elem; j++)
-    for (int i=0; i<Q.n_elem; i++)
-      if (IP::get_instance().get_mask(j))
+  for (int j=0; j<dv.n_elem; j++) {
+    for (int i=0; i<Q.n_elem; i++) {
+      if (IP::get_instance().get_mask(j)) {
         dv(j) += Q(i) * BaryonScenario::get_instance().get_pcs(j, i);
+      }
+    }
+  }
   return dv;
 }
 

@@ -176,37 +176,38 @@ if [[ -z "${IGNORE_COSMOPOWER_CODE}" ]]; then
 fi
 
 # ----------------------------------------------------------------------------
-# ----------------------------- CMB TRF THEORY -------------------------------
+# ----------------------------- EMUL TRF THEORY -------------------------------
 # ----------------------------------------------------------------------------
 if [[ -z "${IGNORE_EMULTRF_CODE}" ]]; then
   ECODEF="${ROOTDIR:?}/external_modules/code"
   COBTH="${ROOTDIR:?}/cobaya/cobaya/theories"
-
   TMP="${EMULTRF_NAME:-"emultrf"}"
+
   TMP2="emulcmb"
-
   if [[ ! -L "${COBTH:?}/${TMP2}" ]]; then
     ln -s "${ECODEF:?}/emulators/${TMP}/${TMP2}" "${COBTH:?}" \
       >${OUT1:?} 2>${OUT2:?} || { error_start_cocoa "${EC34:?}"; return 1; }
   fi
 
-  TMP="${EMULTRF_NAME:-"emultrf"}"
   TMP2="emulbaosn"
-
   if [[ ! -L "${COBTH:?}/${TMP2}" ]]; then
     ln -s "${ECODEF:?}/emulators/${TMP}/${TMP2}" "${COBTH:?}" \
       >${OUT1:?} 2>${OUT2:?} || { error_start_cocoa "${EC34:?}"; return 1; }
   fi
 
-  TMP="${EMULTRF_NAME:-"emultrf"}"
   TMP2="emultheta"
   if [[ ! -L "${COBTH:?}/${TMP2}" ]]; then
     ln -s "${ECODEF:?}/emulators/${TMP}/${TMP2}" "${COBTH:?}" \
       >${OUT1:?} 2>${OUT2:?} || { error_start_cocoa "${EC34:?}"; return 1; }
   fi
 
-  TMP="${EMULTRF_NAME:-"emultrf"}"
   TMP2="emulrdrag"
+  if [[ ! -L "${COBTH:?}/${TMP2}" ]]; then
+    ln -s "${ECODEF:?}/emulators/${TMP}/${TMP2}" "${COBTH:?}" \
+      >${OUT1:?} 2>${OUT2:?} || { error_start_cocoa "${EC34:?}"; return 1; }
+  fi
+
+  TMP2="emul_cosmic_shear"
   if [[ ! -L "${COBTH:?}/${TMP2}" ]]; then
     ln -s "${ECODEF:?}/emulators/${TMP}/${TMP2}" "${COBTH:?}" \
       >${OUT1:?} 2>${OUT2:?} || { error_start_cocoa "${EC34:?}"; return 1; }
