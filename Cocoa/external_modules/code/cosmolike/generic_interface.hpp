@@ -694,6 +694,7 @@ arma::Col<double> compute_add_shear_calib_and_mask_3x2pt_real_any_order(
   ); // ML emulators do not compute fast parameters
 
 arma::Col<int>::fixed<3> compute_data_vector_3x2pt_real_sizes();
+
 arma::Col<int>::fixed<3> compute_data_vector_3x2pt_fourier_sizes();
 
 }  // namespace cosmolike_interface
