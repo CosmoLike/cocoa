@@ -60,6 +60,8 @@ projects/cocoa_lsst_y1
 projects/cocoa_*
 projects/edemay2022
 projects/ede*
+projects/axions*
+projects/axi*
 
 external_modules/data/XXX
 external_modules/data/des_y1
