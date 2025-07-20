@@ -536,17 +536,34 @@ double w_gg_tomo(const int nt, const int ni, const int nj, const int limber)
       double ini = C_gg_tomo_limber(limits.LMIN_tab + 1, 0, 0);
     }
     #pragma GCC diagnostic pop
-    
+
+    #pragma omp parallel for collapse(2)
+    for (int nz=0; nz<NSIZE; nz++) {
+      for (int l=lmin; l<limits.LMIN_tab; l++) {
+        Cl[nz][l] = C_gg_tomo_limber_nointerp(l, nz, nz, 0);
+      }
+    }
+    #pragma omp parallel for collapse(2)
+    for (int nz=0; nz<NSIZE; nz++) {
+      for (int l=limits.LMIN_tab; l<limits.LMAX; l++) {
+        Cl[nz][l] = C_gg_tomo_limber(l, nz, nz);
+      }
+    }
+
     if (1 == limber)
     {
       #pragma omp parallel for collapse(2)
-      for (int nz=0; nz<NSIZE; nz++)
-        for (int l=lmin; l<limits.LMIN_tab; l++)
+      for (int nz=0; nz<NSIZE; nz++) {
+        for (int l=lmin; l<limits.LMIN_tab; l++) {
           Cl[nz][l] = C_gg_tomo_limber_nointerp(l, nz, nz, 0);
+        }
+      }
       #pragma omp parallel for collapse(2)
-      for (int nz=0; nz<NSIZE; nz++)
-        for (int l=limits.LMIN_tab; l<limits.LMAX; l++)
-          Cl[nz][l] = C_gg_tomo_limber( l, nz, nz);
+      for (int nz=0; nz<NSIZE; nz++) {
+        for (int l=limits.LMIN_tab; l<limits.LMAX; l++) {
+          Cl[nz][l] = C_gg_tomo_limber(l, nz, nz);
+        }
+      }
     }
     else
     {
@@ -568,17 +585,6 @@ double w_gg_tomo(const int nt, const int ni, const int nj, const int limber)
         }
       }
     }
-    for (int nz=0; nz<NSIZE; nz++) {
-      for (int i=0; i<Ntable.Ntheta; i++) {
-        double sum = 0.0;
-        #pragma omp parallel for reduction(+:sum)
-        for (int l=lmin; l<limits.LMAX; l++) {
-          sum += Pl[i][l]*Cl[nz][l];
-        }
-        w_vec[nz*Ntable.Ntheta + i] = sum;
-      }
-    }
-
     cache[0] = cosmology.random;
     cache[1] = nuisance.random_photoz_clustering;
     cache[2] = redshift.random_clustering;

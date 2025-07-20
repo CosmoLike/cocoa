@@ -164,6 +164,17 @@ if [[ -z "${IGNORE_EMULTRF_CODE}" ]]; then
   if [[ -L "${COBTH:?}/${TMP:?}" ]]; then
     rm -f "${COBTH:?}/${TMP:?}"
   fi
+
+  TMP="emul_ggl"
+  if [[ -L "${COBTH:?}/${TMP:?}" ]]; then
+    rm -f "${COBTH:?}/${TMP:?}"
+  fi
+  
+  TMP="emul_wtheta"
+  if [[ -L "${COBTH:?}/${TMP:?}" ]]; then
+    rm -f "${COBTH:?}/${TMP:?}"
+  fi
+
   unset -v COBTH TMP
 fi
 

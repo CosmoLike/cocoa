@@ -3591,10 +3591,10 @@ arma::Col<double> compute_add_fpm_6x2pt_real_any_order(
     arma::Col<double> data_vector, 
     arma::Col<int>::fixed<3> ord)
 { // machine learning emulators do not compute fast parameters (fp) nor mask (m)
-  spdlog::debug("{}: Begins","compute_add_fpm_3x2pt_real_any_order");
+  spdlog::debug("{}: Begins","compute_add_fpm_6x2pt_real_any_order");
   if (!IP::get_instance().is_mask_set()) [[unlikely]] {
     spdlog::critical("{}: {} not set prior to this function call",
-                     "compute_add_fpm_3x2pt_real_any_order", 
+                     "compute_add_fpm_6x2pt_real_any_order", 
                      "mask");
     exit(1);
   }
@@ -3606,7 +3606,7 @@ arma::Col<double> compute_add_fpm_6x2pt_real_any_order(
   compute_gk_real_add_mask(data_vector, start(3));
   compute_ks_real_add_shear_calib_and_mask(data_vector, start(4));
   compute_kk_real_add_mask(data_vector, start(5));
-  spdlog::debug("{}: Ends","compute_add_fpm_3x2pt_real_any_order");
+  spdlog::debug("{}: Ends","compute_add_fpm_6x2pt_real_any_order");
   return data_vector;
 }
 
@@ -3621,7 +3621,8 @@ arma::Col<double> compute_add_fpm_6x2pt_real_any_order(
 arma::Col<double> 
 compute_add_fpm_3x2pt_real_any_order(
     arma::Col<double> dv, 
-    arma::Col<int>::fixed<3> ord)
+    arma::Col<int>::fixed<3> ord,
+    const int force_exclude_pm)
 { // machine learning emulators do not compute fast parameters (fp) nor mask (m)
   spdlog::debug("{}: Begins","compute_add_fpm_3x2pt_real_any_order");
   if (!IP::get_instance().is_mask_set()) [[unlikely]] {
@@ -3632,7 +3633,9 @@ compute_add_fpm_3x2pt_real_any_order(
   }
   arma::Col<int>::fixed<3> start = compute_data_vector_3x2pt_real_starts(ord);
   compute_ss_real_add_shear_calib_and_mask(dv, start(0));
-  compute_gs_real_add_pm(dv, start(1));
+  if (force_exclude_pm == 0) {
+    compute_gs_real_add_pm(dv, start(1));
+  }
   compute_gs_real_add_shear_calib_and_mask(dv, start(1));
   compute_gg_real_add_mask(dv, start(2));
   spdlog::debug("{}: Ends","compute_add_fpm_3x2pt_real_any_order");
@@ -5007,7 +5010,6 @@ double PointMass::get_pm(
   constexpr double G_over_c2 = 1.6e-23;
   
   const double a_lens = 1.0/(1.0 + zmean(zl));
-  
   const double chi_lens = chi(a_lens);
 
   return 4*G_over_c2*this->pm_[zl]*1.e+13*

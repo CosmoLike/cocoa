@@ -678,7 +678,8 @@ arma::Col<double> compute_data_vector_3x2pt_fourier_masked_any_order(
 // ML emulators do not compute fast parameters (fp) nor mask (m)
 arma::Col<double> compute_add_fpm_3x2pt_real_any_order(
     arma::Col<double> data_vector,
-    arma::Col<int>::fixed<3> order); // order = (1,2,3): Cosmic Shear, ggl, gg; 
+    arma::Col<int>::fixed<3> order,
+    const int force_exclude_pm); // order = (1,2,3): Cosmic Shear, ggl, gg; 
 
 arma::Col<int>::fixed<6> compute_data_vector_6x2pt_real_sizes();
 arma::Col<int>::fixed<6> compute_data_vector_6x2pt_fourier_sizes();
