@@ -28,14 +28,15 @@ Cmb cmb =
 
 lim limits = 
 {
-  .a_min = 1.0/(1.0 + 10.0),    // a_min (z = 10, needed for CMB lensing)
+  .a_min = 1.0/(1.0 + 40.0),    // a_min (z = 40, needed for CMB lensing)
   .k_min_cH0 = 2.e-2,           // k_min_cH0
   .k_max_cH0 = 3.e+6,           // k_max_cH0
   .M_min = 1.0e+6,              // M_min
   .M_max = 1.0e+17,             // M_max
   .LMIN_tab = 20,               // LMIN_tab
   .LMAX_NOLIMBER = 150,         // LMAX_NOLIMBER
-  .LMAX = 100000,
+  //.LMAX = 100000,
+  .LMAX = 50000,
   .cluster_util_log_M_min = 12.0,
   .cluster_util_log_M_max = 15.9,
   .binned_P_lambda_obs_given_M_zmin_table = 0.20,
@@ -234,11 +235,11 @@ void reset_cmb_struct()
 void reset_Ntable_struct()
 {
   Ntable.random   = 0.0;
-  Ntable.N_a      = 300;                   // N_a       
+  Ntable.N_a      = 200;                   // N_a       
   Ntable.N_k_lin  = 500;                   // N_k_lin
   Ntable.N_k_nlin = 500;                   // N_k_nlin
-  Ntable.N_ell    = 350;                   // N_ell      
-  Ntable.Ntheta   = 250;                   // N_theta  
+  Ntable.N_ell    = 250;                   // N_ell      
+  Ntable.Ntheta   = 225;                   // N_theta  
   Ntable.N_M      = 1000;                  // N_M, M = mass (Halo Model)
   Ntable.NL_Nchi  = 500;                   // Cosmo2D - NL = NonLimber (NL_Nchi)
   Ntable.photoz_interpolation_type = 0;

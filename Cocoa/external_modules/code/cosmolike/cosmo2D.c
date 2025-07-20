@@ -22,9 +22,8 @@
 #include "radial_weights.h"
 #include "redshift_spline.h"
 #include "structs.h"
-
 #include "log.c/src/log.h"
- 
+
 static int include_HOD_GX = 0; // 0 or 1
 static int include_RSD_GS = 0; // 0 or 1 
 static int include_RSD_GG = 1; // 0 or 1 
@@ -399,7 +398,6 @@ double w_gammat_tomo(const int nt, const int ni, const int nj, const int limber)
       log_fatal("NonLimber not implemented");
       exit(1);
     }
-    
     for (int nz=0; nz<NSIZE; nz++) {
       for (int i=0; i<Ntable.Ntheta; i++) {
         double sum = 0.0;
@@ -537,19 +535,6 @@ double w_gg_tomo(const int nt, const int ni, const int nj, const int limber)
     }
     #pragma GCC diagnostic pop
 
-    #pragma omp parallel for collapse(2)
-    for (int nz=0; nz<NSIZE; nz++) {
-      for (int l=lmin; l<limits.LMIN_tab; l++) {
-        Cl[nz][l] = C_gg_tomo_limber_nointerp(l, nz, nz, 0);
-      }
-    }
-    #pragma omp parallel for collapse(2)
-    for (int nz=0; nz<NSIZE; nz++) {
-      for (int l=limits.LMIN_tab; l<limits.LMAX; l++) {
-        Cl[nz][l] = C_gg_tomo_limber(l, nz, nz);
-      }
-    }
-
     if (1 == limber)
     {
       #pragma omp parallel for collapse(2)
@@ -581,10 +566,21 @@ double w_gg_tomo(const int nt, const int ni, const int nj, const int limber)
       #pragma omp parallel for collapse(2)
       for (int nz=0; nz<NSIZE; nz++) { // LIMBER PART
         for (int l=limits.LMAX_NOLIMBER+1; l<limits.LMAX; l++) {
-          Cl[nz][l] = C_gg_tomo_limber( l, nz, nz);
+          Cl[nz][l] = C_gg_tomo_limber(l, nz, nz);
         }
       }
     }
+    for (int nz=0; nz<NSIZE; nz++) {
+      for (int i=0; i<Ntable.Ntheta; i++) {
+        double sum = 0.0;
+        #pragma omp parallel for reduction(+:sum)
+        for (int l=lmin; l<limits.LMAX; l++) {
+          sum += Pl[i][l]*Cl[nz][l];
+        }
+        w_vec[nz*Ntable.Ntheta + i] = sum;
+      }
+    }
+
     cache[0] = cosmology.random;
     cache[1] = nuisance.random_photoz_clustering;
     cache[2] = redshift.random_clustering;
@@ -1097,7 +1093,7 @@ double C_ss_tomo_limber_nointerp(
 
   if (w == NULL || fdiff(cache[0], Ntable.random))
   {
-    const size_t szint = 60 + 50 * (Ntable.high_def_integration);
+    const size_t szint = 40 + 40 * abs(Ntable.high_def_integration);
     if (w != NULL)  gsl_integration_glfixed_table_free(w);
     w = malloc_gslint_glfixed(szint);
     cache[0] = Ntable.random;
@@ -1400,7 +1396,7 @@ double C_gs_tomo_limber_nointerp(
   }
 
   if (NULL == w || fdiff(cache[0], Ntable.random)) {
-    const size_t szint = 60 + 50 * (Ntable.high_def_integration);
+    const size_t szint = 40 + 40 * abs(Ntable.high_def_integration);
     if (w != NULL)  {
       gsl_integration_glfixed_table_free(w);
     }
@@ -1491,7 +1487,6 @@ double C_gs_tomo_limber(const double l, const int ni, const int nj)
     cache[6] = Ntable.random;
     cache[7] = nuisance.random_galaxy_bias;
   }
-  
   double res = 0.0;
   if (test_zoverlap(ni,nj)) {
     const double lnl = log(l);
@@ -1655,7 +1650,7 @@ double C_gg_tomo_limber_linpsopt_nointerp(
   }
 
   if (NULL == w || fdiff(cache[0], Ntable.random)) {
-    const size_t szint = 60 + 50 * (Ntable.high_def_integration);
+    const size_t szint = 50 + 50 * abs(Ntable.high_def_integration);
     if (w != NULL) { 
       gsl_integration_glfixed_table_free(w);
     }
@@ -1895,7 +1890,7 @@ double C_gk_tomo_limber_nointerp(const double l, const int ni, const int init)
 
   if (w == NULL || fdiff(cache[0], Ntable.random))
   {
-    const size_t szint = 200 + 50 * (Ntable.high_def_integration);
+    const size_t szint = 80 + 50 * abs(Ntable.high_def_integration);
     if (w != NULL)  gsl_integration_glfixed_table_free(w);
     w = malloc_gslint_glfixed(szint);
     cache[0] = Ntable.random;
@@ -2047,7 +2042,7 @@ double C_ks_tomo_limber_nointerp(const double l, const int ni, const int init)
 
   if (w == NULL || fdiff(cache[0], Ntable.random))
   {
-    const size_t szint = 200 + 50 * (Ntable.high_def_integration);
+    const size_t szint = 80 + 50 * abs(Ntable.high_def_integration);
     if (w != NULL)  gsl_integration_glfixed_table_free(w);
     w = malloc_gslint_glfixed(szint);
     cache[0] = Ntable.random;
@@ -2171,7 +2166,7 @@ double C_kk_limber_nointerp(const double l, const int init)
   
   if (w == NULL || fdiff(cache[0], Ntable.random))
   {
-    const size_t szint = 200 + 50 * (Ntable.high_def_integration);
+    const size_t szint = 80 + 50 * abs(Ntable.high_def_integration);
     if (w != NULL)  gsl_integration_glfixed_table_free(w);
     w = malloc_gslint_glfixed(szint);
     cache[0] = Ntable.random;
@@ -2316,7 +2311,7 @@ double C_gy_tomo_limber_nointerp(const double l, const int ni, const int init)
 
   if (w == NULL || fdiff(cache[0], Ntable.random))
   {
-    const size_t szint = 200 + 50 * (Ntable.high_def_integration);
+    const size_t szint = 80 + 50 * abs(Ntable.high_def_integration);
     if (w != NULL)  gsl_integration_glfixed_table_free(w);
     w = malloc_gslint_glfixed(szint);
     cache[0] = Ntable.random;
@@ -2453,7 +2448,7 @@ double C_ys_tomo_limber_nointerp(const double l, const int ni, const int init)
 
   if (w == NULL || fdiff(cache[0], Ntable.random))
   {
-    const size_t szint = 200 + 50 * (Ntable.high_def_integration);
+    const size_t szint = 80 + 50 * abs(Ntable.high_def_integration);
     if (w != NULL)  gsl_integration_glfixed_table_free(w);
     w = malloc_gslint_glfixed(szint);
     cache[0] = Ntable.random;
@@ -2576,7 +2571,7 @@ double C_ky_limber_nointerp(const double l, const int init)
   
   if (w == NULL || fdiff(cache[0], Ntable.random))
   {
-    const size_t szint = 200 + 50 * (Ntable.high_def_integration);
+    const size_t szint = 80 + 50 * abs(Ntable.high_def_integration);
     if (w != NULL)  gsl_integration_glfixed_table_free(w);
     w = malloc_gslint_glfixed(szint);
     cache[0] = Ntable.random;
@@ -2674,7 +2669,7 @@ double C_yy_limber_nointerp(const double l, const int init)
   
   if (w == NULL || fdiff(cache[0], Ntable.random))
   {
-    const size_t szint = 200 + 50 * (Ntable.high_def_integration);
+    const size_t szint = 80 + 50 * abs(Ntable.high_def_integration);
     if (w != NULL)  gsl_integration_glfixed_table_free(w);
     w = malloc_gslint_glfixed(szint);
     cache[0] = Ntable.random;

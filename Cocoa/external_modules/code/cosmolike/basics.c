@@ -18,6 +18,7 @@
 #include <gsl/gsl_sf_gamma.h>
 #include <gsl/gsl_sf_legendre.h>
 #include <gsl/gsl_sf_trig.h>
+#include <gsl/gsl_interp.h>
 #include <gsl/gsl_spline.h>
 #include <gsl/gsl_math.h>
 
@@ -25,6 +26,24 @@
 #include "basics.h"
 
 #include "log.c/src/log.h"
+
+gsl_interp* malloc_gsl_interp(const int n)
+{
+  gsl_interp* result;
+
+  if (Ntable.photoz_interpolation_type == 0)
+    result = gsl_interp_alloc(gsl_interp_cspline, n);
+  else if (Ntable.photoz_interpolation_type == 1)
+    result = gsl_interp_alloc(gsl_interp_linear, n);
+  else
+    result = gsl_interp_alloc(gsl_interp_steffen, n);
+
+  if (result == NULL) {
+    log_fatal("array allocation failed");
+    exit(1);
+  }
+  return result;
+}
 
 gsl_spline* malloc_gsl_spline(const int n)
 {
@@ -37,8 +56,7 @@ gsl_spline* malloc_gsl_spline(const int n)
   else
     result = gsl_spline_alloc(gsl_interp_steffen, n);
 
-  if (result == NULL)
-  {
+  if (result == NULL) {
     log_fatal("array allocation failed");
     exit(1);
   }

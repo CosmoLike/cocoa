@@ -227,7 +227,6 @@ int N_ggl(int ni, int nj)
       }
     }
   }
-  
   if (ni < 0 || ni > redshift.clustering_nbin - 1 || 
       nj < 0 || nj > redshift.shear_nbin - 1)
   {
@@ -435,7 +434,7 @@ double zdistr_photoz(double zz, const int nj)
 {
   static double cache_redshift_nz_params_shear;
   static double** table = NULL;
-  static gsl_spline* photoz_splines[MAX_SIZE_ARRAYS+1];
+  static gsl_interp* photoz_splines[MAX_SIZE_ARRAYS+1];
   
   if (table == NULL || 
       fdiff(cache_redshift_nz_params_shear, redshift.random_shear))
@@ -486,14 +485,14 @@ double zdistr_photoz(double zz, const int nj)
 
     for (int i=0; i<ntomo+1; i++) {
       if (photoz_splines[i] != NULL) {
-        gsl_spline_free(photoz_splines[i]);
+        gsl_interp_free(photoz_splines[i]);
       }
-      photoz_splines[i] = malloc_gsl_spline(nzbins);
+      photoz_splines[i] = malloc_gsl_interp(nzbins);
     }
 
     #pragma omp parallel for
     for (int i=0; i<ntomo+1; i++) {
-      int status = gsl_spline_init(photoz_splines[i], 
+      int status = gsl_interp_init(photoz_splines[i], 
                                    table[ntomo+1], // z_v = table[ntomo+1]
                                    table[i], 
                                    nzbins);
@@ -517,11 +516,16 @@ double zdistr_photoz(double zz, const int nj)
   zz = zz - nuisance.photoz[0][0][nj];
   
   double res; 
-  if (zz <= table[ntomo+1][0] || zz >= table[ntomo+1][nzbins - 1]) { // z_v = table[ntomo+1]
+  if (zz <= table[ntomo+1][0] || zz >= table[ntomo+1][nzbins-1]) { // z_v = table[ntomo+1]
     res = 0.0;
   }
   else {
-    int status = gsl_spline_eval_e(photoz_splines[nj+1], zz, NULL, &res);
+    int status = gsl_interp_eval_e(photoz_splines[nj+1], 
+                                   table[ntomo+1],
+                                   table[nj+1],
+                                   zz, 
+                                   NULL, 
+                                   &res);
     if (status) {
       log_fatal(gsl_strerror(status));
       exit(1);
@@ -556,7 +560,7 @@ double zmean_source(int ni)
     if (table != NULL)  free(table);
     table = (double*) malloc1d(redshift.shear_nbin);
    
-    const size_t szint = 300 + 50 * (Ntable.high_def_integration);
+    const size_t szint = 200 + 50 * (Ntable.high_def_integration);
     gsl_integration_glfixed_table* w = malloc_gslint_glfixed(szint);
 
     #pragma GCC diagnostic push
@@ -567,8 +571,7 @@ double zmean_source(int ni)
     #pragma GCC diagnostic pop
 
     #pragma omp parallel for
-    for (int i=0; i<redshift.shear_nbin; i++) 
-    {
+    for (int i=0; i<redshift.shear_nbin; i++) {
       double ar[1] = {(double) i};
       gsl_function F;
       F.params = ar;
@@ -634,13 +637,12 @@ double pf_photoz(double zz, int nj)
 {
   static double cache_redshift_nz_params_clustering;
   static double** table = NULL;
-  static gsl_spline* photoz_splines[MAX_SIZE_ARRAYS+1];
+  static gsl_interp* photoz_splines[MAX_SIZE_ARRAYS+1];
 
   if (table == NULL || 
       fdiff(cache_redshift_nz_params_clustering, redshift.random_clustering)) 
   {  
-    if (table == NULL)
-    {
+    if (table == NULL) {
       for (int i=0; i<MAX_SIZE_ARRAYS+1; i++) 
         photoz_splines[i] = NULL;
     }
@@ -662,8 +664,7 @@ double pf_photoz(double zz, int nj)
     double NORM[MAX_SIZE_ARRAYS];
     double norm = 0;
     #pragma omp parallel for reduction( + : norm )
-    for (int i=0; i<ntomo; i++) 
-    {
+    for (int i=0; i<ntomo; i++) {
       NORM[i] = 0.0;
       for (int k=0; k<nzbins; k++) 
       {    
@@ -674,8 +675,7 @@ double pf_photoz(double zz, int nj)
     }
 
     #pragma omp parallel for
-    for (int k=0; k<nzbins; k++) 
-    { 
+    for (int k=0; k<nzbins; k++) { 
       table[0][k] = 0; // store normalization in table[0][:]
       for (int i=0; i<ntomo; i++) 
       {
@@ -685,21 +685,18 @@ double pf_photoz(double zz, int nj)
       }
     }
 
-    for (int i=0; i<ntomo+1; i++) 
-    {
-      if (photoz_splines[i] != NULL) gsl_spline_free(photoz_splines[i]);
-      photoz_splines[i] = malloc_gsl_spline(nzbins);
+    for (int i=0; i<ntomo+1; i++)  {
+      if (photoz_splines[i] != NULL) gsl_interp_free(photoz_splines[i]);
+      photoz_splines[i] = malloc_gsl_interp(nzbins);
     }
 
     #pragma omp parallel for
-    for (int i=0; i<ntomo+1; i++) 
-    {
-      int status = gsl_spline_init(photoz_splines[i], 
+    for (int i=0; i<ntomo+1; i++) {
+      int status = gsl_interp_init(photoz_splines[i], 
                                    table[ntomo+1], // z_v = table[ntomo+1]
                                    table[i], 
                                    nzbins);
-      if (status) 
-      {
+      if (status) {
         log_fatal(gsl_strerror(status));
         exit(1);
       }
@@ -711,27 +708,29 @@ double pf_photoz(double zz, int nj)
   const int ntomo  = redshift.clustering_nbin;
   const int nzbins = redshift.clustering_nzbins;
 
-  if (nj < 0 || nj > ntomo - 1) 
-  {
+  if (nj < 0 || nj > ntomo - 1) {
     log_fatal("nj = %d bin outside range (max = %d)", nj, ntomo);
     exit(1);
   }
   
   zz  = (zz - nuisance.photoz[1][0][nj]
-            - redshift.clustering_zdist_zmean[nj])/nuisance.photoz[1][1][nj] + redshift.clustering_zdist_zmean[nj];
+            - redshift.clustering_zdist_zmean[nj])/nuisance.photoz[1][1][nj] 
+        + redshift.clustering_zdist_zmean[nj];
 
   //zz  = zz - nuisance.photoz[1][0][nj];
   
   double res; 
-  if (zz <= table[ntomo+1][0] || zz >= table[ntomo+1][nzbins - 1])
-  { // z_v = table[ntomo+1]
+  if (zz <= table[ntomo+1][0] || zz >= table[ntomo+1][nzbins - 1]) { // z_v = table[ntomo+1]
     res = 0.0;
   }
-  else
-  {
-    int status = gsl_spline_eval_e(photoz_splines[nj+1], zz, NULL, &res);
-    if (status) 
-    {
+  else {
+    int status = gsl_interp_eval_e(photoz_splines[nj+1], 
+                                   table[ntomo+1],
+                                   table[nj+1],
+                                   zz, 
+                                   NULL, 
+                                   &res);
+    if (status) {
       log_fatal(gsl_strerror(status));
       exit(1);
     }
@@ -781,7 +780,7 @@ double zmean(const int ni)
     }
     table = (double*) malloc1d(redshift.clustering_nbin+1);
 
-    const size_t szint = 300 + 50 * (Ntable.high_def_integration);
+    const size_t szint = 200 + 50 * (Ntable.high_def_integration);
     gsl_integration_glfixed_table* w = malloc_gslint_glfixed(szint);
 
     #pragma GCC diagnostic push
@@ -792,8 +791,7 @@ double zmean(const int ni)
     #pragma GCC diagnostic pop
     
     #pragma omp parallel for
-    for (int i=0; i<redshift.clustering_nbin; i++) 
-    {
+    for (int i=0; i<redshift.clustering_nbin; i++) {
       double ar[1] = {(double) i};
       gsl_function F;
       F.params = ar;
@@ -814,8 +812,7 @@ double zmean(const int ni)
     cache_redshift_nz_params_clustering = redshift.random_clustering;
   }
 
-  if (ni < 0 || ni > redshift.clustering_nbin - 1)
-  {
+  if (ni < 0 || ni > redshift.clustering_nbin - 1) {
     log_fatal("invalid bin input ni = %d", ni);
     exit(1);
   }  
@@ -882,7 +879,7 @@ double g_tomo(double ainput, const int ni)
     }
     #pragma GCC diagnostic pop
     
-    const size_t szint = 250 + 50 * (Ntable.high_def_integration);
+    const size_t szint = 200 + 50 * (Ntable.high_def_integration);
     gsl_integration_glfixed_table* w = malloc_gslint_glfixed(szint);
 
     #pragma omp parallel for collapse(2)
@@ -1059,7 +1056,7 @@ double g_lens(double a, int ni)
     }
     #pragma GCC diagnostic pop 
 
-    const size_t szint = 275 + 50 * (Ntable.high_def_integration);
+    const size_t szint = 150 + 50 * (Ntable.high_def_integration);
     gsl_integration_glfixed_table* w = malloc_gslint_glfixed(szint);
 
     #pragma omp parallel for collapse(2)

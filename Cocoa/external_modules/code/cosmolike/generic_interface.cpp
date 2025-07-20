@@ -373,22 +373,30 @@ void initial_setup()
 
 void init_accuracy_boost(
     const double accuracy_boost, 
-    const double sampling_boost,
     const int integration_accuracy
   )
 {
-   // (imp on notebooks where users can change sampling_boost interactively
   static int N_a = 0;
   static int N_ell = 0;
+  static int LMAX = 0;
 
   if (0 == N_a) N_a = Ntable.N_a;
-  Ntable.N_a = static_cast<int>(ceil(N_a*sampling_boost));
+  Ntable.N_a = static_cast<int>(ceil(N_a*accuracy_boost));
   
   if (0 == N_ell) N_ell = Ntable.N_ell;
-  Ntable.N_ell = static_cast<int>(ceil(N_ell*sampling_boost));
+  Ntable.N_ell = static_cast<int>(ceil(N_ell*accuracy_boost));
 
-  Ntable.FPTboost = static_cast<int>(std::max(accuracy_boost-1.0, 0.0));
-  
+  if (accuracy_boost>1) {
+    Ntable.FPTboost = static_cast<int>(accuracy_boost-1.0);
+  }
+  else {
+    Ntable.FPTboost = 0.0;
+  }
+
+  if (0 == LMAX) LMAX = limits.LMAX;
+  if (accuracy_boost>1) {
+    limits.LMAX = static_cast<int>(LMAX + 15000*(accuracy_boost-1));
+  }
   /*  
   Ntable.N_k_lin = 
     static_cast<int>(ceil(Ntable.N_k_lin*sampling_boost));
@@ -400,10 +408,24 @@ void init_accuracy_boost(
     static_cast<int>(ceil(Ntable.N_M*sampling_boost));
   */
 
-  Ntable.high_def_integration = integration_accuracy;
+  if (accuracy_boost>1) {
+    Ntable.high_def_integration = int(integration_accuracy+3*(accuracy_boost-1));
+  }
+  else {
+    Ntable.high_def_integration = int(integration_accuracy);
+  }
 
   // update cache
   Ntable.random = RandomNumber::get_instance().get();
+}
+
+void init_accuracy_boost(
+    const double accuracy_boost, 
+    const double sampling_boost,
+    const int integration_accuracy
+  )
+{
+  init_accuracy_boost(accuracy_boost, integration_accuracy);
 }
 
 // ---------------------------------------------------------------------------
