@@ -466,7 +466,7 @@ double w_gg_tomo(const int nt, const int ni, const int nj, const int limber)
     if (Pl != NULL) {
       free(Pl);
     }
-    Pl = (double**) malloc2d(Ntable.Ntheta, limits.LMAX);;
+    Pl = (double**) malloc2d(Ntable.Ntheta, limits.LMAX);
     if (w_vec != NULL) {
       free(w_vec);
     }
