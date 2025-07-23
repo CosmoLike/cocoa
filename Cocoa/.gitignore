@@ -162,6 +162,7 @@ external_modules/code/emulators/soliket
 external_modules/code/emulators/so*
 external_modules/code/dark_emu*
 external_modules/code/cosmolike2
+external_modules/code/nautilus*
 
 cobaya/cobaya/likelihoods/XXX
 cobaya/cobaya/likelihoods/des_y1

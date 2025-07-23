@@ -59,11 +59,11 @@ export IGNORE_CAMSPEC_LIKELIHOOD_CODE=1
 export IGNORE_HYREC_CODE=1
 #export IGNORE_COSMOREC_CODE=1
 export IGNORE_MGCAMB_CODE=1
-#export IGNORE_EMULTRF_CODE=1 #SaraivanovZhongZhu (SZZ) transformer-based emul
-export IGNORE_COSMOPOWER_CODE=1
+#export IGNORE_EMULTRF_CODE=1     #SaraivanovZhongZhu (SZZ) transformer-based emul
+export IGNORE_COSMOPOWER_CODE=1   #unable to install cosmopower on modern python
 #export IGNORE_EUCLID_EMULATOR_V2_CODE=1
 export IGNORE_DARK_EMULATOR_CODE=1
-
+#export IGNORE_NAUTILUS_SAMPLER_CODE=1
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
@@ -169,7 +169,9 @@ if [ -z "${IGNORE_SIMONS_OBSERVATORY_LIKELIHOOD_CODE}" ]; then
   unset -v IGNORE_FGSPECTRA_CODE
 fi
 
-if [[ -z "${IGNORE_COSMOPOWER_CODE}" || -z "${IGNORE_EMULTRF_CODE}" ]]; then
+if [[ -z "${IGNORE_COSMOPOWER_CODE}" || 
+      -z "${IGNORE_EMULTRF_CODE}" || 
+      -z "${IGNORE_NAUTILUS_SAMPLER_CODE}" ]]; then
   unset -v IGNORE_EMULATOR_GPU_PIP_PACKAGES
 fi
 
@@ -215,6 +217,7 @@ if [ -n "${OVERWRITE_EXISTING_ALL_PACKAGES}" ]; then
   export OVERWRITE_EXISTING_COSMOPOWER_CODE=1
   export OVERWRITE_EXISTING_EMULTRF_CODE=1
   export OVERWRITE_EXISTING_DARK_EMULATOR_CODE=1
+  export OVERWRITE_EXISTING_NAUTILUS_CODE=1
 fi
 
 if [ -n "${REDOWNLOAD_EXISTING_ALL_DATA}" ]; then
@@ -350,6 +353,9 @@ export DARKEMULATOR_GIT_COMMIT="46df5972509624e2eeadc2bf3ac528b02333a7e2"
 export FASTPT_URL="https://github.com/jablazek/FAST-PT.git"
 export FASTPT_GIT_COMMIT="5e65ad23becaaae5b18aedcaacab99411df92b0f"
 
+export NAUTILUS_SAMPLER_URL="https://github.com/johannesulf/nautilus.git"
+export NAUTILUS_SAMPLER_GIT_COMMIT="fc5e84deffb96755b31b3f9834590e28ab5b6016"
+export NAUTILUS_SAMPLER_NAME="nautilus_sampler"
 # --------------------------------------------------------------------
 # --------------------------------------------------------------------
 # Cosmolike projects below -------------------------------------------

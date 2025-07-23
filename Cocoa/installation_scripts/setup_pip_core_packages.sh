@@ -66,7 +66,6 @@ if [ -z "${IGNORE_PIP_CORE_INSTALLATION}" ]; then
   # https://github.com/mpi4py/mpi4py/issues/335
   if [ -n "${COCOA_FORCE_NUMPY_1_23}" ]; then
     COCOA_NUMPY_VERSION='1.23.5'
-
     env MPICC=$MPI_CC_COMPILER ${PIP3:?} install \
         "numpy==${COCOA_NUMPY_VERSION:?}" \
         'mpi4py==4.0.3' \
@@ -78,7 +77,6 @@ if [ -z "${IGNORE_PIP_CORE_INSTALLATION}" ]; then
       >${OUT1:?} 2>${OUT2:?} || { error "(PIP-CORE-PACKAGES) ${EC13:?}"; return 1; }
   else
     COCOA_NUMPY_VERSION='1.26.3'
-
     env MPICC=$MPI_CC_COMPILER ${PIP3:?} install \
         "numpy==${COCOA_NUMPY_VERSION:?}" \
         'mpi4py==4.0.3' \
@@ -96,6 +94,7 @@ if [ -z "${IGNORE_PIP_CORE_INSTALLATION}" ]; then
       'ipyparallel==9.0.1' \
       'emcee== 3.1.6' \
       'sacc==1.0.2' \
+      'flit_core==3.12.0' \
     --no-cache-dir --prefer-binary --use-pep517 \
     --prefix="${ROOTDIR:?}/.local" \
     >${OUT1:?} 2>${OUT2:?} || { error "(PIP-CORE-PACKAGES) ${EC13:?}"; return 1; }
