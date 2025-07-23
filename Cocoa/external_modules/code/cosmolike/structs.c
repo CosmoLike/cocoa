@@ -236,10 +236,10 @@ void reset_Ntable_struct()
 {
   Ntable.LMAX     = 50000;
   Ntable.random   = 0.0;
-  Ntable.N_a      = 200;                   // N_a       
+  Ntable.N_a      = 225;                   // N_a       
   Ntable.N_k_lin  = 500;                   // N_k_lin
   Ntable.N_k_nlin = 500;                   // N_k_nlin
-  Ntable.N_ell    = 250;                   // N_ell      
+  Ntable.N_ell    = 300;                   // N_ell      
   Ntable.Ntheta   = 225;                   // N_theta  
   Ntable.N_M      = 1000;                  // N_M, M = mass (Halo Model)
   Ntable.NL_Nchi  = 500;                   // Cosmo2D - NL = NonLimber (NL_Nchi)

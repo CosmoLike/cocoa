@@ -1396,7 +1396,8 @@ double C_gs_tomo_limber_nointerp(
   }
 
   if (NULL == w || fdiff(cache[0], Ntable.random)) {
-    const size_t szint = 40 + 40 * abs(Ntable.high_def_integration);
+    // minimum 85 tested on jupyter notebook (affects some cross bins a lot on lsst-y1)
+    const size_t szint = 90 + 40 * abs(Ntable.high_def_integration);
     if (w != NULL)  {
       gsl_integration_glfixed_table_free(w);
     }
@@ -1650,7 +1651,8 @@ double C_gg_tomo_limber_linpsopt_nointerp(
   }
 
   if (NULL == w || fdiff(cache[0], Ntable.random)) {
-    const size_t szint = 50 + 50 * abs(Ntable.high_def_integration);
+    // minimum 85 tested on jupyter notebook (affects theta >200 a lot) on lsst-y1
+    const size_t szint = 90 + 50 * abs(Ntable.high_def_integration);
     if (w != NULL) { 
       gsl_integration_glfixed_table_free(w);
     }
