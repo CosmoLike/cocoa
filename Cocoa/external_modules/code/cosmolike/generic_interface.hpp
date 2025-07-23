@@ -407,9 +407,12 @@ almost_equal(T x, T y, int ulp = 100)
 // ---------------------------------------------------------------------------
 // ---------------------------------------------------------------------------
 
+void init_ntable_lmax(
+    const int lmax
+  );
+
 void init_accuracy_boost(
     const double accuracy_boost, 
-    const double sampling_boost,
     const int integration_accuracy
   );
 

@@ -119,13 +119,13 @@ double xi_pm_tomo(
     if (Glpm != NULL) {
       free(Glpm);
     }
-    Glpm = (double***) malloc3d(2, Ntable.Ntheta, limits.LMAX);
+    Glpm = (double***) malloc3d(2, Ntable.Ntheta, Ntable.LMAX);
     if (xipm != NULL) {
       free(xipm);
     }
     xipm = (double**) malloc2d(2, NSIZE*Ntable.Ntheta);
     
-    double*** P = (double***) malloc3d(4, Ntable.Ntheta, limits.LMAX + 1);
+    double*** P = (double***) malloc3d(4, Ntable.Ntheta, Ntable.LMAX + 1);
     double** Pmin  = P[0]; double** Pmax  = P[1];
     double** dPmin = P[2]; double** dPmax = P[3];
 
@@ -141,7 +141,7 @@ double xi_pm_tomo(
     #pragma omp parallel for collapse(2)
     for (int i=0; i<Ntable.Ntheta; i++)
     {
-      for (int l=0; l<(limits.LMAX+1); l++)
+      for (int l=0; l<(Ntable.LMAX+1); l++)
       {
         bin_avg r   = set_bin_average(i, l);
         Pmin[i][l]  = r.Pmin;
@@ -160,7 +160,7 @@ double xi_pm_tomo(
     }
     #pragma omp parallel for collapse(2)
     for (int i=0; i<Ntable.Ntheta; i++) {
-      for (int l=lmin; l<limits.LMAX; l++) {
+      for (int l=lmin; l<Ntable.LMAX; l++) {
         Glpm[0][i][l] = (2.*l+1)/(2.*M_PI*l*l*(l+1)*(l+1))*(
           -l*(l-1.)/2*(l+2./(2*l+1)) * (Pmin[i][l-1]-Pmax[i][l-1])
           -l*(l-1.)*(2.-l)/2 * (xmin[i]*Pmin[i][l]-xmax[i]*Pmax[i][l])
@@ -187,7 +187,7 @@ double xi_pm_tomo(
     if (Cl != NULL) {
       free(Cl);
     }
-    Cl = (double***) malloc3d(2, NSIZE, limits.LMAX); // Cl_EE=Cl[0], Cl_BB=Cl[1]
+    Cl = (double***) malloc3d(2, NSIZE, Ntable.LMAX); // Cl_EE=Cl[0], Cl_BB=Cl[1]
     for (int i=0; i<NSIZE; i++) {
       for (int l=0; l<lmin; l++) {
         Cl[0][i][l] = 0.0;
@@ -223,7 +223,7 @@ double xi_pm_tomo(
       #pragma omp parallel for collapse(3)
       for (int i=0; i<2; i++) {
         for (int nz=0; nz<NSIZE; nz++) {
-          for (int l=limits.LMIN_tab; l<limits.LMAX; l++) {
+          for (int l=limits.LMIN_tab; l<Ntable.LMAX; l++) {
             Cl[i][nz][l] = C_ss_tomo_limber(l, Z1(nz), Z2(nz), 1-i);
           }
         }
@@ -234,7 +234,7 @@ double xi_pm_tomo(
           double sum0 = 0.0;
           double sum1 = 0.0;
           #pragma omp parallel for reduction(+:sum0, sum1)
-          for (int l=lmin; l<limits.LMAX; l++) {
+          for (int l=lmin; l<Ntable.LMAX; l++) {
             const double c0 = Cl[0][nz][l];
             const double c1 = Cl[1][nz][l];
             sum0 += Glpm[0][i][l] * (c0 + c1);
@@ -306,14 +306,14 @@ double w_gammat_tomo(const int nt, const int ni, const int nj, const int limber)
     if (Pl != NULL) {
       free(Pl);
     }
-    Pl = (double**) malloc2d(Ntable.Ntheta, limits.LMAX);;
+    Pl = (double**) malloc2d(Ntable.Ntheta, Ntable.LMAX);;
     
     if (w_vec != NULL) {
       free(w_vec);
     }
     w_vec = (double*) calloc1d(NSIZE*Ntable.Ntheta);
 
-    double*** P = (double***) malloc3d(2, Ntable.Ntheta, limits.LMAX + 1);
+    double*** P = (double***) malloc3d(2, Ntable.Ntheta, Ntable.LMAX + 1);
     double** Pmin  = P[0]; double** Pmax  = P[1];
 
     double xmin[Ntable.Ntheta];
@@ -327,7 +327,7 @@ double w_gammat_tomo(const int nt, const int ni, const int nj, const int limber)
 
     #pragma omp parallel for collapse(2)
     for (int i=0; i<Ntable.Ntheta; i ++) {
-      for (int l=0; l<(limits.LMAX+1); l++) {
+      for (int l=0; l<(Ntable.LMAX+1); l++) {
         bin_avg r = set_bin_average(i, l);
         Pmin[i][l] = r.Pmin;
         Pmax[i][l] = r.Pmax;
@@ -340,7 +340,7 @@ double w_gammat_tomo(const int nt, const int ni, const int nj, const int limber)
     }
     #pragma omp parallel for collapse(2)
     for (int i=0; i<Ntable.Ntheta; i++) {
-      for (int l=lmin; l<limits.LMAX; l++) {
+      for (int l=lmin; l<Ntable.LMAX; l++) {
         Pl[i][l] = (2.*l+1)/(4.*M_PI*l*(l+1)*(xmin[i]-xmax[i]))
           *((l+2./(2*l+1.))*(Pmin[i][l-1]-Pmax[i][l-1])
           +(2-l)*(xmin[i]*Pmin[i][l]-xmax[i]*Pmax[i][l])
@@ -353,7 +353,7 @@ double w_gammat_tomo(const int nt, const int ni, const int nj, const int limber)
     if (Cl != NULL) {
       free(Cl);
     }
-    Cl = (double**) malloc2d(NSIZE, limits.LMAX);
+    Cl = (double**) malloc2d(NSIZE, Ntable.LMAX);
     for (int i=0; i<NSIZE; i++) {
       for (int l=0; l<lmin; l++) {
         Cl[i][l] = 0.0;
@@ -389,7 +389,7 @@ double w_gammat_tomo(const int nt, const int ni, const int nj, const int limber)
       }
       #pragma omp parallel for collapse(2)
       for (int nz=0; nz<NSIZE; nz++) {
-        for (int l=limits.LMIN_tab; l<limits.LMAX; l++) {    
+        for (int l=limits.LMIN_tab; l<Ntable.LMAX; l++) {    
           Cl[nz][l] = C_gs_tomo_limber(l, ZL(nz), ZS(nz));
         }
       }
@@ -402,7 +402,7 @@ double w_gammat_tomo(const int nt, const int ni, const int nj, const int limber)
       for (int i=0; i<Ntable.Ntheta; i++) {
         double sum = 0.0;
         #pragma omp parallel for reduction(+:sum)
-        for (int l=lmin; l<limits.LMAX; l++) {
+        for (int l=lmin; l<Ntable.LMAX; l++) {
           sum += Pl[i][l] * Cl[nz][l];
         }
         w_vec[nz * Ntable.Ntheta + i] = sum;
@@ -466,13 +466,13 @@ double w_gg_tomo(const int nt, const int ni, const int nj, const int limber)
     if (Pl != NULL) {
       free(Pl);
     }
-    Pl = (double**) malloc2d(Ntable.Ntheta, limits.LMAX);
+    Pl = (double**) malloc2d(Ntable.Ntheta, Ntable.LMAX);
     if (w_vec != NULL) {
       free(w_vec);
     }
     w_vec = (double*) calloc1d(NSIZE*Ntable.Ntheta);
 
-    double*** P = (double***) malloc3d(2, Ntable.Ntheta, limits.LMAX + 1);
+    double*** P = (double***) malloc3d(2, Ntable.Ntheta, Ntable.LMAX + 1);
     double** Pmin  = P[0]; double** Pmax  = P[1];
 
     double xmin[Ntable.Ntheta];
@@ -486,7 +486,7 @@ double w_gg_tomo(const int nt, const int ni, const int nj, const int limber)
 
     #pragma omp parallel for collapse(2)
     for (int i=0; i<Ntable.Ntheta; i++) {
-      for (int l=0; l<(limits.LMAX+1); l++) {
+      for (int l=0; l<(Ntable.LMAX+1); l++) {
         bin_avg r = set_bin_average(i,l);
         Pmin[i][l] = r.Pmin;
         Pmax[i][l] = r.Pmax;
@@ -500,7 +500,7 @@ double w_gg_tomo(const int nt, const int ni, const int nj, const int limber)
     }
     #pragma omp parallel for collapse(2)
     for (int i=0; i<Ntable.Ntheta; i++) {
-      for (int l=lmin; l<limits.LMAX; l++) { 
+      for (int l=lmin; l<Ntable.LMAX; l++) { 
         const double tmp = (1.0/(xmin[i] - xmax[i]))*(1. / (4.0 * M_PI));
         Pl[i][l] = tmp*(Pmin[i][l + 1] - Pmax[i][l + 1] 
                         - Pmin[i][l - 1] + Pmax[i][l - 1]);
@@ -512,7 +512,7 @@ double w_gg_tomo(const int nt, const int ni, const int nj, const int limber)
     if (Cl != NULL) {
       free(Cl);
     }
-    Cl = (double**) malloc2d(NSIZE, limits.LMAX);
+    Cl = (double**) malloc2d(NSIZE, Ntable.LMAX);
     for (int i=0; i<NSIZE; i++) {
       for (int l=0; l<lmin; l++) {
         Cl[i][l] = 0.0;
@@ -545,7 +545,7 @@ double w_gg_tomo(const int nt, const int ni, const int nj, const int limber)
       }
       #pragma omp parallel for collapse(2)
       for (int nz=0; nz<NSIZE; nz++) {
-        for (int l=limits.LMIN_tab; l<limits.LMAX; l++) {
+        for (int l=limits.LMIN_tab; l<Ntable.LMAX; l++) {
           Cl[nz][l] = C_gg_tomo_limber(l, nz, nz);
         }
       }
@@ -565,7 +565,7 @@ double w_gg_tomo(const int nt, const int ni, const int nj, const int limber)
       }
       #pragma omp parallel for collapse(2)
       for (int nz=0; nz<NSIZE; nz++) { // LIMBER PART
-        for (int l=limits.LMAX_NOLIMBER+1; l<limits.LMAX; l++) {
+        for (int l=limits.LMAX_NOLIMBER+1; l<Ntable.LMAX; l++) {
           Cl[nz][l] = C_gg_tomo_limber(l, nz, nz);
         }
       }
@@ -574,7 +574,7 @@ double w_gg_tomo(const int nt, const int ni, const int nj, const int limber)
       for (int i=0; i<Ntable.Ntheta; i++) {
         double sum = 0.0;
         #pragma omp parallel for reduction(+:sum)
-        for (int l=lmin; l<limits.LMAX; l++) {
+        for (int l=lmin; l<Ntable.LMAX; l++) {
           sum += Pl[i][l]*Cl[nz][l];
         }
         w_vec[nz*Ntable.Ntheta + i] = sum;
@@ -640,12 +640,12 @@ double w_gk_tomo(const int nt, const int ni, const int limber)
       fdiff(cache[3], Ntable.random))
   {
     if (Pl != NULL) free(Pl);
-    Pl = (double**) malloc2d(Ntable.Ntheta, limits.LMAX);;
+    Pl = (double**) malloc2d(Ntable.Ntheta, Ntable.LMAX);;
 
     if (w_vec != NULL) free(w_vec);
     w_vec = calloc1d(NSIZE*Ntable.Ntheta);
 
-    double*** P = (double***) malloc3d(2, Ntable.Ntheta, limits.LMAX + 1);
+    double*** P = (double***) malloc3d(2, Ntable.Ntheta, Ntable.LMAX + 1);
     double** Pmin  = P[0]; double** Pmax  = P[1];
 
     double xmin[Ntable.Ntheta];
@@ -660,7 +660,7 @@ double w_gk_tomo(const int nt, const int ni, const int limber)
     #pragma omp parallel for collapse(2)
     for (int i=0; i<Ntable.Ntheta; i++)
     {
-      for (int l=0; l<limits.LMAX; l++)
+      for (int l=0; l<Ntable.LMAX; l++)
       {
         bin_avg r = set_bin_average(i,l);
         Pmin[i][l] = r.Pmin;
@@ -676,7 +676,7 @@ double w_gk_tomo(const int nt, const int ni, const int limber)
     }
     #pragma omp parallel for collapse(2)
     for (int i=0; i<Ntable.Ntheta; i++) {
-      for (int l=lmin; l<limits.LMAX; l++) {
+      for (int l=lmin; l<Ntable.LMAX; l++) {
         const double tmp = (1.0/(xmin[i] - xmax[i]))*(1.0 / (4.0 * M_PI));
         Pl[i][l] = tmp*(Pmin[i][l + 1] - Pmax[i][l + 1] 
                         - Pmin[i][l - 1] + Pmax[i][l - 1]);
@@ -691,7 +691,7 @@ double w_gk_tomo(const int nt, const int ni, const int limber)
       fdiff(cache[3], Ntable.random) ||
       fdiff(cache[4], nuisance.random_galaxy_bias))
   { 
-    double** Cl = (double**) malloc2d(NSIZE, limits.LMAX);
+    double** Cl = (double**) malloc2d(NSIZE, Ntable.LMAX);
 
     const int lmin = 1;
     for (int i=0; i<NSIZE; i++)
@@ -716,7 +716,7 @@ double w_gk_tomo(const int nt, const int ni, const int limber)
       }
       #pragma omp parallel for collapse(2)
       for (int nz=0; nz<NSIZE; nz++) {
-        for (int l=limits.LMIN_tab; l<limits.LMAX; l++) {
+        for (int l=limits.LMIN_tab; l<Ntable.LMAX; l++) {
           Cl[nz][l] = C_gk_tomo_limber(l, nz)*beam_cmb(l)*w_pixel(l);
         }
       }
@@ -724,7 +724,7 @@ double w_gk_tomo(const int nt, const int ni, const int limber)
       for (int nz=0; nz<NSIZE; nz++) {
         for (int i=0; i<Ntable.Ntheta; i++) {
           w_vec[nz*Ntable.Ntheta+i] = 0;
-          for (int l=lmin; l<limits.LMAX; l++) {
+          for (int l=lmin; l<Ntable.LMAX; l++) {
             w_vec[nz*Ntable.Ntheta+i] += Pl[i][l]*Cl[nz][l];
           }
         }
@@ -786,12 +786,12 @@ double w_ks_tomo(const int nt, const int ni, const int limber)
   if (Pl == NULL || w_vec == NULL || fdiff(cache[4], Ntable.random))
   {
     if (Pl != NULL) free(Pl);
-    Pl = (double**) malloc2d(Ntable.Ntheta, limits.LMAX);;
+    Pl = (double**) malloc2d(Ntable.Ntheta, Ntable.LMAX);;
 
     if (w_vec != NULL) free(w_vec);
     w_vec = calloc1d(NSIZE*Ntable.Ntheta);
     
-    double*** P = (double***) malloc3d(2, Ntable.Ntheta, limits.LMAX + 1);
+    double*** P = (double***) malloc3d(2, Ntable.Ntheta, Ntable.LMAX + 1);
     double** Pmin  = P[0]; double** Pmax  = P[1];
 
     double xmin[Ntable.Ntheta];
@@ -806,7 +806,7 @@ double w_ks_tomo(const int nt, const int ni, const int limber)
     #pragma omp parallel for collapse(2)
     for (int i=0; i<Ntable.Ntheta; i++)
     {
-      for (int l=0; l<limits.LMAX; l++)
+      for (int l=0; l<Ntable.LMAX; l++)
       {
         bin_avg r = set_bin_average(i,l);
         Pmin[i][l] = r.Pmin;
@@ -822,7 +822,7 @@ double w_ks_tomo(const int nt, const int ni, const int limber)
     #pragma omp parallel for collapse(2)
     for (int i=0; i<Ntable.Ntheta; i++)
     {
-      for (int l=lmin; l<limits.LMAX; l++)
+      for (int l=lmin; l<Ntable.LMAX; l++)
       {
         Pl[i][l] = (2.*l+1)/(4.*M_PI*l*(l+1)*(xmin[i]-xmax[i]))
           *((l+2./(2*l+1.))*(Pmin[i][l-1]-Pmax[i][l-1])
@@ -840,7 +840,7 @@ double w_ks_tomo(const int nt, const int ni, const int limber)
       fdiff(cache[3], redshift.random_shear) || 
       fdiff(cache[4], Ntable.random))
   {
-    double** Cl = (double**) malloc2d(NSIZE, limits.LMAX);
+    double** Cl = (double**) malloc2d(NSIZE, Ntable.LMAX);
 
     const int lmin = 1;
     for (int i=0; i<NSIZE; i++)
@@ -864,7 +864,7 @@ double w_ks_tomo(const int nt, const int ni, const int limber)
          
       #pragma omp parallel for collapse(2)
       for (int nz=0; nz<NSIZE; nz++)
-        for (int l=limits.LMIN_tab; l<limits.LMAX; l++)   
+        for (int l=limits.LMIN_tab; l<Ntable.LMAX; l++)   
           Cl[nz][l] = C_ks_tomo_limber(l, nz)*beam_cmb(l)*w_pixel(l);
    
       #pragma omp parallel for collapse(2)
@@ -873,7 +873,7 @@ double w_ks_tomo(const int nt, const int ni, const int limber)
         for (int i=0; i<Ntable.Ntheta; i++)
         {
           w_vec[nz*Ntable.Ntheta+i] = 0;
-          for (int l=lmin; l<limits.LMAX; l++)
+          for (int l=lmin; l<Ntable.LMAX; l++)
             w_vec[nz*Ntable.Ntheta+i] += Pl[i][l]*Cl[nz][l];
         }
       }
@@ -1132,7 +1132,7 @@ double C_ss_tomo_limber(const double l, const int ni, const int nj, const int EE
   if (NULL == table || fdiff(cache[4], Ntable.random)) {
     nell   = Ntable.N_ell;
     lim[0] = log(fmax(limits.LMIN_tab - 1., 1.0));
-    lim[1] = log(limits.LMAX + 1);
+    lim[1] = log(Ntable.LMAX + 1);
     lim[2] = (lim[1] - lim[0]) / ((double) nell - 1.);
     if (table != NULL) {
       free(table);
@@ -1441,7 +1441,7 @@ double C_gs_tomo_limber(const double l, const int ni, const int nj)
   if (NULL == table || fdiff(cache[6], Ntable.random)) {
     nell   = Ntable.N_ell;
     lim[0] = log(fmax(limits.LMIN_tab, 1.0));
-    lim[1] = log(limits.LMAX + 1);
+    lim[1] = log(Ntable.LMAX + 1);
     lim[2] = (lim[1] - lim[0]) / ((double) nell - 1.0);
 
     if (table != NULL) {
@@ -1709,7 +1709,7 @@ double C_gg_tomo_limber(const double l, const int ni, const int nj)
     nell   = Ntable.N_ell;
     NSIZE  = redshift.clustering_nbin;
     lnlmin = log(fmax(limits.LMIN_tab, 1.0));
-    lnlmax = log(limits.LMAX + 1);
+    lnlmax = log(Ntable.LMAX + 1);
     dlnl   = (lnlmax - lnlmin) / ((double) nell - 1.0);
     if (table != NULL) {
       free(table);
@@ -1933,7 +1933,7 @@ double C_gk_tomo_limber(const double l, const int ni)
   if (table == NULL || fdiff(cache[3], Ntable.random))
   {
     lim[0] = log(fmax(limits.LMIN_tab, 1.0));
-    lim[1] = log(limits.LMAX + 1);
+    lim[1] = log(Ntable.LMAX + 1);
     lim[2] = (lim[1] - lim[0])/((double) Ntable.N_ell - 1.0);
 
     if (table != NULL) free(table);
@@ -2082,7 +2082,7 @@ double C_ks_tomo_limber(double l, int ni)
     table = (double**) malloc2d(redshift.shear_nbin, Ntable.N_ell);
 
     lim[0] = log(fmax(limits.LMIN_tab, 1.0));
-    lim[1] = log(limits.LMAX + 1);
+    lim[1] = log(Ntable.LMAX + 1);
     lim[2] = (lim[1] - lim[0])/((double) Ntable.N_ell - 1.0);
   }
 
@@ -2198,7 +2198,7 @@ double C_kk_limber(const double l)
   if (table == NULL || fdiff(cache[1], Ntable.random))
   {
     lim[0] = log(fmax(limits.LMIN_tab, 1.0));
-    lim[1] = log(limits.LMAX + 1);
+    lim[1] = log(Ntable.LMAX + 1);
     lim[2] = (lim[1] - lim[0])/((double) Ntable.N_ell - 1.0);
 
     if (table != NULL) free(table);
@@ -2343,7 +2343,7 @@ double C_gy_tomo_limber(double l, int ni)
   if (table == NULL || fdiff(cache[4], Ntable.random))
   {
     lim[0] = log(fmax(limits.LMIN_tab, 1.0));
-    lim[1] = log(limits.LMAX + 1);
+    lim[1] = log(Ntable.LMAX + 1);
     lim[2]   = (lim[1] - lim[0])/((double) Ntable.N_ell - 1.0);
 
     if (table != NULL) free(table);
@@ -2483,7 +2483,7 @@ double C_ys_tomo_limber(double l, int ni)
     table = (double**) malloc2d(redshift.shear_nbin, Ntable.N_ell);
 
     lim[0] = log(fmax(limits.LMIN_tab, 1.0));
-    lim[1] = log(limits.LMAX + 1);
+    lim[1] = log(Ntable.LMAX + 1);
     lim[2] = (lim[1] - lim[0])/((double) Ntable.N_ell - 1.0);
   }
 
@@ -2606,7 +2606,7 @@ double C_ky_limber(double l)
     table = (double*) malloc1d(Ntable.N_ell);
 
     lim[0] = log(fmax(limits.LMIN_tab, 1.0));
-    lim[1] = log(limits.LMAX + 1);
+    lim[1] = log(Ntable.LMAX + 1);
     lim[2] = (lim[1] - lim[0])/((double) Ntable.N_ell - 1.0);
   }
 
@@ -2701,7 +2701,7 @@ double C_yy_limber(double l)
   if (table == NULL || fdiff(cache[1], Ntable.random))
   {
     lim[0] = log(fmax(limits.LMIN_tab, 1.0));
-    lim[1] = log(limits.LMAX + 1.0);
+    lim[1] = log(Ntable.LMAX + 1.0);
     lim[2] = (lim[1] - lim[0])/((double) Ntable.N_ell - 1.0);
 
     if (table != NULL) free(table);

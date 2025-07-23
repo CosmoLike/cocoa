@@ -371,6 +371,18 @@ void initial_setup()
 // ---------------------------------------------------------------------------
 // ---------------------------------------------------------------------------
 
+void init_ntable_lmax(const int lmax) {
+  Ntable.LMAX=lmax;
+  Ntable.random = RandomNumber::get_instance().get();
+}
+
+// ---------------------------------------------------------------------------
+// ---------------------------------------------------------------------------
+// ---------------------------------------------------------------------------
+// ---------------------------------------------------------------------------
+// ---------------------------------------------------------------------------
+// ---------------------------------------------------------------------------
+
 void init_accuracy_boost(
     const double accuracy_boost, 
     const int integration_accuracy
@@ -378,7 +390,6 @@ void init_accuracy_boost(
 {
   static int N_a = 0;
   static int N_ell = 0;
-  static int LMAX = 0;
 
   if (0 == N_a) N_a = Ntable.N_a;
   Ntable.N_a = static_cast<int>(ceil(N_a*accuracy_boost));
@@ -391,11 +402,6 @@ void init_accuracy_boost(
   }
   else {
     Ntable.FPTboost = 0.0;
-  }
-
-  if (0 == LMAX) LMAX = limits.LMAX;
-  if (accuracy_boost>1) {
-    limits.LMAX = static_cast<int>(LMAX + 15000*(accuracy_boost-1));
   }
   /*  
   Ntable.N_k_lin = 
@@ -417,15 +423,6 @@ void init_accuracy_boost(
 
   // update cache
   Ntable.random = RandomNumber::get_instance().get();
-}
-
-void init_accuracy_boost(
-    const double accuracy_boost, 
-    const double sampling_boost,
-    const int integration_accuracy
-  )
-{
-  init_accuracy_boost(accuracy_boost, integration_accuracy);
 }
 
 // ---------------------------------------------------------------------------

@@ -9,7 +9,7 @@ FPT FPTbias;
 cosmopara cosmology;
 tomopara tomo;
 redshiftparams redshift;
-Ntab Ntable;
+
 nuisanceparams nuisance;
 likepara like;
 sur survey;
@@ -35,8 +35,6 @@ lim limits =
   .M_max = 1.0e+17,             // M_max
   .LMIN_tab = 20,               // LMIN_tab
   .LMAX_NOLIMBER = 150,         // LMAX_NOLIMBER
-  //.LMAX = 100000,
-  .LMAX = 50000,
   .cluster_util_log_M_min = 12.0,
   .cluster_util_log_M_max = 15.9,
   .binned_P_lambda_obs_given_M_zmin_table = 0.20,
@@ -54,6 +52,8 @@ lim limits =
   .halo_uKS_xmin = 1e-10,   // halo.c u_KS(double c, double k, double rv)
   .halo_uKS_xmax = 5e3      // halo.c u_KS(double c, double k, double rv)
 };
+
+Ntab Ntable;
 
 //  ----------------------------------------------------------------------------------
 //  ----------------------------------------------------------------------------------
@@ -234,6 +234,7 @@ void reset_cmb_struct()
 
 void reset_Ntable_struct()
 {
+  Ntable.LMAX     = 50000;
   Ntable.random   = 0.0;
   Ntable.N_a      = 200;                   // N_a       
   Ntable.N_k_lin  = 500;                   // N_k_lin
