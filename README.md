@@ -154,11 +154,15 @@ Users will see a terminal like this: `$(cocoa)(.local)`. *This is a feature, not
 
 One model evaluation:
 
-    mpirun -n 1 --oversubscribe --mca pml ^ucx --mca btl vader,tcp,self --bind-to core:overload-allowed --rank-by slot --map-by numa:pe=${OMP_NUM_THREADS} cobaya-run  ./projects/example/EXAMPLE_EVALUATE1.yaml -f
+    mpirun -n 1 --oversubscribe --mca pml ^ucx --mca btl vader,tcp,self \
+        --bind-to core:overload-allowed --rank-by slot --map-by numa:pe=${OMP_NUM_THREADS} \
+        --mca mpi_yield_when_idle 1 cobaya-run  ./projects/example/EXAMPLE_EVALUATE1.yaml -f
         
 MCMC (we run MCMCs with 32 cores):
 
-    mpirun -n 4 --oversubscribe --mca pml ^ucx --mca btl vader,tcp,self --bind-to core:overload-allowed --rank-by slot --map-by numa:pe=${OMP_NUM_THREADS} cobaya-run ./projects/example/EXAMPLE_MCMC1.yaml -f
+    mpirun -n 4 --oversubscribe --mca pml ^ucx --mca btl vader,tcp,self \
+        --bind-to core:overload-allowed --rank-by slot --map-by numa:pe=${OMP_NUM_THREADS} \
+        --mca mpi_yield_when_idle 1 cobaya-run ./projects/example/EXAMPLE_MCMC1.yaml -f
 
 ## Examples involving Cosmolike
 
@@ -166,12 +170,16 @@ MCMC (we run MCMCs with 32 cores):
 
 One model evaluation:
 
-    mpirun -n 1 --oversubscribe --mca pml ^ucx --mca btl vader,tcp,self --bind-to core:overload-allowed --rank-by slot --map-by numa:pe=${OMP_NUM_THREADS} cobaya-run ./projects/lsst_y1/EXAMPLE_EVALUATE1.yaml -f
+    mpirun -n 1 --oversubscribe --mca pml ^ucx --mca btl vader,tcp,self \
+        --bind-to core:overload-allowed --rank-by slot --map-by numa:pe=${OMP_NUM_THREADS} \
+        --mca mpi_yield_when_idle 1 cobaya-run ./projects/lsst_y1/EXAMPLE_EVALUATE1.yaml -f
 
 
 MCMC (we run MCMCs with 32 cores):
 
-    mpirun -n 4 --oversubscribe --mca pml ^ucx --mca btl vader,tcp,self --bind-to core:overload-allowed --rank-by slot --map-by numa:pe=${OMP_NUM_THREADS} cobaya-run ./projects/lsst_y1/EXAMPLE_MCMC1.yaml -f
+    mpirun -n 4 --oversubscribe --mca pml ^ucx --mca btl vader,tcp,self \
+        --bind-to core:overload-allowed --rank-by slot --map-by numa:pe=${OMP_NUM_THREADS} \
+        --mca mpi_yield_when_idle 1 cobaya-run ./projects/lsst_y1/EXAMPLE_MCMC1.yaml -f
 
 Profile:
 
@@ -183,7 +191,11 @@ and
 
 and
 
-    mpirun -n ${NMPI} --oversubscribe --mca pml ^ucx --mca btl vader,tcp,self --bind-to core:overload-allowed --rank-by slot --map-by numa:pe=${OMP_NUM_THREADS} python -m mpi4py.futures EXAMPLE_PROFILE1.py --mpi $((${NMPI}-1)) --profile 1 --tol 0.05 --AB 1.0 --outroot 'profile' --minmethod 5 --maxiter 1 --maxfeval 250 
+    mpirun -n ${NMPI} --oversubscribe --mca pml ^ucx --mca btl vader,tcp,self \
+        --bind-to core:overload-allowed --rank-by slot --map-by numa:pe=${OMP_NUM_THREADS} \
+        --mca mpi_yield_when_idle 1 python -m mpi4py.futures EXAMPLE_PROFILE1.py \
+        --mpi $((${NMPI}-1)) --profile 1 --tol 0.05 --AB 1.0 --outroot 'profile' \
+        --minmethod 5 --maxiter 1 --maxfeval 250 
 
 > [!Tip]
 > Cocoa provides several cosmolike projects, not all of which are installed by default. To activate them, refer to the appendix [FAQ: How do we compile external modules?](#appendix_compile_separately).
@@ -240,8 +252,7 @@ Now, users must follow all the steps below.
 
  **Step :two:**: Select the number of OpenMP cores.
     
-    # No need to thread via OpenMP. However, 2-3 threads can reduce the TRF emulator runtime from ~0.2s to 0.1s.
-    export OMP_PROC_BIND=close; export OMP_NUM_THREADS=1
+    export OMP_PROC_BIND=close; export OMP_NUM_THREADS=1 # No OpenMP needed
 
  **Step :three:** Run `cobaya-run` on the first emulator example following the commands below.
 
