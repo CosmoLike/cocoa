@@ -96,8 +96,9 @@ export USE_SPT_CLIK_PLANCK=1
 # ------------------------------------------------------------------------------
 # THREADING COMPILATION/INSTALLATION OF LIBRARIES ------------------------------
 # ------------------------------------------------------------------------------
-export MAKE_NUM_THREADS=4
-
+export MAKE_NUM_THREADS=1
+export OMP_PROC_BIND=close
+export OMP_NUM_THREADS=1 # default is no OpenMP threading
 # ------------------------------------------------------------------------------
 # If not set, pip_core_packages.sh will install several ML packages ------------
 # ------------------------------------------------------------------------------
