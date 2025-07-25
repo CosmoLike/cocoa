@@ -17,7 +17,6 @@ likelihood:
         ET: [50, 3002]
         EE: [50, 3002]
       symmetrize: False
-
     data:
       # List the names and frequencies of all the
       # relevant experiments.
@@ -26,7 +25,6 @@ likelihood:
         - LAT_145
         - LAT_225
         # - PlanckHFI_545:
-
       spectra:
         # Here, list all the different cross-correlations
         # between experiments and bands you want to
@@ -41,7 +39,6 @@ likelihood:
         - experiments: [LAT_145, LAT_225]
         - experiments: [LAT_225, LAT_225]
       lmax_theory: 5000
-
 params:
   logA:
     prior:
@@ -221,5 +218,4 @@ sampler:
     # ---------------------------------------------------------------------
     # ---------------------------------------------------------------------
     Rminus1_single_split: 4
-
 output: ./projects/example/chains/EXAMPLE_EMUL_MCMC1

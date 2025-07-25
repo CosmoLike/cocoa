@@ -17,7 +17,6 @@ likelihood:
         ET: [50, 3002]
         EE: [50, 3002]
       symmetrize: False
-
     data:
       # List the names and frequencies of all the
       # relevant experiments.
@@ -26,7 +25,6 @@ likelihood:
         - LAT_145
         - LAT_225
         # - PlanckHFI_545:
-
       spectra:
         # Here, list all the different cross-correlations
         # between experiments and bands you want to

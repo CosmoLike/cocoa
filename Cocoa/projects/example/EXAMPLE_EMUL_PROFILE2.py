@@ -191,7 +191,6 @@ params:
   omegam:
     derived: true
     latex: \Omega_\mathrm{m}
-
 theory:
   emultheta:
     path: ./cobaya/cobaya/theories/

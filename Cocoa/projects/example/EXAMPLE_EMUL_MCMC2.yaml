@@ -10,7 +10,6 @@ likelihood:
     path: ./external_modules
   planck_2018_lowl.EE:
     path: ./external_modules
-
 params:
   logA:
     prior:
@@ -103,7 +102,6 @@ params:
   omegam:
     derived: true
     latex: \Omega_\mathrm{m}
-
 theory:
   emultheta:
     path: ./cobaya/cobaya/theories/
@@ -187,5 +185,4 @@ sampler:
     # ---------------------------------------------------------------------
     # ---------------------------------------------------------------------
     Rminus1_single_split: 4
-
 output: ./projects/example/chains/EXAMPLE_EMUL_MCMC2
