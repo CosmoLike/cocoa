@@ -65,14 +65,12 @@ if [ -z "${IGNORE_COBAYA_CODE}" ]; then
   COBTH="cobaya/theories"           # COB = Cobaya, TH = theory
 
   cppatch() {
-    cp "${CCCOB:?}/${1:?}/${2:?}" "${COB:?}/${1:?}" \
-      2>"/dev/null" || 
+    cp "${CCCOB:?}/${1:?}/${2:?}" "${COB:?}/${1:?}" || 
       { error "CP FILE ${CCCOB:?}/${1:?}/${2:?} on ${COB:?}/${1:?}"; return 1; }
   }
 
   cppatchfolder() {
-    cp -r "${CCCOB:?}/${1:?}/${2:?}" "${COB:?}/${1:?}" \
-      2>"/dev/null" || 
+    cp -r "${CCCOB:?}/${1:?}/${2:?}" "${COB:?}/${1:?}" || 
       { error "CP FOLDER ${CCCOB:?}/${1:?}/${2:?} on ${COB:?}/${1:?}"; \
       return 1; }
   }
