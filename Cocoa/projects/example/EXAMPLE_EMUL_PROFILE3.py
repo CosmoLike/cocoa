@@ -26,6 +26,72 @@ from getdist import IniFile
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
+parser = argparse.ArgumentParser(prog='EXAMPLE_EMUL_PROFILE1')
+parser.add_argument("--maxfeval",
+                    dest="maxfeval",
+                    help="Minimizer: maximum number of likelihood evaluations",
+                    type=int,
+                    nargs='?',
+                    const=1,
+                    default=5000)
+parser.add_argument("--root",
+                    dest="root",
+                    help="Name of the Output File",
+                    nargs='?',
+                    const=1,
+                    default="./projects/example/")
+parser.add_argument("--outroot",
+                    dest="outroot",
+                    help="Name of the Output File",
+                    nargs='?',
+                    const=1,
+                    default="test.dat")
+parser.add_argument("--profile",
+                    dest="profile",
+                    help="Which Parameter to Profile",
+                    type=int,
+                    nargs='?',
+                    const=1,
+                    default=1)
+parser.add_argument("--numpts",
+                    dest="numpts",
+                    help="Number of Points to Compute Minimum",
+                    type=int,
+                    nargs='?',
+                    const=1,
+                    default=20)
+parser.add_argument("--factor",
+                    dest="factor",
+                    help="Factor that set the bounds (multiple of cov matrix)",
+                    type=int,
+                    nargs='?',
+                    const=1,
+                    default=3)
+parser.add_argument("--cov",
+                    dest="cov",
+                    help="Chain Covariance Matrix",
+                    nargs='?',
+                    const=1) # zero or one
+parser.add_argument("--nwalkers",
+                    dest="nwalkers",
+                    help="Number of emcee walkers",
+                    nargs='?',
+                    const=1)
+args, unknown = parser.parse_known_args()
+maxfeval = args.maxfeval
+oroot    = args.root + "chains/" + args.outroot
+index    = args.profile
+numpts   = args.numpts
+nwalkers = args.nwalkers
+# ------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 info_txt = r"""
 likelihood:
   planck_2018_highl_plik.TTTEEE_lite: 
@@ -190,6 +256,9 @@ theory:
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 x = np.array([
     3.045845885,         # logA
     9.652308970e-01,     # ns
@@ -200,170 +269,14 @@ x = np.array([
     1.00138
 ], dtype='float64')
 
-bounds0 = np.array([
-  [+1.610, +3.91],
-  [+0.920, +1.05],
-  [+1.02,  +1.06],
-  [+0.010, +0.04],
-  [+0.060, +0.20],
-  [+0.040, +0.09],
-  [+0.500, +2.00]
-], dtype='float64') 
-
-name  = [ 
-    "logAs",     # As
-    "ns",        # ns
-    "thetastar", # thetastar
-    "omegabh2",  # omegabh2
-    "omegach2",  # omegach2
-    "tau",       # tau
-    "A_planck",  # A_planck
-]
-
-start  = np.zeros(len(x), dtype='float64')
-stop   = np.zeros(len(x), dtype='float64')
-
-# ------------------------------------------------------------------------------
-# ------------------------------------------------------------------------------
-# ------------------------------------------------------------------------------
-
+cov    = np.loadtxt(args.root + args.cov)[0:len(x),0:len(x)]
+sigma  = np.sqrt(np.diag(cov))
 info  = yaml_load(info_txt)
 model = get_model(info)
-
-def chi2(p):
-    point = dict(zip(model.parameterization.sampled_params(),
-                 model.prior.sample(ignore_external=True)[0]))
-    point.update({'logA': p[0], 
-                  'ns':  p[1],
-                  'thetastar': p[2], 
-                  'omegabh2': p[3], 
-                  'omegach2': p[4], 
-                  'tau': p[5],
-                  'A_planck': p[6]})
-    logposterior = model.logposterior(point, as_dict=True)
-    if 'loglikes' in logposterior.keys(): 
-      res1 = logposterior["loglikes"].get("planck_2018_highl_plik.TTTEEE_lite",-1e200)
-      res2 = logposterior["loglikes"].get("planck_2018_lowl.TT",-1e200)
-      res3 = logposterior["loglikes"].get("planck_2018_lowl.EE",-1e200)
-      res4 = logposterior["loglikes"].get("sn.desy5",-1e200)
-      res5 = logposterior["loglikes"].get("bao.desi_dr2.desi_bao_all",-1e200)
-      res6 = logposterior["logpriors"].get("0",-1e20)
-      res  = -2.0*(res1 + res2 + res3 + res4 + res5 + res6)
-    else:
-      res = -2.0*(1e20)
-    return res
-
-def chi2v2(p):
-    point = dict(zip(model.parameterization.sampled_params(),
-                 model.prior.sample(ignore_external=True)[0]))
-    point.update({'logA': p[0], 
-                  'ns':  p[1],
-                  'thetastar': p[2], 
-                  'omegabh2': p[3], 
-                  'omegach2': p[4], 
-                  'tau': p[5],
-                  'A_planck': p[6]})
-    logposterior = model.logposterior(point, as_dict=True)
-    if 'loglikes' in logposterior.keys(): 
-      res1 = logposterior["loglikes"].get("planck_2018_highl_plik.TTTEEE_lite",-1e20)
-      res2 = logposterior["loglikes"].get("planck_2018_lowl.TT",-1e20)
-      res3 = logposterior["loglikes"].get("planck_2018_lowl.EE",-1e20)
-      res4 = logposterior["loglikes"].get("sn.desy5",-1e20)
-      res5 = logposterior["loglikes"].get("bao.desi_dr2.desi_bao_all",-1e20)
-      res6 = logposterior["logpriors"].get("0",-1e20)
-      return np.array([-2.0*res1, 
-                       -2.0*res2, 
-                       -2.0*res3,
-                       -2.0*res4,
-                       -2.0*res5,
-                       -2.0*res6], dtype='float64')
-    else:
-      return np.array([-2.0*(1e20), 
-                       -2.0*(1e20), 
-                       -2.0*(1e20), 
-                       -2.0*(1e20), 
-                       -2.0*(1e20)], dtype='float64')
-
-# ------------------------------------------------------------------------------
-# ------------------------------------------------------------------------------
-# ------------------------------------------------------------------------------
-# Code below does not require changes ------------------------------------------
-# ------------------------------------------------------------------------------
-# ------------------------------------------------------------------------------
-# ------------------------------------------------------------------------------
-
-parser = argparse.ArgumentParser(prog='EXAMPLE_EMUL_PROFILE1')
-
-parser.add_argument("--maxfeval",
-                    dest="maxfeval",
-                    help="Minimizer: maximum number of likelihood evaluations",
-                    type=int,
-                    nargs='?',
-                    const=1,
-                    default=5000)
-
-parser.add_argument("--root",
-                    dest="root",
-                    help="Name of the Output File",
-                    nargs='?',
-                    const=1,
-                    default="./projects/example/")
-
-parser.add_argument("--outroot",
-                    dest="outroot",
-                    help="Name of the Output File",
-                    nargs='?',
-                    const=1,
-                    default="test.dat")
-
-parser.add_argument("--profile",
-                    dest="profile",
-                    help="Which Parameter to Profile",
-                    type=int,
-                    nargs='?',
-                    const=1,
-                    default=1)
-
-parser.add_argument("--numpts",
-                    dest="numpts",
-                    help="Number of Points to Compute Minimum",
-                    type=int,
-                    nargs='?',
-                    const=1,
-                    default=20)
-
-parser.add_argument("--factor",
-                    dest="factor",
-                    help="Factor that set the bounds (multiple of cov matrix)",
-                    type=int,
-                    nargs='?',
-                    const=1,
-                    default=3)
-
-parser.add_argument("--cov",
-                    dest="cov",
-                    help="Chain Covariance Matrix",
-                    nargs='?',
-                    const=1) # zero or one
-
-parser.add_argument("--nwalkers",
-                    dest="nwalkers",
-                    help="Number of emcee walkers",
-                    nargs='?',
-                    const=1)
-
-# need to use parse_known_args because of mpifuture 
-args, unknown = parser.parse_known_args()
-
-maxfeval = args.maxfeval
-oroot    = args.root + "chains/" + args.outroot
-index    = args.profile
-numpts   = args.numpts
-nwalkers = args.nwalkers
-
-cov_file = args.root + args.cov
-cov      = np.loadtxt(cov_file)[0:len(x),0:len(x)]
-sigma    = np.sqrt(np.diag(cov))
+bounds0 = model.prior.bounds(confidence=0.999999)
+name  = list(model.parameterization.sampled_params().keys())
+start  = np.zeros(len(x), dtype='float64')
+stop   = np.zeros(len(x), dtype='float64')
 start    = x - args.factor*sigma
 stop     = x + args.factor*sigma
 for i in range(len(x)):
@@ -372,16 +285,34 @@ for i in range(len(x)):
     if (stop[i] > bounds0[i][1]):
       stop[i] = bounds0[i][1]
 
+def chi2(p):
+    point = dict(zip(model.parameterization.sampled_params(),
+                 model.prior.sample(ignore_external=True)[0]))
+    names = list(model.parameterization.sampled_params().keys())
+    point.update({name: val for name, val in zip(names, p)})
+    res1 = model.logprior(point,make_finite=False)
+    res2 = model.loglike(point,make_finite=False,cached=False,return_derived=False)
+    return -2.0*(res1+res2)
+def chi2v2(p):
+    point = dict(zip(model.parameterization.sampled_params(),
+                 model.prior.sample(ignore_external=True)[0]))
+    names=list(model.parameterization.sampled_params().keys())
+    point.update({name: val for name, val in zip(names, p)})
+    logposterior = model.logposterior(point, as_dict=True)
+    chi2likes=-2*np.array(list(logposterior["loglikes"].values()))
+    chi2prior=-2*np.atleast_1d(model.logprior(point,make_finite=False))
+    return np.concatenate((chi2likes, chi2prior))
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
-
+# ------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 def min_chi2(x0, 
              fixed=-1, 
              maxfeval=3000, 
              cov=cov,
              nwalkers=5):
-
     def mychi2(params, *args):
         z, fixed, T = args
         params = np.array(params, dtype='float64')
@@ -466,10 +397,6 @@ def min_chi2(x0,
     result = [partial_samples[j], partial[j]]
     return result
 
-# ------------------------------------------------------------------------------
-# ------------------------------------------------------------------------------
-# ------------------------------------------------------------------------------
-
 def prf(x0, index, maxfeval, nwalkers=5):
     t0 = np.array(x0, dtype='float64')
     res =  min_chi2(x0=t0, 
@@ -477,12 +404,14 @@ def prf(x0, index, maxfeval, nwalkers=5):
                     maxfeval=maxfeval, 
                     nwalkers=nwalkers)
     return res
+# ------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
 from cobaya.theories.emultheta.emultheta2 import emultheta
-
 etheta = emultheta(extra_args={ 
     'device': "cuda",
     'file': ['external_modules/data/emultrf/CMB_TRF/emul_lcdm_thetaH0_GP.joblib'],
@@ -490,40 +419,33 @@ etheta = emultheta(extra_args={
     'ord':  [['omegabh2','omegach2','thetastar']],
     'extrapar': [{'MLA' : "GP"}]})
 
-# want to add rd information
 from cobaya.theories.emulrdrag.emulrdrag2 import emulrdrag
-
 # LCDM emulator. On this mass range, DE does not influence rd
 erd = emulrdrag(extra_args={ 
     'file': ['external_modules/data/emultrf/BAO_SN_RES/emul_lcdm_rdrag_GP.joblib'] ,
     'extra': ['external_modules/data/emultrf/BAO_SN_RES/extra_lcdm_rdrag.npy'],
     'ord':  [['omegabh2','omegach2']]})
-
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
-
+# ------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 from mpi4py.futures import MPIPoolExecutor
 
 if __name__ == '__main__':
-    
     print(f"nwalkers={nwalkers}, maxfeval={maxfeval}, param={index}")
-
     executor = MPIPoolExecutor()
-    
     param = np.linspace(start=start[index], stop=stop[index], num=numpts)
     print(f"profile param values = {param}")
     x0 = np.tile(x, (param.size, 1))
     x0[:,index] = param
-
     res = np.array(list(executor.map(functools.partial(prf, 
                                                        index=index,
                                                        maxfeval=maxfeval, 
                                                        nwalkers=nwalkers),x0)),dtype="object")
-
     x0 = np.array([np.insert(row,index,p) for row, p in zip(res[:,0],param)],dtype='float64')
-
-    # Append H0 and omegam (begins) --------------------
+    # Append derived (begins) --------------------
     tmp = [
         etheta.calculate({
             'thetastar': row[2],
@@ -533,13 +455,7 @@ if __name__ == '__main__':
         })
         for row in x0
       ]
-    h  = np.array([d['H0']     for d in tmp], dtype='float64')
-    om = np.array([d['omegam'] for d in tmp], dtype='float64')
-    x0 = np.column_stack((x0, h, om))
-    # Append H0 and omegam (ends) --------------------
-
-    # Append rd (begins) --------------------
-    tmp = [
+    tmp2 = [
         erd.calculate({
             'thetastar': row[2],
             'omegabh2':  row[3],
@@ -549,29 +465,38 @@ if __name__ == '__main__':
         })
         for row in x0
       ]
-    rdrag = np.array([d['rdrag'] for d in tmp], dtype='float64')
-    x0 = np.column_stack((x0, rdrag))
-    # Append rd (ends) --------------------
-
-    # Append individual chi2 (begins) --------------------
-    tmp = np.array([chi2v2(d) for d in x0], dtype='float64')
-    x0 = np.column_stack((x0,tmp[:,0],tmp[:,1],tmp[:,2],tmp[:,3],tmp[:,4]))
-    # Append individual chi2 (ends) --------------------
-
-    rnd = random.randint(0,9999)
+    x0 = np.column_stack((x0, 
+                          np.array([d['H0'] for d in tmp], dtype='float64'), 
+                          np.array([d['omegam'] for d in tmp], dtype='float64'),
+                          np.array([d['rdrag'] for d in tmp2], dtype='float64'),
+                          np.array([chi2v2(d) for d in x0], dtype='float64')))
+    # Append derived (ends) --------------------
+    # --- saving file begins -------------------- 
+    rnd = random.randint(0,1000)
     out = oroot + "_" + str(rnd) + "_" + name[index] 
+    names = list(model.parameterization.sampled_params().keys()) # Cobaya Call
+    names = [names[index],"chi2"]+names+["rdrag"]+list(model.info()['likelihood'].keys())+["prior"]
     print("Output file = ", out + ".txt")
-    np.savetxt(out+"_ref"+".txt",
+    np.savetxt(out+".txt",
                np.concatenate([np.c_[param,res[:,1]],x0],axis=1),
-               header=f"nwalkers={nwalkers}, maxfeval={maxfeval}, param={name[index]}",
+               fmt="%.6e",
+               header=f"nwalkers={nwalkers}, maxfeval={maxfeval}, param={name[index]}\n"+' '.join(names),
                comments="# ")
+    # --- saving file ends --------------------
     executor.shutdown()
-
+# ------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 #HOW TO CALL THIS SCRIPT
-#mpirun -n 5 --oversubscribe --mca pml ^ucx  \
-#  --mca btl vader,tcp,self --bind-to core:overload-allowed \
-#  --rank-by slot --map-by core:pe=${OMP_NUM_THREADS}  \
+#export nmpi=5
+#export numpts=$((${nmpi}-1))
+#mpirun -n ${nmpi} --oversubscribe --mca pml ^ucx --mca btl vader,tcp,self \
+#  --bind-to core:overload-allowed --mca mpi_yield_when_idle 1 \
+#  --rank-by slot --map-by numa:pe=${OMP_NUM_THREADS} \
 #  python -m mpi4py.futures ./projects/example/EXAMPLE_EMUL_PROFILE3.py \
-#  --nwalkers 5 --profile 1 --maxfeval 15 --numpts 4  \
-#  --outroot "example_emul_profile3" --factor 5 \
-#  --cov 'EXAMPLE_EMUL_MCMC2.covmat'
+#  --root ./projects/example/ --cov 'EXAMPLE_EMUL_MCMC2.covmat' \
+#  --nwalkers 5 --profile 1 --maxfeval 8000 --numpts ${numpts}  \
+#  --outroot "example_emul_profile3" --factor 5
