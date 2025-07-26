@@ -283,8 +283,8 @@ Profile (run on an HPC):
 > The `maxfeval` option refers to the number of evaluations per temperature (simulated annealing).
 > Following Procoli's instructions, the sampler runs at 5 decreasing temperatures.
 > `--maxfeval 12000` can be a bit overkill (so adjust it accordingly). This parameter is much more
-> expensive here, compared to the global minimizer example, as emcee has only 1 MPI available.
-> The parallelization is at the level of the number of fixed points in the profile dimension.
+> expensive here, compared to the global minimizer example, as the Emcee sanoker has only 1 MPI available.
+> The parallelization here happens at the level of the number of fixed points in the profile dimension.
        
 > [!TIP]
 > What should users do if they have not configured ML-related keys before running `setup_cocoa.sh` and `compile_cocoa.sh`, as rerunning these scripts can require a long time? Instead, run the following commands.
