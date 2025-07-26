@@ -9,13 +9,19 @@ warnings.filterwarnings(
 warnings.filterwarnings(
     "ignore",
     category=RuntimeWarning,
-    message=r".*overflow encountered in exp.*"
+    message=r".*overflow encountered*"
+)
+warnings.filterwarnings(
+    "ignore",
+    category=UserWarning,
+    message=r".*Hartlap correction*"
 )
 import argparse, random
 import numpy as np
 from cobaya.yaml import yaml_load
 from cobaya.model import get_model
 from nautilus import Prior, Sampler
+from getdist import loadMCSamples
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
@@ -259,9 +265,9 @@ def likelihood(p):
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
 from mpi4py.futures import MPIPoolExecutor
+
 if __name__ == '__main__':
-    cfile = f"{args.root}chains/{args.outroot}_checkpoint.hdf5"
-    print(f"nlive={args.nlive}, output={cfile}")
+    print(f"nlive={args.nlive}, output={args.root}chains/{args.outroot}")
     # Build Nautilus Prior from Cobaya
     NautilusPrior = Prior()                                       # Nautilus Call 
     dim    = model.prior.d()                                      # Cobaya call
@@ -272,7 +278,7 @@ if __name__ == '__main__':
     
     sampler = Sampler(NautilusPrior, 
                       likelihood,  
-                      filepath=cfile, 
+                      filepath=f"{args.root}chains/{args.outroot}_checkpoint.hdf5", 
                       n_dim=dim,
                       pool=MPIPoolExecutor(),
                       n_live=args.nlive,
@@ -285,29 +291,36 @@ if __name__ == '__main__':
                 discard_exploration=True)
     points, log_w, log_l = sampler.posterior()
     
-    # --- saving file begins --------------------
-    cfile  = f"{args.root}chains/{args.outroot}.1.txt"
-    print("Output file = ", cfile)
-    np.savetxt(cfile,
+    # --- saving file begins ---------------------------------------------------
+    np.savetxt(f"{args.root}chains/{args.outroot}.1.txt",
                np.column_stack((np.exp(log_w), log_l, points, -2*log_l)),
                fmt="%.5e",
                header=f"nlive={args.nlive}, maxfeval={args.maxfeval}, log-Z ={sampler.log_z}\n"+' '.join(names),
                comments="# ")
     
-    # Now we need to save a paramname files --------------------
-    cfile   = f"{args.root}chains/{args.outroot}.paramnames"
+    # Now we need to save a paramname files ------------------------------------
     param_info = model.info()['params']
     names2 = names.copy()
     latex  = [param_info[x]['latex'] for x in names2]
     names2.append("chi2*")
     latex.append("\\chi^2")
-    np.savetxt(cfile, np.column_stack((names2,latex)),fmt="%s")
+    np.savetxt(f"{args.root}chains/{args.outroot}.paramnames", 
+               np.column_stack((names2,latex)),
+               fmt="%s")
     
-    # Now we need to save a range files --------------------
-    cfile = f"{args.root}chains/{args.outroot}.ranges"
+    # Now we need to save a range files ----------------------------------------
     rows = [(str(n),float(l),float(h)) for n,l,h in zip(names,bounds[:,0],bounds[:,1])]
-    with open(cfile, "w") as f: 
+    with open(f"{args.root}chains/{args.outroot}.ranges", "w") as f: 
       f.writelines(f"{n} {l:.5e} {h:.5e}\n" for n, l, h in rows)
+    
+    # Now we need to save a cov matrix -----------------------------------------
+    samples = loadMCSamples(f"{args.root}chains/{args.outroot}",
+                            settings={'ignore_rows': u'0.0'})
+    np.savetxt(f"{args.root}chains/{args.outroot}.covmat",
+               np.array(samples.cov(), dtype='float64'),
+               fmt="%.5e",
+               header=' '.join(names),
+               comments="# ")
     # --- saving file ends --------------------
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
