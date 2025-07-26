@@ -208,16 +208,12 @@ MCMC (we run MCMCs with 32 cores):
 Cocoa contains a few transformer-based neural network emulators capable of simulating CMB, cosmolike, matter power spectrum, and distances. We provide a few scripts that exemplify their API. To run them, we assume users have commented out the following lines on `set_installation_options.sh` prior to running the `setup_cocoa.sh` and `compile_cocoa.sh` installation scripts.
 
       [Adapted from Cocoa/set_installation_options.sh shell script] 
-      
       # inset # symbol in the lines below (i.e., unset these environmental keys)
       #export IGNORE_EMULTRF_CODE=1  #SaraivanovZhongZhu (SZZ) transformer-based emul
       #export IGNORE_EMULTRF_DATA=1  #SaraivanovZhongZhu (SZZ) transformer-based emul
-
-      
-      #export IGNORE_FGSPECTRA_CODE=1                        # to run EXAMPLE_EVALUATE26.yaml
-      #export IGNORE_SIMONS_OBSERVATORY_LIKELIHOOD_CODE=1    # to run EXAMPLE_EVALUATE26.yaml
-      #export IGNORE_SIMONS_OBSERVATORY_CMB_DATA=1           # to run EXAMPLE_EVALUATE26.yaml
- 
+      #export IGNORE_ACTDR6_CODE=1   # to run EXAMPLE_EMUL_EVALUATE1.yaml
+      #export IGNORE_ACTDR6_DATA=1   # to run EXAMPLE_EMUL_EVALUATE1.yaml
+           
 Now, users must follow all the steps below.
 
 > [!NOTE]
@@ -285,7 +281,9 @@ Profile (Require to run minimizer first):
 >      source ./installation_scripts/setup_pip_core_packages.sh     # install pip packages required by ML emulators
 >      source ./installation_scripts/setup_emultrf.sh               # download emulator codes
 >      source ./installation_scripts/unxv_emultrf.sh                # download pre-trained emulators
-> 
+>      source ./installation_scripts/setup_act_dr6.sh               # to run EXAMPLE_EMUL_EVALUATE1.yaml
+>      source ./installation_scripts/compile_act_dr6.sh             # to run EXAMPLE_EMUL_EVALUATE1.yaml
+      
 > Finally, rerun all the steps presented in this section, including step one. Users must reload the `(.local)` environment by rerunning `start_cocoa.sh` so Cocoa can create appropriate symlinks that expose the emulators to Cobaya.
 
 # Appendix <a name="appendix"></a>
