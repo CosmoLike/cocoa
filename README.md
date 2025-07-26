@@ -262,27 +262,27 @@ Minimizer (run on an HPC):
        --bind-to core --map-by core --report-bindings --mca mpi_yield_when_idle 1 \
       python ./projects/example/EXAMPLE_EMUL_MINIMIZE1.py --root ./projects/example/ \
       --cov 'EXAMPLE_EMUL_MCMC1.covmat' --outroot "EXAMPLE_EMUL_MIN1" \
-      --nwalkers 7 --maxfeval 20000
+      --nwalkers 7 --maxfeval 10000
 
 > [!NOTE]
 > The `maxfeval` option refers to the number of evaluations per temperature (simulated annealing).
 > Following Procoli's instructions, the sampler runs at 5 decreasing temperatures.
-> `--maxfeval 20000` can be a bit overkill (so adjust it accordingly)
+> `--maxfeval 10000` can be a bit overkill (so adjust it accordingly)
 
-Profile (run on an HPC): 
+Profile (run on an HPC - require Minimizer example result): 
 
     mpirun -n 60 --oversubscribe --mca pml ^ucx --mca btl vader,tcp,self \
        --bind-to core --map-by core --report-bindings --mca mpi_yield_when_idle 1 \
       python -m mpi4py.futures ./projects/example/EXAMPLE_EMUL_PROFILE1.py \
       --root ./projects/example/ --cov 'EXAMPLE_EMUL_MCMC1.covmat' \
-      --nwalkers 7 --profile 1 --maxfeval 12000 --numpts 59  \
+      --nwalkers 7 --profile 1 --maxfeval 10000 --numpts 59  \
       --outroot "EXAMPLE_EMUL_PROFILE1" --factor 5 \
-      --minfile="./projects/example/EXAMPLE_EMUL_MIN1.txt"
+      --minfile="./projects/example/chains/EXAMPLE_EMUL_MIN1.txt"
 
 > [!NOTE]
 > The `maxfeval` option refers to the number of evaluations per temperature (simulated annealing).
 > Following Procoli's instructions, the sampler runs at 5 decreasing temperatures.
-> `--maxfeval 12000` can be a bit overkill (so adjust it accordingly). This parameter is much more
+> `--maxfeval 10000` can be a bit overkill (so adjust it accordingly). This parameter is much more
 > expensive here, compared to the global minimizer example, as the Emcee sanoker has only 1 MPI available.
 > The parallelization here happens at the level of the number of fixed points in the profile dimension.
        
