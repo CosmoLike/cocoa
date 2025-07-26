@@ -246,13 +246,13 @@ MCMC (Metropolis-Hastings Algorithm):
 
 PolyChord (run on an HPC):
 
-    mpirun -n 80 --oversubscribe --mca pml ^ucx --mca btl vader,tcp,self \
+    mpirun -n 86 --oversubscribe --mca pml ^ucx --mca btl vader,tcp,self \
        --bind-to core --map-by numa --report-bindings --mca mpi_yield_when_idle 1 \
        cobaya-run ./projects/example/EXAMPLE_EMUL_POLY1.yaml -f
 
 Nautilus (run on an HPC. Adjust number of MPI if needed):
 
-    mpirun -n 80 --oversubscribe --mca pml ^ucx --mca btl vader,tcp,self \
+    mpirun -n 86 --oversubscribe --mca pml ^ucx --mca btl vader,tcp,self \
        --bind-to core --map-by numa --report-bindings --mca mpi_yield_when_idle 1 \
        python -m mpi4py.futures ./projects/example/EXAMPLE_EMUL_NAUTILUS1.py \
        --root ./projects/example/ --outroot "EXAMPLE_NAUTILUS1"  \
@@ -260,14 +260,14 @@ Nautilus (run on an HPC. Adjust number of MPI if needed):
 
 Minimizer (run on an HPC. Adjust number of MPI if needed):
 
-    mpirun -n 80 --oversubscribe --mca pml ^ucx --mca btl vader,tcp,self \
+    mpirun -n 86 --oversubscribe --mca pml ^ucx --mca btl vader,tcp,self \
        --bind-to core --map-by numa --report-bindings --mca mpi_yield_when_idle 1 \
       python ./projects/example/EXAMPLE_EMUL_MINIMIZE1.py --root ./projects/example/ \
       --cov 'EXAMPLE_EMUL_MCMC1.covmat' --outroot "EXAMPLE_EMUL_MIN1" --maxfeval 5000
 
 Profile (run on an HPC - requires Minimizer and MCMC results): 
 
-    mpirun -n 80 --oversubscribe --mca pml ^ucx --mca btl vader,tcp,self \
+    mpirun -n 86 --oversubscribe --mca pml ^ucx --mca btl vader,tcp,self \
        --bind-to core --map-by core --report-bindings --mca mpi_yield_when_idle 1 \
       python ./projects/example/EXAMPLE_EMUL_PROFILE1.py \
       --root ./projects/example/ --cov 'chains/EXAMPLE_EMUL_MCMC1.covmat' \
