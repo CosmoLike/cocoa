@@ -286,7 +286,7 @@ Profile (run on an HPC):
 > expensive here, compared to the global minimizer example, as emcee has only 1 MPI available.
 > The parallelization is at the level of the number of fixed points in the profile dimension.
        
-> [!NOTE]
+> [!TIP]
 > What should users do if they have not configured ML-related keys before running `setup_cocoa.sh` and `compile_cocoa.sh`, as rerunning these scripts can require a long time? Instead, run the following commands.
 >
 >      source start_cocoa.sh # even if (.local) is already active, users must run start_cocoa.sh again to update bash environment values
