@@ -135,9 +135,6 @@ Users will see a terminal like this: `$(cocoa)(.local)`. *This is a feature, not
     
     export OMP_PROC_BIND=close; export OMP_NUM_THREADS=8
 
-> [!NOTE]
-> This step is mandatory steps even if the number of threads is one. Failing to set `OMP_NUM_THREADS` would incour in the `Floating point exception (core dumped)` error message when running the proposed examples.
-
 ## Examples not involving Cosmolike
 
  **Step :three:**: The folder `projects/example` contains a few examples involving different likelihoods. So, run the `cobaya-run` on the first example following the commands below.
@@ -230,14 +227,7 @@ Now, users must follow all the steps below.
 
     source start_cocoa.sh
 
- **Step :two:**: Select the number of OpenMP cores.
-
-    export OMP_PROC_BIND=close; export OMP_NUM_THREADS=1
-
-> [!NOTE]
-> This step is mandatory steps even if the number of threads is one. Failing to set `OMP_NUM_THREADS` would incour in the `Floating point exception (core dumped)` error message when running the proposed examples
-
- **Step :three:** Run `cobaya-run` on the first emulator example following the commands below.
+ **Step :two:** Run `cobaya-run` on the first emulator example following the commands below.
 
 One model evaluation:
 
@@ -297,14 +287,6 @@ Profile (Require to run minimizer first):
 >      source ./installation_scripts/setup_pip_core_packages.sh     # install pip packages required by ML emulators
 >      source ./installation_scripts/setup_emultrf.sh               # download emulator codes
 >      source ./installation_scripts/unxv_emultrf.sh                # download pre-trained emulators
->
-> and
->
->      source  ./installation_scripts/setup_fgspectra.sh               # download Simons Observatory foreground library
->      source  ./installation_scripts/compile_fgspectra.sh             # download Simons Observatory foreground library
->      source ./installation_scripts/setup_simons_observatory.sh       # download Simons Observatory Likelihood code (to run EXAMPLE_EVALUATE26.yaml)
->      source ./installation_scripts/unxv_simons_observatory.sh        # download Simons Observatory Likelihood data  (to run EXAMPLE_EVALUATE26.yaml)
->      source ./installation_scripts/compile_simons_observatory.sh     # compile Simons Observatory Likelihood code     (to run EXAMPLE_EVALUATE26.yaml)
 > 
 > Finally, rerun all the steps presented in this section, including step one. Users must reload the `(.local)` environment by rerunning `start_cocoa.sh` so Cocoa can create appropriate symlinks that expose the emulators to Cobaya.
 
