@@ -229,21 +229,18 @@ One model evaluation:
 
     mpirun -n 8 --oversubscribe --mca pml ^ucx --mca btl vader,tcp,self \
        --bind-to core --map-by core --report-bindings --mca mpi_yield_when_idle 1 \
-       --rank-by slot --map-by numa:pe=${OMP_NUM_THREADS} \
        cobaya-run ./projects/example/EXAMPLE_EMUL_EVALUATE1.yaml -f
                
 MCMC (Metropolis Hasting):
 
     mpirun -n 8 --oversubscribe --mca pml ^ucx --mca btl vader,tcp,self \
        --bind-to core --map-by core --report-bindings --mca mpi_yield_when_idle 1 \
-       --rank-by slot --map-by numa:pe=${OMP_NUM_THREADS} \
        cobaya-run ./projects/example/EXAMPLE_EMUL_MCMC1.yaml -f
 
 PolyChord:
 
     mpirun -n 8 --oversubscribe --mca pml ^ucx --mca btl vader,tcp,self \
        --bind-to core --map-by core --report-bindings --mca mpi_yield_when_idle 1 \
-       --rank-by slot --map-by numa:pe=${OMP_NUM_THREADS} \
        cobaya-run ./projects/example/EXAMPLE_EMUL_POLY1.yaml -f
 
 Nautilus:
