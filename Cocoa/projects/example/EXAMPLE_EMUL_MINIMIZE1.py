@@ -73,7 +73,6 @@ cov_file = args.root + args.cov
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
 model = get_model(yaml_load("./projects/example/EXAMPLE_EMUL_EVALUATE1.yaml"))
-name  = list(model.parameterization.sampled_params().keys())
 def chi2(p):
     point = dict(zip(model.parameterization.sampled_params(),
                  model.prior.sample(ignore_external=True)[0]))

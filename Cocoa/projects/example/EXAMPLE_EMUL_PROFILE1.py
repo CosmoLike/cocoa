@@ -239,6 +239,7 @@ etheta = emultheta(extra_args={
 from mpi4py.futures import MPIPoolExecutor
 
 if __name__ == '__main__':
+    print(f"nwalkers={nwalkers}, maxfeval={maxfeval}, param={index}")
     # First we need to load minimum (from running EXAMPLE_EMUL_MINIMIZE1.py)
     x = np.loadtxt(args.minfile)[0:model.prior.d()]
 
@@ -259,7 +260,6 @@ if __name__ == '__main__':
     # --------------------------------------------------------------------------
     # --------------------------------------------------------------------------
     # --------------------------------------------------------------------------
-    print(f"nwalkers={nwalkers}, maxfeval={maxfeval}, param={index}")
     executor = MPIPoolExecutor()
     param = np.linspace(start=start[index], stop=stop[index], num=numpts)
     print(f"profile param values = {param}")

@@ -163,9 +163,10 @@ theory:
 sampler:
   polychord:
     path: null
-    nlive: 1024
+    nlive: 256
     num_repeats: 3d
     do_clustering: false
+    measure_speeds: False
     oversample_power: 0
     precision_criterion: 0.05
     boost_posterior: 10
