@@ -135,20 +135,23 @@ Users will see a terminal like this: `$(cocoa)(.local)`. *This is a feature, not
     
     export OMP_PROC_BIND=close; export OMP_NUM_THREADS=8
 
-> [!NOTE]
-> This step is mandatory steps even if the number of threads is one. Failing to set `OMP_NUM_THREADS` would incour in the `Floating point exception (core dumped)` error message when running the proposed examples.
-
 ## Examples not involving Cosmolike
 
  **Step :three:**: The folder `projects/example` contains a few examples involving different likelihoods. So, run the `cobaya-run` on the first example following the commands below.
 
 One model evaluation:
 
-    mpirun -n 1 --oversubscribe --mca pml ^ucx --mca btl vader,tcp,self --bind-to core:overload-allowed --rank-by slot --map-by numa:pe=${OMP_NUM_THREADS} cobaya-run  ./projects/example/EXAMPLE_EVALUATE1.yaml -f
-        
+    mpirun -n 1 --oversubscribe --mca pml ^ucx --mca btl vader,tcp,self \
+       --bind-to core:overload-allowed --mca mpi_yield_when_idle 1 \
+       --rank-by slot --map-by numa:pe=${OMP_NUM_THREADS} \
+       cobaya-run ./projects/example/EXAMPLE_EVALUATE1.yaml -f
+               
 MCMC (we run MCMCs with 32 cores):
 
-    mpirun -n 4 --oversubscribe --mca pml ^ucx --mca btl vader,tcp,self --bind-to core:overload-allowed --rank-by slot --map-by numa:pe=${OMP_NUM_THREADS} cobaya-run ./projects/example/EXAMPLE_MCMC1.yaml -f
+    mpirun -n 4 --oversubscribe --mca pml ^ucx --mca btl vader,tcp,self \
+       --bind-to core:overload-allowed --mca mpi_yield_when_idle 1 \
+       --rank-by slot --map-by numa:pe=${OMP_NUM_THREADS} \
+       cobaya-run ./projects/example/EXAMPLE_MCMC1.yaml -f
 
 ## Examples involving Cosmolike
 
@@ -156,24 +159,17 @@ MCMC (we run MCMCs with 32 cores):
 
 One model evaluation:
 
-    mpirun -n 1 --oversubscribe --mca pml ^ucx --mca btl vader,tcp,self --bind-to core:overload-allowed --rank-by slot --map-by numa:pe=${OMP_NUM_THREADS} cobaya-run ./projects/lsst_y1/EXAMPLE_EVALUATE1.yaml -f
-
-
+    mpirun -n 1 --oversubscribe --mca pml ^ucx --mca btl vader,tcp,self \
+       --bind-to core:overload-allowed --mca mpi_yield_when_idle 1 \
+       --rank-by slot --map-by numa:pe=${OMP_NUM_THREADS} \
+       cobaya-run ./projects/lsst_y1/EXAMPLE_EVALUATE1.yaml -f
+       
 MCMC (we run MCMCs with 32 cores):
 
-    mpirun -n 4 --oversubscribe --mca pml ^ucx --mca btl vader,tcp,self --bind-to core:overload-allowed --rank-by slot --map-by numa:pe=${OMP_NUM_THREADS} cobaya-run ./projects/lsst_y1/EXAMPLE_MCMC1.yaml -f
-
-Profile:
-
-    cd ./projects/lsst_y1
-
-and
-
-    export NMPI=4
-
-and
-
-    mpirun -n ${NMPI} --oversubscribe --mca pml ^ucx --mca btl vader,tcp,self --bind-to core:overload-allowed --rank-by slot --map-by numa:pe=${OMP_NUM_THREADS} python -m mpi4py.futures EXAMPLE_PROFILE1.py --mpi $((${NMPI}-1)) --profile 1 --tol 0.05 --AB 1.0 --outroot 'profile' --minmethod 5 --maxiter 1 --maxfeval 250 
+    mpirun -n 4 --oversubscribe --mca pml ^ucx --mca btl vader,tcp,self \
+       --bind-to core:overload-allowed --mca mpi_yield_when_idle 1 \
+       --rank-by slot --map-by numa:pe=${OMP_NUM_THREADS} \
+       cobaya-run ./projects/lsst_y1/EXAMPLE_MCMC1.yaml -f
 
 > [!Tip]
 > Cocoa provides several cosmolike projects, not all of which are installed by default. To activate them, refer to the appendix [FAQ: How do we compile external modules?](#appendix_compile_separately).
@@ -231,34 +227,56 @@ Now, users must follow all the steps below.
 
     source start_cocoa.sh
 
- **Step :two:**: Select the number of OpenMP cores.
-
-    export OMP_PROC_BIND=close; export OMP_NUM_THREADS=1
-
-> [!NOTE]
-> This step is mandatory steps even if the number of threads is one. Failing to set `OMP_NUM_THREADS` would incour in the `Floating point exception (core dumped)` error message when running the proposed examples
-
- **Step :three:** Run `cobaya-run` on the first emulator example following the commands below.
+ **Step :two:** Run `cobaya-run` on the first emulator example following the commands below.
 
 One model evaluation:
 
-    mpirun -n 1 --oversubscribe --mca pml ^ucx --mca btl vader,tcp,self --bind-to core:overload-allowed --rank-by slot --map-by numa:pe=${OMP_NUM_THREADS} cobaya-run ./projects/example/EXAMPLE_EMUL_EVALUATE1.yaml -f
-        
-MCMC:
+    mpirun -n 1 --oversubscribe --mca pml ^ucx --mca btl vader,tcp,self \
+       --bind-to core:overload-allowed --mca mpi_yield_when_idle 1 \
+       --rank-by slot --map-by numa:pe=${OMP_NUM_THREADS} \
+       cobaya-run ./projects/example/EXAMPLE_EMUL_EVALUATE1.yaml -f
+               
+MCMC (Metropolis Hasting):
 
-    mpirun -n 4 --oversubscribe --mca btl vader,tcp,self --bind-to core:overload-allowed --rank-by slot --map-by numa:pe=${OMP_NUM_THREADS} cobaya-run ./projects/example/EXAMPLE_EMUL_MCMC1.yaml -f
+    mpirun -n 8 --oversubscribe --mca pml ^ucx --mca btl vader,tcp,self \
+       --bind-to core:overload-allowed --mca mpi_yield_when_idle 1 \
+       --rank-by slot --map-by numa:pe=${OMP_NUM_THREADS} \
+       cobaya-run ./projects/example/EXAMPLE_EMUL_MCMC1.yaml -f
 
-PROFILE (simplified parameters to speed-up convergence):
+PolyChord:
 
-    mpirun -n 5 --oversubscribe --mca pml ^ucx  \
-      --mca btl vader,tcp,self --bind-to core:overload-allowed \
-      --rank-by slot --map-by numa:pe=${OMP_NUM_THREADS}  \
-      python -m mpi4py.futures ./projects/example/EXAMPLE_EMUL_PROFILE3.py \
-      --root ./projects/example/ \
-      --tol 0.05 --profile 1 --maxiter 2 --maxfeval 150 --numpts 10 \
-      --outroot "example_emul_profile3" --minmethod 2 --factor 4 --ref 1 \
-      --cov 'EXAMPLE_EMUL_MCMC2.covmat'
+    mpirun -n 8 --oversubscribe --mca pml ^ucx --mca btl vader,tcp,self \
+       --bind-to core:overload-allowed --mca mpi_yield_when_idle 1 \
+       --rank-by slot --map-by numa:pe=${OMP_NUM_THREADS} \
+       cobaya-run ./projects/example/EXAMPLE_EMUL_POLY1.yaml -f
 
+Nautilus:
+
+    mpirun -n 8 --oversubscribe --mca pml ^ucx --mca btl vader,tcp,self \
+       --bind-to core:overload-allowed --rank-by slot --map-by numa:pe=${OMP_NUM_THREADS} \
+       python -m mpi4py.futures ./projects/example/EXAMPLE_EMUL_NAUTILUS1.py \
+       --root ./projects/example/ --outroot "EXAMPLE_NAUTILUS1"  \
+       --maxfeval 1000000 --nlive 500 --neff 10000 --flive 0.01
+
+Minimizer:
+
+    mpirun -n 8 --oversubscribe --mca pml ^ucx --mca btl vader,tcp,self \
+      --bind-to core:overload-allowed --mca mpi_yield_when_idle 1 \
+      --rank-by slot --map-by numa:pe=${OMP_NUM_THREADS} \
+      python ./projects/example/EXAMPLE_EMUL_MINIMIZE1.py --root ./projects/example/ \
+      --cov 'EXAMPLE_EMUL_MCMC1.covmat' --outroot "EXAMPLE_EMUL_MIN1" --nwalkers 7 --maxfeval 7000
+
+Profile (Require to run minimizer first): 
+
+    mpirun -n 8 --oversubscribe --mca pml ^ucx --mca btl vader,tcp,self \
+      --bind-to core:overload-allowed --mca mpi_yield_when_idle 1 \
+      --rank-by slot --map-by numa:pe=${OMP_NUM_THREADS} \
+      python -m mpi4py.futures ./projects/example/EXAMPLE_EMUL_PROFILE1.py \
+      --root ./projects/example/ --cov 'EXAMPLE_EMUL_MCMC1.covmat' \
+      --nwalkers 7 --profile 1 --maxfeval 7000 --numpts ${numpts}  \
+      --outroot "EXAMPLE_EMUL_PROFILE1" --factor 5 \
+      --minfile="./projects/example/EXAMPLE_EMUL_MIN1.txt"
+       
 > [!NOTE]
 > What should users do if they have not configured ML-related keys before running `setup_cocoa.sh` and `compile_cocoa.sh`, as rerunning these scripts can require a long time? Instead, run the following commands.
 >
@@ -269,14 +287,6 @@ PROFILE (simplified parameters to speed-up convergence):
 >      source ./installation_scripts/setup_pip_core_packages.sh     # install pip packages required by ML emulators
 >      source ./installation_scripts/setup_emultrf.sh               # download emulator codes
 >      source ./installation_scripts/unxv_emultrf.sh                # download pre-trained emulators
->
-> and
->
->      source  ./installation_scripts/setup_fgspectra.sh               # download Simons Observatory foreground library
->      source  ./installation_scripts/compile_fgspectra.sh             # download Simons Observatory foreground library
->      source ./installation_scripts/setup_simons_observatory.sh       # download Simons Observatory Likelihood code (to run EXAMPLE_EVALUATE26.yaml)
->      source ./installation_scripts/unxv_simons_observatory.sh        # download Simons Observatory Likelihood data  (to run EXAMPLE_EVALUATE26.yaml)
->      source ./installation_scripts/compile_simons_observatory.sh     # compile Simons Observatory Likelihood code     (to run EXAMPLE_EVALUATE26.yaml)
 > 
 > Finally, rerun all the steps presented in this section, including step one. Users must reload the `(.local)` environment by rerunning `start_cocoa.sh` so Cocoa can create appropriate symlinks that expose the emulators to Cobaya.
 
