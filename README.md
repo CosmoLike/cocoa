@@ -237,36 +237,54 @@ MCMC (Metropolis Hasting):
        --bind-to core --map-by core --report-bindings --mca mpi_yield_when_idle 1 \
        cobaya-run ./projects/example/EXAMPLE_EMUL_MCMC1.yaml -f
 
+> [!NOTE]
+> Before running a job with a large number of MPI workers (examples below), it may be necessary 
+> to increase the  limit of threads that can be created (at UofA HPC type `ulimit -u 2000000`), 
+> otherwise you may face the error `libgomp: Thread creation failed`
+
 PolyChord (run on an HPC):
 
     mpirun -n 60 --oversubscribe --mca pml ^ucx --mca btl vader,tcp,self \
        --bind-to core --map-by core --report-bindings --mca mpi_yield_when_idle 1 \
        cobaya-run ./projects/example/EXAMPLE_EMUL_POLY1.yaml -f
 
-Nautilus:
+Nautilus (run on an HPC):
 
-    mpirun -n 8 --oversubscribe --mca pml ^ucx --mca btl vader,tcp,self \
+    mpirun -n 60 --oversubscribe --mca pml ^ucx --mca btl vader,tcp,self \
        --bind-to core --map-by core --report-bindings --mca mpi_yield_when_idle 1 \
        python -m mpi4py.futures ./projects/example/EXAMPLE_EMUL_NAUTILUS1.py \
        --root ./projects/example/ --outroot "EXAMPLE_NAUTILUS1"  \
-       --maxfeval 1000000 --nlive 500 --neff 10000 --flive 0.01
+       --maxfeval 10000000 --nlive 500 --neff 10000 --flive 0.01
 
-Minimizer:
+Minimizer (run on an HPC):
 
-    mpirun -n 8 --oversubscribe --mca pml ^ucx --mca btl vader,tcp,self \
+    mpirun -n 60 --oversubscribe --mca pml ^ucx --mca btl vader,tcp,self \
        --bind-to core --map-by core --report-bindings --mca mpi_yield_when_idle 1 \
       python ./projects/example/EXAMPLE_EMUL_MINIMIZE1.py --root ./projects/example/ \
-      --cov 'EXAMPLE_EMUL_MCMC1.covmat' --outroot "EXAMPLE_EMUL_MIN1" --nwalkers 7 --maxfeval 7000
+      --cov 'EXAMPLE_EMUL_MCMC1.covmat' --outroot "EXAMPLE_EMUL_MIN1" \
+      --nwalkers 7 --maxfeval 20000
 
-Profile (Require to run minimizer first): 
+> [!NOTE]
+> The `maxfeval` option refers to the number of evaluations per temperature (simulated annealing).
+> Following Procoli's instructions, the sampler runs at 5 decreasing temperatures.
+> Maxfeval 12000 can be a bit overkill (so adjust it accordingly)
 
-    mpirun -n 8 --oversubscribe --mca pml ^ucx --mca btl vader,tcp,self \
+Profile (run on an HPC): 
+
+    mpirun -n 60 --oversubscribe --mca pml ^ucx --mca btl vader,tcp,self \
        --bind-to core --map-by core --report-bindings --mca mpi_yield_when_idle 1 \
       python -m mpi4py.futures ./projects/example/EXAMPLE_EMUL_PROFILE1.py \
       --root ./projects/example/ --cov 'EXAMPLE_EMUL_MCMC1.covmat' \
-      --nwalkers 7 --profile 1 --maxfeval 7000 --numpts ${numpts}  \
+      --nwalkers 7 --profile 1 --maxfeval 12000 --numpts 59  \
       --outroot "EXAMPLE_EMUL_PROFILE1" --factor 5 \
       --minfile="./projects/example/EXAMPLE_EMUL_MIN1.txt"
+
+> [!NOTE]
+> The `maxfeval` option refers to the number of evaluations per temperature (simulated annealing).
+> Following Procoli's instructions, the sampler runs at 5 decreasing temperatures.
+> Maxfeval 12000 can be a bit overkill (so adjust it accordingly). This parameter is much more
+> expensive here, compared to the global minimizer example, as emcee has only 1 MPI available.
+> The parallelization is at the level of the number of fixed points in the profile dimension.
        
 > [!NOTE]
 > What should users do if they have not configured ML-related keys before running `setup_cocoa.sh` and `compile_cocoa.sh`, as rerunning these scripts can require a long time? Instead, run the following commands.
