@@ -117,9 +117,9 @@ Users can now proceed to **the next section**.
 >     # ------------------------------------------------------------------------------
 >     (...)
 >     export OVERWRITE_EXISTING_ALL_PACKAGES=1    # except cosmolike projects
->     #export OVERWRITE_EXISTING_COSMOLIKE_CODE=1 # dangerous (possible lost of uncommit work)
+>     #export OVERWRITE_EXISTING_COSMOLIKE_CODE=1 # dangerous (possible loss of uncommitted work)
 >                                                 # if unset, users must manually delete cosmolike projects
->     #export REDOWNLOAD_EXISTING_ALL_DATA=1      # warning: some data are many GB
+>     #export REDOWNLOAD_EXISTING_ALL_DATA=1      # warning: some data is many GB
 
 # Running Examples  <a name="cobaya_base_code_examples"></a>
 
@@ -172,7 +172,7 @@ MCMC (Metropolis-Hastings Algorithm):
        cobaya-run ./projects/lsst_y1/EXAMPLE_MCMC1.yaml -f
 
 > [!Tip]
-> Cocoa provides several cosmolike projects, not all of which are installed by default. To activate them, refer to the appendix [FAQ: How do we compile external modules?](#appendix_compile_separately).
+> Cocoa provides several cosmolike projects, not all of which are installed by default. To activate them, please refer to the appendix [FAQ: How do we compile external modules?](#appendix_compile_separately).
 
 > [!TIP]
 > Assuming Cocoa is installed on a local (not remote!) machine, type the command below after step 2️⃣ to run Jupyter Notebooks.
@@ -205,7 +205,7 @@ MCMC (Metropolis-Hastings Algorithm):
 
 # Running ML emulators <a name="cobaya_base_code_examples_emul"></a>
 
-Cocoa contains a few transformer-based neural network emulators capable of simulating CMB, cosmolike, matter power spectrum, and distances. We provide a few scripts that exemplify their API. To run them, we assume users have commented out the following lines on `set_installation_options.sh` prior to running the `setup_cocoa.sh` and `compile_cocoa.sh` installation scripts.
+Cocoa contains a few transformer-based neural network emulators capable of simulating CMB, cosmolike, matter power spectrum, and distances. We provide a few scripts that exemplify their API. To run them, we assume users have commented out the following lines on `set_installation_options.sh` before running the `setup_cocoa.sh` and `compile_cocoa.sh` installation scripts.
 
       [Adapted from Cocoa/set_installation_options.sh shell script] 
       # inset # symbol in the lines below (i.e., unset these environmental keys)
@@ -219,7 +219,7 @@ Cocoa contains a few transformer-based neural network emulators capable of simul
 Now, users must follow all the steps below.
 
 > [!NOTE]
-> Having a GPU speeds up transformers-based emulators by a factor ~7 (tested on the simple NVIDIA RTX3060). 
+> Having a GPU speeds up Transformers-Based Emulators by a factor of ~5-10. 
 
  **Step :one:**: Activate the private Python environment by sourcing the script `start_cocoa.sh`
 
