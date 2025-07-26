@@ -70,173 +70,7 @@ args, unknown = parser.parse_known_args()
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
-info_txt = r"""
-likelihood:
-  planck_2018_highl_plik.TTTEEE_lite: 
-    path: ./external_modules/
-    clik_file: plc_3.0/hi_l/plik_lite/plik_lite_v22_TTTEEE.clik
-  planck_2018_lowl.TT: 
-    path: ./external_modules
-  planck_2018_lowl.EE:
-    path: ./external_modules
-  sn.desy5: 
-    path: ./external_modules/data/sn_data
-  bao.desi_dr2.desi_bao_all:
-    path: ./external_modules/data/ 
-  act_dr6_lenslike.ACTDR6LensLike:
-    lens_only: True
-    variant: actplanck_baseline
-params:
-  logA:
-    prior:
-      min: 1.61
-      max: 3.91
-    ref:
-      dist: norm
-      loc: 3.0448
-      scale: 0.05
-    proposal: 0.05
-    latex: \log(10^{10} A_\mathrm{s}
-  ns:
-    prior:
-      min: 0.92
-      max: 1.05
-    ref:
-      dist: norm
-      loc: 0.96605
-      scale: 0.005
-    proposal: 0.005
-    latex: n_\mathrm{s}
-  thetastar:
-    prior:
-      min: 1
-      max: 1.2
-    ref:
-      dist: norm
-      loc: 1.04109
-      scale: 0.0004
-    proposal: 0.0002
-    latex: 100\theta_\mathrm{*}
-    renames: theta
-  omegabh2:
-    prior:
-      min: 0.01
-      max: 0.04
-    ref:
-      dist: norm
-      loc: 0.022383
-      scale: 0.005
-    proposal: 0.005
-    latex: \Omega_\mathrm{b} h^2
-  omegach2:
-    prior:
-      min: 0.06
-      max: 0.2
-    ref:
-      dist: norm
-      loc: 0.12011
-      scale: 0.03
-    proposal: 0.03
-    latex: \Omega_\mathrm{c} h^2
-  tau:
-    prior:
-      dist: norm
-      loc: 0.0544
-      scale: 0.0073
-    ref:
-      dist: norm
-      loc: 0.055
-      scale: 0.006
-    proposal: 0.003
-    latex: \tau_\mathrm{reio}
-  As:
-    derived: 'lambda logA: 1e-10*np.exp(logA)'
-    latex: A_\mathrm{s}
-  A:
-    derived: 'lambda As: 1e9*As'
-    latex: 10^9 A_\mathrm{s}
-  mnu:
-    value: 0.06
-  w0pwa:
-    value: -1.0
-    latex: w_{0,\mathrm{DE}}+w_{a,\mathrm{DE}}
-    drop: true
-  w:
-    value: -1.0
-    latex: w_{0,\mathrm{DE}}
-  wa:
-    value: 'lambda w0pwa, w: w0pwa - w'
-    derived: false
-    latex: w_{a,\mathrm{DE}}
-  H0:
-    derived: true
-    latex: H_0
-  omegamh2:
-    derived: true
-    value: 'lambda omegach2, omegabh2, mnu: omegach2+omegabh2+(mnu*(3.046/3)**0.75)/94.0708'
-    latex: \Omega_\mathrm{m} h^2
-  omegam:
-    derived: true
-    latex: \Omega_\mathrm{m}
-theory:
-  emultheta:
-    path: ./cobaya/cobaya/theories/
-    provides: ['H0', 'omegam']
-    extra_args:
-      file: ['external_modules/data/emultrf/CMB_TRF/emul_lcdm_thetaH0_GP.joblib']
-      extra: ['external_modules/data/emultrf/CMB_TRF/extra_lcdm_thetaH0.npy']
-      ord: [['omegabh2','omegach2','thetastar']]
-      extrapar: [{'MLA' : "GP"}]
-  emulrdrag:
-    path: ./cobaya/cobaya/theories/
-    provides: ['rdrag']
-    extra_args:
-      file: ['external_modules/data/emultrf/BAO_SN_RES/emul_lcdm_rdrag_GP.joblib'] 
-      extra: ['external_modules/data/emultrf/BAO_SN_RES/extra_lcdm_rdrag.npy'] 
-      ord: [['omegabh2','omegach2']]
-  emulcmb:
-    path: ./cobaya/cobaya/theories/
-    extra_args:
-      # This version of the emul was not trained with CosmoRec
-      eval: [True, True, True, True] #TT,TE,EE,PHIPHI
-      device: "cuda"
-      ord: [['omegabh2','omegach2','H0','tau','ns','logA','mnu','w','wa'],
-            ['omegabh2','omegach2','H0','tau','ns','logA','mnu','w','wa'],
-            ['omegabh2','omegach2','H0','tau','ns','logA','mnu','w','wa'],
-            ['omegabh2','omegach2','H0','tau','ns','logA','mnu','w','wa']]
-      file: ['external_modules/data/emultrf/CMB_TRF/emul_lcdm_CMBTT_CNN.pt',
-             'external_modules/data/emultrf/CMB_TRF/emul_lcdm_CMBTE_CNN.pt',
-             'external_modules/data/emultrf/CMB_TRF/emul_lcdm_CMBEE_CNN.pt', 
-             'external_modules/data/emultrf/CMB_TRF/emul_lcdm_phi_ResMLP.pt']
-      extra: ['external_modules/data/emultrf/CMB_TRF/extra_lcdm_CMBTT_CNN.npy',
-              'external_modules/data/emultrf/CMB_TRF/extra_lcdm_CMBTE_CNN.npy',
-              'external_modules/data/emultrf/CMB_TRF/extra_lcdm_CMBEE_CNN.npy', 
-              'external_modules/data/emultrf/CMB_TRF/extra_lcdm_phi_ResMLP.npy']
-      extrapar: [{'ellmax' : 5000, 'MLA': 'CNN', 'INTDIM': 4, 'INTCNN': 5120},
-                 {'ellmax' : 5000, 'MLA': 'CNN', 'INTDIM': 4, 'INTCNN': 5120},
-                 {'ellmax' : 5000, 'MLA': 'CNN', 'INTDIM': 4, 'INTCNN': 5120}, 
-                 {'MLA': 'ResMLP', 'INTDIM': 4, 'NLAYER': 4, 
-                  'TMAT': 'external_modules/data/emultrf/CMB_TRF/PCA_lcdm_phi.npy'}]
-  emulbaosn:
-    path: ./cobaya/cobaya/theories/
-    stop_at_error: True
-    extra_args:
-      device: "cuda"
-      file:  [None, 'external_modules/data/emultrf/BAO_SN_RES/emul_lcdm_H.pt']
-      extra: [None, 'external_modules/data/emultrf/BAO_SN_RES/extra_lcdm_H.npy']    
-      ord: [None, ['omegam','H0']]
-      extrapar: [{'MLA': 'INT', 'ZMIN' : 0.0001, 'ZMAX' : 3, 'NZ' : 600},
-                 {'MLA': 'ResMLP', 'offset' : 0.0, 'INTDIM' : 1, 'NLAYER' : 1,
-                  'TMAT': 'external_modules/data/emultrf/BAO_SN_RES/PCA_lcdm_H.npy',
-                  'ZLIN': 'external_modules/data/emultrf/BAO_SN_RES/z_lin_lcdm.npy'}]
-"""
-# ------------------------------------------------------------------------------
-# ------------------------------------------------------------------------------
-# ------------------------------------------------------------------------------
-# ------------------------------------------------------------------------------
-# ------------------------------------------------------------------------------
-# ------------------------------------------------------------------------------
-model = get_model(yaml_load(info_txt))
+model = get_model(yaml_load("./projects/example/EXAMPLE_EMUL_EVALUATE1.yaml"))
 def likelihood(p):
     point = dict(zip(model.parameterization.sampled_params(),
                  model.prior.sample(ignore_external=True)[0]))
@@ -253,7 +87,8 @@ def likelihood(p):
 # ------------------------------------------------------------------------------
 from mpi4py.futures import MPIPoolExecutor
 if __name__ == '__main__':
-    rnd = random.randint(0,1000)
+    #rnd = random.randint(0,1000)
+    rnd = 100
     cfile= args.root + "chains/" + args.outroot +  "_" + str(rnd) + "_checkpoint" ".hdf5"
     print(f"nlive={args.nlive}, output={cfile}")
     # Here we need to pass Cobaya Prior to Nautilus
@@ -309,5 +144,5 @@ if __name__ == '__main__':
 #mpirun -n 5 --oversubscribe --mca pml ^ucx --mca btl vader,tcp,self \
 #   --bind-to core:overload-allowed --rank-by slot --map-by numa:pe=${OMP_NUM_THREADS} \
 #   python -m mpi4py.futures ./projects/example/EXAMPLE_EMUL_NAUTILUS1.py \
-#   --root ./projects/example/ --outroot "example_nautilus1"  \
-#   --maxfeval 50000 --nlive 500 --neff 10000 --flive 0.01
+#   --root ./projects/example/ --outroot "EXAMPLE_NAUTILUS1"  \
+#   --maxfeval 1000000 --nlive 500 --neff 10000 --flive 0.01

@@ -1,5 +1,5 @@
-stop_at_error: false
-timing: true
+stop_at_error: False
+timing: false
 debug: false
 
 likelihood:
@@ -161,13 +161,12 @@ theory:
                   'TMAT': 'external_modules/data/emultrf/BAO_SN_RES/PCA_lcdm_H.npy',
                   'ZLIN': 'external_modules/data/emultrf/BAO_SN_RES/z_lin_lcdm.npy'}]
 sampler:
-  evaluate:
-    override:
-      logA: 3.045845885
-      ns: 9.652308970e-01
-      thetastar: 1.0415895
-      omegabh2: 2.246801442e-02
-      omegach2: 1.198257361e-01 
-      tau: 5.433339482e-02
-      A_planck: 1.000
-output: ./projects/example/chains/EXAMPLE_EMUL_EVALUATE1
+  polychord:
+    path: null
+    nlive: 1024
+    num_repeats: 3d
+    do_clustering: false
+    precision_criterion: 0.05
+    boost_posterior: 10
+    feedback: 2
+output: ./projects/example/chains/EXAMPLE_EMUL_POLY1

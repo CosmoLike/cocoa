@@ -40,7 +40,9 @@ likelihood:
     path: ./external_modules/data/sn_data
   bao.desi_dr2.desi_bao_all:
     path: ./external_modules/data/ 
-
+  act_dr6_lenslike.ACTDR6LensLike:
+    lens_only: True
+    variant: actplanck_baseline
 params:
   logA:
     prior:
@@ -51,7 +53,7 @@ params:
       loc: 3.0448
       scale: 0.05
     proposal: 0.05
-    latex: \log(10^{10} A_\mathrm{s})
+    latex: \log(10^{10} A_\mathrm{s}
   ns:
     prior:
       min: 0.92
@@ -124,19 +126,15 @@ params:
     derived: false
     latex: w_{a,\mathrm{DE}}
   H0:
-    derived: true
     latex: H_0
   omegamh2:
     derived: true
     value: 'lambda omegach2, omegabh2, mnu: omegach2+omegabh2+(mnu*(3.046/3)**0.75)/94.0708'
     latex: \Omega_\mathrm{m} h^2
   omegam:
-    derived: true
     latex: \Omega_\mathrm{m}
   rdrag:
-    derived: true
     latex: r_\mathrm{drag}
-
 theory:
   emultheta:
     path: ./cobaya/cobaya/theories/
@@ -157,24 +155,25 @@ theory:
     path: ./cobaya/cobaya/theories/
     extra_args:
       # This version of the emul was not trained with CosmoRec
-      eval: [True, True, True, False] #TT,TE,EE,PHIPHI
+      eval: [True, True, True, True] #TT,TE,EE,PHIPHI
       device: "cuda"
-      file: ['external_modules/data/emultrf/CMB_TRF/emul_lcdm_CMBTT_TRF.pt',
-             'external_modules/data/emultrf/CMB_TRF/emul_lcdm_CMBTE_TRF.pt',
-             'external_modules/data/emultrf/CMB_TRF/emul_lcdm_CMBEE_TRF.pt',
-             None] 
-      extra: ['external_modules/data/emultrf/CMB_TRF/extra_lcdm_CMBTT_TRF.npy',
-              'external_modules/data/emultrf/CMB_TRF/extra_lcdm_CMBTE_TRF.npy',
-              'external_modules/data/emultrf/CMB_TRF/extra_lcdm_CMBEE_TRF.npy',
-              None]
       ord: [['omegabh2','omegach2','H0','tau','ns','logA','mnu','w','wa'],
             ['omegabh2','omegach2','H0','tau','ns','logA','mnu','w','wa'],
             ['omegabh2','omegach2','H0','tau','ns','logA','mnu','w','wa'],
-            None]
-      extrapar: [{'ellmax' : 5000, 'MLA': 'TRF', 'NCTRF': 16, 'INTDIM': 4, 'INTTRF': 5120},
-                 {'ellmax' : 5000, 'MLA': 'TRF', 'NCTRF': 16, 'INTDIM': 4, 'INTTRF': 5120},
-                 {'ellmax' : 5000, 'MLA': 'TRF', 'NCTRF': 16, 'INTDIM': 4, 'INTTRF': 5120},
-                 None]
+            ['omegabh2','omegach2','H0','tau','ns','logA','mnu','w','wa']]
+      file: ['external_modules/data/emultrf/CMB_TRF/emul_lcdm_CMBTT_CNN.pt',
+             'external_modules/data/emultrf/CMB_TRF/emul_lcdm_CMBTE_CNN.pt',
+             'external_modules/data/emultrf/CMB_TRF/emul_lcdm_CMBEE_CNN.pt', 
+             'external_modules/data/emultrf/CMB_TRF/emul_lcdm_phi_ResMLP.pt']
+      extra: ['external_modules/data/emultrf/CMB_TRF/extra_lcdm_CMBTT_CNN.npy',
+              'external_modules/data/emultrf/CMB_TRF/extra_lcdm_CMBTE_CNN.npy',
+              'external_modules/data/emultrf/CMB_TRF/extra_lcdm_CMBEE_CNN.npy', 
+              'external_modules/data/emultrf/CMB_TRF/extra_lcdm_phi_ResMLP.npy']
+      extrapar: [{'ellmax' : 5000, 'MLA': 'CNN', 'INTDIM': 4, 'INTCNN': 5120},
+                 {'ellmax' : 5000, 'MLA': 'CNN', 'INTDIM': 4, 'INTCNN': 5120},
+                 {'ellmax' : 5000, 'MLA': 'CNN', 'INTDIM': 4, 'INTCNN': 5120}, 
+                 {'MLA': 'ResMLP', 'INTDIM': 4, 'NLAYER': 4, 
+                  'TMAT': 'external_modules/data/emultrf/CMB_TRF/PCA_lcdm_phi.npy'}]
   emulbaosn:
     path: ./cobaya/cobaya/theories/
     stop_at_error: True
@@ -191,32 +190,18 @@ theory:
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
-
-info  = yaml_load(info_txt)
-model = get_model(info)
-
+# ------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
+model = get_model(yaml_load(info_txt))
 def chi2(p):
     point = dict(zip(model.parameterization.sampled_params(),
                  model.prior.sample(ignore_external=True)[0]))
-    point.update({'logA': p[0], 
-                  'ns':  p[1],
-                  'thetastar': p[2], 
-                  'omegabh2': p[3], 
-                  'omegach2': p[4], 
-                  'tau': p[5],
-                  'A_planck': p[6]})
-    logposterior = model.logposterior(point, as_dict=True)
-    if 'loglikes' in logposterior.keys(): 
-      res1 = logposterior["loglikes"].get("planck_2018_highl_plik.TTTEEE_lite",-1e200)
-      res2 = logposterior["loglikes"].get("planck_2018_lowl.TT",-1e200)
-      res3 = logposterior["loglikes"].get("planck_2018_lowl.EE",-1e200)
-      res4 = logposterior["loglikes"].get("sn.desy5",-1e200)
-      res5 = logposterior["loglikes"].get("bao.desi_dr2.desi_bao_all",-1e200)
-      res6 = logposterior["logpriors"].get("0",-1e20) 
-      res  = -2.0*(res1 + res2 + res3 + res4 + res5 + res6)
-    else:
-      res = -2.0*(1e20)
-    return res
+    names=list(model.parameterization.sampled_params().keys())
+    point.update({ name: p[name].item() for name in names })
+    res1 = model.logprior(point,make_finite=True)
+    res2 = model.loglike(point,make_finite=True,cached=False,return_derived=False)
+    return -2.0*(res1+res2)
 
 x0 = np.array([
     3.045845885,         # logA

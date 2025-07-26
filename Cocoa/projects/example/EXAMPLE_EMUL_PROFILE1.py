@@ -81,180 +81,26 @@ parser.add_argument("--nwalkers",
                     help="Number of emcee walkers",
                     nargs='?',
                     const=1)
+parser.add_argument("--minfile",
+                    dest="minfile",
+                    help="Minimization Result",
+                    nargs='?',
+                    const=1)
 args, unknown = parser.parse_known_args()
 maxfeval = args.maxfeval
 oroot    = args.root + "chains/" + args.outroot
 index    = args.profile
 numpts   = args.numpts
 nwalkers = args.nwalkers
-# ------------------------------------------------------------------------------
-# ------------------------------------------------------------------------------
-# ------------------------------------------------------------------------------
-info_txt = r"""
-likelihood:
-  planck_2018_highl_plik.TTTEEE_lite: 
-    path: ./external_modules/
-    clik_file: plc_3.0/hi_l/plik_lite/plik_lite_v22_TTTEEE.clik
-  planck_2018_lowl.TT: 
-    path: ./external_modules
-  planck_2018_lowl.EE:
-    path: ./external_modules
-params:
-  logA:
-    prior:
-      min: 1.61
-      max: 3.91
-    ref:
-      dist: norm
-      loc: 3.0448
-      scale: 0.05
-    proposal: 0.05
-    latex: \log(10^{10} A_\mathrm{s}
-  ns:
-    prior:
-      min: 0.92
-      max: 1.05
-    ref:
-      dist: norm
-      loc: 0.96605
-      scale: 0.005
-    proposal: 0.005
-    latex: n_\mathrm{s}
-  thetastar:
-    prior:
-      min: 1
-      max: 1.2
-    ref:
-      dist: norm
-      loc: 1.04109
-      scale: 0.0004
-    proposal: 0.0002
-    latex: 100\theta_\mathrm{*}
-    renames: theta
-  omegabh2:
-    prior:
-      min: 0.01
-      max: 0.04
-    ref:
-      dist: norm
-      loc: 0.022383
-      scale: 0.005
-    proposal: 0.005
-    latex: \Omega_\mathrm{b} h^2
-  omegach2:
-    prior:
-      min: 0.06
-      max: 0.2
-    ref:
-      dist: norm
-      loc: 0.12011
-      scale: 0.03
-    proposal: 0.03
-    latex: \Omega_\mathrm{c} h^2
-  tau:
-    prior:
-      dist: norm
-      loc: 0.0544
-      scale: 0.0073
-    ref:
-      dist: norm
-      loc: 0.055
-      scale: 0.006
-    proposal: 0.003
-    latex: \tau_\mathrm{reio}
-  As:
-    derived: 'lambda logA: 1e-10*np.exp(logA)'
-    latex: A_\mathrm{s}
-  A:
-    derived: 'lambda As: 1e9*As'
-    latex: 10^9 A_\mathrm{s}
-  mnu:
-    value: 0.06
-  w0pwa:
-    value: -1.0
-    latex: w_{0,\mathrm{DE}}+w_{a,\mathrm{DE}}
-    drop: true
-  w:
-    value: -1.0
-    latex: w_{0,\mathrm{DE}}
-  wa:
-    value: 'lambda w0pwa, w: w0pwa - w'
-    derived: false
-    latex: w_{a,\mathrm{DE}}
-  H0:
-    derived: true
-    latex: H_0
-  omegamh2:
-    derived: true
-    value: 'lambda omegach2, omegabh2, mnu: omegach2+omegabh2+(mnu*(3.046/3)**0.75)/94.0708'
-    latex: \Omega_\mathrm{m} h^2
-  omegam:
-    derived: true
-    latex: \Omega_\mathrm{m}
-theory:
-  emultheta:
-    path: ./cobaya/cobaya/theories/
-    provides: ['H0', 'omegam']
-    extra_args:
-      file: ['external_modules/data/emultrf/CMB_TRF/emul_lcdm_thetaH0_GP.joblib']
-      extra: ['external_modules/data/emultrf/CMB_TRF/extra_lcdm_thetaH0.npy']
-      ord: [['omegabh2','omegach2','thetastar']]
-      extrapar: [{'MLA' : "GP"}]
-  emulcmb:
-    path: ./cobaya/cobaya/theories/
-    extra_args:
-      # This version of the emul was not trained with CosmoRec
-      eval: [True, True, True, False] #TT,TE,EE,PHIPHI
-      device: "cuda"
-      file: ['external_modules/data/emultrf/CMB_TRF/emul_lcdm_CMBTT_TRF.pt',
-             'external_modules/data/emultrf/CMB_TRF/emul_lcdm_CMBTE_TRF.pt',
-             'external_modules/data/emultrf/CMB_TRF/emul_lcdm_CMBEE_TRF.pt',
-             None] 
-      extra: ['external_modules/data/emultrf/CMB_TRF/extra_lcdm_CMBTT_TRF.npy',
-              'external_modules/data/emultrf/CMB_TRF/extra_lcdm_CMBTE_TRF.npy',
-              'external_modules/data/emultrf/CMB_TRF/extra_lcdm_CMBEE_TRF.npy',
-              None]
-      ord: [['omegabh2','omegach2','H0','tau','ns','logA','mnu','w','wa'],
-            ['omegabh2','omegach2','H0','tau','ns','logA','mnu','w','wa'],
-            ['omegabh2','omegach2','H0','tau','ns','logA','mnu','w','wa'],
-            None]
-      extrapar: [{'ellmax' : 5000, 'MLA': 'TRF', 'NCTRF': 16, 'INTDIM': 4, 'INTTRF': 5120},
-                 {'ellmax' : 5000, 'MLA': 'TRF', 'NCTRF': 16, 'INTDIM': 4, 'INTTRF': 5120},
-                 {'ellmax' : 5000, 'MLA': 'TRF', 'NCTRF': 16, 'INTDIM': 4, 'INTTRF': 5120},
-                 None]
-"""
+cov_file = args.root + args.cov
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
-x = np.array([
-    3.045845885,         # logA
-    9.652308970e-01,     # ns
-    1.0410562,           # thetastar
-    2.246801442e-02,     # omegabh2
-    1.198257361e-01 ,    # omegach2
-    5.433339482e-02,     # tau
-    1.00138              #A_planck
-], dtype='float64')
-
-cov    = np.loadtxt(args.root + args.cov)[0:len(x),0:len(x)]
-sigma  = np.sqrt(np.diag(cov))
-info  = yaml_load(info_txt)
-model = get_model(info)
-bounds0 = model.prior.bounds(confidence=0.999999)
-name  = list(model.parameterization.sampled_params().keys())
-start  = np.zeros(len(x), dtype='float64')
-stop   = np.zeros(len(x), dtype='float64')
-start    = x - args.factor*sigma
-stop     = x + args.factor*sigma
-for i in range(len(x)):
-    if (start[i] < bounds0[i][0]):
-      start[i] = bounds0[i][0]
-    if (stop[i] > bounds0[i][1]):
-      stop[i] = bounds0[i][1]
-
+model = get_model(yaml_load("./projects/example/EXAMPLE_EMUL_EVALUATE1.yaml"))
+name = list(model.parameterization.sampled_params().keys())
 def chi2(p):
     point = dict(zip(model.parameterization.sampled_params(),
                  model.prior.sample(ignore_external=True)[0]))
@@ -278,10 +124,10 @@ def chi2v2(p):
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
-def min_chi2(x0, 
+def min_chi2(x0,
+             cov, 
              fixed=-1, 
              maxfeval=3000, 
-             cov=cov,
              nwalkers=5):
 
     def mychi2(params, *args):
@@ -290,7 +136,6 @@ def min_chi2(x0,
         if fixed > -1:
             params = np.insert(params, fixed, z)
         return chi2(p=params)/T
-
     if fixed > -1:
         z      = x0[fixed]
         x0     = np.delete(x0, (fixed))
@@ -367,11 +212,14 @@ def min_chi2(x0,
     j = np.argmin(np.array(partial))
     result = [partial_samples[j], partial[j]]
     return result
-
-def prf(x0, index, maxfeval, nwalkers=5):
+# ------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
+def prf(x0, index, maxfeval, cov, nwalkers=5):
     t0 = np.array(x0, dtype='float64')
     res =  min_chi2(x0=t0, 
-                    fixed=index, 
+                    fixed=index,
+                    cov=cov, 
                     maxfeval=maxfeval, 
                     nwalkers=nwalkers)
     return res
@@ -391,6 +239,26 @@ etheta = emultheta(extra_args={
 from mpi4py.futures import MPIPoolExecutor
 
 if __name__ == '__main__':
+    # First we need to load minimum (from running EXAMPLE_EMUL_MINIMIZE1.py)
+    x = np.loadtxt(args.minfile)[0:model.prior.d()]
+
+    cov = np.loadtxt(cov_file)[0:model.prior.d(),0:model.prior.d()]
+    sigma = np.sqrt(np.diag(cov))
+
+    start = np.zeros(len(x), dtype='float64')
+    stop  = np.zeros(len(x), dtype='float64')
+    start = x - args.factor*sigma
+    stop  = x + args.factor*sigma
+    
+    bounds0 = model.prior.bounds(confidence=0.999999)
+    for i in range(len(x)):
+        if (start[i] < bounds0[i][0]):
+          start[i] = bounds0[i][0]
+        if (stop[i] > bounds0[i][1]):
+          stop[i] = bounds0[i][1]
+    # --------------------------------------------------------------------------
+    # --------------------------------------------------------------------------
+    # --------------------------------------------------------------------------
     print(f"nwalkers={nwalkers}, maxfeval={maxfeval}, param={index}")
     executor = MPIPoolExecutor()
     param = np.linspace(start=start[index], stop=stop[index], num=numpts)
@@ -400,7 +268,8 @@ if __name__ == '__main__':
     res = np.array(list(executor.map(functools.partial(prf, 
                                                        index=index,
                                                        maxfeval=maxfeval, 
-                                                       nwalkers=nwalkers),x0)),dtype="object")
+                                                       nwalkers=nwalkers,
+                                                       cov=cov),x0)),dtype="object")
     x0 = np.array([np.insert(row,index,p) for row, p in zip(res[:,0],param)],dtype='float64')
     # Append derived (begins) --------------------
     tmp = [
@@ -445,4 +314,5 @@ if __name__ == '__main__':
 #  python -m mpi4py.futures ./projects/example/EXAMPLE_EMUL_PROFILE2.py \
 #  --root ./projects/example/ --cov 'EXAMPLE_EMUL_MCMC2.covmat' \
 #  --nwalkers 5 --profile 1 --maxfeval 15000 --numpts ${numpts}  \
-#  --outroot "example_emul_profile2" --factor 5
+#  --outroot "example_emul_profile2" --factor 5 \
+#  --minfile="./projects/example/example_min2_lcdm.txt"
