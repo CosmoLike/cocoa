@@ -166,6 +166,7 @@ sampler:
     nlive: 1024
     num_repeats: 3d
     do_clustering: false
+    oversample_power: 0
     precision_criterion: 0.05
     boost_posterior: 10
     feedback: 2

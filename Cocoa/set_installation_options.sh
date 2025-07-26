@@ -263,7 +263,7 @@ export HOLICOW_DATA_URL='https://github.com/shsuyu/H0LiCOW-public.git'
 export HOLICOW_DATA_GIT_COMMIT="f792647d1fd6c09d9e052fef526669cbd702ab82"
 
 export POLY_URL="https://github.com/PolyChord/PolyChordLite.git"
-export POLYCHORD_GIT_COMMIT="daba49d1385d065122db76a2b384050f9e95d278"
+export POLYCHORD_GIT_COMMIT="a422163d875d7879d689ce535c47db0281da2775"
 export POLY_NAME="PolyChordLite"
 
 export CAMB_URL="https://github.com/cmbant/CAMB"
