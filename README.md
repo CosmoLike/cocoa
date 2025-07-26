@@ -283,7 +283,7 @@ Profile (Require to run minimizer first):
 >      source ./installation_scripts/unxv_emultrf.sh                # download pre-trained emulators
 >      source ./installation_scripts/setup_act_dr6.sh               # to run EXAMPLE_EMUL_EVALUATE1.yaml
 >      source ./installation_scripts/compile_act_dr6.sh             # to run EXAMPLE_EMUL_EVALUATE1.yaml
-      
+>      
 > Finally, rerun all the steps presented in this section, including step one. Users must reload the `(.local)` environment by rerunning `start_cocoa.sh` so Cocoa can create appropriate symlinks that expose the emulators to Cobaya.
 
 # Appendix <a name="appendix"></a>
