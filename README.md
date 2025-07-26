@@ -267,7 +267,7 @@ Minimizer (run on an HPC):
 > [!NOTE]
 > The `maxfeval` option refers to the number of evaluations per temperature (simulated annealing).
 > Following Procoli's instructions, the sampler runs at 5 decreasing temperatures.
-> Maxfeval 12000 can be a bit overkill (so adjust it accordingly)
+> `--maxfeval 20000` can be a bit overkill (so adjust it accordingly)
 
 Profile (run on an HPC): 
 
@@ -282,7 +282,7 @@ Profile (run on an HPC):
 > [!NOTE]
 > The `maxfeval` option refers to the number of evaluations per temperature (simulated annealing).
 > Following Procoli's instructions, the sampler runs at 5 decreasing temperatures.
-> Maxfeval 12000 can be a bit overkill (so adjust it accordingly). This parameter is much more
+> `--maxfeval 12000` can be a bit overkill (so adjust it accordingly). This parameter is much more
 > expensive here, compared to the global minimizer example, as emcee has only 1 MPI available.
 > The parallelization is at the level of the number of fixed points in the profile dimension.
        
