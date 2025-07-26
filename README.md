@@ -213,7 +213,9 @@ Cocoa contains a few transformer-based neural network emulators capable of simul
       #export IGNORE_EMULTRF_DATA=1  #SaraivanovZhongZhu (SZZ) transformer-based emul
       #export IGNORE_ACTDR6_CODE=1   # to run EXAMPLE_EMUL_EVALUATE1.yaml
       #export IGNORE_ACTDR6_DATA=1   # to run EXAMPLE_EMUL_EVALUATE1.yaml
-           
+      #export IGNORE_NAUTILUS_SAMPLER_CODE=1   # to run EXAMPLE_EMUL_NAUTILUS1.py
+      #export IGNORE_POLYCHORD_SAMPLER_CODE=1  # to run EXAMPLE_EMUL_POLY1.yaml
+      
 Now, users must follow all the steps below.
 
 > [!NOTE]
