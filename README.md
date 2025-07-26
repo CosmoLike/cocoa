@@ -231,29 +231,29 @@ Now, users must follow all the steps below.
 
 One model evaluation:
 
-    mpirun -n 1 --oversubscribe --mca pml ^ucx --mca btl vader,tcp,self \
-       --bind-to core:overload-allowed --mca mpi_yield_when_idle 1 \
+    mpirun -n 8 --oversubscribe --mca pml ^ucx --mca btl vader,tcp,self \
+       --bind-to core --map-by core --report-bindings --mca mpi_yield_when_idle 1 \
        --rank-by slot --map-by numa:pe=${OMP_NUM_THREADS} \
        cobaya-run ./projects/example/EXAMPLE_EMUL_EVALUATE1.yaml -f
                
 MCMC (Metropolis Hasting):
 
     mpirun -n 8 --oversubscribe --mca pml ^ucx --mca btl vader,tcp,self \
-       --bind-to core:overload-allowed --mca mpi_yield_when_idle 1 \
+       --bind-to core --map-by core --report-bindings --mca mpi_yield_when_idle 1 \
        --rank-by slot --map-by numa:pe=${OMP_NUM_THREADS} \
        cobaya-run ./projects/example/EXAMPLE_EMUL_MCMC1.yaml -f
 
 PolyChord:
 
     mpirun -n 8 --oversubscribe --mca pml ^ucx --mca btl vader,tcp,self \
-       --bind-to core:overload-allowed --mca mpi_yield_when_idle 1 \
+       --bind-to core --map-by core --report-bindings --mca mpi_yield_when_idle 1 \
        --rank-by slot --map-by numa:pe=${OMP_NUM_THREADS} \
        cobaya-run ./projects/example/EXAMPLE_EMUL_POLY1.yaml -f
 
 Nautilus:
 
     mpirun -n 8 --oversubscribe --mca pml ^ucx --mca btl vader,tcp,self \
-       --bind-to core:overload-allowed --rank-by slot --map-by numa:pe=${OMP_NUM_THREADS} \
+       --bind-to core --map-by core --report-bindings --mca mpi_yield_when_idle 1 \
        python -m mpi4py.futures ./projects/example/EXAMPLE_EMUL_NAUTILUS1.py \
        --root ./projects/example/ --outroot "EXAMPLE_NAUTILUS1"  \
        --maxfeval 1000000 --nlive 500 --neff 10000 --flive 0.01
@@ -261,16 +261,14 @@ Nautilus:
 Minimizer:
 
     mpirun -n 8 --oversubscribe --mca pml ^ucx --mca btl vader,tcp,self \
-      --bind-to core:overload-allowed --mca mpi_yield_when_idle 1 \
-      --rank-by slot --map-by numa:pe=${OMP_NUM_THREADS} \
+       --bind-to core --map-by core --report-bindings --mca mpi_yield_when_idle 1 \
       python ./projects/example/EXAMPLE_EMUL_MINIMIZE1.py --root ./projects/example/ \
       --cov 'EXAMPLE_EMUL_MCMC1.covmat' --outroot "EXAMPLE_EMUL_MIN1" --nwalkers 7 --maxfeval 7000
 
 Profile (Require to run minimizer first): 
 
     mpirun -n 8 --oversubscribe --mca pml ^ucx --mca btl vader,tcp,self \
-      --bind-to core:overload-allowed --mca mpi_yield_when_idle 1 \
-      --rank-by slot --map-by numa:pe=${OMP_NUM_THREADS} \
+       --bind-to core --map-by core --report-bindings --mca mpi_yield_when_idle 1 \
       python -m mpi4py.futures ./projects/example/EXAMPLE_EMUL_PROFILE1.py \
       --root ./projects/example/ --cov 'EXAMPLE_EMUL_MCMC1.covmat' \
       --nwalkers 7 --profile 1 --maxfeval 7000 --numpts ${numpts}  \
