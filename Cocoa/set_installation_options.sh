@@ -91,12 +91,12 @@ export INSTALL_PRIVATE_AXIONS_PROJECT=1
 # These keys are only relevant if you run setup_cocoa multiple times -----------
 # ------------------------------------------------------------------------------
 export OVERWRITE_EXISTING_ALL_PACKAGES=1    # except cosmolike projects
-#export OVERWRITE_EXISTING_COSMOLIKE_CODE=1 # dangerous (possible lost of uncommit work)
+#export OVERWRITE_EXISTING_COSMOLIKE_CODE=1 # dangerous (possible loss of uncommitted work)
                                             # if unset, users must manually delete
                                             # project if wants setup_cocoa to reclone it
-#export REDOWNLOAD_EXISTING_ALL_DATA=1      # warning: some data are many GB
+#export REDOWNLOAD_EXISTING_ALL_DATA=1      # warning: some data is many GB
 
-#export OVERWRITE_EXISTING_PRIVATE_CODE=1   # dangerous (possible lost of uncommit work)
+#export OVERWRITE_EXISTING_PRIVATE_CODE=1   # dangerous (possible loss of uncommitted work)
                                             # if unset, users must manually delete
                                             # project if wants setup_cocoa to reclone it
 # ------------------------------------------------------------------------------

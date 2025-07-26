@@ -27,7 +27,7 @@ params:
       loc: 3.0448
       scale: 0.05
     proposal: 0.05
-    latex: \log(10^{10} A_\mathrm{s}
+    latex: '\log(10^{10} A_\mathrm{s}'
   ns:
     prior:
       min: 0.92
@@ -37,7 +37,7 @@ params:
       loc: 0.96605
       scale: 0.005
     proposal: 0.005
-    latex: n_\mathrm{s}
+    latex: 'n_\mathrm{s}'
   thetastar:
     prior:
       min: 1
@@ -47,7 +47,7 @@ params:
       loc: 1.04109
       scale: 0.0004
     proposal: 0.0002
-    latex: 100\theta_\mathrm{*}
+    latex: '100\theta_\mathrm{*}'
     renames: theta
   omegabh2:
     prior:
@@ -58,7 +58,7 @@ params:
       loc: 0.022383
       scale: 0.005
     proposal: 0.005
-    latex: \Omega_\mathrm{b} h^2
+    latex: '\Omega_\mathrm{b} h^2'
   omegach2:
     prior:
       min: 0.06
@@ -68,7 +68,7 @@ params:
       loc: 0.12011
       scale: 0.03
     proposal: 0.03
-    latex: \Omega_\mathrm{c} h^2
+    latex: '\Omega_\mathrm{c} h^2'
   tau:
     prior:
       dist: norm
@@ -79,36 +79,36 @@ params:
       loc: 0.055
       scale: 0.006
     proposal: 0.003
-    latex: \tau_\mathrm{reio}
+    latex: '\tau_\mathrm{reio}'
   As:
     derived: 'lambda logA: 1e-10*np.exp(logA)'
-    latex: A_\mathrm{s}
+    latex: 'A_\mathrm{s}'
   A:
     derived: 'lambda As: 1e9*As'
-    latex: 10^9 A_\mathrm{s}
+    latex: '10^9 A_\mathrm{s}'
   mnu:
     value: 0.06
   w0pwa:
     value: -1.0
-    latex: w_{0,\mathrm{DE}}+w_{a,\mathrm{DE}}
+    latex: 'w_{0,\mathrm{DE}}+w_{a,\mathrm{DE}}'
     drop: true
   w:
     value: -1.0
-    latex: w_{0,\mathrm{DE}}
+    latex: 'w_{0,\mathrm{DE}}'
   wa:
     value: 'lambda w0pwa, w: w0pwa - w'
     derived: false
-    latex: w_{a,\mathrm{DE}}
+    latex: 'w_{a,\mathrm{DE}}'
   H0:
     latex: H_0
   omegamh2:
     derived: true
     value: 'lambda omegach2, omegabh2, mnu: omegach2+omegabh2+(mnu*(3.046/3)**0.75)/94.0708'
-    latex: \Omega_\mathrm{m} h^2
+    latex: '\Omega_\mathrm{m} h^2'
   omegam:
-    latex: \Omega_\mathrm{m}
+    latex: '\Omega_\mathrm{m}'
   rdrag:
-    latex: r_\mathrm{drag}
+    latex: 'r_\mathrm{drag}'
 theory:
   emultheta:
     path: ./cobaya/cobaya/theories/
