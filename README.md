@@ -228,13 +228,13 @@ Now, users must follow all the steps below.
 One model evaluation:
 
     mpirun -n 1 --oversubscribe --mca pml ^ucx --mca btl vader,tcp,self \
-       --bind-to core --map-by core --report-bindings --mca mpi_yield_when_idle 1 \
+       --bind-to core --map-by numa --report-bindings --mca mpi_yield_when_idle 1 \
        cobaya-run ./projects/example/EXAMPLE_EMUL_EVALUATE1.yaml -f
                
 MCMC (Metropolis Hasting):
 
     mpirun -n 8 --oversubscribe --mca pml ^ucx --mca btl vader,tcp,self \
-       --bind-to core --map-by core --report-bindings --mca mpi_yield_when_idle 1 \
+       --bind-to core --map-by numa --report-bindings --mca mpi_yield_when_idle 1 \
        cobaya-run ./projects/example/EXAMPLE_EMUL_MCMC1.yaml -f
 
 > [!NOTE]
@@ -245,13 +245,13 @@ MCMC (Metropolis Hasting):
 PolyChord (run on an HPC):
 
     mpirun -n 60 --oversubscribe --mca pml ^ucx --mca btl vader,tcp,self \
-       --bind-to core --map-by core --report-bindings --mca mpi_yield_when_idle 1 \
+       --bind-to core --map-by numa --report-bindings --mca mpi_yield_when_idle 1 \
        cobaya-run ./projects/example/EXAMPLE_EMUL_POLY1.yaml -f
 
 Nautilus (run on an HPC):
 
     mpirun -n 60 --oversubscribe --mca pml ^ucx --mca btl vader,tcp,self \
-       --bind-to core --map-by core --report-bindings --mca mpi_yield_when_idle 1 \
+       --bind-to core --map-by numa --report-bindings --mca mpi_yield_when_idle 1 \
        python -m mpi4py.futures ./projects/example/EXAMPLE_EMUL_NAUTILUS1.py \
        --root ./projects/example/ --outroot "EXAMPLE_NAUTILUS1"  \
        --maxfeval 10000000 --nlive 1024 --neff 12000 --flive 0.01
@@ -259,7 +259,7 @@ Nautilus (run on an HPC):
 Minimizer (run on an HPC):
 
     mpirun -n 60 --oversubscribe --mca pml ^ucx --mca btl vader,tcp,self \
-       --bind-to core --map-by core --report-bindings --mca mpi_yield_when_idle 1 \
+       --bind-to core --map-by numa --report-bindings --mca mpi_yield_when_idle 1 \
       python ./projects/example/EXAMPLE_EMUL_MINIMIZE1.py --root ./projects/example/ \
       --cov 'EXAMPLE_EMUL_MCMC1.covmat' --outroot "EXAMPLE_EMUL_MIN1" \
       --nwalkers 7 --maxfeval 10000
