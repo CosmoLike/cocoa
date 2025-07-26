@@ -17,6 +17,11 @@ warnings.filterwarnings(
     category=RuntimeWarning,
     message=r".*overflow encountered*"
 )
+warnings.filterwarnings(
+    "ignore",
+    category=UserWarning,
+    message=r".*Hartlap correction*"
+)
 import functools, iminuit, copy, argparse, random, time 
 import emcee, itertools
 import numpy as np
