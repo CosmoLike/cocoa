@@ -263,31 +263,17 @@ Minimizer (run on an HPC. Adjust number of MPI if needed):
     mpirun -n 80 --oversubscribe --mca pml ^ucx --mca btl vader,tcp,self \
        --bind-to core --map-by numa --report-bindings --mca mpi_yield_when_idle 1 \
       python ./projects/example/EXAMPLE_EMUL_MINIMIZE1.py --root ./projects/example/ \
-      --cov 'EXAMPLE_EMUL_MCMC1.covmat' --outroot "EXAMPLE_EMUL_MIN1" \
-      --nwalkers 79 --maxfeval 15000
+      --cov 'EXAMPLE_EMUL_MCMC1.covmat' --outroot "EXAMPLE_EMUL_MIN1" --maxfeval 5000
 
-> [!NOTE]
-> The `maxfeval` option refers to the number of evaluations per temperature (simulated annealing).
-> Following Procoli's instructions, the sampler runs at 5 decreasing temperatures.
-> `--maxfeval 15000` can be a bit overkill (so adjust it accordingly)
-
-Profile (run on an HPC - require Minimizer example result): 
+Profile (run on an HPC - requires Minimizer and MCMC results): 
 
     mpirun -n 80 --oversubscribe --mca pml ^ucx --mca btl vader,tcp,self \
        --bind-to core --map-by core --report-bindings --mca mpi_yield_when_idle 1 \
-      python -m mpi4py.futures ./projects/example/EXAMPLE_EMUL_PROFILE1.py \
-      --root ./projects/example/ --cov 'EXAMPLE_EMUL_MCMC1.covmat' \
-      --nwalkers 5 --profile 1 --maxfeval 10000 --numpts 59  \
-      --outroot "EXAMPLE_EMUL_PROFILE1" --factor 5 \
-      --minfile="./projects/example/chains/EXAMPLE_EMUL_MIN1.txt"
-
-> [!NOTE]
-> The `maxfeval` option refers to the number of evaluations per temperature (simulated annealing).
-> Following Procoli's instructions, the sampler runs at 5 decreasing temperatures.
-> `--maxfeval 10000` can be a bit overkill (so adjust it accordingly). This parameter is much more
-> expensive here, compared to the global minimizer example, as the Emcee sampler has only 1 MPI worker available.
-> The parallelization here happens at the level of the number of fixed points in the profile dimension.
-       
+      python ./projects/example/EXAMPLE_EMUL_PROFILE1.py \
+      --root ./projects/example/ --cov 'chains/EXAMPLE_EMUL_MCMC1.covmat' \
+      --outroot "EXAMPLE_EMUL_PROFILE1" --factor 3 --maxfeval 8000 --numpts 10 \
+      --profile 1 --minfile="./projects/example/chains/EXAMPLE_EMUL_MIN1.txt"
+ 
 > [!TIP]
 > What should users do if they have not configured ML-related keys before running `setup_cocoa.sh` and `compile_cocoa.sh`, as rerunning these scripts can require a long time? Instead, run the following commands.
 >
