@@ -164,7 +164,7 @@ One model evaluation:
        --rank-by slot --map-by numa:pe=${OMP_NUM_THREADS} \
        cobaya-run ./projects/lsst_y1/EXAMPLE_EVALUATE1.yaml -f
        
-MCMC (we run MCMCs with 32 cores):
+MCMC (Metropolis-Hastings Algorithm):
 
     mpirun -n 4 --oversubscribe --mca pml ^ucx --mca btl vader,tcp,self \
        --bind-to core:overload-allowed --mca mpi_yield_when_idle 1 \
@@ -228,13 +228,13 @@ Now, users must follow all the steps below.
 One model evaluation:
 
     mpirun -n 1 --oversubscribe --mca pml ^ucx --mca btl vader,tcp,self \
-       --bind-to core --map-by numa --report-bindings --mca mpi_yield_when_idle 1 \
+       --bind-to core --map-by numa --report-bindings \
        cobaya-run ./projects/example/EXAMPLE_EMUL_EVALUATE1.yaml -f
                
-MCMC (Metropolis Hasting):
+MCMC (Metropolis-Hastings Algorithm):
 
-    mpirun -n 8 --oversubscribe --mca pml ^ucx --mca btl vader,tcp,self \
-       --bind-to core --map-by numa --report-bindings --mca mpi_yield_when_idle 1 \
+    mpirun -n 4 --oversubscribe --mca pml ^ucx --mca btl vader,tcp,self \
+       --bind-to core --map-by numa --report-bindings \
        cobaya-run ./projects/example/EXAMPLE_EMUL_MCMC1.yaml -f
 
 > [!NOTE]
