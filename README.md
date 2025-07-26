@@ -208,16 +208,12 @@ MCMC (we run MCMCs with 32 cores):
 Cocoa contains a few transformer-based neural network emulators capable of simulating CMB, cosmolike, matter power spectrum, and distances. We provide a few scripts that exemplify their API. To run them, we assume users have commented out the following lines on `set_installation_options.sh` prior to running the `setup_cocoa.sh` and `compile_cocoa.sh` installation scripts.
 
       [Adapted from Cocoa/set_installation_options.sh shell script] 
-      
       # inset # symbol in the lines below (i.e., unset these environmental keys)
       #export IGNORE_EMULTRF_CODE=1  #SaraivanovZhongZhu (SZZ) transformer-based emul
       #export IGNORE_EMULTRF_DATA=1  #SaraivanovZhongZhu (SZZ) transformer-based emul
-
-      
-      #export IGNORE_FGSPECTRA_CODE=1                        # to run EXAMPLE_EVALUATE26.yaml
-      #export IGNORE_SIMONS_OBSERVATORY_LIKELIHOOD_CODE=1    # to run EXAMPLE_EVALUATE26.yaml
-      #export IGNORE_SIMONS_OBSERVATORY_CMB_DATA=1           # to run EXAMPLE_EVALUATE26.yaml
- 
+      #export IGNORE_ACTDR6_CODE=1   # to run EXAMPLE_EMUL_EVALUATE1.yaml
+      #export IGNORE_ACTDR6_DATA=1   # to run EXAMPLE_EMUL_EVALUATE1.yaml
+           
 Now, users must follow all the steps below.
 
 > [!NOTE]
@@ -231,29 +227,26 @@ Now, users must follow all the steps below.
 
 One model evaluation:
 
-    mpirun -n 1 --oversubscribe --mca pml ^ucx --mca btl vader,tcp,self \
-       --bind-to core:overload-allowed --mca mpi_yield_when_idle 1 \
-       --rank-by slot --map-by numa:pe=${OMP_NUM_THREADS} \
+    mpirun -n 8 --oversubscribe --mca pml ^ucx --mca btl vader,tcp,self \
+       --bind-to core --map-by core --report-bindings --mca mpi_yield_when_idle 1 \
        cobaya-run ./projects/example/EXAMPLE_EMUL_EVALUATE1.yaml -f
                
 MCMC (Metropolis Hasting):
 
     mpirun -n 8 --oversubscribe --mca pml ^ucx --mca btl vader,tcp,self \
-       --bind-to core:overload-allowed --mca mpi_yield_when_idle 1 \
-       --rank-by slot --map-by numa:pe=${OMP_NUM_THREADS} \
+       --bind-to core --map-by core --report-bindings --mca mpi_yield_when_idle 1 \
        cobaya-run ./projects/example/EXAMPLE_EMUL_MCMC1.yaml -f
 
-PolyChord:
+PolyChord (run on an HPC):
 
-    mpirun -n 8 --oversubscribe --mca pml ^ucx --mca btl vader,tcp,self \
-       --bind-to core:overload-allowed --mca mpi_yield_when_idle 1 \
-       --rank-by slot --map-by numa:pe=${OMP_NUM_THREADS} \
+    mpirun -n 60 --oversubscribe --mca pml ^ucx --mca btl vader,tcp,self \
+       --bind-to core --map-by core --report-bindings --mca mpi_yield_when_idle 1 \
        cobaya-run ./projects/example/EXAMPLE_EMUL_POLY1.yaml -f
 
 Nautilus:
 
     mpirun -n 8 --oversubscribe --mca pml ^ucx --mca btl vader,tcp,self \
-       --bind-to core:overload-allowed --rank-by slot --map-by numa:pe=${OMP_NUM_THREADS} \
+       --bind-to core --map-by core --report-bindings --mca mpi_yield_when_idle 1 \
        python -m mpi4py.futures ./projects/example/EXAMPLE_EMUL_NAUTILUS1.py \
        --root ./projects/example/ --outroot "EXAMPLE_NAUTILUS1"  \
        --maxfeval 1000000 --nlive 500 --neff 10000 --flive 0.01
@@ -261,16 +254,14 @@ Nautilus:
 Minimizer:
 
     mpirun -n 8 --oversubscribe --mca pml ^ucx --mca btl vader,tcp,self \
-      --bind-to core:overload-allowed --mca mpi_yield_when_idle 1 \
-      --rank-by slot --map-by numa:pe=${OMP_NUM_THREADS} \
+       --bind-to core --map-by core --report-bindings --mca mpi_yield_when_idle 1 \
       python ./projects/example/EXAMPLE_EMUL_MINIMIZE1.py --root ./projects/example/ \
       --cov 'EXAMPLE_EMUL_MCMC1.covmat' --outroot "EXAMPLE_EMUL_MIN1" --nwalkers 7 --maxfeval 7000
 
 Profile (Require to run minimizer first): 
 
     mpirun -n 8 --oversubscribe --mca pml ^ucx --mca btl vader,tcp,self \
-      --bind-to core:overload-allowed --mca mpi_yield_when_idle 1 \
-      --rank-by slot --map-by numa:pe=${OMP_NUM_THREADS} \
+       --bind-to core --map-by core --report-bindings --mca mpi_yield_when_idle 1 \
       python -m mpi4py.futures ./projects/example/EXAMPLE_EMUL_PROFILE1.py \
       --root ./projects/example/ --cov 'EXAMPLE_EMUL_MCMC1.covmat' \
       --nwalkers 7 --profile 1 --maxfeval 7000 --numpts ${numpts}  \
@@ -287,7 +278,9 @@ Profile (Require to run minimizer first):
 >      source ./installation_scripts/setup_pip_core_packages.sh     # install pip packages required by ML emulators
 >      source ./installation_scripts/setup_emultrf.sh               # download emulator codes
 >      source ./installation_scripts/unxv_emultrf.sh                # download pre-trained emulators
-> 
+>      source ./installation_scripts/setup_act_dr6.sh               # to run EXAMPLE_EMUL_EVALUATE1.yaml
+>      source ./installation_scripts/compile_act_dr6.sh             # to run EXAMPLE_EMUL_EVALUATE1.yaml
+>      
 > Finally, rerun all the steps presented in this section, including step one. Users must reload the `(.local)` environment by rerunning `start_cocoa.sh` so Cocoa can create appropriate symlinks that expose the emulators to Cobaya.
 
 # Appendix <a name="appendix"></a>
