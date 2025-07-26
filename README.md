@@ -237,9 +237,9 @@ MCMC (Metropolis Hasting):
        --bind-to core --map-by core --report-bindings --mca mpi_yield_when_idle 1 \
        cobaya-run ./projects/example/EXAMPLE_EMUL_MCMC1.yaml -f
 
-PolyChord:
+PolyChord (run on an HPC):
 
-    mpirun -n 8 --oversubscribe --mca pml ^ucx --mca btl vader,tcp,self \
+    mpirun -n 60 --oversubscribe --mca pml ^ucx --mca btl vader,tcp,self \
        --bind-to core --map-by core --report-bindings --mca mpi_yield_when_idle 1 \
        cobaya-run ./projects/example/EXAMPLE_EMUL_POLY1.yaml -f
 
