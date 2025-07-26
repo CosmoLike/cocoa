@@ -15,7 +15,7 @@ warnings.filterwarnings(
 warnings.filterwarnings(
     "ignore",
     category=RuntimeWarning,
-    message=r".*overflow encountered in exp.*"
+    message=r".*overflow encountered*"
 )
 import functools, iminuit, copy, argparse, random, time 
 import emcee, itertools
@@ -55,17 +55,8 @@ parser.add_argument("--cov",
                     help="Chain Covariance Matrix",
                     nargs='?',
                     const=1) # zero or one
-parser.add_argument("--nwalkers",
-                    dest="nwalkers",
-                    help="Number of emcee walkers",
-                    nargs='?',
-                    const=1)
 # need to use parse_known_args because of mpifuture 
 args, unknown = parser.parse_known_args()
-maxfeval    = args.maxfeval
-oroot       = args.root + "chains/" + args.outroot
-nwalkers    = args.nwalkers
-cov_file = args.root + args.cov
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
@@ -98,7 +89,7 @@ params:
       loc: 3.0448
       scale: 0.05
     proposal: 0.05
-    latex: '\log(10^{10} A_\mathrm{s}'
+    latex: '\log(10^{10} A_\mathrm{s})'
   ns:
     prior:
       min: 0.92
@@ -309,11 +300,8 @@ def min_chi2(x0,
     temperature = np.array([1.0, 0.25, 0.1, 0.005, 0.001], dtype='float64')
     stepsz      = temperature/4.0
 
-    mychi2(x0, *args) # first call takes a lot longer (when running on cuda)
-
     partial_samples = []
     partial = []
-
     for i in range(len(temperature)):
         x = [] # Initial point
         for j in range(nwalkers):
@@ -328,8 +316,7 @@ def min_chi2(x0,
                                         logprob, 
                                         args=(args[0], args[1], temperature[i]),
                                         moves=[(emcee.moves.GaussianMove(cov=GScov),1.)],
-                                        pool=pool)
-        
+                                        pool=pool)    
         sampler.run_mcmc(x, nsteps, skip_initial_state_check=True)
         samples = sampler.get_chain(flat=True, thin=1, discard=0)
 
@@ -368,17 +355,17 @@ if __name__ == '__main__':
         if not pool.is_master():
             pool.wait()
             sys.exit(0)
-        print(f"nwalkers={nwalkers}, maxfeval={maxfeval}")
+        print(f"maxfeval={args.maxfeval}")
         (x, results) = model.get_valid_point(max_tries=10000, 
                                              ignore_fixed_ref=False,
                                              logposterior_as_dict=True)
         bounds0 = model.prior.bounds(confidence=0.999999)
-        cov = np.loadtxt(cov_file)[0:model.prior.d(),0:model.prior.d()]
+        cov = np.loadtxt(args.root+args.cov)[0:model.prior.d(),0:model.prior.d()]
         res = np.array(list(prf(np.array(x, dtype='float64'), 
                                index=-1, 
-                               maxfeval=maxfeval, 
+                               maxfeval=args.maxfeval, 
                                bounds=bounds0, 
-                               nwalkers=nwalkers,
+                               nwalkers=pool.comm.Get_size() - 1,
                                pool=pool,
                                cov=cov)), dtype="object")
         x0 = np.array([res[0]],dtype='float64')
@@ -390,12 +377,10 @@ if __name__ == '__main__':
         # --- saving file begins -----------------------------------------------
         names = list(model.parameterization.sampled_params().keys()) # Cobaya Call
         names = names+list(model.info()['likelihood'].keys())+["prior"]+["chi2"]
-        rnd = random.randint(0,1000)
-        print("Output file = ", oroot + "_" + str(rnd) + ".txt")
-        np.savetxt(oroot + "_" + str(rnd) +".txt", 
+        np.savetxt(f"{args.root}chains/{args.outroot}.txt", 
                    x0,
                    fmt="%.6e",
-                   header=f"nwalkers={nwalkers}, maxfeval={maxfeval}\n"+' '.join(names),
+                   header=f"maxfeval={args.maxfeval}\n"+' '.join(names),
                    comments="# ")
         # --- saving file ends -------------------------------------------------
 # ------------------------------------------------------------------------------

@@ -63,6 +63,13 @@ parser.add_argument("--flive",
                     nargs='?',
                     const=1,
                     default=0.01)
+parser.add_argument("--nnetworks",
+                    dest="nnetworks",
+                    help="Number of Neural Networks",
+                    type=int,
+                    nargs='?',
+                    const=1,
+                    default=4)
 args, unknown = parser.parse_known_args()
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
@@ -96,7 +103,7 @@ params:
       loc: 3.0448
       scale: 0.05
     proposal: 0.05
-    latex: '\log(10^{10} A_\mathrm{s}'
+    latex: '\log(10^{10} A_\mathrm{s})'
   ns:
     prior:
       min: 0.92
@@ -253,24 +260,23 @@ def likelihood(p):
 # ------------------------------------------------------------------------------
 from mpi4py.futures import MPIPoolExecutor
 if __name__ == '__main__':
-    #rnd = random.randint(0,1000)
-    rnd = 100
-    cfile= args.root + "chains/" + args.outroot +  "_" + str(rnd) + "_checkpoint" ".hdf5"
+    cfile = f"{args.root}chains/{args.outroot}_checkpoint.hdf5"
     print(f"nlive={args.nlive}, output={cfile}")
-    # Here we need to pass Cobaya Prior to Nautilus
-    NautilusPrior = Prior()                              # Nautilus Call 
-    dim    = model.prior.d()                             # Cobaya call
-    bounds = model.prior.bounds(confidence=0.999999)     # Cobaya call
+    # Build Nautilus Prior from Cobaya
+    NautilusPrior = Prior()                                       # Nautilus Call 
+    dim    = model.prior.d()                                      # Cobaya call
+    bounds = model.prior.bounds(confidence=0.999999)              # Cobaya call
     names  = list(model.parameterization.sampled_params().keys()) # Cobaya Call
     for b, name in zip(bounds, names):
       NautilusPrior.add_parameter(name, dist=(b[0], b[1]))
-    # Start Nautilus
+    
     sampler = Sampler(NautilusPrior, 
                       likelihood,  
                       filepath=cfile, 
                       n_dim=dim,
                       pool=MPIPoolExecutor(),
                       n_live=args.nlive,
+                      n_networks=args.nnetworks,
                       resume=True)
     sampler.run(f_live=args.flive,
                 n_eff=args.neff,
@@ -278,24 +284,27 @@ if __name__ == '__main__':
                 verbose=True,
                 discard_exploration=True)
     points, log_w, log_l = sampler.posterior()
+    
     # --- saving file begins --------------------
-    cfile   = args.root + "chains/" + args.outroot +  "_" + str(rnd) + ".1.txt"
+    cfile  = f"{args.root}chains/{args.outroot}.1.txt"
     print("Output file = ", cfile)
     np.savetxt(cfile,
                np.column_stack((np.exp(log_w), log_l, points, -2*log_l)),
                fmt="%.5e",
-               header=f"nlive={args.nlive}, maxfeval={args.maxfeval}\n"+' '.join(names),
+               header=f"nlive={args.nlive}, maxfeval={args.maxfeval}, log-Z ={sampler.log_z}\n"+' '.join(names),
                comments="# ")
+    
     # Now we need to save a paramname files --------------------
-    cfile   = args.root + "chains/" + args.outroot +  "_" + str(rnd) + ".paramnames"
+    cfile   = f"{args.root}chains/{args.outroot}.paramnames"
     param_info = model.info()['params']
     names2 = names.copy()
     latex  = [param_info[x]['latex'] for x in names2]
     names2.append("chi2*")
     latex.append("\\chi^2")
     np.savetxt(cfile, np.column_stack((names2,latex)),fmt="%s")
+    
     # Now we need to save a range files --------------------
-    cfile   = args.root + "chains/" + args.outroot +  "_" + str(rnd) + ".ranges"
+    cfile = f"{args.root}chains/{args.outroot}.ranges"
     rows = [(str(n),float(l),float(h)) for n,l,h in zip(names,bounds[:,0],bounds[:,1])]
     with open(cfile, "w") as f: 
       f.writelines(f"{n} {l:.5e} {h:.5e}\n" for n, l, h in rows)

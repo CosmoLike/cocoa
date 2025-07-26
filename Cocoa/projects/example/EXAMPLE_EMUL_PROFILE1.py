@@ -15,7 +15,7 @@ warnings.filterwarnings(
 warnings.filterwarnings(
     "ignore",
     category=RuntimeWarning,
-    message=r".*overflow encountered in exp.*"
+    message=r".*overflow encountered*"
 )
 import functools, iminuit, copy, argparse, random, time 
 import emcee, itertools
@@ -23,6 +23,7 @@ import numpy as np
 from cobaya.yaml import yaml_load
 from cobaya.model import get_model
 from getdist import IniFile
+from schwimmbad import MPIPool
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
@@ -76,23 +77,12 @@ parser.add_argument("--cov",
                     help="Chain Covariance Matrix",
                     nargs='?',
                     const=1) # zero or one
-parser.add_argument("--nwalkers",
-                    dest="nwalkers",
-                    help="Number of emcee walkers",
-                    nargs='?',
-                    const=1)
 parser.add_argument("--minfile",
                     dest="minfile",
                     help="Minimization Result",
                     nargs='?',
                     const=1)
 args, unknown = parser.parse_known_args()
-maxfeval = args.maxfeval
-oroot    = args.root + "chains/" + args.outroot
-index    = args.profile
-numpts   = args.numpts
-nwalkers = args.nwalkers
-cov_file = args.root + args.cov
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
@@ -294,7 +284,8 @@ def min_chi2(x0,
              cov, 
              fixed=-1, 
              maxfeval=3000, 
-             nwalkers=5):
+             nwalkers=5,
+             pool=None):
 
     def mychi2(params, *args):
         z, fixed, T = args
@@ -334,22 +325,8 @@ def min_chi2(x0,
     temperature = np.array([1.0, 0.25, 0.1, 0.005, 0.001], dtype='float64')
     stepsz      = temperature/4.0
 
-    mychi2(x0, *args) # first call takes a lot longer (when running on cuda)
-    start_time = time.time()
-    mychi2(GaussianStep(stepsize=0.1)(x0)[0,:], *args)
-    elapsed_time = time.time() - start_time
-
-    print(f"Emcee: nwalkers = {nwalkers}, "
-          f"nTemp = {len(temperature)}, "
-          f"feval (per walker) = {maxfeval}, "
-          f"feval (per Temp) = {nwalkers*maxfeval}, "
-          f"feval = {nwalkers*maxfeval*len(temperature)}")
-    print(f"Emcee: Like Eval Time: {elapsed_time:.4f} secs, "
-          f"Eval Time = {elapsed_time*nwalkers*maxfeval*len(temperature)/3600.:.4f} hours.")
-
     partial_samples = []
     partial = []
-
     for i in range(len(temperature)):
         x = [] # Initial point
         for j in range(nwalkers):
@@ -363,7 +340,8 @@ def min_chi2(x0,
                                         ndim, 
                                         logprob, 
                                         args=(args[0], args[1], temperature[i]),
-                                        moves=[(emcee.moves.GaussianMove(cov=GScov),1.)])
+                                        moves=[(emcee.moves.GaussianMove(cov=GScov),1.)],
+                                        pool=pool)
         
         sampler.run_mcmc(x, nsteps, skip_initial_state_check=True)
         samples = sampler.get_chain(flat=True, thin=1, discard=0)
@@ -381,13 +359,14 @@ def min_chi2(x0,
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
-def prf(x0, index, maxfeval, cov, nwalkers=5):
+def prf(x0, index, maxfeval, cov, nwalkers=5, pool=None):
     t0 = np.array(x0, dtype='float64')
     res =  min_chi2(x0=t0, 
                     fixed=index,
                     cov=cov, 
                     maxfeval=maxfeval, 
-                    nwalkers=nwalkers)
+                    nwalkers=nwalkers,
+                    pool=pool)
     return res
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
@@ -405,66 +384,72 @@ etheta = emultheta(extra_args={
 from mpi4py.futures import MPIPoolExecutor
 
 if __name__ == '__main__':
-    print(f"nwalkers={nwalkers}, maxfeval={maxfeval}, param={index}")
-    # First we need to load minimum (from running EXAMPLE_EMUL_MINIMIZE1.py)
-    x = np.loadtxt(args.minfile)[0:model.prior.d()]
+    with MPIPool() as pool:
+        if not pool.is_master():
+            pool.wait()
+            sys.exit(0)
+        
+        print(f"maxfeval={args.maxfeval}, param={args.profile}")
+        # First we need to load minimum (from running EXAMPLE_EMUL_MINIMIZE1.py)
+        x = np.loadtxt(args.minfile)[0:model.prior.d()]
 
-    cov = np.loadtxt(cov_file)[0:model.prior.d(),0:model.prior.d()]
-    sigma = np.sqrt(np.diag(cov))
+        cov = np.loadtxt(args.root + args.cov)[0:model.prior.d(),0:model.prior.d()]
+        sigma = np.sqrt(np.diag(cov))
 
-    start = np.zeros(len(x), dtype='float64')
-    stop  = np.zeros(len(x), dtype='float64')
-    start = x - args.factor*sigma
-    stop  = x + args.factor*sigma
-    
-    bounds0 = model.prior.bounds(confidence=0.999999)
-    for i in range(len(x)):
-        if (start[i] < bounds0[i][0]):
-          start[i] = bounds0[i][0]
-        if (stop[i] > bounds0[i][1]):
-          stop[i] = bounds0[i][1]
-    # --------------------------------------------------------------------------
-    # --------------------------------------------------------------------------
-    # --------------------------------------------------------------------------
-    executor = MPIPoolExecutor()
-    param = np.linspace(start=start[index], stop=stop[index], num=numpts)
-    print(f"profile param values = {param}")
-    x0 = np.tile(x, (param.size, 1))
-    x0[:,index] = param
-    res = np.array(list(executor.map(functools.partial(prf, 
-                                                       index=index,
-                                                       maxfeval=maxfeval, 
-                                                       nwalkers=nwalkers,
-                                                       cov=cov),x0)),dtype="object")
-    x0 = np.array([np.insert(row,index,p) for row, p in zip(res[:,0],param)],dtype='float64')
-    # Append derived (begins) --------------------
-    tmp = [
-        etheta.calculate({
-            'thetastar': row[2],
-            'omegabh2':  row[3],
-            'omegach2':  row[4],
-            'omegamh2':  row[3] + row[4] + (0.06*(3.046/3)**0.75)/94.0708
-        })
-        for row in x0
-      ]
-    x0 = np.column_stack((x0, 
-                          np.array([d['H0'] for d in tmp], dtype='float64'), 
-                          np.array([d['omegam'] for d in tmp], dtype='float64'),
-                          np.array([chi2v2(d) for d in x0], dtype='float64')))
-    # Append derived (ends) --------------------
-    # --- saving file begins -------------------- 
-    rnd = random.randint(0,1000)
-    out = oroot + "_" + str(rnd) + "_" + name[index] 
-    names = list(model.parameterization.sampled_params().keys()) # Cobaya Call
-    names = [names[index],"chi2"]+names+["rdrag"]+list(model.info()['likelihood'].keys())+["prior"]
-    print("Output file = ", out + ".txt")
-    np.savetxt(out+".txt",
-               np.concatenate([np.c_[param,res[:,1]],x0],axis=1),
-               fmt="%.6e",
-               header=f"nwalkers={nwalkers}, maxfeval={maxfeval}, param={name[index]}\n"+' '.join(names),
-               comments="# ")
-    # --- saving file ends --------------------
-    executor.shutdown()
+        start = np.zeros(len(x), dtype='float64')
+        stop  = np.zeros(len(x), dtype='float64')
+        start = x - args.factor*sigma
+        stop  = x + args.factor*sigma
+        
+        bounds0 = model.prior.bounds(confidence=0.999999)
+        for i in range(len(x)):
+            if (start[i] < bounds0[i][0]):
+              start[i] = bounds0[i][0]
+            if (stop[i] > bounds0[i][1]):
+              stop[i] = bounds0[i][1]
+        # --------------------------------------------------------------------------
+        # --------------------------------------------------------------------------
+        # --------------------------------------------------------------------------
+        executor = MPIPoolExecutor()
+        param = np.linspace(start=start[args.profile],stop=stop[args.profile],num=args.numpts)
+        param = np.sort(np.append(param, x[args.profile])) # a bit wasteful but easier to code
+        print(f"profile param values = {param}")
+        x0 = np.tile(x, (param.size, 1))
+        x0[:,args.profile] = param
+        res = np.array(list(map(functools.partial(prf, 
+                                                  index=args.profile,
+                                                  maxfeval=args.maxfeval, 
+                                                  nwalkers=pool.comm.Get_size() - 1,
+                                                  pool=pool,
+                                                  cov=cov),x0)),dtype="object")
+        x0 = np.array([np.insert(row,args.profile,p) for row, p in zip(res[:,0],param)],dtype='float64')
+        # Append derived (begins) --------------------
+        tmp = [
+            etheta.calculate({
+                'thetastar': row[2],
+                'omegabh2':  row[3],
+                'omegach2':  row[4],
+                'omegamh2':  row[3] + row[4] + (0.06*(3.046/3)**0.75)/94.0708
+            })
+            for row in x0
+          ]
+        x0 = np.column_stack((x0, 
+                              np.array([d['H0'] for d in tmp], dtype='float64'), 
+                              np.array([d['omegam'] for d in tmp], dtype='float64'),
+                              np.array([chi2v2(d) for d in x0], dtype='float64')))
+        # Append derived (ends) --------------------
+        # --- saving file begins -------------------- 
+        rnd = random.randint(0,1000)
+        out = args.root + "chains/" + args.outroot + "_" + str(rnd) + "_" + name[args.profile] 
+        names = list(model.parameterization.sampled_params().keys()) # Cobaya Call
+        names = [names[args.profile],"chi2"]+names+["rdrag"]+list(model.info()['likelihood'].keys())+["prior"]
+        print("Output file = ", out + ".txt")
+        np.savetxt(out+".txt",
+                   np.concatenate([np.c_[param,res[:,1]],x0],axis=1),
+                   fmt="%.6e",
+                   header=f"maxfeval={args.maxfeval}, param={name[args.profile]}\n"+' '.join(names),
+                   comments="# ")
+        # --- saving file ends --------------------
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------

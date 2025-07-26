@@ -27,7 +27,7 @@ matplotlib.rcParams['legend.labelspacing'] = 0.77
 matplotlib.rcParams['savefig.bbox'] = 'tight'
 matplotlib.rcParams['savefig.format'] = 'pdf'
 
-parameter = [u'omegach2', u'H0', u'ns', u'omegabh2', u'H0', u'tau']
+parameter = [u'omegach2', u'logA', u'ns', u'omegabh2', u'tau']
 chaindir=os.getcwd()
 
 analysissettings={'smooth_scale_1D':0.35, 'smooth_scale_2D':0.3,'ignore_rows': u'0.4',
@@ -37,13 +37,13 @@ analysissettings2={'smooth_scale_1D':0.35,'smooth_scale_2D':0.3,'ignore_rows': u
 'range_confidence' : u'0.005'}
 
 root_chains = (
-  './chains/EXAMPLE_EMUL_MCMC1',
-  './chains/example_nautilus_100',
-  './chains/EXAMPLE_EMUL_POLY1',
+  '/chains/EXAMPLE_NAUTILUS1_100',
+  '/chains/EXAMPLE_NAUTILUS1_1001',
+  '/chains/EXAMPLE_NAUTILUS1_1002',
 )
 
 # --------------------------------------------------------------------------------
-samples=loadMCSamples(chaindir + root_chains[0],settings=analysissettings)
+samples=loadMCSamples(chaindir + root_chains[0],settings=analysissettings2)
 p = samples.getParams()
 samples.saveAsText(chaindir + '/.VM_P1_TMP1')
 # --------------------------------------------------------------------------------
