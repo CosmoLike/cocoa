@@ -254,7 +254,7 @@ Nautilus (run on an HPC):
        --bind-to core --map-by core --report-bindings --mca mpi_yield_when_idle 1 \
        python -m mpi4py.futures ./projects/example/EXAMPLE_EMUL_NAUTILUS1.py \
        --root ./projects/example/ --outroot "EXAMPLE_NAUTILUS1"  \
-       --maxfeval 10000000 --nlive 500 --neff 10000 --flive 0.01
+       --maxfeval 10000000 --nlive 1024 --neff 12000 --flive 0.01
 
 Minimizer (run on an HPC):
 
