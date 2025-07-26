@@ -246,38 +246,38 @@ MCMC (Metropolis-Hastings Algorithm):
 
 PolyChord (run on an HPC):
 
-    mpirun -n 60 --oversubscribe --mca pml ^ucx --mca btl vader,tcp,self \
+    mpirun -n 80 --oversubscribe --mca pml ^ucx --mca btl vader,tcp,self \
        --bind-to core --map-by numa --report-bindings --mca mpi_yield_when_idle 1 \
        cobaya-run ./projects/example/EXAMPLE_EMUL_POLY1.yaml -f
 
-Nautilus (run on an HPC):
+Nautilus (run on an HPC. Adjust number of MPI if needed):
 
-    mpirun -n 60 --oversubscribe --mca pml ^ucx --mca btl vader,tcp,self \
+    mpirun -n 80 --oversubscribe --mca pml ^ucx --mca btl vader,tcp,self \
        --bind-to core --map-by numa --report-bindings --mca mpi_yield_when_idle 1 \
        python -m mpi4py.futures ./projects/example/EXAMPLE_EMUL_NAUTILUS1.py \
        --root ./projects/example/ --outroot "EXAMPLE_NAUTILUS1"  \
-       --maxfeval 10000000 --nlive 1024 --neff 12000 --flive 0.01
+       --maxfeval 10000000 --nlive 1024 --neff 15000 --flive 0.01 --nnetworks 5
 
-Minimizer (run on an HPC):
+Minimizer (run on an HPC. Adjust number of MPI if needed):
 
-    mpirun -n 60 --oversubscribe --mca pml ^ucx --mca btl vader,tcp,self \
+    mpirun -n 80 --oversubscribe --mca pml ^ucx --mca btl vader,tcp,self \
        --bind-to core --map-by numa --report-bindings --mca mpi_yield_when_idle 1 \
       python ./projects/example/EXAMPLE_EMUL_MINIMIZE1.py --root ./projects/example/ \
       --cov 'EXAMPLE_EMUL_MCMC1.covmat' --outroot "EXAMPLE_EMUL_MIN1" \
-      --nwalkers 7 --maxfeval 10000
+      --nwalkers 79 --maxfeval 15000
 
 > [!NOTE]
 > The `maxfeval` option refers to the number of evaluations per temperature (simulated annealing).
 > Following Procoli's instructions, the sampler runs at 5 decreasing temperatures.
-> `--maxfeval 10000` can be a bit overkill (so adjust it accordingly)
+> `--maxfeval 15000` can be a bit overkill (so adjust it accordingly)
 
 Profile (run on an HPC - require Minimizer example result): 
 
-    mpirun -n 60 --oversubscribe --mca pml ^ucx --mca btl vader,tcp,self \
+    mpirun -n 80 --oversubscribe --mca pml ^ucx --mca btl vader,tcp,self \
        --bind-to core --map-by core --report-bindings --mca mpi_yield_when_idle 1 \
       python -m mpi4py.futures ./projects/example/EXAMPLE_EMUL_PROFILE1.py \
       --root ./projects/example/ --cov 'EXAMPLE_EMUL_MCMC1.covmat' \
-      --nwalkers 7 --profile 1 --maxfeval 10000 --numpts 59  \
+      --nwalkers 5 --profile 1 --maxfeval 10000 --numpts 59  \
       --outroot "EXAMPLE_EMUL_PROFILE1" --factor 5 \
       --minfile="./projects/example/chains/EXAMPLE_EMUL_MIN1.txt"
 
