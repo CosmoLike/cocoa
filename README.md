@@ -227,7 +227,7 @@ Now, users must follow all the steps below.
 
 One model evaluation:
 
-    mpirun -n 8 --oversubscribe --mca pml ^ucx --mca btl vader,tcp,self \
+    mpirun -n 1 --oversubscribe --mca pml ^ucx --mca btl vader,tcp,self \
        --bind-to core --map-by core --report-bindings --mca mpi_yield_when_idle 1 \
        cobaya-run ./projects/example/EXAMPLE_EMUL_EVALUATE1.yaml -f
                
