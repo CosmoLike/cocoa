@@ -324,7 +324,6 @@ def min_chi2(x0,
                                         pool=pool)    
         sampler.run_mcmc(x, nsteps, skip_initial_state_check=True)
         samples = sampler.get_chain(flat=True, thin=1, discard=0)
-
         j = np.argmin(-1.0*np.array(sampler.get_log_prob(flat=True)))
         partial_samples.append(samples[j])
         tchi2 = mychi2(samples[j], *args)
@@ -360,6 +359,8 @@ if __name__ == '__main__':
         if not pool.is_master():
             pool.wait()
             sys.exit(0)
+        nwalkers = 2*(pool.comm.Get_size()-1)
+        maxevals = int(args.maxfeval/(5.0*nwalkers))
         print(f"maxfeval={args.maxfeval}")
         (x, results) = model.get_valid_point(max_tries=10000, 
                                              ignore_fixed_ref=False,
@@ -368,9 +369,9 @@ if __name__ == '__main__':
         cov = np.loadtxt(args.root+args.cov)[0:model.prior.d(),0:model.prior.d()]
         res = np.array(list(prf(np.array(x, dtype='float64'), 
                                index=-1, 
-                               maxfeval=args.maxfeval, 
+                               maxfeval=maxevals, 
                                bounds=bounds0, 
-                               nwalkers=pool.comm.Get_size() - 1,
+                               nwalkers=nwalkers,
                                pool=pool,
                                cov=cov)), dtype="object")
         x0 = np.array([res[0]],dtype='float64')
@@ -394,10 +395,3 @@ if __name__ == '__main__':
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
-#HOW TO CALL THIS SCRIPT
-#export nmpi=5
-#mpirun -n ${nmpi} --oversubscribe --mca pml ^ucx --mca btl vader,tcp,self \
-#  --bind-to core:overload-allowed --mca mpi_yield_when_idle 1 \
-#  --rank-by slot --map-by numa:pe=${OMP_NUM_THREADS} \
-#  python ./projects/example/EXAMPLE_EMUL_MINIMIZE1.py --root ./projects/example/ \
-#  --cov 'EXAMPLE_EMUL_MCMC1.covmat' --outroot "example_min1" --nwalkers 5 --maxfeval 7000

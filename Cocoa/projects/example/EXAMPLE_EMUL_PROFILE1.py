@@ -327,7 +327,7 @@ def min_chi2(x0,
     ndim        = int(x0.shape[0])
     nwalkers    = int(nwalkers)
     nsteps      = maxfeval
-    temperature = np.array([1.0, 0.25, 0.1, 0.005, 0.001], dtype='float64')
+    temperature = np.array([0.25, 0.1, 0.005, 0.001], dtype='float64')
     stepsz      = temperature/4.0
 
     partial_samples = []
@@ -393,8 +393,6 @@ if __name__ == '__main__':
         if not pool.is_master():
             pool.wait()
             sys.exit(0)
-        
-        print(f"maxfeval={args.maxfeval}, param={args.profile}")
         # First we need to load minimum (from running EXAMPLE_EMUL_MINIMIZE1.py)
         x = np.loadtxt(args.minfile)[0:model.prior.d()]
 
@@ -412,23 +410,56 @@ if __name__ == '__main__':
               start[i] = bounds0[i][0]
             if (stop[i] > bounds0[i][1]):
               stop[i] = bounds0[i][1]
-        # --------------------------------------------------------------------------
-        # --------------------------------------------------------------------------
-        # --------------------------------------------------------------------------
-        executor = MPIPoolExecutor()
-        param = np.linspace(start=start[args.profile],stop=stop[args.profile],num=args.numpts)
-        param = np.sort(np.append(param, x[args.profile])) # a bit wasteful but easier to code
+        # ----------------------------------------------------------------------
+        # ----------------------------------------------------------------------
+        # ----------------------------------------------------------------------
+        numpts = args.numpts-1 if args.numpts%2 == 1 else args.numpts
+        half_range = (stop[args.profile] - start[args.profile]) / 2.0
+        param  = np.linspace(start=x[args.profile]-half_range,
+                            stop=x[args.profile]+half_range,
+                            num=numpts)
+        param = np.sort(np.append(param, x[args.profile])) # a bit wasteful
+        numpts=numpts+1
+
+        nwalkers = int(2*(pool.comm.Get_size()-1))
+        maxevals = int(args.maxfeval/(5.0*nwalkers))
+
+        print(f"maxfeval={args.maxfeval}, param={args.profile}")
         print(f"profile param values = {param}")
+
         x0 = np.tile(x, (param.size, 1))
         x0[:,args.profile] = param
-        res = np.array(list(map(functools.partial(prf, 
-                                                  index=args.profile,
-                                                  maxfeval=args.maxfeval, 
-                                                  nwalkers=pool.comm.Get_size() - 1,
-                                                  pool=pool,
-                                                  cov=cov),x0)),dtype="object")
-        x0 = np.array([np.insert(row,args.profile,p) for row, p in zip(res[:,0],param)],dtype='float64')
-        # Append derived (begins) --------------------
+        chi2res = [] 
+        print(x0)
+
+        tmp = np.array(x0[numpts//2,:], dtype='float64')
+        for i in range(numpts//2+1,numpts):
+            tmp[args.profile] = param[i]
+            res = prf(tmp, index=args.profile,
+                           maxfeval=maxevals, 
+                           nwalkers=nwalkers,
+                           pool=pool,
+                           cov=cov)
+            x0[i,:] = np.insert(res[0], args.profile, param[i])
+            tmp = np.array(x0[i,:], dtype='float64')
+            chi2res.append(res[1])
+            print(i, tmp, res[1])
+        
+        tmp = np.array(x0[numpts//2,:], dtype='float64')
+        for i in range(numpts//2-1, -1, -1):
+            tmp[args.profile] = param[i]
+            res = prf(tmp, index=args.profile,
+                               maxfeval=maxevals, 
+                               nwalkers=nwalkers,
+                               pool=pool,
+                               cov=cov)
+            x0[i,:] = np.insert(res[0], args.profile, param[i])
+            tmp = np.array(x0[i,:], dtype='float64')
+            chi2res.append(res[1])
+            print(i, tmp, res[1])
+        chi2res = np.array([t for t in chi2res], dtype='float64')
+        
+        # Append derived (begins) ----------------------------------------------
         tmp = [
             etheta.calculate({
                 'thetastar': row[2],
@@ -442,33 +473,20 @@ if __name__ == '__main__':
                               np.array([d['H0'] for d in tmp], dtype='float64'), 
                               np.array([d['omegam'] for d in tmp], dtype='float64'),
                               np.array([chi2v2(d) for d in x0], dtype='float64')))
-        # Append derived (ends) --------------------
-        # --- saving file begins -------------------- 
-        rnd = random.randint(0,1000)
-        out = args.root + "chains/" + args.outroot + "_" + str(rnd) + "_" + name[args.profile] 
+        # Append derived (ends) ------------------------------------------------
+        
+        # --- saving file begins -----------------------------------------------    
         names = list(model.parameterization.sampled_params().keys()) # Cobaya Call
         names = [names[args.profile],"chi2"]+names+["rdrag"]+list(model.info()['likelihood'].keys())+["prior"]
-        print("Output file = ", out + ".txt")
-        np.savetxt(out+".txt",
-                   np.concatenate([np.c_[param,res[:,1]],x0],axis=1),
+        np.savetxt(f"{args.root}chains/{args.outroot}.{name[args.profile]}.txt",
+                   np.concatenate([np.c_[param,chi2res],x0],axis=1),
                    fmt="%.6e",
                    header=f"maxfeval={args.maxfeval}, param={name[args.profile]}\n"+' '.join(names),
                    comments="# ")
-        # --- saving file ends --------------------
+        # --- saving file ends -------------------------------------------------
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
-#HOW TO CALL THIS SCRIPT
-#export nmpi=5
-#export numpts=$((${nmpi}-1))
-#mpirun -n ${nmpi} --oversubscribe --mca pml ^ucx --mca btl vader,tcp,self \
-#  --bind-to core:overload-allowed --mca mpi_yield_when_idle 1 \
-#  --rank-by slot --map-by numa:pe=${OMP_NUM_THREADS} \
-#  python -m mpi4py.futures ./projects/example/EXAMPLE_EMUL_PROFILE2.py \
-#  --root ./projects/example/ --cov 'EXAMPLE_EMUL_MCMC2.covmat' \
-#  --nwalkers 5 --profile 1 --maxfeval 15000 --numpts ${numpts}  \
-#  --outroot "example_emul_profile2" --factor 5 \
-#  --minfile="./projects/example/example_min2_lcdm.txt"
