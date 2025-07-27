@@ -258,20 +258,23 @@ Nautilus (run on an HPC. Adjust number of MPI if needed):
        --root ./projects/example/ --outroot "EXAMPLE_NAUTILUS1"  \
        --maxfeval 10000000 --nlive 1024 --neff 15000 --flive 0.01 --nnetworks 5
 
-Minimizer (run on an HPC. Adjust number of MPI if needed):
+Minimizer (Run on an HPC. Requires MCMC/Nautilus results. Adjust number of MPI if needed):
 
-    mpirun -n 86 --oversubscribe --mca pml ^ucx --mca btl vader,tcp,self \
+    mpirun -n 40 --oversubscribe --mca pml ^ucx --mca btl vader,tcp,self \
        --bind-to core --map-by numa --report-bindings --mca mpi_yield_when_idle 1 \
       python ./projects/example/EXAMPLE_EMUL_MINIMIZE1.py --root ./projects/example/ \
-      --cov 'EXAMPLE_EMUL_MCMC1.covmat' --outroot "EXAMPLE_EMUL_MIN1" --maxfeval 5000
+      --cov 'chains/EXAMPLE_EMUL_MCMC1.covmat' --outroot "EXAMPLE_EMUL_MIN1" --maxfeval 300000
 
-Profile (run on an HPC - requires Minimizer and MCMC results): 
+> [!TIP]
+> The number of evaluation per MPI walker is maxfeval/2*NMPI. Aim that to be higher than 5000.
 
-    mpirun -n 86 --oversubscribe --mca pml ^ucx --mca btl vader,tcp,self \
+Profile (Run on an HPC. Requires Minimizer and MCMC/Nautilus results. Adjust number of MPI if needed): 
+
+    mpirun -n 40 --oversubscribe --mca pml ^ucx --mca btl vader,tcp,self \
        --bind-to core --map-by core --report-bindings --mca mpi_yield_when_idle 1 \
       python ./projects/example/EXAMPLE_EMUL_PROFILE1.py \
       --root ./projects/example/ --cov 'chains/EXAMPLE_EMUL_MCMC1.covmat' \
-      --outroot "EXAMPLE_EMUL_PROFILE1" --factor 3 --maxfeval 8000 --numpts 10 \
+      --outroot "EXAMPLE_EMUL_PROFILE1" --factor 3 --maxfeval 240000 --numpts 10 \
       --profile 1 --minfile="./projects/example/chains/EXAMPLE_EMUL_MIN1.txt"
  
 > [!TIP]
