@@ -274,12 +274,9 @@ Profile (Requires Minimizer and MCMC/Nautilus results.):
        --bind-to core --map-by core --report-bindings --mca mpi_yield_when_idle 1 \
       python ./projects/example/EXAMPLE_EMUL_PROFILE1.py \
       --root ./projects/example/ --cov 'chains/EXAMPLE_EMUL_MCMC1.covmat' \
-      --outroot "EXAMPLE_EMUL_PROFILE1" --factor 3 --maxfeval 10000 --numpts 10 \
+      --outroot "EXAMPLE_EMUL_PROFILE1" --factor 3 --maxfeval 12500 --numpts 10 \
       --profile 1 --minfile="./projects/example/chains/EXAMPLE_EMUL_MIN1.txt"
-
-> [!TIP]
-> Number of steps per MPI per temperature is maxfeval/3NMPI. Do maintain this number around 600.
-> 
+ 
 > [!TIP]
 > What should users do if they have not configured ML-related keys before running `setup_cocoa.sh` and `compile_cocoa.sh`, as rerunning these scripts can require a long time? Instead, run the following commands.
 >
