@@ -301,8 +301,11 @@ def min_chi2(x0,
     
     ndim        = int(x0.shape[0])
     nwalkers    = int(nwalkers)
-    nsteps      = maxfeval
-    temperature = np.array([1.0, 0.25, 0.1, 0.005, 0.001], dtype='float64')
+    nsteps      = np.array([  maxfeval, 
+                            2*maxfeval, 
+                              maxfeval, 
+                            int(0.5*maxfeval)], dtype='int')
+    temperature = np.array([1.0, 0.25, 0.1, 0.005], dtype='float64')
     stepsz      = temperature/4.0
 
     partial_samples = []
@@ -322,7 +325,7 @@ def min_chi2(x0,
                                         args=(args[0], args[1], temperature[i]),
                                         moves=[(emcee.moves.GaussianMove(cov=GScov),1.)],
                                         pool=pool)    
-        sampler.run_mcmc(x, nsteps, skip_initial_state_check=True)
+        sampler.run_mcmc(x, nsteps[i], skip_initial_state_check=True)
         samples = sampler.get_chain(flat=True, thin=1, discard=0)
         j = np.argmin(-1.0*np.array(sampler.get_log_prob(flat=True)))
         partial_samples.append(samples[j])
@@ -330,6 +333,9 @@ def min_chi2(x0,
         partial.append(tchi2)
         x0 = copy.deepcopy(samples[j])
         sampler.reset()    
+        j = np.argmin(np.array(partial))
+        print(f"Partial ({i+1}/{len(temperature)}): "
+              f"params = {partial_samples[j]}, and chi2 = {partial[j]}")
     # min chi2 from the entire emcee runs
     j = np.argmin(np.array(partial))
     result = [partial_samples[j], partial[j]]
@@ -359,8 +365,8 @@ if __name__ == '__main__':
         if not pool.is_master():
             pool.wait()
             sys.exit(0)
-        nwalkers = 2*(pool.comm.Get_size()-1)
-        maxevals = int(args.maxfeval/(5.0*nwalkers))
+        nwalkers = pool.comm.Get_size()
+        maxevals = int(args.maxfeval/(4.0*nwalkers))
         print(f"maxfeval={args.maxfeval}")
         (x, results) = model.get_valid_point(max_tries=10000, 
                                              ignore_fixed_ref=False,

@@ -327,7 +327,7 @@ def min_chi2(x0,
     ndim        = int(x0.shape[0])
     nwalkers    = int(nwalkers)
     nsteps      = maxfeval
-    temperature = np.array([0.25, 0.1, 0.005, 0.001], dtype='float64')
+    temperature = np.array([0.25, 0.1, 0.005], dtype='float64')
     stepsz      = temperature/4.0
 
     partial_samples = []
@@ -393,45 +393,54 @@ if __name__ == '__main__':
         if not pool.is_master():
             pool.wait()
             sys.exit(0)
+        nwalkers = pool.comm.Get_size()
+        maxevals = int(args.maxfeval/(3.0*nwalkers))
+        # ----------------------------------------------------------------------
         # First we need to load minimum (from running EXAMPLE_EMUL_MINIMIZE1.py)
-        x = np.loadtxt(args.minfile)[0:model.prior.d()]
-
+        xf = np.loadtxt(args.minfile)
+        chi2f = xf[-1]
+        xf = xf[0:model.prior.d()] 
+        # ----------------------------------------------------------------------
+        # Second, we need to load the cov. matrix (from running EXAMPLE_EMUL_MCMC1.yaml)
         cov = np.loadtxt(args.root + args.cov)[0:model.prior.d(),0:model.prior.d()]
         sigma = np.sqrt(np.diag(cov))
-
-        start = np.zeros(len(x), dtype='float64')
-        stop  = np.zeros(len(x), dtype='float64')
-        start = x - args.factor*sigma
-        stop  = x + args.factor*sigma
-        
+        # ----------------------------------------------------------------------
+        # Third we need to set the parameter profile range
+        start = np.zeros(model.prior.d(), dtype='float64')
+        stop  = np.zeros(model.prior.d(), dtype='float64')
+        start = xf - args.factor*sigma
+        stop  = xf + args.factor*sigma
+        # We need to respect the YAML priors
         bounds0 = model.prior.bounds(confidence=0.999999)
-        for i in range(len(x)):
+        for i in range(model.prior.d()):
             if (start[i] < bounds0[i][0]):
               start[i] = bounds0[i][0]
             if (stop[i] > bounds0[i][1]):
               stop[i] = bounds0[i][1]
-        # ----------------------------------------------------------------------
-        # ----------------------------------------------------------------------
-        # ----------------------------------------------------------------------
-        numpts = args.numpts-1 if args.numpts%2 == 1 else args.numpts
+
         half_range = (stop[args.profile] - start[args.profile]) / 2.0
-        param  = np.linspace(start=x[args.profile]-half_range,
-                            stop=x[args.profile]+half_range,
-                            num=numpts)
-        param = np.sort(np.append(param, x[args.profile])) # a bit wasteful
+       
+        numpts = args.numpts-1 if args.numpts%2 == 1 else args.numpts 
+      
+        param  = np.linspace(start = xf[args.profile] - half_range,
+                             stop  = xf[args.profile] + half_range,
+                             num = numpts)
         numpts=numpts+1
-
-        nwalkers = int(2*(pool.comm.Get_size()-1))
-        maxevals = int(args.maxfeval/(5.0*nwalkers))
-
-        print(f"maxfeval={args.maxfeval}, param={args.profile}")
+        param = np.insert(param, numpts//2, xf[args.profile])
+        # ----------------------------------------------------------------------
+        # Print to the terminal (helps debug)
+        names = list(model.parameterization.sampled_params().keys()) # Cobaya Call
+        print(f"maxfeval={args.maxfeval}, param={names[args.profile]}")
         print(f"profile param values = {param}")
-
-        x0 = np.tile(x, (param.size, 1))
+        # ----------------------------------------------------------------------
+        # 4th: we need to set the vectors that will hold the final result
+        x0 = np.tile(xf, (numpts, 1))
         x0[:,args.profile] = param
-        chi2res = [] 
-        print(x0)
-
+        
+        chi2res = np.zeros(numpts)
+        chi2res[numpts//2] = chi2f
+        # ----------------------------------------------------------------------
+        # 5th: run from midpoint to right
         tmp = np.array(x0[numpts//2,:], dtype='float64')
         for i in range(numpts//2+1,numpts):
             tmp[args.profile] = param[i]
@@ -442,9 +451,10 @@ if __name__ == '__main__':
                            cov=cov)
             x0[i,:] = np.insert(res[0], args.profile, param[i])
             tmp = np.array(x0[i,:], dtype='float64')
-            chi2res.append(res[1])
-            print(i, tmp, res[1])
-        
+            chi2res[i] = res[1]
+            print(f"Partial ({i+1}/{numpts}): params = {tmp}, and chi2 = {res[1]}")
+        # ----------------------------------------------------------------------
+        # 6th: run from midpoint to left
         tmp = np.array(x0[numpts//2,:], dtype='float64')
         for i in range(numpts//2-1, -1, -1):
             tmp[args.profile] = param[i]
@@ -455,10 +465,9 @@ if __name__ == '__main__':
                                cov=cov)
             x0[i,:] = np.insert(res[0], args.profile, param[i])
             tmp = np.array(x0[i,:], dtype='float64')
-            chi2res.append(res[1])
-            print(i, tmp, res[1])
-        chi2res = np.array([t for t in chi2res], dtype='float64')
-        
+            chi2res[i] = res[1] 
+            print(f"Partial ({i+1}/{numpts}): params = {tmp}, and chi2 = {res[1]}")       
+        # ----------------------------------------------------------------------
         # Append derived (begins) ----------------------------------------------
         tmp = [
             etheta.calculate({
@@ -473,17 +482,14 @@ if __name__ == '__main__':
                               np.array([d['H0'] for d in tmp], dtype='float64'), 
                               np.array([d['omegam'] for d in tmp], dtype='float64'),
                               np.array([chi2v2(d) for d in x0], dtype='float64')))
-        # Append derived (ends) ------------------------------------------------
-        
+        # ----------------------------------------------------------------------
         # --- saving file begins -----------------------------------------------    
-        names = list(model.parameterization.sampled_params().keys()) # Cobaya Call
         names = [names[args.profile],"chi2"]+names+["rdrag"]+list(model.info()['likelihood'].keys())+["prior"]
         np.savetxt(f"{args.root}chains/{args.outroot}.{name[args.profile]}.txt",
                    np.concatenate([np.c_[param,chi2res],x0],axis=1),
                    fmt="%.6e",
                    header=f"maxfeval={args.maxfeval}, param={name[args.profile]}\n"+' '.join(names),
                    comments="# ")
-        # --- saving file ends -------------------------------------------------
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
