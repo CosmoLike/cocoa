@@ -260,23 +260,26 @@ Nautilus (run on an HPC. Adjust number of MPI if needed):
 
 Minimizer (Run on an HPC. Requires MCMC/Nautilus results. Adjust number of MPI if needed):
 
-    mpirun -n 40 --oversubscribe --mca pml ^ucx --mca btl vader,tcp,self \
+    mpirun -n 15 --oversubscribe --mca pml ^ucx --mca btl vader,tcp,self \
        --bind-to core --map-by numa --report-bindings --mca mpi_yield_when_idle 1 \
       python ./projects/example/EXAMPLE_EMUL_MINIMIZE1.py --root ./projects/example/ \
-      --cov 'chains/EXAMPLE_EMUL_MCMC1.covmat' --outroot "EXAMPLE_EMUL_MIN1" --maxfeval 300000
+      --cov 'chains/EXAMPLE_EMUL_MCMC1.covmat' --outroot "EXAMPLE_EMUL_MIN1" --maxfeval 50000
 
 > [!TIP]
-> The number of evaluation per MPI walker is maxfeval/2*NMPI. Aim that to be higher than 5000.
+> Number of steps per MPI per temperature is maxfeval/4NMPI. Do maintain this number around 1000.
 
 Profile (Run on an HPC. Requires Minimizer and MCMC/Nautilus results. Adjust number of MPI if needed): 
 
-    mpirun -n 40 --oversubscribe --mca pml ^ucx --mca btl vader,tcp,self \
+    mpirun -n 15 --oversubscribe --mca pml ^ucx --mca btl vader,tcp,self \
        --bind-to core --map-by core --report-bindings --mca mpi_yield_when_idle 1 \
       python ./projects/example/EXAMPLE_EMUL_PROFILE1.py \
       --root ./projects/example/ --cov 'chains/EXAMPLE_EMUL_MCMC1.covmat' \
-      --outroot "EXAMPLE_EMUL_PROFILE1" --factor 3 --maxfeval 240000 --numpts 10 \
+      --outroot "EXAMPLE_EMUL_PROFILE1" --factor 3 --maxfeval 30000 --numpts 10 \
       --profile 1 --minfile="./projects/example/chains/EXAMPLE_EMUL_MIN1.txt"
- 
+
+> [!TIP]
+> Number of steps per MPI per temperature is maxfeval/3NMPI. Do maintain this number around 1000.
+> 
 > [!TIP]
 > What should users do if they have not configured ML-related keys before running `setup_cocoa.sh` and `compile_cocoa.sh`, as rerunning these scripts can require a long time? Instead, run the following commands.
 >
