@@ -362,29 +362,28 @@ if __name__ == '__main__':
         nwalkers = 2*(pool.comm.Get_size()-1)
         maxevals = int(args.maxfeval/(5.0*nwalkers))
         print(f"maxfeval={args.maxfeval}")
-        (x, results) = model.get_valid_point(max_tries=10000, 
+        (x0, results) = model.get_valid_point(max_tries=10000, 
                                              ignore_fixed_ref=False,
                                              logposterior_as_dict=True)
-        bounds0 = model.prior.bounds(confidence=0.999999)
         cov = np.loadtxt(args.root+args.cov)[0:model.prior.d(),0:model.prior.d()]
-        res = np.array(list(prf(np.array(x, dtype='float64'), 
+        res = np.array(list(prf(np.array(x0, dtype='float64'), 
                                index=-1, 
                                maxfeval=maxevals, 
-                               bounds=bounds0, 
+                               bounds=model.prior.bounds(confidence=0.999999), 
                                nwalkers=nwalkers,
                                pool=pool,
                                cov=cov)), dtype="object")
-        x0 = np.array([res[0]],dtype='float64')
+        xf = np.array([res[0]],dtype='float64')
         # Append derived (begins) ----------------------------------------------
-        x0 = np.column_stack((x0, 
-                              np.array([chi2v2(d) for d in x0],dtype='float64'),
+        xf = np.column_stack((xf, 
+                              np.array([chi2v2(d) for d in xf], dtype='float64'),
                               res[1]))
         # Append derived (ends) ------------------------------------------------
         # --- saving file begins -----------------------------------------------
         names = list(model.parameterization.sampled_params().keys()) # Cobaya Call
         names = names+list(model.info()['likelihood'].keys())+["prior"]+["chi2"]
         np.savetxt(f"{args.root}chains/{args.outroot}.txt", 
-                   x0,
+                   xf,
                    fmt="%.6e",
                    header=f"maxfeval={args.maxfeval}\n"+' '.join(names),
                    comments="# ")

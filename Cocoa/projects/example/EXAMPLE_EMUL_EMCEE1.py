@@ -15,7 +15,12 @@ warnings.filterwarnings(
 warnings.filterwarnings(
     "ignore",
     category=RuntimeWarning,
-    message=r".*overflow encountered in exp.*"
+    message=r".*overflow encountered*"
+)
+warnings.filterwarnings(
+    "ignore",
+    category=UserWarning,
+    message=r".*Hartlap correction*"
 )
 import functools, iminuit, copy, argparse, random, time 
 import emcee, itertools
@@ -24,6 +29,38 @@ from cobaya.yaml import yaml_load
 from cobaya.model import get_model
 from getdist import IniFile
 from schwimmbad import MPIPool
+# ------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
+parser = argparse.ArgumentParser(prog='EXAMPLE_EMUL_EMCEE')
+
+parser.add_argument("--maxfeval",
+                    dest="maxfeval",
+                    help="Minimizer: maximum number of likelihood evaluations",
+                    type=int,
+                    nargs='?',
+                    const=1,
+                    default=5000)
+
+parser.add_argument("--root",
+                    dest="root",
+                    help="Name of the Output File",
+                    nargs='?',
+                    const=1,
+                    default="./projects/example/")
+
+parser.add_argument("--outroot",
+                    dest="outroot",
+                    help="Name of the Output File",
+                    nargs='?',
+                    const=1,
+                    default="test.dat")
+# ------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
@@ -53,7 +90,7 @@ params:
       loc: 3.0448
       scale: 0.05
     proposal: 0.05
-    latex: \log(10^{10} A_\mathrm{s}
+    latex: '\log(10^{10} A_\mathrm{s}'
   ns:
     prior:
       min: 0.92
@@ -63,7 +100,7 @@ params:
       loc: 0.96605
       scale: 0.005
     proposal: 0.005
-    latex: n_\mathrm{s}
+    latex: 'n_\mathrm{s}'
   thetastar:
     prior:
       min: 1
@@ -73,7 +110,7 @@ params:
       loc: 1.04109
       scale: 0.0004
     proposal: 0.0002
-    latex: 100\theta_\mathrm{*}
+    latex: '100\theta_\mathrm{*}'
     renames: theta
   omegabh2:
     prior:
@@ -84,7 +121,7 @@ params:
       loc: 0.022383
       scale: 0.005
     proposal: 0.005
-    latex: \Omega_\mathrm{b} h^2
+    latex: '\Omega_\mathrm{b} h^2'
   omegach2:
     prior:
       min: 0.06
@@ -94,7 +131,7 @@ params:
       loc: 0.12011
       scale: 0.03
     proposal: 0.03
-    latex: \Omega_\mathrm{c} h^2
+    latex: '\Omega_\mathrm{c} h^2'
   tau:
     prior:
       dist: norm
@@ -105,36 +142,36 @@ params:
       loc: 0.055
       scale: 0.006
     proposal: 0.003
-    latex: \tau_\mathrm{reio}
+    latex: '\tau_\mathrm{reio}'
   As:
     derived: 'lambda logA: 1e-10*np.exp(logA)'
-    latex: A_\mathrm{s}
+    latex: 'A_\mathrm{s}'
   A:
     derived: 'lambda As: 1e9*As'
-    latex: 10^9 A_\mathrm{s}
+    latex: '10^9 A_\mathrm{s}'
   mnu:
     value: 0.06
   w0pwa:
     value: -1.0
-    latex: w_{0,\mathrm{DE}}+w_{a,\mathrm{DE}}
+    latex: 'w_{0,\mathrm{DE}}+w_{a,\mathrm{DE}}'
     drop: true
   w:
     value: -1.0
-    latex: w_{0,\mathrm{DE}}
+    latex: 'w_{0,\mathrm{DE}}'
   wa:
     value: 'lambda w0pwa, w: w0pwa - w'
     derived: false
-    latex: w_{a,\mathrm{DE}}
+    latex: 'w_{a,\mathrm{DE}}'
   H0:
     latex: H_0
   omegamh2:
     derived: true
     value: 'lambda omegach2, omegabh2, mnu: omegach2+omegabh2+(mnu*(3.046/3)**0.75)/94.0708'
-    latex: \Omega_\mathrm{m} h^2
+    latex: '\Omega_\mathrm{m} h^2'
   omegam:
-    latex: \Omega_\mathrm{m}
+    latex: '\Omega_\mathrm{m}'
   rdrag:
-    latex: r_\mathrm{drag}
+    latex: 'r_\mathrm{drag}'
 theory:
   emultheta:
     path: ./cobaya/cobaya/theories/
@@ -193,79 +230,37 @@ theory:
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
-model = get_model(yaml_load(info_txt))
+model = get_model(yaml_load(yaml_string))
 def chi2(p):
     point = dict(zip(model.parameterization.sampled_params(),
                  model.prior.sample(ignore_external=True)[0]))
-    names=list(model.parameterization.sampled_params().keys())
-    point.update({ name: p[name].item() for name in names })
+    names = list(model.parameterization.sampled_params().keys())
+    point.update({name: val for name, val in zip(names, p)})
     res1 = model.logprior(point,make_finite=True)
     res2 = model.loglike(point,make_finite=True,cached=False,return_derived=False)
     return -2.0*(res1+res2)
-
-x0 = np.array([
-    3.045845885,         # logA
-    9.652308970e-01,     # ns
-    1.0410562,           # thetastar
-    2.246801442e-02,     # omegabh2
-    1.198257361e-01 ,    # omegach2
-    5.433339482e-02,     # tau
-    1.00138
-], dtype='float64')
-
+def chi2v2(p):
+    point = dict(zip(model.parameterization.sampled_params(),
+                 model.prior.sample(ignore_external=True)[0]))
+    names=list(model.parameterization.sampled_params().keys())
+    point.update({name: val for name, val in zip(names, p)})
+    logposterior = model.logposterior(point, as_dict=True)
+    chi2likes=-2*np.array(list(logposterior["loglikes"].values()))
+    chi2prior=-2*np.atleast_1d(model.logprior(point,make_finite=False))
+    return np.concatenate((chi2likes, chi2prior))
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
-# Code below does not require changes ------------------------------------------
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
-
-parser = argparse.ArgumentParser(prog='EXAMPLE_EMUL_PROFILE1')
-
-parser.add_argument("--maxfeval",
-                    dest="maxfeval",
-                    help="Minimizer: maximum number of likelihood evaluations",
-                    type=int,
-                    nargs='?',
-                    const=1,
-                    default=5000)
-
-parser.add_argument("--root",
-                    dest="root",
-                    help="Name of the Output File",
-                    nargs='?',
-                    const=1,
-                    default="./projects/example/")
-
-parser.add_argument("--outroot",
-                    dest="outroot",
-                    help="Name of the Output File",
-                    nargs='?',
-                    const=1,
-                    default="test.dat")
-
-parser.add_argument("--cov",
-                    dest="cov",
-                    help="Chain Covariance Matrix",
-                    nargs='?',
-                    const=1) # zero or one
-
-# need to use parse_known_args because of mpifuture 
-args, unknown = parser.parse_known_args()
-
-maxfeval = args.maxfeval
-oroot    = args.root + "chains/" + args.outroot
-cov_file = args.root + args.cov
-cov      = np.loadtxt(cov_file)[0:len(x0),0:len(x0)]
-
-# ------------------------------------------------------------------------------
-# ------------------------------------------------------------------------------
-# ------------------------------------------------------------------------------
-
-def chain(maxfeval=3000, 
+def chain(x0,
+          ndim,
+          nwalker,
+          cov,
+          names,
+          maxfeval=3000, 
           pool=None):
-
     def mychi2(params, *args):
         return chi2(p=params)
 
@@ -280,29 +275,28 @@ def chain(maxfeval=3000,
             return -0.5*mychi2(params, *args) + lp
 
     class GaussianStep:
-       def __init__(self, stepsize=0.2):
+       def __init__(self, stepsize=0.25):
            self.cov = stepsize*cov
        def __call__(self, x):
            return np.random.multivariate_normal(x, self.cov, size=1) 
 
-    ndim        = int(x0.shape[0])
-    nwalkers    = 2*ndim
-
     sampler = emcee.EnsembleSampler(int(nwalkers), 
-                                    ndim, 
+                                    int(2*ndim), 
                                     logprob, 
+                                    parameter_names=names,
                                     moves=[(emcee.moves.GaussianMove(cov=cov), 1.)],
                                     pool=pool)
-    x = [] # Initial point
+    x = [] # Initial point x0
     for j in range(nwalkers):
         x.append(GaussianStep(stepsize=0.25)(x0)[0,:])
-    x = np.array(x,dtype='float64')
-    sampler.run_mcmc(x, maxfeval)
-
+    sampler.run_mcmc(np.array(x0, dtype='float64'), maxfeval)
     xf   = sampler.get_chain(flat=True, discard=0)
     lnpf = sampler.get_log_prob(flat=True, discard=0)
     return np.concatenate([xf, lnpf[:, None]],axis=1)
 
+# ------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
@@ -312,18 +306,57 @@ if __name__ == '__main__':
         if not pool.is_master():
             pool.wait()
             sys.exit(0)
+        print(f"maxfeval={args.maxfeval}")
+        dim     = model.prior.d()                                      # Cobaya call
+        bounds  = model.prior.bounds(confidence=0.999999)              # Cobaya call
+        names   = list(model.parameterization.sampled_params().keys()) # Cobaya Call
+        nwalker = int(2*ndim)
+        # initial point
+        x = [] # Initial point x0
+        for j in range(nwalkers):
+          x.append(GaussianStep(stepsize=0.25)(x0)[0,:])
 
-        print(f"maxfeval={maxfeval}")
-
-        res = chain(maxfeval=maxfeval, pool=pool)
-
-        rnd = random.randint(0,9999)
-        print("Output file = ", oroot + "_" + str(rnd) + ".txt")
-        np.savetxt(oroot + "_" + str(rnd) + ".txt",
-                   res,
-                   header=f"maxfeval={maxfeval}",
+        # --- saving file begins ---------------------------------------------------
+        np.savetxt(f"{args.root}chains/{args.outroot}.1.txt",
+                   chain(ndim=dim,
+                         maxfeval=args.maxfeval, 
+                         names=names,
+                         nwalker=nwalker,
+                         pool=pool),
+                   fmt="%.5e",
+                   header=f"nlive={args.nlive}, maxfeval={args.maxfeval}\n"+' '.join(names),
                    comments="# ")
-
+        
+        # Now we need to save a paramname files ------------------------------------
+        param_info = model.info()['params']
+        names2 = names.copy()
+        latex  = [param_info[x]['latex'] for x in names2]
+        names2.append("chi2*")
+        latex.append("\\chi^2")
+        np.savetxt(f"{args.root}chains/{args.outroot}.paramnames", 
+                   np.column_stack((names2,latex)),
+                   fmt="%s")
+        
+        # Now we need to save a range files ----------------------------------------
+        rows = [(str(n),float(l),float(h)) for n,l,h in zip(names,bounds[:,0],bounds[:,1])]
+        with open(f"{args.root}chains/{args.outroot}.ranges", "w") as f: 
+          f.writelines(f"{n} {l:.5e} {h:.5e}\n" for n, l, h in rows)
+        
+        # Now we need to save a cov matrix -----------------------------------------
+        samples = loadMCSamples(f"{args.root}chains/{args.outroot}",
+                                settings={'ignore_rows': u'0.0'})
+        np.savetxt(f"{args.root}chains/{args.outroot}.covmat",
+                   np.array(samples.cov(), dtype='float64'),
+                   fmt="%.5e",
+                   header=' '.join(names),
+                   comments="# ")
+        # --- saving file ends -------------------------------------------------
+# ------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 #HOW TO CALL THIS SCRIPT
 #mpirun -n 5 --oversubscribe --mca pml ^ucx  \
 #  --mca btl vader,tcp,self --bind-to core:overload-allowed \
