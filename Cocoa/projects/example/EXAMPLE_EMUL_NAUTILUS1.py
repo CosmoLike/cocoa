@@ -298,21 +298,20 @@ if __name__ == '__main__':
                header=f"nlive={args.nlive}, maxfeval={args.maxfeval}, log-Z ={sampler.log_z}\n"+' '.join(names),
                comments="# ")
     
-    # Now we need to save a paramname files ------------------------------------
-    param_info = model.info()['params']
-    names2 = names.copy()
-    latex  = [param_info[x]['latex'] for x in names2]
-    names2.append("chi2*")
-    latex.append("\\chi^2")
-    np.savetxt(f"{args.root}chains/{args.outroot}.paramnames", 
-               np.column_stack((names2,latex)),
-               fmt="%s")
-    
     # Now we need to save a range files ----------------------------------------
     rows = [(str(n),float(l),float(h)) for n,l,h in zip(names,bounds[:,0],bounds[:,1])]
     with open(f"{args.root}chains/{args.outroot}.ranges", "w") as f: 
       f.writelines(f"{n} {l:.5e} {h:.5e}\n" for n, l, h in rows)
-    
+
+    # Now we need to save a paramname files ------------------------------------
+    param_info = model.info()['params']
+    latex  = [param_info[x]['latex'] for x in names]
+    names.append("chi2*")
+    latex.append("\\chi^2")
+    np.savetxt(f"{args.root}chains/{args.outroot}.paramnames", 
+               np.column_stack((names,latex)),
+               fmt="%s")
+
     # Now we need to save a cov matrix -----------------------------------------
     samples = loadMCSamples(f"{args.root}chains/{args.outroot}",
                             settings={'ignore_rows': u'0.0'})
@@ -321,7 +320,6 @@ if __name__ == '__main__':
                fmt="%.5e",
                header=' '.join(names),
                comments="# ")
-    # --- saving file ends --------------------
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------

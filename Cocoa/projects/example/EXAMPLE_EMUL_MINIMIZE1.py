@@ -59,7 +59,8 @@ parser.add_argument("--cov",
                     dest="cov",
                     help="Chain Covariance Matrix",
                     nargs='?',
-                    const=1) # zero or one
+                    const=1,
+                    default=None) # zero or one
 # need to use parse_known_args because of mpifuture 
 args, unknown = parser.parse_known_args()
 # ------------------------------------------------------------------------------
@@ -371,7 +372,13 @@ if __name__ == '__main__':
         (x0, results) = model.get_valid_point(max_tries=10000, 
                                              ignore_fixed_ref=False,
                                              logposterior_as_dict=True)
-        cov = np.loadtxt(args.root+args.cov)[0:model.prior.d(),0:model.prior.d()]
+        # get covariance from prior --------------------------------------------
+        if args.cov is None:
+          cov = model.prior.covmat(ignore_external=False)
+        else:
+          cov = np.loadtxt(args.root+args.cov)[0:model.prior.d(),0:model.prior.d()]
+        
+        # run the chains -------------------------------------------------------
         res = np.array(list(prf(np.array(x0, dtype='float64'), 
                                index=-1, 
                                maxfeval=maxevals, 
@@ -380,11 +387,13 @@ if __name__ == '__main__':
                                pool=pool,
                                cov=cov)), dtype="object")
         xf = np.array([res[0]],dtype='float64')
+        
         # Append derived (begins) ----------------------------------------------
         xf = np.column_stack((xf, 
                               np.array([chi2v2(d) for d in xf], dtype='float64'),
                               res[1]))
         # Append derived (ends) ------------------------------------------------
+        
         # --- saving file begins -----------------------------------------------
         names = list(model.parameterization.sampled_params().keys()) # Cobaya Call
         names = names+list(model.info()['likelihood'].keys())+["prior"]+["chi2"]

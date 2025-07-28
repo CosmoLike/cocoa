@@ -44,20 +44,23 @@ parser.add_argument("--maxfeval",
                     nargs='?',
                     const=1,
                     default=5000)
-
 parser.add_argument("--root",
                     dest="root",
                     help="Name of the Output File",
                     nargs='?',
                     const=1,
                     default="./projects/example/")
-
 parser.add_argument("--outroot",
                     dest="outroot",
                     help="Name of the Output File",
                     nargs='?',
                     const=1,
                     default="test.dat")
+parser.add_argument("--cov",
+                    dest="cov",
+                    help="Chain Covariance Matrix",
+                    nargs='?',
+                    default=None) # zero or one
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
@@ -256,9 +259,10 @@ def chi2v2(p):
 # ------------------------------------------------------------------------------
 def chain(x0,
           ndim,
-          nwalker,
+          nwalkers,
           cov,
           names,
+          burn_in=0.3,
           maxfeval=3000, 
           pool=None):
     def mychi2(params, *args):
@@ -280,19 +284,22 @@ def chain(x0,
        def __call__(self, x):
            return np.random.multivariate_normal(x, self.cov, size=1) 
 
-    sampler = emcee.EnsembleSampler(int(nwalkers), 
-                                    int(2*ndim), 
-                                    logprob, 
+    sampler = emcee.EnsembleSampler(nwalkers=nwalkers, 
+                                    ndim=int(2*ndim), 
+                                    log_prob_fn=logprob, 
                                     parameter_names=names,
-                                    moves=[(emcee.moves.GaussianMove(cov=cov), 1.)],
+                                    moves=[(emcee.moves.GaussianMove(cov=cov), 0.25)],
                                     pool=pool)
-    x = [] # Initial point x0
-    for j in range(nwalkers):
-        x.append(GaussianStep(stepsize=0.25)(x0)[0,:])
-    sampler.run_mcmc(np.array(x0, dtype='float64'), maxfeval)
-    xf   = sampler.get_chain(flat=True, discard=0)
-    lnpf = sampler.get_log_prob(flat=True, discard=0)
-    return np.concatenate([xf, lnpf[:, None]],axis=1)
+    sampler.run_mcmc(x0, maxfeval)
+    burn_in = int(burn_in*maxfeval)
+    xf      = sampler.get_chain(flat=True, discard=burn_in)
+    lnpf    = sampler.get_log_prob(flat=True, discard=burn_in)
+    weights = np.ones(len(xf), dtype='float64')
+    chi2    = -2*lnpf
+    return np.concatenate([weights,
+                           lnpf[:,None], 
+                           xf, 
+                           lnpf[:,None]], axis=1)
 
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
@@ -307,40 +314,53 @@ if __name__ == '__main__':
             pool.wait()
             sys.exit(0)
         print(f"maxfeval={args.maxfeval}")
-        dim     = model.prior.d()                                      # Cobaya call
-        bounds  = model.prior.bounds(confidence=0.999999)              # Cobaya call
-        names   = list(model.parameterization.sampled_params().keys()) # Cobaya Call
-        nwalker = int(2*ndim)
-        # initial point
-        x = [] # Initial point x0
-        for j in range(nwalkers):
-          x.append(GaussianStep(stepsize=0.25)(x0)[0,:])
-
-        # --- saving file begins ---------------------------------------------------
-        np.savetxt(f"{args.root}chains/{args.outroot}.1.txt",
-                   chain(ndim=dim,
-                         maxfeval=args.maxfeval, 
-                         names=names,
-                         nwalker=nwalker,
-                         pool=pool),
-                   fmt="%.5e",
-                   header=f"nlive={args.nlive}, maxfeval={args.maxfeval}\n"+' '.join(names),
-                   comments="# ")
+        dim      = model.prior.d()                                      # Cobaya call
+        bounds   = model.prior.bounds(confidence=0.999999)              # Cobaya call
+        names    = list(model.parameterization.sampled_params().keys()) # Cobaya Call
+        nwalkers = pool.comm.Get_size()
         
-        # Now we need to save a paramname files ------------------------------------
-        param_info = model.info()['params']
-        names2 = names.copy()
-        latex  = [param_info[x]['latex'] for x in names2]
-        names2.append("chi2*")
-        latex.append("\\chi^2")
-        np.savetxt(f"{args.root}chains/{args.outroot}.paramnames", 
-                   np.column_stack((names2,latex)),
-                   fmt="%s")
+        # get initial points ---------------------------------------------------
+        x0 = [] # Initial point x0
+        for j in range(nwalkers):
+          (tmp_x0, tmp) = model.get_valid_point(max_tries=10000, 
+                                                ignore_fixed_ref=False,
+                                                logposterior_as_dict=True)
+          x0.append(tmp_x0)
+        
+        # get covariance from prior --------------------------------------------
+        if cov is None:
+          cov = model.prior.covmat(ignore_external=False)
+        
+        # run the chains -------------------------------------------------------
+        res = chain(x0=np.array(x0, dtype='float64'),
+                    ndim=dim,
+                    nwalker=nwalkers,
+                    cov=cov, 
+                    names=names,
+                    maxfeval=args.maxfeval,
+                    pool=pool,
+                    burn_in=args.burn_in if abs(args.burn_in) < 1 else 0)
+        
+        # saving file begins ---------------------------------------------------
+        np.savetxt(f"{args.root}chains/{args.outroot}.1.txt",
+                   res,
+                   fmt="%.5e",
+                   header=f"nwalkers={nwalkers}, maxfeval={args.maxfeval}\n"+' '.join(names),
+                   comments="# ")
         
         # Now we need to save a range files ----------------------------------------
         rows = [(str(n),float(l),float(h)) for n,l,h in zip(names,bounds[:,0],bounds[:,1])]
         with open(f"{args.root}chains/{args.outroot}.ranges", "w") as f: 
           f.writelines(f"{n} {l:.5e} {h:.5e}\n" for n, l, h in rows)
+
+        # Now we need to save a paramname files --------------------------------
+        param_info = model.info()['params']
+        latex  = [param_info[x]['latex'] for x in names]
+        names.append("chi2*")
+        latex.append("\\chi^2")
+        np.savetxt(f"{args.root}chains/{args.outroot}.paramnames", 
+                   np.column_stack((names,latex)),
+                   fmt="%s")
         
         # Now we need to save a cov matrix -----------------------------------------
         samples = loadMCSamples(f"{args.root}chains/{args.outroot}",
