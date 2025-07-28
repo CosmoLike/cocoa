@@ -375,8 +375,10 @@ if __name__ == '__main__':
         # get covariance from prior --------------------------------------------
         if args.cov is None:
           cov = model.prior.covmat(ignore_external=False)
+          print(cov)
         else:
           cov = np.loadtxt(args.root+args.cov)[0:model.prior.d(),0:model.prior.d()]
+          print(cov)
         
         # run the chains -------------------------------------------------------
         res = np.array(list(prf(np.array(x0, dtype='float64'), 
