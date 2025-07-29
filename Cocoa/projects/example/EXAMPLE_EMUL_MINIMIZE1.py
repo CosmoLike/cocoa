@@ -60,7 +60,7 @@ parser.add_argument("--cov",
                     help="Chain Covariance Matrix",
                     nargs='?',
                     const=1,
-                    default=None) # zero or one
+                    default=None)
 # need to use parse_known_args because of mpifuture 
 args, unknown = parser.parse_known_args()
 # ------------------------------------------------------------------------------
@@ -260,7 +260,6 @@ def chi2v2(p):
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
 def min_chi2(x0, 
-             bounds,
              cov, 
              fixed=-1, 
              maxfeval=3000,
@@ -276,7 +275,6 @@ def min_chi2(x0,
     if fixed > -1:
         z      = x0[fixed]
         x0     = np.delete(x0, (fixed))
-        bounds = np.delete(bounds, (fixed), axis=0)
         args = (z, fixed, 1.0)
         
         cov = np.delete(cov, (fixed), axis=0)
@@ -342,13 +340,9 @@ def min_chi2(x0,
     result = [partial_samples[j], partial[j]]
     return result
 
-def prf(x0, index, maxfeval, bounds, cov, nwalkers=5, pool=None):
+def prf(x0, index, maxfeval, cov, nwalkers=5, pool=None):
     t0 = np.array(x0, dtype='float64')
-    t1 = np.array(bounds, dtype="float64") # np.array do a deep copy. Deep copy necessary 
-                                           # line to avoid weird bug that changes on bounds
-                                           # propagate from different iterations (same MPI core)
     res =  min_chi2(x0=t0, 
-                    bounds=t1, 
                     fixed=index, 
                     maxfeval=maxfeval, 
                     nwalkers=nwalkers, 
@@ -368,23 +362,20 @@ if __name__ == '__main__':
             sys.exit(0)
         nwalkers = pool.comm.Get_size()
         maxevals = int(args.maxfeval/(4.0*nwalkers))
-        print(f"maxfeval={args.maxfeval}")
-        (x0, results) = model.get_valid_point(max_tries=10000, 
+
+        (x0, results) = model.get_valid_point(max_tries=1000, 
                                              ignore_fixed_ref=False,
                                              logposterior_as_dict=True)
-        # get covariance from prior --------------------------------------------
+        # get covariance -------------------------------------------------------
         if args.cov is None:
-          cov = model.prior.covmat(ignore_external=False)
-          print(cov)
+          cov = model.prior.covmat(ignore_external=False) # cov from prior
         else:
           cov = np.loadtxt(args.root+args.cov)[0:model.prior.d(),0:model.prior.d()]
-          print(cov)
         
         # run the chains -------------------------------------------------------
         res = np.array(list(prf(np.array(x0, dtype='float64'), 
                                index=-1, 
-                               maxfeval=maxevals, 
-                               bounds=model.prior.bounds(confidence=0.999999), 
+                               maxfeval=maxevals,
                                nwalkers=nwalkers,
                                pool=pool,
                                cov=cov)), dtype="object")

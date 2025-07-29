@@ -60,14 +60,21 @@ parser.add_argument("--cov",
                     dest="cov",
                     help="Chain Covariance Matrix",
                     nargs='?',
-                    default=None) # zero or one
+                    default=None)
+parser.add_argument("--burn_in",
+                    dest="burn_in",
+                    help="Burn-in fraction",
+                    nargs='?',
+                    type=float,
+                    default=0.3)
+args, unknown = parser.parse_known_args()
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
-info_txt = r"""
+yaml_string = r"""
 likelihood:
   planck_2018_highl_plik.TTTEEE_lite: 
     path: ./external_modules/
@@ -291,7 +298,7 @@ def chain(x0,
                                     moves=[(emcee.moves.GaussianMove(cov=cov), 0.25)],
                                     pool=pool)
     sampler.run_mcmc(x0, maxfeval)
-    burn_in = int(burn_in*maxfeval)
+    burn_in = int(abs(burn_in)*maxfeval) if abs(burn_in) < 1 else 0
     xf      = sampler.get_chain(flat=True, discard=burn_in)
     lnpf    = sampler.get_log_prob(flat=True, discard=burn_in)
     weights = np.ones(len(xf), dtype='float64')
@@ -327,14 +334,16 @@ if __name__ == '__main__':
                                                 logposterior_as_dict=True)
           x0.append(tmp_x0)
         
-        # get covariance from prior --------------------------------------------
-        if cov is None:
-          cov = model.prior.covmat(ignore_external=False)
+        # get covariance -------------------------------------------------------
+        if args.cov is None:
+          cov = model.prior.covmat(ignore_external=False) # cov from prior
+        else:
+          cov = np.loadtxt(args.root+args.cov)[0:model.prior.d(),0:model.prior.d()]
         
         # run the chains -------------------------------------------------------
         res = chain(x0=np.array(x0, dtype='float64'),
                     ndim=dim,
-                    nwalker=nwalkers,
+                    nwalkers=nwalkers,
                     cov=cov, 
                     names=names,
                     maxfeval=args.maxfeval,
