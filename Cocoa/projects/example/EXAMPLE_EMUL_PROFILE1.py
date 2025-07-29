@@ -526,11 +526,11 @@ if __name__ == '__main__':
                               np.array([chi2v2(d) for d in xf], dtype='float64')))
         
         # --- saving file begins -----------------------------------------------    
-        names = [names[args.profile],"chi2"]+names+["rdrag"]+list(model.info()['likelihood'].keys())+["prior"]
+        comment = [names[args.profile],"chi2"]+names+["rdrag"]+list(model.info()['likelihood'].keys())+["prior"]
         np.savetxt(f"{args.root}chains/{args.outroot}.{names[args.profile]}.txt",
                    np.concatenate([np.c_[param,chi2res],xf],axis=1),
                    fmt="%.6e",
-                   header=f"maxfeval={args.maxfeval}, param={names[args.profile]}\n"+' '.join(names),
+                   header=f"maxfeval={args.maxfeval}, param={names[args.profile]}\n"+' '.join(comment),
                    comments="# ")
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------

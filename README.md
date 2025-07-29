@@ -218,8 +218,22 @@ Cocoa contains a few transformer-based neural network emulators capable of simul
       
 Now, users must follow all the steps below.
 
-> [!NOTE]
+> [!TIP]
 > Having a GPU speeds up Transformers-Based Emulators by a factor of ~5-10. 
+
+> [!NOTE]
+> What should users do if they have not configured ML-related keys before running `setup_cocoa.sh` and `compile_cocoa.sh`, as rerunning these scripts can require a long time? Instead, run the following commands.
+>
+>      source start_cocoa.sh 
+>
+> Note that even if (.local) is already active, users must run start_cocoa.sh again to update bash environment values and to allow Cocoa to create appropriate symlinks that expose the emulators to Cobaya. Then, run
+>
+>      source ./installation_scripts/setup_pip_core_packages.sh     # install pip packages required by ML emulators
+>      source ./installation_scripts/setup_emultrf.sh               # download emulator codes
+>      source ./installation_scripts/unxv_emultrf.sh                # download pre-trained emulators
+>      source ./installation_scripts/setup_act_dr6.sh               # to run EXAMPLE_EMUL_EVALUATE1.yaml
+>      source ./installation_scripts/compile_act_dr6.sh             # to run EXAMPLE_EMUL_EVALUATE1.yaml
+>
 
  **Step :one:**: Activate the private Python environment by sourcing the script `start_cocoa.sh`
 
@@ -227,70 +241,73 @@ Now, users must follow all the steps below.
 
  **Step :two:** Run `cobaya-run` on the first emulator example following the commands below.
 
-One model evaluation:
+- **One model evaluation**:
 
-    mpirun -n 1 --oversubscribe --mca pml ^ucx --mca btl vader,tcp,self \
-       --bind-to core --map-by numa --report-bindings \
-       cobaya-run ./projects/example/EXAMPLE_EMUL_EVALUATE1.yaml -f
+        mpirun -n 1 --oversubscribe --mca pml ^ucx --mca btl vader,tcp,self \
+           --bind-to core --map-by numa --report-bindings \
+           cobaya-run ./projects/example/EXAMPLE_EMUL_EVALUATE1.yaml -f
                
-MCMC (Metropolis-Hastings Algorithm):
+- **MCMC (Metropolis-Hastings Algorithm)**:
 
-    mpirun -n 4 --oversubscribe --mca pml ^ucx --mca btl vader,tcp,self \
-       --bind-to core --map-by numa --report-bindings \
-       cobaya-run ./projects/example/EXAMPLE_EMUL_MCMC1.yaml -f
+        mpirun -n 4 --oversubscribe --mca pml ^ucx --mca btl vader,tcp,self \
+           --bind-to core --map-by numa --report-bindings \
+           cobaya-run ./projects/example/EXAMPLE_EMUL_MCMC1.yaml -f
 
-> [!NOTE]
-> Before running a job with a large number of MPI workers (examples below), it may be necessary 
+- **PolyChord**:
+
+        mpirun -n 90 --oversubscribe --mca pml ^ucx --mca btl vader,tcp,self \
+           --bind-to core --map-by numa --report-bindings --mca mpi_yield_when_idle 1 \
+           cobaya-run ./projects/example/EXAMPLE_EMUL_POLY1.yaml -f
+
+> [!TIP]
+> Before running a job with a large number of MPI workers, it may be necessary 
 > to increase the  limit of threads that can be created (at UofA HPC type `ulimit -u 2000000`), 
 > otherwise you may face the error `libgomp: Thread creation failed`
 
-PolyChord (run on an HPC):
+> [!NOTE]
+> The `Nautilis`, `Minimizer`, `Profile`, and `Emcee` scripts contain an internally defined `yaml_string` that specifies priors, 
+> likelihoods, and the theory code, all following Cobaya Conventions.  
 
-    mpirun -n 90 --oversubscribe --mca pml ^ucx --mca btl vader,tcp,self \
-       --bind-to core --map-by numa --report-bindings --mca mpi_yield_when_idle 1 \
-       cobaya-run ./projects/example/EXAMPLE_EMUL_POLY1.yaml -f
+- **Nautilus**:
 
-Nautilus (run on an HPC. Adjust number of MPI if needed):
+        mpirun -n 80 --oversubscribe --mca pml ^ucx --mca btl vader,tcp,self \
+           --bind-to core --map-by numa --report-bindings --mca mpi_yield_when_idle 1 \
+           python -m mpi4py.futures ./projects/example/EXAMPLE_EMUL_NAUTILUS1.py \
+           --root ./projects/example/ --outroot "EXAMPLE_NAUTILUS1"  \
+           --maxfeval 10000000 --nlive 1024 --neff 15000 --flive 0.01 --nnetworks 5
 
-    mpirun -n 80 --oversubscribe --mca pml ^ucx --mca btl vader,tcp,self \
-       --bind-to core --map-by numa --report-bindings --mca mpi_yield_when_idle 1 \
-       python -m mpi4py.futures ./projects/example/EXAMPLE_EMUL_NAUTILUS1.py \
-       --root ./projects/example/ --outroot "EXAMPLE_NAUTILUS1"  \
-       --maxfeval 10000000 --nlive 1024 --neff 15000 --flive 0.01 --nnetworks 5
+- **Global Minimizer**:
 
-Minimizer (Requires MCMC/Nautilus results.):
-
-    mpirun -n 5 --oversubscribe --mca pml ^ucx --mca btl vader,tcp,self \
-       --bind-to core --map-by numa --report-bindings --mca mpi_yield_when_idle 1 \
-      python ./projects/example/EXAMPLE_EMUL_MINIMIZE1.py --root ./projects/example/ \
-      --cov 'chains/EXAMPLE_EMUL_MCMC1.covmat' --outroot "EXAMPLE_EMUL_MIN1" --maxfeval 20000
+        mpirun -n 5 --oversubscribe --mca pml ^ucx --mca btl vader,tcp,self \
+           --bind-to core --map-by numa --report-bindings --mca mpi_yield_when_idle 1 \
+          python ./projects/example/EXAMPLE_EMUL_MINIMIZE1.py --root ./projects/example/ \
+          --cov 'chains/EXAMPLE_EMUL_MCMC1.covmat' --outroot "EXAMPLE_EMUL_MIN1" --maxfeval 25000
 
 > [!TIP]
-> Number of steps per MPI per temperature is maxfeval/4NMPI. Do maintain this number around 1000.
+> The number of steps per MPI per temperature is `maxfeval/4NMPI`. Do maintain this number greater than 1000
+> for reliable results
 
-Profile (Requires Minimizer and MCMC/Nautilus results.): 
+- **Profile**: 
 
-    mpirun -n 5 --oversubscribe --mca pml ^ucx --mca btl vader,tcp,self \
-       --bind-to core --map-by core --report-bindings --mca mpi_yield_when_idle 1 \
-      python ./projects/example/EXAMPLE_EMUL_PROFILE1.py \
-      --root ./projects/example/ --cov 'chains/EXAMPLE_EMUL_MCMC1.covmat' \
-      --outroot "EXAMPLE_EMUL_PROFILE1" --factor 3 --maxfeval 12500 --numpts 10 \
-      --profile 1 --minfile="./projects/example/chains/EXAMPLE_EMUL_MIN1.txt"
- 
+        mpirun -n 5 --oversubscribe --mca pml ^ucx --mca btl vader,tcp,self \
+           --bind-to core --map-by core --report-bindings --mca mpi_yield_when_idle 1 \
+          python ./projects/example/EXAMPLE_EMUL_PROFILE1.py \
+          --root ./projects/example/ --cov 'chains/EXAMPLE_EMUL_MCMC1.covmat' \
+          --outroot "EXAMPLE_EMUL_PROFILE1" --factor 3 --maxfeval 15000 --numpts 10 \
+          --profile 1 --minfile="./projects/example/chains/EXAMPLE_EMUL_MIN1.txt"
+
 > [!TIP]
-> What should users do if they have not configured ML-related keys before running `setup_cocoa.sh` and `compile_cocoa.sh`, as rerunning these scripts can require a long time? Instead, run the following commands.
+> Profile provides the optional argument `minfile`; it is faster to run the profile script if the
+> user can provide the global minimum. The profile also provides the optional argument `cov`; it is significantly
+> more efficient to use a covariance matrix from a converged chain. The argument `factor` specifies
+> the start and end of the parameter being profiled:
 >
->      source start_cocoa.sh # even if (.local) is already active, users must run start_cocoa.sh again to update bash environment values
-> 
-> and
+>     start value ~ mininum value - factor*np.sqrt(np.diag(cov))
+>     end   value ~ mininum value + factor*np.sqrt(np.diag(cov))
 >
->      source ./installation_scripts/setup_pip_core_packages.sh     # install pip packages required by ML emulators
->      source ./installation_scripts/setup_emultrf.sh               # download emulator codes
->      source ./installation_scripts/unxv_emultrf.sh                # download pre-trained emulators
->      source ./installation_scripts/setup_act_dr6.sh               # to run EXAMPLE_EMUL_EVALUATE1.yaml
->      source ./installation_scripts/compile_act_dr6.sh             # to run EXAMPLE_EMUL_EVALUATE1.yaml
->      
-> Finally, rerun all the steps presented in this section, including step one. Users must reload the `(.local)` environment by rerunning `start_cocoa.sh` so Cocoa can create appropriate symlinks that expose the emulators to Cobaya.
+> We advise `factor ~ 3` when a covariance matrix is provided. If `cov` is not supplied, the code estimates
+> one internally from the prior. In this case, the code imposes `factor < 1` and we suggest `factor << 1`
+
 
 # Appendix <a name="appendix"></a>
 
