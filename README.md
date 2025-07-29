@@ -284,7 +284,7 @@ Now, users must follow all the steps below.
           --cov 'chains/EXAMPLE_EMUL_MCMC1.covmat' --outroot "EXAMPLE_EMUL_MIN1" --maxfeval 25000
 
 > [!TIP]
-> The number of steps per MPI per temperature is `maxfeval/4NMPI`. Do maintain this number greater than 1000
+> The number of steps per MPI per temperature is `maxfeval/5NMPI`. Do maintain this number greater than 1000
 > for reliable results
 
 - **Profile**: 
@@ -306,9 +306,22 @@ Now, users must follow all the steps below.
 >     end   value ~ mininum value + factor*np.sqrt(np.diag(cov))
 >
 > We advise `factor ~ 3` when a covariance matrix is provided. If `cov` is not supplied, the code estimates
-> one internally from the prior. In this case, the code imposes `factor < 1` and we suggest `factor << 1`
+> one internally from the prior. In this case, the code imposes `factor < 1` and we suggest `factor << 1`. Finally,
+> The number of steps per MPI per temperature is `maxfeval/4NMPI`. Do maintain this number greater than 1000
+> for reliable results.
 
+- **Profile method 2**:
 
+    If the dimensionaly of the problem is not large, it can be much faster to use a simple scipy `Nelder-Mead`
+  to calculate the profile. Here the `minfile` and `cov` options are mandatory.
+
+        mpirun -n 1 --oversubscribe --mca pml ^ucx --mca btl vader,tcp,self \
+                   --bind-to core --map-by core --report-bindings --mca mpi_yield_when_idle 1 \
+                  python ./projects/example/EXAMPLE_EMUL_PROFILE_SCIPY1.py \
+                  --root ./projects/example/ --cov 'chains/EXAMPLE_EMUL_MCMC1.covmat' \
+                  --outroot "EXAMPLE_EMUL_PROFILE1" --factor 3 --maxfeval 5000 --numpts 10 \
+                  --profile 1 --minfile="./projects/example/chains/EXAMPLE_EMUL_MIN1.txt"
+  
 # Appendix <a name="appendix"></a>
 
 ## :interrobang: FAQ: How do we debug Cocoa? Suggested steps <a name="running_wrong"></a>
