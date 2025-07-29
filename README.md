@@ -31,7 +31,9 @@ Besides integrating [Cobaya](https://github.com/CobayaSampler) and [CosmoLike](h
 
 Our scripts never install packages or Python modules in a global folder such as `$HOME/.local`. Here, `$HOME` denotes a shell environment variable that points to the user's home folder. Doing so would force cocoa packages to be global to the user, possibly breaking environments. Our scripts enable users to work on multiple Cocoa instances simultaneously, similar to what was possible with [CosmoMC](https://github.com/cmbant/CosmoMC). 
 
-This readme file presents basic and advanced instructions for installing all [Cobaya](https://github.com/CobayaSampler) and [CosmoLike](https://github.com/CosmoLike) components.
+This readme file presents basic and advanced instructions for installing all [Cobaya](https://github.com/CobayaSampler) and [CosmoLike](https://github.com/CosmoLike) components **on linux**.
+
+We provide the Docker image [whovian-cocoa](https://hub.docker.com/r/vivianmiranda/whovian-cocoa) to facilitate the installation of Cocoa on Windows and macOS. 
 
 # Installation of core packages <a name="required_packages_conda"></a>
 
@@ -78,7 +80,7 @@ Users can now proceed to the **next section**.
 In this section, we assume users have previously activated the Cocoa conda environment.
 
 **Step :one:**: Download Cocoa's latest release and go to its main folder (`cocoa/Cocoa`),
- 
+
     git clone git@github.com:SBU-COSMOLIKE/cocoa.git cocoa
 
 and
@@ -153,6 +155,7 @@ MCMC (we run MCMCs with 32 cores):
        --rank-by slot --map-by numa:pe=${OMP_NUM_THREADS} \
        cobaya-run ./projects/example/EXAMPLE_MCMC1.yaml -f
 
+
 ## Examples involving Cosmolike
 
  **Step :three:**: The folder `projects/lsst_y1` contains a dozen examples involving different combinations of two-point correlation functions. So, run the `cobaya-run` on the first example following the commands below.
@@ -170,6 +173,7 @@ MCMC (Metropolis-Hastings Algorithm):
        --bind-to core:overload-allowed --mca mpi_yield_when_idle 1 \
        --rank-by slot --map-by numa:pe=${OMP_NUM_THREADS} \
        cobaya-run ./projects/lsst_y1/EXAMPLE_MCMC1.yaml -f
+
 
 > [!Tip]
 > Cocoa provides several cosmolike projects, not all of which are installed by default. To activate them, please refer to the appendix [FAQ: How do we compile external modules?](#appendix_compile_separately).

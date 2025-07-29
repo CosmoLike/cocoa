@@ -65,14 +65,12 @@ if [ -z "${IGNORE_COBAYA_CODE}" ]; then
   COBTH="cobaya/theories"           # COB = Cobaya, TH = theory
 
   cppatch() {
-    cp "${CCCOB:?}/${1:?}/${2:?}" "${COB:?}/${1:?}" \
-      2>"/dev/null" || 
+    cp "${CCCOB:?}/${1:?}/${2:?}" "${COB:?}/${1:?}" || 
       { error "CP FILE ${CCCOB:?}/${1:?}/${2:?} on ${COB:?}/${1:?}"; return 1; }
   }
 
   cppatchfolder() {
-    cp -r "${CCCOB:?}/${1:?}/${2:?}" "${COB:?}/${1:?}" \
-      2>"/dev/null" || 
+    cp -r "${CCCOB:?}/${1:?}/${2:?}" "${COB:?}/${1:?}" || 
       { error "CP FOLDER ${CCCOB:?}/${1:?}/${2:?} on ${COB:?}/${1:?}"; \
       return 1; }
   }
@@ -142,7 +140,7 @@ if [ -z "${IGNORE_COBAYA_CODE}" ]; then
 
       cpfolder "${CCCOB:?}/${TFOLDER[$i]}${TFILEP[$i]:?}" . 2>${OUT2:?} || return 1;
 
-      patch --batch --verbose -u -R "${TFILE[$i]:?}" -i "${TFILEP[$i]:?}" >${OUT1:?} \
+      patch --quiet --batch --verbose -u -R "${TFILE[$i]:?}" -i "${TFILEP[$i]:?}" >${OUT1:?} \
         2>${OUT2:?} || { error "${EC17:?} (${TFILE[$i]:?})"; return 1; }
     done
 
@@ -160,7 +158,7 @@ if [ -z "${IGNORE_COBAYA_CODE}" ]; then
       cpfolder "${CCCOB:?}/${TFOLDER[$i]}${TFILEP[$i]:?}" . 2>${OUT2:?} || return 1;
 
       # HERE I CAN't USE THE -R
-      patch --batch --verbose -u "${TFILE[$i]:?}" -i "${TFILEP[$i]:?}" >${OUT1:?} \
+      patch --quiet --batch --verbose -u "${TFILE[$i]:?}" -i "${TFILEP[$i]:?}" >${OUT1:?} \
         2>${OUT2:?} || { error "${EC17:?} (${TFILE[$i]:?})"; return 1; }
     done
 
@@ -310,7 +308,7 @@ if [ -z "${IGNORE_COBAYA_CODE}" ]; then
     
     cdfolder "${COB:?}/${COBLIKE}/base_classes/" || return 1;
 
-    patch --batch -u "InstallableLikelihood.py" -i "InstallableLikelihood.patch" \
+    patch --quiet --batch --verbose -u "InstallableLikelihood.py" -i "InstallableLikelihood.patch" \
       >${OUT1:?} 2>${OUT2:?} || { error "${EC17:?}"; return 1; }
 
     cdfolder "${ROOTDIR:?}" || return 1;

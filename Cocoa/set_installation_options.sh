@@ -243,7 +243,7 @@ fi
 # Why? Some git repos can be hundreds of MegaBytes (Class is 500 MegaBytes) 
 # But, this can create problem if GIT_COMMIT < LAST COMMIT - GIT_MAXIMUM_DEPTH
 export SPDLOG_VERSION=v1.15.3
-export GIT_CLONE_MAXIMUM_DEPTH=200
+export GIT_CLONE_MAXIMUM_DEPTH=500
 
 export COBAYA_URL="https://github.com/CobayaSampler/cobaya.git"
 export COBAYA_GIT_COMMIT="86943d81d48d2edb2961b17077461df9e799f4d1"
