@@ -298,8 +298,8 @@ def min_chi2(x0,
                             2*maxfeval, 
                               maxfeval, 
                             int(0.5*maxfeval)], dtype='int')
-    temperature = np.array([1.0, 0.25, 0.1, 0.005], dtype='float64')
-    stepsz      = temperature/4.0
+    temperature = np.array([1.0, 0.25, 0.1, 0.005, 0.001], dtype='float64')
+    stepsz      = temperature/5.0
 
     partial_samples = []
     partial = []
@@ -355,7 +355,7 @@ if __name__ == '__main__':
             pool.wait()
             sys.exit(0)
         nwalkers = pool.comm.Get_size()
-        maxevals = int(args.maxfeval/(4.0*nwalkers))
+        maxevals = int(args.maxfeval/(5.0*nwalkers))
 
         (x0, results) = model.get_valid_point(max_tries=1000, 
                                              ignore_fixed_ref=False,
