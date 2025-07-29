@@ -22,13 +22,25 @@ warnings.filterwarnings(
     category=UserWarning,
     message=r".*Hartlap correction*"
 )
+warnings.filterwarnings(
+    "ignore",
+    category=UserWarning,
+    message=r".*Function not smooth or differentiabl*"
+)
+warnings.filterwarnings(
+    "ignore",
+    category=RuntimeWarning,
+    message=r".*invalid value encountered*"
+)
 import functools, iminuit, copy, argparse, random, time 
 import emcee, itertools
 import numpy as np
+from scipy import optimize
 from cobaya.yaml import yaml_load
 from cobaya.model import get_model
 from getdist import IniFile
 from schwimmbad import MPIPool
+import sys, platform, os
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
@@ -273,21 +285,6 @@ def chi2v2(p):
     chi2likes=-2*np.array(list(logposterior["loglikes"].values()))
     chi2prior=-2*np.atleast_1d(model.logprior(point,make_finite=False))
     return np.concatenate((chi2likes, chi2prior))
-def chi2grad(p):
-    ndim = model.prior.d()
-    if (len(p) != ndim):
-      raise RuntimeError("Incorrect Input to chi2grad")
-    grad = np.zeros(ndim, dtype='float64')
-    for i in range(ndim):
-      def chi2local(x):
-        plocal    = np.array(p, dtype='float64')
-        plocal[i] = x
-        return chi2(plocal)
-      DerivativeCalculator(myfunc=chi2local, x_center=p[i])
-      grad[i] = calc.stem_method()
-      print(grad[i], calc.five_point_stencil_method())
-    return grad
-
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
@@ -341,8 +338,9 @@ def min_chi2(x0,
       temperature = np.array([0.25, 0.1, 0.005], dtype='float64')
     stepsz      = temperature/4.0
 
-    partial_samples = []
-    partial = []
+    partial_samples = [x0]
+    partial = [mychi2(x0, *args)]
+
     for i in range(len(temperature)):
         x = [] # Initial point
         for j in range(nwalkers):
@@ -448,8 +446,6 @@ if __name__ == '__main__':
         start = x0 - factor*sigma
         stop  = x0 + factor*sigma
         
-        print("\n\n\n", chi2(x0), chi2(start), chi2(stop), "\n\n\n")
-
         # We need to respect the YAML priors
         bounds0 = model.prior.bounds(confidence=0.999999)
         for i in range(model.prior.d()):
@@ -484,14 +480,32 @@ if __name__ == '__main__':
         tmp = np.array(xf[numpts//2,:], dtype='float64')
         for i in range(numpts//2+1,numpts):
             tmp[args.profile] = param[i]
+            
+            # Use Powell method to get a better first point (begins) -----------
+            def chi2_local(x):
+              x[args.profile] = tmp[args.profile]
+              return chi2(x)
+            res = optimize.minimize(chi2, 
+                                    x0=tmp, 
+                                    options={'maxiter': maxevals/5.0},
+                                    method='Powell',
+                                    bounds=bounds0)
+            test1 = chi2(tmp)
+            print(tmp, test1)
+            tmp = res.x
+            tmp[args.profile] = param[i]
+            test2 = chi2(tmp)
+            print(tmp, test2)
+            # Use Powell method to get a better first point (ends) -------------
+            
             res = prf(tmp, 
                       fixed=args.profile,
-                      maxfeval=maxevals, 
+                      maxfeval=int(4.0*maxevals/5.0), 
                       nwalkers=nwalkers,
                       pool=pool,
                       cov=cov)
             xf[i,:] = np.insert(res[0], args.profile, param[i])
-            tmp = np.array(xf[i,:], dtype='float64')
+            tmp = np.array(xf[i,:],dtype='float64')
             chi2res[i] = res[1]
             print(f"Partial ({i+1}/{numpts}): params = {tmp}, and chi2 = {res[1]}")
         
@@ -499,9 +513,27 @@ if __name__ == '__main__':
         tmp = np.array(xf[numpts//2,:], dtype='float64')
         for i in range(numpts//2-1, -1, -1):
             tmp[args.profile] = param[i]
+            
+            # Use Powell method to get a better first point (begins) -----------
+            def chi2_local(x):
+              x[args.profile] = tmp[args.profile]
+              return chi2(x)
+            res = optimize.minimize(chi2, 
+                                    x0=tmp, 
+                                    options={'maxiter': maxevals/5.0},
+                                    method='Powell',
+                                    bounds=bounds0)
+            test1 = chi2(tmp)
+            print(tmp, test1)
+            tmp = res.x
+            tmp[args.profile] = param[i]
+            test2 = chi2(tmp)
+            print(tmp, test2)
+            # Use Powell method to get a better first point (ends) -------------
+
             res = prf(tmp, 
                       fixed=args.profile,
-                      maxfeval=maxevals, 
+                      maxfeval=int(4.0*maxevals/5.0), 
                       nwalkers=nwalkers,
                       pool=pool,
                       cov=cov)
@@ -509,7 +541,7 @@ if __name__ == '__main__':
             tmp = np.array(xf[i,:], dtype='float64')
             chi2res[i] = res[1] 
             print(f"Partial ({i+1}/{numpts}): params = {tmp}, and chi2 = {res[1]}")       
-        
+  
         # Append derived (begins) ----------------------------------------------
         tmp = [
             etheta.calculate({
