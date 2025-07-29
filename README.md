@@ -298,9 +298,9 @@ Now, users must follow all the steps below.
 
 > [!TIP]
 > Profile provides the optional argument `minfile`; it is faster to run the profile script if the
-> user has saved a previously run global minimization in the same parameter space. Profile also
-> provides the optional argument `cov`; it is more efficient to use a covariance matrix from a converged chain.
-> The argument `factor` specifies the start and end of the parameter being profiled:
+> user can provide the global minimum. The profile also provides the optional argument `cov`; it is significantly
+> more efficient to use a covariance matrix from a converged chain. The argument `factor` specifies
+> the start and end of the parameter being profiled:
 >
 >     start value ~ mininum value - factor*np.sqrt(np.diag(cov))
 >     end   value ~ mininum value + factor*np.sqrt(np.diag(cov))
