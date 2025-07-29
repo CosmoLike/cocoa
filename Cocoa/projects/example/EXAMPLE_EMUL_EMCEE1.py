@@ -242,18 +242,12 @@ theory:
 # ------------------------------------------------------------------------------
 model = get_model(yaml_load(yaml_string))
 def chi2(p):
-    point = dict(zip(model.parameterization.sampled_params(),
-                 model.prior.sample(ignore_external=True)[0]))
-    names = list(model.parameterization.sampled_params().keys())
-    point.update({name: val for name, val in zip(names, p)})
+    point = dict(zip(model.parameterization.sampled_params(), p))
     res1 = model.logprior(point,make_finite=True)
     res2 = model.loglike(point,make_finite=True,cached=False,return_derived=False)
     return -2.0*(res1+res2)
 def chi2v2(p):
-    point = dict(zip(model.parameterization.sampled_params(),
-                 model.prior.sample(ignore_external=True)[0]))
-    names=list(model.parameterization.sampled_params().keys())
-    point.update({name: val for name, val in zip(names, p)})
+    point = dict(zip(model.parameterization.sampled_params(), p))
     logposterior = model.logposterior(point, as_dict=True)
     chi2likes=-2*np.array(list(logposterior["loglikes"].values()))
     chi2prior=-2*np.atleast_1d(model.logprior(point,make_finite=False))

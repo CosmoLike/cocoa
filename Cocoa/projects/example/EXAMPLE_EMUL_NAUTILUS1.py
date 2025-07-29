@@ -251,10 +251,7 @@ theory:
 # ------------------------------------------------------------------------------
 model = get_model(yaml_load(yaml_string))
 def likelihood(p):
-    point = dict(zip(model.parameterization.sampled_params(),
-                 model.prior.sample(ignore_external=True)[0]))
-    names=list(model.parameterization.sampled_params().keys())
-    point.update({ name: p[name].item() for name in names })
+    point = dict(zip(model.parameterization.sampled_params(), p))
     res1 = model.logprior(point,make_finite=True)
     res2 = model.loglike(point,make_finite=True,cached=False,return_derived=False)
     return res1+res2

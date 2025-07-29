@@ -263,22 +263,31 @@ theory:
 # ------------------------------------------------------------------------------
 model = get_model(yaml_load(yaml_string))
 def chi2(p):
-    point = dict(zip(model.parameterization.sampled_params(),
-                 model.prior.sample(ignore_external=True)[0]))
-    names = list(model.parameterization.sampled_params().keys())
-    point.update({name: val for name, val in zip(names, p)})
+    point = dict(zip(model.parameterization.sampled_params(), p))
     res1 = model.logprior(point,make_finite=True)
     res2 = model.loglike(point,make_finite=True,cached=False,return_derived=False)
     return -2.0*(res1+res2)
 def chi2v2(p):
-    point = dict(zip(model.parameterization.sampled_params(),
-                 model.prior.sample(ignore_external=True)[0]))
-    names=list(model.parameterization.sampled_params().keys())
-    point.update({name: val for name, val in zip(names, p)})
+    point = dict(zip(model.parameterization.sampled_params(), p))
     logposterior = model.logposterior(point, as_dict=True)
     chi2likes=-2*np.array(list(logposterior["loglikes"].values()))
     chi2prior=-2*np.atleast_1d(model.logprior(point,make_finite=False))
     return np.concatenate((chi2likes, chi2prior))
+def chi2grad(p):
+    ndim = model.prior.d()
+    if (len(p) != ndim):
+      raise RuntimeError("Incorrect Input to chi2grad")
+    grad = np.zeros(ndim, dtype='float64')
+    for i in range(ndim):
+      def chi2local(x):
+        plocal    = np.array(p, dtype='float64')
+        plocal[i] = x
+        return chi2(plocal)
+      DerivativeCalculator(myfunc=chi2local, x_center=p[i])
+      grad[i] = calc.stem_method()
+      print(grad[i], calc.five_point_stencil_method())
+    return grad
+
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
@@ -408,8 +417,10 @@ if __name__ == '__main__':
         # First: load the cov. matrix (from running EXAMPLE_EMUL_MCMC1.yaml) --
         if args.cov is None:
           cov = model.prior.covmat(ignore_external=False) # cov from prior
+          factor = min(1.0, args.factor)
         else:
           cov = np.loadtxt(args.root+args.cov)[0:model.prior.d(),0:model.prior.d()]
+          factor = args.factor
         sigma = np.sqrt(np.diag(cov))
 
         # Second: get minimum --------------------------------------------------
@@ -434,8 +445,11 @@ if __name__ == '__main__':
         # Third we need to set the parameter profile range ---------------------
         start = np.zeros(model.prior.d(), dtype='float64')
         stop  = np.zeros(model.prior.d(), dtype='float64')
-        start = x0 - args.factor*sigma
-        stop  = x0 + args.factor*sigma
+        start = x0 - factor*sigma
+        stop  = x0 + factor*sigma
+        
+        print("\n\n\n", chi2(x0), chi2(start), chi2(stop), "\n\n\n")
+
         # We need to respect the YAML priors
         bounds0 = model.prior.bounds(confidence=0.999999)
         for i in range(model.prior.d()):
