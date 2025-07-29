@@ -316,14 +316,15 @@ Now, users must follow all the steps below.
 
 - **Profile method 2**:
 
-    If the dimensionaly of the problem is not large, it can be much faster to use a simple scipy `Nelder-Mead`
-  to calculate the profile. Here the `minfile` and `cov` options are mandatory.
+    If the dimensionality of the problem is not large, and the spacing between values of the parameter
+  being profiled is small, it can be considerably faster to use a simple scipy `Nelder-Mead`
+  to calculate the profile. Here, the `minfile` and `cov` options are mandatory.
 
       mpirun -n 1 --oversubscribe --mca pml ^ucx --mca btl vader,tcp,self \
           --bind-to core --map-by core --report-bindings --mca mpi_yield_when_idle 1 \
           python ./projects/example/EXAMPLE_EMUL_PROFILE_SCIPY1.py \
           --root ./projects/example/ --cov 'chains/EXAMPLE_EMUL_MCMC1.covmat' \
-          --outroot "EXAMPLE_EMUL_PROFILE1" --factor 3 --maxfeval 5000 --numpts 10 \
+          --outroot "EXAMPLE_EMUL_PROFILE1" --factor 3 --maxfeval 5000 --numpts 20 \
           --profile 1 --minfile="./projects/example/chains/EXAMPLE_EMUL_MIN1.txt"
   
 # Appendix <a name="appendix"></a>
