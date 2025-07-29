@@ -247,19 +247,19 @@ Now, users must follow all the steps below.
 
 - **One model evaluation**:
 
-        mpirun -n 1 --oversubscribe --mca pml ^ucx --mca btl vader,tcp,self \
+      mpirun -n 1 --oversubscribe --mca pml ^ucx --mca btl vader,tcp,self \
            --bind-to core --map-by numa --report-bindings \
            cobaya-run ./projects/example/EXAMPLE_EMUL_EVALUATE1.yaml -f
                
 - **MCMC (Metropolis-Hastings Algorithm)**:
 
-        mpirun -n 4 --oversubscribe --mca pml ^ucx --mca btl vader,tcp,self \
+      mpirun -n 4 --oversubscribe --mca pml ^ucx --mca btl vader,tcp,self \
            --bind-to core --map-by numa --report-bindings \
            cobaya-run ./projects/example/EXAMPLE_EMUL_MCMC1.yaml -f
 
 - **PolyChord**:
 
-        mpirun -n 90 --oversubscribe --mca pml ^ucx --mca btl vader,tcp,self \
+      mpirun -n 90 --oversubscribe --mca pml ^ucx --mca btl vader,tcp,self \
            --bind-to core --map-by numa --report-bindings --mca mpi_yield_when_idle 1 \
            cobaya-run ./projects/example/EXAMPLE_EMUL_POLY1.yaml -f
 
@@ -274,7 +274,7 @@ Now, users must follow all the steps below.
 
 - **Nautilus**:
 
-        mpirun -n 80 --oversubscribe --mca pml ^ucx --mca btl vader,tcp,self \
+      mpirun -n 80 --oversubscribe --mca pml ^ucx --mca btl vader,tcp,self \
            --bind-to core --map-by numa --report-bindings --mca mpi_yield_when_idle 1 \
            python -m mpi4py.futures ./projects/example/EXAMPLE_EMUL_NAUTILUS1.py \
            --root ./projects/example/ --outroot "EXAMPLE_NAUTILUS1"  \
@@ -282,7 +282,7 @@ Now, users must follow all the steps below.
 
 - **Global Minimizer**:
 
-        mpirun -n 5 --oversubscribe --mca pml ^ucx --mca btl vader,tcp,self \
+      mpirun -n 5 --oversubscribe --mca pml ^ucx --mca btl vader,tcp,self \
            --bind-to core --map-by numa --report-bindings --mca mpi_yield_when_idle 1 \
           python ./projects/example/EXAMPLE_EMUL_MINIMIZE1.py --root ./projects/example/ \
           --cov 'chains/EXAMPLE_EMUL_MCMC1.covmat' --outroot "EXAMPLE_EMUL_MIN1" --maxfeval 25000
@@ -293,7 +293,7 @@ Now, users must follow all the steps below.
 
 - **Profile**: 
 
-        mpirun -n 5 --oversubscribe --mca pml ^ucx --mca btl vader,tcp,self \
+      mpirun -n 5 --oversubscribe --mca pml ^ucx --mca btl vader,tcp,self \
            --bind-to core --map-by core --report-bindings --mca mpi_yield_when_idle 1 \
           python ./projects/example/EXAMPLE_EMUL_PROFILE1.py \
           --root ./projects/example/ --cov 'chains/EXAMPLE_EMUL_MCMC1.covmat' \
@@ -319,12 +319,12 @@ Now, users must follow all the steps below.
     If the dimensionaly of the problem is not large, it can be much faster to use a simple scipy `Nelder-Mead`
   to calculate the profile. Here the `minfile` and `cov` options are mandatory.
 
-        mpirun -n 1 --oversubscribe --mca pml ^ucx --mca btl vader,tcp,self \
-                   --bind-to core --map-by core --report-bindings --mca mpi_yield_when_idle 1 \
-                  python ./projects/example/EXAMPLE_EMUL_PROFILE_SCIPY1.py \
-                  --root ./projects/example/ --cov 'chains/EXAMPLE_EMUL_MCMC1.covmat' \
-                  --outroot "EXAMPLE_EMUL_PROFILE1" --factor 3 --maxfeval 5000 --numpts 10 \
-                  --profile 1 --minfile="./projects/example/chains/EXAMPLE_EMUL_MIN1.txt"
+      mpirun -n 1 --oversubscribe --mca pml ^ucx --mca btl vader,tcp,self \
+          --bind-to core --map-by core --report-bindings --mca mpi_yield_when_idle 1 \
+          python ./projects/example/EXAMPLE_EMUL_PROFILE_SCIPY1.py \
+          --root ./projects/example/ --cov 'chains/EXAMPLE_EMUL_MCMC1.covmat' \
+          --outroot "EXAMPLE_EMUL_PROFILE1" --factor 3 --maxfeval 5000 --numpts 10 \
+          --profile 1 --minfile="./projects/example/chains/EXAMPLE_EMUL_MIN1.txt"
   
 # Appendix <a name="appendix"></a>
 
