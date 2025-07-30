@@ -35,7 +35,6 @@ warnings.filterwarnings(
 import functools, iminuit, copy, argparse, random, time 
 import emcee, itertools
 import numpy as np
-from scipy import optimize
 from cobaya.yaml import yaml_load
 from cobaya.model import get_model
 from getdist import IniFile
