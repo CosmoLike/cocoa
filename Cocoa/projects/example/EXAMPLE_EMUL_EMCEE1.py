@@ -72,6 +72,12 @@ parser.add_argument("--burn_in",
                     nargs='?',
                     type=float,
                     default=0.3)
+parser.add_argument("--progress",
+                    dest="progress",
+                    help="Show Emcee Progress",
+                    nargs='?',
+                    type=bool,
+                    default=False)
 args, unknown = parser.parse_known_args()
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
@@ -288,16 +294,24 @@ def chain(x0,
                                     parameter_names=names,
                                     moves=[(emcee.moves.GaussianMove(cov=cov), 0.25)],
                                     pool=pool)
-    sampler.run_mcmc(x0, maxfeval, skip_initial_state_check=True)
+    sampler.run_mcmc(x0, 
+                     maxfeval, 
+                     skip_initial_state_check=True, 
+                     progress=args.progress)
     burn_in = int(abs(burn_in)*maxfeval) if abs(burn_in) < 1 else 0
     xf      = sampler.get_chain(flat=True, discard=burn_in)
     lnpf    = sampler.get_log_prob(flat=True, discard=burn_in)
     weights = np.ones((len(xf),1), dtype='float64')
     local_chi2    = -2*lnpf
-    return np.concatenate([weights,
+    try:
+      tau = sampler.get_autocorr_time()
+    except AutocorrError as e:
+      print(f"Warning: {e}")
+    return [np.concatenate([weights,
                            lnpf[:,None], 
                            xf, 
-                           local_chi2[:,None]], axis=1)
+                           local_chi2[:,None]], axis=1), 
+            float(np.max(tau))]
 
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
@@ -340,14 +354,14 @@ if __name__ == '__main__':
                     maxfeval=maxevals,
                     pool=pool,
                     burn_in=args.burn_in if abs(args.burn_in) < 1 else 0)
-        
+
         # saving file begins ---------------------------------------------------
+        header=f"nwalkers={nwalkers}, maxfeval={args.maxfeval}, max tau={res[1]}\n"
         np.savetxt(f"{args.root}chains/{args.outroot}.1.txt",
-                   res,
+                   res[0],
                    fmt="%.5e",
-                   header=f"nwalkers={nwalkers}, maxfeval={args.maxfeval}\n"+' '.join(names),
+                   header=header+' '.join(names),
                    comments="# ")
-        
         # Now we need to save a range files ----------------------------------------
         comment = ["weights","lnp"]+names+["chi2*"]
         rows = [(str(n),float(l),float(h)) for n,l,h in zip(names,bounds[:,0],bounds[:,1])]

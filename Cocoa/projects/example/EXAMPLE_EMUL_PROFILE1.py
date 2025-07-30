@@ -92,6 +92,12 @@ parser.add_argument("--cov",
                     nargs='?',
                     const=1,
                     default=None)
+parser.add_argument("--progress",
+                    dest="progress",
+                    help="Show Emcee Progress",
+                    nargs='?',
+                    type=bool,
+                    default=False)
 args, unknown = parser.parse_known_args()
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
@@ -351,7 +357,10 @@ def min_chi2(x0,
                                         moves=[(emcee.moves.GaussianMove(cov=GScov),1.)],
                                         pool=pool)
         
-        sampler.run_mcmc(x, nsteps, skip_initial_state_check=True)
+        sampler.run_mcmc(x, 
+                         nsteps, 
+                         skip_initial_state_check=True,
+                         progress=args.progress)
         samples = sampler.get_chain(flat=True, thin=1, discard=0)
 
         j = np.argmin(-1.0*np.array(sampler.get_log_prob(flat=True)))
