@@ -9,13 +9,17 @@ warnings.filterwarnings(
 warnings.filterwarnings(
     "ignore",
     category=RuntimeWarning,
-    message=r".*invalid value encountered in subtract.*",
-    module=r"emcee\.moves\.mh"
+    message=r".*invalid value encountered*"
 )
 warnings.filterwarnings(
     "ignore",
     category=RuntimeWarning,
     message=r".*overflow encountered*"
+)
+warnings.filterwarnings(
+    "ignore",
+    category=UserWarning,
+    message=r".*Function not smooth or differentiabl*"
 )
 warnings.filterwarnings(
     "ignore",
@@ -28,6 +32,7 @@ import numpy as np
 from cobaya.yaml import yaml_load
 from cobaya.model import get_model
 from getdist import IniFile
+from getdist import loadMCSamples
 from schwimmbad import MPIPool
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
@@ -242,11 +247,13 @@ theory:
 # ------------------------------------------------------------------------------
 model = get_model(yaml_load(yaml_string))
 def chi2(p):
+    p = [float(v) for v in p.values()] if isinstance(p, dict) else p
     point = dict(zip(model.parameterization.sampled_params(), p))
     res1 = model.logprior(point,make_finite=True)
     res2 = model.loglike(point,make_finite=True,cached=False,return_derived=False)
     return -2.0*(res1+res2)
 def chi2v2(p):
+    p = [float(v) for v in p.values()] if isinstance(p, dict) else p
     point = dict(zip(model.parameterization.sampled_params(), p))
     logposterior = model.logposterior(point, as_dict=True)
     chi2likes=-2*np.array(list(logposterior["loglikes"].values()))
@@ -265,19 +272,9 @@ def chain(x0,
           names,
           burn_in=0.3,
           maxfeval=3000, 
-          pool=None):
-    def mychi2(params, *args):
-        return chi2(p=params)
-
-    def log_prior(params):
-        return 1.0
-    
+          pool=None):    
     def logprob(params, *args):
-        lp = log_prior(params)
-        if not np.isfinite(lp):
-            return -np.inf
-        else:
-            return -0.5*mychi2(params, *args) + lp
+        return -0.5*chi2(params)
 
     class GaussianStep:
        def __init__(self, stepsize=0.25):
@@ -286,21 +283,21 @@ def chain(x0,
            return np.random.multivariate_normal(x, self.cov, size=1) 
 
     sampler = emcee.EnsembleSampler(nwalkers=nwalkers, 
-                                    ndim=int(2*ndim), 
+                                    ndim=ndim, 
                                     log_prob_fn=logprob, 
                                     parameter_names=names,
                                     moves=[(emcee.moves.GaussianMove(cov=cov), 0.25)],
                                     pool=pool)
-    sampler.run_mcmc(x0, maxfeval)
+    sampler.run_mcmc(x0, maxfeval, skip_initial_state_check=True)
     burn_in = int(abs(burn_in)*maxfeval) if abs(burn_in) < 1 else 0
     xf      = sampler.get_chain(flat=True, discard=burn_in)
     lnpf    = sampler.get_log_prob(flat=True, discard=burn_in)
-    weights = np.ones(len(xf), dtype='float64')
-    chi2    = -2*lnpf
+    weights = np.ones((len(xf),1), dtype='float64')
+    local_chi2    = -2*lnpf
     return np.concatenate([weights,
                            lnpf[:,None], 
                            xf, 
-                           lnpf[:,None]], axis=1)
+                           local_chi2[:,None]], axis=1)
 
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
@@ -318,16 +315,16 @@ if __name__ == '__main__':
         dim      = model.prior.d()                                      # Cobaya call
         bounds   = model.prior.bounds(confidence=0.999999)              # Cobaya call
         names    = list(model.parameterization.sampled_params().keys()) # Cobaya Call
-        nwalkers = pool.comm.Get_size()
-        
+        nwalkers = pool.comm.Get_size()   
+        maxevals = int(args.maxfeval/(nwalkers))
         # get initial points ---------------------------------------------------
         x0 = [] # Initial point x0
         for j in range(nwalkers):
           (tmp_x0, tmp) = model.get_valid_point(max_tries=10000, 
                                                 ignore_fixed_ref=False,
                                                 logposterior_as_dict=True)
-          x0.append(tmp_x0)
-        
+          x0.append(tmp_x0[0:dim])
+        x0 = np.array(x0, dtype='float64')
         # get covariance -------------------------------------------------------
         if args.cov is None:
           cov = model.prior.covmat(ignore_external=False) # cov from prior
@@ -340,7 +337,7 @@ if __name__ == '__main__':
                     nwalkers=nwalkers,
                     cov=cov, 
                     names=names,
-                    maxfeval=args.maxfeval,
+                    maxfeval=maxevals,
                     pool=pool,
                     burn_in=args.burn_in if abs(args.burn_in) < 1 else 0)
         
@@ -352,8 +349,10 @@ if __name__ == '__main__':
                    comments="# ")
         
         # Now we need to save a range files ----------------------------------------
+        comment = ["weights","lnp"]+names+["chi2*"]
         rows = [(str(n),float(l),float(h)) for n,l,h in zip(names,bounds[:,0],bounds[:,1])]
         with open(f"{args.root}chains/{args.outroot}.ranges", "w") as f: 
+          f.write(f"# {' '.join(comment)}\n")
           f.writelines(f"{n} {l:.5e} {h:.5e}\n" for n, l, h in rows)
 
         # Now we need to save a paramname files --------------------------------
@@ -364,7 +363,7 @@ if __name__ == '__main__':
         np.savetxt(f"{args.root}chains/{args.outroot}.paramnames", 
                    np.column_stack((names,latex)),
                    fmt="%s")
-        
+    
         # Now we need to save a cov matrix -----------------------------------------
         samples = loadMCSamples(f"{args.root}chains/{args.outroot}",
                                 settings={'ignore_rows': u'0.0'})
