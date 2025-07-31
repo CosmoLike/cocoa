@@ -286,16 +286,17 @@ Now, users must follow all the steps below.
            --maxfeval 450000 --nlive 2048 --neff 15000 --flive 0.01 --nnetworks 5
 
 - **Emcee**:
-    
+
       mpirun -n 21 --oversubscribe --mca pml ^ucx --mca btl vader,tcp,self \
            --bind-to core --map-by numa --report-bindings --mca mpi_yield_when_idle 1 \
           python ./projects/example/EXAMPLE_EMUL_EMCEE1.py --root ./projects/example/ \
           --outroot "EXAMPLE_EMUL_EMCEE1" --maxfeval 100000 --burn_in 0.3
 
+
 > [!TIP]
 > The number of steps per MPI worker is `maxfeval/3nwalkers`, and the number of walkers is equal to
-> max(4x the number of parameters, number of MPI workers). It is required for convergence to allow each walker to 
-> walk at least 50 times the auto-correlation length, which is provided in the header of the output chain file. 
+> max(3x the number of parameters, number of MPI workers). It is advised for convergence that each walker 
+> walk 50 times the auto-correlation length, which is provided in the header of the output chain file. 
 
 - **Global Minimizer**:
 
