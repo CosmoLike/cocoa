@@ -376,11 +376,12 @@ if __name__ == '__main__':
     comm = MPI.COMM_WORLD
     numpts = comm.Get_size()
 
-    start = np.zeros(model.prior.d(), dtype='float64')
-    stop  = np.zeros(model.prior.d(), dtype='float64')
+    bounds = model.prior.bounds(confidence=0.999999)              # Cobaya call
+    start  = np.zeros(model.prior.d(), dtype='float64')
+    stop   = np.zeros(model.prior.d(), dtype='float64')
     for i in range(model.prior.d()):
-      start[i] = 1.05*bounds0[i][0]
-      stop[i]  = 0.95*bounds0[i][1]
+      start[i] = 1.05*bounds[i][0]
+      stop[i]  = 0.95*bounds[i][1]
     param = np.linspace(start=start[index], stop=stop[index], num=numpts)
     
     # 2nd: Print to the terminal -----------------------------------------------
