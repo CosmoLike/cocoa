@@ -141,7 +141,7 @@ params:
       scale: 0.03
     proposal: 0.03
     latex: '\Omega_\mathrm{c} h^2'
-   tau:
+  tau:
     prior:
       min: 0.04
       max: 0.09
