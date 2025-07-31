@@ -373,20 +373,25 @@ from mpi4py.futures import MPIPoolExecutor
 
 if __name__ == '__main__':
     # 1st: Set the parameter range ---------------------------------------------
+    executor = MPIPoolExecutor()
     comm = MPI.COMM_WORLD
     numpts = comm.Get_size()
 
+    index  = args.profile
+    maxfeval = args.maxfeval
     bounds = model.prior.bounds(confidence=0.999999)              # Cobaya call
     start  = np.zeros(model.prior.d(), dtype='float64')
     stop   = np.zeros(model.prior.d(), dtype='float64')
     for i in range(model.prior.d()):
       start[i] = 1.05*bounds[i][0]
       stop[i]  = 0.95*bounds[i][1]
-    param = np.linspace(start=start[index], stop=stop[index], num=numpts)
+    param = np.linspace(start = start[index], 
+                        stop  = stop[index], 
+                        num   = numpts)
     
     # 2nd: Print to the terminal -----------------------------------------------
     names = list(model.parameterization.sampled_params().keys()) # Cobaya Call
-    print(f"maxfeval={args.maxfeval}, param={names[args.profile]}")
+    print(f"maxfeval={maxfeval}, param={names[index]}")
     print(f"profile param values = {param}")
         
     # 4th: Set the array that will hold the final result -----------------------
@@ -394,13 +399,13 @@ if __name__ == '__main__':
                                           ignore_fixed_ref=False,
                                           logposterior_as_dict=True)
     xf = np.tile(x0, (numpts, 1))
-    xf[:,args.profile] = param
+    xf[:,index] = param
     
     # 5th: Run the profile -----------------------------------------------------
     dim      = model.prior.d()    
     nwalkers = 3*dim
     ntemp    = 5
-    maxevals = int(args.maxfeval/(ntemp*nwalkers))
+    maxevals = int(maxfeval/(ntemp*nwalkers))
     cov = model.prior.covmat(ignore_external=False) # cov from prior
     res = np.array(list(executor.map(functools.partial(prf, 
                                                        index=index,
@@ -408,7 +413,7 @@ if __name__ == '__main__':
                                                        nwalkers=nwalkers,
                                                        cov=cov), xf)),dtype="object")
     
-    x0 = np.array([np.insert(row,index,p) for row, p in zip(res[:,0],param)],dtype='float64')
+    x0 = np.array([np.insert(row, index, p) for row, p in zip(res[:,0], param)], dtype='float64')
     chi2res = np.array(res[:,1], dtype='float64')
     
     #6th: Append derived parameters --------------------------------------------
@@ -427,12 +432,12 @@ if __name__ == '__main__':
                           np.array([chi2v2(d) for d in xf], dtype='float64')))
     
     #7th: Save output file -----------------------------------------------------   
-    hd = [names[args.profile], "chi2"]+['H0', 'omegam']
+    hd = [names[index], "chi2"]+['H0', 'omegam']
     hd = hd + list(model.info()['likelihood'].keys()) + ["prior"]
-    np.savetxt(f"{args.root}chains/{args.outroot}.{names[args.profile]}.txt",
+    np.savetxt(f"{args.root}chains/{args.outroot}.{names[index]}.txt",
                np.concatenate([np.c_[param, chi2res], xf],axis=1),
                fmt="%.6e",
-               header=f"maxfeval={args.maxfeval}, param={names[args.profile]}\n"+' '.join(hd),
+               header=f"maxfeval={maxfeval}, param={names[index]}\n"+' '.join(hd),
                comments="# ")
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
