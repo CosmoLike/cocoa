@@ -88,10 +88,10 @@ likelihood:
   planck_2018_highl_plik.TTTEEE_lite: 
     path: ./external_modules/
     clik_file: plc_3.0/hi_l/plik_lite/plik_lite_v22_TTTEEE.clik
-  planck_2018_lowl.TT: 
+  planck_2018_lowl.TT:
     path: ./external_modules
-  planck_2018_lowl.EE:
-    path: ./external_modules
+  planck_2020_lollipop.lowlE:
+    data_folder: planck/lollipop
   sn.desy5: 
     path: ./external_modules/data/sn_data
   bao.desi_dr2.desi_bao_all:
@@ -153,15 +153,14 @@ params:
     latex: '\Omega_\mathrm{c} h^2'
   tau:
     prior:
-      dist: norm
-      loc: 0.0544
-      scale: 0.0073
+      min: 0.04
+      max: 0.09
     ref:
       dist: norm
       loc: 0.055
-      scale: 0.006
-    proposal: 0.003
-    latex: '\tau_\mathrm{reio}'
+      scale: 0.01
+    proposal: 0.01
+    latex: \tau_\mathrm{reio}
   As:
     derived: 'lambda logA: 1e-10*np.exp(logA)'
     latex: 'A_\mathrm{s}'
