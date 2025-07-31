@@ -283,17 +283,15 @@ Now, users must follow all the steps below.
            --bind-to core --map-by numa --report-bindings --mca mpi_yield_when_idle 1 \
            python -m mpi4py.futures ./projects/example/EXAMPLE_EMUL_NAUTILUS1.py \
            --root ./projects/example/ --outroot "EXAMPLE_EMUL_NAUTILUS1"  \
-           --maxfeval 450000 --nlive 1024 --neff 15000 --flive 0.01 --nnetworks 5
+           --maxfeval 450000 --nlive 2048 --neff 15000 --flive 0.01 --nnetworks 5
 
 - **Emcee**:
-
-The emcee sampler is highly inefficient for simple LCDM chains if you strictly follow the convergence criteria.
-But it can be helpful for beyond LCDM analysis with complicated, highly degenerate posterior distributions
 
       mpirun -n 21 --oversubscribe --mca pml ^ucx --mca btl vader,tcp,self \
            --bind-to core --map-by numa --report-bindings --mca mpi_yield_when_idle 1 \
           python ./projects/example/EXAMPLE_EMUL_EMCEE1.py --root ./projects/example/ \
-          --outroot "EXAMPLE_EMUL_EMCEE1" --maxfeval 500000 --burn_in 0.3
+          --outroot "EXAMPLE_EMUL_EMCEE1" --maxfeval 100000 --burn_in 0.3
+
 
 > [!TIP]
 > The number of steps per MPI worker is `maxfeval/3nwalkers`, and the number of walkers is equal to
@@ -305,7 +303,7 @@ But it can be helpful for beyond LCDM analysis with complicated, highly degenera
       mpirun -n 5 --oversubscribe --mca pml ^ucx --mca btl vader,tcp,self \
            --bind-to core --map-by numa --report-bindings --mca mpi_yield_when_idle 1 \
           python ./projects/example/EXAMPLE_EMUL_MINIMIZE1.py --root ./projects/example/ \
-          --cov 'chains/EXAMPLE_EMUL_MCMC1.covmat' --outroot "EXAMPLE_EMUL_MIN1" --maxfeval 25000
+          --cov 'chains/EXAMPLE_EMUL_MCMC1.covmat' --outroot "EXAMPLE_EMUL_MIN1" --maxfeval 10000
 
 > [!TIP]
 > The number of steps per MPI per temperature is `maxfeval/5NMPI`. Do maintain this number greater than 1000
