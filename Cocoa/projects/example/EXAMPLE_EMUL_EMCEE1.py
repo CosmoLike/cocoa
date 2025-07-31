@@ -29,6 +29,7 @@ warnings.filterwarnings(
 import functools, iminuit, copy, argparse, random, time 
 import emcee, itertools
 import numpy as np
+from emcee.autocorr import AutocorrError
 from cobaya.yaml import yaml_load
 from cobaya.model import get_model
 from getdist import IniFile
@@ -303,10 +304,7 @@ def chain(x0,
     lnpf    = sampler.get_log_prob(flat=True, discard=burn_in)
     weights = np.ones((len(xf),1), dtype='float64')
     local_chi2    = -2*lnpf
-    try:
-      tau = sampler.get_autocorr_time()
-    except AutocorrError as e:
-      print(f"Warning: {e}")
+    tau = sampler.get_autocorr_time(quiet=True, has_walkers=True)
     return [np.concatenate([weights,
                            lnpf[:,None], 
                            xf, 
@@ -329,7 +327,7 @@ if __name__ == '__main__':
         dim      = model.prior.d()                                      # Cobaya call
         bounds   = model.prior.bounds(confidence=0.999999)              # Cobaya call
         names    = list(model.parameterization.sampled_params().keys()) # Cobaya Call
-        nwalkers = max(3*dim, 10)   
+        nwalkers = max(4*dim,pool.comm.Get_size())   
         maxevals = int(args.maxfeval/(nwalkers))
         print(f"\n\n\n"
               f"maxfeval={args.maxfeval}, "
