@@ -327,7 +327,7 @@ if __name__ == '__main__':
         dim      = model.prior.d()                                      # Cobaya call
         bounds   = model.prior.bounds(confidence=0.999999)              # Cobaya call
         names    = list(model.parameterization.sampled_params().keys()) # Cobaya Call
-        nwalkers = max(4*dim,pool.comm.Get_size())   
+        nwalkers = max(3*dim,pool.comm.Get_size())
         maxevals = int(args.maxfeval/(nwalkers))
         print(f"\n\n\n"
               f"maxfeval={args.maxfeval}, "
