@@ -373,6 +373,9 @@ from mpi4py.futures import MPIPoolExecutor
 
 if __name__ == '__main__':
     # 1st: Set the parameter range ---------------------------------------------
+    comm = MPI.COMM_WORLD
+    numpts = comm.Get_size()
+
     start = np.zeros(model.prior.d(), dtype='float64')
     stop  = np.zeros(model.prior.d(), dtype='float64')
     for i in range(model.prior.d()):
@@ -393,11 +396,9 @@ if __name__ == '__main__':
     xf[:,args.profile] = param
     
     # 5th: Run the profile -----------------------------------------------------
-    comm = MPI.COMM_WORLD
-    size = comm.Get_size()   # Total number of MPI processes
-    rank = comm.Get_rank()   # Rank of the current process
-    nwalkers = comm.Get_size()
-    maxevals = int(args.maxfeval/(5.0*nwalkers))
+    nwalkers = 5
+    ntemperatures = 5
+    maxevals = int(args.maxfeval/(ntemperatures.*nwalkers))
 
     cov = model.prior.covmat(ignore_external=False) # cov from prior
 
