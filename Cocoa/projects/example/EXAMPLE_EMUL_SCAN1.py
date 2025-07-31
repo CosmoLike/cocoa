@@ -298,10 +298,7 @@ def min_chi2(x0,
     ndim        = int(x0.shape[0])
     nwalkers    = int(nwalkers)
     nsteps      = maxfeval
-    if fixed == -1:
-      temperature = np.array([1.0, 0.25, 0.1, 0.005, 0.001], dtype='float64')
-    else:
-      temperature = np.array([0.25, 0.1, 0.005, 0.001], dtype='float64')
+    temperature = np.array([1.0, 0.25, 0.1, 0.005, 0.001], dtype='float64')
     stepsz      = temperature/4.0
 
     partial_samples = [x0]
@@ -400,7 +397,8 @@ if __name__ == '__main__':
     size = comm.Get_size()   # Total number of MPI processes
     rank = comm.Get_rank()   # Rank of the current process
     nwalkers = comm.Get_size()
-    
+    maxevals = int(args.maxfeval/(5.0*nwalkers))
+
     cov = model.prior.covmat(ignore_external=False) # cov from prior
 
     res = np.array(list(executor.map(functools.partial(prf, 
