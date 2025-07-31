@@ -282,15 +282,15 @@ Now, users must follow all the steps below.
 
 - **Emcee**:
     
-      mpirun -n 80 --oversubscribe --mca pml ^ucx --mca btl vader,tcp,self \
+      mpirun -n 28 --oversubscribe --mca pml ^ucx --mca btl vader,tcp,self \
            --bind-to core --map-by numa --report-bindings --mca mpi_yield_when_idle 1 \
           python ./projects/example/EXAMPLE_EMUL_EMCEE1.py --root ./projects/example/ \
           --outroot "EXAMPLE_EMUL_EMCEE1" --maxfeval 200000
 
 > [!TIP]
->  The number of steps per MPI per temperature is `maxfeval/NMPI`. It is required for convergence
->  to allow each walker to walk at least 50 times the auto-correlation length
->  (provided in the first line (header) of the file that saves the chain). 
+> The number of steps per MPI worker is `maxfeval/3nwalkers`, and the number of walkers is equal to
+> max(4x the number of parameters, number of MPI workers). It is required for convergence to allow each walker to 
+> walk at least 50 times the auto-correlation length, which is provided in the header of the output chain file. 
 
 - **Global Minimizer**:
 
