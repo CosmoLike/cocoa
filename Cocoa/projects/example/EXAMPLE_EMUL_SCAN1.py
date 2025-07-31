@@ -32,7 +32,6 @@ import numpy as np
 from cobaya.yaml import yaml_load
 from cobaya.model import get_model
 from getdist import IniFile
-from schwimmbad import MPIPool
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
@@ -67,37 +66,6 @@ parser.add_argument("--profile",
                     nargs='?',
                     const=1,
                     default=1)
-parser.add_argument("--factor",
-                    dest="factor",
-                    help="Factor that set the bounds (multiple of cov matrix)",
-                    type=int,
-                    nargs='?',
-                    const=1,
-                    default=3)
-parser.add_argument("--numpts",
-                    dest="numpts",
-                    help="Number of Points to Compute Minimum",
-                    type=int,
-                    nargs='?',
-                    const=1,
-                    default=20)
-parser.add_argument("--minfile",
-                    dest="minfile",
-                    help="Minimization Result",
-                    nargs='?',
-                    const=1)
-parser.add_argument("--cov",
-                    dest="cov",
-                    help="Chain Covariance Matrix",
-                    nargs='?',
-                    const=1,
-                    default=None)
-parser.add_argument("--progress",
-                    dest="progress",
-                    help="Show Emcee Progress",
-                    nargs='?',
-                    type=bool,
-                    default=False)
 args, unknown = parser.parse_known_args()
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
@@ -173,7 +141,7 @@ params:
       scale: 0.03
     proposal: 0.03
     latex: '\Omega_\mathrm{c} h^2'
-  tau:
+   tau:
     prior:
       min: 0.04
       max: 0.09
@@ -294,8 +262,7 @@ def min_chi2(x0,
              cov, 
              fixed=-1, 
              maxfeval=3000, 
-             nwalkers=5,
-             pool=None):
+             nwalkers=5):
 
     def mychi2(params, *args):
         z, fixed, T = args
@@ -353,8 +320,7 @@ def min_chi2(x0,
                                         ndim=ndim, 
                                         log_prob_fn=logprob, 
                                         args=(args[0], args[1], temperature[i]),
-                                        moves=[(emcee.moves.GaussianMove(cov=GScov),1.)],
-                                        pool=pool)
+                                        moves=[(emcee.moves.GaussianMove(cov=GScov),1.)])
         
         sampler.run_mcmc(x, 
                          nsteps, 
@@ -378,14 +344,13 @@ def min_chi2(x0,
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
-def prf(x0, maxfeval, cov, fixed=-1, nwalkers=5, pool=None):
+def prf(x0, maxfeval, cov, fixed=-1, nwalkers=5):
     t0 = np.array(x0, dtype='float64')
     res =  min_chi2(x0=t0, 
                     fixed=fixed,
                     cov=cov, 
                     maxfeval=maxfeval, 
-                    nwalkers=nwalkers,
-                    pool=pool)
+                    nwalkers=nwalkers)
     return res
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
@@ -406,130 +371,70 @@ etheta = emultheta(extra_args={
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
+from mpi4py import MPI
+from mpi4py.futures import MPIPoolExecutor
+
 if __name__ == '__main__':
-    with MPIPool() as pool:
-        if not pool.is_master():
-            pool.wait()
-            sys.exit(0)
-        nwalkers = pool.comm.Get_size()
-        maxevals = int(args.maxfeval/(4.0*nwalkers))
+    # 1st: Set the parameter range ---------------------------------------------
+    start = np.zeros(model.prior.d(), dtype='float64')
+    stop  = np.zeros(model.prior.d(), dtype='float64')
+    for i in range(model.prior.d()):
+      start[i] = 1.05*bounds0[i][0]
+      stop[i]  = 0.95*bounds0[i][1]
+    param = np.linspace(start=start[index], stop=stop[index], num=numpts)
+    
+    # 2nd: Print to the terminal -----------------------------------------------
+    names = list(model.parameterization.sampled_params().keys()) # Cobaya Call
+    print(f"maxfeval={args.maxfeval}, param={names[args.profile]}")
+    print(f"profile param values = {param}")
+        
+    # 4th: Set the array that will hold the final result -----------------------
+    (x0, results) = model.get_valid_point(max_tries=1000, 
+                                          ignore_fixed_ref=False,
+                                          logposterior_as_dict=True)
+    xf = np.tile(x0, (numpts, 1))
+    xf[:,args.profile] = param
+    
+    # 5th: Run the profile -----------------------------------------------------
+    comm = MPI.COMM_WORLD
+    size = comm.Get_size()   # Total number of MPI processes
+    rank = comm.Get_rank()   # Rank of the current process
+    nwalkers = comm.Get_size()
+    
+    cov = model.prior.covmat(ignore_external=False) # cov from prior
 
-        # 1st: load the cov. matrix --------------------------------------------
-        if args.cov is None:
-          cov = model.prior.covmat(ignore_external=False) # cov from prior
-          factor = min(1.0, args.factor)
-        else:
-          cov = np.loadtxt(args.root+args.cov)[0:model.prior.d(),0:model.prior.d()]
-          factor = args.factor
-        sigma = np.sqrt(np.diag(cov))
-
-        # Second: Get minimum --------------------------------------------------
-        if args.minfile is not None: # load minimum from running MCMC
-          x0 = np.loadtxt(args.minfile)
-          chi20 = x0[-1]
-          x0 = x0[0:model.prior.d()]
-        else: # Compute the minimum (slow)
-          (x0, results) = model.get_valid_point(max_tries=1000, 
-                                     ignore_fixed_ref=False,
-                                     logposterior_as_dict=True)
-          res = np.array(list(prf(x0=x0, 
-                                  maxfeval=int(5.*maxevals/4.), 
-                                  nwalkers=nwalkers,
-                                  pool=pool,
-                                  cov=cov,
-                                  fixed=-1)), dtype="object")
-          x0 = np.array(res[0], dtype='float64')[0:model.prior.d()]
-          chi20 = res[1]
-          print(f"Global Min: params = {x0}, and chi2 = {chi20}")
-        
-        # 3rd: Set the parameter profile range ---------------------------------
-        start = np.zeros(model.prior.d(), dtype='float64')
-        stop  = np.zeros(model.prior.d(), dtype='float64')
-        start = x0 - factor*sigma
-        stop  = x0 + factor*sigma
-        
-        # We need to respect the YAML priors
-        bounds0 = model.prior.bounds(confidence=0.999999)
-        for i in range(model.prior.d()):
-            if (start[i] < bounds0[i][0]):
-              start[i] = bounds0[i][0]
-            if (stop[i] > bounds0[i][1]):
-              stop[i] = bounds0[i][1]
-
-        half_range = (stop[args.profile] - start[args.profile]) / 2.0
-       
-        numpts = args.numpts-1 if args.numpts%2 == 1 else args.numpts 
-      
-        param  = np.linspace(start = x0[args.profile] - half_range,
-                             stop  = x0[args.profile] + half_range,
-                             num = numpts)
-        numpts=numpts+1
-        param = np.insert(param, numpts//2, x0[args.profile])
-        
-        # 4th Print to the terminal ---------------------------------------------
-        names = list(model.parameterization.sampled_params().keys()) # Cobaya Call
-        print(f"maxfeval={args.maxfeval}, param={names[args.profile]}")
-        print(f"profile param values = {param}")
-        
-        # 5th: Set the vectors that will hold the final result -----------------
-        xf = np.tile(x0, (numpts, 1))
-        xf[:,args.profile] = param
-        
-        chi2res = np.zeros(numpts)
-        chi2res[numpts//2] = chi20
-        
-        # 6th: run from midpoint to right --------------------------------------
-        tmp = np.array(xf[numpts//2,:], dtype='float64')
-        for i in range(numpts//2+1,numpts):
-            tmp[args.profile] = param[i]
-            res = prf(tmp, 
-                      fixed=args.profile,
-                      maxfeval=int(maxevals), 
-                      nwalkers=nwalkers,
-                      pool=pool,
-                      cov=cov)
-            xf[i,:] = np.insert(res[0], args.profile, param[i])
-            tmp = np.array(xf[i,:],dtype='float64')
-            chi2res[i] = res[1]
-            print(f"Partial ({i+1}/{numpts}): params = {tmp}, and chi2 = {chi2res[i]}")
-        
-        # 7th: run from midpoint to left ---------------------------------------
-        tmp = np.array(xf[numpts//2,:], dtype='float64')
-        for i in range(numpts//2-1, -1, -1):
-            tmp[args.profile] = param[i]
-            res = prf(tmp, 
-                      fixed=args.profile,
-                      maxfeval=int(maxevals), 
-                      nwalkers=nwalkers,
-                      pool=pool,
-                      cov=cov)
-            xf[i,:] = np.insert(res[0], args.profile, param[i])
-            tmp = np.array(xf[i,:], dtype='float64')
-            chi2res[i] = res[1] 
-            print(f"Partial ({i+1}/{numpts}): params = {tmp}, and chi2 = {chi2res[i]}")
-        
-        # 8th Append derived parameters ----------------------------------------
-        tmp = [
-            etheta.calculate({
-                'thetastar': row[2],
-                'omegabh2':  row[3],
-                'omegach2':  row[4],
-                'omegamh2':  row[3] + row[4] + (0.06*(3.046/3)**0.75)/94.0708
-            })
-            for row in xf
-          ]
-        xf = np.column_stack((xf, 
-                              np.array([d['H0'] for d in tmp], dtype='float64'), 
-                              np.array([d['omegam'] for d in tmp], dtype='float64'),
-                              np.array([chi2v2(d) for d in xf], dtype='float64')))
-
-        # 9th Save output file -------------------------------------------------    
-        comment = [names[args.profile],"chi2"]+names+["rdrag"]+list(model.info()['likelihood'].keys())+["prior"]
-        np.savetxt(f"{args.root}chains/{args.outroot}.{names[args.profile]}.txt",
-                   np.concatenate([np.c_[param,chi2res],xf],axis=1),
-                   fmt="%.6e",
-                   header=f"maxfeval={args.maxfeval}, param={names[args.profile]}\n"+' '.join(comment),
-                   comments="# ")
+    res = np.array(list(executor.map(functools.partial(prf, 
+                                                       index=index,
+                                                       maxfeval=maxfeval, 
+                                                       nwalkers=nwalkers,
+                                                       cov=cov), xf)),dtype="object")
+    
+    x0 = np.array([np.insert(row,index,p) for row, p in zip(res[:,0],param)],dtype='float64')
+    chi2res = np.array(res[:,1], dtype='float64')
+    
+    #6th: Append derived parameters --------------------------------------------
+    tmp = [
+        etheta.calculate({
+            'thetastar': row[2],
+            'omegabh2':  row[3],
+            'omegach2':  row[4],
+            'omegamh2':  row[3] + row[4] + (0.06*(3.046/3)**0.75)/94.0708
+        })
+        for row in xf
+      ]
+    xf = np.column_stack((xf, 
+                          np.array([d['H0'] for d in tmp], dtype='float64'), 
+                          np.array([d['omegam'] for d in tmp], dtype='float64'),
+                          np.array([chi2v2(d) for d in xf], dtype='float64')))
+    
+    #7th: Save output file -----------------------------------------------------   
+    hd = [names[args.profile], "chi2"]+['H0', 'omegam']
+    hd = hd + list(model.info()['likelihood'].keys()) + ["prior"]
+    np.savetxt(f"{args.root}chains/{args.outroot}.{names[args.profile]}.txt",
+               np.concatenate([np.c_[param, chi2res], xf],axis=1),
+               fmt="%.6e",
+               header=f"maxfeval={args.maxfeval}, param={names[args.profile]}\n"+' '.join(hd),
+               comments="# ")
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------

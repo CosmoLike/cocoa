@@ -163,6 +163,8 @@ external_modules/code/emulators/so*
 external_modules/code/dark_emu*
 external_modules/code/cosmolike2
 external_modules/code/nautilus*
+external_modules/code/derivkit
+external_modules/code/deri*
 
 cobaya/cobaya/likelihoods/XXX
 cobaya/cobaya/likelihoods/des_y1
