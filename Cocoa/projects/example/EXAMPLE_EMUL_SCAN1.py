@@ -396,9 +396,10 @@ if __name__ == '__main__':
     xf[:,args.profile] = param
     
     # 5th: Run the profile -----------------------------------------------------
+    dim      = model.prior.d()    
     nwalkers = 3*dim
-    ntemperatures = 5
-    maxevals = int(args.maxfeval/(ntemperatures.*nwalkers))
+    ntemp    = 5
+    maxevals = int(args.maxfeval/(ntemp*nwalkers))
     cov = model.prior.covmat(ignore_external=False) # cov from prior
     res = np.array(list(executor.map(functools.partial(prf, 
                                                        index=index,
