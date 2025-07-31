@@ -213,12 +213,14 @@ Cocoa contains a few transformer-based neural network emulators capable of simul
 
       [Adapted from Cocoa/set_installation_options.sh shell script] 
       # inset # symbol in the lines below (i.e., unset these environmental keys)
-      #export IGNORE_EMULTRF_CODE=1  #SaraivanovZhongZhu (SZZ) transformer-based emul
-      #export IGNORE_EMULTRF_DATA=1  #SaraivanovZhongZhu (SZZ) transformer-based emul
-      #export IGNORE_ACTDR6_CODE=1   # to run EXAMPLE_EMUL_EVALUATE1.yaml
-      #export IGNORE_ACTDR6_DATA=1   # to run EXAMPLE_EMUL_EVALUATE1.yaml
-      #export IGNORE_NAUTILUS_SAMPLER_CODE=1   # to run EXAMPLE_EMUL_NAUTILUS1.py
-      #export IGNORE_POLYCHORD_SAMPLER_CODE=1  # to run EXAMPLE_EMUL_POLY1.yaml
+      #export IGNORE_EMULTRF_CODE=1              #SaraivanovZhongZhu (SZZ) transformer/CNN-based emulators
+      #export IGNORE_EMULTRF_DATA=1              #SaraivanovZhongZhu (SZZ) transformer/CNN-based emulators
+      #export IGNORE_LIPOP_LIKELIHOOD_CODE=1     # to run EXAMPLE_EMUL_EVALUATE/MCMC/NAUTILUS/EMCEE11.yaml
+      #export IGNORE_LIPOP_CMB_DATA=1            # to run EXAMPLE_EMUL_EVALUATE/MCMC/NAUTILUS/EMCEE11.yaml
+      #export IGNORE_ACTDR6_CODE=1               # to run EXAMPLE_EMUL_EVALUATE/MCMC/NAUTILUS/EMCEE11.yaml
+      #export IGNORE_ACTDR6_DATA=1               # to run EXAMPLE_EMUL_EVALUATE/MCMC/NAUTILUS/EMCEE11.yaml
+      #export IGNORE_NAUTILUS_SAMPLER_CODE=1     # to run EXAMPLE_EMUL_NAUTILUS1.py
+      #export IGNORE_POLYCHORD_SAMPLER_CODE=1    # to run EXAMPLE_EMUL_POLY1.yaml
       
 Now, users must follow all the steps below.
 
@@ -235,9 +237,12 @@ Now, users must follow all the steps below.
 >      source ./installation_scripts/setup_pip_core_packages.sh     # install pip packages required by ML emulators
 >      source ./installation_scripts/setup_emultrf.sh               # download emulator codes
 >      source ./installation_scripts/unxv_emultrf.sh                # download pre-trained emulators
->      source ./installation_scripts/setup_act_dr6.sh               # to run EXAMPLE_EMUL_EVALUATE1.yaml
->      source ./installation_scripts/compile_act_dr6.sh             # to run EXAMPLE_EMUL_EVALUATE1.yaml
->
+>      source ./installation_scripts/setup_act_dr6.sh               # to run EXAMPLE_EMUL_EVALUATE/MCMC/NAUTILUS/EMCEE1.yaml
+>      source ./installation_scripts/compile_act_dr6.sh             # to run EXAMPLE_EMUL_EVALUATE/MCMC/NAUTILUS/EMCEE1.yaml
+>      source ./installation_scripts/setup_lipop.sh                 # to run EXAMPLE_EMUL_EVALUATE/MCMC/NAUTILUS/EMCEE1.yaml
+>      source ./installation_scripts/unxv_lipop.sh                  # to run EXAMPLE_EMUL_EVALUATE/MCMC/NAUTILUS/EMCEE1.yaml
+>      source ./installation_scripts/compile_lipop.sh               # to run EXAMPLE_EMUL_EVALUATE/MCMC/NAUTILUS/EMCEE1.yaml 
+> 
 
  **Step :one:**: Activate the private Python environment by sourcing the script `start_cocoa.sh`
 
@@ -278,14 +283,14 @@ Now, users must follow all the steps below.
            --bind-to core --map-by numa --report-bindings --mca mpi_yield_when_idle 1 \
            python -m mpi4py.futures ./projects/example/EXAMPLE_EMUL_NAUTILUS1.py \
            --root ./projects/example/ --outroot "EXAMPLE_EMUL_NAUTILUS1"  \
-           --maxfeval 200000 --nlive 1024 --neff 15000 --flive 0.01 --nnetworks 5
+           --maxfeval 200000 --nlive 1024 --neff 350000 --flive 0.01 --nnetworks 5
 
 - **Emcee**:
     
-      mpirun -n 28 --oversubscribe --mca pml ^ucx --mca btl vader,tcp,self \
+      mpirun -n 21 --oversubscribe --mca pml ^ucx --mca btl vader,tcp,self \
            --bind-to core --map-by numa --report-bindings --mca mpi_yield_when_idle 1 \
           python ./projects/example/EXAMPLE_EMUL_EMCEE1.py --root ./projects/example/ \
-          --outroot "EXAMPLE_EMUL_EMCEE1" --maxfeval 200000 --burn_in 0.3
+          --outroot "EXAMPLE_EMUL_EMCEE1" --maxfeval 350000 --burn_in 0.3
 
 > [!TIP]
 > The number of steps per MPI worker is `maxfeval/3nwalkers`, and the number of walkers is equal to
@@ -301,7 +306,7 @@ Now, users must follow all the steps below.
 
 > [!TIP]
 > The number of steps per MPI per temperature is `maxfeval/5NMPI`. Do maintain this number greater than 1000
-> for reliable results
+> for reliable results (especially when the dimension of the parameter space is high)
 
 - **Profile**: 
 
@@ -328,7 +333,7 @@ Now, users must follow all the steps below.
 
 - **Profile method 2**:
 
-    If the dimensionality of the problem is not large, and the spacing between values of the parameter
+  If the dimensionality of the problem is not large, and the spacing between values of the parameter
   being profiled is small, it can be considerably faster to use a simple scipy `Nelder-Mead`
   to calculate the profile. Here, the `minfile` and `cov` options are mandatory.
 
@@ -338,7 +343,23 @@ Now, users must follow all the steps below.
           --root ./projects/example/ --cov 'chains/EXAMPLE_EMUL_MCMC1.covmat' \
           --outroot "EXAMPLE_EMUL_PROFILE1" --factor 3 --maxfeval 5000 --numpts 20 \
           --profile 1 --minfile="./projects/example/chains/EXAMPLE_EMUL_MIN1.txt"
-  
+
+- **Scan**: 
+
+This profile code has a different MPI strategy and options. It scans one parameter
+on the entire prior, with each MPI being assigned to one minimization. This is the best
+strategy when probing a beyond-LCDM with oscilatory behavior (e.g., Monodromic Dark Energy).
+
+      mpirun -n 80 --oversubscribe --mca pml ^ucx --mca btl vader,tcp,self \
+           --bind-to core --map-by core --report-bindings --mca mpi_yield_when_idle 1 \
+          python ./projects/example/EXAMPLE_EMUL_SCAN1.py --root ./projects/example/ \
+          --outroot "EXAMPLE_EMUL_SCAN1" --maxfeval 25000 --profile 1 
+          
+> [!TIP]
+> The number of steps per Emcee walker per temperature is `maxfeval/25`.
+> Do maintain this number greater than 1000 for reliable results (especially
+> when the dimension of the parameter space is high)
+          
 # Appendix <a name="appendix"></a>
 
 ## :interrobang: FAQ: How do we debug Cocoa? Suggested steps <a name="running_wrong"></a>
