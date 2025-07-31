@@ -396,7 +396,8 @@ if __name__ == '__main__':
     comm = MPI.COMM_WORLD
     size = comm.Get_size()   # Total number of MPI processes
     rank = comm.Get_rank()   # Rank of the current process
-    nwalkers = comm.Get_size()
+    dim      = model.prior.d()
+    nwalkers = max(3*dim, comm.Get_size()) 
     maxevals = int(args.maxfeval/(5.0*nwalkers))
 
     cov = model.prior.covmat(ignore_external=False) # cov from prior

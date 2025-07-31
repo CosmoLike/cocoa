@@ -27,7 +27,7 @@ params:
       loc: 3.0448
       scale: 0.05
     proposal: 0.05
-    latex: \log(10^{10} A_\mathrm{s})
+    latex: '\log(10^{10} A_\mathrm{s}'
   ns:
     prior:
       min: 0.92
@@ -37,7 +37,7 @@ params:
       loc: 0.96605
       scale: 0.005
     proposal: 0.005
-    latex: n_\mathrm{s}
+    latex: 'n_\mathrm{s}'
   thetastar:
     prior:
       min: 1
@@ -45,9 +45,9 @@ params:
     ref:
       dist: norm
       loc: 1.04109
-      scale: 0.0007
-    proposal: 0.0007
-    latex: 100\theta_\mathrm{*}
+      scale: 0.0004
+    proposal: 0.0002
+    latex: '100\theta_\mathrm{*}'
     renames: theta
   omegabh2:
     prior:
@@ -56,9 +56,9 @@ params:
     ref:
       dist: norm
       loc: 0.022383
-      scale: 0.0025
-    proposal: 0.0025
-    latex: \Omega_\mathrm{b} h^2
+      scale: 0.005
+    proposal: 0.005
+    latex: '\Omega_\mathrm{b} h^2'
   omegach2:
     prior:
       min: 0.06
@@ -66,9 +66,9 @@ params:
     ref:
       dist: norm
       loc: 0.12011
-      scale: 0.01
-    proposal: 0.01
-    latex: \Omega_\mathrm{c} h^2
+      scale: 0.03
+    proposal: 0.03
+    latex: '\Omega_\mathrm{c} h^2'
   tau:
     prior:
       min: 0.04

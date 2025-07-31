@@ -162,8 +162,8 @@ theory:
 sampler:
   polychord:
     path: null
-    nlive: 256
-    num_repeats: 2d
+    nlive: 512
+    num_repeats: 3d
     do_clustering: false
     measure_speeds: False
     oversample_power: 0
