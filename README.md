@@ -341,16 +341,16 @@ Now, users must follow all the steps below.
           --bind-to core --map-by core --report-bindings --mca mpi_yield_when_idle 1 \
           python ./projects/example/EXAMPLE_EMUL_PROFILE_SCIPY1.py \
           --root ./projects/example/ --cov 'chains/EXAMPLE_EMUL_MCMC1.covmat' \
-          --outroot "EXAMPLE_EMUL_PROFILE1M2" --factor 3 --maxfeval 5000 --numpts 20 \
+          --outroot "EXAMPLE_EMUL_PROFILE1M2" --factor 3 --maxfeval 5000 --numpts 10 \
           --profile 1 --minfile="./projects/example/chains/EXAMPLE_EMUL_MIN1.txt"
 
 - **Scan**: 
 
-This profile code has a different MPI strategy and options. It scans one parameter
-on the entire prior, with each MPI being assigned to one minimization. This is the best
-strategy when probing a beyond-LCDM with oscilatory behavior (e.g., Monodromic Dark Energy).
+This profile code has a different MPI strategy. It scans one parameter on the entire prior,
+with each MPI being assigned to one minimization. This is the best strategy when probing 
+beyond-LCDM parameters with oscilatory behavior (e.g., Monodromic Dark Energy).
 
-      mpirun -n 80 --oversubscribe --mca pml ^ucx --mca btl vader,tcp,self \
+      mpirun -n 90 --oversubscribe --mca pml ^ucx --mca btl vader,tcp,self \
            --bind-to core --map-by core --report-bindings --mca mpi_yield_when_idle 1 \
           python ./projects/example/EXAMPLE_EMUL_SCAN1.py --root ./projects/example/ \
           --outroot "EXAMPLE_EMUL_SCAN1" --maxfeval 25000 --profile 1 
