@@ -279,23 +279,26 @@ Now, users must follow all the steps below.
 
 - **Nautilus**:
 
-      mpirun -n 80 --oversubscribe --mca pml ^ucx --mca btl vader,tcp,self \
+      mpirun -n 90 --oversubscribe --mca pml ^ucx --mca btl vader,tcp,self \
            --bind-to core --map-by numa --report-bindings --mca mpi_yield_when_idle 1 \
            python -m mpi4py.futures ./projects/example/EXAMPLE_EMUL_NAUTILUS1.py \
            --root ./projects/example/ --outroot "EXAMPLE_EMUL_NAUTILUS1"  \
-           --maxfeval 200000 --nlive 1024 --neff 350000 --flive 0.01 --nnetworks 5
+           --maxfeval 450000 --nlive 1024 --neff 15000 --flive 0.01 --nnetworks 5
 
 - **Emcee**:
-    
+
+The emcee sampler is highly inefficient for simple LCDM chains if you strictly follow the convergence criteria.
+But it can be helpful for beyond LCDM analysis with complicated, highly degenerate posterior distributions
+
       mpirun -n 21 --oversubscribe --mca pml ^ucx --mca btl vader,tcp,self \
            --bind-to core --map-by numa --report-bindings --mca mpi_yield_when_idle 1 \
           python ./projects/example/EXAMPLE_EMUL_EMCEE1.py --root ./projects/example/ \
-          --outroot "EXAMPLE_EMUL_EMCEE1" --maxfeval 350000 --burn_in 0.3
+          --outroot "EXAMPLE_EMUL_EMCEE1" --maxfeval 500000 --burn_in 0.3
 
 > [!TIP]
 > The number of steps per MPI worker is `maxfeval/3nwalkers`, and the number of walkers is equal to
-> max(4x the number of parameters, number of MPI workers). It is required for convergence to allow each walker to 
-> walk at least 50 times the auto-correlation length, which is provided in the header of the output chain file. 
+> max(3x the number of parameters, number of MPI workers). It is advised for convergence that each walker 
+> walk 50 times the auto-correlation length, which is provided in the header of the output chain file. 
 
 - **Global Minimizer**:
 
