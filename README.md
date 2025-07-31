@@ -285,7 +285,7 @@ Now, users must follow all the steps below.
       mpirun -n 28 --oversubscribe --mca pml ^ucx --mca btl vader,tcp,self \
            --bind-to core --map-by numa --report-bindings --mca mpi_yield_when_idle 1 \
           python ./projects/example/EXAMPLE_EMUL_EMCEE1.py --root ./projects/example/ \
-          --outroot "EXAMPLE_EMUL_EMCEE1" --maxfeval 200000
+          --outroot "EXAMPLE_EMUL_EMCEE1" --maxfeval 200000 --burn_in 0.3
 
 > [!TIP]
 > The number of steps per MPI worker is `maxfeval/3nwalkers`, and the number of walkers is equal to
