@@ -298,7 +298,7 @@ def chain(x0,
     print(f"Partial Result: tau = {tau}, nwalkers={nwalkers}")
 
     burn_in = int(abs(burn_in)*maxfeval) if abs(burn_in) < 1 else 0
-    thin = int(0.1 * np.min(tau))
+    thin    = int(0.5 * np.min(tau))
     xf      = sampler.get_chain(flat=True, discard=burn_in, thin=thin)
     lnpf    = sampler.get_log_prob(flat=True, discard=burn_in, thin=thin)
     weights = np.ones((len(xf),1), dtype='float64')
@@ -395,10 +395,3 @@ if __name__ == '__main__':
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
-#HOW TO CALL THIS SCRIPT
-#mpirun -n 5 --oversubscribe --mca pml ^ucx  \
-#  --mca btl vader,tcp,self --bind-to core:overload-allowed \
-#  --rank-by slot --map-by core:pe=${OMP_NUM_THREADS}  \
-#  python ./projects/example/EXAMPLE_EMUL_EMCEE1.py \
-#  --maxfeval 15000 --outroot "example_emul_emcee1" \
-#  --cov="EXAMPLE_EMCEE.covmat"

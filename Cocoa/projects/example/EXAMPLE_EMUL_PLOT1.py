@@ -32,7 +32,7 @@ chaindir=os.getcwd()
 
 analysissettings={'smooth_scale_1D':0.25, 
                   'smooth_scale_2D':0.25,
-                  'ignore_rows': u'0.7',
+                  'ignore_rows': u'0.3',
                   'range_confidence' : u'0.005'}
 
 analysissettings2={'smooth_scale_1D':0.25,
@@ -56,7 +56,7 @@ samples=loadMCSamples(chaindir+ root_chains[1],settings=analysissettings2)
 p = samples.getParams()
 samples.saveAsText(chaindir + '/.VM_P1_TMP2')
 # --------------------------------------------------------------------------------
-samples=loadMCSamples(chaindir+ root_chains[2],settings=analysissettings)
+samples=loadMCSamples(chaindir+ root_chains[2],settings=analysissettings2)
 p = samples.getParams()
 samples.saveAsText(chaindir + '/.VM_P1_TMP3')
 # --------------------------------------------------------------------------------
