@@ -9,8 +9,7 @@ warnings.filterwarnings(
 warnings.filterwarnings(
     "ignore",
     category=RuntimeWarning,
-    message=r".*invalid value encountered in subtract.*",
-    module=r"emcee\.moves\.mh"
+    message=r".*invalid value encountered in subtract.*"
 )
 warnings.filterwarnings(
     "ignore",
@@ -55,18 +54,6 @@ parser.add_argument("--outroot",
                     nargs='?',
                     const=1,
                     default="example_min1")
-parser.add_argument("--cov",
-                    dest="cov",
-                    help="Chain Covariance Matrix",
-                    nargs='?',
-                    const=1,
-                    default=None)
-parser.add_argument("--progress",
-                    dest="progress",
-                    help="Show Emcee Progress",
-                    nargs='?',
-                    type=bool,
-                    default=False)
 # need to use parse_known_args because of mpifuture 
 args, unknown = parser.parse_known_args()
 # ------------------------------------------------------------------------------
@@ -302,12 +289,9 @@ def min_chi2(x0,
     
     ndim        = int(x0.shape[0])
     nwalkers    = int(nwalkers)
-    nsteps      = np.array([  maxfeval, 
-                            2*maxfeval, 
-                              maxfeval, 
-                            int(0.5*maxfeval)], dtype='int')
+    nsteps      = maxfeval
     temperature = np.array([1.0, 0.25, 0.1, 0.005, 0.001], dtype='float64')
-    stepsz      = temperature/5.0
+    stepsz      = temperature/3.0
 
     partial_samples = []
     partial = []
@@ -324,12 +308,12 @@ def min_chi2(x0,
                                         ndim, 
                                         logprob, 
                                         args=(args[0], args[1], temperature[i]),
-                                        moves=[(emcee.moves.GaussianMove(cov=GScov),1.)],
+                                        moves=[(emcee.moves.DEMove(), 0.8),
+                                               (emcee.moves.DESnookerMove(), 0.2)],
                                         pool=pool)    
         sampler.run_mcmc(x, 
-                         nsteps[i], 
-                         skip_initial_state_check=True,
-                         progress=args.progress)
+                         nsteps, 
+                         skip_initial_state_check=True)
         samples = sampler.get_chain(flat=True, thin=1, discard=0)
         j = np.argmin(-1.0*np.array(sampler.get_log_prob(flat=True)))
         partial_samples.append(samples[j])
@@ -365,17 +349,15 @@ if __name__ == '__main__':
         if not pool.is_master():
             pool.wait()
             sys.exit(0)
-        nwalkers = pool.comm.Get_size()
+        dim      = model.prior.d()     
+        nwalkers = max(3*dim,pool.comm.Get_size())
         maxevals = int(args.maxfeval/(5.0*nwalkers))
 
         (x0, results) = model.get_valid_point(max_tries=1000, 
                                              ignore_fixed_ref=False,
                                              logposterior_as_dict=True)
         # get covariance -------------------------------------------------------
-        if args.cov is None:
-          cov = model.prior.covmat(ignore_external=False) # cov from prior
-        else:
-          cov = np.loadtxt(args.root+args.cov)[0:model.prior.d(),0:model.prior.d()]
+        cov = model.prior.covmat(ignore_external=False) # cov from prior
         
         # run the chains -------------------------------------------------------
         res = np.array(list(prf(np.array(x0, dtype='float64'), 

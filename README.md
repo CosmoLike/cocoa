@@ -283,17 +283,14 @@ Now, users must follow all the steps below.
            --bind-to core --map-by numa --report-bindings --mca mpi_yield_when_idle 1 \
            python -m mpi4py.futures ./projects/example/EXAMPLE_EMUL_NAUTILUS1.py \
            --root ./projects/example/ --outroot "EXAMPLE_EMUL_NAUTILUS1"  \
-           --maxfeval 450000 --nlive 1024 --neff 15000 --flive 0.01 --nnetworks 5
+           --maxfeval 450000 --nlive 2048 --neff 15000 --flive 0.01 --nnetworks 5
 
 - **Emcee**:
-
-The emcee sampler is highly inefficient for simple LCDM chains if you strictly follow the convergence criteria.
-But it can be helpful for beyond LCDM analysis with complicated, highly degenerate posterior distributions
 
       mpirun -n 21 --oversubscribe --mca pml ^ucx --mca btl vader,tcp,self \
            --bind-to core --map-by numa --report-bindings --mca mpi_yield_when_idle 1 \
           python ./projects/example/EXAMPLE_EMUL_EMCEE1.py --root ./projects/example/ \
-          --outroot "EXAMPLE_EMUL_EMCEE1" --maxfeval 500000 --burn_in 0.3
+          --outroot "EXAMPLE_EMUL_EMCEE1" --maxfeval 80000 --burn_in 0.3
 
 > [!TIP]
 > The number of steps per MPI worker is `maxfeval/3nwalkers`, and the number of walkers is equal to
@@ -302,22 +299,22 @@ But it can be helpful for beyond LCDM analysis with complicated, highly degenera
 
 - **Global Minimizer**:
 
-      mpirun -n 5 --oversubscribe --mca pml ^ucx --mca btl vader,tcp,self \
+      mpirun -n 14 --oversubscribe --mca pml ^ucx --mca btl vader,tcp,self \
            --bind-to core --map-by numa --report-bindings --mca mpi_yield_when_idle 1 \
           python ./projects/example/EXAMPLE_EMUL_MINIMIZE1.py --root ./projects/example/ \
           --cov 'chains/EXAMPLE_EMUL_MCMC1.covmat' --outroot "EXAMPLE_EMUL_MIN1" --maxfeval 25000
 
 > [!TIP]
-> The number of steps per MPI per temperature is `maxfeval/5NMPI`. Do maintain this number greater than 1000
-> for reliable results (especially when the dimension of the parameter space is high)
+> The number of steps per MPI per temperature is `maxfeval/5NMPI`. Do maintain this number greater than $300$
+> for reliable results when $n_{\\rm param$ = 7$. Scale that number linearly with the parameter dimension.
 
 - **Profile**: 
 
-      mpirun -n 5 --oversubscribe --mca pml ^ucx --mca btl vader,tcp,self \
+      mpirun -n 14 --oversubscribe --mca pml ^ucx --mca btl vader,tcp,self \
            --bind-to core --map-by core --report-bindings --mca mpi_yield_when_idle 1 \
           python ./projects/example/EXAMPLE_EMUL_PROFILE1.py \
           --root ./projects/example/ --cov 'chains/EXAMPLE_EMUL_MCMC1.covmat' \
-          --outroot "EXAMPLE_EMUL_PROFILE1" --factor 3 --maxfeval 15000 --numpts 10 \
+          --outroot "EXAMPLE_EMUL_PROFILE1" --factor 3 --maxfeval 25000 --numpts 10 \
           --profile 1 --minfile="./projects/example/chains/EXAMPLE_EMUL_MIN1.txt"
 
 > [!TIP]
@@ -331,8 +328,8 @@ But it can be helpful for beyond LCDM analysis with complicated, highly degenera
 >
 > We advise `factor ~ 3` when a covariance matrix is provided. If `cov` is not supplied, the code estimates
 > one internally from the prior. In this case, the code imposes `factor < 1` and we suggest `factor << 1`. Finally,
-> The number of steps per MPI per temperature is `maxfeval/4NMPI`. Do maintain this number greater than 1000
-> for reliable results.
+> The number of steps per MPI per temperature is `maxfeval/4NMPI`. Do maintain this number greater than $300$
+> for reliable results when $n_{\\rm param$ = 7$. Scale that number linearly with the parameter dimension.
 
 - **Profile method 2**:
 
@@ -344,7 +341,7 @@ But it can be helpful for beyond LCDM analysis with complicated, highly degenera
           --bind-to core --map-by core --report-bindings --mca mpi_yield_when_idle 1 \
           python ./projects/example/EXAMPLE_EMUL_PROFILE_SCIPY1.py \
           --root ./projects/example/ --cov 'chains/EXAMPLE_EMUL_MCMC1.covmat' \
-          --outroot "EXAMPLE_EMUL_PROFILE1" --factor 3 --maxfeval 5000 --numpts 20 \
+          --outroot "EXAMPLE_EMUL_PROFILE1M2" --factor 3 --maxfeval 5000 --numpts 20 \
           --profile 1 --minfile="./projects/example/chains/EXAMPLE_EMUL_MIN1.txt"
 
 - **Scan**: 
@@ -360,8 +357,8 @@ strategy when probing a beyond-LCDM with oscilatory behavior (e.g., Monodromic D
           
 > [!TIP]
 > The number of steps per Emcee walker per temperature is `maxfeval/25`.
-> Do maintain this number greater than 1000 for reliable results (especially
-> when the dimension of the parameter space is high)
+> Do maintain this number greater than $300$ for reliable results when $n_{\\rm param$ = 7$.
+> Scale that number linearly with the parameter dimension.
           
 # Appendix <a name="appendix"></a>
 

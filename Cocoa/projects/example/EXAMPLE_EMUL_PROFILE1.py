@@ -92,12 +92,6 @@ parser.add_argument("--cov",
                     nargs='?',
                     const=1,
                     default=None)
-parser.add_argument("--progress",
-                    dest="progress",
-                    help="Show Emcee Progress",
-                    nargs='?',
-                    type=bool,
-                    default=False)
 args, unknown = parser.parse_known_args()
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
@@ -358,8 +352,7 @@ def min_chi2(x0,
         
         sampler.run_mcmc(x, 
                          nsteps, 
-                         skip_initial_state_check=True,
-                         progress=args.progress)
+                         skip_initial_state_check=True)
         samples = sampler.get_chain(flat=True, thin=1, discard=0)
 
         j = np.argmin(-1.0*np.array(sampler.get_log_prob(flat=True)))
@@ -411,7 +404,8 @@ if __name__ == '__main__':
         if not pool.is_master():
             pool.wait()
             sys.exit(0)
-        nwalkers = pool.comm.Get_size()
+        dim      = model.prior.d()     
+        nwalkers = max(3*dim, pool.comm.Get_size())
         maxevals = int(args.maxfeval/(4.0*nwalkers))
 
         # 1st: load the cov. matrix --------------------------------------------

@@ -282,29 +282,28 @@ def chain(x0,
     def logprob(params, *args):
         return -0.5*chi2(params)
 
-    class GaussianStep:
-       def __init__(self, stepsize=0.25):
-           self.cov = stepsize*cov
-       def __call__(self, x):
-           return np.random.multivariate_normal(x, self.cov, size=1) 
-
     sampler = emcee.EnsembleSampler(nwalkers=nwalkers, 
                                     ndim=ndim, 
                                     log_prob_fn=logprob, 
                                     parameter_names=names,
-                                    moves=[(emcee.moves.GaussianMove(cov=cov), 0.25)],
+                                    moves=[(emcee.moves.DEMove(), 0.8),
+                                           (emcee.moves.DESnookerMove(), 0.2)],
                                     pool=pool)
     sampler.run_mcmc(x0, 
                      maxfeval, 
                      skip_initial_state_check=True, 
                      progress=args.progress)
+    
+    tau = sampler.get_autocorr_time(quiet=True, has_walkers=True)
+    print(f"Partial Result: tau = {tau}, nwalkers={nwalkers}")
+
     burn_in = int(abs(burn_in)*maxfeval) if abs(burn_in) < 1 else 0
-    xf      = sampler.get_chain(flat=True, discard=burn_in)
-    lnpf    = sampler.get_log_prob(flat=True, discard=burn_in)
+    thin = int(0.1 * np.min(tau))
+    xf      = sampler.get_chain(flat=True, discard=burn_in, thin=thin)
+    lnpf    = sampler.get_log_prob(flat=True, discard=burn_in, thin=thin)
     weights = np.ones((len(xf),1), dtype='float64')
     local_chi2    = -2*lnpf
-    tau = sampler.get_autocorr_time(quiet=True, has_walkers=True)
-    print(f"Partial Result: tau = {tau}")
+    
     return [np.concatenate([weights,
                            lnpf[:,None], 
                            xf, 
@@ -327,7 +326,7 @@ if __name__ == '__main__':
         dim      = model.prior.d()                                      # Cobaya call
         bounds   = model.prior.bounds(confidence=0.999999)              # Cobaya call
         names    = list(model.parameterization.sampled_params().keys()) # Cobaya Call
-        nwalkers = max(4*dim,pool.comm.Get_size())   
+        nwalkers = max(3*dim,pool.comm.Get_size())
         maxevals = int(args.maxfeval/(nwalkers))
         print(f"\n\n\n"
               f"maxfeval={args.maxfeval}, "
