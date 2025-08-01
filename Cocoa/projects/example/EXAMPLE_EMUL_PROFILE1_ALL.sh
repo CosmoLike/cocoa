@@ -1,17 +1,16 @@
 #!/bin/bash
 
 #SBATCH --job-name=PROF1
-#SBATCH --output=PROF1-%A.out
+#SBATCH --output=PROF1-%A-%a.out
 #SBATCH --nodes=1
-#SBATCH --ntasks=96
-#SBATCH --ntasks-per-node=94
-#SBATCH --ntasks-per-socket=47
+#SBATCH --ntasks=14
+#SBATCH --ntasks-per-node=14
+#SBATCH --ntasks-per-socket=14
 #SBATCH --cpus-per-task=1
 #SBATCH --time=48:00:00
 #SBATCH --partition=high_priority
 #SBATCH --qos=user_qos_timeifler
 #SBATCH --account=timeifler
-#SBATCH --exclusive
 
 echo Running on host `hostname`
 echo Time is `date`
@@ -33,12 +32,10 @@ else
 fi
 
 ulimit -u 2000000 # require line when nmpi is high
-for i in {0..6..1}
-do
-  mpirun -n 13 --oversubscribe --mca pml ^ucx --mca btl vader,tcp,self \
+mpirun -n 14 --oversubscribe --mca pml ^ucx --mca btl vader,tcp,self \
        --bind-to core --map-by core --report-bindings --mca mpi_yield_when_idle 1 \
       python ./projects/example/EXAMPLE_EMUL_PROFILE1.py \
       --root ./projects/example/ --cov 'chains/EXAMPLE_EMUL_MCMC1.covmat' \
       --outroot "EXAMPLE_EMUL_PROFILE1" --factor 3 --maxfeval 25000 --numpts 10 \
-      --profile $i --minfile="./projects/example/chains/EXAMPLE_EMUL_MIN1.txt" &
-done
+      --profile ${SLURM_ARRAY_TASK_ID} \
+      --minfile="./projects/example/chains/EXAMPLE_EMUL_MIN1.txt"
