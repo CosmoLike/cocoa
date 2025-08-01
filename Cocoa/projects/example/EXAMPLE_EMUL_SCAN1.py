@@ -313,23 +313,23 @@ def min_chi2(x0,
         GScov  = copy.deepcopy(cov)
         GScov *= temperature[i]*stepsz[i] 
   
-        sampler = emcee.EnsembleSampler(nwalkers=nwalkers, 
-                                        ndim=ndim, 
-                                        log_prob_fn=logprob, 
+        sampler = emcee.EnsembleSampler(nwalkers, 
+                                        ndim, 
+                                        logprob, 
                                         args=(args[0], args[1], temperature[i]),
-                                        moves=[(emcee.moves.GaussianMove(cov=GScov),1.)])
-        
+                                        moves=[(emcee.moves.DEMove(), 0.8),
+                                               (emcee.moves.DESnookerMove(), 0.2)],
+                                        pool=pool) 
         sampler.run_mcmc(x, 
                          nsteps, 
                          skip_initial_state_check=True)
-        samples = sampler.get_chain(flat=True, thin=1, discard=0)
-
+        samples = sampler.get_chain(flat=True, discard=0)
         j = np.argmin(-1.0*np.array(sampler.get_log_prob(flat=True)))
         partial_samples.append(samples[j])
         tchi2 = mychi2(samples[j], *args)
         partial.append(tchi2)
         x0 = copy.deepcopy(samples[j])
-        sampler.reset()
+        sampler.reset()  
     # min chi2 from the entire emcee runs
     j = np.argmin(np.array(partial))
     result = [partial_samples[j], partial[j]]
@@ -375,9 +375,8 @@ if __name__ == '__main__':
     executor = MPIPoolExecutor()
     comm = MPI.COMM_WORLD
     numpts = comm.Get_size()
-
+    
     index  = args.profile
-    maxfeval = args.maxfeval
     bounds = model.prior.bounds(confidence=0.999999)              # Cobaya call
     start  = np.zeros(model.prior.d(), dtype='float64')
     stop   = np.zeros(model.prior.d(), dtype='float64')

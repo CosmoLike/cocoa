@@ -314,7 +314,7 @@ def min_chi2(x0,
         sampler.run_mcmc(x, 
                          nsteps, 
                          skip_initial_state_check=True)
-        samples = sampler.get_chain(flat=True, thin=1, discard=0)
+        samples = sampler.get_chain(flat=True, discard=0)
         j = np.argmin(-1.0*np.array(sampler.get_log_prob(flat=True)))
         partial_samples.append(samples[j])
         tchi2 = mychi2(samples[j], *args)
