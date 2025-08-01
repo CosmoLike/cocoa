@@ -32,7 +32,7 @@ else
 fi
 
 ulimit -u 2000000 # require line when nmpi is high
-mpirun -n 14 --oversubscribe --mca pml ^ucx --mca btl vader,tcp,self \
+mpirun -n ${SLURM_NTASKS} --oversubscribe --mca pml ^ucx --mca btl vader,tcp,self \
        --bind-to core --map-by core --report-bindings --mca mpi_yield_when_idle 1 \
       python ./projects/example/EXAMPLE_EMUL_PROFILE1.py \
       --root ./projects/example/ --cov 'chains/EXAMPLE_EMUL_MCMC1.covmat' \
