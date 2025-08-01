@@ -27,7 +27,7 @@ params:
       loc: 3.0448
       scale: 0.05
     proposal: 0.05
-    latex: \log(10^{10} A_\mathrm{s}
+    latex: '\log(10^{10} A_\mathrm{s})'
   ns:
     prior:
       min: 0.92

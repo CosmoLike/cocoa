@@ -27,7 +27,7 @@ matplotlib.rcParams['legend.labelspacing'] = 0.77
 matplotlib.rcParams['savefig.bbox'] = 'tight'
 matplotlib.rcParams['savefig.format'] = 'pdf'
 
-parameter = [u'omegach2', u'logA', u'ns', u'omegabh2', u'tau', u'chi2']
+parameter = [u'omegach2', u'logA', u'ns', u'omegabh2', u'tau', u'chi2v2']
 chaindir=os.getcwd()
 
 analysissettings={'smooth_scale_1D':0.25, 
@@ -50,18 +50,22 @@ root_chains = (
 # --------------------------------------------------------------------------------
 samples=loadMCSamples(chaindir + root_chains[0],settings=analysissettings)
 p = samples.getParams()
+samples.addDerived(p.chi2+2*p.minuslogprior,name='chi2v2',label='{\\chi^2}')
 samples.saveAsText(chaindir + '/.VM_P1_TMP1')
 # --------------------------------------------------------------------------------
-samples=loadMCSamples(chaindir+ root_chains[1],settings=analysissettings2)
+samples=loadMCSamples(chaindir+ root_chains[1], settings=analysissettings2)
 p = samples.getParams()
+samples.addDerived(p.chi2,name='chi2v2',label='{\\chi^2}')
 samples.saveAsText(chaindir + '/.VM_P1_TMP2')
 # --------------------------------------------------------------------------------
 samples=loadMCSamples(chaindir+ root_chains[2],settings=analysissettings2)
 p = samples.getParams()
+samples.addDerived(p.chi2,name='chi2v2',label='{\\chi^2}')
 samples.saveAsText(chaindir + '/.VM_P1_TMP3')
 # --------------------------------------------------------------------------------
 samples=loadMCSamples(chaindir+ root_chains[3],settings=analysissettings2)
 p = samples.getParams()
+samples.addDerived(p.chi2+2*p.minuslogprior,name='chi2v2',label='{\\chi^2}')
 samples.saveAsText(chaindir + '/.VM_P1_TMP4')
 # --------------------------------------------------------------------------------
 
@@ -98,8 +102,8 @@ g.triangle_plot(
   legend_labels=[
     'MH, 4-walkers, $(R-1)_{\\rm median}$=0.015, $(R-1)_{\\rm std dev}$ = 0.18, burn-in=0.3',
     'Nautilus, $n_{\\rm eval} \sim 64k$, $n_{\\rm live}=1024$, $\\log(Z)=-1172.64$ ',
-    'EMCEE $n_{\\rm eval} = 200k$, $n_{\\rm walkers}=28$, burn-in=0.3',
-    'PolyChord $n_{\\rm live}=256$, $n_{\\rm repeat}=2D$, $\\log(Z)=-1187.6 \\pm 0.20$',
+    'EMCEE $n_{\\rm eval}=80k$, $n_{\\rm walkers}=21$, burn-in=0.3',
+    'PolyChord $n_{\\rm live}=512$, $n_{\\rm repeat}=3D$, $\\log(Z)=-1187.62 \\pm 0.20$',
   ],
   legend_loc=(0.3, 0.85))
 g.export()
