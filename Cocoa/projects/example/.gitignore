@@ -1,3 +1,4 @@
 chains/
 .VM_*
 *.pdf
+*.sbatch
