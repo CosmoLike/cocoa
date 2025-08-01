@@ -334,7 +334,7 @@ Now, users must follow all the steps below.
 > We advise `factor ~ 3` when a covariance matrix is provided. If `cov` is not supplied, the code estimates
 > one internally from the prior. In this case, the code imposes `factor < 1` and we suggest `factor << 1`. Finally,
 > The number of steps per MPI per temperature is `maxfeval/4NMPI`. Do maintain this number greater than $300$
-> for reliable results when $n_{\\rm param$ = 7$. Scale that number linearly with the parameter dimension.
+> for reliable results when $n_{\\rm param} = 7$. Scale that number linearly with the parameter dimension.
 
 - **Profile method 2**:
 
@@ -362,7 +362,7 @@ beyond-LCDM parameters with oscilatory behavior (e.g., Monodromic Dark Energy).
           
 > [!TIP]
 > The number of steps per Emcee walker per temperature is `maxfeval/25`.
-> Do maintain this number greater than $300$ for reliable results when $n_{\\rm param$ = 7$.
+> Do maintain this number greater than $300$ for reliable results when $n_{\\rm param} = 7$.
 > Scale that number linearly with the parameter dimension.
           
 # Appendix <a name="appendix"></a>
