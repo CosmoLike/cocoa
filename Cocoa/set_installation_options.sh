@@ -64,6 +64,7 @@ export IGNORE_COSMOPOWER_CODE=1   #unable to install cosmopower on modern python
 export IGNORE_DARK_EMULATOR_CODE=1
 #export IGNORE_NAUTILUS_SAMPLER_CODE=1
 #export IGNORE_DERIVKIT_CODE=1
+#export IGNORE_TENSIOMETER_CODE=1
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
@@ -220,6 +221,7 @@ if [ -n "${OVERWRITE_EXISTING_ALL_PACKAGES}" ]; then
   export OVERWRITE_EXISTING_DARK_EMULATOR_CODE=1
   export OVERWRITE_EXISTING_NAUTILUS_CODE=1
   export OVERWRITE_EXISTING_DERIVKIT_CODE=1
+  export OVERWRITE_EXISTING_TENSIOMETER_CODE=1
 fi
 
 if [ -n "${REDOWNLOAD_EXISTING_ALL_DATA}" ]; then
@@ -362,6 +364,10 @@ export NAUTILUS_SAMPLER_NAME="nautilus_sampler"
 export DERIVKIT_URL="https://github.com/nikosarcevic/derivkit.git"
 export DERIVKIT_GIT_COMMIT="bd31e834e4e6b8b125aefcf821fe15d8a7e11a4b"
 export DERIVKIT_NAME="derivkit"
+
+export TENSIOMETER_SAMPLER_URL="https://github.com/mraveri/tensiometer.git"
+export TENSIOMETER_GIT_COMMIT="199233a8b11674cdf6839702e3f05bf10e3a4982"
+export TENSIOMETER_NAME="tensiometer"
 # --------------------------------------------------------------------
 # --------------------------------------------------------------------
 # Cosmolike projects below -------------------------------------------
