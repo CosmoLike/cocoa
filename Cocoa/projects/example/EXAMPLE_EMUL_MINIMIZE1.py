@@ -356,10 +356,10 @@ if __name__ == '__main__':
         (x0, results) = model.get_valid_point(max_tries=1000, 
                                              ignore_fixed_ref=False,
                                              logposterior_as_dict=True)
-        # get covariance -------------------------------------------------------
+        # 1st: Get covariance --------------------------------------------------
         cov = model.prior.covmat(ignore_external=False) # cov from prior
         
-        # run the chains -------------------------------------------------------
+        # 2nd: Run Procoli -----------------------------------------------------
         res = np.array(list(prf(np.array(x0, dtype='float64'), 
                                index=-1, 
                                maxfeval=maxevals,
@@ -368,13 +368,12 @@ if __name__ == '__main__':
                                cov=cov)), dtype="object")
         xf = np.array([res[0]],dtype='float64')
         
-        # Append derived (begins) ----------------------------------------------
+        # 3rd Append derived parameters ----------------------------------------
         xf = np.column_stack((xf, 
                               np.array([chi2v2(d) for d in xf], dtype='float64'),
                               res[1]))
-        # Append derived (ends) ------------------------------------------------
         
-        # --- saving file begins -----------------------------------------------
+        # 4th Save output file -------------------------------------------------
         names = list(model.parameterization.sampled_params().keys()) # Cobaya Call
         names = names+list(model.info()['likelihood'].keys())+["prior"]+["chi2"]
         np.savetxt(f"{args.root}chains/{args.outroot}.txt", 
@@ -382,7 +381,6 @@ if __name__ == '__main__':
                    fmt="%.6e",
                    header=f"maxfeval={args.maxfeval}\n"+' '.join(names),
                    comments="# ")
-        # --- saving file ends -------------------------------------------------
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------

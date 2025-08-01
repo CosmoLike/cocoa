@@ -347,14 +347,13 @@ def min_chi2(x0,
                                         ndim=ndim, 
                                         log_prob_fn=logprob, 
                                         args=(args[0], args[1], temperature[i]),
-                                        moves=[(emcee.moves.GaussianMove(cov=GScov),1.)],
+                                        moves=[(emcee.moves.DEMove(), 0.8),
+                                               (emcee.moves.DESnookerMove(), 0.2)],
                                         pool=pool)
-        
         sampler.run_mcmc(x, 
                          nsteps, 
                          skip_initial_state_check=True)
-        samples = sampler.get_chain(flat=True, thin=1, discard=0)
-
+        samples = sampler.get_chain(flat=True, discard=0)
         j = np.argmin(-1.0*np.array(sampler.get_log_prob(flat=True)))
         partial_samples.append(samples[j])
         tchi2 = mychi2(samples[j], *args)
@@ -417,7 +416,7 @@ if __name__ == '__main__':
           factor = args.factor
         sigma = np.sqrt(np.diag(cov))
 
-        # Second: Get minimum --------------------------------------------------
+        # 2nd: Get minimum --------------------------------------------------
         if args.minfile is not None: # load minimum from running MCMC
           x0 = np.loadtxt(args.minfile)
           chi20 = x0[-1]
@@ -472,7 +471,7 @@ if __name__ == '__main__':
         chi2res = np.zeros(numpts)
         chi2res[numpts//2] = chi20
         
-        # 6th: run from midpoint to right --------------------------------------
+        # 5th: run from midpoint to right --------------------------------------
         tmp = np.array(xf[numpts//2,:], dtype='float64')
         for i in range(numpts//2+1,numpts):
             tmp[args.profile] = param[i]
@@ -487,7 +486,7 @@ if __name__ == '__main__':
             chi2res[i] = res[1]
             print(f"Partial ({i+1}/{numpts}): params = {tmp}, and chi2 = {chi2res[i]}")
         
-        # 7th: run from midpoint to left ---------------------------------------
+        # 6th: run from midpoint to left ---------------------------------------
         tmp = np.array(xf[numpts//2,:], dtype='float64')
         for i in range(numpts//2-1, -1, -1):
             tmp[args.profile] = param[i]

@@ -318,8 +318,7 @@ def min_chi2(x0,
                                         logprob, 
                                         args=(args[0], args[1], temperature[i]),
                                         moves=[(emcee.moves.DEMove(), 0.8),
-                                               (emcee.moves.DESnookerMove(), 0.2)],
-                                        pool=pool) 
+                                               (emcee.moves.DESnookerMove(), 0.2)]) 
         sampler.run_mcmc(x, 
                          nsteps, 
                          skip_initial_state_check=True)
@@ -375,7 +374,7 @@ if __name__ == '__main__':
     executor = MPIPoolExecutor()
     comm = MPI.COMM_WORLD
     numpts = comm.Get_size()
-    
+
     index  = args.profile
     bounds = model.prior.bounds(confidence=0.999999)              # Cobaya call
     start  = np.zeros(model.prior.d(), dtype='float64')

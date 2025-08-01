@@ -288,19 +288,19 @@ if __name__ == '__main__':
                 discard_exploration=True)
     points, log_w, log_l = sampler.posterior()
     
-    # --- saving file begins ---------------------------------------------------
+    # Save output file ---------------------------------------------------------
     np.savetxt(f"{args.root}chains/{args.outroot}.1.txt",
                np.column_stack((np.exp(log_w), log_l, points, -2*log_l)),
                fmt="%.5e",
                header=f"nlive={args.nlive}, maxfeval={args.maxfeval}, log-Z ={sampler.log_z}\n"+' '.join(names),
                comments="# ")
     
-    # Now we need to save a range files ----------------------------------------
+    # Save a range files -------------------------------------------------------
     rows = [(str(n),float(l),float(h)) for n,l,h in zip(names,bounds[:,0],bounds[:,1])]
     with open(f"{args.root}chains/{args.outroot}.ranges", "w") as f: 
       f.writelines(f"{n} {l:.5e} {h:.5e}\n" for n, l, h in rows)
 
-    # Now we need to save a paramname files ------------------------------------
+    # Save a paramname files ---------------------------------------------------
     param_info = model.info()['params']
     latex  = [param_info[x]['latex'] for x in names]
     names.append("chi2*")
@@ -309,7 +309,7 @@ if __name__ == '__main__':
                np.column_stack((names,latex)),
                fmt="%s")
 
-    # Now we need to save a cov matrix -----------------------------------------
+    # Save a cov matrix --------------------------------------------------------
     samples = loadMCSamples(f"{args.root}chains/{args.outroot}",
                             settings={'ignore_rows': u'0.0'})
     np.savetxt(f"{args.root}chains/{args.outroot}.covmat",
