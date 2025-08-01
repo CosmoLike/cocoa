@@ -297,6 +297,11 @@ Now, users must follow all the steps below.
 > max(3x the number of parameters, number of MPI workers). It is advised for convergence that each walker 
 > walk 50 times the auto-correlation length, which is provided in the header of the output chain file. 
 
+<p align="center">
+<img width="733" height="734" alt="Screenshot 2025-07-31 at 9 10 02 PM" src="https://github.com/user-attachments/assets/6fc4d107-e53b-41fa-8ff2-19e2166f5c92" />
+</p>
+
+
 - **Global Minimizer**:
 
       mpirun -n 14 --oversubscribe --mca pml ^ucx --mca btl vader,tcp,self \
