@@ -12,11 +12,10 @@ export ROOTDIR=$(pwd -P)
 if [ $? -ne 0 ]; then
   return 1;
 fi
-
 # ------------------------------------------------------------------------------
 # VERBOSE AS DEBUG TOOL --------------------------------------------------------
 # ------------------------------------------------------------------------------
-#export COCOA_OUTPUT_VERBOSE=1
+export COCOA_OUTPUT_VERBOSE=1
 
 # ------------------------------------------------------------------------------
 # If set, COSMOLIKE will compile with DEBUG flags ------------------------------
@@ -26,18 +25,18 @@ fi
 # ------------------------------------------------------------------------------
 # The flags below allow users to skip downloading specific datasets ------------
 # ------------------------------------------------------------------------------
-export IGNORE_ACTDR6_DATA=1
+#export IGNORE_ACTDR6_DATA=1
 # export IGNORE_BAO_DATA=1
 export IGNORE_BICEP_CMB_DATA=1
 # export IGNORE_HOLICOW_STRONG_LENSING_DATA=1
 #export IGNORE_SN_DATA=1
 export IGNORE_SPT_CMB_DATA=1
-export IGNORE_SIMONS_OBSERVATORY_CMB_DATA=1
+#export IGNORE_SIMONS_OBSERVATORY_CMB_DATA=1
 #export IGNORE_PLANCK_CMB_DATA=1
 export IGNORE_CAMSPEC_CMB_DATA=1
-export IGNORE_LIPOP_CMB_DATA=1
+#export IGNORE_LIPOP_CMB_DATA=1
 export IGNORE_COSMOPOWER_DATA=1
-export IGNORE_EMULTRF_DATA=1 #SaraivanovZhongZhu (SZZ) transformer-based emul
+#export IGNORE_EMULTRF_DATA=1 #SaraivanovZhongZhu (SZZ) transformer-based emul
 
 # ------------------------------------------------------------------------------
 # The keys below control which packages will be installed and compiled 
@@ -49,21 +48,22 @@ export IGNORE_CLASS_CODE=1 # Default: we just use CAMB (reduces compilation time
 #export IGNORE_POLYCHORD_SAMPLER_CODE=1
 #export IGNORE_PLANCK_LIKELIHOOD_CODE=1
 export IGNORE_ACTDR4_CODE=1
-export IGNORE_ACTDR6_CODE=1
+#export IGNORE_ACTDR6_CODE=1
 export IGNORE_CPP_CUBA_INSTALLATION=1
 export IGNORE_FGSPECTRA_CODE=1
 export IGNORE_VELOCILEPTORS_CODE=1
-export IGNORE_SIMONS_OBSERVATORY_LIKELIHOOD_CODE=1
+#export IGNORE_SIMONS_OBSERVATORY_LIKELIHOOD_CODE=1
 export IGNORE_CAMSPEC_LIKELIHOOD_CODE=1
-export IGNORE_LIPOP_LIKELIHOOD_CODE=1
+#export IGNORE_LIPOP_LIKELIHOOD_CODE=1
 export IGNORE_HYREC_CODE=1
-export IGNORE_COSMOREC_CODE=1
+#export IGNORE_COSMOREC_CODE=1
 export IGNORE_MGCAMB_CODE=1
-export IGNORE_EMULTRF_CODE=1 #SaraivanovZhongZhu (SZZ) transformer-based emul
-export IGNORE_COSMOPOWER_CODE=1
+#export IGNORE_EMULTRF_CODE=1     #SaraivanovZhongZhu (SZZ) transformer-based emul
+export IGNORE_COSMOPOWER_CODE=1   #unable to install cosmopower on modern python
 #export IGNORE_EUCLID_EMULATOR_V2_CODE=1
 export IGNORE_DARK_EMULATOR_CODE=1
-
+#export IGNORE_NAUTILUS_SAMPLER_CODE=1
+#export IGNORE_DERIVKIT_CODE=1
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
@@ -72,9 +72,18 @@ export IGNORE_DARK_EMULATOR_CODE=1
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
 #export IGNORE_COSMOLIKE_LSST_Y1_CODE=1
-export IGNORE_COSMOLIKE_DES_Y3_CODE=1
-#export IGNORE_COSMOLIKE_ROMAN_FOURIER_CODE=1
+#export IGNORE_COSMOLIKE_DES_Y3_CODE=1
+export IGNORE_COSMOLIKE_ROMAN_FOURIER_CODE=1
 #export IGNORE_COSMOLIKE_ROMAN_REAL_CODE=1
+
+# ------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
+# The keys below control which private projects (not public repo)
+# ------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
+export INSTALL_PRIVATE_AXIONS_PROJECT=1
 
 # ------------------------------------------------------------------------------
 # OVERWRITE_EXISTING_XXX_CODE=1 -> setup_cocoa overwrites existing PACKAGES ----
@@ -83,11 +92,14 @@ export IGNORE_COSMOLIKE_DES_Y3_CODE=1
 # These keys are only relevant if you run setup_cocoa multiple times -----------
 # ------------------------------------------------------------------------------
 export OVERWRITE_EXISTING_ALL_PACKAGES=1    # except cosmolike projects
-#export OVERWRITE_EXISTING_COSMOLIKE_CODE=1 # dangerous (possible lost of uncommit work)
+#export OVERWRITE_EXISTING_COSMOLIKE_CODE=1 # dangerous (possible loss of uncommitted work)
                                             # if unset, users must manually delete
                                             # project if wants setup_cocoa to reclone it
-#export REDOWNLOAD_EXISTING_ALL_DATA=1      # warning: some data are many GB
+#export REDOWNLOAD_EXISTING_ALL_DATA=1      # warning: some data is many GB
 
+#export OVERWRITE_EXISTING_PRIVATE_CODE=1   # dangerous (possible loss of uncommitted work)
+                                            # if unset, users must manually delete
+                                            # project if wants setup_cocoa to reclone it
 # ------------------------------------------------------------------------------
 # If set, compile_planck.sh uses click like code from github.com/benabed/clik
 # ------------------------------------------------------------------------------
@@ -102,7 +114,7 @@ export OMP_NUM_THREADS=1 # default is no OpenMP threading
 # ------------------------------------------------------------------------------
 # If not set, pip_core_packages.sh will install several ML packages ------------
 # ------------------------------------------------------------------------------
-export IGNORE_EMULATOR_GPU_PIP_PACKAGES=1
+#export IGNORE_EMULATOR_GPU_PIP_PACKAGES=1
 
 # ------------------------------------------------------------------------------
 # Adopted Python version -------------------------------------------------------
@@ -158,7 +170,9 @@ if [ -z "${IGNORE_SIMONS_OBSERVATORY_LIKELIHOOD_CODE}" ]; then
   unset -v IGNORE_FGSPECTRA_CODE
 fi
 
-if [[ -z "${IGNORE_COSMOPOWER_CODE}" || -z "${IGNORE_EMULTRF_CODE}" ]]; then
+if [[ -z "${IGNORE_COSMOPOWER_CODE}" || 
+      -z "${IGNORE_EMULTRF_CODE}" || 
+      -z "${IGNORE_NAUTILUS_SAMPLER_CODE}" ]]; then
   unset -v IGNORE_EMULATOR_GPU_PIP_PACKAGES
 fi
 
@@ -204,6 +218,8 @@ if [ -n "${OVERWRITE_EXISTING_ALL_PACKAGES}" ]; then
   export OVERWRITE_EXISTING_COSMOPOWER_CODE=1
   export OVERWRITE_EXISTING_EMULTRF_CODE=1
   export OVERWRITE_EXISTING_DARK_EMULATOR_CODE=1
+  export OVERWRITE_EXISTING_NAUTILUS_CODE=1
+  export OVERWRITE_EXISTING_DERIVKIT_CODE=1
 fi
 
 if [ -n "${REDOWNLOAD_EXISTING_ALL_DATA}" ]; then
@@ -249,7 +265,7 @@ export HOLICOW_DATA_URL='https://github.com/shsuyu/H0LiCOW-public.git'
 export HOLICOW_DATA_GIT_COMMIT="f792647d1fd6c09d9e052fef526669cbd702ab82"
 
 export POLY_URL="https://github.com/PolyChord/PolyChordLite.git"
-export POLYCHORD_GIT_COMMIT="daba49d1385d065122db76a2b384050f9e95d278"
+export POLYCHORD_GIT_COMMIT="a422163d875d7879d689ce535c47db0281da2775"
 export POLY_NAME="PolyChordLite"
 
 export CAMB_URL="https://github.com/cmbant/CAMB"
@@ -327,11 +343,11 @@ export COSMOPOWER_GIT_COMMIT="7cac5e71c975c06257b2f95f0dcea5dd09b0f45f"
 export COSMOPOWER_URL_DATA="https://github.com/cosmopower-organization/jense_2024_emulators.git"
 export COSMOPOWER_URL_DATA_COMMIT="4317635eed70289ee1ec6b3df828027173071e36"
 
-export EMULTRF_URL="https://github.com/CosmoLike/emulators_code.git"
-export EMULTRF_GIT_COMMIT="0a0cba998643670ca90316eada46fecac1a92e85"
+export EMULTRF_URL="git@github.com:SBU-COSMOLIKE/emulators_code.git"
+#export EMULTRF_GIT_COMMIT="0a0cba998643670ca90316eada46fecac1a92e85"
 
-export EMULTRF_DATA_URL="https://github.com/CosmoLike/emulators_data.git"
-export EMULTRF_DATA_GIT_COMMIT="208fc465a2beb219fabf92e0802c2815d7556588"
+export EMULTRF_DATA_URL="git@github.com:SBU-COSMOLIKE/emulators_data_lcdm.git"
+#export EMULTRF_DATA_GIT_COMMIT="208fc465a2beb219fabf92e0802c2815d7556588"
 
 export DARKEMULATOR_URL="https://github.com/DarkQuestCosmology/dark_emulator_public.git"
 export DARKEMULATOR_GIT_COMMIT="46df5972509624e2eeadc2bf3ac528b02333a7e2"
@@ -339,46 +355,59 @@ export DARKEMULATOR_GIT_COMMIT="46df5972509624e2eeadc2bf3ac528b02333a7e2"
 export FASTPT_URL="https://github.com/jablazek/FAST-PT.git"
 export FASTPT_GIT_COMMIT="5e65ad23becaaae5b18aedcaacab99411df92b0f"
 
+export NAUTILUS_SAMPLER_URL="https://github.com/johannesulf/nautilus.git"
+export NAUTILUS_SAMPLER_GIT_COMMIT="fc5e84deffb96755b31b3f9834590e28ab5b6016"
+export NAUTILUS_SAMPLER_NAME="nautilus_sampler"
+
+export DERIVKIT_URL="https://github.com/nikosarcevic/derivkit.git"
+export DERIVKIT_GIT_COMMIT="bd31e834e4e6b8b125aefcf821fe15d8a7e11a4b"
+export DERIVKIT_NAME="derivkit"
 # --------------------------------------------------------------------
 # --------------------------------------------------------------------
 # Cosmolike projects below -------------------------------------------
 # --------------------------------------------------------------------
 # --------------------------------------------------------------------
-export LSST_Y1_URL="https://github.com/CosmoLike/cocoa_lsst_y1.git"
+export LSST_Y1_URL="git@github.com:SBU-COSMOLIKE/cocoa_lsst_y1.git"
 export LSST_Y1_NAME="lsst_y1"
 #BRANCH: if unset, load the latest commit on the specified branch
 #export LSST_Y1_BRANCH="dev"
 #COMMIT: if unset, load the specified commit
-export LSST_Y1_COMMIT="df96af9558c97b07d355df4bfc56f1677e71b201"
+#export LSST_Y1_COMMIT="df96af9558c97b07d355df4bfc56f1677e71b201"
 #BRANCH: if unset, load the specified TAG
 #export LSST_Y1_TAG="v4.0-beta17"
 
-export DES_Y3_URL="https://github.com/CosmoLike/cocoa_des_y3.git"
+export DES_Y3_URL="git@github.com:SBU-COSMOLIKE/cocoa_des_y3.git"
 export DES_Y3_NAME="des_y3"
 #BRANCH: if unset, load the latest commit on the specified branch
 #export DES_Y3_BRANCH="main"
 #COMMIT: if unset, load the specified commit
-export DES_Y3_COMMIT="1a46582b5539c177bd68f8863c054f79a15f8538"
+#export DES_Y3_COMMIT="1a46582b5539c177bd68f8863c054f79a15f8538"
 #BRANCH: if unset, load the specified TAG
 #export DES_Y3_TAG="v4.0-beta17"
 
-export ROMAN_FOURIER_URL="https://github.com/CosmoLike/cocoa_roman_fourier.git"
+export ROMAN_FOURIER_URL="git@github.com:SBU-COSMOLIKE/cocoa_roman_fourier.git"
 export ROMAN_FOURIER_NAME="roman_fourier"
 #BRANCH: if unset, load the latest commit on the specified branch
 #export ROMAN_FOURIER_BRANCH="main"
 #COMMIT: if unset, load the specified commit
-export ROMAN_FOURIER_COMMIT="407a35a15b2a1d96d96cb5f0276cf772c2c60e6d"
+#export ROMAN_FOURIER_COMMIT="407a35a15b2a1d96d96cb5f0276cf772c2c60e6d"
 #BRANCH: if unset, load the specified TAG
 #export ROMAN_FOURIER_TAG="v4.0-beta17"
 
-export ROMAN_REAL_URL="https://github.com/CosmoLike/cocoa_roman_real.git"
+export ROMAN_REAL_URL="git@github.com:SBU-COSMOLIKE/cocoa_roman_real.git"
 export ROMAN_REAL_NAME="roman_real"
 #BRANCH: if unset, load the latest commit on the specified branch
 #export ROMAN_REAL_BRANCH="main"
 #COMMIT: if unset, load the specified commit
-export ROMAN_REAL_COMMIT="8a13be52849fc7965b99f41bd173b7dda05fba67"
+#export ROMAN_REAL_COMMIT="8a13be52849fc7965b99f41bd173b7dda05fba67"
 #BRANCH: if unset, load the specified TAG
 #export ROMAN_REAL_TAG="v4.0-beta17"
-# ------------------------------------------------------------------------------
-# ------------------------------------------------------------------------------
-# ------------------------------------------------------------------------------
+
+# --------------------------------------------------------------------
+# --------------------------------------------------------------------
+# private projects below ---------------------------------------------
+# --------------------------------------------------------------------
+# --------------------------------------------------------------------
+export AXIONS_PROJECT_URL="git@github.com:SBU-COSMOLIKE/cocoa_axions.git"
+export AXIONS_PROJECT_NAME="axions"
+#export AXIONS_PROJECT_COMMIT="df96af9558c97b07d355df4bfc56f1677e71b201"

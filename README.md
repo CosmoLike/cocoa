@@ -41,7 +41,7 @@ Core packages include compilers and numerical libraries that users typically do 
 
 **Step :one:**: Download the file `cocoapy310.yml` yml file
 
-    wget https://raw.githubusercontent.com/CosmoLike/cocoa/refs/heads/main/cocoapy310.yml
+    wget https://raw.githubusercontent.com/SBU-COSMOLIKE/cocoa/refs/heads/main/cocoapy310.yml
 
 create the cocoa environment,
 
@@ -70,7 +70,7 @@ Users can now proceed to the **next section**.
 > To install the `cocoa` conda environment on a supercomputer, users may take advantage of the fact that several HPC environments provide the [Anaconda installer](https://www.anaconda.com) as an external module. If this applies to you, then check the appendix [FAQ: How do we use an available Anaconda module on HPC?](#overview_anaconda).
 
 > [!TIP]
-> Users working in an HPC environment that does not offer Anaconda or  may want to check the appendix [FAQ: How do we install Conda?](#overview_conda).
+> Users working in an HPC environment that does not offer Anaconda may want to check the appendix [FAQ: How do we install Conda?](#overview_conda).
 
 > [!TIP]
 > We provide a Docker image named *whovian-cocoa* with Cocoa pre-installed and pre-compiled. For further instructions, refer to the appendix [FAQ: How do we run Cocoa with Docker?](#appendix_jupyter_whovian).
@@ -81,7 +81,7 @@ In this section, we assume users have previously activated the Cocoa conda envir
 
 **Step :one:**: Download Cocoa's latest release and go to its main folder (`cocoa/Cocoa`),
 
-    git clone https://github.com/CosmoLike/cocoa.git --branch v4.0-beta28 cocoa
+    git clone git@github.com:SBU-COSMOLIKE/cocoa.git cocoa
 
 and
 
@@ -102,17 +102,6 @@ This script compiles external modules selected for installation on `set_installa
 Users can now proceed to **the next section**.
 
 > [!TIP]
-> If you want to work from the latest commit, then clone the repository with the following command 
->
-> (SSH)
-> 
->     git clone git@github.com:CosmoLike/cocoa.git cocoa
-> 
-> (HTTP)
-> 
->     git clone https://github.com/CosmoLike/cocoa.git cocoa
->
->
 > Users who want to develop from a release version (e.g., `v4.0-beta20`) should read the appendix [FAQ: How do we push changes to the cocoa main branch? A few git hacks](#push_main)
 
 > [!TIP]
@@ -130,9 +119,9 @@ Users can now proceed to **the next section**.
 >     # ------------------------------------------------------------------------------
 >     (...)
 >     export OVERWRITE_EXISTING_ALL_PACKAGES=1    # except cosmolike projects
->     #export OVERWRITE_EXISTING_COSMOLIKE_CODE=1 # dangerous (possible lost of uncommit work)
+>     #export OVERWRITE_EXISTING_COSMOLIKE_CODE=1 # dangerous (possible loss of uncommitted work)
 >                                                 # if unset, users must manually delete cosmolike projects
->     #export REDOWNLOAD_EXISTING_ALL_DATA=1      # warning: some data are many GB
+>     #export REDOWNLOAD_EXISTING_ALL_DATA=1      # warning: some data is many GB
 
 # Running Examples  <a name="cobaya_base_code_examples"></a>
 
@@ -155,14 +144,17 @@ Users will see a terminal like this: `$(cocoa)(.local)`. *This is a feature, not
 One model evaluation:
 
     mpirun -n 1 --oversubscribe --mca pml ^ucx --mca btl vader,tcp,self \
-        --bind-to core:overload-allowed --rank-by slot --map-by numa:pe=${OMP_NUM_THREADS} \
-        --mca mpi_yield_when_idle 1 cobaya-run  ./projects/example/EXAMPLE_EVALUATE1.yaml -f
-        
+       --bind-to core:overload-allowed --mca mpi_yield_when_idle 1 \
+       --rank-by slot --map-by numa:pe=${OMP_NUM_THREADS} \
+       cobaya-run ./projects/example/EXAMPLE_EVALUATE1.yaml -f
+               
 MCMC (we run MCMCs with 32 cores):
 
     mpirun -n 4 --oversubscribe --mca pml ^ucx --mca btl vader,tcp,self \
-        --bind-to core:overload-allowed --rank-by slot --map-by numa:pe=${OMP_NUM_THREADS} \
-        --mca mpi_yield_when_idle 1 cobaya-run ./projects/example/EXAMPLE_MCMC1.yaml -f
+       --bind-to core:overload-allowed --mca mpi_yield_when_idle 1 \
+       --rank-by slot --map-by numa:pe=${OMP_NUM_THREADS} \
+       cobaya-run ./projects/example/EXAMPLE_MCMC1.yaml -f
+
 
 ## Examples involving Cosmolike
 
@@ -171,34 +163,20 @@ MCMC (we run MCMCs with 32 cores):
 One model evaluation:
 
     mpirun -n 1 --oversubscribe --mca pml ^ucx --mca btl vader,tcp,self \
-        --bind-to core:overload-allowed --rank-by slot --map-by numa:pe=${OMP_NUM_THREADS} \
-        --mca mpi_yield_when_idle 1 cobaya-run ./projects/lsst_y1/EXAMPLE_EVALUATE1.yaml -f
-
-
-MCMC (we run MCMCs with 32 cores):
+       --bind-to core:overload-allowed --mca mpi_yield_when_idle 1 \
+       --rank-by slot --map-by numa:pe=${OMP_NUM_THREADS} \
+       cobaya-run ./projects/lsst_y1/EXAMPLE_EVALUATE1.yaml -f
+       
+MCMC (Metropolis-Hastings Algorithm):
 
     mpirun -n 4 --oversubscribe --mca pml ^ucx --mca btl vader,tcp,self \
-        --bind-to core:overload-allowed --rank-by slot --map-by numa:pe=${OMP_NUM_THREADS} \
-        --mca mpi_yield_when_idle 1 cobaya-run ./projects/lsst_y1/EXAMPLE_MCMC1.yaml -f
+       --bind-to core:overload-allowed --mca mpi_yield_when_idle 1 \
+       --rank-by slot --map-by numa:pe=${OMP_NUM_THREADS} \
+       cobaya-run ./projects/lsst_y1/EXAMPLE_MCMC1.yaml -f
 
-Profile:
-
-    cd ./projects/lsst_y1
-
-and
-
-    export NMPI=4
-
-and
-
-    mpirun -n ${NMPI} --oversubscribe --mca pml ^ucx --mca btl vader,tcp,self \
-        --bind-to core:overload-allowed --rank-by slot --map-by numa:pe=${OMP_NUM_THREADS} \
-        --mca mpi_yield_when_idle 1 python -m mpi4py.futures EXAMPLE_PROFILE1.py \
-        --mpi $((${NMPI}-1)) --profile 1 --tol 0.05 --AB 1.0 --outroot 'profile' \
-        --minmethod 5 --maxiter 1 --maxfeval 250 
 
 > [!Tip]
-> Cocoa provides several cosmolike projects, not all of which are installed by default. To activate them, refer to the appendix [FAQ: How do we compile external modules?](#appendix_compile_separately).
+> Cocoa provides several cosmolike projects, not all of which are installed by default. To activate them, please refer to the appendix [FAQ: How do we compile external modules?](#appendix_compile_separately).
 
 > [!TIP]
 > Assuming Cocoa is installed on a local (not remote!) machine, type the command below after step 2️⃣ to run Jupyter Notebooks.
@@ -227,68 +205,166 @@ and
 >      Cocoa/.local/lib
 >      Cocoa/.local/share
 >
-> Another reason 
+> Consistency of the environment across all Cocoa instances is crucial, and the `start_cocoa.sh`/`stop_cocoa.sh` scripts handle the loading and unloading of environmental path variables. 
 
 # Running ML emulators <a name="cobaya_base_code_examples_emul"></a>
 
-Cocoa contains a few transformer-based neural network emulators capable of simulating CMB, cosmolike, matter power spectrum, and distances. We provide a few scripts that exemplify their API. To run them, we assume users have commented out the following lines on `set_installation_options.sh` prior to running the `setup_cocoa.sh` and `compile_cocoa.sh` installation scripts.
+Cocoa contains a few transformer-based neural network emulators capable of simulating CMB, cosmolike, matter power spectrum, and distances. We provide a few scripts that exemplify their API. To run them, we assume users have commented out the following lines on `set_installation_options.sh` before running the `setup_cocoa.sh` and `compile_cocoa.sh` installation scripts.
 
       [Adapted from Cocoa/set_installation_options.sh shell script] 
-      
       # inset # symbol in the lines below (i.e., unset these environmental keys)
-      #export IGNORE_EMULTRF_CODE=1  #SaraivanovZhongZhu (SZZ) transformer-based emul
-      #export IGNORE_EMULTRF_DATA=1  #SaraivanovZhongZhu (SZZ) transformer-based emul
-
+      #export IGNORE_EMULTRF_CODE=1              #SaraivanovZhongZhu (SZZ) transformer/CNN-based emulators
+      #export IGNORE_EMULTRF_DATA=1              #SaraivanovZhongZhu (SZZ) transformer/CNN-based emulators
+      #export IGNORE_LIPOP_LIKELIHOOD_CODE=1     # to run EXAMPLE_EMUL_EVALUATE/MCMC/NAUTILUS/EMCEE11.yaml
+      #export IGNORE_LIPOP_CMB_DATA=1            # to run EXAMPLE_EMUL_EVALUATE/MCMC/NAUTILUS/EMCEE11.yaml
+      #export IGNORE_ACTDR6_CODE=1               # to run EXAMPLE_EMUL_EVALUATE/MCMC/NAUTILUS/EMCEE11.yaml
+      #export IGNORE_ACTDR6_DATA=1               # to run EXAMPLE_EMUL_EVALUATE/MCMC/NAUTILUS/EMCEE11.yaml
+      #export IGNORE_NAUTILUS_SAMPLER_CODE=1     # to run EXAMPLE_EMUL_NAUTILUS1.py
+      #export IGNORE_POLYCHORD_SAMPLER_CODE=1    # to run EXAMPLE_EMUL_POLY1.yaml
       
-      #export IGNORE_FGSPECTRA_CODE=1                        # to run EXAMPLE_EVALUATE26.yaml
-      #export IGNORE_SIMONS_OBSERVATORY_LIKELIHOOD_CODE=1    # to run EXAMPLE_EVALUATE26.yaml
-      #export IGNORE_SIMONS_OBSERVATORY_CMB_DATA=1           # to run EXAMPLE_EVALUATE26.yaml
- 
 Now, users must follow all the steps below.
+
+> [!TIP]
+> Having a GPU speeds up Transformers-Based Emulators by a factor of ~5-10. 
+
+> [!NOTE]
+> What should users do if they have not configured ML-related keys before running `setup_cocoa.sh` and `compile_cocoa.sh`, as rerunning these scripts can require a long time? Instead, run the following commands.
+>
+>      source start_cocoa.sh 
+>
+> Note that even if (.local) is already active, users must run start_cocoa.sh again to update bash environment values and to allow Cocoa to create appropriate symlinks that expose the emulators to Cobaya. Then, run
+>
+>      source ./installation_scripts/setup_pip_core_packages.sh     # install pip packages required by ML emulators
+>      source ./installation_scripts/setup_emultrf.sh               # download emulator codes
+>      source ./installation_scripts/unxv_emultrf.sh                # download pre-trained emulators
+>      source ./installation_scripts/setup_act_dr6.sh               # to run EXAMPLE_EMUL_EVALUATE/MCMC/NAUTILUS/EMCEE1.yaml
+>      source ./installation_scripts/compile_act_dr6.sh             # to run EXAMPLE_EMUL_EVALUATE/MCMC/NAUTILUS/EMCEE1.yaml
+>      source ./installation_scripts/setup_lipop.sh                 # to run EXAMPLE_EMUL_EVALUATE/MCMC/NAUTILUS/EMCEE1.yaml
+>      source ./installation_scripts/unxv_lipop.sh                  # to run EXAMPLE_EMUL_EVALUATE/MCMC/NAUTILUS/EMCEE1.yaml
+>      source ./installation_scripts/compile_lipop.sh               # to run EXAMPLE_EMUL_EVALUATE/MCMC/NAUTILUS/EMCEE1.yaml 
+> 
 
  **Step :one:**: Activate the private Python environment by sourcing the script `start_cocoa.sh`
 
     source start_cocoa.sh
 
- **Step :two:**: Select the number of OpenMP cores.
-    
-    export OMP_PROC_BIND=close; export OMP_NUM_THREADS=1 # No OpenMP needed
+ **Step :two:** Run `cobaya-run` on the first emulator example following the commands below.
 
- **Step :three:** Run `cobaya-run` on the first emulator example following the commands below.
+- **One model evaluation**:
 
-One model evaluation:
+      mpirun -n 1 --oversubscribe --mca pml ^ucx --mca btl vader,tcp,self \
+           --bind-to core --map-by numa --report-bindings \
+           cobaya-run ./projects/example/EXAMPLE_EMUL_EVALUATE1.yaml -f
+               
+- **MCMC (Metropolis-Hastings Algorithm)**:
 
-    mpirun -n 1 --oversubscribe --mca pml ^ucx --mca btl vader,tcp,self --bind-to core:overload-allowed --rank-by slot --map-by numa:pe=${OMP_NUM_THREADS} cobaya-run ./projects/example/EXAMPLE_EVALUATE22.yaml -f
-        
-MCMC:
+      mpirun -n 4 --oversubscribe --mca pml ^ucx --mca btl vader,tcp,self \
+           --bind-to core --map-by numa --report-bindings \
+           cobaya-run ./projects/example/EXAMPLE_EMUL_MCMC1.yaml -f
 
-    mpirun -n 4 --oversubscribe --mca btl vader,tcp,self --bind-to core:overload-allowed --rank-by slot --map-by numa:pe=${OMP_NUM_THREADS} cobaya-run ./projects/example/EXAMPLE_MCMC22.yaml -f
+- **PolyChord**:
 
-PolyChord:
+      mpirun -n 90 --oversubscribe --mca pml ^ucx --mca btl vader,tcp,self \
+           --bind-to core --map-by numa --report-bindings --mca mpi_yield_when_idle 1 \
+           cobaya-run ./projects/example/EXAMPLE_EMUL_POLY1.yaml -f
 
-    mpirun -n 8 --oversubscribe --mca pml ^ucx --mca btl vader,tcp,self --bind-to core:overload-allowed --rank-by slot --map-by numa:pe=${OMP_NUM_THREADS} cobaya-run ./projects/example/EXAMPLE_POLY22.yaml -f
+> [!TIP]
+> Before running a job with a large number of MPI workers, it may be necessary 
+> to increase the  limit of threads that can be created (at UofA HPC type `ulimit -u 2000000`), 
+> otherwise you may face the error `libgomp: Thread creation failed`
 
 > [!NOTE]
-> What should users do if they have not configured ML-related keys before running `setup_cocoa.sh` and `compile_cocoa.sh`, as rerunning these scripts can require a long time? Instead, run the following commands.
->
->      source start_cocoa.sh # even if (.local) is already active, users must run start_cocoa.sh again to update bash environment values
-> 
-> and
->
->      source ./installation_scripts/setup_pip_core_packages.sh     # install pip packages required by ML emulators
->      source ./installation_scripts/setup_emultrf.sh               # download emulator codes
->      source ./installation_scripts/unxv_emultrf.sh                # download pre-trained emulators
->
-> and
->
->      source  ./installation_scripts/setup_fgspectra.sh               # download Simons Observatory foreground library
->      source  ./installation_scripts/compile_fgspectra.sh             # download Simons Observatory foreground library
->      source ./installation_scripts/setup_simons_observatory.sh       # download Simons Observatory Likelihood code (to run EXAMPLE_EVALUATE26.yaml)
->      source ./installation_scripts/unxv_simons_observatory.sh        # download Simons Observatory Likelihood data  (to run EXAMPLE_EVALUATE26.yaml)
->      source ./installation_scripts/compile_simons_observatory.sh     # compile Simons Observatory Likelihood code     (to run EXAMPLE_EVALUATE26.yaml)
-> 
-> Finally, rerun all the steps presented in this section, including step one. Users must reload the `(.local)` environment by rerunning `start_cocoa.sh` so Cocoa can create appropriate symlinks that expose the emulators to Cobaya.
+> The `Nautilis`, `Minimizer`, `Profile`, and `Emcee` scripts contain an internally defined `yaml_string` that specifies priors, 
+> likelihoods, and the theory code, all following Cobaya Conventions.  
 
+- **Nautilus**:
+
+      mpirun -n 90 --oversubscribe --mca pml ^ucx --mca btl vader,tcp,self \
+           --bind-to core --map-by numa --report-bindings --mca mpi_yield_when_idle 1 \
+           python -m mpi4py.futures ./projects/example/EXAMPLE_EMUL_NAUTILUS1.py \
+           --root ./projects/example/ --outroot "EXAMPLE_EMUL_NAUTILUS1"  \
+           --maxfeval 450000 --nlive 2048 --neff 15000 --flive 0.01 --nnetworks 5
+
+- **Emcee**:
+
+      mpirun -n 21 --oversubscribe --mca pml ^ucx --mca btl vader,tcp,self \
+           --bind-to core --map-by numa --report-bindings --mca mpi_yield_when_idle 1 \
+          python ./projects/example/EXAMPLE_EMUL_EMCEE1.py --root ./projects/example/ \
+          --outroot "EXAMPLE_EMUL_EMCEE1" --maxfeval 80000 --burn_in 0.3
+
+> [!TIP]
+> The number of steps per MPI worker is `maxfeval/3nwalkers`, and the number of walkers is equal to
+> max(3x the number of parameters, number of MPI workers). It is advised for convergence that each walker 
+> walk 50 times the auto-correlation length, which is provided in the header of the output chain file. 
+
+<p align="center">
+<img width="733" height="734" alt="Screenshot 2025-07-31 at 9 10 02 PM" src="https://github.com/user-attachments/assets/6fc4d107-e53b-41fa-8ff2-19e2166f5c92" />
+</p>
+
+
+- **Global Minimizer**:
+
+      mpirun -n 14 --oversubscribe --mca pml ^ucx --mca btl vader,tcp,self \
+           --bind-to core --map-by numa --report-bindings --mca mpi_yield_when_idle 1 \
+          python ./projects/example/EXAMPLE_EMUL_MINIMIZE1.py --root ./projects/example/ \
+          --cov 'chains/EXAMPLE_EMUL_MCMC1.covmat' --outroot "EXAMPLE_EMUL_MIN1" --maxfeval 25000
+
+> [!TIP]
+> The number of steps per MPI per temperature is `maxfeval/5NMPI`. Do maintain this number greater than $300$
+> for reliable results when $n_{\\rm param} = 7$. Scale that number linearly with the parameter dimension.
+
+- **Profile**: 
+
+      mpirun -n 14 --oversubscribe --mca pml ^ucx --mca btl vader,tcp,self \
+           --bind-to core --map-by core --report-bindings --mca mpi_yield_when_idle 1 \
+          python ./projects/example/EXAMPLE_EMUL_PROFILE1.py \
+          --root ./projects/example/ --cov 'chains/EXAMPLE_EMUL_MCMC1.covmat' \
+          --outroot "EXAMPLE_EMUL_PROFILE1" --factor 3 --maxfeval 25000 --numpts 10 \
+          --profile 1 --minfile="./projects/example/chains/EXAMPLE_EMUL_MIN1.txt"
+
+> [!TIP]
+> Profile provides the optional argument `minfile`; it is faster to run the profile script if the
+> user can provide the global minimum. The profile also provides the optional argument `cov`; it is significantly
+> more efficient to use a covariance matrix from a converged chain. The argument `factor` specifies
+> the start and end of the parameter being profiled:
+>
+>     start value ~ mininum value - factor*np.sqrt(np.diag(cov))
+>     end   value ~ mininum value + factor*np.sqrt(np.diag(cov))
+>
+> We advise `factor ~ 3` when a covariance matrix is provided. If `cov` is not supplied, the code estimates
+> one internally from the prior. In this case, the code imposes `factor < 1` and we suggest `factor << 1`. Finally,
+> The number of steps per MPI per temperature is `maxfeval/4NMPI`. Do maintain this number greater than $300$
+> for reliable results when $n_{\\rm param} = 7$. Scale that number linearly with the parameter dimension.
+
+- **Profile method 2**:
+
+  If the dimensionality of the problem is not large, and the spacing between values of the parameter
+  being profiled is small, it can be considerably faster to use a simple scipy `Nelder-Mead`
+  to calculate the profile. Here, the `minfile` and `cov` options are mandatory.
+
+      mpirun -n 1 --oversubscribe --mca pml ^ucx --mca btl vader,tcp,self \
+          --bind-to core --map-by core --report-bindings --mca mpi_yield_when_idle 1 \
+          python ./projects/example/EXAMPLE_EMUL_PROFILE_SCIPY1.py \
+          --root ./projects/example/ --cov 'chains/EXAMPLE_EMUL_MCMC1.covmat' \
+          --outroot "EXAMPLE_EMUL_PROFILE1M2" --factor 3 --maxfeval 5000 --numpts 10 \
+          --profile 1 --minfile="./projects/example/chains/EXAMPLE_EMUL_MIN1.txt"
+
+- **Scan**: 
+
+This profile code has a different MPI strategy. It scans one parameter on the entire prior,
+with each MPI being assigned to one minimization. This is the best strategy when probing 
+beyond-LCDM parameters with oscilatory behavior (e.g., Monodromic Dark Energy).
+
+      mpirun -n 90 --oversubscribe --mca pml ^ucx --mca btl vader,tcp,self \
+           --bind-to core --map-by core --report-bindings --mca mpi_yield_when_idle 1 \
+          python -m mpi4py.futures ./projects/example/EXAMPLE_EMUL_SCAN1.py \
+          --root ./projects/example/ --outroot "EXAMPLE_EMUL_SCAN1" --maxfeval 25000 --profile 1 
+          
+> [!TIP]
+> The number of steps per Emcee walker per temperature is `maxfeval/25`.
+> Do maintain this number greater than $300$ for reliable results when $n_{\\rm param} = 7$.
+> Scale that number linearly with the parameter dimension.
+          
 # Appendix <a name="appendix"></a>
 
 ## :interrobang: FAQ: How do we debug Cocoa? Suggested steps <a name="running_wrong"></a>

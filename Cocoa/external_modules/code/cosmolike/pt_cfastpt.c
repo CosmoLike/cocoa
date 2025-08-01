@@ -19,8 +19,8 @@ void get_FPT_bias(void)
   if (fdiff(cache[1], Ntable.random))
   {
     FPTIA.k_min     = 1.e-5;
-    FPTIA.k_max     = 1.e+5;
-    FPTbias.N       = 800 + 200 * Ntable.FPTboost;
+    FPTIA.k_max     = 1.e+6;
+    FPTbias.N       = 350 + 200 * Ntable.FPTboost;
     if (FPTbias.tab != NULL) {
       free(FPTbias.tab);
     }
@@ -64,10 +64,9 @@ void get_FPT_IA(void)
 
   if (fdiff(cache[1], Ntable.random))
   {
-    FPTIA.k_min     = 5.e-4;
-    FPTIA.k_max     = 1.e+6;
-    //FPTIA.N       = 1200 + 200 * Ntable.FPTboost;
-    FPTIA.N         = 400 + 200 * Ntable.FPTboost;
+    FPTIA.k_min = 1.e-5;
+    FPTIA.k_max = 1.e+6;
+    FPTIA.N     = 270 + 200 * Ntable.FPTboost;
 
     if (FPTIA.tab != NULL) {
       free(FPTIA.tab);

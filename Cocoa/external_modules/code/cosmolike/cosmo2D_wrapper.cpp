@@ -64,10 +64,8 @@ static int has_b2_galaxies()
 arma::Col<double> get_binning_real_space()
 {  
   arma::Col<double> result(Ntable.Ntheta, arma::fill::none);
-  
   const double logdt=(std::log(Ntable.vtmax)-std::log(Ntable.vtmin))/Ntable.Ntheta;
-  for (int i = 0; i < Ntable.Ntheta; i++)
-  {  
+  for (int i = 0; i < Ntable.Ntheta; i++) {  
     const double thetamin = std::exp(log(Ntable.vtmin) + (i + 0.0) * logdt);
     const double thetamax = std::exp(log(Ntable.vtmin) + (i + 1.0) * logdt);
     const double theta = (2./ 3.) * (std::pow(thetamax,3) - std::pow(thetamin,3)) /
@@ -84,10 +82,8 @@ arma::Col<double> get_binning_real_space()
 arma::Col<double> get_binning_fourier_space()
 {  
   arma::Col<double> result(like.Ncl, arma::fill::none);
-  
   const double logdl = (std::log(like.lmax) - std::log(like.lmin))/like.Ncl;
-  for (int i = 0; i < like.Ncl; i++)
-  {  
+  for (int i = 0; i < like.Ncl; i++) {  
     result(i) = std::exp(std::log(like.lmin) + (i + 0.5)*logdl);
   }
   return result;
@@ -103,21 +99,16 @@ py::tuple xi_pm_tomo_cpp()
                         redshift.shear_nbin,
                         redshift.shear_nbin,
                         arma::fill::zeros);
-  
   arma::Cube<double> xm(Ntable.Ntheta,
                         redshift.shear_nbin,
                         redshift.shear_nbin,
                         arma::fill::zeros);
-
-  for (int nz=0; nz<tomo.shear_Npowerspectra; nz++)
-  {    
-    for (int i=0; i<Ntable.Ntheta; i++)
-    {
+  for (int nz=0; nz<tomo.shear_Npowerspectra; nz++) {    
+    for (int i=0; i<Ntable.Ntheta; i++) {
       const int z1 = Z1(nz);
       const int z2 = Z2(nz);
       xp(i,z1,z2) = xi_pm_tomo(1, i, z1, z2, 1);
       xm(i,z1,z2) = xi_pm_tomo(-1, i, z1, z2, 1);
-
       xp(i,z2,z1) = xp(i,z1,z2);
       xm(i,z2,z1) = xm(i,z1,z2);
     }
@@ -131,10 +122,11 @@ arma::Cube<double> w_gammat_tomo_cpp()
                             redshift.clustering_nbin, 
                             redshift.shear_nbin,
                             arma::fill::zeros);
-  
-  for (int nz=0; nz<tomo.ggl_Npowerspectra; nz++)
-    for (int i=0; i<Ntable.Ntheta; i++)
+  for (int nz=0; nz<tomo.ggl_Npowerspectra; nz++) {
+    for (int i=0; i<Ntable.Ntheta; i++) {
       result(i,ZL(nz),ZS(nz)) = w_gammat_tomo(i, ZL(nz), ZS(nz), 1);
+    }
+  }
   return result;
 }
 
@@ -144,10 +136,11 @@ arma::Cube<double> w_gg_tomo_cpp()
                             redshift.clustering_nbin,
                             redshift.clustering_nbin,
                             arma::fill::zeros);
-
-  for (int nz=0; nz<tomo.clustering_Npowerspectra; nz++)
-    for (int i=0; i<Ntable.Ntheta; i++)
+  for (int nz=0; nz<tomo.clustering_Npowerspectra; nz++) {
+    for (int i=0; i<Ntable.Ntheta; i++) {
       result(i, nz, nz) = w_gg_tomo(i, nz, nz, 0);
+    }
+  }
   return result;
 }
 
@@ -197,7 +190,6 @@ py::tuple C_ss_tomo_limber_cpp(const arma::Col<double> l)
                      l.n_elem);
     exit(1);
   }
-  
   arma::Cube<double> EE(l.n_elem,
                         redshift.shear_nbin,
                         redshift.shear_nbin,
@@ -206,7 +198,6 @@ py::tuple C_ss_tomo_limber_cpp(const arma::Col<double> l)
                         redshift.shear_nbin,
                         redshift.shear_nbin,
                         arma::fill::zeros);
-
   #pragma GCC diagnostic push
   #pragma GCC diagnostic ignored "-Wunused-variable"
   { // init static variables
@@ -218,10 +209,8 @@ py::tuple C_ss_tomo_limber_cpp(const arma::Col<double> l)
   #pragma GCC diagnostic pop
 
   #pragma omp parallel for collapse(2)
-  for (int nz=0; nz<tomo.shear_Npowerspectra; nz++)
-  {
-    for (int i=0; i<static_cast<int>(l.n_elem); i++)
-    {
+  for (int nz=0; nz<tomo.shear_Npowerspectra; nz++) {
+    for (int i=0; i<static_cast<int>(l.n_elem); i++) {
       const int ni = Z1(nz);
       const int nj = Z2(nz);
       EE(i, ni, nj) = C_ss_tomo_limber_nointerp(l(i), ni, nj, 1, 0);
@@ -237,8 +226,7 @@ py::tuple C_ss_tomo_limber_cpp(const arma::Col<double> l)
 arma::Mat<double> gs_bins()
 {
   arma::Mat<double> result(tomo.ggl_Npowerspectra, 2);
-  for (int nz=0; nz<tomo.ggl_Npowerspectra; nz++)
-  {
+  for (int nz=0; nz<tomo.ggl_Npowerspectra; nz++) {
     result(nz,0) = ZL(nz);
     result(nz,1) = ZS(nz);
   }

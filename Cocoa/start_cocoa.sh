@@ -11,10 +11,10 @@ error_start_cocoa () {
   local FILE="$(basename ${BASH_SOURCE[0]})"
   local MSG="\033[0;31m (${FILE}) we cannot run "
   local MSG2="\033[0m"
-  echo -e "${MSG}${1:?}${MSG2}" 2>"/dev/null"
+  echo -e "${MSG}${1:?}${MSG2}"
   unset -f error_start_cocoa
-  cd $(pwd -P) 2>"/dev/null"
-  source stop_cocoa.sh 2>"/dev/null"
+  cd $(pwd -P) 
+  source stop_cocoa.sh
   return 1
 }
 
@@ -176,47 +176,50 @@ if [[ -z "${IGNORE_COSMOPOWER_CODE}" ]]; then
 fi
 
 # ----------------------------------------------------------------------------
-# ----------------------------- CMB TRF THEORY -------------------------------
+# ----------------------------- EMUL TRF THEORY -------------------------------
 # ----------------------------------------------------------------------------
 if [[ -z "${IGNORE_EMULTRF_CODE}" ]]; then
   ECODEF="${ROOTDIR:?}/external_modules/code"
   COBTH="${ROOTDIR:?}/cobaya/cobaya/theories"
-
   TMP="${EMULTRF_NAME:-"emultrf"}"
+
   TMP2="emulcmb"
-
   if [[ ! -L "${COBTH:?}/${TMP2}" ]]; then
     ln -s "${ECODEF:?}/emulators/${TMP}/${TMP2}" "${COBTH:?}" \
       >${OUT1:?} 2>${OUT2:?} || { error_start_cocoa "${EC34:?}"; return 1; }
   fi
 
-  TMP="${EMULTRF_NAME:-"emultrf"}"
   TMP2="emulbaosn"
-
   if [[ ! -L "${COBTH:?}/${TMP2}" ]]; then
     ln -s "${ECODEF:?}/emulators/${TMP}/${TMP2}" "${COBTH:?}" \
       >${OUT1:?} 2>${OUT2:?} || { error_start_cocoa "${EC34:?}"; return 1; }
   fi
 
-  TMP="${EMULTRF_NAME:-"emultrf"}"
-  TMP2="emulsn"
-
-  if [[ ! -L "${COBTH:?}/${TMP2}" ]]; then
-    ln -s "${ECODEF:?}/emulators/${TMP}/${TMP2}" "${COBTH:?}" \
-      >${OUT1:?} 2>${OUT2:?} || { error_start_cocoa "${EC34:?}"; return 1; }
-  fi
-
-  TMP="${EMULTRF_NAME:-"emultrf"}"
   TMP2="emultheta"
-
   if [[ ! -L "${COBTH:?}/${TMP2}" ]]; then
     ln -s "${ECODEF:?}/emulators/${TMP}/${TMP2}" "${COBTH:?}" \
       >${OUT1:?} 2>${OUT2:?} || { error_start_cocoa "${EC34:?}"; return 1; }
   fi
 
-  TMP="${EMULTRF_NAME:-"emultrf"}"
   TMP2="emulrdrag"
+  if [[ ! -L "${COBTH:?}/${TMP2}" ]]; then
+    ln -s "${ECODEF:?}/emulators/${TMP}/${TMP2}" "${COBTH:?}" \
+      >${OUT1:?} 2>${OUT2:?} || { error_start_cocoa "${EC34:?}"; return 1; }
+  fi
 
+  TMP2="emul_cosmic_shear"
+  if [[ ! -L "${COBTH:?}/${TMP2}" ]]; then
+    ln -s "${ECODEF:?}/emulators/${TMP}/${TMP2}" "${COBTH:?}" \
+      >${OUT1:?} 2>${OUT2:?} || { error_start_cocoa "${EC34:?}"; return 1; }
+  fi
+
+  TMP2="emul_ggl"
+  if [[ ! -L "${COBTH:?}/${TMP2}" ]]; then
+    ln -s "${ECODEF:?}/emulators/${TMP}/${TMP2}" "${COBTH:?}" \
+      >${OUT1:?} 2>${OUT2:?} || { error_start_cocoa "${EC34:?}"; return 1; }
+  fi
+
+  TMP2="emul_wtheta"
   if [[ ! -L "${COBTH:?}/${TMP2}" ]]; then
     ln -s "${ECODEF:?}/emulators/${TMP}/${TMP2}" "${COBTH:?}" \
       >${OUT1:?} 2>${OUT2:?} || { error_start_cocoa "${EC34:?}"; return 1; }

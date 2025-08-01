@@ -55,7 +55,7 @@ if [ -z "${IGNORE_COSMOPOWER_DATA}" ]; then
   PACKDIR="${EDATAF:?}/${FOLDER:?}"
 
   # ---------------------------------------------------------------------------
-  ptop "SETUP/UNXV EMULATOR CMB TRF DATA" || return 1
+  ptop "SETUP/UNXV EMULATOR CMB COSMOPOWER DATA" || return 1
 
   # ---------------------------------------------------------------------------
   # in case this script is called twice
@@ -72,13 +72,13 @@ if [ -z "${IGNORE_COSMOPOWER_DATA}" ]; then
     if [ -n "${COSMOPOWER_URL_DATA_COMMIT}" ]; then
       cdfolder "${PACKDIR:?}" || return 1
 
-      ${GIT:?} checkout "${EMULTRF_DATA_GIT_COMMIT:?}" \
+      ${GIT:?} checkout "${COSMOPOWER_URL_DATA_COMMIT:?}" \
         >${OUT1:?} 2>${OUT2:?} || { error "${EC16:?}"; return 1; }
     fi
   fi
   # ---------------------------------------------------------------------------
   
-  pbottom "SETUP/UNXV EMULATOR CMB TRF DATA" || return 1
+  pbottom "SETUP/UNXV EMULATOR CMB COSMOPOWER DATA" || return 1
 
   unset_all || return 1
 
