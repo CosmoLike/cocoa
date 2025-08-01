@@ -120,7 +120,6 @@ if [ -z "${IGNORE_PIP_CORE_INSTALLATION}" ]; then
         'torch==2.6.0' \
         'torchvision==0.21.0' \
         'torchaudio==2.6.0' \
-        'tensiometer==1.0.2' \
         'scikit-learn==1.6.1' \
         'jupyter==1.0.0' \
         'typing-extensions==4.13.2' \
