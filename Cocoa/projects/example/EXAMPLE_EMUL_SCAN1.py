@@ -321,8 +321,7 @@ def min_chi2(x0,
         
         sampler.run_mcmc(x, 
                          nsteps, 
-                         skip_initial_state_check=True,
-                         progress=args.progress)
+                         skip_initial_state_check=True)
         samples = sampler.get_chain(flat=True, thin=1, discard=0)
 
         j = np.argmin(-1.0*np.array(sampler.get_log_prob(flat=True)))
@@ -408,11 +407,10 @@ if __name__ == '__main__':
     maxevals = int(maxfeval/(ntemp*nwalkers))
     cov = model.prior.covmat(ignore_external=False) # cov from prior
     res = np.array(list(executor.map(functools.partial(prf, 
-                                                       index=index,
+                                                       fixed=index,
                                                        maxfeval=maxfeval, 
                                                        nwalkers=nwalkers,
                                                        cov=cov), xf)),dtype="object")
-    
     x0 = np.array([np.insert(row, index, p) for row, p in zip(res[:,0], param)], dtype='float64')
     chi2res = np.array(res[:,1], dtype='float64')
     
