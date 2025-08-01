@@ -311,7 +311,7 @@ Now, users must follow all the steps below.
 
 > [!TIP]
 > The number of steps per MPI per temperature is `maxfeval/5NMPI`. Do maintain this number greater than $300$
-> for reliable results when $n_{\\rm param$ = 7$. Scale that number linearly with the parameter dimension.
+> for reliable results when $n_{\\rm param} = 7$. Scale that number linearly with the parameter dimension.
 
 - **Profile**: 
 
