@@ -352,8 +352,8 @@ beyond-LCDM parameters with oscilatory behavior (e.g., Monodromic Dark Energy).
 
       mpirun -n 90 --oversubscribe --mca pml ^ucx --mca btl vader,tcp,self \
            --bind-to core --map-by core --report-bindings --mca mpi_yield_when_idle 1 \
-          python ./projects/example/EXAMPLE_EMUL_SCAN1.py --root ./projects/example/ \
-          --outroot "EXAMPLE_EMUL_SCAN1" --maxfeval 25000 --profile 1 
+          python -m mpi4py.futures ./projects/example/EXAMPLE_EMUL_SCAN1.py \
+          --root ./projects/example/ --outroot "EXAMPLE_EMUL_SCAN1" --maxfeval 25000 --profile 1 
           
 > [!TIP]
 > The number of steps per Emcee walker per temperature is `maxfeval/25`.
