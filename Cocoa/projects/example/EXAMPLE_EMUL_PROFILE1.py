@@ -359,8 +359,7 @@ def min_chi2(x0,
         sampler.reset()
     # min chi2 from the entire emcee runs
     j = np.argmin(np.array(partial))
-    result = [partial_samples[j], partial[j]]
-    return result
+    return partial_samples[j]
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
@@ -431,7 +430,7 @@ if __name__ == '__main__':
           x0 = np.array(res[0], dtype='float64')[0:model.prior.d()]
           chi20 = res[1]
           print(f"Global Min: params = {x0}, and chi2 = {chi20}")
-        
+
         # 3rd: Set the parameter profile range ---------------------------------
         start = np.zeros(model.prior.d(), dtype='float64')
         stop  = np.zeros(model.prior.d(), dtype='float64')
@@ -464,13 +463,16 @@ if __name__ == '__main__':
         # 5th: Set the vectors that will hold the final result -----------------
         xf = np.tile(x0, (numpts, 1))
         xf[:,args.profile] = param
-        
-        chi2res = np.zeros(numpts)        
+
+        # Warning: Fixing a param shifts prior in Cobaya compare to global 
+        # minimization by the prior volume of the fixed parameter. 
+        # So we need to recompute The global chi2 at the result cosmologies
+        chi2res = np.zeros(numpts)  
+        chi2res[numpts//2] = chi20
 
         # 5th: run from midpoint to right --------------------------------------
-        # PS: we recompute min as the param fixed will change prior value
         tmp = np.array(xf[numpts//2,:], dtype='float64')
-        for i in range(numpts//2,numpts): 
+        for i in range(numpts//2+1,numpts): 
             tmp[args.profile] = param[i]
             res = prf(tmp, 
                       fixed=args.profile,
@@ -478,10 +480,10 @@ if __name__ == '__main__':
                       nwalkers=nwalkers,
                       pool=pool,
                       cov=cov)
-            xf[i,:] = np.insert(res[0], args.profile, param[i])
+            xf[i,:] = np.insert(res, args.profile, param[i])
             tmp = np.array(xf[i,:],dtype='float64')
-            chi2res[i] = res[1]
-            print(f"Partial ({i+1}/{numpts}): params = {tmp}, and chi2 = {chi2res[i]}")
+            chi2res[i] = chi2(xf[i,:])
+            print(f"Partial ({i+1}/{numpts}): params = {xf[i,:]}, and chi2 = {chi2res[i]}")
         
         # 6th: run from midpoint to left ---------------------------------------
         tmp = np.array(xf[numpts//2,:], dtype='float64')
@@ -493,9 +495,9 @@ if __name__ == '__main__':
                       nwalkers=nwalkers,
                       pool=pool,
                       cov=cov)
-            xf[i,:] = np.insert(res[0], args.profile, param[i])
-            tmp = np.array(xf[i,:], dtype='float64')
-            chi2res[i] = res[1] 
+            xf[i,:] = np.insert(res, args.profile, param[i])
+            tmp = np.array(xf[i,:],dtype='float64')
+            chi2res[i] = chi2(xf[i,:])
             print(f"Partial ({i+1}/{numpts}): params = {tmp}, and chi2 = {chi2res[i]}")
         
         # 8th Append derived parameters ----------------------------------------
