@@ -427,8 +427,8 @@ if __name__ == '__main__':
                                   pool=pool,
                                   cov=cov,
                                   fixed=-1)), dtype="object")
-          x0 = np.array(res[0], dtype='float64')[0:model.prior.d()]
-          chi20 = res[1]
+          x0 = np.array(res, dtype='float64')[0:model.prior.d()]
+          chi20 = chi2(x0)
           print(f"Global Min: params = {x0}, and chi2 = {chi20}")
 
         # 3rd: Set the parameter profile range ---------------------------------
@@ -466,6 +466,7 @@ if __name__ == '__main__':
 
         chi2res = np.zeros(numpts)  
         chi2res[numpts//2] = chi20
+        
         # 5th: run from midpoint to right --------------------------------------
         tmp = np.array(xf[numpts//2,:], dtype='float64')
         for i in range(numpts//2+1,numpts): 
@@ -479,7 +480,7 @@ if __name__ == '__main__':
             xf[i,:] = np.insert(res, args.profile, param[i])
             tmp = np.array(xf[i,:],dtype='float64')
             chi2res[i] = chi2(xf[i,:])
-            print(f"Partial ({i+1}/{numpts}): params = {xf[i,:]}, and chi2 = {chi2res[i]}")
+            print(f"Partial ({i+1}/{numpts}): params={tmp}, and chi2={chi2res[i]}")
         
         # 6th: run from midpoint to left ---------------------------------------
         tmp = np.array(xf[numpts//2,:], dtype='float64')
@@ -494,7 +495,7 @@ if __name__ == '__main__':
             xf[i,:] = np.insert(res, args.profile, param[i])
             tmp = np.array(xf[i,:],dtype='float64')
             chi2res[i] = chi2(xf[i,:])
-            print(f"Partial ({i+1}/{numpts}): params = {tmp}, and chi2 = {chi2res[i]}")
+            print(f"Partial ({i+1}/{numpts}): params={tmp}, and chi2={chi2res[i]}")
         
         # 8th Append derived parameters ----------------------------------------
         tmp = [
