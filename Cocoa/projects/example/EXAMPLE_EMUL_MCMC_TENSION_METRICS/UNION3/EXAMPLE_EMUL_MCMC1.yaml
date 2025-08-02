@@ -1,5 +1,5 @@
 stop_at_error: false
-timing: true
+timing: false
 debug: false
 
 likelihood:
@@ -10,7 +10,7 @@ likelihood:
     path: ./external_modules
   planck_2020_lollipop.lowlE:
     data_folder: planck/lollipop
-  sn.desy5: 
+  sn.union3: 
     path: ./external_modules/data/sn_data
   bao.desi_dr2.desi_bao_all:
     path: ./external_modules/data/ 
@@ -183,8 +183,8 @@ sampler:
     # --------------------------------------
     # Maximum number of posterior evaluations
     max_samples: .inf
-    Rminus1_stop: 0.015
-    Rminus1_cl_stop: 0.18
+    Rminus1_stop: 0.01        # tension metrics: require stringent convergence criteria
+    Rminus1_cl_stop: 0.15     # tension metrics: require stringent convergence criteria
     Rminus1_cl_level: 0.95
     # ---------------------------------------------------------------------
     # ---------------------------------------------------------------------
@@ -208,4 +208,4 @@ sampler:
     # ---------------------------------------------------------------------
     # ---------------------------------------------------------------------
     Rminus1_single_split: 4
-output: ./projects/example/chains/EXAMPLE_EMUL_MCMC6
+output: ./projects/example/chains/TM/UNION3/EXAMPLE_EMUL_MCMC1
