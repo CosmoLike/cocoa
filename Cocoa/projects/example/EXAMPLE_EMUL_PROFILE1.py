@@ -432,9 +432,8 @@ if __name__ == '__main__':
           print(f"Global Min: params = {x0}, and chi2 = {chi20}")
 
         # Test consistency of the min and profile codes
-        print(abs(chi2(x0)-chi20))
         if (abs(chi2(x0)-chi20)>0.02):
-          raise RuntimeError("Inconsistency Min and Profile setups")
+          raise ValueError("Inconsistency Min and Profile setups")
 
         # 3rd: Set the parameter profile range ---------------------------------
         start = np.zeros(model.prior.d(), dtype='float64')
