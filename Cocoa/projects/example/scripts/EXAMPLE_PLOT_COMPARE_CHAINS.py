@@ -107,4 +107,4 @@ g.triangle_plot(
     'PolyChord $n_{\\rm live}=512$, $n_{\\rm repeat}=3D$, $\\log(Z)=-1187.62 \\pm 0.20$',
   ],
   legend_loc=(0.3, 0.85))
-g.export(os.path.join(chaindir,"example_emul_compare_chains.pdf"))
+g.export(os.path.join(chaindir,"example_compare_chains.pdf"))

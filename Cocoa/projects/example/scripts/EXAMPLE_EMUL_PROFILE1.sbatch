@@ -24,18 +24,14 @@ cd $SLURM_SUBMIT_DIR
 conda activate cocoa
 source start_cocoa.sh
 
-export OMP_PROC_BIND=close
-if [ -n "$SLURM_CPUS_PER_TASK" ]; then
-  export OMP_NUM_THREADS=$SLURM_CPUS_PER_TASK
-else
-  export OMP_NUM_THREADS=1
-fi
-
+export OMP_NUM_THREADS=1
 ulimit -u 2000000 # require line when nmpi is high
+
 mpirun -n ${SLURM_NTASKS} --oversubscribe --mca pml ^ucx --mca btl vader,tcp,self \
-       --bind-to core --map-by core --report-bindings --mca mpi_yield_when_idle 1 \
-      python ./projects/example/EXAMPLE_EMUL_PROFILE1.py \
-      --root ./projects/example/ --cov 'chains/EXAMPLE_EMUL_MCMC1.covmat' \
-      --outroot "EXAMPLE_EMUL_PROFILE1" --factor 3 --maxfeval 25000 --numpts 10 \
-      --profile ${SLURM_ARRAY_TASK_ID} \
-      --minfile="./projects/example/chains/EXAMPLE_EMUL_MIN1.txt"
+  --bind-to core:overload-allowed --rank-by slot \
+  --map-by slot:pe=${OMP_NUM_THREADS} --mca mpi_yield_when_idle 1 \
+  python ./projects/example/EXAMPLE_EMUL_PROFILE1.py \
+    --root ./projects/example/ --cov 'chains/EXAMPLE_EMUL_MCMC1.covmat' \
+    --outroot "EXAMPLE_EMUL_PROFILE1" --factor 3 --maxfeval 25000 --numpts 10 \
+    --profile ${SLURM_ARRAY_TASK_ID} \
+    --minfile="./projects/example/chains/EXAMPLE_EMUL_MIN1.txt"
