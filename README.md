@@ -229,14 +229,10 @@ Cocoa contains a few transformer-based neural network emulators capable of simul
 > Answer: comment the keys below before rerunning `setup_cocoa.sh`.
 > 
 >     [Adapted from Cocoa/set_installation_options.sh shell script]
->     # OVERWRITE_EXISTING_XXX_CODE=1 -> setup_cocoa overwrites existing PACKAGES ----
->     # overwrite: delete the existing PACKAGE folder and install it again -----------
->     # redownload: delete the compressed file and download data again ---------------
->     # These keys are only relevant if you run setup_cocoa multiple times -----------
+>     # These keys are only relevant if you run setup_cocoa multiple times
 >     #export OVERWRITE_EXISTING_ALL_PACKAGES=1    
 >     #export OVERWRITE_EXISTING_COSMOLIKE_CODE=1 
 >     #export REDOWNLOAD_EXISTING_ALL_DATA=1      
->
 
       
 Now, users must follow all the steps below.
