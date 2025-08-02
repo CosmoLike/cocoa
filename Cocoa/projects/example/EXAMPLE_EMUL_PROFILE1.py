@@ -125,7 +125,7 @@ params:
       loc: 3.0448
       scale: 0.05
     proposal: 0.05
-    latex: '\log(10^{10} A_\mathrm{s}'
+    latex: '\log(10^{10} A_\mathrm{s})'
   ns:
     prior:
       min: 0.92
@@ -464,12 +464,8 @@ if __name__ == '__main__':
         xf = np.tile(x0, (numpts, 1))
         xf[:,args.profile] = param
 
-        # Warning: Fixing a param shifts prior in Cobaya compare to global 
-        # minimization by the prior volume of the fixed parameter. 
-        # So we need to recompute The global chi2 at the result cosmologies
         chi2res = np.zeros(numpts)  
         chi2res[numpts//2] = chi20
-
         # 5th: run from midpoint to right --------------------------------------
         tmp = np.array(xf[numpts//2,:], dtype='float64')
         for i in range(numpts//2+1,numpts): 

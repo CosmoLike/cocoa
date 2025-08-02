@@ -132,15 +132,14 @@ params:
     latex: '\Omega_\mathrm{c} h^2'
   tau:
     prior:
-      dist: norm
-      loc: 0.0544
-      scale: 0.0073
+      min: 0.04
+      max: 0.09
     ref:
       dist: norm
       loc: 0.055
-      scale: 0.006
-    proposal: 0.003
-    latex: '\tau_\mathrm{reio}'
+      scale: 0.01
+    proposal: 0.01
+    latex: \tau_\mathrm{reio}
   As:
     derived: 'lambda logA: 1e-10*np.exp(logA)'
     latex: 'A_\mathrm{s}'
