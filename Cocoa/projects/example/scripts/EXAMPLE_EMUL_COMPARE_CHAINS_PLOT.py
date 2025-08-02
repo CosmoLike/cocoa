@@ -28,7 +28,7 @@ matplotlib.rcParams['savefig.bbox'] = 'tight'
 matplotlib.rcParams['savefig.format'] = 'pdf'
 
 parameter = [u'omegach2', u'logA', u'ns', u'omegabh2', u'tau', u'chi2v2']
-chaindir=os.getcwd()
+chaindir  = os.environ['ROOTDIR'] + "/projects/example/chains/"
 
 analysissettings={'smooth_scale_1D':0.25, 
                   'smooth_scale_2D':0.25,
@@ -41,10 +41,10 @@ analysissettings2={'smooth_scale_1D':0.25,
                    'range_confidence' : u'0.005'}
 
 root_chains = (
-  '/chains/EXAMPLE_EMUL_MCMC1',
-  '/chains/EXAMPLE_EMUL_NAUTILUS1',
-  '/chains/EXAMPLE_EMUL_EMCEE1',
-  '/chains/EXAMPLE_EMUL_POLY1',
+  'EXAMPLE_EMUL_MCMC1',
+  'EXAMPLE_EMUL_NAUTILUS1',
+  'EXAMPLE_EMUL_EMCEE1',
+  'EXAMPLE_EMUL_POLY1',
 )
 
 # --------------------------------------------------------------------------------
@@ -71,7 +71,8 @@ samples.saveAsText(chaindir + '/.VM_P1_TMP4')
 
 #GET DIST PLOT SETUP
 g=gplot.getSubplotPlotter(chain_dir=chaindir,
-  analysis_settings=analysissettings2,width_inch=10.5)
+                          analysis_settings=analysissettings2,
+                          width_inch=10.5)
 g.settings.axis_tick_x_rotation=65
 g.settings.lw_contour=1.0
 g.settings.legend_rect_border = False
@@ -106,4 +107,4 @@ g.triangle_plot(
     'PolyChord $n_{\\rm live}=512$, $n_{\\rm repeat}=3D$, $\\log(Z)=-1187.62 \\pm 0.20$',
   ],
   legend_loc=(0.3, 0.85))
-g.export()
+g.export(os.path.join(chaindir,"example_emul_compare_chains.pdf"))
