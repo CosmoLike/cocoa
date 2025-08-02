@@ -316,17 +316,18 @@ likelihoods, and the theory code, all following Cobaya Conventions.
           --outroot "EXAMPLE_EMUL_PROFILE1" --factor 3 --maxfeval 25000 --numpts 10 \
           --profile 1 --minfile="./projects/example/chains/EXAMPLE_EMUL_MIN1.txt"
 
-  Profile provides the optional argument `minfile`; it is faster to run the profile script if the
-  user can provide the global minimum. The profile also provides the optional argument `cov`; it is significantly
-  more efficient to use a covariance matrix from a converged chain. The argument `factor` specifies
-  the start and end of the parameter being profiled:
+  Profile provides the optional argument `minfile`, as it is significantly faster to run the profile script with a previously provided global minimum. 
+  The profile also provides the optional argument `cov`. Again, it is considerably more efficient to employ a covariance matrix from a converged chain. 
+
+  The argument `factor` specifies the start and end of the parameter being profiled:
 
       start value ~ mininum value - factor*np.sqrt(np.diag(cov))
       end   value ~ mininum value + factor*np.sqrt(np.diag(cov))
 
   We advise `factor ~ 3` when a covariance matrix is provided. If `cov` is not supplied, the code estimates
-  one internally from the prior. In this case, the code imposes `factor < 1` and we suggest `factor << 1`. Finally,
-  The number of steps per MPI per temperature is `maxfeval/4NMPI`. Do maintain this number greater than $300$
+  one internally from the prior. In this case, the code imposes `factor < 1` and we suggest `factor << 1`.
+
+  Finally, the number of steps per MPI per temperature is `maxfeval/4NMPI`. Do maintain this number greater than $300$
   for reliable results when $n_{\\rm param} = 7$. Scale that number linearly with the parameter dimension.
 
 - **Profile method 2**:
