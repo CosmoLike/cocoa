@@ -5,8 +5,6 @@ debug: false
 likelihood:
   sn.pantheonplus: 
     path: ./external_modules/data/sn_data
-  bao.desi_dr2.desi_bao_all:
-    path: ./external_modules/data/ 
 params:
   thetastar:
     prior:

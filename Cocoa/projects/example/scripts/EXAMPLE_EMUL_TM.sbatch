@@ -35,22 +35,19 @@ fi
 
 # MCMC REQUIRED FOR TENSION METRICS ON `EXAMPLE_TENSION_METRICS.ipynb`
 declare -a YAML=( "EXAMPLE_EMUL_MCMC1.yaml" 
+                  "EXAMPLE_EMUL_MCMC2.yaml" 
                   "PANTHEON/EXAMPLE_EMUL_MCMC1.yaml" 
                   "PANTHEON/EXAMPLE_EMUL_MCMC2.yaml" 
                   "PANTHEON/EXAMPLE_EMUL_MCMC3.yaml" 
-                  "PANTHEON/EXAMPLE_EMUL_MCMC4.yaml" 
                   "PANTHEONPLUS/EXAMPLE_EMUL_MCMC1.yaml" 
                   "PANTHEONPLUS/EXAMPLE_EMUL_MCMC2.yaml" 
                   "PANTHEONPLUS/EXAMPLE_EMUL_MCMC3.yaml" 
-                  "PANTHEONPLUS/EXAMPLE_EMUL_MCMC4.yaml" 
                   "DESY5/EXAMPLE_EMUL_MCMC1.yaml" 
                   "DESY5/EXAMPLE_EMUL_MCMC2.yaml" 
                   "DESY5/EXAMPLE_EMUL_MCMC3.yaml" 
-                  "DESY5/EXAMPLE_EMUL_MCMC4.yaml" 
                   "UNION3/EXAMPLE_EMUL_MCMC1.yaml" 
                   "UNION3/EXAMPLE_EMUL_MCMC2.yaml" 
-                  "UNION3/EXAMPLE_EMUL_MCMC3.yaml" 
-                  "UNION3/EXAMPLE_EMUL_MCMC4.yaml" )
+                  "UNION3/EXAMPLE_EMUL_MCMC3.yaml" )
 
 mpirun -n ${SLURM_NTASKS} --oversubscribe --mca pml ^ucx --mca btl vader,tcp,self \
   --bind-to core:overload-allowed --rank-by slot \
