@@ -69,8 +69,8 @@ likelihood:
     clik_file: plc_3.0/hi_l/plik_lite/plik_lite_v22_TTTEEE.clik
   planck_2018_lowl.TT: 
     path: ./external_modules
-  planck_2018_lowl.EE:
-    path: ./external_modules
+  planck_2020_lollipop.lowlE:
+    data_folder: planck/lollipop
   sn.desy5: 
     path: ./external_modules/data/sn_data
   bao.desi_dr2.desi_bao_all:
