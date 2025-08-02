@@ -307,8 +307,8 @@ Now, users must follow all the steps below.
 
   The number of steps per Emcee walker per temperature is $n_{\\rm sw} = {\\rm maxfeval}/5 n_{\\rm w}$,
   and the number of walkers is $n_{\\rm w}={\\rm max}(3n_{\\rm params},n_{\\rm MPI})$.
-  Do maintain $n_{\\rm sw} > 400$ for reliable results when the parameter dimension $n_{\\rm param} = 7$
-  and scale it linearly with $n_{\\rm param}>7$.
+  Do maintain $n_{\\rm sw} > 400$ for reliable results when the parameter dimension $n_{\\rm params} = 7$
+  and scale it linearly with $n_{\\rm params}>7$.
 
 - **Profile**: 
 
@@ -331,8 +331,8 @@ Now, users must follow all the steps below.
   one internally from the prior. In this case, the code imposes `factor < 1` and we suggest `factor << 1`.
   Finally, the number of steps per Emcee walker, $n_{\\rm sw}$, per temperature is $n_{\\rm sw} = {\\rm maxfeval}/4 n_{\\rm w}$,
   and the number of walkers is $n_{\\rm w}={\\rm max}(3n_{\\rm params},n_{\\rm MPI})$.
-  Do maintain $n_{\\rm sw} > 400$ for reliable results when the parameter dimension $n_{\\rm param} = 7$
-  and scale it linearly with $n_{\\rm param}>7$.
+  Do maintain $n_{\\rm sw} > 400$ for reliable results when the parameter dimension $n_{\\rm params} = 7$
+  and scale it linearly with $n_{\\rm params}>7$.
 
 - **Profile method 2**:
 
@@ -359,8 +359,8 @@ Now, users must follow all the steps below.
               --root ./projects/example/ --outroot "EXAMPLE_EMUL_SCAN1" --maxfeval 40000 --profile 1 
           
   The number of steps per Emcee walker, $n_{\\rm sw}$, per temperature is $n_{\\rm sw} = {\\rm maxfeval}/5 n_{\\rm w}$,
-  and the number of walkers is $n_{\\rm w}={\\rm max}(3n_{\\rm params},n_{\\rm MPI})$. Do maintain $n_{\\rm steps-walker} > 400$
-  for reliable results when the parameter dimension $n_{\\rm param} = 7$ and scale it linearly with $n_{\\rm param}>7$.
+  and the number of walkers is $n_{\\rm w}={\\rm max}(3n_{\\rm params},n_{\\rm MPI})$. Do maintain $n_{\\rm sw} > 400$
+  for reliable results when the parameter dimension $n_{\\rm params} = 7$ and scale it linearly with $n_{\\rm params}>7$.
 
 
 # Appendix <a name="appendix"></a>
