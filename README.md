@@ -141,38 +141,38 @@ Users will see a terminal like this: `$(cocoa)(.local)`. *This is a feature, not
 
  **Step :three:**: The folder `projects/example` contains a few examples involving different likelihoods. So, run the `cobaya-run` on the first example following the commands below.
 
-One model evaluation:
+- **One model evaluation**:
 
-    mpirun -n 1 --oversubscribe --mca pml ^ucx --mca btl vader,tcp,self \
-       --bind-to core:overload-allowed --mca mpi_yield_when_idle 1 \
-       --rank-by slot --map-by numa:pe=${OMP_NUM_THREADS} \
-       cobaya-run ./projects/example/EXAMPLE_EVALUATE1.yaml -f
+      mpirun -n 1 --oversubscribe --mca pml ^ucx --mca btl vader,tcp,self \
+         --bind-to core:overload-allowed --mca mpi_yield_when_idle 1 \
+         --rank-by slot --map-by numa:pe=${OMP_NUM_THREADS} \
+         cobaya-run ./projects/example/EXAMPLE_EVALUATE1.yaml -f
                
-MCMC (we run MCMCs with 32 cores):
+- **MCMC (Metropolis-Hastings Algorithm)**:
 
-    mpirun -n 4 --oversubscribe --mca pml ^ucx --mca btl vader,tcp,self \
-       --bind-to core:overload-allowed --mca mpi_yield_when_idle 1 \
-       --rank-by slot --map-by numa:pe=${OMP_NUM_THREADS} \
-       cobaya-run ./projects/example/EXAMPLE_MCMC1.yaml -f
+      mpirun -n 4 --oversubscribe --mca pml ^ucx --mca btl vader,tcp,self \
+         --bind-to core:overload-allowed --mca mpi_yield_when_idle 1 \
+         --rank-by slot --map-by numa:pe=${OMP_NUM_THREADS} \
+         cobaya-run ./projects/example/EXAMPLE_MCMC1.yaml -f
 
 
 ## Examples involving Cosmolike
 
  **Step :three:**: The folder `projects/lsst_y1` contains a dozen examples involving different combinations of two-point correlation functions. So, run the `cobaya-run` on the first example following the commands below.
 
-One model evaluation:
+- **One model evaluation**:
 
-    mpirun -n 1 --oversubscribe --mca pml ^ucx --mca btl vader,tcp,self \
-       --bind-to core:overload-allowed --mca mpi_yield_when_idle 1 \
-       --rank-by slot --map-by numa:pe=${OMP_NUM_THREADS} \
-       cobaya-run ./projects/lsst_y1/EXAMPLE_EVALUATE1.yaml -f
+      mpirun -n 1 --oversubscribe --mca pml ^ucx --mca btl vader,tcp,self \
+         --bind-to core:overload-allowed --mca mpi_yield_when_idle 1 \
+         --rank-by slot --map-by numa:pe=${OMP_NUM_THREADS} \
+         cobaya-run ./projects/lsst_y1/EXAMPLE_EVALUATE1.yaml -f
        
-MCMC (Metropolis-Hastings Algorithm):
+- **MCMC (Metropolis-Hastings Algorithm)**:
 
-    mpirun -n 4 --oversubscribe --mca pml ^ucx --mca btl vader,tcp,self \
-       --bind-to core:overload-allowed --mca mpi_yield_when_idle 1 \
-       --rank-by slot --map-by numa:pe=${OMP_NUM_THREADS} \
-       cobaya-run ./projects/lsst_y1/EXAMPLE_MCMC1.yaml -f
+      mpirun -n 4 --oversubscribe --mca pml ^ucx --mca btl vader,tcp,self \
+         --bind-to core:overload-allowed --mca mpi_yield_when_idle 1 \
+         --rank-by slot --map-by numa:pe=${OMP_NUM_THREADS} \
+         cobaya-run ./projects/lsst_y1/EXAMPLE_MCMC1.yaml -f
 
 
 > [!Tip]
