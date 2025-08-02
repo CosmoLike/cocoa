@@ -209,7 +209,7 @@ MCMC (Metropolis-Hastings Algorithm):
 
 # Running ML emulators <a name="cobaya_base_code_examples_emul"></a>
 
-Cocoa contains a few transformer-based neural network emulators capable of simulating CMB, cosmolike, matter power spectrum, and distances. We provide a few scripts that exemplify their API. To run them, we assume users have commented out the following lines on `set_installation_options.sh` before running the `setup_cocoa.sh` and `compile_cocoa.sh` installation scripts.
+Cocoa contains a few transformer-based neural network emulators capable of simulating CMB, cosmolike, matter power spectrum, and distances. We provide a few scripts that exemplify their API. To run them, users must have commented out the following lines on `set_installation_options.sh` before running the `setup_cocoa.sh` and `compile_cocoa.sh`.
 
       [Adapted from Cocoa/set_installation_options.sh shell script] 
       # insert the # symbol (i.e., unset these environmental keys  on `set_installation_options.sh`)
@@ -224,7 +224,7 @@ Cocoa contains a few transformer-based neural network emulators capable of simul
       #export IGNORE_GETDIST_CODE=1              # to run EXAMPLE_TENSION_METRICS.ipynb
       
 > [!TIP]
-> What if you have not configured ML-related keys before sourcing `setup_cocoa.sh` for the first time?
+> What if users have not configured ML-related keys before sourcing `setup_cocoa.sh`?
 > 
 > Answer: comment the keys below before rerunning `setup_cocoa.sh`.
 > 
