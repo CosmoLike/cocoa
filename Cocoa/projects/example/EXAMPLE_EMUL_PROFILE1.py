@@ -328,8 +328,8 @@ def min_chi2(x0,
     if fixed == -1:
       temperature = np.array([1.0, 0.25, 0.1, 0.005, 0.001], dtype='float64')
     else:
-      temperature = np.array([0.25, 0.1, 0.005, 0.001], dtype='float64')
-    stepsz      = temperature/4.0
+      temperature = np.array([0.3, 0.1, 0.005, 0.001], dtype='float64')
+    stepsz      = temperature/3.0
 
     partial_samples = [x0]
     partial = [mychi2(x0, *args)]
@@ -339,9 +339,6 @@ def min_chi2(x0,
         for j in range(nwalkers):
             x.append(GaussianStep(stepsize=stepsz[i])(x0)[0,:])
         x = np.array(x,dtype='float64')
-
-        GScov  = copy.deepcopy(cov)
-        GScov *= temperature[i]*stepsz[i] 
   
         sampler = emcee.EnsembleSampler(nwalkers=nwalkers, 
                                         ndim=ndim, 
@@ -468,12 +465,12 @@ if __name__ == '__main__':
         xf = np.tile(x0, (numpts, 1))
         xf[:,args.profile] = param
         
-        chi2res = np.zeros(numpts)
-        chi2res[numpts//2] = chi20
-        
+        chi2res = np.zeros(numpts)        
+
         # 5th: run from midpoint to right --------------------------------------
+        # PS: we recompute min as the param fixed will change prior value
         tmp = np.array(xf[numpts//2,:], dtype='float64')
-        for i in range(numpts//2+1,numpts):
+        for i in range(numpts//2,numpts): 
             tmp[args.profile] = param[i]
             res = prf(tmp, 
                       fixed=args.profile,

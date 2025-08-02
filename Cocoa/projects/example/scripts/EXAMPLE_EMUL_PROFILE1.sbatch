@@ -3,9 +3,9 @@
 #SBATCH --job-name=PROF1
 #SBATCH --output=PROF1-%A-%a.out
 #SBATCH --nodes=1
-#SBATCH --ntasks=14
-#SBATCH --ntasks-per-node=14
-#SBATCH --ntasks-per-socket=14
+#SBATCH --ntasks=21
+#SBATCH --ntasks-per-node=21
+#SBATCH --ntasks-per-socket=21
 #SBATCH --cpus-per-task=1
 #SBATCH --time=48:00:00
 #SBATCH --partition=high_priority
