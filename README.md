@@ -289,8 +289,8 @@ Now, users must follow all the steps below.
           python ./projects/example/EXAMPLE_EMUL_EMCEE1.py --root ./projects/example/ \
               --outroot "EXAMPLE_EMUL_EMCEE1" --maxfeval 80000 --burn_in 0.3
 
-  The number of steps per MPI worker is $n_{\\rm steps-walker} =  {\\rm maxfeval}/n_{\\rm walker}$,
-  with the number of walkers being $n_{\\rm walker}={\\rm max}(3n_{\\rm params},n_{\\rm MPI})$.
+  The number of steps per MPI worker is $n_{\\rm sw} =  {\\rm maxfeval}/n_{\\rm w}$,
+  with the number of walkers being $n_{\\rm w}={\\rm max}(3n_{\\rm params},n_{\\rm MPI})$.
   For proper convergence, each walker should traverse 50 times the auto-correlation length,
   which is provided in the header of the output chain file. 
 
