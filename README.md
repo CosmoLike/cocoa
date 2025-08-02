@@ -212,37 +212,34 @@ MCMC (Metropolis-Hastings Algorithm):
 Cocoa contains a few transformer-based neural network emulators capable of simulating CMB, cosmolike, matter power spectrum, and distances. We provide a few scripts that exemplify their API. To run them, we assume users have commented out the following lines on `set_installation_options.sh` before running the `setup_cocoa.sh` and `compile_cocoa.sh` installation scripts.
 
       [Adapted from Cocoa/set_installation_options.sh shell script] 
-      # inset # symbol in the lines below (i.e., unset these environmental keys)
+      # insert the # symbol (i.e., unset these environmental keys  on `set_installation_options.sh`)
       #export IGNORE_EMULTRF_CODE=1              #SaraivanovZhongZhu (SZZ) transformer/CNN-based emulators
-      #export IGNORE_EMULTRF_DATA=1              #SaraivanovZhongZhu (SZZ) transformer/CNN-based emulators
-      #export IGNORE_LIPOP_LIKELIHOOD_CODE=1     # to run EXAMPLE_EMUL_EVALUATE/MCMC/NAUTILUS/EMCEE11.yaml
-      #export IGNORE_LIPOP_CMB_DATA=1            # to run EXAMPLE_EMUL_EVALUATE/MCMC/NAUTILUS/EMCEE11.yaml
-      #export IGNORE_ACTDR6_CODE=1               # to run EXAMPLE_EMUL_EVALUATE/MCMC/NAUTILUS/EMCEE11.yaml
-      #export IGNORE_ACTDR6_DATA=1               # to run EXAMPLE_EMUL_EVALUATE/MCMC/NAUTILUS/EMCEE11.yaml
-      #export IGNORE_NAUTILUS_SAMPLER_CODE=1     # to run EXAMPLE_EMUL_NAUTILUS1.py
-      #export IGNORE_POLYCHORD_SAMPLER_CODE=1    # to run EXAMPLE_EMUL_POLY1.yaml
+      #export IGNORE_EMULTRF_DATA=1            
+      #export IGNORE_LIPOP_LIKELIHOOD_CODE=1     # to run EXAMPLE_EMUL_(EVALUATE/MCMC/NAUTILUS/EMCEE1).yaml
+      #export IGNORE_LIPOP_CMB_DATA=1           
+      #export IGNORE_ACTDR6_CODE=1               # to run EXAMPLE_EMUL_(EVALUATE/MCMC/NAUTILUS/EMCEE1).yaml
+      #export IGNORE_ACTDR6_DATA=1         
+      #export IGNORE_NAUTILUS_SAMPLER_CODE=1     # to run PROJECTS/EXAMPLE/EXAMPLE_EMUL_NAUTILUS1.py
+      #export IGNORE_POLYCHORD_SAMPLER_CODE=1    # to run PROJECTS/EXAMPLE/EXAMPLE_EMUL_POLY1.yaml
+      #export IGNORE_GETDIST_CODE=1              # to run EXAMPLE_TENSION_METRICS.ipynb
+      
+> [!TIP]
+> What if you have not configured ML-related keys before sourcing `setup_cocoa.sh` for the first time?
+> 
+> Answer: comment the keys below before rerunning `setup_cocoa.sh`.
+> 
+>     [Adapted from Cocoa/set_installation_options.sh shell script]
+>     # OVERWRITE_EXISTING_XXX_CODE=1 -> setup_cocoa overwrites existing PACKAGES ----
+>     # overwrite: delete the existing PACKAGE folder and install it again -----------
+>     # redownload: delete the compressed file and download data again ---------------
+>     # These keys are only relevant if you run setup_cocoa multiple times -----------
+>     #export OVERWRITE_EXISTING_ALL_PACKAGES=1    
+>     #export OVERWRITE_EXISTING_COSMOLIKE_CODE=1 
+>     #export REDOWNLOAD_EXISTING_ALL_DATA=1      
+>
+
       
 Now, users must follow all the steps below.
-
-> [!TIP]
-> Having a GPU speeds up Transformers-Based Emulators by a factor of ~5-10. 
-
-> [!NOTE]
-> What should users do if they have not configured ML-related keys before running `setup_cocoa.sh` and `compile_cocoa.sh`, as rerunning these scripts can require a long time? Instead, run the following commands.
->
->      source start_cocoa.sh 
->
-> Note that even if (.local) is already active, users must run start_cocoa.sh again to update bash environment values and to allow Cocoa to create appropriate symlinks that expose the emulators to Cobaya. Then, run
->
->      source ./installation_scripts/setup_pip_core_packages.sh     # install pip packages required by ML emulators
->      source ./installation_scripts/setup_emultrf.sh               # download emulator codes
->      source ./installation_scripts/unxv_emultrf.sh                # download pre-trained emulators
->      source ./installation_scripts/setup_act_dr6.sh               # to run EXAMPLE_EMUL_EVALUATE/MCMC/NAUTILUS/EMCEE1.yaml
->      source ./installation_scripts/compile_act_dr6.sh             # to run EXAMPLE_EMUL_EVALUATE/MCMC/NAUTILUS/EMCEE1.yaml
->      source ./installation_scripts/setup_lipop.sh                 # to run EXAMPLE_EMUL_EVALUATE/MCMC/NAUTILUS/EMCEE1.yaml
->      source ./installation_scripts/unxv_lipop.sh                  # to run EXAMPLE_EMUL_EVALUATE/MCMC/NAUTILUS/EMCEE1.yaml
->      source ./installation_scripts/compile_lipop.sh               # to run EXAMPLE_EMUL_EVALUATE/MCMC/NAUTILUS/EMCEE1.yaml 
-> 
 
  **Step :one:**: Activate the private Python environment by sourcing the script `start_cocoa.sh`
 
@@ -300,7 +297,6 @@ Now, users must follow all the steps below.
 <p align="center">
 <img width="733" height="734" alt="Screenshot 2025-07-31 at 9 10 02 PM" src="https://github.com/user-attachments/assets/6fc4d107-e53b-41fa-8ff2-19e2166f5c92" />
 </p>
-
 
 - **Global Minimizer**:
 
@@ -364,7 +360,8 @@ beyond-LCDM parameters with oscilatory behavior (e.g., Monodromic Dark Energy).
 > The number of steps per Emcee walker per temperature is `maxfeval/25`.
 > Do maintain this number greater than $300$ for reliable results when $n_{\\rm param} = 7$.
 > Scale that number linearly with the parameter dimension.
-          
+
+
 # Appendix <a name="appendix"></a>
 
 ## :interrobang: FAQ: How do we debug Cocoa? Suggested steps <a name="running_wrong"></a>
@@ -486,7 +483,9 @@ This is a large image with a size of approximately 16GB, as it already contains 
 
  **Step :three:**: As shown in the picture below, users can follow the instructions provided in Section [Running Examples](#cobaya_base_code_examples) to run a few non-cosmolike-based examples, as well as examples within `LSST-Y1`, `ROMAN_REAL`, and `ROMAN_FOURIER` projects. 
 
+<p align="center">
 ![screenshot_2025-06-02_at_7 23 48_pm](https://github.com/user-attachments/assets/2b15ce75-3d43-4a65-ab7b-e70077492b32)
+</p>
 
 > [!TIP]
 > Once installation is complete, the user must learn how to **start** and **exit** the Docker container. Assuming the user maintained the container name `cocoa2025` set on the flag `--name cocoa2025`, type:
