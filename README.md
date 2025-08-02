@@ -237,6 +237,9 @@ Cocoa contains a few transformer-based neural network emulators capable of simul
       
 Now, users must follow all the steps below.
 
+> [!Note]
+> We provide SLURM job script examples in the `projects/example/script` folder, which allow users to run the examples below in an HPC environment.
+
  **Step :one:**: Activate the private Python environment by sourcing the script `start_cocoa.sh`
 
     source start_cocoa.sh
@@ -245,49 +248,46 @@ Now, users must follow all the steps below.
 
 - **One model evaluation**:
 
-      mpirun -n 1 --oversubscribe --mca pml ^ucx --mca btl vader,tcp,self \
-           --bind-to core --map-by numa --report-bindings \
-           cobaya-run ./projects/example/EXAMPLE_EMUL_EVALUATE1.yaml -f
+      mpirun -n 1 --oversubscribe --mca pml ^ucx --mca btl vader,tcp,self --rank-by slot \
+          --bind-to core:overload-allowed --map-by slot --mca mpi_yield_when_idle 1 \
+          cobaya-run ./projects/example/EXAMPLE_EMUL_EVALUATE1.yaml -f
                
 - **MCMC (Metropolis-Hastings Algorithm)**:
 
-      mpirun -n 4 --oversubscribe --mca pml ^ucx --mca btl vader,tcp,self \
-           --bind-to core --map-by numa --report-bindings \
-           cobaya-run ./projects/example/EXAMPLE_EMUL_MCMC1.yaml -f
+      mpirun -n 4 --oversubscribe --mca pml ^ucx --mca btl vader,tcp,self --rank-by slot \
+          --bind-to core:overload-allowed --map-by slot --mca mpi_yield_when_idle 1 \
+          cobaya-run ./projects/example/EXAMPLE_EMUL_MCMC1.yaml -f
 
-<p align="center">
-The examples below may require a large number of MPI workers. Before running them, it may be necessary to increase 
-the limit of threads that can be created (at UofA HPC type `ulimit -u 2000000`), otherwise users 
-may envounter the error `libgomp: Thread creation failed`
-</p>
-
+> [!Note]
+> The examples below may require a large number of MPI workers. Before running them, it may be necessary to increase 
+> the limit of threads that can be created (at UofA HPC type `ulimit -u 1000000`), otherwise users 
+> may encounter the error `libgomp: Thread creation failed`
 
 - **PolyChord**:
 
-      mpirun -n 90 --oversubscribe --mca pml ^ucx --mca btl vader,tcp,self \
-           --bind-to core --map-by numa --report-bindings --mca mpi_yield_when_idle 1 \
-           cobaya-run ./projects/example/EXAMPLE_EMUL_POLY1.yaml -f
+      mpirun -n 90 --oversubscribe --mca pml ^ucx --mca btl vader,tcp,self --rank-by slot \
+          --bind-to core:overload-allowed --map-by slot --mca mpi_yield_when_idle 1 \
+          cobaya-run ./projects/example/EXAMPLE_EMUL_POLY1.yaml -f
 
-<p align="center">
-The `Nautilis`, `Minimizer`, `Profile`, and `Emcee` scripts below contain an internally defined `yaml_string` that specifies priors, 
-likelihoods, and the theory code, all following Cobaya Conventions. 
-</p>
+> [!Note]
+> The `Nautilis`, `Minimizer`, `Profile`, and `Emcee` scripts below contain an internally defined `yaml_string` that specifies priors, 
+> likelihoods, and the theory code, all following Cobaya Conventions.
 
 
 - **Nautilus**:
 
-      mpirun -n 90 --oversubscribe --mca pml ^ucx --mca btl vader,tcp,self \
-           --bind-to core --map-by numa --report-bindings --mca mpi_yield_when_idle 1 \
-           python -m mpi4py.futures ./projects/example/EXAMPLE_EMUL_NAUTILUS1.py \
-           --root ./projects/example/ --outroot "EXAMPLE_EMUL_NAUTILUS1"  \
-           --maxfeval 450000 --nlive 2048 --neff 15000 --flive 0.01 --nnetworks 5
+      mpirun -n 90 --oversubscribe --mca pml ^ucx --mca btl vader,tcp,self --rank-by slot \
+          --bind-to core:overload-allowed --map-by slot --mca mpi_yield_when_idle 1 \
+          python -m mpi4py.futures ./projects/example/EXAMPLE_EMUL_NAUTILUS1.py \
+              --root ./projects/example/ --outroot "EXAMPLE_EMUL_NAUTILUS1"  \
+              --maxfeval 450000 --nlive 2048 --neff 15000 --flive 0.01 --nnetworks 5
 
 - **Emcee**:
 
-      mpirun -n 21 --oversubscribe --mca pml ^ucx --mca btl vader,tcp,self \
-           --bind-to core --map-by numa --report-bindings --mca mpi_yield_when_idle 1 \
+      mpirun -n 21 --oversubscribe --mca pml ^ucx --mca btl vader,tcp,self --rank-by slot \
+          --bind-to core:overload-allowed --map-by slot --mca mpi_yield_when_idle 1 \
           python ./projects/example/EXAMPLE_EMUL_EMCEE1.py --root ./projects/example/ \
-          --outroot "EXAMPLE_EMUL_EMCEE1" --maxfeval 80000 --burn_in 0.3
+              --outroot "EXAMPLE_EMUL_EMCEE1" --maxfeval 80000 --burn_in 0.3
 
   The number of steps per MPI worker is `maxfeval/3nwalkers`, and the number of walkers is equal to
   max(3x the number of parameters, number of MPI workers). It is advised for convergence that each walker 
@@ -299,22 +299,23 @@ likelihoods, and the theory code, all following Cobaya Conventions.
 
 - **Global Minimizer**:
 
-      mpirun -n 14 --oversubscribe --mca pml ^ucx --mca btl vader,tcp,self \
-           --bind-to core --map-by numa --report-bindings --mca mpi_yield_when_idle 1 \
+      mpirun -n 14 --oversubscribe --mca pml ^ucx --mca btl vader,tcp,self --rank-by slot \
+          --bind-to core:overload-allowed --map-by slot --mca mpi_yield_when_idle 1 \
           python ./projects/example/EXAMPLE_EMUL_MINIMIZE1.py --root ./projects/example/ \
-          --cov 'chains/EXAMPLE_EMUL_MCMC1.covmat' --outroot "EXAMPLE_EMUL_MIN1" --maxfeval 25000
+              --cov 'chains/EXAMPLE_EMUL_MCMC1.covmat' --outroot "EXAMPLE_EMUL_MIN1" --maxfeval 25000
 
-  The number of steps per MPI per temperature is `maxfeval/5NMPI`. Do maintain this number greater than $300$
-  for reliable results when $n_{\\rm param} = 7$. Scale that number linearly with the parameter dimension.
+  The number of steps per MPI per temperature is $n_{\\rm walker} = {\\rm maxfeval}/4 n_{\\rm MPI}$.
+  Do maintain $n_{\\rm walker} > 300$ for reliable results when the parameter dimension $n_{\\rm param} = 7$
+  and scale it linearly with $n_{\\rm param}>7$.
 
 - **Profile**: 
 
-      mpirun -n 14 --oversubscribe --mca pml ^ucx --mca btl vader,tcp,self \
-           --bind-to core --map-by core --report-bindings --mca mpi_yield_when_idle 1 \
+      mpirun -n 14 --oversubscribe --mca pml ^ucx --mca btl vader,tcp,self --rank-by slot \
+          --bind-to core:overload-allowed --map-by slot --mca mpi_yield_when_idle 1 \
           python ./projects/example/EXAMPLE_EMUL_PROFILE1.py \
-          --root ./projects/example/ --cov 'chains/EXAMPLE_EMUL_MCMC1.covmat' \
-          --outroot "EXAMPLE_EMUL_PROFILE1" --factor 3 --maxfeval 25000 --numpts 10 \
-          --profile 1 --minfile="./projects/example/chains/EXAMPLE_EMUL_MIN1.txt"
+              --root ./projects/example/ --cov 'chains/EXAMPLE_EMUL_MCMC1.covmat' \
+              --outroot "EXAMPLE_EMUL_PROFILE1" --factor 3 --maxfeval 25000 --numpts 10 \
+              --profile 1 --minfile="./projects/example/chains/EXAMPLE_EMUL_MIN1.txt"
 
   Profile provides the optional argument `minfile`, as it is significantly faster to run the profile script with a previously provided global minimum. 
   The profile also provides the optional argument `cov`. Again, it is considerably more efficient to employ a covariance matrix from a converged chain. 
@@ -327,8 +328,9 @@ likelihoods, and the theory code, all following Cobaya Conventions.
   We advise `factor ~ 3` when a covariance matrix is provided. If `cov` is not supplied, the code estimates
   one internally from the prior. In this case, the code imposes `factor < 1` and we suggest `factor << 1`.
 
-  Finally, the number of steps per MPI per temperature is `maxfeval/4NMPI`. Do maintain this number greater than $300$
-  for reliable results when $n_{\\rm param} = 7$. Scale that number linearly with the parameter dimension.
+  Finally, the number of steps per MPI worker per temperature is $n_{\\rm walker} = {\\rm maxfeval}/4 n_{\\rm MPI}$.
+  Do maintain $n_{\\rm walker} > 300$ for reliable results when the parameter dimension $n_{\\rm param} = 7$
+  and scale it linearly with $n_{\\rm param}>7$.
 
 - **Profile method 2**:
 
@@ -336,27 +338,27 @@ likelihoods, and the theory code, all following Cobaya Conventions.
     being profiled is small, it can be considerably faster to use a simple scipy `Nelder-Mead`
     to calculate the profile. Here, the `minfile` and `cov` options are mandatory.
 
-      mpirun -n 1 --oversubscribe --mca pml ^ucx --mca btl vader,tcp,self \
-          --bind-to core --map-by core --report-bindings --mca mpi_yield_when_idle 1 \
+      mpirun -n 1 --oversubscribe --mca pml ^ucx --mca btl vader,tcp,self --rank-by slot \
+          --bind-to core:overload-allowed --map-by slot --mca mpi_yield_when_idle 1 \
           python ./projects/example/EXAMPLE_EMUL_PROFILE_SCIPY1.py \
-          --root ./projects/example/ --cov 'chains/EXAMPLE_EMUL_MCMC1.covmat' \
-          --outroot "EXAMPLE_EMUL_PROFILE1M2" --factor 3 --maxfeval 5000 --numpts 10 \
-          --profile 1 --minfile="./projects/example/chains/EXAMPLE_EMUL_MIN1.txt"
+              --root ./projects/example/ --cov 'chains/EXAMPLE_EMUL_MCMC1.covmat' \
+              --outroot "EXAMPLE_EMUL_PROFILE1M2" --factor 3 --maxfeval 5000 --numpts 10 \
+              --profile 1 --minfile="./projects/example/chains/EXAMPLE_EMUL_MIN1.txt"
 
 - **Scan**: 
 
   This profile code has a different MPI strategy. It scans one parameter on the entire prior,
-  with each MPI being assigned to one minimization. This is the best strategy when probing 
+  with each MPI being assigned to one minimization (not Emcee walker!). This is a strategy when probing 
   beyond-LCDM parameters with oscilatory behavior (e.g., Monodromic Dark Energy).
 
       mpirun -n 90 --oversubscribe --mca pml ^ucx --mca btl vader,tcp,self \
-           --bind-to core --map-by core --report-bindings --mca mpi_yield_when_idle 1 \
+          --bind-to core:overload-allowed --map-by slot --mca mpi_yield_when_idle 1 \
           python -m mpi4py.futures ./projects/example/EXAMPLE_EMUL_SCAN1.py \
-          --root ./projects/example/ --outroot "EXAMPLE_EMUL_SCAN1" --maxfeval 25000 --profile 1 
+              --root ./projects/example/ --outroot "EXAMPLE_EMUL_SCAN1" --maxfeval 25000 --profile 1 
           
-  The number of steps per Emcee walker per temperature is `maxfeval/25`.
-  Do maintain this number greater than $300$ for reliable results when $n_{\\rm param} = 7$.
-  Scale that number linearly with the parameter dimension.
+  The number of steps per Emcee walker per temperature is $n_{\\rm walker} = {\\rm maxfeval}/25$.
+  Do maintain $n_{\\rm walker} > 300$ for reliable results when the parameter dimension $n_{\\rm param} = 7$
+  and scale it linearly with $n_{\\rm param}>7$.
 
 
 # Appendix <a name="appendix"></a>
