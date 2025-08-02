@@ -255,20 +255,24 @@ Now, users must follow all the steps below.
            --bind-to core --map-by numa --report-bindings \
            cobaya-run ./projects/example/EXAMPLE_EMUL_MCMC1.yaml -f
 
+<p align="center">
+The examples below may require a large number of MPI workers. Before running them, it may be necessary to increase 
+the limit of threads that can be created (at UofA HPC type `ulimit -u 2000000`), otherwise users 
+may envounter the error `libgomp: Thread creation failed`
+</p>
+
+
 - **PolyChord**:
 
       mpirun -n 90 --oversubscribe --mca pml ^ucx --mca btl vader,tcp,self \
            --bind-to core --map-by numa --report-bindings --mca mpi_yield_when_idle 1 \
            cobaya-run ./projects/example/EXAMPLE_EMUL_POLY1.yaml -f
 
-> [!TIP]
-> Before running a job with a large number of MPI workers, it may be necessary 
-> to increase the  limit of threads that can be created (at UofA HPC type `ulimit -u 2000000`), 
-> otherwise you may face the error `libgomp: Thread creation failed`
+<p align="center">
+The `Nautilis`, `Minimizer`, `Profile`, and `Emcee` scripts below contain an internally defined `yaml_string` that specifies priors, 
+likelihoods, and the theory code, all following Cobaya Conventions. 
+</p>
 
-> [!NOTE]
-> The `Nautilis`, `Minimizer`, `Profile`, and `Emcee` scripts contain an internally defined `yaml_string` that specifies priors, 
-> likelihoods, and the theory code, all following Cobaya Conventions.  
 
 - **Nautilus**:
 
@@ -285,13 +289,12 @@ Now, users must follow all the steps below.
           python ./projects/example/EXAMPLE_EMUL_EMCEE1.py --root ./projects/example/ \
           --outroot "EXAMPLE_EMUL_EMCEE1" --maxfeval 80000 --burn_in 0.3
 
-> [!TIP]
-> The number of steps per MPI worker is `maxfeval/3nwalkers`, and the number of walkers is equal to
-> max(3x the number of parameters, number of MPI workers). It is advised for convergence that each walker 
-> walk 50 times the auto-correlation length, which is provided in the header of the output chain file. 
+  The number of steps per MPI worker is `maxfeval/3nwalkers`, and the number of walkers is equal to
+  max(3x the number of parameters, number of MPI workers). It is advised for convergence that each walker 
+  walk 50 times the auto-correlation length, which is provided in the header of the output chain file. 
 
 <p align="center">
-<img width="733" height="734" alt="Screenshot 2025-07-31 at 9 10 02 PM" src="https://github.com/user-attachments/assets/6fc4d107-e53b-41fa-8ff2-19e2166f5c92" />
+<img width="750" height="750" alt="Screenshot 2025-07-31 at 9 10 02 PM" src="https://github.com/user-attachments/assets/6fc4d107-e53b-41fa-8ff2-19e2166f5c92" />
 </p>
 
 - **Global Minimizer**:
@@ -301,9 +304,8 @@ Now, users must follow all the steps below.
           python ./projects/example/EXAMPLE_EMUL_MINIMIZE1.py --root ./projects/example/ \
           --cov 'chains/EXAMPLE_EMUL_MCMC1.covmat' --outroot "EXAMPLE_EMUL_MIN1" --maxfeval 25000
 
-> [!TIP]
-> The number of steps per MPI per temperature is `maxfeval/5NMPI`. Do maintain this number greater than $300$
-> for reliable results when $n_{\\rm param} = 7$. Scale that number linearly with the parameter dimension.
+  The number of steps per MPI per temperature is `maxfeval/5NMPI`. Do maintain this number greater than $300$
+  for reliable results when $n_{\\rm param} = 7$. Scale that number linearly with the parameter dimension.
 
 - **Profile**: 
 
@@ -314,25 +316,24 @@ Now, users must follow all the steps below.
           --outroot "EXAMPLE_EMUL_PROFILE1" --factor 3 --maxfeval 25000 --numpts 10 \
           --profile 1 --minfile="./projects/example/chains/EXAMPLE_EMUL_MIN1.txt"
 
-> [!TIP]
-> Profile provides the optional argument `minfile`; it is faster to run the profile script if the
-> user can provide the global minimum. The profile also provides the optional argument `cov`; it is significantly
-> more efficient to use a covariance matrix from a converged chain. The argument `factor` specifies
-> the start and end of the parameter being profiled:
->
->     start value ~ mininum value - factor*np.sqrt(np.diag(cov))
->     end   value ~ mininum value + factor*np.sqrt(np.diag(cov))
->
-> We advise `factor ~ 3` when a covariance matrix is provided. If `cov` is not supplied, the code estimates
-> one internally from the prior. In this case, the code imposes `factor < 1` and we suggest `factor << 1`. Finally,
-> The number of steps per MPI per temperature is `maxfeval/4NMPI`. Do maintain this number greater than $300$
-> for reliable results when $n_{\\rm param} = 7$. Scale that number linearly with the parameter dimension.
+  Profile provides the optional argument `minfile`; it is faster to run the profile script if the
+  user can provide the global minimum. The profile also provides the optional argument `cov`; it is significantly
+  more efficient to use a covariance matrix from a converged chain. The argument `factor` specifies
+  the start and end of the parameter being profiled:
+
+      start value ~ mininum value - factor*np.sqrt(np.diag(cov))
+      end   value ~ mininum value + factor*np.sqrt(np.diag(cov))
+
+  We advise `factor ~ 3` when a covariance matrix is provided. If `cov` is not supplied, the code estimates
+  one internally from the prior. In this case, the code imposes `factor < 1` and we suggest `factor << 1`. Finally,
+  The number of steps per MPI per temperature is `maxfeval/4NMPI`. Do maintain this number greater than $300$
+  for reliable results when $n_{\\rm param} = 7$. Scale that number linearly with the parameter dimension.
 
 - **Profile method 2**:
 
-  If the dimensionality of the problem is not large, and the spacing between values of the parameter
-  being profiled is small, it can be considerably faster to use a simple scipy `Nelder-Mead`
-  to calculate the profile. Here, the `minfile` and `cov` options are mandatory.
+    If the dimensionality of the problem is not large, and the spacing between values of the parameter
+    being profiled is small, it can be considerably faster to use a simple scipy `Nelder-Mead`
+    to calculate the profile. Here, the `minfile` and `cov` options are mandatory.
 
       mpirun -n 1 --oversubscribe --mca pml ^ucx --mca btl vader,tcp,self \
           --bind-to core --map-by core --report-bindings --mca mpi_yield_when_idle 1 \
@@ -343,19 +344,18 @@ Now, users must follow all the steps below.
 
 - **Scan**: 
 
-This profile code has a different MPI strategy. It scans one parameter on the entire prior,
-with each MPI being assigned to one minimization. This is the best strategy when probing 
-beyond-LCDM parameters with oscilatory behavior (e.g., Monodromic Dark Energy).
+  This profile code has a different MPI strategy. It scans one parameter on the entire prior,
+  with each MPI being assigned to one minimization. This is the best strategy when probing 
+  beyond-LCDM parameters with oscilatory behavior (e.g., Monodromic Dark Energy).
 
       mpirun -n 90 --oversubscribe --mca pml ^ucx --mca btl vader,tcp,self \
            --bind-to core --map-by core --report-bindings --mca mpi_yield_when_idle 1 \
           python -m mpi4py.futures ./projects/example/EXAMPLE_EMUL_SCAN1.py \
           --root ./projects/example/ --outroot "EXAMPLE_EMUL_SCAN1" --maxfeval 25000 --profile 1 
           
-> [!TIP]
-> The number of steps per Emcee walker per temperature is `maxfeval/25`.
-> Do maintain this number greater than $300$ for reliable results when $n_{\\rm param} = 7$.
-> Scale that number linearly with the parameter dimension.
+  The number of steps per Emcee walker per temperature is `maxfeval/25`.
+  Do maintain this number greater than $300$ for reliable results when $n_{\\rm param} = 7$.
+  Scale that number linearly with the parameter dimension.
 
 
 # Appendix <a name="appendix"></a>
