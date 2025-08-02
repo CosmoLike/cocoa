@@ -289,9 +289,10 @@ Now, users must follow all the steps below.
           python ./projects/example/EXAMPLE_EMUL_EMCEE1.py --root ./projects/example/ \
               --outroot "EXAMPLE_EMUL_EMCEE1" --maxfeval 80000 --burn_in 0.3
 
-  The number of steps per MPI worker is `maxfeval/3nwalkers`, and the number of walkers is equal to
-  max(3x the number of parameters, number of MPI workers). It is advised for convergence that each walker 
-  walk 50 times the auto-correlation length, which is provided in the header of the output chain file. 
+  The number of steps per MPI worker is $n_{\\rm steps-walker} =  {\\rm maxfeval}/n_{\\rm walker}$,
+  with the number of walkers being $n_{\\rm walker}={\\rm max}(3n_{\\rm params},n_{\\rm MPI})$.
+  For proper convergence, each walker should traverse 50 times the auto-correlation length,
+  which is provided in the header of the output chain file. 
 
 <p align="center">
 <img width="750" height="750" alt="Screenshot 2025-07-31 at 9 10 02 PM" src="https://github.com/user-attachments/assets/6fc4d107-e53b-41fa-8ff2-19e2166f5c92" />
@@ -304,8 +305,9 @@ Now, users must follow all the steps below.
           python ./projects/example/EXAMPLE_EMUL_MINIMIZE1.py --root ./projects/example/ \
               --cov 'chains/EXAMPLE_EMUL_MCMC1.covmat' --outroot "EXAMPLE_EMUL_MIN1" --maxfeval 40000
 
-  The number of steps per Emcee walker per temperature is $n_{\\rm steps-walker} = {\\rm maxfeval}/5 {\\rm max}(3n_{\\rm params},n_{\\rm MPI})$.
-  Do maintain $n_{\\rm steps-walker} > 400$ for reliable results when the parameter dimension $n_{\\rm param} = 7$
+  The number of steps per Emcee walker per temperature is $n_{\\rm sw} = {\\rm maxfeval}/5 n_{\\rm w}$,
+  and the number of walkers is $n_{\\rm w}={\\rm max}(3n_{\\rm params},n_{\\rm MPI})$.
+  Do maintain $n_{\\rm sw} > 400$ for reliable results when the parameter dimension $n_{\\rm param} = 7$
   and scale it linearly with $n_{\\rm param}>7$.
 
 - **Profile**: 
@@ -327,8 +329,9 @@ Now, users must follow all the steps below.
 
   We advise `factor ~ 3` when a covariance matrix is provided. If `cov` is not supplied, the code estimates
   one internally from the prior. In this case, the code imposes `factor < 1` and we suggest `factor << 1`.
-  Finally, the number of steps per Emcee walker per temperature is $n_{\\rm steps-walker} = {\\rm maxfeval}/4 {\\rm max}(3n_{\\rm params},n_{\\rm MPI})$.
-  Do maintain $n_{\\rm steps-walker} > 400$ for reliable results when the parameter dimension $n_{\\rm param} = 7$
+  Finally, the number of steps per Emcee walker, $n_{\\rm sw}$, per temperature is $n_{\\rm sw} = {\\rm maxfeval}/4 n_{\\rm w}$,
+  and the number of walkers is $n_{\\rm w}={\\rm max}(3n_{\\rm params},n_{\\rm MPI})$.
+  Do maintain $n_{\\rm sw} > 400$ for reliable results when the parameter dimension $n_{\\rm param} = 7$
   and scale it linearly with $n_{\\rm param}>7$.
 
 - **Profile method 2**:
@@ -355,9 +358,9 @@ Now, users must follow all the steps below.
           python -m mpi4py.futures ./projects/example/EXAMPLE_EMUL_SCAN1.py \
               --root ./projects/example/ --outroot "EXAMPLE_EMUL_SCAN1" --maxfeval 40000 --profile 1 
           
-  The number of steps per Emcee walker per temperature is $n_{\\rm walker} = {\\rm maxfeval}/15n_{\\rm params}$.
-  Do maintain $n_{\\rm steps-walker} > 400$ for reliable results when the parameter dimension $n_{\\rm param} = 7$
-  and scale it linearly with $n_{\\rm param}>7$.
+  The number of steps per Emcee walker, $n_{\\rm sw}$, per temperature is $n_{\\rm sw} = {\\rm maxfeval}/5 n_{\\rm w}$,
+  and the number of walkers is $n_{\\rm w}={\\rm max}(3n_{\\rm params},n_{\\rm MPI})$. Do maintain $n_{\\rm steps-walker} > 400$
+  for reliable results when the parameter dimension $n_{\\rm param} = 7$ and scale it linearly with $n_{\\rm param}>7$.
 
 
 # Appendix <a name="appendix"></a>
