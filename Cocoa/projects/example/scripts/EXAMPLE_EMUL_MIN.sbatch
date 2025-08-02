@@ -1,7 +1,7 @@
 #!/bin/bash
 
-#SBATCH --job-name=PROF1
-#SBATCH --output=PROF1-%A-%a.out
+#SBATCH --job-name=MIN1
+#SBATCH --output=MIN1-%A-%a.out
 #SBATCH --nodes=1
 #SBATCH --ntasks=14
 #SBATCH --ntasks-per-node=14
