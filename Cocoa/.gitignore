@@ -167,6 +167,8 @@ external_modules/code/nautilus*
 external_modules/code/derivkit
 external_modules/code/deri*
 external_modules/code/tensiometer
+/external_modules/code/getdist
+/external_modules/code/getdist*
 
 cobaya/cobaya/likelihoods/XXX
 cobaya/cobaya/likelihoods/des_y1

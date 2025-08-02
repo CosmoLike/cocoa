@@ -2,7 +2,7 @@
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
-if [ -z "${IGNORE_TENSIOMETER_CODE}" ]; then
+if [ -z "${IGNORE_GETDIST_CODE}" ]; then
 
   if [ -z "${ROOTDIR}" ]; then
     source start_cocoa.sh || { pfail 'ROOTDIR'; return 1; }
@@ -54,15 +54,15 @@ if [ -z "${IGNORE_TENSIOMETER_CODE}" ]; then
   # E = EXTERNAL, CODE, F=FODLER
   ECODEF="${ROOTDIR:?}/external_modules/code"
 
-  URL="${TENSIOMETER_URL:-"https://github.com/mraveri/tensiometer.git"}"
+  URL="${GETDIST_URL:-"https://github.com/SBU-COSMOLIKE/getdist.git"}"
   
-  FOLDER="${TENSIOMETER_NAME:-"tensiometer"}"
+  FOLDER="${GETDIST_NAME:-"getdist"}"
 
   PACKDIR="${ECODEF:?}/${FOLDER:?}"
   
-  ptop "INSTALLING TENSIOMETER" || return 1;
+  ptop "INSTALLING GETDIST" || return 1;
 
-  if [ -n "${OVERWRITE_EXISTING_TENSIOMETER_CODE}" ]; then
+  if [ -n "${OVERWRITE_EXISTING_GETDIST_CODE}" ]; then
     rm -rf "${PACKDIR:?}"
   fi
 
@@ -74,15 +74,15 @@ if [ -z "${IGNORE_TENSIOMETER_CODE}" ]; then
   
     cdfolder "${PACKDIR:?}" || { cdroot; return 1; }
 
-    if [ -n "${TENSIOMETER_GIT_COMMIT}" ]; then
-      "${GIT:?}" checkout "${TENSIOMETER_GIT_COMMIT:?}" \
+    if [ -n "${GETDIST_GIT_COMMIT}" ]; then
+      "${GIT:?}" checkout "${GETDIST_GIT_COMMIT:?}" \
         >${OUT1:?} 2>${OUT2:?} || { error "${EC16:?}"; return 1; }
     fi  
   fi
   
   cdfolder "${ROOTDIR}" || return 1
   
-  pbottom "INSTALLING TENSIOMETER" || return 1
+  pbottom "INSTALLING GETDIST" || return 1
 
   # ---------------------------------------------------------------------------
 
