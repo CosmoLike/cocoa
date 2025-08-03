@@ -296,7 +296,6 @@ Now, users must follow all the steps below.
   which is provided in the header of the output chain file. 
 
   The script of the plot below is provided at `projects/example/script/EXAMPLE_PLOT_COMPARE_CHAINS.py`
-
 <p align="center">
 <img width="750" height="750" alt="Screenshot 2025-08-03 at 4 19 17 PM" src="https://github.com/user-attachments/assets/5badda55-2152-4520-a358-cc4d6c517ac9" />
 </p>
@@ -313,6 +312,7 @@ Now, users must follow all the steps below.
   Do maintain $n_{\\rm sw} > 200$ for reliable results when the parameter dimension $n_{\\rm params} = 7$ (see plot below)
   and scale it linearly with $n_{\\rm params}>7$. The same rule applies to *Profile* and *Scan* codes, as they are all based on the same minimization strategy.
 
+  The script of the plot below is provided at `projects/example/script/EXAMPLE_MIN_COMPARE_CONV.py`
 <p align="center">
 <img width="700" height="470" alt="Screenshot 2025-08-03 at 4 18 19 PM" src="https://github.com/user-attachments/assets/d9e52323-165c-4f5b-8837-c99db191ea33" />
 </p>
@@ -357,6 +357,12 @@ Now, users must follow all the steps below.
               --root ./projects/example/ --cov 'chains/EXAMPLE_EMUL_MCMC1.covmat' \
               --outroot "EXAMPLE_EMUL_PROFILE1M2" --factor 3 --maxfeval 5000 --numpts 10 \
               --profile 1 --minfile="./projects/example/chains/EXAMPLE_EMUL_MIN1.txt"
+
+     The script of the plot below is provided at `projects/example/script/EXAMPLE_PLOT_PROFILE1_COMP.py`
+  
+<p align="center">
+<img width="1156" height="858" alt="Screenshot 2025-08-03 at 5 08 04 PM" src="https://github.com/user-attachments/assets/ba0c0629-bd3b-4274-9f24-9db5929dc35c" />
+</p>
 
 - **Scan**: 
 
