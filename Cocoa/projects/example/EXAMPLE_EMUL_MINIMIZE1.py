@@ -377,7 +377,7 @@ if __name__ == '__main__':
         names = names+list(model.info()['likelihood'].keys())+["prior"]+["chi2"]
         np.savetxt(f"{args.root}chains/{args.outroot}.txt", 
                    xf,
-                   fmt="%.6e",
+                   fmt="%.7e",
                    header=f"maxfeval={args.maxfeval}\n"+' '.join(names),
                    comments="# ")
 # ------------------------------------------------------------------------------
