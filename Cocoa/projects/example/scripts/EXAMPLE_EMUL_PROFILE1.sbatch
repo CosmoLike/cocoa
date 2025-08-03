@@ -33,6 +33,6 @@ mpirun -n ${SLURM_NTASKS} --oversubscribe --mca pml ^ucx --mca btl vader,tcp,sel
   --map-by slot:pe=${OMP_NUM_THREADS} --mca mpi_yield_when_idle 1 \
   python ./projects/example/EXAMPLE_EMUL_PROFILE1.py \
     --root ./projects/example/ --cov 'chains/EXAMPLE_EMUL_MCMC1.covmat' \
-    --outroot "EXAMPLE_EMUL_PROFILE1" --factor 3 --maxfeval 28000 --numpts 10 \
+    --outroot "EXAMPLE_EMUL_PROFILE1" --factor 3 --maxfeval 18500 --numpts 10 \
     --profile ${SLURM_ARRAY_TASK_ID} \
     --minfile="./projects/example/chains/EXAMPLE_EMUL_MIN1.txt"
