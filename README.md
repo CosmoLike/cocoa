@@ -358,6 +358,12 @@ Now, users must follow all the steps below.
               --outroot "EXAMPLE_EMUL_PROFILE1M2" --factor 3 --maxfeval 5000 --numpts 10 \
               --profile 1 --minfile="./projects/example/chains/EXAMPLE_EMUL_MIN1.txt"
 
+     The script of the plot below is provided at `projects/example/script/EXAMPLE_PLOT_PROFILE1_COMP.py`
+  
+<p align="center">
+<img width="900" height="700" alt="Screenshot 2025-08-03 at 5 04 37 PM" src="https://github.com/user-attachments/assets/45a88846-7652-4687-981b-238c1f7515b8" />
+</p>
+
 - **Scan**: 
 
   This profile code has a different MPI strategy. It scans one parameter on the entire prior,
