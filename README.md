@@ -294,6 +294,8 @@ Now, users must follow all the steps below.
   For proper convergence, each walker should traverse 50 times the auto-correlation length,
   which is provided in the header of the output chain file. 
 
+  The script of the plot below is provided at `projects/example/script/EXAMPLE_PLOT_COMPARE_CHAINS.py`
+  
 <p align="center">
 <img width="750" height="750" alt="Screenshot 2025-07-31 at 9 10 02 PM" src="https://github.com/user-attachments/assets/6fc4d107-e53b-41fa-8ff2-19e2166f5c92" />
 </p>
@@ -334,6 +336,8 @@ Now, users must follow all the steps below.
   Do maintain $n_{\\rm sw} > 400$ for reliable results when the parameter dimension $n_{\\rm params} = 7$
   and scale it linearly with $n_{\\rm params}>7$.
 
+  The script of the plot below is provided at `projects/example/script/EXAMPLE_PLOT_PROFILE1.py`
+  
 <p align="center">
 <img width="1156" height="858" alt="Screenshot 2025-08-02 at 8 42 41 PM" src="https://github.com/user-attachments/assets/22182688-2865-4b15-a80b-783ddd21f715" />
 </p>
