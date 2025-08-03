@@ -334,6 +334,10 @@ Now, users must follow all the steps below.
   Do maintain $n_{\\rm sw} > 400$ for reliable results when the parameter dimension $n_{\\rm params} = 7$
   and scale it linearly with $n_{\\rm params}>7$.
 
+<p align="center">
+<img width="1156" height="858" alt="Screenshot 2025-08-02 at 8 42 41 PM" src="https://github.com/user-attachments/assets/22182688-2865-4b15-a80b-783ddd21f715" />
+</p>
+
 - **Profile method 2**:
 
     If the dimensionality of the problem is not large, and the spacing between values of the parameter
