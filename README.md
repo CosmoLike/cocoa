@@ -361,7 +361,7 @@ Now, users must follow all the steps below.
      The script of the plot below is provided at `projects/example/script/EXAMPLE_PLOT_PROFILE1_COMP.py`
   
 <p align="center">
-<img width="900" height="700" alt="Screenshot 2025-08-03 at 5 04 37 PM" src="https://github.com/user-attachments/assets/45a88846-7652-4687-981b-238c1f7515b8" />
+<img width="1156" height="858" alt="Screenshot 2025-08-03 at 5 08 04 PM" src="https://github.com/user-attachments/assets/ba0c0629-bd3b-4274-9f24-9db5929dc35c" />
 </p>
 
 - **Scan**: 
