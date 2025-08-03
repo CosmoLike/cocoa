@@ -1,5 +1,6 @@
-
+<p align="center">
 <img width="780" alt="Screenshot 2024-09-16 at 10 55 14 PM" src="https://github.com/user-attachments/assets/f327e3bf-22c7-46e4-9bb5-14c8e7afc4c1">
+</p>
 
 # Table of contents
 1. [Overview](#overview) 
@@ -296,9 +297,9 @@ Now, users must follow all the steps below.
   which is provided in the header of the output chain file. 
 
   The script of the plot below is provided at `projects/example/script/EXAMPLE_PLOT_COMPARE_CHAINS.py`
-  
+
 <p align="center">
-<img width="750" height="750" alt="Screenshot 2025-07-31 at 9 10 02 PM" src="https://github.com/user-attachments/assets/6fc4d107-e53b-41fa-8ff2-19e2166f5c92" />
+<img width="750" height="750" alt="Screenshot 2025-08-03 at 4 19 17 PM" src="https://github.com/user-attachments/assets/5badda55-2152-4520-a358-cc4d6c517ac9" />
 </p>
 
 - **Global Minimizer**:
@@ -314,7 +315,7 @@ Now, users must follow all the steps below.
   and scale it linearly with $n_{\\rm params}>7$.
 
 <p align="center">
-<img width="1008" height="670" alt="Screenshot 2025-08-03 at 4 16 06 PM" src="https://github.com/user-attachments/assets/81e4f8c4-9eaf-4800-954f-b21153336f62" />
+<img width="700" height="470" alt="Screenshot 2025-08-03 at 4 18 19 PM" src="https://github.com/user-attachments/assets/d9e52323-165c-4f5b-8837-c99db191ea33" />
 </p>
 
 - **Profile**: 
