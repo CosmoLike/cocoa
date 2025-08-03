@@ -314,7 +314,7 @@ Now, users must follow all the steps below.
   and scale it linearly with $n_{\\rm params}>7$.
 
 <p align="center">
-<img width="1680" height="1116" alt="Screenshot 2025-08-03 at 4 16 06 PM" src="https://github.com/user-attachments/assets/81e4f8c4-9eaf-4800-954f-b21153336f62" />
+<img width="1008" height="670" alt="Screenshot 2025-08-03 at 4 16 06 PM" src="https://github.com/user-attachments/assets/81e4f8c4-9eaf-4800-954f-b21153336f62" />
 </p>
 
 - **Profile**: 
