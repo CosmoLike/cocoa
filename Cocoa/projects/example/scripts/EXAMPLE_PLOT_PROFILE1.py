@@ -5,6 +5,7 @@ import numpy as np
 import matplotlib
 import matplotlib.pyplot as plt
 import matplotlib.gridspec as gridspec
+import math
 
 # GENERAL PLOT OPTIONS
 matplotlib.rcParams['mathtext.fontset'] = 'stix'
@@ -45,6 +46,7 @@ ax = [fig.add_subplot(gs_top[0, i]) for i in range(4)]
 gs_bottom = gridspec.GridSpecFromSubplotSpec(1,3,subplot_spec=outer_gs[1], wspace=0.35)
 ax += [fig.add_subplot(gs_bottom[0, i]) for i in range(3)]
 
+
 # --------------------------------------------------------------------------------
 # --------------------------------------------------------------------------------
 # --------------------------------------------------------------------------------
@@ -60,19 +62,58 @@ for i in range(7):
         data[:,0] = 100*data[:,0]
     if i == 3:
         data[:,0] = 10*data[:,0]
-    x = data[:, 0]
-    y = data[:, 1]-(data[:, -1])
+    x  = data[:, 0]
+    y  = data[:, 1]-np.min(data[:,1])
 
     ax[i].plot(x, y, 
                marker='D',c='black', linestyle='None', markersize=4,
                alpha=1.0,lw=1.0,
                label=params[i])
     
+    # fit a parabola
     coeffs = np.polyfit(x, y, deg=2)
     xfit = np.linspace(np.min(x), np.max(x), 300)
     yfit = np.polyval(coeffs, xfit)
     ax[i].plot(xfit, yfit, color='blue', lw=1.5, alpha=0.7, label='Parabola fit')
+    
+    # get 1σ, 2σ and 3σ - print as vertical lines
+    sigma_lines = {}
+    for y0 in [1, 4, 9]:
+        a, b, c = coeffs
+        roots = np.roots([a, b, c - y0])
+        real_roots = [np.real(r) for r in roots if np.isreal(r)]
+        if len(real_roots) == 2:
+            sigma_lines[y0] = sorted(real_roots)
+            for r in real_roots:
+                ax[i].axvline(x=r, 
+                              linestyle='--', 
+                              color='grey', 
+                              alpha=0.5, 
+                              lw=1.0)
+    # Build annotation text
+    label_map = {1: "1σ", 4: "2σ", 9: "3σ"}
+    text_lines = []
+    # difits adapt to xscale
+    xrange = x[-1] - x[0]
+    precision = max(0, int(-math.floor(math.log10(xrange))) + 1)
+    for y0 in [1, 4, 9]:
+        if y0 in sigma_lines:
+            lo, hi = sigma_lines[y0]
+            text_lines.append(f"{label_map[y0]}: [{lo:.{precision}f}, {hi:.{precision}f}]")
+           
 
+    # print their values
+    textstr = "\n".join(text_lines)
+    ax[i].text(
+        0.5, 0.90, textstr,
+        transform=ax[i].transAxes,
+        fontsize=11,
+        va='top', ha='center',
+        bbox=dict(boxstyle="round", 
+                  facecolor='white', 
+                  alpha=0.8, 
+                  edgecolor='black')
+    )
 
     ax[i].grid(True)
     ax[i].grid(True, which='minor', color='black',
