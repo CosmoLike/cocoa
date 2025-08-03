@@ -493,7 +493,7 @@ This is a large image with a size of approximately 16GB, as it already contains 
  **Step :three:**: As shown in the picture below, users can follow the instructions provided in Section [Running Examples](#cobaya_base_code_examples) to run a few non-cosmolike-based examples, as well as examples within `LSST-Y1`, `ROMAN_REAL`, and `ROMAN_FOURIER` projects. 
 
 <p align="center">
-![screenshot_2025-06-02_at_7 23 48_pm](https://github.com/user-attachments/assets/2b15ce75-3d43-4a65-ab7b-e70077492b32)
+<img width="1156" height="858" alt="screenshot_2025-06-02_at_7 23 48_pm" src="https://github.com/user-attachments/assets/2b15ce75-3d43-4a65-ab7b-e70077492b32" />
 </p>
 
 > [!TIP]
