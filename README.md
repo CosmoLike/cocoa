@@ -312,7 +312,7 @@ Now, users must follow all the steps below.
   The number of steps per Emcee walker per temperature is $n_{\\rm sw} = {\\rm maxfeval}/5 n_{\\rm w}$,
   and the number of walkers is $n_{\\rm w}={\\rm max}(3n_{\\rm params},n_{\\rm MPI})$.
   Do maintain $n_{\\rm sw} > 200$ for reliable results when the parameter dimension $n_{\\rm params} = 7$ (see plot below)
-  and scale it linearly with $n_{\\rm params}>7$.
+  and scale it linearly with $n_{\\rm params}>7$. The same rule applies to *Profile* and *Scan* codes, as they are all based on the same minimization strategy.
 
 <p align="center">
 <img width="700" height="470" alt="Screenshot 2025-08-03 at 4 18 19 PM" src="https://github.com/user-attachments/assets/d9e52323-165c-4f5b-8837-c99db191ea33" />
@@ -339,8 +339,6 @@ Now, users must follow all the steps below.
   one internally from the prior. In this case, the code imposes `factor < 1` and we suggest `factor << 1`.
   Finally, the number of steps per Emcee walker, $n_{\\rm sw}$, per temperature is $n_{\\rm sw} = {\\rm maxfeval}/4 n_{\\rm w}$,
   and the number of walkers is $n_{\\rm w}={\\rm max}(3n_{\\rm params},n_{\\rm MPI})$.
-  Do maintain $n_{\\rm sw} > 200$ for reliable results when the parameter dimension $n_{\\rm params} = 7$
-  and scale it linearly with $n_{\\rm params}>7$.
 
   The script of the plot below is provided at `projects/example/script/EXAMPLE_PLOT_PROFILE1.py`
   
@@ -373,8 +371,7 @@ Now, users must follow all the steps below.
               --root ./projects/example/ --outroot "EXAMPLE_EMUL_SCAN1" --maxfeval 28000 --profile 1 
           
   The number of steps per Emcee walker, $n_{\\rm sw}$, per temperature is $n_{\\rm sw} = {\\rm maxfeval}/5 n_{\\rm w}$,
-  and the number of walkers is $n_{\\rm w}=3n_{\\rm params}$. Do maintain $n_{\\rm sw} > 200$
-  for reliable results when the parameter dimension $n_{\\rm params} = 7$ and scale it linearly with $n_{\\rm params}>7$.
+  and the number of walkers is $n_{\\rm w}=3n_{\\rm params}$.
 
 - **Tension Metrics**
 
