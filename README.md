@@ -368,7 +368,7 @@ Now, users must follow all the steps below.
               --root ./projects/example/ --outroot "EXAMPLE_EMUL_SCAN1" --maxfeval 40000 --profile 1 
           
   The number of steps per Emcee walker, $n_{\\rm sw}$, per temperature is $n_{\\rm sw} = {\\rm maxfeval}/5 n_{\\rm w}$,
-  and the number of walkers is $n_{\\rm w}={\\rm max}(3n_{\\rm params},n_{\\rm MPI})$. Do maintain $n_{\\rm sw} > 400$
+  and the number of walkers is $n_{\\rm w}=3n_{\\rm params}$. Do maintain $n_{\\rm sw} > 400$
   for reliable results when the parameter dimension $n_{\\rm params} = 7$ and scale it linearly with $n_{\\rm params}>7$.
 
 - **Tension Metrics**
