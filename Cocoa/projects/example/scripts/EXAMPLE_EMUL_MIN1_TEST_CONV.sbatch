@@ -33,6 +33,6 @@ declare -i maxfeval=$((5000+5*$SLURM_ARRAY_TASK_ID))
 mpirun -n ${SLURM_NTASKS} --oversubscribe --mca pml ^ucx --mca btl vader,tcp,self \
   --bind-to core:overload-allowed --rank-by slot \
   --map-by slot:pe=${OMP_NUM_THREADS} --mca mpi_yield_when_idle 1 \
-  python ./projects/example/EXAMPLE_EMUL_MINIMIZE${SLURM_ARRAY_TASK_ID}.py \
+  python ./projects/example/EXAMPLE_EMUL_MINIMIZE1.py \
     --root ./projects/example/ --cov "chains/EXAMPLE_EMUL_MCMC1.covmat" \
     --outroot "EXAMPLE_EMUL_MIN_TEST_CONV${OMP_NUM_THREADS}" --maxfeval ${maxfeval}
