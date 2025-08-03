@@ -33,6 +33,11 @@ else
   export OMP_NUM_THREADS=1
 fi
 
+mkdir -p "${ROOTDIR:?}/projects/example/chains/TM/PANTHEON"
+mkdir -p "${ROOTDIR:?}/projects/example/chains/TM/PANTHEONPLUS"
+mkdir -p "${ROOTDIR:?}/projects/example/chains/TM/DESY5"
+mkdir -p "${ROOTDIR:?}/projects/example/chains/TM/UNION3"
+
 # MCMC REQUIRED FOR TENSION METRICS ON `EXAMPLE_TENSION_METRICS.ipynb`
 declare -a YAML=( "EXAMPLE_EMUL_MCMC1.yaml" 
                   "EXAMPLE_EMUL_MCMC2.yaml" 
