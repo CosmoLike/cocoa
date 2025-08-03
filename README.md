@@ -306,12 +306,16 @@ Now, users must follow all the steps below.
       mpirun -n 21 --oversubscribe --mca pml ^ucx --mca btl vader,tcp,self --rank-by slot \
           --bind-to core:overload-allowed --map-by slot --mca mpi_yield_when_idle 1 \
           python ./projects/example/EXAMPLE_EMUL_MINIMIZE1.py --root ./projects/example/ \
-              --cov 'chains/EXAMPLE_EMUL_MCMC1.covmat' --outroot "EXAMPLE_EMUL_MIN1" --maxfeval 40000
+              --cov 'chains/EXAMPLE_EMUL_MCMC1.covmat' --outroot "EXAMPLE_EMUL_MIN1" --maxfeval 28000
 
   The number of steps per Emcee walker per temperature is $n_{\\rm sw} = {\\rm maxfeval}/5 n_{\\rm w}$,
   and the number of walkers is $n_{\\rm w}={\\rm max}(3n_{\\rm params},n_{\\rm MPI})$.
-  Do maintain $n_{\\rm sw} > 400$ for reliable results when the parameter dimension $n_{\\rm params} = 7$
+  Do maintain $n_{\\rm sw} > 250$ for reliable results when the parameter dimension $n_{\\rm params} = 7$ (see plot below)
   and scale it linearly with $n_{\\rm params}>7$.
+
+<p align="center">
+<img width="1435" height="967" alt="Screenshot 2025-08-03 at 4 12 09 PM" src="https://github.com/user-attachments/assets/e3f24686-36d0-4655-80aa-376f024c4335" />
+</p>
 
 - **Profile**: 
 
@@ -319,7 +323,7 @@ Now, users must follow all the steps below.
           --bind-to core:overload-allowed --map-by slot --mca mpi_yield_when_idle 1 \
           python ./projects/example/EXAMPLE_EMUL_PROFILE1.py \
               --root ./projects/example/ --cov 'chains/EXAMPLE_EMUL_MCMC1.covmat' \
-              --outroot "EXAMPLE_EMUL_PROFILE1" --factor 3 --maxfeval 35000 --numpts 10 \
+              --outroot "EXAMPLE_EMUL_PROFILE1" --factor 3 --maxfeval 28000 --numpts 10 \
               --profile 1 --minfile="./projects/example/chains/EXAMPLE_EMUL_MIN1.txt"
 
   Profile provides the optional argument `minfile`, as it is significantly faster to run the profile script with a previously provided global minimum. 
@@ -334,7 +338,7 @@ Now, users must follow all the steps below.
   one internally from the prior. In this case, the code imposes `factor < 1` and we suggest `factor << 1`.
   Finally, the number of steps per Emcee walker, $n_{\\rm sw}$, per temperature is $n_{\\rm sw} = {\\rm maxfeval}/4 n_{\\rm w}$,
   and the number of walkers is $n_{\\rm w}={\\rm max}(3n_{\\rm params},n_{\\rm MPI})$.
-  Do maintain $n_{\\rm sw} > 400$ for reliable results when the parameter dimension $n_{\\rm params} = 7$
+  Do maintain $n_{\\rm sw} > 250$ for reliable results when the parameter dimension $n_{\\rm params} = 7$
   and scale it linearly with $n_{\\rm params}>7$.
 
   The script of the plot below is provided at `projects/example/script/EXAMPLE_PLOT_PROFILE1.py`
@@ -365,10 +369,10 @@ Now, users must follow all the steps below.
       mpirun -n 90 --oversubscribe --mca pml ^ucx --mca btl vader,tcp,self \
           --bind-to core:overload-allowed --map-by slot --mca mpi_yield_when_idle 1 \
           python -m mpi4py.futures ./projects/example/EXAMPLE_EMUL_SCAN1.py \
-              --root ./projects/example/ --outroot "EXAMPLE_EMUL_SCAN1" --maxfeval 40000 --profile 1 
+              --root ./projects/example/ --outroot "EXAMPLE_EMUL_SCAN1" --maxfeval 28000 --profile 1 
           
   The number of steps per Emcee walker, $n_{\\rm sw}$, per temperature is $n_{\\rm sw} = {\\rm maxfeval}/5 n_{\\rm w}$,
-  and the number of walkers is $n_{\\rm w}=3n_{\\rm params}$. Do maintain $n_{\\rm sw} > 400$
+  and the number of walkers is $n_{\\rm w}=3n_{\\rm params}$. Do maintain $n_{\\rm sw} > 250$
   for reliable results when the parameter dimension $n_{\\rm params} = 7$ and scale it linearly with $n_{\\rm params}>7$.
 
 - **Tension Metrics**
