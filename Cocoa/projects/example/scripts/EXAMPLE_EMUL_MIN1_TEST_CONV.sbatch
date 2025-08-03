@@ -28,11 +28,11 @@ source start_cocoa.sh
 export OMP_NUM_THREADS=1
 ulimit -u 2000000 # require line when nmpi is high
 
-declare -i maxfeval=$((5000+5*$SLURM_ARRAY_TASK_ID))
+declare -i maxfeval=$((5000+5000*$SLURM_ARRAY_TASK_ID))
 
 mpirun -n ${SLURM_NTASKS} --oversubscribe --mca pml ^ucx --mca btl vader,tcp,self \
   --bind-to core:overload-allowed --rank-by slot \
   --map-by slot:pe=${OMP_NUM_THREADS} --mca mpi_yield_when_idle 1 \
   python ./projects/example/EXAMPLE_EMUL_MINIMIZE1.py \
     --root ./projects/example/ --cov "chains/EXAMPLE_EMUL_MCMC1.covmat" \
-    --outroot "EXAMPLE_EMUL_MIN_TEST_CONV${OMP_NUM_THREADS}" --maxfeval ${maxfeval}
+    --outroot "EXAMPLE_EMUL_MIN_TEST_CONV${SLURM_ARRAY_TASK_ID}" --maxfeval ${maxfeval}
