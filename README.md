@@ -275,7 +275,6 @@ Now, users must follow all the steps below.
 > The `Nautilis`, `Minimizer`, `Profile`, and `Emcee` scripts below contain an internally defined `yaml_string` that specifies priors, 
 > likelihoods, and the theory code, all following Cobaya Conventions.
 
-
 - **Nautilus**:
 
       mpirun -n 90 --oversubscribe --mca pml ^ucx --mca btl vader,tcp,self --rank-by slot \
@@ -399,7 +398,7 @@ Now, users must follow all the steps below.
 
   - Profs. Tim Eifler and Elisabeth Krause for their support of this idea since its inception in 2019 and all Cosmolike-related development.
   - Profs. Antony Lewis and Jesús Torrado for helping me understand Cobaya since its early days in 2019.
-  - Jonathan Gordon, João Rebouças, Evan Saraivanov, Diogo Souza, Jiachuan Xu, Yijie Zhu, and KunHao Zhong for working on CoCoA on many fruitful projects at Stony Brook Univ. and the Univ. of Arizona.
+  - Jonathan Gordon, Joshua Kable, João Rebouças, Evan Saraivanov, Diogo Souza, Jiachuan Xu, Yijie Zhu, and KunHao Zhong for working on CoCoA on many fruitful projects at Stony Brook Univ. and the Univ. of Arizona.
   - Evan Saraivanov, Yijie Zhu, and KunHao Zhong for developing the emulator interface within the CoCoA framework.
   - Haley Bowden, Kali Cao, and members of the Roman HLIS Cosmology PIT for all Roman-specific development and testing.
 
