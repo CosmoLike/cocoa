@@ -1,6 +1,6 @@
 #!/bin/bash
 
-#SBATCH --job-name=PROF1
+#SBATCH --job-name=PROF1M2
 #SBATCH --output=PROF1-%A.out
 #SBATCH --nodes=1
 #SBATCH --ntasks=1
