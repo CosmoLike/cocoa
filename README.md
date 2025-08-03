@@ -222,6 +222,7 @@ Cocoa contains a few transformer-based neural network emulators capable of simul
       #export IGNORE_NAUTILUS_SAMPLER_CODE=1     # to run PROJECTS/EXAMPLE/EXAMPLE_EMUL_NAUTILUS1.py
       #export IGNORE_POLYCHORD_SAMPLER_CODE=1    # to run PROJECTS/EXAMPLE/EXAMPLE_EMUL_POLY1.yaml
       #export IGNORE_GETDIST_CODE=1              # to run EXAMPLE_TENSION_METRICS.ipynb
+      #export IGNORE_TENSIOMETER_CODE=1          # to run EXAMPLE_TENSION_METRICS.ipynb
       
 > [!TIP]
 > What if users have not configured ML-related keys before sourcing `setup_cocoa.sh`?
@@ -370,6 +371,21 @@ Now, users must follow all the steps below.
   and the number of walkers is $n_{\\rm w}={\\rm max}(3n_{\\rm params},n_{\\rm MPI})$. Do maintain $n_{\\rm sw} > 400$
   for reliable results when the parameter dimension $n_{\\rm params} = 7$ and scale it linearly with $n_{\\rm params}>7$.
 
+- **Tension Metrics**
+
+    We provide the Jupyter Notebook and the SLURM script, located at
+
+      projects/example/EXAMPLE_EMUL_MCMC_TENSION_METRICS/EXAMPLE_TENSION_METRICS.ipynb
+      projects/example/scripts/EXAMPLE_EMUL_TM.sbatch
+
+    that exemplifies how emulators can be used to quickly assess the tension between data sets.
+    All Tension metrics were computed using the package `Tensiometer`.
+
+    The plot below, taken from `EXAMPLE_TENSION_METRICS.ipynb`, exemplifies the tension between CMB+BAO vs. Type Ia SN.
+
+<p align="center">
+<img width="790" height="333" alt="Unknown" src="https://github.com/user-attachments/assets/b5ef808e-0efa-4bb9-852a-854f6531e3ed" />
+</p>
 
 # Appendix <a name="appendix"></a>
 
