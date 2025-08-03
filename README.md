@@ -393,7 +393,7 @@ Now, users must follow all the steps below.
 
   The entire CoCoA team is deeply grateful to everyone who has contributed to the development of our code.
 
-  Special Thanks to the junior members:
+  **Special Thanks to:**
 
   - Profs. Tim Eifler and Elisabeth Krause for their support of this idea since its inception in 2019 and all Cosmolike-related development.
   - Profs. Antony Lewis and Jesús Torrado for helping me understand Cobaya since its early days in 2019.
