@@ -1,4 +1,5 @@
 import warnings
+import os
 from sklearn.exceptions import InconsistentVersionWarning
 warnings.filterwarnings("ignore", category=InconsistentVersionWarning)
 warnings.filterwarnings(
@@ -372,6 +373,7 @@ if __name__ == '__main__':
         # 4th Save output file -------------------------------------------------
         names = list(model.parameterization.sampled_params().keys()) # Cobaya Call
         names = names+list(model.info()['likelihood'].keys())+["prior"]+["chi2"]
+        os.makedirs(os.path.dirname(f"{args.root}chains/"),exist_ok=True)
         np.savetxt(f"{args.root}chains/{args.outroot}.txt", 
                    xf,
                    fmt="%.7e",

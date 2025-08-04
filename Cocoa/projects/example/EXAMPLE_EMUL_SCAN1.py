@@ -1,4 +1,5 @@
 import warnings
+import os
 from sklearn.exceptions import InconsistentVersionWarning
 warnings.filterwarnings("ignore", category=InconsistentVersionWarning)
 warnings.filterwarnings(
@@ -427,6 +428,7 @@ if __name__ == '__main__':
     #7th: Save output file -----------------------------------------------------   
     hd = [names[index], "chi2"]+['H0', 'omegam']
     hd = hd + list(model.info()['likelihood'].keys()) + ["prior"]
+    os.makedirs(os.path.dirname(f"{args.root}chains/"),exist_ok=True)
     np.savetxt(f"{args.root}chains/{args.outroot}.{names[index]}.txt",
                np.concatenate([np.c_[param, chi2res], xf],axis=1),
                fmt="%.6e",

@@ -1,4 +1,5 @@
 import warnings
+import os
 from sklearn.exceptions import InconsistentVersionWarning
 warnings.filterwarnings("ignore", category=InconsistentVersionWarning)
 warnings.filterwarnings(
@@ -289,6 +290,7 @@ if __name__ == '__main__':
     points, log_w, log_l = sampler.posterior()
     
     # Save output file ---------------------------------------------------------
+    os.makedirs(os.path.dirname(f"{args.root}chains/"),exist_ok=True)
     np.savetxt(f"{args.root}chains/{args.outroot}.1.txt",
                np.column_stack((np.exp(log_w), log_l, points, -2*log_l)),
                fmt="%.5e",

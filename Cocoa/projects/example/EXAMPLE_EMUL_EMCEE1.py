@@ -1,4 +1,5 @@
 import warnings
+import os
 from sklearn.exceptions import InconsistentVersionWarning
 warnings.filterwarnings("ignore", category=InconsistentVersionWarning)
 warnings.filterwarnings(
@@ -359,6 +360,7 @@ if __name__ == '__main__':
 
         # saving file begins ---------------------------------------------------
         header=f"nwalkers={nwalkers}, maxfeval={args.maxfeval}, max tau={res[1]}\n"
+        os.makedirs(os.path.dirname(f"{args.root}chains/"),exist_ok=True)
         np.savetxt(f"{args.root}chains/{args.outroot}.1.txt",
                    res[0],
                    fmt="%.5e",

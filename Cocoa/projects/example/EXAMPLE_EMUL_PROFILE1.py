@@ -1,4 +1,5 @@
 import warnings
+import os
 from sklearn.exceptions import InconsistentVersionWarning
 warnings.filterwarnings("ignore", category=InconsistentVersionWarning)
 warnings.filterwarnings(
@@ -515,6 +516,7 @@ if __name__ == '__main__':
 
         # 9th Save output file -------------------------------------------------    
         comment = [names[args.profile],"chi2"]+names+["rdrag"]+list(model.info()['likelihood'].keys())+["prior"]
+        os.makedirs(os.path.dirname(f"{args.root}chains/"),exist_ok=True)
         np.savetxt(f"{args.root}chains/{args.outroot}.{names[args.profile]}.txt",
                    np.concatenate([np.c_[param,chi2res],xf],axis=1),
                    fmt="%.6e",
