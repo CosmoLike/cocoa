@@ -374,8 +374,8 @@ if __name__ == '__main__':
     start  = np.zeros(model.prior.d(), dtype='float64')
     stop   = np.zeros(model.prior.d(), dtype='float64')
     for i in range(model.prior.d()):
-      start[i] = 1.05*bounds[i][0]
-      stop[i]  = 0.95*bounds[i][1]
+      start[i] = bounds[i][0]
+      stop[i]  = bounds[i][1]
     param = np.linspace(start = start[index], 
                         stop  = stop[index], 
                         num   = numpts)

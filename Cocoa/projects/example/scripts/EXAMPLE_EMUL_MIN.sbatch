@@ -37,4 +37,4 @@ mpirun -n ${SLURM_NTASKS} --oversubscribe --mca pml ^ucx --mca btl vader,tcp,sel
   --map-by slot:pe=${OMP_NUM_THREADS} --mca mpi_yield_when_idle 1 \
   python ./projects/example/EXAMPLE_EMUL_MINIMIZE${SLURM_ARRAY_TASK_ID}.py \
     --root ./projects/example/ --cov "${COV[${SLURM_ARRAY_TASK_ID}]}" \
-    --outroot "EXAMPLE_EMUL_MIN${SLURM_ARRAY_TASK_ID}" --nstw 250
+    --outroot "EXAMPLE_EMUL_MIN${SLURM_ARRAY_TASK_ID}" --nstw 200
