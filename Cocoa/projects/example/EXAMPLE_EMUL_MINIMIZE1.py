@@ -357,7 +357,7 @@ if __name__ == '__main__':
         
         # 2nd: Run Procoli -----------------------------------------------------
         res = np.array(list(prf(np.array(x0, dtype='float64'), 
-                               index=-1, 
+                               fixed=-1, 
                                nstw=nstw,
                                nwalkers=nwalkers,
                                pool=pool,
