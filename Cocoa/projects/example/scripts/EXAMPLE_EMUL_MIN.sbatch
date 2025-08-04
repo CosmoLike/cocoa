@@ -28,13 +28,8 @@ source start_cocoa.sh
 export OMP_NUM_THREADS=1
 ulimit -u 2000000 # require line when nmpi is high
 
-# WRITE DOWN HERE THE COV ASSOCIATED WITH EACH JOB IN THE ARRAY
-declare -a COV=( "chains/EXAMPLE_EMUL_MCMC1.covmat"
-                 "chains/EXAMPLE_EMUL_MCMC1.covmat")
-
 mpirun -n ${SLURM_NTASKS} --oversubscribe --mca pml ^ucx --mca btl vader,tcp,self \
   --bind-to core:overload-allowed --rank-by slot \
   --map-by slot:pe=${OMP_NUM_THREADS} --mca mpi_yield_when_idle 1 \
-  python ./projects/example/EXAMPLE_EMUL_MINIMIZE${SLURM_ARRAY_TASK_ID}.py \
-    --root ./projects/example/ --cov "${COV[${SLURM_ARRAY_TASK_ID}]}" \
-    --outroot "EXAMPLE_EMUL_MIN${SLURM_ARRAY_TASK_ID}" --nstw 250
+  python ./projects/example/EXAMPLE_EMUL_MINIMIZE${SLURM_ARRAY_TASK_ID}.py --nstw 250 \
+    --root ./projects/example/ --outroot "EXAMPLE_EMUL_MIN${SLURM_ARRAY_TASK_ID}"
