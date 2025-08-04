@@ -41,13 +41,13 @@ from schwimmbad import MPIPool
 # ------------------------------------------------------------------------------
 parser = argparse.ArgumentParser(prog='EXAMPLE_EMUL_PROFILE1')
 
-parser.add_argument("--maxfeval",
-                    dest="maxfeval",
-                    help="Minimizer: maximum number of likelihood evaluations",
+parser.add_argument("--nstw",
+                    dest="nstw",
+                    help="Number of likelihood evaluations (steps) per temperature per walker",
                     type=int,
                     nargs='?',
                     const=1,
-                    default=5000)
+                    default=200)
 parser.add_argument("--root",
                     dest="root",
                     help="Name of the Output File",
@@ -287,7 +287,7 @@ def chi2v2(p):
 def min_chi2(x0,
              cov, 
              fixed=-1, 
-             maxfeval=3000, 
+             nstw=200,
              nwalkers=5,
              pool=None):
 
@@ -324,7 +324,7 @@ def min_chi2(x0,
     
     ndim        = int(x0.shape[0])
     nwalkers    = int(nwalkers)
-    nsteps      = maxfeval
+    nstw        = int(nstw)
     if fixed == -1:
       temperature = np.array([1.0, 0.25, 0.1, 0.005, 0.001], dtype='float64')
     else:
@@ -337,9 +337,7 @@ def min_chi2(x0,
     for i in range(len(temperature)):
         x = [] # Initial point
         for j in range(nwalkers):
-            x.append(GaussianStep(stepsize=stepsz[i])(x0)[0,:])
-        x = np.array(x,dtype='float64')
-  
+            x.append(GaussianStep(stepsize=stepsz[i])(x0)[0,:]) 
         sampler = emcee.EnsembleSampler(nwalkers=nwalkers, 
                                         ndim=ndim, 
                                         log_prob_fn=logprob, 
@@ -347,14 +345,13 @@ def min_chi2(x0,
                                         moves=[(emcee.moves.DEMove(), 0.8),
                                                (emcee.moves.DESnookerMove(), 0.2)],
                                         pool=pool)
-        sampler.run_mcmc(x, 
-                         nsteps, 
+        sampler.run_mcmc(np.array(x,dtype='float64'), 
+                         nstw, 
                          skip_initial_state_check=True)
         samples = sampler.get_chain(flat=True, discard=0)
         j = np.argmin(-1.0*np.array(sampler.get_log_prob(flat=True)))
         partial_samples.append(samples[j])
-        tchi2 = mychi2(samples[j], *args)
-        partial.append(tchi2)
+        partial.append(mychi2(samples[j], *args))
         x0 = copy.deepcopy(samples[j])
         sampler.reset()
     # min chi2 from the entire emcee runs
@@ -366,12 +363,11 @@ def min_chi2(x0,
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
-def prf(x0, maxfeval, cov, fixed=-1, nwalkers=5, pool=None):
-    t0 = np.array(x0, dtype='float64')
-    res =  min_chi2(x0=t0, 
+def prf(x0, nstw, cov, fixed=-1, nwalkers=5, pool=None):
+    res =  min_chi2(x0=np.array(x0, dtype='float64'), 
                     fixed=fixed,
                     cov=cov, 
-                    maxfeval=maxfeval, 
+                    nstw=nstw, 
                     nwalkers=nwalkers,
                     pool=pool)
     return res
@@ -401,7 +397,7 @@ if __name__ == '__main__':
             sys.exit(0)
         dim      = model.prior.d()     
         nwalkers = max(3*dim, pool.comm.Get_size())
-        maxevals = int(args.maxfeval/(4.0*nwalkers))
+        nstw = args.nstw
 
         # 1st: load the cov. matrix --------------------------------------------
         if args.cov is None:
@@ -422,7 +418,7 @@ if __name__ == '__main__':
                                      ignore_fixed_ref=False,
                                      logposterior_as_dict=True)
           res = np.array(list(prf(x0=x0, 
-                                  maxfeval=int(5.*maxevals/4.), 
+                                  nstw=int(5.*nstw/4.), 
                                   nwalkers=nwalkers,
                                   pool=pool,
                                   cov=cov,
@@ -461,8 +457,9 @@ if __name__ == '__main__':
         
         # 4th Print to the terminal ---------------------------------------------
         names = list(model.parameterization.sampled_params().keys()) # Cobaya Call
-        print(f"maxfeval={args.maxfeval}, param={names[args.profile]}")
-        print(f"profile param values = {param}")
+        print(f"nstw (evals/Temp/walkers)={args.nstw}, "
+              f" param={names[args.profile]}\n"
+              f"profile param values = {param}")
         
         # 5th: Set the vectors that will hold the final result -----------------
         xf = np.tile(x0, (numpts, 1))
@@ -477,7 +474,7 @@ if __name__ == '__main__':
             tmp[args.profile] = param[i]
             res = prf(tmp, 
                       fixed=args.profile,
-                      maxfeval=int(maxevals), 
+                      nstw=int(nstw), 
                       nwalkers=nwalkers,
                       pool=pool,
                       cov=cov)
@@ -492,7 +489,7 @@ if __name__ == '__main__':
             tmp[args.profile] = param[i]
             res = prf(tmp, 
                       fixed=args.profile,
-                      maxfeval=int(maxevals), 
+                      nstw=int(nstw), 
                       nwalkers=nwalkers,
                       pool=pool,
                       cov=cov)
@@ -521,7 +518,7 @@ if __name__ == '__main__':
         np.savetxt(f"{args.root}chains/{args.outroot}.{names[args.profile]}.txt",
                    np.concatenate([np.c_[param,chi2res],xf],axis=1),
                    fmt="%.6e",
-                   header=f"maxfeval={args.maxfeval}, param={names[args.profile]}\n"+' '.join(comment),
+                   header=f"nstw={args.nstw}, param={names[args.profile]}\n"+' '.join(comment),
                    comments="# ")
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------

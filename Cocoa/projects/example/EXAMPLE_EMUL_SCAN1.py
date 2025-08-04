@@ -38,15 +38,14 @@ from getdist import IniFile
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
-parser = argparse.ArgumentParser(prog='EXAMPLE_EMUL_PROFILE1')
-
-parser.add_argument("--maxfeval",
-                    dest="maxfeval",
-                    help="Minimizer: maximum number of likelihood evaluations",
+parser = argparse.ArgumentParser(prog='EXAMPLE_EMUL_SCAN1')
+parser.add_argument("--nstw",
+                    dest="nstw",
+                    help="Number of likelihood evaluations per temperature per walker",
                     type=int,
                     nargs='?',
                     const=1,
-                    default=5000)
+                    default=200)
 parser.add_argument("--root",
                     dest="root",
                     help="Name of the Output File",
@@ -297,9 +296,10 @@ def min_chi2(x0,
     
     ndim        = int(x0.shape[0])
     nwalkers    = int(nwalkers)
-    nsteps      = maxfeval
+    nstw        = int(nstw)
     temperature = np.array([1.0, 0.25, 0.1, 0.005, 0.001], dtype='float64')
-    stepsz      = temperature/4.0
+    ntemp       = len(temperature)
+    stepsz      = temperature/2.0
 
     partial_samples = [x0]
     partial = [mychi2(x0, *args)]
@@ -308,25 +308,19 @@ def min_chi2(x0,
         x = [] # Initial point
         for j in range(nwalkers):
             x.append(GaussianStep(stepsize=stepsz[i])(x0)[0,:])
-        x = np.array(x,dtype='float64')
-
-        GScov  = copy.deepcopy(cov)
-        GScov *= temperature[i]*stepsz[i] 
-  
         sampler = emcee.EnsembleSampler(nwalkers, 
                                         ndim, 
                                         logprob, 
                                         args=(args[0], args[1], temperature[i]),
                                         moves=[(emcee.moves.DEMove(), 0.8),
                                                (emcee.moves.DESnookerMove(), 0.2)]) 
-        sampler.run_mcmc(x, 
-                         nsteps, 
+        sampler.run_mcmc(np.array(x, dtype='float64'), 
+                         nstw, 
                          skip_initial_state_check=True)
         samples = sampler.get_chain(flat=True, discard=0)
         j = np.argmin(-1.0*np.array(sampler.get_log_prob(flat=True)))
         partial_samples.append(samples[j])
-        tchi2 = mychi2(samples[j], *args)
-        partial.append(tchi2)
+        partial.append(mychi2(samples[j], *args))
         x0 = copy.deepcopy(samples[j])
         sampler.reset()  
     # min chi2 from the entire emcee runs
@@ -339,12 +333,11 @@ def min_chi2(x0,
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
-def prf(x0, maxfeval, cov, fixed=-1, nwalkers=5):
-    t0 = np.array(x0, dtype='float64')
-    res =  min_chi2(x0=t0, 
-                    fixed=fixed,
+def prf(x0, nstw, cov, fixed=-1, nwalkers):
+    res =  min_chi2(x0=np.array(x0, dtype='float64'), 
                     cov=cov, 
-                    maxfeval=maxfeval, 
+                    fixed=fixed,
+                    nstw=nstw, 
                     nwalkers=nwalkers)
     return res
 # ------------------------------------------------------------------------------
@@ -388,17 +381,21 @@ if __name__ == '__main__':
     
     # 2nd: Print to the terminal -----------------------------------------------
     names = list(model.parameterization.sampled_params().keys()) # Cobaya Call
-    print(f"maxfeval={maxfeval}, param={names[index]}")
+    nstw = args.nstw
+    maxfeval = nstw*ntemp*nwalkers
+    print(f"maxfeval={maxfeval}, " 
+          f"nstw (evals/Temp/walkers)={nstw}, "
+          f"param={names[index]}")
     print(f"profile param values = {param}")
         
-    # 4th: Set the array that will hold the final result -----------------------
+    # 3rd: Set the array that will hold the final result -----------------------
     (x0, results) = model.get_valid_point(max_tries=1000, 
                                           ignore_fixed_ref=False,
                                           logposterior_as_dict=True)
     xf = np.tile(x0, (numpts, 1))
     xf[:,index] = param
     
-    # 5th: Run the profile -----------------------------------------------------
+    # 4th: Run the profile -----------------------------------------------------
     dim      = model.prior.d()    
     nwalkers = 3*dim
     ntemp    = 5
@@ -406,10 +403,10 @@ if __name__ == '__main__':
     cov = model.prior.covmat(ignore_external=False) # cov from prior
     res = np.array(list(executor.map(functools.partial(prf, 
                                                        fixed=index,
-                                                       maxfeval=maxfeval, 
+                                                       nstw=nstw, 
                                                        nwalkers=nwalkers,
                                                        cov=cov), xf)),dtype="object")
-    x0 = np.array([np.insert(row, index, p) for row, p in zip(res[:,0], param)], dtype='float64')
+    xf = np.array([np.insert(row,index,p) for row, p in zip(res[:,0], param)], dtype='float64')
     chi2res = np.array(res[:,1], dtype='float64')
     
     #6th: Append derived parameters --------------------------------------------
@@ -435,6 +432,8 @@ if __name__ == '__main__':
                fmt="%.6e",
                header=f"maxfeval={maxfeval}, param={names[index]}\n"+' '.join(hd),
                comments="# ")
+    # MPI Shutdown -------------------------------------------------------------
+    executor.shutdown()
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------

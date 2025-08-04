@@ -66,7 +66,7 @@ ax.tick_params(axis='both', which='minor',labelsize=15)
 plt.yscale('log')
 plt.ylim(1e-5, 10)
 # Styling
-plt.xlabel("$n_{\\rm SW}$")
+plt.xlabel("$n_{\\rm STW}$")
 plt.ylabel("$\\Delta \\chi_{\\rm min}^2$")
 ax.legend(fontsize=13, frameon=False)
 plt.savefig(os.environ['ROOTDIR']+
