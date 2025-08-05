@@ -11,15 +11,15 @@
 6. [Creating Cosmolike projects (external readme)](Cocoa/projects/)
 7. [Credits](#appendix_proper_credits)
 8. [Appendix](#appendix)
-    1. [FAQ: How do we debug Cocoa? Suggested steps](#running_wrong)
-    2. [FAQ: How do we compile external modules?](#appendix_compile_separately)
-    3. [FAQ: How do we run Cocoa with Docker?](#appendix_jupyter_whovian)
-    4. [FAQ: How do we use an available Anaconda module on HPC?](#overview_anaconda)
-    5. [FAQ: How do we install Conda?](#overview_miniconda)
-    6. [FAQ: How do we set the environment for Machine Learning projects?](#ml_emulators)
-    7. [FAQ: How do we push changes to the Cocoa main branch?](#push_main)
-    8. [FAQ: How do we develop from a Git tag? A few more Git hacks](#dev_from_tag)
-    9. [FAQ: How do we download additional likelihood data? (external readme)](Cocoa/external_modules/data)
+    1. [FAQ: How can we debug Cocoa? Suggested steps](#running_wrong)
+    2. [FAQ: How can we compile external modules?](#appendix_compile_separately)
+    3. [FAQ: How can we run Cocoa with Docker?](#appendix_jupyter_whovian)
+    4. [FAQ: How can we use an available Anaconda module on HPC?](#overview_anaconda)
+    5. [FAQ: How can we install Conda?](#overview_miniconda)
+    6. [FAQ: How can we set the environment for Machine Learning projects?](#ml_emulators)
+    7. [FAQ: How can we push changes to the Cocoa main branch?](#push_main)
+    8. [FAQ: How can we develop from a Git tag? A few more Git hacks](#dev_from_tag)
+    9. [FAQ: How can we download additional likelihood data? (external readme)](Cocoa/external_modules/data)
    10. [FAQ: Where do we find common FAQs about external modules? (external readme)](Cocoa/external_modules/code)
    11. [FAQ: Where do we find common FAQs about Cosmolike? (external readme)](Cocoa/projects/)
    12. [FAQ: How can we improve our Bash/C/C++ knowledge?](#lectnotes)
@@ -177,7 +177,7 @@ Users will see a terminal like this: `$(cocoa)(.local)`. *This is a feature, not
 
 
 > [!Tip]
-> Cocoa provides several cosmolike projects, not all of which are installed by default. To activate them, please refer to the appendix [FAQ: How do we compile external modules?](#appendix_compile_separately).
+> Cocoa provides several Cosmolike projects, not all of which are installed by default. To activate them, please refer to the appendix [FAQ: How do we compile external modules?](#appendix_compile_separately).
 
 > [!TIP]
 > Assuming Cocoa is installed on a local (not remote!) machine, type the command below after step 2️⃣ to run Jupyter Notebooks.
@@ -424,7 +424,7 @@ Following best practices, Cocoa scripts download most external modules from thei
 
 # Appendix <a name="appendix"></a>
 
-## :interrobang: FAQ: How do we debug Cocoa? Suggested steps <a name="running_wrong"></a>
+## :interrobang: FAQ: How can we debug Cocoa? Suggested steps <a name="running_wrong"></a>
 
 **Step :one:**: define the `COCOA_OUTPUT_VERBOSE` and `COSMOLIKE_DEBUG_MODE` flags on `set_installation_options.sh` to obtain a more detailed output, as shown below
   
@@ -445,9 +445,9 @@ Following best practices, Cocoa scripts download most external modules from thei
 
 **Step 4️⃣**: rerun `setup_cocoa.sh` and `compile_cocoa.sh` to ensure all packages are installed and compiled correctly.
 
-## :interrobang: FAQ: How do we compile external modules? <a name="appendix_compile_separately"></a>
+## :interrobang: FAQ: How can we compile external modules? <a name="appendix_compile_separately"></a>
 
-To avoid excessive compilation or download times during development, users can use scripts located at `Cocoa/installation_scripts/` to download and compile only specific modules (or datasets). To take full advantage of them, users must first unset the appropriate keys on `set_installation_options.sh`, as exemplified below.
+To avoid excessive compilation or download times during development, users may run scripts located at `Cocoa/installation_scripts/` directly to download and compile only specific modules (or datasets). To take full advantage of them, users must first unset the appropriate keys on `set_installation_options.sh`, as exemplified below.
 
      [Adapted from Cocoa/set_installation_options.sh shell script]
      # ------------------------------------------------------------------------------
@@ -464,21 +464,29 @@ To avoid excessive compilation or download times during development, users can u
      (...)
      #export IGNORE_ACTDR6_CODE=1                            # ACT-DR6 likelihood code
 
-Everytime users edit `set_installation_options.sh`, they need to reload `(.local)` by rerunning `start_cocoa.sh`. Then, users should run the commands below
+Whenever users edit `set_installation_options.sh`, they must reload the Cocoa private environment (.local) by sourcing `start_cocoa.sh`. To do that, follow the commands below.
 
      cd ./cocoa/Cocoa
+
+and
+
      source start_cocoa.sh # even if (.local) is already active, users must run start_cocoa.sh again to update bash environment values
 
- and
+Similarly to `setup_cocoa.sh` and `compile_cocoa.sh`, each code package contains a `setup` scripts that download it from the internet and a `compile` scripts that compile it. E.g., the `ACT-DR6` likelihood code can be downloaded and installed via the bash commands
  
      source ./installation_scripts/setup_act_dr6.sh                # download likelihood code
-     source ./installation_scripts/setup_simons_observatory.sh     # download likelihood code
-     source ./installation_scripts/compile_act_dr6.sh              # compile likelihood code
-     source ./installation_scripts/compile_simons_observatory.sh   # compile likelihood code
-     source ./installation_scripts/unxv_act_dr6.sh                 # download and unpack likelihood data
-     source ./installation_scripts/unxv_simons_observatory.sh      # download and unpack likelihood data
 
-Finally, cocoa's `set_installation_options.sh` master script includes instructions to install several cosmolike projects. To activate them, manipulate the following lines on `set_installation_options.sh` 
+and
+
+     source ./installation_scripts/compile_act_dr6.sh              # compile likelihood code
+
+In addition to `setup` and `compile` scripts, Cocoa contains `unxv` scripts that download data sets. For instance, to download the ACT-DR6 data, users must source the script
+
+     source ./installation_scripts/unxv_act_dr6.sh                 # download and unpack likelihood data
+
+### :interrobang: FAQ: How can we compile Cosmolike projects?
+
+The script `set_installation_options.sh` includes instructions for installing several Cosmo-like-based projects. To activate them, modify the following lines in `set_installation_options.sh` by inserting the symbol `#` before the name of the module users want to be installed and compiled.
 
      [Adapted from Cocoa/set_installation_options.sh shell script]
      # ------------------------------------------------------------------------------
@@ -512,17 +520,30 @@ Finally, cocoa's `set_installation_options.sh` master script includes instructio
      #TAG: if unset, load the specified TAG
      #export ROMAN_REAL_TAG="v4.0-beta17"
  
-Everytime users edit `set_installation_options.sh`, they need to reload `(.local)` by rerunning `start_cocoa.sh`. Then, run the following commands:
+Once more, anytime `set_installation_options.sh` is modified, we need to reload `(.local)` by rerunning `start_cocoa.sh`. Then, run the following commands:
 
       cd ./cocoa/Cocoa
+
+and
+
       source start_cocoa.sh # even if (.local) is already active, users must run start_cocoa.sh again to update bash environment values
       
- and
+Now, to download and compile all Cosmolike projects, type
  
       source ./installation_scripts/setup_cosmolike_projects.sh   # download all cosmolike projects  
-      source ./installation_scripts/compile_all_projects.sh           # compile  all cosmolike project
 
-In case users only want to compile a single cosmolike project (let's say the `roman_real` project)
+and
+
+      source ./installation_scripts/compile_all_projects.sh       # compile  all cosmolike project
+
+> [!NOTE]
+> In case users need to rerun `setup_cocoa.sh` (or `setup_cosmolike_projects.sh`) , Cocoa will not download previously installed cosmolike projects (this avoids loss of uncommitted work), unless the following key is set on `set_installation_options.sh`
+>
+>     [Adapted from Cocoa/set_installation_options.sh shell script]
+>     #export OVERWRITE_EXISTING_COSMOLIKE_CODE=1 # dangerous (possible loss of uncommitted work)
+>                                                 # if unset, users must manually delete cosmolike projects
+
+In case users only want to compile a single Cosmolike project (let's say the `roman_real` project)
 
       source ./projects/roman_real/scripts/compile_roman_real.sh
      
