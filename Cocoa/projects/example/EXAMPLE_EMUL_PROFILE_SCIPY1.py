@@ -266,14 +266,18 @@ theory:
 model = get_model(yaml_load(yaml_string))
 def chi2(p):
     p = [float(v) for v in p.values()] if isinstance(p, dict) else p
+    if np.any(np.isinf(p)) or  np.any(np.isnan(p)):
+      return 1e20
     point = dict(zip(model.parameterization.sampled_params(), p))
     res1 = model.logprior(point,make_finite=False)
-    if np.isinf(res1):
+    if np.isinf(res1) or  np.any(np.isnan(res1)):
       return 1e20
     res2 = model.loglike(point,
-                         make_finite=True,
+                         make_finite=False,
                          cached=False,
                          return_derived=False)
+    if np.isinf(res2) or  np.any(np.isnan(res2)):
+      return 1e20
     return -2.0*(res1+res2)
 def chi2v2(p):
     p = [float(v) for v in p.values()] if isinstance(p, dict) else p

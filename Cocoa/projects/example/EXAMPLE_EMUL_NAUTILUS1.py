@@ -260,18 +260,28 @@ theory:
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
 model = get_model(yaml_load(yaml_string))
-def likelihood(p):
+def chi2(p):
     p = [float(v) for v in p.values()] if isinstance(p, dict) else p
+    if np.any(np.isinf(p)) or  np.any(np.isnan(p)):
+      raise ValueError(f"At least one parameter value was infinite (CoCoa) param = {p}")
     point = dict(zip(model.parameterization.sampled_params(), p))
-    res1 = model.logprior(point, 
-                          make_finite=False)
-    if np.isinf(res1):
-      return 1e20
+    res1 = model.logprior(point,make_finite=False)
+    if np.isinf(res1) or  np.any(np.isnan(res1)):
+      return 1.e20
     res2 = model.loglike(point,
-                         make_finite=True,
+                         make_finite=False,
                          cached=False,
                          return_derived=False)
-    return res1+res2
+    if np.isinf(res2) or  np.any(np.isnan(res2)):
+      return 1e20
+    return -2.0*(res1+res2)
+
+def likelihood(params):
+  res = chi2(params)
+  if (res > 1.e19 or np.isinf(res) or  np.isnan(res)):
+    return -np.inf
+  else:
+    return -0.5*res
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
@@ -289,7 +299,7 @@ if __name__ == '__main__':
     names  = list(model.parameterization.sampled_params().keys()) # Cobaya Call
     for b, name in zip(bounds, names):
       NautilusPrior.add_parameter(name, dist=(b[0], b[1]))
-    
+
     sampler = Sampler(NautilusPrior, 
                       likelihood,  
                       filepath=f"{args.root}chains/{args.outroot}_checkpoint.hdf5", 

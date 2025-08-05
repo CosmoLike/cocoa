@@ -267,14 +267,18 @@ theory:
 model = get_model(yaml_load(yaml_string))
 def chi2(p):
     p = [float(v) for v in p.values()] if isinstance(p, dict) else p
+    if np.any(np.isinf(p)) or  np.any(np.isnan(p)):
+      raise ValueError(f"At least one parameter value was infinite (CoCoa) param = {p}")
     point = dict(zip(model.parameterization.sampled_params(), p))
     res1 = model.logprior(point,make_finite=False)
-    if np.isinf(res1):
+    if np.isinf(res1) or  np.any(np.isnan(res1)):
       return 1e20
     res2 = model.loglike(point,
-                         make_finite=True,
+                         make_finite=False,
                          cached=False,
                          return_derived=False)
+    if np.isinf(res2) or  np.any(np.isnan(res2)):
+      return 1e20
     return -2.0*(res1+res2)
 def chi2v2(p):
     p = [float(v) for v in p.values()] if isinstance(p, dict) else p
@@ -311,15 +315,12 @@ def min_chi2(x0,
     else:
         args = (0.0, -2.0, 1.0)
 
-    def log_prior(params):
-        return 1.0
-    
     def logprob(params, *args):
-        lp = log_prior(params)
-        if not np.isfinite(lp):
-            return -np.inf
+        res = mychi2(params, *args)
+        if (res > 1.e19 or np.isinf(res) or  np.isnan(res)):
+          return -np.inf
         else:
-            return -0.5*mychi2(params, *args) + lp
+          return -0.5*res
     
     class GaussianStep:
        def __init__(self, stepsize=0.2):
