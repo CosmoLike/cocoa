@@ -41,7 +41,6 @@ from schwimmbad import MPIPool
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
 parser = argparse.ArgumentParser(prog='EXAMPLE_EMUL_PROFILE1')
-
 parser.add_argument("--nstw",
                     dest="nstw",
                     help="Number of likelihood evaluations (steps) per temperature per walker",

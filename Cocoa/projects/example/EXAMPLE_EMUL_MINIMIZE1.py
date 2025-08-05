@@ -10,12 +10,17 @@ warnings.filterwarnings(
 warnings.filterwarnings(
     "ignore",
     category=RuntimeWarning,
-    message=r".*invalid value encountered in subtract.*"
+    message=r".*invalid value encountered*"
 )
 warnings.filterwarnings(
     "ignore",
     category=RuntimeWarning,
     message=r".*overflow encountered*"
+)
+warnings.filterwarnings(
+    "ignore",
+    category=UserWarning,
+    message=r".*Function not smooth or differentiabl*"
 )
 warnings.filterwarnings(
     "ignore",
@@ -232,8 +237,13 @@ model = get_model(yaml_load(yaml_string))
 def chi2(p):
     p = [float(v) for v in p.values()] if isinstance(p, dict) else p
     point = dict(zip(model.parameterization.sampled_params(), p))
-    res1 = model.logprior(point,make_finite=True)
-    res2 = model.loglike(point,make_finite=True,cached=False,return_derived=False)
+    res1 = model.logprior(point,make_finite=False)
+    if np.isinf(res1):
+      return 1e20
+    res2 = model.loglike(point,
+                         make_finite=True,
+                         cached=False,
+                         return_derived=False)
     return -2.0*(res1+res2)
 def chi2v2(p):
     p = [float(v) for v in p.values()] if isinstance(p, dict) else p

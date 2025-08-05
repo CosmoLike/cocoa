@@ -10,8 +10,7 @@ warnings.filterwarnings(
 warnings.filterwarnings(
     "ignore",
     category=RuntimeWarning,
-    message=r".*invalid value encountered in subtract.*",
-    module=r"emcee\.moves\.mh"
+    message=r".*invalid value encountered*"
 )
 warnings.filterwarnings(
     "ignore",
@@ -21,17 +20,12 @@ warnings.filterwarnings(
 warnings.filterwarnings(
     "ignore",
     category=UserWarning,
-    message=r".*Hartlap correction*"
-)
-warnings.filterwarnings(
-    "ignore",
-    category=UserWarning,
     message=r".*Function not smooth or differentiabl*"
 )
 warnings.filterwarnings(
     "ignore",
-    category=RuntimeWarning,
-    message=r".*invalid value encountered*"
+    category=UserWarning,
+    message=r".*Hartlap correction*"
 )
 import functools, iminuit, copy, argparse, random, time 
 import emcee, itertools
