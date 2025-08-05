@@ -12,7 +12,7 @@
 7. [Credits](#appendix_proper_credits)
 8. [Appendix](#appendix)
     1. [FAQ: How can we debug Cocoa? Suggested steps](#running_wrong)
-    2. [FAQ: How can we compile external modules?](#appendix_compile_separately)
+    2. [FAQ: How can we compile external modules (not involving Cosmolike)?](#appendix_compile_separately)
     3. [FAQ: How can we install Cosmolike projects?](#appendix_compile_cosmolike_separately)
     4. [FAQ: How can we run Cocoa with Docker?](#appendix_jupyter_whovian)
     5. [FAQ: How can we use an available Anaconda module on HPC?](#overview_anaconda)
@@ -464,8 +464,8 @@ To avoid excessive compilation or download times during development, users may r
      #export IGNORE_SIMONS_OBSERVATORY_LIKELIHOOD_CODE=1     # SO likelihood code
      (...)
      #export IGNORE_ACTDR6_CODE=1                            # ACT-DR6 likelihood code
-
-Whenever users edit `set_installation_options.sh`, they must reload the Cocoa private environment (.local) by sourcing `start_cocoa.sh`. To do that, follow the commands below.
+9(
+Whenever users edit `set_installation_options.sh`, they must reload the Cocoa private environment (.local) by sourcing `start_cocoa.sh` (even if (.local) is already active). To do that, follow the commands below.
 
      cd ./cocoa/Cocoa
 
