@@ -13,16 +13,17 @@
 8. [Appendix](#appendix)
     1. [FAQ: How can we debug Cocoa? Suggested steps](#running_wrong)
     2. [FAQ: How can we compile external modules?](#appendix_compile_separately)
-    3. [FAQ: How can we run Cocoa with Docker?](#appendix_jupyter_whovian)
-    4. [FAQ: How can we use an available Anaconda module on HPC?](#overview_anaconda)
-    5. [FAQ: How can we install Conda?](#overview_miniconda)
-    6. [FAQ: How can we set the environment for Machine Learning projects?](#ml_emulators)
-    7. [FAQ: How can we push changes to the Cocoa main branch?](#push_main)
-    8. [FAQ: How can we develop from a Git tag? A few more Git hacks](#dev_from_tag)
-    9. [FAQ: How can we download additional likelihood data? (external readme)](Cocoa/external_modules/data)
-   10. [FAQ: Where do we find common FAQs about external modules? (external readme)](Cocoa/external_modules/code)
-   11. [FAQ: Where do we find common FAQs about Cosmolike? (external readme)](Cocoa/projects/)
-   12. [FAQ: How can we improve our Bash/C/C++ knowledge?](#lectnotes)
+    3. [FAQ: How can we install Cosmolike projects?](#appendix_compile_cosmolike_separately)
+    4. [FAQ: How can we run Cocoa with Docker?](#appendix_jupyter_whovian)
+    5. [FAQ: How can we use an available Anaconda module on HPC?](#overview_anaconda)
+    6. [FAQ: How can we install Conda?](#overview_miniconda)
+    7. [FAQ: How can we set the environment for Machine Learning projects?](#ml_emulators)
+    8. [FAQ: How can we push changes to the Cocoa main branch?](#push_main)
+    9. [FAQ: How can we develop from a Git tag? A few more Git hacks](#dev_from_tag)
+    10. [FAQ: How can we download additional likelihood data? (external readme)](Cocoa/external_modules/data)
+   11. [FAQ: Where do we find common FAQs about external modules? (external readme)](Cocoa/external_modules/code)
+   12. [FAQ: Where do we find common FAQs about Cosmolike? (external readme)](Cocoa/projects/)
+   13. [FAQ: How can we improve our Bash/C/C++ knowledge?](#lectnotes)
 
 # Overview <a name="overview"></a>
 
@@ -210,7 +211,7 @@ Users will see a terminal like this: `$(cocoa)(.local)`. *This is a feature, not
 
 # Running ML emulators <a name="cobaya_base_code_examples_emul"></a>
 
-Cocoa contains a few transformer-based neural network emulators capable of simulating CMB, cosmolike, matter power spectrum, and distances. We provide a few scripts that exemplify their API. To run them, users must have commented out the following lines on `set_installation_options.sh` before running the `setup_cocoa.sh` and `compile_cocoa.sh`.
+Cocoa contains a few transformer- and CNN-based neural network emulators capable of simulating CMB, cosmolike, matter power spectrum, and distances. We provide a few scripts that exemplify their API. To run them, users must have commented out the following lines on `set_installation_options.sh` before running the `setup_cocoa.sh` and `compile_cocoa.sh`.
 
       [Adapted from Cocoa/set_installation_options.sh shell script] 
       # insert the # symbol (i.e., unset these environmental keys  on `set_installation_options.sh`)
@@ -445,7 +446,7 @@ Following best practices, Cocoa scripts download most external modules from thei
 
 **Step 4️⃣**: rerun `setup_cocoa.sh` and `compile_cocoa.sh` to ensure all packages are installed and compiled correctly.
 
-## :interrobang: FAQ: How can we compile external modules? <a name="appendix_compile_separately"></a>
+## :interrobang: FAQ: How can we compile external modules (not involving Cosmolike)? <a name="appendix_compile_separately"></a>
 
 To avoid excessive compilation or download times during development, users may run scripts located at `Cocoa/installation_scripts/` directly to download and compile only specific modules (or datasets). To take full advantage of them, users must first unset the appropriate keys on `set_installation_options.sh`, as exemplified below.
 
@@ -484,7 +485,7 @@ In addition to `setup` and `compile` scripts, Cocoa contains `unxv` scripts that
 
      source ./installation_scripts/unxv_act_dr6.sh                 # download and unpack likelihood data
 
-### :interrobang: FAQ: How can we compile Cosmolike projects?
+## :interrobang: FAQ: How can we install Cosmolike projects?  <a name="appendix_compile_cosmolike_separately"></a>
 
 The script `set_installation_options.sh` includes instructions for installing several Cosmo-like-based projects. To activate them, modify the following lines in `set_installation_options.sh` by inserting the symbol `#` before the name of the module users want to be installed and compiled.
 
