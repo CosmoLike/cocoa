@@ -186,8 +186,8 @@ sampler:
     # --------------------------------------
     # Maximum number of posterior evaluations
     max_samples: .inf
-    Rminus1_stop: 0.015
-    Rminus1_cl_stop: 0.18
+    Rminus1_stop: 0.02
+    Rminus1_cl_stop: 0.2
     Rminus1_cl_level: 0.95
     # ---------------------------------------------------------------------
     # ---------------------------------------------------------------------
