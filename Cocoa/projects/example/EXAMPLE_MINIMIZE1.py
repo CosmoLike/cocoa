@@ -1,5 +1,4 @@
-import warnings
-import os, psutil
+import warnings, os, psutil
 from sklearn.exceptions import InconsistentVersionWarning
 warnings.filterwarnings("ignore", category=InconsistentVersionWarning)
 warnings.filterwarnings(
@@ -10,12 +9,17 @@ warnings.filterwarnings(
 warnings.filterwarnings(
     "ignore",
     category=RuntimeWarning,
-    message=r".*invalid value encountered.*"
+    message=r".*invalid value encountered*"
 )
 warnings.filterwarnings(
     "ignore",
     category=RuntimeWarning,
     message=r".*overflow encountered*"
+)
+warnings.filterwarnings(
+    "ignore",
+    category=UserWarning,
+    message=r".*Function not smooth or differentiabl*"
 )
 warnings.filterwarnings(
     "ignore",
@@ -102,24 +106,25 @@ likelihood:
 params:
   logA:
     prior:
-      min: 1.61
-      max: 3.91
+      min: 2.7
+      max: 3.4
     ref:
       dist: norm
-      loc: 3.0448
-      scale: 0.05
-    proposal: 0.05
-    latex: '\log(10^{10} A_\mathrm{s})'
+      loc: 3.04
+      scale: 0.025
+    proposal: 0.025
+    latex: \log(10^{10} A_\mathrm{s}
+    drop: true
   ns:
     prior:
-      min: 0.92
-      max: 1.05
+      min: 0.93
+      max: 1.01
     ref:
       dist: norm
-      loc: 0.96605
-      scale: 0.005
-    proposal: 0.005
-    latex: 'n_\mathrm{s}'
+      loc: 0.96
+      scale: 0.0075
+    proposal: 0.0075
+    latex: n_\mathrm{s}
   theta_MC_100:
     prior:
       min: 1
@@ -138,23 +143,23 @@ params:
   omegabh2:
     prior:
       min: 0.01
-      max: 0.04
+      max: 0.03
     ref:
       dist: norm
       loc: 0.022383
       scale: 0.005
     proposal: 0.005
-    latex: '\Omega_\mathrm{b} h^2'
+    latex: \Omega_\mathrm{b} h^2
   omegach2:
     prior:
-      min: 0.06
-      max: 0.2
+      min: 0.08
+      max: 0.16
     ref:
       dist: norm
       loc: 0.12011
-      scale: 0.03
-    proposal: 0.03
-    latex: '\Omega_\mathrm{c} h^2'
+      scale: 0.01
+    proposal: 0.01
+    latex: \Omega_\mathrm{c} h^2
   tau:
     prior:
       min: 0.04
@@ -195,14 +200,15 @@ theory:
   camb:
     path: ./external_modules/code/CAMB
     extra_args:
-      AccuracyBoost: 1.10
-      lens_potential_accuracy: 2
-      num_massive_neutrinos: 1
-      nnu: 3.046
-      nonlinear: true
-      halofit_version: takahashi
-      dark_energy_model: ppf
-      kmax: 5
+      halofit_version: mead2020
+      lmax: 4000
+      lens_margin: 1250
+      AccuracyBoost: 1.05
+      lens_potential_accuracy: 4
+      lens_k_eta_reference: 18000
+      nonlinear: NonLinear_both
+      recombination_model: CosmoRec
+      Accuracy.AccurateBB: True
 """
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
