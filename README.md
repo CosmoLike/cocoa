@@ -137,7 +137,7 @@ Users will see a terminal like this: `$(cocoa)(.local)`. *This is a feature, not
 
  **Step :two:**: Select the number of OpenMP cores (below, we set it to 8).
     
-    export OMP_PROC_BIND=close; export OMP_NUM_THREADS=8
+    export OMP_PROC_BIND=close; export OMP_NUM_THREADS=8; export OMP_PLACES=cores; export OMP_DYNAMIC=FALSE
 
 ## Examples not involving Cosmolike
 
@@ -146,14 +146,14 @@ Users will see a terminal like this: `$(cocoa)(.local)`. *This is a feature, not
 - **One model evaluation**:
 
       mpirun -n 1 --oversubscribe --mca pml ^ucx --mca btl vader,tcp,self \
-         --bind-to core:overload-allowed --mca mpi_yield_when_idle 1 \
+         --bind-to core:overload-allowed --mca mpi_yield_when_idle 1 --report-bindings  \
          --rank-by slot --map-by numa:pe=${OMP_NUM_THREADS} \
          cobaya-run ./projects/example/EXAMPLE_EVALUATE1.yaml -f
                
 - **MCMC (Metropolis-Hastings Algorithm)**:
 
       mpirun -n 4 --oversubscribe --mca pml ^ucx --mca btl vader,tcp,self \
-         --bind-to core:overload-allowed --mca mpi_yield_when_idle 1 \
+         --bind-to core:overload-allowed --mca mpi_yield_when_idle 1 --report-bindings  \
          --rank-by slot --map-by numa:pe=${OMP_NUM_THREADS} \
          cobaya-run ./projects/example/EXAMPLE_MCMC1.yaml -f
 
@@ -165,17 +165,16 @@ Users will see a terminal like this: `$(cocoa)(.local)`. *This is a feature, not
 - **One model evaluation**:
 
       mpirun -n 1 --oversubscribe --mca pml ^ucx --mca btl vader,tcp,self \
-         --bind-to core:overload-allowed --mca mpi_yield_when_idle 1 \
+         --bind-to core:overload-allowed --mca mpi_yield_when_idle 1 --report-bindings  \
          --rank-by slot --map-by numa:pe=${OMP_NUM_THREADS} \
          cobaya-run ./projects/lsst_y1/EXAMPLE_EVALUATE1.yaml -f
        
 - **MCMC (Metropolis-Hastings Algorithm)**:
 
       mpirun -n 4 --oversubscribe --mca pml ^ucx --mca btl vader,tcp,self \
-         --bind-to core:overload-allowed --mca mpi_yield_when_idle 1 \
+         --bind-to core:overload-allowed --mca mpi_yield_when_idle 1 --report-bindings  \
          --rank-by slot --map-by numa:pe=${OMP_NUM_THREADS} \
          cobaya-run ./projects/lsst_y1/EXAMPLE_MCMC1.yaml -f
-
 
 > [!Tip]
 > Cocoa provides several Cosmolike projects, not all of which are installed by default. To activate them, please refer to the appendix [FAQ: How do we compile external modules?](#appendix_compile_separately).
@@ -247,7 +246,11 @@ Now, users must follow all the steps below.
 
     source start_cocoa.sh
 
- **Step :two:** Run `cobaya-run` on the first emulator example following the commands below.
+ **Step :two:**: Ensure OpenMP is **OFF**.
+    
+    export OMP_NUM_THREADS=1
+    
+ **Step :three:** Run `cobaya-run` on the first emulator example following the commands below.
 
 - **One model evaluation**:
 
@@ -306,7 +309,7 @@ Now, users must follow all the steps below.
       mpirun -n 21 --oversubscribe --mca pml ^ucx --mca btl vader,tcp,self --rank-by slot \
           --bind-to core:overload-allowed --map-by slot --mca mpi_yield_when_idle 1 \
           python ./projects/example/EXAMPLE_EMUL_MINIMIZE1.py --root ./projects/example/ \
-              --cov 'chains/EXAMPLE_EMUL_MCMC1.covmat' --outroot "EXAMPLE_EMUL_MIN1" --nstw 200
+              --cov 'chains/EXAMPLE_EMUL_MCMC1.covmat' --outroot "EXAMPLE_EMUL_MIN1" --nstw 150
 
   The number of steps per Emcee walker per temperature is $n_{\\rm stw}$,
   and the number of walkers is $n_{\\rm w}={\\rm max}(3n_{\\rm params},n_{\\rm MPI})$.
@@ -324,7 +327,7 @@ Now, users must follow all the steps below.
           --bind-to core:overload-allowed --map-by slot --mca mpi_yield_when_idle 1 \
           python ./projects/example/EXAMPLE_EMUL_PROFILE1.py \
               --root ./projects/example/ --cov 'chains/EXAMPLE_EMUL_MCMC1.covmat' \
-              --outroot "EXAMPLE_EMUL_PROFILE1" --factor 3 --nstw 200 --numpts 10 \
+              --outroot "EXAMPLE_EMUL_PROFILE1" --factor 3 --nstw 150 --numpts 10 \
               --profile 1 --minfile="./projects/example/chains/EXAMPLE_EMUL_MIN1.txt"
 
   Profile provides the optional argument `minfile`, as it is significantly faster to run the profile script with a previously provided global minimum. 
@@ -374,7 +377,7 @@ Now, users must follow all the steps below.
       mpirun -n 90 --oversubscribe --mca pml ^ucx --mca btl vader,tcp,self \
           --bind-to core:overload-allowed --map-by slot --mca mpi_yield_when_idle 1 \
           python -m mpi4py.futures ./projects/example/EXAMPLE_EMUL_SCAN1.py \
-              --root ./projects/example/ --outroot "EXAMPLE_EMUL_SCAN1" --nstw 200 --profile 1
+              --root ./projects/example/ --outroot "EXAMPLE_EMUL_SCAN1" --nstw 150 --profile 1
 
 - **Tension Metrics**
 
