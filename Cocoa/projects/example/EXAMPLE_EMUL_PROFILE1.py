@@ -461,7 +461,7 @@ if __name__ == '__main__':
         numpts=numpts+1
         param = np.insert(param, numpts//2, x0[args.profile])
         
-        # 4th Print to the terminal ---------------------------------------------
+        # 4th Print to the terminal --------------------------------------------
         names = list(model.parameterization.sampled_params().keys()) # Cobaya Call
         print(f"nstw (evals/Temp/walkers)={args.nstw}, "
               f" param={names[args.profile]}\n"
@@ -474,7 +474,7 @@ if __name__ == '__main__':
         chi2res = np.zeros(numpts)  
         chi2res[numpts//2] = chi20
         
-        # 5th: run from midpoint to right --------------------------------------
+        # 6th: run from midpoint to right --------------------------------------
         tmp = np.array(xf[numpts//2,:], dtype='float64')
         for i in range(numpts//2+1,numpts): 
             tmp[args.profile] = param[i]
@@ -489,7 +489,7 @@ if __name__ == '__main__':
             chi2res[i] = chi2(xf[i,:])
             print(f"Partial ({i+1}/{numpts}): params={tmp}, and chi2={chi2res[i]}")
         
-        # 6th: run from midpoint to left ---------------------------------------
+        # 7th: run from midpoint to left ---------------------------------------
         tmp = np.array(xf[numpts//2,:], dtype='float64')
         for i in range(numpts//2-1, -1, -1):
             tmp[args.profile] = param[i]
@@ -520,12 +520,13 @@ if __name__ == '__main__':
                               np.array([chi2v2(d) for d in xf], dtype='float64')))
 
         # 9th Save output file -------------------------------------------------    
-        comment = [names[args.profile],"chi2"]+names+["rdrag"]+list(model.info()['likelihood'].keys())+["prior"]
-        os.makedirs(os.path.dirname(f"{args.root}chains/"),exist_ok=True)
+        os.makedirs(os.path.dirname(f"{args.root}chains/"), exist_ok=True)
+        hd = [names[args.profile], "chi2"] + names + ["H0", 'omegam']
+        hd = hd + list(model.info()['likelihood'].keys()) + ["prior"]
         np.savetxt(f"{args.root}chains/{args.outroot}.{names[args.profile]}.txt",
-                   np.concatenate([np.c_[param,chi2res],xf],axis=1),
+                   np.concatenate([np.c_[param, chi2res],xf],axis=1),
                    fmt="%.6e",
-                   header=f"nstw={args.nstw}, param={names[args.profile]}\n"+' '.join(comment),
+                   header=f"nstw={args.nstw}, param={names[args.profile]}\n"+' '.join(hd),
                    comments="# ")
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------

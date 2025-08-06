@@ -342,7 +342,7 @@ if __name__ == '__main__':
                             settings={'ignore_rows': u'0.0'})
     np.savetxt(f"{args.root}chains/{args.outroot}.covmat",
                np.array(samples.cov(), dtype='float64'),
-               fmt="%.5e",
+               fmt="%.7e",
                header=' '.join(names),
                comments="# ")
 # ------------------------------------------------------------------------------
