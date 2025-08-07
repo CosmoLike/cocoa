@@ -3,14 +3,17 @@ debug: False
 timing: true
 
 likelihood:
+  #planck_2018_highl_plik.TTTEEE:
+  #  path: ./external_modules/
   planck_2018_highl_plik.TT:
     path: ./external_modules/
     clik_file: plc_3.0/hi_l/plik/plik_rd12_HM_v22_TT.clik
   planck_2018_lowl.TT:
     path: ./external_modules
+  # choose only one low ell EE likelihood
   planck_2018_lowl.EE:
     path: ./external_modules
-
+  #planck_2018_lowl.EE_sroll2: null 
 params:
   logA:
     prior:
@@ -79,9 +82,8 @@ params:
     value: 0.06
   tau:
     prior:
-      dist: norm
-      loc: 0.0544
-      scale: 0.0073
+      min: 0.04
+      max: 0.1
     ref:
       dist: norm
       loc: 0.055
