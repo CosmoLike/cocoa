@@ -1,4 +1,5 @@
 import warnings
+import os
 from sklearn.exceptions import InconsistentVersionWarning
 warnings.filterwarnings("ignore", category=InconsistentVersionWarning)
 warnings.filterwarnings(
@@ -62,11 +63,6 @@ parser.add_argument("--outroot",
                     nargs='?',
                     const=1,
                     default="test.dat")
-parser.add_argument("--cov",
-                    dest="cov",
-                    help="Chain Covariance Matrix",
-                    nargs='?',
-                    default=None)
 parser.add_argument("--burn_in",
                     dest="burn_in",
                     help="Burn-in fraction",
@@ -254,9 +250,18 @@ theory:
 model = get_model(yaml_load(yaml_string))
 def chi2(p):
     p = [float(v) for v in p.values()] if isinstance(p, dict) else p
+    if np.any(np.isinf(p)) or  np.any(np.isnan(p)):
+      raise ValueError(f"At least one parameter value was infinite (CoCoa) param = {p}")
     point = dict(zip(model.parameterization.sampled_params(), p))
-    res1 = model.logprior(point,make_finite=True)
-    res2 = model.loglike(point,make_finite=True,cached=False,return_derived=False)
+    res1 = model.logprior(point,make_finite=False)
+    if np.isinf(res1) or  np.any(np.isnan(res1)):
+      return 1.e20
+    res2 = model.loglike(point,
+                         make_finite=False,
+                         cached=False,
+                         return_derived=False)
+    if np.isinf(res2) or  np.any(np.isnan(res2)):
+      return 1e20
     return -2.0*(res1+res2)
 def chi2v2(p):
     p = [float(v) for v in p.values()] if isinstance(p, dict) else p
@@ -279,8 +284,13 @@ def chain(x0,
           burn_in=0.3,
           maxfeval=3000, 
           pool=None):    
+    
     def logprob(params, *args):
-        return -0.5*chi2(params)
+        res = chi2(params)
+        if (res > 1.e19 or np.isinf(res) or  np.isnan(res)):
+          return -np.inf
+        else:
+          return -0.5*res
 
     sampler = emcee.EnsembleSampler(nwalkers=nwalkers, 
                                     ndim=ndim, 
@@ -341,11 +351,9 @@ if __name__ == '__main__':
                                                 logposterior_as_dict=True)
           x0.append(tmp_x0[0:dim])
         x0 = np.array(x0, dtype='float64')
+        
         # get covariance -------------------------------------------------------
-        if args.cov is None:
-          cov = model.prior.covmat(ignore_external=False) # cov from prior
-        else:
-          cov = np.loadtxt(args.root+args.cov)[0:model.prior.d(),0:model.prior.d()]
+        cov = model.prior.covmat(ignore_external=False) # cov from prior
         
         # run the chains -------------------------------------------------------
         res = chain(x0=np.array(x0, dtype='float64'),
@@ -358,17 +366,18 @@ if __name__ == '__main__':
                     burn_in=args.burn_in if abs(args.burn_in) < 1 else 0)
 
         # saving file begins ---------------------------------------------------
-        header=f"nwalkers={nwalkers}, maxfeval={args.maxfeval}, max tau={res[1]}\n"
+        os.makedirs(os.path.dirname(f"{args.root}chains/"),exist_ok=True)
+        hd=f"nwalkers={nwalkers}, maxfeval={args.maxfeval}, max tau={res[1]}\n"
         np.savetxt(f"{args.root}chains/{args.outroot}.1.txt",
                    res[0],
-                   fmt="%.5e",
-                   header=header+' '.join(names),
+                   fmt="%.7e",
+                   header=hd + ' '.join(names),
                    comments="# ")
         # Now we need to save a range files ----------------------------------------
-        comment = ["weights","lnp"]+names+["chi2*"]
-        rows = [(str(n),float(l),float(h)) for n,l,h in zip(names,bounds[:,0],bounds[:,1])]
+        hd = ["weights","lnp"] + names + ["chi2*"]
+        rows = [(str(n),float(l),float(h)) for n,l,h in zip(names, bounds[:,0], bounds[:,1])]
         with open(f"{args.root}chains/{args.outroot}.ranges", "w") as f: 
-          f.write(f"# {' '.join(comment)}\n")
+          f.write(f"# {' '.join(hd)}\n")
           f.writelines(f"{n} {l:.5e} {h:.5e}\n" for n, l, h in rows)
 
         # Now we need to save a paramname files --------------------------------

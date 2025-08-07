@@ -28,7 +28,7 @@ source start_cocoa.sh
 export OMP_NUM_THREADS=1
 ulimit -u 2000000 # require line when nmpi is high
 
-declare -i nstw=$((250+25*$SLURM_ARRAY_TASK_ID))
+declare -i nstw=$((100+25*$SLURM_ARRAY_TASK_ID))
 
 mpirun -n ${SLURM_NTASKS} --oversubscribe --mca pml ^ucx --mca btl vader,tcp,self \
   --bind-to core:overload-allowed --rank-by slot \

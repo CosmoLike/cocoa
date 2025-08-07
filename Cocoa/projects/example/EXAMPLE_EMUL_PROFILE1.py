@@ -1,4 +1,5 @@
 import warnings
+import os
 from sklearn.exceptions import InconsistentVersionWarning
 warnings.filterwarnings("ignore", category=InconsistentVersionWarning)
 warnings.filterwarnings(
@@ -40,7 +41,6 @@ from schwimmbad import MPIPool
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
 parser = argparse.ArgumentParser(prog='EXAMPLE_EMUL_PROFILE1')
-
 parser.add_argument("--nstw",
                     dest="nstw",
                     help="Number of likelihood evaluations (steps) per temperature per walker",
@@ -267,9 +267,18 @@ theory:
 model = get_model(yaml_load(yaml_string))
 def chi2(p):
     p = [float(v) for v in p.values()] if isinstance(p, dict) else p
+    if np.any(np.isinf(p)) or  np.any(np.isnan(p)):
+      raise ValueError(f"At least one parameter value was infinite (CoCoa) param = {p}")
     point = dict(zip(model.parameterization.sampled_params(), p))
-    res1 = model.logprior(point,make_finite=True)
-    res2 = model.loglike(point,make_finite=True,cached=False,return_derived=False)
+    res1 = model.logprior(point,make_finite=False)
+    if np.isinf(res1) or  np.any(np.isnan(res1)):
+      return 1e20
+    res2 = model.loglike(point,
+                         make_finite=False,
+                         cached=False,
+                         return_derived=False)
+    if np.isinf(res2) or  np.any(np.isnan(res2)):
+      return 1e20
     return -2.0*(res1+res2)
 def chi2v2(p):
     p = [float(v) for v in p.values()] if isinstance(p, dict) else p
@@ -306,15 +315,12 @@ def min_chi2(x0,
     else:
         args = (0.0, -2.0, 1.0)
 
-    def log_prior(params):
-        return 1.0
-    
     def logprob(params, *args):
-        lp = log_prior(params)
-        if not np.isfinite(lp):
-            return -np.inf
+        res = mychi2(params, *args)
+        if (res > 1.e19 or np.isinf(res) or  np.isnan(res)):
+          return -np.inf
         else:
-            return -0.5*mychi2(params, *args) + lp
+          return -0.5*res
     
     class GaussianStep:
        def __init__(self, stepsize=0.2):
@@ -455,7 +461,7 @@ if __name__ == '__main__':
         numpts=numpts+1
         param = np.insert(param, numpts//2, x0[args.profile])
         
-        # 4th Print to the terminal ---------------------------------------------
+        # 4th Print to the terminal --------------------------------------------
         names = list(model.parameterization.sampled_params().keys()) # Cobaya Call
         print(f"nstw (evals/Temp/walkers)={args.nstw}, "
               f" param={names[args.profile]}\n"
@@ -468,7 +474,7 @@ if __name__ == '__main__':
         chi2res = np.zeros(numpts)  
         chi2res[numpts//2] = chi20
         
-        # 5th: run from midpoint to right --------------------------------------
+        # 6th: run from midpoint to right --------------------------------------
         tmp = np.array(xf[numpts//2,:], dtype='float64')
         for i in range(numpts//2+1,numpts): 
             tmp[args.profile] = param[i]
@@ -483,7 +489,7 @@ if __name__ == '__main__':
             chi2res[i] = chi2(xf[i,:])
             print(f"Partial ({i+1}/{numpts}): params={tmp}, and chi2={chi2res[i]}")
         
-        # 6th: run from midpoint to left ---------------------------------------
+        # 7th: run from midpoint to left ---------------------------------------
         tmp = np.array(xf[numpts//2,:], dtype='float64')
         for i in range(numpts//2-1, -1, -1):
             tmp[args.profile] = param[i]
@@ -514,11 +520,13 @@ if __name__ == '__main__':
                               np.array([chi2v2(d) for d in xf], dtype='float64')))
 
         # 9th Save output file -------------------------------------------------    
-        comment = [names[args.profile],"chi2"]+names+["rdrag"]+list(model.info()['likelihood'].keys())+["prior"]
+        os.makedirs(os.path.dirname(f"{args.root}chains/"), exist_ok=True)
+        hd = [names[args.profile], "chi2"] + names + ["H0", 'omegam']
+        hd = hd + list(model.info()['likelihood'].keys()) + ["prior"]
         np.savetxt(f"{args.root}chains/{args.outroot}.{names[args.profile]}.txt",
-                   np.concatenate([np.c_[param,chi2res],xf],axis=1),
+                   np.concatenate([np.c_[param, chi2res],xf],axis=1),
                    fmt="%.6e",
-                   header=f"nstw={args.nstw}, param={names[args.profile]}\n"+' '.join(comment),
+                   header=f"nstw={args.nstw}, param={names[args.profile]}\n"+' '.join(hd),
                    comments="# ")
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------

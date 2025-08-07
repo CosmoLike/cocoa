@@ -1,4 +1,5 @@
 import warnings
+import os
 from sklearn.exceptions import InconsistentVersionWarning
 warnings.filterwarnings("ignore", category=InconsistentVersionWarning)
 warnings.filterwarnings(
@@ -9,8 +10,7 @@ warnings.filterwarnings(
 warnings.filterwarnings(
     "ignore",
     category=RuntimeWarning,
-    message=r".*invalid value encountered in subtract.*",
-    module=r"emcee\.moves\.mh"
+    message=r".*invalid value encountered*"
 )
 warnings.filterwarnings(
     "ignore",
@@ -20,17 +20,12 @@ warnings.filterwarnings(
 warnings.filterwarnings(
     "ignore",
     category=UserWarning,
-    message=r".*Hartlap correction*"
-)
-warnings.filterwarnings(
-    "ignore",
-    category=UserWarning,
     message=r".*Function not smooth or differentiabl*"
 )
 warnings.filterwarnings(
     "ignore",
-    category=RuntimeWarning,
-    message=r".*invalid value encountered*"
+    category=UserWarning,
+    message=r".*Hartlap correction*"
 )
 import functools, iminuit, copy, argparse, random, time 
 import emcee, itertools
@@ -270,11 +265,22 @@ theory:
 # ------------------------------------------------------------------------------
 model = get_model(yaml_load(yaml_string))
 def chi2(p):
+    p = [float(v) for v in p.values()] if isinstance(p, dict) else p
+    if np.any(np.isinf(p)) or  np.any(np.isnan(p)):
+      return 1e20
     point = dict(zip(model.parameterization.sampled_params(), p))
-    res1 = model.logprior(point,make_finite=True)
-    res2 = model.loglike(point,make_finite=True,cached=False,return_derived=False)
+    res1 = model.logprior(point,make_finite=False)
+    if np.isinf(res1) or  np.any(np.isnan(res1)):
+      return 1e20
+    res2 = model.loglike(point,
+                         make_finite=False,
+                         cached=False,
+                         return_derived=False)
+    if np.isinf(res2) or  np.any(np.isnan(res2)):
+      return 1e20
     return -2.0*(res1+res2)
 def chi2v2(p):
+    p = [float(v) for v in p.values()] if isinstance(p, dict) else p
     point = dict(zip(model.parameterization.sampled_params(), p))
     logposterior = model.logposterior(point, as_dict=True)
     chi2likes=-2*np.array(list(logposterior["loglikes"].values()))
@@ -302,17 +308,17 @@ etheta = emultheta(extra_args={
 if __name__ == '__main__':
     maxevals = args.maxfeval
 
-    # First: load the cov. matrix (from running EXAMPLE_EMUL_MCMC1.yaml) --
+    # 1st: load the cov. matrix (from running EXAMPLE_EMUL_MCMC1.yaml) ---------
     cov = np.loadtxt(args.root+args.cov[0])[0:model.prior.d(),0:model.prior.d()]
     factor = args.factor
     sigma = np.sqrt(np.diag(cov))
 
-    # Second: get minimum --------------------------------------------------
+    # 2nd: read minimum --------------------------------------------------------
     x0 = np.loadtxt(args.minfile[0])
     chi20 = x0[-1]
     x0 = x0[0:model.prior.d()]
     
-    # Third we need to set the parameter profile range ---------------------
+    # 3rd: set the parameter profile range -------------------------------------
     start = np.zeros(model.prior.d(), dtype='float64')
     stop  = np.zeros(model.prior.d(), dtype='float64')
     start = x0 - factor*sigma
@@ -335,20 +341,20 @@ if __name__ == '__main__':
                          num = numpts)
     numpts=numpts+1
     param = np.insert(param, numpts//2, x0[args.profile])
-    
-    # Print to the terminal ------------------------------------------------
+
+    # 4th Print to the terminal ------------------------------------------------
     names = list(model.parameterization.sampled_params().keys()) # Cobaya Call
     print(f"maxfeval={args.maxfeval}, param={names[args.profile]}")
     print(f"profile param values = {param}")
     
-    # 4th: we need to set the vectors that will hold the final result ------
+    # 5th: Set the vectors that will hold the final result ---------------------
     xf = np.tile(x0, (numpts, 1))
     xf[:,args.profile] = param
     
     chi2res = np.zeros(numpts)
     chi2res[numpts//2] = chi20
     
-    # 5th: run from midpoint to right --------------------------------------
+    # 6th: run from midpoint to right ------------------------------------------
     tmp = np.array(xf[numpts//2,:], dtype='float64')
     for i in range(numpts//2+1,numpts):
         tmp[args.profile] = param[i]
@@ -367,7 +373,7 @@ if __name__ == '__main__':
         chi2res[i] = chi2(tmp)
         print(f"Partial ({i+1}/{numpts}): params = {tmp}, and chi2 = {chi2res[i]}")
     
-    # 6th: run from midpoint to left ---------------------------------------
+    # 7th: run from midpoint to left -------------------------------------------
     tmp = np.array(xf[numpts//2,:], dtype='float64')
     for i in range(numpts//2-1, -1, -1):
         tmp[args.profile] = param[i]
@@ -386,7 +392,7 @@ if __name__ == '__main__':
         chi2res[i] = chi2(tmp)
         print(f"Partial ({i+1}/{numpts}): params = {tmp}, and chi2 = {chi2res[i]}")       
 
-    # Append derived (begins) ----------------------------------------------
+    # 8th Append derived parameters --------------------------------------------
     tmp = [
         etheta.calculate({
             'thetastar': row[2],
@@ -401,12 +407,14 @@ if __name__ == '__main__':
                           np.array([d['omegam'] for d in tmp], dtype='float64'),
                           np.array([chi2v2(d) for d in xf], dtype='float64')))
     
-    # --- saving file begins -----------------------------------------------    
-    comment = [names[args.profile],"chi2"]+names+["rdrag"]+list(model.info()['likelihood'].keys())+["prior"]
+    # 9th Save output file -----------------------------------------------------
+    os.makedirs(os.path.dirname(f"{args.root}chains/"),exist_ok=True)
+    hd = [names[args.profile], "chi2"] + names + ["H0", 'omegam']
+    hd = hd + list(model.info()['likelihood'].keys()) + ["prior"]    
     np.savetxt(f"{args.root}chains/{args.outroot}.{names[args.profile]}.txt",
-               np.concatenate([np.c_[param,chi2res],xf],axis=1),
+               np.concatenate([np.c_[param, chi2res],xf],axis=1),
                fmt="%.6e",
-               header=f"maxfeval={args.maxfeval}, param={names[args.profile]}\n"+' '.join(comment),
+               header=f"maxfeval={args.maxfeval}, param={names[args.profile]}\n"+' '.join(hd),
                comments="# ")
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
