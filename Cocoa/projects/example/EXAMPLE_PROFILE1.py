@@ -1,5 +1,4 @@
-import warnings
-import os
+import warnings, os, psutil
 from sklearn.exceptions import InconsistentVersionWarning
 warnings.filterwarnings("ignore", category=InconsistentVersionWarning)
 warnings.filterwarnings(
@@ -34,6 +33,26 @@ from cobaya.yaml import yaml_load
 from cobaya.model import get_model
 from getdist import IniFile
 from schwimmbad import MPIPool
+# ------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
+_affinity_set = False
+
+def enforce_affinity():
+    # schwimmbad.MPIPool uses one Python process per MPI rank
+    # So each rank can directly control its own CPU affinity via psutil
+    # No reliance on mpirun or OpenMPI doing the right thing
+    rank = int(os.environ.get("OMPI_COMM_WORLD_RANK", 0))
+    omp_threads = int(os.environ.get("OMP_NUM_THREADS", 1))
+    first_core = rank * omp_threads
+    last_core  = first_core + omp_threads - 1
+    try:
+        psutil.Process().cpu_affinity(list(range(first_core, last_core + 1)))
+    except Exception as e:
+        print(f"[Rank {rank}] Failed to set affinity: {e}")
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
@@ -118,25 +137,26 @@ likelihood:
 params:
   logA:
     prior:
-      min: 1.61
-      max: 3.91
+      min: 2.7
+      max: 3.4
     ref:
       dist: norm
-      loc: 3.0448
-      scale: 0.05
-    proposal: 0.05
-    latex: '\log(10^{10} A_\mathrm{s})'
+      loc: 3.04
+      scale: 0.025
+    proposal: 0.025
+    latex: \log(10^{10} A_\mathrm{s}
+    drop: true
   ns:
     prior:
-      min: 0.92
-      max: 1.05
+      min: 0.93
+      max: 1.01
     ref:
       dist: norm
-      loc: 0.96605
-      scale: 0.005
-    proposal: 0.005
-    latex: 'n_\mathrm{s}'
-  thetastar:
+      loc: 0.96
+      scale: 0.0075
+    proposal: 0.0075
+    latex: n_\mathrm{s}
+  theta_MC_100:
     prior:
       min: 1
       max: 1.2
@@ -145,28 +165,32 @@ params:
       loc: 1.04109
       scale: 0.0004
     proposal: 0.0002
-    latex: '100\theta_\mathrm{*}'
+    latex: 100\theta_\mathrm{MC}
+    drop: true
     renames: theta
+  cosmomc_theta:
+    value: 'lambda theta_MC_100: 1.e-2*theta_MC_100'
+    derived: false
   omegabh2:
     prior:
       min: 0.01
-      max: 0.04
+      max: 0.03
     ref:
       dist: norm
       loc: 0.022383
       scale: 0.005
     proposal: 0.005
-    latex: '\Omega_\mathrm{b} h^2'
+    latex: \Omega_\mathrm{b} h^2
   omegach2:
     prior:
-      min: 0.06
-      max: 0.2
+      min: 0.08
+      max: 0.16
     ref:
       dist: norm
       loc: 0.12011
-      scale: 0.03
-    proposal: 0.03
-    latex: '\Omega_\mathrm{c} h^2'
+      scale: 0.01
+    proposal: 0.01
+    latex: \Omega_\mathrm{c} h^2
   tau:
     prior:
       min: 0.04
@@ -177,86 +201,45 @@ params:
       scale: 0.01
     proposal: 0.01
     latex: \tau_\mathrm{reio}
-  As:
-    derived: 'lambda logA: 1e-10*np.exp(logA)'
-    latex: 'A_\mathrm{s}'
-  A:
-    derived: 'lambda As: 1e9*As'
-    latex: '10^9 A_\mathrm{s}'
   mnu:
     value: 0.06
-  w0pwa:
-    value: -1.0
-    latex: 'w_{0,\mathrm{DE}}+w_{a,\mathrm{DE}}'
-    drop: true
-  w:
-    value: -1.0
-    latex: 'w_{0,\mathrm{DE}}'
-  wa:
-    value: 'lambda w0pwa, w: w0pwa - w'
-    derived: false
-    latex: 'w_{a,\mathrm{DE}}'
+  As:
+    value: 'lambda logA: 1e-10*np.exp(logA)'
+    latex: A_\mathrm{s}
+  omegab:
+    derived: 'lambda omegabh2, H0: omegabh2/((H0/100)**2)'
+    latex: \Omega_\mathrm{b}
+  omegac:
+    derived: 'lambda omegach2, H0: omegach2/((H0/100)**2)'
+    latex: \Omega_\mathrm{c}
   H0:
-    latex: H_0
-  omegamh2:
     derived: true
-    value: 'lambda omegach2, omegabh2, mnu: omegach2+omegabh2+(mnu*(3.046/3)**0.75)/94.0708'
-    latex: '\Omega_\mathrm{m} h^2'
+    latex: H_0
   omegam:
-    latex: '\Omega_\mathrm{m}'
+    derived: true
+    latex: \Omega_\mathrm{m}
   rdrag:
-    latex: 'r_\mathrm{drag}'
+    derived: true
+    latex: r_\mathrm{drag}
+  omegamh2:
+    derived: 'lambda omegach2, omegabh2, mnu: omegach2+omegabh2+(mnu*(3.046/3)**0.75)/94.0708'
+    latex: \Omega_\mathrm{m} h^2
+  thetastar:
+   derived: true
+   latex: \Theta_\star
 theory:
-  emultheta:
-    path: ./cobaya/cobaya/theories/
-    provides: ['H0', 'omegam']
+  camb:
+    path: ./external_modules/code/CAMB
     extra_args:
-      file: ['external_modules/data/emultrf/CMB_TRF/emul_lcdm_thetaH0_GP.joblib']
-      extra: ['external_modules/data/emultrf/CMB_TRF/extra_lcdm_thetaH0.npy']
-      ord: [['omegabh2','omegach2','thetastar']]
-      extrapar: [{'MLA' : "GP"}]
-  emulrdrag:
-    path: ./cobaya/cobaya/theories/
-    provides: ['rdrag']
-    extra_args:
-      file: ['external_modules/data/emultrf/BAO_SN_RES/emul_lcdm_rdrag_GP.joblib'] 
-      extra: ['external_modules/data/emultrf/BAO_SN_RES/extra_lcdm_rdrag.npy'] 
-      ord: [['omegabh2','omegach2']]
-  emulcmb:
-    path: ./cobaya/cobaya/theories/
-    extra_args:
-      # This version of the emul was not trained with CosmoRec
-      eval: [True, True, True, True] #TT,TE,EE,PHIPHI
-      device: "cuda"
-      ord: [['omegabh2','omegach2','H0','tau','ns','logA','mnu','w','wa'],
-            ['omegabh2','omegach2','H0','tau','ns','logA','mnu','w','wa'],
-            ['omegabh2','omegach2','H0','tau','ns','logA','mnu','w','wa'],
-            ['omegabh2','omegach2','H0','tau','ns','logA','mnu','w','wa']]
-      file: ['external_modules/data/emultrf/CMB_TRF/emul_lcdm_CMBTT_CNN.pt',
-             'external_modules/data/emultrf/CMB_TRF/emul_lcdm_CMBTE_CNN.pt',
-             'external_modules/data/emultrf/CMB_TRF/emul_lcdm_CMBEE_CNN.pt', 
-             'external_modules/data/emultrf/CMB_TRF/emul_lcdm_phi_ResMLP.pt']
-      extra: ['external_modules/data/emultrf/CMB_TRF/extra_lcdm_CMBTT_CNN.npy',
-              'external_modules/data/emultrf/CMB_TRF/extra_lcdm_CMBTE_CNN.npy',
-              'external_modules/data/emultrf/CMB_TRF/extra_lcdm_CMBEE_CNN.npy', 
-              'external_modules/data/emultrf/CMB_TRF/extra_lcdm_phi_ResMLP.npy']
-      extrapar: [{'ellmax' : 5000, 'MLA': 'CNN', 'INTDIM': 4, 'INTCNN': 5120},
-                 {'ellmax' : 5000, 'MLA': 'CNN', 'INTDIM': 4, 'INTCNN': 5120},
-                 {'ellmax' : 5000, 'MLA': 'CNN', 'INTDIM': 4, 'INTCNN': 5120}, 
-                 {'MLA': 'ResMLP', 'INTDIM': 4, 'NLAYER': 4, 
-                  'TMAT': 'external_modules/data/emultrf/CMB_TRF/PCA_lcdm_phi.npy'}]
-  emulbaosn:
-    path: ./cobaya/cobaya/theories/
-    stop_at_error: True
-    extra_args:
-      device: "cuda"
-      file:  [None, 'external_modules/data/emultrf/BAO_SN_RES/emul_lcdm_H.pt']
-      extra: [None, 'external_modules/data/emultrf/BAO_SN_RES/extra_lcdm_H.npy']    
-      ord: [None, ['omegam','H0']]
-      extrapar: [{'MLA': 'INT', 'ZMIN' : 0.0001, 'ZMAX' : 3, 'NZ' : 600},
-                 {'MLA': 'ResMLP', 'offset' : 0.0, 'INTDIM' : 1, 'NLAYER' : 1,
-                  'TMAT': 'external_modules/data/emultrf/BAO_SN_RES/PCA_lcdm_H.npy',
-                  'ZLIN': 'external_modules/data/emultrf/BAO_SN_RES/z_lin_lcdm.npy'}]
+      halofit_version: mead2020
+      lmax: 4000
+      lens_margin: 1250
+      AccuracyBoost: 1.05
+      lens_potential_accuracy: 4
+      lens_k_eta_reference: 18000
+      nonlinear: NonLinear_both
+      recombination_model: CosmoRec
+      Accuracy.AccurateBB: True
 """
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
@@ -270,15 +253,16 @@ def chi2(p):
     if np.any(np.isinf(p)) or  np.any(np.isnan(p)):
       raise ValueError(f"At least one parameter value was infinite (CoCoa) param = {p}")
     point = dict(zip(model.parameterization.sampled_params(), p))
-    res1 = model.logprior(point,make_finite=False)
-    if np.isinf(res1) or  np.any(np.isnan(res1)):
-      return 1e20
+    res1 = model.logprior(point,
+                          make_finite=False)
+    if np.isinf(res1) or np.any(np.isnan(res1)):
+      return 1.e20
     res2 = model.loglike(point,
                          make_finite=False,
                          cached=False,
                          return_derived=False)
-    if np.isinf(res2) or  np.any(np.isnan(res2)):
-      return 1e20
+    if np.isinf(res2) or np.isnan(res2):
+      return 1.e20
     return -2.0*(res1+res2)
 def chi2v2(p):
     p = [float(v) for v in p.values()] if isinstance(p, dict) else p
@@ -316,7 +300,17 @@ def min_chi2(x0,
         args = (0.0, -2.0, 1.0)
 
     def logprob(params, *args):
-        res = mychi2(params, *args)
+        global _affinity_set
+        if not _affinity_set:
+          enforce_affinity()  # enforce per-rank affinity on pool workers!
+          _affinity_set = True
+          start_time = time.time()
+          res = mychi2(params, *args)
+          etime = time.time() - start_time
+          rank = int(os.environ.get("OMPI_COMM_WORLD_RANK",0))
+          print(f"Emcee: Like Eval Time: {etime:.4f} secs and MPI Rank: {rank}")
+        else:
+          res = mychi2(params, *args)
         if (res > 1.e19 or np.isinf(res) or  np.isnan(res)):
           return -np.inf
         else:
@@ -383,29 +377,13 @@ def prf(x0, nstw, cov, fixed=-1, nwalkers=5, pool=None):
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
-from cobaya.theories.emultheta.emultheta2 import emultheta
-etheta = emultheta(extra_args={ 
-    'device': "cuda",
-    'file': ['external_modules/data/emultrf/CMB_TRF/emul_lcdm_thetaH0_GP.joblib'],
-    'extra':['external_modules/data/emultrf/CMB_TRF/extra_lcdm_thetaH0.npy'],
-    'ord':  [['omegabh2','omegach2','thetastar']],
-    'extrapar': [{'MLA' : "GP"}]})
-from cobaya.theories.emulrdrag.emulrdrag2 import emulrdrag
-erd = emulrdrag(extra_args={ 
-    'file': ['external_modules/data/emultrf/BAO_SN_RES/emul_lcdm_rdrag_GP.joblib'],
-    'extra':['external_modules/data/emultrf/BAO_SN_RES/extra_lcdm_rdrag.npy'],
-    'ord':  [['omegabh2','omegach2']]})
-# ------------------------------------------------------------------------------
-# ------------------------------------------------------------------------------
-# ------------------------------------------------------------------------------
-# ------------------------------------------------------------------------------
-# ------------------------------------------------------------------------------
-# ------------------------------------------------------------------------------
 if __name__ == '__main__':
     with MPIPool() as pool:
         if not pool.is_master():
             pool.wait()
             sys.exit(0)
+        enforce_affinity() # enforce affinity (so Hybrid MPI-OpenMP works)!
+
         dim      = model.prior.d()     
         nwalkers = max(3*dim, pool.comm.Get_size())
         nstw = args.nstw
@@ -510,36 +488,31 @@ if __name__ == '__main__':
             print(f"Partial ({i+1}/{numpts}): params={tmp}, and chi2={chi2res[i]}")
         
         # 8th Append derived parameters ----------------------------------------
-        tmp = [
-            etheta.calculate({
-                'thetastar': row[2],
-                'omegabh2':  row[3],
-                'omegach2':  row[4],
-                'omegamh2':  row[3] + row[4] + (0.06*(3.046/3)**0.75)/94.0708
-            })
-            for row in xf
-          ]
-        tmp2 = [
-            erd.calculate({
-                'omegabh2':   row[3],
-                'omegach2':   row[4]
-            })
-            for row in xf
-          ]
+        H0 = []
+        omm = []
+        rdrag = []
+        for d in xf:
+            tmp = model.logposterior(d, 
+                                     as_dict=True, 
+                                     make_finite=True, 
+                                     return_derived=True)
+            H0.append(tmp['derived']['H0'])
+            omm.append(tmp['derived']['omegam'])
+            rdrag.append(tmp['derived']['rdrag'])
         xf = np.column_stack((xf, 
-                              np.array([d['H0'] for d in tmp], dtype='float64'), 
-                              np.array([d['omegam'] for d in tmp], dtype='float64'),
-                              np.array([d['rdrag'] for d in tmp2],dtype='float64'),
+                              np.array(H0,dtype='float64'), 
+                              np.array(omm,dtype='float64'),
+                              np.array(rdrag,dtype='float64'), 
                               np.array([chi2v2(d) for d in xf], dtype='float64')))
 
         # 9th Save output file -------------------------------------------------    
         os.makedirs(os.path.dirname(f"{args.root}chains/"), exist_ok=True)
-        hd = [names[args.profile], "chi2"] + names + ["H0", 'omegam', "rdrag"]
+        hd = [names[args.profile], "chi2"] + names + ['H0', 'omegam', 'rdrag']
         hd = hd + list(model.info()['likelihood'].keys()) + ["prior"]
         np.savetxt(f"{args.root}chains/{args.outroot}.{names[args.profile]}.txt",
-                   np.concatenate([np.c_[param, chi2res],xf], axis=1),
-                   fmt="%.9e",
-                   header=f"nstw={args.nstw}, param={names[args.profile]}\n"+' '.join(hd),
+                   np.concatenate([np.c_[param, chi2res], xf], axis=1),
+                   fmt="%.6e",
+                   header=f"nstw (evals/Temp/walker)={args.nstw}, param={names[args.profile]}\n"+' '.join(hd),
                    comments="# ")
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
