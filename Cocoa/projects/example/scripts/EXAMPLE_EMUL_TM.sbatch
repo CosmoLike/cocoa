@@ -21,6 +21,8 @@ echo Slurm job ID is $SLURM_JOBID
 echo Number of task is $SLURM_NTASKS
 echo Number of cpus per task is $SLURM_CPUS_PER_TASK
 
+sleep $(( RANDOM%61 + SLURM_ARRAY_TASK_ID*10 )) # avoid different scripts running start_cocoa.sh 
+                                                # at the same time
 cd $SLURM_SUBMIT_DIR
 source ~/.bashrc
 conda activate cocoa
