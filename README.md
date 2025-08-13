@@ -299,7 +299,7 @@ Now, users must follow all the steps below.
   For proper convergence, each walker should traverse 50 times its autocorrelation length,
   which is provided in the header of the output chain file. 
 
-  The script of the plot below is provided at `projects/example/script/EXAMPLE_PLOT_COMPARE_CHAINS.py`
+  The script of the plot below is provided at `projects/example/scripts/EXAMPLE_PLOT_COMPARE_CHAINS.py`
 <p align="center">
 <img width="750" height="750" alt="Screenshot 2025-08-03 at 4 19 17 PM" src="https://github.com/user-attachments/assets/5badda55-2152-4520-a358-cc4d6c517ac9" />
 </p>
@@ -316,14 +316,14 @@ Now, users must follow all the steps below.
   Do maintain $n_{\\rm sw} > 200$ for reliable results (see plot below).
   The same rule applies to *Profile* and *Scan* codes, as they are all based on the same minimization strategy.
 
-  The script of the plot below is provided at `projects/example/script/EXAMPLE_MIN_COMPARE_CONV.py`
+  The script of the plot below is provided at `projects/example/scripts/EXAMPLE_MIN_COMPARE_CONV.py`
 
   <p align="center">
   <img width="700" height="470" alt="Screenshot 2025-08-04 at 7 05 53 AM" src="https://github.com/user-attachments/assets/a48b267a-beba-4e53-9dbf-e3c5a24daff1" />
   </p>
 
   In our testing, the recommendation $n_{\\rm sw} \sim 200$ worked reasonably well up to $n_{\rm param} \sim 15$. 
-  Below is a case with $n_{\rm param} = 38$ that illustrates that users must test the convergence of the minimizers on a case-by-case basis.
+  Below is a case with $n_{\rm param} = 38$ that illustrates the need for users to test the convergence of the minimizers on a case-by-case basis.
 
   <p align="center">
   <img width="750" height="750" alt="Screenshot 2025-08-13 at 5 29 59 PM" src="https://github.com/user-attachments/assets/12130055-9697-4326-8ffe-83654e9b564d" /> 
@@ -351,7 +351,7 @@ Now, users must follow all the steps below.
   Finally, the number of steps per Emcee walker, $n_{\\rm sw}$, per temperature is $n_{\\rm sw} = {\\rm maxfeval}/4 n_{\\rm w}$,
   and the number of walkers is $n_{\\rm w}={\\rm max}(3n_{\\rm params},n_{\\rm MPI})$.
 
-  The script of the plot below is provided at `projects/example/script/EXAMPLE_PLOT_PROFILE1.py`
+  The script of the plot below is provided at `projects/example/scripts/EXAMPLE_PLOT_PROFILE1.py`
   
 <p align="center">
 <img width="1156" height="858" alt="Screenshot 2025-08-02 at 8 42 41 PM" src="https://github.com/user-attachments/assets/22182688-2865-4b15-a80b-783ddd21f715" />
@@ -370,7 +370,7 @@ Now, users must follow all the steps below.
               --outroot "EXAMPLE_EMUL_PROFILE1M2" --factor 3 --maxfeval 5000 --numpts 10 \
               --profile 1 --minfile="./projects/example/chains/EXAMPLE_EMUL_MIN1.txt"
 
-     The script of the plot below is provided at `projects/example/script/EXAMPLE_PLOT_PROFILE1_COMP.py`
+     The script of the plot below is provided at `projects/example/scripts/EXAMPLE_PLOT_PROFILE1_COMP.py`
   
 <p align="center">
 <img width="1156" height="858" alt="Screenshot 2025-08-03 at 5 08 04 PM" src="https://github.com/user-attachments/assets/ba0c0629-bd3b-4274-9f24-9db5929dc35c" />
@@ -484,7 +484,7 @@ and
 
      source start_cocoa.sh # even if (.local) is already active, users must run start_cocoa.sh again to update bash environment values
 
-Similarly to `setup_cocoa.sh` and `compile_cocoa.sh`, each code package contains a `setup` scripts that download it from the internet and a `compile` scripts that compile it. E.g., the `ACT-DR6` likelihood code can be downloaded and installed via the bash commands
+Similar to `setup_cocoa.sh` and `compile_cocoa.sh`, each code package contains a `setup` scripts that download it from the internet and a `compile` scripts that compile it. E.g., the `ACT-DR6` likelihood code can be downloaded and installed via the bash commands
  
      source ./installation_scripts/setup_act_dr6.sh                # download likelihood code
 
@@ -568,7 +568,7 @@ We provide the Docker image [whovian-cocoa](https://hub.docker.com/r/vivianmiran
      mkdir -p cocoa_docker
      cd ./cocoa_docker
 
- **Step :two:**: Download the docker image *whovian-cocoa*, name the associated container `cocoa2023`, and run the container for the first time, type:
+ **Step :two:**: Download the Docker image *whovian-cocoa*, name the associated container `cocoa2023`, and run the container for the first time, type:
 
     docker run --platform linux/amd64 --hostname cocoa --name cocoa2025 -it -p 8888:8888 -v $(pwd):/home/whovian/host/ -v ~/.ssh:/home/whovian/.ssh:ro vivianmiranda/whovian-cocoa
 
@@ -774,7 +774,7 @@ Until recently, Cocoa development was a bit unstructured. Developers could push 
 
     git push -u origin xyzdev   # run on the xyzdev branch
 
-**Step :three:**: Once the developers created an atomic, meaningful, and well-tested improvement to Cocoa, the developer needs to merge any subsequent changes made in `main`.
+**Step :three:**: Once the developers have created an atomic, meaningful, and well-tested improvement to Cocoa, the developer needs to merge any subsequent changes made in `main`.
 
     git merge main   # run on the xyzdev branch
 
