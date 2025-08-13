@@ -296,7 +296,7 @@ Now, users must follow all the steps below.
 
   The number of steps per MPI worker is $n_{\\rm sw} =  {\\rm maxfeval}/n_{\\rm w}$,
   with the number of walkers being $n_{\\rm w}={\\rm max}(3n_{\\rm params},n_{\\rm MPI})$.
-  For proper convergence, each walker should traverse 50 times the auto-correlation length,
+  For proper convergence, each walker should traverse 50 times its autocorrelation length,
   which is provided in the header of the output chain file. 
 
   The script of the plot below is provided at `projects/example/script/EXAMPLE_PLOT_COMPARE_CHAINS.py`
