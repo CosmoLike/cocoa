@@ -323,7 +323,7 @@ Now, users must follow all the steps below.
   </p>
 
   In our testing, the recommendation $n_{\\rm sw} \sim 150$ worked reasonably well up to $n_{\rm param} \sim 15$. 
-  Below is a case with 38 parameters involving CMB and LSST-Y1 showing that users must test the convergence of the minimizers in high dimension
+  Below is a case with 38 parameters involving CMB and LSST-Y1, illustrating that users must test the convergence of the minimizers on a case-by-case basis.
 
   <p align="center">
   <img width="750" height="750" alt="Screenshot 2025-08-13 at 5 29 59 PM" src="https://github.com/user-attachments/assets/12130055-9697-4326-8ffe-83654e9b564d" /> 
