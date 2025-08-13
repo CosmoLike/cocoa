@@ -317,9 +317,17 @@ Now, users must follow all the steps below.
   The same rule applies to *Profile* and *Scan* codes, as they are all based on the same minimization strategy.
 
   The script of the plot below is provided at `projects/example/script/EXAMPLE_MIN_COMPARE_CONV.py`
-<p align="center">
-<img width="700" height="470" alt="Screenshot 2025-08-04 at 7 05 53 AM" src="https://github.com/user-attachments/assets/a48b267a-beba-4e53-9dbf-e3c5a24daff1" />
-</p>
+
+  <p align="center">
+  <img width="700" height="470" alt="Screenshot 2025-08-04 at 7 05 53 AM" src="https://github.com/user-attachments/assets/a48b267a-beba-4e53-9dbf-e3c5a24daff1" />
+  </p>
+
+  In our testing, the recommendation $n_{\\rm sw} \sim 150$ worked reasonably well up to $n_{\rm param} \sim 15$. 
+  Below is a case with 38 parameters involving CMB and LSST-Y1 showing that users must test the convergence of the minimizers in high dimension
+
+  <p align="center">
+  <img width="750" height="750" alt="Screenshot 2025-08-13 at 5 29 59 PM" src="https://github.com/user-attachments/assets/12130055-9697-4326-8ffe-83654e9b564d" /> 
+  </p>
 
 - **Profile**: 
 
