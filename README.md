@@ -314,9 +314,9 @@ Now, users must follow all the steps below.
               --outroot "EXAMPLE_EMUL_MIN1" --nstw 200
 
   The number of steps per Emcee walker per temperature is $n_{\\rm stw}$,
-  and the number of walkers is $n_{\\rm w}={\\rm max}(3n_{\\rm params},n_{\\rm MPI})$.
-  Do maintain $n_{\\rm stw} > 200$ for reliable results (see plot below).
-  The same rule applies to *Profile* and *Scan* codes, as they are all based on the same minimization strategy.
+  and the number of walkers is $n_{\\rm w}={\\rm max}(3n_{\\rm params},n_{\\rm MPI})$. The total number of evaluations is
+  $n_{\rm param} \times n_{\\rm w} \times n_{\rm T} \times n_{\\rm stw}$, distributed, in our example, among $n_{\\rm MPI} = n_{\\rm w} = 3n_{\\rm params}$ MPI processes.
+  Do maintain $n_{\\rm stw} > 200$ for reliable results (see plot below). The same rule applies to *Profile* and *Scan* codes, as they are all based on the same minimization strategy.
 
   The script of the plot below is provided at `projects/example/scripts/EXAMPLE_MIN_COMPARE_CONV.py`
 
@@ -324,10 +324,10 @@ Now, users must follow all the steps below.
   <img width="700" height="470" alt="Screenshot 2025-08-04 at 7 05 53 AM" src="https://github.com/user-attachments/assets/a48b267a-beba-4e53-9dbf-e3c5a24daff1" />
   </p>
 
-  In our testing, the recommendation $n_{\\rm stw} \sim 200$ worked reasonably well up to $n_{\rm param} \sim 15$. 
-  Below is a case with $n_{\rm param} = 38$ that illustrates the need for users to test the minimizer convergence on a case-by-case basis. In this case,
-  the total number of evaluations for a reliable minimum is approximately $n_{\rm param} \times n_{\rm walkers} \times n_{\rm T} \times n_{\\rm stw} \sim 38 \times 3 \times 4 \times 700 = 319,200$.
-  This high number emphasizes the need for emulators, especially when computing Profile likelihoods.
+  In our testing, $n_{\\rm stw} \sim 200$ worked reasonably well up to $n_{\rm param} \sim \mathcal{O}(10)$. 
+  Below is a case with $n_{\rm param} = 38$ that illustrates the need for convergence tests on a case-by-case basis. In this case,
+  the total number of evaluations for a reliable minimum is approximately $319,200$ (with $n_{\\rm stw} = 700$), which can be distributed among
+  $n_{\\rm MPI} = 114$ MPI processes for faster results. With the use of emulators, such minima can be computed with $\mathcal{O}(1)$ MPI processes.
 
   <p align="center">
   <img width="750" height="750" alt="Screenshot 2025-08-13 at 5 29 59 PM" src="https://github.com/user-attachments/assets/c43b8eea-ee2e-443d-a497-cb9b2dae2fc3" />
