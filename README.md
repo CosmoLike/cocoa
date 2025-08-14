@@ -314,9 +314,10 @@ Now, users must follow all the steps below.
               --outroot "EXAMPLE_EMUL_MIN1" --nstw 200
 
   The number of steps per Emcee walker per temperature is $n_{\\rm stw}$,
-  and the number of walkers is $n_{\\rm w}={\\rm max}(3n_{\\rm params},n_{\\rm MPI})$. The minimum number of total evaluations is
+  and the number of walkers is $n_{\\rm w}={\\rm max}(3n_{\\rm params},n_{\\rm MPI})$. The minimum number of total evaluations is then 
   $3n_{\\rm params} \times n_{\rm T} \times n_{\\rm stw}$, which can be distributed among $n_{\\rm MPI} = 3n_{\\rm params}$ MPI processes for faster results.
-  Do maintain $n_{\\rm stw} > 200$ for reliable convergence (see plot below). The same rule applies to *Profile* and *Scan* codes, as they are all based on the same minimization strategy.
+  Do maintain $n_{\\rm stw} > 200$ for reliable convergence in LCDM (see plot below).
+  The same rule applies to *Profile* and *Scan* codes, as they are all based on the same minimization strategy.
 
   The script that generated the plot below is provided at `projects/example/scripts/EXAMPLE_MIN_COMPARE_CONV.py`
 
