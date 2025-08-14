@@ -20,8 +20,8 @@ echo Slurm job ID is $SLURM_JOBID
 echo Number of task is $SLURM_NTASKS
 echo Number of cpus per task is $SLURM_CPUS_PER_TASK
 
-sleep $(( RANDOM%61 + SLURM_ARRAY_TASK_ID*10 )) # avoid different scripts running start_cocoa.sh 
-                                                # at the same time
+sleep $(( 10 + SLURM_ARRAY_TASK_ID*20 )) # avoid different scripts running start_cocoa.sh at the same time
+
 cd $SLURM_SUBMIT_DIR
 source ~/.bashrc
 conda activate cocoa
@@ -30,13 +30,8 @@ source start_cocoa.sh
 export OMP_NUM_THREADS=1
 ulimit -u 2000000 # require line when nmpi is high
 
-# WRITE DOWN HERE THE COV ASSOCIATED WITH EACH JOB IN THE ARRAY
-declare -a COV=( "chains/EXAMPLE_EMUL_MCMC1.covmat"
-                 "chains/EXAMPLE_EMUL_MCMC1.covmat")
-
 mpirun -n ${SLURM_NTASKS} --oversubscribe --mca pml ^ucx --mca btl vader,tcp,self \
   --bind-to core:overload-allowed --rank-by slot \
   --map-by slot:pe=${OMP_NUM_THREADS} --mca mpi_yield_when_idle 1 \
   python ./projects/example/EXAMPLE_EMUL_MINIMIZE${SLURM_ARRAY_TASK_ID}.py \
-    --root ./projects/example/ --cov "${COV[${SLURM_ARRAY_TASK_ID}]}" \
-    --outroot "EXAMPLE_EMUL_MIN${SLURM_ARRAY_TASK_ID}" --nstw 200
+    --root ./projects/example/ --outroot "EXAMPLE_EMUL_MIN${SLURM_ARRAY_TASK_ID}" --nstw 200
