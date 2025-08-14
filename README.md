@@ -324,10 +324,10 @@ Now, users must follow all the steps below.
   <img width="700" height="470" alt="Screenshot 2025-08-04 at 7 05 53 AM" src="https://github.com/user-attachments/assets/a48b267a-beba-4e53-9dbf-e3c5a24daff1" />
   </p>
 
-  In our testing, $n_{\\rm stw} \sim 200$ worked reasonably well up to $n_{\rm param} \sim \mathcal{O}(10)$. 
-  Below is a case with $n_{\rm param} = 38$ that illustrates the need for convergence tests on a case-by-case basis. In this case,
-  the total number of evaluations for a reliable minimum is approximately $319,200$ (with $n_{\\rm stw} = 700$), which can be distributed among
-  $n_{\\rm MPI} = 114$ MPI processes for faster results. With the use of emulators, such minima can be computed with $\mathcal{O}(1)$ MPI processes.
+  In our testing, $n_{\\rm stw} \sim 200$ worked reasonably well up to $n_{\rm param} \sim \mathcal{O}(10)$.
+  Below we show a case with $n_{\rm param} = 38$ that illustrates the need for performing convergence tests on a case-by-case basis.
+  In this example, the total number of evaluations for a reliable minimum is approximately $319,200$ ($n_{\\rm stw} \sim 700$), distributed among $n_{\\rm MPI} = 114$ processes for faster results.
+  With the use of emulators, such minima can be computed with $\mathcal{O}(1)$ MPI workers.
 
   <p align="center">
   <img width="750" height="750" alt="Screenshot 2025-08-13 at 5 29 59 PM" src="https://github.com/user-attachments/assets/c43b8eea-ee2e-443d-a497-cb9b2dae2fc3" />
