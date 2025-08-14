@@ -287,6 +287,8 @@ Now, users must follow all the steps below.
               --root ./projects/example/ --outroot "EXAMPLE_EMUL_NAUTILUS1"  \
               --maxfeval 450000 --nlive 2048 --neff 15000 --flive 0.01 --nnetworks 5
 
+  What if the user runs an `Nautilus` chain with `maxeval` insufficient for producing `neff` samples? `Nautilus` saves the chain checkpoint at `chains/outroot_checkpoint.hdf5`.
+
 - **Emcee**:
 
       mpirun -n 21 --oversubscribe --mca pml ^ucx --mca btl vader,tcp,self --rank-by slot \
@@ -307,7 +309,10 @@ Now, users must follow all the steps below.
   
   Conclusion: `Emcee` requires $\sim 3$ more evaluations in this case, but the number of evaluations per MPI worker (assuming one MPI worker per walker) is reduced by $\sim 10$.
   Therefore, `Emcee` seems well-suited for cases where the evaluation of a single cosmology is time-consuming (and there is no slow/fast decomposition).
-  
+
+  What if the user runs an `Emcee` chain with `maxeval` insufficient for convergence? `Emcee` saves the chain checkpoint at `chains/outroot.h5`.
+
+- **Sampler Comparison**
 
   The script of the plot below is provided at `projects/example/scripts/EXAMPLE_PLOT_COMPARE_CHAINS.py`
 <p align="center">
