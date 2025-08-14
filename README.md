@@ -314,11 +314,11 @@ Now, users must follow all the steps below.
               --outroot "EXAMPLE_EMUL_MIN1" --nstw 200
 
   The number of steps per Emcee walker per temperature is $n_{\\rm stw}$,
-  and the number of walkers is $n_{\\rm w}={\\rm max}(3n_{\\rm params},n_{\\rm MPI})$. The total number of evaluations is
-  $n_{\rm param} \times n_{\\rm w} \times n_{\rm T} \times n_{\\rm stw}$, distributed, in our example, among $n_{\\rm MPI} = 3n_{\\rm params}$ MPI processes.
-  Do maintain $n_{\\rm stw} > 200$ for reliable results (see plot below). The same rule applies to *Profile* and *Scan* codes, as they are all based on the same minimization strategy.
+  and the number of walkers is $n_{\\rm w}={\\rm max}(3n_{\\rm params},n_{\\rm MPI})$. The minimum number of total evaluations is
+  $3n_{\\rm params} \times n_{\rm T} \times n_{\\rm stw}$, which can be distributed among $n_{\\rm MPI} = 3n_{\\rm params}$ MPI processes for faster results.
+  Do maintain $n_{\\rm stw} > 200$ for reliable convergence (see plot below). The same rule applies to *Profile* and *Scan* codes, as they are all based on the same minimization strategy.
 
-  The script of the plot below is provided at `projects/example/scripts/EXAMPLE_MIN_COMPARE_CONV.py`
+  The script that generated the plot below is provided at `projects/example/scripts/EXAMPLE_MIN_COMPARE_CONV.py`
 
   <p align="center">
   <img width="700" height="470" alt="Screenshot 2025-08-04 at 7 05 53 AM" src="https://github.com/user-attachments/assets/a48b267a-beba-4e53-9dbf-e3c5a24daff1" />
