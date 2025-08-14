@@ -316,7 +316,7 @@ Now, users must follow all the steps below.
 
   The script of the plot below is provided at `projects/example/scripts/EXAMPLE_PLOT_COMPARE_CHAINS.py`
 <p align="center">
-<img width="750" height="750" alt="Screenshot 2025-08-03 at 4 19 17 PM" src="https://github.com/user-attachments/assets/5badda55-2152-4520-a358-cc4d6c517ac9" />
+<img width="750" height="750" alt="projects_example_sampler_comparison" src="https://github.com/user-attachments/assets/d3639673-36ea-4fd9-9c91-1f5b97845fe0" />
 </p>
 
 - **Global Minimizer**:
@@ -366,10 +366,9 @@ Now, users must follow all the steps below.
       start value ~ mininum value - factor*np.sqrt(np.diag(cov))
       end   value ~ mininum value + factor*np.sqrt(np.diag(cov))
 
-  We advise `factor ~ 3` when a covariance matrix is provided. If `cov` is not supplied, the code estimates
-  one internally from the prior. In this case, the code imposes `factor < 1` and we suggest `factor << 1`.
-  Finally, the number of steps per Emcee walker, $n_{\\rm sw}$, per temperature is $n_{\\rm sw} = {\\rm maxfeval}/4 n_{\\rm w}$,
-  and the number of walkers is $n_{\\rm w}={\\rm max}(3n_{\\rm params},n_{\\rm MPI})$.
+  We advise ${\rm factor} \sim 3$ for parameters that are well constrained by the data when a covariance matrix is provided.
+  If `cov` is not supplied, the code estimates one internally from the prior.
+  If a parameter is poorly constrained or `cov` is not given, we recommend ${\rm factor} \ll 1$.
 
   The script of the plot below is provided at `projects/example/scripts/EXAMPLE_PLOT_PROFILE1.py`
   
