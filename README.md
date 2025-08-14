@@ -313,7 +313,7 @@ Now, users must follow all the steps below.
 
   The number of steps per Emcee walker per temperature is $n_{\\rm stw}$,
   and the number of walkers is $n_{\\rm w}={\\rm max}(3n_{\\rm params},n_{\\rm MPI})$.
-  Do maintain $n_{\\rm sw} > 200$ for reliable results (see plot below).
+  Do maintain $n_{\\rm stw} > 200$ for reliable results (see plot below).
   The same rule applies to *Profile* and *Scan* codes, as they are all based on the same minimization strategy.
 
   The script of the plot below is provided at `projects/example/scripts/EXAMPLE_MIN_COMPARE_CONV.py`
@@ -322,11 +322,12 @@ Now, users must follow all the steps below.
   <img width="700" height="470" alt="Screenshot 2025-08-04 at 7 05 53 AM" src="https://github.com/user-attachments/assets/a48b267a-beba-4e53-9dbf-e3c5a24daff1" />
   </p>
 
-  In our testing, the recommendation $n_{\\rm sw} \sim 200$ worked reasonably well up to $n_{\rm param} \sim 15$. 
-  Below is a case with $n_{\rm param} = 38$ that illustrates the need for users to test the convergence of the minimizers on a case-by-case basis.
+  In our testing, the recommendation $n_{\\rm stw} \sim 200$ worked reasonably well up to $n_{\rm param} \sim 15$. 
+  Below is a case with $n_{\rm param} = 38$ that illustrates the need for users to test the convergence of the minimizers on a case-by-case basis. In this case,
+  the total number of evaluations for a reliable minimum is approximately $n_{\rm param} \times n_{\rm walkers} \times n_{\rm T} \times n_{\\rm stw} \sim 38 \times 3 \times 4 \times 600 = 273,600$. 
 
   <p align="center">
-  <img width="750" height="750" alt="Screenshot 2025-08-13 at 5 29 59 PM" src="https://github.com/user-attachments/assets/12130055-9697-4326-8ffe-83654e9b564d" /> 
+  <img width="750" height="750" alt="Screenshot 2025-08-13 at 5 29 59 PM" src="https://github.com/user-attachments/assets/c43b8eea-ee2e-443d-a497-cb9b2dae2fc3" />
   </p>
 
 - **Profile**: 
