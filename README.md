@@ -304,7 +304,8 @@ Now, users must follow all the steps below.
   Here are a few numbers based on a `Planck CMB (l < 396) + SN + BAO + LSST-Y1` chain with 38 parameters in total.
   1) `MH` achieves convergence with $n_{\\rm sw} \sim 120,000$, but only requires four walkers.
   2) `Emcee` has $\tau \sim 300$, so it requires $n_{\\rm sw} \sim 15,000$ when running with $n_{\\rm w}=114$.
-  Conclusion: `Emcee` requires $\sim 4$ more evaluations in this case, but the number of evaluations per MPI walker (assuming one MPI worker per walker) is reduced by $\sim 10$.
+  
+  Conclusion: `Emcee` requires $\sim 4$ more evaluations in this case, but the number of evaluations per MPI worker (assuming one MPI worker per walker) is reduced by $\sim 10$.
   Therefore, `Emcee` seems well-suited for cases where the evaluation of a single cosmology is time-consuming (and there is no slow/fast decomposition).
   
 
