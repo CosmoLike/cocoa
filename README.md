@@ -306,6 +306,8 @@ Now, users must follow all the steps below.
 
 - **Global Minimizer**:
 
+  Our minimizer is a reimplementation of `Procoli`, developed by Karwal et al (arXiv:2401.14225) 
+
       mpirun -n 21 --oversubscribe --mca pml ^ucx --mca btl vader,tcp,self --rank-by slot \
           --bind-to core:overload-allowed --map-by slot --mca mpi_yield_when_idle 1 \
           python ./projects/example/EXAMPLE_EMUL_MINIMIZE1.py --root ./projects/example/ \
@@ -323,7 +325,7 @@ Now, users must follow all the steps below.
   </p>
 
   In our testing, the recommendation $n_{\\rm stw} \sim 200$ worked reasonably well up to $n_{\rm param} \sim 15$. 
-  Below is a case with $n_{\rm param} = 38$ that illustrates the need for users to test the convergence of the minimizers on a case-by-case basis. In this case,
+  Below is a case with $n_{\rm param} = 38$ that illustrates the need for users to test the minimizer convergence on a case-by-case basis. In this case,
   the total number of evaluations for a reliable minimum is approximately $n_{\rm param} \times n_{\rm walkers} \times n_{\rm T} \times n_{\\rm stw} \sim 38 \times 3 \times 4 \times 600 = 273,600$. 
 
   <p align="center">
