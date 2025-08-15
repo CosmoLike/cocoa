@@ -21,14 +21,22 @@ echo Slurm job ID is $SLURM_JOBID
 echo Number of task is $SLURM_NTASKS
 echo Number of cpus per task is $SLURM_CPUS_PER_TASK
 
-sleep $(( 10 + SLURM_ARRAY_TASK_ID*20 )) # avoid different scripts running start_cocoa.sh at the same time
-
 cd $SLURM_SUBMIT_DIR
-source ~/.bashrc
-conda activate cocoa
-source start_cocoa.sh
+
+# conda and (.local) envs should be already loaded prior to submitting a slurm script
+if [ -z "${ROOTDIR}" ]; then
+  sleep $(( 10 + SLURM_ARRAY_TASK_ID*20 )) # help avoid different scripts running start_cocoa.sh simultaneously
+                                           # clash can still happen when one script runs start_cocoa.sh, the other
+                                           # script is reading a file (start_cocoa.sh invokes stop_cocoa.sh)
+                                           # which delete links and ROOTDIR so the running script can find file/likelihood
+  source ~/.bashrc
+  conda activate cocoa
+  source start_cocoa.sh
+fi
 
 export OMP_PROC_BIND=close
+export OMP_PLACES=cores
+export OMP_DYNAMIC=FALSE
 if [ -n "$SLURM_CPUS_PER_TASK" ]; then
   export OMP_NUM_THREADS=$SLURM_CPUS_PER_TASK
 else

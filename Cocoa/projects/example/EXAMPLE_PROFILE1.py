@@ -89,10 +89,10 @@ parser.add_argument("--profile",
 parser.add_argument("--factor",
                     dest="factor",
                     help="Factor that set the bounds (multiple of cov matrix)",
-                    type=int,
+                    type=float,
                     nargs='?',
-                    const=1,
-                    default=3)
+                    const=1.0,
+                    default=3.0)
 parser.add_argument("--numpts",
                     dest="numpts",
                     help="Number of Points to Compute Minimum",
