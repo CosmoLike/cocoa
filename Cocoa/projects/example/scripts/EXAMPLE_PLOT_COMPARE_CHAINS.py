@@ -102,8 +102,8 @@ g.triangle_plot(
   shaded=False,
   legend_labels=[
     'MH, 4-walkers, $(R-1)_{\\rm median}$=0.015, $(R-1)_{\\rm std dev}$ = 0.18, burn-in=0.3',
-    'Nautilus, $n_{\\rm eval} \sim 64k$, $n_{\\rm live}=1024$, $\\log(Z)=-1172.64$ ',
-    'EMCEE $n_{\\rm eval}=80k$, $n_{\\rm walkers}=21$, burn-in=0.3',
+    'Nautilus, $n_{\\rm live}=1024$, $\\log(Z)=-1172.64$, $n_{\\rm eval} \\sim 64,000$',
+    'EMCEE $n_{\\rm walkers}=21$, $n_{\\rm eval} \\sim 80,000$',
     'PolyChord $n_{\\rm live}=512$, $n_{\\rm repeat}=3D$, $\\log(Z)=-1187.62 \\pm 0.20$',
   ],
   legend_loc=(0.3, 0.85))

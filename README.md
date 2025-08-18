@@ -287,39 +287,67 @@ Now, users must follow all the steps below.
               --root ./projects/example/ --outroot "EXAMPLE_EMUL_NAUTILUS1"  \
               --maxfeval 450000 --nlive 2048 --neff 15000 --flive 0.01 --nnetworks 5
 
+  What if the user runs an `Nautilus` chain with `maxeval` insufficient for producing `neff` samples? `Nautilus` saves the chain checkpoint at `chains/outroot_checkpoint.hdf5`.
+
 - **Emcee**:
 
       mpirun -n 21 --oversubscribe --mca pml ^ucx --mca btl vader,tcp,self --rank-by slot \
           --bind-to core:overload-allowed --map-by slot --mca mpi_yield_when_idle 1 \
           python ./projects/example/EXAMPLE_EMUL_EMCEE1.py --root ./projects/example/ \
-              --outroot "EXAMPLE_EMUL_EMCEE1" --maxfeval 80000 --burn_in 0.3
+              --outroot "EXAMPLE_EMUL_EMCEE1" --maxfeval 80000
 
   The number of steps per MPI worker is $n_{\\rm sw} =  {\\rm maxfeval}/n_{\\rm w}$,
   with the number of walkers being $n_{\\rm w}={\\rm max}(3n_{\\rm params},n_{\\rm MPI})$.
-  For proper convergence, each walker should traverse 50 times the auto-correlation length,
-  which is provided in the header of the output chain file. 
+  For proper convergence, each walker should traverse 50 times its autocorrelation length ($\tau$),
+  which is provided in the header of the output chain file. A reasonable rule of thumb is to assume
+  $\tau > 200$ and therefore set ${\\rm maxfeval} > 10,000 \times n_{\\rm w}$.
 
-  The script of the plot below is provided at `projects/example/script/EXAMPLE_PLOT_COMPARE_CHAINS.py`
+  With these numbers, users may ask when `Emcee` is preferable to `Metropolis-Hastings`?
+  Here are a few numbers based on a `Planck CMB (l < 396) + SN + BAO + LSST-Y1` chain with 38 parameters in total.
+  1) `MH` achieves convergence with $n_{\\rm sw} \sim 150,000$, but only requires four walkers.
+  2) `Emcee` has $\tau \sim 300$, so it requires $n_{\\rm sw} \sim 15,000$ when running with $n_{\\rm w}=114$.
+  
+  Conclusion: `Emcee` requires $\sim 3$ more evaluations in this case, but the number of evaluations per MPI worker (assuming one MPI worker per walker) is reduced by $\sim 10$.
+  Therefore, `Emcee` seems well-suited for cases where the evaluation of a single cosmology is time-consuming (and there is no slow/fast decomposition).
+
+  What if the user runs an `Emcee` chain with `maxeval` insufficient for convergence? `Emcee` saves the chain checkpoint at `chains/outroot.h5`.
+
+- **Sampler Comparison**
+
+  The script of the plot below is provided at `projects/example/scripts/EXAMPLE_PLOT_COMPARE_CHAINS.py`
 <p align="center">
-<img width="750" height="750" alt="Screenshot 2025-08-03 at 4 19 17 PM" src="https://github.com/user-attachments/assets/5badda55-2152-4520-a358-cc4d6c517ac9" />
+<img width="750" height="750" alt="projects_example_sampler_comparison" src="https://github.com/user-attachments/assets/d3639673-36ea-4fd9-9c91-1f5b97845fe0" />
 </p>
 
 - **Global Minimizer**:
 
+  Our minimizer is a reimplementation of `Procoli`, developed by Karwal et al (arXiv:2401.14225) 
+
       mpirun -n 21 --oversubscribe --mca pml ^ucx --mca btl vader,tcp,self --rank-by slot \
           --bind-to core:overload-allowed --map-by slot --mca mpi_yield_when_idle 1 \
           python ./projects/example/EXAMPLE_EMUL_MINIMIZE1.py --root ./projects/example/ \
-              --cov 'chains/EXAMPLE_EMUL_MCMC1.covmat' --outroot "EXAMPLE_EMUL_MIN1" --nstw 150
+              --outroot "EXAMPLE_EMUL_MIN1" --nstw 200
 
   The number of steps per Emcee walker per temperature is $n_{\\rm stw}$,
-  and the number of walkers is $n_{\\rm w}={\\rm max}(3n_{\\rm params},n_{\\rm MPI})$.
-  Do maintain $n_{\\rm sw} > 200$ for reliable results (see plot below).
+  and the number of walkers is $n_{\\rm w}={\\rm max}(3n_{\\rm params},n_{\\rm MPI})$. The minimum number of total evaluations is then 
+  $3n_{\\rm params} \times n_{\rm T} \times n_{\\rm stw}$, which can be distributed among $n_{\\rm MPI} = 3n_{\\rm params}$ MPI processes for faster results.
+  Do maintain $n_{\\rm stw} > 200$ for reliable convergence in LCDM (see plot below).
   The same rule applies to *Profile* and *Scan* codes, as they are all based on the same minimization strategy.
 
-  The script of the plot below is provided at `projects/example/script/EXAMPLE_MIN_COMPARE_CONV.py`
-<p align="center">
-<img width="700" height="470" alt="Screenshot 2025-08-04 at 7 05 53 AM" src="https://github.com/user-attachments/assets/a48b267a-beba-4e53-9dbf-e3c5a24daff1" />
-</p>
+  The script that generated the plot below is provided at `projects/example/scripts/EXAMPLE_MIN_COMPARE_CONV.py`
+
+  <p align="center">
+  <img width="700" height="470" alt="Screenshot 2025-08-04 at 7 05 53 AM" src="https://github.com/user-attachments/assets/a48b267a-beba-4e53-9dbf-e3c5a24daff1" />
+  </p>
+
+  In our testing, $n_{\\rm stw} \sim 200$ worked reasonably well up to $n_{\rm param} \sim \mathcal{O}(10)$.
+  Below we show a case with $n_{\rm param} = 38$ that illustrates the need for performing convergence tests on a case-by-case basis.
+  In this example, the total number of evaluations for a reliable minimum is approximately $319,200$ ($n_{\\rm stw} \sim 700$), distributed among $n_{\\rm MPI} = 114$ processes for faster results.
+  With the use of emulators, such minima can be computed with $\mathcal{O}(1)$ MPI workers.
+
+  <p align="center">
+  <img width="750" height="750" alt="Screenshot 2025-08-13 at 5 29 59 PM" src="https://github.com/user-attachments/assets/c43b8eea-ee2e-443d-a497-cb9b2dae2fc3" />
+  </p>
 
 - **Profile**: 
 
@@ -327,7 +355,7 @@ Now, users must follow all the steps below.
           --bind-to core:overload-allowed --map-by slot --mca mpi_yield_when_idle 1 \
           python ./projects/example/EXAMPLE_EMUL_PROFILE1.py \
               --root ./projects/example/ --cov 'chains/EXAMPLE_EMUL_MCMC1.covmat' \
-              --outroot "EXAMPLE_EMUL_PROFILE1" --factor 3 --nstw 150 --numpts 10 \
+              --outroot "EXAMPLE_EMUL_PROFILE1" --factor 3 --nstw 200 --numpts 10 \
               --profile 1 --minfile="./projects/example/chains/EXAMPLE_EMUL_MIN1.txt"
 
   Profile provides the optional argument `minfile`, as it is significantly faster to run the profile script with a previously provided global minimum. 
@@ -338,12 +366,11 @@ Now, users must follow all the steps below.
       start value ~ mininum value - factor*np.sqrt(np.diag(cov))
       end   value ~ mininum value + factor*np.sqrt(np.diag(cov))
 
-  We advise `factor ~ 3` when a covariance matrix is provided. If `cov` is not supplied, the code estimates
-  one internally from the prior. In this case, the code imposes `factor < 1` and we suggest `factor << 1`.
-  Finally, the number of steps per Emcee walker, $n_{\\rm sw}$, per temperature is $n_{\\rm sw} = {\\rm maxfeval}/4 n_{\\rm w}$,
-  and the number of walkers is $n_{\\rm w}={\\rm max}(3n_{\\rm params},n_{\\rm MPI})$.
+  We advise ${\rm factor} \sim 3$ for parameters that are well constrained by the data when a covariance matrix is provided.
+  If `cov` is not supplied, the code estimates one internally from the prior.
+  If a parameter is poorly constrained or `cov` is not given, we recommend ${\rm factor} \ll 1$.
 
-  The script of the plot below is provided at `projects/example/script/EXAMPLE_PLOT_PROFILE1.py`
+  The script of the plot below is provided at `projects/example/scripts/EXAMPLE_PLOT_PROFILE1.py`
   
 <p align="center">
 <img width="1156" height="858" alt="Screenshot 2025-08-02 at 8 42 41 PM" src="https://github.com/user-attachments/assets/22182688-2865-4b15-a80b-783ddd21f715" />
@@ -358,15 +385,15 @@ Now, users must follow all the steps below.
       mpirun -n 1 --oversubscribe --mca pml ^ucx --mca btl vader,tcp,self --rank-by slot \
           --bind-to core:overload-allowed --map-by slot --mca mpi_yield_when_idle 1 \
           python ./projects/example/EXAMPLE_EMUL_PROFILE_SCIPY1.py \
-              --root ./projects/example/ --cov 'chains/EXAMPLE_EMUL_MCMC1.covmat' \
+              --root ./projects/example/ --cov 'chains/EXAMPLE_EMUL_MCMC1.covmat' I am running a few minutes late; my previous meeting is running over.
               --outroot "EXAMPLE_EMUL_PROFILE1M2" --factor 3 --maxfeval 5000 --numpts 10 \
               --profile 1 --minfile="./projects/example/chains/EXAMPLE_EMUL_MIN1.txt"
 
-     The script of the plot below is provided at `projects/example/script/EXAMPLE_PLOT_PROFILE1_COMP.py`
+     The script of the plot below is provided at `projects/example/scripts/EXAMPLE_PLOT_PROFILE1_COMP.py`
   
-<p align="center">
-<img width="1156" height="858" alt="Screenshot 2025-08-03 at 5 08 04 PM" src="https://github.com/user-attachments/assets/ba0c0629-bd3b-4274-9f24-9db5929dc35c" />
-</p>
+  <p align="center">
+  <img width="1156" height="858" alt="example_profile_comp" src="https://github.com/user-attachments/assets/ba0c0629-bd3b-4274-9f24-9db5929dc35c" />
+  </p>
 
 - **Scan**: 
 
@@ -377,7 +404,7 @@ Now, users must follow all the steps below.
       mpirun -n 90 --oversubscribe --mca pml ^ucx --mca btl vader,tcp,self \
           --bind-to core:overload-allowed --map-by slot --mca mpi_yield_when_idle 1 \
           python -m mpi4py.futures ./projects/example/EXAMPLE_EMUL_SCAN1.py \
-              --root ./projects/example/ --outroot "EXAMPLE_EMUL_SCAN1" --nstw 150 --profile 1
+              --root ./projects/example/ --outroot "EXAMPLE_EMUL_SCAN1" --nstw 200 --profile 1
 
 - **Tension Metrics**
 
@@ -476,7 +503,7 @@ and
 
      source start_cocoa.sh # even if (.local) is already active, users must run start_cocoa.sh again to update bash environment values
 
-Similarly to `setup_cocoa.sh` and `compile_cocoa.sh`, each code package contains a `setup` scripts that download it from the internet and a `compile` scripts that compile it. E.g., the `ACT-DR6` likelihood code can be downloaded and installed via the bash commands
+Similar to `setup_cocoa.sh` and `compile_cocoa.sh`, each code package contains a `setup` scripts that download it from the internet and a `compile` scripts that compile it. E.g., the `ACT-DR6` likelihood code can be downloaded and installed via the bash commands
  
      source ./installation_scripts/setup_act_dr6.sh                # download likelihood code
 
@@ -560,7 +587,7 @@ We provide the Docker image [whovian-cocoa](https://hub.docker.com/r/vivianmiran
      mkdir -p cocoa_docker
      cd ./cocoa_docker
 
- **Step :two:**: Download the docker image *whovian-cocoa*, name the associated container `cocoa2023`, and run the container for the first time, type:
+ **Step :two:**: Download the Docker image *whovian-cocoa*, name the associated container `cocoa2023`, and run the container for the first time, type:
 
     docker run --platform linux/amd64 --hostname cocoa --name cocoa2025 -it -p 8888:8888 -v $(pwd):/home/whovian/host/ -v ~/.ssh:/home/whovian/.ssh:ro vivianmiranda/whovian-cocoa
 
@@ -766,7 +793,7 @@ Until recently, Cocoa development was a bit unstructured. Developers could push 
 
     git push -u origin xyzdev   # run on the xyzdev branch
 
-**Step :three:**: Once the developers created an atomic, meaningful, and well-tested improvement to Cocoa, the developer needs to merge any subsequent changes made in `main`.
+**Step :three:**: Once the developers have created an atomic, meaningful, and well-tested improvement to Cocoa, the developer needs to merge any subsequent changes made in `main`.
 
     git merge main   # run on the xyzdev branch
 
