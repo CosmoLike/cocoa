@@ -364,7 +364,7 @@ export NAUTILUS_SAMPLER_GIT_COMMIT="fc5e84deffb96755b31b3f9834590e28ab5b6016"
 export NAUTILUS_SAMPLER_NAME="nautilus_sampler"
 
 export DERIVKIT_URL="https://github.com/nikosarcevic/derivkit.git"
-export DERIVKIT_GIT_COMMIT="bd31e834e4e6b8b125aefcf821fe15d8a7e11a4b"
+export DERIVKIT_GIT_COMMIT="5af3f9a5635c8f5bbb32b6b9f6ac0d7f586d24c7"
 export DERIVKIT_NAME="derivkit"
 
 export TENSIOMETER_URL="https://github.com/mraveri/tensiometer.git"
