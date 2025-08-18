@@ -391,9 +391,9 @@ Now, users must follow all the steps below.
 
      The script of the plot below is provided at `projects/example/scripts/EXAMPLE_PLOT_PROFILE1_COMP.py`
   
-<p align="center">
-<img width="1156" height="858" alt="Screenshot 2025-08-03 at 5 08 04 PM" src="https://github.com/user-attachments/assets/ba0c0629-bd3b-4274-9f24-9db5929dc35c" />
-</p>
+  <p align="center">
+  <img width="1156" height="858" alt="example_profile_comp" src="https://github.com/user-attachments/assets/ba0c0629-bd3b-4274-9f24-9db5929dc35c" />
+  </p>
 
 - **Scan**: 
 
