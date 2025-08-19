@@ -72,13 +72,14 @@ and install `git-lfs`
 Users can now proceed to the **next section**.
 
 > [!Note]
-> Users who want to maintain *exact reproducibility* of the Cocoa conda environment across multiple linux systems should install it via the `conda-lock`, as shown below
-> **Step :one:** Install the package `conda-lock` (in a private environment to avoid any conflicts)
+> Users who want to maintain *exact reproducibility* of the Cocoa conda environment should install it via the `conda-lock`.
+> 
+> **Step :one:** Install the package `conda-lock` in a private conda environment to avoid conflicts.
 > 
 >     conda create -n lockenv -c conda-forge python=3.10 conda-lock=2.*
 >     conda activate lockenv
 >
-> **Step :two:**  Download the file `cocoapy310-linux.yml`,  and create the conda environment using the command below
+> **Step :two:**  Download the file `cocoapy310-linux.yml`,  and create the conda environment using the special command below
 > 
 >     wget https://raw.githubusercontent.com/SBU-COSMOLIKE/cocoa/refs/heads/main/cocoapy310-linux.yml
 >     conda-lock install -n cocoa cocoapy310-linux.yml
