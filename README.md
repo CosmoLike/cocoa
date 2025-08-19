@@ -72,7 +72,7 @@ and install `git-lfs`
 Users can now proceed to the **next section**.
 
 > [!Note]
-> Users who want to maintain *exact reproducibility* of the Cocoa conda environment should install it via the `conda-lock`.
+> Users who want to maintain *exact reproducibility* of the conda environment should install it via `conda-lock`.
 > 
 > **Step :one:** Install the package `conda-lock` in a private conda environment to avoid conflicts.
 > 
