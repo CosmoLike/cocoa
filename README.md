@@ -15,15 +15,14 @@
     2. [FAQ: How can we compile external modules (not involving Cosmolike)?](#appendix_compile_separately)
     3. [FAQ: How can we install Cosmolike projects?](#appendix_compile_cosmolike_separately)
     4. [FAQ: How can we run Cocoa with Docker?](#appendix_jupyter_whovian)
-    5. [FAQ: How can we use an available Anaconda module on HPC?](#overview_anaconda)
-    6. [FAQ: How can we install Conda?](#overview_miniconda)
-    7. [FAQ: How can we set the environment for Machine Learning projects?](#ml_emulators)
-    8. [FAQ: How can we push changes to the Cocoa main branch?](#push_main)
-    9. [FAQ: How can we develop from a Git tag? A few more Git hacks](#dev_from_tag)
-    10. [FAQ: How can we download additional likelihood data? (external readme)](Cocoa/external_modules/data)
-   11. [FAQ: Where do we find common FAQs about external modules? (external readme)](Cocoa/external_modules/code)
-   12. [FAQ: Where do we find common FAQs about Cosmolike? (external readme)](Cocoa/projects/)
-   13. [FAQ: How can we improve our Bash/C/C++ knowledge?](#lectnotes)
+    5. [FAQ: How can we install Conda?](#overview_miniconda)
+    6. [FAQ: How can we set the environment for Machine Learning projects?](#ml_emulators)
+    7. [FAQ: How can we push changes to the Cocoa main branch?](#push_main)
+    8. [FAQ: How can we develop from a Git tag? A few more Git hacks](#dev_from_tag)
+    9. [FAQ: How can we download additional likelihood data? (external readme)](Cocoa/external_modules/data)
+   10. [FAQ: Where do we find common FAQs about external modules? (external readme)](Cocoa/external_modules/code)
+   11. [FAQ: Where do we find common FAQs about Cosmolike? (external readme)](Cocoa/projects/)
+   12. [FAQ: How can we improve our Bash/C/C++ knowledge?](#lectnotes)
 
 # Overview <a name="overview"></a>
 
@@ -67,9 +66,6 @@ and install `git-lfs`
     git-lfs install
 
 Users can now proceed to the **next section**.
-
-> [!TIP]
-> To install the `cocoa` conda environment on a supercomputer, users may take advantage of the fact that several HPC environments provide the [Anaconda installer](https://www.anaconda.com) as an external module. If this applies to you, then check the appendix [FAQ: How do we use an available Anaconda module on HPC?](#overview_anaconda).
 
 > [!TIP]
 > Users working in an HPC environment that does not offer Anaconda may want to check the appendix [FAQ: How do we install Conda?](#overview_conda).
@@ -646,91 +642,17 @@ This is a large image with a size of approximately 16GB, as it already contains 
 > [!Warning]
 > Do not allow the Docker container to have system-wide access to your files. Accidents happen, especially when dealing with dangerous bash commands such as `rm` (deletion).
 
-## :interrobang: FAQ: How do we use an available Anaconda module on HPC? <a name="overview_anaconda"></a>
-
-Below, we list the most common issues users encounter when installing Cocoa conda environments in a supercomputer environment using a globally defined Anaconda module. 
-
-- :interrobang: **Conda command not found**.
-  
-Anaconda is not usually set by default on HPC environments, but may be available as a module. For example, on the Midway HPC cluster, it can be loaded using the command below.
-
-    module load Anaconda3/2022.10
-
-If you are not sure about the name of the available Anaconda module, type the command
-
-    module avail An
-
-to show all modules with names that start with `An`. The output should resemble the following.
-
-<img width="700" alt="Anaconda" src="https://github.com/user-attachments/assets/09326f5f-49e0-45b5-a157-25fe2b09918e">
-
-- :interrobang: **Installation seems to take forever**.
-
-There are several reasons why installing the Cocoa conda environment may take a long time. Here is a checklist of best practices for troubleshooting installations.
-
-:one: *Never install conda environments using the login node*. 
-
-Instead, request an interactive job with a few cores. However, users should be aware that some supercomputers do not provide internet access on computing nodes. Ask the HPC staff for a queue dedicated to installing and compiling code; it should be part of a well-designed HPC environment.
-
-- :interrobang: **Conda installation is interrupted due to quota limitations**.
-
-Supercomputers usually enforce strict quota limits on home folders. These limits apply to the total file size and the number of files. By default, Anaconda modules install new environments at `$HOME/.conda/envs`. Anaconda also stores Gigabytes of downloaded packages in the `$HOME/.conda/pkgs` folder; the `pkgs` folder is used by Anaconda as a package cache.
-
-:one: Create an Anaconda folder in a partition containing a more tolerant quota restriction than `$HOME`. For instance, we used the command below on the Midway supercomputer to create the Anaconda folder in the KICP projects partition.
-
-    mkdir /project2/kicp/XXX/anaconda/
-
-:two: Set the `pkgs` package cache folder to `anaconda/pkgs`.
-
-    conda config --add pkgs_dirs /project2/kicp/XXX/anaconda/pkgs
-
-3️⃣: Set the env folder to `anaconda/envs/` 
-
-    conda config --add envs_dirs /project2/kicp/XXX/anaconda/envs
-
-:four: Set the following flags for a proper conda environment installation
-
-    conda config --set auto_update_conda false
-    conda config --set show_channel_urls true
-    conda config --set auto_activate_base false
-    conda config --prepend channels conda-forge
-    conda config --set channel_priority strict
-    conda init bash
-
-:five: Source the `.bashrc` file so the new Anaconda settings are loaded. 
-
-    source ~/.bashrc
-
-:six: After completing steps :one:-:five:, check the internals of the `$HOME/.condarc` file with the command
-
-    more "${HOME:?}"/.condarc
-
-to make sure it resembles the one below.
-
-    auto_update_conda: false
-    show_channel_urls: true
-    auto_activate_base: false
-    channels:
-      - conda-forge
-      - defaults
-    channel_priority: strict
-    verbosity: 0
-    pkgs_dirs:
-      - /project2/kicp/XXX/anaconda/pkgs  # adjust this directory path
-    envs_dirs:
-      - /project2/kicp/XXX/anaconda/envs/ # adjust this directory path
-
 ## :interrobang: FAQ: How do we install Conda? <a name="overview_miniconda"></a>
 
 **Step :one:**: Download and run the Miniconda installation script. 
 
-    export CONDA_DIR="/gpfs/home/XXX/miniconda" # replace this string!
+    export CONDA_DIR="/gpfs/home/XXX/miniforge" # replace this string!
     
     mkdir "${CONDA_DIR:?}"
     
-    wget https://repo.anaconda.com/miniconda/Miniconda3-py310_25.3.1-1-Linux-x86_64.sh
+    curl -L -O "https://github.com/conda-forge/miniforge/releases/latest/download/Miniforge3-$(uname)-$(uname -m).sh"
     
-    /bin/bash Miniconda3-py310_25.3.1-1-Linux-x86_64.sh -f -b -p "${CONDA_DIR:?}"
+    /bin/bash Miniforge3-Linux-x86_64.sh -f -b -p "${CONDA_DIR:?}"
 
     /bin/bash 
 
@@ -741,6 +663,7 @@ to make sure it resembles the one below.
           && conda config --set show_channel_urls true \
           && conda config --set auto_activate_base false \
           && conda config --prepend channels conda-forge \
+          && conda config --add allowlist_channels conda-forge \
           && conda config --set channel_priority strict \
           && conda init bash
 
