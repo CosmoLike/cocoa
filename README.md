@@ -47,7 +47,7 @@ Core packages include compilers and numerical libraries that users typically do 
 > [!Tip]
 > Users running `macOS` may not have `wget` installed. In this case, run 
 >
->     conda activate    # this will activate base environment
+>     conda activate    # this will activate the base environment
 >
 > followed by
 >
