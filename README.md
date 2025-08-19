@@ -45,7 +45,7 @@ Core packages include compilers and numerical libraries that users typically do 
     wget https://raw.githubusercontent.com/SBU-COSMOLIKE/cocoa/refs/heads/main/cocoapy310.yml
 
 > [!Tip]
-> Users running `macOS` with freshly installed ``wget` installed. In this case, run 
+> Users running `macOS` with freshly installed `wget` installed. In this case, run 
 >
 >     conda activate
 >
