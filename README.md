@@ -649,12 +649,20 @@ This is a large image with a size of approximately 16GB, as it already contains 
 **Step :one:**: Download and run the Miniforge installation script. 
 
     export CONDA_DIR="/gpfs/home/XXX/miniforge" # replace this string!
-    
+
+and
+
     mkdir "${CONDA_DIR:?}"
-    
+
+and
+
     curl -L -O "https://github.com/conda-forge/miniforge/releases/latest/download/Miniforge3-$(uname)-$(uname -m).sh"
-    
-    /bin/bash Miniforge3-Linux-x86_64.sh -f -b -p "${CONDA_DIR:?}"
+
+and
+
+    /bin/bash Miniforge3-$(uname)-$(uname -m).sh -f -b -p "${CONDA_DIR:?}"
+
+and
 
     /bin/bash 
 
