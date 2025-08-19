@@ -79,10 +79,15 @@ Users can now proceed to the **next section**.
 >     conda create -n lockenv -c conda-forge python=3.10 conda-lock=2.*
 >     conda activate lockenv
 >
-> **Step :two:**  Download the file `cocoapy310-linux.yml`,  and create the conda environment using the special command below
+> **Step :two:**  Download the file `cocoapy310-linux.yml`,  and create the conda environment
 > 
 >     wget https://raw.githubusercontent.com/SBU-COSMOLIKE/cocoa/refs/heads/main/cocoapy310-linux.yml
+>
+> and
+> 
 >     conda-lock install -n cocoa cocoapy310-linux.yml
+>
+> Finally, proceed to **step :two:** in the general installation. 
 
 # Installation and Compilation of external modules <a name="cobaya_base_code"></a>
 
