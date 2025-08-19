@@ -44,9 +44,14 @@ Core packages include compilers and numerical libraries that users typically do 
 
     wget https://raw.githubusercontent.com/SBU-COSMOLIKE/cocoa/refs/heads/main/cocoapy310.yml
 
-> [!Warning]
-> Users running MacOS with a freshly installed 
-> 
+> [!Tip]
+> Users running `macOS` with freshly installed ``wget` installed. In this case, run 
+>
+>     conda activate
+>
+> followed by
+>
+>     conda install wget
 
 Then, create the cocoa environment,
 
@@ -752,9 +757,9 @@ and
 
     git push origin main  # run on the main branch
 
-## :interrobang: FAQ: How can developers develop from a git tag? <a name="dev_from_tag"></a>
+## :interrobang: FAQ: How can developers develop from a Git tag? <a name="dev_from_tag"></a>
 
-A useful git hack is related to developing Cocoa from a git tag. We reserve Git tags to set milestones in our development, so they serve as good starting points for coding localized new features (e.g., changes to a file that other developers have not recently modified) or bug fixes.
+A useful Git hack is related to developing Cocoa from a Git tag. We reserve Git tags to set milestones in our development, so they serve as good starting points for coding localized new features (e.g., changes to a file that other developers have not recently modified) or bug fixes.
 
 **Step :one: (optional)** If the developer has cloned the repository using the `https` URL address, then change the URL to the SSH-key-based address (if the developer has previously uploaded a public key to their GitHub account)
 
