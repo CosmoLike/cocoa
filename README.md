@@ -55,7 +55,7 @@ activate it
 > [!Warning]
 > We advise users to stay away from all repositories managed by `Anaconda` due to potential license limitations. See the Appendix [FAQ: How can we install Conda?](#overview_conda)
 > for instructions on how to install `Miniforge`, a version of conda that strictly downloads packages from the `conda-forge` channel.
-> `Conda-forge` is a community-driven channel, and Anaconda’s commercial license fees/restrictions for the “defaults” repo don’t apply to conda-forge packages.  
+> Conda-forge is a community-driven channel, and Anaconda’s commercial license fees/restrictions for the “defaults” repo don’t apply to conda-forge packages.  
 
 **Step :two:**: When and only when loading the conda cocoa environment for the first time, create symbolic links that will give better names for the GNU compilers
 
