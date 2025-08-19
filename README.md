@@ -15,7 +15,7 @@
     2. [FAQ: How can we compile external modules (not involving Cosmolike)?](#appendix_compile_separately)
     3. [FAQ: How can we install Cosmolike projects?](#appendix_compile_cosmolike_separately)
     4. [FAQ: How can we run Cocoa with Docker?](#appendix_jupyter_whovian)
-    5. [FAQ: How can we install Conda?](#overview_miniconda)
+    5. [FAQ: How can we install Conda?](#overview_miniforge)
     6. [FAQ: How can we set the environment for Machine Learning projects?](#ml_emulators)
     7. [FAQ: How can we push changes to the Cocoa main branch?](#push_main)
     8. [FAQ: How can we develop from a Git tag? A few more Git hacks](#dev_from_tag)
@@ -52,6 +52,11 @@ activate it
 
     conda activate cocoa
 
+> [!Warning]
+> We advise users to stay away from all repositories managed by `Anaconda` due to potential license limitations. See the Appendix [FAQ: How can we install Conda?](#overview_conda)
+> for instructions on how to install `Miniforge`, a version of conda that strictly downloads packages from the `conda-forge` channel.
+> `Conda-forge` is a community-driven channel, and Anaconda’s commercial license fees/restrictions for the “defaults” repo don’t apply to conda-forge packages.  
+
 **Step :two:**: When and only when loading the conda cocoa environment for the first time, create symbolic links that will give better names for the GNU compilers
 
     ln -s "${CONDA_PREFIX}"/bin/x86_64-conda_cos6-linux-gnu-gcc "${CONDA_PREFIX}"/bin/gcc
@@ -66,9 +71,6 @@ and install `git-lfs`
     git-lfs install
 
 Users can now proceed to the **next section**.
-
-> [!TIP]
-> Users working in an HPC environment that does not offer Anaconda may want to check the appendix [FAQ: How do we install Conda?](#overview_conda).
 
 > [!TIP]
 > We provide a Docker image named *whovian-cocoa* with Cocoa pre-installed and pre-compiled. For further instructions, refer to the appendix [FAQ: How do we run Cocoa with Docker?](#appendix_jupyter_whovian).
@@ -642,9 +644,9 @@ This is a large image with a size of approximately 16GB, as it already contains 
 > [!Warning]
 > Do not allow the Docker container to have system-wide access to your files. Accidents happen, especially when dealing with dangerous bash commands such as `rm` (deletion).
 
-## :interrobang: FAQ: How do we install Conda? <a name="overview_miniconda"></a>
+## :interrobang: FAQ: How do we install Conda? <a name="overview_miniforge"></a>
 
-**Step :one:**: Download and run the Miniconda installation script. 
+**Step :one:**: Download and run the Miniforge installation script. 
 
     export CONDA_DIR="/gpfs/home/XXX/miniforge" # replace this string!
     
