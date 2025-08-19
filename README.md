@@ -36,7 +36,7 @@ This Readme file presents basic and advanced instructions for installing all [Co
 
 We provide the Docker image [whovian-cocoa](https://hub.docker.com/r/vivianmiranda/whovian-cocoa) to facilitate the installation of Cocoa on Windows and macOS. 
 
-# Installation of core packages (LinuxX86) <a name="required_packages_conda"></a>
+# Installation of core packages (Linux-x86) <a name="required_packages_conda"></a>
 
 Core packages include compilers and numerical libraries that users typically do not modify.
 
