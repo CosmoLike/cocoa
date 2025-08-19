@@ -16,7 +16,7 @@
     3. [FAQ: How can users install Cosmolike projects?](#appendix_compile_cosmolike_separately)
     4. [FAQ: How can users run Cocoa with Docker?](#appendix_jupyter_whovian)
     5. [FAQ: How can users install Conda?](#overview_miniforge)
-    6. [FAQ: How can users set the appropriate environment for Machine Learning projects?](#ml_emulators)
+    6. [FAQ: How can users set the appropriate environment for ML?](#ml_emulators)
     7. [FAQ: How can developers push changes to the Cocoa main branch?](#push_main)
     8. [FAQ: How can developers develop from a Git tag?](#dev_from_tag)
     9. [FAQ: How can users download additional likelihood data? (external readme)](Cocoa/external_modules/data)
@@ -687,7 +687,7 @@ and
 
 After that, the `conda` command will be available.
 
-## :interrobang: FAQ: How can users set the appropriate environment for Machine Learning projects? <a name="ml_emulators"></a>
+## :interrobang: FAQ: How can users set the appropriate environment for ML? <a name="ml_emulators"></a>
 
 Commenting out the environmental flags below *before running* `setup_cocoa.sh` will enable the installation of machine-learning-related libraries via pip.  
 
