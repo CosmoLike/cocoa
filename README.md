@@ -250,10 +250,10 @@ Users will see a terminal like this: `$(cocoa)(.local)`. *This is a feature, not
 > 
 >     [... NotebookApp] or http://127.0.0.1:8888/?token=XXX
 >
-> The project lsst-y1 contains jupyter notebook examples located at `projects/lsst_y1`.
+> The project `lsst-y1` contains jupyter notebook examples located at `projects/lsst_y1`.
 
 > [!NOTE]
-> Why did we choose to work with two distinct shell environments, `(cocoa)` and `(.local)`? Our scripts enable users to work on multiple Cocoa instances, similar to what was possible with [CosmoMC](https://github.com/cmbant/CosmoMC). On each instance, our scripts install packages at
+> Why did we choose to work with two distinct shell environments, `(cocoa)` and `(.local)`? Our scripts enable users to work on multiple Cocoa instances, similar to what was possible with [CosmoMC](https://github.com/cmbant/CosmoMC). In each instance, our scripts install packages at
 >
 >      Cocoa/.local/bin
 >      Cocoa/.local/include
