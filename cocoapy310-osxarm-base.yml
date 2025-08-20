@@ -1,0 +1,177 @@
+name: cocoa-mac-arm
+channels:
+  - conda-forge
+dependencies:
+  # Core / Python
+  - python=3.10.17
+  - pip
+  - wheel=0.45.1
+
+  # Build tools & compilers (portable on mac)
+  - cmake=4.0.2
+  - make=4.4.1
+  - c-compiler
+  - cxx-compiler
+  - fortran-compiler
+  - llvm-openmp           # OpenMP runtime on mac (clang)
+
+  # Math / Sci stack
+  - numpy==1.26.3 
+  - scipy==1.12.0
+  - hdf5=1.14.6
+  - h5py=3.13.0
+  - fftw=3.3.10
+  - arpack=3.9.1
+  - superlu=7.0.1
+  - metis=5.2.1
+  - gsl=2.8
+  - cfitsio=4.6.2
+  - pyfftw=0.15.0
+  - getdist=1.6.2
+  - numba=0.60.0
+  - llvmlite=0.43.0
+  - pandas=2.2.3
+  - matplotlib=3.10.1
+  - scikit-learn=1.6.1
+  - scikit-image=0.24.0
+
+  # MPI stack (mac)
+  - openmpi=5.0.7
+  #- ucx=1.18.0            # OK on mac; remove if it causes conflicts
+
+  # CLI / libs (cross-platform)
+  - git=2.49.0
+  - git-lfs=3.6.1
+  - curl=8.13.0
+  - wget=1.21.4
+  - tk=8.6.13
+  - readline=8.2
+  - yaml=0.2.5
+  - zlib=1.3.1
+  - xz=5.8.1
+  - lz4-c=1.10.0
+  - icu=75.1
+  - libxml2=2.13.8
+  - libuv=1.50.0
+  - zeromq=4.3.5
+  - libsqlite=3.49.2
+  - libiconv=1.18
+  - libedit=3.1.20250104
+  - krb5=1.21.3
+  - libssh2=1.11.1
+  - openssl=3.5.0
+  - pcre2=10.44
+
+  # Jupyter/runtime bits
+  - jupyter_core=5.7.2
+  - jupyter_client=8.6.3
+  - traitlets=5.14.3
+  - platformdirs=4.3.7
+  - python-dateutil=2.9.0.post0
+  - types-python-dateutil=2.9.0.20241206
+
+  # Cython, etc.
+  - cython==3.0.12
+
+  # ---- Pip-only extras (pure Python or wheels OK on mac ARM) ----
+  - pip:
+      - alabaster==1.0.0
+      - anytree==2.13.0
+      - appdirs==1.4.4
+      - astropy==6.1.7
+      - astropy-iers-data==0.2025.5.5.0.38.14
+      - babel==2.17.0
+      - cachetools==5.5.2
+      - certifi==2025.4.26
+      - charset-normalizer==3.4.2
+      - click==8.1.8
+      - configparser==7.2.0
+      - contourpy==1.3.2
+      - corner==2.2.3
+      - coverage==7.8.0
+      - cycler==0.12.1
+      - decorator==5.2.1
+      - deprecated==1.2.18
+      - dill==0.4.0
+      - distlib==0.3.9
+      - docutils==0.21.2
+      - filelock==3.18.0
+      - fonttools==4.57.0
+      - fsspec==2025.3.2
+      - fuzzywuzzy==0.18.0
+      - gpy==1.13.2
+      - hf-xet==1.1.0
+      - huggingface-hub==0.31.1
+      - idna==3.10
+      - imageio==2.37.0
+      - imagesize==1.4.1
+      - iminuit==2.31.1
+      - importlib-metadata==8.7.0
+      - importlib-resources==6.5.2
+      - jax==0.4.30
+      - jaxlib==0.4.30
+      - jinja2==3.1.6
+      - joblib==1.5.0
+      - johnnydep==1.20.6
+      - kiwisolver==1.4.8
+      - lazy-loader==0.4
+      - lenstronomy==1.13.0
+      - markupsafe==3.0.2
+      - ml-dtypes==0.5.1
+      - mpmath==1.3.0
+      - multiprocess==0.70.18
+      - network==0.1
+      - networkx==3.4.2
+      - numpydoc==1.8.0
+      - oauthlib==3.2.2
+      - opt-einsum==3.4.0
+      - oyaml==1.0
+      - packaging==25.0
+      - paramz==0.9.6
+      - pgen==0.2.1
+      - pillow==11.2.1
+      - portalocker==3.1.1
+      - protobuf==6.30.2
+      - py-bobyqa==1.5.0
+      - pybind11==2.13.6
+      - pydoe2==1.3.0
+      - pyerfa==2.0.1.5
+      - pygments==2.19.1
+      - pyparsing==3.2.3
+      - pytz==2025.2
+      - pywavelets==1.8.0
+      - pyxdg==0.28
+      - pyyaml==6.0.2
+      - pyzmq==26.4.0
+      - qp-prob==0.9.3
+      - requests==2.32.3
+      - sacc==1.0.2
+      - schwimmbad==0.4.2
+      - setuptools==80.3.1
+      - setuptools-scm==8.3.1
+      - snowballstemmer==2.2.0
+      - sphinx==8.1.3
+      - sphinxcontrib-applehelp==2.0.0
+      - sphinxcontrib-devhelp==2.0.0
+      - sphinxcontrib-htmlhelp==2.1.0
+      - sphinxcontrib-jsmath==1.0.1
+      - sphinxcontrib-qthelp==2.0.0
+      - sphinxcontrib-serializinghtml==2.0.0
+      - structlog==25.3.0
+      - sympy==1.14.0
+      - tables-io==0.9.10
+      - tabulate==0.9.0
+      - threadpoolctl==3.6.0
+      - tifffile==2025.3.30
+      - tokenizers==0.21.1
+      - toml==0.10.2
+      - tomli==2.2.1
+      - tornado==6.4.2
+      - tqdm==4.67.1
+      - typing-extensions==4.13.2
+      - tzdata==2025.2
+      - urllib3==2.4.0
+      - virtualenv==20.31.1
+      - wimpy==0.6
+      - wrapt==1.17.2
+      - zipfile38==0.0.3
