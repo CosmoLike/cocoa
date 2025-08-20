@@ -50,7 +50,7 @@ Core packages include compilers and numerical libraries that users typically do 
 
          wget https://raw.githubusercontent.com/SBU-COSMOLIKE/cocoa/refs/heads/main/cocoapy310-osxarm-base.yml
     
-**Step :two:**: create the Cocoa environment,
+**Step :two:**: Create the Cocoa environment,
 
   - Linux
   
@@ -100,7 +100,7 @@ Users can now proceed to the **next section**.
 >     conda create -n lockenv -c conda-forge python=3.10 conda-lock=2.* wget
 >     conda activate lockenv
 >
-> **Step :two:**  Download the file appropriate conda-lock compatible `yml` file.
+> **Step :two:** Download the file appropriate conda-lock compatible `yml` file.
 >   - Linux
 >     
 >         wget https://raw.githubusercontent.com/SBU-COSMOLIKE/cocoa/refs/heads/main/cocoapy310-linux.yml
@@ -109,7 +109,7 @@ Users can now proceed to the **next section**.
 >     
 >         wget https://raw.githubusercontent.com/SBU-COSMOLIKE/cocoa/refs/heads/main/cocoapy310-osxarm.yml
 >
-> **Step :three:**  Create the conda environment
+> **Step :three:** Create the conda environment
 >   - Linux
 >     
 >         conda-lock install -n cocoa cocoapy310-linux.yml
