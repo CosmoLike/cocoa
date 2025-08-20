@@ -26,7 +26,7 @@
 
 # Overview <a name="overview"></a>
 
-Cocoa allows users to run [CosmoLike](https://github.com/CosmoLike) routines inside the [Cobaya](https://github.com/CobayaSampler) framework. [CosmoLike](https://github.com/CosmoLike) can analyze data primarily from the [Dark Energy Survey](https://www.darkenergysurvey.org) and simulate future multi-probe analyses for LSST and Roman Space Telescope. 
+Cocoa allows users to run [CosmoLike](https://github.com/CosmoLike) routines inside the [Cobaya](https://github.com/CobayaSampler) framework. [CosmoLike](https://github.com/CosmoLike) can analyze data from the [Dark Energy Survey](https://www.darkenergysurvey.org) and simulate future multi-probe analyses for LSST and Roman Space Telescope. 
 
 Besides integrating [Cobaya](https://github.com/CobayaSampler) and [CosmoLike](https://github.com/CosmoLike), Cocoa introduces shell scripts that allow users to containerize [Cobaya](https://github.com/CobayaSampler), the Boltzmann codes, and multiple likelihoods. The container structure of Cocoa ensures that users can adopt consistent versions for the Fortran/C/C++ compilers and libraries across multiple machines. Such a systematic approach greatly simplifies the debugging process. 
 
@@ -36,22 +36,13 @@ This Readme file presents basic and advanced instructions for installing all [Co
 
 We provide the Docker image [whovian-cocoa](https://hub.docker.com/r/vivianmiranda/whovian-cocoa) to facilitate the installation of Cocoa on Windows and macOS. 
 
-# Installation of core packages <a name="required_packages_conda"></a>
+# Installation of core packages (Linux-x86) <a name="required_packages_conda"></a>
 
-Core packages include compilers and numerical libraries that users typically do not modify. We install most of these core packages via Conda, as shown below.
+Core packages include compilers and numerical libraries that users typically do not modify.
 
 **Step :one:**: Download the file `cocoapy310.yml` yml file
 
     wget https://raw.githubusercontent.com/SBU-COSMOLIKE/cocoa/refs/heads/main/cocoapy310.yml
-
-> [!Tip]
-> Users running `macOS` may not have `wget` installed. In this case, run 
->
->     conda activate    # this will activate the base environment
->
-> followed by
->
->     conda install wget
 
 Then, create the cocoa environment,
 
@@ -62,9 +53,8 @@ activate it
     conda activate cocoa
 
 > [!Warning]
-> We advise users to stay away from all repositories managed by `Anaconda` due to potential license limitations. See the Appendix [FAQ: How can we install Conda?](#overview_miniforge)
-> for instructions on how to install `Miniforge`, a version of conda that strictly downloads packages from the `conda-forge` channel.
-> `Conda-forge` is a community-driven channel, and `Anaconda`’s commercial license fees/restrictions for the `defaults` repo don’t apply to their packages.  
+> We advise users to stay away from all repositories managed by `Anaconda` due to license limitations. See the Appendix [FAQ: How can we install Conda?](#overview_miniforge)
+> for instructions on how to install `Miniforge`, which is a  minimal installer of conda that downloads default packages from the `conda-forge` community-driven channel.
 
 **Step :two:**: When and only when loading the conda cocoa environment for the first time, create symbolic links that will give better names for the GNU compilers
 
@@ -81,8 +71,23 @@ and install `git-lfs`
 
 Users can now proceed to the **next section**.
 
-> [!TIP]
-> We provide a Docker image named *whovian-cocoa* with Cocoa pre-installed and pre-compiled. For further instructions, refer to the appendix [FAQ: How can we run Cocoa with Docker?](#appendix_jupyter_whovian).
+> [!Note]
+> Users who want to maintain *exact reproducibility* of the conda environment should install it via `conda-lock`.
+> 
+> **Step :one:** Install the package `conda-lock` in a private conda environment to avoid conflicts.
+> 
+>     conda create -n lockenv -c conda-forge python=3.10 conda-lock=2.*
+>     conda activate lockenv
+>
+> **Step :two:**  Download the file `cocoapy310-linux.yml`,  and create the conda environment
+> 
+>     wget https://raw.githubusercontent.com/SBU-COSMOLIKE/cocoa/refs/heads/main/cocoapy310-linux.yml
+>
+> and
+> 
+>     conda-lock install -n cocoa cocoapy310-linux.yml
+>
+> Finally, proceed to **step :two:** in the general installation. 
 
 # Installation and Compilation of external modules <a name="cobaya_base_code"></a>
 
