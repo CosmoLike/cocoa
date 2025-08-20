@@ -93,7 +93,8 @@ Users can now proceed to the **next section**.
 > for instructions on how to install `Miniforge`, which is a  minimal installer of conda that downloads default packages from the `conda-forge` community-driven channel.
 
 > [!Tip]
-> We advise users to maintain *exact reproducibility* of the conda environment by installing it via `conda-lock`, following the slightly more convoluted instructions below.
+> We advise (but have not yet imposed) users to maintain *exact reproducibility* of the Cocoa conda environment (across time) by installing it via `conda-lock`,
+> following the slightly more convoluted instructions below.
 > 
 > **Step :one:** Install the package `conda-lock` in a private conda environment to avoid conflicts.
 > 
