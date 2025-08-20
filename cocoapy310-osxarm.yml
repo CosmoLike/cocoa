@@ -13,7 +13,7 @@
 version: 1
 metadata:
   content_hash:
-    osx-arm64: 9ea4f86333f733c6c422c2d9c59e0015f7082daaf3855a47b382b088e1f5b37c
+    osx-arm64: 4bdc2100a740446149be5477368e10faecab9c5ea904b9aefcbed9ef8e8e9ba5
   channels:
   - url: conda-forge
     used_env_vars: []
@@ -50,6 +50,31 @@ package:
   hash:
     md5: 7da333ca69131caf002baf360f5de7f9
     sha256: 314fb780a811d1bcd31b34266016d1d49e754e37a476f8b18d8ea81599865444
+  category: main
+  optional: false
+- name: binutils
+  version: '2.44'
+  manager: conda
+  platform: osx-arm64
+  dependencies:
+    binutils_impl_osx-arm64: '>=2.44,<2.45.0a0'
+  url: https://conda.anaconda.org/conda-forge/osx-arm64/binutils-2.44-ha5b214f_1.conda
+  hash:
+    md5: 560fe097a3b7cc9a8de4a02303e27f49
+    sha256: 68b732ecef4501e6b49c7f7f45506450b5f2fa51b3ee7ada40aa10eee98b9019
+  category: main
+  optional: false
+- name: binutils_impl_osx-arm64
+  version: '2.44'
+  manager: conda
+  platform: osx-arm64
+  dependencies:
+    __osx: '>=11.0'
+    libcxx: '>=17'
+  url: https://conda.anaconda.org/conda-forge/osx-arm64/binutils_impl_osx-arm64-2.44-h0b6420b_1.conda
+  hash:
+    md5: eff42b7ed6f366b63af8cadf4c86ee35
+    sha256: 8f2ac78f84ee2b20b2934cf2fb98a31f618f85492b461e0b34bddbc72c678166
   category: main
   optional: false
 - name: blosc
