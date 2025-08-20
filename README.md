@@ -32,62 +32,97 @@ Besides integrating [Cobaya](https://github.com/CobayaSampler) and [CosmoLike](h
 
 Our scripts never install packages or Python modules in a global folder such as `$HOME/.local`. Here, `$HOME` denotes a shell environment variable that points to the user's home folder. Doing so would force cocoa packages to be global to the user, possibly breaking environments. Our scripts enable users to work on multiple Cocoa instances simultaneously, similar to what was possible with [CosmoMC](https://github.com/cmbant/CosmoMC). 
 
-This Readme file presents basic and advanced instructions for installing all [Cobaya](https://github.com/CobayaSampler) and [CosmoLike](https://github.com/CosmoLike) components **on linux**.
+This Readme file presents basic and advanced instructions for installing all [Cobaya](https://github.com/CobayaSampler) and [CosmoLike](https://github.com/CosmoLike) components **on linux** (macOS-arm instructions are still in beta).
 
 We provide the Docker image [whovian-cocoa](https://hub.docker.com/r/vivianmiranda/whovian-cocoa) to facilitate the installation of Cocoa on Windows and macOS. 
 
-# Installation of core packages (Linux-x86) <a name="required_packages_conda"></a>
+# Installation of core packages (Linux-x86 / macOS-arm) <a name="required_packages_conda"></a>
 
 Core packages include compilers and numerical libraries that users typically do not modify.
 
-**Step :one:**: Download the file `cocoapy310.yml` yml file
+**Step :one:**: Download the appropriate `Python-3.10` compatible `yml` file
 
-    wget https://raw.githubusercontent.com/SBU-COSMOLIKE/cocoa/refs/heads/main/cocoapy310.yml
+  - Linux
+    
+         wget https://raw.githubusercontent.com/SBU-COSMOLIKE/cocoa/refs/heads/main/cocoapy310.yml
 
-Then, create the cocoa environment,
+  - macOS (arm)
 
-    conda env create --name cocoa --file=cocoapy310.yml
+         wget https://raw.githubusercontent.com/SBU-COSMOLIKE/cocoa/refs/heads/main/cocoapy310-osxarm-base.yml
+    
+**Step :two:**: create the Cocoa environment,
 
-activate it
+  - Linux
+  
+        conda env create --name cocoa --file=cocoapy310.yml
+
+  - macOS (arm)
+
+        conda env create --name cocoa --file=cocoapy310-osxarm-base.yml
+    
+and activate it
 
     conda activate cocoa
 
-> [!Warning]
-> We advise users to stay away from all repositories managed by `Anaconda` due to license limitations. See the Appendix [FAQ: How can we install Conda?](#overview_miniforge)
-> for instructions on how to install `Miniforge`, which is a  minimal installer of conda that downloads default packages from the `conda-forge` community-driven channel.
+**Step :three:**: When and only when loading the conda cocoa environment for the first time, create symbolic links that will give better names for the GNU compilers
 
-**Step :two:**: When and only when loading the conda cocoa environment for the first time, create symbolic links that will give better names for the GNU compilers
+  - Linux
+    
+        ln -s "${CONDA_PREFIX}"/bin/x86_64-conda_cos6-linux-gnu-gcc "${CONDA_PREFIX}"/bin/gcc
+        ln -s "${CONDA_PREFIX}"/bin/x86_64-conda_cos6-linux-gnu-g++ "${CONDA_PREFIX}"/bin/g++
+        ln -s "${CONDA_PREFIX}"/bin/x86_64-conda_cos6-linux-gnu-gfortran "${CONDA_PREFIX}"/bin/gfortran
+        ln -s "${CONDA_PREFIX}"/bin/x86_64-conda-linux-gnu-gcc-ar "${CONDA_PREFIX}"/bin/gcc-ar
+        ln -s "${CONDA_PREFIX}"/bin/x86_64-conda-linux-gnu-gcc-ranlib "${CONDA_PREFIX}"/bin/gcc-ranlib
+        ln -s "${CONDA_PREFIX}"/bin/x86_64-conda-linux-gnu-ld "${CONDA_PREFIX}"/bin/ld
 
-    ln -s "${CONDA_PREFIX}"/bin/x86_64-conda_cos6-linux-gnu-gcc "${CONDA_PREFIX}"/bin/gcc
-    ln -s "${CONDA_PREFIX}"/bin/x86_64-conda_cos6-linux-gnu-g++ "${CONDA_PREFIX}"/bin/g++
-    ln -s "${CONDA_PREFIX}"/bin/x86_64-conda_cos6-linux-gnu-gfortran "${CONDA_PREFIX}"/bin/gfortran
-    ln -s "${CONDA_PREFIX}"/bin/x86_64-conda-linux-gnu-gcc-ar "${CONDA_PREFIX}"/bin/gcc-ar
-    ln -s "${CONDA_PREFIX}"/bin/x86_64-conda-linux-gnu-gcc-ranlib "${CONDA_PREFIX}"/bin/gcc-ranlib
-    ln -s "${CONDA_PREFIX}"/bin/x86_64-conda-linux-gnu-ld "${CONDA_PREFIX}"/bin/ld
+  - macOS (arm)
 
+        ln -s "${CONDA_PREFIX}"/bin/clang "${CONDA_PREFIX}"/bin/gcc
+        ln -s "${CONDA_PREFIX}"/bin/clang++ "${CONDA_PREFIX}"/bin/g++
+        ln -s "${CONDA_PREFIX}"/bin/ar "${CONDA_PREFIX}"/bin/gcc-ar
+        ln -s "${CONDA_PREFIX}"/bin/ranlib "${CONDA_PREFIX}"/bin/gcc-ranlib
+    
 and install `git-lfs`
 
     git-lfs install
 
 Users can now proceed to the **next section**.
 
-> [!Note]
-> Users who want to maintain *exact reproducibility* of the conda environment should install it via `conda-lock`.
+> [!Warning]
+> We advise users to stay away from all repositories managed by `Anaconda` due to license limitations. See the Appendix [FAQ: How can we install Conda?](#overview_miniforge)
+> for instructions on how to install `Miniforge`, which is a  minimal installer of conda that downloads default packages from the `conda-forge` community-driven channel.
+
+> [!Tip]
+> We advise users to maintain *exact reproducibility* of the conda environment by installing it via `conda-lock`, following the slightly more convoluted instructions below.
 > 
 > **Step :one:** Install the package `conda-lock` in a private conda environment to avoid conflicts.
 > 
->     conda create -n lockenv -c conda-forge python=3.10 conda-lock=2.*
+>     conda create -n lockenv -c conda-forge python=3.10 conda-lock=2.* wget
 >     conda activate lockenv
 >
-> **Step :two:**  Download the file `cocoapy310-linux.yml`,  and create the conda environment
-> 
->     wget https://raw.githubusercontent.com/SBU-COSMOLIKE/cocoa/refs/heads/main/cocoapy310-linux.yml
+> **Step :two:**  Download the file appropriate conda-lock compatible `yml` file.
+>   - Linux
+>     
+>         wget https://raw.githubusercontent.com/SBU-COSMOLIKE/cocoa/refs/heads/main/cocoapy310-linux.yml
 >
-> and
-> 
->     conda-lock install -n cocoa cocoapy310-linux.yml
+>   - macOS (arm)
+>     
+>         wget https://raw.githubusercontent.com/SBU-COSMOLIKE/cocoa/refs/heads/main/cocoapy310-osxarm.yml
 >
-> Finally, proceed to **step :two:** in the general installation. 
+> **Step :three:**  Create the conda environment
+>   - Linux
+>     
+>         conda-lock install -n cocoa cocoapy310-linux.yml
+>
+>   - macOS (arm)
+>
+>         conda-lock install -n cocoa cocoapy310-osxarm.yml   
+>
+>  and activate it
+>
+>         conda activate cocoa
+>
+> Finally, proceed to **step :three:** in the general installation instructions. 
 
 # Installation and Compilation of external modules <a name="cobaya_base_code"></a>
 
