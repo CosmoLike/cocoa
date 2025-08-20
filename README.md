@@ -52,7 +52,7 @@ Core packages include compilers and numerical libraries that users typically do 
   
         conda activate; conda install wget
 
-    This will activate the conda base environment (users should see the prefix `(base)` written on the terminal) and install `wget`. Then, type.
+    This will activate the conda base environment (users should see the prefix `(base)`) and install `wget`. Then, type.
 
         wget https://raw.githubusercontent.com/SBU-COSMOLIKE/cocoa/refs/heads/main/cocoapy310-osxarm-base.yml
    
