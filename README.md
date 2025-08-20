@@ -71,8 +71,8 @@ and install `git-lfs`
 
 Users can now proceed to the **next section**.
 
-> [!Note]
-> Users who want to maintain *exact reproducibility* of the conda environment should install it via `conda-lock`.
+> [!Tip]
+> We advise users to maintain *exact reproducibility* of the conda environment by installing it via `conda-lock`.
 > 
 > **Step :one:** Install the package `conda-lock` in a private conda environment to avoid conflicts.
 > 
@@ -84,8 +84,13 @@ Users can now proceed to the **next section**.
 >     wget https://raw.githubusercontent.com/SBU-COSMOLIKE/cocoa/refs/heads/main/cocoapy310-linux.yml
 >
 > and
-> 
->     conda-lock install -n cocoa cocoapy310-linux.yml
+>   - Linux
+>     
+>         conda-lock install -n cocoa cocoapy310-linux.yml
+>
+>   - macOS (arm)
+>
+>         conda-lock install -n cocoa cocoapy310-osxarm.yml   
 >
 > Finally, proceed to **step :two:** in the general installation. 
 
