@@ -47,9 +47,15 @@ Core packages include compilers and numerical libraries that users typically do 
          wget https://raw.githubusercontent.com/SBU-COSMOLIKE/cocoa/refs/heads/main/cocoapy310.yml
 
   - macOS (arm)
-
-         wget https://raw.githubusercontent.com/SBU-COSMOLIKE/cocoa/refs/heads/main/cocoapy310-osxarm-base.yml
     
+    Users on macOS may not have `wget` installed. If that is the case, run the following.
+  
+        conda activate; conda install wget
+
+    This will activate the conda base environment (users should see the prefix `(base)` written on the terminal) and install `wget`. Then, type.
+
+        wget https://raw.githubusercontent.com/SBU-COSMOLIKE/cocoa/refs/heads/main/cocoapy310-osxarm-base.yml
+   
 **Step :two:**: Create the Cocoa environment,
 
   - Linux
