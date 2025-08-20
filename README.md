@@ -70,7 +70,7 @@ and activate it
 
     conda activate cocoa
 
-**Step :three:**: When and only when loading the conda cocoa environment for the first time, create symbolic links that will give better names for the GNU compilers
+**Step :three:**: When and only when loading the conda cocoa environment for the first time, create the following symbolic links
 
   - Linux
     
@@ -127,7 +127,7 @@ Users can now proceed to the **next section**.
 >
 >  and activate it
 >
->         conda activate cocoa
+>     conda activate cocoa
 >
 > Finally, proceed to **step :three:** in the general installation instructions. 
 
