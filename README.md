@@ -36,7 +36,7 @@ This Readme file presents basic and advanced instructions for installing all [Co
 
 We provide the Docker image [whovian-cocoa](https://hub.docker.com/r/vivianmiranda/whovian-cocoa) to facilitate the installation of Cocoa on Windows and macOS. 
 
-# Installation of core packages (Linux-x86 / macOS-arm) <a name="required_packages_conda"></a>
+# Installation of core packages <a name="required_packages_conda"></a>
 
 Core packages include compilers and numerical libraries that users typically do not modify.
 
@@ -47,10 +47,16 @@ Core packages include compilers and numerical libraries that users typically do 
          wget https://raw.githubusercontent.com/SBU-COSMOLIKE/cocoa/refs/heads/main/cocoapy310.yml
 
   - macOS (arm)
-
-         wget https://raw.githubusercontent.com/SBU-COSMOLIKE/cocoa/refs/heads/main/cocoapy310-osxarm-base.yml
     
-**Step :two:**: create the Cocoa environment,
+    Users on macOS may not have `wget` installed. If that is the case, run the following.
+  
+        conda activate; conda install wget
+
+    This will activate the conda base environment (the prefix `(base)`) and install `wget`. Then, type.
+
+        wget https://raw.githubusercontent.com/SBU-COSMOLIKE/cocoa/refs/heads/main/cocoapy310-osxarm-base.yml
+   
+**Step :two:**: Create the Cocoa environment,
 
   - Linux
   
@@ -64,7 +70,7 @@ and activate it
 
     conda activate cocoa
 
-**Step :three:**: When and only when loading the conda cocoa environment for the first time, create symbolic links that will give better names for the GNU compilers
+**Step :three:**: When and only when loading the conda cocoa environment for the first time, create the following symbolic links
 
   - Linux
     
@@ -93,14 +99,15 @@ Users can now proceed to the **next section**.
 > for instructions on how to install `Miniforge`, which is a  minimal installer of conda that downloads default packages from the `conda-forge` community-driven channel.
 
 > [!Tip]
-> We advise users to maintain *exact reproducibility* of the conda environment by installing it via `conda-lock`, following the slightly more convoluted instructions below.
+> We advise (but have not yet imposed) users to maintain *exact reproducibility* (across time) of the Cocoa conda environment by installing it via `conda-lock`,
+> following the slightly more convoluted instructions below.
 > 
 > **Step :one:** Install the package `conda-lock` in a private conda environment to avoid conflicts.
 > 
 >     conda create -n lockenv -c conda-forge python=3.10 conda-lock=2.* wget
 >     conda activate lockenv
 >
-> **Step :two:**  Download the file appropriate conda-lock compatible `yml` file.
+> **Step :two:** Download the file appropriate conda-lock compatible `yml` file.
 >   - Linux
 >     
 >         wget https://raw.githubusercontent.com/SBU-COSMOLIKE/cocoa/refs/heads/main/cocoapy310-linux.yml
@@ -109,7 +116,7 @@ Users can now proceed to the **next section**.
 >     
 >         wget https://raw.githubusercontent.com/SBU-COSMOLIKE/cocoa/refs/heads/main/cocoapy310-osxarm.yml
 >
-> **Step :three:**  Create the conda environment
+> **Step :three:** Create the conda environment
 >   - Linux
 >     
 >         conda-lock install -n cocoa cocoapy310-linux.yml
@@ -120,7 +127,7 @@ Users can now proceed to the **next section**.
 >
 >  and activate it
 >
->         conda activate cocoa
+>     conda activate cocoa
 >
 > Finally, proceed to **step :three:** in the general installation instructions. 
 
@@ -243,10 +250,10 @@ Users will see a terminal like this: `$(cocoa)(.local)`. *This is a feature, not
 > 
 >     [... NotebookApp] or http://127.0.0.1:8888/?token=XXX
 >
-> The project lsst-y1 contains jupyter notebook examples located at `projects/lsst_y1`.
+> The project `lsst-y1` contains jupyter notebook examples located at `projects/lsst_y1`.
 
 > [!NOTE]
-> Why did we choose to work with two distinct shell environments, `(cocoa)` and `(.local)`? Our scripts enable users to work on multiple Cocoa instances, similar to what was possible with [CosmoMC](https://github.com/cmbant/CosmoMC). On each instance, our scripts install packages at
+> Why did we choose to work with two distinct shell environments, `(cocoa)` and `(.local)`? Our scripts enable users to work on multiple Cocoa instances, similar to what was possible with [CosmoMC](https://github.com/cmbant/CosmoMC). In each instance, our scripts install packages at
 >
 >      Cocoa/.local/bin
 >      Cocoa/.local/include
