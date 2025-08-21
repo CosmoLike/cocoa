@@ -89,21 +89,53 @@ unset -v INT_INCL INT_LIB INT_INCL_PY INT_INCL_PY_SP INT_INCL_PY_SP_NP
 # --------------------------------------------------------------------------
 # COMPILER
 # --------------------------------------------------------------------------
-export C_COMPILER="${CONDA_PREFIX:?}"/bin/x86_64-conda-linux-gnu-cc
+OS=$(uname -s)
+ARCH=$(uname -m)
 
-export CXX_COMPILER="${CONDA_PREFIX:?}"/bin/x86_64-conda-linux-gnu-g++
+if [[ "$OS" == "Darwin" && "$ARCH" == "arm64" ]]; then
+  export C_COMPILER="${CONDA_PREFIX:?}/bin/clang"
 
-export FORTRAN_COMPILER="${CONDA_PREFIX:?}"/bin/x86_64-conda-linux-gnu-gfortran
+  export CXX_COMPILER="${CONDA_PREFIX:?}/bin/clang++"
+
+  export FORTRAN_COMPILER="${CONDA_PREFIX:?}/bin/gfortran"
+
+  export AR_COMPILER=="${CONDA_PREFIX:?}"/bin/ar
+
+  export RANLIB_COMPILER=="${CONDA_PREFIX:?}"/bin/ranlib
+
+elif [[ "$OS" == "Darwin" && "$ARCH" == "x86_64" ]]; then
+
+  export C_COMPILER="${CONDA_PREFIX:?}/bin/clang"
+
+  export CXX_COMPILER="${CONDA_PREFIX:?}/bin/clang++"
+
+  export FORTRAN_COMPILER="${CONDA_PREFIX:?}/bin/gfortran"
+  
+  export AR_COMPILER=="${CONDA_PREFIX:?}"/bin/ar
+
+  export RANLIB_COMPILER=="${CONDA_PREFIX:?}"/bin/ranlib
+
+else
+
+  export C_COMPILER="${CONDA_PREFIX:?}/bin/x86_64-conda-linux-gnu-cc"
+  
+  export CXX_COMPILER="${CONDA_PREFIX:?}/bin/x86_64-conda-linux-gnu-g++"
+  
+  export FORTRAN_COMPILER="${CONDA_PREFIX:?}/bin/x86_64-conda-linux-gnu-gfortran"
+  
+  export AR_COMPILER=="${CONDA_PREFIX:?}"/bin/x86_64-conda-linux-gnu-ar
+  
+  export RANLIB_COMPILER=="${CONDA_PREFIX:?}"/bin/x86_64-conda-linux-gnu-ranlib
+
+fi
+
+unset -v OS ARCH
 
 export MPI_FORTRAN_COMPILER="${CONDA_PREFIX:?}"/bin/mpif90
 
 export MPI_CC_COMPILER="${CONDA_PREFIX:?}"/bin/mpicc
 
 export MPI_CXX_COMPILER="${CONDA_PREFIX:?}"/bin/mpicxx
-
-export AR_COMPILER=="${CONDA_PREFIX:?}"/bin/x86_64-conda-linux-gnu-ar
-
-export RANLIB_COMPILER=="${CONDA_PREFIX:?}"/bin/x86_64-conda-linux-gnu-ranlib
 
 # --------------------------------------------------------------------------
 # IGNORE MOST PACKAGES (ALREADY ON CONDA)

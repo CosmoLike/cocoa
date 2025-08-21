@@ -604,8 +604,11 @@ if [ -z "${IGNORE_CORE_INSTALLATION}" ]; then
       -DCMAKE_INSTALL_PREFIX="${ROOTDIR:?}/.local" \
       -DCMAKE_C_COMPILER="${C_COMPILER:?}" \
       -DCMAKE_CXX_COMPILER="${CXX_COMPILER:?}" \
-      -DLAPACK_FOUND=YES -DARPACK_FOUND=YES  \
-      -DATLAS_FOUND=NO -DOpenBLAS_FOUND=YES -DBLAS_FOUND=NO  . \
+      -DLAPACK_FOUND=YES \
+      -DARPACK_FOUND=YES  \
+      -DATLAS_FOUND=NO \
+      -DOpenBLAS_FOUND=YES \
+      -DBLAS_FOUND=NO  . \
       >${OUT1:?} 2>${OUT2:?} || { error "(ARMA) ${EC12:?}"; return 1; })
     
     make clean >${OUT1:?} 2>${OUT2:?} || { error "(ARMA) ${EC2:?}"; return 1; }
