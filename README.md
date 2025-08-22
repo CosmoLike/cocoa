@@ -751,6 +751,9 @@ and
           && conda config --set channel_priority strict \
           && conda init bash
 
+> [!Note]
+> The strict use of Miniconda and conda-forge packages appears to mitigate the significant licensing issue involving Anaconda packages and academic/research institutions.
+
 **Step :three:**: After running this command, you will see a message in the terminal that ends with the statement *For changes to take effect, close and re-open your current shell*. Then, type
 
     source ~/.bashrc
