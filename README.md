@@ -188,27 +188,44 @@ We assume that you are still in the Conda cocoa environment from the previous `c
 Users will see a terminal like this: `$(cocoa)(.local)`. *This is a feature, not a bug*!
 
  **Step :two:**: Select the number of OpenMP cores (below, we set it to 8).
-    
-    export OMP_PROC_BIND=close; export OMP_NUM_THREADS=8; export OMP_PLACES=cores; export OMP_DYNAMIC=FALSE
 
+  - Linux
+    
+        export OMP_NUM_THREADS=8; export OMP_PROC_BIND=close; export OMP_PLACES=cores; export OMP_DYNAMIC=FALSE
+
+  - macOS (arm)
+    
+        export OMP_NUM_THREADS=8; export OMP_PROC_BIND=disabled; export OMP_PLACES=cores; export OMP_DYNAMIC=FALSE
+    
 ## Examples not involving Cosmolike
 
  **Step :three:**: The folder `projects/example` contains a few examples involving different likelihoods. So, run the `cobaya-run` on the first example following the commands below.
 
 - **One model evaluation**:
 
-      mpirun -n 1 --oversubscribe --mca pml ^ucx --mca btl vader,tcp,self \
-         --bind-to core:overload-allowed --mca mpi_yield_when_idle 1 --report-bindings  \
-         --rank-by slot --map-by numa:pe=${OMP_NUM_THREADS} \
-         cobaya-run ./projects/example/EXAMPLE_EVALUATE1.yaml -f
-               
+  - Linux
+  
+        mpirun -n 1 --oversubscribe --mca pml ^ucx --mca btl vader,tcp,self \
+           --bind-to core:overload-allowed --mca mpi_yield_when_idle 1 --report-bindings  \
+           --rank-by slot --map-by numa:pe=${OMP_NUM_THREADS} \
+           cobaya-run ./projects/example/EXAMPLE_EVALUATE1.yaml -f
+
+  - macOS (arm)
+  
+        mpirun -n 1 --oversubscribe cobaya-run ./projects/example/EXAMPLE_EVALUATE1.yaml -f
+    
 - **MCMC (Metropolis-Hastings Algorithm)**:
 
-      mpirun -n 4 --oversubscribe --mca pml ^ucx --mca btl vader,tcp,self \
-         --bind-to core:overload-allowed --mca mpi_yield_when_idle 1 --report-bindings  \
-         --rank-by slot --map-by numa:pe=${OMP_NUM_THREADS} \
-         cobaya-run ./projects/example/EXAMPLE_MCMC1.yaml -f
+    - Linux
+  
+          mpirun -n 4 --oversubscribe --mca pml ^ucx --mca btl vader,tcp,self \
+             --bind-to core:overload-allowed --mca mpi_yield_when_idle 1 --report-bindings  \
+             --rank-by slot --map-by numa:pe=${OMP_NUM_THREADS} \
+             cobaya-run ./projects/example/EXAMPLE_MCMC1.yaml -f
 
+  - macOS (arm)
+
+        mpirun -n 4 --oversubscribe cobaya-run ./projects/example/EXAMPLE_MCMC1.yaml -f
 
 ## Examples involving Cosmolike
 
