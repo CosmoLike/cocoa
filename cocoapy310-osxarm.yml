@@ -13,7 +13,7 @@
 version: 1
 metadata:
   content_hash:
-    osx-arm64: 4bdc2100a740446149be5477368e10faecab9c5ea904b9aefcbed9ef8e8e9ba5
+    osx-arm64: b9f1bebaa0419ffa15a7e5072f9e6b8178d237656ef42cc197f83314af19758f
   channels:
   - url: conda-forge
     used_env_vars: []
@@ -419,6 +419,17 @@ package:
   hash:
     md5: 18ad60675af8d74a6e49bf40055419d0
     sha256: 758a7a858d8a5dca265e0754c73659690a99226e7e8d530666fece3b38e44558
+  category: main
+  optional: false
+- name: coreutils
+  version: '9.5'
+  manager: conda
+  platform: osx-arm64
+  dependencies: {}
+  url: https://conda.anaconda.org/conda-forge/osx-arm64/coreutils-9.5-h93a5062_0.conda
+  hash:
+    md5: 75840e25e62a109b1d25043c63a4f36c
+    sha256: 70e50f2f1458e7c172c9b1c149a4289e8eecc9b53e06ab9de0b3572cdbd30a61
   category: main
   optional: false
 - name: curl
@@ -2239,7 +2250,7 @@ package:
   category: main
   optional: false
 - name: pyzmq
-  version: 27.0.1
+  version: 27.0.2
   manager: conda
   platform: osx-arm64
   dependencies:
@@ -2249,10 +2260,10 @@ package:
     python: '>=3.10,<3.11.0a0'
     python_abi: 3.10.*
     zeromq: '>=4.3.5,<4.4.0a0'
-  url: https://conda.anaconda.org/conda-forge/osx-arm64/pyzmq-27.0.1-py310h315defb_0.conda
+  url: https://conda.anaconda.org/conda-forge/osx-arm64/pyzmq-27.0.2-py310h315defb_0.conda
   hash:
-    md5: ad2cc09fa13ce5974ee7228482eddbb7
-    sha256: 4ccc1cbd7c94ca9f223cf724999938741636a6f3a4324593a457ebf6ea7097ce
+    md5: 15278d609f6eae8e05d8cc85a1b49e13
+    sha256: c4c576a162247b2486e4b9839866885831890824c3e89abec63d5e36e0042131
   category: main
   optional: false
 - name: qhull
@@ -2366,6 +2377,19 @@ package:
   hash:
     md5: f76b5b7a015dc835732277b3907550b0
     sha256: ebe7606be576180d1e0cbba911d7768f2fae48410ba8236de033a637d67fc971
+  category: main
+  optional: false
+- name: sed
+  version: '4.9'
+  manager: conda
+  platform: osx-arm64
+  dependencies:
+    __osx: '>=11.0'
+    libintl: '>=0.24.1,<1.0a0'
+  url: https://conda.anaconda.org/conda-forge/osx-arm64/sed-4.9-h21ae2d7_0.conda
+  hash:
+    md5: d3c7f3721d56985890cb6b9aadb084f0
+    sha256: 8c95129762d26d5e0c1513d5ff0c79cd436357da96aa2a23b1d21a4da847beed
   category: main
   optional: false
 - name: setuptools
