@@ -16,6 +16,7 @@ dependencies:
   - fortran-compiler
   - llvm-openmp           # OpenMP runtime on mac (clang)
   # Math / Sci stack
+  - boost=1.85
   - numpy==1.26.3 
   - scipy==1.12.0
   - hdf5=1.14.6

@@ -96,14 +96,14 @@ if [[ -z "${IGNORE_ACTDR6_CODE}" ]]; then
   TMP2="act_dr6_cmbonly"
   if [[ ! -L "${COBLIKE:?}/${TMP2}" ]]; then
     ln -s "${ECODEF:?}/${TMP}/${TMP2}" "${COBLIKE:?}" \
-      >${OUT1:?} 2>${OUT2:?} || { error_start_cocoa "${EC34:?}"; return 1; }
+      >>${OUT1:?} 2>>${OUT2:?} || { error_start_cocoa "${EC34:?}"; return 1; }
   fi
 
   TMP="${ACTDR6_MFLIKE_NAME:-"act_dr6_mflike"}"
   TMP2="act_dr6_mflike"
   if [[ ! -L "${COBLIKE:?}/${TMP2}" ]]; then
     ln -s "${ECODEF:?}/${TMP}/${TMP2}" "${COBLIKE:?}" \
-      >${OUT1:?} 2>${OUT2:?} || { error_start_cocoa "${EC34:?}"; return 1; }
+      >>${OUT1:?} 2>>${OUT2:?} || { error_start_cocoa "${EC34:?}"; return 1; }
   fi
 
   unset -v ECODEF COBLIKE TMP TMP2
@@ -122,11 +122,11 @@ if [[ -z "${IGNORE_SIMONS_OBSERVATORY_LIKELIHOOD_CODE}" ]]; then
   
   if [[ ! -L "${COBLIKE:?}/${TMP2}" ]]; then
     ln -s "${ECODEF:?}/${TMP}/${TMP2}" "${COBLIKE:?}" \
-      >${OUT1:?} 2>${OUT2:?} || { error_start_cocoa "${EC34:?}"; return 1; }
+      >>${OUT1:?} 2>>${OUT2:?} || { error_start_cocoa "${EC34:?}"; return 1; }
   fi
   if [[ ! -L "${COBTH:?}/${TMP2}" ]]; then
     ln -s "${ECODEF:?}/${TMP}/${TMP2}" "${COBTH:?}" \
-      >${OUT1:?} 2>${OUT2:?} || { error_start_cocoa "${EC34:?}"; return 1; }
+      >>${OUT1:?} 2>>${OUT2:?} || { error_start_cocoa "${EC34:?}"; return 1; }
   fi
 
   unset -v ECODEF COBLIKE TMP TMP2 COBTH
@@ -143,14 +143,14 @@ if [[ -z "${IGNORE_LIPOP_LIKELIHOOD_CODE}" ]]; then
   TMP2="planck_2020_hillipop"
   if [[ ! -L "${COBLIKE:?}/${TMP2}" ]]; then
     ln -s "${ECODEF:?}/${TMP}/${TMP2}" "${COBLIKE:?}" \
-      >${OUT1:?} 2>${OUT2:?} || { error_start_cocoa "${EC34:?}"; return 1; }
+      >>${OUT1:?} 2>>${OUT2:?} || { error_start_cocoa "${EC34:?}"; return 1; }
   fi
 
   TMP="${PL2020_LOLLIPOP_NAME:-"planck_2020_lollipop"}"
   TMP2="planck_2020_lollipop"
   if [[ ! -L "${COBLIKE:?}/${TMP2}" ]]; then
     ln -s "${ECODEF:?}/${TMP}/${TMP2}" "${COBLIKE:?}" \
-      >${OUT1:?} 2>${OUT2:?} || { error_start_cocoa "${EC34:?}"; return 1; }
+      >>${OUT1:?} 2>>${OUT2:?} || { error_start_cocoa "${EC34:?}"; return 1; }
   fi
 
   unset -v ECODEF COBLIKE TMP TMP2
@@ -169,7 +169,7 @@ if [[ -z "${IGNORE_COSMOPOWER_CODE}" ]]; then
 
   if [[ ! -L "${COBTH:?}/${TMP3:?}" ]]; then
     ln -s "${ECODEF:?}/emulators/${TMP}/${TMP2}" "${COBTH:?}" \
-      >${OUT1:?} 2>${OUT2:?} || { error_start_cocoa "${EC34:?}"; return 1; }
+      >>${OUT1:?} 2>>${OUT2:?} || { error_start_cocoa "${EC34:?}"; return 1; }
   fi
 
   unset -v ECODEF COBTH TMP TMP2 TMP3
@@ -186,43 +186,43 @@ if [[ -z "${IGNORE_EMULTRF_CODE}" ]]; then
   TMP2="emulcmb"
   if [[ ! -L "${COBTH:?}/${TMP2}" ]]; then
     ln -s "${ECODEF:?}/emulators/${TMP}/${TMP2}" "${COBTH:?}" \
-      >${OUT1:?} 2>${OUT2:?} || { error_start_cocoa "${EC34:?}"; return 1; }
+      >>${OUT1:?} 2>>${OUT2:?} || { error_start_cocoa "${EC34:?}"; return 1; }
   fi
 
   TMP2="emulbaosn"
   if [[ ! -L "${COBTH:?}/${TMP2}" ]]; then
     ln -s "${ECODEF:?}/emulators/${TMP}/${TMP2}" "${COBTH:?}" \
-      >${OUT1:?} 2>${OUT2:?} || { error_start_cocoa "${EC34:?}"; return 1; }
+      >>${OUT1:?} 2>>${OUT2:?} || { error_start_cocoa "${EC34:?}"; return 1; }
   fi
 
   TMP2="emultheta"
   if [[ ! -L "${COBTH:?}/${TMP2}" ]]; then
     ln -s "${ECODEF:?}/emulators/${TMP}/${TMP2}" "${COBTH:?}" \
-      >${OUT1:?} 2>${OUT2:?} || { error_start_cocoa "${EC34:?}"; return 1; }
+      >>${OUT1:?} 2>>${OUT2:?} || { error_start_cocoa "${EC34:?}"; return 1; }
   fi
 
   TMP2="emulrdrag"
   if [[ ! -L "${COBTH:?}/${TMP2}" ]]; then
     ln -s "${ECODEF:?}/emulators/${TMP}/${TMP2}" "${COBTH:?}" \
-      >${OUT1:?} 2>${OUT2:?} || { error_start_cocoa "${EC34:?}"; return 1; }
+      >>${OUT1:?} 2>>${OUT2:?} || { error_start_cocoa "${EC34:?}"; return 1; }
   fi
 
   TMP2="emul_cosmic_shear"
   if [[ ! -L "${COBTH:?}/${TMP2}" ]]; then
     ln -s "${ECODEF:?}/emulators/${TMP}/${TMP2}" "${COBTH:?}" \
-      >${OUT1:?} 2>${OUT2:?} || { error_start_cocoa "${EC34:?}"; return 1; }
+      >>${OUT1:?} 2>>${OUT2:?} || { error_start_cocoa "${EC34:?}"; return 1; }
   fi
 
   TMP2="emul_ggl"
   if [[ ! -L "${COBTH:?}/${TMP2}" ]]; then
     ln -s "${ECODEF:?}/emulators/${TMP}/${TMP2}" "${COBTH:?}" \
-      >${OUT1:?} 2>${OUT2:?} || { error_start_cocoa "${EC34:?}"; return 1; }
+      >>${OUT1:?} 2>>${OUT2:?} || { error_start_cocoa "${EC34:?}"; return 1; }
   fi
 
   TMP2="emul_wtheta"
   if [[ ! -L "${COBTH:?}/${TMP2}" ]]; then
     ln -s "${ECODEF:?}/emulators/${TMP}/${TMP2}" "${COBTH:?}" \
-      >${OUT1:?} 2>${OUT2:?} || { error_start_cocoa "${EC34:?}"; return 1; }
+      >>${OUT1:?} 2>>${OUT2:?} || { error_start_cocoa "${EC34:?}"; return 1; }
   fi
 
   unset -v ECODEF COBTH TMP TMP2

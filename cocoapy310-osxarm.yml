@@ -13,7 +13,7 @@
 version: 1
 metadata:
   content_hash:
-    osx-arm64: b9f1bebaa0419ffa15a7e5072f9e6b8178d237656ef42cc197f83314af19758f
+    osx-arm64: 7973b3b525f55609458a3a23e378b84bb36d5564ec99851d6f5db843b1bda43a
   channels:
   - url: conda-forge
     used_env_vars: []
@@ -67,6 +67,20 @@ package:
   hash:
     md5: 925acfb50a750aa178f7a0aced77f351
     sha256: c3fe902114b9a3ac837e1a32408cc2142c147ec054c1038d37aec6814343f48a
+  category: main
+  optional: false
+- name: boost
+  version: 1.85.0
+  manager: conda
+  platform: osx-arm64
+  dependencies:
+    libboost-python-devel: 1.85.0
+    numpy: '>=1.19,<3'
+    python_abi: 3.10.*
+  url: https://conda.anaconda.org/conda-forge/osx-arm64/boost-1.85.0-h24597f5_4.conda
+  hash:
+    md5: 09bfe142826142e806b64062fac4f97f
+    sha256: f73c0e9eba69f1c91c8930924f37af91091b97c9a0950601dee7f52383a2036e
   category: main
   optional: false
 - name: brotli
@@ -1058,6 +1072,80 @@ package:
   hash:
     md5: cdb3e1ca1661dbf19f9aad7dad524996
     sha256: 5de3c3bfcdc8ba05da1a7815c9953fe392c2065d9efdc2491f91df6d0d1d9e76
+  category: main
+  optional: false
+- name: libboost
+  version: 1.85.0
+  manager: conda
+  platform: osx-arm64
+  dependencies:
+    __osx: '>=11.0'
+    bzip2: '>=1.0.8,<2.0a0'
+    icu: '>=75.1,<76.0a0'
+    libcxx: '>=16'
+    libzlib: '>=1.3.1,<2.0a0'
+    xz: '>=5.2.6,<6.0a0'
+    zstd: '>=1.5.6,<1.6.0a0'
+  url: https://conda.anaconda.org/conda-forge/osx-arm64/libboost-1.85.0-hf763ba5_4.conda
+  hash:
+    md5: 1dd9608cfbf7e5e09df19ec2187f1a5a
+    sha256: 2ef0667e01ad218a1e61167cccace83821e551994eb55e917cbf53ca58e418a4
+  category: main
+  optional: false
+- name: libboost-devel
+  version: 1.85.0
+  manager: conda
+  platform: osx-arm64
+  dependencies:
+    libboost: 1.85.0
+    libboost-headers: 1.85.0
+  url: https://conda.anaconda.org/conda-forge/osx-arm64/libboost-devel-1.85.0-hf450f58_4.conda
+  hash:
+    md5: c7adf58ea69ec5520517529ae6b6370e
+    sha256: c54a44d4933dc2f9c0978205d22b0e13cba9c9d73e98a70e524b3cae72c8a62f
+  category: main
+  optional: false
+- name: libboost-headers
+  version: 1.85.0
+  manager: conda
+  platform: osx-arm64
+  dependencies: {}
+  url: https://conda.anaconda.org/conda-forge/osx-arm64/libboost-headers-1.85.0-hce30654_4.conda
+  hash:
+    md5: e4da2f0886a3029ec3b7274b13a54714
+    sha256: 52c298c34a25960f48aef00981934808b70953f046abb08076f6005e2df83d22
+  category: main
+  optional: false
+- name: libboost-python
+  version: 1.85.0
+  manager: conda
+  platform: osx-arm64
+  dependencies:
+    __osx: '>=11.0'
+    libcxx: '>=16'
+    numpy: '>=1.19,<3'
+    python: '>=3.10,<3.11.0a0'
+    python_abi: 3.10.*
+  url: https://conda.anaconda.org/conda-forge/osx-arm64/libboost-python-1.85.0-py310h2fb3287_4.conda
+  hash:
+    md5: c19f4b877ab268e236e538cf0dfbffc9
+    sha256: ea2b732e802bba34dea16eb43c36861cea0c09bce8af215a3af35c7e832b1ecf
+  category: main
+  optional: false
+- name: libboost-python-devel
+  version: 1.85.0
+  manager: conda
+  platform: osx-arm64
+  dependencies:
+    libboost-devel: 1.85.0
+    libboost-python: 1.85.0
+    numpy: '>=1.19,<3'
+    python: '>=3.10,<3.11.0a0'
+    python_abi: 3.10.*
+  url: https://conda.anaconda.org/conda-forge/osx-arm64/libboost-python-devel-1.85.0-py310h24597f5_4.conda
+  hash:
+    md5: 318141b6272c954a19439ea58888cf83
+    sha256: db55216b816f4e58862c2ff980b64f619c253cc39b9b776666969771cc842e16
   category: main
   optional: false
 - name: libbrotlicommon
