@@ -103,6 +103,9 @@ Users can now proceed to the **next section**.
 > **Step :one:** Install the package `conda-lock` in a private conda environment to avoid conflicts.
 > 
 >     conda create -n lockenv -c conda-forge python=3.10 conda-lock=2.* wget
+>
+> and
+> 
 >     conda activate lockenv
 >
 > **Step :two:** Download the file appropriate conda-lock compatible `yml` file.
