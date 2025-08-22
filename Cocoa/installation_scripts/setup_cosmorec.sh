@@ -111,18 +111,23 @@ if [ -z "${IGNORE_COSMOREC_CODE}" ]; then
     # --------------------------------------------------------------------------
     # We patch the files below so they use the right compilers -----------------
     # --------------------------------------------------------------------------
-    # T = TMP
+    # PREFIX: T = TMP, P = PATCH, AL = Array Length
     declare -a TFOLDER=("" 
                        ) # If nonblank, path must include /
     
-    # T = TMP
     declare -a TFILE=("Makefile.in")
 
-    #T = TMP, P = PATCH
-    declare -a TFILEP=("Makefile.in.patch" 
-                      )
+    case "$(uname -s)" in
+      Linux)
+        declare -a TFILEP=("Makefile.in.patch" 
+                          )
+        ;;
+      Darwin)
+        declare -a TFILEP=("MakefileOSX.in.patch" 
+                          )
+        ;;
+    esac
 
-    # AL = Array Length
     AL=${#TFOLDER[@]}
 
     for (( i=0; i<${AL}; i++ ));

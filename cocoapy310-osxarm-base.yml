@@ -7,7 +7,6 @@ dependencies:
   - pip
   - wheel=0.45.1
   # Build tools & compilers (portable on mac)
-  - binutils
   - cmake=4.0.2
   - make=4.4.1
   - c-compiler

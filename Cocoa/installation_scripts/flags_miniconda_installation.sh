@@ -22,13 +22,31 @@ INT_INCL="${CONDA_PREFIX:?}/include"
 
 INT_LIB="${CONDA_PREFIX:?}/lib"
 
-INT_INCL_PY="${INT_INCL:?}/python${PYTHON_VERSION:?}"
+if [ -n "${INT_INCL}" ]; then
+  if [ -d "${INT_INCL:?}/python${PYTHON_VERSION:?}" ]; then
+    INT_INCL_PY="${INT_INCL:?}/python${PYTHON_VERSION:?}"
+  fi
+fi
 
-INT_INCL_PY_SP="${INT_INCL_PY}/site-packages"
+if [ -n "${INT_INCL_PY}" ]; then
+  if [ -d "${INT_INCL_PY:?}/site-packages" ]; then
+    INT_INCL_PY_SP="${INT_INCL_PY}/site-packages"
+  fi
+fi
 
-INT_INCL_PY_SP_NP="${INT_INCL_PY_SP:?}/numpy/core/include"
+if [ -n "${INT_INCL_PY_SP}" ]; then
+  if [ -d "${INT_INCL_PY_SP:?}/numpy/core/include" ]; then
+    INT_INCL_PY_SP_NP="${INT_INCL_PY_SP:?}/numpy/core/include"
+  fi
+fi
 
-# --------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 
 export PATH="${CONDA_PREFIX:?}"/bin:$PATH
 
@@ -36,49 +54,57 @@ export CFLAGS="${CFLAGS} -I${CONDA_PREFIX:?}/include"
 
 export LDFLAGS="${LDFLAGS} -L${CONDA_PREFIX:?}/lib"
 
-export C_INCLUDE_PATH="${INT_INCL:?}/":$C_INCLUDE_PATH
+if [ -n "${INT_INCL_PY}" ]; then
+  export C_INCLUDE_PATH="${INT_INCL_PY:?}m/":$C_INCLUDE_PATH
+  
+  export CPLUS_INCLUDE_PATH="${INT_INCL_PY:?}m/":$CPLUS_INCLUDE_PATH
+  
+  export CMAKE_INCLUDE_PATH="${INT_INCL_PY:?}m/":$CMAKE_INCLUDE_PATH 
+fi
 
-export C_INCLUDE_PATH="${INT_INCL_PY:?}m/":$C_INCLUDE_PATH
+if [ -n "${INT_INCL_PY_SP_NP}" ]; then
+  export C_INCLUDE_PATH="${INT_INCL_PY_SP_NP:?}/":$C_INCLUDE_PATH
+  
+  export CPLUS_INCLUDE_PATH="${INT_INCL_PY_SP_NP:?}/":$CPLUS_INCLUDE_PATH
+fi
 
-export C_INCLUDE_PATH="${INT_INCL_PY_SP_NP:?}/":$C_INCLUDE_PATH
+if [ -n "${INT_INCL_PY_SP}" ]; then
+  export PYTHONPATH="${INT_INCL_PY_SP:?}/":$PYTHONPATH
+  
+  export LD_RUN_PATH="${INT_INCL_PY_SP}/":$LD_RUN_PATH
+  
+  export LIBRARY_PATH="${INT_INCL_PY_SP}/":$LIBRARY_PATH
+  
+  export CMAKE_LIBRARY_PATH="${INT_INCL_PY_SP:?}/":$CMAKE_LIBRARY_PATH
+fi
 
-export CPLUS_INCLUDE_PATH="${INT_INCL:?}/":$CPLUS_INCLUDE_PATH
+if [ -n "${INT_LIB}" ]; then
+  export PYTHONPATH="${INT_LIB:?}/":$PYTHONPATH
+  
+  export LD_RUN_PATH="${INT_LIB:?}/":$LD_RUN_PATH
+  
+  export LIBRARY_PATH="${INT_LIB:?}/":$LIBRARY_PATH
+  
+  export CMAKE_LIBRARY_PATH="${INT_LIB:?}":$CMAKE_LIBRARY_PATH
+fi
 
-export CPLUS_INCLUDE_PATH="${INT_INCL_PY:?}m/":$CPLUS_INCLUDE_PATH
+if [ -n "${INT_INCL}" ]; then
+  export C_INCLUDE_PATH="${INT_INCL:?}/":$C_INCLUDE_PATH
+  
+  export CPLUS_INCLUDE_PATH="${INT_INCL:?}/":$CPLUS_INCLUDE_PATH
+  
+  export CMAKE_INCLUDE_PATH="${INT_INCL:?}/":$CMAKE_INCLUDE_PATH
+  
+  export INCLUDE_PATH="${INT_INCL:?}/":$INCLUDE_PATH
+  
+  export INCLUDEPATH="${INT_INCL:?}/":$INCLUDEPATH
+  
+  export INCLUDE="${INT_INCL:?}/":$INCLUDE
 
-export CPLUS_INCLUDE_PATH="${INT_INCL_PY_SP_NP:?}/":$CPLUS_INCLUDE_PATH
+  export CPATH="${INT_INCL:?}/":${CPATH}
 
-export PYTHONPATH="${INT_INCL_PY_SP:?}/":$PYTHONPATH
-
-export PYTHONPATH="${INT_LIB:?}/":$PYTHONPATH
-
-export LD_RUN_PATH="${INT_INCL_PY_SP}/":$LD_RUN_PATH
-
-export LD_RUN_PATH="${INT_LIB:?}/":$LD_RUN_PATH
-
-export LIBRARY_PATH="${INT_INCL_PY_SP}/":$LIBRARY_PATH
-
-export LIBRARY_PATH="${INT_LIB:?}/":$LIBRARY_PATH
-
-export CMAKE_INCLUDE_PATH="${INT_INCL:?}/":$CMAKE_INCLUDE_PATH
-
-export CMAKE_INCLUDE_PATH="${INT_INCL_PY:?}m/":$CMAKE_INCLUDE_PATH    
-
-export CMAKE_LIBRARY_PATH="${INT_INCL_PY_SP:?}/":$CMAKE_LIBRARY_PATH
-
-export CMAKE_LIBRARY_PATH="${INT_LIB:?}":$CMAKE_LIBRARY_PATH
-
-export INCLUDE_PATH="${INT_INCL:?}/":$INCLUDE_PATH
-
-export INCLUDEPATH="${INT_INCL:?}/":$INCLUDEPATH
-
-export INCLUDE="${CONDA_PREFIX:?}"/x86_64-conda-linux-gnu/include:$INCLUDE
-
-export INCLUDE="${INT_INCL:?}/":$INCLUDE
-
-export CPATH="${INT_INCL:?}/":${CPATH}
-
-export OBJC_INCLUDE_PATH="${INT_INCL:?}/":$OBJC_INCLUDE_PATH
+  export OBJC_INCLUDE_PATH="${INT_INCL:?}/":$OBJC_INCLUDE_PATH
+fi 
 
 export OBJC_PATH="${CONDA_PREFIX:?}/include/":OBJC_PATH
 
@@ -99,9 +125,9 @@ if [[ "$OS" == "Darwin" && "$ARCH" == "arm64" ]]; then
 
   export FORTRAN_COMPILER="${CONDA_PREFIX:?}/bin/gfortran"
 
-  export AR_COMPILER=="${CONDA_PREFIX:?}"/bin/ar
+  export AR_COMPILER="/usr/bin/ar"
 
-  export RANLIB_COMPILER=="${CONDA_PREFIX:?}"/bin/ranlib
+  export RANLIB_COMPILER="/usr/bin/ranlib"
 
 elif [[ "$OS" == "Darwin" && "$ARCH" == "x86_64" ]]; then
 
@@ -116,6 +142,7 @@ elif [[ "$OS" == "Darwin" && "$ARCH" == "x86_64" ]]; then
   export RANLIB_COMPILER=="${CONDA_PREFIX:?}"/bin/ranlib
 
 else
+  export INCLUDE="${CONDA_PREFIX:?}"/x86_64-conda-linux-gnu/include:$INCLUDE
 
   export C_COMPILER="${CONDA_PREFIX:?}/bin/x86_64-conda-linux-gnu-cc"
   

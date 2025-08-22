@@ -252,11 +252,11 @@ bin_avg set_bin_average(const int i_theta, const int j_L)
 
     #pragma omp parallel for
     for (int i=0; i<Ntable.Ntheta; i++) {
-      if (abs(xminmax[0][i]) > 1) {
+      if (fabs(xminmax[0][i]) > 1) {
         log_fatal("logical error: Legendre argument xmin = %.3e>1", xminmax[0][i]);
         exit(1);
       }
-      if (abs(xminmax[1][i]) > 1) {
+      if (fabs(xminmax[1][i]) > 1) {
         log_fatal("logical error: Legendre argument xmax = %.3e>1", xminmax[1][i]);
         exit(1);
       }

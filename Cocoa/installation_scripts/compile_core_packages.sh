@@ -274,13 +274,17 @@ if [ -z "${IGNORE_CORE_INSTALLATION}" ]; then
       -DCMAKE_FC_COMPILER="${FORTRAN_COMPILER:?}" --log-level=ERROR .. \
       >${OUT1:?} 2>${OUT2:?} || { error "(HDF5) ${EC12:?}"; return 1; })
 
-    (export LD_LIBRARY_PATH=${CONDA_PREFIX:?}/lib:$LD_LIBRARY_PATH && \
-     export LD_LIBRARY_PATH=${ROOTDIR:?}/.local/lib:$LD_LIBRARY_PATH && \
-     make -j $MNT >${OUT1:?} 2>${OUT2:?} || { error "(HDF5) ${EC8:?}"; return 1; })
-
-    (export LD_LIBRARY_PATH=${CONDA_PREFIX:?}/lib:$LD_LIBRARY_PATH && \
-     export LD_LIBRARY_PATH=${ROOTDIR:?}/.local/lib:$LD_LIBRARY_PATH && \
-     make install >${OUT1:?} 2>${OUT2:?} || { error "(HDF5) ${EC10:?}"; return 1; })
+    if [ $? -eq 0 ]; then
+      (export LD_LIBRARY_PATH=${CONDA_PREFIX:?}/lib:$LD_LIBRARY_PATH && \
+       export LD_LIBRARY_PATH=${ROOTDIR:?}/.local/lib:$LD_LIBRARY_PATH && \
+       make -j $MNT >${OUT1:?} 2>${OUT2:?} || { error "(HDF5) ${EC8:?}"; return 1; })
+    
+      if [ $? -eq 0 ]; then
+        (export LD_LIBRARY_PATH=${CONDA_PREFIX:?}/lib:$LD_LIBRARY_PATH && \
+         export LD_LIBRARY_PATH=${ROOTDIR:?}/.local/lib:$LD_LIBRARY_PATH && \
+         make install >${OUT1:?} 2>${OUT2:?} || { error "(HDF5) ${EC10:?}"; return 1; })
+      fi
+    fi
 
     unset -v PACKDIR BDF
     
@@ -550,17 +554,24 @@ if [ -z "${IGNORE_CORE_INSTALLATION}" ]; then
     
     (export LD_LIBRARY_PATH=${CONDA_PREFIX:?}/lib:$LD_LIBRARY_PATH && \
      export LD_LIBRARY_PATH=${ROOTDIR:?}/.local/lib:$LD_LIBRARY_PATH && \
-     ${CMAKE:?} -DCMAKE_INSTALL_PREFIX="${ROOTDIR:?}/.local" \
-     -DCMAKE_CXX_COMPILER="${CXX_COMPILER:?}" --log-level=ERROR . \
+     ${CMAKE:?} \
+       -DCMAKE_INSTALL_PREFIX="${ROOTDIR:?}/.local" \
+       -DSPDLOG_BUILD_SHARED=ON \
+       -DSPDLOG_FMT_EXTERNAL=OFF \
+       -DCMAKE_CXX_COMPILER="${CXX_COMPILER:?}" . \
      >${OUT1:?} 2>${OUT2:?} || { error "(SPDLOG) ${EC12:?}"; return 1; })
 
-    (export LD_LIBRARY_PATH=${CONDA_PREFIX:?}/lib:$LD_LIBRARY_PATH && \
-     export LD_LIBRARY_PATH=${ROOTDIR:?}/.local/lib:$LD_LIBRARY_PATH && \
-     make -j $MNT >${OUT1:?} 2>${OUT2:?} || { error "(SPDLOG) ${EC8:?}"; return 1; })
+    if [ $? -eq 0 ]; then
+      (export LD_LIBRARY_PATH=${CONDA_PREFIX:?}/lib:$LD_LIBRARY_PATH && \
+       export LD_LIBRARY_PATH=${ROOTDIR:?}/.local/lib:$LD_LIBRARY_PATH && \
+       make -j $MNT >${OUT1:?} 2>${OUT2:?} || { error "(SPDLOG) ${EC8:?}"; return 1; })
 
-    (export LD_LIBRARY_PATH=${CONDA_PREFIX:?}/lib:$LD_LIBRARY_PATH && \
-     export LD_LIBRARY_PATH=${ROOTDIR:?}/.local/lib:$LD_LIBRARY_PATH && \
-     make install >${OUT1:?} 2>${OUT2:?} || { error "(SPDLOG) ${EC10:?}"; return 1; })
+      if [ $? -eq 0 ]; then
+        (export LD_LIBRARY_PATH=${CONDA_PREFIX:?}/lib:$LD_LIBRARY_PATH && \
+         export LD_LIBRARY_PATH=${ROOTDIR:?}/.local/lib:$LD_LIBRARY_PATH && \
+         make install >${OUT1:?} 2>${OUT2:?} || { error "(SPDLOG) ${EC10:?}"; return 1; })
+      fi
+    fi
 
     unset -v PACKDIR FOLDER
 

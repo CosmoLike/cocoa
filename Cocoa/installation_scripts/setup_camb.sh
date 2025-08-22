@@ -92,25 +92,38 @@ if [ -z "${IGNORE_CAMB_CODE}" ]; then
     # --------------------------------------------------------------------------
     # We patch the files below so they use the right compilers -----------------
     # --------------------------------------------------------------------------
-    # T = TMP
+    # PREFIX: T = TMP, P = PATCH, AL = Array Length
     declare -a TFOLDER=("camb/" 
                         "fortran/" 
                         "forutils/"
                         "fortran/") # If nonblank, path must include /
     
-    # T = TMP
     declare -a TFILE=("_compilers.py" 
                       "Makefile" 
                       "Makefile_compiler"
                       "Makefile_main")
 
-    #T = TMP, P = PATCH
+    
     declare -a TFILEP=("_compilers.patch" 
                        "Makefile.patch" 
                        "Makefile_compiler.patch"
                        "Makefile_main.patch")
 
-    # AL = Array Length
+    case "$(uname -s)" in
+      Linux)
+        declare -a TFILEP=("_compilers.patch" 
+                           "Makefile.patch" 
+                           "Makefile_compiler.patch"
+                           "Makefile_main.patch")
+        ;;
+      Darwin)
+        declare -a TFILEP=("_compilers.patch" 
+                           "Makefile.patch" 
+                           "Makefile_compiler.patch"
+                           "Makefile_main_osx.patch")
+        ;;
+    esac
+    
     AL=${#TFOLDER[@]}
 
     for (( i=0; i<${AL}; i++ ));

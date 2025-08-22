@@ -27,7 +27,7 @@
 -GSL_INC_PATH = /opt/local/include/
 -GSL_LIB_PATH = /opt/local/lib/
 +GSL_INC_PATH = $(ROOTDIR)/.local/include/
-+GSL_LIB_PATH = $(ROOTDIR)/.local/lib/ $(CONDA_PREFIX)/lib/libgfortran.so.5 $(CONDA_PREFIX)/lib/libquadmath.so
++GSL_LIB_PATH = $(ROOTDIR)/.local/lib/ $(CONDA_PREFIX)/lib/libgfortran.dylib $(CONDA_PREFIX)/lib/libquadmath.dylib
  LIBSGSL = -L$(GSL_LIB_PATH) -l$(GSL) -lgslcblas
  
  #===============================================================================

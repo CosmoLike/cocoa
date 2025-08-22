@@ -24,7 +24,15 @@ export INCLUDEPATH=${ROOTDIR:?}/.local/include/:$INCLUDEPATH
 export INCLUDE=${ROOTDIR:?}/.local/include/:$INCLUDE
 
 export LDFLAGS="${LDFLAGS} -L${ROOTDIR:?}/.local/lib"
-export LDFLAGS="${LDFLAGS} -L${ROOTDIR:?}/external_modules/code/${POLY_NAME}/lib  -Wl,-rpath-link,${ROOTDIR:?}/external_modules/code/${POLY_NAME}/lib"
+export LDFLAGS="${LDFLAGS} -L${ROOTDIR:?}/external_modules/code/${POLY_NAME}/lib"
+case "$(uname -s)" in
+  Linux)
+    export LDFLAGS="${LDFLAGS} -Wl,-rpath-link,${ROOTDIR:?}/external_modules/code/${POLY_NAME}/lib"
+    ;;
+  Darwin)
+    export LDFLAGS="${LDFLAGS} -Wl,-rpath,${ROOTDIR:?}/external_modules/code/${POLY_NAME}/lib"
+    ;;
+esac
 
 export LD_RUN_PATH=${ROOTDIR:?}/.local/lib:$LD_RUN_PATH
 
