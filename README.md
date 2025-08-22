@@ -85,10 +85,8 @@ and activate it
 
         ln -s "${CONDA_PREFIX}"/bin/clang "${CONDA_PREFIX}"/bin/gcc
         ln -s "${CONDA_PREFIX}"/bin/clang++ "${CONDA_PREFIX}"/bin/g++
-        ln -s "${CONDA_PREFIX}"/bin/ar "${CONDA_PREFIX}"/bin/gcc-ar
-        ln -s "${CONDA_PREFIX}"/bin/ranlib "${CONDA_PREFIX}"/bin/gcc-ranlib
-    
-and install `git-lfs`
+  
+**Step :four:**: When and only when loading the conda cocoa environment for the first time, install `git-lfs`
 
     git-lfs install
 
