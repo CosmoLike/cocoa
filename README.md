@@ -236,11 +236,16 @@ Users will see a terminal like this: `$(cocoa)(.local)`. *This is a feature, not
 
 - **One model evaluation**:
 
-      mpirun -n 1 --oversubscribe --mca pml ^ucx --mca btl vader,tcp,self \
-         --bind-to core:overload-allowed --mca mpi_yield_when_idle 1 --report-bindings  \
-         --rank-by slot --map-by numa:pe=${OMP_NUM_THREADS} \
-         cobaya-run ./projects/lsst_y1/EXAMPLE_EVALUATE1.yaml -f
-       
+  - Linux
+        mpirun -n 1 --oversubscribe --mca pml ^ucx --mca btl vader,tcp,self \
+           --bind-to core:overload-allowed --mca mpi_yield_when_idle 1 --report-bindings  \
+           --rank-by slot --map-by numa:pe=${OMP_NUM_THREADS} \
+           cobaya-run ./projects/lsst_y1/EXAMPLE_EVALUATE1.yaml -f
+
+  - macOS (arm)
+
+        mpirun -n 1 --oversubscribe  cobaya-run ./projects/lsst_y1/EXAMPLE_EVALUATE1.yaml -f
+
 - **MCMC (Metropolis-Hastings Algorithm)**:
 
       mpirun -n 4 --oversubscribe --mca pml ^ucx --mca btl vader,tcp,self \
