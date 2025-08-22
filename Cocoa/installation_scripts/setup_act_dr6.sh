@@ -83,13 +83,13 @@ if [ -z "${IGNORE_ACTDR6_CODE}" ]; then
 
     "${GIT:?}" clone --depth ${GIT_CLONE_MAXIMUM_DEPTH:?} "${URL:?}" \
       --recursive "${FOLDER:?}" \
-      >${OUT1:?} 2>${OUT2:?} || { error "${EC15:?}"; return 1; }
+      >>${OUT1:?} 2>>${OUT2:?} || { error "${EC15:?}"; return 1; }
     
     cdfolder "${PACKDIR:?}" || { cdroot; return 1; }
 
     if [ -n "${ACTDR6_CMBONLY_GIT_COMMIT}" ]; then
       "${GIT:?}" checkout "${ACTDR6_CMBONLY_GIT_COMMIT:?}" \
-        >${OUT1:?} 2>${OUT2:?} || { error "${EC16:?}"; return 1; }
+        >>${OUT1:?} 2>>${OUT2:?} || { error "${EC16:?}"; return 1; }
     fi
 
     # --------------------------------------------------------------------------
@@ -109,7 +109,7 @@ if [ -z "${IGNORE_ACTDR6_CODE}" ]; then
       cpfolder "${CHANGES:?}/${TFOLDER[$i]}${TFILEP[$i]:?}" . 2>${OUT2:?} || return 1;
 
       patch -u "${TFILE[$i]:?}" -i "${TFILEP[$i]:?}" >${OUT1:?} \
-        2>${OUT2:?} || { error "${EC17:?} (${TFILE[$i]:?})"; return 1; }
+        2>>${OUT2:?} || { error "${EC17:?} (${TFILE[$i]:?})"; return 1; }
     done
   fi
 
@@ -136,18 +136,16 @@ if [ -z "${IGNORE_ACTDR6_CODE}" ]; then
   fi
 
   if [[ ! -d "${PACKDIR:?}" ]]; then
-    
     cdfolder "${ECODEF:?}" || { cdroot; return 1; }
 
-    "${GIT:?}" clone --depth ${GIT_CLONE_MAXIMUM_DEPTH:?} "${URL:?}" \
-      --recursive "${FOLDER:?}" \
-      >${OUT1:?} 2>${OUT2:?} || { error "${EC15:?}"; return 1; }
+    "${GIT:?}" clone --depth ${GIT_CLONE_MAXIMUM_DEPTH:?} "${URL:?}" --recursive "${FOLDER:?}" \
+    >>${OUT1:?} 2>>${OUT2:?} || { error "${EC15:?}"; return 1; }
     
     cdfolder "${PACKDIR:?}" || { cdroot; return 1; }
 
     if [ -n "${ACTDR6_MFLIKE_GIT_COMMIT}" ]; then
       "${GIT:?}" checkout "${ACTDR6_MFLIKE_GIT_COMMIT:?}" \
-        >${OUT1:?} 2>${OUT2:?} || { error "${EC16:?}"; return 1; }
+      >>${OUT1:?} 2>>${OUT2:?} || { error "${EC16:?}"; return 1; }
     fi
   fi
 
@@ -156,9 +154,7 @@ if [ -z "${IGNORE_ACTDR6_CODE}" ]; then
   cdfolder "${ROOTDIR}" || return 1;
   
   unset_all || return 1
-  
 fi
-
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------

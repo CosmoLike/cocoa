@@ -51,6 +51,7 @@ declare -a SCRIPTS=("compile_core_packages.sh"
                      "compile_nautilus_sampler.sh"
                      "compile_tensiometer.sh"
                      "compile_getdist.sh"
+                     "compile_derivkit.sh"
                      ) # T = TMP
 
 for (( i=0; i<${#SCRIPTS[@]}; i++ ));

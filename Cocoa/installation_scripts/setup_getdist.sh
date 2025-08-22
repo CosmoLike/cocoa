@@ -70,13 +70,13 @@ if [ -z "${IGNORE_GETDIST_CODE}" ]; then
     cdfolder "${ECODEF:?}" || return 1;
 
     "${GIT:?}" clone "${URL:?}" --depth ${GIT_CLONE_MAXIMUM_DEPTH:?} --recursive \
-      "${FOLDER:?}" >${OUT1:?} 2>${OUT2:?} || { error "${EC15:?}"; return 1; }
+      "${FOLDER:?}" >>${OUT1:?} 2>>${OUT2:?} || { error "${EC15:?}"; return 1; }
   
     cdfolder "${PACKDIR:?}" || { cdroot; return 1; }
 
     if [ -n "${GETDIST_GIT_COMMIT}" ]; then
       "${GIT:?}" checkout "${GETDIST_GIT_COMMIT:?}" \
-        >${OUT1:?} 2>${OUT2:?} || { error "${EC16:?}"; return 1; }
+        >>${OUT1:?} 2>>${OUT2:?} || { error "${EC16:?}"; return 1; }
     fi  
   fi
   
@@ -84,12 +84,8 @@ if [ -z "${IGNORE_GETDIST_CODE}" ]; then
   
   pbottom "INSTALLING GETDIST" || return 1
 
-  # ---------------------------------------------------------------------------
-
-  unset_all || return 1
-  
+  unset_all || return 1  
 fi
-
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------

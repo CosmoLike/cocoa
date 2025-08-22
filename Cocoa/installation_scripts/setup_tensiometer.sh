@@ -69,14 +69,14 @@ if [ -z "${IGNORE_TENSIOMETER_CODE}" ]; then
   if [ ! -d "${PACKDIR:?}" ]; then
     cdfolder "${ECODEF:?}" || return 1;
 
-    "${GIT:?}" clone "${URL:?}" --depth ${GIT_CLONE_MAXIMUM_DEPTH:?} --recursive \
-      "${FOLDER:?}" >${OUT1:?} 2>${OUT2:?} || { error "${EC15:?}"; return 1; }
+    "${GIT:?}" clone "${URL:?}" --depth ${GIT_CLONE_MAXIMUM_DEPTH:?} --recursive "${FOLDER:?}" \
+    >>${OUT1:?} 2>${OUT2:?} || { error "${EC15:?}"; return 1; }
   
     cdfolder "${PACKDIR:?}" || { cdroot; return 1; }
 
     if [ -n "${TENSIOMETER_GIT_COMMIT}" ]; then
       "${GIT:?}" checkout "${TENSIOMETER_GIT_COMMIT:?}" \
-        >${OUT1:?} 2>${OUT2:?} || { error "${EC16:?}"; return 1; }
+      >>${OUT1:?} 2>>${OUT2:?} || { error "${EC16:?}"; return 1; }
     fi  
   fi
   
@@ -84,10 +84,7 @@ if [ -z "${IGNORE_TENSIOMETER_CODE}" ]; then
   
   pbottom "INSTALLING TENSIOMETER" || return 1
 
-  # ---------------------------------------------------------------------------
-
-  unset_all || return 1
-  
+  unset_all || return 1  
 fi
 
 # ------------------------------------------------------------------------------

@@ -8,10 +8,18 @@ source "$(pwd -P)/installation_scripts/flags_impl_unset_keys.sh"
 # ------------------------------------------------------------------------------
 # DEFINING ROOTDIR (DO NOT CHANGE) ---------------------------------------------
 # ------------------------------------------------------------------------------
-export ROOTDIR=$(pwd -P)
-if [ $? -ne 0 ]; then
-  return 1;
-fi
+case "$(uname -s)" in
+  Linux)
+    export ROOTDIR=$(pwd -P)
+    if [ $? -ne 0 ]; then
+      return 1;
+    fi
+    ;;
+  Darwin)
+    export ROOTDIR=$(pwd -P | sed 's:^//:/:')
+    ;;
+esac
+
 # ------------------------------------------------------------------------------
 # VERBOSE AS DEBUG TOOL --------------------------------------------------------
 # ------------------------------------------------------------------------------
@@ -203,7 +211,7 @@ if [ -n "${OVERWRITE_EXISTING_ALL_PACKAGES}" ]; then
   export OVERWRITE_EXISTING_EE2_CODE=1
   export OVERWRITE_EXISTING_BAO_DATA=1
   export OVERWRITE_EXISTING_SIMONS_OBSERVATORY_CODE=1
-  export OVERWRITE_EXISTING_FGSPECTRA_DATA=1
+  export OVERWRITE_EXISTING_FGSPECTRA_CODE=1
   export OVERWRITE_EXISTING_LIPOP_CMB_CODE=1
   export OVERWRITE_EXISTING_LIPOP_CMB_DATA=1
   export OVERWRITE_EXISTING_ACTDR4_CMB_CODE=1
@@ -277,7 +285,7 @@ export CAMB_GIT_COMMIT="886b17cbc23137737b7ef4318d165aa7bdbbbbed"
 export CAMB_NAME='CAMB'
 
 export CLASS_URL="https://github.com/lesgourg/class_public.git"
-export CLASS_GIT_COMMIT="0ceb7a9a4c1e444ef5d5d56a8328a0640be91b18"
+export CLASS_GIT_COMMIT="5668031a8021bdc399e380ecf58f7a8e37a2a5e4"
 export CLASS_NAME="class_public"
 
 export ACTDR4_URL="https://github.com/ACTCollaboration/pyactlike"
@@ -317,7 +325,7 @@ export SO_SYSLIB_URL="https://github.com/simonsobs/syslibrary.git"
 export SO_SYSLIB_GIT_COMMIT="2471df981053a7526a441d2547eb8dde10d92f70"
 
 export EE2_URL="https://github.com/vivianmiranda/EuclidEmulator2.git"
-export EE2_GIT_COMMIT="df250250e31fcd15841b622b42142cb12f9fd68b"
+export EE2_GIT_COMMIT="4c17dfa6fd826facb69de327401949a1c7fe55d2"
 # THIS GIT IS FOR THE ORIGNIAL EE2 BEFORE VM MODS
 #export EE2_GIT_COMMIT="ff59f6683069417f6b4d2fb5d59197044d424445"
 export EE2_NAME="euclidemu2"

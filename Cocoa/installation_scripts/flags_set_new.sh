@@ -23,7 +23,7 @@ export INCLUDEPATH=${ROOTDIR:?}/.local/include/:$INCLUDEPATH
 
 export INCLUDE=${ROOTDIR:?}/.local/include/:$INCLUDE
 
-export LDFLAGS="${LDFLAGS} -L${ROOTDIR:?}/.local/lib"
+export LDFLAGS="${LDFLAGS} -L${ROOTDIR:?}/.local/lib -Wl,-rpath,${ROOTDIR:?}/.local/lib"
 export LDFLAGS="${LDFLAGS} -L${ROOTDIR:?}/external_modules/code/${POLY_NAME}/lib"
 case "$(uname -s)" in
   Linux)
