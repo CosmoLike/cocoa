@@ -586,7 +586,7 @@ if [ -z "${IGNORE_CORE_INSTALLATION}" ]; then
     ${CMAKE:?} \
        -DCMAKE_PREFIX_PATH="$CONDA_PREFIX;${ROOTDIR}/.local" \
        -DCMAKE_INSTALL_PREFIX="${ROOTDIR:?}/.local" \
-       -DSPDLOG_BUILD_SHARED=ON \
+       -DSPDLOG_BUILD_SHARED=OFF \
        -DSPDLOG_FMT_EXTERNAL=OFF \
        -DCMAKE_CXX_COMPILER="${CXX_COMPILER:?}" \
        --log-level=ERROR . \

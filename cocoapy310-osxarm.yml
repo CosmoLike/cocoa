@@ -13,7 +13,7 @@
 version: 1
 metadata:
   content_hash:
-    osx-arm64: 7973b3b525f55609458a3a23e378b84bb36d5564ec99851d6f5db843b1bda43a
+    osx-arm64: 708b367b99dd35e42a63964d51beba5649c7526b500a9d6d59b0f4ce257c6df8
   channels:
   - url: conda-forge
     used_env_vars: []
@@ -50,6 +50,34 @@ package:
   hash:
     md5: 7da333ca69131caf002baf360f5de7f9
     sha256: 314fb780a811d1bcd31b34266016d1d49e754e37a476f8b18d8ea81599865444
+  category: main
+  optional: false
+- name: blas
+  version: '2.131'
+  manager: conda
+  platform: osx-arm64
+  dependencies:
+    blas-devel: 3.9.0
+  url: https://conda.anaconda.org/conda-forge/osx-arm64/blas-2.131-openblas.conda
+  hash:
+    md5: f3feb2ac376ea907dde8a647507d4aad
+    sha256: 7152165afbcbe2481fdc5635b6f7b0613054cf5f54bb333dba345adf708c40da
+  category: main
+  optional: false
+- name: blas-devel
+  version: 3.9.0
+  manager: conda
+  platform: osx-arm64
+  dependencies:
+    libblas: 3.9.0
+    libcblas: 3.9.0
+    liblapack: 3.9.0
+    liblapacke: 3.9.0
+    openblas: 0.3.29.*
+  url: https://conda.anaconda.org/conda-forge/osx-arm64/blas-devel-3.9.0-31_h11c0a38_openblas.conda
+  hash:
+    md5: 9729c69b7fdf6065b66f84c00d2383d3
+    sha256: dc26e8ed65151508df177926f6712144195d0d95fa5633e0e3ecbff6318c5239
   category: main
   optional: false
 - name: blosc
@@ -1067,11 +1095,11 @@ package:
   manager: conda
   platform: osx-arm64
   dependencies:
-    libopenblas: '>=0.3.30,<1.0a0'
-  url: https://conda.anaconda.org/conda-forge/osx-arm64/libblas-3.9.0-34_h10e41b3_openblas.conda
+    libopenblas: '>=0.3.29,<1.0a0'
+  url: https://conda.anaconda.org/conda-forge/osx-arm64/libblas-3.9.0-31_h10e41b3_openblas.conda
   hash:
-    md5: cdb3e1ca1661dbf19f9aad7dad524996
-    sha256: 5de3c3bfcdc8ba05da1a7815c9953fe392c2065d9efdc2491f91df6d0d1d9e76
+    md5: 39b053da5e7035c6592102280aa7612a
+    sha256: 369586e7688b59b4f92c709b99d847d66d4d095425db327dd32ee5e6ab74697f
   category: main
   optional: false
 - name: libboost
@@ -1192,10 +1220,10 @@ package:
   platform: osx-arm64
   dependencies:
     libblas: 3.9.0
-  url: https://conda.anaconda.org/conda-forge/osx-arm64/libcblas-3.9.0-34_hb3479ef_openblas.conda
+  url: https://conda.anaconda.org/conda-forge/osx-arm64/libcblas-3.9.0-31_hb3479ef_openblas.conda
   hash:
-    md5: e15018d609b8957c146dcb6c356dd50c
-    sha256: 6639f6c6b2e76cb1be62cd6d9033bda7dc3fab2e5a80f5be4b5c522c27dcba17
+    md5: 7353c2bf0e90834cb70545671996d871
+    sha256: f237486cc9118d09d0f3ff8820280de34365f98ee7b7dc5ab923b04c7cbf25a5
   category: main
   optional: false
 - name: libclang-cpp19.1
@@ -1527,10 +1555,24 @@ package:
   platform: osx-arm64
   dependencies:
     libblas: 3.9.0
-  url: https://conda.anaconda.org/conda-forge/osx-arm64/liblapack-3.9.0-34_hc9a63f6_openblas.conda
+  url: https://conda.anaconda.org/conda-forge/osx-arm64/liblapack-3.9.0-31_hc9a63f6_openblas.conda
   hash:
-    md5: 94b13d05122e301de02842d021eea5fb
-    sha256: 659c7cc2d7104c5fa33482d28a6ce085fd116ff5625a117b7dd45a3521bf8efc
+    md5: ff57a55a2cbce171ef5707fb463caf19
+    sha256: fe55b9aaf82c6c0192c3d1fcc9b8e884f97492dda9a8de5dae29334b3135fab5
+  category: main
+  optional: false
+- name: liblapacke
+  version: 3.9.0
+  manager: conda
+  platform: osx-arm64
+  dependencies:
+    libblas: 3.9.0
+    libcblas: 3.9.0
+    liblapack: 3.9.0
+  url: https://conda.anaconda.org/conda-forge/osx-arm64/liblapacke-3.9.0-31_hbb7bcf8_openblas.conda
+  hash:
+    md5: 0b638076f73e631a8bf05720b0f51585
+    sha256: 9016c089174e50def138793a06b2b5b5f36d4b9eefe42f4830e0f8e583da0d9a
   category: main
   optional: false
 - name: libllvm14
@@ -1605,18 +1647,18 @@ package:
   category: main
   optional: false
 - name: libopenblas
-  version: 0.3.30
+  version: 0.3.29
   manager: conda
   platform: osx-arm64
   dependencies:
     __osx: '>=11.0'
-    libgfortran: 5.*
-    libgfortran5: '>=13.3.0'
+    libgfortran: '>=5'
+    libgfortran5: '>=13.2.0'
     llvm-openmp: '>=18.1.8'
-  url: https://conda.anaconda.org/conda-forge/osx-arm64/libopenblas-0.3.30-openmp_hf332438_0.conda
+  url: https://conda.anaconda.org/conda-forge/osx-arm64/libopenblas-0.3.29-openmp_hf332438_0.conda
   hash:
-    md5: 5d7dbaa423b4c253c476c24784286e4b
-    sha256: 501c8c64f1a6e6b671e49835e6c483bc25f0e7147f3eb4bbb19a4c3673dcaf28
+    md5: 0cd1148c68f09027ee0b0f0179f77c30
+    sha256: 8989d9e01ec8c9b2d48dbb5efbe70b356fcd15990fb53b64fcb84798982c0343
   category: main
   optional: false
 - name: libpmix
@@ -2038,6 +2080,18 @@ package:
   hash:
     md5: 7b21fe62c0a87637ea399e06b3194b96
     sha256: 67c14ae57b502c1bbd3e2af7f35c92514735983e261c83e3960d4aacfd19bc73
+  category: main
+  optional: false
+- name: openblas
+  version: 0.3.29
+  manager: conda
+  platform: osx-arm64
+  dependencies:
+    libopenblas: 0.3.29
+  url: https://conda.anaconda.org/conda-forge/osx-arm64/openblas-0.3.29-openmp_hea878ba_0.conda
+  hash:
+    md5: cef07535f767f550b75f1a9a9ec61cb8
+    sha256: 366590bc5a415949e6500e53f5c7519be83e1c257e64ac05438e7e693cf0139b
   category: main
   optional: false
 - name: openjpeg
