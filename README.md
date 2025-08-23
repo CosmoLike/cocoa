@@ -237,6 +237,7 @@ Users will see a terminal like this: `$(cocoa)(.local)`. *This is a feature, not
 - **One model evaluation**:
 
   - Linux
+
         mpirun -n 1 --oversubscribe --mca pml ^ucx --mca btl vader,tcp,self \
            --bind-to core:overload-allowed --mca mpi_yield_when_idle 1 --report-bindings  \
            --rank-by slot --map-by numa:pe=${OMP_NUM_THREADS} \
@@ -248,11 +249,17 @@ Users will see a terminal like this: `$(cocoa)(.local)`. *This is a feature, not
 
 - **MCMC (Metropolis-Hastings Algorithm)**:
 
-      mpirun -n 4 --oversubscribe --mca pml ^ucx --mca btl vader,tcp,self \
-         --bind-to core:overload-allowed --mca mpi_yield_when_idle 1 --report-bindings  \
-         --rank-by slot --map-by numa:pe=${OMP_NUM_THREADS} \
-         cobaya-run ./projects/lsst_y1/EXAMPLE_MCMC1.yaml -f
+  - Linux
+    
+        mpirun -n 4 --oversubscribe --mca pml ^ucx --mca btl vader,tcp,self \
+           --bind-to core:overload-allowed --mca mpi_yield_when_idle 1 --report-bindings  \
+           --rank-by slot --map-by numa:pe=${OMP_NUM_THREADS} \
+           cobaya-run ./projects/lsst_y1/EXAMPLE_MCMC1.yaml -f
 
+  - macOS (arm)
+
+        mpirun -n 4 --oversubscribe cobaya-run ./projects/lsst_y1/EXAMPLE_MCMC1.yaml -f
+     
 > [!Tip]
 > Cocoa provides several Cosmolike projects, not all of which are installed by default. To activate them, please take a look at the appendix [FAQ: How can we compile external modules?](#appendix_compile_separately).
 
@@ -331,16 +338,28 @@ Now, users must follow all the steps below.
 
 - **One model evaluation**:
 
-      mpirun -n 1 --oversubscribe --mca pml ^ucx --mca btl vader,tcp,self --rank-by slot \
+  - Linux
+    
+        mpirun -n 1 --oversubscribe --mca pml ^ucx --mca btl vader,tcp,self --rank-by slot \
           --bind-to core:overload-allowed --map-by slot --mca mpi_yield_when_idle 1 \
           cobaya-run ./projects/example/EXAMPLE_EMUL_EVALUATE1.yaml -f
-               
+
+  - macOS (arm)
+
+        mpirun -n 1 --oversubscribe cobaya-run ./projects/example/EXAMPLE_EMUL_EVALUATE1.yaml -f
+    
 - **MCMC (Metropolis-Hastings Algorithm)**:
 
-      mpirun -n 4 --oversubscribe --mca pml ^ucx --mca btl vader,tcp,self --rank-by slot \
-          --bind-to core:overload-allowed --map-by slot --mca mpi_yield_when_idle 1 \
-          cobaya-run ./projects/example/EXAMPLE_EMUL_MCMC1.yaml -f
+  - Linux
+    
+        mpirun -n 4 --oversubscribe --mca pml ^ucx --mca btl vader,tcp,self --rank-by slot \
+            --bind-to core:overload-allowed --map-by slot --mca mpi_yield_when_idle 1 \
+            cobaya-run ./projects/example/EXAMPLE_EMUL_MCMC1.yaml -f
 
+  - macOS (arm)
+
+        mpirun -n 4 --oversubscribe cobaya-run ./projects/example/EXAMPLE_EMUL_MCMC1.yaml -f
+    
 > [!Note]
 > The examples below may require a large number of MPI workers. Before running them, it may be necessary to increase 
 > the limit of threads that can be created (at UofA HPC type `ulimit -u 1000000`), otherwise users 
@@ -348,30 +367,51 @@ Now, users must follow all the steps below.
 
 - **PolyChord**:
 
-      mpirun -n 90 --oversubscribe --mca pml ^ucx --mca btl vader,tcp,self --rank-by slot \
-          --bind-to core:overload-allowed --map-by slot --mca mpi_yield_when_idle 1 \
-          cobaya-run ./projects/example/EXAMPLE_EMUL_POLY1.yaml -f
+  - Linux
+    
+        mpirun -n 90 --oversubscribe --mca pml ^ucx --mca btl vader,tcp,self --rank-by slot \
+            --bind-to core:overload-allowed --map-by slot --mca mpi_yield_when_idle 1 \
+            cobaya-run ./projects/example/EXAMPLE_EMUL_POLY1.yaml -f
 
+  - macOS (arm)
+ 
+        mpirun -n 8 --oversubscribe cobaya-run ./projects/example/EXAMPLE_EMUL_POLY1.yaml -f
+    
 > [!Note]
 > The `Nautilis`, `Minimizer`, `Profile`, and `Emcee` scripts below contain an internally defined `yaml_string` that specifies priors, 
 > likelihoods, and the theory code, all following Cobaya Conventions.
 
 - **Nautilus**:
 
-      mpirun -n 90 --oversubscribe --mca pml ^ucx --mca btl vader,tcp,self --rank-by slot \
-          --bind-to core:overload-allowed --map-by slot --mca mpi_yield_when_idle 1 \
-          python -m mpi4py.futures ./projects/example/EXAMPLE_EMUL_NAUTILUS1.py \
-              --root ./projects/example/ --outroot "EXAMPLE_EMUL_NAUTILUS1"  \
-              --maxfeval 450000 --nlive 2048 --neff 15000 --flive 0.01 --nnetworks 5
+  - Linux
+    
+        mpirun -n 90 --oversubscribe --mca pml ^ucx --mca btl vader,tcp,self --rank-by slot \
+            --bind-to core:overload-allowed --map-by slot --mca mpi_yield_when_idle 1 \
+            python -m mpi4py.futures ./projects/example/EXAMPLE_EMUL_NAUTILUS1.py \
+                --root ./projects/example/ --outroot "EXAMPLE_EMUL_NAUTILUS1"  \
+                --maxfeval 450000 --nlive 2048 --neff 15000 --flive 0.01 --nnetworks 5
+
+  - macOS (arm)
+
+        mpirun -n 8 --oversubscribe python -m mpi4py.futures ./projects/example/EXAMPLE_EMUL_NAUTILUS1.py \
+                --root ./projects/example/ --outroot "EXAMPLE_EMUL_NAUTILUS1"  \
+                --maxfeval 450000 --nlive 2048 --neff 15000 --flive 0.01 --nnetworks 5
 
   What if the user runs an `Nautilus` chain with `maxeval` insufficient for producing `neff` samples? `Nautilus` saves the chain checkpoint at `chains/outroot_checkpoint.hdf5`.
 
 - **Emcee**:
 
-      mpirun -n 21 --oversubscribe --mca pml ^ucx --mca btl vader,tcp,self --rank-by slot \
-          --bind-to core:overload-allowed --map-by slot --mca mpi_yield_when_idle 1 \
-          python ./projects/example/EXAMPLE_EMUL_EMCEE1.py --root ./projects/example/ \
-              --outroot "EXAMPLE_EMUL_EMCEE1" --maxfeval 80000
+    - Linux
+      
+          mpirun -n 21 --oversubscribe --mca pml ^ucx --mca btl vader,tcp,self --rank-by slot \
+              --bind-to core:overload-allowed --map-by slot --mca mpi_yield_when_idle 1 \
+              python ./projects/example/EXAMPLE_EMUL_EMCEE1.py --root ./projects/example/ \
+                  --outroot "EXAMPLE_EMUL_EMCEE1" --maxfeval 80000
+
+    - macOS (arm)
+
+          mpirun -n 8 --oversubscribe python ./projects/example/EXAMPLE_EMUL_EMCEE1.py \
+                --root ./projects/example/ --outroot "EXAMPLE_EMUL_EMCEE1" --maxfeval 80000
 
   The number of steps per MPI worker is $n_{\\rm sw} =  {\\rm maxfeval}/n_{\\rm w}$,
   with the number of walkers being $n_{\\rm w}={\\rm max}(3n_{\\rm params},n_{\\rm MPI})$.
@@ -400,11 +440,18 @@ Now, users must follow all the steps below.
 
   Our minimizer is a reimplementation of `Procoli`, developed by Karwal et al (arXiv:2401.14225) 
 
-      mpirun -n 21 --oversubscribe --mca pml ^ucx --mca btl vader,tcp,self --rank-by slot \
-          --bind-to core:overload-allowed --map-by slot --mca mpi_yield_when_idle 1 \
-          python ./projects/example/EXAMPLE_EMUL_MINIMIZE1.py --root ./projects/example/ \
-              --outroot "EXAMPLE_EMUL_MIN1" --nstw 200
+    - Linux
+      
+          mpirun -n 21 --oversubscribe --mca pml ^ucx --mca btl vader,tcp,self --rank-by slot \
+              --bind-to core:overload-allowed --map-by slot --mca mpi_yield_when_idle 1 \
+              python ./projects/example/EXAMPLE_EMUL_MINIMIZE1.py --root ./projects/example/ \
+                  --outroot "EXAMPLE_EMUL_MIN1" --nstw 200
+  
+    - macOS (arm)
 
+          mpirun -n 8 --oversubscribe python ./projects/example/EXAMPLE_EMUL_MINIMIZE1.py \
+                --root ./projects/example/ --outroot "EXAMPLE_EMUL_MIN1" --nstw 200
+       
   The number of steps per Emcee walker per temperature is $n_{\\rm stw}$,
   and the number of walkers is $n_{\\rm w}={\\rm max}(3n_{\\rm params},n_{\\rm MPI})$. The minimum number of total evaluations is then 
   $3n_{\\rm params} \times n_{\rm T} \times n_{\\rm stw}$, which can be distributed among $n_{\\rm MPI} = 3n_{\\rm params}$ MPI processes for faster results.
@@ -428,13 +475,22 @@ Now, users must follow all the steps below.
 
 - **Profile**: 
 
-      mpirun -n 21 --oversubscribe --mca pml ^ucx --mca btl vader,tcp,self --rank-by slot \
-          --bind-to core:overload-allowed --map-by slot --mca mpi_yield_when_idle 1 \
-          python ./projects/example/EXAMPLE_EMUL_PROFILE1.py \
-              --root ./projects/example/ --cov 'chains/EXAMPLE_EMUL_MCMC1.covmat' \
-              --outroot "EXAMPLE_EMUL_PROFILE1" --factor 3 --nstw 200 --numpts 10 \
-              --profile 1 --minfile="./projects/example/chains/EXAMPLE_EMUL_MIN1.txt"
+    - Linux
+      
+          mpirun -n 21 --oversubscribe --mca pml ^ucx --mca btl vader,tcp,self --rank-by slot \
+              --bind-to core:overload-allowed --map-by slot --mca mpi_yield_when_idle 1 \
+              python ./projects/example/EXAMPLE_EMUL_PROFILE1.py \
+                  --root ./projects/example/ --cov 'chains/EXAMPLE_EMUL_MCMC1.covmat' \
+                  --outroot "EXAMPLE_EMUL_PROFILE1" --factor 3 --nstw 200 --numpts 10 \
+                  --profile 1 --minfile="./projects/example/chains/EXAMPLE_EMUL_MIN1.txt"
 
+    - macOS (arm)
+
+          mpirun -n 8 python --oversubscribe ./projects/example/EXAMPLE_EMUL_PROFILE1.py \
+                  --root ./projects/example/ --cov 'chains/EXAMPLE_EMUL_MCMC1.covmat' \
+                  --outroot "EXAMPLE_EMUL_PROFILE1" --factor 3 --nstw 200 --numpts 10 \
+                  --profile 1 --minfile="./projects/example/chains/EXAMPLE_EMUL_MIN1.txt"
+      
   Profile provides the optional argument `minfile`, as it is significantly faster to run the profile script with a previously provided global minimum. 
   The profile also provides the optional argument `cov`. Again, it is considerably more efficient to employ a covariance matrix from a converged chain. 
 
@@ -459,13 +515,22 @@ Now, users must follow all the steps below.
     being profiled is small, it can be considerably faster to use a simple scipy `Nelder-Mead`
     to calculate the profile. Here, the `minfile` and `cov` options are mandatory.
 
-      mpirun -n 1 --oversubscribe --mca pml ^ucx --mca btl vader,tcp,self --rank-by slot \
-          --bind-to core:overload-allowed --map-by slot --mca mpi_yield_when_idle 1 \
-          python ./projects/example/EXAMPLE_EMUL_PROFILE_SCIPY1.py \
-              --root ./projects/example/ --cov 'chains/EXAMPLE_EMUL_MCMC1.covmat' I am running a few minutes late; my previous meeting is running over.
-              --outroot "EXAMPLE_EMUL_PROFILE1M2" --factor 3 --maxfeval 5000 --numpts 10 \
-              --profile 1 --minfile="./projects/example/chains/EXAMPLE_EMUL_MIN1.txt"
+    - Linux
+      
+          mpirun -n 1 --mca pml ^ucx --mca btl vader,tcp,self --rank-by slot \
+              --bind-to core:overload-allowed --map-by slot --mca mpi_yield_when_idle 1 \
+              python ./projects/example/EXAMPLE_EMUL_PROFILE_SCIPY1.py \
+                  --root ./projects/example/ --cov 'chains/EXAMPLE_EMUL_MCMC1.covmat'
+                  --outroot "EXAMPLE_EMUL_PROFILE1M2" --factor 3 --maxfeval 5000 --numpts 10 \
+                  --profile 1 --minfile="./projects/example/chains/EXAMPLE_EMUL_MIN1.txt"
 
+    - macOS (arm)
+
+          mpirun -n 1 python ./projects/example/EXAMPLE_EMUL_PROFILE_SCIPY1.py \
+                --root ./projects/example/ --cov 'chains/EXAMPLE_EMUL_MCMC1.covmat'
+                --outroot "EXAMPLE_EMUL_PROFILE1M2" --factor 3 --maxfeval 5000 --numpts 10 \
+                --profile 1 --minfile="./projects/example/chains/EXAMPLE_EMUL_MIN1.txt"
+      
      The script of the plot below is provided at `projects/example/scripts/EXAMPLE_PLOT_PROFILE1_COMP.py`
   
   <p align="center">
@@ -478,11 +543,18 @@ Now, users must follow all the steps below.
   with each MPI being assigned to one minimization (not Emcee walker!). This is a strategy when probing 
   beyond-LCDM parameters with oscilatory behavior (e.g., Monodromic Dark Energy).
 
-      mpirun -n 90 --oversubscribe --mca pml ^ucx --mca btl vader,tcp,self \
-          --bind-to core:overload-allowed --map-by slot --mca mpi_yield_when_idle 1 \
-          python -m mpi4py.futures ./projects/example/EXAMPLE_EMUL_SCAN1.py \
-              --root ./projects/example/ --outroot "EXAMPLE_EMUL_SCAN1" --nstw 200 --profile 1
+    - Linux
+      
+          mpirun -n 90 --oversubscribe --mca pml ^ucx --mca btl vader,tcp,self \
+              --bind-to core:overload-allowed --map-by slot --mca mpi_yield_when_idle 1 \
+              python -m mpi4py.futures ./projects/example/EXAMPLE_EMUL_SCAN1.py \
+                  --root ./projects/example/ --outroot "EXAMPLE_EMUL_SCAN1" --nstw 200 --profile 1
 
+    - macOS (arm)
+
+          mpirun -n 90 --oversubscribe python -m mpi4py.futures ./projects/example/EXAMPLE_EMUL_SCAN1.py \
+                  --root ./projects/example/ --outroot "EXAMPLE_EMUL_SCAN1" --nstw 200 --profile 1
+      
 - **Tension Metrics**
 
     We provide the Jupyter Notebook and the SLURM script, located at
