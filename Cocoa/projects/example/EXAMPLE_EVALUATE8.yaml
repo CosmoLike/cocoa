@@ -1,10 +1,22 @@
-stop_at_error: False
+stop_at_error: false
 debug: false
 timing: true
 
 likelihood:
-  planck_2018_highl_plik.TTTEEE:
-    path: ./external_modules/
+  act_dr6_mflike.act_dr6_mflike:
+    data_folder: act_dr6_mflike/v1.0
+    input_file: dr6_data.fits
+    lmax_theory: 4000
+  act_dr6_lenslike.ACTDR6LensLike:
+     lens_only: False
+     lmax: 4000
+     variant: act_baseline
+
+prior:
+  tau_sroll2_prior: "lambda tau: stats.norm.logpdf(tau, loc=5.66e-2, scale=5.8e-3)"
+  TTdust_prior: "lambda a_gtt: stats.norm.logpdf(a_gtt, loc=7.95, scale=0.32)"
+  TEdust_prior: "lambda a_gte: stats.norm.logpdf(a_gte, loc=0.423, scale=0.03)"
+  EEdust_prior: "lambda a_gee: stats.norm.logpdf(a_gee, loc=0.1681, scale=0.017)"
 
 params:
   logA:
@@ -13,9 +25,9 @@ params:
       max: 3.91
     ref:
       dist: norm
-      loc: 3.05
-      scale: 0.001
-    proposal: 0.001
+      loc: 3.0448
+      scale: 0.05
+    proposal: 0.05
     latex: \log(10^{10} A_\mathrm{s})
     drop: true
   As:
@@ -23,57 +35,91 @@ params:
     latex: A_\mathrm{s}
   ns:
     prior:
-      min: 0.8
-      max: 1.2
+      min: 0.92
+      max: 1.05
     ref:
       dist: norm
-      loc: 0.965
-      scale: 0.004
-    proposal: 0.002
+      loc: 0.96605
+      scale: 0.005
+    proposal: 0.005
     latex: n_\mathrm{s}
-  H0:
+  theta_MC_100:
     prior:
-      min: 20
-      max: 100
+      min: 0.5
+      max: 10
     ref:
       dist: norm
-      loc: 67
-      scale: 2
-    proposal: 2
+      loc: 1.04109
+      scale: 0.001
+    proposal: 0.001
+    latex: 100\theta_\mathrm{MC}
+    drop: true
+    renames: theta
+  cosmomc_theta:
+    value: 'lambda theta_MC_100: 1.e-2*theta_MC_100'
+    derived: false
+  H0:
     latex: H_0
+    min: 20
+    max: 100
   omegabh2:
     prior:
-      min: 0.005
-      max: 0.1
+      min: 0.01
+      max: 0.04
     ref:
       dist: norm
-      loc: 0.0224
-      scale: 0.0001
-    proposal: 0.0001
+      loc: 0.022383
+      scale: 0.005
+    proposal: 0.005
     latex: \Omega_\mathrm{b} h^2
   omegach2:
     prior:
-      min: 0.001
-      max: 0.99
+      min: 0.06
+      max: 0.2
     ref:
       dist: norm
-      loc: 0.12
-      scale: 0.001
-    proposal: 0.0005
+      loc: 0.12011
+      scale: 0.03
+    proposal: 0.03
     latex: \Omega_\mathrm{c} h^2
-  m_ncdm:
+  mnu:
     value: 0.06
-    renames: mnu
   tau:
     prior:
-      min: 0.01
-      max: 0.8
+      dist: norm
+      loc: 0.0544
+      scale: 0.0073
     ref:
       dist: norm
       loc: 0.055
       scale: 0.006
     proposal: 0.003
     latex: \tau_\mathrm{reio}
+  w0pwa:
+    prior:
+      min: -5 
+      max: -0.01
+    ref:
+      dist: norm
+      loc: -0.99
+      scale: 0.05
+    proposal: 0.05
+    latex: w_{0,\mathrm{DE}}+w_{a,\mathrm{DE}}
+    drop: true
+  w:
+    prior:
+      min: -3
+      max: -0.01
+    ref:
+      dist: norm
+      loc: -0.99
+      scale: 0.05
+    proposal: 0.05
+    latex: w_{0,\mathrm{DE}}
+  wa:
+    value: 'lambda w0pwa, w: w0pwa - w'
+    derived: false
+    latex: w_{a,\mathrm{DE}}
   omegal:
     latex: \Omega_\Lambda
   omegam:
@@ -101,60 +147,276 @@ params:
   A:
     derived: 'lambda As: 1e9*As'
     latex: 10^9 A_\mathrm{s}
-  clamp:
-    derived: 'lambda As, tau: 1e9*As*np.exp(-2*tau)'
-    latex: 10^9 A_\mathrm{s} e^{-2\tau}
   age:
     latex: '{\rm{Age}}/\mathrm{Gyr}'
   rdrag:
     latex: r_\mathrm{drag}
   yheused:
     latex: Y_P^\mathrm{BBN}
-  omegan:
-    latex: \Omega_\mathrm{\\nu}
-  omegan2:
-    derived: 'lambda omegan, H0: omegan*(H0/100)**2'
-    latex: \Omega_\mathrm{\\nu} h^2
+  zstar:
+    latex: z_*
+  rstar:
+    latex: r_*
+  thetastar:
+    latex: 100\theta_*
+  DAstar:
+    latex: D_\mathrm{A}/\mathrm{Gpc}
+  zdrag:
+    latex: z_\mathrm{drag}
+  kd:
+    latex: k_\mathrm{D}
+  thetad:
+    latex: 100\theta_\mathrm{D}
+  zeq:
+    latex: z_\mathrm{eq}
+  keq:
+    latex: k_\mathrm{eq}
+  thetaeq:
+    latex: 100\theta_\mathrm{eq}
+  thetarseq:
+    latex: 100\theta_\mathrm{s,eq}
+  DHBBN:
+    derived: "lambda DH: 10**5*DH"
+    latex: 10^5 \mathrm{D}/\mathrm{H}
+  zrei:
+    latex: z_\mathrm{re}
+  nrun:
+    value: 0.0
+    latex: n_\mathrm{run}
+  nrunrun:
+    value: 0.0
+    latex: n_\mathrm{run,run}
+  omegak:
+    value: 0.0
+    latex: \Omega_k
+  # Foregrounds
+  a_tSZ:
+    prior:
+      min: 0.0
+      max: 10.0
+    ref:
+      dist: norm
+      loc: 5.6
+      scale: 1.0
+    proposal: 0.1
+    latex: a_\mathrm{tSZ}
+  a_kSZ:
+    prior:
+      min: 0.0
+      max: 10.0
+    ref:
+      dist: norm
+      loc: 2.0
+      scale: 2.0
+    proposal: 0.1
+    latex: a_\mathrm{kSZ}
+  a_p:
+    prior:
+      min: 0.0
+      max: 50.0
+    ref:
+      dist: norm
+      loc: 6.0
+      scale: 0.7
+    proposal: 0.3
+    latex: a_p
+  beta_p:
+    prior:
+      min: 0.0
+      max: 5.0
+    ref:
+      dist: norm
+      loc: 2.0
+      scale: 0.05
+    proposal: 0.015
+    latex: \beta_p
+  a_c:
+    prior:
+      min: 0.0
+      max: 50.0
+    ref:
+      dist: norm
+      loc: 3.0
+      scale: 1.0
+    proposal: 0.7
+    latex: a_c
+  beta_c:
+    value: "lambda beta_p: beta_p"
+    latex: \beta_c
+  a_s:
+    prior:
+      min: 0.0
+      max: 50.0
+    ref:
+      dist: norm
+      loc: 3.0
+      scale: 1.0
+    proposal: 0.3
+    latex: a_s
+  beta_s:
+    prior:
+      min: -3.5
+      max: -1.5
+    proposal: 0.3
+    latex: \beta_s
+  a_gtt:
+    prior:
+      min: 0.0
+      max: 50.0
+    ref:
+      dist: norm
+      loc: 8.0
+      scale: 0.6
+    proposal: 0.4
+    latex: a_\mathrm{dust}^\mathrm{TT}
+  a_gte:
+    prior:
+      min: 0.0
+      max: 1.0
+    ref:
+      dist: norm
+      loc: 0.42
+      scale: 0.06
+    proposal: 0.03
+    latex: a_\mathrm{dust}^\mathrm{TE}
+  a_gee:
+    prior:
+      min: 0.0
+      max: 1.0
+    ref:
+      dist: norm
+      loc: 0.17
+      scale: 0.03
+    proposal: 0.03
+    latex: a_\mathrm{dust}^\mathrm{EE}
+  a_psee:
+    prior:
+      min: 0.0
+      max: 1.0
+    ref:
+      dist: halfnorm
+      loc: 0.0
+      scale: 0.04
+    proposal: 0.05
+    latex: a_\mathrm{ps}^\mathrm{EE}
+  a_pste:
+    prior:
+      min: -1.0
+      max: 1.0
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 0.11
+    proposal: 0.05
+    latex: a_\mathrm{ps}^\mathrm{TE}
+  xi:
+    prior:
+      min: 0.0
+      max: 0.2
+    proposal: 0.05
+    latex: \xi
+  alpha_tSZ:
+    prior:
+      min: -5.0
+      max: 5.0
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 0.3
+    proposal: 0.1
+    latex: \alpha_\mathrm{tSZ}
+  # Fixed values of dust temperature
+  T_d:
+    value: 9.60
+    latex: T_d
 
 theory:
-  classy:
-    path: ./external_modules/code/class_public
+  camb:
+    path: ./external_modules/code/CAMB
     use_renames: True
     extra_args:
-      non linear: hmcode
-      l_max_scalars: 3000
-      N_ncdm: 1
-      N_ur: 2.0328
-
+      num_massive_neutrinos: 1
+      nnu: 3.046
+      #dark_energy_model: ppf
+      kmax: 10
+      k_per_logint: 30
+      nonlinear: true
+      lens_potential_accuracy: 8
+      lens_margin: 2050
+      AccuracyBoost: 1.3
+      lAccuracyBoost: 1.3
+      min_l_logl_sampling: 6000
+      DoLateRadTruncation: false
+      recombination_model: CosmoRec
+      halofit_version: mead2020
+  mflike.BandpowerForeground:
+    top_hat_band:
+    beam_profile: 
+      beam_from_file: null
+    normalisation:
+      nu_0: 150.0
+      ell_0: 3000
+      T_CMB: 2.725
+    experiments:
+      - dr6_pa4_f220
+      - dr6_pa5_f090
+      - dr6_pa5_f150
+      - dr6_pa6_f090
+      - dr6_pa6_f150
+    bandint_freqs: [220, 90, 150, 90, 150]
+    components:
+      tt:
+        - kSZ
+        - tSZ_and_CIB
+        - cibp
+        - dust
+        - radio
+      te:
+        - radio
+        - dust
+      ee:
+        - radio
+        - dust
 sampler:
   evaluate:
     override:
-      logA: 3.0448
-      ns: 0.96605
-      H0: 67.32
-      omegabh2: 0.022383
-      omegach2: 0.12011
-      tau: 0.0543
-      A_planck: 1.0
-      calib_100T: 0.9987983397505178
-      calib_217T: 0.9987920200754659
-      A_cib_217: 65.73042744689862
-      xi_sz_cib: 0.014846669030139295
-      A_sz: 7.578566683767703
-      ksz_norm: 1.830268477586373
-      gal545_A_100: 7.125299946661039
-      gal545_A_143: 8.131426090291662
-      gal545_A_143_217: 15.761217543468344
-      gal545_A_217: 77.5214280531049
-      ps_A_100_100: 261.2823535136313
-      ps_A_143_143: 74.28290799465884
-      ps_A_143_217: 41.22322908951794
-      ps_A_217_217: 125.31939118418777
-      galf_TE_A_100: 0.15314307440243102
-      galf_TE_A_100_143: 0.07963000762154462
-      galf_TE_A_100_217: 0.46305342686237344
-      galf_TE_A_143: 0.104139430567495
-      galf_TE_A_143_217: 0.7243969435429755
-      galf_TE_A_217: 1.9172389532222787
+      #ACT PROVIDED NUMBER: chi-sq    = 5881.056 (\delta chi2 if recfast is off~ 0.45)
+      logA: 3.054029209
+      ns: 0.9674033551 
+      theta_MC_100: 1.040548130
+      omegabh2: 2.259704353e-02 
+      omegach2: 1.239697476e-01
+      tau: 5.671529467e-02
+      w0pwa: -0.999
+      w: -0.999
+      a_tSZ: 3.489236433
+      alpha_tSZ: -4.546365922e-01
+      a_kSZ: 1.061365288e+00
+      a_p: 7.629630989e+00
+      beta_p: 1.858061887e+00
+      a_c: 3.784241034e+00
+      a_s: 2.845033763e+00
+      beta_s: -2.779685125e+00 
+      a_gtt: 7.970993437
+      a_gte: 4.186537040e-01
+      a_gee: 1.672634046e-01 
+      a_psee: 3.828045568e-03
+      a_pste: -2.453029221e-02 
+      xi: 6.858509947e-02
+      calG_all: 1.000050478
+      cal_dr6_pa4_f220: 9.812613896e-01
+      cal_dr6_pa5_f090: 1.000168951
+      cal_dr6_pa5_f150: 9.992407463e-01
+      cal_dr6_pa6_f090: 9.998818650e-01
+      cal_dr6_pa6_f150: 1.001491175
+      calE_dr6_pa5_f090: 9.873920950e-01  
+      calE_dr6_pa5_f150: 9.974938525e-01 
+      calE_dr6_pa6_f090: 9.974483244e-01
+      calE_dr6_pa6_f150: 9.967553054e-01
+      bandint_shift_dr6_pa4_f220: 6.635359341
+      bandint_shift_dr6_pa5_f090: -5.145090313e-02
+      bandint_shift_dr6_pa5_f150: -9.974598944e-01
+      bandint_shift_dr6_pa6_f090: 5.530410872e-01
+      bandint_shift_dr6_pa6_f150: -3.459811085e-01 
 
 output: ./projects/example/chains/EXAMPLE_EVALUATE8

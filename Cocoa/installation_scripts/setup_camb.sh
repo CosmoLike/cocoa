@@ -75,42 +75,48 @@ if [ -z "${IGNORE_CAMB_CODE}" ]; then
     
     cdfolder "${ECODEF:?}" || { cdroot; return 1; }
 
-    "${CURL:?}" -fsS "${URL:?}" \
-      >${OUT1:?} 2>${OUT2:?} || { error "${EC27:?} (URL=${URL:?})"; return 1; }
-
     "${GIT:?}" clone --depth ${GIT_CLONE_MAXIMUM_DEPTH:?} "${URL:?}" \
       --recursive "${FOLDER:?}" \
-      >${OUT1:?} 2>${OUT2:?} || { error "${EC15:?}"; return 1; }
+    >>${OUT1:?} 2>>${OUT2:?} || { error "${EC15:?}"; return 1; }
     
     cdfolder "${PACKDIR}" || { cdroot; return 1; }
 
     if [ -n "${CAMB_GIT_COMMIT}" ]; then
       "${GIT:?}" checkout "${CAMB_GIT_COMMIT:?}" \
-        >${OUT1:?} 2>${OUT2:?} || { error "${EC16:?}"; return 1; }
+      >>${OUT1:?} 2>>${OUT2:?} || { error "${EC16:?}"; return 1; }
     fi
     
     # --------------------------------------------------------------------------
     # We patch the files below so they use the right compilers -----------------
     # --------------------------------------------------------------------------
-    # T = TMP
+    # PREFIX: T = TMP, P = PATCH, AL = Array Length
     declare -a TFOLDER=("camb/" 
                         "fortran/" 
                         "forutils/"
                         "fortran/") # If nonblank, path must include /
-    
-    # T = TMP
     declare -a TFILE=("_compilers.py" 
                       "Makefile" 
                       "Makefile_compiler"
                       "Makefile_main")
-
-    #T = TMP, P = PATCH
     declare -a TFILEP=("_compilers.patch" 
                        "Makefile.patch" 
                        "Makefile_compiler.patch"
                        "Makefile_main.patch")
-
-    # AL = Array Length
+    case "$(uname -s)" in
+      Linux)
+        declare -a TFILEP=("_compilers.patch" 
+                           "Makefile.patch" 
+                           "Makefile_compiler.patch"
+                           "Makefile_main.patch")
+        ;;
+      Darwin)
+        declare -a TFILEP=("_compilers.patch" 
+                           "Makefile.patch" 
+                           "Makefile_compiler.patch"
+                           "Makefile_main_osx.patch")
+        ;;
+    esac
+    
     AL=${#TFOLDER[@]}
 
     for (( i=0; i<${AL}; i++ ));
@@ -131,9 +137,7 @@ if [ -z "${IGNORE_CAMB_CODE}" ]; then
   cdfolder "${ROOTDIR}" || return 1
 
   unset_all || return 1
-  
 fi
-
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------

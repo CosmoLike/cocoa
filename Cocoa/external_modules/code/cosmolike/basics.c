@@ -18,6 +18,7 @@
 #include <gsl/gsl_sf_gamma.h>
 #include <gsl/gsl_sf_legendre.h>
 #include <gsl/gsl_sf_trig.h>
+#include <gsl/gsl_interp.h>
 #include <gsl/gsl_spline.h>
 #include <gsl/gsl_math.h>
 
@@ -25,6 +26,24 @@
 #include "basics.h"
 
 #include "log.c/src/log.h"
+
+gsl_interp* malloc_gsl_interp(const int n)
+{
+  gsl_interp* result;
+
+  if (Ntable.photoz_interpolation_type == 0)
+    result = gsl_interp_alloc(gsl_interp_cspline, n);
+  else if (Ntable.photoz_interpolation_type == 1)
+    result = gsl_interp_alloc(gsl_interp_linear, n);
+  else
+    result = gsl_interp_alloc(gsl_interp_steffen, n);
+
+  if (result == NULL) {
+    log_fatal("array allocation failed");
+    exit(1);
+  }
+  return result;
+}
 
 gsl_spline* malloc_gsl_spline(const int n)
 {
@@ -37,8 +56,7 @@ gsl_spline* malloc_gsl_spline(const int n)
   else
     result = gsl_spline_alloc(gsl_interp_steffen, n);
 
-  if (result == NULL)
-  {
+  if (result == NULL) {
     log_fatal("array allocation failed");
     exit(1);
   }
@@ -204,76 +222,69 @@ bin_avg set_bin_average(const int i_theta, const int j_L)
   static double*** P  = NULL;
   static double** xminmax = NULL;
   static int ntheta = 0;
-  
-  if (Ntable.Ntheta == 0)
-  {
+  static double cache[MAX_SIZE_ARRAYS];
+
+  if (Ntable.Ntheta == 0) {
     log_fatal("Ntable.Ntheta not initialized");
     exit(1);
   }
-  if (!(i_theta < Ntable.Ntheta))
+  if (P == NULL || (ntheta != Ntable.Ntheta) || fdiff(cache[0], Ntable.random))
   {
-    log_fatal("bad i_theta index");
-    exit(1);
-  }
-  if (j_L > limits.LMAX)
-  {
-    log_fatal("bad j_L index");
-    exit(1);
-  }
-
-  if (P == NULL || (ntheta != Ntable.Ntheta))
-  {
-    if (P != NULL) free(P);
-    if (xminmax != NULL) free(xminmax);
+    if (P != NULL) {
+      free(P);
+    }
+    if (xminmax != NULL) {
+      free(xminmax);
+    }
 
     // Legendre computes l=0,...,lmax (inclusive)
-    P  = (double***) malloc3d(4, Ntable.Ntheta, limits.LMAX+1);
+    P  = (double***) malloc3d(4, Ntable.Ntheta, Ntable.LMAX+1);
     double** Pmin  = P[0]; double** Pmax  = P[1];
     double** dPmin = P[2]; double** dPmax = P[3];
 
     xminmax = (double**) malloc2d(2, Ntable.Ntheta);
 
     const double logdt = (log(Ntable.vtmax)-log(Ntable.vtmin))/ Ntable.Ntheta;
-    for(int i=0; i<Ntable.Ntheta ; i++)
-    {
+    for(int i=0; i<Ntable.Ntheta ; i++) {
       xminmax[0][i] = cos(exp(log(Ntable.vtmin) + (i + 0.)*logdt));
       xminmax[1][i] = cos(exp(log(Ntable.vtmin) + (i + 1.)*logdt));
     }
 
     #pragma omp parallel for
-    for (int i=0; i<Ntable.Ntheta; i++)
-    {
-      if (abs(xminmax[0][i]) > 1)
-      {
+    for (int i=0; i<Ntable.Ntheta; i++) {
+      if (fabs(xminmax[0][i]) > 1) {
         log_fatal("logical error: Legendre argument xmin = %.3e>1", xminmax[0][i]);
         exit(1);
       }
-      if (abs(xminmax[1][i]) > 1)
-      {
+      if (fabs(xminmax[1][i]) > 1) {
         log_fatal("logical error: Legendre argument xmax = %.3e>1", xminmax[1][i]);
         exit(1);
       }
       
       int status = 
-      gsl_sf_legendre_Pl_deriv_array(limits.LMAX, xminmax[0][i], Pmin[i], dPmin[i]);
-      if (status) 
-      {
+      gsl_sf_legendre_Pl_deriv_array(Ntable.LMAX, xminmax[0][i], Pmin[i], dPmin[i]);
+      if (status) {
         log_fatal(gsl_strerror(status));
         exit(1);
       }
-
       status = 
-      gsl_sf_legendre_Pl_deriv_array(limits.LMAX, xminmax[1][i], Pmax[i], dPmax[i]);
-      if (status) 
-      {
+      gsl_sf_legendre_Pl_deriv_array(Ntable.LMAX, xminmax[1][i], Pmax[i], dPmax[i]);
+      if (status) {
         log_fatal(gsl_strerror(status));
         exit(1);
       } 
     }
-
     ntheta = Ntable.Ntheta;
+    cache[0] = Ntable.random;
   }
-
+  if (!(i_theta < Ntable.Ntheta)) {
+    log_fatal("bad i_theta index");
+    exit(1);
+  }
+  if (j_L > Ntable.LMAX) {
+    log_fatal("bad j_L index");
+    exit(1);
+  }
   bin_avg r;
   r.xmin = xminmax[0][i_theta];
   r.xmax = xminmax[1][i_theta];

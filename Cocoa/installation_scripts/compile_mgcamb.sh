@@ -62,27 +62,21 @@ if [ -z "${IGNORE_MGCAMB_CODE}" ]; then
 
   # ---------------------------------------------------------------------------
   # cleaning any previous compilation
-  
   rm -rf "${PACKDIR:?}/build/"
   rm -rf "${PACKDIR:?}/camb/__pycache__/"
   rm -f  "${PACKDIR:?}/camb/camblib.so"
   rm -rf "${PACKDIR:?}/forutils/Releaselib/"
   
-  "${PYTHON3:?}" setup.py clean >${OUT1:?} 2>${OUT2:?} || { error "${EC1:?}"; return 1; }
-  
+  "${PYTHON3:?}" setup.py clean >>${OUT1:?} 2>>${OUT2:?} || { error "${EC1:?}"; return 1; }
   # ---------------------------------------------------------------------------
   
-  (export LD_LIBRARY_PATH=${CONDA_PREFIX:?}/lib:$LD_LIBRARY_PATH && \
-   export LD_LIBRARY_PATH=${ROOTDIR:?}/.local/lib:$LD_LIBRARY_PATH && \
-   COMPILER="${FORTRAN_COMPILER:?}" F90C="${FORTRAN_COMPILER:?}" \
-   "${PYTHON3:?}" setup.py build >${OUT1:?} 2>${OUT2:?} || { error "${EC4:?}"; return 1; })
+  (COMPILER="${FORTRAN_COMPILER:?}" F90C="${FORTRAN_COMPILER:?}" \
+    "${PYTHON3:?}" setup.py build 
+  ) >>${OUT1:?} 2>>${OUT2:?} || { error "${EC4:?}"; return 1; }
   
   pbottom "COMPILING ${PRINTNAME:?}" || return 1
 
-  # ---------------------------------------------------------------------------
-
   unset_all || return 1
-
 fi
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------

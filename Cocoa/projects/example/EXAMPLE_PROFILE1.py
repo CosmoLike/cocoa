@@ -1,212 +1,84 @@
-import sys, platform, os
-from cobaya.theories.emulcmbtrf.emuprofile import EmulProfile
-import functools
-import numpy as np
-import ipyparallel
-import sys, platform, os
-import math
-import scipy
-from getdist import IniFile
-import itertools
-import iminuit
-import copy
-import argparse
-import random
-import emcee
-import itertools
-from mflike import TTTEEE, BandpowerForeground
-
-# ------------------------------------------------------------------------------
-# ------------------------------------------------------------------------------
-# ------------------------------------------------------------------------------
-
-x = np.array([
-                3.04,         # logA
-                0.96,         # ns
-                67.0,         # H0
-                0.02,         # omegabh2
-                0.12,         # omegach2
-                0.05,         # tau
-                3.29,         # a_tSZ
-                1.60,         # a_kSZ
-                6.90,         # a_p
-                2.08,         # beta_p
-                4.90,         # a_c
-                2.20,         # beta_c
-                3.10,         # a_s
-                2.84,         # a_gtt
-                1.9e-01,      # xi
-                10.2,         # T_d
-                0.10,         # a_gte
-                5.31e-04,     # a_pste
-                9.8e-02,      # a_gee
-                0.0,          # a_psee
-              ], dtype='float64')
-name  = [ 
-            "logAs",     # As
-            "ns",        # ns
-            "H0",        # H0
-            "omegabh2",  # omegabh2
-            "omegach2",  # omegach2
-            "tau",       # tau
-            "a_tSZ",     # a_tSZ
-            "a_kSZ",     # a_kSZ
-            "a_p",       # a_p
-            "beta_p",    # beta_p          
-            "a_c",       # a_c
-            "beta_c",    # beta_c
-            "a_s",       # a_s
-            "a_gtt",     # a_gtt
-            "xi"         # xi
-            "T_d"        # T_d
-            "a_gte",     # a_gte
-            "a_pste"     # a_pste
-            "a_gee",     # a_gee
-            "a_psee"     # a_psee
-        ]
-
-bounds = np.zeros((len(x),2), dtype='float64')
-start  = np.zeros(len(x), dtype='float64')
-stop   = np.zeros(len(x), dtype='float64')
-
-# ------------------------------------------------------------------------------
-# ------------------------------------------------------------------------------
-# ------------------------------------------------------------------------------
-MKL = TTTEEE(
-    {
-        "data_folder": "simons_observatory/v0.8",
-        "input_file": "LAT_simu_sacc_00044.fits",
-        "cov_Bbl_file": "data_sacc_w_covar_and_Bbl.fits",
-        "defaults": {
-            "polarizations": ['TT', 'TE', 'ET', 'EE'],
-            "scales": {
-                "TT": [50, 3002],
-                "TE": [50, 3002],
-                "ET": [50, 3002],
-                "EE": [50, 3002],
-            },
-            "symmetrize": False,
-        },
-        "lmax_theory": 5000
-    }
+import warnings, os, psutil
+from sklearn.exceptions import InconsistentVersionWarning
+warnings.filterwarnings("ignore", category=InconsistentVersionWarning)
+warnings.filterwarnings(
+    "ignore",
+    message=".*column is deprecated.*",
+    module=r"sacc\.sacc"
 )
-fg  = BandpowerForeground(MKL.get_fg_requirements())
-
-tmp='external_modules/data/emultrf/CMB_TRF/'
-emu=EmulProfile(ROOTDIR=os.environ.get("ROOTDIR"), 
-                ttfilename=tmp+'/chiTTAstautrf1dot2milnewlhcevansqrtrescalec16', 
-                tefilename=tmp+'/chiTEAstautrf1dot2milnewlhcevansqrtrescalec16', 
-                eefilename=tmp+'/chiEEAstautrf1dot2milnewlhcevansqrtrescalec16', 
-                ttextraname=tmp+'/extrainfo_lhs_tt_96.npy', 
-                teextraname=tmp+'/extrainfo_lhs_te_96.npy', 
-                eeextraname=tmp+'/extrainfo_lhs_ee_96.npy')
-
-
-def chi2(p):
-
-    NP = {
-        "T_effd": 19.6,
-        "beta_d": 1.5,
-        "beta_s": -2.5,
-        "alpha_s": 1,
-        "bandint_shift_LAT_93": 0,
-        "bandint_shift_LAT_145": 0,
-        "bandint_shift_LAT_225": 0,
-        "cal_LAT_93": 1,
-        "cal_LAT_145": 1,
-        "cal_LAT_225": 1,
-        "calG_all": 1,
-        "alpha_LAT_93": 0,
-        "alpha_LAT_145": 0,
-        "alpha_LAT_225": 0,
-    } | {
-        "a_tSZ": p[6],
-        "a_kSZ": p[7],
-        "a_p": p[8],
-        "beta_p": p[9],
-        "a_c": p[10],
-        "beta_c": p[11],
-        "a_s": p[12],
-        "T_d": p[15],
-        "a_gtt": p[13],
-        "xi": p[14],
-        "alpha_dT": -0.6,
-        "alpha_p": 1,
-        "alpha_tSZ": 0.,
-        "calT_LAT_93": 1,
-        "calT_LAT_145": 1,
-        "calT_LAT_225": 1,
-    } | {
-        "a_gte": p[16],
-        "a_pste": p[17],
-        "alpha_dE": -0.4
-    } | {
-        "a_gee": p[18],
-        "a_psee": p[19],
-        "alpha_dE": -0.4,
-        "calE_LAT_93": 1,
-        "calE_LAT_145": 1,
-        "calE_LAT_225": 1
-    }
-
-    #ordering: [ombh2, omch2, H0, tau, ns, logAs]
-    result= -2 * (MKL.loglike(emu.get_Cl(
-        cmb_params=[p[3],p[4],p[2],p[5],p[1],p[0]]),
-        fg.get_foreground_model_totals(**NP),**NP)-MKL.logp_const)
-    return result
-
+warnings.filterwarnings(
+    "ignore",
+    category=RuntimeWarning,
+    message=r".*invalid value encountered*"
+)
+warnings.filterwarnings(
+    "ignore",
+    category=RuntimeWarning,
+    message=r".*overflow encountered*"
+)
+warnings.filterwarnings(
+    "ignore",
+    category=UserWarning,
+    message=r".*Function not smooth or differentiabl*"
+)
+warnings.filterwarnings(
+    "ignore",
+    category=UserWarning,
+    message=r".*Hartlap correction*"
+)
+import functools, iminuit, copy, argparse, random, time 
+import emcee, itertools
+import numpy as np
+from cobaya.yaml import yaml_load
+from cobaya.model import get_model
+from getdist import IniFile
+from schwimmbad import MPIPool
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
+_affinity_set = False
 
-parser = argparse.ArgumentParser(prog='EXAMPLE_PROFILE1')
-
-parser.add_argument("--tol",
-                    dest="tolerance",
-                    help="Minimizer Tolerance",
-                    type=float,
-                    nargs='?',
-                    const=1,
-                    default=0.05)
-
-parser.add_argument("--maxfeval",
-                    dest="maxfeval",
-                    help="Minimizer: maximum number of likelihood evaluations",
+def enforce_affinity():
+    # schwimmbad.MPIPool uses one Python process per MPI rank
+    # So each rank can directly control its own CPU affinity via psutil
+    # No reliance on mpirun or OpenMPI doing the right thing
+    rank = int(os.environ.get("OMPI_COMM_WORLD_RANK", 0))
+    omp_threads = int(os.environ.get("OMP_NUM_THREADS", 1))
+    first_core = rank * omp_threads
+    last_core  = first_core + omp_threads - 1
+    try:
+        psutil.Process().cpu_affinity(list(range(first_core, last_core + 1)))
+    except Exception as e:
+        print(f"[Rank {rank}] Failed to set affinity: {e}")
+# ------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
+parser = argparse.ArgumentParser(prog='EXAMPLE_EMUL_PROFILE1')
+parser.add_argument("--nstw",
+                    dest="nstw",
+                    help="Number of likelihood evaluations (steps) per temperature per walker",
                     type=int,
                     nargs='?',
                     const=1,
-                    default=250)
-
-parser.add_argument("--maxiter",
-                    dest="maxiter",
-                    help="Minimizer: maximum number of minimizer iterations",
-                    type=int,
-                    nargs='?',
-                    const=1,
-                    default=5)
-
-parser.add_argument("--minmethod",
-                    dest="minmethod",
-                    help="Minimizer: minimizer method",
-                    type=int,
-                    nargs='?',
-                    const=1,
-                    default=5)
-
+                    default=200)
 parser.add_argument("--root",
                     dest="root",
                     help="Name of the Output File",
                     nargs='?',
                     const=1,
                     default="./projects/example/")
-
 parser.add_argument("--outroot",
                     dest="outroot",
                     help="Name of the Output File",
                     nargs='?',
                     const=1,
                     default="test.dat")
-
 parser.add_argument("--profile",
                     dest="profile",
                     help="Which Parameter to Profile",
@@ -214,327 +86,437 @@ parser.add_argument("--profile",
                     nargs='?',
                     const=1,
                     default=1)
-
-parser.add_argument("--mpi",
-                    dest="mpi",
-                    help="Number of MPI cores",
-                    type=int,
-                    nargs='?',
-                    const=1,
-                    default=5)
-
 parser.add_argument("--factor",
                     dest="factor",
-                    help="Factor that set the bounds",
+                    help="Factor that set the bounds (multiple of cov matrix)",
+                    type=float,
+                    nargs='?',
+                    const=1.0,
+                    default=3.0)
+parser.add_argument("--numpts",
+                    dest="numpts",
+                    help="Number of Points to Compute Minimum",
                     type=int,
                     nargs='?',
                     const=1,
-                    default=2)
-
-# need to use parse_known_args because of mpifuture 
+                    default=20)
+parser.add_argument("--minfile",
+                    dest="minfile",
+                    help="Minimization Result",
+                    nargs='?',
+                    const=1)
+parser.add_argument("--cov",
+                    dest="cov",
+                    help="Chain Covariance Matrix",
+                    nargs='?',
+                    const=1,
+                    default=None)
 args, unknown = parser.parse_known_args()
-
-tol             = args.tolerance
-maxfeval        = args.maxfeval
-maxiter         = args.maxiter
-min_method      = args.minmethod
-oroot           = args.root + "chains/" + args.outroot
-index           = args.profile
-nummpi          = args.mpi
-
-cov_file = args.root + 'EXAMPLE_POLY22.covmat'
-cov      = np.loadtxt(cov_file)[0:20,0:20]
-for i in range(19):
-    start[i] = x[i] -args.factor*np.sqrt(cov[i,i])
-    stop[i]  = x[i] +args.factor*np.sqrt(cov[i,i])
-    bounds[i][0] = x[i] -2.0*args.factor*np.sqrt(cov[i,i])  
-    bounds[i][1] = x[i] +2.0*args.factor*np.sqrt(cov[i,i])
-
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
-
-def min_chi2(x0, 
-             bounds, 
-             min_method, 
+# ------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
+yaml_string=r"""
+likelihood:
+  planck_2018_highl_plik.TTTEEE_lite: 
+    path: ./external_modules/
+    clik_file: plc_3.0/hi_l/plik_lite/plik_lite_v22_TTTEEE.clik
+  planck_2018_lowl.TT: 
+    path: ./external_modules
+  planck_2020_lollipop.lowlE:
+    data_folder: planck/lollipop
+  sn.desy5: 
+    path: ./external_modules/data/sn_data
+  bao.desi_dr2.desi_bao_all:
+    path: ./external_modules/data/ 
+  act_dr6_lenslike.ACTDR6LensLike:
+    lens_only: True
+    variant: actplanck_baseline
+params:
+  logA:
+    prior:
+      min: 2.7
+      max: 3.4
+    ref:
+      dist: norm
+      loc: 3.04
+      scale: 0.025
+    proposal: 0.025
+    latex: \log(10^{10} A_\mathrm{s}
+    drop: true
+  ns:
+    prior:
+      min: 0.93
+      max: 1.01
+    ref:
+      dist: norm
+      loc: 0.96
+      scale: 0.0075
+    proposal: 0.0075
+    latex: n_\mathrm{s}
+  theta_MC_100:
+    prior:
+      min: 1
+      max: 1.2
+    ref:
+      dist: norm
+      loc: 1.04109
+      scale: 0.0004
+    proposal: 0.0002
+    latex: 100\theta_\mathrm{MC}
+    drop: true
+    renames: theta
+  cosmomc_theta:
+    value: 'lambda theta_MC_100: 1.e-2*theta_MC_100'
+    derived: false
+  omegabh2:
+    prior:
+      min: 0.01
+      max: 0.03
+    ref:
+      dist: norm
+      loc: 0.022383
+      scale: 0.005
+    proposal: 0.005
+    latex: \Omega_\mathrm{b} h^2
+  omegach2:
+    prior:
+      min: 0.08
+      max: 0.16
+    ref:
+      dist: norm
+      loc: 0.12011
+      scale: 0.01
+    proposal: 0.01
+    latex: \Omega_\mathrm{c} h^2
+  tau:
+    prior:
+      min: 0.04
+      max: 0.09
+    ref:
+      dist: norm
+      loc: 0.055
+      scale: 0.01
+    proposal: 0.01
+    latex: \tau_\mathrm{reio}
+  mnu:
+    value: 0.06
+  As:
+    value: 'lambda logA: 1e-10*np.exp(logA)'
+    latex: A_\mathrm{s}
+  omegab:
+    derived: 'lambda omegabh2, H0: omegabh2/((H0/100)**2)'
+    latex: \Omega_\mathrm{b}
+  omegac:
+    derived: 'lambda omegach2, H0: omegach2/((H0/100)**2)'
+    latex: \Omega_\mathrm{c}
+  H0:
+    derived: true
+    latex: H_0
+  omegam:
+    derived: true
+    latex: \Omega_\mathrm{m}
+  rdrag:
+    derived: true
+    latex: r_\mathrm{drag}
+  omegamh2:
+    derived: 'lambda omegach2, omegabh2, mnu: omegach2+omegabh2+(mnu*(3.046/3)**0.75)/94.0708'
+    latex: \Omega_\mathrm{m} h^2
+  thetastar:
+   derived: true
+   latex: \Theta_\star
+theory:
+  camb:
+    path: ./external_modules/code/CAMB
+    extra_args:
+      halofit_version: mead2020
+      lmax: 4000
+      lens_margin: 1250
+      AccuracyBoost: 1.05
+      lens_potential_accuracy: 4
+      lens_k_eta_reference: 18000
+      nonlinear: NonLinear_both
+      recombination_model: CosmoRec
+      Accuracy.AccurateBB: True
+"""
+# ------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
+model = get_model(yaml_load(yaml_string))
+def chi2(p):
+    p = [float(v) for v in p.values()] if isinstance(p, dict) else p
+    if np.any(np.isinf(p)) or  np.any(np.isnan(p)):
+      raise ValueError(f"At least one parameter value was infinite (CoCoa) param = {p}")
+    point = dict(zip(model.parameterization.sampled_params(), p))
+    res1 = model.logprior(point,
+                          make_finite=False)
+    if np.isinf(res1) or np.any(np.isnan(res1)):
+      return 1.e20
+    res2 = model.loglike(point,
+                         make_finite=False,
+                         cached=False,
+                         return_derived=False)
+    if np.isinf(res2) or np.isnan(res2):
+      return 1.e20
+    return -2.0*(res1+res2)
+def chi2v2(p):
+    p = [float(v) for v in p.values()] if isinstance(p, dict) else p
+    point = dict(zip(model.parameterization.sampled_params(), p))
+    logposterior = model.logposterior(point, as_dict=True)
+    chi2likes=-2*np.array(list(logposterior["loglikes"].values()))
+    chi2prior=-2*np.atleast_1d(model.logprior(point,make_finite=False))
+    return np.concatenate((chi2likes, chi2prior))
+# ------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
+def min_chi2(x0,
+             cov, 
              fixed=-1, 
-             tol=0.01, 
-             maxfeval=3000, 
-             maxiter=10, 
-             cov=cov):
+             nstw=200,
+             nwalkers=5,
+             pool=None):
 
     def mychi2(params, *args):
         z, fixed, T = args
-        params = np.array(params)
+        params = np.array(params, dtype='float64')
         if fixed > -1:
             params = np.insert(params, fixed, z)
-        res = chi2(p=params)/T
-        return res
-
+        return chi2(p=params)/T
     if fixed > -1:
         z      = x0[fixed]
         x0     = np.delete(x0, (fixed))
-        bounds = np.delete(bounds, (fixed), axis=0)
         args = (z, fixed, 1.0)
+        cov = np.delete(cov, (fixed), axis=0)
+        cov = np.delete(cov, (fixed), axis=1)
     else:
         args = (0.0, -2.0, 1.0)
 
-    def log_prior(params):
-        return 1.0
-    
     def logprob(params, *args):
-        lp = log_prior(params)
-        if not np.isfinite(lp):
-            return -np.inf
+        global _affinity_set
+        if not _affinity_set:
+          enforce_affinity()  # enforce per-rank affinity on pool workers!
+          _affinity_set = True
+          start_time = time.time()
+          res = mychi2(params, *args)
+          etime = time.time() - start_time
+          rank = int(os.environ.get("OMPI_COMM_WORLD_RANK",0))
+          print(f"Emcee: Like Eval Time: {etime:.4f} secs and MPI Rank: {rank}")
         else:
-            return -0.5*mychi2(params, *args) + lp
+          res = mychi2(params, *args)
+        if (res > 1.e19 or np.isinf(res) or  np.isnan(res)):
+          return -np.inf
+        else:
+          return -0.5*res
     
-    cov = np.delete(cov, (fixed), axis=0)
-    cov = np.delete(cov, (fixed), axis=1)
-
     class GaussianStep:
        def __init__(self, stepsize=0.2):
            self.cov = stepsize*cov
        def __call__(self, x):
            return np.random.multivariate_normal(x, self.cov, size=1)
+    
+    ndim        = int(x0.shape[0])
+    nwalkers    = int(nwalkers)
+    nstw        = int(nstw)
+    if fixed == -1:
+      temperature = np.array([1.0, 0.25, 0.1, 0.005, 0.001], dtype='float64')
+    else:
+      temperature = np.array([0.3, 0.1, 0.005, 0.001], dtype='float64')
+    stepsz      = temperature/3.0
 
-    if min_method == 1:
-    
-        x = copy.deepcopy(x0)
-        tmp = iminuit.minimize(fun=mychi2, 
-                               x0=x, 
-                               args=args, 
-                               bounds=bounds, 
-                               method="migrad", 
-                               tol=tol,
-                               options = {'stra'  : 2, 
-                                          'maxfun': int(maxfeval/3.0)}) 
-        
-        x = copy.deepcopy(tmp.x)  
-        GS = GaussianStep()
-        tmp = scipy.optimize.basinhopping(func=mychi2, 
-                                          x0=x, 
-                                          T=0.1, 
-                                          target_accept_rate=0.25, 
-                                          niter=maxiter, 
-                                          stepsize=0.02,
-                                          interval=100,
-                                          niter_success=3,
-                                          take_step=GS,
-                                          minimizer_kwargs={"method": 'Nelder-Mead', 
-                                                            "args": args, 
-                                                            "bounds": bounds, 
-                                                            "options": {'adaptive' : True, 
-                                                                        'xatol'    : tol,
-                                                                        'fatol'    : tol, 
-                                                                        'maxfev'   : maxfeval,
-                                                                        'maxiter'  : maxiter}})
-        x = copy.deepcopy(tmp.x)  
-        tmp = iminuit.minimize(fun=mychi2, 
-                               x0=x, 
-                               args=args, 
-                               bounds=bounds, 
-                               method="migrad", 
-                               tol=tol,
-                               options = {'stra'  : 2, 
-                                          'maxfun': int(maxfeval/3.0)})
-        result = [tmp.x, tmp.fun]
-    
-    elif min_method == 2:
-    
-        x = copy.deepcopy(x0)
-        tmp = iminuit.minimize(fun=mychi2, 
-                               x0=x, 
-                               args=args, 
-                               bounds=bounds, 
-                               method="migrad", 
-                               tol=tol,
-                               options = {'stra'  : 2, 
-                                          'maxfun': int(maxfeval/3.0)})
-        
-        x = copy.deepcopy(tmp.x)
-        # https://stats.stackexchange.com/a/456073
-        tmp = scipy.optimize.dual_annealing(func=mychi2, 
-                                            x0=x, 
-                                            args=args, 
-                                            bounds=bounds, 
-                                            maxfun=maxfeval,
-                                            no_local_search=True, 
-                                            maxiter=maxiter, 
-                                            visit=1.01, 
-                                            accept=1, 
-                                            initial_temp=5230.0, 
-                                            restart_temp_ratio=0.0002)
-        x = copy.deepcopy(tmp.x)  
-        tmp = iminuit.minimize(fun=mychi2, 
-                               x0=x, 
-                               args=args, 
-                               bounds=bounds, 
-                               method="migrad", 
-                               tol=tol,
-                               options = {'stra'  : 2, 
-                                          'maxfun': int(maxfeval/3.0)})
-        result = [tmp.x, tmp.fun]
-    
-    elif min_method == 3:
-    
-        tmp = scipy.optimize.shgo(func=mychi2, 
-                                  args=args, 
-                                  bounds=bounds,
-                                  n=50,
-                                  iters=maxiter,
-                                  options={'f_tol'    : tol, 
-                                           'maxfev'   : maxfeval,
-                                           'maxiter'  : maxiter},
-                                  minimizer_kwargs={"method": 'Nelder-Mead', 
-                                                              "args": args, 
-                                                              "bounds": bounds, 
-                                                              "options": {'adaptive' : True, 
-                                                                          'xatol'    : tol,
-                                                                          'fatol'    : tol, 
-                                                                          'maxfev'   : maxfeval,
-                                                                          'maxiter'  : maxiter}})
-        result = [tmp.x, tmp.fun]
-    
-    elif min_method == 4:
-    
-        x = copy.deepcopy(x0)
-        partial_samples = [x]
-        partial = [mychi2(x, *args)]
-        for i in range(maxiter):
-            tmp = iminuit.minimize(fun=mychi2, 
-                                   x0=x, 
-                                   args=args, 
-                                   bounds=bounds, 
-                                   method="migrad", 
-                                   tol=tol,
-                                   options = {'stra'  : 2, 
-                                              'maxfun': maxfeval})
-            partial_samples.append(tmp.x)
-            partial.append(tmp.fun)
-            j = np.argmin(np.array(partial))
-            x = GaussianStep(stepsize=0.005)(partial_samples[j])[0,:]
-            print(f"MN: i = {i}, chi2 = {partial[j]}, param = {args[0]}")
-        j = np.argmin(np.array(partial))
-        result = [partial_samples[j], partial[j]]   
-    
-    elif min_method == 5: # adapted from PROCOLI       
-        ndim        = int(x0.shape[0])
-        nwalkers    = int(2*x0.shape[0])
-        nsteps      = maxfeval
-        temperature = np.array([1.0, 0.25, 0.1, 0.005, 0.001], dtype='float64')
-        stepsz      = temperature/4.0
+    partial_samples = [x0]
+    partial = [mychi2(x0, *args)]
 
-        partial_samples = []
-        partial = []
-
-        for i in range(5):
-            print(f"emcee: i = {i} begins")
-
-            x = [] # Initial point
-            for j in range(nwalkers):
-                x.append(GaussianStep(stepsize=stepsz[i])(x0)[0,:])
-            x = np.array(x,dtype='float64')
-
-            GScov  = copy.deepcopy(cov)
-            GScov *= temperature[i]*stepsz[i] 
-      
-            sampler = emcee.EnsembleSampler(nwalkers, 
-                                            ndim, 
-                                            logprob, 
-                                            args=(args[0], args[1], temperature[i]),
-                                            moves=[(emcee.moves.GaussianMove(cov=GScov),1.)])
-            
-            sampler.run_mcmc(x, nsteps, skip_initial_state_check=False)
-            samples = sampler.get_chain(flat=True, thin=1, discard=0)
-
-            j = np.argmin(-1.0*np.array(sampler.get_log_prob(flat=True)))
-            
-            partial_samples.append(samples[j])
-            partial.append(mychi2(samples[j], *args))
-            j = np.argmin(np.array(partial))
-            x0 = copy.deepcopy(partial_samples[j])
-            sampler.reset()
-            print(f"emcee: i = {i}, chi2 = {partial[j]}, param = {args[0]}")
-        
-        tmp = iminuit.minimize(fun=mychi2, 
-                               x0=x0, 
-                               args=args, 
-                               bounds=bounds, 
-                               method="migrad", 
-                               tol=tol,
-                               options = {'stra'  : 2, 
-                                          'maxfun': int(maxfeval/3)})
-        partial_samples.append(tmp.x)
-        partial.append(tmp.fun)  
-        j = np.argmin(np.array(partial))
-        result = [partial_samples[j], partial[j]]
-        print(f"MN: chi2 = {result}, param = {args[0]}")
-        print(f"All: chi2 = {partial}, param = {args[0]}")
-    return result
-
+    for i in range(len(temperature)):
+        x = [] # Initial point
+        for j in range(nwalkers):
+            x.append(GaussianStep(stepsize=stepsz[i])(x0)[0,:]) 
+        sampler = emcee.EnsembleSampler(nwalkers=nwalkers, 
+                                        ndim=ndim, 
+                                        log_prob_fn=logprob, 
+                                        args=(args[0], args[1], temperature[i]),
+                                        moves=[(emcee.moves.DEMove(), 0.8),
+                                               (emcee.moves.DESnookerMove(), 0.2)],
+                                        pool=pool)
+        sampler.run_mcmc(np.array(x,dtype='float64'), 
+                         nstw, 
+                         skip_initial_state_check=True)
+        samples = sampler.get_chain(flat=True, discard=0)
+        j = np.argmin(-1.0*np.array(sampler.get_log_prob(flat=True)))
+        partial_samples.append(samples[j])
+        partial.append(mychi2(samples[j], *args))
+        x0 = copy.deepcopy(samples[j])
+        sampler.reset()
+    # min chi2 from the entire emcee runs
+    j = np.argmin(np.array(partial))
+    return partial_samples[j]
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
-
-def prf(x0, index, min_method, maxiter, maxfeval):
+# ------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
+def prf(x0, nstw, cov, fixed=-1, nwalkers=5, pool=None):
     res =  min_chi2(x0=np.array(x0, dtype='float64'), 
-                    bounds=np.array(bounds, dtype='float64'), 
-                    min_method=min_method, 
-                    fixed=index, 
-                    tol=tol, 
-                    maxfeval=maxfeval, 
-                    maxiter=maxiter)
+                    fixed=fixed,
+                    cov=cov, 
+                    nstw=nstw, 
+                    nwalkers=nwalkers,
+                    pool=pool)
     return res
-
-
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
-
-from mpi4py.futures import MPIPoolExecutor
-
+# ------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 if __name__ == '__main__':
-    
-    print(f"min_method={min_method}, maxiter={maxiter}, maxfeval={maxfeval}, tol={tol}, param={index}")
+    with MPIPool() as pool:
+        if not pool.is_master():
+            pool.wait()
+            sys.exit(0)
+        enforce_affinity() # enforce affinity (so Hybrid MPI-OpenMP works)!
 
-    executor = MPIPoolExecutor()
-    
-    param = np.linspace(start=start[index], stop=stop[index], num=nummpi)
-    print(f"profile param values = {param}")
+        dim      = model.prior.d()     
+        nwalkers = max(3*dim, pool.comm.Get_size())
+        nstw = args.nstw
 
-    x0 = []
-    for i in range(nummpi):
-        tmp = copy.deepcopy(x)
-        tmp[index] = param[i]
-        x0.append(tmp)
-    x0 = np.array(x0, dtype=object)
+        # 1st: load the cov. matrix --------------------------------------------
+        if args.cov is None:
+          cov = model.prior.covmat(ignore_external=False) # cov from prior
+          factor = min(1.0, args.factor)
+        else:
+          cov = np.loadtxt(args.root+args.cov)[0:model.prior.d(),0:model.prior.d()]
+          factor = args.factor
+        sigma = np.sqrt(np.diag(cov))
 
-    res = np.array(list(executor.map(functools.partial(prf,
-                                                       index=index, 
-                                                       min_method=min_method,
-                                                       maxiter=maxiter,
-                                                       maxfeval=maxfeval),
-                                     x0)))
+        # 2nd: Get minimum --------------------------------------------------
+        if args.minfile is not None: # load minimum from running MCMC
+          x0 = np.loadtxt(args.minfile)
+          chi20 = x0[-1]
+          x0 = x0[0:model.prior.d()]
+        else: # Compute the minimum (slow)
+          (x0, results) = model.get_valid_point(max_tries=1000, 
+                                     ignore_fixed_ref=False,
+                                     logposterior_as_dict=True)
+          res = np.array(list(prf(x0=x0, 
+                                  nstw=int(5.*nstw/4.), 
+                                  nwalkers=nwalkers,
+                                  pool=pool,
+                                  cov=cov,
+                                  fixed=-1)), dtype="object")
+          x0 = np.array(res, dtype='float64')[0:model.prior.d()]
+          chi20 = chi2(x0)
+          print(f"Global Min: params = {x0}, and chi2 = {chi20}")
 
-    rnd = random.randint(0,1000)
-    out = oroot + "_" + str(rnd) + "_method_" + str(min_method) + "_" + name[index] + ".txt"
-    print("Output file = ", out)
-    np.savetxt(out, np.c_[param, res[:,1]])
+        # Test consistency of the min and profile codes
+        if (abs(chi2(x0)-chi20)>0.02):
+          raise ValueError("Inconsistency Min and Profile setups")
 
-    if min_method != 4:
-        x0 = []
-        for i in range(nummpi):
-            x0.append(np.insert(res[i,0], index, param[i]))
-        x0 = np.array(x0, dtype=object)
-        res = np.array(list(executor.map(functools.partial(prf,
-                                                           index=index, 
-                                                           min_method=4,
-                                                           maxiter=maxiter,
-                                                           maxfeval=int(2500)),
-                                         x0)))
-        rnd = random.randint(0,1000)
-        out = oroot + "_" + str(rnd) + "_method_" + str(4) + "_" + name[index] + ".txt"
-        print("Output file = ", out)
-        np.savetxt(out, np.c_[param, res[:,1]])
-    executor.shutdown()
+        # 3rd: Set the parameter profile range ---------------------------------
+        start = np.zeros(model.prior.d(), dtype='float64')
+        stop  = np.zeros(model.prior.d(), dtype='float64')
+        start = x0 - factor*sigma
+        stop  = x0 + factor*sigma
+        
+        # We need to respect the YAML priors
+        bounds0 = model.prior.bounds(confidence=0.999999)
+        for i in range(model.prior.d()):
+            if (start[i] < bounds0[i][0]):
+              start[i] = bounds0[i][0]
+            if (stop[i] > bounds0[i][1]):
+              stop[i] = bounds0[i][1]
+
+        half_range = (stop[args.profile] - start[args.profile]) / 2.0
+       
+        numpts = args.numpts-1 if args.numpts%2 == 1 else args.numpts 
+      
+        param  = np.linspace(start = x0[args.profile] - half_range,
+                             stop  = x0[args.profile] + half_range,
+                             num = numpts)
+        numpts=numpts+1
+        param = np.insert(param, numpts//2, x0[args.profile])
+        
+        # 4th Print to the terminal --------------------------------------------
+        names = list(model.parameterization.sampled_params().keys()) # Cobaya Call
+        print(f"nstw (evals/Temp/walkers)={args.nstw}, "
+              f" param={names[args.profile]}\n"
+              f"profile param values = {param}")
+        
+        # 5th: Set the vectors that will hold the final result -----------------
+        xf = np.tile(x0, (numpts, 1))
+        xf[:,args.profile] = param
+
+        chi2res = np.zeros(numpts)  
+        chi2res[numpts//2] = chi20
+        
+        # 6th: run from midpoint to right --------------------------------------
+        tmp = np.array(xf[numpts//2,:], dtype='float64')
+        for i in range(numpts//2+1,numpts): 
+            tmp[args.profile] = param[i]
+            res = prf(tmp, 
+                      fixed=args.profile,
+                      nstw=int(nstw), 
+                      nwalkers=nwalkers,
+                      pool=pool,
+                      cov=cov)
+            xf[i,:] = np.insert(res, args.profile, param[i])
+            tmp = np.array(xf[i,:],dtype='float64')
+            chi2res[i] = chi2(xf[i,:])
+            print(f"Partial ({i+1}/{numpts}): params={tmp}, and chi2={chi2res[i]}")
+        
+        # 7th: run from midpoint to left ---------------------------------------
+        tmp = np.array(xf[numpts//2,:], dtype='float64')
+        for i in range(numpts//2-1, -1, -1):
+            tmp[args.profile] = param[i]
+            res = prf(tmp, 
+                      fixed=args.profile,
+                      nstw=int(nstw), 
+                      nwalkers=nwalkers,
+                      pool=pool,
+                      cov=cov)
+            xf[i,:] = np.insert(res, args.profile, param[i])
+            tmp = np.array(xf[i,:],dtype='float64')
+            chi2res[i] = chi2(xf[i,:])
+            print(f"Partial ({i+1}/{numpts}): params={tmp}, and chi2={chi2res[i]}")
+        
+        # 8th Append derived parameters ----------------------------------------
+        H0 = []
+        omm = []
+        rdrag = []
+        for d in xf:
+            tmp = model.logposterior(d, 
+                                     as_dict=True, 
+                                     make_finite=True, 
+                                     return_derived=True)
+            H0.append(tmp['derived']['H0'])
+            omm.append(tmp['derived']['omegam'])
+            rdrag.append(tmp['derived']['rdrag'])
+        xf = np.column_stack((xf, 
+                              np.array(H0,dtype='float64'), 
+                              np.array(omm,dtype='float64'),
+                              np.array(rdrag,dtype='float64'), 
+                              np.array([chi2v2(d) for d in xf], dtype='float64')))
+
+        # 9th Save output file -------------------------------------------------    
+        os.makedirs(os.path.dirname(f"{args.root}chains/"), exist_ok=True)
+        hd = [names[args.profile], "chi2"] + names + ['H0', 'omegam', 'rdrag']
+        hd = hd + list(model.info()['likelihood'].keys()) + ["prior"]
+        np.savetxt(f"{args.root}chains/{args.outroot}.{names[args.profile]}.txt",
+                   np.concatenate([np.c_[param, chi2res], xf], axis=1),
+                   fmt="%.6e",
+                   header=f"nstw (evals/Temp/walker)={args.nstw}, param={names[args.profile]}\n"+' '.join(hd),
+                   comments="# ")
+# ------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------

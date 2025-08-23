@@ -50,30 +50,27 @@ if [ -z "${IGNORE_LIPOP_LIKELIHOOD_CODE}" ]; then
   fhilipop() {
     local TF="${ECODEF:?}/${1:?}"
     
-    if [ -n "${OVERWRITE_EXISTING_LIPOP_CMB_DATA}" ]; then
+    if [ -n "${OVERWRITE_EXISTING_LIPOP_CMB_CODE}" ]; then
       rm -rf "${TF:?}"
     fi
 
     if [ ! -d "${TF:?}" ]; then
-
       cdfolder "${ECODEF:?}" || return 1;
 
-      "${GIT:?}" clone --depth ${GIT_CLONE_MAXIMUM_DEPTH:?} "${3:?}" --recursive \
-        ${1:?} >${OUT1:?} 2>${OUT2:?} || { error "${EC15:?}"; return 1; }
+      "${GIT:?}" clone --depth ${GIT_CLONE_MAXIMUM_DEPTH:?} "${3:?}" --recursive ${1:?} \
+        >>${OUT1:?} 2>>${OUT2:?} || { error "${EC15:?}"; return 1; }
     
       cdfolder "${TF:?}" || return 1;
 
-      "${GIT:?}" reset --hard "${4:?}" \
-        >${OUT1:?} 2>${OUT2:?} || { error "${EC23:?}"; return 1; }
+      "${GIT:?}" reset --hard "${4:?}" >>${OUT1:?} 2>>${OUT2:?} || { error "${EC23:?}"; return 1; }
 
-      cp "${CCIL:?}/${2:?}_changes/init.patch" "${TF:?}/${2:?}" 2>"/dev/null" \
-        || { error "CP FILE init.patch"; return 1; }
+      cp "${CCIL:?}/${2:?}_changes/init.patch" "${TF:?}/${2:?}" \
+        2>>"/dev/null" || { error "CP FILE init.patch"; return 1; }
 
       cdfolder "${TF:?}/${2:?}" || return 1;
 
-      patch -u '__init__.py' -i 'init.patch' >${OUT1:?} 2>${OUT2:?} || 
-        { error "${EC17:?}"; return 1; }
-
+      patch -u '__init__.py' -i 'init.patch' \
+        >>${OUT1:?} 2>>${OUT2:?} || { error "${EC17:?}"; return 1; }
     fi
 
     cdfolder "${ROOTDIR:?}" || return 1; 
@@ -87,31 +84,29 @@ if [ -z "${IGNORE_LIPOP_LIKELIHOOD_CODE}" ]; then
     fi
 
     if [ ! -d "${TF:?}" ]; then
-
       cdfolder "${ECODEF:?}" || return 1;
 
       "${GIT:?}" clone --depth ${GIT_CLONE_MAXIMUM_DEPTH:?} "${3:?}" --recursive \
-        ${1:?} >${OUT1:?} 2>${OUT2:?} || { error "${EC15:?}"; return 1; }
+        ${1:?} >>${OUT1:?} 2>>${OUT2:?} || { error "${EC15:?}"; return 1; }
     
       cdfolder "${TF:?}" || return 1;
 
       "${GIT:?}" reset --hard "${4:?}" \
-        >${OUT1:?} 2>${OUT2:?} || { error "${EC23:?}"; return 1; }
+        >>${OUT1:?} 2>>${OUT2:?} || { error "${EC23:?}"; return 1; }
 
-      cp "${CCIL:?}/${2:?}_changes/init.patch" "${TF:?}/${2:?}" 2>"/dev/null" \
-        || { error "CP FILE init.patch"; return 1; }
+      cp "${CCIL:?}/${2:?}_changes/init.patch" "${TF:?}/${2:?}" \
+        2>>"/dev/null" || { error "CP FILE init.patch"; return 1; }
 
-      cp "${CCIL:?}/${2:?}_changes/lollipop.patch" "${TF:?}/${2:?}" 2>"/dev/null" \
-        || { error "CP FILE lollipop.patch"; return 1; }
+      cp "${CCIL:?}/${2:?}_changes/lollipop.patch" "${TF:?}/${2:?}" \
+        2>>"/dev/null" || { error "CP FILE lollipop.patch"; return 1; }
 
       cdfolder "${TF:?}/${2:?}" || return 1;
 
-      patch -u '__init__.py' -i 'init.patch' >${OUT1:?} 2>${OUT2:?} || 
-        { error "${EC17:?}"; return 1; }
+      patch -u '__init__.py' -i 'init.patch' \
+        >>${OUT1:?} 2>>${OUT2:?} || { error "${EC17:?}"; return 1; }
 
-      patch -u 'lollipop.py' -i 'lollipop.patch' >${OUT1:?} 2>${OUT2:?} || 
-        { error "${EC17:?}"; return 1; }
-  
+      patch -u 'lollipop.py' -i 'lollipop.patch' \
+        >>${OUT1:?} 2>>${OUT2:?} || { error "${EC17:?}"; return 1; }
     fi
 
     cdfolder "${ROOTDIR:?}" || return 1; 

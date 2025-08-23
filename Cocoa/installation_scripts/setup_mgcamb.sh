@@ -77,10 +77,8 @@ if [ -z "${IGNORE_MGCAMB_CODE}" ]; then
   # In case this script is called twice ----------------------------------------
   # ----------------------------------------------------------------------------
   if [ -n "${OVERWRITE_EXISTING_MGCAMB_CODE}" ]; then
-    
     rm -rf "${ECODEF:?}/${TFOLDER:?}"
     rm -rf "${PACKDIR:?}"
-  
   fi
 
   # ----------------------------------------------------------------------------
@@ -90,30 +88,24 @@ if [ -z "${IGNORE_MGCAMB_CODE}" ]; then
 
     cdfolder "${ECODEF:?}" || { cdroot; return 1; }
 
-    "${CURL:?}" -fsS "${URL:?}" \
-      >${OUT1:?} 2>${OUT2:?} || { error "${EC27:?} (URL=${URL:?})"; return 1; }
-
     "${GIT:?}" clone "${URL:?}" --depth ${GIT_CLONE_MAXIMUM_DEPTH:?} \
       --recursive "${TFOLDER:?}" \
-      >${OUT1:?} 2>${OUT2:?} || { error "${EC15:?}"; return 1; }
+    >>${OUT1:?} 2>>${OUT2:?} || { error "${EC15:?}"; return 1; }
     
     cdfolder "${ECODEF:?}/${TFOLDER:?}" || { cdroot; return 1; }
 
     if [ -n "${MGCAMB_GIT_COMMIT}" ]; then
       "${GIT:?}" checkout "${MGCAMB_GIT_COMMIT:?}" \
-        >${OUT1:?} 2>${OUT2:?} || { error "${EC16:?}"; return 1; }
+      >>${OUT1:?} 2>>${OUT2:?} || { error "${EC16:?}"; return 1; }
     fi
     
     # ---------------------------------------------------------------------------
     # move MGCAMB folders
     # ---------------------------------------------------------------------------
-    
     mv "${ECODEF:?}/${TFOLDER:?}/MGCAMB" "${ECODEF:?}"
     
     if [ "MGCAMB/" != "${FOLDER:?}" ] && [ "MGCAMB" != "${FOLDER:?}" ] ; then
-
       mv "${ECODEF:?}/MGCAMB" ${FOLDER:?}
-    
     fi
 
     rm -rf "${ECODEF:?}/${TFOLDER:?}"
@@ -145,11 +137,10 @@ if [ -z "${IGNORE_MGCAMB_CODE}" ]; then
     do
       cdfolder "${PACKDIR:?}/${TFOLDER[$i]}" || return 1
 
-      cpfolder "${CHANGES:?}/${TFOLDER[$i]}${TFILEP[$i]:?}" . \
-        2>${OUT2:?} || return 1;
+      cpfolder "${CHANGES:?}/${TFOLDER[$i]}${TFILEP[$i]:?}" . 2>>${OUT2:?} || return 1;
 
       patch -u "${TFILE[$i]:?}" -i "${TFILEP[$i]:?}" >${OUT1:?} \
-        2>${OUT2:?} || { error "${EC17:?} (${TFILE[$i]:?})"; return 1; }
+      2>>${OUT2:?} || { error "${EC17:?} (${TFILE[$i]:?})"; return 1; }
     done
   
   fi
@@ -158,12 +149,8 @@ if [ -z "${IGNORE_MGCAMB_CODE}" ]; then
   
   pbottom "INSTALLING ${PRINTNAME:?}" || return 1
   
-  # ---------------------------------------------------------------------------
-
   unset_all || return 1
-  
 fi
-
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------

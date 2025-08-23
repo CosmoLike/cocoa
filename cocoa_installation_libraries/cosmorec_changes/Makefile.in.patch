@@ -14,7 +14,7 @@
  #===============================================================================
 -CXXFLAGS = -Wall -pedantic -O2
 -#CXXFLAGS = -Wall -pedantic -pg
-+CXXFLAGS = -fPIC -Wall -pedantic -O2
++CXXFLAGS = -std=c++14 -fPIC -Wall -pedantic -O2
  
  #===============================================================================
  # linker flags

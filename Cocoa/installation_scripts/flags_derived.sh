@@ -3,10 +3,10 @@
 # ----------------------------------------------------------------------------
 # ----------------------------------------------------------------------------
 
-#ulimit -s unlimited
 export COBAYA_PACKAGES_PATH=$ROOTDIR/external_modules
 
 # ------------------------------------------------------------------------------
+
 if [ -z "${IGNORE_CMAKE_INSTALLATION}" ]; then
     export CMAKE_ROOT=${ROOTDIR:?}/.local/bin/cmake
     export CMAKE=${ROOTDIR:?}/.local/bin/cmake
@@ -15,6 +15,7 @@ else
 fi
 
 # ------------------------------------------------------------------------------
+
 if [ -n "${IGNORE_CPP_INSTALLATION}" ]; then
   export IGNORE_CPP_BOOST_INSTALLATION=1
   export IGNORE_CPP_ARMA_INSTALLATION=1
@@ -23,6 +24,7 @@ if [ -n "${IGNORE_CPP_INSTALLATION}" ]; then
 fi
 
 # ------------------------------------------------------------------------------
+
 if [ -n "${IGNORE_C_INSTALLATION}" ]; then
   export IGNORE_C_CFITSIO_INSTALLATION=1
   export IGNORE_C_FFTW_INSTALLATION=1
@@ -30,11 +32,13 @@ if [ -n "${IGNORE_C_INSTALLATION}" ]; then
 fi
 
 # ------------------------------------------------------------------------------
+
 if [ -n "${IGNORE_FORTRAN_INSTALLATION}" ]; then
   export IGNORE_FORTRAN_LAPACK_INSTALLATION=1
 fi
 
 # ------------------------------------------------------------------------------
+
 if [ -n "${DEBUG_SKIP_FILE_DECOMPRESSION_SETUP_COCOA}" ]; then
   export SKIP_DECOMM_CORE_PACKAGES=1
   export SKIP_DECOMM_ACT=1
@@ -50,18 +54,20 @@ if [ -n "${DEBUG_SKIP_FILE_DECOMPRESSION_SETUP_COCOA}" ]; then
 fi
 
 # ------------------------------------------------------------------------------
+
 if [ -n "${GLOBAL_PACKAGES_LOCATION}" ]; then
   export GLOBAL_PACKAGES_INCLUDE=$GLOBAL_PACKAGES_LOCATION/include
   export GLOBAL_PACKAGES_LIB=$GLOBAL_PACKAGES_LOCATION/lib
 fi
 
 # ------------------------------------------------------------------------------
+
 export PYTHON3="${ROOTDIR}/.local/bin/python3"
 export PIP3="${PYTHON3:?} -m pip"
 export COBAYA_PACKAGES_PATH=external_modules
 
 # ------------------------------------------------------------------------------
-# ------------------------------------------------------------------------------
+
 if [ -n "${COSMOLIKE_DEBUG_MODE}" ]; then
     export SPDLOG_LEVEL=debug
 else
@@ -77,7 +83,7 @@ ptop() {
 }
 
 pbottom() {
-  echo -e "\033[1;34m  \e[4m${1} DONE\033[0m"
+  echo -e "\033[1;34m  \033[4m${1} DONE\033[0m"
 }
 
 ptop2() {
@@ -85,7 +91,7 @@ ptop2() {
 }
 
 pbottom2() {
-  echo -e "\033[1;44m\e[4m${1} DONE\033[0m"
+  echo -e "\033[1;44m\033[4m${1} DONE\033[0m"
 }
 
 pfail() {
@@ -100,21 +106,25 @@ cdroot() {
 
 if [ -z "${COCOA_OUTPUT_VERBOSE}" ]; then
   export OUT1="/dev/null"; export OUT2="/dev/null"
-  export MNT="${MAKE_NUM_THREADS:-1}"; 
-  [[ ${MNT} == +([0-9]) ]] || export MNT=1
+  #export MNT="${MAKE_NUM_THREADS:-1}"; 
+  #[[ ${MNT} == +([0-9]) ]] || export MNT=1
+  # USE REGEX and not glob (macos friendly)
+  export MNT="${MAKE_NUM_THREADS:-1}"
+  [[ $MNT =~ ^[0-9]+$ ]] || MNT=1
+  export MNT
 else
   export OUT1="/dev/tty"; export OUT2="/dev/tty"
   export MNT=1
 fi
 
 fail_script_msg () {
-  local MSG="\033[0;31m        (${1:-"empty arg"}) we cannot run \e[3m"
+  local MSG="\033[0;31m        (${1:-"empty arg"}) we cannot run \033[3m"
   local MSG2="\033[0m"
   echo -e "${MSG} ${2:-"empty arg"} ${MSG2}"
 }
 
 warning_script_msg () {
-  local MSG="\033[0;31m        (${1:-"empty arg"}) warning: \e[3m"
+  local MSG="\033[0;31m        (${1:-"empty arg"}) warning: \033[3m"
   local MSG2="\033[0m"
   echo -e "${MSG} ${2:-"empty arg"} ${MSG2}"
 }
@@ -198,10 +208,6 @@ export EC36="FILE DOES NOT EXIST"
 export EC37="ENV VARIABLE NOT PROPERLY DEFINED"
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
-
-export COCOA_RUN_EVALUATE="mpirun -n 1 --oversubscribe --mca btl vader,tcp,self --bind-to core:overload-allowed --rank-by core --map-by numa:pe=4 cobaya-run"
-
-export COCOA_RUN_MCMC="mpirun -n 4 --oversubscribe --mca btl vader,tcp,self --bind-to core:overload-allowed --rank-by core --map-by numa:pe=4 cobaya-run"
 
 # ------------------------------------------------------------------------------
 # DEBUG THE COMPILATION OF PREREQUISITES PACKAGES. IF YOU NEED TO RUN ----------

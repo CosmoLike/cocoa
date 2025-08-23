@@ -70,45 +70,31 @@ if [ -z "${IGNORE_ACTDR4_CODE}" ]; then
   # In case this script is called twice ---------------------------------------
   # ---------------------------------------------------------------------------
   if [ -n "${OVERWRITE_EXISTING_ACTDR4_CMB_CODE}" ]; then
-
     rm -rf "${PACKDIR:?}"
-
   fi
 
   if [ ! -d "${PACKDIR:?}" ]; then
-
     # --------------------------------------------------------------------------
     # Clone from original repo -------------------------------------------------
     # --------------------------------------------------------------------------
     cdfolder "${ECODEF:?}" || { cdroot; return 1; }
 
-    "${CURL:?}" -fsS "${URL:?}" \
-      >${OUT1:?} 2>${OUT2:?} || { error "${EC27:?} (URL=${URL:?})"; return 1; }
-
     "${GIT:?}" clone "${URL:?}" "${FOLDER:?}" \
-      >${OUT1:?} 2>${OUT2:?} || { error "${EC15:?}"; return 1; }
+      >>${OUT1:?} 2>>${OUT2:?} || { error "${EC15:?}"; return 1; }
     
     cdfolder "${PACKDIR}" || { cdroot; return 1; }
 
     if [ -n "${ACTDR4_GIT_COMMIT}" ]; then
       "${GIT:?}" checkout "${ACTDR4_GIT_COMMIT:?}" \
-        >${OUT1:?} 2>${OUT2:?} || { error "${EC16:?}"; return 1; }
+        >>${OUT1:?} 2>>${OUT2:?} || { error "${EC16:?}"; return 1; }
     fi
-
     # --------------------------------------------------------------------------
     # Patch code to be compatible w/ COCOA environment -------------------------
     # --------------------------------------------------------------------------
     # T = TMP
-    declare -a TFOLDER=("pyactlike/" 
-                       ) # If nonblank, path must include /
-    
-    # T = TMP
-    declare -a TFILE=("like.py" 
-                     )
-
-    #T = TMP, P = PATCH
-    declare -a TFILEP=("like.patch" 
-                      )
+    declare -a TFOLDER=("pyactlike/") # If nonblank, path must include /
+    declare -a TFILE=("like.py")
+    declare -a TFILEP=("like.patch")
     # AL = Array Length
     AL=${#TFOLDER[@]}
 
@@ -117,24 +103,19 @@ if [ -z "${IGNORE_ACTDR4_CODE}" ]; then
       cdfolder "${PACKDIR:?}/${TFOLDER[$i]}" || return 1
 
       cpfolder "${CHANGES:?}/${TFOLDER[$i]}${TFILEP[$i]:?}" . \
-        2>${OUT2:?} || return 1;
+        2>>${OUT2:?} || return 1;
 
       patch -u "${TFILE[$i]:?}" -i "${TFILEP[$i]:?}" >${OUT1:?} \
-        2>${OUT2:?} || { error "${EC17:?} (${TFILE[$i]:?})"; return 1; }
+        2>>${OUT2:?} || { error "${EC17:?} (${TFILE[$i]:?})"; return 1; }
     done
-
   fi
   
   cdfolder "${ROOTDIR}" || return 1;
   
   pbottom 'SETUP ACTDR4' || return 1
-  
-  # ---------------------------------------------------------------------------
 
   unset_all || return 1
-  
 fi
-
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------

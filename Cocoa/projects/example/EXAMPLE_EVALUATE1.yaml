@@ -3,6 +3,16 @@ debug: false
 timing: true
 
 likelihood:
+  planck_2018_highl_plik.TTTEEE_lite:
+    path: ./external_modules/
+    clik_file: plc_3.0/hi_l/plik_lite/plik_lite_v22_TTTEEE.clik
+  planck_2018_lowl.TT:
+    path: ./external_modules
+  # choose only one low ell EE likelihood
+  planck_2018_lowl.EE:
+    path: ./external_modules
+  planck_2018_lowl.EE_sroll2: null 
+  # choose only one SN
   sn.pantheon:
     path: ./external_modules/data/sn_data
   sn.roman_c:
@@ -85,9 +95,8 @@ params:
     value: 0.06
   tau:
     prior:
-      dist: norm
-      loc: 0.0544
-      scale: 0.0073
+      min: 0.03
+      max: 0.1
     ref:
       dist: norm
       loc: 0.055
@@ -194,7 +203,7 @@ theory:
     path: ./external_modules/code/CAMB
     use_renames: True
     extra_args:
-      AccuracyBoost: 1.10
+      AccuracyBoost: 1.05
       lens_potential_accuracy: 2
       num_massive_neutrinos: 1
       nnu: 3.046
@@ -211,5 +220,6 @@ sampler:
       tau: 0.0543
       w0pwa: -0.968859
       w: -0.909098
+      A_planck: 1.00138
 
 output: ./projects/example/chains/EXAMPLE_EVALUATE1

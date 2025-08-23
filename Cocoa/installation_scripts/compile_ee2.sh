@@ -61,26 +61,26 @@ if [ -z "${IGNORE_EUCLID_EMULATOR_V2_CODE}" ]; then
   rm -rf "${PLIB:?}"/euclidemu2-*
   rm -rf "${PLIB:?}"/euclidemu2.cpython*
   # ---------------------------------------------------------------------------  
- 
+
   cdfolder "${PACKDIR}" || return 1
 
   #prevent all compile_XXX.sh from using the internet (run @compute nodes)
   #FROM: https://github.com/pypa/pip/issues/12050
   #That is why we use --no-dependencies --no-index --no-build-isolation
-  (export LD_LIBRARY_PATH=${CONDA_PREFIX:?}/lib:$LD_LIBRARY_PATH && \
-   export LD_LIBRARY_PATH=${ROOTDIR:?}/.local/lib:$LD_LIBRARY_PATH && \
-   env CXX="${CXX_COMPILER:?}" CC="${C_COMPILER:?}" ${PIP3:?} install \
-    ${PACKDIR:?} --no-dependencies --prefix="${ROOTDIR:?}/.local" --no-index \
-    --no-build-isolation >${OUT1:?} 2>${OUT2:?} || { error "${EC3:?}"; return 1; })
+  (env CXX="${CXX_COMPILER:?}" CC="${C_COMPILER:?}" \
+    ${PIP3:?} install ${PACKDIR:?} \
+      --no-dependencies \
+      --prefix="${ROOTDIR:?}/.local" \
+      --no-index \
+      --no-build-isolation
+  ) >>${OUT1:?} 2>>${OUT2:?} || { error "${EC3:?}"; return 1; }
 
   pbottom "COMPILING EUCLID EMULATOR V2" || return 1
 
   cdfolder "${ROOTDIR}" || return 1;
 
-  unset_all || return 1
-  
+  unset_all || return 1 
 fi
-
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------

@@ -1,4 +1,5 @@
 #include <fftw3.h>
+#include <gsl/gsl_interp.h>
 #include <gsl/gsl_spline.h>
 #include <gsl/gsl_integration.h>
 #include <gsl/gsl_matrix.h>
@@ -22,6 +23,8 @@ typedef struct
   double dPmin;
   double dPmax;
 } bin_avg;
+
+gsl_interp* malloc_gsl_interp(const int n);
 
 gsl_spline* malloc_gsl_spline(const int n);
 

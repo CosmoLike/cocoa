@@ -82,13 +82,10 @@ if [ -z "${IGNORE_COSMOREC_CODE}" ]; then
   # In case this script is called twice ---------------------------------------
   # ---------------------------------------------------------------------------
   if [ -n "${OVERWRITE_EXISTING_COSMOREC_CODE}" ]; then
-
     rm -rf "${PACKDIR:?}"
     rm -f  "${ECODEF:?}/${FILE}"
     rm -rf "${ECODEF:?}/${FILENAME}"
-  
   fi
-
   # ----------------------------------------------------------------------------
   # Clone from original repo ---------------------------------------------------
   # ----------------------------------------------------------------------------
@@ -96,14 +93,11 @@ if [ -z "${IGNORE_COSMOREC_CODE}" ]; then
   
     cdfolder "${ECODEF:?}" || { cdroot; return 1; }
 
-    "${WGET:?}" "${URL:?}" -q --show-progress --progress=bar:force || 
-      { error "${EC24:?}"; return 1; }
+    "${WGET:?}" "${URL:?}" -q --show-progress --progress=bar:force || { error "${EC24:?}"; return 1; }
     
-    tar -zxvf "${FILE:?}" \
-      >${OUT1:?} 2>${OUT2:?} || { error "${EC25:?}"; return 1; }
+    tar -zxvf "${FILE:?}" >>${OUT1:?} 2>${OUT2:?} || { error "${EC25:?}"; return 1; }
 
-    mv "${FILENAME:?}" "${FOLDER:?}" \
-      >${OUT1:?} 2>${OUT2:?} || { error "${EC30:?}"; return 1; }
+    mv "${FILENAME:?}" "${FOLDER:?}" >>${OUT1:?} 2>>${OUT2:?} || { error "${EC30:?}"; return 1; }
 
     rm -f  "${ECODEF:?}/${FILE}"
     rm -rf "${ECODEF:?}/${FILENAME}"
@@ -111,18 +105,20 @@ if [ -z "${IGNORE_COSMOREC_CODE}" ]; then
     # --------------------------------------------------------------------------
     # We patch the files below so they use the right compilers -----------------
     # --------------------------------------------------------------------------
-    # T = TMP
-    declare -a TFOLDER=("" 
-                       ) # If nonblank, path must include /
+    # PREFIX: T = TMP, P = PATCH, AL = Array Length
+    declare -a TFOLDER=("") # If nonblank, path must include /
     
-    # T = TMP
     declare -a TFILE=("Makefile.in")
 
-    #T = TMP, P = PATCH
-    declare -a TFILEP=("Makefile.in.patch" 
-                      )
+    case "$(uname -s)" in
+      Linux)
+        declare -a TFILEP=("Makefile.in.patch")
+        ;;
+      Darwin)
+        declare -a TFILEP=("MakefileOSX.in.patch")
+        ;;
+    esac
 
-    # AL = Array Length
     AL=${#TFOLDER[@]}
 
     for (( i=0; i<${AL}; i++ ));
@@ -142,12 +138,8 @@ if [ -z "${IGNORE_COSMOREC_CODE}" ]; then
   
   pbottom "INSTALLING ${PRINTNAME:?}" || return 1
   
-  # ----------------------------------------------------------------------------
-
   unset_all || return 1
-  
 fi
-
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------

@@ -66,8 +66,7 @@ if [ -z "${IGNORE_SIMONS_OBSERVATORY_CMB_DATA}" ]; then
   fi
   
   if [ ! -d "${PACKDIR:?}" ]; then
-    
-    mkdir -p "${PACKDIR:?}" >${OUT1:?} 2>${OUT2:?} || { error "${EC20:?}"; return 1; }
+    mkdir -p "${PACKDIR:?}" >${OUT1:?} 2>>${OUT2:?} || { error "${EC20:?}"; return 1; }
     
     cdfolder "${EDATAF:?}" || return 1
   
@@ -78,12 +77,11 @@ if [ -z "${IGNORE_SIMONS_OBSERVATORY_CMB_DATA}" ]; then
       FILE="${x}.tar.gz"
 
       if [ ! -e "${FILE:?}" ]; then
-        "${WGET:?}" "${URL}/${FILE:?}" -q --show-progress --progress=bar:force \
-          || { error "${EC24:?}"; return 1; }
+        "${WGET:?}" "${URL}/${FILE:?}" -q --show-progress --progress=bar:force || { error "${EC24:?}"; return 1; }
       fi
 
       TMP=$(tar -tf "${FILE:?}" | head -1 | cut -f1 -d"/")
-      tar -zxvf "${FILE:?}" >${OUT1:?} 2>${OUT2:?} || { error "${EC25:?}"; return 1; }
+      tar -zxvf "${FILE:?}" >${OUT1:?} 2>>${OUT2:?} || { error "${EC25:?}"; return 1; }
       mv "${TMP:?}" "${PACKDIR:?}"
     done
   fi
@@ -93,9 +91,7 @@ if [ -z "${IGNORE_SIMONS_OBSERVATORY_CMB_DATA}" ]; then
   cdfolder "${ROOTDIR}" || return 1;
 
   unset_all || return 1
-  
 fi
-
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------

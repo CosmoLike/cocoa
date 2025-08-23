@@ -71,15 +71,14 @@ if [ -z "${IGNORE_SIMONS_OBSERVATORY_LIKELIHOOD_CODE}" ]; then
   if [[ ! -d "${PACKDIR:?}" ]]; then
     cdfolder "${ECODEF}" || return 1;
 
-    "${GIT:?}" clone "${URL:?}" --depth ${GIT_CLONE_MAXIMUM_DEPTH:?} \
-      --recursive "${FOLDER:?}" \
-      >${OUT1:?} 2>${OUT2:?} || { error "${EC15:?}"; return 1; }
+    "${GIT:?}" clone "${URL:?}" --depth ${GIT_CLONE_MAXIMUM_DEPTH:?} --recursive "${FOLDER:?}" \
+    >>${OUT1:?} 2>${OUT2:?} || { error "${EC15:?}"; return 1; }
 
     cdfolder "${PACKDIR}" || return 1;
 
     if [ -n "${SO_SYSLIB_GIT_COMMIT}" ]; then
       "${GIT:?}" checkout "${SO_SYSLIB_GIT_COMMIT:?}" \
-        >${OUT1:?} 2>${OUT2:?} || { error "${EC16:?}"; return 1; }
+      >>${OUT1:?} 2>>${OUT2:?} || { error "${EC16:?}"; return 1; }
     fi
   fi
 
@@ -104,23 +103,23 @@ if [ -z "${IGNORE_SIMONS_OBSERVATORY_LIKELIHOOD_CODE}" ]; then
     cdfolder "${ECODEF}" || return 1;
 
     "${GIT:?}" clone "${URL:?}" --recursive "${FOLDER:?}" \
-      >${OUT1:?} 2>${OUT2:?} || { error "${EC15:?}"; return 1; }
+    >>${OUT1:?} 2>>${OUT2:?} || { error "${EC15:?}"; return 1; }
 
     cdfolder "${PACKDIR}" || return 1;
 
     if [ -n "${SO_MFLIKE_GIT_COMMIT}" ]; then
       "${GIT:?}" checkout "${SO_MFLIKE_GIT_COMMIT:?}" \
-        >${OUT1:?} 2>${OUT2:?} || { error "${EC16:?}"; return 1; }
+      >>${OUT1:?} 2>>${OUT2:?} || { error "${EC16:?}"; return 1; }
     fi
 
     # PATCH MKFLIKE
     cdfolder "${PACKDIR:?}/mflike"|| return 1;
 
     cp "${CCCOB:?}/${COBLIKE:?}/mflike/mflike.patch" "${PACKDIR:?}/mflike" \
-      2>"/dev/null" || { error "CP FILE mflike.patch"; return 1; }
+    2>>"/dev/null" || { error "CP FILE mflike.patch"; return 1; }
 
     patch -u "mflike.py" -i "mflike.patch" >${OUT1:?} \
-        2>${OUT2:?} || { error "${EC17:?} (mflike.patch)"; return 1; }
+    2>>${OUT2:?} || { error "${EC17:?} (mflike.patch)"; return 1; }
   fi
 
   pbottom "SETUP SIMONS OBSERVATORY MFLIKE" || return 1;
@@ -128,9 +127,7 @@ if [ -z "${IGNORE_SIMONS_OBSERVATORY_LIKELIHOOD_CODE}" ]; then
   cdfolder "${ROOTDIR}" || return 1
 
   unset_all || return 1;
-  
 fi
-
 #-------------------------------------------------------------------------------
 #-------------------------------------------------------------------------------
 #-------------------------------------------------------------------------------

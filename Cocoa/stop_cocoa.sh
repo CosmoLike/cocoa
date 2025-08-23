@@ -150,17 +150,27 @@ if [[ -z "${IGNORE_EMULTRF_CODE}" ]]; then
     rm -f "${COBTH:?}/${TMP:?}"
   fi
 
-  TMP="emulsn"
-  if [[ -L "${COBTH:?}/${TMP:?}" ]]; then
-    rm -f "${COBTH:?}/${TMP:?}"
-  fi
-
   TMP="emultheta"
   if [[ -L "${COBTH:?}/${TMP:?}" ]]; then
     rm -f "${COBTH:?}/${TMP:?}"
   fi
 
   TMP="emulrdrag"
+  if [[ -L "${COBTH:?}/${TMP:?}" ]]; then
+    rm -f "${COBTH:?}/${TMP:?}"
+  fi
+
+  TMP="emul_cosmic_shear"
+  if [[ -L "${COBTH:?}/${TMP:?}" ]]; then
+    rm -f "${COBTH:?}/${TMP:?}"
+  fi
+
+  TMP="emul_ggl"
+  if [[ -L "${COBTH:?}/${TMP:?}" ]]; then
+    rm -f "${COBTH:?}/${TMP:?}"
+  fi
+  
+  TMP="emul_wtheta"
   if [[ -L "${COBTH:?}/${TMP:?}" ]]; then
     rm -f "${COBTH:?}/${TMP:?}"
   fi

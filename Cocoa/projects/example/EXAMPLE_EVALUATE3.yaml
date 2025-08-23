@@ -1,20 +1,18 @@
 stop_at_error: False
-debug: false
+timing: True
+debug: False
 
 likelihood:
-  sn.union3: 
-    path: ./external_modules/data/sn_data
-  sn.pantheon: 
-    path: ./external_modules/data/sn_data
-  sn.pantheonplus: 
-    path: ./external_modules/data/sn_data
-  planck_2018_highl_plik.TT:
-    path: ./external_modules/
-    clik_file: plc_3.0/hi_l/plik/plik_rd12_HM_v22_TT.clik
-  sn.desy5: 
-    path: ./external_modules/data/sn_data
-  bao.desi_2024_bao_all:
-    path: ./external_modules/data/
+  SPT3G_Y1.TTTEEE: 
+    clik_file: spt3g_Y1_v1_TTTEEE.clik
+    # uncomment the 3 next lines to compute TEEE only likelihood
+    SPT3G_2018_TTTEEE_spectra_to_fit : "90_Tx90_E 90_Tx150_E 90_Tx220_E 150_Tx150_E 150_Tx220_E 220_Tx220_E 90_Ex90_E 90_Ex150_E 90_Ex220_E 150_Ex150_E 150_Ex220_E 220_Ex220_E"
+    SPT3G_2018_TTTEEE_spectra_to_fit_bin_min : "1 1 1 1 1 1 1 1 1 1 1 1"
+    SPT3G_2018_TTTEEE_spectra_to_fit_bin_max : "44 44 44 44 44 44 44 44 44 44 44 44"
+  act_dr6_lenslike.ACTDR6LensLike:
+     lens_only: False
+     lmax: 4000
+     variant: act_baseline
 
 params:
   logA:
@@ -23,9 +21,9 @@ params:
       max: 3.91
     ref:
       dist: norm
-      loc: 3.0448
-      scale: 0.05
-    proposal: 0.05
+      loc: 3.05
+      scale: 0.001
+    proposal: 0.001
     latex: \log(10^{10} A_\mathrm{s})
     drop: true
   As:
@@ -33,13 +31,13 @@ params:
     latex: A_\mathrm{s}
   ns:
     prior:
-      min: 0.92
-      max: 1.05
+      min: 0.8
+      max: 1.2
     ref:
       dist: norm
-      loc: 0.96605
-      scale: 0.005
-    proposal: 0.005
+      loc: 0.965
+      scale: 0.004
+    proposal: 0.002
     latex: n_\mathrm{s}
   theta_MC_100:
     prior:
@@ -48,8 +46,8 @@ params:
     ref:
       dist: norm
       loc: 1.04109
-      scale: 0.001
-    proposal: 0.001
+      scale: 0.0004
+    proposal: 0.0002
     latex: 100\theta_\mathrm{MC}
     drop: true
     renames: theta
@@ -62,23 +60,23 @@ params:
     max: 100
   omegabh2:
     prior:
-      min: 0.01
-      max: 0.04
+      min: 0.005
+      max: 0.1
     ref:
       dist: norm
-      loc: 0.022383
-      scale: 0.005
-    proposal: 0.005
+      loc: 0.0224
+      scale: 0.0001
+    proposal: 0.0001
     latex: \Omega_\mathrm{b} h^2
   omegach2:
     prior:
-      min: 0.06
-      max: 0.2
+      min: 0.001
+      max: 0.99
     ref:
       dist: norm
-      loc: 0.12011
-      scale: 0.03
-    proposal: 0.03
+      loc: 0.12
+      scale: 0.001
+    proposal: 0.0005
     latex: \Omega_\mathrm{c} h^2
   mnu:
     value: 0.06
@@ -145,63 +143,37 @@ params:
   A:
     derived: 'lambda As: 1e9*As'
     latex: 10^9 A_\mathrm{s}
+  clamp:
+    derived: 'lambda As, tau: 1e9*As*np.exp(-2*tau)'
+    latex: 10^9 A_\mathrm{s} e^{-2\tau}
   age:
     latex: '{\rm{Age}}/\mathrm{Gyr}'
   rdrag:
     latex: r_\mathrm{drag}
   yheused:
     latex: Y_P^\mathrm{BBN}
-  omegan2:
-    latex: \Omega_\mathrm{\\nu} h^2
-  omegan:
-    derived: 'lambda omegan2, H0: omegan2/((H0/100)**2)'
-    latex: \Omega_\mathrm{\\nu}
-  zstar:
-    latex: z_*
-  rstar:
-    latex: r_*
-  thetastar:
-    latex: 100\theta_*
-  DAstar:
-    latex: D_\mathrm{A}/\mathrm{Gpc}
-  zdrag:
-    latex: z_\mathrm{drag}
-  kd:
-    latex: k_\mathrm{D}
-  thetad:
-    latex: 100\theta_\mathrm{D}
-  zeq:
-    latex: z_\mathrm{eq}
-  keq:
-    latex: k_\mathrm{eq}
-  thetaeq:
-    latex: 100\theta_\mathrm{eq}
-  thetarseq:
-    latex: 100\theta_\mathrm{s,eq}
-  DHBBN:
-    derived: "lambda DH: 10**5*DH"
-    latex: 10^5 \mathrm{D}/\mathrm{H}
-  zrei:
-    latex: z_\mathrm{re}
-  nrun:
-    value: 0.0
-    latex: n_\mathrm{run}
-  nrunrun:
-    value: 0.0
-    latex: n_\mathrm{run,run}
-  omegak:
-    value: 0.0
-    latex: \Omega_k
-    
+
 theory:
   camb:
     path: ./external_modules/code/CAMB
-    use_renames: True
     extra_args:
-      AccuracyBoost: 1.05
+      kmax: 10
+      #k_per_logint: 130
+      nonlinear: true
+      halofit_version: takahashi
+      dark_energy_model: ppf
+      DoLateRadTruncation: False
+      lmax: 5000
+      lens_potential_accuracy: 3
+      AccuracyBoost: 1.2
+      lSampleBoost: 1.0
+      lAccuracyBoost: 1.2
       num_massive_neutrinos: 1
       nnu: 3.046
-      dark_energy_model: ppf
+      accurate_massive_neutrino_transfers: false
+      min_l_logl_sampling: 6000
+      #recombination_model: CosmoRec
+      #recombination_model: HyRec
 
 sampler:
   evaluate:
@@ -210,24 +182,42 @@ sampler:
       ns: 0.96605
       theta_MC_100: 1.04088
       omegabh2: 0.022383
-      omegach2: 0.118
+      omegach2: 0.12011
       tau: 0.0543
-      w0pwa: -0.999
-      w: -0.999
-      A_planck: 1.00138
-      calib_100T: 1.00136
-      calib_217T: 0.997534
-      A_cib_217: 74.4119
-      xi_sz_cib: 0.127483
-      A_sz: 5.954
-      ksz_norm: 2.93033
-      gal545_A_100: 7.06323
-      gal545_A_143: 8.49817
-      gal545_A_143_217: 23.3975
-      gal545_A_217: 78.1438
-      ps_A_100_100: 222.559
-      ps_A_143_143: 60.2773
-      ps_A_143_217: 30.2718
-      ps_A_217_217: 109.975
-    
+      w0pwa: -0.968859
+      w: -0.909098
+      Kappa: 0.000542926
+      Tcal90: 0.991114
+      Tcal150: 0.985064
+      Tcal220: 0.999315
+      Ecal90: 0.989296
+      Ecal150: 0.999177
+      Ecal220: 1.01436
+      EE_Poisson_90x90: 0.0319273
+      EE_Poisson_90x150: 0.0206496
+      EE_Poisson_90x220: 0.0157639
+      EE_Poisson_150x150: 0.0170127
+      EE_Poisson_150x220: 0.0434801
+      EE_Poisson_220x220: 0.0524791
+      EE_PolGalDust_Amp: 0.0639372
+      EE_PolGalDust_Alpha: -2.42809
+      EE_PolGalDust_Beta: 1.48396
+      TE_PolGalDust_Amp: 0.180636
+      TE_PolGalDust_Alpha: -2.41541
+      TE_PolGalDust_Beta: 1.46023
+      TT_Poisson_90x90: 41.0994
+      TT_Poisson_90x150: 21.7638
+      TT_Poisson_90x220: 15.5607
+      TT_Poisson_150x150: 18.3752
+      TT_Poisson_150x220: 30.4297
+      TT_Poisson_220x220: 73.1095
+      TT_GalCirrus_Amp: 2.08048
+      TT_GalCirrus_Alpha: -2.4864
+      TT_GalCirrus_Beta: 1.64493
+      TT_CIBClustering_Amp: 3.1618
+      TT_CIBClustering_Beta: 2.64788
+      TT_tSZ_Amp: 3.54295
+      TT_tSZ_CIB_corr: 0.164791
+      TT_kSZ_Amp: 2.80885
+
 output: ./projects/example/chains/EXAMPLE_EVALUATE3

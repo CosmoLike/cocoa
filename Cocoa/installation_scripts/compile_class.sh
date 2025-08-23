@@ -86,29 +86,21 @@ if [ -z "${IGNORE_CLASS_CODE}" ]; then
   # Delete folder in case this script is called twice
   # --------------------------------------------------------------------------- 
   rm -rf "${PACKDIR:?}/include"
-
   # ---------------------------------------------------------------------------
   
   cpfolder "${PACKDIR:?}/include2" "${PACKDIR:?}/include" || return 1;
 
-  (export LD_LIBRARY_PATH=${CONDA_PREFIX:?}/lib:$LD_LIBRARY_PATH && \
-   export LD_LIBRARY_PATH=${ROOTDIR:?}/.local/lib:$LD_LIBRARY_PATH && \
-   CC="${C_COMPILER:?}" PYTHON=${PYTHON3:?} make all \
-   >${OUT1:?} 2>${OUT2:?} || { error "${EC7:?}"; return 1; })
+  (CC="${C_COMPILER:?}" PYTHON=${PYTHON3:?} make all
+  )>>${OUT1:?} 2>>${OUT2:?} || { error "${EC7:?}"; return 1; }
    
   cdfolder "${PACKDIR}/python" || return 1
 
-  (export LD_LIBRARY_PATH=${CONDA_PREFIX:?}/lib:$LD_LIBRARY_PATH && \
-   export LD_LIBRARY_PATH=${ROOTDIR:?}/.local/lib:$LD_LIBRARY_PATH && \
-   CC="${C_COMPILER:?}" ${PYTHON3:?} setup.py build \
-   >${OUT1:?} 2>${OUT2:?} || { error "${EC4:?}"; return 1; })
+  (CC="${C_COMPILER:?}" ${PYTHON3:?} setup.py build
+  )>>${OUT1:?} 2>>${OUT2:?} || { error "${EC4:?}"; return 1; }
 
   pbottom "COMPILING ${PRINTNAME:?}" || return 1
 
-  # ---------------------------------------------------------------------------
-
   unset_all || return 1
-
 fi
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
