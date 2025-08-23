@@ -237,6 +237,7 @@ Users will see a terminal like this: `$(cocoa)(.local)`. *This is a feature, not
 - **One model evaluation**:
 
   - Linux
+
         mpirun -n 1 --oversubscribe --mca pml ^ucx --mca btl vader,tcp,self \
            --bind-to core:overload-allowed --mca mpi_yield_when_idle 1 --report-bindings  \
            --rank-by slot --map-by numa:pe=${OMP_NUM_THREADS} \
@@ -248,11 +249,17 @@ Users will see a terminal like this: `$(cocoa)(.local)`. *This is a feature, not
 
 - **MCMC (Metropolis-Hastings Algorithm)**:
 
+  - Linux
+    
       mpirun -n 4 --oversubscribe --mca pml ^ucx --mca btl vader,tcp,self \
          --bind-to core:overload-allowed --mca mpi_yield_when_idle 1 --report-bindings  \
          --rank-by slot --map-by numa:pe=${OMP_NUM_THREADS} \
          cobaya-run ./projects/lsst_y1/EXAMPLE_MCMC1.yaml -f
 
+  - macOS (arm)
+
+      mpirun -n 4 --oversubscribe cobaya-run ./projects/lsst_y1/EXAMPLE_MCMC1.yaml -f
+     
 > [!Tip]
 > Cocoa provides several Cosmolike projects, not all of which are installed by default. To activate them, please take a look at the appendix [FAQ: How can we compile external modules?](#appendix_compile_separately).
 
@@ -331,16 +338,28 @@ Now, users must follow all the steps below.
 
 - **One model evaluation**:
 
-      mpirun -n 1 --oversubscribe --mca pml ^ucx --mca btl vader,tcp,self --rank-by slot \
+  - Linux
+    
+        mpirun -n 1 --oversubscribe --mca pml ^ucx --mca btl vader,tcp,self --rank-by slot \
           --bind-to core:overload-allowed --map-by slot --mca mpi_yield_when_idle 1 \
           cobaya-run ./projects/example/EXAMPLE_EMUL_EVALUATE1.yaml -f
-               
+
+  - macOS (arm)
+
+        mpirun -n 1 --oversubscribe cobaya-run ./projects/example/EXAMPLE_EMUL_EVALUATE1.yaml -f
+    
 - **MCMC (Metropolis-Hastings Algorithm)**:
 
+  - Linux
+    
       mpirun -n 4 --oversubscribe --mca pml ^ucx --mca btl vader,tcp,self --rank-by slot \
           --bind-to core:overload-allowed --map-by slot --mca mpi_yield_when_idle 1 \
           cobaya-run ./projects/example/EXAMPLE_EMUL_MCMC1.yaml -f
 
+  - macOS (arm)
+
+      mpirun -n 4 --oversubscribe cobaya-run ./projects/example/EXAMPLE_EMUL_MCMC1.yaml -f
+    
 > [!Note]
 > The examples below may require a large number of MPI workers. Before running them, it may be necessary to increase 
 > the limit of threads that can be created (at UofA HPC type `ulimit -u 1000000`), otherwise users 
@@ -348,10 +367,16 @@ Now, users must follow all the steps below.
 
 - **PolyChord**:
 
+  - Linux
+    
       mpirun -n 90 --oversubscribe --mca pml ^ucx --mca btl vader,tcp,self --rank-by slot \
           --bind-to core:overload-allowed --map-by slot --mca mpi_yield_when_idle 1 \
           cobaya-run ./projects/example/EXAMPLE_EMUL_POLY1.yaml -f
 
+  - macOS (arm)
+ 
+      mpirun -n 8 --oversubscribe cobaya-run ./projects/example/EXAMPLE_EMUL_POLY1.yaml -f
+    
 > [!Note]
 > The `Nautilis`, `Minimizer`, `Profile`, and `Emcee` scripts below contain an internally defined `yaml_string` that specifies priors, 
 > likelihoods, and the theory code, all following Cobaya Conventions.
