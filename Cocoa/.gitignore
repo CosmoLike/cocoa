@@ -1,4 +1,5 @@
 .DS_Store
+Cocoa/logs
 Cocoa/cobaya
 cobaya2/
 cobaya3/
@@ -60,6 +61,8 @@ projects/cocoa_lsst_y1
 projects/cocoa_*
 projects/edemay2022
 projects/ede*
+projects/axions*
+projects/axi*
 
 external_modules/data/XXX
 external_modules/data/des_y1
@@ -160,6 +163,12 @@ external_modules/code/emulators/soliket
 external_modules/code/emulators/so*
 external_modules/code/dark_emu*
 external_modules/code/cosmolike2
+external_modules/code/nautilus*
+external_modules/code/derivkit
+external_modules/code/deri*
+external_modules/code/tensiometer
+/external_modules/code/getdist
+/external_modules/code/getdist*
 
 cobaya/cobaya/likelihoods/XXX
 cobaya/cobaya/likelihoods/des_y1

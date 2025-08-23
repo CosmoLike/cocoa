@@ -75,9 +75,7 @@ if [ -z "${IGNORE_POLYCHORD_SAMPLER_CODE}" ]; then
   # in case this script is called twice
   # ---------------------------------------------------------------------------
   if [ -n "${OVERWRITE_EXISTING_POLYCHORD_CODE}" ]; then
-
     rm -rf "${PACKDIR:?}"
-
   fi
 
   # ---------------------------------------------------------------------------
@@ -87,18 +85,14 @@ if [ -z "${IGNORE_POLYCHORD_SAMPLER_CODE}" ]; then
 
     cdfolder "${ECODEF}" || return 1;
 
-    "${CURL:?}" -fsS "${URL:?}" \
-      >${OUT1:?} 2>${OUT2:?} || { error "${EC27:?} (URL=${URL:?})"; return 1; }
-
-    "${GIT:?}" clone --depth ${GIT_CLONE_MAXIMUM_DEPTH:?} "${URL:?}" \
-      --recursive "${FOLDER:?}" \
-      >${OUT1:?} 2>${OUT2:?} || { error "${EC15:?}"; return 1; }
+    "${GIT:?}" clone --depth ${GIT_CLONE_MAXIMUM_DEPTH:?} "${URL:?}" --recursive "${FOLDER:?}" \
+    >>${OUT1:?} 2>>${OUT2:?} || { error "${EC15:?}"; return 1; }
     
     cdfolder "${PACKDIR}" || return 1;
 
     if [ -n "${POLYCHORD_GIT_COMMIT}" ]; then
       "${GIT:?}" checkout "${POLYCHORD_GIT_COMMIT:?}" \
-        >${OUT1:?} 2>${OUT2:?} || { error "${EC16:?}"; return 1; }
+      >>${OUT1:?} 2>>${OUT2:?} || { error "${EC16:?}"; return 1; }
     fi
     
     # ---------------------------------------------------------------------------
@@ -126,10 +120,10 @@ if [ -z "${IGNORE_POLYCHORD_SAMPLER_CODE}" ]; then
       cdfolder "${PACKDIR:?}/${TFOLDER[$i]}" || return 1
 
       cpfolder "${CHANGES:?}/${TFOLDER[$i]}${TFILEP[$i]:?}" . \
-        2>${OUT2:?} || return 1;
+        2>>${OUT2:?} || return 1;
 
       patch -u "${TFILE[$i]:?}" -i "${TFILEP[$i]:?}" >${OUT1:?} \
-        2>${OUT2:?} || { error "${EC17:?} (${TFILE[$i]:?})"; return 1; }
+        2>>${OUT2:?} || { error "${EC17:?} (${TFILE[$i]:?})"; return 1; }
     done
 
   fi
@@ -137,13 +131,9 @@ if [ -z "${IGNORE_POLYCHORD_SAMPLER_CODE}" ]; then
   cdfolder "${ROOTDIR}" || return 1;
   
   pbottom 'SETUP POLYCHORD'
-  
-  # ---------------------------------------------------------------------------
-  
+    
   unset_all || return 1;
-
 fi
-
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------

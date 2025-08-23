@@ -92,16 +92,32 @@ if [ -z "${IGNORE_PLANCK_LIKELIHOOD_CODE}" ]; then
 
   # ---------------------------------------------------------------------------
   
-  (export LD_LIBRARY_PATH=${CONDA_PREFIX:?}/lib:$LD_LIBRARY_PATH && \
-   export LD_LIBRARY_PATH=${ROOTDIR:?}/.local/lib:$LD_LIBRARY_PATH && \
-   FC="${FORTRAN_COMPILER:?}" CC="${C_COMPILER:?}" CXX="${CXX_COMPILER:?}" \
-   "${PYTHON3:?}" waf configure --gcc --gfortran --cfitsio_islocal --prefix "${ROOTDIR:?}/.local" \
-   --lapack_prefix="${CLIK_LAPACK_LIBS:?}" --cfitsio_lib="${CLIK_CFITSIO_LIBS:?}" \
-   --python="${PYTHON3:?}" >${OUT1:?} 2>${OUT2:?} || { error "${EC5:?}"; return 1; })
+  case "$(uname -s)" in
+    Linux)
+      (export LD_LIBRARY_PATH=${CONDA_PREFIX:?}/lib:$LD_LIBRARY_PATH && \
+       export LD_LIBRARY_PATH=${ROOTDIR:?}/.local/lib:$LD_LIBRARY_PATH && \
+       FC="${FORTRAN_COMPILER:?}" CC="${C_COMPILER:?}" CXX="${CXX_COMPILER:?}" \
+       "${PYTHON3:?}" waf configure --gcc --gfortran --cfitsio_islocal --prefix "${ROOTDIR:?}/.local" \
+       --lapack_prefix="${CLIK_LAPACK_LIBS:?}" --cfitsio_lib="${CLIK_CFITSIO_LIBS:?}" \
+       --python="${PYTHON3:?}" >${OUT1:?} 2>${OUT2:?} || { error "${EC5:?}"; return 1; })
+      ;;
+    Darwin)
+      (export LD_LIBRARY_PATH=${CONDA_PREFIX:?}/lib:$LD_LIBRARY_PATH && \
+       export LD_LIBRARY_PATH=${ROOTDIR:?}/.local/lib:$LD_LIBRARY_PATH && \
+       FC="${FORTRAN_COMPILER:?}" CC="${C_COMPILER:?}" CXX="${CXX_COMPILER:?}" \
+       AR="/usr/bin/ar" RANLIB="/usr/bin/ranlib" CFLAGS="-O2 -fPIC -std=gnu89" \
+       "${PYTHON3:?}" waf configure --cfitsio_islocal --prefix "${ROOTDIR:?}/.local" \
+       --lapack_prefix="${CLIK_LAPACK_LIBS:?}" --cfitsio_lib="${CLIK_CFITSIO_LIBS:?}" \
+       --python="${PYTHON3:?}" >${OUT1:?} 2>${OUT2:?} || { error "${EC5:?}"; return 1; })
+    ;;
+  esac
+
   
-  (export LD_LIBRARY_PATH=${CONDA_PREFIX:?}/lib:$LD_LIBRARY_PATH && \
-   export LD_LIBRARY_PATH=${ROOTDIR:?}/.local/lib:$LD_LIBRARY_PATH && \
-   "${PYTHON3:?}" waf install -v >${OUT1:?} 2>${OUT2:?} || { error "${EC6:?}"; return 1; })
+  if [ $? -eq 0 ]; then
+    (export LD_LIBRARY_PATH=${CONDA_PREFIX:?}/lib:$LD_LIBRARY_PATH && \
+     export LD_LIBRARY_PATH=${ROOTDIR:?}/.local/lib:$LD_LIBRARY_PATH && \
+     "${PYTHON3:?}" waf install -v >${OUT1:?} 2>${OUT2:?} || { error "${EC6:?}"; return 1; })
+  fi
   
   pbottom "COMPILING ${PRINTNAME:?}" || return 1
 

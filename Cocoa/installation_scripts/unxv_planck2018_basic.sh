@@ -47,20 +47,16 @@ if [ -z "${IGNORE_PLANCK_CMB_DATA}" ]; then
 
   # Name to be printed on this shell script messages
   PRINTNAME="PLANCK-2018 (PLC 3.0)"
-
-  # ---------------------------------------------------------------------------
  
   ptop "SETUP/UNXV ${PRINTNAME:?} DATA" || return 1
 
   # ---------------------------------------------------------------------------
   # note: in case this script is run twice
   if [ -n "${OVERWRITE_EXISTING_PLANCK_CMB_DATA}" ]; then
- 
     rm -rf "${EDATAF:?}/planck/plc_3.0/low_l"
     rm -rf "${EDATAF:?}/planck/plc_3.0/lensing"
     rm -rf "${EDATAF:?}/planck/plc_3.0/hi_l/plik"
     rm -rf "${EDATAF:?}/planck/plc_3.0/hi_l/plik_lite"
-
   fi
 
   if [[ ! -d "${EDATAF:?}/planck/plc_3.0/low_l" && \
@@ -70,20 +66,15 @@ if [ -z "${IGNORE_PLANCK_CMB_DATA}" ]; then
 
     cdfolder "${EDATAF:?}/planck/plc_3.0" || return 1
     
-    tar xf lensing.xz \
-        >${OUT1:?} 2>${OUT2:?} || { error "${EC25:?}"; return 1; }
+    tar xf lensing.xz >>${OUT1:?} 2>>${OUT2:?} || { error "${EC25:?}"; return 1; }
 
-    tar xf low_l.xz \
-        >${OUT1:?} 2>${OUT2:?} || { error "${EC25:?}"; return 1; }
+    tar xf low_l.xz >>${OUT1:?} 2>>${OUT2:?} || { error "${EC25:?}"; return 1; }
 
     cdfolder "${EDATAF:?}/planck/plc_3.0/hi_l" || return 1
     
-    tar xf plik.xz \
-        >${OUT1:?} 2>${OUT2:?} || { error "${EC25:?}"; return 1; }
+    tar xf plik.xz >>${OUT1:?} 2>>${OUT2:?} || { error "${EC25:?}"; return 1; }
 
-    tar xf plik_lite.xz \
-        >${OUT1:?} 2>${OUT2:?} || { error "${EC25:?}"; return 1; }
-    
+    tar xf plik_lite.xz >>${OUT1:?} 2>>${OUT2:?} || { error "${EC25:?}"; return 1; }
   fi
 
   cdfolder "${ROOTDIR}" || return 1
@@ -91,9 +82,7 @@ if [ -z "${IGNORE_PLANCK_CMB_DATA}" ]; then
   pbottom "SETUP/UNXV ${PRINTNAME:?} DATA" || return 1
 
   unset_all || return 1;
-
 fi
-
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------

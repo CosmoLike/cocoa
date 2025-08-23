@@ -65,23 +65,17 @@ if [ -z "${IGNORE_COSMOREC_CODE}" ]; then
   rm -f "${ROOTDIR:?}/.local/libCosmoRec.a"
   cdfolder "${PACKDIR}" || return 1
   make cleanall >${OUT1:?} 2>${OUT2:?} || { error "${EC2:?}"; return 1; }
-
   # ---------------------------------------------------------------------------
   cdfolder "${PACKDIR}" || return 1
 
-  (export LD_LIBRARY_PATH=${CONDA_PREFIX:?}/lib:$LD_LIBRARY_PATH && \
-   export LD_LIBRARY_PATH=${ROOTDIR:?}/.local/lib:$LD_LIBRARY_PATH && \
-   CC="${CXX_COMPILER:?}" make all >${OUT1:?} 2>${OUT2:?} || { error "${EC7:?}"; return 1; })
+  (CC="${CXX_COMPILER:?}" make all) >>${OUT1:?} 2>>${OUT2:?} || { error "${EC7:?}"; return 1; }
   
   mv "${PACKDIR:?}/libCosmoRec.a" "${ROOTDIR:?}/.local/lib" \
-    >${OUT1:?} 2>${OUT2:?} || { error "${EC30:?}"; return 1; }
+    >>${OUT1:?} 2>>${OUT2:?} || { error "${EC30:?}"; return 1; }
 
   pbottom "COMPILING ${PRINTNAME:?}" || return 1
 
-  # ---------------------------------------------------------------------------
-
   unset_all || return 1
-
 fi
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------

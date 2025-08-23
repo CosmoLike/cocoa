@@ -95,7 +95,7 @@ COB="${ROOTDIR:?}/cobaya"
 
 COBLIKE="cobaya/likelihoods"
 
-for TMP in $(find "${ROOTDIR:?}/projects/" -mindepth 1 -maxdepth 1 -type d ! -name 'example'); do
+for TMP in $(find "${ROOTDIR:?}/projects" -mindepth 1 -maxdepth 1 -type d ! -name 'example'); do
   
   TMP2=$(echo "${TMP:?}" | sed -E "s@${ROOTDIR:?}/projects/@@")
 
