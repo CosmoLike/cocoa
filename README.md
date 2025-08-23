@@ -31,7 +31,9 @@ Besides integrating [Cobaya](https://github.com/CobayaSampler) and [CosmoLike](h
 
 Our scripts never install packages or Python modules in a global folder such as `$HOME/.local`. Here, `$HOME` denotes a shell environment variable that points to the user's home folder. Doing so would force cocoa packages to be global to the user, possibly breaking environments. Our scripts enable users to work on multiple Cocoa instances simultaneously, similar to what was possible with [CosmoMC](https://github.com/cmbant/CosmoMC). 
 
-This readme file presents basic and advanced instructions for installing all [Cobaya](https://github.com/CobayaSampler) and [CosmoLike](https://github.com/CosmoLike) components.
+This readme file presents basic and advanced instructions for installing all [Cobaya](https://github.com/CobayaSampler) and [CosmoLike](https://github.com/CosmoLike) components **on linux**.
+
+We provide the Docker image [whovian-cocoa](https://hub.docker.com/r/vivianmiranda/whovian-cocoa) to facilitate the installation of Cocoa on Windows and macOS. 
 
 # Installation of core packages <a name="required_packages_conda"></a>
 
@@ -79,7 +81,7 @@ In this section, we assume users have previously activated the Cocoa conda envir
 
 **Step :one:**: Download Cocoa's latest release and go to its main folder (`cocoa/Cocoa`),
 
-    git clone https://github.com/CosmoLike/cocoa.git --branch v4.0-beta27 cocoa
+    git clone https://github.com/CosmoLike/cocoa.git --branch v4.0-beta28 cocoa
 
 and
 
@@ -155,11 +157,15 @@ Users will see a terminal like this: `$(cocoa)(.local)`. *This is a feature, not
 
 One model evaluation:
 
-    mpirun -n 1 --oversubscribe --mca pml ^ucx --mca btl vader,tcp,self --bind-to core:overload-allowed --rank-by slot --map-by numa:pe=${OMP_NUM_THREADS} cobaya-run  ./projects/example/EXAMPLE_EVALUATE1.yaml -f
+    mpirun -n 1 --oversubscribe --mca pml ^ucx --mca btl vader,tcp,self \
+        --bind-to core:overload-allowed --rank-by slot --map-by numa:pe=${OMP_NUM_THREADS} \
+        --mca mpi_yield_when_idle 1 cobaya-run  ./projects/example/EXAMPLE_EVALUATE1.yaml -f
         
 MCMC (we run MCMCs with 32 cores):
 
-    mpirun -n 4 --oversubscribe --mca pml ^ucx --mca btl vader,tcp,self --bind-to core:overload-allowed --rank-by slot --map-by numa:pe=${OMP_NUM_THREADS} cobaya-run ./projects/example/EXAMPLE_MCMC1.yaml -f
+    mpirun -n 4 --oversubscribe --mca pml ^ucx --mca btl vader,tcp,self \
+        --bind-to core:overload-allowed --rank-by slot --map-by numa:pe=${OMP_NUM_THREADS} \
+        --mca mpi_yield_when_idle 1 cobaya-run ./projects/example/EXAMPLE_MCMC1.yaml -f
 
 ## Examples involving Cosmolike
 
@@ -167,12 +173,16 @@ MCMC (we run MCMCs with 32 cores):
 
 One model evaluation:
 
-    mpirun -n 1 --oversubscribe --mca pml ^ucx --mca btl vader,tcp,self --bind-to core:overload-allowed --rank-by slot --map-by numa:pe=${OMP_NUM_THREADS} cobaya-run ./projects/lsst_y1/EXAMPLE_EVALUATE1.yaml -f
+    mpirun -n 1 --oversubscribe --mca pml ^ucx --mca btl vader,tcp,self \
+        --bind-to core:overload-allowed --rank-by slot --map-by numa:pe=${OMP_NUM_THREADS} \
+        --mca mpi_yield_when_idle 1 cobaya-run ./projects/lsst_y1/EXAMPLE_EVALUATE1.yaml -f
 
 
 MCMC (we run MCMCs with 32 cores):
 
-    mpirun -n 4 --oversubscribe --mca pml ^ucx --mca btl vader,tcp,self --bind-to core:overload-allowed --rank-by slot --map-by numa:pe=${OMP_NUM_THREADS} cobaya-run ./projects/lsst_y1/EXAMPLE_MCMC1.yaml -f
+    mpirun -n 4 --oversubscribe --mca pml ^ucx --mca btl vader,tcp,self \
+        --bind-to core:overload-allowed --rank-by slot --map-by numa:pe=${OMP_NUM_THREADS} \
+        --mca mpi_yield_when_idle 1 cobaya-run ./projects/lsst_y1/EXAMPLE_MCMC1.yaml -f
 
 Profile:
 
@@ -184,7 +194,11 @@ and
 
 and
 
-    mpirun -n ${NMPI} --oversubscribe --mca pml ^ucx --mca btl vader,tcp,self --bind-to core:overload-allowed --rank-by slot --map-by numa:pe=${OMP_NUM_THREADS} python -m mpi4py.futures EXAMPLE_PROFILE1.py --mpi $((${NMPI}-1)) --profile 1 --tol 0.05 --AB 1.0 --outroot 'profile' --minmethod 5 --maxiter 1 --maxfeval 250 
+    mpirun -n ${NMPI} --oversubscribe --mca pml ^ucx --mca btl vader,tcp,self \
+        --bind-to core:overload-allowed --rank-by slot --map-by numa:pe=${OMP_NUM_THREADS} \
+        --mca mpi_yield_when_idle 1 python -m mpi4py.futures EXAMPLE_PROFILE1.py \
+        --mpi $((${NMPI}-1)) --profile 1 --tol 0.05 --AB 1.0 --outroot 'profile' \
+        --minmethod 5 --maxiter 1 --maxfeval 250 
 
 > [!Tip]
 > Cocoa provides several cosmolike projects, not all of which are installed by default. To activate them, refer to the appendix [FAQ: How do we compile external modules?](#appendix_compile_separately).
@@ -244,7 +258,7 @@ Now, users must follow all the steps below.
 
  **Step :two:**: Select the number of OpenMP cores.
 
-    export OMP_PROC_BIND=close; export OMP_NUM_THREADS=1
+    export OMP_PROC_BIND=close; export OMP_NUM_THREADS=1 # No OpenMP needed
 
 > [!NOTE]
 > This step is mandatory steps even if the number of threads is one. Failing to set `OMP_NUM_THREADS` would incour in the `Floating point exception (core dumped)` error message when running the proposed examples
@@ -558,6 +572,9 @@ to make sure it resembles the one below.
           && conda config --prepend channels conda-forge \
           && conda config --set channel_priority strict \
           && conda init bash
+
+> [!Note]
+> The strict use of Miniconda and conda-forge packages appears to mitigate the significant licensing issue involving Anaconda packages and academic/research institutions.
 
 **Step :three:**: After running this command, you will see a message in the terminal that ends with the statement *For changes to take effect, close and re-open your current shell*. Then, type
 

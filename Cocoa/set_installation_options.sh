@@ -108,8 +108,9 @@ export USE_SPT_CLIK_PLANCK=1
 # ------------------------------------------------------------------------------
 # THREADING COMPILATION/INSTALLATION OF LIBRARIES ------------------------------
 # ------------------------------------------------------------------------------
-export MAKE_NUM_THREADS=4
-
+export MAKE_NUM_THREADS=1
+export OMP_PROC_BIND=close
+export OMP_NUM_THREADS=1 # default is no OpenMP threading
 # ------------------------------------------------------------------------------
 # If not set, pip_core_packages.sh will install several ML packages ------------
 # ------------------------------------------------------------------------------
@@ -238,7 +239,7 @@ fi
 # Why? Some git repos can be hundreds of MegaBytes (Class is 500 MegaBytes) 
 # But, this can create problem if GIT_COMMIT < LAST COMMIT - GIT_MAXIMUM_DEPTH
 export SPDLOG_VERSION=v1.15.3
-export GIT_CLONE_MAXIMUM_DEPTH=40
+export GIT_CLONE_MAXIMUM_DEPTH=500
 
 export COBAYA_URL="https://github.com/CobayaSampler/cobaya.git"
 export COBAYA_GIT_COMMIT="86943d81d48d2edb2961b17077461df9e799f4d1"
