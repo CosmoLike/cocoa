@@ -44,7 +44,7 @@ Core packages include compilers and numerical libraries that users typically do 
 
   - Linux
     
-         wget https://raw.githubusercontent.com/SBU-COSMOLIKE/cocoa/refs/heads/main/cocoapy310.yml
+         wget https://raw.githubusercontent.com/CosmoLike/cocoa/refs/heads/dev/cocoapy310.yml
 
   - macOS (arm)
     
@@ -54,7 +54,7 @@ Core packages include compilers and numerical libraries that users typically do 
 
     This will activate the conda base environment (the prefix `(base)`) and install `wget`. Then, type.
 
-        wget https://raw.githubusercontent.com/SBU-COSMOLIKE/cocoa/refs/heads/main/cocoapy310-osxarm-base.yml
+        wget https://raw.githubusercontent.com/CosmoLike/cocoa/refs/heads/dev/cocoapy310-osxarm-base.yml
    
 **Step :two:**: Create the Cocoa environment,
 
@@ -111,11 +111,11 @@ Users can now proceed to the **next section**.
 > **Step :two:** Download the file appropriate conda-lock compatible `yml` file.
 >   - Linux
 >     
->         wget https://raw.githubusercontent.com/SBU-COSMOLIKE/cocoa/refs/heads/main/cocoapy310-linux.yml
+>         wget https://raw.githubusercontent.com/CosmoLike/cocoa/refs/heads/dev/cocoapy310-linux.yml
 >
 >   - macOS (arm)
 >     
->         wget https://raw.githubusercontent.com/SBU-COSMOLIKE/cocoa/refs/heads/main/cocoapy310-osxarm.yml
+>         wget https://raw.githubusercontent.com/CosmoLike/cocoa/refs/heads/dev/cocoapy310-osxarm.yml
 >
 > **Step :three:** Create the conda environment
 >   - Linux
