@@ -34,12 +34,12 @@ export COCOA_OUTPUT_VERBOSE=1
 # The flags below allow users to skip downloading specific datasets ------------
 # ------------------------------------------------------------------------------
 #export IGNORE_ACTDR6_DATA=1
-# export IGNORE_BAO_DATA=1
+#export IGNORE_BAO_DATA=1
 export IGNORE_BICEP_CMB_DATA=1
 # export IGNORE_HOLICOW_STRONG_LENSING_DATA=1
 #export IGNORE_SN_DATA=1
-export IGNORE_SPT_CMB_DATA=1
-#export IGNORE_SIMONS_OBSERVATORY_CMB_DATA=1
+#export IGNORE_SPT_CMB_DATA=1
+export IGNORE_SIMONS_OBSERVATORY_CMB_DATA=1
 #export IGNORE_PLANCK_CMB_DATA=1
 export IGNORE_CAMSPEC_CMB_DATA=1
 #export IGNORE_LIPOP_CMB_DATA=1
@@ -55,7 +55,7 @@ export IGNORE_CLASS_CODE=1 # Default: we just use CAMB (reduces compilation time
 #export IGNORE_COSMOLIKE_CODE=1
 #export IGNORE_POLYCHORD_SAMPLER_CODE=1
 #export IGNORE_PLANCK_LIKELIHOOD_CODE=1
-export IGNORE_ACTDR4_CODE=1
+#export IGNORE_ACTDR4_CODE=1
 #export IGNORE_ACTDR6_CODE=1
 export IGNORE_CPP_CUBA_INSTALLATION=1
 export IGNORE_FGSPECTRA_CODE=1
@@ -82,7 +82,7 @@ export IGNORE_DARK_EMULATOR_CODE=1
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
 #export IGNORE_COSMOLIKE_LSST_Y1_CODE=1
-#export IGNORE_COSMOLIKE_DES_Y3_CODE=1
+export IGNORE_COSMOLIKE_DES_Y3_CODE=1
 export IGNORE_COSMOLIKE_ROMAN_FOURIER_CODE=1
 #export IGNORE_COSMOLIKE_ROMAN_REAL_CODE=1
 
@@ -93,7 +93,7 @@ export IGNORE_COSMOLIKE_ROMAN_FOURIER_CODE=1
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
-export INSTALL_PRIVATE_AXIONS_PROJECT=1
+#export INSTALL_PRIVATE_AXIONS_PROJECT=1
 
 # ------------------------------------------------------------------------------
 # OVERWRITE_EXISTING_XXX_CODE=1 -> setup_cocoa overwrites existing PACKAGES ----
@@ -190,59 +190,6 @@ fi
 #  unset -v IGNORE_CLASS_CODE
 #fi
 
-# ------------------------------------------------------------------------------
-
-# ------------------------------------------------------------------------------
-# If OVERWRITE_EXISTING_XXX_CODE=1, the setup_cocoa overwrites existing PACKAGES
-# overwrite means: delete existing PACKAGE folder and install it again ---------
-# these keys are only relevant if you run setup_cocoa multiple times -----------
-# ------------------------------------------------------------------------------
-if [ -n "${OVERWRITE_EXISTING_ALL_PACKAGES}" ]; then
-  export OVERWRITE_EXISTING_COCOA_PRIVATE_PYTHON_ENV=1
-  export OVERWRITE_EXISTING_CORE_PACKAGES=1
-  export OVERWRITE_EXISTING_COBAYA_CODE=1
-  export OVERWRITE_EXISTING_CAMB_CODE=1
-  export OVERWRITE_EXISTING_MGCAMB_CODE=1
-  export OVERWRITE_EXISTING_CLASS_CODE=1
-  export OVERWRITE_EXISTING_HYREC_CODE=1
-  export OVERWRITE_EXISTING_COSMOREC_CODE=1
-  export OVERWRITE_EXISTING_POLYCHORD_CODE=1
-  export OVERWRITE_EXISTING_VELOCILEPTORS_CODE=1
-  export OVERWRITE_EXISTING_EE2_CODE=1
-  export OVERWRITE_EXISTING_BAO_DATA=1
-  export OVERWRITE_EXISTING_SIMONS_OBSERVATORY_CODE=1
-  export OVERWRITE_EXISTING_FGSPECTRA_CODE=1
-  export OVERWRITE_EXISTING_LIPOP_CMB_CODE=1
-  export OVERWRITE_EXISTING_LIPOP_CMB_DATA=1
-  export OVERWRITE_EXISTING_ACTDR4_CMB_CODE=1
-  export OVERWRITE_EXISTING_ACTDR4_CMB_DATA=1
-  export OVERWRITE_EXISTING_ACTDR6_CMB_CODE=1
-  export OVERWRITE_EXISTING_ACTDR6_CMB_DATA=1
-  export OVERWRITE_EXISTING_BICEP_CMB_DATA=1
-  export OVERWRITE_EXISTING_CAMPSPEC_CMB_DATA=1
-  export OVERWRITE_EXISTING_SPT3G_CMB_DATA=1
-  export OVERWRITE_EXISTING_PLANCK_CMB_DATA=1
-  export OVERWRITE_EXISTING_SIMONS_OBSERVATORY_CMB_DATA=1
-  export OVERWRITE_EXISTING_SN_DATA=1
-  export OVERWRITE_EXISTING_HOLICOW_DATA=1
-  export OVERWRITE_EXISTING_COSMOPOWER_CODE=1
-  export OVERWRITE_EXISTING_EMULTRF_CODE=1
-  export OVERWRITE_EXISTING_DARK_EMULATOR_CODE=1
-  export OVERWRITE_EXISTING_NAUTILUS_CODE=1
-  export OVERWRITE_EXISTING_DERIVKIT_CODE=1
-  export OVERWRITE_EXISTING_TENSIOMETER_CODE=1
-  export OVERWRITE_EXISTING_GETDIST_CODE=1
-fi
-
-if [ -n "${REDOWNLOAD_EXISTING_ALL_DATA}" ]; then
-  export REDOWNLOAD_EXISTING_CORE_PACKAGES=1
-  export REDOWNLOAD_EXISTING_ACTDR6_CMB_DATA=1
-  export REDOWNLOAD_EXISTING_LIPOP_CMB_DATA=1
-  export REDOWNLOAD_EXISTING_SIMONS_OBSERVATORY_CMB_DATA=1
-  export REDOWNLOAD_EXISTING_CAMPSPEC_CMB_DATA=1
-  export OVERWRITE_EXISTING_EMULTRF_DATA=1
-  export OVERWRITE_EXISTING_COSMOPOWER_DATA=1
-fi
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
@@ -356,10 +303,10 @@ export COSMOPOWER_URL_DATA="https://github.com/cosmopower-organization/jense_202
 export COSMOPOWER_URL_DATA_COMMIT="4317635eed70289ee1ec6b3df828027173071e36"
 
 export EMULTRF_URL="git@github.com:SBU-COSMOLIKE/emulators_code.git"
-#export EMULTRF_GIT_COMMIT="0a0cba998643670ca90316eada46fecac1a92e85"
+#export EMULTRF_GIT_COMMIT="32139fee45a9a6774b3eb95c2e71539ee24d10f1"
 
-export EMULTRF_DATA_URL="git@github.com:SBU-COSMOLIKE/emulators_data_lcdm.git"
-#export EMULTRF_DATA_GIT_COMMIT="208fc465a2beb219fabf92e0802c2815d7556588"
+export EMULTRF_DATA_URL="https://github.com/SBU-COSMOLIKE/emulators_data_lcdm.git"
+#export EMULTRF_DATA_URL="090277edf910bde37a856b8e62044d06ea5b5dc0"
 
 export DARKEMULATOR_URL="https://github.com/DarkQuestCosmology/dark_emulator_public.git"
 export DARKEMULATOR_GIT_COMMIT="46df5972509624e2eeadc2bf3ac528b02333a7e2"
@@ -379,9 +326,8 @@ export TENSIOMETER_URL="https://github.com/mraveri/tensiometer.git"
 export TENSIOMETER_GIT_COMMIT="199233a8b11674cdf6839702e3f05bf10e3a4982"
 export TENSIOMETER_NAME="tensiometer"
 
-#export GETDIST_URL="https://github.com/SBU-COSMOLIKE/getdist.git"
-export GETDIST_URL="git@github.com:SBU-COSMOLIKE/getdist.git"
-#export GETDIST_GIT_COMMIT="734dfb460bec29cc2c54d327f135864db43ab96a"
+export GETDIST_URL="https://github.com/cmbant/getdist.git"
+export GETDIST_GIT_COMMIT="ff477beea2e7e2231a3de4941bdc3d64bd1f0bb4"
 export GETDIST_NAME="getdist"
 # --------------------------------------------------------------------
 # --------------------------------------------------------------------
@@ -429,6 +375,5 @@ export ROMAN_REAL_NAME="roman_real"
 # private projects below ---------------------------------------------
 # --------------------------------------------------------------------
 # --------------------------------------------------------------------
-export AXIONS_PROJECT_URL="git@github.com:SBU-COSMOLIKE/cocoa_axions.git"
-export AXIONS_PROJECT_NAME="axions"
-#export AXIONS_PROJECT_COMMIT="df96af9558c97b07d355df4bfc56f1677e71b201"
+#export AXIONS_PROJECT_URL="git@github.com:SBU-COSMOLIKE/cocoa_axions.git"
+#export AXIONS_PROJECT_NAME="axions"

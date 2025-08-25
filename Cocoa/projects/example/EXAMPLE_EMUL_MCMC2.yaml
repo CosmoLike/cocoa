@@ -8,8 +8,12 @@ likelihood:
     clik_file: plc_3.0/hi_l/plik_lite/plik_lite_v22_TTTEEE.clik
   planck_2018_lowl.TT:
     path: ./external_modules
-  planck_2020_lollipop.lowlE:
-    data_folder: planck/lollipop
+  # choose only one low ell EE likelihood
+  #planck_2018_lowl.EE:
+  #  path: ./external_modules
+  planck_2018_lowl.EE_sroll2: null 
+  #planck_2020_lollipop.lowlE:
+  #  data_folder: planck/lollipop
 params:
   logA:
     prior:
@@ -179,8 +183,8 @@ sampler:
     # --------------------------------------
     # Maximum number of posterior evaluations
     max_samples: .inf
-    Rminus1_stop: 0.015
-    Rminus1_cl_stop: 0.18
+    Rminus1_stop: 0.02
+    Rminus1_cl_stop: 0.2
     Rminus1_cl_level: 0.95
     # ---------------------------------------------------------------------
     # ---------------------------------------------------------------------
