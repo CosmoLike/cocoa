@@ -3714,55 +3714,6 @@ arma::Col<double> compute_add_baryons_pcs(
 // ---------------------------------------------------------------------------
 // ---------------------------------------------------------------------------
 
-arma::Col<double> 
-compute_add_baryons_pcs_to_dark_matter_data_vector_3x2pt_fourier(
-    arma::Col<double> Q,                // PC amplitudes
-    arma::Col<double> dm_only_datavector)
-{
-  spdlog::debug("{}: Begins", 
-                "compute_add_baryons_pcs_to_dark_matter_data_vector_3x2pt_fourier");
-  if (!BaryonScenario::get_instance().is_pcs_set()) [[unlikely]] {
-    spdlog::critical(
-        "{}: {} not set prior to this function call",
-        "compute_add_baryons_pcs_to_dark_matter_data_vector_3x2pt_fourier", 
-        "baryon PCs"
-      );
-    exit(1);
-  }
-  if (BaryonScenario::get_instance().get_pcs().row(0).n_elem < Q.n_elem) [[unlikely]] {
-    spdlog::critical(
-        "{}: invalid PC amplitude vector or PC eigenvectors",
-        "compute_add_baryons_pcs_to_dark_matter_data_vector_3x2pt_fourier"
-      );
-    exit(1);
-  }
-  arma::Col<double>& dv = dm_only_datavector; // alias
-  if (BaryonScenario::get_instance().get_pcs().col(0).n_elem != dv.n_elem) [[unlikely]] {
-    spdlog::critical(
-        "{}: invalid datavector or PC eigenvectors",
-        "compute_add_baryons_pcs_to_dark_matter_data_vector_3x2pt_fourier"
-      );
-    exit(1);
-  }
-  for (int j=0; j<dv.n_elem; j++) {
-    for (int i=0; i<Q.n_elem; i++) {
-      if (IP::get_instance().get_mask(j)) {
-        dv(j) += Q(i) * BaryonScenario::get_instance().get_pcs(j, i);
-      }
-    }
-  }
-  spdlog::debug("{}: Ends", 
-                "compute_add_baryons_pcs_to_dark_matter_data_vector_3x2pt_fourier");
-  return dv;
-}
-
-// ---------------------------------------------------------------------------
-// ---------------------------------------------------------------------------
-// ---------------------------------------------------------------------------
-// ---------------------------------------------------------------------------
-// ---------------------------------------------------------------------------
-// ---------------------------------------------------------------------------
-
 matrix compute_baryon_pcas_3x2pt_real(arma::Col<int>::fixed<3> order)
 {
   const int ndata = IP::get_instance().get_ndata();

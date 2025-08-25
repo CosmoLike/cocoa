@@ -23,7 +23,7 @@ esac
 # ------------------------------------------------------------------------------
 # VERBOSE AS DEBUG TOOL --------------------------------------------------------
 # ------------------------------------------------------------------------------
-#export COCOA_OUTPUT_VERBOSE=1
+export COCOA_OUTPUT_VERBOSE=1
 
 # ------------------------------------------------------------------------------
 # If set, COSMOLIKE will compile with DEBUG flags ------------------------------
@@ -83,7 +83,7 @@ export IGNORE_DARK_EMULATOR_CODE=1
 # ------------------------------------------------------------------------------
 #export IGNORE_COSMOLIKE_LSST_Y1_CODE=1
 export IGNORE_COSMOLIKE_DES_Y3_CODE=1
-export IGNORE_COSMOLIKE_ROMAN_FOURIER_CODE=1
+#export IGNORE_COSMOLIKE_ROMAN_FOURIER_CODE=1
 #export IGNORE_COSMOLIKE_ROMAN_REAL_CODE=1
 
 # ------------------------------------------------------------------------------
