@@ -64,11 +64,13 @@ if [ -z "${IGNORE_SIMONS_OBSERVATORY_LIKELIHOOD_CODE}" ]; then
   #prevent all compile_XXX.sh from using the internet (run @compute nodes)
   #FROM: https://github.com/pypa/pip/issues/12050
   #That is why we use --no-dependencies --no-index --no-build-isolation
-  (export LD_LIBRARY_PATH=${CONDA_PREFIX:?}/lib:$LD_LIBRARY_PATH && \
-   export LD_LIBRARY_PATH=${ROOTDIR:?}/.local/lib:$LD_LIBRARY_PATH && \
-   env CXX="${CXX_COMPILER:?}" CC="${C_COMPILER:?}" ${PIP3:?} install . \
-   --prefix="${ROOTDIR:?}/.local" --no-index --no-deps --no-build-isolation \
-   >${OUT1:?} 2>${OUT2:?} || { error "${EC13:?}"; return 1; })
+  (env CXX="${CXX_COMPILER:?}" CC="${C_COMPILER:?}" \
+    ${PIP3:?} install . \
+      --prefix="${ROOTDIR:?}/.local" \
+      --no-index \
+      --no-deps \
+      --no-build-isolation \
+  ) >>${OUT1:?} 2>>${OUT2:?} || { error "${EC13:?}"; return 1; }
     
   cdfolder "${ROOTDIR}" || return 1
 
@@ -89,25 +91,22 @@ if [ -z "${IGNORE_SIMONS_OBSERVATORY_LIKELIHOOD_CODE}" ]; then
   rm -rf  "${PLIB:?}/mflike"-*
   # ----------------------------------------------------------------------------
 
-  (export LD_LIBRARY_PATH=${CONDA_PREFIX:?}/lib:$LD_LIBRARY_PATH && \
-   export LD_LIBRARY_PATH=${ROOTDIR:?}/.local/lib:$LD_LIBRARY_PATH && \
-   env CXX="${CXX_COMPILER:?}" CC="${C_COMPILER:?}" ${PIP3:?} install ${PACKDIR:?} \
-   --prefix="${ROOTDIR:?}/.local" --no-index --no-dependencies --no-build-isolation \
-   >${OUT1:?} 2>${OUT2:?} || { error "${EC13:?}"; return 1; })
+  (env CXX="${CXX_COMPILER:?}" CC="${C_COMPILER:?}" \
+    ${PIP3:?} install ${PACKDIR:?} \
+      --prefix="${ROOTDIR:?}/.local" \
+      --no-index \
+      --no-dependencies \
+      --no-build-isolation
+  ) >>${OUT1:?} 2>>${OUT2:?} || { error "${EC13:?}"; return 1; }
 
   cdfolder "${ROOTDIR}" || return 1
 
   pbottom "COMPILING SIMONS OBSERVATORY MKLIKE" || return 1
 
-  # ---------------------------------------------------------------------------  
-  # ---------------------------------------------------------------------------
-
   cdfolder "${ROOTDIR}" || return 1
 
-  unset_all || return 1
-  
+  unset_all || return 1  
 fi
-
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------

@@ -19,7 +19,6 @@ typedef struct
   double M_max;
   int LMIN_tab;
   int LMAX_NOLIMBER;
-  int LMAX;
   // ---------------------------------------------------
   // CLUSTER ROUTINES (ALPHA STAGE)
   // ---------------------------------------------------
@@ -54,14 +53,15 @@ typedef struct
   // CONTROL NUM POINTS ON COSMOLIKE TABLES
   // ---------------------------------------------------
   // ---------------------------------------------------
+  int LMAX;            // Cosmo2d: lmax used to compute 2D correlation function
   int N_a;          
   int N_k_lin;
   int N_k_nlin;
   int N_ell;
   int Ntheta;
   int N_M;
-  int NL_Nell_block;               // Cosmo2D - NL = NonLimber
-  int NL_Nchi;                     // Cosmo2D - NL = NonLimber
+  int NL_Nell_block;   // Cosmo2D - NL = NonLimber
+  int NL_Nchi;         // Cosmo2D - NL = NonLimber
   // ---------------------------------------------------
   // ---------------------------------------------------
   // INTERPOL TYPE ON SOURCE/LENS n(z) INTERPOLATION

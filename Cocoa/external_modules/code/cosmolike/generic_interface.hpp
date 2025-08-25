@@ -407,9 +407,12 @@ almost_equal(T x, T y, int ulp = 100)
 // ---------------------------------------------------------------------------
 // ---------------------------------------------------------------------------
 
+void init_ntable_lmax(
+    const int lmax
+  );
+
 void init_accuracy_boost(
     const double accuracy_boost, 
-    const double sampling_boost,
     const int integration_accuracy
   );
 
@@ -534,8 +537,6 @@ void init_ggl_exclude(
 	arma::Col<int> ggl_exclude
   );
 
-
-
 // ---------------------------------------------------------------------------
 // ---------------------------------------------------------------------------
 // ---------------------------------------------------------------------------
@@ -642,6 +643,8 @@ void init_ntomo_powerspectra();
 // ---------------------------------------------------------------------------
 // ---------------------------------------------------------------------------
 
+arma::Col<double> compute_binning_real_space();
+
 arma::Mat<double> compute_baryon_pcas_3x2pt_real(
     arma::Col<int>::fixed<3> order
   );
@@ -654,6 +657,11 @@ arma::Mat<double> compute_baryon_pcas_6x2pt(
     arma::Col<int>::fixed<6> order
   );
 
+arma::Col<double> compute_add_baryons_pcs(
+    arma::Col<double> Q, 
+    arma::Col<double> dv
+  );
+
 arma::Col<double> compute_data_vector_6x2pt_real_masked_any_order(
     arma::Col<int>::fixed<6> order
   );
@@ -662,19 +670,24 @@ arma::Col<double> compute_data_vector_3x2pt_real_masked_any_order(
     arma::Col<int>::fixed<3> order
   );
 
-arma::Col<double> compute_data_vector_3x2pt_real_masked_any_order(
-    arma::Col<double> Q,                // PC amplitudes
-    arma::Col<int>::fixed<3> order
-  );
-
 arma::Col<double> compute_data_vector_3x2pt_fourier_masked_any_order(
     arma::Col<int>::fixed<3> order
   );
 
-arma::Col<double> compute_data_vector_3x2pt_fourier_masked_any_order(
-    arma::Col<double> Q,                // PC amplitudes
-    arma::Col<int>::fixed<3> order
-  );
+// ------------------------------------------------------------------
+// Functions relevant for machine learning emulators
+// ------------------------------------------------------------------
+
+// ML emulators do not compute fast parameters (fp) nor mask (m)
+arma::Col<double> compute_add_fpm_3x2pt_real_any_order(
+    arma::Col<double> data_vector,
+    arma::Col<int>::fixed<3> order,
+    const int force_exclude_pm); // order = (1,2,3): Cosmic Shear, ggl, gg; 
+
+arma::Col<int>::fixed<6> compute_data_vector_6x2pt_real_sizes();
+arma::Col<int>::fixed<6> compute_data_vector_6x2pt_fourier_sizes();
+arma::Col<int>::fixed<3> compute_data_vector_3x2pt_real_sizes();
+arma::Col<int>::fixed<3> compute_data_vector_3x2pt_fourier_sizes();
 
 }  // namespace cosmolike_interface
 #endif // HEADER GUARD

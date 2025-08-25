@@ -1,6 +1,6 @@
 stop_at_error: false
 debug: false
-timing: false
+timing: True
 
 likelihood:
   sn.pantheon:
