@@ -98,7 +98,6 @@ declare -a SCRIPTS=( "setup_core_packages.sh"
                      "setup_mgcamb.sh"
                      "setup_class.sh"
                      "setup_velocileptors.sh"
-                     "setup_ee2.sh"
                      "setup_cosmopower.sh"
                      "setup_emultrf.sh"
                      "setup_cosmolike_projects.sh"
@@ -120,7 +119,8 @@ declare -a SCRIPTS=( "setup_core_packages.sh"
                      "unxv_camspec.sh"
                      "unxv_lipop.sh"
                      "unxv_emultrf.sh"
-                     "unxv_cosmopower.sh")
+                     "unxv_cosmopower.sh"
+                     "setup_ee2.sh")
 
 for (( i=0; i<${#SCRIPTS[@]}; i++ ));
 do

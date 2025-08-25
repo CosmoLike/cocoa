@@ -40,7 +40,6 @@ declare -a SCRIPTS=("compile_core_packages.sh"
                      "compile_planck.sh" 
                      "compile_polychord.sh"
                      "compile_velocileptors.sh"
-                     "compile_ee2.sh"
                      "compile_fgspectra.sh"
                      "compile_lipop.sh"
                      "compile_cosmopower.sh"
@@ -52,6 +51,7 @@ declare -a SCRIPTS=("compile_core_packages.sh"
                      "compile_tensiometer.sh"
                      "compile_getdist.sh"
                      "compile_derivkit.sh"
+                     "compile_ee2.sh"
                      ) # T = TMP
 
 for (( i=0; i<${#SCRIPTS[@]}; i++ ));
