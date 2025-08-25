@@ -294,7 +294,7 @@ Users will see a terminal like this: `$(cocoa)(.local)`. *This is a feature, not
 
 # Running ML emulators <a name="cobaya_base_code_examples_emul"></a>
 
-Cocoa contains a few transformer- and CNN-based neural network emulators capable of simulating CMB, cosmolike, matter power spectrum, and distances. We provide a few scripts that exemplify their API. To run them, users must have commented out the following lines on `set_installation_options.sh` before running the `setup_cocoa.sh` and `compile_cocoa.sh`.
+Cocoa contains a few transformer- and CNN-based neural network emulators capable of simulating the CMB, cosmolike outputs, matter power spectrum, and distances. We provide a few scripts that exemplify their API. To run them, users must have commented out the following lines in `set_installation_options.sh` before running the `setup_cocoa.sh` and `compile_cocoa.sh`. By default, these lines should be commented out, but it is worth checking.
 
       [Adapted from Cocoa/set_installation_options.sh shell script] 
       # insert the # symbol (i.e., unset these environmental keys  on `set_installation_options.sh`)
@@ -308,8 +308,14 @@ Cocoa contains a few transformer- and CNN-based neural network emulators capable
       #export IGNORE_POLYCHORD_SAMPLER_CODE=1    # to run PROJECTS/EXAMPLE/EXAMPLE_EMUL_POLY1.yaml
       #export IGNORE_GETDIST_CODE=1              # to run EXAMPLE_TENSION_METRICS.ipynb
       #export IGNORE_TENSIOMETER_CODE=1          # to run EXAMPLE_TENSION_METRICS.ipynb
-      
-> [!TIP]
+          
+
+Now, users must follow all the steps below.
+
+> [!Note]
+> We provide SLURM job script examples in the `projects/example/script` folder, which allow users to run the examples below in an HPC environment.
+
+> [!Note]
 > What if users have not configured ML-related keys before sourcing `setup_cocoa.sh`?
 > 
 > Answer: Comment the keys below before rerunning `setup_cocoa.sh`.
@@ -318,13 +324,7 @@ Cocoa contains a few transformer- and CNN-based neural network emulators capable
 >     # These keys are only relevant if you run setup_cocoa multiple times
 >     #export OVERWRITE_EXISTING_ALL_PACKAGES=1    
 >     #export OVERWRITE_EXISTING_COSMOLIKE_CODE=1 
->     #export REDOWNLOAD_EXISTING_ALL_DATA=1      
-
-      
-Now, users must follow all the steps below.
-
-> [!Note]
-> We provide SLURM job script examples in the `projects/example/script` folder, which allow users to run the examples below in an HPC environment.
+>     #export REDOWNLOAD_EXISTING_ALL_DATA=1
 
  **Step :one:**: Activate the private Python environment by sourcing the script `start_cocoa.sh`
 
