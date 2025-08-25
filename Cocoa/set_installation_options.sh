@@ -23,7 +23,7 @@ esac
 # ------------------------------------------------------------------------------
 # VERBOSE AS DEBUG TOOL --------------------------------------------------------
 # ------------------------------------------------------------------------------
-export COCOA_OUTPUT_VERBOSE=1
+#export COCOA_OUTPUT_VERBOSE=1
 
 # ------------------------------------------------------------------------------
 # If set, COSMOLIKE will compile with DEBUG flags ------------------------------
@@ -38,7 +38,7 @@ export COCOA_OUTPUT_VERBOSE=1
 export IGNORE_BICEP_CMB_DATA=1
 # export IGNORE_HOLICOW_STRONG_LENSING_DATA=1
 #export IGNORE_SN_DATA=1
-export IGNORE_SPT_CMB_DATA=1
+#export IGNORE_SPT_CMB_DATA=1
 export IGNORE_SIMONS_OBSERVATORY_CMB_DATA=1
 #export IGNORE_PLANCK_CMB_DATA=1
 export IGNORE_CAMSPEC_CMB_DATA=1
@@ -55,7 +55,7 @@ export IGNORE_CLASS_CODE=1 # Default: we just use CAMB (reduces compilation time
 #export IGNORE_COSMOLIKE_CODE=1
 #export IGNORE_POLYCHORD_SAMPLER_CODE=1
 #export IGNORE_PLANCK_LIKELIHOOD_CODE=1
-export IGNORE_ACTDR4_CODE=1
+#export IGNORE_ACTDR4_CODE=1
 #export IGNORE_ACTDR6_CODE=1
 export IGNORE_CPP_CUBA_INSTALLATION=1
 export IGNORE_FGSPECTRA_CODE=1
@@ -190,59 +190,6 @@ fi
 #  unset -v IGNORE_CLASS_CODE
 #fi
 
-# ------------------------------------------------------------------------------
-
-# ------------------------------------------------------------------------------
-# If OVERWRITE_EXISTING_XXX_CODE=1, the setup_cocoa overwrites existing PACKAGES
-# overwrite means: delete existing PACKAGE folder and install it again ---------
-# these keys are only relevant if you run setup_cocoa multiple times -----------
-# ------------------------------------------------------------------------------
-if [ -n "${OVERWRITE_EXISTING_ALL_PACKAGES}" ]; then
-  export OVERWRITE_EXISTING_COCOA_PRIVATE_PYTHON_ENV=1
-  export OVERWRITE_EXISTING_CORE_PACKAGES=1
-  export OVERWRITE_EXISTING_COBAYA_CODE=1
-  export OVERWRITE_EXISTING_CAMB_CODE=1
-  export OVERWRITE_EXISTING_MGCAMB_CODE=1
-  export OVERWRITE_EXISTING_CLASS_CODE=1
-  export OVERWRITE_EXISTING_HYREC_CODE=1
-  export OVERWRITE_EXISTING_COSMOREC_CODE=1
-  export OVERWRITE_EXISTING_POLYCHORD_CODE=1
-  export OVERWRITE_EXISTING_VELOCILEPTORS_CODE=1
-  export OVERWRITE_EXISTING_EE2_CODE=1
-  export OVERWRITE_EXISTING_BAO_DATA=1
-  export OVERWRITE_EXISTING_SIMONS_OBSERVATORY_CODE=1
-  export OVERWRITE_EXISTING_FGSPECTRA_CODE=1
-  export OVERWRITE_EXISTING_LIPOP_CMB_CODE=1
-  export OVERWRITE_EXISTING_LIPOP_CMB_DATA=1
-  export OVERWRITE_EXISTING_ACTDR4_CMB_CODE=1
-  export OVERWRITE_EXISTING_ACTDR4_CMB_DATA=1
-  export OVERWRITE_EXISTING_ACTDR6_CMB_CODE=1
-  export OVERWRITE_EXISTING_ACTDR6_CMB_DATA=1
-  export OVERWRITE_EXISTING_BICEP_CMB_DATA=1
-  export OVERWRITE_EXISTING_CAMPSPEC_CMB_DATA=1
-  export OVERWRITE_EXISTING_SPT3G_CMB_DATA=1
-  export OVERWRITE_EXISTING_PLANCK_CMB_DATA=1
-  export OVERWRITE_EXISTING_SIMONS_OBSERVATORY_CMB_DATA=1
-  export OVERWRITE_EXISTING_SN_DATA=1
-  export OVERWRITE_EXISTING_HOLICOW_DATA=1
-  export OVERWRITE_EXISTING_COSMOPOWER_CODE=1
-  export OVERWRITE_EXISTING_EMULTRF_CODE=1
-  export OVERWRITE_EXISTING_DARK_EMULATOR_CODE=1
-  export OVERWRITE_EXISTING_NAUTILUS_CODE=1
-  export OVERWRITE_EXISTING_DERIVKIT_CODE=1
-  export OVERWRITE_EXISTING_TENSIOMETER_CODE=1
-  export OVERWRITE_EXISTING_GETDIST_CODE=1
-fi
-
-if [ -n "${REDOWNLOAD_EXISTING_ALL_DATA}" ]; then
-  export REDOWNLOAD_EXISTING_CORE_PACKAGES=1
-  export REDOWNLOAD_EXISTING_ACTDR6_CMB_DATA=1
-  export REDOWNLOAD_EXISTING_LIPOP_CMB_DATA=1
-  export REDOWNLOAD_EXISTING_SIMONS_OBSERVATORY_CMB_DATA=1
-  export REDOWNLOAD_EXISTING_CAMPSPEC_CMB_DATA=1
-  export OVERWRITE_EXISTING_EMULTRF_DATA=1
-  export OVERWRITE_EXISTING_COSMOPOWER_DATA=1
-fi
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
