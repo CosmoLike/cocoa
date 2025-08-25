@@ -583,7 +583,7 @@ Now, users must follow all the steps below.
   - Profs. Antony Lewis and Jesús Torrado for helping me understand Cobaya since its early days in 2019.
   - Jonathan Gordon, Joshua Kable, João Rebouças, Evan Saraivanov, Diogo Souza, Jiachuan Xu, Yijie Zhu, and KunHao Zhong for working on CoCoA on many fruitful projects at Stony Brook Univ. and the Univ. of Arizona.
   - Evan Saraivanov, Yijie Zhu, and KunHao Zhong for developing the emulator interface within the CoCoA framework.
-  - Haley Bowden, Kali Cao, and members of the Roman HLIS Cosmology PIT for all Roman-specific development and testing.
+  - Haley Bowden, Kali Cao, Nihar Dalal, Niko, Junzhou Zhang, and members of the Roman HLIS Cosmology PIT for all Roman-specific development and testing.
 
 
 The following is not an exhaustive list of the codes we use/download/adopt
