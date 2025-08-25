@@ -482,14 +482,14 @@ Now, users must follow all the steps below.
               python ./projects/example/EXAMPLE_EMUL_PROFILE1.py \
                   --root ./projects/example/ --cov 'chains/EXAMPLE_EMUL_MCMC1.covmat' \
                   --outroot "EXAMPLE_EMUL_PROFILE1" --factor 3 --nstw 200 --numpts 10 \
-                  --profile 1 --minfile="./projects/example/chains/EXAMPLE_EMUL_MIN1.txt"
+                  --profile 1 --minfile "./projects/example/chains/EXAMPLE_EMUL_MIN1.txt"
 
     - macOS (arm)
 
-          mpirun -n 8 python --oversubscribe ./projects/example/EXAMPLE_EMUL_PROFILE1.py \
+          mpirun -n 8 --oversubscribe python ./projects/example/EXAMPLE_EMUL_PROFILE1.py \
                   --root ./projects/example/ --cov 'chains/EXAMPLE_EMUL_MCMC1.covmat' \
                   --outroot "EXAMPLE_EMUL_PROFILE1" --factor 3 --nstw 200 --numpts 10 \
-                  --profile 1 --minfile="./projects/example/chains/EXAMPLE_EMUL_MIN1.txt"
+                  --profile 1 --minfile "./projects/example/chains/EXAMPLE_EMUL_MIN1.txt"
       
   Profile provides the optional argument `minfile`, as it is significantly faster to run the profile script with a previously provided global minimum. 
   The profile also provides the optional argument `cov`. Again, it is considerably more efficient to employ a covariance matrix from a converged chain. 
@@ -520,16 +520,16 @@ Now, users must follow all the steps below.
           mpirun -n 1 --mca pml ^ucx --mca btl vader,tcp,self --rank-by slot \
               --bind-to core:overload-allowed --map-by slot --mca mpi_yield_when_idle 1 \
               python ./projects/example/EXAMPLE_EMUL_PROFILE_SCIPY1.py \
-                  --root ./projects/example/ --cov 'chains/EXAMPLE_EMUL_MCMC1.covmat'
+                  --root ./projects/example/ --cov 'chains/EXAMPLE_EMUL_MCMC1.covmat' \
                   --outroot "EXAMPLE_EMUL_PROFILE1M2" --factor 3 --maxfeval 5000 --numpts 10 \
-                  --profile 1 --minfile="./projects/example/chains/EXAMPLE_EMUL_MIN1.txt"
+                  --profile 1 --minfile "./projects/example/chains/EXAMPLE_EMUL_MIN1.txt"
 
     - macOS (arm)
 
           mpirun -n 1 python ./projects/example/EXAMPLE_EMUL_PROFILE_SCIPY1.py \
-                --root ./projects/example/ --cov 'chains/EXAMPLE_EMUL_MCMC1.covmat'
+                --root ./projects/example/ --cov 'chains/EXAMPLE_EMUL_MCMC1.covmat' \
                 --outroot "EXAMPLE_EMUL_PROFILE1M2" --factor 3 --maxfeval 5000 --numpts 10 \
-                --profile 1 --minfile="./projects/example/chains/EXAMPLE_EMUL_MIN1.txt"
+                --profile 1 --minfile "./projects/example/chains/EXAMPLE_EMUL_MIN1.txt"
       
      The script of the plot below is provided at `projects/example/scripts/EXAMPLE_PLOT_PROFILE1_COMP.py`
   
@@ -552,7 +552,7 @@ Now, users must follow all the steps below.
 
     - macOS (arm)
 
-          mpirun -n 90 --oversubscribe python -m mpi4py.futures ./projects/example/EXAMPLE_EMUL_SCAN1.py \
+          mpirun -n 8 --oversubscribe python -m mpi4py.futures ./projects/example/EXAMPLE_EMUL_SCAN1.py \
                   --root ./projects/example/ --outroot "EXAMPLE_EMUL_SCAN1" --nstw 200 --profile 1
       
 - **Tension Metrics**
