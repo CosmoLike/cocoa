@@ -273,7 +273,7 @@ export SO_SYSLIB_GIT_COMMIT="2471df981053a7526a441d2547eb8dde10d92f70"
 
 export EE2_URL="https://github.com/vivianmiranda/EuclidEmulator2.git"
 export EE2_GIT_COMMIT="4c17dfa6fd826facb69de327401949a1c7fe55d2"
-# THIS GIT IS FOR THE ORIGNIAL EE2 BEFORE VM MODS
+# THIS GIT IS FOR THE ORIGINAL EE2 BEFORE VM MODS
 #export EE2_GIT_COMMIT="ff59f6683069417f6b4d2fb5d59197044d424445"
 export EE2_NAME="euclidemu2"
 
@@ -302,7 +302,7 @@ export COSMOPOWER_GIT_COMMIT="7cac5e71c975c06257b2f95f0dcea5dd09b0f45f"
 export COSMOPOWER_URL_DATA="https://github.com/cosmopower-organization/jense_2024_emulators.git"
 export COSMOPOWER_URL_DATA_COMMIT="4317635eed70289ee1ec6b3df828027173071e36"
 
-export EMULTRF_URL="git@github.com:CosmoLike/emulators_code.git"
+export EMULTRF_URL="https://github.com/CosmoLike/emulators_code.git"
 #export EMULTRF_GIT_COMMIT="32139fee45a9a6774b3eb95c2e71539ee24d10f1"
 
 export EMULTRF_DATA_URL="https://github.com/SBU-COSMOLIKE/emulators_data_lcdm.git"
