@@ -40,7 +40,7 @@ We provide the Docker image [whovian-cocoa](https://hub.docker.com/r/vivianmiran
 
 Core packages include compilers and numerical libraries that users typically do not modify.
 
-**Step :one:**: Download the appropriate `Python-3.10` compatible `yml` file (*
+**Step :one:**: Download the appropriate `Python-3.10` compatible `yml` file
 
 > [!Note]
 > We recommend but do not yet impose the use of the package `conda-lock` and its tailored YML files to install the Cocoa conda environment, see the Tip section below
