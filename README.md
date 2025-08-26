@@ -298,7 +298,7 @@ Users will see a terminal like this: `$(cocoa)(.local)`. *This is a feature, not
 
 # Running ML emulators <a name="cobaya_base_code_examples_emul"></a>
 
-Cocoa contains a few transformer- and CNN-based neural network emulators capable of simulating the CMB, cosmolike outputs, matter power spectrum, and distances. We provide a few scripts that exemplify their API. To run them, users must have commented out the following lines in `set_installation_options.sh` before running the `setup_cocoa.sh` and `compile_cocoa.sh`. By default, these lines should be commented out, but it is worth checking.
+Cocoa contains a few transformer- and CNN-based neural network emulators capable of simulating the CMB, cosmolike outputs, matter power spectrum, and distances. We provide a few scripts that exemplify their API. To run them, users ensure the following lines are commented out in `set_installation_options.sh` before running the `setup_cocoa.sh` and `compile_cocoa.sh`. By default, these lines should be commented out, but it is worth checking.
 
       [Adapted from Cocoa/set_installation_options.sh shell script] 
       # insert the # symbol (i.e., unset these environmental keys  on `set_installation_options.sh`)
@@ -358,15 +358,15 @@ Now, users must follow all the steps below.
     
         mpirun -n 4 --oversubscribe --mca pml ^ucx --mca btl vader,tcp,self --rank-by slot \
             --bind-to core:overload-allowed --map-by slot --mca mpi_yield_when_idle 1 \
-            cobaya-run ./projects/example/EXAMPLE_EMUL_MCMC1.yaml -f
+            cobaya-run ./projects/example/EXAMPLE_EMUL_MCMC1.yaml -r
 
   - macOS (arm)
 
-        mpirun -n 4 --oversubscribe cobaya-run ./projects/example/EXAMPLE_EMUL_MCMC1.yaml -f
-    
+        mpirun -n 4 --oversubscribe cobaya-run ./projects/example/EXAMPLE_EMUL_MCMC1.yaml -r
+
 > [!Note]
 > The examples below may require a large number of MPI workers. Before running them, it may be necessary to increase 
-> the limit of threads that can be created (at UofA HPC type `ulimit -u 1000000`), otherwise users 
+> the limit of threads that can be created (at *UofA/SBU HPC* type `ulimit -u 1000000`), otherwise users 
 > may encounter the error `libgomp: Thread creation failed`
 
 - **PolyChord**:
@@ -375,15 +375,17 @@ Now, users must follow all the steps below.
     
         mpirun -n 90 --oversubscribe --mca pml ^ucx --mca btl vader,tcp,self --rank-by slot \
             --bind-to core:overload-allowed --map-by slot --mca mpi_yield_when_idle 1 \
-            cobaya-run ./projects/example/EXAMPLE_EMUL_POLY1.yaml -f
+            cobaya-run ./projects/example/EXAMPLE_EMUL_POLY1.yaml -r
 
   - macOS (arm)
  
-        mpirun -n 8 --oversubscribe cobaya-run ./projects/example/EXAMPLE_EMUL_POLY1.yaml -f
+        mpirun -n 12 --oversubscribe cobaya-run ./projects/example/EXAMPLE_EMUL_POLY1.yaml -r
     
 > [!Note]
-> The `Nautilis`, `Minimizer`, `Profile`, and `Emcee` scripts below contain an internally defined `yaml_string` that specifies priors, 
-> likelihoods, and the theory code, all following Cobaya Conventions.
+> When running `PolyChord` or any of our scripts in more than one node, replace `--mca btl vader,tcp,self` by `--mca btl tcp,self`.
+
+The `Nautilis`, `Minimizer`, `Profile`, and `Emcee` scripts below contain an internally defined `yaml_string` that specifies priors, 
+likelihoods, and the theory code, all following Cobaya Conventions.
 
 - **Nautilus**:
 
@@ -397,7 +399,7 @@ Now, users must follow all the steps below.
 
   - macOS (arm)
 
-        mpirun -n 8 --oversubscribe python -m mpi4py.futures ./projects/example/EXAMPLE_EMUL_NAUTILUS1.py \
+        mpirun -n 12 --oversubscribe python -m mpi4py.futures ./projects/example/EXAMPLE_EMUL_NAUTILUS1.py \
                 --root ./projects/example/ --outroot "EXAMPLE_EMUL_NAUTILUS1"  \
                 --maxfeval 450000 --nlive 2048 --neff 15000 --flive 0.01 --nnetworks 5
 
@@ -414,7 +416,7 @@ Now, users must follow all the steps below.
 
     - macOS (arm)
 
-          mpirun -n 8 --oversubscribe python ./projects/example/EXAMPLE_EMUL_EMCEE1.py \
+          mpirun -n 12 --oversubscribe python ./projects/example/EXAMPLE_EMUL_EMCEE1.py \
                 --root ./projects/example/ --outroot "EXAMPLE_EMUL_EMCEE1" --maxfeval 80000
 
   The number of steps per MPI worker is $n_{\\rm sw} =  {\\rm maxfeval}/n_{\\rm w}$,
@@ -453,7 +455,7 @@ Now, users must follow all the steps below.
   
     - macOS (arm)
 
-          mpirun -n 8 --oversubscribe python ./projects/example/EXAMPLE_EMUL_MINIMIZE1.py \
+          mpirun -n 12 --oversubscribe python ./projects/example/EXAMPLE_EMUL_MINIMIZE1.py \
                 --root ./projects/example/ --outroot "EXAMPLE_EMUL_MIN1" --nstw 200
        
   The number of steps per Emcee walker per temperature is $n_{\\rm stw}$,
@@ -490,7 +492,7 @@ Now, users must follow all the steps below.
 
     - macOS (arm)
 
-          mpirun -n 8 --oversubscribe python ./projects/example/EXAMPLE_EMUL_PROFILE1.py \
+          mpirun -n 12 --oversubscribe python ./projects/example/EXAMPLE_EMUL_PROFILE1.py \
                   --root ./projects/example/ --cov 'chains/EXAMPLE_EMUL_MCMC1.covmat' \
                   --outroot "EXAMPLE_EMUL_PROFILE1" --factor 3 --nstw 200 --numpts 10 \
                   --profile 1 --minfile "./projects/example/chains/EXAMPLE_EMUL_MIN1.txt"
@@ -556,7 +558,7 @@ Now, users must follow all the steps below.
 
     - macOS (arm)
 
-          mpirun -n 8 --oversubscribe python -m mpi4py.futures ./projects/example/EXAMPLE_EMUL_SCAN1.py \
+          mpirun -n 12 --oversubscribe python -m mpi4py.futures ./projects/example/EXAMPLE_EMUL_SCAN1.py \
                   --root ./projects/example/ --outroot "EXAMPLE_EMUL_SCAN1" --nstw 200 --profile 1
       
 - **Tension Metrics**
