@@ -740,17 +740,11 @@ We provide the Docker image [whovian-cocoa](https://hub.docker.com/r/vivianmiran
      mkdir -p cocoa_docker
      cd ./cocoa_docker
 
- **Step :two:**: Download the Docker image *whovian-cocoa*, name the associated container `cocoa2023`, and run the container for the first time, type:
+ **Step :two:**: Download the Docker image *whovian-cocoa*, name the associated container `cocoa2025` (flag `--name cocoa2025` in the command below), and run the container for the first time, type:
 
-    docker run --platform linux/amd64 --hostname cocoa --name cocoa2025 -it -p 8888:8888 -v $(pwd):/home/whovian/host/ -v ~/.ssh:/home/whovian/.ssh:ro vivianmiranda/whovian-cocoa
+    docker run --platform linux/amd64 --hostname cocoa --name cocoa2025 -it -p 8888:8888 -v $(pwd):/home/whovian/host/ -v ~/.ssh:/home/whovian/.ssh:ro vivianmiranda/whovian-cocoa:thin
 
-This is a large image with a size of approximately 16GB, as it already contains the Cocoa version `v4.0beta26` installed and pre-compiled. 
-
- **Step :three:**: As shown in the picture below, users can follow the instructions provided in Section [Running Examples](#cobaya_base_code_examples) to run a few non-cosmolike-based examples, as well as examples within `LSST-Y1`, `ROMAN_REAL`, and `ROMAN_FOURIER` projects. 
-
-<p align="center">
-<img width="1156" height="858" alt="screenshot_2025-06-02_at_7 23 48_pm" src="https://github.com/user-attachments/assets/2b15ce75-3d43-4a65-ab7b-e70077492b32" />
-</p>
+This is a large image with a size of approximately 13GB, as it already contains the conda cocoa environment installed. Users can now proceed to the section [Installation and Compilation of external modules](#cobaya_base_code) to continue installation. 
 
 > [!TIP]
 > Once installation is complete, the user must learn how to **start** and **exit** the Docker container. Assuming the user maintained the container name `cocoa2025` set on the flag `--name cocoa2025`, type:
@@ -760,7 +754,7 @@ This is a large image with a size of approximately 16GB, as it already contains 
 >  to restart the container.
 
 > [!TIP]
-> To run Jupyter Notebooks within the *whovian-cocoa* docker container installed on a local machine, type the following command:
+> To run Jupyter Notebooks within the *whovian-cocoa* Docker container installed on a local machine, type the following command:
 >
 >      jupyter notebook --no-browser --port=8888
 >
