@@ -67,7 +67,7 @@ export IGNORE_HYREC_CODE=1
 #export IGNORE_COSMOREC_CODE=1
 export IGNORE_MGCAMB_CODE=1
 #export IGNORE_EMULTRF_CODE=1     #SaraivanovZhongZhu (SZZ) transformer-based emul
-export IGNORE_COSMOPOWER_CODE=1   #unable to install cosmopower on modern python
+export IGNORE_COSMOPOWER_CODE=1   #unable to install cosmopower on modern Python
 #export IGNORE_EUCLID_EMULATOR_V2_CODE=1
 export IGNORE_DARK_EMULATOR_CODE=1
 #export IGNORE_NAUTILUS_SAMPLER_CODE=1
@@ -83,7 +83,7 @@ export IGNORE_DARK_EMULATOR_CODE=1
 # ------------------------------------------------------------------------------
 #export IGNORE_COSMOLIKE_LSST_Y1_CODE=1
 export IGNORE_COSMOLIKE_DES_Y3_CODE=1
-#export IGNORE_COSMOLIKE_ROMAN_FOURIER_CODE=1
+export IGNORE_COSMOLIKE_ROMAN_FOURIER_CODE=1
 #export IGNORE_COSMOLIKE_ROMAN_REAL_CODE=1
 
 # ------------------------------------------------------------------------------
@@ -164,7 +164,7 @@ if [ $? -ne 0 ]; then
 fi
 
 # We decided to install C++ Armadillo library locally 
-# to link it against lapack & OpenBlas & arpack
+# to link it against LAPACK & OpenBLAS & ARPACK
 unset IGNORE_CPP_ARMA_INSTALLATION
 
 # ------------------------------------------------------------------------------
@@ -200,7 +200,7 @@ fi
 
 # This flag saves a lot of time when running setup_cocoa.py 
 # Why? Some git repos can be hundreds of MegaBytes (Class is 500 MegaBytes) 
-# But, this can create problem if GIT_COMMIT < LAST COMMIT - GIT_MAXIMUM_DEPTH
+# But, this can create a problem if GIT_COMMIT < LAST COMMIT - GIT_MAXIMUM_DEPTH
 export SPDLOG_VERSION=v1.15.3
 export GIT_CLONE_MAXIMUM_DEPTH=500
 
