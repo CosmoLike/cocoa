@@ -447,7 +447,7 @@ likelihoods, and the theory code, all following Cobaya Conventions.
 
 - **Global Minimizer**:
 
-  Our minimizer is a reimplementation of `Procoli`, developed by Karwal et al (arXiv:2401.14225) 
+  Our minimizer is a reimplementation of `Procoli`, developed by Karwal et al ([arXiv:2401.14225](https://arxiv.org/abs/2401.14225)) 
 
     - Linux
       
