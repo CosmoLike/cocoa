@@ -438,12 +438,16 @@ likelihoods, and the theory code, all following Cobaya Conventions.
 - **Sampler Comparison (Google Colab)**
 
   The script of the plot below is provided at `projects/example/scripts/EXAMPLE_PLOT_COMPARE_CHAINS.py`
-<p align="center">
-<img width="750" height="750" alt="projects_example_sampler_comparison" src="https://github.com/user-attachments/assets/d3639673-36ea-4fd9-9c91-1f5b97845fe0" />
-</p>
 
-   A similar version of this figure can be reconstructed using Google Colab, and we provide an example [here](https://colab.research.google.com/drive/1bafbg42HOX578JSMUuiy6WoKTX0YXFWD?usp=sharing). 
-   The only difference to the plot above is the choice of low $\ell$ CMB EE likelihood (`planck_2020_lollipop.lowlE` vs `planck_2018_lowl.EE_sroll2`).
+  <p align="center">
+  <img width="750" height="750" alt="projects_example_sampler_comparison" src="https://github.com/user-attachments/assets/d3639673-36ea-4fd9-9c91-1f5b97845fe0" />
+  </p>
+
+  A similar version of this figure can be reconstructed using Google Colab, and an example is provided [here](https://colab.research.google.com/drive/1bafbg42HOX578JSMUuiy6WoKTX0YXFWD?usp=sharing). 
+  The only difference between  Colab and the plot above is the choice of low $\ell$ CMB EE likelihood (`planck_2020_lollipop.lowlE` vs `planck_2018_lowl.EE_sroll2`).
+  The notebook consumed approximately 50 compute nodes (runtime $\sim 9$ hours) on the A100 high-memory node instance, which corresponds to roughly $10$% of the monthly Google Colab Pro+ computing budget.
+
+  Even though emulators can run on the GPU, with the Colab A100 utilization reaching 40% when running `Emcee`, `Nautilus`, and `Polychord` samplers due to the high number of walkers, the main limitation was the limited CPU allocation provided by Colab. Nevertheless, our example demonstrates that cosmological analyses using emulators are within the reach of Google Colab, allowing users to design notebooks that showcase their main scientific results. 
 
 - **Global Minimizer**:
 
