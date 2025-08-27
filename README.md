@@ -435,12 +435,15 @@ likelihoods, and the theory code, all following Cobaya Conventions.
 
   What if the user runs an `Emcee` chain with `maxeval` insufficient for convergence? `Emcee` saves the chain checkpoint at `chains/outroot.h5`.
 
-- **Sampler Comparison**
+- **Sampler Comparison (Google Colab)**
 
   The script of the plot below is provided at `projects/example/scripts/EXAMPLE_PLOT_COMPARE_CHAINS.py`
 <p align="center">
 <img width="750" height="750" alt="projects_example_sampler_comparison" src="https://github.com/user-attachments/assets/d3639673-36ea-4fd9-9c91-1f5b97845fe0" />
 </p>
+
+   A similar version of this figure can be reconstructed using Google Colab, and we provide an example [here](https://colab.research.google.com/drive/1bafbg42HOX578JSMUuiy6WoKTX0YXFWD?usp=sharing). 
+   The only difference to the plot above is the choice of low $\ell$ CMB EE likelihood (`planck_2020_lollipop.lowlE` vs `planck_2018_lowl.EE_sroll2`).
 
 - **Global Minimizer**:
 
