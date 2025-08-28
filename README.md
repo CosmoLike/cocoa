@@ -877,12 +877,18 @@ There are a few differences users should be aware of when running Cocoa on Googl
 
           %%bash
           DEST="/content/drive/MyDrive/ColabBackups"
+          ARCHIVE="$DEST/colab_basic_cocoa.tar.gz"
+          if [[ -f "$ARCHIVE" ]]; then
+            echo "Backup already exists: $ARCHIVE — skipping."
+            exit 0
+          fi
           mkdir -p "$DEST"
           tar -czf "$DEST/colab_basic_cocoa.tar.gz" \
             --exclude='/content/drive' \
             --exclude='**/__pycache__' \
             --exclude='**/.ipynb_checkpoints' \
             /content
+          echo "Created: $ARCHIVE"
 
   - Running Collab Notebook with CoCoA pre-installed (after first run)
 
