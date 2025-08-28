@@ -873,7 +873,7 @@ There are a few differences users should be aware of when running Cocoa on Googl
           cd ./cocoa/Cocoa/
           source compile_cocoa.sh
 
-    - **Cell 7️⃣:**: Saving CoCoA (pre-installed)
+    - **Cell 7️⃣:**: Save CoCoA
 
           %%bash
           DEST="/content/drive/MyDrive/ColabBackups"
@@ -897,7 +897,7 @@ There are a few differences users should be aware of when running Cocoa on Googl
           from google.colab import drive
           drive.mount('/content/drive')
 
-    - **Cell 2️⃣:**: Load CoCoA pre-installed
+    - **Cell 2️⃣:**: Load CoCoA (pre-installed and pre-compiled)
 
           %%bash
           DEST="/content/drive/MyDrive/ColabBackups"
@@ -945,7 +945,7 @@ and
 **Step :two:**: After installation, users must source the conda configuration file, as shown below:
 
     source $CONDA_DIR/etc/profile.d/conda.sh \
-          && conda config --set auto_update_conda false \
+          && conda config --set auto_update_conda false I am running a few minutes late; my previous meeting is running over.
           && conda config --set show_channel_urls true \
           && conda config --set auto_activate_base false \
           && conda config --prepend channels conda-forge \
