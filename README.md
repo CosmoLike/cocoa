@@ -873,16 +873,16 @@ There are a few differences users should be aware of when running CoCoA on Googl
           cd ./cocoa/Cocoa/
           source compile_cocoa.sh
 
-    - **Cell 7️⃣:**: **Saving CoCoA**
+    - **Cell 7️⃣:**: Saving CoCoA (pre-installed)
 
-        %%bash
-        DEST="/content/drive/MyDrive/ColabBackups"
-        mkdir -p "$DEST"
-        tar -czf "$DEST/colab_basic_cocoa.tar.gz" \
-          --exclude='/content/drive' \
-          --exclude='**/__pycache__' \
-          --exclude='**/.ipynb_checkpoints' \
-          /content
+          %%bash
+          DEST="/content/drive/MyDrive/ColabBackups"
+          mkdir -p "$DEST"
+          tar -czf "$DEST/colab_basic_cocoa.tar.gz" \
+            --exclude='/content/drive' \
+            --exclude='**/__pycache__' \
+            --exclude='**/.ipynb_checkpoints' \
+            /content
 
   - Running Collab Notebook with CoCoA pre-installed (after first run)
 
