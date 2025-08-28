@@ -850,7 +850,7 @@ There are a few differences users should be aware of when running CoCoA on Googl
           ln -s "${CONDA_PREFIX}"/bin/x86_64-conda-linux-gnu-gcc-ranlib "${CONDA_PREFIX}"/bin/gcc-ranlib
           git-lfs install
 
-    - **Cell 4️⃣:**: Clone CoCoA
+    - **Cell 4️⃣:**: Clone CoCoA (similar to our documentation in section [Installation and Compilation of external modules](#cobaya_base_code))
 
           %%bash
           source "/content/conda/etc/profile.d/conda.sh"
