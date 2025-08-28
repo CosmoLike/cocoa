@@ -900,13 +900,14 @@ There are a few differences users should be aware of when running Cocoa on Googl
     - **Cell 2️⃣:**: Load CoCoA pre-installed
 
           %%bash
-          # when reloading the notebook - use this to save time and GitLFS band
+          DEST="/content/drive/MyDrive/ColabBackups"
+          ARCHIVE="$DEST/colab_basic_cocoa.tar.gz"
           SENTINEL="/content/conda/etc/profile.d/conda.sh"  # exists when your env is restored
-          test -f "$ARCHIVE"
           if [[ -e "$SENTINEL" ]]; then
             echo "Found $SENTINEL — environment already restored. Skipping untar."
             exit 0
           fi
+          test -f "$ARCHIVE"
           ARCHIVE="/content/drive/MyDrive/ColabBackups/colab_basic_cocoa.tar.gz"
           tar -xzf "$ARCHIVE" -C /
 
