@@ -15,14 +15,15 @@
     2. [FAQ: How can users compile external modules (not involving Cosmolike)?](#appendix_compile_separately)
     3. [FAQ: How can users install Cosmolike projects?](#appendix_compile_cosmolike_separately)
     4. [FAQ: How can users run Cocoa with Docker?](#appendix_jupyter_whovian)
-    5. [FAQ: How can users install Conda?](#overview_miniforge)
-    6. [FAQ: How can users set the appropriate environment for ML?](#ml_emulators)
-    7. [FAQ: How can developers push changes to the Cocoa main branch?](#push_main)
-    8. [FAQ: How can developers develop from a Git tag?](#dev_from_tag)
-    9. [FAQ: How can users download additional likelihood data? (external readme)](Cocoa/external_modules/data)
-   10. [FAQ: Where do users find common FAQs about external modules? (external readme)](Cocoa/external_modules/code)
-   11. [FAQ: Where do users find common FAQs about Cosmolike? (external readme)](Cocoa/projects/)
-   12. [FAQ: How can users improve our Bash/C/C++ knowledge?](#lectnotes)
+    5. [FAQ: How can users run CoCoA on Google Colab?](#overview_google_colab)
+    6. [FAQ: How can users install Conda?](#overview_miniforge)
+    7. [FAQ: How can users set the appropriate environment for ML?](#ml_emulators)
+    8. [FAQ: How can developers push changes to the Cocoa main branch?](#push_main)
+    9. [FAQ: How can developers develop from a Git tag?](#dev_from_tag)
+    10. [FAQ: How can users download additional likelihood data? (external readme)](Cocoa/external_modules/data)
+   11. [FAQ: Where do users find common FAQs about external modules? (external readme)](Cocoa/external_modules/code)
+   12. [FAQ: Where do users find common FAQs about Cosmolike? (external readme)](Cocoa/projects/)
+   13. [FAQ: How can users improve our Bash/C/C++ knowledge?](#lectnotes)
 
 # Overview <a name="overview"></a>
 
@@ -443,7 +444,7 @@ likelihoods, and the theory code, all following Cobaya Conventions.
   <img width="750" height="750" alt="projects_example_sampler_comparison" src="https://github.com/user-attachments/assets/d3639673-36ea-4fd9-9c91-1f5b97845fe0" />
   </p>
 
-  A similar version of this figure can be reconstructed using Google Colab, and an example is provided [here](https://colab.research.google.com/drive/1bafbg42HOX578JSMUuiy6WoKTX0YXFWD?usp=sharing). 
+  A similar version of this figure can be reconstructed using Google Colab, as we provide the notebook [Cocoa_Example_(Sampler_Comparison)](https://github.com/CosmoLike/CoCoAGoogleColabExamples/blob/main/Cocoa_Example_(Sampler_Comparison).ipynb). 
   The only difference between  Colab and the plot above is the choice of low $\ell$ CMB EE likelihood (`planck_2020_lollipop.lowlE` vs `planck_2018_lowl.EE_sroll2`).
   The notebook consumed approximately 50 compute nodes (runtime $\sim 9$ hours) on the A100 high-memory node instance, which corresponds to roughly $10$% of the monthly Google Colab Pro+ computing budget.
 
@@ -802,6 +803,116 @@ This is a large image with a size of approximately 13GB, as it already contains 
 > [!Warning]
 > Do not allow the Docker container to have system-wide access to your files. Accidents happen, especially when dealing with dangerous bash commands such as `rm` (deletion).
 
+## :interrobang: FAQ: How can users run CoCoA on Google Colab? <a name="overview_google_colab"></a>
+
+[Google Colab](https://colab.research.google.com/) provides a convenient platform for users to run MCMCs, likelihood minimizations, and profiles, as long as Machine-Learning Emulators are used to compute the data vectors. In the repository [CoCoAGoogleColabExamples](https://github.com/CosmoLike/CoCoAGoogleColabExamples), we provide a few examples along with explanatory notes. 
+
+Installing CoCoA requires time and also strains our limited Git-LFS quota, which is especially relevant given that **the entire `/content` local drive is wiped when a Colab notebook is disconnected**. We provide instructions on how to save and load CoCoa right after the initial installation to avoid this problem. 
+
+There are a few differences users should be aware of when running CoCoA on Google Colab.
+
+  - Running Collab Notebook for the first time
+
+    - **Cell :one:**: Connect the notebook to your Google Drive account (will be important later)
+
+          from google.colab import drive
+          drive.mount('/content/drive')
+
+    - **Cell 2️⃣:**: Install Miniforge (Similar to our documentation in section [FAQ: How can users install Conda?](#overview_miniforge))
+
+          %%bash
+          export CONDA_DIR="/content/conda"
+          mkdir "${CONDA_DIR:?}"
+          curl -L -O "https://github.com/conda-forge/miniforge/releases/latest/download/Miniforge3-$(uname)-$(uname -m).sh"
+          /bin/bash Miniforge3-$(uname)-$(uname -m).sh -f -b -p "${CONDA_DIR:?}"
+          /bin/bash
+          source $CONDA_DIR/etc/profile.d/conda.sh \
+                && conda config --set auto_update_conda false \
+                && conda config --set show_channel_urls true \
+                && conda config --set auto_activate_base false \
+                && conda config --prepend channels conda-forge \
+                && conda config --add allowlist_channels conda-forge \
+                && conda config --set channel_priority strict \
+                && conda init bash
+          source ~/.bashrc
+
+    - **Cell 3️⃣:**: Install Conda cocoa env (similar to our documentation in section [Installation of core packages](#required_packages_conda))
+
+          %%bash
+          source "/content/conda/etc/profile.d/conda.sh"
+          conda activate lockenv
+          conda-lock install -n cocoa cocoapy310-linux.yml
+          conda activate cocoa 
+          ln -s "${CONDA_PREFIX}"/bin/x86_64-conda_cos6-linux-gnu-gcc "${CONDA_PREFIX}"/bin/gcc
+          ln -s "${CONDA_PREFIX}"/bin/x86_64-conda_cos6-linux-gnu-g++ "${CONDA_PREFIX}"/bin/g++
+          ln -s "${CONDA_PREFIX}"/bin/x86_64-conda_cos6-linux-gnu-gfortran "${CONDA_PREFIX}"/bin/gfortran
+          ln -s "${CONDA_PREFIX}"/bin/x86_64-conda-linux-gnu-gcc-ar "${CONDA_PREFIX}"/bin/gcc-ar
+          ln -s "${CONDA_PREFIX}"/bin/x86_64-conda-linux-gnu-gcc-ranlib "${CONDA_PREFIX}"/bin/gcc-ranlib
+          git-lfs install
+
+    - **Cell 4️⃣:**: Clone CoCoA
+
+          %%bash
+          source "/content/conda/etc/profile.d/conda.sh"
+          conda activate cocoa                                  
+          git clone https://github.com/CosmoLike/cocoa.git --branch v4.0 cocoa # users can adjust this line
+
+    - **Cell 5️⃣:**: run `setup_cocoa.sh`
+
+           %%bash
+           source "/content/conda/etc/profile.d/conda.sh" 
+           conda activate cocoa
+           cd ./cocoa/Cocoa/
+           source setup_cocoa.sh
+
+    - **Cell 6️⃣:**: run `compile_cocoa.sh`
+
+          %%bash
+          source "/content/conda/etc/profile.d/conda.sh"
+          conda activate cocoa
+          cd ./cocoa/Cocoa/
+          source compile_cocoa.sh
+
+    - **Cell 7️⃣:**: **Saving CoCoA**
+
+        %%bash
+        DEST="/content/drive/MyDrive/ColabBackups"
+        mkdir -p "$DEST"
+        tar -czf "$DEST/colab_basic_cocoa.tar.gz" \
+          --exclude='/content/drive' \
+          --exclude='**/__pycache__' \
+          --exclude='**/.ipynb_checkpoints' \
+          /content
+
+  - Running Collab Notebook with CoCoA pre-installed (after first run)
+
+    - **Cell :one:**: Connect the notebook to your Google Drive account (will be important later)
+
+          from google.colab import drive
+          drive.mount('/content/drive')
+
+    - **Cell 2️⃣:**: Load CoCoA pre-installed
+
+          %%bash
+          # when reloading the notebook - use this to save time and GitLFS band
+          SENTINEL="/content/conda/etc/profile.d/conda.sh"  # exists when your env is restored
+          test -f "$ARCHIVE"
+          if [[ -e "$SENTINEL" ]]; then
+            echo "Found $SENTINEL — environment already restored. Skipping untar."
+            exit 0
+          fi
+          ARCHIVE="/content/drive/MyDrive/ColabBackups/colab_basic_cocoa.tar.gz"
+          tar -xzf "$ARCHIVE" -C /
+
+> [!Note]
+> From now on, users must start every subsequent shell with 
+>
+>        %%bash
+>        source "/content/conda/etc/profile.d/conda.sh"
+>        conda activate cocoa`
+>        cd ./cocoa/Cocoa/
+>        source start_cocoa.sh
+   
 ## :interrobang: FAQ: How can users install Conda? <a name="overview_miniforge"></a>
 
 **Step :one:**: Download and run the Miniforge installation script. 
