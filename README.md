@@ -15,7 +15,7 @@
     2. [FAQ: How can users compile external modules (not involving Cosmolike)?](#appendix_compile_separately)
     3. [FAQ: How can users install Cosmolike projects?](#appendix_compile_cosmolike_separately)
     4. [FAQ: How can users run Cocoa with Docker?](#appendix_jupyter_whovian)
-    5. [FAQ: How can users run CoCoA on Google Colab?](#overview_google_colab)
+    5. [FAQ: How can users run Cocoa on Google Colab?](#overview_google_colab)
     6. [FAQ: How can users install Conda?](#overview_miniforge)
     7. [FAQ: How can users set the appropriate environment for ML?](#ml_emulators)
     8. [FAQ: How can developers push changes to the Cocoa main branch?](#push_main)
@@ -803,13 +803,13 @@ This is a large image with a size of approximately 13GB, as it already contains 
 > [!Warning]
 > Do not allow the Docker container to have system-wide access to your files. Accidents happen, especially when dealing with dangerous bash commands such as `rm` (deletion).
 
-## :interrobang: FAQ: How can users run CoCoA on Google Colab? <a name="overview_google_colab"></a>
+## :interrobang: FAQ: How can users run Cocoa on Google Colab? <a name="overview_google_colab"></a>
 
 [Google Colab](https://colab.research.google.com/) provides a convenient platform for users to run MCMCs, likelihood minimizations, and profiles, as long as Machine-Learning Emulators are used to compute the data vectors. In the repository [CoCoAGoogleColabExamples](https://github.com/CosmoLike/CoCoAGoogleColabExamples), we provide a few examples along with explanatory notes. 
 
-Installing CoCoA requires time and also strains our limited Git-LFS quota, which is especially relevant given that **the entire `/content` local drive is wiped when a Colab notebook is disconnected**. We provide instructions on how to save and load CoCoa right after the initial installation to avoid this problem. 
+Installing Cocoa requires time and also strains our limited Git-LFS quota, which is especially relevant given that **the entire `/content` local drive is wiped when a Colab notebook is disconnected**. We provide instructions on how to save and load CoCoa right after the initial installation to avoid this problem. 
 
-There are a few differences users should be aware of when running CoCoA on Google Colab.
+There are a few differences users should be aware of when running Cocoa on Google Colab.
 
   - Running Collab Notebook for the first time
 
