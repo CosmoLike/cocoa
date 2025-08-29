@@ -939,7 +939,7 @@ There are a few differences users should be aware of when running Cocoa on Googl
                 /content
             echo "Created: $ARCHIVE"
 
-  - Loading checkpoints: decompress and copy the `/content` folder from the user's Drive to the local disk (set `ARCHIVE` to the appropriate checkpoint file)
+  - Loading checkpoints: decompress and copy the `/content` folder from the user's Drive to the local disk
     
             %%bash
             SENTINEL="/content/conda/etc/profile.d/conda.sh"  # exists when your env is restored
