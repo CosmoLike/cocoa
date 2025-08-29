@@ -818,7 +818,7 @@ There are a few differences users should be aware of when running Cocoa on Googl
           from google.colab import drive
           drive.mount('/content/drive')
 
-    - **Cell 2️⃣:**: Install Miniforge (Similar to our documentation in section [FAQ: How can users install Conda?](#overview_miniforge))
+    - **Cell 2️⃣**: Install Miniforge (Similar to our documentation in section [FAQ: How can users install Conda?](#overview_miniforge))
 
           %%bash
           export CONDA_DIR="/content/conda"
@@ -836,7 +836,7 @@ There are a few differences users should be aware of when running Cocoa on Googl
                 && conda init bash
           source ~/.bashrc
 
-    - **Cell 3️⃣:**: Install Conda cocoa env (similar to our documentation in section [Installation of core packages](#required_packages_conda))
+    - **Cell 3️⃣**: Install Conda cocoa env (similar to our documentation in section [Installation of core packages](#required_packages_conda))
 
           %%bash
           source "/content/conda/etc/profile.d/conda.sh"
@@ -850,14 +850,14 @@ There are a few differences users should be aware of when running Cocoa on Googl
           ln -s "${CONDA_PREFIX}"/bin/x86_64-conda-linux-gnu-gcc-ranlib "${CONDA_PREFIX}"/bin/gcc-ranlib
           git-lfs install
 
-    - **Cell 4️⃣:**: Clone CoCoA (similar to our documentation in section [Installation and Compilation of external modules](#cobaya_base_code))
+    - **Cell 4️⃣**: Clone CoCoA (similar to our documentation in section [Installation and Compilation of external modules](#cobaya_base_code))
 
           %%bash
           source "/content/conda/etc/profile.d/conda.sh"
           conda activate cocoa                                  
           git clone https://github.com/CosmoLike/cocoa.git --branch v4.0 cocoa # users can adjust this line
 
-    - **Cell 5️⃣:**: run `setup_cocoa.sh`
+    - **Cell 5️⃣**: run `setup_cocoa.sh`
 
            %%bash
            source "/content/conda/etc/profile.d/conda.sh" 
@@ -865,7 +865,7 @@ There are a few differences users should be aware of when running Cocoa on Googl
            cd ./cocoa/Cocoa/
            source setup_cocoa.sh
 
-    - **Cell 6️⃣:**: run `compile_cocoa.sh`
+    - **Cell 6️⃣**: run `compile_cocoa.sh`
 
           %%bash
           source "/content/conda/etc/profile.d/conda.sh"
@@ -873,7 +873,7 @@ There are a few differences users should be aware of when running Cocoa on Googl
           cd ./cocoa/Cocoa/
           source compile_cocoa.sh
 
-    - **Cell 7️⃣:**: Save CoCoA
+    - **Cell 7️⃣**: Save Cocoa on Drive (does not work with local runtime)
 
           %%bash
           DEST="/content/drive/MyDrive/ColabBackups"
@@ -890,14 +890,14 @@ There are a few differences users should be aware of when running Cocoa on Googl
             /content
           echo "Created: $ARCHIVE"
 
-  - Running Collab Notebook with CoCoA pre-installed (after first run)
+  - Running Collab Notebook with Cocoa pre-installed, loaded from Drive (does not work with local runtime)
 
     - **Cell :one:**: Connect the notebook to your Google Drive account
 
           from google.colab import drive
           drive.mount('/content/drive')
 
-    - **Cell 2️⃣:**: Load CoCoA (pre-installed and pre-compiled)
+    - **Cell 2️⃣**: Load Cocoa from Drive
 
           %%bash
           DEST="/content/drive/MyDrive/ColabBackups"
