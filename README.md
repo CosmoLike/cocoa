@@ -807,7 +807,7 @@ This is a large image with a size of approximately 13GB, as it already contains 
 
 [Google Colab](https://colab.research.google.com/) provides a convenient platform for users to run MCMCs, likelihood minimizations, and profiles, as long as Machine-Learning Emulators are used to compute the data vectors. In the repository [CoCoAGoogleColabExamples](https://github.com/CosmoLike/CoCoAGoogleColabExamples), we provide a few examples along with explanatory notes. 
 
-Installing Cocoa requires time and also strains our limited Git-LFS quota, which is especially relevant given that **the entire `/content` local drive is wiped when a Colab notebook is disconnected**. We provide instructions on how to save and load Cocoa right after the initial installation to avoid this problem. 
+Installing Cocoa requires time and also strains our limited Git-LFS quota, which is especially relevant given that **the entire local drive is wiped when a Colab notebook is disconnected**. To prevent this problem, we provide instructions on how to save and load Cocoa immediately after the initial installation. 
 
 There are a few differences users should be aware of when running Cocoa on Google Colab.
 
@@ -919,7 +919,38 @@ There are a few differences users should be aware of when running Cocoa on Googl
 >        conda activate cocoa`
 >        cd ./cocoa/Cocoa/
 >        source start_cocoa.sh
-   
+
+
+- Saving/Loading checkpoints
+
+  Not reserving time to copy the `/content` folder to the user's Google Drive, an expensive operation, can result in 24 hours of lost computation. To prevent such a catastrophe, the code below creates and loads *checkpoints* that users can add after computationally intensive cells. 
+  
+  - Saving checkpoints: compress and copy the `/content` folder from the local disk to the user's Drive
+    
+            %%bash
+            ROOT="colab_name_notebook"
+            DEST="/content/drive/MyDrive/ColabBackups"
+            mkdir -p "$DEST"
+            ARCHIVE="$DEST/$ROOT_$(date +%F_%H-%M).tar.gz"
+            tar -czf "$ARCHIVE" \
+                --exclude='/content/drive' \
+                --exclude='**/__pycache__' \
+                --exclude='**/.ipynb_checkpoints' \
+                /content
+            echo "Created: $ARCHIVE"
+
+  - Loading checkpoints: decompress and copy the `/content` folder from the user's Drive to the local disk (set `ARCHIVE` to the appropriate checkpoint file)
+    
+            %%bash
+            SENTINEL="/content/conda/etc/profile.d/conda.sh"  # exists when your env is restored
+            if [[ -e "$SENTINEL" ]]; then
+              echo "Found $SENTINEL — environment already restored. Skipping untar."
+              exit 0
+            fi
+            ARCHIVE="CHECKPOINT_FILE"
+            test -f "$ARCHIVE"
+            tar -xzf "$ARCHIVE" -C /
+
 ## :interrobang: FAQ: How can users install Conda? <a name="overview_miniforge"></a>
 
 **Step :one:**: Download and run the Miniforge installation script. 
