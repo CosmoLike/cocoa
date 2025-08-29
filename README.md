@@ -444,12 +444,9 @@ likelihoods, and the theory code, all following Cobaya Conventions.
   <img width="750" height="750" alt="projects_example_sampler_comparison" src="https://github.com/user-attachments/assets/d3639673-36ea-4fd9-9c91-1f5b97845fe0" />
   </p>
 
-  A similar version of this figure can be reconstructed using Google Colab, as we provide the notebook [Cocoa_Example_(Sampler_Comparison)](https://github.com/CosmoLike/CoCoAGoogleColabExamples/blob/main/Cocoa_Example_(Sampler_Comparison).ipynb). 
+  A similar version of this figure can be reconstructed using Google Colab, as we provide the notebook [Example Sampler Comparison](https://github.com/CosmoLike/CoCoAGoogleColabExamples/blob/main/Cocoa_Example_(Sampler_Comparison).ipynb). 
   The only difference between  Colab and the plot above is the choice of low $\ell$ CMB EE likelihood (`planck_2020_lollipop.lowlE` vs `planck_2018_lowl.EE_sroll2`).
-  The notebook consumed approximately 50 compute nodes (runtime $\sim 9$ hours) on the A100 high-memory node instance, which corresponds to roughly $10$% of the monthly Google Colab Pro+ computing budget.
-
-  Even though emulators can run on the GPU, with the Colab A100 utilization reaching 40% when running `Emcee`, `Nautilus`, and `Polychord` samplers due to the high number of walkers, the main limitation was the limited CPU allocation provided by Colab. Nevertheless, our example demonstrates that cosmological analyses using emulators are within the reach of Google Colab, allowing users to design notebooks that showcase their main scientific results. 
-
+  
 - **Global Minimizer**:
 
   Our minimizer is a reimplementation of `Procoli`, developed by Karwal et al ([arXiv:2401.14225](https://arxiv.org/abs/2401.14225)) 
@@ -522,6 +519,9 @@ likelihoods, and the theory code, all following Cobaya Conventions.
 <p align="center">
 <img width="1156" height="858" alt="Screenshot 2025-08-02 at 8 42 41 PM" src="https://github.com/user-attachments/assets/22182688-2865-4b15-a80b-783ddd21f715" />
 </p>
+
+  A similar version of this figure can be reconstructed using Google Colab, as we provide the notebook [Example Profile Likelihood](https://github.com/CosmoLike/CoCoAGoogleColabExamples/blob/main/Cocoa_Example_Profile_Likelihoods.ipynb). 
+  The only difference between  Colab and the plot above is the choice of low $\ell$ CMB EE likelihood (`planck_2020_lollipop.lowlE` vs `planck_2018_lowl.EE_sroll2`).
 
 - **Profile method 2**:
 
