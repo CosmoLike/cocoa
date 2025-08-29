@@ -923,33 +923,33 @@ There are a few differences users should be aware of when running Cocoa on Googl
 
 - Saving/Loading checkpoints
 
-  Not reserving time to copy the `/content` folder to the user's Google Drive, an expensive operation, can result in 24 hours of lost computation. To prevent such a catastrophe, the code below creates and loads *checkpoints* that users can add after computationally intensive cells. 
+  Not reserving time to copy the `/content` folder to the user's Google Drive, an expensive operation, can result in up to 24 hours of lost computation. To prevent such a catastrophe, the code below creates and loads *checkpoints* that users can add after computationally intensive cells. 
   
   - Saving checkpoints: compress and copy the `/content` folder from the local disk to the user's Drive
     
-            %%bash
-            ROOT="colab_name_notebook"
-            DEST="/content/drive/MyDrive/ColabBackups"
-            mkdir -p "$DEST"
-            ARCHIVE="$DEST/$ROOT_$(date +%F_%H-%M).tar.gz"
-            tar -czf "$ARCHIVE" \
-                --exclude='/content/drive' \
-                --exclude='**/__pycache__' \
-                --exclude='**/.ipynb_checkpoints' \
-                /content
-            echo "Created: $ARCHIVE"
+        %%bash
+        ROOT="colab_name_notebook"
+        DEST="/content/drive/MyDrive/ColabBackups"
+        mkdir -p "$DEST"
+        ARCHIVE="$DEST/$ROOT_$(date +%F_%H-%M).tar.gz"
+        tar -czf "$ARCHIVE" \
+            --exclude='/content/drive' \
+            --exclude='**/__pycache__' \
+            --exclude='**/.ipynb_checkpoints' \
+            /content
+        echo "Created: $ARCHIVE"
 
   - Loading checkpoints: decompress and copy the `/content` folder from the user's Drive to the local disk
     
-            %%bash
-            SENTINEL="/content/conda/etc/profile.d/conda.sh"  # exists when your env is restored
-            if [[ -e "$SENTINEL" ]]; then
-              echo "Found $SENTINEL — environment already restored. Skipping untar."
-              exit 0
-            fi
-            ARCHIVE="CHECKPOINT_FILE"
-            test -f "$ARCHIVE"
-            tar -xzf "$ARCHIVE" -C /
+        %%bash
+        SENTINEL="/content/conda/etc/profile.d/conda.sh"  # exists when your env is restored
+        if [[ -e "$SENTINEL" ]]; then
+          echo "Found $SENTINEL — environment already restored. Skipping untar."
+          exit 0
+        fi
+        ARCHIVE="CHECKPOINT_FILE"
+        test -f "$ARCHIVE"
+        tar -xzf "$ARCHIVE" -C /
 
 ## :interrobang: FAQ: How can users install Conda? <a name="overview_miniforge"></a>
 
