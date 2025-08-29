@@ -892,7 +892,7 @@ There are a few differences users should be aware of when running Cocoa on Googl
 
   - Running Collab Notebook with CoCoA pre-installed (after first run)
 
-    - **Cell :one:**: Connect the notebook to your Google Drive account (will be important later)
+    - **Cell :one:**: Connect the notebook to your Google Drive account
 
           from google.colab import drive
           drive.mount('/content/drive')
