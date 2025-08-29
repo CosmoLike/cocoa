@@ -923,7 +923,9 @@ There are a few differences users should be aware of when running Cocoa on Googl
 
 - Saving/Loading checkpoints
 
-  Not reserving time to copy the `/content` folder to the user's Google Drive, an expensive operation, can result in up to 24 hours of lost computation. To prevent such a catastrophe, the code below creates and loads *checkpoints* that users can add after computationally intensive cells. 
+  Not reserving time to copy the `/content` folder to the user's Google Drive, an expensive operation, can result in up to 24 hours of lost computation. To prevent such a catastrophe, the code below creates and loads *checkpoints* that users can add after computationally intensive cells.
+
+  *This solution is not valid when running Colab with local runtime* (see [Google documentation](https://research.google.com/colaboratory/local-runtimes.html) for additional information on how to link notebooks to local resources). The good news here is that local storage is persistent, so there is no need to create backups on Google Drive.
   
   - Saving checkpoints: compress and copy the `/content` folder from the local disk to the user's Drive
     
