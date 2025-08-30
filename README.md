@@ -404,7 +404,8 @@ likelihoods, and the theory code, all following Cobaya Conventions.
                 --root ./projects/example/ --outroot "EXAMPLE_EMUL_NAUTILUS1"  \
                 --maxfeval 450000 --nlive 2048 --neff 15000 --flive 0.01 --nnetworks 5
 
-  What if the user runs an `Nautilus` chain with `maxeval` insufficient for producing `neff` samples? `Nautilus` saves the chain checkpoint at `chains/outroot_checkpoint.hdf5`.
+> [!NOTE]
+> What if the user runs an `Nautilus` chain with `maxeval` insufficient for producing `neff` samples? `Nautilus` creates a checkpoint at `chains/outroot_checkpoint.hdf5`.
 
 - **Emcee**:
 
@@ -434,17 +435,16 @@ likelihoods, and the theory code, all following Cobaya Conventions.
   Conclusion: `Emcee` requires $\sim 3$ more evaluations in this case, but the number of evaluations per MPI worker (assuming one MPI worker per walker) is reduced by $\sim 10$.
   Therefore, `Emcee` seems well-suited for cases where the evaluation of a single cosmology is time-consuming (and there is no slow/fast decomposition).
 
-  What if the user runs an `Emcee` chain with `maxeval` insufficient for convergence? `Emcee` saves the chain checkpoint at `chains/outroot.h5`.
+> [!NOTE]
+> What if the user runs an `Emcee` chain with `maxeval` insufficient for convergence? `Emcee` creates a checkpoint at `chains/outroot.h5`.
 
 - **Sampler Comparison**
 
-  The script of the plot below is provided at `projects/example/scripts/EXAMPLE_PLOT_COMPARE_CHAINS.py`
+    The script that generated the plot below is provided at `projects/example/scripts/EXAMPLE_PLOT_COMPARE_CHAINS.py`. The Google Colab notebook [Example Sampler Comparison](https://github.com/CosmoLike/CoCoAGoogleColabExamples/blob/main/Cocoa_Example_(Sampler_Comparison).ipynb) can also reconstruct a similar version of this figure.
 
-  <p align="center">
-  <img width="750" height="750" alt="projects_example_sampler_comparison" src="https://github.com/user-attachments/assets/d3639673-36ea-4fd9-9c91-1f5b97845fe0" />
-  </p>
-
-  The Google Colab notebook [Example Sampler Comparison](https://github.com/CosmoLike/CoCoAGoogleColabExamples/blob/main/Cocoa_Example_(Sampler_Comparison).ipynb) can reconstruct a similar version of this figure.
+    <p align="center">
+    <img width="750" height="750" alt="projects_example_sampler_comparison" src="https://github.com/user-attachments/assets/d3639673-36ea-4fd9-9c91-1f5b97845fe0" />
+    </p>
   
 - **Global Minimizer**:
 
@@ -468,13 +468,11 @@ likelihoods, and the theory code, all following Cobaya Conventions.
   Do maintain $n_{\\rm stw} > 200$ for reliable convergence in LCDM (see plot below).
   The same rule applies to *Profile* and *Scan* codes, as they are all based on the same minimization strategy.
 
-  The script that generated the plot below is provided at `projects/example/scripts/EXAMPLE_MIN_COMPARE_CONV.py`
+  The script that generated the plot below is provided at `projects/example/scripts/EXAMPLE_MIN_COMPARE_CONV.py`. The Google Colab notebook [Test Minimizer Convergence](https://github.com/CosmoLike/CoCoAGoogleColabExamples/blob/main/Cocoa_Example_Test_Minimizer_Convergence.ipynb) can also reconstruct a similar version of this figure. 
 
   <p align="center">
   <img width="700" height="470" alt="Screenshot 2025-08-04 at 7 05 53 AM" src="https://github.com/user-attachments/assets/a48b267a-beba-4e53-9dbf-e3c5a24daff1" />
   </p>
-
-  The Google Colab notebook [Test Minimizer Convergence](https://github.com/CosmoLike/CoCoAGoogleColabExamples/blob/main/Cocoa_Example_Test_Minimizer_Convergence.ipynb) can reconstruct a similar version of this figure. 
 
   Below we show a case with $n_{\rm param} = 38$ that illustrates the need for performing convergence tests on a case-by-case basis.
   In this example, the total number of evaluations for a reliable minimum is approximately $319,200$ ($n_{\\rm stw} \sim 700$), distributed among $n_{\\rm MPI} = 114$ processes for faster results.
@@ -501,25 +499,24 @@ likelihoods, and the theory code, all following Cobaya Conventions.
                   --outroot "EXAMPLE_EMUL_PROFILE1" --factor 3 --nstw 200 --numpts 10 \
                   --profile 1 --minfile "./projects/example/chains/EXAMPLE_EMUL_MIN1.txt"
       
-  Profile provides the optional argument `minfile`, as it is significantly faster to run the profile script with a previously provided global minimum. 
-  The profile also provides the optional argument `cov`. Again, it is considerably more efficient to employ a covariance matrix from a converged chain. 
 
-  The argument `factor` specifies the start and end of the parameter being profiled:
+    Profile provides the optional argument `minfile`, as it is significantly faster to run the profile script with a previously provided global minimum. 
+    The profile also provides the optional argument `cov`. Again, it is considerably more efficient to employ a covariance matrix from a converged chain. 
 
-      start value ~ mininum value - factor*np.sqrt(np.diag(cov))
-      end   value ~ mininum value + factor*np.sqrt(np.diag(cov))
+    The argument `factor` specifies the start and end of the parameter being profiled:
 
-  We advise ${\rm factor} \sim 3$ for parameters that are well constrained by the data when a covariance matrix is provided.
-  If `cov` is not supplied, the code estimates one internally from the prior.
-  If a parameter is poorly constrained or `cov` is not given, we recommend ${\rm factor} \ll 1$.
+          start value ~ mininum value - factor*np.sqrt(np.diag(cov))
+          end   value ~ mininum value + factor*np.sqrt(np.diag(cov))
 
-  The script of the plot below is provided at `projects/example/scripts/EXAMPLE_PLOT_PROFILE1.py`
+    We advise ${\rm factor} \sim 3$ for parameters that are well constrained by the data when a covariance matrix is provided.
+    If `cov` is not supplied, the code estimates one internally from the prior.
+    If a parameter is poorly constrained or `cov` is not given, we recommend ${\rm factor} \ll 1$.
+
+    The script that generated the plot below is provided at `projects/example/scripts/EXAMPLE_PLOT_PROFILE1.py`. The Google Colab notebook [Example Profile Likelihood](https://github.com/CosmoLike/CoCoAGoogleColabExamples/blob/main/Cocoa_Example_Profile_Likelihoods.ipynb) can also reconstruct a similar version of this figure. 
   
-<p align="center">
-<img width="1156" height="858" alt="Screenshot 2025-08-02 at 8 42 41 PM" src="https://github.com/user-attachments/assets/22182688-2865-4b15-a80b-783ddd21f715" />
-</p>
-
-  The Google Colab notebook [Example Profile Likelihood](https://github.com/CosmoLike/CoCoAGoogleColabExamples/blob/main/Cocoa_Example_Profile_Likelihoods.ipynb) can reconstruct a similar version of this figure. 
+    <p align="center">
+    <img width="1156" height="858" alt="Screenshot 2025-08-02 at 8 42 41 PM" src="https://github.com/user-attachments/assets/22182688-2865-4b15-a80b-783ddd21f715" />
+    </p>
 
 - **Profile method 2**:
 
@@ -543,11 +540,11 @@ likelihoods, and the theory code, all following Cobaya Conventions.
                 --outroot "EXAMPLE_EMUL_PROFILE1M2" --factor 3 --maxfeval 5000 --numpts 10 \
                 --profile 1 --minfile "./projects/example/chains/EXAMPLE_EMUL_MIN1.txt"
       
-     The script of the plot below is provided at `projects/example/scripts/EXAMPLE_PLOT_PROFILE1_COMP.py`
+    The script that generated the plot below is provided at `projects/example/scripts/EXAMPLE_PLOT_PROFILE1_COMP.py`
   
-  <p align="center">
-  <img width="1156" height="858" alt="example_profile_comp" src="https://github.com/user-attachments/assets/ba0c0629-bd3b-4274-9f24-9db5929dc35c" />
-  </p>
+    <p align="center">
+    <img width="1156" height="858" alt="example_profile_comp" src="https://github.com/user-attachments/assets/ba0c0629-bd3b-4274-9f24-9db5929dc35c" />
+    </p>
 
 - **Scan**: 
 
