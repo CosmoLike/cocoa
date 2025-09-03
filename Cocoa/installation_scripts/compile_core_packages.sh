@@ -790,11 +790,13 @@ if [ -z "${IGNORE_CORE_INSTALLATION}" ]; then
                        ) # If nonblank, path must include /
     
     # T = TMP
-    declare -a TFILE=("makefile" 
+    declare -a TFILE=("makefile"
+                      "makefile" 
                      )
 
     #T = TMP, P = PATCH
-    declare -a TFILEP=("makefile.patch" 
+    declare -a TFILEP=("makefile.patch"
+                       "makefilev2.patch" 
                       )
 
     # AL = Array Length
