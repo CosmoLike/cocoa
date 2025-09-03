@@ -1,50 +1,42 @@
---- makefile	2024-07-02 13:05:04.023318560 -0400
-+++ makefile_vivian	2024-07-02 13:05:17.501947000 -0400
-@@ -9,7 +9,6 @@
- INSTALL_DATA = ${INSTALL} -m 644
- INSTALL_PROGRAM = ${INSTALL}
- RANLIB = /gpfs/home/vinmirandabr/data/Vivian/miniconda/envs/cocoa/bin/x86_64-conda-linux-gnu-ranlib
--EXE = 
+--- makefile.orig	2025-09-03 17:34:17
++++ makefile	2025-09-03 18:21:43
+@@ -33,12 +33,17 @@
  
- prefix = /gpfs/projects/MirandaGroup/Vivian/2024/cocoa_dev4/Cocoa/.local
- exec_prefix = ${prefix}
-@@ -20,54 +19,32 @@
- datarootdir = ${prefix}/share
- datadir = ${datarootdir}
- 
--MATH_DEFAULT = 
--TOOLS_DEFAULT = 
--DEMO_FORTRAN_DEFAULT = demo-fortran$(EXE)
--
- MCC = CC="$(tools)/fcc" CXX="$(tools)/fcc -stdlib=libstdc++" \
-   REALCC="$(CC)" REALCXX="$(CXX)" PATH="$(PATH):$(tools)" mcc
- 
- TARDIR = Cuba-4.2.2
- TARFILE = $(TARDIR).tar.gz
- 
--
  HEADERS = cuba$(SUFFIX).h
--LIB = libcuba$(SUFFIX).a
--MATH = Vegas$(SUFFIX)$(EXE) Suave$(SUFFIX)$(EXE) Divonne$(SUFFIX)$(EXE) Cuhre$(SUFFIX)$(EXE)
--TOOLS = partview$(EXE)
--
-+LIB = libcuba$(SUFFIX).a 
-+LIBDYN = libcuba$(SUFFIX).so
+ LIB = libcuba$(SUFFIX).a
++UNAME_S := $(shell uname -s)
++ifeq ($(UNAME_S),Darwin)
++  LIBDYN = libcuba$(SUFFIX).dylib
++else
++  LIBDYN = libcuba$(SUFFIX).so
++endif
+ MATH = Vegas$(SUFFIX)$(EXE) Suave$(SUFFIX)$(EXE) Divonne$(SUFFIX)$(EXE) Cuhre$(SUFFIX)$(EXE)
+ TOOLS = partview$(EXE)
+ 
++all: lib $(LIBDYN)
  
 -all: lib demos $(MATH_DEFAULT) $(TOOLS_DEFAULT)
-+all: lib libdyn
- 
+-
  lib: $(LIB) $(HEADERS)
  
--demos: demo-c$(EXE) $(DEMO_FORTRAN_DEFAULT)
--
--math: $(MATH)
--
--tools: $(TOOLS)
-+libdyn: $(LIBDYN) $(HEADERS)
+ demos: demo-c$(EXE) $(DEMO_FORTRAN_DEFAULT)
+@@ -47,22 +52,29 @@
  
--
+ tools: $(TOOLS)
+ 
++OBJS_U = \
++  Vegas_.o llVegas_.o Suave_.o llSuave_.o Divonne_.o llDivonne_.o \
++  Cuhre_.o llCuhre_.o Fork_.o Global_.o Data.o
+ 
 -install: lib $(TOOLS_DEFAULT)
++$(LIBDYN): $(OBJS_U)
++	$(CC) -dynamiclib -o $@ $(OBJS_U) \
++	      -install_name @rpath/$(LIBDYN) \
++	      -Wl,-undefined,dynamic_lookup
++
++.PHONY: libdyn
++libdyn: $(LIBDYN)
++
 +install: lib libdyn
  	$(INSTALL) -m 755 -d $(DESTDIR)$(libdir) \
  	                     $(DESTDIR)$(includedir) \
@@ -59,17 +51,12 @@
 -	  test -f $$f && $(INSTALL_PROGRAM) $$f $(DESTDIR)$(bindir) || : ; \
 -	done
 -	$(INSTALL_DATA) $(srcdir)/cuba.pdf $(DESTDIR)$(datadir)
--
--
--check: demo-c
--	./demo-c | grep RESULT > demo-c.out
--	@echo diff demo-c.out $(demo)/demo-c.out
--	@diff demo-c.out $(demo)/demo-c.out || \
--	echo "Note: This is serious only if the results deviate significantly."
  
- .SUFFIXES:
- .SUFFIXES: .c .f .tm
-@@ -80,7 +57,6 @@
+-
+ check: demo-c
+ 	./demo-c | grep RESULT > demo-c.out
+ 	@echo diff demo-c.out $(demo)/demo-c.out
+@@ -80,7 +92,6 @@
  demo = $(srcdir)/demo
  tools = $(srcdir)/tools
  
@@ -77,48 +64,36 @@
  COMMON_DEPS = $(common)/stddecl.h $(common)/ChiSquare.c $(common)/Erf.c
  COMMON_CDEPS = $(COMMON_DEPS) $(common)/CSample.c $(common)/Parallel.c $(common)/sock.h
  COMMON_TMDEPS = $(COMMON_DEPS) $(common)/MSample.c
-@@ -94,38 +70,50 @@
+@@ -94,39 +105,38 @@
    $(vegas)/Grid.c $(vegas)/Integrate.c
  VEGAS = $(VEGAS_C) $(VEGAS_TM) $(VEGAS_DEPS)
  
-+
-+$(LIBDYN)(Vegas.o): config.h $(VEGAS_C) $(VEGAS_DEPS) $(COMMON_CDEPS) 
++Vegas.o: config.h $(VEGAS_C) $(VEGAS_DEPS) $(COMMON_CDEPS) 
 +	$(CC) $(CFLAGS) -fPIC -I$(vegas) -DNOUNDERSCORE -c -o Vegas.o $(VEGAS_C)
-+	$(CC) -shared -o $(LIBDYN) Vegas.o
-+	$(RM) Vegas.o
 +
  $(LIB)(Vegas.o): config.h $(VEGAS_C) $(VEGAS_DEPS) $(COMMON_CDEPS) 
  	$(CC) $(CFLAGS) -I$(vegas) -DNOUNDERSCORE -c -o Vegas.o $(VEGAS_C)
  	$(AR) $(ARFLAGS) $(LIB) Vegas.o
  	$(RM) Vegas.o
  
-+
-+$(LIBDYN)(llVegas.o): config.h $(VEGAS_C) $(VEGAS_DEPS) $(COMMON_CDEPS)
++llVegas.o: config.h $(VEGAS_C) $(VEGAS_DEPS) $(COMMON_CDEPS)
 +	$(CC) $(CFLAGS) -fPIC -I$(vegas) -DLONGLONGINT -DNOUNDERSCORE -c -o llVegas.o $(VEGAS_C)
-+	$(CC) -shared -o $(LIBDYN) llVegas.o
-+	$(RM) llVegas.o
 +
  $(LIB)(llVegas.o): config.h $(VEGAS_C) $(VEGAS_DEPS) $(COMMON_CDEPS)
  	$(CC) $(CFLAGS) -I$(vegas) -DLONGLONGINT -DNOUNDERSCORE -c -o llVegas.o $(VEGAS_C)
  	$(AR) $(ARFLAGS) $(LIB) llVegas.o
  	$(RM) llVegas.o
  
-+
-+$(LIBDYN)(Vegas_.o): config.h $(VEGAS_C) $(VEGAS_DEPS) $(COMMON_CDEPS)
++Vegas_.o: config.h $(VEGAS_C) $(VEGAS_DEPS) $(COMMON_CDEPS)
 +	$(CC) $(CFLAGS) -fPIC -I$(vegas) -c -o Vegas_.o $(VEGAS_C)
-+	$(CC) -shared -o $(LIBDYN) Vegas_.o
-+	$(RM) Vegas_.o
 +
  $(LIB)(Vegas_.o): config.h $(VEGAS_C) $(VEGAS_DEPS) $(COMMON_CDEPS)
  	$(CC) $(CFLAGS) -I$(vegas) -c -o Vegas_.o $(VEGAS_C)
  	$(AR) $(ARFLAGS) $(LIB) Vegas_.o
  	$(RM) Vegas_.o
  
-+
-+$(LIBDYN)(llVegas_.o): config.h $(VEGAS_C) $(VEGAS_DEPS) $(COMMON_CDEPS)
++llVegas_.o: config.h $(VEGAS_C) $(VEGAS_DEPS) $(COMMON_CDEPS)
 +	$(CC) $(CFLAGS) -fPIC -I$(vegas) -DLONGLONGINT -c -o llVegas_.o $(VEGAS_C)
-+	$(CC) -shared -o $(LIBDYN) llVegas_.o
-+	$(RM) llVegas_.o
 +
  $(LIB)(llVegas_.o): config.h $(VEGAS_C) $(VEGAS_DEPS) $(COMMON_CDEPS)
  	$(CC) $(CFLAGS) -I$(vegas) -DLONGLONGINT -c -o llVegas_.o $(VEGAS_C)
@@ -137,51 +112,40 @@
 -
 -Vegasq$(EXE):
 -
- 
+-
  SUAVE_C = $(suave)/Suave.c
  SUAVE_TM = $(suave)/Suave.tm
-@@ -135,38 +123,50 @@
+ SUAVE_DEPS = $(RNG_DEPS) \
+@@ -135,39 +145,38 @@
    $(suave)/Integrate.c
  SUAVE = $(SUAVE_C) $(SUAVE_TM) $(SUAVE_DEPS)
  
-+
-+$(LIBDYN)(Suave.o): config.h $(SUAVE_C) $(SUAVE_DEPS) $(COMMON_CDEPS)
++Suave.o: config.h $(SUAVE_C) $(SUAVE_DEPS) $(COMMON_CDEPS)
 +	$(CC) $(CFLAGS) -fPIC -I$(suave) -DNOUNDERSCORE -c -o Suave.o $(SUAVE_C)
-+	$(CC) -shared -o $(LIBDYN) Suave.o
-+	$(RM) Suave.o
 +
  $(LIB)(Suave.o): config.h $(SUAVE_C) $(SUAVE_DEPS) $(COMMON_CDEPS)
  	$(CC) $(CFLAGS) -I$(suave) -DNOUNDERSCORE -c -o Suave.o $(SUAVE_C)
  	$(AR) $(ARFLAGS) $(LIB) Suave.o
  	$(RM) Suave.o
  
-+
-+$(LIBDYN)(llSuave.o): config.h $(SUAVE_C) $(SUAVE_DEPS) $(COMMON_CDEPS)
++llSuave.o: config.h $(SUAVE_C) $(SUAVE_DEPS) $(COMMON_CDEPS)
 +	$(CC) $(CFLAGS) -fPIC -I$(suave) -DLONGLONGINT -DNOUNDERSCORE -c -o llSuave.o $(SUAVE_C)
-+	$(CC) -shared -o $(LIBDYN) llSuave.o
-+	$(RM) llSuave.o
 +
  $(LIB)(llSuave.o): config.h $(SUAVE_C) $(SUAVE_DEPS) $(COMMON_CDEPS)
  	$(CC) $(CFLAGS) -I$(suave) -DLONGLONGINT -DNOUNDERSCORE -c -o llSuave.o $(SUAVE_C)
  	$(AR) $(ARFLAGS) $(LIB) llSuave.o
  	$(RM) llSuave.o
  
-+
-+$(LIBDYN)(Suave_.o): config.h $(SUAVE_C) $(SUAVE_DEPS) $(COMMON_CDEPS)
++Suave_.o: config.h $(SUAVE_C) $(SUAVE_DEPS) $(COMMON_CDEPS)
 +	$(CC) $(CFLAGS) -fPIC -I$(suave) -c -o Suave_.o $(SUAVE_C)
-+	$(CC) -shared -o $(LIBDYN) Suave_.o
-+	$(RM) Suave_.o
 +
  $(LIB)(Suave_.o): config.h $(SUAVE_C) $(SUAVE_DEPS) $(COMMON_CDEPS)
  	$(CC) $(CFLAGS) -I$(suave) -c -o Suave_.o $(SUAVE_C)
  	$(AR) $(ARFLAGS) $(LIB) Suave_.o
  	$(RM) Suave_.o
  
-+
-+$(LIBDYN)(llSuave_.o): config.h $(SUAVE_C) $(SUAVE_DEPS) $(COMMON_CDEPS)
++llSuave_.o: config.h $(SUAVE_C) $(SUAVE_DEPS) $(COMMON_CDEPS)
 +	$(CC) $(CFLAGS) -fPIC -I$(suave) -DLONGLONGINT -c -o llSuave_.o $(SUAVE_C)
-+	$(CC) -shared -o $(LIBDYN) llSuave_.o
-+	$(RM) llSuave_.o
 +
  $(LIB)(llSuave_.o): config.h $(SUAVE_C) $(SUAVE_DEPS) $(COMMON_CDEPS)
  	$(CC) $(CFLAGS) -I$(suave) -DLONGLONGINT -c -o llSuave_.o $(SUAVE_C)
@@ -200,51 +164,40 @@
 -
 -Suaveq$(EXE):
 -
- 
+-
  DIVONNE_C = $(divonne)/Divonne.c
  DIVONNE_TM = $(divonne)/Divonne.tm
-@@ -177,38 +177,50 @@
+ DIVONNE_DEPS = $(RNG_DEPS) \
+@@ -177,39 +186,38 @@
    $(divonne)/Split.c $(divonne)/Integrate.c
  DIVONNE = $(DIVONNE_C) $(DIVONNE_TM) $(DIVONNE_DEPS)
  
-+
-+$(LIBDYN)(Divonne.o): config.h $(DIVONNE_C) $(DIVONNE_DEPS) $(COMMON_CDEPS)
++Divonne.o: config.h $(DIVONNE_C) $(DIVONNE_DEPS) $(COMMON_CDEPS)
 +	$(CC) $(CFLAGS) -fPIC -I$(divonne) -DNOUNDERSCORE -c -o Divonne.o $(DIVONNE_C)
-+	$(CC) -shared -o $(LIBDYN) Divonne.o
-+	$(RM) Divonne.o
 +
  $(LIB)(Divonne.o): config.h $(DIVONNE_C) $(DIVONNE_DEPS) $(COMMON_CDEPS)
  	$(CC) $(CFLAGS) -I$(divonne) -DNOUNDERSCORE -c -o Divonne.o $(DIVONNE_C)
  	$(AR) $(ARFLAGS) $(LIB) Divonne.o
  	$(RM) Divonne.o
  
-+
-+$(LIBDYN)(llDivonne.o): config.h $(DIVONNE_C) $(DIVONNE_DEPS) $(COMMON_CDEPS)
++llDivonne.o: config.h $(DIVONNE_C) $(DIVONNE_DEPS) $(COMMON_CDEPS)
 +	$(CC) $(CFLAGS) -fPIC -I$(divonne) -DLONGLONGINT -DNOUNDERSCORE -c -o llDivonne.o $(DIVONNE_C)
-+	$(CC) -shared -o $(LIBDYN) llDivonne.o
-+	$(RM) llDivonne.o
 +
  $(LIB)(llDivonne.o): config.h $(DIVONNE_C) $(DIVONNE_DEPS) $(COMMON_CDEPS)
  	$(CC) $(CFLAGS) -I$(divonne) -DLONGLONGINT -DNOUNDERSCORE -c -o llDivonne.o $(DIVONNE_C)
  	$(AR) $(ARFLAGS) $(LIB) llDivonne.o
  	$(RM) llDivonne.o
  
-+
-+$(LIBDYN)(Divonne_.o): config.h $(DIVONNE_C) $(DIVONNE_DEPS) $(COMMON_CDEPS)
++Divonne_.o: config.h $(DIVONNE_C) $(DIVONNE_DEPS) $(COMMON_CDEPS)
 +	$(CC) $(CFLAGS) -fPIC -I$(divonne) -c -o Divonne_.o $(DIVONNE_C)
-+	$(CC) -shared -o $(LIBDYN) Divonne_.o
-+	$(RM) Divonne_.o
 +
  $(LIB)(Divonne_.o): config.h $(DIVONNE_C) $(DIVONNE_DEPS) $(COMMON_CDEPS)
  	$(CC) $(CFLAGS) -I$(divonne) -c -o Divonne_.o $(DIVONNE_C)
  	$(AR) $(ARFLAGS) $(LIB) Divonne_.o
  	$(RM) Divonne_.o
  
-+
-+$(LIBDYN)(llDivonne_.o): config.h $(DIVONNE_C) $(DIVONNE_DEPS) $(COMMON_CDEPS)
++llDivonne_.o: config.h $(DIVONNE_C) $(DIVONNE_DEPS) $(COMMON_CDEPS)
 +	$(CC) $(CFLAGS) -fPIC -I$(divonne) -DLONGLONGINT -c -o llDivonne_.o $(DIVONNE_C)
-+	$(CC) -shared -o $(LIBDYN) llDivonne_.o
-+	$(RM) llDivonne_.o
 +
  $(LIB)(llDivonne_.o): config.h $(DIVONNE_C) $(DIVONNE_DEPS) $(COMMON_CDEPS)
  	$(CC) $(CFLAGS) -I$(divonne) -DLONGLONGINT -c -o llDivonne_.o $(DIVONNE_C)
@@ -263,51 +216,40 @@
 -
 -Divonneq$(EXE):
 -
- 
+-
  CUHRE_C = $(cuhre)/Cuhre.c
  CUHRE_TM = $(cuhre)/Cuhre.tm
-@@ -217,61 +229,101 @@
+ CUHRE_DEPS = \
+@@ -217,67 +225,78 @@
    $(cuhre)/Rule.c $(cuhre)/Integrate.c
  CUHRE = $(CUHRE_C) $(CUHRE_TM) $(CUHRE_DEPS)
  
-+
-+$(LIBDYN)(Cuhre.o): config.h $(CUHRE_C) $(CUHRE_DEPS) $(COMMON_CDEPS)
++Cuhre.o: config.h $(CUHRE_C) $(CUHRE_DEPS) $(COMMON_CDEPS)
 +	$(CC) $(CFLAGS) -fPIC -I$(cuhre) -DNOUNDERSCORE -c -o Cuhre.o $(CUHRE_C)
-+	$(CC) -shared -o $(LIBDYN) Cuhre.o
-+	$(RM) Cuhre.o
 +
  $(LIB)(Cuhre.o): config.h $(CUHRE_C) $(CUHRE_DEPS) $(COMMON_CDEPS)
  	$(CC) $(CFLAGS) -I$(cuhre) -DNOUNDERSCORE -c -o Cuhre.o $(CUHRE_C)
  	$(AR) $(ARFLAGS) $(LIB) Cuhre.o
  	$(RM) Cuhre.o
  
-+
-+$(LIBDYN)(llCuhre.o): config.h $(CUHRE_C) $(CUHRE_DEPS) $(COMMON_CDEPS)
++llCuhre.o: config.h $(CUHRE_C) $(CUHRE_DEPS) $(COMMON_CDEPS)
 +	$(CC) $(CFLAGS) -fPIC -I$(cuhre) -DLONGLONGINT -DNOUNDERSCORE -c -o llCuhre.o $(CUHRE_C)
-+	$(CC) -shared -o $(LIBDYN) llCuhre.o
-+	$(RM) llCuhre.o
 +
  $(LIB)(llCuhre.o): config.h $(CUHRE_C) $(CUHRE_DEPS) $(COMMON_CDEPS)
  	$(CC) $(CFLAGS) -I$(cuhre) -DLONGLONGINT -DNOUNDERSCORE -c -o llCuhre.o $(CUHRE_C)
  	$(AR) $(ARFLAGS) $(LIB) llCuhre.o
  	$(RM) llCuhre.o
  
-+
-+$(LIBDYN)(Cuhre_.o): config.h $(CUHRE_C) $(CUHRE_DEPS) $(COMMON_CDEPS)
++Cuhre_.o: config.h $(CUHRE_C) $(CUHRE_DEPS) $(COMMON_CDEPS)
 +	$(CC) $(CFLAGS) -fPIC -I$(cuhre) -c -o Cuhre_.o $(CUHRE_C)
-+	$(CC) -shared -o $(LIBDYN) Cuhre_.o
-+	$(RM) Cuhre_.o
 +
  $(LIB)(Cuhre_.o): config.h $(CUHRE_C) $(CUHRE_DEPS) $(COMMON_CDEPS)
  	$(CC) $(CFLAGS) -I$(cuhre) -c -o Cuhre_.o $(CUHRE_C)
  	$(AR) $(ARFLAGS) $(LIB) Cuhre_.o
  	$(RM) Cuhre_.o
  
-+
-+$(LIBDYN)(llCuhre_.o): config.h $(CUHRE_C) $(CUHRE_DEPS) $(COMMON_CDEPS)
++llCuhre_.o: config.h $(CUHRE_C) $(CUHRE_DEPS) $(COMMON_CDEPS)
 +	$(CC) $(CFLAGS) -fPIC -I$(cuhre) -DLONGLONGINT -c -o llCuhre_.o $(CUHRE_C)
-+	$(CC) -shared -o $(LIBDYN) llCuhre_.o
-+	$(RM) llCuhre_.o
 +
  $(LIB)(llCuhre_.o): config.h $(CUHRE_C) $(CUHRE_DEPS) $(COMMON_CDEPS)
  	$(CC) $(CFLAGS) -I$(cuhre) -DLONGLONGINT -c -o llCuhre_.o $(CUHRE_C)
@@ -317,7 +259,9 @@
 -Cuhre$(EXE): config.h $(CUHRE_TM) $(CUHRE_DEPS) $(COMMON_TMDEPS)
 -	$(MCC) $(MCFLAGS) $(CFLAGS) -I$(cuhre) -o Cuhre$(EXE) $(CUHRE_TM)
 -	strip Cuhre$(EXE)
--
++Fork.o: $(common)/Fork.c $(common)/stddecl.h $(common)/sock.h
++	$(CC) $(CFLAGS) -fPIC -DNOUNDERSCORE -c -o Fork.o $(common)/Fork.c
+ 
 -Cuhrel$(EXE): config.h $(CUHRE_TM) $(CUHRE_DEPS) $(COMMON_TMDEPS)
 -	sed '/:Begin:/,/:End:/ s/Real64/Real128/g' $(CUHRE_TM) > Cuhrel.tm
 -	$(MCC) $(MCFLAGS) $(CFLAGS) -I$(cuhre) -o Cuhrel$(EXE) Cuhrel.tm
@@ -325,79 +269,57 @@
 -	$(RM) Cuhrel.tm
 -
 -Cuhreq$(EXE):
- 
-+$(LIBDYN)(Fork.o): $(common)/Fork.c $(common)/stddecl.h $(common)/sock.h
-+	$(CC) $(CFLAGS) -fPIC -DNOUNDERSCORE -c -o Fork.o $(common)/Fork.c
-+	$(CC) -shared -o $(LIBDYN) Fork.o
-+	$(RM) Fork.o
- 
+-
+-
  $(LIB)(Fork.o): $(common)/Fork.c $(common)/stddecl.h $(common)/sock.h
  	$(CC) $(CFLAGS) -DNOUNDERSCORE -c -o Fork.o $(common)/Fork.c
  	$(AR) $(ARFLAGS) $(LIB) Fork.o
  	$(RM) Fork.o
  
-+
-+
-+$(LIBDYN)(Fork_.o): $(common)/Fork.c $(common)/stddecl.h $(common)/sock.h
++Fork_.o: $(common)/Fork.c $(common)/stddecl.h $(common)/sock.h
 +	$(CC) $(CFLAGS) -fPIC -c -o Fork_.o $(common)/Fork.c
-+	$(CC) -shared -o $(LIBDYN) Fork_.o
-+	$(RM) Fork_.o
 +
  $(LIB)(Fork_.o): $(common)/Fork.c $(common)/stddecl.h $(common)/sock.h
  	$(CC) $(CFLAGS) -c -o Fork_.o $(common)/Fork.c
  	$(AR) $(ARFLAGS) $(LIB) Fork_.o
  	$(RM) Fork_.o
  
- 
-+$(LIBDYN)(Global.o): $(common)/Global.c $(common)/stddecl.h
++Global.o: $(common)/Global.c $(common)/stddecl.h
 +	$(CC) $(CFLAGS) -fPIC -DNOUNDERSCORE -c -o Global.o $(common)/Global.c
-+	$(CC) -shared -o $(LIBDYN) Global.o
-+	$(RM) Global.o
-+
+ 
  $(LIB)(Global.o): $(common)/Global.c $(common)/stddecl.h
  	$(CC) $(CFLAGS) -DNOUNDERSCORE -c -o Global.o $(common)/Global.c
  	$(AR) $(ARFLAGS) $(LIB) Global.o
  	$(RM) Global.o
  
-+
-+$(LIBDYN)(Global_.o): $(common)/Global.c $(common)/stddecl.h
++Global_.o: $(common)/Global.c $(common)/stddecl.h
 +	$(CC) $(CFLAGS) -fPIC -c -o Global_.o $(common)/Global.c
-+	$(CC) -shared -o $(LIBDYN) Global_.o
-+	$(RM) Global_.o
 +
  $(LIB)(Global_.o): $(common)/Global.c $(common)/stddecl.h
  	$(CC) $(CFLAGS) -c -o Global_.o $(common)/Global.c
  	$(AR) $(ARFLAGS) $(LIB) Global_.o
  	$(RM) Global_.o
  
- 
-+$(LIBDYN)(Data.o): $(common)/Data.c $(common)/stddecl.h
++Data.o: $(common)/Data.c $(common)/stddecl.h
 +	$(CC) $(CFLAGS) -fPIC -c -o Data.o $(common)/Data.c
-+	$(CC) -shared -o $(LIBDYN) Data.o
-+	$(RM) Data.o
-+
+ 
  $(LIB)(Data.o): $(common)/Data.c $(common)/stddecl.h
  	$(CC) $(CFLAGS) -c -o Data.o $(common)/Data.c
  	$(AR) $(ARFLAGS) $(LIB) Data.o
-@@ -291,6 +343,17 @@
+ 	$(RM) Data.o
+ 
+-
+ $(LIB): $(LIB)(Vegas.o)     $(LIB)(Vegas_.o)     \
+ 	$(LIB)(llVegas.o)   $(LIB)(llVegas_.o)   \
+ 	$(LIB)(Suave.o)     $(LIB)(Suave_.o)     \
+@@ -291,71 +310,11 @@
  	$(LIB)(Data.o)
  	-$(RANLIB) $(LIB)
  
-+$(LIBDYN): $(LIBDYN)(Vegas.o)     $(LIBDYN)(Vegas_.o)     \
-+	$(LIBDYN)(llVegas.o)   $(LIBDYN)(llVegas_.o)   \
-+	$(LIBDYN)(Suave.o)     $(LIBDYN)(Suave_.o)     \
-+	$(LIBDYN)(llSuave.o)   $(LIBDYN)(llSuave_.o)   \
-+	$(LIBDYN)(Divonne.o)   $(LIBDYN)(Divonne_.o)   \
-+	$(LIBDYN)(llDivonne.o) $(LIBDYN)(llDivonne_.o) \
-+	$(LIBDYN)(Cuhre.o)     $(LIBDYN)(Cuhre_.o)     \
-+	$(LIBDYN)(llCuhre.o)   $(LIBDYN)(llCuhre_.o)   \
-+	$(LIBDYN)(Fork.o)      $(LIBDYN)(Fork_.o)      \
-+	$(LIBDYN)(Global.o)    $(LIBDYN)(Global_.o)    \
-+	$(LIBDYN)(Data.o)
- 
+-
  cubal.h: cuba.h
  	sed 's/double/long double/g' cuba.h > cubal.h
-@@ -298,64 +361,5 @@
+ 
  cubaq.h: cuba.h
  	sed 's/double/__float128/g' cuba.h > cubaq.h
  
