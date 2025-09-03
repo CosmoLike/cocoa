@@ -787,6 +787,7 @@ if [ -z "${IGNORE_CORE_INSTALLATION}" ]; then
     CHANGES="${CCIL:?}/cuba_changes"
     
     declare -a TFOLDER=("" 
+                        ""  
                        ) # If nonblank, path must include /
     
     # T = TMP
@@ -809,7 +810,7 @@ if [ -z "${IGNORE_CORE_INSTALLATION}" ]; then
       cpfolder "${CHANGES:?}/${TFOLDER[$i]}${TFILEP[$i]:?}" . \
         2>>${OUT2:?} || return 1;
     
-      patch -u "${TFILE[$i]:?}" -i "${TFILEP[$i]:?}" >>${OUT1:?} \
+      patch -u -l "${TFILE[$i]:?}" -i "${TFILEP[$i]:?}" >>${OUT1:?} \
         2>>${OUT2:?} || { error "${EC17:?} (${TFILE[$i]:?})"; return 1; }
     done
 
