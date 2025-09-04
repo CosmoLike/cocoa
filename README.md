@@ -143,7 +143,7 @@ In this section, we assume users have previously activated the Cocoa conda envir
 
 **Step :one:**: Download Cocoa's latest release and go to its main folder (`cocoa/Cocoa`),
 
-    git clone https://github.com/CosmoLike/cocoa.git --branch v4.01 cocoa
+    git clone https://github.com/CosmoLike/cocoa.git --branch v4.02 cocoa
 
 and
 
@@ -813,6 +813,8 @@ There are a few differences users should be aware of when running Cocoa on Googl
           from google.colab import drive
           drive.mount('/content/drive')
 
+    Below, we provide instructions on how to install Cocoa. *Google Colab does provide direct terminal access if users prefer to follow the standard installation procedure*
+    
     - **Cell 2️⃣**: Install Miniforge (Similar to our documentation in section [FAQ: How can users install Conda?](#overview_miniforge))
 
           %%bash
