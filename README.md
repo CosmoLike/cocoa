@@ -285,7 +285,7 @@ Users will see a terminal like this: `$(cocoa)(.local)`. *This is a feature, not
 > 
 >     [... NotebookApp] or http://127.0.0.1:8888/?token=XXX
 >
-> The project `lsst-y1` contains jupyter notebook examples located at `projects/lsst_y1`.
+> The project `lsst-y1` contains Jupyter notebook examples located at `projects/lsst_y1`.
 
 > [!NOTE]
 > Why did we choose to work with two distinct shell environments, `(cocoa)` and `(.local)`? Our scripts enable users to work on multiple Cocoa instances, similar to what was possible with [CosmoMC](https://github.com/cmbant/CosmoMC). In each instance, our scripts install packages at
@@ -615,13 +615,15 @@ Following best practices, Cocoa scripts download most external modules from thei
 
 ## :interrobang: FAQ: How can users debug Cocoa? Suggested steps <a name="running_wrong"></a>
 
-**Step :one:**: define the `COCOA_OUTPUT_VERBOSE` and `COSMOLIKE_DEBUG_MODE` flags on `set_installation_options.sh` to obtain a more detailed output, as shown below
+**Step :one:**: define the `COCOA_OUTPUT_VERBOSE` and `COSMOLIKE_DEBUG_MODE` flags on `set_installation_options.sh` to obtain a more detailed output, as shown below (for even more output, define `COCOA_OUTPUT_DEBUG` as well)
   
       [Adapted from Cocoa/set_installation_options.sh shell script] 
       # ------------------------------------------------------------------------------
       # VERBOSE AS DEBUG TOOL --------------------------------------------------------
       # ------------------------------------------------------------------------------
       export COCOA_OUTPUT_VERBOSE=1
+      #export COCOA_OUTPUT_DEBUG=1 # turn on bash strict mode (set -exo pipefail) on  
+                                   # instalation_scripts/setup/compile_x.sh scripts 
       # ------------------------------------------------------------------------------
       # If set, COSMOLIKE will compile with DEBUG flags ------------------------------
       # ------------------------------------------------------------------------------
