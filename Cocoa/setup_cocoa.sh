@@ -2,6 +2,14 @@
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
+if [[ ! "${BASH_SOURCE[0]}" != "$0" ]]; then
+  FILE="$(basename ${BASH_SOURCE[0]})"
+  MSG="\033[0;31m ${FILE} must be sourced (not executed as program)"
+  MSG2=", e.g.: \n source ${FILE}\033[0m"
+  echo -e "${MSG}${MSG2}"
+  unset FILE MSG MSG2
+  exit 1
+fi
 
 if [ -n "${ROOTDIR}" ]; then
   source stop_cocoa.sh
@@ -125,11 +133,17 @@ declare -a SCRIPTS=( "setup_core_packages.sh"
 for (( i=0; i<${#SCRIPTS[@]}; i++ ));
 do
   cdroot; 
-  ( source "${ROOTDIR:?}/installation_scripts/${SCRIPTS[$i]}" )
+  if [ -n "${COCOA_OUTPUT_DEBUG}" ]; then
+    # bash strict mode explanation
+    # http://redsymbol.net/articles/unofficial-bash-strict-mode/
+    ( set -exo pipefail; source "${ROOTDIR:?}/installation_scripts/${SCRIPTS[$i]}" )
+  else
+    ( source "${ROOTDIR:?}/installation_scripts/${SCRIPTS[$i]}" )
+  fi
   if [ $? -ne 0 ]; then
     if [ -n "${COCOA_OUTPUT_VERBOSE}" ]; then
-      error_cip_msg "script ${SCRIPTS[$i]}"
-      ERRORCODE=1
+      error_cip "script ${SCRIPTS[$i]}"
+      return 1
     else
       error_cip_msg "script ${SCRIPTS[$i]}"
       ERRORCODE=1
