@@ -813,6 +813,8 @@ There are a few differences users should be aware of when running Cocoa on Googl
           from google.colab import drive
           drive.mount('/content/drive')
 
+    Below, we provide instructions on how to install Cocoa. *Google Colab does provide direct terminal access if users prefer to follow the standard installation procedure*
+    
     - **Cell 2️⃣**: Install Miniforge (Similar to our documentation in section [FAQ: How can users install Conda?](#overview_miniforge))
 
           %%bash
