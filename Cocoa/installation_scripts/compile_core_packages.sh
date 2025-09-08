@@ -743,15 +743,21 @@ if [ -z "${IGNORE_CORE_INSTALLATION}" ]; then
     # note: in case this script run >1x w/ previous run killed b/c of an error
     rm -f "${PACKDIR:?}/libcuba.a"
     rm -f "${PACKDIR:?}/libcuba.so"
+    rm -f "${PACKDIR:?}/libcuba.dylib"
     rm -f "${PACKDIR:?}/makefile"
     rm -f "${PACKDIR:?}/makefile.patch"
     rm -f "${PACKDIR:?}/config.h"
+    rm -f "${PACKDIR:?}/config.sub"
     rm -f "${ROOTDIR:?}/.local/lib/libcuba.so"
     rm -f "${ROOTDIR:?}/.local/lib/libcuba.a"
-
+    rm -f "${ROOTDIR:?}/.local/lib/libcuba.dylib"
     # --------------------------------------------------------------------------
     cdfolder "${PACKDIR}" || return 1;
 
+    # --------------------------------------------------------------------------
+    # CUBA NEEDS AN UPDATED config.sub
+    # --------------------------------------------------------------------------
+    cpfile "${CCIL:?}/cuba_changes/config.sub" "${PACKDIR}/"
     #NOTE: LD_LIBRARY_PATH/DYLD_FALLBACK_LIBRARY_PATH matters only when something 
     #NOTE: is executed during the build (e.g., configure checks, unit tests)
     case "$(uname -s)" in
@@ -779,14 +785,17 @@ if [ -z "${IGNORE_CORE_INSTALLATION}" ]; then
     CHANGES="${CCIL:?}/cuba_changes"
     
     declare -a TFOLDER=("" 
+                        ""  
                        ) # If nonblank, path must include /
     
     # T = TMP
-    declare -a TFILE=("makefile" 
+    declare -a TFILE=("makefile"
+                      "makefile" 
                      )
 
     #T = TMP, P = PATCH
-    declare -a TFILEP=("makefile.patch" 
+    declare -a TFILEP=("makefile.patch"
+                       "makefilev2.patch" 
                       )
 
     # AL = Array Length
@@ -795,11 +804,11 @@ if [ -z "${IGNORE_CORE_INSTALLATION}" ]; then
     for (( i=0; i<${AL}; i++ ));
     do
       cdfolder "${PACKDIR:?}/${TFOLDER[$i]}" || return 1
-
+    
       cpfolder "${CHANGES:?}/${TFOLDER[$i]}${TFILEP[$i]:?}" . \
         2>>${OUT2:?} || return 1;
-
-      patch -u "${TFILE[$i]:?}" -i "${TFILEP[$i]:?}" >>${OUT1:?} \
+    
+      patch -u -l "${TFILE[$i]:?}" -i "${TFILEP[$i]:?}" >>${OUT1:?} \
         2>>${OUT2:?} || { error "${EC17:?} (${TFILE[$i]:?})"; return 1; }
     done
 
@@ -830,7 +839,7 @@ if [ -z "${IGNORE_CORE_INSTALLATION}" ]; then
     PACKDIR="${CCIL:?}/${COCOA_EXPAT_DIR:-"expat-2.5.0/"}"
 
     cdfolder "${PACKDIR:?}" || return 1;
-  
+
     #NOTE: LD_LIBRARY_PATH/DYLD_FALLBACK_LIBRARY_PATH matters only when something 
     #NOTE: is executed during the build (e.g., configure checks, unit tests)
     case "$(uname -s)" in

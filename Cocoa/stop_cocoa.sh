@@ -2,6 +2,14 @@
 # ----------------------------------------------------------------------------
 # ----------------------------------------------------------------------------
 # ----------------------------------------------------------------------------
+if [[ ! "${BASH_SOURCE[0]}" != "$0" ]]; then
+  FILE="$(basename ${BASH_SOURCE[0]})"
+  MSG="\033[0;31m ${FILE} must be sourced (not executed as program)"
+  MSG2=", e.g.: \n source ${FILE}\033[0m"
+  echo -e "${MSG}${MSG2}"
+  unset FILE MSG MSG2
+  exit 1
+fi
 
 if [ -z "${ROOTDIR}" ]; then
   ROOTDIR=$(pwd -P) || { echo -e \

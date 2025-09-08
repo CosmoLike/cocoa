@@ -166,7 +166,12 @@ if [ -z "${COCOA_OUTPUT_VERBOSE}" ]; then
   [[ $MNT =~ ^[0-9]+$ ]] || MNT=1
   export MNT
 else
-  export OUT1="/dev/tty"; export OUT2="/dev/tty"
+  # : = does nothing and immediately returns success (exit status 0).
+  if { : > /dev/tty; } 2>/dev/null; then
+    export OUT1=/dev/tty OUT2=/dev/tty
+  else
+    export OUT1=/dev/null OUT2=/dev/null
+  fi
   export MNT=1
 fi
 

@@ -2,6 +2,15 @@
 # ----------------------------------------------------------------------------
 # ----------------------------------------------------------------------------
 # ----------------------------------------------------------------------------
+if [[ ! "${BASH_SOURCE[0]}" != "$0" ]]; then
+  FILE="$(basename ${BASH_SOURCE[0]})"
+  MSG="\033[0;31m ${FILE} must be sourced (not executed as program)"
+  MSG2=", e.g.: \n source ${FILE}\033[0m"
+  echo -e "${MSG}${MSG2}"
+  unset FILE MSG MSG2
+  exit 1
+fi
+
 error_cem_msg () {
   local FILE="$(basename ${BASH_SOURCE[0]})"
   local MSG="\033[0;31m\t\t (${FILE}) we cannot run "
@@ -58,10 +67,15 @@ for (( i=0; i<${#SCRIPTS[@]}; i++ ));
 do
 
   cdroot; 
-
-  ( export LD_LIBRARY_PATH=${CONDA_PREFIX:?}/lib:$LD_LIBRARY_PATH && \
-    export LD_LIBRARY_PATH=${ROOTDIR:?}/.local/lib:$LD_LIBRARY_PATH && \
-    source "${ROOTDIR:?}/installation_scripts/${SCRIPTS[$i]}" )
+  if [ -n "${COCOA_OUTPUT_DEBUG}" ]; then
+    ( export LD_LIBRARY_PATH=${CONDA_PREFIX:?}/lib:$LD_LIBRARY_PATH && \
+      export LD_LIBRARY_PATH=${ROOTDIR:?}/.local/lib:$LD_LIBRARY_PATH && \
+      set -exo pipefail; source "${ROOTDIR:?}/installation_scripts/${SCRIPTS[$i]}" )
+  else
+    ( export LD_LIBRARY_PATH=${CONDA_PREFIX:?}/lib:$LD_LIBRARY_PATH && \
+      export LD_LIBRARY_PATH=${ROOTDIR:?}/.local/lib:$LD_LIBRARY_PATH && \
+      source "${ROOTDIR:?}/installation_scripts/${SCRIPTS[$i]}" )
+  fi
   if [ $? -ne 0 ]; then
     if [ -n "${COCOA_OUTPUT_VERBOSE}" ]; then
       error_cem "script ${SCRIPTS[$i]}";
