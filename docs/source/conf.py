@@ -26,3 +26,17 @@ exclude_patterns = []
 
 html_theme = 'alabaster'
 html_static_path = ['_static']
+
+
+extensions = [
+    "myst_parser",
+]
+
+# Tell Sphinx what file to start with
+master_doc = "index"
+
+# Optional: make .md recognized
+source_suffix = {
+    ".rst": "restructuredtext",
+    ".md": "markdown",
+}
