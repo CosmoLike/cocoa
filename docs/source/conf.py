@@ -14,25 +14,10 @@ release = '2020'
 # -- General configuration ---------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration
 
-extensions = [
-    "sphinx.ext.autodoc",
-    "sphinx.ext.napoleon",
-    "sphinx_autodoc_typehints",  # must be loaded *after* napoleon
-    "sphinx.ext.todo",
-    "sphinx.ext.coverage",
-    "sphinx.ext.mathjax",
-    "sphinx.ext.inheritance_diagram",
-    "sphinx.ext.graphviz",
-    "sphinxcontrib.programoutput",
-    "sphinx_rtd_theme",
-    "sphinxcontrib.jquery",
-]
-
-if importlib.util.find_spec("sphinx_markdown_builder") is not None:
-    extensions.append("sphinx_markdown_builder")
+extensions = []
 
 # Add any paths that contain templates here, relative to this directory.
-templates_path = ['_templates']
+templates_path = []
 
 # The suffix(es) of source filenames.
 # You can specify multiple suffix as a list of string:
