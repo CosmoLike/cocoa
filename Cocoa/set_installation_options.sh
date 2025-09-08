@@ -23,7 +23,7 @@ esac
 # ------------------------------------------------------------------------------
 # VERBOSE AS DEBUG TOOL --------------------------------------------------------
 # ------------------------------------------------------------------------------
-#export COCOA_OUTPUT_VERBOSE=1
+export COCOA_OUTPUT_VERBOSE=1
 #export COCOA_OUTPUT_DEBUG=1 # turn on bash strict mode (set -exo pipefail) on  
                              # instalation_scripts/setup/compile_x.sh scripts 
 # ------------------------------------------------------------------------------
@@ -58,7 +58,7 @@ export IGNORE_CLASS_CODE=1 # Default: we just use CAMB (reduces compilation time
 #export IGNORE_PLANCK_LIKELIHOOD_CODE=1
 #export IGNORE_ACTDR4_CODE=1
 #export IGNORE_ACTDR6_CODE=1
-export IGNORE_CPP_CUBA_INSTALLATION=1
+#export IGNORE_CPP_CUBA_INSTALLATION=1
 export IGNORE_FGSPECTRA_CODE=1
 export IGNORE_VELOCILEPTORS_CODE=1
 #export IGNORE_SIMONS_OBSERVATORY_LIKELIHOOD_CODE=1
@@ -338,7 +338,7 @@ export GETDIST_NAME="getdist"
 export LSST_Y1_URL="git@github.com:SBU-COSMOLIKE/cocoa_lsst_y1.git"
 export LSST_Y1_NAME="lsst_y1"
 #BRANCH: if unset, load the latest commit on the specified branch
-#export LSST_Y1_BRANCH="dev"
+export LSST_Y1_BRANCH="main"
 #COMMIT: if unset, load the specified commit
 #export LSST_Y1_COMMIT="df96af9558c97b07d355df4bfc56f1677e71b201"
 #BRANCH: if unset, load the specified TAG
@@ -347,7 +347,7 @@ export LSST_Y1_NAME="lsst_y1"
 export DES_Y3_URL="git@github.com:SBU-COSMOLIKE/cocoa_des_y3.git"
 export DES_Y3_NAME="des_y3"
 #BRANCH: if unset, load the latest commit on the specified branch
-#export DES_Y3_BRANCH="main"
+export DES_Y3_BRANCH="main"
 #COMMIT: if unset, load the specified commit
 #export DES_Y3_COMMIT="1a46582b5539c177bd68f8863c054f79a15f8538"
 #BRANCH: if unset, load the specified TAG
@@ -365,7 +365,7 @@ export ROMAN_FOURIER_NAME="roman_fourier"
 export ROMAN_REAL_URL="git@github.com:SBU-COSMOLIKE/cocoa_roman_real.git"
 export ROMAN_REAL_NAME="roman_real"
 #BRANCH: if unset, load the latest commit on the specified branch
-#export ROMAN_REAL_BRANCH="main"
+export ROMAN_REAL_BRANCH="main"
 #COMMIT: if unset, load the specified commit
 #export ROMAN_REAL_COMMIT="8a13be52849fc7965b99f41bd173b7dda05fba67"
 #BRANCH: if unset, load the specified TAG

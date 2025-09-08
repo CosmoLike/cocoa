@@ -108,13 +108,13 @@ declare -a SCRIPTS=( "setup_core_packages.sh"
                      "setup_velocileptors.sh"
                      "setup_cosmopower.sh"
                      "setup_emultrf.sh"
-                     "setup_cosmolike_projects.sh"
                      "setup_darkemulator.sh"
                      "setup_private_projects.sh"
                      "setup_nautilus_sampler.sh"
                      "setup_tensiometer.sh"
                      "setup_getdist.sh"
                      "setup_derivkit.sh"
+                     "setup_ee2.sh"
                      "unxv_core_packages.sh"  
                      "unxv_sn.sh"
                      "unxv_bao.sh"
@@ -128,7 +128,8 @@ declare -a SCRIPTS=( "setup_core_packages.sh"
                      "unxv_lipop.sh"
                      "unxv_emultrf.sh"
                      "unxv_cosmopower.sh"
-                     "setup_ee2.sh")
+                     "setup_cosmolike_projects.sh"
+                     )
 
 for (( i=0; i<${#SCRIPTS[@]}; i++ ));
 do

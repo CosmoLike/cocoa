@@ -59,24 +59,31 @@ gitact0() {
   fi
 
   if [ ! -d "${PACKDIR:?}" ]; then
-    "${GIT:?}" clone "${2:?}" "${1:?}" >${OUT1:?} 2>${OUT2:?} || { error "${EC15:?}"; return 1; }
+    "${GIT:?}" clone "${2:?}" "${1:?}" \
+      >${OUT1:?} 2>${OUT2:?} || { error "${EC15:?}"; return 1; }
   fi
     
   cdfolder "${ROOTDIR:?}" || return 1;
 }
 
-gitact1() {  
+gitact1() { 
+  local PROJECT="${ROOTDIR:?}/projects" 
   local PACKDIR="${ROOTDIR:?}/projects/${1:?}"
-  local TAG="${2:?}"
+  local URL="${2:?}"
+  local TAG="${3:?}"
+  
+  cdfolder "${PROJECT:?}" || return 1;
+  
+  # ---------------------------------------------------------------------------
+  # In case this script runs twice --------------------------------------------
+  # ---------------------------------------------------------------------------
+  if [ -n "${OVERWRITE_EXISTING_COSMOLIKE_CODE}" ]; then
+    rm -rf "${PACKDIR:?}"
+  fi
 
-  if [ -d "${PACKDIR:?}" ]; then
-    cdfolder "${PACKDIR:?}" || return 1;
-    if "${GIT:?}" show-ref --quiet refs/heads/${TAG}; then
-      echo "git branch exists" >${OUT1:?} 2>${OUT2:?} || { return 1; }
-    else
-      "${GIT:?}" checkout -b ${TAG} origin/${TAG} \
-        >${OUT1:?} 2>${OUT2:?} || { error "${EC16:?}"; return 1; }
-    fi
+  if [ ! -d "${PACKDIR:?}" ]; then
+    "${GIT:?}" clone "${URL}" --branch "${TAG}" --single-branch \
+      >${OUT1:?} 2>${OUT2:?} || { error "${EC15:?}"; return 1; }
   fi
     
   cdfolder "${ROOTDIR:?}" || return 1;
@@ -88,7 +95,8 @@ gitact2() {
 
   if [ -d "${PACKDIR:?}" ]; then
     cdfolder "${PACKDIR:?}" || return 1;
-    "${GIT:?}" checkout ${TAG} >${OUT1:?} 2>${OUT2:?} || { error "${EC16:?}"; return 1; }
+    "${GIT:?}" checkout ${TAG} \
+      >${OUT1:?} 2>${OUT2:?} || { error "${EC16:?}"; return 1; }
   fi
     
   cdfolder "${ROOTDIR}" || return 1;
@@ -129,14 +137,18 @@ if [ -z "${IGNORE_COSMOLIKE_LSST_Y1_CODE}" ]; then
 
   URL="${LSST_Y1_URL:-"https://github.com/CosmoLike/cocoa_lsst_y1.git"}"
 
-  gitact0 "${FOLDER:?}" "${URL:?}"
+  
 
   if [ -n "${LSST_Y1_COMMIT}" ]; then
+    gitact0 "${FOLDER:?}" "${URL:?}"
     gitact2 "${FOLDER:?}" "${LSST_Y1_COMMIT:?}"  || return 1
   elif [ -n "${LSST_Y1_BRANCH}" ]; then 
-    gitact1 "${FOLDER:?}" "${LSST_Y1_BRANCH:?}" || return 1
+    gitact1 "${FOLDER:?}" "${URL:?}" "${LSST_Y1_BRANCH:?}" || return 1
   elif [ -n "${LSST_Y1_TAG}" ]; then 
+    gitact0 "${FOLDER:?}" "${URL:?}"
     gitact3 "${FOLDER:?}" "${LSST_Y1_TAG:?}" || return 1
+  else
+    gitact0 "${FOLDER:?}" "${URL:?}"
   fi
 
   pbottom "GETTING ${PRINTNAME:?}" || return 1
@@ -158,14 +170,16 @@ if [ -z "${IGNORE_COSMOLIKE_DES_Y3_CODE}" ]; then
 
   URL="${DES_Y3_URL:-"https://github.com/CosmoLike/cocoa_des_y3.git"}"
 
-  gitact0 "${FOLDER:?}" "${URL:?}"
-
   if [ -n "${DES_Y3_COMMIT}" ]; then
+    gitact0 "${FOLDER:?}" "${URL:?}"
     gitact2 "${FOLDER:?}" "${DES_Y3_COMMIT:?}"  || return 1
   elif [ -n "${DES_Y3_BRANCH}" ]; then 
-    gitact1 "${FOLDER:?}" "${DES_Y3_BRANCH:?}" || return 1
+    gitact1 "${FOLDER:?}" "${URL:?}" "${DES_Y3_BRANCH:?}" || return 1
   elif [ -n "${DES_Y3_TAG}" ]; then 
+    gitact0 "${FOLDER:?}" "${URL:?}"
     gitact3 "${FOLDER:?}" "${DES_Y3_TAG:?}" || return 1
+  else
+    gitact0 "${FOLDER:?}" "${URL:?}"
   fi
 
   pbottom "GETTING ${PRINTNAME:?}" || return 1
@@ -187,14 +201,18 @@ if [ -z "${IGNORE_COSMOLIKE_ROMAN_FOURIER_CODE}" ]; then
 
   URL="${ROMAN_FOURIER_URL:-"git@github.com:CosmoLike/cocoa_roman_fourier.git"}"
 
-  gitact0 "${FOLDER:?}" "${URL:?}"
+  
 
   if [ -n "${ROMAN_FOURIER_COMMIT}" ]; then
+    gitact0 "${FOLDER:?}" "${URL:?}"
     gitact2 "${FOLDER:?}" "${ROMAN_FOURIER_COMMIT:?}"  || return 1
   elif [ -n "${ROMAN_FOURIER_BRANCH}" ]; then 
-    gitact1 "${FOLDER:?}" "${ROMAN_FOURIER_BRANCH:?}" || return 1
+    gitact1 "${FOLDER:?}" "${URL:?}" "${ROMAN_FOURIER_BRANCH:?}" || return 1
   elif [ -n "${ROMAN_FOURIER_TAG}" ]; then 
+    gitact0 "${FOLDER:?}" "${URL:?}"
     gitact3 "${FOLDER:?}" "${ROMAN_FOURIER_TAG:?}" || return 1
+  else
+    gitact0 "${FOLDER:?}" "${URL:?}"
   fi
 
   pbottom "GETTING ${PRINTNAME:?}" || return 1
@@ -216,14 +234,16 @@ if [ -z "${IGNORE_COSMOLIKE_ROMAN_REAL_CODE}" ]; then
 
   URL="${ROMAN_REAL_URL:-"git@github.com:CosmoLike/cocoa_roman_real.git"}"
 
-  gitact0 "${FOLDER:?}" "${URL:?}"
-
   if [ -n "${ROMAN_REAL_COMMIT}" ]; then
+    gitact0 "${FOLDER:?}" "${URL:?}"
     gitact2 "${FOLDER:?}" "${ROMAN_REAL_COMMIT:?}"  || return 1
   elif [ -n "${ROMAN_REAL_BRANCH}" ]; then 
-    gitact1 "${FOLDER:?}" "${ROMAN_REAL_BRANCH:?}" || return 1
+    gitact1 "${FOLDER:?}" "${URL:?}" "${ROMAN_REAL_BRANCH:?}" || return 1
   elif [ -n "${ROMAN_REAL_TAG}" ]; then 
+    gitact0 "${FOLDER:?}" "${URL:?}"
     gitact3 "${FOLDER:?}" "${ROMAN_REAL_TAG:?}" || return 1
+  else
+    gitact0 "${FOLDER:?}" "${URL:?}"
   fi
 
   pbottom "GETTING ${PRINTNAME:?}" || return 1
