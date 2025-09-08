@@ -48,7 +48,9 @@ cpfile() {
 
 gitact0() {  
   local PROJECT="${ROOTDIR:?}/projects"
-  local PACKDIR="${PROJECT:?}/${1:?}"
+  local NAME="${1:?}"
+  local URL="${2:?}"
+  local PACKDIR="${PROJECT:?}/${NAME}"
   cdfolder "${PROJECT:?}" || return 1;
 
   # ---------------------------------------------------------------------------
@@ -59,7 +61,7 @@ gitact0() {
   fi
 
   if [ ! -d "${PACKDIR:?}" ]; then
-    "${GIT:?}" clone "${2:?}" "${1:?}" \
+    "${GIT:?}" clone "${URL}" "${NAME}" \
       >${OUT1:?} 2>${OUT2:?} || { error "${EC15:?}"; return 1; }
   fi
     
@@ -68,7 +70,8 @@ gitact0() {
 
 gitact1() { 
   local PROJECT="${ROOTDIR:?}/projects" 
-  local PACKDIR="${ROOTDIR:?}/projects/${1:?}"
+  local NAME="${1:?}"
+  local PACKDIR="${ROOTDIR:?}/projects/${NAME}"
   local URL="${2:?}"
   local TAG="${3:?}"
   
@@ -82,7 +85,7 @@ gitact1() {
   fi
 
   if [ ! -d "${PACKDIR:?}" ]; then
-    "${GIT:?}" clone "${URL}" --branch "${TAG}" --single-branch \
+    "${GIT:?}" clone "${URL}" "${NAME}" --branch "${TAG}" --single-branch \
       >${OUT1:?} 2>${OUT2:?} || { error "${EC15:?}"; return 1; }
   fi
     
