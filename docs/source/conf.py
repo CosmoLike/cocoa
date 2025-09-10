@@ -24,7 +24,7 @@ templates_path = []
 #
 source_suffix = ['.rst', '.md']
 
-master_doc = "../../README.md"
+master_doc = "../../README"
 
 exclude_patterns = ["_build", "Thumbs.db", ".DS_Store"]
 
