@@ -14,15 +14,17 @@ release = '2020'
 # -- General configuration ---------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration
 
-extensions = []
+extensions = [
+    "myst_parser",
+]
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = []
 
-# The suffix(es) of source filenames.
-# You can specify multiple suffix as a list of string:
-#
-source_suffix = ['.rst', '.md']
+source_suffix = {
+    ".rst": "restructuredtext",
+    ".md": "markdown",
+}
 
 master_doc = "index"
 
@@ -37,8 +39,6 @@ language = "en"
 
 
 # -- Options for HTML output -------------------------------------------------
-# https://www.sphinx-doc.org/en/master/usage/configuration.html#options-for-html-output
-
 html_theme = 'alabaster'
 html_static_path = ['_static']
 
