@@ -44,7 +44,7 @@ htmlhelp_basename = "cocoadoc"
 
 
 # GPT code for rendering GitHub [TIP] and [Note]
-import emoji
+import emoji, re
 from docutils import nodes
 from docutils.parsers.rst import Directive
 from sphinx.transforms import SphinxTransform
