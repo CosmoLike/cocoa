@@ -24,14 +24,6 @@ myst_enable_extensions = [
     "amsmath",
 ]
 
-mathjax3_config = {
-    "tex": {
-        "macros": {
-            "rm": ["\\mathrm{#1}", 1],
-        }
-    }
-}
-
 templates_path = []
 
 source_suffix = {
@@ -64,11 +56,11 @@ from sphinx.transforms import SphinxTransform
 
 _CALLOUT_RE = re.compile(r'^\s*\[!\s*(TIP|NOTE|WARNING|IMPORTANT|CAUTION)\s*\]\s*', re.I)
 _KIND_MAP = {
-    'tip': 'tip',
-    'note': 'note',
-    'warning': 'warning',
-    'important': 'important',
-    'caution': 'caution',
+  'tip': 'tip',
+  'note': 'note',
+  'warning': 'warning',
+  'important': 'important',
+  'caution': 'caution',
 }
 
 def _in_code(node):
