@@ -36,7 +36,7 @@ language = "en"
 # -- Options for HTML output -------------------------------------------------
 html_theme = 'alabaster'
 html_static_path = ['_static']
-
+html_css_files = ['custom.css']
 show_authors = True
 
 # Output file base name for HTML help builder.
