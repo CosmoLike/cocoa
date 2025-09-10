@@ -24,7 +24,7 @@ templates_path = []
 #
 source_suffix = ['.rst', '.md']
 
-master_doc = "../../README"
+master_doc = "index"
 
 exclude_patterns = ["_build", "Thumbs.db", ".DS_Store"]
 
@@ -42,4 +42,7 @@ language = "en"
 html_theme = 'alabaster'
 html_static_path = ['_static']
 
+show_authors = True
 
+# Output file base name for HTML help builder.
+htmlhelp_basename = "cocoadoc"
