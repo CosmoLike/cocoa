@@ -473,7 +473,7 @@ likelihoods, and the theory code, all following Cobaya Conventions.
   <img width="700" height="470" alt="Screenshot 2025-08-04 at 7 05 53 AM" src="https://github.com/user-attachments/assets/a48b267a-beba-4e53-9dbf-e3c5a24daff1" />
   </p>
 
-  Below we show a case with $n_{\rm param} = 38$ that illustrates the need for performing convergence tests on a case-by-case basis.
+  Below we show a case with $n_{\mathrm{param}} = 38$ that illustrates the need for performing convergence tests on a case-by-case basis.
   In this example, the total number of evaluations for a reliable minimum is approximately $319,200$ ($n_{\mathrm{stw}} \sim 700$), distributed among $n_{\mathrm{MPI}} = 114$ processes for faster results.
 
   <p align="center">
@@ -506,9 +506,9 @@ likelihoods, and the theory code, all following Cobaya Conventions.
           start value ~ mininum value - factor*np.sqrt(np.diag(cov))
           end   value ~ mininum value + factor*np.sqrt(np.diag(cov))
 
-    We advise ${\rm factor} \sim 3$ for parameters that are well constrained by the data when a covariance matrix is provided.
+    We advise $\mathrm{factor} \sim 3$ for parameters that are well constrained by the data when a covariance matrix is provided.
     If `cov` is not supplied, the code estimates one internally from the prior.
-    If a parameter is poorly constrained or `cov` is not given, we recommend ${\rm factor} \ll 1$.
+    If a parameter is poorly constrained or `cov` is not given, we recommend $\mathrm{factor} \ll 1$.
 
     The script that generated the plot below is provided at `projects/example/scripts/EXAMPLE_PLOT_PROFILE1.py`. The Google Colab notebook [Example Profile Likelihood](https://github.com/CosmoLike/CoCoAGoogleColabExamples/blob/main/Cocoa_Example_Profile_Likelihoods.ipynb) can also reconstruct a similar version of this figure. 
   
