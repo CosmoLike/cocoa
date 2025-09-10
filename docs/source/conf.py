@@ -41,3 +41,26 @@ show_authors = True
 
 # Output file base name for HTML help builder.
 htmlhelp_basename = "cocoadoc"
+
+
+# GPT code for rendering GitHub [TIP] and [Note]
+
+from docutils import nodes
+from docutils.parsers.rst import Directive
+from sphinx.transforms import SphinxTransform
+
+class GithubAdmonitionTransform(SphinxTransform):
+  default_priority = 210  # run after parsing
+
+  def apply(self):
+    for node in self.document.traverse(nodes.literal_block):
+      continue  # skip code
+    for node in self.document.traverse(nodes.paragraph):
+      text = node.astext().strip()
+      if text.startswith("[!TIP]"):
+        node.replace_self(nodes.admonition("", nodes.paragraph(text=text[6:].strip()), classes=["tip"]))
+      elif text.startswith("[!NOTE]"):
+        node.replace_self(nodes.admonition("", nodes.paragraph(text=text[7:].strip()), classes=["note"]))
+
+def setup(app):
+  app.add_transform(GithubAdmonitionTransform)
