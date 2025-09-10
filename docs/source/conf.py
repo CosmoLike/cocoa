@@ -49,25 +49,39 @@ from docutils import nodes
 from docutils.parsers.rst import Directive
 from sphinx.transforms import SphinxTransform
 
+_CALLOUT_RE = re.compile(r'^\s*\[!\s*(TIP|NOTE|WARNING|IMPORTANT|CAUTION)\s*\]\s*', re.I)
+_KIND_MAP = {
+    'tip': 'tip',
+    'note': 'note',
+    'warning': 'warning',
+    'important': 'important',
+    'caution': 'caution',
+}
+
+def _in_code(node):
+    p = node.parent
+    while p:
+        if isinstance(p, (nodes.literal_block, nodes.literal)):
+            return True
+        p = p.parent
+    return False
 
 class GithubAdmonitionTransform(SphinxTransform):
-  default_priority = 210  # run after parsing
+  default_priority = 210  # after parsing
 
   def apply(self):
-    for node in self.document.traverse(nodes.literal_block):
-      continue  # skip code
-    for node in self.document.traverse(nodes.paragraph):
-      text = node.astext().strip()
-      if text.startswith("[!TIP]"):
-        node.replace_self(nodes.admonition("", nodes.paragraph(text=text[6:].strip()), classes=["tip"]))
-      elif text.startswith("[!Tip]"):
-        node.replace_self(nodes.admonition("", nodes.paragraph(text=text[6:].strip()), classes=["tip"]))
-      elif text.startswith("[!Note]"):
-        node.replace_self(nodes.admonition("", nodes.paragraph(text=text[7:].strip()), classes=["note"]))
-      elif text.startswith("[!NOTE]"):
-        node.replace_self(nodes.admonition("", nodes.paragraph(text=text[7:].strip()), classes=["note"]))
-      elif text.startswith("[!Warning]"):
-        node.replace_self(nodes.admonition("", nodes.paragraph(text=text[7:].strip()), classes=["warn"]))
+    for p in list(self.document.traverse(nodes.paragraph)):
+      if _in_code(p):
+        continue
+      txt = p.astext()
+      m = _CALLOUT_RE.match(txt)
+      if not m:
+        continue
+      kind = _KIND_MAP[m.group(1).lower()]
+      body = _CALLOUT_RE.sub('', txt, count=1)  # remove the [!...] tag cleanly
+      admon = nodes.admonition('', classes=[kind])
+      admon += nodes.paragraph(text=body)
+      p.replace_self(admon)
 
 def _is_in_code(node):
     p = node.parent
