@@ -59,6 +59,8 @@ class GithubAdmonitionTransform(SphinxTransform):
       text = node.astext().strip()
       if text.startswith("[!TIP]"):
         node.replace_self(nodes.admonition("", nodes.paragraph(text=text[6:].strip()), classes=["tip"]))
+      elif text.startswith("[!Tip]"):
+        node.replace_self(nodes.admonition("", nodes.paragraph(text=text[6:].strip()), classes=["tip"]))
       elif text.startswith("[!NOTE]"):
         node.replace_self(nodes.admonition("", nodes.paragraph(text=text[7:].strip()), classes=["note"]))
 
