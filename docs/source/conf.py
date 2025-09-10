@@ -67,7 +67,7 @@ class GithubAdmonitionTransform(SphinxTransform):
       elif text.startswith("[!NOTE]"):
         node.replace_self(nodes.admonition("", nodes.paragraph(text=text[7:].strip()), classes=["note"]))
       elif text.startswith("[!Warning]"):
-        node.replace_self(nodes.admonition("", nodes.paragraph(text=text[7:].strip()), classes=["warning"]))
+        node.replace_self(nodes.admonition("", nodes.paragraph(text=text[7:].strip()), classes=["warn"]))
 
 def _is_in_code(node):
     p = node.parent
