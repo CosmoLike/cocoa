@@ -420,16 +420,16 @@ likelihoods, and the theory code, all following Cobaya Conventions.
           mpirun -n 12 --oversubscribe python ./projects/example/EXAMPLE_EMUL_EMCEE1.py \
                 --root ./projects/example/ --outroot "EXAMPLE_EMUL_EMCEE1" --maxfeval 80000
 
-  The number of steps per MPI worker is $n_{\\mathrm{sw}} =  \\mathrm{maxfeval}/n_{\\mathrm{w}}$,
-  with the number of walkers being $n_{\\mathrm{w}}=\\mathrm{max}(3n_{\\mathrm{params}},n_{\\mathrm{MPI}})$.
+  The number of steps per MPI worker is $n_{\mathrm{sw}} =  \mathrm{maxfeval}/n_{\mathrm{w}}$,
+  with the number of walkers being $n_{\mathrm{w}}=\mathrm{max}(3n_{\mathrm{params}},n_{\mathrm{MPI}})$.
   For proper convergence, each walker should traverse 50 times its autocorrelation length ($\tau$),
   which is provided in the header of the output chain file. A reasonable rule of thumb is to assume
-  $\tau > 200$ and therefore set $\\mathrm{maxfeval} > 10,000 \times n_{\\mathrm{w}}$.
+  $\tau > 200$ and therefore set $\mathrm{maxfeval} > 10,000 \times n_{\mathrm{w}}$.
 
   With these numbers, users may ask when `Emcee` is preferable to `Metropolis-Hastings`?
   Here are a few numbers based on a `Planck CMB (l < 396) + SN + BAO + LSST-Y1` chain with 38 parameters in total.
-  1) `MH` achieves convergence with $n_{\\mathrm{sw}} \sim 150,000$, but only requires four walkers.
-  2) `Emcee` has $\tau \sim 300$, so it requires $n_{\\mathrm{sw}} \sim 15,000$ when running with $n_{\\mathrm{w}}=114$.
+  1) `MH` achieves convergence with $n_{\mathrm{sw}} \sim 150,000$, but only requires four walkers.
+  2) `Emcee` has $\tau \sim 300$, so it requires $n_{\mathrm{sw}} \sim 15,000$ when running with $n_{\mathrm{w}}=114$.
   
   Conclusion: `Emcee` requires $\sim 3$ more evaluations in this case, but the number of evaluations per MPI worker (assuming one MPI worker per walker) is reduced by $\sim 10$.
   Therefore, `Emcee` seems well-suited for cases where the evaluation of a single cosmology is time-consuming (and there is no slow/fast decomposition).
@@ -461,10 +461,10 @@ likelihoods, and the theory code, all following Cobaya Conventions.
           mpirun -n 12 --oversubscribe python ./projects/example/EXAMPLE_EMUL_MINIMIZE1.py \
                 --root ./projects/example/ --outroot "EXAMPLE_EMUL_MIN1" --nstw 200
        
-  The number of steps per Emcee walker per temperature is $n_{\\mathrm{stw}}$,
-  and the number of walkers is $n_{\\mathrm{w}}=\\mathrm{max}(3n_{\\mathrm{params}},n_{\\mathrm{MPI}})$. The minimum number of total evaluations is then 
-  $3n_{\\mathrm{params}} \times n_{\\mathrm{T}} \times n_{\\mathrm{stw}}$, which can be distributed among $n_{\\mathrm{MPI}} = 3n_{\\mathrm{params}}$ MPI processes for faster results.
-  Do maintain $n_{\\mathrm{stw}} > 200$ for reliable convergence in LCDM (see plot below).
+  The number of steps per Emcee walker per temperature is $n_{\mathrm{stw}}$,
+  and the number of walkers is $n_{\mathrm{w}}=\mathrm{max}(3n_{\mathrm{params}},n_{\mathrm{MPI}})$. The minimum number of total evaluations is then 
+  $3n_{\mathrm{params}} \times n_{\mathrm{T}} \times n_{\mathrm{stw}}$, which can be distributed among $n_{\mathrm{MPI}} = 3n_{\mathrm{params}}$ MPI processes for faster results.
+  Do maintain $n_{\mathrm{stw}} > 200$ for reliable convergence in LCDM (see plot below).
   The same rule applies to *Profile* and *Scan* codes, as they are all based on the same minimization strategy.
 
   The script that generated the plot below is provided at `projects/example/scripts/EXAMPLE_MIN_COMPARE_CONV.py`. The Google Colab notebook [Test Minimizer Convergence](https://github.com/CosmoLike/CoCoAGoogleColabExamples/blob/main/Cocoa_Example_Test_Minimizer_Convergence.ipynb) can also reconstruct a similar version of this figure. 
@@ -474,7 +474,7 @@ likelihoods, and the theory code, all following Cobaya Conventions.
   </p>
 
   Below we show a case with $n_{\rm param} = 38$ that illustrates the need for performing convergence tests on a case-by-case basis.
-  In this example, the total number of evaluations for a reliable minimum is approximately $319,200$ ($n_{\\mathrm{stw}} \sim 700$), distributed among $n_{\\mathrm{MPI}} = 114$ processes for faster results.
+  In this example, the total number of evaluations for a reliable minimum is approximately $319,200$ ($n_{\mathrm{stw}} \sim 700$), distributed among $n_{\mathrm{MPI}} = 114$ processes for faster results.
 
   <p align="center">
   <img width="700" height="470" alt="Screenshot 2025-08-13 at 5 29 59 PM" src="https://github.com/user-attachments/assets/c43b8eea-ee2e-443d-a497-cb9b2dae2fc3" />
