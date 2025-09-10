@@ -6,7 +6,7 @@ build:
     python: "3.10"
   jobs:
     pre_install:
-      - pip install myst-parser
+      - pip install myst-parser sphinxemoji
 
 sphinx:
   configuration: docs/source/conf.py

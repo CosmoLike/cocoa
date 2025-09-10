@@ -16,6 +16,7 @@ release = '2020'
 
 extensions = [
     "myst_parser",
+    "sphinxemoji.sphinxemoji"
 ]
 
 templates_path = []
