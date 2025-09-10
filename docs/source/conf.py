@@ -19,6 +19,11 @@ extensions = [
     "sphinxemoji.sphinxemoji"
 ]
 
+myst_enable_extensions = [
+    "dollarmath",
+    "amsmath",
+]
+
 templates_path = []
 
 source_suffix = {
