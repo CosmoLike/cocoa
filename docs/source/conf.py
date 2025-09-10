@@ -24,6 +24,14 @@ myst_enable_extensions = [
     "amsmath",
 ]
 
+mathjax3_config = {
+    "tex": {
+        "macros": {
+            "rm": ["\\mathrm{#1}", 1],
+        }
+    }
+}
+
 templates_path = []
 
 source_suffix = {
