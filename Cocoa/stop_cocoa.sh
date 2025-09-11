@@ -92,6 +92,34 @@ if [ -z "${IGNORE_ACTDR6_CODE}" ]; then
 fi
 
 # ----------------------------------------------------------------------------
+# ------------------------------- COSMOLIKE CORE -----------------------------
+# ----------------------------------------------------------------------------
+
+if [[ -z "${IGNORE_COSMOLIKE_CODE}" ]]; then
+  ECODEF="${ROOTDIR:?}/external_modules/code"
+
+  TMP1="cfastpt"
+  TMP2="cfftlog"
+  TMP3="cosmolike"
+  TMP4="log.c"
+
+  if [[ -L "${ECODEF:?}/${TMP1:?}" ]]; then
+    rm -f "${ECODEF:?}/${TMP1:?}"
+  fi
+  if [[ -L "${ECODEF:?}/${TMP2:?}" ]]; then
+    rm -f "${ECODEF:?}/${TMP2:?}"
+  fi
+  if [[ -L "${ECODEF:?}/${TMP3:?}" ]]; then
+    rm -f "${ECODEF:?}/${TMP3:?}"
+  fi
+  if [[ -L "${ECODEF:?}/${TMP4:?}" ]]; then
+    rm -f "${ECODEF:?}/${TMP4:?}"
+  fi
+
+  unset -v ECODEF FOLDER TMP1 TMP2 TMP3 TMP4
+fi
+
+# ----------------------------------------------------------------------------
 # ------------------------------- SO LIKELIHOOD ------------------------------
 # ----------------------------------------------------------------------------
 if [[ -z "${IGNORE_SIMONS_OBSERVATORY_LIKELIHOOD_CODE}" ]]; then

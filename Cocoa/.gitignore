@@ -90,6 +90,10 @@ external_modules/data/act_dr6_mflike
 external_modules/data/mflike*/
 external_modules/data/mf*/
 
+external_modules/code/cfastpt
+external_modules/code/cfftlog
+external_modules/code/cosmolike
+external_modules/code/log.c
 external_modules/code/planck/code/spt_clik/.lock-waf_*
 external_modules/code/planck/code/spt_clik/.waf*
 external_modules/code/planck/code/spt_clik/build/

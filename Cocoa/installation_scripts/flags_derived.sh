@@ -45,6 +45,8 @@ if [ -n "${OVERWRITE_EXISTING_ALL_PACKAGES}" ]; then
   export OVERWRITE_EXISTING_GETDIST_CODE=1
 fi
 
+# ------------------------------------------------------------------------------
+
 if [ -n "${REDOWNLOAD_EXISTING_ALL_DATA}" ]; then
   export REDOWNLOAD_EXISTING_CORE_PACKAGES=1
   export REDOWNLOAD_EXISTING_ACTDR6_CMB_DATA=1
