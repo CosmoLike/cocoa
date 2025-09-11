@@ -67,6 +67,12 @@ if [ -z "${IGNORE_DERIVKIT_CODE}" ]; then
   fi
 
   if [ ! -d "${PACKDIR:?}" ]; then
+    env MPICC=$MPI_CC_COMPILER ${PIP3:?} install \
+      'numdifftools==0.9.41' \
+    --no-cache-dir --prefer-binary --use-pep517 \
+    --prefix="${ROOTDIR:?}/.local" \
+    >${OUT1:?} 2>${OUT2:?} || { error "(PIP-CORE-PACKAGES) ${EC13:?}"; return 1; }
+
     cdfolder "${ECODEF:?}" || return 1;
 
     "${GIT:?}" clone "${URL:?}" --depth ${GIT_CLONE_MAXIMUM_DEPTH:?} --recursive \

@@ -67,6 +67,13 @@ if [ -z "${IGNORE_TENSIOMETER_CODE}" ]; then
   fi
 
   if [ ! -d "${PACKDIR:?}" ]; then
+    env MPICC=$MPI_CC_COMPILER ${PIP3:?} install \
+      'autograd==1.8.0' \
+      'pymanopt==0.2.5' \
+    --no-cache-dir --prefer-binary --use-pep517 \
+    --prefix="${ROOTDIR:?}/.local" \
+    >${OUT1:?} 2>${OUT2:?} || { error "${EC13:?}"; return 1; }
+
     cdfolder "${ECODEF:?}" || return 1;
 
     "${GIT:?}" clone "${URL:?}" --depth ${GIT_CLONE_MAXIMUM_DEPTH:?} --recursive "${FOLDER:?}" \

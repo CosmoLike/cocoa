@@ -742,7 +742,6 @@ if [ -z "${IGNORE_CORE_INSTALLATION}" ]; then
     # --------------------------------------------------------------------------
     # note: in case this script run >1x w/ previous run killed b/c of an error
     rm -f "${PACKDIR:?}/libcuba.a"
-    rm -f "${PACKDIR:?}/libcuba.a"
     rm -f "${PACKDIR:?}/libcuba.so"
     rm -f "${PACKDIR:?}/libcuba.dylib"
     rm -f "${PACKDIR:?}/makefile"
@@ -759,7 +758,6 @@ if [ -z "${IGNORE_CORE_INSTALLATION}" ]; then
     # CUBA NEEDS AN UPDATED config.sub
     # --------------------------------------------------------------------------
     cpfile "${CCIL:?}/cuba_changes/config.sub" "${PACKDIR}/"
-
     #NOTE: LD_LIBRARY_PATH/DYLD_FALLBACK_LIBRARY_PATH matters only when something 
     #NOTE: is executed during the build (e.g., configure checks, unit tests)
     case "$(uname -s)" in
@@ -841,9 +839,6 @@ if [ -z "${IGNORE_CORE_INSTALLATION}" ]; then
     PACKDIR="${CCIL:?}/${COCOA_EXPAT_DIR:-"expat-2.5.0/"}"
 
     cdfolder "${PACKDIR:?}" || return 1;
-    
-    # CUBA NEEDS AN UPDATED config.sub
-
 
     #NOTE: LD_LIBRARY_PATH/DYLD_FALLBACK_LIBRARY_PATH matters only when something 
     #NOTE: is executed during the build (e.g., configure checks, unit tests)

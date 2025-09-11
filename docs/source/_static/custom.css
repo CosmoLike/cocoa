@@ -1,0 +1,19 @@
+/* Keep images responsive and preserve aspect ratio everywhere */
+.rst-content img,
+.rst-content .figure img,
+.rst-content svg {
+  max-width: 100%;
+  height: auto !important;   /* override any fixed height that would stretch */
+}
+
+/* If an inline width is present (e.g., width="300"), keep aspect ratio */
+.rst-content img[width] {
+  height: auto !important;
+}
+
+/* Sometimes tables/containers can squish images — let them scale naturally */
+.wy-table-responsive img,
+.rst-content .align-center img {
+  height: auto !important;
+  max-width: 100%;
+}

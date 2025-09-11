@@ -46,7 +46,6 @@ Core packages include compilers and numerical libraries that users typically do 
 > [!Note]
 > We recommend but do not yet impose the use of the package `conda-lock` and its tailored YML files to install the Cocoa conda environment, *see the [Tip] section below*
 
-
   - Linux
     
          wget https://raw.githubusercontent.com/CosmoLike/cocoa/refs/heads/dev/cocoapy310.yml
@@ -421,16 +420,16 @@ likelihoods, and the theory code, all following Cobaya Conventions.
           mpirun -n 12 --oversubscribe python ./projects/example/EXAMPLE_EMUL_EMCEE1.py \
                 --root ./projects/example/ --outroot "EXAMPLE_EMUL_EMCEE1" --maxfeval 80000
 
-  The number of steps per MPI worker is $n_{\\rm sw} =  {\\rm maxfeval}/n_{\\rm w}$,
-  with the number of walkers being $n_{\\rm w}={\\rm max}(3n_{\\rm params},n_{\\rm MPI})$.
+  The number of steps per MPI worker is $n_{\mathrm{sw}} =  \mathrm{maxfeval}/n_{\mathrm{w}}$,
+  with the number of walkers being $n_{\mathrm{w}}=\mathrm{max}(3n_{\mathrm{params}},n_{\mathrm{MPI}})$.
   For proper convergence, each walker should traverse 50 times its autocorrelation length ($\tau$),
   which is provided in the header of the output chain file. A reasonable rule of thumb is to assume
-  $\tau > 200$ and therefore set ${\\rm maxfeval} > 10,000 \times n_{\\rm w}$.
+  $\tau > 200$ and therefore set $\mathrm{maxfeval} > 10,000 \times n_{\mathrm{w}}$.
 
   With these numbers, users may ask when `Emcee` is preferable to `Metropolis-Hastings`?
   Here are a few numbers based on a `Planck CMB (l < 396) + SN + BAO + LSST-Y1` chain with 38 parameters in total.
-  1) `MH` achieves convergence with $n_{\\rm sw} \sim 150,000$, but only requires four walkers.
-  2) `Emcee` has $\tau \sim 300$, so it requires $n_{\\rm sw} \sim 15,000$ when running with $n_{\\rm w}=114$.
+  1) `MH` achieves convergence with $n_{\mathrm{sw}} \sim 150,000$, but only requires four walkers.
+  2) `Emcee` has $\tau \sim 300$, so it requires $n_{\mathrm{sw}} \sim 15,000$ when running with $n_{\mathrm{w}}=114$.
   
   Conclusion: `Emcee` requires $\sim 3$ more evaluations in this case, but the number of evaluations per MPI worker (assuming one MPI worker per walker) is reduced by $\sim 10$.
   Therefore, `Emcee` seems well-suited for cases where the evaluation of a single cosmology is time-consuming (and there is no slow/fast decomposition).
@@ -462,10 +461,10 @@ likelihoods, and the theory code, all following Cobaya Conventions.
           mpirun -n 12 --oversubscribe python ./projects/example/EXAMPLE_EMUL_MINIMIZE1.py \
                 --root ./projects/example/ --outroot "EXAMPLE_EMUL_MIN1" --nstw 200
        
-  The number of steps per Emcee walker per temperature is $n_{\\rm stw}$,
-  and the number of walkers is $n_{\\rm w}={\\rm max}(3n_{\\rm params},n_{\\rm MPI})$. The minimum number of total evaluations is then 
-  $3n_{\\rm params} \times n_{\rm T} \times n_{\\rm stw}$, which can be distributed among $n_{\\rm MPI} = 3n_{\\rm params}$ MPI processes for faster results.
-  Do maintain $n_{\\rm stw} > 200$ for reliable convergence in LCDM (see plot below).
+  The number of steps per Emcee walker per temperature is $n_{\mathrm{stw}}$,
+  and the number of walkers is $n_{\mathrm{w}}=\mathrm{max}(3n_{\mathrm{params}},n_{\mathrm{MPI}})$. The minimum number of total evaluations is then 
+  $3n_{\mathrm{params}} \times n_{\mathrm{T}} \times n_{\mathrm{stw}}$, which can be distributed among $n_{\mathrm{MPI}} = 3n_{\mathrm{params}}$ MPI processes for faster results.
+  Do maintain $n_{\mathrm{stw}} > 200$ for reliable convergence in LCDM (see plot below).
   The same rule applies to *Profile* and *Scan* codes, as they are all based on the same minimization strategy.
 
   The script that generated the plot below is provided at `projects/example/scripts/EXAMPLE_MIN_COMPARE_CONV.py`. The Google Colab notebook [Test Minimizer Convergence](https://github.com/CosmoLike/CoCoAGoogleColabExamples/blob/main/Cocoa_Example_Test_Minimizer_Convergence.ipynb) can also reconstruct a similar version of this figure. 
@@ -474,11 +473,11 @@ likelihoods, and the theory code, all following Cobaya Conventions.
   <img width="700" height="470" alt="Screenshot 2025-08-04 at 7 05 53 AM" src="https://github.com/user-attachments/assets/a48b267a-beba-4e53-9dbf-e3c5a24daff1" />
   </p>
 
-  Below we show a case with $n_{\rm param} = 38$ that illustrates the need for performing convergence tests on a case-by-case basis.
-  In this example, the total number of evaluations for a reliable minimum is approximately $319,200$ ($n_{\\rm stw} \sim 700$), distributed among $n_{\\rm MPI} = 114$ processes for faster results.
+  Below we show a case with $n_{\mathrm{param}} = 38$ that illustrates the need for performing convergence tests on a case-by-case basis.
+  In this example, the total number of evaluations for a reliable minimum is approximately $319,200$ ($n_{\mathrm{stw}} \sim 700$), distributed among $n_{\mathrm{MPI}} = 114$ processes for faster results.
 
   <p align="center">
-  <img width="750" height="750" alt="Screenshot 2025-08-13 at 5 29 59 PM" src="https://github.com/user-attachments/assets/c43b8eea-ee2e-443d-a497-cb9b2dae2fc3" />
+  <img width="700" height="470" alt="Screenshot 2025-08-13 at 5 29 59 PM" src="https://github.com/user-attachments/assets/c43b8eea-ee2e-443d-a497-cb9b2dae2fc3" />
   </p>
 
 - **Profile**: 
@@ -499,7 +498,6 @@ likelihoods, and the theory code, all following Cobaya Conventions.
                   --outroot "EXAMPLE_EMUL_PROFILE1" --factor 3 --nstw 200 --numpts 10 \
                   --profile 1 --minfile "./projects/example/chains/EXAMPLE_EMUL_MIN1.txt"
       
-
     Profile provides the optional argument `minfile`, as it is significantly faster to run the profile script with a previously provided global minimum. 
     The profile also provides the optional argument `cov`. Again, it is considerably more efficient to employ a covariance matrix from a converged chain. 
 
@@ -508,14 +506,14 @@ likelihoods, and the theory code, all following Cobaya Conventions.
           start value ~ mininum value - factor*np.sqrt(np.diag(cov))
           end   value ~ mininum value + factor*np.sqrt(np.diag(cov))
 
-    We advise ${\rm factor} \sim 3$ for parameters that are well constrained by the data when a covariance matrix is provided.
+    We advise $\mathrm{factor} \sim 3$ for parameters that are well constrained by the data when a covariance matrix is provided.
     If `cov` is not supplied, the code estimates one internally from the prior.
-    If a parameter is poorly constrained or `cov` is not given, we recommend ${\rm factor} \ll 1$.
+    If a parameter is poorly constrained or `cov` is not given, we recommend $\mathrm{factor} \ll 1$.
 
     The script that generated the plot below is provided at `projects/example/scripts/EXAMPLE_PLOT_PROFILE1.py`. The Google Colab notebook [Example Profile Likelihood](https://github.com/CosmoLike/CoCoAGoogleColabExamples/blob/main/Cocoa_Example_Profile_Likelihoods.ipynb) can also reconstruct a similar version of this figure. 
   
     <p align="center">
-    <img width="1156" height="858" alt="Screenshot 2025-08-02 at 8 42 41 PM" src="https://github.com/user-attachments/assets/22182688-2865-4b15-a80b-783ddd21f715" />
+    <img width="832.32" height="617.76" alt="Screenshot 2025-08-02 at 8 42 41 PM" src="https://github.com/user-attachments/assets/22182688-2865-4b15-a80b-783ddd21f715" />
     </p>
 
 - **Profile method 2**:
@@ -543,7 +541,7 @@ likelihoods, and the theory code, all following Cobaya Conventions.
     The script that generated the plot below is provided at `projects/example/scripts/EXAMPLE_PLOT_PROFILE1_COMP.py`
   
     <p align="center">
-    <img width="1156" height="858" alt="example_profile_comp" src="https://github.com/user-attachments/assets/ba0c0629-bd3b-4274-9f24-9db5929dc35c" />
+    <img width="832.32" height="617.76" alt="example_profile_comp" src="https://github.com/user-attachments/assets/ba0c0629-bd3b-4274-9f24-9db5929dc35c" />
     </p>
 
 - **Scan**: 
@@ -562,7 +560,7 @@ likelihoods, and the theory code, all following Cobaya Conventions.
     - macOS (arm)
 
           mpirun -n 12 --oversubscribe python -m mpi4py.futures ./projects/example/EXAMPLE_EMUL_SCAN1.py \
-                  --root ./projects/example/ --outroot "EXAMPLE_EMUL_SCAN1" --nstw 200 --profile 1
+              --root ./projects/example/ --outroot "EXAMPLE_EMUL_SCAN1" --nstw 200 --profile 1
       
 - **Tension Metrics**
 
@@ -593,7 +591,6 @@ likelihoods, and the theory code, all following Cobaya Conventions.
   - Jonathan Gordon, Joshua Kable, João Rebouças, Evan Saraivanov, Diogo Souza, Jiachuan Xu, Yijie Zhu, and KunHao Zhong for working on CoCoA on many fruitful projects at Stony Brook Univ. and the Univ. of Arizona.
   - Evan Saraivanov, Yijie Zhu, and KunHao Zhong for developing the emulator interface within the CoCoA framework.
   - Haley Bowden, Kali Cao, Nihar Dalal, Yu-Hsiu Huang, Niko, Junzhou Zhang, and members of the Roman HLIS Cosmology PIT for all Roman-specific development and testing.
-
 
 The following is not an exhaustive list of the codes we use/download/adopt
 
