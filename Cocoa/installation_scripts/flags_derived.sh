@@ -8,6 +8,7 @@
 # these keys are only relevant if you run setup_cocoa multiple times -----------
 # ------------------------------------------------------------------------------
 if [ -n "${OVERWRITE_EXISTING_ALL_PACKAGES}" ]; then
+  export OVERWRITE_EXISTING_COSMOLIKE_CODE
   export OVERWRITE_EXISTING_COCOA_PRIVATE_PYTHON_ENV=1
   export OVERWRITE_EXISTING_CORE_PACKAGES=1
   export OVERWRITE_EXISTING_COBAYA_CODE=1

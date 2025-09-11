@@ -77,7 +77,7 @@ if [ -z "${IGNORE_CAMB_CODE}" ]; then
 
     "${GIT:?}" clone --depth ${GIT_CLONE_MAXIMUM_DEPTH:?} "${URL:?}" \
       --recursive "${FOLDER:?}" \
-    >>${OUT1:?} 2>>${OUT2:?} || { error "${EC15:?}"; return 1; }
+      >>${OUT1:?} 2>>${OUT2:?} || { error "${EC15:?}"; return 1; }
     
     cdfolder "${PACKDIR}" || { cdroot; return 1; }
 
