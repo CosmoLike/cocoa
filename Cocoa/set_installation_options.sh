@@ -50,7 +50,6 @@ export IGNORE_COSMOPOWER_DATA=1
 # ------------------------------------------------------------------------------
 # The keys below control which packages will be installed and compiled 
 # ------------------------------------------------------------------------------
-#export IGNORE_COBAYA_CODE=1
 #export IGNORE_CAMB_CODE=1
 export IGNORE_CLASS_CODE=1 # Default: we just use CAMB (reduces compilation time)
 #export IGNORE_COSMOLIKE_CODE=1
