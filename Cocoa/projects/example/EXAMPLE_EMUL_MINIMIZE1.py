@@ -330,7 +330,7 @@ def min_chi2(x0,
       temperature = np.array([1.0, 0.25, 0.1, 0.005, 0.001], dtype='float64')
       stepsz      = temperature/3.0
     else:
-      nstw        = int(5.0*nstw/3.0)
+      nstw        = int(nstw)
       temperature = np.array([0.1, 0.005, 0.001], dtype='float64')
       stepsz      = temperature/3.0
 
@@ -399,9 +399,12 @@ if __name__ == '__main__':
             pool.wait()
             sys.exit(0)
         dim      = model.prior.d()     
-        nwalkers = max(3*dim,pool.comm.Get_size())
         nstw = args.nstw
         emoves = args.emoves #emcee moves
+        if emoves == 3:
+          nwalkers = max(6*dim, pool.comm.Get_size()) # KDE MOVES REQUIRE MORE WALKERS
+        else:
+          nwalkers = max(3*dim, pool.comm.Get_size())
          
         # 1st: Get covariance --------------------------------------------------
         if args.cov is not None and args.minfile is not None:
