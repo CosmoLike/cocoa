@@ -60,6 +60,25 @@ parser.add_argument("--outroot",
                     nargs='?',
                     const=1,
                     default="example_min1")
+parser.add_argument("--cov",
+                    dest="cov",
+                    help="Chain Covariance Matrix",
+                    nargs='?',
+                    const=1,
+                    default=None)
+parser.add_argument("--minfile",
+                    dest="minfile",
+                    help="Previous Minimization Result",
+                    nargs='?',
+                    const=1,
+                    default=None)
+parser.add_argument("--emoves",
+                    dest="emoves",
+                    help="Type of Emcee moves",
+                    type=int,
+                    nargs='?',
+                    const=1,
+                    default=0)
 # need to use parse_known_args because of mpifuture 
 args, unknown = parser.parse_known_args()
 # ------------------------------------------------------------------------------
@@ -271,7 +290,9 @@ def min_chi2(x0,
              fixed=-1, 
              nstw=200,
              nwalkers=5,
-             pool=None):
+             pool=None,
+             emoves=0,
+             lowT=True):
     def mychi2(params, *args):
         z, fixed, T = args
         params = np.array(params, dtype='float64')
@@ -304,9 +325,23 @@ def min_chi2(x0,
     
     ndim        = int(x0.shape[0])
     nwalkers    = int(nwalkers)
-    nstw        = int(nstw)
-    temperature = np.array([1.0, 0.25, 0.1, 0.005, 0.001], dtype='float64')
-    stepsz      = temperature/3.0
+    if lowT == True:
+      nstw        = int(nstw)
+      temperature = np.array([1.0, 0.25, 0.1, 0.005, 0.001], dtype='float64')
+      stepsz      = temperature/3.0
+    else:
+      nstw        = int(5.0*nstw/3.0)
+      temperature = np.array([0.1, 0.005, 0.001], dtype='float64')
+      stepsz      = temperature/3.0
+
+    if emoves == 0:
+      moves = [(emcee.moves.DEMove(), 0.8), (emcee.moves.DESnookerMove(), 0.2)]
+    elif emoves == 1:
+      moves = emcee.moves.DEMove()
+    elif emoves == 2:
+      moves = emcee.moves.WalkMove()
+    else:
+      moves = emcee.moves.KDEMove()
 
     partial_samples = []
     partial = []
@@ -318,8 +353,7 @@ def min_chi2(x0,
                                         ndim, 
                                         logprob, 
                                         args=(args[0], args[1], temperature[i]),
-                                        moves=[(emcee.moves.DEMove(), 0.8),
-                                               (emcee.moves.DESnookerMove(), 0.2)],
+                                        moves=moves,
                                         pool=pool)    
         sampler.run_mcmc(np.array(x, dtype='float64'), 
                          nstw, 
@@ -343,13 +377,15 @@ def min_chi2(x0,
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
-def prf(x0, nstw, cov, fixed=-1, nwalkers=5, pool=None):
+def prf(x0, nstw, cov, fixed=-1, nwalkers=5, pool=None, emoves=0, lowT=True):
     res =  min_chi2(x0=np.array(x0, dtype='float64'), 
                     fixed=fixed,
                     cov=cov, 
                     nstw=nstw, 
                     nwalkers=nwalkers,
-                    pool=pool)
+                    pool=pool,
+                    emoves=emoves,
+                    lowT=lowT)
     return res
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
@@ -365,19 +401,32 @@ if __name__ == '__main__':
         dim      = model.prior.d()     
         nwalkers = max(3*dim,pool.comm.Get_size())
         nstw = args.nstw
-        (x0, results) = model.get_valid_point(max_tries=1000, 
-                                             ignore_fixed_ref=False,
-                                             logposterior_as_dict=True)
+        emoves = args.emoves #emcee moves
+         
         # 1st: Get covariance --------------------------------------------------
-        cov = model.prior.covmat(ignore_external=False) # cov from prior
-        
+        if args.cov is not None and args.minfile is not None:
+          cov = np.loadtxt(args.root+args.cov)[0:dim,0:dim]
+          tmp = np.loadtxt(args.root+args.minfile)
+          x0 = tmp[0:model.prior.d()]
+          if (abs(chi2(x0)-tmp[-1])>0.02):
+            raise ValueError("Inconsistency min file with current setup")
+          lowT = False
+        else:
+          cov = model.prior.covmat(ignore_external=False) # cov from prior 
+          (x0, results) = model.get_valid_point(max_tries=1000, 
+                                                ignore_fixed_ref=False,
+                                                logposterior_as_dict=True)
+          lowT = True
+
         # 2nd: Run Procoli -----------------------------------------------------
         res = np.array(list(prf(np.array(x0, dtype='float64'), 
-                               fixed=-1, 
-                               nstw=nstw,
-                               nwalkers=nwalkers,
-                               pool=pool,
-                               cov=cov)), dtype="object")
+                                fixed=-1, 
+                                nstw=nstw,
+                                nwalkers=nwalkers,
+                                pool=pool,
+                                cov=cov,
+                                emoves=emoves,
+                                lowT=lowT)), dtype="object")
         xf = np.array([res[0]],dtype='float64')
         
         # 3rd Append derived parameters ----------------------------------------
