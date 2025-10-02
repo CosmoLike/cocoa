@@ -23,7 +23,7 @@ esac
 # ------------------------------------------------------------------------------
 # VERBOSE AS DEBUG TOOL --------------------------------------------------------
 # ------------------------------------------------------------------------------
-#export COCOA_OUTPUT_VERBOSE=1
+export COCOA_OUTPUT_VERBOSE=1
 #export COCOA_OUTPUT_DEBUG=1 # turn on bash strict mode (set -exo pipefail) on  
                              # instalation_scripts/setup/compile_x.sh scripts 
 # ------------------------------------------------------------------------------
@@ -51,7 +51,7 @@ export IGNORE_COSMOPOWER_DATA=1
 # The keys below control which packages will be installed and compiled 
 # ------------------------------------------------------------------------------
 #export IGNORE_CAMB_CODE=1
-export IGNORE_CLASS_CODE=1 # Default: we just use CAMB (reduces compilation time)
+#export IGNORE_CLASS_CODE=1 # Default: we just use CAMB (reduces compilation time)
 #export IGNORE_COSMOLIKE_CODE=1
 #export IGNORE_POLYCHORD_SAMPLER_CODE=1
 #export IGNORE_PLANCK_LIKELIHOOD_CODE=1
@@ -82,7 +82,7 @@ export IGNORE_DARK_EMULATOR_CODE=1
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
 #export IGNORE_COSMOLIKE_LSST_Y1_CODE=1
-export IGNORE_COSMOLIKE_DES_Y3_CODE=1
+#export IGNORE_COSMOLIKE_DES_Y3_CODE=1
 export IGNORE_COSMOLIKE_ROMAN_FOURIER_CODE=1
 #export IGNORE_COSMOLIKE_ROMAN_REAL_CODE=1
 
@@ -374,6 +374,9 @@ export ROMAN_REAL_BRANCH="main"
 #BRANCH: if unset, load the specified TAG
 #export ROMAN_REAL_TAG="v4.0-beta17"
 
+export DESY1PLANCK_URL="git@github.com:SBU-COSMOLIKE/cocoa_desy1xplanck.git"
+export DESY1PLANCK_NAME="desy1xplanck"
+export DESY1PLANCK_BRANCH="main"
 # --------------------------------------------------------------------
 # --------------------------------------------------------------------
 # private projects below ---------------------------------------------

@@ -1,5 +1,5 @@
 stop_at_error: False
-debug: false
+debug: true
 timing: true
 
 likelihood:
@@ -63,7 +63,7 @@ params:
     latex: \Omega_\mathrm{c} h^2
   m_ncdm:
     value: 0.06
-    renames: mnu
+    renames: mnu # mnu (CAMB, always total mass) vs m_ncdm (CLASS, mass of a single nu)
   tau:
     prior:
       min: 0.01
@@ -118,7 +118,6 @@ params:
 
 theory:
   classy:
-    path: ./external_modules/code/class_public
     use_renames: True
     extra_args:
       non linear: hmcode
