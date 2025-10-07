@@ -254,8 +254,35 @@ if [ -z "${IGNORE_COSMOLIKE_ROMAN_REAL_CODE}" ]; then
 fi
 
 # ----------------------------------------------------------------------------
-# ----------------------------- DES_Y1 x Planck ------------------------------
+# ----------------------------- DES x Planck ------------------------------
 # ----------------------------------------------------------------------------
+
+if [ -z "${IGNORE_COSMOLIKE_DESXPLANCK_CODE}" ]; then 
+  
+  # Name to be printed on this shell script messages
+  PRINTNAME="DESXPLANCK"
+
+  ptop "GETTING ${PRINTNAME:?}" || return 1
+
+  FOLDER="${DESXPLANCK_NAME:-"desy1xplanck"}"
+
+  URL="${DESXPLANCK_URL:-"https://github.com/CosmoLike/cocoa_desy1xplanck.git"}"
+
+  if [ -n "${DESXPLANCK_COMMIT}" ]; then
+    gitact0 "${FOLDER:?}" "${URL:?}"
+    gitact2 "${FOLDER:?}" "${DES_Y3_COMMIT:?}"  || return 1
+  elif [ -n "${DESXPLANCK_BRANCH}" ]; then 
+    gitact1 "${FOLDER:?}" "${URL:?}" "${DES_Y3_BRANCH:?}" || return 1
+  elif [ -n "${DESXPLANCK_TAG}" ]; then 
+    gitact0 "${FOLDER:?}" "${URL:?}"
+    gitact3 "${FOLDER:?}" "${DES_Y3_TAG:?}" || return 1
+  else
+    gitact0 "${FOLDER:?}" "${URL:?}"
+  fi
+
+  pbottom "GETTING ${PRINTNAME:?}" || return 1
+
+fi
 
 # -----------------------------------------------------------------------------
 # -----------------------------------------------------------------------------
