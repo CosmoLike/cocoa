@@ -146,7 +146,7 @@ if [ -z "${IGNORE_COSMOLIKE_LSST_Y1_CODE}" ]; then
     gitact0 "${FOLDER:?}" "${URL:?}"
     gitact2 "${FOLDER:?}" "${LSST_Y1_COMMIT:?}"  || return 1
   elif [ -n "${LSST_Y1_BRANCH}" ]; then 
-    gitact1 "${FOLDER:?}" "${LSST_Y1_BRANCH:?}" || return 1
+    gitact1 "${FOLDER:?}" "${URL:?}" "${LSST_Y1_BRANCH:?}" || return 1
   elif [ -n "${LSST_Y1_TAG}" ]; then 
     gitact0 "${FOLDER:?}" "${URL:?}"
     gitact3 "${FOLDER:?}" "${LSST_Y1_TAG:?}" || return 1
@@ -173,13 +173,11 @@ if [ -z "${IGNORE_COSMOLIKE_DES_Y3_CODE}" ]; then
 
   URL="${DES_Y3_URL:-"https://github.com/CosmoLike/cocoa_des_y3.git"}"
 
-  gitact0 "${FOLDER:?}" "${URL:?}"
-
   if [ -n "${DES_Y3_COMMIT}" ]; then
     gitact0 "${FOLDER:?}" "${URL:?}"
     gitact2 "${FOLDER:?}" "${DES_Y3_COMMIT:?}"  || return 1
   elif [ -n "${DES_Y3_BRANCH}" ]; then 
-    gitact1 "${FOLDER:?}" "${DES_Y3_BRANCH:?}" || return 1
+    gitact1 "${FOLDER:?}" "${URL:?}" "${DES_Y3_BRANCH:?}" || return 1
   elif [ -n "${DES_Y3_TAG}" ]; then 
     gitact0 "${FOLDER:?}" "${URL:?}"
     gitact3 "${FOLDER:?}" "${DES_Y3_TAG:?}" || return 1
@@ -212,7 +210,7 @@ if [ -z "${IGNORE_COSMOLIKE_ROMAN_FOURIER_CODE}" ]; then
     gitact0 "${FOLDER:?}" "${URL:?}"
     gitact2 "${FOLDER:?}" "${ROMAN_FOURIER_COMMIT:?}"  || return 1
   elif [ -n "${ROMAN_FOURIER_BRANCH}" ]; then 
-    gitact1 "${FOLDER:?}" "${ROMAN_FOURIER_BRANCH:?}" || return 1
+    gitact1 "${FOLDER:?}" "${URL:?}" "${ROMAN_FOURIER_BRANCH:?}" || return 1
   elif [ -n "${ROMAN_FOURIER_TAG}" ]; then 
     gitact0 "${FOLDER:?}" "${URL:?}"
     gitact3 "${FOLDER:?}" "${ROMAN_FOURIER_TAG:?}" || return 1
@@ -239,13 +237,11 @@ if [ -z "${IGNORE_COSMOLIKE_ROMAN_REAL_CODE}" ]; then
 
   URL="${ROMAN_REAL_URL:-"git@github.com:CosmoLike/cocoa_roman_real.git"}"
 
-  gitact0 "${FOLDER:?}" "${URL:?}"
-
   if [ -n "${ROMAN_REAL_COMMIT}" ]; then
     gitact0 "${FOLDER:?}" "${URL:?}"
     gitact2 "${FOLDER:?}" "${ROMAN_REAL_COMMIT:?}"  || return 1
   elif [ -n "${ROMAN_REAL_BRANCH}" ]; then 
-    gitact1 "${FOLDER:?}" "${ROMAN_REAL_BRANCH:?}" || return 1
+    gitact1 "${FOLDER:?}" "${URL:?}" "${ROMAN_REAL_BRANCH:?}" || return 1
   elif [ -n "${ROMAN_REAL_TAG}" ]; then 
     gitact0 "${FOLDER:?}" "${URL:?}"
     gitact3 "${FOLDER:?}" "${ROMAN_REAL_TAG:?}" || return 1
