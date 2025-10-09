@@ -75,12 +75,14 @@ if [ -z "${IGNORE_LIPOP_CMB_DATA}" ]; then
     for (( i=0; i<${#FILE[@]}; i++ ));
     do
       if [ ! -e "${EDATAF:?}/planck/${FILE[$i]:?}.tar.gz" ]; then
-        "${WGET:?}" "${URL}/${FILE[$i]:?}.tar.gz" -q --show-progress \
+        "${WGET:?}" "${URL}/${FILE[$i]:?}.tar.gz" \
+          -q \
+          --show-progress \
           --progress=bar:force:noscroll || { error "${EC24:?}"; return 1; }
       fi
 
       tar -xvzf "${FILE[$i]:?}.tar.gz" \
-        >${OUT1:?} 2>${OUT2:?} || { error "${EC25:?} (${FILE[$i]:?})"; return 1; }
+      >>${OUT1:?} 2>>${OUT2:?} || { error "${EC25:?} (${FILE[$i]:?})"; return 1; }
     done
 
     # note: by default, LIPOP saves the likelihoods on planck_2020

@@ -2,11 +2,67 @@
 # ----------------------------------------------------------------------------
 # ----------------------------------------------------------------------------
 # ----------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
+# If OVERWRITE_EXISTING_XXX_CODE=1, the setup_cocoa overwrites existing PACKAGES
+# overwrite means: delete existing PACKAGE folder and install it again ---------
+# these keys are only relevant if you run setup_cocoa multiple times -----------
+# ------------------------------------------------------------------------------
+if [ -n "${OVERWRITE_EXISTING_ALL_PACKAGES}" ]; then
+  export OVERWRITE_EXISTING_COSMOLIKE_CODE
+  export OVERWRITE_EXISTING_COCOA_PRIVATE_PYTHON_ENV=1
+  export OVERWRITE_EXISTING_CORE_PACKAGES=1
+  export OVERWRITE_EXISTING_COBAYA_CODE=1
+  export OVERWRITE_EXISTING_CAMB_CODE=1
+  export OVERWRITE_EXISTING_MGCAMB_CODE=1
+  export OVERWRITE_EXISTING_CLASS_CODE=1
+  export OVERWRITE_EXISTING_HYREC_CODE=1
+  export OVERWRITE_EXISTING_COSMOREC_CODE=1
+  export OVERWRITE_EXISTING_POLYCHORD_CODE=1
+  export OVERWRITE_EXISTING_VELOCILEPTORS_CODE=1
+  export OVERWRITE_EXISTING_EE2_CODE=1
+  export OVERWRITE_EXISTING_BAO_DATA=1
+  export OVERWRITE_EXISTING_SIMONS_OBSERVATORY_CODE=1
+  export OVERWRITE_EXISTING_FGSPECTRA_CODE=1
+  export OVERWRITE_EXISTING_LIPOP_CMB_CODE=1
+  export OVERWRITE_EXISTING_LIPOP_CMB_DATA=1
+  export OVERWRITE_EXISTING_ACTDR4_CMB_CODE=1
+  export OVERWRITE_EXISTING_ACTDR4_CMB_DATA=1
+  export OVERWRITE_EXISTING_ACTDR6_CMB_CODE=1
+  export OVERWRITE_EXISTING_ACTDR6_CMB_DATA=1
+  export OVERWRITE_EXISTING_BICEP_CMB_DATA=1
+  export OVERWRITE_EXISTING_CAMPSPEC_CMB_DATA=1
+  export OVERWRITE_EXISTING_SPT3G_CMB_DATA=1
+  export OVERWRITE_EXISTING_PLANCK_CMB_DATA=1
+  export OVERWRITE_EXISTING_SIMONS_OBSERVATORY_CMB_DATA=1
+  export OVERWRITE_EXISTING_SN_DATA=1
+  export OVERWRITE_EXISTING_HOLICOW_DATA=1
+  export OVERWRITE_EXISTING_COSMOPOWER_CODE=1
+  export OVERWRITE_EXISTING_EMULTRF_CODE=1
+  export OVERWRITE_EXISTING_DARK_EMULATOR_CODE=1
+  export OVERWRITE_EXISTING_NAUTILUS_CODE=1
+  export OVERWRITE_EXISTING_DERIVKIT_CODE=1
+  export OVERWRITE_EXISTING_TENSIOMETER_CODE=1
+  export OVERWRITE_EXISTING_GETDIST_CODE=1
+fi
 
-#ulimit -s unlimited
+# ------------------------------------------------------------------------------
+
+if [ -n "${REDOWNLOAD_EXISTING_ALL_DATA}" ]; then
+  export REDOWNLOAD_EXISTING_CORE_PACKAGES=1
+  export REDOWNLOAD_EXISTING_ACTDR6_CMB_DATA=1
+  export REDOWNLOAD_EXISTING_LIPOP_CMB_DATA=1
+  export REDOWNLOAD_EXISTING_SIMONS_OBSERVATORY_CMB_DATA=1
+  export REDOWNLOAD_EXISTING_CAMPSPEC_CMB_DATA=1
+  export OVERWRITE_EXISTING_EMULTRF_DATA=1
+  export OVERWRITE_EXISTING_COSMOPOWER_DATA=1
+fi
+
+# ------------------------------------------------------------------------------
+
 export COBAYA_PACKAGES_PATH=$ROOTDIR/external_modules
 
 # ------------------------------------------------------------------------------
+
 if [ -z "${IGNORE_CMAKE_INSTALLATION}" ]; then
     export CMAKE_ROOT=${ROOTDIR:?}/.local/bin/cmake
     export CMAKE=${ROOTDIR:?}/.local/bin/cmake
@@ -15,6 +71,7 @@ else
 fi
 
 # ------------------------------------------------------------------------------
+
 if [ -n "${IGNORE_CPP_INSTALLATION}" ]; then
   export IGNORE_CPP_BOOST_INSTALLATION=1
   export IGNORE_CPP_ARMA_INSTALLATION=1
@@ -23,6 +80,7 @@ if [ -n "${IGNORE_CPP_INSTALLATION}" ]; then
 fi
 
 # ------------------------------------------------------------------------------
+
 if [ -n "${IGNORE_C_INSTALLATION}" ]; then
   export IGNORE_C_CFITSIO_INSTALLATION=1
   export IGNORE_C_FFTW_INSTALLATION=1
@@ -30,11 +88,13 @@ if [ -n "${IGNORE_C_INSTALLATION}" ]; then
 fi
 
 # ------------------------------------------------------------------------------
+
 if [ -n "${IGNORE_FORTRAN_INSTALLATION}" ]; then
   export IGNORE_FORTRAN_LAPACK_INSTALLATION=1
 fi
 
 # ------------------------------------------------------------------------------
+
 if [ -n "${DEBUG_SKIP_FILE_DECOMPRESSION_SETUP_COCOA}" ]; then
   export SKIP_DECOMM_CORE_PACKAGES=1
   export SKIP_DECOMM_ACT=1
@@ -50,18 +110,20 @@ if [ -n "${DEBUG_SKIP_FILE_DECOMPRESSION_SETUP_COCOA}" ]; then
 fi
 
 # ------------------------------------------------------------------------------
+
 if [ -n "${GLOBAL_PACKAGES_LOCATION}" ]; then
   export GLOBAL_PACKAGES_INCLUDE=$GLOBAL_PACKAGES_LOCATION/include
   export GLOBAL_PACKAGES_LIB=$GLOBAL_PACKAGES_LOCATION/lib
 fi
 
 # ------------------------------------------------------------------------------
+
 export PYTHON3="${ROOTDIR}/.local/bin/python3"
 export PIP3="${PYTHON3:?} -m pip"
 export COBAYA_PACKAGES_PATH=external_modules
 
 # ------------------------------------------------------------------------------
-# ------------------------------------------------------------------------------
+
 if [ -n "${COSMOLIKE_DEBUG_MODE}" ]; then
     export SPDLOG_LEVEL=debug
 else
@@ -77,7 +139,7 @@ ptop() {
 }
 
 pbottom() {
-  echo -e "\033[1;34m  \e[4m${1} DONE\033[0m"
+  echo -e "\033[1;34m  \033[4m${1} DONE\033[0m"
 }
 
 ptop2() {
@@ -85,7 +147,7 @@ ptop2() {
 }
 
 pbottom2() {
-  echo -e "\033[1;44m\e[4m${1} DONE\033[0m"
+  echo -e "\033[1;44m\033[4m${1} DONE\033[0m"
 }
 
 pfail() {
@@ -100,21 +162,30 @@ cdroot() {
 
 if [ -z "${COCOA_OUTPUT_VERBOSE}" ]; then
   export OUT1="/dev/null"; export OUT2="/dev/null"
-  export MNT="${MAKE_NUM_THREADS:-1}"; 
-  [[ ${MNT} == +([0-9]) ]] || export MNT=1
+  #export MNT="${MAKE_NUM_THREADS:-1}"; 
+  #[[ ${MNT} == +([0-9]) ]] || export MNT=1
+  # USE REGEX and not glob (macos friendly)
+  export MNT="${MAKE_NUM_THREADS:-1}"
+  [[ $MNT =~ ^[0-9]+$ ]] || MNT=1
+  export MNT
 else
-  export OUT1="/dev/tty"; export OUT2="/dev/tty"
+  # : = does nothing and immediately returns success (exit status 0).
+  if { : > /dev/tty; } 2>/dev/null; then
+    export OUT1=/dev/tty OUT2=/dev/tty
+  else
+    export OUT1=/dev/null OUT2=/dev/null
+  fi
   export MNT=1
 fi
 
 fail_script_msg () {
-  local MSG="\033[0;31m        (${1:-"empty arg"}) we cannot run \e[3m"
+  local MSG="\033[0;31m        (${1:-"empty arg"}) we cannot run \033[3m"
   local MSG2="\033[0m"
   echo -e "${MSG} ${2:-"empty arg"} ${MSG2}"
 }
 
 warning_script_msg () {
-  local MSG="\033[0;31m        (${1:-"empty arg"}) warning: \e[3m"
+  local MSG="\033[0;31m        (${1:-"empty arg"}) warning: \033[3m"
   local MSG2="\033[0m"
   echo -e "${MSG} ${2:-"empty arg"} ${MSG2}"
 }
@@ -198,10 +269,6 @@ export EC36="FILE DOES NOT EXIST"
 export EC37="ENV VARIABLE NOT PROPERLY DEFINED"
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
-
-export COCOA_RUN_EVALUATE="mpirun -n 1 --oversubscribe --mca btl vader,tcp,self --bind-to core:overload-allowed --rank-by core --map-by numa:pe=4 cobaya-run"
-
-export COCOA_RUN_MCMC="mpirun -n 4 --oversubscribe --mca btl vader,tcp,self --bind-to core:overload-allowed --rank-by core --map-by numa:pe=4 cobaya-run"
 
 # ------------------------------------------------------------------------------
 # DEBUG THE COMPILATION OF PREREQUISITES PACKAGES. IF YOU NEED TO RUN ----------

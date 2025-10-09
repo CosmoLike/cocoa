@@ -1,0 +1,24 @@
+--- makefile	2025-09-03 19:46:10
++++ makefile2	2025-09-03 19:48:08
+@@ -36,8 +36,10 @@
+ UNAME_S := $(shell uname -s)
+ ifeq ($(UNAME_S),Darwin)
+   LIBDYN = libcuba$(SUFFIX).dylib
++  SOFLAGS = -dynamiclib -install_name @rpath/$(LIBDYN) -Wl,-undefined,dynamic_lookup
+ else
+   LIBDYN = libcuba$(SUFFIX).so
++	SOFLAGS = -shared
+ endif
+ MATH = Vegas$(SUFFIX)$(EXE) Suave$(SUFFIX)$(EXE) Divonne$(SUFFIX)$(EXE) Cuhre$(SUFFIX)$(EXE)
+ TOOLS = partview$(EXE)
+@@ -57,9 +59,7 @@
+   Cuhre_.o llCuhre_.o Fork_.o Global_.o Data.o
+ 
+ $(LIBDYN): $(OBJS_U)
+-	$(CC) -dynamiclib -o $@ $(OBJS_U) \
+-	      -install_name @rpath/$(LIBDYN) \
+-	      -Wl,-undefined,dynamic_lookup
++	$(CC) $(SOFLAGS) -o $@ $(OBJS_U) $(LIBS)
+ 
+ .PHONY: libdyn
+ libdyn: $(LIBDYN)

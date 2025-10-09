@@ -2,6 +2,14 @@
 # ----------------------------------------------------------------------------
 # ----------------------------------------------------------------------------
 # ----------------------------------------------------------------------------
+if [[ ! "${BASH_SOURCE[0]}" != "$0" ]]; then
+  FILE="$(basename ${BASH_SOURCE[0]})"
+  MSG="\033[0;31m ${FILE} must be sourced (not executed as program)"
+  MSG2=", e.g.: \n source ${FILE}\033[0m"
+  echo -e "${MSG}${MSG2}"
+  unset FILE MSG MSG2
+  exit 1
+fi
 
 if [ -z "${ROOTDIR}" ]; then
   ROOTDIR=$(pwd -P) || { echo -e \
@@ -84,6 +92,34 @@ if [ -z "${IGNORE_ACTDR6_CODE}" ]; then
 fi
 
 # ----------------------------------------------------------------------------
+# ------------------------------- COSMOLIKE CORE -----------------------------
+# ----------------------------------------------------------------------------
+
+if [[ -z "${IGNORE_COSMOLIKE_CODE}" ]]; then
+  ECODEF="${ROOTDIR:?}/external_modules/code"
+
+  TMP1="cfastpt"
+  TMP2="cfftlog"
+  TMP3="cosmolike"
+  TMP4="log.c"
+
+  if [[ -L "${ECODEF:?}/${TMP1:?}" ]]; then
+    rm -f "${ECODEF:?}/${TMP1:?}"
+  fi
+  if [[ -L "${ECODEF:?}/${TMP2:?}" ]]; then
+    rm -f "${ECODEF:?}/${TMP2:?}"
+  fi
+  if [[ -L "${ECODEF:?}/${TMP3:?}" ]]; then
+    rm -f "${ECODEF:?}/${TMP3:?}"
+  fi
+  if [[ -L "${ECODEF:?}/${TMP4:?}" ]]; then
+    rm -f "${ECODEF:?}/${TMP4:?}"
+  fi
+
+  unset -v ECODEF FOLDER TMP1 TMP2 TMP3 TMP4
+fi
+
+# ----------------------------------------------------------------------------
 # ------------------------------- SO LIKELIHOOD ------------------------------
 # ----------------------------------------------------------------------------
 if [[ -z "${IGNORE_SIMONS_OBSERVATORY_LIKELIHOOD_CODE}" ]]; then
@@ -140,7 +176,37 @@ fi
 if [[ -z "${IGNORE_EMULTRF_CODE}" ]]; then
   COBTH="${ROOTDIR:?}/cobaya/cobaya/theories"
 
-  TMP="emulcmbtrf"
+  TMP="emulcmb"
+  if [[ -L "${COBTH:?}/${TMP:?}" ]]; then
+    rm -f "${COBTH:?}/${TMP:?}"
+  fi
+
+  TMP="emulbaosn"
+  if [[ -L "${COBTH:?}/${TMP:?}" ]]; then
+    rm -f "${COBTH:?}/${TMP:?}"
+  fi
+
+  TMP="emultheta"
+  if [[ -L "${COBTH:?}/${TMP:?}" ]]; then
+    rm -f "${COBTH:?}/${TMP:?}"
+  fi
+
+  TMP="emulrdrag"
+  if [[ -L "${COBTH:?}/${TMP:?}" ]]; then
+    rm -f "${COBTH:?}/${TMP:?}"
+  fi
+
+  TMP="emul_cosmic_shear"
+  if [[ -L "${COBTH:?}/${TMP:?}" ]]; then
+    rm -f "${COBTH:?}/${TMP:?}"
+  fi
+
+  TMP="emul_ggl"
+  if [[ -L "${COBTH:?}/${TMP:?}" ]]; then
+    rm -f "${COBTH:?}/${TMP:?}"
+  fi
+  
+  TMP="emul_wtheta"
   if [[ -L "${COBTH:?}/${TMP:?}" ]]; then
     rm -f "${COBTH:?}/${TMP:?}"
   fi

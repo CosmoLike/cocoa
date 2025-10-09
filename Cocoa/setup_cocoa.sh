@@ -2,6 +2,14 @@
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
+if [[ ! "${BASH_SOURCE[0]}" != "$0" ]]; then
+  FILE="$(basename ${BASH_SOURCE[0]})"
+  MSG="\033[0;31m ${FILE} must be sourced (not executed as program)"
+  MSG2=", e.g.: \n source ${FILE}\033[0m"
+  echo -e "${MSG}${MSG2}"
+  unset FILE MSG MSG2
+  exit 1
+fi
 
 if [ -n "${ROOTDIR}" ]; then
   source stop_cocoa.sh
@@ -86,6 +94,7 @@ declare -i ERRORCODE=0
 declare -a SCRIPTS=( "setup_core_packages.sh" 
                      "setup_pip_core_packages.sh"
                      "setup_cobaya.sh"
+                     "setup_cosmolike.sh"
                      "setup_fgspectra.sh"
                      "setup_simons_observatory.sh"
                      "setup_lipop.sh"
@@ -98,10 +107,15 @@ declare -a SCRIPTS=( "setup_core_packages.sh"
                      "setup_mgcamb.sh"
                      "setup_class.sh"
                      "setup_velocileptors.sh"
-                     "setup_ee2.sh"
                      "setup_cosmopower.sh"
                      "setup_emultrf.sh"
-                     "setup_cosmolike_projects.sh"
+                     "setup_darkemulator.sh"
+                     "setup_private_projects.sh"
+                     "setup_nautilus_sampler.sh"
+                     "setup_tensiometer.sh"
+                     "setup_getdist.sh"
+                     "setup_derivkit.sh"
+                     "setup_ee2.sh"
                      "unxv_core_packages.sh"  
                      "unxv_sn.sh"
                      "unxv_bao.sh"
@@ -114,16 +128,24 @@ declare -a SCRIPTS=( "setup_core_packages.sh"
                      "unxv_camspec.sh"
                      "unxv_lipop.sh"
                      "unxv_emultrf.sh"
-                     "unxv_cosmopower.sh")
+                     "unxv_cosmopower.sh"
+                     "setup_cosmolike_projects.sh"
+                     )
 
 for (( i=0; i<${#SCRIPTS[@]}; i++ ));
 do
   cdroot; 
-  ( source "${ROOTDIR:?}/installation_scripts/${SCRIPTS[$i]}" )
+  if [ -n "${COCOA_OUTPUT_DEBUG}" ]; then
+    # bash strict mode explanation
+    # http://redsymbol.net/articles/unofficial-bash-strict-mode/
+    ( set -exo pipefail; source "${ROOTDIR:?}/installation_scripts/${SCRIPTS[$i]}" )
+  else
+    ( source "${ROOTDIR:?}/installation_scripts/${SCRIPTS[$i]}" )
+  fi
   if [ $? -ne 0 ]; then
     if [ -n "${COCOA_OUTPUT_VERBOSE}" ]; then
-      error_cip_msg "script ${SCRIPTS[$i]}"
-      ERRORCODE=1
+      error_cip "script ${SCRIPTS[$i]}"
+      return 1
     else
       error_cip_msg "script ${SCRIPTS[$i]}"
       ERRORCODE=1

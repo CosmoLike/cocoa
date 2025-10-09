@@ -71,43 +71,32 @@ if [ -z "${IGNORE_EUCLID_EMULATOR_V2_CODE}" ]; then
   # In case this script is called twice ----------------------------------------
   # ----------------------------------------------------------------------------
   if [ -n "${OVERWRITE_EXISTING_EE2_CODE}" ]; then
-
     rm -rf "${PACKDIR:?}"
-
   fi
   
   if [[ ! -d "${PACKDIR:?}" ]]; then
-    
     # --------------------------------------------------------------------------
     # Clone from original repo -------------------------------------------------
     # --------------------------------------------------------------------------
     cdfolder "${ECODEF:?}" || { cdroot; return 1; }
 
-    "${CURL:?}" -fsS "${URL:?}" \
-      >${OUT1:?} 2>${OUT2:?} || { error "${EC27:?} (URL=${URL:?})"; return 1; }
-
     "${GIT:?}" clone "${URL:?}" "${FOLDER:?}" \
-      >${OUT1:?} 2>${OUT2:?} || { error "${EC15:?}"; return 1; }
+      >>${OUT1:?} 2>>${OUT2:?} || { error "${EC15:?}"; return 1; }
     
     cdfolder "${PACKDIR}" || { cdroot; return 1; }
 
     if [ -n "${EE2_GIT_COMMIT}" ]; then
       "${GIT:?}" checkout "${EE2_GIT_COMMIT:?}" \
-        >${OUT1:?} 2>${OUT2:?} || { error "${EC16:?}"; return 1; }
+        >>${OUT1:?} 2>>${OUT2:?} || { error "${EC16:?}"; return 1; }
     fi
-  
   fi
   
   cdfolder "${ROOTDIR}" || return 1
   
   pbottom "INSTALLING ${PRINTNAME:?}" || return 1
-  
-  # ----------------------------------------------------------------------------
 
   unset_all || return 1
-  
 fi
-
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------

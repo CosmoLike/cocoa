@@ -57,36 +57,22 @@ if [ -z "${IGNORE_SPT_CMB_DATA}" ]; then
   # Name to be printed on this shell script messages
   PRINTNAME="SPT-3G Y1"
   
-  # ---------------------------------------------------------------------------
-
   ptop "SETUP/UNXV ${PRINTNAME:?} DATA" || return 1
   
-  # ---------------------------------------------------------------------------
-  # note: in case this script is run twice
   if [ -n "${OVERWRITE_EXISTING_SPT3G_CMB_DATA}" ]; then
-
     rm -rf "${PACKDIR:?}"
-
   fi
   
   if [ ! -d "${PACKDIR:?}" ]; then
-
     cdfolder "${EDATAF:?}" || return 1
-
-    # check if the link exists
-    "${CURL:?}" -fsS "${URL:?}" \
-      >${OUT1:?} 2>${OUT2:?} || { error "${EC27:?} (URL=${URL:?})"; return 1; }
       
     ${GIT:?} clone "${URL:?}" "${FOLDER:?}" \
-      >${OUT1:?} 2>${OUT2:?} || { error "${EC15:?}"; return 1; }
+    >>${OUT1:?} 2>>${OUT2:?} || { error "${EC15:?}"; return 1; }
 
     if [ -n "${SPT3G_DATA_GIT_COMMIT}" ]; then
-      
       cdfolder "${PACKDIR:?}"
-
       ${GIT:?} checkout "${SPT3G_DATA_GIT_COMMIT:?}" \
-        >${OUT1:?} 2>${OUT2:?} || { error "${EC16:?}"; return 1; }
-    
+      >>${OUT1:?} 2>>${OUT2:?} || { error "${EC16:?}"; return 1; }
     fi
 
   fi
@@ -96,9 +82,7 @@ if [ -z "${IGNORE_SPT_CMB_DATA}" ]; then
   pbottom "SETUP/UNXV ${PRINTNAME:?} DATA" || return 1
 
   unset_all || return 1; 
-  
 fi
-
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------

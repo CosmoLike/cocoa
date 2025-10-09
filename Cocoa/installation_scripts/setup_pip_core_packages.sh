@@ -65,34 +65,42 @@ if [ -z "${IGNORE_PIP_CORE_INSTALLATION}" ]; then
   # (e.g., midway) no-cache-dir is important to fix this bug
   # https://github.com/mpi4py/mpi4py/issues/335
   if [ -n "${COCOA_FORCE_NUMPY_1_23}" ]; then
-    # ISSUE: https://github.com/numpy/numpy/issues/24903
     COCOA_NUMPY_VERSION='1.23.5'
+    env MPICC=$MPI_CC_COMPILER ${PIP3:?} install \
+        "numpy==${COCOA_NUMPY_VERSION:?}" \
+        'mpi4py==4.0.3' \
+        'pyfftw==0.13.1' \
+        'setuptools==80.3.1' \
+      --no-cache-dir --prefer-binary \
+      --prefix="${ROOTDIR:?}/.local" \
+      --force-reinstall \
+      >${OUT1:?} 2>${OUT2:?} || { error "(PIP-CORE-PACKAGES) ${EC13:?}"; return 1; }
   else
     COCOA_NUMPY_VERSION='1.26.3'
+    env MPICC=$MPI_CC_COMPILER ${PIP3:?} install \
+        "numpy==${COCOA_NUMPY_VERSION:?}" \
+        'mpi4py==4.0.3' \
+        'setuptools==80.3.1' \
+      --no-cache-dir --prefer-binary \
+      --prefix="${ROOTDIR:?}/.local" \
+      --force-reinstall \
+      >${OUT1:?} 2>${OUT2:?} || { error "(PIP-CORE-PACKAGES) ${EC13:?}"; return 1; }
   fi
-  
-  env MPICC=$MPI_CC_COMPILER ${PIP3:?} install \
-      "numpy==${COCOA_NUMPY_VERSION:?}" \
-      'mpi4py==4.0.3' \
-    --no-cache-dir --prefer-binary \
-    --prefix="${ROOTDIR:?}/.local" \
-    --force-reinstall \
-    >${OUT1:?} 2>${OUT2:?} || { error "(PIP-CORE-PACKAGES) ${EC13:?}"; return 1; }
 
   env MPICC=$MPI_CC_COMPILER ${PIP3:?} install \
-      "numpy==${COCOA_NUMPY_VERSION:?}" \
-      'mpi4py==4.0.3' \
       'notebook==7.4.2' \
       'ipyparallel==9.0.1' \
       'emcee== 3.1.6' \
       'sacc==1.0.2' \
+      'flit_core==3.12.0' \
+      'jax==0.4.1' \
     --no-cache-dir --prefer-binary --use-pep517 \
     --prefix="${ROOTDIR:?}/.local" \
     >${OUT1:?} 2>${OUT2:?} || { error "(PIP-CORE-PACKAGES) ${EC13:?}"; return 1; }
 
-  env CXX="${CXX_COMPILER:?}" CC="${C_COMPILER:?}" ${PIP3:?} install \
-  --upgrade setuptools --no-cache-dir >${OUT1:?} 2>${OUT2:?} \
-  || { error "(PIP-CORE-PACKAGES) ${EC13:?}"; return 1; }
+  #env CXX="${CXX_COMPILER:?}" CC="${C_COMPILER:?}" ${PIP3:?} install \
+  #--upgrade setuptools --no-cache-dir >${OUT1:?} 2>${OUT2:?} \
+  #|| { error "(PIP-CORE-PACKAGES) ${EC13:?}"; return 1; }
 
   pbottom "INSTALLING PYTHON CORE LIBRARIES VIA PIP" || return 1
   
@@ -104,6 +112,7 @@ if [ -z "${IGNORE_PIP_CORE_INSTALLATION}" ]; then
     ptop "PIP INSTALL MACHINE LEARNING GPU PACKAGES (takes a while O(5-10min)...)"
 
     env CXX="${CXX_COMPILER:?}" CC="${C_COMPILER:?}" ${PIP3:?} install \
+        "numpy==${COCOA_NUMPY_VERSION:?}" \
         'tensorflow==2.17.0' \
         'tensorflow_probability==0.24.0' \
         'keras==3.9.2' \
@@ -111,7 +120,6 @@ if [ -z "${IGNORE_PIP_CORE_INSTALLATION}" ]; then
         'torch==2.6.0' \
         'torchvision==0.21.0' \
         'torchaudio==2.6.0' \
-        'tensiometer==1.0.2' \
         'scikit-learn==1.6.1' \
         'jupyter==1.0.0' \
         'typing-extensions==4.13.2' \
@@ -126,6 +134,7 @@ if [ -z "${IGNORE_PIP_CORE_INSTALLATION}" ]; then
 
     # Without this code, jupyter breaks notebook
     env CXX="${CXX_COMPILER:?}" CC="${C_COMPILER:?}" ${PIP3:?} install \
+        "numpy==${COCOA_NUMPY_VERSION:?}" \
         'notebook==7.4.2' \
         'ipyparallel==9.0.1' \
       --no-cache-dir --prefer-binary \

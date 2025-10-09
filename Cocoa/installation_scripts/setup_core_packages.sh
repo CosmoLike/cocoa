@@ -69,7 +69,8 @@ if [ -z "${IGNORE_CORE_INSTALLATION}" ]; then
     if [[ ! -d "${CCIL:?}/${4:?}" && ! -d "${CCIL:?}/${1:?}" ]]; then
 
       if [[ ! -e "${CCIL:?}/${FILE:?}" ]]; then
-        wget "${3:?}" --retry-connrefused --waitretry=1 --tries=3 --read-timeout=20 \
+        wget "${3:?}" --no-check-certificate --retry-connrefused --waitretry=1 \
+          --tries=3 --read-timeout=20 \
           --timeout=15 --waitretry=0 --show-progress --progress=bar:force \
           >${OUT1:?} 2>${OUT2:?} || { error "${EC24:?}"; return 1; }
       fi
@@ -551,13 +552,14 @@ if [ -z "${IGNORE_CORE_INSTALLATION}" ]; then
 
     ptop "GETTING SPDLOG LIBRARY (CORE LIBS)" || return 1;
 
-    PACKAGE_VERSION="${SPDLOG_VERSION:-"1.14.1"}" 
+    #PACKAGE_VERSION="${SPDLOG_VERSION:-"v1.14.1"}"  
+    PACKAGE_VERSION="${SPDLOG_VERSION:-"v1.15.3"}"  
 
     URL='https://github.com/gabime/spdlog.git'
 
     FOLDER='spdlog'
 
-    VER="v${PACKAGE_VERSION:?}"
+    VER="${PACKAGE_VERSION:?}"
 
     # note: Do not change XFZ filename. 
     # note: Otherwise the script unxv_core_packages.sh will stop working

@@ -77,19 +77,30 @@ if [ -z "${IGNORE_CORE_INSTALLATION}" ]; then
 
     cdfolder "${PACKDIR:?}" || return 1;
 
-    (export LD_LIBRARY_PATH=${CONDA_PREFIX:?}/lib:$LD_LIBRARY_PATH && \
-     export LD_LIBRARY_PATH=${ROOTDIR:?}/.local/lib:$LD_LIBRARY_PATH && \
-     env CC="${C_COMPILER:?}" CXX="${CXX_COMPILER:?}" \
-     ./bootstrap --prefix="${ROOTDIR:?}/.local" \
-     >${OUT1:?} 2>${OUT2:?} || { error "(CMAKE) ${EC19:?}"; return 1; })
+    #NOTE: LD_LIBRARY_PATH/DYLD_FALLBACK_LIBRARY_PATH matters only when something 
+    #NOTE: is executed during the build (e.g., configure checks, unit tests)
+    case "$(uname -s)" in
+      Linux)
+        (export LD_LIBRARY_PATH=${CONDA_PREFIX:?}/lib:$LD_LIBRARY_PATH && \
+         export LD_LIBRARY_PATH=${ROOTDIR:?}/.local/lib:$LD_LIBRARY_PATH && \
+         env CC="${C_COMPILER:?}" CXX="${CXX_COMPILER:?}" \
+         ./bootstrap \
+           --prefix="${ROOTDIR:?}/.local" 
+        ) >>${OUT1:?} 2>>${OUT2:?} || { error "(CMAKE) ${EC19:?}"; return 1; }
+        ;;
+      Darwin)
+        (export DYLD_FALLBACK_LIBRARY_PATH=${CONDA_PREFIX:?}/lib:$DYLD_FALLBACK_LIBRARY_PATH && \
+         export DYLD_FALLBACK_LIBRARY_PATH=${ROOTDIR:?}/.local/lib:$DYLD_FALLBACK_LIBRARY_PATH && \
+         env CC="${C_COMPILER:?}" CXX="${CXX_COMPILER:?}" \
+         ./bootstrap \
+           --prefix="${ROOTDIR:?}/.local" 
+        ) >>${OUT1:?} 2>>${OUT2:?} || { error "(CMAKE) ${EC19:?}"; return 1; }
+        ;;
+    esac
 
-    (export LD_LIBRARY_PATH=${CONDA_PREFIX:?}/lib:$LD_LIBRARY_PATH && \
-     export LD_LIBRARY_PATH=${ROOTDIR:?}/.local/lib:$LD_LIBRARY_PATH && \
-     make -j $MNT >${OUT1:?} 2>${OUT2:?} || { error "(CMAKE) ${EC8:?}"; return 1; })
-
-    (export LD_LIBRARY_PATH=${CONDA_PREFIX:?}/lib:$LD_LIBRARY_PATH && \
-     export LD_LIBRARY_PATH=${ROOTDIR:?}/.local/lib:$LD_LIBRARY_PATH && \
-     make install >${OUT1:?} 2>${OUT2:?} || { error "(CMAKE) ${EC10:?}"; return 1; })
+    make -j $MNT >>${OUT1:?} 2>>${OUT2:?} || { error "(CMAKE) ${EC8:?}"; return 1; }
+    
+    make install >>${OUT1:?} 2>>${OUT2:?} || { error "(CMAKE) ${EC10:?}"; return 1; }
 
     unset -v PACKDIR FOLDER PACKAGE_VERSION DEFAULT
 
@@ -117,25 +128,30 @@ if [ -z "${IGNORE_CORE_INSTALLATION}" ]; then
 
     cdfolder "${PACKDIR}" || return 1;
 
-    (export LD_LIBRARY_PATH=${CONDA_PREFIX:?}/lib:$LD_LIBRARY_PATH && \
-     export LD_LIBRARY_PATH=${ROOTDIR:?}/.local/lib:$LD_LIBRARY_PATH && \
-     FC="${FORTRAN_COMPILER:?}" CC="${C_COMPILER:?}" \
-     ./configure --prefix="${ROOTDIR:?}/.local" \
-     >${OUT1:?} 2>${OUT2:?} || { error "(WGET) ${EC11:?}"; return 1; })
+    #NOTE: LD_LIBRARY_PATH/DYLD_FALLBACK_LIBRARY_PATH matters only when something 
+    #NOTE: is executed during the build (e.g., configure checks, unit tests)
+    case "$(uname -s)" in
+      Linux)
+        (export LD_LIBRARY_PATH=${CONDA_PREFIX:?}/lib:$LD_LIBRARY_PATH && \
+         export LD_LIBRARY_PATH=${ROOTDIR:?}/.local/lib:$LD_LIBRARY_PATH && \
+         FC="${FORTRAN_COMPILER:?}" CC="${C_COMPILER:?}" \
+         ./configure --prefix="${ROOTDIR:?}/.local" 
+        ) >>${OUT1:?} 2>>${OUT2:?} || { error "(WGET) ${EC11:?}"; return 1; }
+        ;;
+      Darwin)
+        (export DYLD_FALLBACK_LIBRARY_PATH=${CONDA_PREFIX:?}/lib:$DYLD_FALLBACK_LIBRARY_PATH && \
+         export DYLD_FALLBACK_LIBRARY_PATH=${ROOTDIR:?}/.local/lib:$DYLD_FALLBACK_LIBRARY_PATH && \
+         FC="${FORTRAN_COMPILER:?}" CC="${C_COMPILER:?}" \
+         ./configure --prefix="${ROOTDIR:?}/.local" 
+        ) >>${OUT1:?} 2>>${OUT2:?} || { error "(WGET) ${EC11:?}"; return 1; }
+        ;;
+    esac
 
-    # --------------------------------------------------------------------------
-    # note: in case script run >1x w/ previous run stoped prematurely b/c error
-    make clean >${OUT1:?} 2>${OUT2:?} || { error "(WGET) ${EC2:?}"; return 1; }
+    make clean >>${OUT1:?} 2>>${OUT2:?} || { error "(WGET) ${EC2:?}"; return 1; }
 
-    # --------------------------------------------------------------------------
-    
-    (export LD_LIBRARY_PATH=${CONDA_PREFIX:?}/lib:$LD_LIBRARY_PATH && \
-     export LD_LIBRARY_PATH=${ROOTDIR:?}/.local/lib:$LD_LIBRARY_PATH && \
-     make -j $MNT all >${OUT1:?} 2>${OUT2:?} || { error "(WGET) ${EC7:?}"; return 1; })
-      
-    (export LD_LIBRARY_PATH=${CONDA_PREFIX:?}/lib:$LD_LIBRARY_PATH && \
-     export LD_LIBRARY_PATH=${ROOTDIR:?}/.local/lib:$LD_LIBRARY_PATH && \
-     make install >${OUT1:?} 2>${OUT2:?} || { error "(WGET) ${EC10:?}"; return 1; })
+    make -j $MNT all >>${OUT1:?} 2>>${OUT2:?} || { error "(WGET) ${EC7:?}"; return 1; }
+
+    make install >>${OUT1:?} 2>>${OUT2:?} || { error "(WGET) ${EC10:?}"; return 1; }
 
     unset -v PACKDIR FOLDER DEFAULT PACKAGE_VERSION
 
@@ -163,25 +179,34 @@ if [ -z "${IGNORE_CORE_INSTALLATION}" ]; then
 
     cdfolder "${PACKDIR}" || return 1;
 
-    (export LD_LIBRARY_PATH=${CONDA_PREFIX:?}/lib:$LD_LIBRARY_PATH && \
-     export LD_LIBRARY_PATH=${ROOTDIR:?}/.local/lib:$LD_LIBRARY_PATH && \
-     FC="${FORTRAN_COMPILER:?}" CC="${C_COMPILER:?}" \
-     ./configure --prefix="${ROOTDIR:?}/.local" --disable-perl-xs \
-     >${OUT1:?} 2>${OUT2:?} || { error "(TEXINFO) ${EC11:?}"; return 1; })
+    #NOTE: LD_LIBRARY_PATH/DYLD_FALLBACK_LIBRARY_PATH matters only when something 
+    #NOTE: is executed during the build (e.g., configure checks, unit tests)
+    case "$(uname -s)" in
+      Linux)
+        (export LD_LIBRARY_PATH=${CONDA_PREFIX:?}/lib:$LD_LIBRARY_PATH && \
+         export LD_LIBRARY_PATH=${ROOTDIR:?}/.local/lib:$LD_LIBRARY_PATH && \
+         FC="${FORTRAN_COMPILER:?}" CC="${C_COMPILER:?}" \
+         ./configure \
+           --prefix="${ROOTDIR:?}/.local"  \
+           --disable-perl-xs ) \
+         >>${OUT1:?} 2>>${OUT2:?} || { error "(TEXINFO) ${EC11:?}"; return 1; }
+        ;;
+      Darwin)
+        (export DYLD_FALLBACK_LIBRARY_PATH=${CONDA_PREFIX:?}/lib:$DYLD_FALLBACK_LIBRARY_PATH && \
+         export DYLD_FALLBACK_LIBRARY_PATH=${ROOTDIR:?}/.local/lib:$DYLD_FALLBACK_LIBRARY_PATH && \
+         FC="${FORTRAN_COMPILER:?}" CC="${C_COMPILER:?}" \
+         ./configure \
+           --prefix="${ROOTDIR:?}/.local"  \
+           --disable-perl-xs ) \
+         >>${OUT1:?} 2>>${OUT2:?} || { error "(TEXINFO) ${EC11:?}"; return 1; }
+        ;;
+    esac
 
-    # --------------------------------------------------------------------------
-    # note: in case script run >1x w/ previous run stoped prematurely b/c error
-    make clean >${OUT1:?} 2>${OUT2:?} || { error "(TEXINFO) ${EC2:?}"; return 1; }
+    make clean >>${OUT1:?} 2>>${OUT2:?} || { error "(TEXINFO) ${EC2:?}"; return 1; }
 
-    # --------------------------------------------------------------------------
+    make -j $MNT all >>${OUT1:?} 2>>${OUT2:?} || { error "(TEXINFO) ${EC7:?}"; return 1; }
 
-    (export LD_LIBRARY_PATH=${CONDA_PREFIX:?}/lib:$LD_LIBRARY_PATH && \
-     export LD_LIBRARY_PATH=${ROOTDIR:?}/.local/lib:$LD_LIBRARY_PATH && \
-     make -j $MNT all >${OUT1:?} 2>${OUT2:?} || { error "(TEXINFO) ${EC7:?}"; return 1; })
-      
-    (export LD_LIBRARY_PATH=${CONDA_PREFIX:?}/lib:$LD_LIBRARY_PATH && \
-     export LD_LIBRARY_PATH=${ROOTDIR:?}/.local/lib:$LD_LIBRARY_PATH && \
-     make install >${OUT1:?} 2>${OUT2:?} || { error "(TEXINFO) ${EC10:?}"; return 1; })
+    make install >>${OUT1:?} 2>>${OUT2:?} || { error "(TEXINFO) ${EC10:?}"; return 1; }
 
     unset -v PACKDIR FOLDER DEFAULT PACKAGE_VERSION
 
@@ -209,26 +234,30 @@ if [ -z "${IGNORE_CORE_INSTALLATION}" ]; then
 
     cdfolder "${PACKDIR}" || return 1;
 
-    (export LD_LIBRARY_PATH=${CONDA_PREFIX:?}/lib:$LD_LIBRARY_PATH && \
-     export LD_LIBRARY_PATH=${ROOTDIR:?}/.local/lib:$LD_LIBRARY_PATH && \
-     FC="${FORTRAN_COMPILER:?}" CC="${C_COMPILER:?}" \
-     ./configure --prefix="${ROOTDIR:?}/.local" \
-     >${OUT1:?} 2>${OUT2:?} || { error "(BINUTILS) ${EC11:?}"; return 1; })
+    #NOTE: LD_LIBRARY_PATH/DYLD_FALLBACK_LIBRARY_PATH matters only when something 
+    #NOTE: is executed during the build (e.g., configure checks, unit tests)
+    case "$(uname -s)" in
+      Linux)
+        (export LD_LIBRARY_PATH=${CONDA_PREFIX:?}/lib:$LD_LIBRARY_PATH && \
+         export LD_LIBRARY_PATH=${ROOTDIR:?}/.local/lib:$LD_LIBRARY_PATH && \
+         FC="${FORTRAN_COMPILER:?}" CC="${C_COMPILER:?}" \
+         ./configure --prefix="${ROOTDIR:?}/.local" 
+        ) >>${OUT1:?} 2>>${OUT2:?} || { error "(BINUTILS) ${EC11:?}"; return 1; }
+        ;;
+      Darwin)
+        (export DYLD_FALLBACK_LIBRARY_PATH=${CONDA_PREFIX:?}/lib:$DYLD_FALLBACK_LIBRARY_PATH && \
+         export DYLD_FALLBACK_LIBRARY_PATH=${ROOTDIR:?}/.local/lib:$DYLD_FALLBACK_LIBRARY_PATH && \
+         FC="${FORTRAN_COMPILER:?}" CC="${C_COMPILER:?}" \
+         ./configure --prefix="${ROOTDIR:?}/.local" 
+        ) >>${OUT1:?} 2>>${OUT2:?} || { error "(BINUTILS) ${EC11:?}"; return 1; }
+        ;;
+    esac
 
-    # --------------------------------------------------------------------------
-    # note: in case script run >1x w/ previous run stoped prematurely b/c error
-    
-    make clean >${OUT1:?} 2>${OUT2:?} || { error "(BINUTILS) ${EC2:?}"; return 1; }
+    make clean >>${OUT1:?} 2>>${OUT2:?} || { error "(BINUTILS) ${EC2:?}"; return 1; }
 
-    # --------------------------------------------------------------------------
+    make -j $MNT >>${OUT1:?} 2>>${OUT2:?} || { error "(BINUTILS) ${EC7:?}"; return 1; }
 
-    (export LD_LIBRARY_PATH=${CONDA_PREFIX:?}/lib:$LD_LIBRARY_PATH && \
-     export LD_LIBRARY_PATH=${ROOTDIR:?}/.local/lib:$LD_LIBRARY_PATH && \
-     make -j $MNT >${OUT1:?} 2>${OUT2:?} || { error "(BINUTILS) ${EC7:?}"; return 1; })
-
-    (export LD_LIBRARY_PATH=${CONDA_PREFIX:?}/lib:$LD_LIBRARY_PATH && \
-     export LD_LIBRARY_PATH=${ROOTDIR:?}/.local/lib:$LD_LIBRARY_PATH && \
-     make install >${OUT1:?} 2>${OUT2:?} || { error "(BINUTILS) ${EC10:?}"; return 1; })
+    make install >>${OUT1:?} 2>>${OUT2:?} || { error "(BINUTILS) ${EC10:?}"; return 1; }
 
     unset -v PACKDIR FOLDER DEFAULT PACKAGE_VERSION
 
@@ -253,35 +282,30 @@ if [ -z "${IGNORE_CORE_INSTALLATION}" ]; then
     BDF="${PACKDIR:?}/cocoa_HDF5_build"
 
     # --------------------------------------------------------------------------
-    # note: in case script run >1x w/ previous run stoped prematurely b/c error
-
+    # note: in case this script run >1x w/ previous run killed b/c of an error
     rm -f  "${PACKDIR:?}/CMakeCache.txt"
     rm -rf "${PACKDIR:?}/CMakeFiles/"
     rm -rf "${BDF:?}"
     
     # --------------------------------------------------------------------------
-
-    mkdir "${BDF:?}" 2>${OUT2:?} || { error "${EC20:?}"; return 1; }
+    mkdir "${BDF:?}" 2>>${OUT2:?} || { error "${EC20:?}"; return 1; }
 
     cdfolder "${BDF:?}" || return 1;
 
-    (export LD_LIBRARY_PATH=${CONDA_PREFIX:?}/lib:$LD_LIBRARY_PATH && \
-     export LD_LIBRARY_PATH=${ROOTDIR:?}/.local/lib:$LD_LIBRARY_PATH && \
-      "${CMAKE:?}" -DBUILD_SHARED_LIBS=TRUE \
-      -DCMAKE_INSTALL_PREFIX="${ROOTDIR:?}/.local" \
-      -DCMAKE_C_COMPILER="${C_COMPILER:?}" \
-      -DCMAKE_CXX_COMPILER="${CXX_COMPILER:?}" \
-      -DCMAKE_FC_COMPILER="${FORTRAN_COMPILER:?}" --log-level=ERROR .. \
-      >${OUT1:?} 2>${OUT2:?} || { error "(HDF5) ${EC12:?}"; return 1; })
+    "${CMAKE:?}" \
+        -DCMAKE_PREFIX_PATH="$CONDA_PREFIX;${ROOTDIR}/.local" \
+        -DBUILD_SHARED_LIBS=TRUE \
+        -DCMAKE_INSTALL_PREFIX="${ROOTDIR:?}/.local" \
+        -DCMAKE_C_COMPILER="${C_COMPILER:?}" \
+        -DCMAKE_CXX_COMPILER="${CXX_COMPILER:?}" \
+        -DCMAKE_FC_COMPILER="${FORTRAN_COMPILER:?}" \
+        --log-level=ERROR .. \
+      >>${OUT1:?} 2>>${OUT2:?} || { error "(HDF5) ${EC12:?}"; return 1; }
+ 
+    make -j $MNT  >>${OUT1:?} 2>>${OUT2:?} || { error "(HDF5) ${EC8:?}"; return 1; }
 
-    (export LD_LIBRARY_PATH=${CONDA_PREFIX:?}/lib:$LD_LIBRARY_PATH && \
-     export LD_LIBRARY_PATH=${ROOTDIR:?}/.local/lib:$LD_LIBRARY_PATH && \
-     make -j $MNT >${OUT1:?} 2>${OUT2:?} || { error "(HDF5) ${EC8:?}"; return 1; })
-
-    (export LD_LIBRARY_PATH=${CONDA_PREFIX:?}/lib:$LD_LIBRARY_PATH && \
-     export LD_LIBRARY_PATH=${ROOTDIR:?}/.local/lib:$LD_LIBRARY_PATH && \
-     make install >${OUT1:?} 2>${OUT2:?} || { error "(HDF5) ${EC10:?}"; return 1; })
-
+    make install >>${OUT1:?} 2>>${OUT2:?} || { error "(HDF5) ${EC10:?}"; return 1; }
+    
     unset -v PACKDIR BDF
     
     cdfolder "${ROOTDIR}" || return 1;
@@ -310,22 +334,13 @@ if [ -z "${IGNORE_CORE_INSTALLATION}" ]; then
 
     export MAKE_NB_JOBS=$MNT
     
-    # --------------------------------------------------------------------------
-    # note: in case script run >1x w/ previous run stoped prematurely b/c error
+    make clean >>${OUT1:?} 2>>${OUT2:?} || { error "(OpenBLAS) ${EC2:?}"; return 1; }
 
-    make clean >${OUT1:?} 2>${OUT2:?} || { error "(OpenBLAS) ${EC2:?}"; return 1; }
+    make CC="${C_COMPILER:?}" FC="${FORTRAN_COMPILER:?}" USE_OPENMP=1 \
+     >>${OUT1:?} 2>>${OUT2:?} || { error "(OpenBLAS) ${EC8:?}"; return 1; }
 
-    # --------------------------------------------------------------------------
-
-    (export LD_LIBRARY_PATH=${CONDA_PREFIX:?}/lib:$LD_LIBRARY_PATH && \
-     export LD_LIBRARY_PATH=${ROOTDIR:?}/.local/lib:$LD_LIBRARY_PATH && \
-     make CC="${C_COMPILER:?}" FC="${FORTRAN_COMPILER:?}" USE_OPENMP=1 \
-     >${OUT1:?} 2>${OUT2:?} || { error "(OpenBLAS) ${EC8:?}"; return 1; })
-    
-    (export LD_LIBRARY_PATH=${CONDA_PREFIX:?}/lib:$LD_LIBRARY_PATH && \
-     export LD_LIBRARY_PATH=${ROOTDIR:?}/.local/lib:$LD_LIBRARY_PATH && \
-     make install PREFIX="${ROOTDIR:?}/.local" \
-     >${OUT1:?} 2>${OUT2:?} || { error "(OpenBLAS) ${EC10:?}"; return 1; })
+    make install PREFIX="${ROOTDIR:?}/.local" \
+     >>${OUT1:?} 2>>${OUT2:?} || { error "(OpenBLAS) ${EC10:?}"; return 1; }
 
     unset -v PACKDIR  MAKE_NB_JOBS FOLDER DEFAULT PACKAGE_VERSION
 
@@ -354,35 +369,26 @@ if [ -z "${IGNORE_CORE_INSTALLATION}" ]; then
     BDF="${PACKDIR:?}/lapack-build"
 
     # --------------------------------------------------------------------------
-    # note: in case script run >1x w/ previous run stoped prematurely b/c error
-
+    # note: in case this script run >1x w/ previous run killed b/c of an error
     rm -rf "${BDF:?}"
-
     # --------------------------------------------------------------------------
-    
-    mkdir "${BDF:?}" 2>${OUT2:?} || { error "${EC20:?}"; return 1; }
+    mkdir "${BDF:?}" 2>>${OUT2:?} || { error "${EC20:?}"; return 1; }
 
     cdfolder "${BDF:?}" || return 1;
 
-    (export LD_LIBRARY_PATH=${CONDA_PREFIX:?}/lib:$LD_LIBRARY_PATH && \
-     export LD_LIBRARY_PATH=${ROOTDIR:?}/.local/lib:$LD_LIBRARY_PATH && \
-     ${CMAKE:?} -DBUILD_SHARED_LIBS=TRUE \
-     -DCMAKE_INSTALL_PREFIX="${ROOTDIR:?}/.local" \
-     -DCMAKE_C_COMPILER="${C_COMPILER:?}" --log-level=ERROR "../${PACKDIR:?}" \
-     >${OUT1:?} 2>${OUT2:?} || { error "(LAPACK) ${EC12:?}"; return 1; })
+    ${CMAKE:?} \
+      -DCMAKE_PREFIX_PATH="$CONDA_PREFIX;${ROOTDIR}/.local" \
+      -DBUILD_SHARED_LIBS=TRUE \
+      -DCMAKE_INSTALL_PREFIX="${ROOTDIR:?}/.local" \
+      -DCMAKE_C_COMPILER="${C_COMPILER:?}" \
+      --log-level=ERROR "../${PACKDIR:?}" \
+     >>${OUT1:?} 2>>${OUT2:?} || { error "(LAPACK) ${EC12:?}"; return 1; }
 
-    (export LD_LIBRARY_PATH=${CONDA_PREFIX:?}/lib:$LD_LIBRARY_PATH && \
-     export LD_LIBRARY_PATH=${ROOTDIR:?}/.local/lib:$LD_LIBRARY_PATH && \
-     make -j $MNT all >${OUT1:?} 2>${OUT2:?} || { error "(LAPACK) ${EC8:?}"; return 1; })
+    make -j $MNT all >>${OUT1:?} 2>>${OUT2:?} || { error "(LAPACK) ${EC8:?}"; return 1; }
 
-    (export LD_LIBRARY_PATH=${CONDA_PREFIX:?}/lib:$LD_LIBRARY_PATH && \
-     export LD_LIBRARY_PATH=${ROOTDIR:?}/.local/lib:$LD_LIBRARY_PATH && \
-     make install >${OUT1:?} 2>${OUT2:?} || { error "(LAPACK) ${EC10:?}"; return 1; })
-
-    # --------------------------------------------------------------------------
-    # clean build
-    rm -rf "${BDF:?}"
-    # --------------------------------------------------------------------------
+    make install >>${OUT1:?} 2>>${OUT2:?} || { error "(LAPACK) ${EC10:?}"; return 1; }
+    
+    rm -rf "${BDF:?}" # clean build
 
     unset -v PACKDIR BDF FOLDER PACKAGE_VERSION DEFAULT
 
@@ -410,20 +416,36 @@ if [ -z "${IGNORE_CORE_INSTALLATION}" ]; then
 
     cdfolder "${PACKDIR}" || return 1;
 
-    (export LD_LIBRARY_PATH=${CONDA_PREFIX:?}/lib:$LD_LIBRARY_PATH && \
-     export LD_LIBRARY_PATH=${ROOTDIR:?}/.local/lib:$LD_LIBRARY_PATH && \
-     FC="${FORTRAN_COMPILER:?}" CC="${C_COMPILER:?}" ./configure \
-     --enable-openmp --prefix="${ROOTDIR:?}/.local" \
-     --enable-shared=yes --enable-static=yes \
-     >${OUT1:?} 2>${OUT2:?} || { error "(FFTW) ${EC11:?}"; return 1; })
+    #NOTE: LD_LIBRARY_PATH/DYLD_FALLBACK_LIBRARY_PATH matters only when something 
+    #NOTE: is executed during the build (e.g., configure checks, unit tests)
+    case "$(uname -s)" in
+      Linux)
+        (export LD_LIBRARY_PATH=${CONDA_PREFIX:?}/lib:$LD_LIBRARY_PATH && \
+         export LD_LIBRARY_PATH=${ROOTDIR:?}/.local/lib:$LD_LIBRARY_PATH && \
+         FC="${FORTRAN_COMPILER:?}" CC="${C_COMPILER:?}" \
+         ./configure \
+            --enable-openmp \
+            --prefix="${ROOTDIR:?}/.local" \
+            --enable-shared=yes \
+            --enable-static=yes 
+        ) >>${OUT1:?} 2>>${OUT2:?} || { error "(FFTW) ${EC11:?}"; return 1; }
+        ;;
+      Darwin)
+        (export DYLD_FALLBACK_LIBRARY_PATH=${CONDA_PREFIX:?}/lib:$DYLD_FALLBACK_LIBRARY_PATH && \
+         export DYLD_FALLBACK_LIBRARY_PATH=${ROOTDIR:?}/.local/lib:$DYLD_FALLBACK_LIBRARY_PATH && \
+         FC="${FORTRAN_COMPILER:?}" CC="${C_COMPILER:?}" \
+         ./configure \
+            --enable-openmp \
+            --prefix="${ROOTDIR:?}/.local" \
+            --enable-shared=yes \
+            --enable-static=yes 
+        ) >>${OUT1:?} 2>>${OUT2:?} || { error "(FFTW) ${EC11:?}"; return 1; }
+        ;;
+    esac
 
-    (export LD_LIBRARY_PATH=${CONDA_PREFIX:?}/lib:$LD_LIBRARY_PATH && \
-     export LD_LIBRARY_PATH=${ROOTDIR:?}/.local/lib:$LD_LIBRARY_PATH && \
-     make -j $MNT all >${OUT1:?} 2>${OUT2:?} || { error "(FFTW) ${EC8:?}"; return 1; })
+    make -j $MNT all >>${OUT1:?} 2>>${OUT2:?} || { error "(FFTW) ${EC8:?}"; return 1; }
 
-    (export LD_LIBRARY_PATH=${CONDA_PREFIX:?}/lib:$LD_LIBRARY_PATH && \
-     export LD_LIBRARY_PATH=${ROOTDIR:?}/.local/lib:$LD_LIBRARY_PATH && \
-     make install >${OUT1:?} 2>${OUT2:?} || { error "(FFTW) ${EC10:?}"; return 1; })
+    make install >>${OUT1:?} 2>>${OUT2:?} || { error "(FFTW) ${EC10:?}"; return 1; }
 
     unset -v PACKDIR FOLDER PACKAGE_VERSION DEFAULT
 
@@ -452,30 +474,28 @@ if [ -z "${IGNORE_CORE_INSTALLATION}" ]; then
     BDF="${PACKDIR:?}/CFITSIOBUILD"
 
     # --------------------------------------------------------------------------
-    # note: in case script run >1x w/ previous run stoped prematurely b/c error
+    # note: in case this script run >1x w/ previous run killed b/c of an error
     rm -f  "${PACKDIR:?}/CMakeCache.txt"
     rm -rf "${BDF:?}"
     
     # --------------------------------------------------------------------------
-    mkdir "${BDF:?}/" 2>${OUT2:?} || { error "${EC14:?}"; return 1; }
+    mkdir "${BDF:?}/" 2>>${OUT2:?} || { error "${EC14:?}"; return 1; }
     
     cdfolder "${BDF:?}" || return 1;
 
-    (export LD_LIBRARY_PATH=${CONDA_PREFIX:?}/lib:$LD_LIBRARY_PATH && \
-     export LD_LIBRARY_PATH=${ROOTDIR:?}/.local/lib:$LD_LIBRARY_PATH && \
-     ${CMAKE:?} -DBUILD_SHARED_LIBS=TRUE -DCMAKE_INSTALL_PREFIX="${ROOTDIR:?}/.local" \
-     -DCMAKE_C_COMPILER="${C_COMPILER:?}" -DCMAKE_CXX_COMPILER="${CXX_COMPILER:?}" \
-     -DCMAKE_FC_COMPILER="${FORTRAN_COMPILER:?}" --log-level=ERROR .. \
-     >${OUT1:?} 2>${OUT2:?} || { error "(CFITSIO) ${EC12:?}"; return 1; })
+    ${CMAKE:?} \
+        -DCMAKE_PREFIX_PATH="$CONDA_PREFIX;${ROOTDIR}/.local" \
+        -DBUILD_SHARED_LIBS=TRUE \
+        -DCMAKE_INSTALL_PREFIX="${ROOTDIR:?}/.local" \
+        -DCMAKE_C_COMPILER="${C_COMPILER:?}" \
+        -DCMAKE_CXX_COMPILER="${CXX_COMPILER:?}" \
+        -DCMAKE_FC_COMPILER="${FORTRAN_COMPILER:?}" \
+        --log-level=ERROR .. \
+     >>${OUT1:?} 2>>${OUT2:?} || { error "(CFITSIO) ${EC12:?}"; return 1; }
 
-    (export LD_LIBRARY_PATH=${CONDA_PREFIX:?}/lib:$LD_LIBRARY_PATH && \
-     export LD_LIBRARY_PATH=${ROOTDIR:?}/.local/lib:$LD_LIBRARY_PATH && \
-     make -j $MNT all >${OUT1:?} 2>${OUT2:?} || { error "(CFITSIO) ${EC8:?}"; return 1; })
+    make -j $MNT all >>${OUT1:?} 2>>${OUT2:?} || { error "(CFITSIO) ${EC8:?}"; return 1; }
 
-    (export LD_LIBRARY_PATH=${CONDA_PREFIX:?}/lib:$LD_LIBRARY_PATH && \
-     export LD_LIBRARY_PATH=${ROOTDIR:?}/.local/lib:$LD_LIBRARY_PATH && \
-     make install >${OUT1:?} 2>${OUT2:?} || { error "(CFITSIO) ${EC10:?}"; return 1; })
-    
+    make install >>${OUT1:?} 2>>${OUT2:?} || { error "(CFITSIO) ${EC10:?}"; return 1; }
     # --------------------------------------------------------------------------
     # clean build
     rm -rf "${BDF:?}"
@@ -507,19 +527,34 @@ if [ -z "${IGNORE_CORE_INSTALLATION}" ]; then
 
     cdfolder "${PACKDIR}" || return 1;
 
-    (export LD_LIBRARY_PATH=${CONDA_PREFIX:?}/lib:$LD_LIBRARY_PATH && \
-     export LD_LIBRARY_PATH=${ROOTDIR:?}/.local/lib:$LD_LIBRARY_PATH && \
-     CC="${C_COMPILER:?}" ./configure \
-     --prefix="${ROOTDIR:?}/.local" --enable-shared=yes --enable-static=yes \
-     >${OUT1:?} 2>${OUT2:?} || { error "(GSL) ${EC11:?}"; return 1; })
- 
-    (export LD_LIBRARY_PATH=${CONDA_PREFIX:?}/lib:$LD_LIBRARY_PATH && \
-     export LD_LIBRARY_PATH=${ROOTDIR:?}/.local/lib:$LD_LIBRARY_PATH && \
-     make -j $MNT all >${OUT1:?} 2>${OUT2:?} || { error "(GSL) ${EC8:?}"; return 1; })
+    #NOTE: LD_LIBRARY_PATH/DYLD_FALLBACK_LIBRARY_PATH matters only when something 
+    #NOTE: is executed during the build (e.g., configure checks, unit tests)
+    case "$(uname -s)" in
+      Linux)
+        (export LD_LIBRARY_PATH=${CONDA_PREFIX:?}/lib:$LD_LIBRARY_PATH && \
+         export LD_LIBRARY_PATH=${ROOTDIR:?}/.local/lib:$LD_LIBRARY_PATH && \
+         CC="${C_COMPILER:?}" \
+         ./configure \
+           --prefix="${ROOTDIR:?}/.local" \
+           --enable-shared=yes \
+           --enable-static=yes
+        ) >>${OUT1:?} 2>>${OUT2:?} || { error "(GSL) ${EC11:?}"; return 1; }
+        ;;
+      Darwin)
+        (export DYLD_FALLBACK_LIBRARY_PATH=${CONDA_PREFIX:?}/lib:$DYLD_FALLBACK_LIBRARY_PATH && \
+         export DYLD_FALLBACK_LIBRARY_PATH=${ROOTDIR:?}/.local/lib:$DYLD_FALLBACK_LIBRARY_PATH && \
+         CC="${C_COMPILER:?}" \
+         ./configure \
+           --prefix="${ROOTDIR:?}/.local" \
+           --enable-shared=yes \
+           --enable-static=yes
+        ) >>${OUT1:?} 2>>${OUT2:?} || { error "(GSL) ${EC11:?}"; return 1; }
+        ;;
+    esac
 
-    (export LD_LIBRARY_PATH=${CONDA_PREFIX:?}/lib:$LD_LIBRARY_PATH && \
-     export LD_LIBRARY_PATH=${ROOTDIR:?}/.local/lib:$LD_LIBRARY_PATH && \
-     make install >${OUT1:?} 2>${OUT2:?} || { error "(GSL) ${EC10:?}"; return 1; })
+    make -j $MNT all >>${OUT1:?} 2>>${OUT2:?} || { error "(GSL) ${EC8:?}"; return 1; }
+
+    make install >>${OUT1:?} 2>>${OUT2:?} || { error "(GSL) ${EC10:?}"; return 1; }
 
     unset -v PACKDIR FOLDER DEFAULT PACKAGE_VERSION
 
@@ -542,25 +577,24 @@ if [ -z "${IGNORE_CORE_INSTALLATION}" ]; then
     PACKDIR="${CCIL:?}/${FOLDER:?}"
 
     # --------------------------------------------------------------------------
-    # note: in case script run >1x w/ previous run stoped prematurely b/c error
+    # note: in case this script run >1x w/ previous run killed b/c of an error
     rm -f "${PACKDIR:?}/CMakeCache.txt"
 
     # --------------------------------------------------------------------------
     cdfolder "${PACKDIR}" || return 1;
-    
-    (export LD_LIBRARY_PATH=${CONDA_PREFIX:?}/lib:$LD_LIBRARY_PATH && \
-     export LD_LIBRARY_PATH=${ROOTDIR:?}/.local/lib:$LD_LIBRARY_PATH && \
-     ${CMAKE:?} -DCMAKE_INSTALL_PREFIX="${ROOTDIR:?}/.local" \
-     -DCMAKE_CXX_COMPILER="${CXX_COMPILER:?}" --log-level=ERROR . \
-     >${OUT1:?} 2>${OUT2:?} || { error "(SPDLOG) ${EC12:?}"; return 1; })
 
-    (export LD_LIBRARY_PATH=${CONDA_PREFIX:?}/lib:$LD_LIBRARY_PATH && \
-     export LD_LIBRARY_PATH=${ROOTDIR:?}/.local/lib:$LD_LIBRARY_PATH && \
-     make -j $MNT >${OUT1:?} 2>${OUT2:?} || { error "(SPDLOG) ${EC8:?}"; return 1; })
+    ${CMAKE:?} \
+       -DCMAKE_PREFIX_PATH="$CONDA_PREFIX;${ROOTDIR}/.local" \
+       -DCMAKE_INSTALL_PREFIX="${ROOTDIR:?}/.local" \
+       -DSPDLOG_BUILD_SHARED=OFF \
+       -DSPDLOG_FMT_EXTERNAL=OFF \
+       -DCMAKE_CXX_COMPILER="${CXX_COMPILER:?}" \
+       --log-level=ERROR . \
+     >>${OUT1:?} 2>>${OUT2:?} || { error "(SPDLOG) ${EC12:?}"; return 1; }
 
-    (export LD_LIBRARY_PATH=${CONDA_PREFIX:?}/lib:$LD_LIBRARY_PATH && \
-     export LD_LIBRARY_PATH=${ROOTDIR:?}/.local/lib:$LD_LIBRARY_PATH && \
-     make install >${OUT1:?} 2>${OUT2:?} || { error "(SPDLOG) ${EC10:?}"; return 1; })
+    make -j $MNT >>${OUT1:?} 2>>${OUT2:?} || { error "(SPDLOG) ${EC8:?}"; return 1; }
+
+    make install >>${OUT1:?} 2>>${OUT2:?} || { error "(SPDLOG) ${EC10:?}"; return 1; }
 
     unset -v PACKDIR FOLDER
 
@@ -588,35 +622,33 @@ if [ -z "${IGNORE_CORE_INSTALLATION}" ]; then
     PACKDIR="${CCIL:?}/${FOLDER:?}"
 
     # --------------------------------------------------------------------------
-    # note: in case script run >1x w/ previous run stoped prematurely b/c error
+    # note: in case this script run >1x w/ previous run killed b/c of an error
     rm -f "${PACKDIR:?}/CMakeCache.txt"
     rm -rf "${ROOTDIR:?}"/.local/share/Armadillo/
     rm -rf "${ROOTDIR:?}"/.local/lib/libarmadillo*
     rm -rf "${ROOTDIR:?}"/.local/include/armadillo*
     rm -rf "${ROOTDIR:?}"/.local/lib64/libarmadillo*
-
     # --------------------------------------------------------------------------
     cdfolder "${PACKDIR}" || return 1;
     
-    (export LD_LIBRARY_PATH=${CONDA_PREFIX:?}/lib:$LD_LIBRARY_PATH && \
-     export LD_LIBRARY_PATH=${ROOTDIR:?}/.local/lib:$LD_LIBRARY_PATH && \
-      ${CMAKE:?} -DBUILD_SHARED_LIBS=TRUE \
+    ${CMAKE:?} -DBUILD_SHARED_LIBS=TRUE \
+      -DCMAKE_PREFIX_PATH="$CONDA_PREFIX;${ROOTDIR}/.local" \
       -DCMAKE_INSTALL_PREFIX="${ROOTDIR:?}/.local" \
       -DCMAKE_C_COMPILER="${C_COMPILER:?}" \
       -DCMAKE_CXX_COMPILER="${CXX_COMPILER:?}" \
-      -DLAPACK_FOUND=YES -DARPACK_FOUND=YES  \
-      -DATLAS_FOUND=NO -DOpenBLAS_FOUND=YES -DBLAS_FOUND=NO  . \
-      >${OUT1:?} 2>${OUT2:?} || { error "(ARMA) ${EC12:?}"; return 1; })
+      -DLAPACK_FOUND=YES \
+      -DARPACK_FOUND=YES  \
+      -DATLAS_FOUND=NO \
+      -DOpenBLAS_FOUND=YES \
+      -DBLAS_FOUND=NO  \
+      --log-level=ERROR . \
+    >>${OUT1:?} 2>>${OUT2:?} || { error "(ARMA) ${EC12:?}"; return 1; }
     
-    make clean >${OUT1:?} 2>${OUT2:?} || { error "(ARMA) ${EC2:?}"; return 1; }
+    make clean >>${OUT1:?} 2>>${OUT2:?} || { error "(ARMA) ${EC2:?}"; return 1; }
 
-    (export LD_LIBRARY_PATH=${CONDA_PREFIX:?}/lib:$LD_LIBRARY_PATH && \
-     export LD_LIBRARY_PATH=${ROOTDIR:?}/.local/lib:$LD_LIBRARY_PATH && \
-     make all >${OUT1:?} 2>${OUT2:?} || { error "(ARMA) ${EC8:?}"; return 1; })
+    make all >>${OUT1:?} 2>>${OUT2:?} || { error "(ARMA) ${EC8:?}"; return 1; } 
 
-    (export LD_LIBRARY_PATH=${CONDA_PREFIX:?}/lib:$LD_LIBRARY_PATH && \
-     export LD_LIBRARY_PATH=${ROOTDIR:?}/.local/lib:$LD_LIBRARY_PATH && \
-     make install >${OUT1:?} 2>${OUT2:?} || { error "(ARMA) ${EC10:?}"; return 1; })
+    make install >>${OUT1:?} 2>>${OUT2:?} || { error "(ARMA) ${EC10:?}"; return 1; }
 
     unset -v PACKDIR FOLDER DEFAULT PACKAGE_VERSION
 
@@ -644,17 +676,45 @@ if [ -z "${IGNORE_CORE_INSTALLATION}" ]; then
 
     cdfolder "${PACKDIR}" || return 1;
 
-    (export LD_LIBRARY_PATH=${CONDA_PREFIX:?}/lib:$LD_LIBRARY_PATH && \
-     export LD_LIBRARY_PATH=${ROOTDIR:?}/.local/lib:$LD_LIBRARY_PATH && \
-     ./bootstrap.sh --prefix="${ROOTDIR:?}/.local" \
-     >${OUT1:?} 2>${OUT2:?} || { error "(BOOST) ${EC19:?}"; return 1; })
+    #NOTE: LD_LIBRARY_PATH/DYLD_FALLBACK_LIBRARY_PATH matters only when something 
+    #NOTE: is executed during the build (e.g., configure checks, unit tests)
+    case "$(uname -s)" in
+      Linux)
+        (export LD_LIBRARY_PATH=${CONDA_PREFIX:?}/lib:$LD_LIBRARY_PATH && \
+         export LD_LIBRARY_PATH=${ROOTDIR:?}/.local/lib:$LD_LIBRARY_PATH && \
+         ./bootstrap.sh --prefix="${ROOTDIR:?}/.local" 
+        ) >>${OUT1:?} 2>>${OUT2:?} || { error "(BOOST) ${EC19:?}"; return 1; }
 
-    (export LD_LIBRARY_PATH=${CONDA_PREFIX:?}/lib:$LD_LIBRARY_PATH && \
-     export LD_LIBRARY_PATH=${ROOTDIR:?}/.local/lib:$LD_LIBRARY_PATH && \
-     ./b2 --with=regex install --without-python --without-thread \
-     --without-timer --without-mpi --without-atomic \
-     >${OUT1:?} 2>${OUT2:?} || { error "(BOOST) ${EC21:?}"; return 1; })
-    
+        (export LD_LIBRARY_PATH=${CONDA_PREFIX:?}/lib:$LD_LIBRARY_PATH && \
+         export LD_LIBRARY_PATH=${ROOTDIR:?}/.local/lib:$LD_LIBRARY_PATH && \
+         ./b2 \
+           --with-regex install \
+           --without-python \
+           --without-thread \
+           --without-timer \
+           --without-mpi \
+           --without-atomic 
+        ) >>${OUT1:?} 2>>${OUT2:?} || { error "(BOOST) ${EC21:?}"; return 1; }
+        ;;
+      Darwin)
+        (export DYLD_FALLBACK_LIBRARY_PATH=${CONDA_PREFIX:?}/lib:$DYLD_FALLBACK_LIBRARY_PATH && \
+         export DYLD_FALLBACK_LIBRARY_PATH=${ROOTDIR:?}/.local/lib:$DYLD_FALLBACK_LIBRARY_PATH && \
+         ./bootstrap.sh --prefix="${ROOTDIR:?}/.local" 
+        ) >>${OUT1:?} 2>>${OUT2:?} || { error "(BOOST) ${EC19:?}"; return 1; }
+
+        (export DYLD_FALLBACK_LIBRARY_PATH=${CONDA_PREFIX:?}/lib:$DYLD_FALLBACK_LIBRARY_PATH && \
+         export DYLD_FALLBACK_LIBRARY_PATH=${ROOTDIR:?}/.local/lib:$DYLD_FALLBACK_LIBRARY_PATH && \
+          ./b2 \
+           --with-regex install \
+           --without-python \
+           --without-thread \
+           --without-timer \
+           --without-mpi \
+           --without-atomic 
+        ) >>${OUT1:?} 2>>${OUT2:?} || { error "(BOOST) ${EC21:?}"; return 1; }
+        ;;
+    esac
+
     unset -v PACKDIR FOLDER DEFAULT PACKAGE_VERSION
 
     cdfolder "${ROOTDIR}" || return 1;
@@ -680,24 +740,44 @@ if [ -z "${IGNORE_CORE_INSTALLATION}" ]; then
     PACKDIR="${CCIL:?}/${FOLDER:?}"
 
     # --------------------------------------------------------------------------
-    # In case this script runs twice (after being killed by CTRL-D)
-
+    # note: in case this script run >1x w/ previous run killed b/c of an error
     rm -f "${PACKDIR:?}/libcuba.a"
     rm -f "${PACKDIR:?}/libcuba.so"
+    rm -f "${PACKDIR:?}/libcuba.dylib"
     rm -f "${PACKDIR:?}/makefile"
     rm -f "${PACKDIR:?}/makefile.patch"
     rm -f "${PACKDIR:?}/config.h"
+    rm -f "${PACKDIR:?}/config.sub"
     rm -f "${ROOTDIR:?}/.local/lib/libcuba.so"
     rm -f "${ROOTDIR:?}/.local/lib/libcuba.a"
-
+    rm -f "${ROOTDIR:?}/.local/lib/libcuba.dylib"
     # --------------------------------------------------------------------------
     cdfolder "${PACKDIR}" || return 1;
 
-    (export LD_LIBRARY_PATH=${CONDA_PREFIX:?}/lib:$LD_LIBRARY_PATH && \
-     export LD_LIBRARY_PATH=${ROOTDIR:?}/.local/lib:$LD_LIBRARY_PATH && \
-     FC="${FORTRAN_COMPILER:?}" CC="${C_COMPILER:?}" \
-     ./configure --prefix="${ROOTDIR:?}/.local" \
-     >${OUT1:?} 2>${OUT2:?} || { error "(CUBA) ${EC11:?}"; return 1; })
+    # --------------------------------------------------------------------------
+    # CUBA NEEDS AN UPDATED config.sub
+    # --------------------------------------------------------------------------
+    cpfile "${CCIL:?}/cuba_changes/config.sub" "${PACKDIR}/"
+    #NOTE: LD_LIBRARY_PATH/DYLD_FALLBACK_LIBRARY_PATH matters only when something 
+    #NOTE: is executed during the build (e.g., configure checks, unit tests)
+    case "$(uname -s)" in
+      Linux)
+        (export LD_LIBRARY_PATH=${CONDA_PREFIX:?}/lib:$LD_LIBRARY_PATH && \
+         export LD_LIBRARY_PATH=${ROOTDIR:?}/.local/lib:$LD_LIBRARY_PATH && \
+         FC="${FORTRAN_COMPILER:?}" CC="${C_COMPILER:?}" \
+         ./configure \
+           --prefix="${ROOTDIR:?}/.local"
+        ) >>${OUT1:?} 2>>${OUT2:?} || { error "(CUBA) ${EC11:?}"; return 1; }
+        ;;
+      Darwin)
+        (export DYLD_FALLBACK_LIBRARY_PATH=${CONDA_PREFIX:?}/lib:$DYLD_FALLBACK_LIBRARY_PATH && \
+         export DYLD_FALLBACK_LIBRARY_PATH=${ROOTDIR:?}/.local/lib:$DYLD_FALLBACK_LIBRARY_PATH && \
+         FC="${FORTRAN_COMPILER:?}" CC="${C_COMPILER:?}" \
+         ./configure \
+           --prefix="${ROOTDIR:?}/.local"
+        ) >>${OUT1:?} 2>>${OUT2:?} || { error "(CUBA) ${EC11:?}"; return 1; }
+        ;;
+    esac
 
     # --------------------------------------------------------------------------
     # Patch CUBA so it also compiles an .so dynamic library --------------------
@@ -705,14 +785,17 @@ if [ -z "${IGNORE_CORE_INSTALLATION}" ]; then
     CHANGES="${CCIL:?}/cuba_changes"
     
     declare -a TFOLDER=("" 
+                        ""  
                        ) # If nonblank, path must include /
     
     # T = TMP
-    declare -a TFILE=("makefile" 
+    declare -a TFILE=("makefile"
+                      "makefile" 
                      )
 
     #T = TMP, P = PATCH
-    declare -a TFILEP=("makefile.patch" 
+    declare -a TFILEP=("makefile.patch"
+                       "makefilev2.patch" 
                       )
 
     # AL = Array Length
@@ -721,23 +804,20 @@ if [ -z "${IGNORE_CORE_INSTALLATION}" ]; then
     for (( i=0; i<${AL}; i++ ));
     do
       cdfolder "${PACKDIR:?}/${TFOLDER[$i]}" || return 1
-
+    
       cpfolder "${CHANGES:?}/${TFOLDER[$i]}${TFILEP[$i]:?}" . \
-        2>${OUT2:?} || return 1;
-
-      patch -u "${TFILE[$i]:?}" -i "${TFILEP[$i]:?}" >${OUT1:?} \
-        2>${OUT2:?} || { error "${EC17:?} (${TFILE[$i]:?})"; return 1; }
+        2>>${OUT2:?} || return 1;
+    
+      patch -u -l "${TFILE[$i]:?}" -i "${TFILEP[$i]:?}" >>${OUT1:?} \
+        2>>${OUT2:?} || { error "${EC17:?} (${TFILE[$i]:?})"; return 1; }
     done
 
     # --------------------------------------------------------------------------
-    
     cdfolder "${PACKDIR}" || return 1;
 
-    make clean >${OUT1:?} 2>${OUT2:?} || { error "(CUBA) ${EC2:?}"; return 1; }
-      
-    (export LD_LIBRARY_PATH=${CONDA_PREFIX:?}/lib:$LD_LIBRARY_PATH && \
-     export LD_LIBRARY_PATH=${ROOTDIR:?}/.local/lib:$LD_LIBRARY_PATH && \
-     make install >${OUT1:?} 2>${OUT2:?} || { error "(CUBA) ${EC10:?}"; return 1; })
+    make clean >>${OUT1:?} 2>>${OUT2:?} || { error "(CUBA) ${EC2:?}"; return 1; }
+
+    make install >>${OUT1:?} 2>>${OUT2:?} || { error "(CUBA) ${EC10:?}"; return 1; }
 
     unset -v PACKDIR FOLDER DEFAULT PACKAGE_VERSION 
     unset -v CHANGES TFOLDER TFILE TFILEP AL
@@ -759,20 +839,35 @@ if [ -z "${IGNORE_CORE_INSTALLATION}" ]; then
     PACKDIR="${CCIL:?}/${COCOA_EXPAT_DIR:-"expat-2.5.0/"}"
 
     cdfolder "${PACKDIR:?}" || return 1;
-    
-    (export LD_LIBRARY_PATH=${CONDA_PREFIX:?}/lib:$LD_LIBRARY_PATH && \
-     export LD_LIBRARY_PATH=${ROOTDIR:?}/.local/lib:$LD_LIBRARY_PATH && \
-     FC="${FORTRAN_COMPILER:?}" CC="${C_COMPILER:?}" ./configure \
-     --prefix="${ROOTDIR:?}/.local" --enable-shared=yes --enable-static=yes \
-     >${OUT1:?} 2>${OUT2:?} || { error "${EC11:?}"; return 1; })
 
-    (export LD_LIBRARY_PATH=${CONDA_PREFIX:?}/lib:$LD_LIBRARY_PATH && \
-     export LD_LIBRARY_PATH=${ROOTDIR:?}/.local/lib:$LD_LIBRARY_PATH && \
-     make -j $MNT >${OUT1:?} 2>${OUT2:?} || { error "${EC8:?}"; return 1; })
+    #NOTE: LD_LIBRARY_PATH/DYLD_FALLBACK_LIBRARY_PATH matters only when something 
+    #NOTE: is executed during the build (e.g., configure checks, unit tests)
+    case "$(uname -s)" in
+      Linux)
+        (export LD_LIBRARY_PATH=${CONDA_PREFIX:?}/lib:$LD_LIBRARY_PATH && \
+         export LD_LIBRARY_PATH=${ROOTDIR:?}/.local/lib:$LD_LIBRARY_PATH && \
+         FC="${FORTRAN_COMPILER:?}" CC="${C_COMPILER:?}" \
+         ./configure \
+           --prefix="${ROOTDIR:?}/.local" \
+           --enable-shared=yes \
+           --enable-static=yes
+        ) >>${OUT1:?} 2>>${OUT2:?} || { error "${EC11:?}"; return 1; }
+        ;;
+      Darwin)
+        (export DYLD_FALLBACK_LIBRARY_PATH=${CONDA_PREFIX:?}/lib:$DYLD_FALLBACK_LIBRARY_PATH && \
+         export DYLD_FALLBACK_LIBRARY_PATH=${ROOTDIR:?}/.local/lib:$DYLD_FALLBACK_LIBRARY_PATH && \
+         FC="${FORTRAN_COMPILER:?}" CC="${C_COMPILER:?}" \
+         ./configure \
+           --prefix="${ROOTDIR:?}/.local" \
+           --enable-shared=yes \
+           --enable-static=yes
+        ) >>${OUT1:?} 2>>${OUT2:?} || { error "${EC11:?}"; return 1; }
+        ;;
+    esac
 
-    (export LD_LIBRARY_PATH=${CONDA_PREFIX:?}/lib:$LD_LIBRARY_PATH && \
-     export LD_LIBRARY_PATH=${ROOTDIR:?}/.local/lib:$LD_LIBRARY_PATH && \
-     make install >${OUT1:?} 2>${OUT2:?} || { error "${EC10:?}"; return 1; })
+    make -j $MNT >>${OUT1:?} 2>>${OUT2:?} || { error "${EC8:?}"; return 1; }
+
+    make install >>${OUT1:?} 2>>${OUT2:?} || { error "${EC10:?}"; return 1; }
 
     LLIB="${ROOTDIR:?}/.local/lib"
 
@@ -797,13 +892,10 @@ if [ -z "${IGNORE_CORE_INSTALLATION}" ]; then
     PACKDIR="${CCIL:?}/${FOLDER:?}"
 
     # --------------------------------------------------------------------------
-    # note: in case script run >1x w/ previous run stoped prematurely b/c error
+    # note: in case this script run >1x w/ previous run killed b/c of an error
     rm -rf "${ROOTDIR:?}/.local/include/carma/"   
-
     # --------------------------------------------------------------------------
-
-    mkdir "${ROOTDIR:?}/.local/include/carma/" \
-      2>${OUT2:?} || { error "${EC20:?}"; return 1; }
+    mkdir "${ROOTDIR:?}/.local/include/carma/" 2>>${OUT2:?} || { error "${EC20:?}"; return 1; }
     
     cpfile "${PACKDIR:?}/carma.h" "${ROOTDIR:?}/.local/include/" || return 1
 

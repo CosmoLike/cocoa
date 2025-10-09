@@ -65,14 +65,12 @@ if [ -z "${IGNORE_COBAYA_CODE}" ]; then
   COBTH="cobaya/theories"           # COB = Cobaya, TH = theory
 
   cppatch() {
-    cp "${CCCOB:?}/${1:?}/${2:?}" "${COB:?}/${1:?}" \
-      2>"/dev/null" || 
+    cp "${CCCOB:?}/${1:?}/${2:?}" "${COB:?}/${1:?}" || 
       { error "CP FILE ${CCCOB:?}/${1:?}/${2:?} on ${COB:?}/${1:?}"; return 1; }
   }
 
   cppatchfolder() {
-    cp -r "${CCCOB:?}/${1:?}/${2:?}" "${COB:?}/${1:?}" \
-      2>"/dev/null" || 
+    cp -r "${CCCOB:?}/${1:?}/${2:?}" "${COB:?}/${1:?}" || 
       { error "CP FOLDER ${CCCOB:?}/${1:?}/${2:?} on ${COB:?}/${1:?}"; \
       return 1; }
   }
@@ -135,15 +133,32 @@ if [ -z "${IGNORE_COBAYA_CODE}" ]; then
     declare -a TFOLDER=("cobaya/likelihoods/base_classes/") # Must include  
     declare -a TFILE=("planck_clik.py")
     declare -a TFILEP=("planck_clik.patch")
-    AL=${#TFOLDER[@]}
 
-    for (( i=0; i<${AL}; i++ ));
+    for (( i=0; i<${#TFOLDER[@]}; i++ ));
     do
       cdfolder "${COB:?}/${TFOLDER[$i]}" || return 1;
 
       cpfolder "${CCCOB:?}/${TFOLDER[$i]}${TFILEP[$i]:?}" . 2>${OUT2:?} || return 1;
 
-      patch -R -u "${TFILE[$i]:?}" -i "${TFILEP[$i]:?}" >${OUT1:?} \
+      patch --quiet --batch --verbose -u -R "${TFILE[$i]:?}" -i "${TFILEP[$i]:?}" >${OUT1:?} \
+        2>${OUT2:?} || { error "${EC17:?} (${TFILE[$i]:?})"; return 1; }
+    done
+
+    # --------------------------------------------------------------------------
+    # PATCH FILE2 --------------------------------------------- -----------------
+    # --------------------------------------------------------------------------  
+    declare -a TFOLDER=("cobaya/") # Must include  
+    declare -a TFILE=("model.py")
+    declare -a TFILEP=("model.patch")
+
+    for (( i=0; i<${#TFOLDER[@]}; i++ ));
+    do
+      cdfolder "${COB:?}/${TFOLDER[$i]}" || return 1;
+
+      cpfolder "${CCCOB:?}/${TFOLDER[$i]}${TFILEP[$i]:?}" . 2>${OUT2:?} || return 1;
+
+      # HERE I CAN't USE THE -R
+      patch --quiet --batch --verbose -u "${TFILE[$i]:?}" -i "${TFILEP[$i]:?}" >${OUT1:?} \
         2>${OUT2:?} || { error "${EC17:?} (${TFILE[$i]:?})"; return 1; }
     done
 
@@ -293,7 +308,7 @@ if [ -z "${IGNORE_COBAYA_CODE}" ]; then
     
     cdfolder "${COB:?}/${COBLIKE}/base_classes/" || return 1;
 
-    patch -u "InstallableLikelihood.py" -i "InstallableLikelihood.patch" \
+    patch --quiet --batch --verbose -u "InstallableLikelihood.py" -i "InstallableLikelihood.patch" \
       >${OUT1:?} 2>${OUT2:?} || { error "${EC17:?}"; return 1; }
 
     cdfolder "${ROOTDIR:?}" || return 1;
