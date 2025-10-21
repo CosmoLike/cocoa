@@ -1092,7 +1092,7 @@ If this merge does not create any merge conflicts, type
 
 ## :interrobang: FAQ: Note on Planck-2018 low-ell SimAll EE and Gibbs TT likelihoods <a name="planck2018lowell"></a>
 
-Cocoa does not adopt Cobaya's Python reimplementation of the SimAll EE and Gibbs TT likelihoods. Therefore, we patch the files. 
+Cocoa does not adopt Cobaya's Python reimplementation of SimAll EE and Gibbs TT likelihoods. Therefore, we patch the files. 
 
     cobaya/cobaya/likelihoods/planck_2018_lowl/TT.py
     cobaya/cobaya/likelihoods/planck_2018_lowl/EE.py
