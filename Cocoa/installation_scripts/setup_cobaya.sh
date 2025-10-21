@@ -217,7 +217,8 @@ if [ -z "${IGNORE_COBAYA_CODE}" ]; then
     # note 2: associated with CLIK. We rename them to simply TT/EE.py
     
     TFOLDER="${COBLIKE:?}/planck_2018_lowl"
-    
+    rm -f "${COB:?}/${TFOLDER:?}/TT_clik.py"
+    rm -f "${COB:?}/${TFOLDER:?}/TT_clik.yaml"
     rm -f "${COB:?}/${TFOLDER:?}/EE_clik.py"
     rm -f "${COB:?}/${TFOLDER:?}/EE_clik.yaml"
     rm -f "${COB:?}/${TFOLDER:?}/EE_sroll2.py"
