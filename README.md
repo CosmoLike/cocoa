@@ -20,10 +20,11 @@
     7. [FAQ: How can users set the appropriate environment for ML?](#ml_emulators)
     8. [FAQ: How can developers push changes to the Cocoa main branch?](#push_main)
     9. [FAQ: How can developers develop from a Git tag?](#dev_from_tag)
-    10. [FAQ: How can users download additional likelihood data? (external readme)](Cocoa/external_modules/data)
+   10. [FAQ: How can users download additional likelihood data? (external readme)](Cocoa/external_modules/data)
    11. [FAQ: Where do users find common FAQs about external modules? (external readme)](Cocoa/external_modules/code)
    12. [FAQ: Where do users find common FAQs about Cosmolike? (external readme)](Cocoa/projects/)
-   13. [FAQ: How can users improve our Bash/C/C++ knowledge?](#lectnotes)
+   13. [FAQ: Note on Planck-2018 low-ell SimAll EE and Gibbs TT likelihoods?](#planck2018lowell)
+   14. [FAQ: How can users improve our Bash/C/C++ knowledge?](#lectnotes)
 
 # Overview <a name="overview"></a>
 
@@ -1088,6 +1089,20 @@ Finally, the developer needs to merge the changes made on `xyzlocdev`.
 If this merge does not create any merge conflicts, type
 
     git push origin xyzdev # run on the xyzdev branch
+
+## :interrobang: FAQ: Note on Planck-2018 low-ell SimAll EE and Gibbs TT likelihoods <a name="planck2018lowell"></a>
+
+Cocoa does not adopt Cobaya's Python reimplementation of the SimAll EE and Gibbs TT likelihoods. Therefore, we patch the files. 
+
+    cobaya/cobaya/likelihoods/planck_2018_lowl/TT.py
+    cobaya/cobaya/likelihoods/planck_2018_lowl/EE.py
+
+to call the original Planck-2018 Clik likelihoods, as shown below.
+
+<img width="1146" height="498" alt="Screenshot 2025-10-20 at 8 38 56 PM" src="https://github.com/user-attachments/assets/4ab8beff-bda1-4bf8-b2c6-56f5501e3773" />
+<img width="1236" height="514" alt="Screenshot 2025-10-20 at 8 39 04 PM" src="https://github.com/user-attachments/assets/22b21a5d-c716-45dc-949c-59f31be91def" />
+
+This ensure backward consistency in our code, as `TT.py` and `EE.py` used to point to Planck-2018 Clik before Cobaya's authors moved them to `EE_clik.py` and `TT_clik.py`. 
 
 ## :interrobang: FAQ: How can users improve our Bash/C/C++ knowledge? <a name="lectnotes"></a>
 
