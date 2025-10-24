@@ -582,7 +582,7 @@ likelihoods, and the theory code, all following Cobaya Conventions.
 > [!NOTE]
 > What about [CosmoPower](https://alessiospuriomancini.github.io/cosmopower/)? CosmoPower is a suite of popular emulators developed by Prof. Alessio Mancini
 > and collaborators. Even though they are not the suite of AI-powered emulators adopted by Cocoa developers, we do provide limited support for running them.
-> To set up and compile Cosmopower and also the corresponding Cobaya Wrapper, set the following keys before running `setup_cocoa.sh` and `compile_cocoa.sh`.
+> To set up and compile Cosmopower and also the corresponding Cobaya Wrapper, comment the following keys before running `setup_cocoa.sh` and `compile_cocoa.sh`.
 > 
 >     [Adapted from Cocoa/set_installation_options.sh shell script]
 >     #export IGNORE_COSMOPOWER_DATA=1  
