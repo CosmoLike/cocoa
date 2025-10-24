@@ -581,13 +581,18 @@ likelihoods, and the theory code, all following Cobaya Conventions.
 
 > [!NOTE]
 > What about [CosmoPower](https://alessiospuriomancini.github.io/cosmopower/)? CosmoPower is a suite of popular emulators developed by Prof. Alessio Mancini
-> and collaborators. Even though they are not the suite of AI-powered emulators adopted by Cocoa developers, we do provide limited support for running them.
+> and collaborators. Our Cocoa port heavily relies on the work done by Hidde Jense @HTJense (kudos for his work) as well as the Simons Observatory SOLikeT code.
+> Even though they are not the suite of AI-powered emulators adopted by Cocoa developers, we do provide limited support for running them.
 > To set up and compile Cosmopower and also the corresponding Cobaya Wrapper, comment the following keys before running `setup_cocoa.sh` and `compile_cocoa.sh`.
 > 
 >     [Adapted from Cocoa/set_installation_options.sh shell script]
 >     #export IGNORE_COSMOPOWER_DATA=1  
 >     #export IGNORE_COSMOPOWER_CODE=1
->
+>     (...)
+>     # Edit below if you have your own set of CosmoPower Emulators
+>     export COSMOPOWER_URL_DATA="https://github.com/cosmopower-organization/jense_2024_emulators.git"
+>     export COSMOPOWER_URL_DATA_COMMIT="4317635eed70289ee1ec6b3df828027173071e36"
+> 
 > We also provide a few examples using CosmoPower (they all end with `CP` suffix)
 >
 > - **One model evaluation**:
@@ -763,7 +768,7 @@ In case users only want to compile a single Cosmolike project (let's say the `ro
      
 ## :interrobang: FAQ: How can users run Cocoa with Docker? <a name="appendix_jupyter_whovian"></a>
 
-We provide the Docker image [whovian-cocoa](https://hub.docker.com/r/vivianmiranda/whovian-cocoa) to facilitate the installation of Cocoa on Windows and macOS. This appendix assumes that users have already installed the Docker Engine on their local PC. For instructions on installing the Docker engine on specific operating systems, refer to [Docker's official documentation](https://docs.docker.com/engine/install/). 
+We provide the Docker image [whovian-cocoa](https://hub.docker.com/r/vivianmiranda/whovian-cocoa) to facilitate installing Cocoa on Windows and macOS. This appendix assumes that users have already installed the Docker Engine on their local PC. For instructions on installing the Docker engine on specific operating systems, refer to [Docker's official documentation](https://docs.docker.com/engine/install/). 
 
  **Step :one:**: Create a folder and go to the location on the host computer where you want to provide access to the Docker container, as shown below. 
 
@@ -774,7 +779,7 @@ We provide the Docker image [whovian-cocoa](https://hub.docker.com/r/vivianmiran
 
     docker run --platform linux/amd64 --hostname cocoa --name cocoa2025 -it -p 8888:8888 -v $(pwd):/home/whovian/host/ -v ~/.ssh:/home/whovian/.ssh:ro vivianmiranda/whovian-cocoa:thin
 
-This is a large image with a size of approximately 13GB, as it already contains the conda cocoa environment installed. Users can now proceed to the section [Installation and Compilation of external modules](#cobaya_base_code) to continue installation. 
+This is a large image, approximately 13GB, as it already contains the conda cocoa environment. Users can now proceed to the [Installation and Compilation of external modules](#cobaya_base_code) section to continue the installation. 
 
 > [!TIP]
 > Once installation is complete, the user must learn how to **start** and **exit** the Docker container. Assuming the user maintained the container name `cocoa2025` set on the flag `--name cocoa2025`, type:
@@ -827,7 +832,7 @@ This is a large image with a size of approximately 13GB, as it already contains 
 
 [Google Colab](https://colab.research.google.com/) provides a convenient platform for users to run MCMCs, likelihood minimizations, and profiles, as long as Machine-Learning Emulators are used to compute the data vectors. In the repository [CoCoAGoogleColabExamples](https://github.com/CosmoLike/CoCoAGoogleColabExamples), we provide a few examples along with explanatory notes. 
 
-Installing Cocoa requires time and also strains our limited Git-LFS quota, which is especially relevant given that **the entire local drive is wiped when a Colab notebook is disconnected**. To prevent this problem, we provide instructions on how to save and load Cocoa immediately after the initial installation. 
+Installing Cocoa requires time and also strains our limited Git-LFS quota, which is especially relevant given that **the entire local drive is wiped when a Colab notebook is disconnected**. To prevent this problem, we provide instructions for saving and loading Cocoa immediately after the initial installation. 
 
 There are a few differences users should be aware of when running Cocoa on Google Colab.
 
@@ -1051,7 +1056,7 @@ Until recently, Cocoa development was a bit unstructured. Developers could push 
     git switch -c xyzdev  # run on the main branch
 
 > [!TIP]
-> The use of developers' initials followed by `dev` helps make the branch easily identifiable.
+The use of developers' initials followed by `dev` makes the branch easily identifiable.
 
 > [!TIP]
 > If the branch `xyzdev` already exists, use the `git switch` command without the `-c` flag. 
@@ -1103,7 +1108,7 @@ A useful Git hack is related to developing Cocoa from a Git tag. We reserve Git 
 Now, all commits will be associated with this local branch. 
 
 > [!TIP]
-> The use of developers' initials followed by `dev` helps make the branch easily identifiable.
+The use of developers' initials followed by `dev` makes the branch easily identifiable.
 
 **Step :three:** The developer has two options at the end of development. They can **either** create a new remote branch
 
@@ -1133,7 +1138,7 @@ to call the original Planck-2018 Clik likelihoods, as shown below.
 <img width="1146" height="498" alt="Screenshot 2025-10-20 at 8 38 56 PM" src="https://github.com/user-attachments/assets/4ab8beff-bda1-4bf8-b2c6-56f5501e3773" />
 <img width="1236" height="514" alt="Screenshot 2025-10-20 at 8 39 04 PM" src="https://github.com/user-attachments/assets/22b21a5d-c716-45dc-949c-59f31be91def" />
 
-This ensure backward consistency in our code, as `TT.py` and `EE.py` used to point to Planck-2018 Clik before Cobaya's authors moved them to `EE_clik.py` and `TT_clik.py`. 
+This ensures backward consistency in our code, as `TT.py` and `EE.py` used to point to Planck-2018 Clik before Cobaya's authors moved them to `EE_clik.py` and `TT_clik.py`. 
 
 ## :interrobang: FAQ: How can users improve our Bash/C/C++ knowledge? <a name="lectnotes"></a>
 
