@@ -20,10 +20,11 @@
     7. [FAQ: How can users set the appropriate environment for ML?](#ml_emulators)
     8. [FAQ: How can developers push changes to the Cocoa main branch?](#push_main)
     9. [FAQ: How can developers develop from a Git tag?](#dev_from_tag)
-    10. [FAQ: How can users download additional likelihood data? (external readme)](Cocoa/external_modules/data)
+   10. [FAQ: How can users download additional likelihood data? (external readme)](Cocoa/external_modules/data)
    11. [FAQ: Where do users find common FAQs about external modules? (external readme)](Cocoa/external_modules/code)
    12. [FAQ: Where do users find common FAQs about Cosmolike? (external readme)](Cocoa/projects/)
-   13. [FAQ: How can users improve our Bash/C/C++ knowledge?](#lectnotes)
+   13. [FAQ: Note on Planck-2018 low-ell SimAll EE and Gibbs TT likelihoods?](#planck2018lowell)
+   14. [FAQ: How can users improve our Bash/C/C++ knowledge?](#lectnotes)
 
 # Overview <a name="overview"></a>
 
@@ -812,7 +813,7 @@ There are a few differences users should be aware of when running Cocoa on Googl
           from google.colab import drive
           drive.mount('/content/drive')
 
-    Below, we provide instructions on how to install Cocoa. *Google Colab does provide direct terminal access if users prefer to follow the standard installation procedure*
+    Below, we provide instructions for installing Cocoa. *Google Colab does provide direct terminal access if users prefer to follow the standard installation procedure*
     
     - **Cell 2️⃣**: Install Miniforge (Similar to our documentation in section [FAQ: How can users install Conda?](#overview_miniforge))
 
@@ -919,7 +920,7 @@ There are a few differences users should be aware of when running Cocoa on Googl
 
 - Saving/Loading checkpoints
 
-  Not reserving time to copy the `/content` folder to the user's Google Drive, an expensive operation, can result in up to 24 hours of lost computation. To prevent such a catastrophe, the code below creates and loads *checkpoints* that users can add after computationally intensive cells.
+  Not reserving time to copy the `/content` folder to the user's Google Drive —an expensive operation —can result in up to 24 hours of lost computation. To prevent such a catastrophe, the code below creates and loads *checkpoints* that users can add after computationally intensive cells.
 
   *This solution is not valid when running Colab with local runtime* (see [Google documentation](https://research.google.com/colaboratory/local-runtimes.html) for additional information on how to link notebooks to local resources). The good news here is that local storage is persistent, so there is no need to create backups on Google Drive.
   
@@ -1002,7 +1003,7 @@ Commenting out the environmental flags below *before running* `setup_cocoa.sh` w
     #export IGNORE_EMULATOR_GPU_PIP_PACKAGES=1
     (...)
 
-In case users have already run `setup_cocoa.sh`, then run the command.
+If users have already run `setup_cocoa.sh`, run the command.
 
     source start_cocoa.sh # even if (.local) is already active, users must run start_cocoa.sh again to update bash environment values
    
@@ -1030,7 +1031,7 @@ Until recently, Cocoa development was a bit unstructured. Developers could push 
 > [!TIP]
 > If the branch `xyzdev` already exists, use the `git switch` command without the `-c` flag. 
 
-**Step :two:**: develop the proposed changes. We advise developers to commit frequently. In your branch, a commit does not need to be atomic, changing the code from one working state to another well-tested, meaningful working state. Developers can push to the server via the command.
+**Step :two:**: develop the proposed changes. We advise developers to commit frequently. In your branch, a commit does not need to be atomic, changing the code from one well-tested, meaningful working state to another. Developers can push to the server via the command.
 
     git push -u origin xyzdev   # run on the xyzdev branch
 
@@ -1038,7 +1039,9 @@ Until recently, Cocoa development was a bit unstructured. Developers could push 
 
     git merge main   # run on the xyzdev branch
 
-This step may create conflicts that must be addressed before step four. 
+This step may create conflicts that must be addressed before step four. If there are conflicts, the best way to identify the files that need to be edited is via the command
+
+    git diff --name-only --diff-filter=U # shows only files with conflict
 
 **Step :four:**: Once the developers have merged recent changes made on the `main` branch, they must push to the main branch the modifications made on the `xyzdev` branch by first **squashing all your changes into a single commit**, as shown below
 
@@ -1048,8 +1051,12 @@ and
 
     git merge --squash xyzdev   # run on the main branch
 
-and
+Again, if there are conflicts, use the command. 
 
+   git diff --name-only --diff-filter=U
+   
+to identify files that need to be edited to solve the conflict state. Finally, make the merger commit (please solve all conflicts before commit)
+ 
     git commit -m "merge xyzdev branch"  # run on the main branch
 
 and
@@ -1088,6 +1095,20 @@ Finally, the developer needs to merge the changes made on `xyzlocdev`.
 If this merge does not create any merge conflicts, type
 
     git push origin xyzdev # run on the xyzdev branch
+
+## :interrobang: FAQ: Note on Planck-2018 low-ell SimAll EE and Gibbs TT likelihoods <a name="planck2018lowell"></a>
+
+Cocoa does not adopt Cobaya's Python reimplementation of SimAll EE and Gibbs TT likelihoods. Therefore, we patch the files. 
+
+    cobaya/cobaya/likelihoods/planck_2018_lowl/TT.py
+    cobaya/cobaya/likelihoods/planck_2018_lowl/EE.py
+
+to call the original Planck-2018 Clik likelihoods, as shown below.
+
+<img width="1146" height="498" alt="Screenshot 2025-10-20 at 8 38 56 PM" src="https://github.com/user-attachments/assets/4ab8beff-bda1-4bf8-b2c6-56f5501e3773" />
+<img width="1236" height="514" alt="Screenshot 2025-10-20 at 8 39 04 PM" src="https://github.com/user-attachments/assets/22b21a5d-c716-45dc-949c-59f31be91def" />
+
+This ensure backward consistency in our code, as `TT.py` and `EE.py` used to point to Planck-2018 Clik before Cobaya's authors moved them to `EE_clik.py` and `TT_clik.py`. 
 
 ## :interrobang: FAQ: How can users improve our Bash/C/C++ knowledge? <a name="lectnotes"></a>
 
