@@ -110,27 +110,59 @@ if [ -z "${IGNORE_PIP_CORE_INSTALLATION}" ]; then
   
   if [ -z "${IGNORE_EMULATOR_GPU_PIP_PACKAGES}" ]; then
     ptop "PIP INSTALL MACHINE LEARNING GPU PACKAGES (takes a while O(5-10min)...)"
-
-    env CXX="${CXX_COMPILER:?}" CC="${C_COMPILER:?}" ${PIP3:?} install \
-        "numpy==${COCOA_NUMPY_VERSION:?}" \
-        'tensorflow==2.17.0' \
-        'tensorflow_probability==0.24.0' \
-        'keras==3.9.2' \
-        'keras-preprocessing==1.1.2' \
-        'torch==2.6.0' \
-        'torchvision==0.21.0' \
-        'torchaudio==2.6.0' \
-        'scikit-learn==1.6.1' \
-        'jupyter==1.0.0' \
-        'typing-extensions==4.13.2' \
-        'mkdocs_material==9.6.13' \
-        'mkdocstrings==0.29.1' \
-        'pytest==8.3.5' \
-        'tf-keras==2.17.0' \
-      --no-cache-dir --prefer-binary \
-      --extra-index-url "https://download.pytorch.org/whl/cu118" \
-      --prefix="${ROOTDIR:?}/.local" \
-      >${OUT1:?} 2>${OUT2:?} || { error "${EC13:?}"; return 1; } 
+  
+    if [[ "$(uname)" == "Darwin" ]]; then
+      env CXX="${CXX_COMPILER:?}" CC="${C_COMPILER:?}" ${PIP3:?} install \
+          "numpy==${COCOA_NUMPY_VERSION:?}" \
+          'tensorflow==2.18.1' \
+          'tensorflow-metal==1.2.0' \
+          'tensorflow_probability==0.25.0' \
+        --no-cache-dir --prefer-binary \
+        --prefix="${ROOTDIR:?}/.local" \
+        >${OUT1:?} 2>${OUT2:?} || { error "${EC13:?}"; return 1; } 
+      env CXX="${CXX_COMPILER:?}" CC="${C_COMPILER:?}" ${PIP3:?} install \
+          'keras==3.9.2' \
+          'torch==2.6.0' \
+          'torchvision==0.21.0' \
+          'torchaudio==2.6.0' \
+          'scikit-learn==1.6.1' \
+          'jupyter==1.0.0' \
+          'typing-extensions==4.13.2' \
+          'mkdocs_material==9.6.13' \
+          'mkdocstrings==0.29.1' \
+          'pytest==8.3.5' \
+          'gdown==5.1.0' \
+          'pyDOE3==1.4.0' \
+          'jax==0.4.30' \
+          'jaxlib==0.4.30' \
+        --no-cache-dir --prefer-binary \
+        --prefix="${ROOTDIR:?}/.local" \
+        >${OUT1:?} 2>${OUT2:?} || { error "${EC13:?}"; return 1; } 
+    else
+      env CXX="${CXX_COMPILER:?}" CC="${C_COMPILER:?}" ${PIP3:?} install \
+          "numpy==${COCOA_NUMPY_VERSION:?}" \
+          'tensorflow==2.17.0' \
+          'tensorflow_probability==0.24.0' \
+          'keras==3.9.2' \
+          'keras-preprocessing==1.1.2' \
+          'torch==2.6.0' \
+          'torchvision==0.21.0' \
+          'torchaudio==2.6.0' \
+          'scikit-learn==1.6.1' \
+          'jupyter==1.0.0' \
+          'typing-extensions==4.13.2' \
+          'mkdocs_material==9.6.13' \
+          'mkdocstrings==0.29.1' \
+          'pytest==8.3.5' \
+          'gdown==5.1.0' \
+          'pyDOE3==1.4.0' \
+          'jax==0.4.30' \
+          'jaxlib==0.4.30' \
+        --no-cache-dir --prefer-binary \
+        --extra-index-url "https://download.pytorch.org/whl/cu118" \
+        --prefix="${ROOTDIR:?}/.local" \
+        >${OUT1:?} 2>${OUT2:?} || { error "${EC13:?}"; return 1; } 
+    fi
 
     # Without this code, jupyter breaks notebook
     env CXX="${CXX_COMPILER:?}" CC="${C_COMPILER:?}" ${PIP3:?} install \

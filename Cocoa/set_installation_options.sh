@@ -23,7 +23,7 @@ esac
 # ------------------------------------------------------------------------------
 # VERBOSE AS DEBUG TOOL --------------------------------------------------------
 # ------------------------------------------------------------------------------
-#export COCOA_OUTPUT_VERBOSE=1
+export COCOA_OUTPUT_VERBOSE=1
 #export COCOA_OUTPUT_DEBUG=1 # turn on bash strict mode (set -exo pipefail) on  
                              # instalation_scripts/setup/compile_x.sh scripts 
 # ------------------------------------------------------------------------------
@@ -44,7 +44,7 @@ export IGNORE_SIMONS_OBSERVATORY_CMB_DATA=1
 #export IGNORE_PLANCK_CMB_DATA=1
 export IGNORE_CAMSPEC_CMB_DATA=1
 export IGNORE_LIPOP_CMB_DATA=1
-export IGNORE_COSMOPOWER_DATA=1
+#export IGNORE_COSMOPOWER_DATA=1
 #export IGNORE_EMULTRF_DATA=1 #SaraivanovZhongZhu (SZZ) transformer-based emul
 
 # ------------------------------------------------------------------------------
@@ -67,7 +67,7 @@ export IGNORE_HYREC_CODE=1
 #export IGNORE_COSMOREC_CODE=1
 export IGNORE_MGCAMB_CODE=1
 #export IGNORE_EMULTRF_CODE=1     #SaraivanovZhongZhu (SZZ) transformer-based emul
-export IGNORE_COSMOPOWER_CODE=1   #unable to install cosmopower on modern Python
+#export IGNORE_COSMOPOWER_CODE=1   #unable to install cosmopower on modern Python
 #export IGNORE_EUCLID_EMULATOR_V2_CODE=1
 export IGNORE_DARK_EMULATOR_CODE=1
 #export IGNORE_NAUTILUS_SAMPLER_CODE=1
@@ -298,11 +298,11 @@ export MGCAMB_NAME='MGCAMB'
 export PLANCK2018_SROLL2_URL="https://web.fe.infn.it/~pagano/low_ell_datasets/sroll2/"
 export PLANCK2018_SROLL2_FILE="simall_100x143_sroll2_v3_EE_Aplanck.tgz"
 
-export COSMOPOWER_SOLIKET_URL="https://github.com/simonsobs/SOLikeT.git"
-export COSMOPOWER_SOLIKET_GIT_COMMIT="1d8333ea0007c88e7c2de192de39301884093cd8"
+export COSMOPOWER_SOLIKET_URL="https://github.com/SBU-COSMOLIKE/SOLikeT.git"
+export COSMOPOWER_SOLIKET_GIT_COMMIT="91a2b33daf6f783933007839083fbab25d73b77b"
 
-export COSMOPOWER_URL="https://github.com/alessiospuriomancini/cosmopower.git"
-export COSMOPOWER_GIT_COMMIT="7cac5e71c975c06257b2f95f0dcea5dd09b0f45f"
+export COSMOPOWER_URL="https://github.com/SBU-COSMOLIKE/cosmopower.git"
+export COSMOPOWER_GIT_COMMIT="2bc18d60001bc0879ee4e109668b9e93f0767ab7"
 
 export COSMOPOWER_URL_DATA="https://github.com/cosmopower-organization/jense_2024_emulators.git"
 export COSMOPOWER_URL_DATA_COMMIT="4317635eed70289ee1ec6b3df828027173071e36"
