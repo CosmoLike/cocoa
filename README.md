@@ -579,6 +579,31 @@ likelihoods, and the theory code, all following Cobaya Conventions.
 <img width="790" height="333" alt="Unknown" src="https://github.com/user-attachments/assets/b5ef808e-0efa-4bb9-852a-854f6531e3ed" />
 </p>
 
+> [!NOTE]
+> What about [CosmoPower](https://alessiospuriomancini.github.io/cosmopower/)? CosmoPower is a suite of popular emulators developed by Prof. Alessio Mancini
+> and collaborators. Even though they are not the suite of AI-powered emulators adopted by Cocoa developers, we do provide limited support for running them.
+> To set up and compile Cosmopower and also the corresponding Cobaya Wrapper, set the following keys before running `setup_cocoa.sh` and `compile_cocoa.sh`.
+> 
+>     [Adapted from Cocoa/set_installation_options.sh shell script]
+>     #export IGNORE_COSMOPOWER_DATA=1  
+>     #export IGNORE_COSMOPOWER_CODE=1
+>
+> We also provide a few examples using CosmoPower (they all end with `CP` suffix)
+>
+> - **One model evaluation**:
+>
+>  - Linux
+>    
+>        mpirun -n 1 --oversubscribe --mca pml ^ucx --mca btl vader,tcp,self --rank-by slot \
+>          --bind-to core:overload-allowed --map-by slot --mca mpi_yield_when_idle 1 \
+>          cobaya-run ./projects/example/EXAMPLE_EMUL_EVALUATE2_CP.yaml -f
+>
+>  - macOS (arm)
+>
+>        mpirun -n 1 --oversubscribe cobaya-run ./projects/example/EXAMPLE_EMUL_EVALUATE2_CP.yaml -f
+> 
+
+
 ## Credits <a name="appendix_proper_credits"></a>
 
 - **Acknowledgments**:
@@ -1053,7 +1078,7 @@ and
 
 Again, if there are conflicts, use the command. 
 
-   git diff --name-only --diff-filter=U
+    git diff --name-only --diff-filter=U
    
 to identify files that need to be edited to solve the conflict state. Finally, make the merger commit (please solve all conflicts before commit)
  
