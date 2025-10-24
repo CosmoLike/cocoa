@@ -117,6 +117,7 @@ if [ -z "${IGNORE_PIP_CORE_INSTALLATION}" ]; then
           'tensorflow==2.18.1' \
           'tensorflow-metal==1.2.0' \
           'tensorflow_probability==0.25.0' \
+          "tf-keras==2.18.0" \
         --no-cache-dir --prefer-binary \
         --prefix="${ROOTDIR:?}/.local" \
         >${OUT1:?} 2>${OUT2:?} || { error "${EC13:?}"; return 1; } 
@@ -154,6 +155,7 @@ if [ -z "${IGNORE_PIP_CORE_INSTALLATION}" ]; then
           'mkdocs_material==9.6.13' \
           'mkdocstrings==0.29.1' \
           'pytest==8.3.5' \
+          'tf-keras==2.17.0' \
           'gdown==5.1.0' \
           'pyDOE3==1.4.0' \
           'jax==0.4.30' \
