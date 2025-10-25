@@ -302,7 +302,7 @@ export COSMOPOWER_SOLIKET_URL="https://github.com/SBU-COSMOLIKE/SOLikeT.git"
 export COSMOPOWER_SOLIKET_GIT_COMMIT="91a2b33daf6f783933007839083fbab25d73b77b"
 
 export COSMOPOWER_URL="https://github.com/SBU-COSMOLIKE/cosmopower.git"
-export COSMOPOWER_GIT_COMMIT="2bc18d60001bc0879ee4e109668b9e93f0767ab7"
+export COSMOPOWER_GIT_COMMIT="f70fc789426847eed996d707ec67a3a93d74bbc3"
 
 export COSMOPOWER_URL_DATA="https://github.com/cosmopower-organization/jense_2024_emulators.git"
 export COSMOPOWER_URL_DATA_COMMIT="4317635eed70289ee1ec6b3df828027173071e36"
