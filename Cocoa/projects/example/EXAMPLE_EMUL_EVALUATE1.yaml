@@ -8,19 +8,65 @@ likelihood:
     clik_file: plc_3.0/hi_l/plik_lite/plik_lite_v22_TTTEEE.clik
   planck_2018_lowl.TT: 
     path: ./external_modules
-  # choose only one low ell EE likelihood
-  #planck_2018_lowl.EE:
-  #  path: ./external_modules
-  planck_2018_lowl.EE_sroll2: null 
-  #planck_2020_lollipop.lowlE:
-  #  data_folder: planck/lollipop
+  planck_2018_lowl.EE:
+    path: ./external_modules
   sn.desy5: 
+    path: ./external_modules/data/sn_data
+  sn.pantheon:
+    path: ./external_modules/data/sn_data
+  sn.roman_c:
+    path: ./external_modules/data/sn_data
+  sn.roman_o:
     path: ./external_modules/data/sn_data
   bao.desi_dr2.desi_bao_all:
     path: ./external_modules/data/ 
+  bao.sixdf_2011_bao:
+    path: ./external_modules/data/
+  bao.sdss_dr7_mgs:
+    path: ./external_modules/data/
+  bao.sdss_dr12_consensus_bao:
+    path: ./external_modules/data/
   act_dr6_lenslike.ACTDR6LensLike:
     lens_only: True
     variant: actplanck_baseline
+  mflike.TTTEEE:
+    data_folder: simons_observatory/v0.8
+    input_file: LAT_simu_sacc_00044.fits
+    cov_Bbl_file: data_sacc_w_covar_and_Bbl.fits
+    defaults:
+      # Which spectra?
+      polarizations: ['TT', 'TE', 'ET', 'EE']
+      # Scale cuts (in ell) for each spectrum
+      scales:
+        TT: [50, 3002]
+        TE: [50, 3002]
+        ET: [50, 3002]
+        EE: [50, 3002]
+      symmetrize: False
+
+    data:
+      # List the names and frequencies of all the
+      # relevant experiments.
+      experiments:
+        - LAT_93
+        - LAT_145
+        - LAT_225
+        # - PlanckHFI_545:
+
+      spectra:
+        # Here, list all the different cross-correlations
+        # between experiments and bands you want to
+        # analyse.
+        # For each of them, you can specify which spectra
+        # and scale cuts you'd like to use. If you don't
+        # specify anything, the defaults will be used.
+        - experiments: [LAT_93, LAT_93]
+        - experiments: [LAT_93, LAT_145]
+        - experiments: [LAT_93, LAT_225]
+        - experiments: [LAT_145, LAT_145]
+        - experiments: [LAT_145, LAT_225]
+        - experiments: [LAT_225, LAT_225]
+
 params:
   logA:
     prior:
@@ -164,14 +210,31 @@ theory:
                  {'MLA': 'ResMLP', 'offset' : 0.0, 'INTDIM' : 1, 'NLAYER' : 1,
                   'TMAT': 'external_modules/data/emultrf/BAO_SN_RES/PCA_lcdm_H.npy',
                   'ZLIN': 'external_modules/data/emultrf/BAO_SN_RES/z_lin_lcdm.npy'}]
+  mflike.BandpowerForeground:
+
 sampler:
   evaluate:
     override:
       logA: 3.045845885
       ns: 9.652308970e-01
-      thetastar: 1.0415895
+      thetastar: 1.04107
       omegabh2: 2.246801442e-02
       omegach2: 1.198257361e-01 
       tau: 5.433339482e-02
-      A_planck: 1.000
+      A_planck: 1.00138
+      a_tSZ: 3.30
+      a_kSZ: 1.6
+      a_p: 6.90
+      beta_p: 2.08
+      a_c: 4.90
+      beta_c: 2.20
+      a_s: 3.10
+      a_gtt: 2.81
+      a_gte: 0.10
+      a_gee: 0.10
+      a_psee: 0.0
+      a_pste: 0.0
+      xi: 0.2
+      T_d: 9.60
+
 output: ./projects/example/chains/EXAMPLE_EMUL_EVALUATE1

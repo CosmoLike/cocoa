@@ -3,12 +3,6 @@ timing: True
 debug: False
 
 likelihood:
-  sn.union3: 
-    path: ./external_modules/data/sn_data
-  sn.pantheon: 
-    path: ./external_modules/data/sn_data
-  sn.pantheonplus: 
-    path: ./external_modules/data/sn_data
   sn.desy5: 
     path: ./external_modules/data/sn_data
   bao.desi_dr2.desi_bao_all:
@@ -86,9 +80,7 @@ params:
       scale: 0.0004
     proposal: 0.0002
     latex: 100\theta_*
-    #drop: true
     renames: theta
-
   H0:
     latex: H_0
     min: 20
@@ -229,12 +221,12 @@ sampler:
     override:
       logA: 3.045
       ns: 0.9649
-      thetastar: 1.04167
+      thetastar: 1.0451
       omegabh2: 0.02236
-      omegach2: 0.1202
+      omegach2: 0.12
       tau: 0.0544
-      w0pwa: -0.999
-      w: -0.999
+      w0pwa: -0.99
+      w: -0.97
       a_tSZ: 3.30
       a_kSZ: 1.6
       a_p: 6.90
@@ -250,4 +242,4 @@ sampler:
       xi: 0.2
       T_d: 9.60
 
-output: ./projects/example/chains/EXAMPLE_EVALUATE6
+output: ./projects/example/chains/EXAMPLE_EMUL_EVALUATE2
