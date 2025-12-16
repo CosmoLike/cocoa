@@ -1005,7 +1005,7 @@ and
 **Step :two:**: After installation, users must source the conda configuration file, as shown below:
 
     source $CONDA_DIR/etc/profile.d/conda.sh \
-          && conda config --set auto_update_conda false I am running a few minutes late; my previous meeting is running over.
+          && conda config --set auto_update_conda false \
           && conda config --set show_channel_urls true \
           && conda config --set auto_activate_base false \
           && conda config --prepend channels conda-forge \
