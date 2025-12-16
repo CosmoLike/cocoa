@@ -49,7 +49,7 @@ Core packages include compilers and numerical libraries that users typically do 
 
   - Linux
     
-         wget https://raw.githubusercontent.com/CosmoLike/cocoa/refs/heads/dev/cocoapy310.yml
+         wget https://raw.githubusercontent.com/SBU-COSMOLIKE/cocoa/refs/heads/main/cocoapy310.yml
 
   - macOS (arm)
     
