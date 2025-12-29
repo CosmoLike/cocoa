@@ -20,17 +20,18 @@
     7. [FAQ: How can users set the appropriate environment for ML?](#ml_emulators)
     8. [FAQ: How can developers push changes to the Cocoa main branch?](#push_main)
     9. [FAQ: How can developers develop from a Git tag?](#dev_from_tag)
-   10. [FAQ: How can users download additional likelihood data? (external readme)](Cocoa/external_modules/data)
-   11. [FAQ: Where do users find common FAQs about external modules? (external readme)](Cocoa/external_modules/code)
-   12. [FAQ: Where do users find common FAQs about Cosmolike? (external readme)](Cocoa/projects/)
-   13. [FAQ: Note on Planck-2018 low-ell SimAll EE and Gibbs TT likelihoods?](#planck2018lowell)
-   14. [FAQ: How can users improve our Bash/C/C++ knowledge?](#lectnotes)
+   10. [FAQ: How can users fork Cocoa correctly?](#fork_cocoa_tag)
+   11. [FAQ: How can users download additional likelihood data? (external readme)](Cocoa/external_modules/data)
+   12. [FAQ: Where do users find common FAQs about external modules? (external readme)](Cocoa/external_modules/code)
+   13. [FAQ: Where do users find common FAQs about Cosmolike? (external readme)](Cocoa/projects/)
+   14. [FAQ: Note on Planck-2018 low-ell SimAll EE and Gibbs TT likelihoods?](#planck2018lowell)
+   15. [FAQ: How can users improve our Bash/C/C++ knowledge?](#lectnotes)
 
 # Overview <a name="overview"></a>
 
 Cocoa allows users to run [CosmoLike](https://github.com/CosmoLike) routines inside the [Cobaya](https://github.com/CobayaSampler) framework. [CosmoLike](https://github.com/CosmoLike) can analyze data from the [Dark Energy Survey](https://www.darkenergysurvey.org) and simulate future multi-probe analyses for LSST and Roman Space Telescope. 
 
-Besides integrating [Cobaya](https://github.com/CobayaSampler) and [CosmoLike](https://github.com/CosmoLike), Cocoa introduces shell scripts that allow users to containerize [Cobaya](https://github.com/CobayaSampler), the Boltzmann codes, and multiple likelihoods. The container structure of Cocoa ensures that users can adopt consistent versions for the Fortran/C/C++ compilers and libraries across multiple machines. Such a systematic approach greatly simplifies the debugging process. 
+Besides integrating [Cobaya](https://github.com/CobayaSampler) and [CosmoLike](https://github.com/CosmoLike), Cocoa also introduces shell scripts that allow users to containerize [Cobaya](https://github.com/CobayaSampler), the Boltzmann codes, and multiple likelihoods. The container structure of Cocoa ensures that users can adopt consistent versions for the Fortran/C/C++ compilers and libraries across multiple machines. Such a systematic approach greatly simplifies the debugging process. 
 
 Our scripts never install packages or Python modules in a global folder such as `$HOME/.local`. Here, `$HOME` denotes a shell environment variable that points to the user's home folder. Doing so would force cocoa packages to be global to the user, possibly breaking environments. Our scripts enable users to work on multiple Cocoa instances simultaneously, similar to what was possible with [CosmoMC](https://github.com/cmbant/CosmoMC). 
 
@@ -98,8 +99,7 @@ and activate it
 Users can now proceed to the **next section**.
 
 > [!Warning]
-> We advise users to stay away from all repositories managed by `Anaconda` due to license limitations. See the Appendix [FAQ: How can we install Conda?](#overview_miniforge)
-> for instructions on how to install `Miniforge`, which is a  minimal installer of conda that downloads default packages from the `conda-forge` community-driven channel.
+> We advise users to stay away from all repositories managed by `Anaconda` due to draconian license restrictions that can affect researchers outside universities (e.g., NASA-JPL). See the Appendix [FAQ: How can we install Conda?](#overview_miniforge) for instructions on how to install `Miniforge`, which is a minimal installer of conda that downloads default packages from the `conda-forge` community-driven channel.
 
 > [!Tip]
 > We advise users to maintain *exact reproducibility* (across time) of the Cocoa conda environment by installing it via `conda-lock`,
@@ -581,7 +581,7 @@ likelihoods, and the theory code, all following Cobaya Conventions.
 
 > [!NOTE]
 > What about [CosmoPower](https://alessiospuriomancini.github.io/cosmopower/)? CosmoPower is a suite of popular emulators developed by Prof. Alessio Mancini
-> and collaborators. Our Cocoa port heavily relies on the work done by Hidde Jense @HTJense (kudos for his work) as well as the Simons Observatory SOLikeT code.
+> and collaborators. Our Cocoa port relies on the work done by Hidde Jense @HTJense (kudos to his/their work) as well as the Simons Observatory SOLikeT code.
 > Even though they are not the suite of AI-powered emulators adopted by Cocoa developers, we do provide limited support for running them.
 > To set up and compile Cosmopower and also the corresponding Cobaya Wrapper, comment the following keys before running `setup_cocoa.sh` and `compile_cocoa.sh`.
 > 
@@ -1061,7 +1061,7 @@ The use of developers' initials followed by `dev` makes the branch easily identi
 > [!TIP]
 > If the branch `xyzdev` already exists, use the `git switch` command without the `-c` flag. 
 
-**Step :two:**: develop the proposed changes. We advise developers to commit frequently. In your branch, a commit does not need to be atomic, changing the code from one well-tested, meaningful working state to another. Developers can push to the server via the command.
+**Step :two:**: develop the proposed changes. We advise developers to commit frequently. In your branch, a commit does not need to be *atomic*, meaning the commit is not require to change the code from one well-tested working state to another well-tested state. Developers can push to the server via the command.
 
     git push -u origin xyzdev   # run on the xyzdev branch
 
@@ -1126,6 +1126,45 @@ If this merge does not create any merge conflicts, type
 
     git push origin xyzdev # run on the xyzdev branch
 
+## :interrobang: FAQ: How can users fork Cocoa correctly? <a name="fork_cocoa_tag"></a>
+
+Cocoa manages a few core repositories that must all be forked to provide users with developer-editing capabilities across all our core projects. There are a few well-known Cocoa forks in addition to the main code hosted on the [Cosmolike organization](https://github.com/CosmoLike). They are
+
+* Forks hosted by [SBU-Cosmolike organization](https://github.com/SBU-COSMOLIKE)
+	- Here is where Prof. Miranda and her group do the main development of Cocoa. Code is much more unstable here, meaning we may break CODE from time to time, thereby relaxing the `atomic` requirements, described in the appendix [FAQ: How can developers push changes to the Cocoa main branch?](#push_main), for commits to the main branch. There is usually a significant difference in commit counts between the SBU-Cosmolike and Cosmolike organizations because we typically push changes with squash commits. 
+	- Many cutting-edge cocoa features are developed within SBU-Cosmolike organization, especially related to machine-learning emulators. 
+	- All documentation for the SBU-Cosmolike organization assumes users can clone repositories using `ssh-key` authentication, so users outside Stony Brook must adapt the instructions in the Readme and the URL addresses set in the `set_installation_options.sh` bash file to install Cocoa from this fork successfully. 
+	- We do not provide any support for people outside Stony Brook when using code from this fork.
+	
+* Forks hosted by [Roman HLIS Cosmology PIT](https://github.com/Roman-HLIS-Cosmology-PIT)
+	- Here is where we intend to port the code to be branded as official releases by the HLIS Cosmology PIT. 
+	
+Assuming, for concreteness, that users want to fork work from the SBU-Cosmolike organization, below we list the repositories that must be forked and the settings that must be adjusted in `set_installation_options.sh` bash script (the only substring that needs to be changed is `SBU-COSMOLIKE`, replaced by the organization that is the source of the fork). 
+
+    [Adapted from Cocoa/set_installation_options.sh shell script]    
+    export COSMOLIKE_URL="git@github.com:SBU-COSMOLIKE/cocoa-cosmolike-core.git"  # main repository with cosmolike code
+    
+    (...)   
+    
+    # Below is the code that implements ML-learning emulators
+    export EMULTRF_URL="git@github.com:SBU-COSMOLIKE/emulators_code.git"
+    # Below are the files that implement ML-learning emulators
+    export EMULTRF_DATA_URL="https://github.com/SBU-COSMOLIKE/emulators_data_lcdm.git" 
+    
+    (...)
+    
+    # Cosmolike projects below
+    export LSST_Y1_URL="git@github.com:SBU-COSMOLIKE/cocoa_lsst_y1.git"
+    (...)
+    export DES_Y3_URL="git@github.com:SBU-COSMOLIKE/cocoa_des_y3.git" # This is DES-Y3 redmagic
+	(...) 
+    export ROMAN_FOURIER_URL="git@github.com:SBU-COSMOLIKE/cocoa_roman_fourier.git" 
+    (...)
+    export ROMAN_REAL_URL="git@github.com:SBU-COSMOLIKE/cocoa_roman_real.git"
+    (...)
+    export DESXPLANCK_URL="git@github.com:SBU-COSMOLIKE/cocoa_desy1xplanck.git"  # This is DES-Y3 maglim
+
+    
 ## :interrobang: FAQ: Note on Planck-2018 low-ell SimAll EE and Gibbs TT likelihoods <a name="planck2018lowell"></a>
 
 Cocoa does not adopt Cobaya's Python reimplementation of SimAll EE and Gibbs TT likelihoods. Therefore, we patch the files. 
