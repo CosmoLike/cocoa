@@ -1131,13 +1131,15 @@ If this merge does not create any merge conflicts, type
 Cocoa manages a few core repositories that must all be forked to provide users with developer-editing capabilities across all our core projects. There are a few well-known Cocoa forks in addition to the main code hosted on the [Cosmolike organization](https://github.com/CosmoLike). They are
 
 * Forks hosted by [SBU-Cosmolike organization](https://github.com/SBU-COSMOLIKE)
-	- Here is where Prof. Miranda and her group do the main development of Cocoa. Code is much more unstable here, meaning we may break CODE from time to time, thereby relaxing the `atomic` requirements, described in the appendix [FAQ: How can developers push changes to the Cocoa main branch?](#push_main), for commits to the main branch. There is usually a significant difference in commit counts between the SBU-Cosmolike and Cosmolike organizations because we typically push changes with squash commits. 
-	- Many cutting-edge cocoa features are developed within SBU-Cosmolike organization, especially related to machine-learning emulators. 
-	- All documentation for the SBU-Cosmolike organization assumes users can clone repositories using `ssh-key` authentication, so users outside Stony Brook must adapt the instructions in the Readme and the URL addresses set in the `set_installation_options.sh` bash file to install Cocoa from this fork successfully. 
+	- Here is where Prof. Miranda and her group at Stony Brook are developing Cocoa, while the University of Arizona leads development at Cosmolike org. 
+    	+ Code is more unstable at SBU-Cosmolike, as the *atomic requirements* described in the appendix [FAQ: How can developers push changes to the Cocoa main branch?](#push_main) are not so strictly observed.
+     	+ There are differences in commit counts between the SBU-Cosmolike and Cosmolike organizations, as changes to Cosmolike org are typically pushed via squash commits. 
+	- Some cutting-edge features are developed within SBU-Cosmolike, especially the ones related to machine-learning emulators (users should use forks to develop cutting-edge code!).
+	- Documentation within the SBU-Cosmolike org assumes users can clone repositories using SSH key authentication. So, users outside SBU must adapt the URL addresses to install Cocoa successfully from this fork. 
 	- We do not provide any support for people outside Stony Brook when using code from this fork.
 	
 * Forks hosted by [Roman HLIS Cosmology PIT](https://github.com/Roman-HLIS-Cosmology-PIT)
-	- Here is where we intend to port the code to be branded as official releases by the HLIS Cosmology PIT. 
+	- Here is where we port the code that is intended to be branded as official releases by the HLIS Cosmology PIT. 
 	
 Assuming, for concreteness, that users want to fork work from the SBU-Cosmolike organization, below we list the repositories that must be forked and the settings that must be adjusted in `set_installation_options.sh` bash script (the only substring that needs to be changed is `SBU-COSMOLIKE`, replaced by the organization that is the source of the fork). 
 
