@@ -1141,7 +1141,7 @@ Cocoa manages a few core repositories that must all be forked to provide users w
 * Forks hosted by [Roman HLIS Cosmology PIT](https://github.com/Roman-HLIS-Cosmology-PIT)
 	- Here is where we port the code that is intended to be branded as official releases by the HLIS Cosmology PIT. 
 	
-Assuming, for concreteness, that users want to fork work from the SBU-Cosmolike organization, below we list the repositories that must be forked and the settings that must be adjusted in `set_installation_options.sh` bash script (the only substring that needs to be changed is `SBU-COSMOLIKE`, replaced by the organization that is the source of the fork). 
+Assuming, for concreteness, that users want to fork relevant repositories from SBU-Cosmolike (**not advised**), we list below the settings that must be adjusted in `set_installation_options.sh`. 
 
     [Adapted from Cocoa/set_installation_options.sh shell script]    
     export COSMOLIKE_URL="git@github.com:SBU-COSMOLIKE/cocoa-cosmolike-core.git"  # main repository with cosmolike code
