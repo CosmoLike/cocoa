@@ -1043,7 +1043,11 @@ and
               
 ## :interrobang: FAQ: How can developers push changes to the Cocoa main branch? <a name="push_main"></a>
 
-Until recently, Cocoa development was a bit unstructured. Developers could push directly to the `main` branch, and small commits to the main were not discouraged. Such flexible development rules will soon change when `v4.0` leaves the beta phase. We will protect the `main` branch by requiring every push to be reviewed by Cocoa's leading developers. Our new philosophy establishes that *a commit in the main branch should contain an atomic change that takes code from one working state to another working state with meaningful and well-tested improvements*. Therefore, developers should propose changes to the `main` branch in larger chunks (*via squash commits*), as shown below.
+Until recently, Cocoa development was a bit unstructured. Developers could push directly to the `main` branch, and small commits to the main were not discouraged. Such flexible development rules will soon change when `v4.0` leaves the beta phase. We will protect the `main` branch by requiring every push to be reviewed by Cocoa's leading developers. 
+
+Our new philosophy establishes that **a commit in the main branch should contain an atomic change that moves code from one working state to another working state with meaningful and well-tested improvements**. 
+
+Therefore, developers should propose changes to the `main` branch in larger chunks (*via squash commits*), as shown below.
 
 > [!NOTE]
 > In a developer branch, users are encouraged to make small commits so that work can be tracked easily. Our policy regarding squash atomic changes only applies to the main branch.
@@ -1131,15 +1135,17 @@ If this merge does not create any merge conflicts, type
 Cocoa manages a few core repositories that must all be forked to provide users with developer-editing capabilities across all our core projects. There are a few well-known Cocoa forks in addition to the main code hosted on the [Cosmolike organization](https://github.com/CosmoLike). They are
 
 * Forks hosted by [SBU-Cosmolike organization](https://github.com/SBU-COSMOLIKE)
-	- Here is where Prof. Miranda and her group do the main development of Cocoa. Code is much more unstable here, meaning we may break CODE from time to time, thereby relaxing the `atomic` requirements, described in the appendix [FAQ: How can developers push changes to the Cocoa main branch?](#push_main), for commits to the main branch. There is usually a significant difference in commit counts between the SBU-Cosmolike and Cosmolike organizations because we typically push changes with squash commits. 
-	- Many cutting-edge cocoa features are developed within SBU-Cosmolike organization, especially related to machine-learning emulators. 
-	- All documentation for the SBU-Cosmolike organization assumes users can clone repositories using `ssh-key` authentication, so users outside Stony Brook must adapt the instructions in the Readme and the URL addresses set in the `set_installation_options.sh` bash file to install Cocoa from this fork successfully. 
-	- We do not provide any support for people outside Stony Brook when using code from this fork.
+	- Here is where Prof. Miranda and her group at Stony Brook are developing Cocoa, while the University of Arizona leads development at Cosmolike org. 
+    	+ Code is more unstable at SBU-Cosmolike, as the *atomic requirements* described in the appendix [FAQ: How can developers push changes to the Cocoa main branch?](#push_main) are not so strictly observed.
+     	+ There are differences in commit counts between the SBU-Cosmolike and Cosmolike organizations, as changes to the Cosmolike org are typically pushed via squash commits. 
+	- Some cutting-edge features are developed within SBU-Cosmolike, especially the ones related to machine-learning emulators (users should use forks to develop cutting-edge code!).
+    - We do not provide any support for people outside Stony Brook when using code from the SBU-Cosmolike org, but they are still open-source.
+    - Documentation within the SBU-Cosmolike org assumes users can clone repositories using SSH key authentication. So, non-members of the SBU-Cosmolike org must adapt the URL addresses to install Cocoa successfully.  
 	
 * Forks hosted by [Roman HLIS Cosmology PIT](https://github.com/Roman-HLIS-Cosmology-PIT)
-	- Here is where we intend to port the code to be branded as official releases by the HLIS Cosmology PIT. 
+	- Here is where we port the code that is intended to be branded as official releases by the [HLIS Cosmology Project Infrastructure Team](https://roman-hlis-cosmology.caltech.edu). 
 	
-Assuming, for concreteness, that users want to fork work from the SBU-Cosmolike organization, below we list the repositories that must be forked and the settings that must be adjusted in `set_installation_options.sh` bash script (the only substring that needs to be changed is `SBU-COSMOLIKE`, replaced by the organization that is the source of the fork). 
+Assuming, for concreteness, that users want to fork relevant repositories from SBU-Cosmolike (**not advised**, better to clone from Cosmolike org), we list below the settings that must be adjusted in `set_installation_options.sh`. 
 
     [Adapted from Cocoa/set_installation_options.sh shell script]    
     export COSMOLIKE_URL="git@github.com:SBU-COSMOLIKE/cocoa-cosmolike-core.git"  # main repository with cosmolike code
