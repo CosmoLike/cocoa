@@ -226,48 +226,22 @@ if [[ -z "${IGNORE_EMULTRF_CODE}" ]]; then
   COBTH="${ROOTDIR:?}/cobaya/cobaya/theories"
   TMP="${EMULTRF_NAME:-"emultrf"}"
 
-  TMP2="emulcmb"
-  if [[ ! -L "${COBTH:?}/${TMP2}" ]]; then
-    ln -s "${ECODEF:?}/emulators/${TMP}/${TMP2}" "${COBTH:?}" \
-      >>${OUT1:?} 2>>${OUT2:?} || { error_start_cocoa "${EC34:?}"; return 1; }
-  fi
-
-  TMP2="emulbaosn"
-  if [[ ! -L "${COBTH:?}/${TMP2}" ]]; then
-    ln -s "${ECODEF:?}/emulators/${TMP}/${TMP2}" "${COBTH:?}" \
-      >>${OUT1:?} 2>>${OUT2:?} || { error_start_cocoa "${EC34:?}"; return 1; }
-  fi
-
-  TMP2="emultheta"
-  if [[ ! -L "${COBTH:?}/${TMP2}" ]]; then
-    ln -s "${ECODEF:?}/emulators/${TMP}/${TMP2}" "${COBTH:?}" \
-      >>${OUT1:?} 2>>${OUT2:?} || { error_start_cocoa "${EC34:?}"; return 1; }
-  fi
-
-  TMP2="emulrdrag"
-  if [[ ! -L "${COBTH:?}/${TMP2}" ]]; then
-    ln -s "${ECODEF:?}/emulators/${TMP}/${TMP2}" "${COBTH:?}" \
-      >>${OUT1:?} 2>>${OUT2:?} || { error_start_cocoa "${EC34:?}"; return 1; }
-  fi
-
-  TMP2="emul_cosmic_shear"
-  if [[ ! -L "${COBTH:?}/${TMP2}" ]]; then
-    ln -s "${ECODEF:?}/emulators/${TMP}/${TMP2}" "${COBTH:?}" \
-      >>${OUT1:?} 2>>${OUT2:?} || { error_start_cocoa "${EC34:?}"; return 1; }
-  fi
-
-  TMP2="emul_ggl"
-  if [[ ! -L "${COBTH:?}/${TMP2}" ]]; then
-    ln -s "${ECODEF:?}/emulators/${TMP}/${TMP2}" "${COBTH:?}" \
-      >>${OUT1:?} 2>>${OUT2:?} || { error_start_cocoa "${EC34:?}"; return 1; }
-  fi
-
-  TMP2="emul_wtheta"
-  if [[ ! -L "${COBTH:?}/${TMP2}" ]]; then
-    ln -s "${ECODEF:?}/emulators/${TMP}/${TMP2}" "${COBTH:?}" \
-      >>${OUT1:?} 2>>${OUT2:?} || { error_start_cocoa "${EC34:?}"; return 1; }
-  fi
-
+  for TMP2 in \
+    "emulcmb" \
+    "emulbaosn" \
+    "emultheta" \
+    "emulrdrag" \
+    "emul_cosmic_shear" \
+    "emul_ggl" \
+    "emul_wtheta" \
+    "emulmps"
+  do
+    if [[ ! -L "${COBTH:?}/${TMP2}" ]]; then
+      ln -s "${ECODEF:?}/emulators/${TMP}/${TMP2}" "${COBTH:?}" \
+        >>"${OUT1:?}" 2>>"${OUT2:?}" || { error_start_cocoa "${EC34:?}"; return 1; }
+    fi
+  done
+  
   unset -v ECODEF COBTH TMP TMP2
 fi
 

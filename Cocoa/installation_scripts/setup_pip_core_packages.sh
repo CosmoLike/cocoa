@@ -175,6 +175,13 @@ if [ -z "${IGNORE_PIP_CORE_INSTALLATION}" ]; then
       --prefix="${ROOTDIR:?}/.local" \
       >${OUT1:?} 2>${OUT2:?} || { error "${EC13:?}"; return 1; }
 
+    # MPS emulator needs collosus
+    env CXX="${CXX_COMPILER:?}" CC="${C_COMPILER:?}" ${PIP3:?} install \
+        'colossus==1.3.10' \
+      --no-cache-dir --prefer-binary \
+      --prefix="${ROOTDIR:?}/.local" \
+      >${OUT1:?} 2>${OUT2:?} || { error "${EC13:?}"; return 1; }
+
     pbottom "PIP INSTALL MACHINE LEARNING GPU PACKAGES" || return 1
   
   fi
