@@ -661,9 +661,9 @@ Now, users must follow all the steps below.
 
         mpirun -n 4 --oversubscribe cobaya-run ./projects/lsst_y1/EXAMPLE_EMUL2_MCMC1.yaml -r
     
-> [!NOTE]
-> Details on the matter power spectrum emulator designs will be shown in the external readme associated with the [emulator_code](https://github.com/SBU-COSMOLIKE/emulators_code) repository. As a basic introduction, we apply standard neural network techniques to generalize the *syren-new* formula for the linear power spectrum for w0waCDM with fixed neutrino mass at 0.06eV, shown in Eq 6 of [arXiv:2410.14623](https://arxiv.org/abs/2410.14623) with fixed neutrino mass at 0.06eV to new models or extended ranges or even higher precision. Similarly, we try to generalize the *syren-Halofit* LCDM Halofit formula, shown in Eq 11 of [arXiv:2402.17492](https://arxiv.org/abs/2402.17492).
->
+Details on the matter power spectrum emulator designs will be presented in the [emulator_code](https://github.com/SBU-COSMOLIKE/emulators_code) repository. Basically, we apply standard neural network techniques to generalize the *syren-new* Eq. 6 of [arXiv:2410.14623](https://arxiv.org/abs/2410.14623) formula for the linear power spectrum (w0waCDM with a fixed neutrino mass of 0.06eV) to new models, extended ranges or higher precision. Similarly, we use networks to generalize the *syren-Halofit* LCDM Halofit (Eq. 11 of [arXiv:2402.17492](https://arxiv.org/abs/2402.17492)).
+
+> [!NOTE] 
 > Users can decide not to correct the *syren-new* formula for the linear power spectrum (flag in the yaml). Although we have not conducted extensive studies of the caveats of the syren-new approximation, it seems to be sufficient for w0waCDM forecasts when combined with the Euclid Emulator to compute the nonlinear boost.
 >
 > For back-of-the-envelope LCDM calculations (e.g., to test cosmolike features), users can also choose not to correct the syren-Halofit formula for the nonlinear boost (see figure below). In this case, the overhead on top of cosmolike computations is minimum, at the order of 0.01 seconds on a macOS M2Pro laptop. 
