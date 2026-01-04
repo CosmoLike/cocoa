@@ -614,20 +614,11 @@ likelihoods, and the theory code, all following Cobaya Conventions.
 > [!Warning]
 > The code and examples associated with this section are still in alpha stage (not good enough for data analysis)
 
-Previous section focused on emulators that simulate the entire data vector computed by cosmolike using either transformer- or CNN-based neural network emulators, which is the most appropriate solution for running expensive scripts such as Profile and Bayesian Evidence calculations, especially if the user wants to run Roman 3x2pt or DES 6x2pt data vectors.  
+Previous section focused on emulators that simulate the entire data vector computed by cosmolike using either transformer- or CNN-based neural network emulators. We believe this is the optimal solution for running expensive scripts, e.g., Profile on Roman 3x2pt data vectors.  
 
-There is, however, an intermediate solution of emulating only CAMB outputs, including the linear and non-linear matter power spectrum, that can provide greater flexibility. Here, changes to the modeling of nuisance physics (e.g., intrinsic alignment) or to the lens or source galaxy distributions do not require retraining of the neural network. The hybrid case can also be used to generate the training data vectors for the training of the full emulator. 
+There is, however, an intermediate proposal of emulating only Boltzmann outputs, which can provide greater flexibility. Here, changes to the modeling of lensing/clusterting associated nuisance physics, e.g., intrinsic alignment, or to the lens or source galaxy distributions do not require retraining of the neural network. 
 
-While examples in the previous section all started with the prefix **EXAMPLE_EMUL**, the examples in the hybrid approach have the prefix **EXAMPLE_EMUL2**. To run them, users ensure the following lines are commented out in `set_installation_options.sh` before running the `setup_cocoa.sh` and `compile_cocoa.sh`. By default, these lines should be commented out, but it is worth checking.
-
-      [Adapted from Cocoa/set_installation_options.sh shell script] 
-      # insert the # symbol (i.e., unset these environmental keys  on `set_installation_options.sh`)
-      #export IGNORE_EMULTRF_CODE=1             #LoydSaraivanovZhongZhu (SZZ) Neural-Network emulators
-      #export IGNORE_EMULTRF_DATA=1                     
-      #export IGNORE_ACTDR6_CODE=1              # to run EXAMPLE_EMUL2_(EVALUATE/MCMC) that contains ACT Lensing data
-      #export IGNORE_ACTDR6_DATA=1              # to run EXAMPLE_EMUL2_(EVALUATE/MCMC) that contains ACT Lensing data
-          
-Now, users must follow all the steps below.
+While examples in the previous section all started with the prefix **EXAMPLE_EMUL**, the examples in the hybrid approach have the prefix **EXAMPLE_EMUL2**. Flags on `set_installation_options.sh` are similar to what we explained last section
 
  **Step :one:**: Activate the private Python environment by sourcing the script `start_cocoa.sh`
 
