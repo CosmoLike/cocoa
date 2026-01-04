@@ -612,13 +612,11 @@ likelihoods, and the theory code, all following Cobaya Conventions.
 # Running Hybrid Cosmolike-ML emulators <a name="cobaya_base_code_examples_emul2"></a>
 
 > [!Warning]
-> The code and examples associated with this section are still in alpha stage (not good enough for data analysis)
+> The code and examples associated with this section are still in alpha stage
 
-Previous section focused on emulators that simulate the entire data vector computed by cosmolike using either transformer- or CNN-based neural network emulators. We believe this is the optimal solution for running expensive scripts, e.g., Profile on Roman 3x2pt data vectors.  
+While the previous section focused on emulators that simulate the entire data vector computed by cosmolike via neural networks, an intermediate approach is to emulate only the Boltzmann outputs, which can offer greater flexibility. For example, changes to the modeling of lensing/clustering associated nuisance physics, e.g., intrinsic alignment, or to the lens or source galaxy distributions do not require retraining of the neural network. 
 
-There is, however, an intermediate proposal of emulating only Boltzmann outputs, which can provide greater flexibility. Here, changes to the modeling of lensing/clusterting associated nuisance physics, e.g., intrinsic alignment, or to the lens or source galaxy distributions do not require retraining of the neural network. 
-
-While examples in the previous section all started with the prefix **EXAMPLE_EMUL**, the examples in the hybrid case have the prefix **EXAMPLE_EMUL2**. Finally, the required flags on `set_installation_options.sh` are similar to what we shown in full emulator section.
+Examples in the hybrid case all have the prefix **EXAMPLE_EMUL2** (note the `2`). The required flags on `set_installation_options.sh` are similar to what we shown in full emulator section.
 
 Now, users must follow all the steps below.
 
