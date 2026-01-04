@@ -8,9 +8,10 @@
 3. [Installation and Compilation of external modules](#cobaya_base_code)
 4. [Running Examples](#cobaya_base_code_examples)
 5. [Running ML emulators](#cobaya_base_code_examples_emul)
-6. [Creating Cosmolike projects (external readme)](Cocoa/projects/)
-7. [Credits](#appendix_proper_credits)
-8. [Appendix](#appendix)
+6. [Running Hybrid Cosmolike-ML emulators](#cobaya_base_code_examples_emul2)
+7. [Creating Cosmolike projects (external readme)](Cocoa/projects/)
+8. [Credits](#appendix_proper_credits)
+9. [Appendix](#appendix)
     1. [FAQ: How can users debug Cocoa? Suggested steps](#running_wrong)
     2. [FAQ: How can users compile external modules (not involving Cosmolike)?](#appendix_compile_separately)
     3. [FAQ: How can users install Cosmolike projects?](#appendix_compile_cosmolike_separately)
@@ -608,6 +609,75 @@ likelihoods, and the theory code, all following Cobaya Conventions.
 >        mpirun -n 1 --oversubscribe cobaya-run ./projects/example/EXAMPLE_EMUL_EVALUATE2_CP.yaml -f
 > 
 
+# Running Hybrid Cosmolike-ML emulators <a name="cobaya_base_code_examples_emul2"></a>
+
+> [!Warning]
+> The code and examples associated with this section are still in alpha stage (not good enough for data analysis)
+
+Previous section focused on emulators that simulate the entire data vector computed by cosmolike using either transformer- or CNN-based neural network emulators, which is the most appropriate solution for running expensive scripts such as Profile and Bayesian Evidence calculations, especially if the user wants to run Roman 3x2pt or DES 6x2pt data vectors.  
+
+There is, however, an intermediate solution of emulating only CAMB outputs, including the linear and non-linear matter power spectrum, that can provide greater flexibility. Here, changes to the modeling of nuisance physics (e.g., intrinsic alignment) or to the lens or source galaxy distributions do not require retraining of the neural network. The hybrid case can also be used to generate the training data vectors for the training of the full emulator. 
+
+While examples in the previous section all started with the prefix **EXAMPLE_EMUL**, the examples in the hybrid approach have the prefix **EXAMPLE_EMUL2**. To run them, users ensure the following lines are commented out in `set_installation_options.sh` before running the `setup_cocoa.sh` and `compile_cocoa.sh`. By default, these lines should be commented out, but it is worth checking.
+
+      [Adapted from Cocoa/set_installation_options.sh shell script] 
+      # insert the # symbol (i.e., unset these environmental keys  on `set_installation_options.sh`)
+      #export IGNORE_EMULTRF_CODE=1             #LoydSaraivanovZhongZhu (SZZ) Neural-Network emulators
+      #export IGNORE_EMULTRF_DATA=1                     
+      #export IGNORE_ACTDR6_CODE=1              # to run EXAMPLE_EMUL2_(EVALUATE/MCMC) that contains ACT Lensing data
+      #export IGNORE_ACTDR6_DATA=1              # to run EXAMPLE_EMUL2_(EVALUATE/MCMC) that contains ACT Lensing data
+          
+Now, users must follow all the steps below.
+
+ **Step :one:**: Activate the private Python environment by sourcing the script `start_cocoa.sh`
+
+    source start_cocoa.sh
+
+ **Step :two:**: Select the number of OpenMP cores. Below, we set it to 4, the ideal setting on hybrid approach.
+
+  - Linux
+    
+        export OMP_NUM_THREADS=4; export OMP_PROC_BIND=close; export OMP_PLACES=cores; export OMP_DYNAMIC=FALSE
+
+  - macOS (arm)
+    
+        export OMP_NUM_THREADS=4; export OMP_PROC_BIND=disabled; export OMP_PLACES=cores; export OMP_DYNAMIC=FALSE
+    
+ **Step :three:** Run `cobaya-run` on the first emulator example following the commands below (here we only provide lsst-y1 examples).
+
+- **One model evaluation**:
+
+  - Linux
+    
+        mpirun -n 1 --oversubscribe --mca pml ^ucx --mca btl vader,tcp,self \
+           --bind-to core:overload-allowed --mca mpi_yield_when_idle 1 --report-bindings  \
+           --rank-by slot --map-by numa:pe=${OMP_NUM_THREADS} \
+           cobaya-run ./projects/lsst_y1/EXAMPLE_EMUL2_EVALUATE1.yaml -f
+
+  - macOS (arm)
+    
+        mpirun -n 1 --oversubscribe  cobaya-run ./projects/lsst_y1/EXAMPLE_EMUL2_EVALUATE1.yaml -f
+    
+- **MCMC (Metropolis-Hastings Algorithm)**:
+
+  - Linux
+    
+        mpirun -n 4 --oversubscribe --mca pml ^ucx --mca btl vader,tcp,self --rank-by slot \
+            --bind-to core:overload-allowed --map-by slot --mca mpi_yield_when_idle 1 \
+            cobaya-run ./projects/lsst_y1/EXAMPLE_EMUL_EMUL2_MCMC1.yaml -r
+
+  - macOS (arm)
+
+        mpirun -n 4 --oversubscribe cobaya-run ./projects/lsst_y1/EXAMPLE_EMUL2_MCMC1.yaml -r
+    
+> [!NOTE]
+> Details on our emulator approach will be written with greater detail in the external readme associated with the [emulator_code](https://github.com/SBU-COSMOLIKE/emulators_code) repository. Basically, we apply standard neural network techniques to generalize the *syren-new* formula for the linear power spectrum for $w_0w_a$CDM with fixed neutrino mass at 0.06eV, shown in Eq 6 of [arXiv:2410.14623](https://arxiv.org/abs/2410.14623) with fixed neutrino mass at 0.06eV to new models or extended ranges or even higher precision. Similarly, we try to generalize the *syren-Halofit* Halofit formula for $\Lambda$CDM, shown in Eq 11 of [arXiv:2402.17492](https://arxiv.org/abs/2402.17492).
+
+> [!NOTE]
+> Users can also decide not to correct the *syren-new* formula for the linear power spectrum (flag provided in the yaml). Although we have not done extensive studies on the caveats of syren-new, this case could be sufficient for forecasts in $w_0w_a$CDM when combined with the Euclid Emulator. On our fiducial *lsst-y1* evaluate cosmic shear example, the $\Delta chi^2$ to CAMB was around $\Delta chi^2 \sim 0.5$. 
+
+> [!NOTE]
+> For quick and dirty calculations and or forecasts, or simply tests of cosmolike, users can also choose not correct the *syren-Halofit*. In this case, the overhead to cosmolike will be less than 0.01 seconds. We chose not to adopt the most sophisticated *syren-new* formula for the nonlinear Boost because the it involves denominators that can cross zero outside their bounds of applicability. Here, we just wanted a crude base model to serve as a baseline for our own emulators.
 
 ## Credits <a name="appendix_proper_credits"></a>
 
