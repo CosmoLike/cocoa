@@ -618,7 +618,7 @@ Previous section focused on emulators that simulate the entire data vector compu
 
 There is, however, an intermediate proposal of emulating only Boltzmann outputs, which can provide greater flexibility. Here, changes to the modeling of lensing/clusterting associated nuisance physics, e.g., intrinsic alignment, or to the lens or source galaxy distributions do not require retraining of the neural network. 
 
-While examples in the previous section all started with the prefix **EXAMPLE_EMUL**, the examples in the hybrid approach have the prefix **EXAMPLE_EMUL2**. Finally, the required flags on `set_installation_options.sh` are similar to what we shown in full emulator section.
+While examples in the previous section all started with the prefix **EXAMPLE_EMUL**, the examples in the hybrid case have the prefix **EXAMPLE_EMUL2**. Finally, the required flags on `set_installation_options.sh` are similar to what we shown in full emulator section.
 
 Now, users must follow all the steps below.
 
@@ -626,7 +626,7 @@ Now, users must follow all the steps below.
 
     source start_cocoa.sh
 
- **Step :two:**: Select the number of OpenMP cores. Below, we set it to 4, the ideal setting on hybrid approach.
+ **Step :two:**: Select the number of OpenMP cores. Below, we set it to 4, the ideal setting on hybrid examples.
 
   - Linux
     
@@ -664,13 +664,16 @@ Now, users must follow all the steps below.
         mpirun -n 4 --oversubscribe cobaya-run ./projects/lsst_y1/EXAMPLE_EMUL2_MCMC1.yaml -r
     
 > [!NOTE]
-> Details on our emulator approach will be written with greater detail in the external readme associated with the [emulator_code](https://github.com/SBU-COSMOLIKE/emulators_code) repository. Basically, we apply standard neural network techniques to generalize the *syren-new* formula for the linear power spectrum for $w_0w_a$CDM with fixed neutrino mass at 0.06eV, shown in Eq 6 of [arXiv:2410.14623](https://arxiv.org/abs/2410.14623) with fixed neutrino mass at 0.06eV to new models or extended ranges or even higher precision. Similarly, we try to generalize the *syren-Halofit* Halofit formula for $\Lambda$CDM, shown in Eq 11 of [arXiv:2402.17492](https://arxiv.org/abs/2402.17492).
+> Details on the matter power spectrum emulator designs will be shown in the external readme associated with the [emulator_code](https://github.com/SBU-COSMOLIKE/emulators_code) repository. As a basic introduction, we apply standard neural network techniques to generalize the *syren-new* formula for the linear power spectrum for w0waCDM with fixed neutrino mass at 0.06eV, shown in Eq 6 of [arXiv:2410.14623](https://arxiv.org/abs/2410.14623) with fixed neutrino mass at 0.06eV to new models or extended ranges or even higher precision. Similarly, we try to generalize the *syren-Halofit* LCDM Halofit formula, shown in Eq 11 of [arXiv:2402.17492](https://arxiv.org/abs/2402.17492).
+>
+> Users can decide not to correct the *syren-new* formula for the linear power spectrum (flag in the yaml). Although we have not conducted extensive studies of the caveats of the syren-new approximation, it seems to be sufficient for w0waCDM forecasts when combined with the Euclid Emulator to compute the nonlinear boost.
+>
+> For back-of-the-envelope LCDM calculations (e.g., to test cosmolike features), users can also choose not to correct the syren-Halofit formula for the nonlinear boost (see figure below). In this case, the overhead on top of cosmolike computations is minimum, at the order of 0.01 seconds on a macOS M2Pro laptop. 
+>
+>  <p align="center">
+>  <img width="700" height="700" alt="compare_emul_hemul" src="https://github.com/user-attachments/assets/c3230e9e-db61-4bce-b2b3-3e1d4c547270" />
+>  </p>
 
-> [!NOTE]
-> Users can also decide not to correct the *syren-new* formula for the linear power spectrum (flag provided in the yaml). Although we have not done extensive studies on the caveats of syren-new, this case could be sufficient for forecasts in $w_0w_a$CDM when combined with the Euclid Emulator. On our fiducial *lsst-y1* evaluate cosmic shear example, the $\Delta chi^2$ to CAMB was around $\Delta chi^2 \sim 0.5$. 
-
-> [!NOTE]
-> For quick and dirty calculations and or forecasts, or simply tests of cosmolike, users can also choose not correct the *syren-Halofit*. In this case, the overhead to cosmolike will be less than 0.01 seconds. We chose not to adopt the most sophisticated *syren-new* formula for the nonlinear Boost because the it involves denominators that can cross zero outside their bounds of applicability. Here, we just wanted a crude base model to serve as a baseline for our own emulators.
 
 ## Credits <a name="appendix_proper_credits"></a>
 
@@ -683,7 +686,8 @@ Now, users must follow all the steps below.
   - Profs. Tim Eifler and Elisabeth Krause for their support of this idea since its inception in 2018 and all Cosmolike-related development.
   - Profs. Antony Lewis and Jesús Torrado for helping me understand Cobaya since its early days in 2019.
   - Jonathan Gordon, Joshua Kable, João Rebouças, Evan Saraivanov, Diogo Souza, Jiachuan Xu, Yijie Zhu, and KunHao Zhong for working on CoCoA on many fruitful projects at Stony Brook Univ. and the Univ. of Arizona.
-  - Evan Saraivanov, Yijie Zhu, and KunHao Zhong for developing the emulator interface within the CoCoA framework.
+  - Evan Saraivanov, Yijie Zhu, and KunHao Zhong for developing the emulator interface within the CoCoA framework (and training emulators).
+  - Victoria Loyd for developing the hybrid-emulator interface within the CoCoA framework (and training emulators).
   - Haley Bowden, Kali Cao, Nihar Dalal, Yu-Hsiu Huang, Niko, Junzhou Zhang, and members of the Roman HLIS Cosmology PIT for all Roman-specific development and testing.
 
 The following is not an exhaustive list of the codes we use/download/adopt
