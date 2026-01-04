@@ -614,7 +614,7 @@ likelihoods, and the theory code, all following Cobaya Conventions.
 > [!Warning]
 > The code and examples associated with this section are still in alpha stage
 
-While the previous section focused on emulators that simulate the entire data vector computed by cosmolike via neural networks, an intermediate approach is to emulate only the Boltzmann outputs. This hybrid-ML case can offer greater flexibility, especially in the initial phases of a research project, as changes to the modeling of nuisance parameters, e.g., intrinsic alignment, or to the galaxy distributions do not require retraining of the network. 
+While the previous section focused on emulators that simulate the entire data vector computed by cosmolike via neural networks, an intermediate approach is to emulate only the Boltzmann outputs. This hybrid-ML case can offer greater flexibility, especially in the initial phases of a research project, as changes to the modeling of nuisance parameters or to the assumed galaxy distributions do not require retraining of the network. 
 
 Examples in the hybrid case all have the prefix **EXAMPLE_EMUL2** (note the `2`). The required flags on `set_installation_options.sh` are similar to what we shown in full emulator section.
 
