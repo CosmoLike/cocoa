@@ -614,7 +614,7 @@ likelihoods, and the theory code, all following Cobaya Conventions.
 > [!Warning]
 > The code and examples associated with this section are still in alpha stage
 
-Our main line of research involves emulators that simulate the entire Cosmolike data vectors, and each project (LSST, Roman, DES) contains its own README with emulator examples. The speed of such emulators is incredible, especially when GPUs are available, and our emulators do take advantage of the CPU-GPU integration on Apple MX chips. For example, the cobaya timing of the average lsst-y1 cosmic shear data vector computation time in a Metropolis-Hastings chain on a macOS M2 Pro is around 0.005s ($\sim 200828$ evaluations in $850.5$s total).
+Our main line of research involves emulators that simulate the entire Cosmolike data vectors, and each project (LSST, Roman, DES) contains its own README with emulator examples. The speed of such emulators is incredible, especially when GPUs are available, and our emulators do take advantage of the CPU-GPU integration on Apple MX chips. For example, the cobaya timing of the average lsst-y1 cosmic shear data vector computation time in a Metropolis-Hastings chain on a macOS M2 Pro is around 0.005s ($\sim$ 200828 evaluations in 850.5 seconds).
 
 While the data vector emulators are incredibly fast, there is an intermediate approach that emulates only the Boltzmann outputs (comoving distance, linear and nonlinear matter power spectrum). This hybrid-ML case can offer greater flexibility, especially in the initial phases of a research project, as changes to the modeling of nuisance parameters or to the assumed galaxy distributions do not require retraining of the network. 
 
@@ -663,12 +663,12 @@ Now, users must follow all the steps below.
 
         mpirun -n 4 --oversubscribe cobaya-run ./projects/lsst_y1/EXAMPLE_EMUL2_MCMC1.yaml -r
     
-Details on the matter power spectrum emulator designs will be presented in the [emulator_code](https://github.com/SBU-COSMOLIKE/emulators_code) repository. Basically, we apply standard neural network techniques to generalize the *syren-new* Eq. 6 of [arXiv:2410.14623](https://arxiv.org/abs/2410.14623) formula for the linear power spectrum (w0waCDM with a fixed neutrino mass of 0.06eV) to new models, extended ranges, or higher precision. Similarly, we use networks to generalize the *syren-Halofit* LCDM Halofit (Eq. 11 of [arXiv:2402.17492](https://arxiv.org/abs/2402.17492)).
+Details on the matter power spectrum emulator designs will be presented in the [emulator_code](https://github.com/SBU-COSMOLIKE/emulators_code) repository. Basically, we apply standard neural network techniques to generalize the *syren-new* Eq. 6 of [arXiv:2410.14623](https://arxiv.org/abs/2410.14623) formula for the linear power spectrum (w0waCDM with a fixed neutrino mass of $0.06$ eV) to new models, extended ranges, or higher precision. Similarly, we use networks to generalize the *syren-Halofit* LCDM boost fit (Eq. 11 of [arXiv:2402.17492](https://arxiv.org/abs/2402.17492)).
 
 > [!NOTE] 
 > Users can decide not to correct the *syren-new* formula for the linear power spectrum (flag in the yaml). Although we have not conducted extensive studies of the caveats of the syren-new approximation, it appears sufficient for w0waCDM forecasts when combined with the Euclid Emulator to compute the nonlinear boost.
 >
-> For back-of-the-envelope LCDM calculations (e.g., to test cosmolike features), users can also choose not to correct the syren-Halofit formula for the nonlinear boost (see figure below). In this case, the overhead on top of cosmolike computations is minimum, at the order of 0.01 seconds on a macOS M2Pro laptop. 
+> For back-of-the-envelope LCDM calculations (e.g., to test cosmolike features), users can also choose not to correct the syren-Halofit formula for the nonlinear boost (see figure below). In this case, the overhead on top of cosmolike computations is minimum, at the order of $0.01$ seconds on a macOS M2Pro laptop. 
 >
 >  <p align="center">
 >  <img width="700" height="700" alt="compare_emul_hemul" src="https://github.com/user-attachments/assets/efebb807-0f44-433a-80a9-3f600eab1e26" />
