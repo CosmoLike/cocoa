@@ -671,7 +671,7 @@ Details on the matter power spectrum emulator designs will be presented in the [
 > For back-of-the-envelope LCDM calculations (e.g., to test cosmolike features), users can also choose not to correct the *syren-Halofit* formula for the LCDM nonlinear boost (see figure below). In this case, the overhead on top of cosmolike computations is minimum, at the order of $0.01$ seconds on a macOS M2Pro laptop. 
 >
 >  <p align="center">
->  <img width="700" height="700" alt="compare_emul_hemul" src="https://github.com/user-attachments/assets/efebb807-0f44-433a-80a9-3f600eab1e26" />
+>  <img width="700" height="700" alt="compare_emul_hemul" src="https://github.com/user-attachments/assets/c3c6814f-6674-46c9-b567-1167948082bb" />
 >  </p>
 
 ## Credits <a name="appendix_proper_credits"></a>
