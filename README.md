@@ -614,9 +614,11 @@ likelihoods, and the theory code, all following Cobaya Conventions.
 > [!Warning]
 > The code and examples associated with this section are still in alpha stage
 
-While the previous section focused on emulators that simulate the entire data vector computed by cosmolike via neural networks, an intermediate approach is to emulate only the Boltzmann outputs. This hybrid-ML case can offer greater flexibility, especially in the initial phases of a research project, as changes to the modeling of nuisance parameters or to the assumed galaxy distributions do not require retraining of the network. 
+Our main line of research involves emulators that simulate the entire Cosmolike data vectors, and each project (LSST, Roman, DES) contains its own README with emulator examples. The speed of such emulators is incredible, especially when GPUs are available, and our emulators do take advantage of the CPU-GPU integration on Apple MX chips. For example, the cobaya timing of the average lsst-y1 cosmic shear data vector computation time in a Metropolis-Hastings chain on a macOS M2 Pro is around 0.005s ($\sim 200828$ evaluations in 850.543s total).
 
-Examples in the hybrid case all have the prefix **EXAMPLE_EMUL2** (note the `2`). The required flags on `set_installation_options.sh` are similar to what we shown in full emulator section.
+While the data vector emulators are incredibly fast, there is an intermediate approach that emulates only the Boltzmann outputs (comoving distance, linear and nonlinear matter power spectrum). This hybrid-ML case can offer greater flexibility, especially in the initial phases of a research project, as changes to the modeling of nuisance parameters or to the assumed galaxy distributions do not require retraining of the network. 
+
+Examples in the hybrid case all have the prefix **EXAMPLE_EMUL2** (note the `2`). The required flags on `set_installation_options.sh` are similar to what we showed in the previous emulator section.
 
 Now, users must follow all the steps below.
 
@@ -624,7 +626,7 @@ Now, users must follow all the steps below.
 
     source start_cocoa.sh
 
- **Step :two:**: Select the number of OpenMP cores. Below, we set it to 4, the ideal setting on hybrid examples.
+ **Step :two:**: Select the number of OpenMP cores. Below, we set it to 4, the ideal setting for hybrid examples.
 
   - Linux
     
@@ -634,7 +636,7 @@ Now, users must follow all the steps below.
     
         export OMP_NUM_THREADS=4; export OMP_PROC_BIND=disabled; export OMP_PLACES=cores; export OMP_DYNAMIC=FALSE
     
- **Step :three:** Run `cobaya-run` on the first emulator example following the commands below (here we only provide lsst-y1 examples).
+ **Step :three:** Run `cobaya-run` on the first emulator example, following the commands below (here we only provide lsst-y1 examples).
 
 - **One model evaluation**:
 
@@ -661,15 +663,15 @@ Now, users must follow all the steps below.
 
         mpirun -n 4 --oversubscribe cobaya-run ./projects/lsst_y1/EXAMPLE_EMUL2_MCMC1.yaml -r
     
-Details on the matter power spectrum emulator designs will be presented in the [emulator_code](https://github.com/SBU-COSMOLIKE/emulators_code) repository. Basically, we apply standard neural network techniques to generalize the *syren-new* Eq. 6 of [arXiv:2410.14623](https://arxiv.org/abs/2410.14623) formula for the linear power spectrum (w0waCDM with a fixed neutrino mass of 0.06eV) to new models, extended ranges or higher precision. Similarly, we use networks to generalize the *syren-Halofit* LCDM Halofit (Eq. 11 of [arXiv:2402.17492](https://arxiv.org/abs/2402.17492)).
+Details on the matter power spectrum emulator designs will be presented in the [emulator_code](https://github.com/SBU-COSMOLIKE/emulators_code) repository. Basically, we apply standard neural network techniques to generalize the *syren-new* Eq. 6 of [arXiv:2410.14623](https://arxiv.org/abs/2410.14623) formula for the linear power spectrum (w0waCDM with a fixed neutrino mass of 0.06eV) to new models, extended ranges, or higher precision. Similarly, we use networks to generalize the *syren-Halofit* LCDM Halofit (Eq. 11 of [arXiv:2402.17492](https://arxiv.org/abs/2402.17492)).
 
 > [!NOTE] 
-> Users can decide not to correct the *syren-new* formula for the linear power spectrum (flag in the yaml). Although we have not conducted extensive studies of the caveats of the syren-new approximation, it seems to be sufficient for w0waCDM forecasts when combined with the Euclid Emulator to compute the nonlinear boost.
+> Users can decide not to correct the *syren-new* formula for the linear power spectrum (flag in the yaml). Although we have not conducted extensive studies of the caveats of the syren-new approximation, it appears sufficient for w0waCDM forecasts when combined with the Euclid Emulator to compute the nonlinear boost.
 >
 > For back-of-the-envelope LCDM calculations (e.g., to test cosmolike features), users can also choose not to correct the syren-Halofit formula for the nonlinear boost (see figure below). In this case, the overhead on top of cosmolike computations is minimum, at the order of 0.01 seconds on a macOS M2Pro laptop. 
 >
 >  <p align="center">
->  <img width="700" height="700" alt="compare_emul_hemul" src="https://github.com/user-attachments/assets/e1f1b57b-10f0-4590-a4ba-c109bc54dc4b" />
+>  <img width="700" height="700" alt="compare_emul_hemul" src="https://github.com/user-attachments/assets/efebb807-0f44-433a-80a9-3f600eab1e26" />
 >  </p>
 
 ## Credits <a name="appendix_proper_credits"></a>
