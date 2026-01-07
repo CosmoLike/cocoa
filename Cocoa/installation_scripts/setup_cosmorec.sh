@@ -93,7 +93,7 @@ if [ -z "${IGNORE_COSMOREC_CODE}" ]; then
   
     cdfolder "${ECODEF:?}" || { cdroot; return 1; }
 
-    "${WGET:?}" "${URL:?}" -q --show-progress --progress=bar:force || { error "${EC24:?}"; return 1; }
+    "${WGET:?}" "${URL:?}" -q --show-progress --no-check-certificate --progress=bar:force || { error "${EC24:?}"; return 1; }
     
     tar -zxvf "${FILE:?}" >>${OUT1:?} 2>${OUT2:?} || { error "${EC25:?}"; return 1; }
 
