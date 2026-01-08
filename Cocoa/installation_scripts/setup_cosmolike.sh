@@ -64,9 +64,11 @@ if [ -z "${IGNORE_COSMOLIKE_CODE}" ]; then
   fi
 
   if [ ! -d "${PACKDIR:?}" ]; then
+    
     cdfolder "${ECODEF:?}" || { cdroot; return 1; }
 
     if [ -n "${COSMOLIKE_GIT_COMMIT}" ]; then
+    
       "${GIT:?}" clone "${URL:?}" "${FOLDER:?}" \
         >>${OUT1:?} 2>>${OUT2:?} || { error "${EC15:?}"; return 1; }
     
@@ -74,12 +76,29 @@ if [ -z "${IGNORE_COSMOLIKE_CODE}" ]; then
 
       "${GIT:?}" checkout "${COSMOLIKE_GIT_COMMIT:?}" \
         >>${OUT1:?} 2>>${OUT2:?} || { error "${EC16:?}"; return 1; }
+    
     elif [ -n "${COSMOLIKE_GIT_BRANCH}" ]; then
+    
       "${GIT:?}" clone "${URL:?}" "${FOLDER:?}" --branch ${COSMOLIKE_GIT_BRANCH:?} \
         --single-branch >>${OUT1:?} 2>>${OUT2:?} || { error "${EC15:?}"; return 1; }
+    
+    elif [ -n "${COSMOLIKE_GIT_TAG}" ]; then
+    
+      "${GIT:?}" clone "${URL:?}" "${FOLDER:?}" \
+        >>${OUT1:?} 2>>${OUT2:?} || { error "${EC15:?}"; return 1; }
+    
+      cdfolder "${PACKDIR}" || { cdroot; return 1; }
+      
+      "${GIT:?}" fetch --all --tags --prune
+
+      "${GIT:?}" checkout tags/${COSMOLIKE_GIT_TAG:?} -b ${COSMOLIKE_GIT_TAG:?} \
+        >>${OUT1:?} 2>>${OUT2:?} || { error "${EC16:?}"; return 1; }      
+    
     else
+    
       "${GIT:?}" clone --depth ${GIT_CLONE_MAXIMUM_DEPTH:?} "${URL:?}" "${FOLDER:?}" \
         >>${OUT1:?} 2>>${OUT2:?} || { error "${EC15:?}"; return 1; }
+    
     fi
   fi
 

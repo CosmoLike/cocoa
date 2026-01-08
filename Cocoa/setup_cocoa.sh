@@ -94,7 +94,6 @@ declare -i ERRORCODE=0
 declare -a SCRIPTS=( "setup_core_packages.sh" 
                      "setup_pip_core_packages.sh"
                      "setup_cobaya.sh"
-                     "setup_cosmolike.sh"
                      "setup_fgspectra.sh"
                      "setup_simons_observatory.sh"
                      "setup_lipop.sh"
@@ -129,6 +128,7 @@ declare -a SCRIPTS=( "setup_core_packages.sh"
                      "unxv_lipop.sh"
                      "unxv_emultrf.sh"
                      "unxv_cosmopower.sh"
+                     "setup_cosmolike.sh"
                      "setup_cosmolike_projects.sh"
                      )
 
