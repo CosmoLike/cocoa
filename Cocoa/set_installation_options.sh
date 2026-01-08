@@ -210,7 +210,7 @@ export COBAYA_GIT_COMMIT="86943d81d48d2edb2961b17077461df9e799f4d1"
 
 export COSMOLIKE_URL="https://github.com/CosmoLike/cocoa-cosmolike-core.git"
 #export COSMOLIKE_GIT_COMMIT= ""
-export COSMOLIKE_BRANCH="dev"
+export COSMOLIKE_GIT_BRANCH="dev"
 export COSMOLIKE_NAME="cosmolike_core"
 
 export HILLIPOP_URL="https://github.com/planck-npipe/hillipop.git"
