@@ -144,7 +144,13 @@ In this section, we assume users have previously activated the Cocoa conda envir
 
 **Step :one:**: Download Cocoa's latest release and go to its main folder (`cocoa/Cocoa`),
 
-    git clone git@github.com:SBU-COSMOLIKE/cocoa.git cocoa
+  - Stable Version
+    
+        git clone https://github.com/CosmoLike/cocoa.git --branch v4.05 cocoa
+
+  - Testing beta release
+    
+        git clone https://github.com/CosmoLike/cocoa.git --branch v5.0beta1 cocoa
 
 and
 
@@ -1242,7 +1248,7 @@ Assuming, for concreteness, that users want to fork relevant repositories from S
     (...)
     export DESXPLANCK_URL="git@github.com:SBU-COSMOLIKE/cocoa_desy1xplanck.git"  # This is DES-Y3 maglim
 
-    
+
 ## :interrobang: FAQ: Note on Planck-2018 low-ell SimAll EE and Gibbs TT likelihoods <a name="planck2018lowell"></a>
 
 Cocoa does not adopt Cobaya's Python reimplementation of SimAll EE and Gibbs TT likelihoods. Therefore, we patch the files. 
@@ -1255,7 +1261,7 @@ to call the original Planck-2018 Clik likelihoods, as shown below.
 <img width="1146" height="498" alt="Screenshot 2025-10-20 at 8 38 56 PM" src="https://github.com/user-attachments/assets/4ab8beff-bda1-4bf8-b2c6-56f5501e3773" />
 <img width="1236" height="514" alt="Screenshot 2025-10-20 at 8 39 04 PM" src="https://github.com/user-attachments/assets/22b21a5d-c716-45dc-949c-59f31be91def" />
 
-This ensures backward consistency in our code, as `TT.py` and `EE.py` used to point to Planck-2018 Clik before Cobaya's authors moved them to `EE_clik.py` and `TT_clik.py`. 
+This ensures backward consistency in our code, as `TT.py` and `EE.py` used to point to Planck-2018 Clik before Cobaya's authors moved them to `EE_clik.py` and `TT_clik.py`.
 
 ## :interrobang: FAQ: How can users improve our Bash/C/C++ knowledge? <a name="lectnotes"></a>
 
