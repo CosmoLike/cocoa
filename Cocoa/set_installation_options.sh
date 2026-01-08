@@ -70,6 +70,7 @@ export IGNORE_MGCAMB_CODE=1
 export IGNORE_COSMOPOWER_CODE=1   #unable to install cosmopower on modern Python
 #export IGNORE_EUCLID_EMULATOR_V2_CODE=1
 export IGNORE_DARK_EMULATOR_CODE=1
+#export IGNORE_FASTPT_CODE=1
 export IGNORE_NAUTILUS_SAMPLER_CODE=1
 export IGNORE_DERIVKIT_CODE=1
 export IGNORE_TENSIOMETER_CODE=1
@@ -319,6 +320,9 @@ export DARKEMULATOR_GIT_COMMIT="46df5972509624e2eeadc2bf3ac528b02333a7e2"
 
 export FASTPT_URL="https://github.com/jablazek/FAST-PT.git"
 export FASTPT_GIT_COMMIT="5e65ad23becaaae5b18aedcaacab99411df92b0f"
+export FASTPT_NAME="FAST-PT"
+export FASTPT_WRAPPER_URL="https://github.com/JerreYjz/fastpt.git"
+export FASTPT_WRAPPER_NAME="PyFAST-PT"
 
 export NAUTILUS_SAMPLER_URL="https://github.com/johannesulf/nautilus.git"
 export NAUTILUS_SAMPLER_GIT_COMMIT="fc5e84deffb96755b31b3f9834590e28ab5b6016"
