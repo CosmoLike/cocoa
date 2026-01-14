@@ -106,8 +106,10 @@ if [ -z "${IGNORE_EMULTRF_CODE}" ]; then
       
       "${GIT:?}" fetch --all --tags --prune
 
-      "${GIT:?}" checkout tags/${EMULTRF_GIT_TAG:?} -b ${EMULTRF_GIT_TAG:?} \
-        >>${OUT1:?} 2>>${OUT2:?} || { error "${EC16:?}"; return 1; } 
+      if ! "${GIT:?}" show-ref --verify --quiet "refs/heads/${TAG}"; then
+        "${GIT:?}" checkout tags/${EMULTRF_GIT_TAG:?} -b ${EMULTRF_GIT_TAG:?} \
+          >>${OUT1:?} 2>>${OUT2:?} || { error "${EC16:?}"; return 1; } 
+      fi
 
     else
     
