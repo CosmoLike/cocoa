@@ -112,8 +112,10 @@ gitact3() {
   if [ -d "${PACKDIR:?}" ]; then
     cdfolder "${PACKDIR:?}" || return 1;
     "${GIT:?}" fetch --all --tags --prune
-    "${GIT:?}" checkout tags/${TAG} -b ${TAG} \
-      >${OUT1:?} 2>${OUT2:?} || { error "${EC16:?}"; return 1; }
+    if ! "${GIT:?}" show-ref --verify --quiet "refs/heads/${TAG}"; then
+      "${GIT:?}" checkout tags/${TAG} -b ${TAG} \
+        >${OUT1:?} 2>${OUT2:?} || { error "${EC16:?}"; return 1; }
+    fi
   fi
     
   cdfolder "${ROOTDIR}" || return 1;
@@ -139,8 +141,6 @@ if [ -z "${IGNORE_COSMOLIKE_LSST_Y1_CODE}" ]; then
   FOLDER="${LSST_Y1_NAME:-"lsst_y1"}"
 
   URL="${LSST_Y1_URL:-"https://github.com/CosmoLike/cocoa_lsst_y1.git"}"
-
-  
 
   if [ -n "${LSST_Y1_COMMIT}" ]; then
     gitact0 "${FOLDER:?}" "${URL:?}"
@@ -204,8 +204,6 @@ if [ -z "${IGNORE_COSMOLIKE_ROMAN_FOURIER_CODE}" ]; then
 
   URL="${ROMAN_FOURIER_URL:-"git@github.com:CosmoLike/cocoa_roman_fourier.git"}"
 
-  
-
   if [ -n "${ROMAN_FOURIER_COMMIT}" ]; then
     gitact0 "${FOLDER:?}" "${URL:?}"
     gitact2 "${FOLDER:?}" "${ROMAN_FOURIER_COMMIT:?}"  || return 1
@@ -254,7 +252,7 @@ if [ -z "${IGNORE_COSMOLIKE_ROMAN_REAL_CODE}" ]; then
 fi
 
 # ----------------------------------------------------------------------------
-# ----------------------------- DES x Planck ------------------------------
+# ----------------------------- DES x Planck ---------------------------------
 # ----------------------------------------------------------------------------
 
 if [ -z "${IGNORE_COSMOLIKE_DESXPLANCK_CODE}" ]; then 
