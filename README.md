@@ -44,9 +44,6 @@ Core packages include compilers and numerical libraries that users typically do 
 
 **Step :one:**: Download the appropriate `Python-3.10` compatible `yml` file
 
-> [!Note]
-> We recommend but do not yet impose the use of the package `conda-lock` and its tailored YML files to install the Cocoa conda environment, *see the [Tip] section below*
-
   - Linux
     
          wget https://raw.githubusercontent.com/CosmoLike/cocoa/refs/heads/dev/cocoapy310.yml
@@ -60,7 +57,10 @@ Core packages include compilers and numerical libraries that users typically do 
     This will activate the conda base environment (the prefix `(base)`) and install `wget`. Then, type.
 
         wget https://raw.githubusercontent.com/CosmoLike/cocoa/refs/heads/dev/cocoapy310-osxarm-base.yml
-   
+
+> [!Note]
+> We recommend but do not yet impose the use of the package `conda-lock` and its tailored YML files to install the Cocoa conda environment, *see the [Tip] section below*
+
 **Step :two:**: Create the Cocoa environment,
 
   - Linux
