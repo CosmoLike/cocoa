@@ -197,7 +197,7 @@ Users can now proceed to **the next section**.
 
 # Running Examples  <a name="cobaya_base_code_examples"></a>
 
-We assume that you are still in the Conda cocoa environment from the previous `conda activate cocoa` command and that you are in the cocoa main folder `cocoa/Cocoa`, 
+We assume that you are still in the Conda cocoa environment from the previous `conda activate cocoa` command, and that users switch to bash, and that you are in the cocoa main folder `cocoa/Cocoa`, 
 
  **Step :one:**: Activate the private Python environment by sourcing the script `start_cocoa.sh`
 
