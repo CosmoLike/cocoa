@@ -42,6 +42,10 @@ We provide the Docker image [whovian-cocoa](https://hub.docker.com/r/vivianmiran
 
 Core packages include compilers and numerical libraries that users typically do not modify.
 
+**Step :zero:** If you are using zsh, switch to bash by typing
+
+    bash
+
 **Step :one:**: Download the appropriate `Python-3.10` compatible `yml` file
 
   - Linux
