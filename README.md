@@ -79,6 +79,26 @@ and activate it
 
     conda activate cocoa
 
+
+> [!Note]
+> During the Arizona Winter School (January 2026), we noted that some students with macOS struggled to get the conda to work (conflicts). 
+> If this is the case, try the steps below instead
+>
+> **Step :one:** Create a new base environment, as your base may have legacy packages that can create incompatibilities (note here slightly modified conda command)
+> 
+>      conda create --solver=libmamba --strict-channel-priority --override-channels -c conda-forge --name base2
+>      conda activate base2
+>
+> **Step :one:** Install wget and download a looser version of the yml file (note here slightly modified conda command)
+>
+>      conda install -y wget --solver=libmamba --strict-channel-priority --override-channels -c conda-forge
+>      wget https://raw.githubusercontent.com/CosmoLike/cocoa/refs/heads/dev/cocoapy310-osxarm-loose.yml
+>
+> **Step :two:** Create the cocoa conda env using a looser yml ((note here slightly modified conda command)
+>    
+>     conda env create --solver=libmamba --name cocoa -f cocoapy310-osxarm-loose.yml
+> 
+
 **Step :three:**: When and only when loading the conda cocoa environment for the first time, create the following symbolic links
 
   - Linux
