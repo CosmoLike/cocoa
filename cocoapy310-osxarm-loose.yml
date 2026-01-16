@@ -1,6 +1,7 @@
 name: cocoa-mac-arm
 channels:
   - conda-forge
+channel_priority: strict
 dependencies:
   - python=3.10
   - pip
