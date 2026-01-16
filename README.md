@@ -89,7 +89,7 @@ and activate it
 >      conda create --solver=libmamba --strict-channel-priority --override-channels -c conda-forge --name base2
 >      conda activate base2
 >
-> **Step :one:** Install wget and download a looser version of the yml file (note here slightly modified conda command)
+> Now Install wget and download a looser version of the yml file (note here slightly modified conda command)
 >
 >      conda install -y wget --solver=libmamba --strict-channel-priority --override-channels -c conda-forge
 >      wget https://raw.githubusercontent.com/CosmoLike/cocoa/refs/heads/dev/cocoapy310-osxarm-loose.yml
