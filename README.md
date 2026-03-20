@@ -117,7 +117,7 @@ Users can now proceed to the **next section**.
 > **Step :two:** Download the file appropriate conda-lock compatible `yml` file.
 >   - Linux
 >     
->         wget https://raw.githubusercontent.com/CosmoLike/cocoa/refs/heads/dev/cocoapy310-linux.yml
+>         wget https://raw.githubusercontent.com/SBU-COSMOLIKE/cocoa/refs/heads/main/cocoapy310.yml
 >
 >   - macOS (arm)
 >     
@@ -144,13 +144,7 @@ In this section, we assume users have previously activated the Cocoa conda envir
 
 **Step :one:**: Download Cocoa's latest release and go to its main folder (`cocoa/Cocoa`),
 
-  - Stable Version
-    
-        git clone https://github.com/CosmoLike/cocoa.git --branch v4.05 cocoa
-
-  - Testing beta release
-    
-        git clone https://github.com/CosmoLike/cocoa.git --branch v5.0beta1 cocoa
+      git clone git@github.com:SBU-COSMOLIKE/cocoa.git cocoa
 
 and
 
@@ -221,7 +215,7 @@ Users will see a terminal like this: `$(cocoa)(.local)`. *This is a feature, not
   - Linux
   
         mpirun -n 1 --oversubscribe --mca pml ^ucx --mca btl vader,tcp,self \
-           --bind-to core:overload-allowed --mca mpi_yield_when_idle 1 --report-bindings  \
+           --bind-to core:overload-allowed --report-bindings  \
            --rank-by slot --map-by numa:pe=${OMP_NUM_THREADS} \
            cobaya-run ./projects/example/EXAMPLE_EVALUATE1.yaml -f
 
@@ -234,7 +228,7 @@ Users will see a terminal like this: `$(cocoa)(.local)`. *This is a feature, not
     - Linux
   
           mpirun -n 4 --oversubscribe --mca pml ^ucx --mca btl vader,tcp,self \
-             --bind-to core:overload-allowed --mca mpi_yield_when_idle 1 --report-bindings  \
+             --bind-to core:overload-allowed --report-bindings  \
              --rank-by slot --map-by numa:pe=${OMP_NUM_THREADS} \
              cobaya-run ./projects/example/EXAMPLE_MCMC1.yaml -f
 
@@ -251,7 +245,7 @@ Users will see a terminal like this: `$(cocoa)(.local)`. *This is a feature, not
   - Linux
 
         mpirun -n 1 --oversubscribe --mca pml ^ucx --mca btl vader,tcp,self \
-           --bind-to core:overload-allowed --mca mpi_yield_when_idle 1 --report-bindings  \
+           --bind-to core:overload-allowed --report-bindings  \
            --rank-by slot --map-by numa:pe=${OMP_NUM_THREADS} \
            cobaya-run ./projects/lsst_y1/EXAMPLE_EVALUATE1.yaml -f
 
@@ -264,7 +258,7 @@ Users will see a terminal like this: `$(cocoa)(.local)`. *This is a feature, not
   - Linux
     
         mpirun -n 4 --oversubscribe --mca pml ^ucx --mca btl vader,tcp,self \
-           --bind-to core:overload-allowed --mca mpi_yield_when_idle 1 --report-bindings  \
+           --bind-to core:overload-allowed --report-bindings  \
            --rank-by slot --map-by numa:pe=${OMP_NUM_THREADS} \
            cobaya-run ./projects/lsst_y1/EXAMPLE_MCMC1.yaml -f
 
@@ -353,7 +347,7 @@ Now, users must follow all the steps below.
   - Linux
     
         mpirun -n 1 --oversubscribe --mca pml ^ucx --mca btl vader,tcp,self --rank-by slot \
-          --bind-to core:overload-allowed --map-by slot --mca mpi_yield_when_idle 1 \
+          --bind-to core:overload-allowed --map-by slot \
           cobaya-run ./projects/example/EXAMPLE_EMUL_EVALUATE1.yaml -f
 
   - macOS (arm)
@@ -365,7 +359,7 @@ Now, users must follow all the steps below.
   - Linux
     
         mpirun -n 4 --oversubscribe --mca pml ^ucx --mca btl vader,tcp,self --rank-by slot \
-            --bind-to core:overload-allowed --map-by slot --mca mpi_yield_when_idle 1 \
+            --bind-to core:overload-allowed --map-by slot \
             cobaya-run ./projects/example/EXAMPLE_EMUL_MCMC1.yaml -r
 
   - macOS (arm)
@@ -382,7 +376,7 @@ Now, users must follow all the steps below.
   - Linux
     
         mpirun -n 90 --oversubscribe --mca pml ^ucx --mca btl vader,tcp,self --rank-by slot \
-            --bind-to core:overload-allowed --map-by slot --mca mpi_yield_when_idle 1 \
+            --bind-to core:overload-allowed --map-by slot \
             cobaya-run ./projects/example/EXAMPLE_EMUL_POLY1.yaml -r
 
   - macOS (arm)
@@ -392,6 +386,9 @@ Now, users must follow all the steps below.
 > [!Note]
 > When running `PolyChord` or any of our scripts in more than one node, replace `--mca btl vader,tcp,self` by `--mca btl tcp,self`.
 
+> [!Note]
+> When running `PolyChord` (or any of the samplers below) with oversubscription (more MPI processes than available cores), add the option `--mca mpi_yield_when_idle 1`
+
 The `Nautilis`, `Minimizer`, `Profile`, and `Emcee` scripts below contain an internally defined `yaml_string` that specifies priors, 
 likelihoods, and the theory code, all following Cobaya Conventions.
 
@@ -400,7 +397,7 @@ likelihoods, and the theory code, all following Cobaya Conventions.
   - Linux
     
         mpirun -n 90 --oversubscribe --mca pml ^ucx --mca btl vader,tcp,self --rank-by slot \
-            --bind-to core:overload-allowed --map-by slot --mca mpi_yield_when_idle 1 \
+            --bind-to core:overload-allowed --map-by slot \
             python -m mpi4py.futures ./projects/example/EXAMPLE_EMUL_NAUTILUS1.py \
                 --root ./projects/example/ --outroot "EXAMPLE_EMUL_NAUTILUS1"  \
                 --maxfeval 450000 --nlive 2048 --neff 15000 --flive 0.01 --nnetworks 5
@@ -419,7 +416,7 @@ likelihoods, and the theory code, all following Cobaya Conventions.
     - Linux
       
           mpirun -n 21 --oversubscribe --mca pml ^ucx --mca btl vader,tcp,self --rank-by slot \
-              --bind-to core:overload-allowed --map-by slot --mca mpi_yield_when_idle 1 \
+              --bind-to core:overload-allowed --map-by slot \
               python ./projects/example/EXAMPLE_EMUL_EMCEE1.py --root ./projects/example/ \
                   --outroot "EXAMPLE_EMUL_EMCEE1" --maxfeval 80000
 
@@ -460,7 +457,7 @@ likelihoods, and the theory code, all following Cobaya Conventions.
     - Linux
       
           mpirun -n 21 --oversubscribe --mca pml ^ucx --mca btl vader,tcp,self --rank-by slot \
-              --bind-to core:overload-allowed --map-by slot --mca mpi_yield_when_idle 1 \
+              --bind-to core:overload-allowed --map-by slot \
               python ./projects/example/EXAMPLE_EMUL_MINIMIZE1.py --root ./projects/example/ \
                   --outroot "EXAMPLE_EMUL_MIN1" --nstw 200
   
@@ -493,7 +490,7 @@ likelihoods, and the theory code, all following Cobaya Conventions.
     - Linux
       
           mpirun -n 21 --oversubscribe --mca pml ^ucx --mca btl vader,tcp,self --rank-by slot \
-              --bind-to core:overload-allowed --map-by slot --mca mpi_yield_when_idle 1 \
+              --bind-to core:overload-allowed --map-by slot \
               python ./projects/example/EXAMPLE_EMUL_PROFILE1.py \
                   --root ./projects/example/ --cov 'chains/EXAMPLE_EMUL_MCMC1.covmat' \
                   --outroot "EXAMPLE_EMUL_PROFILE1" --factor 3 --nstw 200 --numpts 10 \
@@ -533,7 +530,7 @@ likelihoods, and the theory code, all following Cobaya Conventions.
     - Linux
       
           mpirun -n 1 --mca pml ^ucx --mca btl vader,tcp,self --rank-by slot \
-              --bind-to core:overload-allowed --map-by slot --mca mpi_yield_when_idle 1 \
+              --bind-to core:overload-allowed --map-by slot \
               python ./projects/example/EXAMPLE_EMUL_PROFILE_SCIPY1.py \
                   --root ./projects/example/ --cov 'chains/EXAMPLE_EMUL_MCMC1.covmat' \
                   --outroot "EXAMPLE_EMUL_PROFILE1M2" --factor 3 --maxfeval 5000 --numpts 10 \
@@ -561,7 +558,7 @@ likelihoods, and the theory code, all following Cobaya Conventions.
     - Linux
       
           mpirun -n 90 --oversubscribe --mca pml ^ucx --mca btl vader,tcp,self \
-              --bind-to core:overload-allowed --map-by slot --mca mpi_yield_when_idle 1 \
+              --bind-to core:overload-allowed --map-by slot \
               python -m mpi4py.futures ./projects/example/EXAMPLE_EMUL_SCAN1.py \
                   --root ./projects/example/ --outroot "EXAMPLE_EMUL_SCAN1" --nstw 200 --profile 1
 
@@ -607,7 +604,7 @@ likelihoods, and the theory code, all following Cobaya Conventions.
 >  - Linux
 >    
 >        mpirun -n 1 --oversubscribe --mca pml ^ucx --mca btl vader,tcp,self --rank-by slot \
->          --bind-to core:overload-allowed --map-by slot --mca mpi_yield_when_idle 1 \
+>          --bind-to core:overload-allowed --map-by slot \
 >          cobaya-run ./projects/example/EXAMPLE_EMUL_EVALUATE2_CP.yaml -f
 >
 >  - macOS (arm)
@@ -649,7 +646,7 @@ Now, users must follow all the steps below.
   - Linux
     
         mpirun -n 1 --oversubscribe --mca pml ^ucx --mca btl vader,tcp,self \
-           --bind-to core:overload-allowed --mca mpi_yield_when_idle 1 --report-bindings  \
+           --bind-to core:overload-allowed --report-bindings  \
            --rank-by slot --map-by numa:pe=${OMP_NUM_THREADS} \
            cobaya-run ./projects/lsst_y1/EXAMPLE_EMUL2_EVALUATE1.yaml -f
 
@@ -662,7 +659,7 @@ Now, users must follow all the steps below.
   - Linux
     
         mpirun -n 4 --oversubscribe --mca pml ^ucx --mca btl vader,tcp,self --rank-by slot \
-            --bind-to core:overload-allowed --map-by slot --mca mpi_yield_when_idle 1 \
+            --bind-to core:overload-allowed --map-by slot \
             cobaya-run ./projects/lsst_y1/EXAMPLE_EMUL_EMUL2_MCMC1.yaml -r
 
   - macOS (arm)
