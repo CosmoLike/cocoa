@@ -208,7 +208,7 @@ export GIT_CLONE_MAXIMUM_DEPTH=500
 export COBAYA_URL="https://github.com/CobayaSampler/cobaya.git"
 export COBAYA_GIT_COMMIT="86943d81d48d2edb2961b17077461df9e799f4d1"
 
-export COSMOLIKE_URL="git@github.com:SBU-COSMOLIKE/cocoa-cosmolike-core.git"
+export COSMOLIKE_URL="https://github.com/COSMOLIKE/cocoa-cosmolike-core.git"
 #export COSMOLIKE_GIT_COMMIT= ""
 export COSMOLIKE_NAME="cosmolike_core"
 
@@ -341,7 +341,7 @@ export GETDIST_NAME="getdist"
 # Cosmolike projects below -------------------------------------------
 # --------------------------------------------------------------------
 # --------------------------------------------------------------------
-export LSST_Y1_URL="git@github.com:SBU-COSMOLIKE/cocoa_lsst_y1.git"
+export LSST_Y1_URL="https://github.com/COSMOLIKE/cocoa_lsst_y1.git"
 export LSST_Y1_NAME="lsst_y1"
 #BRANCH: if unset, load the latest commit on the specified branch
 #export LSST_Y1_BRANCH="dev"
@@ -350,7 +350,7 @@ export LSST_Y1_NAME="lsst_y1"
 #BRANCH: if unset, load the specified TAG
 #export LSST_Y1_TAG="v5.0beta1"
 
-export DES_Y3_URL="git@github.com:SBU-COSMOLIKE/cocoa_des_y3.git"
+export DES_Y3_URL="https://github.com/COSMOLIKE/cocoa_des_y3.git"
 export DES_Y3_NAME="des_y3"
 #BRANCH: if unset, load the latest commit on the specified branch
 #export DES_Y3_BRANCH="dev"
@@ -359,7 +359,7 @@ export DES_Y3_NAME="des_y3"
 #BRANCH: if unset, load the specified TAG
 #export DES_Y3_TAG="v5.0beta1"
 
-export ROMAN_FOURIER_URL="git@github.com:SBU-COSMOLIKE/cocoa_roman_fourier.git"
+export ROMAN_FOURIER_URL="https://github.com/COSMOLIKE/cocoa_roman_fourier.git"
 export ROMAN_FOURIER_NAME="roman_fourier"
 #BRANCH: if unset, load the latest commit on the specified branch
 #export ROMAN_FOURIER_BRANCH="dev2"
@@ -368,7 +368,7 @@ export ROMAN_FOURIER_NAME="roman_fourier"
 #BRANCH: if unset, load the specified TAG
 #export ROMAN_FOURIER_TAG="v5.0beta1"
 
-export ROMAN_REAL_URL="git@github.com:SBU-COSMOLIKE/cocoa_roman_real.git"
+export ROMAN_REAL_URL="https://github.com/COSMOLIKE/cocoa_roman_real.git"
 export ROMAN_REAL_NAME="roman_real"
 #BRANCH: if unset, load the latest commit on the specified branch
 #export ROMAN_REAL_BRANCH="dev"
@@ -377,7 +377,7 @@ export ROMAN_REAL_NAME="roman_real"
 #BRANCH: if unset, load the specified TAG
 #export ROMAN_REAL_TAG="v5.0beta2"
 
-export DESXPLANCK_URL="git@github.com:SBU-COSMOLIKE/cocoa_desy1xplanck.git"
+export DESXPLANCK_URL="https://github.com/COSMOLIKE/cocoa_desy1xplanck.git"
 #export DESXPLANCK_NAME="desy1xplanck"
 #export DESXPLANCK_BRANCH="dev"
 #export DESXPLANCK_COMMIT=
