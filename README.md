@@ -44,6 +44,10 @@ We provide the Docker image [whovian-cocoa](https://hub.docker.com/r/vivianmiran
 
 Core packages include compilers and numerical libraries that users typically do not modify.
 
+**Step :zero:** If you are using zsh, switch to bash by typing
+
+    bash
+
 **Step :one:**: Download the appropriate `Python-3.10` compatible `yml` file
 
 > [!Note]
@@ -62,7 +66,7 @@ Core packages include compilers and numerical libraries that users typically do 
     This will activate the conda base environment (the prefix `(base)`) and install `wget`. Then, type.
 
         wget https://raw.githubusercontent.com/CosmoLike/cocoa/refs/heads/dev/cocoapy310-osxarm-base.yml
-   
+
 **Step :two:**: Create the Cocoa environment,
 
   - Linux
@@ -76,6 +80,33 @@ Core packages include compilers and numerical libraries that users typically do 
 and activate it
 
     conda activate cocoa
+
+
+> [!Note]
+> During the Arizona Winter School (January 2026), we noted that some students with macOS struggled to get the conda to work (conflicts). 
+> If this is the case for you, try the steps below instead
+>
+> **Step :one:** Create a new base environment, as your base may have legacy packages that can create incompatibilities (note here slightly modified conda command)
+> 
+>     conda create --solver=libmamba --strict-channel-priority --override-channels -c conda-forge --name base2
+>
+> and
+>
+>     conda activate base2
+>
+>
+> Now install wget and download a looser version of the yml file (note here slightly modified conda command)
+>
+>     conda install -y wget --solver=libmamba --strict-channel-priority --override-channels -c conda-forge
+>
+> and
+>
+>     wget https://raw.githubusercontent.com/CosmoLike/cocoa/refs/heads/dev/cocoapy310-osxarm-loose.yml
+>
+> **Step :two:** Create the cocoa conda env using a looser yml ((note here slightly modified conda command)
+>    
+>     conda env create --solver=libmamba --name cocoa -f cocoapy310-osxarm-loose.yml
+> 
 
 **Step :three:**: When and only when loading the conda cocoa environment for the first time, create the following symbolic links
 
@@ -100,7 +131,8 @@ and activate it
 Users can now proceed to the **next section**.
 
 > [!Warning]
-> We advise users to stay away from all repositories managed by `Anaconda` due to draconian license restrictions that can affect researchers outside universities (e.g., NASA-JPL). See the Appendix [FAQ: How can we install Conda?](#overview_miniforge) for instructions on how to install `Miniforge`, which is a minimal installer of conda that downloads default packages from the `conda-forge` community-driven channel.
+> We advise users to stay away from all repositories managed by `Anaconda` due to license limitations. See the Appendix [FAQ: How can we install Conda?](#overview_miniforge)
+> for instructions on how to install `Miniforge`, which is a  minimal installer of conda that downloads default packages from the `conda-forge` community-driven channel.
 
 > [!Tip]
 > We advise users to maintain *exact reproducibility* (across time) of the Cocoa conda environment by installing it via `conda-lock`,
@@ -117,7 +149,7 @@ Users can now proceed to the **next section**.
 > **Step :two:** Download the file appropriate conda-lock compatible `yml` file.
 >   - Linux
 >     
->         wget https://raw.githubusercontent.com/SBU-COSMOLIKE/cocoa/refs/heads/main/cocoapy310.yml
+>         wget https://raw.githubusercontent.com/CosmoLike/cocoa/refs/heads/dev/cocoapy310-linux.yml
 >
 >   - macOS (arm)
 >     
@@ -144,7 +176,13 @@ In this section, we assume users have previously activated the Cocoa conda envir
 
 **Step :one:**: Download Cocoa's latest release and go to its main folder (`cocoa/Cocoa`),
 
-      git clone git@github.com:SBU-COSMOLIKE/cocoa.git cocoa
+  - Stable Version
+    
+        git clone https://github.com/CosmoLike/cocoa.git --branch v4.05 cocoa
+
+  - Testing beta release
+    
+        git clone https://github.com/CosmoLike/cocoa.git --branch v5.0beta2 cocoa
 
 and
 
@@ -188,7 +226,7 @@ Users can now proceed to **the next section**.
 
 # Running Examples  <a name="cobaya_base_code_examples"></a>
 
-We assume that you are still in the Conda cocoa environment from the previous `conda activate cocoa` command and that you are in the cocoa main folder `cocoa/Cocoa`, 
+We assume that you are still in the Conda cocoa environment from the previous `conda activate cocoa` command, and that users switch to bash, and that you are in the cocoa main folder `cocoa/Cocoa`, 
 
  **Step :one:**: Activate the private Python environment by sourcing the script `start_cocoa.sh`
 
@@ -918,7 +956,7 @@ There are a few differences users should be aware of when running Cocoa on Googl
           from google.colab import drive
           drive.mount('/content/drive')
 
-    Below, we provide instructions for installing Cocoa. *Google Colab does provide direct terminal access if users prefer to follow the standard installation procedure*
+    Below, we provide instructions on how to install Cocoa. *Google Colab does provide direct terminal access if users prefer to follow the standard installation procedure*
     
     - **Cell 2️⃣**: Install Miniforge (Similar to our documentation in section [FAQ: How can users install Conda?](#overview_miniforge))
 
