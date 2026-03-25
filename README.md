@@ -76,6 +76,27 @@ and activate it
 
     conda activate cocoa
 
+**Step :three:**: When and only when loading the conda cocoa environment for the first time, create the following symbolic links
+
+  - Linux
+    
+        ln -s "${CONDA_PREFIX}"/bin/x86_64-conda_cos6-linux-gnu-gcc "${CONDA_PREFIX}"/bin/gcc
+        ln -s "${CONDA_PREFIX}"/bin/x86_64-conda_cos6-linux-gnu-g++ "${CONDA_PREFIX}"/bin/g++
+        ln -s "${CONDA_PREFIX}"/bin/x86_64-conda_cos6-linux-gnu-gfortran "${CONDA_PREFIX}"/bin/gfortran
+        ln -s "${CONDA_PREFIX}"/bin/x86_64-conda-linux-gnu-gcc-ar "${CONDA_PREFIX}"/bin/gcc-ar
+        ln -s "${CONDA_PREFIX}"/bin/x86_64-conda-linux-gnu-gcc-ranlib "${CONDA_PREFIX}"/bin/gcc-ranlib
+        ln -s "${CONDA_PREFIX}"/bin/x86_64-conda-linux-gnu-ld "${CONDA_PREFIX}"/bin/ld
+
+  - macOS (arm)
+
+        ln -s "${CONDA_PREFIX}"/bin/clang "${CONDA_PREFIX}"/bin/gcc
+        ln -s "${CONDA_PREFIX}"/bin/clang++ "${CONDA_PREFIX}"/bin/g++
+  
+**Step :four:**: When and only when loading the conda cocoa environment for the first time, install `git-lfs`
+
+    git-lfs install
+
+Users can now proceed to the **next section**.
 
 > [!Note]
 > During the Arizona Winter School (January 2026), we noted that some students with macOS struggled to get the conda to work (conflicts). 
@@ -103,30 +124,8 @@ and activate it
 >     conda env create --solver=libmamba --name cocoa -f cocoapy310-osxarm-loose.yml
 > 
 
-**Step :three:**: When and only when loading the conda cocoa environment for the first time, create the following symbolic links
-
-  - Linux
-    
-        ln -s "${CONDA_PREFIX}"/bin/x86_64-conda_cos6-linux-gnu-gcc "${CONDA_PREFIX}"/bin/gcc
-        ln -s "${CONDA_PREFIX}"/bin/x86_64-conda_cos6-linux-gnu-g++ "${CONDA_PREFIX}"/bin/g++
-        ln -s "${CONDA_PREFIX}"/bin/x86_64-conda_cos6-linux-gnu-gfortran "${CONDA_PREFIX}"/bin/gfortran
-        ln -s "${CONDA_PREFIX}"/bin/x86_64-conda-linux-gnu-gcc-ar "${CONDA_PREFIX}"/bin/gcc-ar
-        ln -s "${CONDA_PREFIX}"/bin/x86_64-conda-linux-gnu-gcc-ranlib "${CONDA_PREFIX}"/bin/gcc-ranlib
-        ln -s "${CONDA_PREFIX}"/bin/x86_64-conda-linux-gnu-ld "${CONDA_PREFIX}"/bin/ld
-
-  - macOS (arm)
-
-        ln -s "${CONDA_PREFIX}"/bin/clang "${CONDA_PREFIX}"/bin/gcc
-        ln -s "${CONDA_PREFIX}"/bin/clang++ "${CONDA_PREFIX}"/bin/g++
-  
-**Step :four:**: When and only when loading the conda cocoa environment for the first time, install `git-lfs`
-
-    git-lfs install
-
-Users can now proceed to the **next section**.
-
 > [!Warning]
-> We advise users to stay away from all repositories managed by `Anaconda` due to license limitations. See the Appendix [FAQ: How can we install Conda?](#overview_miniforge)
+We advise users to avoid repositories managed by `Anaconda` due to licensing restrictions. See the Appendix [FAQ: How can we install Conda?](#overview_miniforge)
 > for instructions on how to install `Miniforge`, which is a  minimal installer of conda that downloads default packages from the `conda-forge` community-driven channel.
 
 > [!Tip]
