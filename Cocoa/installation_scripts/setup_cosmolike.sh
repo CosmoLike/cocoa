@@ -74,7 +74,12 @@ if [ -z "${IGNORE_COSMOLIKE_CODE}" ]; then
     if [ -n "${COSMOLIKE_GIT_COMMIT}" ]; then
       "${GIT:?}" checkout "${COSMOLIKE_GIT_COMMIT:?}" \
         >>${OUT1:?} 2>>${OUT2:?} || { error "${EC16:?}"; return 1; }
-    fi
+    elif [ -n "${COSMOLIKE_GIT_TAG}" ]; then 
+      "${GIT:?}" fetch --all --tags --prune
+      
+      "${GIT:?}" checkout tags/${COSMOLIKE_GIT_TAG} -b ${COSMOLIKE_GIT_TAG} \
+        >>${OUT1:?} 2>>${OUT2:?} || { error "${EC16:?}"; return 1; }
+    fi    
   fi
 
   pbottom "SETUP COCOA-COSMOLIKE CORE" || return 1
