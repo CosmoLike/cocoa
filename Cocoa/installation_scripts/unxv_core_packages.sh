@@ -17,7 +17,7 @@ if [[ -z "${SKIP_DECOMM_CORE_PACKAGES}" && -z "${IGNORE_CORE_INSTALLATION}" ]]; 
   }
 
   unset_env_funcs () {
-    unset -f cdfolder cpfolder cpfolder cpfile error
+    unset -f cdfolder cpfolder cpfile error
     unset -f unset_env_funcs
     cdroot || return 1;
   }
@@ -120,7 +120,7 @@ if [[ -z "${SKIP_DECOMM_CORE_PACKAGES}" && -z "${IGNORE_CORE_INSTALLATION}" ]]; 
       
       # check if the command that defines FOLDER fails
       #tar tf "${TFILES[$i]}.xz" | cut -f1 -d"/" | sort | uniq \
-      #  >${OUT1:?} 2>${OUT2:?} || 
+      #  >>${OUT1:?} 2>>${OUT2:?} || 
       #  { error "${EC25:?} (${TFILES[$i]}.xz)"; return 1; }
 
       FOLDER=$(tar tf "${TFILES[$i]}.xz" | cut -f1 -d"/" | sort | uniq)
@@ -131,14 +131,14 @@ if [[ -z "${SKIP_DECOMM_CORE_PACKAGES}" && -z "${IGNORE_CORE_INSTALLATION}" ]]; 
 
       if [ -n "${OVERWRITE_EXISTING_CORE_PACKAGES}" ]; then
         
-        rm -rf ${FOLDER:?}
+        rm -rf "${FOLDER:?}"
 
       fi
 
-      if [[ ! -d ${FOLDER:?} ]]; then
+      if [[ ! -d "${FOLDER:?}" ]]; then
 
-        tar xf "${TFILES[$i]}.xz" >${OUT1:?} 2>${OUT2:?} || 
-          { error "${EC25:?} (${TFILES[$i]}.xz)"; return 1; }
+        tar xf "${TFILES[$i]}.xz" \
+          >>${OUT1:?} 2>>${OUT2:?} { error "${EC25:?} (${TFILES[$i]}.xz)"; return 1; }
 
       fi
       unset -v FOLDER

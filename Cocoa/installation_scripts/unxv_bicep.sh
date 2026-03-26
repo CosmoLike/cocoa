@@ -69,7 +69,7 @@ if [ -z "${IGNORE_BICEP_CMB_DATA}" ]; then
   
   if [ ! -d "${PACKDIR:?}" ]; then
     cdfolder "${EDATAF:?}" || return 1
-    tar xf "${FILE:?}" >${OUT1:?} 2>>${OUT2:?} || { error "${EC25:?}"; return 1; }
+    tar xf "${FILE:?}" >>${OUT1:?} 2>>${OUT2:?} || { error "${EC25:?}"; return 1; }
   fi 
 
   cdfolder "${ROOTDIR}" || return 1;

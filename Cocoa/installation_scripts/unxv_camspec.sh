@@ -67,11 +67,12 @@ if [ -z "${IGNORE_CAMSPEC_CMB_DATA}" ]; then
     cdfolder "${EDATAF:?}" || return 1
 
     if [ ! -e "${FILE:?}" ]; then
-      "${WGET:?}" "${URL:?}" -q --show-progress \
-        --progress=bar:force:noscroll || { error "${EC24:?}"; return 1; }
+      "${WGET:?}" "${URL:?}" -q --show-progress --no-check-certificate \
+        --progress=bar:force:noscroll --timeout=30 --tries=2 --waitretry=0 \
+        --retry-connrefused --read-timeout=30 || { error "${EC24:?}"; return 1; }
     fi
 
-    unzip "${FILE:?}" >${OUT1:?} 2>${OUT2:?} || { error "${EC26:?}"; return 1; }
+    unzip "${FILE:?}" >>${OUT1:?} 2>>${OUT2:?} || { error "${EC26:?}"; return 1; }
   fi
   
   pbottom "SETUP/UNXV CAMSPEC-2021 DATA" || return 1

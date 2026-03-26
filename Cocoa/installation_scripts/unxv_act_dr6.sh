@@ -67,18 +67,19 @@ if [ -z "${IGNORE_ACTDR6_DATA}" ]; then
   fi 
 
   if [[ ! -d "${PACKDIR:?}" || ! -d "${PACKDIR:?}/lensing" ]]; then
-    mkdir -p "${PACKDIR:?}" >${OUT1:?} 2>${OUT2:?} || { error "${EC20:?}"; return 1; }
-    mkdir -p "${PACKDIR:?}/lensing" >${OUT1:?} 2>${OUT2:?} || { error "${EC20:?}"; return 1; }
+    mkdir -p "${PACKDIR:?}" >>${OUT1:?} 2>>${OUT2:?} || { error "${EC20:?}"; return 1; }
+    mkdir -p "${PACKDIR:?}/lensing" >>${OUT1:?} 2>>${OUT2:?} || { error "${EC20:?}"; return 1; }
     
     cdfolder "${EDATAF:?}" || return 1
 
     if [ ! -e "${FILE:?}" ]; then
-      "${WGET:?}" "${URL:?}" -q --show-progress --progress=bar:force || 
-        { error "${EC24:?}"; return 1; }
+      "${WGET:?}" "${URL:?}" -q --show-progress --no-check-certificate \
+        --progress=bar:force:noscroll --timeout=30 --tries=2 --waitretry=0 \
+        --retry-connrefused --read-timeout=30 || { error "${EC24:?}"; return 1; }
     fi
 
     TMP=$(tar -tf "${FILE:?}" | head -1 | cut -f1 -d"/")
-    tar -zxvf "${FILE:?}" >${OUT1:?} 2>${OUT2:?} || { error "${EC25:?}"; return 1; }
+    tar -zxf "${FILE:?}" >>${OUT1:?} 2>>${OUT2:?} || { error "${EC25:?}"; return 1; }
     mv "${TMP:?}" "${PACKDIR:?}/lensing"
   fi
 
@@ -110,17 +111,18 @@ if [ -z "${IGNORE_ACTDR6_DATA}" ]; then
   fi
 
   if [ ! -d "${PACKDIR:?}" ]; then
-    mkdir -p "${PACKDIR:?}" >${OUT1:?} 2>${OUT2:?} || { error "${EC20:?}"; return 1; }
+    mkdir -p "${PACKDIR:?}" >>${OUT1:?} 2>>${OUT2:?} || { error "${EC20:?}"; return 1; }
           
     cdfolder "${EDATAF:?}" || return 1
 
     if [ ! -e "${FILE:?}" ]; then
-      "${WGET:?}" "${URL:?}" -q --show-progress --progress=bar:force || 
-        { error "${EC24:?}"; return 1; }
+      "${WGET:?}" "${URL:?}" -q --show-progress --no-check-certificate \
+        --progress=bar:force:noscroll --timeout=30 --tries=2 --waitretry=0 \
+        --retry-connrefused --read-timeout=30 || { error "${EC24:?}"; return 1; }
     fi
 
     TMP=$(tar -tf "${FILE:?}" | head -1 | cut -f1 -d"/")
-    tar -zxvf "${FILE:?}" >${OUT1:?} 2>${OUT2:?} || { error "${EC25:?}"; return 1; }
+    tar -zxvf "${FILE:?}" >>${OUT1:?} 2>>${OUT2:?} || { error "${EC25:?}"; return 1; }
     mv "${TMP:?}" "${PACKDIR:?}"
   fi
 
@@ -151,17 +153,18 @@ if [ -z "${IGNORE_ACTDR6_DATA}" ]; then
   fi
 
   if [ ! -d "${PACKDIR:?}" ]; then
-    mkdir -p "${PACKDIR:?}" >${OUT1:?} 2>${OUT2:?} || { error "${EC20:?}"; return 1; }
+    mkdir -p "${PACKDIR:?}" >>${OUT1:?} 2>>${OUT2:?} || { error "${EC20:?}"; return 1; }
           
     cdfolder "${EDATAF:?}" || return 1
 
     if [ ! -e "${FILE:?}" ]; then
-      "${WGET:?}" "${URL:?}" -q --show-progress \
-        --progress=bar:force:noscroll || { error "${EC24:?}"; return 1; }
+      "${WGET:?}" "${URL:?}" -q --show-progress --no-check-certificate \
+        --progress=bar:force:noscroll --timeout=30 --tries=2 --waitretry=0 \
+        --retry-connrefused --read-timeout=30 || { error "${EC24:?}"; return 1; }
     fi
 
     TMP=$(tar -tf "${FILE:?}" | head -1 | cut -f1 -d"/")
-    tar -zxvf "${FILE:?}" >${OUT1:?} 2>${OUT2:?} || { error "${EC25:?}"; return 1; }
+    tar -zxvf "${FILE:?}" >>${OUT1:?} 2>>${OUT2:?} || { error "${EC25:?}"; return 1; }
     mv "${TMP:?}" "${PACKDIR:?}"
   fi
 

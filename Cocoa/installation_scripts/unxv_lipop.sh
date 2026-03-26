@@ -70,24 +70,26 @@ if [ -z "${IGNORE_LIPOP_CMB_DATA}" ]; then
   
   if [[ ! -d "${EDATAF:?}/planck/hillipop" ||  
         ! -d "${EDATAF:?}/planck/lollipop" ]]; then
-    cdfolder "${EDATAF:?}/planck"
+    cdfolder "${EDATAF:?}/planck" || return 1
 
     for (( i=0; i<${#FILE[@]}; i++ ));
     do
       if [ ! -e "${EDATAF:?}/planck/${FILE[$i]:?}.tar.gz" ]; then
-        "${WGET:?}" "${URL}/${FILE[$i]:?}.tar.gz" \
-          -q \
-          --show-progress \
-          --progress=bar:force:noscroll || { error "${EC24:?}"; return 1; }
+        "${WGET:?}" "${URL}/${FILE[$i]:?}.tar.gz" -q --show-progress \
+          --no-check-certificate --progress=bar:force:noscroll \
+          --timeout=30 --tries=2 --waitretry=0 --retry-connrefused \
+          --read-timeout=30 || { error "${EC24:?}"; return 1; }
       fi
 
       tar -xvzf "${FILE[$i]:?}.tar.gz" \
-      >>${OUT1:?} 2>>${OUT2:?} || { error "${EC25:?} (${FILE[$i]:?})"; return 1; }
+        >>${OUT1:?} 2>>${OUT2:?} || { error "${EC25:?} (${FILE[$i]:?})"; return 1; }
     done
 
     # note: by default, LIPOP saves the likelihoods on planck_2020
-    mv "${EDATAF:?}/planck/planck_2020/hillipop" "${EDATAF:?}/planck"
-    mv "${EDATAF:?}/planck/planck_2020/lollipop" "${EDATAF:?}/planck"
+    mv "${EDATAF:?}/planck/planck_2020/hillipop" "${EDATAF:?}/planck" \
+      >>${OUT1:?} 2>>${OUT2:?} || { error "MV HILLIPOP DATA"; return 1; }
+    mv "${EDATAF:?}/planck/planck_2020/lollipop" "${EDATAF:?}/planck" \
+      >>${OUT1:?} 2>>${OUT2:?} || { error "MV LOLLIPOP DATA"; return 1; }
     rm -rf "${EDATAF:?}/planck/planck_2020"
   fi
     

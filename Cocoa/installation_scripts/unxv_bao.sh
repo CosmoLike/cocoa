@@ -73,7 +73,7 @@ if [ -z "${IGNORE_BAO_DATA}" ]; then
   
     cdfolder "${EDATAF:?}" || return 1
 
-    tar xf "${FILE:?}" >${OUT1:?} 2>${OUT2:?} || { error "${EC25:?}"; return 1; }
+    tar xf "${FILE:?}" >>${OUT1:?} 2>>${OUT2:?} || { error "${EC25:?}"; return 1; }
 
   fi
   

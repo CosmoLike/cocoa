@@ -69,9 +69,9 @@ if [ -z "${IGNORE_CORE_INSTALLATION}" ]; then
     if [[ ! -d "${CCIL:?}/${4:?}" && ! -d "${CCIL:?}/${1:?}" ]]; then
 
       if [[ ! -e "${CCIL:?}/${FILE:?}" ]]; then
-        wget "${3:?}" --no-check-certificate --retry-connrefused --waitretry=1 \
-          --tries=3 --read-timeout=20 \
-          --timeout=15 --waitretry=0 --show-progress --progress=bar:force \
+        "${WGET:?}" "${3:?}" -q --show-progress --no-check-certificate \
+          --progress=bar:force:noscroll --timeout=30 --tries=2 --waitretry=0 \
+          --retry-connrefused --read-timeout=30 \
           >>${OUT1:?} 2>>${OUT2:?} || { error "${EC24:?}"; return 1; }
       fi
 

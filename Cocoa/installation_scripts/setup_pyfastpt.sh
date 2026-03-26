@@ -89,7 +89,8 @@ if [ -z "${IGNORE_FASTPT_CODE}" ]; then
     # --------------------------------------------------------------------------
     cdfolder "${ECODEF:?}" || { cdroot; return 1; }
 
-    "${GIT:?}" clone "${URL:?}" "${FOLDER:?}" \
+    "${GIT:?}" clone "${URL:?}" --depth ${GIT_CLONE_MAXIMUM_DEPTH:?} \
+      --recursive "${FOLDER:?}" \
       >>${OUT1:?} 2>>${OUT2:?} || { error "${EC15:?}"; return 1; }
     
     cdfolder "${PACKDIR}" || { cdroot; return 1; }

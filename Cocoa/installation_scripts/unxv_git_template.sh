@@ -65,18 +65,20 @@ if [ -z "${IGNORE_XXX_DATA}" ]; then
   # ---------------------------------------------------------------------------
   # in case this script is called twice
   
-  rm -rf "${EDATAF:?}/${FOLDER:?}"
-  
+  if [ -n "${OVERWRITE_EXISTING_XXX_DATA}" ]; then
+    rm -rf "${EDATAF:?}/${FOLDER:?}"
+  fi
+
   # ---------------------------------------------------------------------------
 
   cdfolder "${EDATAF:?}" || return 1
 
   # check if the link exists
   "${CURL:?}" -fsS "${URL:?}" \
-    >${OUT1:?} 2>${OUT2:?} || { error "${EC27:?} (URL=${URL:?})"; return 1; }
+    >>${OUT1:?} 2>>${OUT2:?} || { error "${EC27:?} (URL=${URL:?})"; return 1; }
 
   ${GIT:?} clone "${URL:?}" "${FOLDER:?}" \
-    >${OUT1:?} 2>${OUT2:?} || { error "${EC15:?}"; return 1; }
+    >>${OUT1:?} 2>>${OUT2:?} || { error "${EC15:?}"; return 1; }
 
   # XXX_DATA_GIT_COMMIT = commit hash
   if [ -n "${XXX_DATA_GIT_COMMIT}" ]; then
@@ -84,7 +86,7 @@ if [ -z "${IGNORE_XXX_DATA}" ]; then
     cdfolder "${PACKDIR:?}" || return 1
 
     ${GIT:?} checkout "${XXX_DATA_GIT_COMMIT:?}" \
-      >${OUT1:?} 2>${OUT2:?} || { error "${EC16:?}"; return 1; }
+      >>${OUT1:?} 2>>${OUT2:?} || { error "${EC16:?}"; return 1; }
   
   fi
 

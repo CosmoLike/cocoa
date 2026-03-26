@@ -66,14 +66,15 @@ if [ -z "${IGNORE_COSMOPOWER_DATA}" ]; then
   if [[ ! -d "${PACKDIR:?}" ]]; then
     cdfolder "${EDATAF:?}" || return 1
 
-    ${GIT:?} clone "${URL:?}" "${FOLDER:?}" \
-      >${OUT1:?} 2>${OUT2:?} || { error "${EC15:?}"; return 1; }
+    "${GIT:?}" clone "${URL:?}" --depth ${GIT_CLONE_MAXIMUM_DEPTH:?} \
+      --recursive "${FOLDER:?}" \
+      >>${OUT1:?} 2>>${OUT2:?} || { error "${EC15:?}"; return 1; }
 
     if [ -n "${COSMOPOWER_URL_DATA_COMMIT}" ]; then
       cdfolder "${PACKDIR:?}" || return 1
 
-      ${GIT:?} checkout "${COSMOPOWER_URL_DATA_COMMIT:?}" \
-        >${OUT1:?} 2>${OUT2:?} || { error "${EC16:?}"; return 1; }
+      "${GIT:?}" checkout "${COSMOPOWER_URL_DATA_COMMIT:?}" \
+        >>${OUT1:?} 2>>${OUT2:?} || { error "${EC16:?}"; return 1; }
     fi
   fi
   # ---------------------------------------------------------------------------

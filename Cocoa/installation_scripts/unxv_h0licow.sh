@@ -64,17 +64,19 @@ if [ -z "${IGNORE_HOLICOW_STRONG_LENSING_DATA}" ]; then
 
     cdfolder "${EDATAF:?}" || return 1
       
-    ${GIT:?} clone "${URL:?}" "${TMP:?}" \
-      >${OUT1:?} 2>${OUT2:?} || { error "${EC15:?}"; return 1; }
+    "${GIT:?}" clone "${URL:?}" --depth ${GIT_CLONE_MAXIMUM_DEPTH:?} \
+      --recursive  "${TMP:?}" \
+      >>${OUT1:?} 2>>${OUT2:?} || { error "${EC15:?}"; return 1; }
 
     cdfolder "${EDATAF:?}/${TMP:?}" || return 1
 
     if [ -n "${HOLICOW_DATA_GIT_COMMIT}" ]; then
-      ${GIT:?} checkout "${HOLICOW_DATA_GIT_COMMIT:?}" \
+      "${GIT:?}" checkout "${HOLICOW_DATA_GIT_COMMIT:?}" \
         >${OUT1:?} 2>${OUT2:?} || { error "${EC16:?}"; return 1; }
     fi
 
-    mv "${FOLDER:?}" "${EDATAF:?}"
+    mv "${FOLDER:?}" "${EDATAF:?}" \
+      >>${OUT1:?} 2>>${OUT2:?} || { error "MV H0LICOW DATA"; return 1; }
     rm -rf "${EDATAF:?}/${TMP:?}"
   fi
 

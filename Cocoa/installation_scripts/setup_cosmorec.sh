@@ -100,8 +100,8 @@ if [ -z "${IGNORE_COSMOREC_CODE}" ]; then
     #  >>${OUT1:?} 2>>${OUT2:?} || { error "${EC24:?}"; return 1; }
     
     "${WGET:?}" "${URL/https:/http:}" --show-progress --no-check-certificate \
-      --progress=bar:force --timeout=30 --tries=2 \
-      >>${OUT1:?} 2>>${OUT2:?} || {
+      --progress=bar:force:noscroll --timeout=30 --tries=2 --waitretry=0  \
+      --retry-connrefused --read-timeout=30 >>${OUT1:?} 2>>${OUT2:?} || {
       
       pwarning "WGET FAILED - USING LOCAL COCOA COSMOREC BACKUP" || return 1;
       
