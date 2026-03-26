@@ -138,7 +138,7 @@ if [[ -z "${SKIP_DECOMM_CORE_PACKAGES}" && -z "${IGNORE_CORE_INSTALLATION}" ]]; 
       if [[ ! -d "${FOLDER:?}" ]]; then
 
         tar xf "${TFILES[$i]}.xz" \
-          >>${OUT1:?} 2>>${OUT2:?} { error "${EC25:?} (${TFILES[$i]}.xz)"; return 1; }
+          >>${OUT1:?} 2>>${OUT2:?} || { error "${EC25:?} (${TFILES[$i]}.xz)"; return 1; }
 
       fi
       unset -v FOLDER
