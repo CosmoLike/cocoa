@@ -202,7 +202,7 @@ if [ -z "${IGNORE_COSMOLIKE_ROMAN_FOURIER_CODE}" ]; then
 
   FOLDER="${ROMAN_FOURIER_NAME:-"roman_fourier"}"
 
-  URL="${ROMAN_FOURIER_URL:-"git@github.com:CosmoLike/cocoa_roman_fourier.git"}"
+  URL="${ROMAN_FOURIER_URL:-"https://github.com/CosmoLike/cocoa_roman_fourier.git"}"
 
   if [ -n "${ROMAN_FOURIER_GIT_COMMIT}" ]; then
     gitact0 "${FOLDER:?}" "${URL:?}"
@@ -233,7 +233,7 @@ if [ -z "${IGNORE_COSMOLIKE_ROMAN_REAL_CODE}" ]; then
 
   FOLDER="${ROMAN_REAL_NAME:-"roman_real"}"
 
-  URL="${ROMAN_REAL_URL:-"git@github.com:CosmoLike/cocoa_roman_real.git"}"
+  URL="${ROMAN_REAL_URL:-"https://github.com/CosmoLike/cocoa_roman_real.git"}"
 
   if [ -n "${ROMAN_REAL_GIT_COMMIT}" ]; then
     gitact0 "${FOLDER:?}" "${URL:?}"

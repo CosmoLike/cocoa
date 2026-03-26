@@ -175,7 +175,7 @@ if [ -z "${IGNORE_CORE_INSTALLATION}" ]; then
 
     fi
 
-    if [ ! -d "${CCIL:?}/${3:?}" ]; then
+    if [ ! -f "${CCIL:?}/${3:?}" ]; then
     
       cdfolder "${CCIL:?}" || return 1;
 
@@ -345,7 +345,7 @@ if [ -z "${IGNORE_CORE_INSTALLATION}" ]; then
 
   if [ -z "${IGNORE_DISTUTILS_INSTALLATION}" ]; then
     
-    ptop "GETTING TEXINFO LIBRARY (CORE LIBS)"
+    ptop "GETTING TEXINFO LIBRARY (CORE LIBS)" || return 1;
 
     PACKAGE_VERSION="${TEXTINFO_VERSION:-"7.0.3"}"
 
@@ -701,10 +701,10 @@ if [ -z "${IGNORE_CORE_INSTALLATION}" ]; then
       # --------------------------------------------------------------------------
       # move/rename include file and carma.h folder
       # --------------------------------------------------------------------------
-      mv "${CCIL:?}/${FOLDER:?}/include" "${CCIL:?}" >${OUT1:?} 2>${OUT2:?} || 
+      mv "${CCIL:?}/${FOLDER:?}/include" "${CCIL:?}" >>${OUT1:?} 2>>${OUT2:?} || 
         { error "MV CARMA INCLUDE FOLDER"; return 1; }
 
-      mv "${CCIL:?}/include" "${PACKDIR:?}" 2>${OUT2:?} || 
+      mv "${CCIL:?}/include" "${PACKDIR:?}" 2>>${OUT2:?} || 
         { error "RENAME CARMA INCLUDE FOLDER"; return 1; }
 
       mv "${PACKDIR:?}/carma" "${PACKDIR:?}/carma.h" \

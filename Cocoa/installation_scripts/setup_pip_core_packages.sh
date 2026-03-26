@@ -17,8 +17,8 @@ if [ -z "${IGNORE_PIP_CORE_INSTALLATION}" ]; then
   }
 
   unset_env_funcs () {
-    unset -f cdfolder cpfolder cpfile error wgetact gitact gitact1 gitact2
-    unset -f unset_env_funcs wgetact1 wgetact2
+    unset -f cdfolder cpfolder cpfile error
+    unset -f unset_env_funcs
     cdroot || return 1;
   }
 
