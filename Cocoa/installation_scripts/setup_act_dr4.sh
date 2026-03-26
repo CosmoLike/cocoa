@@ -79,7 +79,8 @@ if [ -z "${IGNORE_ACTDR4_CODE}" ]; then
     # --------------------------------------------------------------------------
     cdfolder "${ECODEF:?}" || { cdroot; return 1; }
 
-    "${GIT:?}" clone "${URL:?}" "${FOLDER:?}" \
+    "${GIT:?}" clone "${URL:?}" --depth ${GIT_CLONE_MAXIMUM_DEPTH:?} \
+      --recursive "${FOLDER:?}" \
       >>${OUT1:?} 2>>${OUT2:?} || { error "${EC15:?}"; return 1; }
     
     cdfolder "${PACKDIR}" || { cdroot; return 1; }
@@ -105,8 +106,8 @@ if [ -z "${IGNORE_ACTDR4_CODE}" ]; then
       cpfolder "${CHANGES:?}/${TFOLDER[$i]}${TFILEP[$i]:?}" . \
         2>>${OUT2:?} || return 1;
 
-      patch -u "${TFILE[$i]:?}" -i "${TFILEP[$i]:?}" >${OUT1:?} \
-        2>>${OUT2:?} || { error "${EC17:?} (${TFILE[$i]:?})"; return 1; }
+      patch -u "${TFILE[$i]:?}" -i "${TFILEP[$i]:?}" \
+        >>${OUT1:?} 2>>${OUT2:?} || { error "${EC17:?} (${TFILE[$i]:?})"; return 1; }
     done
   fi
   

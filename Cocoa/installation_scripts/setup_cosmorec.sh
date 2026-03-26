@@ -13,7 +13,7 @@ if [ -z "${IGNORE_COSMOREC_CODE}" ]; then
 
   unset_env_vars () {
     unset -v URL CCIL ECODEF FOLDER PACKDIR CHANGES TFOLDER 
-    unset -v TFILE TFILEP AL PRINTNAME URL_BASE
+    unset -v TFILE TFILEP AL PRINTNAME URL_BASE LOCAL_BACKUP_USED
     cdroot || return 1;
   }
 
@@ -93,44 +93,70 @@ if [ -z "${IGNORE_COSMOREC_CODE}" ]; then
   
     cdfolder "${ECODEF:?}" || { cdroot; return 1; }
 
-    "${WGET:?}" "${URL:?}" -q --show-progress --progress=bar:force || { error "${EC24:?}"; return 1; }
-    
-    tar -zxvf "${FILE:?}" >>${OUT1:?} 2>${OUT2:?} || { error "${EC25:?}"; return 1; }
+    LOCAL_BACKUP_USED=0
 
-    mv "${FILENAME:?}" "${FOLDER:?}" >>${OUT1:?} 2>>${OUT2:?} || { error "${EC30:?}"; return 1; }
+    #"${WGET:?}" "${URL/https:/http:}" --show-progress --no-check-certificate \
+    #  --progress=bar:force --timeout=30 --tries=2 \
+    #  >>${OUT1:?} 2>>${OUT2:?} || { error "${EC24:?}"; return 1; }
+    
+    "${WGET:?}" "${URL/https:/http:}" --show-progress --no-check-certificate \
+      --progress=bar:force --timeout=30 --tries=2 \
+      >>${OUT1:?} 2>>${OUT2:?} || {
+      
+      pwarning "WGET FAILED - USING LOCAL COCOA COSMOREC BACKUP" || return 1;
+      
+      LOCAL_BACKUP_USED=1
+
+      if [ -f "${ECODEF:?}/${FILE}" ]; then
+        rm -f "${ECODEF:?}/${FILE}" \
+          2>>${OUT2:?} || { error "RM COSMOREC FILE"; return 1; }
+      fi
+
+      xz -dc "${CCIL:?}/cosmorec.xz" > "${ECODEF:?}/${FILE}" \
+        2>>${OUT2:?} || { error "UNXZ LOCAL COSMOREC BACKUP"; return 1; }
+    }
+
+    tar -zxf "${FILE:?}" >>${OUT1:?} 2>>${OUT2:?} || { error "${EC25:?}"; return 1; }
+
+    if [ ! -d "${FOLDER:?}" ]; then
+      mv "${FILENAME:?}" "${FOLDER:?}" >>${OUT1:?} 2>>${OUT2:?} \
+        || { error "${EC30:?}"; return 1; }
+    fi
 
     rm -f  "${ECODEF:?}/${FILE}"
     rm -rf "${ECODEF:?}/${FILENAME}"
 
-    # --------------------------------------------------------------------------
-    # We patch the files below so they use the right compilers -----------------
-    # --------------------------------------------------------------------------
-    # PREFIX: T = TMP, P = PATCH, AL = Array Length
-    declare -a TFOLDER=("") # If nonblank, path must include /
-    
-    declare -a TFILE=("Makefile.in")
+    if [ "${LOCAL_BACKUP_USED}" -eq 0 ]; then
+      # --------------------------------------------------------------------------
+      # We patch the files below so they use the right compilers -----------------
+      # --------------------------------------------------------------------------
+      # PREFIX: T = TMP, P = PATCH, AL = Array Length
+      declare -a TFOLDER=("") # If nonblank, path must include /
+      
+      declare -a TFILE=("Makefile.in")
 
-    case "$(uname -s)" in
-      Linux)
-        declare -a TFILEP=("Makefile.in.patch")
-        ;;
-      Darwin)
-        declare -a TFILEP=("MakefileOSX.in.patch")
-        ;;
-    esac
+      case "$(uname -s)" in
+        Linux)
+          declare -a TFILEP=("Makefile.in.patch")
+          ;;
+        Darwin)
+          declare -a TFILEP=("MakefileOSX.in.patch")
+          ;;
+      esac
 
-    AL=${#TFOLDER[@]}
+      AL=${#TFOLDER[@]}
 
-    for (( i=0; i<${AL}; i++ ));
-    do
-      cdfolder "${PACKDIR:?}/${TFOLDER[$i]}" || return 1
+      for (( i=0; i<${AL}; i++ ));
+      do
+        cdfolder "${PACKDIR:?}/${TFOLDER[$i]}" || return 1
 
-      cpfolder "${CHANGES:?}/${TFOLDER[$i]}${TFILEP[$i]:?}" . \
-        2>${OUT2:?} || return 1;
+        cpfolder "${CHANGES:?}/${TFOLDER[$i]}${TFILEP[$i]:?}" . \
+          2>>${OUT2:?} || return 1;
 
-      patch -u "${TFILE[$i]:?}" -i "${TFILEP[$i]:?}" >${OUT1:?} \
-        2>${OUT2:?} || { error "${EC17:?} (${TFILE[$i]:?})"; return 1; }
-    done
+        patch -u "${TFILE[$i]:?}" -i "${TFILEP[$i]:?}" \
+          >>${OUT1:?} 2>>${OUT2:?} || { error "${EC17:?} (${TFILE[$i]:?})"; return 1; }
+      done
+    fi
 
   fi
   

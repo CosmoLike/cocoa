@@ -59,7 +59,7 @@ if [ -z "${IGNORE_CLASS_CODE}" ]; then
 
   FOLDER=${CLASS_NAME:-"class_public"}
   
-  PACKDIR="${ECODEF:?}/${FOLDER:?}/"
+  PACKDIR="${ECODEF:?}/${FOLDER:?}"
 
   # Name to be printed on this shell script messages
   PRINTNAME="CLASS"
@@ -90,16 +90,20 @@ if [ -z "${IGNORE_CLASS_CODE}" ]; then
 
     if [ -n "${CLASS_GIT_COMMIT}" ]; then
       "${GIT:?}" checkout "${CLASS_GIT_COMMIT:?}" \
-        >>${OUT1:?} 2>>${OUT2:?} || { error "${EC16\?}"; return 1; }
+        >>${OUT1:?} 2>>${OUT2:?} || { error "${EC16:?}"; return 1; }
     fi
     
     # --------------------------------------------------------------------------
     # historical reasons (we used to save class_python on Cocoa Branch) --------
     # historical: Workaround Cocoa .gitignore entry on /include ----------------
     # --------------------------------------------------------------------------
-    mv ./include ./include2/ \
-      >>${OUT1:?} 2>>${OUT2:?} || 
-      { error "MKDIR FROM INCLUDE TO INCLUDE2"; return 1; }
+    if [ -d "${PACKDIR:?}/include2" ]; then
+      rm -rf "${PACKDIR:?}/include2" \
+         >>${OUT1:?} 2>>${OUT2:?} || { error "RM INCLUDE2"; return 1; }
+    fi
+
+    mv ./include ./include2 >>${OUT1:?} 2>>${OUT2:?} \
+      || { error "MKDIR FROM INCLUDE TO INCLUDE2"; return 1; }
     
     # --------------------------------------------------------------------------
     # We patch the files below so they use the right C compiler ----------------

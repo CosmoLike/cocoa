@@ -13,7 +13,7 @@ if [ -z "${IGNORE_COSMOPOWER_CODE}" ]; then
   ( source "${ROOTDIR:?}/installation_scripts/flags_check.sh" ) || return 1;
 
   unset_env_vars () {
-    unset -v URL URL CCIL ECODEF FOLDER PACKDIR  
+    unset -v URL CCIL ECODEF FOLDER PACKDIR  
     cdroot || return 1;
   }
 
@@ -61,7 +61,7 @@ if [ -z "${IGNORE_COSMOPOWER_CODE}" ]; then
 
   if [ ! -d "${ECODEF:?}/emulators" ]; then
     mkdir -p "${ECODEF:?}/emulators" \
-      >${OUT1:?} 2>${OUT2:?} || { error "${EC20:?}"; return 1; }
+      >>${OUT1:?} 2>>${OUT2:?} || { error "${EC20:?}"; return 1; }
   fi
 
   URL="${COSMOPOWER_SOLIKET_URL:-"https://github.com/simonsobs/SOLikeT.git"}"
@@ -80,14 +80,15 @@ if [ -z "${IGNORE_COSMOPOWER_CODE}" ]; then
 
     cdfolder "${ECODEF:?}/emulators" || { cdroot; return 1; }
 
-    "${GIT:?}" clone "${URL:?}" --depth ${GIT_CLONE_MAXIMUM_DEPTH:?} --recursive \
-      "${PACKDIR:?}" >${OUT1:?} 2>${OUT2:?} || { error "${EC15:?}"; return 1; }
+    "${GIT:?}" clone "${URL:?}" --depth ${GIT_CLONE_MAXIMUM_DEPTH:?} \
+      --recursive "${PACKDIR:?}" \
+      >>${OUT1:?} 2>${OUT2:?} || { error "${EC15:?}"; return 1; }
   
     cdfolder "${PACKDIR:?}" || { cdroot; return 1; }
 
     if [ -n "${COSMOPOWER_SOLIKET_GIT_COMMIT}" ]; then
       "${GIT:?}" checkout "${COSMOPOWER_SOLIKET_GIT_COMMIT:?}" \
-        >${OUT1:?} 2>${OUT2:?} || { error "${EC16:?}"; return 1; }
+        >>${OUT1:?} 2>>${OUT2:?} || { error "${EC16:?}"; return 1; }
     fi  
   fi
   
@@ -115,14 +116,15 @@ if [ -z "${IGNORE_COSMOPOWER_CODE}" ]; then
 
     cdfolder "${ECODEF:?}/emulators" || { cdroot; return 1; }
 
-    "${GIT:?}" clone "${URL:?}" "${PACKDIR:?}" \
-      >${OUT1:?} 2>${OUT2:?} || { error "${EC15:?}"; return 1; }
+    "${GIT:?}" clone "${URL:?}" --depth ${GIT_CLONE_MAXIMUM_DEPTH:?} \
+      --recursive "${PACKDIR:?}" \
+      >>${OUT1:?} 2>>${OUT2:?} || { error "${EC15:?}"; return 1; }
   
     cdfolder "${PACKDIR:?}" || { cdroot; return 1; }
 
     if [ -n "${COSMOPOWER_GIT_COMMIT}" ]; then
       "${GIT:?}" checkout "${COSMOPOWER_GIT_COMMIT:?}" \
-        >${OUT1:?} 2>${OUT2:?} || { error "${EC16:?}"; return 1; }
+        >>${OUT1:?} 2>>${OUT2:?} || { error "${EC16:?}"; return 1; }
     fi  
   fi
   

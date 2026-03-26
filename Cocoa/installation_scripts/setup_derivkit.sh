@@ -12,7 +12,7 @@ if [ -z "${IGNORE_DERIVKIT_CODE}" ]; then
   ( source "${ROOTDIR:?}/installation_scripts/flags_check.sh" ) || return 1;
 
   unset_env_vars () {
-    unset -v URL URL CCIL ECODEF FOLDER PACKDIR  
+    unset -v URL CCIL ECODEF FOLDER PACKDIR  
     cdroot || return 1;
   }
 
@@ -71,12 +71,13 @@ if [ -z "${IGNORE_DERIVKIT_CODE}" ]; then
       'numdifftools==0.9.41' \
     --no-cache-dir --prefer-binary --use-pep517 \
     --prefix="${ROOTDIR:?}/.local" \
-    >${OUT1:?} 2>${OUT2:?} || { error "(PIP-CORE-PACKAGES) ${EC13:?}"; return 1; }
+    >>${OUT1:?} 2>>${OUT2:?} || { error "(PIP-CORE-PACKAGES) ${EC13:?}"; return 1; }
 
     cdfolder "${ECODEF:?}" || return 1;
 
-    "${GIT:?}" clone "${URL:?}" --depth ${GIT_CLONE_MAXIMUM_DEPTH:?} --recursive \
-      "${FOLDER:?}" >>${OUT1:?} 2>>${OUT2:?} || { error "${EC15:?}"; return 1; }
+    "${GIT:?}" clone "${URL:?}" --depth ${GIT_CLONE_MAXIMUM_DEPTH:?} \
+      --recursive "${FOLDER:?}" \
+      >>${OUT1:?} 2>>${OUT2:?} || { error "${EC15:?}"; return 1; }
   
     cdfolder "${PACKDIR:?}" || { cdroot; return 1; }
 

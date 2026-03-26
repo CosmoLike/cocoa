@@ -81,7 +81,7 @@ if [ -z "${IGNORE_ACTDR6_CODE}" ]; then
 
     cdfolder "${ECODEF:?}" || { cdroot; return 1; }
 
-    "${GIT:?}" clone --depth ${GIT_CLONE_MAXIMUM_DEPTH:?} "${URL:?}" \
+    "${GIT:?}" clone "${URL:?}" --depth ${GIT_CLONE_MAXIMUM_DEPTH:?} \
       --recursive "${FOLDER:?}" \
       >>${OUT1:?} 2>>${OUT2:?} || { error "${EC15:?}"; return 1; }
     
@@ -106,10 +106,10 @@ if [ -z "${IGNORE_ACTDR6_CODE}" ]; then
     do
       cdfolder "${PACKDIR:?}/${TFOLDER[$i]}" || return 1
 
-      cpfolder "${CHANGES:?}/${TFOLDER[$i]}${TFILEP[$i]:?}" . 2>${OUT2:?} || return 1;
+      cpfolder "${CHANGES:?}/${TFOLDER[$i]}${TFILEP[$i]:?}" . 2>>${OUT2:?} || return 1;
 
-      patch -u "${TFILE[$i]:?}" -i "${TFILEP[$i]:?}" >${OUT1:?} \
-        2>>${OUT2:?} || { error "${EC17:?} (${TFILE[$i]:?})"; return 1; }
+      patch -u "${TFILE[$i]:?}" -i "${TFILEP[$i]:?}" \
+        >>${OUT1:?} 2>>${OUT2:?} || { error "${EC17:?} (${TFILE[$i]:?})"; return 1; }
     done
   fi
 
@@ -138,14 +138,15 @@ if [ -z "${IGNORE_ACTDR6_CODE}" ]; then
   if [[ ! -d "${PACKDIR:?}" ]]; then
     cdfolder "${ECODEF:?}" || { cdroot; return 1; }
 
-    "${GIT:?}" clone --depth ${GIT_CLONE_MAXIMUM_DEPTH:?} "${URL:?}" --recursive "${FOLDER:?}" \
-    >>${OUT1:?} 2>>${OUT2:?} || { error "${EC15:?}"; return 1; }
+    "${GIT:?}" clone "${URL:?}" --depth ${GIT_CLONE_MAXIMUM_DEPTH:?} \
+      --recursive "${FOLDER:?}" \
+      >>${OUT1:?} 2>>${OUT2:?} || { error "${EC15:?}"; return 1; }
     
     cdfolder "${PACKDIR:?}" || { cdroot; return 1; }
 
     if [ -n "${ACTDR6_MFLIKE_GIT_COMMIT}" ]; then
       "${GIT:?}" checkout "${ACTDR6_MFLIKE_GIT_COMMIT:?}" \
-      >>${OUT1:?} 2>>${OUT2:?} || { error "${EC16:?}"; return 1; }
+        >>${OUT1:?} 2>>${OUT2:?} || { error "${EC16:?}"; return 1; }
     fi
   fi
 

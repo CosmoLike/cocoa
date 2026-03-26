@@ -72,13 +72,13 @@ if [ -z "${IGNORE_CORE_INSTALLATION}" ]; then
         wget "${3:?}" --no-check-certificate --retry-connrefused --waitretry=1 \
           --tries=3 --read-timeout=20 \
           --timeout=15 --waitretry=0 --show-progress --progress=bar:force \
-          >${OUT1:?} 2>${OUT2:?} || { error "${EC24:?}"; return 1; }
+          >>${OUT1:?} 2>>${OUT2:?} || { error "${EC24:?}"; return 1; }
       fi
 
       if [ "${2:?}" == "tar.gz" ]; then
-        tar zxvf "${FILE}" >${OUT1:?} 2>${OUT2:?} || { error "${EC25:?} (gz)"; return 1; }
+        tar zxvf "${FILE}" >>${OUT1:?} 2>>${OUT2:?} || { error "${EC25:?} (gz)"; return 1; }
       elif [ "${2:?}" == "tar.xz" ]; then
-        tar xf "${FILE}" >${OUT1:?} 2>${OUT2:?} || { error "${EC25:?} (xz)"; return 1; }
+        tar xf "${FILE}" >>${OUT1:?} 2>>${OUT2:?} || { error "${EC25:?} (xz)"; return 1; }
       else
         error "UNKNOWN FILE EXTENSION"; return 1;
       fi
@@ -86,7 +86,7 @@ if [ -z "${IGNORE_CORE_INSTALLATION}" ]; then
       if [[ "${1:?}/" != "${4:?}" && "${1:?}" != "${4:?}" && "${1:?}" != "${4:?}/" ]]; then
         # In case this script runs twice (after being killed by CTRL-D)
         rm -rf "${CCIL:?}/${4:?}"
-        mv "${1:?}/" "${4:?}" 2>${OUT2:?} || { error "MV FOLDER"; return 1; }
+        mv "${1:?}/" "${4:?}" 2>>${OUT2:?} || { error "MV FOLDER"; return 1; }
       fi
     fi
 
@@ -113,7 +113,7 @@ if [ -z "${IGNORE_CORE_INSTALLATION}" ]; then
       # the github repo using git lfs. So this way preserves the old scripts
       # we set "-k 1" to be the minimum compression
       tar -cf - "${4:?}" | xz -k -1 --threads=$MNT -c - > "${5}" \
-        2>${OUT2:?} || { error "TAR (COMPRESS)"; return 1; }
+        2>>${OUT2:?} || { error "TAR (COMPRESS)"; return 1; }
 
     fi
 
@@ -146,15 +146,15 @@ if [ -z "${IGNORE_CORE_INSTALLATION}" ]; then
     if [ ! -d "${CCIL:?}/${1:?}" ]; then
     
       "${CURL:?}" -fsS "${3:?}" \
-        >${OUT1:?} 2>${OUT2:?} || { error "${EC27:?} (URL=${3:?})"; return 1; }
+        >>${OUT1:?} 2>>${OUT2:?} || { error "${EC27:?} (URL=${3:?})"; return 1; }
 
       "${GIT:?}" clone "${3:?}" "${1:?}" \
-        >${OUT1:?} 2>${OUT2:?} || { error "GIT CLONE"; return 1; }
+        >>${OUT1:?} 2>>${OUT2:?} || { error "GIT CLONE"; return 1; }
       
       cdfolder "${CCIL:?}/${1:?}" || return 1;
       
       "${GIT:?}" checkout "${2:?}" \
-        >${OUT1:?} 2>${OUT2:?} || { error "GIT CHECKOUT"; return 1; }
+        >>${OUT1:?} 2>>${OUT2:?} || { error "GIT CHECKOUT"; return 1; }
       
       rm -rf "${CCIL:?}/${1:?}/.git/"
     
@@ -185,7 +185,7 @@ if [ -z "${IGNORE_CORE_INSTALLATION}" ]; then
         # In case this script runs twice (after being killed by CTRL-D)
         rm -rf "${CCIL:?}/${2:?}"
 
-        mv "${1:?}/" "${2:?}" 2>${OUT2:?} || { error "MV FOLDER"; return 1; }
+        mv "${1:?}/" "${2:?}" 2>>${OUT2:?} || { error "MV FOLDER"; return 1; }
       
       fi
 
@@ -193,7 +193,7 @@ if [ -z "${IGNORE_CORE_INSTALLATION}" ]; then
       # the github repo using git lfs. So this way preserves the old scripts
       # we set "-k 1" to be the minimum compression
       tar -cf - "${2:?}" | xz -k -1 --threads=$MNT -c - > "${3}" \
-        2>${OUT2:?} || { error "TAR (COMPRESS)"; return 1; }
+        2>>${OUT2:?} || { error "TAR (COMPRESS)"; return 1; }
 
     fi
 
@@ -227,19 +227,19 @@ if [ -z "${IGNORE_CORE_INSTALLATION}" ]; then
 
     #False xz file: just to trigger GIT LFS
     cp xz-5.2.5.tar.gz.xz xz-5.2.5.tar.gz \
-      2>${OUT2} ||  { error "CP XZ TAR"; return 1; }
+      2>>${OUT2} ||  { error "CP XZ TAR"; return 1; }
 
     tar -xf xz-5.2.5.tar.gz.xz \
-      >${OUT1:?} 2>${OUT2:?} ||  { error "TAR XZ TAR"; return 1; }
+      >>${OUT1:?} 2>>${OUT2:?} ||  { error "TAR XZ TAR"; return 1; }
 
     cdfolder "${CCIL:?}/xz-5.2.5/" || return 1;
 
     CC="${C_COMPILER:?}" ./configure --prefix="${ROOTDIR:?}/.local" \
-      >${OUT1:?} 2>${OUT2:?} || { error "${EC11:?}"; return 1; }
+      >>${OUT1:?} 2>>${OUT2:?} || { error "${EC11:?}"; return 1; }
 
-    make -j $MNT all >${OUT1:?} 2>${OUT2:?} || { error "${:EC8?}"; return 1; }
+    make -j $MNT all >>${OUT1:?} 2>>${OUT2:?} || { error "${EC8:?}"; return 1; }
 
-    make install >${OUT1:?} 2>${OUT2:?} || { error "${EC10:?}"; return 1; }
+    make install >>${OUT1:?} 2>>${OUT2:?} || { error "${EC10:?}"; return 1; }
 
     cdfolder "${ROOTDIR}" || return 1;
 
@@ -708,7 +708,7 @@ if [ -z "${IGNORE_CORE_INSTALLATION}" ]; then
         { error "RENAME CARMA INCLUDE FOLDER"; return 1; }
 
       mv "${PACKDIR:?}/carma" "${PACKDIR:?}/carma.h" \
-        2>${OUT2:?} || { error "RENANE CARMA HEADER"; return 1; }
+        2>>${OUT2:?} || { error "RENANE CARMA HEADER"; return 1; }
 
       # --------------------------------------------------------------------------
       

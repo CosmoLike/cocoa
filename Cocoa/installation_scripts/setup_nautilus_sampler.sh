@@ -69,8 +69,9 @@ if [ -z "${IGNORE_NAUTILUS_SAMPLER_CODE}" ]; then
   if [ ! -d "${PACKDIR:?}" ]; then
     cdfolder "${ECODEF:?}" || return 1;
 
-    "${GIT:?}" clone "${URL:?}" --depth ${GIT_CLONE_MAXIMUM_DEPTH:?} --recursive \
-      "${FOLDER:?}" >${OUT1:?} 2>>${OUT2:?} || { error "${EC15:?}"; return 1; }
+    "${GIT:?}" clone "${URL:?}" --depth ${GIT_CLONE_MAXIMUM_DEPTH:?} \
+      --recursive "${FOLDER:?}" \
+      >>${OUT1:?} 2>>${OUT2:?} || { error "${EC15:?}"; return 1; }
   
     cdfolder "${PACKDIR:?}" || { cdroot; return 1; }
 

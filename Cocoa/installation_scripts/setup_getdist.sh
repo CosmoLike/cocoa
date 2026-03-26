@@ -12,7 +12,7 @@ if [ -z "${IGNORE_GETDIST_CODE}" ]; then
   ( source "${ROOTDIR:?}/installation_scripts/flags_check.sh" ) || return 1;
 
   unset_env_vars () {
-    unset -v URL URL CCIL ECODEF FOLDER PACKDIR  
+    unset -v URL CCIL ECODEF FOLDER PACKDIR  
     cdroot || return 1;
   }
 
@@ -69,8 +69,9 @@ if [ -z "${IGNORE_GETDIST_CODE}" ]; then
   if [ ! -d "${PACKDIR:?}" ]; then
     cdfolder "${ECODEF:?}" || return 1;
 
-    "${GIT:?}" clone "${URL:?}" --depth ${GIT_CLONE_MAXIMUM_DEPTH:?} --recursive \
-      "${FOLDER:?}" >>${OUT1:?} 2>>${OUT2:?} || { error "${EC15:?}"; return 1; }
+    "${GIT:?}" clone "${URL:?}" --depth ${GIT_CLONE_MAXIMUM_DEPTH:?} \
+      --recursive "${FOLDER:?}" \
+      >>${OUT1:?} 2>>${OUT2:?} || { error "${EC15:?}"; return 1; }
   
     cdfolder "${PACKDIR:?}" || { cdroot; return 1; }
 

@@ -43,6 +43,7 @@ if [ -n "${OVERWRITE_EXISTING_ALL_PACKAGES}" ]; then
   export OVERWRITE_EXISTING_DERIVKIT_CODE=1
   export OVERWRITE_EXISTING_TENSIOMETER_CODE=1
   export OVERWRITE_EXISTING_GETDIST_CODE=1
+  export OVERWRITE_EXISTING_FASTPT_CODE=1
 fi
 
 # ------------------------------------------------------------------------------
@@ -153,6 +154,11 @@ pbottom2() {
 pfail() {
   echo -e \
   "\033[0;31m       ERROR ENV VARIABLE ${1:-"empty arg"} NOT DEFINED \033[0m"
+}
+
+pwarning() {
+  echo -e \
+  "\033[0;33m       WARNING: ${1:-"empty arg"} \033[0m"
 }
 
 cdroot() {

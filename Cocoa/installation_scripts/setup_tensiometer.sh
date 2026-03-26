@@ -72,18 +72,19 @@ if [ -z "${IGNORE_TENSIOMETER_CODE}" ]; then
       'pymanopt==0.2.5' \
     --no-cache-dir --prefer-binary --use-pep517 \
     --prefix="${ROOTDIR:?}/.local" \
-    >${OUT1:?} 2>${OUT2:?} || { error "${EC13:?}"; return 1; }
+    >>${OUT1:?} 2>>${OUT2:?} || { error "${EC13:?}"; return 1; }
 
     cdfolder "${ECODEF:?}" || return 1;
 
-    "${GIT:?}" clone "${URL:?}" --depth ${GIT_CLONE_MAXIMUM_DEPTH:?} --recursive "${FOLDER:?}" \
-    >>${OUT1:?} 2>${OUT2:?} || { error "${EC15:?}"; return 1; }
+    "${GIT:?}" clone "${URL:?}" \
+      --depth ${GIT_CLONE_MAXIMUM_DEPTH:?} --recursive "${FOLDER:?}" \
+      >>${OUT1:?} 2>>${OUT2:?} || { error "${EC15:?}"; return 1; }
   
     cdfolder "${PACKDIR:?}" || { cdroot; return 1; }
 
     if [ -n "${TENSIOMETER_GIT_COMMIT}" ]; then
       "${GIT:?}" checkout "${TENSIOMETER_GIT_COMMIT:?}" \
-      >>${OUT1:?} 2>>${OUT2:?} || { error "${EC16:?}"; return 1; }
+        >>${OUT1:?} 2>>${OUT2:?} || { error "${EC16:?}"; return 1; }
     fi  
   fi
   

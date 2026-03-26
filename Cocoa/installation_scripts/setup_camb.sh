@@ -124,10 +124,10 @@ if [ -z "${IGNORE_CAMB_CODE}" ]; then
       cdfolder "${PACKDIR:?}/${TFOLDER[$i]}" || return 1
 
       cpfolder "${CHANGES:?}/${TFOLDER[$i]}${TFILEP[$i]:?}" . \
-        2>${OUT2:?} || return 1;
+        2>>${OUT2:?} || return 1;
 
-      patch -u "${TFILE[$i]:?}" -i "${TFILEP[$i]:?}" >${OUT1:?} \
-        2>${OUT2:?} || { error "${EC17:?} (${TFILE[$i]:?})"; return 1; }
+      patch -u "${TFILE[$i]:?}" -i "${TFILEP[$i]:?}" \
+        >>${OUT1:?} 2>>${OUT2:?} || { error "${EC17:?} (${TFILE[$i]:?})"; return 1; }
     done
 
   fi

@@ -57,7 +57,7 @@ if [ -z "${IGNORE_LIPOP_LIKELIHOOD_CODE}" ]; then
     if [ ! -d "${TF:?}" ]; then
       cdfolder "${ECODEF:?}" || return 1;
 
-      "${GIT:?}" clone --depth ${GIT_CLONE_MAXIMUM_DEPTH:?} "${3:?}" --recursive ${1:?} \
+      "${GIT:?}" clone "${3:?}" --depth ${GIT_CLONE_MAXIMUM_DEPTH:?} --recursive ${1:?} \
         >>${OUT1:?} 2>>${OUT2:?} || { error "${EC15:?}"; return 1; }
     
       cdfolder "${TF:?}" || return 1;

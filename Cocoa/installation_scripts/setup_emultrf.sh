@@ -15,7 +15,7 @@ if [ -z "${IGNORE_EMULTRF_CODE}" ]; then
   ( source "${ROOTDIR:?}/installation_scripts/flags_check.sh" ) || return 1;
 
   unset_env_vars () {
-    unset -v URL URL CCIL ECODEF FOLDER PACKDIR  
+    unset -v URL CCIL ECODEF FOLDER PACKDIR  
     cdroot || return 1;
   }
 
@@ -63,7 +63,7 @@ if [ -z "${IGNORE_EMULTRF_CODE}" ]; then
 
   if [ ! -d "${ECODEF:?}/emulators" ]; then
     mkdir -p "${ECODEF:?}/emulators" \
-      >${OUT1:?} 2>${OUT2:?} || { error "${EC20:?}"; return 1; }
+      >>${OUT1:?} 2>>${OUT2:?} || { error "${EC20:?}"; return 1; }
   fi
 
   URL="${EMULTRF_URL:-"https://github.com/CosmoLike/emulators_code.git"}"
@@ -82,14 +82,15 @@ if [ -z "${IGNORE_EMULTRF_CODE}" ]; then
 
     cdfolder "${ECODEF:?}/emulators" || { cdroot; return 1; }
 
-    "${GIT:?}" clone "${URL:?}" --depth ${GIT_CLONE_MAXIMUM_DEPTH:?} --recursive \
-      "${PACKDIR:?}" >${OUT1:?} 2>${OUT2:?} || { error "${EC15:?}"; return 1; }
+    "${GIT:?}" clone "${URL:?}" --depth ${GIT_CLONE_MAXIMUM_DEPTH:?} \
+      --recursive "${PACKDIR:?}" \
+      >>${OUT1:?} 2>>${OUT2:?} || { error "${EC15:?}"; return 1; }
   
     cdfolder "${PACKDIR:?}" || { cdroot; return 1; }
 
     if [ -n "${EMULTRF_GIT_COMMIT}" ]; then
       "${GIT:?}" checkout "${EMULTRF_GIT_COMMIT:?}" \
-        >${OUT1:?} 2>${OUT2:?} || { error "${EC16:?}"; return 1; }
+        >>${OUT1:?} 2>>${OUT2:?} || { error "${EC16:?}"; return 1; }
     fi  
   fi
   

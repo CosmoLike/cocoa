@@ -12,12 +12,12 @@ if [ -z "${IGNORE_COBAYA_CODE}" ]; then
   ( source "${ROOTDIR:?}/installation_scripts/flags_check.sh" ) || return 1;
 
   unset_env_vars () {
-    unset -v COB CCCOB COBLIKE COBTH URL TFILE TFOLDER TFOLDER2
+    unset -v COB CCCOB COBLIKE COBTH URL TFILE TFOLDER
     cdroot || return 1;
   }
 
   unset_env_funcs () {
-    unset -f cdfolder cpfolder error cpfile flipop cppatch cppatchfolder
+    unset -f cdfolder cpfolder error cpfile cppatch cppatchfolder
     unset -f unset_env_funcs
     cdroot || return 1;
   }
@@ -98,18 +98,19 @@ if [ -z "${IGNORE_COBAYA_CODE}" ]; then
     URL="${COBAYA_URL:-"https://github.com/CobayaSampler/cobaya.git"}"
 
     "${CURL:?}" -fsS "${URL:?}" \
-      >${OUT1:?} 2>${OUT2:?} || { error "${EC27:?} (URL=${URL:?})"; return 1; }
+      >>${OUT1:?} 2>>${OUT2:?} || { error "${EC27:?} (URL=${URL:?})"; return 1; }
 
-    "${GIT:?}" clone "${URL:?}" cobaya \
-      >${OUT1:?} 2>${OUT2:?} || { error "${EC15:?}"; return 1; }
+    "${GIT:?}" clone "${URL:?}" cobaya --depth ${GIT_CLONE_MAXIMUM_DEPTH:?} \
+      --recursive \
+      >>${OUT1:?} 2>>${OUT2:?} || { error "${EC15:?}"; return 1; }
     
     unset URL
     
     cdfolder "${COB:?}" || return 1;
 
     if [ -n "${COBAYA_GIT_COMMIT}" ]; then
-      ${GIT:?} reset --hard "${COBAYA_GIT_COMMIT:?}" \
-        >${OUT1:?} 2>${OUT2:?} || { error "${EC16:?}"; return 1; }
+      "${GIT:?}" reset --hard "${COBAYA_GIT_COMMIT:?}" \
+        >>${OUT1:?} 2>>${OUT2:?} || { error "${EC16:?}"; return 1; }
     fi
 
     cdfolder "${ROOTDIR:?}" || return 1;
@@ -138,10 +139,10 @@ if [ -z "${IGNORE_COBAYA_CODE}" ]; then
     do
       cdfolder "${COB:?}/${TFOLDER[$i]}" || return 1;
 
-      cpfolder "${CCCOB:?}/${TFOLDER[$i]}${TFILEP[$i]:?}" . 2>${OUT2:?} || return 1;
+      cpfolder "${CCCOB:?}/${TFOLDER[$i]}${TFILEP[$i]:?}" . 2>>${OUT2:?} || return 1;
 
-      patch --quiet --batch --verbose -u -R "${TFILE[$i]:?}" -i "${TFILEP[$i]:?}" >${OUT1:?} \
-        2>${OUT2:?} || { error "${EC17:?} (${TFILE[$i]:?})"; return 1; }
+      patch --quiet --batch --verbose -u -R "${TFILE[$i]:?}" -i "${TFILEP[$i]:?}" \
+        >>${OUT1:?} 2>>${OUT2:?} || { error "${EC17:?} (${TFILE[$i]:?})"; return 1; }
     done
 
     # --------------------------------------------------------------------------
@@ -155,11 +156,11 @@ if [ -z "${IGNORE_COBAYA_CODE}" ]; then
     do
       cdfolder "${COB:?}/${TFOLDER[$i]}" || return 1;
 
-      cpfolder "${CCCOB:?}/${TFOLDER[$i]}${TFILEP[$i]:?}" . 2>${OUT2:?} || return 1;
+      cpfolder "${CCCOB:?}/${TFOLDER[$i]}${TFILEP[$i]:?}" . 2>>${OUT2:?} || return 1;
 
       # HERE I CAN't USE THE -R
-      patch --quiet --batch --verbose -u "${TFILE[$i]:?}" -i "${TFILEP[$i]:?}" >${OUT1:?} \
-        2>${OUT2:?} || { error "${EC17:?} (${TFILE[$i]:?})"; return 1; }
+      patch --quiet --batch --verbose -u "${TFILE[$i]:?}" -i "${TFILEP[$i]:?}" \
+        >>${OUT1:?} 2>>${OUT2:?} || { error "${EC17:?} (${TFILE[$i]:?})"; return 1; }
     done
 
     cdfolder "${ROOTDIR:?}" || return 1;
@@ -173,7 +174,7 @@ if [ -z "${IGNORE_COBAYA_CODE}" ]; then
     TFOLDER="${COBLIKE:?}/sn" # T = TMP
 
     cp "${CCCOB:?}/${TFOLDER:?}/"roman_* "${COB:?}/${TFOLDER:?}/" \
-      2>${OUT2:?} || { error "CP ROMAN FILES"; return 1; }
+      2>>${OUT2:?} || { error "CP ROMAN FILES"; return 1; }
 
     cppatchfolder "${COBLIKE:?}" "h0licow" || return 1
 
@@ -304,12 +305,12 @@ if [ -z "${IGNORE_COBAYA_CODE}" ]; then
     # CAMSPEC ------------------------------------------------------------------
     #---------------------------------------------------------------------------
     
-    cppatch "${COBLIKE}/base_classes" "InstallableLikelihood.patch"
+    cppatch "${COBLIKE}/base_classes" "InstallableLikelihood.patch" || return 1
     
     cdfolder "${COB:?}/${COBLIKE}/base_classes/" || return 1;
 
     patch --quiet --batch --verbose -u "InstallableLikelihood.py" -i "InstallableLikelihood.patch" \
-      >${OUT1:?} 2>${OUT2:?} || { error "${EC17:?}"; return 1; }
+      >>${OUT1:?} 2>>${OUT2:?} || { error "${EC17:?}"; return 1; }
 
     cdfolder "${ROOTDIR:?}" || return 1;
 
@@ -318,7 +319,7 @@ if [ -z "${IGNORE_COBAYA_CODE}" ]; then
     # ----------------------------------------------------------------------------
     
     ${PIP3:?} install --editable cobaya --prefix="${ROOTDIR:?}/.local" \
-      >"${OUT1:?}" 2>"${OUT2:?}" || { error "${EC13:?}"; return 1; }
+      >>"${OUT1:?}" 2>>"${OUT2:?}" || { error "${EC13:?}"; return 1; }
 
     #-----------------------------------------------------------------------------
 

@@ -85,7 +85,8 @@ if [ -z "${IGNORE_FGSPECTRA_CODE}" ]; then
     # ---------------------------------------------------------------------------
     cdfolder "${ECODEF}" || return 1;
 
-    "${GIT:?}" clone "${URL:?}" --recursive "${FOLDER:?}" \
+    "${GIT:?}" clone "${URL:?}" --depth ${GIT_CLONE_MAXIMUM_DEPTH:?} \
+      --recursive "${FOLDER:?}" \
       >>${OUT1:?} 2>>${OUT2:?} || { error "${EC15:?}"; return 1; }
     
     cdfolder "${PACKDIR}" || return 1;
@@ -98,7 +99,7 @@ if [ -z "${IGNORE_FGSPECTRA_CODE}" ]; then
   
   cdfolder "${ROOTDIR}" || return 1;
   
-  pbottom "INSTALLING ${PRINTNAME:?}"
+  pbottom "INSTALLING ${PRINTNAME:?}" || return 1;
     
   unset_all || return 1;
 fi

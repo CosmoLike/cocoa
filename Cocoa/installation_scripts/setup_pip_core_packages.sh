@@ -74,7 +74,7 @@ if [ -z "${IGNORE_PIP_CORE_INSTALLATION}" ]; then
       --no-cache-dir --prefer-binary \
       --prefix="${ROOTDIR:?}/.local" \
       --force-reinstall \
-      >${OUT1:?} 2>${OUT2:?} || { error "(PIP-CORE-PACKAGES) ${EC13:?}"; return 1; }
+      >>${OUT1:?} 2>>${OUT2:?} || { error "(PIP-CORE-PACKAGES) ${EC13:?}"; return 1; }
   else
     COCOA_NUMPY_VERSION='1.26.3'
     env MPICC=$MPI_CC_COMPILER ${PIP3:?} install \
@@ -84,19 +84,19 @@ if [ -z "${IGNORE_PIP_CORE_INSTALLATION}" ]; then
       --no-cache-dir --prefer-binary \
       --prefix="${ROOTDIR:?}/.local" \
       --force-reinstall \
-      >${OUT1:?} 2>${OUT2:?} || { error "(PIP-CORE-PACKAGES) ${EC13:?}"; return 1; }
+      >>${OUT1:?} 2>>${OUT2:?} || { error "(PIP-CORE-PACKAGES) ${EC13:?}"; return 1; }
   fi
 
   env MPICC=$MPI_CC_COMPILER ${PIP3:?} install \
       'notebook==7.4.2' \
       'ipyparallel==9.0.1' \
-      'emcee== 3.1.6' \
+      'emcee==3.1.6' \
       'sacc==1.0.2' \
       'flit_core==3.12.0' \
       'jax==0.4.1' \
     --no-cache-dir --prefer-binary --use-pep517 \
     --prefix="${ROOTDIR:?}/.local" \
-    >${OUT1:?} 2>${OUT2:?} || { error "(PIP-CORE-PACKAGES) ${EC13:?}"; return 1; }
+    >>${OUT1:?} 2>>${OUT2:?} || { error "(PIP-CORE-PACKAGES) ${EC13:?}"; return 1; }
 
   #env CXX="${CXX_COMPILER:?}" CC="${C_COMPILER:?}" ${PIP3:?} install \
   #--upgrade setuptools --no-cache-dir >${OUT1:?} 2>${OUT2:?} \
@@ -130,7 +130,7 @@ if [ -z "${IGNORE_PIP_CORE_INSTALLATION}" ]; then
       --no-cache-dir --prefer-binary \
       --extra-index-url "https://download.pytorch.org/whl/cu118" \
       --prefix="${ROOTDIR:?}/.local" \
-      >${OUT1:?} 2>${OUT2:?} || { error "${EC13:?}"; return 1; } 
+      >>${OUT1:?} 2>>${OUT2:?} || { error "${EC13:?}"; return 1; } 
 
     # Without this code, jupyter breaks notebook
     env CXX="${CXX_COMPILER:?}" CC="${C_COMPILER:?}" ${PIP3:?} install \
@@ -139,7 +139,7 @@ if [ -z "${IGNORE_PIP_CORE_INSTALLATION}" ]; then
         'ipyparallel==9.0.1' \
       --no-cache-dir --prefer-binary \
       --prefix="${ROOTDIR:?}/.local" \
-      >${OUT1:?} 2>${OUT2:?} || { error "${EC13:?}"; return 1; }
+      >>${OUT1:?} 2>>${OUT2:?} || { error "${EC13:?}"; return 1; }
 
     pbottom "PIP INSTALL MACHINE LEARNING GPU PACKAGES" || return 1
   
