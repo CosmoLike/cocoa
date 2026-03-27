@@ -13,6 +13,9 @@ if [ -z "${IGNORE_PIP_CORE_INSTALLATION}" ]; then
 
   unset_env_vars () {
     unset -v URL_BASE URL FOLDER VER XZF CCIL CNAME PACKDIR PACKAGE_VERSION 
+    unset -v PIPCPFR PIPCP PIPCPML
+    unset -v PIPCPFR_HASH PIPCP_HASH PIPCPML_HASH
+    unset -v SENTINEL_PIPCPFR SENTINEL_PIPCP SENTINEL_PIPCPML
     cdroot || return 1;
   }
 
@@ -57,91 +60,160 @@ if [ -z "${IGNORE_PIP_CORE_INSTALLATION}" ]; then
   # ----------------------------------------------------------------------------
   # --------------------------- PIP CORE PACKAGES ------------------------------
   # ----------------------------------------------------------------------------  
+  if [ -n "${OVERWRITE_EXISTING_PIP_PACKAGES:-}" ]; then
+  
+    # here are the ones protected by sentinel
+    rm -f "${ROOTDIR:?}/.local/pip_core_packages_"*
+  
+  fi
+
   ptop "INSTALLING A FEW PYTHON CORE LIBRARIES VIA PIP" || { unset_all; return 1; }
 
+  # ----------------------------------------------------------------------------
+  # ----------------------------------------------------------------------------
+  # CORE PACKAGES - FORCE REINSTALL (PIP CPFR) ---------------------------------
+  # ----------------------------------------------------------------------------
+  # ----------------------------------------------------------------------------
   #PS: --force-reinstall - this helps CARMA to see numpy files
   #PS2: Need to include numpy in the same command to avoid numpy 2.0
   # mpi4py has a weird bug when installing from conda on a few machines 
   # (e.g., midway) no-cache-dir is important to fix this bug
   # https://github.com/mpi4py/mpi4py/issues/335
+  
   if [ -n "${COCOA_FORCE_NUMPY_1_23}" ]; then
     COCOA_NUMPY_VERSION='1.23.5'
-    env MPICC=$MPI_CC_COMPILER ${PIP3:?} install \
-        "numpy==${COCOA_NUMPY_VERSION:?}" \
-        'mpi4py==4.0.3' \
-        'pyfftw==0.13.1' \
-        'setuptools==80.3.1' \
-      --no-cache-dir --prefer-binary \
-      --prefix="${ROOTDIR:?}/.local" \
-      --force-reinstall \
-      >>${OUT1:?} 2>>${OUT2:?} || { error "(PIP-CORE-PACKAGES) ${EC13:?}"; return 1; }
   else
     COCOA_NUMPY_VERSION='1.26.3'
+  fi
+
+  PIPCPFR=(
+    "numpy==${COCOA_NUMPY_VERSION:?}"
+    'mpi4py==4.0.3'
+    'setuptools==80.3.1'
+  )
+
+  PIPCPFR_HASH=$(
+    {
+      printf '%s ' "${PIPCPFR[@]}";
+      printf 'PYTHON=%s\n' "${PYTHON3:-}";
+      printf 'PIP=%s\n'    "${PIP3:-}";
+      printf 'MPICC=%s\n'  "${MPI_CC_COMPILER:-}";
+    } | md5sum | cut -d' ' -f1
+  )
+
+  SENTINEL_PIPCPFR="${ROOTDIR:?}/.local/pip_core_packages_${PIPCPFR_HASH:?}"
+
+  if [ ! -f "${SENTINEL_PIPCPFR:?}" ]; then
+ 
     env MPICC=$MPI_CC_COMPILER ${PIP3:?} install \
-        "numpy==${COCOA_NUMPY_VERSION:?}" \
-        'mpi4py==4.0.3' \
-        'setuptools==80.3.1' \
+        "${PIPCPFR[@]}" \
       --no-cache-dir --prefer-binary \
       --prefix="${ROOTDIR:?}/.local" \
       --force-reinstall \
-      >>${OUT1:?} 2>>${OUT2:?} || { error "(PIP-CORE-PACKAGES) ${EC13:?}"; return 1; }
+      >>${OUT1:?} 2>>${OUT2:?} || { error "(PIP-CPFR) ${EC13:?}"; return 1; }
+
+    touch "${SENTINEL_PIPCPFR:?}" \
+      >>${OUT1:?} 2>>${OUT2:?} || { error "SENTINEL PIP CPFR"; return 1; }
+
   fi
 
-  env MPICC=$MPI_CC_COMPILER ${PIP3:?} install \
-      'notebook==7.4.2' \
-      'ipyparallel==9.0.1' \
-      'emcee==3.1.6' \
-      'sacc==1.0.2' \
-      'flit_core==3.12.0' \
-      'jax==0.4.1' \
-    --no-cache-dir --prefer-binary --use-pep517 \
-    --prefix="${ROOTDIR:?}/.local" \
-    >>${OUT1:?} 2>>${OUT2:?} || { error "(PIP-CORE-PACKAGES) ${EC13:?}"; return 1; }
+  # ----------------------------------------------------------------------------
+  # ----------------------------------------------------------------------------
+  # CORE PACKAGES (PIP CP) -----------------------------------------------------
+  # ----------------------------------------------------------------------------
+  # ----------------------------------------------------------------------------
+  PIPCP=(
+      "numpy==${COCOA_NUMPY_VERSION:?}"
+      'notebook==7.4.2'
+      'ipyparallel==9.0.1'
+      'emcee==3.1.6'
+      'sacc==1.0.2'
+      'pyfftw==0.13.1'
+      'flit_core==3.12.0'
+      'jax==0.4.1'
+    )
+  
+  PIPCP_HASH=$(
+    {
+      printf '%s ' "${PIPCP[@]}";
+      printf 'PYTHON=%s\n' "${PYTHON3:-}";
+      printf 'PIP=%s\n'    "${PIP3:-}";
+      printf 'MPICC=%s\n'  "${MPI_CC_COMPILER:-}";
+    } | md5sum | cut -d' ' -f1
+  )
 
-  #env CXX="${CXX_COMPILER:?}" CC="${C_COMPILER:?}" ${PIP3:?} install \
-  #--upgrade setuptools --no-cache-dir >${OUT1:?} 2>${OUT2:?} \
-  #|| { error "(PIP-CORE-PACKAGES) ${EC13:?}"; return 1; }
+  SENTINEL_PIPCP="${ROOTDIR:?}/.local/pip_core_packages_${PIPCP_HASH:?}"
+
+  if [ ! -f "${SENTINEL_PIPCP:?}" ]; then
+  
+    env MPICC=$MPI_CC_COMPILER ${PIP3:?} install "${PIPCP[@]}" \
+      --no-cache-dir --prefer-binary --use-pep517 \
+      --prefix="${ROOTDIR:?}/.local" \
+      >>${OUT1:?} 2>>${OUT2:?} || { error "(PIP-CP) ${EC13:?}"; return 1; }
+  
+    touch "${SENTINEL_PIPCP:?}" \
+      >>${OUT1:?} 2>>${OUT2:?} || { error "SENTINEL PIP CP"; return 1; }
+  
+  fi
 
   pbottom "INSTALLING PYTHON CORE LIBRARIES VIA PIP" || { unset_all; return 1; }
   
   # ----------------------------------------------------------------------------
-  # ----------------------------- PIP ML PACKAGES ------------------------------
   # ----------------------------------------------------------------------------
-  
+  # CORE PACKAGES - MACHINE LEARNING (PIP CPML) --------------------------------
+  # ----------------------------------------------------------------------------
+  # ----------------------------------------------------------------------------
+
   if [ -z "${IGNORE_EMULATOR_GPU_PIP_PACKAGES}" ]; then
-    ptop "PIP INSTALL MACHINE LEARNING GPU PACKAGES (takes a while O(5-10min)...)" || { unset_all; return 1; }
+    
+    ptop "PIP INSTALL ML-GPU (takes O(5-10min)...)" || { unset_all; return 1; }
 
-    env CXX="${CXX_COMPILER:?}" CC="${C_COMPILER:?}" ${PIP3:?} install \
-        "numpy==${COCOA_NUMPY_VERSION:?}" \
-        'tensorflow==2.17.0' \
-        'tensorflow_probability==0.24.0' \
-        'keras==3.9.2' \
-        'keras-preprocessing==1.1.2' \
-        'torch==2.6.0' \
-        'torchvision==0.21.0' \
-        'torchaudio==2.6.0' \
-        'scikit-learn==1.6.1' \
-        'jupyter==1.0.0' \
-        'typing-extensions==4.13.2' \
-        'mkdocs_material==9.6.13' \
-        'mkdocstrings==0.29.1' \
-        'pytest==8.3.5' \
-        'tf-keras==2.17.0' \
-      --no-cache-dir --prefer-binary \
-      --extra-index-url "https://download.pytorch.org/whl/cu118" \
-      --prefix="${ROOTDIR:?}/.local" \
-      >>${OUT1:?} 2>>${OUT2:?} || { error "${EC13:?}"; return 1; } 
+    PIPCPML=(
+        "numpy==${COCOA_NUMPY_VERSION:?}"
+        'tensorflow==2.17.0'
+        'tensorflow_probability==0.24.0'
+        'keras==3.9.2'
+        'keras-preprocessing==1.1.2'
+        'torch==2.6.0'
+        'torchvision==0.21.0'
+        'torchaudio==2.6.0'
+        'scikit-learn==1.6.1'
+        'jupyter==1.0.0'
+        'typing-extensions==4.13.2'
+        'mkdocs_material==9.6.13'
+        'mkdocstrings==0.29.1'
+        'pytest==8.3.5'
+        'tf-keras==2.17.0'
+      )
 
-    # Without this code, jupyter breaks notebook
-    env CXX="${CXX_COMPILER:?}" CC="${C_COMPILER:?}" ${PIP3:?} install \
-        "numpy==${COCOA_NUMPY_VERSION:?}" \
-        'notebook==7.4.2' \
-        'ipyparallel==9.0.1' \
-      --no-cache-dir --prefer-binary \
-      --prefix="${ROOTDIR:?}/.local" \
-      >>${OUT1:?} 2>>${OUT2:?} || { error "${EC13:?}"; return 1; }
+    PIPCPML_HASH=$(
+      {
+        printf '%s ' "${PIPCPML[@]}";
+        printf 'PYTHON=%s\n' "${PYTHON3:-}";
+        printf 'PIP=%s\n'    "${PIP3:-}";
+        printf 'MPICC=%s\n'  "${MPI_CC_COMPILER:-}";
+      } | md5sum | cut -d' ' -f1
+    )
 
-    pbottom "PIP INSTALL MACHINE LEARNING GPU PACKAGES" || { unset_all; return 1; }
+    SENTINEL_PIPCPML="${ROOTDIR:?}/.local/pip_core_packages_${PIPCPML_HASH:?}"
+
+    if [ ! -f "${SENTINEL_PIPCPML:?}" ]; then
+    
+      env CXX="${CXX_COMPILER:?}" CC="${C_COMPILER:?}" ${PIP3:?} install "${PIPCPML[@]}" \
+        --no-cache-dir --prefer-binary \
+        --extra-index-url "https://download.pytorch.org/whl/cu118" \
+        --prefix="${ROOTDIR:?}/.local" \
+        >>${OUT1:?} 2>>${OUT2:?} || { error "${EC13:?}"; return 1; } 
+
+      # Without this code, jupyter breaks notebook
+      env CXX="${CXX_COMPILER:?}" CC="${C_COMPILER:?}" ${PIP3:?} install "${PIPCP[@]}" \
+        --no-cache-dir --prefer-binary \
+        --prefix="${ROOTDIR:?}/.local" \
+        >>${OUT1:?} 2>>${OUT2:?} || { error "${EC13:?}"; return 1; }
+    
+    fi
+
+    pbottom "PIP INSTALL ML-GPU" || { unset_all; return 1; }
   
   fi
 
