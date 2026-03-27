@@ -52,7 +52,7 @@ if [ -z "${IGNORE_CAMB_CODE}" ]; then
 
   # ---------------------------------------------------------------------------
 
-  ptop "SETUP CAMB" || return 1;
+  ptop "SETUP CAMB" || { unset_all; return 1; }
 
   CCIL="${ROOTDIR:?}/../cocoa_installation_libraries"
 
@@ -67,23 +67,39 @@ if [ -z "${IGNORE_CAMB_CODE}" ]; then
 
   PACKDIR="${ECODEF:?}/${FOLDER:?}"
 
-  if [ -n "${OVERWRITE_EXISTING_CAMB_CODE}" ]; then
+  if [ -n "${OVERWRITE_EXISTING_CAMB_CODE:-}" ]; then
+  
     rm -rf "${PACKDIR:?}"
+  
   fi
 
   if [ ! -d "${PACKDIR:?}" ]; then
     
-    cdfolder "${ECODEF:?}" || { cdroot; return 1; }
+    cdfolder "${ECODEF:?}" || { unset_all; return 1; }
 
-    "${GIT:?}" clone --depth ${GIT_CLONE_MAXIMUM_DEPTH:?} "${URL:?}" \
+    "${GIT:?}" clone "${URL:?}" --depth ${GIT_CLONE_MAXIMUM_DEPTH:-1000} \
       --recursive "${FOLDER:?}" \
       >>${OUT1:?} 2>>${OUT2:?} || { error "${EC15:?}"; return 1; }
     
-    cdfolder "${PACKDIR}" || { cdroot; return 1; }
+    cdfolder "${PACKDIR}" || { unset_all; return 1; }
 
-    if [ -n "${CAMB_GIT_COMMIT}" ]; then
+    if [ -n "${CAMB_GIT_COMMIT:-}" ]; then
+    
+      if [ "$("${GIT:?}" rev-parse --is-shallow-repository)" = "true" ]; then
+      
+        "${GIT:?}" fetch --unshallow --all --tags --prune \
+          >>${OUT1:?} 2>>${OUT2:?} || { error "${EC16:?}"; return 1; }
+      
+      else
+      
+        "${GIT:?}" fetch --all --tags --prune \
+          >>${OUT1:?} 2>>${OUT2:?} || { error "${EC16:?}"; return 1; }
+      
+      fi
+
       "${GIT:?}" checkout "${CAMB_GIT_COMMIT:?}" \
       >>${OUT1:?} 2>>${OUT2:?} || { error "${EC16:?}"; return 1; }
+    
     fi
     
     # --------------------------------------------------------------------------
@@ -121,10 +137,10 @@ if [ -z "${IGNORE_CAMB_CODE}" ]; then
 
     for (( i=0; i<${AL}; i++ ));
     do
-      cdfolder "${PACKDIR:?}/${TFOLDER[$i]}" || return 1
+      cdfolder "${PACKDIR:?}/${TFOLDER[$i]}" || { unset_all; return 1; }
 
       cpfolder "${CHANGES:?}/${TFOLDER[$i]}${TFILEP[$i]:?}" . \
-        2>>${OUT2:?} || return 1;
+        2>>${OUT2:?} || { unset_all; return 1; }
 
       patch -u "${TFILE[$i]:?}" -i "${TFILEP[$i]:?}" \
         >>${OUT1:?} 2>>${OUT2:?} || { error "${EC17:?} (${TFILE[$i]:?})"; return 1; }
@@ -132,9 +148,9 @@ if [ -z "${IGNORE_CAMB_CODE}" ]; then
 
   fi
 
-  pbottom "SETUP CAMB" || return 1
+  pbottom "SETUP CAMB" || { unset_all; return 1; }
   
-  cdfolder "${ROOTDIR}" || return 1
+  cdfolder "${ROOTDIR}" || { unset_all; return 1; }
 
   unset_all || return 1
 fi

@@ -64,12 +64,12 @@ if [ -z "${IGNORE_CLASS_CODE}" ]; then
   # Name to be printed on this shell script messages
   PRINTNAME="CLASS"
 
-  ptop "SETUP ${PRINTNAME:?}" || return 1;
+  ptop "SETUP ${PRINTNAME:?}" || { unset_all; return 1; }
 
   # ---------------------------------------------------------------------------
   # in case this script is called twice ---------------------------------------
   # ---------------------------------------------------------------------------
-  if [ -n "${OVERWRITE_EXISTING_CLASS_CODE}" ]; then
+  if [ -n "${OVERWRITE_EXISTING_CLASS_CODE:-}" ]; then
     
     rm -rf "${PACKDIR:?}"
   
@@ -80,17 +80,31 @@ if [ -z "${IGNORE_CLASS_CODE}" ]; then
   # ---------------------------------------------------------------------------
   if [ ! -d "${PACKDIR:?}" ]; then
 
-    cdfolder "${ECODEF}" || return 1;
+    cdfolder "${ECODEF}" || { unset_all; return 1; }
     
-    "${GIT:?}" clone "${URL:?}" --depth ${GIT_CLONE_MAXIMUM_DEPTH:?} \
+    "${GIT:?}" clone "${URL:?}" --depth ${GIT_CLONE_MAXIMUM_DEPTH:-1000} \
       --recursive "${FOLDER:?}" \
       >>${OUT1:?} 2>>${OUT2:?} || { error "${EC15:?}"; return 1; }
     
-    cdfolder "${PACKDIR}" || return 1;
+    cdfolder "${PACKDIR}" || { unset_all; return 1; }
 
-    if [ -n "${CLASS_GIT_COMMIT}" ]; then
+    if [ -n "${CLASS_GIT_COMMIT:-}" ]; then
+    
+      if [ "$("${GIT:?}" rev-parse --is-shallow-repository)" = "true" ]; then
+      
+        "${GIT:?}" fetch --unshallow --all --tags --prune \
+          >>${OUT1:?} 2>>${OUT2:?} || { error "${EC16:?}"; return 1; }
+      
+      else
+      
+        "${GIT:?}" fetch --all --tags --prune \
+          >>${OUT1:?} 2>>${OUT2:?} || { error "${EC16:?}"; return 1; }
+      
+      fi
+
       "${GIT:?}" checkout "${CLASS_GIT_COMMIT:?}" \
         >>${OUT1:?} 2>>${OUT2:?} || { error "${EC16:?}"; return 1; }
+    
     fi
     
     # --------------------------------------------------------------------------
@@ -98,8 +112,10 @@ if [ -z "${IGNORE_CLASS_CODE}" ]; then
     # historical: Workaround Cocoa .gitignore entry on /include ----------------
     # --------------------------------------------------------------------------
     if [ -d "${PACKDIR:?}/include2" ]; then
+    
       rm -rf "${PACKDIR:?}/include2" \
          >>${OUT1:?} 2>>${OUT2:?} || { error "RM INCLUDE2"; return 1; }
+    
     fi
 
     mv ./include ./include2 >>${OUT1:?} 2>>${OUT2:?} \
@@ -125,10 +141,10 @@ if [ -z "${IGNORE_CLASS_CODE}" ]; then
 
     for (( i=0; i<${AL}; i++ ));
     do
-      cdfolder "${PACKDIR:?}/${TFOLDER[$i]}" || return 1;
+      cdfolder "${PACKDIR:?}/${TFOLDER[$i]}" || { unset_all; return 1; }
 
       cpfolder "${CHANGES:?}/${TFOLDER[$i]}${TFILEP[$i]:?}" . \
-        2>>${OUT2:?} || return 1;
+        2>>${OUT2:?} || { unset_all; return 1; }
 
       patch -u "${TFILE[$i]:?}" -i "${TFILEP[$i]:?}" >>${OUT1:?} \
         2>>${OUT2:?} || { error "${EC17:?} (${TFILE[$i]:?})"; return 1; }
@@ -136,9 +152,9 @@ if [ -z "${IGNORE_CLASS_CODE}" ]; then
 
   fi
   
-  cdfolder "${ROOTDIR}" || return 1;
+  cdfolder "${ROOTDIR}" || { unset_all; return 1; }
 
-  pbottom "SETUP ${PRINTNAME:?}" || return 1
+  pbottom "SETUP ${PRINTNAME:?}" || { unset_all; return 1; }
 
   unset_all || return 1
 fi

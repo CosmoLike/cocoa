@@ -73,10 +73,6 @@ if [ -z "${IGNORE_XXX_DATA}" ]; then
 
   cdfolder "${EDATAF:?}" || return 1
 
-  # check if the link exists
-  "${CURL:?}" -fsS "${URL:?}" \
-    >>${OUT1:?} 2>>${OUT2:?} || { error "${EC27:?} (URL=${URL:?})"; return 1; }
-
   ${GIT:?} clone "${URL:?}" "${FOLDER:?}" \
     >>${OUT1:?} 2>>${OUT2:?} || { error "${EC15:?}"; return 1; }
 

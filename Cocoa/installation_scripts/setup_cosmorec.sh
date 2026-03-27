@@ -76,33 +76,31 @@ if [ -z "${IGNORE_COSMOREC_CODE}" ]; then
   # Name to be printed on this shell script messages
   PRINTNAME="COSMOREC RECOMBINATION CODE"
 
-  ptop "INSTALLING ${PRINTNAME:?}" || return 1;
+  ptop "INSTALLING ${PRINTNAME:?}" || { unset_all; return 1; }
 
   # ---------------------------------------------------------------------------
   # In case this script is called twice ---------------------------------------
   # ---------------------------------------------------------------------------
-  if [ -n "${OVERWRITE_EXISTING_COSMOREC_CODE}" ]; then
+  if [ -n "${OVERWRITE_EXISTING_COSMOREC_CODE:-}" ]; then
+  
     rm -rf "${PACKDIR:?}"
     rm -f  "${ECODEF:?}/${FILE}"
     rm -rf "${ECODEF:?}/${FILENAME}"
+  
   fi
+  
   # ----------------------------------------------------------------------------
   # Clone from original repo ---------------------------------------------------
   # ----------------------------------------------------------------------------
   if [ ! -d "${PACKDIR:?}" ]; then
   
-    cdfolder "${ECODEF:?}" || { cdroot; return 1; }
+    cdfolder "${ECODEF:?}" || { unset_all; return 1; }
 
     LOCAL_BACKUP_USED=0
-
-    #"${WGET:?}" "${URL/https:/http:}" --show-progress --no-check-certificate \
-    #  --progress=bar:force --timeout=30 --tries=2 \
-    #  >>${OUT1:?} 2>>${OUT2:?} || { error "${EC24:?}"; return 1; }
     
-    "${WGET:?}" "${URL/https:/http:}" --show-progress --no-check-certificate \
+    "${WGET:?}" "${URL}" --show-progress --no-check-certificate \
       --progress=bar:force:noscroll --timeout=30 --tries=2 --waitretry=0  \
       --retry-connrefused --read-timeout=30 >>${OUT1:?} 2>>${OUT2:?} || {
-      
       pwarning "WGET FAILED - USING LOCAL COCOA COSMOREC BACKUP" || return 1;
       
       LOCAL_BACKUP_USED=1
@@ -116,15 +114,18 @@ if [ -z "${IGNORE_COSMOREC_CODE}" ]; then
         2>>${OUT2:?} || { error "UNXZ LOCAL COSMOREC BACKUP"; return 1; }
     }
 
-    tar -zxf "${FILE:?}" >>${OUT1:?} 2>>${OUT2:?} || { error "${EC25:?}"; return 1; }
+    tar -zxf "${FILE:?}" \
+      >>${OUT1:?} 2>>${OUT2:?} || { error "${EC25:?}"; return 1; }
 
     if [ ! -d "${FOLDER:?}" ]; then
-      mv "${FILENAME:?}" "${FOLDER:?}" >>${OUT1:?} 2>>${OUT2:?} \
-        || { error "${EC30:?}"; return 1; }
+    
+      mv "${FILENAME:?}" "${FOLDER:?}" \
+        >>${OUT1:?} 2>>${OUT2:?} || { error "${EC30:?}"; return 1; }
+    
     fi
 
-    rm -f  "${ECODEF:?}/${FILE}"
-    rm -rf "${ECODEF:?}/${FILENAME}"
+    rm -f  "${ECODEF:?}/${FILE:?}"
+    rm -rf "${ECODEF:?}/${FILENAME:?}"
 
     if [ "${LOCAL_BACKUP_USED}" -eq 0 ]; then
       # --------------------------------------------------------------------------
@@ -148,10 +149,10 @@ if [ -z "${IGNORE_COSMOREC_CODE}" ]; then
 
       for (( i=0; i<${AL}; i++ ));
       do
-        cdfolder "${PACKDIR:?}/${TFOLDER[$i]}" || return 1
+        cdfolder "${PACKDIR:?}/${TFOLDER[$i]}" || { unset_all; return 1; }
 
         cpfolder "${CHANGES:?}/${TFOLDER[$i]}${TFILEP[$i]:?}" . \
-          2>>${OUT2:?} || return 1;
+          2>>${OUT2:?} || { unset_all; return 1; }
 
         patch -u "${TFILE[$i]:?}" -i "${TFILEP[$i]:?}" \
           >>${OUT1:?} 2>>${OUT2:?} || { error "${EC17:?} (${TFILE[$i]:?})"; return 1; }
@@ -160,9 +161,9 @@ if [ -z "${IGNORE_COSMOREC_CODE}" ]; then
 
   fi
   
-  cdfolder "${ROOTDIR}" || return 1
+  cdfolder "${ROOTDIR:?}" || { unset_all; return 1; }
   
-  pbottom "INSTALLING ${PRINTNAME:?}" || return 1
+  pbottom "INSTALLING ${PRINTNAME:?}" || { unset_all; return 1; }
   
   unset_all || return 1
 fi

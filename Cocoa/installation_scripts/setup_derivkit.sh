@@ -60,36 +60,50 @@ if [ -z "${IGNORE_DERIVKIT_CODE}" ]; then
 
   PACKDIR="${ECODEF:?}/${FOLDER:?}"
   
-  ptop "INSTALLING DERIVKIT DERIVATIVE CALCULATOR" || return 1;
+  ptop "INSTALLING DERIVKIT DERIVATIVE CALCULATOR" || { unset_all; return 1; }
 
-  if [ -n "${OVERWRITE_EXISTING_DERIVKIT_CODE}" ]; then
+  if [ -n "${OVERWRITE_EXISTING_DERIVKIT_CODE:-}" ]; then
+  
     rm -rf "${PACKDIR:?}"
+  
   fi
 
   if [ ! -d "${PACKDIR:?}" ]; then
     env MPICC=$MPI_CC_COMPILER ${PIP3:?} install \
       'numdifftools==0.9.41' \
-    --no-cache-dir --prefer-binary --use-pep517 \
-    --prefix="${ROOTDIR:?}/.local" \
-    >>${OUT1:?} 2>>${OUT2:?} || { error "(PIP-CORE-PACKAGES) ${EC13:?}"; return 1; }
+      --no-cache-dir --prefer-binary --use-pep517 --prefix="${ROOTDIR:?}/.local" \
+      >>${OUT1:?} 2>>${OUT2:?} || { error "(PIP-CORE-PACKAGES) ${EC13:?}"; return 1; }
 
-    cdfolder "${ECODEF:?}" || return 1;
+    cdfolder "${ECODEF:?}" || { unset_all; return 1; }
 
-    "${GIT:?}" clone "${URL:?}" --depth ${GIT_CLONE_MAXIMUM_DEPTH:?} \
+    "${GIT:?}" clone "${URL:?}" --depth ${GIT_CLONE_MAXIMUM_DEPTH:-1000} \
       --recursive "${FOLDER:?}" \
       >>${OUT1:?} 2>>${OUT2:?} || { error "${EC15:?}"; return 1; }
   
     cdfolder "${PACKDIR:?}" || { cdroot; return 1; }
 
-    if [ -n "${DERIVKIT_GIT_COMMIT}" ]; then
+    if [ -n "${DERIVKIT_GIT_COMMIT:-}" ]; then
+    
+      if [ "$("${GIT:?}" rev-parse --is-shallow-repository)" = "true" ]; then
+    
+        "${GIT:?}" fetch --unshallow --all --tags --prune \
+          >>${OUT1:?} 2>>${OUT2:?} || { error "${EC16:?}"; return 1; }
+    
+      else
+    
+        "${GIT:?}" fetch --all --tags --prune \
+          >>${OUT1:?} 2>>${OUT2:?} || { error "${EC16:?}"; return 1; }
+    
+      fi
+
       "${GIT:?}" checkout "${DERIVKIT_GIT_COMMIT:?}" \
         >>${OUT1:?} 2>>${OUT2:?} || { error "${EC16:?}"; return 1; }
     fi  
   fi
   
-  cdfolder "${ROOTDIR}" || return 1
+  cdfolder "${ROOTDIR}" || { unset_all; return 1; }
   
-  pbottom "INSTALLING DERIVKIT DERIVATIVE CALCULATOR" || return 1
+  pbottom "INSTALLING DERIVKIT DERIVATIVE CALCULATOR" || { unset_all; return 1; }
 
   unset_all || return 1  
 fi

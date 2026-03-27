@@ -49,7 +49,7 @@ if [ -z "${IGNORE_COSMOLIKE_CODE}" ]; then
 
   unset_env_vars || return 1
 
-  ptop "SETUP COCOA-COSMOLIKE CORE" || return 1;
+  ptop "SETUP COCOA-COSMOLIKE CORE" || { unset_all; return 1; }
 
   URL="${COSMOLIKE_URL:-"https://github.com/CosmoLike/cocoa-cosmolike-core.git"}"
 
@@ -59,33 +59,62 @@ if [ -z "${IGNORE_COSMOLIKE_CODE}" ]; then
 
   PACKDIR="${ECODEF:?}/${FOLDER:?}"
 
-  if [ -n "${OVERWRITE_EXISTING_COSMOLIKE_CODE}" ]; then
+  if [ -n "${OVERWRITE_EXISTING_COSMOLIKE_CODE:-}" ]; then
+  
     rm -rf "${PACKDIR:?}"
+  
   fi
 
   if [ ! -d "${PACKDIR:?}" ]; then
-    cdfolder "${ECODEF:?}" || { cdroot; return 1; }
+  
+    cdfolder "${ECODEF:?}" || { unset_all; return 1; }
 
-    "${GIT:?}" clone "${URL:?}" --depth ${GIT_CLONE_MAXIMUM_DEPTH:?} \
+    "${GIT:?}" clone "${URL:?}" --depth ${GIT_CLONE_MAXIMUM_DEPTH:-1000} \
       --recursive "${FOLDER:?}" \
       >>${OUT1:?} 2>>${OUT2:?} || { error "${EC15:?}"; return 1; }
     
-    cdfolder "${PACKDIR}" || { cdroot; return 1; }
+    cdfolder "${PACKDIR}" || { unset_all; return 1; }
 
-    if [ -n "${COSMOLIKE_GIT_COMMIT}" ]; then
+    if [ -n "${COSMOLIKE_GIT_COMMIT:-}" ]; then
+
+      if [ "$("${GIT:?}" rev-parse --is-shallow-repository)" = "true" ]; then
+   
+        "${GIT:?}" fetch --unshallow --all --tags --prune \
+          >>${OUT1:?} 2>>${OUT2:?} || { error "${EC16:?}"; return 1; }
+   
+      else
+   
+        "${GIT:?}" fetch --all --tags --prune \
+          >>${OUT1:?} 2>>${OUT2:?} || { error "${EC16:?}"; return 1; }
+   
+      fi
+
       "${GIT:?}" checkout "${COSMOLIKE_GIT_COMMIT:?}" \
         >>${OUT1:?} 2>>${OUT2:?} || { error "${EC16:?}"; return 1; }
+    
     elif [ -n "${COSMOLIKE_GIT_TAG}" ]; then 
-      "${GIT:?}" fetch --all --tags --prune
-      
+    
+      if [ "$("${GIT:?}" rev-parse --is-shallow-repository)" = "true" ]; then
+  
+        "${GIT:?}" fetch --unshallow --all --tags --prune \
+          >>${OUT1:?} 2>>${OUT2:?} || { error "${EC16:?}"; return 1; }
+  
+      else
+  
+        "${GIT:?}" fetch --all --tags --prune \
+          >>${OUT1:?} 2>>${OUT2:?} || { error "${EC16:?}"; return 1; }
+  
+      fi
+  
       "${GIT:?}" checkout tags/${COSMOLIKE_GIT_TAG} -b ${COSMOLIKE_GIT_TAG} \
         >>${OUT1:?} 2>>${OUT2:?} || { error "${EC16:?}"; return 1; }
-    fi    
+
+    fi
   fi
 
-  pbottom "SETUP COCOA-COSMOLIKE CORE" || return 1
+  pbottom "SETUP COCOA-COSMOLIKE CORE" || { unset_all; return 1; }
   
-  cdfolder "${ROOTDIR}" || return 1
+  cdfolder "${ROOTDIR:?}" || { unset_all; return 1; }
 
   unset_all || return 1
 fi

@@ -72,31 +72,50 @@ if [ -z "${IGNORE_EMULTRF_CODE}" ]; then
 
   PACKDIR="${ECODEF:?}/emulators/${FOLDER:?}"
   
-  ptop "INSTALLING EMULATOR CMB TRF THEORY (COBAYA)" || return 1;
+  ptop "INSTALLING EMULATOR CMB TRF THEORY (COBAYA)" || { unset_all; return 1; }
 
-  if [ -n "${OVERWRITE_EXISTING_EMULTRF_CODE}" ]; then
+  # ----------------------------------------------------------------------------
+  # In case this script is called twice ----------------------------------------
+  # ----------------------------------------------------------------------------
+  if [ -n "${OVERWRITE_EXISTING_EMULTRF_CODE:-}" ]; then
+  
     rm -rf "${PACKDIR:?}"
+  
   fi
 
   if [ ! -d "${PACKDIR:?}" ]; then
 
-    cdfolder "${ECODEF:?}/emulators" || { cdroot; return 1; }
+    cdfolder "${ECODEF:?}/emulators" || { unset_all; return 1; }
 
-    "${GIT:?}" clone "${URL:?}" --depth ${GIT_CLONE_MAXIMUM_DEPTH:?} \
+    "${GIT:?}" clone "${URL:?}" --depth ${GIT_CLONE_MAXIMUM_DEPTH:-1000} \
       --recursive "${PACKDIR:?}" \
       >>${OUT1:?} 2>>${OUT2:?} || { error "${EC15:?}"; return 1; }
   
-    cdfolder "${PACKDIR:?}" || { cdroot; return 1; }
+    cdfolder "${PACKDIR:?}" || { unset_all; return 1; }
 
-    if [ -n "${EMULTRF_GIT_COMMIT}" ]; then
+    if [ -n "${EMULTRF_GIT_COMMIT:-}" ]; then
+      
+      if [ "$("${GIT:?}" rev-parse --is-shallow-repository)" = "true" ]; then
+    
+        "${GIT:?}" fetch --unshallow --all --tags --prune \
+          >>${OUT1:?} 2>>${OUT2:?} || { error "${EC16:?}"; return 1; }
+    
+      else
+    
+        "${GIT:?}" fetch --all --tags --prune \
+          >>${OUT1:?} 2>>${OUT2:?} || { error "${EC16:?}"; return 1; }
+    
+      fi
+
       "${GIT:?}" checkout "${EMULTRF_GIT_COMMIT:?}" \
         >>${OUT1:?} 2>>${OUT2:?} || { error "${EC16:?}"; return 1; }
     fi  
+  
   fi
   
-  cdfolder "${ROOTDIR}" || return 1
+  cdfolder "${ROOTDIR:?}" || { unset_all; return 1; }
   
-  pbottom "INSTALLING EMULATOR CMB TRF THEORY (COBAYA)" || return 1
+  pbottom "INSTALLING EMULATOR CMB TRF THEORY (COBAYA)" || { unset_all; return 1; }
 
   # ---------------------------------------------------------------------------
 

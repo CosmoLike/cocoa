@@ -70,36 +70,52 @@ if [ -z "${IGNORE_FGSPECTRA_CODE}" ]; then
   # Name to be printed on this shell script messages
   PRINTNAME="FGSPECTRA"
 
-  ptop "INSTALLING ${PRINTNAME:?}" || return 1;
+  ptop "INSTALLING ${PRINTNAME:?}" || { unset_all; return 1; }
 
   # ---------------------------------------------------------------------------
   # in case this script is called twice
   # ---------------------------------------------------------------------------
-  if [ -n "${OVERWRITE_EXISTING_FGSPECTRA_CODE}" ]; then
+  if [ -n "${OVERWRITE_EXISTING_FGSPECTRA_CODE:-}" ]; then
+  
     rm -rf "${PACKDIR:?}"
+  
   fi
 
   if [ ! -d "${PACKDIR:?}" ]; then
     # ---------------------------------------------------------------------------
     # clone from original repo
     # ---------------------------------------------------------------------------
-    cdfolder "${ECODEF}" || return 1;
+    cdfolder "${ECODEF}" || { unset_all; return 1; }
 
     "${GIT:?}" clone "${URL:?}" --depth ${GIT_CLONE_MAXIMUM_DEPTH:?} \
       --recursive "${FOLDER:?}" \
       >>${OUT1:?} 2>>${OUT2:?} || { error "${EC15:?}"; return 1; }
     
-    cdfolder "${PACKDIR}" || return 1;
+    cdfolder "${PACKDIR}" || { unset_all; return 1; }
 
-    if [ -n "${FGSPECTRA_GIT_COMMIT}" ]; then
+    if [ -n "${FGSPECTRA_GIT_COMMIT:-}" ]; then
+
+      if [ "$("${GIT:?}" rev-parse --is-shallow-repository)" = "true" ]; then
+    
+        "${GIT:?}" fetch --unshallow --all --tags --prune \
+          >>${OUT1:?} 2>>${OUT2:?} || { error "${EC16:?}"; return 1; }
+    
+      else
+    
+        "${GIT:?}" fetch --all --tags --prune \
+          >>${OUT1:?} 2>>${OUT2:?} || { error "${EC16:?}"; return 1; }
+    
+      fi
+      
       "${GIT:?}" checkout "${FGSPECTRA_GIT_COMMIT:?}" \
         >>${OUT1:?} 2>>${OUT2:?} || { error "${EC16:?}"; return 1; }
+    
     fi
   fi
   
-  cdfolder "${ROOTDIR}" || return 1;
+  cdfolder "${ROOTDIR}" || { unset_all; return 1; }
   
-  pbottom "INSTALLING ${PRINTNAME:?}" || return 1;
+  pbottom "INSTALLING ${PRINTNAME:?}" || { unset_all; return 1; }
     
   unset_all || return 1;
 fi

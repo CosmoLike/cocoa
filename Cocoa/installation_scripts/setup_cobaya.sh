@@ -77,12 +77,12 @@ if [ -z "${IGNORE_COBAYA_CODE}" ]; then
 
   # ----------------------------------------------------------------------------
     
-  ptop "SETUP COBAYA" || return 1;
+  ptop "SETUP COBAYA" || { unset_all; return 1; }
 
   #-----------------------------------------------------------------------------
   # Remove any previous installed cobaya folder --------------------------------
   #-----------------------------------------------------------------------------
-  if [ -n "${OVERWRITE_EXISTING_COBAYA_CODE}" ]; then
+  if [ -n "${OVERWRITE_EXISTING_COBAYA_CODE:-}" ]; then
   
     rm -rf "${ROOTDIR:?}/cobaya"
 
@@ -93,27 +93,38 @@ if [ -z "${IGNORE_COBAYA_CODE}" ]; then
     #-----------------------------------------------------------------------------
     # Clone Cobaya from original git repo ----------------------------------------
     #-----------------------------------------------------------------------------
-    cdfolder "${ROOTDIR:?}" || return 1;
+    cdfolder "${ROOTDIR:?}" || { unset_all; return 1; }
     
     URL="${COBAYA_URL:-"https://github.com/CobayaSampler/cobaya.git"}"
 
-    "${CURL:?}" -fsS "${URL:?}" \
-      >>${OUT1:?} 2>>${OUT2:?} || { error "${EC27:?} (URL=${URL:?})"; return 1; }
-
-    "${GIT:?}" clone "${URL:?}" cobaya --depth ${GIT_CLONE_MAXIMUM_DEPTH:?} \
+    "${GIT:?}" clone "${URL:?}" cobaya --depth ${GIT_CLONE_MAXIMUM_DEPTH:-1000} \
       --recursive \
       >>${OUT1:?} 2>>${OUT2:?} || { error "${EC15:?}"; return 1; }
     
     unset URL
     
-    cdfolder "${COB:?}" || return 1;
+    cdfolder "${COB:?}" || { unset_all; return 1; }
 
-    if [ -n "${COBAYA_GIT_COMMIT}" ]; then
+    if [ -n "${COBAYA_GIT_COMMIT:-}" ]; then
+    
+      if [ "$("${GIT:?}" rev-parse --is-shallow-repository)" = "true" ]; then
+    
+        "${GIT:?}" fetch --unshallow --all --tags --prune \
+          >>${OUT1:?} 2>>${OUT2:?} || { error "${EC16:?}"; return 1; }
+    
+      else
+    
+        "${GIT:?}" fetch --all --tags --prune \
+          >>${OUT1:?} 2>>${OUT2:?} || { error "${EC16:?}"; return 1; }
+    
+      fi
+
       "${GIT:?}" reset --hard "${COBAYA_GIT_COMMIT:?}" \
         >>${OUT1:?} 2>>${OUT2:?} || { error "${EC16:?}"; return 1; }
+    
     fi
 
-    cdfolder "${ROOTDIR:?}" || return 1;
+    cdfolder "${ROOTDIR:?}" || { unset_all; return 1; }
 
     #-----------------------------------------------------------------------------
     # Adjust Cobaya Files --------------------------------------------------------
@@ -121,9 +132,9 @@ if [ -z "${IGNORE_COBAYA_CODE}" ]; then
     
     TFILE="change_python_files.sh" # T = TMP
     
-    cppatch "cobaya" "${TFILE:?}" || return 1
+    cppatch "cobaya" "${TFILE:?}" || { unset_all; return 1; }
 
-    cdfolder "${COB:?}/cobaya/" || return 1;
+    cdfolder "${COB:?}/cobaya/" || { unset_all; return 1; }
     
     # parenthesis = run in a subshell
     ( sh change_python_files.sh ) || { error "${EC22:?} (CPF)"; return 1; }
@@ -137,9 +148,10 @@ if [ -z "${IGNORE_COBAYA_CODE}" ]; then
 
     for (( i=0; i<${#TFOLDER[@]}; i++ ));
     do
-      cdfolder "${COB:?}/${TFOLDER[$i]}" || return 1;
+      cdfolder "${COB:?}/${TFOLDER[$i]}" || { unset_all; return 1; }
 
-      cpfolder "${CCCOB:?}/${TFOLDER[$i]}${TFILEP[$i]:?}" . 2>>${OUT2:?} || return 1;
+      cpfolder "${CCCOB:?}/${TFOLDER[$i]}${TFILEP[$i]:?}" . \
+        2>>${OUT2:?} || { unset_all; return 1; }
 
       patch --quiet --batch --verbose -u -R "${TFILE[$i]:?}" -i "${TFILEP[$i]:?}" \
         >>${OUT1:?} 2>>${OUT2:?} || { error "${EC17:?} (${TFILE[$i]:?})"; return 1; }
@@ -154,16 +166,17 @@ if [ -z "${IGNORE_COBAYA_CODE}" ]; then
 
     for (( i=0; i<${#TFOLDER[@]}; i++ ));
     do
-      cdfolder "${COB:?}/${TFOLDER[$i]}" || return 1;
+      cdfolder "${COB:?}/${TFOLDER[$i]}" || { unset_all; return 1; }
 
-      cpfolder "${CCCOB:?}/${TFOLDER[$i]}${TFILEP[$i]:?}" . 2>>${OUT2:?} || return 1;
+      cpfolder "${CCCOB:?}/${TFOLDER[$i]}${TFILEP[$i]:?}" . \
+        2>>${OUT2:?} || { unset_all; return 1; }
 
       # HERE I CAN't USE THE -R
       patch --quiet --batch --verbose -u "${TFILE[$i]:?}" -i "${TFILEP[$i]:?}" \
         >>${OUT1:?} 2>>${OUT2:?} || { error "${EC17:?} (${TFILE[$i]:?})"; return 1; }
     done
 
-    cdfolder "${ROOTDIR:?}" || return 1;
+    cdfolder "${ROOTDIR:?}" || { unset_all; return 1; }
 
     unset -v TFILE
 
@@ -176,7 +189,7 @@ if [ -z "${IGNORE_COBAYA_CODE}" ]; then
     cp "${CCCOB:?}/${TFOLDER:?}/"roman_* "${COB:?}/${TFOLDER:?}/" \
       2>>${OUT2:?} || { error "CP ROMAN FILES"; return 1; }
 
-    cppatchfolder "${COBLIKE:?}" "h0licow" || return 1
+    cppatchfolder "${COBLIKE:?}" "h0licow" || { unset_all; return 1; }
 
     unset -v TFOLDER
 
@@ -200,14 +213,14 @@ if [ -z "${IGNORE_COBAYA_CODE}" ]; then
     
     cppatch "${TFOLDER:?}" "change_planck_clik.sh" || return 1
 
-    cdfolder "${COB:?}/${TFOLDER}" || return 1;
+    cdfolder "${COB:?}/${TFOLDER}" || { unset_all; return 1; }
     
     # parenthesis = run in a subshell
     ( sh change_planck_clik.sh ) || { error "${EC22:?} (CPC)"; return 1; }
     
     unset -v TFOLDER
 
-    cdfolder "${ROOTDIR:?}" || return 1;
+    cdfolder "${ROOTDIR:?}" || { unset_all; return 1; }
 
     #---------------------------------------------------------------------------
     # Adjust Planck 2018 low-ell -----------------------------------------------
@@ -224,15 +237,15 @@ if [ -z "${IGNORE_COBAYA_CODE}" ]; then
     rm -f "${COB:?}/${TFOLDER:?}/EE_sroll2.py"
     #rm -f "${COB:?}/${TFOLDER:?}/EE_sroll2.bibtex"
 
-    cppatch "${TFOLDER:?}" "EE.py" || return 1
+    cppatch "${TFOLDER:?}" "EE.py" || { unset_all; return 1; }
 
-    cppatch "${TFOLDER:?}" "EE.yaml" || return 1
+    cppatch "${TFOLDER:?}" "EE.yaml" || { unset_all; return 1; }
 
-    cppatch "${TFOLDER:?}" "TT.py" || return 1
+    cppatch "${TFOLDER:?}" "TT.py" || { unset_all; return 1; }
 
-    cppatch "${TFOLDER:?}" "TT.yaml" || return 1
+    cppatch "${TFOLDER:?}" "TT.yaml" || { unset_all; return 1; }
 
-    cppatch "${TFOLDER:?}" "EE_sroll2.py" || return 1
+    cppatch "${TFOLDER:?}" "EE_sroll2.py" || { unset_all; return 1; }
 
     unset -v TFOLDER
     
@@ -247,7 +260,7 @@ if [ -z "${IGNORE_COBAYA_CODE}" ]; then
     rm -f "${COB:?}/${TFOLDER:?}/CMBMarged.yaml"
     rm -f "${COB:?}/${TFOLDER:?}/native.yaml"
 
-    cppatch "${TFOLDER:?}" "clik.yaml" || return 1
+    cppatch "${TFOLDER:?}" "clik.yaml" || { unset_all; return 1; }
 
     unset -v TFOLDER
 
@@ -269,17 +282,17 @@ if [ -z "${IGNORE_COBAYA_CODE}" ]; then
     rm -f "${COB:?}/${TFOLDER:?}/TT_lite_native.py"
     rm -f "${COB:?}/${TFOLDER:?}/TT_lite_native.yaml"
 
-    cppatch "${TFOLDER:?}" "EE.yaml" || return 1
+    cppatch "${TFOLDER:?}" "EE.yaml" || { unset_all; return 1; }
     
-    cppatch "${TFOLDER:?}" "TE.yaml" || return 1
+    cppatch "${TFOLDER:?}" "TE.yaml" || { unset_all; return 1; }
     
-    cppatch "${TFOLDER:?}" "TT.yaml" || return 1
+    cppatch "${TFOLDER:?}" "TT.yaml" || { unset_all; return 1; }
     
-    cppatch "${TFOLDER:?}" "TTTEEE.yaml" || return 1
+    cppatch "${TFOLDER:?}" "TTTEEE.yaml" || { unset_all; return 1; }
     
-    cppatch "${TFOLDER:?}" "TT_lite.yaml" || return 1
+    cppatch "${TFOLDER:?}" "TT_lite.yaml" || { unset_all; return 1; }
     
-    cppatch "${TFOLDER:?}" "TTTEEE_lite.yaml" || return 1
+    cppatch "${TFOLDER:?}" "TTTEEE_lite.yaml" || { unset_all; return 1; }
     
     unset -v TFOLDER
 
@@ -287,32 +300,32 @@ if [ -z "${IGNORE_COBAYA_CODE}" ]; then
     # SPT3G Y1 LIKELIHOOD --------------------------------------------------------
     #-----------------------------------------------------------------------------
 
-    cppatchfolder "${COBLIKE:?}" "SPT3G_Y1" || return 1
+    cppatchfolder "${COBLIKE:?}" "SPT3G_Y1" || { unset_all; return 1; }
     
     #-----------------------------------------------------------------------------
     # ACT DR6 LENSLIKE LIKELIHOOD ------------------------------------------------
     #-----------------------------------------------------------------------------
 
-    cppatchfolder "${COBLIKE:?}" "act_dr6_lenslike" || return 1
+    cppatchfolder "${COBLIKE:?}" "act_dr6_lenslike" || { unset_all; return 1; }
     
     #-----------------------------------------------------------------------------
     # Fix renaming parameters in CAMB --------------------------------------------
     #-----------------------------------------------------------------------------
     
-    cppatch "${COBTH:?}/camb" "camb.yaml" || return 1
+    cppatch "${COBTH:?}/camb" "camb.yaml" || { unset_all; return 1; }
 
     #---------------------------------------------------------------------------
     # CAMSPEC ------------------------------------------------------------------
     #---------------------------------------------------------------------------
     
-    cppatch "${COBLIKE}/base_classes" "InstallableLikelihood.patch" || return 1
+    cppatch "${COBLIKE}/base_classes" "InstallableLikelihood.patch" || { unset_all; return 1; }
     
-    cdfolder "${COB:?}/${COBLIKE}/base_classes/" || return 1;
+    cdfolder "${COB:?}/${COBLIKE}/base_classes/" || { unset_all; return 1; }
 
     patch --quiet --batch --verbose -u "InstallableLikelihood.py" -i "InstallableLikelihood.patch" \
       >>${OUT1:?} 2>>${OUT2:?} || { error "${EC17:?}"; return 1; }
 
-    cdfolder "${ROOTDIR:?}" || return 1;
+    cdfolder "${ROOTDIR:?}" || { unset_all; return 1; }
 
     # ----------------------------------------------------------------------------
     # PIP COBAYA -----------------------------------------------------------------
@@ -325,9 +338,9 @@ if [ -z "${IGNORE_COBAYA_CODE}" ]; then
 
   fi
 
-  cdfolder "${ROOTDIR:?}" || return 1;
+  cdfolder "${ROOTDIR:?}" || { unset_all; return 1; }
 
-  pbottom "SETUP COBAYA" || return 1;
+  pbottom "SETUP COBAYA" || { unset_all; return 1; }
   
   #-----------------------------------------------------------------------------
   

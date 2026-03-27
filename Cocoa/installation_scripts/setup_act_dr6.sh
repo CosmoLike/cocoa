@@ -63,7 +63,7 @@ if [ -z "${IGNORE_ACTDR6_CODE}" ]; then
   # ----------------------------------------------------------------------------
   # ----------------------------------------------------------------------------
 
-  ptop 'SETUP ACTDR6 (CMBONLY)' || return 1;
+  ptop 'SETUP ACTDR6 (CMBONLY)' || { unset_all; return 1; }
 
   URL="${ACTDR6_CMBONLY_URL:-"https://github.com/ACTCollaboration/DR6-ACT-lite.git"}"
 
@@ -73,23 +73,39 @@ if [ -z "${IGNORE_ACTDR6_CODE}" ]; then
 
   PACKDIR="${ECODEF:?}/${FOLDER:?}"
 
-  if [[ -n "${OVERWRITE_EXISTING_ACTDR6_CMB_CODE}" ]]; then
+  if [[ -n "${OVERWRITE_EXISTING_ACTDR6_CMB_CODE:-}" ]]; then
+  
     rm -rf "${PACKDIR:?}"
+  
   fi
 
   if [[ ! -d "${PACKDIR:?}" ]]; then
 
-    cdfolder "${ECODEF:?}" || { cdroot; return 1; }
+    cdfolder "${ECODEF:?}" || { unset_all; return 1; }
 
-    "${GIT:?}" clone "${URL:?}" --depth ${GIT_CLONE_MAXIMUM_DEPTH:?} \
+    "${GIT:?}" clone "${URL:?}" --depth ${GIT_CLONE_MAXIMUM_DEPTH:-1000} \
       --recursive "${FOLDER:?}" \
       >>${OUT1:?} 2>>${OUT2:?} || { error "${EC15:?}"; return 1; }
     
-    cdfolder "${PACKDIR:?}" || { cdroot; return 1; }
+    cdfolder "${PACKDIR:?}" || { unset_all; return 1; }
 
-    if [ -n "${ACTDR6_CMBONLY_GIT_COMMIT}" ]; then
+    if [ -n "${ACTDR6_CMBONLY_GIT_COMMIT:-}" ]; then
+
+      if [ "$("${GIT:?}" rev-parse --is-shallow-repository)" = "true" ]; then
+      
+        "${GIT:?}" fetch --unshallow --all --tags --prune \
+          >>${OUT1:?} 2>>${OUT2:?} || { error "${EC16:?}"; return 1; }
+      
+      else
+      
+        "${GIT:?}" fetch --all --tags --prune \
+          >>${OUT1:?} 2>>${OUT2:?} || { error "${EC16:?}"; return 1; }
+      
+      fi
+      
       "${GIT:?}" checkout "${ACTDR6_CMBONLY_GIT_COMMIT:?}" \
         >>${OUT1:?} 2>>${OUT2:?} || { error "${EC16:?}"; return 1; }
+    
     fi
 
     # --------------------------------------------------------------------------
@@ -104,24 +120,25 @@ if [ -z "${IGNORE_ACTDR6_CODE}" ]; then
 
     for (( i=0; i<${AL}; i++ ));
     do
-      cdfolder "${PACKDIR:?}/${TFOLDER[$i]}" || return 1
+      cdfolder "${PACKDIR:?}/${TFOLDER[$i]}" || { unset_all; return 1; }
 
-      cpfolder "${CHANGES:?}/${TFOLDER[$i]}${TFILEP[$i]:?}" . 2>>${OUT2:?} || return 1;
+      cpfolder "${CHANGES:?}/${TFOLDER[$i]}${TFILEP[$i]:?}" . \
+        2>>${OUT2:?} || { unset_all; return 1; }
 
       patch -u "${TFILE[$i]:?}" -i "${TFILEP[$i]:?}" \
         >>${OUT1:?} 2>>${OUT2:?} || { error "${EC17:?} (${TFILE[$i]:?})"; return 1; }
     done
   fi
 
-  pbottom 'SETUP ACTDR6 (CMBONLY)' || return 1
+  pbottom 'SETUP ACTDR6 (CMBONLY)' || { unset_all; return 1; }
 
-  cdfolder "${ROOTDIR}" || return 1;
+  cdfolder "${ROOTDIR}" || { unset_all; return 1; }
 
   # ----------------------------------------------------------------------------
   # ----------------------------------------------------------------------------
   # ----------------------------------------------------------------------------
 
-  ptop 'SETUP ACTDR6 (MFLIKE)' || return 1;
+  ptop 'SETUP ACTDR6 (MFLIKE)' || { unset_all; return 1; }
 
   URL="${ACTDR6_MFLIKE_URL:-"https://github.com/ACTCollaboration/act_dr6_mflike.git"}"
 
@@ -131,28 +148,45 @@ if [ -z "${IGNORE_ACTDR6_CODE}" ]; then
 
   PACKDIR="${ECODEF:?}/${FOLDER:?}"
 
-  if [[ -n "${OVERWRITE_EXISTING_ACTDR6_CMB_CODE}" ]]; then
+  if [[ -n "${OVERWRITE_EXISTING_ACTDR6_CMB_CODE:-}" ]]; then
+    
     rm -rf "${PACKDIR:?}"
+  
   fi
 
   if [[ ! -d "${PACKDIR:?}" ]]; then
-    cdfolder "${ECODEF:?}" || { cdroot; return 1; }
+  
+    cdfolder "${ECODEF:?}" || { unset_all; return 1; }
 
-    "${GIT:?}" clone "${URL:?}" --depth ${GIT_CLONE_MAXIMUM_DEPTH:?} \
+    "${GIT:?}" clone "${URL:?}" --depth ${GIT_CLONE_MAXIMUM_DEPTH:-1000} \
       --recursive "${FOLDER:?}" \
       >>${OUT1:?} 2>>${OUT2:?} || { error "${EC15:?}"; return 1; }
     
-    cdfolder "${PACKDIR:?}" || { cdroot; return 1; }
+    cdfolder "${PACKDIR:?}" || { unset_all; return 1; }
 
-    if [ -n "${ACTDR6_MFLIKE_GIT_COMMIT}" ]; then
+    if [ -n "${ACTDR6_MFLIKE_GIT_COMMIT:-}" ]; then
+    
+      if [ "$("${GIT:?}" rev-parse --is-shallow-repository)" = "true" ]; then
+      
+        "${GIT:?}" fetch --unshallow --all --tags --prune \
+          >>${OUT1:?} 2>>${OUT2:?} || { error "${EC16:?}"; return 1; }
+      
+      else
+      
+        "${GIT:?}" fetch --all --tags --prune \
+          >>${OUT1:?} 2>>${OUT2:?} || { error "${EC16:?}"; return 1; }
+      
+      fi
+
       "${GIT:?}" checkout "${ACTDR6_MFLIKE_GIT_COMMIT:?}" \
         >>${OUT1:?} 2>>${OUT2:?} || { error "${EC16:?}"; return 1; }
+    
     fi
   fi
 
-  pbottom 'SETUP ACTDR6 (MFLIKE)' || return 1
+  pbottom 'SETUP ACTDR6 (MFLIKE)' || { unset_all; return 1; }
 
-  cdfolder "${ROOTDIR}" || return 1;
+  cdfolder "${ROOTDIR}" || { unset_all; return 1; }
   
   unset_all || return 1
 fi
