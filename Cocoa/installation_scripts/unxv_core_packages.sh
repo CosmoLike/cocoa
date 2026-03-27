@@ -2,7 +2,7 @@
 # ----------------------------------------------------------------------------
 # ----------------------------------------------------------------------------
 # ----------------------------------------------------------------------------
-if [[ -z "${SKIP_DECOMM_CORE_PACKAGES}" && -z "${IGNORE_CORE_INSTALLATION}" ]]; then
+if [[ -z "${SKIP_DECOMM_CORE_PACKAGES:-}" && -z "${IGNORE_CORE_INSTALLATION:-}" ]]; then
 
   if [ -z "${ROOTDIR}" ]; then
     source start_cocoa.sh || { pfail 'ROOTDIR'; return 1; }
@@ -92,7 +92,7 @@ if [[ -z "${SKIP_DECOMM_CORE_PACKAGES}" && -z "${IGNORE_CORE_INSTALLATION}" ]]; 
 
   # ----------------------------------------------------------------------------
 
-  ptop 'UNXV CORE LIBRARIES' || return 1
+  ptop 'UNXV CORE LIBRARIES' || { unset_all; return 1; }
   
   if [ "${#TKEYS[@]}" -eq "${#TFILES[@]}" ]; then
     AL=${#TFILES[@]}
@@ -105,7 +105,7 @@ if [[ -z "${SKIP_DECOMM_CORE_PACKAGES}" && -z "${IGNORE_CORE_INSTALLATION}" ]]; 
 
     if [ -z "${TKEYS[$i]}" ]; then
 
-      cdfolder "${CCIL:?}" || return 1
+      cdfolder "${CCIL:?}" || { unset_all; return 1; }
       
       # ------------------------------------------------------------------------
       # check if file exists
@@ -124,8 +124,10 @@ if [[ -z "${SKIP_DECOMM_CORE_PACKAGES}" && -z "${IGNORE_CORE_INSTALLATION}" ]]; 
       #  { error "${EC25:?} (${TFILES[$i]}.xz)"; return 1; }
 
       FOLDER=$(tar tf "${TFILES[$i]}.xz" | cut -f1 -d"/" | sort | uniq)
-      if [ -z ${FOLDER:?} ]; then
+      if [ -z "${FOLDER:?}" ]; then
+      
         error "${EC25:?} (${TFILES[$i]}.xz)"; return 1;
+      
       fi
 
 
@@ -147,11 +149,11 @@ if [[ -z "${SKIP_DECOMM_CORE_PACKAGES}" && -z "${IGNORE_CORE_INSTALLATION}" ]]; 
   
   done
 
-  cdfolder "${ROOTDIR}" || return 1;
+  cdfolder "${ROOTDIR}" || { unset_all; return 1; }
+
+  pbottom 'UNXV CORE LIBRARIES' || { unset_all; return 1; }
 
   unset_all || return 1;
-
-  pbottom 'UNXV CORE LIBRARIES' || return 1
 
 fi
 

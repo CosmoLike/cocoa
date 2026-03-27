@@ -2,7 +2,7 @@
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
-if [ -z "${IGNORE_SIMONS_OBSERVATORY_CMB_DATA}" ]; then
+if [ -z "${IGNORE_SIMONS_OBSERVATORY_CMB_DATA:-}" ]; then
 
   if [ -z "${ROOTDIR}" ]; then
     source start_cocoa.sh || { pfail 'ROOTDIR'; return 1; }
@@ -12,7 +12,7 @@ if [ -z "${IGNORE_SIMONS_OBSERVATORY_CMB_DATA}" ]; then
   ( source "${ROOTDIR:?}/installation_scripts/flags_check.sh" ) || return 1;
     
   unset_env_vars () {
-    unset -v EDATAF FOLDER URL VER PACKDIR FILE PRINTNAME
+    unset -v TMP EDATAF FOLDER URL VER PACKDIR FILE PRINTNAME
     cdroot || return 1;
   }
 
@@ -54,21 +54,30 @@ if [ -z "${IGNORE_SIMONS_OBSERVATORY_CMB_DATA}" ]; then
 
   ptop "SETUP/UNXV SIMONS OBSERVATORY DATA" || return 1
 
-  if [ -n "${OVERWRITE_EXISTING_SIMONS_OBSERVATORY_CMB_DATA}" ]; then
+  # ---------------------------------------------------------------------------
+  # in case this script is called twice
+  # ---------------------------------------------------------------------------
+  if [ -n "${OVERWRITE_EXISTING_SIMONS_OBSERVATORY_CMB_DATA:-}" ]; then
+  
     rm -rf "${PACKDIR:?}"
-    if [ -n "${REDOWNLOAD_EXISTING_SIMONS_OBSERVATORY_CMB_DATA}" ]; then
+    if [ -n "${REDOWNLOAD_EXISTING_SIMONS_OBSERVATORY_CMB_DATA:-}" ]; then
+    
       for x in $(echo "${VER:?}")
       do
         FILE="${x}.tar.gz"
         rm -f "${EDATAF:?}/${FILE:?}"
       done
+    
     fi
+  
   fi
   
   if [ ! -d "${PACKDIR:?}" ]; then
-    mkdir -p "${PACKDIR:?}" >>${OUT1:?} 2>>${OUT2:?} || { error "${EC20:?}"; return 1; }
     
-    cdfolder "${EDATAF:?}" || return 1
+    mkdir -p "${PACKDIR:?}" \
+      >>${OUT1:?} 2>>${OUT2:?} || { error "${EC20:?}"; return 1; }
+    
+    cdfolder "${EDATAF:?}" || { unset_all; return 1; }
   
     # note: users can download multiple versions (reproduce existing work)
     # note: For example, SO_DATA_VERSION="v0.7.1 v0.8"
@@ -77,21 +86,27 @@ if [ -z "${IGNORE_SIMONS_OBSERVATORY_CMB_DATA}" ]; then
       FILE="${x}.tar.gz"
 
       if [ ! -e "${FILE:?}" ]; then
+      
         "${WGET:?}" "${URL}/${FILE:?}" -q --show-progress --no-check-certificate \
           --progress=bar:force:noscroll --timeout=30 --tries=2 --waitretry=0 \
           --retry-connrefused --read-timeout=30 || { error "${EC24:?}"; return 1; }
+      
       fi
 
       TMP=$(tar -tf "${FILE:?}" | head -1 | cut -f1 -d"/")
-      tar -zxvf "${FILE:?}" >>${OUT1:?} 2>>${OUT2:?} || { error "${EC25:?}"; return 1; }
+      
+      tar -zxvf "${FILE:?}" \
+        >>${OUT1:?} 2>>${OUT2:?} || { error "${EC25:?}"; return 1; }
+      
       mv "${TMP:?}" "${PACKDIR:?}" \
         >>${OUT1:?} 2>>${OUT2:?} || { error "MV SO DATA"; return 1; }
     done
+  
   fi
 
-  pbottom "SETUP/UNXV SIMONS OBSERVATORY DATA" || return 1
+  pbottom "SETUP/UNXV SIMONS OBSERVATORY DATA" || { unset_all; return 1; }
   
-  cdfolder "${ROOTDIR}" || return 1;
+  cdfolder "${ROOTDIR}" || { unset_all; return 1; }
 
   unset_all || return 1
 fi

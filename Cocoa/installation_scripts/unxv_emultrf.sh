@@ -2,7 +2,7 @@
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
-if [ -z "${IGNORE_EMULTRF_DATA}" ]; then
+if [ -z "${IGNORE_EMULTRF_DATA:-}" ]; then
 
   if [ -z "${ROOTDIR}" ]; then
     source start_cocoa.sh || { pfail 'ROOTDIR'; return 1; }
@@ -55,31 +55,49 @@ if [ -z "${IGNORE_EMULTRF_DATA}" ]; then
   PACKDIR="${EDATAF:?}/${FOLDER:?}"
 
   # ---------------------------------------------------------------------------
-  ptop "SETUP/UNXV EMULATOR CMB TRF DATA" || return 1
+  ptop "SETUP/UNXV EMULATOR CMB TRF DATA" || { unset_all; return 1; }
 
   # ---------------------------------------------------------------------------
   # in case this script is called twice
-  if [ -n "${OVERWRITE_EXISTING_EMULTRF_DATA}" ]; then
-    rm -rf "${PACKDIR:?}"
-  fi
   # ---------------------------------------------------------------------------
+  if [ -n "${OVERWRITE_EXISTING_EMULTRF_DATA:-}" ]; then
+  
+    rm -rf "${PACKDIR:?}"
+  
+  fi
+  
   if [[ ! -d "${PACKDIR:?}" ]]; then
-    cdfolder "${EDATAF:?}" || return 1
+    
+    cdfolder "${EDATAF:?}" || { unset_all; return 1; }
 
-    ${GIT:?} clone "${URL:?}" --depth ${GIT_CLONE_MAXIMUM_DEPTH:?} \
+    "${GIT:?}" clone "${URL:?}" --depth ${GIT_CLONE_MAXIMUM_DEPTH:-1000} \
       --recursive "${FOLDER:?}" \
       >>${OUT1:?} 2>>${OUT2:?} || { error "${EC15:?}"; return 1; }
 
-    if [ -n "${EMULTRF_DATA_GIT_COMMIT}" ]; then
-      cdfolder "${PACKDIR:?}" || return 1
+    if [ -n "${EMULTRF_DATA_GIT_COMMIT:-}" ]; then
+    
+      cdfolder "${PACKDIR:?}" || { unset_all; return 1; }
 
-      ${GIT:?} checkout "${EMULTRF_DATA_GIT_COMMIT:?}" \
+      if [ "$("${GIT:?}" rev-parse --is-shallow-repository)" = "true" ]; then
+      
+        "${GIT:?}" fetch --unshallow --all --tags --prune \
+          >>${OUT1:?} 2>>${OUT2:?} || { error "${EC16:?}"; return 1; }
+      
+      else
+      
+        "${GIT:?}" fetch --all --tags --prune \
+          >>${OUT1:?} 2>>${OUT2:?} || { error "${EC16:?}"; return 1; }
+      
+      fi
+
+      "${GIT:?}" checkout "${EMULTRF_DATA_GIT_COMMIT:?}" \
         >>${OUT1:?} 2>>${OUT2:?} || { error "${EC16:?}"; return 1; }
+    
     fi
-  fi
-  # ---------------------------------------------------------------------------
   
-  pbottom "SETUP/UNXV EMULATOR CMB TRF DATA" || return 1
+  fi
+  
+  pbottom "SETUP/UNXV EMULATOR CMB TRF DATA" || { unset_all; return 1; }
 
   unset_all || return 1
 

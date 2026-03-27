@@ -2,9 +2,9 @@
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
-if [ -z "${IGNORE_TENSIOMETER_CODE}" ]; then
+if [ -z "${IGNORE_TENSIOMETER_CODE:-}" ]; then
 
-  if [ -z "${ROOTDIR}" ]; then
+  if [ -z "${ROOTDIR:-}" ]; then
     source start_cocoa.sh || { pfail 'ROOTDIR'; return 1; }
   fi
 
@@ -12,7 +12,7 @@ if [ -z "${IGNORE_TENSIOMETER_CODE}" ]; then
   ( source "${ROOTDIR:?}/installation_scripts/flags_check.sh" ) || return 1;
 
   unset_env_vars () {
-    unset -v URL CCIL ECODEF FOLDER PACKDIR  
+    unset -v URL CCIL ECODEF FOLDER PACKDIR PIPCP PIPCP_HASH SENTINEL_PIPCP 
     cdroot || return 1;
   }
 
@@ -65,18 +65,40 @@ if [ -z "${IGNORE_TENSIOMETER_CODE}" ]; then
   if [ -n "${OVERWRITE_EXISTING_TENSIOMETER_CODE:-}" ]; then
   
     rm -rf "${PACKDIR:?}"
+    rm -f  "${ROOTDIR:?}/.local/pip_tensiometer_"*
   
   fi
 
   if [ ! -d "${PACKDIR:?}" ]; then
-  
-    env MPICC=$MPI_CC_COMPILER ${PIP3:?} install \
-      'autograd==1.8.0' \
-      'pymanopt==0.2.5' \
-    --no-cache-dir --prefer-binary --use-pep517 \
-    --prefix="${ROOTDIR:?}/.local" \
-    >>${OUT1:?} 2>>${OUT2:?} || { error "${EC13:?}"; return 1; }
+    
+    PIPCP=(
+      'autograd==1.8.0'
+      'pymanopt==0.2.5'
+    )
 
+    PIPCP_HASH=$(
+      {
+        printf '%s ' "${PIPCP[@]}";
+        printf 'PYTHON=%s\n' "${PYTHON3:-}";
+        printf 'PIP=%s\n'    "${PIP3:-}";
+        printf 'MPICC=%s\n'  "${MPI_CC_COMPILER:-}";
+      } | md5sum | cut -d' ' -f1
+    )
+
+    SENTINEL_PIPCP="${ROOTDIR:?}/.local/pip_tensiometer_${PIPCP_HASH:?}"
+
+    if [ ! -f "${SENTINEL_PIPCP:?}" ]; then
+      
+      env MPICC=$MPI_CC_COMPILER ${PIP3:?} install "${PIPCP[@]}" \
+        --no-cache-dir --prefer-binary --use-pep517 \
+        --prefix="${ROOTDIR:?}/.local" \
+        >>${OUT1:?} 2>>${OUT2:?} || { error "${EC13:?}"; return 1; }
+
+      touch "${SENTINEL_PIPCP:?}" \
+        >>${OUT1:?} 2>>${OUT2:?} || { error "SENTINEL PIP TEN"; return 1; }
+
+    fi
+    
     cdfolder "${ECODEF:?}" || { unset_all; return 1; }
 
     "${GIT:?}" clone "${URL:?}" --depth ${GIT_CLONE_MAXIMUM_DEPTH:-1000} \

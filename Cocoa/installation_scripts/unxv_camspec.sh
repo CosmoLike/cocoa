@@ -2,7 +2,7 @@
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
-if [ -z "${IGNORE_CAMSPEC_CMB_DATA}" ]; then
+if [ -z "${IGNORE_CAMSPEC_CMB_DATA:-}" ]; then
   
   if [ -z "${ROOTDIR}" ]; then
     source start_cocoa.sh || { pfail 'ROOTDIR'; return 1; }
@@ -54,30 +54,37 @@ if [ -z "${IGNORE_CAMSPEC_CMB_DATA}" ]; then
 
   URL="${URL_BASE:?}/releases/download/v1/${FILE:?}"
   
-  ptop "SETUP/UNXV CAMSPEC-2021 DATA"  || return 1
+  ptop "SETUP/UNXV CAMSPEC-2021 DATA"  || { unset_all; return 1; }
 
   if [ -n "${OVERWRITE_EXISTING_CAMPSPEC_CMB_DATA}" ]; then  
     rm -rf "${PACKDIR:?}"
+    
     if [ -n "${REDOWNLOAD_EXISTING_CAMPSPEC_CMB_DATA}" ]; then  
       rm -rf "${EDATAF:?}/${FILE:?}"
     fi
+  
   fi
   
   if [ ! -d "${PACKDIR:?}" ]; then
-    cdfolder "${EDATAF:?}" || return 1
+    
+    cdfolder "${EDATAF:?}" || { unset_all; return 1; }
 
     if [ ! -e "${FILE:?}" ]; then
+    
       "${WGET:?}" "${URL:?}" -q --show-progress --no-check-certificate \
         --progress=bar:force:noscroll --timeout=30 --tries=2 --waitretry=0 \
         --retry-connrefused --read-timeout=30 || { error "${EC24:?}"; return 1; }
+    
     fi
 
-    unzip "${FILE:?}" >>${OUT1:?} 2>>${OUT2:?} || { error "${EC26:?}"; return 1; }
+    unzip "${FILE:?}" \
+      >>${OUT1:?} 2>>${OUT2:?} || { error "${EC26:?}"; return 1; }
+  
   fi
   
-  pbottom "SETUP/UNXV CAMSPEC-2021 DATA" || return 1
+  pbottom "SETUP/UNXV CAMSPEC-2021 DATA" || { unset_all; return 1; }
 
-  cdfolder "${ROOTDIR}" || return 1;
+  cdfolder "${ROOTDIR}" || { unset_all; return 1; }
 
   unset_all || return 1
 

@@ -2,9 +2,9 @@
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
-if [ -z "${IGNORE_PIP_CORE_INSTALLATION}" ]; then
+if [ -z "${IGNORE_PIP_CORE_INSTALLATION:-}" ]; then
 
-  if [ -z "${ROOTDIR}" ]; then
+  if [ -z "${ROOTDIR:-}" ]; then
     pfail 'ROOTDIR'; return 1
   fi
 
@@ -13,7 +13,7 @@ if [ -z "${IGNORE_PIP_CORE_INSTALLATION}" ]; then
 
   unset_env_vars () {
     unset -v PIPCPFR PIPCP PIPCPML PIPCPFR_HASH PIPCP_HASH PIPCPML_HASH
-    unset -v SENTINEL_PIPCPFR SENTINEL_PIPCP SENTINEL_PIPCPML
+    unset -v SENTINEL_PIPCPFR SENTINEL_PIPCP SENTINEL_PIPCPML COCOA_NUMPY_VERSION
     cdroot || return 1;
   }
 

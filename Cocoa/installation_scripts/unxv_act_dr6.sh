@@ -2,7 +2,7 @@
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
-if [ -z "${IGNORE_ACTDR6_DATA}" ]; then
+if [ -z "${IGNORE_ACTDR6_DATA:-}" ]; then
   
   if [ -z "${ROOTDIR}" ]; then
     source start_cocoa.sh || { pfail 'ROOTDIR'; return 1; }
@@ -46,7 +46,7 @@ if [ -z "${IGNORE_ACTDR6_DATA}" ]; then
   # --------------------------------------------------------------------------- 
   # ---------------------------------------------------------------------------
 
-  ptop "SETUP/UNXV ACT-DR6 DATA (LENSING)" || return 1
+  ptop "SETUP/UNXV ACT-DR6 DATA (LENSING)" || { unset_all; return 1; }
 
   FOLDER="act"
 
@@ -70,7 +70,7 @@ if [ -z "${IGNORE_ACTDR6_DATA}" ]; then
     mkdir -p "${PACKDIR:?}" >>${OUT1:?} 2>>${OUT2:?} || { error "${EC20:?}"; return 1; }
     mkdir -p "${PACKDIR:?}/lensing" >>${OUT1:?} 2>>${OUT2:?} || { error "${EC20:?}"; return 1; }
     
-    cdfolder "${EDATAF:?}" || return 1
+    cdfolder "${EDATAF:?}" || { unset_all; return 1; }
 
     if [ ! -e "${FILE:?}" ]; then
       "${WGET:?}" "${URL:?}" -q --show-progress --no-check-certificate \
@@ -83,14 +83,14 @@ if [ -z "${IGNORE_ACTDR6_DATA}" ]; then
     mv "${TMP:?}" "${PACKDIR:?}/lensing"
   fi
 
-  cdfolder "${ROOTDIR}" || return 1;
+  cdfolder "${ROOTDIR}" || { unset_all; return 1; }
   
-  pbottom "SETUP/UNXV ACT-DR6 DATA (LENSING)" || return 1
+  pbottom "SETUP/UNXV ACT-DR6 DATA (LENSING)" || { unset_all; return 1; }
 
   # ----------------------------------------------------------------------------
   # ----------------------------------------------------------------------------
 
-  ptop "SETUP/UNXV ACT-DR6 DATA (CMBONLY)" || return 1
+  ptop "SETUP/UNXV ACT-DR6 DATA (CMBONLY)" || { unset_all; return 1; }
 
   FOLDER="act_dr6_cmbonly"
 
@@ -103,37 +103,50 @@ if [ -z "${IGNORE_ACTDR6_DATA}" ]; then
 
   URL="${ACTDR6_CMBONLY_DATA_URL:-"${URL_BASE:?}"}/${FILE:?}"
 
-  if [ -n "${OVERWRITE_EXISTING_ACTDR6_CMB_DATA}" ]; then    
+  # ---------------------------------------------------------------------------
+  # in case this script is called twice
+  # ---------------------------------------------------------------------------
+  if [ -n "${OVERWRITE_EXISTING_ACTDR6_CMB_DATA:-}" ]; then    
+    
     rm -rf "${PACKDIR:?}"
-    if [ -n "${REDOWNLOAD_EXISTING_ACTDR6_CMB_DATA}" ]; then
+    
+    if [ -n "${REDOWNLOAD_EXISTING_ACTDR6_CMB_DATA:-}" ]; then
       rm -f "${EDATAF:?}/${FILE:?}"
     fi
+  
   fi
 
   if [ ! -d "${PACKDIR:?}" ]; then
+    
     mkdir -p "${PACKDIR:?}" >>${OUT1:?} 2>>${OUT2:?} || { error "${EC20:?}"; return 1; }
           
-    cdfolder "${EDATAF:?}" || return 1
+    cdfolder "${EDATAF:?}" || { unset_all; return 1; }
 
     if [ ! -e "${FILE:?}" ]; then
+    
       "${WGET:?}" "${URL:?}" -q --show-progress --no-check-certificate \
         --progress=bar:force:noscroll --timeout=30 --tries=2 --waitretry=0 \
         --retry-connrefused --read-timeout=30 || { error "${EC24:?}"; return 1; }
+    
     fi
 
+    
     TMP=$(tar -tf "${FILE:?}" | head -1 | cut -f1 -d"/")
-    tar -zxvf "${FILE:?}" >>${OUT1:?} 2>>${OUT2:?} || { error "${EC25:?}"; return 1; }
+    
+    tar -zxvf "${FILE:?}" \
+      >>${OUT1:?} 2>>${OUT2:?} || { error "${EC25:?}"; return 1; }
+    
     mv "${TMP:?}" "${PACKDIR:?}"
   fi
 
-  cdfolder "${ROOTDIR}" || return 1;
+  cdfolder "${ROOTDIR}" || { unset_all; return 1; }
 
-  pbottom "SETUP/UNXV ACT-DR6 DATA (CMBONLY)" || return 1
+  pbottom "SETUP/UNXV ACT-DR6 DATA (CMBONLY)" || { unset_all; return 1; }
 
   # ----------------------------------------------------------------------------
   # ----------------------------------------------------------------------------
 
-  ptop "SETUP/UNXV ACT-DR6 DATA (MFLIKE)" || return 1
+  ptop "SETUP/UNXV ACT-DR6 DATA (MFLIKE)" || { unset_all; return 1; }
 
   FOLDER="act_dr6_mflike"
 
@@ -145,32 +158,45 @@ if [ -z "${IGNORE_ACTDR6_DATA}" ]; then
 
   URL="${ACTDR6_MFLIKE_DATA_URL:-"${URL_BASE:?}"}/${FILE:?}"
 
-  if [ -n "${OVERWRITE_EXISTING_ACTDR6_CMB_DATA}" ]; then 
+  # ---------------------------------------------------------------------------
+  # in case this script is called twice
+  # ---------------------------------------------------------------------------
+  if [ -n "${OVERWRITE_EXISTING_ACTDR6_CMB_DATA:-}" ]; then 
+    
     rm -rf "${PACKDIR:?}"
-    if [ -n "${REDOWNLOAD_EXISTING_ACTDR6_CMB_DATA}" ]; then
+    
+    if [ -n "${REDOWNLOAD_EXISTING_ACTDR6_CMB_DATA:-}" ]; then
       rm -f "${EDATAF:?}/${FILE:?}"
     fi
+  
   fi
 
   if [ ! -d "${PACKDIR:?}" ]; then
-    mkdir -p "${PACKDIR:?}" >>${OUT1:?} 2>>${OUT2:?} || { error "${EC20:?}"; return 1; }
+    
+    mkdir -p "${PACKDIR:?}" \
+      >>${OUT1:?} 2>>${OUT2:?} || { error "${EC20:?}"; return 1; }
           
-    cdfolder "${EDATAF:?}" || return 1
+    cdfolder "${EDATAF:?}" || { unset_all; return 1; }
 
     if [ ! -e "${FILE:?}" ]; then
+    
       "${WGET:?}" "${URL:?}" -q --show-progress --no-check-certificate \
         --progress=bar:force:noscroll --timeout=30 --tries=2 --waitretry=0 \
         --retry-connrefused --read-timeout=30 || { error "${EC24:?}"; return 1; }
+    
     fi
 
     TMP=$(tar -tf "${FILE:?}" | head -1 | cut -f1 -d"/")
-    tar -zxvf "${FILE:?}" >>${OUT1:?} 2>>${OUT2:?} || { error "${EC25:?}"; return 1; }
+    tar -zxvf "${FILE:?}" \
+      >>${OUT1:?} 2>>${OUT2:?} || { error "${EC25:?}"; return 1; }
+    
     mv "${TMP:?}" "${PACKDIR:?}"
+  
   fi
 
-  pbottom "SETUP/UNXV ACT-DR6 DATA (MFLIKE)" || return 1
+  pbottom "SETUP/UNXV ACT-DR6 DATA (MFLIKE)" || { unset_all; return 1; }
 
-  cdfolder "${ROOTDIR}" || return 1;
+  cdfolder "${ROOTDIR}" || { unset_all; return 1; }
 
   unset_all || return 1
   

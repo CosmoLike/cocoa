@@ -2,7 +2,7 @@
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
-if [ -z "${IGNORE_LIPOP_CMB_DATA}" ]; then
+if [ -z "${IGNORE_LIPOP_CMB_DATA:-}" ]; then
 
   if [ -z "${ROOTDIR}" ]; then
     source start_cocoa.sh || { pfail 'ROOTDIR'; return 1; }
@@ -54,31 +54,38 @@ if [ -z "${IGNORE_LIPOP_CMB_DATA}" ]; then
                     "planck_2020_hillipop_TTTEEE_v${LPDVS:?}"
                     "planck_2020_lollipop")
 
-  ptop "SETUP/UNXV LIPOP DATA" || return 1
+  ptop "SETUP/UNXV LIPOP DATA" || { unset_all; return 1; }
     
-  if [ -n "${OVERWRITE_EXISTING_LIPOP_CMB_DATA}" ]; then
+  if [ -n "${OVERWRITE_EXISTING_LIPOP_CMB_DATA:-}" ]; then
     rm -rf "${EDATAF:?}/planck/planck_2020"
     rm -rf "${EDATAF:?}/planck/hillipop"  
     rm -rf "${EDATAF:?}/planck/lollipop"
-    if [ -n "${REDOWNLOAD_EXISTING_LIPOP_CMB_DATA}" ]; then
+    
+    if [ -n "${REDOWNLOAD_EXISTING_LIPOP_CMB_DATA:-}" ]; then
+      
       for (( i=0; i<${#FILE[@]}; i++ ));
       do
         rm -f  "${EDATAF:?}/planck/${FILE[$i]:?}.tar.gz"
       done 
+    
     fi
+  
   fi 
   
   if [[ ! -d "${EDATAF:?}/planck/hillipop" ||  
         ! -d "${EDATAF:?}/planck/lollipop" ]]; then
-    cdfolder "${EDATAF:?}/planck" || return 1
+    
+    cdfolder "${EDATAF:?}/planck" || { unset_all; return 1; }
 
     for (( i=0; i<${#FILE[@]}; i++ ));
     do
       if [ ! -e "${EDATAF:?}/planck/${FILE[$i]:?}.tar.gz" ]; then
+      
         "${WGET:?}" "${URL}/${FILE[$i]:?}.tar.gz" -q --show-progress \
           --no-check-certificate --progress=bar:force:noscroll \
           --timeout=30 --tries=2 --waitretry=0 --retry-connrefused \
           --read-timeout=30 || { error "${EC24:?}"; return 1; }
+      
       fi
 
       tar -xvzf "${FILE[$i]:?}.tar.gz" \
@@ -88,12 +95,14 @@ if [ -z "${IGNORE_LIPOP_CMB_DATA}" ]; then
     # note: by default, LIPOP saves the likelihoods on planck_2020
     mv "${EDATAF:?}/planck/planck_2020/hillipop" "${EDATAF:?}/planck" \
       >>${OUT1:?} 2>>${OUT2:?} || { error "MV HILLIPOP DATA"; return 1; }
+    
     mv "${EDATAF:?}/planck/planck_2020/lollipop" "${EDATAF:?}/planck" \
       >>${OUT1:?} 2>>${OUT2:?} || { error "MV LOLLIPOP DATA"; return 1; }
+    
     rm -rf "${EDATAF:?}/planck/planck_2020"
   fi
     
-  pbottom "SETUP/UNXV LIPOP DATA" || return 1
+  pbottom "SETUP/UNXV LIPOP DATA" || { unset_all; return 1; }
 
   unset_all || return 1;
 
