@@ -86,7 +86,7 @@ if [ -z "${IGNORE_PIP_CORE_INSTALLATION}" ]; then
       "numpy==${COCOA_NUMPY_VERSION:?}"
       'mpi4py==4.0.3'
       'setuptools==80.3.1'
-      'pyfftw==0.13.1'    # ← only when COCOA_FORCE_NUMPY_1_23 is set
+      'pyfftw==0.13.1'
     )
   else
     COCOA_NUMPY_VERSION='1.26.3'
@@ -133,7 +133,6 @@ if [ -z "${IGNORE_PIP_CORE_INSTALLATION}" ]; then
       'ipyparallel==9.0.1'
       'emcee==3.1.6'
       'sacc==1.0.2'
-      'pyfftw==0.13.1'
       'flit_core==3.12.0'
       'jax==0.4.1'
     )
