@@ -84,7 +84,7 @@ if [ -z "${IGNORE_VELOCILEPTORS_CODE}" ]; then
       --recursive "${FOLDER:?}" \
       >>${OUT1:?} 2>>${OUT2:?} || { error "${EC15:?}"; return 1; }
     
-    cdfolder "${PACKDIR}" || { cdroot; return 1; }
+    cdfolder "${PACKDIR}" || { unset_all; return 1; }
 
     if [ -n "${VELOCILEPTORS_GIT_COMMIT:-}" ]; then
 

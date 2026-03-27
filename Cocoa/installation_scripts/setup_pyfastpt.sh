@@ -94,7 +94,7 @@ if [ -z "${IGNORE_FASTPT_CODE}" ]; then
       --recursive "${FOLDER:?}" \
       >>${OUT1:?} 2>>${OUT2:?} || { error "${EC15:?}"; return 1; }
     
-    cdfolder "${PACKDIR}" || { cdroot; return 1; }
+    cdfolder "${PACKDIR}" || { unset_all; return 1; }
 
     if [ -n "${FASTPT_GIT_COMMIT:-}" ]; then
 
