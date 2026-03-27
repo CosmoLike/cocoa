@@ -12,7 +12,7 @@ if [ -z "${IGNORE_LIPOP_CMB_DATA:-}" ]; then
   ( source "${ROOTDIR:?}/installation_scripts/flags_check.sh" ) || return 1;
     
   unset_env_vars () { 
-    unset -v EDATAF URL LPDVS FOLDER PRINTNAME TMP
+    unset -v EDATAF URL LPDVS FOLDER PRINTNAME TMP FILE
     cdroot || return 1;
   }
 

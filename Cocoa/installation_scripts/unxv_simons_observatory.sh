@@ -52,7 +52,7 @@ if [ -z "${IGNORE_SIMONS_OBSERVATORY_CMB_DATA:-}" ]; then
   # PACK = PACKAGE, DIR = DIRECTORY
   PACKDIR="${EDATAF:?}/${FOLDER:?}"
 
-  ptop "SETUP/UNXV SIMONS OBSERVATORY DATA" || return 1
+  ptop "SETUP/UNXV SIMONS OBSERVATORY DATA" || { unset_all; return 1; }
 
   # ---------------------------------------------------------------------------
   # in case this script is called twice

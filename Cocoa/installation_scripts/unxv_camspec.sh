@@ -56,11 +56,11 @@ if [ -z "${IGNORE_CAMSPEC_CMB_DATA:-}" ]; then
   
   ptop "SETUP/UNXV CAMSPEC-2021 DATA"  || { unset_all; return 1; }
 
-  if [ -n "${OVERWRITE_EXISTING_CAMPSPEC_CMB_DATA}" ]; then  
+  if [ -n "${OVERWRITE_EXISTING_CAMPSPEC_CMB_DATA:-}" ]; then  
     rm -rf "${PACKDIR:?}"
     
-    if [ -n "${REDOWNLOAD_EXISTING_CAMPSPEC_CMB_DATA}" ]; then  
-      rm -rf "${EDATAF:?}/${FILE:?}"
+    if [ -n "${REDOWNLOAD_EXISTING_CAMPSPEC_CMB_DATA:-}" ]; then  
+      rm -f "${EDATAF:?}/${FILE:?}"
     fi
   
   fi

@@ -63,6 +63,7 @@ if [ -z "${IGNORE_BAO_DATA:-}" ]; then
 
   # ---------------------------------------------------------------------------
   # note: in case script run >1x w/ previous run stoped prematurely b/c error
+  # ---------------------------------------------------------------------------
   if [ -n "${OVERWRITE_EXISTING_BAO_DATA:-}" ]; then
     
     rm -rf "${PACKDIR:?}"

@@ -59,16 +59,26 @@ if [ -z "${IGNORE_ACTDR6_DATA:-}" ]; then
 
   URL="${ACTDR6_LENSING_DATA_URL:-"${URL_BASE:?}"}/${FILE:?}"
 
-  if [ -n "${OVERWRITE_EXISTING_ACTDR6_CMB_DATA}" ]; then
+  # ---------------------------------------------------------------------------
+  # note: in case script run >1x w/ previous run stoped prematurely b/c error
+  # ---------------------------------------------------------------------------
+  if [ -n "${OVERWRITE_EXISTING_ACTDR6_CMB_DATA:-}" ]; then
+    
     rm -rf "${PACKDIR:?}"
-    if [ -n "${REDOWNLOAD_EXISTING_ACTDR6_CMB_DATA}" ]; then
+  
+    if [ -n "${REDOWNLOAD_EXISTING_ACTDR6_CMB_DATA:-}" ]; then
       rm -f "${EDATAF:?}/${FILE:?}"
     fi
+  
   fi 
 
   if [[ ! -d "${PACKDIR:?}" || ! -d "${PACKDIR:?}/lensing" ]]; then
-    mkdir -p "${PACKDIR:?}" >>${OUT1:?} 2>>${OUT2:?} || { error "${EC20:?}"; return 1; }
-    mkdir -p "${PACKDIR:?}/lensing" >>${OUT1:?} 2>>${OUT2:?} || { error "${EC20:?}"; return 1; }
+    
+    mkdir -p "${PACKDIR:?}" \
+      >>${OUT1:?} 2>>${OUT2:?} || { error "${EC20:?}"; return 1; }
+    
+    mkdir -p "${PACKDIR:?}/lensing" \
+      >>${OUT1:?} 2>>${OUT2:?} || { error "${EC20:?}"; return 1; }
     
     cdfolder "${EDATAF:?}" || { unset_all; return 1; }
 
@@ -79,8 +89,12 @@ if [ -z "${IGNORE_ACTDR6_DATA:-}" ]; then
     fi
 
     TMP=$(tar -tf "${FILE:?}" | head -1 | cut -f1 -d"/")
-    tar -zxf "${FILE:?}" >>${OUT1:?} 2>>${OUT2:?} || { error "${EC25:?}"; return 1; }
+    
+    tar -zxf "${FILE:?}" \
+      >>${OUT1:?} 2>>${OUT2:?} || { error "${EC25:?}"; return 1; }
+    
     mv "${TMP:?}" "${PACKDIR:?}/lensing"
+  
   fi
 
   cdfolder "${ROOTDIR}" || { unset_all; return 1; }
@@ -118,7 +132,8 @@ if [ -z "${IGNORE_ACTDR6_DATA:-}" ]; then
 
   if [ ! -d "${PACKDIR:?}" ]; then
     
-    mkdir -p "${PACKDIR:?}" >>${OUT1:?} 2>>${OUT2:?} || { error "${EC20:?}"; return 1; }
+    mkdir -p "${PACKDIR:?}" \
+      >>${OUT1:?} 2>>${OUT2:?} || { error "${EC20:?}"; return 1; }
           
     cdfolder "${EDATAF:?}" || { unset_all; return 1; }
 
@@ -137,6 +152,7 @@ if [ -z "${IGNORE_ACTDR6_DATA:-}" ]; then
       >>${OUT1:?} 2>>${OUT2:?} || { error "${EC25:?}"; return 1; }
     
     mv "${TMP:?}" "${PACKDIR:?}"
+  
   fi
 
   cdfolder "${ROOTDIR}" || { unset_all; return 1; }
@@ -159,7 +175,7 @@ if [ -z "${IGNORE_ACTDR6_DATA:-}" ]; then
   URL="${ACTDR6_MFLIKE_DATA_URL:-"${URL_BASE:?}"}/${FILE:?}"
 
   # ---------------------------------------------------------------------------
-  # in case this script is called twice
+  # note: in case script run >1x w/ previous run stoped prematurely b/c error
   # ---------------------------------------------------------------------------
   if [ -n "${OVERWRITE_EXISTING_ACTDR6_CMB_DATA:-}" ]; then 
     

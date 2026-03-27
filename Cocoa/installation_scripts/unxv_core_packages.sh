@@ -131,7 +131,7 @@ if [[ -z "${SKIP_DECOMM_CORE_PACKAGES:-}" && -z "${IGNORE_CORE_INSTALLATION:-}" 
       fi
 
 
-      if [ -n "${OVERWRITE_EXISTING_CORE_PACKAGES}" ]; then
+      if [ -n "${OVERWRITE_EXISTING_CORE_PACKAGES:-}" ]; then
         
         rm -rf "${FOLDER:?}"
 
