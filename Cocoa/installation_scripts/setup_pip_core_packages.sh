@@ -12,16 +12,13 @@ if [ -z "${IGNORE_PIP_CORE_INSTALLATION}" ]; then
   ( source "${ROOTDIR:?}/installation_scripts/flags_check.sh" )  || return 1;
 
   unset_env_vars () {
-    unset -v URL_BASE URL FOLDER VER XZF CCIL CNAME PACKDIR PACKAGE_VERSION 
-    unset -v PIPCPFR PIPCP PIPCPML
-    unset -v PIPCPFR_HASH PIPCP_HASH PIPCPML_HASH
+    unset -v PIPCPFR PIPCP PIPCPML PIPCPFR_HASH PIPCP_HASH PIPCPML_HASH
     unset -v SENTINEL_PIPCPFR SENTINEL_PIPCP SENTINEL_PIPCPML
     cdroot || return 1;
   }
 
   unset_env_funcs () {
-    unset -f cdfolder cpfolder cpfile error
-    unset -f unset_env_funcs
+    unset -f cdfolder cpfolder cpfile error unset_env_funcs
     cdroot || return 1;
   }
 
@@ -67,7 +64,7 @@ if [ -z "${IGNORE_PIP_CORE_INSTALLATION}" ]; then
   
   fi
 
-  ptop "INSTALLING A FEW PYTHON CORE LIBRARIES VIA PIP" || { unset_all; return 1; }
+  ptop "INSTALLING PYTHON CORE LIBRARIES VIA PIP" || { unset_all; return 1; }
 
   # ----------------------------------------------------------------------------
   # ----------------------------------------------------------------------------
@@ -217,7 +214,10 @@ if [ -z "${IGNORE_PIP_CORE_INSTALLATION}" ]; then
         --no-cache-dir --prefer-binary \
         --prefix="${ROOTDIR:?}/.local" \
         >>${OUT1:?} 2>>${OUT2:?} || { error "${EC13:?}"; return 1; }
-    
+
+      touch "${SENTINEL_PIPCPML:?}" \
+        >>${OUT1:?} 2>>${OUT2:?} || { error "SENTINEL PIP CP"; return 1; }
+       
     fi
 
     pbottom "PIP INSTALL ML-GPU" || { unset_all; return 1; }
