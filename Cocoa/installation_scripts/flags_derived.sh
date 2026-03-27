@@ -8,7 +8,7 @@
 # these keys are only relevant if you run setup_cocoa multiple times -----------
 # ------------------------------------------------------------------------------
 if [ -n "${OVERWRITE_EXISTING_ALL_PACKAGES}" ]; then
-  export OVERWRITE_EXISTING_COSMOLIKE_CODE
+  export OVERWRITE_EXISTING_COSMOLIKE_CODE=1
   export OVERWRITE_EXISTING_COCOA_PRIVATE_PYTHON_ENV=1
   export OVERWRITE_EXISTING_CORE_PACKAGES=1
   export OVERWRITE_EXISTING_COBAYA_CODE=1
@@ -44,6 +44,8 @@ if [ -n "${OVERWRITE_EXISTING_ALL_PACKAGES}" ]; then
   export OVERWRITE_EXISTING_TENSIOMETER_CODE=1
   export OVERWRITE_EXISTING_GETDIST_CODE=1
   export OVERWRITE_EXISTING_FASTPT_CODE=1
+  export OVERWRITE_EXISTING_PIP_PACKAGES=1
+  export OVERWRITE_EXISTING_PRIVATE_CODE=1
 fi
 
 # ------------------------------------------------------------------------------
