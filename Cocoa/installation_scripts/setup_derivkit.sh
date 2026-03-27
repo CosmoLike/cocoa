@@ -80,7 +80,7 @@ if [ -z "${IGNORE_DERIVKIT_CODE}" ]; then
       --recursive "${FOLDER:?}" \
       >>${OUT1:?} 2>>${OUT2:?} || { error "${EC15:?}"; return 1; }
   
-    cdfolder "${PACKDIR:?}" || { cdroot; return 1; }
+    cdfolder "${PACKDIR:?}" || { unset_all; return 1; }
 
     if [ -n "${DERIVKIT_GIT_COMMIT:-}" ]; then
     

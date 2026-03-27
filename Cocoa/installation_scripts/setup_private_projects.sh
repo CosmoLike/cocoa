@@ -51,7 +51,8 @@ gitact0() {
   local NAME="${1:?}"
   local URL="${2:?}"
   local PACKDIR="${PROJECT:?}/${NAME}"
-  cdfolder "${PROJECT:?}" || return 1;
+  
+  cdfolder "${PROJECT:?}" || { unset_all; return 1; }
 
   # ---------------------------------------------------------------------------
   # In case this script runs twice --------------------------------------------
@@ -61,11 +62,14 @@ gitact0() {
   fi
 
   if [ ! -d "${PACKDIR:?}" ]; then
-    "${GIT:?}" clone "${URL}" "${NAME}" \
+  
+    "${GIT:?}" clone "${URL}" --depth ${GIT_CLONE_MAXIMUM_DEPTH:-1000} \
+      --recursive "${NAME}" \
       >>${OUT1:?} 2>>${OUT2:?} || { error "${EC15:?}"; return 1; }
+  
   fi
     
-  cdfolder "${ROOTDIR:?}" || return 1;
+  cdfolder "${ROOTDIR:?}" || { unset_all; return 1; }
 }
 
 gitact1() { 
@@ -75,21 +79,25 @@ gitact1() {
   local URL="${2:?}"
   local TAG="${3:?}"
   
-  cdfolder "${PROJECT:?}" || return 1;
+  cdfolder "${PROJECT:?}" || { unset_all; return 1; }
   
   # ---------------------------------------------------------------------------
   # In case this script runs twice --------------------------------------------
   # ---------------------------------------------------------------------------
-  if [ -n "${OVERWRITE_EXISTING_COSMOLIKE_CODE}" ]; then
+  if [ -n "${OVERWRITE_EXISTING_COSMOLIKE_CODE:-}" ]; then
+  
     rm -rf "${PACKDIR:?}"
+  
   fi
 
   if [ ! -d "${PACKDIR:?}" ]; then
+  
     "${GIT:?}" clone "${URL}" "${NAME}" --branch "${TAG}" --single-branch \
       >>${OUT1:?} 2>>${OUT2:?} || { error "${EC15:?}"; return 1; }
+  
   fi
     
-  cdfolder "${ROOTDIR:?}" || return 1;
+  cdfolder "${ROOTDIR:?}" || { unset_all; return 1; }
 }
 
 gitact2() {  
@@ -97,12 +105,25 @@ gitact2() {
   local TAG="${2}"
 
   if [ -d "${PACKDIR:?}" ]; then
-    cdfolder "${PACKDIR:?}" || return 1;
+    cdfolder "${PACKDIR:?}" || { unset_all; return 1; }
+
+    if [ "$("${GIT:?}" rev-parse --is-shallow-repository)" = "true" ]; then
+    
+      "${GIT:?}" fetch --unshallow --all --tags --prune \
+        >>${OUT1:?} 2>>${OUT2:?} || { error "${EC16:?}"; return 1; }
+    
+    else
+    
+      "${GIT:?}" fetch --all --tags --prune \
+        >>${OUT1:?} 2>>${OUT2:?} || { error "${EC16:?}"; return 1; }
+    
+    fi
+
     "${GIT:?}" checkout ${TAG} \
       >>${OUT1:?} 2>>${OUT2:?} || { error "${EC16:?}"; return 1; }
   fi
     
-  cdfolder "${ROOTDIR}" || return 1;
+  cdfolder "${ROOTDIR}" || { unset_all; return 1; }
 }
 
 gitact3() {  
@@ -110,13 +131,35 @@ gitact3() {
   local TAG="${2}"
 
   if [ -d "${PACKDIR:?}" ]; then
-    cdfolder "${PACKDIR:?}" || return 1;
-    "${GIT:?}" fetch --all --tags --prune
-    "${GIT:?}" checkout tags/${TAG} -b ${TAG} \
-      >>${OUT1:?} 2>>${OUT2:?} || { error "${EC16:?}"; return 1; }
+    cdfolder "${PACKDIR:?}" || { unset_all; return 1; }
+    
+    if [ "$("${GIT:?}" rev-parse --is-shallow-repository)" = "true" ]; then
+   
+      "${GIT:?}" fetch --unshallow --all --tags --prune \
+        >>${OUT1:?} 2>>${OUT2:?} || { error "${EC16:?}"; return 1; }
+   
+    else
+   
+      "${GIT:?}" fetch --all --tags --prune \
+        >>${OUT1:?} 2>>${OUT2:?} || { error "${EC16:?}"; return 1; }
+   
+    fi
+    
+    if "${GIT:?}" show-ref --verify --quiet "refs/heads/${TAG:?}"; then
+   
+      "${GIT:?}" checkout "${TAG:?}" \
+        >>${OUT1:?} 2>>${OUT2:?} || { error "${EC16:?}"; return 1; }
+   
+    else
+   
+      "${GIT:?}" checkout "tags/${TAG:?}" -b "${TAG:?}" \
+        >>${OUT1:?} 2>>${OUT2:?} || { error "${EC16:?}"; return 1; }
+   
+    fi
+
   fi
     
-  cdfolder "${ROOTDIR}" || return 1;
+  cdfolder "${ROOTDIR}" || { unset_all; return 1; }
 }
 
 
@@ -130,30 +173,40 @@ unset_env_vars || return 1
 # -------------------------------- AXIONS -----------------------------------
 # ----------------------------------------------------------------------------
 
-if [ -n "${INSTALL_PRIVATE_AXIONS_PROJECT}" ]; then 
+if [ -n "${INSTALL_PRIVATE_AXIONS_PROJECT:-}" ]; then 
   
   # Name to be printed on this shell script messages
   PRINTNAME="AXIONS PROJECT"
 
-  ptop "GETTING ${PRINTNAME:?}" || return 1
+  ptop "GETTING ${PRINTNAME:?}" || { unset_all; return 1; }
 
   FOLDER="${AXIONS_PROJECT_NAME:-"axions"}"
 
   URL="${AXIONS_PROJECT_URL:?}"
 
-  if [ -n "${AXIONS_PROJECT_GIT_COMMIT}" ]; then
-    gitact0 "${FOLDER:?}" "${URL:?}"
-    gitact2 "${FOLDER:?}" "${AXIONS_PROJECT_GIT_COMMIT:?}"  || return 1
-  elif [ -n "${AXIONS_PROJECT_GIT_BRANCH}" ]; then 
-    gitact1 "${FOLDER:?}" "${URL:?}" "${AXIONS_PROJECT_GIT_BRANCH:?}" || return 1
-  elif [ -n "${AXIONS_PROJECT_GIT_TAG}" ]; then 
-    gitact0 "${FOLDER:?}" "${URL:?}"
-    gitact3 "${FOLDER:?}" "${AXIONS_PROJECT_GIT_TAG:?}" || return 1
+  if [ -n "${AXIONS_PROJECT_GIT_COMMIT:-}" ]; then
+
+    gitact0 "${FOLDER:?}" "${URL:?}" || { unset_all; return 1; }
+  
+    gitact2 "${FOLDER:?}" "${AXIONS_PROJECT_GIT_COMMIT:?}"  || { unset_all; return 1; }
+  
+  elif [ -n "${AXIONS_PROJECT_GIT_BRANCH:-}" ]; then 
+  
+    gitact1 "${FOLDER:?}" "${URL:?}" "${AXIONS_PROJECT_GIT_BRANCH:?}" || { unset_all; return 1; }
+  
+  elif [ -n "${AXIONS_PROJECT_GIT_TAG:-}" ]; then 
+  
+    gitact0 "${FOLDER:?}" "${URL:?}" || { unset_all; return 1; }
+  
+    gitact3 "${FOLDER:?}" "${AXIONS_PROJECT_GIT_TAG:?}" || { unset_all; return 1; }
+  
   else
-    gitact0 "${FOLDER:?}" "${URL:?}"
+  
+    gitact0 "${FOLDER:?}" "${URL:?}" || { unset_all; return 1; }
+  
   fi
 
-  pbottom "GETTING ${PRINTNAME:?}" || return 1
+  pbottom "GETTING ${PRINTNAME:?}" || { unset_all; return 1; }
 
 fi
 

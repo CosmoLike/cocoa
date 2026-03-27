@@ -56,7 +56,7 @@ if [ -z "${IGNORE_SIMONS_OBSERVATORY_LIKELIHOOD_CODE}" ]; then
   # ----------------------------------------------------------------------------
   # ----------------------------------------------------------------------------
   
-  ptop "SETUP SIMONS OBSERVATORY SYSLIBRARY" || return 1;
+  ptop "SETUP SIMONS OBSERVATORY SYSLIBRARY" || { unset_all; return 1; }
 
   URL="${SO_SYSLIB_URL:-"https://github.com/simonsobs/syslibrary.git"}"
     
@@ -64,31 +64,49 @@ if [ -z "${IGNORE_SIMONS_OBSERVATORY_LIKELIHOOD_CODE}" ]; then
 
   PACKDIR="${ECODEF:?}/${FOLDER:?}"
 
-  if [[ -n "${OVERWRITE_EXISTING_SIMONS_OBSERVATORY_CODE}" ]]; then
+  if [[ -n "${OVERWRITE_EXISTING_SIMONS_OBSERVATORY_CODE:-}" ]]; then
+  
     rm -rf "${PACKDIR:?}"
+  
   fi
 
   if [[ ! -d "${PACKDIR:?}" ]]; then
-    cdfolder "${ECODEF}" || return 1;
+  
+    cdfolder "${ECODEF}" || { unset_all; return 1; }
 
-    "${GIT:?}" clone "${URL:?}" --depth ${GIT_CLONE_MAXIMUM_DEPTH:?} \
+    "${GIT:?}" clone "${URL:?}" --depth ${GIT_CLONE_MAXIMUM_DEPTH:-1000} \
       --recursive "${FOLDER:?}" \
       >>${OUT1:?} 2>>${OUT2:?} || { error "${EC15:?}"; return 1; }
 
-    cdfolder "${PACKDIR}" || return 1;
+    cdfolder "${PACKDIR}" || { unset_all; return 1; }
 
-    if [ -n "${SO_SYSLIB_GIT_COMMIT}" ]; then
+    if [ -n "${SO_SYSLIB_GIT_COMMIT:-}" ]; then
+      
+      if [ "$("${GIT:?}" rev-parse --is-shallow-repository)" = "true" ]; then
+    
+        "${GIT:?}" fetch --unshallow --all --tags --prune \
+          >>${OUT1:?} 2>>${OUT2:?} || { error "${EC16:?}"; return 1; }
+    
+      else
+    
+        "${GIT:?}" fetch --all --tags --prune \
+          >>${OUT1:?} 2>>${OUT2:?} || { error "${EC16:?}"; return 1; }
+    
+      fi
+
       "${GIT:?}" checkout "${SO_SYSLIB_GIT_COMMIT:?}" \
         >>${OUT1:?} 2>>${OUT2:?} || { error "${EC16:?}"; return 1; }
+    
     fi
+  
   fi
 
-  pbottom "SETUP SIMONS OBSERVATORY SYSLIBRARY" || return 1;
+  pbottom "SETUP SIMONS OBSERVATORY SYSLIBRARY" || { unset_all; return 1; }
 
   # ----------------------------------------------------------------------------
   # ----------------------------------------------------------------------------
 
-  ptop "SETUP SIMONS OBSERVATORY MFLIKE" || return 1;
+  ptop "SETUP SIMONS OBSERVATORY MFLIKE" || { unset_all; return 1; }
 
   URL="${SO_MFLIKE_URL:-"https://github.com/simonsobs/LAT_MFLike.git"}"
   
@@ -96,37 +114,54 @@ if [ -z "${IGNORE_SIMONS_OBSERVATORY_LIKELIHOOD_CODE}" ]; then
 
   PACKDIR="${ECODEF:?}/${FOLDER:?}"
 
-  if [[ -n "${OVERWRITE_EXISTING_SIMONS_OBSERVATORY_CODE}" ]]; then    
+  if [[ -n "${OVERWRITE_EXISTING_SIMONS_OBSERVATORY_CODE:-}" ]]; then    
+  
     rm -rf "${PACKDIR:?}"
+  
   fi
 
   if [[ ! -d "${PACKDIR:?}" ]]; then
-    cdfolder "${ECODEF}" || return 1;
+  
+    cdfolder "${ECODEF}" || { unset_all; return 1; }
 
-    "${GIT:?}" clone "${URL:?}" --depth ${GIT_CLONE_MAXIMUM_DEPTH:?} \
+    "${GIT:?}" clone "${URL:?}" --depth ${GIT_CLONE_MAXIMUM_DEPTH:-1000} \
       --recursive "${FOLDER:?}" \
       >>${OUT1:?} 2>>${OUT2:?} || { error "${EC15:?}"; return 1; }
 
-    cdfolder "${PACKDIR}" || return 1;
+    cdfolder "${PACKDIR}" || { unset_all; return 1; }
 
-    if [ -n "${SO_MFLIKE_GIT_COMMIT}" ]; then
+    if [ -n "${SO_MFLIKE_GIT_COMMIT:-}" ]; then
+
+      if [ "$("${GIT:?}" rev-parse --is-shallow-repository)" = "true" ]; then
+    
+        "${GIT:?}" fetch --unshallow --all --tags --prune \
+          >>${OUT1:?} 2>>${OUT2:?} || { error "${EC16:?}"; return 1; }
+    
+      else
+    
+        "${GIT:?}" fetch --all --tags --prune \
+          >>${OUT1:?} 2>>${OUT2:?} || { error "${EC16:?}"; return 1; }
+    
+      fi
+      
       "${GIT:?}" checkout "${SO_MFLIKE_GIT_COMMIT:?}" \
         >>${OUT1:?} 2>>${OUT2:?} || { error "${EC16:?}"; return 1; }
     fi
 
     # PATCH MKFLIKE
-    cdfolder "${PACKDIR:?}/mflike"|| return 1;
+    cdfolder "${PACKDIR:?}/mflike"|| { unset_all; return 1; }
 
     cp "${CCCOB:?}/${COBLIKE:?}/mflike/mflike.patch" "${PACKDIR:?}/mflike" \
       2>>"/dev/null" || { error "CP FILE mflike.patch"; return 1; }
 
     patch -u "mflike.py" -i "mflike.patch" \
       >>${OUT1:?} 2>>${OUT2:?} || { error "${EC17:?} (mflike.patch)"; return 1; }
+  
   fi
 
-  pbottom "SETUP SIMONS OBSERVATORY MFLIKE" || return 1;
+  pbottom "SETUP SIMONS OBSERVATORY MFLIKE" || { unset_all; return 1; }
 
-  cdfolder "${ROOTDIR}" || return 1
+  cdfolder "${ROOTDIR}" || { unset_all; return 1; }
 
   unset_all || return 1;
 fi

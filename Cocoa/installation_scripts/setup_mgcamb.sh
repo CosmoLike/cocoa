@@ -71,14 +71,16 @@ if [ -z "${IGNORE_MGCAMB_CODE}" ]; then
   # Name to be printed on this shell script messages
   PRINTNAME="MGCAMB"
 
-  ptop "INSTALLING ${PRINTNAME:?}" || return 1;
+  ptop "INSTALLING ${PRINTNAME:?}" || { unset_all; return 1; }
 
   # ----------------------------------------------------------------------------
   # In case this script is called twice ----------------------------------------
   # ----------------------------------------------------------------------------
-  if [ -n "${OVERWRITE_EXISTING_MGCAMB_CODE}" ]; then
+  if [ -n "${OVERWRITE_EXISTING_MGCAMB_CODE:-}" ]; then
+  
     rm -rf "${ECODEF:?}/${TFOLDER:?}"
     rm -rf "${PACKDIR:?}"
+  
   fi
 
   # ----------------------------------------------------------------------------
@@ -86,17 +88,31 @@ if [ -z "${IGNORE_MGCAMB_CODE}" ]; then
   # ----------------------------------------------------------------------------
   if [ ! -d "${PACKDIR:?}" ]; then
 
-    cdfolder "${ECODEF:?}" || { cdroot; return 1; }
+    cdfolder "${ECODEF:?}" || { unset_all; return 1; }
 
-    "${GIT:?}" clone "${URL:?}" --depth ${GIT_CLONE_MAXIMUM_DEPTH:?} \
+    "${GIT:?}" clone "${URL:?}" --depth ${GIT_CLONE_MAXIMUM_DEPTH:-1000} \
       --recursive "${TFOLDER:?}" \
       >>${OUT1:?} 2>>${OUT2:?} || { error "${EC15:?}"; return 1; }
     
-    cdfolder "${ECODEF:?}/${TFOLDER:?}" || { cdroot; return 1; }
+    cdfolder "${ECODEF:?}/${TFOLDER:?}" || { unset_all; return 1; }
 
-    if [ -n "${MGCAMB_GIT_COMMIT}" ]; then
+    if [ -n "${MGCAMB_GIT_COMMIT:-}" ]; then
+
+      if [ "$("${GIT:?}" rev-parse --is-shallow-repository)" = "true" ]; then
+    
+        "${GIT:?}" fetch --unshallow --all --tags --prune \
+          >>${OUT1:?} 2>>${OUT2:?} || { error "${EC16:?}"; return 1; }
+    
+      else
+    
+        "${GIT:?}" fetch --all --tags --prune \
+          >>${OUT1:?} 2>>${OUT2:?} || { error "${EC16:?}"; return 1; }
+    
+      fi
+
       "${GIT:?}" checkout "${MGCAMB_GIT_COMMIT:?}" \
-      >>${OUT1:?} 2>>${OUT2:?} || { error "${EC16:?}"; return 1; }
+        >>${OUT1:?} 2>>${OUT2:?} || { error "${EC16:?}"; return 1; }
+    
     fi
     
     # ---------------------------------------------------------------------------
@@ -105,7 +121,9 @@ if [ -z "${IGNORE_MGCAMB_CODE}" ]; then
     mv "${ECODEF:?}/${TFOLDER:?}/MGCAMB" "${ECODEF:?}"
     
     if [ "MGCAMB/" != "${FOLDER:?}" ] && [ "MGCAMB" != "${FOLDER:?}" ] ; then
+    
       mv "${ECODEF:?}/MGCAMB" ${FOLDER:?}
+    
     fi
 
     rm -rf "${ECODEF:?}/${TFOLDER:?}"
@@ -135,9 +153,10 @@ if [ -z "${IGNORE_MGCAMB_CODE}" ]; then
 
     for (( i=0; i<${AL}; i++ ));
     do
-      cdfolder "${PACKDIR:?}/${TFOLDER[$i]}" || return 1
+      cdfolder "${PACKDIR:?}/${TFOLDER[$i]}" || { unset_all; return 1; }
 
-      cpfolder "${CHANGES:?}/${TFOLDER[$i]}${TFILEP[$i]:?}" . 2>>${OUT2:?} || return 1;
+      cpfolder "${CHANGES:?}/${TFOLDER[$i]}${TFILEP[$i]:?}" . \
+        2>>${OUT2:?} || { unset_all; return 1; }
 
       patch -u "${TFILE[$i]:?}" -i "${TFILEP[$i]:?}" \
         >>${OUT1:?} 2>>${OUT2:?} || { error "${EC17:?} (${TFILE[$i]:?})"; return 1; }
@@ -145,9 +164,9 @@ if [ -z "${IGNORE_MGCAMB_CODE}" ]; then
   
   fi
   
-  cdfolder "${ROOTDIR}" || return 1
+  cdfolder "${ROOTDIR:?}" || { unset_all; return 1; }
   
-  pbottom "INSTALLING ${PRINTNAME:?}" || return 1
+  pbottom "INSTALLING ${PRINTNAME:?}" || { unset_all; return 1; }
   
   unset_all || return 1
 fi

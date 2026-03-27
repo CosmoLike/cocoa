@@ -88,7 +88,7 @@ if [ -z "${IGNORE_EUCLID_EMULATOR_V2_CODE}" ]; then
     
     cdfolder "${PACKDIR}" || { unset_all; return 1; }
 
-    if [ -n "${EE2_GIT_COMMIT}" ]; then
+    if [ -n "${EE2_GIT_COMMIT:-}" ]; then
 
       if [ "$("${GIT:?}" rev-parse --is-shallow-repository)" = "true" ]; then
     
@@ -101,7 +101,7 @@ if [ -z "${IGNORE_EUCLID_EMULATOR_V2_CODE}" ]; then
           >>${OUT1:?} 2>>${OUT2:?} || { error "${EC16:?}"; return 1; }
     
       fi
-      
+
       "${GIT:?}" checkout "${EE2_GIT_COMMIT:?}" \
         >>${OUT1:?} 2>>${OUT2:?} || { error "${EC16:?}"; return 1; }
     

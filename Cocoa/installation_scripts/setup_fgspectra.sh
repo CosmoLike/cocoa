@@ -87,7 +87,7 @@ if [ -z "${IGNORE_FGSPECTRA_CODE}" ]; then
     # ---------------------------------------------------------------------------
     cdfolder "${ECODEF}" || { unset_all; return 1; }
 
-    "${GIT:?}" clone "${URL:?}" --depth ${GIT_CLONE_MAXIMUM_DEPTH:?} \
+    "${GIT:?}" clone "${URL:?}" --depth ${GIT_CLONE_MAXIMUM_DEPTH:-1000} \
       --recursive "${FOLDER:?}" \
       >>${OUT1:?} 2>>${OUT2:?} || { error "${EC15:?}"; return 1; }
     
@@ -106,11 +106,12 @@ if [ -z "${IGNORE_FGSPECTRA_CODE}" ]; then
           >>${OUT1:?} 2>>${OUT2:?} || { error "${EC16:?}"; return 1; }
     
       fi
-      
+
       "${GIT:?}" checkout "${FGSPECTRA_GIT_COMMIT:?}" \
         >>${OUT1:?} 2>>${OUT2:?} || { error "${EC16:?}"; return 1; }
     
     fi
+  
   fi
   
   cdfolder "${ROOTDIR}" || { unset_all; return 1; }

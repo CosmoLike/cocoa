@@ -53,7 +53,7 @@ if [ -z "${IGNORE_VELOCILEPTORS_CODE}" ]; then
 
   # ---------------------------------------------------------------------------
   
-  ptop 'INSTALLING VELOCILEPTORS' || return 1;
+  ptop 'INSTALLING VELOCILEPTORS' || { unset_all; return 1; }
 
   URL="${VELOCILEPTORS_URL:-"https://github.com/sfschen/velocileptors.git"}"
 
@@ -67,8 +67,10 @@ if [ -z "${IGNORE_VELOCILEPTORS_CODE}" ]; then
   # ---------------------------------------------------------------------------
   # In case this script is called twice ---------------------------------------
   # ---------------------------------------------------------------------------
-  if [ -n "${OVERWRITE_EXISTING_VELOCILEPTORS_CODE}" ]; then
+  if [ -n "${OVERWRITE_EXISTING_VELOCILEPTORS_CODE:-}" ]; then
+  
     rm -rf "${PACKDIR:?}"
+  
   fi
 
   if [ ! -d "${PACKDIR:?}" ]; then
@@ -76,23 +78,38 @@ if [ -z "${IGNORE_VELOCILEPTORS_CODE}" ]; then
     # ---------------------------------------------------------------------------
     # Clone from original repo --------------------------------------------------
     # ---------------------------------------------------------------------------
-    cdfolder "${ECODEF:?}" || { cdroot; return 1; }
+    cdfolder "${ECODEF:?}" || { unset_all; return 1; }
 
-    "${GIT:?}" clone "${URL:?}" \
-      --depth ${GIT_CLONE_MAXIMUM_DEPTH:?} --recursive "${FOLDER:?}" \
+    "${GIT:?}" clone "${URL:?}" --depth ${GIT_CLONE_MAXIMUM_DEPTH:-1000} \
+      --recursive "${FOLDER:?}" \
       >>${OUT1:?} 2>>${OUT2:?} || { error "${EC15:?}"; return 1; }
     
     cdfolder "${PACKDIR}" || { cdroot; return 1; }
 
-    if [ -n "${VELOCILEPTORS_GIT_COMMIT}" ]; then
+    if [ -n "${VELOCILEPTORS_GIT_COMMIT:-}" ]; then
+
+      if [ "$("${GIT:?}" rev-parse --is-shallow-repository)" = "true" ]; then
+      
+        "${GIT:?}" fetch --unshallow --all --tags --prune \
+          >>${OUT1:?} 2>>${OUT2:?} || { error "${EC16:?}"; return 1; }
+      
+      else
+      
+        "${GIT:?}" fetch --all --tags --prune \
+          >>${OUT1:?} 2>>${OUT2:?} || { error "${EC16:?}"; return 1; }
+      
+      fi
+      
       "${GIT:?}" checkout "${VELOCILEPTORS_GIT_COMMIT:?}" \
       >>${OUT1:?} 2>>${OUT2:?} || { error "${EC16:?}"; return 1; }
+    
     fi
+  
   fi
     
-  cdfolder "${ROOTDIR}" || return 1
+  cdfolder "${ROOTDIR}" || { unset_all; return 1; }
   
-  pbottom 'INSTALLING VELOCILEPTORS' || return 1
+  pbottom 'INSTALLING VELOCILEPTORS' || { unset_all; return 1; }
   
   unset_all || return 1
 fi

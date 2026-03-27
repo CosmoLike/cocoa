@@ -57,7 +57,7 @@ if [ -z "${IGNORE_PIP_CORE_INSTALLATION}" ]; then
   # ----------------------------------------------------------------------------
   # --------------------------- PIP CORE PACKAGES ------------------------------
   # ----------------------------------------------------------------------------  
-  ptop "INSTALLING A FEW PYTHON CORE LIBRARIES VIA PIP" || return 1
+  ptop "INSTALLING A FEW PYTHON CORE LIBRARIES VIA PIP" || { unset_all; return 1; }
 
   #PS: --force-reinstall - this helps CARMA to see numpy files
   #PS2: Need to include numpy in the same command to avoid numpy 2.0
@@ -102,14 +102,14 @@ if [ -z "${IGNORE_PIP_CORE_INSTALLATION}" ]; then
   #--upgrade setuptools --no-cache-dir >${OUT1:?} 2>${OUT2:?} \
   #|| { error "(PIP-CORE-PACKAGES) ${EC13:?}"; return 1; }
 
-  pbottom "INSTALLING PYTHON CORE LIBRARIES VIA PIP" || return 1
+  pbottom "INSTALLING PYTHON CORE LIBRARIES VIA PIP" || { unset_all; return 1; }
   
   # ----------------------------------------------------------------------------
   # ----------------------------- PIP ML PACKAGES ------------------------------
   # ----------------------------------------------------------------------------
   
   if [ -z "${IGNORE_EMULATOR_GPU_PIP_PACKAGES}" ]; then
-    ptop "PIP INSTALL MACHINE LEARNING GPU PACKAGES (takes a while O(5-10min)...)"
+    ptop "PIP INSTALL MACHINE LEARNING GPU PACKAGES (takes a while O(5-10min)...)" || { unset_all; return 1; }
 
     env CXX="${CXX_COMPILER:?}" CC="${C_COMPILER:?}" ${PIP3:?} install \
         "numpy==${COCOA_NUMPY_VERSION:?}" \
@@ -141,7 +141,7 @@ if [ -z "${IGNORE_PIP_CORE_INSTALLATION}" ]; then
       --prefix="${ROOTDIR:?}/.local" \
       >>${OUT1:?} 2>>${OUT2:?} || { error "${EC13:?}"; return 1; }
 
-    pbottom "PIP INSTALL MACHINE LEARNING GPU PACKAGES" || return 1
+    pbottom "PIP INSTALL MACHINE LEARNING GPU PACKAGES" || { unset_all; return 1; }
   
   fi
 

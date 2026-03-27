@@ -84,7 +84,9 @@ gitact1() {
   # In case this script runs twice --------------------------------------------
   # ---------------------------------------------------------------------------
   if [ -n "${OVERWRITE_EXISTING_COSMOLIKE_CODE:-}" ]; then
+  
     rm -rf "${PACKDIR:?}"
+  
   fi
 
   if [ ! -d "${PACKDIR:?}" ]; then
