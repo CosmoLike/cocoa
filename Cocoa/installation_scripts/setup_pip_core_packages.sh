@@ -82,15 +82,20 @@ if [ -z "${IGNORE_PIP_CORE_INSTALLATION}" ]; then
   
   if [ -n "${COCOA_FORCE_NUMPY_1_23}" ]; then
     COCOA_NUMPY_VERSION='1.23.5'
+    PIPCPFR=(
+      "numpy==${COCOA_NUMPY_VERSION:?}"
+      'mpi4py==4.0.3'
+      'setuptools==80.3.1'
+      'pyfftw==0.13.1'    # ← only when COCOA_FORCE_NUMPY_1_23 is set
+    )
   else
     COCOA_NUMPY_VERSION='1.26.3'
+    PIPCPFR=(
+      "numpy==${COCOA_NUMPY_VERSION:?}"
+      'mpi4py==4.0.3'
+      'setuptools==80.3.1'
+    )
   fi
-
-  PIPCPFR=(
-    "numpy==${COCOA_NUMPY_VERSION:?}"
-    'mpi4py==4.0.3'
-    'setuptools==80.3.1'
-  )
 
   PIPCPFR_HASH=$(
     {
@@ -105,9 +110,9 @@ if [ -z "${IGNORE_PIP_CORE_INSTALLATION}" ]; then
 
   if [ ! -f "${SENTINEL_PIPCPFR:?}" ]; then
  
-    env MPICC=$MPI_CC_COMPILER ${PIP3:?} install \
-        "${PIPCPFR[@]}" \
-      --no-cache-dir --prefer-binary \
+    env MPICC=$MPI_CC_COMPILER ${PIP3:?} install "${PIPCPFR[@]}" \
+      --no-cache-dir \
+      --prefer-binary \
       --prefix="${ROOTDIR:?}/.local" \
       --force-reinstall \
       >>${OUT1:?} 2>>${OUT2:?} || { error "(PIP-CPFR) ${EC13:?}"; return 1; }
@@ -147,7 +152,9 @@ if [ -z "${IGNORE_PIP_CORE_INSTALLATION}" ]; then
   if [ ! -f "${SENTINEL_PIPCP:?}" ]; then
   
     env MPICC=$MPI_CC_COMPILER ${PIP3:?} install "${PIPCP[@]}" \
-      --no-cache-dir --prefer-binary --use-pep517 \
+      --no-cache-dir \
+      --prefer-binary \
+      --use-pep517 \
       --prefix="${ROOTDIR:?}/.local" \
       >>${OUT1:?} 2>>${OUT2:?} || { error "(PIP-CP) ${EC13:?}"; return 1; }
   
@@ -200,7 +207,8 @@ if [ -z "${IGNORE_PIP_CORE_INSTALLATION}" ]; then
     if [ ! -f "${SENTINEL_PIPCPML:?}" ]; then
     
       env CXX="${CXX_COMPILER:?}" CC="${C_COMPILER:?}" ${PIP3:?} install "${PIPCPML[@]}" \
-        --no-cache-dir --prefer-binary \
+        --no-cache-dir \
+        --prefer-binary \
         --extra-index-url "https://download.pytorch.org/whl/cu118" \
         --prefix="${ROOTDIR:?}/.local" \
         >>${OUT1:?} 2>>${OUT2:?} || { error "${EC13:?}"; return 1; } 
