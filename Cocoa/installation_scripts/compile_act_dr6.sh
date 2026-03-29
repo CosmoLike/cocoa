@@ -67,7 +67,7 @@ if [ -z "${IGNORE_ACTDR6_CODE:-}" ]; then
 
   (
     env CXX="${CXX_COMPILER:?}" CC="${C_COMPILER:?}" \
-      "${PIP3:?}" install "${PACKDIR:?}" \
+      ${PIP3:?} install "${PACKDIR:?}" \
         --prefix="${ROOTDIR:?}/.local" \
         --no-index \
         --no-deps \
@@ -97,7 +97,7 @@ if [ -z "${IGNORE_ACTDR6_CODE:-}" ]; then
 
   (
     env CXX="${CXX_COMPILER:?}" CC="${C_COMPILER:?}" \
-    "${PIP3:?}" install "${PACKDIR:?}" \
+    ${PIP3:?} install "${PACKDIR:?}" \
       --prefix="${ROOTDIR:?}/.local" \
       --no-index \
       --no-deps \
