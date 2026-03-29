@@ -63,10 +63,10 @@ if [ -z "${IGNORE_TENSIOMETER_CODE:-}" ]; then
    # cleaning any previous compilation
   # ----------------------------------------------------------------------------
   rm -rf "${PACKDIR:?}/build/"
-  rm -rf "${PACKDIR:?}/euclidemu2.egg-info/"
-  rm -rf "${PLIB:?}"/euclidemu2
-  rm -rf "${PLIB:?}"/euclidemu2-*
-  rm -rf "${PLIB:?}"/euclidemu2.cpython*
+  rm -rf "${PACKDIR:?}/tensiometer.egg-info/"
+  rm -rf "${PLIB:?}"/tensiometer
+  rm -rf "${PLIB:?}"/tensiometer-*
+  rm -rf "${PLIB:?}"/tensiometer.cpython*
   # ---------------------------------------------------------------------------  
  
   cdfolder "${PACKDIR}" || { unset_all; return 1; }
