@@ -90,9 +90,10 @@ if [ -z "${IGNORE_LIPOP_LIKELIHOOD_CODE:-}" ]; then
   
   ptop "COMPILING LOLLIPOP LIKELIHOOD" || { unset_all; return 1; }
 
+  PACKDIR="${ECODEF:?}/${PL2020_LOLLIPOP_NAME:-"planck_2020_lollipop"}"
+
   cdfolder "${PACKDIR:?}" ||{ unset_all; return 1; }
 
-  PACKDIR="${ECODEF:?}/${PL2020_LOLLIPOP_NAME:-"planck_2020_lollipop"}"
 
   # ----------------------------------------------------------------------------
   # cleaning any previous compilation
@@ -105,7 +106,7 @@ if [ -z "${IGNORE_LIPOP_LIKELIHOOD_CODE:-}" ]; then
 
   (
     env CXX="${CXX_COMPILER:?}" CC="${C_COMPILER:?}" \
-      ${PIP3:?} install ${PACKDIR:?} \
+      "${PIP3:?}" install "${PACKDIR:?}" \
         --no-dependencies \
         --prefix="${ROOTDIR:?}/.local" \
         --no-index \

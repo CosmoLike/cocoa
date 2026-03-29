@@ -4,7 +4,7 @@
 # ------------------------------------------------------------------------------
 if [ -z "${IGNORE_EUCLID_EMULATOR_V2_CODE:-}" ]; then
   
-  if [ -z "${ROOTDIR}" ]; then
+  if [ -z "${ROOTDIR:-}" ]; then
     source start_cocoa.sh || { pfail 'ROOTDIR'; return 1; }
   fi
     

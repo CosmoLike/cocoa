@@ -12,7 +12,7 @@ if [ -z "${IGNORE_PLANCK_LIKELIHOOD_CODE:-}" ]; then
   ( source "${ROOTDIR:?}/installation_scripts/flags_check.sh" ) || return 1;
     
   unset_env_vars () {
-    unset -v ECPCF CLIK_LAPACK_LIBS CLIK_CFITSIO_LIBS PRINTNAME
+    unset -v ECPCF CLIK_LAPACK_LIBS CLIK_CFITSIO_LIBS PRINTNAME PACKDIR
     cdroot || return 1;
   }
 
