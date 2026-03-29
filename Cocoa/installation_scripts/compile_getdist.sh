@@ -2,9 +2,9 @@
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
-if [ -z "${IGNORE_GETDIST_CODE}" ]; then
+if [ -z "${IGNORE_GETDIST_CODE:-}" ]; then
   
-  if [ -z "${ROOTDIR}" ]; then
+  if [ -z "${ROOTDIR:-}" ]; then
     source start_cocoa.sh || { pfail 'ROOTDIR'; return 1; }
   fi
     
@@ -43,44 +43,55 @@ if [ -z "${IGNORE_GETDIST_CODE}" ]; then
   
   unset_env_vars || return 1
 
+  # ----------------------------------------------------------------------------
+
   # E = EXTERNAL, CODE, F=FODLER
   ECODEF="${ROOTDIR:?}/external_modules/code"
 
-  FOLDER="${GETDIST_NAME:-"tensiometer"}"
+  FOLDER="${GETDIST_NAME:-"getdist"}"
 
   PACKDIR="${ECODEF:?}/${FOLDER:?}"
 
   PLIB="${ROOTDIR:?}/.local/lib/python${PYTHON_VERSION:?}/site-packages"
 
-  ptop "COMPILING GETDIST" || return 1
+  # ----------------------------------------------------------------------------
+  # ----------------------------------------------------------------------------
 
-  # ---------------------------------------------------------------------------
+  ptop "COMPILING GETDIST" || { unset_all; return 1; }
+
+  cdfolder "${PACKDIR}" || { unset_all; return 1; }
+
+  # ----------------------------------------------------------------------------
+  # cleaning any previous compilation
+  # ----------------------------------------------------------------------------
   rm -rf "${PACKDIR:?}/build/"
-  rm -rf "${PACKDIR:?}/euclidemu2.egg-info/"
-  rm -rf "${PLIB:?}"/euclidemu2
-  rm -rf "${PLIB:?}"/euclidemu2-*
-  rm -rf "${PLIB:?}"/euclidemu2.cpython*
-  # ---------------------------------------------------------------------------  
+  rm -rf "${PACKDIR:?}/getdist.egg-info/"
+  rm -rf "${PLIB:?}"/getdist
+  rm -rf "${PLIB:?}"/getdist-*
+  # ----------------------------------------------------------------------------  
  
-  cdfolder "${PACKDIR}" || return 1
-
   #prevent all compile_XXX.sh from using the internet (run @compute nodes)
   #FROM: https://github.com/pypa/pip/issues/12050
   #That is why we use --no-dependencies --no-index --no-build-isolation
-  (env CXX="${CXX_COMPILER:?}" CC="${C_COMPILER:?}" \
-    ${PIP3:?} install ${PACKDIR:?} \
-      --no-dependencies \
-      --prefix="${ROOTDIR:?}/.local" \
-      --no-index \
-      --no-build-isolation 
+  (
+    env CXX="${CXX_COMPILER:?}" CC="${C_COMPILER:?}" \
+      ${PIP3:?} install ${PACKDIR:?} \
+        --no-dependencies \
+        --prefix="${ROOTDIR:?}/.local" \
+        --no-index \
+        --no-build-isolation 
   ) >>${OUT1:?} 2>>${OUT2:?} || { error "${EC3:?}"; return 1; }
 
-  pbottom "COMPILING GETDIST" || return 1
+  pbottom "COMPILING GETDIST" || { unset_all; return 1; }
 
-  cdfolder "${ROOTDIR}" || return 1;
+  cdfolder "${ROOTDIR}" || { unset_all; return 1; }
 
+  # ----------------------------------------------------------------------------
+  
   unset_all || return 1
+
 fi
+
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------

@@ -2,9 +2,9 @@
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
-if [ -z "${IGNORE_HYREC_CODE}" ]; then
+if [ -z "${IGNORE_HYREC_CODE:-}" ]; then
   
-  if [ -z "${ROOTDIR}" ]; then
+  if [ -z "${ROOTDIR:-}" ]; then
     source start_cocoa.sh || { pfail 'ROOTDIR'; return 1; }
   fi
 
@@ -56,32 +56,41 @@ if [ -z "${IGNORE_HYREC_CODE}" ]; then
   # Name to be printed on this shell script messages
   PRINTNAME="HYREC2 RECOMBINATION CODE"
 
-  ptop "COMPILING ${PRINTNAME:?}" || return 1
+  # ----------------------------------------------------------------------------
+  # ----------------------------------------------------------------------------
 
-  # ---------------------------------------------------------------------------
+  ptop "COMPILING ${PRINTNAME:?}" || { unset_all; return 1; }
+
+  cdfolder "${PACKDIR}" || { unset_all; return 1; }
+
+  # ----------------------------------------------------------------------------
   # cleaning any previous compilation
+  # ----------------------------------------------------------------------------
   rm -f  "${ROOTDIR:?}/.local/lib/libhyrec.a"
   rm -f  "${ROOTDIR:?}/.local/lib/libhyrec.so"
   rm -rf "${ROOTDIR:?}/.local/include/hyrec2"
-  
   # ---------------------------------------------------------------------------  
-  cdfolder "${PACKDIR}" || return 1
   
   # create .local/include/hyrec2 where headers will be located
   mkdir "${ROOTDIR:?}/.local/include/hyrec2" \
-    >${OUT1:?} 2>${OUT2:?}  || { error "${EC20:?}"; return 1; }
+    >>${OUT1:?} 2>>${OUT2:?}  || { error "${EC20:?}"; return 1; }
 
-  (export LD_LIBRARY_PATH=${CONDA_PREFIX:?}/lib:$LD_LIBRARY_PATH && \
-   export LD_LIBRARY_PATH=${ROOTDIR:?}/.local/lib:$LD_LIBRARY_PATH && \
-   CC="${C_COMPILER:?}" make install >${OUT1:?} 2>${OUT2:?} || { error "${EC10:?}"; return 1; })
+  (
+    export LD_LIBRARY_PATH=${CONDA_PREFIX:?}/lib:$LD_LIBRARY_PATH && \
+    export LD_LIBRARY_PATH=${ROOTDIR:?}/.local/lib:$LD_LIBRARY_PATH && \
+    CC="${C_COMPILER:?}" make install 
+  ) >>${OUT1:?} 2>>${OUT2:?} || { error "${EC10:?}"; return 1; }
   
-  pbottom "COMPILING ${PRINTNAME:?}" || return 1
+  pbottom "COMPILING ${PRINTNAME:?}" || { unset_all; return 1; }
 
+  cdfolder "${ROOTDIR}" || { unset_all; return 1; }
+  
   # ---------------------------------------------------------------------------
 
   unset_all || return 1
 
 fi
+
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------

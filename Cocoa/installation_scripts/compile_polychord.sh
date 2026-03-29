@@ -2,9 +2,9 @@
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
-if [ -z "${IGNORE_POLYCHORD_SAMPLER_CODE}" ]; then
+if [ -z "${IGNORE_POLYCHORD_SAMPLER_CODE:-}" ]; then
   
-  if [ -z "${ROOTDIR}" ]; then
+  if [ -z "${ROOTDIR:-}" ]; then
     source start_cocoa.sh || { pfail 'ROOTDIR'; return 1; }
   fi
   
@@ -44,9 +44,7 @@ if [ -z "${IGNORE_POLYCHORD_SAMPLER_CODE}" ]; then
 
   unset_env_vars || return 1
 
-  # ---------------------------------------------------------------------------
-
-  ptop 'COMPILING POLYCHORD' || return 1
+  # ----------------------------------------------------------------------------
 
   # E = EXTERNAL, CODE, F=FODLER
   ECODEF="${ROOTDIR:?}/external_modules/code"
@@ -55,11 +53,17 @@ if [ -z "${IGNORE_POLYCHORD_SAMPLER_CODE}" ]; then
   
   PACKDIR="${ECODEF:?}/${FOLDER:?}"
 
-  cdfolder "${PACKDIR}" || return 1
+  # ----------------------------------------------------------------------------
+  # ----------------------------------------------------------------------------
+  ptop 'COMPILING POLYCHORD' || { unset_all; return 1; }
 
-  # ---------------------------------------------------------------------------
+  cdfolder "${PACKDIR}" || { unset_all; return 1; }
+
+  # ----------------------------------------------------------------------------
   # cleaning any previous compilation
-  make clean >${OUT1:?} 2>${OUT2:?} || { error "${EC2:?}"; return 1; }
+  # ----------------------------------------------------------------------------
+  make clean \
+    >>${OUT1:?} 2>>${OUT2:?} || { error "${EC2:?}"; return 1; }
   PLIB="${ROOTDIR:?}/.local/lib/python${PYTHON_VERSION:?}/site-packages"
   rm -rf "${PLIB:?}"/pypolychord-*
   rm -rf "${PACKDIR:?}/lib"/*.a
@@ -69,20 +73,29 @@ if [ -z "${IGNORE_POLYCHORD_SAMPLER_CODE}" ]; then
   rm -rf "${PACKDIR:?}/pypolychord.egg-info"
   # ---------------------------------------------------------------------------
 
-  make >${OUT1:?} 2>${OUT2:?} || { error "${EC7:?}"; return 1; }
+  make \
+    >>${OUT1:?} 2>>${OUT2:?} || { error "${EC7:?}"; return 1; }
 
-  make -j $MNT all >${OUT1:?} 2>${OUT2:?} || { error "${EC7:?}"; return 1; }
+  make -j "${MNT:-1}" all \
+    >>${OUT1:?} 2>>${OUT2:?} || { error "${EC7:?}"; return 1; }
 
-  make -j $MNT pypolychord >${OUT1:?} 2>${OUT2:?} || { error "${EC8:?}"; return 1; }
+  make -j "${MNT:-1}" pypolychord \
+    >>${OUT1:?} 2?>${OUT2:?} || { error "${EC8:?}"; return 1; }
 
-  (CC="${MPI_CC_COMPILER:?}" CXX="${MPI_CXX_COMPILER:?}" \
+  (
+    CC="${MPI_CC_COMPILER:?}" CXX="${MPI_CXX_COMPILER:?}" \
     "${PYTHON3:?}" setup.py install --prefix "${ROOTDIR:?}/.local" \
   ) >>${OUT1:?} 2>> ${OUT2:?} || { error "${EC9:?}"; return 1; }
 
-  pbottom 'COMPILING POLYCHORD' || return 1
+  pbottom 'COMPILING POLYCHORD' || { unset_all; return 1; }
+
+  cdfolder "${ROOTDIR}" || { unset_all; return 1; }
+
+  # ----------------------------------------------------------------------------
 
   unset_all || return 1;
 fi
+
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------

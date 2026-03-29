@@ -3,7 +3,7 @@
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
 
-if [ -z "${ROOTDIR}" ]; then
+if [ -z "${ROOTDIR:-}" ]; then
   source start_cocoa.sh || { pfail 'ROOTDIR'; return 1; }
 fi
 
@@ -57,16 +57,18 @@ for TMP in $(find "${ROOTDIR:?}/projects" -mindepth 1 -maxdepth 1 -type d ! -nam
 
   if [ ! -d "${FOLDER:?}" ]; then
     
-    warning "${EC31:?} (${FOLDER:?})";
+    warning "${EC31:?} (${FOLDER:?})" || cd ${ROOTDIR:?} || { unset_all; return 1; }
   
   else
 
     FILE="${FOLDER:?}/compile_${TMP2:?}.sh"
 
     if [ -f "${FILE:?}" ]; then
-      ( export LD_LIBRARY_PATH=${CONDA_PREFIX:?}/lib:$LD_LIBRARY_PATH && \
+      (
+        export LD_LIBRARY_PATH=${CONDA_PREFIX:?}/lib:$LD_LIBRARY_PATH && \
         export LD_LIBRARY_PATH=${ROOTDIR:?}/.local/lib:$LD_LIBRARY_PATH && \
-        source "${FILE:?}" ) || { error "${EC31:?} (${FILE:?})"; return 1; }
+        source "${FILE:?}" 
+      ) || { error "${EC31:?} (${FILE:?})"; return 1; }
     fi
 
   fi
@@ -75,9 +77,11 @@ done
 
 # ------------------------------------------------------------------------------
 
-unset_all
+cdfolder "${ROOTDIR:?}" || { unset_all; return 1; }
 
-cd ${ROOTDIR:?}
+# ---------------------------------------------------------------------------
+
+unset_all || return 1;
 
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------

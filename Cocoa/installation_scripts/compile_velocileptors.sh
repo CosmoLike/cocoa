@@ -2,9 +2,9 @@
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
-if [ -z "${IGNORE_VELOCILEPTORS_CODE}" ]; then
+if [ -z "${IGNORE_VELOCILEPTORS_CODE:-}" ]; then
   
-  if [ -z "${ROOTDIR}" ]; then
+  if [ -z "${ROOTDIR:-}" ]; then
     source start_cocoa.sh || { pfail 'ROOTDIR'; return 1; }
   fi
 
@@ -42,9 +42,9 @@ if [ -z "${IGNORE_VELOCILEPTORS_CODE}" ]; then
   # --------------------------------------------------------------------------- 
   # ---------------------------------------------------------------------------
 
-  ptop 'COMPILING VELOCILEPTORS' || return 1
-
   unset_env_vars || return 1
+
+  # ----------------------------------------------------------------------------
 
   # E = EXTERNAL, CODE, F=FODLER
   ECODEF="${ROOTDIR:?}/external_modules/code"
@@ -53,33 +53,45 @@ if [ -z "${IGNORE_VELOCILEPTORS_CODE}" ]; then
 
   PACKDIR="${ECODEF:?}/${FOLDER:?}"
 
-  cdfolder "${PACKDIR}" || return 1
+  # ----------------------------------------------------------------------------
+  # ----------------------------------------------------------------------------
+  
+  ptop 'COMPILING VELOCILEPTORS' || { unset_all; return 1; }
 
-  # ---------------------------------------------------------------------------
+  cdfolder "${PACKDIR}" || { unset_all; return 1; }
+
+  # ----------------------------------------------------------------------------
   # cleaning any previous compilation
+  # ----------------------------------------------------------------------------
   rm -rf "${PACKDIR:?}/build"
-
-  "${PYTHON3:?}" setup.py clean >${OUT1:?} 2>${OUT2:?} || { error "${EC1:?}"; return 1; }
-  
+  "${PYTHON3:?}" setup.py clean \
+    >>${OUT1:?} 2>>${OUT2:?} || { error "${EC1:?}"; return 1; }
   PLIB="${ROOTDIR:?}/.local/lib/python${PYTHON_VERSION:?}/site-packages"
-
   rm -f  "${PLIB:?}"/velocileptors-*
-  
   # ---------------------------------------------------------------------------
   
-  (export LD_LIBRARY_PATH=${CONDA_PREFIX:?}/lib:$LD_LIBRARY_PATH && \
-   export LD_LIBRARY_PATH=${ROOTDIR:?}/.local/lib:$LD_LIBRARY_PATH && \
-   "${PYTHON3:?}" setup.py build >${OUT1:?} 2>${OUT2:?} || { error "${EC4:?}"; return 1; })
+  (
+    export LD_LIBRARY_PATH=${CONDA_PREFIX:?}/lib:$LD_LIBRARY_PATH && \
+    export LD_LIBRARY_PATH=${ROOTDIR:?}/.local/lib:$LD_LIBRARY_PATH && \
+    "${PYTHON3:?}" setup.py build 
+  ) >>${OUT1:?} 2>>${OUT2:?} || { error "${EC4:?}"; return 1; }
 
-  (export LD_LIBRARY_PATH=${CONDA_PREFIX:?}/lib:$LD_LIBRARY_PATH && 
-   export LD_LIBRARY_PATH=${ROOTDIR:?}/.local/lib:$LD_LIBRARY_PATH && \
-   "${PYTHON3:?}" setup.py install >${OUT1:?} 2>${OUT2:?} || { error "${EC4:?}"; return 1; })
+  (
+    export LD_LIBRARY_PATH=${CONDA_PREFIX:?}/lib:$LD_LIBRARY_PATH && 
+    export LD_LIBRARY_PATH=${ROOTDIR:?}/.local/lib:$LD_LIBRARY_PATH && \
+    "${PYTHON3:?}" setup.py install 
+  ) >>${OUT1:?} 2>>${OUT2:?} || { error "${EC4:?}"; return 1; }
+
+  pbottom 'COMPILING VELOCILEPTORS' || { unset_all; return 1; }
+
+  cdfolder "${ROOTDIR}" || { unset_all; return 1; }
+
+  # ----------------------------------------------------------------------------
 
   unset_all || return 1
-  
-  pbottom 'COMPILING VELOCILEPTORS' || return 1
-  
+    
 fi
+
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------

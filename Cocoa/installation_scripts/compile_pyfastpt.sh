@@ -2,9 +2,9 @@
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
-if [ -z "${IGNORE_FASTPT_CODE}" ]; then
+if [ -z "${IGNORE_FASTPT_CODE:-}" ]; then
   
-  if [ -z "${ROOTDIR}" ]; then
+  if [ -z "${ROOTDIR:-}" ]; then
     source start_cocoa.sh || { pfail 'ROOTDIR'; return 1; }
   fi
     
@@ -43,6 +43,8 @@ if [ -z "${IGNORE_FASTPT_CODE}" ]; then
   
   unset_env_vars || return 1
 
+  # ----------------------------------------------------------------------------
+
   # E = EXTERNAL, CODE, F=FODLER
   ECODEF="${ROOTDIR:?}/external_modules/code"
 
@@ -52,27 +54,38 @@ if [ -z "${IGNORE_FASTPT_CODE}" ]; then
 
   PLIB="${ROOTDIR:?}/.local/lib/python${PYTHON_VERSION:?}/site-packages"
 
-  ptop "COMPILING PYFAST-PT" || return 1
+  # ----------------------------------------------------------------------------
+  # ----------------------------------------------------------------------------
+  ptop "COMPILING PYFAST-PT" || { unset_all; return 1; }
+  
+  cdfolder "${PACKDIR}" || { unset_all; return 1; }
 
-  # ---------------------------------------------------------------------------
+  # ----------------------------------------------------------------------------
+  # cleaning any previous compilation
+  # ----------------------------------------------------------------------------
   rm -rf "${PACKDIR:?}/build/"
   rm -rf "${PACKDIR:?}/fast_pt.egg-info/"
   # ---------------------------------------------------------------------------  
  
-  cdfolder "${PACKDIR}" || return 1
-
   #prevent all compile_XXX.sh from using the internet (run @compute nodes)
   #FROM: https://github.com/pypa/pip/issues/12050
   #That is why we use --no-dependencies --no-index --no-build-isolation
-  (export LD_LIBRARY_PATH=${CONDA_PREFIX:?}/lib:$LD_LIBRARY_PATH && \
-   export LD_LIBRARY_PATH=${ROOTDIR:?}/.local/lib:$LD_LIBRARY_PATH && \
-   env CXX="${CXX_COMPILER:?}" CC="${C_COMPILER:?}" ${PIP3:?} install \
-    ${PACKDIR:?} --no-dependencies --prefix="${ROOTDIR:?}/.local" --no-index \
-    --no-build-isolation >${OUT1:?} 2>${OUT2:?} || { error "${EC3:?}"; return 1; })
+  (
+    export LD_LIBRARY_PATH=${CONDA_PREFIX:?}/lib:$LD_LIBRARY_PATH && \
+    export LD_LIBRARY_PATH=${ROOTDIR:?}/.local/lib:$LD_LIBRARY_PATH && \
+    env CXX="${CXX_COMPILER:?}" CC="${C_COMPILER:?}" \
+      "${PIP3:?}" install "${PACKDIR:?}" \
+        --no-dependencies \
+        --prefix="${ROOTDIR:?}/.local" \
+        --no-index \
+        --no-build-isolation \
+  ) >>${OUT1:?} 2>>${OUT2:?} || { error "${EC3:?}"; return 1; }
 
-  pbottom "COMPILING PYFAST-PT" || return 1
+  pbottom "COMPILING PYFAST-PT" || { unset_all; return 1; }
 
-  cdfolder "${ROOTDIR}" || return 1;
+  cdfolder "${ROOTDIR}" || { unset_all; return 1; }
+
+  # ----------------------------------------------------------------------------
 
   unset_all || return 1
   

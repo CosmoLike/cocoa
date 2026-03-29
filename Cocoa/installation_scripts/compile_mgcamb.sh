@@ -2,9 +2,9 @@
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
-if [ -z "${IGNORE_MGCAMB_CODE}" ]; then
+if [ -z "${IGNORE_MGCAMB_CODE:-}" ]; then
   
-  if [ -z "${ROOTDIR}" ]; then
+  if [ -z "${ROOTDIR:-}" ]; then
     source start_cocoa.sh || { pfail 'ROOTDIR'; return 1; }
   fi
 
@@ -56,28 +56,37 @@ if [ -z "${IGNORE_MGCAMB_CODE}" ]; then
   # Name to be printed on this shell script messages
   PRINTNAME="MGCAMB"
 
-  ptop "COMPILING ${PRINTNAME:?}" || return 1
+  # ----------------------------------------------------------------------------
+  # ----------------------------------------------------------------------------
 
-  cdfolder "${PACKDIR}" || return 1
+  ptop "COMPILING ${PRINTNAME:?}" || { unset_all; return 1; }
 
-  # ---------------------------------------------------------------------------
+  cdfolder "${PACKDIR}" || { unset_all; return 1; }
+
+  # ----------------------------------------------------------------------------
   # cleaning any previous compilation
+  # ----------------------------------------------------------------------------
   rm -rf "${PACKDIR:?}/build/"
   rm -rf "${PACKDIR:?}/camb/__pycache__/"
   rm -f  "${PACKDIR:?}/camb/camblib.so"
   rm -rf "${PACKDIR:?}/forutils/Releaselib/"
+  "${PYTHON3:?}" setup.py clean \
+    >>${OUT1:?} 2>>${OUT2:?} || { error "${EC1:?}"; return 1; }
+  # ----------------------------------------------------------------------------
   
-  "${PYTHON3:?}" setup.py clean >>${OUT1:?} 2>>${OUT2:?} || { error "${EC1:?}"; return 1; }
-  # ---------------------------------------------------------------------------
-  
-  (COMPILER="${FORTRAN_COMPILER:?}" F90C="${FORTRAN_COMPILER:?}" \
+  (
+    COMPILER="${FORTRAN_COMPILER:?}" F90C="${FORTRAN_COMPILER:?}" \
     "${PYTHON3:?}" setup.py build 
   ) >>${OUT1:?} 2>>${OUT2:?} || { error "${EC4:?}"; return 1; }
   
-  pbottom "COMPILING ${PRINTNAME:?}" || return 1
+  pbottom "COMPILING ${PRINTNAME:?}" || { unset_all; return 1; }
+
+  # ----------------------------------------------------------------------------
 
   unset_all || return 1
+
 fi
+
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------

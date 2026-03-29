@@ -2,9 +2,9 @@
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
-if [ -z "${IGNORE_CLASS_CODE}" ]; then
+if [ -z "${IGNORE_CLASS_CODE:-}" ]; then
   
-  if [ -z "${ROOTDIR}" ]; then
+  if [ -z "${ROOTDIR:-}" ]; then
     source start_cocoa.sh || { pfail 'ROOTDIR'; return 1; }
   fi
     
@@ -12,7 +12,7 @@ if [ -z "${IGNORE_CLASS_CODE}" ]; then
   ( source "${ROOTDIR:?}/installation_scripts/flags_check.sh" ) || return 1;
       
   unset_env_vars () {
-    unset -v ECODEF FOLDER PACKDIR PLIB
+    unset -v ECODEF FOLDER PACKDIR PLIB PRINTNAME
     cdroot || return 1;
   }
 
@@ -43,13 +43,13 @@ if [ -z "${IGNORE_CLASS_CODE}" ]; then
       2>"/dev/null" || { error "CP FOLDER ${1} on ${2}"; return 1; }
   }
 
-  # ---------------------------------------------------------------------------
-  # ---------------------------------------------------------------------------
-  # ---------------------------------------------------------------------------
+  # ----------------------------------------------------------------------------
+  # ----------------------------------------------------------------------------
+  # ----------------------------------------------------------------------------
 
   unset_env_vars || return 1
 
-  # ---------------------------------------------------------------------------
+  # ----------------------------------------------------------------------------
 
   # E = EXTERNAL, CODE, F=FODLER
   ECODEF="${ROOTDIR:?}/external_modules/code"
@@ -61,16 +61,18 @@ if [ -z "${IGNORE_CLASS_CODE}" ]; then
   # Name to be printed on this shell script messages
   PRINTNAME="CLASS"
   
-  ptop "COMPILING ${PRINTNAME:?}" || return 1
-
-  cdfolder "${PACKDIR}" || return 1
-
-  # ---------------------------------------------------------------------------
-  # cleaning any previous compilation
+  # ----------------------------------------------------------------------------
+  # ----------------------------------------------------------------------------
   
-  # note: below we ignore if something goes wrong (related to include/ mv)
-  "${PYTHON3:?}" setup.py clean >${OUT1:?} 2>${OUT2:?}
+  ptop "COMPILING ${PRINTNAME:?}" || { unset_all; return 1; }
 
+  cdfolder "${PACKDIR}" || { unset_all; return 1; }
+
+  # ----------------------------------------------------------------------------
+  # cleaning any previous compilation
+  # ----------------------------------------------------------------------------
+  # note: below we ignore if something goes wrong (related to include/ mv)
+  "${PYTHON3:?}" setup.py clean >>${OUT1:?} 2>>${OUT2:?}
   PLIB="${ROOTDIR:?}/.local/lib/python${PYTHON_VERSION:?}/site-packages"
   rm -rf "${PLIB:?}"/classy*
   rm -rf "${PACKDIR:?}/python/build/"
@@ -86,22 +88,30 @@ if [ -z "${IGNORE_CLASS_CODE}" ]; then
   # Delete folder in case this script is called twice
   # --------------------------------------------------------------------------- 
   rm -rf "${PACKDIR:?}/include"
-  # ---------------------------------------------------------------------------
-  
-  cpfolder "${PACKDIR:?}/include2" "${PACKDIR:?}/include" || return 1;
+  # ----------------------------------------------------------------------------
 
-  (CC="${C_COMPILER:?}" PYTHON=${PYTHON3:?} make all
+  cpfolder "${PACKDIR:?}/include2" "${PACKDIR:?}/include" || { unset_all; return 1; }
+
+  (
+    CC="${C_COMPILER:?}" PYTHON="${PYTHON3:?}" make all
   )>>${OUT1:?} 2>>${OUT2:?} || { error "${EC7:?}"; return 1; }
    
-  cdfolder "${PACKDIR}/python" || return 1
+  cdfolder "${PACKDIR}/python" || { unset_all; return 1; }
 
-  (CC="${C_COMPILER:?}" ${PYTHON3:?} setup.py build
+  (
+    CC="${C_COMPILER:?}" "${PYTHON3:?}" setup.py build
   )>>${OUT1:?} 2>>${OUT2:?} || { error "${EC4:?}"; return 1; }
 
-  pbottom "COMPILING ${PRINTNAME:?}" || return 1
+  pbottom "COMPILING ${PRINTNAME:?}" || { unset_all; return 1; }
+
+  cdfolder "${ROOTDIR}" || { unset_all; return 1; }
+
+  # ----------------------------------------------------------------------------
 
   unset_all || return 1
+
 fi
+
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
