@@ -104,7 +104,7 @@ if [ -z "${IGNORE_SIMONS_OBSERVATORY_LIKELIHOOD_CODE:-}" ]; then
 
   (
     env CXX="${CXX_COMPILER:?}" CC="${C_COMPILER:?}" \
-      "${PIP3:?}" install "${PACKDIR:?}" \
+      ${PIP3:?} install "${PACKDIR:?}" \
         --prefix="${ROOTDIR:?}/.local" \
         --no-index \
         --no-dependencies \
