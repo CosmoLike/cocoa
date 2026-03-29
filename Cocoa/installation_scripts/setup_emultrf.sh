@@ -95,17 +95,17 @@ if [ -z "${IGNORE_EMULTRF_CODE:-}" ]; then
 
     if [ -n "${EMULTRF_GIT_COMMIT:-}" ]; then
       
-      if [ "$("${GIT:?}" rev-parse --is-shallow-repository)" = "true" ]; then
-    
-        "${GIT:?}" fetch --unshallow --all --tags --prune \
-          >>${OUT1:?} 2>>${OUT2:?} || { error "${EC16:?}"; return 1; }
-    
-      else
-    
-        "${GIT:?}" fetch --all --tags --prune \
-          >>${OUT1:?} 2>>${OUT2:?} || { error "${EC16:?}"; return 1; }
-    
-      fi
+#      if [ "$("${GIT:?}" rev-parse --is-shallow-repository)" = "true" ]; then
+#      
+#        "${GIT:?}" fetch --unshallow --all --tags --prune \
+#          >>${OUT1:?} 2>>${OUT2:?} || { error "${EC16:?}"; return 1; }
+#    
+#      else
+#    
+#        "${GIT:?}" fetch --all --tags --prune \
+#          >>${OUT1:?} 2>>${OUT2:?} || { error "${EC16:?}"; return 1; }
+#    
+#      fi
 
       "${GIT:?}" checkout "${EMULTRF_GIT_COMMIT:?}" \
         >>${OUT1:?} 2>>${OUT2:?} || { error "${EC16:?}"; return 1; }
