@@ -110,7 +110,7 @@ if [ -z "${IGNORE_CAMB_CODE:-}" ]; then
   #That is why we use --no-dependencies --no-index --no-build-isolation
   (
     env CXX="${CXX_COMPILER:?}" CC="${C_COMPILER:?}" \
-      "${PIP3:?}" install "${PACKDIR:?}" \
+      ${PIP3:?} install "${PACKDIR:?}" \
         --no-dependencies \
         --prefix="${ROOTDIR:?}/.local" \
         --no-index \

@@ -76,7 +76,7 @@ if [ -z "${IGNORE_FGSPECTRA_CODE:-}" ]; then
  
   (
     env CXX="${CXX_COMPILER:?}" CC="${C_COMPILER:?}" \
-      "${PIP3:?}" install . \
+      ${PIP3:?} install . \
         --no-dependencies \
         --prefix="${ROOTDIR:?}/.local" \
         --no-index \

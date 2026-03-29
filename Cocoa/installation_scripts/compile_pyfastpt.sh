@@ -74,7 +74,7 @@ if [ -z "${IGNORE_FASTPT_CODE:-}" ]; then
     export LD_LIBRARY_PATH=${CONDA_PREFIX:?}/lib:$LD_LIBRARY_PATH && \
     export LD_LIBRARY_PATH=${ROOTDIR:?}/.local/lib:$LD_LIBRARY_PATH && \
     env CXX="${CXX_COMPILER:?}" CC="${C_COMPILER:?}" \
-      "${PIP3:?}" install "${PACKDIR:?}" \
+      ${PIP3:?} install "${PACKDIR:?}" \
         --no-dependencies \
         --prefix="${ROOTDIR:?}/.local" \
         --no-index \
