@@ -57,7 +57,7 @@ for TMP in $(find "${ROOTDIR:?}/projects" -mindepth 1 -maxdepth 1 -type d ! -nam
 
   if [ ! -d "${FOLDER:?}" ]; then
     
-    warning "${EC31:?} (${FOLDER:?})" || cd ${ROOTDIR:?} || { unset_all; return 1; }
+    warning "${EC31:?} (${FOLDER:?})" || cd "${ROOTDIR:?}" || { unset_all; return 1; }
   
   else
 

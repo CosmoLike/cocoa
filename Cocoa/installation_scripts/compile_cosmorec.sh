@@ -82,7 +82,10 @@ if [ -z "${IGNORE_COSMOREC_CODE:-}" ]; then
 
   pbottom "COMPILING ${PRINTNAME:?}" || { unset_all; return 1; }
 
+  cdfolder "${ROOTDIR:?}" || { unset_all; return 1; }
+
   # ----------------------------------------------------------------------------
+  
   unset_all || return 1
 
 fi
