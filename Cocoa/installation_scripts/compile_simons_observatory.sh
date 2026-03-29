@@ -89,7 +89,7 @@ if [ -z "${IGNORE_SIMONS_OBSERVATORY_LIKELIHOOD_CODE:-}" ]; then
 
   ptop "COMPILING SIMONS OBSERVATORY MKLIKE" || { unset_all; return 1; }
 
-  PACKDIR="${ECODEF:?}/mflike"
+  PACKDIR="${ECODEF:?}/${SO_MFLIKE_NAME:-"mflike"}"
 
   cdfolder "${PACKDIR}" || { unset_all; return 1; }
 

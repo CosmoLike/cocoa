@@ -90,6 +90,8 @@ if [ -z "${IGNORE_LIPOP_LIKELIHOOD_CODE:-}" ]; then
   
   ptop "COMPILING LOLLIPOP LIKELIHOOD" || { unset_all; return 1; }
 
+  cdfolder "${PACKDIR:?}" ||{ unset_all; return 1; }
+
   PACKDIR="${ECODEF:?}/${PL2020_LOLLIPOP_NAME:-"planck_2020_lollipop"}"
 
   # ----------------------------------------------------------------------------
@@ -100,8 +102,6 @@ if [ -z "${IGNORE_LIPOP_LIKELIHOOD_CODE:-}" ]; then
   rm -rf "${PACKDIR:?}/build/"
   rm -rf "${PACKDIR:?}/planck_2020_lollipop.egg-info/"  
   # ---------------------------------------------------------------------------
-
-  cdfolder "${PACKDIR:?}" || return 1;
 
   (
     env CXX="${CXX_COMPILER:?}" CC="${C_COMPILER:?}" \

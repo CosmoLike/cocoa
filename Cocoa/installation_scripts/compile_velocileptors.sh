@@ -77,9 +77,9 @@ if [ -z "${IGNORE_VELOCILEPTORS_CODE:-}" ]; then
   ) >>${OUT1:?} 2>>${OUT2:?} || { error "${EC4:?}"; return 1; }
 
   (
-    export LD_LIBRARY_PATH=${CONDA_PREFIX:?}/lib:$LD_LIBRARY_PATH && 
+    export LD_LIBRARY_PATH=${CONDA_PREFIX:?}/lib:$LD_LIBRARY_PATH &&  \
     export LD_LIBRARY_PATH=${ROOTDIR:?}/.local/lib:$LD_LIBRARY_PATH && \
-    "${PYTHON3:?}" setup.py install 
+    "${PYTHON3:?}" setup.py install --prefix="${ROOTDIR:?}/.local"
   ) >>${OUT1:?} 2>>${OUT2:?} || { error "${EC4:?}"; return 1; }
 
   pbottom 'COMPILING VELOCILEPTORS' || { unset_all; return 1; }
