@@ -80,7 +80,7 @@ if [ -z "${IGNORE_POLYCHORD_SAMPLER_CODE:-}" ]; then
     >>${OUT1:?} 2>>${OUT2:?} || { error "${EC7:?}"; return 1; }
 
   make -j "${MNT:-1}" pypolychord \
-    >>${OUT1:?} 2?>${OUT2:?} || { error "${EC8:?}"; return 1; }
+    >>${OUT1:?} 2>>${OUT2:?} || { error "${EC8:?}"; return 1; }
 
   (
     CC="${MPI_CC_COMPILER:?}" CXX="${MPI_CXX_COMPILER:?}" \
