@@ -12,7 +12,7 @@
 7. [Credits](#appendix_proper_credits)
 8. [Appendix](#appendix)
     1. [FAQ: How can users install conda env via conda-lock?](#install_conda_env_condalock)
-    2. [FAQ: (MacOS) - How can users deal with Conda conflicts - a possible solution](#macos_solve_conda_conficts)
+    2. [FAQ: How can users deal with Conda conflicts (MacOS): a possible solution](#macos_solve_conda_conficts)
     3. [FAQ: How can users debug Cocoa? Suggested steps](#running_wrong)
     4. [FAQ: How can users compile external modules (not involving Cosmolike)?](#appendix_compile_separately)
     5. [FAQ: How can users install Cosmolike projects?](#appendix_compile_cosmolike_separately)
@@ -106,7 +106,7 @@ We advise users to avoid repositories managed by `Anaconda` due to licensing res
 
 > [!Warning]
 > During the Arizona Winter School (January 2026), we noted that some students with macOS struggled to get the conda to work (conflicts). 
-> If this is the case for you, try the steps in the appendix [FAQ: (MacOS) - How can users deal with Conda conflicts - a possible solution](#macos_solve_conda_conficts)
+> If this is the case for you, try the steps in the appendix [FAQ: How can users deal with Conda conflicts (MacOS): a possible solution](#macos_solve_conda_conficts)
 
 # Installation and Compilation of external modules <a name="cobaya_base_code"></a>
 
@@ -622,7 +622,7 @@ and
 
      conda activate cocoa
 
-## :interrobang: FAQ: (MacOS) - How can users deal with Conda conflicts - a possible solution <a name="macos_solve_conda_conficts"></a>
+## :interrobang: FAQ: How can users deal with Conda conflicts (MacOS): a possible solution <a name="macos_solve_conda_conficts"></a>
 
 During the Arizona Winter School (January 2026), we noted that some students with macOS struggled to get Conda to work (conflicts). If this is the case for you, try the steps below instead
 
