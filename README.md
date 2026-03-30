@@ -200,7 +200,7 @@ Users can now proceed to **the next section**.
 > Users who want to develop from a release version (e.g., `v4.0-beta20`) should read the appendix [FAQ: How can we push changes to the Cocoa main branch?](#push_main)
 
 > [!TIP]
-> Cocoa does not install all the available external modules by default. If the user needs additional packages, please refer to the appendix [FAQ: How can we compile external modules?](#appendix_compile_separately).
+> Cocoa does not install all the available external modules by default. If the user needs additional packages, please refer to the appendix [FAQ: How can users compile external modules?](#appendix_compile_separately).
 
 > [!NOTE]
 > In case users need to rerun `setup_cocoa.sh`, Cocoa will not download previously installed packages, cosmolike projects, or large datasets, unless the following keys are set on `set_installation_options.sh`
@@ -299,7 +299,7 @@ Users will see a terminal like this: `$(cocoa)(.local)`. *This is a feature, not
         mpirun -n 4 --oversubscribe cobaya-run ./projects/lsst_y1/EXAMPLE_MCMC1.yaml -f
      
 > [!Tip]
-> Cocoa provides several Cosmolike projects, not all of which are installed by default. To activate them, please take a look at the appendix [FAQ: How can we compile external modules?](#appendix_compile_separately).
+> Cocoa provides several Cosmolike projects, not all of which are installed by default. To activate them, please take a look at the appendix [FAQ: How can users compile external modules?](#appendix_compile_separately).
 
 > [!TIP]
 > Assuming Cocoa is installed on a local (not remote!) machine, type the command below after step 2️⃣ to run Jupyter Notebooks.
@@ -669,7 +669,8 @@ Following best practices, Cocoa scripts download most external modules from thei
 
 ## :interrobang: FAQ: How can users compile external modules (not involving Cosmolike)? <a name="appendix_compile_separately"></a>
 
-To avoid excessive compilation or download times during development, users may run scripts located at `Cocoa/installation_scripts/` directly to download and compile only specific modules (or datasets). To take full advantage of them, users must first unset the appropriate keys on `set_installation_options.sh`, as exemplified below.
+To setup and compile a single module, users may run scripts located at `Cocoa/installation_scripts/` directly.  
+To take full advantage of them, users must first unset the appropriate keys on `set_installation_options.sh`, as exemplified below.
 
      [Adapted from Cocoa/set_installation_options.sh shell script]
      # ------------------------------------------------------------------------------
@@ -685,7 +686,7 @@ To avoid excessive compilation or download times during development, users may r
      #export IGNORE_SIMONS_OBSERVATORY_LIKELIHOOD_CODE=1     # SO likelihood code
      (...)
      #export IGNORE_ACTDR6_CODE=1                            # ACT-DR6 likelihood code
-9(
+
 Whenever users edit `set_installation_options.sh`, they must reload the Cocoa private environment (.local) by sourcing `start_cocoa.sh` (even if (.local) is already active). To do that, follow the commands below.
 
      cd ./cocoa/Cocoa
