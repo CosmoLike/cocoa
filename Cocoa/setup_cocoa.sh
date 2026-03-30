@@ -52,6 +52,84 @@ if [ -n "${MINICONDA_INSTALLATION}" ]; then
   fi
 fi
 
+# ------------------------------------------------------------------------------
+# ------------------------------ SET RUN MODES ---------------------------------
+# ------------------------------------------------------------------------------
+
+mode="soft"        # default
+mode_arg_seen=0
+
+while [[ $# -gt 0 ]]; do
+  case "$1" in
+    --soft|--hard|--purge)
+      if [[ $mode_arg_seen -eq 1 ]]; then
+        error_cip "choose only one [--soft | --hard | --aggressive | --purge]"
+        return 1
+      fi
+      mode_arg_seen=1
+      mode="${1#--}"
+      ;;
+    -h|--help)
+      echo "Usage: $0 [--soft | --hard | --aggressive | --purge]"
+      return 0
+      ;;
+    *)
+      error_cip "Error: unknown option: $1"
+      return 1
+      ;;
+  esac
+  shift
+done
+
+case "$mode" in
+  soft)
+    unset -v OVERWRITE_EXISTING_COCOA_PRIVATE_PYTHON_ENV
+    unset -v OVERWRITE_EXISTING_PIP_PACKAGES
+    export OVERWRITE_EXISTING_ALL_PACKAGES=1
+    unset -v REDOWNLOAD_EXISTING_ALL_DATA
+    unset -v OVERWRITE_EXISTING_PRIVATE_CODE
+    unset -v OVERWRITE_EXISTING_COSMOLIKE_CODE
+    ;;
+  hard)
+    export OVERWRITE_EXISTING_COCOA_PRIVATE_PYTHON_ENV=1
+    export OVERWRITE_EXISTING_PIP_PACKAGES=1
+    export OVERWRITE_EXISTING_ALL_PACKAGES=1
+    unset -v REDOWNLOAD_EXISTING_ALL_DATA
+    unset -v OVERWRITE_EXISTING_PRIVATE_CODE
+    unset -v OVERWRITE_EXISTING_COSMOLIKE_CODE
+    ;;
+  aggressive)
+    export OVERWRITE_EXISTING_COCOA_PRIVATE_PYTHON_ENV=1
+    export OVERWRITE_EXISTING_PIP_PACKAGES=1
+    export OVERWRITE_EXISTING_ALL_PACKAGES=1
+    export REDOWNLOAD_EXISTING_ALL_DATA=1
+    unset -v OVERWRITE_EXISTING_PRIVATE_CODE
+    unset -v OVERWRITE_EXISTING_COSMOLIKE_CODE
+    ;;
+  purge)
+    export OVERWRITE_EXISTING_COCOA_PRIVATE_PYTHON_ENV=1
+    export OVERWRITE_EXISTING_ALL_PACKAGES=1
+    export OVERWRITE_EXISTING_PIP_PACKAGES=1
+    export REDOWNLOAD_EXISTING_ALL_DATA=1
+    export OVERWRITE_EXISTING_PRIVATE_CODE=1     # dangerous (possible loss of uncommitted work)
+                                                 # if unset, users must manually delete
+                                                 # project if wants setup_cocoa to reclone it
+    export OVERWRITE_EXISTING_COSMOLIKE_CODE=1   # dangerous (possible loss of uncommitted work)
+                                                 # if unset, users must manually delete
+                                                 # project if wants setup_cocoa to reclone it
+    ;;
+  *)
+    echo "Error: invalid mode: $mode" >&2
+    exit 1
+    ;;
+esac
+
+unset mode
+
+# ------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
+
 ptop2 'SETUP COCOA INSTALLATION PACKAGES'
 
 # ------------------------------------------------------------------------------
@@ -132,9 +210,79 @@ declare -a SCRIPTS=( "setup_core_packages.sh"
                      "setup_cosmolike_projects.sh"
                      )
 
+
+# SET CACHE BEGINS -------------------------------------------------------------
+
+declare -a CACHE=()
+
+CACHE_FILE="${ROOTDIR:?}/.local/setup_local_packages.txt"
+
+load_cache() {
+  local file="$1"
+  local line
+
+  CACHE=()
+  # read line and continue if line is not empty --------------------------------
+  while IFS= read -r line || [[ -n "$line" ]]; do
+    CACHE+=("$line")
+  done < "$file"
+}
+
+save_cache() {
+  printf '%s\n' "${CACHE[@]}" > "${CACHE_FILE:?}"
+}
+
+reset_cache() {
+  local i
+  CACHE=()
+  for (( i=0; i<${#SCRIPTS[@]}; i++ )); do
+    CACHE[i]=0
+  done
+  save_cache
+}
+
+init_cache() {
+  local i
+  local LOCAL_DIR="${ROOTDIR:?}/.local"
+  
+  if [[ ! -d "${LOCAL_DIR:?}" ]]; then
+    error_cip "(.local)  does not exist: ${LOCAL_DIR:?}"
+    return 1 
+  fi
+  # In hard or purge mode, always rebuild the cache from scratch ---------------
+  if [[ "${mode:-soft}" == "hard" || "${mode:-soft}" == "purge" ]]; then
+    reset_cache
+    return
+  fi
+  if [[ -f "${CACHE_FILE:?}" ]]; then
+    load_cache "${CACHE_FILE:?}"
+    # If the file size does not match the number of scripts, rebuild it --------
+    if [[ ${#CACHE[@]} -ne ${#SCRIPTS[@]} ]]; then
+      reset_cache
+      return
+    fi
+    # Validate entries: only 0 or 1 are allowed --------------------------------
+    for (( i=0; i<${#CACHE[@]}; i++ )); do
+      if [[ "${CACHE[i]}" != "0" && "${CACHE[i]}" != "1" ]]; then
+        reset_cache
+        return
+      fi
+    done
+    return
+  fi
+  reset_cache # File does not exist yet ----------------------------------------
+}
+
+init_cache
+
+# SET CACHE ENDS ---------------------------------------------------------------
+
 for (( i=0; i<${#SCRIPTS[@]}; i++ ));
 do
   cdroot; 
+
+  [[ "${CACHE[i]}" -eq 1 ]] && continue
+  
   if [ -n "${COCOA_OUTPUT_DEBUG}" ]; then
     # bash strict mode explanation
     # http://redsymbol.net/articles/unofficial-bash-strict-mode/
@@ -142,7 +290,15 @@ do
   else
     ( source "${ROOTDIR:?}/installation_scripts/${SCRIPTS[$i]}" )
   fi
-  if [ $? -ne 0 ]; then
+  
+  rc=$?
+
+  if [[ ${rc:?} -eq 0 ]]; then
+    CACHE[i]=1
+    save_cache
+  elif [[ ${rc:?} -eq 99 ]]; then
+    continue
+  else
     if [ -n "${COCOA_OUTPUT_VERBOSE}" ]; then
       error_cip "script ${SCRIPTS[$i]}"
       return 1
@@ -164,6 +320,8 @@ fi
 
 unset -v ERRORCODE SCRIPTS
 unset -f error_cip error_cip_msg
+unset -v CACHE CACHE_FILE
+unset -f init_cache reset_cache save_cache load_cache
 pbottom2 'SETUP COCOA INSTALLATION PACKAGES'
 source stop_cocoa.sh || return 1;
 

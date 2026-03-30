@@ -172,43 +172,42 @@ unset_env_vars || return 1
 # ----------------------------------------------------------------------------
 # -------------------------------- AXIONS -----------------------------------
 # ----------------------------------------------------------------------------
+if [ -z "${INSTALL_PRIVATE_AXIONS_PROJECT:-}" ]; then 
+  return 99
+fi
+  
+# Name to be printed on this shell script messages
+PRINTNAME="AXIONS PROJECT"
 
-if [ -n "${INSTALL_PRIVATE_AXIONS_PROJECT:-}" ]; then 
-  
-  # Name to be printed on this shell script messages
-  PRINTNAME="AXIONS PROJECT"
+ptop "GETTING ${PRINTNAME:?}" || { unset_all; return 1; }
 
-  ptop "GETTING ${PRINTNAME:?}" || { unset_all; return 1; }
+FOLDER="${AXIONS_PROJECT_NAME:-"axions"}"
 
-  FOLDER="${AXIONS_PROJECT_NAME:-"axions"}"
+URL="${AXIONS_PROJECT_URL:?}"
 
-  URL="${AXIONS_PROJECT_URL:?}"
+if [ -n "${AXIONS_PROJECT_GIT_COMMIT:-}" ]; then
 
-  if [ -n "${AXIONS_PROJECT_GIT_COMMIT:-}" ]; then
+  gitact0 "${FOLDER:?}" "${URL:?}" || { unset_all; return 1; }
 
-    gitact0 "${FOLDER:?}" "${URL:?}" || { unset_all; return 1; }
-  
-    gitact2 "${FOLDER:?}" "${AXIONS_PROJECT_GIT_COMMIT:?}"  || { unset_all; return 1; }
-  
-  elif [ -n "${AXIONS_PROJECT_GIT_BRANCH:-}" ]; then 
-  
-    gitact1 "${FOLDER:?}" "${URL:?}" "${AXIONS_PROJECT_GIT_BRANCH:?}" || { unset_all; return 1; }
-  
-  elif [ -n "${AXIONS_PROJECT_GIT_TAG:-}" ]; then 
-  
-    gitact0 "${FOLDER:?}" "${URL:?}" || { unset_all; return 1; }
-  
-    gitact3 "${FOLDER:?}" "${AXIONS_PROJECT_GIT_TAG:?}" || { unset_all; return 1; }
-  
-  else
-  
-    gitact0 "${FOLDER:?}" "${URL:?}" || { unset_all; return 1; }
-  
-  fi
+  gitact2 "${FOLDER:?}" "${AXIONS_PROJECT_GIT_COMMIT:?}"  || { unset_all; return 1; }
 
-  pbottom "GETTING ${PRINTNAME:?}" || { unset_all; return 1; }
+elif [ -n "${AXIONS_PROJECT_GIT_BRANCH:-}" ]; then 
+
+  gitact1 "${FOLDER:?}" "${URL:?}" "${AXIONS_PROJECT_GIT_BRANCH:?}" || { unset_all; return 1; }
+
+elif [ -n "${AXIONS_PROJECT_GIT_TAG:-}" ]; then 
+
+  gitact0 "${FOLDER:?}" "${URL:?}" || { unset_all; return 1; }
+
+  gitact3 "${FOLDER:?}" "${AXIONS_PROJECT_GIT_TAG:?}" || { unset_all; return 1; }
+
+else
+
+  gitact0 "${FOLDER:?}" "${URL:?}" || { unset_all; return 1; }
 
 fi
+
+pbottom "GETTING ${PRINTNAME:?}" || { unset_all; return 1; }
 
 # -----------------------------------------------------------------------------
 # -----------------------------------------------------------------------------
