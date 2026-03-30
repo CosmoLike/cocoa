@@ -11,20 +11,21 @@
 6. [Creating Cosmolike projects (external readme)](Cocoa/projects/)
 7. [Credits](#appendix_proper_credits)
 8. [Appendix](#appendix)
-    1. [FAQ: How can users debug Cocoa? Suggested steps](#running_wrong)
-    2. [FAQ: How can users compile external modules (not involving Cosmolike)?](#appendix_compile_separately)
-    3. [FAQ: How can users install Cosmolike projects?](#appendix_compile_cosmolike_separately)
-    4. [FAQ: How can users run Cocoa with Docker?](#appendix_jupyter_whovian)
-    5. [FAQ: How can users run Cocoa on Google Colab?](#overview_google_colab)
-    6. [FAQ: How can users install Conda?](#overview_miniforge)
-    7. [FAQ: How can users set the appropriate environment for ML?](#ml_emulators)
-    8. [FAQ: How can developers push changes to the Cocoa main branch?](#push_main)
-    9. [FAQ: How can developers develop from a Git tag?](#dev_from_tag)
-   10. [FAQ: How can users download additional likelihood data? (external readme)](Cocoa/external_modules/data)
-   11. [FAQ: Where do users find common FAQs about external modules? (external readme)](Cocoa/external_modules/code)
-   12. [FAQ: Where do users find common FAQs about Cosmolike? (external readme)](Cocoa/projects/)
-   13. [FAQ: Note on Planck-2018 low-ell SimAll EE and Gibbs TT likelihoods?](#planck2018lowell)
-   14. [FAQ: How can users improve our Bash/C/C++ knowledge?](#lectnotes)
+    1. [FAQ: How can users install conda env via conda-lock?](#install_conda_env_condalock)
+    2. [FAQ: How can users debug Cocoa? Suggested steps](#running_wrong)
+    3. [FAQ: How can users compile external modules (not involving Cosmolike)?](#appendix_compile_separately)
+    4. [FAQ: How can users install Cosmolike projects?](#appendix_compile_cosmolike_separately)
+    5. [FAQ: How can users run Cocoa with Docker?](#appendix_jupyter_whovian)
+    6. [FAQ: How can users run Cocoa on Google Colab?](#overview_google_colab)
+    7. [FAQ: How can users install Conda?](#overview_miniforge)
+    8. [FAQ: How can users set the appropriate environment for ML?](#ml_emulators)
+    9. [FAQ: How can developers push changes to the Cocoa main branch?](#push_main)
+    10. [FAQ: How can developers develop from a Git tag?](#dev_from_tag)
+   11. [FAQ: How can users download additional likelihood data? (external readme)](Cocoa/external_modules/data)
+   12. [FAQ: Where do users find common FAQs about external modules? (external readme)](Cocoa/external_modules/code)
+   13. [FAQ: Where do users find common FAQs about Cosmolike? (external readme)](Cocoa/projects/)
+   14. [FAQ: Note on Planck-2018 low-ell SimAll EE and Gibbs TT likelihoods?](#planck2018lowell)
+   15. [FAQ: How can users improve our Bash/C/C++ knowledge?](#lectnotes)
 
 # Overview <a name="overview"></a>
 
@@ -127,42 +128,6 @@ Users can now proceed to the **next section**.
 > [!Warning]
 We advise users to avoid repositories managed by `Anaconda` due to licensing restrictions. See the Appendix [FAQ: How can we install Conda?](#overview_miniforge)
 > for instructions on how to install `Miniforge`, which is a  minimal installer of conda that downloads default packages from the `conda-forge` community-driven channel.
-
-> [!Tip]
-> We advise users to maintain *exact reproducibility* (across time) of the Cocoa conda environment by installing it via `conda-lock`,
-> following the slightly more convoluted instructions below.
-> 
-> **Step :one:** Install the package `conda-lock` in a private conda environment to avoid conflicts.
-> 
->     conda create -n lockenv -c conda-forge python=3.10 conda-lock=2.* wget
->
-> and
-> 
->     conda activate lockenv
->
-> **Step :two:** Download the file appropriate conda-lock compatible `yml` file.
->   - Linux
->     
->         wget https://raw.githubusercontent.com/CosmoLike/cocoa/refs/heads/dev/cocoapy310-linux.yml
->
->   - macOS (arm)
->     
->         wget https://raw.githubusercontent.com/CosmoLike/cocoa/refs/heads/dev/cocoapy310-osxarm.yml
->
-> **Step :three:** Create the conda environment
->   - Linux
->     
->         conda-lock install -n cocoa cocoapy310-linux.yml
->
->   - macOS (arm)
->
->         conda-lock install -n cocoa cocoapy310-osxarm.yml   
->
->  and activate it
->
->     conda activate cocoa
->
-> Finally, proceed to **step :three:** in the general installation instructions. 
 
 # Installation and Compilation of external modules <a name="cobaya_base_code"></a>
 
@@ -643,6 +608,40 @@ The following is not an exhaustive list of the codes we use/download/adopt
 Following best practices, Cocoa scripts download most external modules from their original repositories. Although our repository includes a few likelihoods in compressed xz file format, we do not want to discourage users from cloning code and data from their original repositories.  The work of those authors is extraordinary, and users **must cite them** appropriately.
 
 # Appendix <a name="appendix"></a>
+
+## :interrobang: FAQ: How can users install conda env via conda-lock? <a name="install_conda_env_condalock"></a>
+
+We advise users to maintain *exact reproducibility* (across time) of the Cocoa conda environment by installing it via `conda-lock`, following the slightly more convoluted instructions below.
+
+**Step :one:** Install the package `conda-lock` in a private conda environment to avoid conflicts.
+ 
+     conda create -n lockenv -c conda-forge python=3.10 conda-lock=2.* wget
+
+and
+ 
+     conda activate lockenv
+
+**Step :two:** Download the file appropriate conda-lock compatible `yml` file.
+   - Linux
+  
+         wget https://raw.githubusercontent.com/CosmoLike/cocoa/refs/heads/dev/cocoapy310-linux.yml
+
+   - macOS (arm)
+     
+         wget https://raw.githubusercontent.com/CosmoLike/cocoa/refs/heads/dev/cocoapy310-osxarm.yml
+
+**Step :three:** Create the conda environment
+   - Linux
+     
+         conda-lock install -n cocoa cocoapy310-linux.yml
+
+   - macOS (arm)
+
+         conda-lock install -n cocoa cocoapy310-osxarm.yml   
+
+  and activate it
+
+     conda activate cocoa
 
 ## :interrobang: FAQ: How can users debug Cocoa? Suggested steps <a name="running_wrong"></a>
 
