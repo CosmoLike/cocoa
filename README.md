@@ -12,20 +12,21 @@
 7. [Credits](#appendix_proper_credits)
 8. [Appendix](#appendix)
     1. [FAQ: How can users install conda env via conda-lock?](#install_conda_env_condalock)
-    2. [FAQ: How can users debug Cocoa? Suggested steps](#running_wrong)
-    3. [FAQ: How can users compile external modules (not involving Cosmolike)?](#appendix_compile_separately)
-    4. [FAQ: How can users install Cosmolike projects?](#appendix_compile_cosmolike_separately)
-    5. [FAQ: How can users run Cocoa with Docker?](#appendix_jupyter_whovian)
-    6. [FAQ: How can users run Cocoa on Google Colab?](#overview_google_colab)
-    7. [FAQ: How can users install Conda?](#overview_miniforge)
-    8. [FAQ: How can users set the appropriate environment for ML?](#ml_emulators)
-    9. [FAQ: How can developers push changes to the Cocoa main branch?](#push_main)
-    10. [FAQ: How can developers develop from a Git tag?](#dev_from_tag)
-   11. [FAQ: How can users download additional likelihood data? (external readme)](Cocoa/external_modules/data)
-   12. [FAQ: Where do users find common FAQs about external modules? (external readme)](Cocoa/external_modules/code)
-   13. [FAQ: Where do users find common FAQs about Cosmolike? (external readme)](Cocoa/projects/)
-   14. [FAQ: Note on Planck-2018 low-ell SimAll EE and Gibbs TT likelihoods?](#planck2018lowell)
-   15. [FAQ: How can users improve our Bash/C/C++ knowledge?](#lectnotes)
+    2. [FAQ: (MacOS) - How can users deal with Conda conflicts - a possible solution](#macos_solve_conda_conficts)
+    3. [FAQ: How can users debug Cocoa? Suggested steps](#running_wrong)
+    4. [FAQ: How can users compile external modules (not involving Cosmolike)?](#appendix_compile_separately)
+    5. [FAQ: How can users install Cosmolike projects?](#appendix_compile_cosmolike_separately)
+    6. [FAQ: How can users run Cocoa with Docker?](#appendix_jupyter_whovian)
+    7. [FAQ: How can users run Cocoa on Google Colab?](#overview_google_colab)
+    8. [FAQ: How can users install Conda?](#overview_miniforge)
+    9. [FAQ: How can users set the appropriate environment for ML?](#ml_emulators)
+    10. [FAQ: How can developers push changes to the Cocoa main branch?](#push_main)
+    11. [FAQ: How can developers develop from a Git tag?](#dev_from_tag)
+   12. [FAQ: How can users download additional likelihood data? (external readme)](Cocoa/external_modules/data)
+   13. [FAQ: Where do users find common FAQs about external modules? (external readme)](Cocoa/external_modules/code)
+   14. [FAQ: Where do users find common FAQs about Cosmolike? (external readme)](Cocoa/projects/)
+   15. [FAQ: Note on Planck-2018 low-ell SimAll EE and Gibbs TT likelihoods?](#planck2018lowell)
+   16. [FAQ: How can users improve our Bash/C/C++ knowledge?](#lectnotes)
 
 # Overview <a name="overview"></a>
 
@@ -99,35 +100,13 @@ and activate it
 
 Users can now proceed to the **next section**.
 
-> [!Note]
-> During the Arizona Winter School (January 2026), we noted that some students with macOS struggled to get the conda to work (conflicts). 
-> If this is the case for you, try the steps below instead
->
-> **Step :one:** Create a new base environment, as your base may have legacy packages that can create incompatibilities (note here slightly modified conda command)
-> 
->     conda create --solver=libmamba --strict-channel-priority --override-channels -c conda-forge --name base2
->
-> and
->
->     conda activate base2
->
->
-> Now install wget and download a looser version of the yml file (note here slightly modified conda command)
->
->     conda install -y wget --solver=libmamba --strict-channel-priority --override-channels -c conda-forge
->
-> and
->
->     wget https://raw.githubusercontent.com/CosmoLike/cocoa/refs/heads/dev/cocoapy310-osxarm-loose.yml
->
-> **Step :two:** Create the cocoa conda env using a looser yml ((note here slightly modified conda command)
->    
->     conda env create --solver=libmamba --name cocoa -f cocoapy310-osxarm-loose.yml
-> 
-
 > [!Warning]
 We advise users to avoid repositories managed by `Anaconda` due to licensing restrictions. See the Appendix [FAQ: How can we install Conda?](#overview_miniforge)
 > for instructions on how to install `Miniforge`, which is a  minimal installer of conda that downloads default packages from the `conda-forge` community-driven channel.
+
+> [!Warning]
+> During the Arizona Winter School (January 2026), we noted that some students with macOS struggled to get the conda to work (conflicts). 
+> If this is the case for you, try the steps in the appendix [FAQ: (MacOS) - How can users deal with Conda conflicts - a possible solution](#macos_solve_conda_conficts)
 
 # Installation and Compilation of external modules <a name="cobaya_base_code"></a>
 
@@ -642,6 +621,31 @@ and
   and activate it
 
      conda activate cocoa
+
+## :interrobang: FAQ: (MacOS) - How can users deal with Conda conflicts - a possible solution <a name="macos_solve_conda_conficts"></a>
+
+During the Arizona Winter School (January 2026), we noted that some students with macOS struggled to get Conda to work (conflicts). If this is the case for you, try the steps below instead
+
+**Step :one:** Create a new base environment, as your base may have legacy packages that can create incompatibilities (note here slightly modified conda command)
+ 
+     conda create --solver=libmamba --strict-channel-priority --override-channels -c conda-forge --name base2
+
+and
+
+     conda activate base2
+
+**Step :two:** Now install wget and download a looser version of the yml file (note here slightly modified conda command)
+
+     conda install -y wget --solver=libmamba --strict-channel-priority --override-channels -c conda-forge
+
+and
+
+     wget https://raw.githubusercontent.com/CosmoLike/cocoa/refs/heads/dev/cocoapy310-osxarm-loose.yml
+
+**Step :three:** Create the cocoa conda env using a looser yml ((note here slightly modified conda command)
+    
+    conda env create --solver=libmamba --name cocoa -f cocoapy310-osxarm-loose.yml
+
 
 ## :interrobang: FAQ: How can users debug Cocoa? Suggested steps <a name="running_wrong"></a>
 
