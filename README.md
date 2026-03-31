@@ -101,7 +101,7 @@ and activate it
 Users can now proceed to the **next section**.
 
 > [!TIP]
-We advise users to avoid repositories managed by `Anaconda` due to licensing restrictions. See the Appendix [FAQ: How can we install Conda?](#overview_miniforge)
+> We advise users to avoid repositories managed by `Anaconda` due to licensing restrictions. See the Appendix [FAQ: How can we install Conda?](#overview_miniforge)
 > for instructions on how to install `Miniforge`, which is a  minimal installer of conda that downloads default packages from the `conda-forge` community-driven channel.
 
 > [!TIP]
@@ -130,7 +130,9 @@ and
         
     source setup_cocoa.sh
 
-This script downloads and decompresses external modules, requiring internet access. Therefore, users cannot run this script on an interactive compute node in an HPC environment where only the cluster login node can access the web.
+This script downloads and decompresses external modules, requiring internet access (on a HPC, this typically means running `setup_cocoa.sh` on the login node).
+
+Cocoa does not install all the available external modules by default. If the user needs additional packages, please refer to the appendix [FAQ: How can users compile external modules?](#appendix_compile_separately).
 
 **Step :three:**: Run the script `compile_cocoa.sh` by typing 
 
@@ -141,30 +143,33 @@ This script compiles external modules selected for installation on `set_installa
 Users can now proceed to **the next section**.
 
 > [!TIP]
-> Users who want to develop from a release version (e.g., `v4.0-beta20`) should read the appendix [FAQ: How can we push changes to the Cocoa main branch?](#push_main)
-
-> [!TIP]
-> Cocoa does not install all the available external modules by default. If the user needs additional packages, please refer to the appendix [FAQ: How can users compile external modules?](#appendix_compile_separately).
-
-> [!NOTE]
 When rerunning `setup_cocoa.sh`, Cocoa will not redownload previously installed packages. 
 > To force this behavior, rerun `setup_cocoa.sh` with either `--soft`, `--hard`, `--aggressive` or `--purge` flags, as explained below. 
 >
->      --soft = force redownload of code/data except for: (1) pip packages, (2) a few core libraries, (3) cobaya, (4) large data products, (5) cosmolike_core and project repos
->      --hard = force redownload of code/data except for: (1) cobaya, (2) large data products, (3) cosmolike_core and project repos
->      --aggressive = force redownload of code/data except for: (3) cosmolike_core and project repos
->      --purge = force redownload of ALL code/data except (beware: users may lose uncommitted code on project repos)
+>      --soft = erase current copy and force download of all packages except for: (1) pip packages, (2) a few core libraries, (3) cobaya, (4) large data products, (5) cosmolike_core and project repos
+>      --hard = erase current copy and force download of all packages for: (1) cobaya, (2) large data products, (3) cosmolike_core and project repos
+>      --aggressive = erase current copy and force download  all packages except for: (3) cosmolike_core and project repos
+>      --purge = erase current copy and force download of all packages (beware: users may lose uncommitted code on project repos)
 >
-
+ 
 # Running Examples  <a name="cobaya_base_code_examples"></a>
 
-We assume that you are still in the Conda cocoa environment from the previous `conda activate cocoa` command, and that users switch to bash, and that you are in the cocoa main folder `cocoa/Cocoa`, 
+We assume that users are still in the Conda cocoa environment from the previous `conda activate cocoa` command, and that users switch to bash, and that you are in the cocoa main folder `cocoa/Cocoa`.
 
  **Step :one:**: Activate the private Python environment by sourcing the script `start_cocoa.sh`
 
     source start_cocoa.sh
 
 Users will see a terminal like this: `$(cocoa)(.local)`. *This is a feature, not a bug*!
+
+> [!NOTE]
+> *This is a feature, not a bug*! Why did we choose to work with two distinct shell environments, `(cocoa)` and `(.local)`? Our scripts enable users to work on multiple Cocoa instances, similar to what was possible with [CosmoMC](https://github.com/cmbant/CosmoMC). In each instance, our scripts install packages at
+>
+>      Cocoa/.local/bin
+>      Cocoa/.local/include
+>      Cocoa/.local/lib
+>      Cocoa/.local/share
+>
 
  **Step :two:**: Select the number of OpenMP cores (below, we set it to 8).
 
@@ -208,6 +213,8 @@ Users will see a terminal like this: `$(cocoa)(.local)`. *This is a feature, not
 
 ## Examples involving Cosmolike
 
+Cocoa provides several Cosmolike projects, not all of which are installed by default. To activate them, please refer to the appendix [FAQ: How can users compile external modules?](#appendix_compile_separately).
+
  **Step :three:**: The folder `projects/lsst_y1` contains a dozen examples involving different combinations of two-point correlation functions. So, run the `cobaya-run` on the first example following the commands below.
 
 - **One model evaluation**:
@@ -235,42 +242,31 @@ Users will see a terminal like this: `$(cocoa)(.local)`. *This is a feature, not
   - macOS (arm)
 
         mpirun -n 4 --oversubscribe cobaya-run ./projects/lsst_y1/EXAMPLE_MCMC1.yaml -f
-     
-> [!TIP]
-> Cocoa provides several Cosmolike projects, not all of which are installed by default. To activate them, please take a look at the appendix [FAQ: How can users compile external modules?](#appendix_compile_separately).
 
-> [!TIP]
-> Assuming Cocoa is installed on a local (not remote!) machine, type the command below after step 2️⃣ to run Jupyter Notebooks.
->
->     jupyter notebook --no-browser --port=8888
->
-> The terminal will then show a message similar to the following template:
->
->     (...)
->     [... NotebookApp] Jupyter Notebook 6.1.1 is running at:
->     [... NotebookApp] http://f0a13949f6b5:8888/?token=XXX
->     [... NotebookApp] or http://127.0.0.1:8888/?token=XXX
->     [... NotebookApp] Use Control-C to stop this server and shut down all kernels (twice to skip confirmation).
->
-> Now go to the local internet browser and type `http://127.0.0.1:8888/?token=XXX`, where XXX is the previously saved token displayed on the line
-> 
->     [... NotebookApp] or http://127.0.0.1:8888/?token=XXX
->
-> The project `lsst-y1` contains Jupyter notebook examples located at `projects/lsst_y1`.
+### Running Jupyter Notebooks
 
-> [!NOTE]
-> Why did we choose to work with two distinct shell environments, `(cocoa)` and `(.local)`? Our scripts enable users to work on multiple Cocoa instances, similar to what was possible with [CosmoMC](https://github.com/cmbant/CosmoMC). In each instance, our scripts install packages at
->
->      Cocoa/.local/bin
->      Cocoa/.local/include
->      Cocoa/.local/lib
->      Cocoa/.local/share
->
-> Consistency of the environment across all Cocoa instances is crucial, and the `start_cocoa.sh`/`stop_cocoa.sh` scripts handle the loading and unloading of environmental path variables. 
+Assuming Cocoa is installed on a local (not remote!) machine, type the command below after step 2️⃣ to run Jupyter Notebooks.
+
+     jupyter notebook --no-browser --port=8888
+
+ The terminal will then show a message similar to the following template:
+
+     (...)
+     [... NotebookApp] Jupyter Notebook 6.1.1 is running at:
+     [... NotebookApp] http://f0a13949f6b5:8888/?token=XXX
+     [... NotebookApp] or http://127.0.0.1:8888/?token=XXX
+     [... NotebookApp] Use Control-C to stop this server and shut down all kernels (twice to skip confirmation).
+
+ Now go to the local internet browser and type `http://127.0.0.1:8888/?token=XXX`, where XXX is the previously saved token displayed on the line
+ 
+     [... NotebookApp] or http://127.0.0.1:8888/?token=XXX
+
+ The project `lsst-y1` contains Jupyter notebook examples located at `projects/lsst_y1`.
+
 
 # Running ML emulators <a name="cobaya_base_code_examples_emul"></a>
 
-Cocoa contains a few transformer- and CNN-based neural network emulators capable of simulating the CMB, cosmolike outputs, matter power spectrum, and distances. We provide a few scripts that exemplify their API. To run them, users ensure the following lines are commented out in `set_installation_options.sh` before running the `setup_cocoa.sh` and `compile_cocoa.sh`. By default, these lines should be commented out, but it is worth checking.
+Cocoa contains a few transformer- and CNN-based neural network emulators capable of simulating the CMB, cosmolike outputs, matter power spectrum, and distances. We provide a few scripts that exemplify their API. To run them, users ensure the following lines are commented out in `set_installation_options.sh` before running the `setup_cocoa.sh` and `compile_cocoa.sh`. *By default, these lines should be commented out, but it is worth checking*.
 
       [Adapted from Cocoa/set_installation_options.sh shell script] 
       # insert the # symbol (i.e., unset these environmental keys  on `set_installation_options.sh`)
@@ -286,7 +282,7 @@ Cocoa contains a few transformer- and CNN-based neural network emulators capable
       #export IGNORE_TENSIOMETER_CODE=1          # to run EXAMPLE_TENSION_METRICS.ipynb
           
 > [!TIP]
-> We provide SLURM job script examples in the `projects/example/script` folder, which allow users to run the examples below in an HPC environment.
+> We provide a few SLURM job script examples in the `projects/example/script` folder that help users to run the examples below on an HPC system.
 
 Now, users must follow all the steps below.
 
