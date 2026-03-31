@@ -100,11 +100,11 @@ and activate it
 
 Users can now proceed to the **next section**.
 
-> [!Warning]
+> [!TIP]
 We advise users to avoid repositories managed by `Anaconda` due to licensing restrictions. See the Appendix [FAQ: How can we install Conda?](#overview_miniforge)
 > for instructions on how to install `Miniforge`, which is a  minimal installer of conda that downloads default packages from the `conda-forge` community-driven channel.
 
-> [!Warning]
+> [!TIP]
 > During the Arizona Winter School (January 2026), we noted that some students with macOS struggled to get the conda to work (conflicts). 
 > If this is the case for you, try the steps in the appendix [FAQ: How can users deal with Conda conflicts (MacOS): a possible solution](#macos_solve_conda_conficts)
 
@@ -232,7 +232,7 @@ Users will see a terminal like this: `$(cocoa)(.local)`. *This is a feature, not
 
         mpirun -n 4 --oversubscribe cobaya-run ./projects/lsst_y1/EXAMPLE_MCMC1.yaml -f
      
-> [!Tip]
+> [!TIP]
 > Cocoa provides several Cosmolike projects, not all of which are installed by default. To activate them, please take a look at the appendix [FAQ: How can users compile external modules?](#appendix_compile_separately).
 
 > [!TIP]
@@ -281,22 +281,10 @@ Cocoa contains a few transformer- and CNN-based neural network emulators capable
       #export IGNORE_GETDIST_CODE=1              # to run EXAMPLE_TENSION_METRICS.ipynb
       #export IGNORE_TENSIOMETER_CODE=1          # to run EXAMPLE_TENSION_METRICS.ipynb
           
-
-Now, users must follow all the steps below.
-
-> [!Note]
+> [!TIP]
 > We provide SLURM job script examples in the `projects/example/script` folder, which allow users to run the examples below in an HPC environment.
 
-> [!Note]
-> What if users have not configured ML-related keys before sourcing `setup_cocoa.sh`?
-> 
-> Answer: Comment the keys below before rerunning `setup_cocoa.sh`.
-> 
->     [Adapted from Cocoa/set_installation_options.sh shell script]
->     # These keys are only relevant if you run setup_cocoa multiple times
->     #export OVERWRITE_EXISTING_ALL_PACKAGES=1    
->     #export OVERWRITE_EXISTING_COSMOLIKE_CODE=1 
->     #export REDOWNLOAD_EXISTING_ALL_DATA=1
+Now, users must follow all the steps below.
 
  **Step :one:**: Activate the private Python environment by sourcing the script `start_cocoa.sh`
 
@@ -545,6 +533,7 @@ likelihoods, and the theory code, all following Cobaya Conventions.
 <p align="center">
 <img width="790" height="333" alt="Unknown" src="https://github.com/user-attachments/assets/b5ef808e-0efa-4bb9-852a-854f6531e3ed" />
 </p>
+
 
 ## Credits <a name="appendix_proper_credits"></a>
 
