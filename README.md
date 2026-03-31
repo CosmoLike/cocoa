@@ -150,8 +150,8 @@ Users can now proceed to **the next section**.
 When rerunning `setup_cocoa.sh`, Cocoa will not redownload previously installed packages. 
 > To force this behavior, rerun `setup_cocoa.sh` with either `--soft`, `--hard`, `--aggressive` or `--purge` flags, as explained below. 
 >
->      --soft = force redownload of code/data except for: (1) pip packages, (2) a few core libraries, (3) cobaya, (4) download of large data products, (5) cosmolike_core and project repos
->      --hard = force redownload of code/data except for: (1) cobaya, (2) download of large data products, (3) cosmolike_core and project repos
+>      --soft = force redownload of code/data except for: (1) pip packages, (2) a few core libraries, (3) cobaya, (4) large data products, (5) cosmolike_core and project repos
+>      --hard = force redownload of code/data except for: (1) cobaya, (2) large data products, (3) cosmolike_core and project repos
 >      --aggressive = force redownload of code/data except for: (3) cosmolike_core and project repos
 >      --purge = force redownload of ALL code/data except (beware: users may lose uncommitted code on project repos)
 >
