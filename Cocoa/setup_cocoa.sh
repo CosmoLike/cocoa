@@ -57,11 +57,11 @@ fi
 # ------------------------------ SET RUN MODES ---------------------------------
 # ------------------------------------------------------------------------------
 CACHE_FILE="${ROOTDIR:?}/.local/setup_local_packages.txt"
-mode="ultrasoft"        # default
+mode="default"        # default
 mode_arg_seen=0
 while [[ $# -gt 0 ]]; do
   case "$1" in
-    --ultrasoft|--soft|--hard|--aggressive|--purge)
+    --soft|--hard|--aggressive|--purge)
       if [[ $mode_arg_seen -eq 1 ]]; then
         error_cip "choose only one ode"
         return 1
@@ -78,22 +78,24 @@ while [[ $# -gt 0 ]]; do
 done
 
 case "$mode" in
-  ultrasoft)
-    unset -v OVERWRITE_EXISTING_ALL_PACKAGES
-    unset -v REDOWNLOAD_EXISTING_ALL_DATA
+  default)
+    # will not use flags but the cache to decide which scripts to run
+    export USE_CACHE=1
+    export OVERWRITE_EXISTING_ALL_PACKAGES=1
+    export REDOWNLOAD_EXISTING_ALL_DATA=1
+    export OVERWRITE_EXISTING_PIP_PACKAGES=1
+    export OVERWRITE_EXISTING_CORE_PACKAGES=1
+    export OVERWRITE_EXISTING_COBAYA_CODE=1
+    export OVERWRITE_EXISTING_PRIVATE_CODE=1
+    export OVERWRITE_EXISTING_COSMOLIKE_CODE=1
     source "${ROOTDIR:?}/installation_scripts/flags_derived.sh"
     if [ $? -ne 0 ]; then
       return 1;
     fi
-    unset -v OVERWRITE_EXISTING_PIP_PACKAGES
-    unset -v OVERWRITE_EXISTING_CORE_PACKAGES
-    unset -v OVERWRITE_EXISTING_COBAYA_CODE
-    unset -v OVERWRITE_EXISTING_PRIVATE_CODE
-    unset -v OVERWRITE_EXISTING_COSMOLIKE_CODE
     unset -v OVERWRITE_EXISTING_COCOA_PRIVATE_PYTHON_ENV
     ;;
   soft)
-    rm -f ${CACHE_FILE:?}
+    export USE_CACHE=0
     export OVERWRITE_EXISTING_ALL_PACKAGES=1
     unset -v REDOWNLOAD_EXISTING_ALL_DATA
     source "${ROOTDIR:?}/installation_scripts/flags_derived.sh"
@@ -108,7 +110,7 @@ case "$mode" in
     unset -v OVERWRITE_EXISTING_COCOA_PRIVATE_PYTHON_ENV
     ;;
   hard)
-    rm -f ${CACHE_FILE:?}
+    export USE_CACHE=0
     export OVERWRITE_EXISTING_ALL_PACKAGES=1
     unset -v REDOWNLOAD_EXISTING_ALL_DATA
     source "${ROOTDIR:?}/installation_scripts/flags_derived.sh"
@@ -123,7 +125,7 @@ case "$mode" in
     unset -v OVERWRITE_EXISTING_COCOA_PRIVATE_PYTHON_ENV
     ;;
   aggressive)
-    rm -f ${CACHE_FILE:?}
+    export USE_CACHE=0
     export OVERWRITE_EXISTING_ALL_PACKAGES=1
     export REDOWNLOAD_EXISTING_ALL_DATA=1
     source "${ROOTDIR:?}/installation_scripts/flags_derived.sh"
@@ -138,6 +140,7 @@ case "$mode" in
     unset -v OVERWRITE_EXISTING_COCOA_PRIVATE_PYTHON_ENV=1
     ;;
   purge)
+    export USE_CACHE=0
     rm -f ${CACHE_FILE:?}
     export OVERWRITE_EXISTING_ALL_PACKAGES=1
     export REDOWNLOAD_EXISTING_ALL_DATA=1
@@ -163,6 +166,7 @@ case "$mode" in
 esac
 
 unset mode
+
 
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
@@ -318,7 +322,7 @@ for (( i=0; i<${#SCRIPTS[@]}; i++ ));
 do
   cdroot; 
 
-  [[ "${CACHE[i]}" -eq 1 ]] && continue
+  [[ "${CACHE[i]}" -eq 1 && "${USE_CACHE:?}" -eq 1 ]] && continue
   
   if [ -n "${COCOA_OUTPUT_DEBUG}" ]; then
     # bash strict mode explanation
