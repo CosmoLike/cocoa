@@ -4,7 +4,7 @@ Cocoa/cobaya
 cobaya2/
 cobaya3/
 cobaya4/
-.setup_local_packages
+.setup_local_packages.txt
 .compile_local_packages
 .ipynb_checkpoints/
 ./cobaya
