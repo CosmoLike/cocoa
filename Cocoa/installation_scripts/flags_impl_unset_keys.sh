@@ -150,5 +150,5 @@ unset -v ROMAN_REAL_GIT_TAG DESXPLANCK_GIT_BRANCH DESXPLANCK_GIT_COMMIT  DESXPLA
 unset -v OVERWRITE_EXISTING_PIP_PACKAGES
 unset -v ERRORCODE SCRIPTS
 unset -f error_cip error_cip_msg
-unset -v CACHE CACHE_FILE
+unset -v CACHE CACHE_FILE mode_arg_seen mode
 unset -f init_cache reset_cache save_cache load_cache

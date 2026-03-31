@@ -34,6 +34,7 @@ error_cip () {
 # ------------------------------------------------------------------------------
 # ------------------------------ Basic Settings --------------------------------
 # ------------------------------------------------------------------------------
+
 source $(pwd -P)/installation_scripts/flags_save_old.sh
 if [ $? -ne 0 ]; then
   error_cip 'script flags_save_old.sh' 
@@ -61,7 +62,7 @@ mode_arg_seen=0
 
 while [[ $# -gt 0 ]]; do
   case "$1" in
-    --soft|--hard|--purge)
+    --soft|--hard|--aggressive|--purge)
       if [[ $mode_arg_seen -eq 1 ]]; then
         error_cip "choose only one [--soft | --hard | --aggressive | --purge]"
         return 1
@@ -86,6 +87,7 @@ case "$mode" in
     unset -v OVERWRITE_EXISTING_COCOA_PRIVATE_PYTHON_ENV
     unset -v OVERWRITE_EXISTING_PIP_PACKAGES
     export OVERWRITE_EXISTING_ALL_PACKAGES=1
+    unset -v OVERWRITE_EXISTING_CORE_PACKAGES
     unset -v REDOWNLOAD_EXISTING_ALL_DATA
     unset -v OVERWRITE_EXISTING_PRIVATE_CODE
     unset -v OVERWRITE_EXISTING_COSMOLIKE_CODE
@@ -94,6 +96,7 @@ case "$mode" in
     export OVERWRITE_EXISTING_COCOA_PRIVATE_PYTHON_ENV=1
     export OVERWRITE_EXISTING_PIP_PACKAGES=1
     export OVERWRITE_EXISTING_ALL_PACKAGES=1
+    unset -v OVERWRITE_EXISTING_CORE_PACKAGES
     unset -v REDOWNLOAD_EXISTING_ALL_DATA
     unset -v OVERWRITE_EXISTING_PRIVATE_CODE
     unset -v OVERWRITE_EXISTING_COSMOLIKE_CODE
@@ -102,6 +105,7 @@ case "$mode" in
     export OVERWRITE_EXISTING_COCOA_PRIVATE_PYTHON_ENV=1
     export OVERWRITE_EXISTING_PIP_PACKAGES=1
     export OVERWRITE_EXISTING_ALL_PACKAGES=1
+    export OVERWRITE_EXISTING_CORE_PACKAGES=1
     export REDOWNLOAD_EXISTING_ALL_DATA=1
     unset -v OVERWRITE_EXISTING_PRIVATE_CODE
     unset -v OVERWRITE_EXISTING_COSMOLIKE_CODE
@@ -110,6 +114,7 @@ case "$mode" in
     export OVERWRITE_EXISTING_COCOA_PRIVATE_PYTHON_ENV=1
     export OVERWRITE_EXISTING_ALL_PACKAGES=1
     export OVERWRITE_EXISTING_PIP_PACKAGES=1
+    export OVERWRITE_EXISTING_CORE_PACKAGES=1
     export REDOWNLOAD_EXISTING_ALL_DATA=1
     export OVERWRITE_EXISTING_PRIVATE_CODE=1     # dangerous (possible loss of uncommitted work)
                                                  # if unset, users must manually delete
@@ -165,10 +170,8 @@ if [ $? -ne 0 ]; then
 fi
 
 # ------------------------------------------------------------------------------
-# ------------------------------ INSTALL PACKAGES ------------------------------
+# --------------------------- SET PACKAGES TO INSTALL --------------------------
 # ------------------------------------------------------------------------------
-declare -i ERRORCODE=0
-
 declare -a SCRIPTS=( "setup_core_packages.sh" 
                      "setup_pip_core_packages.sh"
                      "setup_cobaya.sh"
@@ -210,9 +213,9 @@ declare -a SCRIPTS=( "setup_core_packages.sh"
                      "setup_cosmolike_projects.sh"
                      )
 
-
-# SET CACHE BEGINS -------------------------------------------------------------
-
+# ------------------------------------------------------------------------------
+# -------------------------- SET CACHE  ----------------------------------------
+# ------------------------------------------------------------------------------
 declare -a CACHE=()
 
 CACHE_FILE="${ROOTDIR:?}/.local/setup_local_packages.txt"
@@ -275,7 +278,10 @@ init_cache() {
 
 init_cache
 
-# SET CACHE ENDS ---------------------------------------------------------------
+# ------------------------------------------------------------------------------
+# -------------------------- RUN INSTALL PACKAGES ------------------------------
+# ------------------------------------------------------------------------------
+declare -i ERRORCODE=0
 
 for (( i=0; i<${#SCRIPTS[@]}; i++ ));
 do
@@ -320,7 +326,7 @@ fi
 
 unset -v ERRORCODE SCRIPTS
 unset -f error_cip error_cip_msg
-unset -v CACHE CACHE_FILE
+unset -v CACHE CACHE_FILE mode_arg_seen mode
 unset -f init_cache reset_cache save_cache load_cache
 pbottom2 'SETUP COCOA INSTALLATION PACKAGES'
 source stop_cocoa.sh || return 1;
