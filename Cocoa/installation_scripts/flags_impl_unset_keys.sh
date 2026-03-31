@@ -49,7 +49,7 @@ unset -v POLY_NAME CAMB_NAME CAMB_GIT_COMMIT cocoa_HDF5_build
 unset -v OUT1 OUT2 MNT URL CHANGES CLASS_NAME fail_sdf PACKDIR
 unset -f pfail fail_comp_act fail_clact error_stop_cocoa 
 unset -v INT_LIB INT_INCL INT_INCL_PY INT_INCL_PY_SP 
-unset -f ptop ptop2 ptop3 pbottom pbottom3 pbottom2
+unset -f ptop ptop2 ptop3 pbottom pbottom3 pbottom2 unset_all
 unset -v URL CHANGES ECODEF CLNAME PACKDIR TFOLDER TFILE TFILEP AL
 unset -f cdfolder cpfolder error cpfile cdroot wgetact1 wgetact2 gitact1 gitact2
 unset -f unset_env_funcs unset_env_vars unset_all error wgetact gitact
