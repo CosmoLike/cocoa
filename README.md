@@ -148,8 +148,10 @@ Users can now proceed to **the next section**.
 
 > [!NOTE]
 > In case users need to rerun `setup_cocoa.sh`, Cocoa will not download previously installed packages (the code has a smart cache system), unless users rerun `setup_cocoa.sh` with `--hard` mode flag
-> In addition to that, Cocoa will not download previously unxv large data products, unless users rerun `setup_cocoa.sh` with `--aggressive` mode flag (`--aggressive` = `--hard` + redownload large data products).
-> Finally, Cocoa will not redownload cosmolike and projects unless the users rerun `setup_cocoa.sh` with `--purge` mode flag. (`--purge` = `--aggressive` + redownload cosmolike and projects). 
+> 
+> In addition to that, Cocoa will not redownload large data products, unless users rerun `setup_cocoa.sh` with `--aggressive` mode flag (`--aggressive` = `--hard` + download again data products).
+> 
+> Finally, Cocoa will not redownload cosmolike and projects unless the users rerun `setup_cocoa.sh` with `--purge` mode flag. (`--purge` = `--aggressive` + clean cosmolike and project git repositories). 
 > In this `--purge` mode, be careful not to lose uncommitted work on either cosmolike or projects.
 
 
