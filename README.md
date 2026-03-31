@@ -152,7 +152,7 @@ When rerunning `setup_cocoa.sh`, Cocoa will not redownload previously installed 
 > - --extreme: force new download of `THEORY`, `ML`, `LIKELIHOOD`, `CORE`, and `DATA` blocks of scripts
 > - --purge: force new download of all packages (beware for the loss of uncommitted work)
 >
-> 
+
 > [!NOTE]
 When rerunning `compile_cocoa.sh`, Cocoa will not recompile previously compiled packages, except for cosmolike projects. 
 > To force this behavior, use `--soft`, `--hard`, `--aggressive`, `--extreme` flags. 
