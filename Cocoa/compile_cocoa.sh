@@ -28,7 +28,7 @@ declare -a CORE=("compile_core_packages.sh"
                  "compile_polychord.sh"
                  "compile_nautilus_sampler.sh"
                  "compile_tensiometer.sh"
-                 "compile_ee2.sh"
+                 "compile_ee2.sh" 
                 )
 
 declare -a THEORY=("compile_hyrec2.sh"
@@ -36,7 +36,7 @@ declare -a THEORY=("compile_hyrec2.sh"
                    "compile_camb.sh"
                    "compile_class.sh"
                    "compile_mgcamb.sh"
-                   "compile_velocileptors.sh" 
+                   "compile_velocileptors.sh"
                   )
 
 declare -a LIKELIHOOD=("compile_planck.sh"
@@ -77,8 +77,8 @@ SCRIPTS+=("${LIKELIHOOD[@]}")
 # ------------------------------------------------------------------------------ 
 
 unset_all () {
-  unset -v ERRORCODE SCRIPTS ML LIKELIHOOD THEORY CORE 
-  unset -v CACHE CACHE_FILE mode_arg_seen mode
+  unset -v ERRORCODE SCRIPTS CORE THEORY ML LIKELIHOOD
+  unset -v CACHE CACHE_FILE mode_arg_seen mode INIT END
   unset -f init_cache reset_cache save_cache load_cache 
   unset -f error_cem error_cem_msg
 }
@@ -91,7 +91,7 @@ error_cem_msg () {
 }
 
 error_cem () {
-  error_cem_msg ${1:?}
+  error_cem_msg "${1:?}"
   unset_all
   cd $(pwd -P) 2>"/dev/null"
   source stop_cocoa 2>"/dev/null"
@@ -99,7 +99,7 @@ error_cem () {
 }
 
 # ------------------------------------------------------------------------------
-# ------------------------------ SET RUN MODES ---------------------------------
+# --------------------------- CHOOSE RUN MODES ---------------------------------
 # ------------------------------------------------------------------------------
 CACHE_FILE="${ROOTDIR:?}/.local/compile_local_packages.txt"
 mode="default"        # default
@@ -115,7 +115,7 @@ while [[ $# -gt 0 ]]; do
       mode="${1#--}"
       ;;
     *)
-      error_cem "Error: unknown option: $1"
+      error_cem "unknown run mode option $1"
       return 1
       ;;
   esac
@@ -155,7 +155,6 @@ reset_cache() {
 init_cache() {
   local i
   local LOCAL_DIR="${ROOTDIR:?}/.local"
-  
   if [[ ! -d "${LOCAL_DIR:?}" ]]; then
     error_cem "(.local)  does not exist: ${LOCAL_DIR:?}"
     return 1 
@@ -181,6 +180,10 @@ init_cache() {
 }
 
 init_cache
+
+# ------------------------------------------------------------------------------
+# -------------------------- CONFIG MODE ---------------------------------------
+# ------------------------------------------------------------------------------
 
 case "$mode" in
   default) ;;
@@ -212,7 +215,7 @@ case "$mode" in
     done
     ;;
   purge)
-    # FORCE RECOMPILE THEORY + CORE + ML + LIKELIHOOD
+    # FORCE RECOMPILE OF ALL CODE
     INIT=0
     END=${#SCRIPTS[@]}
     for (( i=$INIT; i<$END; i++ ));

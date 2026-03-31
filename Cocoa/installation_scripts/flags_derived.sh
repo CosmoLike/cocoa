@@ -7,6 +7,12 @@
 # overwrite means: delete existing PACKAGE folder and install it again ---------
 # these keys are only relevant if you run setup_cocoa multiple times -----------
 # ------------------------------------------------------------------------------
+export OVERWRITE_EXISTING_ALL_PACKAGES=1
+export REDOWNLOAD_EXISTING_ALL_DATA=1
+export OVERWRITE_EXISTING_PIP_PACKAGES=1
+export OVERWRITE_EXISTING_CORE_PACKAGES=1
+export OVERWRITE_EXISTING_COBAYA_CODE=1
+
 if [ -n "${OVERWRITE_EXISTING_ALL_PACKAGES}" ]; then
   export OVERWRITE_EXISTING_COBAYA_CODE=1
   export OVERWRITE_EXISTING_CORE_PACKAGES=1
