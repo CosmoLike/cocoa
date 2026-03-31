@@ -147,20 +147,20 @@ When rerunning `setup_cocoa.sh`, Cocoa will not redownload previously installed 
 > To force this behavior, use `--soft`, `--hard`, `--aggressive`, `--extreme`, or `--purge` flags.
 >
 > - --soft: force new download of the `THEORY` and `ML` script blocks
-> - --hard: force new download of `THEORY`, `ML`, and `LIKELIHOOD` blocks of scripts
-> - --aggressive: force new download of `THEORY`, `ML`, `LIKELIHOOD`, and CORE blocks of scripts
-> - --extreme: force new download of `THEORY`, `ML`, `LIKELIHOOD`, `CORE`, and `DATA` blocks of scripts
-> - --purge: force new download of all packages (beware for the loss of uncommitted work)
+> - --hard: force new download of `THEORY`, `ML`, and `LIKELIHOOD` script blocks
+> - --aggressive: force new download of `THEORY`, `ML`, `LIKELIHOOD`, and CORE script blocks
+> - --extreme: force new download of `THEORY`, `ML`, `LIKELIHOOD`, `CORE`, and `DATA` script blocks
+> - --purge: force new download of all packages (beware of the loss of uncommitted work)
 >
 
 > [!NOTE]
 When rerunning `compile_cocoa.sh`, Cocoa will not recompile previously compiled packages, except for cosmolike projects. 
 > To force this behavior, use `--soft`, `--hard`, `--aggressive`, `--extreme` flags. 
 >
-> - --soft: recompile `THEORY` block of scripts. 
-> - --hard: recompile `THEORY` and `ML` blocks of scripts.
-> - --aggressive: recompile `THEORY`, `ML`, and `CORE` blocks of scripts.
-> - --extreme: recompile `THEORY`, `ML`, `CORE`, and `LIKELIHOOD` blocks of scripts.
+> - --soft: recompile `THEORY` script block. 
+> - --hard: recompile `THEORY` and `ML` script blocks.
+> - --aggressive: recompile `THEORY`, `ML`, and `CORE` script blocks.
+> - --extreme: recompile `THEORY`, `ML`, `CORE`, and `LIKELIHOOD` script blocks.
 >
  
 # Running Examples  <a name="cobaya_base_code_examples"></a>
