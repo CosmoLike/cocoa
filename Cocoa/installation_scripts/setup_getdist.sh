@@ -107,7 +107,17 @@ cdfolder "${ROOTDIR:?}" || { unset_all; return 1; }
 
 pbottom "INSTALLING GETDIST" || { unset_all; return 1; }
 
+#-------------------------------------------------------------------------------
+
 unset_all || return 1  
+
+#-------------------------------------------------------------------------------
+
+return 55; # why this odd number? Setup_cocoa will cache this installation only
+           #   if this script runs entirely. What if the user close the terminal 
+           #   or the system shuts down in the middle of a git clone?  
+           #   In this case, PACKDIR would exists, but it is corrupted
+
 
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------

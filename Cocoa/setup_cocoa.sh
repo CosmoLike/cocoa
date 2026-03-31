@@ -56,23 +56,18 @@ fi
 # ------------------------------------------------------------------------------
 # ------------------------------ SET RUN MODES ---------------------------------
 # ------------------------------------------------------------------------------
-
-mode="soft"        # default
+CACHE_FILE="${ROOTDIR:?}/.local/setup_local_packages.txt"
+mode="ultrasoft"        # default
 mode_arg_seen=0
-
 while [[ $# -gt 0 ]]; do
   case "$1" in
-    --soft|--hard|--aggressive|--purge)
+    --ultrasoft|--soft|--hard|--aggressive|--purge)
       if [[ $mode_arg_seen -eq 1 ]]; then
-        error_cip "choose only one [--soft | --hard | --aggressive | --purge]"
+        error_cip "choose only one ode"
         return 1
       fi
       mode_arg_seen=1
       mode="${1#--}"
-      ;;
-    -h|--help)
-      echo "Usage: $0 [--soft | --hard | --aggressive | --purge]"
-      return 0
       ;;
     *)
       error_cip "Error: unknown option: $1"
@@ -83,45 +78,83 @@ while [[ $# -gt 0 ]]; do
 done
 
 case "$mode" in
-  soft)
-    unset -v OVERWRITE_EXISTING_COCOA_PRIVATE_PYTHON_ENV
-    unset -v OVERWRITE_EXISTING_PIP_PACKAGES
-    export OVERWRITE_EXISTING_ALL_PACKAGES=1
-    unset -v OVERWRITE_EXISTING_CORE_PACKAGES
+  ultrasoft)
+    unset -v OVERWRITE_EXISTING_ALL_PACKAGES
     unset -v REDOWNLOAD_EXISTING_ALL_DATA
+    source "${ROOTDIR:?}/installation_scripts/flags_derived.sh"
+    if [ $? -ne 0 ]; then
+      return 1;
+    fi
+    unset -v OVERWRITE_EXISTING_PIP_PACKAGES
+    unset -v OVERWRITE_EXISTING_CORE_PACKAGES
+    unset -v OVERWRITE_EXISTING_COBAYA_CODE
     unset -v OVERWRITE_EXISTING_PRIVATE_CODE
     unset -v OVERWRITE_EXISTING_COSMOLIKE_CODE
+    unset -v OVERWRITE_EXISTING_COCOA_PRIVATE_PYTHON_ENV
+    ;;
+  soft)
+    rm -f ${CACHE_FILE:?}
+    export OVERWRITE_EXISTING_ALL_PACKAGES=1
+    unset -v REDOWNLOAD_EXISTING_ALL_DATA
+    source "${ROOTDIR:?}/installation_scripts/flags_derived.sh"
+    if [ $? -ne 0 ]; then
+      return 1;
+    fi
+    unset -v OVERWRITE_EXISTING_PIP_PACKAGES
+    unset -v OVERWRITE_EXISTING_CORE_PACKAGES
+    unset -v OVERWRITE_EXISTING_COBAYA_CODE
+    unset -v OVERWRITE_EXISTING_PRIVATE_CODE
+    unset -v OVERWRITE_EXISTING_COSMOLIKE_CODE
+    unset -v OVERWRITE_EXISTING_COCOA_PRIVATE_PYTHON_ENV
     ;;
   hard)
-    export OVERWRITE_EXISTING_COCOA_PRIVATE_PYTHON_ENV=1
-    export OVERWRITE_EXISTING_PIP_PACKAGES=1
+    rm -f ${CACHE_FILE:?}
     export OVERWRITE_EXISTING_ALL_PACKAGES=1
-    unset -v OVERWRITE_EXISTING_CORE_PACKAGES
     unset -v REDOWNLOAD_EXISTING_ALL_DATA
+    source "${ROOTDIR:?}/installation_scripts/flags_derived.sh"
+    if [ $? -ne 0 ]; then
+      return 1;
+    fi
+    export OVERWRITE_EXISTING_PIP_PACKAGES=1
+    unset -v OVERWRITE_EXISTING_CORE_PACKAGES
+    unset -v OVERWRITE_EXISTING_COBAYA_CODE
     unset -v OVERWRITE_EXISTING_PRIVATE_CODE
     unset -v OVERWRITE_EXISTING_COSMOLIKE_CODE
+    unset -v OVERWRITE_EXISTING_COCOA_PRIVATE_PYTHON_ENV
     ;;
   aggressive)
-    export OVERWRITE_EXISTING_COCOA_PRIVATE_PYTHON_ENV=1
-    export OVERWRITE_EXISTING_PIP_PACKAGES=1
+    rm -f ${CACHE_FILE:?}
     export OVERWRITE_EXISTING_ALL_PACKAGES=1
-    export OVERWRITE_EXISTING_CORE_PACKAGES=1
     export REDOWNLOAD_EXISTING_ALL_DATA=1
+    source "${ROOTDIR:?}/installation_scripts/flags_derived.sh"
+    if [ $? -ne 0 ]; then
+      return 1;
+    fi
+    export OVERWRITE_EXISTING_CORE_PACKAGES=1
+    export OVERWRITE_EXISTING_PIP_PACKAGES=1
+    export OVERWRITE_EXISTING_COBAYA_CODE=1
     unset -v OVERWRITE_EXISTING_PRIVATE_CODE
     unset -v OVERWRITE_EXISTING_COSMOLIKE_CODE
+    unset -v OVERWRITE_EXISTING_COCOA_PRIVATE_PYTHON_ENV=1
     ;;
   purge)
-    export OVERWRITE_EXISTING_COCOA_PRIVATE_PYTHON_ENV=1
+    rm -f ${CACHE_FILE:?}
     export OVERWRITE_EXISTING_ALL_PACKAGES=1
+    export REDOWNLOAD_EXISTING_ALL_DATA=1
+    if [ $? -ne 0 ]; then
+      return 1;
+    fi
     export OVERWRITE_EXISTING_PIP_PACKAGES=1
     export OVERWRITE_EXISTING_CORE_PACKAGES=1
-    export REDOWNLOAD_EXISTING_ALL_DATA=1
+    export OVERWRITE_EXISTING_COBAYA_CODE=1
     export OVERWRITE_EXISTING_PRIVATE_CODE=1     # dangerous (possible loss of uncommitted work)
                                                  # if unset, users must manually delete
                                                  # project if wants setup_cocoa to reclone it
     export OVERWRITE_EXISTING_COSMOLIKE_CODE=1   # dangerous (possible loss of uncommitted work)
                                                  # if unset, users must manually delete
                                                  # project if wants setup_cocoa to reclone it
+    export OVERWRITE_EXISTING_COCOA_PRIVATE_PYTHON_ENV=1
+    source "${ROOTDIR:?}/installation_scripts/flags_derived.sh"
     ;;
   *)
     echo "Error: invalid mode: $mode" >&2
@@ -218,8 +251,6 @@ declare -a SCRIPTS=( "setup_core_packages.sh"
 # ------------------------------------------------------------------------------
 declare -a CACHE=()
 
-CACHE_FILE="${ROOTDIR:?}/.local/setup_local_packages.txt"
-
 load_cache() {
   local file="$1"
   local line
@@ -299,7 +330,7 @@ do
   
   rc=$?
 
-  if [[ ${rc:?} -eq 0 ]]; then
+  if [[ ${rc:?} -eq 55 ]]; then
     CACHE[i]=1
     save_cache
   elif [[ ${rc:?} -eq 99 ]]; then
