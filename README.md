@@ -116,7 +116,7 @@ In this section, we assume users have previously activated the Cocoa conda envir
 
   - Stable Version
     
-        git clone https://github.com/CosmoLike/cocoa.git --branch v4.06 cocoa
+        git clone https://github.com/CosmoLike/cocoa.git --branch v4.07 cocoa
 
   - Testing beta release
     
@@ -130,7 +130,7 @@ and
         
     source setup_cocoa.sh
 
-This script downloads and decompresses external modules, requiring internet access (on a HPC, this typically means running `setup_cocoa.sh` on the login node).
+This script downloads and decompresses external modules, which require internet access (on an HPC, this typically means running `setup_cocoa.sh` on the login node).
 
 Cocoa does not install all the available external modules by default. If the user needs additional packages, please refer to the appendix [FAQ: How can users compile external modules?](#appendix_compile_separately).
 
@@ -138,7 +138,7 @@ Cocoa does not install all the available external modules by default. If the use
 
     source compile_cocoa.sh
     
-This script compiles external modules selected for installation on `set_installation_options.sh` (e.g., CAMB) and does not require internet access. Code compilation is a CPU-intensive operation; therefore, running  `compile_cocoa.sh` on a cluster login node can be against HPC policy. Users should then run `setup_cocoa.sh` in a login node and `compile_cocoa.sh` on an interactive compute node.
+This script compiles external modules selected for installation on `set_installation_options.sh` (e.g., CAMB) and does not require internet access. Code compilation is CPU-intensive; therefore, running  `compile_cocoa.sh` on a cluster login node may violate HPC policy. Users should then run `setup_cocoa.sh` in a login node and `compile_cocoa.sh` on an interactive compute node.
 
 Users can now proceed to **the next section**.
 
