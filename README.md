@@ -147,10 +147,14 @@ Users can now proceed to **the next section**.
 > Cocoa does not install all the available external modules by default. If the user needs additional packages, please refer to the appendix [FAQ: How can users compile external modules?](#appendix_compile_separately).
 
 > [!NOTE]
-> In case users need to rerun `setup_cocoa.sh`, Cocoa will not download again previously installed packages. 
-> To force this behavior, rerun `setup_cocoa.sh` with either `--hard`, `--aggressive` or `--purge` mode flags. 
-> In the `--purge` mode, be careful not to lose uncommitted work on either `cosmolike_core` or project repositories.
-
+When rerunning `setup_cocoa.sh`, Cocoa will not redownload previously installed packages. 
+> To force this behavior, rerun `setup_cocoa.sh` with either `--soft`, `--hard`, `--aggressive` or `--purge` flags, as explained below. 
+>
+>      --soft = force redownload of code/data except for: (1) pip packages, (2) a few core libraries, (3) cobaya, (4) download of large data products, (5) cosmolike_core and project repos
+>      --hard = force redownload of code/data except for: (1) cobaya, (2) download of large data products, (3) cosmolike_core and project repos
+>      --aggressive = force redownload of code/data except for: (3) cosmolike_core and project repos
+>      --purge = force redownload of ALL code/data except (beware: users may lose uncommitted code on project repos)
+>
 
 # Running Examples  <a name="cobaya_base_code_examples"></a>
 
