@@ -147,7 +147,7 @@ Users can now proceed to **the next section**.
 > Cocoa does not install all the available external modules by default. If the user needs additional packages, please refer to the appendix [FAQ: How can users compile external modules?](#appendix_compile_separately).
 
 > [!NOTE]
-> In case users need to rerun `setup_cocoa.sh`, Cocoa will not download agan previously installed packages. 
+> In case users need to rerun `setup_cocoa.sh`, Cocoa will not download again previously installed packages. 
 > To force this behavior, rerun `setup_cocoa.sh` with either `--hard`, `--aggressive` or `--purge` mode flags. 
 > In the `--purge` mode, be careful not to lose uncommitted work on either `cosmolike_core` or project repositories.
 
