@@ -147,20 +147,11 @@ Users can now proceed to **the next section**.
 > Cocoa does not install all the available external modules by default. If the user needs additional packages, please refer to the appendix [FAQ: How can users compile external modules?](#appendix_compile_separately).
 
 > [!NOTE]
-> In case users need to rerun `setup_cocoa.sh`, Cocoa will not download previously installed packages, cosmolike projects, or large datasets, unless the following keys are set on `set_installation_options.sh`
+> In case users need to rerun `setup_cocoa.sh`, Cocoa will not download previously installed packages, unless users rerun it in `--aggressive` mode via
 >
->     [Adapted from Cocoa/set_installation_options.sh shell script]
->     # ------------------------------------------------------------------------------
->     # OVERWRITE_EXISTING_XXX_CODE=1 -> setup_cocoa overwrites existing PACKAGES ----
->     # overwrite: delete the existing PACKAGE folder and install it again -----------
->     # redownload: delete the compressed file and download data again ---------------
->     # These keys are only relevant if you run setup_cocoa multiple times -----------
->     # ------------------------------------------------------------------------------
->     (...)
->     export OVERWRITE_EXISTING_ALL_PACKAGES=1    # except cosmolike projects
->     #export OVERWRITE_EXISTING_COSMOLIKE_CODE=1 # dangerous (possible loss of uncommitted work)
->                                                 # if unset, users must manually delete cosmolike projects
->     #export REDOWNLOAD_EXISTING_ALL_DATA=1      # warning: some data is many GB
+>     source setup_cocoa.sh --aggressive
+>
+> Similarly, `setup_cocoa.sh` will not redownload cosmolike projects unless the users rerun it on `--purge`. Be careful with loss of uncommitted work on cosmolike and on cosmolike projects when running `setup_cocoa.sh --purge`
 
 # Running Examples  <a name="cobaya_base_code_examples"></a>
 
