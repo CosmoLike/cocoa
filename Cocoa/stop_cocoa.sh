@@ -98,23 +98,11 @@ fi
 if [[ -z "${IGNORE_COSMOLIKE_CODE}" ]]; then
   ECODEF="${ROOTDIR:?}/external_modules/code"
 
-  TMP1="cfastpt"
-  TMP2="cfftlog"
-  TMP3="cosmolike"
-  TMP4="log.c"
-
-  if [[ -L "${ECODEF:?}/${TMP1:?}" ]]; then
-    rm -f "${ECODEF:?}/${TMP1:?}"
-  fi
-  if [[ -L "${ECODEF:?}/${TMP2:?}" ]]; then
-    rm -f "${ECODEF:?}/${TMP2:?}"
-  fi
-  if [[ -L "${ECODEF:?}/${TMP3:?}" ]]; then
-    rm -f "${ECODEF:?}/${TMP3:?}"
-  fi
-  if [[ -L "${ECODEF:?}/${TMP4:?}" ]]; then
-    rm -f "${ECODEF:?}/${TMP4:?}"
-  fi
+  for TMP1 in "cfastpt" "cfftlog" "cosmolike" "log.c"; do
+    if [[ -L "${ECODEF:?}/${TMP1}" ]]; then
+      rm -f "${ECODEF:?}/${TMP1}"
+    fi
+  done
 
   unset -v ECODEF FOLDER TMP1 TMP2 TMP3 TMP4
 fi
@@ -143,15 +131,11 @@ fi
 if [ -z "${IGNORE_ACTDR6_CODE}" ]; then
   COBLIKE="${ROOTDIR:?}/cobaya/cobaya/likelihoods"
 
-  TMP="planck_2020_hillipop"
-  if [[ -L "${COBLIKE:?}/${TMP:?}" ]]; then
-    rm -f "${COBLIKE:?}/${TMP:?}"
-  fi
-
-  TMP="planck_2020_lollipop"
-  if [[ -L "${COBLIKE:?}/${TMP:?}" ]]; then
-    rm -f "${COBLIKE:?}/${TMP:?}"
-  fi
+  for TMP in "planck_2020_hillipop" "planck_2020_lollipop"; do
+    if [[ -L "${COBLIKE:?}/${TMP}" ]]; then
+      rm -f "${COBLIKE:?}/${TMP}"
+    fi
+  done
 
   unset -v COBLIKE TMP
 fi
@@ -176,40 +160,12 @@ fi
 if [[ -z "${IGNORE_EMULTRF_CODE}" ]]; then
   COBTH="${ROOTDIR:?}/cobaya/cobaya/theories"
 
-  TMP="emulcmb"
-  if [[ -L "${COBTH:?}/${TMP:?}" ]]; then
-    rm -f "${COBTH:?}/${TMP:?}"
-  fi
-
-  TMP="emulbaosn"
-  if [[ -L "${COBTH:?}/${TMP:?}" ]]; then
-    rm -f "${COBTH:?}/${TMP:?}"
-  fi
-
-  TMP="emultheta"
-  if [[ -L "${COBTH:?}/${TMP:?}" ]]; then
-    rm -f "${COBTH:?}/${TMP:?}"
-  fi
-
-  TMP="emulrdrag"
-  if [[ -L "${COBTH:?}/${TMP:?}" ]]; then
-    rm -f "${COBTH:?}/${TMP:?}"
-  fi
-
-  TMP="emul_cosmic_shear"
-  if [[ -L "${COBTH:?}/${TMP:?}" ]]; then
-    rm -f "${COBTH:?}/${TMP:?}"
-  fi
-
-  TMP="emul_ggl"
-  if [[ -L "${COBTH:?}/${TMP:?}" ]]; then
-    rm -f "${COBTH:?}/${TMP:?}"
-  fi
-  
-  TMP="emul_wtheta"
-  if [[ -L "${COBTH:?}/${TMP:?}" ]]; then
-    rm -f "${COBTH:?}/${TMP:?}"
-  fi
+  for TMP in "emulcmb" "emulbaosn" "emultheta" "emulrdrag" \
+             "emul_cosmic_shear" "emul_ggl" "emul_wtheta"; do
+    if [[ -L "${COBTH:?}/${TMP}" ]]; then
+      rm -f "${COBTH:?}/${TMP}"
+    fi
+  done
 
   unset -v COBTH TMP
 fi
