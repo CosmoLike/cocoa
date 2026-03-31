@@ -2,8 +2,8 @@
 # ------------------------------------------------------------------------------
 # ------------------------------ Basic Settings --------------------------------
 # ------------------------------------------------------------------------------
-if [[ ! "${BASH_SOURCE[0]}" != "$0" ]]; then
-  FILE="$(basename ${BASH_SOURCE[0]})"
+if [[ "${BASH_SOURCE[0]}" == "$0" ]]; then
+  FILE="$(basename "${BASH_SOURCE[0]}")"
   MSG="\033[0;31m ${FILE} must be sourced (not executed as program)"
   MSG2=", e.g.: \n source ${FILE}\033[0m"
   echo -e "${MSG}${MSG2}"
@@ -32,25 +32,25 @@ error_cip_msg () {
 error_cip () {
   error_cip_msg "${1:?}"
   unset_all_cip
-  cd $(pwd -P) 2>"/dev/null"
+  cd "$(pwd -P)" 2>"/dev/null"
   source stop_cocoa 2>"/dev/null"
   return 1
 }
 
-source $(pwd -P)/installation_scripts/flags_save_old.sh
+source "$(pwd -P)/installation_scripts/flags_save_old.sh"
 if [ $? -ne 0 ]; then
   error_cip 'script flags_save_old.sh' 
   return 1
 fi
 
 # note: here is where we define env flag ROOTDIR as $(pwd -P)
-source ${SET_INSTALLATION_OPTIONS:-"set_installation_options.sh"}
+source "${SET_INSTALLATION_OPTIONS:-"set_installation_options.sh"}"
 if [ $? -ne 0 ]; then
   error_cip 'script set_installation_options.sh'; return 1;
 fi
 
 if [ -n "${MINICONDA_INSTALLATION}" ]; then
-  if [ -z ${CONDA_PREFIX} ]; then
+  if [ -z "${CONDA_PREFIX:-}" ]; then
     error_cip "conda environment activation"; return 1;
   fi
 fi
@@ -142,7 +142,6 @@ while [[ $# -gt 0 ]]; do
   case "$1" in
     --soft|--hard|--aggressive|--extreme|--purge)
       if [[ $mode_arg_seen -eq 1 ]]; then
-        echo "what..."
         error_cip "choose only one mode"
         return 1
       fi
@@ -180,7 +179,6 @@ save_cache() {
 reset_cache() {
   local i
   CACHE=()
-  echo "WHAT ${#SCRIPTS[@]}"
   for (( i=0; i<${#SCRIPTS[@]}; i++ )); do
     CACHE[i]=0
   done
@@ -231,7 +229,6 @@ case "$mode" in
     unset -v OVERWRITE_EXISTING_PRIVATE_CODE   # ADDITIONAL PROTECTION
     ;;
   soft)
-    export USE_CACHE=1
     # FORCE DOWNLOAD OF THEORY + ML
     INIT=${#CORE[@]}
     END=$(( ${#CORE[@]} + ${#THEORY[@]} + ${#ML[@]} ))
@@ -323,7 +320,7 @@ unset mode
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
 
-ptop2 'SETUP COCOA INSTALLATION PACKAGES' || { unset_all; return 1; }
+ptop2 'SETUP COCOA & EXTERNAL MODULES' || { unset_all; return 1; }
 
 # ------------------------------------------------------------------------------
 # ---------------------- Activate Virtual Environment --------------------------
@@ -402,7 +399,7 @@ fi
 
 
 unset_all_cip
-pbottom2 'SETUP COCOA INSTALLATION PACKAGES' || return 1;
+pbottom2 'SETUP EXTERNAL & EXTERNAL MODULES' || return 1;
 source stop_cocoa.sh || return 1;
 
 # ------------------------------------------------------------------------------

@@ -2,8 +2,8 @@
 # ------------------------------------------------------------------------------
 # ------------------------------ Basic Settings --------------------------------
 # ------------------------------------------------------------------------------
-if [[ ! "${BASH_SOURCE[0]}" != "$0" ]]; then
-  FILE="$(basename ${BASH_SOURCE[0]})"
+if [[ "${BASH_SOURCE[0]}" == "$0" ]]; then
+  FILE="$(basename "${BASH_SOURCE[0]}")"
   MSG="\033[0;31m ${FILE} must be sourced (not executed as program)"
   MSG2=", e.g.: \n source ${FILE}\033[0m"
   echo -e "${MSG}${MSG2}"
@@ -106,7 +106,7 @@ mode="default"        # default
 mode_arg_seen=0
 while [[ $# -gt 0 ]]; do
   case "$1" in
-    --soft|--hard|--aggressive|--purge)
+    --soft|--hard|--aggressive|--extreme)
       if [[ $mode_arg_seen -eq 1 ]]; then
         error_cem "choose only one mode"
         return 1
@@ -206,7 +206,7 @@ case "$mode" in
     done
     ;;
   aggressive)
-    # FORCE RECOMPILE THEORY + ML
+    # FORCE RECOMPILE THEORY + CORE + ML
     INIT=0
     END=$(( ${#THEORY[@]} + ${#CORE[@]} + ${#ML[@]} ))
     for (( i=$INIT; i<$END; i++ ));
