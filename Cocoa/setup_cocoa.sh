@@ -15,10 +15,52 @@ if [ -n "${ROOTDIR}" ]; then
   source stop_cocoa.sh
 fi
 
+unset_all_cip () {
+  unset -v ERRORCODE SCRIPTS CACHE CACHE_FILE mode_arg_seen mode INIT END
+  unset -v CORE THEORY ML LIKELIHOOD DATA COSMOLIKE 
+  unset -f init_cache reset_cache save_cache load_cache
+  unset -f error_cip error_cip_msg unset_all_cip
+}
+
+error_cip_msg () {
+  local FILE="$(basename "${BASH_SOURCE[0]}")"
+  local MSG="\033[0;31m\t\t (${FILE}) we cannot run "
+  local MSG2="\033[0m"
+  echo -e "${MSG}${1:?}${MSG2}" 2>"/dev/null"
+}
+
+error_cip () {
+  error_cip_msg "${1:?}"
+  unset_all_cip
+  cd $(pwd -P) 2>"/dev/null"
+  source stop_cocoa 2>"/dev/null"
+  return 1
+}
+
+source $(pwd -P)/installation_scripts/flags_save_old.sh
+if [ $? -ne 0 ]; then
+  error_cip 'script flags_save_old.sh' 
+  return 1
+fi
+
+# note: here is where we define env flag ROOTDIR as $(pwd -P)
+source ${SET_INSTALLATION_OPTIONS:-"set_installation_options.sh"}
+if [ $? -ne 0 ]; then
+  error_cip 'script set_installation_options.sh'; return 1;
+fi
+
+if [ -n "${MINICONDA_INSTALLATION}" ]; then
+  if [ -z ${CONDA_PREFIX} ]; then
+    error_cip "conda environment activation"; return 1;
+  fi
+fi
+# ------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
 # --------------------------- SET PACKAGES TO INSTALL --------------------------
 # ------------------------------------------------------------------------------
-
+# ------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 declare -a CORE=("setup_core_packages.sh" 
                  "setup_pip_core_packages.sh"
                  "setup_cobaya.sh"
@@ -71,6 +113,7 @@ SCRIPTS+=("${ML[@]}")
 SCRIPTS+=("${LIKELIHOOD[@]}")
 SCRIPTS+=("${DATA[@]}")
 SCRIPTS+=("${COSMOLIKE[@]}")
+
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
@@ -79,7 +122,7 @@ SCRIPTS+=("${COSMOLIKE[@]}")
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------                    
-# Below here should not require users input
+# Below here should not require user input
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
@@ -88,46 +131,6 @@ SCRIPTS+=("${COSMOLIKE[@]}")
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------ 
-
-unset_all_cip () {
-  unset -v ERRORCODE SCRIPTS CACHE_FILE mode_arg_seen mode
-  unset -v CORE THEORY ML LIKELIHOOD DATA COSMOLIKE INIT END
-  unset -f init_cache reset_cache save_cache load_cache
-  unset -f error_cip error_cip_msg unset_all
-}
-
-error_cip_msg () {
-  local FILE="$(basename "${BASH_SOURCE[0]}")"
-  local MSG="\033[0;31m\t\t (${FILE}) we cannot run "
-  local MSG2="\033[0m"
-  echo -e "${MSG}${1:?}${MSG2}" 2>"/dev/null"
-}
-
-error_cip () {
-  error_cip_msg "${1:?}"
-  unset_all_cip
-  cd $(pwd -P) 2>"/dev/null"
-  source stop_cocoa 2>"/dev/null"
-  return 1
-}
-
-source $(pwd -P)/installation_scripts/flags_save_old.sh
-if [ $? -ne 0 ]; then
-  error_cip 'script flags_save_old.sh' 
-  return 1
-fi
-
-# note: here is where we define env flag ROOTDIR as $(pwd -P)
-source ${SET_INSTALLATION_OPTIONS:-"set_installation_options.sh"}
-if [ $? -ne 0 ]; then
-  error_cip 'script set_installation_options.sh'; return 1;
-fi
-
-if [ -n "${MINICONDA_INSTALLATION}" ]; then
-  if [ -z ${CONDA_PREFIX} ]; then
-    error_cip "conda environment activation"; return 1;
-  fi
-fi
 
 # ------------------------------------------------------------------------------
 # ------------------------------ CHOOSE RUN MODES ------------------------------
@@ -163,7 +166,6 @@ declare -a CACHE=()
 load_cache() {
   local file="$1"
   local line
-
   CACHE=()
   # read line and continue if line is not empty --------------------------------
   while IFS= read -r line || [[ -n "$line" ]]; do
@@ -178,6 +180,7 @@ save_cache() {
 reset_cache() {
   local i
   CACHE=()
+  echo "WHAT ${#SCRIPTS[@]}"
   for (( i=0; i<${#SCRIPTS[@]}; i++ )); do
     CACHE[i]=0
   done

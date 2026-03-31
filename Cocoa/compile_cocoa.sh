@@ -2,7 +2,6 @@
 # ------------------------------------------------------------------------------
 # ------------------------------ Basic Settings --------------------------------
 # ------------------------------------------------------------------------------
-
 if [[ ! "${BASH_SOURCE[0]}" != "$0" ]]; then
   FILE="$(basename ${BASH_SOURCE[0]})"
   MSG="\033[0;31m ${FILE} must be sourced (not executed as program)"
@@ -16,10 +15,34 @@ if [ -n "${ROOTDIR}" ]; then
   source stop_cocoa.sh
 fi
 
+unset_all () {
+  unset -v ERRORCODE SCRIPTS CACHE CACHE_FILE mode_arg_seen mode INIT END
+  unset -v CORE THEORY ML LIKELIHOOD
+  unset -f init_cache reset_cache save_cache load_cache 
+  unset -f error_cem error_cem_msg unset_all
+}
+
+error_cem_msg () {
+  local FILE="$(basename ${BASH_SOURCE[0]})"
+  local MSG="\033[0;31m\t\t (${FILE}) we cannot run "
+  local MSG2="\033[0m"
+  echo -e "${MSG}${1:?}${MSG2}" 2>"/dev/null"
+}
+
+error_cem () {
+  error_cem_msg "${1:?}"
+  unset_all
+  cd $(pwd -P) 2>"/dev/null"
+  source stop_cocoa 2>"/dev/null"
+  return 1
+}
+
 source start_cocoa.sh || { error_cem "start_cocoa.sh"; return 1; }
 
 # ------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # ----------------- LIST OF SCRIPTS TO COMPILE ---------------------------------
+# ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
 
 declare -a CORE=("compile_core_packages.sh"
@@ -44,10 +67,8 @@ declare -a LIKELIHOOD=("compile_planck.sh"
                        "compile_simons_observatory.sh"
                        "compile_act_dr4.sh"
                        "compile_act_dr6.sh"
-                       
                        "compile_lipop.sh"
-
-                    )
+                      )
 
 declare -a ML=("compile_cosmopower.sh"
                "compile_darkemulator.sh"
@@ -58,6 +79,7 @@ SCRIPTS+=("${CORE[@]}")
 SCRIPTS+=("${THEORY[@]}")
 SCRIPTS+=("${ML[@]}")
 SCRIPTS+=("${LIKELIHOOD[@]}")
+
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
@@ -66,7 +88,7 @@ SCRIPTS+=("${LIKELIHOOD[@]}")
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------                    
-# Below here should not require users input
+# Below here should not require user input
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
@@ -75,28 +97,6 @@ SCRIPTS+=("${LIKELIHOOD[@]}")
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------ 
-
-unset_all () {
-  unset -v ERRORCODE SCRIPTS CORE THEORY ML LIKELIHOOD
-  unset -v CACHE CACHE_FILE mode_arg_seen mode INIT END
-  unset -f init_cache reset_cache save_cache load_cache 
-  unset -f error_cem error_cem_msg
-}
-
-error_cem_msg () {
-  local FILE="$(basename ${BASH_SOURCE[0]})"
-  local MSG="\033[0;31m\t\t (${FILE}) we cannot run "
-  local MSG2="\033[0m"
-  echo -e "${MSG}${1:?}${MSG2}" 2>"/dev/null"
-}
-
-error_cem () {
-  error_cem_msg "${1:?}"
-  unset_all
-  cd $(pwd -P) 2>"/dev/null"
-  source stop_cocoa 2>"/dev/null"
-  return 1
-}
 
 # ------------------------------------------------------------------------------
 # --------------------------- CHOOSE RUN MODES ---------------------------------
@@ -197,16 +197,16 @@ case "$mode" in
     done
     ;;
   hard)
-    # FORCE RECOMPILE THEORY + CORE
-    INIT=0
-    END=$(( ${#THEORY[@]} + ${#CORE[@]} ))
+    # FORCE RECOMPILE THEORY + ML
+    INIT=${#CORE[@]}
+    END=$(( ${#THEORY[@]} + ${#CORE[@]} + ${#ML[@]} ))
     for (( i=$INIT; i<$END; i++ ));
     do
       CACHE[i]=0
     done
     ;;
   aggressive)
-    # FORCE RECOMPILE THEORY + CORE + ML
+    # FORCE RECOMPILE THEORY + ML
     INIT=0
     END=$(( ${#THEORY[@]} + ${#CORE[@]} + ${#ML[@]} ))
     for (( i=$INIT; i<$END; i++ ));
@@ -214,8 +214,8 @@ case "$mode" in
       CACHE[i]=0
     done
     ;;
-  purge)
-    # FORCE RECOMPILE OF ALL CODE
+  extreme)
+    # FORCE RECOMPILE OF THEORY + CORE + ML + LIKELIHOOD
     INIT=0
     END=${#SCRIPTS[@]}
     for (( i=$INIT; i<$END; i++ ));
