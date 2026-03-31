@@ -150,7 +150,7 @@ When rerunning `setup_cocoa.sh`, Cocoa will not redownload previously installed 
 > - --hard: force new download of `THEORY`, `ML`, and `LIKELIHOOD` blocks of scripts
 > - --aggressive: force new download of `THEORY`, `ML`, `LIKELIHOOD`, and CORE blocks of scripts
 > - --extreme: force new download of `THEORY`, `ML`, `LIKELIHOOD`, `CORE`, and `DATA` blocks of scripts
-> - --purge: force new download of all packages (beware: users may lose uncommitted code on project repos)
+> - --purge: force new download of all packages (beware for the loss of uncommitted work)
 >
 > 
 > [!NOTE]
