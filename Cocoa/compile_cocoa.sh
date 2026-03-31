@@ -15,11 +15,11 @@ if [ -n "${ROOTDIR}" ]; then
   source stop_cocoa.sh
 fi
 
-unset_all () {
+unset_all_cem () {
   unset -v ERRORCODE SCRIPTS CACHE CACHE_FILE mode_arg_seen mode INIT END
   unset -v CORE THEORY ML LIKELIHOOD
   unset -f init_cache reset_cache save_cache load_cache 
-  unset -f error_cem error_cem_msg unset_all
+  unset -f error_cem error_cem_msg unset_all_cem
 }
 
 error_cem_msg () {
@@ -31,7 +31,7 @@ error_cem_msg () {
 
 error_cem () {
   error_cem_msg "${1:?}"
-  unset_all
+  unset_all_cem
   cd $(pwd -P) 2>"/dev/null"
   source stop_cocoa 2>"/dev/null"
   return 1
@@ -293,7 +293,7 @@ if [ ${ERRORCODE:?} -ne 0 ]; then
   return 1
 fi
 
-unset_all
+unset_all_cem
 pbottom2 "COMPILING EXTERNAL MODULES" || return 1
 source stop_cocoa.sh
 
