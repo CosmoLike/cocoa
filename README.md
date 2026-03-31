@@ -11,20 +11,22 @@
 6. [Creating Cosmolike projects (external readme)](Cocoa/projects/)
 7. [Credits](#appendix_proper_credits)
 8. [Appendix](#appendix)
-    1. [FAQ: How can users debug Cocoa? Suggested steps](#running_wrong)
-    2. [FAQ: How can users compile external modules (not involving Cosmolike)?](#appendix_compile_separately)
-    3. [FAQ: How can users install Cosmolike projects?](#appendix_compile_cosmolike_separately)
-    4. [FAQ: How can users run Cocoa with Docker?](#appendix_jupyter_whovian)
-    5. [FAQ: How can users run Cocoa on Google Colab?](#overview_google_colab)
-    6. [FAQ: How can users install Conda?](#overview_miniforge)
-    7. [FAQ: How can users set the appropriate environment for ML?](#ml_emulators)
-    8. [FAQ: How can developers push changes to the Cocoa main branch?](#push_main)
-    9. [FAQ: How can developers develop from a Git tag?](#dev_from_tag)
-   10. [FAQ: How can users download additional likelihood data? (external readme)](Cocoa/external_modules/data)
-   11. [FAQ: Where do users find common FAQs about external modules? (external readme)](Cocoa/external_modules/code)
-   12. [FAQ: Where do users find common FAQs about Cosmolike? (external readme)](Cocoa/projects/)
-   13. [FAQ: Note on Planck-2018 low-ell SimAll EE and Gibbs TT likelihoods?](#planck2018lowell)
-   14. [FAQ: How can users improve our Bash/C/C++ knowledge?](#lectnotes)
+    1. [FAQ: How can users install conda env via conda-lock?](#install_conda_env_condalock)
+    2. [FAQ: How can users deal with Conda conflicts (MacOS): a possible solution](#macos_solve_conda_conficts)
+    3. [FAQ: How can users debug Cocoa? Suggested steps](#running_wrong)
+    4. [FAQ: How can users compile external modules (not involving Cosmolike)?](#appendix_compile_separately)
+    5. [FAQ: How can users install Cosmolike projects?](#appendix_compile_cosmolike_separately)
+    6. [FAQ: How can users run Cocoa with Docker?](#appendix_jupyter_whovian)
+    7. [FAQ: How can users run Cocoa on Google Colab?](#overview_google_colab)
+    8. [FAQ: How can users install Conda?](#overview_miniforge)
+    9. [FAQ: How can users set the appropriate environment for ML?](#ml_emulators)
+    10. [FAQ: How can developers push changes to the Cocoa main branch?](#push_main)
+    11. [FAQ: How can developers develop from a Git tag?](#dev_from_tag)
+   12. [FAQ: How can users download additional likelihood data? (external readme)](Cocoa/external_modules/data)
+   13. [FAQ: Where do users find common FAQs about external modules? (external readme)](Cocoa/external_modules/code)
+   14. [FAQ: Where do users find common FAQs about Cosmolike? (external readme)](Cocoa/projects/)
+   15. [FAQ: Note on Planck-2018 low-ell SimAll EE and Gibbs TT likelihoods?](#planck2018lowell)
+   16. [FAQ: How can users improve our Bash/C/C++ knowledge?](#lectnotes)
 
 # Overview <a name="overview"></a>
 
@@ -98,71 +100,13 @@ and activate it
 
 Users can now proceed to the **next section**.
 
-> [!Note]
-> During the Arizona Winter School (January 2026), we noted that some students with macOS struggled to get the conda to work (conflicts). 
-> If this is the case for you, try the steps below instead
->
-> **Step :one:** Create a new base environment, as your base may have legacy packages that can create incompatibilities (note here slightly modified conda command)
-> 
->     conda create --solver=libmamba --strict-channel-priority --override-channels -c conda-forge --name base2
->
-> and
->
->     conda activate base2
->
->
-> Now install wget and download a looser version of the yml file (note here slightly modified conda command)
->
->     conda install -y wget --solver=libmamba --strict-channel-priority --override-channels -c conda-forge
->
-> and
->
->     wget https://raw.githubusercontent.com/CosmoLike/cocoa/refs/heads/dev/cocoapy310-osxarm-loose.yml
->
-> **Step :two:** Create the cocoa conda env using a looser yml ((note here slightly modified conda command)
->    
->     conda env create --solver=libmamba --name cocoa -f cocoapy310-osxarm-loose.yml
-> 
-
-> [!Warning]
-We advise users to avoid repositories managed by `Anaconda` due to licensing restrictions. See the Appendix [FAQ: How can we install Conda?](#overview_miniforge)
+> [!TIP]
+> We advise users to avoid repositories managed by `Anaconda` due to licensing restrictions. See the Appendix [FAQ: How can we install Conda?](#overview_miniforge)
 > for instructions on how to install `Miniforge`, which is a  minimal installer of conda that downloads default packages from the `conda-forge` community-driven channel.
 
-> [!Tip]
-> We advise users to maintain *exact reproducibility* (across time) of the Cocoa conda environment by installing it via `conda-lock`,
-> following the slightly more convoluted instructions below.
-> 
-> **Step :one:** Install the package `conda-lock` in a private conda environment to avoid conflicts.
-> 
->     conda create -n lockenv -c conda-forge python=3.10 conda-lock=2.* wget
->
-> and
-> 
->     conda activate lockenv
->
-> **Step :two:** Download the file appropriate conda-lock compatible `yml` file.
->   - Linux
->     
->         wget https://raw.githubusercontent.com/CosmoLike/cocoa/refs/heads/dev/cocoapy310-linux.yml
->
->   - macOS (arm)
->     
->         wget https://raw.githubusercontent.com/CosmoLike/cocoa/refs/heads/dev/cocoapy310-osxarm.yml
->
-> **Step :three:** Create the conda environment
->   - Linux
->     
->         conda-lock install -n cocoa cocoapy310-linux.yml
->
->   - macOS (arm)
->
->         conda-lock install -n cocoa cocoapy310-osxarm.yml   
->
->  and activate it
->
->     conda activate cocoa
->
-> Finally, proceed to **step :three:** in the general installation instructions. 
+> [!TIP]
+> During the Arizona Winter School (January 2026), we noted that some students with macOS struggled to get the conda to work (conflicts). 
+> If this is the case for you, try the steps in the appendix [FAQ: How can users deal with Conda conflicts (MacOS): a possible solution](#macos_solve_conda_conficts)
 
 # Installation and Compilation of external modules <a name="cobaya_base_code"></a>
 
@@ -186,7 +130,9 @@ and
         
     source setup_cocoa.sh
 
-This script downloads and decompresses external modules, requiring internet access. Therefore, users cannot run this script on an interactive compute node in an HPC environment where only the cluster login node can access the web.
+This script downloads and decompresses external modules, requiring internet access (on a HPC, this typically means running `setup_cocoa.sh` on the login node).
+
+Cocoa does not install all the available external modules by default. If the user needs additional packages, please refer to the appendix [FAQ: How can users compile external modules?](#appendix_compile_separately).
 
 **Step :three:**: Run the script `compile_cocoa.sh` by typing 
 
@@ -196,37 +142,45 @@ This script compiles external modules selected for installation on `set_installa
 
 Users can now proceed to **the next section**.
 
-> [!TIP]
-> Users who want to develop from a release version (e.g., `v4.0-beta20`) should read the appendix [FAQ: How can we push changes to the Cocoa main branch?](#push_main)
-
-> [!TIP]
-> Cocoa does not install all the available external modules by default. If the user needs additional packages, please refer to the appendix [FAQ: How can we compile external modules?](#appendix_compile_separately).
+> [!NOTE]
+When rerunning `setup_cocoa.sh`, Cocoa will not redownload previously installed packages. 
+> To force this behavior, use `--soft`, `--hard`, `--aggressive`, `--extreme`, or `--purge` flags.
+>
+> - --soft: force new download of the `THEORY` and `ML` script blocks
+> - --hard: force new download of `THEORY`, `ML`, and `LIKELIHOOD` script blocks
+> - --aggressive: force new download of `THEORY`, `ML`, `LIKELIHOOD`, and CORE script blocks
+> - --extreme: force new download of `THEORY`, `ML`, `LIKELIHOOD`, `CORE`, and `DATA` script blocks
+> - --purge: force new download of all packages (beware of the loss of uncommitted work)
+>
 
 > [!NOTE]
-> In case users need to rerun `setup_cocoa.sh`, Cocoa will not download previously installed packages, cosmolike projects, or large datasets, unless the following keys are set on `set_installation_options.sh`
+When rerunning `compile_cocoa.sh`, Cocoa will not recompile previously compiled packages, except for cosmolike projects. 
+> To force this behavior, use `--soft`, `--hard`, `--aggressive`, `--extreme` flags. 
 >
->     [Adapted from Cocoa/set_installation_options.sh shell script]
->     # ------------------------------------------------------------------------------
->     # OVERWRITE_EXISTING_XXX_CODE=1 -> setup_cocoa overwrites existing PACKAGES ----
->     # overwrite: delete the existing PACKAGE folder and install it again -----------
->     # redownload: delete the compressed file and download data again ---------------
->     # These keys are only relevant if you run setup_cocoa multiple times -----------
->     # ------------------------------------------------------------------------------
->     (...)
->     export OVERWRITE_EXISTING_ALL_PACKAGES=1    # except cosmolike projects
->     #export OVERWRITE_EXISTING_COSMOLIKE_CODE=1 # dangerous (possible loss of uncommitted work)
->                                                 # if unset, users must manually delete cosmolike projects
->     #export REDOWNLOAD_EXISTING_ALL_DATA=1      # warning: some data is many GB
-
+> - --soft: recompile `THEORY` script block. 
+> - --hard: recompile `THEORY` and `ML` script blocks.
+> - --aggressive: recompile `THEORY`, `ML`, and `CORE` script blocks.
+> - --extreme: recompile `THEORY`, `ML`, `CORE`, and `LIKELIHOOD` script blocks.
+>
+ 
 # Running Examples  <a name="cobaya_base_code_examples"></a>
 
-We assume that you are still in the Conda cocoa environment from the previous `conda activate cocoa` command, and that users switch to bash, and that you are in the cocoa main folder `cocoa/Cocoa`, 
+We assume that users are still in the Conda cocoa environment from the previous `conda activate cocoa` command, and that users switch to bash, and that you are in the cocoa main folder `cocoa/Cocoa`.
 
  **Step :one:**: Activate the private Python environment by sourcing the script `start_cocoa.sh`
 
     source start_cocoa.sh
 
 Users will see a terminal like this: `$(cocoa)(.local)`. *This is a feature, not a bug*!
+
+> [!NOTE]
+> *This is a feature, not a bug*! Why did we choose to work with two distinct shell environments, `(cocoa)` and `(.local)`? Our scripts enable users to work on multiple Cocoa instances, similar to what was possible with [CosmoMC](https://github.com/cmbant/CosmoMC). In each instance, our scripts install packages at
+>
+>      Cocoa/.local/bin
+>      Cocoa/.local/include
+>      Cocoa/.local/lib
+>      Cocoa/.local/share
+>
 
  **Step :two:**: Select the number of OpenMP cores (below, we set it to 8).
 
@@ -270,6 +224,8 @@ Users will see a terminal like this: `$(cocoa)(.local)`. *This is a feature, not
 
 ## Examples involving Cosmolike
 
+Cocoa provides several Cosmolike projects, not all of which are installed by default. To activate them, please refer to the appendix [FAQ: How can users compile external modules?](#appendix_compile_separately).
+
  **Step :three:**: The folder `projects/lsst_y1` contains a dozen examples involving different combinations of two-point correlation functions. So, run the `cobaya-run` on the first example following the commands below.
 
 - **One model evaluation**:
@@ -297,42 +253,31 @@ Users will see a terminal like this: `$(cocoa)(.local)`. *This is a feature, not
   - macOS (arm)
 
         mpirun -n 4 --oversubscribe cobaya-run ./projects/lsst_y1/EXAMPLE_MCMC1.yaml -f
-     
-> [!Tip]
-> Cocoa provides several Cosmolike projects, not all of which are installed by default. To activate them, please take a look at the appendix [FAQ: How can we compile external modules?](#appendix_compile_separately).
 
-> [!TIP]
-> Assuming Cocoa is installed on a local (not remote!) machine, type the command below after step 2️⃣ to run Jupyter Notebooks.
->
->     jupyter notebook --no-browser --port=8888
->
-> The terminal will then show a message similar to the following template:
->
->     (...)
->     [... NotebookApp] Jupyter Notebook 6.1.1 is running at:
->     [... NotebookApp] http://f0a13949f6b5:8888/?token=XXX
->     [... NotebookApp] or http://127.0.0.1:8888/?token=XXX
->     [... NotebookApp] Use Control-C to stop this server and shut down all kernels (twice to skip confirmation).
->
-> Now go to the local internet browser and type `http://127.0.0.1:8888/?token=XXX`, where XXX is the previously saved token displayed on the line
-> 
->     [... NotebookApp] or http://127.0.0.1:8888/?token=XXX
->
-> The project `lsst-y1` contains Jupyter notebook examples located at `projects/lsst_y1`.
+### Running Jupyter Notebooks
 
-> [!NOTE]
-> Why did we choose to work with two distinct shell environments, `(cocoa)` and `(.local)`? Our scripts enable users to work on multiple Cocoa instances, similar to what was possible with [CosmoMC](https://github.com/cmbant/CosmoMC). In each instance, our scripts install packages at
->
->      Cocoa/.local/bin
->      Cocoa/.local/include
->      Cocoa/.local/lib
->      Cocoa/.local/share
->
-> Consistency of the environment across all Cocoa instances is crucial, and the `start_cocoa.sh`/`stop_cocoa.sh` scripts handle the loading and unloading of environmental path variables. 
+Assuming Cocoa is installed on a local (not remote!) machine, type the command below after step 2️⃣ to run Jupyter Notebooks.
+
+     jupyter notebook --no-browser --port=8888
+
+ The terminal will then show a message similar to the following template:
+
+     (...)
+     [... NotebookApp] Jupyter Notebook 6.1.1 is running at:
+     [... NotebookApp] http://f0a13949f6b5:8888/?token=XXX
+     [... NotebookApp] or http://127.0.0.1:8888/?token=XXX
+     [... NotebookApp] Use Control-C to stop this server and shut down all kernels (twice to skip confirmation).
+
+ Now go to the local internet browser and type `http://127.0.0.1:8888/?token=XXX`, where XXX is the previously saved token displayed on the line
+ 
+     [... NotebookApp] or http://127.0.0.1:8888/?token=XXX
+
+ The project `lsst-y1` contains Jupyter notebook examples located at `projects/lsst_y1`.
+
 
 # Running ML emulators <a name="cobaya_base_code_examples_emul"></a>
 
-Cocoa contains a few transformer- and CNN-based neural network emulators capable of simulating the CMB, cosmolike outputs, matter power spectrum, and distances. We provide a few scripts that exemplify their API. To run them, users ensure the following lines are commented out in `set_installation_options.sh` before running the `setup_cocoa.sh` and `compile_cocoa.sh`. By default, these lines should be commented out, but it is worth checking.
+Cocoa contains a few transformer- and CNN-based neural network emulators capable of simulating the CMB, cosmolike outputs, matter power spectrum, and distances. We provide a few scripts that exemplify their API. To run them, users ensure the following lines are commented out in `set_installation_options.sh` before running the `setup_cocoa.sh` and `compile_cocoa.sh`. *By default, these lines should be commented out, but it is worth checking*.
 
       [Adapted from Cocoa/set_installation_options.sh shell script] 
       # insert the # symbol (i.e., unset these environmental keys  on `set_installation_options.sh`)
@@ -347,22 +292,10 @@ Cocoa contains a few transformer- and CNN-based neural network emulators capable
       #export IGNORE_GETDIST_CODE=1              # to run EXAMPLE_TENSION_METRICS.ipynb
       #export IGNORE_TENSIOMETER_CODE=1          # to run EXAMPLE_TENSION_METRICS.ipynb
           
+> [!TIP]
+> We provide a few SLURM job script examples in the `projects/example/script` folder that help users to run the examples below on an HPC system.
 
 Now, users must follow all the steps below.
-
-> [!Note]
-> We provide SLURM job script examples in the `projects/example/script` folder, which allow users to run the examples below in an HPC environment.
-
-> [!Note]
-> What if users have not configured ML-related keys before sourcing `setup_cocoa.sh`?
-> 
-> Answer: Comment the keys below before rerunning `setup_cocoa.sh`.
-> 
->     [Adapted from Cocoa/set_installation_options.sh shell script]
->     # These keys are only relevant if you run setup_cocoa multiple times
->     #export OVERWRITE_EXISTING_ALL_PACKAGES=1    
->     #export OVERWRITE_EXISTING_COSMOLIKE_CODE=1 
->     #export REDOWNLOAD_EXISTING_ALL_DATA=1
 
  **Step :one:**: Activate the private Python environment by sourcing the script `start_cocoa.sh`
 
@@ -612,6 +545,7 @@ likelihoods, and the theory code, all following Cobaya Conventions.
 <img width="790" height="333" alt="Unknown" src="https://github.com/user-attachments/assets/b5ef808e-0efa-4bb9-852a-854f6531e3ed" />
 </p>
 
+
 ## Credits <a name="appendix_proper_credits"></a>
 
 - **Acknowledgments**:
@@ -644,6 +578,65 @@ Following best practices, Cocoa scripts download most external modules from thei
 
 # Appendix <a name="appendix"></a>
 
+## :interrobang: FAQ: How can users install conda env via conda-lock? <a name="install_conda_env_condalock"></a>
+
+We advise users to maintain *exact reproducibility* (across time) of the Cocoa conda environment by installing it via `conda-lock`, following the slightly more convoluted instructions below.
+
+**Step :one:** Install the package `conda-lock` in a private conda environment to avoid conflicts.
+ 
+     conda create -n lockenv -c conda-forge python=3.10 conda-lock=2.* wget
+
+and
+ 
+     conda activate lockenv
+
+**Step :two:** Download the file appropriate conda-lock compatible `yml` file.
+   - Linux
+  
+         wget https://raw.githubusercontent.com/CosmoLike/cocoa/refs/heads/dev/cocoapy310-linux.yml
+
+   - macOS (arm)
+     
+         wget https://raw.githubusercontent.com/CosmoLike/cocoa/refs/heads/dev/cocoapy310-osxarm.yml
+
+**Step :three:** Create the conda environment
+   - Linux
+     
+         conda-lock install -n cocoa cocoapy310-linux.yml
+
+   - macOS (arm)
+
+         conda-lock install -n cocoa cocoapy310-osxarm.yml   
+
+  and activate it
+
+     conda activate cocoa
+
+## :interrobang: FAQ: How can users deal with Conda conflicts (MacOS): a possible solution <a name="macos_solve_conda_conficts"></a>
+
+During the Arizona Winter School (January 2026), we noted that some students with macOS struggled to get Conda to work (conflicts). If this is the case for you, try the steps below instead
+
+**Step :one:** Create a new base environment, as your base may have legacy packages that can create incompatibilities (note here slightly modified conda command)
+ 
+     conda create --solver=libmamba --strict-channel-priority --override-channels -c conda-forge --name base2
+
+and
+
+     conda activate base2
+
+**Step :two:** Now install wget and download a looser version of the yml file (note here slightly modified conda command)
+
+     conda install -y wget --solver=libmamba --strict-channel-priority --override-channels -c conda-forge
+
+and
+
+     wget https://raw.githubusercontent.com/CosmoLike/cocoa/refs/heads/dev/cocoapy310-osxarm-loose.yml
+
+**Step :three:** Create the cocoa conda env using a looser yml ((note here slightly modified conda command)
+    
+    conda env create --solver=libmamba --name cocoa -f cocoapy310-osxarm-loose.yml
+
+
 ## :interrobang: FAQ: How can users debug Cocoa? Suggested steps <a name="running_wrong"></a>
 
 **Step :one:**: define the `COCOA_OUTPUT_VERBOSE` and `COSMOLIKE_DEBUG_MODE` flags on `set_installation_options.sh` to obtain a more detailed output, as shown below (for even more output, define `COCOA_OUTPUT_DEBUG` as well)
@@ -669,7 +662,8 @@ Following best practices, Cocoa scripts download most external modules from thei
 
 ## :interrobang: FAQ: How can users compile external modules (not involving Cosmolike)? <a name="appendix_compile_separately"></a>
 
-To avoid excessive compilation or download times during development, users may run scripts located at `Cocoa/installation_scripts/` directly to download and compile only specific modules (or datasets). To take full advantage of them, users must first unset the appropriate keys on `set_installation_options.sh`, as exemplified below.
+To setup and compile a single module, users may run scripts located at `Cocoa/installation_scripts/` directly.  
+To take full advantage of them, users must first unset the appropriate keys on `set_installation_options.sh`, as exemplified below.
 
      [Adapted from Cocoa/set_installation_options.sh shell script]
      # ------------------------------------------------------------------------------
@@ -685,7 +679,7 @@ To avoid excessive compilation or download times during development, users may r
      #export IGNORE_SIMONS_OBSERVATORY_LIKELIHOOD_CODE=1     # SO likelihood code
      (...)
      #export IGNORE_ACTDR6_CODE=1                            # ACT-DR6 likelihood code
-9(
+
 Whenever users edit `set_installation_options.sh`, they must reload the Cocoa private environment (.local) by sourcing `start_cocoa.sh` (even if (.local) is already active). To do that, follow the commands below.
 
      cd ./cocoa/Cocoa

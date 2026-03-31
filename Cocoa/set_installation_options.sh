@@ -23,7 +23,7 @@ esac
 # ------------------------------------------------------------------------------
 # VERBOSE AS DEBUG TOOL --------------------------------------------------------
 # ------------------------------------------------------------------------------
-export COCOA_OUTPUT_VERBOSE=1
+#export COCOA_OUTPUT_VERBOSE=1
 #export COCOA_OUTPUT_DEBUG=1 # turn on bash strict mode (set -exo pipefail) on  
                              # instalation_scripts/setup/compile_x.sh scripts 
 # ------------------------------------------------------------------------------
@@ -97,21 +97,6 @@ export IGNORE_COSMOLIKE_DESXPLANCK_CODE=1
 # ------------------------------------------------------------------------------
 #export INSTALL_PRIVATE_AXIONS_PROJECT=1
 
-# ------------------------------------------------------------------------------
-# OVERWRITE_EXISTING_XXX_CODE=1 -> setup_cocoa overwrites existing PACKAGES ----
-# overwrite: delete the existing PACKAGE folder and install it again -----------
-# redownload: delete the compressed file and download data again ---------------
-# These keys are only relevant if you run setup_cocoa multiple times -----------
-# ------------------------------------------------------------------------------
-export OVERWRITE_EXISTING_ALL_PACKAGES=1    # except cosmolike projects
-#export OVERWRITE_EXISTING_COSMOLIKE_CODE=1 # dangerous (possible loss of uncommitted work)
-                                            # if unset, users must manually delete
-                                            # project if wants setup_cocoa to reclone it
-#export REDOWNLOAD_EXISTING_ALL_DATA=1      # warning: some data is many GB
-
-#export OVERWRITE_EXISTING_PRIVATE_CODE=1   # dangerous (possible loss of uncommitted work)
-                                            # if unset, users must manually delete
-                                            # project if wants setup_cocoa to reclone it
 # ------------------------------------------------------------------------------
 # If set, compile_planck.sh uses click like code from github.com/benabed/clik
 # ------------------------------------------------------------------------------
