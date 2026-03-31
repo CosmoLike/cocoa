@@ -134,6 +134,17 @@ This script downloads and decompresses external modules, requiring internet acce
 
 Cocoa does not install all the available external modules by default. If the user needs additional packages, please refer to the appendix [FAQ: How can users compile external modules?](#appendix_compile_separately).
 
+> [!NOTE]
+When rerunning `setup_cocoa.sh`, Cocoa will not redownload previously installed packages. 
+> To force this behavior, rerun `setup_cocoa.sh` with either `--soft`, `--hard`, `--aggressive`, `--extreme` or `--purge` flags, as explained below. 
+>
+> - --soft: force new download of the `THEORY` and `ML` script blocks
+> - --hard: force new download of `THEORY`, `ML`, and `LIKELIHOOD` blocks of scripts
+> - --aggressive: force new download of `THEORY`, `ML`, `LIKELIHOOD`, and CORE blocks of scripts
+> - --extreme: force new download of `THEORY`, `ML`, `LIKELIHOOD`, `CORE`, and `DATA` blocks of scripts
+> - --purge: force new download of all packages (beware: users may lose uncommitted code on project repos)
+>
+
 **Step :three:**: Run the script `compile_cocoa.sh` by typing 
 
     source compile_cocoa.sh
@@ -142,14 +153,14 @@ This script compiles external modules selected for installation on `set_installa
 
 Users can now proceed to **the next section**.
 
-> [!TIP]
-When rerunning `setup_cocoa.sh`, Cocoa will not redownload previously installed packages. 
-> To force this behavior, rerun `setup_cocoa.sh` with either `--soft`, `--hard`, `--aggressive` or `--purge` flags, as explained below. 
+> [!NOTE]
+When rerunning `compile_cocoa.sh`, Cocoa will not recompile previously compiled packages, except for cosmolike projects. 
+> To force this behavior, rerun `compile_cocoa.sh` with either `--soft`, `--hard`, `--aggressive`, `--extreme` flags, as explained below. 
 >
->      --soft = erase current copy and force download of all packages except for: (1) pip packages, (2) a few core libraries, (3) cobaya, (4) large data products, (5) cosmolike_core and project repos
->      --hard = erase current copy and force download of all packages for: (1) cobaya, (2) large data products, (3) cosmolike_core and project repos
->      --aggressive = erase current copy and force download  all packages except for: (3) cosmolike_core and project repos
->      --purge = erase current copy and force download of all packages (beware: users may lose uncommitted code on project repos)
+> - --soft: recompile `THEORY` block of scripts. 
+> - --hard: recompile `THEORY` and `ML` blocks of scripts.
+> - --aggressive: recompile `THEORY`, `ML`, and `CORE` blocks of scripts.
+> - --extreme: recompile `THEORY`, `ML`, `CORE`, and `LIKELIHOOD` blocks of scripts.
 >
  
 # Running Examples  <a name="cobaya_base_code_examples"></a>
