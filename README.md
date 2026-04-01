@@ -147,20 +147,20 @@ Users can now proceed to **the next section**.
 When rerunning `setup_cocoa.sh`, Cocoa will not redownload previously installed packages. 
 > To force this behavior, use `--soft`, `--hard`, `--aggressive`, `--extreme`, or `--purge` flags.
 >
-> - --soft: force new download of the `THEORY` and `ML` script blocks
-> - --hard: force new download of `THEORY`, `ML`, and `LIKELIHOOD` script blocks
-> - --aggressive: force new download of `THEORY`, `ML`, `LIKELIHOOD`, and CORE script blocks
-> - --extreme: force new download of `THEORY`, `ML`, `LIKELIHOOD`, `CORE`, and `DATA` script blocks
-> - --purge: force new download of all packages (beware of the loss of uncommitted work)
+> - --soft: force new download of the `THEORY` and `ML` script blocks (it spares `cosmolike_core` and all projects)
+> - --hard: force new download of `THEORY`, `ML`, and `LIKELIHOOD` script blocks (it spares `cosmolike_core` and all projects)
+> - --aggressive: force new download of `THEORY`, `ML`, `LIKELIHOOD`, and CORE script blocks (it spares `cosmolike_core` and all projects)
+> - --extreme: force new download of `THEORY`, `ML`, `LIKELIHOOD`, `CORE`, and `DATA` script blocks (it spares `cosmolike_core` and all projects)
+> - --purge: force new download of all packages (beware of the loss of uncommitted work associted with `cosmolike_core` and all projects)
 >
 
 > [!NOTE]
 When rerunning `compile_cocoa.sh`, Cocoa will not recompile previously compiled packages, except for cosmolike projects. 
 > To force this behavior, use `--soft`, `--hard`, `--aggressive`, `--extreme` flags. 
 >
-> - --soft: recompile `THEORY`, `ML` script blocks. 
-> - --hard: recompile `THEORY`, `ML` and `LIKELIHOOD` script blocks.
-> - --aggressive: recompile `THEORY`, `ML`, `LIKELIHOOD`, and `CORE` script blocks.
+> - --soft: recompile `THEORY`, `ML` script blocks and all `Cosmolike Projects`. 
+> - --hard: recompile `THEORY`, `ML` and `LIKELIHOOD` script blocks and all `Cosmolike Projects`.
+> - --aggressive: recompile `THEORY`, `ML`, `LIKELIHOOD`, and `CORE` script blocks and all `Cosmolike Projects`.
 >
  
 # Running Examples  <a name="cobaya_base_code_examples"></a>
