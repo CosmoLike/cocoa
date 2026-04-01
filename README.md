@@ -158,10 +158,9 @@ When rerunning `setup_cocoa.sh`, Cocoa will not redownload previously installed 
 When rerunning `compile_cocoa.sh`, Cocoa will not recompile previously compiled packages, except for cosmolike projects. 
 > To force this behavior, use `--soft`, `--hard`, `--aggressive`, `--extreme` flags. 
 >
-> - --soft: recompile `THEORY` script block. 
-> - --hard: recompile `THEORY` and `ML` script blocks.
-> - --aggressive: recompile `THEORY`, `ML`, and `CORE` script blocks.
-> - --extreme: recompile `THEORY`, `ML`, `CORE`, and `LIKELIHOOD` script blocks.
+> - --soft: recompile `THEORY`, `ML` script blocks. 
+> - --hard: recompile `THEORY`, `ML` and `LIKELIHOOD` script blocks.
+> - --aggressive: recompile `THEORY`, `ML`, `LIKELIHOOD`, and `CORE` script blocks.
 >
  
 # Running Examples  <a name="cobaya_base_code_examples"></a>
