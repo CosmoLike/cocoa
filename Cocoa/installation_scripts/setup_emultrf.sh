@@ -97,8 +97,8 @@ if [ ! -d "${PACKDIR:?}" ]; then
 
   cdfolder "${PACKDIR:?}" || { unset_all; return 1; }
 
-  if [[ -n "${EMULTRF_GIT_COMMIT:-}" || 
-        -n "${EMULTRF_GIT_BRANCH:-}" || 
+  if [[ -n "${EMULTRF_GIT_COMMIT:-}" ||
+        -n "${EMULTRF_GIT_BRANCH:-}" ||
         -n "${EMULTRF_GIT_TAG:-}" ]]; then
     if [ "$("${GIT:?}" rev-parse --is-shallow-repository)" = "true" ]; then
       "${GIT:?}" fetch --unshallow --all --tags --prune \

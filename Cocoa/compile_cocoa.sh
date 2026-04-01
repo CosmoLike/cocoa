@@ -46,11 +46,11 @@ source start_cocoa.sh || { error_cem "start_cocoa.sh"; return 1; }
 # ------------------------------------------------------------------------------
 
 declare -a CORE=("compile_core_packages.sh"
-                 "compile_getdist.sh"
-                 "compile_derivkit.sh"
                  "compile_polychord.sh"
                  "compile_nautilus_sampler.sh"
                  "compile_tensiometer.sh"
+                 "compile_getdist.sh"
+                 "compile_derivkit.sh"
                  "compile_ee2.sh" 
                 )
 
@@ -62,17 +62,18 @@ declare -a THEORY=("compile_hyrec2.sh"
                    "compile_velocileptors.sh"
                   )
 
-declare -a LIKELIHOOD=("compile_planck.sh"
-                       "compile_fgspectra.sh"
-                       "compile_simons_observatory.sh"
-                       "compile_act_dr4.sh"
-                       "compile_act_dr6.sh"
-                       "compile_lipop.sh"
-                      )
-
 declare -a ML=("compile_cosmopower.sh"
                "compile_darkemulator.sh"
               )
+
+declare -a LIKELIHOOD=("compile_planck.sh"
+                       "compile_fgspectra.sh"
+                       "compile_simons_observatory.sh"
+                       "compile_lipop.sh"
+                       "compile_act_dr4.sh"
+                       "compile_act_dr6.sh"
+                      )
+
 
 declare -a SCRIPTS=()
 SCRIPTS+=("${CORE[@]}")
@@ -188,36 +189,27 @@ init_cache
 case "$mode" in
   default) ;;
   soft)
-    # FORCE RECOMPILE THEORY
+    # FORCE RECOMPILE THEORY + ML
     INIT=${#CORE[@]}
-    END=$(( ${#CORE[@]} + ${#THEORY[@]} ))
+    END=$(( ${#CORE[@]} + ${#THEORY[@]} + ${#ML[@]} ))
     for (( i=$INIT; i<$END; i++ ));
     do
       CACHE[i]=0
     done
     ;;
   hard)
-    # FORCE RECOMPILE THEORY + ML
+    # FORCE RECOMPILE THEORY + ML + LIKELIHOOD
     INIT=${#CORE[@]}
-    END=$(( ${#THEORY[@]} + ${#CORE[@]} + ${#ML[@]} ))
+    END=$(( ${#THEORY[@]} + ${#CORE[@]} + ${#ML[@]} + ${#LIKELIHOOD[@]} ))
     for (( i=$INIT; i<$END; i++ ));
     do
       CACHE[i]=0
     done
     ;;
   aggressive)
-    # FORCE RECOMPILE THEORY + CORE + ML
+    # FORCE RECOMPILE THEORY + CORE + ML + LIKELIHOOD
     INIT=0
-    END=$(( ${#THEORY[@]} + ${#CORE[@]} + ${#ML[@]} ))
-    for (( i=$INIT; i<$END; i++ ));
-    do
-      CACHE[i]=0
-    done
-    ;;
-  extreme)
-    # FORCE RECOMPILE OF THEORY + CORE + ML + LIKELIHOOD
-    INIT=0
-    END=${#SCRIPTS[@]}
+    END=$(( ${#THEORY[@]} + ${#CORE[@]} + ${#ML[@]} + ${#LIKELIHOOD[@]} ))
     for (( i=$INIT; i<$END; i++ ));
     do
       CACHE[i]=0

@@ -71,6 +71,7 @@ declare -a CORE=("setup_core_packages.sh"
                  "setup_derivkit.sh"
                  "setup_ee2.sh"
                 )
+
 declare -a THEORY=("setup_hyrec2.sh"
                    "setup_cosmorec.sh"
                    "setup_camb.sh"
@@ -78,16 +79,19 @@ declare -a THEORY=("setup_hyrec2.sh"
                    "setup_class.sh"
                    "setup_velocileptors.sh"
                   )
+
 declare -a ML=("setup_cosmopower.sh"
                "setup_emultrf.sh"
                "setup_darkemulator.sh"
               )
+
 declare -a LIKELIHOOD=("setup_fgspectra.sh"
                        "setup_simons_observatory.sh"
                        "setup_lipop.sh"
                        "setup_act_dr4.sh"
                        "setup_act_dr6.sh"
                       )
+
 declare -a DATA=("unxv_core_packages.sh"  
                  "unxv_sn.sh"
                  "unxv_bao.sh"
@@ -102,6 +106,7 @@ declare -a DATA=("unxv_core_packages.sh"
                  "unxv_emultrf.sh"
                  "unxv_cosmopower.sh"
                 )
+
 declare -a COSMOLIKE=("setup_cosmolike.sh"
                       "setup_private_projects.sh"
                       "setup_cosmolike_projects.sh"
@@ -263,7 +268,7 @@ case "$mode" in
   aggressive)
     # FORCE DOWNLOAD OF CORE + THEORY + ML + LIKELIHOOD
     INIT=0
-    END=$(( ${#THEORY[@]} + ${#CORE[@]} + ${#ML[@]} ))
+    END=$(( ${#THEORY[@]} + ${#CORE[@]} + ${#ML[@]} + ${#LIKELIHOOD[@]} ))
     for (( i=$INIT; i<$END; i++ ));
     do
       CACHE[i]=0
