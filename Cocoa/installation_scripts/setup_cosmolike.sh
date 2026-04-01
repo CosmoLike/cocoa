@@ -93,20 +93,14 @@ if [ ! -d "${PACKDIR:?}" ]; then
   fi
 
   if [ -n "${COSMOLIKE_GIT_COMMIT:-}" ]; then
-
     "${GIT:?}" checkout "${COSMOLIKE_GIT_COMMIT:?}" \
       >>${OUT1:?} 2>>${OUT2:?} || { error "${EC16:?}"; return 1; }
-
   elif [ -n "${COSMOLIKE_GIT_BRANCH}" ]; then
-    
     "${GIT:?}" checkout "${COSMOLIKE_GIT_BRANCH:?}" \
       >>${OUT1:?} 2>>${OUT2:?} || { error "${EC16:?}"; return 1; }
-
   elif [ -n "${COSMOLIKE_GIT_TAG:-}" ]; then 
-
     "${GIT:?}" checkout tags/${COSMOLIKE_GIT_TAG} -b ${COSMOLIKE_GIT_TAG} \
       >>${OUT1:?} 2>>${OUT2:?} || { error "${EC16:?}"; return 1; }
-  
   fi
 
 fi

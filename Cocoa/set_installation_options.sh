@@ -291,8 +291,8 @@ export COSMOPOWER_SOLIKET_GIT_COMMIT="91a2b33daf6f783933007839083fbab25d73b77b"
 export COSMOPOWER_URL="https://github.com/SBU-COSMOLIKE/cosmopower.git"
 export COSMOPOWER_GIT_COMMIT="f70fc789426847eed996d707ec67a3a93d74bbc3"
 
-export COSMOPOWER_URL_DATA="https://github.com/cosmopower-organization/jense_2024_emulators.git"
-export COSMOPOWER_URL_DATA_COMMIT="4317635eed70289ee1ec6b3df828027173071e36"
+export COSMOPOWER_DATA_URL="https://github.com/cosmopower-organization/jense_2024_emulators.git"
+export COSMOPOWER_DATA_URL_COMMIT="4317635eed70289ee1ec6b3df828027173071e36"
 
 export EMULTRF_URL="https://github.com/CosmoLike/emulators_code.git"
 export EMULTRF_GIT_TAG="v5.0beta2"

@@ -100,7 +100,6 @@ if [ ! -d "${PACKDIR:?}" ]; then
   if [[ -n "${EMULTRF_GIT_COMMIT:-}" || 
         -n "${EMULTRF_GIT_BRANCH:-}" || 
         -n "${EMULTRF_GIT_TAG:-}" ]]; then
-
     if [ "$("${GIT:?}" rev-parse --is-shallow-repository)" = "true" ]; then
       "${GIT:?}" fetch --unshallow --all --tags --prune \
         >>${OUT1:?} 2>>${OUT2:?} || { error "${EC16:?}"; return 1; }
@@ -108,26 +107,19 @@ if [ ! -d "${PACKDIR:?}" ]; then
       "${GIT:?}" fetch --all --tags --prune \
         >>${OUT1:?} 2>>${OUT2:?} || { error "${EC16:?}"; return 1; }
     fi
-
   fi
 
   if [ -n "${EMULTRF_GIT_COMMIT:-}" ]; then
-
     "${GIT:?}" checkout "${EMULTRF_GIT_COMMIT:?}" \
       >>${OUT1:?} 2>>${OUT2:?} || { error "${EC16:?}"; return 1; }
-
-  elif [ -n "${EMULTRF_GIT_BRANCH}" ]; then
-    
+  elif [ -n "${EMULTRF_GIT_BRANCH:-}" ]; then
     "${GIT:?}" checkout "${EMULTRF_GIT_BRANCH:?}" \
       >>${OUT1:?} 2>>${OUT2:?} || { error "${EC16:?}"; return 1; }
-
-  elif [ -n "${EMULTRF_GIT_TAG:-}" ]; then 
-
-    "${GIT:?}" checkout tags/${EMULTRF_GIT_TAG} -b ${EMULTRF_GIT_TAG} \
+  elif [ -n "${EMULTRF_GIT_TAG:-}" ]; then
+    "${GIT:?}" checkout "tags/${EMULTRF_GIT_TAG:?}" -b "${EMULTRF_GIT_TAG:?}" \
       >>${OUT1:?} 2>>${OUT2:?} || { error "${EC16:?}"; return 1; }
-  
-  fi  
-
+  fi
+ 
 fi
 
 cdfolder "${ROOTDIR:?}" || { unset_all; return 1; }
