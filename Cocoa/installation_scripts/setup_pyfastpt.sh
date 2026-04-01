@@ -2,9 +2,10 @@
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
-if [ -n "${IGNORE_DARK_EMULATOR_CODE:-}" ]; then
+if [ -n "${IGNORE_FASTPT_CODE:-}" ]; then
   return 99
 fi
+
 if [ -z "${ROOTDIR:-}" ]; then
   source start_cocoa.sh || { pfail 'ROOTDIR'; return 1; }
 fi
@@ -53,34 +54,41 @@ unset_env_vars || return 1
 CCIL="${ROOTDIR:?}/../cocoa_installation_libraries"
 
 # ---------------------------------------------------------------------------
-
-URL="${DARKEMULATOR_URL:?}"
-
 # E = EXTERNAL, CODE, F=FODLER
 ECODEF="${ROOTDIR:?}/external_modules/code"
 
-FOLDER="${DARK_EMULATOR_NAME:-"dark_emulator"}"
+URL="${FASTPT_URL:-"https://github.com/jablazek/FAST-PT.git"}"
+
+FOLDER="${FASTPT_NAME:-"FAST-PT"}"
 
 PACKDIR="${ECODEF:?}/${FOLDER:?}"
 
 # Name to be printed on this shell script messages
-PRINTNAME="DARK EMULATOR"
+PRINTNAME="PyFAST-PT"
 
 ptop "INSTALLING ${PRINTNAME:?}" || { unset_all; return 1; }
 
 # ----------------------------------------------------------------------------
+# ----------------------------------------------------------------------------
+# ----------------------------------------------------------------------------
+# FAST-PT
+# ----------------------------------------------------------------------------
+# ----------------------------------------------------------------------------
+# ----------------------------------------------------------------------------
+
+# ----------------------------------------------------------------------------
 # In case this script is called twice ----------------------------------------
 # ----------------------------------------------------------------------------
-if [ -n "${OVERWRITE_EXISTING_DARK_EMULATOR_CODE:-}" ]; then
+if [ -n "${OVERWRITE_EXISTING_FASTPT_CODE:-}" ]; then
 
-  rm -rf "${PACKDIR:?}"
+  rm -rf "${PACKDIR:?}";
 
 fi
 
 if [[ ! -d "${PACKDIR:?}" ]]; then
   
   # --------------------------------------------------------------------------
-  # Clone from original repo -------------------------------------------------
+  # Clone from original FAST-PT repo -----------------------------------------
   # --------------------------------------------------------------------------
   cdfolder "${ECODEF:?}" || { unset_all; return 1; }
 
@@ -90,21 +98,76 @@ if [[ ! -d "${PACKDIR:?}" ]]; then
   
   cdfolder "${PACKDIR}" || { unset_all; return 1; }
 
-  if [ -n "${DARKEMULATOR_GIT_COMMIT:-}" ]; then
-  
+  if [ -n "${FASTPT_GIT_COMMIT:-}" ]; then
+
     if [ "$("${GIT:?}" rev-parse --is-shallow-repository)" = "true" ]; then
-  
+    
       "${GIT:?}" fetch --unshallow --all --tags --prune \
         >>${OUT1:?} 2>>${OUT2:?} || { error "${EC16:?}"; return 1; }
-  
+    
     else
-  
+    
       "${GIT:?}" fetch --all --tags --prune \
         >>${OUT1:?} 2>>${OUT2:?} || { error "${EC16:?}"; return 1; }
-  
+    
     fi
 
-    "${GIT:?}" checkout "${DARKEMULATOR_GIT_COMMIT:?}" \
+    "${GIT:?}" checkout "${FASTPT_GIT_COMMIT:?}" \
+      >>${OUT1:?} 2>>${OUT2:?} || { error "${EC16:?}"; return 1; }
+  
+  fi
+    
+fi
+
+unset -v URL FOLDER PACKDIR
+
+URL="${FASTPT_WRAPPER_URL:-"https://github.com/CosmoLike/fastpt.git"}"
+
+FOLDER="${FASTPT_WRAPPER_NAME:-"PyFAST-PT"}"
+
+PACKDIR="${ECODEF:?}/${FOLDER:?}"
+
+# ----------------------------------------------------------------------------
+# ----------------------------------------------------------------------------
+# ----------------------------------------------------------------------------
+# FAST-PT cobaya theory wrapper
+# ----------------------------------------------------------------------------
+# ----------------------------------------------------------------------------
+# ----------------------------------------------------------------------------
+if [ -n "${OVERWRITE_EXISTING_FASTPT_CODE:-}" ]; then
+
+  rm -rf "${PACKDIR:?}";
+
+fi
+
+if [[ ! -d "${PACKDIR:?}" ]]; then
+  
+  # --------------------------------------------------------------------------
+  # Clone from original FAST-PT theory wrapper repo --------------------------
+  # --------------------------------------------------------------------------
+  cdfolder "${ECODEF:?}" || { unset_all; return 1; }
+
+  "${GIT:?}" clone "${URL:?}" --depth ${GIT_CLONE_MAXIMUM_DEPTH:-1000} \
+    --recursive "${FOLDER:?}" \
+    >>${OUT1:?} 2>>${OUT2:?} || { error "${EC15:?}"; return 1; }
+  
+  cdfolder "${PACKDIR}" || { unset_all; return 1; }
+
+  if [ -n "${FASTPT_WRAPPER_GIT_COMMIT:-}" ]; then
+    
+    if [ "$("${GIT:?}" rev-parse --is-shallow-repository)" = "true" ]; then
+    
+      "${GIT:?}" fetch --unshallow --all --tags --prune \
+        >>${OUT1:?} 2>>${OUT2:?} || { error "${EC16:?}"; return 1; }
+    
+    else
+    
+      "${GIT:?}" fetch --all --tags --prune \
+        >>${OUT1:?} 2>>${OUT2:?} || { error "${EC16:?}"; return 1; }
+    
+    fi
+
+    "${GIT:?}" checkout "${FASTPT_WRAPPER_GIT_COMMIT:?}" \
       >>${OUT1:?} 2>>${OUT2:?} || { error "${EC16:?}"; return 1; }
   fi
 
@@ -118,13 +181,14 @@ pbottom "INSTALLING ${PRINTNAME:?}" || { unset_all; return 1; }
 
 unset_all || return 1
 
-#-----------------------------------------------------------------------------
+#-------------------------------------------------------------------------------
 
 return 55; # why this odd number? Setup_cocoa will cache this installation only
            #   if this script runs entirely. What if the user close the terminal 
            #   or the system shuts down in the middle of a git clone?  
            #   In this case, PACKDIR would exists, but it is corrupted
 
+  
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------

@@ -2,7 +2,7 @@
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
-if [ -z "${ROOTDIR}" ]; then
+if [ -z "${ROOTDIR:-}" ]; then
   pfail 'ROOTDIR'; return 1
 fi
 
@@ -15,7 +15,7 @@ unset_env_vars () {
 }
 
 unset_env_funcs () {
-  unset -f cdfolder cpfolder cpfile error gitact gitact1 gitact2
+  unset -f cdfolder cpfolder cpfile error gitact0 gitact1 gitact2 gitact3
   unset -f unset_env_funcs
   cdroot || return 1;
 }
@@ -46,59 +46,120 @@ cpfile() {
     2>"/dev/null" || { error "CP FILE ${1} on ${2}"; return 1; }
 }
 
-gitact() {  
-  local PROJECT="${ROOTDIR}/projects"
-
-  local PACKDIR="${PROJECT:?}/${1:?}"
-
-  cdfolder "${PROJECT:?}" || return 1;
+gitact0() {  
+  local PROJECT="${ROOTDIR:?}/projects"
+  local NAME="${1:?}"
+  local URL="${2:?}"
+  local PACKDIR="${PROJECT:?}/${NAME}"
+  
+  cdfolder "${PROJECT:?}" || { unset_all; return 1; }
 
   # ---------------------------------------------------------------------------
   # In case this script runs twice --------------------------------------------
   # ---------------------------------------------------------------------------
-  if [ -n "${OVERWRITE_EXISTING_PRIVATE_CODE}" ]; then
+  if [ -n "${OVERWRITE_EXISTING_COSMOLIKE_CODE}" ]; then
     rm -rf "${PACKDIR:?}"
   fi
 
-  # ---------------------------------------------------------------------------
-  # clone from original repo --------------------------------------------------
-  # ---------------------------------------------------------------------------
   if [ ! -d "${PACKDIR:?}" ]; then
-    "${GIT:?}" clone "${2:?}" "${1:?}" \
-      >${OUT1:?} 2>${OUT2:?} || { error "${EC15:?}"; return 1; }
-
-    cdfolder "${1}" || return 1;
-
-    "${GIT:?}" checkout ${3} \
-        >${OUT1:?} 2>${OUT2:?} || { error "${EC16:?}"; return 1; }
+  
+    "${GIT:?}" clone "${URL}" --depth ${GIT_CLONE_MAXIMUM_DEPTH:-1000} \
+      --recursive "${NAME}" \
+      >>${OUT1:?} 2>>${OUT2:?} || { error "${EC15:?}"; return 1; }
+  
   fi
     
-  cdfolder "${ROOTDIR}" || return 1;
+  cdfolder "${ROOTDIR:?}" || { unset_all; return 1; }
+}
+
+gitact1() { 
+  local PROJECT="${ROOTDIR:?}/projects" 
+  local NAME="${1:?}"
+  local PACKDIR="${ROOTDIR:?}/projects/${NAME}"
+  local URL="${2:?}"
+  local TAG="${3:?}"
+  
+  cdfolder "${PROJECT:?}" || { unset_all; return 1; }
+  
+  # ---------------------------------------------------------------------------
+  # In case this script runs twice --------------------------------------------
+  # ---------------------------------------------------------------------------
+  if [ -n "${OVERWRITE_EXISTING_COSMOLIKE_CODE:-}" ]; then
+  
+    rm -rf "${PACKDIR:?}"
+  
+  fi
+
+  if [ ! -d "${PACKDIR:?}" ]; then
+  
+    "${GIT:?}" clone "${URL}" "${NAME}" --branch "${TAG}" --single-branch \
+      >>${OUT1:?} 2>>${OUT2:?} || { error "${EC15:?}"; return 1; }
+  
+  fi
+    
+  cdfolder "${ROOTDIR:?}" || { unset_all; return 1; }
 }
 
 gitact2() {  
-  local PROJECT="${ROOTDIR}/projects"
+  local PACKDIR="${ROOTDIR:?}/projects/${1:?}"
+  local TAG="${2}"
 
-  local PACKDIR="${PROJECT:?}/${1:?}"
+  if [ -d "${PACKDIR:?}" ]; then
+    cdfolder "${PACKDIR:?}" || { unset_all; return 1; }
 
-  cdfolder "${PROJECT:?}" || return 1;
+    if [ "$("${GIT:?}" rev-parse --is-shallow-repository)" = "true" ]; then
+    
+      "${GIT:?}" fetch --unshallow --all --tags --prune \
+        >>${OUT1:?} 2>>${OUT2:?} || { error "${EC16:?}"; return 1; }
+    
+    else
+    
+      "${GIT:?}" fetch --all --tags --prune \
+        >>${OUT1:?} 2>>${OUT2:?} || { error "${EC16:?}"; return 1; }
+    
+    fi
 
-  # ---------------------------------------------------------------------------
-  # In case this script runs twice --------------------------------------------
-  # ---------------------------------------------------------------------------
-  if [ -n "${OVERWRITE_EXISTING_PRIVATE_CODE}" ]; then
-    rm -rf "${PACKDIR:?}"
-  fi
-
-  # ---------------------------------------------------------------------------
-  # clone from original repo --------------------------------------------------
-  # ---------------------------------------------------------------------------
-  if [ ! -d "${PACKDIR:?}" ]; then
-    "${GIT:?}" clone "${2:?}" "${1:?}" \
-      >${OUT1:?} 2>${OUT2:?} || { error "${EC15:?}"; return 1; }
+    "${GIT:?}" checkout "${TAG:?}" \
+      >>${OUT1:?} 2>>${OUT2:?} || { error "${EC16:?}"; return 1; }
   fi
     
-  cdfolder "${ROOTDIR}" || return 1;
+  cdfolder "${ROOTDIR}" || { unset_all; return 1; }
+}
+
+gitact3() {  
+  local PACKDIR="${ROOTDIR:?}/projects/${1:?}"
+  local TAG="${2}"
+
+  if [ -d "${PACKDIR:?}" ]; then
+    cdfolder "${PACKDIR:?}" || { unset_all; return 1; }
+    
+    if [ "$("${GIT:?}" rev-parse --is-shallow-repository)" = "true" ]; then
+   
+      "${GIT:?}" fetch --unshallow --all --tags --prune \
+        >>${OUT1:?} 2>>${OUT2:?} || { error "${EC16:?}"; return 1; }
+   
+    else
+   
+      "${GIT:?}" fetch --all --tags --prune \
+        >>${OUT1:?} 2>>${OUT2:?} || { error "${EC16:?}"; return 1; }
+   
+    fi
+    
+    if "${GIT:?}" show-ref --verify --quiet "refs/heads/${TAG:?}"; then
+   
+      "${GIT:?}" checkout "${TAG:?}" \
+        >>${OUT1:?} 2>>${OUT2:?} || { error "${EC16:?}"; return 1; }
+   
+    else
+   
+      "${GIT:?}" checkout "tags/${TAG:?}" -b "${TAG:?}" \
+        >>${OUT1:?} 2>>${OUT2:?} || { error "${EC16:?}"; return 1; }
+   
+    fi
+
+  fi
+    
+  cdfolder "${ROOTDIR}" || { unset_all; return 1; }
 }
 
 
@@ -111,27 +172,53 @@ unset_env_vars || return 1
 # ----------------------------------------------------------------------------
 # -------------------------------- AXIONS -----------------------------------
 # ----------------------------------------------------------------------------
-
-if [ -n "${INSTALL_PRIVATE_AXIONS_PROJECT}" ]; then 
+if [ -z "${INSTALL_PRIVATE_AXIONS_PROJECT:-}" ]; then 
+  return 99
+fi
   
-  # Name to be printed on this shell script messages
-  PRINTNAME="AXIONS PROJECT"
+# Name to be printed on this shell script messages
+PRINTNAME="AXIONS PROJECT"
 
-  ptop "GETTING ${PRINTNAME:?}" || return 1
+ptop "GETTING ${PRINTNAME:?}" || { unset_all; return 1; }
 
-  FOLDER="${AXIONS_PROJECT_NAME:-"axions"}"
+FOLDER="${AXIONS_PROJECT_NAME:-"axions"}"
 
-  URL="${AXIONS_PROJECT_URL:?}"
+URL="${AXIONS_PROJECT_URL:?}"
 
-  if [ -n "${AXIONS_PROJECT_COMMIT}" ]; then
-    gitact "${FOLDER:?}" "${URL:?}" "${AXIONS_PROJECT_COMMIT:?}"  || return 1
-  else
-    gitact2 "${FOLDER:?}" "${URL:?}"  || return 1
-  fi
+if [ -n "${AXIONS_PROJECT_GIT_COMMIT:-}" ]; then
 
-  pbottom "GETTING ${PRINTNAME:?}" || return 1
+  gitact0 "${FOLDER:?}" "${URL:?}" || { unset_all; return 1; }
+
+  gitact2 "${FOLDER:?}" "${AXIONS_PROJECT_GIT_COMMIT:?}"  || { unset_all; return 1; }
+
+elif [ -n "${AXIONS_PROJECT_GIT_BRANCH:-}" ]; then 
+
+  gitact1 "${FOLDER:?}" "${URL:?}" "${AXIONS_PROJECT_GIT_BRANCH:?}" || { unset_all; return 1; }
+
+elif [ -n "${AXIONS_PROJECT_GIT_TAG:-}" ]; then 
+
+  gitact0 "${FOLDER:?}" "${URL:?}" || { unset_all; return 1; }
+
+  gitact3 "${FOLDER:?}" "${AXIONS_PROJECT_GIT_TAG:?}" || { unset_all; return 1; }
+
+else
+
+  gitact0 "${FOLDER:?}" "${URL:?}" || { unset_all; return 1; }
 
 fi
+
+pbottom "GETTING ${PRINTNAME:?}" || { unset_all; return 1; }
+
+#-------------------------------------------------------------------------------
+
+unset_all || return 1;
+
+#-------------------------------------------------------------------------------
+
+return 55; # why this odd number? Setup_cocoa will cache this installation only
+           #   if this script runs entirely. What if the user close the terminal 
+           #   or the system shuts down in the middle of a git clone?  
+           #   In this case, PACKDIR would exists, but it is corrupted
 
 # -----------------------------------------------------------------------------
 # -----------------------------------------------------------------------------
