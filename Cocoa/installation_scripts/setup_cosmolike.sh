@@ -71,47 +71,36 @@ if [ ! -d "${PACKDIR:?}" ]; then
 
   cdfolder "${ECODEF:?}" || { unset_all; return 1; }
 
-  "${GIT:?}" clone "${URL:?}" --depth ${GIT_CLONE_MAXIMUM_DEPTH:-1000} \
+  "${GIT:?}" clone "${URL:?}" \
+    --depth ${GIT_CLONE_MAXIMUM_DEPTH:-1000} \
     --recursive "${FOLDER:?}" \
     >>${OUT1:?} 2>>${OUT2:?} || { error "${EC15:?}"; return 1; }
   
   cdfolder "${PACKDIR}" || { unset_all; return 1; }
 
-  if [ -n "${COSMOLIKE_GIT_COMMIT:-}" ]; then
-
+  if [[ -n "${COSMOLIKE_GIT_COMMIT:-}" ||
+        -n "${COSMOLIKE_GIT_BRANCH:-}" ||
+        -n "${COSMOLIKE_GIT_TAG:-}" ]]; then
     if [ "$("${GIT:?}" rev-parse --is-shallow-repository)" = "true" ]; then
- 
       "${GIT:?}" fetch --unshallow --all --tags --prune \
         >>${OUT1:?} 2>>${OUT2:?} || { error "${EC16:?}"; return 1; }
- 
     else
- 
       "${GIT:?}" fetch --all --tags --prune \
         >>${OUT1:?} 2>>${OUT2:?} || { error "${EC16:?}"; return 1; }
- 
     fi
+  fi
 
+  if [ -n "${COSMOLIKE_GIT_COMMIT:-}" ]; then
     "${GIT:?}" checkout "${COSMOLIKE_GIT_COMMIT:?}" \
       >>${OUT1:?} 2>>${OUT2:?} || { error "${EC16:?}"; return 1; }
-  
-  elif [ -n "${COSMOLIKE_GIT_TAG}" ]; then 
-  
-    if [ "$("${GIT:?}" rev-parse --is-shallow-repository)" = "true" ]; then
-
-      "${GIT:?}" fetch --unshallow --all --tags --prune \
-        >>${OUT1:?} 2>>${OUT2:?} || { error "${EC16:?}"; return 1; }
-
-    else
-
-      "${GIT:?}" fetch --all --tags --prune \
-        >>${OUT1:?} 2>>${OUT2:?} || { error "${EC16:?}"; return 1; }
-
-    fi
-
-    "${GIT:?}" checkout tags/${COSMOLIKE_GIT_TAG} -b ${COSMOLIKE_GIT_TAG} \
+  elif [ -n "${COSMOLIKE_GIT_BRANCH:-}" ]; then
+    "${GIT:?}" checkout "${COSMOLIKE_GIT_BRANCH:?}" \
       >>${OUT1:?} 2>>${OUT2:?} || { error "${EC16:?}"; return 1; }
-
+  elif [ -n "${COSMOLIKE_GIT_TAG:-}" ]; then
+    "${GIT:?}" checkout "tags/${COSMOLIKE_GIT_TAG:?}" -b "${COSMOLIKE_GIT_TAG:?}" \
+      >>${OUT1:?} 2>>${OUT2:?} || { error "${EC16:?}"; return 1; }
   fi
+
 fi
 
 pbottom "SETUP COCOA-COSMOLIKE CORE" || { unset_all; return 1; }

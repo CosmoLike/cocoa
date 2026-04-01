@@ -98,23 +98,27 @@ if [[ ! -d "${PACKDIR:?}" ]]; then
   
   cdfolder "${PACKDIR}" || { unset_all; return 1; }
 
-  if [ -n "${FASTPT_GIT_COMMIT:-}" ]; then
-
+  if [[ -n "${FASTPT_GIT_COMMIT:-}" ||
+        -n "${FASTPT_GIT_BRANCH:-}" ||
+        -n "${FASTPT_GIT_TAG:-}" ]]; then
     if [ "$("${GIT:?}" rev-parse --is-shallow-repository)" = "true" ]; then
-    
       "${GIT:?}" fetch --unshallow --all --tags --prune \
         >>${OUT1:?} 2>>${OUT2:?} || { error "${EC16:?}"; return 1; }
-    
     else
-    
       "${GIT:?}" fetch --all --tags --prune \
         >>${OUT1:?} 2>>${OUT2:?} || { error "${EC16:?}"; return 1; }
-    
     fi
+  fi
 
+  if [ -n "${FASTPT_GIT_COMMIT:-}" ]; then
     "${GIT:?}" checkout "${FASTPT_GIT_COMMIT:?}" \
       >>${OUT1:?} 2>>${OUT2:?} || { error "${EC16:?}"; return 1; }
-  
+  elif [ -n "${FASTPT_GIT_BRANCH:-}" ]; then
+    "${GIT:?}" checkout "${FASTPT_GIT_BRANCH:?}" \
+      >>${OUT1:?} 2>>${OUT2:?} || { error "${EC16:?}"; return 1; }
+  elif [ -n "${FASTPT_GIT_TAG:-}" ]; then
+    "${GIT:?}" checkout "tags/${FASTPT_GIT_TAG:?}" -b "${FASTPT_GIT_TAG:?}" \
+      >>${OUT1:?} 2>>${OUT2:?} || { error "${EC16:?}"; return 1; }
   fi
     
 fi
@@ -153,21 +157,26 @@ if [[ ! -d "${PACKDIR:?}" ]]; then
   
   cdfolder "${PACKDIR}" || { unset_all; return 1; }
 
-  if [ -n "${FASTPT_WRAPPER_GIT_COMMIT:-}" ]; then
-    
+  if [[ -n "${FASTPT_WRAPPER_GIT_COMMIT:-}" ||
+        -n "${FASTPT_WRAPPER_GIT_BRANCH:-}" ||
+        -n "${FASTPT_WRAPPER_GIT_TAG:-}" ]]; then
     if [ "$("${GIT:?}" rev-parse --is-shallow-repository)" = "true" ]; then
-    
       "${GIT:?}" fetch --unshallow --all --tags --prune \
         >>${OUT1:?} 2>>${OUT2:?} || { error "${EC16:?}"; return 1; }
-    
     else
-    
       "${GIT:?}" fetch --all --tags --prune \
         >>${OUT1:?} 2>>${OUT2:?} || { error "${EC16:?}"; return 1; }
-    
     fi
+  fi
 
+  if [ -n "${FASTPT_WRAPPER_GIT_COMMIT:-}" ]; then
     "${GIT:?}" checkout "${FASTPT_WRAPPER_GIT_COMMIT:?}" \
+      >>${OUT1:?} 2>>${OUT2:?} || { error "${EC16:?}"; return 1; }
+  elif [ -n "${FASTPT_WRAPPER_GIT_BRANCH:-}" ]; then
+    "${GIT:?}" checkout "${FASTPT_WRAPPER_GIT_BRANCH:?}" \
+      >>${OUT1:?} 2>>${OUT2:?} || { error "${EC16:?}"; return 1; }
+  elif [ -n "${FASTPT_WRAPPER_GIT_TAG:-}" ]; then
+    "${GIT:?}" checkout "tags/${FASTPT_WRAPPER_GIT_TAG:?}" -b "${FASTPT_WRAPPER_GIT_TAG:?}" \
       >>${OUT1:?} 2>>${OUT2:?} || { error "${EC16:?}"; return 1; }
   fi
 

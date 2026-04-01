@@ -83,24 +83,29 @@ if [ ! -d "${PACKDIR:?}" ]; then
 
   cdfolder "${PACKDIR:?}" || { unset_all; return 1; }
 
-  if [ -n "${NAUTILUS_SAMPLER_GIT_COMMIT:-}" ]; then
-
+  if [[ -n "${NAUTILUS_GIT_COMMIT:-}" ||
+        -n "${NAUTILUS_GIT_BRANCH:-}" ||
+        -n "${NAUTILUS_GIT_TAG:-}" ]]; then
     if [ "$("${GIT:?}" rev-parse --is-shallow-repository)" = "true" ]; then
-  
       "${GIT:?}" fetch --unshallow --all --tags --prune \
         >>${OUT1:?} 2>>${OUT2:?} || { error "${EC16:?}"; return 1; }
-  
     else
-  
       "${GIT:?}" fetch --all --tags --prune \
         >>${OUT1:?} 2>>${OUT2:?} || { error "${EC16:?}"; return 1; }
-  
     fi
+  fi
 
-    "${GIT:?}" checkout "${NAUTILUS_SAMPLER_GIT_COMMIT:?}" \
+  if [ -n "${NAUTILUS_GIT_COMMIT:-}" ]; then
+    "${GIT:?}" checkout "${NAUTILUS_GIT_COMMIT:?}" \
       >>${OUT1:?} 2>>${OUT2:?} || { error "${EC16:?}"; return 1; }
-  
-  fi  
+  elif [ -n "${NAUTILUS_GIT_BRANCH:-}" ]; then
+    "${GIT:?}" checkout "${NAUTILUS_GIT_BRANCH:?}" \
+      >>${OUT1:?} 2>>${OUT2:?} || { error "${EC16:?}"; return 1; }
+  elif [ -n "${NAUTILUS_GIT_TAG:-}" ]; then
+    "${GIT:?}" checkout "tags/${NAUTILUS_GIT_TAG:?}" -b "${NAUTILUS_GIT_TAG:?}" \
+      >>${OUT1:?} 2>>${OUT2:?} || { error "${EC16:?}"; return 1; }
+  fi
+
 fi
 
 cdfolder "${ROOTDIR}" || { unset_all; return 1; }

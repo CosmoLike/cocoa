@@ -49,7 +49,7 @@ unset_env_vars || return 1
 # E = EXTERNAL, DATA, F=FODLER
 EDATAF="${ROOTDIR:?}/external_modules/data/"
 
-URL="${COSMOPOWER_URL_DATA:-"https://github.com/cosmopower-organization/jense_2024_emulators.git"}"
+URL="${COSMOPOWER_DATA_URL:-"https://github.com/cosmopower-organization/jense_2024_emulators.git"}"
 
 FOLDER="cosmopower"
 
@@ -77,25 +77,27 @@ if [[ ! -d "${PACKDIR:?}" ]]; then
     --recursive "${FOLDER:?}" \
     >>${OUT1:?} 2>>${OUT2:?} || { error "${EC15:?}"; return 1; }
 
-  if [ -n "${COSMOPOWER_URL_DATA_COMMIT:-}" ]; then
-    
-    cdfolder "${PACKDIR:?}" || { unset_all; return 1; }
-
+  if [[ -n "${COSMOPOWER_DATA_GIT_COMMIT:-}" ||
+        -n "${COSMOPOWER_DATA_GIT_BRANCH:-}" ||
+        -n "${COSMOPOWER_DATA_GIT_TAG:-}" ]]; then
     if [ "$("${GIT:?}" rev-parse --is-shallow-repository)" = "true" ]; then
-    
       "${GIT:?}" fetch --unshallow --all --tags --prune \
         >>${OUT1:?} 2>>${OUT2:?} || { error "${EC16:?}"; return 1; }
-    
     else
-    
       "${GIT:?}" fetch --all --tags --prune \
         >>${OUT1:?} 2>>${OUT2:?} || { error "${EC16:?}"; return 1; }
-    
     fi
+  fi
 
-    "${GIT:?}" checkout "${COSMOPOWER_URL_DATA_COMMIT:?}" \
+  if [ -n "${COSMOPOWER_DATA_GIT_COMMIT:-}" ]; then
+    "${GIT:?}" checkout "${COSMOPOWER_DATA_GIT_COMMIT:?}" \
       >>${OUT1:?} 2>>${OUT2:?} || { error "${EC16:?}"; return 1; }
-  
+  elif [ -n "${COSMOPOWER_DATA_GIT_BRANCH:-}" ]; then
+    "${GIT:?}" checkout "${COSMOPOWER_DATA_GIT_BRANCH:?}" \
+      >>${OUT1:?} 2>>${OUT2:?} || { error "${EC16:?}"; return 1; }
+  elif [ -n "${COSMOPOWER_DATA_GIT_TAG:-}" ]; then
+    "${GIT:?}" checkout "tags/${COSMOPOWER_DATA_GIT_TAG:?}" -b "${COSMOPOWER_DATA_GIT_TAG:?}" \
+      >>${OUT1:?} 2>>${OUT2:?} || { error "${EC16:?}"; return 1; }
   fi
 
 fi

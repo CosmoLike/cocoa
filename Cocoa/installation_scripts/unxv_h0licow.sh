@@ -77,21 +77,26 @@ if [ ! -d "${EDATAF:?}/${FOLDER:?}" ]; then
 
   cdfolder "${EDATAF:?}/${TMP:?}" || { unset_all; return 1; }
 
-  if [ -n "${HOLICOW_DATA_GIT_COMMIT:-}" ]; then
-
+  if [[ -n "${HOLICOW_GIT_COMMIT:-}" ||
+        -n "${HOLICOW_GIT_BRANCH:-}" ||
+        -n "${HOLICOW_GIT_TAG:-}" ]]; then
     if [ "$("${GIT:?}" rev-parse --is-shallow-repository)" = "true" ]; then
-    
       "${GIT:?}" fetch --unshallow --all --tags --prune \
         >>${OUT1:?} 2>>${OUT2:?} || { error "${EC16:?}"; return 1; }
-    
     else
-    
       "${GIT:?}" fetch --all --tags --prune \
         >>${OUT1:?} 2>>${OUT2:?} || { error "${EC16:?}"; return 1; }
-    
     fi
-    
-    "${GIT:?}" checkout "${HOLICOW_DATA_GIT_COMMIT:?}" \
+  fi
+
+  if [ -n "${HOLICOW_GIT_COMMIT:-}" ]; then
+    "${GIT:?}" checkout "${HOLICOW_GIT_COMMIT:?}" \
+      >>${OUT1:?} 2>>${OUT2:?} || { error "${EC16:?}"; return 1; }
+  elif [ -n "${HOLICOW_GIT_BRANCH:-}" ]; then
+    "${GIT:?}" checkout "${HOLICOW_GIT_BRANCH:?}" \
+      >>${OUT1:?} 2>>${OUT2:?} || { error "${EC16:?}"; return 1; }
+  elif [ -n "${HOLICOW_GIT_TAG:-}" ]; then
+    "${GIT:?}" checkout "tags/${HOLICOW_GIT_TAG:?}" -b "${HOLICOW_GIT_TAG:?}" \
       >>${OUT1:?} 2>>${OUT2:?} || { error "${EC16:?}"; return 1; }
   fi
 

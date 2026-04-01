@@ -89,22 +89,29 @@ if [ ! -d "${PACKDIR:?}" ]; then
   
   cdfolder "${PACKDIR}" || { unset_all; return 1; }
 
-  if [ -n "${ACTDR4_GIT_COMMIT:-}" ]; then
+  if [[ -n "${ACTDR4_GIT_COMMIT:-}" ||
+        -n "${ACTDR4_GIT_BRANCH:-}" ||
+        -n "${ACTDR4_GIT_TAG:-}" ]]; then
     if [ "$("${GIT:?}" rev-parse --is-shallow-repository)" = "true" ]; then
-    
       "${GIT:?}" fetch --unshallow --all --tags --prune \
         >>${OUT1:?} 2>>${OUT2:?} || { error "${EC16:?}"; return 1; }
-    
     else
-    
       "${GIT:?}" fetch --all --tags --prune \
         >>${OUT1:?} 2>>${OUT2:?} || { error "${EC16:?}"; return 1; }
-    
     fi
+  fi
 
+  if [ -n "${ACTDR4_GIT_COMMIT:-}" ]; then
     "${GIT:?}" checkout "${ACTDR4_GIT_COMMIT:?}" \
       >>${OUT1:?} 2>>${OUT2:?} || { error "${EC16:?}"; return 1; }
+  elif [ -n "${ACTDR4_GIT_BRANCH:-}" ]; then
+    "${GIT:?}" checkout "${ACTDR4_GIT_BRANCH:?}" \
+      >>${OUT1:?} 2>>${OUT2:?} || { error "${EC16:?}"; return 1; }
+  elif [ -n "${ACTDR4_GIT_TAG:-}" ]; then
+    "${GIT:?}" checkout "tags/${ACTDR4_GIT_TAG:?}" -b "${ACTDR4_GIT_TAG:?}" \
+      >>${OUT1:?} 2>>${OUT2:?} || { error "${EC16:?}"; return 1; }
   fi
+
   # --------------------------------------------------------------------------
   # Patch code to be compatible w/ COCOA environment -------------------------
   # --------------------------------------------------------------------------
