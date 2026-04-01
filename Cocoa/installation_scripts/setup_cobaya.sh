@@ -99,7 +99,8 @@ if [ ! -d "${ROOTDIR:?}/cobaya" ]; then
   
   URL="${COBAYA_URL:-"https://github.com/CobayaSampler/cobaya.git"}"
 
-  "${GIT:?}" clone "${URL:?}" cobaya --depth ${GIT_CLONE_MAXIMUM_DEPTH:-1000} \
+  "${GIT:?}" clone "${URL:?}" cobaya \
+    --depth ${GIT_CLONE_MAXIMUM_DEPTH:-1000} \
     --recursive \
     >>${OUT1:?} 2>>${OUT2:?} || { error "${EC15:?}"; return 1; }
   
@@ -107,23 +108,27 @@ if [ ! -d "${ROOTDIR:?}/cobaya" ]; then
   
   cdfolder "${COB:?}" || { unset_all; return 1; }
 
-  if [ -n "${COBAYA_GIT_COMMIT:-}" ]; then
-  
+  if [[ -n "${COBAYA_GIT_COMMIT:-}" ||
+        -n "${COBAYA_GIT_BRANCH:-}" ||
+        -n "${COBAYA_GIT_TAG:-}" ]]; then
     if [ "$("${GIT:?}" rev-parse --is-shallow-repository)" = "true" ]; then
-  
       "${GIT:?}" fetch --unshallow --all --tags --prune \
         >>${OUT1:?} 2>>${OUT2:?} || { error "${EC16:?}"; return 1; }
-  
     else
-  
       "${GIT:?}" fetch --all --tags --prune \
         >>${OUT1:?} 2>>${OUT2:?} || { error "${EC16:?}"; return 1; }
-  
     fi
+  fi
 
-    "${GIT:?}" reset --hard "${COBAYA_GIT_COMMIT:?}" \
+  if [ -n "${COBAYA_GIT_COMMIT:-}" ]; then
+    "${GIT:?}" checkout "${COBAYA_GIT_COMMIT:?}" \
       >>${OUT1:?} 2>>${OUT2:?} || { error "${EC16:?}"; return 1; }
-  
+  elif [ -n "${COBAYA_GIT_BRANCH:-}" ]; then
+    "${GIT:?}" checkout "${COBAYA_GIT_BRANCH:?}" \
+      >>${OUT1:?} 2>>${OUT2:?} || { error "${EC16:?}"; return 1; }
+  elif [ -n "${COBAYA_GIT_TAG:-}" ]; then
+    "${GIT:?}" checkout "tags/${COBAYA_GIT_TAG:?}" -b "${COBAYA_GIT_TAG:?}" \
+      >>${OUT1:?} 2>>${OUT2:?} || { error "${EC16:?}"; return 1; }
   fi
 
   cdfolder "${ROOTDIR:?}" || { unset_all; return 1; }
@@ -340,9 +345,9 @@ if [ ! -d "${ROOTDIR:?}/cobaya" ]; then
 
 fi
 
-cdfolder "${ROOTDIR:?}" || { unset_all; return 1; }
-
 pbottom "SETUP COBAYA" || { unset_all; return 1; }
+
+cdfolder "${ROOTDIR:?}" || { unset_all; return 1; }
 
 #-----------------------------------------------------------------------------
 

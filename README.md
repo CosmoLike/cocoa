@@ -130,6 +130,7 @@ and
         
     source setup_cocoa.sh
 
+
 This script downloads and decompresses external modules, which require internet access (on an HPC, this typically means running `setup_cocoa.sh` on the login node).
 
 Cocoa does not install all the available external modules by default. If the user needs additional packages, please refer to the appendix [FAQ: How can users compile external modules?](#appendix_compile_separately).
