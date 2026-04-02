@@ -24,7 +24,6 @@ unset_env_funcs () {
   cdroot || return 1;
 }
 
-<<<<<<< HEAD
 unset_all () {
   unset_env_vars
   unset_env_funcs
@@ -77,6 +76,8 @@ if [[ ! -d "${PACKDIR:?}" ]]; then
     --recursive "${FOLDER:?}" \
     >>${OUT1:?} 2>>${OUT2:?} || { error "${EC15:?}"; return 1; }
 
+  cdfolder "${PACKDIR:?}" || { unset_all; return 1; }
+  
   if [[ -n "${EMULTRF_DATA_GIT_COMMIT:-}" ||
         -n "${EMULTRF_DATA_GIT_BRANCH:-}" ||
         -n "${EMULTRF_DATA_GIT_TAG:-}" ]]; then
