@@ -67,13 +67,30 @@ if [ -z "${IGNORE_EMULTRF_DATA}" ]; then
     cdfolder "${EDATAF:?}" || return 1
 
     ${GIT:?} clone "${URL:?}" "${FOLDER:?}" \
-      >${OUT1:?} 2>${OUT2:?} || { error "${EC15:?}"; return 1; }
+      >>${OUT1:?} 2>>${OUT2:?} || { error "${EC15:?}"; return 1; }
 
-    if [ -n "${EMULTRF_DATA_GIT_COMMIT}" ]; then
-      cdfolder "${PACKDIR:?}" || return 1
-
-      ${GIT:?} checkout "${EMULTRF_DATA_GIT_COMMIT:?}" \
-        >${OUT1:?} 2>${OUT2:?} || { error "${EC16:?}"; return 1; }
+    cdfolder "${PACKDIR:?}" || { cdroot; return 1; }
+    
+    if [[ -n "${EMULTRF_DATA_GIT_COMMIT:-}" ||
+          -n "${EMULTRF_DATA_GIT_BRANCH:-}" ||
+          -n "${EMULTRF_DATA_GIT_TAG:-}" ]]; then
+      if [ "$("${GIT:?}" rev-parse --is-shallow-repository)" = "true" ]; then
+        "${GIT:?}" fetch --unshallow --all --tags --prune \
+          >>${OUT1:?} 2>>${OUT2:?} || { error "${EC16:?}"; return 1; }
+      else
+        "${GIT:?}" fetch --all --tags --prune \
+          >>${OUT1:?} 2>>${OUT2:?} || { error "${EC16:?}"; return 1; }
+      fi
+    fi
+    if [ -n "${EMULTRF_DATA_GIT_COMMIT:-}" ]; then
+      "${GIT:?}" checkout "${EMULTRF_DATA_GIT_COMMIT:?}" \
+        >>${OUT1:?} 2>>${OUT2:?} || { error "${EC16:?}"; return 1; }
+    elif [ -n "${EMULTRF_DATA_GIT_BRANCH:-}" ]; then
+      "${GIT:?}" checkout "${EMULTRF_DATA_GIT_BRANCH:?}" \
+        >>${OUT1:?} 2>>${OUT2:?} || { error "${EC16:?}"; return 1; }
+    elif [ -n "${EMULTRF_DATA_GIT_TAG:-}" ]; then
+      "${GIT:?}" checkout "tags/${EMULTRF_DATA_GIT_TAG:?}" -b "${EMULTRF_DATA_GIT_TAG:?}" \
+        >>${OUT1:?} 2>>${OUT2:?} || { error "${EC16:?}"; return 1; }
     fi
   fi
   # ---------------------------------------------------------------------------
