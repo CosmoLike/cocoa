@@ -10,6 +10,9 @@
 5. [Running ML emulators](#cobaya_base_code_examples_emul)
 6. [Creating Cosmolike projects (external readme)](Cocoa/projects/)
 7. [Credits](#appendix_proper_credits)
+
+The appendices below contain answers to frequently asked questions or problems faced by students and developers.
+
 8. [Appendix](#appendix)
     1. [FAQ: How can users install conda env via conda-lock?](#install_conda_env_condalock)
     2. [FAQ: How can users deal with Conda conflicts (MacOS): a possible solution](#macos_solve_conda_conficts)
