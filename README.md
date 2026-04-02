@@ -11,7 +11,7 @@
 6. [Creating Cosmolike projects (external readme)](Cocoa/projects/)
 7. [Credits](#appendix_proper_credits)
 
-The appendices below contain answers to frequently asked questions or problems faced by students and developers.
+The appendices below contain answers to questions raised or problems encountered by students and developers (most of whom have some familiarity with Cocoa).
 
 8. [Appendix](#appendix)
     1. [FAQ: How can users install conda env via conda-lock?](#install_conda_env_condalock)
