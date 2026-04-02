@@ -314,7 +314,7 @@ export EMULTRF_GIT_TAG="v4.05"
 
 export EMULTRF_DATA_URL="https://github.com/SBU-COSMOLIKE/emulators_data_lcdm.git"
 export EMULTRF_DATA_GIT_TAG="v4.05"
-#export EMULTRF_GIT_COMMIT="090277edf910bde37a856b8e62044d06ea5b5dc0"
+#export EMULTRF_DATA_GIT_COMMIT="090277edf910bde37a856b8e62044d06ea5b5dc0"
 
 export DARKEMULATOR_URL="https://github.com/DarkQuestCosmology/dark_emulator_public.git"
 export DARKEMULATOR_GIT_COMMIT="46df5972509624e2eeadc2bf3ac528b02333a7e2"
