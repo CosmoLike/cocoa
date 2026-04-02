@@ -76,6 +76,8 @@ if [[ ! -d "${PACKDIR:?}" ]]; then
     --recursive "${FOLDER:?}" \
     >>${OUT1:?} 2>>${OUT2:?} || { error "${EC15:?}"; return 1; }
 
+  cdfolder "${PACKDIR:?}" || { unset_all; return 1; }
+
 	if [[ -n "${EMULTRF_DATA_GIT_COMMIT:-}" ||
 	      -n "${EMULTRF_DATA_GIT_BRANCH:-}" ||
 	      -n "${EMULTRF_DATA_GIT_TAG:-}" ]]; then
@@ -87,6 +89,7 @@ if [[ ! -d "${PACKDIR:?}" ]]; then
 	      >>${OUT1:?} 2>>${OUT2:?} || { error "${EC16:?}"; return 1; }
 	  fi
 	fi
+
 	if [ -n "${EMULTRF_DATA_GIT_COMMIT:-}" ]; then
 	  "${GIT:?}" checkout "${EMULTRF_DATA_GIT_COMMIT:?}" \
 	    >>${OUT1:?} 2>>${OUT2:?} || { error "${EC16:?}"; return 1; }
@@ -97,6 +100,7 @@ if [[ ! -d "${PACKDIR:?}" ]]; then
 	  "${GIT:?}" checkout "tags/${EMULTRF_DATA_GIT_TAG:?}" -b "${EMULTRF_DATA_GIT_TAG:?}" \
 	    >>${OUT1:?} 2>>${OUT2:?} || { error "${EC16:?}"; return 1; }
 	fi
+
 fi
 
 pbottom "SETUP/UNXV EMULATOR CMB TRF DATA" || { unset_all; return 1; }
