@@ -102,7 +102,7 @@ export IGNORE_COSMOLIKE_DESXPLANCK_CODE=1
 # redownload: delete the compressed file and download data again ---------------
 # These keys are only relevant if you run setup_cocoa multiple times -----------
 # ------------------------------------------------------------------------------
-export OVERWRITE_EXISTING_ALL_PACKAGES=1    # except cosmolike projects
+#export OVERWRITE_EXISTING_ALL_PACKAGES=1    # except cosmolike projects
 #export OVERWRITE_EXISTING_COSMOLIKE_CODE=1 # dangerous (possible loss of uncommitted work)
                                             # if unset, users must manually delete
                                             # project if wants setup_cocoa to reclone it
