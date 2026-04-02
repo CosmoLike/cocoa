@@ -656,14 +656,13 @@ and
 
 **Step :two:**: restart the Cocoa private environment by rerunning `source start_cocoa.sh` (every time users edit `set_installation_options.sh`, they must reload the `(.local)` environment by rerunning `start_cocoa.sh`).
 
-**Step :three:**: compile the failed package by following the instructions in the appendix [FAQ: How can we compile external modules?](#appendix_compile_separately).
-
-**Step 4️⃣**: rerun `setup_cocoa.sh` and `compile_cocoa.sh` to ensure all packages are installed and compiled correctly.
+**Step :three:**:  rerun `setup_cocoa.sh` and `compile_cocoa.sh`.
 
 ## :interrobang: FAQ: How can users compile external modules (not involving Cosmolike)? <a name="appendix_compile_separately"></a>
 
-To setup and compile a single module, users may run scripts located at `Cocoa/installation_scripts/` directly.  
-To take full advantage of them, users must first unset the appropriate keys on `set_installation_options.sh`, as exemplified below.
+To download and compile only a single module (e.g., `CAMB`), users must directly run the associated bash scripts in `Cocoa/installation_scripts/` directly (e.g., `setup_camb.sh` and `compile_camb.sh`).  
+
+Users must also ensure the appropriate keys in `set_installation_options.sh` are unset, as shown below.
 
      [Adapted from Cocoa/set_installation_options.sh shell script]
      # ------------------------------------------------------------------------------
@@ -688,7 +687,7 @@ and
 
      source start_cocoa.sh # even if (.local) is already active, users must run start_cocoa.sh again to update bash environment values
 
-Similar to `setup_cocoa.sh` and `compile_cocoa.sh`, each code package contains a `setup` scripts that download it from the internet and a `compile` scripts that compile it. E.g., the `ACT-DR6` likelihood code can be downloaded and installed via the bash commands
+Similar to `setup_cocoa.sh` and `compile_cocoa.sh`, each package contains its own `setup` script that downloads it from the internet and `compile` scripts that compile it. For example, the `ACT-DR6` likelihood code can be downloaded and installed via the bash commands
  
      source ./installation_scripts/setup_act_dr6.sh                # download likelihood code
 
@@ -696,7 +695,7 @@ and
 
      source ./installation_scripts/compile_act_dr6.sh              # compile likelihood code
 
-In addition to `setup` and `compile` scripts, Cocoa contains `unxv` scripts that download data sets. For instance, to download the ACT-DR6 data, users must source the script
+In addition to `setup` and `compile` scripts, Cocoa contains `unxv` scripts that download large data sets. For instance, to download the ACT-DR6 data, users must source the script
 
      source ./installation_scripts/unxv_act_dr6.sh                 # download and unpack likelihood data
 
@@ -1086,22 +1085,39 @@ and
 
 ## :interrobang: FAQ: How can developers develop from a Git tag? <a name="dev_from_tag"></a>
 
-A useful Git hack is related to developing Cocoa from a Git tag. We reserve Git tags to set milestones in our development, so they serve as good starting points for coding localized new features (e.g., changes to a file that other developers have not recently modified) or bug fixes.
+A useful Git hack concerns developing Cocoa from a remote Git tag (i.e., a release version of the code). We reserve Git tags to set milestones in our development, so they serve as good starting points for coding localized new features (e.g., changes to a file that other developers have not recently modified) or bug fixes.
 
 **Step :one: (optional)** If the developer has cloned the repository using the `https` URL address, then change the URL to the SSH-key-based address (if the developer has previously uploaded a public key to their GitHub account)
 
     git remote set-url origin git@github.com:CosmoLike/cocoa.git # that would allow users to push without typing a password
 
-**Step :two:** Move the detached state to a new local branch via the command
+**Step :two:** Check the names of all remote branches so you can create a unique branch name
+
+    git remote set-branches origin '*'
+
+and
+
+    git fetch origin -v
+
+This will display all remote branches in the terminal. The output will be resemble the following snippet
+
+    [Adapted from the terminal output of git fetch origin -v] 
+    (...)
+    From https://github.com/CosmoLike/cocoa
+     = [up to date]        CMB_bp        -> origin/CMB_bp
+     = [up to date]        cocoa_emu     -> origin/cocoa_emu
+     = [up to date]        demu          -> origin/demu
+     = [up to date]        dev           -> origin/dev
+    
+**Step :three:** Move the detached state to a new local branch via the command
 
     git switch -c xyzlocdev
 
-Now, all commits will be associated with this local branch. 
+Here, it is important to create a unique name that does not already exist as a branch in the remote repository. The author's initial, followed by `locdev`, is a suggestion of such a branch name.
 
-> [!TIP]
-> The use of developers' initials followed by `dev` helps make the branch easily identifiable.
+Now, all commits will be associated with the xyzlocdev local branch. 
 
-**Step :three:** The developer has two options at the end of development. They can **either** create a new remote branch
+**Step :four:** The developer has two options at the end of development. They can **either** create a new remote branch
 
     git push origin xyzlocdev # run on the xyzlocdev branch
 
