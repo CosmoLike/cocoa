@@ -13,23 +13,26 @@
 
 The appendices below contain answers to questions raised or problems encountered by students and developers (most of whom have some familiarity with Cocoa).
 
-8. [Appendix](#appendix)
-    1. [FAQ: How can users install conda env via conda-lock?](#install_conda_env_condalock)
-    2. [FAQ: How can users deal with Conda conflicts (MacOS): a possible solution](#macos_solve_conda_conficts)
-    3. [FAQ: How can users debug Cocoa? Suggested steps](#running_wrong)
-    4. [FAQ: How can users compile external modules (not involving Cosmolike)?](#appendix_compile_separately)
-    5. [FAQ: How can users install Cosmolike projects?](#appendix_compile_cosmolike_separately)
-    6. [FAQ: How can users run Cocoa with Docker?](#appendix_jupyter_whovian)
-    7. [FAQ: How can users run Cocoa on Google Colab?](#overview_google_colab)
-    8. [FAQ: How can users install Conda?](#overview_miniforge)
-    9. [FAQ: How can users set the appropriate environment for ML?](#ml_emulators)
-    10. [FAQ: How can developers push changes to the Cocoa main branch?](#push_main)
-    11. [FAQ: How can developers develop from a Git tag?](#dev_from_tag)
-   12. [FAQ: How can users download additional likelihood data? (external readme)](Cocoa/external_modules/data)
-   13. [FAQ: Where do users find common FAQs about external modules? (external readme)](Cocoa/external_modules/code)
-   14. [FAQ: Where do users find common FAQs about Cosmolike? (external readme)](Cocoa/projects/)
-   15. [FAQ: Note on Planck-2018 low-ell SimAll EE and Gibbs TT likelihoods?](#planck2018lowell)
-   16. [FAQ: How can users improve our Bash/C/C++ knowledge?](#lectnotes)
+8. [Appendices about Conda](#appendix_conda)
+    1. [FAQ: How can users install Conda?](#overview_miniforge)
+    2. [FAQ: How can users install cocoa conda environment via conda-lock (better reproducibility)?](#install_conda_env_condalock)
+    3. [FAQ: How can users deal with Conda conflicts (MacOS): a possible solution](#macos_solve_conda_conficts)
+9. [Appendices about Git](#appendix_git)
+    1. [FAQ: How can developers develop from a Git tag?](#dev_from_tag)
+    2. [FAQ: How can developers push changes to the Cocoa main branch?](#push_main)
+10. [Appendices about Cocoa run](#appendix_cocoa_install)    
+    1. [FAQ: How can users debug Cocoa Installation? Suggested steps](#running_wrong)
+    2. [FAQ: How can users compile a single external module (not involving Cosmolike)?](#appendix_compile_separately)
+    3. [FAQ: How can users install Cosmolike projects?](#appendix_compile_cosmolike_separately)
+    4. [FAQ: How can users run Cocoa with Docker?](#appendix_jupyter_whovian)
+    6. [FAQ: How can users set the appropriate environment for ML?](#ml_emulators)
+11. [Additional Appendices](#appendix_additional)
+   1. [FAQ: How can users download additional likelihood data? (external readme)](Cocoa/external_modules/data)
+   2. [FAQ: Where do users find common FAQs about external modules? (external readme)](Cocoa/external_modules/code)
+   3. [FAQ: Where do users find common FAQs about Cosmolike? (external readme)](Cocoa/projects/)
+   4. [FAQ: Note on Planck-2018 low-ell SimAll EE and Gibbs TT likelihoods?](#planck2018lowell)
+   5. [FAQ: How can users run Cocoa on Google Colab?](#overview_google_colab)
+   6. [FAQ: How can users improve our Bash/C/C++ knowledge?](#lectnotes)
 
 # Overview <a name="overview"></a>
 
@@ -47,7 +50,9 @@ We provide the Docker image [whovian-cocoa](https://hub.docker.com/r/vivianmiran
 
 Core packages include compilers and numerical libraries that users typically do not modify.
 
-**Step :zero:** If you are using zsh, switch to bash by typing
+
+**Step :zero:** All the commands in this README assume a Bash shell. If your terminal is using zsh, switch to Bash now by typing
+
 
     bash
 
@@ -59,11 +64,12 @@ Core packages include compilers and numerical libraries that users typically do 
 
   - macOS (arm)
     
-    Users on macOS may not have `wget` installed. If that is the case, run the following.
+    Users on macOS may not have `wget` installed. If that is the case,  activate your base Conda environment  and install it.
   
-        conda activate; conda install wget
+        conda activate
+        conda install -y wget
 
-    This will activate the conda base environment (the prefix `(base)`) and install `wget`. Then, type.
+    Then, type.
 
         wget https://raw.githubusercontent.com/CosmoLike/cocoa/refs/heads/dev/cocoapy310-osxarm-base.yml
 
@@ -579,7 +585,49 @@ The following is not an exhaustive list of the codes we use/download/adopt
   
 Following best practices, Cocoa scripts download most external modules from their original repositories. Although our repository includes a few likelihoods in compressed xz file format, we do not want to discourage users from cloning code and data from their original repositories.  The work of those authors is extraordinary, and users **must cite them** appropriately.
 
-# Appendix <a name="appendix"></a>
+# Appendices about Conda <a name="appendix_conda"></a>
+
+## :interrobang: FAQ: How can users install Conda? <a name="overview_miniforge"></a>
+
+**Step :one:**: Download and run the Miniforge installation script. 
+
+    export CONDA_DIR="/gpfs/home/XXX/miniforge" # replace this string!
+
+and
+
+    mkdir "${CONDA_DIR:?}"
+
+and
+
+    curl -L -O "https://github.com/conda-forge/miniforge/releases/latest/download/Miniforge3-$(uname)-$(uname -m).sh"
+
+and
+
+    /bin/bash Miniforge3-$(uname)-$(uname -m).sh -f -b -p "${CONDA_DIR:?}"
+
+and
+
+    /bin/bash 
+
+**Step :two:**: After installation, users must source the conda configuration file, as shown below:
+
+    source $CONDA_DIR/etc/profile.d/conda.sh \
+          && conda config --set auto_update_conda false \
+          && conda config --set show_channel_urls true \
+          && conda config --set auto_activate_base false \
+          && conda config --prepend channels conda-forge \
+          && conda config --add allowlist_channels conda-forge \
+          && conda config --set channel_priority strict \
+          && conda init bash
+
+> [!Note]
+> The strict use of Miniconda and conda-forge packages appears to mitigate the significant licensing issue involving Anaconda packages and academic/research institutions.
+
+**Step :three:**: After running this command, you will see a message in the terminal that ends with the statement *For changes to take effect, close and re-open your current shell*. Then, type
+
+    source ~/.bashrc
+
+After that, the `conda` command will be available.
 
 ## :interrobang: FAQ: How can users install conda env via conda-lock? <a name="install_conda_env_condalock"></a>
 
@@ -594,6 +642,7 @@ and
      conda activate lockenv
 
 **Step :two:** Download the file appropriate conda-lock compatible `yml` file.
+
    - Linux
   
          wget https://raw.githubusercontent.com/CosmoLike/cocoa/refs/heads/dev/cocoapy310-linux.yml
@@ -603,6 +652,7 @@ and
          wget https://raw.githubusercontent.com/CosmoLike/cocoa/refs/heads/dev/cocoapy310-osxarm.yml
 
 **Step :three:** Create the conda environment
+
    - Linux
      
          conda-lock install -n cocoa cocoapy310-linux.yml
@@ -639,8 +689,108 @@ and
     
     conda env create --solver=libmamba --name cocoa -f cocoapy310-osxarm-loose.yml
 
+# Appendices about Git <a name="appendix_git"></a>
 
-## :interrobang: FAQ: How can users debug Cocoa? Suggested steps <a name="running_wrong"></a>
+## :interrobang: FAQ: How can developers develop from a Git tag? <a name="dev_from_tag"></a>
+
+A useful Git hack concerns developing Cocoa from a remote Git tag (i.e., a release version of the code). We reserve Git tags to set milestones in our development, so they serve as good starting points for coding localized new features (e.g., changes to a file that other developers have not recently modified) or bug fixes.
+
+**Step :one: (optional)** If the developer has cloned the repository using the `https` URL address, then change the URL to the SSH-key-based address (if the developer has previously uploaded a public key to their GitHub account)
+
+    git remote set-url origin git@github.com:CosmoLike/cocoa.git # that would allow users to push without typing a password
+
+**Step :two:** Check the names of all remote branches so you can create a unique branch name
+
+    git remote set-branches origin '*'
+
+and
+
+    git fetch origin -v
+
+This will display all remote branches in the terminal. The output will be resemble the following snippet
+
+    [Adapted from the terminal output of git fetch origin -v] 
+    (...)
+    From https://github.com/CosmoLike/cocoa
+     = [up to date]        CMB_bp        -> origin/CMB_bp
+     = [up to date]        cocoa_emu     -> origin/cocoa_emu
+     = [up to date]        demu          -> origin/demu
+     = [up to date]        dev           -> origin/dev
+    
+**Step :three:** Move the detached state to a new local branch via the command
+
+    git switch -c xyzlocdev
+
+Here, it is important to create a unique name that does not already exist as a branch in the remote repository. The author's initial, followed by `locdev`, is a suggestion of such a branch name.
+
+Now, all commits will be associated with the xyzlocdev local branch. 
+
+**Step :four:** The developer has two options at the end of development. They can **either** create a new remote branch
+
+    git push origin xyzlocdev # run on the xyzlocdev branch
+
+**or** they can fetch and download the remote `xyzdev` branch, which will later absorb the changes made on `xyzlocdev`
+
+    git switch -c xyzdev origin/xyzdev # run on the xyzlocdev branch
+
+Finally, the developer needs to merge the changes made on `xyzlocdev`.
+
+    git merge --squash xyzlocdev # run on the xyzdev branch
+
+If this merge does not create any merge conflicts, type
+
+    git push origin xyzdev # run on the xyzdev branch
+               
+## :interrobang: FAQ: How can developers push changes to the Cocoa main branch? <a name="push_main"></a>
+
+Until recently, Cocoa development was a bit unstructured. Developers could push directly to the `main` branch, and small commits to the main were not discouraged. Such flexible development rules will soon change when `v4.0` leaves the beta phase. We will protect the `main` branch by requiring every push to be reviewed by Cocoa's leading developers. Our new philosophy establishes that *a commit in the main branch should contain an atomic change that takes code from one working state to another working state with meaningful and well-tested improvements*. Therefore, developers should propose changes to the `main` branch in larger chunks (*via squash commits*), as shown below.
+
+> [!NOTE]
+> In a developer branch, users are encouraged to make small commits so that work can be tracked easily. Our policy regarding squash atomic changes only applies to the main branch.
+
+- :interrobang: **How to apply squash commits?**
+  
+**Step :one:**: create a development branch. Do not call the development branch `dev`, as `dev` is reserved for work done by the leading Cocoa developers. For concreteness, let's name the new branch `xyzdev`
+
+   
+    git switch -c xyzdev  # run on the main branch
+
+> [!TIP]
+> The use of developers' initials followed by `dev` helps make the branch easily identifiable.
+
+> [!TIP]
+> If the branch `xyzdev` already exists, use the `git switch` command without the `-c` flag. 
+
+**Step :two:**: develop the proposed changes. We advise developers to commit frequently. In your branch, a commit does not need to be atomic, changing the code from one working state to another well-tested, meaningful working state. Developers can push to the server via the command.
+
+    git push -u origin xyzdev   # run on the xyzdev branch
+
+**Step :three:**: Once the developers have created an atomic, meaningful, and well-tested improvement to Cocoa, the developer needs to merge any subsequent changes made in `main`.
+
+    git merge main   # run on the xyzdev branch
+
+This step may create conflicts that must be addressed before step four. 
+
+**Step :four:**: Once the developers have merged recent changes made on the `main` branch, they must push to the main branch the modifications made on the `xyzdev` branch by first **squashing all your changes into a single commit**, as shown below
+
+    git switch main  # run on the xyzdev branch
+
+and
+
+    git merge --squash xyzdev   # run on the main branch
+
+and
+
+    git commit -m "merge xyzdev branch"  # run on the main branch
+
+and
+
+    git push origin main  # run on the main branch
+
+
+# Appendices about Cocoa run <a name="appendix_cocoa_run"></a>
+
+## :interrobang: FAQ: How can users debug Cocoa Installation? Suggested steps <a name="running_wrong"></a>
 
 **Step :one:**: define the `COCOA_OUTPUT_VERBOSE` and `COSMOLIKE_DEBUG_MODE` flags on `set_installation_options.sh` to obtain a more detailed output, as shown below (for even more output, define `COCOA_OUTPUT_DEBUG` as well)
   
@@ -661,7 +811,7 @@ and
 
 **Step :three:**:  rerun `setup_cocoa.sh` and `compile_cocoa.sh`.
 
-## :interrobang: FAQ: How can users compile external modules (not involving Cosmolike)? <a name="appendix_compile_separately"></a>
+## :interrobang: FAQ: How can users compile a single external module (not involving Cosmolike)? <a name="appendix_compile_separately"></a>
 
 To download and compile only a single module (e.g., `CAMB`), users must directly run the associated bash scripts in `Cocoa/installation_scripts/` directly (e.g., `setup_camb.sh` and `compile_camb.sh`).  
 
@@ -827,6 +977,42 @@ This is a large image with a size of approximately 13GB, as it already contains 
 > [!Warning]
 > Do not allow the Docker container to have system-wide access to your files. Accidents happen, especially when dealing with dangerous bash commands such as `rm` (deletion).
 
+## :interrobang: FAQ: How can users set the appropriate environment for ML? <a name="ml_emulators"></a>
+
+Commenting out the environmental flags below *before running* `setup_cocoa.sh` will enable the installation of machine-learning-related libraries via pip.  
+
+    [Adapted from Cocoa/set_installation_options.sh shell script] 
+    # ------------------------------------------------------------------------------
+    # If not set, pip_core_packages.sh will install several ML package
+    # ------------------------------------------------------------------------------
+    #export IGNORE_EMULATOR_GPU_PIP_PACKAGES=1
+    (...)
+
+In case users have already run `setup_cocoa.sh`, then run the command.
+
+    source start_cocoa.sh # even if (.local) is already active, users must run start_cocoa.sh again to update bash environment values
+   
+and
+
+    source ./installation_scripts/setup_pip_core_packages.sh
+   
+
+# Additional Appendices <a name="appendix_additional"></a>
+
+## :interrobang: FAQ: Note on Planck-2018 low-ell SimAll EE and Gibbs TT likelihoods <a name="planck2018lowell"></a>
+
+Cocoa does not adopt Cobaya's Python reimplementation of SimAll EE and Gibbs TT likelihoods. Therefore, we patch the files. 
+
+    cobaya/cobaya/likelihoods/planck_2018_lowl/TT.py
+    cobaya/cobaya/likelihoods/planck_2018_lowl/EE.py
+
+to call the original Planck-2018 Clik likelihoods, as shown below.
+
+<img width="1146" height="498" alt="Screenshot 2025-10-20 at 8 38 56 PM" src="https://github.com/user-attachments/assets/4ab8beff-bda1-4bf8-b2c6-56f5501e3773" />
+<img width="1236" height="514" alt="Screenshot 2025-10-20 at 8 39 04 PM" src="https://github.com/user-attachments/assets/22b21a5d-c716-45dc-949c-59f31be91def" />
+
+This ensure backward consistency in our code, as `TT.py` and `EE.py` used to point to Planck-2018 Clik before Cobaya's authors moved them to `EE_clik.py` and `TT_clik.py`. 
+
 ## :interrobang: FAQ: How can users run Cocoa on Google Colab? <a name="overview_google_colab"></a>
 
 [Google Colab](https://colab.research.google.com/) provides a convenient platform for users to run MCMCs, likelihood minimizations, and profiles, as long as Machine-Learning Emulators are used to compute the data vectors. In the repository [CoCoAGoogleColabExamples](https://github.com/CosmoLike/CoCoAGoogleColabExamples), we provide a few examples along with explanatory notes. 
@@ -835,7 +1021,7 @@ Installing Cocoa requires time and also strains our limited Git-LFS quota, which
 
 There are a few differences users should be aware of when running Cocoa on Google Colab.
 
-  - Running Collab Notebook for the first time
+  - Running Colab Notebook for the first time
 
     - **Cell :one:**: Connect the notebook to your Google Drive account (will be important later)
 
@@ -916,7 +1102,7 @@ There are a few differences users should be aware of when running Cocoa on Googl
             /content
           echo "Created: $ARCHIVE"
 
-  - Running Collab Notebook with Cocoa pre-installed, loaded from Drive (does not work with local runtime)
+  - Running Colab Notebook with Cocoa pre-installed, loaded from Drive (does not work with local runtime)
 
     - **Cell :one:**: Connect the notebook to your Google Drive account
 
@@ -978,177 +1164,6 @@ There are a few differences users should be aware of when running Cocoa on Googl
         ARCHIVE="CHECKPOINT_FILE"
         test -f "$ARCHIVE"
         tar -xzf "$ARCHIVE" -C /
-
-## :interrobang: FAQ: How can users install Conda? <a name="overview_miniforge"></a>
-
-**Step :one:**: Download and run the Miniforge installation script. 
-
-    export CONDA_DIR="/gpfs/home/XXX/miniforge" # replace this string!
-
-and
-
-    mkdir "${CONDA_DIR:?}"
-
-and
-
-    curl -L -O "https://github.com/conda-forge/miniforge/releases/latest/download/Miniforge3-$(uname)-$(uname -m).sh"
-
-and
-
-    /bin/bash Miniforge3-$(uname)-$(uname -m).sh -f -b -p "${CONDA_DIR:?}"
-
-and
-
-    /bin/bash 
-
-**Step :two:**: After installation, users must source the conda configuration file, as shown below:
-
-    source $CONDA_DIR/etc/profile.d/conda.sh \
-          && conda config --set auto_update_conda false \
-          && conda config --set show_channel_urls true \
-          && conda config --set auto_activate_base false \
-          && conda config --prepend channels conda-forge \
-          && conda config --add allowlist_channels conda-forge \
-          && conda config --set channel_priority strict \
-          && conda init bash
-
-> [!Note]
-> The strict use of Miniconda and conda-forge packages appears to mitigate the significant licensing issue involving Anaconda packages and academic/research institutions.
-
-**Step :three:**: After running this command, you will see a message in the terminal that ends with the statement *For changes to take effect, close and re-open your current shell*. Then, type
-
-    source ~/.bashrc
-
-After that, the `conda` command will be available.
-
-## :interrobang: FAQ: How can users set the appropriate environment for ML? <a name="ml_emulators"></a>
-
-Commenting out the environmental flags below *before running* `setup_cocoa.sh` will enable the installation of machine-learning-related libraries via pip.  
-
-    [Adapted from Cocoa/set_installation_options.sh shell script] 
-    # ------------------------------------------------------------------------------
-    # If not set, pip_core_packages.sh will install several ML package
-    # ------------------------------------------------------------------------------
-    #export IGNORE_EMULATOR_GPU_PIP_PACKAGES=1
-    (...)
-
-In case users have already run `setup_cocoa.sh`, then run the command.
-
-    source start_cocoa.sh # even if (.local) is already active, users must run start_cocoa.sh again to update bash environment values
-   
-and
-
-    source ./installation_scripts/setup_pip_core_packages.sh
-              
-## :interrobang: FAQ: How can developers push changes to the Cocoa main branch? <a name="push_main"></a>
-
-Until recently, Cocoa development was a bit unstructured. Developers could push directly to the `main` branch, and small commits to the main were not discouraged. Such flexible development rules will soon change when `v4.0` leaves the beta phase. We will protect the `main` branch by requiring every push to be reviewed by Cocoa's leading developers. Our new philosophy establishes that *a commit in the main branch should contain an atomic change that takes code from one working state to another working state with meaningful and well-tested improvements*. Therefore, developers should propose changes to the `main` branch in larger chunks (*via squash commits*), as shown below.
-
-> [!NOTE]
-> In a developer branch, users are encouraged to make small commits so that work can be tracked easily. Our policy regarding squash atomic changes only applies to the main branch.
-
-- :interrobang: **How to apply squash commits?**
-  
-**Step :one:**: create a development branch. Do not call the development branch `dev`, as `dev` is reserved for work done by the leading Cocoa developers. For concreteness, let's name the new branch `xyzdev`
-
-   
-    git switch -c xyzdev  # run on the main branch
-
-> [!TIP]
-> The use of developers' initials followed by `dev` helps make the branch easily identifiable.
-
-> [!TIP]
-> If the branch `xyzdev` already exists, use the `git switch` command without the `-c` flag. 
-
-**Step :two:**: develop the proposed changes. We advise developers to commit frequently. In your branch, a commit does not need to be atomic, changing the code from one working state to another well-tested, meaningful working state. Developers can push to the server via the command.
-
-    git push -u origin xyzdev   # run on the xyzdev branch
-
-**Step :three:**: Once the developers have created an atomic, meaningful, and well-tested improvement to Cocoa, the developer needs to merge any subsequent changes made in `main`.
-
-    git merge main   # run on the xyzdev branch
-
-This step may create conflicts that must be addressed before step four. 
-
-**Step :four:**: Once the developers have merged recent changes made on the `main` branch, they must push to the main branch the modifications made on the `xyzdev` branch by first **squashing all your changes into a single commit**, as shown below
-
-    git switch main  # run on the xyzdev branch
-
-and
-
-    git merge --squash xyzdev   # run on the main branch
-
-and
-
-    git commit -m "merge xyzdev branch"  # run on the main branch
-
-and
-
-    git push origin main  # run on the main branch
-
-## :interrobang: FAQ: How can developers develop from a Git tag? <a name="dev_from_tag"></a>
-
-A useful Git hack concerns developing Cocoa from a remote Git tag (i.e., a release version of the code). We reserve Git tags to set milestones in our development, so they serve as good starting points for coding localized new features (e.g., changes to a file that other developers have not recently modified) or bug fixes.
-
-**Step :one: (optional)** If the developer has cloned the repository using the `https` URL address, then change the URL to the SSH-key-based address (if the developer has previously uploaded a public key to their GitHub account)
-
-    git remote set-url origin git@github.com:CosmoLike/cocoa.git # that would allow users to push without typing a password
-
-**Step :two:** Check the names of all remote branches so you can create a unique branch name
-
-    git remote set-branches origin '*'
-
-and
-
-    git fetch origin -v
-
-This will display all remote branches in the terminal. The output will be resemble the following snippet
-
-    [Adapted from the terminal output of git fetch origin -v] 
-    (...)
-    From https://github.com/CosmoLike/cocoa
-     = [up to date]        CMB_bp        -> origin/CMB_bp
-     = [up to date]        cocoa_emu     -> origin/cocoa_emu
-     = [up to date]        demu          -> origin/demu
-     = [up to date]        dev           -> origin/dev
-    
-**Step :three:** Move the detached state to a new local branch via the command
-
-    git switch -c xyzlocdev
-
-Here, it is important to create a unique name that does not already exist as a branch in the remote repository. The author's initial, followed by `locdev`, is a suggestion of such a branch name.
-
-Now, all commits will be associated with the xyzlocdev local branch. 
-
-**Step :four:** The developer has two options at the end of development. They can **either** create a new remote branch
-
-    git push origin xyzlocdev # run on the xyzlocdev branch
-
-**or** they can fetch and download the remote `xyzdev` branch, which will later absorb the changes made on `xyzlocdev`
-
-    git switch -c xyzdev origin/xyzdev # run on the xyzlocdev branch
-
-Finally, the developer needs to merge the changes made on `xyzlocdev`.
-
-    git merge --squash xyzlocdev # run on the xyzdev branch
-
-If this merge does not create any merge conflicts, type
-
-    git push origin xyzdev # run on the xyzdev branch
-
-## :interrobang: FAQ: Note on Planck-2018 low-ell SimAll EE and Gibbs TT likelihoods <a name="planck2018lowell"></a>
-
-Cocoa does not adopt Cobaya's Python reimplementation of SimAll EE and Gibbs TT likelihoods. Therefore, we patch the files. 
-
-    cobaya/cobaya/likelihoods/planck_2018_lowl/TT.py
-    cobaya/cobaya/likelihoods/planck_2018_lowl/EE.py
-
-to call the original Planck-2018 Clik likelihoods, as shown below.
-
-<img width="1146" height="498" alt="Screenshot 2025-10-20 at 8 38 56 PM" src="https://github.com/user-attachments/assets/4ab8beff-bda1-4bf8-b2c6-56f5501e3773" />
-<img width="1236" height="514" alt="Screenshot 2025-10-20 at 8 39 04 PM" src="https://github.com/user-attachments/assets/22b21a5d-c716-45dc-949c-59f31be91def" />
-
-This ensure backward consistency in our code, as `TT.py` and `EE.py` used to point to Planck-2018 Clik before Cobaya's authors moved them to `EE_clik.py` and `TT_clik.py`. 
 
 ## :interrobang: FAQ: How can users improve our Bash/C/C++ knowledge? <a name="lectnotes"></a>
 
