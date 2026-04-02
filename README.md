@@ -693,13 +693,16 @@ and
 
 ## :interrobang: FAQ: How can developers develop from a Git tag? <a name="dev_from_tag"></a>
 
-A useful Git hack concerns developing Cocoa from a remote Git tag (i.e., a release version of the code). We reserve Git tags to set milestones in our development, so they serve as good starting points for coding localized new features (e.g., changes to a file that other developers have not recently modified) or bug fixes.
+A useful Git hack concerns developing Cocoa from a Git tag. 
 
-**Step :one: (optional)** If the developer has cloned the repository using the `https` URL address, then change the URL to the SSH-key-based address (if the developer has previously uploaded a public key to their GitHub account)
+Git tags set milestones in our development, so they serve as good starting points for coding new features or implementing bug fixes.
+When you check out a tag, Git places you in a detached `HEAD` state. So, before making futher commits, you must create a local branch from that tag.
+
+**Step :one: (optional)** If the repository was cloned with the `https` URL, switch `origin` to the SSH-based URL address (assuming your public key is already registered on GitHub)
 
     git remote set-url origin git@github.com:CosmoLike/cocoa.git # that would allow users to push without typing a password
 
-**Step :two:** Check the names of all remote branches so you can create a unique branch name
+**Step :two: (optional)** check the names of remote branches so you can create a unique branch name from the checked-out tag
 
     git remote set-branches origin '*'
 
@@ -717,29 +720,32 @@ This will display all remote branches in the terminal. The output will be resemb
      = [up to date]        demu          -> origin/demu
      = [up to date]        dev           -> origin/dev
     
-**Step :three:** Move the detached state to a new local branch via the command
+**Step :three:** Create a new local working branch from the checked-out tag:
 
     git switch -c xyzlocdev
 
-Here, it is important to create a unique name that does not already exist as a branch in the remote repository. The author's initial, followed by `locdev`, is a suggestion of such a branch name.
+Choose a unique name that does not already exist as a branch in the remote repository. 
+A practical convention is to use your initial, followed a suffix such as `locdev`.
 
-Now, all commits will be associated with the xyzlocdev local branch. 
+Now, all subsequent commits will be associated with the xyzlocdev local branch. 
 
-**Step :four:** The developer has two options at the end of development. They can **either** create a new remote branch
+**Step :four:** The developer has two options at the end of development. They can **either**
 
-    git push origin xyzlocdev # run on the xyzlocdev branch
+  - Create a new remote branch
 
-**or** they can fetch and download the remote `xyzdev` branch, which will later absorb the changes made on `xyzlocdev`
+        git push origin xyzlocdev # run on the xyzlocdev branch
 
-    git switch -c xyzdev origin/xyzdev # run on the xyzlocdev branch
+  - Fetch and download the already existing remote `xyzdev` branch, which will later absorb the changes made on `xyzlocdev`
 
-Finally, the developer needs to merge the changes made on `xyzlocdev`.
+        git switch -c xyzdev origin/xyzdev # run on the xyzlocdev branch
 
-    git merge --squash xyzlocdev # run on the xyzdev branch
+    Then, squash-merge the changes made on `xyzlocdev`.
 
-If this merge does not create any merge conflicts, type
+        git merge --squash xyzlocdev # run on the xyzdev branch
 
-    git push origin xyzdev # run on the xyzdev branch
+    If this merge does not create any merge conflicts, then type
+
+        git push origin xyzdev # run on the xyzdev branch
                
 ## :interrobang: FAQ: How can developers push changes to the Cocoa main branch? <a name="push_main"></a>
 
