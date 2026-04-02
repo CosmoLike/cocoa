@@ -23,7 +23,7 @@ esac
 # ------------------------------------------------------------------------------
 # VERBOSE AS DEBUG TOOL --------------------------------------------------------
 # ------------------------------------------------------------------------------
-#export COCOA_OUTPUT_VERBOSE=1
+export COCOA_OUTPUT_VERBOSE=1
 #export COCOA_OUTPUT_DEBUG=1 # turn on bash strict mode (set -exo pipefail) on  
                              # instalation_scripts/setup/compile_x.sh scripts 
 # ------------------------------------------------------------------------------
@@ -313,7 +313,7 @@ export EMULTRF_GIT_TAG="v4.05"
 #export EMULTRF_GIT_COMMIT="32139fee45a9a6774b3eb95c2e71539ee24d10f1"
 
 export EMULTRF_DATA_URL="https://github.com/SBU-COSMOLIKE/emulators_data_lcdm.git"
-export EMULTRF_GIT_TAG="v4.05"
+export EMULTRF_DATA_GIT_TAG="v4.05"
 #export EMULTRF_GIT_COMMIT="090277edf910bde37a856b8e62044d06ea5b5dc0"
 
 export DARKEMULATOR_URL="https://github.com/DarkQuestCosmology/dark_emulator_public.git"
