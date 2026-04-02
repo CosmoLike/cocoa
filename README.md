@@ -11,7 +11,7 @@
 6. [Creating Cosmolike projects (external readme)](Cocoa/projects/)
 7. [Credits](#appendix_proper_credits)
 
-The appendices below contain answers to questions raised or problems encountered by students and developers (most of whom have some familiarity with Cocoa).
+### Common questions raised by developers
 
 8. [Appendices about Conda](#appendix_conda)
     1. [FAQ: How can users install Conda?](#overview_miniforge)
@@ -20,19 +20,19 @@ The appendices below contain answers to questions raised or problems encountered
 9. [Appendices about Git](#appendix_git)
     1. [FAQ: How can developers develop from a Git tag?](#dev_from_tag)
     2. [FAQ: How can developers push changes to the Cocoa main branch?](#push_main)
-10. [Appendices about Cocoa run](#appendix_cocoa_install)    
+10. [Appendices about Cocoa run](#appendix_cocoa_run)    
     1. [FAQ: How can users debug Cocoa Installation? Suggested steps](#running_wrong)
     2. [FAQ: How can users compile a single external module (not involving Cosmolike)?](#appendix_compile_separately)
     3. [FAQ: How can users install Cosmolike projects?](#appendix_compile_cosmolike_separately)
     4. [FAQ: How can users run Cocoa with Docker?](#appendix_jupyter_whovian)
     6. [FAQ: How can users set the appropriate environment for ML?](#ml_emulators)
-11. [Additional Appendices](#appendix_additional)
-   1. [FAQ: How can users download additional likelihood data? (external readme)](Cocoa/external_modules/data)
-   2. [FAQ: Where do users find common FAQs about external modules? (external readme)](Cocoa/external_modules/code)
-   3. [FAQ: Where do users find common FAQs about Cosmolike? (external readme)](Cocoa/projects/)
-   4. [FAQ: Note on Planck-2018 low-ell SimAll EE and Gibbs TT likelihoods?](#planck2018lowell)
-   5. [FAQ: How can users run Cocoa on Google Colab?](#overview_google_colab)
-   6. [FAQ: How can users improve our Bash/C/C++ knowledge?](#lectnotes)
+11. [Advanced Appendices](#appendix_additional)
+    1. [FAQ: How can users download additional likelihood data? (external readme)](Cocoa/external_modules/data)
+    2. [FAQ: Where do users find common FAQs about external modules? (external readme)](Cocoa/external_modules/code)
+    3. [FAQ: Where do users find common FAQs about Cosmolike? (external readme)](Cocoa/projects/)
+    4. [FAQ: Note on Planck-2018 low-ell SimAll EE and Gibbs TT likelihoods?](#planck2018lowell)
+    5. [FAQ: How can users run Cocoa on Google Colab?](#overview_google_colab)
+    6. [FAQ: How can developers improve their Bash/C/C++ knowledge?](#lectnotes)
 
 # Overview <a name="overview"></a>
 
@@ -979,7 +979,7 @@ This is a large image with a size of approximately 13GB, as it already contains 
 
 ## :interrobang: FAQ: How can users set the appropriate environment for ML? <a name="ml_emulators"></a>
 
-Commenting out the environmental flags below *before running* `setup_cocoa.sh` will enable the installation of machine-learning-related libraries via pip.  
+Although this is the default configuration in CoCoA, it is worth noting that commenting out the environmental flags below enables the installation of several machine-learning-related libraries via pip.  
 
     [Adapted from Cocoa/set_installation_options.sh shell script] 
     # ------------------------------------------------------------------------------
@@ -988,7 +988,7 @@ Commenting out the environmental flags below *before running* `setup_cocoa.sh` w
     #export IGNORE_EMULATOR_GPU_PIP_PACKAGES=1
     (...)
 
-In case users have already run `setup_cocoa.sh`, then run the command.
+If users have already run `setup_cocoa.sh` prior to commenting these flags, run the command.
 
     source start_cocoa.sh # even if (.local) is already active, users must run start_cocoa.sh again to update bash environment values
    
@@ -1165,7 +1165,7 @@ There are a few differences users should be aware of when running Cocoa on Googl
         test -f "$ARCHIVE"
         tar -xzf "$ARCHIVE" -C /
 
-## :interrobang: FAQ: How can users improve our Bash/C/C++ knowledge? <a name="lectnotes"></a>
+## :interrobang: FAQ: How can developers improve their Bash/C/C++ knowledge? <a name="lectnotes"></a>
 
 A working knowledge of Python is required to understand the Cobaya framework at the developer level. Users must also be familiar with the Bash language to understand Cocoa's scripts. Proficiency in C and C++ is also needed to manipulate Cosmolike and the C++ Cobaya-Cosmolike C++ interface. Finally, users need to understand the Fortran-2003 language to modify CAMB.
 
