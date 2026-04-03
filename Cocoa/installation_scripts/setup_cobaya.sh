@@ -99,9 +99,8 @@ if [ ! -d "${ROOTDIR:?}/cobaya" ]; then
   
   URL="${COBAYA_URL:-"https://github.com/CobayaSampler/cobaya.git"}"
 
-  "${GIT:?}" clone "${URL:?}" cobaya \
-    --depth ${GIT_CLONE_MAXIMUM_DEPTH:-1000} \
-    --recursive \
+  "${GIT:?}" clone "${URL:?}" --depth ${GIT_CLONE_MAXIMUM_DEPTH:-1000} \
+    --recursive --no-single-branch cobaya \
     >>${OUT1:?} 2>>${OUT2:?} || { error "${EC15:?}"; return 1; }
   
   unset URL
