@@ -104,7 +104,7 @@ if [ ! -d "${PACKDIR:?}" ]; then
     "${GIT:?}" checkout "${VELOCILEPTORS_GIT_COMMIT:?}" \
       >>${OUT1:?} 2>>${OUT2:?} || { error "${EC16:?}"; return 1; }
   elif [ -n "${VELOCILEPTORS_GIT_BRANCH:-}" ]; then
-    "${GIT:?}" checkout "${VELOCILEPTORS_GIT_BRANCH:?}" \
+    "${GIT:?}" checkout -b "${VELOCILEPTORS_GIT_BRANCH:?}" "origin/${VELOCILEPTORS_GIT_BRANCH:?}" \
       >>${OUT1:?} 2>>${OUT2:?} || { error "${EC16:?}"; return 1; }
   elif [ -n "${VELOCILEPTORS_GIT_TAG:-}" ]; then
     "${GIT:?}" checkout "tags/${VELOCILEPTORS_GIT_TAG:?}" -b "${VELOCILEPTORS_GIT_TAG:?}" \

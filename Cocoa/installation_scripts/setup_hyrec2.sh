@@ -112,7 +112,7 @@ if [ ! -d "${PACKDIR:?}" ]; then
     "${GIT:?}" checkout "${HYREC_GIT_COMMIT:?}" \
       >>${OUT1:?} 2>>${OUT2:?} || { error "${EC16:?}"; return 1; }
   elif [ -n "${HYREC_GIT_BRANCH:-}" ]; then
-    "${GIT:?}" checkout "${HYREC_GIT_BRANCH:?}" \
+    "${GIT:?}" checkout -b "${HYREC_GIT_BRANCH:?}" "origin/${HYREC_GIT_BRANCH:?}" \
       >>${OUT1:?} 2>>${OUT2:?} || { error "${EC16:?}"; return 1; }
   elif [ -n "${HYREC_GIT_TAG:-}" ]; then
     "${GIT:?}" checkout "tags/${HYREC_GIT_TAG:?}" -b "${HYREC_GIT_TAG:?}" \

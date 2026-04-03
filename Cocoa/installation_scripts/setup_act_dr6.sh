@@ -112,7 +112,7 @@ if [[ ! -d "${PACKDIR:?}" ]]; then
     "${GIT:?}" checkout "${ACTDR6_GIT_COMMIT:?}" \
       >>${OUT1:?} 2>>${OUT2:?} || { error "${EC16:?}"; return 1; }
   elif [ -n "${ACTDR6_GIT_BRANCH:-}" ]; then
-    "${GIT:?}" checkout "${ACTDR6_GIT_BRANCH:?}" \
+    "${GIT:?}" checkout -b "${ACTDR6_GIT_BRANCH:?}" "origin/${ACTDR6_GIT_BRANCH:?}" \
       >>${OUT1:?} 2>>${OUT2:?} || { error "${EC16:?}"; return 1; }
   elif [ -n "${ACTDR6_GIT_TAG:-}" ]; then
     "${GIT:?}" checkout "tags/${ACTDR6_GIT_TAG:?}" -b "${ACTDR6_GIT_TAG:?}" \

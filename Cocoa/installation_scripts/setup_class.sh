@@ -106,7 +106,7 @@ if [ ! -d "${PACKDIR:?}" ]; then
     "${GIT:?}" checkout "${CLASS_GIT_COMMIT:?}" \
       >>${OUT1:?} 2>>${OUT2:?} || { error "${EC16:?}"; return 1; }
   elif [ -n "${CLASS_GIT_BRANCH:-}" ]; then
-    "${GIT:?}" checkout "${CLASS_GIT_BRANCH:?}" \
+    "${GIT:?}" checkout -b "${CLASS_GIT_BRANCH:?}" "origin/${CLASS_GIT_BRANCH:?}" \
       >>${OUT1:?} 2>>${OUT2:?} || { error "${EC16:?}"; return 1; }
   elif [ -n "${CLASS_GIT_TAG:-}" ]; then
     "${GIT:?}" checkout "tags/${CLASS_GIT_TAG:?}" -b "${CLASS_GIT_TAG:?}" \

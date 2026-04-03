@@ -105,7 +105,7 @@ if [ ! -d "${PACKDIR:?}" ]; then
     "${GIT:?}" checkout "${ACTDR4_GIT_COMMIT:?}" \
       >>${OUT1:?} 2>>${OUT2:?} || { error "${EC16:?}"; return 1; }
   elif [ -n "${ACTDR4_GIT_BRANCH:-}" ]; then
-    "${GIT:?}" checkout "${ACTDR4_GIT_BRANCH:?}" \
+    "${GIT:?}" checkout -b "${ACTDR4_GIT_BRANCH:?}" "origin/${ACTDR4_GIT_BRANCH:?}" \
       >>${OUT1:?} 2>>${OUT2:?} || { error "${EC16:?}"; return 1; }
   elif [ -n "${ACTDR4_GIT_TAG:-}" ]; then
     "${GIT:?}" checkout "tags/${ACTDR4_GIT_TAG:?}" -b "${ACTDR4_GIT_TAG:?}" \
