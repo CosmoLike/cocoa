@@ -297,7 +297,7 @@ export EMULTRF_URL="https://github.com/CosmoLike/emulators_code.git"
 export EMULTRF_GIT_BRANCH="dev"
 
 export EMULTRF_DATA_URL="https://github.com/SBU-COSMOLIKE/emulators_data_lcdm.git"
-export EMULTRF_DATA_GIT_BRANCH="dev"
+export EMULTRF_DATA_GIT_BRANCH="main"
 
 export DARKEMULATOR_URL="https://github.com/DarkQuestCosmology/dark_emulator_public.git"
 export DARKEMULATOR_GIT_COMMIT="46df5972509624e2eeadc2bf3ac528b02333a7e2"

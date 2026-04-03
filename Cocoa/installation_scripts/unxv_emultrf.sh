@@ -71,34 +71,68 @@ fi
 if [[ ! -d "${PACKDIR:?}" ]]; then
   
   cdfolder "${EDATAF:?}" || { unset_all; return 1; }
-
-  "${GIT:?}" clone "${URL:?}" \
-    --depth ${GIT_CLONE_MAXIMUM_DEPTH:-1000} \
-    --recursive "${FOLDER:?}" \
-    >>${OUT1:?} 2>>${OUT2:?} || { error "${EC15:?}"; return 1; }
-
-  cdfolder "${PACKDIR:?}" || { unset_all; return 1; }
   
-  if [[ -n "${EMULTRF_DATA_GIT_COMMIT:-}" ||
-        -n "${EMULTRF_DATA_GIT_BRANCH:-}" ||
-        -n "${EMULTRF_DATA_GIT_TAG:-}" ]]; then
-    if [ "$("${GIT:?}" rev-parse --is-shallow-repository)" = "true" ]; then
-      "${GIT:?}" fetch --unshallow --all --tags --prune \
-        >>${OUT1:?} 2>>${OUT2:?} || { error "${EC16:?}"; return 1; }
-    else
-      "${GIT:?}" fetch --all --tags --prune \
-        >>${OUT1:?} 2>>${OUT2:?} || { error "${EC16:?}"; return 1; }
-    fi
-  fi
+  # THIS REPO HAS LARGE GIT-LFS FILES (git lfs pull is more transparent)
   if [ -n "${EMULTRF_DATA_GIT_COMMIT:-}" ]; then
-    "${GIT:?}" checkout "${EMULTRF_DATA_GIT_COMMIT:?}" \
-      >>${OUT1:?} 2>>${OUT2:?} || { error "${EC16:?}"; return 1; }
+    
+    (
+      export GIT_LFS_SKIP_SMUDGE=1
+      
+      "${GIT:?}" clone "${URL:?}" "${FOLDER:?}" \
+        >>${OUT1:?} 2>>${OUT2:?} || { error "${EC15:?}"; exit 1; }
+      
+      cdfolder "${PACKDIR:?}" || exit 1;
+      "${GIT:?}" checkout "${EMULTRF_DATA_GIT_COMMIT:?}" \
+        >>${OUT1:?} 2>>${OUT2:?} || { error "${EC16:?}"; exit 1; }
+      
+      "${GIT:?}" lfs pull || { error "${EC16:?}"; exit 1; }
+    ) || { unset_all; return 1; }
+
   elif [ -n "${EMULTRF_DATA_GIT_BRANCH:-}" ]; then
-    "${GIT:?}" checkout "${EMULTRF_DATA_GIT_BRANCH:?}" \
-      >>${OUT1:?} 2>>${OUT2:?} || { error "${EC16:?}"; return 1; }
+
+    (
+      export GIT_LFS_SKIP_SMUDGE=1;
+      
+      "${GIT:?}" clone "${URL:?}" "${FOLDER:?}" \
+        --branch "${EMULTRF_DATA_GIT_BRANCH:?}"  \
+        >>${OUT1:?} 2>>${OUT2:?} || { error "${EC15:?}"; exit 1; };
+      
+      cdfolder "${PACKDIR:?}" || exit 1;
+      
+      "${GIT:?}" lfs pull || { error "${EC16:?}"; exit 1; }
+    ) || { unset_all; return 1; }
+
   elif [ -n "${EMULTRF_DATA_GIT_TAG:-}" ]; then
-    "${GIT:?}" checkout "tags/${EMULTRF_DATA_GIT_TAG:?}" -b "${EMULTRF_DATA_GIT_TAG:?}" \
-      >>${OUT1:?} 2>>${OUT2:?} || { error "${EC16:?}"; return 1; }
+
+    (
+      export GIT_LFS_SKIP_SMUDGE=1
+      
+      "${GIT:?}" clone "${URL:?}" "${FOLDER:?}" \
+        >>${OUT1:?} 2>>${OUT2:?} || { error "${EC15:?}"; exit 1; }
+      
+      cdfolder "${PACKDIR:?}" || exit 1;
+      
+      "${GIT:?}" checkout \
+        "tags/${EMULTRF_DATA_GIT_TAG:?}" -b "${EMULTRF_DATA_GIT_TAG:?}" \
+        >>${OUT1:?} 2>>${OUT2:?} || { error "${EC16:?}"; exit 1; };
+      
+      "${GIT:?}" lfs pull || { error "${EC16:?}"; exit 1; }
+    ) || { unset_all; return 1; }
+
+  else
+    
+    (
+      export GIT_LFS_SKIP_SMUDGE=1;
+      
+      "${GIT:?}" clone "${URL:?}" \
+        --recursive --no-single-branch "${FOLDER:?}" \
+        >>${OUT1:?} 2>>${OUT2:?} || { error "${EC15:?}"; exit 1; };
+      
+      cdfolder "${PACKDIR:?}" || exit 1;
+      
+      "${GIT:?}" lfs pull || { error "${EC16:?}"; exit 1; }
+    ) || { unset_all; return 1; }
+
   fi
 
 fi
