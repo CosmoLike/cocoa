@@ -1,9 +1,8 @@
 #!/bin/bash
-
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
-if [ -n "${IGNORE_COSMOPOWER_CODE:-}" ]; then
+if [ -n "${IGNORE_FASTPT_CODE:-}" ]; then
   return 99
 fi
 
@@ -15,7 +14,7 @@ fi
 ( source "${ROOTDIR:?}/installation_scripts/flags_check.sh" ) || return 1;
 
 unset_env_vars () {
-  unset -v URL CCIL ECODEF FOLDER PACKDIR  
+  unset -v URL CCIL ECODEF FOLDER PACKDIR CHANGES TFOLDER TFILE TFILEP AL
   cdroot || return 1;
 }
 
@@ -54,48 +53,54 @@ unset_env_vars || return 1
 
 CCIL="${ROOTDIR:?}/../cocoa_installation_libraries"
 
+# ---------------------------------------------------------------------------
 # E = EXTERNAL, CODE, F=FODLER
 ECODEF="${ROOTDIR:?}/external_modules/code"
 
+URL="${FASTPT_URL:-"https://github.com/jablazek/FAST-PT.git"}"
+
+FOLDER="${FASTPT_NAME:-"FAST-PT"}"
+
+PACKDIR="${ECODEF:?}/${FOLDER:?}"
+
+# Name to be printed on this shell script messages
+PRINTNAME="PyFAST-PT"
+
+ptop "INSTALLING ${PRINTNAME:?}" || { unset_all; return 1; }
+
+# ----------------------------------------------------------------------------
+# ----------------------------------------------------------------------------
+# ----------------------------------------------------------------------------
+# FAST-PT
+# ----------------------------------------------------------------------------
+# ----------------------------------------------------------------------------
+# ----------------------------------------------------------------------------
+
 # ----------------------------------------------------------------------------
 # In case this script is called twice ----------------------------------------
 # ----------------------------------------------------------------------------
+if [ -n "${OVERWRITE_EXISTING_FASTPT_CODE:-}" ]; then
 
-if [ ! -d "${ECODEF:?}/emulators" ]; then
-  mkdir -p "${ECODEF:?}/emulators" \
-    >>${OUT1:?} 2>>${OUT2:?} || { error "${EC20:?}"; return 1; }
-fi
-
-URL="${COSMOPOWER_SOLIKET_URL:-"https://github.com/simonsobs/SOLikeT.git"}"
-
-FOLDER="${COSMOPOWER_SOLIKET_NAME:-"soliket"}"
-
-PACKDIR="${ECODEF:?}/emulators/${FOLDER:?}"
-
-ptop "INSTALLING COSMOPOWER SO.LIKE.T THEORY (COBAYA)" || { unset_all; return 1; }
-
-# ----------------------------------------------------------------------------
-# In case this script is called twice ----------------------------------------
-# ----------------------------------------------------------------------------
-if [ -n "${OVERWRITE_EXISTING_COSMOPOWER_CODE:-}" ]; then
-
-  rm -rf "${PACKDIR:?}"
+  rm -rf "${PACKDIR:?}";
 
 fi
 
-if [ ! -d "${PACKDIR:?}" ]; then
-
-  cdfolder "${ECODEF:?}/emulators" || { cdroot; return 1; }
+if [[ ! -d "${PACKDIR:?}" ]]; then
+  
+  # --------------------------------------------------------------------------
+  # Clone from original FAST-PT repo -----------------------------------------
+  # --------------------------------------------------------------------------
+  cdfolder "${ECODEF:?}" || { unset_all; return 1; }
 
   "${GIT:?}" clone "${URL:?}" --depth ${GIT_CLONE_MAXIMUM_DEPTH:-1000} \
-    --recursive --no-single-branch "${PACKDIR:?}" \
+    --recursive --no-single-branch "${FOLDER:?}" \
     >>${OUT1:?} 2>>${OUT2:?} || { error "${EC15:?}"; return 1; }
+  
+  cdfolder "${PACKDIR}" || { unset_all; return 1; }
 
-  cdfolder "${PACKDIR:?}" || { unset_all; return 1; }
-
-  if [[ -n "${COSMOPOWER_SOLIKET_GIT_COMMIT:-}" ||
-        -n "${COSMOPOWER_SOLIKET_GIT_BRANCH:-}" ||
-        -n "${COSMOPOWER_SOLIKET_GIT_TAG:-}" ]]; then
+  if [[ -n "${FASTPT_GIT_COMMIT:-}" ||
+        -n "${FASTPT_GIT_BRANCH:-}" ||
+        -n "${FASTPT_GIT_TAG:-}" ]]; then
     if [ "$("${GIT:?}" rev-parse --is-shallow-repository)" = "true" ]; then
       "${GIT:?}" fetch --unshallow --all --tags --prune \
         >>${OUT1:?} 2>>${OUT2:?} || { error "${EC16:?}"; return 1; }
@@ -105,57 +110,56 @@ if [ ! -d "${PACKDIR:?}" ]; then
     fi
   fi
 
-  if [ -n "${COSMOPOWER_SOLIKET_GIT_COMMIT:-}" ]; then
-    "${GIT:?}" checkout "${COSMOPOWER_SOLIKET_GIT_COMMIT:?}" \
+  if [ -n "${FASTPT_GIT_COMMIT:-}" ]; then
+    "${GIT:?}" checkout "${FASTPT_GIT_COMMIT:?}" \
       >>${OUT1:?} 2>>${OUT2:?} || { error "${EC16:?}"; return 1; }
-  elif [ -n "${COSMOPOWER_SOLIKET_GIT_BRANCH:-}" ]; then
-    "${GIT:?}" checkout -b "${COSMOPOWER_SOLIKET_GIT_BRANCH:?}" "origin/${COSMOPOWER_SOLIKET_GIT_BRANCH:?}" \
+  elif [ -n "${FASTPT_GIT_BRANCH:-}" ]; then
+    "${GIT:?}" checkout -b "${FASTPT_GIT_BRANCH:?}" "origin/${FASTPT_GIT_BRANCH:?}" \
       >>${OUT1:?} 2>>${OUT2:?} || { error "${EC16:?}"; return 1; }
-  elif [ -n "${COSMOPOWER_SOLIKET_GIT_TAG:-}" ]; then
-    "${GIT:?}" checkout "tags/${COSMOPOWER_SOLIKET_GIT_TAG:?}" -b "${COSMOPOWER_SOLIKET_GIT_TAG:?}" \
+  elif [ -n "${FASTPT_GIT_TAG:-}" ]; then
+    "${GIT:?}" checkout "tags/${FASTPT_GIT_TAG:?}" -b "${FASTPT_GIT_TAG:?}" \
       >>${OUT1:?} 2>>${OUT2:?} || { error "${EC16:?}"; return 1; }
   fi
- 
+    
 fi
 
-cdfolder "${ROOTDIR}" || { unset_all; return 1; }
+unset -v URL FOLDER PACKDIR
 
-pbottom "INSTALLING COSMOPOWER SO.LIKE.T THEORY (COBAYA)" || { unset_all; return 1; }
+URL="${FASTPT_WRAPPER_URL:-"https://github.com/CosmoLike/fastpt.git"}"
 
+FOLDER="${FASTPT_WRAPPER_NAME:-"PyFAST-PT"}"
+
+PACKDIR="${ECODEF:?}/${FOLDER:?}"
+
+# ----------------------------------------------------------------------------
+# ----------------------------------------------------------------------------
+# ----------------------------------------------------------------------------
+# FAST-PT cobaya theory wrapper
 # ----------------------------------------------------------------------------
 # ----------------------------------------------------------------------------
 # ----------------------------------------------------------------------------
+if [ -n "${OVERWRITE_EXISTING_FASTPT_CODE:-}" ]; then
 
-URL="${COSMOPOWER_URL:-"https://github.com/alessiospuriomancini/cosmopower.git"}"
-
-FOLDER="${COSMOPOWER_NAME:-"cosmopower"}"
-
-PACKDIR="${ECODEF:?}/emulators/${FOLDER:?}"
-
-ptop "INSTALLING COSMOPOWER" || { unset_all; return 1; }
-
-# ----------------------------------------------------------------------------
-# In case this script is called twice ----------------------------------------
-# ----------------------------------------------------------------------------
-if [ -n "${OVERWRITE_EXISTING_COSMOPOWER_CODE:-}" ]; then
-
-  rm -rf "${PACKDIR:?}"
+  rm -rf "${PACKDIR:?}";
 
 fi
 
-if [ ! -d "${PACKDIR:?}" ]; then
-
-  cdfolder "${ECODEF:?}/emulators" || { cdroot; return 1; }
+if [[ ! -d "${PACKDIR:?}" ]]; then
+  
+  # --------------------------------------------------------------------------
+  # Clone from original FAST-PT theory wrapper repo --------------------------
+  # --------------------------------------------------------------------------
+  cdfolder "${ECODEF:?}" || { unset_all; return 1; }
 
   "${GIT:?}" clone "${URL:?}" --depth ${GIT_CLONE_MAXIMUM_DEPTH:-1000} \
-    --recursive "${PACKDIR:?}" \
+    --recursive "${FOLDER:?}" \
     >>${OUT1:?} 2>>${OUT2:?} || { error "${EC15:?}"; return 1; }
+  
+  cdfolder "${PACKDIR}" || { unset_all; return 1; }
 
-  cdfolder "${PACKDIR:?}" || { unset_all; return 1; }
-
-  if [[ -n "${COSMOPOWER_GIT_COMMIT:-}" ||
-        -n "${COSMOPOWER_GIT_BRANCH:-}" ||
-        -n "${COSMOPOWER_GIT_TAG:-}" ]]; then
+  if [[ -n "${FASTPT_WRAPPER_GIT_COMMIT:-}" ||
+        -n "${FASTPT_WRAPPER_GIT_BRANCH:-}" ||
+        -n "${FASTPT_WRAPPER_GIT_TAG:-}" ]]; then
     if [ "$("${GIT:?}" rev-parse --is-shallow-repository)" = "true" ]; then
       "${GIT:?}" fetch --unshallow --all --tags --prune \
         >>${OUT1:?} 2>>${OUT2:?} || { error "${EC16:?}"; return 1; }
@@ -165,14 +169,14 @@ if [ ! -d "${PACKDIR:?}" ]; then
     fi
   fi
 
-  if [ -n "${COSMOPOWER_GIT_COMMIT:-}" ]; then
-    "${GIT:?}" checkout "${COSMOPOWER_GIT_COMMIT:?}" \
+  if [ -n "${FASTPT_WRAPPER_GIT_COMMIT:-}" ]; then
+    "${GIT:?}" checkout "${FASTPT_WRAPPER_GIT_COMMIT:?}" \
       >>${OUT1:?} 2>>${OUT2:?} || { error "${EC16:?}"; return 1; }
-  elif [ -n "${COSMOPOWER_GIT_BRANCH:-}" ]; then
-    "${GIT:?}" checkout "${COSMOPOWER_GIT_BRANCH:?}" \
+  elif [ -n "${FASTPT_WRAPPER_GIT_BRANCH:-}" ]; then
+    "${GIT:?}" checkout -b "${FASTPT_WRAPPER_GIT_BRANCH:?}" "origin/${FASTPT_WRAPPER_GIT_BRANCH:?}" \
       >>${OUT1:?} 2>>${OUT2:?} || { error "${EC16:?}"; return 1; }
-  elif [ -n "${COSMOPOWER_GIT_TAG:-}" ]; then
-    "${GIT:?}" checkout "tags/${COSMOPOWER_GIT_TAG:?}" -b "${COSMOPOWER_GIT_TAG:?}" \
+  elif [ -n "${FASTPT_WRAPPER_GIT_TAG:-}" ]; then
+    "${GIT:?}" checkout "tags/${FASTPT_WRAPPER_GIT_TAG:?}" -b "${FASTPT_WRAPPER_GIT_TAG:?}" \
       >>${OUT1:?} 2>>${OUT2:?} || { error "${EC16:?}"; return 1; }
   fi
 
@@ -180,9 +184,9 @@ fi
 
 cdfolder "${ROOTDIR:?}" || { unset_all; return 1; }
 
-pbottom "INSTALLING COSMOPOWER" || { unset_all; return 1; }
+pbottom "INSTALLING ${PRINTNAME:?}" || { unset_all; return 1; }
 
-# ------------------------------------------------------------------------------
+# ----------------------------------------------------------------------------
 
 unset_all || return 1
 
@@ -193,6 +197,7 @@ return 55; # why this odd number? Setup_cocoa will cache this installation only
            #   or the system shuts down in the middle of a git clone?  
            #   In this case, PACKDIR would exists, but it is corrupted
 
+  
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------

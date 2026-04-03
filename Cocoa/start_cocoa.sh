@@ -226,22 +226,31 @@ if [[ -z "${IGNORE_EMULTRF_CODE}" ]]; then
   COBTH="${ROOTDIR:?}/cobaya/cobaya/theories"
   TMP="${EMULTRF_NAME:-"emultrf"}"
 
-  for TMP2 in \
-    "emulcmb" \
-    "emulbaosn" \
-    "emultheta" \
-    "emulrdrag" \
-    "emul_cosmic_shear" \
-    "emul_ggl" \
-    "emul_wtheta" \
-    "emulmps"
-  do
+  for TMP2 in "emulcmb" "emulbaosn" "emultheta" "emulrdrag" \
+              "emul_cosmic_shear" "emul_ggl" "emul_wtheta"; do
     if [[ ! -L "${COBTH:?}/${TMP2}" ]]; then
       ln -s "${ECODEF:?}/emulators/${TMP}/${TMP2}" "${COBTH:?}" \
-        >>"${OUT1:?}" 2>>"${OUT2:?}" || { error_start_cocoa "${EC34:?}"; return 1; }
+        >>${OUT1:?} 2>>${OUT2:?} || { error_start_cocoa "${EC34:?}"; return 1; }
     fi
   done
-  
+
+  unset -v ECODEF COBTH TMP TMP2
+fi
+
+# ----------------------------------------------------------------------------
+# ---------------------------- PYFAST-PT THEORY ------------------------------
+# ----------------------------------------------------------------------------
+if [[ -z "${IGNORE_FASTPT_CODE}" ]]; then
+  ECODEF="${ROOTDIR:?}/external_modules/code"
+  COBTH="${ROOTDIR:?}/cobaya/cobaya/theories"
+  TMP="${FASTPT_WRAPPER_NAME:-"PyFAST-PT"}"
+
+  TMP2="fastpt"
+  if [[ ! -L "${COBTH:?}/${TMP2}" ]]; then
+    ln -s "${ECODEF:?}/${TMP}" "${COBTH:?}/${TMP2}" \
+      >>${OUT1:?} 2>>${OUT2:?} || { error_start_cocoa "${EC34:?}"; return 1; }
+  fi
+
   unset -v ECODEF COBTH TMP TMP2
 fi
 

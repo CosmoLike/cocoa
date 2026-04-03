@@ -97,14 +97,9 @@ fi
 if [[ -z "${IGNORE_COSMOLIKE_CODE}" ]]; then
   ECODEF="${ROOTDIR:?}/external_modules/code"
 
-  for TMP in \
-    "cfastpt" \
-    "cfftlog" \
-    "cosmolike" \
-    "log.c"
-  do
-    if [[ -L "${ECODEF:?}/${TMP:?}" ]]; then
-      rm -f "${ECODEF:?}/${TMP:?}"
+  for TMP1 in "cfastpt" "cfftlog" "cosmolike" "log.c"; do
+    if [[ -L "${ECODEF:?}/${TMP1}" ]]; then
+      rm -f "${ECODEF:?}/${TMP1}"
     fi
   done
 
@@ -135,12 +130,9 @@ fi
 if [ -z "${IGNORE_ACTDR6_CODE}" ]; then
   COBLIKE="${ROOTDIR:?}/cobaya/cobaya/likelihoods"
 
-  for TMP in \
-    "planck_2020_hillipop" \
-    "planck_2020_lollipop"
-  do
-    if [[ -L "${COBLIKE:?}/${TMP:?}" ]]; then
-      rm -f "${COBLIKE:?}/${TMP:?}"
+  for TMP in "planck_2020_hillipop" "planck_2020_lollipop"; do
+    if [[ -L "${COBLIKE:?}/${TMP}" ]]; then
+      rm -f "${COBLIKE:?}/${TMP}"
     fi
   done
 
@@ -167,18 +159,10 @@ fi
 if [[ -z "${IGNORE_EMULTRF_CODE}" ]]; then
   COBTH="${ROOTDIR:?}/cobaya/cobaya/theories"
 
-  for TMP in \
-    "emulcmb" \
-    "emulbaosn" \
-    "emultheta" \
-    "emulrdrag" \
-    "emul_cosmic_shear" \
-    "emul_ggl" \
-    "emul_wtheta" \
-    "emulmps"
-  do
-    if [[ -L "${COBTH:?}/${TMP:?}" ]]; then
-      rm -f "${COBTH:?}/${TMP:?}"
+  for TMP in "emulcmb" "emulbaosn" "emultheta" "emulrdrag" \
+             "emul_cosmic_shear" "emul_ggl" "emul_wtheta"; do
+    if [[ -L "${COBTH:?}/${TMP}" ]]; then
+      rm -f "${COBTH:?}/${TMP}"
     fi
   done
 
@@ -188,6 +172,7 @@ fi
 # ----------------------------------------------------------------------------
 # ------------------------ STOP EXTERNAL PROJECTS ---------------------------
 # ----------------------------------------------------------------------------
+
 
 if [ -n "${ROOTDIR}" ]; then
   source "${ROOTDIR:?}/installation_scripts/stop_all_projects.sh"
