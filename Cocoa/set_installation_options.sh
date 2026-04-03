@@ -82,8 +82,8 @@ export IGNORE_DARK_EMULATOR_CODE=1
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
 #export IGNORE_COSMOLIKE_LSST_Y1_CODE=1
-export IGNORE_COSMOLIKE_DES_Y3_CODE=1
-export IGNORE_COSMOLIKE_DESXPLANCK_CODE=1
+#export IGNORE_COSMOLIKE_DES_Y3_CODE=1
+#export IGNORE_COSMOLIKE_DESXPLANCK_CODE=1
 #export IGNORE_COSMOLIKE_ROMAN_FOURIER_CODE=1
 #export IGNORE_COSMOLIKE_ROMAN_REAL_CODE=1
 
@@ -209,8 +209,9 @@ export COBAYA_URL="https://github.com/CobayaSampler/cobaya.git"
 export COBAYA_GIT_COMMIT="86943d81d48d2edb2961b17077461df9e799f4d1"
 
 export COSMOLIKE_URL="https://github.com/CosmoLike/cocoa-cosmolike-core.git"
-#export COSMOLIKE_GIT_COMMIT= ""
 export COSMOLIKE_NAME="cosmolike_core"
+#export COSMOLIKE_GIT_COMMIT= ""
+export COSMOLIKE_GIT_TAG="v4.04"
 
 export HILLIPOP_URL="https://github.com/planck-npipe/hillipop.git"
 export HILLIPOP_GIT_COMMIT="cc9cbe31991d4662522241543a46d44d2cdec251"
@@ -309,9 +310,10 @@ export COSMOPOWER_URL_DATA_COMMIT="4317635eed70289ee1ec6b3df828027173071e36"
 
 export EMULTRF_URL="https://github.com/CosmoLike/emulators_code.git"
 #export EMULTRF_GIT_COMMIT="32139fee45a9a6774b3eb95c2e71539ee24d10f1"
+export EMULTRF_GIT_COMMIT="dd55722e33498242755d8e1cbdd8b3966bba310f"
 
 export EMULTRF_DATA_URL="https://github.com/SBU-COSMOLIKE/emulators_data_lcdm.git"
-#export EMULTRF_DATA_URL="090277edf910bde37a856b8e62044d06ea5b5dc0"
+export EMULTRF_DATA_GIT_COMMIT="090277edf910bde37a856b8e62044d06ea5b5dc0"
 
 export DARKEMULATOR_URL="https://github.com/DarkQuestCosmology/dark_emulator_public.git"
 export DARKEMULATOR_GIT_COMMIT="46df5972509624e2eeadc2bf3ac528b02333a7e2"
@@ -342,20 +344,20 @@ export GETDIST_NAME="getdist"
 export LSST_Y1_URL="https://github.com/CosmoLike/cocoa_lsst_y1.git"
 export LSST_Y1_NAME="lsst_y1"
 #BRANCH: if unset, load the latest commit on the specified branch
-export LSST_Y1_BRANCH="main"
+#export LSST_Y1_BRANCH="main"
 #COMMIT: if unset, load the specified commit
 #export LSST_Y1_COMMIT="df96af9558c97b07d355df4bfc56f1677e71b201"
 #BRANCH: if unset, load the specified TAG
-#export LSST_Y1_TAG="v4.0-beta17"
+export LSST_Y1_TAG="v4.04"
 
 export DES_Y3_URL="https://github.com/CosmoLike/cocoa_des_y3.git"
 export DES_Y3_NAME="des_y3"
 #BRANCH: if unset, load the latest commit on the specified branch
-export DES_Y3_BRANCH="main"
+#export DES_Y3_BRANCH="main"
 #COMMIT: if unset, load the specified commit
 #export DES_Y3_COMMIT="1a46582b5539c177bd68f8863c054f79a15f8538"
 #BRANCH: if unset, load the specified TAG
-#export DES_Y3_TAG="v4.0-beta17"
+export DES_Y3_TAG="v4.04"
 
 export ROMAN_FOURIER_URL="https://github.com/CosmoLike/cocoa_roman_fourier.git"
 export ROMAN_FOURIER_NAME="roman_fourier"
@@ -364,22 +366,22 @@ export ROMAN_FOURIER_NAME="roman_fourier"
 #COMMIT: if unset, load the specified commit
 #export ROMAN_FOURIER_COMMIT="407a35a15b2a1d96d96cb5f0276cf772c2c60e6d"
 #BRANCH: if unset, load the specified TAG
-#export ROMAN_FOURIER_TAG="v4.0-beta17"
+export ROMAN_FOURIER_TAG="v4.04"
 
 export ROMAN_REAL_URL="https://github.com/CosmoLike/cocoa_roman_real.git"
 export ROMAN_REAL_NAME="roman_real"
 #BRANCH: if unset, load the latest commit on the specified branch
-export ROMAN_REAL_BRANCH="main"
+#export ROMAN_REAL_BRANCH="main"
 #COMMIT: if unset, load the specified commit
 #export ROMAN_REAL_COMMIT="8a13be52849fc7965b99f41bd173b7dda05fba67"
 #BRANCH: if unset, load the specified TAG
-#export ROMAN_REAL_TAG="v4.0-beta17"
+export ROMAN_REAL_TAG="v4.04"
 
 export DESXPLANCK_URL="https://git@github.com/CosmoLike/cocoa_desy1xplanck.git"
 export DESXPLANCK_NAME="desy1xplanck"
-export DESXPLANCK_BRANCH="main"
+#export DESXPLANCK_BRANCH="main"
 #export DESXPLANCK_COMMIT=
-#export DESXPLANCK_TAG=
+export DESXPLANCK_TAG="v4.04"
 # --------------------------------------------------------------------
 # --------------------------------------------------------------------
 # private projects below ---------------------------------------------
