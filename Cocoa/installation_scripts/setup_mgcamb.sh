@@ -93,7 +93,7 @@ if [ ! -d "${PACKDIR:?}" ]; then
   cdfolder "${ECODEF:?}" || { unset_all; return 1; }
 
   "${GIT:?}" clone "${URL:?}" --depth ${GIT_CLONE_MAXIMUM_DEPTH:-1000} \
-    --recursive "${TFOLDER:?}" \
+    --recursive --no-single-branch "${TFOLDER:?}" \
     >>${OUT1:?} 2>>${OUT2:?} || { error "${EC15:?}"; return 1; }
   
   cdfolder "${ECODEF:?}/${TFOLDER:?}" || { unset_all; return 1; }

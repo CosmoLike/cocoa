@@ -89,10 +89,8 @@ if [ ! -d "${PACKDIR:?}" ]; then
 
   cdfolder "${ECODEF:?}/emulators" || { unset_all; return 1; }
 
-  "${GIT:?}" clone "${URL:?}" \
-    --depth "${GIT_CLONE_MAXIMUM_DEPTH:-1000}" \
-    --recurse-submodules \
-    "${PACKDIR:?}" \
+  "${GIT:?}" clone "${URL:?}" --depth ${GIT_CLONE_MAXIMUM_DEPTH:-1000} \
+    --recurse-submodules --no-single-branch "${PACKDIR:?}" \
     >>${OUT1:?} 2>>${OUT2:?} || { error "${EC15:?}"; return 1; }
 
   cdfolder "${PACKDIR:?}" || { unset_all; return 1; }
