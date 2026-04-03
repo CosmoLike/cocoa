@@ -111,7 +111,7 @@ if [ ! -d "${PACKDIR:?}" ]; then
     "${GIT:?}" checkout "${FGSPECTRA_GIT_COMMIT:?}" \
       >>${OUT1:?} 2>>${OUT2:?} || { error "${EC16:?}"; return 1; }
   elif [ -n "${FGSPECTRA_GIT_BRANCH:-}" ]; then
-    "${GIT:?}" checkout "${FGSPECTRA_GIT_BRANCH:?}" \
+    "${GIT:?}" checkout -b "${FGSPECTRA_GIT_BRANCH:?}" "origin/${FGSPECTRA_GIT_BRANCH:?}" \
       >>${OUT1:?} 2>>${OUT2:?} || { error "${EC16:?}"; return 1; }
   elif [ -n "${FGSPECTRA_GIT_TAG:-}" ]; then
     "${GIT:?}" checkout "tags/${FGSPECTRA_GIT_TAG:?}" -b "${FGSPECTRA_GIT_TAG:?}" \

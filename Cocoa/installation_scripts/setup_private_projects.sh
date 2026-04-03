@@ -108,15 +108,11 @@ gitact2() {
     cdfolder "${PACKDIR:?}" || { unset_all; return 1; }
 
     if [ "$("${GIT:?}" rev-parse --is-shallow-repository)" = "true" ]; then
-    
       "${GIT:?}" fetch --unshallow --all --tags --prune \
         >>${OUT1:?} 2>>${OUT2:?} || { error "${EC16:?}"; return 1; }
-    
     else
-    
       "${GIT:?}" fetch --all --tags --prune \
         >>${OUT1:?} 2>>${OUT2:?} || { error "${EC16:?}"; return 1; }
-    
     fi
 
     "${GIT:?}" checkout "${TAG:?}" \
@@ -134,27 +130,20 @@ gitact3() {
     cdfolder "${PACKDIR:?}" || { unset_all; return 1; }
     
     if [ "$("${GIT:?}" rev-parse --is-shallow-repository)" = "true" ]; then
-   
       "${GIT:?}" fetch --unshallow --all --tags --prune \
         >>${OUT1:?} 2>>${OUT2:?} || { error "${EC16:?}"; return 1; }
-   
     else
    
       "${GIT:?}" fetch --all --tags --prune \
         >>${OUT1:?} 2>>${OUT2:?} || { error "${EC16:?}"; return 1; }
-   
     fi
     
     if "${GIT:?}" show-ref --verify --quiet "refs/heads/${TAG:?}"; then
-   
       "${GIT:?}" checkout "${TAG:?}" \
         >>${OUT1:?} 2>>${OUT2:?} || { error "${EC16:?}"; return 1; }
-   
     else
-   
       "${GIT:?}" checkout "tags/${TAG:?}" -b "${TAG:?}" \
         >>${OUT1:?} 2>>${OUT2:?} || { error "${EC16:?}"; return 1; }
-   
     fi
 
   fi

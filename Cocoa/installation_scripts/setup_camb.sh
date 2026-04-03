@@ -101,7 +101,7 @@ if [ ! -d "${PACKDIR:?}" ]; then
     "${GIT:?}" checkout "${CAMB_GIT_COMMIT:?}" \
       >>${OUT1:?} 2>>${OUT2:?} || { error "${EC16:?}"; return 1; }
   elif [ -n "${CAMB_GIT_BRANCH:-}" ]; then
-    "${GIT:?}" checkout "${CAMB_GIT_BRANCH:?}" \
+    "${GIT:?}" checkout -b "${CAMB_GIT_BRANCH:?}" "origin/${CAMB_GIT_BRANCH:?}" \
       >>${OUT1:?} 2>>${OUT2:?} || { error "${EC16:?}"; return 1; }
   elif [ -n "${CAMB_GIT_TAG:-}" ]; then
     "${GIT:?}" checkout "tags/${CAMB_GIT_TAG:?}" -b "${CAMB_GIT_TAG:?}" \

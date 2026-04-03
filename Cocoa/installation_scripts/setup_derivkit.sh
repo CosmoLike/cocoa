@@ -100,7 +100,7 @@ if [ ! -d "${PACKDIR:?}" ]; then
     "${GIT:?}" checkout "${DERIVKIT_GIT_COMMIT:?}" \
       >>${OUT1:?} 2>>${OUT2:?} || { error "${EC16:?}"; return 1; }
   elif [ -n "${DERIVKIT_GIT_BRANCH:-}" ]; then
-    "${GIT:?}" checkout "${DERIVKIT_GIT_BRANCH:?}" \
+    "${GIT:?}" checkout -b "${DERIVKIT_GIT_BRANCH:?}" "origin/${DERIVKIT_GIT_BRANCH:?}" \
       >>${OUT1:?} 2>>${OUT2:?} || { error "${EC16:?}"; return 1; }
   elif [ -n "${DERIVKIT_GIT_TAG:-}" ]; then
     "${GIT:?}" checkout "tags/${DERIVKIT_GIT_TAG:?}" -b "${DERIVKIT_GIT_TAG:?}" \

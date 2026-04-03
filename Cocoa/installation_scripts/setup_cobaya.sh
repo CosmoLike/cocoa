@@ -124,7 +124,7 @@ if [ ! -d "${ROOTDIR:?}/cobaya" ]; then
     "${GIT:?}" checkout "${COBAYA_GIT_COMMIT:?}" \
       >>${OUT1:?} 2>>${OUT2:?} || { error "${EC16:?}"; return 1; }
   elif [ -n "${COBAYA_GIT_BRANCH:-}" ]; then
-    "${GIT:?}" checkout "${COBAYA_GIT_BRANCH:?}" \
+    "${GIT:?}" checkout -b "${COBAYA_GIT_BRANCH:?}" "origin/${COBAYA_GIT_BRANCH:?}" \
       >>${OUT1:?} 2>>${OUT2:?} || { error "${EC16:?}"; return 1; }
   elif [ -n "${COBAYA_GIT_TAG:-}" ]; then
     "${GIT:?}" checkout "tags/${COBAYA_GIT_TAG:?}" -b "${COBAYA_GIT_TAG:?}" \

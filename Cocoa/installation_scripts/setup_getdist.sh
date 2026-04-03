@@ -99,7 +99,7 @@ if [ ! -d "${PACKDIR:?}" ]; then
     "${GIT:?}" checkout "${GETDIST_GIT_COMMIT:?}" \
       >>${OUT1:?} 2>>${OUT2:?} || { error "${EC16:?}"; return 1; }
   elif [ -n "${GETDIST_GIT_BRANCH:-}" ]; then
-    "${GIT:?}" checkout "${GETDIST_GIT_BRANCH:?}" \
+    "${GIT:?}" checkout -b "${GETDIST_GIT_BRANCH:?}" "origin/${GETDIST_GIT_BRANCH:?}" \
       >>${OUT1:?} 2>>${OUT2:?} || { error "${EC16:?}"; return 1; }
   elif [ -n "${GETDIST_GIT_TAG:-}" ]; then
     "${GIT:?}" checkout "tags/${GETDIST_GIT_TAG:?}" -b "${GETDIST_GIT_TAG:?}" \
