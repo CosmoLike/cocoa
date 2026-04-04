@@ -99,9 +99,8 @@ if [ ! -d "${ROOTDIR:?}/cobaya" ]; then
   
   URL="${COBAYA_URL:-"https://github.com/CobayaSampler/cobaya.git"}"
 
-  "${GIT:?}" clone "${URL:?}" cobaya \
-    --depth ${GIT_CLONE_MAXIMUM_DEPTH:-1000} \
-    --recursive \
+  "${GIT:?}" clone "${URL:?}" --depth ${GIT_CLONE_MAXIMUM_DEPTH:-1000} \
+    --recursive --no-single-branch cobaya \
     >>${OUT1:?} 2>>${OUT2:?} || { error "${EC15:?}"; return 1; }
   
   unset URL
@@ -124,7 +123,7 @@ if [ ! -d "${ROOTDIR:?}/cobaya" ]; then
     "${GIT:?}" checkout "${COBAYA_GIT_COMMIT:?}" \
       >>${OUT1:?} 2>>${OUT2:?} || { error "${EC16:?}"; return 1; }
   elif [ -n "${COBAYA_GIT_BRANCH:-}" ]; then
-    "${GIT:?}" checkout "${COBAYA_GIT_BRANCH:?}" \
+    "${GIT:?}" checkout -b "${COBAYA_GIT_BRANCH:?}" "origin/${COBAYA_GIT_BRANCH:?}" \
       >>${OUT1:?} 2>>${OUT2:?} || { error "${EC16:?}"; return 1; }
   elif [ -n "${COBAYA_GIT_TAG:-}" ]; then
     "${GIT:?}" checkout "tags/${COBAYA_GIT_TAG:?}" -b "${COBAYA_GIT_TAG:?}" \

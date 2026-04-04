@@ -90,7 +90,7 @@ if [ ! -d "${PACKDIR:?}" ]; then
   cdfolder "${ECODEF}" || { unset_all; return 1; }
 
   "${GIT:?}" clone "${URL:?}" --depth ${GIT_CLONE_MAXIMUM_DEPTH:-1000} \
-    --recursive "${FOLDER:?}" \
+    --recursive --no-single-branch "${FOLDER:?}" \
     >>${OUT1:?} 2>>${OUT2:?} || { error "${EC15:?}"; return 1; }
   
   cdfolder "${PACKDIR}" || { unset_all; return 1; }
@@ -111,7 +111,7 @@ if [ ! -d "${PACKDIR:?}" ]; then
     "${GIT:?}" checkout "${POLYCHORD_GIT_COMMIT:?}" \
       >>${OUT1:?} 2>>${OUT2:?} || { error "${EC16:?}"; return 1; }
   elif [ -n "${POLYCHORD_GIT_BRANCH:-}" ]; then
-    "${GIT:?}" checkout "${POLYCHORD_GIT_BRANCH:?}" \
+    "${GIT:?}" checkout -b "${POLYCHORD_GIT_BRANCH:?}" "origin/${POLYCHORD_GIT_BRANCH:?}" \
       >>${OUT1:?} 2>>${OUT2:?} || { error "${EC16:?}"; return 1; }
   elif [ -n "${POLYCHORD_GIT_TAG:-}" ]; then
     "${GIT:?}" checkout "tags/${POLYCHORD_GIT_TAG:?}" -b "${POLYCHORD_GIT_TAG:?}" \

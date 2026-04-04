@@ -196,7 +196,7 @@ export COBAYA_GIT_COMMIT="86943d81d48d2edb2961b17077461df9e799f4d1"
 
 export COSMOLIKE_URL="https://github.com/CosmoLike/cocoa-cosmolike-core.git"
 #export COSMOLIKE_GIT_COMMIT= ""
-export COSMOLIKE_GIT_TAG="v4.05" 
+export COSMOLIKE_GIT_TAG="v4.07" 
 export COSMOLIKE_NAME="cosmolike_core"
 
 export HILLIPOP_URL="https://github.com/planck-npipe/hillipop.git"
@@ -295,11 +295,11 @@ export COSMOPOWER_DATA_URL="https://github.com/cosmopower-organization/jense_202
 export COSMOPOWER_DATA_URL_COMMIT="4317635eed70289ee1ec6b3df828027173071e36"
 
 export EMULTRF_URL="https://github.com/CosmoLike/emulators_code.git"
-export EMULTRF_GIT_TAG="v4.05"
+export EMULTRF_GIT_TAG="v4.07"
 #export EMULTRF_GIT_COMMIT="32139fee45a9a6774b3eb95c2e71539ee24d10f1"
 
 export EMULTRF_DATA_URL="https://github.com/SBU-COSMOLIKE/emulators_data_lcdm.git"
-export EMULTRF_GIT_TAG="v4.05"
+export EMULTRF_DATA_GIT_TAG="v4.05"
 #export EMULTRF_GIT_COMMIT="090277edf910bde37a856b8e62044d06ea5b5dc0"
 
 export DARKEMULATOR_URL="https://github.com/DarkQuestCosmology/dark_emulator_public.git"
@@ -367,7 +367,7 @@ export ROMAN_REAL_NAME="roman_real"
 #COMMIT: if unset, load the specified commit
 #export ROMAN_REAL_GIT_COMMIT="8a13be52849fc7965b99f41bd173b7dda05fba67"
 #BRANCH: if unset, load the specified TAG
-export ROMAN_REAL_GIT_TAG="v4.05"
+export ROMAN_REAL_GIT_TAG="v4.07"
 
 export DESXPLANCK_URL="https://git@github.com/CosmoLike/cocoa_desy1xplanck.git"
 #export DESXPLANCK_GIT_NAME="desy1xplanck"

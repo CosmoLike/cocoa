@@ -90,7 +90,7 @@ if [ ! -d "${PACKDIR:?}" ]; then
   cdfolder "${ECODEF:?}/emulators" || { unset_all; return 1; }
 
   "${GIT:?}" clone "${URL:?}" --depth ${GIT_CLONE_MAXIMUM_DEPTH:-1000} \
-    --recursive "${PACKDIR:?}" \
+    --recursive --no-single-branch "${PACKDIR:?}" \
     >>${OUT1:?} 2>>${OUT2:?} || { error "${EC15:?}"; return 1; }
 
   cdfolder "${PACKDIR:?}" || { unset_all; return 1; }
@@ -111,7 +111,7 @@ if [ ! -d "${PACKDIR:?}" ]; then
     "${GIT:?}" checkout "${EMULTRF_GIT_COMMIT:?}" \
       >>${OUT1:?} 2>>${OUT2:?} || { error "${EC16:?}"; return 1; }
   elif [ -n "${EMULTRF_GIT_BRANCH:-}" ]; then
-    "${GIT:?}" checkout "${EMULTRF_GIT_BRANCH:?}" \
+    "${GIT:?}" checkout -b "${EMULTRF_GIT_BRANCH:?}" "origin/${EMULTRF_GIT_BRANCH:?}" \
       >>${OUT1:?} 2>>${OUT2:?} || { error "${EC16:?}"; return 1; }
   elif [ -n "${EMULTRF_GIT_TAG:-}" ]; then
     "${GIT:?}" checkout "tags/${EMULTRF_GIT_TAG:?}" -b "${EMULTRF_GIT_TAG:?}" \
