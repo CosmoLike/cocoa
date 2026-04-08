@@ -173,23 +173,45 @@ if [ -z "${IGNORE_EMULATOR_GPU_PIP_PACKAGES}" ]; then
   
   ptop "PIP INSTALL ML-GPU (takes O(5-10min)...)" || { unset_all; return 1; }
 
-  PIPCPML=(
+  if [ -z "${ML_BLEEDING_EDGE_LIBS:-}" ]; then
+    PIPCPML=(
+        "numpy==${COCOA_NUMPY_VERSION:?}"
+        'tensorflow==2.17.0'
+        'tensorflow_probability==0.24.0'
+        'keras==3.9.2'
+        'keras-preprocessing==1.1.2'
+        'torch==2.6.0'
+        'torchvision==0.21.0'
+        'torchaudio==2.6.0'
+        'scikit-learn==1.6.1'
+        'jupyter==1.0.0'
+        'typing-extensions==4.13.2'
+        'mkdocs_material==9.6.13'
+        'mkdocstrings==0.29.1'
+        'pytest==8.3.5'
+        'tf-keras==2.17.0'
+      )
+  else
+    PIPCPML=(
       "numpy==${COCOA_NUMPY_VERSION:?}"
-      'tensorflow==2.17.0'
-      'tensorflow_probability==0.24.0'
-      'keras==3.9.2'
+      'tensorflow==2.21.0'
+      'tensorflow_probability==0.25.0'
+      'keras==3.12.1'
       'keras-preprocessing==1.1.2'
-      'torch==2.6.0'
-      'torchvision==0.21.0'
-      'torchaudio==2.6.0'
-      'scikit-learn==1.6.1'
+      'torch==2.11.0'
+      'torchvision==0.26.0'
+      'torchaudio==2.11.0'
+      'scikit-learn==1.7.2'
       'jupyter==1.0.0'
       'typing-extensions==4.13.2'
       'mkdocs_material==9.6.13'
       'mkdocstrings==0.29.1'
       'pytest==8.3.5'
-      'tf-keras==2.17.0'
+      'tf-keras==2.21.0'
+      'nvidia-pyindex'
+      "cuda-toolkit[all]>=13.0.0"
     )
+  fi
 
   PIPCPML_HASH=$(
     {
