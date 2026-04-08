@@ -319,7 +319,7 @@ Now, users must follow all the steps below.
 - **One model evaluation**:
 
   - Linux
-    
+
         mpirun -n 1 --oversubscribe --mca pml ^ucx --mca btl vader,tcp,self --rank-by slot \
           --bind-to core:overload-allowed --map-by slot \
           cobaya-run ./projects/example/EXAMPLE_EMUL_EVALUATE1.yaml -f
@@ -331,7 +331,7 @@ Now, users must follow all the steps below.
 - **MCMC (Metropolis-Hastings Algorithm)**:
 
   - Linux
-    
+
         mpirun -n 4 --oversubscribe --mca pml ^ucx --mca btl vader,tcp,self --rank-by slot \
             --bind-to core:overload-allowed --map-by slot \
             cobaya-run ./projects/example/EXAMPLE_EMUL_MCMC1.yaml -r
@@ -348,13 +348,13 @@ Now, users must follow all the steps below.
 - **PolyChord**:
 
   - Linux
-    
+
         mpirun -n 90 --oversubscribe --mca pml ^ucx --mca btl vader,tcp,self --rank-by slot \
             --bind-to core:overload-allowed --map-by slot \
             cobaya-run ./projects/example/EXAMPLE_EMUL_POLY1.yaml -r
 
   - macOS (arm)
- 
+
         mpirun -n 12 --oversubscribe cobaya-run ./projects/example/EXAMPLE_EMUL_POLY1.yaml -r
     
 > [!Note]
@@ -369,7 +369,7 @@ likelihoods, and the theory code, all following Cobaya Conventions.
 - **Nautilus**:
 
   - Linux
-    
+
         mpirun -n 90 --oversubscribe --mca pml ^ucx --mca btl vader,tcp,self --rank-by slot \
             --bind-to core:overload-allowed --map-by slot \
             python -m mpi4py.futures ./projects/example/EXAMPLE_EMUL_NAUTILUS1.py \
@@ -429,7 +429,7 @@ likelihoods, and the theory code, all following Cobaya Conventions.
   Our minimizer is a reimplementation of `Procoli`, developed by Karwal et al ([arXiv:2401.14225](https://arxiv.org/abs/2401.14225)) 
 
     - Linux
-      
+
           mpirun -n 21 --oversubscribe --mca pml ^ucx --mca btl vader,tcp,self --rank-by slot \
               --bind-to core:overload-allowed --map-by slot \
               python ./projects/example/EXAMPLE_EMUL_MINIMIZE1.py --root ./projects/example/ \
@@ -462,7 +462,7 @@ likelihoods, and the theory code, all following Cobaya Conventions.
 - **Profile**: 
 
     - Linux
-      
+
           mpirun -n 21 --oversubscribe --mca pml ^ucx --mca btl vader,tcp,self --rank-by slot \
               --bind-to core:overload-allowed --map-by slot \
               python ./projects/example/EXAMPLE_EMUL_PROFILE1.py \
@@ -502,7 +502,7 @@ likelihoods, and the theory code, all following Cobaya Conventions.
     to calculate the profile. Here, the `minfile` and `cov` options are mandatory.
 
     - Linux
-      
+
           mpirun -n 1 --mca pml ^ucx --mca btl vader,tcp,self --rank-by slot \
               --bind-to core:overload-allowed --map-by slot \
               python ./projects/example/EXAMPLE_EMUL_PROFILE_SCIPY1.py \
@@ -594,11 +594,11 @@ Now, users must follow all the steps below.
  **Step :two:**: Select the number of OpenMP cores. Below, we set it to 4, the ideal setting for hybrid examples.
 
   - Linux
-    
+
         export OMP_NUM_THREADS=4; export OMP_PROC_BIND=close; export OMP_PLACES=cores; export OMP_DYNAMIC=FALSE
 
   - macOS (arm)
-    
+
         export OMP_NUM_THREADS=4; export OMP_PROC_BIND=disabled; export OMP_PLACES=cores; export OMP_DYNAMIC=FALSE
     
  **Step :three:** Run `cobaya-run` on the first emulator example, following the commands below (here we only provide lsst-y1 examples).
@@ -606,20 +606,20 @@ Now, users must follow all the steps below.
 - **One model evaluation**:
 
   - Linux
-    
+
         mpirun -n 1 --oversubscribe --mca pml ^ucx --mca btl vader,tcp,self \
            --bind-to core:overload-allowed --report-bindings  \
            --rank-by slot --map-by numa:pe=${OMP_NUM_THREADS} \
            cobaya-run ./projects/lsst_y1/EXAMPLE_EMUL2_EVALUATE1.yaml -f
 
   - macOS (arm)
-    
+
         mpirun -n 1 --oversubscribe  cobaya-run ./projects/lsst_y1/EXAMPLE_EMUL2_EVALUATE1.yaml -f
     
 - **MCMC (Metropolis-Hastings Algorithm)**:
 
   - Linux
-    
+
         mpirun -n 4 --oversubscribe --mca pml ^ucx --mca btl vader,tcp,self --rank-by slot \
             --bind-to core:overload-allowed --map-by slot \
             cobaya-run ./projects/lsst_y1/EXAMPLE_EMUL_EMUL2_MCMC1.yaml -r
@@ -1088,11 +1088,11 @@ Although this is the default configuration in CoCoA, it is worth noting that com
 If users have already run `setup_cocoa.sh` prior to commenting these flags, run the command.
 
     source start_cocoa.sh # even if (.local) is already active, users must run start_cocoa.sh again to update bash environment values
-   
+
 and
 
     source ./installation_scripts/setup_pip_core_packages.sh
-   
+
 
 # Additional Appendices <a name="appendix_additional"></a>
 
@@ -1237,7 +1237,7 @@ There are a few differences users should be aware of when running Cocoa on Googl
   *This solution is not valid when running Colab with local runtime* (see [Google documentation](https://research.google.com/colaboratory/local-runtimes.html) for additional information on how to link notebooks to local resources). The good news here is that local storage is persistent, so there is no need to create backups on Google Drive.
   
   - Saving checkpoints: compress and copy the `/content` folder from the local disk to the user's Drive
-    
+
         %%bash
         ROOT="colab_name_notebook"
         DEST="/content/drive/MyDrive/ColabBackups"
@@ -1251,7 +1251,7 @@ There are a few differences users should be aware of when running Cocoa on Googl
         echo "Created: $ARCHIVE"
 
   - Loading checkpoints: decompress and copy the `/content` folder from the user's Drive to the local disk
-    
+
         %%bash
         SENTINEL="/content/conda/etc/profile.d/conda.sh"  # exists when your env is restored
         if [[ -e "$SENTINEL" ]]; then
