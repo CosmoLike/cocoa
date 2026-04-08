@@ -51,7 +51,7 @@ export IGNORE_COSMOPOWER_DATA=1
 # The keys below control which packages will be installed and compiled 
 # ------------------------------------------------------------------------------
 #export IGNORE_CAMB_CODE=1
-#export IGNORE_CLASS_CODE=1 # Default: we just use CAMB (reduces compilation time)
+export IGNORE_CLASS_CODE=1 # Default: we just use CAMB (reduces compilation time)
 #export IGNORE_COSMOLIKE_CODE=1
 #export IGNORE_POLYCHORD_SAMPLER_CODE=1
 #export IGNORE_PLANCK_LIKELIHOOD_CODE=1
@@ -285,11 +285,11 @@ export MGCAMB_NAME='MGCAMB'
 export PLANCK2018_SROLL2_URL="https://web.fe.infn.it/~pagano/low_ell_datasets/sroll2/"
 export PLANCK2018_SROLL2_FILE="simall_100x143_sroll2_v3_EE_Aplanck.tgz"
 
-export COSMOPOWER_SOLIKET_URL="https://github.com/simonsobs/SOLikeT.git"
-export COSMOPOWER_SOLIKET_GIT_COMMIT="1d8333ea0007c88e7c2de192de39301884093cd8"
+export COSMOPOWER_SOLIKET_URL="https://github.com/SBU-COSMOLIKE/SOLikeT.git"
+export COSMOPOWER_SOLIKET_GIT_COMMIT="91a2b33daf6f783933007839083fbab25d73b77b"
 
-export COSMOPOWER_URL="https://github.com/alessiospuriomancini/cosmopower.git"
-export COSMOPOWER_GIT_COMMIT="7cac5e71c975c06257b2f95f0dcea5dd09b0f45f"
+export COSMOPOWER_URL="https://github.com/SBU-COSMOLIKE/cosmopower.git"
+export COSMOPOWER_GIT_COMMIT="f70fc789426847eed996d707ec67a3a93d74bbc3"
 
 export COSMOPOWER_DATA_URL="https://github.com/cosmopower-organization/jense_2024_emulators.git"
 export COSMOPOWER_DATA_URL_COMMIT="4317635eed70289ee1ec6b3df828027173071e36"
