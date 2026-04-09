@@ -373,7 +373,7 @@ export ROMAN_REAL_NAME="roman_real"
 #COMMIT: if unset, load the specified commit
 #export ROMAN_REAL_GIT_COMMIT="8a13be52849fc7965b99f41bd173b7dda05fba67"
 #BRANCH: if unset, load the specified TAG
-export ROMAN_REAL_GIT_TAG="v4.07"
+export ROMAN_REAL_GIT_TAG="v4.071"
 
 export DESXPLANCK_URL="https://git@github.com/CosmoLike/cocoa_desy1xplanck.git"
 #export DESXPLANCK_GIT_NAME="desy1xplanck"
