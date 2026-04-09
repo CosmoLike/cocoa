@@ -200,9 +200,9 @@ if [ -z "${IGNORE_EMULATOR_GPU_PIP_PACKAGES}" ]; then
       'tensorflow_probability==0.22.1'
       'keras==2.14.0'
       'keras-preprocessing==1.1.2'
-      'torch==2.7.0'
-      'torchvision==0.22.0'
-      'torchaudio==2.7.0'
+      'torch==2.6.0+cu118'
+      'torchvision==0.21.0'
+      'torchaudio==2.6.0'
       'scikit-learn==1.6.1'
       'jupyter==1.0.0'
       'typing-extensions==4.13.2'
@@ -211,7 +211,6 @@ if [ -z "${IGNORE_EMULATOR_GPU_PIP_PACKAGES}" ]; then
       'pytest==8.3.5'
       'nvidia-pyindex'
       "cuda-toolkit[all]==11.8.0"
-      'nvidia-cudnn-cu11==8.7.0.84'
     )
   else
     PIPCPML=(
