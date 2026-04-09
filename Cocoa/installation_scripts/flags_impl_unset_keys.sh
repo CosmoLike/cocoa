@@ -394,6 +394,7 @@ unset -v MGCAMB_NAME
 unset -v MGCAMB_URL
 unset -v MINICONDA_INSTALLATION
 unset -v ML_BLEEDING_EDGE_LIBS
+unset -v ML_LEGACY_LIBS
 unset -v MNT
 unset -v MPI_CC_COMPILER
 unset -v MPI_CXX_COMPILER
