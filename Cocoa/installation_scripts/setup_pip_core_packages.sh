@@ -173,25 +173,7 @@ if [ -z "${IGNORE_EMULATOR_GPU_PIP_PACKAGES}" ]; then
   
   ptop "PIP INSTALL ML-GPU (takes O(5-10min)...)" || { unset_all; return 1; }
 
-  if [ -z "${ML_BLEEDING_EDGE_LIBS:-}" ]; then
-    PIPCPML=(
-        "numpy==${COCOA_NUMPY_VERSION:?}"
-        'tensorflow==2.17.0'
-        'tensorflow_probability==0.24.0'
-        'keras==3.9.2'
-        'keras-preprocessing==1.1.2'
-        'torch==2.6.0'
-        'torchvision==0.21.0'
-        'torchaudio==2.6.0'
-        'scikit-learn==1.6.1'
-        'jupyter==1.0.0'
-        'typing-extensions==4.13.2'
-        'mkdocs_material==9.6.13'
-        'mkdocstrings==0.29.1'
-        'pytest==8.3.5'
-        'tf-keras==2.17.0'
-      )
-  else
+  if [ -n "${ML_BLEEDING_EDGE_LIBS:-}" ]; then
     PIPCPML=(
       "numpy==${COCOA_NUMPY_VERSION:?}"
       'tensorflow==2.21.0'
@@ -211,6 +193,44 @@ if [ -z "${IGNORE_EMULATOR_GPU_PIP_PACKAGES}" ]; then
       'nvidia-pyindex'
       "cuda-toolkit[all]>=13.0.0"
     )
+  elif [ -n "${ML_LEGACY_LIBS:-}" ]; then
+    PIPCPML=(
+      "numpy==${COCOA_NUMPY_VERSION:?}"
+      'tensorflow==2.14.0'
+      'tensorflow_probability==0.22.1'
+      'keras==2.14.0'
+      'keras-preprocessing==1.1.2'
+      'torch==2.7.0'
+      'torchvision==0.22.0'
+      'torchaudio==2.7.0'
+      'scikit-learn==1.6.1'
+      'jupyter==1.0.0'
+      'typing-extensions==4.13.2'
+      'mkdocs_material==9.6.13'
+      'mkdocstrings==0.29.1'
+      'pytest==8.3.5'
+      'nvidia-pyindex'
+      "cuda-toolkit[all]==11.8.0"
+      'nvidia-cudnn-cu11==8.7.0.84'
+    )
+  else
+    PIPCPML=(
+        "numpy==${COCOA_NUMPY_VERSION:?}"
+        'tensorflow==2.17.0'
+        'tensorflow_probability==0.24.0'
+        'keras==3.9.2'
+        'keras-preprocessing==1.1.2'
+        'torch==2.6.0'
+        'torchvision==0.21.0'
+        'torchaudio==2.6.0'
+        'scikit-learn==1.6.1'
+        'jupyter==1.0.0'
+        'typing-extensions==4.13.2'
+        'mkdocs_material==9.6.13'
+        'mkdocstrings==0.29.1'
+        'pytest==8.3.5'
+        'tf-keras==2.17.0'
+      )
   fi
 
   PIPCPML_HASH=$(
@@ -231,7 +251,8 @@ if [ -z "${IGNORE_EMULATOR_GPU_PIP_PACKAGES}" ]; then
       --prefer-binary \
       --extra-index-url "https://download.pytorch.org/whl/cu118" \
       --prefix="${ROOTDIR:?}/.local" \
-      >>${OUT1:?} 2>>${OUT2:?} || { error "${EC13:?}"; return 1; } 
+      >>${OUT1:?} 2>>${OUT2:?} || { error "${EC13:?}"; return 1; }
+
 
     # Without this code, jupyter breaks notebook
     env CXX="${CXX_COMPILER:?}" CC="${C_COMPILER:?}" ${PIP3:?} install "${PIPCP[@]}" \

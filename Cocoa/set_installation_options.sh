@@ -35,6 +35,7 @@ esac
 # New GPUs require cuda 13
 # ------------------------------------------------------------------------------
 #export ML_BLEEDING_EDGE_LIBS=1
+#export ML_LEGACY_LIBS=1
 
 # ------------------------------------------------------------------------------
 # The flags below allow users to skip downloading specific datasets ------------
