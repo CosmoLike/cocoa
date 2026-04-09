@@ -63,7 +63,7 @@ gitact0() {
   if [ ! -d "${PACKDIR:?}" ]; then
   
     "${GIT:?}" clone "${URL}" --depth ${GIT_CLONE_MAXIMUM_DEPTH:-1000} \
-      --recursive "${NAME}" \
+      --no-single-branch --recursive "${NAME}" \
       >>${OUT1:?} 2>>${OUT2:?} || { error "${EC15:?}"; return 1; }
   
   fi
