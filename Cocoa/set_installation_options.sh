@@ -32,7 +32,7 @@ esac
 #export COSMOLIKE_DEBUG_MODE=1
 
 # ------------------------------------------------------------------------------
-# New GPUs require cuda 13
+# New GPUs require cuda 13 / Old GPUs may still require cuda 11.8
 # ------------------------------------------------------------------------------
 #export ML_BLEEDING_EDGE_LIBS=1
 #export ML_LEGACY_LIBS=1
