@@ -301,7 +301,7 @@ export FASTPT_NAME="FAST-PT"
 
 export FASTPT_WRAPPER_URL="https://github.com/CosmoLike/fastpt.git"
 export FASTPT_WRAPPER_NAME="PyFAST-PT"
-export FASTPT_WRAPPER_GIT_COMMIT="d86c66deda72618905693e79cc31a441e16931be"
+export FASTPT_WRAPPER_GIT_COMMIT="f9dae0764c1b378ab3d942e926c433d4c4555ba0"
 
 export NAUTILUS_SAMPLER_URL="https://github.com/johannesulf/nautilus.git"
 export NAUTILUS_SAMPLER_GIT_COMMIT="fc5e84deffb96755b31b3f9834590e28ab5b6016"
