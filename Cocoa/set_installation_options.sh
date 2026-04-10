@@ -120,7 +120,7 @@ export LSST_Y1_NAME="lsst_y1"
 #COMMIT: if unset, load the specified commit
 #export LSST_Y1_GIT_COMMIT="df96af9558c97b07d355df4bfc56f1677e71b201"
 #BRANCH: if unset, load the specified TAG
-export LSST_Y1_GIT_TAG="v4.05"
+export LSST_Y1_GIT_TAG="v4.06"
 
 export DES_Y3_URL="https://github.com/CosmoLike/cocoa_des_y3.git"
 export DES_Y3_NAME="des_y3"
@@ -147,7 +147,7 @@ export ROMAN_REAL_NAME="roman_real"
 #COMMIT: if unset, load the specified commit
 #export ROMAN_REAL_GIT_COMMIT="8a13be52849fc7965b99f41bd173b7dda05fba67"
 #BRANCH: if unset, load the specified TAG
-export ROMAN_REAL_GIT_TAG="v4.071"
+export ROMAN_REAL_GIT_TAG="v4.072"
 
 export DESXPLANCK_URL="https://git@github.com/CosmoLike/cocoa_desy1xplanck.git"
 #export DESXPLANCK_GIT_NAME="desy1xplanck"
