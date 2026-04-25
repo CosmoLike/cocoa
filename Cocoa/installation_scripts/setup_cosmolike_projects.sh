@@ -144,19 +144,19 @@ gitact3() {
     fi
     "${GIT:?}" fetch ${ARGS:?} \
       >>${OUT1:?} 2>>${OUT2:?} || { error "${EC16:?}"; return 1; }
-      
-    if "${GIT:?}" show-ref --verify --quiet "refs/heads/${TAG:?}"; then
+    
+    if "${GIT:?}" show-ref --verify --quiet "refs/heads/${TAG:?}TMP"; then
       # in case it this script runs twice (CB = CURRENT BRANCH)
       # check if the branch = tag name. 
       # why this works? --branch creates a local branch with the TAG name
       local CB=$("${GIT:?}" rev-parse --abbrev-ref HEAD 2>/dev/null)
       CB="${CB##*/}"
-      if [ "${CB}" != "${TAG}" ]; then
+      if [ "${CB}" != "${TAG}TMP" ]; then
         # first check unstagged, second check staged but uncommitted work
         # only checkout on a second run if there isn't uncommitted work
         if "${GIT:?}" diff --quiet HEAD 2>/dev/null && \
            "${GIT:?}" diff --cached --quiet HEAD 2>/dev/null; then
-          "${GIT:?}" checkout "${TAG:?}" \
+          "${GIT:?}" checkout "${TAG:?}TMP" \
               >>${OUT1:?} 2>>${OUT2:?} || { error "${EC16:?}"; return 1; }
         else
           local tmp="skipping checkout: uncommitted changes in ${PACKDIR}"
@@ -164,7 +164,7 @@ gitact3() {
         fi
       fi
     else
-      "${GIT:?}" checkout "tags/${TAG:?}" -b "${TAG:?}" \
+      "${GIT:?}" checkout "tags/${TAG:?}" -b "${TAG:?}TMP" \
         >>${OUT1:?} 2>>${OUT2:?} || { error "${EC16:?}"; return 1; }
     fi
   fi
