@@ -78,15 +78,14 @@ fi
 if [ -z "${IGNORE_ACTDR6_CODE}" ]; then
   COBLIKE="${ROOTDIR:?}/cobaya/cobaya/likelihoods"
 
-  TMP="act_dr6_cmbonly"
-  if [[ -L "${COBLIKE:?}/${TMP:?}" ]]; then
-    rm -f "${COBLIKE:?}/${TMP:?}"
-  fi
-
-  TMP="act_dr6_mflike"
-  if [[ -L "${COBLIKE:?}/${TMP:?}" ]]; then
-    rm -f "${COBLIKE:?}/${TMP:?}"
-  fi
+  for TMP in \
+    "act_dr6_cmbonly" \
+    "act_dr6_mflike"
+  do
+    if [[ -L "${COBLIKE:?}/${TMP:?}" ]]; then
+      rm -f "${COBLIKE:?}/${TMP:?}"
+    fi
+  done
 
   unset -v COBLIKE TMP
 fi
@@ -160,10 +159,18 @@ fi
 if [[ -z "${IGNORE_EMULTRF_CODE}" ]]; then
   COBTH="${ROOTDIR:?}/cobaya/cobaya/theories"
 
-  for TMP in "emulcmb" "emulbaosn" "emultheta" "emulrdrag" \
-             "emul_cosmic_shear" "emul_ggl" "emul_wtheta"; do
-    if [[ -L "${COBTH:?}/${TMP}" ]]; then
-      rm -f "${COBTH:?}/${TMP}"
+  for TMP in \
+    "emulcmb" \
+    "emulbaosn" \
+    "emultheta" \
+    "emulrdrag" \
+    "emul_cosmic_shear" \
+    "emul_ggl" \
+    "emul_wtheta" \
+    "emulmps"
+  do
+    if [[ -L "${COBTH:?}/${TMP:?}" ]]; then
+      rm -f "${COBTH:?}/${TMP:?}"
     fi
   done
 
@@ -173,7 +180,6 @@ fi
 # ----------------------------------------------------------------------------
 # ------------------------ STOP EXTERNAL PROJECTS ---------------------------
 # ----------------------------------------------------------------------------
-
 
 if [ -n "${ROOTDIR}" ]; then
   source "${ROOTDIR:?}/installation_scripts/stop_all_projects.sh"

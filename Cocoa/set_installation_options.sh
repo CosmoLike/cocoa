@@ -23,9 +23,10 @@ esac
 # ------------------------------------------------------------------------------
 # VERBOSE AS DEBUG TOOL --------------------------------------------------------
 # ------------------------------------------------------------------------------
-#export COCOA_OUTPUT_VERBOSE=1
+export COCOA_OUTPUT_VERBOSE=1
 #export COCOA_OUTPUT_DEBUG=1 # turn on bash strict mode (set -exo pipefail) on  
                              # instalation_scripts/setup/compile_x.sh scripts 
+
 # ------------------------------------------------------------------------------
 # If set, COSMOLIKE will compile with DEBUG flags ------------------------------
 # ------------------------------------------------------------------------------
@@ -51,7 +52,7 @@ export IGNORE_COSMOPOWER_DATA=1
 # The keys below control which packages will be installed and compiled 
 # ------------------------------------------------------------------------------
 #export IGNORE_CAMB_CODE=1
-#export IGNORE_CLASS_CODE=1 # Default: we just use CAMB (reduces compilation time)
+export IGNORE_CLASS_CODE=1 # Default: we just use CAMB (reduces compilation time)
 #export IGNORE_COSMOLIKE_CODE=1
 #export IGNORE_POLYCHORD_SAMPLER_CODE=1
 #export IGNORE_PLANCK_LIKELIHOOD_CODE=1
@@ -75,27 +76,29 @@ export IGNORE_DARK_EMULATOR_CODE=1
 #export IGNORE_DERIVKIT_CODE=1
 #export IGNORE_TENSIOMETER_CODE=1
 #export IGNORE_GETDIST_CODE=1 #dev getdist with code tweaks
-# ------------------------------------------------------------------------------
-# ------------------------------------------------------------------------------
+
 # ------------------------------------------------------------------------------
 # The keys below control which cosmolike projects will be installed and compiled 
 # ------------------------------------------------------------------------------
-# ------------------------------------------------------------------------------
-# ------------------------------------------------------------------------------
 #export IGNORE_COSMOLIKE_LSST_Y1_CODE=1
 export IGNORE_COSMOLIKE_DES_Y3_CODE=1
-export IGNORE_COSMOLIKE_DESXPLANCK_CODE=1
+#export IGNORE_COSMOLIKE_DESXPLANCK_CODE=1
 #export IGNORE_COSMOLIKE_ROMAN_FOURIER_CODE=1
 #export IGNORE_COSMOLIKE_ROMAN_REAL_CODE=1
 
 # ------------------------------------------------------------------------------
-# ------------------------------------------------------------------------------
-# ------------------------------------------------------------------------------
 # The keys below control which private projects (not public repo)
 # ------------------------------------------------------------------------------
-# ------------------------------------------------------------------------------
-# ------------------------------------------------------------------------------
 #export INSTALL_PRIVATE_AXIONS_PROJECT=1
+
+# ------------------------------------------------------------------------------
+# If not set, pip_core_packages.sh will install several ML packages ------------
+# ------------------------------------------------------------------------------
+#export IGNORE_EMULATOR_GPU_PIP_PACKAGES=1
+
+# New GPUs require cuda 13 / Old GPUs may still require cuda 11.8 --------------
+#export ML_BLEEDING_EDGE_LIBS=1
+#export ML_LEGACY_LIBS=1
 
 # ------------------------------------------------------------------------------
 # If set, compile_planck.sh uses click like code from github.com/benabed/clik
@@ -103,101 +106,88 @@ export IGNORE_COSMOLIKE_DESXPLANCK_CODE=1
 export USE_SPT_CLIK_PLANCK=1
 
 # ------------------------------------------------------------------------------
-# THREADING COMPILATION/INSTALLATION OF LIBRARIES ------------------------------
-# ------------------------------------------------------------------------------
-export MAKE_NUM_THREADS=1
-export OMP_PROC_BIND=close
-export OMP_NUM_THREADS=1 # default is no OpenMP threading
-# ------------------------------------------------------------------------------
-# If not set, pip_core_packages.sh will install several ML packages ------------
-# ------------------------------------------------------------------------------
-#export IGNORE_EMULATOR_GPU_PIP_PACKAGES=1
-
-# ------------------------------------------------------------------------------
-# Adopted Python version -------------------------------------------------------
-# ------------------------------------------------------------------------------
-export PYTHON_VERSION=3.10
-
-# ------------------------------------------------------------------------------
-# HOW COCOA CORE PACKAGES SHOULD BE INSTALLED? ---------------------------------
-# ------------------------------------------------------------------------------
-export MINICONDA_INSTALLATION=1
-#export MANUAL_INSTALLATION=1
-
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
-# ------------------------------------------------------------------------------
-# DERIVED & RARELY CHANGED FLAGS (DO NOT CHANGE) -------------------------------
+# URL of Cosmolike projects below ----------------------------------------------
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
 
-if [ -n "${MANUAL_INSTALLATION}" ]; then      
-  source "${ROOTDIR:?}/installation_scripts/flags_manual_installation.sh" 
-  if [ $? -ne 0 ]; then
-    return 1;
-  fi
-elif [ -n "${MINICONDA_INSTALLATION}" ]; then
-  source "${ROOTDIR:?}/installation_scripts/flags_miniconda_installation.sh"
-  if [ $? -ne 0 ]; then
-    return 1;
-  fi
-fi
+export LSST_Y1_URL="https://github.com/CosmoLike/cocoa_lsst_y1.git"
+export LSST_Y1_NAME="lsst_y1"
+#BRANCH: if unset, load the latest commit on the specified branch
+#export LSST_Y1_GIT_BRANCH="main"
+#COMMIT: if unset, load the specified commit
+#export LSST_Y1_GIT_COMMIT="df96af9558c97b07d355df4bfc56f1677e71b201"
+#BRANCH: if unset, load the specified TAG
+export LSST_Y1_GIT_TAG="v4.06"
 
-# `flags_derived.sh` also contains many rarely used flags (useful to debug)
-source "${ROOTDIR:?}/installation_scripts/flags_derived.sh"
-if [ $? -ne 0 ]; then
-  return 1;
-fi
+export DES_Y3_URL="https://github.com/CosmoLike/cocoa_des_y3.git"
+export DES_Y3_NAME="des_y3"
+#BRANCH: if unset, load the latest commit on the specified branch
+export DES_Y3_GIT_BRANCH="main"
+#COMMIT: if unset, load the specified commit
+#export DES_Y3_GIT_COMMIT="1a46582b5539c177bd68f8863c054f79a15f8538"
+#BRANCH: if unset, load the specified TAG
+export DES_Y3_GIT_TAG="v4.05"
 
-# We decided to install C++ Armadillo library locally 
-# to link it against LAPACK & OpenBLAS & ARPACK
-unset IGNORE_CPP_ARMA_INSTALLATION
+export ROMAN_FOURIER_URL="https://github.com/CosmoLike/cocoa_roman_fourier.git"
+export ROMAN_FOURIER_NAME="roman_fourier"
+#BRANCH: if unset, load the latest commit on the specified branch
+#export ROMAN_FOURIER_GIT_BRANCH="main"
+#COMMIT: if unset, load the specified commit
+#export ROMAN_FOURIER_GIT_COMMIT="407a35a15b2a1d96d96cb5f0276cf772c2c60e6d"
+#BRANCH: if unset, load the specified TAG
+export ROMAN_FOURIER_GIT_TAG="v4.05"
 
-# ------------------------------------------------------------------------------
-# -------------------- COMPATIBILITY/DEPENDENCIES ------------------------------
-# ------------------------------------------------------------------------------
-if [ -z "${IGNORE_ACTDR6_CODE}" ]; then
-  unset -v IGNORE_FGSPECTRA_CODE
-  unset -v IGNORE_SIMONS_OBSERVATORY_LIKELIHOOD_CODE
-  unset -v IGNORE_COSMOREC_CODE
-fi
+export ROMAN_REAL_URL="https://github.com/CosmoLike/cocoa_roman_real.git"
+export ROMAN_REAL_NAME="roman_real"
+#BRANCH: if unset, load the latest commit on the specified branch
+#export ROMAN_REAL_GIT_BRANCH="main"
+#COMMIT: if unset, load the specified commit
+#export ROMAN_REAL_GIT_COMMIT="8a13be52849fc7965b99f41bd173b7dda05fba67"
+#BRANCH: if unset, load the specified TAG
+export ROMAN_REAL_GIT_TAG="v4.073"
 
-if [ -z "${IGNORE_SIMONS_OBSERVATORY_LIKELIHOOD_CODE}" ]; then
-  unset -v IGNORE_FGSPECTRA_CODE
-fi
+export DESXPLANCK_URL="https://git@github.com/CosmoLike/cocoa_desy1xplanck.git"
+#export DESXPLANCK_GIT_NAME="desy1xplanck"
+#export DESXPLANCK_GIT_BRANCH="main"
+#export DESXPLANCK_GIT_COMMIT=
+export DESXPLANCK_GIT_TAG=v4.07
 
-if [[ -z "${IGNORE_COSMOPOWER_CODE}" || 
-      -z "${IGNORE_EMULTRF_CODE}" || 
-      -z "${IGNORE_NAUTILUS_SAMPLER_CODE}" ]]; then
-  unset -v IGNORE_EMULATOR_GPU_PIP_PACKAGES
-fi
+export COSMOLIKE_URL="https://github.com/CosmoLike/cocoa-cosmolike-core.git"
+#export COSMOLIKE_GIT_COMMIT= ""
+export COSMOLIKE_GIT_TAG="v4.072" 
+export COSMOLIKE_NAME="cosmolike_core"
 
-#if [ -z "${IGNORE_EUCLID_EMULATOR_V2_CODE}" ]; then
-#  unset -v IGNORE_CLASS_CODE
-#fi
-
-# ------------------------------------------------------------------------------
-# ------------------------------------------------------------------------------
-# ------------------------------------------------------------------------------
-# PACKAGE URL AND VERSIONS. CHANGES IN THE COMMIT ID MAY BREAK COCOA -----------
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
+# URL of private projects below ------------------------------------------------
+# ------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
+#export AXIONS_PROJECT_URL="git@github.com:SBU-COSMOLIKE/cocoa_axions.git"
+#export AXIONS_PROJECT_NAME="axions"
 
-# This flag saves a lot of time when running setup_cocoa.py 
-# Why? Some git repos can be hundreds of MegaBytes (Class is 500 MegaBytes) 
-# But, this can create a problem if GIT_COMMIT < LAST COMMIT - GIT_MAXIMUM_DEPTH
+# ------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
+# GENERAL PACKAGE URL AND VERSIONS. CHANGES IN THE COMMIT ID MAY BREAK COCOA ---
+# ------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 export SPDLOG_VERSION=v1.15.3
 export GIT_CLONE_MAXIMUM_DEPTH=1000
 
 export COBAYA_URL="https://github.com/CobayaSampler/cobaya.git"
 export COBAYA_GIT_COMMIT="86943d81d48d2edb2961b17077461df9e799f4d1"
-
-export COSMOLIKE_URL="https://github.com/CosmoLike/cocoa-cosmolike-core.git"
-#export COSMOLIKE_GIT_COMMIT= ""
-export COSMOLIKE_GIT_TAG="v4.07" 
-export COSMOLIKE_NAME="cosmolike_core"
 
 export HILLIPOP_URL="https://github.com/planck-npipe/hillipop.git"
 export HILLIPOP_GIT_COMMIT="cc9cbe31991d4662522241543a46d44d2cdec251"
@@ -285,11 +275,11 @@ export MGCAMB_NAME='MGCAMB'
 export PLANCK2018_SROLL2_URL="https://web.fe.infn.it/~pagano/low_ell_datasets/sroll2/"
 export PLANCK2018_SROLL2_FILE="simall_100x143_sroll2_v3_EE_Aplanck.tgz"
 
-export COSMOPOWER_SOLIKET_URL="https://github.com/simonsobs/SOLikeT.git"
-export COSMOPOWER_SOLIKET_GIT_COMMIT="1d8333ea0007c88e7c2de192de39301884093cd8"
+export COSMOPOWER_SOLIKET_URL="https://github.com/SBU-COSMOLIKE/SOLikeT.git"
+export COSMOPOWER_SOLIKET_GIT_COMMIT="91a2b33daf6f783933007839083fbab25d73b77b"
 
-export COSMOPOWER_URL="https://github.com/alessiospuriomancini/cosmopower.git"
-export COSMOPOWER_GIT_COMMIT="7cac5e71c975c06257b2f95f0dcea5dd09b0f45f"
+export COSMOPOWER_URL="https://github.com/SBU-COSMOLIKE/cosmopower.git"
+export COSMOPOWER_GIT_COMMIT="f70fc789426847eed996d707ec67a3a93d74bbc3"
 
 export COSMOPOWER_DATA_URL="https://github.com/cosmopower-organization/jense_2024_emulators.git"
 export COSMOPOWER_DATA_URL_COMMIT="4317635eed70289ee1ec6b3df828027173071e36"
@@ -311,7 +301,7 @@ export FASTPT_NAME="FAST-PT"
 
 export FASTPT_WRAPPER_URL="https://github.com/CosmoLike/fastpt.git"
 export FASTPT_WRAPPER_NAME="PyFAST-PT"
-export FASTPT_WRAPPER_GIT_COMMIT="d86c66deda72618905693e79cc31a441e16931be"
+export FASTPT_WRAPPER_GIT_COMMIT="f9dae0764c1b378ab3d942e926c433d4c4555ba0"
 
 export NAUTILUS_SAMPLER_URL="https://github.com/johannesulf/nautilus.git"
 export NAUTILUS_SAMPLER_GIT_COMMIT="fc5e84deffb96755b31b3f9834590e28ab5b6016"
@@ -328,56 +318,75 @@ export TENSIOMETER_NAME="tensiometer"
 export GETDIST_URL="https://github.com/cmbant/getdist.git"
 export GETDIST_GIT_COMMIT="ff477beea2e7e2231a3de4941bdc3d64bd1f0bb4"
 export GETDIST_NAME="getdist"
-# --------------------------------------------------------------------
-# --------------------------------------------------------------------
-# Cosmolike projects below -------------------------------------------
-# --------------------------------------------------------------------
-# --------------------------------------------------------------------
-export LSST_Y1_URL="https://github.com/CosmoLike/cocoa_lsst_y1.git"
-export LSST_Y1_NAME="lsst_y1"
-#BRANCH: if unset, load the latest commit on the specified branch
-#export LSST_Y1_GIT_BRANCH="main"
-#COMMIT: if unset, load the specified commit
-#export LSST_Y1_GIT_COMMIT="df96af9558c97b07d355df4bfc56f1677e71b201"
-#BRANCH: if unset, load the specified TAG
-export LSST_Y1_GIT_TAG="v4.05"
 
-export DES_Y3_URL="https://github.com/CosmoLike/cocoa_des_y3.git"
-export DES_Y3_NAME="des_y3"
-#BRANCH: if unset, load the latest commit on the specified branch
-export DES_Y3_GIT_BRANCH="main"
-#COMMIT: if unset, load the specified commit
-#export DES_Y3_GIT_COMMIT="1a46582b5539c177bd68f8863c054f79a15f8538"
-#BRANCH: if unset, load the specified TAG
-export DES_Y3_GIT_TAG="v4.05"
+# ------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
+# DERIVED & RARELY CHANGED FLAGS (DO NOT CHANGE) -------------------------------
+# ------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
+export PYTHON_VERSION=3.10
+export MINICONDA_INSTALLATION=1
+#export MANUAL_INSTALLATION=1
 
-export ROMAN_FOURIER_URL="https://github.com/CosmoLike/cocoa_roman_fourier.git"
-export ROMAN_FOURIER_NAME="roman_fourier"
-#BRANCH: if unset, load the latest commit on the specified branch
-#export ROMAN_FOURIER_GIT_BRANCH="main"
-#COMMIT: if unset, load the specified commit
-#export ROMAN_FOURIER_GIT_COMMIT="407a35a15b2a1d96d96cb5f0276cf772c2c60e6d"
-#BRANCH: if unset, load the specified TAG
-export ROMAN_FOURIER_GIT_TAG="v4.05"
+# ------------------------------------------------------------------------------
+# THREADING COMPILATION/INSTALLATION OF LIBRARIES ------------------------------
+# ------------------------------------------------------------------------------
+export MAKE_NUM_THREADS=1
+export OMP_PROC_BIND=close
+export OMP_NUM_THREADS=1 # default is no OpenMP threading
 
-export ROMAN_REAL_URL="https://github.com/CosmoLike/cocoa_roman_real.git"
-export ROMAN_REAL_NAME="roman_real"
-#BRANCH: if unset, load the latest commit on the specified branch
-#export ROMAN_REAL_GIT_BRANCH="main"
-#COMMIT: if unset, load the specified commit
-#export ROMAN_REAL_GIT_COMMIT="8a13be52849fc7965b99f41bd173b7dda05fba67"
-#BRANCH: if unset, load the specified TAG
-export ROMAN_REAL_GIT_TAG="v4.071"
+if [ -n "${MANUAL_INSTALLATION}" ]; then      
+  source "${ROOTDIR:?}/installation_scripts/flags_manual_installation.sh" 
+  if [ $? -ne 0 ]; then
+    return 1;
+  fi
+elif [ -n "${MINICONDA_INSTALLATION}" ]; then
+  source "${ROOTDIR:?}/installation_scripts/flags_miniconda_installation.sh"
+  if [ $? -ne 0 ]; then
+    return 1;
+  fi
+fi
 
-export DESXPLANCK_URL="https://git@github.com/CosmoLike/cocoa_desy1xplanck.git"
-#export DESXPLANCK_GIT_NAME="desy1xplanck"
-#export DESXPLANCK_GIT_BRANCH="main"
-#export DESXPLANCK_GIT_COMMIT=
-export DESXPLANCK_GIT_TAG=v4.05
-# --------------------------------------------------------------------
-# --------------------------------------------------------------------
-# private projects below ---------------------------------------------
-# --------------------------------------------------------------------
-# --------------------------------------------------------------------
-#export AXIONS_PROJECT_URL="git@github.com:SBU-COSMOLIKE/cocoa_axions.git"
-#export AXIONS_PROJECT_NAME="axions"
+# `flags_derived.sh` also contains many rarely used flags (useful to debug)
+source "${ROOTDIR:?}/installation_scripts/flags_derived.sh"
+if [ $? -ne 0 ]; then
+  return 1;
+fi
+
+# Install C++ Armadillo locally to link it against LAPACK/OpenBLAS/ARPACK
+unset IGNORE_CPP_ARMA_INSTALLATION
+
+# -------------------- COMPATIBILITY/DEPENDENCIES ------------------------------
+
+if [ -z "${IGNORE_ACTDR6_CODE}" ]; then
+  unset -v IGNORE_FGSPECTRA_CODE
+  unset -v IGNORE_SIMONS_OBSERVATORY_LIKELIHOOD_CODE
+  unset -v IGNORE_COSMOREC_CODE
+fi
+
+if [ -z "${IGNORE_SIMONS_OBSERVATORY_LIKELIHOOD_CODE}" ]; then
+  unset -v IGNORE_FGSPECTRA_CODE
+fi
+
+if [[ -z "${IGNORE_COSMOPOWER_CODE}" || 
+      -z "${IGNORE_EMULTRF_CODE}" || 
+      -z "${IGNORE_NAUTILUS_SAMPLER_CODE}" ]]; then
+  unset -v IGNORE_EMULATOR_GPU_PIP_PACKAGES
+fi

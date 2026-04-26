@@ -95,7 +95,8 @@ dependencies:
   - mpi=1.0
   - ncurses=6.5
   - openblas=0.3.29
-  - openmpi=5.0.7
+  #- openmpi=5.0.7
+  - openmpi=5.0.7=h*
   - openssl=3.5.0
   - pcre2=10.44
   - perl=5.32.1
