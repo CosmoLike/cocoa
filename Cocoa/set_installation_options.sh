@@ -150,10 +150,10 @@ export ROMAN_REAL_NAME="roman_real"
 export ROMAN_REAL_GIT_TAG="v4.074"
 
 export DESXPLANCK_URL="https://git@github.com/CosmoLike/cocoa_desy1xplanck.git"
-#export DESXPLANCK_GIT_NAME="desy1xplanck"
+export DESXPLANCK_GIT_NAME="desy1xplanck"
 #export DESXPLANCK_GIT_BRANCH="main"
 #export DESXPLANCK_GIT_COMMIT=
-export DESXPLANCK_GIT_TAG=v4.07
+export DESXPLANCK_GIT_TAG="v4.071"
 
 export COSMOLIKE_URL="https://github.com/CosmoLike/cocoa-cosmolike-core.git"
 #export COSMOLIKE_GIT_COMMIT= ""
