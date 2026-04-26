@@ -129,7 +129,7 @@ In this section, we assume users have previously activated the Cocoa conda envir
 
   - Testing beta release
     
-        git clone https://github.com/CosmoLike/cocoa.git --branch v4.08b cocoa
+        git clone https://github.com/CosmoLike/cocoa.git --branch v4.082 cocoa
 
 and
 
