@@ -60,6 +60,7 @@ declare -a THEORY=("compile_hyrec2.sh"
                    "compile_class.sh"
                    "compile_mgcamb.sh"
                    "compile_velocileptors.sh"
+                   "compile_pyfastpt.sh"
                   )
 
 declare -a ML=("compile_cosmopower.sh"
