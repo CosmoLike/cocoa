@@ -78,6 +78,7 @@ declare -a THEORY=("setup_hyrec2.sh"
                    "setup_mgcamb.sh"
                    "setup_class.sh"
                    "setup_velocileptors.sh"
+                   "setup_pyfastpt.sh"
                   )
 
 declare -a ML=("setup_cosmopower.sh"
