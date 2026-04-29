@@ -97,13 +97,13 @@ fi
 if [[ -z "${IGNORE_COSMOLIKE_CODE}" ]]; then
   ECODEF="${ROOTDIR:?}/external_modules/code"
 
-  for TMP1 in "cfastpt" "cfftlog" "cosmolike" "log.c"; do
+  for TMP1 in "cfastpt" "cosmolike" "log.c"; do
     if [[ -L "${ECODEF:?}/${TMP1}" ]]; then
       rm -f "${ECODEF:?}/${TMP1}"
     fi
   done
 
-  unset -v ECODEF FOLDER TMP1 TMP2 TMP3 TMP4
+  unset -v ECODEF TMP1
 fi
 
 # ----------------------------------------------------------------------------

@@ -126,16 +126,11 @@ if [[ -z "${IGNORE_COSMOLIKE_CODE}" ]]; then
   FOLDER="${COSMOLIKE_NAME:-"cosmolike_core"}"
 
   TMP1="cfastpt"
-  TMP2="cfftlog"
   TMP3="cosmolike"
   TMP4="log.c"
 
   if [[ ! -L "${ECODEF:?}/${TMP1:?}" ]]; then
     ln -s "${ECODEF:?}/${FOLDER:?}/${TMP1:?}" "${ECODEF:?}" \
-      >>${OUT1:?} 2>>${OUT2:?} || { error_start_cocoa "${EC34:?}"; return 1; }
-  fi
-  if [[ ! -L "${ECODEF:?}/${TMP2:?}" ]]; then
-    ln -s "${ECODEF:?}/${FOLDER:?}/${TMP2:?}" "${ECODEF:?}" \
       >>${OUT1:?} 2>>${OUT2:?} || { error_start_cocoa "${EC34:?}"; return 1; }
   fi
   if [[ ! -L "${ECODEF:?}/${TMP3:?}" ]]; then
@@ -147,7 +142,7 @@ if [[ -z "${IGNORE_COSMOLIKE_CODE}" ]]; then
       >>${OUT1:?} 2>>${OUT2:?} || { error_start_cocoa "${EC34:?}"; return 1; }
   fi
 
-  unset -v ECODEF FOLDER TMP1 TMP2 TMP3 TMP4
+  unset -v ECODEF FOLDER TMP1 TMP3 TMP4
 fi
 
 

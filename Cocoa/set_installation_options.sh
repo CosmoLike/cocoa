@@ -113,15 +113,6 @@ export USE_SPT_CLIK_PLANCK=1
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
 
-export LSST_Y1_URL="https://github.com/CosmoLike/cocoa_lsst_y1.git"
-export LSST_Y1_NAME="lsst_y1"
-#BRANCH: if unset, load the latest commit on the specified branch
-#export LSST_Y1_GIT_BRANCH="main"
-#COMMIT: if unset, load the specified commit
-#export LSST_Y1_GIT_COMMIT="df96af9558c97b07d355df4bfc56f1677e71b201"
-#BRANCH: if unset, load the specified TAG
-export LSST_Y1_GIT_TAG="v4.06"
-
 export DES_Y3_URL="https://github.com/CosmoLike/cocoa_des_y3.git"
 export DES_Y3_NAME="des_y3"
 #BRANCH: if unset, load the latest commit on the specified branch
@@ -131,33 +122,25 @@ export DES_Y3_GIT_BRANCH="main"
 #BRANCH: if unset, load the specified TAG
 export DES_Y3_GIT_TAG="v4.05"
 
+export LSST_Y1_URL="https://github.com/CosmoLike/cocoa_lsst_y1.git"
+export LSST_Y1_NAME="lsst_y1"
+export LSST_Y1_GIT_TAG="v4.10"
+
 export ROMAN_FOURIER_URL="https://github.com/CosmoLike/cocoa_roman_fourier.git"
 export ROMAN_FOURIER_NAME="roman_fourier"
-#BRANCH: if unset, load the latest commit on the specified branch
-#export ROMAN_FOURIER_GIT_BRANCH="main"
-#COMMIT: if unset, load the specified commit
-#export ROMAN_FOURIER_GIT_COMMIT="407a35a15b2a1d96d96cb5f0276cf772c2c60e6d"
-#BRANCH: if unset, load the specified TAG
-export ROMAN_FOURIER_GIT_TAG="v4.05"
+export ROMAN_FOURIER_GIT_TAG="v4.10"
 
 export ROMAN_REAL_URL="https://github.com/CosmoLike/cocoa_roman_real.git"
 export ROMAN_REAL_NAME="roman_real"
-#BRANCH: if unset, load the latest commit on the specified branch
-#export ROMAN_REAL_GIT_BRANCH="main"
-#COMMIT: if unset, load the specified commit
-#export ROMAN_REAL_GIT_COMMIT="8a13be52849fc7965b99f41bd173b7dda05fba67"
-#BRANCH: if unset, load the specified TAG
-export ROMAN_REAL_GIT_TAG="v4.074"
+export ROMAN_REAL_GIT_TAG="v4.10"
 
 export DESXPLANCK_URL="https://git@github.com/CosmoLike/cocoa_desy1xplanck.git"
-#export DESXPLANCK_GIT_NAME="desy1xplanck"
-#export DESXPLANCK_GIT_BRANCH="main"
-#export DESXPLANCK_GIT_COMMIT=
-export DESXPLANCK_GIT_TAG=v4.07
+export DESXPLANCK_GIT_NAME="desy1xplanck"
+export DESXPLANCK_GIT_TAG="v4.10"
 
 export COSMOLIKE_URL="https://github.com/CosmoLike/cocoa-cosmolike-core.git"
 #export COSMOLIKE_GIT_COMMIT= ""
-export COSMOLIKE_GIT_TAG="v4.072" 
+export COSMOLIKE_GIT_TAG="v4.10" 
 export COSMOLIKE_NAME="cosmolike_core"
 
 # ------------------------------------------------------------------------------
