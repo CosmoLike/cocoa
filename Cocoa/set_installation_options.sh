@@ -132,16 +132,9 @@ export ROMAN_REAL_GIT_TAG="v4.10.1"
 export DESXPLANCK_URL="https://git@github.com/CosmoLike/cocoa_desy1xplanck.git"
 export DESXPLANCK_GIT_NAME="desy1xplanck"
 export DESXPLANCK_GIT_TAG="v4.10"
-<<<<<<< HEAD
-
 
 export COSMOLIKE_URL="https://github.com/CosmoLike/cocoa-cosmolike-core.git"
-export COSMOLIKE_GIT_TAG="v4.10" 
-=======
-
-export COSMOLIKE_URL="https://github.com/CosmoLike/cocoa-cosmolike-core.git"
-export COSMOLIKE_GIT_TAG="v4.10.1" 
->>>>>>> tmp
+export COSMOLIKE_GIT_TAG="v4.10.1"
 export COSMOLIKE_NAME="cosmolike_core"
 
 # ------------------------------------------------------------------------------
