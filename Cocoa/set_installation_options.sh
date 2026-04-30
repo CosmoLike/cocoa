@@ -81,7 +81,7 @@ export IGNORE_DARK_EMULATOR_CODE=1
 # The keys below control which cosmolike projects will be installed and compiled 
 # ------------------------------------------------------------------------------
 #export IGNORE_COSMOLIKE_LSST_Y1_CODE=1
-export IGNORE_COSMOLIKE_DES_Y3_CODE=1
+#export IGNORE_COSMOLIKE_DES_Y3_CODE=1
 #export IGNORE_COSMOLIKE_DESXPLANCK_CODE=1
 #export IGNORE_COSMOLIKE_ROMAN_FOURIER_CODE=1
 #export IGNORE_COSMOLIKE_ROMAN_REAL_CODE=1
@@ -132,10 +132,16 @@ export ROMAN_REAL_GIT_TAG="v4.10.1"
 export DESXPLANCK_URL="https://git@github.com/CosmoLike/cocoa_desy1xplanck.git"
 export DESXPLANCK_GIT_NAME="desy1xplanck"
 export DESXPLANCK_GIT_TAG="v4.10"
+<<<<<<< HEAD
 
 
 export COSMOLIKE_URL="https://github.com/CosmoLike/cocoa-cosmolike-core.git"
 export COSMOLIKE_GIT_TAG="v4.10" 
+=======
+
+export COSMOLIKE_URL="https://github.com/CosmoLike/cocoa-cosmolike-core.git"
+export COSMOLIKE_GIT_TAG="v4.10.1" 
+>>>>>>> tmp
 export COSMOLIKE_NAME="cosmolike_core"
 
 # ------------------------------------------------------------------------------
