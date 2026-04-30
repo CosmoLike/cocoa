@@ -146,7 +146,6 @@ In this section, we assume users have previously activated the Cocoa conda envir
 > - Go to `EXAMPLE_EVALUATE2.yaml` on each repository; Turn on TATT flag (`IA_model: 1`),
 > - Set `N=10` on the evaluate sampler (Timing on `N=1` is highly biased); Remove the `override` YAML block. 
 
-
 and
 
     cd ./cocoa/Cocoa
