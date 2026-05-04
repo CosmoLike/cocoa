@@ -22,6 +22,8 @@ ignore_obsolete: False
 use_renames: False
 # request primordial P(k) from an external Theory implementation
 external_primordial_pk: False
+# request non-linear P(k) ratio from an external Theory implementation
+use_non_linear_ratio: False
 # Dictionary of Planck->CAMB names
 renames:
   omegabh2: ombh2

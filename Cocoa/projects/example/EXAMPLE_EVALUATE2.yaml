@@ -3,6 +3,8 @@ timing: true
 debug: false
 
 likelihood:
+  planck_2018_highl_plik.TTTEEE:
+    path: ./external_modules/
   planck_2018_highl_plik.TTTEEE_lite:
     path: ./external_modules/
     clik_file: plc_3.0/hi_l/plik_lite/plik_lite_v22_TTTEEE.clik
@@ -210,4 +212,24 @@ sampler:
       omegach2: 0.12011
       tau: 0.0543
       A_planck: 1.00138
+      calib_100T: 0.9987983397505178
+      calib_217T: 0.9987920200754659
+      A_cib_217: 65.73042744689862
+      xi_sz_cib: 0.014846669030139295
+      A_sz: 7.578566683767703
+      ksz_norm: 1.830268477586373
+      gal545_A_100: 7.125299946661039
+      gal545_A_143: 8.131426090291662
+      gal545_A_143_217: 15.761217543468344
+      gal545_A_217: 77.5214280531049
+      ps_A_100_100: 261.2823535136313
+      ps_A_143_143: 74.28290799465884
+      ps_A_143_217: 41.22322908951794
+      ps_A_217_217: 125.31939118418777
+      galf_TE_A_100: 0.15314307440243102
+      galf_TE_A_100_143: 0.07963000762154462
+      galf_TE_A_100_217: 0.46305342686237344
+      galf_TE_A_143: 0.104139430567495
+      galf_TE_A_143_217: 0.7243969435429755
+      galf_TE_A_217: 1.9172389532222787
 output: ./projects/example/chains/EXAMPLE_EVALUATE2
