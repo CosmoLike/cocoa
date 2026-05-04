@@ -70,6 +70,7 @@ declare -a CORE=("setup_core_packages.sh"
                  "setup_getdist.sh"
                  "setup_derivkit.sh"
                  "setup_ee2.sh"
+                 "setup_simde.sh"
                 )
 
 declare -a THEORY=("setup_hyrec2.sh"
