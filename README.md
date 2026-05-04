@@ -125,7 +125,26 @@ In this section, we assume users have previously activated the Cocoa conda envir
 
   - Stable Version
     
-        git clone https://github.com/CosmoLike/cocoa.git --branch v4.08b cocoa
+        git clone https://github.com/CosmoLike/cocoa.git --branch v4.07 cocoa
+
+  - Testing beta release
+    
+        git clone https://github.com/CosmoLike/cocoa.git --branch v4.10.2 cocoa
+
+> [!NOTE]
+> Version `v4.10.1` and above include significant cosmolike speed-ups from refactoring non-limber/C-FASTPT modules. 
+
+> [!NOTE]
+> `v4.10.2` cosmolike benchmark: do not include CAMB; CPU: `Intel(R) Core(TM) i9-10940X CPU @ 3.30GHz`; OpenMP cores: `8`; Includes TATT and non-limber (in `w_gg`).
+> - **LSST-Y1 Real 3x2pt**: ~`0.093`s
+> - **Roman Real 3x2pt**: ~`0.161`s    
+> - **Roman Fourier 3x2pt**: ~`0.06`s
+> - **DES-Y3 x Planck 6x2pt** ~`0.10`s
+> - **DES-Y3 Real 3x2pt (des_y3 repo)** ~`0.074`s
+> 
+> How to record benchmarks on cosmolike projects? 
+> - Go to `EXAMPLE_EVALUATE2.yaml` on each repository; Turn on TATT flag (`IA_model: 1`),
+> - Set `N=10` on the evaluate sampler (Timing on `N=1` is highly biased); Remove the `override` YAML block. 
 
 and
 

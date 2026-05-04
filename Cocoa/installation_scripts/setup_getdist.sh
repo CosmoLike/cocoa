@@ -14,7 +14,7 @@ fi
 ( source "${ROOTDIR:?}/installation_scripts/flags_check.sh" ) || return 1;
 
 unset_env_vars () {
-  unset -v URL CCIL ECODEF FOLDER PACKDIR  
+  unset -v URL CCIL ECODEF FOLDER PACKDIR PRINTNAME 
   cdroot || return 1;
 }
 
@@ -53,6 +53,8 @@ unset_env_vars || return 1
 
 CCIL="${ROOTDIR:?}/../cocoa_installation_libraries"
 
+# ---------------------------------------------------------------------------
+
 # E = EXTERNAL, CODE, F=FODLER
 ECODEF="${ROOTDIR:?}/external_modules/code"
 
@@ -62,17 +64,22 @@ FOLDER="${GETDIST_NAME:-"getdist"}"
 
 PACKDIR="${ECODEF:?}/${FOLDER:?}"
 
-ptop "INSTALLING GETDIST" || { unset_all; return 1; }
+PRINTNAME="GETDIST CODE"
 
-# ---------------------------------------------------------------------------
-# in case this script is called twice
-# ---------------------------------------------------------------------------
+ptop "INSTALLING ${PRINTNAME:?}" || { unset_all; return 1; }
+
+# ----------------------------------------------------------------------------
+# In case this script is called twice ----------------------------------------
+# ----------------------------------------------------------------------------
 if [ -n "${OVERWRITE_EXISTING_GETDIST_CODE:-}" ]; then
 
   rm -rf "${PACKDIR:?}"
 
 fi
 
+# ----------------------------------------------------------------------------
+# Clone from original repo ---------------------------------------------------
+# ----------------------------------------------------------------------------
 if [ ! -d "${PACKDIR:?}" ]; then
   
   cdfolder "${ECODEF:?}" || { unset_all; return 1; }
@@ -110,7 +117,7 @@ fi
 
 cdfolder "${ROOTDIR:?}" || { unset_all; return 1; }
 
-pbottom "INSTALLING GETDIST" || { unset_all; return 1; }
+pbottom "INSTALLING ${PRINTNAME:?}" || { unset_all; return 1; }
 
 #-------------------------------------------------------------------------------
 

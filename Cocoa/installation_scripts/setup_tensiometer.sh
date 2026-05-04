@@ -14,7 +14,7 @@ fi
 ( source "${ROOTDIR:?}/installation_scripts/flags_check.sh" ) || return 1;
 
 unset_env_vars () {
-  unset -v URL CCIL ECODEF FOLDER PACKDIR PIPCP PIPCP_HASH SENTINEL_PIPCP 
+  unset -v URL CCIL ECODEF FOLDER PACKDIR PIPCP PIPCP_HASH SENTINEL_PIPCP PRINTNAME
   cdroot || return 1;
 }
 
@@ -62,7 +62,10 @@ FOLDER="${TENSIOMETER_NAME:-"tensiometer"}"
 
 PACKDIR="${ECODEF:?}/${FOLDER:?}"
 
-ptop "INSTALLING TENSIOMETER" || { unset_all; return 1; }
+# Name to be printed on this shell script messages
+PRINTNAME="TENSIOMETER"
+
+ptop "INSTALLING ${PRINTNAME:?}" || { unset_all; return 1; }
 
 if [ -n "${OVERWRITE_EXISTING_TENSIOMETER_CODE:-}" ]; then
 
@@ -136,7 +139,7 @@ fi
 
 cdfolder "${ROOTDIR:?}" || { unset_all; return 1; }
 
-pbottom "INSTALLING TENSIOMETER" || { unset_all; return 1; }
+pbottom "INSTALLING ${PRINTNAME:?}" || { unset_all; return 1; }
 
 #-------------------------------------------------------------------------------
 
@@ -148,7 +151,6 @@ return 55; # why this odd number? Setup_cocoa will cache this installation only
            #   if this script runs entirely. What if the user close the terminal 
            #   or the system shuts down in the middle of a git clone?  
            #   In this case, PACKDIR would exists, but it is corrupted
-
 
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
