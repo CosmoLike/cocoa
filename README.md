@@ -136,10 +136,10 @@ In this section, we assume users have previously activated the Cocoa conda envir
 
 > [!NOTE]
 > `v4.10.2` cosmolike benchmark: do not include CAMB; CPU: `Intel(R) Core(TM) i9-10940X CPU @ 3.30GHz`; OpenMP cores: `8`; Includes TATT and non-limber (in `w_gg`).
-> - **LSST-Y1 Real 3x2pt**: ~`0.064`s
-> - **Roman Real 3x2pt**: ~`0.135`s    
-> - **Roman Fourier 3x2pt**: ~`0.05`s
-> - **DES-Y3 x Planck 6x2pt** ~`0.09`s
+> - **LSST-Y1 Real 3x2pt**: ~`0.093`s
+> - **Roman Real 3x2pt**: ~`0.161`s    
+> - **Roman Fourier 3x2pt**: ~`0.06`s
+> - **DES-Y3 x Planck 6x2pt** ~`0.10`s
 > - **DES-Y3 Real 3x2pt (des_y3 repo)** ~`0.074`s
 > 
 > How to record benchmarks on cosmolike projects? 
