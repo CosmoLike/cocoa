@@ -84,11 +84,9 @@ gitact1() {
   # ---------------------------------------------------------------------------
   if [ -n "${OVERWRITE_EXISTING_COSMOLIKE_CODE:-}" ]; then
     rm -rf "${PACKDIR:?}"
-  
   fi
 
   if [ ! -d "${PACKDIR:?}" ]; then
-  
     "${GIT:?}" clone "${URL}" "${NAME}" --branch "${TAG}" --single-branch \
       >>${OUT1:?} 2>>${OUT2:?} || { error "${EC15:?}"; return 1; }
   fi
