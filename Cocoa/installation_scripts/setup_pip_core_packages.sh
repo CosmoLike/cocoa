@@ -133,7 +133,8 @@ PIPCP=(
     'emcee==3.1.6'
     'sacc==1.0.2'
     'flit_core==3.12.0'
-    'jax==0.4.1'
+    'jax==0.4.18'
+    'jaxlib==0.4.18'
   )
 
 PIPCP_HASH=$(
@@ -149,10 +150,14 @@ SENTINEL_PIPCP="${ROOTDIR:?}/.local/pip_core_packages_${PIPCP_HASH:?}"
 
 if [ ! -f "${SENTINEL_PIPCP:?}" ]; then
 
+  # why ? -f https://storage.googleapis.com/jax-releases/jax_releases.html
+  # jax lib versions get deprecated from PyPI frequently. 
+
   env MPICC=$MPI_CC_COMPILER ${PIP3:?} install "${PIPCP[@]}" \
     --no-cache-dir \
     --prefer-binary \
     --use-pep517 \
+    -f https://storage.googleapis.com/jax-releases/jax_releases.html \
     --prefix="${ROOTDIR:?}/.local" \
     >>${OUT1:?} 2>>${OUT2:?} || { error "(PIP-CP) ${EC13:?}"; return 1; }
 
@@ -169,17 +174,42 @@ pbottom "INSTALLING PYTHON CORE LIBRARIES VIA PIP" || { unset_all; return 1; }
 # ----------------------------------------------------------------------------
 # ----------------------------------------------------------------------------
 
-if [ -z "${IGNORE_EMULATOR_GPU_PIP_PACKAGES}" ]; then
+if [ -z "${IGNORE_EMULATOR_GPU_PIP_PACKAGES:-}" ]; then
   
   ptop "PIP INSTALL ML-GPU (takes O(5-10min)...)" || { unset_all; return 1; }
 
-  PIPCPML=(
+  if [ -n "${ML_BLEEDING_EDGE_LIBS:-}" ]; then
+    PYTORCH_EXTRA_INDEX="https://download.pytorch.org/whl/cu130"
+    PIPCPML=(
       "numpy==${COCOA_NUMPY_VERSION:?}"
-      'tensorflow==2.17.0'
-      'tensorflow_probability==0.24.0'
-      'keras==3.9.2'
+      'tensorflow==2.21.0'
+      'tensorflow_probability==0.25.0'
+      'keras==3.12.1'
       'keras-preprocessing==1.1.2'
-      'torch==2.6.0'
+      'torch==2.11.0'
+      'torchvision==0.26.0'
+      'torchaudio==2.11.0'
+      'scikit-learn==1.7.2'
+      'jupyter==1.0.0'
+      'typing-extensions==4.13.2'
+      'mkdocs_material==9.6.13'
+      'mkdocstrings==0.29.1'
+      'pytest==8.3.5'
+      'tf-keras==2.21.0'
+      'nvidia-pyindex'
+      "cuda-toolkit[all]>=13.0.0"
+      'jax==0.4.30'
+      'jaxlib==0.4.30'
+    )
+  elif [ -n "${ML_LEGACY_LIBS:-}" ]; then
+    PYTORCH_EXTRA_INDEX="https://download.pytorch.org/whl/cu118"
+    PIPCPML=(
+      "numpy==${COCOA_NUMPY_VERSION:?}"
+      'tensorflow==2.14.0'
+      'tensorflow_probability==0.22.1'
+      'keras==2.14.0'
+      'keras-preprocessing==1.1.2'
+      'torch==2.6.0+cu118'
       'torchvision==0.21.0'
       'torchaudio==2.6.0'
       'scikit-learn==1.6.1'
@@ -188,8 +218,33 @@ if [ -z "${IGNORE_EMULATOR_GPU_PIP_PACKAGES}" ]; then
       'mkdocs_material==9.6.13'
       'mkdocstrings==0.29.1'
       'pytest==8.3.5'
-      'tf-keras==2.17.0'
+      'nvidia-pyindex'
+      "cuda-toolkit[all]==11.8.0"
+      'jax==0.4.18'
+      'jaxlib==0.4.18'
     )
+  else
+    PYTORCH_EXTRA_INDEX=""
+    PIPCPML=(
+        "numpy==${COCOA_NUMPY_VERSION:?}"
+        'tensorflow==2.17.0'
+        'tensorflow_probability==0.24.0'
+        'keras==3.9.2'
+        'keras-preprocessing==1.1.2'
+        'torch==2.6.0'
+        'torchvision==0.21.0'
+        'torchaudio==2.6.0'
+        'scikit-learn==1.6.1'
+        'jupyter==1.0.0'
+        'typing-extensions==4.13.2'
+        'mkdocs_material==9.6.13'
+        'mkdocstrings==0.29.1'
+        'pytest==8.3.5'
+        'tf-keras==2.17.0'
+        'jax==0.4.18'
+        'jaxlib==0.4.18'
+      )
+  fi
 
   PIPCPML_HASH=$(
     {
@@ -207,13 +262,17 @@ if [ -z "${IGNORE_EMULATOR_GPU_PIP_PACKAGES}" ]; then
     env CXX="${CXX_COMPILER:?}" CC="${C_COMPILER:?}" ${PIP3:?} install "${PIPCPML[@]}" \
       --no-cache-dir \
       --prefer-binary \
-      --extra-index-url "https://download.pytorch.org/whl/cu118" \
+      ${PYTORCH_EXTRA_INDEX:+--extra-index-url "${PYTORCH_EXTRA_INDEX}"} \
+      -f https://storage.googleapis.com/jax-releases/jax_releases.html \
       --prefix="${ROOTDIR:?}/.local" \
-      >>${OUT1:?} 2>>${OUT2:?} || { error "${EC13:?}"; return 1; } 
+      >>${OUT1:?} 2>>${OUT2:?} || { error "${EC13:?}"; return 1; }
 
-    # Without this code, jupyter breaks notebook
+    # This reinstall serves two purposes:
+    #   1. TensorFlow can override jax/jaxlib versions
+    #   2. The ML packages can break jupyter/notebook
     env CXX="${CXX_COMPILER:?}" CC="${C_COMPILER:?}" ${PIP3:?} install "${PIPCP[@]}" \
       --no-cache-dir --prefer-binary \
+      -f https://storage.googleapis.com/jax-releases/jax_releases.html \
       --prefix="${ROOTDIR:?}/.local" \
       >>${OUT1:?} 2>>${OUT2:?} || { error "${EC13:?}"; return 1; }
 

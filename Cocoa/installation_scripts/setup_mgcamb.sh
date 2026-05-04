@@ -185,7 +185,6 @@ return 55; # why this odd number? Setup_cocoa will cache this installation only
            #   or the system shuts down in the middle of a git clone?  
            #   In this case, PACKDIR would exists, but it is corrupted
 
-
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------

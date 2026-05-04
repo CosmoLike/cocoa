@@ -125,18 +125,33 @@ In this section, we assume users have previously activated the Cocoa conda envir
 
   - Stable Version
     
-        git clone https://github.com/CosmoLike/cocoa.git --branch v4.07 cocoa
+        git clone https://github.com/SBU-COSMOLIKE/cocoa.git --branch v4.10.2 cocoa
 
   - Testing beta release
     
-        git clone https://github.com/CosmoLike/cocoa.git --branch v5.0beta2 cocoa
+        git clone https://github.com/SBU-COSMOLIKE/cocoa.git cocoa
+
+> [!NOTE]
+> Version `v4.10.1` and above include significant cosmolike speed-ups from refactoring non-limber/C-FASTPT modules. 
+
+> [!NOTE]
+> `v4.10.2` cosmolike benchmark: do not include CAMB; CPU: `Intel(R) Core(TM) i9-10940X CPU @ 3.30GHz`; OpenMP cores: `8`; Includes TATT and non-limber (in `w_gg`).
+> - **LSST-Y1 Real 3x2pt**: ~`0.093`s
+> - **Roman Real 3x2pt**: ~`0.161`s    
+> - **Roman Fourier 3x2pt**: ~`0.06`s
+> - **DES-Y3 x Planck 6x2pt** ~`0.10`s
+> - **DES-Y3 Real 3x2pt (des_y3 repo)** ~`0.074`s
+> 
+> How to record benchmarks on cosmolike projects? 
+> - Go to `EXAMPLE_EVALUATE2.yaml` on each repository; Turn on TATT flag (`IA_model: 1`),
+> - Set `N=10` on the evaluate sampler (Timing on `N=1` is highly biased); Remove the `override` YAML block. 
 
 and
 
     cd ./cocoa/Cocoa
 
 **Step :two:**: Run the script `setup_cocoa.sh` via
-        
+
     source setup_cocoa.sh
 
 
@@ -319,7 +334,7 @@ Now, users must follow all the steps below.
 - **One model evaluation**:
 
   - Linux
-    
+
         mpirun -n 1 --oversubscribe --mca pml ^ucx --mca btl vader,tcp,self --rank-by slot \
           --bind-to core:overload-allowed --map-by slot \
           cobaya-run ./projects/example/EXAMPLE_EMUL_EVALUATE1.yaml -f
@@ -331,7 +346,7 @@ Now, users must follow all the steps below.
 - **MCMC (Metropolis-Hastings Algorithm)**:
 
   - Linux
-    
+
         mpirun -n 4 --oversubscribe --mca pml ^ucx --mca btl vader,tcp,self --rank-by slot \
             --bind-to core:overload-allowed --map-by slot \
             cobaya-run ./projects/example/EXAMPLE_EMUL_MCMC1.yaml -r
@@ -348,13 +363,13 @@ Now, users must follow all the steps below.
 - **PolyChord**:
 
   - Linux
-    
+
         mpirun -n 90 --oversubscribe --mca pml ^ucx --mca btl vader,tcp,self --rank-by slot \
             --bind-to core:overload-allowed --map-by slot \
             cobaya-run ./projects/example/EXAMPLE_EMUL_POLY1.yaml -r
 
   - macOS (arm)
- 
+
         mpirun -n 12 --oversubscribe cobaya-run ./projects/example/EXAMPLE_EMUL_POLY1.yaml -r
     
 > [!Note]
@@ -369,7 +384,7 @@ likelihoods, and the theory code, all following Cobaya Conventions.
 - **Nautilus**:
 
   - Linux
-    
+
         mpirun -n 90 --oversubscribe --mca pml ^ucx --mca btl vader,tcp,self --rank-by slot \
             --bind-to core:overload-allowed --map-by slot \
             python -m mpi4py.futures ./projects/example/EXAMPLE_EMUL_NAUTILUS1.py \
@@ -429,7 +444,7 @@ likelihoods, and the theory code, all following Cobaya Conventions.
   Our minimizer is a reimplementation of `Procoli`, developed by Karwal et al ([arXiv:2401.14225](https://arxiv.org/abs/2401.14225)) 
 
     - Linux
-      
+
           mpirun -n 21 --oversubscribe --mca pml ^ucx --mca btl vader,tcp,self --rank-by slot \
               --bind-to core:overload-allowed --map-by slot \
               python ./projects/example/EXAMPLE_EMUL_MINIMIZE1.py --root ./projects/example/ \
@@ -462,7 +477,7 @@ likelihoods, and the theory code, all following Cobaya Conventions.
 - **Profile**: 
 
     - Linux
-      
+
           mpirun -n 21 --oversubscribe --mca pml ^ucx --mca btl vader,tcp,self --rank-by slot \
               --bind-to core:overload-allowed --map-by slot \
               python ./projects/example/EXAMPLE_EMUL_PROFILE1.py \
@@ -502,7 +517,7 @@ likelihoods, and the theory code, all following Cobaya Conventions.
     to calculate the profile. Here, the `minfile` and `cov` options are mandatory.
 
     - Linux
-      
+
           mpirun -n 1 --mca pml ^ucx --mca btl vader,tcp,self --rank-by slot \
               --bind-to core:overload-allowed --map-by slot \
               python ./projects/example/EXAMPLE_EMUL_PROFILE_SCIPY1.py \
@@ -556,6 +571,93 @@ likelihoods, and the theory code, all following Cobaya Conventions.
 <p align="center">
 <img width="790" height="333" alt="Unknown" src="https://github.com/user-attachments/assets/b5ef808e-0efa-4bb9-852a-854f6531e3ed" />
 </p>
+
+> [!NOTE]
+> What about [CosmoPower](https://alessiospuriomancini.github.io/cosmopower/)? CosmoPower is a suite of popular emulators developed by Prof. Alessio Mancini
+> and collaborators. Our Cocoa port relies on the work done by Hidde Jense @HTJense (kudos to his/their work) as well as the Simons Observatory SOLikeT code.
+> Even though they are not the suite of AI-powered emulators adopted by Cocoa developers, we do provide limited support for running them.
+> To set up and compile Cosmopower and also the corresponding Cobaya Wrapper, comment the following keys before running `setup_cocoa.sh` and `compile_cocoa.sh`.
+> 
+>     [Adapted from Cocoa/set_installation_options.sh shell script]
+>     #export IGNORE_COSMOPOWER_DATA=1  
+>     #export IGNORE_COSMOPOWER_CODE=1
+>     (...)
+>	  export COSMOPOWER_URL="https://github.com/SBU-COSMOLIKE/cosmopower.git"
+>	  export COSMOPOWER_GIT_COMMIT="f70fc789426847eed996d707ec67a3a93d74bbc3"
+>     (...)
+>     # Edit below if you have your own set of CosmoPower Emulators
+>     export COSMOPOWER_URL_DATA="https://github.com/cosmopower-organization/jense_2024_emulators.git"
+>     export COSMOPOWER_URL_DATA_COMMIT="4317635eed70289ee1ec6b3df828027173071e36"
+
+# Running Hybrid Cosmolike-ML emulators <a name="cobaya_base_code_examples_emul2"></a>
+
+> [!Warning]
+> The code and examples associated with this section are still in alpha stage
+
+Our main line of research involves emulators that simulate the entire Cosmolike data vectors, and each project (LSST, Roman, DES) contains its own README with emulator examples. The speed of such emulators is incredible, especially when GPUs are available, and our emulators do take advantage of the CPU-GPU integration on Apple MX chips. For example, the average timing of lsst-y1 cosmic shear data vector emulation is around 0.005s ($\sim$ 200828 evaluations in $\sim$ 850.5 seconds) on a macOS M2 Pro.
+
+While the data vector emulators are incredibly fast, there is an intermediate approach that emulates only the Boltzmann outputs (comoving distance, linear and nonlinear matter power spectrum). This hybrid-ML case can offer greater flexibility, especially in the initial phases of a research project, as changes to the modeling of nuisance parameters or to the assumed galaxy distributions do not require retraining of the network. 
+
+Examples in the hybrid case all have the prefix **EXAMPLE_EMUL2** (note the `2`). The required flags on `set_installation_options.sh` are similar to what we showed in the previous emulator section.
+
+Now, users must follow all the steps below.
+
+ **Step :one:**: Activate the private Python environment by sourcing the script `start_cocoa.sh`
+
+    source start_cocoa.sh
+
+ **Step :two:**: Select the number of OpenMP cores. Below, we set it to 4, the ideal setting for hybrid examples.
+
+  - Linux
+
+        export OMP_NUM_THREADS=4; export OMP_PROC_BIND=close; export OMP_PLACES=cores; export OMP_DYNAMIC=FALSE
+
+  - macOS (arm)
+
+        export OMP_NUM_THREADS=4; export OMP_PROC_BIND=disabled; export OMP_PLACES=cores; export OMP_DYNAMIC=FALSE
+    
+ **Step :three:** Run `cobaya-run` on the first emulator example, following the commands below (here we only provide lsst-y1 examples).
+
+- **One model evaluation**:
+
+  - Linux
+
+        mpirun -n 1 --oversubscribe --mca pml ^ucx --mca btl vader,tcp,self \
+           --bind-to core:overload-allowed --report-bindings  \
+           --rank-by slot --map-by numa:pe=${OMP_NUM_THREADS} \
+           cobaya-run ./projects/lsst_y1/EXAMPLE_EMUL2_EVALUATE1.yaml -f
+
+  - macOS (arm)
+
+        mpirun -n 1 --oversubscribe  cobaya-run ./projects/lsst_y1/EXAMPLE_EMUL2_EVALUATE1.yaml -f
+    
+- **MCMC (Metropolis-Hastings Algorithm)**:
+
+  - Linux
+
+        mpirun -n 4 --oversubscribe --mca pml ^ucx --mca btl vader,tcp,self --rank-by slot \
+            --bind-to core:overload-allowed --map-by slot \
+            cobaya-run ./projects/lsst_y1/EXAMPLE_EMUL_EMUL2_MCMC1.yaml -r
+
+  - macOS (arm)
+
+        mpirun -n 4 --oversubscribe cobaya-run ./projects/lsst_y1/EXAMPLE_EMUL2_MCMC1.yaml -r
+    
+Details on the matter power spectrum emulator designs will be presented in the [emulator_code](https://github.com/CosmoLike/emulators_code) repository. Basically, we apply standard neural network techniques to generalize the *syren-new* Eq. 6 of [arXiv:2410.14623](https://arxiv.org/abs/2410.14623) formula for the linear power spectrum (w0waCDM with a fixed neutrino mass of $0.06$ eV) to new models, extended ranges, or higher precision. Similarly, we use networks to generalize the *syren-Halofit* LCDM nonlinear boost fit (Eq. 11 of [arXiv:2402.17492](https://arxiv.org/abs/2402.17492)).
+
+> [!NOTE] 
+> Users can decide not to correct the *syren-new* formula for the linear power spectrum (flag in the yaml). Although we have not conducted extensive studies of the caveats of the syren-new approximation, it appears sufficient for w0waCDM forecasts when combined with the Euclid Emulator to compute the nonlinear boost.
+>
+> For back-of-the-envelope LCDM calculations (e.g., to test cosmolike features), users can also choose not to correct the *syren-Halofit* formula for the LCDM nonlinear boost (see figure below). In this case, the overhead on top of cosmolike computations is minimum, at the order of $0.01$ seconds on a macOS M2Pro laptop. 
+>
+> <p align="center">
+>  <span style="display:flex; justify-content:center; gap:16px; flex-wrap:wrap;">
+>    <img width="450" alt="compare_emul_hemul" src="https://github.com/user-attachments/assets/7ada9b3b-db01-499f-8170-a2db5ef90636" />
+>    <img width="450" alt="Screenshot 2026-01-06 at 2 13 06 AM" src="https://github.com/user-attachments/assets/d19f0900-cebc-41ca-9028-1d4e0bd40cc9" />
+>  </span>
+> </p>
+
+
 
 
 ## Credits <a name="appendix_proper_credits"></a>
@@ -1001,11 +1103,11 @@ Although this is the default configuration in CoCoA, it is worth noting that com
 If users have already run `setup_cocoa.sh` prior to commenting these flags, run the command.
 
     source start_cocoa.sh # even if (.local) is already active, users must run start_cocoa.sh again to update bash environment values
-   
+
 and
 
     source ./installation_scripts/setup_pip_core_packages.sh
-   
+
 
 # Additional Appendices <a name="appendix_additional"></a>
 
@@ -1150,7 +1252,7 @@ There are a few differences users should be aware of when running Cocoa on Googl
   *This solution is not valid when running Colab with local runtime* (see [Google documentation](https://research.google.com/colaboratory/local-runtimes.html) for additional information on how to link notebooks to local resources). The good news here is that local storage is persistent, so there is no need to create backups on Google Drive.
   
   - Saving checkpoints: compress and copy the `/content` folder from the local disk to the user's Drive
-    
+
         %%bash
         ROOT="colab_name_notebook"
         DEST="/content/drive/MyDrive/ColabBackups"
@@ -1164,7 +1266,7 @@ There are a few differences users should be aware of when running Cocoa on Googl
         echo "Created: $ARCHIVE"
 
   - Loading checkpoints: decompress and copy the `/content` folder from the user's Drive to the local disk
-    
+
         %%bash
         SENTINEL="/content/conda/etc/profile.d/conda.sh"  # exists when your env is restored
         if [[ -e "$SENTINEL" ]]; then

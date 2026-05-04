@@ -2,7 +2,7 @@
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
-if [ -n "${IGNORE_HYREC_CODE:-}" ]; then
+if [ -n "${IGNORE_SIMDE_CODE:-}" ]; then
   return 99
 fi
 
@@ -14,8 +14,7 @@ fi
 ( source "${ROOTDIR:?}/installation_scripts/flags_check.sh" ) || return 1;
 
 unset_env_vars () {
-  unset -v URL CCIL ECODEF FOLDER PACKDIR CHANGES TFOLDER 
-  unset -v TFILE TFILEP AL PRINTNAME
+  unset -v URL CCIL ECODEF FOLDER PACKDIR CHANGES TFOLDER TFILE TFILEP AL
   cdroot || return 1;
 }
 
@@ -56,49 +55,44 @@ CCIL="${ROOTDIR:?}/../cocoa_installation_libraries"
 
 # ---------------------------------------------------------------------------
 
-URL="${HYREC_URL:-"https://github.com/nanoomlee/HYREC-2.git"}"
-
-CHANGES="${CCIL:?}/hyrec_changes"
+URL="${SIMDE_URL:-"https://github.com/simd-everywhere/simde.git"}"
 
 # E = EXTERNAL, CODE, F=FODLER
 ECODEF="${ROOTDIR:?}/external_modules/code"
 
-# Here we don't include an default option like in other codes because
-# The makefile patch requires HYREC_NAME env variable
-FOLDER="${HYREC_NAME:?}"
+FOLDER="${SIMDE_NAME:-"simde"}"
 
 PACKDIR="${ECODEF:?}/${FOLDER:?}"
 
 # Name to be printed on this shell script messages
-PRINTNAME="HYREC2 RECOMBINATION CODE"
+PRINTNAME="SIMD EVERYWHERE CODE"
 
-ptop "SETUP ${PRINTNAME:?}" || { unset_all; return 1; }
+ptop "INSTALLING ${PRINTNAME:?}" || { unset_all; return 1; }
 
 # ----------------------------------------------------------------------------
 # In case this script is called twice ----------------------------------------
 # ----------------------------------------------------------------------------
-if [ -n "${OVERWRITE_EXISTING_HYREC_CODE:-}" ]; then
-  
+if [ -n "${OVERWRITE_EXISTING_SIMDE_CODE:-}" ]; then
+
   rm -rf "${PACKDIR:?}"
 
 fi
 
-# ----------------------------------------------------------------------------
-# Clone from original repo ---------------------------------------------------
-# ----------------------------------------------------------------------------
-if [ ! -d "${PACKDIR:?}" ]; then
-
+if [[ ! -d "${PACKDIR:?}" ]]; then
+  # --------------------------------------------------------------------------
+  # Clone from original repo -------------------------------------------------
+  # --------------------------------------------------------------------------
   cdfolder "${ECODEF:?}" || { unset_all; return 1; }
 
   "${GIT:?}" clone "${URL:?}" --depth ${GIT_CLONE_MAXIMUM_DEPTH:-1000} \
     --recursive --no-single-branch "${FOLDER:?}" \
     >>${OUT1:?} 2>>${OUT2:?} || { error "${EC15:?}"; return 1; }
   
-  cdfolder "${PACKDIR:?}" || { unset_all; return 1; }
+  cdfolder "${PACKDIR}" || { unset_all; return 1; }
 
-  if [[ -n "${HYREC_GIT_COMMIT:-}" ||
-        -n "${HYREC_GIT_BRANCH:-}" ||
-        -n "${HYREC_GIT_TAG:-}" ]]; then
+  if [[ -n "${SIMDE_GIT_COMMIT:-}" ||
+        -n "${SIMDE_GIT_BRANCH:-}" ||
+        -n "${SIMDE_GIT_TAG:-}" ]]; then
     if [ "$("${GIT:?}" rev-parse --is-shallow-repository)" = "true" ]; then
       "${GIT:?}" fetch --unshallow --all --tags --prune \
         >>${OUT1:?} 2>>${OUT2:?} || { error "${EC16:?}"; return 1; }
@@ -108,56 +102,24 @@ if [ ! -d "${PACKDIR:?}" ]; then
     fi
   fi
 
-  if [ -n "${HYREC_GIT_COMMIT:-}" ]; then
-    "${GIT:?}" checkout "${HYREC_GIT_COMMIT:?}" \
+  if [ -n "${SIMDE_GIT_COMMIT:-}" ]; then
+    "${GIT:?}" checkout "${SIMDE_GIT_COMMIT:?}" \
       >>${OUT1:?} 2>>${OUT2:?} || { error "${EC16:?}"; return 1; }
-  elif [ -n "${HYREC_GIT_BRANCH:-}" ]; then
-    "${GIT:?}" checkout -b "${HYREC_GIT_BRANCH:?}" "origin/${HYREC_GIT_BRANCH:?}" \
+  elif [ -n "${SIMDE_GIT_BRANCH:-}" ]; then
+    "${GIT:?}" checkout -b "${SIMDE_GIT_BRANCH:?}" "origin/${SIMDE_GIT_BRANCH:?}" \
       >>${OUT1:?} 2>>${OUT2:?} || { error "${EC16:?}"; return 1; }
-  elif [ -n "${HYREC_GIT_TAG:-}" ]; then
-    "${GIT:?}" checkout "tags/${HYREC_GIT_TAG:?}" -b "${HYREC_GIT_TAG:?}" \
+  elif [ -n "${SIMDE_GIT_TAG:-}" ]; then
+    "${GIT:?}" checkout "tags/${SIMDE_GIT_TAG:?}" -b "${SIMDE_GIT_TAG:?}" \
       >>${OUT1:?} 2>>${OUT2:?} || { error "${EC16:?}"; return 1; }
   fi
 
-  # --------------------------------------------------------------------------
-  # We patch the files below so they use the right compilers -----------------
-  # --------------------------------------------------------------------------
-  # T = TMP
-  declare -a TFOLDER=("" 
-                      "" 
-                     ) # If nonblank, path must include /
-  
-  # T = TMP
-  declare -a TFILE=("Makefile"
-                    "history.c"
-                   )
-
-  #T = TMP, P = PATCH
-  declare -a TFILEP=("Makefile.patch" 
-                     "history.patch" 
-                    )
-
-  # AL = Array Length
-  AL=${#TFOLDER[@]}
-
-  for (( i=0; i<${AL}; i++ ));
-  do
-    cdfolder "${PACKDIR:?}/${TFOLDER[$i]}" || { unset_all; return 1; }
-
-    cpfolder "${CHANGES:?}/${TFOLDER[$i]}${TFILEP[$i]:?}" . \
-      2>>${OUT2:?} || { unset_all; return 1; }
-
-    patch -u "${TFILE[$i]:?}" -i "${TFILEP[$i]:?}" \
-      >>${OUT1:?} 2>>${OUT2:?} || { error "${EC17:?} (${TFILE[$i]:?})"; return 1; }
-  done
-
 fi
 
-cdfolder "${ROOTDIR:?}" || { unset_all; return 1; }
+cdfolder "${ROOTDIR}" || { unset_all; return 1; }
 
 pbottom "INSTALLING ${PRINTNAME:?}" || { unset_all; return 1; }
 
-# ----------------------------------------------------------------------------
+#-------------------------------------------------------------------------------
 
 unset_all || return 1
 

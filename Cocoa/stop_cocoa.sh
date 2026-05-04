@@ -97,13 +97,13 @@ fi
 if [[ -z "${IGNORE_COSMOLIKE_CODE}" ]]; then
   ECODEF="${ROOTDIR:?}/external_modules/code"
 
-  for TMP1 in "cfastpt" "cfftlog" "cosmolike" "log.c"; do
+  for TMP1 in "cfastpt" "cosmolike" "log.c"; do
     if [[ -L "${ECODEF:?}/${TMP1}" ]]; then
       rm -f "${ECODEF:?}/${TMP1}"
     fi
   done
 
-  unset -v ECODEF FOLDER TMP1 TMP2 TMP3 TMP4
+  unset -v ECODEF TMP1
 fi
 
 # ----------------------------------------------------------------------------
@@ -159,10 +159,18 @@ fi
 if [[ -z "${IGNORE_EMULTRF_CODE}" ]]; then
   COBTH="${ROOTDIR:?}/cobaya/cobaya/theories"
 
-  for TMP in "emulcmb" "emulbaosn" "emultheta" "emulrdrag" \
-             "emul_cosmic_shear" "emul_ggl" "emul_wtheta"; do
-    if [[ -L "${COBTH:?}/${TMP}" ]]; then
-      rm -f "${COBTH:?}/${TMP}"
+  for TMP in \
+    "emulcmb" \
+    "emulbaosn" \
+    "emultheta" \
+    "emulrdrag" \
+    "emul_cosmic_shear" \
+    "emul_ggl" \
+    "emul_wtheta" \
+    "emulmps"
+  do
+    if [[ -L "${COBTH:?}/${TMP:?}" ]]; then
+      rm -f "${COBTH:?}/${TMP:?}"
     fi
   done
 
@@ -172,7 +180,6 @@ fi
 # ----------------------------------------------------------------------------
 # ------------------------ STOP EXTERNAL PROJECTS ---------------------------
 # ----------------------------------------------------------------------------
-
 
 if [ -n "${ROOTDIR}" ]; then
   source "${ROOTDIR:?}/installation_scripts/stop_all_projects.sh"

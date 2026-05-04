@@ -86,6 +86,9 @@ if [ ! -d "${PACKDIR:?}" ]; then
     else
       "${GIT:?}" fetch --all --tags --prune \
         >>${OUT1:?} 2>>${OUT2:?} || { error "${EC16:?}"; return 1; }
+    else
+      "${GIT:?}" fetch --all --tags --prune \
+        >>${OUT1:?} 2>>${OUT2:?} || { error "${EC16:?}"; return 1; }
     
     elif [ -n "${COSMOLIKE_GIT_BRANCH}" ]; then
     

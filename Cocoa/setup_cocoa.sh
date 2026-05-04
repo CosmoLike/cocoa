@@ -70,6 +70,7 @@ declare -a CORE=("setup_core_packages.sh"
                  "setup_getdist.sh"
                  "setup_derivkit.sh"
                  "setup_ee2.sh"
+                 "setup_simde.sh"
                 )
 
 declare -a THEORY=("setup_hyrec2.sh"
@@ -78,6 +79,7 @@ declare -a THEORY=("setup_hyrec2.sh"
                    "setup_mgcamb.sh"
                    "setup_class.sh"
                    "setup_velocileptors.sh"
+                   "setup_pyfastpt.sh"
                   )
 
 declare -a ML=("setup_cosmopower.sh"
