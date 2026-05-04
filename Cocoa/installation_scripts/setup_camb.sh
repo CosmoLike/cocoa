@@ -72,6 +72,7 @@ PACKDIR="${ECODEF:?}/${FOLDER:?}"
 if [ -n "${OVERWRITE_EXISTING_CAMB_CODE:-}" ]; then
 
   rm -rf "${PACKDIR:?}"
+  rm -rf "${ROOTDIR:?}/.local/lib/python${PYTHON_VERSION:?}/site-packages/camb*"
 
 fi
 
@@ -148,7 +149,7 @@ if [ ! -d "${PACKDIR:?}" ]; then
     cpfolder "${CHANGES:?}/${TFOLDER[$i]}${TFILEP[$i]:?}" . \
       2>>${OUT2:?} || { unset_all; return 1; }
 
-    patch -u "${TFILE[$i]:?}" -i "${TFILEP[$i]:?}" \
+    patch -l -u "${TFILE[$i]:?}" -i "${TFILEP[$i]:?}" \
       >>${OUT1:?} 2>>${OUT2:?} || { error "${EC17:?} (${TFILE[$i]:?})"; return 1; }
   done
 
