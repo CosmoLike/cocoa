@@ -178,6 +178,8 @@ export OVERWRITE_EXISTING_EMULTRF_DATA=1
 export SPDLOG_VERSION=v1.15.3
 export GIT_CLONE_MAXIMUM_DEPTH=1000
 
+# This is COBAYA version 3.6.2 
+# Except that CoCoA patches revert clik back to Fortran + few minor patches
 export COBAYA_URL="https://github.com/CobayaSampler/cobaya.git"
 export COBAYA_GIT_COMMIT="899f30a49f85de610dac321e91a1af50018e56aa"
 
@@ -201,6 +203,7 @@ export POLY_URL="https://github.com/PolyChord/PolyChordLite.git"
 export POLYCHORD_GIT_COMMIT="a422163d875d7879d689ce535c47db0281da2775"
 export POLY_NAME="PolyChordLite"
 
+# This is CAMB version between 1.6.6 and 1.6.7
 export CAMB_URL="https://github.com/cmbant/CAMB"
 export CAMB_GIT_COMMIT="6c978c716e163157c95191ee1c089e8b36c8adb9"
 export CAMB_NAME='CAMB'
