@@ -8,7 +8,7 @@ likelihood:
   planck_2018_highl_plik.TTTEEE_lite:
     path: ./external_modules/
     clik_file: plc_3.0/hi_l/plik_lite/plik_lite_v22_TTTEEE.clik
-  planck_2018_lowl.TT: 
+  planck_2018_lowl.TT:
     path: ./external_modules
   planck_2018_lowl.EE:
     path: ./external_modules
@@ -205,8 +205,8 @@ theory:
 sampler:
   evaluate:
     override:
-      logA: 3.045845885
-      ns: 9.652308970e-01
+      logA: 3.0448
+      ns: 0.96605
       theta_MC_100: 1.04088
       omegabh2: 0.022383
       omegach2: 0.12011

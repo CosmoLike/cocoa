@@ -1,7 +1,6 @@
 stop_at_error: false
 debug: false
 timing: true
-debug: false
 
 likelihood:
   planck_2018_highl_plik.TTTEEE_lite: 
@@ -67,6 +66,7 @@ likelihood:
         - experiments: [LAT_145, LAT_145]
         - experiments: [LAT_145, LAT_225]
         - experiments: [LAT_225, LAT_225]
+
 params:
   logA:
     prior:
@@ -144,11 +144,25 @@ params:
     proposal: 0.003
     latex: \tau_\mathrm{reio}
   w0pwa:
-    value: -0.9999999
+    prior:
+      min: -5 
+      max: -0.01
+    ref:
+      dist: norm
+      loc: -0.99
+      scale: 0.05
+    proposal: 0.05
     latex: w_{0,\mathrm{DE}}+w_{a,\mathrm{DE}}
     drop: true
   w:
-    value: -0.9999999
+    prior:
+      min: -3
+      max: -0.01
+    ref:
+      dist: norm
+      loc: -0.99
+      scale: 0.05
+    proposal: 0.05
     latex: w_{0,\mathrm{DE}}
   wa:
     value: 'lambda w0pwa, w: w0pwa - w'
@@ -248,8 +262,25 @@ sampler:
       logA: 3.045845885
       ns: 9.652308970e-01
       theta_MC_100: 1.04088
-      omegabh2: 0.022383
-      omegach2: 0.12011
-      tau: 0.0543
+      omegabh2: 2.246801442e-02
+      omegach2: 1.198257361e-01 
+      tau: 5.433339482e-02
+      w0pwa: -0.9999
+      w: -0.9999
       A_planck: 1.00138
+      a_tSZ: 3.30
+      a_kSZ: 1.6
+      a_p: 6.90
+      beta_p: 2.08
+      a_c: 4.90
+      beta_c: 2.20
+      a_s: 3.10
+      a_gtt: 2.81
+      a_gte: 0.10
+      a_gee: 0.10
+      a_psee: 0.0
+      a_pste: 0.0
+      xi: 0.2
+      T_d: 9.60
+
 output: ./projects/example/chains/EXAMPLE_EVALUATE2
