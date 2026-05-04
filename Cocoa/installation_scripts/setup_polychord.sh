@@ -14,7 +14,7 @@ fi
 ( source "${ROOTDIR:?}/installation_scripts/flags_check.sh" ) || return 1;
 
 unset_env_vars () {
-  unset -v URL CCIL ECODEF FOLDER PACKDIR CHANGES TFOLDER TFILE TFILEP AL
+  unset -v URL CCIL ECODEF FOLDER PACKDIR CHANGES TFOLDER TFILE TFILEP AL PRINTNAME
   cdroot || return 1;
 }
 
@@ -54,13 +54,11 @@ cpfile() {
 # ----------------------------------------------------------------------------
 # ----------------------------------------------------------------------------
 
-unset_env_vars || return 1;
+unset_env_vars || return 1
 
 CCIL="${ROOTDIR:?}/../cocoa_installation_libraries"
 
 # ----------------------------------------------------------------------------
-
-ptop  'SETUP POLYCHORD' || { unset_all; return 1; }
 
 URL="${POLY_URL:-"https://github.com/PolyChord/PolyChordLite.git"}"
   
@@ -72,6 +70,11 @@ ECODEF="${ROOTDIR:?}/external_modules/code"
 FOLDER=${POLY_NAME:-"PolyChordLite"}
 
 PACKDIR="${ECODEF:?}/${FOLDER:?}"
+
+# Name to be printed on this shell script messages
+PRINTNAME="POLYCHORD CODE"
+
+ptop "INSTALLING ${PRINTNAME:?}" || { unset_all; return 1; }
 
 # ---------------------------------------------------------------------------
 # in case this script is called twice
@@ -151,9 +154,9 @@ if [ ! -d "${PACKDIR:?}" ]; then
 
 fi
 
-cdfolder "${ROOTDIR}" || { unset_all; return 1; }
+cdfolder "${ROOTDIR:?}" || { unset_all; return 1; }
 
-pbottom 'SETUP POLYCHORD' || { unset_all; return 1; }
+pbottom "INSTALLING ${PRINTNAME:?}" || { unset_all; return 1; }
 
 #-------------------------------------------------------------------------------
 

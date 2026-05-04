@@ -14,7 +14,7 @@ fi
 ( source "${ROOTDIR:?}/installation_scripts/flags_check.sh" ) || return 1;
 
 unset_env_vars () {
-  unset -v URL CCIL ECODEF FOLDER PACKDIR  
+  unset -v URL CCIL ECODEF FOLDER PACKDIR PRINTNAME 
   cdroot || return 1;
 }
 
@@ -62,7 +62,10 @@ FOLDER="${DERIVKIT_NAME:-"derivkit"}"
 
 PACKDIR="${ECODEF:?}/${FOLDER:?}"
 
-ptop "INSTALLING DERIVKIT DERIVATIVE CALCULATOR" || { unset_all; return 1; }
+# Name to be printed on this shell script messages
+PRINTNAME="DERIVKIT DERIVATIVE CALCULATOR"
+
+ptop "INSTALLING ${PRINTNAME:?}" || { unset_all; return 1; }
 
 if [ -n "${OVERWRITE_EXISTING_DERIVKIT_CODE:-}" ]; then
 
@@ -109,9 +112,9 @@ if [ ! -d "${PACKDIR:?}" ]; then
  
 fi
 
-cdfolder "${ROOTDIR}" || { unset_all; return 1; }
+cdfolder "${ROOTDIR:?}" || { unset_all; return 1; }
 
-pbottom "INSTALLING DERIVKIT DERIVATIVE CALCULATOR" || { unset_all; return 1; }
+pbottom "INSTALLING ${PRINTNAME:?}" || { unset_all; return 1; }
 
 #-------------------------------------------------------------------------------
 

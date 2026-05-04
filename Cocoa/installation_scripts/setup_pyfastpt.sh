@@ -14,12 +14,12 @@ fi
 ( source "${ROOTDIR:?}/installation_scripts/flags_check.sh" ) || return 1;
 
 unset_env_vars () {
-  unset -v URL CCIL ECODEF FOLDER PACKDIR CHANGES TFOLDER TFILE TFILEP AL
+  unset -v URL CCIL ECODEF FOLDER PACKDIR CHANGES TFOLDER TFILE TFILEP AL PRINTNAME
   cdroot || return 1;
 }
 
 unset_env_funcs () {
-  unset -f cdfolder cpfolder error cpfile
+  unset -f cdfolder cpfolder error
   unset -f unset_env_funcs
   cdroot || return 1;
 }
@@ -197,7 +197,6 @@ return 55; # why this odd number? Setup_cocoa will cache this installation only
            #   or the system shuts down in the middle of a git clone?  
            #   In this case, PACKDIR would exists, but it is corrupted
 
-  
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
