@@ -121,10 +121,6 @@ export LSST_Y1_URL="https://github.com/CosmoLike/cocoa_lsst_y1.git"
 export LSST_Y1_NAME="lsst_y1"
 export LSST_Y1_GIT_TAG="v4.10.2"
 
-export LSST_Y1_URL="https://github.com/CosmoLike/cocoa_lsst_y1.git"
-export LSST_Y1_NAME="lsst_y1"
-export LSST_Y1_GIT_TAG="v4.10"
-
 export ROMAN_FOURIER_URL="https://github.com/CosmoLike/cocoa_roman_fourier.git"
 export ROMAN_FOURIER_NAME="roman_fourier"
 export ROMAN_FOURIER_GIT_TAG="4.10.1"
