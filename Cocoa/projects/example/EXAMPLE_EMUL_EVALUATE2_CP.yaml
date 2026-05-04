@@ -1,0 +1,135 @@
+stop_at_error: false
+timing: true
+debug: false
+
+likelihood:
+  planck_2018_highl_plik.TTTEEE_lite:
+    path: ./external_modules/
+    clik_file: plc_3.0/hi_l/plik_lite/plik_lite_v22_TTTEEE.clik
+  planck_2018_lowl.TT: 
+    path: ./external_modules
+  planck_2018_lowl.EE:
+    path: ./external_modules
+  act_dr6_lenslike.ACTDR6LensLike:
+     lens_only: True
+     lmax: 2998
+     variant: actplanck_baseline
+params:
+  logA:
+    prior:
+      min: 1.61
+      max: 3.91
+    ref:
+      dist: norm
+      loc: 3.0448
+      scale: 0.05
+    proposal: 0.05
+    latex: '\log(10^{10} A_\mathrm{s})'
+  ns:
+    prior:
+      min: 0.92
+      max: 1.05
+    ref:
+      dist: norm
+      loc: 0.96605
+      scale: 0.005
+    proposal: 0.005
+    latex: 'n_\mathrm{s}'
+  H0:
+    prior:
+      min: 55
+      max: 91
+    ref:
+      dist: norm
+      loc: 67.32
+      scale: 5
+    proposal: 3
+    latex: 'H_0'
+    drop: true
+  omegabh2:
+    prior:
+      min: 0.01
+      max: 0.04
+    ref:
+      dist: norm
+      loc: 0.022383
+      scale: 0.005
+    proposal: 0.005
+    latex: '\Omega_\mathrm{b} h^2'
+    drop: true
+  omegach2:
+    prior:
+      min: 0.06
+      max: 0.2
+    ref:
+      dist: norm
+      loc: 0.12011
+      scale: 0.03
+    proposal: 0.03
+    latex: '\Omega_\mathrm{c} h^2'
+    drop: true
+  tau:
+    prior:
+      dist: norm
+      loc: 0.0544
+      scale: 0.0073
+    ref:
+      dist: norm
+      loc: 0.055
+      scale: 0.006
+    proposal: 0.003
+    latex: '\tau_\mathrm{reio}'
+  mnu:
+    value: 0.06
+  ombh2:
+    derived: false
+    value: 'lambda omegabh2: omegabh2'
+    latex: '\Omega_\mathrm{b} h^2'
+  omch2:
+    derived: false
+    value: 'lambda omegach2: omegach2'
+    latex: '\Omega_\mathrm{c} h^2'
+  h:
+    derived: false
+    value: 'lambda H0: H0/100.0'
+    latex: 'H_0'
+theory:
+  cosmopower:
+    network_path: ./external_modules/data/cosmopower/jense_2023_camb_lcdm/networks
+    network_settings:
+      tt:
+        type: NN
+        log: True
+        filename: jense_2023_camb_lcdm_Cl_tt
+        has_ell_factor: True
+      ee:
+        type: NN
+        log: True
+        filename: jense_2023_camb_lcdm_Cl_ee
+        has_ell_factor: True
+      bb:
+        type: NN
+        log: True
+        filename: jense_2023_camb_lcdm_Cl_bb
+        has_ell_factor: True
+      te:
+        type: PCAplusNN
+        log: False
+        filename: jense_2023_camb_lcdm_Cl_te
+        has_ell_factor: True
+      pp:
+        type: PCAplusNN
+        log: True
+        filename: jense_2023_camb_lcdm_Cl_pp
+        has_ell_factor: True
+sampler:
+  evaluate:
+    override:
+      logA: 3.0448
+      ns: 0.96605
+      H0: 67.2987
+      omegabh2: 0.022383
+      omegach2: 0.12011
+      tau: 0.0543
+      A_planck: 1.00138
+output: ./projects/example/chains/EXAMPLE_EMUL_EVALUATE2_CP
