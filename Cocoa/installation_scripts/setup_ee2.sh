@@ -109,7 +109,7 @@ if [[ ! -d "${PACKDIR:?}" ]]; then
     "${GIT:?}" checkout -b "${EE2_GIT_BRANCH:?}" "origin/${EE2_GIT_BRANCH:?}" \
       >>${OUT1:?} 2>>${OUT2:?} || { error "${EC16:?}"; return 1; }
   elif [ -n "${EE2_GIT_TAG:-}" ]; then
-    "${GIT:?}" checkout "tags/${EE2_GIT_TAG:?}" -b "${EE2_GIT_TAG:?}" \
+    "${GIT:?}" checkout "tags/${EE2_GIT_TAG:?}" -b "${EE2_GIT_TAG:?}TMP" \
       >>${OUT1:?} 2>>${OUT2:?} || { error "${EC16:?}"; return 1; }
   fi
 
