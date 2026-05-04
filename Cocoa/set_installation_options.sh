@@ -246,7 +246,7 @@ export SO_SYSLIB_URL="https://github.com/simonsobs/syslibrary.git"
 export SO_SYSLIB_GIT_COMMIT="2471df981053a7526a441d2547eb8dde10d92f70"
 
 export EE2_URL="https://github.com/vivianmiranda/EuclidEmulator2.git"
-export EE2_GIT_COMMIT="4c17dfa6fd826facb69de327401949a1c7fe55d2"
+export EE2_GIT_COMMIT="1c019a5c8985202e55534fad3e26fa298e5c572e"
 # THIS GIT IS FOR THE ORIGINAL EE2 BEFORE VM MODS
 #export EE2_GIT_COMMIT="ff59f6683069417f6b4d2fb5d59197044d424445"
 export EE2_NAME="euclidemu2"

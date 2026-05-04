@@ -116,7 +116,7 @@ likelihood:
   bao.desi_dr2.desi_bao_all:
     path: ./external_modules/data/ 
   act_dr6_lenslike.ACTDR6LensLike:
-    lens_only: True
+    lens_only: False
     variant: actplanck_baseline
 params:
   logA:
