@@ -102,7 +102,7 @@ if [ ! -d "${PACKDIR:?}" ]; then
     "${GIT:?}" checkout -b "${NAUTILUS_GIT_BRANCH:?}" "origin/${NAUTILUS_GIT_BRANCH:?}" \
       >>${OUT1:?} 2>>${OUT2:?} || { error "${EC16:?}"; return 1; }
   elif [ -n "${NAUTILUS_GIT_TAG:-}" ]; then
-    "${GIT:?}" checkout "tags/${NAUTILUS_GIT_TAG:?}" -b "${NAUTILUS_GIT_TAG:?}" \
+    "${GIT:?}" checkout "tags/${NAUTILUS_GIT_TAG:?}" -b "${NAUTILUS_GIT_TAG:?}TMP" \
       >>${OUT1:?} 2>>${OUT2:?} || { error "${EC16:?}"; return 1; }
   fi
 
