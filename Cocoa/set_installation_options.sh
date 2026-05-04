@@ -113,27 +113,27 @@ export USE_SPT_CLIK_PLANCK=1
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
 
-export DES_Y3_URL="https://github.com/SBU-COSMOLIKE/cocoa_des_y3.git"
+export DES_Y3_URL="https://github.com/CosmoLike/cocoa_des_y3.git"
 export DES_Y3_NAME="des_y3"
 export DES_Y3_GIT_TAG="v4.10.1"
 
-export LSST_Y1_URL="https://github.com/SBU-COSMOLIKE/cocoa_lsst_y1.git"
+export LSST_Y1_URL="https://github.com/CosmoLike/cocoa_lsst_y1.git"
 export LSST_Y1_NAME="lsst_y1"
 export LSST_Y1_GIT_TAG="v4.10.2"
 
-export ROMAN_FOURIER_URL="https://github.com/SBU-COSMOLIKE/cocoa_roman_fourier.git"
+export ROMAN_FOURIER_URL="https://github.com/CosmoLike/cocoa_roman_fourier.git"
 export ROMAN_FOURIER_NAME="roman_fourier"
 export ROMAN_FOURIER_GIT_TAG="4.10.1"
 
-export ROMAN_REAL_URL="https://github.com/SBU-COSMOLIKE/cocoa_roman_real.git"
+export ROMAN_REAL_URL="https://github.com/CosmoLike/cocoa_roman_real.git"
 export ROMAN_REAL_NAME="roman_real"
 export ROMAN_REAL_GIT_TAG="v4.10.3"
 
-export DESXPLANCK_URL="https://git@github.com/SBU-COSMOLIKE/cocoa_desy1xplanck.git"
+export DESXPLANCK_URL="https://git@github.com/CosmoLike/cocoa_desy1xplanck.git"
 export DESXPLANCK_GIT_NAME="desy1xplanck"
 export DESXPLANCK_GIT_TAG="v4.10.1"
 
-export COSMOLIKE_URL="https://github.com/SBU-COSMOLIKE/cocoa-cosmolike-core.git"
+export COSMOLIKE_URL="https://github.com/CosmoLike/cocoa-cosmolike-core.git"
 export COSMOLIKE_GIT_TAG="v4.10.2"
 export COSMOLIKE_NAME="cosmolike_core"
 

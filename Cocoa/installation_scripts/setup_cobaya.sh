@@ -148,20 +148,32 @@ if [ ! -d "${ROOTDIR:?}/cobaya" ]; then
   # --------------------------------------------------------------------------
   # PATCH FILE --------------------------------------------- -----------------
   # --------------------------------------------------------------------------  
+<<<<<<< HEAD
   # instead of using JAX-CLIK - uses the original CLIK in FORTRAN
 
+=======
+>>>>>>> main
   declare -a TFOLDER=("cobaya/likelihoods/base_classes/") # Must include  
   declare -a TFILE=("planck_clik.py")
   declare -a TFILEP=("planck_clik.patch")
 
   for (( i=0; i<${#TFOLDER[@]}; i++ ));
   do
+<<<<<<< HEAD
     cdfolder "${COB:?}/${TFOLDER[$i]}" || { unset_all; return 1; } 
   
     cpfolder "${CCCOB:?}/${TFOLDER[$i]}${TFILEP[$i]:?}" . \
       2>>${OUT2:?} || { unset_all; return 1; }
   
    patch --quiet --batch --verbose -u -R "${TFILE[$i]:?}" -i "${TFILEP[$i]:?}" \
+=======
+    cdfolder "${COB:?}/${TFOLDER[$i]}" || { unset_all; return 1; }
+
+    cpfolder "${CCCOB:?}/${TFOLDER[$i]}${TFILEP[$i]:?}" . \
+      2>>${OUT2:?} || { unset_all; return 1; }
+
+    patch --quiet --batch --verbose -u -R "${TFILE[$i]:?}" -i "${TFILEP[$i]:?}" \
+>>>>>>> main
       >>${OUT1:?} 2>>${OUT2:?} || { error "${EC17:?} (${TFILE[$i]:?})"; return 1; }
   done
 
@@ -171,6 +183,7 @@ if [ ! -d "${ROOTDIR:?}/cobaya" ]; then
   declare -a TFOLDER=("cobaya/") # Must include  
   declare -a TFILE=("model.py")
   declare -a TFILEP=("model.patch")
+<<<<<<< HEAD
   
   for (( i=0; i<${#TFOLDER[@]}; i++ ));
   do
@@ -179,13 +192,29 @@ if [ ! -d "${ROOTDIR:?}/cobaya" ]; then
     cpfolder "${CCCOB:?}/${TFOLDER[$i]}${TFILEP[$i]:?}" . \
       2>>${OUT2:?} || { unset_all; return 1; }
   
+=======
+
+  for (( i=0; i<${#TFOLDER[@]}; i++ ));
+  do
+    cdfolder "${COB:?}/${TFOLDER[$i]}" || { unset_all; return 1; }
+
+    cpfolder "${CCCOB:?}/${TFOLDER[$i]}${TFILEP[$i]:?}" . \
+      2>>${OUT2:?} || { unset_all; return 1; }
+
+>>>>>>> main
     # HERE I CAN't USE THE -R
     patch --quiet --batch --verbose -u "${TFILE[$i]:?}" -i "${TFILEP[$i]:?}" \
       >>${OUT1:?} 2>>${OUT2:?} || { error "${EC17:?} (${TFILE[$i]:?})"; return 1; }
   done
+<<<<<<< HEAD
   
   cdfolder "${ROOTDIR:?}" || { unset_all; return 1; }
   
+=======
+
+  cdfolder "${ROOTDIR:?}" || { unset_all; return 1; }
+
+>>>>>>> main
   unset -v TFILE
 
   #-----------------------------------------------------------------------------
@@ -329,10 +358,17 @@ if [ ! -d "${ROOTDIR:?}/cobaya" ]; then
   cppatch "${COBLIKE}/base_classes" "InstallableLikelihood.patch" || { unset_all; return 1; }
   
   cdfolder "${COB:?}/${COBLIKE}/base_classes/" || { unset_all; return 1; }
+<<<<<<< HEAD
   
   patch --quiet --batch --verbose -u "InstallableLikelihood.py" -i "InstallableLikelihood.patch" \
     >>${OUT1:?} 2>>${OUT2:?} || { error "${EC17:?}"; return 1; }
   
+=======
+
+  patch --quiet --batch --verbose -u "InstallableLikelihood.py" -i "InstallableLikelihood.patch" \
+    >>${OUT1:?} 2>>${OUT2:?} || { error "${EC17:?}"; return 1; }
+
+>>>>>>> main
   cdfolder "${ROOTDIR:?}" || { unset_all; return 1; }
 
   # ----------------------------------------------------------------------------
