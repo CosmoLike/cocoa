@@ -129,7 +129,7 @@ In this section, we assume users have previously activated the Cocoa conda envir
 
   - Testing beta release
     
-        git clone https://github.com/CosmoLike/cocoa.git --branch v4.10.2 cocoa
+        git clone https://github.com/CosmoLike/cocoa.git --branch v4.10.3 cocoa
 
 > [!NOTE]
 > Version `v4.10.1` and above include significant cosmolike speed-ups from refactoring non-limber/C-FASTPT modules. 
