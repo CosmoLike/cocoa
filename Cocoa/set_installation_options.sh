@@ -81,7 +81,7 @@ export IGNORE_DARK_EMULATOR_CODE=1
 # The keys below control which cosmolike projects will be installed and compiled 
 # ------------------------------------------------------------------------------
 #export IGNORE_COSMOLIKE_LSST_Y1_CODE=1
-export IGNORE_COSMOLIKE_DES_Y3_CODE=1
+#export IGNORE_COSMOLIKE_DES_Y3_CODE=1
 #export IGNORE_COSMOLIKE_DESXPLANCK_CODE=1
 #export IGNORE_COSMOLIKE_ROMAN_FOURIER_CODE=1
 #export IGNORE_COSMOLIKE_ROMAN_REAL_CODE=1
@@ -115,12 +115,11 @@ export USE_SPT_CLIK_PLANCK=1
 
 export DES_Y3_URL="https://github.com/CosmoLike/cocoa_des_y3.git"
 export DES_Y3_NAME="des_y3"
-#BRANCH: if unset, load the latest commit on the specified branch
-export DES_Y3_GIT_BRANCH="main"
-#COMMIT: if unset, load the specified commit
-#export DES_Y3_GIT_COMMIT="1a46582b5539c177bd68f8863c054f79a15f8538"
-#BRANCH: if unset, load the specified TAG
-export DES_Y3_GIT_TAG="v4.05"
+export DES_Y3_GIT_TAG="v4.10.1"
+
+export LSST_Y1_URL="https://github.com/CosmoLike/cocoa_lsst_y1.git"
+export LSST_Y1_NAME="lsst_y1"
+export LSST_Y1_GIT_TAG="v4.10.2"
 
 export LSST_Y1_URL="https://github.com/CosmoLike/cocoa_lsst_y1.git"
 export LSST_Y1_NAME="lsst_y1"
@@ -128,19 +127,18 @@ export LSST_Y1_GIT_TAG="v4.10"
 
 export ROMAN_FOURIER_URL="https://github.com/CosmoLike/cocoa_roman_fourier.git"
 export ROMAN_FOURIER_NAME="roman_fourier"
-export ROMAN_FOURIER_GIT_TAG="v4.10"
+export ROMAN_FOURIER_GIT_TAG="4.10.1"
 
 export ROMAN_REAL_URL="https://github.com/CosmoLike/cocoa_roman_real.git"
 export ROMAN_REAL_NAME="roman_real"
-export ROMAN_REAL_GIT_TAG="v4.10"
+export ROMAN_REAL_GIT_TAG="v4.10.3"
 
 export DESXPLANCK_URL="https://git@github.com/CosmoLike/cocoa_desy1xplanck.git"
 export DESXPLANCK_GIT_NAME="desy1xplanck"
-export DESXPLANCK_GIT_TAG="v4.10"
+export DESXPLANCK_GIT_TAG="v4.10.1"
 
 export COSMOLIKE_URL="https://github.com/CosmoLike/cocoa-cosmolike-core.git"
-#export COSMOLIKE_GIT_COMMIT= ""
-export COSMOLIKE_GIT_TAG="v4.10" 
+export COSMOLIKE_GIT_TAG="v4.10.2"
 export COSMOLIKE_NAME="cosmolike_core"
 
 # ------------------------------------------------------------------------------
@@ -152,6 +150,21 @@ export COSMOLIKE_NAME="cosmolike_core"
 # ------------------------------------------------------------------------------
 #export AXIONS_PROJECT_URL="git@github.com:SBU-COSMOLIKE/cocoa_axions.git"
 #export AXIONS_PROJECT_NAME="axions"
+
+# ------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
+# URL of emulator projects below ----------------------------------------------
+# ------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
+export EMULTRF_URL="https://github.com/CosmoLike/emulators_code.git"
+export EMULTRF_GIT_TAG="v4.10"
+export OVERWRITE_EXISTING_EMULTRF_CODE=1
+
+export EMULTRF_DATA_URL="https://github.com/SBU-COSMOLIKE/emulators_data_lcdm.git"
+export EMULTRF_DATA_GIT_TAG="v4.10"
+export OVERWRITE_EXISTING_EMULTRF_DATA=1
 
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
@@ -267,14 +280,6 @@ export COSMOPOWER_GIT_COMMIT="f70fc789426847eed996d707ec67a3a93d74bbc3"
 export COSMOPOWER_DATA_URL="https://github.com/cosmopower-organization/jense_2024_emulators.git"
 export COSMOPOWER_DATA_URL_COMMIT="4317635eed70289ee1ec6b3df828027173071e36"
 
-export EMULTRF_URL="https://github.com/CosmoLike/emulators_code.git"
-export EMULTRF_GIT_TAG="v4.07"
-#export EMULTRF_GIT_COMMIT="32139fee45a9a6774b3eb95c2e71539ee24d10f1"
-
-export EMULTRF_DATA_URL="https://github.com/SBU-COSMOLIKE/emulators_data_lcdm.git"
-export EMULTRF_DATA_GIT_TAG="v4.05"
-#export EMULTRF_GIT_COMMIT="090277edf910bde37a856b8e62044d06ea5b5dc0"
-
 export DARKEMULATOR_URL="https://github.com/DarkQuestCosmology/dark_emulator_public.git"
 export DARKEMULATOR_GIT_COMMIT="46df5972509624e2eeadc2bf3ac528b02333a7e2"
 
@@ -302,6 +307,9 @@ export GETDIST_URL="https://github.com/cmbant/getdist.git"
 export GETDIST_GIT_COMMIT="ff477beea2e7e2231a3de4941bdc3d64bd1f0bb4"
 export GETDIST_NAME="getdist"
 
+export SIMDE_URL="https://github.com/simd-everywhere/simde.git"
+export SIMDE_GIT_COMMIT="71fd833d9666141edcd1d3c109a80e228303d8d7"
+export SIMDE_NAME="simde"
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
@@ -326,7 +334,6 @@ export GETDIST_NAME="getdist"
 # ------------------------------------------------------------------------------
 export PYTHON_VERSION=3.10
 export MINICONDA_INSTALLATION=1
-#export MANUAL_INSTALLATION=1
 
 # ------------------------------------------------------------------------------
 # THREADING COMPILATION/INSTALLATION OF LIBRARIES ------------------------------
