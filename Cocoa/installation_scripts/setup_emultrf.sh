@@ -114,7 +114,7 @@ if [ ! -d "${PACKDIR:?}" ]; then
     "${GIT:?}" checkout -b "${EMULTRF_GIT_BRANCH:?}" "origin/${EMULTRF_GIT_BRANCH:?}" \
       >>${OUT1:?} 2>>${OUT2:?} || { error "${EC16:?}"; return 1; }
   elif [ -n "${EMULTRF_GIT_TAG:-}" ]; then
-    "${GIT:?}" checkout "tags/${EMULTRF_GIT_TAG:?}" -b "${EMULTRF_GIT_TAG:?}" \
+    "${GIT:?}" checkout "tags/${EMULTRF_GIT_TAG:?}" -b "${EMULTRF_GIT_TAG:?}TMP" \
       >>${OUT1:?} 2>>${OUT2:?} || { error "${EC16:?}"; return 1; }
   fi
  
