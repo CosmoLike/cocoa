@@ -116,8 +116,13 @@ if [ ! -d "${PACKDIR:?}" ]; then
       2>>${OUT2:?} || { error "UNXZ LOCAL COSMOREC BACKUP"; return 1; }
   }
 
-  tar -zxf "${FILE:?}" \
-    >>${OUT1:?} 2>>${OUT2:?} || { error "${EC25:?}"; return 1; }
+  if [ "${LOCAL_BACKUP_USED}" -eq 1 ]; then
+    tar -xf "${FILE:?}" \
+      >>${OUT1:?} 2>>${OUT2:?} || { error "${EC25:?}"; return 1; }
+  else
+    tar -zxf "${FILE:?}" \
+      >>${OUT1:?} 2>>${OUT2:?} || { error "${EC25:?}"; return 1; }
+  fi
 
   if [ ! -d "${FOLDER:?}" ]; then
   
@@ -129,37 +134,35 @@ if [ ! -d "${PACKDIR:?}" ]; then
   rm -f  "${ECODEF:?}/${FILE:?}"
   rm -rf "${ECODEF:?}/${FILENAME:?}"
 
-  if [ "${LOCAL_BACKUP_USED}" -eq 0 ]; then
-    # --------------------------------------------------------------------------
-    # We patch the files below so they use the right compilers -----------------
-    # --------------------------------------------------------------------------
-    # PREFIX: T = TMP, P = PATCH, AL = Array Length
-    declare -a TFOLDER=("") # If nonblank, path must include /
-    
-    declare -a TFILE=("Makefile.in")
+  # --------------------------------------------------------------------------
+  # We patch the files below so they use the right compilers -----------------
+  # --------------------------------------------------------------------------
+  # PREFIX: T = TMP, P = PATCH, AL = Array Length
+  declare -a TFOLDER=("") # If nonblank, path must include /
+  
+  declare -a TFILE=("Makefile.in")
 
-    case "$(uname -s)" in
-      Linux)
-        declare -a TFILEP=("Makefile.in.patch")
-        ;;
-      Darwin)
-        declare -a TFILEP=("MakefileOSX.in.patch")
-        ;;
-    esac
+  case "$(uname -s)" in
+    Linux)
+      declare -a TFILEP=("Makefile.in.patch")
+      ;;
+    Darwin)
+      declare -a TFILEP=("MakefileOSX.in.patch")
+      ;;
+  esac
 
-    AL=${#TFOLDER[@]}
+  AL=${#TFOLDER[@]}
 
-    for (( i=0; i<${AL}; i++ ));
-    do
-      cdfolder "${PACKDIR:?}/${TFOLDER[$i]}" || { unset_all; return 1; }
+  for (( i=0; i<${AL}; i++ ));
+  do
+    cdfolder "${PACKDIR:?}/${TFOLDER[$i]}" || { unset_all; return 1; }
 
-      cpfolder "${CHANGES:?}/${TFOLDER[$i]}${TFILEP[$i]:?}" . \
-        2>>${OUT2:?} || { unset_all; return 1; }
+    cpfolder "${CHANGES:?}/${TFOLDER[$i]}${TFILEP[$i]:?}" . \
+      2>>${OUT2:?} || { unset_all; return 1; }
 
-      patch -u "${TFILE[$i]:?}" -i "${TFILEP[$i]:?}" \
-        >>${OUT1:?} 2>>${OUT2:?} || { error "${EC17:?} (${TFILE[$i]:?})"; return 1; }
-    done
-  fi
+    patch -u "${TFILE[$i]:?}" -i "${TFILEP[$i]:?}" \
+      >>${OUT1:?} 2>>${OUT2:?} || { error "${EC17:?} (${TFILE[$i]:?})"; return 1; }
+  done
 
 fi
 
