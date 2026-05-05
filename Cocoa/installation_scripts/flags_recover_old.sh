@@ -185,6 +185,15 @@ if [ -n "${OLD_INCLUDE_PATH}" ]; then
   unset OLD_INCLUDE_PATH
 fi
 
+if [ -n "${OLD_CUDA_VISIBLE_DEVICES}" ]; then
+  if [ "${OLD_CUDA_VISIBLE_DEVICES}" != "x" ]; then
+    export CUDA_VISIBLE_DEVICES=$CUDA_VISIBLE_DEVICES 
+  else
+    unset CUDA_VISIBLE_DEVICES
+  fi
+  unset OLD_CUDA_VISIBLE_DEVICES
+fi
+
 # ----------------------------------------------------------------------------
 # ----------------------------------------------------------------------------
 # ----------------------------------------------------------------------------
