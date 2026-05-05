@@ -136,6 +136,12 @@ else
   export OLD_INCLUDE_PATH="x"
 fi
 
+if [ -n "${CUDA_VISIBLE_DEVICES}" ]; then
+  export OLD_CUDA_VISIBLE_DEVICES=$CUDA_VISIBLE_DEVICES
+else
+  export OLD_CUDA_VISIBLE_DEVICES="x"
+fi
+
 # ----------------------------------------------------------------------------
 # ----------------------------------------------------------------------------
 # ----------------------------------------------------------------------------
