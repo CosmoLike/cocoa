@@ -619,8 +619,12 @@ Now, users must follow all the steps below.
   - macOS (arm)
 
         export OMP_NUM_THREADS=4; export OMP_PROC_BIND=disabled; export OMP_PLACES=cores; export OMP_DYNAMIC=FALSE
-    
- **Step :three:** Run `cobaya-run` on the first emulator example, following the commands below (here we only provide lsst-y1 examples).
+  
+ **Step :three:**: Remove GPU (idea is to run with CPU!) CPU also increase compatibility with hardware
+  
+        export CUDA_VISIBLE_DEVICES=""
+
+ **Step :four:** Run `cobaya-run` on the first emulator example, following the commands below (here we only provide lsst-y1 examples).
 
 - **One model evaluation**:
 
