@@ -23,14 +23,9 @@ esac
 # ------------------------------------------------------------------------------
 # VERBOSE AS DEBUG TOOL --------------------------------------------------------
 # ------------------------------------------------------------------------------
-#export COCOA_OUTPUT_VERBOSE=1
+export COCOA_OUTPUT_VERBOSE=1
 #export COCOA_OUTPUT_DEBUG=1 # turn on bash strict mode (set -exo pipefail) on  
                              # instalation_scripts/setup/compile_x.sh scripts 
-
-# ------------------------------------------------------------------------------
-# If set, COSMOLIKE will compile with DEBUG flags ------------------------------
-# ------------------------------------------------------------------------------
-#export COSMOLIKE_DEBUG_MODE=1
 
 # ------------------------------------------------------------------------------
 # The flags below allow users to skip downloading specific datasets ------------
@@ -134,7 +129,7 @@ export DESXPLANCK_GIT_NAME="desy1xplanck"
 export DESXPLANCK_GIT_TAG="v4.10.1"
 
 export COSMOLIKE_URL="https://github.com/CosmoLike/cocoa-cosmolike-core.git"
-export COSMOLIKE_GIT_TAG="v4.10.2"
+export COSMOLIKE_GIT_TAG="v4.11"
 export COSMOLIKE_NAME="cosmolike_core"
 
 # ------------------------------------------------------------------------------
@@ -161,6 +156,37 @@ export OVERWRITE_EXISTING_EMULTRF_CODE=1
 export EMULTRF_DATA_URL="https://github.com/SBU-COSMOLIKE/emulators_data_lcdm.git"
 export EMULTRF_DATA_GIT_TAG="v4.10"
 export OVERWRITE_EXISTING_EMULTRF_DATA=1
+
+# ------------------------------------------------------------------------------
+# Build modes — select ONE via environment or make invocation:
+#
+#   make COSMOLIKE_DEBUG_MODE=1       → debug
+#   make COSMOLIKE_AGGRESSIVE_MODE=1  → aggressive
+#   make                              → default (strict)
+#
+# ---------------------------------------------------------------------------
+# DEBUG MODE (COSMOLIKE_DEBUG_MODE=1)
+#   No optimization (-O0), full warnings, debug symbols, and sanitizers
+#   (UBSan + float-divide-by-zero on macOS). Disables SIMD codepaths.
+#   Use for: debugging, valgrind, catching undefined behavior.
+#
+# AGGRESSIVE MODE (COSMOLIKE_AGGRESSIVE_MODE=1)
+#   Maximum performance. Enables -ffast-math (non-IEEE FP: reassociation,
+#   reciprocal math, no NaN/Inf checks) and link-time optimization (-flto).
+#   Use for: production MCMC chains where the model has been validated
+#   against the strict build and posteriors are unchanged.
+#   WARNING: -ffast-math assumes no NaN/Inf ever occur, allows the compiler
+#   to reorder and simplify FP arithmetic. Always validate a new model
+#   against the strict build before running long chains in this mode.
+#
+# DEFAULT MODE (neither flag set)
+#   Full optimization (-O3, -march=native, LTO, loop unrolling) but with
+#   strict IEEE-754 floating-point semantics: no reassociation, correct
+#   rounding, trapping on signaling NaNs. This is the safe baseline for
+#   validating new models or investigating numerical differences.
+# ------------------------------------------------------------------------------
+#export COSMOLIKE_DEBUG_MODE=1
+#export COSMOLIKE_AGGRESSIVE_MODE=1
 
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
