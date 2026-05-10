@@ -123,16 +123,20 @@ In this section, we assume users have previously activated the Cocoa conda envir
 
 **Step :one:**: Download Cocoa's latest release and go to its main folder (`cocoa/Cocoa`),
 
+  - Legacy Version
+
+        git clone https://github.com/CosmoLike/cocoa.git --branch v4.052 cocoa
+  
   - Stable Version
     
-        git clone https://github.com/CosmoLike/cocoa.git --branch v4.07 cocoa
+        git clone https://github.com/CosmoLike/cocoa.git --branch v4.071 cocoa
 
   - Testing beta release
   
         git clone https://github.com/CosmoLike/cocoa.git --branch v4.11.1 cocoa
 
 > [!NOTE]
-> Version `v4.11.1` and include significant cosmolike speed-ups from refactoring non-limber/C-FASTPT modules. 
+> Version `v4.11.1` and include significant cosmolike speed-ups (compared to `v4.071`) from refactoring non-limber/C-FASTPT/cosmo2d modules. 
 
 > [!NOTE]
 > `v4.11.1` benchmark: do not include CAMB (or the Hybrid Emulator); CPU: `Intel(R) Core(TM) i9-10940X CPU @ 3.30GHz`; OpenMP cores: `8`; Includes TATT and non-limber (in `w_gg`).
