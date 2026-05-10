@@ -110,26 +110,26 @@ export USE_SPT_CLIK_PLANCK=1
 
 export DES_Y3_URL="https://github.com/CosmoLike/cocoa_des_y3.git"
 export DES_Y3_NAME="des_y3"
-export DES_Y3_GIT_TAG="v4.10.1"
-
-export LSST_Y1_URL="https://github.com/CosmoLike/cocoa_lsst_y1.git"
-export LSST_Y1_NAME="lsst_y1"
-export LSST_Y1_GIT_TAG="v4.10.2"
-
-export ROMAN_FOURIER_URL="https://github.com/CosmoLike/cocoa_roman_fourier.git"
-export ROMAN_FOURIER_NAME="roman_fourier"
-export ROMAN_FOURIER_GIT_TAG="4.10.1"
-
-export ROMAN_REAL_URL="https://github.com/CosmoLike/cocoa_roman_real.git"
-export ROMAN_REAL_NAME="roman_real"
-export ROMAN_REAL_GIT_TAG="v4.10.3"
+export DES_Y3_GIT_TAG="v4.10.2"
 
 export DESXPLANCK_URL="https://git@github.com/CosmoLike/cocoa_desy1xplanck.git"
 export DESXPLANCK_GIT_NAME="desy1xplanck"
-export DESXPLANCK_GIT_TAG="v4.10.1"
+export DESXPLANCK_GIT_TAG="v4.10.2"
+
+export LSST_Y1_URL="https://github.com/CosmoLike/cocoa_lsst_y1.git"
+export LSST_Y1_NAME="lsst_y1"
+export LSST_Y1_GIT_TAG="v4.10.3"
+
+export ROMAN_FOURIER_URL="https://github.com/CosmoLike/cocoa_roman_fourier.git"
+export ROMAN_FOURIER_NAME="roman_fourier"
+export ROMAN_FOURIER_GIT_TAG="v4.10.2"
+
+export ROMAN_REAL_URL="https://github.com/CosmoLike/cocoa_roman_real.git"
+export ROMAN_REAL_NAME="roman_real"
+export ROMAN_REAL_GIT_TAG="v4.10.4"
 
 export COSMOLIKE_URL="https://github.com/CosmoLike/cocoa-cosmolike-core.git"
-export COSMOLIKE_GIT_TAG="v4.11"
+export COSMOLIKE_GIT_TAG="v4.11.1"
 export COSMOLIKE_NAME="cosmolike_core"
 
 # ------------------------------------------------------------------------------
@@ -159,12 +159,7 @@ export OVERWRITE_EXISTING_EMULTRF_DATA=1
 
 # ------------------------------------------------------------------------------
 # Build modes — select ONE via environment or make invocation:
-#
-#   make COSMOLIKE_DEBUG_MODE=1       → debug
-#   make COSMOLIKE_AGGRESSIVE_MODE=1  → aggressive
-#   make                              → default (strict)
-#
-# ---------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # DEBUG MODE (COSMOLIKE_DEBUG_MODE=1)
 #   No optimization (-O0), full warnings, debug symbols, and sanitizers
 #   (UBSan + float-divide-by-zero on macOS). Disables SIMD codepaths.
@@ -173,11 +168,6 @@ export OVERWRITE_EXISTING_EMULTRF_DATA=1
 # AGGRESSIVE MODE (COSMOLIKE_AGGRESSIVE_MODE=1)
 #   Maximum performance. Enables -ffast-math (non-IEEE FP: reassociation,
 #   reciprocal math, no NaN/Inf checks) and link-time optimization (-flto).
-#   Use for: production MCMC chains where the model has been validated
-#   against the strict build and posteriors are unchanged.
-#   WARNING: -ffast-math assumes no NaN/Inf ever occur, allows the compiler
-#   to reorder and simplify FP arithmetic. Always validate a new model
-#   against the strict build before running long chains in this mode.
 #
 # DEFAULT MODE (neither flag set)
 #   Full optimization (-O3, -march=native, LTO, loop unrolling) but with
