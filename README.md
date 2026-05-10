@@ -128,27 +128,24 @@ In this section, we assume users have previously activated the Cocoa conda envir
         git clone https://github.com/CosmoLike/cocoa.git --branch v4.07 cocoa
 
   - Testing beta release
-    
-        git clone https://github.com/CosmoLike/cocoa.git --branch v4.10.3 cocoa
-
-  - Testing new Cobaya/CAMB
-
-        git clone https://github.com/CosmoLike/cocoa.git --branch v4.11 cocoa
+  
+        git clone https://github.com/CosmoLike/cocoa.git --branch v4.11.1 cocoa
 
 > [!NOTE]
-> Version `v4.10.1` and above include significant cosmolike speed-ups from refactoring non-limber/C-FASTPT modules. 
+> Version `v4.11.1` and include significant cosmolike speed-ups from refactoring non-limber/C-FASTPT modules. 
 
 > [!NOTE]
-> `v4.10.2` cosmolike benchmark: do not include CAMB; CPU: `Intel(R) Core(TM) i9-10940X CPU @ 3.30GHz`; OpenMP cores: `8`; Includes TATT and non-limber (in `w_gg`).
-> - **LSST-Y1 Real 3x2pt**: ~`0.075`s
-> - **Roman Real 3x2pt**: ~`0.14`s    
-> - **Roman Fourier 3x2pt**: ~`0.06`s
-> - **DES-Y3 x Planck 6x2pt** ~`0.10`s
-> - **DES-Y3 Real 3x2pt (des_y3 repo)** ~`0.063`s
+> `v4.11.1` benchmark: do not include CAMB (or the Hybrid Emulator); CPU: `Intel(R) Core(TM) i9-10940X CPU @ 3.30GHz`; OpenMP cores: `8`; Includes TATT and non-limber (in `w_gg`).
+> CPU: `Intel(R) Core(TM) i9-10940X CPU @ 3.30GHz` (1\8 OpenMP cores) , `M2Pro` (1\8 OpenMP cores)
+> - **LSST-Y1 Real 3x2pt**: ~`0.29\0.06`s,  ~`0.22\0.05`s
+> - **Roman Real 3x2pt**: ~`0.45\0.095`s,  ~`0.39\0.085`s     
+> - **Roman Fourier 3x2pt**: ~`0.08\0.03`s, ~`0.05\0.02`s   
+> - **DES-Y3 x Planck 6x2pt** ~`0.40\0.075`s, ~`0.28\0.065`s
+> - **DES-Y3 Real 3x2pt (des_y3 repo)** ~`0.25\0.05`s, ~`0.18\0.04`s 
 > 
 > How to record benchmarks on cosmolike projects? 
 > - Go to `EXAMPLE_EVALUATE2.yaml` on each repository; Turn on TATT flag (`IA_model: 1`),
-> - Set `N=10` on the evaluate sampler (Timing on `N=1` is highly biased); Remove the `override` YAML block. 
+> - Set `N=10` on the evaluate sampler (Timing on `N=1` is highly biased due to once per chain array allocation and initialization); Remove the `override` YAML block. 
 
 and
 
@@ -214,11 +211,11 @@ Users will see a terminal like this: `$(cocoa)(.local)`. *This is a feature, not
 
   - Linux
     
-        export OMP_NUM_THREADS=8; export OMP_PROC_BIND=close; export OMP_PLACES=cores; export OMP_DYNAMIC=FALSE
+        export OMP_NUM_THREADS=8; export OMP_PROC_BIND=close; export OMP_PLACES=cores; export OMP_DYNAMIC=FALSE; export OPENBLAS_NUM_THREADS=1; export MKL_NUM_THREADS=1
 
   - macOS (arm)
     
-        export OMP_NUM_THREADS=8; export OMP_PROC_BIND=disabled; export OMP_PLACES=cores; export OMP_DYNAMIC=FALSE
+        export OMP_NUM_THREADS=8; export OMP_PROC_BIND=disabled; export OMP_PLACES=cores; export OMP_DYNAMIC=FALSE; export OPENBLAS_NUM_THREADS=1; export MKL_NUM_THREADS=1
     
 ## Examples not involving Cosmolike
 
@@ -330,9 +327,9 @@ Now, users must follow all the steps below.
     source start_cocoa.sh
 
  **Step :two:**: Ensure OpenMP is **OFF**.
-    
-    export OMP_NUM_THREADS=1
-    
+
+    export OMP_NUM_THREADS=1; export OPENBLAS_NUM_THREADS=1; export MKL_NUM_THREADS=1
+
  **Step :three:** Run `cobaya-run` on the first emulator example following the commands below.
 
 - **One model evaluation**:
@@ -614,13 +611,15 @@ Now, users must follow all the steps below.
 
   - Linux
 
-        export OMP_NUM_THREADS=4; export OMP_PROC_BIND=close; export OMP_PLACES=cores; export OMP_DYNAMIC=FALSE
+        export OMP_NUM_THREADS=4; export OMP_PROC_BIND=close; export OMP_PLACES=cores; export OMP_DYNAMIC=FALSE; export OPENBLAS_NUM_THREADS=1; export MKL_NUM_THREADS=1
 
   - macOS (arm)
 
-        export OMP_NUM_THREADS=4; export OMP_PROC_BIND=disabled; export OMP_PLACES=cores; export OMP_DYNAMIC=FALSE
+        export OMP_NUM_THREADS=4; export OMP_PROC_BIND=disabled; export OMP_PLACES=cores; export OMP_DYNAMIC=FALSE; export OPENBLAS_NUM_THREADS=1; export MKL_NUM_THREADS=1
   
  **Step :three:**: Remove GPU (idea is to run with CPU!) CPU also increase compatibility with hardware
+  
+  - Linux
   
         export CUDA_VISIBLE_DEVICES=""
 
