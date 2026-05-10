@@ -23,7 +23,7 @@ esac
 # ------------------------------------------------------------------------------
 # VERBOSE AS DEBUG TOOL --------------------------------------------------------
 # ------------------------------------------------------------------------------
-export COCOA_OUTPUT_VERBOSE=1
+#export COCOA_OUTPUT_VERBOSE=1
 #export COCOA_OUTPUT_DEBUG=1 # turn on bash strict mode (set -exo pipefail) on  
                              # instalation_scripts/setup/compile_x.sh scripts 
 
@@ -154,7 +154,7 @@ export EMULTRF_GIT_TAG="v4.10.2"
 export OVERWRITE_EXISTING_EMULTRF_CODE=1
 
 export EMULTRF_DATA_URL="https://github.com/SBU-COSMOLIKE/emulators_data_lcdm.git"
-export EMULTRF_DATA_GIT_TAG="v4.10"
+export EMULTRF_DATA_GIT_TAG="v4.11"
 export OVERWRITE_EXISTING_EMULTRF_DATA=1
 
 # ------------------------------------------------------------------------------
