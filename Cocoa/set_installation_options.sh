@@ -82,8 +82,8 @@ export IGNORE_DARK_EMULATOR_CODE=1
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
 #export IGNORE_COSMOLIKE_LSST_Y1_CODE=1
-export IGNORE_COSMOLIKE_DES_Y3_CODE=1
-export IGNORE_COSMOLIKE_DESXPLANCK_CODE=1
+#export IGNORE_COSMOLIKE_DES_Y3_CODE=1
+#export IGNORE_COSMOLIKE_DESXPLANCK_CODE=1
 #export IGNORE_COSMOLIKE_ROMAN_FOURIER_CODE=1
 #export IGNORE_COSMOLIKE_ROMAN_REAL_CODE=1
 
@@ -354,7 +354,7 @@ export LSST_Y1_TAG="v4.05"
 export DES_Y3_URL="https://github.com/CosmoLike/cocoa_des_y3.git"
 export DES_Y3_NAME="des_y3"
 #BRANCH: if unset, load the latest commit on the specified branch
-export DES_Y3_BRANCH="main"
+#export DES_Y3_BRANCH="main"
 #COMMIT: if unset, load the specified commit
 #export DES_Y3_COMMIT="1a46582b5539c177bd68f8863c054f79a15f8538"
 #BRANCH: if unset, load the specified TAG
