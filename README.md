@@ -156,7 +156,7 @@ In this section, we assume users have previously activated the Cocoa conda envir
 > How to record benchmarks on cosmolike projects? 
 > - Go to `EXAMPLE_EVALUATE2.yaml` on each repository; Turn on TATT flag (`IA_model: 1`),
 > - Set `N=10` on the evaluate sampler (Timing on `N=1` is highly biased due to once per chain array allocation and initialization); Remove the `override` YAML block.
-> The CLL-Benchmark code can be found [here](https://github.com/vivianmiranda/CCL-benchmark)
+> The CCL-Benchmark scripts can be found [here](https://github.com/vivianmiranda/CCL-benchmark)
 
 and
 
