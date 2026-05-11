@@ -119,7 +119,7 @@ Users can now proceed to the **next section**.
 >      conda activate base
 >      conda install -n base -c conda-forge mamba
 >      mamba env create --name cocoa --file=cocoapy310.yml
->      mamba activate cocoa
+>      conda activate cocoa
 
 > [!TIP]
 > During the Arizona Winter School (January 2026), we noted that some students with macOS struggled to get the conda to work (conflicts). 
