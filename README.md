@@ -60,7 +60,7 @@ Core packages include compilers and numerical libraries that users typically do 
 
   - Linux
     
-         wget https://raw.githubusercontent.com/CosmoLike/cocoa/refs/heads/dev/cocoapy310.yml
+         wget https://raw.githubusercontent.com/CosmoLike/cocoa/refs/heads/main/cocoapy310.yml
 
   - macOS (arm)
     
@@ -112,6 +112,14 @@ Users can now proceed to the **next section**.
 > [!TIP]
 > We advise users to avoid repositories managed by `Anaconda` due to licensing restrictions. See the Appendix [FAQ: How can we install Conda?](#overview_miniforge)
 > for instructions on how to install `Miniforge`, which is a  minimal installer of conda that downloads default packages from the `conda-forge` community-driven channel.
+
+> [!TIP]
+> If conda create hangs or fails, install mamba (faster and more robust dependency solver) and retry with (e.g., Linux version)
+>
+>      conda activate base
+>      conda install -n base -c conda-forge mamba
+>      mamba env create --name cocoa --file=cocoapy310.yml
+>      mamba activate cocoa
 
 > [!TIP]
 > During the Arizona Winter School (January 2026), we noted that some students with macOS struggled to get the conda to work (conflicts). 
