@@ -157,7 +157,7 @@ In this section, we assume users have previously activated the Cocoa conda envir
 > - Go to `EXAMPLE_EVALUATE2.yaml` on each repository; Turn on TATT flag (`IA_model: 1`),
 > - Set `N=10` on the evaluate sampler (Timing on `N=1` is highly biased due to once per chain array allocation and initialization); Remove the `override` YAML block.
 > The DESC-CCL-Benchmark scripts can be found [here](https://github.com/vivianmiranda/CCL-benchmark)
-> DESC-CCL uses flat-sky for fourier -> real transformation. If you know how to implement curved sky transformation for a more 1x1 comparison, let us know. 
+> DESC-CCL uses flat-sky for fourier -> real transformation. If you know a module that implements curved sky transformation in CCL for a more 1x1 comparison, let us know. 
 
 and
 
