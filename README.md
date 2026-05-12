@@ -149,7 +149,7 @@ In this section, we assume users have previously activated the Cocoa conda envir
 >
 > - **LSST-Y1-Real 3x2pt**: (CoCoA) `0.29s\\0.06s`, (DESC-CCL)`7.96s\\1.72s`. **CoCoA speed-up**: `27x\\28x%`
 > - **Roman-Real 3x2pt**: (CoCoA) `0.45s\\0.095s`, (DESC-CCL) `8.17s\\1.96s`. **CoCoA speed-up**: `18x%\\20x%`
-> - **Roman-Fourier 3x2pt**:  (CoCoA) `0.08s\\0.03s`, (DESC-CCL) `0.65s\\0.36s`. **CoCoA speed-up**: `12x%\\21x%`
+> - **Roman-Fourier 3x2pt**:  (CoCoA) `0.08s\\0.03s`, (DESC-CCL) `0.65s\\0.36s`. **CoCoA speed-up**: `7.5x%\\21x%`
 > - **DES-Y3xPlanck 6x2pt**  (CoCoA) `0.40s\\0.075s`
 > - **DES-Y3-Real 3x2pt (des_y3 repo)**  (CoCoA)~`0.25s\0.05s`
 > 
