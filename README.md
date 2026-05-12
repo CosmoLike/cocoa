@@ -147,16 +147,17 @@ In this section, we assume users have previously activated the Cocoa conda envir
 >
 > CPU: `Intel(R) Core(TM) i9-10940X CPU @ 3.30GHz` (1\8 OpenMP cores) - times are approximate
 >
-> - **LSST-Y1-Real 3x2pt**: (CoCoA) `0.29\0.06`s, (DES-CCL)`7.96s\1.72`s: CoCoA speed-up: `27,448%\28,666%`
-> - **Roman-Real 3x2pt**: (CoCoA) `0.45\0.095`s, (DES-CCL) `8.17s\1.96s`s: CoCoA speed-up: `18,1555.%\20,631.%`
-> - **Roman-Fourier 3x2pt**:  (CoCoA) `0.08\0.03`s, (DES-CCL) `0.36s\0.65s`s: CoCoA speed-up: `12,000.%\21.666.%`
+> - **LSST-Y1-Real 3x2pt**: (CoCoA) `0.29\0.06`s, (DESC-CCL)`7.96s\1.72`s: CoCoA speed-up: `27,448%\28,666%`
+> - **Roman-Real 3x2pt**: (CoCoA) `0.45\0.095`s, (DESC-CCL) `8.17s\1.96s`s: CoCoA speed-up: `18,1555.%\20,631.%`
+> - **Roman-Fourier 3x2pt**:  (CoCoA) `0.08\0.03`s, (DESC-CCL) `0.36s\0.65s`s: CoCoA speed-up: `12,000.%\21.666.%`
 > - **DES-Y3xPlanck 6x2pt**  (CoCoA) `0.40\0.075`s
 > - **DES-Y3-Real 3x2pt (des_y3 repo)**  (CoCoA)~`0.25\0.05`s
 > 
 > How to record benchmarks on cosmolike projects? 
 > - Go to `EXAMPLE_EVALUATE2.yaml` on each repository; Turn on TATT flag (`IA_model: 1`),
 > - Set `N=10` on the evaluate sampler (Timing on `N=1` is highly biased due to once per chain array allocation and initialization); Remove the `override` YAML block.
-> The CCL-Benchmark scripts can be found [here](https://github.com/vivianmiranda/CCL-benchmark)
+> The DESC-CCL-Benchmark scripts can be found [here](https://github.com/vivianmiranda/CCL-benchmark)
+> DESC-CCL uses flat-sky for fourier -> real transformation. If you know how to implement curved sky transformation for a more 1x1 comparison, let us know. 
 
 and
 
