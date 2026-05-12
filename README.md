@@ -145,7 +145,7 @@ In this section, we assume users have previously activated the Cocoa conda envir
 > [!NOTE]
 > `v4.11.1` benchmark: do not include CAMB (or the Hybrid Emulator); Includes TATT and non-limber (in `w_gg`).
 >
-> CPU: `Intel(R) Core(TM) i9-10940X CPU @ 3.30GHz` (1\8 OpenMP cores) - times are approximate
+> CPU: `Intel(R) Core(TM) i9-10940X CPU @ 3.30GHz` (`1\8 OpenMP cores`) - times are approximate.
 >
 > - **LSST-Y1-Real 3x2pt**: (CoCoA) `0.29\0.06`s, (DESC-CCL)`7.96s\1.72`s: CoCoA speed-up: `27,448.0%\28,666.0%`
 > - **Roman-Real 3x2pt**: (CoCoA) `0.45\0.095`s, (DESC-CCL) `8.17s\1.96s`s: CoCoA speed-up: `18,1555.0%\20,631.0%`
