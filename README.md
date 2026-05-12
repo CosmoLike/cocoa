@@ -143,15 +143,15 @@ In this section, we assume users have previously activated the Cocoa conda envir
 > Version `v4.11.1` and include significant cosmolike speed-ups from refactoring non-limber/C-FASTPT modules. 
 
 > [!NOTE]
-> `v4.11.1` benchmark: do not include CAMB (or the Hybrid Emulator); Includes TATT and non-limber (in `w_gg`).
+> `v4.11.1` benchmark: do not include CAMB (or the Hybrid Emulator); **Includes TATT in ($\xi_{\pm}, \gamma_t$) and non-limber in $w_{gg}(\theta)$.
 >
-> CPU: `Intel(R) Core(TM) i9-10940X CPU @ 3.30GHz` (`1\8 OpenMP cores`) - times are approximate.
+> CPU: `Intel(R) Core(TM) i9-10940X CPU @ 3.30GHz` (`1\\8 OpenMP cores`) - times are approximate.
 >
-> - **LSST-Y1-Real 3x2pt**: (CoCoA) `0.29\0.06`s, (DESC-CCL)`7.96s\1.72`s: CoCoA speed-up: `27,448.0%\28,666.0%`
-> - **Roman-Real 3x2pt**: (CoCoA) `0.45\0.095`s, (DESC-CCL) `8.17s\1.96s`s: CoCoA speed-up: `18,1555.0%\20,631.0%`
-> - **Roman-Fourier 3x2pt**:  (CoCoA) `0.08\0.03`s, (DESC-CCL) `0.36s\0.65s`s: CoCoA speed-up: `12,000.0%\21,666.0%`
-> - **DES-Y3xPlanck 6x2pt**  (CoCoA) `0.40\0.075`s
-> - **DES-Y3-Real 3x2pt (des_y3 repo)**  (CoCoA)~`0.25\0.05`s
+> - **LSST-Y1-Real 3x2pt**: (CoCoA) `0.29s\\0.06s`, (DESC-CCL)`7.96s\\1.72s`: CoCoA speed-up: `27,448.0%\\28,666.0%`
+> - **Roman-Real 3x2pt**: (CoCoA) `0.45s\\0.095s`, (DESC-CCL) `8.17s\\1.96s`: CoCoA speed-up: `18,1555.0%\\20,631.0%`
+> - **Roman-Fourier 3x2pt**:  (CoCoA) `0.08s\\0.03s`, (DESC-CCL) `0.36s\\0.65s`: CoCoA speed-up: `12,000.0%\\21,666.0%`
+> - **DES-Y3xPlanck 6x2pt**  (CoCoA) `0.40s\\0.075s`
+> - **DES-Y3-Real 3x2pt (des_y3 repo)**  (CoCoA)~`0.25s\0.05s`
 > 
 > How to record benchmarks on cosmolike projects? 
 > - Go to `EXAMPLE_EVALUATE2.yaml` on each repository; Turn on TATT flag (`IA_model: 1`),
