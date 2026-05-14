@@ -660,7 +660,7 @@ Now, users must follow all the steps below.
 
         mpirun -n 4 --oversubscribe --mca pml ^ucx --mca btl vader,tcp,self --rank-by slot \
             --bind-to core:overload-allowed --map-by slot \
-            cobaya-run ./projects/lsst_y1/EXAMPLE_EMUL_EMUL2_MCMC1.yaml -r
+            cobaya-run ./projects/lsst_y1/EXAMPLE_EMUL2_MCMC1.yaml -r
 
   - macOS (arm)
 
