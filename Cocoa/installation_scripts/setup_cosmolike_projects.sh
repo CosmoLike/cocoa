@@ -344,7 +344,7 @@ if [ -z "${IGNORE_COSMOLIKE_ROMAN_REAL_CODE}" ]; then
 fi
 
 # ----------------------------------------------------------------------------
-# ----------------------------- DES x Planck ------------------------------
+# ----------------------------- DES x Planck ---------------------------------
 # ----------------------------------------------------------------------------
 
 if [ -z "${IGNORE_COSMOLIKE_DESXPLANCK_CODE}" ]; then 
@@ -373,6 +373,47 @@ if [ -z "${IGNORE_COSMOLIKE_DESXPLANCK_CODE}" ]; then
     gitact0 "${FOLDER:?}" "${URL:?}" || { unset_all; return 1; }
     
     gitact3 "${FOLDER:?}" "${DESXPLANCK_GIT_TAG:?}" || { unset_all; return 1; }
+
+  else
+
+    gitact0 "${FOLDER:?}" "${URL:?}" || { unset_all; return 1; }
+
+  fi
+
+  pbottom "GETTING ${PRINTNAME:?}" || { unset_all; return 1; }
+
+fi
+
+# ----------------------------------------------------------------------------
+# ----------------------------- ROMAN KL -------------------------------------
+# ----------------------------------------------------------------------------
+
+if [ -z "${IGNORE_COSMOLIKE_ROMAN_KL_CODE}" ]; then 
+  
+  # Name to be printed on this shell script messages
+  PRINTNAME="ROMAN_KL"
+
+  ptop "GETTING ${PRINTNAME:?}" || { unset_all; return 1; }
+
+  FOLDER="${ROMAN_KL_NAME:-"roman_kl"}"
+
+  URL="${ROMAN_KL_URL:-"https://github.com/CosmoLike/cocoa_roman_kl.git"}"
+
+  if [ -n "${ROMAN_KL_GIT_COMMIT:-}" ]; then
+
+    gitact0 "${FOLDER:?}" "${URL:?}" || { unset_all; return 1; }
+    
+    gitact2 "${FOLDER:?}" "${ROMAN_KL_GIT_COMMIT:?}"  || { unset_all; return 1; }
+
+  elif [ -n "${ROMAN_KL_GIT_BRANCH:-}" ]; then 
+
+    gitact1 "${FOLDER:?}" "${URL:?}" "${ROMAN_KL_GIT_BRANCH:?}" || { unset_all; return 1; }
+
+  elif [ -n "${ROMAN_KL_GIT_TAG:-}" ]; then 
+
+    gitact0 "${FOLDER:?}" "${URL:?}" || { unset_all; return 1; }
+    
+    gitact3 "${FOLDER:?}" "${ROMAN_KL_GIT_TAG:?}" || { unset_all; return 1; }
 
   else
 
