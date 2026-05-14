@@ -76,10 +76,11 @@ export IGNORE_DARK_EMULATOR_CODE=1
 # The keys below control which cosmolike projects will be installed and compiled 
 # ------------------------------------------------------------------------------
 #export IGNORE_COSMOLIKE_LSST_Y1_CODE=1
-#export IGNORE_COSMOLIKE_DES_Y3_CODE=1
-#export IGNORE_COSMOLIKE_DESXPLANCK_CODE=1
+export IGNORE_COSMOLIKE_DES_Y3_CODE=1
+export IGNORE_COSMOLIKE_DESXPLANCK_CODE=1
 #export IGNORE_COSMOLIKE_ROMAN_FOURIER_CODE=1
 #export IGNORE_COSMOLIKE_ROMAN_REAL_CODE=1
+export IGNORE_COSMOLIKE_ROMAN_KL_CODE=1
 
 # ------------------------------------------------------------------------------
 # The keys below control which private projects (not public repo)
@@ -131,6 +132,10 @@ export ROMAN_REAL_GIT_TAG="v4.10.5"
 export COSMOLIKE_URL="https://github.com/CosmoLike/cocoa-cosmolike-core.git"
 export COSMOLIKE_GIT_TAG="v4.11.1"
 export COSMOLIKE_NAME="cosmolike_core"
+
+export ROMAN_KL_URL="https://github.com/CosmoLike/cocoa_roman_kl.git"
+export ROMAN_KL_NAME="roman_kl"
+#export ROMAN_KL_GIT_TAG=""
 
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
