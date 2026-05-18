@@ -75,12 +75,12 @@ export IGNORE_DARK_EMULATOR_CODE=1
 # ------------------------------------------------------------------------------
 # The keys below control which cosmolike projects will be installed and compiled 
 # ------------------------------------------------------------------------------
-export IGNORE_COSMOLIKE_LSST_Y1_CODE=1
+#export IGNORE_COSMOLIKE_LSST_Y1_CODE=1
 export IGNORE_COSMOLIKE_DES_Y3_CODE=1
-export IGNORE_COSMOLIKE_DESXPLANCK_CODE=1
+#export IGNORE_COSMOLIKE_DESXPLANCK_CODE=1
 #export IGNORE_COSMOLIKE_ROMAN_FOURIER_CODE=1
 #export IGNORE_COSMOLIKE_ROMAN_REAL_CODE=1
-export IGNORE_COSMOLIKE_ROMAN_KL_CODE=1
+#export IGNORE_COSMOLIKE_ROMAN_KL_CODE=1
 
 # ------------------------------------------------------------------------------
 # The keys below control which private projects (not public repo)
@@ -115,19 +115,19 @@ export DES_Y3_GIT_TAG="v4.10.4"
 
 export DESXPLANCK_URL="https://git@github.com/CosmoLike/cocoa_desy1xplanck.git"
 export DESXPLANCK_GIT_NAME="desy1xplanck"
-export DESXPLANCK_GIT_TAG="v4.10.3"
+export DESXPLANCK_GIT_TAG="v4.10.4"
 
 export LSST_Y1_URL="https://github.com/CosmoLike/cocoa_lsst_y1.git"
 export LSST_Y1_NAME="lsst_y1"
-export LSST_Y1_GIT_TAG="v4.10.4"
+export LSST_Y1_GIT_TAG="v4.10.5"
 
 export ROMAN_FOURIER_URL="https://github.com/CosmoLike/cocoa_roman_fourier.git"
 export ROMAN_FOURIER_NAME="roman_fourier"
-export ROMAN_FOURIER_GIT_TAG="v4.10.4"
+export ROMAN_FOURIER_GIT_TAG="v4.10.5"
 
 export ROMAN_REAL_URL="https://github.com/CosmoLike/cocoa_roman_real.git"
 export ROMAN_REAL_NAME="roman_real"
-export ROMAN_REAL_GIT_TAG="v4.10.6"
+export ROMAN_REAL_GIT_TAG="v4.10.7"
 
 export COSMOLIKE_URL="https://github.com/CosmoLike/cocoa-cosmolike-core.git"
 export COSMOLIKE_GIT_TAG="v4.11.3"
@@ -135,7 +135,7 @@ export COSMOLIKE_NAME="cosmolike_core"
 
 export ROMAN_KL_URL="https://github.com/CosmoLike/cocoa_roman_kl.git"
 export ROMAN_KL_NAME="roman_kl"
-#export ROMAN_KL_GIT_TAG=""
+export ROMAN_KL_GIT_TAG="v4.11.0"
 
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
@@ -150,7 +150,7 @@ export ROMAN_KL_NAME="roman_kl"
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
-# URL of emulator projects below ----------------------------------------------
+# URL of emulator projects below -----------------------------------------------
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
@@ -161,6 +161,21 @@ export OVERWRITE_EXISTING_EMULTRF_CODE=1
 export EMULTRF_DATA_URL="https://github.com/SBU-COSMOLIKE/emulators_data_lcdm.git"
 export EMULTRF_DATA_GIT_TAG="v4.11.1"
 export OVERWRITE_EXISTING_EMULTRF_DATA=1
+
+# ------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
+# URL of FASTPT INTEGRATION ----------------------------------------------------
+# ------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
+export FASTPT_URL="https://github.com/jablazek/FAST-PT.git"
+export FASTPT_GIT_COMMIT="a970d700703814f8513cf3848add4c167e60fc76"
+export FASTPT_NAME="FAST-PT"
+
+export FASTPT_WRAPPER_URL="https://github.com/CosmoLike/fastpt.git"
+export FASTPT_WRAPPER_NAME="PyFAST-PT"
+export FASTPT_WRAPPER_GIT_COMMIT="398e79264098f83b4df711b6a33861b62d21b4b1"
 
 # ------------------------------------------------------------------------------
 # Build modes — select ONE via environment or make invocation:
@@ -302,14 +317,6 @@ export COSMOPOWER_DATA_URL_COMMIT="4317635eed70289ee1ec6b3df828027173071e36"
 
 export DARKEMULATOR_URL="https://github.com/DarkQuestCosmology/dark_emulator_public.git"
 export DARKEMULATOR_GIT_COMMIT="46df5972509624e2eeadc2bf3ac528b02333a7e2"
-
-export FASTPT_URL="https://github.com/jablazek/FAST-PT.git"
-export FASTPT_GIT_COMMIT="a970d700703814f8513cf3848add4c167e60fc76"
-export FASTPT_NAME="FAST-PT"
-
-export FASTPT_WRAPPER_URL="https://github.com/CosmoLike/fastpt.git"
-export FASTPT_WRAPPER_NAME="PyFAST-PT"
-export FASTPT_WRAPPER_GIT_COMMIT="f9dae0764c1b378ab3d942e926c433d4c4555ba0"
 
 export NAUTILUS_SAMPLER_URL="https://github.com/johannesulf/nautilus.git"
 export NAUTILUS_SAMPLER_GIT_COMMIT="fc5e84deffb96755b31b3f9834590e28ab5b6016"
