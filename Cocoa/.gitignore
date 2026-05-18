@@ -66,6 +66,7 @@ projects/ede*
 projects/axions*
 projects/axi*
 
+external_modules/data/._sn_data
 external_modules/data/XXX
 external_modules/data/des_y1
 external_modules/data/des_*
