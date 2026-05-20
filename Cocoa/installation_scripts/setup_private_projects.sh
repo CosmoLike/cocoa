@@ -220,17 +220,19 @@ if [ -n "${INSTALL_PRIVATE_AXIONS_PROJECT:-}" ]; then
 
 fi
 
+echo "what2?"
 # ----------------------------------------------------------------------------
 # -------------------------------- INFPC -------------------------------------
 # ----------------------------------------------------------------------------
-if [ -n "${INSTALL_PRIVATE_AXIONS_PROJECT:-}" ]; then 
-
+if [ -n "${INSTALL_PRIVATE_INFPC_PROJECT:-}" ]; then 
+  echo "what2?"
+  
   # Name to be printed on this shell script messages
   PRINTNAME="INFPC PROJECT"
 
   ptop "GETTING ${PRINTNAME:?}" || { unset_all; return 1; }
 
-  FOLDER="${AXIONS_PROJECT_NAME:-"axions"}"
+  FOLDER="${INFPC_PROJECT_NAME:-"InPCReiPC"}"
 
   URL="${INFPC_PROJECT_URL:-"git@github.com:SBU-COSMOLIKE/InPCReiPCNewCAMB.git"}"
 

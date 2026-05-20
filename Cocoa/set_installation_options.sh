@@ -86,7 +86,7 @@ export IGNORE_COSMOLIKE_ROMAN_KL_CODE=1
 # The keys below control which private projects (not public repo)
 # ------------------------------------------------------------------------------
 #export INSTALL_PRIVATE_AXIONS_PROJECT=1
-#export INSTALL_PRIVATE_INFPC_PROJECT=1
+export INSTALL_PRIVATE_INFPC_PROJECT=1
 
 # ------------------------------------------------------------------------------
 # If not set, pip_core_packages.sh will install several ML packages ------------
