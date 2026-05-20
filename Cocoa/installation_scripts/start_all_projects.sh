@@ -60,27 +60,23 @@ rm -f "${ROOTDIR:?}/cobaya/cobaya/likelihoods/.gitignore"
 touch "${ROOTDIR:?}/projects/.gitignore"
 
 for TMP in $(find "${ROOTDIR:?}/projects" -mindepth 1 -maxdepth 1 -type d ! -name 'example'); do
-  
   TMP2=$(echo "${TMP:?}" | sed -E "s@${ROOTDIR:?}/projects/@@")
 
   FOLDER="${ROOTDIR:?}/projects/${TMP2:?}/scripts"
 
   if [ ! -d "${FOLDER:?}" ]; then
-    
-    warning "${EC31:?} (${FOLDER:?})";
-
+    warning "${EC31:?} (${FOLDER:?})" \
+      >${OUT1:?} 2>${OUT2:?} || { error "${EC34:?}"; return 1; }
   else
     FILE="${FOLDER:?}/start_${TMP2:?}.sh"
 
     if [ -f "${FILE:?}" ]; then
       source "${FILE:?}" || { error "${EC31:?} (${FILE:?})"; return 1; }
     fi
-
   fi
 
   echo "${TMP2:?}" >> "${ROOTDIR:?}/projects/.gitignore" || 
     { error "${EC35:?}"; return 1; }
-
 done
 
 unset_env_vars || return 1

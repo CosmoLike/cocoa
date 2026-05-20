@@ -45,13 +45,10 @@ cdfolder() {
 
 clink() {
   if [ ! -d "${1:?}" ]; then
-
-    warning "${EC31:?} (${1:?})";
-  
+    warning "${EC31:?} (${1:?})" \
+      >${OUT1:?} 2>${OUT2:?} || { error "${EC34:?}"; return 1; }
   else
-
     if [ ! -d "${4:?}/${2:?}" ]; then
-    
       ln -sf "${1:?}" "${4:?}" \
         >${OUT1:?} 2>${OUT2:?} || { error "${EC34:?}"; return 1; }
       
@@ -59,9 +56,7 @@ clink() {
 
       mv -T "${3:?}" "${2:?}" \
         >${OUT1:?} 2>${OUT2:?} || { error "${EC31:?}"; return 1; }
-    
     else
-
       rm -f "${4:?}/${2:?}"
 
       ln -sf "${1:?}" "${4:?}" \
@@ -71,9 +66,7 @@ clink() {
 
       mv -T "${3:?}" "${2:?}" \
         >${OUT1:?} 2>${OUT2:?} || { error "${EC31:?}"; return 1; }
-
     fi
-  
   fi
 }
 
@@ -94,6 +87,8 @@ EDATAF="${ROOTDIR:?}/external_modules/data"
 COB="${ROOTDIR:?}/cobaya" 
 
 COBLIKE="cobaya/likelihoods"
+
+COBTH="cobaya/theories"
 
 for TMP in $(find "${ROOTDIR:?}/projects" -mindepth 1 -maxdepth 1 -type d ! -name 'example'); do
   
@@ -124,6 +119,16 @@ for TMP in $(find "${ROOTDIR:?}/projects" -mindepth 1 -maxdepth 1 -type d ! -nam
   FOLDER="${ROOTDIR:?}/projects/${TMP2:?}/${TMP3:?}"
 
   TARGET=${EDATAF:?}
+
+  clink "${FOLDER:?}" "${TMP2:?}" "${TMP3:?}" "${TARGET:?}" || return 1;
+
+  # ----------------------------------------------------------------------------
+
+  TMP3=theory
+
+  FOLDER="${ROOTDIR:?}/projects/${TMP2:?}/${TMP3:?}"
+
+  TARGET="${COB:?}/${COBTH:?}"
 
   clink "${FOLDER:?}" "${TMP2:?}" "${TMP3:?}" "${TARGET:?}" || return 1;
 

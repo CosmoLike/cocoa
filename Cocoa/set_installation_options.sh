@@ -78,14 +78,15 @@ export IGNORE_DARK_EMULATOR_CODE=1
 export IGNORE_COSMOLIKE_LSST_Y1_CODE=1
 export IGNORE_COSMOLIKE_DES_Y3_CODE=1
 export IGNORE_COSMOLIKE_DESXPLANCK_CODE=1
-#export IGNORE_COSMOLIKE_ROMAN_FOURIER_CODE=1
-#export IGNORE_COSMOLIKE_ROMAN_REAL_CODE=1
+export IGNORE_COSMOLIKE_ROMAN_FOURIER_CODE=1
+export IGNORE_COSMOLIKE_ROMAN_REAL_CODE=1
 export IGNORE_COSMOLIKE_ROMAN_KL_CODE=1
 
 # ------------------------------------------------------------------------------
 # The keys below control which private projects (not public repo)
 # ------------------------------------------------------------------------------
 #export INSTALL_PRIVATE_AXIONS_PROJECT=1
+#export INSTALL_PRIVATE_INFPC_PROJECT=1
 
 # ------------------------------------------------------------------------------
 # If not set, pip_core_packages.sh will install several ML packages ------------
@@ -144,8 +145,11 @@ export ROMAN_KL_GIT_TAG="v4.11.0"
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
-#export AXIONS_PROJECT_URL="git@github.com:SBU-COSMOLIKE/cocoa_axions.git"
-#export AXIONS_PROJECT_NAME="axions"
+export AXIONS_PROJECT_URL="git@github.com:SBU-COSMOLIKE/cocoa_axions.git"
+export AXIONS_PROJECT_NAME="axions"
+
+export INFPC_PROJECT_URL="git@github.com:SBU-COSMOLIKE/InPCReiPCNewCAMB.git"
+export INFPC_PROJECT_NAME="InPCReiPC"
 
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
