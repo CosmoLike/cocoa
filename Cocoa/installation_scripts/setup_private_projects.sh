@@ -217,16 +217,12 @@ if [ -n "${INSTALL_PRIVATE_AXIONS_PROJECT:-}" ]; then
   fi
 
   pbottom "GETTING ${PRINTNAME:?}" || { unset_all; return 1; }
-
 fi
 
-echo "what2?"
 # ----------------------------------------------------------------------------
 # -------------------------------- INFPC -------------------------------------
 # ----------------------------------------------------------------------------
 if [ -n "${INSTALL_PRIVATE_INFPC_PROJECT:-}" ]; then 
-  echo "what2?"
-  
   # Name to be printed on this shell script messages
   PRINTNAME="INFPC PROJECT"
 
