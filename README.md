@@ -624,15 +624,15 @@ Now, users must follow all the steps below.
 
     source start_cocoa.sh
 
- **Step :two:**: Select the number of OpenMP cores. Below, we set it to 4, the ideal setting for hybrid examples.
+ **Step :two:**: Select the number of OpenMP cores.
 
   - Linux
 
-        export OMP_NUM_THREADS=4; export OMP_PROC_BIND=close; export OMP_PLACES=cores; export OMP_DYNAMIC=FALSE; export OPENBLAS_NUM_THREADS=1; export MKL_NUM_THREADS=1
+        export OMP_NUM_THREADS=8; export OMP_PROC_BIND=close; export OMP_PLACES=cores; export OMP_DYNAMIC=FALSE; export OPENBLAS_NUM_THREADS=1; export MKL_NUM_THREADS=1
 
   - macOS (arm)
 
-        export OMP_NUM_THREADS=4; export OMP_PROC_BIND=disabled; export OMP_PLACES=cores; export OMP_DYNAMIC=FALSE; export OPENBLAS_NUM_THREADS=1; export MKL_NUM_THREADS=1
+        export OMP_NUM_THREADS=8; export OMP_PROC_BIND=disabled; export OMP_PLACES=cores; export OMP_DYNAMIC=FALSE; export OPENBLAS_NUM_THREADS=1; export MKL_NUM_THREADS=1
   
  **Step :three:**: Remove GPU (idea is to run with CPU!) CPU also increase compatibility with hardware
   
