@@ -46,6 +46,12 @@ This Readme file presents basic and advanced instructions for installing all [Co
 
 We provide the Docker image [whovian-cocoa](https://hub.docker.com/r/vivianmiranda/whovian-cocoa) to facilitate the installation of Cocoa on Windows. 
 
+**Why CoCoA?** CoCoA is built on the principle that computational efficiency, usability, and ease of modification can coexist in a single framework. Its successful use across multiple beyond-LCDM investigations by small groups demonstrates that efficient code can cut the immense consumption of computer resources reported for recent large-impact analyses in the literature. This benefits theoretical groups, particularly those without routine access to large-scale supercomputers like NERSC. CoCoA also integrates closely with machine learning emulators, enabling preliminary research on laptops and workstations. The table below illustrates the efficiency of CoCoA compared to alternative pipelines
+
+<p align="center">
+  <img width="750" alt="Screenshot 2026-06-19 at 3 18 57 PM" src="https://github.com/user-attachments/assets/3683e6e3-21fa-4814-8c6c-5a4d7f0b7ca7" />
+</p>
+
 # Installation of core packages <a name="required_packages_conda"></a>
 
 Core packages include compilers and numerical libraries that users typically do not modify.
