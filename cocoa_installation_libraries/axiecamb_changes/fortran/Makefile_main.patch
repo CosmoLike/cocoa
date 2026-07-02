@@ -1,0 +1,53 @@
+--- Makefile_main	2024-07-11 19:38:25.857514000 -0400
++++ Makefile_main2	2024-07-12 17:43:10.549756000 -0400
+@@ -54,25 +54,19 @@
+ 
+ LIBLINK = -L"$(FORUTILS_DIR)" -lforutils
+ 	
+-
+-## CosmoRec
++#VM BEGINS
+ ifneq (,$(findstring cosmorec,$(RECOMBINATION_FILES)))
+-camb: libCosmoRec.a
+-python: libCosmoRec.a
+-FFLAGS += -DCOSMOREC
+-COSMOREC_PATH ?=../../CosmoRec/
+-GSL_LINK ?=-lgsl -lgslcblas
+-LIBLINK += -L$(COSMOREC_PATH) -lCosmoRec $(GSL_LINK) -lstdc++
++  FFLAGS += -DCOSMOREC
++  
++  LIBLINK += -L"$(ROOTDIR)/.local/lib" -lCosmoRec -lgsl -lgslcblas -lstdc++
+ endif
+ 
+-
+ ifneq (,$(findstring hyrec,$(RECOMBINATION_FILES)))
+-FFLAGS += -DHYREC
+-HYREC_PATH ?= ../../HYREC-2/
+-LIBLINK += -L$(HYREC_PATH) -lhyrec
+-camb: libhyrec.a
+-python: libhyrec.a
++  FFLAGS += -DHYREC
++  
++  LIBLINK += "$(ROOTDIR)/.local/lib/libhyrec.a" -lhyrec -lm
+ endif
++#VM ENDS
+ 
+ default: camb
+ 
+@@ -154,16 +148,6 @@
+ 	rm -f camb	
+ 	rm -f ../camb/*.so
+ 
+-## CosmoRec make parts
+-cleanCR:
+-	cd $(COSMOREC_PATH); make tidy;
+-
+-libCosmoRec.a:
+-	cd $(COSMOREC_PATH); make lib;
+-
+-libhyrec.a:
+-	cd $(HYREC_PATH); make libhyrec.a;
+-
+ silent:
+ 	@:
+ 
