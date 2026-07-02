@@ -57,7 +57,7 @@ gitact0() {
   # ---------------------------------------------------------------------------
   # In case this script runs twice --------------------------------------------
   # ---------------------------------------------------------------------------
-  if [ -n "${OVERWRITE_EXISTING_COSMOLIKE_CODE}" ]; then
+  if [ -n "${OVERWRITE_EXISTING_PRIVATE_PROJECTS_CODE}" ]; then
     rm -rf "${PACKDIR:?}"
   fi
 
@@ -84,10 +84,8 @@ gitact1() {
   # ---------------------------------------------------------------------------
   # In case this script runs twice --------------------------------------------
   # ---------------------------------------------------------------------------
-  if [ -n "${OVERWRITE_EXISTING_COSMOLIKE_CODE:-}" ]; then
-  
+  if [ -n "${OVERWRITE_EXISTING_PRIVATE_PROJECTS_CODE:-}" ]; then
     rm -rf "${PACKDIR:?}"
-  
   fi
 
   if [ ! -d "${PACKDIR:?}" ]; then
@@ -161,47 +159,65 @@ unset_env_vars || return 1
 # ----------------------------------------------------------------------------
 # -------------------------------- AXIONS -----------------------------------
 # ----------------------------------------------------------------------------
-if [ -z "${INSTALL_PRIVATE_AXIONS_PROJECT:-}" ]; then 
-  return 99
+if [ -n "${INSTALL_AXIONS_2025_PROJECT:-}" ]; then 
+  # Name to be printed on this shell script messages
+  PRINTNAME="AXIONS PROJECT"
+
+  ptop "GETTING ${PRINTNAME:?}" || { unset_all; return 1; }
+
+  FOLDER="${AXIONS_PROJECT_NAME:-"axions"}"
+
+  URL="${AXIONS_2025_PROJECT_URL:?}"
+
+  if [ -n "${AXIONS_2025_PROJECT_GIT_COMMIT:-}" ]; then
+    gitact0 "${FOLDER:?}" "${URL:?}" || { unset_all; return 1; }
+    gitact2 "${FOLDER:?}" "${AXIONS_2025_PROJECT_GIT_COMMIT:?}"  || { unset_all; return 1; }
+  elif [ -n "${AXIONS_2025_PROJECT_GIT_BRANCH:-}" ]; then 
+    gitact1 "${FOLDER:?}" "${URL:?}" "${AXIONS_2025_PROJECT_GIT_BRANCH:?}" || { unset_all; return 1; }
+  elif [ -n "${AXIONS_2025_PROJECT_GIT_TAG:-}" ]; then 
+    gitact0 "${FOLDER:?}" "${URL:?}" || { unset_all; return 1; }
+    gitact3 "${FOLDER:?}" "${AXIONS_2025_PROJECT_GIT_TAG:?}" || { unset_all; return 1; }
+  else
+    gitact0 "${FOLDER:?}" "${URL:?}" || { unset_all; return 1; }
+  fi
+
+  pbottom "GETTING ${PRINTNAME:?}" || { unset_all; return 1; }
 fi
-  
-# Name to be printed on this shell script messages
-PRINTNAME="AXIONS PROJECT"
-
-ptop "GETTING ${PRINTNAME:?}" || { unset_all; return 1; }
-
-FOLDER="${AXIONS_PROJECT_NAME:-"axions"}"
-
-URL="${AXIONS_PROJECT_URL:?}"
-
-if [ -n "${AXIONS_PROJECT_GIT_COMMIT:-}" ]; then
-
-  gitact0 "${FOLDER:?}" "${URL:?}" || { unset_all; return 1; }
-
-  gitact2 "${FOLDER:?}" "${AXIONS_PROJECT_GIT_COMMIT:?}"  || { unset_all; return 1; }
-
-elif [ -n "${AXIONS_PROJECT_GIT_BRANCH:-}" ]; then 
-
-  gitact1 "${FOLDER:?}" "${URL:?}" "${AXIONS_PROJECT_GIT_BRANCH:?}" || { unset_all; return 1; }
-
-elif [ -n "${AXIONS_PROJECT_GIT_TAG:-}" ]; then 
-
-  gitact0 "${FOLDER:?}" "${URL:?}" || { unset_all; return 1; }
-
-  gitact3 "${FOLDER:?}" "${AXIONS_PROJECT_GIT_TAG:?}" || { unset_all; return 1; }
-
-else
-
-  gitact0 "${FOLDER:?}" "${URL:?}" || { unset_all; return 1; }
-
-fi
-
-pbottom "GETTING ${PRINTNAME:?}" || { unset_all; return 1; }
 
 #-------------------------------------------------------------------------------
+#-------------------------------------------------------------------------------
+#-------------------------------------------------------------------------------
+
+if [ -n "${INSTALL_AXIE_CAMB_2026_PROJECT:-}" ]; then 
+  # Name to be printed on this shell script messages
+  PRINTNAME="AXIE CAMB 2026 PROJECT"
+
+  ptop "GETTING ${PRINTNAME:?}" || { unset_all; return 1; }
+
+  FOLDER="${AXIE_CAMB_2026_PROJECT_NAME:-"axicambv2"}"
+
+  URL="${AXIE_CAMB_2026_PROJECT_URL:?}"
+
+  if [ -n "${AXIE_CAMB_2026_PROJECT_GIT_COMMIT:-}" ]; then
+    gitact0 "${FOLDER:?}" "${URL:?}" || { unset_all; return 1; }
+
+    gitact2 "${FOLDER:?}" "${AXIE_CAMB_2026_PROJECT_GIT_COMMIT:?}"  || { unset_all; return 1; }
+  elif [ -n "${AXIE_CAMB_2026_PROJECT_GIT_BRANCH:-}" ]; then 
+    gitact1 "${FOLDER:?}" "${URL:?}" "${AXIE_CAMB_2026_PROJECT_GIT_BRANCH:?}" || { unset_all; return 1; }
+  elif [ -n "${AXIE_CAMB_2026_PROJECT_GIT_TAG:-}" ]; then 
+    gitact0 "${FOLDER:?}" "${URL:?}" || { unset_all; return 1; }
+    gitact3 "${FOLDER:?}" "${AXIE_CAMB_2026_PROJECT_GIT_TAG:?}" || { unset_all; return 1; }
+  else
+    gitact0 "${FOLDER:?}" "${URL:?}" || { unset_all; return 1; }
+  fi
+
+  pbottom "GETTING ${PRINTNAME:?}" || { unset_all; return 1; }
+fi
 
 unset_all || return 1;
 
+#-------------------------------------------------------------------------------
+#-------------------------------------------------------------------------------
 #-------------------------------------------------------------------------------
 
 return 55; # why this odd number? Setup_cocoa will cache this installation only

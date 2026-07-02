@@ -66,9 +66,7 @@ for TMP in $(find "${ROOTDIR:?}/projects" -mindepth 1 -maxdepth 1 -type d ! -nam
   FOLDER="${ROOTDIR:?}/projects/${TMP2:?}/scripts"
 
   if [ ! -d "${FOLDER:?}" ]; then
-    
     warning "${EC31:?} (${FOLDER:?})";
-
   else
     FILE="${FOLDER:?}/start_${TMP2:?}.sh"
 

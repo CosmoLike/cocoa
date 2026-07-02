@@ -9,13 +9,13 @@ if [ -z "${ROOTDIR}" ]; then
 fi
 
 fail_script_msg2 () {
-  local MSG="\033[0;31m        (${1:-"empty arg"}) we cannot run \e[3m"
+  local MSG="\033[0;31m        (${1:-"empty arg"}) we cannot run \033[3m"
   local MSG2="\033[0m"
   echo -e "${MSG} ${2:-"empty arg"} ${MSG2}"
 }
 
 warning_script_msg2 () {
-  local MSG="\033[0;31m        (${1:-"empty arg"}) warning: \e[3m"
+  local MSG="\033[0;31m        (${1:-"empty arg"}) warning: \033[3m"
   local MSG2="\033[0m"
   echo -e "${MSG} ${2:-"empty arg"} ${MSG2}"
 }
@@ -55,6 +55,8 @@ warning () {
 }
 
 
+
+
 # ---------------------------------------------------------------------------
 # ---------------------------------------------------------------------------
 # ---------------------------------------------------------------------------
@@ -63,16 +65,14 @@ unset_env_vars || return 1
 
 # ---------------------------------------------------------------------------
 
-for TMP in $(find "${ROOTDIR:?}/projects/" -mindepth 1 -maxdepth 1 -type d ! -name 'example'); do
+for TMP in $(find "${ROOTDIR:?}/projects" -mindepth 1 -maxdepth 1 -type d ! -name 'example'); do
   
   TMP2=$(echo "${TMP:?}" | sed -E "s@${ROOTDIR:?}/projects/@@")
   
   FOLDER="${ROOTDIR:?}/projects/${TMP2:?}/scripts"
 
   if [ ! -d "${FOLDER:?}" ]; then
-    
     warning "${EC31:?} (${FOLDER:?})";
-  
   else
 
     FILE="${FOLDER:?}/stop_${TMP2:?}.sh"
