@@ -185,7 +185,7 @@ if [[ -z "${IGNORE_FASTPT_CODE}" ]]; then
   TMP="${FASTPT_WRAPPER_NAME:-"PyFAST-PT"}"
 
   TMP2="fastpt"
-  if [[ ! -L "${COBTH:?}/${TMP2}" ]]; then
+  if [[ -L "${COBTH:?}/${TMP2}" ]]; then
     rm -f "${COBTH:?}/${TMP2:?}"
   fi
   unset -v COBTH TMP TMP2
@@ -194,10 +194,10 @@ fi
 # ----------------------------------------------------------------------------
 # ------------------------------- AXIE CAMB ----------------------------------
 # ----------------------------------------------------------------------------
-if [[ -z "${IGNORE_FASTPT_CODE}" ]]; then
+if [[ -z "${INSTALL_AXIE_CAMB_V2}" ]]; then
   COBTH="${ROOTDIR:?}/cobaya/cobaya/theories"
   TMP="${AXION_HMCODE_NAME:-"axionHMcode"}"
-  if [[ ! -L "${COBTH:?}/${TMP}" ]]; then
+  if [[ -L "${COBTH:?}/${TMP}" ]]; then
     rm -f "${COBTH:?}/${TMP:?}"
   fi
   unset -v COBTH TMP
