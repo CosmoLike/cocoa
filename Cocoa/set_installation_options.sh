@@ -344,11 +344,11 @@ export SIMDE_GIT_COMMIT="71fd833d9666141edcd1d3c109a80e228303d8d7"
 export SIMDE_NAME="simde"
 
 export AXIE_CAMB_URL="https://github.com/SBU-COSMOLIKE/NewTestingAxieCAMB.git"
-export AXIE_CAMB_GIT_COMMIT="5007a6d228f36bc68cf488b41798764f169de632"
+export AXIE_CAMB_GIT_COMMIT="6fd63c6753120bed2f306de8494605bde3472262"
 export AXIE_CAMB_NAME="axiecamb"
 
 export AXION_HMCODE_URL="https://github.com/SBU-COSMOLIKE/axionHMcode.git"
-export AXION_HMCODE_GIT_COMMIT="a85ba2679cba5abe68b4cfd1e49b7a52bdcda424"
+export AXION_HMCODE_GIT_COMMIT="c9c482300f8d0853fc3d46f64ae086917738e078"
 export AXION_HMCODE_NAME="axionHMcode"
 
 # ------------------------------------------------------------------------------
