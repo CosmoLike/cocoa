@@ -46,6 +46,12 @@ This Readme file presents basic and advanced instructions for installing all [Co
 
 We provide the Docker image [whovian-cocoa](https://hub.docker.com/r/vivianmiranda/whovian-cocoa) to facilitate the installation of Cocoa on Windows. 
 
+**Why CoCoA?** CoCoA is built on the principle that computational efficiency, usability, and ease of modification can coexist in a single framework. Its successful use across multiple beyond-LCDM investigations by small groups demonstrates that efficient code can cut the immense consumption of computer resources reported for recent large-impact analyses in the literature. This benefits theoretical groups, particularly those without routine access to large-scale supercomputers like NERSC. CoCoA also integrates closely with machine learning emulators, enabling preliminary research on laptops and workstations. The table below illustrates the efficiency of CoCoA compared to alternative pipelines
+
+<p align="center">
+  <img width="750" alt="Screenshot 2026-06-19 at 3 18 57 PM" src="https://github.com/user-attachments/assets/3683e6e3-21fa-4814-8c6c-5a4d7f0b7ca7" />
+</p>
+
 # Installation of core packages <a name="required_packages_conda"></a>
 
 Core packages include compilers and numerical libraries that users typically do not modify.
@@ -148,11 +154,12 @@ In this section, we assume users have previously activated the Cocoa conda envir
 
 > [!NOTE]
 > `v4.11.1` benchmark: do not include CAMB (or the Hybrid Emulator); **Includes TATT in** ($\xi_{\pm}, \gamma_t$) **and non-limber in** $w_{gg}(\theta)$.
+> CLOE-LIB caveat: We were not able to make TATT work on CloeLib. We were also not able to speed-up cloelib with `OMP_NUM_THREADS` flag
 >
 > CPU: `Intel(R) Core(TM) i9-10940X CPU @ 3.30GHz` (`1/8 OpenMP cores`). *Times are approximate*.
 >
-> - **LSST-Y1-Real 3x2pt**: (CoCoA) `0.29/0.06s`, (DESC-CCL)`7.96/1.72s`. **CoCoA speed-up**: `27/28x`
-> - **Roman-Real 3x2pt**: (CoCoA) `0.45/0.095s`, (DESC-CCL) `8.17/1.96s`. **CoCoA speed-up**: `18/20x`
+> - **LSST-Y1-Real 3x2pt**: (CoCoA) `0.29/0.06s`, (DESC-CCL)`7.96/1.72s`, (CLOE-LIB) 0.23/0.23s. **CoCoA speed-up (CCL)**: `27/28x`
+> - **Roman-Real 3x2pt**: (CoCoA) `0.45/0.095s`, (DESC-CCL) `8.17/1.96s`, (CLOE-LIB) 0.27/0.27s. **CoCoA speed-up (CCL)**: `18/20x`
 > - **Roman-Fourier 3x2pt**:  (CoCoA) `0.08/0.03s`, (DESC-CCL) `0.65/0.36s`. **CoCoA speed-up**: `7.5/21x`
 > - **DES-Y3xPlanck 6x2pt**  (CoCoA) `0.40/0.075s`
 > - **DES-Y3-Real 3x2pt (des_y3 repo)**  (CoCoA)~`0.25/0.05s`
@@ -608,9 +615,6 @@ likelihoods, and the theory code, all following Cobaya Conventions.
 
 # Running Hybrid Cosmolike-ML emulators <a name="cobaya_base_code_examples_emul2"></a>
 
-> [!Warning]
-> The code and examples associated with this section are still in alpha stage
-
 Our main line of research involves emulators that simulate the entire Cosmolike data vectors, and each project (LSST, Roman, DES) contains its own README with emulator examples. The speed of such emulators is incredible, especially when GPUs are available, and our emulators do take advantage of the CPU-GPU integration on Apple MX chips. For example, the average timing of lsst-y1 cosmic shear data vector emulation is around 0.005s ($\sim$ 200828 evaluations in $\sim$ 850.5 seconds) on a macOS M2 Pro.
 
 While the data vector emulators are incredibly fast, there is an intermediate approach that emulates only the Boltzmann outputs (comoving distance, linear and nonlinear matter power spectrum). This hybrid-ML case can offer greater flexibility, especially in the initial phases of a research project, as changes to the modeling of nuisance parameters or to the assumed galaxy distributions do not require retraining of the network. 
@@ -623,15 +627,15 @@ Now, users must follow all the steps below.
 
     source start_cocoa.sh
 
- **Step :two:**: Select the number of OpenMP cores. Below, we set it to 4, the ideal setting for hybrid examples.
+ **Step :two:**: Select the number of OpenMP cores.
 
   - Linux
 
-        export OMP_NUM_THREADS=4; export OMP_PROC_BIND=close; export OMP_PLACES=cores; export OMP_DYNAMIC=FALSE; export OPENBLAS_NUM_THREADS=1; export MKL_NUM_THREADS=1
+        export OMP_NUM_THREADS=8; export OMP_PROC_BIND=close; export OMP_PLACES=cores; export OMP_DYNAMIC=FALSE; export OPENBLAS_NUM_THREADS=1; export MKL_NUM_THREADS=1
 
   - macOS (arm)
 
-        export OMP_NUM_THREADS=4; export OMP_PROC_BIND=disabled; export OMP_PLACES=cores; export OMP_DYNAMIC=FALSE; export OPENBLAS_NUM_THREADS=1; export MKL_NUM_THREADS=1
+        export OMP_NUM_THREADS=8; export OMP_PROC_BIND=disabled; export OMP_PLACES=cores; export OMP_DYNAMIC=FALSE; export OPENBLAS_NUM_THREADS=1; export MKL_NUM_THREADS=1
   
  **Step :three:**: Remove GPU (idea is to run with CPU!) CPU also increase compatibility with hardware
   
@@ -1062,6 +1066,11 @@ We provide the Docker image [whovian-cocoa](https://hub.docker.com/r/vivianmiran
  **Step :two:**: Download the Docker image *whovian-cocoa*, name the associated container `cocoa2025` (flag `--name cocoa2025` in the command below), and run the container for the first time, type:
 
     docker run --platform linux/amd64 --hostname cocoa --name cocoa2025 -it -p 8888:8888 -v $(pwd):/home/whovian/host/ -v ~/.ssh:/home/whovian/.ssh:ro vivianmiranda/whovian-cocoa:thin
+
+> [!Warning] 
+> There is a weird bug on macOS that mathplotlib does not work unless you add the flags `-e EXPERIMENTAL_DOCKER_DESKTOP_FORCE_QEMU=1 -e PYTHONUNBUFFERED=1` 
+>  right after `docker run --platform linux/amd64`
+>  
 
 This is a large image, approximately 13GB, as it already contains the conda cocoa environment. Users can now proceed to the [Installation and Compilation of external modules](#cobaya_base_code) section to continue the installation. 
 

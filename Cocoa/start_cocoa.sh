@@ -238,7 +238,6 @@ if [[ -z "${IGNORE_EMULTRF_CODE}" ]]; then
   done
 
   unset -v ECODEF COBTH TMP TMP2
-
 fi 
 
 # ----------------------------------------------------------------------------
@@ -254,7 +253,24 @@ if [[ -z "${IGNORE_FASTPT_CODE}" ]]; then
     ln -s "${ECODEF:?}/${TMP}" "${COBTH:?}/${TMP2}" \
       >>${OUT1:?} 2>>${OUT2:?} || { error_start_cocoa "${EC34:?}"; return 1; }
   fi
+
   unset -v ECODEF COBTH TMP TMP2
+fi
+
+# ----------------------------------------------------------------------------
+# ------------------------------- AXIE CAMB ----------------------------------
+# ----------------------------------------------------------------------------
+if [[ -n "${INSTALL_AXIE_CAMB_V2}" ]]; then
+  ECODEF="${ROOTDIR:?}/external_modules/code"
+  COBTH="${ROOTDIR:?}/cobaya/cobaya/theories"
+  TMP="${AXION_HMCODE_NAME:-"axionHMcode"}"
+
+  if [[ ! -L "${COBTH:?}/${TMP}" ]]; then
+    ln -s "${ECODEF:?}/${TMP}" "${COBTH:?}/${TMP}" \
+      >>${OUT1:?} 2>>${OUT2:?} || { error_start_cocoa "${EC34:?}"; return 1; }
+  fi
+
+  unset -v ECODEF COBTH TMP
 fi
 
 # ----------------------------------------------------------------------------

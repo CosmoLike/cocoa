@@ -83,10 +83,12 @@ export IGNORE_COSMOLIKE_ROMAN_REAL_CODE=1
 export IGNORE_COSMOLIKE_ROMAN_KL_CODE=1
 
 # ------------------------------------------------------------------------------
-# The keys below control which private projects (not public repo)
+# The keys below control which private projects (may not be public repo)
 # ------------------------------------------------------------------------------
-#export INSTALL_PRIVATE_AXIONS_PROJECT=1
-export INSTALL_PRIVATE_INFPC_PROJECT=1
+#export INSTALL_PRIVATE_INFPC_PROJECT=1
+#export INSTALL_AXIONS_2025_PROJECT=1
+#export INSTALL_AXIE_CAMB_V2=1
+#export INSTALL_AXIE_CAMB_2026_PROJECT=1
 
 # ------------------------------------------------------------------------------
 # If not set, pip_core_packages.sh will install several ML packages ------------
@@ -145,11 +147,14 @@ export ROMAN_KL_GIT_TAG="v4.11.0"
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
-export AXIONS_PROJECT_URL="git@github.com:SBU-COSMOLIKE/cocoa_axions.git"
-export AXIONS_PROJECT_NAME="axions"
-
 export INFPC_PROJECT_URL="git@github.com:SBU-COSMOLIKE/InPCReiPCNewCAMB.git"
 export INFPC_PROJECT_NAME="InPCReiPC"
+
+export AXIONS_2025_PROJECT_URL="https://github.com/SBU-COSMOLIKE/cocoa_axions.git"
+export AXIONS_PROJECT_NAME="axions"
+
+export AXIE_CAMB_2026_PROJECT_URL="https://github.com/SBU-COSMOLIKE/cocoa_axiecamb_2026.git"
+export AXIE_CAMB_2026_PROJECT_NAME="axicambv2"
 
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
@@ -341,6 +346,15 @@ export GETDIST_NAME="getdist"
 export SIMDE_URL="https://github.com/simd-everywhere/simde.git"
 export SIMDE_GIT_COMMIT="71fd833d9666141edcd1d3c109a80e228303d8d7"
 export SIMDE_NAME="simde"
+
+export AXIE_CAMB_URL="https://github.com/SBU-COSMOLIKE/NewTestingAxieCAMB.git"
+export AXIE_CAMB_GIT_COMMIT="6fd63c6753120bed2f306de8494605bde3472262"
+export AXIE_CAMB_NAME="axiecamb"
+
+export AXION_HMCODE_URL="https://github.com/SBU-COSMOLIKE/axionHMcode.git"
+export AXION_HMCODE_GIT_COMMIT="c9c482300f8d0853fc3d46f64ae086917738e078"
+export AXION_HMCODE_NAME="axionHMcode"
+
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------

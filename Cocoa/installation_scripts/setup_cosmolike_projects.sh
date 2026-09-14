@@ -354,7 +354,7 @@ if [ -z "${IGNORE_COSMOLIKE_DESXPLANCK_CODE}" ]; then
 
   ptop "GETTING ${PRINTNAME:?}" || { unset_all; return 1; }
 
-  FOLDER="${DESXPLANCK_NAME:-"desy1xplanck"}"
+  FOLDER="${DESXPLANCK_GIT_NAME:-"desy1xplanck"}"
 
   URL="${DESXPLANCK_URL:-"https://github.com/CosmoLike/cocoa_desy1xplanck.git"}"
 

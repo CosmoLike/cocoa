@@ -144,12 +144,10 @@ fi
 # ----------------------------------------------------------------------------
 if [[ -z "${IGNORE_COSMOPOWER_CODE}" ]]; then
   COBTH="${ROOTDIR:?}/cobaya/cobaya/theories"
-
   TMP="cosmopower"
   if [[ -L "${COBTH:?}/${TMP:?}" ]]; then
     rm -f "${COBTH:?}/${TMP:?}"
   fi
-
   unset -v COBTH TMP
 fi
 
@@ -158,7 +156,6 @@ fi
 # ----------------------------------------------------------------------------
 if [[ -z "${IGNORE_EMULTRF_CODE}" ]]; then
   COBTH="${ROOTDIR:?}/cobaya/cobaya/theories"
-
   for TMP in \
     "emulcmb" \
     "emulbaosn" \
@@ -173,7 +170,30 @@ if [[ -z "${IGNORE_EMULTRF_CODE}" ]]; then
       rm -f "${COBTH:?}/${TMP:?}"
     fi
   done
+  unset -v COBTH TMP
+fi
 
+# ----------------------------------------------------------------------------
+# ---------------------------- PYFAST-PT THEORY ------------------------------
+# ----------------------------------------------------------------------------
+if [[ -z "${IGNORE_FASTPT_CODE}" ]]; then
+  COBTH="${ROOTDIR:?}/cobaya/cobaya/theories"
+  TMP="fastpt"
+  if [[ -L "${COBTH:?}/${TMP}" ]]; then
+    rm -f "${COBTH:?}/${TMP:?}"
+  fi
+  unset -v COBTH TMP
+fi
+
+# ----------------------------------------------------------------------------
+# ------------------------------- AXIE CAMB ----------------------------------
+# ----------------------------------------------------------------------------
+if [[ -z "${INSTALL_AXIE_CAMB_V2}" ]]; then
+  COBTH="${ROOTDIR:?}/cobaya/cobaya/theories"
+  TMP="${AXION_HMCODE_NAME:-"axionHMcode"}"
+  if [[ -L "${COBTH:?}/${TMP}" ]]; then
+    rm -f "${COBTH:?}/${TMP:?}"
+  fi
   unset -v COBTH TMP
 fi
 
