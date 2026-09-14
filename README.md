@@ -42,7 +42,7 @@ Besides integrating [Cobaya](https://github.com/CobayaSampler) and [CosmoLike](h
 
 Our scripts never install packages or Python modules in a global folder such as `$HOME/.local`. Here, `$HOME` denotes a shell environment variable that points to the user's home folder. Doing so would force cocoa packages to be global to the user, possibly breaking environments. Our scripts enable users to work on multiple Cocoa instances simultaneously, similar to what was possible with [CosmoMC](https://github.com/cmbant/CosmoMC). 
 
-This Readme file presents basic and advanced instructions for installing all [Cobaya](https://github.com/CobayaSampler) and [CosmoLike](https://github.com/CosmoLike) components **on linux** or **macOS-arm**.
+This Readme file presents basic and advanced instructions for installing all [Cobaya](https://github.com/CobayaSampler) and [CosmoLike](https://github.com/CosmoLike) components **on Linux** or **macOS-arm**.
 
 We provide the Docker image [whovian-cocoa](https://hub.docker.com/r/vivianmiranda/whovian-cocoa) to facilitate the installation of Cocoa on Windows. 
 
@@ -150,7 +150,7 @@ In this section, we assume users have previously activated the Cocoa conda envir
         git clone https://github.com/CosmoLike/cocoa.git --branch v4.11.2 cocoa
 
 > [!NOTE]
-> Version `v4.11.1` and include significant cosmolike speed-ups from refactoring non-limber/C-FASTPT/cosmo2d modules. 
+> Version `v4.11.1` includes significant cosmolike speed-ups from refactoring non-limber/C-FASTPT/cosmo2d modules. 
 
 > [!NOTE]
 > `v4.11.1` benchmark: do not include CAMB (or the Hybrid Emulator); **Includes TATT in** ($\xi_{\pm}, \gamma_t$) **and non-limber in** $w_{gg}(\theta)$.
@@ -199,7 +199,7 @@ When rerunning `setup_cocoa.sh`, Cocoa will not redownload previously installed 
 > - --hard: force new download of `THEORY`, `ML`, and `LIKELIHOOD` script blocks (it spares `cosmolike_core` and all projects)
 > - --aggressive: force new download of `THEORY`, `ML`, `LIKELIHOOD`, and CORE script blocks (it spares `cosmolike_core` and all projects)
 > - --extreme: force new download of `THEORY`, `ML`, `LIKELIHOOD`, `CORE`, and `DATA` script blocks (it spares `cosmolike_core` and all projects)
-> - --purge: force new download of all packages (beware of the loss of uncommitted work associted with `cosmolike_core` and all projects)
+> - --purge: force new download of all packages (beware of the loss of uncommitted work associated with `cosmolike_core` and all projects)
 >
 
 > [!NOTE]
@@ -234,11 +234,15 @@ Users will see a terminal like this: `$(cocoa)(.local)`. *This is a feature, not
 
   - Linux
     
-        export OMP_NUM_THREADS=8; export OMP_PROC_BIND=close; export OMP_PLACES=cores; export OMP_DYNAMIC=FALSE; export OPENBLAS_NUM_THREADS=1; export MKL_NUM_THREADS=1
+        export OMP_NUM_THREADS=8; export OMP_PROC_BIND=close; \
+        export OMP_PLACES=cores; export OMP_DYNAMIC=FALSE; \
+        export OPENBLAS_NUM_THREADS=1; export MKL_NUM_THREADS=1
 
   - macOS (arm)
     
-        export OMP_NUM_THREADS=8; export OMP_PROC_BIND=disabled; export OMP_PLACES=cores; export OMP_DYNAMIC=FALSE; export OPENBLAS_NUM_THREADS=1; export MKL_NUM_THREADS=1
+        export OMP_NUM_THREADS=8; export OMP_PROC_BIND=disabled; \
+        export OMP_PLACES=cores; export OMP_DYNAMIC=FALSE; \
+        export OPENBLAS_NUM_THREADS=1; export MKL_NUM_THREADS=1
     
 ## Examples not involving Cosmolike
 
@@ -248,10 +252,11 @@ Users will see a terminal like this: `$(cocoa)(.local)`. *This is a feature, not
 
   - Linux
   
-        mpirun -n 1 --oversubscribe --mca pml ^ucx --mca btl vader,tcp,self \
-           --bind-to core:overload-allowed --report-bindings  \
-           --rank-by slot --map-by numa:pe=${OMP_NUM_THREADS} \
-           cobaya-run ./projects/example/EXAMPLE_EVALUATE1.yaml -f
+        mpirun -n 1 --oversubscribe --mca pml ob1 --mca btl vader,tcp,self \
+          --mca btl_tcp_if_exclude lo,docker0,virbr0,ib0 \
+          --bind-to core:overload-allowed --report-bindings \
+          --rank-by slot --map-by numa:pe=${OMP_NUM_THREADS} \
+          cobaya-run ./projects/example/EXAMPLE_EVALUATE1.yaml -f
 
   - macOS (arm)
   
@@ -259,12 +264,13 @@ Users will see a terminal like this: `$(cocoa)(.local)`. *This is a feature, not
     
 - **MCMC (Metropolis-Hastings Algorithm)**:
 
-    - Linux
+  - Linux
   
-          mpirun -n 4 --oversubscribe --mca pml ^ucx --mca btl vader,tcp,self \
-             --bind-to core:overload-allowed --report-bindings  \
-             --rank-by slot --map-by numa:pe=${OMP_NUM_THREADS} \
-             cobaya-run ./projects/example/EXAMPLE_MCMC1.yaml -f
+        mpirun -n 4 --oversubscribe --mca pml ob1 --mca btl vader,tcp,self \
+          --mca btl_tcp_if_exclude lo,docker0,virbr0,ib0 \
+          --bind-to core:overload-allowed --report-bindings \
+          --rank-by slot --map-by numa:pe=${OMP_NUM_THREADS} \
+          cobaya-run ./projects/example/EXAMPLE_MCMC1.yaml -f
 
   - macOS (arm)
 
@@ -280,10 +286,11 @@ Cocoa provides several Cosmolike projects, not all of which are installed by def
 
   - Linux
 
-        mpirun -n 1 --oversubscribe --mca pml ^ucx --mca btl vader,tcp,self \
-           --bind-to core:overload-allowed --report-bindings  \
-           --rank-by slot --map-by numa:pe=${OMP_NUM_THREADS} \
-           cobaya-run ./projects/lsst_y1/EXAMPLE_EVALUATE1.yaml -f
+        mpirun -n 1 --oversubscribe --mca pml ob1 --mca btl vader,tcp,self \
+          --mca btl_tcp_if_exclude lo,docker0,virbr0,ib0 \
+          --bind-to core:overload-allowed --report-bindings \
+          --rank-by slot --map-by numa:pe=${OMP_NUM_THREADS} \
+          cobaya-run ./projects/lsst_y1/EXAMPLE_EVALUATE1.yaml -f
 
   - macOS (arm)
 
@@ -293,10 +300,11 @@ Cocoa provides several Cosmolike projects, not all of which are installed by def
 
   - Linux
     
-        mpirun -n 4 --oversubscribe --mca pml ^ucx --mca btl vader,tcp,self \
-           --bind-to core:overload-allowed --report-bindings  \
-           --rank-by slot --map-by numa:pe=${OMP_NUM_THREADS} \
-           cobaya-run ./projects/lsst_y1/EXAMPLE_MCMC1.yaml -f
+        mpirun -n 4 --oversubscribe --mca pml ob1 --mca btl vader,tcp,self \
+          --mca btl_tcp_if_exclude lo,docker0,virbr0,ib0 \
+          --bind-to core:overload-allowed --report-bindings \
+          --rank-by slot --map-by numa:pe=${OMP_NUM_THREADS} \
+          cobaya-run ./projects/lsst_y1/EXAMPLE_MCMC1.yaml -f
 
   - macOS (arm)
 
@@ -359,8 +367,10 @@ Now, users must follow all the steps below.
 
   - Linux
 
-        mpirun -n 1 --oversubscribe --mca pml ^ucx --mca btl vader,tcp,self --rank-by slot \
-          --bind-to core:overload-allowed --map-by slot \
+        mpirun -n 1 --oversubscribe --mca pml ob1 --mca btl vader,tcp,self \
+          --mca btl_tcp_if_exclude lo,docker0,virbr0,ib0 \
+          --bind-to core:overload-allowed --report-bindings \
+          --rank-by slot --map-by slot \
           cobaya-run ./projects/example/EXAMPLE_EMUL_EVALUATE1.yaml -f
 
   - macOS (arm)
@@ -371,9 +381,11 @@ Now, users must follow all the steps below.
 
   - Linux
 
-        mpirun -n 4 --oversubscribe --mca pml ^ucx --mca btl vader,tcp,self --rank-by slot \
-            --bind-to core:overload-allowed --map-by slot \
-            cobaya-run ./projects/example/EXAMPLE_EMUL_MCMC1.yaml -r
+        mpirun -n 4 --oversubscribe --mca pml ob1 --mca btl vader,tcp,self \
+          --mca btl_tcp_if_exclude lo,docker0,virbr0,ib0 \
+          --bind-to core:overload-allowed --report-bindings \
+          --rank-by slot --map-by slot \
+          cobaya-run ./projects/example/EXAMPLE_EMUL_MCMC1.yaml -r
 
   - macOS (arm)
 
@@ -388,55 +400,62 @@ Now, users must follow all the steps below.
 
   - Linux
 
-        mpirun -n 90 --oversubscribe --mca pml ^ucx --mca btl vader,tcp,self --rank-by slot \
-            --bind-to core:overload-allowed --map-by slot \
-            cobaya-run ./projects/example/EXAMPLE_EMUL_POLY1.yaml -r
+        mpirun -n 90 --oversubscribe --mca pml ob1 --mca btl vader,tcp,self \
+          --mca btl_tcp_if_exclude lo,docker0,virbr0,ib0 \
+          --bind-to core:overload-allowed --report-bindings \
+          --rank-by slot --map-by slot \
+          cobaya-run ./projects/example/EXAMPLE_EMUL_POLY1.yaml -r
 
   - macOS (arm)
 
         mpirun -n 12 --oversubscribe cobaya-run ./projects/example/EXAMPLE_EMUL_POLY1.yaml -r
     
 > [!Note]
-> When running `PolyChord` or any of our scripts in more than one node, replace `--mca btl vader,tcp,self` by `--mca btl tcp,self`.
+> The flag `--mca btl vader,tcp,self` also works unchanged on multi-node runs: 
+> Open MPI uses `vader` (shared memory) within a node and `tcp` between nodes automatically.
 
 > [!Note]
 > When running `PolyChord` (or any of the samplers below) with oversubscription (more MPI processes than available cores), add the option `--mca mpi_yield_when_idle 1`
 
-The `Nautilis`, `Minimizer`, `Profile`, and `Emcee` scripts below contain an internally defined `yaml_string` that specifies priors, 
+The `Nautilus`, `Minimizer`, `Profile`, and `Emcee` scripts below contain an internally defined `yaml_string` that specifies priors, 
 likelihoods, and the theory code, all following Cobaya Conventions.
 
 - **Nautilus**:
 
   - Linux
 
-        mpirun -n 90 --oversubscribe --mca pml ^ucx --mca btl vader,tcp,self --rank-by slot \
-            --bind-to core:overload-allowed --map-by slot \
-            python -m mpi4py.futures ./projects/example/EXAMPLE_EMUL_NAUTILUS1.py \
-                --root ./projects/example/ --outroot "EXAMPLE_EMUL_NAUTILUS1"  \
-                --maxfeval 450000 --nlive 2048 --neff 15000 --flive 0.01 --nnetworks 5
+        mpirun -n 90 --oversubscribe --mca pml ob1 --mca btl vader,tcp,self \
+          --mca btl_tcp_if_exclude lo,docker0,virbr0,ib0 \
+          --bind-to core:overload-allowed --report-bindings \
+          --rank-by slot --map-by slot \
+          python -m mpi4py.futures ./projects/example/EXAMPLE_EMUL_NAUTILUS1.py \
+            --root ./projects/example/ --outroot "EXAMPLE_EMUL_NAUTILUS1"  \
+            --maxfeval 450000 --nlive 2048 --neff 15000 --flive 0.01 --nnetworks 5
 
   - macOS (arm)
 
         mpirun -n 12 --oversubscribe python -m mpi4py.futures ./projects/example/EXAMPLE_EMUL_NAUTILUS1.py \
-                --root ./projects/example/ --outroot "EXAMPLE_EMUL_NAUTILUS1"  \
-                --maxfeval 450000 --nlive 2048 --neff 15000 --flive 0.01 --nnetworks 5
+          --root ./projects/example/ --outroot "EXAMPLE_EMUL_NAUTILUS1"  \
+          --maxfeval 450000 --nlive 2048 --neff 15000 --flive 0.01 --nnetworks 5
 
 > [!NOTE]
 > What if the user runs an `Nautilus` chain with `maxeval` insufficient for producing `neff` samples? `Nautilus` creates a checkpoint at `chains/outroot_checkpoint.hdf5`.
 
 - **Emcee**:
 
-    - Linux
-      
-          mpirun -n 21 --oversubscribe --mca pml ^ucx --mca btl vader,tcp,self --rank-by slot \
-              --bind-to core:overload-allowed --map-by slot \
-              python ./projects/example/EXAMPLE_EMUL_EMCEE1.py --root ./projects/example/ \
-                  --outroot "EXAMPLE_EMUL_EMCEE1" --maxfeval 80000
+  - Linux
+    
+        mpirun -n 21 --oversubscribe --mca pml ob1 --mca btl vader,tcp,self \
+          --mca btl_tcp_if_exclude lo,docker0,virbr0,ib0 \
+          --bind-to core:overload-allowed --report-bindings \
+          --rank-by slot --map-by slot \
+          python ./projects/example/EXAMPLE_EMUL_EMCEE1.py --root ./projects/example/ \
+            --outroot "EXAMPLE_EMUL_EMCEE1" --maxfeval 80000
 
-    - macOS (arm)
+  - macOS (arm)
 
-          mpirun -n 12 --oversubscribe python ./projects/example/EXAMPLE_EMUL_EMCEE1.py \
-                --root ./projects/example/ --outroot "EXAMPLE_EMUL_EMCEE1" --maxfeval 80000
+        mpirun -n 12 --oversubscribe python ./projects/example/EXAMPLE_EMUL_EMCEE1.py \
+          --root ./projects/example/ --outroot "EXAMPLE_EMUL_EMCEE1" --maxfeval 80000
 
   The number of steps per MPI worker is $n_{\mathrm{sw}} =  \mathrm{maxfeval}/n_{\mathrm{w}}$,
   with the number of walkers being $n_{\mathrm{w}}=\mathrm{max}(3n_{\mathrm{params}},n_{\mathrm{MPI}})$.
@@ -457,11 +476,11 @@ likelihoods, and the theory code, all following Cobaya Conventions.
 
 - **Sampler Comparison**
 
-    The script that generated the plot below is provided at `projects/example/scripts/EXAMPLE_PLOT_COMPARE_CHAINS.py`. The Google Colab notebook [Example Sampler Comparison](https://github.com/CosmoLike/CoCoAGoogleColabExamples/blob/main/Cocoa_Example_(Sampler_Comparison).ipynb) can also reconstruct a similar version of this figure.
+  The script that generated the plot below is provided at `projects/example/scripts/EXAMPLE_PLOT_COMPARE_CHAINS.py`. The Google Colab notebook [Example Sampler Comparison](https://github.com/CosmoLike/CoCoAGoogleColabExamples/blob/main/Cocoa_Example_(Sampler_Comparison).ipynb) can also reconstruct a similar version of this figure.
 
-    <p align="center">
-    <img width="750" height="750" alt="projects_example_sampler_comparison" src="https://github.com/user-attachments/assets/d3639673-36ea-4fd9-9c91-1f5b97845fe0" />
-    </p>
+  <p align="center">
+  <img width="750" height="750" alt="projects_example_sampler_comparison" src="https://github.com/user-attachments/assets/d3639673-36ea-4fd9-9c91-1f5b97845fe0" />
+  </p>
   
 - **Global Minimizer**:
 
@@ -469,15 +488,17 @@ likelihoods, and the theory code, all following Cobaya Conventions.
 
     - Linux
 
-          mpirun -n 21 --oversubscribe --mca pml ^ucx --mca btl vader,tcp,self --rank-by slot \
-              --bind-to core:overload-allowed --map-by slot \
-              python ./projects/example/EXAMPLE_EMUL_MINIMIZE1.py --root ./projects/example/ \
-                  --outroot "EXAMPLE_EMUL_MIN1" --nstw 200
+          mpirun -n 21 --oversubscribe --mca pml ob1 --mca btl vader,tcp,self \
+            --mca btl_tcp_if_exclude lo,docker0,virbr0,ib0 \
+            --bind-to core:overload-allowed --report-bindings \
+            --rank-by slot --map-by slot \
+            python ./projects/example/EXAMPLE_EMUL_MINIMIZE1.py --root ./projects/example/ \
+              --outroot "EXAMPLE_EMUL_MIN1" --nstw 200
   
     - macOS (arm)
 
           mpirun -n 12 --oversubscribe python ./projects/example/EXAMPLE_EMUL_MINIMIZE1.py \
-                --root ./projects/example/ --outroot "EXAMPLE_EMUL_MIN1" --nstw 200
+            --root ./projects/example/ --outroot "EXAMPLE_EMUL_MIN1" --nstw 200
        
   The number of steps per Emcee walker per temperature is $n_{\mathrm{stw}}$,
   and the number of walkers is $n_{\mathrm{w}}=\mathrm{max}(3n_{\mathrm{params}},n_{\mathrm{MPI}})$. The minimum number of total evaluations is then 
@@ -500,29 +521,31 @@ likelihoods, and the theory code, all following Cobaya Conventions.
 
 - **Profile**: 
 
-    - Linux
+  - Linux
 
-          mpirun -n 21 --oversubscribe --mca pml ^ucx --mca btl vader,tcp,self --rank-by slot \
-              --bind-to core:overload-allowed --map-by slot \
-              python ./projects/example/EXAMPLE_EMUL_PROFILE1.py \
-                  --root ./projects/example/ --cov 'chains/EXAMPLE_EMUL_MCMC1.covmat' \
-                  --outroot "EXAMPLE_EMUL_PROFILE1" --factor 3 --nstw 200 --numpts 10 \
-                  --profile 1 --minfile "./projects/example/chains/EXAMPLE_EMUL_MIN1.txt"
+        mpirun -n 21 --oversubscribe --mca pml ob1 --mca btl vader,tcp,self \
+          --mca btl_tcp_if_exclude lo,docker0,virbr0,ib0 \
+          --bind-to core:overload-allowed --report-bindings \
+          --rank-by slot --map-by slot \
+          python ./projects/example/EXAMPLE_EMUL_PROFILE1.py \
+            --root ./projects/example/ --cov 'chains/EXAMPLE_EMUL_MCMC1.covmat' \
+            --outroot "EXAMPLE_EMUL_PROFILE1" --factor 3 --nstw 200 --numpts 10 \
+            --profile 1 --minfile "./projects/example/chains/EXAMPLE_EMUL_MIN1.txt"
 
-    - macOS (arm)
+  - macOS (arm)
 
-          mpirun -n 12 --oversubscribe python ./projects/example/EXAMPLE_EMUL_PROFILE1.py \
-                  --root ./projects/example/ --cov 'chains/EXAMPLE_EMUL_MCMC1.covmat' \
-                  --outroot "EXAMPLE_EMUL_PROFILE1" --factor 3 --nstw 200 --numpts 10 \
-                  --profile 1 --minfile "./projects/example/chains/EXAMPLE_EMUL_MIN1.txt"
+        mpirun -n 12 --oversubscribe python ./projects/example/EXAMPLE_EMUL_PROFILE1.py \
+          --root ./projects/example/ --cov 'chains/EXAMPLE_EMUL_MCMC1.covmat' \
+          --outroot "EXAMPLE_EMUL_PROFILE1" --factor 3 --nstw 200 --numpts 10 \
+          --profile 1 --minfile "./projects/example/chains/EXAMPLE_EMUL_MIN1.txt"
       
     Profile provides the optional argument `minfile`, as it is significantly faster to run the profile script with a previously provided global minimum. 
     The profile also provides the optional argument `cov`. Again, it is considerably more efficient to employ a covariance matrix from a converged chain. 
 
     The argument `factor` specifies the start and end of the parameter being profiled:
 
-          start value ~ mininum value - factor*np.sqrt(np.diag(cov))
-          end   value ~ mininum value + factor*np.sqrt(np.diag(cov))
+          start value ~ minimum value - factor*np.sqrt(np.diag(cov))
+          end   value ~ minimum value + factor*np.sqrt(np.diag(cov))
 
     We advise $\mathrm{factor} \sim 3$ for parameters that are well constrained by the data when a covariance matrix is provided.
     If `cov` is not supplied, the code estimates one internally from the prior.
@@ -536,61 +559,67 @@ likelihoods, and the theory code, all following Cobaya Conventions.
 
 - **Profile method 2**:
 
-    If the dimensionality of the problem is not large, and the spacing between values of the parameter
-    being profiled is small, it can be considerably faster to use a simple scipy `Nelder-Mead`
-    to calculate the profile. Here, the `minfile` and `cov` options are mandatory.
+  If the dimensionality of the problem is not large, and the spacing between values of the parameter
+  being profiled is small, it can be considerably faster to use a simple scipy `Nelder-Mead`
+  to calculate the profile. Here, the `minfile` and `cov` options are mandatory.
 
     - Linux
 
-          mpirun -n 1 --mca pml ^ucx --mca btl vader,tcp,self --rank-by slot \
-              --bind-to core:overload-allowed --map-by slot \
-              python ./projects/example/EXAMPLE_EMUL_PROFILE_SCIPY1.py \
-                  --root ./projects/example/ --cov 'chains/EXAMPLE_EMUL_MCMC1.covmat' \
-                  --outroot "EXAMPLE_EMUL_PROFILE1M2" --factor 3 --maxfeval 5000 --numpts 10 \
-                  --profile 1 --minfile "./projects/example/chains/EXAMPLE_EMUL_MIN1.txt"
+          mpirun -n 1 --mca pml ob1 --mca btl vader,tcp,self \
+            --mca btl_tcp_if_exclude lo,docker0,virbr0,ib0 \
+            --bind-to core:overload-allowed --report-bindings \
+            --rank-by slot --map-by slot \
+            python ./projects/example/EXAMPLE_EMUL_PROFILE_SCIPY1.py \
+              --root ./projects/example/ --cov 'chains/EXAMPLE_EMUL_MCMC1.covmat' \
+              --outroot "EXAMPLE_EMUL_PROFILE1M2" --factor 3 --maxfeval 5000 --numpts 10 \
+              --profile 1 --minfile "./projects/example/chains/EXAMPLE_EMUL_MIN1.txt"
 
     - macOS (arm)
 
           mpirun -n 1 python ./projects/example/EXAMPLE_EMUL_PROFILE_SCIPY1.py \
-                --root ./projects/example/ --cov 'chains/EXAMPLE_EMUL_MCMC1.covmat' \
-                --outroot "EXAMPLE_EMUL_PROFILE1M2" --factor 3 --maxfeval 5000 --numpts 10 \
-                --profile 1 --minfile "./projects/example/chains/EXAMPLE_EMUL_MIN1.txt"
-      
-    The script that generated the plot below is provided at `projects/example/scripts/EXAMPLE_PLOT_PROFILE1_COMP.py`
-  
-    <p align="center">
-    <img width="832.32" height="617.76" alt="example_profile_comp" src="https://github.com/user-attachments/assets/ba0c0629-bd3b-4274-9f24-9db5929dc35c" />
-    </p>
+            --root ./projects/example/ --cov 'chains/EXAMPLE_EMUL_MCMC1.covmat' \
+            --outroot "EXAMPLE_EMUL_PROFILE1M2" --factor 3 --maxfeval 5000 --numpts 10 \
+            --profile 1 --minfile "./projects/example/chains/EXAMPLE_EMUL_MIN1.txt"
+    
+  The script that generated the plot below is provided at `projects/example/scripts/EXAMPLE_PLOT_PROFILE1_COMP.py`
+
+  <p align="center">
+  <img width="832.32" height="617.76" alt="example_profile_comp" src="https://github.com/user-attachments/assets/ba0c0629-bd3b-4274-9f24-9db5929dc35c" />
+  </p>
 
 - **Scan**: 
 
   This profile code has a different MPI strategy. It scans one parameter on the entire prior,
   with each MPI being assigned to one minimization (not Emcee walker!). This is a strategy when probing 
-  beyond-LCDM parameters with oscilatory behavior (e.g., Monodromic Dark Energy).
+  beyond-LCDM parameters with oscillatory behavior (e.g., Monodromic Dark Energy).
 
     - Linux
       
-          mpirun -n 90 --oversubscribe --mca pml ^ucx --mca btl vader,tcp,self \
-              --bind-to core:overload-allowed --map-by slot \
+          mpirun -n 90 --oversubscribe --mca pml ob1 --mca btl vader,tcp,self \
+            --mca btl_tcp_if_exclude lo,docker0,virbr0,ib0 \
+            --bind-to core:overload-allowed --report-bindings \
+            --rank-by slot --map-by slot \
               python -m mpi4py.futures ./projects/example/EXAMPLE_EMUL_SCAN1.py \
-                  --root ./projects/example/ --outroot "EXAMPLE_EMUL_SCAN1" --nstw 200 --profile 1
+                --root ./projects/example/ --outroot "EXAMPLE_EMUL_SCAN1" \
+                --nstw 200 --profile 1
 
     - macOS (arm)
 
           mpirun -n 12 --oversubscribe python -m mpi4py.futures ./projects/example/EXAMPLE_EMUL_SCAN1.py \
-              --root ./projects/example/ --outroot "EXAMPLE_EMUL_SCAN1" --nstw 200 --profile 1
+            --root ./projects/example/ --outroot "EXAMPLE_EMUL_SCAN1" \
+            --nstw 200 --profile 1
       
 - **Tension Metrics**
 
-    We provide the Jupyter Notebook and the SLURM script, located at
+  We provide the Jupyter Notebook and the SLURM script, located at
 
       projects/example/EXAMPLE_EMUL_MCMC_TENSION_METRICS/EXAMPLE_TENSION_METRICS.ipynb
       projects/example/scripts/EXAMPLE_EMUL_TM.sbatch
 
-    that exemplifies how emulators can be used to quickly assess the tension between data sets.
-    All Tension metrics were computed using the package `Tensiometer`.
+  that exemplify how emulators can be used to quickly assess the tension between data sets.
+  All Tension metrics were computed using the package `Tensiometer`.
 
-    The plot below, taken from `EXAMPLE_TENSION_METRICS.ipynb`, exemplifies the tension between CMB+BAO vs. Type Ia SN.
+  The plot below, taken from `EXAMPLE_TENSION_METRICS.ipynb`, exemplifies the tension between CMB+BAO vs. Type Ia SN.
 
 <p align="center">
 <img width="790" height="333" alt="Unknown" src="https://github.com/user-attachments/assets/b5ef808e-0efa-4bb9-852a-854f6531e3ed" />
@@ -631,13 +660,17 @@ Now, users must follow all the steps below.
 
   - Linux
 
-        export OMP_NUM_THREADS=8; export OMP_PROC_BIND=close; export OMP_PLACES=cores; export OMP_DYNAMIC=FALSE; export OPENBLAS_NUM_THREADS=1; export MKL_NUM_THREADS=1
+        export OMP_NUM_THREADS=8; export OMP_PROC_BIND=close; \
+        export OMP_PLACES=cores; export OMP_DYNAMIC=FALSE; \
+        export OPENBLAS_NUM_THREADS=1; export MKL_NUM_THREADS=1
 
   - macOS (arm)
 
-        export OMP_NUM_THREADS=8; export OMP_PROC_BIND=disabled; export OMP_PLACES=cores; export OMP_DYNAMIC=FALSE; export OPENBLAS_NUM_THREADS=1; export MKL_NUM_THREADS=1
+        export OMP_NUM_THREADS=8; export OMP_PROC_BIND=disabled; \
+        export OMP_PLACES=cores; export OMP_DYNAMIC=FALSE; \
+        export OPENBLAS_NUM_THREADS=1; export MKL_NUM_THREADS=1
   
- **Step :three:**: Remove GPU (idea is to run with CPU!) CPU also increase compatibility with hardware
+ **Step :three:**: Remove GPU (idea is to run emulators on the CPU!)
   
   - Linux
   
@@ -649,8 +682,9 @@ Now, users must follow all the steps below.
 
   - Linux
 
-        mpirun -n 1 --oversubscribe --mca pml ^ucx --mca btl vader,tcp,self \
-           --bind-to core:overload-allowed --report-bindings  \
+        mpirun -n 1 --oversubscribe --mca pml ob1 --mca btl vader,tcp,self \
+           --mca btl_tcp_if_exclude lo,docker0,virbr0,ib0 \
+           --bind-to core:overload-allowed --report-bindings \
            --rank-by slot --map-by numa:pe=${OMP_NUM_THREADS} \
            cobaya-run ./projects/lsst_y1/EXAMPLE_EMUL2_EVALUATE1.yaml -f
 
@@ -662,9 +696,11 @@ Now, users must follow all the steps below.
 
   - Linux
 
-        mpirun -n 4 --oversubscribe --mca pml ^ucx --mca btl vader,tcp,self --rank-by slot \
-            --bind-to core:overload-allowed --map-by slot \
-            cobaya-run ./projects/lsst_y1/EXAMPLE_EMUL2_MCMC1.yaml -r
+        mpirun -n 4 --oversubscribe --mca pml ob1 --mca btl vader,tcp,self \
+          --mca btl_tcp_if_exclude lo,docker0,virbr0,ib0 \
+          --bind-to core:overload-allowed --report-bindings \
+          --rank-by slot --map-by numa:pe=${OMP_NUM_THREADS} \
+          cobaya-run ./projects/lsst_y1/EXAMPLE_EMUL2_MCMC1.yaml -r
 
   - macOS (arm)
 
@@ -683,8 +719,6 @@ Details on the matter power spectrum emulator designs will be presented in the [
 >    <img width="450" alt="Screenshot 2026-01-06 at 2 13 06 AM" src="https://github.com/user-attachments/assets/d19f0900-cebc-41ca-9028-1d4e0bd40cc9" />
 >  </span>
 > </p>
-
-
 
 
 ## Credits <a name="appendix_proper_credits"></a>
@@ -754,7 +788,7 @@ and
           && conda init bash
 
 > [!Note]
-> The strict use of Miniconda and conda-forge packages appears to mitigate the significant licensing issue involving Anaconda packages and academic/research institutions.
+> The strict use of Miniforge and conda-forge packages appears to mitigate the significant licensing issue involving Anaconda packages and academic/research institutions.
 
 **Step :three:**: After running this command, you will see a message in the terminal that ends with the statement *For changes to take effect, close and re-open your current shell*. Then, type
 
@@ -774,7 +808,7 @@ and
  
      conda activate lockenv
 
-**Step :two:** Download the file appropriate conda-lock compatible `yml` file.
+**Step :two:** Download the appropriate conda-lock compatible `yml` file.
 
    - Linux
   
@@ -818,8 +852,8 @@ and
 
      wget https://raw.githubusercontent.com/CosmoLike/cocoa/refs/heads/dev/cocoapy310-osxarm-loose.yml
 
-**Step :three:** Create the cocoa conda env using a looser yml ((note here slightly modified conda command)
-    
+**Step :three:** Create the cocoa conda env using a looser yml (note here slightly modified conda command)
+
     conda env create --solver=libmamba --name cocoa -f cocoapy310-osxarm-loose.yml
 
 # Appendices about Git <a name="appendix_git"></a>
@@ -829,7 +863,7 @@ and
 A useful Git hack concerns developing Cocoa from a Git tag. 
 
 Git tags set milestones in our development, so they serve as good starting points for coding new features or implementing bug fixes.
-When you check out a tag, Git places you in a detached `HEAD` state. So, before making futher commits, you must create a local branch from that tag.
+When you check out a tag, Git places you in a detached `HEAD` state. So, before making further commits, you must create a local branch from that tag.
 
 **Step :one: (optional)** If the repository was cloned with the `https` URL, switch `origin` to the SSH-based URL address (assuming your public key is already registered on GitHub)
 
@@ -843,7 +877,7 @@ and
 
     git fetch origin -v
 
-This will display all remote branches in the terminal. The output will be resemble the following snippet
+This will display all remote branches in the terminal. The output will resemble the following snippet
 
     [Adapted from the terminal output of git fetch origin -v] 
     (...)
@@ -858,7 +892,7 @@ This will display all remote branches in the terminal. The output will be resemb
     git switch -c xyzlocdev
 
 Choose a unique name that does not already exist as a branch in the remote repository. 
-A practical convention is to use your initial, followed a suffix such as `locdev`.
+A practical convention is to use your initial, followed by suffix such as `locdev`.
 
 Now, all subsequent commits will be associated with the xyzlocdev local branch. 
 
@@ -999,7 +1033,7 @@ The script `set_installation_options.sh` includes instructions for installing se
      # ------------------------------------------------------------------------------
      # The keys below control which cosmolike projects will be installed and compiled
      # ------------------------------------------------------------------------------
-     export IGNORE_COSMOLIKE_LSSTY1_CODE=1
+     export IGNORE_COSMOLIKE_LSST_Y1_CODE=1
      export IGNORE_COSMOLIKE_DES_Y3_CODE=1
      #export IGNORE_COSMOLIKE_ROMAN_FOURIER_CODE=1
      #export IGNORE_COSMOLIKE_ROMAN_REAL_CODE=1
@@ -1021,11 +1055,11 @@ The script `set_installation_options.sh` includes instructions for installing se
      export ROMAN_REAL_URL="https://github.com/CosmoLike/cocoa_roman_real.git"
      export ROMAN_REAL_NAME="roman_real"
      #BRANCH: if unset, load the latest commit on the specified branch
-     #export ROMAN_REAL_BRANCH="dev"
+     #export ROMAN_REAL_GIT_BRANCH="dev"
      #COMMIT: if unset, load the specified commit
-     export ROMAN_REAL_COMMIT="a5cf62ffcec7b862dda5bf343bf6bb19124bb5d0"
+     export ROMAN_REAL_GIT_COMMIT="a5cf62ffcec7b862dda5bf343bf6bb19124bb5d0"
      #TAG: if unset, load the specified TAG
-     #export ROMAN_REAL_TAG="v4.0-beta17"
+     #export ROMAN_REAL_GIT_TAG="v4.0-beta17"
  
 Once more, anytime `set_installation_options.sh` is modified, we need to reload `(.local)` by rerunning `start_cocoa.sh`. Then, run the following commands:
 
@@ -1041,7 +1075,7 @@ Now, to download and compile all Cosmolike projects, type
 
 and
 
-      source ./installation_scripts/compile_all_projects.sh       # compile  all cosmolike project
+      source ./installation_scripts/compile_all_projects.sh       # compile all cosmolike projects
 
 > [!NOTE]
 > In case users need to rerun `setup_cocoa.sh` (or `setup_cosmolike_projects.sh`) , Cocoa will not download previously installed cosmolike projects (this avoids loss of uncommitted work), unless the following key is set on `set_installation_options.sh`
@@ -1068,7 +1102,7 @@ We provide the Docker image [whovian-cocoa](https://hub.docker.com/r/vivianmiran
     docker run --platform linux/amd64 --hostname cocoa --name cocoa2025 -it -p 8888:8888 -v $(pwd):/home/whovian/host/ -v ~/.ssh:/home/whovian/.ssh:ro vivianmiranda/whovian-cocoa:thin
 
 > [!Warning] 
-> There is a weird bug on macOS that mathplotlib does not work unless you add the flags `-e EXPERIMENTAL_DOCKER_DESKTOP_FORCE_QEMU=1 -e PYTHONUNBUFFERED=1` 
+> There is a weird bug on macOS that Mathplotlib does not work unless you add the flags `-e EXPERIMENTAL_DOCKER_DESKTOP_FORCE_QEMU=1 -e PYTHONUNBUFFERED=1` 
 >  right after `docker run --platform linux/amd64`
 >  
 
@@ -1155,7 +1189,7 @@ to call the original Planck-2018 Clik likelihoods, as shown below.
 <img width="1146" height="498" alt="Screenshot 2025-10-20 at 8 38 56 PM" src="https://github.com/user-attachments/assets/4ab8beff-bda1-4bf8-b2c6-56f5501e3773" />
 <img width="1236" height="514" alt="Screenshot 2025-10-20 at 8 39 04 PM" src="https://github.com/user-attachments/assets/22b21a5d-c716-45dc-949c-59f31be91def" />
 
-This ensure backward consistency in our code, as `TT.py` and `EE.py` used to point to Planck-2018 Clik before Cobaya's authors moved them to `EE_clik.py` and `TT_clik.py`. 
+This ensures backward consistency in our code, as `TT.py` and `EE.py` used to point to Planck-2018 Clik before Cobaya's authors moved them to `EE_clik.py` and `TT_clik.py`. 
 
 ## :interrobang: FAQ: How can users run Cocoa on Google Colab? <a name="overview_google_colab"></a>
 
@@ -1272,7 +1306,7 @@ There are a few differences users should be aware of when running Cocoa on Googl
 >
 >        %%bash
 >        source "/content/conda/etc/profile.d/conda.sh"
->        conda activate cocoa`
+>        conda activate cocoa
 >        cd ./cocoa/Cocoa/
 >        source start_cocoa.sh
 
@@ -1289,7 +1323,7 @@ There are a few differences users should be aware of when running Cocoa on Googl
         ROOT="colab_name_notebook"
         DEST="/content/drive/MyDrive/ColabBackups"
         mkdir -p "$DEST"
-        ARCHIVE="$DEST/$ROOT_$(date +%F_%H-%M).tar.gz"
+        ARCHIVE="$DEST/${ROOT}_$(date +%F_%H-%M).tar.gz"
         tar -czf "$ARCHIVE" \
             --exclude='/content/drive' \
             --exclude='**/__pycache__' \
