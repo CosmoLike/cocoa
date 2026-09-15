@@ -20,7 +20,8 @@ declare -a CHAINS=("EXAMPLE_EMUL_MCMC1"
 
 for chain in "${CHAINS[@]}"; do
   root="./projects/example/EXAMPLE_EMUL_MCMC_TENSION_METRICS"
-  mpirun -n 4 --oversubscribe --mca pml ob1 --mca btl vader,tcp,self \
+  mpirun -n 4 --oversubscribe \
+     --mca pml ob1 --mca btl vader,tcp,self \
      --bind-to core --map-by numa --report-bindings \
      cobaya-run ${root}/${chain}.yaml -r
 done

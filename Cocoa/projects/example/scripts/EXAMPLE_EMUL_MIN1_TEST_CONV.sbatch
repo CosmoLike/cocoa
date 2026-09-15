@@ -39,7 +39,8 @@ ulimit -u 2000000 # require line when nmpi is high
 
 declare -i nstw=$((100+25*$SLURM_ARRAY_TASK_ID))
 
-mpirun -n ${SLURM_NTASKS} --oversubscribe --mca pml ob1 --mca btl vader,tcp,self \
+mpirun -n ${SLURM_NTASKS} --oversubscribe \
+  --mca pml ob1 --mca btl vader,tcp,self \
   --mca btl_tcp_if_exclude lo,docker0,virbr0,ib0 \
   --bind-to core:overload-allowed --rank-by slot \
   --map-by slot:pe=${OMP_NUM_THREADS} --mca mpi_yield_when_idle 1 \
