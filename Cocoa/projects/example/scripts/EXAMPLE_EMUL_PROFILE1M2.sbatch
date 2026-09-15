@@ -37,7 +37,8 @@ fi
 export OMP_NUM_THREADS=1
 
 for ((i=0; i<7; i++)); do
-mpirun -n 1 --oversubscribe --mca pml ^ucx --mca btl vader,tcp,self --rank-by slot \
+mpirun -n 1 --oversubscribe --mca pml ob1 --mca btl vader,tcp,self --rank-by slot \
+    --mca btl_tcp_if_exclude lo,docker0,virbr0,ib0 \
     --bind-to core:overload-allowed --map-by slot --mca mpi_yield_when_idle 1 \
     python ./projects/example/EXAMPLE_EMUL_PROFILE_SCIPY1.py \
         --root ./projects/example/ --cov 'chains/EXAMPLE_EMUL_MCMC1.covmat' \

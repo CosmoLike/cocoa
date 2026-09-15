@@ -139,7 +139,7 @@ or
 
 and 
 
-    mpirun -n 1 --oversubscribe --mca pml ^ucx --mca btl vader,tcp,self --bind-to core:overload-allowed --rank-by slot --map-by numa:pe=${OMP_NUM_THREADS} cobaya-run ./projects/XXX/EXAMPLE_EVALUATE1.yaml -f
+    mpirun -n 1 --oversubscribe --mca pml ob1 --mca btl vader,tcp,self --bind-to core:overload-allowed --rank-by slot --map-by numa:pe=${OMP_NUM_THREADS} cobaya-run ./projects/XXX/EXAMPLE_EVALUATE1.yaml -f
 
 If users want to make a particular Cosmolike project widely available in Cocoa, implement the following changes to Cocoa's configuration scripts:
 
@@ -399,7 +399,7 @@ and
 
 and
     
-    mpirun -n 1 --oversubscribe --mca pml ^ucx --mca btl vader,tcp,self --bind-to core:overload-allowed --rank-by slot --map-by numa:pe=${OMP_NUM_THREADS} cobaya-run ./projects/xxx/EXAMPLE_EVALUATE1.yaml -f
+    mpirun -n 1 --oversubscribe --mca pml ob1 --mca btl vader,tcp,self --bind-to core:overload-allowed --rank-by slot --map-by numa:pe=${OMP_NUM_THREADS} cobaya-run ./projects/xxx/EXAMPLE_EVALUATE1.yaml -f
     
 ## The hard way <a name="appendix_projects_new_hard"></a> 
 
