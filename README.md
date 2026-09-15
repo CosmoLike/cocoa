@@ -1137,9 +1137,9 @@ The script `set_installation_options.sh` includes instructions for installing se
      #Pin the project version with at most one of the keys below (COMMIT, BRANCH, or TAG).
      #If more than one is set, COMMIT wins over BRANCH, and BRANCH wins over TAG.
      #If none is set, Cocoa loads the latest commit on the repository default branch.
-     #export ROMAN_REAL_GIT_BRANCH="dev"
-     export ROMAN_REAL_GIT_COMMIT="a5cf62ffcec7b862dda5bf343bf6bb19124bb5d0"
-     #export ROMAN_REAL_GIT_TAG="v4.0-beta17"
+     #export ROMAN_REAL_GIT_BRANCH="main"
+     #export ROMAN_REAL_GIT_COMMIT="abc"
+     export ROMAN_REAL_GIT_TAG="v4.10.8"
  
 Once more, anytime `set_installation_options.sh` is modified, we need to reload `(.local)` by rerunning `start_cocoa.sh`. Then, run the following commands:
 

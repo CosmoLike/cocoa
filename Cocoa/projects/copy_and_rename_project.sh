@@ -25,17 +25,12 @@ cp -r "${ROOTDIR:?}/projects/${OLD_PROJECT:?}" "${PRJ:?}"
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
 
-cd "${PRJ:?}/data/"
-find . -iname "*${OLD_PROJECT}*" -exec rename ${OLD_PROJECT} ${NEW_PROJECT,,} '{}' \;
-
-cd "${PRJ:?}/likelihood/"
-find . -iname "*${OLD_PROJECT}*" -exec rename ${OLD_PROJECT} ${NEW_PROJECT,,} '{}' \;
-
-cd "${PRJ:?}/scripts/"
-find . -iname "*${OLD_PROJECT}*" -exec rename ${OLD_PROJECT} ${NEW_PROJECT,,} '{}' \;
+for d in data likelihood scripts interface; do
+  cd "${PRJ:?}/${d}/"
+  find . -iname "*${OLD_PROJECT}*" -exec rename ${OLD_PROJECT} ${NEW_PROJECT,,} '{}' \;
+done
 
 cd "${PRJ:?}/interface/"
-find . -iname "*${OLD_PROJECT}*" -exec rename ${OLD_PROJECT} ${NEW_PROJECT,,} '{}' \;
 find . -iname "*${OLD_SURVEY}*" -exec rename ${OLD_SURVEY} ${NEW_SURVEY,,} '{}' \;
 find . -iname "*${OLD_SURVEY,,}*" -exec rename ${OLD_SURVEY} ${NEW_SURVEY,,} '{}' \;
 
@@ -80,17 +75,15 @@ done
 rm -f "${PRJ:?}"/*.txt                   2>/dev/null
 rm -f "${PRJ:?}"/*.sbatch                2>/dev/null
 rm -f "${PRJ:?}"/*.ipynb                 2>/dev/null
+# The data-vector emulators (and the EXAMPLE_EMUL_* examples that load them)
+# were trained on the old survey, so they are untransferable. The hybrid
+# EXAMPLE_EMUL2_* examples emulate only Boltzmann outputs and are kept.
+rm -rf "${PRJ:?}"/emulators              2>/dev/null
+rm -f "${PRJ:?}"/EXAMPLE_EMUL_*.yaml     2>/dev/null
+rm -f "${PRJ:?}"/EXAMPLE_EMUL_*.py       2>/dev/null
 rm -f "${PRJ:?}"/interface/*.so          2>/dev/null
 rm -f "${PRJ:?}"/interface/*.o           2>/dev/null
-rm -f "${PRJ:?}"/chains/*.txt            2>/dev/null
-rm -f "${PRJ:?}"/chains/*.1.txt          2>/dev/null
-rm -f "${PRJ:?}"/chains/*.2.txt          2>/dev/null
-rm -f "${PRJ:?}"/chains/*.3.txt          2>/dev/null
-rm -f "${PRJ:?}"/chains/*.4.txt          2>/dev/null
-rm -f "${PRJ:?}"/chains/*.5.txt          2>/dev/null
-rm -f "${PRJ:?}"/chains/*.6.txt          2>/dev/null
-rm -f "${PRJ:?}"/chains/*.7.txt          2>/dev/null
-rm -f "${PRJ:?}"/chains/*.8.txt          2>/dev/null
+rm -f "${PRJ:?}"/chains/*.txt            2>/dev/null # also covers rank-suffixed *.N.txt chains
 rm -f "${PRJ:?}"/chains/*.progress       2>/dev/null
 rm -f "${PRJ:?}"/chains/*.covmat         2>/dev/null
 rm -f "${PRJ:?}"/chains/*.locked         2>/dev/null
