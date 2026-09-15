@@ -51,8 +51,7 @@ gitact0() {
   local NAME="${1:?}"
   local URL="${2:?}"
   local PACKDIR="${PROJECT:?}/${NAME}"
-  
-  cdfolder "${PROJECT:?}" || { unset_all; return 1; }
+  cdfolder "${PROJECT:?}" || return 1;
 
   # ---------------------------------------------------------------------------
   # In case this script runs twice --------------------------------------------
@@ -64,12 +63,12 @@ gitact0() {
   if [ ! -d "${PACKDIR:?}" ]; then
   
     "${GIT:?}" clone "${URL}" --depth ${GIT_CLONE_MAXIMUM_DEPTH:-1000} \
-      --recursive "${NAME}" \
+      --no-single-branch --recursive "${NAME}" \
       >>${OUT1:?} 2>>${OUT2:?} || { error "${EC15:?}"; return 1; }
   
   fi
     
-  cdfolder "${ROOTDIR:?}" || { unset_all; return 1; }
+  cdfolder "${ROOTDIR:?}" || return 1;
 }
 
 gitact1() { 
@@ -78,8 +77,7 @@ gitact1() {
   local PACKDIR="${ROOTDIR:?}/projects/${NAME}"
   local URL="${2:?}"
   local TAG="${3:?}"
-  
-  cdfolder "${PROJECT:?}" || { unset_all; return 1; }
+  cdfolder "${PROJECT:?}" || return 1;
   
   # ---------------------------------------------------------------------------
   # In case this script runs twice --------------------------------------------
@@ -89,10 +87,8 @@ gitact1() {
   fi
 
   if [ ! -d "${PACKDIR:?}" ]; then
-  
     "${GIT:?}" clone "${URL}" "${NAME}" --branch "${TAG}" --single-branch \
       >>${OUT1:?} 2>>${OUT2:?} || { error "${EC15:?}"; return 1; }
-  
   fi
     
   cdfolder "${ROOTDIR:?}" || { unset_all; return 1; }
@@ -100,21 +96,36 @@ gitact1() {
 
 gitact2() {  
   local PACKDIR="${ROOTDIR:?}/projects/${1:?}"
-  local TAG="${2}"
-
+  local COMMIT="${2}"
+  local ARGS="--all --tags --prune"
+  
   if [ -d "${PACKDIR:?}" ]; then
     cdfolder "${PACKDIR:?}" || { unset_all; return 1; }
-
+    
+    # unshallow the repo if necessary before check out a specific commit/tag
     if [ "$("${GIT:?}" rev-parse --is-shallow-repository)" = "true" ]; then
-      "${GIT:?}" fetch --unshallow --all --tags --prune \
-        >>${OUT1:?} 2>>${OUT2:?} || { error "${EC16:?}"; return 1; }
-    else
-      "${GIT:?}" fetch --all --tags --prune \
-        >>${OUT1:?} 2>>${OUT2:?} || { error "${EC16:?}"; return 1; }
+      ARGS="--unshallow ${ARGS}"
     fi
-
-    "${GIT:?}" checkout "${TAG:?}" \
+    "${GIT:?}" fetch ${ARGS:?} \
       >>${OUT1:?} 2>>${OUT2:?} || { error "${EC16:?}"; return 1; }
+
+    # in case it this script runs twice:
+    # check if the current commit = wanted commit
+    local CURRENT=$("${GIT:?}" rev-parse HEAD 2>/dev/null)
+    local TARGET=$("${GIT:?}" rev-parse "${COMMIT}" 2>/dev/null)
+    if [ "${CURRENT}" != "${TARGET}" ]; then
+      # first check unstagged, second check staged but uncommitted work
+      # only checkout on a second run if there isn't uncommitted work
+      if "${GIT:?}" diff --quiet HEAD 2>/dev/null && \
+         "${GIT:?}" diff --cached --quiet HEAD 2>/dev/null; then
+        "${GIT:?}" checkout "${COMMIT}" \
+          >>${OUT1:?} 2>>${OUT2:?} || { error "${EC16:?}"; return 1; }
+      else
+        local tmp="skipping checkout: uncommitted changes in ${PACKDIR}"
+        warning_script_msg "$(basename "${BASH_SOURCE[0]}")" "${tmp:?}"
+      fi
+    fi
+  
   fi
     
   cdfolder "${ROOTDIR}" || { unset_all; return 1; }
@@ -123,27 +134,40 @@ gitact2() {
 gitact3() {  
   local PACKDIR="${ROOTDIR:?}/projects/${1:?}"
   local TAG="${2}"
+  local ARGS="--all --tags --prune"
 
   if [ -d "${PACKDIR:?}" ]; then
     cdfolder "${PACKDIR:?}" || { unset_all; return 1; }
-    
-    if [ "$("${GIT:?}" rev-parse --is-shallow-repository)" = "true" ]; then
-      "${GIT:?}" fetch --unshallow --all --tags --prune \
-        >>${OUT1:?} 2>>${OUT2:?} || { error "${EC16:?}"; return 1; }
-    else
-   
-      "${GIT:?}" fetch --all --tags --prune \
-        >>${OUT1:?} 2>>${OUT2:?} || { error "${EC16:?}"; return 1; }
-    fi
-    
-    if "${GIT:?}" show-ref --verify --quiet "refs/heads/${TAG:?}"; then
-      "${GIT:?}" checkout "${TAG:?}" \
-        >>${OUT1:?} 2>>${OUT2:?} || { error "${EC16:?}"; return 1; }
-    else
-      "${GIT:?}" checkout "tags/${TAG:?}" -b "${TAG:?}" \
-        >>${OUT1:?} 2>>${OUT2:?} || { error "${EC16:?}"; return 1; }
-    fi
 
+    # unshallow the repo if necessary before check out a specific commit/tag
+    if [ "$("${GIT:?}" rev-parse --is-shallow-repository)" = "true" ]; then
+      ARGS="--unshallow ${ARGS}"
+    fi
+    "${GIT:?}" fetch ${ARGS:?} \
+      >>${OUT1:?} 2>>${OUT2:?} || { error "${EC16:?}"; return 1; }
+    
+    if "${GIT:?}" show-ref --verify --quiet "refs/heads/${TAG:?}TMP"; then
+      # in case it this script runs twice (CB = CURRENT BRANCH)
+      # check if the branch = tag name. 
+      # why this works? --branch creates a local branch with the TAG name
+      local CB=$("${GIT:?}" rev-parse --abbrev-ref HEAD 2>/dev/null)
+      CB="${CB##*/}"
+      if [ "${CB}" != "${TAG}TMP" ]; then
+        # first check unstagged, second check staged but uncommitted work
+        # only checkout on a second run if there isn't uncommitted work
+        if "${GIT:?}" diff --quiet HEAD 2>/dev/null && \
+           "${GIT:?}" diff --cached --quiet HEAD 2>/dev/null; then
+          "${GIT:?}" checkout "${TAG:?}TMP" \
+              >>${OUT1:?} 2>>${OUT2:?} || { error "${EC16:?}"; return 1; }
+        else
+          local tmp="skipping checkout: uncommitted changes in ${PACKDIR}"
+          warning_script_msg "$(basename "${BASH_SOURCE[0]}")" "${tmp:?}"
+        fi
+      fi
+    else
+      "${GIT:?}" checkout "tags/${TAG:?}" -b "${TAG:?}TMP" \
+        >>${OUT1:?} 2>>${OUT2:?} || { error "${EC16:?}"; return 1; }
+    fi
   fi
     
   cdfolder "${ROOTDIR}" || { unset_all; return 1; }
@@ -160,6 +184,7 @@ unset_env_vars || return 1
 # -------------------------------- AXIONS -----------------------------------
 # ----------------------------------------------------------------------------
 if [ -n "${INSTALL_AXIONS_2025_PROJECT:-}" ]; then 
+
   # Name to be printed on this shell script messages
   PRINTNAME="AXIONS PROJECT"
 
@@ -170,20 +195,70 @@ if [ -n "${INSTALL_AXIONS_2025_PROJECT:-}" ]; then
   URL="${AXIONS_2025_PROJECT_URL:?}"
 
   if [ -n "${AXIONS_2025_PROJECT_GIT_COMMIT:-}" ]; then
+
     gitact0 "${FOLDER:?}" "${URL:?}" || { unset_all; return 1; }
-    gitact2 "${FOLDER:?}" "${AXIONS_2025_PROJECT_GIT_COMMIT:?}"  || { unset_all; return 1; }
+    
+    gitact2 "${FOLDER:?}" "${AXIONS_2025_PROJECT_GIT_COMMIT:?}" || { unset_all; return 1; }
+  
   elif [ -n "${AXIONS_2025_PROJECT_GIT_BRANCH:-}" ]; then 
+  
     gitact1 "${FOLDER:?}" "${URL:?}" "${AXIONS_2025_PROJECT_GIT_BRANCH:?}" || { unset_all; return 1; }
+  
   elif [ -n "${AXIONS_2025_PROJECT_GIT_TAG:-}" ]; then 
+  
     gitact0 "${FOLDER:?}" "${URL:?}" || { unset_all; return 1; }
+    
     gitact3 "${FOLDER:?}" "${AXIONS_2025_PROJECT_GIT_TAG:?}" || { unset_all; return 1; }
+  
   else
+  
     gitact0 "${FOLDER:?}" "${URL:?}" || { unset_all; return 1; }
   fi
 
   pbottom "GETTING ${PRINTNAME:?}" || { unset_all; return 1; }
+
 fi
 
+# ----------------------------------------------------------------------------
+# -------------------------------- INFPC -------------------------------------
+# ----------------------------------------------------------------------------
+
+if [ -n "${INSTALL_PRIVATE_INFPC_PROJECT:-}" ]; then 
+ 
+  # Name to be printed on this shell script messages
+  PRINTNAME="INFPC PROJECT"
+
+  ptop "GETTING ${PRINTNAME:?}" || { unset_all; return 1; }
+
+  FOLDER="${INFPC_PROJECT_NAME:-"InPCReiPC"}"
+
+  URL="${INFPC_PROJECT_URL:-"git@github.com:SBU-COSMOLIKE/InPCReiPCNewCAMB.git"}"
+
+  if [ -n "${INFPC_PROJECT_GIT_COMMIT:-}" ]; then
+
+    gitact0 "${FOLDER:?}" "${URL:?}" || { unset_all; return 1; }
+
+    gitact2 "${FOLDER:?}" "${INFPC_PROJECT_GIT_COMMIT:?}"  || { unset_all; return 1; }
+
+  elif [ -n "${INFPC_PROJECT_GIT_BRANCH:-}" ]; then 
+
+    gitact1 "${FOLDER:?}" "${URL:?}" "${INFPC_PROJECT_GIT_BRANCH:?}" || { unset_all; return 1; }
+
+  elif [ -n "${INFPC_PROJECT_GIT_TAG:-}" ]; then 
+
+    gitact0 "${FOLDER:?}" "${URL:?}" || { unset_all; return 1; }
+
+    gitact3 "${FOLDER:?}" "${INFPC_PROJECT_GIT_TAG:?}" || { unset_all; return 1; }
+
+  else
+
+    gitact0 "${FOLDER:?}" "${URL:?}" || { unset_all; return 1; }
+
+  fi
+
+  pbottom "GETTING ${PRINTNAME:?}" || { unset_all; return 1; }
+
+fi
 #-------------------------------------------------------------------------------
 #-------------------------------------------------------------------------------
 #-------------------------------------------------------------------------------
@@ -202,13 +277,21 @@ if [ -n "${INSTALL_AXIE_CAMB_2026_PROJECT:-}" ]; then
     gitact0 "${FOLDER:?}" "${URL:?}" || { unset_all; return 1; }
 
     gitact2 "${FOLDER:?}" "${AXIE_CAMB_2026_PROJECT_GIT_COMMIT:?}"  || { unset_all; return 1; }
+  
   elif [ -n "${AXIE_CAMB_2026_PROJECT_GIT_BRANCH:-}" ]; then 
+  
     gitact1 "${FOLDER:?}" "${URL:?}" "${AXIE_CAMB_2026_PROJECT_GIT_BRANCH:?}" || { unset_all; return 1; }
+  
   elif [ -n "${AXIE_CAMB_2026_PROJECT_GIT_TAG:-}" ]; then 
+  
     gitact0 "${FOLDER:?}" "${URL:?}" || { unset_all; return 1; }
+  
     gitact3 "${FOLDER:?}" "${AXIE_CAMB_2026_PROJECT_GIT_TAG:?}" || { unset_all; return 1; }
+  
   else
+  
     gitact0 "${FOLDER:?}" "${URL:?}" || { unset_all; return 1; }
+  
   fi
 
   pbottom "GETTING ${PRINTNAME:?}" || { unset_all; return 1; }

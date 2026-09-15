@@ -35,8 +35,10 @@ else
   export OMP_NUM_THREADS=1
 fi
 
-mpirun -n ${SLURM_NTASKS} --oversubscribe --mca pml ^ucx  \
-  --mca btl vader,tcp,self --bind-to core:overload-allowed \
+mpirun -n ${SLURM_NTASKS} --oversubscribe \
+  --mca pml ob1 --mca btl vader,tcp,self \
+  --bind-to core:overload-allowed \
+  --mca btl_tcp_if_exclude lo,docker0,virbr0,ib0 \
   --rank-by slot --map-by numa:pe=${OMP_NUM_THREADS}  \
   python ./projects/example/EXAMPLE_MINIMIZE1.py --nstw 150 \
     --root ./projects/example/ --outroot "example_lcdm_camb_min1"

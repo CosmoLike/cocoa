@@ -43,7 +43,8 @@ else
   export OMP_NUM_THREADS=1
 fi
 
-mpirun -n ${SLURM_NTASKS} --oversubscribe --mca pml ^ucx --mca btl vader,tcp,self \
+mpirun -n ${SLURM_NTASKS} --oversubscribe \
+  --mca pml ob1 --mca btl vader,tcp,self \
   --bind-to core:overload-allowed --mca mpi_yield_when_idle 1 \
   --rank-by slot --map-by numa:pe=${OMP_NUM_THREADS} \
   cobaya-run ./projects/example/EXAMPLE_MCMC${SLURM_ARRAY_TASK_ID}.yaml -r

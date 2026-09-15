@@ -62,7 +62,8 @@ declare -a YAML=( "EXAMPLE_EMUL_MCMC1.yaml"
                   "UNION3/EXAMPLE_EMUL_MCMC2.yaml" 
                   "UNION3/EXAMPLE_EMUL_MCMC3.yaml" )
 
-mpirun -n ${SLURM_NTASKS} --oversubscribe --mca pml ^ucx --mca btl vader,tcp,self \
+mpirun -n ${SLURM_NTASKS} --oversubscribe \
+  --mca pml ob1 --mca btl vader,tcp,self \
   --bind-to core:overload-allowed --rank-by slot \
   --map-by slot:pe=${OMP_NUM_THREADS} --mca mpi_yield_when_idle 1 \
   cobaya-run ./projects/example/EXAMPLE_EMUL_MCMC_TENSION_METRICS/${YAML[${SLURM_ARRAY_TASK_ID}]} -f

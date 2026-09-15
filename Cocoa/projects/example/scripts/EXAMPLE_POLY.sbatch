@@ -37,7 +37,9 @@ else
 fi
 
 ulimit -u 2000000 # require line when nmpi is high
-mpirun -n ${SLURM_NTASKS} --oversubscribe --mca pml ^ucx --mca btl vader,tcp,self \
+mpirun -n ${SLURM_NTASKS} --oversubscribe \
+  --mca pml ob1 --mca btl vader,tcp,self \
+  --mca btl_tcp_if_exclude lo,docker0,virbr0,ib0 \
   --bind-to core:overload-allowed --mca mpi_yield_when_idle 1 \
   --rank-by slot --map-by numa:pe=${OMP_NUM_THREADS} \
   cobaya-run ./projects/example/EXAMPLE_POLY${SLURM_ARRAY_TASK_ID}.yaml -r

@@ -144,12 +144,10 @@ fi
 # ----------------------------------------------------------------------------
 if [[ -z "${IGNORE_COSMOPOWER_CODE}" ]]; then
   COBTH="${ROOTDIR:?}/cobaya/cobaya/theories"
-
   TMP="cosmopower"
   if [[ -L "${COBTH:?}/${TMP:?}" ]]; then
     rm -f "${COBTH:?}/${TMP:?}"
   fi
-
   unset -v COBTH TMP
 fi
 
@@ -158,7 +156,6 @@ fi
 # ----------------------------------------------------------------------------
 if [[ -z "${IGNORE_EMULTRF_CODE}" ]]; then
   COBTH="${ROOTDIR:?}/cobaya/cobaya/theories"
-
   for TMP in \
     "emulcmb" \
     "emulbaosn" \
@@ -173,7 +170,6 @@ if [[ -z "${IGNORE_EMULTRF_CODE}" ]]; then
       rm -f "${COBTH:?}/${TMP:?}"
     fi
   done
-
   unset -v COBTH TMP
 fi
 
@@ -182,13 +178,11 @@ fi
 # ----------------------------------------------------------------------------
 if [[ -z "${IGNORE_FASTPT_CODE}" ]]; then
   COBTH="${ROOTDIR:?}/cobaya/cobaya/theories"
-  TMP="${FASTPT_WRAPPER_NAME:-"PyFAST-PT"}"
-
-  TMP2="fastpt"
-  if [[ -L "${COBTH:?}/${TMP2}" ]]; then
-    rm -f "${COBTH:?}/${TMP2:?}"
+  TMP="fastpt"
+  if [[ -L "${COBTH:?}/${TMP}" ]]; then
+    rm -f "${COBTH:?}/${TMP:?}"
   fi
-  unset -v COBTH TMP TMP2
+  unset -v COBTH TMP
 fi
 
 # ----------------------------------------------------------------------------
