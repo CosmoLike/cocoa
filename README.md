@@ -256,7 +256,8 @@ Users will see a terminal like this: `$(cocoa)(.local)`. *This is a feature, not
 
   - Linux
   
-        "${CONDA_PREFIX}"/bin/mpirun -n 1 --oversubscribe --mca pml ob1 --mca btl vader,tcp,self \
+        "${CONDA_PREFIX}"/bin/mpirun -n 1 --oversubscribe \
+          --mca pml ob1 --mca btl vader,tcp,self \
           --bind-to core:overload-allowed --report-bindings \
           --rank-by slot --map-by numa:pe=${OMP_NUM_THREADS} \
           cobaya-run ./projects/example/EXAMPLE_EVALUATE1.yaml -f
@@ -270,7 +271,8 @@ Users will see a terminal like this: `$(cocoa)(.local)`. *This is a feature, not
 
   - Linux
   
-        "${CONDA_PREFIX}"/bin/mpirun -n 4 --oversubscribe --mca pml ob1 --mca btl vader,tcp,self \
+        "${CONDA_PREFIX}"/bin/mpirun -n 4 --oversubscribe \
+          --mca pml ob1 --mca btl vader,tcp,self \
           --bind-to core:overload-allowed --report-bindings \
           --rank-by slot --map-by numa:pe=${OMP_NUM_THREADS} \
           cobaya-run ./projects/example/EXAMPLE_MCMC1.yaml -f
@@ -290,7 +292,8 @@ Cocoa provides several Cosmolike projects, not all of which are installed by def
 
   - Linux
 
-        "${CONDA_PREFIX}"/bin/mpirun -n 1 --oversubscribe --mca pml ob1 --mca btl vader,tcp,self \
+        "${CONDA_PREFIX}"/bin/mpirun -n 1 --oversubscribe \
+          --mca pml ob1 --mca btl vader,tcp,self \
           --bind-to core:overload-allowed --report-bindings \
           --rank-by slot --map-by numa:pe=${OMP_NUM_THREADS} \
           cobaya-run ./projects/lsst_y1/EXAMPLE_EVALUATE1.yaml -f
@@ -304,7 +307,8 @@ Cocoa provides several Cosmolike projects, not all of which are installed by def
 
   - Linux
     
-        "${CONDA_PREFIX}"/bin/mpirun -n 4 --oversubscribe --mca pml ob1 --mca btl vader,tcp,self \
+        "${CONDA_PREFIX}"/bin/mpirun -n 4 --oversubscribe \
+          --mca pml ob1 --mca btl vader,tcp,self \
           --bind-to core:overload-allowed --report-bindings \
           --rank-by slot --map-by numa:pe=${OMP_NUM_THREADS} \
           cobaya-run ./projects/lsst_y1/EXAMPLE_MCMC1.yaml -f
@@ -371,7 +375,8 @@ Now, users must follow all the steps below.
 
   - Linux
 
-        "${CONDA_PREFIX}"/bin/mpirun -n 1 --oversubscribe --mca pml ob1 --mca btl vader,tcp,self \
+        "${CONDA_PREFIX}"/bin/mpirun -n 1 --oversubscribe \
+          --mca pml ob1 --mca btl vader,tcp,self \
           --bind-to core:overload-allowed --report-bindings \
           --rank-by slot --map-by slot \
           cobaya-run ./projects/example/EXAMPLE_EMUL_EVALUATE1.yaml -f
@@ -385,7 +390,8 @@ Now, users must follow all the steps below.
 
   - Linux
 
-        "${CONDA_PREFIX}"/bin/mpirun -n 4 --oversubscribe --mca pml ob1 --mca btl vader,tcp,self \
+        "${CONDA_PREFIX}"/bin/mpirun -n 4 --oversubscribe \
+          --mca pml ob1 --mca btl vader,tcp,self \
           --bind-to core:overload-allowed --report-bindings \
           --rank-by slot --map-by slot \
           cobaya-run ./projects/example/EXAMPLE_EMUL_MCMC1.yaml -r
@@ -404,7 +410,8 @@ Now, users must follow all the steps below.
 
   - Linux
 
-        "${CONDA_PREFIX}"/bin/mpirun -n 90 --oversubscribe --mca pml ob1 --mca btl vader,tcp,self \
+        "${CONDA_PREFIX}"/bin/mpirun -n 90 --oversubscribe \
+          --mca pml ob1 --mca btl vader,tcp,self \
           -x PATH -x LD_LIBRARY_PATH -x PYTHONPATH -x CONDA_PREFIX -x ROOTDIR \
           -x OMP_NUM_THREADS -x OMP_PROC_BIND -x OMP_PLACES -x OMP_DYNAMIC \
           -x OPENBLAS_NUM_THREADS -x MKL_NUM_THREADS -x CLIK_PATH -x CLIK_DATA \
@@ -453,7 +460,8 @@ likelihoods, and the theory code, all following Cobaya Conventions.
 
   - Linux
 
-        "${CONDA_PREFIX}"/bin/mpirun -n 90 --oversubscribe --mca pml ob1 --mca btl vader,tcp,self \
+        "${CONDA_PREFIX}"/bin/mpirun -n 90 --oversubscribe \
+          --mca pml ob1 --mca btl vader,tcp,self \
           -x PATH -x LD_LIBRARY_PATH -x PYTHONPATH -x CONDA_PREFIX -x ROOTDIR \
           -x OMP_NUM_THREADS -x OMP_PROC_BIND -x OMP_PLACES -x OMP_DYNAMIC \
           -x OPENBLAS_NUM_THREADS -x MKL_NUM_THREADS -x CLIK_PATH -x CLIK_DATA \
@@ -479,7 +487,8 @@ likelihoods, and the theory code, all following Cobaya Conventions.
 
   - Linux
     
-        "${CONDA_PREFIX}"/bin/mpirun -n 21 --oversubscribe --mca pml ob1 --mca btl vader,tcp,self \
+        "${CONDA_PREFIX}"/bin/mpirun -n 21 --oversubscribe \
+          --mca pml ob1 --mca btl vader,tcp,self \
           -x PATH -x LD_LIBRARY_PATH -x PYTHONPATH -x CONDA_PREFIX -x ROOTDIR \
           -x OMP_NUM_THREADS -x OMP_PROC_BIND -x OMP_PLACES -x OMP_DYNAMIC \
           -x OPENBLAS_NUM_THREADS -x MKL_NUM_THREADS -x CLIK_PATH -x CLIK_DATA \
@@ -527,7 +536,8 @@ likelihoods, and the theory code, all following Cobaya Conventions.
 
     - Linux
 
-          "${CONDA_PREFIX}"/bin/mpirun -n 21 --oversubscribe --mca pml ob1 --mca btl vader,tcp,self \
+          "${CONDA_PREFIX}"/bin/mpirun -n 21 --oversubscribe \
+            --mca pml ob1 --mca btl vader,tcp,self \
             -x PATH -x LD_LIBRARY_PATH -x PYTHONPATH -x CONDA_PREFIX -x ROOTDIR \
             -x OMP_NUM_THREADS -x OMP_PROC_BIND -x OMP_PLACES -x OMP_DYNAMIC \
             -x OPENBLAS_NUM_THREADS -x MKL_NUM_THREADS -x CLIK_PATH -x CLIK_DATA \
@@ -571,7 +581,8 @@ likelihoods, and the theory code, all following Cobaya Conventions.
 
   - Linux
 
-        "${CONDA_PREFIX}"/bin/mpirun -n 21 --oversubscribe --mca pml ob1 --mca btl vader,tcp,self \
+        "${CONDA_PREFIX}"/bin/mpirun -n 21 --oversubscribe \
+          --mca pml ob1 --mca btl vader,tcp,self \
           -x PATH -x LD_LIBRARY_PATH -x PYTHONPATH -x CONDA_PREFIX -x ROOTDIR \
           -x OMP_NUM_THREADS -x OMP_PROC_BIND -x OMP_PLACES -x OMP_DYNAMIC \
           -x OPENBLAS_NUM_THREADS -x MKL_NUM_THREADS -x CLIK_PATH -x CLIK_DATA \
@@ -621,7 +632,8 @@ likelihoods, and the theory code, all following Cobaya Conventions.
 
     - Linux
 
-          "${CONDA_PREFIX}"/bin/mpirun -n 1 --mca pml ob1 --mca btl vader,tcp,self \
+          "${CONDA_PREFIX}"/bin/mpirun -n 1 \
+            --mca pml ob1 --mca btl vader,tcp,self \
             -x PATH -x LD_LIBRARY_PATH -x PYTHONPATH -x CONDA_PREFIX -x ROOTDIR \
             -x OMP_NUM_THREADS -x OMP_PROC_BIND -x OMP_PLACES -x OMP_DYNAMIC \
             -x OPENBLAS_NUM_THREADS -x MKL_NUM_THREADS -x CLIK_PATH -x CLIK_DATA \
@@ -655,7 +667,8 @@ likelihoods, and the theory code, all following Cobaya Conventions.
 
     - Linux
       
-          "${CONDA_PREFIX}"/bin/mpirun -n 90 --oversubscribe --mca pml ob1 --mca btl vader,tcp,self \
+          "${CONDA_PREFIX}"/bin/mpirun -n 90 --oversubscribe \
+            --mca pml ob1 --mca btl vader,tcp,self \
             -x PATH -x LD_LIBRARY_PATH -x PYTHONPATH -x CONDA_PREFIX -x ROOTDIR \
             -x OMP_NUM_THREADS -x OMP_PROC_BIND -x OMP_PLACES -x OMP_DYNAMIC \
             -x OPENBLAS_NUM_THREADS -x MKL_NUM_THREADS -x CLIK_PATH -x CLIK_DATA \
@@ -747,7 +760,8 @@ Now, users must follow all the steps below.
 
   - Linux
 
-        "${CONDA_PREFIX}"/bin/mpirun -n 1 --oversubscribe --mca pml ob1 --mca btl vader,tcp,self \
+        "${CONDA_PREFIX}"/bin/mpirun -n 1 --oversubscribe \
+          --mca pml ob1 --mca btl vader,tcp,self \
            --bind-to core:overload-allowed --report-bindings \
            --rank-by slot --map-by numa:pe=${OMP_NUM_THREADS} \
            cobaya-run ./projects/lsst_y1/EXAMPLE_EMUL2_EVALUATE1.yaml -f
@@ -761,7 +775,8 @@ Now, users must follow all the steps below.
 
   - Linux
 
-        "${CONDA_PREFIX}"/bin/mpirun -n 4 --oversubscribe --mca pml ob1 --mca btl vader,tcp,self \
+        "${CONDA_PREFIX}"/bin/mpirun -n 4 --oversubscribe \
+          --mca pml ob1 --mca btl vader,tcp,self \
           --bind-to core:overload-allowed --report-bindings \
           --rank-by slot --map-by numa:pe=${OMP_NUM_THREADS} \
           cobaya-run ./projects/lsst_y1/EXAMPLE_EMUL2_MCMC1.yaml -r
