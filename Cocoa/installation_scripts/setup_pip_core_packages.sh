@@ -196,7 +196,6 @@ if [ -z "${IGNORE_EMULATOR_GPU_PIP_PACKAGES:-}" ]; then
       'mkdocstrings==0.29.1'
       'pytest==8.3.5'
       'tf-keras==2.21.0'
-      'nvidia-pyindex'
       "cuda-toolkit[all]>=13.0.0"
       'jax==0.4.30'
       'jaxlib==0.4.30'
@@ -218,7 +217,6 @@ if [ -z "${IGNORE_EMULATOR_GPU_PIP_PACKAGES:-}" ]; then
       'mkdocs_material==9.6.13'
       'mkdocstrings==0.29.1'
       'pytest==8.3.5'
-      'nvidia-pyindex'
       "cuda-toolkit[all]==11.8.0"
       'jax==0.4.18'
       'jaxlib==0.4.18'

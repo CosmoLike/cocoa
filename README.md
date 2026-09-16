@@ -31,8 +31,9 @@
     2. [FAQ: Where do users find common FAQs about external modules? (external readme)](Cocoa/external_modules/code)
     3. [FAQ: Where do users find common FAQs about Cosmolike? (external readme)](Cocoa/projects/)
     4. [FAQ: Note on Planck-2018 low-ell SimAll EE and Gibbs TT likelihoods?](#planck2018lowell)
-    5. [FAQ: How can users run Cocoa on Google Colab?](#overview_google_colab)
-    6. [FAQ: How can developers improve their Bash/C/C++ knowledge?](#lectnotes)
+    5. [FAQ: How can users deal with pip getting stuck during installation (Linux): a possible cause](#pip_ngc_nvidia)
+    6. [FAQ: How can users run Cocoa on Google Colab?](#overview_google_colab)
+    7. [FAQ: How can developers improve their Bash/C/C++ knowledge?](#lectnotes)
 
 # Overview <a name="overview"></a>
 
@@ -67,7 +68,7 @@ Core packages include compilers and numerical libraries that users typically do 
 > [!Warning]
 > The version chosen here must be the same Cocoa version (git tag) cloned later in the section
 > [Installation and Compilation of external modules](#cobaya_base_code); the options below mirror
-> the versions offered there. From `v4.11.3` on, the `yml` files are named `cocoapy311-*` and
+> the versions offered there. From `v4.11.4` on, the `yml` files are named `cocoapy311-*` and
 > provide `Python-3.11`; older tags carry `cocoapy310-*` files that provide `Python-3.10`.
 
   - Linux
@@ -82,7 +83,7 @@ Core packages include compilers and numerical libraries that users typically do 
 
     - Testing beta release
 
-          wget https://raw.githubusercontent.com/CosmoLike/cocoa/refs/tags/v4.11.3/cocoapy311.yml
+          wget https://raw.githubusercontent.com/CosmoLike/cocoa/refs/tags/v4.11.4/cocoapy311.yml
 
   - macOS (arm)
     
@@ -103,7 +104,7 @@ Core packages include compilers and numerical libraries that users typically do 
 
     - Testing beta release
 
-          wget https://raw.githubusercontent.com/CosmoLike/cocoa/refs/tags/v4.11.3/cocoapy311-osxarm-base.yml
+          wget https://raw.githubusercontent.com/CosmoLike/cocoa/refs/tags/v4.11.4/cocoapy311-osxarm-base.yml
 
 **Step :two:**: Create the Cocoa environment (if the Legacy or Stable version was chosen in the previous step, replace `cocoapy311` with `cocoapy310` below),
 
@@ -154,6 +155,11 @@ Users can now proceed to the **next section**.
 >      conda activate cocoa
 
 > [!TIP]
+> If the `Installing pip dependencies` step seems stuck, the machine's pip may be configured
+> with a dead package index. See the appendix
+> [FAQ: How can users deal with pip getting stuck during installation (Linux): a possible cause](#pip_ngc_nvidia).
+
+> [!TIP]
 > During the Arizona Winter School (January 2026), we noted that some students with macOS struggled to get the conda to work (conflicts). 
 > If this is the case for you, try the steps in the appendix [FAQ: How can users deal with Conda conflicts (MacOS): a possible solution](#macos_solve_conda_conficts)
 
@@ -173,7 +179,7 @@ In this section, we assume users have previously activated the Cocoa conda envir
 
   - Testing beta release
   
-        git clone https://github.com/CosmoLike/cocoa.git --branch v4.11.3 cocoa
+        git clone https://github.com/CosmoLike/cocoa.git --branch v4.11.4 cocoa
 
 > [!Warning]
 > The version cloned here must match the version of the `yml` file downloaded in the section
@@ -918,15 +924,15 @@ and
  
      conda activate lockenv
 
-**Step :two:** Download the appropriate conda-lock compatible `yml` file. As in the section [Installation of core packages](#required_packages_conda), replace the tag `v4.11.3` in the URL with the Cocoa version that will be cloned (tags older than `v4.11.3` carry the `cocoapy310` prefix).
+**Step :two:** Download the appropriate conda-lock compatible `yml` file. As in the section [Installation of core packages](#required_packages_conda), replace the tag `v4.11.4` in the URL with the Cocoa version that will be cloned (tags older than `v4.11.4` carry the `cocoapy310` prefix).
 
    - Linux
   
-         wget https://raw.githubusercontent.com/CosmoLike/cocoa/refs/tags/v4.11.3/cocoapy311-linux.yml
+         wget https://raw.githubusercontent.com/CosmoLike/cocoa/refs/tags/v4.11.4/cocoapy311-linux.yml
 
    - macOS (arm)
      
-         wget https://raw.githubusercontent.com/CosmoLike/cocoa/refs/tags/v4.11.3/cocoapy311-osxarm.yml
+         wget https://raw.githubusercontent.com/CosmoLike/cocoa/refs/tags/v4.11.4/cocoapy311-osxarm.yml
 
 **Step :three:** Create the conda environment
 
@@ -954,13 +960,13 @@ and
 
      conda activate base2
 
-**Step :two:** Now install wget and download a looser version of the yml file (note here slightly modified conda command). As in the section [Installation of core packages](#required_packages_conda), replace the tag `v4.11.3` in the URL with the Cocoa version that will be cloned (tags older than `v4.11.3` carry the `cocoapy310` prefix).
+**Step :two:** Now install wget and download a looser version of the yml file (note here slightly modified conda command). As in the section [Installation of core packages](#required_packages_conda), replace the tag `v4.11.4` in the URL with the Cocoa version that will be cloned (tags older than `v4.11.4` carry the `cocoapy310` prefix).
 
      conda install -y wget --solver=libmamba --strict-channel-priority --override-channels -c conda-forge
 
 and
 
-     wget https://raw.githubusercontent.com/CosmoLike/cocoa/refs/tags/v4.11.3/cocoapy311-osxarm-loose.yml
+     wget https://raw.githubusercontent.com/CosmoLike/cocoa/refs/tags/v4.11.4/cocoapy311-osxarm-loose.yml
 
 **Step :three:** Create the cocoa conda env using a looser yml (note here slightly modified conda command)
 
@@ -1300,6 +1306,20 @@ to call the original Planck-2018 Clik likelihoods, as shown below.
 <img width="1236" height="514" alt="Screenshot 2025-10-20 at 8 39 04 PM" src="https://github.com/user-attachments/assets/22b21a5d-c716-45dc-949c-59f31be91def" />
 
 This ensures backward consistency in our code, as `TT.py` and `EE.py` used to point to Planck-2018 Clik before Cobaya's authors moved them to `EE_clik.py` and `TT_clik.py`. 
+
+## :interrobang: FAQ: How can users deal with pip getting stuck during installation (Linux): a possible cause <a name="pip_ngc_nvidia"></a>
+
+When creating the Cocoa conda environment, the `Installing pip dependencies` step may seem stuck (plain conda hides pip's output behind a spinner) or, under mamba, may show repeated `Failed to establish a new connection` warnings. One possible cause: the machine's pip is configured with NVIDIA's retired `pypi.ngc.nvidia.com` index. The `nvidia-pyindex` package plants this index in pip configuration files, and pip then wastes five connection retries per package on the dead host before falling back to PyPI. Diagnose with
+
+    python3 -m pip config list -v
+
+and remove the `extra-index-url`/`trusted-host` entries pointing to `pypi.ngc.nvidia.com` from the configuration files it lists, e.g.,
+
+    sed -i '/extra-index-url/,+1d; /trusted-host/,+1d' ~/.pip/pip.conf ~/.config/pip/pip.conf
+
+Before `v4.11.4`, Cocoa's own machine-learning GPU setup (`setup_pip_core_packages.sh`) installed `nvidia-pyindex` (back then, the NGC index hosted the `cuda-toolkit` pip wheels; today they live on PyPI itself), so machines that ran older Cocoa installations likely carry this configuration. Also check for site-level `pip.conf` files inside old Cocoa installs (`<old cocoa>/Cocoa/.local/pip.conf`), which take priority whenever that `(.local)` environment is active. If the interrupted installation already finished its conda stage, rerun only the pip stage with
+
+    conda env update --name cocoa --file=cocoapy311.yml
 
 ## :interrobang: FAQ: How can users run Cocoa on Google Colab? <a name="overview_google_colab"></a>
 
