@@ -147,17 +147,16 @@ Users can now proceed to the **next section**.
 > for instructions on how to install `Miniforge`, which is a  minimal installer of conda that downloads default packages from the `conda-forge` community-driven channel.
 
 > [!TIP]
-> If conda create hangs or fails, install mamba (faster and more robust dependency solver) and retry with (e.g., Linux version)
+> If conda create hangs or fails, there are two possible solutions.
 >
->      conda activate base
->      conda install -n base -c conda-forge mamba
->      mamba env create --name cocoa --file=cocoapy311.yml
->      conda activate cocoa
-
-> [!TIP]
-> If the `Installing pip dependencies` step seems stuck, the machine's pip may be configured
-> with a dead package index. See the appendix
-> [FAQ: How can users deal with pip getting stuck during installation (Linux): a possible cause](#pip_ngc_nvidia).
+> 1. Install mamba (faster and more robust dependency solver) and retry with (e.g., Linux version)
+>
+>        conda activate base
+>        conda install -n base -c conda-forge mamba
+>        mamba env create --name cocoa --file=cocoapy311.yml
+>        conda activate cocoa
+>
+> 2. If the hang happens at the `Installing pip dependencies` step, the machine's pip may be configured with a dead package index. See the appendix [FAQ: How can users deal with pip getting stuck during installation (Linux): a possible cause](#pip_ngc_nvidia).
 
 > [!TIP]
 > During the Arizona Winter School (January 2026), we noted that some students with macOS struggled to get the conda to work (conflicts). 
