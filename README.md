@@ -81,7 +81,7 @@ Core packages include compilers and numerical libraries that users typically do 
 
     - Testing beta release
 
-          wget https://raw.githubusercontent.com/CosmoLike/cocoa/refs/tags/v4.11.2/cocoapy310.yml
+          wget https://raw.githubusercontent.com/CosmoLike/cocoa/refs/tags/v4.11.3/cocoapy310.yml
 
   - macOS (arm)
     
@@ -102,7 +102,7 @@ Core packages include compilers and numerical libraries that users typically do 
 
     - Testing beta release
 
-          wget https://raw.githubusercontent.com/CosmoLike/cocoa/refs/tags/v4.11.2/cocoapy310-osxarm-base.yml
+          wget https://raw.githubusercontent.com/CosmoLike/cocoa/refs/tags/v4.11.3/cocoapy310-osxarm-base.yml
 
 **Step :two:**: Create the Cocoa environment,
 
