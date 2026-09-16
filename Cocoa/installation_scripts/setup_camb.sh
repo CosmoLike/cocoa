@@ -85,7 +85,15 @@ if [ -z "${IGNORE_CAMB_CODE}" ]; then
       "${GIT:?}" checkout "${CAMB_GIT_COMMIT:?}" \
       >>${OUT1:?} 2>>${OUT2:?} || { error "${EC16:?}"; return 1; }
     fi
-    
+
+    # From Diogo's Patch
+    # Match submodules to the selected CAMB revision before applying patches
+    "${GIT:?}" submodule sync --recursive \
+      >>${OUT1:?} 2>>${OUT2:?} || { error "${EC16:?}"; return 1; }
+
+    "${GIT:?}" submodule update --init --recursive \
+      >>${OUT1:?} 2>>${OUT2:?} || { error "${EC16:?}"; return 1; } 
+ 
     # --------------------------------------------------------------------------
     # We patch the files below so they use the right compilers -----------------
     # --------------------------------------------------------------------------
