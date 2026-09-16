@@ -462,30 +462,17 @@ Now, users must follow all the steps below.
     
 > [!NOTE]
 > **Running on more than one node.** The flag `--mca btl vader,tcp,self` works unchanged across
-> nodes: Open MPI picks the transport per pair of ranks, using shared memory (`vader`) within a
-> node and TCP between nodes. Three things deserve attention on multi-node runs:
+> nodes (shared memory within a node, TCP between nodes). The commands that can run on more
+> than one node already include the flags below.
 >
-> 1. **Network interface.** The TCP layer must not select an interface that is not routable
->    between compute nodes. The flag `--mca btl_tcp_if_exclude lo,docker0,virbr0,ib0` excludes
->    the common offenders. TCP bandwidth is not a limitation for our workloads, which exchange
->    small, infrequent MPI messages.
->
-> 2. **Environment.** Ranks on remote nodes must see Cocoa's environment (`ROOTDIR`, `PATH`,
->    `LD_LIBRARY_PATH`, `PYTHONPATH`, `CONDA_PREFIX`, the OpenMP/BLAS thread settings, and
->    `CLIK_PATH`/`CLIK_DATA`/`CLIK_PLUGIN`). Slurm forwards the submitting environment
->    automatically; the explicit `-x` flags in our sbatch templates repeat this so the
->    scripts also work under ssh-based launchers. No other Cocoa installation flags are read at runtime.
->
-> 3. **Slurm geometry.** Keep `ntasks-per-node` × `cpus-per-task` no larger than the cores per
->    node, and use `--map-by numa:pe=${OMP_NUM_THREADS}` so each rank reserves the cores its
->    OpenMP threads will use.
-
-> [!NOTE]
-> **Note on core oversubscription**: an MPI process that is waiting still burns 100% of its
-> core, checking for messages in a loop. With more processes than cores, this stalls the
-> processes doing real work. Open MPI usually detects this and makes waiting processes give
-> up the CPU, but its detection can be fooled. Adding `--mca mpi_yield_when_idle 1` forces
-> that behavior; it is harmless otherwise.
+> 1. `--mca btl_tcp_if_exclude lo,docker0,virbr0,ib0`: stop TCP from selecting an interface
+>    that is not routable between compute nodes.
+> 2. `-x PATH -x LD_LIBRARY_PATH (...)`: forward Cocoa's environment to ranks on remote nodes
+>    (needed under ssh-based launchers; Slurm forwards it automatically).
+> 3. `--map-by numa:pe=${OMP_NUM_THREADS}`: reserve, on each rank, the cores its OpenMP threads
+>    will use. On Slurm, keep `ntasks-per-node` × `cpus-per-task` within the cores per node.
+> 4. `--mca mpi_yield_when_idle 1`: make waiting MPI processes give up the CPU instead of
+>    burning 100% of a core; harmless when cores are not oversubscribed.
 
 The `Nautilus`, `Minimizer`, `Profile`, and `Emcee` scripts below contain an internally defined `yaml_string` that specifies priors, 
 likelihoods, and the theory code, all following Cobaya Conventions.
