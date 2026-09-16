@@ -75,11 +75,11 @@ Core packages include compilers and numerical libraries that users typically do 
 
     - Legacy Version
 
-          wget https://raw.githubusercontent.com/CosmoLike/cocoa/refs/tags/v4.052/cocoapy310.yml
+          wget https://raw.githubusercontent.com/CosmoLike/cocoa/refs/tags/v4.053/cocoapy310.yml
 
     - Stable Version
 
-          wget https://raw.githubusercontent.com/CosmoLike/cocoa/refs/tags/v4.071/cocoapy310.yml
+          wget https://raw.githubusercontent.com/CosmoLike/cocoa/refs/tags/v4.072/cocoapy310.yml
 
     - Testing beta release
 
@@ -171,7 +171,7 @@ In this section, we assume users have previously activated the Cocoa conda envir
   
   - Legacy Version
     
-        git clone https://github.com/CosmoLike/cocoa.git --branch v4.052 cocoa
+        git clone https://github.com/CosmoLike/cocoa.git --branch v4.053 cocoa
     
   - Stable Version
     
