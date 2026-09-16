@@ -1309,15 +1309,21 @@ This ensures backward consistency in our code, as `TT.py` and `EE.py` used to po
 
 ## :interrobang: FAQ: How can users deal with pip getting stuck during installation (Linux): a possible cause <a name="pip_ngc_nvidia"></a>
 
-When creating the Cocoa conda environment, the `Installing pip dependencies` step may seem stuck (plain conda hides pip's output behind a spinner) or, under mamba, may show repeated `Failed to establish a new connection` warnings. One possible cause: the machine's pip is configured with NVIDIA's retired `pypi.ngc.nvidia.com` index. The `nvidia-pyindex` package plants this index in pip configuration files, and pip then wastes five connection retries per package on the dead host before falling back to PyPI. Diagnose with
+On some machines, the step `Installing pip dependencies` hangs (mamba shows repeated `Failed to establish a new connection` warnings). A possible cause: pip is configured with the retired NVIDIA index `pypi.ngc.nvidia.com`, planted by the `nvidia-pyindex` package (which Cocoa's machine-learning setup installed before `v4.11.4`). If that is the case, follow the steps below.
+
+**Step :one:**: Locate the pip configuration files
 
     python3 -m pip config list -v
 
-and remove the `extra-index-url`/`trusted-host` entries pointing to `pypi.ngc.nvidia.com` from the configuration files it lists, e.g.,
+**Step :two:**: Remove the `extra-index-url` and `trusted-host` entries that point to `pypi.ngc.nvidia.com`
 
     sed -i '/extra-index-url/,+1d; /trusted-host/,+1d' ~/.pip/pip.conf ~/.config/pip/pip.conf
 
-Before `v4.11.4`, Cocoa's own machine-learning GPU setup (`setup_pip_core_packages.sh`) installed `nvidia-pyindex` (back then, the NGC index hosted the `cuda-toolkit` pip wheels; today they live on PyPI itself), so machines that ran older Cocoa installations likely carry this configuration. Also check for site-level `pip.conf` files inside old Cocoa installs (`<old cocoa>/Cocoa/.local/pip.conf`), which take priority whenever that `(.local)` environment is active. If the interrupted installation already finished its conda stage, rerun only the pip stage with
+**Step :three:**: Remove the `pip.conf` files located on older Cocoa installations (they take priority whenever that `(.local)` environment is active)
+
+    rm -f <old cocoa>/Cocoa/.local/pip.conf
+
+**Step :four:**: In case the interrupted installation already finished the conda stage, rerun only the pip stage
 
     conda env update --name cocoa --file=cocoapy311.yml
 
