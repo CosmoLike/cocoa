@@ -67,7 +67,8 @@ Core packages include compilers and numerical libraries that users typically do 
 > [!Warning]
 > The version chosen here must be the same Cocoa version (git tag) cloned later in the section
 > [Installation and Compilation of external modules](#cobaya_base_code); the options below mirror
-> the versions offered there.
+> the versions offered there. From `v4.11.3` on, the `yml` files are named `cocoapy311-*` and
+> provide `Python-3.11`; older tags carry `cocoapy310-*` files that provide `Python-3.10`.
 
   - Linux
 
@@ -81,7 +82,7 @@ Core packages include compilers and numerical libraries that users typically do 
 
     - Testing beta release
 
-          wget https://raw.githubusercontent.com/CosmoLike/cocoa/refs/tags/v4.11.3/cocoapy310.yml
+          wget https://raw.githubusercontent.com/CosmoLike/cocoa/refs/tags/v4.11.3/cocoapy311.yml
 
   - macOS (arm)
     
@@ -102,17 +103,17 @@ Core packages include compilers and numerical libraries that users typically do 
 
     - Testing beta release
 
-          wget https://raw.githubusercontent.com/CosmoLike/cocoa/refs/tags/v4.11.3/cocoapy310-osxarm-base.yml
+          wget https://raw.githubusercontent.com/CosmoLike/cocoa/refs/tags/v4.11.3/cocoapy311-osxarm-base.yml
 
-**Step :two:**: Create the Cocoa environment,
+**Step :two:**: Create the Cocoa environment (if the Legacy or Stable version was chosen in the previous step, replace `cocoapy311` with `cocoapy310` below),
 
   - Linux
   
-        conda env create --name cocoa --file=cocoapy310.yml
+        conda env create --name cocoa --file=cocoapy311.yml
 
   - macOS (arm)
 
-        conda env create --name cocoa --file=cocoapy310-osxarm-base.yml
+        conda env create --name cocoa --file=cocoapy311-osxarm-base.yml
     
 and activate it
 
@@ -149,7 +150,7 @@ Users can now proceed to the **next section**.
 >
 >      conda activate base
 >      conda install -n base -c conda-forge mamba
->      mamba env create --name cocoa --file=cocoapy310.yml
+>      mamba env create --name cocoa --file=cocoapy311.yml
 >      conda activate cocoa
 
 > [!TIP]
@@ -917,25 +918,25 @@ and
  
      conda activate lockenv
 
-**Step :two:** Download the appropriate conda-lock compatible `yml` file. As in the section [Installation of core packages](#required_packages_conda), replace the tag `v4.11.2` in the URL with the Cocoa version that will be cloned.
+**Step :two:** Download the appropriate conda-lock compatible `yml` file. As in the section [Installation of core packages](#required_packages_conda), replace the tag `v4.11.3` in the URL with the Cocoa version that will be cloned (tags older than `v4.11.3` carry the `cocoapy310` prefix).
 
    - Linux
   
-         wget https://raw.githubusercontent.com/CosmoLike/cocoa/refs/tags/v4.11.2/cocoapy310-linux.yml
+         wget https://raw.githubusercontent.com/CosmoLike/cocoa/refs/tags/v4.11.3/cocoapy311-linux.yml
 
    - macOS (arm)
      
-         wget https://raw.githubusercontent.com/CosmoLike/cocoa/refs/tags/v4.11.2/cocoapy310-osxarm.yml
+         wget https://raw.githubusercontent.com/CosmoLike/cocoa/refs/tags/v4.11.3/cocoapy311-osxarm.yml
 
 **Step :three:** Create the conda environment
 
    - Linux
      
-         conda-lock install -n cocoa cocoapy310-linux.yml
+         conda-lock install -n cocoa cocoapy311-linux.yml
 
    - macOS (arm)
 
-         conda-lock install -n cocoa cocoapy310-osxarm.yml   
+         conda-lock install -n cocoa cocoapy311-osxarm.yml   
 
   and activate it
 
@@ -953,17 +954,17 @@ and
 
      conda activate base2
 
-**Step :two:** Now install wget and download a looser version of the yml file (note here slightly modified conda command). As in the section [Installation of core packages](#required_packages_conda), replace the tag `v4.11.2` in the URL with the Cocoa version that will be cloned.
+**Step :two:** Now install wget and download a looser version of the yml file (note here slightly modified conda command). As in the section [Installation of core packages](#required_packages_conda), replace the tag `v4.11.3` in the URL with the Cocoa version that will be cloned (tags older than `v4.11.3` carry the `cocoapy310` prefix).
 
      conda install -y wget --solver=libmamba --strict-channel-priority --override-channels -c conda-forge
 
 and
 
-     wget https://raw.githubusercontent.com/CosmoLike/cocoa/refs/tags/v4.11.2/cocoapy310-osxarm-loose.yml
+     wget https://raw.githubusercontent.com/CosmoLike/cocoa/refs/tags/v4.11.3/cocoapy311-osxarm-loose.yml
 
 **Step :three:** Create the cocoa conda env using a looser yml (note here slightly modified conda command)
 
-    conda env create --solver=libmamba --name cocoa -f cocoapy310-osxarm-loose.yml
+    conda env create --solver=libmamba --name cocoa -f cocoapy311-osxarm-loose.yml
 
 # Appendices about Git <a name="appendix_git"></a>
 
@@ -1340,7 +1341,7 @@ There are a few differences users should be aware of when running Cocoa on Googl
           %%bash
           source "/content/conda/etc/profile.d/conda.sh"
           conda activate lockenv
-          conda-lock install -n cocoa cocoapy310-linux.yml
+          conda-lock install -n cocoa cocoapy311-linux.yml
           conda activate cocoa 
           ln -s "${CONDA_PREFIX}"/bin/x86_64-conda_cos6-linux-gnu-gcc "${CONDA_PREFIX}"/bin/gcc
           ln -s "${CONDA_PREFIX}"/bin/x86_64-conda_cos6-linux-gnu-g++ "${CONDA_PREFIX}"/bin/g++
