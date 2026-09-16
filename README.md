@@ -116,14 +116,14 @@ In this section, we assume users have previously activated the Cocoa conda envir
 
   - Stable Version
     
-        git clone https://github.com/CosmoLike/cocoa.git --branch v4.07 cocoa
+        git clone https://github.com/CosmoLike/cocoa.git --branch v4.072 cocoa
 
 and
 
     cd ./cocoa/Cocoa
 
 **Step :two:**: Run the script `setup_cocoa.sh` via
-        
+
     source setup_cocoa.sh
 
 
