@@ -96,11 +96,11 @@ Core packages include compilers and numerical libraries that users typically do 
 
     - Legacy Version
 
-          wget https://raw.githubusercontent.com/CosmoLike/cocoa/refs/tags/v4.052/cocoapy310-osxarm-base.yml
+          wget https://raw.githubusercontent.com/CosmoLike/cocoa/refs/tags/v4.053/cocoapy310-osxarm-base.yml
 
     - Stable Version
 
-          wget https://raw.githubusercontent.com/CosmoLike/cocoa/refs/tags/v4.071/cocoapy310-osxarm-base.yml
+          wget https://raw.githubusercontent.com/CosmoLike/cocoa/refs/tags/v4.072/cocoapy310-osxarm-base.yml
 
     - Testing beta release
 
