@@ -62,11 +62,26 @@ Core packages include compilers and numerical libraries that users typically do 
 
     bash
 
-**Step :one:**: Download the appropriate `Python-3.10` compatible `yml` file
+**Step :one:**: Choose the Cocoa version to be installed, and download the corresponding `Python-3.10` compatible `yml` file
+
+> [!Warning]
+> The version chosen here must be the same Cocoa version (git tag) cloned later in the section
+> [Installation and Compilation of external modules](#cobaya_base_code); the options below mirror
+> the versions offered there.
 
   - Linux
-    
-         wget https://raw.githubusercontent.com/CosmoLike/cocoa/refs/heads/main/cocoapy310.yml
+
+    - Legacy Version
+
+          wget https://raw.githubusercontent.com/CosmoLike/cocoa/refs/tags/v4.052/cocoapy310.yml
+
+    - Stable Version
+
+          wget https://raw.githubusercontent.com/CosmoLike/cocoa/refs/tags/v4.071/cocoapy310.yml
+
+    - Testing beta release
+
+          wget https://raw.githubusercontent.com/CosmoLike/cocoa/refs/tags/v4.11.2/cocoapy310.yml
 
   - macOS (arm)
     
@@ -75,9 +90,19 @@ Core packages include compilers and numerical libraries that users typically do 
         conda activate
         conda install -y wget
 
-    Then, type.
+    Then, download the `yml` file matching the chosen version.
 
-        wget https://raw.githubusercontent.com/CosmoLike/cocoa/refs/heads/dev/cocoapy310-osxarm-base.yml
+    - Legacy Version
+
+          wget https://raw.githubusercontent.com/CosmoLike/cocoa/refs/tags/v4.052/cocoapy310-osxarm-base.yml
+
+    - Stable Version
+
+          wget https://raw.githubusercontent.com/CosmoLike/cocoa/refs/tags/v4.071/cocoapy310-osxarm-base.yml
+
+    - Testing beta release
+
+          wget https://raw.githubusercontent.com/CosmoLike/cocoa/refs/tags/v4.11.2/cocoapy310-osxarm-base.yml
 
 **Step :two:**: Create the Cocoa environment,
 
@@ -148,6 +173,10 @@ In this section, we assume users have previously activated the Cocoa conda envir
   - Testing beta release
   
         git clone https://github.com/CosmoLike/cocoa.git --branch v4.11.2 cocoa
+
+> [!Warning]
+> The version cloned here must match the version of the `yml` file downloaded in the section
+> [Installation of core packages](#required_packages_conda).
 
 > [!NOTE]
 > Version `v4.11.1` includes significant cosmolike speed-ups from refactoring non-limber/C-FASTPT/cosmo2d modules. 
@@ -888,15 +917,15 @@ and
  
      conda activate lockenv
 
-**Step :two:** Download the appropriate conda-lock compatible `yml` file.
+**Step :two:** Download the appropriate conda-lock compatible `yml` file. As in the section [Installation of core packages](#required_packages_conda), replace the tag `v4.11.2` in the URL with the Cocoa version that will be cloned.
 
    - Linux
   
-         wget https://raw.githubusercontent.com/CosmoLike/cocoa/refs/heads/dev/cocoapy310-linux.yml
+         wget https://raw.githubusercontent.com/CosmoLike/cocoa/refs/tags/v4.11.2/cocoapy310-linux.yml
 
    - macOS (arm)
      
-         wget https://raw.githubusercontent.com/CosmoLike/cocoa/refs/heads/dev/cocoapy310-osxarm.yml
+         wget https://raw.githubusercontent.com/CosmoLike/cocoa/refs/tags/v4.11.2/cocoapy310-osxarm.yml
 
 **Step :three:** Create the conda environment
 
@@ -924,13 +953,13 @@ and
 
      conda activate base2
 
-**Step :two:** Now install wget and download a looser version of the yml file (note here slightly modified conda command)
+**Step :two:** Now install wget and download a looser version of the yml file (note here slightly modified conda command). As in the section [Installation of core packages](#required_packages_conda), replace the tag `v4.11.2` in the URL with the Cocoa version that will be cloned.
 
      conda install -y wget --solver=libmamba --strict-channel-priority --override-channels -c conda-forge
 
 and
 
-     wget https://raw.githubusercontent.com/CosmoLike/cocoa/refs/heads/dev/cocoapy310-osxarm-loose.yml
+     wget https://raw.githubusercontent.com/CosmoLike/cocoa/refs/tags/v4.11.2/cocoapy310-osxarm-loose.yml
 
 **Step :three:** Create the cocoa conda env using a looser yml (note here slightly modified conda command)
 
