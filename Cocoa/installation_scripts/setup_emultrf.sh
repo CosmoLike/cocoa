@@ -22,7 +22,7 @@ unset_env_vars () {
 }
 
 unset_env_funcs () {
-  unset -f cdfolder cpfolder error cpfile
+  unset -f cdfolder cpfolder error cpfile devurl
   unset -f unset_env_funcs
   cdroot || return 1;
 }
@@ -48,6 +48,17 @@ cpfolder() {
     2>"/dev/null" || { error "CP FOLDER ${1} on ${2}"; return 1; }
 }
 
+devurl() {
+  # SWITCH_TO_DEV_MODE=1: rewrite GitHub https URLs to their ssh form
+  local U="${1:?}"
+  if [ -n "${SWITCH_TO_DEV_MODE:-}" ]; then
+    case "${U}" in
+      https://*github.com/*) U="git@github.com:${U#*github.com/}" ;;
+    esac
+  fi
+  echo "${U}"
+}
+
 # ---------------------------------------------------------------------------
 # ---------------------------------------------------------------------------
 # ---------------------------------------------------------------------------
@@ -69,6 +80,7 @@ if [ ! -d "${ECODEF:?}/emulators" ]; then
 fi
 
 URL="${EMULTRF_URL:-"https://github.com/CosmoLike/emulators_code.git"}"
+URL=$(devurl "${URL:?}")
 
 FOLDER="${EMULTRF_NAME:-"emultrf"}"
 

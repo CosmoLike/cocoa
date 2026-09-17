@@ -15,7 +15,7 @@ unset_env_vars () {
 }
 
 unset_env_funcs () {
-  unset -f cdfolder cpfolder cpfile error gitact0 gitact1 gitact2 gitact3
+  unset -f cdfolder cpfolder cpfile error gitact0 gitact1 gitact2 gitact3 devurl
   unset -f unset_env_funcs
   cdroot || return 1;
 }
@@ -173,6 +173,17 @@ gitact3() {
   cdfolder "${ROOTDIR}" || { unset_all; return 1; }
 }
 
+devurl() {
+  # SWITCH_TO_DEV_MODE=1: rewrite GitHub https URLs to their ssh form
+  local U="${1:?}"
+  if [ -n "${SWITCH_TO_DEV_MODE:-}" ]; then
+    case "${U}" in
+      https://*github.com/*) U="git@github.com:${U#*github.com/}" ;;
+    esac
+  fi
+  echo "${U}"
+}
+
 # ---------------------------------------------------------------------------
 # ---------------------------------------------------------------------------
 # ---------------------------------------------------------------------------
@@ -193,6 +204,7 @@ if [ -z "${IGNORE_COSMOLIKE_LSST_Y1_CODE}" ]; then
   FOLDER="${LSST_Y1_NAME:-"lsst_y1"}"
 
   URL="${LSST_Y1_URL:-"https://github.com/CosmoLike/cocoa_lsst_y1.git"}"
+  URL=$(devurl "${URL:?}")
 
   if [ -n "${LSST_Y1_GIT_COMMIT:-}" ]; then
   
@@ -234,6 +246,7 @@ if [ -z "${IGNORE_COSMOLIKE_DES_Y3_CODE}" ]; then
   FOLDER="${DES_Y3_NAME:-"des_y3"}"
 
   URL="${DES_Y3_URL:-"https://github.com/CosmoLike/cocoa_des_y3.git"}"
+  URL=$(devurl "${URL:?}")
 
   if [ -n "${DES_Y3_GIT_COMMIT:-}" ]; then
   
@@ -275,6 +288,7 @@ if [ -z "${IGNORE_COSMOLIKE_ROMAN_FOURIER_CODE}" ]; then
   FOLDER="${ROMAN_FOURIER_NAME:-"roman_fourier"}"
 
   URL="${ROMAN_FOURIER_URL:-"https://github.com/CosmoLike/cocoa_roman_fourier.git"}"
+  URL=$(devurl "${URL:?}")
 
   if [ -n "${ROMAN_FOURIER_GIT_COMMIT:-}" ]; then
   
@@ -316,6 +330,7 @@ if [ -z "${IGNORE_COSMOLIKE_ROMAN_REAL_CODE}" ]; then
   FOLDER="${ROMAN_REAL_NAME:-"roman_real"}"
 
   URL="${ROMAN_REAL_URL:-"https://github.com/CosmoLike/cocoa_roman_real.git"}"
+  URL=$(devurl "${URL:?}")
 
   if [ -n "${ROMAN_REAL_GIT_COMMIT:-}" ]; then
   
@@ -357,6 +372,7 @@ if [ -z "${IGNORE_COSMOLIKE_DESXPLANCK_CODE}" ]; then
   FOLDER="${DESXPLANCK_GIT_NAME:-"desy1xplanck"}"
 
   URL="${DESXPLANCK_URL:-"https://github.com/CosmoLike/cocoa_desy1xplanck.git"}"
+  URL=$(devurl "${URL:?}")
 
   if [ -n "${DESXPLANCK_GIT_COMMIT:-}" ]; then
 
@@ -398,6 +414,7 @@ if [ -z "${IGNORE_COSMOLIKE_ROMAN_KL_CODE}" ]; then
   FOLDER="${ROMAN_KL_NAME:-"roman_kl"}"
 
   URL="${ROMAN_KL_URL:-"https://github.com/CosmoLike/cocoa_roman_kl.git"}"
+  URL=$(devurl "${URL:?}")
 
   if [ -n "${ROMAN_KL_GIT_COMMIT:-}" ]; then
 
