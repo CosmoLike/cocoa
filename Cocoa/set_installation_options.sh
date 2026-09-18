@@ -23,7 +23,7 @@ esac
 # ------------------------------------------------------------------------------
 # VERBOSE AS DEBUG TOOL --------------------------------------------------------
 # ------------------------------------------------------------------------------
-export COCOA_OUTPUT_VERBOSE=1
+#export COCOA_OUTPUT_VERBOSE=1
 #export COCOA_OUTPUT_DEBUG=1 # turn on bash strict mode (set -exo pipefail) on  
                              # instalation_scripts/setup/compile_x.sh scripts 
 
@@ -80,11 +80,11 @@ export IGNORE_DARK_EMULATOR_CODE=1
 # The keys below control which cosmolike projects will be installed and compiled 
 # ------------------------------------------------------------------------------
 #export IGNORE_COSMOLIKE_LSST_Y1_CODE=1
-export IGNORE_COSMOLIKE_DES_Y3_CODE=1
-export IGNORE_COSMOLIKE_DESXPLANCK_CODE=1
+#export IGNORE_COSMOLIKE_DES_Y3_CODE=1
+#export IGNORE_COSMOLIKE_DESXPLANCK_CODE=1
 #export IGNORE_COSMOLIKE_ROMAN_FOURIER_CODE=1
 #export IGNORE_COSMOLIKE_ROMAN_REAL_CODE=1
-export IGNORE_COSMOLIKE_ROMAN_KL_CODE=1
+#export IGNORE_COSMOLIKE_ROMAN_KL_CODE=1
 
 #export IGNORE_BFMT_CODE=1 # Baryon Feedback Theory Block from Nihar&JVicente
 
@@ -124,23 +124,23 @@ export USE_SPT_CLIK_PLANCK=1
 
 export DES_Y3_URL="https://github.com/CosmoLike/cocoa_des_y3.git"
 export DES_Y3_NAME="des_y3"
-export DES_Y3_GIT_TAG="v4.10.5"
+export DES_Y3_GIT_TAG="v4.10.6"
 
 export DESXPLANCK_URL="https://git@github.com/CosmoLike/cocoa_desy1xplanck.git"
 export DESXPLANCK_GIT_NAME="desy1xplanck"
-export DESXPLANCK_GIT_TAG="v4.10.5"
+export DESXPLANCK_GIT_TAG="v4.10.6"
 
 export LSST_Y1_URL="https://github.com/CosmoLike/cocoa_lsst_y1.git"
 export LSST_Y1_NAME="lsst_y1"
-export LSST_Y1_GIT_TAG="v4.10.6"
+export LSST_Y1_GIT_TAG="v4.10.7"
 
 export ROMAN_FOURIER_URL="https://github.com/CosmoLike/cocoa_roman_fourier.git"
 export ROMAN_FOURIER_NAME="roman_fourier"
-export ROMAN_FOURIER_GIT_TAG="v4.10.6"
+export ROMAN_FOURIER_GIT_TAG="v4.10.7"
 
 export ROMAN_REAL_URL="https://github.com/CosmoLike/cocoa_roman_real.git"
 export ROMAN_REAL_NAME="roman_real"
-export ROMAN_REAL_GIT_TAG="v4.10.8"
+export ROMAN_REAL_GIT_TAG="v4.10.9"
 
 export COSMOLIKE_URL="https://github.com/CosmoLike/cocoa-cosmolike-core.git"
 export COSMOLIKE_GIT_TAG="v4.11.3"
