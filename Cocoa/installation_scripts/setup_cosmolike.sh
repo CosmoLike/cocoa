@@ -19,7 +19,7 @@ unset_env_vars () {
 }
 
 unset_env_funcs () {
-  unset -f cdfolder cpfolder error cpfile
+  unset -f cdfolder cpfolder error cpfile devurl
   unset -f unset_env_funcs
   cdroot || return 1;
 }
@@ -45,6 +45,17 @@ cpfolder() {
     2>"/dev/null" || { error "CP FOLDER ${1} on ${2}"; return 1; }
 }
 
+devurl() {
+  # SWITCH_TO_DEV_MODE=1: rewrite GitHub https URLs to their ssh form
+  local U="${1:?}"
+  if [ -n "${SWITCH_TO_DEV_MODE:-}" ]; then
+    case "${U}" in
+      https://*github.com/*) U="git@github.com:${U#*github.com/}" ;;
+    esac
+  fi
+  echo "${U}"
+}
+
 # ---------------------------------------------------------------------------
 # ---------------------------------------------------------------------------
 # ---------------------------------------------------------------------------
@@ -54,6 +65,7 @@ unset_env_vars || return 1
 ptop "SETUP COCOA-COSMOLIKE CORE" || { unset_all; return 1; }
 
 URL="${COSMOLIKE_URL:-"https://github.com/CosmoLike/cocoa-cosmolike-core.git"}"
+URL=$(devurl "${URL:?}")
 
 ECODEF="${ROOTDIR:?}/external_modules/code" # E = EXTERNAL, CODE, F=FODLER
 

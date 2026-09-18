@@ -19,8 +19,8 @@ unset_env_vars () {
 }
 
 unset_env_funcs () {
-  unset -f cdfolder cpfolder error
-  unset -f unset_env_funcs
+  unset -f cdfolder cpfolder error devurl
+  unset -f unset_env_funcs 
   cdroot || return 1;
 }
 
@@ -40,6 +40,17 @@ cdfolder() {
   cd "${1:?}" 2>"/dev/null" || { error "CD FOLDER: ${1}"; return 1; }
 }
 
+devurl() {
+  # SWITCH_TO_DEV_MODE=1: rewrite GitHub https URLs to their ssh form
+  local U="${1:?}"
+  if [ -n "${SWITCH_TO_DEV_MODE:-}" ]; then
+    case "${U}" in
+      https://*github.com/*) U="git@github.com:${U#*github.com/}" ;;
+    esac
+  fi
+  echo "${U}"
+}
+
 # --------------------------------------------------------------------------- 
 # --------------------------------------------------------------------------- 
 # ---------------------------------------------------------------------------
@@ -50,6 +61,7 @@ unset_env_vars || return 1
 EDATAF="${ROOTDIR:?}/external_modules/data/"
 
 URL="${EMULTRF_DATA_URL:-"https://github.com/CosmoLike/emulators_data.git"}"
+URL=$(devurl "${URL:?}")
 
 FOLDER="emultrf"
 

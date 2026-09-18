@@ -94,10 +94,14 @@ export IGNORE_COSMOLIKE_ROMAN_KL_CODE=1
 # If not set, pip_core_packages.sh will install several ML packages ------------
 # ------------------------------------------------------------------------------
 #export IGNORE_EMULATOR_GPU_PIP_PACKAGES=1
-
 # New GPUs require cuda 13 / Old GPUs may still require cuda 11.8 --------------
 #export ML_BLEEDING_EDGE_LIBS=1
 #export ML_LEGACY_LIBS=1
+
+# ------------------------------------------------------------------------------
+# If set, clone Cosmolike/Emulator repos via SSH (developers with write access)
+# ------------------------------------------------------------------------------
+#export SWITCH_TO_DEV_MODE=1
 
 # ------------------------------------------------------------------------------
 # If set, compile_planck.sh uses click like code from github.com/benabed/clik

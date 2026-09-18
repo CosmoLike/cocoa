@@ -11,9 +11,9 @@ dependencies:
   - coreutils
   - cmake=4.0.2
   - make=4.4.1
-  - c-compiler
-  - cxx-compiler
-  - fortran-compiler
+  - c-compiler=1.11.0
+  - cxx-compiler=1.11.0    # 2.x drops clangxx_osx-arm64 (the triplet clang++ mpicxx needs)
+  - fortran-compiler=1.11.0
   - llvm-openmp           # OpenMP runtime on mac (clang)
   # Math / Sci stack
   - "libopenblas=0.3.29=*openmp*"

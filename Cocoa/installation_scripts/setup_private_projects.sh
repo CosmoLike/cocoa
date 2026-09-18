@@ -15,7 +15,7 @@ unset_env_vars () {
 }
 
 unset_env_funcs () {
-  unset -f cdfolder cpfolder cpfile error gitact0 gitact1 gitact2 gitact3
+  unset -f cdfolder cpfolder cpfile error gitact0 gitact1 gitact2 gitact3 devurl
   unset -f unset_env_funcs
   cdroot || return 1;
 }
@@ -173,6 +173,16 @@ gitact3() {
   cdfolder "${ROOTDIR}" || { unset_all; return 1; }
 }
 
+devurl() {
+  # SWITCH_TO_DEV_MODE=1: rewrite GitHub https URLs to their ssh form
+  local U="${1:?}"
+  if [ -n "${SWITCH_TO_DEV_MODE:-}" ]; then
+    case "${U}" in
+      https://*github.com/*) U="git@github.com:${U#*github.com/}" ;;
+    esac
+  fi
+  echo "${U}"
+}
 
 # ---------------------------------------------------------------------------
 # ---------------------------------------------------------------------------
@@ -193,6 +203,7 @@ if [ -n "${INSTALL_AXIONS_2025_PROJECT:-}" ]; then
   FOLDER="${AXIONS_PROJECT_NAME:-"axions"}"
 
   URL="${AXIONS_2025_PROJECT_URL:?}"
+  URL=$(devurl "${URL:?}")
 
   if [ -n "${AXIONS_2025_PROJECT_GIT_COMMIT:-}" ]; then
 
@@ -233,6 +244,7 @@ if [ -n "${INSTALL_PRIVATE_INFPC_PROJECT:-}" ]; then
   FOLDER="${INFPC_PROJECT_NAME:-"InPCReiPC"}"
 
   URL="${INFPC_PROJECT_URL:-"git@github.com:SBU-COSMOLIKE/InPCReiPCNewCAMB.git"}"
+  URL=$(devurl "${URL:?}")
 
   if [ -n "${INFPC_PROJECT_GIT_COMMIT:-}" ]; then
 
@@ -272,8 +284,10 @@ if [ -n "${INSTALL_AXIE_CAMB_2026_PROJECT:-}" ]; then
   FOLDER="${AXIE_CAMB_2026_PROJECT_NAME:-"axicambv2"}"
 
   URL="${AXIE_CAMB_2026_PROJECT_URL:?}"
+  URL=$(devurl "${URL:?}")
 
   if [ -n "${AXIE_CAMB_2026_PROJECT_GIT_COMMIT:-}" ]; then
+
     gitact0 "${FOLDER:?}" "${URL:?}" || { unset_all; return 1; }
 
     gitact2 "${FOLDER:?}" "${AXIE_CAMB_2026_PROJECT_GIT_COMMIT:?}"  || { unset_all; return 1; }
