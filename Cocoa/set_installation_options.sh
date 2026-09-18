@@ -74,6 +74,7 @@ export IGNORE_DARK_EMULATOR_CODE=1
 #export IGNORE_PYSPK_CODE
 #export IGNORE_BCEMU_CODE
 #export IGNORE_FBRE_CODE
+#export IGNORE_BACCOEMU_CODE
 
 # ------------------------------------------------------------------------------
 # The keys below control which cosmolike projects will be installed and compiled 
@@ -379,6 +380,10 @@ export BCEMU_NAME="bcemu"
 export FBRE_URL="https://github.com/FLAMINGOSIM/FlamingoBaryonResponseEmulator.git"
 export FBRE_GIT_COMMIT="76b259cd44d28d9ab24b5f08ffaf536a9d4c41d7"
 export FBRE_NAME="fbre"
+
+export BACCOEMU_URL="https://bitbucket.org/rangulo/baccoemu.git"
+export BACCOEMU_GIT_COMMIT="2dfea6e3960fe0239c1d56480f952c3da7e9843b"
+export BACCOEMU_NAME="baccoemu"
 
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
