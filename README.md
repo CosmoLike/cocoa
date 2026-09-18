@@ -63,7 +63,7 @@ Core packages include compilers and numerical libraries that users typically do 
 
     bash
 
-**Step :one:**: Choose the Cocoa version to be installed, and download the corresponding `Python-3.10` compatible `yml` file
+**Step :one:**: Choose the Cocoa version to be installed, and download the corresponding `yml` file
 
 > [!Warning]
 > The version chosen here must be the same Cocoa version (git tag) cloned later in the section
@@ -124,9 +124,9 @@ and activate it
 
   - Linux
 
-        ln -s "${CONDA_PREFIX}"/bin/x86_64-conda_cos6-linux-gnu-gcc "${CONDA_PREFIX}"/bin/gcc
-        ln -s "${CONDA_PREFIX}"/bin/x86_64-conda_cos6-linux-gnu-g++ "${CONDA_PREFIX}"/bin/g++
-        ln -s "${CONDA_PREFIX}"/bin/x86_64-conda_cos6-linux-gnu-gfortran "${CONDA_PREFIX}"/bin/gfortran
+        ln -s "${CONDA_PREFIX}"/bin/x86_64-conda-linux-gnu-gcc "${CONDA_PREFIX}"/bin/gcc
+        ln -s "${CONDA_PREFIX}"/bin/x86_64-conda-linux-gnu-g++ "${CONDA_PREFIX}"/bin/g++
+        ln -s "${CONDA_PREFIX}"/bin/x86_64-conda-linux-gnu-gfortran "${CONDA_PREFIX}"/bin/gfortran
         ln -s "${CONDA_PREFIX}"/bin/x86_64-conda-linux-gnu-gcc-ar "${CONDA_PREFIX}"/bin/gcc-ar
         ln -s "${CONDA_PREFIX}"/bin/x86_64-conda-linux-gnu-gcc-ranlib "${CONDA_PREFIX}"/bin/gcc-ranlib
         ln -s "${CONDA_PREFIX}"/bin/x86_64-conda-linux-gnu-ld "${CONDA_PREFIX}"/bin/ld
@@ -970,6 +970,9 @@ When you check out a tag, Git places you in a detached `HEAD` state. So, before 
 
     git remote set-url origin git@github.com:CosmoLike/cocoa.git # that would allow users to push without typing a password
 
+> [!TIP]
+> This step covers the Cocoa repository itself. For the Cosmolike/Emulator repositories, set `SWITCH_TO_DEV_MODE=1` on `set_installation_options.sh` *before* `setup_cocoa.sh`, and they are cloned via SSH from the start (see [FAQ: How can users install Cosmolike projects?](#appendix_compile_cosmolike_separately)).
+
 **Step :two: (optional)** check the names of remote branches so you can create a unique branch name from the checked-out tag
 
     git remote set-branches origin '*'
@@ -1017,7 +1020,7 @@ Now, all subsequent commits will be associated with the xyzlocdev local branch.
                
 ## :interrobang: FAQ: How can developers push changes to the Cocoa main branch? <a name="push_main"></a>
 
-Until recently, Cocoa development was a bit unstructured. Developers could push directly to the `main` branch, and small commits to the main were not discouraged. Such flexible development rules will soon change when `v4.0` leaves the beta phase. We will protect the `main` branch by requiring every push to be reviewed by Cocoa's leading developers. Our new philosophy establishes that *a commit in the main branch should contain an atomic change that takes code from one working state to another working state with meaningful and well-tested improvements*. Therefore, developers should propose changes to the `main` branch in larger chunks (*via squash commits*), as shown below.
+The `main` branch is protected: *a commit in the main branch should contain an atomic change that takes code from one working state to another working state with meaningful and well-tested improvements*. Therefore, developers should propose changes to the `main` branch in larger chunks (*via squash commits*), as shown below.
 
 > [!NOTE]
 > In a developer branch, users are encouraged to make small commits so that work can be tracked easily. Our policy regarding squash atomic changes only applies to the main branch.
@@ -1128,16 +1131,18 @@ In addition to `setup` and `compile` scripts, Cocoa contains `unxv` scripts that
 
 ## :interrobang: FAQ: How can users install Cosmolike projects?  <a name="appendix_compile_cosmolike_separately"></a>
 
-The script `set_installation_options.sh` includes instructions for installing several Cosmo-like-based projects. To activate them, modify the following lines in `set_installation_options.sh` by inserting the symbol `#` before the name of the module users want to be installed and compiled.
+The script `set_installation_options.sh` includes instructions for installing several Cosmolike-based projects; the keys below are commented out by default, meaning all projects are installed. To skip a project, remove the symbol `#` from its corresponding key.
 
      [Adapted from Cocoa/set_installation_options.sh shell script]
      # ------------------------------------------------------------------------------
      # The keys below control which cosmolike projects will be installed and compiled
      # ------------------------------------------------------------------------------
-     export IGNORE_COSMOLIKE_LSST_Y1_CODE=1
-     export IGNORE_COSMOLIKE_DES_Y3_CODE=1
+     #export IGNORE_COSMOLIKE_LSST_Y1_CODE=1
+     #export IGNORE_COSMOLIKE_DES_Y3_CODE=1
+     #export IGNORE_COSMOLIKE_DESXPLANCK_CODE=1
      #export IGNORE_COSMOLIKE_ROMAN_FOURIER_CODE=1
      #export IGNORE_COSMOLIKE_ROMAN_REAL_CODE=1
+     #export IGNORE_COSMOLIKE_ROMAN_KL_CODE=1
      (...)
      # ------------------------------------------------------------------------------
      # OVERWRITE_EXISTING_XXX_CODE=1 -> setup_cocoa overwrites existing PACKAGES ----
@@ -1160,8 +1165,19 @@ The script `set_installation_options.sh` includes instructions for installing se
      #If none is set, Cocoa loads the latest commit on the repository default branch.
      #export ROMAN_REAL_GIT_BRANCH="main"
      #export ROMAN_REAL_GIT_COMMIT="abc"
-     export ROMAN_REAL_GIT_TAG="v4.10.8"
- 
+     export ROMAN_REAL_GIT_TAG="v4.10.9"
+
+> [!NOTE]
+> The https URLs are the right choice for almost all users. Developers with write
+> access to the Cosmolike/Emulator repositories can clone them via SSH keys instead
+> by setting the key below on `set_installation_options.sh`.
+>
+>     [Adapted from Cocoa/set_installation_options.sh shell script]
+>     # ------------------------------------------------------------------------------
+>     # If set, clone Cosmolike/Emulator repos via SSH (developers with write access)
+>     # ------------------------------------------------------------------------------
+>     #export SWITCH_TO_DEV_MODE=1
+
 Once more, anytime `set_installation_options.sh` is modified, we need to reload `(.local)` by rerunning `start_cocoa.sh`. Then, run the following commands:
 
       cd ./cocoa/Cocoa
@@ -1256,15 +1272,40 @@ This is a large image, approximately 13GB, as it already contains the conda coco
 > [!Warning]
 > Do not allow the Docker container to have system-wide access to your files. Accidents happen, especially when dealing with dangerous bash commands such as `rm` (deletion).
 
+> [!NOTE]
+> The recipe of the *whovian-cocoa* image is maintained at `cocoa_installation_libraries/docker/`.
+> To rebuild and publish the image (developers only), type
+>
+>     cd ./cocoa/cocoa_installation_libraries/docker
+>
+> and
+>
+>     docker build . --build-arg COCOA_TAG=v4.11.4 -t vivianmiranda/whovian-cocoa # replace the tag with the Cocoa version whose yml seeds the conda env
+>
+> and
+>
+>     docker push vivianmiranda/whovian-cocoa
+>
+> To publish the `:thin` variant, run the container, install and compile Cocoa inside it, and type
+>
+>     docker commit <containerid> vivianmiranda/whovian-cocoa:thin # docker ps -a shows the container id
+>
+> and
+>
+>     docker push vivianmiranda/whovian-cocoa:thin
+
 ## :interrobang: FAQ: How can users set the appropriate environment for ML? <a name="ml_emulators"></a>
 
-Although this is the default configuration in CoCoA, it is worth noting that commenting out the environmental flags below enables the installation of several machine-learning-related libraries via pip.  
+By default, Cocoa installs several machine-learning-related libraries via pip; the keys below control this installation. To skip the GPU-based ML libraries, uncomment `IGNORE_EMULATOR_GPU_PIP_PACKAGES`. GPU users must also select the CUDA generation that matches their hardware.
 
     [Adapted from Cocoa/set_installation_options.sh shell script] 
     # ------------------------------------------------------------------------------
-    # If not set, pip_core_packages.sh will install several ML package
+    # If not set, pip_core_packages.sh will install several ML packages ------------
     # ------------------------------------------------------------------------------
     #export IGNORE_EMULATOR_GPU_PIP_PACKAGES=1
+    # New GPUs require cuda 13 / Old GPUs may still require cuda 11.8 --------------
+    #export ML_BLEEDING_EDGE_LIBS=1
+    #export ML_LEGACY_LIBS=1
     (...)
 
 If users have already run `setup_cocoa.sh` prior to commenting these flags, run the command.
@@ -1287,8 +1328,30 @@ Cocoa does not adopt Cobaya's Python reimplementation of SimAll EE and Gibbs TT 
 
 to call the original Planck-2018 Clik likelihoods, as shown below.
 
-<img width="1146" height="498" alt="Screenshot 2025-10-20 at 8 38 56 PM" src="https://github.com/user-attachments/assets/4ab8beff-bda1-4bf8-b2c6-56f5501e3773" />
-<img width="1236" height="514" alt="Screenshot 2025-10-20 at 8 39 04 PM" src="https://github.com/user-attachments/assets/22b21a5d-c716-45dc-949c-59f31be91def" />
+    [Adapted from Cocoa/cobaya/cobaya/likelihoods/planck_2018_lowl/TT.py]
+    from cobaya.likelihoods.base_classes import Planck2018Clik
+
+    #COCOA BEGINS
+    #class TT_clik(Planck2018Clik):
+    class TT(Planck2018Clik):
+    #COCOA ENDS
+        r"""
+        Low-$\ell$ temperature-only likelihood of Planck's 2018 data release
+        """
+        pass
+
+and
+
+    [Adapted from Cocoa/cobaya/cobaya/likelihoods/planck_2018_lowl/EE.py]
+    from cobaya.likelihoods.base_classes import Planck2018Clik
+
+    #COCOA BEGINS
+    #class EE_clik(Planck2018Clik):
+    class EE(Planck2018Clik):
+    #COCOA ENDS
+        r"""
+        Low-$\ell$ EE likelihood of Planck's 2018 data release
+        """
 
 This ensures backward consistency in our code, as `TT.py` and `EE.py` used to point to Planck-2018 Clik before Cobaya's authors moved them to `EE_clik.py` and `TT_clik.py`. 
 
@@ -1351,12 +1414,14 @@ There are a few differences users should be aware of when running Cocoa on Googl
 
           %%bash
           source "/content/conda/etc/profile.d/conda.sh"
+          conda create -y -n lockenv -c conda-forge python=3.10 conda-lock=2.* wget
           conda activate lockenv
+          wget https://raw.githubusercontent.com/CosmoLike/cocoa/refs/tags/v4.11.4/cocoapy311-linux.yml
           conda-lock install -n cocoa cocoapy311-linux.yml
           conda activate cocoa 
-          ln -s "${CONDA_PREFIX}"/bin/x86_64-conda_cos6-linux-gnu-gcc "${CONDA_PREFIX}"/bin/gcc
-          ln -s "${CONDA_PREFIX}"/bin/x86_64-conda_cos6-linux-gnu-g++ "${CONDA_PREFIX}"/bin/g++
-          ln -s "${CONDA_PREFIX}"/bin/x86_64-conda_cos6-linux-gnu-gfortran "${CONDA_PREFIX}"/bin/gfortran
+          ln -s "${CONDA_PREFIX}"/bin/x86_64-conda-linux-gnu-gcc "${CONDA_PREFIX}"/bin/gcc
+          ln -s "${CONDA_PREFIX}"/bin/x86_64-conda-linux-gnu-g++ "${CONDA_PREFIX}"/bin/g++
+          ln -s "${CONDA_PREFIX}"/bin/x86_64-conda-linux-gnu-gfortran "${CONDA_PREFIX}"/bin/gfortran
           ln -s "${CONDA_PREFIX}"/bin/x86_64-conda-linux-gnu-gcc-ar "${CONDA_PREFIX}"/bin/gcc-ar
           ln -s "${CONDA_PREFIX}"/bin/x86_64-conda-linux-gnu-gcc-ranlib "${CONDA_PREFIX}"/bin/gcc-ranlib
           git-lfs install
@@ -1366,7 +1431,7 @@ There are a few differences users should be aware of when running Cocoa on Googl
           %%bash
           source "/content/conda/etc/profile.d/conda.sh"
           conda activate cocoa                                  
-          git clone https://github.com/CosmoLike/cocoa.git --branch v4.0 cocoa # users can adjust this line
+          git clone https://github.com/CosmoLike/cocoa.git --branch v4.11.4 cocoa # replace the tag with the Cocoa version being installed (it must match the yml downloaded on Cell 3)
 
     - **Cell 5️⃣**: run `setup_cocoa.sh`
 
@@ -1419,7 +1484,6 @@ There are a few differences users should be aware of when running Cocoa on Googl
             exit 0
           fi
           test -f "$ARCHIVE"
-          ARCHIVE="/content/drive/MyDrive/ColabBackups/colab_basic_cocoa.tar.gz"
           tar -xzf "$ARCHIVE" -C /
 
 > [!Note]
@@ -1460,7 +1524,7 @@ There are a few differences users should be aware of when running Cocoa on Googl
           echo "Found $SENTINEL — environment already restored. Skipping untar."
           exit 0
         fi
-        ARCHIVE="CHECKPOINT_FILE"
+        ARCHIVE="CHECKPOINT_FILE" # replace this string!
         test -f "$ARCHIVE"
         tar -xzf "$ARCHIVE" -C /
 
