@@ -81,6 +81,8 @@ declare -a THEORY=("setup_hyrec2.sh"
                    "setup_class.sh"
                    "setup_velocileptors.sh"
                    "setup_pyfastpt.sh"
+                   "setup_bfmt.sh"
+                   "setup_pyspk.sh"
                   )
 
 declare -a ML=("setup_cosmopower.sh"
@@ -110,8 +112,7 @@ declare -a DATA=("unxv_core_packages.sh"
                  "unxv_cosmopower.sh"
                 )
 
-declare -a COSMOLIKE=("setup_bfmt.sh"
-                      "setup_cosmolike.sh"
+declare -a COSMOLIKE=("setup_cosmolike.sh"
                       "setup_private_projects.sh"
                       "setup_cosmolike_projects.sh"
                      )

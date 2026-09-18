@@ -23,7 +23,7 @@ esac
 # ------------------------------------------------------------------------------
 # VERBOSE AS DEBUG TOOL --------------------------------------------------------
 # ------------------------------------------------------------------------------
-#export COCOA_OUTPUT_VERBOSE=1
+export COCOA_OUTPUT_VERBOSE=1
 #export COCOA_OUTPUT_DEBUG=1 # turn on bash strict mode (set -exo pipefail) on  
                              # instalation_scripts/setup/compile_x.sh scripts 
 
@@ -71,6 +71,7 @@ export IGNORE_DARK_EMULATOR_CODE=1
 #export IGNORE_DERIVKIT_CODE=1
 #export IGNORE_TENSIOMETER_CODE=1
 #export IGNORE_GETDIST_CODE=1 #dev getdist with code tweaks
+#export IGNORE_PYSPK_CODE
 
 # ------------------------------------------------------------------------------
 # The keys below control which cosmolike projects will be installed and compiled 
@@ -364,6 +365,10 @@ export AXIE_CAMB_NAME="axiecamb"
 export AXION_HMCODE_URL="https://github.com/SBU-COSMOLIKE/axionHMcode.git"
 export AXION_HMCODE_GIT_COMMIT="c9c482300f8d0853fc3d46f64ae086917738e078"
 export AXION_HMCODE_NAME="axionHMcode"
+
+export PYSPK_URL="https://github.com/jemme07/pyspk.git"
+export PYSPK_GIT_COMMIT="50737f9295fee75ef2fe97e4bdd284134ed0d474"
+export PYSPK_NAME="pyspk"
 
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------

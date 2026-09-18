@@ -599,6 +599,13 @@ unset -v BFMT_GIT_TAG
 unset -v BFMT_GIT_COMMIT
 unset -v BFMT_GIT_BRANCH
 unset -v OVERWRITE_EXISTING_BFMT_CODE
+unset -v PYSPK_URL
+unset -v PYSPK_GIT_COMMIT
+unset -v PYSPK_GIT_TAG
+unset -v PYSPK_GIT_BRANCH
+unset -v PYSPK_NAME
+unset -v IGNORE_PYSPK_CODE
+unset -v OVERWRITE_EXISTING_PYSPK_CODE
 
 # Functions
 unset -f cdfolder
