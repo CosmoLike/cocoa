@@ -14,7 +14,7 @@ fi
 ( source "${ROOTDIR:?}/installation_scripts/flags_check.sh" ) || return 1;
 
 unset_env_vars () {
-  unset -v URL CCIL ECODEF FOLDER PACKDIR
+  unset -v URL CCIL ECODEF FOLDER PACKDIR PLIB
   cdroot || return 1;
 }
 
@@ -119,6 +119,35 @@ sed --in-place --regexp-extended \
   's@^from \.spectra import@#from .spectra import@' \
   "${PACKDIR:?}/src/BCemu/__init__.py" \
   2>>${OUT2:?} || { error "SED BCEMU SPECTRA PATCH"; return 1; }
+
+# ------------------------------------------------------------------------------
+# Install BCemu on .local and download its trained emulator files. Both steps
+# may need internet and therefore live in setup (not compile): compile_*.sh
+# scripts must stay offline-safe (they may run on compute nodes)
+# ------------------------------------------------------------------------------
+
+PLIB="${ROOTDIR:?}/.local/lib/python${PYTHON_VERSION:?}/site-packages"
+rm -rf "${PLIB:?}/BCemu"
+rm -rf "${PLIB:?}"/BCemu-*
+rm -rf "${PLIB:?}"/bcemu-*
+
+(
+  env CXX="${CXX_COMPILER:?}" CC="${C_COMPILER:?}" \
+    ${PIP3:?} install "${PACKDIR:?}" \
+      --no-dependencies \
+      --prefix="${ROOTDIR:?}/.local" \
+      --no-index \
+      --no-build-isolation
+) >>${OUT1:?} 2>>${OUT2:?} || { error "${EC3:?}"; return 1; }
+
+# Existing emulator files are skipped; without this step, BCemu would download
+# them at the FIRST MCMC evaluation, which fails on offline compute nodes
+(
+  env PYTHONPATH="${PLIB:?}:${PYTHONPATH:-}" ${PYTHON3:?} -c \
+    "from BCemu.download import download_emulators; \
+     download_emulators(model_name='BCemu2021'); \
+     download_emulators(model_name='BCemu2025')"
+) >>${OUT1:?} 2>>${OUT2:?} || { error "BCEMU EMULATOR FILES DOWNLOAD"; return 1; }
 
 cdfolder "${ROOTDIR:?}" || return 1;
 
