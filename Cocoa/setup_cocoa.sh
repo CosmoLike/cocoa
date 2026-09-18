@@ -84,6 +84,7 @@ declare -a THEORY=("setup_hyrec2.sh"
                    "setup_bfmt.sh"
                    "setup_pyspk.sh"
                    "setup_bcemu.sh"
+                   "setup_fbre.sh"
                   )
 
 declare -a ML=("setup_cosmopower.sh"

@@ -73,6 +73,7 @@ export IGNORE_DARK_EMULATOR_CODE=1
 #export IGNORE_GETDIST_CODE=1 #dev getdist with code tweaks
 #export IGNORE_PYSPK_CODE
 #export IGNORE_BCEMU_CODE
+#export IGNORE_FBRE_CODE
 
 # ------------------------------------------------------------------------------
 # The keys below control which cosmolike projects will be installed and compiled 
@@ -374,6 +375,10 @@ export PYSPK_NAME="pyspk"
 export BCEMU_URL="https://github.com/sambit-giri/BCemu.git"
 export BCEMU_GIT_COMMIT="c32577654e1b48b4bdf079c01a26b16f1473598f"
 export BCEMU_NAME="bcemu"
+
+export FBRE_URL="https://github.com/FLAMINGOSIM/FlamingoBaryonResponseEmulator.git"
+export FBRE_GIT_COMMIT="76b259cd44d28d9ab24b5f08ffaf536a9d4c41d7"
+export FBRE_NAME="fbre"
 
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------

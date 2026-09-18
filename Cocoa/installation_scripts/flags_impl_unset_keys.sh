@@ -613,6 +613,13 @@ unset -v BCEMU_GIT_BRANCH
 unset -v BCEMU_NAME
 unset -v IGNORE_BCEMU_CODE
 unset -v OVERWRITE_EXISTING_BCEMU_CODE
+unset -v FBRE_URL
+unset -v FBRE_GIT_COMMIT
+unset -v FBRE_GIT_TAG
+unset -v FBRE_GIT_BRANCH
+unset -v FBRE_NAME
+unset -v IGNORE_FBRE_CODE
+unset -v OVERWRITE_EXISTING_FBRE_CODE
 
 # Functions
 unset -f cdfolder
