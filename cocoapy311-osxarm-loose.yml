@@ -10,9 +10,9 @@ dependencies:
   - sed
   - make
   - cmake>=3.26,<5
-  - c-compiler
-  - cxx-compiler
-  - fortran-compiler
+  - c-compiler=1.11.0
+  - cxx-compiler=1.11.0    # 2.x drops clangxx_osx-arm64 (the triplet clang++ mpicxx needs)
+  - fortran-compiler=1.11.0
   - llvm-openmp
   - blas=*=openblas
   - boost=1.85

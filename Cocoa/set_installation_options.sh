@@ -23,7 +23,7 @@ esac
 # ------------------------------------------------------------------------------
 # VERBOSE AS DEBUG TOOL --------------------------------------------------------
 # ------------------------------------------------------------------------------
-export COCOA_OUTPUT_VERBOSE=1
+#export COCOA_OUTPUT_VERBOSE=1
 #export COCOA_OUTPUT_DEBUG=1 # turn on bash strict mode (set -exo pipefail) on  
                              # instalation_scripts/setup/compile_x.sh scripts 
 
@@ -101,7 +101,7 @@ export IGNORE_COSMOLIKE_ROMAN_KL_CODE=1
 # ------------------------------------------------------------------------------
 # If set, clone Cosmolike/Emulator repos via SSH (developers with write access)
 # ------------------------------------------------------------------------------
-export SWITCH_TO_DEV_MODE=1
+#export SWITCH_TO_DEV_MODE=1
 
 # ------------------------------------------------------------------------------
 # If set, compile_planck.sh uses click like code from github.com/benabed/clik
