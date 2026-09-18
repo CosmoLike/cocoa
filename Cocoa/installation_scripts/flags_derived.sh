@@ -50,6 +50,7 @@ if [ -n "${OVERWRITE_EXISTING_ALL_PACKAGES}" ]; then
   export OVERWRITE_EXISTING_FASTPT_CODE=1
   export OVERWRITE_EXISTING_AXION_HMCODE_CODE=1
   export OVERWRITE_EXISTING_AXIECAMB_CODE=1
+  export OVERWRITE_EXISTING_BFMT_CODE=1
 fi
 
 # ------------------------------------------------------------------------------

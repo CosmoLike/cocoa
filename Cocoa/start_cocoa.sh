@@ -214,7 +214,7 @@ if [[ -z "${IGNORE_COSMOPOWER_CODE}" ]]; then
 fi
 
 # ----------------------------------------------------------------------------
-# ----------------------------- EMUL TRF THEORY -------------------------------
+# ----------------------------- EMUL TRF THEORY ------------------------------
 # ----------------------------------------------------------------------------
 if [[ -z "${IGNORE_EMULTRF_CODE}" ]]; then
   ECODEF="${ROOTDIR:?}/external_modules/code"
@@ -271,6 +271,23 @@ if [[ -n "${INSTALL_AXIE_CAMB_V2}" ]]; then
   fi
 
   unset -v ECODEF COBTH TMP
+fi
+
+# ----------------------------------------------------------------------------
+# ----------------------------- BFM Theory -----------------------------------
+# ----------------------------------------------------------------------------
+if [[ -z "${IGNORE_FASTPT_CODE}" ]]; then
+  ECODEF="${ROOTDIR:?}/external_modules/code"
+  COBTH="${ROOTDIR:?}/cobaya/cobaya/theories"
+  TMP="${BFMT_NAME:-"baryon_suppression"}"
+
+  TMP2="bfmt"
+  if [[ ! -L "${COBTH:?}/${TMP2}" ]]; then
+    ln -s "${ECODEF:?}/${TMP}" "${COBTH:?}/${TMP2}" \
+      >>${OUT1:?} 2>>${OUT2:?} || { error_start_cocoa "${EC34:?}"; return 1; }
+  fi
+
+  unset -v ECODEF COBTH TMP TMP2
 fi
 
 # ----------------------------------------------------------------------------

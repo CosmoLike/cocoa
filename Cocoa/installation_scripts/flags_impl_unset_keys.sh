@@ -592,6 +592,13 @@ unset -v VELOCILEPTORS_NAME
 unset -v VELOCILEPTORS_URL
 unset -v WGET
 unset -v WGET_VERSION
+unset -v IGNORE_BFMT_CODE
+unset -v BFMT_THEORY_URL
+unset -v BFMT_NAME
+unset -v BFMT_GIT_TAG
+unset -v BFMT_GIT_COMMIT
+unset -v BFMT_GIT_BRANCH
+unset -v OVERWRITE_EXISTING_BFMT_CODE
 
 # Functions
 unset -f cdfolder

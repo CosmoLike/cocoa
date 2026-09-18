@@ -82,6 +82,8 @@ export IGNORE_COSMOLIKE_DESXPLANCK_CODE=1
 #export IGNORE_COSMOLIKE_ROMAN_REAL_CODE=1
 export IGNORE_COSMOLIKE_ROMAN_KL_CODE=1
 
+#export IGNORE_BFMT_CODE=1 # Baryon Feedback Theory Block from Nihar&JVicente
+
 # ------------------------------------------------------------------------------
 # The keys below control which private projects (may not be public repo)
 # ------------------------------------------------------------------------------
@@ -143,6 +145,10 @@ export COSMOLIKE_NAME="cosmolike_core"
 export ROMAN_KL_URL="https://github.com/CosmoLike/cocoa_roman_kl.git"
 export ROMAN_KL_NAME="roman_kl"
 export ROMAN_KL_GIT_TAG="v4.11.1"
+
+export BFMT_THEORY_URL="https://github.com/CosmoLike/cocoa_baryonic_feedback_models_theory.git"
+export BFMT_NAME="baryon_suppression"
+#export BFMT_GIT_TAG="v1.0"
 
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
