@@ -112,6 +112,14 @@ if [ ! -d "${PACKDIR:?}" ]; then
 
 fi
 
+# Cocoa patch: BCemu's __init__ imports its spectra module, which imports camb
+# at package import. That hijacks cobaya's path-checked CAMB load (bfmt only
+# needs the BCM_* emulator, not BCemu's CAMB helpers). Drop the import.
+sed --in-place --regexp-extended \
+  's@^from \.spectra import@#from .spectra import@' \
+  "${PACKDIR:?}/src/BCemu/__init__.py" \
+  2>>${OUT2:?} || { error "SED BCEMU SPECTRA PATCH"; return 1; }
+
 cdfolder "${ROOTDIR:?}" || return 1;
 
 pbottom "INSTALLING BARYONIC BCEMU FEEDBACK MODELS" || { unset_all; return 1; }

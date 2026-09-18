@@ -84,6 +84,16 @@ cdfolder "${PACKDIR}" || return 1;
       --no-build-isolation
 ) >>${OUT1:?} 2>>${OUT2:?} || { error "${EC3:?}"; return 1; }
 
+# Download the BCemu2021/BCemu2025 trained emulator files now (needs internet;
+# existing files are skipped). Without this, BCemu would download them at the
+# FIRST MCMC evaluation, which fails on compute nodes without internet access.
+(
+  env PYTHONPATH="${PLIB:?}:${PYTHONPATH:-}" ${PYTHON3:?} -c \
+    "from BCemu.download import download_emulators; \
+     download_emulators(model_name='BCemu2021'); \
+     download_emulators(model_name='BCemu2025')"
+) >>${OUT1:?} 2>>${OUT2:?} || { error "BCEMU EMULATOR FILES DOWNLOAD"; return 1; }
+
 pbottom "COMPILING BARYONIC BCEMU FEEDBACK MODELS" || { unset_all; return 1; }
 
 cdfolder "${ROOTDIR}" || return 1;

@@ -128,11 +128,25 @@ fi
 # ----------------------------------------------------------------------------
 PIPCP=(
     "numpy==${COCOA_NUMPY_VERSION:?}"
+    # guard pins: stop pip's resolver from upgrading scipy/typing-extensions
+    # on .local when solving the emulator dependencies below (matches the yml)
+    'scipy==1.12.0'
+    'typing-extensions==4.13.2'
     'notebook==7.4.2'
     'ipyparallel==9.0.1'
     'emcee==3.1.6'
     'sacc==1.0.2'
     'flit_core==3.12.0'
+    # runtime deps of the baryonic feedback emulators:
+    # pydantic (pyspk); smt + wget + msgpack (BCemu; smt==1.0.0 - other
+    # versions are incompatible); swiftemulator (FBRE; pulls george, attrs,
+    # unyt, SALib, velociraptor); progressbar2 (baccoemu)
+    'pydantic==2.11.4'
+    'smt==1.0.0'
+    'wget==3.2'
+    'msgpack==1.1.0'
+    'swiftemulator==1.3.1'
+    'progressbar2==4.5.0'
     'jax==0.4.18'
     'jaxlib==0.4.18'
   )

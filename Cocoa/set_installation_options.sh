@@ -71,10 +71,10 @@ export IGNORE_DARK_EMULATOR_CODE=1
 #export IGNORE_DERIVKIT_CODE=1
 #export IGNORE_TENSIOMETER_CODE=1
 #export IGNORE_GETDIST_CODE=1 #dev getdist with code tweaks
-#export IGNORE_PYSPK_CODE
-#export IGNORE_BCEMU_CODE
-#export IGNORE_FBRE_CODE
-#export IGNORE_BACCOEMU_CODE
+#export IGNORE_PYSPK_CODE=1
+#export IGNORE_BCEMU_CODE=1
+#export IGNORE_FBRE_CODE=1
+#export IGNORE_BACCOEMU_CODE=1
 
 # ------------------------------------------------------------------------------
 # The keys below control which cosmolike projects will be installed and compiled 
