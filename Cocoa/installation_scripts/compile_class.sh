@@ -68,7 +68,7 @@ PRINTNAME="CLASS"
 
 ptop "COMPILING ${PRINTNAME:?}" || { unset_all; return 1; }
 
-cdfolder "${PACKDIR}" || { unset_all; return 1; }
+cdfolder "${PACKDIR}" || return 1;
 
 # ----------------------------------------------------------------------------
 # cleaning any previous compilation
@@ -92,13 +92,13 @@ rm -f "${PACKDIR:?}/libclass.a"
 rm -rf "${PACKDIR:?}/include"
 # ----------------------------------------------------------------------------
 
-cpfolder "${PACKDIR:?}/include2" "${PACKDIR:?}/include" || { unset_all; return 1; }
+cpfolder "${PACKDIR:?}/include2" "${PACKDIR:?}/include" || return 1;
 
 (
   CC="${C_COMPILER:?}" PYTHON="${PYTHON3:?}" make all
 )>>${OUT1:?} 2>>${OUT2:?} || { error "${EC7:?}"; return 1; }
  
-cdfolder "${PACKDIR}/python" || { unset_all; return 1; }
+cdfolder "${PACKDIR}/python" || return 1;
 
 (
   CC="${C_COMPILER:?}" "${PYTHON3:?}" setup.py build
@@ -106,7 +106,7 @@ cdfolder "${PACKDIR}/python" || { unset_all; return 1; }
 
 pbottom "COMPILING ${PRINTNAME:?}" || { unset_all; return 1; }
 
-cdfolder "${ROOTDIR}" || { unset_all; return 1; }
+cdfolder "${ROOTDIR}" || return 1;
 
 # ----------------------------------------------------------------------------
 

@@ -2,7 +2,7 @@
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
-if [ -n "${IGNORE_SIMDE_CODE:-}" ]; then
+if [ -n "${IGNORE_BFMT_CODE:-}" ]; then
   return 99
 fi
 
@@ -14,12 +14,12 @@ fi
 ( source "${ROOTDIR:?}/installation_scripts/flags_check.sh" ) || return 1;
 
 unset_env_vars () {
-  unset -v URL CCIL ECODEF FOLDER PACKDIR CHANGES TFOLDER TFILE TFILEP AL
+  unset -v URL CCIL ECODEF FOLDER PACKDIR  
   cdroot || return 1;
 }
 
 unset_env_funcs () {
-  unset -f cdfolder cpfolder error cpfile
+  unset -f cdfolder cpfolder error cpfile devurl
   unset -f unset_env_funcs
   cdroot || return 1;
 }
@@ -45,6 +45,17 @@ cpfolder() {
     2>"/dev/null" || { error "CP FOLDER ${1} on ${2}"; return 1; }
 }
 
+devurl() {
+  # SWITCH_TO_DEV_MODE=1: rewrite GitHub https URLs to their ssh form
+  local U="${1:?}"
+  if [ -n "${SWITCH_TO_DEV_MODE:-}" ]; then
+    case "${U}" in
+      https://*github.com/*) U="git@github.com:${U#*github.com/}" ;;
+    esac
+  fi
+  echo "${U}"
+}
+
 # ---------------------------------------------------------------------------
 # ---------------------------------------------------------------------------
 # ---------------------------------------------------------------------------
@@ -53,46 +64,38 @@ unset_env_vars || return 1
 
 CCIL="${ROOTDIR:?}/../cocoa_installation_libraries"
 
-# ---------------------------------------------------------------------------
-
-URL="${SIMDE_URL:-"https://github.com/simd-everywhere/simde.git"}"
-
 # E = EXTERNAL, CODE, F=FODLER
 ECODEF="${ROOTDIR:?}/external_modules/code"
 
-FOLDER="${SIMDE_NAME:-"simde"}"
+URL="${BFMT_THEORY_URL:-"https://github.com/CosmoLike/cocoa_baryonic_feedback_models_theory.git"}"
+URL=$(devurl "${URL:?}")
+
+FOLDER="${BFMT_NAME:-"baryon_suppression"}"
 
 PACKDIR="${ECODEF:?}/${FOLDER:?}"
-
-# Name to be printed on this shell script messages
-PRINTNAME="SIMD EVERYWHERE CODE"
-
-ptop "INSTALLING ${PRINTNAME:?}" || { unset_all; return 1; }
+ptop "INSTALLING BARYONIC FEEDBACK MODELS THEORY (COBAYA)" || { unset_all; return 1; }
 
 # ----------------------------------------------------------------------------
 # In case this script is called twice ----------------------------------------
 # ----------------------------------------------------------------------------
-if [ -n "${OVERWRITE_EXISTING_SIMDE_CODE:-}" ]; then
-
+if [ -n "${OVERWRITE_EXISTING_BFMT_CODE:-}" ]; then
   rm -rf "${PACKDIR:?}"
-
 fi
 
-if [[ ! -d "${PACKDIR:?}" ]]; then
-  # --------------------------------------------------------------------------
-  # Clone from original repo -------------------------------------------------
-  # --------------------------------------------------------------------------
+if [ ! -d "${PACKDIR:?}" ]; then
+  echo "${PACKDIR:?}"
+
   cdfolder "${ECODEF:?}" || return 1;
 
   "${GIT:?}" clone "${URL:?}" --depth ${GIT_CLONE_MAXIMUM_DEPTH:-1000} \
-    --recursive --no-single-branch "${FOLDER:?}" \
+    --recursive --no-single-branch "${PACKDIR:?}" \
     >>${OUT1:?} 2>>${OUT2:?} || { error "${EC15:?}"; return 1; }
-  
-  cdfolder "${PACKDIR}" || return 1;
 
-  if [[ -n "${SIMDE_GIT_COMMIT:-}" ||
-        -n "${SIMDE_GIT_BRANCH:-}" ||
-        -n "${SIMDE_GIT_TAG:-}" ]]; then
+  cdfolder "${PACKDIR:?}" || return 1;
+
+  if [[ -n "${BFMT_GIT_COMMIT:-}" ||
+        -n "${BFMT_GIT_BRANCH:-}" ||
+        -n "${BFMT_GIT_TAG:-}" ]]; then
     if [ "$("${GIT:?}" rev-parse --is-shallow-repository)" = "true" ]; then
       "${GIT:?}" fetch --unshallow --all --tags --prune \
         >>${OUT1:?} 2>>${OUT2:?} || { error "${EC16:?}"; return 1; }
@@ -102,27 +105,33 @@ if [[ ! -d "${PACKDIR:?}" ]]; then
     fi
   fi
 
-  if [ -n "${SIMDE_GIT_COMMIT:-}" ]; then
-    "${GIT:?}" checkout "${SIMDE_GIT_COMMIT:?}" \
-      >>${OUT1:?} 2>>${OUT2:?} || { error "${EC16:?}"; return 1; }
-  elif [ -n "${SIMDE_GIT_BRANCH:-}" ]; then
-    "${GIT:?}" checkout -b "${SIMDE_GIT_BRANCH:?}" "origin/${SIMDE_GIT_BRANCH:?}" \
-      >>${OUT1:?} 2>>${OUT2:?} || { error "${EC16:?}"; return 1; }
-  elif [ -n "${SIMDE_GIT_TAG:-}" ]; then
-    "${GIT:?}" checkout "tags/${SIMDE_GIT_TAG:?}" -b "${SIMDE_GIT_TAG:?}TMP" \
-      >>${OUT1:?} 2>>${OUT2:?} || { error "${EC16:?}"; return 1; }
-  fi
+  if [ -n "${BFMT_GIT_COMMIT:-}" ]; then
 
+    "${GIT:?}" checkout "${BFMT_GIT_COMMIT:?}" \
+      >>${OUT1:?} 2>>${OUT2:?} || { error "${EC16:?}"; return 1; }
+  
+  elif [ -n "${BFMT_GIT_BRANCH:-}" ]; then
+  
+    "${GIT:?}" checkout -b "${BFMT_GIT_BRANCH:?}" "origin/${BFMT_GIT_BRANCH:?}" \
+      >>${OUT1:?} 2>>${OUT2:?} || { error "${EC16:?}"; return 1; }
+  
+  elif [ -n "${BFMT_GIT_TAG:-}" ]; then
+    
+    "${GIT:?}" checkout "tags/${BFMT_GIT_TAG:?}" -b "${BFMT_GIT_TAG:?}TMP" \
+      >>${OUT1:?} 2>>${OUT2:?} || { error "${EC16:?}"; return 1; }
+  
+  fi
+ 
 fi
 
-cdfolder "${ROOTDIR}" || return 1;
+cdfolder "${ROOTDIR:?}" || return 1;
 
-pbottom "INSTALLING ${PRINTNAME:?}" || { unset_all; return 1; }
+pbottom "INSTALLING BARYONIC FEEDBACK MODELS THEORY (COBAYA)" || { unset_all; return 1; }
 
-#-------------------------------------------------------------------------------
+# ---------------------------------------------------------------------------
 
 unset_all || return 1
-
+  
 #-------------------------------------------------------------------------------
 
 return 55; # why this odd number? Setup_cocoa will cache this installation only

@@ -76,7 +76,7 @@ rm -rf  "${PLIB:?}/${ACTDR6_CMBONLY_NAME:-"act_dr6_cmbonly"}"-*
       --no-build-isolation \
 )>>${OUT1:?} 2>>${OUT2:?} || { error "${EC13:?}"; return 1; }
   
-cdfolder "${ROOTDIR}" || { unset_all; return 1; }
+cdfolder "${ROOTDIR}" || return 1;
 
 pbottom "COMPILING ACT-DR6 (CMBONLY)" || { unset_all; return 1; }
 
@@ -108,7 +108,7 @@ rm -rf  "${PLIB:?}/${ACTDR6_MFLIKE_NAME:-"act_dr6_mflike"}"-*
     
 pbottom "COMPILING ACT-DR6 (MFLIKE)" || { unset_all; return 1; }
 
-cdfolder "${ROOTDIR}" || { unset_all; return 1; }
+cdfolder "${ROOTDIR}" || return 1;
 
 # ---------------------------------------------------------------------------
 

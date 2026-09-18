@@ -71,16 +71,22 @@ export IGNORE_DARK_EMULATOR_CODE=1
 #export IGNORE_DERIVKIT_CODE=1
 #export IGNORE_TENSIOMETER_CODE=1
 #export IGNORE_GETDIST_CODE=1 #dev getdist with code tweaks
+#export IGNORE_PYSPK_CODE=1
+#export IGNORE_BCEMU_CODE=1
+#export IGNORE_FBRE_CODE=1
+#export IGNORE_BACCOEMU_CODE=1
 
 # ------------------------------------------------------------------------------
 # The keys below control which cosmolike projects will be installed and compiled 
 # ------------------------------------------------------------------------------
 #export IGNORE_COSMOLIKE_LSST_Y1_CODE=1
-export IGNORE_COSMOLIKE_DES_Y3_CODE=1
-export IGNORE_COSMOLIKE_DESXPLANCK_CODE=1
+#export IGNORE_COSMOLIKE_DES_Y3_CODE=1
+#export IGNORE_COSMOLIKE_DESXPLANCK_CODE=1
 #export IGNORE_COSMOLIKE_ROMAN_FOURIER_CODE=1
 #export IGNORE_COSMOLIKE_ROMAN_REAL_CODE=1
-export IGNORE_COSMOLIKE_ROMAN_KL_CODE=1
+#export IGNORE_COSMOLIKE_ROMAN_KL_CODE=1
+
+#export IGNORE_BFMT_CODE=1 # Baryon Feedback Theory Block from Nihar&JVicente
 
 # ------------------------------------------------------------------------------
 # The keys below control which private projects (may not be public repo)
@@ -118,23 +124,23 @@ export USE_SPT_CLIK_PLANCK=1
 
 export DES_Y3_URL="https://github.com/CosmoLike/cocoa_des_y3.git"
 export DES_Y3_NAME="des_y3"
-export DES_Y3_GIT_TAG="v4.10.5"
+export DES_Y3_GIT_TAG="v4.10.6"
 
 export DESXPLANCK_URL="https://git@github.com/CosmoLike/cocoa_desy1xplanck.git"
 export DESXPLANCK_GIT_NAME="desy1xplanck"
-export DESXPLANCK_GIT_TAG="v4.10.5"
+export DESXPLANCK_GIT_TAG="v4.10.6"
 
 export LSST_Y1_URL="https://github.com/CosmoLike/cocoa_lsst_y1.git"
 export LSST_Y1_NAME="lsst_y1"
-export LSST_Y1_GIT_TAG="v4.10.6"
+export LSST_Y1_GIT_TAG="v4.10.7"
 
 export ROMAN_FOURIER_URL="https://github.com/CosmoLike/cocoa_roman_fourier.git"
 export ROMAN_FOURIER_NAME="roman_fourier"
-export ROMAN_FOURIER_GIT_TAG="v4.10.6"
+export ROMAN_FOURIER_GIT_TAG="v4.10.7"
 
 export ROMAN_REAL_URL="https://github.com/CosmoLike/cocoa_roman_real.git"
 export ROMAN_REAL_NAME="roman_real"
-export ROMAN_REAL_GIT_TAG="v4.10.8"
+export ROMAN_REAL_GIT_TAG="v4.10.9"
 
 export COSMOLIKE_URL="https://github.com/CosmoLike/cocoa-cosmolike-core.git"
 export COSMOLIKE_GIT_TAG="v4.11.3"
@@ -142,7 +148,11 @@ export COSMOLIKE_NAME="cosmolike_core"
 
 export ROMAN_KL_URL="https://github.com/CosmoLike/cocoa_roman_kl.git"
 export ROMAN_KL_NAME="roman_kl"
-export ROMAN_KL_GIT_TAG="v4.11.1"
+export ROMAN_KL_GIT_TAG="v4.11.2"
+
+export BFMT_THEORY_URL="https://github.com/CosmoLike/cocoa_baryonic_feedback_models_theory.git"
+export BFMT_NAME="baryon_suppression"
+export BFMT_GIT_TAG="v1.0"
 
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
@@ -358,6 +368,22 @@ export AXIE_CAMB_NAME="axiecamb"
 export AXION_HMCODE_URL="https://github.com/SBU-COSMOLIKE/axionHMcode.git"
 export AXION_HMCODE_GIT_COMMIT="c9c482300f8d0853fc3d46f64ae086917738e078"
 export AXION_HMCODE_NAME="axionHMcode"
+
+export PYSPK_URL="https://github.com/jemme07/pyspk.git"
+export PYSPK_GIT_COMMIT="50737f9295fee75ef2fe97e4bdd284134ed0d474"
+export PYSPK_NAME="pyspk"
+
+export BCEMU_URL="https://github.com/sambit-giri/BCemu.git"
+export BCEMU_GIT_COMMIT="c32577654e1b48b4bdf079c01a26b16f1473598f"
+export BCEMU_NAME="bcemu"
+
+export FBRE_URL="https://github.com/FLAMINGOSIM/FlamingoBaryonResponseEmulator.git"
+export FBRE_GIT_COMMIT="76b259cd44d28d9ab24b5f08ffaf536a9d4c41d7"
+export FBRE_NAME="fbre"
+
+export BACCOEMU_URL="https://bitbucket.org/rangulo/baccoemu.git"
+export BACCOEMU_GIT_COMMIT="2dfea6e3960fe0239c1d56480f952c3da7e9843b"
+export BACCOEMU_NAME="baccoemu"
 
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------

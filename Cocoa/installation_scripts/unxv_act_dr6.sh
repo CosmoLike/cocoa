@@ -82,7 +82,7 @@ if [[ ! -d "${PACKDIR:?}" || ! -d "${PACKDIR:?}/lensing" ]]; then
   mkdir -p "${PACKDIR:?}/lensing" \
     >>${OUT1:?} 2>>${OUT2:?} || { error "${EC20:?}"; return 1; }
   
-  cdfolder "${EDATAF:?}" || { unset_all; return 1; }
+  cdfolder "${EDATAF:?}" || return 1;
 
   if [ ! -e "${FILE:?}" ]; then
     "${WGET:?}" "${URL:?}" -q --show-progress --no-check-certificate \
@@ -99,7 +99,7 @@ if [[ ! -d "${PACKDIR:?}" || ! -d "${PACKDIR:?}/lensing" ]]; then
 
 fi
 
-cdfolder "${ROOTDIR}" || { unset_all; return 1; }
+cdfolder "${ROOTDIR}" || return 1;
 
 pbottom "SETUP/UNXV ACT-DR6 DATA (LENSING)" || { unset_all; return 1; }
 
@@ -137,7 +137,7 @@ if [ ! -d "${PACKDIR:?}" ]; then
   mkdir -p "${PACKDIR:?}" \
     >>${OUT1:?} 2>>${OUT2:?} || { error "${EC20:?}"; return 1; }
         
-  cdfolder "${EDATAF:?}" || { unset_all; return 1; }
+  cdfolder "${EDATAF:?}" || return 1;
 
   if [ ! -e "${FILE:?}" ]; then
   
@@ -157,7 +157,7 @@ if [ ! -d "${PACKDIR:?}" ]; then
 
 fi
 
-cdfolder "${ROOTDIR}" || { unset_all; return 1; }
+cdfolder "${ROOTDIR}" || return 1;
 
 pbottom "SETUP/UNXV ACT-DR6 DATA (CMBONLY)" || { unset_all; return 1; }
 
@@ -194,7 +194,7 @@ if [ ! -d "${PACKDIR:?}" ]; then
   mkdir -p "${PACKDIR:?}" \
     >>${OUT1:?} 2>>${OUT2:?} || { error "${EC20:?}"; return 1; }
         
-  cdfolder "${EDATAF:?}" || { unset_all; return 1; }
+  cdfolder "${EDATAF:?}" || return 1;
 
   if [ ! -e "${FILE:?}" ]; then
   
@@ -214,7 +214,7 @@ fi
 
 pbottom "SETUP/UNXV ACT-DR6 DATA (MFLIKE)" || { unset_all; return 1; }
 
-cdfolder "${ROOTDIR}" || { unset_all; return 1; }
+cdfolder "${ROOTDIR}" || return 1;
 
 #-------------------------------------------------------------------------------
 

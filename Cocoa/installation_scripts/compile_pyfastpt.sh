@@ -60,7 +60,7 @@ PLIB="${ROOTDIR:?}/.local/lib/python${PYTHON_VERSION:?}/site-packages"
 # ----------------------------------------------------------------------------
 ptop "COMPILING PYFAST-PT" || { unset_all; return 1; }
 
-cdfolder "${PACKDIR}" || { unset_all; return 1; }
+cdfolder "${PACKDIR}" || return 1;
 
 # ----------------------------------------------------------------------------
 # cleaning any previous compilation
@@ -85,7 +85,7 @@ rm -rf "${PACKDIR:?}/fast_pt.egg-info/"
 
 pbottom "COMPILING PYFAST-PT" || { unset_all; return 1; }
 
-cdfolder "${ROOTDIR}" || { unset_all; return 1; }
+cdfolder "${ROOTDIR}" || return 1;
 
 # ----------------------------------------------------------------------------
 

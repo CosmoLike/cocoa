@@ -69,7 +69,7 @@ if [[ ! -d "${EDATAF:?}/planck/plc_3.0/low_l" && \
       ! -d "${EDATAF:?}/planck/plc_3.0/hi_l/plik" && \
       ! -d "${EDATAF:?}/planck/plc_3.0/hi_l/plik_lite" ]]; then
 
-  cdfolder "${EDATAF:?}/planck/plc_3.0" || { unset_all; return 1; }
+  cdfolder "${EDATAF:?}/planck/plc_3.0" || return 1;
   
   tar xf lensing.xz \
     >>${OUT1:?} 2>>${OUT2:?} || { error "${EC25:?}"; return 1; }
@@ -77,7 +77,7 @@ if [[ ! -d "${EDATAF:?}/planck/plc_3.0/low_l" && \
   tar xf low_l.xz \
     >>${OUT1:?} 2>>${OUT2:?} || { error "${EC25:?}"; return 1; }
 
-  cdfolder "${EDATAF:?}/planck/plc_3.0/hi_l" || { unset_all; return 1; }
+  cdfolder "${EDATAF:?}/planck/plc_3.0/hi_l" || return 1;
   
   tar xf plik.xz \
     >>${OUT1:?} 2>>${OUT2:?} || { error "${EC25:?}"; return 1; }
@@ -86,7 +86,7 @@ if [[ ! -d "${EDATAF:?}/planck/plc_3.0/low_l" && \
     >>${OUT1:?} 2>>${OUT2:?} || { error "${EC25:?}"; return 1; }
 fi
 
-cdfolder "${ROOTDIR}" || { unset_all; return 1; }
+cdfolder "${ROOTDIR}" || return 1;
 
 pbottom "SETUP/UNXV ${PRINTNAME:?} DATA" || { unset_all; return 1; }
 

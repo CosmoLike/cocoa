@@ -60,7 +60,7 @@ PACKDIR="${ECODEF:?}/${FOLDER:?}"
 
 ptop "COMPILING AXIECAMB" || { unset_all; return 1; }
 
-cdfolder "${PACKDIR:?}" || { unset_all; return 1; }
+cdfolder "${PACKDIR:?}" || return 1;
 
 # ---------------------------------------------------------------------------- 
 # cleaning any previous compilation
@@ -106,7 +106,7 @@ fi
 
 pbottom "COMPILING AXIECAMB" || { unset_all; return 1; }
 
-cdfolder "${ROOTDIR}" || { unset_all; return 1; }
+cdfolder "${ROOTDIR}" || return 1;
 
 # ---------------------------------------------------------------------------
 

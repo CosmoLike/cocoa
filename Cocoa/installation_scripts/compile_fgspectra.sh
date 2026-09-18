@@ -62,7 +62,7 @@ PRINTNAME="FGSPECTRA"
 
 ptop "COMPILING ${PRINTNAME:?}" || { unset_all; return 1; }
 
-cdfolder "${PACKDIR}" || { unset_all; return 1; }
+cdfolder "${PACKDIR}" || return 1;
 
 # ----------------------------------------------------------------------------
 # cleaning any previous compilation
@@ -87,7 +87,7 @@ rm -rf "${PLIB:?}"/fgspectra-*
 
 pbottom "COMPILING ${PRINTNAME:?}" || { unset_all; return 1; }
 
-cdfolder "${ROOTDIR}" || { unset_all; return 1; }
+cdfolder "${ROOTDIR}" || return 1;
 
 # ----------------------------------------------------------------------------
 

@@ -2,7 +2,7 @@
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
-if [ -n "${IGNORE_DERIVKIT_CODE:-}" ]; then
+if [ -n "${IGNORE_PYSPK_CODE:-}" ]; then
   return 99
 fi
 
@@ -50,7 +50,7 @@ unset_env_vars || return 1
 # E = EXTERNAL, CODE, F=FODLER
 ECODEF="${ROOTDIR:?}/external_modules/code"
 
-FOLDER="${DERIVKIT_NAME:-"derivkit"}"
+FOLDER="${PYSPK_NAME:-"pyspk"}"
 
 PACKDIR="${ECODEF:?}/${FOLDER:?}"
 
@@ -59,15 +59,14 @@ PLIB="${ROOTDIR:?}/.local/lib/python${PYTHON_VERSION:?}/site-packages"
 # ----------------------------------------------------------------------------
 # ----------------------------------------------------------------------------
 
-ptop "COMPILING DERIVKIT DERIVATIVE CALCULATOR" || { unset_all; return 1; }
+ptop "COMPILING BARYONIC PYSPK FEEDBACK MODELS" || { unset_all; return 1; }
 
 # ----------------------------------------------------------------------------
 # cleaning any previous compilation
 # ----------------------------------------------------------------------------
 rm -rf "${PACKDIR:?}/build/"
-rm -rf "${PACKDIR:?}/derivkit.egg-info/"
-rm -rf "${PLIB:?}"/derivkit/
-rm -rf "${PLIB:?}"/derivkit-*
+rm -rf "${PLIB:?}"/pyspk/
+rm -rf "${PLIB:?}"/pyspk-*
 # ----------------------------------------------------------------------------  
 
 cdfolder "${PACKDIR}" || return 1;
@@ -81,16 +80,16 @@ cdfolder "${PACKDIR}" || return 1;
       --no-dependencies \
       --prefix="${ROOTDIR:?}/.local" \
       --no-index \
-      --no-build-isolation 
+      --no-build-isolation
 ) >>${OUT1:?} 2>>${OUT2:?} || { error "${EC3:?}"; return 1; }
 
-pbottom "COMPILING DERIVKIT DERIVATIVE CALCULATOR" || { unset_all; return 1; }
+pbottom "COMPILING BARYONIC PYSPK FEEDBACK MODELS" || { unset_all; return 1; }
 
 cdfolder "${ROOTDIR}" || return 1;
 
 # ----------------------------------------------------------------------------
 
-unset_all || return 1
+unset_all || return 1 
 
 #-------------------------------------------------------------------------------
 

@@ -2,7 +2,7 @@
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
-if [ -n "${IGNORE_SIMDE_CODE:-}" ]; then
+if [ -n "${IGNORE_BACCOEMU_CODE:-}" ]; then
   return 99
 fi
 
@@ -14,7 +14,7 @@ fi
 ( source "${ROOTDIR:?}/installation_scripts/flags_check.sh" ) || return 1;
 
 unset_env_vars () {
-  unset -v URL CCIL ECODEF FOLDER PACKDIR CHANGES TFOLDER TFILE TFILEP AL
+  unset -v URL CCIL ECODEF FOLDER PACKDIR PLIB
   cdroot || return 1;
 }
 
@@ -53,46 +53,37 @@ unset_env_vars || return 1
 
 CCIL="${ROOTDIR:?}/../cocoa_installation_libraries"
 
-# ---------------------------------------------------------------------------
-
-URL="${SIMDE_URL:-"https://github.com/simd-everywhere/simde.git"}"
-
 # E = EXTERNAL, CODE, F=FODLER
 ECODEF="${ROOTDIR:?}/external_modules/code"
 
-FOLDER="${SIMDE_NAME:-"simde"}"
+URL="${BACCOEMU_URL:-"https://bitbucket.org/rangulo/baccoemu.git"}"
+
+FOLDER="${BACCOEMU_NAME:-"baccoemu"}"
 
 PACKDIR="${ECODEF:?}/${FOLDER:?}"
-
-# Name to be printed on this shell script messages
-PRINTNAME="SIMD EVERYWHERE CODE"
-
-ptop "INSTALLING ${PRINTNAME:?}" || { unset_all; return 1; }
+ptop "INSTALLING BARYONIC BACCOEMU FEEDBACK MODELS" || { unset_all; return 1; }
 
 # ----------------------------------------------------------------------------
 # In case this script is called twice ----------------------------------------
 # ----------------------------------------------------------------------------
-if [ -n "${OVERWRITE_EXISTING_SIMDE_CODE:-}" ]; then
-
+if [ -n "${OVERWRITE_EXISTING_BACCOEMU_CODE:-}" ]; then
   rm -rf "${PACKDIR:?}"
-
 fi
 
-if [[ ! -d "${PACKDIR:?}" ]]; then
-  # --------------------------------------------------------------------------
-  # Clone from original repo -------------------------------------------------
-  # --------------------------------------------------------------------------
+if [ ! -d "${PACKDIR:?}" ]; then
+  echo "${PACKDIR:?}"
+
   cdfolder "${ECODEF:?}" || return 1;
 
   "${GIT:?}" clone "${URL:?}" --depth ${GIT_CLONE_MAXIMUM_DEPTH:-1000} \
-    --recursive --no-single-branch "${FOLDER:?}" \
+    --recursive --no-single-branch "${PACKDIR:?}" \
     >>${OUT1:?} 2>>${OUT2:?} || { error "${EC15:?}"; return 1; }
-  
-  cdfolder "${PACKDIR}" || return 1;
 
-  if [[ -n "${SIMDE_GIT_COMMIT:-}" ||
-        -n "${SIMDE_GIT_BRANCH:-}" ||
-        -n "${SIMDE_GIT_TAG:-}" ]]; then
+  cdfolder "${PACKDIR:?}" || return 1;
+
+  if [[ -n "${BACCOEMU_GIT_COMMIT:-}" ||
+        -n "${BACCOEMU_GIT_BRANCH:-}" ||
+        -n "${BACCOEMU_GIT_TAG:-}" ]]; then
     if [ "$("${GIT:?}" rev-parse --is-shallow-repository)" = "true" ]; then
       "${GIT:?}" fetch --unshallow --all --tags --prune \
         >>${OUT1:?} 2>>${OUT2:?} || { error "${EC16:?}"; return 1; }
@@ -102,32 +93,59 @@ if [[ ! -d "${PACKDIR:?}" ]]; then
     fi
   fi
 
-  if [ -n "${SIMDE_GIT_COMMIT:-}" ]; then
-    "${GIT:?}" checkout "${SIMDE_GIT_COMMIT:?}" \
+  if [ -n "${BACCOEMU_GIT_COMMIT:-}" ]; then
+
+    "${GIT:?}" checkout "${BACCOEMU_GIT_COMMIT:?}" \
       >>${OUT1:?} 2>>${OUT2:?} || { error "${EC16:?}"; return 1; }
-  elif [ -n "${SIMDE_GIT_BRANCH:-}" ]; then
-    "${GIT:?}" checkout -b "${SIMDE_GIT_BRANCH:?}" "origin/${SIMDE_GIT_BRANCH:?}" \
+
+  elif [ -n "${BACCOEMU_GIT_BRANCH:-}" ]; then
+
+    "${GIT:?}" checkout -b "${BACCOEMU_GIT_BRANCH:?}" "origin/${BACCOEMU_GIT_BRANCH:?}" \
       >>${OUT1:?} 2>>${OUT2:?} || { error "${EC16:?}"; return 1; }
-  elif [ -n "${SIMDE_GIT_TAG:-}" ]; then
-    "${GIT:?}" checkout "tags/${SIMDE_GIT_TAG:?}" -b "${SIMDE_GIT_TAG:?}TMP" \
+
+  elif [ -n "${BACCOEMU_GIT_TAG:-}" ]; then
+
+    "${GIT:?}" checkout "tags/${BACCOEMU_GIT_TAG:?}" -b "${BACCOEMU_GIT_TAG:?}TMP" \
       >>${OUT1:?} 2>>${OUT2:?} || { error "${EC16:?}"; return 1; }
+
   fi
 
 fi
 
-cdfolder "${ROOTDIR}" || return 1;
+# ------------------------------------------------------------------------------
+# Install baccoemu on .local and trigger the download of its emulator files
+# (they land inside the installed package). Both steps may need internet and
+# therefore live in setup (not compile): compile_*.sh scripts must stay
+# offline-safe (they may run on compute nodes)
+# ------------------------------------------------------------------------------
 
-pbottom "INSTALLING ${PRINTNAME:?}" || { unset_all; return 1; }
+PLIB="${ROOTDIR:?}/.local/lib/python${PYTHON_VERSION:?}/site-packages"
+rm -rf "${PLIB:?}/baccoemu"
+rm -rf "${PLIB:?}"/baccoemu-*
 
-#-------------------------------------------------------------------------------
+(
+  env CXX="${CXX_COMPILER:?}" CC="${C_COMPILER:?}"     ${PIP3:?} install "${PACKDIR:?}"       --no-dependencies       --prefix="${ROOTDIR:?}/.local"       --no-index       --no-build-isolation
+) >>${OUT1:?} 2>>${OUT2:?} || { error "${EC3:?}"; return 1; }
+
+# Existing emulator files are skipped; without this step, baccoemu would
+# download them at the FIRST MCMC evaluation, which fails on offline nodes
+(
+  env PYTHONPATH="${PLIB:?}:${PYTHONPATH:-}" ${PYTHON3:?} -c     "import baccoemu;      baccoemu.Matter_powerspectrum(baryonic_model_name='Burger2025', verbose=False)"
+) >>${OUT1:?} 2>>${OUT2:?} || { error "BACCOEMU EMULATOR FILES DOWNLOAD"; return 1; }
+
+cdfolder "${ROOTDIR:?}" || return 1;
+
+pbottom "INSTALLING BARYONIC BACCOEMU FEEDBACK MODELS" || { unset_all; return 1; }
+
+# ---------------------------------------------------------------------------
 
 unset_all || return 1
 
 #-------------------------------------------------------------------------------
 
 return 55; # why this odd number? Setup_cocoa will cache this installation only
-           #   if this script runs entirely. What if the user close the terminal 
-           #   or the system shuts down in the middle of a git clone?  
+           #   if this script runs entirely. What if the user close the terminal
+           #   or the system shuts down in the middle of a git clone?
            #   In this case, PACKDIR would exists, but it is corrupted
 
 # ------------------------------------------------------------------------------

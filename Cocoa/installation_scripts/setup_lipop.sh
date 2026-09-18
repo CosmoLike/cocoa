@@ -59,12 +59,12 @@ fhilipop() {
   fi
 
   if [ ! -d "${TF:?}" ]; then
-    cdfolder "${ECODEF:?}" || { unset_all; return 1; }
+    cdfolder "${ECODEF:?}" || return 1;
 
     "${GIT:?}" clone "${3:?}" --recursive "${1:?}" \
       >>${OUT1:?} 2>>${OUT2:?} || { error "${EC15:?}"; return 1; }
   
-    cdfolder "${TF:?}" || { unset_all; return 1; }
+    cdfolder "${TF:?}" || return 1;
 
     "${GIT:?}" reset --hard "${4:?}" \
       >>${OUT1:?} 2>>${OUT2:?} || { error "${EC23:?}"; return 1; }
@@ -78,7 +78,7 @@ fhilipop() {
       >>${OUT1:?} 2>>${OUT2:?} || { error "${EC17:?}"; return 1; }
   fi
 
-  cdfolder "${ROOTDIR:?}" || { unset_all; return 1; }
+  cdfolder "${ROOTDIR:?}" || return 1;
 }
 
 flolipop() {
@@ -92,12 +92,12 @@ flolipop() {
 
   if [ ! -d "${TF:?}" ]; then
     
-    cdfolder "${ECODEF:?}" || { unset_all; return 1; }
+    cdfolder "${ECODEF:?}" || return 1;
 
     "${GIT:?}" clone "${3:?}" --recursive  "${1:?}" \
       >>${OUT1:?} 2>>${OUT2:?} || { error "${EC15:?}"; return 1; }
   
-    cdfolder "${TF:?}" || { unset_all; return 1; }
+    cdfolder "${TF:?}" || return 1;
 
     "${GIT:?}" reset --hard "${4:?}" \
       >>${OUT1:?} 2>>${OUT2:?} || { error "${EC23:?}"; return 1; }
@@ -108,7 +108,7 @@ flolipop() {
     cp "${CCIL:?}/${2:?}_changes/lollipop.patch" "${TF:?}/${2:?}" \
       2>>"/dev/null" || { error "CP FILE lollipop.patch"; return 1; }
 
-    cdfolder "${TF:?}/${2:?}" || { unset_all; return 1; }
+    cdfolder "${TF:?}/${2:?}" || return 1;
 
     patch -u '__init__.py' -i 'init.patch' \
       >>${OUT1:?} 2>>${OUT2:?} || { error "${EC17:?}"; return 1; }
@@ -117,7 +117,7 @@ flolipop() {
       >>${OUT1:?} 2>>${OUT2:?} || { error "${EC17:?}"; return 1; }
   fi
 
-  cdfolder "${ROOTDIR:?}" || { unset_all; return 1; }
+  cdfolder "${ROOTDIR:?}" || return 1;
 }
 
 #-----------------------------------------------------------------------------
@@ -130,7 +130,7 @@ TFOLDER="${PL2020_HILLIPOP_NAME:-"planck_2020_hillipop"}"
 URL="${HILLIPOP_URL:-"https://github.com/planck-npipe/hillipop.git"}"
 
 fhilipop "${TFOLDER:?}" "planck_2020_hillipop" "${URL:?}" \
-  "${HILLIPOP_GIT_COMMIT:-"HEAD~"}" || { unset_all; return 1; }
+  "${HILLIPOP_GIT_COMMIT:-"HEAD~"}" || return 1;
 
 pbottom "SETUP HILLIPOP LIKELIHOOD" || { unset_all; return 1; }
 
@@ -144,7 +144,7 @@ TFOLDER="${PL2020_LOLLIPOP_NAME:-"planck_2020_lollipop"}"
 URL="${LOLLIPOP_URL:-"https://github.com/planck-npipe/lollipop.git"}"
 
 flolipop "${TFOLDER:?}" "planck_2020_lollipop" "${URL:?}" \
-  "${LOLLIPOP_GIT_COMMIT:-"HEAD~"}" || { unset_all; return 1; }
+  "${LOLLIPOP_GIT_COMMIT:-"HEAD~"}" || return 1;
 
 pbottom "SETUP LOLLIPOP LIKELIHOOD" || { unset_all; return 1; }
 

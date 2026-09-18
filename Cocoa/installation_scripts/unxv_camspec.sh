@@ -69,7 +69,7 @@ fi
 
 if [ ! -d "${PACKDIR:?}" ]; then
   
-  cdfolder "${EDATAF:?}" || { unset_all; return 1; }
+  cdfolder "${EDATAF:?}" || return 1;
 
   if [ ! -e "${FILE:?}" ]; then
   
@@ -86,7 +86,7 @@ fi
 
 pbottom "SETUP/UNXV CAMSPEC-2021 DATA" || { unset_all; return 1; }
 
-cdfolder "${ROOTDIR}" || { unset_all; return 1; }
+cdfolder "${ROOTDIR}" || return 1;
 
 #-------------------------------------------------------------------------------
 

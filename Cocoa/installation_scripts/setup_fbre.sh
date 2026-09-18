@@ -2,24 +2,24 @@
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
-if [ -n "${IGNORE_SPT_CMB_DATA:-}" ]; then
+if [ -n "${IGNORE_FBRE_CODE:-}" ]; then
   return 99
 fi
 
-if [ -z "${ROOTDIR}" ]; then
+if [ -z "${ROOTDIR:-}" ]; then
   source start_cocoa.sh || { pfail 'ROOTDIR'; return 1; }
 fi
 
-# parenthesis = run in a subshell 
+# parenthesis = run in a subshell
 ( source "${ROOTDIR:?}/installation_scripts/flags_check.sh" ) || return 1;
-  
-unset_env_vars () { 
-  unset -v EDATAF FOLDER URL PACKDIR PRINTNAME
+
+unset_env_vars () {
+  unset -v URL CCIL ECODEF FOLDER PACKDIR
   cdroot || return 1;
 }
 
 unset_env_funcs () {
-  unset -f cdfolder cpfolder error
+  unset -f cdfolder cpfolder error cpfile
   unset -f unset_env_funcs
   cdroot || return 1;
 }
@@ -40,47 +40,50 @@ cdfolder() {
   cd "${1:?}" 2>"/dev/null" || { error "CD FOLDER: ${1}"; return 1; }
 }
 
-# --------------------------------------------------------------------------- 
-# --------------------------------------------------------------------------- 
+cpfolder() {
+  cp -r "${1:?}" "${2:?}"  \
+    2>"/dev/null" || { error "CP FOLDER ${1} on ${2}"; return 1; }
+}
+
+# ---------------------------------------------------------------------------
+# ---------------------------------------------------------------------------
 # ---------------------------------------------------------------------------
 
 unset_env_vars || return 1
 
-# E = EXTERNAL, DATA, F=FODLER
-EDATAF="${ROOTDIR:?}/external_modules/data"
+CCIL="${ROOTDIR:?}/../cocoa_installation_libraries"
 
-FOLDER="${SPT_3G_NAME:-"spt_3g"}"
+# E = EXTERNAL, CODE, F=FODLER
+ECODEF="${ROOTDIR:?}/external_modules/code"
 
-# PACK = PACKAGE, DIR = DIRECTORY
-PACKDIR="${EDATAF:?}/${FOLDER:?}"
+URL="${FBRE_URL:-"https://github.com/FLAMINGOSIM/FlamingoBaryonResponseEmulator.git"}"
 
-URL="${SPT3G_DATA_URL:-"https://github.com/SouthPoleTelescope/spt3g_y1_dist.git"}"
+FOLDER="${FBRE_NAME:-"fbre"}"
 
-# Name to be printed on this shell script messages
-PRINTNAME="SPT-3G Y1"
+PACKDIR="${ECODEF:?}/${FOLDER:?}"
+ptop "INSTALLING BARYONIC FBRE FEEDBACK MODELS" || { unset_all; return 1; }
 
-ptop "SETUP/UNXV ${PRINTNAME:?} DATA" || { unset_all; return 1; }
-
-# ---------------------------------------------------------------------------
-# in case this script is called twice
-# ---------------------------------------------------------------------------
-if [ -n "${OVERWRITE_EXISTING_SPT3G_CMB_DATA:-}" ]; then
-
+# ----------------------------------------------------------------------------
+# In case this script is called twice ----------------------------------------
+# ----------------------------------------------------------------------------
+if [ -n "${OVERWRITE_EXISTING_FBRE_CODE:-}" ]; then
   rm -rf "${PACKDIR:?}"
-
 fi
 
 if [ ! -d "${PACKDIR:?}" ]; then
-  
-  cdfolder "${EDATAF:?}" || return 1;
-    
+  echo "${PACKDIR:?}"
+
+  cdfolder "${ECODEF:?}" || return 1;
+
   "${GIT:?}" clone "${URL:?}" --depth ${GIT_CLONE_MAXIMUM_DEPTH:-1000} \
-    --recursive "${FOLDER:?}" \
+    --recursive --no-single-branch "${PACKDIR:?}" \
     >>${OUT1:?} 2>>${OUT2:?} || { error "${EC15:?}"; return 1; }
 
-  if [[ -n "${SPT3G_GIT_COMMIT:-}" ||
-        -n "${SPT3G_GIT_BRANCH:-}" ||
-        -n "${SPT3G_GIT_TAG:-}" ]]; then
+  cdfolder "${PACKDIR:?}" || return 1;
+
+  if [[ -n "${FBRE_GIT_COMMIT:-}" ||
+        -n "${FBRE_GIT_BRANCH:-}" ||
+        -n "${FBRE_GIT_TAG:-}" ]]; then
     if [ "$("${GIT:?}" rev-parse --is-shallow-repository)" = "true" ]; then
       "${GIT:?}" fetch --unshallow --all --tags --prune \
         >>${OUT1:?} 2>>${OUT2:?} || { error "${EC16:?}"; return 1; }
@@ -90,32 +93,38 @@ if [ ! -d "${PACKDIR:?}" ]; then
     fi
   fi
 
-  if [ -n "${SPT3G_GIT_COMMIT:-}" ]; then
-    "${GIT:?}" checkout "${SPT3G_GIT_COMMIT:?}" \
+  if [ -n "${FBRE_GIT_COMMIT:-}" ]; then
+
+    "${GIT:?}" checkout "${FBRE_GIT_COMMIT:?}" \
       >>${OUT1:?} 2>>${OUT2:?} || { error "${EC16:?}"; return 1; }
-  elif [ -n "${SPT3G_GIT_BRANCH:-}" ]; then
-    "${GIT:?}" checkout "${SPT3G_GIT_BRANCH:?}" \
+
+  elif [ -n "${FBRE_GIT_BRANCH:-}" ]; then
+
+    "${GIT:?}" checkout -b "${FBRE_GIT_BRANCH:?}" "origin/${FBRE_GIT_BRANCH:?}" \
       >>${OUT1:?} 2>>${OUT2:?} || { error "${EC16:?}"; return 1; }
-  elif [ -n "${SPT3G_GIT_TAG:-}" ]; then
-    "${GIT:?}" checkout "tags/${SPT3G_GIT_TAG:?}" -b "${SPT3G_GIT_TAG:?}" \
+
+  elif [ -n "${FBRE_GIT_TAG:-}" ]; then
+
+    "${GIT:?}" checkout "tags/${FBRE_GIT_TAG:?}" -b "${FBRE_GIT_TAG:?}TMP" \
       >>${OUT1:?} 2>>${OUT2:?} || { error "${EC16:?}"; return 1; }
+
   fi
 
 fi
 
-cdfolder "${ROOTDIR}" || return 1;
+cdfolder "${ROOTDIR:?}" || return 1;
 
-pbottom "SETUP/UNXV ${PRINTNAME:?} DATA" || { unset_all; return 1; }
+pbottom "INSTALLING BARYONIC FBRE FEEDBACK MODELS" || { unset_all; return 1; }
 
-#-------------------------------------------------------------------------------
+# ---------------------------------------------------------------------------
 
-unset_all || return 1; 
+unset_all || return 1
 
 #-------------------------------------------------------------------------------
 
 return 55; # why this odd number? Setup_cocoa will cache this installation only
-           #   if this script runs entirely. What if the user close the terminal 
-           #   or the system shuts down in the middle of a git clone?  
+           #   if this script runs entirely. What if the user close the terminal
+           #   or the system shuts down in the middle of a git clone?
            #   In this case, PACKDIR would exists, but it is corrupted
 
 # ------------------------------------------------------------------------------
