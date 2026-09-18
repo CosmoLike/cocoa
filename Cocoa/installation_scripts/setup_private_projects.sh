@@ -91,7 +91,7 @@ gitact1() {
       >>${OUT1:?} 2>>${OUT2:?} || { error "${EC15:?}"; return 1; }
   fi
     
-  cdfolder "${ROOTDIR:?}" || { unset_all; return 1; }
+  cdfolder "${ROOTDIR:?}" || return 1;
 }
 
 gitact2() {  
@@ -100,7 +100,7 @@ gitact2() {
   local ARGS="--all --tags --prune"
   
   if [ -d "${PACKDIR:?}" ]; then
-    cdfolder "${PACKDIR:?}" || { unset_all; return 1; }
+    cdfolder "${PACKDIR:?}" || return 1;
     
     # unshallow the repo if necessary before check out a specific commit/tag
     if [ "$("${GIT:?}" rev-parse --is-shallow-repository)" = "true" ]; then
@@ -128,7 +128,7 @@ gitact2() {
   
   fi
     
-  cdfolder "${ROOTDIR}" || { unset_all; return 1; }
+  cdfolder "${ROOTDIR}" || return 1;
 }
 
 gitact3() {  
@@ -137,7 +137,7 @@ gitact3() {
   local ARGS="--all --tags --prune"
 
   if [ -d "${PACKDIR:?}" ]; then
-    cdfolder "${PACKDIR:?}" || { unset_all; return 1; }
+    cdfolder "${PACKDIR:?}" || return 1;
 
     # unshallow the repo if necessary before check out a specific commit/tag
     if [ "$("${GIT:?}" rev-parse --is-shallow-repository)" = "true" ]; then
@@ -170,7 +170,7 @@ gitact3() {
     fi
   fi
     
-  cdfolder "${ROOTDIR}" || { unset_all; return 1; }
+  cdfolder "${ROOTDIR}" || return 1;
 }
 
 devurl() {
@@ -207,23 +207,23 @@ if [ -n "${INSTALL_AXIONS_2025_PROJECT:-}" ]; then
 
   if [ -n "${AXIONS_2025_PROJECT_GIT_COMMIT:-}" ]; then
 
-    gitact0 "${FOLDER:?}" "${URL:?}" || { unset_all; return 1; }
+    gitact0 "${FOLDER:?}" "${URL:?}" || return 1;
     
-    gitact2 "${FOLDER:?}" "${AXIONS_2025_PROJECT_GIT_COMMIT:?}" || { unset_all; return 1; }
+    gitact2 "${FOLDER:?}" "${AXIONS_2025_PROJECT_GIT_COMMIT:?}" || return 1;
   
   elif [ -n "${AXIONS_2025_PROJECT_GIT_BRANCH:-}" ]; then 
   
-    gitact1 "${FOLDER:?}" "${URL:?}" "${AXIONS_2025_PROJECT_GIT_BRANCH:?}" || { unset_all; return 1; }
+    gitact1 "${FOLDER:?}" "${URL:?}" "${AXIONS_2025_PROJECT_GIT_BRANCH:?}" || return 1;
   
   elif [ -n "${AXIONS_2025_PROJECT_GIT_TAG:-}" ]; then 
   
-    gitact0 "${FOLDER:?}" "${URL:?}" || { unset_all; return 1; }
+    gitact0 "${FOLDER:?}" "${URL:?}" || return 1;
     
-    gitact3 "${FOLDER:?}" "${AXIONS_2025_PROJECT_GIT_TAG:?}" || { unset_all; return 1; }
+    gitact3 "${FOLDER:?}" "${AXIONS_2025_PROJECT_GIT_TAG:?}" || return 1;
   
   else
   
-    gitact0 "${FOLDER:?}" "${URL:?}" || { unset_all; return 1; }
+    gitact0 "${FOLDER:?}" "${URL:?}" || return 1;
   fi
 
   pbottom "GETTING ${PRINTNAME:?}" || { unset_all; return 1; }
@@ -248,23 +248,23 @@ if [ -n "${INSTALL_PRIVATE_INFPC_PROJECT:-}" ]; then
 
   if [ -n "${INFPC_PROJECT_GIT_COMMIT:-}" ]; then
 
-    gitact0 "${FOLDER:?}" "${URL:?}" || { unset_all; return 1; }
+    gitact0 "${FOLDER:?}" "${URL:?}" || return 1;
 
-    gitact2 "${FOLDER:?}" "${INFPC_PROJECT_GIT_COMMIT:?}"  || { unset_all; return 1; }
+    gitact2 "${FOLDER:?}" "${INFPC_PROJECT_GIT_COMMIT:?}"  || return 1;
 
   elif [ -n "${INFPC_PROJECT_GIT_BRANCH:-}" ]; then 
 
-    gitact1 "${FOLDER:?}" "${URL:?}" "${INFPC_PROJECT_GIT_BRANCH:?}" || { unset_all; return 1; }
+    gitact1 "${FOLDER:?}" "${URL:?}" "${INFPC_PROJECT_GIT_BRANCH:?}" || return 1;
 
   elif [ -n "${INFPC_PROJECT_GIT_TAG:-}" ]; then 
 
-    gitact0 "${FOLDER:?}" "${URL:?}" || { unset_all; return 1; }
+    gitact0 "${FOLDER:?}" "${URL:?}" || return 1;
 
-    gitact3 "${FOLDER:?}" "${INFPC_PROJECT_GIT_TAG:?}" || { unset_all; return 1; }
+    gitact3 "${FOLDER:?}" "${INFPC_PROJECT_GIT_TAG:?}" || return 1;
 
   else
 
-    gitact0 "${FOLDER:?}" "${URL:?}" || { unset_all; return 1; }
+    gitact0 "${FOLDER:?}" "${URL:?}" || return 1;
 
   fi
 
@@ -288,23 +288,23 @@ if [ -n "${INSTALL_AXIE_CAMB_2026_PROJECT:-}" ]; then
 
   if [ -n "${AXIE_CAMB_2026_PROJECT_GIT_COMMIT:-}" ]; then
 
-    gitact0 "${FOLDER:?}" "${URL:?}" || { unset_all; return 1; }
+    gitact0 "${FOLDER:?}" "${URL:?}" || return 1;
 
-    gitact2 "${FOLDER:?}" "${AXIE_CAMB_2026_PROJECT_GIT_COMMIT:?}"  || { unset_all; return 1; }
+    gitact2 "${FOLDER:?}" "${AXIE_CAMB_2026_PROJECT_GIT_COMMIT:?}"  || return 1;
   
   elif [ -n "${AXIE_CAMB_2026_PROJECT_GIT_BRANCH:-}" ]; then 
   
-    gitact1 "${FOLDER:?}" "${URL:?}" "${AXIE_CAMB_2026_PROJECT_GIT_BRANCH:?}" || { unset_all; return 1; }
+    gitact1 "${FOLDER:?}" "${URL:?}" "${AXIE_CAMB_2026_PROJECT_GIT_BRANCH:?}" || return 1;
   
   elif [ -n "${AXIE_CAMB_2026_PROJECT_GIT_TAG:-}" ]; then 
   
-    gitact0 "${FOLDER:?}" "${URL:?}" || { unset_all; return 1; }
+    gitact0 "${FOLDER:?}" "${URL:?}" || return 1;
   
-    gitact3 "${FOLDER:?}" "${AXIE_CAMB_2026_PROJECT_GIT_TAG:?}" || { unset_all; return 1; }
+    gitact3 "${FOLDER:?}" "${AXIE_CAMB_2026_PROJECT_GIT_TAG:?}" || return 1;
   
   else
   
-    gitact0 "${FOLDER:?}" "${URL:?}" || { unset_all; return 1; }
+    gitact0 "${FOLDER:?}" "${URL:?}" || return 1;
   
   fi
 

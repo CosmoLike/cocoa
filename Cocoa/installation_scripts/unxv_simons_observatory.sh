@@ -79,7 +79,7 @@ if [ ! -d "${PACKDIR:?}" ]; then
   mkdir -p "${PACKDIR:?}" \
     >>${OUT1:?} 2>>${OUT2:?} || { error "${EC20:?}"; return 1; }
   
-  cdfolder "${EDATAF:?}" || { unset_all; return 1; }
+  cdfolder "${EDATAF:?}" || return 1;
 
   # note: users can download multiple versions (reproduce existing work)
   # note: For example, SO_DATA_VERSION="v0.7.1 v0.8"
@@ -108,7 +108,7 @@ fi
 
 pbottom "SETUP/UNXV SIMONS OBSERVATORY DATA" || { unset_all; return 1; }
 
-cdfolder "${ROOTDIR}" || { unset_all; return 1; }
+cdfolder "${ROOTDIR}" || return 1;
 
 #-------------------------------------------------------------------------------
 

@@ -91,7 +91,7 @@ if [ ! -d "${PACKDIR:?}" ]; then
     --recursive --no-single-branch "${PACKDIR:?}" \
     >>${OUT1:?} 2>>${OUT2:?} || { error "${EC15:?}"; return 1; }
 
-  cdfolder "${PACKDIR:?}" || { unset_all; return 1; }
+  cdfolder "${PACKDIR:?}" || return 1;
 
   if [[ -n "${COSMOPOWER_SOLIKET_GIT_COMMIT:-}" ||
         -n "${COSMOPOWER_SOLIKET_GIT_BRANCH:-}" ||
@@ -118,7 +118,7 @@ if [ ! -d "${PACKDIR:?}" ]; then
  
 fi
 
-cdfolder "${ROOTDIR}" || { unset_all; return 1; }
+cdfolder "${ROOTDIR}" || return 1;
 
 pbottom "INSTALLING COSMOPOWER SO.LIKE.T THEORY (COBAYA)" || { unset_all; return 1; }
 
@@ -151,7 +151,7 @@ if [ ! -d "${PACKDIR:?}" ]; then
     --recursive "${PACKDIR:?}" \
     >>${OUT1:?} 2>>${OUT2:?} || { error "${EC15:?}"; return 1; }
 
-  cdfolder "${PACKDIR:?}" || { unset_all; return 1; }
+  cdfolder "${PACKDIR:?}" || return 1;
 
   if [[ -n "${COSMOPOWER_GIT_COMMIT:-}" ||
         -n "${COSMOPOWER_GIT_BRANCH:-}" ||
@@ -178,7 +178,7 @@ if [ ! -d "${PACKDIR:?}" ]; then
 
 fi
 
-cdfolder "${ROOTDIR:?}" || { unset_all; return 1; }
+cdfolder "${ROOTDIR:?}" || return 1;
 
 pbottom "INSTALLING COSMOPOWER" || { unset_all; return 1; }
 

@@ -606,6 +606,13 @@ unset -v PYSPK_GIT_BRANCH
 unset -v PYSPK_NAME
 unset -v IGNORE_PYSPK_CODE
 unset -v OVERWRITE_EXISTING_PYSPK_CODE
+unset -v BCEMU_URL
+unset -v BCEMU_GIT_COMMIT
+unset -v BCEMU_GIT_TAG
+unset -v BCEMU_GIT_BRANCH
+unset -v BCEMU_NAME
+unset -v IGNORE_BCEMU_CODE
+unset -v OVERWRITE_EXISTING_BCEMU_CODE
 
 # Functions
 unset -f cdfolder

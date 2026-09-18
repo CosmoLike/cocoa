@@ -74,13 +74,13 @@ fi
 
 if [ ! -d "${PACKDIR:?}" ]; then
 
-  cdfolder "${EDATAF:?}" || { unset_all; return 1; }
+  cdfolder "${EDATAF:?}" || return 1;
 
   tar xf "${FILE:?}" >>${OUT1:?} 2>>${OUT2:?} || { error "${EC25:?}"; return 1; }
 
 fi
 
-cdfolder "${ROOTDIR}" || { unset_all; return 1; }
+cdfolder "${ROOTDIR}" || return 1;
 
 pbottom "SETUP/UNXV ${PRINTNAME:?} DATA" || { unset_all; return 1; }
 

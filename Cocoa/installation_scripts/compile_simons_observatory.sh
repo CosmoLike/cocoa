@@ -59,7 +59,7 @@ ptop "COMPILING SIMONS OBSERVATORY SYSLIBRARY" || { unset_all; return 1; }
 
 PACKDIR="${ECODEF:?}/${SO_SYSLIB_NAME:-"syslibrary"}"
 
-cdfolder "${PACKDIR}" || { unset_all; return 1; }
+cdfolder "${PACKDIR}" || return 1;
 
 # ---------------------------------------------------------------------------- 
 # cleaning any previous compilation
@@ -84,7 +84,7 @@ rm -rf  "${PLIB:?}/syslibrary"-*
   
 pbottom "COMPILING SIMONS OBSERVATORY SYSLIBRARY" || { unset_all; return 1; }
 
-cdfolder "${ROOTDIR}" || { unset_all; return 1; }
+cdfolder "${ROOTDIR}" || return 1;
 
 # ----------------------------------------------------------------------------  
 # ----------------------------------------------------------------------------
@@ -93,7 +93,7 @@ ptop "COMPILING SIMONS OBSERVATORY MKLIKE" || { unset_all; return 1; }
 
 PACKDIR="${ECODEF:?}/${SO_MFLIKE_NAME:-"mflike"}"
 
-cdfolder "${PACKDIR}" || { unset_all; return 1; }
+cdfolder "${PACKDIR}" || return 1;
 
 # ----------------------------------------------------------------------------
 # cleaning any previous compilation
@@ -115,7 +115,7 @@ rm -rf  "${PLIB:?}/mflike"-*
 
 pbottom "COMPILING SIMONS OBSERVATORY MKLIKE" || { unset_all; return 1; }
 
-cdfolder "${ROOTDIR}" || { unset_all; return 1; }
+cdfolder "${ROOTDIR}" || return 1;
 
 # ----------------------------------------------------------------------------
 

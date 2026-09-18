@@ -72,6 +72,7 @@ export IGNORE_DARK_EMULATOR_CODE=1
 #export IGNORE_TENSIOMETER_CODE=1
 #export IGNORE_GETDIST_CODE=1 #dev getdist with code tweaks
 #export IGNORE_PYSPK_CODE
+#export IGNORE_BCEMU_CODE
 
 # ------------------------------------------------------------------------------
 # The keys below control which cosmolike projects will be installed and compiled 
@@ -369,6 +370,10 @@ export AXION_HMCODE_NAME="axionHMcode"
 export PYSPK_URL="https://github.com/jemme07/pyspk.git"
 export PYSPK_GIT_COMMIT="50737f9295fee75ef2fe97e4bdd284134ed0d474"
 export PYSPK_NAME="pyspk"
+
+export BCEMU_URL="https://github.com/sambit-giri/BCemu.git"
+export BCEMU_GIT_COMMIT="c32577654e1b48b4bdf079c01a26b16f1473598f"
+export BCEMU_NAME="bcemu"
 
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------

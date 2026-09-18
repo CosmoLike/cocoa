@@ -91,7 +91,7 @@ gitact1() {
       >>${OUT1:?} 2>>${OUT2:?} || { error "${EC15:?}"; return 1; }
   fi
     
-  cdfolder "${ROOTDIR:?}" || { unset_all; return 1; }
+  cdfolder "${ROOTDIR:?}" || return 1;
 }
 
 gitact2() {  
@@ -100,7 +100,7 @@ gitact2() {
   local ARGS="--all --tags --prune"
   
   if [ -d "${PACKDIR:?}" ]; then
-    cdfolder "${PACKDIR:?}" || { unset_all; return 1; }
+    cdfolder "${PACKDIR:?}" || return 1;
     
     # unshallow the repo if necessary before check out a specific commit/tag
     if [ "$("${GIT:?}" rev-parse --is-shallow-repository)" = "true" ]; then
@@ -128,7 +128,7 @@ gitact2() {
   
   fi
     
-  cdfolder "${ROOTDIR}" || { unset_all; return 1; }
+  cdfolder "${ROOTDIR}" || return 1;
 }
 
 gitact3() {  
@@ -137,7 +137,7 @@ gitact3() {
   local ARGS="--all --tags --prune"
 
   if [ -d "${PACKDIR:?}" ]; then
-    cdfolder "${PACKDIR:?}" || { unset_all; return 1; }
+    cdfolder "${PACKDIR:?}" || return 1;
 
     # unshallow the repo if necessary before check out a specific commit/tag
     if [ "$("${GIT:?}" rev-parse --is-shallow-repository)" = "true" ]; then
@@ -170,7 +170,7 @@ gitact3() {
     fi
   fi
     
-  cdfolder "${ROOTDIR}" || { unset_all; return 1; }
+  cdfolder "${ROOTDIR}" || return 1;
 }
 
 devurl() {
@@ -208,23 +208,23 @@ if [ -z "${IGNORE_COSMOLIKE_LSST_Y1_CODE}" ]; then
 
   if [ -n "${LSST_Y1_GIT_COMMIT:-}" ]; then
   
-    gitact0 "${FOLDER:?}" "${URL:?}" || { unset_all; return 1; }
+    gitact0 "${FOLDER:?}" "${URL:?}" || return 1;
   
-    gitact2 "${FOLDER:?}" "${LSST_Y1_GIT_COMMIT:?}" || { unset_all; return 1; }
+    gitact2 "${FOLDER:?}" "${LSST_Y1_GIT_COMMIT:?}" || return 1;
   
   elif [ -n "${LSST_Y1_GIT_BRANCH:-}" ]; then 
   
-    gitact1 "${FOLDER:?}" "${URL:?}" "${LSST_Y1_GIT_BRANCH:?}" || { unset_all; return 1; }
+    gitact1 "${FOLDER:?}" "${URL:?}" "${LSST_Y1_GIT_BRANCH:?}" || return 1;
   
   elif [ -n "${LSST_Y1_GIT_TAG:-}" ]; then 
   
-    gitact0 "${FOLDER:?}" "${URL:?}" || { unset_all; return 1; }
+    gitact0 "${FOLDER:?}" "${URL:?}" || return 1;
   
-    gitact3 "${FOLDER:?}" "${LSST_Y1_GIT_TAG:?}" || { unset_all; return 1; }
+    gitact3 "${FOLDER:?}" "${LSST_Y1_GIT_TAG:?}" || return 1;
   
   else
   
-    gitact0 "${FOLDER:?}" "${URL:?}" || { unset_all; return 1; }
+    gitact0 "${FOLDER:?}" "${URL:?}" || return 1;
   
   fi
 
@@ -250,23 +250,23 @@ if [ -z "${IGNORE_COSMOLIKE_DES_Y3_CODE}" ]; then
 
   if [ -n "${DES_Y3_GIT_COMMIT:-}" ]; then
   
-    gitact0 "${FOLDER:?}" "${URL:?}" || { unset_all; return 1; }
+    gitact0 "${FOLDER:?}" "${URL:?}" || return 1;
   
-    gitact2 "${FOLDER:?}" "${DES_Y3_GIT_COMMIT:?}" || { unset_all; return 1; }
+    gitact2 "${FOLDER:?}" "${DES_Y3_GIT_COMMIT:?}" || return 1;
   
   elif [ -n "${DES_Y3_GIT_BRANCH:-}" ]; then 
   
-    gitact1 "${FOLDER:?}" "${URL:?}" "${DES_Y3_GIT_BRANCH:?}" || { unset_all; return 1; }
+    gitact1 "${FOLDER:?}" "${URL:?}" "${DES_Y3_GIT_BRANCH:?}" || return 1;
   
   elif [ -n "${DES_Y3_GIT_TAG:-}" ]; then 
   
-    gitact0 "${FOLDER:?}" "${URL:?}" || { unset_all; return 1; }
+    gitact0 "${FOLDER:?}" "${URL:?}" || return 1;
   
-    gitact3 "${FOLDER:?}" "${DES_Y3_GIT_TAG:?}" || { unset_all; return 1; }
+    gitact3 "${FOLDER:?}" "${DES_Y3_GIT_TAG:?}" || return 1;
   
   else
   
-    gitact0 "${FOLDER:?}" "${URL:?}" || { unset_all; return 1; }
+    gitact0 "${FOLDER:?}" "${URL:?}" || return 1;
   
   fi
 
@@ -292,23 +292,23 @@ if [ -z "${IGNORE_COSMOLIKE_ROMAN_FOURIER_CODE}" ]; then
 
   if [ -n "${ROMAN_FOURIER_GIT_COMMIT:-}" ]; then
   
-    gitact0 "${FOLDER:?}" "${URL:?}" || { unset_all; return 1; }
+    gitact0 "${FOLDER:?}" "${URL:?}" || return 1;
    
-    gitact2 "${FOLDER:?}" "${ROMAN_FOURIER_GIT_COMMIT:?}" || { unset_all; return 1; }
+    gitact2 "${FOLDER:?}" "${ROMAN_FOURIER_GIT_COMMIT:?}" || return 1;
   
   elif [ -n "${ROMAN_FOURIER_GIT_BRANCH:-}" ]; then 
   
-    gitact1 "${FOLDER:?}" "${URL:?}" "${ROMAN_FOURIER_GIT_BRANCH:?}" || { unset_all; return 1; }
+    gitact1 "${FOLDER:?}" "${URL:?}" "${ROMAN_FOURIER_GIT_BRANCH:?}" || return 1;
   
   elif [ -n "${ROMAN_FOURIER_GIT_TAG:-}" ]; then 
   
-    gitact0 "${FOLDER:?}" "${URL:?}" || { unset_all; return 1; }
+    gitact0 "${FOLDER:?}" "${URL:?}" || return 1;
    
-    gitact3 "${FOLDER:?}" "${ROMAN_FOURIER_GIT_TAG:?}" || { unset_all; return 1; }
+    gitact3 "${FOLDER:?}" "${ROMAN_FOURIER_GIT_TAG:?}" || return 1;
   
   else
   
-    gitact0 "${FOLDER:?}" "${URL:?}" || { unset_all; return 1; }
+    gitact0 "${FOLDER:?}" "${URL:?}" || return 1;
   
   fi
 
@@ -334,23 +334,23 @@ if [ -z "${IGNORE_COSMOLIKE_ROMAN_REAL_CODE}" ]; then
 
   if [ -n "${ROMAN_REAL_GIT_COMMIT:-}" ]; then
   
-    gitact0 "${FOLDER:?}" "${URL:?}" || { unset_all; return 1; }
+    gitact0 "${FOLDER:?}" "${URL:?}" || return 1;
   
-    gitact2 "${FOLDER:?}" "${ROMAN_REAL_GIT_COMMIT:?}" || { unset_all; return 1; }
+    gitact2 "${FOLDER:?}" "${ROMAN_REAL_GIT_COMMIT:?}" || return 1;
   
   elif [ -n "${ROMAN_REAL_GIT_BRANCH:-}" ]; then 
   
-    gitact1 "${FOLDER:?}" "${URL:?}" "${ROMAN_REAL_GIT_BRANCH:?}" || { unset_all; return 1; }
+    gitact1 "${FOLDER:?}" "${URL:?}" "${ROMAN_REAL_GIT_BRANCH:?}" || return 1;
   
   elif [ -n "${ROMAN_REAL_GIT_TAG:-}" ]; then 
   
-    gitact0 "${FOLDER:?}" "${URL:?}" || { unset_all; return 1; }
+    gitact0 "${FOLDER:?}" "${URL:?}" || return 1;
   
-    gitact3 "${FOLDER:?}" "${ROMAN_REAL_GIT_TAG:?}" || { unset_all; return 1; }
+    gitact3 "${FOLDER:?}" "${ROMAN_REAL_GIT_TAG:?}" || return 1;
   
   else
   
-    gitact0 "${FOLDER:?}" "${URL:?}" || { unset_all; return 1; }
+    gitact0 "${FOLDER:?}" "${URL:?}" || return 1;
   
   fi
 
@@ -376,23 +376,23 @@ if [ -z "${IGNORE_COSMOLIKE_DESXPLANCK_CODE}" ]; then
 
   if [ -n "${DESXPLANCK_GIT_COMMIT:-}" ]; then
 
-    gitact0 "${FOLDER:?}" "${URL:?}" || { unset_all; return 1; }
+    gitact0 "${FOLDER:?}" "${URL:?}" || return 1;
     
-    gitact2 "${FOLDER:?}" "${DESXPLANCK_GIT_COMMIT:?}"  || { unset_all; return 1; }
+    gitact2 "${FOLDER:?}" "${DESXPLANCK_GIT_COMMIT:?}"  || return 1;
 
   elif [ -n "${DESXPLANCK_GIT_BRANCH:-}" ]; then 
 
-    gitact1 "${FOLDER:?}" "${URL:?}" "${DESXPLANCK_GIT_BRANCH:?}" || { unset_all; return 1; }
+    gitact1 "${FOLDER:?}" "${URL:?}" "${DESXPLANCK_GIT_BRANCH:?}" || return 1;
 
   elif [ -n "${DESXPLANCK_GIT_TAG:-}" ]; then 
 
-    gitact0 "${FOLDER:?}" "${URL:?}" || { unset_all; return 1; }
+    gitact0 "${FOLDER:?}" "${URL:?}" || return 1;
     
-    gitact3 "${FOLDER:?}" "${DESXPLANCK_GIT_TAG:?}" || { unset_all; return 1; }
+    gitact3 "${FOLDER:?}" "${DESXPLANCK_GIT_TAG:?}" || return 1;
 
   else
 
-    gitact0 "${FOLDER:?}" "${URL:?}" || { unset_all; return 1; }
+    gitact0 "${FOLDER:?}" "${URL:?}" || return 1;
 
   fi
 
@@ -418,23 +418,23 @@ if [ -z "${IGNORE_COSMOLIKE_ROMAN_KL_CODE}" ]; then
 
   if [ -n "${ROMAN_KL_GIT_COMMIT:-}" ]; then
 
-    gitact0 "${FOLDER:?}" "${URL:?}" || { unset_all; return 1; }
+    gitact0 "${FOLDER:?}" "${URL:?}" || return 1;
     
-    gitact2 "${FOLDER:?}" "${ROMAN_KL_GIT_COMMIT:?}"  || { unset_all; return 1; }
+    gitact2 "${FOLDER:?}" "${ROMAN_KL_GIT_COMMIT:?}"  || return 1;
 
   elif [ -n "${ROMAN_KL_GIT_BRANCH:-}" ]; then 
 
-    gitact1 "${FOLDER:?}" "${URL:?}" "${ROMAN_KL_GIT_BRANCH:?}" || { unset_all; return 1; }
+    gitact1 "${FOLDER:?}" "${URL:?}" "${ROMAN_KL_GIT_BRANCH:?}" || return 1;
 
   elif [ -n "${ROMAN_KL_GIT_TAG:-}" ]; then 
 
-    gitact0 "${FOLDER:?}" "${URL:?}" || { unset_all; return 1; }
+    gitact0 "${FOLDER:?}" "${URL:?}" || return 1;
     
-    gitact3 "${FOLDER:?}" "${ROMAN_KL_GIT_TAG:?}" || { unset_all; return 1; }
+    gitact3 "${FOLDER:?}" "${ROMAN_KL_GIT_TAG:?}" || return 1;
 
   else
 
-    gitact0 "${FOLDER:?}" "${URL:?}" || { unset_all; return 1; }
+    gitact0 "${FOLDER:?}" "${URL:?}" || return 1;
 
   fi
 

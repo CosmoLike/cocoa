@@ -69,13 +69,13 @@ fi
 
 if [ ! -d "${EDATAF:?}/${FOLDER:?}" ]; then
 
-  cdfolder "${EDATAF:?}" || { unset_all; return 1; }
+  cdfolder "${EDATAF:?}" || return 1;
     
   "${GIT:?}" clone "${URL:?}" --depth ${GIT_CLONE_MAXIMUM_DEPTH:-1000} \
     --recursive  "${TMP:?}" \
     >>${OUT1:?} 2>>${OUT2:?} || { error "${EC15:?}"; return 1; }
 
-  cdfolder "${EDATAF:?}/${TMP:?}" || { unset_all; return 1; }
+  cdfolder "${EDATAF:?}/${TMP:?}" || return 1;
 
   if [[ -n "${HOLICOW_GIT_COMMIT:-}" ||
         -n "${HOLICOW_GIT_BRANCH:-}" ||
@@ -109,7 +109,7 @@ fi
 
 pbottom "SETUP/UNXV H0LICOW DATA" || { unset_all; return 1; }
 
-cdfolder "${ROOTDIR}" || { unset_all; return 1; }
+cdfolder "${ROOTDIR}" || return 1;
 
 #-------------------------------------------------------------------------------
 

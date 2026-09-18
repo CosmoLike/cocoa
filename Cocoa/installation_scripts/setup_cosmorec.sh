@@ -96,7 +96,7 @@ fi
 # ----------------------------------------------------------------------------
 if [ ! -d "${PACKDIR:?}" ]; then
 
-  cdfolder "${ECODEF:?}" || { unset_all; return 1; }
+  cdfolder "${ECODEF:?}" || return 1;
 
   LOCAL_BACKUP_USED=0
   
@@ -155,10 +155,10 @@ if [ ! -d "${PACKDIR:?}" ]; then
 
   for (( i=0; i<${AL}; i++ ));
   do
-    cdfolder "${PACKDIR:?}/${TFOLDER[$i]}" || { unset_all; return 1; }
+    cdfolder "${PACKDIR:?}/${TFOLDER[$i]}" || return 1;
 
     cpfolder "${CHANGES:?}/${TFOLDER[$i]}${TFILEP[$i]:?}" . \
-      2>>${OUT2:?} || { unset_all; return 1; }
+      2>>${OUT2:?} || return 1;
 
     patch -u "${TFILE[$i]:?}" -i "${TFILEP[$i]:?}" \
       >>${OUT1:?} 2>>${OUT2:?} || { error "${EC17:?} (${TFILE[$i]:?})"; return 1; }
@@ -166,7 +166,7 @@ if [ ! -d "${PACKDIR:?}" ]; then
 
 fi
 
-cdfolder "${ROOTDIR:?}" || { unset_all; return 1; }
+cdfolder "${ROOTDIR:?}" || return 1;
 
 pbottom "INSTALLING ${PRINTNAME:?}" || { unset_all; return 1; }
 

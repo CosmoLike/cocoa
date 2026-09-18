@@ -96,13 +96,13 @@ fi
 
 if [ ! -d "${PACKDIR:?}" ]; then
 
-  cdfolder "${ECODEF:?}/emulators" || { unset_all; return 1; }
+  cdfolder "${ECODEF:?}/emulators" || return 1;
 
   "${GIT:?}" clone "${URL:?}" --depth ${GIT_CLONE_MAXIMUM_DEPTH:-1000} \
     --recursive --no-single-branch "${PACKDIR:?}" \
     >>${OUT1:?} 2>>${OUT2:?} || { error "${EC15:?}"; return 1; }
 
-  cdfolder "${PACKDIR:?}" || { unset_all; return 1; }
+  cdfolder "${PACKDIR:?}" || return 1;
 
   if [[ -n "${EMULTRF_GIT_COMMIT:-}" ||
         -n "${EMULTRF_GIT_BRANCH:-}" ||
@@ -129,7 +129,7 @@ if [ ! -d "${PACKDIR:?}" ]; then
  
 fi
 
-cdfolder "${ROOTDIR:?}" || { unset_all; return 1; }
+cdfolder "${ROOTDIR:?}" || return 1;
 
 pbottom "INSTALLING EMULATOR CMB TRF THEORY (COBAYA)" || { unset_all; return 1; }
 

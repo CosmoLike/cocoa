@@ -101,7 +101,7 @@ wgetact1() {
   
   fi
 
-  cdfolder "${CCIL:?}" || { unset_all; return 1; }
+  cdfolder "${CCIL:?}" || return 1;
   
   if [[ ! -d "${CCIL:?}/${4:?}" && ! -d "${CCIL:?}/${1:?}" ]]; then
 
@@ -207,7 +207,7 @@ wgetact1() {
   
   fi
 
-  cdfolder "${ROOTDIR:?}" || { unset_all; return 1; }
+  cdfolder "${ROOTDIR:?}" || return 1;
 }
 
 wgetact2() {
@@ -216,7 +216,7 @@ wgetact2() {
   
   local CCIL="${ROOTDIR:?}/../cocoa_installation_libraries"
 
-  cdfolder "${CCIL:?}" || { unset_all; return 1; }
+  cdfolder "${CCIL:?}" || return 1;
 
   # --------------------------------------------------------------------------
   # In case this script runs twice -------------------------------------------
@@ -242,7 +242,7 @@ wgetact2() {
   
   fi
 
-  cdfolder "${ROOTDIR:?}" || { unset_all; return 1; }
+  cdfolder "${ROOTDIR:?}" || return 1;
 }
 
 wgetact() {
@@ -252,9 +252,9 @@ wgetact() {
   #           FINAL UNCOMPRESS DIRECTORY WITH APPROPRIATE NAME CHOSEN BY USER(4) 
   #           FINAL COMPRESSED DIRECTORY IN THE APPROPRIATE XZ FORMAT (5)
 
-  wgetact1 "${1:?}" "${2:?}" "${3:?}" "${4:?}" || { unset_all; return 1; }
+  wgetact1 "${1:?}" "${2:?}" "${3:?}" "${4:?}" || return 1;
 
-  wgetact2 "${4:?}" "${5:?}" || { unset_all; return 1; }
+  wgetact2 "${4:?}" "${5:?}" || return 1;
 
 }
 
@@ -265,7 +265,7 @@ gitact1() {
   
   local CCIL="${ROOTDIR:?}/../cocoa_installation_libraries"
 
-  cdfolder "${CCIL:?}" || { unset_all; return 1; }
+  cdfolder "${CCIL:?}" || return 1;
 
   # --------------------------------------------------------------------------
   # In case this script runs twice -------------------------------------------
@@ -290,7 +290,7 @@ gitact1() {
   
   fi
 
-  cdfolder "${ROOTDIR:?}" || { unset_all; return 1; }
+  cdfolder "${ROOTDIR:?}" || return 1;
 }
 
 gitact2() {
@@ -325,7 +325,7 @@ gitact2() {
 
   fi
 
-  cdfolder "${ROOTDIR:?}" || { unset_all; return 1; }
+  cdfolder "${ROOTDIR:?}" || return 1;
 }
 
 gitact() {
@@ -354,7 +354,7 @@ if [ -z "${IGNORE_XZ_INSTALLATION}" ]; then
 
   ptop "GETTING AND COMPILING XZ LIBRARY (CORE LIBS)" || { unset_all; return 1; }
 
-  cdfolder "${CCIL:?}" || { unset_all; return 1; }
+  cdfolder "${CCIL:?}" || return 1;
 
   #False xz file (if I am installing xz - this has to be a fake xz file): just to trigger GIT LFS
   cp xz-5.2.5.tar.gz.xz xz-5.2.5.tar.gz \
@@ -363,7 +363,7 @@ if [ -z "${IGNORE_XZ_INSTALLATION}" ]; then
   tar -xf xz-5.2.5.tar.gz.xz \
     >>${OUT1:?} 2>>${OUT2:?} ||  { error "TAR XZ TAR"; return 1; }
 
-  cdfolder "${CCIL:?}/xz-5.2.5/" || { unset_all; return 1; }
+  cdfolder "${CCIL:?}/xz-5.2.5/" || return 1;
 
   CC="${C_COMPILER:?}" ./configure --prefix="${ROOTDIR:?}/.local" \
     >>${OUT1:?} 2>>${OUT2:?} || { error "${EC11:?}"; return 1; }
@@ -401,7 +401,7 @@ if [ -z "${IGNORE_CMAKE_INSTALLATION}" ]; then
   gitact "${COCOA_CMAKE_DIR:-"${FOLDER:?}"}" \
          "${VER:?}" \
          "${URL:?}" \
-         "${XZF:?}" || { unset_all; return 1; }
+         "${XZF:?}" || return 1;
 
   unset -v URL FOLDER VER XZF PACKAGE_VERSION
 
@@ -438,7 +438,7 @@ if [ -z "${IGNORE_WGET_INSTALLATION}" ]; then
           "${COMPRESSED_FILE_EXT:?}" \
           "${URL:?}" \
           "${COCOA_WGET_DIR:-"${FILE_ROOT:?}"}" \
-          "${XZF:?}" || { unset_all; return 1; }
+          "${XZF:?}" || return 1;
 
   unset -v URL FILE_ROOT COMPRESSED_FILE_EXT XZF PACKAGE_VERSION
 
@@ -469,7 +469,7 @@ if [ -z "${IGNORE_DISTUTILS_INSTALLATION}" ]; then
   wgetact "${FILE_ROOT:?}" \
           "${COMPRESSED_FILE_EXT:?}" "${URL:?}" \
           "${COCOA_BINUTILS_DIR:-"${FILE_ROOT:?}"}" \
-          "${XZF:?}" || { unset_all; return 1; }
+          "${XZF:?}" || return 1;
 
   unset -v URL FILE_ROOT COMPRESSED_FILE_EXT XZF PACKAGE_VERSION
 
@@ -501,7 +501,7 @@ if [ -z "${IGNORE_DISTUTILS_INSTALLATION}" ]; then
           "${COMPRESSED_FILE_EXT:?}" \
           "${URL:?}" \
           "${COCOA_TEXINFO_DIR:-"${FILE_ROOT:?}"}" \
-          "${XZF:?}" || { unset_all; return 1; }
+          "${XZF:?}" || return 1;
 
   unset -v URL FILE_ROOT COMPRESSED_FILE_EXT XZF PACKAGE_VERSION
 
@@ -532,7 +532,7 @@ if [ -z "${IGNORE_OPENBLAS_INSTALLATION}" ]; then
   gitact "${COCOA_OPENBLAS_DIR:-"${FOLDER:?}"}" \
          "${VER:?}" \
          "${URL:?}" \
-         "${XZF:?}" || { unset_all; return 1; }
+         "${XZF:?}" || return 1;
 
   unset -v URL FOLDER VER XZF PACKAGE_VERSION
 
@@ -563,7 +563,7 @@ if [ -z "${IGNORE_FORTRAN_LAPACK_INSTALLATION}" ]; then
   gitact "${COCOA_LAPACK_DIR:-"${FOLDER:?}"}" \
          "${VER:?}" \
          "${URL:?}" \
-         "${XZF:?}" || { unset_all; return 1; }
+         "${XZF:?}" || return 1;
 
   unset -v URL FOLDER VER XZF PACKAGE_VERSION
 
@@ -595,7 +595,7 @@ if [ -z "${IGNORE_HDF5_INSTALLATION}" ]; then
           "${COMPRESSED_FILE_EXT:?}" \
           "${URL:?}" \
           "${COCOA_HDF5_DIR:-"${FILE_ROOT:?}"}" \
-          "${XZF:?}" || { unset_all; return 1; }
+          "${XZF:?}" || return 1;
 
   unset -v URL_BASE URL FILE_ROOT COMPRESSED_FILE_EXT XZF
 
@@ -629,7 +629,7 @@ if [ -z "${IGNORE_C_CFITSIO_INSTALLATION}" ]; then
           "${COMPRESSED_FILE_EXT:?}" \
           "${URL:?}" \
           "${COCOA_CFITSIO_DIR:-"${FILE_ROOT:?}"}" \
-          "${XZF:?}" || { unset_all; return 1; }
+          "${XZF:?}" || return 1;
 
   unset -v URL_BASE URL FILE_ROOT COMPRESSED_FILE_EXT XZF PACKAGE_VERSION
 
@@ -661,7 +661,7 @@ if [ -z "${IGNORE_C_FFTW_INSTALLATION}" ]; then
           "${COMPRESSED_FILE_EXT:?}" \
           "${URL:?}" \
           "${COCOA_FFTW_DIR:-"${FILE_ROOT:?}"}" \
-          "${XZF:?}" || { unset_all; return 1; }
+          "${XZF:?}" || return 1;
 
   unset -v URL FILE_ROOT COMPRESSED_FILE_EXT XZF PACKAGE_VERSION
 
@@ -693,7 +693,7 @@ if [ -z "${IGNORE_C_GSL_INSTALLATION}" ]; then
           "${COMPRESSED_FILE_EXT:?}" \
           "${URL:?}" \
           "${COCOA_GSL_DIR:-"${FILE_ROOT:?}"}" \
-          "${XZF:?}" || { unset_all; return 1; }
+          "${XZF:?}" || return 1;
 
   unset -v URL FILE_ROOT COMPRESSED_FILE_EXT XZF PACKAGE_VERSION
 
@@ -724,7 +724,7 @@ if [ -z "${IGNORE_CPP_SPDLOG_INSTALLATION}" ]; then
   gitact "${COCOA_SPDLOG_DIR:-"spdlog"}" \
          "${VER:?}" \
          "${URL:?}" \
-         "${XZF:?}" || { unset_all; return 1; }
+         "${XZF:?}" || return 1;
 
   unset -v URL FOLDER VER XZF
 
@@ -756,7 +756,7 @@ if [ -z "${IGNORE_CPP_ARMA_INSTALLATION}" ]; then
           "${COMPRESSED_FILE_EXT:?}" \
           "${URL:?}" \
           "${COCOA_ARMADILLO_DIR:-"${FILE_ROOT:?}"}" \
-          "${XZF:?}" || { unset_all; return 1; }
+          "${XZF:?}" || return 1;
 
   unset -v URL FILE_ROOT COMPRESSED_FILE_EXT XZF
 
@@ -790,7 +790,7 @@ if [ -z "${IGNORE_CPP_BOOST_INSTALLATION}" ]; then
           "${COMPRESSED_FILE_EXT:?}" \
           "${URL:?}" \
           "${COCOA_BOOST_DIR:-"${FILE_ROOT:?}"}" \
-          "${XZF:?}" || { unset_all; return 1; }
+          "${XZF:?}" || return 1;
 
   unset -v URL_BASE URL FILE_ROOT COMPRESSED_FILE_EXT XZF PACKAGE_VERSION
 
@@ -822,7 +822,7 @@ if [ -z "${IGNORE_CPP_CUBA_INSTALLATION}" ]; then
           "${COMPRESSED_FILE_EXT:?}" \
           "${URL:?}" \
           "${COCOA_CUBA_DIR:-"${FILE_ROOT:?}"}" \
-          "${XZF:?}" || { unset_all; return 1; }
+          "${XZF:?}" || return 1;
 
   unset -v URL FILE_ROOT COMPRESSED_FILE_EXT XZF PACKAGE_VERSION PACKDIR
 
@@ -869,7 +869,7 @@ if [ -z "${IGNORE_CPP_CARMA_INSTALLATION}" ]; then
  
   if [ ! -f "${CCIL:?}/${XZF:?}" ]; then
     
-    gitact1 "${FOLDER:?}" "${VER:?}" "${URL:?}" || { unset_all; return 1; }
+    gitact1 "${FOLDER:?}" "${VER:?}" "${URL:?}" || return 1;
 
     # ------------------------------------------------------------------------
     # move/rename include file and carma.h folder
@@ -888,7 +888,7 @@ if [ -z "${IGNORE_CPP_CARMA_INSTALLATION}" ]; then
 
     # --------------------------------------------------------------------------
     
-    gitact2 "${CNAME:?}" "${XZF:?}" || { unset_all; return 1; }
+    gitact2 "${CNAME:?}" "${XZF:?}" || return 1;
 
   fi
 

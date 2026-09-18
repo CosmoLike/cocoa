@@ -59,7 +59,7 @@ PACKDIR="${ECODEF:?}/${FOLDER:?}"
 # ----------------------------------------------------------------------------
 ptop 'COMPILING POLYCHORD' || { unset_all; return 1; }
 
-cdfolder "${PACKDIR}" || { unset_all; return 1; }
+cdfolder "${PACKDIR}" || return 1;
 
 # ----------------------------------------------------------------------------
 # cleaning any previous compilation
@@ -91,7 +91,7 @@ make -j "${MNT:-1}" pypolychord \
 
 pbottom 'COMPILING POLYCHORD' || { unset_all; return 1; }
 
-cdfolder "${ROOTDIR}" || { unset_all; return 1; }
+cdfolder "${ROOTDIR}" || return 1;
 
 # ----------------------------------------------------------------------------
 

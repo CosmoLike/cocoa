@@ -110,7 +110,7 @@ do
 
   if [ -z "${TKEYS[$i]}" ]; then
 
-    cdfolder "${CCIL:?}" || { unset_all; return 1; }
+    cdfolder "${CCIL:?}" || return 1;
     
     # ------------------------------------------------------------------------
     # check if file exists
@@ -154,7 +154,7 @@ do
 
 done
 
-cdfolder "${ROOTDIR}" || { unset_all; return 1; }
+cdfolder "${ROOTDIR}" || return 1;
 
 pbottom 'UNXV CORE LIBRARIES' || { unset_all; return 1; }
 

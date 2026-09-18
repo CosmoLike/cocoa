@@ -2,14 +2,14 @@
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
-if [ -n "${IGNORE_DERIVKIT_CODE:-}" ]; then
+if [ -n "${IGNORE_BCEMU_CODE:-}" ]; then
   return 99
 fi
 
 if [ -z "${ROOTDIR:-}" ]; then
   source start_cocoa.sh || { pfail 'ROOTDIR'; return 1; }
 fi
-  
+
 ( source "${ROOTDIR:?}/installation_scripts/flags_check.sh" ) || return 1;
 
 unset_env_vars () {
@@ -40,8 +40,8 @@ cdfolder() {
 }
 
 # ---------------------------------------------------------------------------
-# ---------------------------------------------------------------------------  
-# ---------------------------------------------------------------------------  
+# ---------------------------------------------------------------------------
+# ---------------------------------------------------------------------------
 
 unset_env_vars || return 1
 
@@ -50,7 +50,7 @@ unset_env_vars || return 1
 # E = EXTERNAL, CODE, F=FODLER
 ECODEF="${ROOTDIR:?}/external_modules/code"
 
-FOLDER="${DERIVKIT_NAME:-"derivkit"}"
+FOLDER="${BCEMU_NAME:-"bcemu"}"
 
 PACKDIR="${ECODEF:?}/${FOLDER:?}"
 
@@ -59,16 +59,16 @@ PLIB="${ROOTDIR:?}/.local/lib/python${PYTHON_VERSION:?}/site-packages"
 # ----------------------------------------------------------------------------
 # ----------------------------------------------------------------------------
 
-ptop "COMPILING DERIVKIT DERIVATIVE CALCULATOR" || { unset_all; return 1; }
+ptop "COMPILING BARYONIC BCEMU FEEDBACK MODELS" || { unset_all; return 1; }
 
 # ----------------------------------------------------------------------------
 # cleaning any previous compilation
 # ----------------------------------------------------------------------------
 rm -rf "${PACKDIR:?}/build/"
-rm -rf "${PACKDIR:?}/derivkit.egg-info/"
-rm -rf "${PLIB:?}"/derivkit/
-rm -rf "${PLIB:?}"/derivkit-*
-# ----------------------------------------------------------------------------  
+rm -rf "${PLIB:?}"/BCemu/
+rm -rf "${PLIB:?}"/BCemu-*
+rm -rf "${PLIB:?}"/bcemu-*
+# ----------------------------------------------------------------------------
 
 cdfolder "${PACKDIR}" || return 1;
 
@@ -81,10 +81,10 @@ cdfolder "${PACKDIR}" || return 1;
       --no-dependencies \
       --prefix="${ROOTDIR:?}/.local" \
       --no-index \
-      --no-build-isolation 
+      --no-build-isolation
 ) >>${OUT1:?} 2>>${OUT2:?} || { error "${EC3:?}"; return 1; }
 
-pbottom "COMPILING DERIVKIT DERIVATIVE CALCULATOR" || { unset_all; return 1; }
+pbottom "COMPILING BARYONIC BCEMU FEEDBACK MODELS" || { unset_all; return 1; }
 
 cdfolder "${ROOTDIR}" || return 1;
 
@@ -96,7 +96,7 @@ unset_all || return 1
 
 return 55; # why this odd number? compile_cocoa will cache this compilation only
            #   if this script runs entirely.
-           
+
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------

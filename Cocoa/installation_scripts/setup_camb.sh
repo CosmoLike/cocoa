@@ -78,13 +78,13 @@ fi
 
 if [ ! -d "${PACKDIR:?}" ]; then
   
-  cdfolder "${ECODEF:?}" || { unset_all; return 1; }
+  cdfolder "${ECODEF:?}" || return 1;
 
   "${GIT:?}" clone "${URL:?}" --depth ${GIT_CLONE_MAXIMUM_DEPTH:-1000} \
     --recursive --no-single-branch "${FOLDER:?}" \
     >>${OUT1:?} 2>>${OUT2:?} || { error "${EC15:?}"; return 1; }
   
-  cdfolder "${PACKDIR}" || { unset_all; return 1; }
+  cdfolder "${PACKDIR}" || return 1;
 
   if [[ -n "${CAMB_GIT_COMMIT:-}" ||
         -n "${CAMB_GIT_BRANCH:-}" ||
@@ -152,10 +152,10 @@ if [ ! -d "${PACKDIR:?}" ]; then
 
   for (( i=0; i<${AL}; i++ ));
   do
-    cdfolder "${PACKDIR:?}/${TFOLDER[$i]}" || { unset_all; return 1; }
+    cdfolder "${PACKDIR:?}/${TFOLDER[$i]}" || return 1;
 
     cpfolder "${CHANGES:?}/${TFOLDER[$i]}${TFILEP[$i]:?}" . \
-      2>>${OUT2:?} || { unset_all; return 1; }
+      2>>${OUT2:?} || return 1;
 
     patch -l -u "${TFILE[$i]:?}" -i "${TFILEP[$i]:?}" \
       >>${OUT1:?} 2>>${OUT2:?} || { error "${EC17:?} (${TFILE[$i]:?})"; return 1; }
@@ -165,7 +165,7 @@ fi
 
 pbottom "SETUP CAMB" || { unset_all; return 1; }
 
-cdfolder "${ROOTDIR}" || { unset_all; return 1; }
+cdfolder "${ROOTDIR}" || return 1;
 
 unset_all || return 1
 

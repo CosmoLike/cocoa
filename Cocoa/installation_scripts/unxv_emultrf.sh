@@ -82,13 +82,13 @@ fi
 
 if [[ ! -d "${PACKDIR:?}" ]]; then
   
-  cdfolder "${EDATAF:?}" || { unset_all; return 1; }
+  cdfolder "${EDATAF:?}" || return 1;
 
   "${GIT:?}" clone "${URL:?}" --depth ${GIT_CLONE_MAXIMUM_DEPTH:-1000} \
     --recursive --no-single-branch "${FOLDER:?}" \
     >>${OUT1:?} 2>>${OUT2:?} || { error "${EC15:?}"; return 1; }
 
-  cdfolder "${PACKDIR:?}" || { unset_all; return 1; }
+  cdfolder "${PACKDIR:?}" || return 1;
   
   if [[ -n "${EMULTRF_DATA_GIT_COMMIT:-}" ||
         -n "${EMULTRF_DATA_GIT_BRANCH:-}" ||

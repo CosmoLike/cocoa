@@ -70,7 +70,7 @@ rm -rf  "${PLIB:?}"/dark_emulator
 rm -rf  "${PLIB:?}"/dark_emulator-*
 # ---------------------------------------------------------------------------  
 
-cdfolder "${PACKDIR}" || { unset_all; return 1; }
+cdfolder "${PACKDIR}" || return 1;
 
 #prevent all compile_XXX.sh from using the internet (run @compute nodes)
 #FROM: https://github.com/pypa/pip/issues/12050
@@ -88,7 +88,7 @@ cdfolder "${PACKDIR}" || { unset_all; return 1; }
 
 pbottom "COMPILING DARK EMULATOR" || { unset_all; return 1; }
 
-cdfolder "${ROOTDIR}" || { unset_all; return 1; }
+cdfolder "${ROOTDIR}" || return 1;
 
 # ----------------------------------------------------------------------------
 

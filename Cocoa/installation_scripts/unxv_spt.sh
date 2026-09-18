@@ -72,7 +72,7 @@ fi
 
 if [ ! -d "${PACKDIR:?}" ]; then
   
-  cdfolder "${EDATAF:?}" || { unset_all; return 1; }
+  cdfolder "${EDATAF:?}" || return 1;
     
   "${GIT:?}" clone "${URL:?}" --depth ${GIT_CLONE_MAXIMUM_DEPTH:-1000} \
     --recursive "${FOLDER:?}" \
@@ -103,7 +103,7 @@ if [ ! -d "${PACKDIR:?}" ]; then
 
 fi
 
-cdfolder "${ROOTDIR}" || { unset_all; return 1; }
+cdfolder "${ROOTDIR}" || return 1;
 
 pbottom "SETUP/UNXV ${PRINTNAME:?} DATA" || { unset_all; return 1; }
 

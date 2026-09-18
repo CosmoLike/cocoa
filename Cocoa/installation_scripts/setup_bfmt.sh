@@ -67,21 +67,12 @@ CCIL="${ROOTDIR:?}/../cocoa_installation_libraries"
 # E = EXTERNAL, CODE, F=FODLER
 ECODEF="${ROOTDIR:?}/external_modules/code"
 
-# ----------------------------------------------------------------------------
-# In case this script is called twice ----------------------------------------
-# ----------------------------------------------------------------------------
-
-if [ ! -d "${ECODEF:?}/emulators" ]; then
-  mkdir -p "${ECODEF:?}/emulators" \
-    >>${OUT1:?} 2>>${OUT2:?} || { error "${EC20:?}"; return 1; }
-fi
-
 URL="${BFMT_THEORY_URL:-"https://github.com/CosmoLike/cocoa_baryonic_feedback_models_theory.git"}"
 URL=$(devurl "${URL:?}")
 
 FOLDER="${BFMT_NAME:-"baryon_suppression"}"
 
-PACKDIR="${ECODEF:?}/emulators/${FOLDER:?}"
+PACKDIR="${ECODEF:?}/${FOLDER:?}"
 ptop "INSTALLING BARYONIC FEEDBACK MODELS THEORY (COBAYA)" || { unset_all; return 1; }
 
 # ----------------------------------------------------------------------------
@@ -94,13 +85,13 @@ fi
 if [ ! -d "${PACKDIR:?}" ]; then
   echo "${PACKDIR:?}"
 
-  cdfolder "${ECODEF:?}/emulators" || { unset_all; return 1; }
+  cdfolder "${ECODEF:?}" || return 1;
 
   "${GIT:?}" clone "${URL:?}" --depth ${GIT_CLONE_MAXIMUM_DEPTH:-1000} \
     --recursive --no-single-branch "${PACKDIR:?}" \
     >>${OUT1:?} 2>>${OUT2:?} || { error "${EC15:?}"; return 1; }
 
-  cdfolder "${PACKDIR:?}" || { unset_all; return 1; }
+  cdfolder "${PACKDIR:?}" || return 1;
 
   if [[ -n "${BFMT_GIT_COMMIT:-}" ||
         -n "${BFMT_GIT_BRANCH:-}" ||
@@ -133,7 +124,7 @@ if [ ! -d "${PACKDIR:?}" ]; then
  
 fi
 
-cdfolder "${ROOTDIR:?}" || { unset_all; return 1; }
+cdfolder "${ROOTDIR:?}" || return 1;
 
 pbottom "INSTALLING BARYONIC FEEDBACK MODELS THEORY (COBAYA)" || { unset_all; return 1; }
 

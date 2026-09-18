@@ -77,7 +77,7 @@ fi
 if [[ ! -d "${EDATAF:?}/planck/hillipop" ||  
       ! -d "${EDATAF:?}/planck/lollipop" ]]; then
   
-  cdfolder "${EDATAF:?}/planck" || { unset_all; return 1; }
+  cdfolder "${EDATAF:?}/planck" || return 1;
 
   for (( i=0; i<${#FILE[@]}; i++ ));
   do

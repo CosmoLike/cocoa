@@ -74,13 +74,13 @@ fi
 
 if [[ ! -d "${PACKDIR:?}" ]]; then
 
-  cdfolder "${ECODEF}" || { unset_all; return 1; }
+  cdfolder "${ECODEF}" || return 1;
 
   "${GIT:?}" clone "${URL:?}" --depth ${GIT_CLONE_MAXIMUM_DEPTH:-1000} \
     --recursive --no-single-branch "${FOLDER:?}" \
     >>${OUT1:?} 2>>${OUT2:?} || { error "${EC15:?}"; return 1; }
 
-  cdfolder "${PACKDIR}" || { unset_all; return 1; }
+  cdfolder "${PACKDIR}" || return 1;
 
   if [[ -n "${SO_SYSLIB_GIT_COMMIT:-}" ||
         -n "${SO_SYSLIB_GIT_BRANCH:-}" ||
@@ -128,13 +128,13 @@ fi
 
 if [[ ! -d "${PACKDIR:?}" ]]; then
 
-  cdfolder "${ECODEF}" || { unset_all; return 1; }
+  cdfolder "${ECODEF}" || return 1;
 
   "${GIT:?}" clone "${URL:?}" --depth ${GIT_CLONE_MAXIMUM_DEPTH:-1000} \
     --recursive --no-single-branch "${FOLDER:?}" \
     >>${OUT1:?} 2>>${OUT2:?} || { error "${EC15:?}"; return 1; }
 
-  cdfolder "${PACKDIR}" || { unset_all; return 1; }
+  cdfolder "${PACKDIR}" || return 1;
 
   if [ -n "${SO_MFLIKE_GIT_COMMIT:-}" ]; then
     if [ "$("${GIT:?}" rev-parse --is-shallow-repository)" = "true" ]; then
@@ -150,7 +150,7 @@ if [[ ! -d "${PACKDIR:?}" ]]; then
   fi
 
   # PATCH MKFLIKE
-  cdfolder "${PACKDIR:?}/mflike"|| { unset_all; return 1; }
+  cdfolder "${PACKDIR:?}/mflike"|| return 1;
 
   cp "${CCCOB:?}/${COBLIKE:?}/mflike/mflike.patch" "${PACKDIR:?}/mflike" \
     2>>"/dev/null" || { error "CP FILE mflike.patch"; return 1; }
@@ -162,7 +162,7 @@ fi
 
 pbottom "SETUP SIMONS OBSERVATORY MFLIKE" || { unset_all; return 1; }
 
-cdfolder "${ROOTDIR}" || { unset_all; return 1; }
+cdfolder "${ROOTDIR}" || return 1;
 
 #-------------------------------------------------------------------------------
 

@@ -69,11 +69,11 @@ ptop "COMPILING ${PRINTNAME:?}" || { unset_all; return 1; }
 rm -f "${PACKDIR:?}/libCosmoRec.a"
 rm -f "${PACKDIR:?}/CosmoRec"
 rm -f "${ROOTDIR:?}/.local/libCosmoRec.a"
-cdfolder "${PACKDIR}" || { unset_all; return 1; }
+cdfolder "${PACKDIR}" || return 1;
 make cleanall >>${OUT1:?} 2>>${OUT2:?} || { error "${EC2:?}"; return 1; }
 # ---------------------------------------------------------------------------
 
-cdfolder "${PACKDIR}" || { unset_all; return 1; }
+cdfolder "${PACKDIR}" || return 1;
 
 (
   CC="${CXX_COMPILER:?}" make all
@@ -84,7 +84,7 @@ mv "${PACKDIR:?}/libCosmoRec.a" "${ROOTDIR:?}/.local/lib" \
 
 pbottom "COMPILING ${PRINTNAME:?}" || { unset_all; return 1; }
 
-cdfolder "${ROOTDIR:?}" || { unset_all; return 1; }
+cdfolder "${ROOTDIR:?}" || return 1;
 
 # ----------------------------------------------------------------------------
 

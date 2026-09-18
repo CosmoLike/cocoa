@@ -2,7 +2,7 @@
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
-if [ -n "${IGNORE_PYSPK_CODE:-}" ]; then
+if [ -n "${IGNORE_BCEMU_CODE:-}" ]; then
   return 99
 fi
 
@@ -14,7 +14,7 @@ fi
 ( source "${ROOTDIR:?}/installation_scripts/flags_check.sh" ) || return 1;
 
 unset_env_vars () {
-  unset -v URL CCIL ECODEF FOLDER PACKDIR  
+  unset -v URL CCIL ECODEF FOLDER PACKDIR
   cdroot || return 1;
 }
 
@@ -67,18 +67,18 @@ CCIL="${ROOTDIR:?}/../cocoa_installation_libraries"
 # E = EXTERNAL, CODE, F=FODLER
 ECODEF="${ROOTDIR:?}/external_modules/code"
 
-URL="${PYSPK_URL:-"https://github.com/jemme07/pyspk.git"}"
+URL="${BCEMU_URL:-"https://github.com/sambit-giri/BCemu.git"}"
 URL=$(devurl "${URL:?}")
 
-FOLDER="${PYSPK_NAME:-"pyspk"}"
+FOLDER="${BCEMU_NAME:-"bcemu"}"
 
 PACKDIR="${ECODEF:?}/${FOLDER:?}"
-ptop "INSTALLING BARYONIC PYSPK FEEDBACK MODELS" || { unset_all; return 1; }
+ptop "INSTALLING BARYONIC BCEMU FEEDBACK MODELS" || { unset_all; return 1; }
 
 # ----------------------------------------------------------------------------
 # In case this script is called twice ----------------------------------------
 # ----------------------------------------------------------------------------
-if [ -n "${OVERWRITE_EXISTING_PYSPK_CODE:-}" ]; then
+if [ -n "${OVERWRITE_EXISTING_BCEMU_CODE:-}" ]; then
   rm -rf "${PACKDIR:?}"
 fi
 
@@ -93,9 +93,9 @@ if [ ! -d "${PACKDIR:?}" ]; then
 
   cdfolder "${PACKDIR:?}" || return 1;
 
-  if [[ -n "${PYSPK_GIT_COMMIT:-}" ||
-        -n "${PYSPK_GIT_BRANCH:-}" ||
-        -n "${PYSPK_GIT_TAG:-}" ]]; then
+  if [[ -n "${BCEMU_GIT_COMMIT:-}" ||
+        -n "${BCEMU_GIT_BRANCH:-}" ||
+        -n "${BCEMU_GIT_TAG:-}" ]]; then
     if [ "$("${GIT:?}" rev-parse --is-shallow-repository)" = "true" ]; then
       "${GIT:?}" fetch --unshallow --all --tags --prune \
         >>${OUT1:?} 2>>${OUT2:?} || { error "${EC16:?}"; return 1; }
@@ -105,38 +105,38 @@ if [ ! -d "${PACKDIR:?}" ]; then
     fi
   fi
 
-  if [ -n "${PYSPK_GIT_COMMIT:-}" ]; then
+  if [ -n "${BCEMU_GIT_COMMIT:-}" ]; then
 
-    "${GIT:?}" checkout "${PYSPK_GIT_COMMIT:?}" \
+    "${GIT:?}" checkout "${BCEMU_GIT_COMMIT:?}" \
       >>${OUT1:?} 2>>${OUT2:?} || { error "${EC16:?}"; return 1; }
-  
-  elif [ -n "${PYSPK_GIT_BRANCH:-}" ]; then
-  
-    "${GIT:?}" checkout -b "${PYSPK_GIT_BRANCH:?}" "origin/${PYSPK_GIT_BRANCH:?}" \
+
+  elif [ -n "${BCEMU_GIT_BRANCH:-}" ]; then
+
+    "${GIT:?}" checkout -b "${BCEMU_GIT_BRANCH:?}" "origin/${BCEMU_GIT_BRANCH:?}" \
       >>${OUT1:?} 2>>${OUT2:?} || { error "${EC16:?}"; return 1; }
-  
-  elif [ -n "${PYSPK_GIT_TAG:-}" ]; then
-    
-    "${GIT:?}" checkout "tags/${PYSPK_GIT_TAG:?}" -b "${PYSPK_GIT_TAG:?}TMP" \
+
+  elif [ -n "${BCEMU_GIT_TAG:-}" ]; then
+
+    "${GIT:?}" checkout "tags/${BCEMU_GIT_TAG:?}" -b "${BCEMU_GIT_TAG:?}TMP" \
       >>${OUT1:?} 2>>${OUT2:?} || { error "${EC16:?}"; return 1; }
-  
+
   fi
- 
+
 fi
 
 cdfolder "${ROOTDIR:?}" || return 1;
 
-pbottom "INSTALLING BARYONIC PYSPK FEEDBACK MODELS" || { unset_all; return 1; }
+pbottom "INSTALLING BARYONIC BCEMU FEEDBACK MODELS" || { unset_all; return 1; }
 
 # ---------------------------------------------------------------------------
 
 unset_all || return 1
-  
+
 #-------------------------------------------------------------------------------
 
 return 55; # why this odd number? Setup_cocoa will cache this installation only
-           #   if this script runs entirely. What if the user close the terminal 
-           #   or the system shuts down in the middle of a git clone?  
+           #   if this script runs entirely. What if the user close the terminal
+           #   or the system shuts down in the middle of a git clone?
            #   In this case, PACKDIR would exists, but it is corrupted
 
 # ------------------------------------------------------------------------------

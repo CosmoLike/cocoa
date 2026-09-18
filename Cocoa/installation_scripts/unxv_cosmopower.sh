@@ -71,7 +71,7 @@ fi
 # ---------------------------------------------------------------------------
 if [[ ! -d "${PACKDIR:?}" ]]; then
 
-  cdfolder "${EDATAF:?}" || { unset_all; return 1; }
+  cdfolder "${EDATAF:?}" || return 1;
 
   "${GIT:?}" clone "${URL:?}" --depth ${GIT_CLONE_MAXIMUM_DEPTH:-1000} \
     --recursive "${FOLDER:?}" \

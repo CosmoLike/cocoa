@@ -69,7 +69,7 @@ rm -rf "${PACKDIR:?}/build/"
 rm -rf "${PACKDIR:?}/planck_2020_hillipop.egg-info/"  
 # ---------------------------------------------------------------------------
 
-cdfolder "${PACKDIR:?}" || { unset_all; return 1; }
+cdfolder "${PACKDIR:?}" || return 1;
 
 #prevent all compile_XXX.sh from using the internet (run @compute nodes)
 #FROM: https://github.com/pypa/pip/issues/12050
@@ -85,7 +85,7 @@ cdfolder "${PACKDIR:?}" || { unset_all; return 1; }
 
 pbottom "COMPILING HILLIPOP LIKELIHOOD" || { unset_all; return 1; }
 
-cdfolder "${ROOTDIR:?}" || { unset_all; return 1; }
+cdfolder "${ROOTDIR:?}" || return 1;
 
 #-----------------------------------------------------------------------------
 #-----------------------------------------------------------------------------
@@ -94,7 +94,7 @@ ptop "COMPILING LOLLIPOP LIKELIHOOD" || { unset_all; return 1; }
 
 PACKDIR="${ECODEF:?}/${PL2020_LOLLIPOP_NAME:-"planck_2020_lollipop"}"
 
-cdfolder "${PACKDIR:?}" ||{ unset_all; return 1; }
+cdfolder "${PACKDIR:?}" || return 1;
 
 
 # ----------------------------------------------------------------------------
@@ -117,7 +117,7 @@ rm -rf "${PACKDIR:?}/planck_2020_lollipop.egg-info/"
 
 pbottom "COMPILING LOLLIPOP LIKELIHOOD" || { unset_all; return 1; }
 
-cdfolder "${ROOTDIR:?}" || { unset_all; return 1; }
+cdfolder "${ROOTDIR:?}" || return 1;
 
 # ----------------------------------------------------------------------------
 
