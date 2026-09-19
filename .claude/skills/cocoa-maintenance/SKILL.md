@@ -390,3 +390,193 @@ Before a Cocoa tag is created, verify in `set_installation_options.sh`:
   creation; grep for the source project's name after any copy.
 - Tags must share the `v` prefix style; a tag named `4.X.Y` (no `v`) will be
   missed by `v*` globs in scripts and searches.
+
+## 6. Bash style guide (observed across all installation_scripts)
+
+When writing or editing a script, imitate these conventions exactly. They
+hold across the ~85 scripts in `installation_scripts/`.
+
+### 6.1 Layout
+
+- `#!/bin/bash` first line (even though scripts are sourced).
+- Sections separated by full-width divider comments:
+
+      # ------------------------------------------------------------------------------
+      # SECTION TITLE IN WORDS ------------------------------------------------------
+      # ------------------------------------------------------------------------------
+
+- Order inside a script: IGNORE-key guard, ROOTDIR guard, flags_check in a
+  subshell, unset functions, error/helper functions, body, `unset_all`,
+  `return 55`.
+
+### 6.2 Naming
+
+- Environmental keys and script-level variables: UPPER_SNAKE
+  (`PACKDIR`, `ECODEF`, `CCIL`, `PLIB`, `URL`, `FOLDER`, `TMP`, `TMP2`).
+- `PRINTNAME` holds the banner text passed to `ptop`/`pbottom`.
+- Functions: lowercase (`cdfolder`, `cpfolder`, `cpfile`, `gitact0`,
+  `wgetact`, `devurl`, `error`, `unset_all`).
+- Abbreviation comments are welcome where a name is dense:
+  `# E = EXTERNAL, CODE, F=FODLER`.
+
+### 6.3 Quoting and parameter expansion
+
+- Must-exist expansion everywhere a wrong value would be destructive:
+  `"${VAR:?}"`. Every `rm` path uses it (Section 2.4).
+- Defaults with fallback: `"${XXX_URL:-"https://github.com/..."}"`.
+- Optional test: `[ -n "${KEY:-}" ]` / `[ -z "${KEY:-}" ]` — always with
+  the `:-` so `set -u` (debug mode) does not break.
+- Case conversion via expansion, not `tr`: `${VAR,,}` (lower), `${VAR^^}`.
+
+### 6.4 Output and error text
+
+- Commands are silenced by appending `>>${OUT1:?} 2>>${OUT2:?}`; OUT1/OUT2
+  are chosen by the verbosity keys, so never hardcode `/dev/null`.
+- User-visible progress uses `ptop "DOING X"` / `pbottom "DOING X"` pairs
+  with identical text.
+- Error messages come from the `EC<N>` catalog exported in
+  `flags_derived.sh` (for example `EC15="GIT CLONE"`,
+  `EC34="SYMLINK CREATION FAILED"`). To add a new error string, add the next
+  `EC<N>` there and reference it as `"${EC<N>:?}"`; do not inline new
+  free-text messages in scripts when a code fits.
+- No `set -e` in scripts: every command's failure is handled explicitly with
+  `|| { ...; return 1; }`. (`COCOA_OUTPUT_DEBUG=1` turns on strict mode
+  externally; scripts must still work without it.)
+
+### 6.5 Idempotence patterns (scripts run twice safely)
+
+- Clone guard: `if [ ! -d "${PACKDIR:?}" ]; then git clone ...; fi`,
+  preceded by `if [ -n "${OVERWRITE_EXISTING_XXX_CODE:-}" ]; then rm -rf ...`.
+- Symlink guard: `if [[ ! -L "${LINK}" ]]; then ln -s ...; fi` on create,
+  `if [[ -L "${LINK}" ]]; then rm -f ...; fi` on remove.
+- Expensive pip stages use a sentinel file whose name contains a hash of the
+  inputs (see `PIPCP_HASH` in `setup_pip_core_packages.sh`); changing the
+  inputs invalidates the sentinel automatically.
+- Cleanup `rm` lines append `2>/dev/null` so missing files are not errors.
+
+### 6.6 Loops, arrays, platform
+
+- Arrays: `declare -a NAME=("item1"` ... one item per line ... `)`.
+  Script lists in `setup_cocoa.sh`/`compile_cocoa.sh` follow this form.
+- Index loops are C-style: `for (( i=0; i<${#TMP[@]}; i++ ))`; use
+  glob loops (`for f in ...`) when no index is needed.
+- Platform switches: `case "$(uname -s)" in Linux) ... ;; Darwin) ... ;; esac`.
+  Linux and macOS variants stay as separate explicit blocks — do not merge
+  them with clever conditionals.
+- `sed` is GNU sed from the conda environment:
+  `sed --in-place --regexp-extended 's@old@new@g'` (note `@` delimiters when
+  paths contain `/`).
+
+## 7. Integrating an external code as a Cobaya theory block (the bfmt case)
+
+This is the complete checklist for adding a new theory block, in the order
+the pieces were built for `bfmt` (the baryonic feedback block). A theory
+block has two kinds of ingredients: the theory-block repository (a Python
+`Theory` class for Cobaya) and zero or more external emulator/model codes it
+imports. For each numbered item, the bfmt example is named so you can open
+the real files and copy their shape.
+
+**Step 1 — keys in `set_installation_options.sh`:**
+- One `IGNORE_XXX_CODE` per repository (commented = installed by default).
+  bfmt: `IGNORE_BFMT_CODE`, plus `IGNORE_PYSPK_CODE`, `IGNORE_BCEMU_CODE`,
+  `IGNORE_FBRE_CODE`, `IGNORE_BACCOEMU_CODE` for its emulators.
+- One URL/NAME/pin trio per repository (Section 2.6). Pin third-party codes
+  by COMMIT; pin the team-owned theory repo by TAG.
+  bfmt: `BFMT_THEORY_URL`, `BFMT_NAME="baryon_suppression"`, `BFMT_GIT_TAG`.
+
+**Step 2 — flag bookkeeping:**
+- `flags_impl_unset_keys.sh`: `unset -v` for every new key
+  (URL, NAME, GIT_COMMIT, GIT_TAG, GIT_BRANCH, IGNORE, OVERWRITE).
+- `flags_derived.sh`: add `OVERWRITE_EXISTING_XXX_CODE=1` inside the
+  `OVERWRITE_EXISTING_ALL_PACKAGES` cascade.
+
+**Step 3 — setup scripts (one per repository, Section 2.2 skeleton):**
+- Theory repo: clone at the pin into `external_modules/code/${XXX_NAME}`.
+  bfmt: `setup_bfmt.sh`.
+- Each emulator code: clone at the pin. If the code needs a source patch
+  (for example removing an unwanted import that hijacks another module),
+  apply it in setup with an idempotent `sed`, placed AFTER the clone block
+  so re-runs also patch existing clones.
+  bfmt: `setup_bcemu.sh` comments out BCemu's `from .spectra import ...`
+  (it imported camb at package load, shadowing Cobaya's path-checked CAMB).
+- The internet invariant decides where pip install goes (Section 2.7):
+  if the package downloads model files, BOTH the pip install and a download
+  trigger go in setup (bfmt: `setup_bcemu.sh`, `setup_baccoemu.sh`);
+  if it is fully offline-installable, pip goes in a `compile_XXX.sh`
+  (bfmt: `compile_pyspk.sh`, `compile_fbre.sh`).
+
+**Step 4 — wire the runner lists:**
+- Add each `setup_XXX.sh` to the matching array in `setup_cocoa.sh` and each
+  `compile_XXX.sh` to `compile_cocoa.sh`. A repository whose setup does
+  everything has NO compile script and no compile entry.
+
+**Step 5 — Python runtime dependencies:**
+- Because compile-time pip uses `--no-dependencies`, every runtime import of
+  the new codes must be seeded in `PIPCP`
+  (`setup_pip_core_packages.sh`) with a pinned version, after the dry-run
+  check of Section 2.8. Find the imports with:
+
+      grep -rhE "^(import|from) [a-zA-Z0-9_]+" <pkg>/*.py | sort -u
+
+  bfmt additions: `pydantic` (pyspk), `smt==1.0.0` + `wget` + `msgpack`
+  (BCemu), `swiftemulator` (FBRE), `progressbar2` (baccoemu).
+
+**Step 6 — the symlink into Cobaya (start/stop pair):**
+Cobaya finds a theory class at `cobaya/cobaya/theories/<blockname>/`.
+Cocoa does not copy files there; `start_cocoa.sh` creates a symlink and
+`stop_cocoa.sh` removes it. Add one block to EACH file, guarded by the
+block's OWN IGNORE key (a copy-pasted guard from the neighboring block is a
+real bug that happened):
+
+```bash
+# in start_cocoa.sh
+if [[ -z "${IGNORE_BFMT_CODE}" ]]; then
+  ECODEF="${ROOTDIR:?}/external_modules/code"
+  COBTH="${ROOTDIR:?}/cobaya/cobaya/theories"
+  TMP="${BFMT_NAME:-"baryon_suppression"}"
+  TMP2="bfmt"   # the name Cobaya sees: theory block `bfmt`
+  if [[ ! -L "${COBTH:?}/${TMP2}" ]]; then
+    ln -s "${ECODEF:?}/${TMP}" "${COBTH:?}/${TMP2}" \
+      >>${OUT1:?} 2>>${OUT2:?} || { error_start_cocoa "${EC34:?}"; return 1; }
+  fi
+  unset -v ECODEF COBTH TMP TMP2
+fi
+
+# in stop_cocoa.sh
+if [[ -z "${IGNORE_BFMT_CODE}" ]]; then
+  COBTH="${ROOTDIR:?}/cobaya/cobaya/theories"
+  TMP="bfmt"
+  if [[ -L "${COBTH:?}/${TMP}" ]]; then
+    rm -f "${COBTH:?}/${TMP:?}"
+  fi
+  unset -v COBTH TMP
+fi
+```
+
+The repository must contain `<blockname>.py` defining
+`class <blockname>(Theory)` at its top level for the symlinked folder to
+work as a Cobaya theory package.
+
+**Step 7 — housekeeping:**
+- Add every clone destination (`external_modules/code/<name>`) to
+  `.gitignore`.
+- Document the block: keys quote + usage in the theory repository's README,
+  and a short section in the consuming project READMEs pointing to it.
+
+**Step 8 — theory-block code expectations (lives in the theory repo, not
+here, but reviewers should check):**
+- Sample rejection returns `False` from `calculate()` after logging a
+  warning. NEVER `raise LoggedError` for a per-sample rejection: LoggedError
+  is in Cobaya's `always_stop_exceptions` and kills the whole run.
+- Validate sampled parameters and emulator training boxes; out-of-range
+  redshifts degrade to S=1 or a clamped boundary value, never silent
+  extrapolation.
+- Load emulator files ONCE in `initialize()`; per-sample updates go through
+  the emulator's public per-call API.
+- Compute on a small internal grid and 2D-spline onto the grid the
+  likelihood requests (the Cobaya matter-power-interpolator strategy), so
+  cost does not scale with the likelihood's interpolation grid.
+
+**Verification for the whole integration:** `bash -n` every touched script;
+`source setup_XXX.sh` end-to-end in the cocoa environment; run a cobaya
+evaluate with the block enabled and once with it disabled, and compare.

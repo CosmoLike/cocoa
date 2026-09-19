@@ -276,7 +276,7 @@ fi
 # ----------------------------------------------------------------------------
 # ----------------------------- BFM Theory -----------------------------------
 # ----------------------------------------------------------------------------
-if [[ -z "${IGNORE_FASTPT_CODE}" ]]; then
+if [[ -z "${IGNORE_BFMT_CODE}" ]]; then
   ECODEF="${ROOTDIR:?}/external_modules/code"
   COBTH="${ROOTDIR:?}/cobaya/cobaya/theories"
   TMP="${BFMT_NAME:-"baryon_suppression"}"
