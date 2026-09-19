@@ -389,18 +389,35 @@ Consequences:
 
 ### 2.14 Environment hygiene: the shell must be clean after stop_cocoa.sh
 
-Cocoa is obsessive about leaving the user's shell exactly as it found it.
-`source stop_cocoa.sh` sources
-`installation_scripts/flags_impl_unset_keys.sh`, which must unset EVERY
-key and function Cocoa defines. Hygiene has two layers:
+Cocoa is obsessive about leaving the user's shell exactly as it found it:
+after `source stop_cocoa.sh`, the environment must be indistinguishable
+from before `source start_cocoa.sh`. Hygiene has three mechanisms, and
+every variable belongs to exactly one of them:
 
 - per-script `unset_env_vars`/`unset_env_funcs`/`unset_all`
   (Sections 2.1–2.2) clean the names a script defines for itself;
-- `flags_impl_unset_keys.sh` cleans the exported keys (from
-  `set_installation_options.sh`, `flags_derived.sh`, `start_cocoa.sh`)
-  that deliberately survive across scripts until stop.
+- `flags_impl_unset_keys.sh` (sourced by `stop_cocoa.sh`) UNSETS every
+  Cocoa-invented exported key (from `set_installation_options.sh`,
+  `flags_derived.sh`, `start_cocoa.sh`) that deliberately survives across
+  scripts until stop;
+- `flags_save_old.sh` / `flags_recover_old.sh` handle variables that
+  ALREADY EXIST in the system and that Cocoa merely modifies (`PATH`,
+  `LD_LIBRARY_PATH`, `PYTHONPATH`, `C_INCLUDE_PATH`, `LDFLAGS`,
+  `OMP_NUM_THREADS`, `OMP_PROC_BIND`, `CUDA_VISIBLE_DEVICES`, ... — 21 in
+  total, mirrored between the two files). `start_cocoa.sh` saves each into
+  `OLD_<NAME>` (with the sentinel value `"x"` meaning "was unset");
+  `stop_cocoa.sh` restores the saved value (or unsets, on the sentinel)
+  and drops the `OLD_` copy. These variables must NEVER go into
+  `flags_impl_unset_keys.sh`: a blind unset would destroy the user's own
+  pre-Cocoa value instead of recovering it.
 
 Rules:
+
+- When adding a variable, first decide its class. A name Cocoa invents
+  (keys, pins, `IGNORE_*`, ...) goes in `flags_impl_unset_keys.sh`. A
+  standard system/toolchain name Cocoa modifies goes as a matching pair of
+  blocks in `flags_save_old.sh` AND `flags_recover_old.sh`, copying the
+  existing `"x"`-sentinel pattern.
 
 - Every new key gets an `unset -v KEY` line in the `# Variables` block;
   every new function gets `unset -f name` in the `# Functions` block. Add
@@ -429,9 +446,12 @@ Rules:
             installation_scripts/flags_impl_unset_keys.sh \
           | awk '{print $3}' | sort -u)
 
-  As of v4.11.5 this prints only `OMP_NUM_THREADS` and `OMP_PROC_BIND`;
-  treat ANY other name in the output as a missing unset. Do not add a new
-  exception without the maintainer's explicit approval.
+  Every name this prints must belong to the save/recover class — confirm
+  it appears in BOTH `flags_save_old.sh` and `flags_recover_old.sh` (as of
+  v4.11.5 the output is exactly `OMP_NUM_THREADS` and `OMP_PROC_BIND`,
+  the two save/recover variables that `set_installation_options.sh`
+  exports directly). A name in neither the unset file nor the
+  save/recover pair is a hygiene bug: fix it in the class it belongs to.
 - End-to-end smoke test: `source start_cocoa.sh` then
   `source stop_cocoa.sh`, then
 
