@@ -265,6 +265,29 @@ cloned via plain https with no `devurl`.
   `git branch -D <branch>` (`-d` refuses: squash-merged branches never look
   merged to git) and start the next branch fresh from updated `main`.
 
+### 2.11 Conservative version policy (Python, NumPy, everything)
+
+Cocoa deliberately runs OLD, known-good versions. Never upgrade a version as
+a side effect of another task, and never pick "latest" when adding a pin.
+
+- Python stays at 3.11 (`export PYTHON_VERSION=3.11` in
+  `set_installation_options.sh`). Do not propose newer Pythons.
+- NumPy is capped BELOW 2.0: `COCOA_NUMPY_VERSION` in
+  `setup_pip_core_packages.sh` is `1.26.3` (`1.23.5` under
+  `COCOA_FORCE_NUMPY_1_23`), and 1.26.x is the permanent maximum. NumPy 2.x
+  breaks the compiled stack (CARMA/cosmolike bindings, older scipy/numba
+  wheels). That is why `numpy==${COCOA_NUMPY_VERSION}` is repeated inside
+  the pip commands in that script: pip must never get a chance to resolve
+  `numpy>=2` on its own.
+- The same idea applies to every package: when a new dependency is needed,
+  pin the oldest version that works with the already-pinned stack, not the
+  newest release. Emulator model files are often serialized against one
+  exact library version (BCemu loads its trained files only with
+  `smt==1.0.0`; other versions are incompatible).
+- Version bumps are a deliberate maintainer task of their own (tested on
+  Linux and macOS, conda-lock files regenerated) — never bundled into a
+  feature or bugfix change.
+
 ## 3. README rules
 
 ### 3.1 Writing style (mandatory)
@@ -390,6 +413,46 @@ Before a Cocoa tag is created, verify in `set_installation_options.sh`:
   creation; grep for the source project's name after any copy.
 - Tags must share the `v` prefix style; a tag named `4.X.Y` (no `v`) will be
   missed by `v*` globs in scripts and searches.
+- NumPy 2.0: any pip command that can resolve numpy without an explicit
+  `numpy==${COCOA_NUMPY_VERSION}` in the same command may pull numpy 2.x
+  into `.local` and break the compiled stack. NumPy stays at 1.26.x maximum,
+  forever (Section 2.11).
+- macOS arm compile failure — mpicxx dies with
+  `arm64-apple-darwin20.0.0-clang++: No such file or directory`: conda-forge
+  `cxx-compiler` 2.0.0 dropped the `clangxx_osx-arm64` triplet shim that
+  the MPI compiler wrappers expect. Fix: pin `c-compiler`, `cxx-compiler`,
+  and `fortran-compiler` to 1.11.0 in the `cocoapy311-osxarm*.yml` files.
+  Version fixes go into the base/loose ymls AND the lock file is regenerated
+  with conda-lock (`-p osx-arm64`); never hand-edit a lock file.
+- Key-name mismatch between options file and script: if
+  `set_installation_options.sh` exports `XXX_THEORY_URL` but the setup
+  script reads `${XXX_URL:-<default>}`, the default URL silently wins, and
+  a pinned commit that exists only in the intended fork fails later with
+  `fatal: unable to read tree <commit>`. When touching a pin trio, grep the
+  consuming script for the exact key names it actually reads.
+- Emulators fail silently outside their training box: out-of-range inputs
+  (for example baccoemu with `omega_baryon` below its box) return -inf/NaN
+  with no exception. The theory block must validate the box and reject the
+  sample (Section 7, step 8).
+- A guard copied from the neighboring block: the bfmt symlink blocks in
+  `start_cocoa.sh`/`stop_cocoa.sh` shipped guarded by `IGNORE_FASTPT_CODE`,
+  copy-pasted from the FAST-PT block above them. After copying any guarded
+  block, grep the new block for the donor's key.
+- Git LFS repos: branch operations fail with "This repository is configured
+  for Git LFS but 'git-lfs' was not found on your path" when the cocoa
+  conda environment is not active. Activate it (it provides `git-lfs`)
+  before any git work in project repositories.
+- `~/.condarc` edits: steps that temporarily change conda channel settings
+  (the channel allowlist) must save a copy first and restore the file
+  byte-for-byte afterwards (verify with `diff`) — never reconstruct it from
+  memory.
+- Validating cobaya yamls: they may contain the `!defaults` tag, which
+  plain `yaml.safe_load` rejects. Use cobaya's own loader (or register a
+  tolerant constructor) when checking that a yaml parses.
+- Emulator first-use downloads: some packages fetch their model files at
+  the first evaluation; on an offline compute node the first MCMC step then
+  dies mid-run. Trigger the download in the package's `setup_*.sh`
+  (Section 2.7), never leave it to run time.
 
 ## 6. Bash style guide (observed across all installation_scripts)
 
