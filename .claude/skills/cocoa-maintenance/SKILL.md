@@ -176,6 +176,9 @@ Adding a key requires touching, in this order:
    matching array (`CORE`/`THEORY`/`ML`/`LIKELIHOOD`) in `setup_cocoa.sh`
    and/or `compile_cocoa.sh`. Adding or removing a list entry is safe: the
    cache file rebuilds automatically when the list length changes.
+5. If the key's script clones or downloads into `external_modules/code` or
+   `external_modules/data`: add the destination folder to `Cocoa/.gitignore`
+   (Section 2.12). This step is as mandatory as the other four.
 
 ### 2.6 Version pins
 
@@ -311,6 +314,40 @@ a side effect of another task, and never pick "latest" when adding a pin.
     violates the intent of `setup_pip_core_packages.sh` or the conda
     recipes is never an acceptable side effect, even if it makes the task
     "work".
+
+### 2.12 .gitignore review for installed packages (quite important)
+
+Every `setup_*.sh` clone destination and every `unxv_*.sh` data folder
+under `external_modules/code/` and `external_modules/data/` MUST have a
+matching entry in `Cocoa/.gitignore`.
+
+Why this matters: cloned packages are full git repositories. If one is not
+ignored, a user running `git add --all` in Cocoa stages that directory as a
+bare gitlink — an accidental submodule with no `.gitmodules` entry — which
+commits an unusable pointer and breaks everyone else's clone. Users must
+always be able to run `git add --all` safely; the `.gitignore` is what
+guarantees that.
+
+Rules:
+
+- When adding a package, add its destination folder to `Cocoa/.gitignore`
+  next to its neighbors, using the DEFAULT `XXX_NAME` value (the entry
+  cannot follow a user's rename). Example entries from the baryon work:
+
+      external_modules/code/baryon_suppression
+      external_modules/code/pyspk
+      external_modules/code/bcemu
+
+- Data folders get `external_modules/data/<name>` entries; families may use
+  a wildcard (`external_modules/data/roman*`), matching the existing style.
+- Verify after running the new setup script, from the repository root:
+
+      git check-ignore -v "external_modules/code/<folder>"
+      git status --porcelain | grep external_modules
+
+  The first must print the matching rule; the second must print nothing.
+- Review this whenever a script's destination folder is added or renamed —
+  a renamed `XXX_NAME` default silently orphans the old `.gitignore` entry.
 
 ## 3. README rules
 
@@ -646,7 +683,8 @@ work as a Cobaya theory package.
 
 **Step 7 — housekeeping:**
 - Add every clone destination (`external_modules/code/<name>`) to
-  `.gitignore`.
+  `Cocoa/.gitignore` and verify with `git check-ignore` (Section 2.12 —
+  otherwise `git add --all` stages the clone as an accidental submodule).
 - Document the block: keys quote + usage in the theory repository's README,
   and a short section in the consuming project READMEs pointing to it.
 
