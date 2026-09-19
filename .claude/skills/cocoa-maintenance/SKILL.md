@@ -349,6 +349,43 @@ Rules:
 - Review this whenever a script's destination folder is added or renamed —
   a renamed `XXX_NAME` default silently orphans the old `.gitignore` entry.
 
+### 2.13 Science packages: always install the Cocoa way (the getdist pattern)
+
+When a task or a user needs a new scientific package — a cosmology code, an
+emulator, a sampler, an analysis tool — NEVER suggest `pip install <pkg>`
+into the environment. The answer is always the key mechanism in
+`set_installation_options.sh`, with `getdist` as the reference example:
+
+- Keys (set_installation_options.sh):
+
+      #export IGNORE_GETDIST_CODE=1 #dev getdist with code tweaks
+      export GETDIST_URL="https://github.com/cmbant/getdist.git"
+      export GETDIST_GIT_COMMIT="ff477beea2e7e2231a3de4941bdc3d64bd1f0bb4"
+      export GETDIST_NAME="getdist"
+
+- `setup_getdist.sh` clones the pinned commit into
+  `external_modules/code/getdist`; `compile_getdist.sh` pip-installs that
+  clone offline into `.local` (Section 2.7 flags). Both are wired into the
+  runner arrays, and the destination is gitignored (Sections 2.5, 2.12).
+
+Why this is non-negotiable: scientists-as-developers break backward
+compatibility ALL the time. A directly pip-installed package floats with
+upstream and silently diverges between users and machines; the key
+mechanism pins an exact commit, so every Cocoa installation is identical
+and a breaking upstream change can never reach users until the maintainer
+deliberately moves the pin (Section 2.11).
+
+Consequences:
+
+- Adding a science package = the full recipe: pin-trio keys + IGNORE key,
+  setup (and, if offline-installable, compile) scripts, flag bookkeeping,
+  runner lists, `.gitignore`, and PIPCP pins for its runtime dependencies.
+  There is no shortcut version of this.
+- The rule extends to documentation and support answers: when a README or
+  a reply explains how to get a package, it shows the key block to
+  enable/add — it never tells users to `pip install` the package directly
+  (the theory-block READMEs carry an explicit warning about this).
+
 ## 3. README rules
 
 ### 3.1 Writing style (mandatory)
