@@ -270,8 +270,11 @@ cloned via plain https with no `devurl`.
 Cocoa deliberately runs OLD, known-good versions. Never upgrade a version as
 a side effect of another task, and never pick "latest" when adding a pin.
 
-- Python stays at 3.11 (`export PYTHON_VERSION=3.11` in
-  `set_installation_options.sh`). Do not propose newer Pythons.
+- Python stays at the pinned version (`export PYTHON_VERSION=3.11` in
+  `set_installation_options.sh`) until that version is within about a month
+  of its upstream end-of-life; only then does Cocoa move to the next minor
+  (3.11 → 3.12, and so on). Until that point, do not propose newer Pythons,
+  and the migration itself is a maintainer-led task, never a side effect.
 - NumPy is capped BELOW 2.0: `COCOA_NUMPY_VERSION` in
   `setup_pip_core_packages.sh` is `1.26.3` (`1.23.5` under
   `COCOA_FORCE_NUMPY_1_23`), and 1.26.x is the permanent maximum. NumPy 2.x
