@@ -168,7 +168,8 @@ Adding a key requires touching, in this order:
    commented: `#export KEY=1`. Keys the user may uncomment to skip a package
    are named `IGNORE_XXX_CODE` / `IGNORE_XXX_DATA`.
 2. `installation_scripts/flags_impl_unset_keys.sh` — add `unset -v KEY` in
-   alphabetical position (functions go under `# Functions` as `unset -f`).
+   case-insensitive alphabetical position, never at the end (functions go
+   under `# Functions` as `unset -f`). Verify with Section 2.14's checks.
 3. `installation_scripts/flags_derived.sh` — only if the key participates in
    a cascade (for example each `OVERWRITE_EXISTING_XXX_CODE` is set to 1 when
    `OVERWRITE_EXISTING_ALL_PACKAGES` is set).
@@ -385,6 +386,58 @@ Consequences:
   a reply explains how to get a package, it shows the key block to
   enable/add — it never tells users to `pip install` the package directly
   (the theory-block READMEs carry an explicit warning about this).
+
+### 2.14 Environment hygiene: the shell must be clean after stop_cocoa.sh
+
+Cocoa is obsessive about leaving the user's shell exactly as it found it.
+`source stop_cocoa.sh` sources
+`installation_scripts/flags_impl_unset_keys.sh`, which must unset EVERY
+key and function Cocoa defines. Hygiene has two layers:
+
+- per-script `unset_env_vars`/`unset_env_funcs`/`unset_all`
+  (Sections 2.1–2.2) clean the names a script defines for itself;
+- `flags_impl_unset_keys.sh` cleans the exported keys (from
+  `set_installation_options.sh`, `flags_derived.sh`, `start_cocoa.sh`)
+  that deliberately survive across scripts until stop.
+
+Rules:
+
+- Every new key gets an `unset -v KEY` line in the `# Variables` block;
+  every new function gets `unset -f name` in the `# Functions` block. Add
+  ALL spellings of a pin family (`_URL`, `_NAME`, `_GIT_COMMIT`,
+  `_GIT_BRANCH`, `_GIT_TAG`, `IGNORE_`, `OVERWRITE_EXISTING_`) as
+  insurance, even the ones not currently exported.
+- Both blocks are kept in CASE-INSENSITIVE alphabetical order, and a new
+  key is inserted at its position — NEVER appended at the end. The
+  ordering exists so a developer can spot-check for a missing key at a
+  glance; an appended block defeats that. (This happened: the
+  baryon-emulator key families shipped appended after `WGET_VERSION` and
+  were only caught later by the sort check below.)
+- Verification, after any key change:
+
+      grep '^unset -v' installation_scripts/flags_impl_unset_keys.sh | sort -cf
+      grep '^unset -f' installation_scripts/flags_impl_unset_keys.sh | sort -cf
+
+  Both must print nothing. Then the coverage check:
+
+      comm -23 \
+        <(grep -hoE '^(export )?[A-Za-z][A-Za-z0-9_]+=' \
+            set_installation_options.sh \
+            installation_scripts/flags_derived.sh \
+          | sed -E 's/^export //; s/=$//' | sort -u) \
+        <(grep -oE '^unset -v [A-Za-z0-9_]+' \
+            installation_scripts/flags_impl_unset_keys.sh \
+          | awk '{print $3}' | sort -u)
+
+  As of v4.11.5 this prints only `OMP_NUM_THREADS` and `OMP_PROC_BIND`;
+  treat ANY other name in the output as a missing unset. Do not add a new
+  exception without the maintainer's explicit approval.
+- End-to-end smoke test: `source start_cocoa.sh` then
+  `source stop_cocoa.sh`, then
+
+      env | grep -E '_GIT_(COMMIT|TAG|BRANCH)=|^IGNORE_|^OVERWRITE_'
+
+  must print nothing.
 
 ## 3. README rules
 
