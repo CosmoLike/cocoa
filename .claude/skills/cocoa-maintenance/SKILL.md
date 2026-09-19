@@ -287,6 +287,27 @@ a side effect of another task, and never pick "latest" when adding a pin.
 - Version bumps are a deliberate maintainer task of their own (tested on
   Linux and macOS, conda-lock files regenerated) — never bundled into a
   feature or bugfix change.
+- ENFORCEMENT — be obsessive about this. The policy only holds if versions
+  are locked tightly everywhere a resolver runs, above all in
+  `setup_pip_core_packages.sh` and the conda ymls:
+  - Every entry you add to `PIPCP`/`PIPCPFR` carries an exact `==` pin.
+    Never an unpinned name, never `>=`, never a range: any of those is an
+    open door for pip to upgrade the stack later.
+  - A pin that exists in both a conda yml and a pip array must be the SAME
+    version in both places; they protect each other.
+  - Before AND after touching these files, run the Section 2.8 dry-run.
+    If any already-pinned package (numpy, scipy, matplotlib,
+    typing-extensions, ...) shows up in pip's "Would install" line, that is
+    a bug in your change — stop and add the missing guard pin. Never accept
+    the upgrade, never "fix" it by bumping the existing pin.
+  - The same discipline applies to conda recipe edits: adding a package to
+    a yml without an exact version lets the solver move other packages.
+    Pin the addition and confirm the solver keeps everything else fixed.
+  - If a task appears to REQUIRE upgrading a pinned package, do not do it:
+    report the conflict to the maintainer and stop. An upgrade that
+    violates the intent of `setup_pip_core_packages.sh` or the conda
+    recipes is never an acceptable side effect, even if it makes the task
+    "work".
 
 ## 3. README rules
 
