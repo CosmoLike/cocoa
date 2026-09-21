@@ -486,6 +486,12 @@ Rules:
 - FAQ bodies: one or two intro sentences ending "If that is the case, follow
   the steps below", then `**Step :one:**:` blocks — one short imperative
   line plus one command each.
+- Every command flow uses `**Step :one:**:` blocks — ALWAYS, even
+  when there is a single step. A bare command block with a lead-in
+  sentence is not a flow.
+- A README with more than three sections opens with a numbered
+  Contents list linking `<a name>` anchors placed on each heading
+  (the main README pattern).
 - One topic = one TIP (a tip may contain two numbered solutions; do not
   split into two tips).
 - A paragraph must not carry what a display shows better. Settings
