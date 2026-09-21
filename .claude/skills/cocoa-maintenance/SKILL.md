@@ -982,6 +982,17 @@ Before a Cocoa tag is created, verify in `set_installation_options.sh`:
   Reproduce notebook crashes headlessly (extract the cells into a script
   and run it in a subprocess) before guessing. Interior linspace segments
   take `endpoint=False`; the junction value belongs to one segment only.
+- Notebook wrapper defaults mirror the project's yaml, not each other:
+  before homogenizing a signature default across projects, check that
+  project's `EXAMPLE_EVALUATE*.yaml`. des_y3's `CLIntegrationAccuracy = 1`
+  looked like drift next to roman/lsst's 0, but its EVALUATE1 yaml
+  deliberately sets `integration_accuracy: 1` (same category as its
+  preserved `CAMBAccuracyBoost=1.1` and `k_per_logint=20`). Structure
+  (fold formulas, follower laws such as the shared
+  `init_ntable_lmax(int(<yaml lmax> + 20000*(CLAccuracyBoost-1)))`) is
+  unified across projects; values are anchored per project in its yaml.
+  Each EVALUATE notebook follows its own numbered yaml (EVALUATE2's
+  `integration_accuracy: 0` overrides what EVALUATE1 chose).
 
 ## 6. Bash style guide (observed across all installation_scripts)
 
