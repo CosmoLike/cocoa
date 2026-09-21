@@ -600,6 +600,10 @@ shape, the main README wins.
 - No commentary about other projects or past incidents ("which in
   other projects exposed interface breakdowns"): state what the
   check does here.
+- A project README section about the tests is a short summary (what
+  the tests cover, in one sentence) plus the Step flow to run them
+  and a pointer to tests/README.md; every further detail lives
+  there, never in the project page.
 - Never quote measured values in a README: they go stale with the
   next commit and force a page redo. State the conclusion ("the
   measured values sit far below the 0.2 band") and point at the
