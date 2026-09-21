@@ -993,6 +993,19 @@ Before a Cocoa tag is created, verify in `set_installation_options.sh`:
   unified across projects; values are anchored per project in its yaml.
   Each EVALUATE notebook follows its own numbered yaml (EVALUATE2's
   `integration_accuracy: 0` overrides what EVALUATE1 chose).
+- Notebook compute functions must reset the interface state they run
+  under: every def that drives the compiled interface (data vectors,
+  derivatives, response functions, the Fisher dv) calls
+  `init_ntable_lmax` with the project's unified law AND
+  `init_accuracy_boost` (plus `init_binning` for real-space outputs)
+  itself, never inheriting them from an earlier cell. roman_real's
+  response computes ran at whatever table lmax the accuracy scans
+  left behind (up to 180000) versus 70000 after a fresh init. Audit:
+  sweep every code cell containing both `def ` and `ci.` (defs are
+  not always the first statement) and check the presence AND the law
+  string of both init calls. Prove a fix with a pollute-then-repeat
+  run: set a foreign lmax/boost/binning between two identical calls;
+  the outputs must be bit-identical.
 
 ## 6. Bash style guide (observed across all installation_scripts)
 
