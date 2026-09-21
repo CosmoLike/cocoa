@@ -1227,10 +1227,16 @@ default settings. Three shapes occur:
   not a refinement. The desy1xplanck `accuracyboost` scan is fine
   through 3.25, then +0.26 at 4 and +27 at 5. Cap the knob and file
   an interface bug.
-- Oscillation with no plateau — integration jitter, also an
-  interface problem. The roman_kl `accuracyboost` scan jumps by 0.3
-  to 3 between boosts 1.25 and 6. Do not chase it by raising
-  defaults.
+- Oscillation with no plateau — a re-phasing interpolation grid, not
+  a convergence property. The roman_kl `accuracyboost` scan jumped by
+  0.3 to 3 between boosts 1.25 and 6 because the z-node count of the
+  power-spectrum tables grew additively, re-phasing the linear-
+  interpolation sawtooth at every boost. Do not chase such a shape by
+  raising defaults; fix the grid. The cure, now in every project's
+  likelihood prototype: the boost refines the z grid dyadically
+  (nested nodes, boost-1 grid unchanged, CAMB's 256-redshift cap
+  respected by a fixed request grid), after which the same scan is
+  monotone below 0.007.
 
 ### 9.4 What a measurement changes
 
