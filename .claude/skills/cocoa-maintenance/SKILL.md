@@ -608,8 +608,14 @@ shape, the main README wins.
   next commit and force a page redo. State the conclusion ("the
   measured values sit far below the 0.2 band") and point at the
   checks that print the numbers; the terminal output on the current
-  code is the source of truth. Contract numbers (pass limits such as
-  0.2, tolerances such as 1e-4) are not measurements and stay.
+  code is the source of truth. The same goes for conclusions drawn
+  from measurements ("the measured values sit far below the band, so
+  the defaults are adequate"): they would need re-verification after
+  every commit. Say what the check measures and which band the
+  reader compares against. Contract numbers (pass limits such as
+  0.2, tolerances such as 1e-4) are not measurements and stay, and
+  so does the recorded rationale of a past decision (why a default
+  changed).
 
 ### 3.2 Quote blocks must match the source files
 
