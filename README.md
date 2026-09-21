@@ -24,6 +24,7 @@
     1. [FAQ: How can users debug Cocoa Installation? Suggested steps](#running_wrong)
     2. [FAQ: How can users compile a single external module (not involving Cosmolike)?](#appendix_compile_separately)
     3. [FAQ: How can users install Cosmolike projects?](#appendix_compile_cosmolike_separately)
+    4. [FAQ: How can users test Cosmolike projects?](#appendix_test_cosmolike_projects)
     4. [FAQ: How can users run Cocoa with Docker?](#appendix_jupyter_whovian)
     6. [FAQ: How can users set the appropriate environment for ML?](#ml_emulators)
 11. [Advanced Appendices](#appendix_additional)
@@ -351,6 +352,9 @@ Cocoa provides several Cosmolike projects, not all of which are installed by def
 
         mpirun -n 4 --oversubscribe \
           cobaya-run ./projects/lsst_y1/EXAMPLE_MCMC1.yaml -f
+
+> [!TIP]
+> Each Cosmolike project ships a unit-test suite under its `tests/` folder. To run it after an installation or a code change, see the appendix [FAQ: How can users test Cosmolike projects?](#appendix_test_cosmolike_projects).
 
 ### Running Jupyter Notebooks
 
@@ -1205,6 +1209,40 @@ In case users only want to compile a single Cosmolike project (let's say the `ro
 
       source ./projects/roman_real/scripts/compile_roman_real.sh
      
+## :interrobang: FAQ: How can users test Cosmolike projects? <a name="appendix_test_cosmolike_projects"></a>
+
+Every Cosmolike project ships a unit-test suite under its `tests/` folder (e.g., `projects/lsst_y1/tests`). Each suite reads nothing from the live project and changes no project files; it runs three kinds of checks:
+
+- chi2: the chi2 of each likelihood at a fixed reference point must stay within 0.2 of the value stored in `tests/frozen/reference_chi2.json`. A drift means code or data changed the numbers.
+- race: the same point is evaluated fresh and then again as the 10th of 10 cosmologies in a row, with the test modules forcing `OMP_NUM_THREADS=4` internally; the two chi2 values must agree to 1e-4. Leftover internal state or colliding OpenMP threads break the agreement.
+- accuracy (`test_accuracy.py`; advisory, no pass/fail): a one-knob-at-a-time scan of the numerical settings, then checks with all knobs pushed beyond the defaults. Each check prints chi2(high accuracy) minus chi2(default): the numerical error of the default settings.
+
+To run a suite, follow the steps below.
+
+**Step :one:**: from the Cocoa main folder `cocoa/Cocoa`, activate the Conda cocoa environment and source `start_cocoa.sh`
+
+     conda activate cocoa
+
+and
+
+     source start_cocoa.sh
+
+**Step :two:**: run the suite of a project (below, the `lsst_y1` project)
+
+     python -m pytest ./projects/lsst_y1/tests
+
+> [!NOTE]
+> `--ignore ./projects/lsst_y1/tests/test_accuracy.py`: skip the accuracy checks, whose high-accuracy evaluations take minutes each. The rest of the suite takes a few minutes.
+
+The frozen state under `tests/frozen/` holds the cobaya configurations fully expanded (every option and every parameter written out, so editing the likelihood default yaml files cannot change what the tests evaluate), the tests' own copy of the data files, and synthetic data vectors generated at the reference point, so each chi2 sits at its minimum. The file `tests/manifest_sha256.json` stores a SHA-256 hash of every frozen file, and each test refuses to run when a frozen file was edited. Users can therefore change the live data and examples freely without breaking the tests.
+
+Maintainers redefine the frozen state after a deliberate change to the data files, examples, or likelihood defaults:
+
+     python ./projects/lsst_y1/tests/generate_frozen_reference.py --overwrite
+
+> [!NOTE]
+> `--overwrite`: delete the existing `frozen/` folder, rebuild it from the current project, and rewrite the manifest (the script refuses to run without this flag). Review the printed reference chi2 values before committing: they define what every later test run compares against.
+
 ## :interrobang: FAQ: How can users run Cocoa with Docker? <a name="appendix_jupyter_whovian"></a>
 
 We provide the Docker image [whovian-cocoa](https://hub.docker.com/r/vivianmiranda/whovian-cocoa) to facilitate installing Cocoa on Windows and macOS. This appendix assumes that users have already installed the Docker Engine on their local PC. For instructions on installing the Docker engine on specific operating systems, refer to [Docker's official documentation](https://docs.docker.com/engine/install/). 
