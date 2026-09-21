@@ -1,5 +1,5 @@
 # Table of contents
-1. [Integrating an external code as a Cobaya theory block](#appendix_new_theory_block)
+1. [FAQ: How to integrate an external code as a Cobaya theory block?](#appendix_new_theory_block)
     1. [What the theory-block Python class must do](#appendix_theory_block_class)
     2. [Running the verification](#appendix_theory_block_verification)
 2. [FAQ: How to switch Cocoa's adopted CAMB/CLASS? (the easy way)](#appendix_new_camb_class)
@@ -14,13 +14,13 @@ The folder `Cocoa/external_modules/code` is where external code lives. Every cod
 
 Installing a new CAMB code in Cocoa requires a few changes to the existing CAMB/CLASS code. Fortunately, Cocoa provides a set of scripts, located at `Cocoa/installation_scripts`, and patches, located at `Cocoa/../cocoa_installation_libraries/XXX_changes` where XXX is the specific code to be patched, that automatically handle the necessary code adjustments.
 
-The shell scripts are split into two categories. The first category of shell scripts downloads the code and applies necessary patches; they are named `setup_XXX.sh`, where XXX is the specific code to be downloaded. For instance, the script `setup_camb.sh` downloads CAMB Boltzmann code from its original GitHub repository. The second category of shell scripts compiles the code; they are named `compile_XXX.sh`. For instance, the script `setup_camb.sh` compiles CAMB.
+The shell scripts are split into two categories. The first category of shell scripts downloads the code and applies necessary patches; they are named `setup_XXX.sh`, where XXX is the specific code to be downloaded. For instance, the script `setup_camb.sh` downloads CAMB Boltzmann code from its original GitHub repository. The second category of shell scripts compiles the code; they are named `compile_XXX.sh`. For instance, the script `compile_camb.sh` compiles CAMB.
 
 The patches are always located at `Cocoa/../cocoa_installation_libraries`. These patches enforce that these codes are compiled with the Cocoa-prescribed compilers and linked against the Cocoa-prescribed version of any necessary numerical library. Consistency when compiling and linking code is one of the main advantages of working within the Cocoa framework.
 
 On an advanced note, three scripts are worth mentioning separately: `setup_core_packages.sh`, `unxv_core_packages.sh`, and `compile_core_packages.sh`. The first two scripts manage the installation, while the third manages the compilation of stable numerical libraries that other codes may need. *The vast majority of these codes are provided by the Cocoa Conda environment*, with a few exceptions, including the CUBA integration library. Nevertheless, these scripts provide a unified and simple interface for users to add new required numerical libraries that may not be available on Conda (or that need some unique way to be compiled).
       
-## Integrating an external code as a Cobaya theory block <a name="appendix_new_theory_block"></a>
+## :interrobang: FAQ: How to integrate an external code as a Cobaya theory block? <a name="appendix_new_theory_block"></a>
 
 In Cobaya, a *theory block* is a Python class that computes an intermediate physical quantity at every point the sampler visits. It sits between the Boltzmann code and the likelihood: Cobaya runs the Boltzmann code, hands its products to the theory block, and hands the combined products to the likelihood. Integrating a block into Cocoa means teaching Cocoa's installation scripts to download the code, install its dependencies, and place it where Cobaya looks for theories.
 
@@ -253,11 +253,11 @@ Swapping the default CAMB/CLASS is simple. Go to Cocoa's main folder and open th
     [Adapted from Cocoa/set_installation_options.sh shell script]
     
     export CAMB_URL="https://github.com/cmbant/CAMB"
-    export CAMB_GIT_COMMIT="45d1c3d27e7480c0f9a82c98522c17ed422dd408"
+    export CAMB_GIT_COMMIT="6c978c716e163157c95191ee1c089e8b36c8adb9"
     export CAMB_NAME='CAMB'
      
     export CLASS_URL="https://github.com/lesgourg/class_public.git"
-    export CLASS_GIT_COMMIT="8df566c1ff2d0b3e40e106567c435575aea337be"
+    export CLASS_GIT_COMMIT="5668031a8021bdc399e380ecf58f7a8e37a2a5e4"
     export CLASS_NAME="class_public"
 
 As long as your new CAMB/CLASS makefiles are not altered to the extent that Cocoa patch files designed to adjust [CAMB installation](../../../cocoa_installation_libraries/camb_changes) and [CLASS installation](../../../cocoa_installation_libraries/class_changes)  fail, that is all that is needed to change the adopted Boltzmann codes.
@@ -268,7 +268,10 @@ Finally, what if the user wants to skip CAMB or CLASS compilation? In this case,
     
     [Adapted from Cocoa/set_installation_options.sh shell script]
     #export IGNORE_CAMB_CODE=1
-    #export IGNORE_CLASS_CODE=1
+    export IGNORE_CLASS_CODE=1 # Default: we just use CAMB (reduces compilation time)
+
+> [!NOTE]
+> Cocoa ships with `IGNORE_CLASS_CODE` already exported: CLASS is skipped by default to reduce compilation time. Comment the key out to download and compile it.
 
 ## :interrobang: FAQ: What about installing Polychord and Velocileptors? <a name="appendix_new_polychord"></a> 
 
@@ -277,12 +280,15 @@ The shell script `set_installation_options.sh` provides the following keys that 
     [Adapted from Cocoa/set_installation_options.sh shell script]
     
     #export IGNORE_POLYCHORD_SAMPLER_CODE=1
-    #export IGNORE_VELOCILEPTORS_CODE=1
+    export IGNORE_VELOCILEPTORS_CODE=1
+
+> [!NOTE]
+> Cocoa ships with `IGNORE_VELOCILEPTORS_CODE` already exported: Velocileptors is skipped by default. Comment the key out to download and compile it.
 
     (...)
 
     export POLY_URL="https://github.com/PolyChord/PolyChordLite.git"
-    export POLYCHORD_GIT_COMMIT="daba49d1385d065122db76a2b384050f9e95d278"
+    export POLYCHORD_GIT_COMMIT="a422163d875d7879d689ce535c47db0281da2775"
     export POLY_NAME="PolyChordLite"
 
     (...)
@@ -309,8 +315,11 @@ The CMB data sets require specialized likelihoods. Cocoa will download, patch, a
     #export IGNORE_ACTDR4_CODE=1
     #export IGNORE_ACTDR6_CODE=1
     #export IGNORE_SIMONS_OBSERVATORY_LIKELIHOOD_CODE=1
-    #export IGNORE_CAMSPEC_LIKELIHOOD_CODE=1
-    #export IGNORE_LIPOP_LIKELIHOOD_CODE=1
+    export IGNORE_CAMSPEC_LIKELIHOOD_CODE=1
+    export IGNORE_LIPOP_LIKELIHOOD_CODE=1
+
+> [!NOTE]
+> Cocoa ships with the CamSpec and Lipop keys already exported: these two likelihood codes are skipped by default. Comment their keys out to download and compile them.
 
 Cocoa selects the URL to download the likelihoods (and the version of the likelihood) using the following keys.
 
@@ -334,11 +343,11 @@ If users want to create their setup and compile shell scripts to work seamlessly
 
 **Step :one::** Copy the setup and compile shell scripts. 
 
-    cp "${ROOTDIR:?}"/installation_scripts/setup_camb "${ROOTDIR:?}"/installation_scripts/setup_cambq
+    cp "${ROOTDIR:?}"/installation_scripts/setup_camb.sh "${ROOTDIR:?}"/installation_scripts/setup_cambq.sh
 
 and
 
-    cp "${ROOTDIR:?}"/installation_scripts/compile_camb "${ROOTDIR:?}"/installation_scripts/compile_cambq
+    cp "${ROOTDIR:?}"/installation_scripts/compile_camb.sh "${ROOTDIR:?}"/installation_scripts/compile_cambq.sh
 
 **Step :two::** Modify the name of the environmental variables `CAMB_URL`, `CAMB_NAME`, and `CAMB_GIT_COMMIT` on `setup_cambq.sh` shell script.
 
@@ -381,7 +390,7 @@ and
     [Adapted from Cocoa/set_installation_options.sh shell script]
 
     export CAMB_URL="https://github.com/cmbant/CAMB"
-    export CAMB_GIT_COMMIT="45d1c3d27e7480c0f9a82c98522c17ed422dd408"
+    export CAMB_GIT_COMMIT="6c978c716e163157c95191ee1c089e8b36c8adb9"
     export CAMB_NAME='CAMB'
 
     # Add and adapt the lines below
@@ -432,26 +441,30 @@ Adding additional patches to the default CAMB/CLASS is pretty straightforward. H
 
     (...)
     
-    # T = TMP
+    # PREFIX: T = TMP, P = PATCH
     declare -a TFOLDER=("camb/" 
                         "fortran/" 
                         "forutils/"
+                        "fortran/"
                         # Add here the subfolder where the file to be patched is located
                         ) # If nonblank, path must include /
   
-    # T = TMP
     declare -a TFILE=("_compilers.py" 
                       "Makefile" 
                       "Makefile_compiler"
+                      "Makefile_main"
                       # Add here the file that needs to be patched
                       )
 
-    #T = TMP, P = PATCH
     declare -a TFILEP=("_compilers.patch" 
                        "Makefile.patch" 
                        "Makefile_compiler.patch"
-                       # Add here the file that the patch file
+                       "Makefile_main.patch"
+                       # Add here the patch file
                        )
+
+> [!NOTE]
+> Right below these arrays, a `case "$(uname -s)"` switch re-declares `TFILEP` per platform, so a patch that must differ between Linux and macOS gets one file per system. The fourth CAMB patch is the current example: `Makefile_main.patch` on Linux and `Makefile_main_osx.patch` on macOS.
                      
 ## Understanding CAMB's patches (developers only :bangbang: :scream: ☠️ :bangbang: ) <a name="appendix_patch_camb"></a> 
 
@@ -459,7 +472,9 @@ To start, we show the current list of CAMB patches below.
     
     cocoa_installation_libraries/camb_changes/camb/_compilers.patch 
     cocoa_installation_libraries/camb_changes/fortran/Makefile.patch
-    cocoa_installation_libraries/camb_changes/forutils/Makefile_compiler
+    cocoa_installation_libraries/camb_changes/forutils/Makefile_compiler.patch
+    cocoa_installation_libraries/camb_changes/fortran/Makefile_main.patch
+    cocoa_installation_libraries/camb_changes/fortran/Makefile_main_osx.patch
 
 Below, we explain what these patches do.
 
@@ -560,6 +575,20 @@ Below, we explain what these patches do.
         
     endif
         
+**:four: Patches [fortran/Makefile_main.patch](../../../cocoa_installation_libraries/camb_changes/fortran/Makefile_main.patch) and [fortran/Makefile_main_osx.patch](../../../cocoa_installation_libraries/camb_changes/fortran/Makefile_main_osx.patch)**: These patches modify the file `fortran/Makefile_main` so the optional recombination codes are linked from Cocoa's private environment. Unpatched CAMB builds CosmoRec and HyRec by itself from hardcoded relative paths; Cocoa compiles them once, installs the libraries in `.local/lib`, and the patch removes CAMB's own build targets and links the installed libraries instead. The two variants differ only in the C++ standard library each platform links (`-lstdc++` on Linux, `-lc++` on macOS); `setup_camb.sh` picks the right one with a `case "$(uname -s)"` switch.
+
+    [Adapted from Cocoa/external_modules/code/CAMB/fortran/Makefile_main]
+    
+    ifneq (,$(findstring cosmorec,$(RECOMBINATION_FILES)))
+      FFLAGS += -DCOSMOREC
+      LIBLINK += -L"$(ROOTDIR)/.local/lib" -lCosmoRec -lgsl -lgslcblas -lstdc++
+    endif
+    
+    ifneq (,$(findstring hyrec,$(RECOMBINATION_FILES)))
+      FFLAGS += -DHYREC
+      LIBLINK += "$(ROOTDIR)/.local/lib/libhyrec.a" -lhyrec -lm
+    endif
+
 ## Understanding CLASS's patches (developers only :bangbang: :scream: ☠️ :bangbang:) <a name="appendix_patch_class"></a> 
 
 To start, we show the current list of CLASS patches below.
