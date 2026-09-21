@@ -354,7 +354,7 @@ Cocoa provides several Cosmolike projects, not all of which are installed by def
           cobaya-run ./projects/lsst_y1/EXAMPLE_MCMC1.yaml -f
 
 > [!TIP]
-> Each Cosmolike project ships a unit-test suite under its `tests/` folder. To run it after an installation or a code change, see the appendix [FAQ: How can users test Cosmolike projects?](#appendix_test_cosmolike_projects).
+> Each Cosmolike project ships unit tests under its `tests/` folder. To run them after an installation or a code change, see the appendix [FAQ: How can users test Cosmolike projects?](#appendix_test_cosmolike_projects).
 
 ### Running Jupyter Notebooks
 
@@ -729,9 +729,9 @@ likelihoods, and the theory code, all following Cobaya Conventions.
 </p>
 
 > [!NOTE]
-> What about [CosmoPower](https://alessiospuriomancini.github.io/cosmopower/)? CosmoPower is a suite of popular emulators developed by Prof. Alessio Mancini
+> What about [CosmoPower](https://alessiospuriomancini.github.io/cosmopower/)? CosmoPower is a collection of popular emulators developed by Prof. Alessio Mancini
 > and collaborators. Our Cocoa port relies on the work done by Hidde Jense @HTJense (kudos to his/their work) as well as the Simons Observatory SOLikeT code.
-> Even though they are not the suite of AI-powered emulators adopted by Cocoa developers, we do provide limited support for running them.
+> Even though they are not the AI-powered emulators adopted by Cocoa developers, we do provide limited support for running them.
 > To set up and compile Cosmopower and also the corresponding Cobaya Wrapper, comment the following keys before running `setup_cocoa.sh` and `compile_cocoa.sh`.
 > 
 >     [Adapted from Cocoa/set_installation_options.sh shell script]
@@ -1211,13 +1211,13 @@ In case users only want to compile a single Cosmolike project (let's say the `ro
      
 ## :interrobang: FAQ: How can users test Cosmolike projects? <a name="appendix_test_cosmolike_projects"></a>
 
-Every Cosmolike project ships a unit-test suite under its `tests/` folder (e.g., `projects/lsst_y1/tests`). Each suite reads nothing from the live project and changes no project files; it runs three kinds of checks:
+Every Cosmolike project ships unit tests under its `tests/` folder (e.g., `projects/lsst_y1/tests`). The tests read nothing from the live project and change no project files; they run three kinds of checks:
 
 - $\chi^2$: the $\chi^2$ of each likelihood at a fixed reference point must stay within 0.2 of the value stored in `tests/frozen/reference_chi2.json`. A drift means code or data changed the numbers.
 - race: the same point is evaluated fresh and then again as the 10th of 10 cosmologies in a row, with the test modules forcing `OMP_NUM_THREADS=4` internally; the two $\chi^2$ values must agree to $10^{-4}$. Leftover internal state or colliding OpenMP threads break the agreement.
 - accuracy (`test_accuracy.py`; advisory, no pass/fail): a one-knob-at-a-time scan of the numerical settings, then checks with all knobs pushed beyond the defaults. Each check prints $\chi^2$(high accuracy) minus $\chi^2$(default): the numerical error of the default settings.
 
-To run a suite, follow the steps below.
+To run the tests of a project, follow the steps below.
 
 **Step :one:**: from the Cocoa main folder `cocoa/Cocoa`, activate the Conda cocoa environment and source `start_cocoa.sh`
 
@@ -1227,12 +1227,12 @@ and
 
      source start_cocoa.sh
 
-**Step :two:**: run the suite of a project (below, the `lsst_y1` project)
+**Step :two:**: run the tests of a project (below, the `lsst_y1` project)
 
      python -m pytest ./projects/lsst_y1/tests
 
 > [!NOTE]
-> `--ignore ./projects/lsst_y1/tests/test_accuracy.py`: skip the accuracy checks, whose high-accuracy evaluations take minutes each. The rest of the suite takes a few minutes.
+> `--ignore ./projects/lsst_y1/tests/test_accuracy.py`: skip the accuracy checks, whose high-accuracy evaluations take minutes each. The remaining tests take a few minutes.
 
 The frozen state under `tests/frozen/` holds the cobaya configurations fully expanded (every option and every parameter written out, so editing the likelihood default yaml files cannot change what the tests evaluate), the tests' own copy of the data files, and synthetic data vectors generated at the reference point, so each $\chi^2$ sits at its minimum. The file `tests/manifest_sha256.json` stores a SHA-256 hash of every frozen file, and each test refuses to run when a frozen file was edited. Users can therefore change the live data and examples freely without breaking the tests.
 
