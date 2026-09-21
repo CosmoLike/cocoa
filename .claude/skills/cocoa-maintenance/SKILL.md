@@ -1070,10 +1070,57 @@ idioms.
 
 ### 8.2 Documentation density (the activations.py standard)
 
-The reference for how much to comment is `emulator/activations.py` in
-the SBU-COSMOLIKE/emulators_code_v2 repository: roughly half of every file is
-explanation, written for someone who knows the physics but not this
-code. Concretely:
+Roughly half of every file is explanation, written for someone who
+knows the physics but not this code. This sample shows the expected
+density; imitate its shape (a constant with the meaning of its value,
+a docstring teaching the mechanism and the reason, an Arguments block
+in `name = description` form, and inline comments that state
+invariants rather than narrate lines):
+
+```python
+# The race tests must run multi-threaded: with one thread there is no
+# thread scheduling, so an OpenMP race could never show up.
+REQUIRED_OMP_THREADS = "4"
+
+
+def verify_frozen():
+    """Fail every test up front when the frozen state was edited.
+
+    Compares the stored manifest with a fresh hash of tests/frozen/ in
+    both directions, so an edited file (CHANGED), a deleted file
+    (MISSING), and a new file (EXTRA) are all reported. This runs
+    before any model is built: a tampered frozen state must not
+    produce a plausible-looking chi2.
+
+    Returns:
+      nothing when every frozen file matches the manifest.
+
+    Raises:
+      AssertionError listing every mismatched path and pointing to
+      generate_frozen_reference.py --overwrite for a deliberate
+      refresh.
+    """
+    with open(MANIFEST_FILE) as f:
+        expected = json.load(f)["files"]
+    actual = compute_manifest()
+    problems = []
+    for rel, digest in expected.items():
+        if rel not in actual:
+            problems.append(f"MISSING  {rel}")
+        elif actual[rel] != digest:
+            problems.append(f"CHANGED  {rel}")
+    # both directions matter: a file ADDED to frozen/ is as suspicious
+    # as an edited one, so the reverse scan runs too
+    for rel in actual:
+        if rel not in expected:
+            problems.append(f"EXTRA    {rel}")
+    if problems:
+        raise AssertionError(
+            "Frozen test data does not match the manifest:\n  "
+            + "\n  ".join(problems))
+```
+
+Concretely:
 
 - **Module docstring** teaches the domain first: what the file
   computes, the definition of every non-obvious term it relies on
