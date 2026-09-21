@@ -600,6 +600,12 @@ shape, the main README wins.
 - No commentary about other projects or past incidents ("which in
   other projects exposed interface breakdowns"): state what the
   check does here.
+- Never quote measured values in a README: they go stale with the
+  next commit and force a page redo. State the conclusion ("the
+  measured values sit far below the 0.2 band") and point at the
+  checks that print the numbers; the terminal output on the current
+  code is the source of truth. Contract numbers (pass limits such as
+  0.2, tolerances such as 1e-4) are not measurements and stay.
 
 ### 3.2 Quote blocks must match the source files
 
