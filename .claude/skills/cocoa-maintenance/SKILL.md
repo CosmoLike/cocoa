@@ -528,6 +528,9 @@ shape, the main README wins.
   and quoted terminal output keep everything verbatim. In table
   cells never put a raw | inside math: use \lvert and \rvert for
   absolute values, or the pipe breaks the table.
+- A list item is one short clause: the action, nothing else. The
+  reasoning ("so the chi2 against it is zero by construction") moves
+  to a sentence after the list that refers back to the steps.
 - Numbered lists count 1, 2, 3 with no gaps and no grouped items:
   the renderer recounts an ordered list, so "5. -8." followed by
   "9. -14." renders as "6.", "7." and the printed numbers lie.
