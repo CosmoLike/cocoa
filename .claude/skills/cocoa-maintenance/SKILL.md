@@ -488,6 +488,37 @@ Rules:
   line plus one command each.
 - One topic = one TIP (a tip may contain two numbered solutions; do not
   split into two tips).
+- A paragraph must not carry what a display shows better. Settings
+  with values, parameter lists, and commands go into indented blocks
+  (the main README's mpirun blocks are the model), enumerable facts
+  and measured numbers into tables, sequences of actions into
+  numbered lists. NO-GO: "(cosmolike accuracyboost 2,
+  integration_accuracy 10, lmax 200000, kmax_boltzmann 40; CAMB
+  AccuracyBoost 2, k_per_logint 50)" buried inside a sentence. GO: a
+  short sentence, then an indented block with one `key: value` per
+  line.
+- Paragraph size: about six rendered lines is the ceiling. A
+  ten-line paragraph that chains a mechanism, a report format, a
+  cost estimate, and an activation switch is four paragraphs (or a
+  numbered list plus two short paragraphs) pretending to be one.
+- Math is LaTeX, settings are code spans. Write $\chi^2 < 0.2$ and
+  $\Delta\chi^2$, never the bare words "chi2 < 0.2"; write
+  `accuracyboost: 2`, never accuracyboost 2. Inside command blocks
+  and quoted terminal output keep everything verbatim. In table
+  cells never put a raw | inside math: use \lvert and \rvert for
+  absolute values, or the pipe breaks the table.
+- Numbered lists count 1, 2, 3 with no gaps and no grouped items:
+  the renderer recounts an ordered list, so "5. -8." followed by
+  "9. -14." renders as "6.", "7." and the printed numbers lie.
+  Grouped ranges belong in a table.
+- READMEs name only what users type or open: commands, files,
+  folders, yaml keys. Never internal python function names (naming
+  the function that implements a check helps nobody); a pytest
+  selector inside a command (`-k nmodels`) is part of the command
+  and stays.
+- Banned words in READMEs (user-vetoed): "suite" (say "the tests")
+  and "keypress" (say what is pressed, e.g. "until space or enter is
+  pressed"). Identifiers in code stay as the code spells them.
 
 ### 3.2 Quote blocks must match the source files
 
@@ -1177,7 +1208,18 @@ Concretely:
   frozen, fiducial, coverage — unless that comment (or the docstring
   it sits under) spells the concept out in plain words at the point
   of use. Write for a physics student opening the file for the first
-  time: assume they know physics and python, not this harness.
+  time. Calibrate "knows python" carefully: assume BASIC working
+  knowledge with gaps, the way a C programmer reads python — they
+  will not remember what an idiom does on the fly, and the comments
+  must save them the trip to the python documentation. Whenever a
+  line uses a non-obvious python construct (splitlines with
+  keepends, a comprehension with a condition, a generator expression
+  inside sum, functools.partial, a with-statement's cleanup
+  guarantee, star-unpacking, str.format field syntax), the comment
+  at that line says in plain words what the construct produces.
+  Prefer the plainer construct when it reads better in C terms: an
+  explicit loop that a comment can narrate beats a nested one-liner
+  that needs a paragraph.
   Corrected failures, kept as calibration: "the same drift condition
   build_point checks" named neither the condition nor what drifts
   (say instead: the drawn point and today's model must name the same
