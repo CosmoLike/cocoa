@@ -268,6 +268,10 @@ cloned via plain https with no `devurl`.
 - After a squash merge, delete the local topic branch with
   `git branch -D <branch>` (`-d` refuses: squash-merged branches never look
   merged to git) and start the next branch fresh from updated `main`.
+- **NEVER `git push --force`** (including `--force-with-lease`). When
+  a remote topic branch is stale (for example the pre-squash leftover
+  of a merged branch), the maintainer deletes it on GitHub and the
+  local branch is pushed plain.
 - **NEVER `git commit --amend`.** Follow-up fixes go in a new commit.
   The maintainer may push the branch at any moment; amending rewrites
   the local history and the next `git pull` then ends in a merge
