@@ -3,9 +3,12 @@
 # setup_class.sh: download CLASS (the alternative Boltzmann code) and its
 # classy wrapper.
 #
-# Sourced by setup_cocoa.sh, never executed directly. Setup scripts MAY use
-# the internet (git clone, wget, pip index); the matching compile step never
-# does, so anything that must be downloaded happens here.
+# Sourced, never executed (only `source` keeps its environment changes).
+# setup_cocoa.sh runs it during a full installation, and sourcing it on its
+# own redoes just this package (see the README FAQ on installing a single
+# package). Setup scripts MAY use the internet (git clone, wget, pip index);
+# the matching compile step never does, so anything that must be downloaded
+# happens here.
 #
 # Skipped (return 99) when IGNORE_CLASS_CODE is set. Reruns are safe: existing
 # results are kept unless OVERWRITE_EXISTING_CLASS_CODE is set. On failure

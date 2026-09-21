@@ -3,8 +3,11 @@
 # unxv_h0licow.sh: unpack the H0LiCOW time-delay distance chains into
 # external_modules/data.
 #
-# Sourced by setup_cocoa.sh, never executed directly. Datasets are downloaded
-# or unpacked at setup time only, never at compile or run time.
+# Sourced, never executed (only `source` keeps its environment changes).
+# setup_cocoa.sh runs it during a full installation, and sourcing it on its
+# own redoes just this package (see the README FAQ on installing a single
+# package). Datasets are downloaded or unpacked at setup time only, never at
+# compile or run time.
 #
 # Skipped (return 99) when IGNORE_HOLICOW_STRONG_LENSING_DATA is set. Reruns
 # are safe: existing results are kept unless OVERWRITE_EXISTING_HOLICOW_DATA

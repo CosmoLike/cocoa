@@ -2,9 +2,12 @@
 # ------------------------------------------------------------------------------
 # compile_polychord.sh: build and install the PolyChord nested sampler.
 #
-# Sourced by compile_cocoa.sh, never executed directly. Compile scripts NEVER
-# use the internet (they may run on compute nodes without network access):
-# they only build what the matching setup script already downloaded.
+# Sourced, never executed (only `source` keeps its environment changes).
+# compile_cocoa.sh runs it during a full installation, and sourcing it on its
+# own redoes just this package (see the README FAQ on installing a single
+# package). Compile scripts NEVER use the internet (they may run on compute
+# nodes without network access): they only build what the matching setup
+# script already downloaded.
 #
 # Skipped (return 99) when IGNORE_POLYCHORD_SAMPLER_CODE is set. On failure
 # error() names the failing step and unsets everything defined here; on

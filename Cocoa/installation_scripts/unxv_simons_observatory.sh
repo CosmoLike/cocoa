@@ -3,8 +3,11 @@
 # unxv_simons_observatory.sh: unpack the Simons Observatory likelihood code
 # (mflike) into external_modules/data.
 #
-# Sourced by setup_cocoa.sh, never executed directly. Datasets are downloaded
-# or unpacked at setup time only, never at compile or run time.
+# Sourced, never executed (only `source` keeps its environment changes).
+# setup_cocoa.sh runs it during a full installation, and sourcing it on its
+# own redoes just this package (see the README FAQ on installing a single
+# package). Datasets are downloaded or unpacked at setup time only, never at
+# compile or run time.
 #
 # Skipped (return 99) when IGNORE_SIMONS_OBSERVATORY_CMB_DATA is set. Reruns
 # are safe: existing results are kept unless
