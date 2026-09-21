@@ -1240,3 +1240,25 @@ default settings. Three shapes occur:
 - Document caps in the likelihood yamls, next to the knob they limit,
   so a user raising the knob past the cap finds the warning where
   they type.
+
+### 9.5 Fixing the cosmolike C core
+
+A fix inside external_modules/code/cosmolike_core follows two rules
+at once:
+
+- **Smallest possible diff.** Change only the lines the demonstrated
+  failure requires; never restructure around the fix. The FFTLog
+  padding repair is the model: three constants became three scaled
+  expressions, nothing else moved.
+- **Didactic to a physics student.** The comment above the changed
+  lines must let a student who has never seen the file understand the
+  numerical mechanism: what the quantity is, why the old form failed
+  (with the measured number), and why the new form is right. A fix a
+  student cannot learn from is not finished.
+
+Work on a `bugfix` branch of the core repository (check
+`git rev-parse --show-toplevel` and the remote first: the core is a
+separate repository pinned by the COSMOLIKE keys), commit, never
+push, and verify that results at the unboosted defaults are unchanged
+(the frozen project references must not move) before claiming the
+fix.
