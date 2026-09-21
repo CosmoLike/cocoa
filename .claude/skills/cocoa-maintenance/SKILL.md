@@ -1100,14 +1100,23 @@ def verify_frozen():
       generate_frozen_reference.py --overwrite for a deliberate
       refresh.
     """
+    # expected = the {relative path: sha256 digest} table written at
+    # freeze time; it is the definition of "untouched"
     with open(MANIFEST_FILE) as f:
         expected = json.load(f)["files"]
+    # actual = the same table computed from the files on disk right
+    # now (compute_manifest walks frozen/ and fingerprints each file
+    # with SHA-256, skipping only python bytecode caches)
     actual = compute_manifest()
+    # collect every discrepancy before raising: a report naming all
+    # problem files at once beats failing on the first one
     problems = []
     for rel, digest in expected.items():
         if rel not in actual:
+            # the manifest lists it but the file is gone from disk
             problems.append(f"MISSING  {rel}")
         elif actual[rel] != digest:
+            # the file exists but at least one byte differs
             problems.append(f"CHANGED  {rel}")
     # both directions matter: a file ADDED to frozen/ is as suspicious
     # as an edited one, so the reverse scan runs too
@@ -1119,6 +1128,10 @@ def verify_frozen():
             "Frozen test data does not match the manifest:\n  "
             + "\n  ".join(problems))
 ```
+
+At a call site, say what the called helper produces, not just its
+name: the reader should not need to open another file to follow the
+flow.
 
 Concretely:
 
