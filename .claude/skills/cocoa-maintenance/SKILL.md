@@ -1183,7 +1183,10 @@ The file runs two kinds of checks on frozen configurations:
   configuration: each accuracy knob is raised alone and the resulting
   chi2 is compared with the frozen default-settings reference.
 - A1-A6 — all knobs raised at once, one check per probe (cosmic
-  shear, 2x2pt, 3x2pt) and IA model (NLA, TATT).
+  shear, 2x2pt, 3x2pt) and IA model (NLA, TATT). The all-knobs set
+  compares the default cosmolike accuracyboost 1 against 3, the
+  highest value that stays healthy in every project scanned; the
+  KNOB scan keeps 5 as a deliberate stress entry.
 
 Every reference is frozen and sits at the chi2 minimum, because the
 data vectors are synthetic: the model generated them at the frozen
