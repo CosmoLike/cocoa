@@ -1213,9 +1213,9 @@ In case users only want to compile a single Cosmolike project (let's say the `ro
 
 Every Cosmolike project ships a unit-test suite under its `tests/` folder (e.g., `projects/lsst_y1/tests`). Each suite reads nothing from the live project and changes no project files; it runs three kinds of checks:
 
-- chi2: the chi2 of each likelihood at a fixed reference point must stay within 0.2 of the value stored in `tests/frozen/reference_chi2.json`. A drift means code or data changed the numbers.
-- race: the same point is evaluated fresh and then again as the 10th of 10 cosmologies in a row, with the test modules forcing `OMP_NUM_THREADS=4` internally; the two chi2 values must agree to 1e-4. Leftover internal state or colliding OpenMP threads break the agreement.
-- accuracy (`test_accuracy.py`; advisory, no pass/fail): a one-knob-at-a-time scan of the numerical settings, then checks with all knobs pushed beyond the defaults. Each check prints chi2(high accuracy) minus chi2(default): the numerical error of the default settings.
+- $\chi^2$: the $\chi^2$ of each likelihood at a fixed reference point must stay within 0.2 of the value stored in `tests/frozen/reference_chi2.json`. A drift means code or data changed the numbers.
+- race: the same point is evaluated fresh and then again as the 10th of 10 cosmologies in a row, with the test modules forcing `OMP_NUM_THREADS=4` internally; the two $\chi^2$ values must agree to $10^{-4}$. Leftover internal state or colliding OpenMP threads break the agreement.
+- accuracy (`test_accuracy.py`; advisory, no pass/fail): a one-knob-at-a-time scan of the numerical settings, then checks with all knobs pushed beyond the defaults. Each check prints $\chi^2$(high accuracy) minus $\chi^2$(default): the numerical error of the default settings.
 
 To run a suite, follow the steps below.
 
@@ -1234,14 +1234,14 @@ and
 > [!NOTE]
 > `--ignore ./projects/lsst_y1/tests/test_accuracy.py`: skip the accuracy checks, whose high-accuracy evaluations take minutes each. The rest of the suite takes a few minutes.
 
-The frozen state under `tests/frozen/` holds the cobaya configurations fully expanded (every option and every parameter written out, so editing the likelihood default yaml files cannot change what the tests evaluate), the tests' own copy of the data files, and synthetic data vectors generated at the reference point, so each chi2 sits at its minimum. The file `tests/manifest_sha256.json` stores a SHA-256 hash of every frozen file, and each test refuses to run when a frozen file was edited. Users can therefore change the live data and examples freely without breaking the tests.
+The frozen state under `tests/frozen/` holds the cobaya configurations fully expanded (every option and every parameter written out, so editing the likelihood default yaml files cannot change what the tests evaluate), the tests' own copy of the data files, and synthetic data vectors generated at the reference point, so each $\chi^2$ sits at its minimum. The file `tests/manifest_sha256.json` stores a SHA-256 hash of every frozen file, and each test refuses to run when a frozen file was edited. Users can therefore change the live data and examples freely without breaking the tests.
 
 Maintainers redefine the frozen state after a deliberate change to the data files, examples, or likelihood defaults:
 
      python ./projects/lsst_y1/tests/generate_frozen_reference.py --overwrite
 
 > [!NOTE]
-> `--overwrite`: delete the existing `frozen/` folder, rebuild it from the current project, and rewrite the manifest (the script refuses to run without this flag). Review the printed reference chi2 values before committing: they define what every later test run compares against.
+> `--overwrite`: delete the existing `frozen/` folder, rebuild it from the current project, and rewrite the manifest (the script refuses to run without this flag). Review the printed reference $\chi^2$ values before committing: they define what every later test run compares against.
 
 ## :interrobang: FAQ: How can users run Cocoa with Docker? <a name="appendix_jupyter_whovian"></a>
 
