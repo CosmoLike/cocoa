@@ -470,6 +470,21 @@ Rules:
 
 ## 3. README rules
 
+### 3.0 Imitate before you write (the governing rule)
+
+Every correction the maintainer made to freshly written README pages
+was already visible in the main README: the numbered Contents list
+with `<a name>` anchors, the assumption paragraph followed by
+`**Step :one:**:` blocks, NOTE/TIP callouts for asides, appendix
+FAQs for detail beyond the main flow, tables and indented
+`key: value` blocks for anything enumerable, LaTeX for math. So:
+before writing or editing ANY README in this tree, open the main
+README and the closest existing page of the same kind, and build the
+new page by imitating their shapes section by section. Never compose
+a page fresh from prose and let it get patched back into the house
+shape rule by rule. When a page and the main README disagree in
+shape, the main README wins.
+
 ### 3.1 Writing style (mandatory)
 
 - Golden rule: **"less is more, and when you need more — put it into an
