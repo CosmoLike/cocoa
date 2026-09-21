@@ -1,6 +1,13 @@
 #!/bin/bash
 # ----------------------------------------------------------------------------
-# ----------------------------------------------------------------------------
+# stop_cocoa.sh: deactivate the Cocoa session started by start_cocoa.sh.
+#
+# Run as `source stop_cocoa.sh`. It removes the project and theory-block
+# symlinks, unsets every key and function Cocoa defined
+# (flags_impl_unset_keys.sh), and restores the saved system variables
+# (flags_recover_old.sh): afterwards the shell is exactly as it was
+# before start_cocoa.sh. The guard just below refuses execution for the
+# same reason start_cocoa.sh does.
 # ----------------------------------------------------------------------------
 if [[ ! "${BASH_SOURCE[0]}" != "$0" ]]; then
   FILE="$(basename ${BASH_SOURCE[0]})"

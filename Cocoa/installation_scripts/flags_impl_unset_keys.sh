@@ -1,3 +1,14 @@
+# ------------------------------------------------------------------------------
+# flags_impl_unset_keys.sh: unset EVERY key and function Cocoa defines.
+#
+# Sourced by stop_cocoa.sh so the user's shell ends exactly as it
+# started (system variables Cocoa merely modifies are handled by
+# flags_save_old.sh / flags_recover_old.sh instead: unsetting those
+# would destroy the user's own values). Both blocks are kept in
+# case-insensitive alphabetical order, variables then functions, so a
+# missing or duplicated key is easy to spot; insert new keys at their
+# position, never at the end.
+# ------------------------------------------------------------------------------
 # Variables
 unset -v ACTDR4_GIT_BRANCH
 unset -v ACTDR4_GIT_COMMIT

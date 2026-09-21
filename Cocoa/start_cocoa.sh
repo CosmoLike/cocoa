@@ -1,6 +1,15 @@
 #!/bin/bash
 # ----------------------------------------------------------------------------
-# ----------------------------------------------------------------------------
+# start_cocoa.sh: activate a Cocoa session in the current shell.
+#
+# Run as `source start_cocoa.sh` from this folder, with the cocoa conda
+# environment already active. It reads set_installation_options.sh, saves
+# the system variables it is about to modify (flags_save_old.sh), exports
+# ROOTDIR and the library/python paths the compiled codes need, and
+# creates the symlinks that expose the installed projects and theory
+# blocks inside cobaya. stop_cocoa.sh undoes all of it. The guard just
+# below refuses execution: an executed script could not change this
+# shell's environment, so running it that way would silently do nothing.
 # ----------------------------------------------------------------------------
 if [[ ! "${BASH_SOURCE[0]}" != "$0" ]]; then
   FILE="$(basename ${BASH_SOURCE[0]})"

@@ -1,4 +1,13 @@
 #!/bin/bash
+# ------------------------------------------------------------------------------
+# flags_recover_old.sh: restore the system variables saved by
+# flags_save_old.sh (PATH, PYTHONPATH, OMP_*, ...) so stop_cocoa.sh returns
+# the shell to its pre-Cocoa state; the sentinel value x marks a variable that
+# did not exist and is unset instead.
+#
+# Sourced, never executed: use `return`, not `exit`, and unset everything
+# defined here before returning.
+# ------------------------------------------------------------------------------
 # ----------------------------------------------------------------------------
 # ----------------------------------------------------------------------------
 # ----------------------------------------------------------------------------

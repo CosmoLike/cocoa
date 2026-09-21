@@ -1,7 +1,14 @@
 #!/bin/bash
 # ------------------------------------------------------------------------------
+# compile_cocoa.sh: build and install everything setup_cocoa.sh downloaded.
+#
+# Run as `source compile_cocoa.sh` from this folder, after
+# setup_cocoa.sh. It runs the matching installation_scripts/compile_*.sh
+# entries from the script lists below. Compile scripts NEVER use the
+# internet (compute nodes may have no network access): a package that
+# needs downloads at install time does all of them in its setup script.
+# Each finished script returns 55 and is cached exactly like setup.
 # ------------------------------ Basic Settings --------------------------------
-# ------------------------------------------------------------------------------
 if [[ "${BASH_SOURCE[0]}" == "$0" ]]; then
   FILE="$(basename "${BASH_SOURCE[0]}")"
   MSG="\033[0;31m ${FILE} must be sourced (not executed as program)"
