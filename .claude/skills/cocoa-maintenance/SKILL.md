@@ -504,6 +504,21 @@ shape, the main README wins.
 - Every command flow uses `**Step :one:**:` blocks — ALWAYS, even
   when there is a single step. A bare command block with a lead-in
   sentence is not a flow.
+- Every flow is self-contained: repeat the assumption paragraph
+  ("We assume users are in the Conda cocoa environment ...") and the
+  `source start_cocoa.sh` step in EVERY flow. Never write "with the
+  environment of [some other section]" — the reader landing from
+  the table of contents must not chase references.
+- Table rows are atomic: one item per row (one test, one knob, one
+  file), so an item number maps to exactly one row. Do not condense
+  ("1-4", "NLA and TATT" in one cell); expand instead. Checks and
+  configuration are different columns: NLA/TATT is configuration
+  (write "IA modeling: NLA"), a race test is a check (write "race
+  condition (OpenMP threading)", never bare "race").
+- Name things by physics, never by internal bookkeeping: "cosmic
+  shear", "3x2pt", "6x2pt" — not "example1"/"example2". Example
+  numbers may appear only where the reader touches the actual file
+  (a `test_example1.py` filename, an `example1.dataset` path).
 - A README with more than three sections opens with a numbered
   Contents list linking `<a name>` anchors placed on each heading
   (the main README pattern).
