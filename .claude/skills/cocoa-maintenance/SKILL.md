@@ -1172,6 +1172,23 @@ Concretely:
   boundaries — never the next line.** NO-GO: `# add one to counter`.
   GO: `# count accepted rows only; rejected rows must not shift
   checkpoint indices`.
+- **Comments teach; jargon without its lesson is banned.** A comment
+  must not lean on project-internal vocabulary — drift, descriptor,
+  frozen, fiducial, coverage — unless that comment (or the docstring
+  it sits under) spells the concept out in plain words at the point
+  of use. Write for a physics student opening the file for the first
+  time: assume they know physics and python, not this harness.
+  Corrected failures, kept as calibration: "the same drift condition
+  build_point checks" named neither the condition nor what drifts
+  (say instead: the drawn point and today's model must name the same
+  sampled parameters; a mismatch means the code gained or lost a
+  parameter since the freeze). "the new descriptor is the frozen
+  descriptor text with only its data_file line replaced" assumed the
+  reader knows a descriptor (say instead: the ".dataset" file, the
+  small text file listing which data files the likelihood reads, one
+  `key = filename` line each, rewritten with one line changed).
+  Repeating a lesson where the concept reappears beats defining it
+  once far away.
 - **Every constant** carries a comment with the meaning of the chosen
   value (why 0.2, why 4 threads, why this list of nine cosmologies).
 - Python prose follows the anti-AI rules of Section 3.6 in full.
