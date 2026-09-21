@@ -561,6 +561,45 @@ shape, the main README wins.
 - Banned words in READMEs (user-vetoed): "suite" (say "the tests")
   and "keypress" (say what is pressed, e.g. "until space or enter is
   pressed"). Identifiers in code stay as the code spells them.
+- Titles never repeat the repository name: inside the lsst_y1
+  project the tests page is "Unit tests for the likelihoods", never
+  "Unit tests for the lsst_y1 likelihoods". The repository already
+  scopes its pages.
+- On a project tests page the appendix heading is exactly
+  `# Appendix <a name="appendix"></a>`; never a descriptive tail
+  ("Appendices about the frozen state").
+- FAQ titles are short, simple questions ("FAQ: Do the tests keep
+  their own data?"); a compound question ("How do the tests keep
+  their own copy of configurations and data?") is cut down and the
+  detail moves to the body.
+- Each check family gets a concept section ("Accuracy checks") that
+  says what is measured, and a "Running ..." subsection under it
+  that opens directly on the `**Step :one:**:` blocks.
+- Write $\Delta\chi^2$, never bare $\chi^2$, for every drift or
+  accuracy quantity: the $\Delta$ tells the reader the value should
+  be zero. Bare $\chi^2$ stays only where the raw statistic itself
+  is meant.
+- Coined labels are defined at first use or replaced with everyday
+  words: "stored"/"reference" instead of decorative "frozen" (the
+  `frozen/` path stays literal, with one sentence at first mention
+  saying what the snapshot is); "the fiducial evaluated on its own
+  vs after nine other cosmologies" instead of "fresh vs 10th-of-10";
+  "accuracy parameter" or "setting" instead of "knob".
+- Counts name their members: "cosmic shear, 3x2pt, and 2x2pt", never
+  "the three probes"; "NLA and TATT", never "both IA models".
+- Sentences lead with the subject and action; fronted contrast
+  openers ("Instead of the one frozen fiducial point, this
+  check...") are rewritten as direct statements with the contrast at
+  the end or dropped.
+- Explanations restate their setup in place ("Again, we set the data
+  vector at the point itself, so the $\Delta\chi^2$ is zero by
+  construction"), never point at another step or section ("the
+  vector of step 2").
+- No ALL-CAPS emphasis in body text ("GENERATED WITH TATT", "the
+  DEFAULT settings"); the sentence's contrast carries the stress.
+- No commentary about other projects or past incidents ("which in
+  other projects exposed interface breakdowns"): state what the
+  check does here.
 
 ### 3.2 Quote blocks must match the source files
 
