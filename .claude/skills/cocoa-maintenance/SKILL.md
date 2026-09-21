@@ -33,7 +33,7 @@ Follow these rules exactly. When a rule below conflicts with your own idea of
    git repositories. Before committing, run `git rev-parse --show-toplevel`
    and confirm you are in the repository you intend.
 5. **Verify before claiming.** After editing a script run `bash -n <file>`.
-   After editing a README run the render check (Section 3.6). Report the
+   After editing a README run the render check (Section 3.7). Report the
    actual output; if a check fails, say so.
 
 ## 1. Repository layout facts
@@ -536,7 +536,212 @@ old-version mention as a boundary.
   four flag-first items). It must stay byte-identical across the main README
   and all project READMEs; verify with `md5` on the extracted note.
 
-### 3.6 Verification after every README edit
+### 3.6 Anti-AI prose rules (README, comments, docstrings, commit messages)
+
+These rules apply to every piece of explanatory text: README prose,
+Python comments and docstrings, error messages, and commit messages.
+The target reader is a physics student who knows no AI-agent language
+and may know little Git.
+
+- **Describe the current state, never the editing history.** When a rule
+  changes, rewrite the explanation in place. Never write "now", "new
+  rule", "previously", "as of", a date attached to a rule, or a
+  reference to the request/review that caused the change. Git holds the
+  history.
+- **Abstractions need real examples.** A broad term (test, key, block,
+  freeze) gets one or two concrete repository examples nearby: a real
+  file or command, the action, and the visible result.
+- **Define terms where first used, keep one name per object.** Never
+  rotate synonyms (script/tool/utility for the same file); never write
+  "X (called Y in the code)" before the difference is explained.
+
+#### Replace generic praise with checkable facts
+
+Use concrete actors and verbs. "The watcher moves the file" is easier
+to check than "a filesystem transition occurs." "`--cycle 2` admits no
+more than two tickets" carries more information than "this provides
+useful runtime control." The following claims need evidence or
+removal:
+
+- `easy`, `simple`, `intuitive`, `automatic`, `safe`, `fast`,
+  `lightweight`, `flexible`, `powerful`, `production-ready`,
+  `seamless`, `complete`, and `supported`;
+- "handles errors", "works out of the box", "uses best practices",
+  "improves performance", and "provides a better experience";
+- "standard approach", "conventional method", or "robust workflow"
+  without the exact algorithm, version, condition, test, or failure
+  behavior.
+
+For example, replace "safe automatic shutdown" with the actual
+condition: "The watcher stops starting jobs, waits for jobs already
+running, and then prints the Ctrl-C countdown." Replace "fast" with a
+measured time and machine, or remove the claim.
+
+#### Vocabulary bans
+
+- do not use `thereby`;
+- do not use `commendable`, `innovative`, `meticulous`, `intricate`,
+  `notable`, or `versatile` as adjectives;
+- replace decorative `delve`, `crucial`, `comprehensive`, `notably`,
+  `underscores`, `highlights`, `showcases`, `sheds light on`,
+  `leveraging`, and `utilize` with the fact they were trying to
+  decorate;
+- keep `robust`, `robustness`, and other domain terms when they carry
+  a precise technical meaning;
+
+#### Hard-zero words
+
+Prohibited in new or changed prose. An exact command, code identifier,
+external title, or quotation may contain one only when changing it
+would make the reference false; name every such exception.
+
+    commendable    comprehensive   crucial        crucially
+    delve          delves          delving        dwelve
+    innovative     intricate       meticulous     multifaceted
+    notable        notably         pivotal        thereby
+    transformative versatile
+
+These forms are prohibited for the same reason:
+
+    showcase   showcases   showcasing
+    underscore underscores underscoring
+    unveil     unveils     unveiling
+
+#### Hard-zero phrases
+
+    as an AI                     it is worth noting
+    certainly, here is           plays a crucial role
+    complex interplay            provides valuable insights
+    deeper understanding         sheds light on
+    evolving landscape           stands as a testament
+    future work should explore   taken together, these results
+    important implications       the realm of
+    it is important to note      valuable insights
+
+Also remove bot closers and chat residue such as "I hope this helps",
+"Let me know if you would like", "Here is the revised version",
+"In conclusion", and "Overall" when they merely end a generated
+answer.
+
+#### Decorative vocabulary to replace
+
+These words and phrases usually hide a simpler verb or a missing
+fact. Replace them unless a literal technical meaning is identified:
+
+    actionable insights          landscape
+    advance our understanding    leverage
+    at the forefront             meaningful
+    broader implications         nuanced
+    cornerstone                  offer insights
+    cutting-edge                 pave the way
+    dynamic                      poised to
+    ecosystem                    powerful
+    elevate                      realm
+    empower                      roadmap
+    enhance                      seamless
+    facilitate                   state-of-the-art
+    foster                       streamline
+    harness                      synergy
+    holistic                     tapestry
+    impactful                    unlock
+    in order to                  utilize
+    in the context of            valuable
+    insightful                   vibrant
+    journey                      within the context of
+
+Prefer `use` to `utilize` or `leverage`. Prefer `is` to `serves as`.
+Prefer the name of the operation to `streamline`, `enhance`, or
+`facilitate`. These generated-sounding phrases are also banned unless
+they are literal names or technically necessary:
+
+- "It is important to note", "It is worth noting", "This is important
+  because", and "A few points should be noted";
+- "plays a crucial role", "serves as", "stands as", "acts as", and
+  "represents a key step" when the plain verb `is`, `uses`, `checks`,
+  or `runs` says the fact;
+- `rich`, `vibrant`, `pivotal`, `transformative`, `cutting-edge`,
+  `state-of-the-art`, `multifaceted`, `nuanced`, `evolving landscape`,
+  `ecosystem`, `realm`, `tapestry`, and `cornerstone` as praise;
+- "valuable insight", "meaningful contribution", "important
+  implication", "deeper understanding", "comprehensive perspective",
+  and "future work should explore";
+- `unlock`, `foster`, `enhance`, `streamline`, `empower`,
+  `facilitate`, `harness`, and `unveil` when a concrete verb names
+  the operation;
+- `Moreover`, `Furthermore`, `Additionally`, `Notably`, `Importantly`,
+  `Consequently`, `Taken together`, and `Overall` when they merely
+  make a paragraph sound connected.
+
+Do not replace one banned phrase with a synonym that performs the same
+empty job. Delete the decoration or write the missing fact.
+
+#### Sentence-level patterns
+
+Look for repeated patterns across a changed section: many
+medium-length sentences with the same shape; paragraphs sharing an
+announce-explain-caveat-summary arc; repeated "This suggests",
+"While X, Y", or "By doing X, we Y" openings; repeated endings such
+as ", highlighting" or ", underscoring"; abstract nouns where a
+person or program could act; roadmap sentences that announce, perform,
+and recap a simple step.
+
+Check the em dash. Inside a sentence it is the punctuation a reader
+notices first, and a passage that reaches for it repeatedly reads as
+machine-written rhythm. Use the mark that carries the join: a colon
+when what follows restates the clause before it, a comma for an
+appositive, parentheses for a true aside, a full stop when two
+statements were welded together. The em dash keeps one job:
+separating a label from its body in a list entry, table cell, or
+heading. More than one sentence-interrupting dash in a changed
+section requires review, of the unspaced `word—word` form as well as
+the spaced one.
+
+Check these sentence shapes explicitly (three or more rhetorical uses
+in one section require a rewrite as direct statements; `thereby` is
+banned outright):
+
+1. `This suggests/indicates/demonstrates/highlights that ...`
+2. `While X, Y ...`
+3. `By doing X, we Y ...`
+4. `X, thereby Y ...`
+5. `X, highlighting/indicating/reinforcing Y ...`
+6. `Although X, it is important to note Y ...`
+7. `Not only X, but also Y ...`
+8. `X does not merely do A; it also does B ...`
+
+Check abstract-noun stacking: "The validation of the configuration
+enables the identification of the availability of the route" hides
+every actor; write "The watcher checks the configuration and reports
+whether the route is available." Four or more nearby nouns ending in
+`-tion`, `-ment`, `-ity`, `-ance`, `-ence`, `-ness`, or `-ization`
+require review. Check hedge stacking: two or more of `may`, `might`,
+`could`, `appears`, `potentially`, `somewhat` in one sentence usually
+mean the actual condition is unstated; prefer "This happens only when
+X" or "This case is not tested." Check causal words: `therefore`,
+`thus`, `hence`, `consequently` must connect facts that actually
+prove the conclusion.
+
+#### Paragraph-level and formatting patterns
+
+Generated paragraphs repeat a five-part arc: announce, explain
+broadly, add one detail, add a balanced caveat, summarize. Short,
+uneven paragraphs are normal in a README; repeating the polished arc
+across a section buries the action. Do not add a roadmap sentence
+before every table or example ("The next section explores...", "We
+now examine..."). Do not announce, show, and then recap a command
+whose result is already clear; use the space to say where to run it,
+what it changes, and what the output means.
+
+Keep three items when there are exactly three real items; do not
+reshape two or four facts into three for rhythm. In FAQ appendices,
+answer the heading directly; no "What does this mean? The answer lies
+in...". Bold lead-ins, colons, semicolons, parentheses, passive
+voice, and complete sentences are not AI evidence by themselves;
+review repetition and reader cost. Do not rotate through synonyms to
+avoid repeating the correct term: if the code calls it a watcher,
+keep calling it a watcher.
+
+### 3.7 Verification after every README edit
 
 Run all that apply and report the results:
 
@@ -815,3 +1020,84 @@ here, but reviewers should check):**
 **Verification for the whole integration:** `bash -n` every touched script;
 `source setup_XXX.sh` end-to-end in the cocoa environment; run a cobaya
 evaluate with the block enabled and once with it disabled, and compare.
+
+## 8. Python scripts: style and documentation contract
+
+This contract applies to every Python file committed to a Cocoa
+repository: tests, maintenance
+scripts, generators, drivers. The intended reader is a physics student
+who understands C-like control flow but may not know advanced Python
+idioms.
+
+### 8.1 Code shape
+
+- Explicit, C-like control flow. One consequential operation per line.
+  An `if` block over a clever expression; an explicit loop over a
+  comprehension whenever the loop validates, mutates, logs, or does
+  more than one transformation.
+- Stage operations into named intermediate variables. NO-GO:
+
+      training = torch.from_numpy(rows[idx].astype("float32")).to(dev)
+
+  GO (each step can fail on its own line and be named in an error):
+
+      training_rows = rows[idx].astype("float32")
+      training = torch.from_numpy(training_rows)
+      training = training.to(device=dev)
+
+- Use named (keyword) arguments whenever the callee accepts names.
+- A dictionary or list with three or more entries puts one item per
+  line.
+- Forbidden when a plainer form exists: the walrus operator `:=`,
+  nested comprehensions, chained ternaries, a `lambda` where a named
+  function is clearer, starred unpacking that hides value order, and
+  monkey patching (replacing a function/method/module attribute at
+  run time) anywhere, including tests.
+- Never de-vectorize a numerical hot path for readability: vectorized
+  numpy stays vectorized, with a comment giving the mathematical
+  reason or shape invariant instead.
+- Validate inputs BEFORE any mutation, file write, or expensive setup.
+  A failure message states: what failed, the observed value, the
+  required condition, and the corrective action. "invalid input" is
+  never enough. No silent fallback, no silent coercion.
+- Keep lines within 90 columns; prefer parentheses over backslash
+  continuation; match the indentation style of the file being edited.
+
+### 8.2 Documentation density (the activations.py standard)
+
+The reference for how much to comment is `emulator/activations.py` in
+the SBU-COSMOLIKE/emulators_code_v2 repository: roughly half of every file is
+explanation, written for someone who knows the physics but not this
+code. Concretely:
+
+- **Module docstring** teaches the domain first: what the file
+  computes, the definition of every non-obvious term it relies on
+  (assume the reader has NOT seen the framework before), how the
+  pieces relate, and how to run it when it is runnable.
+- **Every function, method, and class gets a docstring** with:
+  - a first sentence containing a subject and a verb;
+  - a paragraph explaining the mechanism and WHY it is built this way
+    (the non-obvious decision, the failure it prevents);
+  - an `Arguments:` block naming every parameter as
+    `name = what it is, units/shape/valid range when relevant`;
+  - a `Returns:` block (type, shape, units);
+  - a `Raises:` block when the function refuses inputs;
+  - side effects (files written, directories changed, state mutated).
+- **Comments state reasons, invariants, units, and failure
+  boundaries — never the next line.** NO-GO: `# add one to counter`.
+  GO: `# count accepted rows only; rejected rows must not shift
+  checkpoint indices`.
+- **Every constant** carries a comment with the meaning of the chosen
+  value (why 0.2, why 4 threads, why this list of nine cosmologies).
+- Python prose follows the anti-AI rules of Section 3.6 in full.
+
+### 8.3 Scope discipline
+
+- A narrow bug gets a narrow fix: no new registry, framework, or
+  validation subsystem where a short direct check repairs the named
+  problem.
+- Do not turn one task into a repository-wide cleanup; note other
+  problem sites and report them instead.
+- Tests may be longer than the code they test (they show valid and
+  invalid cases), but they follow every rule above, including full
+  docstrings.
