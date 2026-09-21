@@ -838,6 +838,22 @@ Before a Cocoa tag is created, verify in `set_installation_options.sh`:
   the first evaluation; on an offline compute node the first MCMC step then
   dies mid-run. Trigger the download in the package's `setup_*.sh`
   (Section 2.7), never leave it to run time.
+- Notebooks lag interface upgrades: the EXAMPLE_EVALUATE notebooks call the
+  compiled cosmolike bindings directly (their own CAMB run, `set_cosmology`,
+  `compute_data_vector_masked`), a path the cobaya pipeline never exercises.
+  After any binding change (`init_IA` growing `ia_code`) or C-side
+  validation change, sweep every project's `*.ipynb` for the old call and
+  run the project's `tests/test_notebook_interface.py`, which rebuilds the
+  notebook call sequence against the frozen data.
+- Cosmolike grid validation aborts the process, not the call: a
+  non-monotone grid handed to `set_cosmology` (for example a chi(z) grid
+  concatenated from linspace segments that each include both endpoints,
+  duplicating the junction values) hits `log_fatal` + `exit` in basics.c.
+  Inside Jupyter that is a dead kernel with no traceback; the message
+  ("chi z: not strictly increasing at i=N") only appears on a terminal.
+  Reproduce notebook crashes headlessly (extract the cells into a script
+  and run it in a subprocess) before guessing. Interior linspace segments
+  take `endpoint=False`; the junction value belongs to one segment only.
 
 ## 6. Bash style guide (observed across all installation_scripts)
 
