@@ -516,6 +516,9 @@ Rules:
   the function that implements a check helps nobody); a pytest
   selector inside a command (`-k nmodels`) is part of the command
   and stays.
+- Operational caveats (a pager swallowing output, a platform quirk,
+  anything of the form "if the terminal does X, do Y") are
+  `> [!NOTE]` or `> [!TIP]` callouts, never body paragraphs.
 - Banned words in READMEs (user-vetoed): "suite" (say "the tests")
   and "keypress" (say what is pressed, e.g. "until space or enter is
   pressed"). Identifiers in code stay as the code spells them.
