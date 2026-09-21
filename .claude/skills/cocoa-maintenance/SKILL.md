@@ -1166,3 +1166,74 @@ Concretely:
 - Tests may be longer than the code they test (they show valid and
   invalid cases), but they follow every rule above, including full
   docstrings.
+
+## 9. Interpreting the project accuracy tests
+
+Every Cosmolike project carries `tests/test_accuracy.py`. Its output
+is advisory: no assertion fails on a large delta chi2, because how
+much numerical error an analysis tolerates is a judgment call. This
+section says how to read the numbers and what to change when they
+move.
+
+### 9.1 What the output is
+
+The file runs two kinds of checks on frozen configurations:
+
+- `KNOB` lines — a one-knob-at-a-time scan on the 3x2pt NLA
+  configuration: each accuracy knob is raised alone and the resulting
+  chi2 is compared with the frozen default-settings reference.
+- A1-A6 — all knobs raised at once, one check per probe (cosmic
+  shear, 2x2pt, 3x2pt) and IA model (NLA, TATT).
+
+Every reference is frozen and sits at the chi2 minimum, because the
+data vectors are synthetic: the model generated them at the frozen
+point. At a minimum the chi2 responds quadratically to a settings
+change, so the reported deltas are stable and small. The comfort
+target is |delta chi2| below 0.2. A larger delta is not a failure; it
+is a number to investigate.
+
+### 9.2 Investigation order when knobs move the chi2
+
+Settle the cheap knobs before blaming the expensive one:
+
+1. cosmolike `accuracyboost` first (cheap at run time);
+2. camb `k_per_logint` second;
+3. camb `AccuracyBoost` last. It is expensive, and an apparent CAMB
+   sensitivity can masquerade as unresolved cheap-knob resolution: in
+   roman_kl an apparent +0.80 from camb `AccuracyBoost` collapsed to
+   +0.002 once `k_per_logint` reached 50.
+
+`kmax_boltzmann` (cosmolike) and camb `kmax` are one physical cutoff
+seen from two sides; move them together, never one alone.
+
+### 9.3 Reading a knob's convergence scan
+
+To decide what a delta means, scan the knob: evaluate the chi2 at
+increasing knob values, always against the vector generated at the
+default settings. Three shapes occur:
+
+- Monotone rise to a plateau — the plateau is the real numerical
+  error of the default. The roman_kl camb `k_per_logint` scan
+  plateaus at 0.255 by 25; raising the default removes exactly that
+  error.
+- Explosion far beyond every other knob — an interface breakdown,
+  not a refinement. The desy1xplanck `accuracyboost` scan is fine
+  through 3.25, then +0.26 at 4 and +27 at 5. Cap the knob and file
+  an interface bug.
+- Oscillation with no plateau — integration jitter, also an
+  interface problem. The roman_kl `accuracyboost` scan jumps by 0.3
+  to 3 between boosts 1.25 and 6. Do not chase it by raising
+  defaults.
+
+### 9.4 What a measurement changes
+
+- Fix cheap knobs in the example yamls, with a comment stating the
+  measured numbers (the scanned values, the plateau, the resulting
+  delta).
+- Never bake a camb `AccuracyBoost` increase into a yaml without
+  re-measuring at the raised cheap knobs; the roman_kl case in
+  Section 9.2 shows the expensive knob absorbing blame that belonged
+  to a cheap one.
+- Document caps in the likelihood yamls, next to the knob they limit,
+  so a user raising the knob past the cap finds the warning where
+  they type.
