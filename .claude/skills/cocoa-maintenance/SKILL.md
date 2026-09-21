@@ -1246,6 +1246,11 @@ default settings. Three shapes occur:
 A fix inside external_modules/code/cosmolike_core follows two rules
 at once:
 
+- **Never propose cubic interpolation for the z axis of the
+  cosmolike hot-path tables** (p_lin, p_nonlin, growth): it is too
+  expensive at run time. Interpolation-grid problems are fixed
+  through the node count and node placement handed in by the
+  likelihood prototypes, not by raising the interpolation order.
 - **Smallest possible diff.** Change only the lines the demonstrated
   failure requires; never restructure around the fix. The FFTLog
   padding repair is the model: three constants became three scaled
