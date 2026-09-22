@@ -1028,13 +1028,17 @@ Before a Cocoa tag is created, verify in `set_installation_options.sh`:
   integrating any library, scan its public API for factory,
   evaluator, or precompute interfaces (`build_*`, `*Evaluator`,
   cached constructors) and USE them - this is a requirement, not a
-  preference. If the library offers no such split, make one: hack
-  it, or copy the relevant internals into the theory block, so setup
-  runs once in initialize() and the per-sample path does compute
-  only. An insanely slow per-call API in the MCMC hot loop is never
-  acceptable. Prove the outputs bit-identical against the plain
-  call, and record the measured per-call cost in the commit
-  message.
+  preference. If the library offers no such split, make one, in this
+  order: FIRST copy the relevant internals into the theory block, so
+  setup runs once in initialize() and the per-sample path does
+  compute only; ONLY when copying does not work, patch the library
+  through Cocoa's patch machinery (cocoa_installation_libraries/
+  <name>_changes applied by the setup script - the mechanism already
+  patches CAMB, CLASS, and even cobaya), because a patch means
+  carrying our own version of that file forever. An insanely slow
+  per-call API in the MCMC hot loop is never acceptable. Prove the
+  outputs bit-identical against the plain call, and record the
+  measured per-call cost in the commit message.
 
 ## 6. Bash style guide (observed across all installation_scripts)
 
