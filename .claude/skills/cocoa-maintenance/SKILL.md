@@ -1056,6 +1056,43 @@ Before a Cocoa tag is created, verify in `set_installation_options.sh`:
   check with its family ("check BF2, the SP(k) Akino relation"), never
   a bare letter-digit token.
 
+### 5.1 Creating a new accuracy or unit check (the chi2 = 0 doctrine)
+
+This happened: the first baryonic-feedback accuracy checks compared
+feedback-on theory against the feedback-FREE stored data vector, so
+the chi2 sat at ~229 and the accuracy delta rode a steep slope -
+meaningless as a numerics measurement, and caught by the user. The
+dark-matter-only tests already embodied the correct design (the TATT
+checks and the synthetic NLA vectors); every new check family follows
+it from the start:
+
+- An accuracy check is only meaningful at the chi2 minimum. GENERATE
+  the data vector with the new physics switched on at the fiducial
+  point and make that vector the check's own fiducial (a dataset
+  descriptor pointing at the generated .modelvector, the TATT
+  pattern): chi2 = 0 by construction, and the default-vs-high delta
+  becomes a quadratic curvature response. Comparing new physics
+  against a fiducial-less vector measures the slope of the mismatch,
+  not the numerics.
+- The check's configuration must be fully measurable. The fiducial
+  point sits inside every component's validity or training box
+  (shift a parameter and record why: BACCOemu's omega_baryon floor at
+  0.04001 sits exactly above an omegab = 0.04 fiducial), and the
+  method's parameters keep the model inside its calibrated band over
+  the FULL evaluation grid (pyspk NaNs fb outside its fitted band and
+  the block falls back to unity per redshift: a configuration that
+  triggers fallbacks tests the fallback, not the method). Scan for
+  NaN/fallback log lines across the grid before freezing a parameter
+  point.
+- Rejections belong to samplers, never to checks. A check that
+  reports "the sample was rejected" as its result is a failed check
+  design; reconfigure until the quantity is measurable.
+- Ship the one-knob-at-a-time scan alongside the all-knobs
+  comparison (the K-scan pattern), so a large delta names the knob
+  that causes it.
+- New frozen files enter the SHA-256 manifest through the generator,
+  never by hand.
+
 ## 6. Bash style guide (observed across all installation_scripts)
 
 When writing or editing a script, imitate these conventions exactly. They
