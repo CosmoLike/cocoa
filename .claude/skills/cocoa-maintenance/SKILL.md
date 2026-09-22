@@ -1003,7 +1003,13 @@ Before a Cocoa tag is created, verify in `set_installation_options.sh`:
   `init_ntable_lmax(int(<yaml lmax> + 20000*(CLAccuracyBoost-1)))`) is
   unified across projects; values are anchored per project in its yaml.
   Each EVALUATE notebook follows its own numbered yaml (EVALUATE2's
-  `integration_accuracy: 0` overrides what EVALUATE1 chose).
+  `integration_accuracy: 0` overrides what EVALUATE1 chose). The
+  notebook's fiducial cell mirrors the yaml's sampler.evaluate
+  OVERRIDE block - the point cobaya actually evaluates - never the
+  ref distributions' locations: porting roman's EVALUATE2 with the
+  ref locs (w -0.99, A1 0.7, the B1 refs) instead of the override
+  (w -1.0, A1 0.6, the override B1 list) inflated the chi2 from 0.07
+  to 20480 before a data-vector comparison exposed it.
 - Notebook compute functions must reset the interface state they run
   under: every def that drives the compiled interface (data vectors,
   derivatives, response functions, the Fisher dv) calls
