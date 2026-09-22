@@ -1,6 +1,19 @@
 #!/bin/bash
 # ------------------------------------------------------------------------------
-# ------------------------------------------------------------------------------
+# compile_fgspectra.sh: build and install fgspectra (foreground spectra used
+# by CMB likelihoods).
+#
+# Sourced, never executed (only `source` keeps its environment changes).
+# compile_cocoa.sh runs it during a full installation, and sourcing it on its
+# own redoes just this package (see the README FAQ on installing a single
+# package). Compile scripts NEVER use the internet (they may run on compute
+# nodes without network access): they only build what the matching setup
+# script already downloaded.
+#
+# Skipped (return 99) when IGNORE_FGSPECTRA_CODE is set. On failure error()
+# names the failing step and unsets everything defined here; on success the
+# script returns 55, the value the runner caches so a finished step is not
+# repeated.
 # ------------------------------------------------------------------------------
 if [ -n "${IGNORE_FGSPECTRA_CODE:-}" ]; then
   return 99
@@ -12,17 +25,24 @@ fi
   
 ( source "${ROOTDIR:?}/installation_scripts/flags_check.sh" ) || return 1;
 
+# unset_env_vars: forget every variable the body defines. Sourced scripts
+# share the caller's shell, so anything not unset here would leak into the
+# user's environment. cdroot returns to the directory the user launched from.
 unset_env_vars () {
   unset -v ECODEF FOLDER PACKDIR PRINTNAME PLIB
   cdroot || return 1;
 }
 
+# unset_env_funcs: forget every helper function defined below (functions leak
+# into the user's shell exactly like variables).
 unset_env_funcs () {
   unset -f cdfolder cpfolder error
   unset -f unset_env_funcs
   cdroot || return 1;
 }
 
+# unset_all: the single cleanup entry point: variables, then functions, then
+# itself.
 unset_all () {
   unset_env_vars
   unset_env_funcs
@@ -30,11 +50,16 @@ unset_all () {
   cdroot || return 1;
 }
 
+# error: print which step failed (fail_script_msg names this script and the
+# message) and run the FULL cleanup. A call site whose helper already routes
+# through error() therefore uses plain `|| return 1`; adding another unset_all
+# there would run the cleanup twice.
 error () {
   fail_script_msg "$(basename "${BASH_SOURCE[0]}")" "${1}"
   unset_all || return 1
 }
 
+# cdfolder: cd that reports the target and cleans up on failure.
 cdfolder() {
   cd "${1:?}" 2>"/dev/null" || { error "CD FOLDER ${1}"; return 1; }
 }

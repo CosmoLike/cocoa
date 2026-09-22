@@ -1,4 +1,13 @@
 #!/bin/bash
+# ------------------------------------------------------------------------------
+# flags_save_old.sh: save the pre-existing system variables Cocoa is about to
+# modify (PATH, PYTHONPATH, OMP_*, compiler flags) into OLD_* copies so
+# flags_recover_old.sh can restore them at stop; the sentinel value x marks a
+# variable that did not exist.
+#
+# Sourced, never executed: use `return`, not `exit`, and unset everything
+# defined here before returning.
+# ------------------------------------------------------------------------------
 # ----------------------------------------------------------------------------
 # ----------------------------------------------------------------------------
 # ----------------------------------------------------------------------------

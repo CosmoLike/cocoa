@@ -1,4 +1,12 @@
 #!/bin/bash
+# ------------------------------------------------------------------------------
+# flags_check.sh: confirm the mandatory environment flags exist before any
+# installation step runs (sourced in a subshell by every setup/compile script
+# so a missing flag stops the step early with a clear message).
+#
+# Sourced, never executed: use `return`, not `exit`, and unset everything
+# defined here before returning.
+# ------------------------------------------------------------------------------
 # ----------------------------------------------------------------------------
 # ----------------------------------------------------------------------------
 # ----------------------------------------------------------------------------

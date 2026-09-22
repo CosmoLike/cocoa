@@ -1,7 +1,15 @@
 #!/bin/bash
 # ------------------------------------------------------------------------------
+# setup_cocoa.sh: download every selected package and dataset.
+#
+# Run as `source setup_cocoa.sh` from this folder. It reads the selection
+# keys in set_installation_options.sh and runs the matching
+# installation_scripts/setup_*.sh and unxv_*.sh entries from the script
+# lists below. Setup MAY use the internet; compile_cocoa.sh never does,
+# so everything that must be downloaded happens here. Each finished
+# script returns 55 and is cached: a rerun repeats only unfinished or
+# changed steps (the cache rebuilds when a script list changes).
 # ------------------------------ Basic Settings --------------------------------
-# ------------------------------------------------------------------------------
 if [[ "${BASH_SOURCE[0]}" == "$0" ]]; then
   FILE="$(basename "${BASH_SOURCE[0]}")"
   MSG="\033[0;31m ${FILE} must be sourced (not executed as program)"

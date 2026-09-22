@@ -1,3 +1,14 @@
+# ------------------------------------------------------------------------------
+# flags_impl_unset_keys.sh: unset EVERY key and function Cocoa defines.
+#
+# Sourced by stop_cocoa.sh so the user's shell ends exactly as it
+# started (system variables Cocoa merely modifies are handled by
+# flags_save_old.sh / flags_recover_old.sh instead: unsetting those
+# would destroy the user's own values). Both blocks are kept in
+# case-insensitive alphabetical order, variables then functions, so a
+# missing or duplicated key is easy to spot; insert new keys at their
+# position, never at the end.
+# ------------------------------------------------------------------------------
 # Variables
 unset -v ACTDR4_GIT_BRANCH
 unset -v ACTDR4_GIT_COMMIT
@@ -52,7 +63,22 @@ unset -v AXION_HMCODE_GIT_COMMIT
 unset -v AXION_HMCODE_GIT_TAG
 unset -v AXION_HMCODE_NAME
 unset -v AXION_HMCODE_URL
+unset -v BACCOEMU_GIT_BRANCH
+unset -v BACCOEMU_GIT_COMMIT
+unset -v BACCOEMU_GIT_TAG
+unset -v BACCOEMU_NAME
+unset -v BACCOEMU_URL
 unset -v BASECL
+unset -v BCEMU_GIT_BRANCH
+unset -v BCEMU_GIT_COMMIT
+unset -v BCEMU_GIT_TAG
+unset -v BCEMU_NAME
+unset -v BCEMU_URL
+unset -v BFMT_GIT_BRANCH
+unset -v BFMT_GIT_COMMIT
+unset -v BFMT_GIT_TAG
+unset -v BFMT_NAME
+unset -v BFMT_THEORY_URL
 unset -v BINUTILS_VERSION
 unset -v BLAS_LIBRARY_LOC
 unset -v CAMB_GIT_BRANCH
@@ -253,6 +279,11 @@ unset -v FASTPT_WRAPPER_GIT_COMMIT
 unset -v FASTPT_WRAPPER_GIT_TAG
 unset -v FASTPT_WRAPPER_NAME
 unset -v FASTPT_WRAPPER_URL
+unset -v FBRE_GIT_BRANCH
+unset -v FBRE_GIT_COMMIT
+unset -v FBRE_GIT_TAG
+unset -v FBRE_NAME
+unset -v FBRE_URL
 unset -v FFTW_NEW_VERSION
 unset -v FFTW_VERSION
 unset -v FGSPECTRA_GIT_BRANCH
@@ -298,7 +329,10 @@ unset -v IGNORE_ACTDR6_DATA
 unset -v IGNORE_ACT_COMPILATION
 unset -v IGNORE_ALL_COBAYA_INSTALLATION
 unset -v IGNORE_ALL_PIP_INSTALLATION
+unset -v IGNORE_BACCOEMU_CODE
 unset -v IGNORE_BAO_DATA
+unset -v IGNORE_BCEMU_CODE
+unset -v IGNORE_BFMT_CODE
 unset -v IGNORE_BICEP_CMB_DATA
 unset -v IGNORE_CAMB_CODE
 unset -v IGNORE_CAMB_COMPILATION
@@ -344,6 +378,7 @@ unset -v IGNORE_EMULTRF_DATA
 unset -v IGNORE_EUCLID_EMULATOR_V2_CODE
 unset -v IGNORE_EXPAT_CORE_PACKAGE
 unset -v IGNORE_FASTPT_CODE
+unset -v IGNORE_FBRE_CODE
 unset -v IGNORE_FGSPECTRA_CODE
 unset -v IGNORE_FORTRAN_INSTALLATION
 unset -v IGNORE_FORTRAN_LAPACK_INSTALLATION
@@ -364,6 +399,7 @@ unset -v IGNORE_PLANCK_COMPILATION
 unset -v IGNORE_PLANCK_LIKELIHOOD_CODE
 unset -v IGNORE_POLYCHORD_COMPILATION
 unset -v IGNORE_POLYCHORD_SAMPLER_CODE
+unset -v IGNORE_PYSPK_CODE
 unset -v IGNORE_SIMDE_CODE
 unset -v IGNORE_SIMONS_OBSERVATORY_CMB_DATA
 unset -v IGNORE_SIMONS_OBSERVATORY_LIKELIHOOD_CODE
@@ -447,7 +483,10 @@ unset -v OVERWRITE_EXISTING_ALL
 unset -v OVERWRITE_EXISTING_ALL_PACKAGES
 unset -v OVERWRITE_EXISTING_AXIECAMB_CODE
 unset -v OVERWRITE_EXISTING_AXION_HMCODE_CODE
+unset -v OVERWRITE_EXISTING_BACCOEMU_CODE
 unset -v OVERWRITE_EXISTING_BAO_DATA
+unset -v OVERWRITE_EXISTING_BCEMU_CODE
+unset -v OVERWRITE_EXISTING_BFMT_CODE
 unset -v OVERWRITE_EXISTING_BICEP_CMB_DATA
 unset -v OVERWRITE_EXISTING_CAMB_CODE
 unset -v OVERWRITE_EXISTING_CAMPSPEC_CMB_DATA
@@ -465,6 +504,7 @@ unset -v OVERWRITE_EXISTING_EE2_CODE
 unset -v OVERWRITE_EXISTING_EMULTRF_CODE
 unset -v OVERWRITE_EXISTING_EMULTRF_DATA
 unset -v OVERWRITE_EXISTING_FASTPT_CODE
+unset -v OVERWRITE_EXISTING_FBRE_CODE
 unset -v OVERWRITE_EXISTING_FGSPECTRA_CODE
 unset -v OVERWRITE_EXISTING_FGSPECTRA_DATA
 unset -v OVERWRITE_EXISTING_GETDIST_CODE
@@ -479,6 +519,7 @@ unset -v OVERWRITE_EXISTING_PLANCK_CMB_DATA
 unset -v OVERWRITE_EXISTING_POLYCHORD_CODE
 unset -v OVERWRITE_EXISTING_PRIVATE_CODE
 unset -v OVERWRITE_EXISTING_PRIVATE_PROJECTS_CODE
+unset -v OVERWRITE_EXISTING_PYSPK_CODE
 unset -v OVERWRITE_EXISTING_SIMDE_CODE
 unset -v OVERWRITE_EXISTING_SIMONS_OBSERVATORY_CMB_DATA
 unset -v OVERWRITE_EXISTING_SIMONS_OBSERVATORY_CODE
@@ -503,6 +544,11 @@ unset -v POLYCHORD_GIT_TAG
 unset -v POLY_NAME
 unset -v POLY_URL
 unset -v PYSPD
+unset -v PYSPK_GIT_BRANCH
+unset -v PYSPK_GIT_COMMIT
+unset -v PYSPK_GIT_TAG
+unset -v PYSPK_NAME
+unset -v PYSPK_URL
 unset -v PYTHON3
 unset -v PYTHON_VERSION
 unset -v RANLIB_COMPILER
@@ -592,41 +638,6 @@ unset -v VELOCILEPTORS_NAME
 unset -v VELOCILEPTORS_URL
 unset -v WGET
 unset -v WGET_VERSION
-unset -v IGNORE_BFMT_CODE
-unset -v BFMT_THEORY_URL
-unset -v BFMT_NAME
-unset -v BFMT_GIT_TAG
-unset -v BFMT_GIT_COMMIT
-unset -v BFMT_GIT_BRANCH
-unset -v OVERWRITE_EXISTING_BFMT_CODE
-unset -v PYSPK_URL
-unset -v PYSPK_GIT_COMMIT
-unset -v PYSPK_GIT_TAG
-unset -v PYSPK_GIT_BRANCH
-unset -v PYSPK_NAME
-unset -v IGNORE_PYSPK_CODE
-unset -v OVERWRITE_EXISTING_PYSPK_CODE
-unset -v BCEMU_URL
-unset -v BCEMU_GIT_COMMIT
-unset -v BCEMU_GIT_TAG
-unset -v BCEMU_GIT_BRANCH
-unset -v BCEMU_NAME
-unset -v IGNORE_BCEMU_CODE
-unset -v OVERWRITE_EXISTING_BCEMU_CODE
-unset -v FBRE_URL
-unset -v FBRE_GIT_COMMIT
-unset -v FBRE_GIT_TAG
-unset -v FBRE_GIT_BRANCH
-unset -v FBRE_NAME
-unset -v IGNORE_FBRE_CODE
-unset -v OVERWRITE_EXISTING_FBRE_CODE
-unset -v BACCOEMU_URL
-unset -v BACCOEMU_GIT_COMMIT
-unset -v BACCOEMU_GIT_TAG
-unset -v BACCOEMU_GIT_BRANCH
-unset -v BACCOEMU_NAME
-unset -v IGNORE_BACCOEMU_CODE
-unset -v OVERWRITE_EXISTING_BACCOEMU_CODE
 
 # Functions
 unset -f cdfolder

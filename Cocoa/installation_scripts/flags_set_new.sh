@@ -1,4 +1,11 @@
 #!/bin/bash
+# ------------------------------------------------------------------------------
+# flags_set_new.sh: export the Cocoa-modified versions of the system variables
+# (library paths, compiler flags) after the originals were saved.
+#
+# Sourced, never executed: use `return`, not `exit`, and unset everything
+# defined here before returning.
+# ------------------------------------------------------------------------------
 # ----------------------------------------------------------------------------
 # ----------------------------------------------------------------------------
 # ----------------------------------------------------------------------------

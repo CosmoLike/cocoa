@@ -9,24 +9,26 @@
 4. [Running Examples](#cobaya_base_code_examples)
 5. [Running ML emulators](#cobaya_base_code_examples_emul)
 6. [Creating Cosmolike projects (external readme)](Cocoa/projects/)
-7. [Credits](#appendix_proper_credits)
+7. [Integrating external codes as Cobaya theory blocks (external readme)](Cocoa/external_modules/code/)
+8. [Credits](#appendix_proper_credits)
 
 ### Common questions raised by developers
 
-8. [Appendices about Conda](#appendix_conda)
+9. [Appendices about Conda](#appendix_conda)
     1. [FAQ: How can users install Conda?](#overview_miniforge)
     2. [FAQ: How can users install cocoa conda environment via conda-lock (better reproducibility)?](#install_conda_env_condalock)
     3. [FAQ: How can users deal with Conda conflicts (MacOS): a possible solution](#macos_solve_conda_conficts)
-9. [Appendices about Git](#appendix_git)
+10. [Appendices about Git](#appendix_git)
     1. [FAQ: How can developers develop from a Git tag?](#dev_from_tag)
     2. [FAQ: How can developers push changes to the Cocoa main branch?](#push_main)
-10. [Appendices about Cocoa run](#appendix_cocoa_run)    
+11. [Appendices about Cocoa run](#appendix_cocoa_run)    
     1. [FAQ: How can users debug Cocoa Installation? Suggested steps](#running_wrong)
     2. [FAQ: How can users compile a single external module (not involving Cosmolike)?](#appendix_compile_separately)
     3. [FAQ: How can users install Cosmolike projects?](#appendix_compile_cosmolike_separately)
+    4. [FAQ: How can users test Cosmolike projects?](#appendix_test_cosmolike_projects)
     4. [FAQ: How can users run Cocoa with Docker?](#appendix_jupyter_whovian)
     6. [FAQ: How can users set the appropriate environment for ML?](#ml_emulators)
-11. [Advanced Appendices](#appendix_additional)
+12. [Advanced Appendices](#appendix_additional)
     1. [FAQ: How can users download additional likelihood data? (external readme)](Cocoa/external_modules/data)
     2. [FAQ: Where do users find common FAQs about external modules? (external readme)](Cocoa/external_modules/code)
     3. [FAQ: Where do users find common FAQs about Cosmolike? (external readme)](Cocoa/projects/)
@@ -83,7 +85,7 @@ Core packages include compilers and numerical libraries that users typically do 
 
     - Testing beta release
 
-          wget https://raw.githubusercontent.com/CosmoLike/cocoa/refs/tags/v4.11.5/cocoapy311.yml
+          wget https://raw.githubusercontent.com/CosmoLike/cocoa/refs/tags/v4.11.6/cocoapy311.yml
 
   - macOS (arm)
     
@@ -104,7 +106,7 @@ Core packages include compilers and numerical libraries that users typically do 
 
     - Testing beta release
 
-          wget https://raw.githubusercontent.com/CosmoLike/cocoa/refs/tags/v4.11.5/cocoapy311-osxarm-base.yml
+          wget https://raw.githubusercontent.com/CosmoLike/cocoa/refs/tags/v4.11.6/cocoapy311-osxarm-base.yml
 
 **Step :two:**: Create the Cocoa environment (if the Legacy or Stable version was chosen in the previous step, replace `cocoapy311` with `cocoapy310` below),
 
@@ -177,7 +179,7 @@ In this section, we assume users have previously activated the Cocoa conda envir
 
   - Testing beta release
   
-        git clone https://github.com/CosmoLike/cocoa.git --branch v4.11.5 cocoa
+        git clone https://github.com/CosmoLike/cocoa.git --branch v4.11.6 cocoa
 
 > [!Warning]
 > The version cloned here must match the version of the `yml` file downloaded in the section
@@ -351,6 +353,9 @@ Cocoa provides several Cosmolike projects, not all of which are installed by def
 
         mpirun -n 4 --oversubscribe \
           cobaya-run ./projects/lsst_y1/EXAMPLE_MCMC1.yaml -f
+
+> [!TIP]
+> Each Cosmolike project ships unit tests under its `tests/` folder. To run them after an installation or a code change, see the appendix [FAQ: How can users test Cosmolike projects?](#appendix_test_cosmolike_projects).
 
 ### Running Jupyter Notebooks
 
@@ -725,9 +730,9 @@ likelihoods, and the theory code, all following Cobaya Conventions.
 </p>
 
 > [!NOTE]
-> What about [CosmoPower](https://alessiospuriomancini.github.io/cosmopower/)? CosmoPower is a suite of popular emulators developed by Prof. Alessio Mancini
+> What about [CosmoPower](https://alessiospuriomancini.github.io/cosmopower/)? CosmoPower is a collection of popular emulators developed by Prof. Alessio Mancini
 > and collaborators. Our Cocoa port relies on the work done by Hidde Jense @HTJense (kudos to his/their work) as well as the Simons Observatory SOLikeT code.
-> Even though they are not the suite of AI-powered emulators adopted by Cocoa developers, we do provide limited support for running them.
+> Even though they are not the AI-powered emulators adopted by Cocoa developers, we do provide limited support for running them.
 > To set up and compile Cosmopower and also the corresponding Cobaya Wrapper, comment the following keys before running `setup_cocoa.sh` and `compile_cocoa.sh`.
 > 
 >     [Adapted from Cocoa/set_installation_options.sh shell script]
@@ -909,15 +914,15 @@ and
  
      conda activate lockenv
 
-**Step :two:** Download the appropriate conda-lock compatible `yml` file. As in the section [Installation of core packages](#required_packages_conda), replace the tag `v4.11.5` in the URL with the Cocoa version that will be cloned (tags older than `v4.11.4` carry the `cocoapy310` prefix).
+**Step :two:** Download the appropriate conda-lock compatible `yml` file. As in the section [Installation of core packages](#required_packages_conda), replace the tag `v4.11.6` in the URL with the Cocoa version that will be cloned (tags older than `v4.11.4` carry the `cocoapy310` prefix).
 
    - Linux
   
-         wget https://raw.githubusercontent.com/CosmoLike/cocoa/refs/tags/v4.11.5/cocoapy311-linux.yml
+         wget https://raw.githubusercontent.com/CosmoLike/cocoa/refs/tags/v4.11.6/cocoapy311-linux.yml
 
    - macOS (arm)
      
-         wget https://raw.githubusercontent.com/CosmoLike/cocoa/refs/tags/v4.11.5/cocoapy311-osxarm.yml
+         wget https://raw.githubusercontent.com/CosmoLike/cocoa/refs/tags/v4.11.6/cocoapy311-osxarm.yml
 
 **Step :three:** Create the conda environment
 
@@ -945,13 +950,13 @@ and
 
      conda activate base2
 
-**Step :two:** Now install wget and download a looser version of the yml file (note here slightly modified conda command). As in the section [Installation of core packages](#required_packages_conda), replace the tag `v4.11.5` in the URL with the Cocoa version that will be cloned (tags older than `v4.11.4` carry the `cocoapy310` prefix).
+**Step :two:** Now install wget and download a looser version of the yml file (note here slightly modified conda command). As in the section [Installation of core packages](#required_packages_conda), replace the tag `v4.11.6` in the URL with the Cocoa version that will be cloned (tags older than `v4.11.4` carry the `cocoapy310` prefix).
 
      conda install -y wget --solver=libmamba --strict-channel-priority --override-channels -c conda-forge
 
 and
 
-     wget https://raw.githubusercontent.com/CosmoLike/cocoa/refs/tags/v4.11.5/cocoapy311-osxarm-loose.yml
+     wget https://raw.githubusercontent.com/CosmoLike/cocoa/refs/tags/v4.11.6/cocoapy311-osxarm-loose.yml
 
 **Step :three:** Create the cocoa conda env using a looser yml (note here slightly modified conda command)
 
@@ -1064,6 +1069,19 @@ and
 
     git push origin main  # run on the main branch
 
+**Step :five:**: after the squash commit lands on `main`, retire the development branch and recreate it fresh. The squash created a brand-new commit on `main`, so the individual commits of `xyzdev` are not part of `main`'s history: git sees the same changes twice, and the merge of Step :three: on the next development cycle would report conflicts on work that `main` already accepted. Deleting the branch and recreating it from the updated `main` avoids this without any force push.
+
+    git branch -D xyzdev   # run on the main branch
+
+and
+
+    git switch -c xyzdev   # run on the main branch
+
+> [!NOTE]
+> The capital `-D` (force) flag is required: because of the squash, git cannot detect that the branch was merged, so the lowercase `-d` would refuse to delete it.
+
+> [!Warning]
+> If the old `xyzdev` still exists on the server, delete it there before pushing the recreated branch — on the GitHub branches page, or with `git push origin --delete xyzdev`. Never force-push over a stale branch.
 
 # Appendices about Cocoa run <a name="appendix_cocoa_run"></a>
 
@@ -1205,6 +1223,40 @@ In case users only want to compile a single Cosmolike project (let's say the `ro
 
       source ./projects/roman_real/scripts/compile_roman_real.sh
      
+## :interrobang: FAQ: How can users test Cosmolike projects? <a name="appendix_test_cosmolike_projects"></a>
+
+Every Cosmolike project ships unit tests under its `tests/` folder (e.g., `projects/lsst_y1/tests`). The tests read nothing from the live project and change no project files; they run three kinds of checks:
+
+- $\chi^2$: the $\chi^2$ of each likelihood at a fixed reference point must stay within 0.2 of the value stored in `tests/frozen/reference_chi2.json`; a moved value means code or data changed the numbers.
+- race condition: the same point is evaluated on its own and then again after nine other cosmologies, with the test modules forcing `OMP_NUM_THREADS=4` internally; the two $\chi^2$ values must agree to $10^{-4}$. Leftover internal state or colliding OpenMP threads break the agreement.
+- accuracy (`test_accuracy.py`; advisory, no pass/fail): the numerical settings are raised one accuracy parameter at a time, then all at once. Each check prints the $\Delta\chi^2$ between the high-accuracy and the default evaluations: the numerical error of the default settings.
+
+To run the tests of a project, follow the steps below.
+
+**Step :one:**: from the Cocoa main folder `cocoa/Cocoa`, activate the Conda cocoa environment and source `start_cocoa.sh`
+
+     conda activate cocoa
+
+and
+
+     source start_cocoa.sh
+
+**Step :two:**: run the tests of a project (below, the `lsst_y1` project)
+
+     python -m pytest ./projects/lsst_y1/tests
+
+> [!NOTE]
+> `--ignore ./projects/lsst_y1/tests/test_accuracy.py`: skip the accuracy checks, whose high-accuracy evaluations take minutes each. The remaining tests take a few minutes.
+
+The tests' own snapshot under `tests/frozen/` holds the cobaya configurations fully expanded (every option and every parameter written out, so editing the likelihood default yaml files cannot change what the tests evaluate), the tests' own copy of the data files, and synthetic data vectors generated at the reference point, so each $\chi^2$ sits at its minimum. The file `tests/manifest_sha256.json` stores a SHA-256 hash of every file of the snapshot, and each test refuses to run when one was edited. Users can therefore change the live data and examples freely without breaking the tests.
+
+Maintainers redefine the snapshot after a deliberate change to the data files, examples, or likelihood defaults:
+
+     python ./projects/lsst_y1/tests/generate_frozen_reference.py --overwrite
+
+> [!NOTE]
+> `--overwrite`: delete the existing `frozen/` folder, rebuild it from the current project, and rewrite the manifest (the script refuses to run without this flag). Review the printed reference $\chi^2$ values before committing: they define what every later test run compares against.
+
 ## :interrobang: FAQ: How can users run Cocoa with Docker? <a name="appendix_jupyter_whovian"></a>
 
 We provide the Docker image [whovian-cocoa](https://hub.docker.com/r/vivianmiranda/whovian-cocoa) to facilitate installing Cocoa on Windows and macOS. This appendix assumes that users have already installed the Docker Engine on their local PC. For instructions on installing the Docker engine on specific operating systems, refer to [Docker's official documentation](https://docs.docker.com/engine/install/). 
@@ -1280,7 +1332,7 @@ This is a large image, approximately 13GB, as it already contains the conda coco
 >
 > and
 >
->     docker build . --build-arg COCOA_TAG=v4.11.5 -t vivianmiranda/whovian-cocoa # replace the tag with the Cocoa version whose yml seeds the conda env
+>     docker build . --build-arg COCOA_TAG=v4.11.6 -t vivianmiranda/whovian-cocoa # replace the tag with the Cocoa version whose yml seeds the conda env
 >
 > and
 >
@@ -1416,7 +1468,7 @@ There are a few differences users should be aware of when running Cocoa on Googl
           source "/content/conda/etc/profile.d/conda.sh"
           conda create -y -n lockenv -c conda-forge python=3.10 conda-lock=2.* wget
           conda activate lockenv
-          wget https://raw.githubusercontent.com/CosmoLike/cocoa/refs/tags/v4.11.5/cocoapy311-linux.yml
+          wget https://raw.githubusercontent.com/CosmoLike/cocoa/refs/tags/v4.11.6/cocoapy311-linux.yml
           conda-lock install -n cocoa cocoapy311-linux.yml
           conda activate cocoa 
           ln -s "${CONDA_PREFIX}"/bin/x86_64-conda-linux-gnu-gcc "${CONDA_PREFIX}"/bin/gcc
@@ -1431,7 +1483,7 @@ There are a few differences users should be aware of when running Cocoa on Googl
           %%bash
           source "/content/conda/etc/profile.d/conda.sh"
           conda activate cocoa                                  
-          git clone https://github.com/CosmoLike/cocoa.git --branch v4.11.5 cocoa # replace the tag with the Cocoa version being installed (it must match the yml downloaded on Cell 3)
+          git clone https://github.com/CosmoLike/cocoa.git --branch v4.11.6 cocoa # replace the tag with the Cocoa version being installed (it must match the yml downloaded on Cell 3)
 
     - **Cell 5️⃣**: run `setup_cocoa.sh`
 

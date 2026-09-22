@@ -1,4 +1,15 @@
 #!/bin/bash
+# ------------------------------------------------------------------------------
+# flags_derived.sh: derive the internal keys from the user-facing ones: the
+# OVERWRITE_EXISTING_ALL_PACKAGES cascade, PYTHON3/PIP3, the EC<N> error-
+# message catalog, and similar bookkeeping.
+#
+# Sourced, never executed: use `return`, not `exit`, and unset everything
+# defined here before returning.
+#
+# Skipped (return 99) when IGNORE_CPP_INSTALLATION is set. Reruns are safe:
+# existing results are kept unless OVERWRITE_EXISTING_ALL_PACKAGES is set.
+# ------------------------------------------------------------------------------
 # ----------------------------------------------------------------------------
 # ----------------------------------------------------------------------------
 # ----------------------------------------------------------------------------
