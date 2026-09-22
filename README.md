@@ -1069,6 +1069,19 @@ and
 
     git push origin main  # run on the main branch
 
+**Step :five:**: after the squash commit lands on `main`, retire the development branch and recreate it fresh. The squash created a brand-new commit on `main`, so the individual commits of `xyzdev` are not part of `main`'s history: git sees the same changes twice, and the merge of Step :three: on the next development cycle would report conflicts on work that `main` already accepted. Deleting the branch and recreating it from the updated `main` avoids this without any force push.
+
+    git branch -D xyzdev   # run on the main branch
+
+and
+
+    git switch -c xyzdev   # run on the main branch
+
+> [!NOTE]
+> The capital `-D` (force) flag is required: because of the squash, git cannot detect that the branch was merged, so the lowercase `-d` would refuse to delete it.
+
+> [!Warning]
+> If the old `xyzdev` still exists on the server, delete it there before pushing the recreated branch — on the GitHub branches page, or with `git push origin --delete xyzdev`. Never force-push over a stale branch.
 
 # Appendices about Cocoa run <a name="appendix_cocoa_run"></a>
 
