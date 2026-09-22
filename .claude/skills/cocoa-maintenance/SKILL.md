@@ -1027,9 +1027,14 @@ Before a Cocoa tag is created, verify in `set_installation_options.sh`:
   evaluator returns identical output at 0.065 ms/call (6.6x). When
   integrating any library, scan its public API for factory,
   evaluator, or precompute interfaces (`build_*`, `*Evaluator`,
-  cached constructors), prefer them, prove the outputs bit-identical
-  against the plain call, and record the measured per-call cost in
-  the commit message.
+  cached constructors) and USE them - this is a requirement, not a
+  preference. If the library offers no such split, make one: hack
+  it, or copy the relevant internals into the theory block, so setup
+  runs once in initialize() and the per-sample path does compute
+  only. An insanely slow per-call API in the MCMC hot loop is never
+  acceptable. Prove the outputs bit-identical against the plain
+  call, and record the measured per-call cost in the commit
+  message.
 
 ## 6. Bash style guide (observed across all installation_scripts)
 
