@@ -263,8 +263,15 @@ cloned via plain https with no `devurl`.
   `sed --in-place --regexp-extended`.
 - Lists of items in scripts are written as bash arrays with loops, not as
   long repeated sed lines — but never loop across DIFFERENT scripts (rule 0.1).
-- Some project repositories use Git LFS; git operations there need `git-lfs`
-  on PATH (the cocoa conda environment provides it).
+- **Run commits inside the cocoa environment** (`conda activate cocoapy311`,
+  then `source start_cocoa.sh`) in the main cocoa repository and in the
+  Git LFS project repositories (lsst_y1, roman_real, roman_fourier,
+  desy1xplanck). Their hooks and filters need `git-lfs` on PATH and only
+  the environment provides it: a plain-shell commit in the main repository
+  still lands, but its post-commit hook fails with "'git-lfs' was not
+  found". The same applies to any hook- or filter-running operation
+  (checkout, merge, pull); read-only commands (log, diff, status) work
+  from any shell.
 - After a squash merge, delete the local topic branch with
   `git branch -D <branch>` (`-d` refuses: squash-merged branches never look
   merged to git) and start the next branch fresh from updated `main`.
