@@ -616,6 +616,17 @@ shape, the main README wins.
   0.2, tolerances such as 1e-4) are not measurements and stay, and
   so does the recorded rationale of a past decision (why a default
   changed).
+- A decision record keeps full strength. Every non-unity accuracy
+  default is a decision the README's Minimum accuracy parameters
+  section must preserve at working strength: the mechanism (what was
+  wrong and how the default fixes it), the dated measurement that
+  motivated it (a historical fact, labeled as such — not a current
+  check output), and a Warning against reverting the knob. A sweep
+  that strips measured values must never thin a decision record to
+  "a measurable error": roman_fourier's boost-2.0 record was reduced
+  exactly that way and the reason was effectively forgotten until
+  the user caught it. The same rationale also lives next to the knob
+  in the likelihood yaml.
 
 ### 3.2 Quote blocks must match the source files
 
