@@ -1046,6 +1046,16 @@ Before a Cocoa tag is created, verify in `set_installation_options.sh`:
   outputs bit-identical against the plain call, and record the
   measured per-call cost in the commit message.
 
+- Check-label families must not collide with physics parameter names.
+  The baryonic feedback checks were first labeled B1-B7, and "B2" read
+  as the second-order galaxy bias b2 of the cosmolike bias expansion;
+  they became BF1-BF7. Before coining a label family, grep the
+  parameter namespace (bias b_n, IA amplitudes A_n, shear calibration
+  M_n, photo-z DZ_n) and pick a prefix that cannot be mistaken for a
+  sampled parameter. The same goes for chat and commit prose: name the
+  check with its family ("check BF2, the SP(k) Akino relation"), never
+  a bare letter-digit token.
+
 ## 6. Bash style guide (observed across all installation_scripts)
 
 When writing or editing a script, imitate these conventions exactly. They
