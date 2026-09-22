@@ -1017,6 +1017,19 @@ Before a Cocoa tag is created, verify in `set_installation_options.sh`:
   string of both init calls. Prove a fix with a pollute-then-repeat
   run: set a foreign lmax/boost/binning between two identical calls;
   the outputs must be bit-identical.
+- Check for an MCMC-optimized entry point before wiring an external
+  library. Cocoa exists to run MCMC, so a per-call convenience API
+  that repeats validation and setup on every call is the wrong
+  default, and the cost is paid nz times per sample. It happened:
+  the bfmt block wired pyspk's `sup_model` (0.42 ms/call, pydantic
+  validation plus k-grid and interpolator setup every call) when the
+  same package exports `build_sup_model_evaluator`, whose prebuilt
+  evaluator returns identical output at 0.065 ms/call (6.6x). When
+  integrating any library, scan its public API for factory,
+  evaluator, or precompute interfaces (`build_*`, `*Evaluator`,
+  cached constructors), prefer them, prove the outputs bit-identical
+  against the plain call, and record the measured per-call cost in
+  the commit message.
 
 ## 6. Bash style guide (observed across all installation_scripts)
 
