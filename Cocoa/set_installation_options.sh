@@ -132,7 +132,7 @@ export DESXPLANCK_GIT_TAG="v4.11"
 
 export LSST_Y1_URL="https://github.com/CosmoLike/cocoa_lsst_y1.git"
 export LSST_Y1_NAME="lsst_y1"
-export LSST_Y1_GIT_TAG="v4.11"
+export LSST_Y1_GIT_TAG="v4.11.1"
 
 export ROMAN_FOURIER_URL="https://github.com/CosmoLike/cocoa_roman_fourier.git"
 export ROMAN_FOURIER_NAME="roman_fourier"
@@ -140,10 +140,10 @@ export ROMAN_FOURIER_GIT_TAG="v4.11"
 
 export ROMAN_REAL_URL="https://github.com/CosmoLike/cocoa_roman_real.git"
 export ROMAN_REAL_NAME="roman_real"
-export ROMAN_REAL_GIT_TAG="v4.11"
+export ROMAN_REAL_GIT_TAG="v4.11.1"
 
 export COSMOLIKE_URL="https://github.com/CosmoLike/cocoa-cosmolike-core.git"
-export COSMOLIKE_GIT_TAG="v4.11.4"
+export COSMOLIKE_GIT_TAG="v4.11.5"
 export COSMOLIKE_NAME="cosmolike_core"
 
 export ROMAN_KL_URL="https://github.com/CosmoLike/cocoa_roman_kl.git"
@@ -152,7 +152,7 @@ export ROMAN_KL_GIT_TAG="v4.11.3"
 
 export BFMT_THEORY_URL="https://github.com/CosmoLike/cocoa_baryonic_feedback_models_theory.git"
 export BFMT_NAME="baryon_suppression"
-export BFMT_GIT_TAG="v1.0"
+export BFMT_GIT_TAG="v1.01"
 
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
