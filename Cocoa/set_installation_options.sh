@@ -124,31 +124,31 @@ export USE_SPT_CLIK_PLANCK=1
 
 export DES_Y3_URL="https://github.com/CosmoLike/cocoa_des_y3.git"
 export DES_Y3_NAME="des_y3"
-export DES_Y3_GIT_TAG="v4.11.1"
+export DES_Y3_GIT_TAG="v4.11.2"
 
 export DESXPLANCK_URL="https://git@github.com/CosmoLike/cocoa_desy1xplanck.git"
 export DESXPLANCK_GIT_NAME="desy1xplanck"
-export DESXPLANCK_GIT_TAG="v4.11.1"
+export DESXPLANCK_GIT_TAG="v4.11.2"
 
 export LSST_Y1_URL="https://github.com/CosmoLike/cocoa_lsst_y1.git"
 export LSST_Y1_NAME="lsst_y1"
-export LSST_Y1_GIT_TAG="v4.11.2"
+export LSST_Y1_GIT_TAG="v4.11.3"
 
 export ROMAN_FOURIER_URL="https://github.com/CosmoLike/cocoa_roman_fourier.git"
 export ROMAN_FOURIER_NAME="roman_fourier"
-export ROMAN_FOURIER_GIT_TAG="v4.11.1"
+export ROMAN_FOURIER_GIT_TAG="v4.11.2"
 
 export ROMAN_REAL_URL="https://github.com/CosmoLike/cocoa_roman_real.git"
 export ROMAN_REAL_NAME="roman_real"
-export ROMAN_REAL_GIT_TAG="v4.11.2"
+export ROMAN_REAL_GIT_TAG="v4.11.3"
 
 export COSMOLIKE_URL="https://github.com/CosmoLike/cocoa-cosmolike-core.git"
-export COSMOLIKE_GIT_TAG="v4.11.6"
+export COSMOLIKE_GIT_TAG="v4.11.7"
 export COSMOLIKE_NAME="cosmolike_core"
 
 export ROMAN_KL_URL="https://github.com/CosmoLike/cocoa_roman_kl.git"
 export ROMAN_KL_NAME="roman_kl"
-export ROMAN_KL_GIT_TAG="v4.11.4"
+export ROMAN_KL_GIT_TAG="v4.11.5"
 
 export BFMT_THEORY_URL="https://github.com/CosmoLike/cocoa_baryonic_feedback_models_theory.git"
 export BFMT_NAME="baryon_suppression"
@@ -308,7 +308,7 @@ export SO_SYSLIB_URL="https://github.com/simonsobs/syslibrary.git"
 export SO_SYSLIB_GIT_COMMIT="2471df981053a7526a441d2547eb8dde10d92f70"
 
 export EE2_URL="https://github.com/vivianmiranda/EuclidEmulator2.git"
-export EE2_GIT_COMMIT="1c019a5c8985202e55534fad3e26fa298e5c572e"
+export EE2_GIT_COMMIT="77084311ef6ce94b44f731281b157be75260c8ad"
 # THIS GIT IS FOR THE ORIGINAL EE2 BEFORE VM MODS
 #export EE2_GIT_COMMIT="ff59f6683069417f6b4d2fb5d59197044d424445"
 export EE2_NAME="euclidemu2"
