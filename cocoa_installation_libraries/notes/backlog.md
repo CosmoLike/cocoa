@@ -162,7 +162,17 @@ scale cuts, machinery in cocoa_testing.py. The dated measurements
 show the two sources are not interchangeable at survey precision
 under the frozen cuts everywhere (medians from 1.4 at DES-Y3 shear
 to 912 at roman_kl 3x2pt, always worst at high omegam). Remaining:
-Cocoa's EE2 vs the original EE2.
+Cocoa's EE2 vs the original EE2 as a shipped test. A first
+measurement exists (2026-09-23, lsst_y1 cosmic shear at the frozen
+fiducial, original commit ff59f66 built into a scratch prefix): the
+original cannot drive the pipeline as-is (no get_boost2, and a hard
+101-redshift limit with silent truncation that the VM modifications
+fixed - the likelihood sends ~110); bridged with an API shim and
+100-redshift chunking, the two builds agree at
+delta chi2 = 2.4e-6 (max fractional data-vector difference 1.8e-5),
+so the modifications changed no emulated physics where the original
+works. A shipped test needs a decision on how it obtains the second
+build.
 
 **Severity: MEDIUM.** Validation coverage for a central ingredient;
 no current defect is demonstrated.
