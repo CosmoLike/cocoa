@@ -38,7 +38,6 @@ No open HIGH tickets.
 
 - OPEN **MEDIUM** **BUG FIX** — [Find why the dlnxi/Css/dlnk notebook functions crash](#open-notebook-derivative-crash)
 - OPEN **MEDIUM** **BUG FIX** — [Teach copy_and_rename_project.sh and the projects FAQ about tests/](#open-new-project-tests)
-- OPEN **MEDIUM** **NEW FUNCTIONALITY** — [Extend the CFASTPT vs FASTPT comparison to 3x2pt and 2x2pt](#open-fastpt-3x2pt)
 - OPEN **MEDIUM** **NEW FUNCTIONALITY** — [Unit tests comparing Halofit vs EE2 and Cocoa's EE2 vs original EE2](#open-nonlinear-pk-tests)
 - OPEN **MEDIUM** **NEW FUNCTIONALITY** — [Two-grid sampling inside cfastpt for faster TATT](#open-cfastpt-two-grid)
 
@@ -140,54 +139,6 @@ what a new project must do with it.
 
 </details>
 
-<a id="open-fastpt-3x2pt"></a>
-## Extend the CFASTPT vs FASTPT comparison to 3x2pt and 2x2pt
-
-### High-level summary
-
-Each project's CFASTPT vs FASTPT comparison test scores cosmic shear
-only. 3x2pt and 2x2pt add galaxy–galaxy lensing and clustering, which
-consume the one-loop galaxy-bias tables both implementations also
-compute, so the comparison should cover those data vectors too.
-
-### Current status
-
-**Ticket type: NEW FUNCTIONALITY.**
-
-**OPEN.** Partial: lsst_y1 landed the 3x2pt sweep as test 16
-(2026-09-23), passing at the defaults; its `tests/README.md` records
-the dated measurements, including an exploratory b2-activated
-variant that scored the one-loop bias tables (density-independent
-floor, well inside the limit). Remaining: 2x2pt, and the other five
-projects.
-
-**Severity: MEDIUM.** Coverage extension; the cosmic-shear comparison
-already gates both implementations at the converged defaults.
-
-### What is already in place
-
-The two-grid FAST-PT block passes the cosmic-shear comparison at its
-defaults on all six projects, and the shared harness builds the
-30-point prior sweep and the per-point comparison machinery.
-
-### What is missing
-
-Wire 3x2pt and 2x2pt datasets into the comparison, run the same
-30-point sweep, and record the passing configuration in each project's
-`tests/README.md`. Comparisons use per-point generated fiducial
-vectors ($\delta^T C^{-1} \delta$), never differences against shipped
-data.
-
-<details><summary>Technical record</summary>
-
-- Owners: `external_modules/code/cosmolike_core/cocoa_testing.py`
-  (`fastpt_comparison_points`, the comparison runner) and each
-  project's `tests/cocoa_test_utils.py` contract.
-- The cosmic-shear decision record lives in
-  `projects/lsst_y1/tests/README.md`.
-
-</details>
-
 <a id="open-nonlinear-pk-tests"></a>
 ## Unit tests comparing Halofit vs EE2 and Cocoa's EE2 vs original EE2
 
@@ -202,7 +153,14 @@ so a regression in either path has nothing to catch it.
 
 **Ticket type: NEW FUNCTIONALITY.**
 
-**OPEN.** No comparison exists yet.
+**OPEN.** Partial: lsst_y1 landed the Halofit-vs-EE2 half as
+advisory check NL1 (2026-09-23, `tests/test_nonlinear.py`): ten
+seeded cosmologies in omegam/ns/As, the EE2 vector as each
+cosmology's fiducial, the difference weighted under the `--mask`
+scale cuts. The dated measurements in its `tests/README.md` show
+the two sources are not interchangeable at that project's precision
+even under the frozen cuts. Remaining: Cocoa's EE2 vs the original
+EE2, and the other five projects.
 
 **Severity: MEDIUM.** Validation coverage for a central ingredient;
 no current defect is demonstrated.
@@ -318,6 +276,36 @@ README. To reopen a ticket, move its content back under
   comparison). The projects became data-only shims binding one
   harness instance; the full suites reproduced their digits exactly
   before and after. Shipped in cosmolike_core v4.11.6.
+
+## CFASTPT vs FASTPT: 3x2pt, 2x2pt, and scale-cut masks (2026-09-23)
+
+- **Comparison extended to every probe.** All six projects gained
+  the 3x2pt (desy1xplanck: 6x2pt) and 2x2pt sweeps next to the
+  cosmic-shear one, passing the 0.2 rule at their contracts; each
+  `tests/README.md` carries the dated measurements. The frozen
+  configurations fix the one-loop bias amplitudes at zero, so the
+  sweeps score the IA tables; lsst_y1's exploratory b2-activated
+  variant measured the bias tables separately (max 0.044,
+  density-independent floor 0.013).
+- **--mask option.** The sweeps rerun under a chosen scale-cut mask
+  (frozen contract, lsst_y1's M2-M6, or the all-ones no-cuts mask)
+  via frozen TATT dataset variants; under a non-frozen mask the
+  chi2 baseline is regenerated from the cfastpt fiducial (zero by
+  construction). conftest.py content was deduplicated into
+  cocoa_testing.py (the file stays per project for pytest
+  discovery; a shim binds the shared hooks).
+- **Findings.** The ones-mask growth at default camb/cosmolike
+  settings collapses under the pushed settings (cosmolike
+  integration accuracy, not the FAST-PT grids); three shipped
+  covariances (desy1xplanck 6x2pt, roman_real 3x2pt, roman_fourier
+  3x2pt) are not positive definite when fully unmasked; roman_kl's
+  frozen 3x2pt mask is already the all-ones mask.
+- **Stray-file repairs.** roman_fourier's ones.mask was a
+  wrong-length lsst_y1 byte-copy, replaced by the correct
+  1,485-row mask (one guarded frozen replacement); roman_fourier's
+  and roman_kl's real-space calculate_mask.py strays were replaced
+  by Fourier generators that reproduce every shipped mask
+  byte-identically.
 
 ## Installation scripts (2026-09)
 
