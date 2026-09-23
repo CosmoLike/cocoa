@@ -58,7 +58,9 @@ We provide the Docker image [whovian-cocoa](https://hub.docker.com/r/vivianmiran
 > [!NOTE]
 > Open known problems and planned work are tracked in the execution backlog at
 > [cocoa_installation_libraries/notes/backlog.md](cocoa_installation_libraries/notes/backlog.md),
-> which also archives closed tickets.
+> which also archives closed tickets. The backlog, together with the maintenance
+> skill at [.claude/skills/cocoa-maintenance/SKILL.md](.claude/skills/cocoa-maintenance/SKILL.md),
+> gives AI assistants enough context to work on Cocoa.
 
 # Installation of core packages <a name="required_packages_conda"></a>
 
