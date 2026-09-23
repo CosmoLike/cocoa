@@ -198,7 +198,7 @@ export FASTPT_NAME="FAST-PT"
 
 export FASTPT_WRAPPER_URL="git@github.com:CosmoLike/fastpt.git"
 export FASTPT_WRAPPER_NAME="PyFAST-PT"
-export FASTPT_WRAPPER_GIT_COMMIT="398e79264098f83b4df711b6a33861b62d21b4b1"
+export FASTPT_WRAPPER_GIT_COMMIT="fcc8a77092c94e1ebcc394cf329c80d6848139f0"
 
 # ------------------------------------------------------------------------------
 # Build modes — select ONE via environment or make invocation:
