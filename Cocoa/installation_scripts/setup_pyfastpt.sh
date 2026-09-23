@@ -38,7 +38,7 @@ unset_env_vars () {
 # unset_env_funcs: forget every helper function defined below (functions leak
 # into the user's shell exactly like variables).
 unset_env_funcs () {
-  unset -f cdfolder cpfolder error
+  unset -f cdfolder cpfolder error devurl
   unset -f unset_env_funcs
   cdroot || return 1;
 }
@@ -71,6 +71,17 @@ cdfolder() {
 cpfolder() {
   cp -r "${1:?}" "${2:?}"  \
     2>"/dev/null" || { error "CP FOLDER ${1} on ${2}"; return 1; }
+}
+
+devurl() {
+  # SWITCH_TO_DEV_MODE=1: rewrite GitHub https URLs to their ssh form
+  local U="${1:?}"
+  if [ -n "${SWITCH_TO_DEV_MODE:-}" ]; then
+    case "${U}" in
+      https://*github.com/*) U="git@github.com:${U#*github.com/}" ;;
+    esac
+  fi
+  echo "${U}"
 }
 
 # ---------------------------------------------------------------------------
@@ -154,6 +165,7 @@ fi
 unset -v URL FOLDER PACKDIR
 
 URL="${FASTPT_WRAPPER_URL:-"https://github.com/CosmoLike/fastpt.git"}"
+URL=$(devurl "${URL:?}")
 
 FOLDER="${FASTPT_WRAPPER_NAME:-"PyFAST-PT"}"
 
