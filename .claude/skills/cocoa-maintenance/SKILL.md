@@ -1100,6 +1100,33 @@ it from the start:
 - New frozen files enter the SHA-256 manifest through the generator,
   never by hand.
 
+The doctrine is not only for accuracy checks against stored vectors:
+it governs EVERY check that compares two computations - two
+implementations, two accuracy settings, two code versions - at any
+evaluation point. The mistake has now happened twice, both times
+caught by the maintainer: after the baryonic-feedback case above,
+the first draft of the CFASTPT-vs-FASTPT sweep (lsst_y1 test 15)
+asserted on chi2(FASTPT) - chi2(CFASTPT) at 20 prior points with
+the shipped data vector loaded, where sub-percent vector
+differences read as thousands of chi2 units. So the rule is
+procedural: BEFORE writing an assertion on any chi2-derived
+quantity, name the Taylor order it measures. Away from its minimum
+a chi2 responds linearly - 2 r^T C^-1 delta, the residual to the
+loaded data times the vector difference - so a chi2 difference
+between two computations measures their distance from the data,
+amplified by wherever the point sits, never the disagreement under
+test. The correct form makes one computation's data vector the
+fiducial of that point (its own chi2 against it is zero by
+construction) and reports the other computation's chi2 against that
+vector: the quadratic delta^T C^-1 delta, computed directly from
+the two printed .modelvector files and the masked inverse
+covariance, or equivalently through a temporary dataset descriptor
+naming the generated vector. This holds at every evaluation point
+of a sweep, not only the frozen fiducial: a per-point comparison
+generates one fiducial vector per point. Raw chi2 values against
+the shipped data may still be printed, labeled as information,
+never asserted on.
+
 ## 6. Bash style guide (observed across all installation_scripts)
 
 When writing or editing a script, imitate these conventions exactly. They
