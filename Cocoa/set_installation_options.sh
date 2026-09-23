@@ -196,7 +196,7 @@ export FASTPT_URL="https://github.com/jablazek/FAST-PT.git"
 export FASTPT_GIT_COMMIT="a970d700703814f8513cf3848add4c167e60fc76"
 export FASTPT_NAME="FAST-PT"
 
-export FASTPT_WRAPPER_URL="https://github.com/CosmoLike/fastpt.git"
+export FASTPT_WRAPPER_URL="git@github.com:CosmoLike/fastpt.git"
 export FASTPT_WRAPPER_NAME="PyFAST-PT"
 export FASTPT_WRAPPER_GIT_COMMIT="398e79264098f83b4df711b6a33861b62d21b4b1"
 
