@@ -154,8 +154,12 @@ compute, so the comparison should cover those data vectors too.
 
 **Ticket type: NEW FUNCTIONALITY.**
 
-**OPEN.** The cosmic-shear stage closed in September 2026 (see the
-archive); this ticket is its planned continuation.
+**OPEN.** Partial: lsst_y1 landed the 3x2pt sweep as test 16
+(2026-09-23), passing at the defaults; its `tests/README.md` records
+the dated measurements, including an exploratory b2-activated
+variant that scored the one-loop bias tables (density-independent
+floor, well inside the limit). Remaining: 2x2pt, and the other five
+projects.
 
 **Severity: MEDIUM.** Coverage extension; the cosmic-shear comparison
 already gates both implementations at the converged defaults.
