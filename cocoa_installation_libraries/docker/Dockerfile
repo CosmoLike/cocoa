@@ -4,7 +4,7 @@ ARG NB_USER="whovian"
 ARG NB_UID=1000
 ARG NB_GID=1000
 # Cocoa version whose conda-lock yml file seeds the cocoa environment
-ARG COCOA_TAG="v4.11.7"
+ARG COCOA_TAG="v4.11.8"
 
 # Fix DL4006
 SHELL ["/bin/bash", "-o", "pipefail", "-c"]
@@ -193,7 +193,7 @@ WORKDIR $HOME
 VOLUME ["$HOME/host/"]
 
 # HOW TO BUILD AND PUBLISH THIS IMAGE
-# docker build . --build-arg COCOA_TAG=v4.11.7 -t vivianmiranda/whovian-cocoa
+# docker build . --build-arg COCOA_TAG=v4.11.8 -t vivianmiranda/whovian-cocoa
 # docker push vivianmiranda/whovian-cocoa
 #
 # HOW TO PUBLISH THE :thin VARIANT (image with Cocoa preinstalled/precompiled)
