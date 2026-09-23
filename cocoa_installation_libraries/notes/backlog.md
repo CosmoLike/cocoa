@@ -153,14 +153,16 @@ so a regression in either path has nothing to catch it.
 
 **Ticket type: NEW FUNCTIONALITY.**
 
-**OPEN.** Partial: lsst_y1 landed the Halofit-vs-EE2 half as
-advisory check NL1 (2026-09-23, `tests/test_nonlinear.py`): ten
+**OPEN.** The Halofit-vs-EE2 half is DONE across all six projects
+(2026-09-23): advisory checks NL1 (cosmic shear) and NL2 (3x2pt;
+desy1xplanck: 6x2pt) in each `tests/test_nonlinear.py`, ten shared
 seeded cosmologies in omegam/ns/As, the EE2 vector as each
 cosmology's fiducial, the difference weighted under the `--mask`
-scale cuts. The dated measurements in its `tests/README.md` show
-the two sources are not interchangeable at that project's precision
-even under the frozen cuts. Remaining: Cocoa's EE2 vs the original
-EE2, and the other five projects.
+scale cuts, machinery in cocoa_testing.py. The dated measurements
+show the two sources are not interchangeable at survey precision
+under the frozen cuts everywhere (medians from 1.4 at DES-Y3 shear
+to 912 at roman_kl 3x2pt, always worst at high omegam). Remaining:
+Cocoa's EE2 vs the original EE2.
 
 **Severity: MEDIUM.** Validation coverage for a central ingredient;
 no current defect is demonstrated.
