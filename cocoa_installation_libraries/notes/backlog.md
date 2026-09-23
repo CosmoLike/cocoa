@@ -38,7 +38,6 @@ No open HIGH tickets.
 
 - OPEN **MEDIUM** **BUG FIX** — [Find why the dlnxi/Css/dlnk notebook functions crash](#open-notebook-derivative-crash)
 - OPEN **MEDIUM** **BUG FIX** — [Teach copy_and_rename_project.sh and the projects FAQ about tests/](#open-new-project-tests)
-- OPEN **MEDIUM** **NEW FUNCTIONALITY** — [Unit tests comparing Halofit vs EE2 and Cocoa's EE2 vs original EE2](#open-nonlinear-pk-tests)
 - OPEN **MEDIUM** **NEW FUNCTIONALITY** — [Two-grid sampling inside cfastpt for faster TATT](#open-cfastpt-two-grid)
 
 ### Low
@@ -136,69 +135,6 @@ what a new project must do with it.
   `tests/cocoa_test_utils.py`; the shared machinery is
   `external_modules/code/cosmolike_core/cocoa_testing.py`, whose
   module docstring carries a worked shim example.
-
-</details>
-
-<a id="open-nonlinear-pk-tests"></a>
-## Unit tests comparing Halofit vs EE2 and Cocoa's EE2 vs original EE2
-
-### High-level summary
-
-Cocoa can source the nonlinear $P(k)$ from Halofit or from
-EuclidEmulator2, and Cocoa's EE2 carries local changes. No unit test
-scores Halofit against EE2, or the changed EE2 against the original,
-so a regression in either path has nothing to catch it.
-
-### Current status
-
-**Ticket type: NEW FUNCTIONALITY.**
-
-**OPEN.** The Halofit-vs-EE2 half is DONE across all six projects
-(2026-09-23): advisory checks NL1 (cosmic shear) and NL2 (3x2pt;
-desy1xplanck: 6x2pt) in each `tests/test_nonlinear.py`, ten shared
-seeded cosmologies in omegam/ns/As, the EE2 vector as each
-cosmology's fiducial, the difference weighted under the `--mask`
-scale cuts, machinery in cocoa_testing.py. The dated measurements
-show the two sources are not interchangeable at survey precision
-under the frozen cuts everywhere (medians from 1.4 at DES-Y3 shear
-to 912 at roman_kl 3x2pt, always worst at high omegam). Remaining:
-Cocoa's EE2 vs the original EE2 as a shipped test. A first
-measurement exists (2026-09-23, lsst_y1 cosmic shear at the frozen
-fiducial, original commit ff59f66 built into a scratch prefix): the
-original cannot drive the pipeline as-is (no get_boost2, and a hard
-101-redshift limit with silent truncation that the VM modifications
-fixed - the likelihood sends ~110); bridged with an API shim and
-100-redshift chunking, the two builds agree at
-delta chi2 = 2.4e-6 (max fractional data-vector difference 1.8e-5),
-so the modifications changed no emulated physics where the original
-works. A shipped test needs a decision on how it obtains the second
-build.
-
-**Severity: MEDIUM.** Validation coverage for a central ingredient;
-no current defect is demonstrated.
-
-### What is already in place
-
-The shared harness provides the pattern: fixed comparison points,
-per-point generated fiducial vectors, worker isolation, and a
-documented tolerance, as in the CFASTPT vs FASTPT comparison.
-
-### What is missing
-
-Two comparisons in that pattern: Halofit vs EE2 inside the emulator's
-validity range (an agreement measurement, not a strict gate — they are
-different models), and Cocoa's EE2 vs the original EE2, which must
-agree tightly wherever behavior was not deliberately changed. Record
-tolerances and the reasoning in the owning `tests/README.md`.
-
-<details><summary>Technical record</summary>
-
-- Owners: `external_modules/code/cosmolike_core/cocoa_testing.py` for
-  the shared machinery; the hosting project's `tests/` for the
-  contract and frozen state.
-- Doctrine: comparisons of two computations use per-point generated
-  fiducial vectors ($\delta^T C^{-1} \delta$), never $\chi^2$
-  differences against shipped data.
 
 </details>
 
@@ -318,6 +254,31 @@ README. To reopen a ticket, move its content back under
   and roman_kl's real-space calculate_mask.py strays were replaced
   by Fourier generators that reproduce every shipped mask
   byte-identically.
+
+## Nonlinear P(k): Halofit vs EE2, and the EE2 modifications (2026-09-23)
+
+- **Halofit vs EE2 (advisory checks NL1/NL2, all six projects).**
+  Ten shared seeded cosmologies in omegam/ns/As, the EE2 vector as
+  each cosmology's fiducial, the difference weighted under the
+  --mask scale cuts, reported through the per-project corner
+  figures. The two sources are not interchangeable at survey
+  precision under the frozen cuts anywhere (medians from 1.4 at
+  DES-Y3 shear to 912 at roman_kl 3x2pt, always worst at high
+  omegam).
+- **Cocoa's EE2 vs the original EE2.** The original (commit
+  ff59f66) cannot run inside Cocoa as-is: no get_boost2, and a
+  silent overflow beyond 101 redshifts (the likelihoods send ~110)
+  - two of the defects the Cocoa modifications fixed. Bridged with
+  a compatibility patch (a get_boost2 adapter plus 100-redshift
+  chunking), the side-by-side ten-cosmology comparison passes on
+  all six projects (max delta chi2 4.3e-4, at roman_fourier).
+  Shipped as lsst_y1's test 18, which compiles the original at
+  test time (offline, --ignore-installed) and gates at 0.2; the
+  modifications, their measured 14x speed-up, and the validation
+  table are documented in the euclidemu2 repository README.
+- **EE2 OpenMP race tests.** Every project ships a race check with
+  the nonlinear P(k) from EE2 (ten_in_a_row_chi2's ee2 flag), all
+  passing with exact eight-decimal agreement.
 
 ## Installation scripts (2026-09)
 
