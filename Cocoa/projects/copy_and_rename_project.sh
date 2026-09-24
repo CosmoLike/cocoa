@@ -50,8 +50,11 @@ cp -r "${ROOTDIR:?}/projects/${OLD_PROJECT:?}" "${PRJ:?}"
 # Debian-family systems would misread these arguments). -depth lists
 # the contents of a folder before the folder itself, so a renamed
 # folder never invalidates the paths still on the list.
+# a failed cd must abort: find would otherwise rename files in
+# whatever folder the shell happened to be in
 for d in data likelihood scripts interface; do
-  cd "${PRJ:?}/${d}/"
+  cd "${PRJ:?}/${d}/" || { echo "missing folder: ${PRJ}/${d}" >&2; \
+                           return 1 2>/dev/null || exit 1; }
   find . -depth -iname "*${OLD_PROJECT}*" -print0 | \
     while IFS= read -r -d '' f; do
       g="${f//${OLD_PROJECT}/${NEW_PROJECT_L}}"
@@ -59,7 +62,8 @@ for d in data likelihood scripts interface; do
     done
 done
 
-cd "${PRJ:?}/interface/"
+cd "${PRJ:?}/interface/" || { echo "missing folder: ${PRJ}/interface" >&2; \
+                              return 1 2>/dev/null || exit 1; }
 find . -depth -iname "*${OLD_SURVEY}*" -print0 | \
   while IFS= read -r -d '' f; do
     g="${f//${OLD_SURVEY}/${NEW_SURVEY_L}}"

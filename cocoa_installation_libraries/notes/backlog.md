@@ -298,3 +298,23 @@ README. To reopen a ticket, move its content back under
   its final check became the exhaustive pair `grep -rli lsst` +
   `find -iname "*lsst*"`, both returning nothing on the validated
   macOS run.
+- **Compile-and-run validation (2026-09-24).** A created project was
+  taken through the full easy-way cycle on macOS: re-sourcing
+  `start_cocoa.sh` auto-created its data and cobaya-likelihood
+  symlinks, `compile_xxx.sh` built `cosmolike_xxx_interface.so`, and
+  `EXAMPLE_EVALUATE1.yaml` (cosmic shear) and `EXAMPLE_EVALUATE2.yaml`
+  (3x2pt) both ran, with the full evaluate output identical to the
+  lsst_y1 donor's after name normalization (chi2 0.267263 and
+  0.443061, log-posteriors -1076.03 and -1064.55). A failed `cd` in
+  the rename loops now aborts instead of letting `find` rename the
+  wrong folder.
+- **Project symlinks ignored everywhere.** `start_all_projects.sh`
+  deleted `cobaya/cobaya/likelihoods/.gitignore` but never recreated
+  it (the generated project list was copied only to
+  `external_modules/{data,code}`), so every project's likelihood
+  symlink sat untracked in the cobaya repository. The copy now
+  reaches `cobaya/cobaya/likelihoods/` too, the generated file
+  ignores itself (the cobaya repository has no other rule for it),
+  and `stop_all_projects.sh` removes it symmetrically. Verified: no
+  project link and no generated `.gitignore` shows in any repo's
+  `git status`, for existing projects and a new one alike.

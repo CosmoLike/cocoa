@@ -102,9 +102,15 @@ unset_env_vars || return 1
 
 FILE="${ROOTDIR:?}"/projects/.gitignore
 
+# the generated file must also ignore itself: the cobaya repository
+# has no other rule covering it
+echo ".gitignore" >> "${FILE:?}"
+
 cpfile "${FILE:?}" "${ROOTDIR:?}"/external_modules/data/ || return 1;
 
 cpfile "${FILE:?}" "${ROOTDIR:?}"/external_modules/code/ || return 1;
+
+cpfile "${FILE:?}" "${ROOTDIR:?}"/cobaya/cobaya/likelihoods/ || return 1;
 
 # ------------------------------------------------------------------------------
 
