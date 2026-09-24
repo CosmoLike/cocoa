@@ -105,6 +105,7 @@ unset_env_vars || return 1
 rm -f "${ROOTDIR:?}/projects/.gitignore"
 rm -f "${ROOTDIR:?}/external_modules/data/.gitignore"
 rm -f "${ROOTDIR:?}/external_modules/code/.gitignore"
+rm -f "${ROOTDIR:?}/cobaya/cobaya/likelihoods/.gitignore"
 
 # ------------------------------------------------------------------------------
 

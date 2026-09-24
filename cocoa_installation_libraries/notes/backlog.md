@@ -37,7 +37,6 @@ No open HIGH tickets.
 ### Medium
 
 - OPEN **MEDIUM** **BUG FIX** — [Find why the dlnxi/Css/dlnk notebook functions crash](#open-notebook-derivative-crash)
-- OPEN **MEDIUM** **BUG FIX** — [Teach copy_and_rename_project.sh and the projects FAQ about tests/](#open-new-project-tests)
 - OPEN **MEDIUM** **NEW FUNCTIONALITY** — [Two-grid sampling inside cfastpt for faster TATT](#open-cfastpt-two-grid)
 
 ### Low
@@ -88,53 +87,6 @@ C core. Then fix where it enters and rerun the notebook end to end.
   and the `EXAMPLE_EVALUATE*.ipynb` notebooks that call them.
 - A crash inside the compiled core will not show a python traceback;
   run the reproduction under `python -X faulthandler` or gdb.
-
-</details>
-
-<a id="open-new-project-tests"></a>
-## Teach copy_and_rename_project.sh and the projects FAQ about tests/
-
-### High-level summary
-
-Projects now ship `tests/`: a pytest suite bound to the shared
-`CocoaTestHarness`, manifest-pinned `frozen/` state, and a
-`tests/README.md`. `projects/copy_and_rename_project.sh` never touches
-`tests/`, and the FAQ "How do we create a new Cosmolike project?"
-(the easy way and the hard way) predates it, so a copied project
-carries the donor's tests verbatim: name references, frozen manifests,
-and README all point at the old project.
-
-### Current status
-
-**Ticket type: BUG FIX.**
-
-**OPEN.** Verified: the script contains no reference to `tests/`.
-
-**Severity: MEDIUM.** Every new-project creation inherits misleading
-tests; existing projects are untouched.
-
-### What is already in place
-
-The script handles the rename of the likelihood, interface, and data
-layers; the FAQ documents both creation paths.
-
-### What is missing
-
-Make the rename script rewrite the project name inside `tests/` and
-either regenerate or instruct the user to regenerate `frozen/` (its
-manifests pin the donor's state and are never hand-edited). Update
-both FAQ paths in `projects/README.md` to say what `tests/` is and
-what a new project must do with it.
-
-<details><summary>Technical record</summary>
-
-- Owners: `projects/copy_and_rename_project.sh` and
-  `projects/README.md` anchors `appendix_projects_new`,
-  `appendix_projects_new_easy`, `appendix_projects_new_hard`.
-- The harness binding lives in each project's
-  `tests/cocoa_test_utils.py`; the shared machinery is
-  `external_modules/code/cosmolike_core/cocoa_testing.py`, whose
-  module docstring carries a worked shim example.
 
 </details>
 
@@ -299,3 +251,78 @@ README. To reopen a ticket, move its content back under
   v1.01, BFMT v1.01. Every pin verified against an existing remote
   tag; every repository cycled onto a fresh `bugfix` from its updated
   `main`.
+
+## New projects and the tests/ folder (2026-09-24)
+
+- **Rename script teaches tests/.**
+  `projects/copy_and_rename_project.sh` now renames the project
+  inside `tests/*.py` and `tests/README.md` with the same sed
+  families it applies to the other folders, and deletes the
+  untransferable donor pins — `tests/frozen`,
+  `tests/manifest_sha256.json`, the measured figures, and
+  `tests/__pycache__` — with a comment pointing at
+  `tests/generate_frozen_reference.py --overwrite` for regeneration.
+  Validated on a copy of `lsst_y1/tests`: zero old-name references
+  remain and every renamed test file compiles.
+- **FAQ documents tests/.** `projects/README.md`: the folder-structure
+  tree and a NOTE now describe the suite and its frozen pins; the
+  easy way carries a NOTE on what the script does to `tests/` plus
+  the regeneration command; the hard way gained a "Changes in the
+  `tests` folder" section (rename seds, pin deletions, regeneration,
+  and a tests-scoped leftover-name grep). Pruning survey-specific
+  entries (for example the `M2`-`M6` scale-cut datasets in
+  `tests/cocoa_test_utils.py`) and re-measuring the README's tables
+  and figures stay documented manual steps.
+- **The one script runs on Linux and macOS.** The bash-4
+  `${var,,}`/`${var^^}` expansions became tr-precomputed case
+  variants (bash 3.2, the macOS /bin/bash, suffices), the linux-only
+  `rename` tool became `find -depth -print0` + `mv` with bash pattern
+  substitution, and a guard aborts with a message when GNU sed (from
+  the cocoa environment) is missing, before anything is copied or
+  deleted. Validated by a full end-to-end run on macOS 13 /
+  bash 3.2.57: the FAQ final-check greps return nothing, every
+  renamed python file compiles, and the renamed `tests/` is
+  byte-identical to the precomputed-expansion reference; the FAQ's
+  hard-way data-file rename command was made portable the same way.
+- **Exhaustive leftover scan (2026-09-24).** Scanning EVERY file of a
+  freshly created project (all extensions, contents and filenames,
+  case-insensitive) caught three survivors the code-extension greps
+  missed: the `EXAMPLE_MCMC*.covmat` header line names the sampled
+  parameters with the old survey prefix (a silent proposal-matrix
+  mismatch), `.gitattributes` kept the LFS pattern of the old
+  covariance name (the renamed large file would escape LFS), and the
+  top-level `README.md` is donor documentation that renaming would
+  only falsify. The script now seds the covmat headers (bodies
+  verified byte-identical) and `.gitattributes`, and replaces the
+  README with a stub; the FAQ hard way gained the matching step and
+  its final check became the exhaustive pair `grep -rli lsst` +
+  `find -iname "*lsst*"`, both returning nothing on the validated
+  macOS run.
+- **Compile-and-run validation (2026-09-24).** A created project was
+  taken through the full easy-way cycle on macOS: re-sourcing
+  `start_cocoa.sh` auto-created its data and cobaya-likelihood
+  symlinks, `compile_xxx.sh` built `cosmolike_xxx_interface.so`, and
+  `EXAMPLE_EVALUATE1.yaml` (cosmic shear) and `EXAMPLE_EVALUATE2.yaml`
+  (3x2pt) both ran, with the full evaluate output identical to the
+  lsst_y1 donor's after name normalization (chi2 0.267263 and
+  0.443061, log-posteriors -1076.03 and -1064.55). A failed `cd` in
+  the rename loops now aborts instead of letting `find` rename the
+  wrong folder.
+- **Easy and hard way re-synced (2026-09-24).** Auditing the FAQ hard
+  way against the script found drift in both directions: the script
+  kept `scripts/EXAMPLE_PLOT_*.py` and `scripts/*.sbatch` (they plot
+  emulator chains; now deleted), and the hard-way Final cleanup
+  lacked the chains junk and `interface/*.{so,o}` removals (now
+  listed). After the sync a script-created project's `scripts/`
+  carries exactly the three lifecycle scripts, and both exhaustive
+  final checks stay empty.
+- **Project symlinks ignored everywhere.** `start_all_projects.sh`
+  deleted `cobaya/cobaya/likelihoods/.gitignore` but never recreated
+  it (the generated project list was copied only to
+  `external_modules/{data,code}`), so every project's likelihood
+  symlink sat untracked in the cobaya repository. The copy now
+  reaches `cobaya/cobaya/likelihoods/` too, the generated file
+  ignores itself (the cobaya repository has no other rule for it),
+  and `stop_all_projects.sh` removes it symmetrically. Verified: no
+  project link and no generated `.gitignore` shows in any repo's
+  `git status`, for existing projects and a new one alike.

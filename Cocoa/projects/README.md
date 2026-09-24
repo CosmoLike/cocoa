@@ -43,9 +43,18 @@ The `projects` folder includes all the projects linked to Cosmolike; they can al
     |    |   +-- MakefileCosmolike
     |    |   +-- cosmolike_lsst_y1_interface.py
     |    |   +-- interface.cpp
+    |    +-- tests
+    |    |   +-- test_example1.py
+    |    |   +-- cocoa_test_utils.py
+    |    |   +-- generate_frozen_reference.py
+    |    |   +-- frozen
+    |    |   +-- README.md
     |    +-- emulators
     |    +-- EXAMPLE_EVALUATE1.yaml
     |    +-- EXAMPLE_MCMC1.yaml
+
+> [!Note]
+> The `tests` folder holds the project's pytest unit-test suite. The tests compare the likelihoods against SHA-256-pinned references stored in `tests/frozen`, so they detect unintended changes to the code, the data files, or the environment. Each project's `tests/README.md` documents its tests and how to run them.
 
 > [!Note]
 > Projects should be hosted on independent GitHub repositories. By convention, the Cosmolike Organization adds the prefix `cocoa_` to all Cobaya-Cosmolike projects. For instance, the repository `cocoa_XXX` targets project `XXX`. 
@@ -413,7 +422,20 @@ and
     bash ./projects/copy_and_rename_project.sh
 
 > [!Note]
+> The script runs on Linux and macOS: it needs only bash 3.2 and the GNU sed the cocoa environment provides (it aborts with a message when GNU sed is missing, i.e., when the environment is not active).
+
+> [!Note]
 > The script also deletes the data-vector emulators (`emulators/` folder) and the `EXAMPLE_EMUL_*` examples that load them, since they were trained on LSST-Y1 data vectors and are untransferable. The hybrid `EXAMPLE_EMUL2_*` examples emulate only Boltzmann outputs, so they are kept and renamed.
+
+> [!Note]
+> The script renames the project inside the unit-test suite (`tests/*.py` and `tests/README.md`) and deletes the suite's frozen references (`tests/frozen`, `tests/manifest_sha256.json`, and the measured figures): they are SHA-256-pinned snapshots and measurements of LSST-Y1 data, so they do not transfer. The tests refuse to run until the references are regenerated. Once the new survey's data files are in place, regenerate them with
+>
+>     python ./projects/xxx/tests/generate_frozen_reference.py --overwrite
+>
+> and review the printed chi2 values before committing (they become the new references). Afterwards, prune the LSST-specific entries the rename cannot translate — for example, the `M2`-`M6` scale-cut datasets listed in `tests/cocoa_test_utils.py` — and re-measure the tables and figures reported in `tests/README.md`.
+
+> [!Note]
+> The script also renames the survey parameter prefix in the header line of the `EXAMPLE_MCMC*.covmat` proposal covariances and the Git LFS pattern in `.gitattributes`, and it replaces the top-level `README.md` — which documents the old survey's releases and pinned keys — with a stub for the new project to fill in. After a run, `grep -rli "lsst" .` and `find . -iname "*lsst*"` inside the new project both return nothing.
 
  **Step 4:** Reload the cocoa environment `(.local)`
 
@@ -668,10 +690,12 @@ Finally, users can perform the required replacements by running the following co
     # yyy = the adopted scale cuts on xxx_yyy.dataset
     mv "${ROOTDIR:?}"/projects/xxx/data/lsst_y1_M1_GGL0.05.dataset "${ROOTDIR:?}"/projects/xxx/data/xxx_yyy.dataset
 
-The `.dataset` file references the covariance, mask, n(z), and data vector files by name, so their names must stay consistent. Users can rename all data files that carry the `lsst_y1` prefix at once with the command below.
+The `.dataset` file references the covariance, mask, n(z), and data vector files by name, so their names must stay consistent. Users can rename all data files that carry the `lsst_y1` prefix at once with the command below (portable: the `rename` tool it replaces does not exist on macOS).
 
     cd "${ROOTDIR:?}"/projects/xxx/data/
-    find . -iname "*lsst_y1*" -exec rename lsst_y1 xxx '{}' \;
+    find . -depth -iname "*lsst_y1*" | while read -r f; do
+        mv "$f" "${f//lsst_y1/xxx}"
+    done
 
 > [!Tip]
 > There are many datasets and masks associated with different scale cuts in the `lsst_y1/data` folder. Some of them are listed below.
@@ -750,22 +774,68 @@ Finally, users can perform the required replacements by running the following co
         sed --in-place --regexp-extended "s@LSST@XXX@g" "${f}"
     done
 
+**Step 3:** Rename the survey prefix in three files that are easy to miss: the header line of the `EXAMPLE_MCMC*.covmat` proposal covariances names the sampled parameters (a mismatch with the renamed yamls silently degrades the proposal), and `.gitattributes` carries the Git LFS pattern of the covariance data file (a stale pattern lets the new large file escape LFS tracking).
+
+    cd "${ROOTDIR:?}"/projects/xxx/
+    sed --in-place --regexp-extended "s@LSST@XXX@g" EXAMPLE_MCMC*.covmat
+    sed --in-place --regexp-extended "s@lsst_y1@xxx@g" .gitattributes
+
+The third file is the top-level `README.md`: it documents the old survey (releases, pinned installation keys, data provenance), so none of it transfers. Replace it with the new project's own documentation rather than renaming it.
+
+### Changes in the `Cocoa/projects/xxx/tests` folder
+
+The unit-test suite carries the project name in imports, likelihood references, and parameter prefixes, and it compares the likelihoods against frozen, SHA-256-pinned references of LSST-Y1 data (`frozen/`, `manifest_sha256.json`) and figures measured on them.
+
+**Step 1:** Rename the project inside the test code and the test README by running the commands below.
+
+    cd "${ROOTDIR:?}"/projects/xxx/tests/
+    for f in *.py README.md; do
+        sed --in-place --regexp-extended "s@lsst_y1@xxx@g" "${f}"
+        sed --in-place --regexp-extended "s@LSST@XXX@g" "${f}"
+    done
+
+**Step 2:** Delete the frozen references and the measured figures; they are pinned snapshots and measurements of LSST-Y1 data, so they do not transfer to the new survey (and the tests refuse to run against a broken pin).
+
+    PRJ="${ROOTDIR:?}/projects/xxx"
+    rm -rf "${PRJ:?}"/tests/frozen
+    rm -f "${PRJ:?}"/tests/manifest_sha256.json "${PRJ:?}"/tests/*.png
+    rm -rf "${PRJ:?}"/tests/__pycache__
+
+**Step 3:** Once the new survey's data files are in place, regenerate the frozen references with the command below (from the `Cocoa/` folder, cocoa environment active, `start_cocoa.sh` sourced), and review the printed chi2 values before committing: they become the new references the tests compare against.
+
+    python ./projects/xxx/tests/generate_frozen_reference.py --overwrite
+
+**Step 4:** Prune the LSST-specific entries the rename cannot translate — for example, the `M2`-`M6` scale-cut datasets listed in `tests/cocoa_test_utils.py` — and re-measure the tables and figures reported in `tests/README.md`. Then verify that no references to the old project remain; the command below must return nothing.
+
+    cd "${ROOTDIR:?}"/projects/xxx/tests/
+    grep -rni "lsst" . --include='*.py' --include='*.md'
+
 ### Final cleanup
 
-The data-vector emulators stored on `projects/xxx/emulators`, and the `EXAMPLE_EMUL_*` examples that load them (note the single `EMUL`: these are not the hybrid `EMUL2` examples), are untransferable: they were trained on LSST-Y1 data vectors, so users will need to delete them and train new emulators from scratch for the new survey. Delete them, alongside stale caches and LSST-specific dev files.
+The data-vector emulators stored on `projects/xxx/emulators`, and the `EXAMPLE_EMUL_*` examples that load them (note the single `EMUL`: these are not the hybrid `EMUL2` examples), are untransferable: they were trained on LSST-Y1 data vectors, so users will need to delete them and train new emulators from scratch for the new survey. Delete them, alongside the donor's chains, compiled interface objects, stale caches, and LSST-specific dev files.
 
     PRJ="${ROOTDIR:?}/projects/xxx"
     rm -rf "${PRJ:?}"/emulators
     rm -f "${PRJ:?}"/EXAMPLE_EMUL_*.yaml "${PRJ:?}"/EXAMPLE_EMUL_*.py
     rm -f "${PRJ:?}"/*.sbatch "${PRJ:?}"/*.ipynb "${PRJ:?}"/*.txt
     rm -f "${PRJ:?}"/scripts/EXAMPLE_PLOT_*.py "${PRJ:?}"/scripts/*.sbatch
+    rm -f "${PRJ:?}"/interface/*.so "${PRJ:?}"/interface/*.o
+    rm -f "${PRJ:?}"/chains/*.txt "${PRJ:?}"/chains/*.progress
+    rm -f "${PRJ:?}"/chains/*.covmat "${PRJ:?}"/chains/*.locked
+    rm -f "${PRJ:?}"/chains/*.checkpoint "${PRJ:?}"/chains/*.pyc
+    rm -f "${PRJ:?}"/chains/*.py. "${PRJ:?}"/chains/*.yaml.
+    rm -f "${PRJ:?}"/chains/*.input.yaml "${PRJ:?}"/chains/*.updated.yaml
     rm -rf "${PRJ:?}"/scripts/random_scripts_used_by_dev
     rm -rf "${PRJ:?}"/interface/__pycache__ "${PRJ:?}"/likelihood/__pycache__
 
 ### Final check
 
-After all substitutions, verify that no references to the old project remain. The command below must return nothing (existing projects have been bitten by leftovers, e.g., `filename_baryon_pca` options pointing to another project's folder).
+After all substitutions, verify that no references to the old project remain. Both commands below must return nothing (existing projects have been bitten by leftovers, e.g., `filename_baryon_pca` options pointing to another project's folder; the exhaustive scan is what catches the covmat headers, `.gitattributes`, and README of the previous steps).
 
     cd "${ROOTDIR:?}"/projects/xxx/
-    grep -rni "lsst" . --include='*.py' --include='*.yaml' --include='*.sh' \
-        --include='*.cpp' --include='*.dataset' --include='MakefileCosmolike'
+    grep -rli "lsst" .
+
+and
+
+    cd "${ROOTDIR:?}"/projects/xxx/
+    find . -iname "*lsst*"

@@ -1163,6 +1163,9 @@ hold across the ~85 scripts in `installation_scripts/`.
 - Optional test: `[ -n "${KEY:-}" ]` / `[ -z "${KEY:-}" ]` — always with
   the `:-` so `set -u` (debug mode) does not break.
 - Case conversion via expansion, not `tr`: `${VAR,,}` (lower), `${VAR^^}`.
+  Exception: a script that must run under macOS `/bin/bash` (bash 3.2,
+  which lacks these expansions) precomputes the case variants with `tr`
+  once at the top — `projects/copy_and_rename_project.sh` is the model.
 
 ### 6.4 Output and error text
 
@@ -1202,6 +1205,34 @@ hold across the ~85 scripts in `installation_scripts/`.
 - `sed` is GNU sed from the conda environment:
   `sed --in-place --regexp-extended 's@old@new@g'` (note `@` delimiters when
   paths contain `/`).
+
+### 6.7 Didactical comments carry worked examples
+
+Cocoa's scripts are read by students. When a line uses advanced bash —
+`find -print0`, `IFS= read -r -d ''`, `${f//old/new}`, `:?` guards,
+`cmd || action` — the comment explains each flag or expansion in place,
+and then SHOWS the line at work with one small concrete example: real
+names from the repository, input and output side by side. The model is
+`rename_tree()` in `projects/copy_and_rename_project.sh`:
+
+    # Example: with ${2} = lsst_y1, run inside the copied data folder,
+    # the output is one stream of \0-separated relative names:
+    #     ./lsst_y1_cov\0./lsst_y1_source.nz\0...
+
+    # Example: f = ./lsst_y1_cov    g = ./xxx_cov        -> mv runs
+    #          f = ./LSST_Y1_notes  g = ./LSST_Y1_notes  -> skipped
+
+Rules for these examples:
+
+- Use names that actually exist in the repository, so a student can run
+  the fragment and see the same output.
+- When a guard or branch exists, show both sides (the case that acts
+  and the case that is skipped), as the mv example above does.
+- Explanations and examples state what the code does today and the
+  invariant it satisfies; never write history ("replaces the old X",
+  "as the previous version did") — decision records live in commit
+  messages and the backlog, not in source comments (Section 3.6 has
+  the prose rules).
 
 ## 7. Integrating an external code as a Cobaya theory block (the bfmt case)
 
