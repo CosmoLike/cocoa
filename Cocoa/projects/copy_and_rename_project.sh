@@ -1,7 +1,29 @@
 #!/bin/bash
 # ------------------------------------------------------------------------------
+# copy_and_rename_project.sh: create a new Cosmolike project from a donor
 # ------------------------------------------------------------------------------
-# ------------------------------------------------------------------------------
+# Copies projects/OLD_PROJECT into projects/NEW_PROJECT and renames the
+# project and survey names in file names and file contents: code, yamls,
+# datasets, the parameter names on the covmat header lines, the Git LFS
+# patterns in .gitattributes, and the unit-test suite. It then deletes
+# what does not transfer to a new survey (chains, caches, the data-vector
+# emulators and the EXAMPLE_EMUL_* examples that load them, the tests'
+# frozen references) and replaces the donor README with a stub.
+#
+# Usage (from the Cocoa/ folder, cocoa environment active):
+#
+#     1. edit NEW_PROJECT / NEW_SURVEY below
+#     2. bash ./projects/copy_and_rename_project.sh
+#     3. source start_cocoa.sh   # recreates the project symlinks
+#     4. source ./projects/<new>/scripts/compile_<new>.sh
+#
+# Runs on Linux and macOS: bash 3.2 suffices, and GNU sed comes from the
+# cocoa environment (the script aborts when GNU sed is missing). The
+# script only renames: data vectors, covariances, masks, and n(z) stay
+# the donor's, and the tests' frozen references must be regenerated with
+# tests/generate_frozen_reference.py --overwrite. The FAQ "How do we
+# create a new Cosmolike project?" in projects/README.md documents the
+# remaining manual steps.
 # ------------------------------------------------------------------------------
 
 OLD_PROJECT="lsst_y1"
@@ -32,137 +54,166 @@ fi
 PRJ="${ROOTDIR:?}/projects/${NEW_PROJECT:?}"
 
 # ------------------------------------------------------------------------------
+# Helpers
 # ------------------------------------------------------------------------------
+
+# Rename every file and folder under ${1} whose name contains ${2},
+# replacing ${2} with ${3}. mv + bash pattern substitution replaces the
+# linux-only rename tool (validated byte-identical to it on the full
+# lsst_y1 tree; the rename tool is also flavor-dependent: the perl
+# variant shipped by Debian-family systems would misread these
+# arguments). -depth lists the contents of a folder before the folder
+# itself, so a renamed folder never invalidates the paths still on the
+# list. A failed cd must abort: find would otherwise rename files in
+# whatever folder the shell happened to be in.
+rename_tree () {
+  cd "${1:?}" || { echo "missing folder: ${1}" >&2; return 1; }
+  find . -depth -iname "*${2:?}*" -print0 | \
+    while IFS= read -r -d '' f; do
+      g="${f//${2}/${3:?}}"
+      [ "$f" = "$g" ] || mv "$f" "$g"
+    done
+}
+
+# Replace every case variant of the project and survey names inside the
+# file ${1}. The project expressions run before the survey ones on each
+# line, exactly as the historical one-pass-per-pattern seds did.
+rename_in_file () {
+  sed --in-place --regexp-extended \
+    -e "s@${OLD_PROJECT}@${NEW_PROJECT_L}@g" \
+    -e "s@${OLD_PROJECT_U}@${NEW_PROJECT_L}@g" \
+    -e "s@${OLD_PROJECT_L}@${NEW_PROJECT_L}@g" \
+    -e "s@${OLD_SURVEY}@${NEW_SURVEY_U}@g" \
+    -e "s@${OLD_SURVEY_U}@${NEW_SURVEY_U}@g" \
+    -e "s@${OLD_SURVEY_L}@${NEW_SURVEY_U}@g" \
+    "${1:?}" 2>/dev/null
+}
+
 # ------------------------------------------------------------------------------
+# Copy the donor project
 # ------------------------------------------------------------------------------
 
 rm -rf "${PRJ:?}"
 cp -r "${ROOTDIR:?}/projects/${OLD_PROJECT:?}" "${PRJ:?}"
 
 # ------------------------------------------------------------------------------
-# ------------------------------------------------------------------------------
-# ------------------------------------------------------------------------------
+# Rename file and folder NAMES
 # ------------------------------------------------------------------------------
 
-# mv + bash pattern substitution replaces the linux-only rename tool
-# (validated byte-identical to it on the full lsst_y1 tree; the rename
-# tool is also flavor-dependent: the perl variant shipped by
-# Debian-family systems would misread these arguments). -depth lists
-# the contents of a folder before the folder itself, so a renamed
-# folder never invalidates the paths still on the list.
-# a failed cd must abort: find would otherwise rename files in
-# whatever folder the shell happened to be in
-for d in data likelihood scripts interface; do
-  cd "${PRJ:?}/${d}/" || { echo "missing folder: ${PRJ}/${d}" >&2; \
-                           return 1 2>/dev/null || exit 1; }
-  find . -depth -iname "*${OLD_PROJECT}*" -print0 | \
-    while IFS= read -r -d '' f; do
-      g="${f//${OLD_PROJECT}/${NEW_PROJECT_L}}"
-      [ "$f" = "$g" ] || mv "$f" "$g"
-    done
-done
+declare -a MVDIRS=("data"
+                   "likelihood"
+                   "scripts"
+                   "interface"
+                  )
 
-cd "${PRJ:?}/interface/" || { echo "missing folder: ${PRJ}/interface" >&2; \
-                              return 1 2>/dev/null || exit 1; }
-find . -depth -iname "*${OLD_SURVEY}*" -print0 | \
-  while IFS= read -r -d '' f; do
-    g="${f//${OLD_SURVEY}/${NEW_SURVEY_L}}"
-    [ "$f" = "$g" ] || mv "$f" "$g"
-  done
-
-# ------------------------------------------------------------------------------
-# ------------------------------------------------------------------------------
-# ------------------------------------------------------------------------------
-# ------------------------------------------------------------------------------
-declare -a TMP=(
-                "interface/MakefileCosmolike"
-                ".gitattributes"
-               )
-
-for (( i=0; i<${#TMP[@]}; i++ ));
+for (( i=0; i<${#MVDIRS[@]}; i++ ));
 do
-  sed --in-place --regexp-extended "s@${OLD_PROJECT}@${NEW_PROJECT_L}@g"   "${PRJ:?}/${TMP[$i]}" 2>/dev/null
-  sed --in-place --regexp-extended "s@${OLD_PROJECT_U}@${NEW_PROJECT_L}@g" "${PRJ:?}/${TMP[$i]}" 2>/dev/null
-  sed --in-place --regexp-extended "s@${OLD_PROJECT_L}@${NEW_PROJECT_L}@g" "${PRJ:?}/${TMP[$i]}" 2>/dev/null
-
-  sed --in-place --regexp-extended "s@${OLD_SURVEY}@${NEW_SURVEY_U}@g"   "${PRJ:?}/${TMP[$i]}" 2>/dev/null
-  sed --in-place --regexp-extended "s@${OLD_SURVEY_U}@${NEW_SURVEY_U}@g" "${PRJ:?}/${TMP[$i]}" 2>/dev/null
-  sed --in-place --regexp-extended "s@${OLD_SURVEY_L}@${NEW_SURVEY_U}@g" "${PRJ:?}/${TMP[$i]}" 2>/dev/null
+  rename_tree "${PRJ:?}/${MVDIRS[$i]}" "${OLD_PROJECT}" "${NEW_PROJECT_L}" || \
+    { return 1 2>/dev/null || exit 1; }
 done
 
+rename_tree "${PRJ:?}/interface" "${OLD_SURVEY}" "${NEW_SURVEY_L}" || \
+  { return 1 2>/dev/null || exit 1; }
+
+# ------------------------------------------------------------------------------
+# Rename file CONTENTS
+# ------------------------------------------------------------------------------
+
+# Named files the extension globs below cannot reach: the Makefile, and
+# .gitattributes (its Git LFS pattern names the covariance data file; a
+# stale pattern would let the renamed large file escape LFS tracking).
+declare -a SEDFILES=("interface/MakefileCosmolike"
+                     ".gitattributes"
+                    )
+
+for (( i=0; i<${#SEDFILES[@]}; i++ ));
+do
+  rename_in_file "${PRJ:?}/${SEDFILES[$i]}"
+done
 
 # covmat included: the first line of a proposal covariance names the
 # sampled parameters, which carry the old survey prefix.
-for f in ${PRJ}/{,likelihood/,interface/,data/,scripts/}*.{sh,py,cpp,dataset,yaml,covmat}; do
-  [ -e "$f" ] || continue
+declare -a SEDDIRS=(""
+                    "likelihood/"
+                    "interface/"
+                    "data/"
+                    "scripts/"
+                   )
 
-  sed --in-place --regexp-extended "s@${OLD_PROJECT}@${NEW_PROJECT_L}@g" "${f}" 2>/dev/null
-  sed --in-place --regexp-extended "s@${OLD_PROJECT_U}@${NEW_PROJECT_L}@g" "${f}" 2>/dev/null
-  sed --in-place --regexp-extended "s@${OLD_PROJECT_L}@${NEW_PROJECT_L}@g" "${f}" 2>/dev/null
-
-  sed --in-place --regexp-extended "s@${OLD_SURVEY}@${NEW_SURVEY_U}@g" "${f}" 2>/dev/null
-  sed --in-place --regexp-extended "s@${OLD_SURVEY_U}@${NEW_SURVEY_U}@g" "${f}" 2>/dev/null
-  sed --in-place --regexp-extended "s@${OLD_SURVEY_L}@${NEW_SURVEY_U}@g" "${f}" 2>/dev/null
+for (( i=0; i<${#SEDDIRS[@]}; i++ ));
+do
+  for f in "${PRJ:?}/${SEDDIRS[$i]}"*.{sh,py,cpp,dataset,yaml,covmat}; do
+    [ -e "$f" ] || continue
+    rename_in_file "$f"
+  done
 done
 
 # tests/ ships the project unit-test suite: the code and README carry the
 # project name in imports, likelihood references, and parameter prefixes.
-for f in ${PRJ}/tests/*.{py,md}; do
+for f in "${PRJ:?}"/tests/*.{py,md}; do
   [ -e "$f" ] || continue
-
-  sed --in-place --regexp-extended "s@${OLD_PROJECT}@${NEW_PROJECT_L}@g" "${f}" 2>/dev/null
-  sed --in-place --regexp-extended "s@${OLD_PROJECT_U}@${NEW_PROJECT_L}@g" "${f}" 2>/dev/null
-  sed --in-place --regexp-extended "s@${OLD_PROJECT_L}@${NEW_PROJECT_L}@g" "${f}" 2>/dev/null
-
-  sed --in-place --regexp-extended "s@${OLD_SURVEY}@${NEW_SURVEY_U}@g" "${f}" 2>/dev/null
-  sed --in-place --regexp-extended "s@${OLD_SURVEY_U}@${NEW_SURVEY_U}@g" "${f}" 2>/dev/null
-  sed --in-place --regexp-extended "s@${OLD_SURVEY_L}@${NEW_SURVEY_U}@g" "${f}" 2>/dev/null
+  rename_in_file "$f"
 done
 
-# ------------------------------------------------------------------------------------
-# ------------------------------------------------------------------------------------
-# ------------------------------------------------------------------------------------
-# ------------------------------------------------------------------------------------
-# ------------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
+# Delete what does not transfer to a new survey
+# ------------------------------------------------------------------------------
 
-rm -f "${PRJ:?}"/*.txt                   2>/dev/null
-rm -f "${PRJ:?}"/*.sbatch                2>/dev/null
-rm -f "${PRJ:?}"/*.ipynb                 2>/dev/null
-# The data-vector emulators (and the EXAMPLE_EMUL_* examples that load them)
-# were trained on the old survey, so they are untransferable. The hybrid
-# EXAMPLE_EMUL2_* examples emulate only Boltzmann outputs and are kept.
-rm -rf "${PRJ:?}"/emulators              2>/dev/null
-rm -f "${PRJ:?}"/EXAMPLE_EMUL_*.yaml     2>/dev/null
-rm -f "${PRJ:?}"/EXAMPLE_EMUL_*.py       2>/dev/null
-rm -f "${PRJ:?}"/interface/*.so          2>/dev/null
-rm -f "${PRJ:?}"/interface/*.o           2>/dev/null
-rm -f "${PRJ:?}"/chains/*.txt            2>/dev/null # also covers rank-suffixed *.N.txt chains
-rm -f "${PRJ:?}"/chains/*.progress       2>/dev/null
-rm -f "${PRJ:?}"/chains/*.covmat         2>/dev/null
-rm -f "${PRJ:?}"/chains/*.locked         2>/dev/null
-rm -f "${PRJ:?}"/chains/*.checkpoint     2>/dev/null
-rm -f "${PRJ:?}"/chains/*.py.            2>/dev/null
-rm -f "${PRJ:?}"/chains/*.yaml.          2>/dev/null
-rm -f "${PRJ:?}"/chains/*.input.yaml     2>/dev/null
-rm -f "${PRJ:?}"/chains/*.updated.yaml   2>/dev/null
-rm -f "${PRJ:?}"/chains/*.pyc            2>/dev/null
-rm -rf "${PRJ:?}"/.git/                  2>/dev/null
-rm -rf "${PRJ:?}"/interface/__pycache__  2>/dev/null
-rm -rf "${PRJ:?}"/likelihood/__pycache__ 2>/dev/null
-rm -rf "${PRJ:?}"/tests/__pycache__      2>/dev/null
-rm -rf "${PRJ:?}"/scripts/random_scripts_used_by_dev 2>/dev/null
-# The tests' frozen state (frozen/ + manifest_sha256.json) is a SHA-256
-# pinned snapshot of the old survey's data, and the figures are measurements
-# of it: none transfer. Once the new survey's data files are in place,
-# regenerate them with tests/generate_frozen_reference.py --overwrite
-# (see tests/README.md).
-rm -rf "${PRJ:?}"/tests/frozen               2>/dev/null
-rm -f  "${PRJ:?}"/tests/manifest_sha256.json 2>/dev/null
-rm -f  "${PRJ:?}"/tests/*.png                2>/dev/null
+# The data-vector emulators (and the EXAMPLE_EMUL_* examples that load
+# them) were trained on the old survey, so they are untransferable; the
+# hybrid EXAMPLE_EMUL2_* examples emulate only Boltzmann outputs and are
+# kept. The tests' frozen state (frozen/ + manifest_sha256.json) is a
+# SHA-256 pinned snapshot of the old survey's data, and the figures are
+# measurements of it: none transfer. Once the new survey's data files
+# are in place, regenerate them with
+# tests/generate_frozen_reference.py --overwrite (see tests/README.md).
+declare -a CLEAN_FILES=("*.txt"
+                        "*.sbatch"
+                        "*.ipynb"
+                        "EXAMPLE_EMUL_*.yaml"
+                        "EXAMPLE_EMUL_*.py"
+                        "interface/*.so"
+                        "interface/*.o"
+                        "chains/*.txt"          # also covers rank-suffixed *.N.txt chains
+                        "chains/*.progress"
+                        "chains/*.covmat"
+                        "chains/*.locked"
+                        "chains/*.checkpoint"
+                        "chains/*.py."
+                        "chains/*.yaml."
+                        "chains/*.input.yaml"
+                        "chains/*.updated.yaml"
+                        "chains/*.pyc"
+                        "tests/manifest_sha256.json"
+                        "tests/*.png"
+                       )
+
+for (( i=0; i<${#CLEAN_FILES[@]}; i++ ));
+do
+  rm -f "${PRJ:?}"/${CLEAN_FILES[$i]} 2>/dev/null
+done
+
+declare -a CLEAN_FOLDERS=("emulators"
+                          ".git"
+                          "interface/__pycache__"
+                          "likelihood/__pycache__"
+                          "tests/__pycache__"
+                          "tests/frozen"
+                          "scripts/random_scripts_used_by_dev"
+                         )
+
+for (( i=0; i<${#CLEAN_FOLDERS[@]}; i++ ));
+do
+  rm -rf "${PRJ:?}/${CLEAN_FOLDERS[$i]}" 2>/dev/null
+done
+
+# ------------------------------------------------------------------------------
+# Replace the donor README with a stub
+# ------------------------------------------------------------------------------
 
 # The top-level README documents the OLD survey (its releases, pinned
 # installation keys, and data provenance), so renaming it would only
-# fabricate a history the new project never had: a stub replaces it.
+# fabricate a history the new project never had.
 cat > "${PRJ:?}/README.md" <<EOF
 # The ${NEW_PROJECT_L} project
 
@@ -174,8 +225,14 @@ projects/README.md lists the remaining manual steps, and
 tests/README.md documents the unit-test suite.
 EOF
 
+# ------------------------------------------------------------------------------
+# Leave no variables or functions behind (the script may be sourced)
+# ------------------------------------------------------------------------------
+
 unset -v PRJ OLD_PROJECT OLD_SURVEY NEW_PROJECT NEW_SURVEY
 unset -v OLD_PROJECT_U OLD_PROJECT_L NEW_PROJECT_L
 unset -v OLD_SURVEY_U OLD_SURVEY_L NEW_SURVEY_U NEW_SURVEY_L
+unset -v MVDIRS SEDFILES SEDDIRS CLEAN_FILES CLEAN_FOLDERS i f
+unset -f rename_tree rename_in_file
 
-# ------------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
