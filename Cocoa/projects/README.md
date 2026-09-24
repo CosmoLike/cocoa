@@ -434,6 +434,9 @@ and
 >
 > and review the printed chi2 values before committing (they become the new references). Afterwards, prune the LSST-specific entries the rename cannot translate — for example, the `M2`-`M6` scale-cut datasets listed in `tests/cocoa_test_utils.py` — and re-measure the tables and figures reported in `tests/README.md`.
 
+> [!Note]
+> The script also renames the survey parameter prefix in the header line of the `EXAMPLE_MCMC*.covmat` proposal covariances and the Git LFS pattern in `.gitattributes`, and it replaces the top-level `README.md` — which documents the old survey's releases and pinned keys — with a stub for the new project to fill in. After a run, `grep -rli "lsst" .` and `find . -iname "*lsst*"` inside the new project both return nothing.
+
  **Step 4:** Reload the cocoa environment `(.local)`
 
      source start_cocoa.sh # even if (.local) is already active, users must run start_cocoa.sh again to update bash environment values
@@ -771,6 +774,14 @@ Finally, users can perform the required replacements by running the following co
         sed --in-place --regexp-extended "s@LSST@XXX@g" "${f}"
     done
 
+**Step 3:** Rename the survey prefix in three files that are easy to miss: the header line of the `EXAMPLE_MCMC*.covmat` proposal covariances names the sampled parameters (a mismatch with the renamed yamls silently degrades the proposal), and `.gitattributes` carries the Git LFS pattern of the covariance data file (a stale pattern lets the new large file escape LFS tracking).
+
+    cd "${ROOTDIR:?}"/projects/xxx/
+    sed --in-place --regexp-extended "s@LSST@XXX@g" EXAMPLE_MCMC*.covmat
+    sed --in-place --regexp-extended "s@lsst_y1@xxx@g" .gitattributes
+
+The third file is the top-level `README.md`: it documents the old survey (releases, pinned installation keys, data provenance), so none of it transfers. Replace it with the new project's own documentation rather than renaming it.
+
 ### Changes in the `Cocoa/projects/xxx/tests` folder
 
 The unit-test suite carries the project name in imports, likelihood references, and parameter prefixes, and it compares the likelihoods against frozen, SHA-256-pinned references of LSST-Y1 data (`frozen/`, `manifest_sha256.json`) and figures measured on them.
@@ -813,8 +824,12 @@ The data-vector emulators stored on `projects/xxx/emulators`, and the `EXAMPLE_E
 
 ### Final check
 
-After all substitutions, verify that no references to the old project remain. The command below must return nothing (existing projects have been bitten by leftovers, e.g., `filename_baryon_pca` options pointing to another project's folder).
+After all substitutions, verify that no references to the old project remain. Both commands below must return nothing (existing projects have been bitten by leftovers, e.g., `filename_baryon_pca` options pointing to another project's folder; the exhaustive scan is what catches the covmat headers, `.gitattributes`, and README of the previous steps).
 
     cd "${ROOTDIR:?}"/projects/xxx/
-    grep -rni "lsst" . --include='*.py' --include='*.yaml' --include='*.sh' \
-        --include='*.cpp' --include='*.dataset' --include='MakefileCosmolike'
+    grep -rli "lsst" .
+
+and
+
+    cd "${ROOTDIR:?}"/projects/xxx/
+    find . -iname "*lsst*"

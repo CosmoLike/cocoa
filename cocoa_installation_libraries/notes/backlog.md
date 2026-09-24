@@ -284,3 +284,17 @@ README. To reopen a ticket, move its content back under
   renamed python file compiles, and the renamed `tests/` is
   byte-identical to the precomputed-expansion reference; the FAQ's
   hard-way data-file rename command was made portable the same way.
+- **Exhaustive leftover scan (2026-09-24).** Scanning EVERY file of a
+  freshly created project (all extensions, contents and filenames,
+  case-insensitive) caught three survivors the code-extension greps
+  missed: the `EXAMPLE_MCMC*.covmat` header line names the sampled
+  parameters with the old survey prefix (a silent proposal-matrix
+  mismatch), `.gitattributes` kept the LFS pattern of the old
+  covariance name (the renamed large file would escape LFS), and the
+  top-level `README.md` is donor documentation that renaming would
+  only falsify. The script now seds the covmat headers (bodies
+  verified byte-identical) and `.gitattributes`, and replaces the
+  README with a stub; the FAQ hard way gained the matching step and
+  its final check became the exhaustive pair `grep -rli lsst` +
+  `find -iname "*lsst*"`, both returning nothing on the validated
+  macOS run.

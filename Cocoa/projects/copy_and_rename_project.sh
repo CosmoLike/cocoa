@@ -72,7 +72,8 @@ find . -depth -iname "*${OLD_SURVEY}*" -print0 | \
 # ------------------------------------------------------------------------------
 declare -a TMP=(
                 "interface/MakefileCosmolike"
-               ) 
+                ".gitattributes"
+               )
 
 for (( i=0; i<${#TMP[@]}; i++ ));
 do
@@ -86,7 +87,9 @@ do
 done
 
 
-for f in ${PRJ}/{,likelihood/,interface/,data/,scripts/}*.{sh,py,cpp,dataset,yaml}; do
+# covmat included: the first line of a proposal covariance names the
+# sampled parameters, which carry the old survey prefix.
+for f in ${PRJ}/{,likelihood/,interface/,data/,scripts/}*.{sh,py,cpp,dataset,yaml,covmat}; do
   [ -e "$f" ] || continue
 
   sed --in-place --regexp-extended "s@${OLD_PROJECT}@${NEW_PROJECT_L}@g" "${f}" 2>/dev/null
@@ -152,6 +155,20 @@ rm -rf "${PRJ:?}"/scripts/random_scripts_used_by_dev 2>/dev/null
 rm -rf "${PRJ:?}"/tests/frozen               2>/dev/null
 rm -f  "${PRJ:?}"/tests/manifest_sha256.json 2>/dev/null
 rm -f  "${PRJ:?}"/tests/*.png                2>/dev/null
+
+# The top-level README documents the OLD survey (its releases, pinned
+# installation keys, and data provenance), so renaming it would only
+# fabricate a history the new project never had: a stub replaces it.
+cat > "${PRJ:?}/README.md" <<EOF
+# The ${NEW_PROJECT_L} project
+
+Created by projects/copy_and_rename_project.sh from a donor project.
+The donor README does not transfer, so this stub replaces it: write
+here the new survey documentation (data provenance, scale cuts,
+releases). The FAQ "How do we create a new Cosmolike project?" in
+projects/README.md lists the remaining manual steps, and
+tests/README.md documents the unit-test suite.
+EOF
 
 unset -v PRJ OLD_PROJECT OLD_SURVEY NEW_PROJECT NEW_SURVEY
 unset -v OLD_PROJECT_U OLD_PROJECT_L NEW_PROJECT_L
