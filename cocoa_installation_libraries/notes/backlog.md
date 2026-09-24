@@ -273,3 +273,14 @@ README. To reopen a ticket, move its content back under
   entries (for example the `M2`-`M6` scale-cut datasets in
   `tests/cocoa_test_utils.py`) and re-measuring the README's tables
   and figures stay documented manual steps.
+- **The one script runs on Linux and macOS.** The bash-4
+  `${var,,}`/`${var^^}` expansions became tr-precomputed case
+  variants (bash 3.2, the macOS /bin/bash, suffices), the linux-only
+  `rename` tool became `find -depth -print0` + `mv` with bash pattern
+  substitution, and a guard aborts with a message when GNU sed (from
+  the cocoa environment) is missing, before anything is copied or
+  deleted. Validated by a full end-to-end run on macOS 13 /
+  bash 3.2.57: the FAQ final-check greps return nothing, every
+  renamed python file compiles, and the renamed `tests/` is
+  byte-identical to the precomputed-expansion reference; the FAQ's
+  hard-way data-file rename command was made portable the same way.

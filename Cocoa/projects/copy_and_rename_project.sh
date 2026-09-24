@@ -8,7 +8,26 @@ OLD_PROJECT="lsst_y1"
 OLD_SURVEY="LSST"
 
 NEW_PROJECT="xxx"
-NEW_SURVEY="XXX" 
+NEW_SURVEY="XXX"
+
+# Case variants precomputed with tr so the script runs on bash 3.2
+# (macOS /bin/bash): the ${var,,} and ${var^^} expansions need bash 4.
+OLD_PROJECT_U=$(echo "${OLD_PROJECT:?}" | tr '[:lower:]' '[:upper:]')
+OLD_PROJECT_L=$(echo "${OLD_PROJECT:?}" | tr '[:upper:]' '[:lower:]')
+NEW_PROJECT_L=$(echo "${NEW_PROJECT:?}" | tr '[:upper:]' '[:lower:]')
+OLD_SURVEY_U=$(echo "${OLD_SURVEY:?}" | tr '[:lower:]' '[:upper:]')
+OLD_SURVEY_L=$(echo "${OLD_SURVEY:?}" | tr '[:upper:]' '[:lower:]')
+NEW_SURVEY_U=$(echo "${NEW_SURVEY:?}" | tr '[:lower:]' '[:upper:]')
+NEW_SURVEY_L=$(echo "${NEW_SURVEY:?}" | tr '[:upper:]' '[:lower:]')
+
+# GNU sed ships with the cocoa environment on Linux and macOS; BSD sed
+# (the macOS default) lacks --in-place --regexp-extended and would fail
+# silently below.
+if ! sed --version >/dev/null 2>&1; then
+  echo "GNU sed not found: activate the cocoa environment first" \
+       "(conda activate cocoa; source start_cocoa.sh)" >&2
+  return 1 2>/dev/null || exit 1
+fi
 
 PRJ="${ROOTDIR:?}/projects/${NEW_PROJECT:?}"
 
@@ -25,14 +44,24 @@ cp -r "${ROOTDIR:?}/projects/${OLD_PROJECT:?}" "${PRJ:?}"
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
 
+# mv + bash pattern substitution replaces the linux-only rename tool;
+# -depth lists the contents of a folder before the folder itself, so a
+# renamed folder never invalidates the paths still on the list.
 for d in data likelihood scripts interface; do
   cd "${PRJ:?}/${d}/"
-  find . -iname "*${OLD_PROJECT}*" -exec rename ${OLD_PROJECT} ${NEW_PROJECT,,} '{}' \;
+  find . -depth -iname "*${OLD_PROJECT}*" -print0 | \
+    while IFS= read -r -d '' f; do
+      g="${f//${OLD_PROJECT}/${NEW_PROJECT_L}}"
+      [ "$f" = "$g" ] || mv "$f" "$g"
+    done
 done
 
 cd "${PRJ:?}/interface/"
-find . -iname "*${OLD_SURVEY}*" -exec rename ${OLD_SURVEY} ${NEW_SURVEY,,} '{}' \;
-find . -iname "*${OLD_SURVEY,,}*" -exec rename ${OLD_SURVEY} ${NEW_SURVEY,,} '{}' \;
+find . -depth -iname "*${OLD_SURVEY}*" -print0 | \
+  while IFS= read -r -d '' f; do
+    g="${f//${OLD_SURVEY}/${NEW_SURVEY_L}}"
+    [ "$f" = "$g" ] || mv "$f" "$g"
+  done
 
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
@@ -44,26 +73,26 @@ declare -a TMP=(
 
 for (( i=0; i<${#TMP[@]}; i++ ));
 do
-  sed --in-place --regexp-extended "s@${OLD_PROJECT}@${NEW_PROJECT,,}@g"   "${PRJ:?}/${TMP[$i]}" 2>/dev/null
-  sed --in-place --regexp-extended "s@${OLD_PROJECT^^}@${NEW_PROJECT,,}@g" "${PRJ:?}/${TMP[$i]}" 2>/dev/null
-  sed --in-place --regexp-extended "s@${OLD_PROJECT,,}@${NEW_PROJECT,,}@g" "${PRJ:?}/${TMP[$i]}" 2>/dev/null
+  sed --in-place --regexp-extended "s@${OLD_PROJECT}@${NEW_PROJECT_L}@g"   "${PRJ:?}/${TMP[$i]}" 2>/dev/null
+  sed --in-place --regexp-extended "s@${OLD_PROJECT_U}@${NEW_PROJECT_L}@g" "${PRJ:?}/${TMP[$i]}" 2>/dev/null
+  sed --in-place --regexp-extended "s@${OLD_PROJECT_L}@${NEW_PROJECT_L}@g" "${PRJ:?}/${TMP[$i]}" 2>/dev/null
 
-  sed --in-place --regexp-extended  "s@"${OLD_SURVEY}"@"${NEW_SURVEY^^}"@g"   "${PRJ:?}/${TMP[$i]}" 2>/dev/null
-  sed --in-place --regexp-extended  "s@"${OLD_SURVEY^^}"@"${NEW_SURVEY^^}"@g" "${PRJ:?}/${TMP[$i]}" 2>/dev/null
-  sed --in-place --regexp-extended  "s@"${OLD_SURVEY,,}"@"${NEW_SURVEY^^}"@g" "${PRJ:?}/${TMP[$i]}" 2>/dev/null
+  sed --in-place --regexp-extended "s@${OLD_SURVEY}@${NEW_SURVEY_U}@g"   "${PRJ:?}/${TMP[$i]}" 2>/dev/null
+  sed --in-place --regexp-extended "s@${OLD_SURVEY_U}@${NEW_SURVEY_U}@g" "${PRJ:?}/${TMP[$i]}" 2>/dev/null
+  sed --in-place --regexp-extended "s@${OLD_SURVEY_L}@${NEW_SURVEY_U}@g" "${PRJ:?}/${TMP[$i]}" 2>/dev/null
 done
 
 
 for f in ${PRJ}/{,likelihood/,interface/,data/,scripts/}*.{sh,py,cpp,dataset,yaml}; do
   [ -e "$f" ] || continue
 
-  sed --in-place --regexp-extended "s@${OLD_PROJECT}@${NEW_PROJECT,,}@g" "${f}" 2>/dev/null
-  sed --in-place --regexp-extended "s@${OLD_PROJECT^^}@${NEW_PROJECT,,}@g" "${f}" 2>/dev/null
-  sed --in-place --regexp-extended "s@${OLD_PROJECT,,}@${NEW_PROJECT,,}@g" "${f}" 2>/dev/null
+  sed --in-place --regexp-extended "s@${OLD_PROJECT}@${NEW_PROJECT_L}@g" "${f}" 2>/dev/null
+  sed --in-place --regexp-extended "s@${OLD_PROJECT_U}@${NEW_PROJECT_L}@g" "${f}" 2>/dev/null
+  sed --in-place --regexp-extended "s@${OLD_PROJECT_L}@${NEW_PROJECT_L}@g" "${f}" 2>/dev/null
 
-  sed --in-place --regexp-extended  "s@"${OLD_SURVEY}"@"${NEW_SURVEY^^}"@g" "${f}" 2>/dev/null
-  sed --in-place --regexp-extended  "s@"${OLD_SURVEY^^}"@"${NEW_SURVEY^^}"@g" "${f}" 2>/dev/null
-  sed --in-place --regexp-extended  "s@"${OLD_SURVEY,,}"@"${NEW_SURVEY^^}"@g" "${f}" 2>/dev/null
+  sed --in-place --regexp-extended "s@${OLD_SURVEY}@${NEW_SURVEY_U}@g" "${f}" 2>/dev/null
+  sed --in-place --regexp-extended "s@${OLD_SURVEY_U}@${NEW_SURVEY_U}@g" "${f}" 2>/dev/null
+  sed --in-place --regexp-extended "s@${OLD_SURVEY_L}@${NEW_SURVEY_U}@g" "${f}" 2>/dev/null
 done
 
 # tests/ ships the project unit-test suite: the code and README carry the
@@ -71,13 +100,13 @@ done
 for f in ${PRJ}/tests/*.{py,md}; do
   [ -e "$f" ] || continue
 
-  sed --in-place --regexp-extended "s@${OLD_PROJECT}@${NEW_PROJECT,,}@g" "${f}" 2>/dev/null
-  sed --in-place --regexp-extended "s@${OLD_PROJECT^^}@${NEW_PROJECT,,}@g" "${f}" 2>/dev/null
-  sed --in-place --regexp-extended "s@${OLD_PROJECT,,}@${NEW_PROJECT,,}@g" "${f}" 2>/dev/null
+  sed --in-place --regexp-extended "s@${OLD_PROJECT}@${NEW_PROJECT_L}@g" "${f}" 2>/dev/null
+  sed --in-place --regexp-extended "s@${OLD_PROJECT_U}@${NEW_PROJECT_L}@g" "${f}" 2>/dev/null
+  sed --in-place --regexp-extended "s@${OLD_PROJECT_L}@${NEW_PROJECT_L}@g" "${f}" 2>/dev/null
 
-  sed --in-place --regexp-extended  "s@"${OLD_SURVEY}"@"${NEW_SURVEY^^}"@g" "${f}" 2>/dev/null
-  sed --in-place --regexp-extended  "s@"${OLD_SURVEY^^}"@"${NEW_SURVEY^^}"@g" "${f}" 2>/dev/null
-  sed --in-place --regexp-extended  "s@"${OLD_SURVEY,,}"@"${NEW_SURVEY^^}"@g" "${f}" 2>/dev/null
+  sed --in-place --regexp-extended "s@${OLD_SURVEY}@${NEW_SURVEY_U}@g" "${f}" 2>/dev/null
+  sed --in-place --regexp-extended "s@${OLD_SURVEY_U}@${NEW_SURVEY_U}@g" "${f}" 2>/dev/null
+  sed --in-place --regexp-extended "s@${OLD_SURVEY_L}@${NEW_SURVEY_U}@g" "${f}" 2>/dev/null
 done
 
 # ------------------------------------------------------------------------------------
@@ -122,5 +151,7 @@ rm -f  "${PRJ:?}"/tests/manifest_sha256.json 2>/dev/null
 rm -f  "${PRJ:?}"/tests/*.png                2>/dev/null
 
 unset -v PRJ OLD_PROJECT OLD_SURVEY NEW_PROJECT NEW_SURVEY
+unset -v OLD_PROJECT_U OLD_PROJECT_L NEW_PROJECT_L
+unset -v OLD_SURVEY_U OLD_SURVEY_L NEW_SURVEY_U NEW_SURVEY_L
 
 # ------------------------------------------------------------------------------------

@@ -422,6 +422,9 @@ and
     bash ./projects/copy_and_rename_project.sh
 
 > [!Note]
+> The script runs on Linux and macOS: it needs only bash 3.2 and the GNU sed the cocoa environment provides (it aborts with a message when GNU sed is missing, i.e., when the environment is not active).
+
+> [!Note]
 > The script also deletes the data-vector emulators (`emulators/` folder) and the `EXAMPLE_EMUL_*` examples that load them, since they were trained on LSST-Y1 data vectors and are untransferable. The hybrid `EXAMPLE_EMUL2_*` examples emulate only Boltzmann outputs, so they are kept and renamed.
 
 > [!Note]
@@ -684,10 +687,12 @@ Finally, users can perform the required replacements by running the following co
     # yyy = the adopted scale cuts on xxx_yyy.dataset
     mv "${ROOTDIR:?}"/projects/xxx/data/lsst_y1_M1_GGL0.05.dataset "${ROOTDIR:?}"/projects/xxx/data/xxx_yyy.dataset
 
-The `.dataset` file references the covariance, mask, n(z), and data vector files by name, so their names must stay consistent. Users can rename all data files that carry the `lsst_y1` prefix at once with the command below.
+The `.dataset` file references the covariance, mask, n(z), and data vector files by name, so their names must stay consistent. Users can rename all data files that carry the `lsst_y1` prefix at once with the command below (portable: the `rename` tool it replaces does not exist on macOS).
 
     cd "${ROOTDIR:?}"/projects/xxx/data/
-    find . -iname "*lsst_y1*" -exec rename lsst_y1 xxx '{}' \;
+    find . -depth -iname "*lsst_y1*" | while read -r f; do
+        mv "$f" "${f//lsst_y1/xxx}"
+    done
 
 > [!Tip]
 > There are many datasets and masks associated with different scale cuts in the `lsst_y1/data` folder. Some of them are listed below.
