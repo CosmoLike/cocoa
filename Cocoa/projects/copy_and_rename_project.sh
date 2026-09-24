@@ -66,6 +66,20 @@ for f in ${PRJ}/{,likelihood/,interface/,data/,scripts/}*.{sh,py,cpp,dataset,yam
   sed --in-place --regexp-extended  "s@"${OLD_SURVEY,,}"@"${NEW_SURVEY^^}"@g" "${f}" 2>/dev/null
 done
 
+# tests/ ships the project unit-test suite: the code and README carry the
+# project name in imports, likelihood references, and parameter prefixes.
+for f in ${PRJ}/tests/*.{py,md}; do
+  [ -e "$f" ] || continue
+
+  sed --in-place --regexp-extended "s@${OLD_PROJECT}@${NEW_PROJECT,,}@g" "${f}" 2>/dev/null
+  sed --in-place --regexp-extended "s@${OLD_PROJECT^^}@${NEW_PROJECT,,}@g" "${f}" 2>/dev/null
+  sed --in-place --regexp-extended "s@${OLD_PROJECT,,}@${NEW_PROJECT,,}@g" "${f}" 2>/dev/null
+
+  sed --in-place --regexp-extended  "s@"${OLD_SURVEY}"@"${NEW_SURVEY^^}"@g" "${f}" 2>/dev/null
+  sed --in-place --regexp-extended  "s@"${OLD_SURVEY^^}"@"${NEW_SURVEY^^}"@g" "${f}" 2>/dev/null
+  sed --in-place --regexp-extended  "s@"${OLD_SURVEY,,}"@"${NEW_SURVEY^^}"@g" "${f}" 2>/dev/null
+done
+
 # ------------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------------
@@ -96,7 +110,16 @@ rm -f "${PRJ:?}"/chains/*.pyc            2>/dev/null
 rm -rf "${PRJ:?}"/.git/                  2>/dev/null
 rm -rf "${PRJ:?}"/interface/__pycache__  2>/dev/null
 rm -rf "${PRJ:?}"/likelihood/__pycache__ 2>/dev/null
+rm -rf "${PRJ:?}"/tests/__pycache__      2>/dev/null
 rm -rf "${PRJ:?}"/scripts/random_scripts_used_by_dev 2>/dev/null
+# The tests' frozen state (frozen/ + manifest_sha256.json) is a SHA-256
+# pinned snapshot of the old survey's data, and the figures are measurements
+# of it: none transfer. Once the new survey's data files are in place,
+# regenerate them with tests/generate_frozen_reference.py --overwrite
+# (see tests/README.md).
+rm -rf "${PRJ:?}"/tests/frozen               2>/dev/null
+rm -f  "${PRJ:?}"/tests/manifest_sha256.json 2>/dev/null
+rm -f  "${PRJ:?}"/tests/*.png                2>/dev/null
 
 unset -v PRJ OLD_PROJECT OLD_SURVEY NEW_PROJECT NEW_SURVEY
 

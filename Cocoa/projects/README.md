@@ -43,9 +43,18 @@ The `projects` folder includes all the projects linked to Cosmolike; they can al
     |    |   +-- MakefileCosmolike
     |    |   +-- cosmolike_lsst_y1_interface.py
     |    |   +-- interface.cpp
+    |    +-- tests
+    |    |   +-- test_example1.py
+    |    |   +-- cocoa_test_utils.py
+    |    |   +-- generate_frozen_reference.py
+    |    |   +-- frozen
+    |    |   +-- README.md
     |    +-- emulators
     |    +-- EXAMPLE_EVALUATE1.yaml
     |    +-- EXAMPLE_MCMC1.yaml
+
+> [!Note]
+> The `tests` folder holds the project's pytest unit-test suite. The tests compare the likelihoods against SHA-256-pinned references stored in `tests/frozen`, so they detect unintended changes to the code, the data files, or the environment. Each project's `tests/README.md` documents its tests and how to run them.
 
 > [!Note]
 > Projects should be hosted on independent GitHub repositories. By convention, the Cosmolike Organization adds the prefix `cocoa_` to all Cobaya-Cosmolike projects. For instance, the repository `cocoa_XXX` targets project `XXX`. 
@@ -415,6 +424,13 @@ and
 > [!Note]
 > The script also deletes the data-vector emulators (`emulators/` folder) and the `EXAMPLE_EMUL_*` examples that load them, since they were trained on LSST-Y1 data vectors and are untransferable. The hybrid `EXAMPLE_EMUL2_*` examples emulate only Boltzmann outputs, so they are kept and renamed.
 
+> [!Note]
+> The script renames the project inside the unit-test suite (`tests/*.py` and `tests/README.md`) and deletes the suite's frozen references (`tests/frozen`, `tests/manifest_sha256.json`, and the measured figures): they are SHA-256-pinned snapshots and measurements of LSST-Y1 data, so they do not transfer. The tests refuse to run until the references are regenerated. Once the new survey's data files are in place, regenerate them with
+>
+>     python ./projects/xxx/tests/generate_frozen_reference.py --overwrite
+>
+> and review the printed chi2 values before committing (they become the new references). Afterwards, prune the LSST-specific entries the rename cannot translate — for example, the `M2`-`M6` scale-cut datasets listed in `tests/cocoa_test_utils.py` — and re-measure the tables and figures reported in `tests/README.md`.
+
  **Step 4:** Reload the cocoa environment `(.local)`
 
      source start_cocoa.sh # even if (.local) is already active, users must run start_cocoa.sh again to update bash environment values
@@ -749,6 +765,34 @@ Finally, users can perform the required replacements by running the following co
         sed --in-place --regexp-extended "s@lsst_y1@xxx@g" "${f}"
         sed --in-place --regexp-extended "s@LSST@XXX@g" "${f}"
     done
+
+### Changes in the `Cocoa/projects/xxx/tests` folder
+
+The unit-test suite carries the project name in imports, likelihood references, and parameter prefixes, and it compares the likelihoods against frozen, SHA-256-pinned references of LSST-Y1 data (`frozen/`, `manifest_sha256.json`) and figures measured on them.
+
+**Step 1:** Rename the project inside the test code and the test README by running the commands below.
+
+    cd "${ROOTDIR:?}"/projects/xxx/tests/
+    for f in *.py README.md; do
+        sed --in-place --regexp-extended "s@lsst_y1@xxx@g" "${f}"
+        sed --in-place --regexp-extended "s@LSST@XXX@g" "${f}"
+    done
+
+**Step 2:** Delete the frozen references and the measured figures; they are pinned snapshots and measurements of LSST-Y1 data, so they do not transfer to the new survey (and the tests refuse to run against a broken pin).
+
+    PRJ="${ROOTDIR:?}/projects/xxx"
+    rm -rf "${PRJ:?}"/tests/frozen
+    rm -f "${PRJ:?}"/tests/manifest_sha256.json "${PRJ:?}"/tests/*.png
+    rm -rf "${PRJ:?}"/tests/__pycache__
+
+**Step 3:** Once the new survey's data files are in place, regenerate the frozen references with the command below (from the `Cocoa/` folder, cocoa environment active, `start_cocoa.sh` sourced), and review the printed chi2 values before committing: they become the new references the tests compare against.
+
+    python ./projects/xxx/tests/generate_frozen_reference.py --overwrite
+
+**Step 4:** Prune the LSST-specific entries the rename cannot translate — for example, the `M2`-`M6` scale-cut datasets listed in `tests/cocoa_test_utils.py` — and re-measure the tables and figures reported in `tests/README.md`. Then verify that no references to the old project remain; the command below must return nothing.
+
+    cd "${ROOTDIR:?}"/projects/xxx/tests/
+    grep -rni "lsst" . --include='*.py' --include='*.md'
 
 ### Final cleanup
 
