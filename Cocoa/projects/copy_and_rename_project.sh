@@ -62,15 +62,44 @@ PRJ="${ROOTDIR:?}/projects/${NEW_PROJECT:?}"
 # linux-only rename tool (validated byte-identical to it on the full
 # lsst_y1 tree; the rename tool is also flavor-dependent: the perl
 # variant shipped by Debian-family systems would misread these
-# arguments). -depth lists the contents of a folder before the folder
-# itself, so a renamed folder never invalidates the paths still on the
-# list. A failed cd must abort: find would otherwise rename files in
-# whatever folder the shell happened to be in.
+# arguments). Line-by-line notes below, since this is advanced bash:
+# ${1} ${2} ${3} are the function's positional arguments, and ${1:?}
+# means "expand ${1}, but abort with an error when it is empty or
+# unset" (the same guard every rm in this script uses).
 rename_tree () {
+  # Work from inside the target folder, so find prints short relative
+  # paths (./some_file.py). If cd fails the function must stop at
+  # once: find would otherwise run in whatever folder the shell
+  # happened to be in and rename files THERE. "cmd || action" runs
+  # action only when cmd fails, and >&2 sends the message to stderr.
   cd "${1:?}" || { echo "missing folder: ${1}" >&2; return 1; }
-  find . -depth -iname "*${2:?}*" -print0 | \
+
+  # find lists everything (files AND folders) whose name contains ${2}:
+  #   -iname "*${2}*"  matches the name case-insensitively, as the
+  #                    historical rename-based code did;
+  #   -depth           lists a folder's CONTENTS before the folder
+  #                    itself, so renaming the folder never invalidates
+  #                    paths still waiting on the list;
+  #   -print0          separates results with a \0 byte instead of a
+  #                    newline. \0 is the one character a file name can
+  #                    never contain, so names with spaces or newlines
+  #                    survive the pipe to read intact.
+  find . -depth -iname "*${2:?}*" -print0 |
+    # read pulls the \0-separated names off the pipe one at a time:
+    #   IFS=   empty field separator, so surrounding spaces are kept;
+    #   -r     raw mode: backslashes in names are not special;
+    #   -d ''  read up to the next \0, matching -print0 above.
     while IFS= read -r -d '' f; do
+      # ${f//old/new} is bash pattern substitution: ${f} with EVERY
+      # occurrence of ${2} replaced by ${3} (a single slash,
+      # ${f/old/new}, would replace only the first occurrence).
       g="${f//${2}/${3:?}}"
+
+      # -iname matched case-insensitively but the substitution above
+      # is case-sensitive, so g can come out equal to f (a file named
+      # LSST_Y1_notes when ${2} is lsst_y1). "mv name name" would be
+      # an error, so rename only when the name actually changed:
+      # "[ a = b ] || cmd" runs cmd only when the test fails.
       [ "$f" = "$g" ] || mv "$f" "$g"
     done
 }
