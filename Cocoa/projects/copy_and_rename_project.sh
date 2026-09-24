@@ -58,14 +58,11 @@ PRJ="${ROOTDIR:?}/projects/${NEW_PROJECT:?}"
 # ------------------------------------------------------------------------------
 
 # Rename every file and folder under ${1} whose name contains ${2},
-# replacing ${2} with ${3}. mv + bash pattern substitution replaces the
-# linux-only rename tool (validated byte-identical to it on the full
-# lsst_y1 tree; the rename tool is also flavor-dependent: the perl
-# variant shipped by Debian-family systems would misread these
-# arguments). Line-by-line notes below, since this is advanced bash:
-# ${1} ${2} ${3} are the function's positional arguments, and ${1:?}
-# means "expand ${1}, but abort with an error when it is empty or
-# unset" (the same guard every rm in this script uses).
+# replacing ${2} with ${3}. Line-by-line notes below, since this is
+# advanced bash: ${1} ${2} ${3} are the function's positional
+# arguments, and ${1:?} means "expand ${1}, but abort with an error
+# when it is empty or unset" (the same guard every rm in this script
+# uses).
 rename_tree () {
   # Work from inside the target folder, so find prints short relative
   # paths (./some_file.py). If cd fails the function must stop at
@@ -75,8 +72,7 @@ rename_tree () {
   cd "${1:?}" || { echo "missing folder: ${1}" >&2; return 1; }
 
   # find lists everything (files AND folders) whose name contains ${2}:
-  #   -iname "*${2}*"  matches the name case-insensitively, as the
-  #                    historical rename-based code did;
+  #   -iname "*${2}*"  matches the name case-insensitively;
   #   -depth           lists a folder's CONTENTS before the folder
   #                    itself, so renaming the folder never invalidates
   #                    paths still waiting on the list;
@@ -105,8 +101,9 @@ rename_tree () {
 }
 
 # Replace every case variant of the project and survey names inside the
-# file ${1}. The project expressions run before the survey ones on each
-# line, exactly as the historical one-pass-per-pattern seds did.
+# file ${1}. Order matters: the project expressions run first, so an
+# uppercase project name (LSST_Y1) is consumed as a project name before
+# the survey substitution (LSST) can touch it.
 rename_in_file () {
   sed --in-place --regexp-extended \
     -e "s@${OLD_PROJECT}@${NEW_PROJECT_L}@g" \
