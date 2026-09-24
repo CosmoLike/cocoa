@@ -80,6 +80,9 @@ rename_tree () {
   #                    newline. \0 is the one character a file name can
   #                    never contain, so names with spaces or newlines
   #                    survive the pipe to read intact.
+  # Example: with ${2} = lsst_y1, run inside the copied data folder,
+  # the output is one stream of \0-separated relative names:
+  #     ./lsst_y1_cov\0./lsst_y1_source.nz\0./lsst_y1_M1_GGL0.05.dataset\0...
   find . -depth -iname "*${2:?}*" -print0 |
     # read pulls the \0-separated names off the pipe one at a time:
     #   IFS=   empty field separator, so surrounding spaces are kept;
@@ -89,6 +92,8 @@ rename_tree () {
       # ${f//old/new} is bash pattern substitution: ${f} with EVERY
       # occurrence of ${2} replaced by ${3} (a single slash,
       # ${f/old/new}, would replace only the first occurrence).
+      # Example: f = ./lsst_y1_cov, ${2} = lsst_y1, ${3} = xxx
+      #          ->  g = ./xxx_cov
       g="${f//${2}/${3:?}}"
 
       # -iname matched case-insensitively but the substitution above
