@@ -101,6 +101,8 @@ rename_tree () {
       # LSST_Y1_notes when ${2} is lsst_y1). "mv name name" would be
       # an error, so rename only when the name actually changed:
       # "[ a = b ] || cmd" runs cmd only when the test fails.
+      # Example: f = ./lsst_y1_cov    g = ./xxx_cov        -> mv runs
+      #          f = ./LSST_Y1_notes  g = ./LSST_Y1_notes  -> skipped
       [ "$f" = "$g" ] || mv "$f" "$g"
     done
 }
