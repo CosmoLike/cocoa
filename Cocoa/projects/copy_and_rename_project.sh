@@ -44,9 +44,12 @@ cp -r "${ROOTDIR:?}/projects/${OLD_PROJECT:?}" "${PRJ:?}"
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
 
-# mv + bash pattern substitution replaces the linux-only rename tool;
-# -depth lists the contents of a folder before the folder itself, so a
-# renamed folder never invalidates the paths still on the list.
+# mv + bash pattern substitution replaces the linux-only rename tool
+# (validated byte-identical to it on the full lsst_y1 tree; the rename
+# tool is also flavor-dependent: the perl variant shipped by
+# Debian-family systems would misread these arguments). -depth lists
+# the contents of a folder before the folder itself, so a renamed
+# folder never invalidates the paths still on the list.
 for d in data likelihood scripts interface; do
   cd "${PRJ:?}/${d}/"
   find . -depth -iname "*${OLD_PROJECT}*" -print0 | \
