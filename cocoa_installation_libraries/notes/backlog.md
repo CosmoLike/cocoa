@@ -308,6 +308,14 @@ README. To reopen a ticket, move its content back under
   0.443061, log-posteriors -1076.03 and -1064.55). A failed `cd` in
   the rename loops now aborts instead of letting `find` rename the
   wrong folder.
+- **Easy and hard way re-synced (2026-09-24).** Auditing the FAQ hard
+  way against the script found drift in both directions: the script
+  kept `scripts/EXAMPLE_PLOT_*.py` and `scripts/*.sbatch` (they plot
+  emulator chains; now deleted), and the hard-way Final cleanup
+  lacked the chains junk and `interface/*.{so,o}` removals (now
+  listed). After the sync a script-created project's `scripts/`
+  carries exactly the three lifecycle scripts, and both exhaustive
+  final checks stay empty.
 - **Project symlinks ignored everywhere.** `start_all_projects.sh`
   deleted `cobaya/cobaya/likelihoods/.gitignore` but never recreated
   it (the generated project list was copied only to

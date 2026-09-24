@@ -812,13 +812,19 @@ The unit-test suite carries the project name in imports, likelihood references, 
 
 ### Final cleanup
 
-The data-vector emulators stored on `projects/xxx/emulators`, and the `EXAMPLE_EMUL_*` examples that load them (note the single `EMUL`: these are not the hybrid `EMUL2` examples), are untransferable: they were trained on LSST-Y1 data vectors, so users will need to delete them and train new emulators from scratch for the new survey. Delete them, alongside stale caches and LSST-specific dev files.
+The data-vector emulators stored on `projects/xxx/emulators`, and the `EXAMPLE_EMUL_*` examples that load them (note the single `EMUL`: these are not the hybrid `EMUL2` examples), are untransferable: they were trained on LSST-Y1 data vectors, so users will need to delete them and train new emulators from scratch for the new survey. Delete them, alongside the donor's chains, compiled interface objects, stale caches, and LSST-specific dev files.
 
     PRJ="${ROOTDIR:?}/projects/xxx"
     rm -rf "${PRJ:?}"/emulators
     rm -f "${PRJ:?}"/EXAMPLE_EMUL_*.yaml "${PRJ:?}"/EXAMPLE_EMUL_*.py
     rm -f "${PRJ:?}"/*.sbatch "${PRJ:?}"/*.ipynb "${PRJ:?}"/*.txt
     rm -f "${PRJ:?}"/scripts/EXAMPLE_PLOT_*.py "${PRJ:?}"/scripts/*.sbatch
+    rm -f "${PRJ:?}"/interface/*.so "${PRJ:?}"/interface/*.o
+    rm -f "${PRJ:?}"/chains/*.txt "${PRJ:?}"/chains/*.progress
+    rm -f "${PRJ:?}"/chains/*.covmat "${PRJ:?}"/chains/*.locked
+    rm -f "${PRJ:?}"/chains/*.checkpoint "${PRJ:?}"/chains/*.pyc
+    rm -f "${PRJ:?}"/chains/*.py. "${PRJ:?}"/chains/*.yaml.
+    rm -f "${PRJ:?}"/chains/*.input.yaml "${PRJ:?}"/chains/*.updated.yaml
     rm -rf "${PRJ:?}"/scripts/random_scripts_used_by_dev
     rm -rf "${PRJ:?}"/interface/__pycache__ "${PRJ:?}"/likelihood/__pycache__
 

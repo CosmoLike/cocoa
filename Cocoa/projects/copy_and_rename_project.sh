@@ -207,6 +207,8 @@ declare -a CLEAN_FILES=("*.txt"
                         "EXAMPLE_EMUL_*.py"
                         "interface/*.so"
                         "interface/*.o"
+                        "scripts/EXAMPLE_PLOT_*.py" # they plot emulator chains
+                        "scripts/*.sbatch"
                         "chains/*.txt"          # also covers rank-suffixed *.N.txt chains
                         "chains/*.progress"
                         "chains/*.covmat"
