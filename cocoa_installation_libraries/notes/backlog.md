@@ -36,130 +36,65 @@ No open HIGH tickets.
 
 ### Medium
 
-- OPEN **MEDIUM** **BUG FIX** — [Find why the dlnxi/Css/dlnk notebook functions crash](#open-notebook-derivative-crash)
-- OPEN **MEDIUM** **NEW FUNCTIONALITY** — [Move the cosmo2D_wrapper array overloads to the batched _ells API](#open-cosmo2d-wrapper-ells-api)
+- OPEN **MEDIUM** **NEW FUNCTIONALITY** — [Move C_gk and C_ks onto the _work batch API](#open-cosmo2d-gk-ks-work)
 
 ### Low
 
 - OPEN **LOW** **NEW FUNCTIONALITY** — [IA x higher-order-bias (gb2) cross terms in cfastpt](#open-cfastpt-gb2-ia-bias)
+- OPEN **LOW** **NEW FUNCTIONALITY** — [Finish the Compton-y port (C_gy, C_ys, C_ky, C_yy)](#open-compton-y-port)
 
-<a id="open-notebook-derivative-crash"></a>
-## Find why the dlnxi/Css/dlnk notebook functions crash
-
-### High-level summary
-
-The example notebooks call the diagnostic functions that compute the
-Limber $C_{ss}(\ell)$ spectra and the $d\ln\xi_\pm/d\ln k$ derivatives
-of the data vector, and those calls crash on jupyter. Until the crash
-is reproduced and located, the notebook diagnostics built on them are
-unusable.
-
-### Current status
-
-**Ticket type: BUG FIX.**
-
-**OPEN.** Not yet reproduced under a debugger; only the notebook-level
-crash is reported.
-
-**Severity: MEDIUM.** The crash blocks notebook diagnostics, not a
-likelihood evaluation or a chain; there is no evidence yet that a
-primary result is wrong.
-
-### What is already in place
-
-The functions exist along the whole chain: pybind11 bindings
-(`dlnxi_dlnk_pm_tomo_limber` and the `Css` spectrum functions) in each
-project's compiled interface, python wrappers in the projects'
-notebook-wrapper modules, and calls in the EXAMPLE_EVALUATE notebooks.
-
-### What is missing
-
-Reproduce the crash from one project's example notebook, capture the
-traceback (or the signal, if the compiled core aborts), and bisect
-whether it enters in the notebook wrapper, the pybind11 layer, or the
-C core. Then fix where it enters and rerun the notebook end to end.
-
-<details><summary>Technical record</summary>
-
-- Owners: `projects/<name>/interface/interface.cpp` (the
-  `dlnxi_dlnk_pm_tomo_limber` and `Css` bindings),
-  `projects/<name>/interface/cosmolike_<name>_notebook_wrappers.py`,
-  and the `EXAMPLE_EVALUATE*.ipynb` notebooks that call them.
-- A crash inside the compiled core will not show a python traceback;
-  run the reproduction under `python -X faulthandler` or gdb.
-
-</details>
-
-<a id="open-cosmo2d-wrapper-ells-api"></a>
-## Move the cosmo2D_wrapper array overloads to the batched _ells API
+<a id="open-cosmo2d-gk-ks-work"></a>
+## Move C_gk and C_ks onto the _work batch API
 
 ### High-level summary
 
-The python-facing array overloads `C_ss_tomo_limber_cpp(arma::Col l)`
-and `C_gs_tomo_limber_cpp(arma::Col l)` in `cosmo2D_wrapper.cpp` still
-compute their spectra by calling the scalar
-`C_ss_tomo_limber_nointerp` / `C_gs_tomo_limber_nointerp` once per
-(multipole, bin-pair), after a serial `init=1` warm-up pass. The
-optimized batch entry points `C_ss_tomo_limber_nointerp_ells` and
-`C_gs_tomo_limber_nointerp_ells` already exist in `cosmo2D.h` and are
-what the likelihood path uses. The ss and gs array overloads should
-call the batch API and drop the scalar loop, and the ss and gs scalar
-overloads should be rewritten as one-element calls into the array
-overloads, so the wrapper layer has no dependency left on the old
-non-batched shear cosmo2D API.
+The CMB-lensing cross spectra C_gk and C_ks in cosmo2D.c are the last
+Fourier-space probes on the pre-batch design: their cached-table
+builders and their exact low-multipole paths call the scalar
+`C_gk/C_ks_tomo_limber_nointerp` once per multipole, each a 64-point
+Gauss-Legendre quadrature that re-evaluates every kernel per point.
+They should get the `C_ss_tomo_limber_work` treatment — precompute the
+quadrature-node kernels once, fill every (bin, multipole) output with
+vectorized inner loops — as the next step of the slow transition that
+makes the _work API the standard way cosmo2D computes in Fourier
+space.
 
 ### Current status
 
-**Ticket type: NEW FUNCTIONALITY** (performance and single-code-path
-consolidation; no wrong numbers are known).
+**Ticket type: NEW FUNCTIONALITY.**
 
 **OPEN.**
 
-**Severity: MEDIUM.** Two parallel implementations of the same spectra
-(the wrapper's scalar loop and the batch `_ells` path) can drift apart
-and make notebook diagnostics disagree with the likelihood path; the
-scalar loop is also the slow way to fill the tables the notebooks ask
-for.
+**Severity: MEDIUM.** These spectra sit in the 6x2pt likelihood path
+(desy1xplanck evaluates gk and ks per point through the cached
+tables), so the per-point builders cost real evaluation time, and the
+two-design split invites the same drift the shear probes had.
 
 ### What is already in place
 
-The batch C API with per-argument documentation
-(`C_ss_tomo_limber_nointerp_ells` returning EE and BB as
-`[NSIZE][nell]`, `C_gs_tomo_limber_nointerp_ells` returning
-`[NSIZE][nell]`), the `_batch` thin wrappers over integer multipoles,
-and the bin-pair maps `Z1`/`Z2` and `ZL`/`ZS` that translate the
-power-spectrum index `nz` into the cube coordinates the python side
-expects.
+The pattern, proven on ss and gs: `C_ss/C_gs_tomo_limber_work`, the
+`_nointerp_ells` batch entry points, and the vectorized
+`limber_fill_interp` gather (now shared through cosmo2D.h). The
+`C_gk/C_ks_tomo_limber_fill` gathers already exist.
 
 ### What is missing
 
-Rewrite the ss and gs array overloads to allocate the `[NSIZE][nell]`
-work arrays with `malloc2d`, call the `_ells` batch functions once,
-and scatter the rows into the returned `arma::Cube` via `Z1`/`Z2`
-(EE and BB) and `ZL`/`ZS`. Rewrite the scalar overloads
-`C_ss_tomo_limber_cpp(l, ni, nj)` and
-`C_gs_tomo_limber_cpp(l, ni, nj)` as one-element calls into their
-array overloads, with a doc warning that the scalar API is a
-point diagnostic (it pays the full batch cost per call) and the array
-API is the one to use. Validate that the new wrappers return the same
-values as the current code at notebook multipole arrays before
-deleting the loops, and rerun one EXAMPLE_EVALUATE notebook per
-affected project end to end.
+Write `C_gk/C_ks_tomo_limber_work` (and `_ells` wrappers) in the ss
+design, move the cached-table builders and the exact low-multipole
+integer loops onto them, migrate the cosmo2D_wrapper array overloads,
+and validate: chi2 exact on the desy1xplanck 6x2pt suite, plus the
+usual old-vs-new value comparison. C_kk shares the pattern and can
+ride along or follow.
 
 <details><summary>Technical record</summary>
 
-- Owner: `external_modules/code/cosmolike_core/cosmolike/`
-  (`cosmo2D_wrapper.cpp`; batch API declared in `cosmo2D.h`).
-- Current scalar-loop overloads: `C_ss_tomo_limber_cpp(arma::Col l)`
-  and `C_gs_tomo_limber_cpp(arma::Col l)` in `cosmo2D_wrapper.cpp`
-  (each does a serial `init=1` pass over bin pairs, then an
-  `omp collapse(2)` loop of scalar calls).
-- Only ss and gs have batch entry points; gg has no `_ells` function
-  (the cosmo_nodes batch refactor was never applied to gg), so the gg
-  overloads are out of scope until gg gets a batch API.
-- Related: the notebook-derivative crash ticket
-  (#open-notebook-derivative-crash) lives in the same wrapper layer;
-  if the migration touches shared state, retest that reproduction.
+- Owner: `external_modules/code/cosmolike_core/cosmolike/cosmo2D.c`
+  (`C_gk_tomo_limber*`, `C_ks_tomo_limber*`, their `int_for_*`
+  integrands) and `cosmo2D_wrapper.cpp`.
+- The scalar quadratures use the 64-point glfixed rule at default
+  accuracy; keep it so the migration is quadrature-neutral.
+- The exact low-multipole paths live in the C_gg/gk/ks fill sections
+  (the `Cl[nz][l] = C_XY_nointerp((double) l, ...)*cmbf[l]` loops).
 
 </details>
 
@@ -245,6 +180,47 @@ IA_gb2 module as a cross-check reference (with caveats below).
 
 </details>
 
+<a id="open-compton-y-port"></a>
+## Finish the Compton-y port (C_gy, C_ys, C_ky, C_yy)
+
+### High-level summary
+
+The Compton-y cross spectra were never finished when cosmolike was
+ported into cocoa: nothing enables the gy/sy/ky/yy probes, and every
+python binding for them was commented out. The pieces now live outside
+the build in
+`cosmolike_core/future_port_unfinished/cosmo2d_tmp.c` (declarations,
+C functions, and the commented wrapper bindings), moved there on
+2026-09-26 to clean cosmo2D.c.
+
+### Current status
+
+**Ticket type: NEW FUNCTIONALITY.**
+
+**OPEN.** Idea stage; parked deliberately.
+
+**Severity: LOW.** No analysis in cocoa uses a y probe today.
+
+### What is already in place
+
+The parked code compiles against the pre-batch API it was written
+for, and the radial-weight infrastructure the port needs
+(`radial_weights.c`) already carries the lensing kernels.
+
+### What is missing
+
+Port the y radial weight, revive the parked functions on the _work
+batch design (they follow the retired single-grid per-point pattern),
+wire probes and bindings, and validate against the original cosmolike.
+
+<details><summary>Technical record</summary>
+
+- Parking lot: `cosmolike_core/future_port_unfinished/cosmo2d_tmp.c`
+  (NOT compiled; header comment lists the contents).
+- The like struct already carries the gy/sy/ky/yy probe flags.
+
+</details>
+
 # Closed tickets
 
 Grouped by subject and compressed. Nothing here is open work; dated
@@ -321,6 +297,71 @@ README. To reopen a ticket, move its content back under
   needs `accuracyboost: 2.0`. Each `tests/README.md` carries the
   contract, the measurement table, and the corner plot; the example
   yamls carry the rebased defaults.
+
+## Batched shear wrappers and the cosmo2D_scuts refactor (2026-09-26)
+
+- **cosmo2D_wrapper on the batch APIs (2026-09-25).** The C_ss and
+  C_gs array overloads make one `_nointerp_ells` call and scatter;
+  the scalar overloads are one-element calls into the same engines,
+  documented as point diagnostics. Measured on lsst_y1 (100
+  multipoles, 4 threads): C_ss 13.2 -> 0.5 ms, C_gs 10.8 -> 0.9 ms
+  per call. C_ss matches the retired loop at reassociation level
+  (<= 4e-15); C_gs moved onto the likelihood's own 64-point rule
+  (the legacy scalar used 96 points), each verified at its rule's
+  error against a 2000-point reference.
+- **cosmo2D_scuts on the _work design (2026-09-26).**
+  `dC_ss_dlnk_tomo_limber_work` computes the scale-cut derivative on
+  a (ln k, ell) grid (each output one core evaluation at the Limber
+  node chi = (l+1/2)/k, amplitude dchida/fK); its normalize flag
+  computes C_ss on the same thread team and divides cache-hot rows to
+  dlnC. The hidden deriv argument of int_for_C_ss_tomo_limber is
+  gone (the dC point value is the C_ell integrand times chi). The
+  cached tables start at l = 1, killing the exact-scalar low-l
+  branches; `RF_C_ss/RF_xi_tomo_limber_work` run both RF integrals on
+  precomputed Gauss-Legendre node arrays with the kmax-independent
+  denominators computed once. RF array call (26x26): 108 -> 25 ms.
+- **dlnxi redesigned (2026-09-26).** dlnxi_dlnk_pm_tomo_nointerp now
+  reads the dC table on its multipole log-grid, gathers to every
+  integer multipole with the vectorized limber_fill_interp (exported
+  through cosmo2D.h), and Legendre-sums with restrict + SIMD: first
+  call 4.04 s -> 0.04 s, steady 15 -> 8 ms, and the 6.1 GB
+  per-integer-multipole cache is gone (work arrays are
+  Ntable/tomography-keyed statics).
+- **Wrapper cleanup (2026-09-26).** Every int_for_* python wrapper
+  and binding deleted from cosmo2D_wrapper and all six projects'
+  interface.cpp (never used from notebooks, incompatible with the
+  _work design); the unfinished Compton-y family parked in
+  future_port_unfinished/cosmo2d_tmp.c; per-argument documentation
+  across cosmo2D_scuts, cosmo2D_wrapper and cosmo2D_scuts_wrapper.
+- **Validation.** Every step compared old-vs-new dumps on the lsst_y1
+  frozen TATT fiducial: bit-identical wherever the arithmetic was
+  unchanged (the single-work fusion, the statics, y-move and int_for
+  removal were all bitwise), reassociation-level (<= 1e-13) for the
+  reorganized sums, and lnl-respacing-level shifts only where the
+  table grids deliberately changed. Full suites green through the
+  arc; `test_scale_cut_diagnostics.py` added to lsst_y1 and
+  roman_real. A cosmetic leftover: the notebook wrappers call the
+  dlnC function `dlnC_dlss_tomo_limber` (scrambled name), a
+  rename-commit candidate.
+
+## Notebook derivative crashes (2026-09-26)
+
+- **Root cause found: a deterministic exit.** The retired low-l RF
+  branch underflowed k = exp(-(1-t)/t) to 0 at small quadrature t,
+  and the dC point diagnostic's k > 0 guard was log_fatal -> exit(1):
+  any rf_C_ss call at l <= 20 killed the process — and a jupyter
+  kernel dies from exit(1) with no traceback, matching the reported
+  symptom. Two aggravators: every log_fatal/critical in the
+  diagnostics exits the kernel the same way (for example running
+  cells out of order), and the old dlnxi build allocated 6.1 GB and
+  took 4 s per cosmology.
+- **Fixed by the scuts refactor** (the branch and the point function
+  are gone; dlnxi's cache is gone), and **verified with the
+  notebooks' own calls**: drivers running the exact derivative cells
+  of EXAMPLE_EVALUATE1 (roman_real, and the section newly ported to
+  lsst_y1) complete with finite outputs; the regression test
+  `test_scale_cut_diagnostics.py` pins the old fatal multipoles
+  (rf_C_ss at l = 3) in both suites.
 
 ## Two-grid C-FAST-PT internal grid (2026-09-25)
 
