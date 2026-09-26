@@ -37,11 +37,11 @@ No open HIGH tickets.
 ### Medium
 
 - OPEN **MEDIUM** **BUG FIX** — [Find why the dlnxi/Css/dlnk notebook functions crash](#open-notebook-derivative-crash)
-- OPEN **MEDIUM** **NEW FUNCTIONALITY** — [Two-grid sampling inside cfastpt for faster TATT](#open-cfastpt-two-grid)
+- OPEN **MEDIUM** **NEW FUNCTIONALITY** — [Move the cosmo2D_wrapper array overloads to the batched _ells API](#open-cosmo2d-wrapper-ells-api)
 
 ### Low
 
-No open LOW tickets.
+- OPEN **LOW** **NEW FUNCTIONALITY** — [IA x higher-order-bias (gb2) cross terms in cfastpt](#open-cfastpt-gb2-ia-bias)
 
 <a id="open-notebook-derivative-crash"></a>
 ## Find why the dlnxi/Css/dlnk notebook functions crash
@@ -90,50 +90,158 @@ C core. Then fix where it enters and rerun the notebook end to end.
 
 </details>
 
-<a id="open-cfastpt-two-grid"></a>
-## Two-grid sampling inside cfastpt for faster TATT
+<a id="open-cosmo2d-wrapper-ells-api"></a>
+## Move the cosmo2D_wrapper array overloads to the batched _ells API
 
 ### High-level summary
 
-The FAST-PT theory block computes its convolutions on a coarse
-internal grid and upsamples with a cubic spline in $\log k$ onto the
-dense output table the likelihood reads linearly. cfastpt
-(`IA_code: 0`) still runs everything on one grid; the same two-tier
-strategy could make the C path faster for TATT.
+The python-facing array overloads `C_ss_tomo_limber_cpp(arma::Col l)`
+and `C_gs_tomo_limber_cpp(arma::Col l)` in `cosmo2D_wrapper.cpp` still
+compute their spectra by calling the scalar
+`C_ss_tomo_limber_nointerp` / `C_gs_tomo_limber_nointerp` once per
+(multipole, bin-pair), after a serial `init=1` warm-up pass. The
+optimized batch entry points `C_ss_tomo_limber_nointerp_ells` and
+`C_gs_tomo_limber_nointerp_ells` already exist in `cosmo2D.h` and are
+what the likelihood path uses. The ss and gs array overloads should
+call the batch API and drop the scalar loop, and the ss and gs scalar
+overloads should be rewritten as one-element calls into the array
+overloads, so the wrapper layer has no dependency left on the old
+non-batched shear cosmo2D API.
+
+### Current status
+
+**Ticket type: NEW FUNCTIONALITY** (performance and single-code-path
+consolidation; no wrong numbers are known).
+
+**OPEN.**
+
+**Severity: MEDIUM.** Two parallel implementations of the same spectra
+(the wrapper's scalar loop and the batch `_ells` path) can drift apart
+and make notebook diagnostics disagree with the likelihood path; the
+scalar loop is also the slow way to fill the tables the notebooks ask
+for.
+
+### What is already in place
+
+The batch C API with per-argument documentation
+(`C_ss_tomo_limber_nointerp_ells` returning EE and BB as
+`[NSIZE][nell]`, `C_gs_tomo_limber_nointerp_ells` returning
+`[NSIZE][nell]`), the `_batch` thin wrappers over integer multipoles,
+and the bin-pair maps `Z1`/`Z2` and `ZL`/`ZS` that translate the
+power-spectrum index `nz` into the cube coordinates the python side
+expects.
+
+### What is missing
+
+Rewrite the ss and gs array overloads to allocate the `[NSIZE][nell]`
+work arrays with `malloc2d`, call the `_ells` batch functions once,
+and scatter the rows into the returned `arma::Cube` via `Z1`/`Z2`
+(EE and BB) and `ZL`/`ZS`. Rewrite the scalar overloads
+`C_ss_tomo_limber_cpp(l, ni, nj)` and
+`C_gs_tomo_limber_cpp(l, ni, nj)` as one-element calls into their
+array overloads, with a doc warning that the scalar API is a
+point diagnostic (it pays the full batch cost per call) and the array
+API is the one to use. Validate that the new wrappers return the same
+values as the current code at notebook multipole arrays before
+deleting the loops, and rerun one EXAMPLE_EVALUATE notebook per
+affected project end to end.
+
+<details><summary>Technical record</summary>
+
+- Owner: `external_modules/code/cosmolike_core/cosmolike/`
+  (`cosmo2D_wrapper.cpp`; batch API declared in `cosmo2D.h`).
+- Current scalar-loop overloads: `C_ss_tomo_limber_cpp(arma::Col l)`
+  and `C_gs_tomo_limber_cpp(arma::Col l)` in `cosmo2D_wrapper.cpp`
+  (each does a serial `init=1` pass over bin pairs, then an
+  `omp collapse(2)` loop of scalar calls).
+- Only ss and gs have batch entry points; gg has no `_ells` function
+  (the cosmo_nodes batch refactor was never applied to gg), so the gg
+  overloads are out of scope until gg gets a batch API.
+- Related: the notebook-derivative crash ticket
+  (#open-notebook-derivative-crash) lives in the same wrapper layer;
+  if the migration touches shared state, retest that reproduction.
+
+</details>
+
+<a id="open-cfastpt-gb2-ia-bias"></a>
+## IA x higher-order-bias (gb2) cross terms in cfastpt
+
+### High-level summary
+
+The galaxy-intrinsic (gI) part of gamma_t is computed with linear
+galaxy bias times the full NLA/TATT alignment spectrum, while the
+density part of the same probe keeps the quadratic-bias terms (b2,
+bs). The missing sector is the cross between the two expansions: the
+spectra <delta^2|E> and <s^2|E> (times b2/2 and bs/2), which upstream
+FAST-PT ships as the IA_gb2 module (tables fe, he, F2, G2, S2F2,
+S2G2, S2fe, S2he). Add these tables to cfastpt and wire them into the
+gI integrand, closing the one-loop consistency gap.
 
 ### Current status
 
 **Ticket type: NEW FUNCTIONALITY.**
 
-**OPEN.** Idea stage; no cfastpt change exists.
+**OPEN.** Idea stage; gated on upstream FAST-PT resolving issue #29
+(see below).
 
-**Severity: MEDIUM.** Performance work; current cfastpt is correct
-and remains the reference implementation.
+**Severity: LOW.** The truncation matches the community baseline
+(DES-Y3 TATT, cosmosis tatt_interface, CCL): no current result is
+wrong. The terms are a loop correction inside a correction (of order
+b2*A1 relative to the linear-bias gI term); whether LSST-Y1/Roman
+gamma_t precision cares is a quantifiable question to answer as part
+of this ticket.
 
 ### What is already in place
 
-The strategy is proven twice in python: the FAST-PT theory block and
-the `bfmt` baryon block both separate the computation grid from the
-output grid. The upgrade located the accuracy in the output-table
-density, and none in the convolutions, so a coarse convolution grid
-is safe.
+`get_FPT_bias` (pt_cfastpt.c) provides the exact machinery: hardcoded
+(alpha, beta, ell) J-tables accumulated through one `J_abl` call,
+with exchange pairs collapsed into single doubled rows - an idiom
+that is structurally immune to the transcription slip found upstream
+(see the technical record). Its 13 rows were verified analytically on
+2026-09-25, and the Pd1s2 rows are literally the S2F2 kernel of the
+gb2 family, so part of the derivation work already exists.
+`get_FPT_IA` provides the TATT (ta/tt/mix) side the new terms couple
+to. Upstream FAST-PT 4.0.0 is installed in `.local` and carries the
+IA_gb2 module as a cross-check reference (with caveats below).
 
 ### What is missing
 
-Implement coarse-convolution plus spline-upsampling inside cfastpt,
-verify the result against current cfastpt with the existing
-comparison machinery below the test tolerance, and measure the
-speed-up before adopting. Keep the single-grid path until the
-two-grid version matches it.
+- Derive the eight gb2 tables independently and write them in the
+  `get_FPT_bias` collapsed-row style. Do NOT transcribe upstream:
+  FAST-PT issue #28 (confirmed 2026-09-25 by direct Legendre
+  derivation) has a typo in IA_gb2_S2G2 - the last row must be
+  (-1,1,l=3,1/5), not l=1 - and issue #29 (a duplicated row in
+  IA_gb2_he) is unresolved; the row placement is numerically inert,
+  but whether the total is -1/3 or -2/3 needs the source derivation.
+- Wire the new spectra into the gI integrand of gamma_t with the
+  b2/2 and bs/2 coefficients paired to C1/C1delta/C2 per the gb2
+  module's source paper.
+- Quantify the effect on gamma_t at LSST-Y1 and Roman precision
+  (delta^T C^-1 delta against the truncated model) before deciding
+  whether any default changes.
+- Validate against python FAST-PT once upstream has fixed #28 and
+  resolved #29 (a comparison against the current upstream would
+  inherit its typo).
 
 <details><summary>Technical record</summary>
 
-- Owner: `external_modules/code/cosmolike_core/cfastpt/`.
-- Precedents: `external_modules/code/PyFAST-PT/fastpt.py` (the
-  two-grid mechanism and its README's Design section) and
-  `code/baryon_suppression/bfmt.py` (the nz/nk internal grid).
-- The grid-density analysis is the decision record in
-  `projects/lsst_y1/tests/README.md`.
+- Owners: `external_modules/code/cosmolike_core/cosmolike/
+  pt_cfastpt.c` (new table block beside `get_FPT_bias`), `IA.c` /
+  `cosmo2D.c` (gI integrand), plus the source-paper coefficient map.
+- Upstream references: FAST-PT issues jablazek/FAST-PT#28 and #29
+  (both filed 2026-09-25), fastpt/IA/IA_gb2.py at commit b91f6b7.
+- Analytic facts established 2026-09-25: F2 and G2 share the
+  identical (q1/q2 + q2/q1)(mu/2) term, so the (+-1,-+1) rows of the
+  S2F2 and S2G2 tables must coincide; (mu/2)(mu^2 - 1/3) =
+  (2/15) P1 + (1/5) P3 fixes those rows, proving #28. With
+  alpha = beta = 0 and the same P(k) on both legs, J(l1,l2) equals
+  J(l2,l1), which is why #29's duplicated row is numerically
+  equivalent to the symmetric pair and only the TOTAL coefficient is
+  in question.
+- Exposure audit (2026-09-25): no gb2-family table or caller exists
+  anywhere in cocoa (cfastpt, PyFAST-PT, likelihoods, notebooks);
+  the cosmolike function `gb2(z, ni)` is the b2(z) galaxy bias, a
+  name collision only.
 
 </details>
 
@@ -144,6 +252,54 @@ measurements are kept, since this section is a decision record, not a
 README. To reopen a ticket, move its content back under
 [Open tickets](#open-tickets) as a full ticket section and add its
 `- OPEN` index line.
+
+## Runtime n(z) photo-z conventions (2026-09)
+
+- **Two runtime flags shipped (2026-09-24/25).** `Ntable.photoz_interpolation_type`
+  (0 = cspline default, 1 = linear, 2+ = Steffen monotone; the
+  documented-but-unimplemented switch in basics.c became real, inside
+  `malloc_gsl_interp`/`malloc_gsl_spline`, whose only callers are the
+  photo-z readers) and `Ntable.photoz_zmid_convention` (0 = z column
+  read as Z_LOW left bin edges, values at centers z + dz/2, the
+  historical behavior; 1 = Z_MID sample points). One shared
+  `init_photoz_conventions` in generic_interface.cpp; the n(z) caches
+  watch both values through a packed slot, so a runtime flip rebuilds
+  the tables (both directions covered by a bit-identical round-trip
+  assertion). No preprocessor flag: a compile-time `#ifdef` was
+  rejected because the unit test would need two builds. Defaults
+  unchanged everywhere; every default chi2 reproduces its frozen
+  reference exactly.
+- **Wired end to end in all six projects.** pybind binding, the
+  likelihood call, yaml keys in every likelihood variant (31 yamls),
+  the notebook wrappers of lsst_y1/roman_real (_CONFIG +
+  configure()), and the inline des_y3 notebooks.
+- **Unit test + figures + README section in all six projects.**
+  `test_photoz_conventions.py` evaluates five settings in one process
+  and measures each alternative as delta^T C^-1 delta against the
+  default (masked inverse covariance; dead-flag floors);
+  `generate_photoz_convention_figure.py` makes the per-pair
+  delta-xi/delta-Cl figures the tests README records.
+- **Measured (2026-09-24/25, frozen cosmic-shear fiducials).**
+  Steffen: 4.1e-5 (lsst_y1), 1.3e-6 (roman_real), 2.9e-6
+  (roman_fourier), 1.6e-5 (des_y3), 5.7e-5 (desy1xplanck), 1.5e-6
+  (roman_kl); linear: 6.3e-4, 1.6e-4, 9.4e-4, 3.1e-4, 1.3e-3,
+  2.0e-5; Z_MID: 1.63, 0.94, 3.60, 0.30, 0.42, 2.35. The interpolant
+  is far below statistical precision; the half-bin z-column reading
+  is the one photo-z convention that matters, as the 2026-09 DES-Y6
+  three-code comparison predicted. Full suites green in all six
+  projects (2026-09-25): lsst_y1 (49), roman_real (42), roman_fourier
+  (41), des_y3 (59), desy1xplanck (41), roman_kl (45).
+- **Deferred decisions, deliberately.** Flipping the default to
+  Steffen (the measurements support it whenever desired; a deliberate
+  documented accuracy change under the full validation protocol when
+  taken). The correct Z_LOW-vs-Z_MID setting per survey is a data-
+  product fact (which column the tables were exported from), declared
+  per analysis in its likelihood yamls. Motivating measurements: the
+  DESY6 source tables carry an overflow-like last row against which
+  cspline rings at -0.3% to -0.6% of peak; a single-cell spike makes
+  cspline undershoot -13.7% of peak while Steffen stays non-negative;
+  detector-plus-rebuild designs were rejected because sampled-n(z)
+  analyses rebuild the tables per likelihood call.
 
 ## FAST-PT two-grid upgrade (2026-09)
 
@@ -165,6 +321,41 @@ README. To reopen a ticket, move its content back under
   needs `accuracyboost: 2.0`. Each `tests/README.md` carries the
   contract, the measurement table, and the corner plot; the example
   yamls carry the rebased defaults.
+
+## Two-grid C-FAST-PT internal grid (2026-09-25)
+
+- **Runtime knob shipped.** `Ntable.FPT_internal_accuracy_boost`
+  (yaml key `internal_accuracyboost`; setter `init_fpt_internal_boost`,
+  which refuses values <= 0) runs the C-FAST-PT FFTLog convolutions
+  of `get_FPT_IA` and `get_FPT_bias` on an internal grid of
+  ceil(N * boost) points rounded up to even (the FFTLog engine
+  requires an even count — discovered by the convergence scan) and
+  moves the spectra onto the unchanged output table with
+  `spline_coeffs_uniform` plus Horner evaluation on the uniform ln k
+  grid (`fpt_regrid`, no binary search); 1.0 recovers the single-grid
+  path exactly and is the reference arm of the accuracy tests. Work
+  tables (`FPT.tab_int`), regrid scratch and the FFTLog
+  configurations persist across cosmologies and rebuild only when
+  Ntable changes; the FFTLog padding/extrapolation spans scale with
+  the grid ratio (they are ln-k spans, not point counts).
+- **Default 0.5 (Nint = 550), chosen with margin.** Measured
+  2026-09-25 on lsst_y1 frozen TATT fiducials: delta^T C^-1 delta vs
+  the single-grid path <= 1e-10 (shear) and <= 1e-9 (3x2pt) down to
+  298 internal points, converged from above at 2200; the default
+  keeps a ~100x chi2 margin over the 298-point arm. FPT table cost
+  fits 1.55 us * N ln N on the M-series Mac: 11.9 -> 5.4 ms per
+  evaluation (6.5 ms saved, CAMB excluded); the TATT premium over
+  NLA drops from ~25 ms to ~7 ms.
+- **Validated in all six projects (2026-09-25).**
+  `internal_accuracyboost` is in every project's high-accuracy
+  settings and one-at-a-time accuracy knob scan; full suites green:
+  lsst_y1 (49), roman_real (42), roman_fourier (41), des_y3 (59),
+  desy1xplanck (41), roman_kl (45). Parity at the default point is
+  exact (lsst_y1 chi2 0.267263), and the convergence scan stayed
+  bit-identical through every review refactor.
+- **Deferred decisions, deliberately.** `perf stat -r 3` on the
+  Linux roman benchmark (the citable numbers) and the
+  DEBUG/AGGRESSIVE build-mode sweep are maintainer steps.
 
 ## Shared test harness (2026-09)
 

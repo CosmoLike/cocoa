@@ -1624,3 +1624,122 @@ separate repository pinned by the COSMOLIKE keys), commit, never
 push, and verify that results at the unboosted defaults are unchanged
 (the frozen project references must not move) before claiming the
 fix.
+
+## 7. The execution backlog (cocoa_installation_libraries/notes/backlog.md)
+
+The backlog is the execution tracker: one `- OPEN` index line per
+unfinished ticket, one anchored section per ticket, and a Closed
+archive that works as a compressed decision record (dated
+measurements are kept there on purpose).
+
+- **Close the ticket in the same session that finishes the work.**
+  "Implemented and validated" means closed: remove the `- OPEN`
+  index line and the ticket section, and add a compressed entry to
+  the Closed archive keeping the dated measurements and decisions.
+  Do not leave a ticket open because maintainer-only steps remain
+  (commits, pushes, merges, a deferred default flip): those are
+  recorded as deferred decisions inside the closed entry, not
+  reasons to stay open.
+- New work agreed in conversation gets a ticket before or while it
+  is done, following the existing section template (High-level
+  summary / Current status / What is already in place / What is
+  missing / Technical record).
+- After any backlog edit, verify the file's own invariant: the
+  number of `- OPEN` index lines equals the number of
+  `<a id="open-...">` anchors, and every index link resolves.
+
+## 8. Lessons that generalize (learned 2026-09, DES-Y6 forensics + runtime-knob work)
+
+### 8.1 Cross-code comparisons decompose into layers; test conventions first
+
+- When two codes disagree by FLAT per-bin offsets, suspect input
+  INTERPRETATION before numerics: what a table's z column means (bin
+  left edge vs sample point), normalization windows, bin conventions.
+  A half-cell z-assignment moved cosmic shear by percent; the spline
+  choice moved it by 1e-5.
+- A rigid shift common to lens and source samples has a cross-probe
+  fingerprint: shear moves UP, clustering moves DOWN, gamma_t nearly
+  cancels. Opposite signs from one toggle discriminate a rigid shift
+  from width or shape errors.
+- Per-bin multiplicative layers reveal themselves as
+  residual(i,j) = f_i + f_j across pairs. Fit that structure before
+  interpreting residuals as physics: fiducial shear m-biases
+  (nonzero even at zero sampled nuisances) masqueraded as an n(z)
+  effect until factored out.
+- Mutual-agreement tests (C vs python, code A vs code B) are blind to
+  SHARED conventions and shared upstream typos. Correctness needs an
+  independent derivation: re-deriving Legendre coefficients by hand
+  settled a FAST-PT table typo that both implementations would have
+  agreed on.
+
+### 8.2 Runtime knobs, not compile flags
+
+- A new numerical choice ships as a runtime field (Ntable/struct),
+  set through one init function, declared in every likelihood yaml,
+  and mirrored in the notebook wrappers. Unit tests then flip it in
+  ONE process - no rebuilds - and a compile-time #ifdef would have
+  required two.
+- The knob value must enter the cache-invalidation condition of every
+  table it influences (a packed integer slot compared alongside the
+  existing random works well). The unit test proves it two ways: a
+  dead-flag floor (delta^T C^-1 delta > tiny; a stale cache gives
+  exactly zero) and a bit-identical round trip back to the default
+  (over- and under-invalidation both fail loudly).
+- Defaults are conservative at merge; flipping a default is a
+  separate, measured, documented decision. Never ship an unmeasured
+  default: run the convergence scan first, then bake the number.
+
+### 8.3 The two-grid principle (now confirmed three times)
+
+- Accuracy lives in the OUTPUT table density (what the likelihood
+  interpolates), not in the smooth internal computation. FAST-PT
+  (python), bfmt, and now cfastpt all converged at internal grids far
+  coarser than their outputs (cfastpt: <= 1e-9 in delta chi2 at 298
+  vs 1100 points). When a table build is slow, split compute grid
+  from output grid before buying a faster machine.
+- FFTLog engine facts: the point count must be EVEN, and
+  N_pad/N_extrap are ln-k SPANS in disguise (span = count * dlnk) -
+  scale the counts with the grid so the spans stay fixed, or the
+  circular convolution wraps and the truncation edge rings.
+
+### 8.4 Ntable-keyed persistence (allocation discipline)
+
+- Anything whose SIZE depends only on Ntable (work arrays, spline
+  scratch, FFT configs) is allocated once inside the
+  fdiff2(cache[1], Ntable.random) block and reused across
+  cosmologies - never re-malloc'd per evaluation, and NEVER malloc'd
+  inside an OpenMP region.
+- A shared helper takes caller-owned scratch as an argument: a
+  static inside the helper would be sized by whichever caller ran
+  first and overflow for the other.
+- Watch alias transitions: when a work pointer may alias the output
+  pointer (bypass paths), free the non-aliased one first and guard
+  every free against the aliased case.
+
+### 8.5 Timing cache-keyed code honestly
+
+- To time a cache-keyed rebuild, FORCE it (bump the random the cache
+  watches) every repetition. A timing that shows no dependence on
+  the knob usually means the code path never ran - a null result is
+  a probe bug until proven otherwise.
+- Quote cosmolike speedups excluding CAMB; on the exact-CAMB path
+  everything drowns in the Boltzmann call. Fit cost against the
+  scaling law (N ln N for FFTLog) across several settings instead of
+  differencing two noisy medians. Laptop numbers are proxies;
+  perf stat -r 3 on the Linux benchmark is what a PR may cite.
+
+### 8.6 C review rules the maintainer enforces (in addition to Section 6)
+
+- Function signatures: one argument per line, a short comment per
+  argument.
+- No single-letter variable names (they defeat grep); name any magic
+  number that appears twice.
+- All statics declared at the top of the function.
+- Every omp for carries schedule(static); use collapse(2) where the
+  loop nest allows - and restructure to allow it (e.g. split a
+  per-row setup into its own serial phase) when the outer loop alone
+  underfills the thread team (5-10 iterations).
+- Local restrict pointers inside collapse(2) bodies, with a comment
+  explaining the aliasing consequence in plain words - didactic
+  comments must avoid jargon ("injective", "FMA-chain body") in
+  favor of what actually happens.
