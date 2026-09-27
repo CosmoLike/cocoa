@@ -37,7 +37,6 @@ features, Low bugs, Low features.
 ### Medium
 
 - OPEN **MEDIUM** **NEW FUNCTIONALITY** — [Move C_gk and C_ks onto the _work batch API](#open-cosmo2d-gk-ks-work)
-- OPEN **MEDIUM** **NEW FUNCTIONALITY** — [Extend the cosmo2D_scuts diagnostics to C_ks and w_ks](#open-scuts-ks-family)
 
 ### Low
 
@@ -64,10 +63,17 @@ continuation, no per-ell scalar quadratures).
 
 **Ticket type: NEW FUNCTIONALITY.**
 
-**OPEN.** In progress (2026-09-27): a subagent is verifying the
-cluster_chto math against our gg pipeline and drafting the
-implementation design; implementation follows once the current
-cosmo2D.c workstreams land.
+**OPEN.** Math verified and design done (2026-09-27): the reference
+is FKEM-correct physics with real code bugs — a Legendre-kernel typo
+(Pmin[l+1]-Pmax[l] must be Pmax[l+1]; orders of magnitude at l = 2,
+~1% at l = 10 — Cocoa's w_gammat kernel is already correct and must
+not be overwritten), uninitialized l = 1 entries, and a dead early
+exit. The reference keeps non-Limber for density, RSD, magnification,
+the spin-2 lensing kernel, and NLA IA; Limber only for the
+(P_NL - P_lin) correction (FKEM bound < 0.35%). Design and open
+questions (RSD gating, magnification, switch multipole, yaml
+exposure of adopt_limber_gs) in the phase-A design doc;
+implementation awaits the maintainer's answers.
 
 **Severity: HIGH.** This is the last missing exact projection of the
 3x2pt family, and the default-Limber choice for ggl needs per-project
@@ -109,50 +115,6 @@ evidence backing that default.
   default build, determinism across thread counts.
 
 </details>
-
-<a id="open-scuts-ks-family"></a>
-## Extend the cosmo2D_scuts diagnostics to C_ks and w_ks
-
-### High-level summary
-
-The scale-cut diagnostics of 2011.06469 eq 17 (dlnX/dlnk and the
-cumulative response RF(kmax)) exist only for cosmic shear (C_ss and
-xi_pm). The CMB-lensing x shear probe needs the same family: a
-`dC_ks_dlnk_tomo_limber_work` on the (ln k, ell) grid with the fused
-normalize flag, the cached dC/dlnC tables, `RF_C_ks` and, in real
-space, `dlnw_ks_dlnk_tomo` + `RF_w_ks` built on the w_ks projection
-(gamma_t-type Legendre kernel, CMB beam/pixel filter, normalization
-by w_ks itself), so desy1xplanck can place kmax-style scale cuts on
-the ks part of the 6x2pt vector.
-
-### Current status
-
-**Ticket type: NEW FUNCTIONALITY.**
-
-**OPEN.** In progress (2026-09-27): implementation follows the ss/xi
-design one-to-one on top of the C_ks _work machinery (cosmolike_core
-7c058e3); bindings go to desy1xplanck only (the one project with CMB
-lensing), and a section in the new desy1xplanck notebook will
-exercise them.
-
-**Severity: MEDIUM.** The shear-only diagnostics cannot justify ks
-scale cuts, and desy1xplanck is the 6x2pt flagship.
-
-### What is already in place
-
-The ss/xi family in cosmo2D_scuts (work functions, cached tables,
-RF machinery, the dlnxi real-space pipeline with limber_fill_interp)
-and the batched C_ks_tomo_limber_work with per-source-bin
-quadrature nodes.
-
-### What is missing
-
-The ks analogs of every ss/xi diagnostic, their wrapper overloads at
-the documentation standard, the desy1xplanck bindings (including
-plain C_ks_tomo_limber / w_ks_tomo bindings for notebooks), and the
-validation battery: the dC integral must reconstruct C_ks
-(truth check), RF bounds/monotonicity, determinism, and an unchanged
-6x2pt chi2.
 
 <a id="open-cosmo2d-gk-ks-work"></a>
 ## Move C_gk and C_ks onto the _work batch API
@@ -347,6 +309,27 @@ README. To reopen a ticket, move its content back under
 [Open tickets](#open-tickets) as a full ticket section and add its
 `- OPEN` index line.
 
+## Scale-cut diagnostics for C_ks and w_ks (2026-09-27)
+
+- **The ks family shipped** (cosmolike_core 7ded4a7; desy1xplanck
+  694bd8d): `dC_ks_dlnk_tomo_limber_work` (single-node grid
+  derivative, per-bin source-support gating, fused normalize mode),
+  cached dC/dlnC tables, `RF_C_ks`, the real-space `dlnw_ks_dlnk`
+  pipeline (limber_fill_interp gather, CMB beam/pixel filter,
+  gamma_t-type Legendre kernel, normalized by w_ks) and `RF_w_ks`,
+  wrapper overloads at the doc standard, desy1xplanck bindings (plus
+  plain C_ks_tomo_limber and a fixed live w_ks_tomo binding), six
+  notebook wrappers, and a 15-cell EXAMPLE_EVALUATE1 section.
+- **Validation.** Truth check: the dC_ks/dlnk integral reconstructs
+  C_ks to 4.7e-5 relative (integration_accuracy 3; the 1.9e-3 at the
+  default is the 64-point C_ks rule itself). Scalar-vs-array
+  overloads and repeated calls bit-identical; RF bounded and
+  saturating at 1; 6x2pt chi2 unchanged to the last digit; full
+  41-test suite green; the notebook executes end to end (98 cells,
+  33 figures). The truth check also exposed the inherited ss
+  amplitude bug (see the 2026-09-27 bullet under the scuts
+  refactor).
+
 ## Runtime n(z) photo-z conventions (2026-09)
 
 - **Two runtime flags shipped (2026-09-24/25).** `Ntable.photoz_interpolation_type`
@@ -470,6 +453,18 @@ README. To reopen a ticket, move its content back under
   remaining 2.7 s (and 10.3 GB at roman lmax). The _work path takes
   4.2 s, first call and repeat alike (5.3x / 4.7x), on ~40 MB of
   statics.
+- **dC/dlnk node amplitude fixed (2026-09-27).** The per-node
+  amplitude multiplied the per-a integrand by |dchi/dlnk| = chi
+  without converting the measure (|da/dlnk| = fK/dchida), leaving a
+  spurious dchida — inherited verbatim from the retired GSL
+  implementation and preserved by the old-vs-new migration, which
+  never ran a truth-integral check on ss. Caught by the ks family's
+  reconstruction test and fixed (cosmolike_core 81319fc): the
+  integral of dlnC_ss/dlnk over ln k is now 0.9996-1.0001 (it was
+  1.25-1.57, the kernel-weighted mean of dchida). Every ss
+  diagnostic (dC, dlnC, RF_C_ss, dlnxi, RF_xi) carried the smooth
+  k-dependent tilt; the likelihood never read this path, and chi2
+  is bit-identical.
 
 ## Notebook derivative crashes (2026-09-26)
 
