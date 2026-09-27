@@ -37,11 +37,56 @@ No open HIGH tickets.
 ### Medium
 
 - OPEN **MEDIUM** **NEW FUNCTIONALITY** — [Move C_gk and C_ks onto the _work batch API](#open-cosmo2d-gk-ks-work)
+- OPEN **MEDIUM** **NEW FUNCTIONALITY** — [Extend the cosmo2D_scuts diagnostics to C_ks and w_ks](#open-scuts-ks-family)
 
 ### Low
 
 - OPEN **LOW** **NEW FUNCTIONALITY** — [IA x higher-order-bias (gb2) cross terms in cfastpt](#open-cfastpt-gb2-ia-bias)
 - OPEN **LOW** **NEW FUNCTIONALITY** — [Finish the Compton-y port (C_gy, C_ys, C_ky, C_yy)](#open-compton-y-port)
+
+<a id="open-scuts-ks-family"></a>
+## Extend the cosmo2D_scuts diagnostics to C_ks and w_ks
+
+### High-level summary
+
+The scale-cut diagnostics of 2011.06469 eq 17 (dlnX/dlnk and the
+cumulative response RF(kmax)) exist only for cosmic shear (C_ss and
+xi_pm). The CMB-lensing x shear probe needs the same family: a
+`dC_ks_dlnk_tomo_limber_work` on the (ln k, ell) grid with the fused
+normalize flag, the cached dC/dlnC tables, `RF_C_ks` and, in real
+space, `dlnw_ks_dlnk_tomo` + `RF_w_ks` built on the w_ks projection
+(gamma_t-type Legendre kernel, CMB beam/pixel filter, normalization
+by w_ks itself), so desy1xplanck can place kmax-style scale cuts on
+the ks part of the 6x2pt vector.
+
+### Current status
+
+**Ticket type: NEW FUNCTIONALITY.**
+
+**OPEN.** In progress (2026-09-27): implementation follows the ss/xi
+design one-to-one on top of the C_ks _work machinery (cosmolike_core
+7c058e3); bindings go to desy1xplanck only (the one project with CMB
+lensing), and a section in the new desy1xplanck notebook will
+exercise them.
+
+**Severity: MEDIUM.** The shear-only diagnostics cannot justify ks
+scale cuts, and desy1xplanck is the 6x2pt flagship.
+
+### What is already in place
+
+The ss/xi family in cosmo2D_scuts (work functions, cached tables,
+RF machinery, the dlnxi real-space pipeline with limber_fill_interp)
+and the batched C_ks_tomo_limber_work with per-source-bin
+quadrature nodes.
+
+### What is missing
+
+The ks analogs of every ss/xi diagnostic, their wrapper overloads at
+the documentation standard, the desy1xplanck bindings (including
+plain C_ks_tomo_limber / w_ks_tomo bindings for notebooks), and the
+validation battery: the dC integral must reconstruct C_ks
+(truth check), RF bounds/monotonicity, determinism, and an unchanged
+6x2pt chi2.
 
 <a id="open-cosmo2d-gk-ks-work"></a>
 ## Move C_gk and C_ks onto the _work batch API
