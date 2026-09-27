@@ -343,6 +343,15 @@ README. To reopen a ticket, move its content back under
   roman_real. A cosmetic leftover: the notebook wrappers call the
   dlnC function `dlnC_dlss_tomo_limber` (scrambled name), a
   rename-commit candidate.
+- **End-to-end rf_xi measured (2026-09-27).** roman_real, 76-value
+  kmax grid, idle machine: the retired path (GSL RF integrals over
+  the per-integer-multipole dlnxi table) took 22.4 s on the first
+  call and 19.7 s on every repeat at the same cosmology — the GSL
+  quadrature re-drove the scalar integrand on each call, cached
+  tables or not, while the one-time table builds cost only the
+  remaining 2.7 s (and 10.3 GB at roman lmax). The _work path takes
+  4.2 s, first call and repeat alike (5.3x / 4.7x), on ~40 MB of
+  statics.
 
 ## Notebook derivative crashes (2026-09-26)
 
