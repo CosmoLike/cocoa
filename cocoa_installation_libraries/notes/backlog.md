@@ -63,7 +63,14 @@ space.
 
 **Ticket type: NEW FUNCTIONALITY.**
 
-**OPEN.**
+**OPEN.** C_ks is done (cosmolike_core 7c058e3, 2026-09-27):
+`C_ks_tomo_limber_work` + `_nointerp_ells`/`_batch` in the ss design
+with per-source-bin cosmo_nodes, all four consumers migrated (table
+builder, w_ks_tomo low-ell loop, both wrapper overloads), the scalar
+quadrature deleted, the 64-point rule kept. Validated on the
+desy1xplanck frozen 6x2pt: only the 33 w_ks data-vector entries move,
+at <= 9.8e-16 relative; 41-test suite green; all six projects
+compile. C_gk (and C_kk, which can ride along) remain.
 
 **Severity: MEDIUM.** These spectra sit in the 6x2pt likelihood path
 (desy1xplanck evaluates gk and ks per point through the cached
