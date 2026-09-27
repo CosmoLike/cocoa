@@ -32,7 +32,7 @@ features, Low bugs, Low features.
 
 ### High
 
-No open HIGH tickets.
+- OPEN **HIGH** **NEW FUNCTIONALITY** — [Non-Limber galaxy-galaxy lensing (C_gs exact)](#open-nonlimber-ggl)
 
 ### Medium
 
@@ -43,6 +43,72 @@ No open HIGH tickets.
 
 - OPEN **LOW** **NEW FUNCTIONALITY** — [IA x higher-order-bias (gb2) cross terms in cfastpt](#open-cfastpt-gb2-ia-bias)
 - OPEN **LOW** **NEW FUNCTIONALITY** — [Finish the Compton-y port (C_gy, C_ys, C_ky, C_yy)](#open-compton-y-port)
+
+<a id="open-nonlimber-ggl"></a>
+## Non-Limber galaxy-galaxy lensing (C_gs exact)
+
+### High-level summary
+
+Galaxy-galaxy lensing has no non-Limber computation in Cocoa: w_gammat
+projects the Limber C_gs at every multipole, while galaxy clustering
+runs the exact (non-Limber) C_gg at low multipoles through the cfftlog
+pipeline. The original cosmolike_core has the exact ggl computation
+(cluster_chto branch, theory/cosmo2D_exact.c); the math must be
+verified against that reference and the FKEM literature, and the
+implementation must land in cosmo2D.c in the optimized house form the
+gg non-Limber uses (cfftlog_ells_cocoa0 with the hoisted
+ell-independent forward FFT, per-bin early exit into the Limber
+continuation, no per-ell scalar quadratures).
+
+### Current status
+
+**Ticket type: NEW FUNCTIONALITY.**
+
+**OPEN.** In progress (2026-09-27): a subagent is verifying the
+cluster_chto math against our gg pipeline and drafting the
+implementation design; implementation follows once the current
+cosmo2D.c workstreams land.
+
+**Severity: HIGH.** This is the last missing exact projection of the
+3x2pt family, and the default-Limber choice for ggl needs per-project
+evidence, not folklore.
+
+### What is already in place
+
+The gg non-Limber machinery: C_cl_tomo and the cfftlog pipeline
+(cfftlog_ells_cocoa0), the per-bin early exit, and the
+like.adopt_limber_gg switch (0 everywhere, so gg always runs
+non-Limber below the switch multipole). The batched Limber
+C_gs_tomo_limber_work/_nointerp_ells/_batch design that the exact
+computation hands over to.
+
+### What is missing
+
+The exact C_gs at low multipoles (density side non-Limber; verify
+against the reference which kernels — magnification, IA, lensing —
+the reference keeps Limber and why), wired into w_gammat_tomo the way
+w_gg_tomo consumes the gg pipeline; a like.adopt_limber_gs switch
+analogous to like.adopt_limber_gg, DEFAULTING TO LIMBER-ONLY
+(non-Limber off: the correction is subdominant for ggl, unlike gg);
+and one unit test per project (all six) quantifying the
+Limber-vs-non-Limber difference on the ggl block, which is the
+evidence backing that default.
+
+<details><summary>Technical record</summary>
+
+- Reference: github.com/CosmoLike/cosmolike_core branch cluster_chto,
+  theory/cosmo2D_exact.c (the exact ggl integrals; FKEM 1911.11947).
+- Owner: cosmo2D.c/h (exact C_gs + w_gammat_tomo wiring),
+  structs.c/h + generic_interface.cpp (the adopt_limber_gs flag,
+  mirroring adopt_limber_gg's plumbing), every project's tests/.
+- adopt_limber semantics today: w_gg_tomo(nt, ni, nj, limber) receives
+  like.adopt_limber_gg; 0 selects the non-Limber path. The gs flag
+  mirrors the plumbing with the opposite shipped value.
+- The gg pipeline's correctness bar applies: the per-bin early exit
+  must converge to the no-early-exit fallback, chi2 exact in the
+  default build, determinism across thread counts.
+
+</details>
 
 <a id="open-scuts-ks-family"></a>
 ## Extend the cosmo2D_scuts diagnostics to C_ks and w_ks
