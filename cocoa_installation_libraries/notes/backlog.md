@@ -38,7 +38,6 @@ features, Low bugs, Low features.
 
 ### Low
 
-- OPEN **LOW** **NEW FUNCTIONALITY** — [Per-bin pivot redshift for the FKEM separable spectrum](#open-fkem-pivot-redshift)
 - OPEN **LOW** **NEW FUNCTIONALITY** — [IA x higher-order-bias (gb2) cross terms in cfastpt](#open-cfastpt-gb2-ia-bias)
 - OPEN **LOW** **NEW FUNCTIONALITY** — [Finish the Compton-y port (C_gy, C_ys, C_ky, C_yy)](#open-compton-y-port)
 - OPEN **LOW** **NEW FUNCTIONALITY** — [Skip empty radial slots in cfftlog_ells_p2](#open-cfftlog-empty-slots)
@@ -291,92 +290,6 @@ ell list at one call, and the cubic-spline utilities in basics.c.
 
 </details>
 
-<a id="open-fkem-pivot-redshift"></a>
-## Per-bin pivot redshift for the FKEM separable spectrum
-
-### High-level summary
-
-The maintainer's proposal (2026-09-28): the FKEM split needs a
-SEPARABLE linear spectrum for its FFTLog term, currently
-D(z)^2 P_lin(k, z=0). With massive neutrinos the true growth is scale
-dependent, so the separable form is wrong by [D(k,z)/D(z)]^2 - 1
-accumulated from z = 0 to the lens redshifts (0.7% at z = 0.3, 1.6%
-at z = 1 at the k of l ~ 100). Re-anchor the separable form per
-tomographic bin,
-
-    P_sep(k, z) = [D(z)/D(z_i)]^2 P_lin(k, z_i),   z_i = zmean(bin i),
-
-so the form is EXACT at z_i and the error grows only across the bin
-width instead of from z = 0: an order of magnitude less residual, at
-essentially zero runtime cost.
-
-### Current status
-
-**Ticket type: NEW FUNCTIONALITY.**
-
-**OPEN.** Reviewed 2026-09-28; the logic holds:
-
-- The high-l cancellation needs only that the FFTLog term and the
-  SUBTRACTED Limber term share the same separable spectrum -
-  whichever pivot is chosen. Pivoting preserves the cancellation by
-  construction; the added C_limber(P_delta) term is untouched. What
-  improves is the fidelity of the non-Limber correction at low l,
-  where the separable form is used as physics.
-- gg is the clean case: auto spectra only, one bin per spectrum, so
-  z_i = zmean(i) with no cross-bin ambiguity.
-- ggl inherits most of the benefit: the unequal-time contributions
-  to the projected spectrum are suppressed except at the lowest
-  multipoles, so the double integral's weight concentrates near
-  chi_1 = chi_2 inside the narrow lens support - the effective
-  redshifts sit near the lens z_i even for the broad W_kappa. The
-  IA piece (the genuinely non-Limber-sensitive term for overlapping
-  pairs) rides the source n(z), which for exactly those pairs sits
-  near z_i as well: the pairs where non-Limber matters most benefit
-  most.
-- Cost: P_lin(k, z_i) is the same 2D-interpolator call with a
-  different second argument, and 1/D(z_i)^2 folds into per-bin
-  constants on the kernel rows; the batch engines already loop per
-  lens bin. No measurable runtime change.
-
-**Severity: LOW** at the fiducial neutrino mass - the removed error
-(a ~1% growth mismatch on a few-percent correction, ~1e-4 of C_l)
-sits below the measured method floor - and rises with Sigma m_nu and
-with any scale-dependent-growth extension.
-
-### What is already in place
-
-The use_linear_ps plumbing in C_gg/C_gs_tomo_limber_work, the cached
-zmean(i)/zmean_source(i), the p_lin(k, a) interpolator, growfac with
-growfac(1) = 1, and the l = 149 cancellation diagnostics from the
-2026-09-28 review.
-
-### What is missing
-
-1. Thread one pivot a_i per lens bin through all the linear legs
-   TOGETHER: the FFTLog row builders of C_cl_tomo and C_gs_tomo
-   (rows carry D(a)/D(a_i)), the use_linear_ps = 1 branches of the
-   two work engines (PK = (gf/gf_i)^2 p_lin(k, a_i)), and the
-   backfill/band-center constructions. A pivot mismatch between the
-   legs is exactly the bug class fixed in 0082374; the cancellation
-   diagnostic at l = 149 is the guard (it must stay at the current
-   floor, pivot-independent by construction).
-2. Measure the gain BEFORE the refactor: evaluate the use_linear_ps
-   machinery at both pivots at a heavy-neutrino point (e.g.
-   Sigma m_nu = 0.06 vs 0.3 eV) and compare dC at l = 2-50.
-3. If adopted: the frozen fiducial vectors shift at the 1e-4 level -
-   record the refreeze decision with the change.
-
-<details><summary>Technical record</summary>
-
-- The C1 intrinsic-alignment amplitude carries 1/D, so the same
-  per-bin rescale applies consistently to the combined
-  (W_kappa - W_source C1) source kernel of C_gs_tomo.
-- For a hypothetical cross-bin gg pair the pivot would need a
-  compromise (sqrt(D_i D_j) style); the data vectors carry auto
-  spectra only, so this stays out of scope.
-
-</details>
-
 <a id="open-cfastpt-gb2-ia-bias"></a>
 ## IA x higher-order-bias (gb2) cross terms in cfastpt
 
@@ -544,6 +457,24 @@ measurements are kept, since this section is a decision record, not a
 README. To reopen a ticket, move its content back under
 [Open tickets](#open-tickets) as a full ticket section and add its
 `- OPEN` index line.
+
+## Per-bin pivot for the FKEM separable spectrum (2026-09-28)
+
+- **Implemented the same day it was proposed** (cosmolike_core
+  3c9ed69): the separable linear spectrum of the non-Limber split
+  is anchored per lens bin at a_piv = 1/(1 + zmean(bin)),
+  P_sep = (D(z)/D(a_piv))^2 P_lin(k, a_piv), in the FFTLog terms of
+  C_cl_tomo and C_gs_tomo and both use_linear_ps = 1 Limber legs
+  together (the cancellation invariant); C_gs_tomo's shared P_lin
+  table became per lens bin. COSMO2D_FKEM_PIVOT_Z0 restores the
+  z = 0 anchor exactly.
+- Validated: the l = 149 cancellation floor unchanged (des_y3 BMAG
+  fiducials, 1.126e-3 vs 1.125e-3); lsst_y1 references move by
+  delta chi2 = 0.034 (3x2pt) / 0.031 (2x2pt), inside the 0.2 band,
+  deliberately not refrozen; at the fiducial Sigma m_nu the
+  correction content shifts by 0.05-0.15% of itself at l <= 50 (the
+  removed error grows with Sigma m_nu). Suites on the pivot build:
+  lsst_y1 55, roman_real 48, all green.
 
 ## Non-Limber defaults, regenerated data vectors, and the refreeze (2026-09-28)
 
