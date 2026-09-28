@@ -1586,6 +1586,11 @@ Concretely:
   once far away.
 - **Every constant** carries a comment with the meaning of the chosen
   value (why 0.2, why 4 threads, why this list of nine cosmologies).
+- **Blocked vocabulary**, in ALL documentation (READMEs, C/C++
+  comments, Python docstrings): "accessor". Say what the function
+  does instead - the lookup function, the table read - or name the
+  function itself. The list grows as the maintainer flags words;
+  check it before reaching for computer-science jargon.
 - Python prose follows the anti-AI rules of Section 3.6 in full.
 
 ### 8.3 Scope discipline
@@ -1813,6 +1818,12 @@ measurements are kept there on purpose).
 
 - Function signatures: one argument per line, a short comment per
   argument.
+- Fenced headers carry a "Cache invalidation:" section; the label sits
+  on its own line and the explanation starts on the next line:
+
+      // Cache invalidation:
+      // recomputes when any of these change:
+      //   cosmology.random, nuisance.random_photoz_shear, ...
 - No single-letter variable names (they defeat grep); name any magic
   number that appears twice.
 - All statics declared at the top of the function.

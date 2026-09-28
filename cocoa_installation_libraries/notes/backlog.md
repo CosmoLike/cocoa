@@ -504,6 +504,66 @@ README. To reopen a ticket, move its content back under
 [Open tickets](#open-tickets) as a full ticket section and add its
 `- OPEN` index line.
 
+## sigma2(M): lobe-summed quadrature, the 14.1 cutoff retired (2026-09-28)
+
+- **Implemented** (cosmolike_core 080347a + one binding commit per
+  project): the mass-variance quadrature integrates lobe by lobe
+  between the zeros of the top-hat window (roots of tan x = x,
+  McMahon start + Newton), one low-order Gauss-Legendre rule per
+  single-bump segment, stopping when the near-geometric tail bound
+  s_j r/(1 - r) drops below 1e-7 of the running total. The node
+  cache (nodes, weights folded with 9 j1^2, segment offsets) is
+  mass-independent and Ntable-keyed; sigma2_work fills the whole
+  table threaded over masses with one p_lin read + fma per node.
+  int_for_sigma2 and the fixed x < 14.1 cutoff are DELETED;
+  sigma2_nointerp is the one-mass point diagnostic. The cached
+  table upsamples from Ntable.N_M_internal = 192 coarse ln M nodes
+  (house cubic spline in ln sigma^2); the knob joined
+  init_accuracy_boost's ladder.
+- Measured: the old cutoff cost up to 4.577e-3 relative in sigma^2
+  (worst at M = 2e12 Msun/h; median 5.7e-4 over 1e10..1e16) - the
+  cutoff sat just past the window's 4th zero (14.0662) with no
+  stated error budget. Table upsampling + interpolation: max
+  2.7e-5. Stage-2 point diagnostic bitwise-reproduces the stage-1
+  lobe values; OMP 1 vs 4 bitwise identical; suites lsst_y1 57 +
+  roman_real 50.
+
+- **Implemented** (cosmolike_core 0172c0e + one binding commit per
+  project): C_gk_tomo_limber and C_ks_tomo_limber adopt the internal
+  coarse ell grid (exact quadrature on Ntable.N_ell_internal nodes,
+  the house cubic spline upsampled onto the unchanged N_ell table,
+  workspace static in the Ntable rebuild block, threaded
+  evaluation); C_gg alone keeps the exact grid. The four dC_X/dlnk
+  scale-cut tables coarsen in 2D through the new
+  spline2d_upsample_uniform (basics.c: tensor-product natural
+  bicubic, two passes of the house 1D spline, precomputed direct
+  indices): the ell axis follows N_ell_internal, the ln k axis gets
+  Ntable.dCX_dlnk_nlnk_internal (default 0 = exact; ln k carries
+  the BAO wiggles). init_accuracy_boost became the global super
+  function - one call scales every sampling knob, internal grids
+  and FPT_internal_accuracy_boost included, from first-call
+  baselines, so the coarse/dense ratios are boost-invariant -
+  recorded in the cosmolike-dev skill with the rule that every new
+  sampling knob joins its ladder.
+- Validated: lsst_y1 frozen chi2 3.4316970976e-02 bitwise (3x2pt
+  untouched by gk/ks); desy1xplanck 6x2pt exact-vs-192 dv max rel
+  1.159e-05 (median 2.2e-07), chi2 delta 4.3e-08; suites lsst_y1
+  57, roman_real 50, desy1xplanck 45, all green. Scale-cut impact
+  measured through RF, the real consumer (the dlnC batch reads
+  compute on caller grids and bypass the cached tables): ell at
+  192, max |dRF| 3.2e-3 ss / 4.3e-3 ks (medians 2e-16 / 8e-5);
+  k at 192-of-256 adds a similar 3.2e-3 / 3.5e-3 - RF integrates
+  |dlnC/dlnk| over ln k, so wiggle interpolation errors partly
+  cancel. Also fixed in passing: a factor-2 error in the
+  spline_coeffs_uniform header derivation (the code was always
+  right).
+- Ticket-B evidence from the A/B: on desy1xplanck the fresh chi2 at
+  internal=192 depends on how many pre-first-evaluation
+  Ntable.random bumps ran (8.6002538251e-06 after one init call,
+  8.5994603071e-06 after two; the exact path is bump-invariant in
+  the same comparison) - the invalidation-sequence dependence the
+  cache-hardening ticket hunts.
+
 ## Sector-ladder cache-consistency test (2026-09-28)
 
 - **Implemented** (one commit per project, all six):
