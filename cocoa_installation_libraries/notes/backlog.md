@@ -30,91 +30,16 @@ features, Low bugs, Low features.
 
 ## Open ticket index
 
-### High
-
-- OPEN **HIGH** **NEW FUNCTIONALITY** — [Non-Limber galaxy-galaxy lensing (C_gs exact)](#open-nonlimber-ggl)
-
 ### Medium
 
 - OPEN **MEDIUM** **NEW FUNCTIONALITY** — [Move C_gk and C_ks onto the _work batch API](#open-cosmo2d-gk-ks-work)
+- OPEN **MEDIUM** **NEW FUNCTIONALITY** — [Choose the non-Limber ggl default for LSST-Y1 and Roman](#open-ggl-limber-default)
 
 ### Low
 
 - OPEN **LOW** **NEW FUNCTIONALITY** — [IA x higher-order-bias (gb2) cross terms in cfastpt](#open-cfastpt-gb2-ia-bias)
 - OPEN **LOW** **NEW FUNCTIONALITY** — [Finish the Compton-y port (C_gy, C_ys, C_ky, C_yy)](#open-compton-y-port)
-
-<a id="open-nonlimber-ggl"></a>
-## Non-Limber galaxy-galaxy lensing (C_gs exact)
-
-### High-level summary
-
-Galaxy-galaxy lensing has no non-Limber computation in Cocoa: w_gammat
-projects the Limber C_gs at every multipole, while galaxy clustering
-runs the exact (non-Limber) C_gg at low multipoles through the cfftlog
-pipeline. The original cosmolike_core has the exact ggl computation
-(cluster_chto branch, theory/cosmo2D_exact.c); the math must be
-verified against that reference and the FKEM literature, and the
-implementation must land in cosmo2D.c in the optimized house form the
-gg non-Limber uses (cfftlog_ells_cocoa0 with the hoisted
-ell-independent forward FFT, per-bin early exit into the Limber
-continuation, no per-ell scalar quadratures).
-
-### Current status
-
-**Ticket type: NEW FUNCTIONALITY.**
-
-**OPEN.** Math verified and design done (2026-09-27): the reference
-is FKEM-correct physics with real code bugs — a Legendre-kernel typo
-(Pmin[l+1]-Pmax[l] must be Pmax[l+1]; orders of magnitude at l = 2,
-~1% at l = 10 — Cocoa's w_gammat kernel is already correct and must
-not be overwritten), uninitialized l = 1 entries, and a dead early
-exit. The reference keeps non-Limber for density, RSD, magnification,
-the spin-2 lensing kernel, and NLA IA; Limber only for the
-(P_NL - P_lin) correction (FKEM bound < 0.35%). Design and open
-questions (RSD gating, magnification, switch multipole, yaml
-exposure of adopt_limber_gs) in the phase-A design doc;
-implementation awaits the maintainer's answers.
-
-**Severity: HIGH.** This is the last missing exact projection of the
-3x2pt family, and the default-Limber choice for ggl needs per-project
-evidence, not folklore.
-
-### What is already in place
-
-The gg non-Limber machinery: C_cl_tomo and the cfftlog pipeline
-(cfftlog_ells_cocoa0), the per-bin early exit, and the
-like.adopt_limber_gg switch (0 everywhere, so gg always runs
-non-Limber below the switch multipole). The batched Limber
-C_gs_tomo_limber_work/_nointerp_ells/_batch design that the exact
-computation hands over to.
-
-### What is missing
-
-The exact C_gs at low multipoles (density side non-Limber; verify
-against the reference which kernels — magnification, IA, lensing —
-the reference keeps Limber and why), wired into w_gammat_tomo the way
-w_gg_tomo consumes the gg pipeline; a like.adopt_limber_gs switch
-analogous to like.adopt_limber_gg, DEFAULTING TO LIMBER-ONLY
-(non-Limber off: the correction is subdominant for ggl, unlike gg);
-and one unit test per project (all six) quantifying the
-Limber-vs-non-Limber difference on the ggl block, which is the
-evidence backing that default.
-
-<details><summary>Technical record</summary>
-
-- Reference: github.com/CosmoLike/cosmolike_core branch cluster_chto,
-  theory/cosmo2D_exact.c (the exact ggl integrals; FKEM 1911.11947).
-- Owner: cosmo2D.c/h (exact C_gs + w_gammat_tomo wiring),
-  structs.c/h + generic_interface.cpp (the adopt_limber_gs flag,
-  mirroring adopt_limber_gg's plumbing), every project's tests/.
-- adopt_limber semantics today: w_gg_tomo(nt, ni, nj, limber) receives
-  like.adopt_limber_gg; 0 selects the non-Limber path. The gs flag
-  mirrors the plumbing with the opposite shipped value.
-- The gg pipeline's correctness bar applies: the per-bin early exit
-  must converge to the no-early-exit fallback, chi2 exact in the
-  default build, determinism across thread counts.
-
-</details>
+- OPEN **LOW** **NEW FUNCTIONALITY** — [Skip empty radial slots in cfftlog_ells_p2](#open-cfftlog-empty-slots)
 
 <a id="open-cosmo2d-gk-ks-work"></a>
 ## Move C_gk and C_ks onto the _work batch API
@@ -175,6 +100,57 @@ ride along or follow.
   accuracy; keep it so the migration is quadrature-neutral.
 - The exact low-multipole paths live in the C_gg/gk/ks fill sections
   (the `Cl[nz][l] = C_XY_nointerp((double) l, ...)*cmbf[l]` loops).
+
+</details>
+
+<a id="open-ggl-limber-default"></a>
+## Choose the non-Limber ggl default for LSST-Y1 and Roman
+
+### High-level summary
+
+Galaxy-galaxy lensing ships Limber-only (`adopt_limber_gs: 1`) on the
+premise that its non-Limber correction is small. The per-project
+unit tests (`tests/test_nonlimber_ggl.py`) measure the cost of that
+default as delta^T C^-1 delta between the two data vectors at the
+frozen fiducial: small for DES, not small for LSST-Y1 and Roman.
+
+### Current status
+
+**Ticket type: NEW FUNCTIONALITY.**
+
+**OPEN.** Evidence measured (2026-09-27, NLA, frozen fiducials):
+
+| project | example | delta chi2 |
+|---|---|---|
+| lsst_y1 | 3x2pt | 1.86 |
+| roman_kl | 3x2pt (Fourier) | 1.63 |
+| roman_fourier | 3x2pt (Fourier) | 1.30 |
+| roman_real | 3x2pt | 0.49 |
+| des_y3 | Y3 3x2pt | 0.011 |
+| desy1xplanck | 6x2pt | 0.0037 |
+
+The contributions come from the pairs with lens bin = source bin and,
+for lsst_y1, from pairs with the source bin in front of the lens bin
+(intrinsic alignment times lens density, two narrow kernels).
+
+**Severity: MEDIUM.** A per-project default choice; the non-Limber
+path costs ~50 ms per evaluation (lsst_y1, one thread).
+
+### What is already in place
+
+`like.adopt_limber_gs` with its yaml key in every ggl likelihood, the
+non-Limber real-space and Fourier-space paths, and the six tests.
+
+### What is missing
+
+The maintainer's decision per project (flip the yaml default for
+LSST-Y1/Roman, or exclude the same-bin pairs, or keep Limber), then
+update the tests' recorded values if the default changes.
+
+<details><summary>Technical record</summary>
+
+- The tests assert the measured delta chi2 to 5% and print the
+  per-pair contributions (block alone).
 
 </details>
 
@@ -301,6 +277,43 @@ wire probes and bindings, and validate against the original cosmolike.
 
 </details>
 
+<a id="open-cfftlog-empty-slots"></a>
+## Skip empty radial slots in cfftlog_ells_p2
+
+### High-level summary
+
+`C_gs_tomo` sends every radial row through all three FFTLog slots of
+`cfftlog_ells_p2`, but most slots hold zeros: source rows use slot 2
+only, lens rows use slot 1 only with include_RSD_GS and slot 2 only
+with bmag != 0. With the defaults 10 of the 30 row-slots of lsst_y1
+carry data, so two thirds of the inverse FFTs transform zeros.
+
+### Current status
+
+**Ticket type: NEW FUNCTIONALITY.**
+
+**OPEN.** Idea stage (2026-09-27).
+
+**Severity: LOW.** The non-Limber ggl path is off by default; it
+costs ~50 ms per evaluation on lsst_y1 (one thread).
+
+### What is already in place
+
+The per-row skip (`converged` rows) inside `cfftlog_ells_p2`.
+
+### What is missing
+
+A per-(row, slot) skip mask passed to `cfftlog_ells_p2` (C_cl_tomo
+passes none), `perf stat -r 3` before and after, and bitwise-equal
+C_gs.
+
+<details><summary>Technical record</summary>
+
+- Owner: `cosmolike_core/cosmolike/cosmo2D.c` (`cfftlog_ells_p2`,
+  `C_gs_tomo`, `C_cl_tomo`).
+
+</details>
+
 # Closed tickets
 
 Grouped by subject and compressed. Nothing here is open work; dated
@@ -308,6 +321,84 @@ measurements are kept, since this section is a decision record, not a
 README. To reopen a ticket, move its content back under
 [Open tickets](#open-tickets) as a full ticket section and add its
 `- OPEN` index line.
+
+## Non-Limber galaxy-galaxy lensing and the gg batch API (2026-09-27)
+
+- **Non-Limber C_gs shipped** (cosmolike_core): `C_gs_tomo`, the
+  FKEM split (arXiv:1911.11947) in the house FFTLog design (hoisted
+  forward FFT, per-pair early exit, Limber continuation), with lens
+  rows on the Limber lens range (magnification foreground kept),
+  one combined lensing + NLA source kernel per source bin, and the
+  subtracted Limber term in separable growth. Both Limber terms come
+  from the batched `C_gs_tomo_limber_linpsopt_nointerp_ells`
+  (`use_linear_ps` switch in `C_gs_tomo_limber_work`, bitwise neutral
+  at 0). `C_gs_tomo_ells` adds the correction to Fourier band centers
+  (interpolated between integer l). `like.adopt_limber_gs` (default
+  1) with `init_adopt_limber_gs`, the yaml key in every ggl
+  likelihood of the six projects, `w_gammat_tomo` keyed on the flag,
+  and one `tests/test_nonlimber_ggl.py` per project. The reference
+  code (cluster_chto `cosmo2D_exact.c`) was not ported line by line:
+  its gamma_t Legendre kernel has a typo (Pmin[l+1]-Pmax[l] for
+  Pmax[l+1]; wrong by orders of magnitude at l = 2), its l = 1 terms
+  are uninitialized, its early exit is dead code, and its RSD uses the
+  gamma approximation f = Omega_m(z)^0.55.
+- **Validation (lsst_y1 3x2pt fiducial).** FFTLog term vs a
+  brute-force double integral (scipy spherical_jn, 20000-point chi
+  grid, same kernels): 1e-6 to 1e-4 relative for l >= 3 in all 25
+  pairs (~1% at l = 2 for the highest lens bin). FFTLog -> Limber at
+  l = 149: ~1e-4 for lens-in-front pairs. Early exit vs none within
+  the 1% tolerance. Default data vectors bitwise equal to HEAD (full
+  precision). Debug build (UBSan, scalar fallbacks) and aggressive
+  build agree with the default to 8e-13 and 6e-12 in lens-bin units;
+  OMP 1 vs 8 bitwise; repeated calls bitwise.
+- **gg batch API.** `C_gg_tomo_limber_work` + `_linpsopt_nointerp_ells`
+  / `_nointerp_ells` / `_nointerp_batch` in the ss/gs design, same
+  128-point rule as the scalar path; the table, the w_gg low-l loop,
+  the C_cl_tomo Limber pair, the Fourier gg data vector and the
+  notebook wrapper moved onto it. Batch vs scalar: 2.2e-15 relative;
+  w(theta) moves by 3.3e-14. Cost: 33 ms vs 45 ms (1750 l x 5 bins,
+  one thread; W_RSD and P_delta dominate). The measurement of the gs
+  batch Limber pair: 3.3 ms vs 51 ms scalar (25 pairs x 150 l).
+- **Aggressive-mode n(z) fix.** Under COSMOLIKE_AGGRESSIVE_MODE the
+  `arma::find(nofz > c*nofz.max())` of set_lens/source_sample
+  returned an empty list for a valid column once this work changed the
+  code generation of generic_interface.cpp (HEAD happened to escape).
+  The bin-support search is two plain loops, with identical results
+  in the default build.
+- **Non-Limber C_gg growth fix (kept 2026-09-28, references not
+  refrozen by the maintainer's decision).** `C_cl_tomo` subtracted
+  C_limber(P_lin) with CAMB's p_lin(k, a) while its FFTLog term uses
+  the separable D(z1) D(z2) P_lin(k, 0); D(a)^2 differs from
+  P_lin(k,a)/P_lin(k,0) by 0.7% (z = 0.3) to 1.6% (z = 1), so the pair
+  never cancelled at high l (-0.85% to -1.6% at l = 149; the 1% early
+  exit fired near l = 50 on the crossing of the decaying non-Limber
+  excess with the offset). The subtracted term uses D(a)^2
+  P_lin(k, 0) (batch and scalar integrands); mismatch at l = 149:
+  0.02% to 0.17%. w(theta) delta^T C^-1 delta: lsst_y1 1.52, des_y3
+  0.168 (Y3) / 0.030 (Y1), desy1xplanck 0.0092, roman_real 0.0083,
+  Fourier projects 0. The lsst_y1 3x2pt/2x2pt reference checks fail
+  by 1.43 to 1.52 until a refreeze; the other projects stay within
+  the 0.2 limit. Each real-space project's tests/README.md explains
+  it in an appendix FAQ.
+- **Two pre-existing bugs found by the full test suites.** (1) The
+  python FAST-PT setters `set_IA_PS`/`set_bias_PS` replaced
+  `FPTIA/FPTbias.tab` but left `tab_int` aliasing the freed table;
+  the next cfastpt rebuild freed it again (malloc abort in
+  `get_FPT_IA`, lsst_y1 suite, also in crash reports of 2026-09-26).
+  The setters re-alias `tab_int`, and `get_FPT_IA`/`get_FPT_bias`
+  rebuild whenever `tab` is not the table they allocated
+  (cfastpt -> FAST-PT -> cfastpt reproduces the first chi2 exactly).
+  (2) The static ggl pair maps (`test_zoverlap`, `ZL`, `ZS`, `N_ggl`)
+  were filled once per process, so a cosmic-shear model built after a
+  3x2pt model with another `ggl_exclude` list miscounted the pairs
+  (roman_kl: "IP::set_mask: inconsistent mask"). They rebuild on
+  `tomo.random_ggl`, refreshed by `init_ntomo_powerspectra` and
+  `init_ggl_exclude`, which also warms them single-threaded.
+- **Suites (2026-09-28, one project at a time):** roman_real 47
+  passed, roman_fourier 42, roman_kl 46, lsst_y1 48 passed and 6
+  failed (the frozen 3x2pt/2x2pt references, off by the gg growth
+  fix's delta chi2 of 1.43-1.52); des_y3 60 and desy1xplanck 42 on
+  the build before the two bug fixes.
 
 ## Scale-cut diagnostics for C_ks and w_ks (2026-09-27)
 
