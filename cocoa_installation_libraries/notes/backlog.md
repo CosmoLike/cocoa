@@ -32,7 +32,6 @@ features, Low bugs, Low features.
 
 ### Medium
 
-- OPEN **MEDIUM** **BUG** — [Correctness follow-ups from the 2026-09-28 review](#open-review-correctness)
 - OPEN **MEDIUM** **BUG** — [Cache-key hardening for in-process reconfiguration](#open-cache-key-hardening)
 - OPEN **MEDIUM** **NEW FUNCTIONALITY** — [Cache the Fourier non-Limber band-center corrections](#open-fourier-nonlimber-cache)
 
@@ -42,92 +41,6 @@ features, Low bugs, Low features.
 - OPEN **LOW** **NEW FUNCTIONALITY** — [Finish the Compton-y port (C_gy, C_ys, C_ky, C_yy)](#open-compton-y-port)
 - OPEN **LOW** **NEW FUNCTIONALITY** — [Skip empty radial slots in cfftlog_ells_p2](#open-cfftlog-empty-slots)
 - OPEN **LOW** **NEW FUNCTIONALITY** — [Internal coarse ell grid for the C_ss/C_gs Limber tables](#open-internal-ell-grid)
-
-<a id="open-review-correctness"></a>
-## Correctness follow-ups from the 2026-09-28 review
-
-### High-level summary
-
-The full-code review of 2026-09-28 (five reviewers over cosmo2D.c,
-cosmo3D.c, redshift_spline.c, radial_weights.c, generic_interface.cpp,
-pt_cfastpt.c and the wrappers) confirmed the shipped physics but
-collected a batch of latent defects, none on the frozen-reference
-paths. Fixing them is one mechanical sweep with the exact locations
-below.
-
-### Current status
-
-**Ticket type: BUG.**
-
-**OPEN.** Confirmed by reading, none fixed:
-
-- `sigma2_nointerp` (cosmo3D.c): `double ar[1] = {R}` but the
-  integrand reads `ar[1]` as the scale factor - an out-of-bounds
-  stack read; the function's `a` argument never reaches `p_lin`.
-  `sigma2()` tables at a = 1.0 and halo.c applies growth itself, so
-  the garbage scale factor silently shifts halo-path quantities.
-  Fix: `double ar[2] = {R, a}`.
-- `set_nuisance_nonlinear_bias` (generic_interface.cpp): bs2 =
-  -(4/7)(b1 - 1) recomputed only when b2(i) changed; a b1-only update
-  with b2 fixed leaves bs2 stale (matters whenever b2 != 0).
-- `init_probes` (generic_interface.cpp): the probe key is lowercased
-  for probe_map but `names.at()` uses the original-case string, so an
-  uppercase probe name sets the flags and then throws an uncaught
-  std::out_of_range at the debug print.
-- `zmean_source` (redshift_spline.c): the two cache stamps are stored
-  swapped relative to the guard (guard reads [0] = Ntable.random,
-  [1] = random_shear; the store writes them the other way), so the
-  table and workspace rebuild on every call.
-- `set_source_sample` bumps redshift.random_shear AFTER its
-  `nz_source_photoz` warm-up while `set_lens_sample` bumps before: a
-  second sample install in one process warms the stale sample and
-  leaves the first real rebuild to a possibly parallel caller.
-- `N_ggl` (redshift_spline.c): rebuild guard `N[0][0] < 0` while
-  excluded pairs store -1; a `ggl_exclude` containing pair (0, 0)
-  (roman_kl) rebuilds the map on every call. Fix: `< -1` (the -42
-  sentinel still triggers; -1 is a legal entry).
-- `chi_all` #else fallback (cosmo3D.c): the "up" slope reads index
-  j+2 without the clamp the piecewise variant has - one past the row
-  end when z falls in the last bracket.
-- `f_growth`/`norm_growfac_all` at exactly z = 0: dlnGdlnz carries a
-  factor z, so -dlnGdlnz*(1+z)/z is 0/0 -> NaN.
-- `f_K` (cosmo3D.c): the inline "// open"/"// closed" labels are
-  swapped (the formulas are correct).
-- cosmo2D_scuts.c dlnxi normalization swap (`xi_pm_tomo(p, ...)`
-  where 1-p is meant), reported 2026-09-27.
-- `W_RSD` (radial_weights.c) admits ni = -1 (fatal only downstream);
-  two scuts wrapper array overloads print the wrong function name in
-  their error messages (dlnC_ss/RF_C_ss print dC_ss).
-
-**Severity: MEDIUM.** Nothing reaches the shipped likelihood paths at
-the frozen settings; the sigma2 and bs2 items bite the halo path and
-any b2 != 0 chain, so the sweep should come before those are used in
-anger.
-
-### What is already in place
-
-Exact locations and failing conditions, from the 2026-09-28 review
-reports.
-
-### What is missing
-
-The one-sweep fix with the standard validation (chi2 bitwise at the
-frozen fiducials in the default build, the three build modes, one
-suite run).
-
-<details><summary>Technical record</summary>
-
-- Cleanup batch to ride along: duplicate `#include <cmath>` in both
-  wrapper files; the unused `has_b2_galaxies` copy in
-  cosmo2D_wrapper.cpp; the dead commented w_ks block (sizes by
-  shear_nbin, loops clustering_nbin); `g_lens`'s unused amin_shear;
-  `malloc2d(...);;` double semicolons (3x in cosmo2D.c); the unbound
-  scalar `C_gg_tomo_limber_cpp(double, int)` overload (bind like the
-  gs one or drop); `C_ss_tomo_limber`'s table lower edge uses
-  log(LMIN_tab - 1) where the other probes use log(LMIN_tab)
-  (document or align).
-
-</details>
 
 <a id="open-cache-key-hardening"></a>
 ## Cache-key hardening for in-process reconfiguration
@@ -457,6 +370,29 @@ measurements are kept, since this section is a decision record, not a
 README. To reopen a ticket, move its content back under
 [Open tickets](#open-tickets) as a full ticket section and add its
 `- OPEN` index line.
+
+## Correctness sweep of the 2026-09-28 review findings (2026-09-28)
+
+- **All confirmed defects fixed in one pass** (cosmolike_core
+  c4aa392): the sigma2_nointerp out-of-bounds ar[1] read (the scale
+  factor now reaches p_lin), the chi_all fallback j+2 clamp, finite
+  f_growth/norm_growfac_all at exactly z = 0 (all four variants,
+  z > 0 branch bit-identical), the swapped f_K open/closed labels,
+  the swapped zmean_source cache stamps (table rebuilt every call),
+  the N_ggl < -1 rebuild guard (an excluded pair (0, 0) rebuilt the
+  map per call), the W_RSD bin guard, the stale bs2 on b1-only
+  updates, the set_source_sample bump-before-warm-up order, the
+  init_probes mixed-case out_of_range, the init_ggl_exclude
+  odd-length refusal, the dlnxi normalization swap (1 - p; reported
+  2026-09-27), and the RF_C_ss/RF_C_ks vanishing-denominator guard
+  (the BB plane under NLA was 0/0 = NaN). Cleanups: misattributed
+  fname strings, wrong wrapper error names, dead has_b2 copy and the
+  disabled flat-vector block, double semicolons, the gg scalar
+  wrapper overload declared.
+- Validated: frozen lsst_y1 references reproduce the pivot-build
+  values at all compared digits; test_scale_cut_diagnostics 4/4
+  (the dlnxi and RF changes live under its assertions); suites
+  lsst_y1 55, roman_real 48, green.
 
 ## Per-bin pivot for the FKEM separable spectrum (2026-09-28)
 
