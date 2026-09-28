@@ -563,6 +563,30 @@ README. To reopen a ticket, move its content back under
 [Open tickets](#open-tickets) as a full ticket section and add its
 `- OPEN` index line.
 
+## Scale-cut refill: coarse dln caches and the 128 default (2026-09-28)
+
+- **Implemented** (cosmolike_core 1f67c0b + one binding commit per
+  project): the dlnxi/dlnw_ks caches - the measured owner of the
+  scale-cut refill, one full nointerp Legendre build per ln k node -
+  run their exact builds on the coarse nodes of the scale-cut k
+  knob, and the house cubic spline upsamples every row onto the
+  unchanged 256-node grid. The nointerp node fills read the dC
+  tables' two bracketing k-rows through the new dCss_/dCks_ sharing
+  structs via the file-local limber_krow_blend (SIMDe: contiguous
+  loads and one fused multiply-add per lane - no gathers, since the
+  weight and row offset are shared by every entry, unlike
+  limber_fill_interp's per-multipole indices).
+- The knob default moved 0 -> 128 from measurement (roman_real):
+  refill 5.628 -> 2.788 s (2.0x; 96 gives 2.107 s = 2.7x; 192 gives
+  4.317 s), max |dRF| 2.8e-3 ss / 5.9e-3 ks with ~1e-6 medians - at
+  or below the response error the retired quadrature imposed; chi2
+  is knob-independent, and the shipped default was verified end to
+  end (2.795 s with no knob calls). The RF workers keep their
+  scalar cache sampling: measured at 1.1 ms warm, nothing to win -
+  the third attribution lesson of the day, this one caught before
+  implementing. Suites lsst_y1 57 + roman_real 50 on the shipped
+  default.
+
 ## RF workers: closed-form cumulative, quadrature retired (2026-09-28)
 
 - **Implemented** (cosmolike_core 6e160ac): RF(kmax) integrates
