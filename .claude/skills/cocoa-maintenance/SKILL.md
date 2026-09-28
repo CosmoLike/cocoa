@@ -1194,7 +1194,13 @@ there):
    vectors are NOT rebuilt by `--overwrite`, and the drift tests
    fail on missing files until this step runs. (`--tatt-masks`
    exists as the analogous incremental mode for the per-mask
-   descriptors alone: pure text, no evaluations.)
+   descriptors alone: pure text, no evaluations.) `--baryons` is
+   ALSO required, without any `--overwrite`, after every core commit
+   that changes the shear prediction: test_accuracy_baryons
+   regenerates its vectors in place over the frozen drift files, so
+   a shear-model change makes that rewrite differ from the manifest
+   and every later test class errors at verify_frozen until the
+   re-pin.
 4. The full pytest suite.
 5. Reconcile the printed chi2 values old-vs-new BEFORE committing: a
    refreeze absorbs EVERYTHING that changed since the last one, so

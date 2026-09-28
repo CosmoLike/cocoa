@@ -39,7 +39,6 @@ features, Low bugs, Low features.
 
 - OPEN **LOW** **NEW FUNCTIONALITY** — [IA x higher-order-bias (gb2) cross terms in cfastpt](#open-cfastpt-gb2-ia-bias)
 - OPEN **LOW** **NEW FUNCTIONALITY** — [Finish the Compton-y port (C_gy, C_ys, C_ky, C_yy)](#open-compton-y-port)
-- OPEN **LOW** **NEW FUNCTIONALITY** — [Internal coarse ell grid for the C_ss/C_gs Limber tables](#open-internal-ell-grid)
 
 <a id="open-cache-key-hardening"></a>
 ## Cache-key hardening for in-process reconfiguration
@@ -80,6 +79,18 @@ directly can hit each one.
 - init_binning_fourier/init_binning_real_space/init_probes/
   init_survey/init_bias draw no cache-busting random: a mid-process
   change does not invalidate Ntable.random-keyed tables.
+- CONFIRMED AND MEASURED (2026-09-28, found while validating the
+  internal ell grid): a bare post-initialize Ntable.random bump -
+  init_ntable_ell_internal called with the DEFAULT value, so no
+  setting changes - deterministically shifts the lsst_y1 frozen
+  fiducial chi2 by 2.5e-4 (3.4317e-2 -> 3.4065e-2). Some state built
+  during likelihood initialization is Ntable-coupled but rebuilds to
+  different values on a bump; init_ntable_lmax and every accuracy
+  init that bumps Ntable.random share the trigger. Reproduction:
+  build the frozen lsst_y1 example2 model, call
+  ci.init_ntable_ell_internal(nell_internal=192), evaluate. The
+  planned sector-ladder cache test would have caught this class;
+  finding the stale consumer is the first task of this ticket.
 
 **Severity: MEDIUM.** Latent, notebook-reachable; each fix is one
 key plus one warm-up in the established idiom.
@@ -127,80 +138,6 @@ functions are pure of static state, so the cache wraps cleanly.
 
 The cached wrapper and a timing note in the two project READMEs.
 
-
-<a id="open-internal-ell-grid"></a>
-## Internal coarse ell grid for the C_ss/C_gs Limber tables
-
-### High-level summary
-
-The maintainer's proposal (2026-09-28): the internal/external
-accuracy-boost trick, applied to the ell axis of the interpolation
-tables. The real-space projections MUST keep Ntable.N_ell = 512 with
-linear interpolation - the Legendre sums interpolate ~100k multipoles
-up to LMAX through the vectorized gather fill, and that contract is
-not negotiable. But the tables' construction cost is 512 x N_pairs
-Limber quadratures, and C_l^ss and C_l^gs are smooth in ln l: build
-the cache from an internal coarse grid (~128-192 log-spaced exact
-quadrature nodes over the same [LMIN_tab, LMAX] range) and upsample
-to the identical 512-node table with a cubic spline at cache-build
-time. Everything downstream is unchanged; the quadrature count drops
-3-4x. Especially important for roman_real and roman_kl, whose 10
-source bins put 55 shear pairs and the largest ggl pair counts
-behind these tables.
-
-### Current status
-
-**Ticket type: NEW FUNCTIONALITY.**
-
-**OPEN.** Reviewed 2026-09-28; the logic holds for ss and gs (both
-lensing-kernel-smoothed, no sharp ln-l features; cubic-spline
-upsampling error ~1e-5 to 1e-7 relative, below the method floor).
-C_gg stays OUT of the first pass: its auto spectra carry BAO wiggles
-in the relevant l range and need the fine exact grid or a separate
-validation of their own.
-
-**Severity: LOW** (a per-evaluation table-build cost, largest for
-the Roman configurations).
-
-### What is already in place
-
-The two-grid precedent (FAST-PT internal_accuracyboost: internal
-grid + spline, external grid fixed), the batched
-C_ss/C_gs_tomo_limber_nointerp_ells entry points that evaluate any
-ell list at one call, and the cubic-spline utilities in basics.c.
-
-### What is missing
-
-1. An internal node-count knob in the internal_accuracyboost spirit
-   (exact-512 behavior one setting away: the A/B switch for
-   validation).
-2. The cache-build change inside C_ss_tomo_limber and
-   C_gs_tomo_limber only: batch-evaluate the coarse grid, spline per
-   (pair, component) row, sample onto the unchanged 512-node table.
-3. Validation: max relative table difference exact-512 vs upsampled
-   per pair and component (EE and BB); chi2 at the frozen fiducials
-   inside tolerance with the shift recorded; determinism; the three
-   build modes; timing on roman_real and roman_kl.
-
-<details><summary>Technical record</summary>
-
-- The confirmed edit site (maintainer, 2026-09-28): the cache-build
-  block of C_ss_tomo_limber - the C_ss_tomo_limber_work(&cn, lx,
-  nell, ...) call under the five-key rebuild guard - and its C_gs
-  analog: hand the work engine a coarse lx, spline each (pair,
-  component) row, sample onto the unchanged 512-node table.
-- C_gg_tomo_limber's header gains an explicit warning against
-  applying the upsampling trick to gg (BAO wiggles sit in the
-  relevant ell range and need the fine exact grid).
-- The spline must run at cache-build time so the hot fill path
-  (limber_fill_interp, linear on 512 nodes) is byte-identical in
-  structure.
-- BB rows under TATT are small but equally smooth; under NLA the ss
-  BB row is identically zero and splines trivially.
-- The table range starts at LMIN_tab, so the high-curvature l < 20
-  region never enters these tables.
-
-</details>
 
 <a id="open-cfastpt-gb2-ia-bias"></a>
 ## IA x higher-order-bias (gb2) cross terms in cfastpt
@@ -566,6 +503,25 @@ measurements are kept, since this section is a decision record, not a
 README. To reopen a ticket, move its content back under
 [Open tickets](#open-tickets) as a full ticket section and add its
 `- OPEN` index line.
+
+## Internal coarse ell grid for the C_ss/C_gs tables (2026-09-28)
+
+- **Implemented** (cosmolike_core a3d19e2 + one binding commit per
+  project): the exact quadrature runs on Ntable.N_ell_internal
+  log-spaced nodes (default 192) and a cubic spline in ln l upsamples
+  each (component, pair) row onto the unchanged 512-node table at
+  cache-build time; init_ntable_ell_internal (bound in all six
+  projects, 0 = exact) is the A/B switch. C_gg keeps the exact grid
+  at every node, with the BAO-wiggle warning in its header.
+- Validated (lsst_y1 frozen fiducial, equal footing): data-vector
+  upsampling error max 2.1e-4 relative (median 5.6e-7), chi2 delta
+  1.9e-6; suites lsst_y1 55, roman_real 48 after the six projects
+  re-pinned their baryon drift vectors on this build (the
+  test_accuracy_baryons in-place rewrite, now documented in the
+  maintenance skill, surfaced with the first shear-touching change).
+- The A/B also exposed and recorded a pre-existing defect in the
+  cache-hardening ticket: a bare post-initialize Ntable.random bump
+  shifts the frozen fiducial chi2 by 2.5e-4.
 
 ## cfftlog activity mask: empty radial slots skipped (2026-09-28)
 
