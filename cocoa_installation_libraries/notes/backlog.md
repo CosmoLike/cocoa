@@ -129,6 +129,12 @@ frozen fiducial: small for DES, not small for LSST-Y1 and Roman.
 | des_y3 | Y3 3x2pt | 0.011 |
 | desy1xplanck | 6x2pt | 0.0037 |
 
+The same comparison for galaxy clustering (`test_nonlimber_gg.py`)
+gives 3.3 to 148, so the ggl effect is one to two orders of magnitude
+smaller, but not negligible for LSST-Y1 and Roman. The Fourier-space
+projects also default to Limber gg (delta chi2 3.34 roman_fourier,
+57.4 roman_kl), a choice for the same decision.
+
 The contributions come from the pairs with lens bin = source bin and,
 for lsst_y1, from pairs with the source bin in front of the lens bin
 (intrinsic alignment times lens density, two narrow kernels).
@@ -380,6 +386,14 @@ README. To reopen a ticket, move its content back under
   by 1.43 to 1.52 until a refreeze; the other projects stay within
   the 0.2 limit. Each real-space project's tests/README.md explains
   it in an appendix FAQ.
+- **gg Limber switch as a yaml key (2026-09-28).** `adopt_limber_gg`
+  (`init_adopt_limber_gg`; 0 = non-Limber in the real-space projects,
+  1 = Limber in roman_fourier and roman_kl, so no default changed),
+  w_gg_tomo keyed on the flag, and `C_gg_tomo_ells` for Fourier band
+  centers. `tests/test_nonlimber_gg.py` in every project measures
+  non-Limber minus Limber clustering, delta^T C^-1 delta: lsst_y1 148,
+  roman_kl 57.4, des_y3 9.26, roman_real 8.58, desy1xplanck 6.52,
+  roman_fourier 3.34 (against 0.0037-1.86 for ggl).
 - **Two pre-existing bugs found by the full test suites.** (1) The
   python FAST-PT setters `set_IA_PS`/`set_bias_PS` replaced
   `FPTIA/FPTbias.tab` but left `tab_int` aliasing the freed table;
