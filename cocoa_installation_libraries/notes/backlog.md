@@ -504,6 +504,29 @@ README. To reopen a ticket, move its content back under
 [Open tickets](#open-tickets) as a full ticket section and add its
 `- OPEN` index line.
 
+## Sector-ladder cache-consistency test (2026-09-28)
+
+- **Implemented** (one commit per project, all six):
+  `tests/test_cache_consistency.py` walks a deterministic parameter
+  ladder in one process - three cosmology-only steps, then IA-only,
+  source-photo-z, lens-photo-z and shear-calibration steps, a sector
+  the configuration does not sample dropping out (the Roman lenses
+  are the source sample; roman_kl also fixes every IA amplitude) -
+  evaluating after every step with cobaya's cache bypassed, then
+  scrambles every sector at once and returns to the ladder's final
+  point: the data vector and chi2 must reproduce bit for bit, and a
+  second instance walking the mirrored sector order must land on the
+  same vector. Every step must change the vector, each
+  shear-calibration step must equal the analytic (1+m_i)(1+m_j)
+  block rescale to 1e-12 (the ks cross scales by its source factor;
+  the point-mass term rides inside gamma_t), and a no-op update must
+  change nothing. Both IA models run: the TATT ladder exercises the
+  FAST-PT rebuild machinery NLA never touches.
+- All six projects pass (NLA + TATT, forward + mirrored). The target
+  is the partial-invalidation class the per-point suites never
+  exercise - the class of the cache-hardening ticket's measured
+  post-initialize Ntable.random bump defect.
+
 ## Internal coarse ell grid for the C_ss/C_gs tables (2026-09-28)
 
 - **Implemented** (cosmolike_core a3d19e2 + one binding commit per
@@ -515,13 +538,28 @@ README. To reopen a ticket, move its content back under
   at every node, with the BAO-wiggle warning in its header.
 - Validated (lsst_y1 frozen fiducial, equal footing): data-vector
   upsampling error max 2.1e-4 relative (median 5.6e-7), chi2 delta
-  1.9e-6; suites lsst_y1 55, roman_real 48 after the six projects
+  1.9e-6. Timing (median of 8, 4 threads; the deltas are CAMB-free -
+  the theory cost is identical in both settings and cancels):
+  lsst_y1 saves ~3 ms per evaluation, roman_real ~19.5 ms
+  (1.5037 -> 1.4842 s; ~13% of its cosmolike share), roman_kl
+  ~68 ms (2.2294 -> 2.1615 s; its 10 source bins carry the largest
+  tables) - the pair-count scaling the ticket predicted. Suites
+  lsst_y1 55, roman_real 48 after the six projects
   re-pinned their baryon drift vectors on this build (the
   test_accuracy_baryons in-place rewrite, now documented in the
   maintenance skill, surfaced with the first shear-touching change).
 - The A/B also exposed and recorded a pre-existing defect in the
   cache-hardening ticket: a bare post-initialize Ntable.random bump
   shifts the frozen fiducial chi2 by 2.5e-4.
+- Follow-up after review (cosmolike_core e1e33f8): the coarse-grid
+  workspace - nodes, prefactors, result and coefficient tables, and
+  the precomputed fine-node interval indices and offsets - is
+  allocated only in the Ntable.random-keyed rebuild block, and the
+  GSL spline objects were replaced by the house natural cubic spline
+  (spline_coeffs_uniform + direct-index Horner evaluation; both
+  grids are uniform in ln l, so there is no search and no
+  accelerator state), with the evaluation loop threaded. The lsst_y1
+  frozen fiducial chi2 3.4316970976e-02 reproduces exactly.
 
 ## cfftlog activity mask: empty radial slots skipped (2026-09-28)
 
