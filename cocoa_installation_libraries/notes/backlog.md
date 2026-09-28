@@ -32,131 +32,348 @@ features, Low bugs, Low features.
 
 ### Medium
 
-- OPEN **MEDIUM** **NEW FUNCTIONALITY** — [Move C_gk and C_ks onto the _work batch API](#open-cosmo2d-gk-ks-work)
-- OPEN **MEDIUM** **NEW FUNCTIONALITY** — [Choose the non-Limber ggl default for LSST-Y1 and Roman](#open-ggl-limber-default)
+- OPEN **MEDIUM** **BUG** — [Correctness follow-ups from the 2026-09-28 review](#open-review-correctness)
+- OPEN **MEDIUM** **BUG** — [Cache-key hardening for in-process reconfiguration](#open-cache-key-hardening)
+- OPEN **MEDIUM** **NEW FUNCTIONALITY** — [Cache the Fourier non-Limber band-center corrections](#open-fourier-nonlimber-cache)
 
 ### Low
 
+- OPEN **LOW** **NEW FUNCTIONALITY** — [Per-bin pivot redshift for the FKEM separable spectrum](#open-fkem-pivot-redshift)
 - OPEN **LOW** **NEW FUNCTIONALITY** — [IA x higher-order-bias (gb2) cross terms in cfastpt](#open-cfastpt-gb2-ia-bias)
 - OPEN **LOW** **NEW FUNCTIONALITY** — [Finish the Compton-y port (C_gy, C_ys, C_ky, C_yy)](#open-compton-y-port)
 - OPEN **LOW** **NEW FUNCTIONALITY** — [Skip empty radial slots in cfftlog_ells_p2](#open-cfftlog-empty-slots)
+- OPEN **LOW** **NEW FUNCTIONALITY** — [Internal coarse ell grid for the C_ss/C_gs Limber tables](#open-internal-ell-grid)
 
-<a id="open-cosmo2d-gk-ks-work"></a>
-## Move C_gk and C_ks onto the _work batch API
+<a id="open-review-correctness"></a>
+## Correctness follow-ups from the 2026-09-28 review
 
 ### High-level summary
 
-The CMB-lensing cross spectra C_gk and C_ks in cosmo2D.c are the last
-Fourier-space probes on the pre-batch design: their cached-table
-builders and their exact low-multipole paths call the scalar
-`C_gk/C_ks_tomo_limber_nointerp` once per multipole, each a 64-point
-Gauss-Legendre quadrature that re-evaluates every kernel per point.
-They should get the `C_ss_tomo_limber_work` treatment — precompute the
-quadrature-node kernels once, fill every (bin, multipole) output with
-vectorized inner loops — as the next step of the slow transition that
-makes the _work API the standard way cosmo2D computes in Fourier
-space.
+The full-code review of 2026-09-28 (five reviewers over cosmo2D.c,
+cosmo3D.c, redshift_spline.c, radial_weights.c, generic_interface.cpp,
+pt_cfastpt.c and the wrappers) confirmed the shipped physics but
+collected a batch of latent defects, none on the frozen-reference
+paths. Fixing them is one mechanical sweep with the exact locations
+below.
 
 ### Current status
 
-**Ticket type: NEW FUNCTIONALITY.**
+**Ticket type: BUG.**
 
-**OPEN.** C_ks is done (cosmolike_core 7c058e3, 2026-09-27):
-`C_ks_tomo_limber_work` + `_nointerp_ells`/`_batch` in the ss design
-with per-source-bin cosmo_nodes, all four consumers migrated (table
-builder, w_ks_tomo low-ell loop, both wrapper overloads), the scalar
-quadrature deleted, the 64-point rule kept. Validated on the
-desy1xplanck frozen 6x2pt: only the 33 w_ks data-vector entries move,
-at <= 9.8e-16 relative; 41-test suite green; all six projects
-compile. C_gk (and C_kk, which can ride along) remain.
+**OPEN.** Confirmed by reading, none fixed:
 
-**Severity: MEDIUM.** These spectra sit in the 6x2pt likelihood path
-(desy1xplanck evaluates gk and ks per point through the cached
-tables), so the per-point builders cost real evaluation time, and the
-two-design split invites the same drift the shear probes had.
+- `sigma2_nointerp` (cosmo3D.c): `double ar[1] = {R}` but the
+  integrand reads `ar[1]` as the scale factor - an out-of-bounds
+  stack read; the function's `a` argument never reaches `p_lin`.
+  `sigma2()` tables at a = 1.0 and halo.c applies growth itself, so
+  the garbage scale factor silently shifts halo-path quantities.
+  Fix: `double ar[2] = {R, a}`.
+- `set_nuisance_nonlinear_bias` (generic_interface.cpp): bs2 =
+  -(4/7)(b1 - 1) recomputed only when b2(i) changed; a b1-only update
+  with b2 fixed leaves bs2 stale (matters whenever b2 != 0).
+- `init_probes` (generic_interface.cpp): the probe key is lowercased
+  for probe_map but `names.at()` uses the original-case string, so an
+  uppercase probe name sets the flags and then throws an uncaught
+  std::out_of_range at the debug print.
+- `zmean_source` (redshift_spline.c): the two cache stamps are stored
+  swapped relative to the guard (guard reads [0] = Ntable.random,
+  [1] = random_shear; the store writes them the other way), so the
+  table and workspace rebuild on every call.
+- `set_source_sample` bumps redshift.random_shear AFTER its
+  `nz_source_photoz` warm-up while `set_lens_sample` bumps before: a
+  second sample install in one process warms the stale sample and
+  leaves the first real rebuild to a possibly parallel caller.
+- `N_ggl` (redshift_spline.c): rebuild guard `N[0][0] < 0` while
+  excluded pairs store -1; a `ggl_exclude` containing pair (0, 0)
+  (roman_kl) rebuilds the map on every call. Fix: `< -1` (the -42
+  sentinel still triggers; -1 is a legal entry).
+- `chi_all` #else fallback (cosmo3D.c): the "up" slope reads index
+  j+2 without the clamp the piecewise variant has - one past the row
+  end when z falls in the last bracket.
+- `f_growth`/`norm_growfac_all` at exactly z = 0: dlnGdlnz carries a
+  factor z, so -dlnGdlnz*(1+z)/z is 0/0 -> NaN.
+- `f_K` (cosmo3D.c): the inline "// open"/"// closed" labels are
+  swapped (the formulas are correct).
+- cosmo2D_scuts.c dlnxi normalization swap (`xi_pm_tomo(p, ...)`
+  where 1-p is meant), reported 2026-09-27.
+- `W_RSD` (radial_weights.c) admits ni = -1 (fatal only downstream);
+  two scuts wrapper array overloads print the wrong function name in
+  their error messages (dlnC_ss/RF_C_ss print dC_ss).
+
+**Severity: MEDIUM.** Nothing reaches the shipped likelihood paths at
+the frozen settings; the sigma2 and bs2 items bite the halo path and
+any b2 != 0 chain, so the sweep should come before those are used in
+anger.
 
 ### What is already in place
 
-The pattern, proven on ss and gs: `C_ss/C_gs_tomo_limber_work`, the
-`_nointerp_ells` batch entry points, and the vectorized
-`limber_fill_interp` gather (now shared through cosmo2D.h). The
-`C_gk/C_ks_tomo_limber_fill` gathers already exist.
+Exact locations and failing conditions, from the 2026-09-28 review
+reports.
 
 ### What is missing
 
-Write `C_gk/C_ks_tomo_limber_work` (and `_ells` wrappers) in the ss
-design, move the cached-table builders and the exact low-multipole
-integer loops onto them, migrate the cosmo2D_wrapper array overloads,
-and validate: chi2 exact on the desy1xplanck 6x2pt suite, plus the
-usual old-vs-new value comparison. C_kk shares the pattern and can
-ride along or follow.
+The one-sweep fix with the standard validation (chi2 bitwise at the
+frozen fiducials in the default build, the three build modes, one
+suite run).
 
 <details><summary>Technical record</summary>
 
-- Owner: `external_modules/code/cosmolike_core/cosmolike/cosmo2D.c`
-  (`C_gk_tomo_limber*`, `C_ks_tomo_limber*`, their `int_for_*`
-  integrands) and `cosmo2D_wrapper.cpp`.
-- The scalar quadratures use the 64-point glfixed rule at default
-  accuracy; keep it so the migration is quadrature-neutral.
-- The exact low-multipole paths live in the C_gg/gk/ks fill sections
-  (the `Cl[nz][l] = C_XY_nointerp((double) l, ...)*cmbf[l]` loops).
+- Cleanup batch to ride along: duplicate `#include <cmath>` in both
+  wrapper files; the unused `has_b2_galaxies` copy in
+  cosmo2D_wrapper.cpp; the dead commented w_ks block (sizes by
+  shear_nbin, loops clustering_nbin); `g_lens`'s unused amin_shear;
+  `malloc2d(...);;` double semicolons (3x in cosmo2D.c); the unbound
+  scalar `C_gg_tomo_limber_cpp(double, int)` overload (bind like the
+  gs one or drop); `C_ss_tomo_limber`'s table lower edge uses
+  log(LMIN_tab - 1) where the other probes use log(LMIN_tab)
+  (document or align).
 
 </details>
 
-<a id="open-ggl-limber-default"></a>
-## Choose the non-Limber ggl default for LSST-Y1 and Roman
+<a id="open-cache-key-hardening"></a>
+## Cache-key hardening for in-process reconfiguration
 
 ### High-level summary
 
-Galaxy-galaxy lensing ships Limber-only (`adopt_limber_gs: 1`) on the
-premise that its non-Limber correction is small. The per-project
-unit tests (`tests/test_nonlimber_ggl.py`) measure the cost of that
-default as delta^T C^-1 delta between the two data vectors at the
-frozen fiducial: small for DES, not small for LSST-Y1 and Roman.
+The 2026-09-28 crash fixes keyed the ggl pair maps on
+tomo.random_ggl; the same review found the remaining static state
+that survives an in-process reconfiguration it should not survive.
+None of it is reachable from the shipped pytest suites (every model
+rebuild redraws Ntable.random), but notebooks driving the C inits
+directly can hit each one.
+
+### Current status
+
+**Ticket type: BUG.**
+
+**OPEN.** The list:
+
+- FAST-PT table ownership (pt_cfastpt.c / generic_interface.cpp):
+  `owned_tab` detects a python-installed table by pointer identity;
+  a free-then-malloc of the same base address (common for equal-size
+  blocks) defeats it. Fix: a uint64 generation stamp in the FPTIA
+  and FPTbias structs, bumped by set_IA_PS/set_bias_PS, keyed in
+  get_FPT_IA/get_FPT_bias. Do NOT key on nuisance.random_ia: that
+  redraws per sampled point and would rebuild FAST-PT (~72 ms) every
+  evaluation.
+- Z1/Z2/N_shear/ZCL1/ZCL2/N_CL (redshift_spline.c): build-once maps
+  with no invalidation key; stale when bin COUNTS change in-process.
+  Natural keys exist (redshift.random_shear, random_clustering);
+  warm in init_ntomo_powerspectra beside the ggl maps.
+- C_cl_tomo statics (cosmo2D.c): CLnl/CLlin/lx and the FFT block are
+  sized with the current clustering_nbin but rekeyed only on
+  Ntable.random; add redshift.random_clustering (the class of bug
+  e7a51af fixed elsewhere).
+- `test_kmax`'s chiref (redshift_spline.c): built once, cosmology
+  dependent, never invalidated; currently dormant (no callers).
+- init_binning_fourier/init_binning_real_space/init_probes/
+  init_survey/init_bias draw no cache-busting random: a mid-process
+  change does not invalidate Ntable.random-keyed tables.
+
+**Severity: MEDIUM.** Latent, notebook-reachable; each fix is one
+key plus one warm-up in the established idiom.
+
+### What is already in place
+
+tomo.random_ggl and the init_ntomo_powerspectra warm-up show the
+pattern end to end.
+
+### What is missing
+
+The stamps, the keys, the warm-ups, and the sector-ladder cache test
+(planned per project) that exercises exactly this class.
+
+<a id="open-fourier-nonlimber-cache"></a>
+## Cache the Fourier non-Limber band-center corrections
+
+### High-level summary
+
+adopt_limber_gs = 0 is now the roman_fourier and roman_kl default,
+and C_gs_tomo_ells has no caching: every evaluation redoes C_gs_tomo
+(the FFTLog split), two 150-multipole Limber batches, and the
+band-center interpolation, about +70 ms per evaluation. The
+real-space path caches everything behind w_gammat_tomo's key set;
+the Fourier path deserves the same.
 
 ### Current status
 
 **Ticket type: NEW FUNCTIONALITY.**
 
-**OPEN.** Evidence measured (2026-09-27, NLA, frozen fiducials):
+**OPEN.** Measured 2026-09-28: roman_fourier full evaluation +26%
+with the flag on (22 -> 92 ms cosmolike time).
 
-| project | example | delta chi2 |
-|---|---|---|
-| lsst_y1 | 3x2pt | 1.86 |
-| roman_kl | 3x2pt (Fourier) | 1.63 |
-| roman_fourier | 3x2pt (Fourier) | 1.30 |
-| roman_real | 3x2pt | 0.49 |
-| des_y3 | Y3 3x2pt | 0.011 |
-| desy1xplanck | 6x2pt | 0.0037 |
-
-The same comparison for galaxy clustering (`test_nonlimber_gg.py`)
-gives 3.3 to 148, so the ggl effect is one to two orders of magnitude
-smaller, but not negligible for LSST-Y1 and Roman. The Fourier-space
-projects also default to Limber gg (delta chi2 3.34 roman_fourier,
-57.4 roman_kl), a choice for the same decision.
-
-The contributions come from the pairs with lens bin = source bin and,
-for lsst_y1, from pairs with the source bin in front of the lens bin
-(intrinsic alignment times lens density, two narrow kernels).
-
-**Severity: MEDIUM.** A per-project default choice; the non-Limber
-path costs ~50 ms per evaluation (lsst_y1, one thread).
+**Severity: MEDIUM.** A per-evaluation cost on two default
+configurations; the fix is the standard static-table-plus-randoms
+pattern around C_gs_tomo_ells (and C_gg_tomo_ells for any Fourier
+project that switches adopt_limber_gg to 0).
 
 ### What is already in place
 
-`like.adopt_limber_gs` with its yaml key in every ggl likelihood, the
-non-Limber real-space and Fourier-space paths, and the six tests.
+w_gammat_tomo's cache condition lists the exact key set; the ells
+functions are pure of static state, so the cache wraps cleanly.
 
 ### What is missing
 
-The maintainer's decision per project (flip the yaml default for
-LSST-Y1/Roman, or exclude the same-bin pairs, or keep Limber), then
-update the tests' recorded values if the default changes.
+The cached wrapper and a timing note in the two project READMEs.
+
+
+<a id="open-internal-ell-grid"></a>
+## Internal coarse ell grid for the C_ss/C_gs Limber tables
+
+### High-level summary
+
+The maintainer's proposal (2026-09-28): the internal/external
+accuracy-boost trick, applied to the ell axis of the interpolation
+tables. The real-space projections MUST keep Ntable.N_ell = 512 with
+linear interpolation - the Legendre sums interpolate ~100k multipoles
+up to LMAX through the vectorized gather fill, and that contract is
+not negotiable. But the tables' construction cost is 512 x N_pairs
+Limber quadratures, and C_l^ss and C_l^gs are smooth in ln l: build
+the cache from an internal coarse grid (~128-192 log-spaced exact
+quadrature nodes over the same [LMIN_tab, LMAX] range) and upsample
+to the identical 512-node table with a cubic spline at cache-build
+time. Everything downstream is unchanged; the quadrature count drops
+3-4x. Especially important for roman_real and roman_kl, whose 10
+source bins put 55 shear pairs and the largest ggl pair counts
+behind these tables.
+
+### Current status
+
+**Ticket type: NEW FUNCTIONALITY.**
+
+**OPEN.** Reviewed 2026-09-28; the logic holds for ss and gs (both
+lensing-kernel-smoothed, no sharp ln-l features; cubic-spline
+upsampling error ~1e-5 to 1e-7 relative, below the method floor).
+C_gg stays OUT of the first pass: its auto spectra carry BAO wiggles
+in the relevant l range and need the fine exact grid or a separate
+validation of their own.
+
+**Severity: LOW** (a per-evaluation table-build cost, largest for
+the Roman configurations).
+
+### What is already in place
+
+The two-grid precedent (FAST-PT internal_accuracyboost: internal
+grid + spline, external grid fixed), the batched
+C_ss/C_gs_tomo_limber_nointerp_ells entry points that evaluate any
+ell list at one call, and the cubic-spline utilities in basics.c.
+
+### What is missing
+
+1. An internal node-count knob in the internal_accuracyboost spirit
+   (exact-512 behavior one setting away: the A/B switch for
+   validation).
+2. The cache-build change inside C_ss_tomo_limber and
+   C_gs_tomo_limber only: batch-evaluate the coarse grid, spline per
+   (pair, component) row, sample onto the unchanged 512-node table.
+3. Validation: max relative table difference exact-512 vs upsampled
+   per pair and component (EE and BB); chi2 at the frozen fiducials
+   inside tolerance with the shift recorded; determinism; the three
+   build modes; timing on roman_real and roman_kl.
 
 <details><summary>Technical record</summary>
 
-- The tests assert the measured delta chi2 to 5% and print the
-  per-pair contributions (block alone).
+- The confirmed edit site (maintainer, 2026-09-28): the cache-build
+  block of C_ss_tomo_limber - the C_ss_tomo_limber_work(&cn, lx,
+  nell, ...) call under the five-key rebuild guard - and its C_gs
+  analog: hand the work engine a coarse lx, spline each (pair,
+  component) row, sample onto the unchanged 512-node table.
+- C_gg_tomo_limber's header gains an explicit warning against
+  applying the upsampling trick to gg (BAO wiggles sit in the
+  relevant ell range and need the fine exact grid).
+- The spline must run at cache-build time so the hot fill path
+  (limber_fill_interp, linear on 512 nodes) is byte-identical in
+  structure.
+- BB rows under TATT are small but equally smooth; under NLA the ss
+  BB row is identically zero and splines trivially.
+- The table range starts at LMIN_tab, so the high-curvature l < 20
+  region never enters these tables.
+
+</details>
+
+<a id="open-fkem-pivot-redshift"></a>
+## Per-bin pivot redshift for the FKEM separable spectrum
+
+### High-level summary
+
+The maintainer's proposal (2026-09-28): the FKEM split needs a
+SEPARABLE linear spectrum for its FFTLog term, currently
+D(z)^2 P_lin(k, z=0). With massive neutrinos the true growth is scale
+dependent, so the separable form is wrong by [D(k,z)/D(z)]^2 - 1
+accumulated from z = 0 to the lens redshifts (0.7% at z = 0.3, 1.6%
+at z = 1 at the k of l ~ 100). Re-anchor the separable form per
+tomographic bin,
+
+    P_sep(k, z) = [D(z)/D(z_i)]^2 P_lin(k, z_i),   z_i = zmean(bin i),
+
+so the form is EXACT at z_i and the error grows only across the bin
+width instead of from z = 0: an order of magnitude less residual, at
+essentially zero runtime cost.
+
+### Current status
+
+**Ticket type: NEW FUNCTIONALITY.**
+
+**OPEN.** Reviewed 2026-09-28; the logic holds:
+
+- The high-l cancellation needs only that the FFTLog term and the
+  SUBTRACTED Limber term share the same separable spectrum -
+  whichever pivot is chosen. Pivoting preserves the cancellation by
+  construction; the added C_limber(P_delta) term is untouched. What
+  improves is the fidelity of the non-Limber correction at low l,
+  where the separable form is used as physics.
+- gg is the clean case: auto spectra only, one bin per spectrum, so
+  z_i = zmean(i) with no cross-bin ambiguity.
+- ggl inherits most of the benefit: the unequal-time contributions
+  to the projected spectrum are suppressed except at the lowest
+  multipoles, so the double integral's weight concentrates near
+  chi_1 = chi_2 inside the narrow lens support - the effective
+  redshifts sit near the lens z_i even for the broad W_kappa. The
+  IA piece (the genuinely non-Limber-sensitive term for overlapping
+  pairs) rides the source n(z), which for exactly those pairs sits
+  near z_i as well: the pairs where non-Limber matters most benefit
+  most.
+- Cost: P_lin(k, z_i) is the same 2D-interpolator call with a
+  different second argument, and 1/D(z_i)^2 folds into per-bin
+  constants on the kernel rows; the batch engines already loop per
+  lens bin. No measurable runtime change.
+
+**Severity: LOW** at the fiducial neutrino mass - the removed error
+(a ~1% growth mismatch on a few-percent correction, ~1e-4 of C_l)
+sits below the measured method floor - and rises with Sigma m_nu and
+with any scale-dependent-growth extension.
+
+### What is already in place
+
+The use_linear_ps plumbing in C_gg/C_gs_tomo_limber_work, the cached
+zmean(i)/zmean_source(i), the p_lin(k, a) interpolator, growfac with
+growfac(1) = 1, and the l = 149 cancellation diagnostics from the
+2026-09-28 review.
+
+### What is missing
+
+1. Thread one pivot a_i per lens bin through all the linear legs
+   TOGETHER: the FFTLog row builders of C_cl_tomo and C_gs_tomo
+   (rows carry D(a)/D(a_i)), the use_linear_ps = 1 branches of the
+   two work engines (PK = (gf/gf_i)^2 p_lin(k, a_i)), and the
+   backfill/band-center constructions. A pivot mismatch between the
+   legs is exactly the bug class fixed in 0082374; the cancellation
+   diagnostic at l = 149 is the guard (it must stay at the current
+   floor, pivot-independent by construction).
+2. Measure the gain BEFORE the refactor: evaluate the use_linear_ps
+   machinery at both pivots at a heavy-neutrino point (e.g.
+   Sigma m_nu = 0.06 vs 0.3 eV) and compare dC at l = 2-50.
+3. If adopted: the frozen fiducial vectors shift at the 1e-4 level -
+   record the refreeze decision with the change.
+
+<details><summary>Technical record</summary>
+
+- The C1 intrinsic-alignment amplitude carries 1/D, so the same
+  per-bin rescale applies consistently to the combined
+  (W_kappa - W_source C1) source kernel of C_gs_tomo.
+- For a hypothetical cross-bin gg pair the pivot would need a
+  compromise (sqrt(D_i D_j) style); the data vectors carry auto
+  spectra only, so this stays out of scope.
 
 </details>
 
@@ -327,6 +544,55 @@ measurements are kept, since this section is a decision record, not a
 README. To reopen a ticket, move its content back under
 [Open tickets](#open-tickets) as a full ticket section and add its
 `- OPEN` index line.
+
+## Non-Limber defaults, regenerated data vectors, and the refreeze (2026-09-28)
+
+- **ggl defaults switched to non-Limber** (`adopt_limber_gs: 0` in
+  the yamls, interface bindings, prototype fallbacks, tests and
+  READMEs) for lsst_y1, roman_real, roman_fourier and roman_kl: the
+  measured Limber cost, delta^T C^-1 delta = 1.86 / 0.49 / 1.30 /
+  1.63 at the frozen fiducials, was judged too large to absorb.
+  des_y3 and desy1xplanck keep Limber ggl (0.011 / 0.0037).
+- **Shipped simulated data vectors regenerated** at the frozen
+  fiducial points with the gg growth fix and the new defaults:
+  lsst_y1_theory.modelvector (NLA) and lsst_y1_theory_TATT
+  .modelvector, roman_real example1.modelvector, roman_fourier
+  roman_example.datavector, roman_kl roman_kl_3x2.modelvector and
+  roman_kl_2.modelvector (KL-mode vectors: the ggl switch moves
+  every 3x2 mode and the probe-mixed third of the mcmc vector, by
+  construction of the compression).
+- **All six snapshots refrozen** (`--overwrite`, `--baryons`): every
+  exact-configuration reference sits at its minimum again
+  (0.000000-level; the des_y3 0.168 and desy1xplanck 0.0092 gg-fix
+  drifts absorbed into the regenerated frozen fiducial vectors; the
+  measured drifts matched the predictions to three digits). lsst_y1
+  emul2 references now read the pure emulator-vs-exact difference
+  (0.289 / 0.772, was 0.554 / 1.383 against the stale vector).
+- **Freeze-generator gap closed**: the per-mask TATT dataset
+  descriptors of the `--mask` comparison sweeps (hand-added in
+  lsst_y1 712739e and siblings) were not reproduced by
+  `generate_frozen_reference.py`, so any refreeze silently dropped
+  them. All six generators now carry `TATT_MASK_VARIANTS` +
+  `generate_tatt_mask_datasets()` (run inside `--overwrite`, plus
+  the incremental `--tatt-masks` mode).
+
+## int_for retirement and the C_gk _work port (2026-09-28)
+
+- **int_for_C_gs/gg/gk_tomo_limber retired** with their GSL
+  per-(node, ell) quadratures; every probe keeps one single-ell
+  point diagnostic in the C_ss_tomo_limber_nointerp pattern (one
+  batch call, one entry read), and C_ks gained the missing one.
+  int_for_C_kk_limber stays: kk has no tomography. Validated by a
+  rebuilt lsst_y1 reproducing the frozen reference chi2 to every
+  printed digit.
+- **C_gk moved onto the _work batch API** (C_gk_tomo_limber_work +
+  _nointerp_ells/_batch in the gg design with one leg W_k, the
+  64-node ladder of the retired scalar kept, RSD gate and one-loop
+  FPTbias tables as in gg): table builder, w_gk low-ell loop and
+  both wrapper overloads migrated. Validated on the desy1xplanck
+  6x2pt fiducial: ss/ggl/gg/ks/kk bitwise unchanged, the 37 changed
+  w_gk entries within 4.0e-15 relative, chi2 unchanged at ten
+  digits. Closes the gk/ks _work ticket.
 
 ## Non-Limber galaxy-galaxy lensing and the gg batch API (2026-09-27)
 

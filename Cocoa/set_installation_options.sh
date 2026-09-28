@@ -117,7 +117,7 @@ export USE_SPT_CLIK_PLANCK=1
 # ------------------------------------------------------------------------------
 # If set, setup_camb.sh applies camb_changes/camb/halofit.patch: halofit stops
 # its bisection for the nonlinear scale at |sigma(R)-1| <= 1e-7 (CAMB: 1e-3).
-# With 1e-3 the nonlinear P(k) jitters by ~0.5% between nearby cosmologies, and
+# With 1e-3 the nonlinear P(k) jitters by ~0.3% between nearby cosmologies, and
 # finite-difference Fisher derivatives move with the step size. An installed
 # CAMB gets the patch only when re-cloned (OVERWRITE_EXISTING_CAMB_CODE=1).
 # ------------------------------------------------------------------------------

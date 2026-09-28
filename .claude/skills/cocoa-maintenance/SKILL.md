@@ -1127,6 +1127,81 @@ generates one fiducial vector per point. Raw chi2 values against
 the shipped data may still be printed, labeled as information,
 never asserted on.
 
+### 5.2 The frozen-test machinery of the cosmolike projects (and how to refreeze)
+
+Every cosmolike project carries the same test technology under
+`projects/<name>/tests/`, and a maintenance task that touches data
+vectors, likelihood defaults, or reference values must work through
+it, never around it. The pieces:
+
+- `cocoa_test_utils.py` - the harness: the `EXAMPLES` table (one
+  entry per frozen configuration, naming the likelihood and the
+  provenance yaml), `load_frozen_info`/`build_point` (rebuild the
+  exact frozen model and evaluation point), `single_model_chi2`, and
+  the manifest/reference readers every test calls first.
+- `generate_frozen_reference.py` - the ONLY writer of the frozen
+  state. It refuses to run without `--overwrite`.
+- `frozen/` - the state itself: `frozen_config_*.py` (the cobaya
+  configuration fully resolved at freeze time, every option and
+  parameter written out, plus the exact evaluation point), `data/`
+  (the tests' own copy of data vectors, covariance, n(z), masks),
+  the example-yaml snapshots (for humans to diff, never loaded),
+  `reference_chi2.json`, and the TATT-generated vector.
+- `manifest_sha256.json` - the SHA-256 pin of every file under
+  `frozen/`; each test verifies it before evaluating anything, so
+  nothing under `frozen/` is ever edited by hand.
+
+Two data designs coexist, and knowing which project has which is the
+first step of any refreeze:
+
+- Real-data projects (des_y3, desy1xplanck): the shipped `data_file`
+  is survey measurements and can never be regenerated. Their freeze
+  GENERATES fiducial model vectors into `frozen/data/` and computes
+  the references against those, so references sit at chi2 ~ 1e-13
+  (the 5.1 doctrine: checks live at their minimum).
+- Simulated projects (lsst_y1, roman_real, roman_fourier, roman_kl):
+  `data/` ships `.modelvector` files that ARE pipeline predictions
+  at the fiducial. NLA references measure current-code-vs-shipped
+  vector (exactly zero right after the vector is regenerated, small
+  drift otherwise); TATT references always evaluate against the
+  freeze-generated TATT vector regardless.
+
+One subtlety governs both designs: the frozen configurations pin
+every option that existed at freeze time, and nothing else. A
+likelihood yaml key added later resolves from the LIVE defaults when
+a frozen model is built, so a new key (or a changed default) changes
+what the frozen tests evaluate without touching a byte of `frozen/`.
+
+The refreeze procedure (maintainer-authorized, per project, from the
+`Cocoa/` folder with the environment active - the frozen
+configurations carry ROOTDIR-relative paths such as
+`./external_modules/code/CAMB`, and running from anywhere else fails
+there):
+
+1. If a shipped simulated vector must change, regenerate it FIRST:
+   build the model from the frozen configuration, keep the original
+   `data_file` (the printed theory vector does not depend on the
+   loaded data), set `print_datavector`/`print_datavector_file` at
+   the shipped `data/<name>.modelvector`, evaluate once at the
+   frozen point, and check the entry count against the old file.
+2. `python ./projects/<name>/tests/generate_frozen_reference.py
+   --overwrite` - deletes `frozen/`, copies the current `data/`,
+   writes the resolved configurations, regenerates the TATT vector
+   and its per-mask dataset descriptors (the `--mask` sweep
+   variants; `TATT_MASK_VARIANTS` in the generator), computes every
+   reference chi2, and pins the manifest.
+3. The same script with `--baryons` - the per-method baryon drift
+   vectors are NOT rebuilt by `--overwrite`, and the drift tests
+   fail on missing files until this step runs. (`--tatt-masks`
+   exists as the analogous incremental mode for the per-mask
+   descriptors alone: pure text, no evaluations.)
+4. The full pytest suite.
+5. Reconcile the printed chi2 values old-vs-new BEFORE committing: a
+   refreeze absorbs EVERYTHING that changed since the last one, so
+   every delta must be accounted for by a known, deliberate change
+   (measure the absorbed drift first by running the reference tests
+   against the old frozen state).
+
 ## 6. Bash style guide (observed across all installation_scripts)
 
 When writing or editing a script, imitate these conventions exactly. They
