@@ -39,7 +39,6 @@ features, Low bugs, Low features.
 
 - OPEN **LOW** **NEW FUNCTIONALITY** — [IA x higher-order-bias (gb2) cross terms in cfastpt](#open-cfastpt-gb2-ia-bias)
 - OPEN **LOW** **NEW FUNCTIONALITY** — [Finish the Compton-y port (C_gy, C_ys, C_ky, C_yy)](#open-compton-y-port)
-- OPEN **LOW** **NEW FUNCTIONALITY** — [Skip empty radial slots in cfftlog_ells_p2](#open-cfftlog-empty-slots)
 - OPEN **LOW** **NEW FUNCTIONALITY** — [Internal coarse ell grid for the C_ss/C_gs Limber tables](#open-internal-ell-grid)
 
 <a id="open-cache-key-hardening"></a>
@@ -326,6 +325,203 @@ wire probes and bindings, and validate against the original cosmolike.
 
 </details>
 
+<a id="open-internal-ell-grid"></a>
+## Internal coarse ell grid for the C_ss/C_gs Limber tables
+
+### High-level summary
+
+The maintainer's proposal (2026-09-28): the internal/external
+accuracy-boost trick, applied to the ell axis of the interpolation
+tables. The real-space projections MUST keep Ntable.N_ell = 512 with
+linear interpolation - the Legendre sums interpolate ~100k multipoles
+up to LMAX through the vectorized gather fill, and that contract is
+not negotiable. But the tables' construction cost is 512 x N_pairs
+Limber quadratures, and C_l^ss and C_l^gs are smooth in ln l: build
+the cache from an internal coarse grid (~128-192 log-spaced exact
+quadrature nodes over the same [LMIN_tab, LMAX] range) and upsample
+to the identical 512-node table with a cubic spline at cache-build
+time. Everything downstream is unchanged; the quadrature count drops
+3-4x. Especially important for roman_real and roman_kl, whose 10
+source bins put 55 shear pairs and the largest ggl pair counts
+behind these tables.
+
+### Current status
+
+**Ticket type: NEW FUNCTIONALITY.**
+
+**OPEN.** Reviewed 2026-09-28; the logic holds for ss and gs (both
+lensing-kernel-smoothed, no sharp ln-l features; cubic-spline
+upsampling error ~1e-5 to 1e-7 relative, below the method floor).
+C_gg stays OUT of the first pass: its auto spectra carry BAO wiggles
+in the relevant l range and need the fine exact grid or a separate
+validation of their own.
+
+**Severity: LOW** (a per-evaluation table-build cost, largest for
+the Roman configurations).
+
+### What is already in place
+
+The two-grid precedent (FAST-PT internal_accuracyboost: internal
+grid + spline, external grid fixed), the batched
+C_ss/C_gs_tomo_limber_nointerp_ells entry points that evaluate any
+ell list at one call, and the cubic-spline utilities in basics.c.
+
+### What is missing
+
+1. An internal node-count knob in the internal_accuracyboost spirit
+   (exact-512 behavior one setting away: the A/B switch for
+   validation).
+2. The cache-build change inside C_ss_tomo_limber and
+   C_gs_tomo_limber only: batch-evaluate the coarse grid, spline per
+   (pair, component) row, sample onto the unchanged 512-node table.
+3. Validation: max relative table difference exact-512 vs upsampled
+   per pair and component (EE and BB); chi2 at the frozen fiducials
+   inside tolerance with the shift recorded; determinism; the three
+   build modes; timing on roman_real and roman_kl.
+
+<details><summary>Technical record</summary>
+
+- The confirmed edit site (maintainer, 2026-09-28): the cache-build
+  block of C_ss_tomo_limber - the C_ss_tomo_limber_work(&cn, lx,
+  nell, ...) call under the five-key rebuild guard - and its C_gs
+  analog: hand the work engine a coarse lx, spline each (pair,
+  component) row, sample onto the unchanged 512-node table.
+- C_gg_tomo_limber's header gains an explicit warning against
+  applying the upsampling trick to gg (BAO wiggles sit in the
+  relevant ell range and need the fine exact grid).
+- The spline must run at cache-build time so the hot fill path
+  (limber_fill_interp, linear on 512 nodes) is byte-identical in
+  structure.
+- BB rows under TATT are small but equally smooth; under NLA the ss
+  BB row is identically zero and splines trivially.
+- The table range starts at LMIN_tab, so the high-curvature l < 20
+  region never enters these tables.
+
+</details>
+
+<a id="open-cfastpt-gb2-ia-bias"></a>
+## IA x higher-order-bias (gb2) cross terms in cfastpt
+
+### High-level summary
+
+The galaxy-intrinsic (gI) part of gamma_t is computed with linear
+galaxy bias times the full NLA/TATT alignment spectrum, while the
+density part of the same probe keeps the quadratic-bias terms (b2,
+bs). The missing sector is the cross between the two expansions: the
+spectra <delta^2|E> and <s^2|E> (times b2/2 and bs/2), which upstream
+FAST-PT ships as the IA_gb2 module (tables fe, he, F2, G2, S2F2,
+S2G2, S2fe, S2he). Add these tables to cfastpt and wire them into the
+gI integrand, closing the one-loop consistency gap.
+
+### Current status
+
+**Ticket type: NEW FUNCTIONALITY.**
+
+**OPEN.** Idea stage; gated on upstream FAST-PT resolving issue #29
+(see below).
+
+**Severity: LOW.** The truncation matches the community baseline
+(DES-Y3 TATT, cosmosis tatt_interface, CCL): no current result is
+wrong. The terms are a loop correction inside a correction (of order
+b2*A1 relative to the linear-bias gI term); whether LSST-Y1/Roman
+gamma_t precision cares is a quantifiable question to answer as part
+of this ticket.
+
+### What is already in place
+
+`get_FPT_bias` (pt_cfastpt.c) provides the exact machinery: hardcoded
+(alpha, beta, ell) J-tables accumulated through one `J_abl` call,
+with exchange pairs collapsed into single doubled rows - an idiom
+that is structurally immune to the transcription slip found upstream
+(see the technical record). Its 13 rows were verified analytically on
+2026-09-25, and the Pd1s2 rows are literally the S2F2 kernel of the
+gb2 family, so part of the derivation work already exists.
+`get_FPT_IA` provides the TATT (ta/tt/mix) side the new terms couple
+to. Upstream FAST-PT 4.0.0 is installed in `.local` and carries the
+IA_gb2 module as a cross-check reference (with caveats below).
+
+### What is missing
+
+- Derive the eight gb2 tables independently and write them in the
+  `get_FPT_bias` collapsed-row style. Do NOT transcribe upstream:
+  FAST-PT issue #28 (confirmed 2026-09-25 by direct Legendre
+  derivation) has a typo in IA_gb2_S2G2 - the last row must be
+  (-1,1,l=3,1/5), not l=1 - and issue #29 (a duplicated row in
+  IA_gb2_he) is unresolved; the row placement is numerically inert,
+  but whether the total is -1/3 or -2/3 needs the source derivation.
+- Wire the new spectra into the gI integrand of gamma_t with the
+  b2/2 and bs/2 coefficients paired to C1/C1delta/C2 per the gb2
+  module's source paper.
+- Quantify the effect on gamma_t at LSST-Y1 and Roman precision
+  (delta^T C^-1 delta against the truncated model) before deciding
+  whether any default changes.
+- Validate against python FAST-PT once upstream has fixed #28 and
+  resolved #29 (a comparison against the current upstream would
+  inherit its typo).
+
+<details><summary>Technical record</summary>
+
+- Owners: `external_modules/code/cosmolike_core/cosmolike/
+  pt_cfastpt.c` (new table block beside `get_FPT_bias`), `IA.c` /
+  `cosmo2D.c` (gI integrand), plus the source-paper coefficient map.
+- Upstream references: FAST-PT issues jablazek/FAST-PT#28 and #29
+  (both filed 2026-09-25), fastpt/IA/IA_gb2.py at commit b91f6b7.
+- Analytic facts established 2026-09-25: F2 and G2 share the
+  identical (q1/q2 + q2/q1)(mu/2) term, so the (+-1,-+1) rows of the
+  S2F2 and S2G2 tables must coincide; (mu/2)(mu^2 - 1/3) =
+  (2/15) P1 + (1/5) P3 fixes those rows, proving #28. With
+  alpha = beta = 0 and the same P(k) on both legs, J(l1,l2) equals
+  J(l2,l1), which is why #29's duplicated row is numerically
+  equivalent to the symmetric pair and only the TOTAL coefficient is
+  in question.
+- Exposure audit (2026-09-25): no gb2-family table or caller exists
+  anywhere in cocoa (cfastpt, PyFAST-PT, likelihoods, notebooks);
+  the cosmolike function `gb2(z, ni)` is the b2(z) galaxy bias, a
+  name collision only.
+
+</details>
+
+<a id="open-compton-y-port"></a>
+## Finish the Compton-y port (C_gy, C_ys, C_ky, C_yy)
+
+### High-level summary
+
+The Compton-y cross spectra were never finished when cosmolike was
+ported into cocoa: nothing enables the gy/sy/ky/yy probes, and every
+python binding for them was commented out. The pieces now live outside
+the build in
+`cosmolike_core/future_port_unfinished/cosmo2d_tmp.c` (declarations,
+C functions, and the commented wrapper bindings), moved there on
+2026-09-26 to clean cosmo2D.c.
+
+### Current status
+
+**Ticket type: NEW FUNCTIONALITY.**
+
+**OPEN.** Idea stage; parked deliberately.
+
+**Severity: LOW.** No analysis in cocoa uses a y probe today.
+
+### What is already in place
+
+The parked code compiles against the pre-batch API it was written
+for, and the radial-weight infrastructure the port needs
+(`radial_weights.c`) already carries the lensing kernels.
+
+### What is missing
+
+Port the y radial weight, revive the parked functions on the _work
+batch design (they follow the retired single-grid per-point pattern),
+wire probes and bindings, and validate against the original cosmolike.
+
+<details><summary>Technical record</summary>
+
+- Parking lot: `cosmolike_core/future_port_unfinished/cosmo2d_tmp.c`
+  (NOT compiled; header comment lists the contents).
+- The like struct already carries the gy/sy/ky/yy probe flags.
+
+</details>
+
 <a id="open-cfftlog-empty-slots"></a>
 ## Skip empty radial slots in cfftlog_ells_p2
 
@@ -370,6 +566,23 @@ measurements are kept, since this section is a decision record, not a
 README. To reopen a ticket, move its content back under
 [Open tickets](#open-tickets) as a full ticket section and add its
 `- OPEN` index line.
+
+## cfftlog activity mask: empty radial slots skipped (2026-09-28)
+
+- **Implemented** (cosmolike_core da14c54): cfftlog_ells_p1/_p2 accept a
+  per-(row, slot) activity mask (NULL = all active); inactive slots
+  skip their forward and inverse FFTs and write exact zeros.
+  C_gs_tomo declares the mask its fx assembly implies (lens rows:
+  density always, RSD under include_RSD_GS, magnification when some
+  gbmag != 0; source rows: slot 2 alone) - 10 of 30 row-slots active
+  at the lsst_y1 defaults. C_cl_tomo keeps NULL: its conditional
+  SIZE2 already drops the magnification slot when bmag = 0. The
+  relevance grew with the 2026-09-28 default switch: non-Limber ggl
+  now runs by default in four projects.
+- Validated: bitwise (the skipped slots held identically zero
+  kernels; lsst_y1 frozen references reproduce to all ten printed
+  digits); full-evaluation median 1.677 -> 1.673 s (macOS arm64,
+  4 threads, median of 8). Suites: lsst_y1 55, roman_real 48.
 
 ## Correctness sweep of the 2026-09-28 review findings (2026-09-28)
 
