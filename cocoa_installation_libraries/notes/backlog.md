@@ -40,6 +40,7 @@ features, Low bugs, Low features.
 - OPEN **LOW** **NEW FUNCTIONALITY** — [IA x higher-order-bias (gb2) cross terms in cfastpt](#open-cfastpt-gb2-ia-bias)
 - OPEN **LOW** **NEW FUNCTIONALITY** — [Contract the dlnxi/dlnw scale-cut cache builds](#open-scuts-dlnxi-contraction)
 - OPEN **LOW** **NEW FUNCTIONALITY** — [Finish the Compton-y port (C_gy, C_ys, C_ky, C_yy)](#open-compton-y-port)
+- OPEN **LOW** **NEW FUNCTIONALITY** — [Web-halo model (WHM, arXiv:2508.10902) for nonlinear P(k)](#open-web-halo-model)
 
 <a id="open-cache-key-hardening"></a>
 ## Cache-key hardening for in-process reconfiguration
@@ -552,6 +553,73 @@ reduction over LMAX ~ 1e5 (already threaded and vectorized).
 - Timing evidence (roman_real, 2026-09-28): rf-path per-cosmology
   refill 5.676 s after 6e160ac; dC+dlnxi table stage in isolation
   42.8 ms; the difference is this build.
+
+</details>
+
+<a id="open-web-halo-model"></a>
+## Web-halo model (WHM, arXiv:2508.10902) for nonlinear P(k)
+
+### High-level summary
+
+The web-halo model (Stuecker et al., arXiv:2508.10902) is a
+parameter-free variant of the halo model: alongside halos it adds
+structures collapsed along two axes (filaments) and one axis
+(sheets), combined with 1-loop Lagrangian Perturbation Theory in
+one consistent framework. Against N-body power spectra it reaches
+better than 2% up to k = 0.4, 0.7 and 1.3 h/Mpc at z = 0, 0.8 and
+1.5, matching baccoemu and EuclidEmulator2 across their full
+w0waCDM + sum m_nu space - where HMcode-2020 needs 12 tuned
+parameters and degrades at high z. The authors released WHMcode
+integrated into the HMcode implementations for CAMB and CLASS.
+
+### Current status
+
+**Ticket type: NEW FUNCTIONALITY.**
+
+**OPEN.** Longer-term interest declared by the maintainer
+(2026-09-28); intake ticket, no implementation started. Sequencing:
+after (or alongside the later phases of) the halo.c modernization
+campaign, which supplies the unit-test harness and the HMcode-family
+porting precedent any WHM work would build on.
+
+**Severity: LOW.** Pure feature; no current pipeline depends on it.
+
+### What is already in place
+
+- The halo.c campaign staging (halo_wrapper.cpp bindings plus
+  test_halo.py with frozen references) gives new halo-model code a
+  validation harness.
+- Original-cosmolike `theory/halo_hmcode.c` (HMCode-2020, Ludlow16
+  concentrations, multi-field I0j_y) is available as a reference and
+  its port is a staged campaign phase - the natural precedent for a
+  WHM sector.
+- EuclidEmulator2 already runs inside Cocoa, so one of the paper's
+  two accuracy baselines is available in-tree for validation.
+- Cocoa ships a pinned custom CAMB fork; WHMcode being released
+  inside HMcode for CAMB means an upstream-adoption route exists in
+  addition to a native cosmolike-side port.
+
+### What is missing
+
+- Route decision: adopt WHMcode through the custom CAMB fork's
+  HMcode (pin bump, Fortran fences per house rules) versus a native
+  C port next to the halo_hmcode phase; criteria include whether the
+  halo-model sector must stay differentiable/emulable inside
+  cosmolike and how the y/gas extensions interact.
+- Physics review of the WHM construction (sheet/filament mass
+  fractions, 1l-LPT matching) before any port.
+- Validation plan: reproduce the paper's accuracy claims against
+  EuclidEmulator2 in-tree over the shared parameter space.
+
+<details><summary>Technical record</summary>
+
+- Paper: https://arxiv.org/abs/2508.10902 (WHM; public code WHMcode
+  in the CAMB and CLASS HMcode implementations).
+- Maintainer intake: 2026-09-28, "longer term - I am also very
+  interested in implement this".
+- Related staging: halo campaign documents (session scratchpad
+  halo/STAGE.md, 2026-09-28) list the halo_hmcode.c inclusion phase
+  this ticket would follow.
 
 </details>
 
