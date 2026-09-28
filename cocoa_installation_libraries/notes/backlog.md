@@ -38,6 +38,7 @@ features, Low bugs, Low features.
 ### Low
 
 - OPEN **LOW** **NEW FUNCTIONALITY** — [IA x higher-order-bias (gb2) cross terms in cfastpt](#open-cfastpt-gb2-ia-bias)
+- OPEN **LOW** **NEW FUNCTIONALITY** — [Contract the dlnxi/dlnw scale-cut cache builds](#open-scuts-dlnxi-contraction)
 - OPEN **LOW** **NEW FUNCTIONALITY** — [Finish the Compton-y port (C_gy, C_ys, C_ky, C_yy)](#open-compton-y-port)
 
 <a id="open-cache-key-hardening"></a>
@@ -496,6 +497,64 @@ C_gs.
 
 </details>
 
+<a id="open-scuts-dlnxi-contraction"></a>
+
+## Contract the dlnxi/dlnw scale-cut cache builds
+
+### High-level summary
+
+The per-cosmology scale-cut refill on roman_real costs ~5.7 s, and
+measurement localized it to the dlnxi (and dlnw_ks) cache builds:
+Ntable.dCX_dlnk_nlnk = 256 nointerp calls, each a Glpm Legendre
+sweep over every integer multipole for all (theta, pair) rows. The
+RF layer above is closed-form (6e160ac) and the dC tables below
+cost ~44 ms, so this build is the only expensive stage left. Not
+chain-critical (scale cuts run offline); worth doing when a
+scale-cut study makes 5.7 s per cosmology annoying.
+
+### Current status
+
+Design verified against the code (2026-09-28). The nointerp per-k
+cost splits three ways: (1) the dCgrid node fill - 2 x pairs x
+N_ell scalar dC_ss_dlnk_tomo_limber calls, each paying cache-key
+checks and a bilinear read to evaluate the table at its own ell
+nodes at one fixed k; (2) limber_fill_interp expansion to every
+integer ell (already AVX2, optimal); (3) the Glpm x cx simd
+reduction over LMAX ~ 1e5 (already threaded and vectorized).
+
+### What is missing
+
+1. A perf profile of one nointerp call confirming the split (the
+   RF work taught the attribution lesson twice: measure, never
+   infer).
+2. Step-(1) fix, standalone and small: at fixed k the node fill is
+   one fixed-weight blend of two dC table k-rows (the same t for
+   every entry, contiguous, SIMD-trivial); needs a _fill-style
+   sharing struct for the dC statics - the C_ss/ss_ precedent.
+   Expected ~1.5-2x on the build by itself.
+3. The contraction, subsuming (2)+(3): both apply the same fixed
+   linear map every call - limber_fill_interp's node ->
+   integer-ell weights followed by the Ntable-cached Glpm dot.
+   Precompute W(theta, node) = sum_ell Glpm(theta, ell)
+   w_node(ell) once per Ntable change (one of today's 1e5 sweeps,
+   ~200 KB); each k-node then costs 2 x pairs x Ntheta dot
+   products of length N_ell. Expected order 50-200x on the build;
+   validate to float reassociation (~1e-14 relative) against
+   nointerp on a probe grid, nointerp kept as the guarded
+   reference. The weights to contract against are exactly
+   limber_fill_interp's map (verified in code, no hidden scheme).
+
+<details><summary>Technical record</summary>
+
+- Owner: `cosmolike_core/cosmolike/cosmo2D_scuts.c`
+  (`dlnxi_dlnk_pm_tomo_nointerp`, `dlnw_ks_dlnk_tomo_nointerp`,
+  their cache builders), the Glpm kernels, the la/ldx coupling.
+- Timing evidence (roman_real, 2026-09-28): rf-path per-cosmology
+  refill 5.676 s after 6e160ac; dC+dlnxi table stage in isolation
+  42.8 ms; the difference is this build.
+
+</details>
+
 # Closed tickets
 
 Grouped by subject and compressed. Nothing here is open work; dated
@@ -503,6 +562,37 @@ measurements are kept, since this section is a decision record, not a
 README. To reopen a ticket, move its content back under
 [Open tickets](#open-tickets) as a full ticket section and add its
 `- OPEN` index line.
+
+## RF workers: closed-form cumulative, quadrature retired (2026-09-28)
+
+- **Implemented** (cosmolike_core 6e160ac): RF(kmax) integrates
+  |dlnX/dlnk|, and the tabulated response the workers consume is
+  piecewise linear in ln k, so both RF integrals are closed form
+  (trapezoids; two triangles where the response crosses zero; a
+  partial = prefix + the analytically cut last interval, direct
+  index, no search). All four workers (RF_xi, RF_w_ks, RF_C_ss,
+  RF_C_ks) dropped their per-kmax Gauss-Legendre sweeps for one
+  cumulative per row: a per-kmax sweep was an expensive
+  approximation of a function whose integral has a closed form.
+- Measured: removed Gauss-Legendre error max |dRF| 3.1e-3 (ss) /
+  5.4e-3 (ks), medians 8e-17 / 5.5e-5 - the old rule failed at the
+  |.| kinks, where the closed form is exact, and the error was
+  comparable to the coarse-table dRF, so RF accuracy was never
+  better than few x 1e-3 before this change. Honest timing:
+  roman_real per-cosmology rf refill 5.754 -> 5.676 s; the sweeps
+  were ~80 ms of it (the open dlnxi ticket holds the true owner).
+  Suites lsst_y1 57 + roman_real 50.
+
+## Threaded scuts plane upsamples (2026-09-28)
+
+- **Implemented** (cosmolike_core caaba62): the four coarse-grid
+  refills upsample their ~120 independent (ln k, ln l) planes under
+  omp parallel for (collapse(2) on the ss pair). Bitwise against
+  the serial build; interleaved A/B timing (one process, 12
+  alternating samples per setting): fully coarse derivative refill
+  45.0 ms vs 42.8 ms exact - the upsampling overhead is gone and
+  the coarse path is break-even on the already-cheap derivative
+  tables.
 
 ## sigma2(M): lobe-summed quadrature, the 14.1 cutoff retired (2026-09-28)
 
@@ -563,6 +653,15 @@ README. To reopen a ticket, move its content back under
   8.5994603071e-06 after two; the exact path is bump-invariant in
   the same comparison) - the invalidation-sequence dependence the
   cache-hardening ticket hunts.
+- Timing post-mortem (three protocols, roman_real): on
+  Ntable.random bumps the scuts rebuild is ~5.9 s of Ntable-keyed
+  machinery regardless of the knobs; on cosmology-keyed refills it
+  is ~5.7 s dominated by the dlnxi cache build (its open ticket
+  holds the contraction design); the dC+dlnxi table stage in
+  isolation is 42.8 ms exact vs 154 ms coarse-serial vs 45.0 ms
+  coarse-threaded (caaba62). Lesson recorded: time the
+  invalidation class the workflow actually triggers, and profile
+  before attributing.
 
 ## Sector-ladder cache-consistency test (2026-09-28)
 
