@@ -605,7 +605,11 @@ porting precedent any WHM work would build on.
   HMcode (pin bump, Fortran fences per house rules) versus a native
   C port next to the halo_hmcode phase; criteria include whether the
   halo-model sector must stay differentiable/emulable inside
-  cosmolike and how the y/gas extensions interact.
+  cosmolike and how the y/gas extensions interact. Maintainer lean
+  (2026-09-28): a native cosmolike implementation, including the
+  1-loop LPT ingredient itself, "may be advantageous for us ...
+  when the time comes" - so scope the native route first and treat
+  the CAMB adoption as the comparison baseline, not the target.
 - Physics review of the WHM construction (sheet/filament mass
   fractions, 1l-LPT matching) before any port.
 - Validation plan: reproduce the paper's accuracy claims against
