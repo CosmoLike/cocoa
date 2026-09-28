@@ -1,0 +1,32 @@
+--- halofit.f90
++++ halofit.f90
+@@ -319,16 +319,26 @@
+                         rmid=10**rmid
+                         call wint(CAMB_Pk,itf,rmid,sig,d1,d2)
+                         diff=sig-1.0
+-                        if (abs(diff).le.0.001) then
++                        !VM BEGINS
++                        ! Cocoa (PATCH_CAMB_HALOFIT_TOLERANCE): the bisection for
++                        ! the nonlinear scale stops at |sigma(R) - 1| <= 1e-7. With
++                        ! 1e-3 the stopping point jumps between nearby cosmologies
++                        ! and shifts P_NL of whole redshift slices by ~0.3%, which
++                        ! makes finite-difference (Fisher) derivatives noisy.
++                        !if (abs(diff).le.0.001) then
++                        if (abs(diff).le.1.d-7) then
+                             rknl=1./rmid
+                             rneff=-3-d1
+                             rncur=-d2
+                             exit
+-                        elseif (diff.gt.0.001) then
++                        !elseif (diff.gt.0.001) then
++                        elseif (diff.gt.1.d-7) then
+                             xlogr1=log10(rmid)
+-                        elseif (diff.lt.-0.001) then
++                        !elseif (diff.lt.-0.001) then
++                        elseif (diff.lt.-1.d-7) then
+                             xlogr2=log10(rmid)
+                         endif
++                        !VM ENDS
+                         if (xlogr2 < -1.9999) then
+                             !is still linear, exit
+                             goto 101

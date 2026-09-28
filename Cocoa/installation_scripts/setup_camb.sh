@@ -189,6 +189,27 @@ if [ ! -d "${PACKDIR:?}" ]; then
       >>${OUT1:?} 2>>${OUT2:?} || { error "${EC17:?} (${TFILE[$i]:?})"; return 1; }
   done
 
+  # --------------------------------------------------------------------------
+  # Optional patch for Fisher forecasts (key: PATCH_CAMB_HALOFIT_TOLERANCE) ---
+  # --------------------------------------------------------------------------
+  # halofit finds the nonlinear scale R by bisection until |sigma(R)-1| is
+  # below a tolerance. CAMB stops at 1e-3; where it stops jumps between
+  # nearby cosmologies, so the nonlinear P(k) jitters and finite-difference
+  # Fisher derivatives move with the step size. halofit.patch tightens the
+  # tolerance to 1e-7 in fortran/halofit.f90 (copied next to the file first,
+  # as the loop above does for the compiler patches).
+  # Example: key commented out in set_installation_options.sh -> block
+  #          skipped, CAMB keeps 1e-3; key set -> OUT1 receives
+  #          "patching file halofit.f90".
+  if [ -n "${PATCH_CAMB_HALOFIT_TOLERANCE:-}" ]; then
+    cdfolder "${PACKDIR:?}/fortran" || return 1;
+
+    cpfolder "${CHANGES:?}/camb/halofit.patch" . 2>>${OUT2:?} || return 1;
+
+    patch -l -u "halofit.f90" -i "halofit.patch" \
+      >>${OUT1:?} 2>>${OUT2:?} || { error "${EC17:?} (halofit.f90)"; return 1; }
+  fi
+
 fi
 
 pbottom "SETUP CAMB" || { unset_all; return 1; }
