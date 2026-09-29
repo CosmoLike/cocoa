@@ -344,9 +344,39 @@ such as SLEEF, which SIMDe's SVML-style functions can use
 
 **Ticket type: NEW FUNCTIONALITY.**
 
-**OPEN.** Requested by the maintainer (2026-09-29): "try multiple
-vectorizations on halo.c given how slow it is"; adding SLEEF as a
-dependency is acceptable if testing shows it is worth it. The
+**CLOSED for now (2026-09-29, maintainer decision).** The measurement
+study ran on the dev machine (Apple M2 Pro; harness and full report in
+the session scratchpad, sleef_study/REPORT.md + bench/): SLEEF u10
+makes the nfw_um loop SLOWER there (0.92x; Apple libm's small-argument
+fast paths beat SLEEF's full polynomial - 73 percent of the real sine
+arguments are below pi/4); the only variant above 1.3x needs the
+3.5-ULP inline header, which leaks `#pragma STDC FP_CONTRACT OFF` into
+the rest of the file (maintainer: never add things with side effects
+like that). Production is x86 (glibc sine slower, AVX2 4 lanes), where
+the kernel-level case is plausibly >= 1.5x - but no dev runs are
+possible on SeaWulf, and the algorithmic reductions that landed the
+same day (mass-node ladder, coarse ln k queued) shrink the halo builds
+to where the sine stops mattering in the MCMC budget. Judgment call
+(delegated by the maintainer): do not add SLEEF; revisit only if a
+post-reduction x86 profile shows the sine hot again. If revisited: the
+libsleef.a library form only, Sleef_sind4_u10 direct calls, pin 3.9.0
+commit 906ca7512ee483296780a81a21b9ca715d40dfe1, build with
+-DSLEEF_ENABLE_TLFLOAT=OFF (its ON default git-clones tlfloat at build
+time - forbidden in compile scripts), opt-in guard.
+
+Collateral finding (recorded here; separate ticket if acted on):
+simde_mm256_fmadd_pd is NOT fused on arm64 (fmul.2d + fadd.2d, two
+roundings; only the 128-bit simde_mm_fmadd_pd emits a fused fmla.2d),
+so the existing uses in basics.c ~1207-1211, cosmo2D.c:320 and
+cosmo2D_scuts.c:162 are unfused on Apple Silicon but fused on x86 - a
+silent cross-platform bitwise difference (harmless under the
+tolerance-based frozen tests, but worth knowing when comparing dev and
+production numbers). Related: under -frounding-math -ftrapping-math,
+SIMDe FP compares and cvttpd scalarize on arm64.
+
+Original request (2026-09-29): "try multiple vectorizations on halo.c
+given how slow it is"; adding SLEEF as a dependency was acceptable if
+testing showed it worth it. The
 algorithmic steps are done (NFW transform through a Si/Ci table,
 one-pass HOD tables, one loop nest per spectrum table); what remains in
 the hot loops is nfw_um's sines and table reads.
