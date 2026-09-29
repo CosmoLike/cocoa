@@ -328,8 +328,9 @@ reduction over LMAX ~ 1e5 (already threaded and vectorized).
 
 ### High-level summary
 
-The halo-model spectrum tables are slow (the p_mm build takes about a
-minute on 4 threads), and halo.c runs almost entirely scalar. Under
+After the algorithmic steps of the halo.c campaign, the spectrum
+tables spend their time in one scalar kernel, the NFW transform nfw_um
+(three table reads and two sines per (a, k, mass node)). Under
 Cocoa's default strict-IEEE flags (-frounding-math,
 -fno-associative-math) clang auto-vectorizes no floating-point loop -
 reductions and element-wise loops alike, silently, because the Darwin
@@ -345,10 +346,10 @@ such as SLEEF, which SIMDe's SVML-style functions can use
 
 **OPEN.** Requested by the maintainer (2026-09-29): "try multiple
 vectorizations on halo.c given how slow it is"; adding SLEEF as a
-dependency is acceptable if testing shows it is worth it. Sequencing:
-after the algorithmic steps of the halo.c campaign (NFW table, HOD
-fold, spectra build), which decide which libm calls remain in hot
-loops.
+dependency is acceptable if testing shows it is worth it. The
+algorithmic steps are done (NFW transform through a Si/Ci table,
+one-pass HOD tables, one loop nest per spectrum table); what remains in
+the hot loops is nfw_um's sines and table reads.
 
 **Severity: LOW.** Performance only.
 
@@ -356,6 +357,13 @@ loops.
 
 - u_KS: its S and Q sums are SIMDe loops, confirmed in the disassembly
   (fmul.2d/fadd.2d); a small gain (3.15 -> 3.00 ms per Gamma change).
+- basics.c spline2d_upsample_uniform: row-wise second pass with SIMDe
+  (2026-09-29, single thread: 2.50 -> 0.41 ms per call at the u_KS Q
+  table size).
+- Measured 2026-09-29 (4 threads): p_mm table build 0.42 s, p_gm and
+  p_gg 0.65 s each. A sample(1) profile of the p_mm build puts nfw_um's
+  own code and the libm sine at about equal time; merging the two sines
+  into one sincos gave no gain.
 - The measurement recipe: clang -Rpass/-Rpass-missed/-Rpass-analysis
   remarks with the house flags (minus -flto) to see what the compiler
   does, disassembly (otool -tv / objdump -d) to confirm SIMDe paths,
@@ -363,18 +371,15 @@ loops.
 
 ### What is missing
 
-- A measured libm share of each hot build after the algorithmic steps
-  (HOD node sums: fnu/hb1nu powers per (bin, a, node); spectra build:
-  log/sin/cos per profile read).
-- Hoisting first (pow(x, p) as exp(p ln x) with ln x per node), then
-  SIMDe + SLEEF on what remains; A/B against the scalar path.
+- nfw_um in SIMDe over the mass nodes: the table reads become gathers
+  and the sines need a vector sine (SLEEF through SIMDe's
+  simde_mm256_sin_pd; without SLEEF that call is a per-lane libm loop);
+  A/B against the scalar path.
 - SLEEF through Cocoa's package mechanism (pinned commit, setup and
   compile scripts, .gitignore entry), and a decision on the default:
   SLEEF results differ from libm at the ULP level (1-ULP variants),
   deterministic per machine but not bitwise across x86/ARM - on by
   default, or behind a flag like COSMOLIKE_AGGRESSIVE_MODE.
-- basics.c spline2d_upsample_uniform: row-wise second pass (SIMDe)
-  and/or threads - prepared, not yet measured.
 
 <a id="open-web-halo-model"></a>
 ## Web-halo model (WHM, arXiv:2508.10902) for nonlinear P(k)
