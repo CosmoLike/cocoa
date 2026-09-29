@@ -41,6 +41,7 @@ features, Low bugs, Low features.
 - OPEN **LOW** **NEW FUNCTIONALITY** — [Contract the dlnxi/dlnw scale-cut cache builds](#open-scuts-dlnxi-contraction)
 - OPEN **LOW** **NEW FUNCTIONALITY** — [Finish the Compton-y port (C_gy, C_ys, C_ky, C_yy)](#open-compton-y-port)
 - OPEN **LOW** **NEW FUNCTIONALITY** — [Web-halo model (WHM, arXiv:2508.10902) for nonlinear P(k)](#open-web-halo-model)
+- OPEN **LOW** **NEW FUNCTIONALITY** — [Vectorization study for halo.c (SIMDe, SLEEF)](#open-halo-vectorization)
 
 <a id="open-cache-key-hardening"></a>
 ## Cache-key hardening for in-process reconfiguration
@@ -321,6 +322,59 @@ reduction over LMAX ~ 1e5 (already threaded and vectorized).
   42.8 ms; the difference is this build.
 
 </details>
+
+<a id="open-halo-vectorization"></a>
+## Vectorization study for halo.c (SIMDe, SLEEF)
+
+### High-level summary
+
+The halo-model spectrum tables are slow (the p_mm build takes about a
+minute on 4 threads), and halo.c runs almost entirely scalar. Under
+Cocoa's default strict-IEEE flags (-frounding-math,
+-fno-associative-math) clang auto-vectorizes no floating-point loop -
+reductions and element-wise loops alike, silently, because the Darwin
+build passes -Wno-pass-failed - so vectorization has to be explicit:
+SIMDe intrinsics (the cosmo2D.c pattern) for arithmetic loops, and for
+the loops dominated by exp, log, pow, sin and cos a vector math library
+such as SLEEF, which SIMDe's SVML-style functions can use
+(SIMDE_MATH_SLEEF_ENABLE).
+
+### Current status
+
+**Ticket type: NEW FUNCTIONALITY.**
+
+**OPEN.** Requested by the maintainer (2026-09-29): "try multiple
+vectorizations on halo.c given how slow it is"; adding SLEEF as a
+dependency is acceptable if testing shows it is worth it. Sequencing:
+after the algorithmic steps of the halo.c campaign (NFW table, HOD
+fold, spectra build), which decide which libm calls remain in hot
+loops.
+
+**Severity: LOW.** Performance only.
+
+### What is already in place
+
+- u_KS: its S and Q sums are SIMDe loops, confirmed in the disassembly
+  (fmul.2d/fadd.2d); a small gain (3.15 -> 3.00 ms per Gamma change).
+- The measurement recipe: clang -Rpass/-Rpass-missed/-Rpass-analysis
+  remarks with the house flags (minus -flto) to see what the compiler
+  does, disassembly (otool -tv / objdump -d) to confirm SIMDe paths,
+  interleaved A/B medians for every speed claim.
+
+### What is missing
+
+- A measured libm share of each hot build after the algorithmic steps
+  (HOD node sums: fnu/hb1nu powers per (bin, a, node); spectra build:
+  log/sin/cos per profile read).
+- Hoisting first (pow(x, p) as exp(p ln x) with ln x per node), then
+  SIMDe + SLEEF on what remains; A/B against the scalar path.
+- SLEEF through Cocoa's package mechanism (pinned commit, setup and
+  compile scripts, .gitignore entry), and a decision on the default:
+  SLEEF results differ from libm at the ULP level (1-ULP variants),
+  deterministic per machine but not bitwise across x86/ARM - on by
+  default, or behind a flag like COSMOLIKE_AGGRESSIVE_MODE.
+- basics.c spline2d_upsample_uniform: row-wise second pass (SIMDe)
+  and/or threads - prepared, not yet measured.
 
 <a id="open-web-halo-model"></a>
 ## Web-halo model (WHM, arXiv:2508.10902) for nonlinear P(k)
