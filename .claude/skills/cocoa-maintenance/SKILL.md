@@ -5,12 +5,14 @@ description: >
   (set_installation_options.sh, installation_scripts/*.sh, setup_cocoa.sh,
   compile_cocoa.sh, start/stop scripts). Use this skill whenever the task
   touches Cocoa's README.md, a project README, any *.sh file, the conda yml
-  files, release tags, or environmental keys. This repository does NOT contain
-  the Cosmolike C code; this skill covers only Cocoa's shell layer and
-  documentation.
+  files, release tags, or environmental keys, or any Python file committed
+  to a Cocoa repository (tests, generators, drivers, sampler example scripts,
+  notebook wrappers, plotting scripts): Section 8 is the Python style
+  contract. This repository does NOT contain the Cosmolike C code; this
+  skill covers Cocoa's shell layer, its documentation and its Python.
 ---
 
-# Cocoa maintenance: README and bash scripts
+# Cocoa maintenance: README, bash scripts and Python scripts
 
 Follow these rules exactly. When a rule below conflicts with your own idea of
 "better code", the rule wins. Do not improvise improvements.
@@ -1127,6 +1129,87 @@ generates one fiducial vector per point. Raw chi2 values against
 the shipped data may still be printed, labeled as information,
 never asserted on.
 
+### 5.2 The frozen-test machinery of the cosmolike projects (and how to refreeze)
+
+Every cosmolike project carries the same test technology under
+`projects/<name>/tests/`, and a maintenance task that touches data
+vectors, likelihood defaults, or reference values must work through
+it, never around it. The pieces:
+
+- `cocoa_test_utils.py` - the harness: the `EXAMPLES` table (one
+  entry per frozen configuration, naming the likelihood and the
+  provenance yaml), `load_frozen_info`/`build_point` (rebuild the
+  exact frozen model and evaluation point), `single_model_chi2`, and
+  the manifest/reference readers every test calls first.
+- `generate_frozen_reference.py` - the ONLY writer of the frozen
+  state. It refuses to run without `--overwrite`.
+- `frozen/` - the state itself: `frozen_config_*.py` (the cobaya
+  configuration fully resolved at freeze time, every option and
+  parameter written out, plus the exact evaluation point), `data/`
+  (the tests' own copy of data vectors, covariance, n(z), masks),
+  the example-yaml snapshots (for humans to diff, never loaded),
+  `reference_chi2.json`, and the TATT-generated vector.
+- `manifest_sha256.json` - the SHA-256 pin of every file under
+  `frozen/`; each test verifies it before evaluating anything, so
+  nothing under `frozen/` is ever edited by hand.
+
+Two data designs coexist, and knowing which project has which is the
+first step of any refreeze:
+
+- Real-data projects (des_y3, desy1xplanck): the shipped `data_file`
+  is survey measurements and can never be regenerated. Their freeze
+  GENERATES fiducial model vectors into `frozen/data/` and computes
+  the references against those, so references sit at chi2 ~ 1e-13
+  (the 5.1 doctrine: checks live at their minimum).
+- Simulated projects (lsst_y1, roman_real, roman_fourier, roman_kl):
+  `data/` ships `.modelvector` files that ARE pipeline predictions
+  at the fiducial. NLA references measure current-code-vs-shipped
+  vector (exactly zero right after the vector is regenerated, small
+  drift otherwise); TATT references always evaluate against the
+  freeze-generated TATT vector regardless.
+
+One subtlety governs both designs: the frozen configurations pin
+every option that existed at freeze time, and nothing else. A
+likelihood yaml key added later resolves from the LIVE defaults when
+a frozen model is built, so a new key (or a changed default) changes
+what the frozen tests evaluate without touching a byte of `frozen/`.
+
+The refreeze procedure (maintainer-authorized, per project, from the
+`Cocoa/` folder with the environment active - the frozen
+configurations carry ROOTDIR-relative paths such as
+`./external_modules/code/CAMB`, and running from anywhere else fails
+there):
+
+1. If a shipped simulated vector must change, regenerate it FIRST:
+   build the model from the frozen configuration, keep the original
+   `data_file` (the printed theory vector does not depend on the
+   loaded data), set `print_datavector`/`print_datavector_file` at
+   the shipped `data/<name>.modelvector`, evaluate once at the
+   frozen point, and check the entry count against the old file.
+2. `python ./projects/<name>/tests/generate_frozen_reference.py
+   --overwrite` - deletes `frozen/`, copies the current `data/`,
+   writes the resolved configurations, regenerates the TATT vector
+   and its per-mask dataset descriptors (the `--mask` sweep
+   variants; `TATT_MASK_VARIANTS` in the generator), computes every
+   reference chi2, and pins the manifest.
+3. The same script with `--baryons` - the per-method baryon drift
+   vectors are NOT rebuilt by `--overwrite`, and the drift tests
+   fail on missing files until this step runs. (`--tatt-masks`
+   exists as the analogous incremental mode for the per-mask
+   descriptors alone: pure text, no evaluations.) `--baryons` is
+   ALSO required, without any `--overwrite`, after every core commit
+   that changes the shear prediction: test_accuracy_baryons
+   regenerates its vectors in place over the frozen drift files, so
+   a shear-model change makes that rewrite differ from the manifest
+   and every later test class errors at verify_frozen until the
+   re-pin.
+4. The full pytest suite.
+5. Reconcile the printed chi2 values old-vs-new BEFORE committing: a
+   refreeze absorbs EVERYTHING that changed since the last one, so
+   every delta must be accounted for by a known, deliberate change
+   (measure the absorbed drift first by running the reference tests
+   against the old frozen state).
+
 ## 6. Bash style guide (observed across all installation_scripts)
 
 When writing or editing a script, imitate these conventions exactly. They
@@ -1505,6 +1588,11 @@ Concretely:
   once far away.
 - **Every constant** carries a comment with the meaning of the chosen
   value (why 0.2, why 4 threads, why this list of nine cosmologies).
+- **Blocked vocabulary**, in ALL documentation (READMEs, C/C++
+  comments, Python docstrings): "accessor". Say what the function
+  does instead - the lookup function, the table read - or name the
+  function itself. The list grows as the maintainer flags words;
+  check it before reaching for computer-science jargon.
 - Python prose follows the anti-AI rules of Section 3.6 in full.
 
 ### 8.3 Scope discipline
@@ -1517,6 +1605,130 @@ Concretely:
 - Tests may be longer than the code they test (they show valid and
   invalid cases), but they follow every rule above, including full
   docstrings.
+- As a guide, a fix for one bug that adds plus deletes more than about
+  4000 characters outside the tests needs a stated reason why the
+  smaller direct repair is unsafe, or it is split.
+- Add a protective check when it is simple, cheap, and sits where the
+  value enters. Do not build a framework to anticipate every way a user
+  could express an equivalent scientific choice: document the limit and
+  leave the choice with the user. A best-effort check says what it
+  actually compares; it never claims to be a proof.
+- A bounded repair may leave a harmless exceptional case uncovered. Say
+  so exactly; do not claim complete coverage.
+
+### 8.4 Cold paths and hot paths
+
+Mark every changed path before writing.
+
+- A **cold path** runs once or rarely: configuration, validation,
+  set-up, file handling, command parsing, reporting, object
+  construction, figure layout. Every rule of 8.1 applies in full.
+- A **hot path** repeats many times or works on whole arrays: a
+  vectorized numpy kernel, the per-evaluation body of a likelihood, a
+  loop over thousands of table nodes. Dense numerical syntax is allowed
+  there only where it is needed for speed or states the mathematics
+  more directly, and it still needs descriptive names at the inputs and
+  outputs, a comment with the mathematical reason or shape invariant,
+  the shapes and units in the docstring, a timing before and after when
+  the execution shape changes, and a regression check of the numbers.
+- The set-up, validation and error handling around a hot kernel are
+  cold paths.
+
+### 8.5 No monkey patches
+
+A monkey patch replaces existing executable behavior while Python is
+running: replacing an imported function or a method, changing
+`sys.modules`, `__defaults__`, `__code__` or `__class__`, and using
+`patch`, `patch.object`, `patch.dict` or pytest's `monkeypatch`
+fixture. New ones are prohibited everywhere, tests included. Use
+instead:
+
+- an explicit argument that receives the replacement;
+- a subclass defined before use;
+- a temporary file or directory;
+- a separate process whose files, arguments or environment are chosen
+  before Python imports the code (the worker-subprocess pattern of
+  `cocoa_testing.py`).
+
+Importing a module or binding an alias is not a monkey patch; replacing
+behavior through that alias is. Replacing a method on even one local
+instance is one. An existing monkey patch met during other work is
+reported, not fixed in passing.
+
+### 8.6 Explain the current code, not its history
+
+Comments, docstrings, command help and error text say what the code
+does now and why. They do not record the requests or reviews that led
+to it.
+
+- When behavior changes, replace the old explanation in place: no
+  dated correction, no "now does X", no review round, no ticket number,
+  no model name.
+- No person's name, no personal pronouns, no attributed quotations.
+- Audience nouns: **the user** (who runs or configures the code) and
+  **the reader** (who reads the code or its documentation).
+- A date stays when the program reads or computes it, or when it
+  identifies a data release or a publication. "previous", "history"
+  and "phase" stay when they name run-time data or an algorithm step.
+
+NO-GO: `# Rule from the latest review: now refuse a dirty worktree.`
+GO: `# Refuse a dirty worktree so uncommitted files cannot enter the
+release.`
+
+### 8.7 Interfaces, saved files and dependency versions
+
+- Return shapes, the order of a returned tuple, and units are part of
+  the interface. Changing one is an interface change: every caller
+  (each project's wrappers, notebooks and tests) changes in the same
+  piece of work.
+- Document unavoidable positional conventions near the call or in the
+  docstring: plotting coordinates, `einsum` operands, the tuple a
+  wrapper returns.
+- A value saved to a file for later use (a frozen test configuration, a
+  chain header, a cached array) is saved fully resolved, including the
+  defaults the code applied. A reader of that file never substitutes
+  today's code default for a missing key: it names the key and stops.
+- Do not add compatibility branches for a dependency version outside
+  the declared Cocoa environment (the conda yml files). Detect the
+  unsupported version at the first shared boundary and stop with one
+  clear error.
+
+### 8.8 Plotting functions and notebooks
+
+The data-vector plotting functions and the notebook helpers live in
+the Cosmolike core (`cosmolike_notebook_utils/`), and their
+conventions are written in the Cosmolike skill:
+`external_modules/code/cosmolike_core/.claude/skills/cosmolike-dev/references/python.md`,
+Section 10. Read it before writing or changing a plotting function, a
+notebook wrapper or a notebook. The points that matter from this side:
+
+- `cosmolike_notebook_utils` never imports a project's compiled
+  interface; a function that needs cosmolike receives the notebook's
+  callable as an argument. Its plotting modules are pure numpy and
+  matplotlib.
+- A new plotting function copies the signature order and the behavior
+  of the existing ones: the list of curves, an optional `*_ref` that
+  switches the panels to `value/reference - 1`, `param` with
+  `colorbarlabel` for a sweep, `show = None` returning `(fig, axes)`,
+  and malformed input printing one message and returning 0.
+- A notebook cell calls the project's wrappers and the shared plotting
+  functions; it does not reimplement them inline. The wrapper
+  initializes cosmolike exactly as the project's likelihood does.
+- A figure is checked by rendering it and looking at it, in every mode
+  the function offers.
+
+### 8.9 What to report with a Python change
+
+- the changed `path::symbol` list, each marked cold or hot;
+- the tests and checks that were run: exact commands, return codes and
+  the important output lines;
+- for a hot path: the timing before and after and the numerical
+  regression result;
+- for a plotting function: which modes were rendered and looked at;
+- what was not run or not verified, stated plainly;
+- other problem sites noticed and left alone.
+
+A checkbox without a command or an inspected result is not evidence.
 
 ## 9. Interpreting the project accuracy tests
 
@@ -1624,3 +1836,128 @@ separate repository pinned by the COSMOLIKE keys), commit, never
 push, and verify that results at the unboosted defaults are unchanged
 (the frozen project references must not move) before claiming the
 fix.
+
+## 7. The execution backlog (cocoa_installation_libraries/notes/backlog.md)
+
+The backlog is the execution tracker: one `- OPEN` index line per
+unfinished ticket, one anchored section per ticket, and a Closed
+archive that works as a compressed decision record (dated
+measurements are kept there on purpose).
+
+- **Close the ticket in the same session that finishes the work.**
+  "Implemented and validated" means closed: remove the `- OPEN`
+  index line and the ticket section, and add a compressed entry to
+  the Closed archive keeping the dated measurements and decisions.
+  Do not leave a ticket open because maintainer-only steps remain
+  (commits, pushes, merges, a deferred default flip): those are
+  recorded as deferred decisions inside the closed entry, not
+  reasons to stay open.
+- New work agreed in conversation gets a ticket before or while it
+  is done, following the existing section template (High-level
+  summary / Current status / What is already in place / What is
+  missing / Technical record).
+- After any backlog edit, verify the file's own invariant: the
+  number of `- OPEN` index lines equals the number of
+  `<a id="open-...">` anchors, and every index link resolves.
+
+## 8. Lessons that generalize (learned 2026-09, DES-Y6 forensics + runtime-knob work)
+
+### 8.1 Cross-code comparisons decompose into layers; test conventions first
+
+- When two codes disagree by FLAT per-bin offsets, suspect input
+  INTERPRETATION before numerics: what a table's z column means (bin
+  left edge vs sample point), normalization windows, bin conventions.
+  A half-cell z-assignment moved cosmic shear by percent; the spline
+  choice moved it by 1e-5.
+- A rigid shift common to lens and source samples has a cross-probe
+  fingerprint: shear moves UP, clustering moves DOWN, gamma_t nearly
+  cancels. Opposite signs from one toggle discriminate a rigid shift
+  from width or shape errors.
+- Per-bin multiplicative layers reveal themselves as
+  residual(i,j) = f_i + f_j across pairs. Fit that structure before
+  interpreting residuals as physics: fiducial shear m-biases
+  (nonzero even at zero sampled nuisances) masqueraded as an n(z)
+  effect until factored out.
+- Mutual-agreement tests (C vs python, code A vs code B) are blind to
+  SHARED conventions and shared upstream typos. Correctness needs an
+  independent derivation: re-deriving Legendre coefficients by hand
+  settled a FAST-PT table typo that both implementations would have
+  agreed on.
+
+### 8.2 Runtime knobs, not compile flags
+
+- A new numerical choice ships as a runtime field (Ntable/struct),
+  set through one init function, declared in every likelihood yaml,
+  and mirrored in the notebook wrappers. Unit tests then flip it in
+  ONE process - no rebuilds - and a compile-time #ifdef would have
+  required two.
+- The knob value must enter the cache-invalidation condition of every
+  table it influences (a packed integer slot compared alongside the
+  existing random works well). The unit test proves it two ways: a
+  dead-flag floor (delta^T C^-1 delta > tiny; a stale cache gives
+  exactly zero) and a bit-identical round trip back to the default
+  (over- and under-invalidation both fail loudly).
+- Defaults are conservative at merge; flipping a default is a
+  separate, measured, documented decision. Never ship an unmeasured
+  default: run the convergence scan first, then bake the number.
+
+### 8.3 The two-grid principle (now confirmed three times)
+
+- Accuracy lives in the OUTPUT table density (what the likelihood
+  interpolates), not in the smooth internal computation. FAST-PT
+  (python), bfmt, and now cfastpt all converged at internal grids far
+  coarser than their outputs (cfastpt: <= 1e-9 in delta chi2 at 298
+  vs 1100 points). When a table build is slow, split compute grid
+  from output grid before buying a faster machine.
+- FFTLog engine facts: the point count must be EVEN, and
+  N_pad/N_extrap are ln-k SPANS in disguise (span = count * dlnk) -
+  scale the counts with the grid so the spans stay fixed, or the
+  circular convolution wraps and the truncation edge rings.
+
+### 8.4 Ntable-keyed persistence (allocation discipline)
+
+- Anything whose SIZE depends only on Ntable (work arrays, spline
+  scratch, FFT configs) is allocated once inside the
+  fdiff2(cache[1], Ntable.random) block and reused across
+  cosmologies - never re-malloc'd per evaluation, and NEVER malloc'd
+  inside an OpenMP region.
+- A shared helper takes caller-owned scratch as an argument: a
+  static inside the helper would be sized by whichever caller ran
+  first and overflow for the other.
+- Watch alias transitions: when a work pointer may alias the output
+  pointer (bypass paths), free the non-aliased one first and guard
+  every free against the aliased case.
+
+### 8.5 Timing cache-keyed code honestly
+
+- To time a cache-keyed rebuild, FORCE it (bump the random the cache
+  watches) every repetition. A timing that shows no dependence on
+  the knob usually means the code path never ran - a null result is
+  a probe bug until proven otherwise.
+- Quote cosmolike speedups excluding CAMB; on the exact-CAMB path
+  everything drowns in the Boltzmann call. Fit cost against the
+  scaling law (N ln N for FFTLog) across several settings instead of
+  differencing two noisy medians. Laptop numbers are proxies;
+  perf stat -r 3 on the Linux benchmark is what a PR may cite.
+
+### 8.6 C review rules the maintainer enforces (in addition to Section 6)
+
+- Function signatures: one argument per line, a short comment per
+  argument.
+- Fenced headers carry a "Cache invalidation:" section; the label sits
+  on its own line and the explanation starts on the next line:
+
+      // Cache invalidation:
+      // recomputes when any of these change:
+      //   cosmology.random, nuisance.random_photoz_shear, ...
+- No single-letter variable names (they defeat grep); name any magic
+  number that appears twice.
+- All statics declared at the top of the function.
+- Every omp for carries schedule(static); use collapse(2) where the
+  loop nest allows - and restructure to allow it (e.g. split a
+  per-row setup into its own serial phase) when the outer loop alone
+  underfills the thread team (5-10 iterations).
+- Local restrict pointers inside collapse(2) bodies, with a comment
+  explaining the aliasing consequence in plain words - didactic
+  comments must avoid jargon ("injective", "FMA-chain body") in
+  favor of what actually happens.

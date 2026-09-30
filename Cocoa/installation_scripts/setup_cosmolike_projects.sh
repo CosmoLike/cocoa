@@ -471,6 +471,90 @@ if [ -z "${IGNORE_COSMOLIKE_ROMAN_KL_CODE}" ]; then
 fi
 
 # ----------------------------------------------------------------------------
+# ------------------------------- DES CLUSTER --------------------------------
+# ----------------------------------------------------------------------------
+
+if [ -z "${IGNORE_COSMOLIKE_DES_CLUSTER_CODE}" ]; then 
+  
+  # Name to be printed on this shell script messages
+  PRINTNAME="DES_CLUSTER"
+
+  ptop "GETTING ${PRINTNAME:?}" || { unset_all; return 1; }
+
+  FOLDER="${DES_CLUSTER_NAME:-"des_cluster"}"
+
+  URL="${DES_CLUSTER_URL:-"https://github.com/CosmoLike/cocoa_des_cluster.git"}"
+  URL=$(devurl "${URL:?}")
+
+  if [ -n "${DES_CLUSTER_GIT_COMMIT:-}" ]; then
+
+    gitact0 "${FOLDER:?}" "${URL:?}" || return 1;
+    
+    gitact2 "${FOLDER:?}" "${DES_CLUSTER_GIT_COMMIT:?}"  || return 1;
+
+  elif [ -n "${DES_CLUSTER_GIT_BRANCH:-}" ]; then 
+
+    gitact1 "${FOLDER:?}" "${URL:?}" "${DES_CLUSTER_GIT_BRANCH:?}" || return 1;
+
+  elif [ -n "${DES_CLUSTER_GIT_TAG:-}" ]; then 
+
+    gitact0 "${FOLDER:?}" "${URL:?}" || return 1;
+    
+    gitact3 "${FOLDER:?}" "${DES_CLUSTER_GIT_TAG:?}" || return 1;
+
+  else
+
+    gitact0 "${FOLDER:?}" "${URL:?}" || return 1;
+
+  fi
+
+  pbottom "GETTING ${PRINTNAME:?}" || { unset_all; return 1; }
+
+fi
+
+# ----------------------------------------------------------------------------
+# ---------------------------------- DES Y6 ----------------------------------
+# ----------------------------------------------------------------------------
+
+if [ -z "${IGNORE_COSMOLIKE_DES_Y6_CODE}" ]; then 
+  
+  # Name to be printed on this shell script messages
+  PRINTNAME="DES_Y6"
+
+  ptop "GETTING ${PRINTNAME:?}" || { unset_all; return 1; }
+
+  FOLDER="${DES_Y6_NAME:-"des_y6"}"
+
+  URL="${DES_Y6_URL:-"https://github.com/CosmoLike/cocoa_des_y6.git"}"
+  URL=$(devurl "${URL:?}")
+
+  if [ -n "${DES_Y6_GIT_COMMIT:-}" ]; then
+
+    gitact0 "${FOLDER:?}" "${URL:?}" || return 1;
+    
+    gitact2 "${FOLDER:?}" "${DES_Y6_GIT_COMMIT:?}"  || return 1;
+
+  elif [ -n "${DES_Y6_GIT_BRANCH:-}" ]; then 
+
+    gitact1 "${FOLDER:?}" "${URL:?}" "${DES_Y6_GIT_BRANCH:?}" || return 1;
+
+  elif [ -n "${DES_Y6_GIT_TAG:-}" ]; then 
+
+    gitact0 "${FOLDER:?}" "${URL:?}" || return 1;
+    
+    gitact3 "${FOLDER:?}" "${DES_Y6_GIT_TAG:?}" || return 1;
+
+  else
+
+    gitact0 "${FOLDER:?}" "${URL:?}" || return 1;
+
+  fi
+
+  pbottom "GETTING ${PRINTNAME:?}" || { unset_all; return 1; }
+
+fi
+
+# ----------------------------------------------------------------------------
 
 unset_all || return 1;
 

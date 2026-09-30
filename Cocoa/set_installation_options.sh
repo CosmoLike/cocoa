@@ -85,6 +85,10 @@ export IGNORE_DARK_EMULATOR_CODE=1
 #export IGNORE_COSMOLIKE_ROMAN_FOURIER_CODE=1
 #export IGNORE_COSMOLIKE_ROMAN_REAL_CODE=1
 #export IGNORE_COSMOLIKE_ROMAN_KL_CODE=1
+# The two projects below are skipped by default: comment the key to
+# download and compile the project.
+export IGNORE_COSMOLIKE_DES_CLUSTER_CODE=1
+export IGNORE_COSMOLIKE_DES_Y6_CODE=1
 
 #export IGNORE_BFMT_CODE=1 # Baryon Feedback Theory Block from Nihar&JVicente
 
@@ -113,6 +117,15 @@ export IGNORE_DARK_EMULATOR_CODE=1
 # If set, compile_planck.sh uses click like code from github.com/benabed/clik
 # ------------------------------------------------------------------------------
 export USE_SPT_CLIK_PLANCK=1
+
+# ------------------------------------------------------------------------------
+# If set, setup_camb.sh applies camb_changes/camb/halofit.patch: halofit stops
+# its bisection for the nonlinear scale at |sigma(R)-1| <= 1e-7 (CAMB: 1e-3).
+# With 1e-3 the nonlinear P(k) jitters by ~0.3% between nearby cosmologies, and
+# finite-difference Fisher derivatives move with the step size. An installed
+# CAMB gets the patch only when re-cloned (OVERWRITE_EXISTING_CAMB_CODE=1).
+# ------------------------------------------------------------------------------
+#export PATCH_CAMB_HALOFIT_TOLERANCE=1
 
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
@@ -150,6 +163,14 @@ export ROMAN_KL_URL="https://github.com/CosmoLike/cocoa_roman_kl.git"
 export ROMAN_KL_NAME="roman_kl"
 export ROMAN_KL_GIT_TAG="v4.11.5"
 
+export DES_CLUSTER_URL="https://github.com/CosmoLike/cocoa_des_cluster.git"
+export DES_CLUSTER_NAME="des_cluster"
+export DES_CLUSTER_GIT_BRANCH="main" # no tagged release yet
+
+export DES_Y6_URL="https://github.com/CosmoLike/cocoa_des_y6.git"
+export DES_Y6_NAME="des_y6"
+export DES_Y6_GIT_BRANCH="main" # no tagged release yet
+
 export BFMT_THEORY_URL="https://github.com/CosmoLike/cocoa_baryonic_feedback_models_theory.git"
 export BFMT_NAME="baryon_suppression"
 export BFMT_GIT_TAG="v1.01"
@@ -178,7 +199,11 @@ export AXIE_CAMB_2026_PROJECT_NAME="axicambv2"
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
 export EMULTRF_URL="https://github.com/CosmoLike/emulators_code.git"
-export EMULTRF_GIT_TAG="v4.11.1"
+# Development: follow the branch main, which carries fixes no release tag has
+# yet (tag v4.11.1 fails in emulrdrag when cobaya evaluates without derived
+# parameters). Pin a tag again before the release of Cocoa 5.0.
+#export EMULTRF_GIT_TAG="v4.11.1"
+export EMULTRF_GIT_BRANCH="main"
 export OVERWRITE_EXISTING_EMULTRF_CODE=1
 
 export EMULTRF_DATA_URL="https://github.com/SBU-COSMOLIKE/emulators_data_lcdm.git"
