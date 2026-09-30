@@ -165,7 +165,7 @@ export ROMAN_KL_GIT_TAG="v4.11.5"
 
 export DES_CLUSTER_URL="https://github.com/CosmoLike/cocoa_des_cluster.git"
 export DES_CLUSTER_NAME="des_cluster"
-export DES_CLUSTER_GIT_BRANCH="bugfix" # no tagged release yet
+export DES_CLUSTER_GIT_BRANCH="main" # no tagged release yet
 
 export DES_Y6_URL="https://github.com/CosmoLike/cocoa_des_y6.git"
 export DES_Y6_NAME="des_y6"
