@@ -5,12 +5,14 @@ description: >
   (set_installation_options.sh, installation_scripts/*.sh, setup_cocoa.sh,
   compile_cocoa.sh, start/stop scripts). Use this skill whenever the task
   touches Cocoa's README.md, a project README, any *.sh file, the conda yml
-  files, release tags, or environmental keys. This repository does NOT contain
-  the Cosmolike C code; this skill covers only Cocoa's shell layer and
-  documentation.
+  files, release tags, or environmental keys, or any Python file committed
+  to a Cocoa repository (tests, generators, drivers, sampler example scripts,
+  notebook wrappers, plotting scripts): Section 8 is the Python style
+  contract. This repository does NOT contain the Cosmolike C code; this
+  skill covers Cocoa's shell layer, its documentation and its Python.
 ---
 
-# Cocoa maintenance: README and bash scripts
+# Cocoa maintenance: README, bash scripts and Python scripts
 
 Follow these rules exactly. When a rule below conflicts with your own idea of
 "better code", the rule wins. Do not improvise improvements.
@@ -1603,6 +1605,130 @@ Concretely:
 - Tests may be longer than the code they test (they show valid and
   invalid cases), but they follow every rule above, including full
   docstrings.
+- As a guide, a fix for one bug that adds plus deletes more than about
+  4000 characters outside the tests needs a stated reason why the
+  smaller direct repair is unsafe, or it is split.
+- Add a protective check when it is simple, cheap, and sits where the
+  value enters. Do not build a framework to anticipate every way a user
+  could express an equivalent scientific choice: document the limit and
+  leave the choice with the user. A best-effort check says what it
+  actually compares; it never claims to be a proof.
+- A bounded repair may leave a harmless exceptional case uncovered. Say
+  so exactly; do not claim complete coverage.
+
+### 8.4 Cold paths and hot paths
+
+Mark every changed path before writing.
+
+- A **cold path** runs once or rarely: configuration, validation,
+  set-up, file handling, command parsing, reporting, object
+  construction, figure layout. Every rule of 8.1 applies in full.
+- A **hot path** repeats many times or works on whole arrays: a
+  vectorized numpy kernel, the per-evaluation body of a likelihood, a
+  loop over thousands of table nodes. Dense numerical syntax is allowed
+  there only where it is needed for speed or states the mathematics
+  more directly, and it still needs descriptive names at the inputs and
+  outputs, a comment with the mathematical reason or shape invariant,
+  the shapes and units in the docstring, a timing before and after when
+  the execution shape changes, and a regression check of the numbers.
+- The set-up, validation and error handling around a hot kernel are
+  cold paths.
+
+### 8.5 No monkey patches
+
+A monkey patch replaces existing executable behavior while Python is
+running: replacing an imported function or a method, changing
+`sys.modules`, `__defaults__`, `__code__` or `__class__`, and using
+`patch`, `patch.object`, `patch.dict` or pytest's `monkeypatch`
+fixture. New ones are prohibited everywhere, tests included. Use
+instead:
+
+- an explicit argument that receives the replacement;
+- a subclass defined before use;
+- a temporary file or directory;
+- a separate process whose files, arguments or environment are chosen
+  before Python imports the code (the worker-subprocess pattern of
+  `cocoa_testing.py`).
+
+Importing a module or binding an alias is not a monkey patch; replacing
+behavior through that alias is. Replacing a method on even one local
+instance is one. An existing monkey patch met during other work is
+reported, not fixed in passing.
+
+### 8.6 Explain the current code, not its history
+
+Comments, docstrings, command help and error text say what the code
+does now and why. They do not record the requests or reviews that led
+to it.
+
+- When behavior changes, replace the old explanation in place: no
+  dated correction, no "now does X", no review round, no ticket number,
+  no model name.
+- No person's name, no personal pronouns, no attributed quotations.
+- Audience nouns: **the user** (who runs or configures the code) and
+  **the reader** (who reads the code or its documentation).
+- A date stays when the program reads or computes it, or when it
+  identifies a data release or a publication. "previous", "history"
+  and "phase" stay when they name run-time data or an algorithm step.
+
+NO-GO: `# Rule from the latest review: now refuse a dirty worktree.`
+GO: `# Refuse a dirty worktree so uncommitted files cannot enter the
+release.`
+
+### 8.7 Interfaces, saved files and dependency versions
+
+- Return shapes, the order of a returned tuple, and units are part of
+  the interface. Changing one is an interface change: every caller
+  (each project's wrappers, notebooks and tests) changes in the same
+  piece of work.
+- Document unavoidable positional conventions near the call or in the
+  docstring: plotting coordinates, `einsum` operands, the tuple a
+  wrapper returns.
+- A value saved to a file for later use (a frozen test configuration, a
+  chain header, a cached array) is saved fully resolved, including the
+  defaults the code applied. A reader of that file never substitutes
+  today's code default for a missing key: it names the key and stops.
+- Do not add compatibility branches for a dependency version outside
+  the declared Cocoa environment (the conda yml files). Detect the
+  unsupported version at the first shared boundary and stop with one
+  clear error.
+
+### 8.8 Plotting functions and notebooks
+
+The data-vector plotting functions and the notebook helpers live in
+the Cosmolike core (`cosmolike_notebook_utils/`), and their
+conventions are written in the Cosmolike skill:
+`external_modules/code/cosmolike_core/.claude/skills/cosmolike-dev/references/python.md`,
+Section 10. Read it before writing or changing a plotting function, a
+notebook wrapper or a notebook. The points that matter from this side:
+
+- `cosmolike_notebook_utils` never imports a project's compiled
+  interface; a function that needs cosmolike receives the notebook's
+  callable as an argument. Its plotting modules are pure numpy and
+  matplotlib.
+- A new plotting function copies the signature order and the behavior
+  of the existing ones: the list of curves, an optional `*_ref` that
+  switches the panels to `value/reference - 1`, `param` with
+  `colorbarlabel` for a sweep, `show = None` returning `(fig, axes)`,
+  and malformed input printing one message and returning 0.
+- A notebook cell calls the project's wrappers and the shared plotting
+  functions; it does not reimplement them inline. The wrapper
+  initializes cosmolike exactly as the project's likelihood does.
+- A figure is checked by rendering it and looking at it, in every mode
+  the function offers.
+
+### 8.9 What to report with a Python change
+
+- the changed `path::symbol` list, each marked cold or hot;
+- the tests and checks that were run: exact commands, return codes and
+  the important output lines;
+- for a hot path: the timing before and after and the numerical
+  regression result;
+- for a plotting function: which modes were rendered and looked at;
+- what was not run or not verified, stated plainly;
+- other problem sites noticed and left alone.
+
+A checkbox without a command or an inspected result is not evidence.
 
 ## 9. Interpreting the project accuracy tests
 
