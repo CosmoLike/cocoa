@@ -82,17 +82,21 @@ Core packages include compilers and numerical libraries that users typically do 
 
   - Linux
 
-    - Legacy Version
+    - Deprecated Version
 
           wget https://raw.githubusercontent.com/CosmoLike/cocoa/refs/tags/v4.053/cocoapy310.yml
 
-    - Stable Version
+    - Legacy Version
 
           wget https://raw.githubusercontent.com/CosmoLike/cocoa/refs/tags/v4.072/cocoapy310.yml
 
-    - Testing beta release
+    - Stable Version
 
           wget https://raw.githubusercontent.com/CosmoLike/cocoa/refs/tags/v4.11.8/cocoapy311.yml
+
+    - Testing beta release
+
+          wget https://raw.githubusercontent.com/CosmoLike/cocoa/refs/tags/v5.00/cocoapy311.yml
 
   - macOS (arm)
     
@@ -103,19 +107,23 @@ Core packages include compilers and numerical libraries that users typically do 
 
     Then, download the `yml` file matching the chosen version.
 
-    - Legacy Version
+    - Deprecated Version
 
           wget https://raw.githubusercontent.com/CosmoLike/cocoa/refs/tags/v4.053/cocoapy310-osxarm-base.yml
 
-    - Stable Version
+    - Legacy Version
 
           wget https://raw.githubusercontent.com/CosmoLike/cocoa/refs/tags/v4.072/cocoapy310-osxarm-base.yml
 
-    - Testing beta release
+    - Stable Version
 
           wget https://raw.githubusercontent.com/CosmoLike/cocoa/refs/tags/v4.11.8/cocoapy311-osxarm-base.yml
 
-**Step :two:**: Create the Cocoa environment (if the Legacy or Stable version was chosen in the previous step, replace `cocoapy311` with `cocoapy310` below),
+    - Testing beta release
+
+          wget https://raw.githubusercontent.com/CosmoLike/cocoa/refs/tags/v5.00/cocoapy311-osxarm-base.yml
+
+**Step :two:**: Create the Cocoa environment (if the Deprecated or Legacy version was chosen in the previous step, replace `cocoapy311` with `cocoapy310` below),
 
   - Linux
   
@@ -176,17 +184,21 @@ In this section, we assume users have previously activated the Cocoa conda envir
 
 **Step :one:**: Download Cocoa's latest release and go to its main folder (`cocoa/Cocoa`),
   
-  - Legacy Version
+  - Deprecated Version
     
         git clone https://github.com/CosmoLike/cocoa.git --branch v4.053 cocoa
     
-  - Stable Version
+  - Legacy Version
     
         git clone https://github.com/CosmoLike/cocoa.git --branch v4.072 cocoa
 
-  - Testing beta release
+  - Stable Version
   
         git clone https://github.com/CosmoLike/cocoa.git --branch v4.11.8 cocoa
+
+  - Testing beta release
+  
+        git clone https://github.com/CosmoLike/cocoa.git --branch v5.00 cocoa
 
 > [!Warning]
 > The version cloned here must match the version of the `yml` file downloaded in the section
@@ -921,15 +933,15 @@ and
  
      conda activate lockenv
 
-**Step :two:** Download the appropriate conda-lock compatible `yml` file. As in the section [Installation of core packages](#required_packages_conda), replace the tag `v4.11.8` in the URL with the Cocoa version that will be cloned (tags older than `v4.11.4` carry the `cocoapy310` prefix).
+**Step :two:** Download the appropriate conda-lock compatible `yml` file. As in the section [Installation of core packages](#required_packages_conda), replace the tag `v5.00` in the URL with the Cocoa version that will be cloned (tags older than `v4.11.4` carry the `cocoapy310` prefix).
 
    - Linux
   
-         wget https://raw.githubusercontent.com/CosmoLike/cocoa/refs/tags/v4.11.8/cocoapy311-linux.yml
+         wget https://raw.githubusercontent.com/CosmoLike/cocoa/refs/tags/v5.00/cocoapy311-linux.yml
 
    - macOS (arm)
      
-         wget https://raw.githubusercontent.com/CosmoLike/cocoa/refs/tags/v4.11.8/cocoapy311-osxarm.yml
+         wget https://raw.githubusercontent.com/CosmoLike/cocoa/refs/tags/v5.00/cocoapy311-osxarm.yml
 
 **Step :three:** Create the conda environment
 
@@ -957,13 +969,13 @@ and
 
      conda activate base2
 
-**Step :two:** Now install wget and download a looser version of the yml file (note here slightly modified conda command). As in the section [Installation of core packages](#required_packages_conda), replace the tag `v4.11.8` in the URL with the Cocoa version that will be cloned (tags older than `v4.11.4` carry the `cocoapy310` prefix).
+**Step :two:** Now install wget and download a looser version of the yml file (note here slightly modified conda command). As in the section [Installation of core packages](#required_packages_conda), replace the tag `v5.00` in the URL with the Cocoa version that will be cloned (tags older than `v4.11.4` carry the `cocoapy310` prefix).
 
      conda install -y wget --solver=libmamba --strict-channel-priority --override-channels -c conda-forge
 
 and
 
-     wget https://raw.githubusercontent.com/CosmoLike/cocoa/refs/tags/v4.11.8/cocoapy311-osxarm-loose.yml
+     wget https://raw.githubusercontent.com/CosmoLike/cocoa/refs/tags/v5.00/cocoapy311-osxarm-loose.yml
 
 **Step :three:** Create the cocoa conda env using a looser yml (note here slightly modified conda command)
 
@@ -1168,8 +1180,13 @@ The script `set_installation_options.sh` includes instructions for installing se
      #export IGNORE_COSMOLIKE_ROMAN_FOURIER_CODE=1
      #export IGNORE_COSMOLIKE_ROMAN_REAL_CODE=1
      #export IGNORE_COSMOLIKE_ROMAN_KL_CODE=1
-     export IGNORE_COSMOLIKE_DES_CLUSTER_CODE=1 # skipped by default
-     export IGNORE_COSMOLIKE_DES_Y6_CODE=1      # skipped by default
+     # The two projects below are skipped by default: comment the key to
+     # download and compile the project.
+     export IGNORE_COSMOLIKE_DES_CLUSTER_CODE=1
+     # WARNING: des_y6 is not production ready. It has no tagged release, so the
+     # installation follows its branch main (see DES_Y6_GIT_BRANCH below) and the
+     # code can change between two installations.
+     export IGNORE_COSMOLIKE_DES_Y6_CODE=1
      (...)
      # ------------------------------------------------------------------------------
      # OVERWRITE_EXISTING_XXX_CODE=1 -> setup_cocoa overwrites existing PACKAGES ----
@@ -1192,7 +1209,7 @@ The script `set_installation_options.sh` includes instructions for installing se
      #If none is set, Cocoa loads the latest commit on the repository default branch.
      #export ROMAN_REAL_GIT_BRANCH="main"
      #export ROMAN_REAL_GIT_COMMIT="abc"
-     export ROMAN_REAL_GIT_TAG="v4.11.2"
+     export ROMAN_REAL_GIT_TAG="v5.00"
 
 > [!NOTE]
 > The https URLs are the right choice for almost all users. Developers with write
@@ -1341,7 +1358,7 @@ This is a large image, approximately 13GB, as it already contains the conda coco
 >
 > and
 >
->     docker build . --build-arg COCOA_TAG=v4.11.8 -t vivianmiranda/whovian-cocoa # replace the tag with the Cocoa version whose yml seeds the conda env
+>     docker build . --build-arg COCOA_TAG=v5.00 -t vivianmiranda/whovian-cocoa # replace the tag with the Cocoa version whose yml seeds the conda env
 >
 > and
 >
@@ -1477,7 +1494,7 @@ There are a few differences users should be aware of when running Cocoa on Googl
           source "/content/conda/etc/profile.d/conda.sh"
           conda create -y -n lockenv -c conda-forge python=3.10 conda-lock=2.* wget
           conda activate lockenv
-          wget https://raw.githubusercontent.com/CosmoLike/cocoa/refs/tags/v4.11.8/cocoapy311-linux.yml
+          wget https://raw.githubusercontent.com/CosmoLike/cocoa/refs/tags/v5.00/cocoapy311-linux.yml
           conda-lock install -n cocoa cocoapy311-linux.yml
           conda activate cocoa 
           ln -s "${CONDA_PREFIX}"/bin/x86_64-conda-linux-gnu-gcc "${CONDA_PREFIX}"/bin/gcc
@@ -1492,7 +1509,7 @@ There are a few differences users should be aware of when running Cocoa on Googl
           %%bash
           source "/content/conda/etc/profile.d/conda.sh"
           conda activate cocoa                                  
-          git clone https://github.com/CosmoLike/cocoa.git --branch v4.11.8 cocoa # replace the tag with the Cocoa version being installed (it must match the yml downloaded on Cell 3)
+          git clone https://github.com/CosmoLike/cocoa.git --branch v5.00 cocoa # replace the tag with the Cocoa version being installed (it must match the yml downloaded on Cell 3)
 
     - **Cell 5️⃣**: run `setup_cocoa.sh`
 

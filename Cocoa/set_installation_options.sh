@@ -88,6 +88,9 @@ export IGNORE_DARK_EMULATOR_CODE=1
 # The two projects below are skipped by default: comment the key to
 # download and compile the project.
 export IGNORE_COSMOLIKE_DES_CLUSTER_CODE=1
+# WARNING: des_y6 is not production ready. It has no tagged release, so the
+# installation follows its branch main (see DES_Y6_GIT_BRANCH below) and the
+# code can change between two installations.
 export IGNORE_COSMOLIKE_DES_Y6_CODE=1
 
 #export IGNORE_BFMT_CODE=1 # Baryon Feedback Theory Block from Nihar&JVicente
@@ -137,39 +140,41 @@ export USE_SPT_CLIK_PLANCK=1
 
 export DES_Y3_URL="https://github.com/CosmoLike/cocoa_des_y3.git"
 export DES_Y3_NAME="des_y3"
-export DES_Y3_GIT_TAG="v4.11.2"
+export DES_Y3_GIT_TAG="v5.00"
 
 export DESXPLANCK_URL="https://git@github.com/CosmoLike/cocoa_desy1xplanck.git"
 export DESXPLANCK_GIT_NAME="desy1xplanck"
-export DESXPLANCK_GIT_TAG="v4.11.2"
+export DESXPLANCK_GIT_TAG="v5.00"
 
 export LSST_Y1_URL="https://github.com/CosmoLike/cocoa_lsst_y1.git"
 export LSST_Y1_NAME="lsst_y1"
-export LSST_Y1_GIT_TAG="v4.11.3"
+export LSST_Y1_GIT_TAG="v5.00"
 
 export ROMAN_FOURIER_URL="https://github.com/CosmoLike/cocoa_roman_fourier.git"
 export ROMAN_FOURIER_NAME="roman_fourier"
-export ROMAN_FOURIER_GIT_TAG="v4.11.2"
+export ROMAN_FOURIER_GIT_TAG="v5.00"
 
 export ROMAN_REAL_URL="https://github.com/CosmoLike/cocoa_roman_real.git"
 export ROMAN_REAL_NAME="roman_real"
-export ROMAN_REAL_GIT_TAG="v4.11.3"
+export ROMAN_REAL_GIT_TAG="v5.00"
 
 export COSMOLIKE_URL="https://github.com/CosmoLike/cocoa-cosmolike-core.git"
-export COSMOLIKE_GIT_TAG="v4.11.7"
+export COSMOLIKE_GIT_TAG="v5.00"
 export COSMOLIKE_NAME="cosmolike_core"
 
 export ROMAN_KL_URL="https://github.com/CosmoLike/cocoa_roman_kl.git"
 export ROMAN_KL_NAME="roman_kl"
-export ROMAN_KL_GIT_TAG="v4.11.5"
+export ROMAN_KL_GIT_TAG="v5.00"
 
 export DES_CLUSTER_URL="https://github.com/CosmoLike/cocoa_des_cluster.git"
 export DES_CLUSTER_NAME="des_cluster"
-export DES_CLUSTER_GIT_BRANCH="main" # no tagged release yet
+export DES_CLUSTER_GIT_TAG="v5.00"
 
+# WARNING: des_y6 is not production ready: no tagged release exists, so the
+# key below follows the branch main instead of pinning a version.
 export DES_Y6_URL="https://github.com/CosmoLike/cocoa_des_y6.git"
 export DES_Y6_NAME="des_y6"
-export DES_Y6_GIT_BRANCH="main" # no tagged release yet
+export DES_Y6_GIT_BRANCH="main"
 
 export BFMT_THEORY_URL="https://github.com/CosmoLike/cocoa_baryonic_feedback_models_theory.git"
 export BFMT_NAME="baryon_suppression"
@@ -199,11 +204,7 @@ export AXIE_CAMB_2026_PROJECT_NAME="axicambv2"
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
 export EMULTRF_URL="https://github.com/CosmoLike/emulators_code.git"
-# Development: follow the branch main, which carries fixes no release tag has
-# yet (tag v4.11.1 fails in emulrdrag when cobaya evaluates without derived
-# parameters). Pin a tag again before the release of Cocoa 5.0.
-#export EMULTRF_GIT_TAG="v4.11.1"
-export EMULTRF_GIT_BRANCH="main"
+export EMULTRF_GIT_TAG="v5.00"
 export OVERWRITE_EXISTING_EMULTRF_CODE=1
 
 export EMULTRF_DATA_URL="https://github.com/SBU-COSMOLIKE/emulators_data_lcdm.git"
