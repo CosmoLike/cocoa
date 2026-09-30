@@ -1168,6 +1168,8 @@ The script `set_installation_options.sh` includes instructions for installing se
      #export IGNORE_COSMOLIKE_ROMAN_FOURIER_CODE=1
      #export IGNORE_COSMOLIKE_ROMAN_REAL_CODE=1
      #export IGNORE_COSMOLIKE_ROMAN_KL_CODE=1
+     export IGNORE_COSMOLIKE_DES_CLUSTER_CODE=1 # skipped by default
+     export IGNORE_COSMOLIKE_DES_Y6_CODE=1      # skipped by default
      (...)
      # ------------------------------------------------------------------------------
      # OVERWRITE_EXISTING_XXX_CODE=1 -> setup_cocoa overwrites existing PACKAGES ----

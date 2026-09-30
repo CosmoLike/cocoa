@@ -76,6 +76,8 @@ Cocoa's `set_installation_options.sh` shell script includes instructions to inst
      #export IGNORE_COSMOLIKE_ROMAN_FOURIER_CODE=1
      #export IGNORE_COSMOLIKE_ROMAN_REAL_CODE=1
      #export IGNORE_COSMOLIKE_ROMAN_KL_CODE=1
+     export IGNORE_COSMOLIKE_DES_CLUSTER_CODE=1 # skipped by default
+     export IGNORE_COSMOLIKE_DES_Y6_CODE=1      # skipped by default
      (...)
      # ------------------------------------------------------------------------------
      # Cosmolike projects below -----------------------------------------------------

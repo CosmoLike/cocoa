@@ -85,6 +85,10 @@ export IGNORE_DARK_EMULATOR_CODE=1
 #export IGNORE_COSMOLIKE_ROMAN_FOURIER_CODE=1
 #export IGNORE_COSMOLIKE_ROMAN_REAL_CODE=1
 #export IGNORE_COSMOLIKE_ROMAN_KL_CODE=1
+# The two projects below are skipped by default: comment the key to
+# download and compile the project.
+export IGNORE_COSMOLIKE_DES_CLUSTER_CODE=1
+export IGNORE_COSMOLIKE_DES_Y6_CODE=1
 
 #export IGNORE_BFMT_CODE=1 # Baryon Feedback Theory Block from Nihar&JVicente
 
@@ -158,6 +162,14 @@ export COSMOLIKE_NAME="cosmolike_core"
 export ROMAN_KL_URL="https://github.com/CosmoLike/cocoa_roman_kl.git"
 export ROMAN_KL_NAME="roman_kl"
 export ROMAN_KL_GIT_TAG="v4.11.5"
+
+export DES_CLUSTER_URL="https://github.com/CosmoLike/cocoa_des_cluster.git"
+export DES_CLUSTER_NAME="des_cluster"
+export DES_CLUSTER_GIT_BRANCH="bugfix" # no tagged release yet
+
+export DES_Y6_URL="https://github.com/CosmoLike/cocoa_des_y6.git"
+export DES_Y6_NAME="des_y6"
+export DES_Y6_GIT_BRANCH="main" # no tagged release yet
 
 export BFMT_THEORY_URL="https://github.com/CosmoLike/cocoa_baryonic_feedback_models_theory.git"
 export BFMT_NAME="baryon_suppression"
