@@ -199,7 +199,11 @@ export AXIE_CAMB_2026_PROJECT_NAME="axicambv2"
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
 export EMULTRF_URL="https://github.com/CosmoLike/emulators_code.git"
-export EMULTRF_GIT_TAG="v4.11.1"
+# Development: follow the branch main, which carries fixes no release tag has
+# yet (tag v4.11.1 fails in emulrdrag when cobaya evaluates without derived
+# parameters). Pin a tag again before the release of Cocoa 5.0.
+#export EMULTRF_GIT_TAG="v4.11.1"
+export EMULTRF_GIT_BRANCH="main"
 export OVERWRITE_EXISTING_EMULTRF_CODE=1
 
 export EMULTRF_DATA_URL="https://github.com/SBU-COSMOLIKE/emulators_data_lcdm.git"
