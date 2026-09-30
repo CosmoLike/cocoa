@@ -1180,8 +1180,13 @@ The script `set_installation_options.sh` includes instructions for installing se
      #export IGNORE_COSMOLIKE_ROMAN_FOURIER_CODE=1
      #export IGNORE_COSMOLIKE_ROMAN_REAL_CODE=1
      #export IGNORE_COSMOLIKE_ROMAN_KL_CODE=1
-     export IGNORE_COSMOLIKE_DES_CLUSTER_CODE=1 # skipped by default
-     export IGNORE_COSMOLIKE_DES_Y6_CODE=1      # skipped by default
+     # The two projects below are skipped by default: comment the key to
+     # download and compile the project.
+     export IGNORE_COSMOLIKE_DES_CLUSTER_CODE=1
+     # WARNING: des_y6 is not production ready. It has no tagged release, so the
+     # installation follows its branch main (see DES_Y6_GIT_BRANCH below) and the
+     # code can change between two installations.
+     export IGNORE_COSMOLIKE_DES_Y6_CODE=1
      (...)
      # ------------------------------------------------------------------------------
      # OVERWRITE_EXISTING_XXX_CODE=1 -> setup_cocoa overwrites existing PACKAGES ----

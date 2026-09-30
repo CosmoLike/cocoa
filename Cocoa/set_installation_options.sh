@@ -88,6 +88,9 @@ export IGNORE_DARK_EMULATOR_CODE=1
 # The two projects below are skipped by default: comment the key to
 # download and compile the project.
 export IGNORE_COSMOLIKE_DES_CLUSTER_CODE=1
+# WARNING: des_y6 is not production ready. It has no tagged release, so the
+# installation follows its branch main (see DES_Y6_GIT_BRANCH below) and the
+# code can change between two installations.
 export IGNORE_COSMOLIKE_DES_Y6_CODE=1
 
 #export IGNORE_BFMT_CODE=1 # Baryon Feedback Theory Block from Nihar&JVicente
@@ -167,9 +170,11 @@ export DES_CLUSTER_URL="https://github.com/CosmoLike/cocoa_des_cluster.git"
 export DES_CLUSTER_NAME="des_cluster"
 export DES_CLUSTER_GIT_TAG="v5.00"
 
+# WARNING: des_y6 is not production ready: no tagged release exists, so the
+# key below follows the branch main instead of pinning a version.
 export DES_Y6_URL="https://github.com/CosmoLike/cocoa_des_y6.git"
 export DES_Y6_NAME="des_y6"
-export DES_Y6_GIT_BRANCH="main" # no tagged release yet
+export DES_Y6_GIT_BRANCH="main"
 
 export BFMT_THEORY_URL="https://github.com/CosmoLike/cocoa_baryonic_feedback_models_theory.git"
 export BFMT_NAME="baryon_suppression"
