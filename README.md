@@ -82,13 +82,17 @@ Core packages include compilers and numerical libraries that users typically do 
 
   - Linux
 
-    - Legacy Version
+    - Deprecated Version
 
           wget https://raw.githubusercontent.com/CosmoLike/cocoa/refs/tags/v4.053/cocoapy310.yml
 
-    - Stable Version
+    - Legacy Version
 
           wget https://raw.githubusercontent.com/CosmoLike/cocoa/refs/tags/v4.072/cocoapy310.yml
+
+    - Stable Version
+
+          wget https://raw.githubusercontent.com/CosmoLike/cocoa/refs/tags/v4.11.8/cocoapy311.yml
 
     - Testing beta release
 
@@ -103,19 +107,23 @@ Core packages include compilers and numerical libraries that users typically do 
 
     Then, download the `yml` file matching the chosen version.
 
-    - Legacy Version
+    - Deprecated Version
 
           wget https://raw.githubusercontent.com/CosmoLike/cocoa/refs/tags/v4.053/cocoapy310-osxarm-base.yml
 
-    - Stable Version
+    - Legacy Version
 
           wget https://raw.githubusercontent.com/CosmoLike/cocoa/refs/tags/v4.072/cocoapy310-osxarm-base.yml
+
+    - Stable Version
+
+          wget https://raw.githubusercontent.com/CosmoLike/cocoa/refs/tags/v4.11.8/cocoapy311-osxarm-base.yml
 
     - Testing beta release
 
           wget https://raw.githubusercontent.com/CosmoLike/cocoa/refs/tags/v5.00/cocoapy311-osxarm-base.yml
 
-**Step :two:**: Create the Cocoa environment (if the Legacy or Stable version was chosen in the previous step, replace `cocoapy311` with `cocoapy310` below),
+**Step :two:**: Create the Cocoa environment (if the Deprecated or Legacy version was chosen in the previous step, replace `cocoapy311` with `cocoapy310` below),
 
   - Linux
   
@@ -176,13 +184,17 @@ In this section, we assume users have previously activated the Cocoa conda envir
 
 **Step :one:**: Download Cocoa's latest release and go to its main folder (`cocoa/Cocoa`),
   
-  - Legacy Version
+  - Deprecated Version
     
         git clone https://github.com/CosmoLike/cocoa.git --branch v4.053 cocoa
     
-  - Stable Version
+  - Legacy Version
     
         git clone https://github.com/CosmoLike/cocoa.git --branch v4.072 cocoa
+
+  - Stable Version
+  
+        git clone https://github.com/CosmoLike/cocoa.git --branch v4.11.8 cocoa
 
   - Testing beta release
   
