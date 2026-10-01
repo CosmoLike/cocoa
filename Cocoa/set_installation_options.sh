@@ -155,7 +155,7 @@ export ROMAN_REAL_NAME="roman_real"
 export ROMAN_REAL_GIT_TAG="v5.01"
 
 export COSMOLIKE_URL="https://github.com/CosmoLike/cocoa-cosmolike-core.git"
-export COSMOLIKE_GIT_TAG="v5.02"
+export COSMOLIKE_GIT_TAG="v5.03"
 export COSMOLIKE_NAME="cosmolike_core"
 
 export ROMAN_KL_URL="https://github.com/CosmoLike/cocoa_roman_kl.git"
@@ -165,7 +165,7 @@ export ROMAN_KL_GIT_TAG="v5.01"
 # WARNING: des_cluster is not production ready.
 export DES_CLUSTER_URL="https://github.com/CosmoLike/cocoa_des_cluster.git"
 export DES_CLUSTER_NAME="des_cluster"
-export DES_CLUSTER_GIT_TAG="v5.01"
+export DES_CLUSTER_GIT_TAG="v5.02"
 
 # WARNING: des_y6 is not production ready: no tagged release exists, so the
 # key below follows the branch main instead of pinning a version.
