@@ -49,18 +49,22 @@ This Readme file presents basic and advanced instructions for installing all [Co
 
 We provide the Docker image [whovian-cocoa](https://hub.docker.com/r/vivianmiranda/whovian-cocoa) to facilitate the installation of Cocoa on Windows. 
 
-**Why CoCoA?** CoCoA is built on the principle that computational efficiency, usability, and ease of modification can coexist in a single framework. Its successful use across multiple beyond-LCDM investigations by small groups demonstrates that efficient code can cut the immense consumption of computer resources reported for recent large-impact analyses in the literature. This benefits theoretical groups, particularly those without routine access to large-scale supercomputers like NERSC. CoCoA also integrates closely with machine learning emulators, enabling preliminary research on laptops and workstations. The table below illustrates the efficiency of CoCoA compared to alternative pipelines
-
-<p align="center">
-  <img width="750" alt="Screenshot 2026-06-19 at 3 18 57 PM" src="https://github.com/user-attachments/assets/3683e6e3-21fa-4814-8c6c-5a4d7f0b7ca7" />
-</p>
-
 > [!NOTE]
-> Open known problems and planned work are tracked in the execution backlog at
-> [cocoa_installation_libraries/notes/backlog.md](cocoa_installation_libraries/notes/backlog.md),
-> which also archives closed tickets. The backlog, together with the maintenance
-> skill at [.claude/skills/cocoa-maintenance/SKILL.md](.claude/skills/cocoa-maintenance/SKILL.md),
-> gives users and AI bots enough context to work on Cocoa.
+> CoCoA `v5.02` benchmark (cosmolike only times) 
+> CPU: `Intel(R) Core(TM) i9-10940X CPU @ 3.30GHz` (`1/8 OpenMP cores`).
+> Modeling: Full-sky on real functions except for DESC-CCL (unknown for CLOE-LIB).
+> Modeling: **IA=TATT** in ($\xi_{\pm}, \gamma_t$) except in CLOE-LIB and DES-Y3-Real 6x2pt+N. 
+> Modeling: **Non-limber** in $C_{gg}(l)$. 
+> Modeling: **Non-limber** in $C_{gs}(l)$ in CoCoA (LSST-Y1/Roman-Real/Roman-Real-KL).
+>
+> - **LSST-Y1-Real 3x2pt**: (CoCoA) `0.27/0.06s`, (DESC-CCL)`7.96/1.72s`, (CLOE-LIB) 0.23/0.23s.
+> - **Roman-Real 3x2pt**: (CoCoA) `0.45/0.09s`, (DESC-CCL) `8.17/1.96s`, (CLOE-LIB) 0.27/0.27s.
+> - **Roman-Fourier 3x2pt**:  (CoCoA) `0.12/0.05s`, (DESC-CCL) `0.65/0.36s`.
+> - **Roman-Real-KL 3x2pt**: (CoCoA) `0.21/0.05s`. 
+> - **DES-Y3xPlanck 6x2pt**  (CoCoA) `0.34/0.07s`.
+> - **DES-Y3-Real 3x2pt**  (CoCoA) `0.28/0.06s`.
+> - **DES-YX-Real 6x2pt+N**  (CoCoA) `0.66/0.13s` (YX = not yet production cov, n(z), dv, Y6 analysis).
+> 
 
 # Installation of core packages <a name="required_packages_conda"></a>
 
@@ -96,7 +100,7 @@ Core packages include compilers and numerical libraries that users typically do 
 
     - Testing beta release
 
-          wget https://raw.githubusercontent.com/CosmoLike/cocoa/refs/tags/v5.00/cocoapy311.yml
+          wget https://raw.githubusercontent.com/CosmoLike/cocoa/refs/tags/v5.02/cocoapy311.yml
 
   - macOS (arm)
     
@@ -121,7 +125,7 @@ Core packages include compilers and numerical libraries that users typically do 
 
     - Testing beta release
 
-          wget https://raw.githubusercontent.com/CosmoLike/cocoa/refs/tags/v5.00/cocoapy311-osxarm-base.yml
+          wget https://raw.githubusercontent.com/CosmoLike/cocoa/refs/tags/v5.02/cocoapy311-osxarm-base.yml
 
 **Step :two:**: Create the Cocoa environment (if the Deprecated or Legacy version was chosen in the previous step, replace `cocoapy311` with `cocoapy310` below),
 
@@ -198,32 +202,11 @@ In this section, we assume users have previously activated the Cocoa conda envir
 
   - Testing beta release
   
-        git clone https://github.com/CosmoLike/cocoa.git --branch v5.00 cocoa
+        git clone https://github.com/CosmoLike/cocoa.git --branch v5.02 cocoa
 
 > [!Warning]
 > The version cloned here must match the version of the `yml` file downloaded in the section
 > [Installation of core packages](#required_packages_conda).
-
-> [!NOTE]
-> Version `v4.11.1` includes significant cosmolike speed-ups from refactoring non-limber/C-FASTPT/cosmo2d modules. 
-
-> [!NOTE]
-> `v4.11.1` benchmark: do not include CAMB (or the Hybrid Emulator); **Includes TATT in** ($\xi_{\pm}, \gamma_t$) **and non-limber in** $w_{gg}(\theta)$.
-> CLOE-LIB caveat: We were not able to make TATT work on CloeLib. We were also not able to speed-up cloelib with `OMP_NUM_THREADS` flag
->
-> CPU: `Intel(R) Core(TM) i9-10940X CPU @ 3.30GHz` (`1/8 OpenMP cores`). *Times are approximate*.
->
-> - **LSST-Y1-Real 3x2pt**: (CoCoA) `0.29/0.06s`, (DESC-CCL)`7.96/1.72s`, (CLOE-LIB) 0.23/0.23s. **CoCoA speed-up (CCL)**: `27/28x`
-> - **Roman-Real 3x2pt**: (CoCoA) `0.45/0.095s`, (DESC-CCL) `8.17/1.96s`, (CLOE-LIB) 0.27/0.27s. **CoCoA speed-up (CCL)**: `18/20x`
-> - **Roman-Fourier 3x2pt**:  (CoCoA) `0.08/0.03s`, (DESC-CCL) `0.65/0.36s`. **CoCoA speed-up**: `7.5/21x`
-> - **DES-Y3xPlanck 6x2pt**  (CoCoA) `0.40/0.075s`
-> - **DES-Y3-Real 3x2pt (des_y3 repo)**  (CoCoA)~`0.25/0.05s`
-> 
-> How to record benchmarks on cosmolike projects? 
-> - Go to `EXAMPLE_EVALUATE2.yaml` on each repository; Turn on TATT flag (`IA_model: 1`),
-> - Set `N=10` on the evaluate sampler (Timing on `N=1` is highly biased due to once per chain array allocation and initialization); Remove the `override` YAML block.
-> The DESC-CCL-Benchmark scripts can be found [here](https://github.com/vivianmiranda/CCL-benchmark)
-> DESC-CCL uses flat-sky for fourier -> real transformation. If you know a module that implements curved sky transformation in CCL for a more 1x1 comparison, let us know. 
 
 and
 
@@ -933,15 +916,15 @@ and
  
      conda activate lockenv
 
-**Step :two:** Download the appropriate conda-lock compatible `yml` file. As in the section [Installation of core packages](#required_packages_conda), replace the tag `v5.00` in the URL with the Cocoa version that will be cloned (tags older than `v4.11.4` carry the `cocoapy310` prefix).
+**Step :two:** Download the appropriate conda-lock compatible `yml` file. As in the section [Installation of core packages](#required_packages_conda), replace the tag `v5.02` in the URL with the Cocoa version that will be cloned (tags older than `v4.11.4` carry the `cocoapy310` prefix).
 
    - Linux
   
-         wget https://raw.githubusercontent.com/CosmoLike/cocoa/refs/tags/v5.00/cocoapy311-linux.yml
+         wget https://raw.githubusercontent.com/CosmoLike/cocoa/refs/tags/v5.02/cocoapy311-linux.yml
 
    - macOS (arm)
      
-         wget https://raw.githubusercontent.com/CosmoLike/cocoa/refs/tags/v5.00/cocoapy311-osxarm.yml
+         wget https://raw.githubusercontent.com/CosmoLike/cocoa/refs/tags/v5.02/cocoapy311-osxarm.yml
 
 **Step :three:** Create the conda environment
 
@@ -969,13 +952,13 @@ and
 
      conda activate base2
 
-**Step :two:** Now install wget and download a looser version of the yml file (note here slightly modified conda command). As in the section [Installation of core packages](#required_packages_conda), replace the tag `v5.00` in the URL with the Cocoa version that will be cloned (tags older than `v4.11.4` carry the `cocoapy310` prefix).
+**Step :two:** Now install wget and download a looser version of the yml file (note here slightly modified conda command). As in the section [Installation of core packages](#required_packages_conda), replace the tag `v5.02` in the URL with the Cocoa version that will be cloned (tags older than `v4.11.4` carry the `cocoapy310` prefix).
 
      conda install -y wget --solver=libmamba --strict-channel-priority --override-channels -c conda-forge
 
 and
 
-     wget https://raw.githubusercontent.com/CosmoLike/cocoa/refs/tags/v5.00/cocoapy311-osxarm-loose.yml
+     wget https://raw.githubusercontent.com/CosmoLike/cocoa/refs/tags/v5.02/cocoapy311-osxarm-loose.yml
 
 **Step :three:** Create the cocoa conda env using a looser yml (note here slightly modified conda command)
 
@@ -1209,7 +1192,7 @@ The script `set_installation_options.sh` includes instructions for installing se
      #If none is set, Cocoa loads the latest commit on the repository default branch.
      #export ROMAN_REAL_GIT_BRANCH="main"
      #export ROMAN_REAL_GIT_COMMIT="abc"
-     export ROMAN_REAL_GIT_TAG="v5.00"
+     export ROMAN_REAL_GIT_TAG="v5.01"
 
 > [!NOTE]
 > The https URLs are the right choice for almost all users. Developers with write
@@ -1358,7 +1341,7 @@ This is a large image, approximately 13GB, as it already contains the conda coco
 >
 > and
 >
->     docker build . --build-arg COCOA_TAG=v5.00 -t vivianmiranda/whovian-cocoa # replace the tag with the Cocoa version whose yml seeds the conda env
+>     docker build . --build-arg COCOA_TAG=v5.02 -t vivianmiranda/whovian-cocoa # replace the tag with the Cocoa version whose yml seeds the conda env
 >
 > and
 >
@@ -1494,7 +1477,7 @@ There are a few differences users should be aware of when running Cocoa on Googl
           source "/content/conda/etc/profile.d/conda.sh"
           conda create -y -n lockenv -c conda-forge python=3.10 conda-lock=2.* wget
           conda activate lockenv
-          wget https://raw.githubusercontent.com/CosmoLike/cocoa/refs/tags/v5.00/cocoapy311-linux.yml
+          wget https://raw.githubusercontent.com/CosmoLike/cocoa/refs/tags/v5.02/cocoapy311-linux.yml
           conda-lock install -n cocoa cocoapy311-linux.yml
           conda activate cocoa 
           ln -s "${CONDA_PREFIX}"/bin/x86_64-conda-linux-gnu-gcc "${CONDA_PREFIX}"/bin/gcc
@@ -1509,7 +1492,7 @@ There are a few differences users should be aware of when running Cocoa on Googl
           %%bash
           source "/content/conda/etc/profile.d/conda.sh"
           conda activate cocoa                                  
-          git clone https://github.com/CosmoLike/cocoa.git --branch v5.00 cocoa # replace the tag with the Cocoa version being installed (it must match the yml downloaded on Cell 3)
+          git clone https://github.com/CosmoLike/cocoa.git --branch v5.02 cocoa # replace the tag with the Cocoa version being installed (it must match the yml downloaded on Cell 3)
 
     - **Cell 5️⃣**: run `setup_cocoa.sh`
 
