@@ -61,9 +61,9 @@ We provide the Docker image [whovian-cocoa](https://hub.docker.com/r/vivianmiran
 > - **Roman-Real 3x2pt**: (CoCoA) `0.45/0.09s`, (DESC-CCL) `8.17/1.96s`, (CLOE-LIB) 0.27/0.27s.
 > - **Roman-Fourier 3x2pt**:  (CoCoA) `0.12/0.05s`, (DESC-CCL) `0.65/0.36s`.
 > - **Roman-Real-KL 3x2pt**: (CoCoA) `0.21/0.05s`. 
-> - **DES-Y3xPlanck 6x2pt**  (CoCoA) `0.34/0.07s`.
+> - **DES-Y3xPlanck 6x2pt (w/ CMB)**  (CoCoA) `0.34/0.07s`.
 > - **DES-Y3-Real 3x2pt**  (CoCoA) `0.28/0.06s`.
-> - **DES-YX-Real 6x2pt+N**  (CoCoA) `0.66/0.13s` (YX = not yet production cov, n(z), dv, Y6 analysis).
+> - **DES-YX-Real 6x2pt+N (clusters)**  (CoCoA) `0.66/0.13s` (YX = not yet production cov, n(z), dv, Y6 analysis).
 > 
 
 # Installation of core packages <a name="required_packages_conda"></a>
