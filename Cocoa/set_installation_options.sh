@@ -162,6 +162,7 @@ export ROMAN_KL_URL="https://github.com/CosmoLike/cocoa_roman_kl.git"
 export ROMAN_KL_NAME="roman_kl"
 export ROMAN_KL_GIT_TAG="v5.01"
 
+# WARNING: des_cluster is not production ready.
 export DES_CLUSTER_URL="https://github.com/CosmoLike/cocoa_des_cluster.git"
 export DES_CLUSTER_NAME="des_cluster"
 export DES_CLUSTER_GIT_TAG="v5.01"
