@@ -552,6 +552,20 @@ shape, the main README wins.
   and quoted terminal output keep everything verbatim. In table
   cells never put a raw | inside math: use \lvert and \rvert for
   absolute values, or the pipe breaks the table.
+- Every number names its quantity where it stands. Write
+  "$\Delta\chi^2 = 0.34$" and "at most $\lvert\Delta\xi_+\rvert/\sigma
+  = 0.050$", never "gives 0.34" or "at most 0.050 sigma". A table column
+  of numbers carries the quantity in its header ("$\Delta\chi^2$,
+  LSST-Y1"), not only in the sentence above the table: a reader who lands
+  on the table must know what the numbers are, and ranges say over what
+  they run ("lowest to highest lens bin").
+- GitHub math: write inline math as $`...`$ (dollar-backtick) whenever
+  it touches a bracket or punctuation; a plain $w(\theta)$) does not
+  render. Keep percent signs outside math: GitHub passes \% to the
+  renderer as %, which LaTeX reads as a comment, so "$-0.7\%$ to
+  $-1.5\%$" renders as "-0.7 to -1.5" and the reader sees a different
+  quantity. Write -0.7% as plain text. Display equations go in a
+  ```math block.
 - A list item is one short clause: the action, nothing else. The
   reasoning ("so the chi2 against it is zero by construction") moves
   to a sentence after the list that refers back to the steps.
