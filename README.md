@@ -66,6 +66,9 @@ We provide the Docker image [whovian-cocoa](https://hub.docker.com/r/vivianmiran
 > - **DES-YX-Real 6x2pt+N (clusters)**  (CoCoA) `0.66/0.13s` (YX = not yet production cov, n(z), dv, Y6 analysis).
 > 
 
+> [!NOTE]
+> CoCoA vs DESC-CCL code comparison (LSST-Y1 and Roman-Real real-space 3x2pt, NLA and TATT, same CAMB tables in both codes): [CCL-benchmark](https://github.com/vivianmiranda/CCL-benchmark). Cosmic shear agrees; $\gamma_t$ and $w(\theta)$ differ by $\Delta\chi^2 = 8.8$ (LSST-Y1) and 0.23 (Roman-Real) through DESC-CCL's non-Limber (FKEM) step when the linear growth depends on $k$.
+
 # Installation of core packages <a name="required_packages_conda"></a>
 
 Core packages include compilers and numerical libraries that users typically do not modify.
