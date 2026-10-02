@@ -52,22 +52,31 @@ We provide the Docker image [whovian-cocoa](https://hub.docker.com/r/vivianmiran
 > [!NOTE]
 > CoCoA `v5.02` benchmark (cosmolike only times) 
 > CPU: `Intel(R) Core(TM) i9-10940X CPU @ 3.30GHz` (`1/8 OpenMP cores`).
+>
 > Modeling: Full-sky on real functions except for DESC-CCL (unknown for CLOE-LIB).
+>
 > Modeling: **IA=TATT** in ($\xi_{\pm}, \gamma_t$) except in CLOE-LIB and DES-Y3-Real 6x2pt+N. 
-> Modeling: **Non-limber** in $C_{gg}(l)$. 
-> Modeling: **Non-limber** in $C_{gs}(l)$ in CoCoA (LSST-Y1/Roman-Real/Roman-Real-KL).
+>
+> Modeling: **Non-limber** $C_{gg}(l)$ in real space; **non-limber** $C_{gs}(l)$ in CoCoA LSST-Y1/Roman-Real.
+>
+> Modeling: Roman-Fourier and Roman-Real-KL CoCoA compute the exact 
+> (**non-Limber**) $C_{gg}(l)$ and $C_{gs}(l)$
+> below $l = 150$ with RSD; DESC-CCL uses Limber without RSD.
 >
 > - **LSST-Y1-Real 3x2pt**: (CoCoA) `0.27/0.06s`, (DESC-CCL)`7.96/1.72s`, (CLOE-LIB) 0.23/0.23s.
 > - **Roman-Real 3x2pt**: (CoCoA) `0.45/0.09s`, (DESC-CCL) `8.17/1.96s`, (CLOE-LIB) 0.27/0.27s.
-> - **Roman-Fourier 3x2pt**:  (CoCoA) `0.12/0.05s`, (DESC-CCL) `0.65/0.36s`.
-> - **Roman-Real-KL 3x2pt**: (CoCoA) `0.21/0.05s`. 
+> - **Roman-Fourier 3x2pt**: (CoCoA) `0.27/0.08s`, (DESC-CCL) `0.65/0.36s`.
+> - **Roman-Real-KL 3x2pt**: (CoCoA) `0.162/0.08s`. 
 > - **DES-Y3xPlanck 6x2pt (w/ CMB)**  (CoCoA) `0.34/0.07s`.
-> - **DES-Y3-Real 3x2pt**  (CoCoA) `0.28/0.06s`.
-> - **DES-YX-Real 6x2pt+N (clusters)**  (CoCoA) `0.66/0.13s` (YX = not yet production cov, n(z), dv, Y6 analysis).
-> 
-
-> [!NOTE]
-> CoCoA vs DESC-CCL code comparison (LSST-Y1 and Roman-Real real-space 3x2pt, NLA and TATT, same CAMB tables in both codes): [CCL-benchmark](https://github.com/vivianmiranda/CCL-benchmark). Cosmic shear agrees; $\gamma_t$ and $w(\theta)$ differ by $\Delta\chi^2 = 8.8$ (LSST-Y1) and 0.23 (Roman-Real) through DESC-CCL's non-Limber (FKEM) step when the linear growth depends on $k$.
+> - **DES-Y3-Real 3x2pt**  (CoCoA) `0.27/0.06s`.
+> - **DES-YX-Real 6x2pt+N (clusters)**  (CoCoA) `0.71/0.14s` (YX = not yet production cov, n(z), dv, Y6 analysis).
+>
+> CoCoA vs DESC-CCL Code Comparison Refeference: (LSST-Y1 and Roman-Real 
+> real-space 3x2pt, NLA and TATT, same CAMB tables in both codes): 
+> [CCL-benchmark](https://github.com/vivianmiranda/CCL-benchmark). 
+> Cosmic shear agrees; $\gamma_t$ and $w(\theta)$ differ by 
+> $\Delta\chi^2 = 8.8$ (LSST-Y1) and 0.23 (Roman-Real) through DESC-CCL's 
+> non-Limber (FKEM) step when the linear growth depends on $k$.
 
 # Installation of core packages <a name="required_packages_conda"></a>
 
