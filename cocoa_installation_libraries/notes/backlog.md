@@ -544,6 +544,12 @@ This is verification of the saved run, not a new benchmark of the modified
 libraries. README explains within-code convergence (delta chi2 < 0.2),
 CAMB exclusion, two warm-ups, 20/10 evaluations and configuration scope.
 The older Intel measurements for other likelihoods were not relabeled.
+Follow-up gamma_t check against timing commit a6212ea: the older
+ccl_test_lsst.py/ccl_test_roman.py benchmark used Limber for galaxy-galaxy
+lensing, while CoCoA included non-Limber C_gs. The M2 timing script runs
+ref, whose nonlimber_gs=True passes l_limber=150 and FKEM to angular_cl
+for the gamma_t pairs. README distinguishes those configurations explicitly;
+it does not attribute the older omission to the new reference timings.
 Linked the study and raw log for reproduction or challenges; both URLs
 returned HTTP 200. Markdown render passed (1 table, 39 blockquotes), all
 internal anchors resolved.

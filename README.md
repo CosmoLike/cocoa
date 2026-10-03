@@ -74,7 +74,11 @@ We provide the Docker image [whovian-cocoa](https://hub.docker.com/r/vivianmiran
 > warm-up calls, cycling through five cosmologies. CAMB is excluded from
 > both timings: CoCoA times its likelihood; DESC-CCL times its data-vector
 > script from the supplied CAMB tables, subtracting table-read time.
-> Both use full-sky, bin-averaged transforms and non-Limber galaxy spectra.
+> Both use full-sky, bin-averaged transforms. **In the older benchmark,
+> DESC-CCL used Limber for $`\gamma_t`$, while CoCoA included non-Limber
+> $`C_{gs}`$.** In the reference configuration timed above, DESC-CCL also
+> enables FKEM for $`C_{gs}`$ below $`\ell = 150`$. Both codes include
+> non-Limber galaxy clustering in these reference runs.
 > DESC-CCL uses the study's reference sampling and PR #1296 build; these
 > measurements are specific to these configurations, not all CCL releases
 > or survey likelihoods.
