@@ -204,6 +204,7 @@ covariances remain in use.
   threads; no full covariance speed claim follows from that measurement.
 - Mask-derived ordered-pair areas pass three further optimized/debug checks,
   including independent 60-digit cap geometry; coverage now totals 435.
+  All 43 covariance checks also pass together with the external libraries.
   The pilot's L_max=4096 mask leaves 1.05e-5 pair-area error and up to
   1.30e-6 SSC shell error. L_max=32768 gives 1.06e-8 pair-area agreement;
   mask resolution must be refined as part of survey validation.
@@ -226,9 +227,11 @@ gg). The preliminary total passes its PSD diagnostic, but doubling radial,
 mass and angular resolution changes total eigenmodes by about 2e-4 and
 fails the study's 1e-6 componentwise refinement requirement. Both the SSC
 prescription and the 1+3 multiplicity affect some modes by more than 2%.
-An external smooth-power experiment with finer radial sampling reduces
-total-mode changes to about 5e-6, but still misses the componentwise gate;
-it has not been promoted to a production interpolation choice.
+An external smooth-power experiment, 256-to-512 radial refinement and a
+common L_max=32768 mask reduce total-mode changes to 1.043e-6. Gaussian and
+cNG nonzero-entry relative changes are below 1e-6 in this diagnostic; SSC
+still misses the componentwise gate (up to 9.18e-4 near zero crossings).
+The experimental interpolant has not become a production choice.
 Then finish survey inputs/layout, mask-pair integration, separate G/SSC/cNG
 files, project generators and convergence/Fisher checks. Existing
 covariances must not be replaced before validation and the contract freeze.
