@@ -34,6 +34,7 @@ features, Low bugs, Low features.
 
 - OPEN **MEDIUM** **BUG** — [Cache-key hardening for in-process reconfiguration](#open-cache-key-hardening)
 - OPEN **MEDIUM** **NEW FUNCTIONALITY** — [Cache the Fourier non-Limber band-center corrections](#open-fourier-nonlimber-cache)
+- OPEN **MEDIUM** **NEW FUNCTIONALITY** — [Rewrite analytic covariances in an isolated module](#open-covariance-rewrite)
 
 
 ### Low
@@ -142,6 +143,81 @@ functions are pure of static state, so the cache wraps cleanly.
 
 The cached wrapper and a timing note in the two project READMEs.
 
+
+<a id="open-covariance-rewrite"></a>
+## Rewrite analytic covariances in an isolated module
+
+### High-level summary
+
+Compute Gaussian, super-sample and connected non-Gaussian covariances in
+one process, with covariance-owned numerical choices and caches. Physics
+comes from the papers, especially Krause and Takada; the CosmoCov code is
+a convention comparison, not the final numerical reference.
+
+### Current status
+
+**Ticket type: NEW FUNCTIONALITY.**
+
+**OPEN.** The September study has been reviewed against the current core.
+An initial, independently tested slice implements Gaussian Wick algebra,
+projection of supplied spectra, and analytic pair-count noise. The full
+contract is not frozen and there is no survey covariance generator yet.
+
+**Severity: MEDIUM.** New science functionality; existing project
+covariances remain in use.
+
+### What is already in place
+
+- New C code is isolated in `cosmolike/covariances/gaussian_cov.c`; all
+  new covariance C filenames must end `_cov.c`. Existing core C files
+  outside this directory are not changed for the port.
+- Caller-owned scratch, static OpenMP scheduling and SIMDe across output
+  columns. Scalar/SIMDe results and 1/4/8-thread results agree bitwise on
+  the measured projection workload. No BLAS calls or new global caches.
+- NumPy/mpmath algebra, noise and projection checks outside git in
+  `test/covariance_reference/`; opt-in tests in `lsst_y1/tests` find that
+  directory and its isolated compiled library through environment variables.
+- Core skill records the folder boundary, filename rule, simplicity,
+  paper sources, measured optimization requirement, and no-push policy.
+- Each tested major ticket gets a separate didactic red-eye review before
+  work starts on the next major ticket (owner clarification, 2026-10-03).
+  The Gaussian foundation review is complete. C/header lines fit within
+  80 columns, comparisons use separate lines, and SIMD follows house naming.
+- The final rebuilt seven-project run passed 399 tests, including the new
+  primitives and all Roman slow halo checks; another 24 debug checks passed.
+  No refreezing was needed. Production SIMD is unconditional; scalar
+  comparisons remain in the external test harness.
+
+### What is missing
+
+The study's full Phase-0 configuration/input dump, SSC/cNG references,
+CosmoCov oracle gate, realistic-node positive-semidefiniteness checks,
+physics-delta measurements and contract freeze. Then covariance-owned
+all-pairs spectra (including non-Limber gamma_t and cross-bin gg), survey
+inputs/layout, masks, separate G/SSC/cNG output, project generators and
+convergence/Fisher validation. Existing covariances must not be replaced
+before those checks pass.
+
+### Technical record
+
+<details>
+<summary>Constraints and first measured kernel</summary>
+
+Owner request: 2026-10-03. The detailed plan is external
+`test/cosmocov_port_study/PLAN.md`; the durable core record is
+`.claude/skills/cosmolike-dev/references/covariance_rewrite.md`.
+The plan's old singular folder, total-matter halo default, and three-build
+validation language are superseded by `covariances/`, cb halo statistics,
+and strict default/debug builds. OpenBLAS stays at one thread.
+
+Apple M2 Pro, Clang 19.1.7, strict flags: a 20 x 20 projection over
+50,001 supplied multipoles takes median 24.041/6.359/3.296 ms in the scalar
+path and 1.848/0.616/0.398 ms with tiled SIMDe at 1/4/8 OpenMP threads
+(51 calls, three excluded warm-ups). This is a kernel comparison, not a
+full-covariance forecast or evidence for a delta-chi-squared threshold.
+The raw timing and validation logs remain in the external reference folder.
+
+</details>
 
 <a id="open-cfastpt-gb2-ia-bias"></a>
 ## IA x higher-order-bias (gb2) cross terms in cfastpt
@@ -484,6 +560,72 @@ porting precedent any WHM work would build on.
 </details>
 
 # Closed tickets
+
+## 2026-10-03 — Retired production scalar SIMD switches
+
+Removed `COSMO2D_NOT_USE_SIMD`, `HALO_NOT_USE_SIMD`, and the covariance
+scalar opt-out. Existing SIMDe paths now compile in optimized and debug
+builds; all seven project Makefiles require their headers. Scalar
+single-point kernels and incomplete-vector tails remain where needed.
+The global switch retirement was explicitly requested separately from the
+covariance port and does not relax its `cosmolike/covariances/` boundary.
+
+The retained C tokens match the previous SIMD branches in all 11 affected
+existing C/header files. Scalar comparisons are available through external
+tests and pinned historical sources; no replacement production switch was
+introduced. The unused halo sources remain uncompiled.
+
+All seven optimized interfaces were rebuilt, then **399 project tests
+passed**, including all Roman slow halo checks and the seven new covariance
+primitive tests. No references were refrozen. Selected debug runs passed
+another **24 checks**: 10 LSST Y1 and 14 DES cluster, covering the common
+and cluster paths. The project libraries were left in optimized mode.
+
+| Project | Passed | Test runtime (s) |
+|---|---:|---:|
+| roman_real | 104 | 1285.27 |
+| roman_kl | 49 | 1513.83 |
+| roman_fourier | 45 | 1029.51 |
+| des_y3 | 63 | 1090.45 |
+| lsst_y1 | 64 | 824.30 |
+| desy1xplanck | 45 | 897.60 |
+| des_cluster | 29 | 517.33 |
+
+These runtimes include CAMB and repeated models; they are not likelihood
+benchmarks. A separate manual didactic review followed the tests, fixing
+stale branch references and recording the remaining scalar-tail roles.
+The Gaussian foundation also completed its own review: 80-column C/header
+lines, separate comparisons, house SIMD names, equations, array ownership,
+units and thread responsibilities. The full covariance rewrite remains
+[open](#open-covariance-rewrite).
+
+<details>
+<summary>Source, validation records and local commits</summary>
+
+Core retirement: `b8be6c5`. Gaussian baseline, SIMD implementation and
+naming follow-up: `6f055d0`, `6bc8cb7`, `7286d55`. LSST primitive checks:
+`fe865a6`. Durable records are in the core skill's
+`references/simd_retirement.md` and `references/covariance_rewrite.md`.
+External validation lives in `test/simd_reference/results/` and
+`test/covariance_reference/results/`; their runners keep build/import
+checks and every test exit status. Earlier interrupted or environment-only
+attempts are separate from the final rebuilt-project results.
+
+Project build commits:
+
+| Project | Commit |
+|---|---|
+| lsst_y1 | `8ad57c9` |
+| roman_real | `3edba1a` |
+| roman_fourier | `96b0af6` |
+| roman_kl | `30f8bcc` |
+| des_y3 | `3c4af70` |
+| desy1xplanck | `7194601` |
+| des_cluster | `ddd94da` |
+
+All commits are local. Nothing was pushed.
+
+</details>
 
 ## 2026-10-03 — Evolving neutrino variance and cb halo statistics
 
