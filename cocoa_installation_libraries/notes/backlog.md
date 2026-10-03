@@ -35,6 +35,7 @@ features, Low bugs, Low features.
 - OPEN **MEDIUM** **BUG** — [Cache-key hardening for in-process reconfiguration](#open-cache-key-hardening)
 - OPEN **MEDIUM** **NEW FUNCTIONALITY** — [Cache the Fourier non-Limber band-center corrections](#open-fourier-nonlimber-cache)
 
+
 ### Low
 
 - OPEN **LOW** **NEW FUNCTIONALITY** — [IA x higher-order-bias (gb2) cross terms in cfastpt](#open-cfastpt-gb2-ia-bias)
@@ -483,6 +484,90 @@ porting precedent any WHM work would build on.
 </details>
 
 # Closed tickets
+
+## 2026-10-03 — Evolving neutrino variance and cb halo statistics
+
+Completed owner-approved Phases 2 and 3: FFTLog sigma_m^2(M,a),
+sigma_cb^2(M,a) and their mass slopes; production halo statistics use cb
+peak heights and mean density, with D_cb(M,a) in the concentration.
+Retired halo_matter_field. The M200m radius definition and lensing mass
+weight retain total matter. CAMB supplies cb directly; EMUL2 retains its
+existing documented approximation.
+
+Reused serially created FFTW plans and grouped per-thread work arrays,
+with step-by-step physics and numerical documentation. The complete
+(field,a) row schedule was about 6% faster than the tested split collapse(3)
+layout at 8 threads. Removed COSMO3D_ASSUME_PIECEWISE_UNIFORM and its
+binary-search alternatives; all builds use direct-index helpers.
+OpenBLAS stays at one thread in both covariance paths and after setup;
+explicit CosmoLike OpenMP loops retain their requested team. Both paths
+check the inverse residual without recovery machinery.
+
+All seven final default-build suites passed (392 tests):
+
+| Project | Result | Elapsed seconds |
+|---|---:|---:|
+| des_cluster | 29 passed | 577.39 |
+| lsst_y1 | 57 passed | 891.94 |
+| roman_real | 104 passed | 1367.35 |
+| roman_fourier | 45 passed | 1093.93 |
+| roman_kl | 49 passed | 1564.64 |
+| des_y3 | 63 passed | 1191.31 |
+| desy1xplanck | 45 passed | 948.81 |
+
+The independent cluster reference suite passed 30 tests; selected debug
+checks passed 39 Roman and one cluster test. Aggressive mode was retired
+by owner decision (separate closed record). Direct-integration variance
+error is at most 1.81e-5; one/eight-thread tables and the complete Roman
+NLA/TATT vectors are bit-identical. Independent matched cluster joint
+vectors satisfy delta chi2 < 0.2, including nuisance and production checks.
+Three of 33 stricter row-level precision targets still miss 1e-4 and are
+explicitly documented; no claim of universal row-level agreement is made.
+
+Intentional frozen updates use the documented generators, in separate
+commits; vector changes also include the previously committed Phase 1
+growth convention. The tracked implementation record and plan are in
+cosmolike_core/.claude/skills/cosmolike-dev/references/. Raw execution logs
+are local in test/neutrino_growth_study/implementation/. No pushes; the
+owner handles publication.
+
+## 2026-10-03 — Accuracy-qualified M2 Pro comparison timings
+
+Replaced the old Intel/default-setting table with the four saved M2 Pro
+LSST-Y1/Roman-Real NLA/TATT measurements (8 OpenMP threads, 2026-10-02).
+The timing log was committed in CCL-benchmark a6212ea on 2026-10-02.
+Audited `CCL-benchmark/cocoa_comparison/timing_macos.txt`, both timing
+scripts, `results.json` and saved study reviews: CoCoA means
+0.0459/0.0528/0.0703/0.0764 s, DESC-CCL means
+10.450/15.414/17.962/22.747 s, rounded ratios 228/292/256/298.
+This is verification of the saved run, not a new benchmark of the modified
+libraries. README explains within-code convergence (delta chi2 < 0.2),
+CAMB exclusion, two warm-ups, 20/10 evaluations and configuration scope.
+The older Intel measurements for other likelihoods were not relabeled.
+Linked the study and raw log for reproduction or challenges; both URLs
+returned HTTP 200. Markdown render passed (1 table, 39 blockquotes), all
+internal anchors resolved.
+
+## 2026-10-03 — Retired aggressive compiler mode
+
+Owner chose the optimized strict-IEEE default and debug builds only.
+Removed the aggressive branch from all seven project Makefiles; requesting
+COSMOLIKE_AGGRESSIVE_MODE now fails clearly at parse time (all seven guards
+checked). Installation guidance and the development skill list unsupported
+fast-math flags, including -Ofast; the failing bundle was tested, not each
+flag in isolation. Default/debug compiler options are unchanged apart from
+the separately validated direct-index and BLAS-link changes.
+
+Evidence: pre-change core 4adf735 and cluster interface aa32535 reproduce
+max |R R^-1 - I| = 4 on dummy-data initialization with OpenBLAS=1 and
+OpenMP=1. The current aggressive cluster build also fails. Current Roman
+aggressive tests had 34 passes and 5 failures: four covariance-inverse
+residual failures (83919.9135), plus one tiny halo rounding mismatch
+(max relative 1.47e-12 against a 1e-12 frozen tolerance). Default builds
+pass; permanent BLAS pinning does not repair the aggressive configuration.
+The chosen resolution is to withdraw that configuration, not add fallback
+inversion machinery. Raw evidence remains in the local study logs and the
+tracked sigma_fftlog_implementation.md record.
 
 Grouped by subject and compressed. Nothing here is open work; dated
 measurements are kept, since this section is a decision record, not a

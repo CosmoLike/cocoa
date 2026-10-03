@@ -50,33 +50,39 @@ This Readme file presents basic and advanced instructions for installing all [Co
 We provide the Docker image [whovian-cocoa](https://hub.docker.com/r/vivianmiranda/whovian-cocoa) to facilitate the installation of Cocoa on Windows. 
 
 > [!NOTE]
-> CoCoA `v5.02` benchmark (cosmolike only times) 
-> CPU: `Intel(R) Core(TM) i9-10940X CPU @ 3.30GHz` (`1/8 OpenMP cores`).
+> **Real-space 3x2pt timings with accuracy-tested sampling** (2026-10-02).
+> CPU: **Apple M2 Pro**, macOS 13.7.5, **8 OpenMP threads**.
 >
-> Modeling: Full-sky on real functions except for DESC-CCL (unknown for CLOE-LIB).
+> The previous Intel/default-setting timings did not fully account for a
+> common numerical-convergence target of $`\Delta\chi^2 < 0.2`$. Here
+> $`\Delta\chi^2 = (d_{\rm fine}-d_{\rm base})^T C^{-1}(d_{\rm fine}-d_{\rm base})`$
+> compares two accuracy settings **within one code**, using the survey mask
+> and covariance. It does not require the two codes to agree to that level.
+> For example, DESC-CCL's default sampling differs from the study's reference
+> sampling by $`\Delta\chi^2 = 0.345`$ for LSST-Y1; the reference versus finer
+> sampling gives 0.0014. CoCoA's default versus higher accuracy gives
+> 0.004–0.008 across the two surveys and NLA/TATT cases.
 >
-> Modeling: **IA=TATT** in ($\xi_{\pm}, \gamma_t$) except in CLOE-LIB and DES-Y3-Real 6x2pt+N. 
+> | Case | CoCoA (s) | DESC-CCL (s) | DESC-CCL / CoCoA |
+> |---|---:|---:|---:|
+> | LSST-Y1, NLA | 0.0459 | 10.450 | 228 |
+> | LSST-Y1, TATT | 0.0528 | 15.414 | 292 |
+> | Roman-Real, NLA | 0.0703 | 17.962 | 256 |
+> | Roman-Real, TATT | 0.0764 | 22.747 | 298 |
 >
-> Modeling: **Non-limber** $C_{gg}(l)$ in real space; **non-limber** $C_{gs}(l)$ in CoCoA LSST-Y1/Roman-Real.
+> These are means of 20 CoCoA and 10 DESC-CCL evaluations, after two untimed
+> warm-up calls, cycling through five cosmologies. CAMB is excluded from
+> both timings: CoCoA times its likelihood; DESC-CCL times its data-vector
+> script from the supplied CAMB tables, subtracting table-read time.
+> Both use full-sky, bin-averaged transforms and non-Limber galaxy spectra.
+> DESC-CCL uses the study's reference sampling and PR #1296 build; these
+> measurements are specific to these configurations, not all CCL releases
+> or survey likelihoods.
 >
-> Modeling: Roman-Fourier and Roman-Real-KL CoCoA compute the exact 
-> (**non-Limber**) $C_{gg}(l)$ and $C_{gs}(l)$
-> below $l = 150$ with RSD; DESC-CCL uses Limber without RSD.
->
-> - **LSST-Y1-Real 3x2pt**: (CoCoA) `0.27/0.06s`, (DESC-CCL)`7.96/1.72s`, (CLOE-LIB) 0.23/0.23s.
-> - **Roman-Real 3x2pt**: (CoCoA) `0.45/0.09s`, (DESC-CCL) `8.17/1.96s`, (CLOE-LIB) 0.27/0.27s.
-> - **Roman-Fourier 3x2pt**: (CoCoA) `0.27/0.08s`, (DESC-CCL) `0.65/0.36s`.
-> - **Roman-Real-KL 3x2pt**: (CoCoA) `0.162/0.08s`. 
-> - **DES-Y3xPlanck 6x2pt (w/ CMB)**  (CoCoA) `0.34/0.07s`.
-> - **DES-Y3-Real 3x2pt**  (CoCoA) `0.27/0.06s`.
-> - **DES-YX-Real 6x2pt+N (clusters)**  (CoCoA) `0.71/0.14s` (YX = not yet production cov, n(z), dv, Y6 analysis).
->
-> CoCoA vs DESC-CCL Code Comparison Refeference: (LSST-Y1 and Roman-Real 
-> real-space 3x2pt, NLA and TATT, same CAMB tables in both codes): 
-> [CCL-benchmark](https://github.com/vivianmiranda/CCL-benchmark). 
-> Cosmic shear agrees; $\gamma_t$ and $w(\theta)$ differ by 
-> $\Delta\chi^2 = 8.8$ (LSST-Y1) and 0.23 (Roman-Real) through DESC-CCL's 
-> non-Limber (FKEM) step when the linear growth depends on $k$.
+> The [CCL-benchmark study](https://github.com/vivianmiranda/CCL-benchmark)
+> provides the accuracy checks, modeling differences, reproduction scripts,
+> and [saved timing log](https://github.com/vivianmiranda/CCL-benchmark/blob/main/cocoa_comparison/timing_macos.txt)
+> for users who want to double-check or challenge these results.
 
 # Installation of core packages <a name="required_packages_conda"></a>
 
@@ -238,6 +244,17 @@ Cocoa does not install all the available external modules by default. If the use
     source compile_cocoa.sh
     
 This script compiles external modules selected for installation on `set_installation_options.sh` (e.g., CAMB) and does not require internet access. Code compilation is CPU-intensive; therefore, running  `compile_cocoa.sh` on a cluster login node may violate HPC policy. Users should then run `setup_cocoa.sh` in a login node and `compile_cocoa.sh` on an interactive compute node.
+
+> [!Warning]
+> CosmoLike supports the optimized strict-IEEE default build and
+> `COSMOLIKE_DEBUG_MODE`. The compiler mode `COSMOLIKE_AGGRESSIVE_MODE`
+> is retired because its fast-math configuration produced incorrect
+> covariance inverses. Unset that variable before compiling.
+> Do not enable `-ffast-math`, `-Ofast`, `-funsafe-math-optimizations`,
+> `-fassociative-math`, `-ffinite-math-only`, `-freciprocal-math`,
+> `-fno-signed-zeros`, or `-fno-trapping-math` in CosmoLike builds.
+> The installation script's separate `--aggressive` download option below
+> is unchanged.
 
 Users can now proceed to **the next section**.
 

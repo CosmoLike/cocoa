@@ -231,18 +231,19 @@ export FASTPT_WRAPPER_GIT_TAG="v1.01"
 #   (UBSan + float-divide-by-zero on macOS). Disables SIMD codepaths.
 #   Use for: debugging, valgrind, catching undefined behavior.
 #
-# AGGRESSIVE MODE (COSMOLIKE_AGGRESSIVE_MODE=1)
-#   Maximum performance. Enables -ffast-math (non-IEEE FP: reassociation,
-#   reciprocal math, no NaN/Inf checks) and link-time optimization (-flto).
+# Aggressive mode is retired: fast-math builds produced incorrect covariance
+# inverses. COSMOLIKE_AGGRESSIVE_MODE now causes a build error; unset it.
+# Do not add -ffast-math, -Ofast, -funsafe-math-optimizations,
+# -fassociative-math, -ffinite-math-only, -freciprocal-math,
+# -fno-signed-zeros, or -fno-trapping-math to the compiler flags.
 #
-# DEFAULT MODE (neither flag set)
+# DEFAULT MODE (COSMOLIKE_DEBUG_MODE unset)
 #   Full optimization (-O3, -march=native, LTO, loop unrolling) but with
 #   strict IEEE-754 floating-point semantics: no reassociation, correct
 #   rounding, trapping on signaling NaNs. This is the safe baseline for
 #   validating new models or investigating numerical differences.
 # ------------------------------------------------------------------------------
 #export COSMOLIKE_DEBUG_MODE=1
-#export COSMOLIKE_AGGRESSIVE_MODE=1
 
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
