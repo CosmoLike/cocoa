@@ -159,16 +159,18 @@ a convention comparison, not the final numerical reference.
 **Ticket type: NEW FUNCTIONALITY.**
 
 **OPEN.** The September study has been reviewed against the current core.
-An initial, independently tested slice implements Gaussian Wick algebra,
-projection of supplied spectra, and analytic pair-count noise. The full
-contract is not frozen and there is no survey covariance generator yet.
+Independently tested components implement Gaussian algebra, all-pairs
+Limber spectra, mask variance, SSC shell responses, cb halo moments,
+tree-level angular averages, and the five cNG halo terms. A pinned survey
+diagnostic connects them, but fails the full numerical refinement gate.
+The contract is not frozen and there is no production generator yet.
 
 **Severity: MEDIUM.** New science functionality; existing project
 covariances remain in use.
 
 ### What is already in place
 
-- New C code is isolated in `cosmolike/covariances/gaussian_cov.c`; all
+- New C code is isolated in `cosmolike/covariances/`; all
   new covariance C filenames must end `_cov.c`. Existing core C files
   outside this directory are not changed for the port.
 - Caller-owned scratch, static OpenMP scheduling and SIMDe across output
@@ -177,26 +179,47 @@ covariances remain in use.
 - NumPy/mpmath algebra, noise and projection checks outside git in
   `test/covariance_reference/`; opt-in tests in `lsst_y1/tests` find that
   directory and its isolated compiled library through environment variables.
+- Covariance-owned radial and lensing-efficiency grids, signed field
+  windows and all ten pairs of the pinned two-lens/two-source configuration.
+  A small LSST binding exposes the Limber spectra without changing Ntable.
+- Raw-mask SSC, explicit isotropic/projected-tree response choices, and
+  exact projected-estimator mean subtraction. Independent tree diagrams
+  and labelled halo partitions check the cNG multiplicities.
+- Twenty-seven new focused checks pass in optimized and debug builds,
+  covering these five components. Their didactic self-reviews are recorded
+  separately in the core skill references. All seven project suites pass:
+  405 passed plus 21 opt-in skips. Enabling the external libraries passes
+  all 34 covariance tests together, covering those 21 skips and bringing
+  distinct passing coverage to 426 tests. No references were refrozen.
+- A realistic external harmonic diagnostic has a positive total covariance;
+  C/NumPy projected terms agree to 1.8e-14 and distance-unit changes to
+  3.7e-15 on a diagonal-normalized scale. This is a center-of-band test,
+  not exact band averages, non-Limber spectra or a production covariance.
 - Core skill records the folder boundary, filename rule, simplicity,
   paper sources, measured optimization requirement, and no-push policy.
 - Each tested major ticket gets a separate didactic red-eye review before
   work starts on the next major ticket (owner clarification, 2026-10-03).
-  The Gaussian foundation review is complete. C/header lines fit within
+  Each completed component has its own review. C/header lines fit within
   80 columns, comparisons use separate lines, and SIMD follows house naming.
-- The final rebuilt seven-project run passed 399 tests, including the new
+- The earlier Gaussian/SIMD-retirement run passed 399 tests, including the
   primitives and all Roman slow halo checks; another 24 debug checks passed.
   No refreezing was needed. Production SIMD is unconditional; scalar
   comparisons remain in the external test harness.
 
 ### What is missing
 
-The study's full Phase-0 configuration/input dump, SSC/cNG references,
-CosmoCov oracle gate, realistic-node positive-semidefiniteness checks,
-physics-delta measurements and contract freeze. Then covariance-owned
-all-pairs spectra (including non-Limber gamma_t and cross-bin gg), survey
-inputs/layout, masks, separate G/SSC/cNG output, project generators and
-convergence/Fisher validation. Existing covariances must not be replaced
-before those checks pass.
+The full Phase-0 accuracy and CosmoCov convention gates, exact spin/band
+operators, and all-pairs non-Limber spectra (including gamma_t and cross-bin
+gg). The preliminary total passes its PSD diagnostic, but doubling radial,
+mass and angular resolution changes total eigenmodes by about 2e-4 and
+fails the study's 1e-6 componentwise refinement requirement. Both the SSC
+prescription and the 1+3 multiplicity affect some modes by more than 2%.
+An external smooth-power experiment with finer radial sampling reduces
+total-mode changes to about 5e-6, but still misses the componentwise gate;
+it has not been promoted to a production interpolation choice.
+Then finish survey inputs/layout, mask pair counts, separate G/SSC/cNG
+files, project generators and convergence/Fisher checks. Existing
+covariances must not be replaced before validation and the contract freeze.
 
 ### Technical record
 
