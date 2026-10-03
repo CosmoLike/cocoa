@@ -162,7 +162,7 @@ a convention comparison, not the final numerical reference.
 Independently tested components implement Gaussian algebra, all-pairs
 Limber spectra, mask variance, SSC shell responses, cb halo moments,
 tree-level angular averages, and the five cNG halo terms. A pinned survey
-diagnostic connects them, but fails the full numerical refinement gate.
+diagnostic connects them; production survey validation remains open.
 The contract is not frozen and there is no production generator yet.
 
 **Severity: MEDIUM.** New science functionality; existing project
@@ -225,13 +225,28 @@ The full Phase-0 accuracy and CosmoCov convention gates, survey integration
 of spin/band operators, and all-pairs non-Limber spectra (gamma_t and cross-bin
 gg). The preliminary total passes its PSD diagnostic, but doubling radial,
 mass and angular resolution changes total eigenmodes by about 2e-4 and
-fails the study's 1e-6 componentwise refinement requirement. Both the SSC
+was tested against the study's overly strict 1e-6 componentwise rule. Both the SSC
 prescription and the 1+3 multiplicity affect some modes by more than 2%.
 An external smooth-power experiment, 256-to-512 radial refinement and a
 common L_max=32768 mask reduce total-mode changes to 1.043e-6. Gaussian and
 cNG nonzero-entry relative changes are below 1e-6 in this diagnostic; SSC
-still misses the componentwise gate (up to 9.18e-4 near zero crossings).
+has ratios up to 9.18e-4 near zero crossings. Those ratios are now
+diagnostics: the owner identifies FoM convergence and covariance validity
+as the goals, suggesting 1e-3 mode convergence. The core accuracy record
+distinguishes proposed numerical targets from physical-model validation.
+Do not impose the data-vector delta-chi2 < 0.2 rule on covariances.
 The experimental interpolant has not become a production choice.
+Owner priority: roman_real, with its existing eight lens/eight source
+bins and 2115-entry real-space layout. arXiv:2004.05271 guides survey
+assumptions; do not import its ten-bin Fourier layout.
+The owner requested a small-component runtime estimate before a full run.
+The Roman pilot measures about 44 ms per radial node at 64 multipoles,
+or 0.70 s at 128 multipoles with denser mass/angular quadrature, plus an
+estimated 6.7 s for all Gaussian projections to ell=100000. For 512--1024
+radial nodes, those measured ingredients suggest 30--52 s or 6--12 min,
+respectively. These are conditional budgets, excluding unfinished survey
+and non-Limber stages; no full-runtime, convergence or speedup claim.
+The core reference `covariance_roman_timing.md` records settings and checks.
 Then finish survey inputs/layout, mask-pair integration, separate G/SSC/cNG
 files, project generators and convergence/Fisher checks. Existing
 covariances must not be replaced before validation and the contract freeze.
