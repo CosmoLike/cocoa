@@ -202,6 +202,11 @@ covariances remain in use.
   coverage totals 432 distinct passing tests including the earlier project
   run. On the M2 Pro its reusable 20-bin geometry builds in 0.254 s at eight
   threads; no full covariance speed claim follows from that measurement.
+- Mask-derived ordered-pair areas pass three further optimized/debug checks,
+  including independent 60-digit cap geometry; coverage now totals 435.
+  The pilot's L_max=4096 mask leaves 1.05e-5 pair-area error and up to
+  1.30e-6 SSC shell error. L_max=32768 gives 1.06e-8 pair-area agreement;
+  mask resolution must be refined as part of survey validation.
 - Core skill records the folder boundary, filename rule, simplicity,
   paper sources, measured optimization requirement, and no-push policy.
 - Each tested major ticket gets a separate didactic red-eye review before
@@ -224,7 +229,7 @@ prescription and the 1+3 multiplicity affect some modes by more than 2%.
 An external smooth-power experiment with finer radial sampling reduces
 total-mode changes to about 5e-6, but still misses the componentwise gate;
 it has not been promoted to a production interpolation choice.
-Then finish survey inputs/layout, mask pair counts, separate G/SSC/cNG
+Then finish survey inputs/layout, mask-pair integration, separate G/SSC/cNG
 files, project generators and convergence/Fisher checks. Existing
 covariances must not be replaced before validation and the contract freeze.
 
