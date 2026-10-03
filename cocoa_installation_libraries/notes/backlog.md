@@ -195,6 +195,13 @@ covariances remain in use.
   C/NumPy projected terms agree to 1.8e-14 and distance-unit changes to
   3.7e-15 on a diagonal-normalized scale. This is a center-of-band test,
   not exact band averages, non-Limber spectra or a production covariance.
+- Full-sky spin-bin operators and exact integer Fourier-band weights pass
+  six further optimized/debug checks, including 60-digit low-degree rotation
+  matrices, ell=50000, narrow bins, mode counts and thread determinism.
+  The operator library is isolated and leaves project interfaces unchanged;
+  coverage totals 432 distinct passing tests including the earlier project
+  run. On the M2 Pro its reusable 20-bin geometry builds in 0.254 s at eight
+  threads; no full covariance speed claim follows from that measurement.
 - Core skill records the folder boundary, filename rule, simplicity,
   paper sources, measured optimization requirement, and no-push policy.
 - Each tested major ticket gets a separate didactic red-eye review before
@@ -208,8 +215,8 @@ covariances remain in use.
 
 ### What is missing
 
-The full Phase-0 accuracy and CosmoCov convention gates, exact spin/band
-operators, and all-pairs non-Limber spectra (including gamma_t and cross-bin
+The full Phase-0 accuracy and CosmoCov convention gates, survey integration
+of spin/band operators, and all-pairs non-Limber spectra (gamma_t and cross-bin
 gg). The preliminary total passes its PSD diagnostic, but doubling radial,
 mass and angular resolution changes total eigenmodes by about 2e-4 and
 fails the study's 1e-6 componentwise refinement requirement. Both the SSC
