@@ -80,11 +80,11 @@ export IGNORE_DARK_EMULATOR_CODE=1
 # The keys below control which cosmolike projects will be installed and compiled 
 # ------------------------------------------------------------------------------
 #export IGNORE_COSMOLIKE_LSST_Y1_CODE=1
-#export IGNORE_COSMOLIKE_DES_Y3_CODE=1
+export IGNORE_COSMOLIKE_DES_Y3_CODE=1
 #export IGNORE_COSMOLIKE_DESXPLANCK_CODE=1
-#export IGNORE_COSMOLIKE_ROMAN_FOURIER_CODE=1
+export IGNORE_COSMOLIKE_ROMAN_FOURIER_CODE=1
 #export IGNORE_COSMOLIKE_ROMAN_REAL_CODE=1
-#export IGNORE_COSMOLIKE_ROMAN_KL_CODE=1
+export IGNORE_COSMOLIKE_ROMAN_KL_CODE=1
 export IGNORE_COSMOLIKE_DES_CLUSTER_CODE=1
 # WARNING: des_y6 is not production ready.
 export IGNORE_COSMOLIKE_DES_Y6_CODE=1
@@ -136,36 +136,36 @@ export USE_SPT_CLIK_PLANCK=1
 
 export DES_Y3_URL="https://github.com/CosmoLike/cocoa_des_y3.git"
 export DES_Y3_NAME="des_y3"
-export DES_Y3_GIT_TAG="v5.01"
+export DES_Y3_GIT_TAG="v5.02"
 
 export DESXPLANCK_URL="https://git@github.com/CosmoLike/cocoa_desy1xplanck.git"
 export DESXPLANCK_GIT_NAME="desy1xplanck"
-export DESXPLANCK_GIT_TAG="v5.01"
+export DESXPLANCK_GIT_TAG="v5.02"
 
 export LSST_Y1_URL="https://github.com/CosmoLike/cocoa_lsst_y1.git"
 export LSST_Y1_NAME="lsst_y1"
-export LSST_Y1_GIT_TAG="v5.01"
+export LSST_Y1_GIT_TAG="v5.02"
 
 export ROMAN_FOURIER_URL="https://github.com/CosmoLike/cocoa_roman_fourier.git"
 export ROMAN_FOURIER_NAME="roman_fourier"
-export ROMAN_FOURIER_GIT_TAG="v5.01"
+export ROMAN_FOURIER_GIT_TAG="v5.02"
 
 export ROMAN_REAL_URL="https://github.com/CosmoLike/cocoa_roman_real.git"
 export ROMAN_REAL_NAME="roman_real"
-export ROMAN_REAL_GIT_TAG="v5.01"
+export ROMAN_REAL_GIT_TAG="v5.02"
 
 export COSMOLIKE_URL="https://github.com/CosmoLike/cocoa-cosmolike-core.git"
-export COSMOLIKE_GIT_TAG="v5.02"
+export COSMOLIKE_GIT_TAG="v5.04"
 export COSMOLIKE_NAME="cosmolike_core"
 
 export ROMAN_KL_URL="https://github.com/CosmoLike/cocoa_roman_kl.git"
 export ROMAN_KL_NAME="roman_kl"
-export ROMAN_KL_GIT_TAG="v5.01"
+export ROMAN_KL_GIT_TAG="v5.02"
 
 # WARNING: des_cluster is not production ready.
 export DES_CLUSTER_URL="https://github.com/CosmoLike/cocoa_des_cluster.git"
 export DES_CLUSTER_NAME="des_cluster"
-export DES_CLUSTER_GIT_TAG="v5.01"
+export DES_CLUSTER_GIT_TAG="v5.03"
 
 # WARNING: des_y6 is not production ready: no tagged release exists, so the
 # key below follows the branch main instead of pinning a version.
@@ -231,18 +231,19 @@ export FASTPT_WRAPPER_GIT_TAG="v1.01"
 #   (UBSan + float-divide-by-zero on macOS). Disables SIMD codepaths.
 #   Use for: debugging, valgrind, catching undefined behavior.
 #
-# AGGRESSIVE MODE (COSMOLIKE_AGGRESSIVE_MODE=1)
-#   Maximum performance. Enables -ffast-math (non-IEEE FP: reassociation,
-#   reciprocal math, no NaN/Inf checks) and link-time optimization (-flto).
+# Aggressive mode is retired: fast-math builds produced incorrect covariance
+# inverses. COSMOLIKE_AGGRESSIVE_MODE now causes a build error; unset it.
+# Do not add -ffast-math, -Ofast, -funsafe-math-optimizations,
+# -fassociative-math, -ffinite-math-only, -freciprocal-math,
+# -fno-signed-zeros, or -fno-trapping-math to the compiler flags.
 #
-# DEFAULT MODE (neither flag set)
+# DEFAULT MODE (COSMOLIKE_DEBUG_MODE unset)
 #   Full optimization (-O3, -march=native, LTO, loop unrolling) but with
 #   strict IEEE-754 floating-point semantics: no reassociation, correct
 #   rounding, trapping on signaling NaNs. This is the safe baseline for
 #   validating new models or investigating numerical differences.
 # ------------------------------------------------------------------------------
 #export COSMOLIKE_DEBUG_MODE=1
-#export COSMOLIKE_AGGRESSIVE_MODE=1
 
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------

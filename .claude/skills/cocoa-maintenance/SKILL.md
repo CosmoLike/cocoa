@@ -552,6 +552,20 @@ shape, the main README wins.
   and quoted terminal output keep everything verbatim. In table
   cells never put a raw | inside math: use \lvert and \rvert for
   absolute values, or the pipe breaks the table.
+- Every number names its quantity where it stands. Write
+  "$\Delta\chi^2 = 0.34$" and "at most $\lvert\Delta\xi_+\rvert/\sigma
+  = 0.050$", never "gives 0.34" or "at most 0.050 sigma". A table column
+  of numbers carries the quantity in its header ("$\Delta\chi^2$,
+  LSST-Y1"), not only in the sentence above the table: a reader who lands
+  on the table must know what the numbers are, and ranges say over what
+  they run ("lowest to highest lens bin").
+- GitHub math: write inline math as $`...`$ (dollar-backtick) whenever
+  it touches a bracket or punctuation; a plain $w(\theta)$) does not
+  render. Keep percent signs outside math: GitHub passes \% to the
+  renderer as %, which LaTeX reads as a comment, so "$-0.7\%$ to
+  $-1.5\%$" renders as "-0.7 to -1.5" and the reader sees a different
+  quantity. Write -0.7% as plain text. Display equations go in a
+  ```math block.
 - A list item is one short clause: the action, nothing else. The
   reasoning ("so the chi2 against it is zero by construction") moves
   to a sentence after the list that refers back to the steps.
@@ -1716,6 +1730,82 @@ notebook wrapper or a notebook. The points that matter from this side:
   initializes cosmolike exactly as the project's likelihood does.
 - A figure is checked by rendering it and looking at it, in every mode
   the function offers.
+
+#### The maintainer's figure style (scripts, notebooks, READMEs)
+
+Use these defaults in every plotting script, notebook cell or study
+figure written for the maintainer; deviations get rejected by eye.
+
+Notebook setup (the cell of every `EXAMPLE_EVALUATE*.ipynb`):
+
+```python
+%matplotlib inline
+%config InlineBackend.figure_format = 'retina'
+matplotlib.rcParams['mathtext.fontset'] = 'stix'
+matplotlib.rcParams['font.family'] = 'STIXGeneral'
+matplotlib.rcParams['xtick.bottom'] = True
+matplotlib.rcParams['xtick.top'] = False
+matplotlib.rcParams['ytick.right'] = False
+matplotlib.rcParams['axes.edgecolor'] = 'black'
+matplotlib.rcParams['axes.linewidth'] = '1.0'
+matplotlib.rcParams['axes.labelsize'] = 'medium'
+matplotlib.rcParams['axes.grid'] = True
+matplotlib.rcParams['grid.linewidth'] = '0.0'
+matplotlib.rcParams['grid.alpha'] = '0.18'
+matplotlib.rcParams['grid.color'] = 'lightgray'
+matplotlib.rcParams['legend.labelspacing'] = 0.77
+matplotlib.rcParams['savefig.bbox'] = 'tight'
+matplotlib.rcParams['savefig.format'] = 'pdf'
+```
+
+Plotter call defaults in notebooks (`cosmolike_notebook_utils`
+`plot_datavectors`, ratio mode against a reference):
+
+```python
+cnu.plot_gammat_tomo_limber(theta_gammat=curves, gammat_ref=reference,
+    param=param, colorbarlabel="Accuracy Boost",
+    ylim=(0.981, 1.019),                 # tight: fitted to the curves
+    bintextpos=[0.85, 0.2], bintextsize=20,
+    legendloc=(0.9, 0.55),
+    linewidth=[1.0, 1.3, 1.6, 1.9],
+    linestyle=['solid', 'dashed', 'dashdot', 'dotted'],
+    figsize=(20, 13),                    # grids; (18, 13./5) for one row (w)
+    yaxislabelsize=17, yaxisticklabelsize=14, xaxisticklabelsize=20)
+```
+
+Rules the maintainer applies when reading a figure:
+
+- **No white space.** The y-range is fitted to the data: not symmetric
+  when the curves sit on one side of 0, 0 included, about 10% padding.
+  A ±1 axis for percent-level curves is rejected.
+- **One range per row when rows differ.** Pass the plotters' per-row
+  `ylim` (one `[lo, hi]` per row, ratio mode of `plot_xi` and
+  `plot_gammat_tomo_limber`). If every panel of a row needs a rescale
+  factor, the range is wrong.
+- **Outlier panels get a factor, printed as 1/alpha.** The panel shows
+  alpha times the curve and prints `1/α = f` with f in 2, 3, 5, 10, 20,
+  30, 50, 100, ... (`1/α = 3` reads: the difference is three times what
+  the axis shows). Reserve it for a few panels.
+- **The quantity a reader needs.** For a code or setting comparison,
+  plot the difference in units of the data error,
+  $(d_a - d_b)/\sigma$ with $\sigma = \sqrt{C_{ii}}$ (1 = one sigma), or
+  in percent, `100 (a/b - 1)`; never a raw fraction such as 0.0017.
+  Label the axis with the quantity (`$\Delta\gamma_t/\sigma$`,
+  `$\gamma_t$ diff. [%]`).
+- **Few curves.** Show only the comparison asked for (for example one
+  curve per cosmology); variants and diagnostics go in tables.
+- **Legend above the panels, in one row**, never over a panel. Bin
+  labels and the 1/alpha note sit in a corner the curves leave free
+  (top-left by default).
+- **Readable at README size.** Figures for a README or a study use larger
+  fonts than the notebook defaults: y label 24, y ticks 19, x ticks 22,
+  x label 24, bin labels 22, legend 22, and 180 dpi.
+- **Every curve visible.** No pale colors (colormaps such as
+  `twilight_shifted` lose their middle); a light color gets a long dash
+  and a wide line, a dark color may take the dots; never a light, thin,
+  dotted line.
+- **Look at the rendered image** before showing it (Cosmolike skill,
+  `references/python.md` Section 10).
 
 ### 8.9 What to report with a Python change
 
