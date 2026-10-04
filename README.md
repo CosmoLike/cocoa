@@ -90,7 +90,7 @@ We provide the Docker image [whovian-cocoa](https://hub.docker.com/r/vivianmiran
 
 > [!NOTE]
 > **Covariance forecasts** (2026-10-04).
-> CPU: **Apple M2 Pro**, macOS 13.7.5, **8 OpenMP threads**, one BLAS thread.
+> CPU: **Apple M2 Pro**, macOS 13.7.5, **8 OpenMP threads**.
 >
 > CoCoA computes real- and Fourier-space galaxy-clustering and weak-lensing
 > covariance matrices, returning **Gaussian (G)**, **super-sample (SSC)**,
@@ -103,21 +103,9 @@ We provide the Docker image [whovian-cocoa](https://hub.docker.com/r/vivianmiran
 > | LSST Y1 | 1,560 × 1,560 | 174.0 s (2.90 min) |
 > | Roman real | 2,115 × 2,115 | 178.7 s (2.98 min) |
 >
-> These are single, sequential notebook runs, including spectrum generation,
-> halo calculations, angular transforms and complete matrix assembly.
-> CAMB and initial survey setup, eigenvalue diagnostics, plotting and file
-> writing are excluded. These timings use the settings supplied with each
-> project's covariance example.
->
-> These forecasts assume massless neutrinos, Limber spectra, linear galaxy
-> bias, zero intrinsic alignment/magnification/RSD, and a spherical-cap
-> footprint. All-pairs non-Limber covariance and massive-neutrino non-Gaussian
-> terms remain to be implemented. Both totals are positive definite after
-> their likelihood scale cuts.
->
 > The [LSST Y1 covariance guide](https://github.com/CosmoLike/cocoa_lsst_y1#computing_covariances) and
 > [Roman real covariance guide](https://github.com/CosmoLike/cocoa_roman_real#computing_covariances)
-> explain the inputs, component plots and accuracy comparisons in each
+> explain the model, timing scope, inputs and accuracy comparisons in each
 > `EXAMPLE_EVALUATE_COVARIANCE.ipynb`. Covariance generation is excluded from
 > the default build: enable the project's covariance option and recompile
 > as described in those guides. Likelihood use of a supplied covariance
@@ -1662,5 +1650,4 @@ There are a few differences users should be aware of when running Cocoa on Googl
 A working knowledge of Python is required to understand the Cobaya framework at the developer level. Users must also be familiar with the Bash language to understand Cocoa's scripts. Proficiency in C and C++ is also needed to manipulate Cosmolike and the C++ Cobaya-Cosmolike C++ interface. Finally, users need to understand the Fortran-2003 language to modify CAMB.
 
 Learning all these languages can be overwhelming, so to enable new users to do research that demands modifications on the inner workings of these codes, we include [here](cocoa_installation_libraries/LectNotes.pdf) a link to approximately 600 slides that provide an overview of Bash (slides ~1-137), C (slides ~138-371), and C++ (slides ~372-599). In the future, we aim to add lectures about Python and Fortran. 
-
 
