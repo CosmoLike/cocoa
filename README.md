@@ -88,6 +88,44 @@ We provide the Docker image [whovian-cocoa](https://hub.docker.com/r/vivianmiran
 > and [saved timing log](https://github.com/vivianmiranda/CCL-benchmark/blob/main/cocoa_comparison/timing_macos.txt)
 > for users who want to double-check or challenge these results.
 
+> [!NOTE]
+> **Covariance forecasts** (2026-10-04).
+> CPU: **Apple M2 Pro**, macOS 13.7.5, **8 OpenMP threads**, one BLAS thread.
+>
+> CoCoA computes real- and Fourier-space galaxy-clustering and weak-lensing
+> covariance matrices, returning **Gaussian (G)**, **super-sample (SSC)**,
+> **connected non-Gaussian (cNG)** and total contributions separately.
+> The real-space calculation uses full-sky, bin-averaged transforms and
+> retains the internal cross-bin correlations needed by every covariance block.
+>
+> | Full real-space 3x2pt covariance | Matrix before scale cuts | G + SSC + cNG time |
+> |---|---:|---:|
+> | LSST Y1 | 1,560 × 1,560 | 174.0 s (2.90 min) |
+> | Roman real | 2,115 × 2,115 | 178.7 s (2.98 min) |
+>
+> These are single, sequential notebook runs, including spectrum generation,
+> halo calculations, angular transforms and complete matrix assembly.
+> CAMB and initial survey setup, eigenvalue diagnostics, plotting and file
+> writing are excluded. Both use `accuracy_boost=1`, `integration_accuracy=0`,
+> $`\ell_{\max}=100{,}000`$, and 96-point quadrature per integration panel;
+> the remaining settings are in the project covariance `default.yaml` files.
+>
+> These forecasts assume massless neutrinos, Limber spectra, linear galaxy
+> bias, zero intrinsic alignment/magnification/RSD, and a spherical-cap
+> footprint. All-pairs non-Limber covariance and massive-neutrino non-Gaussian
+> terms remain to be implemented. Both totals are positive definite after
+> their likelihood scale cuts; **numerical and Fisher convergence of these
+> default settings is not yet established**. The data-vector accuracy target
+> in the preceding note does not certify covariance accuracy.
+>
+> The [LSST Y1 covariance guide](https://github.com/CosmoLike/cocoa_lsst_y1#computing_covariances) and
+> [Roman real covariance guide](https://github.com/CosmoLike/cocoa_roman_real#computing_covariances)
+> explain the inputs, component plots and accuracy comparisons in each
+> `EXAMPLE_EVALUATE_COVARIANCE.ipynb`. Covariance generation is excluded from
+> the default build: enable the project's covariance option and recompile
+> as described in those guides. Likelihood use of a supplied covariance
+> remains available in data-vector-only builds.
+
 # Installation of core packages <a name="required_packages_conda"></a>
 
 Core packages include compilers and numerical libraries that users typically do not modify.
