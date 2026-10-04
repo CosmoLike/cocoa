@@ -106,17 +106,14 @@ We provide the Docker image [whovian-cocoa](https://hub.docker.com/r/vivianmiran
 > These are single, sequential notebook runs, including spectrum generation,
 > halo calculations, angular transforms and complete matrix assembly.
 > CAMB and initial survey setup, eigenvalue diagnostics, plotting and file
-> writing are excluded. Both use `accuracy_boost=1`, `integration_accuracy=0`,
-> $`\ell_{\max}=100{,}000`$, and 96-point quadrature per integration panel;
-> the remaining settings are in the project covariance `default.yaml` files.
+> writing are excluded. These timings use the settings supplied with each
+> project's covariance example.
 >
 > These forecasts assume massless neutrinos, Limber spectra, linear galaxy
 > bias, zero intrinsic alignment/magnification/RSD, and a spherical-cap
 > footprint. All-pairs non-Limber covariance and massive-neutrino non-Gaussian
 > terms remain to be implemented. Both totals are positive definite after
-> their likelihood scale cuts; **numerical and Fisher convergence of these
-> default settings is not yet established**. The data-vector accuracy target
-> in the preceding note does not certify covariance accuracy.
+> their likelihood scale cuts.
 >
 > The [LSST Y1 covariance guide](https://github.com/CosmoLike/cocoa_lsst_y1#computing_covariances) and
 > [Roman real covariance guide](https://github.com/CosmoLike/cocoa_roman_real#computing_covariances)
