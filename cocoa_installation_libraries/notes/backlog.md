@@ -217,7 +217,8 @@ covariances remain in use.
 - The 2812-entry joint baseline agrees with independent component pilots
   within 2.1e-15 in total-variance units. The Y total is positive after
   excluding its 48 defined null rows. Notebook boosts 1 and 2 are both
-  positive; their largest generalized variance change is about 18%, so
+  positive; after nested-grid refinement their largest generalized variance
+  change is 18.45%, so
   neither is presented as a converged inference setting. Selected-cluster
   cNG corrections and non-SSC count crosses remain omitted in this baseline.
 - SIMDe arithmetic is unconditional. OpenMP distributes independent output
@@ -230,13 +231,27 @@ covariances remain in use.
   recorded in the core references. All seven projects pass 392 data-vector
   checks, including Roman real's 24 opt-in halo checks, and 114 covariance
   checks. Stored likelihood references were not changed by the notebook
-  rollout, test reorganization or shared matter extraction.
-- The full DES joint baseline takes 13.80/8.98/6.55/6.35 s at 1/2/4/8
+  rollout, test reorganization or shared matter extraction. The subsequent
+  nested-grid and bounded-spectrum changes pass 116 covariance checks.
+  All seven refreshed notebooks execute successfully; all 28 galaxy/shear
+  totals and both DES joint totals remain positive on their defined spaces.
+- Before the later spectrum-batching change, the full DES joint baseline
+  took 13.80/8.98/6.55/6.35 s at 1/2/4/8
   threads on the Apple M2 Pro. These are three-call means after one warm-up
   per worker count, at a fixed cosmology and boost 1, excluding CAMB and
   initialization. No competing numerical job ran; ordinary desktop
   activity remained. Every component is bitwise identical across workers.
   Scaling beyond four threads is weak and still needs optimization.
+- Covariance interpolation refinement retains every old window and
+  non-Gaussian multipole node. Raising a cutoff extends the grid without
+  stretching its cells. Settings archive the actual multipole samples;
+  quadrature-node refinement remains a separate numerical check.
+- A full boost-1/2/4/8 LSST single-source Gaussian test is positive and its
+  successive maximum generalized variance changes fall from 1.02e-4 to
+  1.10e-5 to 2.29e-6. Multipole batching preserves every radial sum bitwise
+  and bounds the high-boost C scratch from about 27.52 GB to 176.16 MB.
+  Quiet component measurements and didactic checks are recorded in the
+  core's covariance_limber_batches.md; these are not full-matrix timings.
 
 ### What is missing
 
@@ -247,6 +262,16 @@ convergence. The proposed 1e-3 mode scale is a diagnostic starting point,
 not a literature requirement; do not impose the data-vector
 |delta chi2| < 0.2 rule or the study's old 1e-6 entrywise rule on covariance
 accuracy. Check several cosmologies and the intended scale cuts.
+
+The high-resolution halo-response diagnostic still finds a copied-power
+derivative floor: a nested 241-to-961-node response table stalls near 0.8%
+maximum error at its fixed off-grid queries. Merely inserting linear
+power samples preserves that floor. Cubic construction of a nested dense
+power copy reduces the same table-refinement error to about 0.03%, but
+changes the between-node input function. Validate against CAMB's own
+interpolator and covariance/Fisher results before adopting that policy;
+production input copying remains unchanged. These component errors are
+not full-covariance generalized-mode bounds.
 
 Finish covariance-owned all-pairs non-Limber spectra, including crossed
 galaxy–shear and cross-bin clustering. Validate physical response choices,
