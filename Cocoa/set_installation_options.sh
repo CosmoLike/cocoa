@@ -89,6 +89,20 @@ export IGNORE_COSMOLIKE_DES_CLUSTER_CODE=1
 # WARNING: des_y6 is not production ready.
 export IGNORE_COSMOLIKE_DES_Y6_CODE=1
 
+# ------------------------------------------------------------------------------
+# Covariance generation is optional; data-vector likelihoods still read their
+# supplied covariance matrices. Unset a project's key after start_cocoa.sh and
+# recompile its interface to enable covariance generation and notebook bindings.
+# Comment its export here to keep covariance generation enabled across sessions.
+# ------------------------------------------------------------------------------
+export IGNORE_COSMOLIKE_LSST_Y1_COVARIANCE=1
+export IGNORE_COSMOLIKE_ROMAN_REAL_COVARIANCE=1
+export IGNORE_COSMOLIKE_ROMAN_FOURIER_COVARIANCE=1
+export IGNORE_COSMOLIKE_ROMAN_KL_COVARIANCE=1
+export IGNORE_COSMOLIKE_DES_Y3_COVARIANCE=1
+export IGNORE_COSMOLIKE_DESXPLANCK_COVARIANCE=1
+export IGNORE_COSMOLIKE_DES_CLUSTER_COVARIANCE=1
+
 #export IGNORE_BFMT_CODE=1 # Baryon Feedback Theory Block from Nihar&JVicente
 
 # ------------------------------------------------------------------------------
