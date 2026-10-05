@@ -89,27 +89,36 @@ We provide the Docker image [whovian-cocoa](https://hub.docker.com/r/vivianmiran
 > for users who want to double-check or challenge these results.
 
 > [!NOTE]
-> **Covariance forecasts** (2026-10-04).
+> **Covariance forecasts — production CLI** (2026-10-05).
 > CPU: **Apple M2 Pro**, macOS 13.7.5, **8 OpenMP threads**.
 >
 > CoCoA computes real- and Fourier-space galaxy-clustering and weak-lensing
-> covariance matrices, returning **Gaussian (G)**, **super-sample (SSC)**,
-> **connected non-Gaussian (cNG)** and total contributions separately.
-> The real-space calculation uses full-sky, bin-averaged transforms and
-> retains the internal cross-bin correlations needed by every covariance block.
+> covariances, plus joint cluster **6×2pt + counts** covariances. Outputs
+> separate **Gaussian (G)**, **super-sample (SSC)**, **connected non-Gaussian
+> (cNG)** and total contributions.
 >
-> | Full real-space 3x2pt covariance | Matrix before scale cuts | G + SSC + cNG time |
-> |---|---:|---:|
-> | LSST Y1 | 1,560 × 1,560 | 174.0 s (2.90 min) |
-> | Roman real | 2,115 × 2,115 | 178.7 s (2.98 min) |
+> The galaxy/shear examples include **non-Limber clustering and galaxy–shear
+> spectra in the Gaussian covariance**. The joint DES cluster example remains
+> Limber. Real-space transforms are full-sky and bin-averaged, retaining the
+> internal cross-bin correlations needed by every covariance block.
 >
-> The [LSST Y1 covariance guide](https://github.com/CosmoLike/cocoa_lsst_y1#computing_covariances) and
-> [Roman real covariance guide](https://github.com/CosmoLike/cocoa_roman_real#computing_covariances)
-> explain the model, timing scope, inputs and accuracy comparisons in each
-> `EXAMPLE_EVALUATE_COVARIANCE.ipynb`. Covariance generation is excluded from
-> the default build: enable the project's covariance option and recompile
-> as described in those guides. Likelihood use of a supplied covariance
-> remains available in data-vector-only builds.
+> | Project | Space | Matrix before scale cuts | G + SSC + cNG construction |
+> |---|---|---:|---:|
+> | [LSST Y1](https://github.com/CosmoLike/cocoa_lsst_y1#computing_covariances) | Real | 1,560 × 1,560 | 68.3 s |
+> | [Roman real](https://github.com/CosmoLike/cocoa_roman_real#computing_covariances) | Real | 2,115 × 2,115 | 74.8 s |
+> | [Roman Fourier](https://github.com/CosmoLike/cocoa_roman_fourier#computing_covariances) | Fourier | 1,485 × 1,485 | 33.1 s |
+> | [Roman KL](https://github.com/CosmoLike/cocoa_roman_kl#computing_covariances) | Fourier | 2,200 × 2,200 | 41.9 s |
+> | [DES Y3](https://github.com/CosmoLike/cocoa_des_y3#computing_covariances) | Real | 900 × 900 | 64.8 s |
+> | [DES × Planck (galaxy/shear)](https://github.com/CosmoLike/cocoa_desy1xplanck#computing_covariances) | Real | 1,500 × 1,500 | 67.2 s |
+> | [DES cluster 6×2pt + N](https://github.com/CosmoLike/cocoa_des_cluster#computing_covariances) | Real (Limber) | 2,812 × 2,812 | 125.2 s |
+>
+> These are mean **CLI** construction times from three sequential runs of
+> each supplied evaluate YAML. Project links above explain the model,
+> timing scope, command-line examples, notebooks and accuracy comparisons.
+> Covariance generation is excluded from the default build: enable the
+> project's covariance option and recompile as described in its guide.
+> Likelihood use of a supplied covariance remains available in
+> data-vector-only builds.
 
 # Installation of core packages <a name="required_packages_conda"></a>
 
