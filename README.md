@@ -49,6 +49,19 @@ This Readme file presents basic and advanced instructions for installing all [Co
 
 We provide the Docker image [whovian-cocoa](https://hub.docker.com/r/vivianmiranda/whovian-cocoa) to facilitate the installation of Cocoa on Windows. 
 
+> [!WARNING]
+> **CLI for production; notebook wrappers for exploration.**
+>
+> Run production and HPC calculations from YAML through the optimized
+> `_interface` bindings. Notebook `_wrapper` APIs expose intermediate
+> quantities for exploration; copying and rearranging their arrays adds
+> overhead. Both routes call the same C kernels.
+>
+> In a matched **LSST Y1 covariance** test on an M2 Pro with eight threads,
+> the CLI averaged **68.34 s** (three runs); one wrapper run took **177.74 s**.
+> The CLI was **2.60× faster**, with bitwise-identical covariance components.
+> The timing comparisons below use the optimized production interfaces.
+
 > [!NOTE]
 > **Real-space 3x2pt timings with accuracy-tested sampling** (2026-10-02).
 > CPU: **Apple M2 Pro**, macOS 13.7.5, **8 OpenMP threads**.
