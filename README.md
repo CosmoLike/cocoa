@@ -58,8 +58,8 @@ We provide the Docker image [whovian-cocoa](https://hub.docker.com/r/vivianmiran
 > overhead. Both routes call the same C kernels.
 >
 > In a matched **LSST Y1 covariance** test on an M2 Pro with eight threads,
-> the CLI averaged **68.34 s** (three runs); one wrapper run took **177.74 s**.
-> The CLI was **2.60× faster**, with bitwise-identical covariance components.
+> the CLI averaged **50.23 s** (three runs); one wrapper run took **173.38 s**.
+> The CLI was **3.45× faster**, with bitwise-identical covariance components.
 > The timing comparisons below use the optimized production interfaces.
 
 > [!NOTE]
@@ -117,13 +117,13 @@ We provide the Docker image [whovian-cocoa](https://hub.docker.com/r/vivianmiran
 >
 > | Project | Space | Matrix before scale cuts | G + SSC + cNG construction |
 > |---|---|---:|---:|
-> | [LSST Y1](https://github.com/CosmoLike/cocoa_lsst_y1#computing_covariances) | Real | 1,560 × 1,560 | 68.3 s |
-> | [Roman real](https://github.com/CosmoLike/cocoa_roman_real#computing_covariances) | Real | 2,115 × 2,115 | 74.8 s |
-> | [Roman Fourier](https://github.com/CosmoLike/cocoa_roman_fourier#computing_covariances) | Fourier | 1,485 × 1,485 | 33.1 s |
-> | [Roman KL](https://github.com/CosmoLike/cocoa_roman_kl#computing_covariances) | Fourier | 2,200 × 2,200 | 41.9 s |
-> | [DES Y3](https://github.com/CosmoLike/cocoa_des_y3#computing_covariances) | Real | 900 × 900 | 64.8 s |
-> | [DES × Planck (galaxy/shear)](https://github.com/CosmoLike/cocoa_desy1xplanck#computing_covariances) | Real | 1,500 × 1,500 | 67.2 s |
-> | [DES cluster 6×2pt + N](https://github.com/CosmoLike/cocoa_des_cluster#computing_covariances) | Real (Limber) | 2,812 × 2,812 | 125.2 s |
+> | [LSST Y1](https://github.com/CosmoLike/cocoa_lsst_y1#computing_covariances) | Real | 1,560 × 1,560 | 50.2 s |
+> | [Roman real](https://github.com/CosmoLike/cocoa_roman_real#computing_covariances) | Real | 2,115 × 2,115 | 54.6 s |
+> | [Roman Fourier](https://github.com/CosmoLike/cocoa_roman_fourier#computing_covariances) | Fourier | 1,485 × 1,485 | 23.1 s |
+> | [Roman KL](https://github.com/CosmoLike/cocoa_roman_kl#computing_covariances) | Fourier | 2,200 × 2,200 | 31.8 s |
+> | [DES Y3](https://github.com/CosmoLike/cocoa_des_y3#computing_covariances) | Real | 900 × 900 | 45.0 s |
+> | [DES × Planck (galaxy/shear)](https://github.com/CosmoLike/cocoa_desy1xplanck#computing_covariances) | Real | 1,500 × 1,500 | 47.4 s |
+> | [DES cluster 6×2pt + N](https://github.com/CosmoLike/cocoa_des_cluster#computing_covariances) | Real (Limber) | 2,812 × 2,812 | 93.9 s |
 >
 > These are mean **CLI** construction times from three sequential runs of
 > each supplied evaluate YAML. Project links above explain the model,
@@ -167,7 +167,7 @@ Core packages include compilers and numerical libraries that users typically do 
 
     - Testing beta release
 
-          wget https://raw.githubusercontent.com/CosmoLike/cocoa/refs/tags/v5.03/cocoapy311.yml
+          wget https://raw.githubusercontent.com/CosmoLike/cocoa/refs/tags/v5.04/cocoapy311.yml
 
   - macOS (arm)
     
@@ -192,7 +192,7 @@ Core packages include compilers and numerical libraries that users typically do 
 
     - Testing beta release
 
-          wget https://raw.githubusercontent.com/CosmoLike/cocoa/refs/tags/v5.03/cocoapy311-osxarm-base.yml
+          wget https://raw.githubusercontent.com/CosmoLike/cocoa/refs/tags/v5.04/cocoapy311-osxarm-base.yml
 
 **Step :two:**: Create the Cocoa environment (if the Deprecated or Legacy version was chosen in the previous step, replace `cocoapy311` with `cocoapy310` below),
 
@@ -269,7 +269,7 @@ In this section, we assume users have previously activated the Cocoa conda envir
 
   - Testing beta release
   
-        git clone https://github.com/CosmoLike/cocoa.git --branch v5.03 cocoa
+        git clone https://github.com/CosmoLike/cocoa.git --branch v5.04 cocoa
 
 > [!Warning]
 > The version cloned here must match the version of the `yml` file downloaded in the section
@@ -994,15 +994,15 @@ and
  
      conda activate lockenv
 
-**Step :two:** Download the appropriate conda-lock compatible `yml` file. As in the section [Installation of core packages](#required_packages_conda), replace the tag `v5.03` in the URL with the Cocoa version that will be cloned (tags older than `v4.11.4` carry the `cocoapy310` prefix).
+**Step :two:** Download the appropriate conda-lock compatible `yml` file. As in the section [Installation of core packages](#required_packages_conda), replace the tag `v5.04` in the URL with the Cocoa version that will be cloned (tags older than `v4.11.4` carry the `cocoapy310` prefix).
 
    - Linux
   
-         wget https://raw.githubusercontent.com/CosmoLike/cocoa/refs/tags/v5.03/cocoapy311-linux.yml
+         wget https://raw.githubusercontent.com/CosmoLike/cocoa/refs/tags/v5.04/cocoapy311-linux.yml
 
    - macOS (arm)
      
-         wget https://raw.githubusercontent.com/CosmoLike/cocoa/refs/tags/v5.03/cocoapy311-osxarm.yml
+         wget https://raw.githubusercontent.com/CosmoLike/cocoa/refs/tags/v5.04/cocoapy311-osxarm.yml
 
 **Step :three:** Create the conda environment
 
@@ -1030,13 +1030,13 @@ and
 
      conda activate base2
 
-**Step :two:** Now install wget and download a looser version of the yml file (note here slightly modified conda command). As in the section [Installation of core packages](#required_packages_conda), replace the tag `v5.03` in the URL with the Cocoa version that will be cloned (tags older than `v4.11.4` carry the `cocoapy310` prefix).
+**Step :two:** Now install wget and download a looser version of the yml file (note here slightly modified conda command). As in the section [Installation of core packages](#required_packages_conda), replace the tag `v5.04` in the URL with the Cocoa version that will be cloned (tags older than `v4.11.4` carry the `cocoapy310` prefix).
 
      conda install -y wget --solver=libmamba --strict-channel-priority --override-channels -c conda-forge
 
 and
 
-     wget https://raw.githubusercontent.com/CosmoLike/cocoa/refs/tags/v5.03/cocoapy311-osxarm-loose.yml
+     wget https://raw.githubusercontent.com/CosmoLike/cocoa/refs/tags/v5.04/cocoapy311-osxarm-loose.yml
 
 **Step :three:** Create the cocoa conda env using a looser yml (note here slightly modified conda command)
 
@@ -1415,7 +1415,7 @@ This is a large image, approximately 13GB, as it already contains the conda coco
 >
 > and
 >
->     docker build . --build-arg COCOA_TAG=v5.03 -t vivianmiranda/whovian-cocoa # replace the tag with the Cocoa version whose yml seeds the conda env
+>     docker build . --build-arg COCOA_TAG=v5.04 -t vivianmiranda/whovian-cocoa # replace the tag with the Cocoa version whose yml seeds the conda env
 >
 > and
 >
@@ -1551,7 +1551,7 @@ There are a few differences users should be aware of when running Cocoa on Googl
           source "/content/conda/etc/profile.d/conda.sh"
           conda create -y -n lockenv -c conda-forge python=3.10 conda-lock=2.* wget
           conda activate lockenv
-          wget https://raw.githubusercontent.com/CosmoLike/cocoa/refs/tags/v5.03/cocoapy311-linux.yml
+          wget https://raw.githubusercontent.com/CosmoLike/cocoa/refs/tags/v5.04/cocoapy311-linux.yml
           conda-lock install -n cocoa cocoapy311-linux.yml
           conda activate cocoa 
           ln -s "${CONDA_PREFIX}"/bin/x86_64-conda-linux-gnu-gcc "${CONDA_PREFIX}"/bin/gcc
@@ -1566,7 +1566,7 @@ There are a few differences users should be aware of when running Cocoa on Googl
           %%bash
           source "/content/conda/etc/profile.d/conda.sh"
           conda activate cocoa                                  
-          git clone https://github.com/CosmoLike/cocoa.git --branch v5.03 cocoa # replace the tag with the Cocoa version being installed (it must match the yml downloaded on Cell 3)
+          git clone https://github.com/CosmoLike/cocoa.git --branch v5.04 cocoa # replace the tag with the Cocoa version being installed (it must match the yml downloaded on Cell 3)
 
     - **Cell 5️⃣**: run `setup_cocoa.sh`
 

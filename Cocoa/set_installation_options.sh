@@ -169,7 +169,7 @@ export ROMAN_REAL_NAME="roman_real"
 export ROMAN_REAL_GIT_TAG="v5.03"
 
 export COSMOLIKE_URL="https://github.com/CosmoLike/cocoa-cosmolike-core.git"
-export COSMOLIKE_GIT_TAG="v5.05"
+export COSMOLIKE_GIT_TAG="v5.07"
 export COSMOLIKE_NAME="cosmolike_core"
 
 export ROMAN_KL_URL="https://github.com/CosmoLike/cocoa_roman_kl.git"
