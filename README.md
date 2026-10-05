@@ -49,6 +49,19 @@ This Readme file presents basic and advanced instructions for installing all [Co
 
 We provide the Docker image [whovian-cocoa](https://hub.docker.com/r/vivianmiranda/whovian-cocoa) to facilitate the installation of Cocoa on Windows. 
 
+> [!WARNING]
+> **CLI for production; notebook wrappers for exploration.**
+>
+> Run production and HPC calculations from YAML through the optimized
+> `_interface` bindings. Notebook `_wrapper` APIs expose intermediate
+> quantities for exploration; copying and rearranging their arrays adds
+> overhead. Both routes call the same C kernels.
+>
+> In a matched **LSST Y1 covariance** test on an M2 Pro with eight threads,
+> the CLI averaged **68.34 s** (three runs); one wrapper run took **177.74 s**.
+> The CLI was **2.60× faster**, with bitwise-identical covariance components.
+> The timing comparisons below use the optimized production interfaces.
+
 > [!NOTE]
 > **Real-space 3x2pt timings with accuracy-tested sampling** (2026-10-02).
 > CPU: **Apple M2 Pro**, macOS 13.7.5, **8 OpenMP threads**.
@@ -87,6 +100,38 @@ We provide the Docker image [whovian-cocoa](https://hub.docker.com/r/vivianmiran
 > provides the accuracy checks, modeling differences, reproduction scripts,
 > and [saved timing log](https://github.com/vivianmiranda/CCL-benchmark/blob/main/cocoa_comparison/timing_macos.txt)
 > for users who want to double-check or challenge these results.
+
+> [!NOTE]
+> **Covariance forecasts — production CLI** (2026-10-05).
+> CPU: **Apple M2 Pro**, macOS 13.7.5, **8 OpenMP threads**.
+>
+> CoCoA computes real- and Fourier-space galaxy-clustering and weak-lensing
+> covariances, plus joint cluster **6×2pt + counts** covariances. Outputs
+> separate **Gaussian (G)**, **super-sample (SSC)**, **connected non-Gaussian
+> (cNG)** and total contributions.
+>
+> The galaxy/shear examples include **non-Limber clustering and galaxy–shear
+> spectra in the Gaussian covariance**. The joint DES cluster example remains
+> Limber. Real-space transforms are full-sky and bin-averaged, retaining the
+> internal cross-bin correlations needed by every covariance block.
+>
+> | Project | Space | Matrix before scale cuts | G + SSC + cNG construction |
+> |---|---|---:|---:|
+> | [LSST Y1](https://github.com/CosmoLike/cocoa_lsst_y1#computing_covariances) | Real | 1,560 × 1,560 | 68.3 s |
+> | [Roman real](https://github.com/CosmoLike/cocoa_roman_real#computing_covariances) | Real | 2,115 × 2,115 | 74.8 s |
+> | [Roman Fourier](https://github.com/CosmoLike/cocoa_roman_fourier#computing_covariances) | Fourier | 1,485 × 1,485 | 33.1 s |
+> | [Roman KL](https://github.com/CosmoLike/cocoa_roman_kl#computing_covariances) | Fourier | 2,200 × 2,200 | 41.9 s |
+> | [DES Y3](https://github.com/CosmoLike/cocoa_des_y3#computing_covariances) | Real | 900 × 900 | 64.8 s |
+> | [DES × Planck (galaxy/shear)](https://github.com/CosmoLike/cocoa_desy1xplanck#computing_covariances) | Real | 1,500 × 1,500 | 67.2 s |
+> | [DES cluster 6×2pt + N](https://github.com/CosmoLike/cocoa_des_cluster#computing_covariances) | Real (Limber) | 2,812 × 2,812 | 125.2 s |
+>
+> These are mean **CLI** construction times from three sequential runs of
+> each supplied evaluate YAML. Project links above explain the model,
+> timing scope, command-line examples, notebooks and accuracy comparisons.
+> Covariance generation is excluded from the default build: enable the
+> project's covariance option and recompile as described in its guide.
+> Likelihood use of a supplied covariance remains available in
+> data-vector-only builds.
 
 # Installation of core packages <a name="required_packages_conda"></a>
 
@@ -1184,48 +1229,36 @@ In addition to `setup` and `compile` scripts, Cocoa contains `unxv` scripts that
 
 ## :interrobang: FAQ: How can users install Cosmolike projects?  <a name="appendix_compile_cosmolike_separately"></a>
 
-The script `set_installation_options.sh` includes instructions for installing several Cosmolike-based projects; the keys below are commented out by default, meaning all projects are installed. To skip a project, remove the symbol `#` from its corresponding key.
+The script `set_installation_options.sh` selects which Cosmolike projects
+are installed. A commented `IGNORE_*_CODE` key enables a project; an active
+key skips it. The defaults enable LSST Y1, DES × Planck and Roman real.
 
      [Adapted from Cocoa/set_installation_options.sh shell script]
-     # ------------------------------------------------------------------------------
-     # The keys below control which cosmolike projects will be installed and compiled
-     # ------------------------------------------------------------------------------
      #export IGNORE_COSMOLIKE_LSST_Y1_CODE=1
-     #export IGNORE_COSMOLIKE_DES_Y3_CODE=1
+     export IGNORE_COSMOLIKE_DES_Y3_CODE=1
      #export IGNORE_COSMOLIKE_DESXPLANCK_CODE=1
-     #export IGNORE_COSMOLIKE_ROMAN_FOURIER_CODE=1
+     export IGNORE_COSMOLIKE_ROMAN_FOURIER_CODE=1
      #export IGNORE_COSMOLIKE_ROMAN_REAL_CODE=1
-     #export IGNORE_COSMOLIKE_ROMAN_KL_CODE=1
-     # The two projects below are skipped by default: comment the key to
-     # download and compile the project.
+     export IGNORE_COSMOLIKE_ROMAN_KL_CODE=1
      export IGNORE_COSMOLIKE_DES_CLUSTER_CODE=1
-     # WARNING: des_y6 is not production ready. It has no tagged release, so the
-     # installation follows its branch main (see DES_Y6_GIT_BRANCH below) and the
-     # code can change between two installations.
+     # WARNING: des_y6 is not production ready.
      export IGNORE_COSMOLIKE_DES_Y6_CODE=1
-     (...)
-     # ------------------------------------------------------------------------------
-     # OVERWRITE_EXISTING_XXX_CODE=1 -> setup_cocoa overwrites existing PACKAGES ----
-     # overwrite: delete the existing PACKAGE folder and install it again -----------
-     # redownload: delete the compressed file and download data again ---------------
-     # These keys are only relevant if you run setup_cocoa multiple times -----------
-     # ------------------------------------------------------------------------------
-     (...)
-     export OVERWRITE_EXISTING_COSMOLIKE_CODE=1 # dangerous (possible loss of uncommitted work)
-                                                # If unset, users must manually delete cosmolike projects
-     (...)
-     # ------------------------------------------------------------------------------
-     # Cosmolike projects below -------------------------------------------
-     # ------------------------------------------------------------------------------
      (...)
      export ROMAN_REAL_URL="https://github.com/CosmoLike/cocoa_roman_real.git"
      export ROMAN_REAL_NAME="roman_real"
-     #Pin the project version with at most one of the keys below (COMMIT, BRANCH, or TAG).
-     #If more than one is set, COMMIT wins over BRANCH, and BRANCH wins over TAG.
-     #If none is set, Cocoa loads the latest commit on the repository default branch.
-     #export ROMAN_REAL_GIT_BRANCH="main"
-     #export ROMAN_REAL_GIT_COMMIT="abc"
-     export ROMAN_REAL_GIT_TAG="v5.01"
+     export ROMAN_REAL_GIT_TAG="v5.03"
+
+Each released project is pinned to a tag. To select another revision, set
+only one of its `GIT_COMMIT`, `GIT_BRANCH` or `GIT_TAG` keys: a commit takes
+precedence over a branch, and a branch over a tag. DES Y6 is disabled by
+default and has no tagged release; enabling it follows its `main` branch.
+
+Covariance generation is a separate build option, disabled for all projects
+by default. To enable it for Roman real, comment out
+`export IGNORE_COSMOLIKE_ROMAN_REAL_COVARIANCE=1`, reload `start_cocoa.sh`
+and recompile that project. See its
+[covariance guide](https://github.com/CosmoLike/cocoa_roman_real#computing_covariances)
+for the production CLI and notebook examples.
 
 > [!NOTE]
 > The https URLs are the right choice for almost all users. Developers with write
@@ -1246,20 +1279,18 @@ and
 
       source start_cocoa.sh # even if (.local) is already active, users must run start_cocoa.sh again to update bash environment values
       
-Now, to download and compile all Cosmolike projects, type
+Now, to download and compile the enabled Cosmolike projects, type
  
-      source ./installation_scripts/setup_cosmolike_projects.sh   # download all cosmolike projects  
+      source ./installation_scripts/setup_cosmolike_projects.sh   # download enabled cosmolike projects
 
 and
 
-      source ./installation_scripts/compile_all_projects.sh       # compile all cosmolike projects
+      source ./installation_scripts/compile_all_projects.sh       # compile enabled cosmolike projects
 
 > [!NOTE]
 > In case users need to rerun `setup_cocoa.sh` (or `setup_cosmolike_projects.sh`) , Cocoa will not download previously installed cosmolike projects (this avoids loss of uncommitted work), unless the following key is set on `set_installation_options.sh`
 >
->     [Adapted from Cocoa/set_installation_options.sh shell script]
 >     #export OVERWRITE_EXISTING_COSMOLIKE_CODE=1 # dangerous (possible loss of uncommitted work)
->                                                 # if unset, users must manually delete cosmolike projects
 
 In case users only want to compile a single Cosmolike project (let's say the `roman_real` project)
 
@@ -1267,7 +1298,9 @@ In case users only want to compile a single Cosmolike project (let's say the `ro
      
 ## :interrobang: FAQ: How can users test Cosmolike projects? <a name="appendix_test_cosmolike_projects"></a>
 
-Every Cosmolike project ships unit tests under its `tests/` folder (e.g., `projects/lsst_y1/tests`). The tests read nothing from the live project and change no project files; they run three kinds of checks:
+Every Cosmolike project separates its tests into `tests/data_vector/` and
+`tests/covariance/`. Most likelihood users need the data-vector tests, which
+include the following checks:
 
 - $\chi^2$: the $\chi^2$ of each likelihood at a fixed reference point must stay within 0.2 of the value stored in `tests/frozen/reference_chi2.json`; a moved value means code or data changed the numbers.
 - race condition: the same point is evaluated on its own and then again after nine other cosmologies, with the test modules forcing `OMP_NUM_THREADS=4` internally; the two $\chi^2$ values must agree to $10^{-4}$. Leftover internal state or colliding OpenMP threads break the agreement.
@@ -1285,10 +1318,18 @@ and
 
 **Step :two:**: run the tests of a project (below, the `lsst_y1` project)
 
-     python -m pytest ./projects/lsst_y1/tests
+     python -m pytest ./projects/lsst_y1/tests/data_vector
 
 > [!NOTE]
-> `--ignore ./projects/lsst_y1/tests/test_accuracy.py`: skip the accuracy checks, whose high-accuracy evaluations take minutes each. The remaining tests take a few minutes.
+> `--ignore ./projects/lsst_y1/tests/data_vector/test_accuracy.py`: skip the accuracy checks, whose high-accuracy evaluations take minutes each. The remaining tests take a few minutes.
+
+To check covariance generation separately, enable the project's covariance
+build option, recompile, and run:
+
+     python -m pytest ./projects/lsst_y1/tests/covariance
+
+The project's [test guide](https://github.com/CosmoLike/cocoa_lsst_y1/tree/main/tests)
+describes the checks and their requirements.
 
 The tests' own snapshot under `tests/frozen/` holds the cobaya configurations fully expanded (every option and every parameter written out, so editing the likelihood default yaml files cannot change what the tests evaluate), the tests' own copy of the data files, and synthetic data vectors generated at the reference point, so each $\chi^2$ sits at its minimum. The file `tests/manifest_sha256.json` stores a SHA-256 hash of every file of the snapshot, and each test refuses to run when one was edited. Users can therefore change the live data and examples freely without breaking the tests.
 
@@ -1627,5 +1668,4 @@ There are a few differences users should be aware of when running Cocoa on Googl
 A working knowledge of Python is required to understand the Cobaya framework at the developer level. Users must also be familiar with the Bash language to understand Cocoa's scripts. Proficiency in C and C++ is also needed to manipulate Cosmolike and the C++ Cobaya-Cosmolike C++ interface. Finally, users need to understand the Fortran-2003 language to modify CAMB.
 
 Learning all these languages can be overwhelming, so to enable new users to do research that demands modifications on the inner workings of these codes, we include [here](cocoa_installation_libraries/LectNotes.pdf) a link to approximately 600 slides that provide an overview of Bash (slides ~1-137), C (slides ~138-371), and C++ (slides ~372-599). In the future, we aim to add lectures about Python and Fortran. 
-
 

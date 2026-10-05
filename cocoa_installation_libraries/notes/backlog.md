@@ -30,10 +30,16 @@ features, Low bugs, Low features.
 
 ## Open ticket index
 
+### High
+
+- OPEN **HIGH** **NEW FUNCTIONALITY** — [Covariance-owned all-pairs non-Limber spectra](#open-covariance-nonlimber)
+- OPEN **HIGH** **NEW FUNCTIONALITY** — [NLA in complete covariance forecasts](#open-covariance-nla)
+
 ### Medium
 
 - OPEN **MEDIUM** **BUG** — [Cache-key hardening for in-process reconfiguration](#open-cache-key-hardening)
 - OPEN **MEDIUM** **NEW FUNCTIONALITY** — [Cache the Fourier non-Limber band-center corrections](#open-fourier-nonlimber-cache)
+- OPEN **MEDIUM** **NEW FUNCTIONALITY** — [Rewrite analytic covariances in an isolated module](#open-covariance-rewrite)
 
 
 ### Low
@@ -43,6 +49,121 @@ features, Low bugs, Low features.
 - OPEN **LOW** **NEW FUNCTIONALITY** — [Finish the Compton-y port (C_gy, C_ys, C_ky, C_yy)](#open-compton-y-port)
 - OPEN **LOW** **NEW FUNCTIONALITY** — [Web-halo model (WHM, arXiv:2508.10902) for nonlinear P(k)](#open-web-halo-model)
 - OPEN **LOW** **NEW FUNCTIONALITY** — [Vectorization study for halo.c (SIMDe, SLEEF)](#open-halo-vectorization)
+
+<a id="open-covariance-nonlimber"></a>
+## Covariance-owned all-pairs non-Limber spectra
+
+### High-level summary
+
+Extend Gaussian covariance inputs with all-pairs non-Limber density and
+shear spectra, including the cross-bin spectra absent from a measured
+data vector. DES Y6 Appendix F explicitly includes non-Limber covariance
+to capture cross-tomographic correlations.
+
+### Current status
+
+**Ticket type: NEW FUNCTIONALITY. Severity: HIGH. OPEN, remaining extensions.**
+Gaussian gg/gs was subsequently authorized and implemented on 2026-10-05
+UTC in small local commits. All-pairs shear–shear and selected-cluster
+non-Limber remain open. Covariance generation stays outside MCMC;
+SSC/cNG changes were explicitly excluded from this implementation block.
+
+### What is already in place
+
+Data-vector `cosmo2D.c` has FFTLog galaxy autos and galaxy–shear spectra.
+Covariance-owned `fftlog_cov.c` and `nonlimber_cov.c` now supply every
+gg/gs pair with a common growth/power anchor and matched linear subtraction.
+Serial shared FFTW plans, worker arrays, SIMD contractions and both C++
+entry paths are implemented. Independent Bessel checks and full real/Fourier
+Gaussian refinements pass for all seven galaxy/shear adapters: largest
+variance-mode change below 0.019%, all base/refined matrices positive.
+Project defaults use the tested cutoff/grid; this does not certify Fisher
+or every other integration/interpolation setting.
+
+### What is missing
+
+1. Extend shear–shear consistently beyond Limber and test lower-noise surveys.
+2. Add selected-cluster transfers and preserve joint transformations.
+3. Measure 1/2/4/8-thread scaling across the intended survey sizes.
+4. Validate multiple cosmologies, IA choices and full covariance/Fisher accuracy.
+
+The partial gg/gs hybrid has negative low-ell noiseless field modes for
+some Roman inputs. Their actual catalog noise restores positive observed
+fields, and the full Gaussian matrices pass. Never generalize those checks
+to arbitrary source densities or repair negative modes.
+
+New C stays inside `cosmolike/covariances/`, with `_cov.c` filenames.
+Shared transforms, serial FFTW planning, bounded worker buffers, SIMDe
+and field/multipole parallelism are part of the design. Study and test the
+actual `cosmo2D.c` optimizations; do not infer speed or accuracy from them.
+Global accuracy boost multiplies tuned internal refinements; the GSL
+quadratures remain controlled separately by integration accuracy.
+
+Non-Limber spectra change Gaussian contractions. They do not remove
+long-mode Limber from SSC or equal-time projection approximations from
+cNG. Keep those approximation labels separate, preserve signed cross
+spectra, and never repair a failed total covariance by clipping eigenvalues.
+
+### Technical record
+
+The tracked core plan has deliverables N1–N6, proposed files and API
+boundaries, equations, independent tests, performance experiments and
+release criteria:
+[covariance_nonlimber_ia_plan.md](../../Cocoa/external_modules/code/cosmolike_core/.claude/skills/cosmolike-dev/references/covariance_nonlimber_ia_plan.md).
+Primary sources include
+[Fang et al.](https://arxiv.org/html/1911.11947),
+[N5K](https://arxiv.org/html/2212.04291) and
+[DES Y6 Appendix F](https://arxiv.org/html/2503.13631v1#A6).
+Each major implementation must pass tests and a separate didactic review
+before starting the next; commit locally and never push.
+
+<a id="open-covariance-nla"></a>
+## NLA in complete covariance forecasts
+
+### High-level summary
+
+Allow an explicitly configured nonlinear-alignment model (NLA) in a
+complete forecast, with consistent source fields in Gaussian, SSC and
+cNG terms. Gaussian-only NLA/TATT is implemented; connected terms retain
+zero IA until their response and four-point models are justified.
+
+### Current status
+
+**Ticket type: NEW FUNCTIONALITY. Severity: HIGH. OPEN, connected IA deferred.**
+The authorized Gaussian-only implementation is complete: explicit per-bin
+NLA/TATT parameters, E/B spectra, B-mode real-space covariance and CLI/
+notebook choices. SSC/cNG keep lensing-only windows and their original
+mean-subtraction signal; a full-assembly test verifies bitwise preservation.
+
+### What is already in place
+
+`spectra_cov.c` constructs signed NLA windows and all-pairs Limber spectra.
+Low-level checks exercise their signs and contractions. The data-vector
+non-Limber source transfer also includes linear/NLA alignment. These
+components do not establish a validated full NLA covariance forecast.
+
+### What is missing
+
+1. Derive and test the declared NLA approximation for every SSC/cNG source leg.
+2. Propagate source IA consistently into cluster and count–source SSC crosses.
+3. Validate full modes/Fisher effects across the intended IA range.
+4. Extend the explicit per-bin API if survey-specific redshift evolution is needed.
+
+The initial connected proposal holds deterministic IA amplitudes fixed
+under the background perturbation and uses signed windows with the matter
+response/trispectrum. This needs physical justification and independent
+tests; NLA two-point spectra alone do not specify a complete intrinsic-shape
+four-point model. If that gate fails, expose limited Gaussian-NLA components
+and clearly label the Gaussian-only scope. Stochastic IA and additional
+IA responses remain separate extensions; Gaussian TATT is implemented.
+
+### Technical record
+
+Deliverables I1–I4, sources and acceptance checks are in the tracked core
+[non-Limber and IA plan](../../Cocoa/external_modules/code/cosmolike_core/.claude/skills/cosmolike-dev/references/covariance_nonlimber_ia_plan.md).
+The plan requires zero-amplitude recovery, odd/even amplitude sign checks,
+independent source-field expansions, CLI/notebook and thread agreement,
+positive total covariances and unchanged data-vector regressions.
 
 <a id="open-cache-key-hardening"></a>
 ## Cache-key hardening for in-process reconfiguration
@@ -142,6 +263,185 @@ functions are pure of static state, so the cache wraps cleanly.
 
 The cached wrapper and a timing note in the two project READMEs.
 
+
+<a id="open-covariance-rewrite"></a>
+## Rewrite analytic covariances in an isolated module
+
+### High-level summary
+
+Compute Gaussian, super-sample and connected non-Gaussian covariances in
+one process, with covariance-owned numerical choices and caches. Physics
+comes from the papers, especially Krause and Takada; the CosmoCov code is
+a convention comparison, not the final numerical reference.
+
+### Current status
+
+**Ticket type: NEW FUNCTIONALITY.**
+
+**OPEN.** Full galaxy/shear Gaussian, super-sample (SSC) and connected
+non-Gaussian (cNG) forecasts are available in real and Fourier space through
+C++ component interfaces and shared Python assembly. All seven projects
+have executed notebooks and thin survey adapters. These use the supported
+massless-neutrino, Limber, linear-bias model; their teaching resolutions
+are not validated inference settings. DESxPlanck currently covers its
+galaxy/shear sector. DES cluster also has a 2812-entry angular joint
+forecast, with explicitly limited cluster cNG and count-cross physics.
+
+A supplied-abundance cluster component returns count means, Poisson noise,
+count SSC and count–two-point SSC. A second component projects all supplied
+cluster–galaxy, cluster–shear and cross-cluster Limber spectra. Selected
+halo moments, fixed-selection responses and all joint Y-transformed blocks
+are available. The joint forecast uses linearly biased matter cNG and
+SSC-only count crosses. Completing the discrete-halo model, non-Limber
+corrections and survey accuracy validation remains open.
+
+**Severity: MEDIUM.** New science functionality; existing project
+covariances remain in use.
+
+### What is already in place
+
+- New covariance C remains isolated in `cosmolike/covariances/`, with
+  `_cov.c` filenames and `_cluster_cov.c` for cluster extensions.
+  Existing data-vector C is unchanged by the covariance port.
+- Shared C++ wrappers expose full Gaussian matrices and low-level numerical
+  components. Shared Python performs all-pairs Limber spectra, bin-averaged
+  transforms, SSC and five cNG halo terms without copying algorithms into
+  project adapters.
+- LSST Y1, Roman real, Roman Fourier, Roman KL, DES Y3, DESxPlanck and DES
+  cluster have executed real/Fourier notebooks, saved-input workflows and
+  covariance instructions in their main READMEs. Their ordinary test
+  command selects data-vector tests; covariance tests are a separate suite.
+- Every notebook compares one covariance `accuracy_boost` at two values,
+  separates G/SSC/cNG and checks total positivity. All 28 example totals
+  (seven projects, two spaces, two boosts) are positive definite. Several
+  refinement changes are substantial; no boost is certified for inference.
+- Shared SSC responses retain all cross-bin blocks before their weighted
+  outer products. The complete supported LSST and Roman timing runs also
+  pass full and selected positivity checks, with no eigenvalue repair.
+- Supplied cluster abundances and density responses give count-shell
+  quantities, count means, Poisson noise and SSC through a DES cluster
+  binding. Six analytic/project checks and 16 isolated debug checks pass,
+  including units, signed cross responses and 1/2/4/8-thread repeatability.
+  The model of the selected abundance is still a separate physical input.
+- The supplied-table cluster spectrum component agrees with independent
+  DES all-pairs projection to 2e-15 relative and repeats bitwise at
+  1/2/4/8 threads. Selected mass moments and physical halo samples have
+  independent analytic/scalar checks and isolated sanitizer checks.
+  Count–matter non-SSC terms are separately tested by Poisson enumeration.
+- Shared cluster preparation keeps the actual count insertion and every
+  internal field pair; streamed multipole/profile batches bound scratch
+  memory without changing quadrature. The full angular forecast and its
+  archive preserve model omissions, count positions and defined Y null rows.
+  All 46 DES covariance checks pass, including thread repeatability,
+  catalog normalization and transformations of every joint cross block.
+- The 2812-entry joint baseline agrees with independent component pilots
+  within 2.1e-15 in total-variance units. The Y total is positive after
+  excluding its 48 defined null rows. Notebook boosts 1 and 2 are both
+  positive; after nested-grid refinement their largest generalized variance
+  change is 18.45%, so
+  neither is presented as a converged inference setting. Selected-cluster
+  cNG corrections and non-SSC count crosses remain omitted in this baseline.
+- SIMDe arithmetic is unconditional. OpenMP distributes independent output
+  work, BLAS remains single-threaded and no C code calls MPI. Benchmarks
+  run one at a time on a quiet machine; tests are not timing evidence.
+- Each completed major component receives a separate didactic review:
+  equations and units, loop rationale, every SIMD operation, paragraph
+  breaks, separate comparisons and 80-column C/header lines.
+- Earlier component/reference runs and their optimized/debug checks remain
+  recorded in the core references. All seven projects pass 392 data-vector
+  checks, including Roman real's 24 opt-in halo checks, and 114 covariance
+  checks. Stored likelihood references were not changed by the notebook
+  rollout, test reorganization or shared matter extraction. The subsequent
+  nested-grid and bounded-spectrum changes pass 116 covariance checks.
+  All seven refreshed notebooks execute successfully; all 28 galaxy/shear
+  totals and both DES joint totals remain positive on their defined spaces.
+- Before the later spectrum-batching change, the full DES joint baseline
+  took 13.80/8.98/6.55/6.35 s at 1/2/4/8
+  threads on the Apple M2 Pro. These are three-call means after one warm-up
+  per worker count, at a fixed cosmology and boost 1, excluding CAMB and
+  initialization. No competing numerical job ran; ordinary desktop
+  activity remained. Every component is bitwise identical across workers.
+  Scaling beyond four threads is weak and still needs optimization.
+- Covariance interpolation refinement retains every old window and
+  non-Gaussian multipole node. Raising a cutoff extends the grid without
+  stretching its cells. Settings archive the actual multipole samples;
+  quadrature-node refinement remains a separate numerical check.
+- A full boost-1/2/4/8 LSST single-source Gaussian test is positive and its
+  successive maximum generalized variance changes fall from 1.02e-4 to
+  1.10e-5 to 2.29e-6. Multipole batching preserves every radial sum bitwise
+  and bounds the high-boost C scratch from about 27.52 GB to 176.16 MB.
+  Quiet component measurements and didactic checks are recorded in the
+  core's covariance_limber_batches.md; these are not full-matrix timings.
+
+### What is missing
+
+Establish a refined numerical reference and practical accuracy settings
+using Fisher Figure of Merit, parameter errors and relative covariance
+modes. Positive definiteness is necessary but does not establish numerical
+convergence. The proposed 1e-3 mode scale is a diagnostic starting point,
+not a literature requirement; do not impose the data-vector
+|delta chi2| < 0.2 rule or the study's old 1e-6 entrywise rule on covariance
+accuracy. Check several cosmologies and the intended scale cuts.
+
+The high-resolution halo-response diagnostic still finds a copied-power
+derivative floor: a nested 241-to-961-node response table stalls near 0.8%
+maximum error at its fixed off-grid queries. Merely inserting linear
+power samples preserves that floor. Cubic construction of a nested dense
+power copy reduces the same table-refinement error to about 0.03%, but
+changes the between-node input function. Validate against CAMB's own
+interpolator and covariance/Fisher results before adopting that policy;
+production input copying remains unchanged. These component errors are
+not full-covariance generalized-mode bounds.
+
+Covariance-owned all-pairs Gaussian gg/gs and NLA/TATT are implemented. The detailed
+[non-Limber ticket](#open-covariance-nonlimber) and
+[NLA ticket](#open-covariance-nla) now track those extensions separately.
+Their remaining connected/cluster/shear extensions are deferred. Validate physical response choices,
+mask/estimator conventions and the independent CosmoCov comparison. The
+massive-neutrino nonlinear model, CMB fields and more general nuisance
+models remain outside the supported notebook configuration.
+
+For DES cluster, extend the joint baseline with selected-cluster one-halo
+cNG and non-SSC count–spectrum terms, including discrete cluster partners
+and consistent observed-catalog normalization. The validated count–matter
+helper alone does not supply those missing terms. Check full and selected
+positivity and Fisher refinement for the completed physical model without
+clipping modes. The existing supplied likelihood covariance is unchanged.
+
+The initial small-component runtime estimates have been superseded by
+complete supported-model runs: 162.93 s for LSST Y1 and 214.39 s for Roman
+real on an Apple M2 Pro with eight OpenMP threads, before the later C++
+Gaussian assembly optimization. These are single cold runs at explicit
+high-resolution settings, not means, accepted accuracy defaults or x86
+performance measurements. Re-measure the current implementation on a
+quiet machine when making a new full-runtime or scaling claim.
+The later DES baseline measurement does not replace these LSST/Roman
+measurements: it uses different grids and explicitly limited cluster
+physics. Its boost is not a converged inference setting.
+
+Existing likelihood covariances must not be replaced before their survey
+model, conventions and accuracy are validated.
+
+### Technical record
+
+<details>
+<summary>Constraints and first measured kernel</summary>
+
+Owner request: 2026-10-03. The detailed plan is external
+`test/cosmocov_port_study/PLAN.md`; the durable core record is
+`.claude/skills/cosmolike-dev/references/covariance_rewrite.md`.
+The plan's old singular folder, total-matter halo default, and three-build
+validation language are superseded by `covariances/`, cb halo statistics,
+and strict default/debug builds. OpenBLAS stays at one thread.
+
+Apple M2 Pro, Clang 19.1.7, strict flags: a 20 x 20 projection over
+50,001 supplied multipoles takes median 24.041/6.359/3.296 ms in the scalar
+path and 1.848/0.616/0.398 ms with tiled SIMDe at 1/4/8 OpenMP threads
+(51 calls, three excluded warm-ups). This is a kernel comparison, not a
+full-covariance forecast or evidence for a delta-chi-squared threshold.
+The raw timing and validation logs remain in the external reference folder.
+
+</details>
 
 <a id="open-cfastpt-gb2-ia-bias"></a>
 ## IA x higher-order-bias (gb2) cross terms in cfastpt
@@ -484,6 +784,72 @@ porting precedent any WHM work would build on.
 </details>
 
 # Closed tickets
+
+## 2026-10-03 — Retired production scalar SIMD switches
+
+Removed `COSMO2D_NOT_USE_SIMD`, `HALO_NOT_USE_SIMD`, and the covariance
+scalar opt-out. Existing SIMDe paths now compile in optimized and debug
+builds; all seven project Makefiles require their headers. Scalar
+single-point kernels and incomplete-vector tails remain where needed.
+The global switch retirement was explicitly requested separately from the
+covariance port and does not relax its `cosmolike/covariances/` boundary.
+
+The retained C tokens match the previous SIMD branches in all 11 affected
+existing C/header files. Scalar comparisons are available through external
+tests and pinned historical sources; no replacement production switch was
+introduced. The unused halo sources remain uncompiled.
+
+All seven optimized interfaces were rebuilt, then **399 project tests
+passed**, including all Roman slow halo checks and the seven new covariance
+primitive tests. No references were refrozen. Selected debug runs passed
+another **24 checks**: 10 LSST Y1 and 14 DES cluster, covering the common
+and cluster paths. The project libraries were left in optimized mode.
+
+| Project | Passed | Test runtime (s) |
+|---|---:|---:|
+| roman_real | 104 | 1285.27 |
+| roman_kl | 49 | 1513.83 |
+| roman_fourier | 45 | 1029.51 |
+| des_y3 | 63 | 1090.45 |
+| lsst_y1 | 64 | 824.30 |
+| desy1xplanck | 45 | 897.60 |
+| des_cluster | 29 | 517.33 |
+
+These runtimes include CAMB and repeated models; they are not likelihood
+benchmarks. A separate manual didactic review followed the tests, fixing
+stale branch references and recording the remaining scalar-tail roles.
+The Gaussian foundation also completed its own review: 80-column C/header
+lines, separate comparisons, house SIMD names, equations, array ownership,
+units and thread responsibilities. The full covariance rewrite remains
+[open](#open-covariance-rewrite).
+
+<details>
+<summary>Source, validation records and local commits</summary>
+
+Core retirement: `b8be6c5`. Gaussian baseline, SIMD implementation and
+naming follow-up: `6f055d0`, `6bc8cb7`, `7286d55`. LSST primitive checks:
+`fe865a6`. Durable records are in the core skill's
+`references/simd_retirement.md` and `references/covariance_rewrite.md`.
+External validation lives in `test/simd_reference/results/` and
+`test/covariance_reference/results/`; their runners keep build/import
+checks and every test exit status. Earlier interrupted or environment-only
+attempts are separate from the final rebuilt-project results.
+
+Project build commits:
+
+| Project | Commit |
+|---|---|
+| lsst_y1 | `8ad57c9` |
+| roman_real | `3edba1a` |
+| roman_fourier | `96b0af6` |
+| roman_kl | `30f8bcc` |
+| des_y3 | `3c4af70` |
+| desy1xplanck | `7194601` |
+| des_cluster | `ddd94da` |
+
+All commits are local. Nothing was pushed.
+
+</details>
 
 ## 2026-10-03 — Evolving neutrino variance and cb halo statistics
 
