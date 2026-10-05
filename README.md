@@ -128,6 +128,10 @@ We provide the Docker image [whovian-cocoa](https://hub.docker.com/r/vivianmiran
 > These are mean **CLI** construction times from three sequential runs of
 > each supplied evaluate YAML. Project links above explain the model,
 > timing scope, command-line examples, notebooks and accuracy comparisons.
+>
+> The project notebooks include saved covariance and **1h, 2h, 3h and 4h
+> matter trispectrum plots**, visible directly on GitHub.
+>
 > Covariance generation is excluded from the default build: enable the
 > project's covariance option and recompile as described in its guide.
 > Likelihood use of a supplied covariance remains available in
@@ -1246,7 +1250,7 @@ key skips it. The defaults enable LSST Y1, DES × Planck and Roman real.
      (...)
      export ROMAN_REAL_URL="https://github.com/CosmoLike/cocoa_roman_real.git"
      export ROMAN_REAL_NAME="roman_real"
-     export ROMAN_REAL_GIT_TAG="v5.03"
+     export ROMAN_REAL_GIT_TAG="v5.04"
 
 Each released project is pinned to a tag. To select another revision, set
 only one of its `GIT_COMMIT`, `GIT_BRANCH` or `GIT_TAG` keys: a commit takes
