@@ -30,6 +30,11 @@ features, Low bugs, Low features.
 
 ## Open ticket index
 
+### High
+
+- OPEN **HIGH** **NEW FUNCTIONALITY** — [Covariance-owned all-pairs non-Limber spectra](#open-covariance-nonlimber)
+- OPEN **HIGH** **NEW FUNCTIONALITY** — [NLA in complete covariance forecasts](#open-covariance-nla)
+
 ### Medium
 
 - OPEN **MEDIUM** **BUG** — [Cache-key hardening for in-process reconfiguration](#open-cache-key-hardening)
@@ -44,6 +49,114 @@ features, Low bugs, Low features.
 - OPEN **LOW** **NEW FUNCTIONALITY** — [Finish the Compton-y port (C_gy, C_ys, C_ky, C_yy)](#open-compton-y-port)
 - OPEN **LOW** **NEW FUNCTIONALITY** — [Web-halo model (WHM, arXiv:2508.10902) for nonlinear P(k)](#open-web-halo-model)
 - OPEN **LOW** **NEW FUNCTIONALITY** — [Vectorization study for halo.c (SIMDe, SLEEF)](#open-halo-vectorization)
+
+<a id="open-covariance-nonlimber"></a>
+## Covariance-owned all-pairs non-Limber spectra
+
+### High-level summary
+
+Extend Gaussian covariance inputs with all-pairs non-Limber density and
+shear spectra, including the cross-bin spectra absent from a measured
+data vector. DES Y6 Appendix F explicitly includes non-Limber covariance
+to capture cross-tomographic correlations.
+
+### Current status
+
+**Ticket type: NEW FUNCTIONALITY. Severity: HIGH. OPEN, planning only.**
+Implementation was explicitly deferred on 2026-10-05 UTC to conserve the
+available development budget. Do not start implementing from this ticket
+until requested. Covariance generation stays outside MCMC.
+
+### What is already in place
+
+Data-vector `cosmo2D.c` has FFTLog galaxy autos and galaxy–shear spectra.
+Covariance `spectra_cov.c` supplies all-pairs Limber spectra. Its field
+coverage and ownership are appropriate starting points; the data-vector
+pair maps, per-pair growth anchors and relative early exits cannot be
+adopted unchanged for a joint field matrix.
+
+### What is missing
+
+1. Derive the common field/growth, spin and matched-subtraction contract.
+2. Validate a covariance-owned FFTLog component against independent integrals.
+3. Assemble all gg/gs/ss pairs and expose production and notebook APIs.
+4. Add selected-cluster density transfers and preserve joint transformations.
+5. Tune nested accuracy controls and measure 1/2/4/8-thread scaling.
+6. Validate full survey modes/Fisher results before enabling project defaults.
+
+New C stays inside `cosmolike/covariances/`, with `_cov.c` filenames.
+Shared transforms, serial FFTW planning, bounded worker buffers, SIMDe
+and field/multipole parallelism are part of the design. Study and test the
+actual `cosmo2D.c` optimizations; do not infer speed or accuracy from them.
+Global accuracy boost multiplies tuned internal refinements; the GSL
+quadratures remain controlled separately by integration accuracy.
+
+Non-Limber spectra change Gaussian contractions. They do not remove
+long-mode Limber from SSC or equal-time projection approximations from
+cNG. Keep those approximation labels separate, preserve signed cross
+spectra, and never repair a failed total covariance by clipping eigenvalues.
+
+### Technical record
+
+The tracked core plan has deliverables N1–N6, proposed files and API
+boundaries, equations, independent tests, performance experiments and
+release criteria:
+[covariance_nonlimber_ia_plan.md](../../Cocoa/external_modules/code/cosmolike_core/.claude/skills/cosmolike-dev/references/covariance_nonlimber_ia_plan.md).
+Primary sources include
+[Fang et al.](https://arxiv.org/html/1911.11947),
+[N5K](https://arxiv.org/html/2212.04291) and
+[DES Y6 Appendix F](https://arxiv.org/html/2503.13631v1#A6).
+Each major implementation must pass tests and a separate didactic review
+before starting the next; commit locally and never push.
+
+<a id="open-covariance-nla"></a>
+## NLA in complete covariance forecasts
+
+### High-level summary
+
+Allow an explicitly configured nonlinear-alignment model (NLA) in a
+complete forecast, with consistent source fields in Gaussian, SSC and
+cNG terms. Zero IA is a current driver restriction, not a requirement of
+covariance physics or an absence of NLA in CosmoLike.
+
+### Current status
+
+**Ticket type: NEW FUNCTIONALITY. Severity: HIGH. OPEN, planning only.**
+Detailed on 2026-10-05 UTC; implementation is deferred. The present full
+forecast initializes IA off, zeros its amplitudes, requests spectra with
+IA disabled and uses lensing-only connected source windows.
+
+### What is already in place
+
+`spectra_cov.c` constructs signed NLA windows and all-pairs Limber spectra.
+Low-level checks exercise their signs and contractions. The data-vector
+non-Limber source transfer also includes linear/NLA alignment. These
+components do not establish a validated full NLA covariance forecast.
+
+### What is missing
+
+1. Audit IA normalization, growth, signs and each project's nuisance convention.
+2. Expose explicit none/NLA configuration without silently zeroing parameters.
+3. Validate GG/GI/IG/II and gG/gI terms in Gaussian and non-Limber spectra.
+4. Derive and test the declared NLA approximation for every SSC/cNG source leg.
+5. Propagate source IA consistently into cluster and count–source SSC crosses.
+6. Validate full modes/Fisher effects and publish matched YAML/notebook examples.
+
+The initial connected proposal holds deterministic IA amplitudes fixed
+under the background perturbation and uses signed windows with the matter
+response/trispectrum. This needs physical justification and independent
+tests; NLA two-point spectra alone do not specify a complete intrinsic-shape
+four-point model. If that gate fails, expose limited Gaussian-NLA components
+and guard unsupported full forecasts. TATT, stochastic IA and additional
+IA responses are separate extensions.
+
+### Technical record
+
+Deliverables I1–I4, sources and acceptance checks are in the tracked core
+[non-Limber and IA plan](../../Cocoa/external_modules/code/cosmolike_core/.claude/skills/cosmolike-dev/references/covariance_nonlimber_ia_plan.md).
+The plan requires zero-amplitude recovery, odd/even amplitude sign checks,
+independent source-field expansions, CLI/notebook and thread agreement,
+positive total covariances and unchanged data-vector regressions.
 
 <a id="open-cache-key-hardening"></a>
 ## Cache-key hardening for in-process reconfiguration
@@ -274,7 +387,10 @@ production input copying remains unchanged. These component errors are
 not full-covariance generalized-mode bounds.
 
 Finish covariance-owned all-pairs non-Limber spectra, including crossed
-galaxy–shear and cross-bin clustering. Validate physical response choices,
+galaxy–shear and cross-bin clustering; the detailed
+[non-Limber ticket](#open-covariance-nonlimber) and
+[NLA ticket](#open-covariance-nla) now track those extensions separately.
+Their implementation is deferred. Validate physical response choices,
 mask/estimator conventions and the independent CosmoCov comparison. The
 massive-neutrino nonlinear model, CMB fields and more general nuisance
 models remain outside the supported notebook configuration.
