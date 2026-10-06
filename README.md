@@ -129,6 +129,9 @@ We provide the Docker image [whovian-cocoa](https://hub.docker.com/r/vivianmiran
 > each supplied evaluate YAML. Project links above explain the model,
 > timing scope, command-line examples, notebooks and accuracy comparisons.
 >
+> Detailed code comparisons between CoCoA and OneCovariance are available
+> in the [OneCov-benchmark study](https://github.com/vivianmiranda/OneCov-benchmark-).
+>
 > The project notebooks include saved covariance and **1h, 2h, 3h and 4h
 > matter trispectrum plots**, visible directly on GitHub.
 >
