@@ -1260,12 +1260,24 @@ only one of its `GIT_COMMIT`, `GIT_BRANCH` or `GIT_TAG` keys: a commit takes
 precedence over a branch, and a branch over a tag. DES Y6 is disabled by
 default and has no tagged release; enabling it follows its `main` branch.
 
+The [DES Y6 project](https://github.com/CosmoLike/cocoa_des_y6) provides
+data-vector notebooks, tests and a covariance forecast CLI. Its active
+likelihood still selects dummy data; the separate supplied covariance has
+an incompatible layout. See its input inventory before using observational
+data.
+
 Covariance generation is a separate build option, disabled for all projects
 by default. To enable it for Roman real, comment out
 `export IGNORE_COSMOLIKE_ROMAN_REAL_COVARIANCE=1`, reload `start_cocoa.sh`
 and recompile that project. See its
 [covariance guide](https://github.com/CosmoLike/cocoa_roman_real#computing_covariances)
 for the production CLI and notebook examples.
+
+DES Y6 uses the corresponding
+`IGNORE_COSMOLIKE_DES_Y6_COVARIANCE` setting. Its
+[covariance guide](https://github.com/CosmoLike/cocoa_des_y6#computing_covariances)
+describes the catalogue assumptions and the distinction between a forecast
+and the supplied likelihood covariance.
 
 > [!NOTE]
 > The https URLs are the right choice for almost all users. Developers with write
@@ -1675,4 +1687,3 @@ There are a few differences users should be aware of when running Cocoa on Googl
 A working knowledge of Python is required to understand the Cobaya framework at the developer level. Users must also be familiar with the Bash language to understand Cocoa's scripts. Proficiency in C and C++ is also needed to manipulate Cosmolike and the C++ Cobaya-Cosmolike C++ interface. Finally, users need to understand the Fortran-2003 language to modify CAMB.
 
 Learning all these languages can be overwhelming, so to enable new users to do research that demands modifications on the inner workings of these codes, we include [here](cocoa_installation_libraries/LectNotes.pdf) a link to approximately 600 slides that provide an overview of Bash (slides ~1-137), C (slides ~138-371), and C++ (slides ~372-599). In the future, we aim to add lectures about Python and Fortran. 
-
