@@ -150,36 +150,36 @@ export USE_SPT_CLIK_PLANCK=1
 
 export DES_Y3_URL="https://github.com/CosmoLike/cocoa_des_y3.git"
 export DES_Y3_NAME="des_y3"
-export DES_Y3_GIT_TAG="v5.04"
+export DES_Y3_GIT_TAG="v5.05"
 
 export DESXPLANCK_URL="https://git@github.com/CosmoLike/cocoa_desy1xplanck.git"
 export DESXPLANCK_GIT_NAME="desy1xplanck"
-export DESXPLANCK_GIT_TAG="v5.04"
+export DESXPLANCK_GIT_TAG="v5.05"
 
 export LSST_Y1_URL="https://github.com/CosmoLike/cocoa_lsst_y1.git"
 export LSST_Y1_NAME="lsst_y1"
-export LSST_Y1_GIT_TAG="v5.04"
+export LSST_Y1_GIT_TAG="v5.05"
 
 export ROMAN_FOURIER_URL="https://github.com/CosmoLike/cocoa_roman_fourier.git"
 export ROMAN_FOURIER_NAME="roman_fourier"
-export ROMAN_FOURIER_GIT_TAG="v5.04"
+export ROMAN_FOURIER_GIT_TAG="v5.05"
 
 export ROMAN_REAL_URL="https://github.com/CosmoLike/cocoa_roman_real.git"
 export ROMAN_REAL_NAME="roman_real"
-export ROMAN_REAL_GIT_TAG="v5.04"
+export ROMAN_REAL_GIT_TAG="v5.05"
 
 export COSMOLIKE_URL="https://github.com/CosmoLike/cocoa-cosmolike-core.git"
-export COSMOLIKE_GIT_TAG="v5.08"
+export COSMOLIKE_GIT_TAG="v5.09"
 export COSMOLIKE_NAME="cosmolike_core"
 
 export ROMAN_KL_URL="https://github.com/CosmoLike/cocoa_roman_kl.git"
 export ROMAN_KL_NAME="roman_kl"
-export ROMAN_KL_GIT_TAG="v5.04"
+export ROMAN_KL_GIT_TAG="v5.05"
 
 # WARNING: des_cluster is not production ready.
 export DES_CLUSTER_URL="https://github.com/CosmoLike/cocoa_des_cluster.git"
 export DES_CLUSTER_NAME="des_cluster"
-export DES_CLUSTER_GIT_TAG="v5.05"
+export DES_CLUSTER_GIT_TAG="v5.06"
 
 # WARNING: des_y6 is not production ready: no tagged release exists, so the
 # key below follows the branch main instead of pinning a version.

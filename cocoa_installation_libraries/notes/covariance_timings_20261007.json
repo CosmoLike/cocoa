@@ -1,0 +1,760 @@
+{
+  "measured_utc": "2026-10-07T12:06:49.368031+00:00",
+  "checked_utc": "2026-10-07T12:07:22.430792+00:00",
+  "machine": "Apple M2 Pro, macOS 13.7.5",
+  "environment": {
+    "OMP_NUM_THREADS": "8",
+    "OMP_PROC_BIND": "disabled",
+    "OPENBLAS_NUM_THREADS": "1",
+    "MKL_NUM_THREADS": "1",
+    "VECLIB_MAXIMUM_THREADS": "1",
+    "COBAYA_NOMPI": "1"
+  },
+  "method": "three fresh sequential CLI processes per project",
+  "order": "Three round-robin passes through the seven projects",
+  "scope": "Construction includes first-use spectra, halo tables, transforms and G/SSC/cNG matrix assembly; excludes CAMB/setup, file writing and subsequent matrix diagnostics.",
+  "quiet_check": "92.24 percent CPU idle in the final prelaunch sample; no other numerical or compiler jobs were active.",
+  "validation_scope": "Finite symmetric components, component sums, bitwise repeatability and positive totals; cluster positivity uses its documented valid subspace. These checks do not establish accuracy convergence.",
+  "source_revisions": {
+    "cocoa": {
+      "head": "a2cdfad1037927b777b191d12707b2d4d3d0a0bf",
+      "status": ""
+    },
+    "core": {
+      "head": "959bb1d9fb54deafa6fe934c0327054bdede8a5e",
+      "status": ""
+    },
+    "lsst_y1": {
+      "head": "c187522125986ad181985c39143aeebbaad50a61",
+      "status": ""
+    },
+    "roman_real": {
+      "head": "535a2f4df79886dc26cd5cb3a271a13334b11237",
+      "status": ""
+    },
+    "roman_fourier": {
+      "head": "64b68bbc0c204857ca03ab4cfd5785df5e28ff77",
+      "status": ""
+    },
+    "roman_kl": {
+      "head": "ba5bf2bbce68317c96f28df0a41275f26ff52e2e",
+      "status": ""
+    },
+    "des_y3": {
+      "head": "822a703a5fefbcfa6a90dbb4cf5ee26cf09fd5bd",
+      "status": ""
+    },
+    "desy1xplanck": {
+      "head": "073dd00a38bec187c2bfc02c1ee1698e66edf45c",
+      "status": ""
+    },
+    "des_cluster": {
+      "head": "45a1e34d772d789ec0c9c93bb3138309c5f0fa86",
+      "status": ""
+    }
+  },
+  "input_and_library_sha256": {
+    "Cocoa/projects/lsst_y1/covariance/default.yaml": "0ff1c57a4f8a4de96cf51df390cacd6c39bc2cc3f612382b62d0ba4e03233b1e",
+    "Cocoa/projects/lsst_y1/EXAMPLE_EVALUATE_COVARIANCE.yaml": "1782f410666df6be14c6e8a595eadde6554085261363e3e007b8e40efa67c662",
+    "Cocoa/projects/lsst_y1/interface/cosmolike_lsst_y1_interface.so": "22e2e3499ac4de7bdcd52eaee62fb148a30d3773d1c49e684d827e8943d079cc",
+    "Cocoa/projects/lsst_y1/covariance/lsst_y1_covariance.py": "1446e1141a469013f2d4cac18692370a8609a3275a86621e223544ed6e413b6b",
+    "Cocoa/projects/lsst_y1/covariance/compute_covariance.py": "89145ff738bcddc784205aa248c97f9c2844b10383c5df819ddf2b05506d83ec",
+    "Cocoa/projects/roman_real/covariance/default.yaml": "ef4d2611acbb42aaa7c5d6300b76b7f5b346b045a297d9227054bb615f838107",
+    "Cocoa/projects/roman_real/EXAMPLE_EVALUATE_COVARIANCE.yaml": "f2733ffcd449d15b9fa52aa5b22f776697efc06c98f9a01d80b375765b94af96",
+    "Cocoa/projects/roman_real/interface/cosmolike_roman_real_interface.so": "2ad65222bb03954f311367e4a18a3de33dcb493774943fbf98d6201a8a16bba2",
+    "Cocoa/projects/roman_real/covariance/compute_covariance.py": "e867443fb33787837eac2cb737fc34bcd54898f7fb6e09d67150a2ec8cd732f6",
+    "Cocoa/projects/roman_real/covariance/roman_real_covariance.py": "5ff94611a5e8f235e7cf0db24b4c4239f6332dea853b1152361d52dec6d0db5f",
+    "Cocoa/projects/roman_fourier/covariance/default.yaml": "ef4d2611acbb42aaa7c5d6300b76b7f5b346b045a297d9227054bb615f838107",
+    "Cocoa/projects/roman_fourier/EXAMPLE_EVALUATE_COVARIANCE.yaml": "0e54fca85aec519b3215d2239a6e4a1269fc729740620a38f0feaa0414ede0ce",
+    "Cocoa/projects/roman_fourier/interface/cosmolike_roman_fourier_interface.so": "794bb3259b362b914a2a598579909d8d94cbc6ee24971c3f54e75e16934a3535",
+    "Cocoa/projects/roman_fourier/covariance/roman_fourier_covariance.py": "094688441285ffd6fb4f5c94fa823ba83090a25941a4ca83634d33f9821febf2",
+    "Cocoa/projects/roman_fourier/covariance/compute_covariance.py": "164cae7127e3929b3f90b3770497d2d1e12fb4f429268b3f4dd4a4467f21be66",
+    "Cocoa/projects/roman_kl/covariance/default.yaml": "9d425e29094fae2267d9b688ea47ff93fe6fc9905df0db5befd8a316f966364f",
+    "Cocoa/projects/roman_kl/EXAMPLE_EVALUATE_COVARIANCE.yaml": "712d47fb205dd03938be53192c5c3cc6536315a85c1325ab18eecfddadcb242d",
+    "Cocoa/projects/roman_kl/interface/cosmolike_roman_kl_interface.so": "3c53a89067e701d780d1e3b46d410a8d74bfed611b849774fd0feb6bc98d953e",
+    "Cocoa/projects/roman_kl/covariance/roman_kl_covariance.py": "9f3adc0059fcd21177691f17bf352304459be717d8a2d61aa3efb9e16fbe4af3",
+    "Cocoa/projects/roman_kl/covariance/compute_covariance.py": "20e5252e32200358e231263f817221b0db6bc813cf0e0a3d406c24c80943579e",
+    "Cocoa/projects/des_y3/covariance/default.yaml": "0ff1c57a4f8a4de96cf51df390cacd6c39bc2cc3f612382b62d0ba4e03233b1e",
+    "Cocoa/projects/des_y3/EXAMPLE_EVALUATE_COVARIANCE.yaml": "ba689b1a846deb951c93558b2f29a83e20aeee2a4a30779b4010ae7069226b97",
+    "Cocoa/projects/des_y3/interface/cosmolike_des_y3_interface.so": "fcbd640767e748c2fa35d57cf06d0b56b42cd1b026fcf72cfbefd1664ed31575",
+    "Cocoa/projects/des_y3/covariance/compute_covariance.py": "eac9530185128d86e7f46061725f1cff8a03525e2191431905b6997ce53bdaa4",
+    "Cocoa/projects/des_y3/covariance/des_y3_covariance.py": "12b055583222839953ee899a386a99a7573b7736838a982e454a489bfad8dcf5",
+    "Cocoa/projects/desy1xplanck/covariance/default.yaml": "0ff1c57a4f8a4de96cf51df390cacd6c39bc2cc3f612382b62d0ba4e03233b1e",
+    "Cocoa/projects/desy1xplanck/EXAMPLE_EVALUATE_COVARIANCE.yaml": "98a0e9696ae97587202e6304254b1bf51598d24612ac184acf7b9e4023bf136a",
+    "Cocoa/projects/desy1xplanck/interface/cosmolike_desy1xplanck_interface.so": "631cbcc93573c930991aafbe1a7c494289bfd4d6815cb7b287d5d94376d25b04",
+    "Cocoa/projects/desy1xplanck/covariance/compute_covariance.py": "97efe1c8a8946f0d9d38480db700ed721177796b0f85ca928b27eddcf393ece4",
+    "Cocoa/projects/desy1xplanck/covariance/desy1xplanck_covariance.py": "a8de6d4202352e714720402a54ff5d9e4f59150cdcf6862b752f417b807cab8e",
+    "Cocoa/projects/des_cluster/covariance/default.yaml": "0ff1c57a4f8a4de96cf51df390cacd6c39bc2cc3f612382b62d0ba4e03233b1e",
+    "Cocoa/projects/des_cluster/EXAMPLE_EVALUATE_COVARIANCE.yaml": "df2180da757d9db8de4d9e094d5d41bc223592c074d24180ed1894bb75274680",
+    "Cocoa/projects/des_cluster/interface/cosmolike_des_cluster_interface.so": "8874ea26eb3cb1f31dc3e2c788a64620bc84f974ea438e0890024ef68d70c0b5",
+    "Cocoa/projects/des_cluster/covariance/compute_covariance.py": "6c9cd1c57193f90126de942f739274c66750d8b0519699c98de835866d528fb0",
+    "Cocoa/projects/des_cluster/covariance/des_cluster_covariance.py": "5ef6d2befce1cb2ba15fda17cce7e30eb9bb1544a47389bd2f1953250af2b5f5",
+    "Cocoa/projects/des_cluster/covariance/des_cluster_joint_covariance.py": "f074f48a52c8d846cf24104149126898e17f145afa6414cc0ba27643e484e3be",
+    "Cocoa/external_modules/code/cosmolike_core/cosmolike_notebook_utils/covariance/counts_cluster.py": "2018c66ad8f526923bd6185ab203de9063cc5dac8d21d7dc152d07013a6becf9",
+    "Cocoa/external_modules/code/cosmolike_core/cosmolike_notebook_utils/covariance/survey.py": "dc64e966a7e25bbebc1148bb0bce4039db2bcad1489521e80a8f587e57e1200e",
+    "Cocoa/external_modules/code/cosmolike_core/cosmolike_notebook_utils/covariance/forecast.py": "2eb577580dfee77bdc30308dfe445f72fff11fa35ac9deb3dec64cd6d3a8bc91",
+    "Cocoa/external_modules/code/cosmolike_core/cosmolike_notebook_utils/covariance/diagnostics.py": "fc5409cf7905ec386fe8a7cf07a3cd5b8c4165037c9646aa95120f2efbe5f0bf",
+    "Cocoa/external_modules/code/cosmolike_core/cosmolike_notebook_utils/covariance/command_line.py": "a6a252f7113b105e9ac8d7dee4a79ac4a1c0c53aadce47fe472af75c1e2e4e3f",
+    "Cocoa/external_modules/code/cosmolike_core/cosmolike_notebook_utils/covariance/__init__.py": "ffa51eb77e51d0c9eef8d54205d39e4e193854cf99fb3cae4259aaad9d6fea7d",
+    "Cocoa/external_modules/code/cosmolike_core/cosmolike_notebook_utils/covariance/survey_cluster.py": "4af0c40f0fac8f0b5c927698f31a4a7c2ce56a5f96584908a780a4ee616f3484",
+    "Cocoa/external_modules/code/cosmolike_core/cosmolike_notebook_utils/covariance/forecast_cluster.py": "db9a454d38f0fde24e658e1369f85f599f85a10e507f0d189792fdd9e0f65b37",
+    "Cocoa/external_modules/code/cosmolike_core/cosmolike_notebook_utils/covariance/geometry.py": "d27183a74c049afb339030283fca55001342379f389df042b91a4997d17df206",
+    "Cocoa/external_modules/code/cosmolike_core/cosmolike_notebook_utils/covariance/sampling.py": "06e3decf9f74c80768804ba3b346f1a193b2a1441172c43625a965537b111278",
+    "Cocoa/external_modules/code/cosmolike_core/cosmolike_notebook_utils/covariance/transform_cluster.py": "1ab94e181152822cd854d9754b538bca6d86fe9b21ac67e2c005993372e38429",
+    "Cocoa/external_modules/code/cosmolike_core/cosmolike_notebook_utils/covariance/halo.py": "deea851468f5297e3d56655799ec39cfd11d394b42a916f3b62eb28bf48edcf1",
+    "Cocoa/external_modules/code/cosmolike_core/cosmolike_notebook_utils/covariance/accuracy.py": "7bac5d6e00c29223f9a842607f03350ae937d2b6582b02cc2ff71fe72e4f8085",
+    "Cocoa/external_modules/code/cosmolike_core/cosmolike_notebook_utils/covariance/likelihood.py": "19deed43f1e75f3899da0fa1ac5f6d1ee184611b7c935be451046827783383b1",
+    "Cocoa/external_modules/code/cosmolike_core/cosmolike_notebook_utils/covariance/power.py": "0456a460e4b5a48ea843836c8ccad4fb9b53e0a81771828335d6a3d65f0646b0",
+    "Cocoa/external_modules/code/cosmolike_core/cosmolike_notebook_utils/covariance/gaussian.py": "621e046334b2724aeb271901752009fc7251f3425e32abb64946e27140bf2921"
+  },
+  "timing_script_sha256": {
+    "benchmark_nonlimber_cli.py": "fe6d0da63fbf4da9fdf9cd1d2aca7be46dd9a09a61d3081986483b01e0ae36a3",
+    "validate_nonlimber_cli_timing.py": "117d8ef692d028acea486fba825b5c9fe637c766fc07c585c1820390aa8162aa"
+  },
+  "raw_timing_sha256": "df02a0d22942335987799a3ae5fb3d7aa54be554906d61ac8fef82650e47cdb9",
+  "raw_validation_sha256": "c8e195beaeb07efc8e99840956a4dc8474c14c8c8131837a9d7cb884d261a2b0",
+  "projects": {
+    "lsst_y1": {
+      "shape": [
+        1560,
+        1560
+      ],
+      "space": "real",
+      "original_power_k_nodes": 1500,
+      "installed_power_k_nodes": 11993,
+      "power_refinement": 8,
+      "settings_sha256": "cdeb0070deb78e280b834b34636f6166642288b84dc99a97c0365baa222ea71e",
+      "construction": {
+        "mean_seconds": 53.38755491670842,
+        "stdev_seconds": 1.1089151609025025,
+        "min_seconds": 52.41678312502336,
+        "max_seconds": 54.59605520905461
+      },
+      "runs": [
+        {
+          "repeat": 1,
+          "construction_seconds": 52.41678312502336,
+          "cli_wall_seconds": 54.01727087504696,
+          "initialization_seconds_rounded": 0.49,
+          "stages_seconds": {
+            "all_pairs_gaussian_spectra": 2.008056667051278,
+            "angular_and_mask_geometry": 1.3156329999910668,
+            "gaussian_blocks": 3.8172759590670466,
+            "observable_signal": 0.06570937496144325,
+            "shared_halo_response_and_trispectrum": 45.13852720800787,
+            "ssc_and_connected_projection": 0.06858933297917247,
+            "total": 52.41678312502336
+          },
+          "archive_sha256": "49f3e22581a34f043c0b580b5beb0af0ccaf224d7d06e691bf481a1be783f22c",
+          "log_sha256": "c2d71ef9140ea07e707ce829a044f6a07bdbccc1c59a81a755a480d531d4012a"
+        },
+        {
+          "repeat": 2,
+          "construction_seconds": 53.14982641604729,
+          "cli_wall_seconds": 54.35565887496341,
+          "initialization_seconds_rounded": 0.49,
+          "stages_seconds": {
+            "all_pairs_gaussian_spectra": 2.060041875112802,
+            "angular_and_mask_geometry": 1.3433168330229819,
+            "gaussian_blocks": 4.278687041020021,
+            "observable_signal": 0.07862625003326684,
+            "shared_halo_response_and_trispectrum": 45.324305874994025,
+            "ssc_and_connected_projection": 0.062065667007118464,
+            "total": 53.14982641604729
+          },
+          "archive_sha256": "c2442cda56e08f29fdf7d03244d23687051c6e8af4836f90e327d7ffe3af82b9",
+          "log_sha256": "9f24e41cb4ca6006d35d96a762751568f840d13ac88e8ffdeb2cc08d618066d1"
+        },
+        {
+          "repeat": 3,
+          "construction_seconds": 54.59605520905461,
+          "cli_wall_seconds": 55.859202875057235,
+          "initialization_seconds_rounded": 0.5,
+          "stages_seconds": {
+            "all_pairs_gaussian_spectra": 2.071364125004038,
+            "angular_and_mask_geometry": 1.3167956250254065,
+            "gaussian_blocks": 3.9013016669778153,
+            "observable_signal": 0.07463212497532368,
+            "shared_halo_response_and_trispectrum": 47.1606416660361,
+            "ssc_and_connected_projection": 0.06801841594278812,
+            "total": 54.59605520905461
+          },
+          "archive_sha256": "00e2ce5313a7fd8621833fcad521cfcc1cb4ccb747ef626402ec7424cbc56bb0",
+          "log_sha256": "500f523904426687a2cfae0827324ece7281def2f132acc8772b9e7a19fa85af"
+        }
+      ],
+      "validation": {
+        "shape": [
+          1560,
+          1560
+        ],
+        "tested_shape": [
+          1560,
+          1560
+        ],
+        "space": "real",
+        "component_sha256": {
+          "gaussian": "2996fd692b6b3f1ae55d62a18be0fce14ded5cdab0d9dd63c713fef7a67f2eff",
+          "ssc": "e70837ae46dfca8c863c1211a455b2fb9884a0a4f9dece89c1540b2b9479d645",
+          "cng": "1c7e45249342d60c12c1d44b194af815b3eedaae7a3825deff24d99b454f7c5b",
+          "total": "c5a8e238ece1cde8ef3961d3c6a4cef7c5b7f7aadbf3e39f50b8164cfbe3deec"
+        },
+        "identical_repetitions": 3,
+        "finite_and_exactly_symmetric": true,
+        "total_component_sum_scaled_residual": 0.0,
+        "total_cholesky_positive_definite": true,
+        "minimum_correlation_eigenvalue": 0.00022698294631417473
+      }
+    },
+    "roman_real": {
+      "shape": [
+        2115,
+        2115
+      ],
+      "space": "real",
+      "original_power_k_nodes": 1500,
+      "installed_power_k_nodes": 11993,
+      "power_refinement": 8,
+      "settings_sha256": "f9cae3a69416641820eb8d2dbc2ce8fa9afafe15a611b293e7f7259a27e55e41",
+      "construction": {
+        "mean_seconds": 58.716889847652055,
+        "stdev_seconds": 1.7987633493794613,
+        "min_seconds": 57.52747420896776,
+        "max_seconds": 60.78622216696385
+      },
+      "runs": [
+        {
+          "repeat": 1,
+          "construction_seconds": 57.83697316702455,
+          "cli_wall_seconds": 59.096153583959676,
+          "initialization_seconds_rounded": 0.51,
+          "stages_seconds": {
+            "all_pairs_gaussian_spectra": 4.465573583031073,
+            "angular_and_mask_geometry": 0.36838887503836304,
+            "gaussian_blocks": 7.659919917001389,
+            "observable_signal": 0.18374462495557964,
+            "shared_halo_response_and_trispectrum": 45.06754366599489,
+            "ssc_and_connected_projection": 0.08652925002388656,
+            "total": 57.83697316702455
+          },
+          "archive_sha256": "1852d417d35735849c3af86f4847ffcb15f9ae57dc785fec7574b6ce0c12cd38",
+          "log_sha256": "00aff342d0c001de00b4b04f4f9931c8b3a78e8d2bc51b40f9abfc585186e842"
+        },
+        {
+          "repeat": 2,
+          "construction_seconds": 57.52747420896776,
+          "cli_wall_seconds": 58.756751292035915,
+          "initialization_seconds_rounded": 0.5,
+          "stages_seconds": {
+            "all_pairs_gaussian_spectra": 4.435199874918908,
+            "angular_and_mask_geometry": 0.3695199169451371,
+            "gaussian_blocks": 7.066279457998462,
+            "observable_signal": 0.1514420419698581,
+            "shared_halo_response_and_trispectrum": 45.413100000005215,
+            "ssc_and_connected_projection": 0.08704025007318705,
+            "total": 57.52747420896776
+          },
+          "archive_sha256": "8c2a3998d0bbf3fa1fc5cc25d930b03b8d4311a9013992ac89fb362760df0bc9",
+          "log_sha256": "769f3b5eea7e5d2af649a5714069a9dfe1d74697afe7f1aa77974c0472b0f419"
+        },
+        {
+          "repeat": 3,
+          "construction_seconds": 60.78622216696385,
+          "cli_wall_seconds": 62.11005474999547,
+          "initialization_seconds_rounded": 0.51,
+          "stages_seconds": {
+            "all_pairs_gaussian_spectra": 4.764523624908179,
+            "angular_and_mask_geometry": 0.3728533750399947,
+            "gaussian_blocks": 7.654285583994351,
+            "observable_signal": 0.1732374170096591,
+            "shared_halo_response_and_trispectrum": 47.715056207962334,
+            "ssc_and_connected_projection": 0.10087495902553201,
+            "total": 60.78622216696385
+          },
+          "archive_sha256": "aeb419a0fa04423992533334d7c25bc5f36171757fb7bbcabe2b3023a88f69f7",
+          "log_sha256": "6dd412b335036f2808d778a5ba82d4cacc1064905bae9bd356f420defa695586"
+        }
+      ],
+      "validation": {
+        "shape": [
+          2115,
+          2115
+        ],
+        "tested_shape": [
+          2115,
+          2115
+        ],
+        "space": "real",
+        "component_sha256": {
+          "gaussian": "a01e7cd1ee6cce3b90f33476b80b7b92c37f207c69b97162488ee43962f5ccbb",
+          "ssc": "55d1e6c8f8e2370e64ceb7563744a20123ff97bf865bc3bd198f70f426885906",
+          "cng": "afa26ba4314225dc561fb8ff96f30330877d5d4c8eaf2d7e16640e489b43d4cd",
+          "total": "9bb4e478e68fd9646492501ca0c6b2f24720435723d8d9b555a0517532ad891a"
+        },
+        "identical_repetitions": 3,
+        "finite_and_exactly_symmetric": true,
+        "total_component_sum_scaled_residual": 0.0,
+        "total_cholesky_positive_definite": true,
+        "minimum_correlation_eigenvalue": 0.0005910330866686941
+      }
+    },
+    "roman_fourier": {
+      "shape": [
+        1485,
+        1485
+      ],
+      "space": "fourier",
+      "original_power_k_nodes": 1500,
+      "installed_power_k_nodes": 11993,
+      "power_refinement": 8,
+      "settings_sha256": "b5e9873d30ea552a42e30f226418215226a4cdb8435c9085916eb86b3a52da0a",
+      "construction": {
+        "mean_seconds": 27.454630722330574,
+        "stdev_seconds": 0.08654729267828618,
+        "min_seconds": 27.35480049997568,
+        "max_seconds": 27.508530667051673
+      },
+      "runs": [
+        {
+          "repeat": 1,
+          "construction_seconds": 27.500560999964364,
+          "cli_wall_seconds": 28.675723665975966,
+          "initialization_seconds_rounded": 0.5,
+          "stages_seconds": {
+            "all_pairs_gaussian_spectra": 1.9078142090002075,
+            "angular_and_mask_geometry": 0.014912125072441995,
+            "gaussian_blocks": 0.07624687510542572,
+            "observable_signal": 0.003866540966555476,
+            "shared_halo_response_and_trispectrum": 25.431506791966967,
+            "ssc_and_connected_projection": 0.06355454202275723,
+            "total": 27.500560999964364
+          },
+          "archive_sha256": "5d3ab1b7e1bf04e5cba093489ae08294c76fa4c7463749622eb0488be351fbe0",
+          "log_sha256": "bc8af57c9851cd6dd4395ca4bc32358826d28d8455d3a7916bbdd0d5e29bf820"
+        },
+        {
+          "repeat": 2,
+          "construction_seconds": 27.508530667051673,
+          "cli_wall_seconds": 28.68397387501318,
+          "initialization_seconds_rounded": 0.51,
+          "stages_seconds": {
+            "all_pairs_gaussian_spectra": 1.902152833994478,
+            "angular_and_mask_geometry": 0.015473749954253435,
+            "gaussian_blocks": 0.0767247499898076,
+            "observable_signal": 0.0039457500679418445,
+            "shared_halo_response_and_trispectrum": 25.440081874956377,
+            "ssc_and_connected_projection": 0.06735912500880659,
+            "total": 27.508530667051673
+          },
+          "archive_sha256": "b50b705e3d25416ec2b5cb7ccc79feef667f8f7469702e46588d06b2dd4814b0",
+          "log_sha256": "22e9f1c0c5a23a1bdfe2d1c32b371d9463137302e8bcbb0a7b0b695ed8609c27"
+        },
+        {
+          "repeat": 3,
+          "construction_seconds": 27.35480049997568,
+          "cli_wall_seconds": 28.633488958003,
+          "initialization_seconds_rounded": 0.52,
+          "stages_seconds": {
+            "all_pairs_gaussian_spectra": 2.0024263330269605,
+            "angular_and_mask_geometry": 0.015223041991703212,
+            "gaussian_blocks": 0.07933029206469655,
+            "observable_signal": 0.00396287499461323,
+            "shared_halo_response_and_trispectrum": 25.192121541011147,
+            "ssc_and_connected_projection": 0.0589228329481557,
+            "total": 27.35480049997568
+          },
+          "archive_sha256": "450580dec65abe87c6516e12ead9a280ea8bc0069cb79cdd21f79091a79e90ac",
+          "log_sha256": "017f77ef6949ffcf1ac950ba7bf0e73747d3c2c798ac104755dd139da23368f3"
+        }
+      ],
+      "validation": {
+        "shape": [
+          1485,
+          1485
+        ],
+        "tested_shape": [
+          1485,
+          1485
+        ],
+        "space": "fourier",
+        "component_sha256": {
+          "gaussian": "8f975af24c03ab9cf0b08a5685ae3fb620fd0db63ef69dba0a28e9fc9e73eadb",
+          "ssc": "06ac0cd9da69eb4d4dc476bb0bb394528bea72a831e13f790297f4e00bb5857a",
+          "cng": "0c612e7106b411c9a1bf897bbdefc4ddd9c2e4c3c23f5b323d385737cba48123",
+          "total": "be47a83ed084771b878e78951265ca2310b7e4e8a97e99f8553d593dcac3b223"
+        },
+        "identical_repetitions": 3,
+        "finite_and_exactly_symmetric": true,
+        "total_component_sum_scaled_residual": 0.0,
+        "total_cholesky_positive_definite": true,
+        "minimum_correlation_eigenvalue": 0.0002512974576734768
+      }
+    },
+    "roman_kl": {
+      "shape": [
+        2200,
+        2200
+      ],
+      "space": "fourier",
+      "original_power_k_nodes": 1500,
+      "installed_power_k_nodes": 11993,
+      "power_refinement": 8,
+      "settings_sha256": "071f65e6944481f9b5d5630f3d726e79de2dd179de5acf153e4337d22b5c4a6e",
+      "construction": {
+        "mean_seconds": 35.317421652648285,
+        "stdev_seconds": 2.1312057777269433,
+        "min_seconds": 32.85768949997146,
+        "max_seconds": 36.6130628749961
+      },
+      "runs": [
+        {
+          "repeat": 1,
+          "construction_seconds": 36.6130628749961,
+          "cli_wall_seconds": 37.86669312498998,
+          "initialization_seconds_rounded": 0.51,
+          "stages_seconds": {
+            "all_pairs_gaussian_spectra": 10.425724542001262,
+            "angular_and_mask_geometry": 0.015341334044933319,
+            "gaussian_blocks": 0.1541785839945078,
+            "observable_signal": 0.004997959011234343,
+            "shared_halo_response_and_trispectrum": 25.903964790981263,
+            "ssc_and_connected_projection": 0.10285333392675966,
+            "total": 36.6130628749961
+          },
+          "archive_sha256": "641abdeb49904ef2c1fd5a985ede700e98b67a45b495e74d4c13da80df99b54d",
+          "log_sha256": "3ea34e8308d781156b89be718f8b6669f4b2be7d781695bc49142128ef55e981"
+        },
+        {
+          "repeat": 2,
+          "construction_seconds": 36.4815125829773,
+          "cli_wall_seconds": 37.735814000014216,
+          "initialization_seconds_rounded": 0.51,
+          "stages_seconds": {
+            "all_pairs_gaussian_spectra": 10.589600458042696,
+            "angular_and_mask_geometry": 0.016272083041258156,
+            "gaussian_blocks": 0.2008057920029387,
+            "observable_signal": 0.005086707998998463,
+            "shared_halo_response_and_trispectrum": 25.563084083027206,
+            "ssc_and_connected_projection": 0.10147770901676267,
+            "total": 36.4815125829773
+          },
+          "archive_sha256": "d7f3f6a0e970fa66df8446747c7a3c8989c6823a5f495ce1aeef6f052f86c28f",
+          "log_sha256": "707fbb6beb19aecb2a5af9e24ec5af2116e5f13d36eef8d5160f13d541110539"
+        },
+        {
+          "repeat": 3,
+          "construction_seconds": 32.85768949997146,
+          "cli_wall_seconds": 34.14787324995268,
+          "initialization_seconds_rounded": 0.51,
+          "stages_seconds": {
+            "all_pairs_gaussian_spectra": 9.44216312491335,
+            "angular_and_mask_geometry": 0.015791999991051853,
+            "gaussian_blocks": 0.1410355829866603,
+            "observable_signal": 0.0046242919052019715,
+            "shared_halo_response_and_trispectrum": 23.151566292042844,
+            "ssc_and_connected_projection": 0.09655141702387482,
+            "total": 32.85768949997146
+          },
+          "archive_sha256": "d9d575292d4da9dd3e702253d90e59376ba5245f812b7782c76932b6f516e520",
+          "log_sha256": "24885b2343f5cff28eeccf6690b6c904224cb36094fc98345f4b256090953a69"
+        }
+      ],
+      "validation": {
+        "shape": [
+          2200,
+          2200
+        ],
+        "tested_shape": [
+          2200,
+          2200
+        ],
+        "space": "fourier",
+        "component_sha256": {
+          "gaussian": "52df654707ef2232d464ec59f4c7bdedb748ae739fbe41ce00796239f2bb5e20",
+          "ssc": "121a96d2bacb87a828b4c2c400c0f79bf0f60be02095755f33122fe5ef2255dc",
+          "cng": "312c3547884dafe4c18b60d8e1c2fa77b84a7046fe13d4c7630fa2ddb6986d0e",
+          "total": "04b59be7a608ef3a8827e86b25cd6010c7057485765dc12a96598ed1649353fb"
+        },
+        "identical_repetitions": 3,
+        "finite_and_exactly_symmetric": true,
+        "total_component_sum_scaled_residual": 0.0,
+        "total_cholesky_positive_definite": true,
+        "minimum_correlation_eigenvalue": 5.966538258102616e-06
+      }
+    },
+    "des_y3": {
+      "shape": [
+        900,
+        900
+      ],
+      "space": "real",
+      "original_power_k_nodes": 1500,
+      "installed_power_k_nodes": 11993,
+      "power_refinement": 8,
+      "settings_sha256": "662858310c3e0a760c4893251ea4c25770483a3eb05adbf71d36097ad0aabce9",
+      "construction": {
+        "mean_seconds": 50.76976518061323,
+        "stdev_seconds": 0.5694185637836772,
+        "min_seconds": 50.11810895893723,
+        "max_seconds": 51.17139320797287
+      },
+      "runs": [
+        {
+          "repeat": 1,
+          "construction_seconds": 50.11810895893723,
+          "cli_wall_seconds": 51.41013112501241,
+          "initialization_seconds_rounded": 0.51,
+          "stages_seconds": {
+            "all_pairs_gaussian_spectra": 1.9422398339956999,
+            "angular_and_mask_geometry": 0.36602616601157933,
+            "gaussian_blocks": 1.4732734160497785,
+            "observable_signal": 0.06355566706042737,
+            "shared_halo_response_and_trispectrum": 46.23775554203894,
+            "ssc_and_connected_projection": 0.03413204196840525,
+            "total": 50.11810895893723
+          },
+          "archive_sha256": "b19386528c2cf385aab58e54901239b60bbc0042e9866a1292fef36d75dcea10",
+          "log_sha256": "ed58781c223528c15ca17d155d0fe95a3382da7d6aaf24f2a2bf0c5109a59ac1"
+        },
+        {
+          "repeat": 2,
+          "construction_seconds": 51.01979337492958,
+          "cli_wall_seconds": 52.1957475830568,
+          "initialization_seconds_rounded": 0.49,
+          "stages_seconds": {
+            "all_pairs_gaussian_spectra": 1.7551683329511434,
+            "angular_and_mask_geometry": 0.3640841250307858,
+            "gaussian_blocks": 1.3502205410040915,
+            "observable_signal": 0.05496954103000462,
+            "shared_halo_response_and_trispectrum": 47.4631073330529,
+            "ssc_and_connected_projection": 0.031028624973259866,
+            "total": 51.01979337492958
+          },
+          "archive_sha256": "619b659e0639ebaae5a6c65aa9da1f88cba6f54399b986db40c07fe8e22364a9",
+          "log_sha256": "2b58bf8628eb59c38ab561122974465006d1051c05c52335feb82aabba7da0c1"
+        },
+        {
+          "repeat": 3,
+          "construction_seconds": 51.17139320797287,
+          "cli_wall_seconds": 52.4110522500705,
+          "initialization_seconds_rounded": 0.5,
+          "stages_seconds": {
+            "all_pairs_gaussian_spectra": 1.9402995000127703,
+            "angular_and_mask_geometry": 0.3661722090328112,
+            "gaussian_blocks": 1.413496125023812,
+            "observable_signal": 0.05658995802514255,
+            "shared_halo_response_and_trispectrum": 47.359120999928564,
+            "ssc_and_connected_projection": 0.034316916950047016,
+            "total": 51.17139320797287
+          },
+          "archive_sha256": "765e92675b69c177139052b4c71af4f05cb2297950d279012d7afe6c5a9c6c07",
+          "log_sha256": "30401a6bec52a3ac8d0097bffefeb956d0abbd4e4366e77b8b2b34075783f124"
+        }
+      ],
+      "validation": {
+        "shape": [
+          900,
+          900
+        ],
+        "tested_shape": [
+          900,
+          900
+        ],
+        "space": "real",
+        "component_sha256": {
+          "gaussian": "e1419ff23104ad7a438929152a2d66d50c8e3d9d23c821620f8075e67bb41edc",
+          "ssc": "129de70dfc12680d14394ca4c0107b857aae72148a6a5969a2c6613e8dc8cdd3",
+          "cng": "13b6277d788dc09a0cc9170385a7c826adad3f92d5f42f2b88f1163aa8d2fd2c",
+          "total": "5a20ebefdad60f0e05824460baa9e058a7149cea541decd679078a93e1896e7a"
+        },
+        "identical_repetitions": 3,
+        "finite_and_exactly_symmetric": true,
+        "total_component_sum_scaled_residual": 0.0,
+        "total_cholesky_positive_definite": true,
+        "minimum_correlation_eigenvalue": 0.01919577882340944
+      }
+    },
+    "desy1xplanck": {
+      "shape": [
+        1500,
+        1500
+      ],
+      "space": "real",
+      "original_power_k_nodes": 1500,
+      "installed_power_k_nodes": 11993,
+      "power_refinement": 8,
+      "settings_sha256": "5bafb8fe2e5bd08b00db42dd90468460348e5067aa1b8eb5e319dbbb0ad8efc0",
+      "construction": {
+        "mean_seconds": 52.260914458349966,
+        "stdev_seconds": 1.1003208915019587,
+        "min_seconds": 51.077916334033944,
+        "max_seconds": 53.25377700000536
+      },
+      "runs": [
+        {
+          "repeat": 1,
+          "construction_seconds": 51.077916334033944,
+          "cli_wall_seconds": 52.257342957891524,
+          "initialization_seconds_rounded": 0.5,
+          "stages_seconds": {
+            "all_pairs_gaussian_spectra": 2.0928003339795396,
+            "angular_and_mask_geometry": 0.4129632080439478,
+            "gaussian_blocks": 3.450743917026557,
+            "observable_signal": 0.0640512079698965,
+            "shared_halo_response_and_trispectrum": 44.990098290960304,
+            "ssc_and_connected_projection": 0.06457604200113565,
+            "total": 51.077916334033944
+          },
+          "archive_sha256": "075081495603afc4f1fca08f77186e13162614c24ab01e6032b8e31bbaaa217e",
+          "log_sha256": "5d9d3de30465e81b3654b942bd2b15170367a5fb2918c7213ce95e5d84ab5e11"
+        },
+        {
+          "repeat": 2,
+          "construction_seconds": 52.4510500410106,
+          "cli_wall_seconds": 53.75078704103362,
+          "initialization_seconds_rounded": 0.51,
+          "stages_seconds": {
+            "all_pairs_gaussian_spectra": 2.2999744579428807,
+            "angular_and_mask_geometry": 0.41620916593819857,
+            "gaussian_blocks": 3.5441172500140965,
+            "observable_signal": 0.06988824997097254,
+            "shared_halo_response_and_trispectrum": 46.0482129160082,
+            "ssc_and_connected_projection": 0.0697149580810219,
+            "total": 52.4510500410106
+          },
+          "archive_sha256": "7b1ffed09b71ece632b600e3257b43db1106eca375c02c549e294149f56f7f0f",
+          "log_sha256": "5f9cac9df2c99b4372e7d69f1949cfe3b053da3edf08f52d55c4f674bd051b0f"
+        },
+        {
+          "repeat": 3,
+          "construction_seconds": 53.25377700000536,
+          "cli_wall_seconds": 54.52386233303696,
+          "initialization_seconds_rounded": 0.5,
+          "stages_seconds": {
+            "all_pairs_gaussian_spectra": 2.1094791661016643,
+            "angular_and_mask_geometry": 0.4154836250236258,
+            "gaussian_blocks": 3.570718542090617,
+            "observable_signal": 0.07067737495526671,
+            "shared_halo_response_and_trispectrum": 47.01864379202016,
+            "ssc_and_connected_projection": 0.06585304194595665,
+            "total": 53.25377700000536
+          },
+          "archive_sha256": "d69fadda2d390510a4a889a738b67be54c168aa45042ff576eb29356bb071798",
+          "log_sha256": "e56d1052f5d2e06112e5086921136fb9821eae2bbfab86c07ea291c951cb8cc5"
+        }
+      ],
+      "validation": {
+        "shape": [
+          1500,
+          1500
+        ],
+        "tested_shape": [
+          1500,
+          1500
+        ],
+        "space": "real",
+        "component_sha256": {
+          "gaussian": "6e75c62fe4a3c6e65d4283816a8e6118601b22347d5861d2460ca619c292bb7d",
+          "ssc": "4ed5c0910f1b19b421f6fd9be3f12c81db477484cdcf0753c91d6ea2702a89d7",
+          "cng": "8839a938d5a4c543a262d7cc9b85850d02ae5afef1b576928dfd3cd69c09f35e",
+          "total": "cb0edee581e14b0cc599690a9c98fe4fcf83f8f126d725656272ba749f1641a4"
+        },
+        "identical_repetitions": 3,
+        "finite_and_exactly_symmetric": true,
+        "total_component_sum_scaled_residual": 0.0,
+        "total_cholesky_positive_definite": true,
+        "minimum_correlation_eigenvalue": 0.0069887375609026655
+      }
+    },
+    "des_cluster": {
+      "shape": [
+        2812,
+        2812
+      ],
+      "space": "real",
+      "original_power_k_nodes": 1500,
+      "installed_power_k_nodes": 11993,
+      "power_refinement": 8,
+      "settings_sha256": "acffec947dea51a0a8e054d57e9d2d1390524f450ef332e8361afd4f9f015770",
+      "construction": {
+        "mean_seconds": 100.87450600000254,
+        "stdev_seconds": 3.3174302907438658,
+        "min_seconds": 97.08314079092816,
+        "max_seconds": 103.24400937499013
+      },
+      "runs": [
+        {
+          "repeat": 1,
+          "construction_seconds": 97.08314079092816,
+          "cli_wall_seconds": 98.37470050004777,
+          "initialization_seconds_rounded": 0.5,
+          "stages_seconds": {
+            "all_pairs_limber_spectra": 15.707921874942258,
+            "gaussian_and_mean": 11.140416915994138,
+            "shared_halo_tables": 69.76753791689407,
+            "joint_ssc_and_connected": 0.27470029203686863,
+            "localization": 0.19228512502741069,
+            "total": 97.08314079092816
+          },
+          "archive_sha256": "bec6ef0b0f8bb221dd6a121b70913e03ba596b8d6bd1f8a9c20969c2b75af0a4",
+          "log_sha256": "2221c055c649e822aa1ca2b173eab7cdb6ca57377417e9768b4b2ab2b5c16e37"
+        },
+        {
+          "repeat": 2,
+          "construction_seconds": 102.29636783408932,
+          "cli_wall_seconds": 103.64440291700885,
+          "initialization_seconds_rounded": 0.5,
+          "stages_seconds": {
+            "all_pairs_limber_spectra": 16.10916408407502,
+            "gaussian_and_mean": 12.33288129104767,
+            "shared_halo_tables": 73.35384225007147,
+            "joint_ssc_and_connected": 0.2915359999751672,
+            "localization": 0.20864416705444455,
+            "total": 102.29636783408932
+          },
+          "archive_sha256": "225df87a6dae15ef41198a55a5bf7d23fb0cf0ec9057497184b959911722a063",
+          "log_sha256": "f9db85afbcddda61c5b4a8dcd73bd3e1d4c6535a2defab9580a82989b1d2669f"
+        },
+        {
+          "repeat": 3,
+          "construction_seconds": 103.24400937499013,
+          "cli_wall_seconds": 104.61403508391231,
+          "initialization_seconds_rounded": 0.51,
+          "stages_seconds": {
+            "all_pairs_limber_spectra": 16.506222833064385,
+            "gaussian_and_mean": 12.129056832985952,
+            "shared_halo_tables": 74.11673112493008,
+            "joint_ssc_and_connected": 0.2850048749241978,
+            "localization": 0.20665820792783052,
+            "total": 103.24400937499013
+          },
+          "archive_sha256": "3b052dcb6b066c56135931f200d9c603cb6d09a325d642011c6330ed06458057",
+          "log_sha256": "0da6d773af2d90ab2a3d4633ceb5ec3cdad9887cc794d6ea8de51f6080690f80"
+        }
+      ],
+      "validation": {
+        "shape": [
+          2812,
+          2812
+        ],
+        "tested_shape": [
+          2764,
+          2764
+        ],
+        "space": "real",
+        "component_sha256": {
+          "gaussian": "a638b35d708c00d20ff2c78a61771ba14847dc09ddd8c1979f81c2ee4d56cfe1",
+          "ssc": "9672274da8fc1c8d7ac92f893d2a9226f667b7e6dc83669da75b36b881483603",
+          "cng": "80fe017f09652647bdfddadb32bb09cec7b48fac8bcccd7fab4a373b674c4692",
+          "total": "5493cdfa177ac8c73c9188e08eb22212be337655280939cf84912a354e8df092"
+        },
+        "identical_repetitions": 3,
+        "finite_and_exactly_symmetric": true,
+        "total_component_sum_scaled_residual": 0.0,
+        "total_cholesky_positive_definite": true,
+        "minimum_correlation_eigenvalue": 1.7820514057130825e-05
+      }
+    }
+  },
+  "command_template": "python projects/PROJECT/covariance/compute_covariance.py projects/PROJECT/EXAMPLE_EVALUATE_COVARIANCE.yaml --output NEW_OUTPUT.npz"
+}

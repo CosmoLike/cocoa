@@ -785,6 +785,17 @@ porting precedent any WHM work would build on.
 
 # Closed tickets
 
+## 2026-10-07 — Covariance CLI timings with dense power tables
+
+Refreshed the main README from 21 fresh sequential production CLI runs:
+three per project, eight OpenMP threads, global 11,993-node power tables.
+The [timing record](covariance_timings_20261007.json) preserves individual
+measurements, sample scatter, source revisions and input/library hashes.
+All G, SSC, cNG and total components repeat bitwise; component sums are
+exact and totals pass Cholesky checks. DES cluster retains its 2,812-entry
+archive and is positive on its documented 2,764-entry valid subspace.
+These saved-run checks do not replace accuracy-convergence studies.
+
 ## 2026-10-03 — Retired production scalar SIMD switches
 
 Removed `COSMO2D_NOT_USE_SIMD`, `HALO_NOT_USE_SIMD`, and the covariance
