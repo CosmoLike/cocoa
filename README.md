@@ -1253,12 +1253,13 @@ key skips it. The defaults enable LSST Y1, DES × Planck and Roman real.
      (...)
      export ROMAN_REAL_URL="https://github.com/CosmoLike/cocoa_roman_real.git"
      export ROMAN_REAL_NAME="roman_real"
-     export ROMAN_REAL_GIT_TAG="v5.05"
+     export ROMAN_REAL_GIT_TAG="v5.06"
 
 Each released project is pinned to a tag. To select another revision, set
 only one of its `GIT_COMMIT`, `GIT_BRANCH` or `GIT_TAG` keys: a commit takes
 precedence over a branch, and a branch over a tag. DES Y6 is disabled by
-default and has no tagged release; enabling it follows its `main` branch.
+default and not production ready; its key block pins a tag like the
+released projects.
 
 The [DES Y6 project](https://github.com/CosmoLike/cocoa_des_y6) provides
 data-vector notebooks, tests and a covariance forecast CLI. Its active

@@ -100,9 +100,9 @@ Cocoa's `set_installation_options.sh` shell script includes instructions to inst
      (...)
      export ROMAN_REAL_URL="https://github.com/CosmoLike/cocoa_roman_real.git"
      export ROMAN_REAL_NAME="roman_real"
-     export ROMAN_REAL_GIT_TAG="v5.05"
+     export ROMAN_REAL_GIT_TAG="v5.06"
 
-Each released project is pinned to a tag. To select another revision, set only one of its `GIT_COMMIT`, `GIT_BRANCH` or `GIT_TAG` keys: a commit takes precedence over a branch, and a branch over a tag; with none set, Cocoa clones the repository's default branch. DES Y6 has no tagged release, so its `DES_Y6_GIT_BRANCH` key follows the branch `main`.
+Each released project is pinned to a tag. To select another revision, set only one of its `GIT_COMMIT`, `GIT_BRANCH` or `GIT_TAG` keys: a commit takes precedence over a branch, and a branch over a tag; with none set, Cocoa clones the repository's default branch. DES Y6 is disabled by default and not production ready; its key block pins a tag like the released projects.
 
 > [!NOTE]
 > The script `setup_cosmolike_projects.sh` also honors the key below. If it is set, Cocoa deletes and clones again any existing project folder (dangerous: possible loss of uncommitted work). If it is unset, users must manually delete a cosmolike project folder to force Cocoa to download it again.
