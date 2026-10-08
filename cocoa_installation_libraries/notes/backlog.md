@@ -42,6 +42,8 @@ features, Low bugs, Low features.
 - OPEN **MEDIUM** **NEW FUNCTIONALITY** — [Rewrite analytic covariances in an isolated module](#open-covariance-rewrite)
 
 
+- CLOSED **MEDIUM** **NEW FUNCTIONALITY** — [Modernize the DES Y6 project](#closed-des-y6-modernization)
+
 ### Low
 
 - OPEN **LOW** **NEW FUNCTIONALITY** — [IA x higher-order-bias (gb2) cross terms in cfastpt](#open-cfastpt-gb2-ia-bias)
@@ -49,6 +51,36 @@ features, Low bugs, Low features.
 - OPEN **LOW** **NEW FUNCTIONALITY** — [Finish the Compton-y port (C_gy, C_ys, C_ky, C_yy)](#open-compton-y-port)
 - OPEN **LOW** **NEW FUNCTIONALITY** — [Web-halo model (WHM, arXiv:2508.10902) for nonlinear P(k)](#open-web-halo-model)
 - OPEN **LOW** **NEW FUNCTIONALITY** — [Vectorization study for halo.c (SIMDe, SLEEF)](#open-halo-vectorization)
+
+<a id="closed-des-y6-modernization"></a>
+## Modernize the DES Y6 project
+
+**Ticket type: NEW FUNCTIONALITY. Severity: MEDIUM. CLOSED (2026-10-07).**
+
+Bring the project interface, optional covariance CLI and notebook, data-vector
+notebooks, tests and documentation into line with DES Y3 and LSST Y1. Preserve
+DES Y6 input files, six lens bins, four source bins and the active 26-angle
+layout. The active likelihood uses dummy data; its separate 1690-entry
+covariance does not match that 1300-entry layout and must not be activated
+without a verified ordering and compatible data vector.
+
+Completed the current-core interface and likelihood port, optional covariance
+CLI, three notebooks, stored-input NLA/TATT regressions, cache and probe-selection
+checks, input-index validation, documentation and installation covariance flag.
+All 27 tests passed. Enabled, disabled and debug builds were checked; all four
+NLA/TATT vectors agree bitwise across modes. The full 1300-entry G/SSC/cNG/total
+arrays agree bitwise between CLI and notebook routes. Total covariance is positive
+before and after the 541-entry selection. Doubling the non-Limber cutoff and
+distance-grid intervals changes the largest generalized Gaussian variance mode
+by 0.00553% in real space and 0.00527% in Fourier space. This is not a full
+quadrature, interpolation or Fisher convergence certificate.
+
+The three executed notebooks contain 12 embedded figures, including separated
+halo trispectra. Original survey inputs and nuisance priors remain unchanged.
+The production module stays enabled locally; disabled/debug checks used isolated
+build directories. Validation records are in the project's tests/validation/
+folder and the external des_y6_validation/20261007/ run directory. The
+1690-versus-1300 observational-data mismatch remains an explicit data limitation.
 
 <a id="open-covariance-nonlimber"></a>
 ## Covariance-owned all-pairs non-Limber spectra
