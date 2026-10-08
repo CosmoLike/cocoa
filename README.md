@@ -58,8 +58,8 @@ We provide the Docker image [whovian-cocoa](https://hub.docker.com/r/vivianmiran
 > overhead. Both routes call the same C kernels.
 >
 > In a matched **LSST Y1 covariance** test on an M2 Pro with eight threads,
-> the CLI averaged **50.23 s** (three runs); one wrapper run took **173.38 s**.
-> The CLI was **3.45× faster**, with bitwise-identical covariance components.
+> the CLI averaged **30.37 s** (three runs); one wrapper run took **150.58 s**.
+> The CLI was **4.96× faster**, with bitwise-identical covariance components.
 > The timing comparisons below use the optimized production interfaces.
 
 > [!NOTE]
@@ -102,7 +102,7 @@ We provide the Docker image [whovian-cocoa](https://hub.docker.com/r/vivianmiran
 > for users who want to double-check or challenge these results.
 
 > [!NOTE]
-> **Covariance forecasts — production CLI** (2026-10-07).
+> **Covariance forecasts — production CLI** (2026-10-08).
 > CPU: **Apple M2 Pro**, macOS 13.7.5, **8 OpenMP threads**.
 >
 > CoCoA computes real- and Fourier-space galaxy-clustering and weak-lensing
@@ -117,13 +117,13 @@ We provide the Docker image [whovian-cocoa](https://hub.docker.com/r/vivianmiran
 >
 > | Project | Space | Matrix before scale cuts | G + SSC + cNG construction |
 > |---|---|---:|---:|
-> | [LSST Y1](https://github.com/CosmoLike/cocoa_lsst_y1#computing_covariances) | Real | 1,560 × 1,560 | 53.4 s |
-> | [Roman real](https://github.com/CosmoLike/cocoa_roman_real#computing_covariances) | Real | 2,115 × 2,115 | 58.7 s |
-> | [Roman Fourier](https://github.com/CosmoLike/cocoa_roman_fourier#computing_covariances) | Fourier | 1,485 × 1,485 | 27.5 s |
-> | [Roman KL](https://github.com/CosmoLike/cocoa_roman_kl#computing_covariances) | Fourier | 2,200 × 2,200 | 35.3 s |
-> | [DES Y3](https://github.com/CosmoLike/cocoa_des_y3#computing_covariances) | Real | 900 × 900 | 50.8 s |
-> | [DES × Planck (galaxy/shear)](https://github.com/CosmoLike/cocoa_desy1xplanck#computing_covariances) | Real | 1,500 × 1,500 | 52.3 s |
-> | [DES cluster 6×2pt + N](https://github.com/CosmoLike/cocoa_des_cluster#computing_covariances) | Real (Limber) | 2,812 × 2,812 | 100.9 s |
+> | [LSST Y1](https://github.com/CosmoLike/cocoa_lsst_y1#computing_covariances) | Real | 1,560 × 1,560 | 30.4 s |
+> | [Roman real](https://github.com/CosmoLike/cocoa_roman_real#computing_covariances) | Real | 2,115 × 2,115 | 35.2 s |
+> | [Roman Fourier](https://github.com/CosmoLike/cocoa_roman_fourier#computing_covariances) | Fourier | 1,485 × 1,485 | 14.5 s |
+> | [Roman KL](https://github.com/CosmoLike/cocoa_roman_kl#computing_covariances) | Fourier | 2,200 × 2,200 | 22.8 s |
+> | [DES Y3](https://github.com/CosmoLike/cocoa_des_y3#computing_covariances) | Real | 900 × 900 | 26.7 s |
+> | [DES × Planck (galaxy/shear)](https://github.com/CosmoLike/cocoa_desy1xplanck#computing_covariances) | Real | 1,500 × 1,500 | 29.1 s |
+> | [DES cluster 6×2pt + N](https://github.com/CosmoLike/cocoa_des_cluster#computing_covariances) | Real (Limber) | 2,812 × 2,812 | 63.8 s |
 >
 > These are mean **CLI** construction times from three sequential runs of
 > each supplied evaluate YAML. Project links above explain the model,
