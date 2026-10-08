@@ -42,55 +42,67 @@ The `projects` folder includes all the projects linked to Cosmolike; they can al
     |    +-- interface
     |    |   +-- MakefileCosmolike
     |    |   +-- cosmolike_lsst_y1_interface.py
+    |    |   +-- cosmolike_lsst_y1_notebook_wrappers.py
     |    |   +-- interface.cpp
+    |    +-- covariance
+    |    |   +-- compute_covariance.py
+    |    |   +-- lsst_y1_covariance.py
+    |    |   +-- default.yaml
+    |    |   +-- README.md
     |    +-- tests
-    |    |   +-- test_example1.py
+    |    |   +-- data_vector
+    |    |   |   +-- test_example1.py
+    |    |   +-- covariance
     |    |   +-- cocoa_test_utils.py
     |    |   +-- generate_frozen_reference.py
     |    |   +-- frozen
     |    |   +-- README.md
     |    +-- emulators
     |    +-- EXAMPLE_EVALUATE1.yaml
+    |    +-- EXAMPLE_EVALUATE1.ipynb
     |    +-- EXAMPLE_MCMC1.yaml
 
 > [!Note]
-> The `tests` folder holds the project's pytest unit-test suite. The tests compare the likelihoods against SHA-256-pinned references stored in `tests/frozen`, so they detect unintended changes to the code, the data files, or the environment. Each project's `tests/README.md` documents its tests and how to run them.
+> The `tests` folder holds the project's pytest unit tests in two folders. The tests in `tests/data_vector/` compare the likelihoods against SHA-256-pinned references stored in `tests/frozen`, so they detect unintended changes to the code, the data files, or the environment. The tests in `tests/covariance/` check the covariance calculation and need the optional covariance build. Each project's `tests/README.md` documents both and how to run them.
 
 > [!Note]
 > Projects should be hosted on independent GitHub repositories. By convention, the Cosmolike Organization adds the prefix `cocoa_` to all Cobaya-Cosmolike projects. For instance, the repository `cocoa_XXX` targets project `XXX`. 
+
+The projects below are registered in `set_installation_options.sh`. Each one ships data-vector notebooks and `EXAMPLE_EVALUATE_COVARIANCE.ipynb`, which needs the optional covariance build. The notebook in the last column applies the baryonic-feedback models of the `bfmt` theory block to the project's data vector and compares each model with the feedback-free prediction. It needs `bfmt` and its emulators: keep `IGNORE_BFMT_CODE`, `IGNORE_PYSPK_CODE`, `IGNORE_BCEMU_CODE`, `IGNORE_FBRE_CODE` and `IGNORE_BACCOEMU_CODE` commented in `set_installation_options.sh` (their default).
+
+| Project | Installed by default | Notebook with the `bfmt` feedback study |
+|---|---|---|
+| [lsst_y1](https://github.com/CosmoLike/cocoa_lsst_y1) | yes | `EXAMPLE_EVALUATE3.ipynb` |
+| [desy1xplanck](https://github.com/CosmoLike/cocoa_desy1xplanck) | yes | `EXAMPLE_EVALUATE1.ipynb` |
+| [roman_real](https://github.com/CosmoLike/cocoa_roman_real) | yes | `EXAMPLE_EVALUATE3.ipynb` |
+| [des_y3](https://github.com/CosmoLike/cocoa_des_y3) | no | `EXAMPLE_EVALUATE2.ipynb` |
+| [roman_fourier](https://github.com/CosmoLike/cocoa_roman_fourier) | no | `notebooks/RomanFourierDataVector.ipynb` |
+| [roman_kl](https://github.com/CosmoLike/cocoa_roman_kl) | no | `EXAMPLE_EVALUATE1.ipynb` |
+| [des_cluster](https://github.com/CosmoLike/cocoa_des_cluster) | no (not production ready) | `EXAMPLE_EVALUATE2.ipynb` |
+| [des_y6](https://github.com/CosmoLike/cocoa_des_y6) | no (not production ready) | `EXAMPLE_EVALUATE1.ipynb` |
 
 ## :interrobang: FAQ: How do we download and run Cosmolike projects? <a name="appendix_projects_download_run_cosmolike"></a> 
 
 ### Part I: Projects already set in the config file <a name="appendix_projects_download_setconfig"></a> 
 
-Cocoa's `set_installation_options.sh` shell script includes instructions to install several Cosmolike projects. To activate a project, keep its `IGNORE_COSMOLIKE_XXX_CODE` key commented (uncommenting the key tells Cocoa to skip the project).
+Cocoa's `set_installation_options.sh` shell script includes instructions to install several Cosmolike projects. To activate a project, keep its `IGNORE_COSMOLIKE_XXX_CODE` key commented (uncommenting the key tells Cocoa to skip the project). The defaults enable LSST Y1, DES × Planck and Roman real.
 
      [Adapted from Cocoa/set_installation_options.sh shell script]
-
-     # ------------------------------------------------------------------------------
-     # The keys below control which cosmolike projects will be installed and compiled
-     # ------------------------------------------------------------------------------
      #export IGNORE_COSMOLIKE_LSST_Y1_CODE=1
-     #export IGNORE_COSMOLIKE_DES_Y3_CODE=1
+     export IGNORE_COSMOLIKE_DES_Y3_CODE=1
      #export IGNORE_COSMOLIKE_DESXPLANCK_CODE=1
-     #export IGNORE_COSMOLIKE_ROMAN_FOURIER_CODE=1
+     export IGNORE_COSMOLIKE_ROMAN_FOURIER_CODE=1
      #export IGNORE_COSMOLIKE_ROMAN_REAL_CODE=1
-     #export IGNORE_COSMOLIKE_ROMAN_KL_CODE=1
-     export IGNORE_COSMOLIKE_DES_CLUSTER_CODE=1 # skipped by default
-     export IGNORE_COSMOLIKE_DES_Y6_CODE=1      # skipped by default
-     (...)
-     # ------------------------------------------------------------------------------
-     # Cosmolike projects below -----------------------------------------------------
-     # ------------------------------------------------------------------------------
+     export IGNORE_COSMOLIKE_ROMAN_KL_CODE=1
+     export IGNORE_COSMOLIKE_DES_CLUSTER_CODE=1
+     # WARNING: des_y6 is not production ready.
+     export IGNORE_COSMOLIKE_DES_Y6_CODE=1
      (...)
      export ROMAN_REAL_URL="https://github.com/CosmoLike/cocoa_roman_real.git"
      export ROMAN_REAL_NAME="roman_real"
-     #Pin the project version with at most one of the keys below (COMMIT, BRANCH, or TAG).
-     #If more than one is set, COMMIT wins over BRANCH, and BRANCH wins over TAG.
-     #If none is set, Cocoa loads the latest commit on the repository default branch.
-     #export ROMAN_REAL_GIT_BRANCH="main"
-     #export ROMAN_REAL_GIT_COMMIT="abc"
-     export ROMAN_REAL_GIT_TAG="v4.10.8"
+     export ROMAN_REAL_GIT_TAG="v5.05"
+
+Each released project is pinned to a tag. To select another revision, set only one of its `GIT_COMMIT`, `GIT_BRANCH` or `GIT_TAG` keys: a commit takes precedence over a branch, and a branch over a tag; with none set, Cocoa clones the repository's default branch. DES Y6 has no tagged release, so its `DES_Y6_GIT_BRANCH` key follows the branch `main`.
 
 > [!NOTE]
 > The script `setup_cosmolike_projects.sh` also honors the key below. If it is set, Cocoa deletes and clones again any existing project folder (dangerous: possible loss of uncommitted work). If it is unset, users must manually delete a cosmolike project folder to force Cocoa to download it again.
@@ -113,7 +125,7 @@ In case users only want to compile a single cosmolike project (let's say the `ro
 
 ### Part II: New Projects <a name="appendix_projects_download_new"></a> 
 
-Below, we provide instructions on how to download and install cosmolike projects that have not been previously configured on `set_installation_options.sh` shell script.
+The steps below download and install a cosmolike project that the `set_installation_options.sh` shell script does not configure.
 
 **Step :one:**: Activate conda environment and go to the projects folder (`Cocoa/projects`)
     
@@ -166,31 +178,25 @@ If users want to make a particular Cosmolike project widely available in Cocoa, 
 **Step :one:**: Add the following env keys on `set_installation_options.sh`
 
     [adapted from Cocoa/set_installation_options.sh shell script]
-    
-    # ------------------------------------------------------------------------------
-    # The keys below control which cosmolike projects will be installed and compiled
-    # ------------------------------------------------------------------------------
     (...)
     #export IGNORE_COSMOLIKE_XXX_CODE=1
     (...)
-    # ------------------------------------------------------------------------------
-    # Cosmolike projects below -----------------------------------------------------
-    # ------------------------------------------------------------------------------
+    export IGNORE_COSMOLIKE_XXX_COVARIANCE=1
     (...)
     export XXX_URL="https://github.com/.../cocoa_XXX.git"
     export XXX_NAME="XXX"
-    #Pin the project version with at most one of the keys below (COMMIT, BRANCH, or TAG).
-    #If more than one is set, COMMIT wins over BRANCH, and BRANCH wins over TAG.
-    #If none is set, Cocoa loads the latest commit on the repository default branch.
     #export XXX_GIT_BRANCH="main"
     #export XXX_GIT_COMMIT="abc"
     #export XXX_GIT_TAG="v4.0"
+
+Set at most one of the three pin keys; the precedence rule of [Part I](#appendix_projects_download_setconfig) applies. The `IGNORE_COSMOLIKE_XXX_COVARIANCE` key matters only when the project's `interface/MakefileCosmolike` reads it, as the LSST Y1 one does: it keeps covariance generation out of the default build.
 
 **Step :two:**: Add all new defined environment keys to `flags_impl_unset_keys.sh` 
     
     [adapted from Cocoa/installation_scripts/flags_impl_unset_keys.sh]
     unset -v XXX_URL XXX_NAME IGNORE_COSMOLIKE_XXX_CODE
     unset -v XXX_GIT_BRANCH XXX_GIT_COMMIT XXX_GIT_TAG
+    unset -v IGNORE_COSMOLIKE_XXX_COVARIANCE
 
 This will ensure the bash script `stop_cocoa.sh` unsets these keys before unloading Cocoa's `(.local)` environment. Failing to do so will pollute your bash environment.
 
@@ -324,15 +330,15 @@ The CosmoLike pipeline requires $\Omega_m$ and $\Omega_b$ to be provided, but th
             latex: \Omega_\mathrm{m} h^2
 
 > [!Warning]
->Adopting $\big(\Omega_m,\Omega_b\big)$ as main MCMC parameters can create a silent bug in Cobaya. We are unsure if this problem persists in newer Cobaya versions; therefore, users are advised to follow our instructions. The problem occurs when the option `drop: true` is absent in $\big(\Omega_m,\Omega_b\big)$ parameters, and there are no expressions that define the derived $\big(\Omega_c h^2, \Omega_b h^2\big)$ quantities. The bug is silent because the MCMC runs without any warnings, but the CAMB Boltzmann code does not update the cosmological parameters at every MCMC iteration. As a result, the posteriors are flawed, but they may seem reasonable to those unfamiliar with the issue. 
+>Adopting $\big(\Omega_m,\Omega_b\big)$ as main MCMC parameters can create a silent bug in Cobaya. It is not known whether this problem persists in newer Cobaya versions, so follow the parameterization above. The problem occurs when the option `drop: true` is absent in $\big(\Omega_m,\Omega_b\big)$ parameters, and there are no expressions that define the derived $\big(\Omega_c h^2, \Omega_b h^2\big)$ quantities. The bug is silent because the MCMC runs without any warnings, but the CAMB Boltzmann code does not update the cosmological parameters at every MCMC iteration. As a result, the posteriors are flawed, but they may seem reasonable to those unfamiliar with the issue.
 
 ## :interrobang: FAQ: How do we set Slow/Fast decomposition with Cosmolike?  <a name="manual_blocking_cosmolike"></a>
 
 Cosmolike can't cache the intermediate products associated with the previous two evaluations, which are necessary to exploit Cobaya optimizations associated with dragging (`drag: True`). Still, it can cache the last evaluation, allowing the user to take advantage of a slow/fast decomposition of parameters in Cobaya's main Markov Chain Monte Carlo (MCMC) sampler. 
 
-Cobaya cannot automatically handle parameters with different speed hierarchies associated with the same likelihood. Luckily, we can manually impose a speed hierarchy in Cobaya using the `blocking:` option in the YAML file. The main limitation of this method is that parameters of all adopted likelihoods, not only the ones required by Cosmolike, must be manually specified.
+Cobaya cannot automatically handle parameters with different speed hierarchies associated with the same likelihood. A speed hierarchy can be imposed manually in Cobaya with the `blocking:` option in the YAML file. The main limitation of this method is that parameters of all adopted likelihoods, not only the ones required by Cosmolike, must be manually specified.
 
-Below, we provide an example YAML configuration for an MCMC chain with the DES-Y3 cosmic shear likelihood.
+Below is an example YAML configuration for an MCMC chain with the DES-Y3 cosmic shear likelihood.
 
         [adapted from Cocoa/projects/des_y3/EXAMPLE_MCMC1.yaml]
         likelihood: 
@@ -430,14 +436,15 @@ and
 > The script also deletes the data-vector emulators (`emulators/` folder) and the `EXAMPLE_EMUL_*` examples that load them, since they were trained on LSST-Y1 data vectors and are untransferable. The hybrid `EXAMPLE_EMUL2_*` examples emulate only Boltzmann outputs, so they are kept and renamed.
 
 > [!Note]
-> The script renames the project inside the unit-test suite (`tests/*.py` and `tests/README.md`) and deletes the suite's frozen references (`tests/frozen`, `tests/manifest_sha256.json`, and the measured figures): they are SHA-256-pinned snapshots and measurements of LSST-Y1 data, so they do not transfer. The tests refuse to run until the references are regenerated. Once the new survey's data files are in place, regenerate them with
+> The script renames the project inside the top-level test files (`tests/*.py` and `tests/README.md`) and deletes their frozen references (`tests/frozen`, `tests/manifest_sha256.json`, and the measured figures): they are SHA-256-pinned snapshots and measurements of LSST-Y1 data, so they do not transfer. The tests refuse to run until the references are regenerated. Once the new survey's data files are in place, regenerate them with
 >
 >     python ./projects/xxx/tests/generate_frozen_reference.py --overwrite
+>     python ./projects/xxx/tests/generate_frozen_reference.py --baryons
 >
-> and review the printed chi2 values before committing (they become the new references). Afterwards, prune the LSST-specific entries the rename cannot translate — for example, the `M2`-`M6` scale-cut datasets listed in `tests/cocoa_test_utils.py` — and re-measure the tables and figures reported in `tests/README.md`.
+> and review the printed chi2 values before committing (they become the new references); the second command writes the baryonic-feedback vectors that the first does not. Afterwards, prune the LSST-specific entries the rename cannot translate — for example, the `M2`-`M6` scale-cut datasets listed in `tests/cocoa_test_utils.py` — and re-measure the tables and figures reported in `tests/data_vector/README.md`.
 
 > [!Note]
-> The script also renames the survey parameter prefix in the header line of the `EXAMPLE_MCMC*.covmat` proposal covariances and the Git LFS pattern in `.gitattributes`, and it replaces the top-level `README.md` — which documents the old survey's releases and pinned keys — with a stub for the new project to fill in. After a run, `grep -rli "lsst" .` and `find . -iname "*lsst*"` inside the new project both return nothing.
+> The script also renames the survey parameter prefix in the header line of the `EXAMPLE_MCMC*.covmat` proposal covariances and the Git LFS pattern in `.gitattributes`, and it replaces the top-level `README.md` — which documents the old survey's releases and pinned keys — with a stub for the new project to fill in. It does not process the `covariance/` folder or the `tests/data_vector/` and `tests/covariance/` folders: after a run, `grep -rli "lsst" .` and `find . -iname "*lsst*"` inside the new project still list files there. Rename them as in the hard way below ([covariance folder](#appendix_projects_new_hard_covariance) and [tests folder](#appendix_projects_new_hard_tests)) and remove the `__pycache__` folders the script leaves at the top level and in `covariance/`, `tests/data_vector/` and `tests/covariance/` (see the [final cleanup](#appendix_projects_new_hard_cleanup)); the [final check](#appendix_projects_new_hard_check) then returns nothing.
 
  **Step 4:** Reload the cocoa environment `(.local)`
 
@@ -514,6 +521,9 @@ Users can also use the following command to perform the required substitutions.
 
     cd "${ROOTDIR:?}"/projects/xxx/interface/
     sed --in-place --regexp-extended "s@lsst_y1@xxx@g" MakefileCosmolike
+    sed --in-place --regexp-extended "s@LSST_Y1@XXX@g" MakefileCosmolike
+
+The second command renames the covariance build key, `IGNORE_COSMOLIKE_LSST_Y1_COVARIANCE` becoming `IGNORE_COSMOLIKE_XXX_COVARIANCE`.
     
 **Step 2:** Change the name of the file `cosmolike_lsst_y1_interface.py` using the command below
        
@@ -552,6 +562,13 @@ Users can also use the following command to perform the required substitutions.
     cd "${ROOTDIR:?}"/projects/xxx/interface/
     sed --in-place --regexp-extended "s@lsst_y1@xxx@g" interface.cpp
     sed --in-place --regexp-extended "s@LSST-Y1@XXX@g" interface.cpp
+
+**Step 5** Rename the notebook wrappers module, which the example notebooks import, and the project and parameter names inside it
+
+    cd "${ROOTDIR:?}"/projects/xxx/interface/
+    mv cosmolike_lsst_y1_notebook_wrappers.py cosmolike_xxx_notebook_wrappers.py
+    sed --in-place --regexp-extended "s@lsst_y1@xxx@g" cosmolike_xxx_notebook_wrappers.py
+    sed --in-place --regexp-extended "s@LSST@XXX@g" cosmolike_xxx_notebook_wrappers.py
     
 ### Changes in the `Cocoa/projects/xxx/scripts` folder
 
@@ -612,7 +629,7 @@ Users can also use the following command to perform the required substitutions.
     survey = "XXX"   #add this line - note here XXX is capitalized
 
 > [!Tip]
-> If the project name `xxx` contains more than the experiment name (e.g., the release year), we suggest assigned `survey` to just the experiment name. For example, if `XXX = DES_Y3`, then assigned `survey = "DES"`.
+> If the project name `xxx` contains more than the experiment name (e.g., the release year), assign `survey` just the experiment name. For example, if `XXX = DES_Y3`, assign `survey = "DES"`.
 >
 
 Users can perform the required replacements by running the following commands.
@@ -705,7 +722,7 @@ The `.dataset` file references the covariance, mask, n(z), and data vector files
 >     lsst_y1_M[2-6]_GGL0.05.dataset
 >     lsst_y1_M[2-6]_GGLOLAP0.05.mask
 >
-> We recommend that users delete these files, as they will not be applicable in the new projects. The same goes for data vectors, covariances, and n(z) files.
+> Delete these files: they do not apply to the new project. The same goes for data vectors, covariances, and n(z) files.
 
 **Step 2:** Update `xxx_yyy.dataset` file with the names of the new data vector, covariance, n(z), binning, mask...
 
@@ -784,16 +801,34 @@ Finally, users can perform the required replacements by running the following co
 
 The third file is the top-level `README.md`: it documents the old survey (releases, pinned installation keys, data provenance), so none of it transfers. Replace it with the new project's own documentation rather than renaming it.
 
-### Changes in the `Cocoa/projects/xxx/tests` folder
+### Changes in the `Cocoa/projects/xxx/covariance` folder <a name="appendix_projects_new_hard_covariance"></a>
 
-The unit-test suite carries the project name in imports, likelihood references, and parameter prefixes, and it compares the likelihoods against frozen, SHA-256-pinned references of LSST-Y1 data (`frozen/`, `manifest_sha256.json`) and figures measured on them.
+The covariance folder holds the survey module `lsst_y1_covariance.py`, the command-line runner `compute_covariance.py` that imports it, the accuracy baseline `default.yaml`, and a README.
 
-**Step 1:** Rename the project inside the test code and the test README by running the commands below.
+**Step 1:** Rename the survey module and the project names inside the folder by running the commands below.
 
-    cd "${ROOTDIR:?}"/projects/xxx/tests/
-    for f in *.py README.md; do
+    cd "${ROOTDIR:?}"/projects/xxx/covariance/
+    mv lsst_y1_covariance.py xxx_covariance.py
+    for f in *.py *.yaml README.md; do
+        sed --in-place --regexp-extended "s@LSST_Y1@XXX@g" "${f}"
         sed --in-place --regexp-extended "s@lsst_y1@xxx@g" "${f}"
         sed --in-place --regexp-extended "s@LSST@XXX@g" "${f}"
+    done
+
+**Step 2:** Replace the LSST Y1 survey numbers in `xxx_covariance.py` (survey area, galaxy densities, shape noise, galaxy bias and the forecast cosmology) with the new survey's values, and rewrite `README.md` for the new survey.
+
+### Changes in the `Cocoa/projects/xxx/tests` folder <a name="appendix_projects_new_hard_tests"></a>
+
+The unit tests carry the project name in imports, likelihood references, and parameter prefixes, and they compare the likelihoods against frozen, SHA-256-pinned references of LSST-Y1 data (`frozen/`, `manifest_sha256.json`) and figures measured on them.
+
+**Step 1:** Rename the project inside the test code and the test READMEs, including the `data_vector/` and `covariance/` folders, by running the commands below.
+
+    cd "${ROOTDIR:?}"/projects/xxx/tests/
+    for f in *.py README.md data_vector/*.py data_vector/README.md covariance/*.py covariance/README.md; do
+        sed --in-place --regexp-extended "s@LSST_Y1@XXX@g" "${f}"
+        sed --in-place --regexp-extended "s@lsst_y1@xxx@g" "${f}"
+        sed --in-place --regexp-extended "s@LSST@XXX@g" "${f}"
+        sed --in-place --regexp-extended "s@lsst@xxx@g" "${f}"
     done
 
 **Step 2:** Delete the frozen references and the measured figures; they are pinned snapshots and measurements of LSST-Y1 data, so they do not transfer to the new survey (and the tests refuse to run against a broken pin).
@@ -802,17 +837,21 @@ The unit-test suite carries the project name in imports, likelihood references, 
     rm -rf "${PRJ:?}"/tests/frozen
     rm -f "${PRJ:?}"/tests/manifest_sha256.json "${PRJ:?}"/tests/*.png
     rm -rf "${PRJ:?}"/tests/__pycache__
+    rm -rf "${PRJ:?}"/tests/data_vector/__pycache__ "${PRJ:?}"/tests/covariance/__pycache__
 
 **Step 3:** Once the new survey's data files are in place, regenerate the frozen references with the command below (from the `Cocoa/` folder, cocoa environment active, `start_cocoa.sh` sourced), and review the printed chi2 values before committing: they become the new references the tests compare against.
 
     python ./projects/xxx/tests/generate_frozen_reference.py --overwrite
+    python ./projects/xxx/tests/generate_frozen_reference.py --baryons
 
-**Step 4:** Prune the LSST-specific entries the rename cannot translate — for example, the `M2`-`M6` scale-cut datasets listed in `tests/cocoa_test_utils.py` — and re-measure the tables and figures reported in `tests/README.md`. Then verify that no references to the old project remain; the command below must return nothing.
+The second command writes the baryonic-feedback vectors of `test_baryons.py`, which the first does not.
+
+**Step 4:** Prune the LSST-specific entries the rename cannot translate — for example, the `M2`-`M6` scale-cut datasets listed in `tests/cocoa_test_utils.py` — and re-measure the tables and figures reported in `tests/data_vector/README.md`. Then verify that no references to the old project remain; the command below must return nothing.
 
     cd "${ROOTDIR:?}"/projects/xxx/tests/
     grep -rni "lsst" . --include='*.py' --include='*.md'
 
-### Final cleanup
+### Final cleanup <a name="appendix_projects_new_hard_cleanup"></a>
 
 The data-vector emulators stored on `projects/xxx/emulators`, and the `EXAMPLE_EMUL_*` examples that load them (note the single `EMUL`: these are not the hybrid `EMUL2` examples), are untransferable: they were trained on LSST-Y1 data vectors, so users will need to delete them and train new emulators from scratch for the new survey. Delete them, alongside the donor's chains, compiled interface objects, stale caches, and LSST-specific dev files.
 
@@ -829,8 +868,9 @@ The data-vector emulators stored on `projects/xxx/emulators`, and the `EXAMPLE_E
     rm -f "${PRJ:?}"/chains/*.input.yaml "${PRJ:?}"/chains/*.updated.yaml
     rm -rf "${PRJ:?}"/scripts/random_scripts_used_by_dev
     rm -rf "${PRJ:?}"/interface/__pycache__ "${PRJ:?}"/likelihood/__pycache__
+    rm -rf "${PRJ:?}"/covariance/__pycache__ "${PRJ:?}"/__pycache__
 
-### Final check
+### Final check <a name="appendix_projects_new_hard_check"></a>
 
 After all substitutions, verify that no references to the old project remain. Both commands below must return nothing (existing projects have been bitten by leftovers, e.g., `filename_baryon_pca` options pointing to another project's folder; the exhaustive scan is what catches the covmat headers, `.gitattributes`, and README of the previous steps).
 

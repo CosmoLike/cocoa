@@ -4,7 +4,7 @@ This folder contains the example YAML files used throughout [Cocoa's main README
 which also provides the appropriate `mpirun` commands to run them. The table below lists, for each
 example, the datasets (likelihoods) it runs and the theory code that computes the observables:
 `CAMB`, `CLASS`, `EMUL` (Cocoa's neural-network emulators), or `EMUL2` (hybrid emulator, which
-emulates only the Boltzmann outputs). This folder currently has no `EMUL2` examples; for those,
+emulates only the Boltzmann outputs). This folder has no `EMUL2` examples; for those,
 see the Cosmolike project READMEs (e.g., `projects/lsst_y1` and `projects/des_y3`).
 
 | Example | Datasets | Theory |
@@ -33,6 +33,20 @@ see the Cosmolike project READMEs (e.g., `projects/lsst_y1` and `projects/des_y3
 | [EXAMPLE_EMUL_MCMC3.yaml](EXAMPLE_EMUL_MCMC3.yaml) | Planck 2018 TTTEEE (Plik-lite); Planck 2018 low-ℓ TT and EE (SRoll2); DES-Y5 SNe; DESI DR2 BAO; ACT DR6 lensing | EMUL |
 | [EXAMPLE_EMUL_POLY1.yaml](EXAMPLE_EMUL_POLY1.yaml) | Planck 2018 TTTEEE (Plik-lite); Planck 2018 low-ℓ TT and EE (SRoll2); DES-Y5 SNe; DESI DR2 BAO; ACT DR6 lensing | EMUL |
 
-The Python scripts in this folder (`EXAMPLE_MINIMIZE1.py`, `EXAMPLE_PROFILE1.py`, and the
-`EXAMPLE_EMUL_*.py` Emcee/Nautilus/Minimize/Profile/Scan examples) are documented in the
-main README; the plain scripts use `CAMB`, and the `EMUL_` scripts use Cocoa's emulators.
+The emulator scripts in this folder (`EXAMPLE_EMUL_EMCEE1.py`, `EXAMPLE_EMUL_NAUTILUS1.py`,
+`EXAMPLE_EMUL_MINIMIZE1.py`, `EXAMPLE_EMUL_PROFILE1.py`, `EXAMPLE_EMUL_PROFILE_SCIPY1.py` and
+`EXAMPLE_EMUL_SCAN1.py`) are documented in the main README. `EXAMPLE_MINIMIZE1.py` and
+`EXAMPLE_PROFILE1.py` are their `CAMB` counterparts, documented in their own module docstrings
+(model, options and output files). `EXAMPLE_MIN_COMPARE_CONV.py` plots how the minimum of
+`EXAMPLE_EMUL_MINIMIZE1.py` converges with its budget.
+
+The subfolders hold:
+
+- `EXAMPLE_EMUL_MCMC_TENSION_METRICS/`: the emulator MCMC YAMLs of the tension study (CMB and
+  BAO at its top level; one subfolder per supernova compilation, `DESY5/`, `PANTHEON/`,
+  `PANTHEONPLUS/` and `UNION3/`, combining that compilation with CMB and BAO or using it alone),
+  the `run_all_chains.sh` launcher, and `EXAMPLE_TENSION_METRICS.ipynb`, the notebook the main
+  README's tension example draws on;
+- `scripts/`: SLURM job scripts (`*.sbatch`) and the plotting scripts of the example chains,
+  minima and profiles;
+- `data/`: a placeholder for data files; this project ships none.
