@@ -129,8 +129,15 @@ We provide the Docker image [whovian-cocoa](https://hub.docker.com/r/vivianmiran
 > each supplied evaluate YAML. Project links above explain the model,
 > timing scope, command-line examples, notebooks and accuracy comparisons.
 >
-> Detailed code comparisons between CoCoA and OneCovariance are available
-> in the [OneCov-benchmark study](https://github.com/vivianmiranda/OneCov-benchmark-).
+> Detailed code comparisons of these covariances — complete source-bin
+> pilot matrices, component-by-component accuracy and execution times —
+> are available against OneCovariance in the
+> [OneCov-benchmark study](https://github.com/vivianmiranda/OneCov-benchmark-)
+> and against TJPCov with CCL halo ingredients in the
+> [TJPCov-benchmark study](https://github.com/vivianmiranda/tjcovbenchmark).
+> The real-space 3x2pt **data vectors** are separately compared against
+> DESC-CCL in the [CCL-benchmark study](https://github.com/vivianmiranda/CCL-benchmark),
+> cited with its timing table above.
 >
 > The project notebooks include saved covariance and **1h, 2h, 3h and 4h
 > matter trispectrum plots**, visible directly on GitHub.
