@@ -174,7 +174,7 @@ Core packages include compilers and numerical libraries that users typically do 
 
     - Testing beta release
 
-          wget https://raw.githubusercontent.com/CosmoLike/cocoa/refs/tags/v5.07/cocoapy311.yml
+          wget https://raw.githubusercontent.com/CosmoLike/cocoa/refs/tags/v5.08/cocoapy311.yml
 
   - macOS (arm)
     
@@ -199,7 +199,7 @@ Core packages include compilers and numerical libraries that users typically do 
 
     - Testing beta release
 
-          wget https://raw.githubusercontent.com/CosmoLike/cocoa/refs/tags/v5.07/cocoapy311-osxarm-base.yml
+          wget https://raw.githubusercontent.com/CosmoLike/cocoa/refs/tags/v5.08/cocoapy311-osxarm-base.yml
 
 **Step :two:**: Create the Cocoa environment (if the Deprecated or Legacy version was chosen in the previous step, replace `cocoapy311` with `cocoapy310` below),
 
@@ -276,7 +276,7 @@ In this section, we assume users have previously activated the Cocoa conda envir
 
   - Testing beta release
   
-        git clone https://github.com/CosmoLike/cocoa.git --branch v5.07 cocoa
+        git clone https://github.com/CosmoLike/cocoa.git --branch v5.08 cocoa
 
 > [!Warning]
 > The version cloned here must match the version of the `yml` file downloaded in the section
@@ -1001,15 +1001,15 @@ and
  
      conda activate lockenv
 
-**Step :two:** Download the appropriate conda-lock compatible `yml` file. As in the section [Installation of core packages](#required_packages_conda), replace the tag `v5.07` in the URL with the Cocoa version that will be cloned (tags older than `v4.11.4` carry the `cocoapy310` prefix).
+**Step :two:** Download the appropriate conda-lock compatible `yml` file. As in the section [Installation of core packages](#required_packages_conda), replace the tag `v5.08` in the URL with the Cocoa version that will be cloned (tags older than `v4.11.4` carry the `cocoapy310` prefix).
 
    - Linux
   
-         wget https://raw.githubusercontent.com/CosmoLike/cocoa/refs/tags/v5.07/cocoapy311-linux.yml
+         wget https://raw.githubusercontent.com/CosmoLike/cocoa/refs/tags/v5.08/cocoapy311-linux.yml
 
    - macOS (arm)
      
-         wget https://raw.githubusercontent.com/CosmoLike/cocoa/refs/tags/v5.07/cocoapy311-osxarm.yml
+         wget https://raw.githubusercontent.com/CosmoLike/cocoa/refs/tags/v5.08/cocoapy311-osxarm.yml
 
 **Step :three:** Create the conda environment
 
@@ -1037,13 +1037,13 @@ and
 
      conda activate base2
 
-**Step :two:** Now install wget and download a looser version of the yml file (note here slightly modified conda command). As in the section [Installation of core packages](#required_packages_conda), replace the tag `v5.07` in the URL with the Cocoa version that will be cloned (tags older than `v4.11.4` carry the `cocoapy310` prefix).
+**Step :two:** Now install wget and download a looser version of the yml file (note here slightly modified conda command). As in the section [Installation of core packages](#required_packages_conda), replace the tag `v5.08` in the URL with the Cocoa version that will be cloned (tags older than `v4.11.4` carry the `cocoapy310` prefix).
 
      conda install -y wget --solver=libmamba --strict-channel-priority --override-channels -c conda-forge
 
 and
 
-     wget https://raw.githubusercontent.com/CosmoLike/cocoa/refs/tags/v5.07/cocoapy311-osxarm-loose.yml
+     wget https://raw.githubusercontent.com/CosmoLike/cocoa/refs/tags/v5.08/cocoapy311-osxarm-loose.yml
 
 **Step :three:** Create the cocoa conda env using a looser yml (note here slightly modified conda command)
 
@@ -1450,7 +1450,7 @@ This is a large image, approximately 13GB, as it already contains the conda coco
 >
 > and
 >
->     docker build . --build-arg COCOA_TAG=v5.07 -t vivianmiranda/whovian-cocoa # replace the tag with the Cocoa version whose yml seeds the conda env
+>     docker build . --build-arg COCOA_TAG=v5.08 -t vivianmiranda/whovian-cocoa # replace the tag with the Cocoa version whose yml seeds the conda env
 >
 > and
 >
@@ -1586,7 +1586,7 @@ There are a few differences users should be aware of when running Cocoa on Googl
           source "/content/conda/etc/profile.d/conda.sh"
           conda create -y -n lockenv -c conda-forge python=3.10 conda-lock=2.* wget
           conda activate lockenv
-          wget https://raw.githubusercontent.com/CosmoLike/cocoa/refs/tags/v5.07/cocoapy311-linux.yml
+          wget https://raw.githubusercontent.com/CosmoLike/cocoa/refs/tags/v5.08/cocoapy311-linux.yml
           conda-lock install -n cocoa cocoapy311-linux.yml
           conda activate cocoa 
           ln -s "${CONDA_PREFIX}"/bin/x86_64-conda-linux-gnu-gcc "${CONDA_PREFIX}"/bin/gcc
@@ -1601,7 +1601,7 @@ There are a few differences users should be aware of when running Cocoa on Googl
           %%bash
           source "/content/conda/etc/profile.d/conda.sh"
           conda activate cocoa                                  
-          git clone https://github.com/CosmoLike/cocoa.git --branch v5.07 cocoa # replace the tag with the Cocoa version being installed (it must match the yml downloaded on Cell 3)
+          git clone https://github.com/CosmoLike/cocoa.git --branch v5.08 cocoa # replace the tag with the Cocoa version being installed (it must match the yml downloaded on Cell 3)
 
     - **Cell 5️⃣**: run `setup_cocoa.sh`
 
