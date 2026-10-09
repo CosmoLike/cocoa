@@ -1312,6 +1312,21 @@ and
 >
 >     #export OVERWRITE_EXISTING_COSMOLIKE_CODE=1 # dangerous (possible loss of uncommitted work)
 
+> [!TIP]
+> **A stale project folder causes compile errors for files the pinned tag contains**, for example `compile_des_y6.sh: No such file or directory` or a `DIR DOES NOT EXIST` message naming a folder the tag ships. The no-overwrite protection above keeps the local clone at whatever revision was downloaded first, so moving a pin (or a project gaining new scripts) does not refresh an existing folder. Refresh the one affected project without touching the others (below, the `des_y6` project), from the Cocoa main folder `cocoa/Cocoa` with `(.local)` active:
+>
+>     rm -rf ./projects/des_y6
+>
+> and
+>
+>     source ./installation_scripts/setup_cosmolike_projects.sh
+>
+> and
+>
+>     source ./projects/des_y6/scripts/compile_des_y6.sh
+>
+> The `OVERWRITE_EXISTING_COSMOLIKE_CODE=1` key also fixes this, but it re-downloads **every** enabled project folder and loses uncommitted work in all of them.
+
 In case users only want to compile a single Cosmolike project (let's say the `roman_real` project)
 
       source ./projects/roman_real/scripts/compile_roman_real.sh
