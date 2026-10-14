@@ -25,7 +25,6 @@
     1. [FAQ: How can users debug Cocoa Installation? Suggested steps](#running_wrong)
     2. [FAQ: How can users compile a single external module (not involving Cosmolike)?](#appendix_compile_separately)
     3. [FAQ: How can users install Cosmolike projects?](#appendix_compile_cosmolike_separately)
-    4. [FAQ: How can users test Cosmolike projects?](#appendix_test_cosmolike_projects)
     4. [FAQ: How can users run Cocoa with Docker?](#appendix_jupyter_whovian)
     6. [FAQ: How can users set the appropriate environment for ML?](#ml_emulators)
 12. [Advanced Appendices](#appendix_additional)
@@ -34,8 +33,6 @@
     3. [FAQ: Where do users find common FAQs about Cosmolike? (external readme)](Cocoa/projects/)
     4. [FAQ: Note on Planck-2018 low-ell SimAll EE and Gibbs TT likelihoods?](#planck2018lowell)
     5. [FAQ: How can users deal with pip getting stuck during installation (Linux): a possible cause](#pip_ngc_nvidia)
-    6. [FAQ: How can users run Cocoa on Google Colab?](#overview_google_colab)
-    7. [FAQ: How can developers improve their Bash/C/C++ knowledge?](#lectnotes)
 
 # Overview <a name="overview"></a>
 
@@ -49,33 +46,15 @@ This Readme file presents basic and advanced instructions for installing all [Co
 
 We provide the Docker image [whovian-cocoa](https://hub.docker.com/r/vivianmiranda/whovian-cocoa) to facilitate the installation of Cocoa on Windows. 
 
-> [!WARNING]
-> **CLI for production; notebook wrappers for exploration.**
->
-> Run production and HPC calculations from YAML through the optimized
-> `_interface` bindings. Notebook `_wrapper` APIs expose intermediate
-> quantities for exploration; copying and rearranging their arrays adds
-> overhead. Both routes call the same C kernels.
->
-> In a matched **LSST Y1 covariance** test on an M2 Pro with eight threads,
-> the CLI averaged **29.45 s** (three runs); one wrapper run took **94.61 s**.
-> The CLI was **3.21× faster**, with bitwise-identical covariance components.
-> The timing comparisons below use the optimized production interfaces.
-
 > [!NOTE]
 > **Real-space 3x2pt timings with accuracy-tested sampling** (2026-10-02).
 > CPU: **Apple M2 Pro**, macOS 13.7.5, **8 OpenMP threads**.
 >
-> The previous Intel/default-setting timings did not fully account for a
-> common numerical-convergence target of $`\Delta\chi^2 < 0.2`$. Here
+> The timings account for the numerical-convergence target of $`\Delta\chi^2 < 0.2`$. Here
 > $`\Delta\chi^2 = (d_{\rm fine}-d_{\rm base})^T C^{-1}(d_{\rm fine}-d_{\rm base})`$
-> compares two accuracy settings **within one code**, using the survey mask
-> and covariance. It does not require the two codes to agree to that level.
-> For example, DESC-CCL's default sampling differs from the study's reference
-> sampling by $`\Delta\chi^2 = 0.345`$ for LSST-Y1; the reference versus finer
-> sampling gives 0.0014. CoCoA's default versus higher accuracy gives
-> 0.004–0.008 across the two surveys and NLA/TATT cases.
+> compares two accuracy settings **within one code**.
 >
+> > 
 > | Case | CoCoA (s) | DESC-CCL (s) | DESC-CCL / CoCoA |
 > |---|---:|---:|---:|
 > | LSST-Y1, NLA | 0.0459 | 10.450 | 228 |
@@ -87,29 +66,18 @@ We provide the Docker image [whovian-cocoa](https://hub.docker.com/r/vivianmiran
 > warm-up calls, cycling through five cosmologies. CAMB is excluded from
 > both timings: CoCoA times its likelihood; DESC-CCL times its data-vector
 > script from the supplied CAMB tables, subtracting table-read time.
-> Both use full-sky, bin-averaged transforms. **In the older benchmark,
-> DESC-CCL used Limber for $`\gamma_t`$, while CoCoA included non-Limber
-> $`C_{gs}`$.** In the reference configuration timed above, DESC-CCL also
-> enables FKEM for $`C_{gs}`$ below $`\ell = 150`$. Both codes include
-> non-Limber galaxy clustering in these reference runs.
-> DESC-CCL uses the study's reference sampling and PR #1296 build; these
-> measurements are specific to these configurations, not all CCL releases
-> or survey likelihoods.
->
-> The [CCL-benchmark study](https://github.com/vivianmiranda/CCL-benchmark)
-> provides the accuracy checks, modeling differences, reproduction scripts,
-> and [saved timing log](https://github.com/vivianmiranda/CCL-benchmark/blob/main/cocoa_comparison/timing_macos.txt)
-> for users who want to double-check or challenge these results.
+> Both use full-sky, bin-averaged transforms. DESC-CCL uses the study's
+> reference sampling and PR #1296 build. The [CCL-benchmark study](https://github.com/vivianmiranda/CCL-benchmark)
+> provides the accuracy checks.
 
 > [!NOTE]
-> **Covariance forecasts — production CLI** (2026-10-09).
-> CPU: **Apple M2 Pro**, macOS 13.7.5, **8 OpenMP threads**.
+> **Covariance forecasts (2026-10-09**). CPU: **Apple M2Pro**, **8 OpenMP threads**.
 >
-> CoCoA computes real- and Fourier-space galaxy-clustering and weak-lensing
-> covariances, plus joint cluster **6×2pt + counts** covariances. Outputs
-> separate **Gaussian (G)**, **super-sample (SSC)**, **connected non-Gaussian
-> (cNG)** and total contributions.
->
+> **CLI for production; wrappers for exploration.** Run production through the optimized `_interface`
+> bindings. The notebook `_wrapper` APIs expose intermediate quantities for exploration but adds overhead.
+> In a matched **LSST Y1 covariance**, the CLI averaged **29.45 s**; one wrapper run took **94.61 s**, with bitwise-identical results.
+> The timings below use the optimized CLI interfaces.
+> 
 > The galaxy/shear examples include **non-Limber clustering and galaxy–shear
 > spectra in the Gaussian covariance**. The joint DES cluster example remains
 > Limber. Real-space transforms are full-sky and bin-averaged, retaining the
@@ -125,51 +93,24 @@ We provide the Docker image [whovian-cocoa](https://hub.docker.com/r/vivianmiran
 > | [DES × Planck (galaxy/shear)](https://github.com/CosmoLike/cocoa_desy1xplanck#computing_covariances) | Real | 1,500 × 1,500 | 28.7 s |
 > | [DES cluster 6×2pt + N](https://github.com/CosmoLike/cocoa_des_cluster#computing_covariances) | Real (Limber) | 2,812 × 2,812 | 63.3 s |
 >
-> These are mean **CLI** construction times from three sequential runs of
-> each supplied evaluate YAML. Project links above explain the model,
-> timing scope, command-line examples, notebooks and accuracy comparisons.
->
-> Detailed code comparisons of these covariances — complete source-bin
-> pilot matrices, component-by-component accuracy and execution times —
-> are available against OneCovariance in the
-> [OneCov-benchmark study](https://github.com/vivianmiranda/OneCov-benchmark-)
-> and against TJPCov with CCL halo ingredients in the
-> [TJPCov-benchmark study](https://github.com/vivianmiranda/tjcovbenchmark).
+> These are construction times from three sequential runs of
+> each supplied evaluate YAML. Project links provides further explanations. Detailed code comparisons
+> are available in [OneCov-benchmark study](https://github.com/vivianmiranda/OneCov-benchmark-)
+> and [TJPCov-benchmark study](https://github.com/vivianmiranda/tjcovbenchmark).
 > The real-space 3x2pt **data vectors** are separately compared against
-> DESC-CCL in the [CCL-benchmark study](https://github.com/vivianmiranda/CCL-benchmark),
-> cited with its timing table above.
->
-> The project notebooks include saved covariance and **1h, 2h, 3h and 4h
-> matter trispectrum plots**, visible directly on GitHub.
->
-> Covariance generation is excluded from the default build: enable the
-> project's covariance option and recompile as described in its guide.
-> Likelihood use of a supplied covariance remains available in
-> data-vector-only builds.
+> DESC-CCL in the [CCL-benchmark study](https://github.com/vivianmiranda/CCL-benchmark).
 
 # Installation of core packages <a name="required_packages_conda"></a>
 
 Core packages include compilers and numerical libraries that users typically do not modify.
 
-
 **Step :zero:** All the commands in this README assume a Bash shell. If your terminal is using zsh, switch to Bash now by typing
-
 
     bash
 
 **Step :one:**: Choose the Cocoa version to be installed, and download the corresponding `yml` file
 
-> [!Warning]
-> The version chosen here must be the same Cocoa version (git tag) cloned later in the section
-> [Installation and Compilation of external modules](#cobaya_base_code); the options below mirror
-> the versions offered there. From `v4.11.4` on, the `yml` files are named `cocoapy311-*` and
-> provide `Python-3.11`; older tags carry `cocoapy310-*` files that provide `Python-3.10`.
-
   - Linux
-
-    - Deprecated Version
-
-          wget https://raw.githubusercontent.com/CosmoLike/cocoa/refs/tags/v4.053/cocoapy310.yml
 
     - Legacy Version
 
@@ -191,10 +132,6 @@ Core packages include compilers and numerical libraries that users typically do 
         conda install -y wget
 
     Then, download the `yml` file matching the chosen version.
-
-    - Deprecated Version
-
-          wget https://raw.githubusercontent.com/CosmoLike/cocoa/refs/tags/v4.053/cocoapy310-osxarm-base.yml
 
     - Legacy Version
 
@@ -245,9 +182,6 @@ and activate it
 Users can now proceed to the **next section**.
 
 > [!TIP]
-> We advise users to avoid repositories managed by `Anaconda` due to licensing restrictions. See the Appendix [FAQ: How can we install Conda?](#overview_miniforge)
-
-> [!TIP]
 > If conda create hangs or fails, there are two possible solutions.
 >
 > 1. Install mamba and redo the creation of the cocoa env, explicitly selecting mamba as the dependency solver (e.g., Linux version)
@@ -259,19 +193,11 @@ Users can now proceed to the **next section**.
 >
 > 2. If the hang happens at the `Installing pip dependencies` step, see the appendix [FAQ: How can users deal with pip getting stuck during installation (Linux): a possible cause](#pip_ngc_nvidia).
 
-> [!TIP]
-> During the Arizona Winter School (January 2026), we noted that some students with macOS struggled to get the conda to work (conflicts). 
-> If this is the case for you, try the steps in the appendix [FAQ: How can users deal with Conda conflicts (MacOS): a possible solution](#macos_solve_conda_conficts)
-
 # Installation and Compilation of external modules <a name="cobaya_base_code"></a>
 
 In this section, we assume users have previously activated the Cocoa conda environment.
 
 **Step :one:**: Download Cocoa's latest release and go to its main folder (`cocoa/Cocoa`),
-  
-  - Deprecated Version
-    
-        git clone https://github.com/CosmoLike/cocoa.git --branch v4.053 cocoa
     
   - Legacy Version
     
@@ -297,7 +223,6 @@ and
 
     source setup_cocoa.sh
 
-
 This script downloads and decompresses external modules, which require internet access (on an HPC, this typically means running `setup_cocoa.sh` on the login node).
 
 Cocoa does not install all the available external modules by default. If the user needs additional packages, please refer to the appendix [FAQ: How can users compile external modules?](#appendix_compile_separately).
@@ -306,18 +231,8 @@ Cocoa does not install all the available external modules by default. If the use
 
     source compile_cocoa.sh
     
-This script compiles external modules selected for installation on `set_installation_options.sh` (e.g., CAMB) and does not require internet access. Code compilation is CPU-intensive; therefore, running  `compile_cocoa.sh` on a cluster login node may violate HPC policy. Users should then run `setup_cocoa.sh` in a login node and `compile_cocoa.sh` on an interactive compute node.
-
-> [!Warning]
-> CosmoLike supports the optimized strict-IEEE default build and
-> `COSMOLIKE_DEBUG_MODE`. The compiler mode `COSMOLIKE_AGGRESSIVE_MODE`
-> is retired because its fast-math configuration produced incorrect
-> covariance inverses. Unset that variable before compiling.
-> Do not enable `-ffast-math`, `-Ofast`, `-funsafe-math-optimizations`,
-> `-fassociative-math`, `-ffinite-math-only`, `-freciprocal-math`,
-> `-fno-signed-zeros`, or `-fno-trapping-math` in CosmoLike builds.
-> The installation script's separate `--aggressive` download option below
-> is unchanged.
+This script compiles external modules selected for installation on `set_installation_options.sh` (e.g., CAMB) and does not require internet access. 
+Code compilation is CPU-intensive; therefore, running  `compile_cocoa.sh` on a cluster login node may violate HPC policy. 
 
 Users can now proceed to **the next section**.
 
@@ -352,7 +267,8 @@ We assume that users are still in the Conda cocoa environment from the previous 
 Users will see a terminal like this: `$(cocoa)(.local)`. *This is a feature, not a bug*!
 
 > [!NOTE]
-> *This is a feature, not a bug*! Why did we choose to work with two distinct shell environments, `(cocoa)` and `(.local)`? Our scripts enable users to work on multiple Cocoa instances, similar to what was possible with [CosmoMC](https://github.com/cmbant/CosmoMC). In each instance, our scripts install packages at
+> *This is a feature, not a bug*! Why did we choose to work with two distinct shell environments, `(cocoa)` and `(.local)`? Our scripts enable users to work on multiple Cocoa instances.
+> In each instance, our scripts install packages at
 >
 >      Cocoa/.local/bin
 >      Cocoa/.local/include
@@ -448,9 +364,6 @@ Cocoa provides several Cosmolike projects, not all of which are installed by def
         mpirun -n 4 --oversubscribe \
           cobaya-run ./projects/lsst_y1/EXAMPLE_MCMC1.yaml -f
 
-> [!TIP]
-> Each Cosmolike project ships unit tests under its `tests/` folder. To run them after an installation or a code change, see the appendix [FAQ: How can users test Cosmolike projects?](#appendix_test_cosmolike_projects).
-
 ### Running Jupyter Notebooks
 
 Assuming Cocoa is installed on a local (not remote!) machine, type the command below after step 2️⃣ to run Jupyter Notebooks.
@@ -471,7 +384,6 @@ Assuming Cocoa is installed on a local (not remote!) machine, type the command b
 
  The project `lsst-y1` contains Jupyter notebook examples located at `projects/lsst_y1`.
 
-
 # Running ML emulators <a name="cobaya_base_code_examples_emul"></a>
 
 Cocoa contains a few transformer- and CNN-based neural network emulators capable of simulating the CMB, cosmolike outputs, matter power spectrum, and distances. We provide a few scripts that exemplify their API. To run them, users ensure the following lines are commented out in `set_installation_options.sh` before running the `setup_cocoa.sh` and `compile_cocoa.sh`. *By default, these lines should be commented out, but it is worth checking*.
@@ -488,9 +400,6 @@ Cocoa contains a few transformer- and CNN-based neural network emulators capable
       #export IGNORE_POLYCHORD_SAMPLER_CODE=1    # to run PROJECTS/EXAMPLE/EXAMPLE_EMUL_POLY1.yaml
       #export IGNORE_GETDIST_CODE=1              # to run EXAMPLE_TENSION_METRICS.ipynb
       #export IGNORE_TENSIOMETER_CODE=1          # to run EXAMPLE_TENSION_METRICS.ipynb
-          
-> [!TIP]
-> We provide a few SLURM job script examples in the `projects/example/script` folder that help users to run the examples below on an HPC system.
 
 Now, users must follow all the steps below.
 
@@ -987,9 +896,6 @@ and
           && conda config --set channel_priority strict \
           && conda init bash
 
-> [!Note]
-> The strict use of Miniforge and conda-forge packages appears to mitigate the significant licensing issue involving Anaconda packages and academic/research institutions.
-
 **Step :three:**: After running this command, you will see a message in the terminal that ends with the statement *For changes to take effect, close and re-open your current shell*. Then, type
 
     source ~/.bashrc
@@ -1338,50 +1244,6 @@ In case users only want to compile a single Cosmolike project (let's say the `ro
 
       source ./projects/roman_real/scripts/compile_roman_real.sh
      
-## :interrobang: FAQ: How can users test Cosmolike projects? <a name="appendix_test_cosmolike_projects"></a>
-
-Every Cosmolike project separates its tests into `tests/data_vector/` and
-`tests/covariance/`. Most likelihood users need the data-vector tests, which
-include the following checks:
-
-- $\chi^2$: the $\chi^2$ of each likelihood at a fixed reference point must stay within 0.2 of the value stored in `tests/frozen/reference_chi2.json`; a moved value means code or data changed the numbers.
-- race condition: the same point is evaluated on its own and then again after nine other cosmologies, with the test modules forcing `OMP_NUM_THREADS=4` internally; the two $\chi^2$ values must agree to $10^{-4}$. Leftover internal state or colliding OpenMP threads break the agreement.
-- accuracy (`test_accuracy.py`; advisory, no pass/fail): the numerical settings are raised one accuracy parameter at a time, then all at once. Each check prints the $\Delta\chi^2$ between the high-accuracy and the default evaluations: the numerical error of the default settings.
-
-To run the tests of a project, follow the steps below.
-
-**Step :one:**: from the Cocoa main folder `cocoa/Cocoa`, activate the Conda cocoa environment and source `start_cocoa.sh`
-
-     conda activate cocoa
-
-and
-
-     source start_cocoa.sh
-
-**Step :two:**: run the tests of a project (below, the `lsst_y1` project)
-
-     python -m pytest ./projects/lsst_y1/tests/data_vector
-
-> [!NOTE]
-> `--ignore ./projects/lsst_y1/tests/data_vector/test_accuracy.py`: skip the accuracy checks, whose high-accuracy evaluations take minutes each. The remaining tests take a few minutes.
-
-To check covariance generation separately, enable the project's covariance
-build option, recompile, and run:
-
-     python -m pytest ./projects/lsst_y1/tests/covariance
-
-The project's [test guide](https://github.com/CosmoLike/cocoa_lsst_y1/tree/main/tests)
-describes the checks and their requirements.
-
-The tests' own snapshot under `tests/frozen/` holds the cobaya configurations fully expanded (every option and every parameter written out, so editing the likelihood default yaml files cannot change what the tests evaluate), the tests' own copy of the data files, and synthetic data vectors generated at the reference point, so each $\chi^2$ sits at its minimum. The file `tests/manifest_sha256.json` stores a SHA-256 hash of every file of the snapshot, and each test refuses to run when one was edited. Users can therefore change the live data and examples freely without breaking the tests.
-
-Maintainers redefine the snapshot after a deliberate change to the data files, examples, or likelihood defaults:
-
-     python ./projects/lsst_y1/tests/generate_frozen_reference.py --overwrite
-
-> [!NOTE]
-> `--overwrite`: delete the existing `frozen/` folder, rebuild it from the current project, and rewrite the manifest (the script refuses to run without this flag). Review the printed reference $\chi^2$ values before committing: they define what every later test run compares against.
-
 ## :interrobang: FAQ: How can users run Cocoa with Docker? <a name="appendix_jupyter_whovian"></a>
 
 We provide the Docker image [whovian-cocoa](https://hub.docker.com/r/vivianmiranda/whovian-cocoa) to facilitate installing Cocoa on Windows and macOS. This appendix assumes that users have already installed the Docker Engine on their local PC. For instructions on installing the Docker engine on specific operating systems, refer to [Docker's official documentation](https://docs.docker.com/engine/install/). 
@@ -1551,162 +1413,3 @@ On some machines, the step `Installing pip dependencies` hangs (mamba shows repe
 **Step :four:**: In case the interrupted installation already finished the conda stage, rerun only the pip stage
 
     conda env update --name cocoa --file=cocoapy311.yml
-
-## :interrobang: FAQ: How can users run Cocoa on Google Colab? <a name="overview_google_colab"></a>
-
-[Google Colab](https://colab.research.google.com/) provides a convenient platform for users to run MCMCs, likelihood minimizations, and profiles, as long as Machine-Learning Emulators are used to compute the data vectors. In the repository [CoCoAGoogleColabExamples](https://github.com/CosmoLike/CoCoAGoogleColabExamples), we provide a few examples along with explanatory notes. 
-
-Installing Cocoa requires time and also strains our limited Git-LFS quota, which is especially relevant given that **the entire local drive is wiped when a Colab notebook is disconnected**. To prevent this problem, we provide instructions for saving and loading Cocoa immediately after the initial installation. 
-
-There are a few differences users should be aware of when running Cocoa on Google Colab.
-
-  - Running Colab Notebook for the first time
-
-    - **Cell :one:**: Connect the notebook to your Google Drive account (will be important later)
-
-          from google.colab import drive
-          drive.mount('/content/drive')
-
-    Below, we provide instructions on how to install Cocoa. *Google Colab does provide direct terminal access if users prefer to follow the standard installation procedure*
-    
-    - **Cell 2️⃣**: Install Miniforge (Similar to our documentation in section [FAQ: How can users install Conda?](#overview_miniforge))
-
-          %%bash
-          export CONDA_DIR="/content/conda"
-          mkdir "${CONDA_DIR:?}"
-          curl -L -O "https://github.com/conda-forge/miniforge/releases/latest/download/Miniforge3-$(uname)-$(uname -m).sh"
-          /bin/bash Miniforge3-$(uname)-$(uname -m).sh -f -b -p "${CONDA_DIR:?}"
-          /bin/bash
-          source $CONDA_DIR/etc/profile.d/conda.sh \
-                && conda config --set auto_update_conda false \
-                && conda config --set show_channel_urls true \
-                && conda config --set auto_activate_base false \
-                && conda config --prepend channels conda-forge \
-                && conda config --add allowlist_channels conda-forge \
-                && conda config --set channel_priority strict \
-                && conda init bash
-          source ~/.bashrc
-
-    - **Cell 3️⃣**: Install Conda cocoa env (similar to our documentation in section [Installation of core packages](#required_packages_conda))
-
-          %%bash
-          source "/content/conda/etc/profile.d/conda.sh"
-          conda create -y -n lockenv -c conda-forge python=3.10 conda-lock=2.* wget
-          conda activate lockenv
-          wget https://raw.githubusercontent.com/CosmoLike/cocoa/refs/tags/v5.08/cocoapy311-linux.yml
-          conda-lock install -n cocoa cocoapy311-linux.yml
-          conda activate cocoa 
-          ln -s "${CONDA_PREFIX}"/bin/x86_64-conda-linux-gnu-gcc "${CONDA_PREFIX}"/bin/gcc
-          ln -s "${CONDA_PREFIX}"/bin/x86_64-conda-linux-gnu-g++ "${CONDA_PREFIX}"/bin/g++
-          ln -s "${CONDA_PREFIX}"/bin/x86_64-conda-linux-gnu-gfortran "${CONDA_PREFIX}"/bin/gfortran
-          ln -s "${CONDA_PREFIX}"/bin/x86_64-conda-linux-gnu-gcc-ar "${CONDA_PREFIX}"/bin/gcc-ar
-          ln -s "${CONDA_PREFIX}"/bin/x86_64-conda-linux-gnu-gcc-ranlib "${CONDA_PREFIX}"/bin/gcc-ranlib
-          git-lfs install
-
-    - **Cell 4️⃣**: Clone CoCoA (similar to our documentation in section [Installation and Compilation of external modules](#cobaya_base_code))
-
-          %%bash
-          source "/content/conda/etc/profile.d/conda.sh"
-          conda activate cocoa                                  
-          git clone https://github.com/CosmoLike/cocoa.git --branch v5.08 cocoa # replace the tag with the Cocoa version being installed (it must match the yml downloaded on Cell 3)
-
-    - **Cell 5️⃣**: run `setup_cocoa.sh`
-
-           %%bash
-           source "/content/conda/etc/profile.d/conda.sh" 
-           conda activate cocoa
-           cd ./cocoa/Cocoa/
-           source setup_cocoa.sh
-
-    - **Cell 6️⃣**: run `compile_cocoa.sh`
-
-          %%bash
-          source "/content/conda/etc/profile.d/conda.sh"
-          conda activate cocoa
-          cd ./cocoa/Cocoa/
-          source compile_cocoa.sh
-
-    - **Cell 7️⃣**: Save Cocoa on Drive (does not work with local runtime)
-
-          %%bash
-          DEST="/content/drive/MyDrive/ColabBackups"
-          ARCHIVE="$DEST/colab_basic_cocoa.tar.gz"
-          if [[ -f "$ARCHIVE" ]]; then
-            echo "Backup already exists: $ARCHIVE — skipping."
-            exit 0
-          fi
-          mkdir -p "$DEST"
-          tar -czf "$DEST/colab_basic_cocoa.tar.gz" \
-            --exclude='/content/drive' \
-            --exclude='**/__pycache__' \
-            --exclude='**/.ipynb_checkpoints' \
-            /content
-          echo "Created: $ARCHIVE"
-
-  - Running Colab Notebook with Cocoa pre-installed, loaded from Drive (does not work with local runtime)
-
-    - **Cell :one:**: Connect the notebook to your Google Drive account
-
-          from google.colab import drive
-          drive.mount('/content/drive')
-
-    - **Cell 2️⃣**: Load Cocoa from Drive
-
-          %%bash
-          DEST="/content/drive/MyDrive/ColabBackups"
-          ARCHIVE="$DEST/colab_basic_cocoa.tar.gz"
-          SENTINEL="/content/conda/etc/profile.d/conda.sh"  # exists when your env is restored
-          if [[ -e "$SENTINEL" ]]; then
-            echo "Found $SENTINEL — environment already restored. Skipping untar."
-            exit 0
-          fi
-          test -f "$ARCHIVE"
-          tar -xzf "$ARCHIVE" -C /
-
-> [!Note]
-> From now on, users must start every subsequent shell with 
->
->        %%bash
->        source "/content/conda/etc/profile.d/conda.sh"
->        conda activate cocoa
->        cd ./cocoa/Cocoa/
->        source start_cocoa.sh
-
-
-- Saving/Loading checkpoints
-
-  Not reserving time to copy the `/content` folder to the user's Google Drive —an expensive operation —can result in up to 24 hours of lost computation. To prevent such a catastrophe, the code below creates and loads *checkpoints* that users can add after computationally intensive cells.
-
-  *This solution is not valid when running Colab with local runtime* (see [Google documentation](https://research.google.com/colaboratory/local-runtimes.html) for additional information on how to link notebooks to local resources). The good news here is that local storage is persistent, so there is no need to create backups on Google Drive.
-  
-  - Saving checkpoints: compress and copy the `/content` folder from the local disk to the user's Drive
-
-        %%bash
-        ROOT="colab_name_notebook"
-        DEST="/content/drive/MyDrive/ColabBackups"
-        mkdir -p "$DEST"
-        ARCHIVE="$DEST/${ROOT}_$(date +%F_%H-%M).tar.gz"
-        tar -czf "$ARCHIVE" \
-            --exclude='/content/drive' \
-            --exclude='**/__pycache__' \
-            --exclude='**/.ipynb_checkpoints' \
-            /content
-        echo "Created: $ARCHIVE"
-
-  - Loading checkpoints: decompress and copy the `/content` folder from the user's Drive to the local disk
-
-        %%bash
-        SENTINEL="/content/conda/etc/profile.d/conda.sh"  # exists when your env is restored
-        if [[ -e "$SENTINEL" ]]; then
-          echo "Found $SENTINEL — environment already restored. Skipping untar."
-          exit 0
-        fi
-        ARCHIVE="CHECKPOINT_FILE" # replace this string!
-        test -f "$ARCHIVE"
-        tar -xzf "$ARCHIVE" -C /
-
-## :interrobang: FAQ: How can developers improve their Bash/C/C++ knowledge? <a name="lectnotes"></a>
-
-A working knowledge of Python is required to understand the Cobaya framework at the developer level. Users must also be familiar with the Bash language to understand Cocoa's scripts. Proficiency in C and C++ is also needed to manipulate Cosmolike and the C++ Cobaya-Cosmolike C++ interface. Finally, users need to understand the Fortran-2003 language to modify CAMB.
-
-Learning all these languages can be overwhelming, so to enable new users to do research that demands modifications on the inner workings of these codes, we include [here](cocoa_installation_libraries/LectNotes.pdf) a link to approximately 600 slides that provide an overview of Bash (slides ~1-137), C (slides ~138-371), and C++ (slides ~372-599). In the future, we aim to add lectures about Python and Fortran. 
