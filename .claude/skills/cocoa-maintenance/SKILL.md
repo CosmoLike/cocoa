@@ -555,6 +555,10 @@ shape, the main README wins.
   with the Linux-only `export CUDA_VISIBLE_DEVICES=""`, then the launch.
   Keep these settings visible even when an earlier evaluation example
   already sets them. A summary linking to a guide needs no setup flow.
+- Separate environment setup from execution in test and study guides too.
+  Do not prefix `python`, `pytest` or MPI launches with inline OpenMP/BLAS
+  assignments. A custom-output example changes only the run command;
+  it reuses the preceding Linux/macOS setup step.
 - Table rows are atomic: one item per row (one test, one knob, one
   file), so an item number maps to exactly one row. Do not condense
   ("1-4", "NLA and TATT" in one cell); expand instead. Checks and
