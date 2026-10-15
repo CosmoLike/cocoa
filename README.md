@@ -469,18 +469,26 @@ Now, users must follow all the steps below.
           cobaya-run ./projects/example/EXAMPLE_EMUL_POLY1.yaml -r
     
 > [!NOTE]
-> **Running on more than one node.** The flag `--mca btl vader,tcp,self` works unchanged across
-> nodes (shared memory within a node, TCP between nodes). The commands that can run on more
-> than one node already include the flags below.
+> **Running on more than one node.**
 >
-> 1. `--mca btl_tcp_if_exclude lo,docker0,virbr0,ib0`: stop TCP from selecting an interface
->    that is not routable between compute nodes.
-> 2. `-x PATH -x LD_LIBRARY_PATH (...)`: forward Cocoa's environment to ranks on remote nodes
->    (needed under ssh-based launchers; Slurm forwards it automatically).
-> 3. `--map-by numa:pe=${OMP_NUM_THREADS}`: reserve, on each rank, the cores its OpenMP threads
->    will use. On Slurm, keep `ntasks-per-node` × `cpus-per-task` within the cores per node.
-> 4. `--mca mpi_yield_when_idle 1`: make waiting MPI processes give up the CPU instead of
->    burning 100% of a core; harmless when cores are not oversubscribed.
+> 1. **Network interface.** TCP must use an interface routable between compute
+>    nodes. A common exclusion list is
+>    `--mca btl_tcp_if_exclude lo,docker0,virbr0,ib0`; adapt it to the cluster.
+>    Keep `ib0` if routable IP-over-InfiniBand is the intended network. These
+>    examples exchange parameter vectors and scalar scores, so communication
+>    volume is small; actual scaling still depends on the machine.
+> 2. **Environment.** Remote ranks need the same Cocoa paths and libraries:
+>    `ROOTDIR`, `PATH`, `LD_LIBRARY_PATH`, `PYTHONPATH`, `CONDA_PREFIX`, OpenMP
+>    and BLAS settings, and `CLIK_PATH`/`CLIK_DATA`/`CLIK_PLUGIN` when used.
+>    Slurm normally exports the submitting environment (`--export=ALL`).
+>    Explicit `-x` options also forward these variables with SSH launchers.
+>    Activate Cocoa before launching; build/download flags do not replace
+>    runtime paths. All nodes must see the same files at the same paths.
+> 3. **Slurm geometry.** Keep `ntasks-per-node × cpus-per-task` within the
+>    allocated physical cores per node. Set `OMP_NUM_THREADS` to
+>    `SLURM_CPUS_PER_TASK` and use `--map-by numa:pe=${OMP_NUM_THREADS}`.
+>    The minimization, profile and Nautilus pool reserves one MPI rank as
+>    coordinator; the remaining ranks evaluate the model.
 
 The `Nautilus`, `Minimizer`, `Profile`, and `Emcee` scripts below contain an internally defined `yaml_string` that specifies priors, 
 likelihoods, and the theory code, all following Cobaya Conventions.
