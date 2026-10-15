@@ -494,6 +494,35 @@ a page fresh from prose and let it get patched back into the house
 shape rule by rule. When a page and the main README disagree in
 shape, the main README wins.
 
+### 3.0a Put each explanation in its owning page
+
+| Page | What belongs there |
+|---|---|
+| Project `README.md` | Short summaries of tests and covariance capabilities, linking to their guides. No repeated test commands, accuracy discussion or covariance compilation steps. |
+| `tests/README.md` | Opening bullets for data-vector checks, covariance checks and optional studies, followed by the test entry points. |
+| `tests/data_vector/README.md` | Likelihood checks, commands, reference inputs and the reasons for numerical defaults. |
+| `tests/studies/README.md` | The optional-study FAQ, reproduction commands, measured comparisons and figure explanations. |
+| `covariance/README.md` | Covariance compilation, CLI and notebook workflows, numerical controls, outputs and physical limits. |
+
+- Introduce optional studies in the opening bullets of `tests/README.md`,
+  not in the data-vector guide or a trailing TIP. Say what the study
+  measures and how to run it; omit explanations of pytest filename
+  discovery and other implementation bookkeeping.
+- Keep ordinary figures and their generators in `tests/data_vector/`.
+  Keep study generators in `tests/studies/` and their figures and saved
+  JSON/NPZ records in `tests/studies/results/`. Shared test infrastructure
+  can stay in `tests/`. Moves include links, script imports and output paths.
+- Published runtime tables live in Cocoa's main README. Other pages link
+  there; do not copy timing numbers or speedup factors into every project.
+  A routine timing check does not authorize updating the published table.
+- Put the CLI-versus-wrapper warning in the covariance guide, not at the
+  top of the project README. Explain the current build choices without
+  repeating the retired `COSMOLIKE_AGGRESSIVE_MODE` history in every guide.
+  This is a documentation rule; it does not remove compiler safeguards.
+- Apply shared layout corrections across the project family, preserving
+  each project's actual capabilities. Do not insert another project's
+  caveat into a local study merely to make the pages identical.
+
 ### 3.1 Writing style (mandatory)
 
 - Golden rule: **"less is more, and when you need more — put it into an
@@ -507,17 +536,25 @@ shape, the main README wins.
   the command block already shows.
 - Appendix FAQ titles are humble: "How can users deal with X (Platform): a
   possible cause" — never claim the only cause.
-- FAQ bodies: one or two intro sentences ending "If that is the case, follow
-  the steps below", then `**Step :one:**:` blocks — one short imperative
-  line plus one command each.
+- A conceptual FAQ answers the question in short paragraphs or a table.
+  A procedural FAQ uses `**Step :one:**:` blocks after its assumptions.
 - Every command flow uses `**Step :one:**:` blocks — ALWAYS, even
   when there is a single step. A bare command block with a lead-in
   sentence is not a flow.
-- Every flow is self-contained: repeat the assumption paragraph
-  ("We assume users are in the Conda cocoa environment ...") and the
-  `source start_cocoa.sh` step in EVERY flow. Never write "with the
-  environment of [some other section]" — the reader landing from
-  the table of contents must not chase references.
+- Every workflow states its environment and working directory. Include
+  `source start_cocoa.sh` in installation or activation flows. Sampler
+  subsections assume Cocoa is activated but repeat their full CPU setup
+  as Step 1; "with the same CPU environment" is not a substitute.
+- A step represents one task, not one shell variable. Thread setup is
+  one step with a grouped command block for Linux and one for macOS,
+  matching the main README. Include `OMP_NUM_THREADS`, `OMP_PROC_BIND`,
+  `OMP_PLACES`, `OMP_DYNAMIC`, `OPENBLAS_NUM_THREADS` and `MKL_NUM_THREADS`.
+  Linux uses `OMP_PROC_BIND=close`; macOS uses `disabled`. A Slurm example
+  substitutes its allocated thread count without splitting the exports
+  into six steps. In each hybrid sampler workflow, follow thread setup
+  with the Linux-only `export CUDA_VISIBLE_DEVICES=""`, then the launch.
+  Keep these settings visible even when an earlier evaluation example
+  already sets them. A summary linking to a guide needs no setup flow.
 - Table rows are atomic: one item per row (one test, one knob, one
   file), so an item number maps to exactly one row. Do not condense
   ("1-4", "NLA and TATT" in one cell); expand instead. Checks and
@@ -546,6 +583,10 @@ shape, the main README wins.
   ten-line paragraph that chains a mechanism, a report format, a
   cost estimate, and an activation switch is four paragraphs (or a
   numbered list plus two short paragraphs) pretending to be one.
+- Break a dense accuracy explanation by control: interpolation,
+  integration, and matter-power sampling. Use short bold labels,
+  separate runnable code blocks and compact tables for counts. Keep
+  detailed level-to-node mappings in one FAQ and link to it.
 - Math is LaTeX, settings are code spans. Write $\chi^2 < 0.2$ and
   $\Delta\chi^2$, never the bare words "chi2 < 0.2"; write
   `accuracyboost: 2`, never accuracyboost 2. Inside command blocks
@@ -566,6 +607,16 @@ shape, the main README wins.
   $-1.5\%$" renders as "-0.7 to -1.5" and the reader sees a different
   quantity. Write -0.7% as plain text. Display equations go in a
   ```math block.
+- Explain formulas for a student. Keep meaningful factors visible:
+  write `100 \times \frac{1}{2}`, not `50`, for a percentage of
+  redistributed probability. Explain that 100 converts to percent and
+  one-half avoids counting both the loss and the gain. Define each symbol
+  and what an index visits: `i` labels each original redshift interval,
+  `p_i` is its normalized input probability, and `q_i` is the integral of
+  the reconstructed density between that interval's edges. Explain that
+  the denominator adds all reconstructed interval areas and the outer
+  sum adds their individual differences. Do not substitute prose such as
+  "both sums run over cells" for those definitions.
 - A list item is one short clause: the action, nothing else. The
   reasoning ("so the chi2 against it is zero by construction") moves
   to a sentence after the list that refers back to the steps.
@@ -623,33 +674,14 @@ shape, the main README wins.
 - No commentary about other projects or past incidents ("which in
   other projects exposed interface breakdowns"): state what the
   check does here.
-- A project README section about the tests is a short summary (what
-  the tests cover, in one sentence) plus the Step flow to run them
-  and a pointer to tests/README.md; every further detail lives
-  there, never in the project page.
-- Never quote measured values in a README: they go stale with the
-  next commit and force a page redo. State the conclusion ("the
-  measured values sit far below the 0.2 band") and point at the
-  checks that print the numbers; the terminal output on the current
-  code is the source of truth. The same goes for conclusions drawn
-  from measurements ("the measured values sit far below the band, so
-  the defaults are adequate"): they would need re-verification after
-  every commit. Say what the check measures and which band the
-  reader compares against. Contract numbers (pass limits such as
-  0.2, tolerances such as 1e-4) are not measurements and stay, and
-  so does the recorded rationale of a past decision (why a default
-  changed).
-- A decision record keeps full strength. Every non-unity accuracy
-  default is a decision the README's Minimum accuracy parameters
-  section must preserve at working strength: the mechanism (what was
-  wrong and how the default fixes it), the dated measurement that
-  motivated it (a historical fact, labeled as such — not a current
-  check output), and a Warning against reverting the knob. A sweep
-  that strips measured values must never thin a decision record to
-  "a measurable error": roman_fourier's boost-2.0 record was reduced
-  exactly that way and the reason was effectively forgotten until
-  the user caught it. The same rationale also lives next to the knob
-  in the likelihood yaml.
+- Avoid transient test measurements in overview prose. Reproducible
+  study results belong in the study guide with their settings and saved
+  record; published runtimes follow Section 3.0a. Contract tolerances
+  and the measurements motivating a numerical default remain documented.
+- Preserve default-setting decisions in the relevant test or covariance
+  guide and beside the likelihood YAML key: the mechanism, dated evidence
+  and reason not to lower the setting. Moving details out of the project
+  README must not erase that rationale or create a second copy.
 
 ### 3.2 Quote blocks must match the source files
 
@@ -690,6 +722,23 @@ old-version mention as a boundary.
 
 ### 3.5 mpirun command conventions
 
+- Read the matching sampler example in the main README before choosing
+  MPI counts; do not replace it with a two-rank smoke run. Its documented
+  examples use the following ranks:
+
+  | Sampler | Linux | macOS |
+  |---|---:|---:|
+  | Cobaya MCMC | 4 | 4 |
+  | Annealed minimization | 21 | 12 |
+  | Annealed profile | 21 | 12 |
+  | Nautilus | 90 | 12 |
+  | PolyChord | 90 | 12 |
+
+  These are example allocations, not algorithmic requirements. Cobaya
+  MCMC runs one chain per rank; minimization, profile and Nautilus pools
+  reserve a coordinator. Preserve sampler-specific launch syntax and
+  hybrid OpenMP placement rather than copying a different sampler's
+  worker layout or the pure-emulator `--map-by slot` blindly.
 - All Linux MPI commands: `--mca pml ob1 --mca btl vader,tcp,self`
   (never `^ucx`).
 - Commands that can span multiple nodes additionally carry
@@ -703,9 +752,11 @@ old-version mention as a boundary.
   The same line-break style applies to sbatch scripts.
 - macOS commands stay bare `mpirun` with no mca flags. Never add the Linux
   flags to macOS commands "for consistency" — the omission is deliberate.
-- Project READMEs carry ONE standard note ("Running on more than one node",
-  four flag-first items). It must stay byte-identical across the main README
-  and all project READMEs; verify with `md5` on the extracted note.
+- Project READMEs carry one standard "Running on more than one node"
+  note with three items: network interface, environment, Slurm geometry.
+  Copy the main README's note without adding transport-version history
+  or a collection of external documentation links. Keep the common text
+  identical across projects; link to it from repeated launch sections.
 
 ### 3.6 Anti-AI prose rules (README, comments, docstrings, commit messages)
 
@@ -926,6 +977,10 @@ Run all that apply and report the results:
 4. URL check (after tags exist on GitHub):
    `curl -s -o /dev/null -w "%{http_code}" <raw URL>` must print 200.
 5. GitHub alert blocks use `> [!NOTE]`, `> [!TIP]`, `> [!Warning]` syntax.
+6. For a shared correction, inspect all project counterparts. Verify
+   rendered tables, code blocks, links and anchors before reporting it
+   complete. Documentation or path-only changes do not require rerunning
+   numerical studies; preserve saved results and update their readers.
 
 ## 4. Release checklist
 
@@ -1794,9 +1849,18 @@ Rules the maintainer applies when reading a figure:
   `$\gamma_t$ diff. [%]`).
 - **Few curves.** Show only the comparison asked for (for example one
   curve per cosmology); variants and diagnostics go in tables.
-- **Legend above the panels, in one row**, never over a panel. Bin
-  labels and the 1/alpha note sit in a corner the curves leave free
-  (top-left by default).
+- **One shared legend, without a frame** (`frameon=False`). Prefer one
+  row above the panels; a free corner of one panel is suitable for a
+  compact illustration. Do not repeat the same legend in every panel.
+  Bin labels and the 1/alpha note sit where the curves leave free space.
+- **Give the panels the space.** Use shared axis labels when their
+  meanings match. Omit an obvious overall title, repeated close-up
+  titles and explanatory footers. Keep equations, normalization details,
+  node-position explanations and limits in the study README instead.
+- For the per-project n(z) study, use at most two panels; the common
+  original/3/5/7 reconstruction illustration may use the requested four
+  columns. Explain how a displayed bin edge and redshift range were
+  selected in both the plotting script's comments and the study README.
 - **Readable at README size.** Figures for a README or a study use larger
   fonts than the notebook defaults: y label 24, y ticks 19, x ticks 22,
   x label 24, bin labels 22, legend 22, and 180 dpi.
