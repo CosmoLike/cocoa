@@ -16,8 +16,8 @@
 
 9. [Appendices about Conda](#appendix_conda)
     1. [FAQ: How can users install Conda?](#overview_miniforge)
-    2. [FAQ: How can users install cocoa conda environment via conda-lock (better reproducibility)?](#install_conda_env_condalock)
-    3. [FAQ: How can users deal with Conda conflicts (MacOS): a possible solution](#macos_solve_conda_conficts)
+    2. [FAQ: How can users install the Cocoa Conda environment via conda-lock (better reproducibility)?](#install_conda_env_condalock)
+    3. [FAQ: How can users deal with Conda conflicts (macOS): a possible solution](#macos_solve_conda_conficts)
 10. [Appendices about Git](#appendix_git)
     1. [FAQ: How can developers develop from a Git tag?](#dev_from_tag)
     2. [FAQ: How can developers push changes to the Cocoa main branch?](#push_main)
@@ -36,13 +36,13 @@
 
 # Overview <a name="overview"></a>
 
-Cocoa allows users to run [CosmoLike](https://github.com/CosmoLike) routines inside the [Cobaya](https://github.com/CobayaSampler) framework. [CosmoLike](https://github.com/CosmoLike) can analyze data from the [Dark Energy Survey](https://www.darkenergysurvey.org) and simulate future multi-probe analyses for LSST and Roman Space Telescope. 
+Cocoa allows users to run [CosmoLike](https://github.com/CosmoLike) routines inside the [Cobaya](https://github.com/CobayaSampler) framework. [CosmoLike](https://github.com/CosmoLike) can analyze data from the [Dark Energy Survey](https://www.darkenergysurvey.org) and simulate future multi-probe analyses for LSST and the Roman Space Telescope. 
 
 Besides integrating [Cobaya](https://github.com/CobayaSampler) and [CosmoLike](https://github.com/CosmoLike), Cocoa introduces shell scripts that allow users to containerize [Cobaya](https://github.com/CobayaSampler), the Boltzmann codes, and multiple likelihoods. The container structure of Cocoa ensures that users can adopt consistent versions for the Fortran/C/C++ compilers and libraries across multiple machines. Such a systematic approach greatly simplifies the debugging process. 
 
-Our scripts never install packages or Python modules in a global folder such as `$HOME/.local`. Here, `$HOME` denotes a shell environment variable that points to the user's home folder. Doing so would force cocoa packages to be global to the user, possibly breaking environments. Our scripts enable users to work on multiple Cocoa instances simultaneously, similar to what was possible with [CosmoMC](https://github.com/cmbant/CosmoMC). 
+Our scripts never install packages or Python modules in a global folder such as `$HOME/.local`. Here, `$HOME` denotes a shell environment variable that points to the user's home folder. Doing so would force Cocoa packages to be global to the user, possibly breaking environments. Our scripts enable users to work on multiple Cocoa instances simultaneously, similar to what was possible with [CosmoMC](https://github.com/cmbant/CosmoMC). 
 
-This Readme file presents basic and advanced instructions for installing all [Cobaya](https://github.com/CobayaSampler) and [CosmoLike](https://github.com/CosmoLike) components **on Linux** or **macOS-arm**.
+This README file presents basic and advanced instructions for installing all [Cobaya](https://github.com/CobayaSampler) and [CosmoLike](https://github.com/CosmoLike) components **on Linux** or **macOS-arm**.
 
 We provide the Docker image [whovian-cocoa](https://hub.docker.com/r/vivianmiranda/whovian-cocoa) to facilitate the installation of Cocoa on Windows. 
 
@@ -74,7 +74,7 @@ We provide the Docker image [whovian-cocoa](https://hub.docker.com/r/vivianmiran
 > **Covariance forecasts (2026-10-09**). CPU: **Apple M2Pro**, **8 OpenMP threads**.
 >
 > **CLI for production; wrappers for exploration.** Run production through the optimized `_interface`
-> bindings. The notebook `_wrapper` APIs expose intermediate quantities for exploration but adds overhead.
+> bindings. The notebook `_wrapper` APIs expose intermediate quantities for exploration but add overhead.
 > In a matched **LSST Y1 covariance**, the CLI averaged **29.45 s**; one wrapper run took **94.61 s**, with bitwise-identical results.
 > The timings below use the optimized CLI interfaces.
 > 
@@ -94,9 +94,9 @@ We provide the Docker image [whovian-cocoa](https://hub.docker.com/r/vivianmiran
 > | [DES cluster 6×2pt + N](https://github.com/CosmoLike/cocoa_des_cluster#computing_covariances) | Real (Limber) | 2,812 × 2,812 | 63.3 s |
 >
 > These are construction times from three sequential runs of
-> each supplied evaluate YAML. Project links provides further explanations. Detailed code comparisons
-> are available in [OneCov-benchmark study](https://github.com/vivianmiranda/OneCov-benchmark-)
-> and [TJPCov-benchmark study](https://github.com/vivianmiranda/tjcovbenchmark).
+> each supplied evaluate YAML. Project links provide further explanations. Detailed code comparisons
+> are available at [OneCov-benchmark](https://github.com/vivianmiranda/OneCov-benchmark-)
+> and [TJPCov-benchmark](https://github.com/vivianmiranda/tjcovbenchmark) repositories.
 > The real-space 3x2pt **data vectors** are separately compared against
 > DESC-CCL in the [CCL-benchmark study](https://github.com/vivianmiranda/CCL-benchmark).
 
@@ -389,7 +389,7 @@ Assuming Cocoa is installed on a local (not remote!) machine, type the command b
 Cocoa contains a few transformer- and CNN-based neural network emulators capable of simulating the CMB, cosmolike outputs, matter power spectrum, and distances. We provide a few scripts that exemplify their API. To run them, users ensure the following lines are commented out in `set_installation_options.sh` before running the `setup_cocoa.sh` and `compile_cocoa.sh`. *By default, these lines should be commented out, but it is worth checking*.
 
       [Adapted from Cocoa/set_installation_options.sh shell script] 
-      # insert the # symbol (i.e., unset these environmental keys  on `set_installation_options.sh`)
+      # insert the # symbol (i.e., unset these environmental keys in `set_installation_options.sh`)
       #export IGNORE_EMULTRF_CODE=1              #SaraivanovZhongZhu (SZZ) transformer/CNN-based emulators
       #export IGNORE_EMULTRF_DATA=1            
       #export IGNORE_LIPOP_LIKELIHOOD_CODE=1     # to run EXAMPLE_EMUL_(EVALUATE/MCMC/NAUTILUS/EMCEE1).yaml
@@ -553,7 +553,7 @@ likelihoods, and the theory code, all following Cobaya Conventions.
 
 - **Sampler Comparison**
 
-  The script that generated the plot below is provided at `projects/example/scripts/EXAMPLE_PLOT_COMPARE_CHAINS.py`. The Google Colab notebook [Example Sampler Comparison](https://github.com/CosmoLike/CoCoAGoogleColabExamples/blob/main/Cocoa_Example_(Sampler_Comparison).ipynb) can also reconstruct a similar version of this figure.
+  The script that generated the plot below is provided at `projects/example/scripts/EXAMPLE_PLOT_COMPARE_CHAINS.py`.
 
   <p align="center">
   <img width="750" height="750" alt="projects_example_sampler_comparison" src="https://github.com/user-attachments/assets/d3639673-36ea-4fd9-9c91-1f5b97845fe0" />
@@ -647,7 +647,7 @@ likelihoods, and the theory code, all following Cobaya Conventions.
     If `cov` is not supplied, the code estimates one internally from the prior.
     If a parameter is poorly constrained or `cov` is not given, we recommend $\mathrm{factor} \ll 1$.
 
-    The script that generated the plot below is provided at `projects/example/scripts/EXAMPLE_PLOT_PROFILE1.py`. The Google Colab notebook [Example Profile Likelihood](https://github.com/CosmoLike/CoCoAGoogleColabExamples/blob/main/Cocoa_Example_Profile_Likelihoods.ipynb) can also reconstruct a similar version of this figure. 
+    The script that generated the plot below is provided at `projects/example/scripts/EXAMPLE_PLOT_PROFILE1.py`.
   
     <p align="center">
     <img width="832.32" height="617.76" alt="Screenshot 2025-08-02 at 8 42 41 PM" src="https://github.com/user-attachments/assets/22182688-2865-4b15-a80b-783ddd21f715" />
@@ -691,7 +691,7 @@ likelihoods, and the theory code, all following Cobaya Conventions.
 - **Scan**: 
 
   This profile code has a different MPI strategy. It scans one parameter on the entire prior,
-  with each MPI being assigned to one minimization (not Emcee walker!). This is a strategy when probing 
+  with each MPI being assigned to one minimization (not an Emcee walker!). This is a strategy when probing 
   beyond-LCDM parameters with oscillatory behavior (e.g., Monodromic Dark Energy).
 
     - Linux
@@ -726,7 +726,7 @@ likelihoods, and the theory code, all following Cobaya Conventions.
   that exemplify how emulators can be used to quickly assess the tension between data sets.
   All Tension metrics were computed using the package `Tensiometer`.
 
-  The plot below, taken from `EXAMPLE_TENSION_METRICS.ipynb`, exemplifies the tension between CMB+BAO vs. Type Ia SN.
+  The plot below, taken from `EXAMPLE_TENSION_METRICS.ipynb`, exemplifies the tension between CMB+BAO and Type Ia SN.
 
 <p align="center">
 <img width="790" height="333" alt="Unknown" src="https://github.com/user-attachments/assets/b5ef808e-0efa-4bb9-852a-854f6531e3ed" />
@@ -818,9 +818,9 @@ Now, users must follow all the steps below.
 Details on the matter power spectrum emulator designs will be presented in the [emulator_code](https://github.com/CosmoLike/emulators_code) repository. Basically, we apply standard neural network techniques to generalize the *syren-new* Eq. 6 of [arXiv:2410.14623](https://arxiv.org/abs/2410.14623) formula for the linear power spectrum (w0waCDM with a fixed neutrino mass of $0.06$ eV) to new models, extended ranges, or higher precision. Similarly, we use networks to generalize the *syren-Halofit* LCDM nonlinear boost fit (Eq. 11 of [arXiv:2402.17492](https://arxiv.org/abs/2402.17492)).
 
 > [!NOTE] 
-> Users can decide not to correct the *syren-new* formula for the linear power spectrum (flag in the yaml). Although we have not conducted extensive studies of the caveats of the syren-new approximation, it appears sufficient for w0waCDM forecasts when combined with the Euclid Emulator to compute the nonlinear boost.
+> Users can decide not to correct the *syren-new* formula for the linear power spectrum (flag in the YAML). Although we have not conducted extensive studies of the caveats of the syren-new approximation, it appears sufficient for w0waCDM forecasts when combined with the Euclid Emulator to compute the nonlinear boost.
 >
-> For back-of-the-envelope LCDM calculations (e.g., to test cosmolike features), users can also choose not to correct the *syren-Halofit* formula for the LCDM nonlinear boost (see figure below). In this case, the overhead on top of cosmolike computations is minimum, at the order of $0.01$ seconds on a macOS M2Pro laptop. 
+> For back-of-the-envelope LCDM calculations (e.g., to test cosmolike features), users can also choose not to correct the *syren-Halofit* formula for the LCDM nonlinear boost (see figure below). In this case, the overhead on top of cosmolike computations is minimal, at the order of $0.01$ seconds on a macOS M2Pro laptop. 
 >
 > <p align="center">
 >  <span style="display:flex; justify-content:center; gap:16px; flex-wrap:wrap;">
@@ -902,7 +902,7 @@ and
 
 After that, the `conda` command will be available.
 
-## :interrobang: FAQ: How can users install conda env via conda-lock? <a name="install_conda_env_condalock"></a>
+## :interrobang: FAQ: How can users install the Cocoa Conda conda env via conda-lock? <a name="install_conda_env_condalock"></a>
 
 We advise users to maintain *exact reproducibility* (across time) of the Cocoa conda environment by installing it via `conda-lock`, following the slightly more convoluted instructions below.
 
@@ -938,11 +938,11 @@ and
 
      conda activate cocoa
 
-## :interrobang: FAQ: How can users deal with Conda conflicts (MacOS): a possible solution <a name="macos_solve_conda_conficts"></a>
+## :interrobang: FAQ: How can users deal with Conda conflicts (macOS): a possible solution <a name="macos_solve_conda_conficts"></a>
 
 During the Arizona Winter School (January 2026), we noted that some students with macOS struggled to get Conda to work (conflicts). If this is the case for you, try the steps below instead
 
-**Step :one:** Create a new base environment, as your base may have legacy packages that can create incompatibilities (note here slightly modified conda command)
+**Step :one:** Create a new base environment, as your base may have legacy packages that can create incompatibilities (note: slightly modified conda command)
  
      conda create --solver=libmamba --strict-channel-priority --override-channels -c conda-forge --name base2
 
@@ -958,7 +958,7 @@ and
 
      wget https://raw.githubusercontent.com/CosmoLike/cocoa/refs/tags/v5.08/cocoapy311-osxarm-loose.yml
 
-**Step :three:** Create the cocoa conda env using a looser yml (note here slightly modified conda command)
+**Step :three:** Create the cocoa conda env using a looser yml (note: slightly modified conda command)
 
     conda env create --solver=libmamba --name cocoa -f cocoapy311-osxarm-loose.yml
 
@@ -1043,7 +1043,7 @@ The `main` branch is protected: *a commit in the main branch should contain an a
 > [!TIP]
 > If the branch `xyzdev` already exists, use the `git switch` command without the `-c` flag. 
 
-**Step :two:**: develop the proposed changes. We advise developers to commit frequently. In your branch, a commit does not need to be atomic, changing the code from one working state to another well-tested, meaningful working state. Developers can push to the server via the command.
+**Step :two:**: develop the proposed changes. We advise developers to commit frequently. In your branch, a commit does not need to be atomic, i.e., changing the code from one working state to another well-tested and meaningful working state. Developers can push to the server via the command.
 
     git push -u origin xyzdev   # run on the xyzdev branch
 
@@ -1078,7 +1078,7 @@ and
     git switch -c xyzdev   # run on the main branch
 
 > [!NOTE]
-> The capital `-D` (force) flag is required: because of the squash, git cannot detect that the branch was merged, so the lowercase `-d` would refuse to delete it.
+> The capital `-D` (force) flag is required because, due to the squash merge, git cannot detect that the branch was merged, so the lowercase `-d` would refuse to delete it.
 
 > [!Warning]
 > If the old `xyzdev` still exists on the server, delete it there before pushing the recreated branch — on the GitHub branches page, or with `git push origin --delete xyzdev`. Never force-push over a stale branch.
@@ -1087,7 +1087,7 @@ and
 
 ## :interrobang: FAQ: How can users debug Cocoa Installation? Suggested steps <a name="running_wrong"></a>
 
-**Step :one:**: define the `COCOA_OUTPUT_VERBOSE` and `COSMOLIKE_DEBUG_MODE` flags on `set_installation_options.sh` to obtain a more detailed output, as shown below (for even more output, define `COCOA_OUTPUT_DEBUG` as well)
+**Step :one:**: define the `COCOA_OUTPUT_VERBOSE` and `COSMOLIKE_DEBUG_MODE` flags on `set_installation_options.sh` to obtain more detailed output, as shown below (for even more output, define `COCOA_OUTPUT_DEBUG` as well)
   
       [Adapted from Cocoa/set_installation_options.sh shell script] 
       # ------------------------------------------------------------------------------
@@ -1108,7 +1108,7 @@ and
 
 ## :interrobang: FAQ: How can users compile a single external module (not involving Cosmolike)? <a name="appendix_compile_separately"></a>
 
-To download and compile only a single module (e.g., `CAMB`), users must directly run the associated bash scripts in `Cocoa/installation_scripts/` directly (e.g., `setup_camb.sh` and `compile_camb.sh`).  
+To download and compile only a single module (e.g., `CAMB`), users must run the associated bash scripts in `Cocoa/installation_scripts/` directly (e.g., `setup_camb.sh` and `compile_camb.sh`).  
 
 Users must also ensure the appropriate keys in `set_installation_options.sh` are unset, as shown below.
 
@@ -1161,7 +1161,7 @@ key skips it. The defaults enable LSST Y1, DES × Planck and Roman real.
      #export IGNORE_COSMOLIKE_ROMAN_REAL_CODE=1
      export IGNORE_COSMOLIKE_ROMAN_KL_CODE=1
      export IGNORE_COSMOLIKE_DES_CLUSTER_CODE=1
-     # WARNING: des_y6 is not production ready.
+     # WARNING: des_y6 is not production-ready.
      export IGNORE_COSMOLIKE_DES_Y6_CODE=1
      (...)
      export ROMAN_REAL_URL="https://github.com/CosmoLike/cocoa_roman_real.git"
@@ -1171,14 +1171,8 @@ key skips it. The defaults enable LSST Y1, DES × Planck and Roman real.
 Each released project is pinned to a tag. To select another revision, set
 only one of its `GIT_COMMIT`, `GIT_BRANCH` or `GIT_TAG` keys: a commit takes
 precedence over a branch, and a branch over a tag. DES Y6 is disabled by
-default and not production ready; its key block pins a tag like the
+default and not production-ready; its key block pins a tag like the
 released projects.
-
-The [DES Y6 project](https://github.com/CosmoLike/cocoa_des_y6) provides
-data-vector notebooks, tests and a covariance forecast CLI. Its active
-likelihood still selects dummy data; the separate supplied covariance has
-an incompatible layout. See its input inventory before using observational
-data.
 
 Covariance generation is a separate build option, disabled for all projects
 by default. To enable it for Roman real, comment out
@@ -1186,12 +1180,6 @@ by default. To enable it for Roman real, comment out
 and recompile that project. See its
 [covariance guide](https://github.com/CosmoLike/cocoa_roman_real#computing_covariances)
 for the production CLI and notebook examples.
-
-DES Y6 uses the corresponding
-`IGNORE_COSMOLIKE_DES_Y6_COVARIANCE` setting. Its
-[covariance guide](https://github.com/CosmoLike/cocoa_des_y6#computing_covariances)
-describes the catalogue assumptions and the distinction between a forecast
-and the supplied likelihood covariance.
 
 > [!NOTE]
 > The https URLs are the right choice for almost all users. Developers with write
@@ -1246,7 +1234,7 @@ In case users only want to compile a single Cosmolike project (let's say the `ro
      
 ## :interrobang: FAQ: How can users run Cocoa with Docker? <a name="appendix_jupyter_whovian"></a>
 
-We provide the Docker image [whovian-cocoa](https://hub.docker.com/r/vivianmiranda/whovian-cocoa) to facilitate installing Cocoa on Windows and macOS. This appendix assumes that users have already installed the Docker Engine on their local PC. For instructions on installing the Docker engine on specific operating systems, refer to [Docker's official documentation](https://docs.docker.com/engine/install/). 
+We provide the Docker image [whovian-cocoa](https://hub.docker.com/r/vivianmiranda/whovian-cocoa) to facilitate installing Cocoa on Windows and macOS. This appendix assumes that users have already installed the Docker Engine on their local PC. For instructions on installing the Docker Engine on specific operating systems, refer to [Docker's official documentation](https://docs.docker.com/engine/install/). 
 
  **Step :one:**: Create a folder and go to the location on the host computer where you want to provide access to the Docker container, as shown below. 
 
@@ -1258,7 +1246,7 @@ We provide the Docker image [whovian-cocoa](https://hub.docker.com/r/vivianmiran
     docker run --platform linux/amd64 --hostname cocoa --name cocoa2025 -it -p 8888:8888 -v $(pwd):/home/whovian/host/ -v ~/.ssh:/home/whovian/.ssh:ro vivianmiranda/whovian-cocoa:thin
 
 > [!Warning] 
-> There is a weird bug on macOS that Mathplotlib does not work unless you add the flags `-e EXPERIMENTAL_DOCKER_DESKTOP_FORCE_QEMU=1 -e PYTHONUNBUFFERED=1` 
+> There is a weird bug on macOS that Matplotlib does not work unless you add the flags `-e EXPERIMENTAL_DOCKER_DESKTOP_FORCE_QEMU=1 -e PYTHONUNBUFFERED=1` 
 >  right after `docker run --platform linux/amd64`
 >  
 
@@ -1291,7 +1279,7 @@ This is a large image, approximately 13GB, as it already contains the conda coco
 >     [... NotebookApp] or http://127.0.0.1:8888/?token=XXX  
       
 > [!TIP]
-> To run the Jupyter Notebook on the *whovian-cocoa* docker container installed on a remote server, adjust the command below
+> To run the Jupyter Notebook on the *whovian-cocoa* Docker container installed on a remote server, adjust the command below
 >
 >     ssh your_username@your_sever.com -L 8888:localhost:8888
 >
