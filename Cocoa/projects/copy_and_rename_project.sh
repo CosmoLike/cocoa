@@ -4,11 +4,21 @@
 # ------------------------------------------------------------------------------
 # Copies projects/OLD_PROJECT into projects/NEW_PROJECT and renames the
 # project and survey names in file names and file contents: code, yamls,
-# datasets, the parameter names on the covmat header lines, the Git LFS
-# patterns in .gitattributes, and the unit-test suite. It then deletes
-# what does not transfer to a new survey (chains, caches, the data-vector
-# emulators and the EXAMPLE_EMUL_* examples that load them, the tests'
-# frozen references) and replaces the donor README with a stub.
+# datasets, the parameter names on the covmat header lines, and the Git
+# LFS patterns in .gitattributes. It then deletes what does not transfer
+# to a new survey (chains, caches, the data-vector emulators and the
+# EXAMPLE_EMUL_* examples that load them, and the entire tests/ folder)
+# and replaces the donor README with a stub.
+#
+# The tests/ folder is deleted rather than renamed: the suite is pinned
+# to the donor survey far beyond its file names (frozen SHA-256
+# references, survey-specific example tables, scale-cut datasets, points
+# and masks in tests/cocoa_test_utils.py, measured tables and figures in
+# its READMEs). A mechanical rename produces a suite that looks
+# transferred but checks nothing real, which is worse than no suite.
+# Porting the tests is judgment work: give an AI assistant the recipe at
+# external_modules/code/cosmolike_core/.claude/skills/cosmolike-dev/
+# references/project_test_transfer.md and review its result.
 #
 # Usage (from the Cocoa/ folder, cocoa environment active):
 #
@@ -20,10 +30,8 @@
 # Runs on Linux and macOS: bash 3.2 suffices, and GNU sed comes from the
 # cocoa environment (the script aborts when GNU sed is missing). The
 # script only renames: data vectors, covariances, masks, and n(z) stay
-# the donor's, and the tests' frozen references must be regenerated with
-# tests/generate_frozen_reference.py --overwrite. The FAQ "How do we
-# create a new Cosmolike project?" in projects/README.md documents the
-# remaining manual steps.
+# the donor's. The FAQ "How do we create a new Cosmolike project?" in
+# projects/README.md documents the remaining manual steps.
 # ------------------------------------------------------------------------------
 
 OLD_PROJECT="lsst_y1"
@@ -181,13 +189,6 @@ do
   done
 done
 
-# tests/ ships the project unit-test suite: the code and README carry the
-# project name in imports, likelihood references, and parameter prefixes.
-for f in "${PRJ:?}"/tests/*.{py,md}; do
-  [ -e "$f" ] || continue
-  rename_in_file "$f"
-done
-
 # ------------------------------------------------------------------------------
 # Delete what does not transfer to a new survey
 # ------------------------------------------------------------------------------
@@ -195,11 +196,12 @@ done
 # The data-vector emulators (and the EXAMPLE_EMUL_* examples that load
 # them) were trained on the old survey, so they are untransferable; the
 # hybrid EXAMPLE_EMUL2_* examples emulate only Boltzmann outputs and are
-# kept. The tests' frozen state (frozen/ + manifest_sha256.json) is a
-# SHA-256 pinned snapshot of the old survey's data, and the figures are
-# measurements of it: none transfer. Once the new survey's data files
-# are in place, regenerate them with
-# tests/generate_frozen_reference.py --overwrite (see tests/README.md).
+# kept. The entire tests/ folder goes too (see the header): renaming it
+# cannot transfer frozen references, survey example tables, scale-cut
+# datasets or measured figures, and a suite that silently checks the
+# wrong survey is worse than no suite. Recreate it for the new survey
+# with an AI assistant and the project_test_transfer.md recipe named in
+# the header, then regenerate the frozen references it describes.
 declare -a CLEAN_FILES=("*.txt"
                         "*.sbatch"
                         "*.ipynb"
@@ -219,8 +221,6 @@ declare -a CLEAN_FILES=("*.txt"
                         "chains/*.input.yaml"
                         "chains/*.updated.yaml"
                         "chains/*.pyc"
-                        "tests/manifest_sha256.json"
-                        "tests/*.png"
                        )
 
 for (( i=0; i<${#CLEAN_FILES[@]}; i++ ));
@@ -232,8 +232,7 @@ declare -a CLEAN_FOLDERS=("emulators"
                           ".git"
                           "interface/__pycache__"
                           "likelihood/__pycache__"
-                          "tests/__pycache__"
-                          "tests/frozen"
+                          "tests"
                           "scripts/random_scripts_used_by_dev"
                          )
 
@@ -256,8 +255,11 @@ Created by projects/copy_and_rename_project.sh from a donor project.
 The donor README does not transfer, so this stub replaces it: write
 here the new survey documentation (data provenance, scale cuts,
 releases). The FAQ "How do we create a new Cosmolike project?" in
-projects/README.md lists the remaining manual steps, and
-tests/README.md documents the unit-test suite.
+projects/README.md lists the remaining manual steps. The donor's
+tests/ folder was deleted, not renamed: its frozen references, example
+tables and measured figures belong to the donor survey. Recreate the
+suite with an AI assistant and the recipe at
+external_modules/code/cosmolike_core/.claude/skills/cosmolike-dev/references/project_test_transfer.md.
 EOF
 
 # ------------------------------------------------------------------------------

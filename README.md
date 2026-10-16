@@ -75,7 +75,7 @@ We provide the Docker image [whovian-cocoa](https://hub.docker.com/r/vivianmiran
 >
 > **CLI for production; wrappers for exploration.** Run production through the optimized `_interface`
 > bindings. The notebook `_wrapper` APIs expose intermediate quantities for exploration but add overhead.
-> In a matched **LSST Y1 covariance**, the CLI averaged **29.45 s**; one wrapper run took **94.61 s**, with bitwise-identical results.
+> In a matched **LSST Y1 covariance**, the wrapper/CLI runtime ratio was **3.21** (one wrapper run versus the CLI mean), with bitwise-identical results.
 > The timings below use the optimized CLI interfaces.
 > 
 > The galaxy/shear examples include **non-Limber clustering and galaxy–shear
@@ -83,18 +83,19 @@ We provide the Docker image [whovian-cocoa](https://hub.docker.com/r/vivianmiran
 > Limber. Real-space transforms are full-sky and bin-averaged, retaining the
 > internal cross-bin correlations needed by every covariance block.
 >
-> | Project | Space | Matrix before scale cuts | G + SSC + cNG construction |
-> |---|---|---:|---:|
-> | [LSST Y1](https://github.com/CosmoLike/cocoa_lsst_y1#computing_covariances) | Real | 1,560 × 1,560 | 29.5 s |
-> | [Roman real](https://github.com/CosmoLike/cocoa_roman_real#computing_covariances) | Real | 2,115 × 2,115 | 34.6 s |
-> | [Roman Fourier](https://github.com/CosmoLike/cocoa_roman_fourier#computing_covariances) | Fourier | 1,485 × 1,485 | 14.1 s |
-> | [Roman KL](https://github.com/CosmoLike/cocoa_roman_kl#computing_covariances) | Fourier | 2,200 × 2,200 | 23.0 s |
-> | [DES Y3](https://github.com/CosmoLike/cocoa_des_y3#computing_covariances) | Real | 900 × 900 | 25.8 s |
-> | [DES × Planck (galaxy/shear)](https://github.com/CosmoLike/cocoa_desy1xplanck#computing_covariances) | Real | 1,500 × 1,500 | 28.7 s |
-> | [DES cluster 6×2pt + N](https://github.com/CosmoLike/cocoa_des_cluster#computing_covariances) | Real (Limber) | 2,812 × 2,812 | 63.3 s |
+> | Project | Space | Matrix before scale cuts | G + SSC + cNG construction | Runtime / LSST Y1 |
+> |---|---|---:|---:|---:|
+> | [LSST Y1](https://github.com/CosmoLike/cocoa_lsst_y1#computing_covariances) | Real | 1,560 × 1,560 | 29.5 s | 1.00 |
+> | [Roman real](https://github.com/CosmoLike/cocoa_roman_real#computing_covariances) | Real | 2,115 × 2,115 | 34.6 s | 1.17 |
+> | [Roman Fourier](https://github.com/CosmoLike/cocoa_roman_fourier#computing_covariances) | Fourier | 1,485 × 1,485 | 14.1 s | 0.48 |
+> | [Roman KL](https://github.com/CosmoLike/cocoa_roman_kl#computing_covariances) | Fourier | 2,200 × 2,200 | 23.0 s | 0.78 |
+> | [DES Y3](https://github.com/CosmoLike/cocoa_des_y3#computing_covariances) | Real | 900 × 900 | 25.8 s | 0.87 |
+> | [DES × Planck (galaxy/shear)](https://github.com/CosmoLike/cocoa_desy1xplanck#computing_covariances) | Real | 1,500 × 1,500 | 28.7 s | 0.97 |
+> | [DES cluster 6×2pt + N](https://github.com/CosmoLike/cocoa_des_cluster#computing_covariances) | Real (Limber) | 2,812 × 2,812 | 63.3 s | 2.15 |
 >
 > These are construction times from three sequential runs of
-> each supplied evaluate YAML. Project links provide further explanations. Detailed code comparisons
+> each supplied evaluate YAML. The ratios compare these survey workloads on the same machine;
+> they are not predictions for another computer. Project links provide further explanations. Detailed code comparisons
 > are available at [OneCov-benchmark](https://github.com/vivianmiranda/OneCov-benchmark-)
 > and [TJPCov-benchmark](https://github.com/vivianmiranda/tjcovbenchmark) repositories.
 > The real-space 3x2pt **data vectors** are separately compared against
@@ -469,18 +470,26 @@ Now, users must follow all the steps below.
           cobaya-run ./projects/example/EXAMPLE_EMUL_POLY1.yaml -r
     
 > [!NOTE]
-> **Running on more than one node.** The flag `--mca btl vader,tcp,self` works unchanged across
-> nodes (shared memory within a node, TCP between nodes). The commands that can run on more
-> than one node already include the flags below.
+> **Running on more than one node.**
 >
-> 1. `--mca btl_tcp_if_exclude lo,docker0,virbr0,ib0`: stop TCP from selecting an interface
->    that is not routable between compute nodes.
-> 2. `-x PATH -x LD_LIBRARY_PATH (...)`: forward Cocoa's environment to ranks on remote nodes
->    (needed under ssh-based launchers; Slurm forwards it automatically).
-> 3. `--map-by numa:pe=${OMP_NUM_THREADS}`: reserve, on each rank, the cores its OpenMP threads
->    will use. On Slurm, keep `ntasks-per-node` × `cpus-per-task` within the cores per node.
-> 4. `--mca mpi_yield_when_idle 1`: make waiting MPI processes give up the CPU instead of
->    burning 100% of a core; harmless when cores are not oversubscribed.
+> 1. **Network interface.** TCP must use an interface routable between compute
+>    nodes. A common exclusion list is
+>    `--mca btl_tcp_if_exclude lo,docker0,virbr0,ib0`; adapt it to the cluster.
+>    Keep `ib0` if routable IP-over-InfiniBand is the intended network. These
+>    examples exchange parameter vectors and scalar scores, so communication
+>    volume is small; actual scaling still depends on the machine.
+> 2. **Environment.** Remote ranks need the same Cocoa paths and libraries:
+>    `ROOTDIR`, `PATH`, `LD_LIBRARY_PATH`, `PYTHONPATH`, `CONDA_PREFIX`, OpenMP
+>    and BLAS settings, and `CLIK_PATH`/`CLIK_DATA`/`CLIK_PLUGIN` when used.
+>    Slurm normally exports the submitting environment (`--export=ALL`).
+>    Explicit `-x` options also forward these variables with SSH launchers.
+>    Activate Cocoa before launching; build/download flags do not replace
+>    runtime paths. All nodes must see the same files at the same paths.
+> 3. **Slurm geometry.** Keep `ntasks-per-node × cpus-per-task` within the
+>    allocated physical cores per node. Set `OMP_NUM_THREADS` to
+>    `SLURM_CPUS_PER_TASK` and use `--map-by numa:pe=${OMP_NUM_THREADS}`.
+>    The minimization, profile and Nautilus pool reserves one MPI rank as
+>    coordinator; the remaining ranks evaluate the model.
 
 The `Nautilus`, `Minimizer`, `Profile`, and `Emcee` scripts below contain an internally defined `yaml_string` that specifies priors, 
 likelihoods, and the theory code, all following Cobaya Conventions.
@@ -751,7 +760,7 @@ likelihoods, and the theory code, all following Cobaya Conventions.
 
 # Running Hybrid Cosmolike-ML emulators <a name="cobaya_base_code_examples_emul2"></a>
 
-Our main line of research involves emulators that simulate the entire Cosmolike data vectors, and each project (LSST, Roman, DES) contains its own README with emulator examples. The speed of such emulators is incredible, especially when GPUs are available, and our emulators do take advantage of the CPU-GPU integration on Apple MX chips. For example, the average timing of lsst-y1 cosmic shear data vector emulation is around 0.005s ($\sim$ 200828 evaluations in $\sim$ 850.5 seconds) on a macOS M2 Pro.
+Our main line of research involves emulators that simulate the entire Cosmolike data vectors, and each project (LSST, Roman, DES) contains its own README with emulator examples. The speed of such emulators is incredible, especially when GPUs are available, and our emulators do take advantage of the CPU-GPU integration on Apple MX chips. Measure the emulator/exact runtime ratio with the same likelihood and numerical settings on the target machine.
 
 While the data vector emulators are incredibly fast, there is an intermediate approach that emulates only the Boltzmann outputs (comoving distance, linear and nonlinear matter power spectrum). This hybrid-ML case can offer greater flexibility, especially in the initial phases of a research project, as changes to the modeling of nuisance parameters or to the assumed galaxy distributions do not require retraining of the network. 
 
@@ -908,7 +917,7 @@ We advise users to maintain *exact reproducibility* (across time) of the Cocoa c
 
 **Step :one:** Install the package `conda-lock` in a private conda environment to avoid conflicts.
  
-     conda create -n lockenv -c conda-forge python=3.10 conda-lock=2.* wget
+     conda create -n lockenv -c conda-forge python=3.11 conda-lock=2.* wget
 
 and
  
@@ -1151,7 +1160,7 @@ In addition to `setup` and `compile` scripts, Cocoa contains `unxv` scripts that
 
 The script `set_installation_options.sh` selects which Cosmolike projects
 are installed. A commented `IGNORE_*_CODE` key enables a project; an active
-key skips it. The defaults enable LSST Y1, DES × Planck and Roman real.
+key skips it; that file is the single source of truth for the selection.
 
      [Adapted from Cocoa/set_installation_options.sh shell script]
      #export IGNORE_COSMOLIKE_LSST_Y1_CODE=1
@@ -1166,7 +1175,7 @@ key skips it. The defaults enable LSST Y1, DES × Planck and Roman real.
      (...)
      export ROMAN_REAL_URL="https://github.com/CosmoLike/cocoa_roman_real.git"
      export ROMAN_REAL_NAME="roman_real"
-     export ROMAN_REAL_GIT_TAG="v5.07"
+     export ROMAN_REAL_GIT_TAG="v5.09"
 
 Each released project is pinned to a tag. To select another revision, set
 only one of its `GIT_COMMIT`, `GIT_BRANCH` or `GIT_TAG` keys: a commit takes
@@ -1307,7 +1316,7 @@ This is a large image, approximately 13GB, as it already contains the conda coco
 >
 > and
 >
->     docker build . --build-arg COCOA_TAG=v5.08 -t vivianmiranda/whovian-cocoa # replace the tag with the Cocoa version whose yml seeds the conda env
+>     docker build . --platform linux/amd64 --build-arg COCOA_TAG=v5.08 -t vivianmiranda/whovian-cocoa # replace the tag with the Cocoa version whose yml seeds the conda env
 >
 > and
 >
