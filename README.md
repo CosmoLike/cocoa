@@ -1175,7 +1175,7 @@ key skips it; that file is the single source of truth for the selection.
      (...)
      export ROMAN_REAL_URL="https://github.com/CosmoLike/cocoa_roman_real.git"
      export ROMAN_REAL_NAME="roman_real"
-     export ROMAN_REAL_GIT_TAG="v5.07"
+     export ROMAN_REAL_GIT_TAG="v5.09"
 
 Each released project is pinned to a tag. To select another revision, set
 only one of its `GIT_COMMIT`, `GIT_BRANCH` or `GIT_TAG` keys: a commit takes
