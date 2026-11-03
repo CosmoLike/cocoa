@@ -131,7 +131,7 @@ if [ ! -d "${PACKDIR:?}" ]; then
     "${GIT:?}" checkout "${AXIE_CAMB_GIT_COMMIT:?}" \
       >>${OUT1:?} 2>>${OUT2:?} || { error "${EC16:?}"; return 1; }
   elif [ -n "${AXIE_CAMB_GIT_BRANCH:-}" ]; then
-    "${GIT:?}" checkout -b "${AXIE_CAMB_GIT_BRANCH:?}" "origin/${AXIE_CAMB_GIT_BRANCH:?}" \
+    "${GIT:?}" checkout -B "${AXIE_CAMB_GIT_BRANCH:?}" "origin/${AXIE_CAMB_GIT_BRANCH:?}" \
       >>${OUT1:?} 2>>${OUT2:?} || { error "${EC16:?}"; return 1; }
   elif [ -n "${AXIE_CAMB_GIT_TAG:-}" ]; then
     "${GIT:?}" checkout "tags/${AXIE_CAMB_GIT_TAG:?}" -b "${AXIE_CAMB_GIT_TAG:?}" \
@@ -237,7 +237,7 @@ if [ ! -d "${PACKDIR:?}" ]; then
     "${GIT:?}" checkout "${AXION_HMCODE_GIT_COMMIT:?}" \
       >>${OUT1:?} 2>>${OUT2:?} || { error "${EC16:?}"; return 1; }
   elif [ -n "${AXION_HMCODE_GIT_BRANCH:-}" ]; then
-    "${GIT:?}" checkout -b "${AXION_HMCODE_GIT_BRANCH:?}" "origin/${AXION_HMCODE_GIT_BRANCH:?}" \
+    "${GIT:?}" checkout -B "${AXION_HMCODE_GIT_BRANCH:?}" "origin/${AXION_HMCODE_GIT_BRANCH:?}" \
       >>${OUT1:?} 2>>${OUT2:?} || { error "${EC16:?}"; return 1; }
   elif [ -n "${AXION_HMCODE_GIT_TAG:-}" ]; then
     "${GIT:?}" checkout "tags/${AXION_HMCODE_GIT_TAG:?}" -b "${AXION_HMCODE_GIT_TAG:?}" \
